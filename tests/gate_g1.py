@@ -10,8 +10,8 @@ import os
 import subprocess
 import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(HERE)
+from common import ROOT, read_bfile
+
 sys.path.insert(0, os.path.join(ROOT, "oracle"))
 
 from g1_naive import count_fixed  # noqa: E402
@@ -22,18 +22,6 @@ CASES = {
     "square8": ("b006770.txt", 8),
     "tri6":    ("b001207.txt", 8),
 }
-
-
-def read_bfile(name):
-    terms = {}
-    with open(os.path.join(ROOT, "fixtures", name)) as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            n, a = line.split()
-            terms[int(n)] = int(a)
-    return terms
 
 
 def main():

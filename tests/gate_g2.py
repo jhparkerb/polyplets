@@ -17,8 +17,8 @@ import os
 import subprocess
 import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(HERE)
+from common import ROOT, read_bfile
+
 sys.path.insert(0, os.path.join(ROOT, "oracle"))
 
 from g1_naive import count_by_box  # noqa: E402
@@ -63,17 +63,6 @@ def parse_counts(out):
         parts = line.split()
         d[tuple(map(int, parts[:-1]))] = int(parts[-1])
     return d  # keys: (n,) or (n, w, h)
-
-
-def read_bfile(name):
-    terms = {}
-    with open(os.path.join(ROOT, "fixtures", name)) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#"):
-                n, a = line.split()
-                terms[int(n)] = int(a)
-    return terms
 
 
 def main():

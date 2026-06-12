@@ -115,13 +115,20 @@ func markWorkerDone(c *Campaign, idx int, output []byte) error {
 	return writeFileAtomic(c.workerOK(idx), []byte(sum+"\n"))
 }
 
+// engineArgs builds the engine command line for one worker. This is the one
+// place the harness knows the engine CLI contract
+// ("BINARY LATTICE MAXN --split S K IDX"); if the engine CLI evolves, change
+// it here and nowhere else.
+func (c *Campaign) engineArgs(idx int) []string {
+	return []string{c.Spec.Lattice, strconv.Itoa(c.Spec.MaxN),
+		"--split", strconv.Itoa(c.Spec.SplitS), strconv.Itoa(c.Spec.K),
+		strconv.Itoa(idx)}
+}
+
 func (c *Campaign) runWorker(idx int) error {
 	var lastErr error
 	for attempt := 0; attempt <= c.Spec.Retries; attempt++ {
-		cmd := exec.Command(c.Spec.Binary, c.Spec.Lattice,
-			strconv.Itoa(c.Spec.MaxN), "--split",
-			strconv.Itoa(c.Spec.SplitS), strconv.Itoa(c.Spec.K),
-			strconv.Itoa(idx))
+		cmd := exec.Command(c.Spec.Binary, c.engineArgs(idx)...)
 		out, err := cmd.Output()
 		if err != nil {
 			lastErr = fmt.Errorf("worker %d attempt %d: %w", idx, attempt+1, err)
