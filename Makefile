@@ -4,7 +4,7 @@ CXXFLAGS = -std=c++20 -Wall -Wextra -Werror
 .PHONY: gates gate-g1 gate-g2 clean
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-g3
+gates: gate-g1 gate-g2 gate-g3 gate-tma
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
@@ -23,6 +23,17 @@ build/g2: cpp/g2_redelmeier.cpp | build
 build/g2_asan: cpp/g2_redelmeier.cpp | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer $< -o $@
+
+# Gate TMA: transfer-matrix engine vs fixtures + G2 height marginals
+gate-tma: build/tma build/tma_asan build/g2
+	python3 tests/gate_tma.py
+
+build/tma: cpp/tma_main.cpp cpp/tma/*.h | build
+	$(CXX) $(CXXFLAGS) -O3 cpp/tma_main.cpp -o $@
+
+build/tma_asan: cpp/tma_main.cpp cpp/tma/*.h | build
+	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
+	    -fno-omit-frame-pointer cpp/tma_main.cpp -o $@
 
 # Gate G3: Go harness -- format, vet, tests (uses build/g2 where present)
 gate-g3: build/g2
