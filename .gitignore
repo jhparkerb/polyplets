@@ -1,0 +1,5 @@
+# copyrighted papers stay local, never pushed
+papers/
+__pycache__/
+*.pyc
+build/
