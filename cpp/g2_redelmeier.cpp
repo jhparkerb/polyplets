@@ -22,11 +22,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
-#include <utility>
 #include <vector>
 
 using u64 = std::uint64_t;
-using Cell = std::pair<int, int>;
 
 struct Offset { int dx, dy; };
 
@@ -44,9 +42,25 @@ struct Counter {
   int splitS = 0;       // 0 = no splitting
   u64 splitK = 1, splitIdx = 0;
 
-  // grid: x in [-(maxn+1), maxn+1], y in [0, maxn+1], flattened
+  // grid: x in [-(maxn+1), maxn+1], y in [0, maxn+1], flattened.
+  // status[j] != 0 means cell j is unavailable: already in some untried
+  // list or placed (the tried-set rule), or outside the allowed region /
+  // on the border. Folding all of those into one byte makes the neighbor
+  // test a single add + load. A cell's status never changes while it is
+  // placed: it was already 1 when it entered an untried list, and the
+  // tried-set rule keeps it 1 after unplacement until its adder unwinds.
   int gridW = 0;
-  std::vector<char> occupied, reached;
+  std::vector<char> status;
+  std::vector<int> xOf, yOf;          // coordinates of grid index j
+  int dj[8] = {0};                    // neighbor deltas in grid-index space
+
+  // Each search level keeps a LOCAL copy of the untried list (fixed-size
+  // C-stack buffer, flat memcpy). A fully shared stack is unsound: a child
+  // level pops entries it shares with its parent and pushes its own
+  // neighbors over those slots, clobbering state the parent still needs.
+  static constexpr int kMaxN = 40;                // enforced in main()
+  static constexpr int kMaxUntried = kMaxN * 8 + 8;
+  std::vector<int> reachedUndo;       // cells to unmark on unwind
 
   // results
   std::vector<u64> bySize;            // [n]
@@ -56,15 +70,32 @@ struct Counter {
   int size = 0, minx = 0, maxx = 0, maxy = 0;
   u64 splitCtr = 0;
 
-  int cellIndex(int x, int y) const { return y * gridW + (x + maxn + 1); }
+  // Row y=-1 exists in the grid as a blocked border: neighbor lookups are a
+  // bare j + dj[k] with no coordinate check, so every cell a delta can reach
+  // from a placeable cell must have a real, blocked entry.
+  int cellIndex(int x, int y) const { return (y + 1) * gridW + (x + maxn + 1); }
 
   static bool allowed(int x, int y) { return y > 0 || (y == 0 && x >= 0); }
 
   void init() {
     gridW = 2 * maxn + 3;
-    int cells = gridW * (maxn + 2);
-    occupied.assign(cells, 0);
-    reached.assign(cells, 0);
+    const int gridH = maxn + 3;                  // rows y = -1 .. maxn+1
+    const int cells = gridW * gridH;
+    status.assign(cells, 0);
+    xOf.assign(cells, 0);
+    yOf.assign(cells, 0);
+    for (int y = -1; y <= maxn + 1; ++y)
+      for (int x = -(maxn + 1); x <= maxn + 1; ++x) {
+        const int j = cellIndex(x, y);
+        xOf[j] = x;
+        yOf[j] = y;
+        const bool border = (y == -1) || (y == maxn + 1) ||
+                            (x == -(maxn + 1)) || (x == maxn + 1);
+        if (border || !allowed(x, y)) status[j] = 1;
+      }
+    for (int k = 0; k < deg; ++k) dj[k] = offs[k].dy * gridW + offs[k].dx;
+    reachedUndo.clear();
+    reachedUndo.reserve(static_cast<size_t>(maxn) * deg + 8);
     bySize.assign(maxn + 1, 0);
     byBox.assign((maxn + 1) * (maxn + 1) * (maxn + 1), 0);
   }
@@ -78,16 +109,16 @@ struct Counter {
     }
   }
 
-  void search(const std::vector<Cell>& untriedIn) {
-    std::vector<Cell> untried = untriedIn;
-    while (!untried.empty()) {
-      const int x = untried.back().first;
-      const int y = untried.back().second;
-      untried.pop_back();
+  void search(const int* untriedIn, int numUntried) {
+    int untried[kMaxUntried];
+    std::memcpy(untried, untriedIn,
+                static_cast<size_t>(numUntried) * sizeof(int));
+    while (numUntried > 0) {
+      const int j = untried[--numUntried];
 
-      // place the cell
-      occupied[cellIndex(x, y)] = 1;
+      // place the cell (status[j] is already 1; see comment at the field)
       const int sminx = minx, smaxx = maxx, smaxy = maxy;
+      const int x = xOf[j], y = yOf[j];
       if (x < minx) minx = x;
       if (x > maxx) maxx = x;
       if (y > maxy) maxy = y;
@@ -107,33 +138,35 @@ struct Counter {
       if (countIt) record();
 
       if (descend && size < maxn) {
-        std::vector<Cell> next = untried;
-        std::vector<int> newlyReached;
+        int newCount = numUntried;
+        const size_t undoMark = reachedUndo.size();
         for (int k = 0; k < deg; ++k) {
-          const int nx = x + offs[k].dx, ny = y + offs[k].dy;
-          if (!allowed(nx, ny)) continue;
-          const int j = cellIndex(nx, ny);
-          if (occupied[j] || reached[j]) continue;
-          reached[j] = 1;
-          newlyReached.push_back(j);
-          next.push_back({nx, ny});
+          const int j2 = j + dj[k];
+          if (!status[j2]) {
+            status[j2] = 1;
+            untried[newCount++] = j2;
+            reachedUndo.push_back(j2);
+          }
         }
-        search(next);
-        for (int j : newlyReached) reached[j] = 0;
+        search(untried, newCount);
+        while (reachedUndo.size() > undoMark) {
+          status[reachedUndo.back()] = 0;
+          reachedUndo.pop_back();
+        }
       }
 
-      // unplace; (x,y) stays 'reached' so later iterations and deeper
-      // levels of this loop never re-add it -- that is the tried-set rule
+      // unplace; (x,y) keeps status 1 so later iterations and deeper
+      // levels of this loop never re-add it -- the tried-set rule
       --size;
-      occupied[cellIndex(x, y)] = 0;
       minx = sminx; maxx = smaxx; maxy = smaxy;
     }
   }
 
   void run() {
     init();
-    reached[cellIndex(0, 0)] = 1;
-    search({{0, 0}});
+    const int origin = cellIndex(0, 0);
+    status[origin] = 1;
+    search(&origin, 1);
   }
 };
 
