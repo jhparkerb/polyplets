@@ -3,3 +3,6 @@ papers/
 __pycache__/
 *.pyc
 build/
+runs/
+build/
+harness/harness
