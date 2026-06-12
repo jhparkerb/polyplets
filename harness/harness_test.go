@@ -167,6 +167,16 @@ func TestRetryTransientFailure(t *testing.T) {
 	if merged[1] != 10 {
 		t.Errorf("merged n=1: got %d, want 10", merged[1])
 	}
+	// stderr from the failed first attempts must have been captured
+	// implicitly, per worker, separately from stdout
+	for idx := 0; idx < 2; idx++ {
+		data, err := os.ReadFile(c.workerErr(idx))
+		if err != nil {
+			t.Errorf("worker %d stderr not captured: %v", idx, err)
+		} else if !strings.Contains(string(data), "transient") {
+			t.Errorf("worker %d .err missing diagnostic: %q", idx, data)
+		}
+	}
 }
 
 // A resumed campaign with a different spec must be rejected.

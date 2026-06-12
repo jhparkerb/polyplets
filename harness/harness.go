@@ -11,6 +11,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -125,16 +126,37 @@ func (c *Campaign) engineArgs(idx int) []string {
 		strconv.Itoa(idx)}
 }
 
+func (c *Campaign) workerErr(idx int) string {
+	return filepath.Join(c.Dir, "workers", fmt.Sprintf("w%03d.err", idx))
+}
+
 func (c *Campaign) runWorker(idx int) error {
 	var lastErr error
 	for attempt := 0; attempt <= c.Spec.Retries; attempt++ {
 		cmd := exec.Command(c.Spec.Binary, c.engineArgs(idx)...)
-		out, err := cmd.Output()
+		var stdout, stderr bytes.Buffer
+		cmd.Stdout = &stdout
+		cmd.Stderr = &stderr
+		err := cmd.Run()
+		// stdout and stderr are captured separately and implicitly:
+		// stdout is the result; stderr is persisted per worker whenever
+		// nonempty, so a failure's diagnostics survive the campaign.
+		if stderr.Len() > 0 {
+			f, ferr := os.OpenFile(c.workerErr(idx),
+				os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+			if ferr == nil {
+				fmt.Fprintf(f, "--- attempt %d ---\n%s", attempt+1,
+					stderr.String())
+				f.Close()
+			}
+		}
 		if err != nil {
-			lastErr = fmt.Errorf("worker %d attempt %d: %w", idx, attempt+1, err)
+			lastErr = fmt.Errorf("worker %d attempt %d: %w (stderr: %s)",
+				idx, attempt+1, err,
+				strings.TrimSpace(stderr.String()))
 			continue
 		}
-		return markWorkerDone(c, idx, out)
+		return markWorkerDone(c, idx, stdout.Bytes())
 	}
 	return lastErr
 }
