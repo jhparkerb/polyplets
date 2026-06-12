@@ -51,6 +51,34 @@ def count_fixed(lattice, maxn):
     return counts
 
 
+def count_by_box(lattice, maxn):
+    """Return {(n, w, h): count} where w, h are bounding-box dimensions.
+
+    For tri6 the "box" is the axial-coordinate bounding parallelogram; the
+    definition only has to be translation-invariant and shared with G2.
+    Deliberately duplicates the growth loop of count_fixed: in the oracle,
+    boring beats DRY.
+    """
+    nbrs = NEIGHBORS[lattice]
+    current = {frozenset([(0, 0)])}
+    boxes = {(1, 1, 1): 1}
+    for n in range(2, maxn + 1):
+        grown = set()
+        for animal in current:
+            for (x, y) in animal:
+                for (dx, dy) in nbrs:
+                    cell = (x + dx, y + dy)
+                    if cell not in animal:
+                        grown.add(normalize(animal | {cell}))
+        for animal in grown:
+            w = max(x for x, y in animal) + 1   # normalized: min is 0
+            h = max(y for x, y in animal) + 1
+            key = (n, w, h)
+            boxes[key] = boxes.get(key, 0) + 1
+        current = grown
+    return boxes
+
+
 def main():
     if len(sys.argv) != 3 or sys.argv[1] not in NEIGHBORS:
         sys.exit(f"usage: {sys.argv[0]} {{{'|'.join(NEIGHBORS)}}} MAXN")
