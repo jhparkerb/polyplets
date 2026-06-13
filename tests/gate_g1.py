@@ -10,7 +10,7 @@ import os
 import subprocess
 import sys
 
-from common import ROOT, read_bfile
+from common import ROOT, Gate, read_bfile
 
 sys.path.insert(0, os.path.join(ROOT, "oracle"))
 
@@ -34,20 +34,17 @@ def main():
         print(sums.stdout, sums.stderr)
         return 1
 
-    failures = 0
+    gate = Gate()
     for lattice, (bfile, maxn) in CASES.items():
         expected = read_bfile(bfile)
         got = count_fixed(lattice, maxn)
         for n in range(1, maxn + 1):
             if n not in expected:
                 continue  # b-file may start past 1 or be short
-            ok = got[n] == expected[n]
-            mark = "ok " if ok else "FAIL"
-            print(f"{mark} {lattice:8s} n={n:2d}  got {got[n]:>10d}  "
-                  f"expect {expected[n]:>10d}  [{bfile}]")
-            failures += 0 if ok else 1
-    print("GATE G1:", "GREEN" if failures == 0 else f"RED ({failures} mismatches)")
-    return 1 if failures else 0
+            gate.check(got[n] == expected[n],
+                       f"{lattice:8s} n={n:2d}  got {got[n]:>10d}  "
+                       f"expect {expected[n]:>10d}  [{bfile}]")
+    return gate.verdict("G1")
 
 
 if __name__ == "__main__":

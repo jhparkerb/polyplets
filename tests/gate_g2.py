@@ -14,10 +14,9 @@ emitting "n count" lines (or "n w h count" with --per-box).
 """
 
 import os
-import subprocess
 import sys
 
-from common import ROOT, read_bfile
+from common import ROOT, Gate, parse_counts, read_bfile, run
 
 sys.path.insert(0, os.path.join(ROOT, "oracle"))
 
@@ -39,33 +38,9 @@ SPLIT_CASE = ("square8", 9, 4, 3)  # lattice, maxn, split size S, K workers
 # check D: sanitizer build depths
 ASAN_CASES = {"square4": 11, "square8": 8, "tri6": 9}
 
-failures = 0
-
-
-def check(ok, label):
-    global failures
-    print(("ok   " if ok else "FAIL ") + label)
-    if not ok:
-        failures += 1
-
-
-def run(binary, *args):
-    r = subprocess.run([binary] + [str(a) for a in args],
-                       capture_output=True, text=True)
-    if r.returncode != 0:
-        raise RuntimeError(f"{binary} {args}: rc={r.returncode}\n{r.stderr}")
-    return r.stdout
-
-
-def parse_counts(out):
-    d = {}
-    for line in out.strip().splitlines():
-        parts = line.split()
-        d[tuple(map(int, parts[:-1]))] = int(parts[-1])
-    return d  # keys: (n,) or (n, w, h)
-
 
 def main():
+    gate = Gate()
     for b in (G2, G2_ASAN):
         if not os.path.exists(b):
             print(f"FAIL missing binary {b} (run: make build/g2 build/g2_asan)")
@@ -77,7 +52,7 @@ def main():
         got = parse_counts(run(G2, lattice, depth))
         bad = [n for n in range(1, depth + 1)
                if n in expected and got.get((n,)) != expected[n]]
-        check(not bad, f"A fixtures  {lattice:8s} n<={depth}  vs {bfile}"
+        gate.check(not bad, f"A fixtures  {lattice:8s} n<={depth}  vs {bfile}"
               + (f"  MISMATCH at n={bad}" if bad else ""))
 
     # B. per-box vs oracle
@@ -85,7 +60,7 @@ def main():
         oracle = count_by_box(lattice, depth)
         engine = {k: v for k, v in
                   parse_counts(run(G2, lattice, depth, "--per-box")).items()}
-        check(engine == oracle,
+        gate.check(engine == oracle,
               f"B per-box   {lattice:8s} n<={depth}  vs G1 oracle "
               f"({len(oracle)} box classes)")
 
@@ -97,17 +72,16 @@ def main():
         part = parse_counts(run(G2, lattice, maxn, "--split", S, K, idx))
         for k, v in part.items():
             summed[k] = summed.get(k, 0) + v
-    check(summed == full,
+    gate.check(summed == full,
           f"C split     {lattice} n<={maxn} S={S} K={K}: workers sum to full run")
 
     # D. sanitizer build agrees and runs clean
     for lattice, depth in ASAN_CASES.items():
         opt = parse_counts(run(G2, lattice, depth))
         san = parse_counts(run(G2_ASAN, lattice, depth))
-        check(opt == san, f"D asan      {lattice:8s} n<={depth}  clean + equal")
+        gate.check(opt == san, f"D asan      {lattice:8s} n<={depth}  clean + equal")
 
-    print("GATE G2:", "GREEN" if failures == 0 else f"RED ({failures} failures)")
-    return 1 if failures else 0
+    return gate.verdict("G2")
 
 
 if __name__ == "__main__":

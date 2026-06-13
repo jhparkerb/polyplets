@@ -41,13 +41,15 @@ inline void unite(std::vector<int>& p, int a, int b) {
 // `mask` bit r set means the new column's row r is occupied.
 inline ColResult stepColumnSquare8(const std::string& old, int H,
                                    unsigned mask) {
-  int comps = 0;
+  int comps = 0, maxLabel = 0;
   bool present[256] = {false};
-  int maxLabel = 0;
   for (int i = 0; i < H; ++i) {
     const unsigned char L = static_cast<unsigned char>(old[i]);
-    if (L && !present[L]) { present[L] = true; ++comps; }
-    maxLabel = std::max(maxLabel, static_cast<int>(L));
+    if (L && !present[L]) {
+      present[L] = true;
+      ++comps;
+      if (L > maxLabel) maxLabel = L;
+    }
   }
 
   // mask == 0 closes the animal: nothing can connect further, so it is a
