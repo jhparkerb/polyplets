@@ -21,12 +21,6 @@
 #include "statedb.h"
 #include "transition_square4.h"
 
-struct SweepResults {
-  // byHeight[h][n] = fixed animals with n cells and height exactly h
-  std::vector<Counts> byHeight;
-  Counts totals;
-};
-
 inline SweepResults sweepSquare4(int maxn) {
   SweepResults res;
   res.byHeight.assign(maxn + 1, Counts(maxn + 1, 0));

@@ -9,15 +9,17 @@
 #include <string>
 
 #include "tma/sweep.h"
+#include "tma/sweep8.h"
 
 int main(int argc, char** argv) {
   if (argc < 3) {
-    std::fprintf(stderr, "usage: %s square4 MAXN [--per-height]\n", argv[0]);
+    std::fprintf(stderr, "usage: %s {square4|square8} MAXN [--per-height]\n",
+                 argv[0]);
     return 2;
   }
-  if (std::string(argv[1]) != "square4") {
-    std::fprintf(stderr,
-                 "only the square4 validation lattice exists so far\n");
+  const std::string lattice = argv[1];
+  if (lattice != "square4" && lattice != "square8") {
+    std::fprintf(stderr, "lattice must be square4 or square8 (v0 engine)\n");
     return 2;
   }
   const int maxn = std::atoi(argv[2]);
@@ -27,7 +29,8 @@ int main(int argc, char** argv) {
   }
   const bool perHeight = (argc > 3 && std::strcmp(argv[3], "--per-height") == 0);
 
-  SweepResults res = sweepSquare4(maxn);
+  SweepResults res =
+      (lattice == "square4") ? sweepSquare4(maxn) : sweepSquare8(maxn);
 
   if (perHeight) {
     for (int h = 1; h <= maxn; ++h)

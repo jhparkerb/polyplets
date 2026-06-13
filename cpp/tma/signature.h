@@ -16,6 +16,9 @@
 
 #include <string>
 
+// Result of feeding a partial animal one transition step.
+enum class Outcome { Alive, Dead, Complete };
+
 // Canonical form: relabel components in order of first occurrence (1, 2, ...).
 // Flags are untouched. Idempotent.
 inline std::string canonicalize(std::string sig, int H) {

@@ -15,6 +15,12 @@ using u64 = std::uint64_t;
 using Counts = std::vector<u64>;  // index = animal size, 0..maxn
 using StateDB = std::unordered_map<std::string, Counts>;
 
+struct SweepResults {
+  // byHeight[h][n] = fixed animals with n cells and height exactly h
+  std::vector<Counts> byHeight;
+  Counts totals;
+};
+
 // Accumulate src into db[sig], shifting sizes by `shift` (1 when the
 // transition occupied a cell), dropping sizes that exceed maxn.
 inline void addCounts(StateDB& db, const std::string& sig, const Counts& src,

@@ -79,6 +79,33 @@ def main():
     san = parse_lines(run(TMA_ASAN, "square4", depth_c))
     check(opt == san, f"C asan        square4 n<={depth_c} clean + equal")
 
+    # --- square-8 (polyplets): THE novel transition ---
+
+    # D. totals vs the real OEIS sequence A006770 (king-move animals)
+    depth_d = 11
+    exp8 = read_bfile("b006770.txt")
+    got8 = parse_lines(run(TMA, "square8", depth_d))
+    bad8 = [n for n in range(1, depth_d + 1) if got8.get((n,)) != exp8[n]]
+    check(not bad8, f"D totals      square8 n<={depth_d} vs b006770.txt"
+          + (f"  MISMATCH at n={bad8}" if bad8 else ""))
+
+    # E. per-height vs G2 per-box marginals (transfer matrix vs generation)
+    depth_e = 9
+    tma8_h = parse_lines(run(TMA, "square8", depth_e, "--per-height"))
+    marg8 = {}
+    for (n, w, h), c in parse_lines(
+            run(G2, "square8", depth_e, "--per-box")).items():
+        marg8[(h, n)] = marg8.get((h, n), 0) + c
+    check(tma8_h == marg8,
+          f"E per-height  square8 n<={depth_e} vs G2 per-box marginals "
+          f"({len(marg8)} (h,n) classes)")
+
+    # F. square-8 sanitizer build clean + equal
+    depth_f = 8
+    check(parse_lines(run(TMA, "square8", depth_f))
+          == parse_lines(run(TMA_ASAN, "square8", depth_f)),
+          f"F asan        square8 n<={depth_f} clean + equal")
+
     print("GATE TMA:", "GREEN" if failures == 0 else f"RED ({failures} failures)")
     return 1 if failures else 0
 

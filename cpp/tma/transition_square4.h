@@ -17,8 +17,6 @@
 
 #include "signature.h"
 
-enum class Outcome { Alive, Dead, Complete };
-
 struct StepResult {
   Outcome outcome;
   std::string sig;  // canonical; meaningful only for Alive
