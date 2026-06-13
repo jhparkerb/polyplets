@@ -79,6 +79,80 @@ def count_by_box(lattice, maxn):
     return boxes
 
 
+# The eight elements of D4 acting on square-lattice cell coordinates.
+# Order: e, r90, r180, r270, then mirrors h, v, d1 (y=x), d2 (y=-x).
+# The first four are the rotation subgroup C4 (one-sided symmetry).
+D4 = [
+    lambda x, y: (x, y),
+    lambda x, y: (-y, x),
+    lambda x, y: (-x, -y),
+    lambda x, y: (y, -x),
+    lambda x, y: (x, -y),
+    lambda x, y: (-x, y),
+    lambda x, y: (y, x),
+    lambda x, y: (-y, -x),
+]
+
+
+def canon_under(cells, t):
+    """Apply transform t, translate to the origin, return a sorted tuple.
+
+    A sorted tuple (unlike a frozenset) is orderable, so min() over the
+    eight images gives a canonical representative of the free orbit.
+    """
+    pts = [t(x, y) for (x, y) in cells]
+    mx = min(x for x, y in pts)
+    my = min(y for x, y in pts)
+    return tuple(sorted((x - mx, y - my) for x, y in pts))
+
+
+def count_symmetry(lattice, maxn):
+    """Brute-force free/one-sided/fixed counts and per-element fixed counts.
+
+    Square lattices only (D4 symmetry); polyhexes have a different group.
+    Returns {fixed, free, onesided, classfix[8]} as {n: count} dicts.
+    Deliberately re-grows from scratch -- oracle clarity over reuse.
+    Validates Burnside internally: sum(classfix)/8 == free.
+    """
+    assert lattice in ("square4", "square8")
+    nbrs = NEIGHBORS[lattice]
+    fixed, free, onesided = {}, {}, {}
+    classfix = {i: {} for i in range(8)}
+
+    def analyze(animals, n):
+        free_orbits, onesided_orbits = set(), set()
+        cfix = [0] * 8
+        for a in animals:
+            self_form = canon_under(a, D4[0])
+            imgs = [canon_under(a, t) for t in D4]
+            for i, im in enumerate(imgs):
+                if im == self_form:
+                    cfix[i] += 1
+            free_orbits.add(min(imgs))
+            onesided_orbits.add(min(imgs[:4]))
+        free[n] = len(free_orbits)
+        onesided[n] = len(onesided_orbits)
+        for i in range(8):
+            classfix[i][n] = cfix[i]
+
+    current = {frozenset([(0, 0)])}
+    fixed[1] = 1
+    analyze(current, 1)
+    for n in range(2, maxn + 1):
+        grown = set()
+        for animal in current:
+            for (x, y) in animal:
+                for (dx, dy) in nbrs:
+                    cell = (x + dx, y + dy)
+                    if cell not in animal:
+                        grown.add(normalize(animal | {cell}))
+        fixed[n] = len(grown)
+        analyze(grown, n)
+        current = grown
+    return {"fixed": fixed, "free": free,
+            "onesided": onesided, "classfix": classfix}
+
+
 def main():
     if len(sys.argv) != 3 or sys.argv[1] not in NEIGHBORS:
         sys.exit(f"usage: {sys.argv[0]} {{{'|'.join(NEIGHBORS)}}} MAXN")
