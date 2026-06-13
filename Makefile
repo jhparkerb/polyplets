@@ -4,7 +4,7 @@ CXXFLAGS = -std=c++20 -Wall -Wextra -Werror
 .PHONY: gates gate-g1 gate-g2 clean
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-g3 gate-tma gate-s2
+gates: gate-g1 gate-g2 gate-g3 gate-tma gate-s2 gate-e0
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
@@ -34,6 +34,13 @@ build/tma: cpp/tma_main.cpp cpp/tma/*.h | build
 build/tma_asan: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer cpp/tma_main.cpp -o $@
+
+# Gate E0: weighted connected-subgraph counter vs brute force
+gate-e0: build/subgraph_count
+	python3 tests/gate_e0.py
+
+build/subgraph_count: cpp/sym/subgraph_count.cpp | build
+	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
 # Gate S2: free/one-sided Burnside counts vs A000105/A030222 (oracle-grade)
 gate-s2:
