@@ -182,10 +182,15 @@ Nothing here is compute-bound; the work is correctness of the builders.
   extrapolated only in the sense that the *algorithm* is fixed and validated —
   same standing as any validated engine past its last cross-checkable term.
 
-## 8. Immediate first step
+## 8. First step — DONE June 13, 2026
 
-E0: the weighted connected-subgraph counter with tiny-graph unit tests, then
-feed it the plain n×n king graph and confirm it reproduces A006770's small
-terms (a sanity check that the generic counter + a trivial "all weight 1, no
-symmetry" graph agrees with the existing engines before any orbit geometry is
-added).
+E0: the weighted connected-subgraph counter, validated against exhaustive
+2^V brute-force subset enumeration on small graphs (gate_e0, green). NOTE: an
+earlier draft proposed sanity-checking E0 by feeding it a king graph to
+reproduce A006770 -- that is WRONG. A finite graph counts *positional*
+subsets, not translation classes, so it would overcount; the lattice/
+translation modding only appears once the orbit-graph geometry (center pinned
+at the origin) is added in E1+. The correct E0 oracle is brute subsets.
+
+Next: E1 -- R180 orbit-graph builders (weights 1 on the center cell, 2 on
+pairs), validate the total against the brute oracle's Fix(r180).
