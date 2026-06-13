@@ -206,10 +206,17 @@ func formatCounts(m map[int]uint64) []byte {
 	return []byte(b.String())
 }
 
-// merge sums all workers' counts elementwise, refusing on u64 overflow.
+// merge sums all workers' counts elementwise. It re-verifies every worker's
+// .ok hash first (completeness: all K present; integrity: .out not corrupted
+// since it was written) so a missing or tampered shard fails loudly rather
+// than producing a silently-low total. Refuses on u64 overflow.
 func (c *Campaign) merge() (map[int]uint64, error) {
 	total := make(map[int]uint64)
 	for idx := 0; idx < c.Spec.K; idx++ {
+		if !c.workerDone(idx) {
+			return nil, fmt.Errorf("worker %d missing or .ok hash mismatch; "+
+				"campaign incomplete", idx)
+		}
 		m, err := readCounts(c.workerOut(idx))
 		if err != nil {
 			return nil, fmt.Errorf("worker %d output: %w", idx, err)
