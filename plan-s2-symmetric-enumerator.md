@@ -47,10 +47,25 @@ different generator rather than just a different split. This plan does not
 replace that; it provides the cheap partial check now and the free-count
 science regardless. Both should be stated plainly when a(19) is submitted.
 
-## 2. Method: the orbit-graph reduction
+## 2. Method
 
-A g-symmetric animal is a union of ⟨g⟩-orbits of cells. Claim (proved in
-`docs-s2-symmetric-enumerator.md`): g-symmetric animals of size n correspond
+> **CORRECTION (June 13, 2026):** the orbit-graph reduction described in this
+> section is **WRONG** — it overcounts (connected-in-orbit-graph does NOT imply
+> connected animal; counterexample {(1,0),(-1,0)} under R180). See
+> `docs-s2-symmetric-enumerator.md` for the full diagnosis. The correct method
+> is **direct symmetric generation** (grow connected symmetric animals
+> cell-by-cell with orbit-images added together, real cell-connectivity
+> tracked, anchored to count once — the Shirakawa/Redelmeier approach).
+> Components E1–E4 and the gate below must be re-cast around generation, not
+> E0 subgraph counting; E0 stays as a correct but now-unused utility. The
+> goal/scope (§1), the validation-against-oracle discipline (§4), and the
+> Burnside assembly (E3/§6) are unchanged. The section below is retained only
+> to show the rejected design.
+
+### (rejected) orbit-graph reduction
+
+A g-symmetric animal is a union of ⟨g⟩-orbits of cells. Claim (FALSE, see
+above): g-symmetric animals of size n correspond
 one-to-one with **connected weighted subgraphs of total weight n in the orbit
 graph**, where
 
