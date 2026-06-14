@@ -35,8 +35,11 @@ build/tma_asan: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer cpp/tma_main.cpp -o $@
 
+build/symcount_fast: cpp/sym/symcount_fast.cpp | build
+	$(CXX) $(CXXFLAGS) -O3 $< -o $@
+
 # Gate sym: symmetric-polyplet counters (4 types) + free count vs A030222
-gate-sym:
+gate-sym: build/symcount_fast
 	python3 tests/gate_sym.py
 
 # Gate E0: weighted connected-subgraph counter vs brute force

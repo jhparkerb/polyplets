@@ -13,6 +13,7 @@ one orientation), D = #(diagonal mirror, one orientation).
 """
 
 import os
+import subprocess
 import sys
 
 from common import ROOT, Gate, read_bfile
@@ -24,6 +25,7 @@ from symcount import SYMMETRY_TYPES, count_symmetry_type  # noqa: E402
 from g1_naive import count_symmetry  # noqa: E402
 
 MAXN = 8  # oracle reach; enough to exercise every placement type
+FAST_MAXN = 11  # depth for the C++ vs Python cross-check
 
 # which oracle D4 fixed-point index each symmetry type must match
 ORACLE_INDEX = {
@@ -32,6 +34,14 @@ ORACLE_INDEX = {
     "axis mirror": 4,
     "diagonal mirror": 6,
 }
+# C++ symcount_fast CLI name for each symmetry type
+FAST_NAME = {
+    "90-degree rotation": "r90",
+    "180-degree rotation": "r180",
+    "axis mirror": "hmirror",
+    "diagonal mirror": "dmirror",
+}
+FAST_BIN = os.path.join(ROOT, "build", "symcount_fast")
 
 
 def main():
@@ -73,6 +83,21 @@ def main():
     if free_bad:
         label += f"  MISMATCH {free_bad}"
     gate.check(not free_bad, label)
+
+    # C++ fast counter must match the Python reference for every type
+    if os.path.exists(FAST_BIN):
+        for name, (placements, anchor) in SYMMETRY_TYPES.items():
+            py = count_symmetry_type(placements, FAST_MAXN, anchor)
+            out = subprocess.run([FAST_BIN, FAST_NAME[name], str(FAST_MAXN)],
+                                 capture_output=True, text=True, check=True).stdout
+            cpp = {}
+            for line in out.strip().splitlines():
+                a, b = line.split()
+                cpp[int(a)] = int(b)
+            py = {n: v for n, v in py.items() if v}
+            gate.check(cpp == py, f"C++ {name:20s} == Python, n<={FAST_MAXN}")
+    else:
+        print(f"note: {FAST_BIN} absent, skipping C++ cross-check")
 
     return gate.verdict("symmetric/free")
 
