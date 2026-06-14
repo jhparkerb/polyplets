@@ -56,3 +56,34 @@ animals are ~2.6^n so it reaches n>=19 cheaply. The subtle cases to get right
 E0 (cpp/sym/subgraph_count.cpp) is a correct general utility but is NOT on the
 S2 path; leave it as-is. Build the symmetric generator next, oracle-validated
 at every placement.
+
+### Concrete correct design (worked out June 13, 2026)
+The clean insight that makes generation correct: **symmetry makes the partner
+connect for free.** If we add a lower-half cell c that is king-adjacent to
+some cell d already in the (symmetric) animal A, then by symmetry rho(c) is
+adjacent to rho(d), and rho(d) is also in A -- so rho(c) connects too. Hence
+growing one "half" while requiring each new cell to touch the current animal
+keeps the *full* animal connected automatically. That is exactly what the
+orbit-graph shortcut threw away (it never checked real adjacency to A).
+
+Anchoring (count each animal once): the lower half is L = { c in A : c < rho(c)
+lexicographically }; every cell of A is in L or rho(L) (or is the center).
+min(A) lies in L. Generate L by Redelmeier rooted at min(A), adding only
+lower-half cells > min(A) that are king-adjacent to the current full animal.
+
+R180 needs two sub-generators (to handle the center as an optional bridge):
+- **(b) no center:** seed = a lower-half cell; A0 = L ∪ rho(L); require A0
+  connected throughout; anchor at min(A0). Used for M/V (no center cell exists)
+  and for center-free C animals.
+- **(a) center-containing (C only):** seed = {center cell}; grow lower-half
+  cells adjacent to A1 = {center} ∪ L ∪ rho(L); Redelmeier-from-fixed-seed
+  counts each once. This is the ONLY way to get "ring" animals where the two
+  halves join *only* through the center -- the case the orbit graph missed.
+R90 is the same idea with 4-cell orbits (quarter as the fundamental domain,
+center optional); H/D mirrors with 2-cell orbits and self-paired axis cells
+(or Shirakawa's half-region weighted TMA).
+
+Validate (a)+(b) summed per placement against count_symmetry's Fix(g) at small
+n; the oracle distinguishes overcount (spurious disconnected sets) from
+undercount (missed ring/winding animals), so it pins down which sub-generator
+is wrong.
