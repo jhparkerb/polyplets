@@ -21,7 +21,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, os.path.join(ROOT, "tests"))
-from common import read_bfile  # noqa: E402
+from common import free_and_one_sided, read_bfile  # noqa: E402
 
 FAST = os.path.join(ROOT, "build", "symcount_fast")
 TYPES = ["r90", "r180", "hmirror", "dmirror"]
@@ -54,12 +54,8 @@ def main():
     for n in range(1, maxn + 1):
         if n not in fixed:
             continue
-        ft = (fixed[n] + 2 * g("r90", n) + g("r180", n)
-              + 2 * g("hmirror", n) + 2 * g("dmirror", n))
-        ot = fixed[n] + 2 * g("r90", n) + g("r180", n)
-        assert ft % 8 == 0, f"Free({n}) not divisible by 8"
-        assert ot % 4 == 0, f"OneSided({n}) not divisible by 4"
-        free, one = ft // 8, ot // 4
+        free, one = free_and_one_sided(
+            fixed[n], g("r90", n), g("r180", n), g("hmirror", n), g("dmirror", n))
         note = ""
         if n in free_known:
             note = "ok vs A030222" if free == free_known[n] else \

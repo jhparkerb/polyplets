@@ -13,7 +13,6 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -121,9 +120,9 @@ struct Counter {
     const int V = static_cast<int>(orbitCells.size());
     weight.assign(V, 0);
     for (int i = 0; i < V; ++i) weight[i] = static_cast<int>(orbitCells[i].size());
-    // adjacency
+    // adjacency (per-orbit mark vector dedups neighbours; V is small and this
+    // runs once per placement, not in the search hot path)
     adj.assign(V, {});
-    std::vector<std::vector<char>> seenEdge;  // dedup via per-orbit marks
     for (int i = 0; i < V; ++i) {
       std::vector<char> mark(V, 0);
       mark[i] = 1;

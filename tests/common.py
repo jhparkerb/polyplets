@@ -38,6 +38,19 @@ def parse_counts(out):
     return d
 
 
+def free_and_one_sided(fixed, r90, r180, hmirror, dmirror):
+    """Burnside's lemma on the square lattice (D4): free and one-sided polyomino/
+    polyplet counts from the fixed count plus the four symmetric counts (each
+    one orientation; the 2x coefficients cover the conjugate orientations).
+    Returns (free, one_sided); raises ValueError if a total is not integral,
+    which signals a wrong fixed or symmetric input."""
+    free_num = fixed + 2 * r90 + r180 + 2 * hmirror + 2 * dmirror
+    one_num = fixed + 2 * r90 + r180
+    if free_num % 8 or one_num % 4:
+        raise ValueError(f"Burnside not integral (free8={free_num}, one4={one_num})")
+    return free_num // 8, one_num // 4
+
+
 class Gate:
     """Accumulates pass/fail results and prints a GREEN/RED verdict."""
 
