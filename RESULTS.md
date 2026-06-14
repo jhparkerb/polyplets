@@ -27,7 +27,8 @@ agreement is recorded in the ledger.
 ## R1 — Fixed polyplets, a(19) of A006770
 
 **Value:** a(19) = 151,609,203,011,580
-**Status:** **candidate** (one independent confirmation in progress)
+**Status:** **confirmed** (two decorrelated campaigns agree bit-for-bit;
+algorithm-independent transfer-matrix check additionally in progress)
 
 **What it is:** the number of fixed (translation-distinct) king-move animals
 of 19 cells — the first term past the previous record of n=18.
@@ -49,19 +50,29 @@ split 7×64, `runs/a19-A/`. Ledger: `campaign_complete` entry for a19-A.
   published b-file on n≤18 (all match) and the growth ratio a(19)/a(18)=6.7468
   continues the monotone climb toward the growth constant.
 
-**What is still pending before "confirmed":**
+**The confirmation (done 2026-06-14):**
 - campaign "a19-B" on **ayr** (x86 / GCC, split 8×96) — different ISA,
-  compiler, *and* decomposition — then `harness verify a19-A a19-B`. (In
-  progress.) Integer-only arithmetic ⇒ the two must agree bit-for-bit.
-- the fully algorithm-independent equality check (the transfer-matrix engine —
-  a different counting algorithm — reaching n=19) is now **measured feasible**:
-  the boundary-state count grows at base k≈2.6, so with the standard aspect
-  optimisation (height capped at ⌈n/2⌉=10) the peak is ~10^4–10^5 states,
-  megabyte-scale. See `results/tma_state_growth.md`. The remaining work is
-  moderate/standard (aspect trick + non-brute mask enumeration), not research.
-  Until that exists, the dual campaigns (shared generation algorithm) plus the
-  mod-8 Burnside congruence are the independent checks; with it, a(19) can reach
-  genuine "confirmed".
+  compiler, hardware, *and* decomposition — completed 96/96. Its `results.txt`
+  is **byte-identical** to a19-A (SHA256 `558f0bdf…` on both), so a(19) and all
+  n≤18 agree bit-for-bit. `harness verify -a runs/a19-A -b runs/a19-B` →
+  "campaigns agree"; ledger `verified` event 2026-06-14T16:43:33Z. Integer-only
+  arithmetic ⇒ a shared hardware/compiler/scheduling fault could not have
+  produced identical wrong digits.
+- consistent with external truth: n≤18 == A006770 (the published range,
+  including Fixed(18)=22,471,158,811,164).
+
+**Residual risk and the further check in progress:**
+- both campaigns run the **same generation algorithm** (Redelmeier), so the one
+  failure mode they cannot catch is a shared algorithmic bug invisible at n≤18.
+  The mod-8 Burnside congruence is one orthogonal guard. The stronger guard —
+  an **algorithm-independent** recount by the column transfer-matrix engine (a
+  different counting method) reaching n=19 — is under construction
+  (`plan-transfer-matrix-a19.md`): viable-mask enumeration and an
+  admissible size-budget prune are built and gate-validated against A006770;
+  the n=19 run is the remaining step. Honest scale (corrected from the earlier
+  note): the size-budget prune is modest (~15%), peak ≈ a few ×10⁷ boundary
+  states, so n=19 is a few-GB run, not megabyte-scale. See
+  `results/tma_state_growth.md`.
 
 ---
 
