@@ -53,11 +53,15 @@ split 7×64, `runs/a19-A/`. Ledger: `campaign_complete` entry for a19-A.
 - campaign "a19-B" on **ayr** (x86 / GCC, split 8×96) — different ISA,
   compiler, *and* decomposition — then `harness verify a19-A a19-B`. (In
   progress.) Integer-only arithmetic ⇒ the two must agree bit-for-bit.
-- not done, noted honestly: a fully algorithm-independent equality check (the
-  transfer-matrix engine reaching n=19) — the dual campaigns share the
-  generation *algorithm*, so they catch decomposition/compiler/hardware faults
-  but not an algorithm bug. At n≥19 there is no external anchor, so this and
-  the Burnside congruence (below) are the only independent checks.
+- the fully algorithm-independent equality check (the transfer-matrix engine —
+  a different counting algorithm — reaching n=19) is now **measured feasible**:
+  the boundary-state count grows at base k≈2.6, so with the standard aspect
+  optimisation (height capped at ⌈n/2⌉=10) the peak is ~10^4–10^5 states,
+  megabyte-scale. See `results/tma_state_growth.md`. The remaining work is
+  moderate/standard (aspect trick + non-brute mask enumeration), not research.
+  Until that exists, the dual campaigns (shared generation algorithm) plus the
+  mod-8 Burnside congruence are the independent checks; with it, a(19) can reach
+  genuine "confirmed".
 
 ---
 

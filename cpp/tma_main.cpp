@@ -32,6 +32,10 @@ int main(int argc, char** argv) {
   SweepResults res =
       (lattice == "square4") ? sweepSquare4(maxn) : sweepSquare8(maxn);
 
+  // calibration line on stderr: peak distinct signatures (memory bottleneck)
+  std::fprintf(stderr, "peak_states %llu peak_height %d\n",
+               static_cast<unsigned long long>(res.peakStates), res.peakHeight);
+
   if (perHeight) {
     for (int h = 1; h <= maxn; ++h)
       for (int n = 1; n <= maxn; ++n)

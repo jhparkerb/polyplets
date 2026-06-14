@@ -33,6 +33,10 @@ inline SweepResults sweepSquare8(int maxn) {
     db[startSig][0] = 1;
 
     for (int col = 0; col <= maxn && !db.empty(); ++col) {
+      if (db.size() > res.peakStates) {
+        res.peakStates = db.size();
+        res.peakHeight = H;
+      }
       StateDB next;
       for (const auto& [sig, counts] : db) {
         for (unsigned mask = 0; mask < (1u << H); ++mask) {

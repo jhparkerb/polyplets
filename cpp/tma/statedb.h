@@ -19,6 +19,10 @@ struct SweepResults {
   // byHeight[h][n] = fixed animals with n cells and height exactly h
   std::vector<Counts> byHeight;
   Counts totals;
+  // calibration: peak number of distinct boundary signatures held at once
+  // (the memory bottleneck), and the boundary height where that peak occurred.
+  u64 peakStates = 0;
+  int peakHeight = 0;
 };
 
 // Accumulate src into db[sig], shifting sizes by `shift` (1 when the
