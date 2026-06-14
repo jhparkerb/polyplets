@@ -67,10 +67,15 @@ def _connected(cells):
     return len(seen) == len(cells)
 
 
-def count_symmetric(group, maxn):
+def count_symmetric(group, maxn, anchor=None):
     """Return {n: # connected g-symmetric animals of size n} for 1<=n<=maxn,
-    with g's centre pinned (one placement)."""
-    orbits, adj = build_orbit_graph(group, maxn)
+    with g's centre/axis pinned (one placement).
+
+    anchor: optional predicate(cells)->bool used to pin any residual
+    translation a pinned *axis* still allows (a rotation centre pins
+    everything, so anchor=None there; a mirror line leaves translation ALONG
+    it free, so the anchor selects one canonical translate)."""
+    orbits, adj = build_orbit_graph(group, maxn + 2)
     weight = [len(o) for o in orbits]
     counts = [0] * (maxn + 1)
     V = len(orbits)
@@ -78,7 +83,7 @@ def count_symmetric(group, maxn):
 
     def search(root, chosen, untried, w):
         cells = [c for idx in chosen for c in orbits[idx]]
-        if _connected(cells):
+        if _connected(cells) and (anchor is None or anchor(cells)):
             counts[w] += 1
         ut = list(untried)
         while ut:
@@ -121,11 +126,62 @@ R180_PLACEMENTS = {
     "V":  [ID, lambda x, y: (1 - x, 1 - y)], # vertex
 }
 
+# 90-degree rotational symmetry: the 4-fold centre sits on a cell or a vertex
+# (never an edge midpoint). Each group is the 4 rotations about that centre.
+R90_PLACEMENTS = {
+    "cell":   [ID,
+               lambda x, y: (-y, x),
+               lambda x, y: (-x, -y),
+               lambda x, y: (y, -x)],
+    "vertex": [ID,
+               lambda x, y: (1 - y, x),
+               lambda x, y: (1 - x, 1 - y),
+               lambda x, y: (y, 1 - x)],
+}
 
-def count_symmetry_type(placements, maxn):
-    """Sum counts over all centre placements of one symmetry type."""
+# Axis-parallel mirror (count the horizontal orientation only; Burnside's
+# coefficient 2 covers the vertical one). Axis runs through a row of cells or
+# between two rows.
+HMIRROR_PLACEMENTS = {
+    "through_cells": [ID, lambda x, y: (x, -y)],
+    "between_rows":  [ID, lambda x, y: (x, 1 - y)],
+}
+
+# Diagonal mirror (main diagonal only; coefficient 2 covers the anti-diagonal).
+# A diagonal lattice reflection must run through cell centres, so there is just
+# the one placement.
+DMIRROR_PLACEMENTS = {
+    "through_cells": [ID, lambda x, y: (y, x)],
+}
+
+# Residual-translation anchors: a rotation centre pins position fully (None);
+# a horizontal mirror axis leaves x free -> pin leftmost cell at x=0; a
+# diagonal axis leaves the (1,1) direction free -> pin min(x+y) to {0,1}
+# (translation along the diagonal moves x+y in steps of 2).
+NO_ANCHOR = None
+
+
+def _anchor_xmin0(cells):
+    return min(c[0] for c in cells) == 0
+
+
+def _anchor_diag(cells):
+    return min(c[0] + c[1] for c in cells) in (0, 1)
+
+
+# Each symmetry type: (placements, anchor). Summing placements -> Fix(g).
+SYMMETRY_TYPES = {
+    "90-degree rotation":  (R90_PLACEMENTS, NO_ANCHOR),
+    "180-degree rotation": (R180_PLACEMENTS, NO_ANCHOR),
+    "axis mirror":         (HMIRROR_PLACEMENTS, _anchor_xmin0),
+    "diagonal mirror":     (DMIRROR_PLACEMENTS, _anchor_diag),
+}
+
+
+def count_symmetry_type(placements, maxn, anchor=None):
+    """Sum counts over all centre/axis placements of one symmetry type."""
     total = {}
     for group in placements.values():
-        for n, c in count_symmetric(group, maxn).items():
+        for n, c in count_symmetric(group, maxn, anchor).items():
             total[n] = total.get(n, 0) + c
     return total
