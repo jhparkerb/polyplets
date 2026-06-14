@@ -1,61 +1,76 @@
-// T4 driver for the column-at-a-time square-8 engine.
+// Driver for the column-at-a-time square-8 (polyplet) engine.
 //
 // Per strip height H: seed the empty boundary, then place columns left to
-// right. At each column step every live state branches over all 2^H column
-// occupancy masks: mask 0 harvests (Complete -> count, Dead -> drop), a
-// nonzero mask extends to a new state (or dies if it strands an old
-// component). Leftmost column anchored at 0 (the seed's only animal-starting
-// move) and exact-height-H via the touch flags make each fixed polyplet
-// counted once, so A(n) = sum over H of byHeight[H][n].
+// right. Each live state branches over the viable column masks (nonzero,
+// non-stranding, in budget -- forEachViableMask); mask 0 harvests a completed
+// animal, a nonzero mask extends to a new state unless the size-budget prune
+// (min cells so far + admissible completion bound > maxn) rules it out.
+// Leftmost column anchored at 0 by the seed, exact-height-H via the touch
+// flags, so each fixed polyplet is counted once and A(n) = sum_H byHeight[H][n].
 //
-// v0: no pruning, serial, plain-map statedb, brute 2^H mask fan-out. The
-// fan-out caps practical reach; this engine's job is to PROVE the king-move
-// transfer matrix is correct, not to set records.
+// Strip heights are INDEPENDENT sub-sums, so sweepSquare8Height runs one height
+// in isolation -- the unit the driver checkpoints, resumes, and (later)
+// parallelizes over.
 
 #pragma once
 
-#include <string>
 #include <utility>
 #include <vector>
 
 #include "statedb.h"
 #include "transition_square8.h"
 
+// Count fixed polyplets of height exactly H (sizes 0..maxn), returned as a
+// byHeight row. Updates res.peakStates/peakHeight (the memory high-water mark).
+inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res) {
+  Counts row(maxn + 1, 0);
+  FlatDB db(maxn), next(maxn);
+  Sig seed;
+  std::memset(seed.b, 0, SIGMAX);
+  db.slot(seed)[0] = 1;
+
+  for (int col = 0; col <= maxn && !db.empty(); ++col) {
+    if (db.size() > res.peakStates) {
+      res.peakStates = db.size();
+      res.peakHeight = H;
+    }
+    next.clear();
+    db.for_each([&](const Sig& sig, const u64* counts) {
+      const int ms = minSizeRow(counts, maxn);
+      if (ms < 0) return;
+      // The boundary is canonical, so the component count is its max label.
+      int comps = 0;
+      for (int j = 0; j < H; ++j)
+        if (sig.b[j] > comps) comps = sig.b[j];
+      // An empty next column closes the animal: valid iff a single component
+      // that has touched both top and bottom (height exactly H).
+      if (comps == 1 && sig.b[H] && sig.b[H + 1])
+        for (int n = 1; n <= maxn; ++n) row[n] += counts[n];
+      // every other mask worth trying: nonzero, non-stranding, in budget
+      forEachViableMask(sig, H, maxn - ms, [&](unsigned mask) {
+        Sig out;
+        if (stepColumnSquare8(sig, H, mask, out) != Outcome::Alive) return;
+        const int cells = __builtin_popcount(mask);
+        // size-budget prune: this contributor's smallest resulting animal is
+        // (ms + cells); if it plus the admissible completion bound already
+        // exceeds maxn, no size it carries can finish in budget -> drop.
+        if (ms + cells + completionLowerBound(out.b, H) > maxn) return;
+        addCounts(next, out, counts, cells, maxn);
+      });
+    });
+    std::swap(db, next);
+  }
+  return row;
+}
+
 inline SweepResults sweepSquare8(int maxn) {
   SweepResults res;
   res.byHeight.assign(maxn + 1, Counts(maxn + 1, 0));
   res.totals.assign(maxn + 1, 0);
 
-  for (int H = 1; H <= maxn; ++H) {
-    const std::string startSig(H + 2, 0);
-    StateDB db;
-    db[startSig] = Counts(maxn + 1, 0);
-    db[startSig][0] = 1;
+  for (int H = 1; H <= maxn; ++H)
+    res.byHeight[H] = sweepSquare8Height(H, maxn, res);
 
-    for (int col = 0; col <= maxn && !db.empty(); ++col) {
-      if (db.size() > res.peakStates) {
-        res.peakStates = db.size();
-        res.peakHeight = H;
-      }
-      StateDB next;
-      for (const auto& [sig, counts] : db) {
-        for (unsigned mask = 0; mask < (1u << H); ++mask) {
-          ColResult cr = stepColumnSquare8(sig, H, mask);
-          if (cr.outcome == Outcome::Dead) continue;
-          if (cr.outcome == Outcome::Complete) {
-            // mask == 0 only; harvest without shifting size
-            for (int n = 1; n <= maxn; ++n) res.byHeight[H][n] += counts[n];
-            continue;
-          }
-          const int cells = __builtin_popcount(mask);
-          addCounts(next, cr.sig, counts, cells, maxn);
-        }
-      }
-      db = std::move(next);
-    }
-  }
-
-  for (int h = 1; h <= maxn; ++h)
-    for (int n = 1; n <= maxn; ++n) res.totals[n] += res.byHeight[h][n];
+  accumulateTotals(res, maxn);
   return res;
 }

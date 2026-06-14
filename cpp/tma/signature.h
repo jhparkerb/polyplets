@@ -14,22 +14,43 @@
 
 #pragma once
 
+#include <cstdint>
+#include <cstring>
 #include <string>
 
 // Result of feeding a partial animal one transition step.
 enum class Outcome { Alive, Dead, Complete };
 
-// Canonical form: relabel components in order of first occurrence (1, 2, ...).
-// Flags are untouched. Idempotent.
-inline std::string canonicalize(std::string sig, int H) {
+// Fixed-size signature for the hot square-8 path: H+2 bytes, zero-padded to
+// SIGMAX (so H <= 30, matching the MAXN cap). Inline (no heap), trivially
+// hashable/comparable -- this is what lets the state store be a flat
+// open-addressing map instead of unordered_map<string,...> (no per-state
+// allocation, no pointer chasing). Same byte layout as the std::string
+// signature above; square-4 keeps using the string form.
+static constexpr int SIGMAX = 32;
+struct Sig {
+  unsigned char b[SIGMAX];
+  bool operator==(const Sig& o) const {
+    return std::memcmp(b, o.b, SIGMAX) == 0;
+  }
+};
+
+// Canonicalize in place over the first H bytes (relabel components 1,2,... in
+// order of first occurrence). Flags at b[H], b[H+1] untouched.
+inline void canonicalizeSig(unsigned char* b, int H) {
   unsigned char map[256] = {0};
   unsigned char next = 1;
   for (int i = 0; i < H; ++i) {
-    const unsigned char v = static_cast<unsigned char>(sig[i]);
+    const unsigned char v = b[i];
     if (v == 0) continue;
     if (map[v] == 0) map[v] = next++;
-    sig[i] = static_cast<char>(map[v]);
+    b[i] = map[v];
   }
+}
+
+// std::string form (square-4 path): same relabeling as canonicalizeSig.
+inline std::string canonicalize(std::string sig, int H) {
+  canonicalizeSig(reinterpret_cast<unsigned char*>(&sig[0]), H);
   return sig;
 }
 
@@ -43,4 +64,57 @@ inline bool labelPresent(const std::string& sig, int H, char label) {
   for (int i = 0; i < H; ++i)
     if (sig[i] == label) return true;
   return false;
+}
+
+// Admissible lower bound on the number of ADDITIONAL cells any completion of
+// this boundary must place to become a valid fixed animal of height exactly H
+// (single component, touching row 0 and row H-1). MUST never over-estimate: a
+// state whose (min cells so far + this bound) exceeds maxn is pruned, so an
+// over-estimate would silently drop a real animal. (The gate, which checks
+// every published term, is the admissibility oracle: an inadmissible bound
+// makes a count come out low.)
+//
+// Future cells attach only to the CURRENT column (king reach is one column
+// left) or to later future cells, never to vacated earlier columns -- so the
+// frontier's vertical reach is fixed by this column's occupied rows. Three
+// disjoint row bands each force future cells; their sum is a lower bound:
+//   top reach     rows 0..tr-1 climbed if row 0 never touched        (>= tr)
+//   bottom reach  rows br+1..H-1 if row H-1 never touched       (>= H-1-br)
+//   separating    an empty band between two occupied rows that NO single
+//   bands         component spans must be crossed by a king path -> >= its
+//                 width in future cells. A band a component spans (same label
+//                 above and below, connected via history) costs nothing, and
+//                 an empty row inside one component likewise -- counting only
+//                 non-spanned bands keeps the bound admissible under
+//                 interleaving (e.g. labels A,B,A down a column).
+inline int completionLowerBound(const unsigned char* sig, int H) {
+  int tr = -1, br = -1;
+  for (int i = 0; i < H; ++i)
+    if (sig[i] != 0) {
+      if (tr < 0) tr = i;
+      br = i;
+    }
+  if (tr < 0) return 0;  // seed / empty boundary
+  const int topReach = sig[H] != 0 ? 0 : tr;
+  const int bottomReach = sig[H + 1] != 0 ? 0 : (H - 1 - br);
+
+  // belowMask[k] = set of labels present in rows >= k
+  std::uint32_t belowMask[SIGMAX + 1];
+  belowMask[H] = 0;
+  for (int k = H - 1; k >= 0; --k)
+    belowMask[k] = belowMask[k + 1] |
+                   (sig[k] ? (1u << static_cast<unsigned char>(sig[k])) : 0u);
+
+  int bandSum = 0;
+  std::uint32_t aboveMask = 0;  // labels in rows tr..prevRow
+  int prevRow = -1;
+  for (int i = tr; i <= br; ++i) {
+    if (!sig[i]) continue;
+    if (prevRow >= 0 && i - prevRow > 1)               // empty band (prevRow,i)
+      if ((aboveMask & belowMask[i]) == 0)             // no component spans it
+        bandSum += i - prevRow - 1;
+    aboveMask |= 1u << static_cast<unsigned char>(sig[i]);
+    prevRow = i;
+  }
+  return topReach + bottomReach + bandSum;
 }
