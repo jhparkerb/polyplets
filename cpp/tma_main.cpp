@@ -14,6 +14,7 @@
 
 #include "tma/sweep.h"
 #include "tma/sweep8.h"
+#include "tma/sweep8_perim.h"
 
 namespace fs = std::filesystem;
 
@@ -106,17 +107,54 @@ int main(int argc, char** argv) {
     std::fprintf(stderr, "MAXN out of range (1..30)\n");
     return 2;
   }
-  bool perHeight = false;
+  bool perHeight = false, perimeter = false;
   std::string checkpointDir;
+  int nthreads = 1, onlyHeight = 0;
   for (int i = 3; i < argc; ++i) {
     if (std::strcmp(argv[i], "--per-height") == 0) {
       perHeight = true;
+    } else if (std::strcmp(argv[i], "--perimeter") == 0) {
+      perimeter = true;
     } else if (std::strcmp(argv[i], "--checkpoint") == 0 && i + 1 < argc) {
       checkpointDir = argv[++i];
+    } else if (std::strcmp(argv[i], "--threads") == 0 && i + 1 < argc) {
+      nthreads = std::atoi(argv[++i]);
+      if (nthreads < 1) nthreads = 1;
+    } else if (std::strcmp(argv[i], "--only-height") == 0 && i + 1 < argc) {
+      onlyHeight = std::atoi(argv[++i]);
     } else {
       std::fprintf(stderr, "unknown arg: %s\n", argv[i]);
       return 2;
     }
+  }
+
+  // (size, edge-perimeter) joint distribution via the column transfer matrix
+  // (square8 only) -- isolated path, cross-checked against `g2 --perimeter`.
+  if (perimeter) {
+    if (lattice != "square8") {
+      std::fprintf(stderr, "--perimeter is supported for square8 only\n");
+      return 2;
+    }
+    const int Pmax = 4 * maxn, Pp = Pmax + 1;
+    std::vector<u64> dist = sweepSquare8Perim(maxn, Pmax);
+    for (int n = 1; n <= maxn; ++n)
+      for (int p = 0; p <= Pmax; ++p) {
+        const u64 v = dist[static_cast<size_t>(n) * Pp + p];
+        if (v) std::printf("%d %d %llu\n", n, p, static_cast<unsigned long long>(v));
+      }
+    return 0;
+  }
+
+  // Compute a single strip height (square8) -- for measuring per-height scaling
+  // and for running heights as independent jobs.
+  if (onlyHeight > 0) {
+    SweepResults res;
+    res.byHeight.assign(maxn + 1, Counts(maxn + 1, 0));
+    res.totals.assign(maxn + 1, 0);
+    res.byHeight[onlyHeight] = heightRow(onlyHeight, maxn, nthreads, res);
+    for (int n = 1; n <= maxn; ++n) res.totals[n] = res.byHeight[onlyHeight][n];
+    emit(res, maxn, perHeight);
+    return 0;
   }
 
   if (!checkpointDir.empty()) {
@@ -135,7 +173,7 @@ int main(int argc, char** argv) {
       if (loadHeight(checkpointDir, H, maxn, row)) {
         std::fprintf(stderr, "height %d/%d resumed from checkpoint\n", H, maxn);
       } else {
-        row = sweepSquare8Height(H, maxn, res);
+        row = heightRow(H, maxn, nthreads, res);
         saveHeight(checkpointDir, H, maxn, row);
         std::fprintf(stderr, "height %d/%d done (peak_states %llu)\n", H, maxn,
                      static_cast<unsigned long long>(res.peakStates));
@@ -147,8 +185,8 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  SweepResults res =
-      (lattice == "square4") ? sweepSquare4(maxn) : sweepSquare8(maxn);
+  SweepResults res = (lattice == "square4") ? sweepSquare4(maxn)
+                                            : sweepSquare8(maxn, nthreads);
   emit(res, maxn, perHeight);
   return 0;
 }

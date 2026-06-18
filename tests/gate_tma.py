@@ -81,6 +81,16 @@ def main():
           == parse_counts(run(TMA_ASAN, "square8", depth_f)),
           f"F asan        square8 n<={depth_f} clean + equal")
 
+    # G. (size, edge-perimeter) joint distribution: transfer matrix == generation.
+    #    A finer-grained Method-B-vs-Method-A check than the totals -- the TM
+    #    carries perimeter as a second DP index (cpp/tma/sweep8_perim.h).
+    depth_g = 11
+    tma_p = parse_counts(run(TMA, "square8", depth_g, "--perimeter"))
+    g2_p = parse_counts(run(G2, "square8", depth_g, "--perimeter"))
+    gate.check(tma_p == g2_p,
+          f"G perimeter   square8 n<={depth_g} TMA==G2 "
+          f"({len(g2_p)} (n,perimeter) cells)")
+
     return gate.verdict("TMA")
 
 

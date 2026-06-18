@@ -29,11 +29,19 @@ gate-tma: build/tma build/tma_asan build/g2
 	python3 tests/gate_tma.py
 
 build/tma: cpp/tma_main.cpp cpp/tma/*.h | build
-	$(CXX) $(CXXFLAGS) -O3 cpp/tma_main.cpp -o $@
+	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_main.cpp -o $@
 
 build/tma_asan: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
-	    -fno-omit-frame-pointer cpp/tma_main.cpp -o $@
+	    -fno-omit-frame-pointer -pthread cpp/tma_main.cpp -o $@
+
+build/tma_tsan: cpp/tma_main.cpp cpp/tma/*.h | build
+	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=thread \
+	    -fno-omit-frame-pointer -pthread cpp/tma_main.cpp -o $@
+
+# Uniform random polyplet sampler / specimen emitter (transfer-matrix completion DP)
+build/tma_sample: cpp/tma_sample.cpp cpp/tma/*.h | build
+	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_sample.cpp -o $@
 
 build/symcount_fast: cpp/sym/symcount_fast.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
