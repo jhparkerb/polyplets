@@ -70,6 +70,41 @@ Do the GF coefficients have structure? A clean dichotomy:
   degree 711, coeffs ~1e55; np.roots and mpmath.polyroots both choke. Get
   lambda_H from the ratio B_H(n)/B_H(n-1) instead.)
 
+## The per-height growth constants lambda_H, and a factor-lifetime law (2026-06-18)
+lambda_H = 1/(smallest pole of G_H) is the growth rate of height-exactly-H
+polyplets as n->infinity. Computed by power iteration on the recurrence (robust;
+roots of the big Q_H are numerically nasty). Values H=2..9:
+
+  H:        2        3        4        5        6        7        8        9
+  lambda_H: 2.41421  3.44372  4.18232  4.71780  5.11532  5.41785  5.65337  5.84046
+
+- lambda_2 = 1 + sqrt(2) exactly; otherwise lambda_H are high-degree algebraic
+  numbers (algebraic degrees 2, 4, 9, 29, 68 for H=2..6) -- NOT an elementary
+  family. The dominant root is real (Perron-Frobenius).
+- lambda_H increases monotonically toward lambda_king ~ 7.10, but SLOWLY and
+  sub-geometrically: increments 1.03, .74, .54, .40, .30, .24, .19 with ratios
+  RISING toward 1 (.72 -> .79). Aitken extrapolation climbs 6.06 -> 6.56 and is
+  still rising at H=9 -- consistent with 7.10 but too slow to pin it; the direct
+  a(n)-ratio method remains the better lambda_king estimator.
+
+### Factor-lifetime law (a real structural finding)
+Q_H is highly reducible, and consecutive denominators share almost everything:
+deg gcd(Q_H, Q_{H+1}) is nearly deg Q_H. The co-degree that DROPS,
+delta_H = deg Q_H - deg gcd(Q_H, Q_{H+1}), is
+
+  H:        2  3  4  5   6   7    8
+  delta_H:  0  1  2  4   9   29   68
+
+These drops are exactly the algebraic degrees 1, 2, 4, 9, 29, 68 of the factors
+carrying the eigenvalue born at height H-2 (1 = the x-1 / eigenvalue-1 factor;
+2 = lambda_2's; 4 = lambda_3's; 9 = lambda_4's; 29 = lambda_5's; 68 = lambda_6's).
+=> **Each irreducible factor of Q_H divides exactly THREE consecutive Q_H** (the
+one born at height H0 appears in Q_{H0}, Q_{H0+1}, Q_{H0+2}, then retires).
+Verified for factors born at H=1..6. Plausibly a finite-range (3-row) coupling
+from king adjacency reaching +/-1 rows; not yet proven. This is the clean
+structure the lambda_H sequence itself lacks: it lives in the GF factorization,
+not in the coefficients or the growth constants.
+
 ## Engines and verification (three independent implementations)
 - `build/tma --only-height H` -- the production column transfer matrix (exact
   u64; overflows past ~n=28 at H=5, the original term wall).
