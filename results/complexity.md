@@ -30,6 +30,9 @@ generation's.
 
 ## Measured refinements (this session)
 - λ ≈ 7.10 (ratio-extrapolation of a(n), n≤19; θ ≈ −1), was previously an eyeball.
-- TM per-height state growth ≈ 2.6^H (D_H = 1, 5, 15, 39, 98, 246, 624, 1604,
-  4177, 11005 for H=1..10) — far below the Bell(H+1) I had first guessed (~60×
-  smaller at H=10), which is why the fixed-height-GF wall sits at ~H=18–20, not ~13.
+- TM per-height boundary-state count, **measured and saturation-confirmed**
+  (maxn=25 vs 30 agree): D_H = 1, 5, 15, 39, 98, 246, 624, 1604, 4177, 11005,
+  29291 for H=1..11. The per-height ratio climbs slowly (2.5 → 2.66), so the base
+  is ~2.7+, not a flat 2.6. This is far below the Bell(H+1) I first guessed
+  (D_11=29,291 vs Bell(12)=4.2M, ~144× smaller, gap widening) — which is why the
+  fixed-height-GF wall sits at ~H=17–18, not ~13.
