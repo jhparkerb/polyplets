@@ -96,14 +96,18 @@ def sym(x, M):
     return x - M if x > M // 2 else x
 
 def main():
+    # usage: modp_recover.py [Hmax] [Hmin]   -- Hmin>1 appends to the existing file
     Hmax = int(sys.argv[1]) if len(sys.argv) > 1 else 10
-    out = open(os.path.join(ROOT, "results", "fixed_height_gfs.txt"), "w")
-    out.write("# Fixed-height polyplet generating functions G_H(x) = P_H(x)/Q_H(x)\n")
-    out.write("# B_H(n) = fixed polyplets of n cells, bounding-box height exactly H.\n")
-    out.write("# Recovered by mod-p transfer matrix + Berlekamp-Massey + CRT; validated.\n")
-    out.write("# Format per height:  P: <numerator coeffs, low->high>\n")
-    out.write("#                     Q: <denominator coeffs, low->high, Q[0]=1>\n\n")
-    for H in range(1, Hmax + 1):
+    Hmin = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+    path = os.path.join(ROOT, "results", "fixed_height_gfs.txt")
+    out = open(path, "a" if Hmin > 1 else "w")
+    if Hmin == 1:
+        out.write("# Fixed-height polyplet generating functions G_H(x) = P_H(x)/Q_H(x)\n")
+        out.write("# B_H(n) = fixed polyplets of n cells, bounding-box height exactly H.\n")
+        out.write("# Recovered by mod-p transfer matrix + Berlekamp-Massey + CRT; validated.\n")
+        out.write("# Format per height:  P: <numerator coeffs, low->high>\n")
+        out.write("#                     Q: <denominator coeffs, low->high, Q[0]=1>\n\n")
+    for H in range(Hmin, Hmax + 1):
         order, _ = find_order(H)
         N = 2 * order + 30
         seqs = [seq_modp(H, N, p) for p in PRIMES]
