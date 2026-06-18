@@ -15,9 +15,32 @@ from functools import reduce
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GF = os.path.join(ROOT, "build", "gf_modp")
 
-# verified-prime moduli near 2^31 (Miller-Rabin checked; 2147483479 is COMPOSITE
-# and was removed -- a non-prime modulus breaks the modular inverse in CRT/BM)
-PRIMES = [2147483647, 2147483629, 2147483587, 2147483563, 2147483549, 2147483477]
+def _isprime(n):
+    if n < 2: return False
+    d = n - 1; r = 0
+    while d % 2 == 0: d //= 2; r += 1
+    for a in (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37):
+        x = pow(a, d, n)
+        if x in (1, n - 1): continue
+        for _ in range(r - 1):
+            x = x * x % n
+            if x == n - 1: break
+        else: return False
+    return True
+
+def _primes_below(below, count):
+    out = []; n = below - 1
+    while len(out) < count:
+        if _isprime(n): out.append(n)
+        n -= 2
+    return out
+
+# Verified prime moduli just under 2^31. The fixed-height GF coefficients grow
+# fast (max|coeff| roughly squares per height: ~1e11 at H=6, ~5e55 at H=8), so the
+# CRT modulus must outrun them -- use a large pool. (A composite modulus, e.g. the
+# tempting 2147483479, silently breaks the modular inverse, so all are MR-checked.)
+PRIMES = _primes_below(1 << 31, 40)
+VAL_PRIME = _primes_below(1 << 30, 1)[0]   # fresh prime for validation, disjoint
 
 def seq_modp(H, N, p):
     out = subprocess.run([GF, str(H), str(N), str(p)], capture_output=True, text=True).stdout
@@ -69,34 +92,55 @@ def crt(rems, mods):
         x %= M
     return x, M
 
+def sym(x, M):
+    return x - M if x > M // 2 else x
+
 def main():
     Hmax = int(sys.argv[1]) if len(sys.argv) > 1 else 10
+    out = open(os.path.join(ROOT, "results", "fixed_height_gfs.txt"), "w")
+    out.write("# Fixed-height polyplet generating functions G_H(x) = P_H(x)/Q_H(x)\n")
+    out.write("# B_H(n) = fixed polyplets of n cells, bounding-box height exactly H.\n")
+    out.write("# Recovered by mod-p transfer matrix + Berlekamp-Massey + CRT; validated.\n")
+    out.write("# Format per height:  P: <numerator coeffs, low->high>\n")
+    out.write("#                     Q: <denominator coeffs, low->high, Q[0]=1>\n\n")
     for H in range(1, Hmax + 1):
         order, _ = find_order(H)
         N = 2 * order + 30
-        # recover the recurrence mod each prime (pad to a common length)
-        Cs, Ls = [], []
-        for p in PRIMES:
-            C, L = bm_modp(seq_modp(H, N, p), p)
-            Cs.append(C); Ls.append(order_of(C))
+        seqs = [seq_modp(H, N, p) for p in PRIMES]
+        Cs = [bm_modp(seqs[k], PRIMES[k]) for k in range(len(PRIMES))]
+        Ls = [order_of(C) for C, _ in Cs]
         if len(set(Ls)) != 1:
             print(f"H={H}: order disagreement across primes {Ls} -- rerun", flush=True)
             continue
         d = Ls[0]
-        # CRT each coefficient C[1..d] (C[0]=1); symmetric lift
-        coeffs = [1]
-        Mtot = reduce(lambda a, b: a * b, PRIMES)
-        for i in range(1, d + 1):
-            x, M = crt([Cs[k][i] for k in range(len(PRIMES))], PRIMES)
-            coeffs.append(x - M if x > M // 2 else x)
-        # validate against a fresh prime not used in the CRT. The recurrence holds
-        # for n > deg(numerator); deg P <= deg Q = d for these proper rational GFs,
-        # so check from n = d+1 onward.
-        vp = 2147483423
+        # denominator Q[0..d] by CRT (Q[0]=1), symmetric lift
+        Q = [1] + [sym(*crt([Cs[k][0][i] for k in range(len(PRIMES))], PRIMES))
+                   for i in range(1, d + 1)]
+        # numerator P[k] = sum_{i<=min(k,d)} Q[i] B_H(k-i), deg P <= d, also by CRT
+        P = []
+        for k in range(d + 1):
+            rems = [sum(Q[i] % p * seqs[ki][k - i] for i in range(min(k, d) + 1)) % p
+                    for ki, p in enumerate(PRIMES)]
+            P.append(sym(*crt(rems, PRIMES)))
+        while len(P) > 1 and P[-1] == 0: P.pop()       # trim leading-zero high terms
+        # validate the FULL GF against a fresh prime: expand P/Q as a power series
+        # and compare to the engine's sequence.
+        vp = VAL_PRIME
         sv = seq_modp(H, N, vp)
-        ok = all((sum(coeffs[i] * sv[n - i] for i in range(d + 1))) % vp == 0
-                 for n in range(d + 1, len(sv)))
-        print(f"H={H}: order {d}  validated:{ok}  denom Q_H = {coeffs}", flush=True)
+        b = [0] * (N + 1)
+        for n in range(N + 1):
+            v = (P[n] if n < len(P) else 0)
+            for i in range(1, d + 1):
+                if n - i >= 0: v -= Q[i] * b[n - i]
+            b[n] = v % vp
+        ok = all(b[n] == sv[n] % vp for n in range(N + 1))
+        print(f"H={H}: order {d}  full-GF-validated:{ok}  "
+              f"deg P={len(P)-1}  P[:4]={P[:4]}", flush=True)
+        out.write(f"H={H}  order={d}  validated={ok}\n")
+        out.write(f"P: {P}\n")
+        out.write(f"Q: {Q}\n\n")
+        out.flush()
+    out.close()
 
 if __name__ == "__main__":
     main()

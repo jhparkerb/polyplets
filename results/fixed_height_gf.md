@@ -39,9 +39,17 @@ patterns off too few data points:
 
 The true orders grow like ~0.45 * D_H (the boundary-state count D_H = 1, 5, 15,
 39, 98, 246, 624, 1604), follow no clean closed form, and 1,3,7,15,42,106,278,711
-is not in OEIS. Exact GFs for H=1..4 (numerator and denominator) are in the
-section above; for H=5..8 the denominators (orders 42..711) are recovered and
-validated, numerators recoverable the same way.
+is not in OEIS.
+
+## Full generating functions, H=1..8
+The complete rational GFs G_H(x) = P_H(x)/Q_H(x) -- BOTH numerator and denominator
+-- are recovered and full-GF-validated (the series expansion of P/Q reproduces the
+engine's B_H(n) for all n) for H=1..8. The exact coefficient lists are in
+`results/fixed_height_gfs.txt` (small ones, H<=4, also shown above). The numerator
+begins at x^H (B_H(n)=0 for n<H) and its leading coefficient is B_H(H)=3^(H-1).
+Coefficient magnitudes grow fast -- max|coeff| roughly squares per height
+(~1e11 at H=6, ~5e55 at H=8) -- so CRT needs a large prime pool (the recovery
+uses 40 moduli near 2^31).
 
 ## Engines and verification (three independent implementations)
 - `build/tma --only-height H` -- the production column transfer matrix (exact
