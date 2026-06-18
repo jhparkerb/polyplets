@@ -20,6 +20,10 @@ build:
 build/g2: cpp/g2_redelmeier.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
+# fixed-height transfer matrix over Z/pZ, for generating-function recovery
+build/gf_modp: cpp/gf_modp.cpp | build
+	$(CXX) $(CXXFLAGS) -O3 $< -o $@
+
 build/g2_asan: cpp/g2_redelmeier.cpp | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer $< -o $@

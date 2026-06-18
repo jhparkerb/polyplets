@@ -21,32 +21,42 @@ remaining term out to n=36 and matches the independently-computed B_H(19).
     - 63x^10 - 19x^11 + 17x^12 - x^13 - 5x^14 - x^15.
   Now held-out-validated by the independent big-integer engine (below).
 
-## The order sequence (and a debunked conjecture)
-The minimal recurrence orders (= deg Q_H), validated:
+## The order sequence (and TWO debunked conjectures)
+The minimal recurrence orders (= deg Q_H), validated three independent ways:
 
-    H:      1   2   3   4   5   6
-    order:  1   3   7   15  35  67
+    H:      1   2   3   4   5   6    7    8
+    order:  1   3   7   15  42  106  278  711
 
-An EARLIER conjecture that this is 2^H - 1 (1, 3, 7, 15, ...) was **FALSE** -- it
-matched only by coincidence through H=4, then breaks (H=5 is 35, not 31; H=6 is
-67, not 63). It was caught precisely by recomputing at higher H with an
-independent implementation. The orders stay well below the boundary-state count
-D_H = 1, 5, 15, 39, 98, 246, but follow no clean closed form yet; the sequence
-1, 3, 7, 15, 35, 67 is not in OEIS.
+Two wrong guesses were caught along the way -- a cautionary tale about reading
+patterns off too few data points:
+1. **2^H - 1** (1, 3, 7, 15, 31, 63): matched by coincidence through H=4, then
+   wrong. Caught by recomputing at higher H with an independent engine.
+2. **1, 3, 7, 15, 35, 67**: ALSO wrong. These came from Berlekamp-Massey on too
+   few terms (~2(2^H-1)) -- underdetermined, so BM returned a spurious low-order
+   recurrence that fit the available terms but not the true sequence. Caught by
+   the mod-p engine with an ADAPTIVE term count (grow N until the recovered order
+   sits well below N/2).
 
-## Independent verification
-`gf/fixed_height.py` is a from-scratch big-integer fixed-height king transfer
-matrix (no overflow, no pruning -- so no modular-reduction subtleties). It:
-- reproduces the C++ engine's B_H(n) exactly for n<=19 at every H (cross-check);
-- held-out-validates the recovered recurrence for H=1..6 (the recurrence,
-  recovered by Berlekamp-Massey, reproduces every term beyond its order);
-- thereby confirms H=4 (order 15) and disproves 2^H-1 at H=5,6.
+The true orders grow like ~0.45 * D_H (the boundary-state count D_H = 1, 5, 15,
+39, 98, 246, 624, 1604), follow no clean closed form, and 1,3,7,15,42,106,278,711
+is not in OEIS. Exact GFs for H=1..4 (numerator and denominator) are in the
+section above; for H=5..8 the denominators (orders 42..711) are recovered and
+validated, numerators recoverable the same way.
 
-## Next
-A mod-p C++ transfer matrix (counts mod several primes, Berlekamp-Massey mod p,
-CRT + rational reconstruction) extends the GFs to higher H than the Python engine
-reaches in reasonable time. NOTE the mod-p trap: the prune's "is this count
-nonzero?" test breaks under modular reduction (a true count = 0 mod p reads as
-absent), so the reachable-size info must be tracked structurally, separate from
-the mod-p magnitudes. Cross-check every recovered GF against the diagonal
-B_H(H) = 3^(H-1).
+## Engines and verification (three independent implementations)
+- `build/tma --only-height H` -- the production column transfer matrix (exact
+  u64; overflows past ~n=28 at H=5, the original term wall).
+- `gf/fixed_height.py` -- from-scratch big-integer transfer matrix (no overflow,
+  no pruning). Cross-checks tma exactly. NOTE its built-in order recovery is
+  UNRELIABLE (its N heuristic assumed order ~ 2^H-1, too few terms) -- use it as a
+  sequence generator / cross-check, not for orders.
+- `build/gf_modp` + `gf/modp_recover.py` -- the mod-p engine: counts mod several
+  primes (no overflow, unbounded terms), Berlekamp-Massey mod p with adaptive N,
+  CRT to lift the exact integer recurrence, validated against a fresh prime AND
+  shown to annihilate the big-integer engine's exact sequence. This is the
+  authoritative tool for orders/GFs. (Watch for composite "primes": 2147483479 is
+  composite and silently corrupts the modular inverse.)
+
+All three agree on B_H(n) wherever each is valid; the orders above are confirmed
+by mod-p+CRT and by annihilating the independent big-int sequence. Every recovered
+GF also reproduces the diagonal B_H(H) = 3^(H-1).
