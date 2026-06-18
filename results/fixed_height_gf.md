@@ -95,15 +95,31 @@ delta_H = deg Q_H - deg gcd(Q_H, Q_{H+1}), is
   H:        2  3  4  5   6   7    8
   delta_H:  0  1  2  4   9   29   68
 
-These drops are exactly the algebraic degrees 1, 2, 4, 9, 29, 68 of the factors
-carrying the eigenvalue born at height H-2 (1 = the x-1 / eigenvalue-1 factor;
-2 = lambda_2's; 4 = lambda_3's; 9 = lambda_4's; 29 = lambda_5's; 68 = lambda_6's).
-=> **Each irreducible factor of Q_H divides exactly THREE consecutive Q_H** (the
-one born at height H0 appears in Q_{H0}, Q_{H0+1}, Q_{H0+2}, then retires).
-Verified for factors born at H=1..6. Plausibly a finite-range (3-row) coupling
-from king adjacency reaching +/-1 rows; not yet proven. This is the clean
-structure the lambda_H sequence itself lacks: it lives in the GF factorization,
-not in the coefficients or the growth constants.
+These drops are exactly the algebraic degrees of the factors carrying the
+eigenvalue born at height H-2. => **Each irreducible factor of Q_H divides exactly
+THREE consecutive Q_H** (the one born at height H0 appears in Q_{H0}, Q_{H0+1},
+Q_{H0+2}, then retires). Plausibly a finite-range (3-row) coupling from king
+adjacency reaching +/-1 rows; not yet proven.
+
+This makes the orders an EXACT moving sum. Define new(H) = degree of the factor
+born at height H = deg Q_H - deg gcd(Q_{H-1}, Q_H) = algebraic degree of lambda_H:
+
+  H:       1   2   3   4    5    6    7    8     9
+  new(H):  1   2   4   9   29   68  181  462  1254
+
+Then **deg Q_H = new(H) + new(H-1) + new(H-2)**, verified exactly for all H=1..9:
+
+  orders:  1   3   7  15   42  106  278  711  1897   ( = 3-term moving sum )
+
+So two linked novel sequences (both absent from OEIS, approximate "matches"
+diverge at the distinctive term 29):
+  - new-factor degrees / alg.deg(lambda_H): 1,2,4,9,29,68,181,462,1254
+  - orders deg Q_H (their 3-term moving sums): 1,3,7,15,42,106,278,711,1897
+This exact identity is the rigorous form of the lifetime-3 law (verified 9 terms,
+not a numerical eyeball); a transfer-matrix embedding argument would prove it. It
+is the clean structure the lambda_H values themselves lack -- it lives in the GF
+factorization, not in the coefficients or the growth constants. Candidates for
+OEIS submission (under the standing signed-orders gate).
 
 ## Engines and verification (three independent implementations)
 - `build/tma --only-height H` -- the production column transfer matrix (exact
