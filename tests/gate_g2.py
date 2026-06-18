@@ -121,6 +121,47 @@ def main():
           f"F transpose square8 n<={F_DEPTH}: byBox[n][w][h]==byBox[n][h][w] "
           f"({len(box)} (n,w,h) cells)")
 
+    # H. hole counting (--holes / --holes8). Two independent guarantees:
+    #    (1) the by-hole-count partition must sum to the total for BOTH background
+    #        conventions (square8 -> A006770); and
+    #    (2) the convention itself is validated against KNOWN answers by running
+    #        the identical flood on polyominoes (square4): hole-free must equal
+    #        A006724 (simply-connected fixed polyominoes) and the with-holes count
+    #        must equal A389193 (fixed polyominoes with holes). This pins the flood
+    #        logic and the 4-connected-hole definition to OEIS's own convention.
+    H_DEPTH = 11
+
+    def hole_table(args):
+        tbl = {}
+        for line in run(G2, *args).strip().splitlines():
+            n, h, c = (int(x) for x in line.split())
+            tbl.setdefault(n, {})[h] = c
+        return tbl
+
+    sum_ok = True
+    for flag in ("--holes", "--holes8"):
+        tbl = hole_table(("square8", H_DEPTH, flag))
+        for n in range(1, H_DEPTH + 1):
+            if sum(tbl.get(n, {}).values()) != a006770[n]:
+                sum_ok = False
+    gate.check(sum_ok,
+          f"H holes-sum square8 n<={H_DEPTH}: 4-bg and 8-bg both sum to A006770")
+
+    # A006724 (fixed simply-connected polyominoes) and A389193 (fixed polyominoes
+    # with holes), n=1..12; the 4-connected-hole convention must reproduce both.
+    A006724 = {1:1,2:2,3:6,4:19,5:63,6:216,7:756,8:2684,9:9638,10:34930,11:127560}
+    A389193 = {n:0 for n in range(1,7)}
+    A389193.update({7:4,8:41,9:272,10:1516,11:7708})
+    poly = hole_table(("square4", H_DEPTH, "--holes"))
+    conv_ok = True
+    for n in range(1, H_DEPTH + 1):
+        free = poly.get(n, {}).get(0, 0)
+        holey = sum(c for h, c in poly.get(n, {}).items() if h > 0)
+        if free != A006724[n] or holey != A389193[n]:
+            conv_ok = False
+    gate.check(conv_ok,
+          f"H holes-conv square4 n<={H_DEPTH}: hole-free=A006724, holey=A389193")
+
     return gate.verdict("G2")
 
 

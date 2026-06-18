@@ -87,6 +87,21 @@ struct Counter {
   std::vector<u64> byPerim;                 // [size*perimStride + perim]
   int perimStride = 0;
 
+  // optional (size, #holes) joint distribution (off by default). A hole is a
+  // bounded 4-connected component of empty cells: the complement of an
+  // 8-connected (king) foreground is taken 4-connected, by planar duality, so
+  // that exactly one of foreground/background "wins" at every diagonal pinch.
+  // Shares the inAnimal/rookOff machinery; adds a flood-fill scratch buffer.
+  // Flood the empty exterior of the bounding box (expanded by one cell) and
+  // count the 4-connected components of empty cells it never reaches.
+  bool holesCheck = false;
+  bool holes8 = false;                      // background flood 8-connected?
+  std::vector<u64> byHoles;                 // [size*holeStride + holes]
+  int holeStride = 0;
+  std::vector<u64> hseen;                   // per-animal visited stamps
+  u64 hstamp = 0;
+  std::vector<int> floodStk;               // flood-fill work stack
+
   static int findp(int* p, int x) { while (p[x] != x) { p[x] = p[p[x]]; x = p[x]; } return x; }
 
   // Connected components of the current animal under the given 4 offsets.
@@ -104,6 +119,55 @@ struct Counter {
     int comps = 0;
     for (int i = 0; i < size; ++i) if (findp(parent, i) == i) ++comps;
     return comps;
+  }
+
+  // Number of holes: bounded enclosed empty regions. Flood the empty exterior of
+  // the bounding box expanded by one cell (so the outside is one connected
+  // region), then count the connected components among the empty cells inside the
+  // box that the exterior flood never reached. Background connectivity is
+  // 4-connected (--holes, the Jordan dual of the 8-connected king foreground:
+  // the topologically consistent choice and the same hole definition OEIS uses
+  // for polyominoes in A389193) or 8-connected (--holes8, the same adjacency as
+  // the foreground); both are computed and compared.
+  int countHoles() {
+    ++hstamp;
+    const int xlo = minx - 1, xhi = maxx + 1;
+    const int ylo = -1, yhi = maxy + 1;        // miny is always 0
+    const int bgdeg = holes8 ? 8 : 4;
+    static const int BX[8] = {1, -1, 0, 0, 1, 1, -1, -1};
+    static const int BY[8] = {0, 0, 1, -1, 1, -1, 1, -1};
+    floodStk.clear();
+    auto push = [&](int x, int y) {
+      const int j = cellIndex(x, y);
+      if (hseen[j] != hstamp) { hseen[j] = hstamp; floodStk.push_back(j); }
+    };
+    auto flood = [&]() {
+      while (!floodStk.empty()) {
+        const int j = floodStk.back(); floodStk.pop_back();
+        const int cx = xOf[j], cy = yOf[j];
+        for (int k = 0; k < bgdeg; ++k) {
+          const int x = cx + BX[k], y = cy + BY[k];
+          if (x < xlo || x > xhi || y < ylo || y > yhi) continue;
+          const int nb = cellIndex(x, y);
+          if (inAnimal[nb] || hseen[nb] == hstamp) continue;
+          hseen[nb] = hstamp; floodStk.push_back(nb);
+        }
+      }
+    };
+    // seed the exterior flood from the whole border of the expanded box
+    for (int x = xlo; x <= xhi; ++x) { push(x, ylo); push(x, yhi); }
+    for (int y = ylo; y <= yhi; ++y) { push(xlo, y); push(xhi, y); }
+    flood();
+    int holes = 0;
+    for (int y = 0; y <= maxy; ++y)
+      for (int x = minx; x <= maxx; ++x) {
+        const int j = cellIndex(x, y);
+        if (inAnimal[j] || hseen[j] == hstamp) continue;
+        ++holes;                               // a fresh enclosed region
+        hseen[j] = hstamp; floodStk.push_back(j);
+        flood();
+      }
+    return holes;
   }
 
   // search state
@@ -138,7 +202,7 @@ struct Counter {
     reachedUndo.reserve(static_cast<size_t>(maxn) * deg + 8);
     bySize.assign(maxn + 1, 0);
     byBox.assign((maxn + 1) * (maxn + 1) * (maxn + 1), 0);
-    if (connCheck || perimCheck) {
+    if (connCheck || perimCheck || holesCheck) {
       inAnimal.assign(cells, 0);
       placed.clear();
       placed.reserve(maxn + 1);
@@ -154,6 +218,13 @@ struct Counter {
     if (perimCheck) {
       perimStride = 4 * maxn + 1;
       byPerim.assign((maxn + 1) * perimStride, 0);
+    }
+    if (holesCheck) {
+      holeStride = maxn + 1;                    // #holes <= size <= maxn
+      byHoles.assign((maxn + 1) * holeStride, 0);
+      hseen.assign(cells, 0);
+      hstamp = 0;
+      floodStk.reserve(static_cast<size_t>(maxn) * 4 + 16);
     }
   }
 
@@ -176,6 +247,9 @@ struct Counter {
       const int perim = 4 * size - adjsum;       // exposed unit edges
       byPerim[size * perimStride + perim] += 1;
     }
+    if (holesCheck) {
+      byHoles[size * holeStride + countHoles()] += 1;
+    }
   }
 
   void search(const int* untriedIn, int numUntried) {
@@ -192,7 +266,7 @@ struct Counter {
       if (x > maxx) maxx = x;
       if (y > maxy) maxy = y;
       ++size;
-      if (connCheck || perimCheck) {
+      if (connCheck || perimCheck || holesCheck) {
         inAnimal[j] = 1; placed.push_back(j);
         if (connCheck) pidx[j] = size - 1;
       }
@@ -230,7 +304,7 @@ struct Counter {
 
       // unplace; (x,y) keeps status 1 so later iterations and deeper
       // levels of this loop never re-add it -- the tried-set rule
-      if (connCheck || perimCheck) { inAnimal[placed.back()] = 0; placed.pop_back(); }
+      if (connCheck || perimCheck || holesCheck) { inAnimal[placed.back()] = 0; placed.pop_back(); }
       --size;
       minx = sminx; maxx = smaxx; maxy = smaxy;
     }
@@ -247,7 +321,8 @@ struct Counter {
 int main(int argc, char** argv) {
   if (argc < 3) {
     std::fprintf(stderr,
-        "usage: %s {square4|square8|tri6} MAXN [--per-box] [--split S K IDX]\n",
+        "usage: %s {square4|square8|tri6} MAXN [--per-box] [--rook-bishop] "
+        "[--perimeter] [--holes|--holes8] [--split S K IDX]\n",
         argv[0]);
     return 2;
   }
@@ -270,6 +345,10 @@ int main(int argc, char** argv) {
       c.connCheck = true;
     } else if (std::strcmp(argv[i], "--perimeter") == 0) {
       c.perimCheck = true;
+    } else if (std::strcmp(argv[i], "--holes") == 0) {
+      c.holesCheck = true;
+    } else if (std::strcmp(argv[i], "--holes8") == 0) {
+      c.holesCheck = true; c.holes8 = true;
     } else if (std::strcmp(argv[i], "--split") == 0 && i + 3 < argc) {
       c.splitS  = std::atoi(argv[i + 1]);
       c.splitK  = std::strtoull(argv[i + 2], nullptr, 10);
@@ -301,6 +380,15 @@ int main(int argc, char** argv) {
       for (int p = 0; p <= 4 * c.maxn; ++p) {
         const u64 v = c.byPerim[n * c.perimStride + p];
         if (v) std::printf("%d %d %llu\n", n, p,
+                           static_cast<unsigned long long>(v));
+      }
+  } else if (c.holesCheck) {
+    // "n  holes  count"; sum over holes of count[n] == bySize[n].
+    // The holes=0 row is the hole-free (simply-connected) polyplet sequence.
+    for (int n = 1; n <= c.maxn; ++n)
+      for (int h = 0; h < c.holeStride; ++h) {
+        const u64 v = c.byHoles[n * c.holeStride + h];
+        if (v) std::printf("%d %d %llu\n", n, h,
                            static_cast<unsigned long long>(v));
       }
   } else if (c.perBox) {
