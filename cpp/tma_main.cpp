@@ -103,8 +103,12 @@ int main(int argc, char** argv) {
     return 2;
   }
   const int maxn = std::atoi(argv[2]);
-  if (maxn < 1 || maxn > 30) {
-    std::fprintf(stderr, "MAXN out of range (1..30)\n");
+  // Cap is a safety bound, not an algorithmic limit: the fixed-width signature
+  // supports strip heights H<=30, but the cell budget n is independent. Larger n
+  // is used by the fixed-height GF work to gather enough terms for recurrence
+  // recovery (counts are exact u64, so watch for overflow past ~n=50 at H>=3).
+  if (maxn < 1 || maxn > 64) {
+    std::fprintf(stderr, "MAXN out of range (1..64)\n");
     return 2;
   }
   bool perHeight = false, perimeter = false;
