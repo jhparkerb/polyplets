@@ -51,6 +51,25 @@ Coefficient magnitudes grow fast -- max|coeff| roughly squares per height
 (~1e11 at H=6, ~5e55 at H=8) -- so CRT needs a large prime pool (the recovery
 uses 40 moduli near 2^31).
 
+## Structure of the GFs: coefficients vs. spectrum (2026-06-18)
+Do the GF coefficients have structure? A clean dichotomy:
+- **Coefficients: none.** Q_H is not palindromic/anti-palindromic (no naive
+  reciprocity), has content 1 (primitive), and there is NO inversion relation
+  B_H(-n) = eps * B_H(n-c) (tested H=2..6, eps=+/-1, all shifts: none). The
+  coefficients are determined algebraic invariants (principal-minor sums of the
+  transfer matrix) but arithmetically wild -- the shadow of the full sequence's
+  believed non-D-finiteness. (Known polyomino/animal inversion relations are
+  PERIMETER/anisotropic phenomena, not single-variable area GFs like these.)
+- **Spectrum: rich.** The smallest pole is 1/lambda_H; the per-height growth
+  constants climb monotonically toward lambda_king ~ 7.10:
+    H:        1   2       3       4       5       6       7
+    lambda_H: 1   1+sqrt2 3.4437  4.1823  4.7178  5.1153  5.4176
+  lambda_2 = 1+sqrt(2) exactly (sympy). The dominant root is real at every H
+  (Perron-Frobenius; the transfer matrix is nonnegative), and a growing fraction
+  of roots sit inside the unit disk. (H>=8 full root sets are numerically nasty --
+  degree 711, coeffs ~1e55; np.roots and mpmath.polyroots both choke. Get
+  lambda_H from the ratio B_H(n)/B_H(n-1) instead.)
+
 ## Engines and verification (three independent implementations)
 - `build/tma --only-height H` -- the production column transfer matrix (exact
   u64; overflows past ~n=28 at H=5, the original term wall).
