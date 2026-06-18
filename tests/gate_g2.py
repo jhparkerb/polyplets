@@ -110,6 +110,17 @@ def main():
     gate.check(per_ok,
           f"E perimeter square8 n<={E_DEPTH}: sum=A006770, perim=4n slice=A001168")
 
+    # F. transpose symmetry: reflecting across the diagonal is a king-lattice
+    #    symmetry that swaps width and height, so the bounding-box distribution
+    #    must satisfy byBox[n][w][h] == byBox[n][h][w]. A free internal invariant
+    #    (no external sequence) that catches any width/height-asymmetric miscount.
+    F_DEPTH = 11
+    box = parse_counts(run(G2, "square8", F_DEPTH, "--per-box"))
+    sym_ok = all(c == box.get((n, h, w), 0) for (n, w, h), c in box.items())
+    gate.check(sym_ok,
+          f"F transpose square8 n<={F_DEPTH}: byBox[n][w][h]==byBox[n][h][w] "
+          f"({len(box)} (n,w,h) cells)")
+
     return gate.verdict("G2")
 
 
