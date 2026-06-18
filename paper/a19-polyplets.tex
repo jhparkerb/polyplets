@@ -7,7 +7,6 @@
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{graphicx}
-\usepackage{subcaption}
 \usepackage{numprint}
 \usepackage{microtype}
 \usepackage[hidelinks]{hyperref}
@@ -17,43 +16,37 @@
 \npthousandsep{,}
 \npfourdigitsep
 \newcommand{\num}[1]{\numprint{#1}}
-
-\newcommand{\an}[1]{a(#1)}
 \newcommand{\byH}{\ensuremath{B_H}}
 
 \title{\textbf{Counting the 19-cell fixed polyplets}\\[2pt]
 \large An independent computation and confirmation of $a(19)$ for OEIS A006770}
 \author{Jason Parker \texttt{<jasonp@panix.com>}\\[2pt]
 \small Independent researcher (unaffiliated)}
-\date{June 17, 2026}
+\date{June 18, 2026}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
 \noindent
-A \emph{polyplet} (also \emph{king-move animal} or \emph{kingwise-connected
-polyomino}) is a finite set of unit cells of the square lattice that is
-connected under king moves---two cells are adjacent if they share an edge
-\emph{or} a corner. OEIS sequence \href{https://oeis.org/A006770}{A006770}
-counts the \emph{fixed} (translation-distinct) polyplets of $n$ cells and was,
-until now, known through $n=18$. We report
+A \emph{polyplet} (also \emph{king-move animal}) is a finite set of unit cells of
+the square lattice connected under king moves---two cells are adjacent if they
+share an edge \emph{or} a corner. OEIS sequence
+\href{https://oeis.org/A006770}{A006770} counts the \emph{fixed}
+(translation-distinct) polyplets of $n$ cells and was, until now, known through
+$n=18$. We report
 \[
   a(19) = \num{151609203011580},
 \]
 computed from scratch and confirmed by two algorithms that share no counting
 logic: direct Redelmeier enumeration, run as two decorrelated campaigns on
 different architectures and compilers, and a column transfer-matrix count over
-boundary-connectivity signatures. The two methods agree exactly and both
-reproduce all eighteen previously published terms. We also give the free and
-one-sided companions, $\mathrm{Free}(19)=\num{18951156321090}$ (the next term of
-A030222) and $\mathrm{OneSided}(19)=\num{37902303297525}$ (a sequence not
-previously recorded). Beyond the methods and runs, we report a battery of
-mutually corroborating cross-checks (including a perimeter-resolved Method-A
-vs.\ Method-B agreement and a fault-injection test of the checks themselves), an
-exact uniform random sampler, and---from a sample of $10{,}000$---the structure
-of a \emph{typical} $19$-cell polyplet, which turns out to be a sparse, branchy,
-corner-glued object almost never connected as a polyomino.
+boundary-connectivity signatures. The two agree exactly and both reproduce all
+eighteen previously published terms. We also give the free and one-sided
+companions, $\mathrm{Free}(19)=\num{18951156321090}$ (the next term of A030222)
+and $\mathrm{OneSided}(19)=\num{37902303297525}$ (not previously recorded), and a
+battery of cross-checks. The contribution is the verified value, not the
+methods, which are standard.
 \end{abstract}
 
 \section{Introduction}
@@ -63,108 +56,50 @@ The enumeration of lattice animals---finite connected sets of cells on a regular
 lattice---is a classical problem at the meeting point of combinatorics and
 statistical physics~\cite{klarner,jensen2001}. On the square lattice the two
 standard families are \emph{polyominoes}, connected through shared edges, and
-\emph{polyplets}, connected through shared edges or corners. Counting the
-\emph{fixed} (translation-distinct) animals of each size $n$ is a benchmark
-hard-counting problem: the counts grow exponentially, so exact values are known
-only for modest $n$ and each additional term is a small computational milestone.
-The fixed-polyomino sequence (OEIS \href{https://oeis.org/A001168}{A001168}) has
-been pushed furthest~\cite{redelmeier,jensen2003,barequet}; the fixed-polyplet
-sequence (OEIS \href{https://oeis.org/A006770}{A006770}) had been recorded
-through $n=18$.
+\emph{polyplets}, connected through shared edges or corners. The fixed counts grow
+exponentially, so exact values are known only for modest $n$ and each new term is
+a small computational milestone. The fixed-polyomino sequence
+(\href{https://oeis.org/A001168}{A001168}) has been pushed
+furthest~\cite{redelmeier,jensen2003,barequet}; the fixed-polyplet sequence
+A006770 had been recorded through $n=18$.
 
-This note reports and confirms the next term, $a(19)$. The work is an amateur
-contribution carried out with substantial AI assistance
-(Section~\ref{sec:ainote}); its value lies not in algorithmic novelty---the
-ingredients are standard---but in an independent, cross-checked computation of a
-previously unrecorded term. Because a single $15$-digit count produced by one
-program is properly a conjecture rather than a result, the central design choice
-was redundancy: the value is computed twice, by two algorithms that share no
-counting logic, on different hardware and compilers.
+This note reports and confirms the next term, $a(19)$. It is an amateur
+contribution carried out with substantial AI assistance (Section~\ref{sec:ai});
+its value lies not in algorithmic novelty but in an independent, cross-checked
+computation of a previously unrecorded term. Since a single $15$-digit count from
+one program is properly a conjecture, the value is computed twice, by two
+algorithms that share no counting logic, on different hardware and compilers, and
+both reproduce the entire published range.
 
-\paragraph{Contributions.}
-\begin{itemize}
-  \item the value $a(19)=\num{151609203011580}$, with the full height
-        decomposition (Tables~\ref{tab:terms},~\ref{tab:byheight});
-  \item a king-adjacency column transfer matrix using a whole-column transfer
-        step and an admissible size-budget prune (Section~\ref{sec:methodB}),
-        independent of the enumeration that produced the same value;
-  \item a confirmation protocol---two algorithms agreeing exactly, both
-        reproducing all eighteen prior terms, plus structural and
-        forward/backward cross-checks (Section~\ref{sec:confirm});
-  \item an exact uniform random sampler for $n$-cell polyplets with an
-        independent verifier (Section~\ref{sec:sampling}); and
-  \item open code, data, and a provenance ledger
-        (Section~\ref{sec:availability}).
-\end{itemize}
-
-\paragraph{Outline.} Section~\ref{sec:object} fixes definitions;
-Section~\ref{sec:result} states the result; Sections~\ref{sec:methodA}
-and~\ref{sec:methodB} describe the two methods; Section~\ref{sec:confirm}
-the confirmation; Section~\ref{sec:runs} the runs; Section~\ref{sec:sampling}
-the sampler and figures; and Sections~\ref{sec:further}--\ref{sec:ainote} discuss
-limitations, further work, availability, and methodology.
-
-\section{Definitions and notation}
+\section{Definitions}
 \label{sec:object}
 
 Fix the square lattice $\mathbb{Z}^2$ and call its unit squares \emph{cells}. A
-\emph{lattice animal} is a finite, nonempty set of cells that is connected under
-some fixed adjacency. Two adjacencies dominate the literature:
+\emph{lattice animal} is a finite, nonempty, adjacency-connected set of cells.
+Under \textbf{rook} (edge) adjacency the animals are \emph{polyominoes}; under
+\textbf{king} (edge-or-corner) adjacency they are \emph{polyplets}. Every
+polyomino is a polyplet but not conversely: two cells touching only at a corner
+form a polyplet and not a polyomino (Figure~\ref{fig:specimen}). One subtlety: a
+polyplet connected \emph{purely} by diagonals lives on a single checkerboard
+colour class, which under diagonal adjacency is isomorphic (rotate $45^\circ$,
+rescale by $\sqrt2$) to the square lattice---so such a shape is a polyomino in
+disguise. A genuinely king shape mixes edge and corner contacts.
 
-\begin{itemize}
-  \item \textbf{Rook} (edge / $4$-)adjacency: cells sharing a side. Animals
-        connected this way are \emph{polyominoes}.
-  \item \textbf{King} (edge-or-corner / $8$-)adjacency: cells sharing a side or
-        a corner. Animals connected this way are \emph{polyplets}.
-\end{itemize}
-
-Every polyomino is a polyplet, but not conversely: two cells touching only at a
-corner form a valid polyplet and not a polyomino. Polyplets are thus the strictly
-larger family, and the diagonal contacts are exactly what distinguishes them
-(Figure~\ref{fig:specimen}).
-
-One subtlety bears noting, since it governs what counts as a genuinely new
-shape. A polyplet connected \emph{purely} by diagonal contacts lives entirely on
-one colour class of the checkerboard---a diagonal step preserves $(c+r)\bmod 2$
----and that colour class, under diagonal adjacency, is isomorphic (rotate
-$45^\circ$, rescale by $\sqrt2$) to the square lattice under edge adjacency. So a
-purely diagonal polyplet is a polyomino in disguise. A polyplet escapes this only
-by using \emph{both} colours, which forces at least one genuine edge contact;
-the honestly-king shapes are those that mix edge and corner adjacencies.
+Animals are counted \textbf{fixed} (up to translation; rotations and reflections
+distinct), \textbf{one-sided} (up to translation and rotation), or \textbf{free}
+(up to all isometries). A006770 is the fixed count. The cleanest illustration is
+$a(2)=4$: the horizontal domino, the vertical domino, and the \emph{two} diagonal
+dominoes, which are mirror images and counted separately. (The free count is
+\href{https://oeis.org/A030222}{A030222}, $\mathrm{Free}(2)=2$.)
 
 \begin{figure}[tbp]
   \centering
-  \includegraphics[width=0.42\textwidth]{../results/a19_specimen.png}
-  \caption{A $19$-cell fixed polyplet (uniform sample,
-  Section~\ref{sec:sampling}; bounding box $11\times 10$). Under rook (edge-only)
-  adjacency it splits into nine pieces, so the diagonal corner-contacts alone
-  hold it together---a polyplet, not a polyomino.}
+  \includegraphics[width=0.36\textwidth]{../results/a19_specimen.png}
+  \caption{A $19$-cell fixed polyplet (drawn uniformly at random; bounding box
+  $11\times 10$). Under rook adjacency it splits into nine pieces, so the diagonal
+  corner-contacts alone hold it together---a polyplet, not a polyomino.}
   \label{fig:specimen}
 \end{figure}
-
-Animals may be counted under three equivalence relations, which must not be
-conflated:
-\begin{description}
-  \item[Fixed] up to translation only; rotations and reflections are
-        \emph{distinct}.
-  \item[One-sided] up to translation and rotation, but not reflection.
-  \item[Free] up to translation, rotation, and reflection.
-\end{description}
-
-\noindent
-A006770 is the \textbf{fixed} count. The cleanest demonstration is $a(2)=4$: the
-two-cell polyplets are the horizontal domino, the vertical domino, and the
-\emph{two} diagonal dominoes---which are reflections of one another and are
-counted separately. (The corresponding free count is
-\href{https://oeis.org/A030222}{A030222}, with $\mathrm{Free}(2)=2$; the fixed
-\emph{polyomino} count is \href{https://oeis.org/A001168}{A001168}.)
-
-\paragraph{The problem.} Determine $a(19)$, the number of fixed polyplets of $19$
-cells. The number of lattice animals grows exponentially
-($a(n)\sim C\lambda^{n}n^{-1}$ for a lattice-dependent growth constant
-$\lambda$~\cite{klarner,jensen2001}), so $a(19)$ is a $15$-digit number that
-cannot be reached by listing animals individually; it must be \emph{counted}
-without enumeration, then cross-checked.
 
 \section{Result}
 \label{sec:result}
@@ -173,13 +108,13 @@ without enumeration, then cross-checked.
   \boxed{\,a(19) = \num{151609203011580}\,}
 \end{equation}
 
-The full sequence through $n=19$ is given in Table~\ref{tab:terms}; terms
-$n\le 18$ reproduce A006770 exactly, and $n=19$ is new. The growth ratio
-$a(19)/a(18)=\num{151609203011580}/\num{22471158811164}\approx 6.7468$ continues
-the slow monotone climb of successive ratios (e.g.\ $a(18)/a(17)\approx 6.7272$)
-toward the king-lattice growth constant $\lambda$. The shortfall from $\lambda$ is
-the $n^{-1}$ correction: $a(n)/a(n-1)=\lambda\,(1-1/n)(1+o(1))$, so inverting the
-last two ratios gives the rough empirical estimate $\lambda\approx 7.1$.
+The full sequence is in Table~\ref{tab:terms}; terms $n\le 18$ reproduce A006770
+exactly and $n=19$ is new. The growth ratio $a(19)/a(18)\approx 6.7468$ continues
+the slow climb of successive ratios (e.g.\ $a(18)/a(17)\approx 6.7272$) toward the
+king-lattice growth constant; ratio extrapolation over $n=10,\dots,19$ gives
+$\lambda\approx 7.10$ with critical exponent $\theta\approx-1$, consistent with the
+universal value for two-dimensional lattice animals (a heuristic series estimate,
+not a bound).
 
 \begin{table}[t]
   \centering
@@ -200,159 +135,72 @@ last two ratios gives the rough empirical estimate $\lambda\approx 7.1$.
     10 & \num{6053180}        & &\\
     \bottomrule
   \end{tabular}
-  \caption{Fixed polyplets $a(n)$, $n=1,\dots,19$. Terms $1$--$18$ match
-  the published A006770; $a(19)$ is the new term reported here.}
+  \caption{Fixed polyplets $a(n)$, $n=1,\dots,19$. Terms $1$--$18$ match the
+  published A006770; $a(19)$ is the new term.}
   \label{tab:terms}
 \end{table}
 
-\section{The free and one-sided companions}
-\label{sec:companions}
-
-The same cell count, counted under coarser equivalences, yields two further new
-terms:
-\begin{align}
-  \mathrm{Free}(19)      &= \num{18951156321090}, &
-  \mathrm{OneSided}(19)  &= \num{37902303297525}.
-\end{align}
-$\mathrm{Free}(19)$ is the next term of OEIS A030222 (free polyplets, previously
-known to $n=17$); the one-sided count has \emph{no} OEIS sequence at all, so that
-entire column is new.
-
-These ride on the fixed count for free, by Burnside's lemma over the square's
-symmetry group $D_4$:
-\[
-  \mathrm{Free}(n) = \tfrac{1}{8}\bigl(\mathrm{Fixed} + 2R_{90} + R_{180}
-                     + 2H + 2D\bigr),\quad
-  \mathrm{OneSided}(n) = \tfrac{1}{4}\bigl(\mathrm{Fixed} + 2R_{90} + R_{180}\bigr),
-\]
-where $R_{90},R_{180},H,D$ count the animals fixed by each symmetry. Those
-symmetric sub-counts are computed by a dedicated enumerator: a $g$-symmetric
-animal is determined by a fundamental domain, so they are $\sqrt{\,}$-rare and
-reach $n=19$ in seconds. Confidence:
-\begin{itemize}
-  \item the assembled free counts reproduce A030222 \emph{exactly} for all
-        $n\le 17$ (the entire published range);
-  \item the $n=19$ symmetric sub-counts are reproduced by an \emph{independent
-        Python reimplementation} matching the C++ counter exactly
-        ($R_{180}=\num{10178520}$, axis $=\num{9765524}$, diagonal
-        $=\num{8923786}$, and $R_{90}$ is empty since a $90^\circ$-symmetric
-        animal needs size $\equiv 0,1 \pmod 4$ and $19\equiv 3$) --- a
-        different-language reimplementation agreeing catches errors a recompile
-        would not;
-  \item sanity: $\mathrm{Free}(19)$ exceeds $a(19)/8$ by only ${\sim}6\times10^6$,
-        the expected small positive symmetric correction.
-\end{itemize}
-Since $\mathrm{Free}/\mathrm{OneSided}$ are exact rational combinations of the
-confirmed $a(19)$ and the symmetric counts, they inherit that confidence; full
-hardware/ISA decorrelation of the symmetric counts is the one remaining step.
+\paragraph{Companions.}
+The same cells counted under coarser equivalences give
+$\mathrm{Free}(19)=\num{18951156321090}$ (the next term of A030222) and
+$\mathrm{OneSided}(19)=\num{37902303297525}$ (no OEIS sequence exists, so that
+column is entirely new). These follow from the fixed count by Burnside's lemma
+over the square's symmetry group:
+$\mathrm{Free}=\tfrac18(\mathrm{Fixed}+2R_{90}+R_{180}+2H+2D)$ and
+$\mathrm{OneSided}=\tfrac14(\mathrm{Fixed}+2R_{90}+R_{180})$, where the symmetric
+sub-counts are computed by a dedicated enumerator over fundamental domains (here
+$R_{90}=0$ since a $90^\circ$-symmetric animal needs $n\equiv 0,1\pmod 4$ while
+$19\equiv3$; $R_{180}=\num{10178520}$, axis $=\num{9765524}$, diagonal
+$=\num{8923786}$). The assembled free counts reproduce A030222 exactly over its
+entire published range ($n\le17$), and an independent Python reimplementation
+matches the C++ symmetric counts at $n=19$.
 
 \section{Method A: direct enumeration}
 \label{sec:methodA}
 
-The first method is Redelmeier's backtracking enumeration~\cite{redelmeier},
-adapted to king adjacency. Starting from a single anchored cell, the algorithm
-grows every animal exactly once by maintaining an ordered frontier of
-\emph{untried} neighbouring cells and recursing on each, with the standard
-discipline (a cell, once placed or rejected at a given level, is excluded from
-deeper levels) that guarantees each fixed animal is generated precisely once. The
-recursion tallies animals by size as it goes; no animal is ever stored.
-
-Enumeration is embarrassingly parallel by sub-tree, so the count was run as two
-\emph{decorrelated} campaigns:
-\begin{itemize}
-  \item \textbf{a19-A} on \texttt{gympie} (Apple silicon, Apple~clang), frontier
-        split $7\times 64$;
-  \item \textbf{a19-B} on \texttt{ayr} (AMD Threadripper 2990WX, GCC~12.2/x86),
-        frontier split $8\times 96$.
-\end{itemize}
-The two differ in instruction-set architecture, compiler, hardware, and
-sub-problem decomposition. Their per-size output files are
-\textbf{byte-identical} (SHA-256 \texttt{558f0bdf\ldots} on both). Because the
-arithmetic is exact integer addition, a shared hardware, compiler, or scheduling
-fault could not have produced identical \emph{wrong} digits; the only error mode
-the two campaigns cannot jointly catch is a bug in the shared \emph{algorithm}.
-That is what Method~B exists to rule out.
+Redelmeier's backtracking enumeration~\cite{redelmeier}, adapted to king
+adjacency, grows every animal exactly once from an anchored cell: it maintains an
+ordered frontier of \emph{untried} neighbours and recurses, with the standard
+rule that a cell once placed or rejected at a level is excluded from deeper
+levels. The recursion tallies by size; no animal is stored. Being embarrassingly
+parallel by sub-tree, the count was run as two decorrelated campaigns---on
+\texttt{gympie} (Apple silicon, Apple~clang, frontier split $7\times64$) and
+\texttt{ayr} (AMD Threadripper, GCC/x86, split $8\times96$). The per-size outputs
+are \textbf{byte-identical} (SHA-256 \texttt{558f0bdf\ldots}). Because the
+arithmetic is exact integer addition, a shared hardware/compiler/scheduling fault
+could not produce identical \emph{wrong} digits; the one error mode the campaigns
+cannot jointly catch is a bug in the shared \emph{algorithm}, which is what
+Method~B rules out.
 
 \section{Method B: the column transfer matrix}
 \label{sec:methodB}
 
 The second method counts the same animals by an entirely different principle:
 dynamic programming over the connectivity of a moving boundary, with no animal
-ever materialised. It is a king-adjacency adaptation of the transfer-matrix /
-finite-lattice technique used for polyominoes and lattice
-animals~\cite{jensen2001,jensen2003,bousquet}.
+materialised---a king adaptation of the transfer-matrix / finite-lattice
+technique for polyominoes~\cite{jensen2001,jensen2003,bousquet}. Every animal has
+a bounding-box height $H$, and animals of height exactly $H$ are counted
+separately, so $a(n)=\sum_{H=1}^{n}\byH(n)$ (Table~\ref{tab:byheight}); the
+heights are independent, checkpointable sub-problems.
 
-\subsection{Decomposition by height}
-Every animal has a bounding box of some height $H$ (number of occupied rows),
-$1\le H\le n$. Counting those of height \emph{exactly} $H$ separately gives
-\begin{equation}
-  a(n) \;=\; \sum_{H=1}^{n} \byH(n),
-  \qquad
-  \byH(n) := \#\{\text{fixed polyplets of } n \text{ cells, bounding-box height } H\}.
-  \label{eq:byheight}
-\end{equation}
-The heights are independent sub-problems---separately computable, checkpointable,
-and parallelisable. Table~\ref{tab:byheight} lists $\byH(19)$.
-
-\subsection{Sweeping a strip column by column}
-Confine the animal to a horizontal strip of $H$ rows and process columns left to
-right. A \emph{boundary signature} records everything about the columns placed so
-far that can affect the future:
-\begin{enumerate}
-  \item the occupancy of the most recent column (which of rows $0,\dots,H-1$ are
-        filled);
-  \item a partition of those filled cells into the connected components of the
-        partial animal; and
-  \item two flags: whether any cell has yet appeared in row $0$ (top) and in row
-        $H-1$ (bottom).
-\end{enumerate}
-Earlier columns are forgotten: a future cell attaches only to the current column
-(one step left) or to later cells, so the signature is a Markov state and the DP
-is exact.
-
-\paragraph{Why a whole column at a time.} King adjacency includes the four
-diagonals, so deciding cell $(c,r)$ requires the diagonal neighbour $(c{-}1,r{\pm}1)$.
-A cell-at-a-time sweep would already have overwritten it. Transferring an
-\emph{entire column} at once keeps the previous column wholly present, so all king
-adjacencies (old rows $r{-}1,r,r{+}1$ to new row $r$) are available with no carry;
-connectivity across the step is then resolved by union--find, which handles the
-$k$-way merges and crossing partitions a single new cell can induce without
-special cases. This whole-column king transfer is the one genuinely new ingredient
-relative to the rook-adjacency literature.
-
-\subsection{Counting each animal once}
-Three invariants together make accepted sweeps biject with fixed polyplets:
-\emph{(i)} the first placed column is column $0$ (the animal's leftmost cells sit
-there, so no animal is counted at several horizontal offsets); \emph{(ii)} a
-completed animal is tallied only when both touch-flags are set (height exactly
-$H$, so~\eqref{eq:byheight} does not double-count across heights); \emph{(iii)} a
-completed animal is tallied only when its boundary is a single component, while a
-partial state in which some component can never reconnect is killed immediately.
-The DP carries, per signature, a vector of counts by cell-count; closing a single
-top-and-bottom-touching component harvests those counts into $\byH(\cdot)$.
-
-\subsection{The admissible pruning}
-A size-budget prune drops any partial state whose minimum cells-so-far plus an
-\emph{admissible} lower bound on cells-still-required exceeds $n$. The lower bound
-sums three forced, disjoint contributions: the vertical reach needed to touch an
-untouched top or bottom row, and the width of any empty row-band that lies between
-occupied rows and is spanned by \emph{no} single component (such a band must be
-bridged by a future king path). Because the bound never over-estimates, the prune
-can only ever cause a count to come out \emph{low}, never high; consequently
-reproducing every published term (Section~\ref{sec:confirm}) is a complete
-certificate that the prune dropped no real animal in range.
-
-\subsection{Engineering}
-The hot path uses a fixed-width signature (supporting $H\le 30$) as the key of a
-flat open-addressing hash map with counts stored contiguously, a stack-allocated
-union--find, and a viable-mask generator that enumerates only the column patterns
-worth trying (nonzero, non-stranding, in budget) rather than all $2^H$. Heights
-are checkpointed as they finish (a crash costs one height, not the run) and were
-executed as independent per-height jobs. Within a single height the sweep is also
-multithreaded by sharding the state map under per-shard locks; this is
-bit-identical to the serial sweep but, being memory-bandwidth bound, scales only
-to $\sim 2\times$, so the production run relied on cross-height parallelism
-instead.
+Within a height, confine the animal to an $H$-row strip and sweep columns left to
+right. A \emph{boundary signature}---the occupancy of the most recent column, a
+partition of its filled cells into the partial animal's connected components, and
+two flags for whether rows $0$ and $H-1$ have yet been touched---is a Markov state,
+since a future cell attaches only to the current column or later. Because king
+adjacency reaches the diagonal neighbours $(c{-}1,r{\pm}1)$, the transfer moves an
+\emph{entire column} at once, keeping the previous column wholly present;
+connectivity across the step is resolved by union--find. Three invariants make
+accepted sweeps biject with fixed polyplets: the first column is column $0$ (no
+horizontal double-counting); an animal is tallied only with both touch-flags set
+(height exactly $H$); and only when its boundary is a single component, partial
+states that can never reconnect being killed. A size-budget prune drops any state
+whose cells-so-far plus an \emph{admissible} lower bound on cells-still-needed
+exceeds $n$; since the bound never over-estimates, the prune can only make a count
+come out low, so reproducing every published term certifies that it dropped no
+animal in range. The hot path uses a flat open-addressing map keyed by a
+fixed-width signature, a stack union--find, and a viable-mask generator; heights
+were run as independent checkpointed jobs.
 
 \begin{table}[t]
   \centering
@@ -375,269 +223,90 @@ instead.
     \multicolumn{4}{r}{$\sum_H \byH(19) = \num{151609203011580}$}\\
     \bottomrule
   \end{tabular}
-  \caption{The height decomposition $\byH(19)$ of $a(19)$. The distribution peaks
-  at $H=9$. The extreme entry is a closed form: a height-$H$ animal of exactly $H$
-  cells is a single cell per row whose column drifts by $\{-1,0,+1\}$ at each of
-  the $H-1$ steps, giving $\byH(H)=3^{H-1}$; here $B_{19}(19)=3^{18}=\num{387420489}$.}
+  \caption{The height decomposition $\byH(19)$ of $a(19)$, peaking at $H=9$. The
+  extreme entry is a closed form: a height-$H$ animal of $H$ cells is one cell per
+  row drifting by $\{-1,0,+1\}$ at each of $H-1$ steps, so
+  $\byH(H)=3^{H-1}$; here $B_{19}(19)=3^{18}=\num{387420489}$.}
   \label{tab:byheight}
 \end{table}
 
-\section{Confirmation and cross-checks}
+\section{Confirmation}
 \label{sec:confirm}
 
-The two methods agree, and several independent checks back the value:
+The value rests on several independent checks.
 \begin{itemize}
-  \item \textbf{External truth.} Both methods reproduce A006770 \emph{exactly} for
-        every $n\le 18$, the entire previously published range.
-  \item \textbf{Method A $=$ Method B.} The transfer-matrix totals
-        $a(n)=\sum_H \byH(n)$ are byte-identical to the Redelmeier campaign output
-        (same SHA-256 \texttt{558f0bdf\ldots}), so $a(19)$ and all lower terms
-        agree across the two algorithms.
-  \item \textbf{Forward vs.\ backward DP.} A separate \emph{backward} completion
-        DP (Section~\ref{sec:sampling}), run on a different host, compiler, and
-        ISA, reproduced a representative height term,
-        $B_{17}(19)=\num{47839787379}$, identically to the forward count.
-  \item \textbf{Structural marginals.} The transfer matrix's
-        (height,\,size) marginals match the bounding-box-height marginals of the
-        enumeration engine---agreement on the finer structure, not only the
-        totals.
-  \item \textbf{Independent subset check.} Of the generated polyplets, those
-        connected under \emph{edge} (rook) adjacency reproduce A001168 (fixed
-        polyominoes) exactly through $n=14$; those connected under \emph{corner}
-        (bishop) adjacency do too, and the two are equal at every $n$ (the
-        $45^\circ$ colour-class invariant of Section~\ref{sec:object}). The
-        perimeter$=4n$ slice (no rook edges) likewise equals A001168 --- so the
-        perimeter and connectivity checks corroborate each other.
-  \item \textbf{Joint (size,\,perimeter) distribution.} Carrying perimeter as a
-        second index, the transfer matrix's full (size,\,perimeter) distribution
-        equals the generator's through $n=12$. Unlike the subset checks, this
-        exercises Method~B's machinery, not just Method~A's, at finer grain than
-        the totals.
-  \item \textbf{Fault injection.} A wall of passing checks is ambiguous, so we
-        confirmed the suite's discriminating power by mutation testing: planted
-        errors are caught (a dropped diagonal diverges at $n=2$, a doubled count
-        at $n=1$, a one-off in the prune at $n=10$), while a provably
-        count-preserving change (reordering the neighbour offsets) correctly
-        survives. The checks fail on wrong programs and pass on right ones.
-  \item \textbf{Implementation hygiene.} Both engines are
-        AddressSanitizer/UndefinedBehaviorSanitizer clean; the multithreaded
-        transfer-matrix path is ThreadSanitizer clean and bit-identical to the
-        serial path.
+  \item \textbf{External truth and Method A $=$ Method B.} Both methods reproduce
+        A006770 exactly for every $n\le 18$, and the transfer-matrix totals
+        $\sum_H\byH(n)$ are byte-identical to the Redelmeier output (same SHA-256)
+        at every term through $n=19$.
+  \item \textbf{Forward vs.\ backward DP.} A separate backward completion-count
+        DP, run on a different host, compiler, and ISA, reproduced a
+        representative height term $B_{17}(19)=\num{47839787379}$ identically.
+  \item \textbf{Structural cross-checks.} The transfer matrix's
+        (height,\,size) and (size,\,perimeter) marginals match the enumeration's
+        through $n=12$; of the generated polyplets, those connected under rook,
+        and (equally) under bishop, adjacency reproduce A001168 (the $45^\circ$
+        colour-class invariant), as does the perimeter-$4n$ slice.
+  \item \textbf{Fault injection.} Planted errors are caught (a dropped diagonal at
+        $n=2$, a doubled count at $n=1$, a prune off-by-one at $n=10$) while a
+        provably count-preserving change survives---so the checks fail on wrong
+        programs and pass on right ones.
+  \item \textbf{Hygiene.} Both engines are AddressSanitizer/UBSan clean; the
+        multithreaded transfer matrix is ThreadSanitizer clean and bit-identical
+        to the serial path.
 \end{itemize}
-Two algorithms that share no counting logic agreeing to all $15$ digits, each
-reproducing eighteen prior terms, is the basis for the value.
 
-\section{Computational particulars}
+\section{Computational particulars and further results}
 \label{sec:runs}
 
-\begin{table}[h]
-  \centering
-  \small
-  \begin{tabular}{lll}
-    \toprule
-    & \texttt{gympie} & \texttt{ayr}\\
-    \midrule
-    CPU      & Apple silicon          & AMD Threadripper 2990WX (32 cores)\\
-    Memory   & 24\,GB            & 78\,GB\\
-    Toolchain& Apple clang            & GCC 12.2 / x86-64\\
-    Role     & Method A campaign a19-A;& Method A campaign a19-B;\\
-             & sampling / backward DP  & Method B production count\\
-    \bottomrule
-  \end{tabular}
-  \caption{Hosts.}
-  \label{tab:hosts}
-\end{table}
+Method~A completed within hours per campaign. Method~B is dominated not by the
+tallest strips but by those with a few cells of vertical slack $n-H$, where the
+signature space is largest; on \texttt{ayr} (32 cores, 78\,GB) the production run
+went height-by-height with $H=17,18,19$ the long poles, peak memory in the low
+tens of gigabytes. A full provenance ledger (host, git commit, binary/result
+SHA-256) accompanies the runs.
 
-Method~A (enumeration) is the cheaper computation and completed within hours per
-campaign. Method~B (transfer matrix) is dominated by its tallest strips: contrary
-to intuition, the difficult heights are not the tallest (fewest animals) but those
-with a few cells of vertical \emph{slack} $n-H$, where the boundary-signature
-space is largest. On \texttt{ayr} the production count was run as independent
-per-height jobs, with heights $17$, $18$, $19$ as the long poles (each its own
-multithreaded process); peak resident memory stayed in the low tens of gigabytes,
-well within the host. The per-height rows and a full provenance ledger (host, git
-commit, binary and result SHA-256) accompany the run.
-
-\section{Uniform random polyplets}
-\label{sec:sampling}
-
-A counting DP is also an exact uniform sampler~\cite{nijenhuis,flajolet}: if one
-knows, for every boundary signature and every residual cell budget, the number of
-ways to \emph{complete} it into a valid $n$-cell height-$H$ animal, then walking
-the transfer matrix forward---at each column choosing the next column with
-probability proportional to the completions it admits---emits a uniformly random
-animal in one pass, at cost one walk rather than a traversal of all $a(n)$. We
-compute the completion counts $W(\text{sig},\,\text{rem})$ by a memoised
-\emph{backward} recursion reusing the same transition and admissible bound; as a
-by-product $W(\text{seed},n)=\byH(n)$, which is the forward-vs-backward
-cross-check of Section~\ref{sec:confirm}. The height itself is drawn first, with
-probability $\byH(19)/a(19)$.
-
-Each emitted specimen is then re-checked by an \emph{independent} verifier sharing
-no code with the DP: a fresh king-BFS for single-connectedness, plus
-bounding-box, anchoring, and cell-count tests, plus de-duplication. Across the
-validation runs every sampled animal passed, and the empirical height histogram
-agrees with $\byH(19)/a(19)$ under a $\chi^2$ test (a counter-vs-sampler
-consistency check). We note that sampling certifies \emph{soundness}---that the
-counted objects are genuine, distinct polyplets---but not the cardinality itself,
-which rests on the agreement of Sections~\ref{sec:methodA}--\ref{sec:confirm}.
-
-% ---------------------------------------------------------------------------
-% GALLERY: to be populated from the 10,000-specimen uniform sample.
-% Drop additional PNGs into results/ and uncomment / extend the subfigures.
-% Candidates worth picking out of the sample:
-%   - a compact "blob" (small bounding box, near-maximal density);
-%   - one enclosing a hole;
-%   - a tall thin near-staircase (large height, near 3^{H-1} regime);
-%   - a strongly diagonal specimen (rook-disconnected; king-only).
-% ---------------------------------------------------------------------------
-\begin{figure}[tbp]
-  \centering
-  \begin{subfigure}[b]{0.47\textwidth}\centering
-    \includegraphics[width=\linewidth,height=3.1cm,keepaspectratio]{../results/a19_gallery_king.png}
-    \caption{Strongly king: $18$ rook-pieces joined by a single edge and the rest
-    corner contacts. It uses both checkerboard colours, so (unlike a
-    \emph{purely} diagonal animal) it is not a polyomino in disguise.}
-  \end{subfigure}\hfill
-  \begin{subfigure}[b]{0.47\textwidth}\centering
-    \includegraphics[width=\linewidth,height=3.1cm,keepaspectratio]{../results/a19_gallery_holed.png}
-    \caption{Encloses a void: a loop of cells around a $16$-cell hole. About
-    $28\%$ of the sample enclose at least one hole.}
-  \end{subfigure}
-
-  \vspace{1.5ex}
-  \begin{subfigure}[b]{0.47\textwidth}\centering
-    \includegraphics[width=\linewidth,height=3.1cm,keepaspectratio]{../results/a19_gallery_compact.png}
-    \caption{Compact: the densest specimen drawn ($19$ cells in a $4\times10$
-    box).}
-  \end{subfigure}\hfill
-  \begin{subfigure}[b]{0.47\textwidth}\centering
-    \includegraphics[width=\linewidth,height=3.1cm,keepaspectratio]{../results/a19_gallery_tall.png}
-    \caption{Elongated: a height-$13$ near-staircase, close to the
-    one-cell-per-row regime.}
-  \end{subfigure}
-  \caption{Four $19$-cell fixed polyplets, hand-picked by extremal property from
-  a sample of $10{,}000$ drawn uniformly at random (over bounding-box heights
-  $\le 13$, which account for $97.6\%$ of $a(19)$). Every specimen was
-  independently re-verified king-connected.}
-  \label{fig:gallery}
-\end{figure}
-
-\subsection{What a typical 19-cell polyplet looks like}
-\label{sec:typical}
-
-A uniform sample is the right instrument for \emph{typical} structure, and the
-portrait (10{,}000 specimens) is strikingly unlike the tidy blob one pictures for
-a polyomino. The average $19$-cell polyplet is a \textbf{sparse, branchy,
-corner-glued} object:
-\begin{itemize}
-  \item it shatters into ${\sim}10$ edge-connected pieces (mean rook-components
-        $10.1$, peak $9$--$11$), held together mostly by diagonals --- $59\%$ of
-        all its contacts are corner contacts;
-  \item it is essentially \emph{never} an honest polyomino: a rook-connected
-        specimen has probability $A001168(19)/a(19)\approx 4\times10^{-5}$, so the
-        sample contains none --- the rarity is real, and only exact counts see it;
-  \item it is fragile, not solid: a mean of $11.3$ of its $19$ cells are cut
-        points (removal disconnects it) and $0\%$ are biconnected; cell degrees
-        cluster at $2$--$3$;
-  \item it fills only ${\sim}25\%$ of a roughly-square bounding box (mean density
-        $0.25$, aspect $1.4$), and \textbf{$28\%$ enclose at least one hole};
-  \item its checkerboard colours stay balanced ($|{\#}\text{even}-{\#}\text{odd}|$
-        usually $1$--$5$), confirming they are genuine two-colour polyplets, not
-        single-colour polyominoes in disguise.
-\end{itemize}
-This is the qualitative reason $a(n)$ so vastly exceeds the polyomino count:
-king-adjacency lets an animal dangle many pieces from corner contacts, so the
-typical one does. (The height cap $\le 13$ biases only the height-dependent
-figures slightly; rare classes such as polyominoes and symmetric animals are
-below the sample's resolution and belong to exact counting.)
-
-\section{Limitations and further work}
-\label{sec:further}
-
-\paragraph{Limitations.} The argument for $a(19)$ is computational, not a proof:
-it rests on two implementations agreeing and on both reproducing the published
-range, which makes an undetected error require the \emph{same} fault in two
-programs that share no counting logic. We regard that as strong evidence but not
-a certificate. The uniform sampler certifies only soundness of the counted
-objects, not the cardinality (Section~\ref{sec:sampling}). The growth-constant
-remark in Section~\ref{sec:result} is a consistency observation, not an estimate.
-We claim no novelty for the underlying methods, which are standard; the
-contribution is the specific verified computation.
-
-\paragraph{Further work.}
-\begin{itemize}
-  \item \textbf{Extend the count.} $a(20)$ and beyond are within reach of the
-        transfer matrix given more cross-height parallelism; the per-height cost
-        is governed by slack $n-H$, which the present pruning already controls.
-  \item \textbf{Confirm the companions.} $\mathrm{Free}(19)$ and
-        $\mathrm{OneSided}(19)$ are reported in Section~\ref{sec:companions} and
-        already reproduced by two independent implementations; the one remaining
-        step to put them on the same fully-confirmed footing as $a(19)$ is an
-        ISA-decorrelated run of the symmetric counters on a different
-        architecture.
-  \item \textbf{A better sampler.} The present sampler builds every height before
-        emitting; an online, one-pass design---weighted-reservoir height
-        selection~\cite{efraimidis} over per-height counts streamed from the
-        count, with sampling riding directly on the forward DP---would emit
-        specimens from the first second and spend effort in proportion to
-        probability mass rather than, as here, mostly on near-empty tall heights.
-  \item \textbf{Scaling of polyplet statistics.} Section~\ref{sec:typical}
-        reports the typical structure at $n=19$; the natural extension is the
-        behaviour \emph{across} $n$ --- the radius-of-gyration size exponent, the
-        decay of the rook-connected fraction, and the growth of hole density ---
-        which needs uniform samples at several sizes.
-\end{itemize}
-
-\section{Concluding remarks}
-\label{sec:remarks}
-
-The methodological point is the familiar one that at fifteen digits a single
-program's output should be treated as a conjecture, and that confidence comes
-from redundancy without shared assumptions: two algorithms whose only common
-ground is the definition of the object, run on different architectures and
-compilers, agreeing exactly while jointly reproducing every prior term. The
-transfer matrix is valuable here not for speed---it is slower than direct
-enumeration---but because its failure modes are disjoint from those of
-enumeration.
-
-The height decomposition is also informative in its own right: the distribution
-of $\byH(19)$ peaks at $H=9$ and has the exact closed form $\byH(H)=3^{H-1}$ at
-its extreme, and the observation that computational difficulty tracks the slack
-$n-H$ rather than the height itself was what made the production schedule
-practical.
+The counting DP is also an exact uniform sampler~\cite{nijenhuis}: walking the
+transfer matrix forward, choosing each next column with probability proportional
+to the completions it admits, emits a uniform random animal in one pass; an
+independent king-BFS verifier confirmed soundness on every specimen, and the
+height histogram matched $\byH(19)/a(19)$. A $10{,}000$-specimen sample shows the
+typical $19$-cell polyplet is \emph{sparse, branchy, corner-glued}: about ten
+rook-connected pieces held together mostly by corners ($59\%$ of contacts),
+$\sim\!25\%$ box density, roughly a $28\%$ chance of enclosing a hole, and
+essentially never an honest polyomino (probability
+$A001168(19)/a(19)\approx4\times10^{-5}$). As a by-product the enumeration also
+yields new hole-stratified sub-sequences (hole-free fixed polyplets
+$1,4,20,109,622,\dots$ under the topologically consistent $4$-connected-background
+convention, validated to $n=14$ and absent from OEIS). These and the growth
+estimate are detailed in the repository; $a(20)$ is within reach of the same
+machinery.
 
 \section{Data and code availability}
 \label{sec:availability}
 
-The source code (both enumeration and transfer-matrix engines, the sampler, and
-the test gates), b-files for $n=1,\dots,19$ of A006770 and A030222, the
-per-height rows $\byH(19)$, the $10{,}000$-specimen uniform sample, and a JSON
-provenance ledger (host, source revision, binary/result SHA-256 per run) are in
-the accompanying repository, together with the records backing the cross-checks
-and statistics of this paper (mutation-testing log, perimeter and per-height
-agreements, and the sample-statistics summary). The two fixed-count methods'
-result files share SHA-256 \texttt{558f0bdf\ldots}; the cross-checks are encoded
-as runnable gates, so a reader can regenerate the b-files and re-verify every
-claim here against the published terms with the included harness.
+The source (both engines, the sampler, the test gates), b-files for
+$n=1,\dots,19$ of A006770 and A030222, the per-height rows $\byH(19)$, the sample
+and its statistics, the hole sub-sequences, and a JSON provenance ledger are in
+the accompanying repository. The cross-checks are encoded as runnable gates and a
+self-contained checker re-verifies every numerical claim in this paper, so a
+reader can regenerate the b-files and reproduce the results with the included
+harness.
 
-\section{Author's note: methodology and use of AI}
-\label{sec:ainote}
+\section{Author's note: use of AI}
+\label{sec:ai}
 
-This is an amateur contribution by an unaffiliated author, carried out in close
-collaboration with an AI assistant (Anthropic's Claude). The AI assisted with
-algorithm design, implementation, the running and monitoring of computations, and
-the drafting of this manuscript; the author set the goals and constraints, made
-the design and verification decisions, owns and operated the machines on which
-the computations ran, inspected the results, and is responsible for the
-correctness of what is reported. The verification protocol of
-Section~\ref{sec:confirm}---two independent algorithms, agreement across all
-prior published terms, and explicit cross-checks---was adopted precisely so that
-the central numerical claim does not depend on trusting any single program, human
-or AI. All code and data are released (Section~\ref{sec:availability}) so that the
-result can be reproduced and checked independently.
+This is an amateur contribution by an unaffiliated author in collaboration with an
+AI assistant (Anthropic's Claude), which helped with algorithm design,
+implementation, running the computations, and drafting. The author set the goals,
+made the design and verification decisions, owns and operated the machines,
+inspected the results, and is responsible for their correctness. The verification
+protocol of Section~\ref{sec:confirm}---two independent algorithms, agreement
+across the published range, and explicit cross-checks---was adopted precisely so
+that the central claim does not depend on trusting any single program, human or
+AI; all code and data are released for independent checking.
 
-\begin{thebibliography}{99}
+\begin{thebibliography}{9}
 
 \bibitem{redelmeier}
 D.~H. Redelmeier,
@@ -657,8 +326,8 @@ Journal of Statistical Physics \textbf{102}(3--4) (2001), 865--881.
 \bibitem{jensen2003}
 I.~Jensen,
 \emph{Counting polyominoes: a parallel implementation for cluster computing},
-in \emph{Computational Science --- ICCS 2003}, Lecture Notes in Computer Science
-\textbf{2659}, Springer, 2003, pp.~203--212.
+in \emph{Computational Science --- ICCS 2003}, LNCS \textbf{2659}, Springer,
+2003, pp.~203--212.
 
 \bibitem{bousquet}
 M.~Bousquet-M\'elou,
@@ -670,16 +339,6 @@ A.~Nijenhuis and H.~S. Wilf,
 \emph{Combinatorial Algorithms for Computers and Calculators}, 2nd~ed.,
 Academic Press, 1978.
 
-\bibitem{flajolet}
-P.~Flajolet, P.~Zimmermann, and B.~Van Cutsem,
-\emph{A calculus for the random generation of labelled combinatorial structures},
-Theoretical Computer Science \textbf{132}(1--2) (1994), 1--35.
-
-\bibitem{efraimidis}
-P.~S. Efraimidis and P.~G. Spirakis,
-\emph{Weighted random sampling with a reservoir},
-Information Processing Letters \textbf{97}(5) (2006), 181--185.
-
 \bibitem{barequet}
 G.~Barequet, G.~Rote, and M.~Shalah,
 \emph{$\lambda > 4$: an improved lower bound on the growth constant of polyominoes},
@@ -688,8 +347,7 @@ Communications of the ACM \textbf{59}(7) (2016), 88--95.
 \bibitem{oeis}
 OEIS Foundation Inc.,
 \emph{The On-Line Encyclopedia of Integer Sequences} (2026),
-sequences A006770 (fixed polyplets), A030222 (free polyplets),
-A001168 (fixed polyominoes). \url{https://oeis.org}.
+sequences A006770, A030222, A001168. \url{https://oeis.org}.
 
 \end{thebibliography}
 
