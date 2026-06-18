@@ -19,27 +19,34 @@ remaining term out to n=36 and matches the independently-computed B_H(19).
 - **H=4:** order-15 recurrence, denominator
   1 - 11x + 41x^2 - 49x^3 - 39x^4 + 113x^5 + 7x^6 - 155x^7 + 57x^8 + 67x^9
     - 63x^10 - 19x^11 + 17x^12 - x^13 - 5x^14 - x^15.
-  Fit on all 32 available exact terms (B_4 overflows u64 at n=32), clean integer
-  coefficients, but NOT yet held-out-validated -- this is the wall the mod-p
-  engine removes. See [[shelf]] / task #26.
+  Now held-out-validated by the independent big-integer engine (below).
 
-## The order conjecture
-The minimal recurrence order (= deg Q_H) is
+## The order sequence (and a debunked conjecture)
+The minimal recurrence orders (= deg Q_H), validated:
 
-    H:      1   2   3   4
-    order:  1   3   7   15      = 2^H - 1
+    H:      1   2   3   4   5   6
+    order:  1   3   7   15  35  67
 
-far below the boundary-state count D_H = 1, 5, 15, 39, ... (~2.6^H). Conjecture:
-**deg Q_H = 2^H - 1**, the number of nonempty column-occupancy patterns of an
-H-row strip -- suggesting the denominator is the characteristic polynomial of the
-(2^H-1)-dimensional occupancy transfer matrix, with connectivity tracking
-affecting only the numerator. Consequence: reaching height H's GF needs only
-~2(2^H-1) terms, not ~2 D_H -- cheaper than feared. Unconfirmed past H=4; the
-mod-p engine (unbounded terms, no overflow) is needed to test H>=5 (order 31+)
-and to held-out-validate H=4.
+An EARLIER conjecture that this is 2^H - 1 (1, 3, 7, 15, ...) was **FALSE** -- it
+matched only by coincidence through H=4, then breaks (H=5 is 35, not 31; H=6 is
+67, not 63). It was caught precisely by recomputing at higher H with an
+independent implementation. The orders stay well below the boundary-state count
+D_H = 1, 5, 15, 39, 98, 246, but follow no clean closed form yet; the sequence
+1, 3, 7, 15, 35, 67 is not in OEIS.
+
+## Independent verification
+`gf/fixed_height.py` is a from-scratch big-integer fixed-height king transfer
+matrix (no overflow, no pruning -- so no modular-reduction subtleties). It:
+- reproduces the C++ engine's B_H(n) exactly for n<=19 at every H (cross-check);
+- held-out-validates the recovered recurrence for H=1..6 (the recurrence,
+  recovered by Berlekamp-Massey, reproduces every term beyond its order);
+- thereby confirms H=4 (order 15) and disproves 2^H-1 at H=5,6.
 
 ## Next
-Build the mod-p transfer-matrix engine: compute B_H(n) mod several primes to
-2(2^H-1)+margin terms, Berlekamp-Massey mod p, CRT + rational reconstruction to
-lift to the exact integer recurrence. Confirms H=4 and extends to higher H.
-Cross-check every recovered GF against the diagonal B_H(H) = 3^(H-1).
+A mod-p C++ transfer matrix (counts mod several primes, Berlekamp-Massey mod p,
+CRT + rational reconstruction) extends the GFs to higher H than the Python engine
+reaches in reasonable time. NOTE the mod-p trap: the prune's "is this count
+nonzero?" test breaks under modular reduction (a true count = 0 mod p reads as
+absent), so the reachable-size info must be tracked structurally, separate from
+the mod-p magnitudes. Cross-check every recovered GF against the diagonal
+B_H(H) = 3^(H-1).
