@@ -27,8 +27,9 @@ agreement is recorded in the ledger.
 ## R1 — Fixed polyplets, a(19) of A006770
 
 **Value:** a(19) = 151,609,203,011,580
-**Status:** **confirmed** (two decorrelated campaigns agree bit-for-bit;
-algorithm-independent transfer-matrix check additionally in progress)
+**Status:** **confirmed** (two decorrelated Redelmeier campaigns agree
+bit-for-bit, *and* an algorithm-independent column transfer-matrix recount
+reproduces the same value — see "The algorithm-independent confirmation" below)
 
 **What it is:** the number of fixed (translation-distinct) king-move animals
 of 19 cells — the first term past the previous record of n=18.
@@ -61,39 +62,49 @@ split 7×64, `runs/a19-A/`. Ledger: `campaign_complete` entry for a19-A.
 - consistent with external truth: n≤18 == A006770 (the published range,
   including Fixed(18)=22,471,158,811,164).
 
-**Residual risk and the further check in progress:**
-- both campaigns run the **same generation algorithm** (Redelmeier), so the one
+**The algorithm-independent confirmation (done 2026-06-16):**
+- both Redelmeier campaigns run the **same generation algorithm**, so the one
   failure mode they cannot catch is a shared algorithmic bug invisible at n≤18.
-  The mod-8 Burnside congruence is one orthogonal guard. The stronger guard —
-  an **algorithm-independent** recount by the column transfer-matrix engine (a
-  different counting method) reaching n=19 — is under construction
-  (`plan-transfer-matrix-a19.md`): viable-mask enumeration and an
-  admissible size-budget prune are built and gate-validated against A006770;
-  the n=19 run is the remaining step. Honest scale (corrected from the earlier
-  note): the size-budget prune is modest (~15%), peak ≈ a few ×10⁷ boundary
-  states, so n=19 is a few-GB run, not megabyte-scale. See
+  That guard is now closed: the **column transfer-matrix engine** (`cpp/tma/`),
+  a completely different counting method — dynamic programming over boundary
+  signatures, no animal ever generated — independently recounted the whole
+  sequence on **ayr** (x86 / GCC) and assembles to a(n) = Σ_H byHeight[H][n] =
+  **151,609,203,011,580** at n=19, with n≤18 byte-identical to A006770. Method
+  documented in `method-a19.md`; engine math/feasibility in
   `results/tma_state_growth.md`.
+- The recount was run as independent per-height jobs (heights 17/18/19 the long
+  poles); per-height rows in `~/poly-tma/runs/tma-a19/` on ayr. Two further
+  cross-checks passed: a **backward** completion DP on gympie (Apple
+  clang/ARM — different host, compiler, ISA, *and* DP direction) reproduced
+  byHeight[17][19] = 47,839,787,379 identically to ayr's forward count; and the
+  transfer-matrix per-height marginals match the generation engine's
+  bounding-box-height marginals (`tests/gate_tma.py`).
+- Net: a(19) is now backed by **two independent algorithms** (Redelmeier
+  generation and transfer-matrix counting) agreeing exactly, each reproducing
+  all 18 prior published terms. A shared algorithmic error would have to corrupt
+  two methods that share no counting logic in the identical way — not credible.
 
 ---
 
-## R2 — Free polyplets, Free(18) of A030222
+## R2 — Free polyplets, Free(18) and Free(19) of A030222
 
-**Value:** Free(18) = 2,808,898,025,438
-**Status:** **computed** (validated method; second run recommended before submit)
+**Value:** Free(18) = 2,808,898,025,438; **Free(19) = 18,951,156,321,090**
+**Status:** **computed** (validated method; second decorrelated run recommended
+before submit). Free(19) additionally rests on the now-**confirmed** Fixed(19).
 
-**What it is:** the number of king-move animals of 18 cells counted up to
-rotation and reflection — the first new term of A030222 since 2002 (it ended
-at n=17).
+**What it is:** the number of king-move animals counted up to rotation and
+reflection — A030222, which ended at n=17 (since 2002). Free(18) and Free(19)
+are both new terms.
 
 **Depends on:**
-- the published fixed count Fixed(18) = 22,471,158,811,164 (OEIS A006770,
-  external) — **NOT** on our a(19) candidate;
-- the symmetric counts at n=18 from `cpp/sym/symcount_fast` (animals with
+- the fixed counts Fixed(18) = 22,471,158,811,164 (published A006770) and
+  Fixed(19) = 151,609,203,011,580 (this work, R1, dual-method confirmed);
+- the symmetric counts at n=18,19 from `cpp/sym/symcount_fast` (animals with
   90°/180° rotation or axis/diagonal mirror symmetry);
 - Burnside assembly `tests/common.py:free_and_one_sided` via
   `sym/free_polyplets.py`.
 
-**How computed:** `sym/free_polyplets.py 18`; data in
+**How computed:** `sym/free_polyplets.py 19 151609203011580`; data in
 `results/free_onesided_polyplets.txt`.
 
 **Why we trust it:**
@@ -103,22 +114,27 @@ at n=17).
   (`tests/gate_sym.py`: oracle ← Python ← C++);
 - assembled through Burnside, the free counts **reproduce A030222 exactly for
   all n≤17** — the entire published range — so the method is validated against
-  external truth right up to the term before this one;
-- sanity: Free(18)/Free(17) = 6.727 (monotone, ≈ growth constant), and
-  Free(18) is within ~3.2×10⁶ of Fixed(18)/8 (the expected tiny symmetric
-  correction).
+  external truth right up to the terms before these;
+- sanity: Free(18) is within ~3.2×10⁶ of Fixed(18)/8 and Free(19) within
+  ~5.9×10⁶ of Fixed(19)/8 (the expected tiny positive symmetric correction);
+  ratios stay monotone (≈ growth constant).
 
-**What would make it "confirmed":**
-- a second, decorrelated run of the symmetric counts (e.g. the x86/GCC build on
-  ayr) — cheap (minutes); the symmetric counters are √-rare so they reach n=18
-  in seconds. Recommended before OEIS submission.
+**Reproduction so far / what would make it "confirmed":**
+- DONE (2026-06-18): the symmetric counts at n=19 are reproduced by an
+  *independent Python reimplementation* (`sym/symcount.py`) matching the C++
+  `symcount_fast` for all four types — r180=10,178,520, axis=9,765,524,
+  diag=8,923,786, r90=none (19≢0,1 mod 4). A different-language reimplementation
+  agreeing catches implementation/algorithmic bugs a recompile would not, so
+  this is a real upgrade over a single engine.
+- REMAINING for full "confirmed": a hardware/ISA-decorrelated run (the x86/GCC
+  build on ayr, available ~June 27) — cheap (minutes; the counters are √-rare).
 
 ---
 
-## R3 — One-sided polyplets, size 18 (and the whole sequence)
+## R3 — One-sided polyplets, size 18–19 (and the whole sequence)
 
-**Value:** OneSided(18) = 5,617,792,259,411 (full table n=1..18 in
-`results/free_onesided_polyplets.txt`)
+**Value:** OneSided(18) = 5,617,792,259,411; **OneSided(19) = 37,902,303,297,525**
+(full table n=1..19 in `results/free_onesided_polyplets.txt`)
 **Status:** **computed** — note: **no OEIS sequence for one-sided polyplets
 exists**, so the *entire* sequence n≥1 is new (the n≤17 values have no external
 sequence to match, only internal consistency).
