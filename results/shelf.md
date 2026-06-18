@@ -25,6 +25,33 @@ Three escalating targets:
 
 Status: SHELVED at user's request 2026-06-18. Pick up at target #1 if revisited.
 
+### Lean-verifying the fixed-height GFs (2026-06-18, now that we HAVE them)
+A GF is a far better Lean target than a bare count: "G_H(x)=P_H(x)/Q_H(x)" is a
+closed-form forall-n claim with real structure, not an opaque number. Sketch:
+1. Define B_H(n) via the column transfer matrix T_H (concrete finite integer
+   matrix over boundary states); B_H(n) = u^T T_H^n v.
+2. Cayley-Hamilton (in Mathlib: `aeval M (charpoly M) = 0`) => B_H satisfies the
+   linear recurrence whose coefficients are charpoly(T_H). Denominator ~ free.
+   Numerator from finitely many initial conditions. Mathlib also has
+   LinearRecurrence / PowerSeries / RatFunc.
+
+Feasible shape:
+- **General theorem (all H):** "fixed-height rows are C-finite, recurrence =
+  charpoly of the transfer matrix." Elegant; covers H=8 structurally WITHOUT
+  computing anything large (specific Q_8 = charpoly of the explicit matrix,
+  computed/trusted outside Lean).
+- **Specific GFs in-kernel:** only H<=4 (maybe 5 via native_decide). H>=6 hits a
+  wall -- charpoly of a ~D_H x D_H matrix (D_8=1604, coeffs ~1e55) is ~n^4 and
+  far past kernel reduction.
+
+*** BIG ASTERISK (jasonp, 2026-06-18) ***: feasibility here is about the MATH being
+tractable, NOT about it being a small job. Actually doing it is a major
+undertaking. The real cost is the definitional bijection -- formalizing "fixed
+polyplet of height H" and PROVING the transfer matrix counts it (the
+"definitions are the hard part" lesson, [[shelf]] reading below). That's
+months-scale Lean work by someone fluent in Mathlib, and it's the bulk of the
+effort; the Cayley-Hamilton step is the easy 10%. Do not enter lightly.
+
 ## Counting tiling polyplets (within a(n))
 Do polyplets that aren't polyominoes tile the plane? Yes, infinitely many: any
 *purely diagonal* polyplet is a polyomino in disguise (the 45-deg sublattice map
