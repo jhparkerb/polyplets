@@ -66,6 +66,46 @@ struct Counter {
   std::vector<u64> bySize;            // [n]
   std::vector<u64> byBox;             // [(n*(maxn+1)+w)*(maxn+1)+h]
 
+  // optional rook/bishop connectivity cross-check (off by default, so the
+  // production counting path is byte-for-byte unchanged). For each generated
+  // polyplet we test whether it is connected under edge (rook) adjacency and,
+  // separately, under corner (bishop) adjacency; both subset counts must equal
+  // A001168 (fixed polyominoes) -- rook-connected polyplets ARE polyominoes,
+  // and bishop-connected ones are polyominoes in disguise (one colour class:
+  // the rook lattice rotated 45 degrees). So rookConn == bishopConn == A001168.
+  bool connCheck = false;
+  std::vector<u64> rookConn, bishopConn;   // [n]
+  std::vector<int> placed;                 // grid indices of placed cells
+  std::vector<int> pidx;                   // cell -> index within `placed`
+  std::vector<char> inAnimal;              // cell -> currently placed?
+  int rookOff[4] = {0}, bishOff[4] = {0};  // neighbour deltas, grid-index space
+
+  // optional (size, edge-perimeter) joint distribution (off by default). Edge
+  // perimeter = exposed unit edges = 4*size - (sum of rook adjacencies). Shares
+  // the placed/inAnimal machinery above; needs only rookOff.
+  bool perimCheck = false;
+  std::vector<u64> byPerim;                 // [size*perimStride + perim]
+  int perimStride = 0;
+
+  static int findp(int* p, int x) { while (p[x] != x) { p[x] = p[p[x]]; x = p[x]; } return x; }
+
+  // Connected components of the current animal under the given 4 offsets.
+  int components(const int* off) {
+    int parent[kMaxN + 1];
+    for (int i = 0; i < size; ++i) parent[i] = i;
+    for (int i = 0; i < size; ++i)
+      for (int k = 0; k < 4; ++k) {
+        const int nb = placed[i] + off[k];
+        if (inAnimal[nb]) {
+          const int ri = findp(parent, i), rj = findp(parent, pidx[nb]);
+          if (ri != rj) parent[ri] = rj;
+        }
+      }
+    int comps = 0;
+    for (int i = 0; i < size; ++i) if (findp(parent, i) == i) ++comps;
+    return comps;
+  }
+
   // search state
   int size = 0, minx = 0, maxx = 0, maxy = 0;
   u64 splitCtr = 0;
@@ -98,6 +138,23 @@ struct Counter {
     reachedUndo.reserve(static_cast<size_t>(maxn) * deg + 8);
     bySize.assign(maxn + 1, 0);
     byBox.assign((maxn + 1) * (maxn + 1) * (maxn + 1), 0);
+    if (connCheck || perimCheck) {
+      inAnimal.assign(cells, 0);
+      placed.clear();
+      placed.reserve(maxn + 1);
+      rookOff[0] = 1; rookOff[1] = -1; rookOff[2] = gridW; rookOff[3] = -gridW;
+    }
+    if (connCheck) {
+      rookConn.assign(maxn + 1, 0);
+      bishopConn.assign(maxn + 1, 0);
+      pidx.assign(cells, 0);
+      bishOff[0] = gridW + 1; bishOff[1] = gridW - 1;
+      bishOff[2] = -gridW + 1; bishOff[3] = -gridW - 1;
+    }
+    if (perimCheck) {
+      perimStride = 4 * maxn + 1;
+      byPerim.assign((maxn + 1) * perimStride, 0);
+    }
   }
 
   void record() {
@@ -106,6 +163,18 @@ struct Counter {
       int w = maxx - minx + 1;
       int h = maxy + 1;                          // miny is always 0
       byBox[(size * (maxn + 1) + w) * (maxn + 1) + h] += 1;
+    }
+    if (connCheck) {
+      if (components(rookOff) == 1) rookConn[size] += 1;
+      if (components(bishOff) == 1) bishopConn[size] += 1;
+    }
+    if (perimCheck) {
+      int adjsum = 0;
+      for (int i = 0; i < size; ++i)
+        for (int k = 0; k < 4; ++k)
+          if (inAnimal[placed[i] + rookOff[k]]) ++adjsum;
+      const int perim = 4 * size - adjsum;       // exposed unit edges
+      byPerim[size * perimStride + perim] += 1;
     }
   }
 
@@ -123,6 +192,10 @@ struct Counter {
       if (x > maxx) maxx = x;
       if (y > maxy) maxy = y;
       ++size;
+      if (connCheck || perimCheck) {
+        inAnimal[j] = 1; placed.push_back(j);
+        if (connCheck) pidx[j] = size - 1;
+      }
 
       // split-mode ownership of this node and its subtree
       bool countIt = true, descend = true;
@@ -157,6 +230,7 @@ struct Counter {
 
       // unplace; (x,y) keeps status 1 so later iterations and deeper
       // levels of this loop never re-add it -- the tried-set rule
+      if (connCheck || perimCheck) { inAnimal[placed.back()] = 0; placed.pop_back(); }
       --size;
       minx = sminx; maxx = smaxx; maxy = smaxy;
     }
@@ -192,6 +266,10 @@ int main(int argc, char** argv) {
   for (int i = 3; i < argc; ++i) {
     if (std::strcmp(argv[i], "--per-box") == 0) {
       c.perBox = true;
+    } else if (std::strcmp(argv[i], "--rook-bishop") == 0) {
+      c.connCheck = true;
+    } else if (std::strcmp(argv[i], "--perimeter") == 0) {
+      c.perimCheck = true;
     } else if (std::strcmp(argv[i], "--split") == 0 && i + 3 < argc) {
       c.splitS  = std::atoi(argv[i + 1]);
       c.splitK  = std::strtoull(argv[i + 2], nullptr, 10);
@@ -209,7 +287,23 @@ int main(int argc, char** argv) {
 
   c.run();
 
-  if (c.perBox) {
+  if (c.connCheck) {
+    // "n  polyplets  rook-connected  bishop-connected"; last two must both
+    // equal A001168 (fixed polyominoes) and each other.
+    for (int n = 1; n <= c.maxn; ++n)
+      std::printf("%d %llu %llu %llu\n", n,
+                  static_cast<unsigned long long>(c.bySize[n]),
+                  static_cast<unsigned long long>(c.rookConn[n]),
+                  static_cast<unsigned long long>(c.bishopConn[n]));
+  } else if (c.perimCheck) {
+    // "n  perimeter  count"; sum over perimeter of count[n] == bySize[n].
+    for (int n = 1; n <= c.maxn; ++n)
+      for (int p = 0; p <= 4 * c.maxn; ++p) {
+        const u64 v = c.byPerim[n * c.perimStride + p];
+        if (v) std::printf("%d %d %llu\n", n, p,
+                           static_cast<unsigned long long>(v));
+      }
+  } else if (c.perBox) {
     for (int n = 1; n <= c.maxn; ++n)
       for (int w = 1; w <= c.maxn; ++w)
         for (int h = 1; h <= c.maxn; ++h) {

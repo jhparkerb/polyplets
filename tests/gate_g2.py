@@ -81,6 +81,35 @@ def main():
         san = parse_counts(run(G2_ASAN, lattice, depth))
         gate.check(opt == san, f"D asan      {lattice:8s} n<={depth}  clean + equal")
 
+    # E. rook/bishop + perimeter cross-checks (independent structural checks on
+    #    the king-animal generator). Of the generated polyplets, those connected
+    #    under edge (rook) or corner (bishop) adjacency must each equal A001168
+    #    (fixed polyominoes); rook==bishop is the 45-degree colour-class
+    #    invariant. The (size,perimeter) distribution must sum to A006770, and
+    #    its perimeter=4n slice (no rook edges) must again equal A001168.
+    a001168 = read_bfile("b001168.txt")
+    a006770 = read_bfile("b006770.txt")
+    E_DEPTH = 11
+
+    rb_ok = True
+    for line in run(G2, "square8", E_DEPTH, "--rook-bishop").strip().splitlines():
+        n, tot, rook, bish = (int(x) for x in line.split())
+        if not (tot == a006770[n] and rook == bish == a001168[n]):
+            rb_ok = False
+    gate.check(rb_ok,
+          f"E rook/bish square8 n<={E_DEPTH}: total=A006770, rook==bishop==A001168")
+
+    psum, p4n = {}, {}
+    for line in run(G2, "square8", E_DEPTH, "--perimeter").strip().splitlines():
+        n, p, c = (int(x) for x in line.split())
+        psum[n] = psum.get(n, 0) + c
+        if p == 4 * n:
+            p4n[n] = c
+    per_ok = all(psum.get(n) == a006770[n] for n in range(1, E_DEPTH + 1)) and \
+             all(p4n.get(n, 0) == a001168[n] for n in range(1, E_DEPTH + 1))
+    gate.check(per_ok,
+          f"E perimeter square8 n<={E_DEPTH}: sum=A006770, perim=4n slice=A001168")
+
     return gate.verdict("G2")
 
 
