@@ -34,15 +34,15 @@ real OEIS contributor name before any submission.
 | A030233 (one-sided) | extend: +a(18),a(19) |
 | A030234/A030235 (symmetric) | pending: verify our bilateral-symmetry counts first |
 | draft hole triangle T(n,k) | new (4-bg convention), exact through n=16 |
-| draft A_0 (hole-free), A_1 (one-hole) | new, exact through n=16 |
-| draft A_max (max hole area) | new; few terms, extendable |
+| draft A_0 (hole-free), A_1 (one-hole) | new; these ARE columns k=0,1 of the triangle (standalone per the OEIS triangle+headline-columns idiom; A_2,A_3,... are NOT minted separately) |
+| draft M(n) = max hole AREA (draft-maxholearea.txt) | new; a DISTINCT statistic (max enclosed empty *area*, not a column of the count triangle); few terms, extendable |
 
 ## Novelty re-checks (OEIS search, 2026)
 - Triangle T(n,k), A_0 (hole-free), A_1 (one-hole): **no OEIS match** on their term
   prefixes — genuinely new.
-- A_max: definition is new, but the 9-term data 0,0,0,1,1,2,3,5,6 matches 16
-  unrelated short sequences (partition counts, etc.). Extend the brute force
-  (n >= 10) to disambiguate before submitting.
+- M(n) (max hole area; NOT a triangle column): definition is new, but the 9-term
+  data 0,0,0,1,1,2,3,5,6 matches 16 unrelated short sequences (partition counts,
+  etc.). Extend the brute force (n >= 10) to disambiguate before submitting.
 - (Lesson from A030233: always search before claiming novelty.)
 
 OEIS content is under the OEIS End-User License; baselines are copied here for
