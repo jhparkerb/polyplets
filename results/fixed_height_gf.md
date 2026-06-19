@@ -101,19 +101,19 @@ THREE consecutive Q_H** (the one born at height H0 appears in Q_{H0}, Q_{H0+1},
 Q_{H0+2}, then retires). Plausibly a finite-range (3-row) coupling from king
 adjacency reaching +/-1 rows; not yet proven.
 
-This makes the orders an EXACT moving sum. Define new(H) = degree of the factor
+This makes the orders an EXACT moving sum. Define deg N_H = degree of the factor
 born at height H = deg Q_H - deg gcd(Q_{H-1}, Q_H) = algebraic degree of lambda_H:
 
   H:       1   2   3   4    5    6    7    8     9     10
-  new(H):  1   2   4   9   29   68  181  462  1254   3289
+  deg N_H:  1   2   4   9   29   68  181  462  1254   3289
 
-Then **deg Q_H = new(H) + new(H-1) + new(H-2)**, verified exactly for H=1..10:
+Then **deg Q_H = deg N_H + deg N_{H-1} + deg N_{H-2}**, verified exactly for H=1..10:
 
   orders:  1   3   7  15   42  106  278  711  1897   5005   ( = 3-term moving sum )
 
 So two linked novel sequences (both absent from OEIS, approximate "matches"
 diverge at the distinctive term 29):
-  - new-factor degrees / alg.deg(lambda_H): 1,2,4,9,29,68,181,462,1254,3289
+  - atom degrees (deg N_H = alg.deg lambda_H): 1,2,4,9,29,68,181,462,1254,3289
   - orders deg Q_H (their 3-term moving sums): 1,3,7,15,42,106,278,711,1897,5005
 
 NOTE orders vs coefficients: the lifetime-3 law is about DEGREES, which are

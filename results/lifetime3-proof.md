@@ -34,8 +34,8 @@ So "height exactly H" is the SECOND DIFFERENCE of "placements in an H-row strip"
 ## Why three
 V_H = u^T (I - x T_H)^{-1} v for the H-row strip transfer matrix T_H, so V_H is
 rational; let **N_H := reduced denominator of V_H** (a factor of det(I - x T_H)).
-Empirically deg N_H = new(H) = 1,2,4,9,29,68,181,... and N_H equals the triple
-gcd gcd(Q_H, Q_{H+1}, Q_{H+2}).
+Empirically deg N_H = 1,2,4,9,29,68,181,... and N_H equals the triple gcd
+gcd(Q_H, Q_{H+1}, Q_{H+2}).
 
 By (**), B_H is a Z-combination of V_H, V_{H-1}, V_{H-2}, so
 
@@ -44,8 +44,8 @@ By (**), B_H is a Z-combination of V_H, V_{H-1}, V_{H-2}, so
 **Lemma 3 (coprimality).** The N_H are pairwise coprime. This follows from two
 facts:
  (3a) each N_H is IRREDUCIBLE over Q  [verified H<=6], and
- (3b) the degrees new(H) = 1,2,4,9,29,68,181,... are strictly increasing
-      [clear; new(H) ~ 2.6 new(H-1)].
+ (3b) the degrees deg N_H = 1,2,4,9,29,68,181,... are strictly increasing
+      [clear; deg N_H ~ 2.6 deg N_{H-1}].
 Distinct irreducibles are coprime, so (3a)+(3b) => Lemma 3. (3a) is equivalent to
 "the dominant strip eigenvalue lambda_H is a primitive element of degree =
 deg N_H", i.e. the Perron root of the H-strip transfer matrix generates the whole
@@ -57,7 +57,7 @@ one atom, say f | N_k with k in {H-2, H-1, H}. The same f divides Q_{H'} only if
 k in {H'-2, H'-1, H'}, i.e. H' in {k, k+1, k+2}: **lifetime at most 3.**
 
 That Q_H equals the FULL product N_{H-2}N_{H-1}N_H (lifetime exactly 3, and
-deg Q_H = new(H)+new(H-1)+new(H-2)) is the statement that the second difference
+deg Q_H = deg N_H+deg N_{H-1}+deg N_{H-2}) is the statement that the second difference
 (**) loses no factor to numerator cancellation. Equivalent residue form, verified
 H<=5: for each atom N_k the three partial-fraction residues of G_k, G_{k+1},
 G_{k+2} over N_k sum to zero -- i.e. every atom-pole CANCELS in the full GF
@@ -81,15 +81,29 @@ rational pieces. Q_H is squarefree (verified H<=6), so no cancellation occurs.
 animal count is the discrete second derivative of a strip placement count whose
 weight grows linearly in the strip height. Everything else is bookkeeping.
 
+## Honest weight of this result
+Don't oversell it. The result splits cleanly:
+- The **<=3 window** (Q_H built from at most 3 consecutive atoms) is ELEMENTARY --
+  it's B_H = Delta^2 V_H plus "denominator of a 3-term combination divides the
+  product." A couple of lines once you take the unanchored-strip viewpoint.
+- The **exactly-3 / irreducible-atom** refinement is the only hard part, and it is
+  "plumbing-hard" (irreducibility of transfer-matrix characteristic polynomials --
+  no general method), not a deep or illuminating theorem even once proved.
+So this is a TIDY STRUCTURAL OBSERVATION with a satisfying elementary explanation,
+plus two new (OEIS-absent) integer sequences (atom degrees; orders). It is worth a
+paragraph in the write-up, NOT a centerpiece. The genuine value is (a) the clean
+"it's a second difference" understanding and (b) the new sequences -- not a major
+theorem.
+
 ## Empirical confirmation: the "3" is translation, not adjacency
 The proof never mentions the adjacency rule -- only that vertical placement is
 1-dimensional (weight H-g+1 linear). Sharp test: change the adjacency so the
 neighborhood is taller. A "reach-2" lattice (neighbors within +/-1 column and
 +/-2 ROWS -- king augmented with the Dabbaba (0,+/-2) leaper and (1,2) knight
 steps, a 5-row-tall neighborhood) gives DIFFERENT atoms:
-    king    new(H) = 1, 2, 4, 9, 29, 68, 181
-    reach-2 new(H) = 1, 2, 3, 5, 10, 17, 39
-yet the SAME lifetime 3 (deg Q_H = new(H)+new(H-1)+new(H-2), verified H<=7). If the
+    king    deg N_H = 1, 2, 4, 9, 29, 68, 181
+    reach-2 deg N_H = 1, 2, 3, 5, 10, 17, 39
+yet the SAME lifetime 3 (deg Q_H = deg N_H+deg N_{H-1}+deg N_{H-2}, verified H<=7). If the
 "3" came from the neighborhood's vertical reach (2*reach+1), reach-2 would give
 lifetime 5; it gives 3. (gf_modp gained a vertical-reach parameter for this;
 rook -- cross-column same row only -- likewise gives lifetime 3, but rook doesn't
@@ -102,7 +116,7 @@ The strongest test is the KNIGHT (moves (+-1,+-2),(+-2,+-1)): horizontal reach 2
 memory -- the only genuinely new axis, since king/rook/reach-V all have
 one-column memory) and it is a gapped leaper (column-skipping). Its strip GFs are
 far more complex -- deg Q_H = 0, 1, 144, 665, 3289 for H=1..5 (vs king
-1,3,7,15,42), new(H) = 0,1,143,521,2625 -- yet deg Q_H = new(H)+new(H-1)+new(H-2)
+1,3,7,15,42), deg N_H = 0,1,143,521,2625 -- yet deg Q_H = deg N_H+deg N_{H-1}+deg N_{H-2}
 holds: LIFETIME 3. (Knight engine cpp/gf_knight.cpp, validated against an
 independent brute force for n<=7.) Varying horizontal coupling does not change
 the lifetime, exactly as B_H = second-difference(V_H) requires: the "3" is the
