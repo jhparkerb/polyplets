@@ -25,6 +25,9 @@
 using u64 = std::uint64_t;
 
 static int H;
+static bool ROOK = false;   // true = rook (cross-column same row only)
+static int VREACH = 1;      // vertical adjacency reach: 1 = king, 2 = "reach-2"
+                            // (5-row-tall neighborhood, still 1-column memory)
 
 // --- tiny union-find over <= 2H node ids ---
 static int uf_find(int* p, int x) { while (p[x] != x) { p[x] = p[p[x]]; x = p[x]; } return x; }
@@ -64,7 +67,9 @@ struct KeyHash { size_t operator()(const Key& k) const {
 static u64 colLabels(int mask) {
   int rows[64]; int k = rowsOf(mask, rows);
   int p[64]; for (int i = 0; i < k; ++i) p[i] = i;
-  for (int i = 0; i + 1 < k; ++i) if (rows[i + 1] == rows[i] + 1) uf_union(p, i, i + 1);
+  for (int i = 0; i < k; ++i)                 // within-column vertical adjacency
+    for (int j = i + 1; j < k; ++j)
+      if (rows[j] - rows[i] <= VREACH) uf_union(p, i, j);
   int roots[64]; for (int i = 0; i < k; ++i) roots[i] = uf_find(p, i);
   return packCanon(roots, k);
 }
@@ -81,11 +86,16 @@ static bool step(int mask1, u64 lab1, int mask2, u64* outLab) {
   for (int i = 0; i < n1; ++i)                 // prev rows sharing a label
     for (int j = i + 1; j < n1; ++j)
       if (lab1arr[i] == lab1arr[j]) uf_union(p, i, j);
-  for (int j = 0; j + 1 < n2; ++j)             // new column vertical adjacency
-    if (r2[j + 1] == r2[j] + 1) uf_union(p, n1 + j, n1 + j + 1);
-  for (int j = 0; j < n2; ++j)                 // king cross-column adjacency
-    for (int i = 0; i < n1; ++i)
-      if (r1[i] >= r2[j] - 1 && r1[i] <= r2[j] + 1) uf_union(p, n1 + j, i);
+  for (int a = 0; a < n2; ++a)                  // new column vertical adjacency
+    for (int b = a + 1; b < n2; ++b)
+      if (r2[b] - r2[a] <= VREACH) uf_union(p, n1 + a, n1 + b);
+  for (int j = 0; j < n2; ++j)                  // cross-column adjacency
+    for (int i = 0; i < n1; ++i) {
+      const int dr = r1[i] - r2[j];
+      const bool adj = ROOK ? (dr == 0)                          // rook: same row
+                            : (dr >= -VREACH && dr <= VREACH);   // king / reach-V
+      if (adj) uf_union(p, n1 + j, i);
+    }
   // every prev component must reach some new-column node
   bool newRoot[128]; for (int i = 0; i < n1 + n2; ++i) newRoot[i] = false;
   for (int j = 0; j < n2; ++j) newRoot[uf_find(p, n1 + j)] = true;
@@ -96,10 +106,14 @@ static bool step(int mask1, u64 lab1, int mask2, u64* outLab) {
 }
 
 int main(int argc, char** argv) {
-  if (argc != 4) { std::fprintf(stderr, "usage: %s H N P\n", argv[0]); return 2; }
+  if (argc < 4) { std::fprintf(stderr, "usage: %s H N P [rook]\n", argv[0]); return 2; }
   H = std::atoi(argv[1]);
   const int N = std::atoi(argv[2]);
   const u64 P = std::strtoull(argv[3], nullptr, 10);
+  if (argc >= 5) {
+    if (std::strcmp(argv[4], "rook") == 0) ROOK = true;
+    else VREACH = std::atoi(argv[4]);          // vertical reach (1=king, 2=reach-2)
+  }
   if (H < 1 || H > 15) { std::fprintf(stderr, "H out of range (1..15)\n"); return 2; }
   const int full = (1 << H) - 1, top = 1, bot = 1 << (H - 1);
 

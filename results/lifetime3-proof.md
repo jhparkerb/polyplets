@@ -80,3 +80,19 @@ rational pieces. Q_H is squarefree (verified H<=6), so no cancellation occurs.
 **Punchline.** The "3" is the width of a second finite difference: a height-exactly
 animal count is the discrete second derivative of a strip placement count whose
 weight grows linearly in the strip height. Everything else is bookkeeping.
+
+## Empirical confirmation: the "3" is translation, not adjacency
+The proof never mentions the adjacency rule -- only that vertical placement is
+1-dimensional (weight H-g+1 linear). Sharp test: change the adjacency so the
+neighborhood is taller. A "reach-2" lattice (neighbors within +/-1 column and
++/-2 ROWS -- king augmented with the Dabbaba (0,+/-2) leaper and (1,2) knight
+steps, a 5-row-tall neighborhood) gives DIFFERENT atoms:
+    king    new(H) = 1, 2, 4, 9, 29, 68, 181
+    reach-2 new(H) = 1, 2, 3, 5, 10, 17, 39
+yet the SAME lifetime 3 (deg Q_H = new(H)+new(H-1)+new(H-2), verified H<=7). If the
+"3" came from the neighborhood's vertical reach (2*reach+1), reach-2 would give
+lifetime 5; it gives 3. (gf_modp gained a vertical-reach parameter for this;
+rook -- cross-column same row only -- likewise gives lifetime 3, but rook doesn't
+discriminate since its vertical reach is also 1.) Conclusion: lifetime-3 is
+universal across finite-range lattice-animal classes; only the atoms are
+lattice-specific.
