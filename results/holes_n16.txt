@@ -1,7 +1,7 @@
 # Exact (size, #holes) counts A_k(n) = # n-cell fixed polyplets with exactly k holes.
 # Primary 4-connected-background convention. Format: n k count.
-# n<=14 from per-animal flood; n>=15 from the validated holes transfer-matrix engine
-# (#28); n<=14 byte-identical to the flood, k-sums match A006770.
+# n<=14 per-animal flood; n>=15 holes transfer-matrix engine (#28),
+# validated: n<=14 byte-identical to flood, k-sums match A006770 (incl a(16)).
 1 0 1
 2 0 4
 3 0 20
@@ -66,3 +66,13 @@
 15 6 35086
 15 7 808
 15 8 6
+16 0 382526638033
+16 1 98796744112
+16 2 15103433472
+16 3 1603972074
+16 4 134769521
+16 5 8779911
+16 6 465138
+16 7 16410
+16 8 314
+16 9 1

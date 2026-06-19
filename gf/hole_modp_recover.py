@@ -18,6 +18,7 @@ Usage:  python3 gf/hole_modp_recover.py [Hmax] [N]   (defaults: Hmax=5, N=240)
 import os
 import sys
 import subprocess
+from multiprocessing import Pool
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from modp_recover import _primes_below, bm_modp, order_of, crt, sym
@@ -126,10 +127,16 @@ def main():
     if Hmin > 1:
         lines.append(f"# --- extension run: H={Hmin}..{Hmax}, N={N}, "
                      f"kmax={K} (hdrop), {len(PRIMES)} primes ---")
+    # the per-prime engine sweeps are independent and CPU-bound -- run them in a
+    # process pool (one core each). On a 32-core box this is ~min(#primes,cores)x
+    # faster than the serial loop and is what makes high H / large N tractable.
+    nproc = min(len(PRIMES) + 1, os.cpu_count() or 4)
     pending, disagree, nval = [], [], 0
     for H in range(Hmin, Hmax + 1):
-        seqs_by_prime = [slices_modp(H, N, p, K) for p in PRIMES]
-        val_by_k = slices_modp(H, N, VAL_PRIME, K)
+        with Pool(nproc) as pool:
+            allseq = pool.starmap(
+                slices_modp, [(H, N, p, K) for p in PRIMES + [VAL_PRIME]])
+        seqs_by_prime, val_by_k = allseq[:-1], allseq[-1]
         lines.append(f"## H={H}")
         for k in sorted(seqs_by_prime[0]):
             seqs = [sb.get(k, [0] * (N + 1)) for sb in seqs_by_prime]
