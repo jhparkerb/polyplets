@@ -11,6 +11,7 @@ Usage:  python3 gf/modp_recover.py [Hmax]
 """
 import sys, subprocess, os
 from functools import reduce
+from multiprocessing import Pool
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GF = os.path.join(ROOT, "build", "gf_modp")
@@ -122,7 +123,10 @@ def main():
         need = order // 110 + 12
         if len(PRIMES) < need:
             PRIMES = _primes_below(1 << 31, need)
-        seqs = [seq_modp(H, N, p) for p in PRIMES]
+        # per-prime sweeps are independent + CPU-bound -> process pool (one core
+        # each), the speedup that makes high H (many primes) tractable on ayr.
+        with Pool(min(len(PRIMES), os.cpu_count() or 4)) as _pool:
+            seqs = _pool.starmap(seq_modp, [(H, N, p) for p in PRIMES])
         Cs = [bm_modp(seqs[k], PRIMES[k]) for k in range(len(PRIMES))]
         Ls = [order_of(C) for C, _ in Cs]
         if len(set(Ls)) != 1:
