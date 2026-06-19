@@ -96,10 +96,16 @@ def sym(x, M):
     return x - M if x > M // 2 else x
 
 def main():
-    # usage: modp_recover.py [Hmax] [Hmin]   -- Hmin>1 appends to the existing file
+    # usage: modp_recover.py [Hmax] [Hmin] [nprimes]
+    #   Hmin>1 appends to the existing file; nprimes enlarges the CRT pool for high
+    #   H (coeffs ~square per height: H=11 ~1e445 needs ~48 primes, H=12 ~96).
+    global PRIMES
     Hmax = int(sys.argv[1]) if len(sys.argv) > 1 else 10
     Hmin = int(sys.argv[2]) if len(sys.argv) > 2 else 1
-    path = os.path.join(ROOT, "results", "fixed_height_gfs.txt")
+    if len(sys.argv) > 3:
+        PRIMES = _primes_below(1 << 31, int(sys.argv[3]))
+    path = sys.argv[4] if len(sys.argv) > 4 else \
+        os.path.join(ROOT, "results", "fixed_height_gfs.txt")
     out = open(path, "a" if Hmin > 1 else "w")
     if Hmin == 1:
         out.write("# Fixed-height polyplet generating functions G_H(x) = P_H(x)/Q_H(x)\n")
@@ -110,6 +116,12 @@ def main():
     for H in range(Hmin, Hmax + 1):
         order, _ = find_order(H)
         N = 2 * order + 30
+        # CRT pool must outrun the coefficients: log10|coeff| ~ 0.078 * deg (roots
+        # ~ lambda^deg), so primes needed ~ deg/110. Auto-grow if under-provisioned
+        # (40 primes silently failed H=10, deg 5005 ~ 1e390 > 40-prime ceiling).
+        need = order // 110 + 12
+        if len(PRIMES) < need:
+            PRIMES = _primes_below(1 << 31, need)
         seqs = [seq_modp(H, N, p) for p in PRIMES]
         Cs = [bm_modp(seqs[k], PRIMES[k]) for k in range(len(PRIMES))]
         Ls = [order_of(C) for C, _ in Cs]

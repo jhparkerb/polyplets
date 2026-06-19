@@ -104,17 +104,27 @@ adjacency reaching +/-1 rows; not yet proven.
 This makes the orders an EXACT moving sum. Define new(H) = degree of the factor
 born at height H = deg Q_H - deg gcd(Q_{H-1}, Q_H) = algebraic degree of lambda_H:
 
-  H:       1   2   3   4    5    6    7    8     9
-  new(H):  1   2   4   9   29   68  181  462  1254
+  H:       1   2   3   4    5    6    7    8     9     10
+  new(H):  1   2   4   9   29   68  181  462  1254   3289
 
-Then **deg Q_H = new(H) + new(H-1) + new(H-2)**, verified exactly for all H=1..9:
+Then **deg Q_H = new(H) + new(H-1) + new(H-2)**, verified exactly for H=1..10:
 
-  orders:  1   3   7  15   42  106  278  711  1897   ( = 3-term moving sum )
+  orders:  1   3   7  15   42  106  278  711  1897   5005   ( = 3-term moving sum )
 
 So two linked novel sequences (both absent from OEIS, approximate "matches"
 diverge at the distinctive term 29):
-  - new-factor degrees / alg.deg(lambda_H): 1,2,4,9,29,68,181,462,1254
-  - orders deg Q_H (their 3-term moving sums): 1,3,7,15,42,106,278,711,1897
+  - new-factor degrees / alg.deg(lambda_H): 1,2,4,9,29,68,181,462,1254,3289
+  - orders deg Q_H (their 3-term moving sums): 1,3,7,15,42,106,278,711,1897,5005
+
+NOTE orders vs coefficients: the lifetime-3 law is about DEGREES, which are
+recovered mod a SINGLE prime (Berlekamp-Massey, no CRT) -- so H=10 was confirmed
+in minutes. The exact INTEGER generating function (all coefficients) is a far
+bigger object: log10|coeff| ~ 0.078*deg (roots ~ lambda^deg), so the CRT pool must
+scale ~ deg/110 primes (40 silently failed H=10's deg-5005, ~1e390 coeffs).
+Validated full GFs (coeffs) are recorded for H<=9; H=10's order/structure is
+confirmed mod-p but its full coefficients were not recovered (would need ~57
+primes; not independently interesting). gf/modp_recover.py now auto-scales the
+prime pool by degree.
 This exact identity is the rigorous form of the lifetime-3 law (verified 9 terms,
 not a numerical eyeball); a transfer-matrix embedding argument would prove it. It
 is the clean structure the lambda_H values themselves lack -- it lives in the GF
