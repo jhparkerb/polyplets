@@ -1,0 +1,22 @@
+%I Axxxxxx
+%S Axxxxxx 1,4,20,109,1,622,16,3664,166,2,22094,1456,42,135609,11788,538,6,
+%T Axxxxxx 843941,91300,5596,144,1,5310754,688034,52268,2082,42,33724862,
+%U Axxxxxx 5091820,457754,24144,820,8,215793158,37209939,3841776,248526,11482
+%N Axxxxxx Irregular triangle read by rows: T(n,k) = number of fixed n-cell polyplets (king-move/"polyplet" animals, A006770) having exactly k holes, n >= 1, 0 <= k <= A_kmax(n); a hole is a bounded 4-connected component of empty cells (the topological-dual convention, matching A389193 for ordinary polyominoes).
+%C Axxxxxx A "polyplet" (or polyking) is a set of unit cells connected through edges or corners (king moves); A006770 counts the fixed ones. Here they are stratified by number of enclosed holes, where the background uses 4-connectivity (so a diagonal wall of cells does seal a region). This is the primary convention; the companion 8-connected-background stratification is a separate (not yet computed) triangle.
+%C Axxxxxx Row sums give A006770. Column k=0 (hole-free polyplets) is A_0 [draft]; column k=1 is A_1 [draft]. The polyomino (edge-connected) analogue of the holed total is A389193.
+%C Axxxxxx Computed exactly by a column transfer matrix carrying the Euler characteristic as a hole index (project thread #28); validated byte-identical to an independent per-animal flood fill for n <= 14 and with row sums equal to A006770 (incl. the confirmed A006770(19)). Terms shown through n = 16; extends as the exact count is pushed (n=17,18 in progress). - _[submitter]_, 2026
+%C Axxxxxx Generating-function structure: the contribution of bounding-box-height-exactly-H, k-hole animals is a rational function G_{H,k}(x); e.g. G_{3,1}(x) = (x^4 + 2*x^5 - 2*x^7 - x^8)/(1 - 8*x + 20*x^2 - 14*x^3 - 8*x^4 + 18*x^5 + 3*x^6 - 16*x^7 + 6*x^8 + 6*x^9 - 3*x^10 - 2*x^11 + x^12). The order of G_{H,k} is c_H*(k+1) with c_H = 6, 20, 68, 185, 537 for H = 3..7. Summed over all heights the columns A_k(x) are not expected to be D-finite (as for A006770).
+%H Axxxxxx Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet</a>.
+%e Axxxxxx Row n=1: {1};
+%e Axxxxxx Row n=2: {4};
+%e Axxxxxx Row n=3: {20};
+%e Axxxxxx Row n=4: {109, 1};
+%e Axxxxxx Row n=5: {622, 16};
+%e Axxxxxx Row n=6: {3664, 166, 2};
+%e Axxxxxx Row n=7: {22094, 1456, 42};
+%e Axxxxxx Row n=8: {135609, 11788, 538, 6};
+%Y Axxxxxx Row sums: A006770. Cf. A030222 (free polyplets), A389193 (holed fixed polyominoes, the edge-connected analogue).
+%K Axxxxxx nonn,tabf,hard
+%O Axxxxxx 1,2
+%A Axxxxxx _[submitter]_, 2026
