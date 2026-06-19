@@ -9,8 +9,9 @@ no new terms wanted, just the richest external truth available.
      (cross-ENGINE structural check: transfer matrix vs generation)
   C. ASan/UBSan build runs clean and agrees with the optimized build
 
-CLI under test: tma LATTICE MAXN [--per-height]
-  totals: "n count" lines; --per-height: "h n count" lines.
+CLI under test: tma LATTICE MAXN [--per-height] [--holes]
+  totals: "n count" lines; --per-height: "h n count" lines;
+  --holes: "n holes count" lines.
 """
 
 import os
@@ -90,6 +91,25 @@ def main():
     gate.check(tma_p == g2_p,
           f"G perimeter   square8 n<={depth_g} TMA==G2 "
           f"({len(g2_p)} (n,perimeter) cells)")
+
+    # H. (size, #holes) joint distribution: transfer matrix == the validated
+    #    per-animal flood oracle (results/holes_n14.txt, #24). The hole count is
+    #    carried in the column DP via the Euler characteristic (cpp/tma/euler.h,
+    #    sweep8_holes.h); this is the fast regression that the engine's hole
+    #    accounting still agrees with the flood. PRIMARY convention = 4-bg holes.
+    depth_h = 11
+    oracle_path = os.path.join(ROOT, "results", "holes_n14.txt")
+    flood = {}
+    with open(oracle_path) as f:
+        for line in f:
+            n, holes, count = map(int, line.split())
+            if n <= depth_h:
+                flood[(n, holes)] = count
+    tma_holes = parse_counts(run(TMA, "square8", depth_h, "--holes"))
+    tma_holes = {k: v for k, v in tma_holes.items() if k[0] <= depth_h}
+    gate.check(tma_holes == flood,
+          f"H holes       square8 n<={depth_h} TMA==flood oracle "
+          f"({len(flood)} (n,#holes) classes)")
 
     return gate.verdict("TMA")
 

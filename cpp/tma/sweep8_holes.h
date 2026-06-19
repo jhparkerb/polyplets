@@ -86,8 +86,17 @@ inline std::uint32_t boundaryOcc(const Sig& sig, int H) {
 }
 
 // Accumulate height-H contributions into result[size*Kp + holes], Kp = Kmax+1.
+// mod > 0 reduces every count mod `mod` (B_{H,k}(n) mod p, no overflow -> any n,
+// for mod-p GF recovery, #5b); mod == 0 is the exact u64 path (unchanged). All
+// counts stay < mod < 2^31, so each (a+b) < 2^32 fits u64 before reduction.
+// hdrop: when true, contributions whose hole index exceeds Kmax are DROPPED
+// rather than aborting. Exact for every slice k <= Kmax, because dHoles >= 0
+// (holes only seal, never reopen) -- a partial state already over Kmax can never
+// produce a final animal with <= Kmax holes. Lets a small Kmax bound RAM to
+// O(D_H * maxn * Kmax) so high maxn (many GF terms) fits in memory. #5b.
 inline void sweepSquare8HeightHoles(int H, int maxn, int Kmax, Conn conn,
-                                    std::vector<u64>& result) {
+                                    std::vector<u64>& result, u64 mod = 0,
+                                    bool hdrop = false) {
   const int Kp = Kmax + 1;
   const size_t stride = static_cast<size_t>(maxn + 1) * Kp;
   HoleDB db(stride), next(stride);
@@ -103,7 +112,9 @@ inline void sweepSquare8HeightHoles(int H, int maxn, int Kmax, Conn conn,
       if (ms < 0) return;
       const int comps = boundaryComps(sig, H);
       if (comps == 1 && sig.b[H] && sig.b[H + 1])         // closure: harvest as-is
-        for (size_t i = 0; i < stride; ++i) if (row[i]) result[i] += row[i];
+        for (size_t i = 0; i < stride; ++i)
+          if (row[i]) result[i] = mod ? (result[i] + row[i]) % mod
+                                       : result[i] + row[i];
       const std::uint32_t occ = boundaryOcc(sig, H);
       forEachViableMask(sig, H, maxn - ms, [&](unsigned mask) {
         Sig out;
@@ -122,12 +133,14 @@ inline void sweepSquare8HeightHoles(int H, int maxn, int Kmax, Conn conn,
             const u64 v = row[s * Kp + h];
             if (!v) continue;
             const int nh = h + dHoles;
-            if (nh < 0 || nh >= Kp) {  // fail loud, never silently truncate
-              std::fprintf(stderr,
+            if (nh >= Kp) {
+              if (hdrop) continue;     // drop: exact for all k <= Kmax (#5b)
+              std::fprintf(stderr,     // else fail loud, never silently truncate
                   "hole index out of range: %d (Kmax=%d); raise --kmax\n", nh, Kmax);
               std::abort();
             }
-            dst[(s + cells) * Kp + nh] += v;
+            u64& cell = dst[(s + cells) * Kp + nh];
+            cell = mod ? (cell + v) % mod : cell + v;
           }
       });
     });

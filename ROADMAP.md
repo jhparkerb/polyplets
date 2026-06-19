@@ -42,13 +42,30 @@ removed in principle (the engine reaches past it; a clean n≥15 production run 
 still pending — it's slow single-threaded under the a(20) contention, tune --kmax
 down to ~10 and thread it). Full design + file-by-file map in
 `plan-transfer-matrix-holes.md`.
+DONE since: (iv) fast hole check folded into `gate_tma.py` (check H, square8 n≤11
+vs the flood oracle); (iii) deliverable (b) the **bivariate hole GFs** —
+recovered as exact rational G_{H,k}(x) for fixed (height, #holes). Two paths,
+both in the tree: `gf/hole_recover.py` (u64, single-height via the new
+`--holes --only-height H`; reaches ~n=36 before u64 wrap) and the **mod-p holes
+engine** `gf/hole_modp_recover.py` (#5b — `sweep8_holes.h` `--modp P` carries the
+*validated* Euler/hole accounting with counts reduced mod p, no overflow → many
+terms; BM-mod-p + CRT, full-GF validated vs a fresh prime). RAM is bounded by
+`--hdrop` (drop partial states whose hole count exceeds kmax — exact for all
+k≤kmax since holes only seal, never reopen), making memory O(D_H·N·kmax), linear
+in N: ~30 MB even at N=2700, so the wall is the engine's N≤4096 cap + time (∝N²),
+not RAM. Recovered + validated to `results/hole_gfs.txt`: H=3 k=0..48, H=4 k=0..13,
+H=5 k=0..3, **H=6 k=0..6** (76 GFs so far); **H=7 k=0..2 running** (N=3400). Order
+law order(H,k) = c_H·(k+1), c = 6,20,68,185,537 for H=3..7 — clean per-hole order
+increment. Feasibility frontier (N≤4096): H=6 reaches k≤10, H=7 k≤2, H=8 k=0 only,
+H≥9 blocked (order(9,0) needs N≈9000).
 REMAINING for #28: (i) n≥15 production run for the new hole terms (big n=19 still
 ayr/#20, ~60–75 GB); (ii) companion 8-bg convention (needs a 4-adjacency
-component tally — deferred); (iii) deliverable (b) the bivariate hole GFs via
-`--holes --per-height` slices → `gf/recover.py`; (iv) fold a fast hole check into
-`gate_tma.py`. NOTE: the live `build/tma` is the OLD pre-holes binary still
-running a(20) — rebuild (`make build/tma`) to get `--holes` once a(20) frees it,
-or use a separate build; `build/tma_holes` was the throwaway test binary.
+component tally — deferred); (iii) **H=8 k=0 hole GF — DEFERRED until a(20)
+finishes and frees the cores** (~20 h single-threaded: D_8=1604 → ~½ h/sweep ×
+~30 primes; run `python3 gf/hole_modp_recover.py 8 8 3400 0 30`, appends).
+NOTE: `build/tma_holes` is the current holes+modp engine (built from live source);
+production `build/tma` is still the OLD pre-holes binary running a(20) — rebuild
+(`make build/tma`) once it frees.
 
 **#25 — OEIS submission prep.**
 Draft b-files + descriptions + cross-references for the new sequences: OneSided

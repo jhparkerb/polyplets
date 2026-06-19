@@ -94,7 +94,8 @@ int main(int argc, char** argv) {
   if (argc < 3) {
     std::fprintf(stderr,
                  "usage: %s {square4|square8} MAXN [--per-height] "
-                 "[--holes [--kmax K]] [--checkpoint DIR]\n",
+                 "[--holes [--kmax K] [--only-height H] [--modp P]] "
+                 "[--checkpoint DIR]\n",
                  argv[0]);
     return 2;
   }
@@ -105,11 +106,12 @@ int main(int argc, char** argv) {
   }
   const int maxn = std::atoi(argv[2]);
   // Cap is a safety bound, not an algorithmic limit: the fixed-width signature
-  // supports strip heights H<=30, but the cell budget n is independent. Larger n
-  // is used by the fixed-height GF work to gather enough terms for recurrence
-  // recovery (counts are exact u64, so watch for overflow past ~n=50 at H>=3).
-  if (maxn < 1 || maxn > 64) {
-    std::fprintf(stderr, "MAXN out of range (1..64)\n");
+  // supports strip heights H<=30, but the cell budget n is independent. The 64
+  // cap guards the EXACT u64 path (counts overflow past ~n=50 at H>=3); the mod-p
+  // holes path (--modp, #5b) has no overflow, so it gathers many more terms --
+  // the relaxed bound for it is applied after arg parsing once --modp is known.
+  if (maxn < 1 || maxn > 4096) {
+    std::fprintf(stderr, "MAXN out of range (1..4096)\n");
     return 2;
   }
   bool perHeight = false, perimeter = false, holes = false;
@@ -117,6 +119,8 @@ int main(int argc, char** argv) {
                   // so maxn can never overflow (override down to save memory)
   std::string checkpointDir;
   int nthreads = 1, onlyHeight = 0;
+  u64 modp = 0;  // --modp P: count B_{H,k}(n) mod P (holes path, #5b GF recovery)
+  bool hdrop = false;  // --hdrop: drop holes > kmax (exact for k<=kmax, bounds RAM)
   for (int i = 3; i < argc; ++i) {
     if (std::strcmp(argv[i], "--per-height") == 0) {
       perHeight = true;
@@ -133,10 +137,20 @@ int main(int argc, char** argv) {
       if (nthreads < 1) nthreads = 1;
     } else if (std::strcmp(argv[i], "--only-height") == 0 && i + 1 < argc) {
       onlyHeight = std::atoi(argv[++i]);
+    } else if (std::strcmp(argv[i], "--modp") == 0 && i + 1 < argc) {
+      modp = static_cast<u64>(std::atoll(argv[++i]));
+    } else if (std::strcmp(argv[i], "--hdrop") == 0) {
+      hdrop = true;
     } else {
       std::fprintf(stderr, "unknown arg: %s\n", argv[i]);
       return 2;
     }
+  }
+  // The exact (non-mod-p) paths overflow u64 well before n=64; only --modp may
+  // exceed the cap, since its counts are reduced and cannot overflow.
+  if (maxn > 64 && modp == 0) {
+    std::fprintf(stderr, "MAXN > 64 requires --modp P (exact counts overflow)\n");
+    return 2;
   }
 
   // (size, edge-perimeter) joint distribution via the column transfer matrix
@@ -169,6 +183,20 @@ int main(int argc, char** argv) {
     }
     if (kmax < 0) kmax = maxn;  // safe default: holes < n always
     const int Kp = kmax + 1;
+    // single height: the per-(H,k) sequences the GF recovery consumes. Isolates
+    // one strip height so a LOW height sweeps cheaply to high n (the all-heights
+    // sweep would explode); emits "H n holes count", same as --per-height for 1 H.
+    if (onlyHeight > 0) {
+      std::vector<u64> row(static_cast<size_t>(maxn + 1) * Kp, 0);
+      sweepSquare8HeightHoles(onlyHeight, maxn, kmax, Conn::FG8, row, modp, hdrop);
+      for (int n = 1; n <= maxn; ++n)
+        for (int k = 0; k <= kmax; ++k) {
+          const u64 v = row[static_cast<size_t>(n) * Kp + k];
+          if (v) std::printf("%d %d %d %llu\n", onlyHeight, n, k,
+                             static_cast<unsigned long long>(v));
+        }
+      return 0;
+    }
     if (perHeight) {
       for (int H = 1; H <= maxn; ++H) {
         std::vector<u64> row(static_cast<size_t>(maxn + 1) * Kp, 0);
