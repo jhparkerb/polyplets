@@ -37,5 +37,13 @@ real OEIS contributor name before any submission.
 | draft A_0 (hole-free), A_1 (one-hole) | new, exact through n=16 |
 | draft A_max (max hole area) | new; few terms, extendable |
 
+## Novelty re-checks (OEIS search, 2026)
+- Triangle T(n,k), A_0 (hole-free), A_1 (one-hole): **no OEIS match** on their term
+  prefixes — genuinely new.
+- A_max: definition is new, but the 9-term data 0,0,0,1,1,2,3,5,6 matches 16
+  unrelated short sequences (partition counts, etc.). Extend the brute force
+  (n >= 10) to disambiguate before submitting.
+- (Lesson from A030233: always search before claiming novelty.)
+
 OEIS content is under the OEIS End-User License; baselines are copied here for
 drafting and are attributed to their original authors in the `%A`/`%E` lines.
