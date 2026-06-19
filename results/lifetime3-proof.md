@@ -96,3 +96,14 @@ rook -- cross-column same row only -- likewise gives lifetime 3, but rook doesn'
 discriminate since its vertical reach is also 1.) Conclusion: lifetime-3 is
 universal across finite-range lattice-animal classes; only the atoms are
 lattice-specific.
+
+The strongest test is the KNIGHT (moves (+-1,+-2),(+-2,+-1)): horizontal reach 2
+(it jumps two columns, so its strip transfer matrix needs TWO-column boundary
+memory -- the only genuinely new axis, since king/rook/reach-V all have
+one-column memory) and it is a gapped leaper (column-skipping). Its strip GFs are
+far more complex -- deg Q_H = 0, 1, 144, 665, 3289 for H=1..5 (vs king
+1,3,7,15,42), new(H) = 0,1,143,521,2625 -- yet deg Q_H = new(H)+new(H-1)+new(H-2)
+holds: LIFETIME 3. (Knight engine cpp/gf_knight.cpp, validated against an
+independent brute force for n<=7.) Varying horizontal coupling does not change
+the lifetime, exactly as B_H = second-difference(V_H) requires: the "3" is the
+1-D vertical translation, full stop.
