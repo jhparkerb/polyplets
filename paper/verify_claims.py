@@ -112,5 +112,90 @@ if os.path.exists(G2):
 else:
     print("  (skipping hole checks: build/g2 not found; run `make build/g2`)")
 
+# === Claims added in the elevated paper (Sections 3, 7, 8) ===
+
+# Companions: extended free / one-sided (n=18,19) vs the symmetric-enumerator output
+fo_path = os.path.join(ROOT, "results", "free_onesided_polyplets.txt")
+if os.path.exists(fo_path):
+    FO = {}
+    for line in open(fo_path):
+        p = line.split()
+        if len(p) >= 3 and p[0].isdigit():
+            FO[int(p[0])] = (int(p[1]), int(p[2]))
+    chk("Free(18)==2808898025438",       FO.get(18,(0,0))[0]==2808898025438)
+    chk("Free(19)==18951156321090",      FO.get(19,(0,0))[0]==18951156321090)
+    chk("OneSided(18)==5617792259411",   FO.get(18,(0,0))[1]==5617792259411)
+    chk("OneSided(19)==37902303297525",  FO.get(19,(0,0))[1]==37902303297525)
+
+# Bilateral (A030234) and asymmetric (A030235) at n=19, from the subcounts
+bil19 = F(Hsym + D, 2)
+chk("bilateral(19)=(H+D)/2=9344655", bil19.denominator==1 and int(bil19)==9344655)
+chk("asymmetric(19)=Free-bilateral=18951146976435", int(free)-int(bil19)==18951146976435)
+
+# Maximum hole area M(n): values, centered-square formula, isoperimetric bound
+M = [0,0,0,1,1,2,3,5,6]   # n=1..9, brute force (sampling/amax_brute.py)
+chk("M(4)=1=2*1^2-2*1+1", M[3]==1==2*1-2*1+1)
+chk("M(8)=5=2*2^2-2*2+1", M[7]==5==2*4-2*2+1)
+chk("M(n)<=floor(n^2/8), n=1..9", all(M[n-1] <= n*n//8 for n in range(1,10)))
+
+# GF transcriptions: paper coefficients must match the recovered data files
+def gf_block(path, header):
+    P = Q = None; want = False
+    for line in open(os.path.join(ROOT, path)):
+        if line.startswith(header): want = True; continue
+        if want and line.startswith("P: "): P = eval(line[3:])
+        if want and line.startswith("Q: "): Q = eval(line[3:]); break
+    return P, Q
+P3, Q3 = gf_block("results/fixed_height_gfs.txt", "H=3 ")
+chk("G_3 numerator transcription",   P3==[0,0,0,9,-8,-2,4,1])
+chk("G_3 denominator transcription", Q3==[1,-7,15,-9,-3,5,-1,-1])
+P31, Q31 = gf_block("results/hole_gfs.txt", "H=3 k=1 ")
+chk("G_{3,1} numerator transcription",   P31==[0,0,0,0,1,2,0,-2,-1])
+chk("G_{3,1} denominator transcription", Q31==[1,-8,20,-14,-8,18,3,-16,6,6,-3,-2,1])
+
+# Fixed-height GF orders, and hole-GF order-law slopes c_H = ord(H,2)-ord(H,1)
+def order_of(path, header):
+    for line in open(os.path.join(ROOT, path)):
+        if line.startswith(header) and "order=" in line:
+            return int(line.split("order=")[1].split()[0])
+orders = [order_of("results/fixed_height_gfs.txt", f"H={H} ") for H in range(1,10)]
+chk("fixed-height orders H=1..9 = 1,3,7,15,42,106,278,711,1897",
+    orders==[1,3,7,15,42,106,278,711,1897], str(orders))
+for H,c in [(3,6),(4,20),(5,68),(6,185)]:
+    s = order_of("results/hole_gfs.txt", f"H={H} k=2 ") - \
+        order_of("results/hole_gfs.txt", f"H={H} k=1 ")
+    chk(f"c_{H}={c} (hole-GF order-law slope)", s==c, f"slope {s}")
+
+# Hole triangle rows in Table tab:holes and the A_0/A_1 caption sequences
+if os.path.exists(G2):
+    paper_rows = {4:{0:109,1:1}, 5:{0:622,1:16}, 6:{0:3664,1:166,2:2},
+                  7:{0:22094,1:1456,2:42}, 8:{0:135609,1:11788,2:538,3:6}}
+    for n,row in paper_rows.items():
+        chk(f"hole-triangle row n={n}", all(h4[n].get(k,0)==v for k,v in row.items()))
+    chk("A_0 caption seq n=1..8",
+        [h4[n].get(0,0) for n in range(1,9)]==[1,4,20,109,622,3664,22094,135609])
+    chk("A_1 caption seq n=4..8",
+        [h4[n].get(1,0) for n in range(4,9)]==[1,16,166,1456,11788])
+
+# Companions table: bilaterally-symmetric (A030234) and asymmetric (A030235) at
+# n=18,19, regenerated from the mirror sub-counts via symcount_fast
+SC = os.path.join(ROOT, "build", "symcount_fast")
+if os.path.exists(SC):
+    def sc(t):
+        out = subprocess.run([SC, t, "19"], capture_output=True, text=True).stdout
+        d = {}
+        for line in out.split("\n"):
+            p = line.split()
+            if len(p) == 2 and p[0].lstrip("-").isdigit(): d[int(p[0])] = int(p[1])
+        return d
+    Hm, Dm = sc("hmirror"), sc("dmirror")
+    freeN = {18: 2808898025438, 19: 18951156321090}
+    for n, bil, asym in [(18, 3791465, 2808894233973), (19, 9344655, 18951146976435)]:
+        b = (Hm.get(n,0) + Dm.get(n,0)) // 2
+        chk(f"bilateral({n})=(hmirror+dmirror)/2={bil}", b == bil, f"got {b}")
+        chk(f"asymmetric({n})=Free-bilateral={asym}", freeN[n] - b == asym)
+else:
+    print("  (skipping symmetric n=18,19 checks: build/symcount_fast not found)")
+
 print(f"\n{ok} checks passed, {bad} failed.")
 raise SystemExit(1 if bad else 0)
