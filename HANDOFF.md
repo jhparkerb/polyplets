@@ -1,43 +1,43 @@
-# HANDOFF — a(19) of A006770, independent confirmation in progress
+# HANDOFF — a(19) confirmed; a(20) candidate assembling on gympie
 
-Polyomino project at `/Users/jasonp/src/polyominoes` (read `method-a19.md` and
-`RESULTS.md` first). We are independently confirming a(19) of OEIS A006770 (fixed
-polyplets / king-move animals): the value **151,609,203,011,580** was produced by
-two decorrelated Redelmeier generation campaigns, and a column transfer-matrix
-engine (`cpp/tma/`) is recounting it by a different algorithm as the final check.
+Polyomino project at `/Users/jasonp/src/polyominoes` (read `ROADMAP.md`,
+`method-a19.md`, and `RESULTS.md` first). Subject: fixed polyplets / king-move
+animals, OEIS A006770.
 
-That transfer-matrix run is in progress **ON AYR** (`ssh ayr`; working dir
-`~/poly-tma`). Heights 1–16 are done (checkpoint files
-`~/poly-tma/runs/tma-a19/h1.txt`..`h16.txt`, format `"n count"` = byHeight[H][n]).
-Heights 17/18/19 run as three parallel jobs writing
-`~/poly-tma/runs/tma-a19/h17.out`, `h18.out`, `h19.out` (same format) when each
-finishes.
+## State
 
-## Your job
+**a(19) = 151,609,203,011,580 is confirmed** (RESULTS.md R1, done 2026-06-16) by
+two independent algorithms: two decorrelated Redelmeier campaigns (clang/ARM on
+gympie + GCC/x86 on ayr, byte-identical results.txt) *and* an
+algorithm-independent column transfer-matrix recount (`cpp/tma/`) that assembles
+to the same value with n≤18 byte-identical to A006770. method-a19.md and the
+b-file (`results/b006770_upload.txt`) reflect this. Nothing left to do on a(19).
 
-1. **Check progress** (do NOT poll with sleep loops; check on request or when
-   work completes):
-   ```
-   ssh ayr 'cd ~/poly-tma; pgrep -xc tma; for H in 17 18 19; do
-     [ -s runs/tma-a19/h$H.out ] && echo "H$H done" || echo "H$H running"; done'
-   ```
-2. **Assemble** when all of h17/18/19.out are non-empty: a(n) = sum over H=1..19
-   of byHeight[H][n], reading h1-16.txt + h17/18/19.out (sum the counts per n).
-3. **Verify:** a(n) must equal A006770 (`fixtures/b006770.txt`) for n=1..18, and
-   a(19) must equal **151,609,203,011,580**. Report any mismatch loudly (a low
-   value would indicate the size-budget prune was inadmissible; a mismatch
-   anywhere is a stop-everything event).
-4. **On full match:** a(19) is confirmed by two independent algorithms. Update
-   `RESULTS.md` R1 accordingly, finalize `method-a19.md`'s status line, and
-   prepare the OEIS b-file (n=1..19) plus submission text citing both methods and
-   the cross-checks (clang/ARM + GCC/x86, ASan/TSan clean, per-height marginals
-   match the generation engine). Then tell the user it's ready to submit.
+## In progress — a(20) single-method candidate (#21)
+
+The transfer-matrix engine is now extending to **a(20)** on **gympie** (local;
+this is the gympie-side single-method run — the cross-ISA reproduction is the
+remaining confirmation step and needs ayr, busy until ~June 27).
+
+- Per-height jobs write `runs/a20/h<H>.out` (format `"n count"` = byHeight[H][n]).
+- **Heights 1–18 are complete.** Height 20 is **running now**
+  (`build/tma square8 20 --only-height 20 --threads 6`, PID 79582).
+- **Height 19 is not yet started** — no `h19.out`, no process. It still needs
+  to be launched before a(20) can be assembled.
+- Assemble once h19 and h20 are both non-empty: a(20) = Σ over H=1..20 of
+  byHeight[H][20], reading h1..h20.out. Verify n≤18 against `fixtures/b006770.txt`
+  and a(19) against the confirmed **151,609,203,011,580**; report any mismatch
+  loudly (a low value would indicate an inadmissible size-budget prune).
+- Result tier: a(20) is a **candidate** (single method) until an ISA-decorrelated
+  rerun on ayr reproduces it. Do not submit; record in the ledger as candidate.
 
 ## Notes
 
-- gympie (the local machine, 24 GB) is free; ayr has 78 GB so no OOM.
+- gympie (local, 24 GB) is **busy** with the a(20) height-20 job — do not assume
+  it is free, and do not kill or disturb that process.
+- ayr (78 GB, no OOM) is busy until ~June 27; dalby off-limits.
 - Build with `make build/tma` (needs `-pthread`, C++20).
-- The user is jasonp — give bare commands, no operational hand-holding; don't run
+- jasonp is a Unix veteran — bare commands, no operational hand-holding; don't run
   destructive git/rm commands or kill processes without confirming; for
   background work, rely on completion notifications rather than sleep-polling.
 - The discarded variable-width memory experiment is preserved as
