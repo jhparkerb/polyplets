@@ -1,10 +1,10 @@
 CXX ?= c++
 CXXFLAGS = -std=c++20 -Wall -Wextra -Werror
 
-.PHONY: gates gate-g1 gate-g2 clean
+.PHONY: gates gate-g1 gate-g2 gate-euler clean
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-g3 gate-tma gate-s2 gate-e0 gate-sym
+gates: gate-g1 gate-g2 gate-g3 gate-tma gate-s2 gate-e0 gate-sym gate-euler
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
@@ -27,6 +27,13 @@ build/gf_modp: cpp/gf_modp.cpp | build
 build/g2_asan: cpp/g2_redelmeier.cpp | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer $< -o $@
+
+# Gate Euler: hole-accounting helper (#28) vs flood oracle, before engine wiring
+gate-euler: build/euler_unit
+	./build/euler_unit
+
+build/euler_unit: tests/euler_unit.cpp cpp/tma/euler.h | build
+	$(CXX) $(CXXFLAGS) -O2 $< -o $@
 
 # Gate TMA: transfer-matrix engine vs fixtures + G2 height marginals
 gate-tma: build/tma build/tma_asan build/g2
