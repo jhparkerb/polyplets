@@ -14,6 +14,7 @@
 
 #include "tma/sweep.h"
 #include "tma/sweep8.h"
+#include "tma/sweep8_holes.h"
 #include "tma/sweep8_perim.h"
 
 namespace fs = std::filesystem;
@@ -93,7 +94,7 @@ int main(int argc, char** argv) {
   if (argc < 3) {
     std::fprintf(stderr,
                  "usage: %s {square4|square8} MAXN [--per-height] "
-                 "[--checkpoint DIR]\n",
+                 "[--holes [--kmax K]] [--checkpoint DIR]\n",
                  argv[0]);
     return 2;
   }
@@ -111,7 +112,9 @@ int main(int argc, char** argv) {
     std::fprintf(stderr, "MAXN out of range (1..64)\n");
     return 2;
   }
-  bool perHeight = false, perimeter = false;
+  bool perHeight = false, perimeter = false, holes = false;
+  int kmax = -1;  // default set to maxn below: an n-cell animal has < n holes,
+                  // so maxn can never overflow (override down to save memory)
   std::string checkpointDir;
   int nthreads = 1, onlyHeight = 0;
   for (int i = 3; i < argc; ++i) {
@@ -119,6 +122,10 @@ int main(int argc, char** argv) {
       perHeight = true;
     } else if (std::strcmp(argv[i], "--perimeter") == 0) {
       perimeter = true;
+    } else if (std::strcmp(argv[i], "--holes") == 0) {
+      holes = true;
+    } else if (std::strcmp(argv[i], "--kmax") == 0 && i + 1 < argc) {
+      kmax = std::atoi(argv[++i]);
     } else if (std::strcmp(argv[i], "--checkpoint") == 0 && i + 1 < argc) {
       checkpointDir = argv[++i];
     } else if (std::strcmp(argv[i], "--threads") == 0 && i + 1 < argc) {
@@ -146,6 +153,42 @@ int main(int argc, char** argv) {
         const u64 v = dist[static_cast<size_t>(n) * Pp + p];
         if (v) std::printf("%d %d %llu\n", n, p, static_cast<unsigned long long>(v));
       }
+    return 0;
+  }
+
+  // (size, #holes) joint distribution via the column transfer matrix (square8
+  // only), primary 4-connected-background convention -- removes the per-animal
+  // flood, so it reaches the bare count's n. Cross-checked vs `g2 --holes`.
+  //   default: "n holes count" (summed over heights)
+  //   --per-height: "h n holes count" (the per-(height,holes) slices the GF
+  //                 recovery consumes)
+  if (holes) {
+    if (lattice != "square8") {
+      std::fprintf(stderr, "--holes is supported for square8 only\n");
+      return 2;
+    }
+    if (kmax < 0) kmax = maxn;  // safe default: holes < n always
+    const int Kp = kmax + 1;
+    if (perHeight) {
+      for (int H = 1; H <= maxn; ++H) {
+        std::vector<u64> row(static_cast<size_t>(maxn + 1) * Kp, 0);
+        sweepSquare8HeightHoles(H, maxn, kmax, Conn::FG8, row);
+        for (int n = 1; n <= maxn; ++n)
+          for (int k = 0; k <= kmax; ++k) {
+            const u64 v = row[static_cast<size_t>(n) * Kp + k];
+            if (v) std::printf("%d %d %d %llu\n", H, n, k,
+                               static_cast<unsigned long long>(v));
+          }
+      }
+    } else {
+      std::vector<u64> dist = sweepSquare8Holes(maxn, kmax, Conn::FG8);
+      for (int n = 1; n <= maxn; ++n)
+        for (int k = 0; k <= kmax; ++k) {
+          const u64 v = dist[static_cast<size_t>(n) * Kp + k];
+          if (v) std::printf("%d %d %llu\n", n, k,
+                             static_cast<unsigned long long>(v));
+        }
+    }
     return 0;
   }
 

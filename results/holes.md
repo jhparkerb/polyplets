@@ -59,6 +59,18 @@ These checks are folded into `tests/gate_g2.py` (check H).
 Novelty: OEIS returns no results for any of the above (checked 2026-06-18); the
 query path was sanity-checked to find A006770/A389193 correctly.
 
+## Transfer-matrix method (#28) — removes the n=14 cap
+As of 2026-06-18 the 4-bg (primary) counts are also produced *inside* the column
+transfer matrix via the Euler characteristic (`tma square8 N --holes`), with no
+per-animal flood — so they reach the bare count's n instead of capping at 14.
+Mechanism + correctness in `cpp/tma/euler.h` and `cpp/tma/sweep8_holes.h`;
+validation: byte-identical to the `g2 --holes` flood above for n≤11 and to
+`results/holes_n14.txt` for n≤14 (including the maximum-hole rows), sum-invariant
+== A006770 for n≤12. The 8-bg companion is NOT yet in the transfer matrix (it
+needs the animal's 4-adjacency component count) and stays on the flood for now.
+See `plan-transfer-matrix-holes.md` and ROADMAP #28 for the remaining work
+(n≥15 production run, the bivariate hole GFs, gate integration).
+
 ## Cost
 Per-animal flood is O(bbox area), so this caps below the bare-count reach.
 Throughput (gympie, single-thread, concurrent with other jobs): n=10 ~3s,

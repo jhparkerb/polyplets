@@ -27,6 +27,29 @@ cross-validated against the n≤14 flood data; the bit-quad/border accounting is
 correctness risk.
 → Produces hole sequences (to n=19) and hole GFs; feeds #25 and #17.
 
+**Status (2026-06-18): primary deliverable (a) built + validated; design proven.**
+The Euler/hole accounting is isolated and unit-tested in `cpp/tma/euler.h`
+(+ `tests/euler_unit.cpp`, `make gate-euler` — 191k random images + the
+diamond/ring/pinch battery). Convention pinned: PRIMARY = 4-bg holes via the
+8-fg Euler number (the −2·QD branch; my first plan draft had the sign backwards).
+The sweep `cpp/tma/sweep8_holes.h` mirrors `sweep8_perim.h` (own state store,
+reuses the validated transition/prune, **does not touch the a(n) path**); driver
+flag `tma square8 N --holes [--per-height] [--kmax K]` (default kmax=maxn, safe).
+VALIDATED: byte-identical to `g2 --holes` (n≤11) and to the saved flood
+`results/holes_n14.txt` (n≤14, incl. the max-hole animals: 6-in-12, 7-in-14);
+sum-invariant = A006770 (n≤12); per-height sums to flat. The flood's n≤14 cap is
+removed in principle (the engine reaches past it; a clean n≥15 production run is
+still pending — it's slow single-threaded under the a(20) contention, tune --kmax
+down to ~10 and thread it). Full design + file-by-file map in
+`plan-transfer-matrix-holes.md`.
+REMAINING for #28: (i) n≥15 production run for the new hole terms (big n=19 still
+ayr/#20, ~60–75 GB); (ii) companion 8-bg convention (needs a 4-adjacency
+component tally — deferred); (iii) deliverable (b) the bivariate hole GFs via
+`--holes --per-height` slices → `gf/recover.py`; (iv) fold a fast hole check into
+`gate_tma.py`. NOTE: the live `build/tma` is the OLD pre-holes binary still
+running a(20) — rebuild (`make build/tma`) to get `--holes` once a(20) frees it,
+or use a separate build; `build/tma_holes` was the throwaway test binary.
+
 **#25 — OEIS submission prep.**
 Draft b-files + descriptions + cross-references for the new sequences: OneSided
 polyplets (no OEIS sequence exists), the hole sequences (4-/8-conn, hole-free and
