@@ -68,11 +68,18 @@ production `build/tma` is still the OLD pre-holes binary running a(20) — rebui
 (`make build/tma`) once it frees.
 
 **#25 — OEIS submission prep.**
-Draft b-files + descriptions + cross-references for the new sequences: OneSided
-polyplets (no OEIS sequence exists), the hole sequences (4-/8-conn, hole-free and
-by-count), and the lifetime-3 byproducts (atom degrees 1,2,4,9,29,68,…; orders
-1,3,7,15,42,…). Includes novelty re-checks and provenance. **Nothing is submitted
-without explicit signed orders (24-h cooling-off).** This is the convergence point
+CORRECTION (verified against mathworld.wolfram.com/Polyplet.html): the polyplet
+*shape* counts already exist in OEIS — free A030222, fixed A006770, **one-sided
+A030233** (our 1,2,6,34,166,991,… matches exactly — the earlier "no OEIS sequence
+exists" note was WRONG; we'd only cross-checked one-sided against A030222), plus
+bilaterally-symmetric A030234 and asymmetric A030235. So for all of these our
+contribution is **extended b-file terms** (n=18,19), NOT new sequences — and our
+symmetric counts must be cross-checked against A030234/A030235 before claiming
+anything. The genuinely NEW sequences are only: the hole-stratified counts (4-/8-
+conn, hole-free and by-count), the hole GFs, and the lifetime-3 byproducts (atom
+degrees 1,2,4,9,29,68,…; orders 1,3,7,15,42,…). Draft b-files/descriptions/cross-
+refs accordingly; includes novelty re-checks and provenance. **Nothing is
+submitted without explicit signed orders (24-h cooling-off).** Convergence point
 where the other threads' new sequences land.
 → Feeds #17.
 
