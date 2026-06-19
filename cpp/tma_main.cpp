@@ -110,8 +110,10 @@ int main(int argc, char** argv) {
   // cap guards the EXACT u64 path (counts overflow past ~n=50 at H>=3); the mod-p
   // holes path (--modp, #5b) has no overflow, so it gathers many more terms --
   // the relaxed bound for it is applied after arg parsing once --modp is known.
-  if (maxn < 1 || maxn > 4096) {
-    std::fprintf(stderr, "MAXN out of range (1..4096)\n");
+  // Here we only enforce a generous sanity ceiling (catch typos / runaway alloc);
+  // the real exact-path cap (n<=64) is enforced below once --modp is parsed.
+  if (maxn < 1 || maxn > (1 << 20)) {
+    std::fprintf(stderr, "MAXN out of range (1..%d)\n", 1 << 20);
     return 2;
   }
   bool perHeight = false, perimeter = false, holes = false;
