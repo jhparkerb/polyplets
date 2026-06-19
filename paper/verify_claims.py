@@ -161,10 +161,13 @@ def order_of(path, header):
 orders = [order_of("results/fixed_height_gfs.txt", f"H={H} ") for H in range(1,10)]
 chk("fixed-height orders H=1..9 = 1,3,7,15,42,106,278,711,1897",
     orders==[1,3,7,15,42,106,278,711,1897], str(orders))
-for H,c in [(3,6),(4,20),(5,68),(6,185)]:
+for H,c in [(3,6),(4,20),(5,68),(6,185),(7,537)]:
     s = order_of("results/hole_gfs.txt", f"H={H} k=2 ") - \
         order_of("results/hole_gfs.txt", f"H={H} k=1 ")
     chk(f"c_{H}={c} (hole-GF order-law slope)", s==c, f"slope {s}")
+# H=7 order law c_7(k+1): rows k=0,1,2 must be exactly 537,1074,1611
+chk("H=7 hole-GF orders == 537,1074,1611 = 537*(k+1)",
+    [order_of("results/hole_gfs.txt", f"H=7 k={k} ") for k in (0,1,2)]==[537,1074,1611])
 
 # Hole triangle rows in Table tab:holes and the A_0/A_1 caption sequences
 if os.path.exists(G2):

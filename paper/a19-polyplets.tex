@@ -389,20 +389,18 @@ is the $[q^k]$ coefficient of a rational bivariate $G_H(x,q)$, hence rational. A
 mod-$p$ version of the hole transfer matrix (counts reduced modulo $p$, with
 partial states beyond the target $k$ dropped---exact since holes only seal, never
 reopen, as columns are added) yields arbitrarily many terms; we recover $G_{H,k}$
-for $H\le6$ (validated against a fresh prime), e.g.\
-% TODO(gf-H7,H8): hole-resolved GFs for H=7 are recovering (gympie, serial run)
-% and H=8 k=0 is on ayr. When H=7 lands, change "for H<=6" to "for H<=7", confirm
-% the predicted c_7=537 against the measured order-law slope (currently inferred
-% only from the H=7 hole-free row), and update verify_claims.py's c_H block.
+for $H\le6$ (all reachable $k$) and the first rows $k\le2$ at $H=7$, each validated
+against a fresh prime, e.g.\
+% TODO(gf-H8): H=8 k=0 is on ayr. The H=7 hole-resolved rows (k=0,1,2) are in and
+% confirm c_7=537 (orders 537,1074,1611); see verify_claims.py's c_H block.
 \[
   G_{3,1}(x)=\frac{x^4+2x^5-2x^7-x^8}
   {1-8x+20x^2-14x^3-8x^4+18x^5+3x^6-16x^7+6x^8+6x^9-3x^{10}-2x^{11}+x^{12}}.
 \]
 Across the recovered range the order of $G_{H,k}$ grows linearly in $k$, of the
-form $c_H(k+1)$ with $c_H=6,20,68,185$ for $H=3,4,5,6$ (and a provisional
-$c_7=537$ inferred from the height-$7$ hole-free row alone, \textbf{[TODO: confirm
-once the $H=7$ hole-resolved rows complete]}); this order law is \emph{observed,
-not proved}. Summed
+form $c_H(k+1)$ with $c_H=6,20,68,185,537$ for $H=3,\dots,7$; at $H=7$ the rows
+$k=0,1,2$ have orders $537,1074,1611$, so two independent slopes both give
+$c_7=537$. This order law is \emph{observed, not proved}. Summed
 over all heights, the columns $A_k(x)=\sum_H G_{H,k}(x)$, like $a(x)$ itself, are
 not expected to be D-finite, so the rationality is genuinely a fixed-height
 phenomenon. The fixed-height GFs also give, for any $n$, the exact contribution of
