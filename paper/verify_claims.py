@@ -133,10 +133,15 @@ chk("bilateral(19)=(H+D)/2=9344655", bil19.denominator==1 and int(bil19)==934465
 chk("asymmetric(19)=Free-bilateral=18951146976435", int(free)-int(bil19)==18951146976435)
 
 # Maximum hole area M(n): values, centered-square formula, isoperimetric bound
-M = [0,0,0,1,1,2,3,5,6]   # n=1..9, brute force (sampling/amax_brute.py)
+M = [0,0,0,1,1,2,3,5,6]   # n=1..9 (now exact via build/g2 --maxhole, C++ Redelmeier+flood)
 chk("M(4)=1=2*1^2-2*1+1", M[3]==1==2*1-2*1+1)
 chk("M(8)=5=2*2^2-2*2+1", M[7]==5==2*4-2*2+1)
 chk("M(n)<=floor(n^2/8), n=1..9", all(M[n-1] <= n*n//8 for n in range(1,10)))
+# the C++ enumerator (4-connected-background primary convention) must reproduce M(1..9)
+if os.path.exists(G2):
+    mout = subprocess.run([G2,"square8","9","--maxhole"],capture_output=True,text=True).stdout
+    mvals = [int(l.split()[1]) for l in mout.split("\n") if l.strip()]
+    chk("build/g2 --maxhole reproduces M(1..9)", mvals==M, str(mvals))
 
 # GF transcriptions: paper coefficients must match the recovered data files
 def gf_block(path, header):

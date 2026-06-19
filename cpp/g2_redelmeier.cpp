@@ -102,6 +102,15 @@ struct Counter {
   u64 hstamp = 0;
   std::vector<int> floodStk;               // flood-fill work stack
 
+  // optional max enclosed empty AREA per size (M(n), off by default). Uses the
+  // same exterior-flood machinery as countHoles(), but SUMS the enclosed empty
+  // cells (total hole area) instead of counting components, and keeps the running
+  // max per size. Across --split workers the global M(n) is the elementwise MAX of
+  // the per-worker outputs (max combines that way; counts would sum).
+  bool maxHoleCheck = false;
+  bool maxHole8 = false;                     // background flood 8-connected?
+  std::vector<u64> maxAreaBySize;            // [size] -> max enclosed empty area
+
   static int findp(int* p, int x) { while (p[x] != x) { p[x] = p[p[x]]; x = p[x]; } return x; }
 
   // Connected components of the current animal under the given 4 offsets.
@@ -170,6 +179,45 @@ struct Counter {
     return holes;
   }
 
+  // Total enclosed empty AREA for the current animal: same exterior flood as
+  // countHoles(), but count every empty cell inside the (expanded) box that the
+  // exterior flood never reaches -- i.e. the sum of all hole areas. Background
+  // connectivity 4-connected (primary, Jordan dual of the king foreground) or
+  // 8-connected (--maxhole8).
+  int holeArea() {
+    ++hstamp;
+    const int xlo = minx - 1, xhi = maxx + 1;
+    const int ylo = -1, yhi = maxy + 1;        // miny is always 0
+    const int bgdeg = maxHole8 ? 8 : 4;
+    static const int BX[8] = {1, -1, 0, 0, 1, 1, -1, -1};
+    static const int BY[8] = {0, 0, 1, -1, 1, -1, 1, -1};
+    floodStk.clear();
+    auto push = [&](int x, int y) {
+      const int j = cellIndex(x, y);
+      if (hseen[j] != hstamp) { hseen[j] = hstamp; floodStk.push_back(j); }
+    };
+    for (int x = xlo; x <= xhi; ++x) { push(x, ylo); push(x, yhi); }
+    for (int y = ylo; y <= yhi; ++y) { push(xlo, y); push(xhi, y); }
+    while (!floodStk.empty()) {
+      const int j = floodStk.back(); floodStk.pop_back();
+      const int cx = xOf[j], cy = yOf[j];
+      for (int k = 0; k < bgdeg; ++k) {
+        const int x = cx + BX[k], y = cy + BY[k];
+        if (x < xlo || x > xhi || y < ylo || y > yhi) continue;
+        const int nb = cellIndex(x, y);
+        if (inAnimal[nb] || hseen[nb] == hstamp) continue;
+        hseen[nb] = hstamp; floodStk.push_back(nb);
+      }
+    }
+    int area = 0;
+    for (int y = 0; y <= maxy; ++y)
+      for (int x = minx; x <= maxx; ++x) {
+        const int j = cellIndex(x, y);
+        if (!inAnimal[j] && hseen[j] != hstamp) ++area;   // enclosed empty cell
+      }
+    return area;
+  }
+
   // search state
   int size = 0, minx = 0, maxx = 0, maxy = 0;
   u64 splitCtr = 0;
@@ -202,7 +250,7 @@ struct Counter {
     reachedUndo.reserve(static_cast<size_t>(maxn) * deg + 8);
     bySize.assign(maxn + 1, 0);
     byBox.assign((maxn + 1) * (maxn + 1) * (maxn + 1), 0);
-    if (connCheck || perimCheck || holesCheck) {
+    if (connCheck || perimCheck || holesCheck || maxHoleCheck) {
       inAnimal.assign(cells, 0);
       placed.clear();
       placed.reserve(maxn + 1);
@@ -222,9 +270,14 @@ struct Counter {
     if (holesCheck) {
       holeStride = maxn + 1;                    // #holes <= size <= maxn
       byHoles.assign((maxn + 1) * holeStride, 0);
+    }
+    if (holesCheck || maxHoleCheck) {
       hseen.assign(cells, 0);
       hstamp = 0;
       floodStk.reserve(static_cast<size_t>(maxn) * 4 + 16);
+    }
+    if (maxHoleCheck) {
+      maxAreaBySize.assign(maxn + 1, 0);
     }
   }
 
@@ -250,6 +303,10 @@ struct Counter {
     if (holesCheck) {
       byHoles[size * holeStride + countHoles()] += 1;
     }
+    if (maxHoleCheck) {
+      const u64 a = static_cast<u64>(holeArea());
+      if (a > maxAreaBySize[size]) maxAreaBySize[size] = a;
+    }
   }
 
   void search(const int* untriedIn, int numUntried) {
@@ -266,7 +323,7 @@ struct Counter {
       if (x > maxx) maxx = x;
       if (y > maxy) maxy = y;
       ++size;
-      if (connCheck || perimCheck || holesCheck) {
+      if (connCheck || perimCheck || holesCheck || maxHoleCheck) {
         inAnimal[j] = 1; placed.push_back(j);
         if (connCheck) pidx[j] = size - 1;
       }
@@ -304,7 +361,7 @@ struct Counter {
 
       // unplace; (x,y) keeps status 1 so later iterations and deeper
       // levels of this loop never re-add it -- the tried-set rule
-      if (connCheck || perimCheck || holesCheck) { inAnimal[placed.back()] = 0; placed.pop_back(); }
+      if (connCheck || perimCheck || holesCheck || maxHoleCheck) { inAnimal[placed.back()] = 0; placed.pop_back(); }
       --size;
       minx = sminx; maxx = smaxx; maxy = smaxy;
     }
@@ -322,7 +379,8 @@ int main(int argc, char** argv) {
   if (argc < 3) {
     std::fprintf(stderr,
         "usage: %s {square4|square8|tri6} MAXN [--per-box] [--rook-bishop] "
-        "[--perimeter] [--holes|--holes8] [--split S K IDX]\n",
+        "[--perimeter] [--holes|--holes8] [--maxhole|--maxhole8] "
+        "[--split S K IDX]\n",
         argv[0]);
     return 2;
   }
@@ -349,6 +407,10 @@ int main(int argc, char** argv) {
       c.holesCheck = true;
     } else if (std::strcmp(argv[i], "--holes8") == 0) {
       c.holesCheck = true; c.holes8 = true;
+    } else if (std::strcmp(argv[i], "--maxhole") == 0) {
+      c.maxHoleCheck = true;
+    } else if (std::strcmp(argv[i], "--maxhole8") == 0) {
+      c.maxHoleCheck = true; c.maxHole8 = true;
     } else if (std::strcmp(argv[i], "--split") == 0 && i + 3 < argc) {
       c.splitS  = std::atoi(argv[i + 1]);
       c.splitK  = std::strtoull(argv[i + 2], nullptr, 10);
@@ -391,6 +453,12 @@ int main(int argc, char** argv) {
         if (v) std::printf("%d %d %llu\n", n, h,
                            static_cast<unsigned long long>(v));
       }
+  } else if (c.maxHoleCheck) {
+    // "n  M(n)"; M(n) = max enclosed empty area over all n-cell polyplets.
+    // Across --split workers, combine by taking the elementwise MAX (not sum).
+    for (int n = 1; n <= c.maxn; ++n)
+      std::printf("%d %llu\n", n,
+                  static_cast<unsigned long long>(c.maxAreaBySize[n]));
   } else if (c.perBox) {
     for (int n = 1; n <= c.maxn; ++n)
       for (int w = 1; w <= c.maxn; ++w)
