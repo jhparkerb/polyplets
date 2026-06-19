@@ -1,0 +1,13 @@
+%I Axxxxxc
+%S Axxxxxc 0,0,0,1,1,2,3,5,6
+%N Axxxxxc Maximum hole area of an n-cell polyplet: the largest number of enclosed empty cells over all fixed n-cell king-move animals (A006770), where a hole is a bounded 4-connected component of the complement.
+%C Axxxxxc A polyplet (polyking) is a set of unit cells connected through edges or corners. With the 4-connected-background convention a diagonal staircase of cells seals a region, so the area-maximizing shape is a diamond (L1 ball): a wall of 4r cells on |x|+|y|=r encloses the radius-(r-1) diamond, of area 2r^2-2r+1. Hence a(4r) = 2r^2-2r+1 (the centered square numbers A001844): a(4)=1, a(8)=5, a(12)=13, a(16)=25, a(20)=41.
+%C Axxxxxc Upper bound: a(n) <= floor(n^2/8), from the grid vertex-isoperimetric inequality (L1 balls minimize the vertex boundary), so a(n) ~ n^2/8. Equivalently, sealing area A needs at least about 2*sqrt(2A) cells. (Edge-connected polyominoes, which cannot use diagonal walls, only reach ~n^2/16.)
+%C Axxxxxc EXACT terms here are a(1..9), found by brute force over all fixed polyplets. For n > 9 only bounds are currently established: the diamond construction gives a lower bound and floor(n^2/8) an upper bound; the exact values await more enumeration. - _[submitter]_, 2026
+%e Axxxxxc a(4)=1: four cells at the N, E, S, W of an empty center form a diamond ring (each pair king-adjacent) that seals the center cell as a hole.
+%e Axxxxxc a(8)=5: the diamond wall |x|+|y|=2 (8 cells) encloses the 5 cells with |x|+|y|<=1.
+%H Axxxxxc Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet</a>.
+%Y Axxxxxc Cf. A006770 (fixed polyplets), A001844 (centered squares; equals a(n) at n=4r), Axxxxxx (polyplets by number of holes).
+%K Axxxxxc nonn,hard,more
+%O Axxxxxc 1,6
+%A Axxxxxc _[submitter]_, 2026
