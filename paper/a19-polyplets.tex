@@ -391,8 +391,9 @@ partial states beyond the target $k$ dropped---exact since holes only seal, neve
 reopen, as columns are added) yields arbitrarily many terms; we recover $G_{H,k}$
 for $H\le6$ (all reachable $k$) and the first rows $k\le2$ at $H=7$, each validated
 against a fresh prime, e.g.\
-% TODO(gf-H8): H=8 k=0 is on ayr. The H=7 hole-resolved rows (k=0,1,2) are in and
-% confirm c_7=537 (orders 537,1074,1611); see verify_claims.py's c_H block.
+% TODO(gf-H8): H=8 k=0 is in (order 1499 -> provisional c_8=1499 from the single
+% row, as c_7 was before its k=1,2 landed). Recovering H=8 k=1,2 would confirm c_8
+% and let us extend the c_H list to H=8. H=7 (k=0,1,2) already confirmed c_7=537.
 \[
   G_{3,1}(x)=\frac{x^4+2x^5-2x^7-x^8}
   {1-8x+20x^2-14x^3-8x^4+18x^5+3x^6-16x^7+6x^8+6x^9-3x^{10}-2x^{11}+x^{12}}.

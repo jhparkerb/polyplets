@@ -168,6 +168,8 @@ for H,c in [(3,6),(4,20),(5,68),(6,185),(7,537)]:
 # H=7 order law c_7(k+1): rows k=0,1,2 must be exactly 537,1074,1611
 chk("H=7 hole-GF orders == 537,1074,1611 = 537*(k+1)",
     [order_of("results/hole_gfs.txt", f"H=7 k={k} ") for k in (0,1,2)]==[537,1074,1611])
+# H=8 k=0 recovered (order 1499); provisional c_8=1499 (single row, k=1,2 pending)
+chk("H=8 k=0 hole-GF order==1499", order_of("results/hole_gfs.txt", "H=8 k=0 ")==1499)
 
 # Hole triangle rows in Table tab:holes and the A_0/A_1 caption sequences
 if os.path.exists(G2):
