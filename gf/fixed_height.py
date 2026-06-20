@@ -14,9 +14,13 @@ conjecture deg Q_H = 2^H - 1.  Usage: python3 gf/fixed_height.py [Hmax] [N]
 """
 import sys, subprocess, os, functools
 from fractions import Fraction as Fr
+from recover import berlekamp_massey as bm  # single-source the exact BM core
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMA = os.path.join(ROOT, "build", "tma")
+
+sys.path.insert(0, ROOT)
+import obs  # shared observability/provenance runtime (docs/observability.md)
 
 # ---- union-find over small integer node ids ----
 def find(p, x):
@@ -100,23 +104,6 @@ def fixed_height(H, N):
     return res
 
 # ---- recurrence recovery (Berlekamp-Massey over Q) ----
-def bm(seq):
-    s = [Fr(x) for x in seq]; C = [Fr(1)]; B = [Fr(1)]; L = 0; m = 1; b = Fr(1)
-    for n in range(len(s)):
-        d = s[n] + sum(C[i] * s[n - i] for i in range(1, L + 1))
-        if d == 0: m += 1
-        elif 2 * L <= n:
-            T = C[:]; c = d / b
-            while len(C) < len(B) + m: C.append(Fr(0))
-            for i in range(len(B)): C[i + m] -= c * B[i]
-            L = n + 1 - L; B = T; b = d; m = 1
-        else:
-            c = d / b
-            while len(C) < len(B) + m: C.append(Fr(0))
-            for i in range(len(B)): C[i + m] -= c * B[i]
-            m += 1
-    return C, L
-
 def c_tma(H):
     """exact B_H(0..19) from the C++ engine, for cross-checking."""
     out = subprocess.run([TMA, "square8", "19", "--only-height", str(H)],
@@ -129,18 +116,34 @@ def c_tma(H):
 
 def main():
     Hmax = int(sys.argv[1]) if len(sys.argv) > 1 else 7
-    for H in range(1, Hmax + 1):
-        order_guess = 2 ** H - 1
-        N = max(20, 2 * order_guess + 6)
-        s = fixed_height(H, N)
-        xcheck = (s[:20] == c_tma(H)) if os.path.exists(TMA) else None
-        C, L = bm(s)
-        def rec(k): return -sum(C[i] * Fr(s[k - i]) for i in range(1, len(C)))
-        validated = all(rec(k) == s[k] for k in range(L, len(s)))
-        order = max((i for i, c in enumerate(C) if c != 0), default=0)
-        print(f"H={H}: order {order}  (2^{H}-1={order_guess}: {order==order_guess})"
-              f"  validated:{validated}  xcheck-vs-C++:{xcheck}  [{len(s)} terms]"
-              f"  B_{H}(19)={s[19]}", flush=True)
+    # Checkpoint the per-height exact sequence: fixed_height(H,N) is an exponential
+    # (2^H boundary states) DP -- the cost. A resume reloads banked heights and
+    # recomputes only the rest, then re-derives the (cheap) recurrence + cross-check.
+    ckpt = obs.Checkpoint(os.path.join(ROOT, "runs", "ckpt", f"fixed-height-H1_{Hmax}"),
+                          {"script": "fixed_height", "Hmax": Hmax})
+    with obs.Reporter(f"fixed-height-H1_{Hmax}", script=__file__, total=Hmax) as rep:
+        for H in range(1, Hmax + 1):
+            order_guess = 2 ** H - 1
+            N = max(20, 2 * order_guess + 6)
+            s = ckpt.get_or_none(f"H{H}-N{N}")
+            if s is None:
+                s = fixed_height(H, N)
+                ckpt.save(f"H{H}-N{N}", s)
+            xcheck = (s[:20] == c_tma(H)) if os.path.exists(TMA) else None
+            C, L = bm(s)
+            def rec(k): return -sum(C[i] * Fr(s[k - i]) for i in range(1, len(C)))
+            validated = all(rec(k) == s[k] for k in range(L, len(s)))
+            order = max((i for i, c in enumerate(C) if c != 0), default=0)
+            print(f"H={H}: order {order}  (2^{H}-1={order_guess}: {order==order_guess})"
+                  f"  validated:{validated}  xcheck-vs-C++:{xcheck}  [{len(s)} terms]"
+                  f"  B_{H}(19)={s[19]}", flush=True)
+            # exponential per-height work (2^H boundary states) -- heartbeat each
+            # completed height with the conjecture check deg Q_H == 2^H-1.
+            rep.beat(done=H, force=True, H=H, order=order,
+                     order_ok=(order == order_guess), validated=validated,
+                     xcheck=xcheck)
+        rep.result = "ok"
+    ckpt.clear()
 
 if __name__ == "__main__":
     main()

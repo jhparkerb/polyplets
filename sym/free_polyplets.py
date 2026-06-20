@@ -20,6 +20,8 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+sys.path.insert(0, ROOT)
+import obs  # shared observability/provenance runtime (docs/observability.md)
 sys.path.insert(0, os.path.join(ROOT, "tests"))
 from common import free_and_one_sided, read_bfile  # noqa: E402
 
@@ -44,25 +46,36 @@ def main():
         fixed[19] = int(sys.argv[2])
     free_known = read_bfile("b030222.txt")
 
-    print(f"computing symmetric counts to n={maxn} (C++)...", flush=True)
-    sym = {t: sym_counts(t, maxn) for t in TYPES}
+    sys.stdout.write(obs.file_header("free_polyplets", f"free-N{maxn}", __file__))
+    mism = 0
+    with obs.Reporter(f"free-N{maxn}", script=__file__, total=len(TYPES)) as rep:
+        sym = {}
+        for i, t in enumerate(TYPES):           # the C++ counter is the long pole
+            sym[t] = sym_counts(t, maxn)
+            rep.beat(done=i + 1, force=True, type=t)
 
-    def g(t, n):
-        return sym[t].get(n, 0)
+        def g(t, n):
+            return sym[t].get(n, 0)
 
-    print(f"{'n':>3} {'free':>22} {'one-sided':>22}  note")
-    for n in range(1, maxn + 1):
-        if n not in fixed:
-            continue
-        free, one = free_and_one_sided(
-            fixed[n], g("r90", n), g("r180", n), g("hmirror", n), g("dmirror", n))
-        note = ""
-        if n in free_known:
-            note = "ok vs A030222" if free == free_known[n] else \
-                   f"!!! A030222 says {free_known[n]}"
-        else:
-            note = "NEW TERM"
-        print(f"{n:>3} {free:>22} {one:>22}  {note}")
+        print(f"{'n':>3} {'free':>22} {'one-sided':>22}  note")
+        for n in range(1, maxn + 1):
+            if n not in fixed:
+                continue
+            free, one = free_and_one_sided(
+                fixed[n], g("r90", n), g("r180", n), g("hmirror", n), g("dmirror", n))
+            note = ""
+            if n in free_known:
+                if free == free_known[n]:
+                    note = "ok vs A030222"
+                else:
+                    note = f"!!! A030222 says {free_known[n]}"
+                    mism += 1
+            else:
+                note = "NEW TERM"
+            print(f"{n:>3} {free:>22} {one:>22}  {note}")
+        # the cross-check against external truth (A030222) is the headline result;
+        # surface its pass/fail on the done line, not just buried in the table.
+        rep.done(result=("ok" if mism == 0 else "MISMATCH"), mismatches=mism)
 
 
 if __name__ == "__main__":

@@ -30,6 +30,9 @@ from recover import berlekamp_massey, integerize_pair, poly  # exact BM + assemb
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMA = os.path.join(ROOT, "build", "tma_holes")  # holes-capable engine
 
+sys.path.insert(0, ROOT)
+import obs  # shared observability/provenance runtime (docs/observability.md)
+
 
 def _truncate_at_wrap(seq):
     """Cut a single B_{H,k}(0..N) at the first u64 wrap. For fixed (H,k) the
@@ -96,7 +99,9 @@ def main():
     Hmax = int(sys.argv[1]) if len(sys.argv) > 1 else 4
     N = int(sys.argv[2]) if len(sys.argv) > 2 else 60
     out_path = os.path.join(ROOT, "results", "hole_gfs.txt")
-    lines = [
+    job = f"holegf-exact-H1_{Hmax}"
+    banner = obs.file_header("hole_recover", job, __file__).rstrip("\n").split("\n")
+    lines = banner + [
         "# Fixed-(height, #holes) polyplet generating functions",
         "#   G_{H,k}(x) = P/Q = sum_n B_{H,k}(n) x^n,",
         "#   B_{H,k}(n) = # height-exactly-H n-cell polyplets with exactly k holes",
@@ -106,38 +111,57 @@ def main():
         "",
     ]
     pending = []   # (H, k, exact_terms) needing the mod-p engine (#5b)
-    for H in range(1, Hmax + 1):
-        by_k = slices(H, N)
-        lines.append(f"## H={H}")
-        for k in sorted(by_k):
-            seq = by_k[k]
-            r = recover(seq)
-            if r is None:
-                continue
-            P, Q, order, validated = r
-            onset = next((i for i, v in enumerate(seq) if v), None)
-            if not validated:
-                # The fit is an overfit on too few exact terms (u64 wraps before
-                # enough terms accrue); don't emit a bogus closed form.
-                pending.append((H, k, len(seq)))
-                continue
-            lines.append(f"H={H} k={k}  order={order}  onset_n={onset}  "
-                         f"validated [{len(seq)} exact terms]")
-            lines.append(f"P: {P}")
-            lines.append(f"Q: {Q}")
-            lines.append(f"G_{{{H},{k}}}(x) = ({poly(P)}) / ({poly(Q)})")
-        lines.append("")
-    if pending:
-        lines.append("## Not recoverable in u64 (need the mod-p holes engine, #5b)")
-        lines.append("# Listed (H, k, #exact terms available before u64 wrap). The")
-        lines.append("# minimal recurrence order exceeds what these terms pin down.")
-        for H, k, t in pending:
-            lines.append(f"#   H={H} k={k}  ({t} exact terms)")
-    text = "\n".join(lines)
-    with open(out_path, "w") as f:
-        f.write(text + "\n")
-    print(text)
-    print(f"\n-> wrote {out_path}")
+    nval = 0
+    # Checkpoint per height: the expensive unit is slices(H,N) (one tma_holes
+    # sweep). A finished height's whole GF block is banked, so a kill resumes from
+    # the next height and the final file is assembled once.
+    ckpt = obs.Checkpoint(os.path.join(ROOT, "runs", "ckpt", job),
+                          {"script": "hole_recover", "Hmax": Hmax, "N": N})
+    with obs.Reporter(job, script=__file__, total=Hmax, N=N) as rep:
+        for H in range(1, Hmax + 1):
+            blk = ckpt.get_or_none(f"H{H}")
+            if blk is None:
+                hlines, hpend, h_nval = [f"## H={H}"], [], 0
+                by_k = slices(H, N)
+                for k in sorted(by_k):
+                    seq = by_k[k]
+                    r = recover(seq)
+                    if r is None:
+                        continue
+                    P, Q, order, validated = r
+                    onset = next((i for i, v in enumerate(seq) if v), None)
+                    if not validated:
+                        # overfit on too few exact terms (u64 wraps before enough
+                        # accrue); don't emit a bogus closed form.
+                        hpend.append([H, k, len(seq)])
+                        continue
+                    h_nval += 1
+                    hlines.append(f"H={H} k={k}  order={order}  onset_n={onset}  "
+                                  f"validated [{len(seq)} exact terms]")
+                    hlines.append(f"P: {P}")
+                    hlines.append(f"Q: {Q}")
+                    hlines.append(f"G_{{{H},{k}}}(x) = ({poly(P)}) / ({poly(Q)})")
+                hlines.append("")
+                blk = {"lines": hlines, "nval": h_nval, "pending": hpend}
+                ckpt.save(f"H{H}", blk)
+            lines += blk["lines"]
+            nval += blk["nval"]
+            pending += [tuple(x) for x in blk["pending"]]
+            rep.beat(done=H, force=True, H=H, validated_k=blk["nval"],
+                     pending=len(pending))
+        if pending:
+            lines.append("## Not recoverable in u64 (need the mod-p holes engine, #5b)")
+            lines.append("# Listed (H, k, #exact terms available before u64 wrap). The")
+            lines.append("# minimal recurrence order exceeds what these terms pin down.")
+            for H, k, t in pending:
+                lines.append(f"#   H={H} k={k}  ({t} exact terms)")
+        text = "\n".join(lines)
+        with open(out_path, "w") as f:
+            f.write(text + "\n")
+        print(text)
+        rep.done(result=nval, pending=len(pending), out=out_path,
+                 resumed=ckpt.n_resumed)
+    ckpt.clear()
 
 
 if __name__ == "__main__":

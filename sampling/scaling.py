@@ -28,6 +28,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SAMPLER = os.path.join(ROOT, "build", "tma_sample")
 OUTDIR = os.path.join(ROOT, "runs", "scaling")
 
+sys.path.insert(0, ROOT)
+import obs  # shared observability/provenance runtime (docs/observability.md)
+
 # (n, source). None source => generate fresh; a path => parse existing file.
 # Ladder caps fresh generation at n=14: all-heights sampling at n>=16 builds a
 # large completion DP (slow, and contends with the a(20) run). n=19 reuses the
@@ -161,8 +164,10 @@ def main():
             seed = int(args[i + 1], 0)
     os.makedirs(OUTDIR, exist_ok=True)
 
+    rep = obs.Reporter(f"scaling-{samples}", script=__file__, total=len(LADDER),
+                       samples=samples, seed=hex(seed))
     rows = []
-    for n, src in LADDER:
+    for i, (n, src) in enumerate(LADDER):
         if src is None:
             path = os.path.join(OUTDIR, f"n{n}.txt")
             subprocess.run([SAMPLER, str(n), "--samples", str(samples),
@@ -174,6 +179,8 @@ def main():
         print(f"  n={n:2d}  count={rows[-1]['count']:6d}  Rg={rows[-1]['Rg']:.3f}"
               f"  rook={rows[-1]['rook']:.2f}  holed={rows[-1]['holed_frac']:.3f}"
               f"  holes/cell={rows[-1]['holes_per_cell']:.4f}")
+        rep.beat(done=i + 1, force=True, n=n, count=rows[-1]["count"],
+                 Rg=rows[-1]["Rg"])
 
     ns = [r["n"] for r in rows]
     nu = powerlaw_exponent(ns, [r["Rg"] for r in rows])
@@ -220,8 +227,10 @@ def main():
     ]
     out_path = os.path.join(ROOT, "results", "scaling_study.md")
     with open(out_path, "w") as f:
+        f.write(obs.file_header("scaling", f"scaling-{samples}", __file__, md=True))
         f.write("\n".join(md) + "\n")
     print(f"\n-> wrote {out_path}  (nu={nu:.3f}, rook-slope={rook_slope:.2f})")
+    rep.done(result=f"nu={nu:.3f}", rook_slope=round(rook_slope, 3), out=out_path)
 
 
 if __name__ == "__main__":

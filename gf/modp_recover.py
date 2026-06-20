@@ -16,6 +16,9 @@ from multiprocessing import Pool
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GF = os.path.join(ROOT, "build", "gf_modp")
 
+sys.path.insert(0, ROOT)
+import obs  # shared observability/provenance runtime (docs/observability.md)
+
 def _isprime(n):
     if n < 2: return False
     d = n - 1; r = 0
@@ -107,64 +110,96 @@ def main():
         PRIMES = _primes_below(1 << 31, int(sys.argv[3]))
     path = sys.argv[4] if len(sys.argv) > 4 else \
         os.path.join(ROOT, "results", "fixed_height_gfs.txt")
-    out = open(path, "a" if Hmin > 1 else "w")
+    cap = int(os.environ.get("POLY_MAX_WORKERS", 0)) or (os.cpu_count() or 4)
+    job = f"fixedgf-H{Hmin}_{Hmax}"
+    # Two-level checkpoint: coarse (a height's finished GF block) skips the height
+    # entirely on resume; fine (a single (H,N,prime) mod-p sweep) skips just the
+    # banked sweeps when a height was interrupted mid-pool. Result is assembled and
+    # written ONCE at the end (atomic), so resume never double-appends a height --
+    # the failure mode of the old per-height out.write() path.
+    ckpt = obs.Checkpoint(os.path.join(ROOT, "runs", "ckpt", job),
+                          {"script": "modp_recover", "Hmin": Hmin, "Hmax": Hmax,
+                           "path": os.path.abspath(path)})
+    header = []
     if Hmin == 1:
-        out.write("# Fixed-height polyplet generating functions G_H(x) = P_H(x)/Q_H(x)\n")
-        out.write("# B_H(n) = fixed polyplets of n cells, bounding-box height exactly H.\n")
-        out.write("# Recovered by mod-p transfer matrix + Berlekamp-Massey + CRT; validated.\n")
-        out.write("# Format per height:  P: <numerator coeffs, low->high>\n")
-        out.write("#                     Q: <denominator coeffs, low->high, Q[0]=1>\n\n")
-    for H in range(Hmin, Hmax + 1):
-        order, _ = find_order(H)
-        N = 2 * order + 30
-        # CRT pool must outrun the coefficients: log10|coeff| ~ 0.078 * deg (roots
-        # ~ lambda^deg), so primes needed ~ deg/110. Auto-grow if under-provisioned
-        # (40 primes silently failed H=10, deg 5005 ~ 1e390 > 40-prime ceiling).
-        need = order // 110 + 12
-        if len(PRIMES) < need:
-            PRIMES = _primes_below(1 << 31, need)
-        # per-prime sweeps are independent + CPU-bound -> process pool (one core
-        # each), the speedup that makes high H (many primes) tractable on ayr.
-        # POLY_MAX_WORKERS caps the pool to a machine's core budget (set =10 on
-        # gympie's 10 performance cores); unset = use all logical cores.
-        _nproc = min(len(PRIMES), os.cpu_count() or 4,
-                     int(os.environ.get("POLY_MAX_WORKERS", 1 << 30)))
-        with Pool(_nproc) as _pool:
-            seqs = _pool.starmap(seq_modp, [(H, N, p) for p in PRIMES])
-        Cs = [bm_modp(seqs[k], PRIMES[k]) for k in range(len(PRIMES))]
-        Ls = [order_of(C) for C, _ in Cs]
-        if len(set(Ls)) != 1:
-            print(f"H={H}: order disagreement across primes {Ls} -- rerun", flush=True)
-            continue
-        d = Ls[0]
-        # denominator Q[0..d] by CRT (Q[0]=1), symmetric lift
-        Q = [1] + [sym(*crt([Cs[k][0][i] for k in range(len(PRIMES))], PRIMES))
-                   for i in range(1, d + 1)]
-        # numerator P[k] = sum_{i<=min(k,d)} Q[i] B_H(k-i), deg P <= d, also by CRT
-        P = []
-        for k in range(d + 1):
-            rems = [sum(Q[i] % p * seqs[ki][k - i] for i in range(min(k, d) + 1)) % p
-                    for ki, p in enumerate(PRIMES)]
-            P.append(sym(*crt(rems, PRIMES)))
-        while len(P) > 1 and P[-1] == 0: P.pop()       # trim leading-zero high terms
-        # validate the FULL GF against a fresh prime: expand P/Q as a power series
-        # and compare to the engine's sequence.
-        vp = VAL_PRIME
-        sv = seq_modp(H, N, vp)
-        b = [0] * (N + 1)
-        for n in range(N + 1):
-            v = (P[n] if n < len(P) else 0)
-            for i in range(1, d + 1):
-                if n - i >= 0: v -= Q[i] * b[n - i]
-            b[n] = v % vp
-        ok = all(b[n] == sv[n] % vp for n in range(N + 1))
-        print(f"H={H}: order {d}  full-GF-validated:{ok}  "
-              f"deg P={len(P)-1}  P[:4]={P[:4]}", flush=True)
-        out.write(f"H={H}  order={d}  validated={ok}\n")
-        out.write(f"P: {P}\n")
-        out.write(f"Q: {Q}\n\n")
-        out.flush()
-    out.close()
+        header = obs.file_header("modp_recover", job, __file__).rstrip("\n").split("\n") + [
+            "# Fixed-height polyplet generating functions G_H(x) = P_H(x)/Q_H(x)",
+            "# B_H(n) = fixed polyplets of n cells, bounding-box height exactly H.",
+            "# Recovered by mod-p transfer matrix + Berlekamp-Massey + CRT; validated.",
+            "# Format per height:  P: <numerator coeffs, low->high>",
+            "#                     Q: <denominator coeffs, low->high, Q[0]=1>", ""]
+    body, nval = [], 0
+    with obs.Reporter(job, script=__file__, total=Hmax - Hmin + 1, threads=cap) as rep:
+        for H in range(Hmin, Hmax + 1):
+            blk = ckpt.get_or_none(f"H{H}-gf")     # coarse: whole height already done
+            if blk is not None:
+                body += blk["lines"]
+                nval += blk["nval"]
+                rep.beat(done=H - Hmin + 1, force=True, H=H, cached=1)
+                continue
+            order, _ = find_order(H)
+            N = 2 * order + 30
+            # CRT pool must outrun the coefficients: log10|coeff| ~ 0.078 * deg (roots
+            # ~ lambda^deg), so primes needed ~ deg/110. Auto-grow if under-provisioned
+            # (40 primes silently failed H=10, deg 5005 ~ 1e390 > 40-prime ceiling).
+            need = order // 110 + 12
+            if len(PRIMES) < need:
+                PRIMES = _primes_below(1 << 31, need)
+            # per-prime sweeps are independent + CPU-bound -> process pool (one core
+            # each), capped by POLY_MAX_WORKERS. Fine checkpoint: load banked sweeps,
+            # compute only the misses, bank each as it lands.
+            _nproc = min(len(PRIMES), os.cpu_count() or 4,
+                         int(os.environ.get("POLY_MAX_WORKERS", 1 << 30)))
+            seqs = [ckpt.get_or_none(f"H{H}-N{N}-p{p}") for p in PRIMES]
+            miss = [ki for ki, s in enumerate(seqs) if s is None]
+            if miss:
+                with Pool(min(_nproc, len(miss))) as _pool:
+                    for ki, s in zip(miss, _pool.starmap(
+                            seq_modp, [(H, N, PRIMES[ki]) for ki in miss])):
+                        ckpt.save(f"H{H}-N{N}-p{PRIMES[ki]}", s)
+                        seqs[ki] = s
+            Cs = [bm_modp(seqs[k], PRIMES[k]) for k in range(len(PRIMES))]
+            Ls = [order_of(C) for C, _ in Cs]
+            if len(set(Ls)) != 1:
+                rep.event("order_disagree", H=H, orders=str(Ls))  # rerun needed
+                continue
+            d = Ls[0]
+            # denominator Q[0..d] by CRT (Q[0]=1), symmetric lift
+            Q = [1] + [sym(*crt([Cs[k][0][i] for k in range(len(PRIMES))], PRIMES))
+                       for i in range(1, d + 1)]
+            # numerator P[k] = sum_{i<=min(k,d)} Q[i] B_H(k-i), deg P <= d, also by CRT
+            P = []
+            for k in range(d + 1):
+                rems = [sum(Q[i] % p * seqs[ki][k - i] for i in range(min(k, d) + 1)) % p
+                        for ki, p in enumerate(PRIMES)]
+                P.append(sym(*crt(rems, PRIMES)))
+            while len(P) > 1 and P[-1] == 0: P.pop()   # trim leading-zero high terms
+            # validate the FULL GF against a fresh prime: expand P/Q as a power series
+            # and compare to the engine's sequence.
+            vp = VAL_PRIME
+            sv = ckpt.get_or_none(f"H{H}-N{N}-val{vp}")
+            if sv is None:
+                sv = seq_modp(H, N, vp)
+                ckpt.save(f"H{H}-N{N}-val{vp}", sv)
+            b = [0] * (N + 1)
+            for n in range(N + 1):
+                v = (P[n] if n < len(P) else 0)
+                for i in range(1, d + 1):
+                    if n - i >= 0: v -= Q[i] * b[n - i]
+                b[n] = v % vp
+            ok = all(b[n] == sv[n] % vp for n in range(N + 1))
+            hlines = [f"H={H}  order={d}  validated={ok}", f"P: {P}", f"Q: {Q}", ""]
+            ckpt.save(f"H{H}-gf", {"lines": hlines, "nval": int(ok)})
+            body += hlines
+            nval += int(ok)
+            # one heartbeat per completed height (coarse units, minutes-to-hours
+            # each): liveness + the per-height detail that used to print to stdout.
+            rep.beat(done=H - Hmin + 1, force=True, H=H, order=d, validated=ok,
+                     degP=len(P) - 1, primes=len(PRIMES))
+        with open(path, "a" if Hmin > 1 else "w") as out:   # single assembled write
+            out.write("\n".join(header + body) + "\n")
+        rep.done(result=nval, resumed=ckpt.n_resumed, out=path)
+    ckpt.clear()
 
 if __name__ == "__main__":
     main()

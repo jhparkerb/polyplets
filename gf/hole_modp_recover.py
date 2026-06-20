@@ -22,9 +22,13 @@ from multiprocessing import Pool
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from modp_recover import _primes_below, bm_modp, order_of, crt, sym
+from recover import poly  # single-source the GF pretty-printer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMA = os.path.join(ROOT, "build", "tma_holes")
+
+sys.path.insert(0, ROOT)
+import obs  # shared observability/provenance runtime (docs/observability.md)
 
 PRIMES = _primes_below(1 << 31, 40)
 VAL_PRIME = _primes_below(1 << 30, 1)[0]   # fresh, disjoint from PRIMES
@@ -47,6 +51,13 @@ def slices_modp(H, N, p, K=None):
         _, n, k, c = (int(x) for x in q)
         by.setdefault(k, [0] * (N + 1))[n] = c % p
     return by
+
+
+def _slice_job(args):
+    """Pool worker: (H, N, p, K) -> (p, slices). Tagged with p so results can be
+    banked per (height, prime) as they complete -- the checkpoint unit."""
+    H, N, p, K = args
+    return p, slices_modp(H, N, p, K)
 
 
 def recover_slice(seqs, val_seq, N):
@@ -83,21 +94,6 @@ def recover_slice(seqs, val_seq, N):
     return ("ok", d, P, Q, ok)
 
 
-def poly(coeffs):
-    out = []
-    for i, c in enumerate(coeffs):
-        if c == 0:
-            continue
-        mon = "" if i == 0 else ("x" if i == 1 else f"x^{i}")
-        if mon == "":
-            out.append(str(c))
-        elif abs(c) == 1:
-            out.append(("-" if c < 0 else "") + mon)
-        else:
-            out.append(f"{c}{mon}")
-    return " + ".join(out).replace("+ -", "- ") or "0"
-
-
 HEADER = [
     "# Fixed-(height, #holes) polyplet generating functions",
     "#   G_{H,k}(x) = P/Q = sum_n B_{H,k}(n) x^n,",
@@ -123,7 +119,9 @@ def main():
         PRIMES = _primes_below(1 << 31, int(sys.argv[5]))
     out_path = os.path.join(ROOT, "results", "hole_gfs.txt")
 
-    lines = [] if Hmin > 1 else list(HEADER)
+    job = f"holegf-H{Hmin}_{Hmax}-k{K}"
+    banner = obs.file_header("hole_modp_recover", job, __file__).rstrip("\n").split("\n")
+    lines = banner + (list(HEADER) if Hmin == 1 else [])
     if Hmin > 1:
         lines.append(f"# --- extension run: H={Hmin}..{Hmax}, N={N}, "
                      f"kmax={K} (hdrop), {len(PRIMES)} primes ---")
@@ -136,48 +134,73 @@ def main():
     # handles more primes serially -- still correct, only slower.
     nproc = min(len(PRIMES) + 1, os.cpu_count() or 4,
                 int(os.environ.get("POLY_MAX_WORKERS", 1 << 30)))
-    print(f"using {nproc} worker(s) "
-          f"(POLY_MAX_WORKERS={os.environ.get('POLY_MAX_WORKERS', 'unset')})",
-          flush=True)
+    # Checkpoint at the (height, prime) sweep -- the expensive C++ unit. A kill
+    # re-runs only the primes not yet banked (resumes by re-issuing the same
+    # command); the meta-guard refuses a resume whose N/kmax/primes differ.
+    allprimes = PRIMES + [VAL_PRIME]
+    ckpt = obs.Checkpoint(
+        os.path.join(ROOT, "runs", "ckpt", f"{job}-N{N}-p{len(PRIMES)}"),
+        {"N": N, "kmax": K, "primes": PRIMES, "val": VAL_PRIME})
     pending, disagree, nval = [], [], 0
-    for H in range(Hmin, Hmax + 1):
-        with Pool(nproc) as pool:
-            allseq = pool.starmap(
-                slices_modp, [(H, N, p, K) for p in PRIMES + [VAL_PRIME]])
-        seqs_by_prime, val_by_k = allseq[:-1], allseq[-1]
-        lines.append(f"## H={H}")
-        for k in sorted(seqs_by_prime[0]):
-            seqs = [sb.get(k, [0] * (N + 1)) for sb in seqs_by_prime]
-            r = recover_slice(seqs, val_by_k.get(k, [0] * (N + 1)), N)
-            if r is None:
-                continue
-            if r[0] == "insufficient":
-                pending.append((H, k, r[1]))
-                continue
-            if r[0] == "order_disagree":
-                disagree.append((H, k, r[1]))
-                continue
-            _, d, P, Q, ok = r
-            nval += ok
-            onset = next((i for i, v in enumerate(val_by_k.get(k, [])) if v), None)
-            lines.append(f"H={H} k={k}  order={d}  onset_n={onset}  validated={ok}")
-            lines.append(f"P: {P}")
-            lines.append(f"Q: {Q}")
-            lines.append(f"G_{{{H},{k}}}(x) = ({poly(P)}) / ({poly(Q)})")
-            print(f"H={H} k={k}: order {d}  validated={ok}", flush=True)
-        lines.append("")
-    if pending:
-        lines.append(f"## Pending: order >= N/2 at N={N} (raise N to recover)")
-        for H, k, d in pending:
-            lines.append(f"#   H={H} k={k}  (BM order ~{d}, need ~{2*d+2} terms)")
-    if disagree:
-        lines.append("## Order disagreement across primes (investigate):")
-        for H, k, Ls in disagree:
-            lines.append(f"#   H={H} k={k}  orders={sorted(set(Ls))}")
-    with open(out_path, "a" if Hmin > 1 else "w") as f:
-        f.write("\n".join(lines) + "\n")
-    print(f"\n-> {nval} validated GFs ({'appended' if Hmin > 1 else 'written'}) "
-          f"to {out_path}  ({len(pending)} pending, {len(disagree)} disagreements)")
+    with obs.Reporter(job, script=__file__, total=Hmax - Hmin + 1, threads=nproc,
+                      N=N, kmax=K, primes=len(PRIMES)) as rep:
+        for H in range(Hmin, Hmax + 1):
+            # gather per-prime sequences: cache-hit, or compute & bank the misses.
+            by_p, missing = {}, []
+            for p in allprimes:
+                cached = ckpt.get_or_none(f"H{H}-p{p}")
+                if cached is not None:
+                    by_p[p] = {int(k): v for k, v in cached.items()}  # JSON keys -> int
+                else:
+                    missing.append(p)
+            if missing:
+                with Pool(min(nproc, len(missing))) as pool:
+                    for p, by in pool.imap_unordered(
+                            _slice_job, [(H, N, p, K) for p in missing]):
+                        ckpt.save(f"H{H}-p{p}", by)   # durable the instant it lands
+                        by_p[p] = by
+            seqs_by_prime = [by_p[p] for p in PRIMES]
+            val_by_k = by_p[VAL_PRIME]
+            lines.append(f"## H={H}")
+            h_nval = 0
+            for k in sorted(seqs_by_prime[0]):
+                seqs = [sb.get(k, [0] * (N + 1)) for sb in seqs_by_prime]
+                r = recover_slice(seqs, val_by_k.get(k, [0] * (N + 1)), N)
+                if r is None:
+                    continue
+                if r[0] == "insufficient":
+                    pending.append((H, k, r[1]))
+                    continue
+                if r[0] == "order_disagree":
+                    disagree.append((H, k, r[1]))
+                    continue
+                _, d, P, Q, ok = r
+                nval += ok
+                h_nval += int(ok)
+                onset = next((i for i, v in enumerate(val_by_k.get(k, [])) if v), None)
+                lines.append(f"H={H} k={k}  order={d}  onset_n={onset}  validated={ok}")
+                lines.append(f"P: {P}")
+                lines.append(f"Q: {Q}")
+                lines.append(f"G_{{{H},{k}}}(x) = ({poly(P)}) / ({poly(Q)})")
+            lines.append("")
+            # one heartbeat per height (each is a full mod-p sweep across all primes,
+            # the long pole); carries the slices validated and the running backlog.
+            rep.beat(done=H - Hmin + 1, force=True, H=H, validated_k=h_nval,
+                     pending=len(pending), disagree=len(disagree))
+        if pending:
+            lines.append(f"## Pending: order >= N/2 at N={N} (raise N to recover)")
+            for H, k, d in pending:
+                lines.append(f"#   H={H} k={k}  (BM order ~{d}, need ~{2*d+2} terms)")
+        if disagree:
+            lines.append("## Order disagreement across primes (investigate):")
+            for H, k, Ls in disagree:
+                lines.append(f"#   H={H} k={k}  orders={sorted(set(Ls))}")
+        with open(out_path, "a" if Hmin > 1 else "w") as f:
+            f.write("\n".join(lines) + "\n")
+        rep.done(result=nval, pending=len(pending), disagreements=len(disagree),
+                 mode=("appended" if Hmin > 1 else "written"), out=out_path,
+                 resumed=ckpt.n_resumed)
+        ckpt.clear()   # result is durable now; drop the per-prime scaffolding
 
 
 if __name__ == "__main__":

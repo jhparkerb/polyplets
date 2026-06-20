@@ -19,6 +19,9 @@ from math import gcd
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMA = os.path.join(ROOT, "build", "tma")
 
+sys.path.insert(0, ROOT)
+import obs  # shared observability/provenance runtime (docs/observability.md)
+
 def row(H, N):
     """B_H(0..N), truncated where exact u64 counts would overflow (the values
     wrap past 2^63, breaking monotonicity) so only correct terms are returned."""
@@ -82,25 +85,32 @@ def poly(coeffs):
 def main():
     Hmax = int(sys.argv[1]) if len(sys.argv) > 1 else 4
     N    = int(sys.argv[2]) if len(sys.argv) > 2 else 36
-    for H in range(1, Hmax + 1):
-        s = row(H, N)
-        Cfull, Lfull = berlekamp_massey(s)
-        hold = len(s) - Lfull >= Lfull + 2       # margin to hold terms out?
-        fit = s[: len(s) - max(2, len(s) // 8)] if hold else s
-        C, L = berlekamp_massey(fit)
-        def rec(seq, k): return -sum(C[i] * Fr(seq[k - i]) for i in range(1, len(C)))
-        validated = hold and all(rec(s, k) == s[k] for k in range(L, len(s)))
-        if not validated:                        # fall back to the all-terms fit
-            C, L = Cfull, Lfull
-        order = max((i for i, c in enumerate(C) if c != 0), default=0)   # deg Q
-        # numerator P = S*Q, a polynomial of degree <= len(C)-1
-        Praw = [sum(C[i] * Fr(s[k - i]) for i in range(min(k, len(C) - 1) + 1))
-                for k in range(len(C))]
-        P, Q = integerize_pair(Praw, [Fr(c) for c in C])
-        print(f"\n=== H={H}: order {order}  (2^{H}-1 = {2**H - 1})  "
-              f"held-out-validated: {validated}  [{len(s)} exact terms] ===")
-        print(f"  G_{H}(x) = ({poly(P)}) / ({poly(Q)})")
-        print(f"  B_{H}(19) = {s[19] if len(s) > 19 else 'n/a'}")
+    with obs.Reporter(f"gf-recover-H1_{Hmax}", script=__file__, total=Hmax,
+                      N=N) as rep:
+        nval = 0
+        for H in range(1, Hmax + 1):
+            s = row(H, N)
+            Cfull, Lfull = berlekamp_massey(s)
+            hold = len(s) - Lfull >= Lfull + 2       # margin to hold terms out?
+            fit = s[: len(s) - max(2, len(s) // 8)] if hold else s
+            C, L = berlekamp_massey(fit)
+            def rec(seq, k): return -sum(C[i] * Fr(seq[k - i]) for i in range(1, len(C)))
+            validated = hold and all(rec(s, k) == s[k] for k in range(L, len(s)))
+            if not validated:                        # fall back to the all-terms fit
+                C, L = Cfull, Lfull
+            order = max((i for i, c in enumerate(C) if c != 0), default=0)   # deg Q
+            # numerator P = S*Q, a polynomial of degree <= len(C)-1
+            Praw = [sum(C[i] * Fr(s[k - i]) for i in range(min(k, len(C) - 1) + 1))
+                    for k in range(len(C))]
+            P, Q = integerize_pair(Praw, [Fr(c) for c in C])
+            nval += int(validated)
+            print(f"\n=== H={H}: order {order}  (2^{H}-1 = {2**H - 1})  "
+                  f"held-out-validated: {validated}  [{len(s)} exact terms] ===")
+            print(f"  G_{H}(x) = ({poly(P)}) / ({poly(Q)})")
+            print(f"  B_{H}(19) = {s[19] if len(s) > 19 else 'n/a'}")
+            rep.beat(done=H, force=True, H=H, order=order, validated=validated,
+                     terms=len(s))
+        rep.result = nval
 
 if __name__ == "__main__":
     main()
