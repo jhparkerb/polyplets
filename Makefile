@@ -1,6 +1,16 @@
 CXX ?= c++
 CXXFLAGS = -std=c++20 -Wall -Wextra -Werror
 
+# Provenance baked at BUILD time (docs/observability.md): a compiled binary
+# outlives the source state, so it must report the commit it was BUILT at, not
+# whatever the tree is now. GIT_REV carries a -dirty suffix when the tree differs
+# from HEAD at all (untracked included), matching Python obs.py's porcelain check.
+# cpp/obs.h reads these via -D; absent them it falls back to "unknown".
+GIT_REV    := $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
+GIT_DIRTY  := $(shell test -n "$$(git status --porcelain 2>/dev/null)" && echo -dirty)
+BUILD_TIME := $(shell date +%Y-%m-%dT%H:%M:%S%z)
+CXXFLAGS += -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
+
 .PHONY: gates gate-g1 gate-g2 gate-euler clean
 
 # All currently existing gates
@@ -22,6 +32,10 @@ build/g2: cpp/g2_redelmeier.cpp | build
 
 # fixed-height transfer matrix over Z/pZ, for generating-function recovery
 build/gf_modp: cpp/gf_modp.cpp | build
+	$(CXX) $(CXXFLAGS) -O3 $< -o $@
+
+# fixed-height KNIGHT-animal transfer matrix over Z/pZ (horizontal-reach test)
+build/gf_knight: cpp/gf_knight.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
 build/g2_asan: cpp/g2_redelmeier.cpp | build

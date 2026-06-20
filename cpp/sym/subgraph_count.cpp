@@ -21,6 +21,8 @@
 #include <cstdlib>
 #include <vector>
 
+#include "../obs.h"  // shared observability/provenance runtime (docs/observability.md)
+
 using u64 = std::uint64_t;
 
 struct Graph {
@@ -88,6 +90,8 @@ int main(int argc, char** argv) {
 
   g = &graph;
   g_counts.assign(g_maxn + 1, 0);
+  obs::Reporter rep("subgraph-N" + std::to_string(g_maxn), graph.V,
+                    "V=" + std::to_string(graph.V) + " E=" + std::to_string(E));
   for (int r = 0; r < graph.V; ++r) {
     g_reached.assign(graph.V, 0);
     g_reached[r] = 1;
@@ -101,10 +105,12 @@ int main(int argc, char** argv) {
       }
     }
     grow(r, graph.wt[r], std::move(untried));
+    rep.beat(r + 1, "root=" + std::to_string(r));
   }
 
   for (int w = 1; w <= g_maxn; ++w)
     if (g_counts[w])
       std::printf("%d %llu\n", w, static_cast<unsigned long long>(g_counts[w]));
+  rep.done("result=ok");
   return 0;
 }

@@ -15,6 +15,7 @@
 #pragma once
 
 #include <cstring>
+#include <functional>
 #include <mutex>
 #include <thread>
 #include <utility>
@@ -25,7 +26,8 @@
 
 // Count fixed polyplets of height exactly H (sizes 0..maxn), returned as a
 // byHeight row. Updates res.peakStates/peakHeight (the memory high-water mark).
-inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res) {
+inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
+                                 const std::function<void(int, u64)>& onColumn = {}) {
   Counts row(maxn + 1, 0);
   FlatDB db(maxn), next(maxn);
   Sig seed;
@@ -37,6 +39,7 @@ inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res) {
       res.peakStates = db.size();
       res.peakHeight = H;
     }
+    if (onColumn) onColumn(col, db.size());  // liveness/ETA hook (no-op if unset)
     next.clear();
     db.for_each([&](const Sig& sig, const u64* counts) {
       const int ms = minSizeRow(counts, maxn);
@@ -74,7 +77,8 @@ inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res) {
 // gate checks exactly that. Memory ~ serial (the shards together hold the same
 // states); no variable-width tricks, since the target machine has the RAM.
 inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
-                                   SweepResults& res) {
+                                   SweepResults& res,
+                                   const std::function<void(int, u64)>& onColumn = {}) {
   Counts row(maxn + 1, 0);
   int S = 64;
   while (S < 128 * nthreads) S <<= 1;  // shards: power of two, >> nthreads
@@ -93,6 +97,7 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
     for (int s = 0; s < S; ++s) total += dbS[s].size();
     if (total == 0) break;
     if (total > res.peakStates) { res.peakStates = total; res.peakHeight = H; }
+    if (onColumn) onColumn(col, total);  // liveness/ETA hook (no-op if unset)
     for (int s = 0; s < S; ++s) nextS[s].clear();
 
     std::vector<Counts> localRow(nthreads, Counts(maxn + 1, 0));
@@ -129,9 +134,10 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
 }
 
 // One height, serial or multithreaded by `nthreads`.
-inline Counts heightRow(int H, int maxn, int nthreads, SweepResults& res) {
-  return nthreads > 1 ? sweepSquare8HeightMT(H, maxn, nthreads, res)
-                      : sweepSquare8Height(H, maxn, res);
+inline Counts heightRow(int H, int maxn, int nthreads, SweepResults& res,
+                        const std::function<void(int, u64)>& onColumn = {}) {
+  return nthreads > 1 ? sweepSquare8HeightMT(H, maxn, nthreads, res, onColumn)
+                      : sweepSquare8Height(H, maxn, res, onColumn);
 }
 
 inline SweepResults sweepSquare8(int maxn, int nthreads = 1) {

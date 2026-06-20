@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <string>
 
+#include "obs.h"
 #include "tma/sweep.h"
 #include "tma/sweep8.h"
 #include "tma/sweep8_holes.h"
@@ -162,8 +163,10 @@ int main(int argc, char** argv) {
       std::fprintf(stderr, "--perimeter is supported for square8 only\n");
       return 2;
     }
+    obs::Reporter rep("tma-perim-N" + std::to_string(maxn), 0, "");
     const int Pmax = 4 * maxn, Pp = Pmax + 1;
     std::vector<u64> dist = sweepSquare8Perim(maxn, Pmax);
+    rep.done("result=ok");
     for (int n = 1; n <= maxn; ++n)
       for (int p = 0; p <= Pmax; ++p) {
         const u64 v = dist[static_cast<size_t>(n) * Pp + p];
@@ -189,8 +192,16 @@ int main(int argc, char** argv) {
     // one strip height so a LOW height sweeps cheaply to high n (the all-heights
     // sweep would explode); emits "H n holes count", same as --per-height for 1 H.
     if (onlyHeight > 0) {
+      obs::Reporter rep(
+          "tma-holes-H" + std::to_string(onlyHeight) + "-N" +
+              std::to_string(maxn) + "-k" + std::to_string(kmax),
+          0,
+          "height=" + std::to_string(onlyHeight) +
+              (modp ? " modp=" + std::to_string(modp) : std::string()) +
+              (hdrop ? std::string(" hdrop=1") : std::string()));
       std::vector<u64> row(static_cast<size_t>(maxn + 1) * Kp, 0);
       sweepSquare8HeightHoles(onlyHeight, maxn, kmax, Conn::FG8, row, modp, hdrop);
+      rep.done("result=ok");
       for (int n = 1; n <= maxn; ++n)
         for (int k = 0; k <= kmax; ++k) {
           const u64 v = row[static_cast<size_t>(n) * Kp + k];
@@ -200,9 +211,11 @@ int main(int argc, char** argv) {
       return 0;
     }
     if (perHeight) {
+      obs::Reporter rep("tma-holes-allH-N" + std::to_string(maxn), maxn, "");
       for (int H = 1; H <= maxn; ++H) {
         std::vector<u64> row(static_cast<size_t>(maxn + 1) * Kp, 0);
         sweepSquare8HeightHoles(H, maxn, kmax, Conn::FG8, row);
+        rep.beat(H, "height=" + std::to_string(H), true);
         for (int n = 1; n <= maxn; ++n)
           for (int k = 0; k <= kmax; ++k) {
             const u64 v = row[static_cast<size_t>(n) * Kp + k];
@@ -210,8 +223,11 @@ int main(int argc, char** argv) {
                                static_cast<unsigned long long>(v));
           }
       }
+      rep.done("result=ok");
     } else {
+      obs::Reporter rep("tma-holes-N" + std::to_string(maxn), 0, "");
       std::vector<u64> dist = sweepSquare8Holes(maxn, kmax, Conn::FG8);
+      rep.done("result=ok");
       for (int n = 1; n <= maxn; ++n)
         for (int k = 0; k <= kmax; ++k) {
           const u64 v = dist[static_cast<size_t>(n) * Kp + k];
@@ -223,13 +239,29 @@ int main(int argc, char** argv) {
   }
 
   // Compute a single strip height (square8) -- for measuring per-height scaling
-  // and for running heights as independent jobs.
+  // and for running heights as independent jobs (the a(n) diagonal sweep). This
+  // is the long-running path with no prior progress signal, so it heartbeats per
+  // column: col/maxn is the denominator, live-state count the liveness, and the
+  // ETA is self-computed from the measured column rate.
   if (onlyHeight > 0) {
     SweepResults res;
     res.byHeight.assign(maxn + 1, Counts(maxn + 1, 0));
     res.totals.assign(maxn + 1, 0);
-    res.byHeight[onlyHeight] = heightRow(onlyHeight, maxn, nthreads, res);
+    obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-N" +
+                          std::to_string(maxn),
+                      maxn, "height=" + std::to_string(onlyHeight) + " threads=" +
+                          std::to_string(nthreads));
+    res.byHeight[onlyHeight] = heightRow(
+        onlyHeight, maxn, nthreads, res, [&](int col, u64 live) {
+          rep.beat(col, "col=" + std::to_string(col) + " states=" +
+                            std::to_string(live) + " peak_states=" +
+                            std::to_string(res.peakStates));
+        });
     for (int n = 1; n <= maxn; ++n) res.totals[n] = res.byHeight[onlyHeight][n];
+    rep.done("result=" + std::to_string(static_cast<unsigned long long>(
+                             res.byHeight[onlyHeight][maxn])),
+             "peak_states=" +
+                 std::to_string(static_cast<unsigned long long>(res.peakStates)));
     emit(res, maxn, perHeight);
     return 0;
   }
@@ -245,25 +277,39 @@ int main(int argc, char** argv) {
     SweepResults res;
     res.byHeight.assign(maxn + 1, Counts(maxn + 1, 0));
     res.totals.assign(maxn + 1, 0);
+    obs::Reporter rep("tma-ckpt-N" + std::to_string(maxn), maxn,
+                      "threads=" + std::to_string(nthreads));
     for (int H = 1; H <= maxn; ++H) {
       Counts row;
       if (loadHeight(checkpointDir, H, maxn, row)) {
-        std::fprintf(stderr, "height %d/%d resumed from checkpoint\n", H, maxn);
+        rep.beat(H, "height=" + std::to_string(H) + " resumed=1", true);
       } else {
         row = heightRow(H, maxn, nthreads, res);
         saveHeight(checkpointDir, H, maxn, row);
-        std::fprintf(stderr, "height %d/%d done (peak_states %llu)\n", H, maxn,
-                     static_cast<unsigned long long>(res.peakStates));
+        rep.beat(H, "height=" + std::to_string(H) + " peak_states=" +
+                        std::to_string(static_cast<unsigned long long>(
+                            res.peakStates)),
+                 true);
       }
       res.byHeight[H] = std::move(row);
     }
     accumulateTotals(res, maxn);
+    rep.done("result=" + std::to_string(static_cast<unsigned long long>(
+                             res.totals[maxn])),
+             "peak_states=" +
+                 std::to_string(static_cast<unsigned long long>(res.peakStates)));
     emit(res, maxn, perHeight);
     return 0;
   }
 
+  obs::Reporter rep("tma-N" + std::to_string(maxn), maxn,
+                    "threads=" + std::to_string(nthreads));
   SweepResults res = (lattice == "square4") ? sweepSquare4(maxn)
                                             : sweepSquare8(maxn, nthreads);
+  rep.done("result=" +
+               std::to_string(static_cast<unsigned long long>(res.totals[maxn])),
+           "peak_states=" +
+               std::to_string(static_cast<unsigned long long>(res.peakStates)));
   emit(res, maxn, perHeight);
   return 0;
 }

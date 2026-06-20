@@ -22,6 +22,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "obs.h"  // shared observability/provenance runtime (docs/observability.md)
+
 using u64 = std::uint64_t;
 
 static int H;
@@ -116,6 +118,9 @@ int main(int argc, char** argv) {
   }
   if (H < 1 || H > 15) { std::fprintf(stderr, "H out of range (1..15)\n"); return 2; }
   const int full = (1 << H) - 1, top = 1, bot = 1 << (H - 1);
+  obs::Reporter rep("gfmodp-H" + std::to_string(H) + "-N" + std::to_string(N), N,
+                    "H=" + std::to_string(H) + " P=" + std::to_string(P) +
+                        (ROOK ? std::string(" rook=1") : std::string()));
 
   // --- enumerate states and their transitions (BFS) ---
   std::unordered_map<Key, int, KeyHash> id;
@@ -174,7 +179,10 @@ int main(int argc, char** argv) {
     u64 acc = 0;
     for (int s = 0; s < S; ++s) if (terminal[s] && bn[s]) acc = (acc + bn[s]) % P;
     res[n] = acc;
+    rep.beat(n, "n=" + std::to_string(n) + " states=" + std::to_string(S));
   }
   for (int n = 1; n <= N; ++n) std::printf("%d %llu\n", n, (unsigned long long)res[n]);
+  rep.done("result=" + std::to_string((unsigned long long)res[N]) +
+           " states=" + std::to_string(S));
   return 0;
 }

@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+#include "../obs.h"  // shared observability/provenance runtime (docs/observability.md)
+
 using u64 = std::uint64_t;
 
 struct Aff {              // (x,y) -> (a*x+b*y+c, d*x+e*y+f)
@@ -246,10 +248,20 @@ int main(int argc, char** argv) {
   c.gridCells = c.gridW * c.gridW;
   c.counts.assign(maxn + 1, 0);
 
-  for (const Placement& p : type.placements) c.runPlacement(p.group);
+  obs::Reporter rep("symcount-" + std::string(argv[1]) + "-N" +
+                        std::to_string(maxn),
+                    static_cast<double>(type.placements.size()),
+                    "type=" + std::string(argv[1]));
+  int pi = 0;
+  for (const Placement& p : type.placements) {
+    c.runPlacement(p.group);
+    ++pi;
+    rep.beat(pi, "placement=" + std::to_string(pi));
+  }
 
   for (int n = 1; n <= maxn; ++n)
     if (c.counts[n])
       std::printf("%d %llu\n", n, static_cast<unsigned long long>(c.counts[n]));
+  rep.done("result=ok");
   return 0;
 }

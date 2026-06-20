@@ -26,6 +26,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "obs.h"  // shared observability/provenance runtime (docs/observability.md)
+
 using u64 = std::uint64_t;
 static int H;
 
@@ -75,6 +77,8 @@ int main(int argc,char**argv){
   H=std::atoi(argv[1]); const int N=std::atoi(argv[2]); const u64 P=std::strtoull(argv[3],nullptr,10);
   if(H<1||H>7){ std::fprintf(stderr,"H out of range (1..7)\n"); return 2; }
   const int full=(1<<H)-1, top=1, bot=1<<(H-1);
+  obs::Reporter rep("gfknight-H" + std::to_string(H) + "-N" + std::to_string(N), N,
+                    "H=" + std::to_string(H) + " P=" + std::to_string(P));
   std::unordered_map<Key,int,KeyHash> id; std::vector<State> states;
   auto intern=[&](int Pm,int Qm,int gap,u64 lab,bool tT,bool tB)->int{
     Key k{Pm,Qm,gap,(tT?2:0)|(tB?1:0),lab}; auto it=id.find(k); if(it!=id.end()) return it->second;
@@ -110,7 +114,10 @@ int main(int argc,char**argv){
     for(size_t e=0;e<E;++e) if(n-eadd[e]>=1){ u64 v=row(n-eadd[e])[efrom[e]]; if(v) bn[eto[e]]=(bn[eto[e]]+v)%P; }
     u64 acc=0; for(int s=0;s<S;++s) if(term[s]&&bn[s]) acc=(acc+bn[s])%P;
     res[n]=acc;
+    rep.beat(n, "n=" + std::to_string(n) + " states=" + std::to_string(S));
   }
   for(int n=1;n<=N;++n) std::printf("%d %llu\n",n,(unsigned long long)res[n]);
+  rep.done("result=" + std::to_string((unsigned long long)res[N]) +
+           " states=" + std::to_string(S));
   return 0;
 }

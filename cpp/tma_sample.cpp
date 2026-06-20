@@ -29,6 +29,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "obs.h"  // shared observability/provenance runtime (docs/observability.md)
 #include "tma/sample8.h"
 
 using Cells = std::vector<std::pair<int, int>>;
@@ -143,6 +144,8 @@ int main(int argc, char** argv) {
     else { std::fprintf(stderr, "unknown arg: %s\n", argv[i]); return 2; }
   }
   std::mt19937_64 rng(seed);
+  obs::Reporter rep("sample-N" + std::to_string(n) + "-K" + std::to_string(K), 0,
+                    "seed=" + std::to_string(seed));
 
   // 1. byHeight[H][n] for every height (the height-selection weights). From the
   //    checkpoint dir if given, else computed by the completion DP.
@@ -156,8 +159,9 @@ int main(int argc, char** argv) {
     if (!byHeightDir.empty() && readByHeight(byHeightDir, H, n, bH[H])) continue;
     comp[H] = std::make_unique<Completion>(H, n);
     bH[H] = comp[H]->W(seedSig, n);  // == byHeight[H][n]; primes the memo for sampling
-    std::fprintf(stderr, "height %d: byHeight[%d][%d] = %llu\n", H, H, n,
-                 static_cast<unsigned long long>(bH[H]));
+    rep.beat(H, "phase=build height=" + std::to_string(H) + " byheight=" +
+                    std::to_string(static_cast<unsigned long long>(bH[H])),
+             true);
   }
   u64 total = 0;
   for (int H = hLo; H <= hHi; ++H) total += bH[H];
@@ -207,6 +211,8 @@ int main(int argc, char** argv) {
       renderSpecimen(f, cells, static_cast<int>(emitted), H);
       if (nFirst < 3) { firstFew[nFirst] = cells; firstFewH[nFirst] = H; ++nFirst; }
     }
+    rep.beat(emitted, "phase=sample height=" + std::to_string(H) +
+                          " emitted=" + std::to_string(emitted), true);
   }
   std::fclose(f);
 
@@ -247,5 +253,8 @@ int main(int argc, char** argv) {
     for (auto& row : grid) std::printf("%s\n", row.c_str());
     std::printf("\n");
   }
+  rep.done("result=" + std::to_string(static_cast<unsigned long long>(total)),
+           "emitted=" + std::to_string(emitted) + " bad=" + std::to_string(bad) +
+               " dups=" + std::to_string(dups));
   return bad ? 1 : 0;
 }

@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+#include "obs.h"  // shared observability/provenance runtime (docs/observability.md)
+
 using u64 = std::uint64_t;
 
 struct Offset { int dx, dy; };
@@ -426,7 +428,19 @@ int main(int argc, char** argv) {
     }
   }
 
+  // The Redelmeier enumeration is one recursive call with no clean per-unit
+  // boundary to heartbeat on; the maxhole_split.py driver provides per-worker
+  // progress, so here we frame it with start/done (provenance + wall + cost).
+  std::string job = "g2-" + lattice + "-N" + std::to_string(c.maxn);
+  std::string extra = "lattice=" + lattice;
+  if (c.splitK > 1) {
+    job += "-s" + std::to_string(c.splitIdx);
+    extra += " split=" + std::to_string(c.splitS) + " k=" +
+             std::to_string(c.splitK) + " idx=" + std::to_string(c.splitIdx);
+  }
+  obs::Reporter rep(job, 0, extra);
   c.run();
+  rep.done("result=ok");
 
   if (c.connCheck) {
     // "n  polyplets  rook-connected  bishop-connected"; last two must both
