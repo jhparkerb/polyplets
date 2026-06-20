@@ -162,13 +162,23 @@ $R_{180}=\num{10178520}$, $H=\num{9765524}$, and $D=\num{8923786}$.
 The resulting counts for $n=18,19$ are collected in Table~\ref{tab:companions}.
 The free and one-sided values extend A030222 and A030233 (each previously recorded
 to $n=17$); the bilaterally-symmetric count $\tfrac12(H+D)$ extends A030234 and the
-asymmetric count $\mathrm{Free}-\tfrac12(H+D)$ extends A030235. The bilateral
-identity $\tfrac12(H+D)$ was verified against all published terms of A030234
-($n\le17$) but is not proved here.
-% TODO(bilateral-proof): the identity bilateral = (H+D)/2 is currently
-% empirical (checked n<=17). A short Burnside argument over the order-2 reflection
-% subgroups would make it a theorem; add it or cite if/when written. Until then the
-% wording "not proved here" must stay.
+asymmetric count $\mathrm{Free}-\tfrac12(H+D)$ extends A030235.
+
+The bilateral count equals $\tfrac12(H+D)$ exactly, by a double count. Write the
+symmetry group of a fixed polyplet as a subgroup $K\le D_4$. If $K$ contains a
+reflection, its rotations form an index-$2$ subgroup, so exactly half of $K$'s
+elements are reflections; otherwise $K$ has none. Count the incidences $(A,m)$ of a
+fixed animal $A$ with a reflection $m\in\operatorname{Stab}(A)$ in two ways. Summed
+over the four reflections it is
+$|\!\operatorname{Fix}(h)|+|\!\operatorname{Fix}(v)|+|\!\operatorname{Fix}(d)|
++|\!\operatorname{Fix}(a)| = 2H+2D$, since conjugate reflections have equal
+fixed-counts ($|\!\operatorname{Fix}(h)|=|\!\operatorname{Fix}(v)|=H$,
+$|\!\operatorname{Fix}(d)|=|\!\operatorname{Fix}(a)|=D$). Summed over free classes, a
+class with stabilizer order $|K|$ contains $8/|K|$ fixed animals, each with $|K|/2$
+reflections in its stabilizer when the class is bilateral (and none otherwise)---so
+exactly $4$ incidences per bilateral class. Hence $2H+2D=4\cdot(\text{bilateral
+classes})$, i.e.\ the bilateral count is $\tfrac12(H+D)$. This was also checked
+numerically against every published term of A030234 ($n\le17$).
 
 As a check, the assembled free counts reproduce A030222 over its entire published
 range, and an independent Python reimplementation matches the C\texttt{++}
