@@ -130,7 +130,15 @@ def main():
     # the per-prime engine sweeps are independent and CPU-bound -- run them in a
     # process pool (one core each). On a 32-core box this is ~min(#primes,cores)x
     # faster than the serial loop and is what makes high H / large N tractable.
-    nproc = min(len(PRIMES) + 1, os.cpu_count() or 4)
+    # POLY_MAX_WORKERS caps the pool to honor a machine's core budget (set =10 on
+    # gympie's 10 performance cores; efficiency cores are off-limits). Without it the
+    # pool grabs every logical core and oversubscribes. Fewer workers just means each
+    # handles more primes serially -- still correct, only slower.
+    nproc = min(len(PRIMES) + 1, os.cpu_count() or 4,
+                int(os.environ.get("POLY_MAX_WORKERS", 1 << 30)))
+    print(f"using {nproc} worker(s) "
+          f"(POLY_MAX_WORKERS={os.environ.get('POLY_MAX_WORKERS', 'unset')})",
+          flush=True)
     pending, disagree, nval = [], [], 0
     for H in range(Hmin, Hmax + 1):
         with Pool(nproc) as pool:

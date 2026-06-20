@@ -125,7 +125,11 @@ def main():
             PRIMES = _primes_below(1 << 31, need)
         # per-prime sweeps are independent + CPU-bound -> process pool (one core
         # each), the speedup that makes high H (many primes) tractable on ayr.
-        with Pool(min(len(PRIMES), os.cpu_count() or 4)) as _pool:
+        # POLY_MAX_WORKERS caps the pool to a machine's core budget (set =10 on
+        # gympie's 10 performance cores); unset = use all logical cores.
+        _nproc = min(len(PRIMES), os.cpu_count() or 4,
+                     int(os.environ.get("POLY_MAX_WORKERS", 1 << 30)))
+        with Pool(_nproc) as _pool:
             seqs = _pool.starmap(seq_modp, [(H, N, p) for p in PRIMES])
         Cs = [bm_modp(seqs[k], PRIMES[k]) for k in range(len(PRIMES))]
         Ls = [order_of(C) for C, _ in Cs]
