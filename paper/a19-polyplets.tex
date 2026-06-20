@@ -238,8 +238,7 @@ whose cells-so-far plus an \emph{admissible} lower bound on cells-still-needed
 exceeds $n$. Since the bound never over-estimates, the prune can only make a
 count come out low, so reproducing every published term certifies that it dropped
 no animal in range. The hot path uses a flat open-addressing map keyed by a
-fixed-width signature, a stack union--find, and a viable-mask generator. Heights
-were run as independent checkpointed jobs.
+fixed-width signature, a stack union--find, and a viable-mask generator.
 
 \begin{table}[H]
   \centering
@@ -353,11 +352,13 @@ $O(n^2)$. Brute force gives the exact values $M(1{:}9)=0,0,0,1,1,2,3,5,6$, which
 the diamond attains at $n=4$ and $8$. We conjecture the diamond is optimal---that
 is, $M(n)\sim n^2/8$, twice the polyomino rate $\sim n^2/16$ since only king
 animals can run diagonal walls---but the exact values for $n>9$ remain open.
-% TODO(M-extend): exact M(n) is known only to n=9 (sampling/amax_brute.py, brute).
-% Extending the brute force to n>=10 would (a) test the diamond-optimality
-% conjecture and (b) disambiguate M(n) from the 16 unrelated OEIS short sequences
-% sharing the prefix 0,0,0,1,1,2,3,5,6 -- a prerequisite before any M(n) submission
-% (see oeis/README.md novelty re-checks). Settling M(n) ~ n^2/8 needs a proof.
+% TODO(M-extend): exact M(n) known to n=9; now computable past that with the C++
+% Redelmeier+flood enumerator `build/g2 square8 N --maxhole` (4-conn-bg primary;
+% --maxhole8 for 8-conn). Run for n=10..13(+14 via --split) -> update the visible
+% M(1:9) list and "n>9 remain open" here, the draft-maxholearea.txt b-file, and
+% verify_claims.py. Extending the terms (a) tests diamond-optimality and (b)
+% disambiguates M(n) from the 16 unrelated OEIS short sequences sharing the prefix
+% 0,0,0,1,1,2,3,5,6. Settling M(n) ~ n^2/8 still needs a proof.
 
 \section{Generating functions by height}
 \label{sec:gf}
