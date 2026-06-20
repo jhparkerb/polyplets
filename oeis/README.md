@@ -34,15 +34,24 @@ real OEIS contributor name before any submission.
 | A030233 (one-sided) | extend: +a(18),a(19) |
 | A030234/A030235 (symmetric) | pending: verify our bilateral-symmetry counts first |
 | draft hole triangle T(n,k) | new (4-bg convention), exact through n=16 |
-| draft A_0 (hole-free), A_1 (one-hole) | new; these ARE columns k=0,1 of the triangle (standalone per the OEIS triangle+headline-columns idiom; A_2,A_3,... are NOT minted separately) |
+| draft A_0 (hole-free), A_1 (one-hole) | new, **novelty-confirmed via Superseeker (2026-06-19)**; b-files `b-draft-A0-holefree.txt` (n=1..16), `b-draft-A1-onehole.txt` (n=4..16) ready; submission-ready pending sign-off. These ARE columns k=0,1 of the triangle (standalone per the OEIS triangle+headline-columns idiom; A_2,A_3,... are NOT minted separately) |
 | draft M(n) = max hole AREA (draft-maxholearea.txt) | new; a DISTINCT statistic (max enclosed empty *area*, not a column of the count triangle); few terms, extendable |
 
-## Novelty re-checks (OEIS search, 2026)
-- Triangle T(n,k), A_0 (hole-free), A_1 (one-hole): **no OEIS match** on their term
-  prefixes — genuinely new.
+## Novelty re-checks (OEIS, 2026-06-19)
+- **A_0 (hole-free) and A_1 (one-hole): confirmed not in OEIS via Superseeker**
+  (`superseeker@oeis.org`, the heavy program: direct lookup + the full T001–T115
+  transform battery — ±constant, scaling, binomial, Euler, Möbius/Stirling,
+  differences — plus gfun/Rate/guesss closed-form search). Both came back clean, so
+  novelty is closed beyond a plain term-prefix search (the additive/transform
+  "secretly a known sequence" cases are ruled out). Cross-checked independently by
+  our own consecutive-run and first/second-difference oeis.org searches.
+- Triangle T(n,k): covered by the A_0/A_1 column lookups — Superseeker's own advice
+  is to look up an array's rows/columns/diagonals, not the flattened array; no
+  separate flattened-triangle lookup needed.
 - M(n) (max hole area; NOT a triangle column): definition is new, but the 9-term
-  data 0,0,0,1,1,2,3,5,6 matches 16 unrelated short sequences (partition counts,
-  etc.). Extend the brute force (n >= 10) to disambiguate before submitting.
+  data 0,0,0,1,1,2,3,5,6 matches 16 unrelated short sequences. Disambiguate by
+  extending the terms: `build/g2 square8 N --maxhole` (C++ Redelmeier+flood, the
+  4-connected-background primary convention) now computes M(n) exactly past n=9.
 - (Lesson from A030233: always search before claiming novelty.)
 
 OEIS content is under the OEIS End-User License; baselines are copied here for
