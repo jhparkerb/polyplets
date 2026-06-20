@@ -117,29 +117,15 @@ fixed-height GFs and lifetime-3 (honestly weighted — see results/lifetime3-pro
 the growth estimate, and the sampling/scaling portrait; then the GitHub drop.
 Strictly after the OEIS drafts (#25), since the paper references those entries.
 
-**#29 — JIS submission conformance (if we target the Journal of Integer Sequences).**
-TODO (not urgent; decide before any submission). JIS is the natural refereed home
-for this paper (diamond OA, indexed in MathSciNet/zbMATH, OEIS-coupled, independent
-authors welcome). Bring the paper into line with their author guidelines
-(cs.uwaterloo.ca/journals/JIS/, instructions page) *before* submitting:
-  - **BLOCKER — text authorship.** JIS forbids using an LLM to write "the actual
-    English words" of the paper; only narrow uses (finding references, suggesting
-    proof techniques) are allowed, and must be explicitly delineated. Our draft was
-    Claude-drafted prose, so a JIS submission requires a genuine from-scratch *human*
-    rewrite of the text (the math/data/code remain ours). This is a go/no-go
-    decision, not a formatting tweak. (Our current Author's-note AI credit is the
-    right disclosure spirit but does NOT satisfy this rule on its own.)
-  - **OEIS-first.** New sequences must be submitted to the OEIS and assigned
-    A-numbers *before* paper submission, then cited — so #25 (and the live OEIS
-    submission, gated per signed-orders rule) must land first. Resolves the
-    `oeis-Anums` TODO in the paper.
-  - **Format.** LaTeX source only, 12pt, English; no PDF/dvi/doc. Use their jis.bst
-    BibTeX style. No page limit. Submit by email to Shallit (shallit@uwaterloo.ca),
-    subject "Submission to the Journal of Integer Sequences".
-  - Alternative if we don't want the human rewrite: keep it an arXiv (math.CO/math.HO)
-    preprint + the OEIS entries themselves, where the AI-drafted text and credit are
-    fine. Decide venue, then conform.
-→ Gated behind #25 and the live-OEIS sign-off; strictly a post-#17 packaging step.
+**#29 — Venue: NOT JIS (decided 2026-06-19).** We are not submitting to the Journal
+of Integer Sequences. JIS forbids LLM-written prose ("the actual English words"),
+which would force a from-scratch human rewrite of the Claude-drafted text; not worth
+it. The paper stays an **arXiv (math.CO/math.HO) preprint + the public repo**, where
+the AI-drafted text and the Author's-note AI credit are fine as-is. The OEIS entries
+themselves remain the canonical record of the new sequences (still gated on sign-off,
+#25). No JIS-specific conformance (12pt/jis.bst/human rewrite) needed. The bilateral
+identity proof added for the JIS angle stays in the paper regardless — it's a real
+result. This closes the venue fork.
 
 ## Dependency graph
 
