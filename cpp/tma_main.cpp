@@ -267,6 +267,16 @@ int main(int argc, char** argv) {
     // one strip height so a LOW height sweeps cheaply to high n (the all-heights
     // sweep would explode); emits "H n holes count", same as --per-height for 1 H.
     if (onlyHeight > 0) {
+      CkptCtl ckctl;
+      const CkptCtl* ckptPtr = nullptr;
+      if (!checkpointDir.empty()) {  // intra-height resume for this single height
+        fs::create_directories(checkpointDir);
+        ckctl.dir = checkpointDir;
+        if (const char* e = std::getenv("TMA_CKPT_SECS")) ckctl.everySeconds = std::atof(e);
+        if (const char* e = std::getenv("TMA_CKPT_MIN_STATES"))
+          ckctl.minStates = std::strtoull(e, nullptr, 10);
+        ckptPtr = &ckctl;
+      }
       obs::Reporter rep(
           "tma-holes-H" + std::to_string(onlyHeight) + "-N" +
               std::to_string(maxn) + "-k" + std::to_string(kmax),
@@ -274,10 +284,11 @@ int main(int argc, char** argv) {
           "height=" + std::to_string(onlyHeight) +
               (modp ? " modp=" + std::to_string(modp) : std::string()) +
               (hdrop ? std::string(" hdrop=1") : std::string()) +
-              " threads=" + std::to_string(nthreads));
+              " threads=" + std::to_string(nthreads) +
+              (ckptPtr ? std::string(" ckpt=1") : std::string()));
       std::vector<u64> row(static_cast<size_t>(maxn + 1) * Kp, 0);
       sweepSquare8HeightHoles(onlyHeight, maxn, kmax, Conn::FG8, row, modp, hdrop,
-                              nthreads, static_cast<size_t>(reserveStates));
+                              nthreads, static_cast<size_t>(reserveStates), ckptPtr);
       rep.done("result=ok");
       for (int n = 1; n <= maxn; ++n)
         for (int k = 0; k <= kmax; ++k) {

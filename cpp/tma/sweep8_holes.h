@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -36,6 +37,7 @@
 #include <utility>
 #include <vector>
 
+#include "checkpoint.h"
 #include "euler.h"
 #include "signature.h"
 #include "statedb.h"            // u64, Sig, FlatDB::hashSig
@@ -111,7 +113,8 @@ inline std::uint32_t boundaryOcc(const Sig& sig, int H) {
 // exact n=18 hole-count, otherwise one core).
 inline void sweepSquare8HeightHolesMT(int H, int maxn, int Kmax, Conn conn,
                                       std::vector<u64>& result, int nthreads,
-                                      u64 mod, bool hdrop, size_t reserveStates = 0) {
+                                      u64 mod, bool hdrop, size_t reserveStates = 0,
+                                      const CkptCtl* ckpt = nullptr) {
   const int Kp = Kmax + 1;
   const size_t stride = static_cast<size_t>(maxn + 1) * Kp;
   int S = 64;
@@ -125,15 +128,49 @@ inline void sweepSquare8HeightHolesMT(int H, int maxn, int Kmax, Conn conn,
     for (int s = 0; s < S; ++s) { dbS[s].reserve(per); nextS[s].reserve(per); }
   }
   std::vector<std::mutex> mu(S);
+  const CkptMeta meta{maxn, H, Kmax, mod, static_cast<std::uint8_t>(hdrop ? 1 : 0),
+                      nthreads, 1, static_cast<u64>(stride)};
 
-  Sig seed;
-  std::memset(seed.b, 0, SIGMAX);
-  dbS[FlatDB::hashSig(seed) & (S - 1)].slot(seed)[0] = 1;  // size 0, holes 0
+  int startCol = 0;
+  bool resumed = false;
+  if (ckpt) {  // resume mid-height; re-route each saved entry to its shard
+    std::int32_t cn = 0, ph = 0; u64 pk = 0;
+    const CkptStatus st = tmaCkptLoad(
+        *ckpt, meta,
+        [&](const Sig& sig, const u64* r) {
+          std::memcpy(dbS[FlatDB::hashSig(sig) & (S - 1)].slot(sig), r,
+                      stride * sizeof(u64));
+        },
+        result.data(), static_cast<u64>(stride), cn, pk, ph);
+    if (st == CkptStatus::Refuse) {
+      std::fprintf(stderr, "checkpoint %s/ckpt refused (param mismatch or corrupt)\n",
+                   ckpt->dir.c_str());
+      std::exit(2);
+    }
+    if (st == CkptStatus::Loaded) {
+      startCol = cn; resumed = true;
+      std::fprintf(stderr, "resumed col=%d (holes height %d, %d threads)\n", startCol,
+                   H, nthreads);
+    }
+  }
+  if (!resumed) {
+    Sig seed;
+    std::memset(seed.b, 0, SIGMAX);
+    dbS[FlatDB::hashSig(seed) & (S - 1)].slot(seed)[0] = 1;  // size 0, holes 0
+  }
 
-  for (int col = 0; col <= maxn; ++col) {
+  auto lastSave = std::chrono::steady_clock::now();
+  for (int col = startCol; col <= maxn; ++col) {
     size_t total = 0;
     for (int s = 0; s < S; ++s) total += dbS[s].cnt;
     if (total == 0) break;
+    if (ckpt && col > 0 && total >= ckpt->minStates && ckptDue(*ckpt, lastSave))
+      if (tmaCkptSave(*ckpt, meta, total,
+                      [&](auto&& emit) {
+                        for (int s = 0; s < S; ++s) dbS[s].for_each(emit);
+                      },
+                      result.data(), static_cast<u64>(stride), col, 0, 0))
+        ckptTestKill(col);
     for (int s = 0; s < S; ++s) nextS[s].clear();
 
     std::vector<std::vector<u64>> localRes(nthreads, std::vector<u64>(stride, 0));
@@ -205,20 +242,52 @@ inline void sweepSquare8HeightHolesMT(int H, int maxn, int Kmax, Conn conn,
 inline void sweepSquare8HeightHoles(int H, int maxn, int Kmax, Conn conn,
                                     std::vector<u64>& result, u64 mod = 0,
                                     bool hdrop = false, int nthreads = 1,
-                                    size_t reserveStates = 0) {
+                                    size_t reserveStates = 0,
+                                    const CkptCtl* ckpt = nullptr) {
   if (nthreads > 1) {
     sweepSquare8HeightHolesMT(H, maxn, Kmax, conn, result, nthreads, mod, hdrop,
-                              reserveStates);
+                              reserveStates, ckpt);
     return;
   }
   const int Kp = Kmax + 1;
   const size_t stride = static_cast<size_t>(maxn + 1) * Kp;
   HoleDB db(stride), next(stride);
   if (reserveStates) { db.reserve(reserveStates); next.reserve(reserveStates); }
-  Sig seed; std::memset(seed.b, 0, SIGMAX);
-  db.slot(seed)[0] = 1;  // size 0, holes 0
+  const CkptMeta meta{maxn, H, Kmax, mod, static_cast<std::uint8_t>(hdrop ? 1 : 0),
+                      1, 1, static_cast<u64>(stride)};
 
-  for (int col = 0; col <= maxn && !db.empty(); ++col) {
+  int startCol = 0;
+  bool resumed = false;
+  if (ckpt) {
+    std::int32_t cn = 0, ph = 0; u64 pk = 0;
+    const CkptStatus st = tmaCkptLoad(
+        *ckpt, meta,
+        [&](const Sig& sig, const u64* r) {
+          std::memcpy(db.slot(sig), r, stride * sizeof(u64));
+        },
+        result.data(), static_cast<u64>(stride), cn, pk, ph);
+    if (st == CkptStatus::Refuse) {
+      std::fprintf(stderr, "checkpoint %s/ckpt refused (param mismatch or corrupt)\n",
+                   ckpt->dir.c_str());
+      std::exit(2);
+    }
+    if (st == CkptStatus::Loaded) {
+      startCol = cn; resumed = true;
+      std::fprintf(stderr, "resumed col=%d (holes height %d)\n", startCol, H);
+    }
+  }
+  if (!resumed) {
+    Sig seed; std::memset(seed.b, 0, SIGMAX);
+    db.slot(seed)[0] = 1;  // size 0, holes 0
+  }
+
+  auto lastSave = std::chrono::steady_clock::now();
+  for (int col = startCol; col <= maxn && !db.empty(); ++col) {
+    if (ckpt && col > 0 && db.cnt >= ckpt->minStates && ckptDue(*ckpt, lastSave))
+      if (tmaCkptSave(*ckpt, meta, db.cnt,
+                      [&](auto&& emit) { db.for_each(emit); }, result.data(),
+                      static_cast<u64>(stride), col, 0, 0))
+        ckptTestKill(col);
     next.clear();
     db.for_each([&](const Sig& sig, const u64* row) {
       int ms = -1;

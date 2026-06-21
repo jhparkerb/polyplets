@@ -157,6 +157,17 @@ def main():
         resumed = subprocess.run(argv, capture_output=True, text=True)  # no kill env
         gate.check(killed.returncode == 137 and banked and resumed.stdout == base_l,
               f"L ihckpt T={threads}  square8 n<={depth_l} kill@col{kill_col} resume == clean")
+    # ...and the holes --only-height path (same checkpoint, larger stride)
+    shutil.rmtree(ckdir, ignore_errors=True)
+    base_h = run(TMA_HOLES, "square8", depth_l, "--holes", "--only-height", H_l)
+    argv_h = [TMA_HOLES, "square8", str(depth_l), "--holes", "--only-height", str(H_l),
+              "--threads", "4", "--checkpoint", ckdir]
+    env = dict(os.environ, TMA_CKPT_SECS="0", TMA_CKPT_MIN_STATES="0",
+               TMA_CKPT_KILL_AT_COL=str(kill_col))
+    killed_h = subprocess.run(argv_h, capture_output=True, text=True, env=env)
+    resumed_h = subprocess.run(argv_h, capture_output=True, text=True)
+    gate.check(killed_h.returncode == 137 and resumed_h.stdout == base_h,
+          f"L ihckpt holes square8 n<={depth_l} kill@col{kill_col} resume == clean")
     shutil.rmtree(ckdir, ignore_errors=True)
 
     return gate.verdict("TMA")
