@@ -27,8 +27,11 @@ gate-g2: build/g2 build/g2_asan
 build:
 	mkdir -p build
 
+# -Wno-error=restrict on the Redelmeier generator: works around a gcc-12 false
+# positive in <bits/char_traits.h> (bogus -Wrestrict on std::string ops; clang and
+# gcc-15 don't trip it). Scoped here so -Werror stays strict everywhere else.
 build/g2: cpp/g2_redelmeier.cpp | build
-	$(CXX) $(CXXFLAGS) -O3 $< -o $@
+	$(CXX) $(CXXFLAGS) -Wno-error=restrict -O3 $< -o $@
 
 # fixed-height transfer matrix over Z/pZ, for generating-function recovery
 build/gf_modp: cpp/gf_modp.cpp | build
@@ -39,7 +42,7 @@ build/gf_knight: cpp/gf_knight.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
 build/g2_asan: cpp/g2_redelmeier.cpp | build
-	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
+	$(CXX) $(CXXFLAGS) -Wno-error=restrict -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer $< -o $@
 
 # Gate Euler: hole-accounting helper (#28) vs flood oracle, before engine wiring
