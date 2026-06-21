@@ -54,10 +54,11 @@ terms; BM-mod-p + CRT, full-GF validated vs a fresh prime). RAM is bounded by
 k≤kmax since holes only seal, never reopen), making memory O(D_H·N·kmax), linear
 in N: ~30 MB even at N=2700, so the wall is the engine's N≤4096 cap + time (∝N²),
 not RAM. Recovered + validated to `results/hole_gfs.txt`: H=3 k=0..48, H=4 k=0..13,
-H=5 k=0..3, **H=6 k=0..6** (76 GFs so far); **H=7 k=0..2 running** (N=3400). Order
+H=5 k=0..3, **H=6 k=0..10** (recovered 2026-06-21 on gympie, validated_k=11, 0
+disagreements — at its N≤4096 frontier), H=7 k=0..2 (81 GFs total). Order
 law order(H,k) = c_H·(k+1), c = 6,20,68,185,537 for H=3..7 — clean per-hole order
-increment. Feasibility frontier (N≤4096): H=6 reaches k≤10, H=7 k≤2, H=8 k=0 only,
-H≥9 blocked (order(9,0) needs N≈9000).
+increment. Feasibility frontier (N≤4096): **H=6 k≤10 ACHIEVED**, H=7 k≤2 done, **H=8
+k=0 DONE** (2026-06-21), H≥9 blocked (order(9,0) needs N≈9000).
 REMAINING for #28: (i) **DONE 2026-06-21: n=18 exact hole count complete**
 (`results/holes_n18.txt`; 44h single-core on ayr, peak 74.6 GB, exit 0;
 sum-invariant per-n == A006770 a(18), n≤14 == the flood oracle; hole-free
@@ -65,9 +66,12 @@ A_0(18)=16,503,616,943,998, one-hole A_1(18)=4,970,078,092,354, max 10 holes).
 Full n=19 (~60–75 GB) is the next run — now ~10× faster + resumable on the new
 MT/checkpoint/reserve engine. (ii) companion 8-bg
 convention (needs a 4-adjacency component tally — deferred); (iii) **H=8 k=0 hole
-GF — SUSPENDED mid-run, awaiting CONT** (the 14 stopped `--only-height 8 --holes
---modp` mod-p sweeps on gympie; jasonp resumes them when h19 frees the cores;
-`python3 gf/hole_modp_recover.py 8 8 3400 0 30`, appends).
+GF — RECOVERED + validated 2026-06-21** on gympie (`hole_modp_recover.py 8 8 3400 0
+30`, ~3.8 h, validated_k=1, 0 disagreements; order(8,0)=1499, k=0 only since k≥1
+needs >4096 terms). NOTE: the earlier killed run had left a **corrupt incomplete
+fragment** in `results/hole_gfs.txt` (header+P+Q, no G line, wrong Q, yet flagged
+validated) — this clean re-run replaced it (fragment removed). **Completes the
+hole-GF frontier at H=8.**
 NOTE: `build/tma_holes` is the current holes+modp engine (built from live source);
 production `build/tma` is still the OLD pre-holes binary running a(20) — rebuild
 (`make build/tma`) once it frees.
@@ -83,9 +87,10 @@ symmetric counts must be cross-checked against A030234/A030235 before claiming
 anything. The genuinely NEW sequences are only: the hole-stratified counts (4-/8-
 conn, hole-free and by-count), the hole GFs, and the lifetime-3 byproducts (atom
 degrees 1,2,4,9,29,68,…; orders 1,3,7,15,42,…). Draft b-files/descriptions/cross-
-refs accordingly; includes novelty re-checks and provenance. **Nothing is
-submitted without explicit signed orders (24-h cooling-off).** Convergence point
-where the other threads' new sequences land.
+refs accordingly; includes novelty re-checks and provenance. **Claude prepares and
+stages all of this; jasonp pushes the actual submit/publish button** (OEIS, arXiv,
+repo) — Claude never sends to an external service itself, just normal care for
+outward-facing steps. Convergence point where the other threads' new sequences land.
 → Feeds #17.
 
 **#27 — Cross-n sampling / scaling study.**

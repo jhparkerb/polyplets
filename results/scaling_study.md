@@ -1,3 +1,5 @@
+<!-- scaling | commit 2c5e3e7-dirty | gympie | 2026-06-21T08:31:50-04:00 | job=scaling-8000
+     source: /Users/jasonp/src/polyominoes/sampling/scaling.py -->
 # Cross-n scaling of uniform-random polyplets (#27)
 
 Uniform samples (~8000 each; n=19 from the existing 10k in `a19_samples.txt`, tall-height-excluded ~2.4% bias). Hole convention = primary 4-connected background (#28). Validation: the n=19 row reproduces `sample_stats.md` (R_g≈3.44, rook≈10.07, holed≈28.3%).

@@ -118,6 +118,10 @@ Assembled on gympie 2026-06-20.
   Berlekamp–Massey + CRT — a different downstream from explicit enumeration)
   expand to series that match the gympie `byHeight[H][n]` columns **exactly for
   all n≤20**. Heights 11–20 have no GF in that file and are not GF-checked.
+  **(2026-06-21) These GFs are now themselves cross-ISA confirmed:** an independent
+  re-recovery on gympie (**clang/ARM**) is **byte-identical** to ayr's (**gcc/x86**)
+  for all H=1..10 (orders 1→5005, validated), so the GF cross-check no longer rests
+  on a single engine.
 
 **Remaining for "confirmed":**
 - **DONE (2026-06-21): height 19 is cross-ISA confirmed.** Gympie's own
@@ -217,10 +221,11 @@ and ISA-confirmed symcounts; OneSided(20) stays candidate via Fixed(20).
 A_0(18) = 16,503,616,943,998** and **one-hole A_1(18) = 4,970,078,092,354**; the
 full table runs k = 0..10 holes (the maximum is 10 holes at n=18).
 
-**Status:** **computed**, strongly validated; single-engine for n=15–18 (the flood
-oracle caps at n=14), so an ISA-decorrelated or independent-method rerun of
-n=15–18 would upgrade those specific terms. Every row total is externally anchored
-(below).
+**Status:** **confirmed** (2026-06-21) — the n=15–18 rows, previously single-engine
+(the flood oracle caps at n=14), are now **cross-ISA confirmed**: a dalby clang/ARM
+per-height recount is **byte-identical** to ayr's gcc/x86 across all 95 rows of the
+n≤18 triangle (`results/holes_n18.dalby.txt` vs `holes_n18.txt`). Combined with the
+flood-oracle agreement at n≤14 and the sum-invariant, every row is now decorrelated.
 
 **What it is:** B(n, k) = the number of fixed (translation-distinct) n-cell
 king-move animals with exactly k enclosed holes, in the **primary
@@ -255,10 +260,12 @@ n=14; the transfer matrix removes that cap.
   saved hole oracle — now byte-identical under the engine's MT, checkpoint, and
   reserve paths (gate checks H–L).
 
-**Remaining for "confirmed":** n=15–18 rest on the single transfer-matrix engine
-(the flood can't reach there). A decorrelated rerun — a different build/ISA, or the
-full n=19 run that re-derives n≤18 as a prefix — would confirm those terms. That
-next run is now ~10× faster and resumable on the MT/checkpoint/reserve engine.
+**Confirmed (2026-06-21):** the decorrelated rerun landed — a **dalby (clang/ARM)
+per-height-parallel recount** is byte-identical to ayr's (gcc/x86) across the whole
+n≤18 triangle, so n=15–18 are confirmed (cross-ISA + cross-compiler of the same
+transfer-matrix method; the flood is the cross-*algorithm* check at n≤14). **Next
+frontier:** n=19 (heaviest n=18 height peaked ~28.8 GB → n=19 heaviest ~69 GB, fits
+dalby's 125 GB single-height; the heavy heights run near-serially for RAM).
 
 ---
 
