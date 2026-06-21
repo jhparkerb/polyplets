@@ -120,11 +120,12 @@ Assembled on gympie 2026-06-20.
   all n≤20**. Heights 11–20 have no GF in that file and are not GF-checked.
 
 **Remaining for "confirmed":**
-- gympie's own height-19 recount is running (PID 85504); when it lands it gives
-  a same-height cross-ISA byte check against ayr's 19,586,258,055.
-- heights 11–18 and 20 currently rest on a single method/machine (gympie);
-  full confidence wants an ISA-decorrelated reproduction of those heights (ayr,
-  ~June 27). Not submitted until then.
+- **DONE (2026-06-21): height 19 is cross-ISA confirmed.** Gympie's own
+  height-19 recount (clang/ARM, ~24.5 h) finished and is **byte-identical to ayr's
+  (x86/GCC)** — both byHeight[19][20] = 19,586,258,055 (peak_states 23,975,127).
+- heights 11–18 and 20 still rest on a single method/machine (gympie); the
+  ISA-decorrelated reproduction of those heights is **running on ayr now**
+  (`a20cross`). a(20) is confirmed once it lands and matches. Not submitted until then.
 
 ---
 
@@ -206,6 +207,58 @@ Free ≤ OneSided ≤ 2·Free. Still weaker than R2 (no external sequence anchor
 so ideally cross-check a few small terms by exhaustive enumeration before
 submitting a new sequence. OneSided(18), OneSided(19) inherit the confirmed Fixed
 and ISA-confirmed symcounts; OneSided(20) stays candidate via Fixed(20).
+
+---
+
+## R5 — Hole-stratified polyplet counts, n=18 (#28; novel sequences)
+
+**Value:** the joint (size, #holes) distribution of fixed polyplets through n=18
+(`results/holes_n18.txt`). Headline new columns at n=18: **hole-free
+A_0(18) = 16,503,616,943,998** and **one-hole A_1(18) = 4,970,078,092,354**; the
+full table runs k = 0..10 holes (the maximum is 10 holes at n=18).
+
+**Status:** **computed**, strongly validated; single-engine for n=15–18 (the flood
+oracle caps at n=14), so an ISA-decorrelated or independent-method rerun of
+n=15–18 would upgrade those specific terms. Every row total is externally anchored
+(below).
+
+**What it is:** B(n, k) = the number of fixed (translation-distinct) n-cell
+king-move animals with exactly k enclosed holes, in the **primary
+4-connected-background convention** (bounded background regions = the Jordan dual;
+the `g2 --holes` / OEIS-A389193 convention). The k=0 column is the hole-free
+(simply-connected) polyplets and k=1 the one-hole polyplets — both **absent from
+OEIS**, as are the higher by-#holes columns. The per-animal flood capped these at
+n=14; the transfer matrix removes that cap.
+
+**Depends on:**
+- the column transfer matrix carrying the hole count *inside* the sweep via the
+  Euler characteristic (holes = 1 − χ for a connected animal; χ accumulates by
+  local 2×2 bit-quad increments) — `cpp/tma/euler.h`, `cpp/tma/sweep8_holes.h`
+  (`build/tma_holes square8 N --holes`), isolated from and not touching the a(n)
+  counting path;
+- the n≤14 per-animal flood oracle `results/holes_n14.txt` (#24) for validation.
+
+**How computed:** `tma_holes square8 18 --holes` on **ayr** (x86 / GCC) —
+44 h single-core, exit 0, peak RSS 74.6 GB.
+
+**Why we trust it:**
+- **sum-invariant:** Σ_k B(n,k) == A006770 a(n) for every n≤18 — each row sums to
+  the published (and for a(19), confirmed) fixed-polyplet total, so a miscounted
+  column would break the row sum. At n=18 the rows sum to a(18) =
+  22,471,158,811,164 exactly;
+- **vs an independent algorithm:** byte-identical to the flood oracle
+  `results/holes_n14.txt` for all n≤14 (including the max-hole shapes) — flood-fill
+  per animal, a different method than the Euler accounting;
+- **vs the generator:** == `g2 --holes` for n≤11;
+- the Euler/hole accounting is unit-tested (`make gate-euler`: 191k random images +
+  the diamond/ring/pinch battery) and regression-checked in `gate-tma` against the
+  saved hole oracle — now byte-identical under the engine's MT, checkpoint, and
+  reserve paths (gate checks H–L).
+
+**Remaining for "confirmed":** n=15–18 rest on the single transfer-matrix engine
+(the flood can't reach there). A decorrelated rerun — a different build/ISA, or the
+full n=19 run that re-derives n≤18 as a prefix — would confirm those terms. That
+next run is now ~10× faster and resumable on the MT/checkpoint/reserve engine.
 
 ---
 

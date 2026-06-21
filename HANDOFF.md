@@ -1,4 +1,4 @@
-# HANDOFF — a(19) confirmed; a(20) candidate blocked only on height-19 on gympie
+# HANDOFF — a(19) confirmed; a(20) candidate, height-19 cross-ISA confirmed; ayr reproducing heights 11–18,20
 
 Polyomino project at `/Users/jasonp/src/polyominoes` (read `ROADMAP.md`,
 `method-a19.md`, and `RESULTS.md` first). Subject: fixed polyplets / king-move
@@ -22,10 +22,11 @@ remaining confirmation step and needs ayr, busy until ~June 27).
 - Per-height jobs write `runs/a20/h<H>.out` (format `"n count"` = byHeight[H][n]).
 - **Heights 1–18 and 20 are complete.** Height 20 finished 2026-06-20 06:43
   (`h20.out`: byHeight[20][20] = 1,162,261,467).
-- **Height 19 is running now** — the sole remaining blocker
-  (`build/tma square8 20 --only-height 19 --threads 6`, PID 85504, started
-  2026-06-20 06:43). `h19.out`/`h19.log` stay empty until it finishes; no
-  intermediate progress markers, so no measured ETA.
+- **Height 19 DONE (2026-06-21): cross-ISA byte-match confirmed.** Gympie's
+  height-19 recount (`build/tma square8 20 --only-height 19`, PID 85504, ~24.5 h)
+  finished: `runs/a20/h19.out` byHeight[19][20] = 19,586,258,055 is **byte-identical
+  to ayr's** `runs/a20/h19.ayr.out`. `build/tma` is now rebuilt with the
+  obs / MT / `--reserve` / intra-height-checkpoint engine.
 - Assemble once h19 and h20 are both non-empty: a(20) = Σ over H=1..20 of
   byHeight[H][20], reading h1..h20.out. Verify n≤18 against `fixtures/b006770.txt`
   and a(19) against the confirmed **151,609,203,011,580**; report any mismatch
