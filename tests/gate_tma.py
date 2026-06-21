@@ -15,18 +15,20 @@ CLI under test: tma LATTICE MAXN [--per-height] [--holes]
 """
 
 import os
+import shutil
 import sys
 
 from common import ROOT, Gate, parse_counts, read_bfile, run
 
 TMA = os.path.join(ROOT, "build", "tma")
 TMA_ASAN = os.path.join(ROOT, "build", "tma_asan")
+TMA_HOLES = os.path.join(ROOT, "build", "tma_holes")  # holes/--modp engine (same source)
 G2 = os.path.join(ROOT, "build", "g2")
 
 
 def main():
     gate = Gate()
-    for b in (TMA, TMA_ASAN, G2):
+    for b in (TMA, TMA_ASAN, TMA_HOLES, G2):
         if not os.path.exists(b):
             print(f"FAIL missing binary {b} (run: make)")
             return 1
@@ -105,11 +107,31 @@ def main():
             n, holes, count = map(int, line.split())
             if n <= depth_h:
                 flood[(n, holes)] = count
-    tma_holes = parse_counts(run(TMA, "square8", depth_h, "--holes"))
-    tma_holes = {k: v for k, v in tma_holes.items() if k[0] <= depth_h}
-    gate.check(tma_holes == flood,
-          f"H holes       square8 n<={depth_h} TMA==flood oracle "
+    holes_serial = parse_counts(run(TMA_HOLES, "square8", depth_h, "--holes"))
+    holes_serial = {k: v for k, v in holes_serial.items() if k[0] <= depth_h}
+    gate.check(holes_serial == flood,
+          f"H holes       square8 n<={depth_h} tma_holes==flood oracle "
           f"({len(flood)} (n,#holes) classes)")
+
+    # I. holes path multithreaded == serial: the sharded MT sweep
+    #    (sweepSquare8HeightHolesMT) must be bit-identical to the single-thread one.
+    depth_i = 11
+    base = parse_counts(run(TMA_HOLES, "square8", depth_i, "--holes"))
+    mt = parse_counts(run(TMA_HOLES, "square8", depth_i, "--holes", "--threads", "4"))
+    gate.check(base == mt,
+          f"I holes MT    square8 n<={depth_i} --threads 4 == serial")
+
+    # J. holes per-height checkpoint: a full --checkpoint run equals plain, and a
+    #    second run over the populated dir (every height resumed from disk)
+    #    reproduces it -- exercises both the bank and the resume/load paths.
+    depth_j = 11
+    ckdir = os.path.join(ROOT, "runs", "ckpt", "gate_holes")
+    shutil.rmtree(ckdir, ignore_errors=True)
+    ck1 = parse_counts(run(TMA_HOLES, "square8", depth_j, "--holes", "--checkpoint", ckdir))
+    ck2 = parse_counts(run(TMA_HOLES, "square8", depth_j, "--holes", "--checkpoint", ckdir))
+    shutil.rmtree(ckdir, ignore_errors=True)
+    gate.check(base == ck1 and ck1 == ck2,
+          f"J holes ckpt  square8 n<={depth_j} write+resume == plain")
 
     return gate.verdict("TMA")
 

@@ -76,6 +76,73 @@ static void checkMeta(const std::string& dir, const std::string& lattice, int ma
   }
 }
 
+// --- holes-sweep checkpoint: one file per finished height ---------------------
+// The (size,#holes) sweep sums independent per-height contributions, so each
+// height's nonzero "(n holes count)" entries persist as hH.txt (atomic temp +
+// rename, like saveHeight) and a completed height resumes instead of recomputing.
+// A kill costs one height, not the whole multi-hour run. (Intra-height resume is
+// the out-of-core #20 work, separate.)
+static bool loadHoleHeight(const std::string& dir, int H, int Kp,
+                           std::vector<u64>& row) {
+  const std::string path = dir + "/h" + std::to_string(H) + ".txt";
+  FILE* f = std::fopen(path.c_str(), "r");
+  if (!f) return false;
+  std::fill(row.begin(), row.end(), 0);
+  int n, k;
+  unsigned long long c;
+  while (std::fscanf(f, "%d %d %llu", &n, &k, &c) == 3) {
+    const size_t idx = static_cast<size_t>(n) * Kp + k;
+    if (idx < row.size()) row[idx] = c;
+  }
+  std::fclose(f);
+  return true;
+}
+
+static void saveHoleHeight(const std::string& dir, int H, int maxn, int Kp,
+                           const std::vector<u64>& row) {
+  const std::string tmp = dir + "/h" + std::to_string(H) + ".tmp";
+  const std::string path = dir + "/h" + std::to_string(H) + ".txt";
+  FILE* f = std::fopen(tmp.c_str(), "w");
+  if (!f) { std::perror("hole checkpoint open"); std::exit(1); }
+  for (int n = 1; n <= maxn; ++n)
+    for (int k = 0; k < Kp; ++k) {
+      const u64 v = row[static_cast<size_t>(n) * Kp + k];
+      if (v) std::fprintf(f, "%d %d %llu\n", n, k,
+                          static_cast<unsigned long long>(v));
+    }
+  std::fflush(f);
+  std::fclose(f);
+  if (std::rename(tmp.c_str(), path.c_str()) != 0) {
+    std::perror("hole checkpoint rename");
+    std::exit(1);
+  }
+}
+
+// Guard a holes checkpoint dir against a resume with mismatched params (a different
+// maxn/kmax/hdrop/modp would mix incompatible per-height tables into one answer).
+static void checkHoleMeta(const std::string& dir, int maxn, int kmax, bool hdrop,
+                          u64 modp) {
+  const std::string path = dir + "/meta";
+  char want[128];
+  std::snprintf(want, sizeof want, "holes maxn=%d kmax=%d hdrop=%d modp=%llu",
+                maxn, kmax, hdrop ? 1 : 0, static_cast<unsigned long long>(modp));
+  if (FILE* f = std::fopen(path.c_str(), "r")) {
+    char have[128] = {0};
+    if (std::fgets(have, sizeof have, f)) have[std::strcspn(have, "\n")] = 0;
+    std::fclose(f);
+    if (std::strcmp(have, want) != 0) {
+      std::fprintf(stderr, "hole checkpoint %s is for '%s', not '%s' -- refuse\n",
+                   path.c_str(), have, want);
+      std::exit(2);
+    }
+    return;
+  }
+  if (FILE* f = std::fopen(path.c_str(), "w")) {
+    std::fprintf(f, "%s\n", want);
+    std::fclose(f);
+  }
+}
+
 static void emit(const SweepResults& res, int maxn, bool perHeight) {
   std::fprintf(stderr, "peak_states %llu peak_height %d\n",
                static_cast<unsigned long long>(res.peakStates), res.peakHeight);
@@ -198,9 +265,11 @@ int main(int argc, char** argv) {
           0,
           "height=" + std::to_string(onlyHeight) +
               (modp ? " modp=" + std::to_string(modp) : std::string()) +
-              (hdrop ? std::string(" hdrop=1") : std::string()));
+              (hdrop ? std::string(" hdrop=1") : std::string()) +
+              " threads=" + std::to_string(nthreads));
       std::vector<u64> row(static_cast<size_t>(maxn + 1) * Kp, 0);
-      sweepSquare8HeightHoles(onlyHeight, maxn, kmax, Conn::FG8, row, modp, hdrop);
+      sweepSquare8HeightHoles(onlyHeight, maxn, kmax, Conn::FG8, row, modp, hdrop,
+                              nthreads);
       rep.done("result=ok");
       for (int n = 1; n <= maxn; ++n)
         for (int k = 0; k <= kmax; ++k) {
@@ -211,10 +280,11 @@ int main(int argc, char** argv) {
       return 0;
     }
     if (perHeight) {
-      obs::Reporter rep("tma-holes-allH-N" + std::to_string(maxn), maxn, "");
+      obs::Reporter rep("tma-holes-allH-N" + std::to_string(maxn), maxn,
+                        "threads=" + std::to_string(nthreads));
       for (int H = 1; H <= maxn; ++H) {
         std::vector<u64> row(static_cast<size_t>(maxn + 1) * Kp, 0);
-        sweepSquare8HeightHoles(H, maxn, kmax, Conn::FG8, row);
+        sweepSquare8HeightHoles(H, maxn, kmax, Conn::FG8, row, 0, false, nthreads);
         rep.beat(H, "height=" + std::to_string(H), true);
         for (int n = 1; n <= maxn; ++n)
           for (int k = 0; k <= kmax; ++k) {
@@ -225,8 +295,33 @@ int main(int argc, char** argv) {
       }
       rep.done("result=ok");
     } else {
-      obs::Reporter rep("tma-holes-N" + std::to_string(maxn), 0, "");
-      std::vector<u64> dist = sweepSquare8Holes(maxn, kmax, Conn::FG8);
+      const bool ckpt = !checkpointDir.empty();
+      obs::Reporter rep("tma-holes-N" + std::to_string(maxn),
+                        ckpt ? static_cast<double>(maxn) : 0.0,
+                        "threads=" + std::to_string(nthreads) +
+                            (ckpt ? std::string(" ckpt=1") : std::string()));
+      std::vector<u64> dist(static_cast<size_t>(maxn + 1) * Kp, 0);
+      if (ckpt) {
+        // per-height checkpoint: bank each finished height's (size,#holes) table,
+        // resume completed heights on restart -- a kill costs one height.
+        fs::create_directories(checkpointDir);
+        checkHoleMeta(checkpointDir, maxn, kmax, hdrop, modp);
+        for (int H = 1; H <= maxn; ++H) {
+          std::vector<u64> hrow(static_cast<size_t>(maxn + 1) * Kp, 0);
+          const bool resumed = loadHoleHeight(checkpointDir, H, Kp, hrow);
+          if (!resumed) {
+            sweepSquare8HeightHoles(H, maxn, kmax, Conn::FG8, hrow, modp, hdrop,
+                                    nthreads);
+            saveHoleHeight(checkpointDir, H, maxn, Kp, hrow);
+          }
+          for (size_t i = 0; i < dist.size(); ++i)
+            dist[i] = modp ? (dist[i] + hrow[i]) % modp : dist[i] + hrow[i];
+          rep.beat(H, "height=" + std::to_string(H) +
+                          (resumed ? " resumed=1" : ""), true);
+        }
+      } else {
+        dist = sweepSquare8Holes(maxn, kmax, Conn::FG8, nthreads);
+      }
       rep.done("result=ok");
       for (int n = 1; n <= maxn; ++n)
         for (int k = 0; k <= kmax; ++k) {

@@ -50,10 +50,17 @@ build/euler_unit: tests/euler_unit.cpp cpp/tma/euler.h | build
 	$(CXX) $(CXXFLAGS) -O2 $< -o $@
 
 # Gate TMA: transfer-matrix engine vs fixtures + G2 height marginals
-gate-tma: build/tma build/tma_asan build/g2
+gate-tma: build/tma build/tma_asan build/tma_holes build/g2
 	python3 tests/gate_tma.py
 
 build/tma: cpp/tma_main.cpp cpp/tma/*.h | build
+	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_main.cpp -o $@
+
+# Holes + mod-p engine: SAME source as build/tma (the --holes / --modp paths live
+# in tma_main.cpp). Kept as a separate named binary because the hole drivers
+# (gf/hole_recover.py, gf/hole_modp_recover.py) and the exact hole-count runs
+# invoke build/tma_holes by name.
+build/tma_holes: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_main.cpp -o $@
 
 build/tma_asan: cpp/tma_main.cpp cpp/tma/*.h | build

@@ -31,6 +31,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <mutex>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -85,6 +87,94 @@ inline std::uint32_t boundaryOcc(const Sig& sig, int H) {
   return m;
 }
 
+// Multithreaded counterpart to sweepSquare8HeightHoles (same algorithm). Each
+// column's signature map is split into S shards by signature hash, each under its
+// own mutex, and the live signatures are fanned across `nthreads` workers; harvest
+// goes to per-thread result accumulators reduced after the column. As in
+// sweepSquare8HeightMT, every shard and accumulator only ACCUMULATES (commutative),
+// so the output is bit-identical to the serial sweep regardless of interleaving --
+// the gate checks exactly that. Memory ~ serial (the shards together hold the same
+// states); this is the speedup for the long single-height holes runs (e.g. the
+// exact n=18 hole-count, otherwise one core).
+inline void sweepSquare8HeightHolesMT(int H, int maxn, int Kmax, Conn conn,
+                                      std::vector<u64>& result, int nthreads,
+                                      u64 mod, bool hdrop) {
+  const int Kp = Kmax + 1;
+  const size_t stride = static_cast<size_t>(maxn + 1) * Kp;
+  int S = 64;
+  while (S < 128 * nthreads) S <<= 1;  // shards: power of two, >> nthreads
+  std::vector<HoleDB> dbS, nextS;
+  dbS.reserve(S);
+  nextS.reserve(S);
+  for (int s = 0; s < S; ++s) { dbS.emplace_back(stride); nextS.emplace_back(stride); }
+  std::vector<std::mutex> mu(S);
+
+  Sig seed;
+  std::memset(seed.b, 0, SIGMAX);
+  dbS[FlatDB::hashSig(seed) & (S - 1)].slot(seed)[0] = 1;  // size 0, holes 0
+
+  for (int col = 0; col <= maxn; ++col) {
+    size_t total = 0;
+    for (int s = 0; s < S; ++s) total += dbS[s].cnt;
+    if (total == 0) break;
+    for (int s = 0; s < S; ++s) nextS[s].clear();
+
+    std::vector<std::vector<u64>> localRes(nthreads, std::vector<u64>(stride, 0));
+    auto worker = [&](int t) {
+      std::vector<u64>& lres = localRes[t];
+      for (int s = t; s < S; s += nthreads)  // thread t owns source shards t,t+T,...
+        dbS[s].for_each([&](const Sig& sig, const u64* row) {
+          int ms = -1;
+          for (int sz = 0; sz <= maxn && ms < 0; ++sz)
+            for (int h = 0; h < Kp; ++h) if (row[sz * Kp + h]) { ms = sz; break; }
+          if (ms < 0) return;
+          const int comps = boundaryComps(sig, H);
+          if (comps == 1 && sig.b[H] && sig.b[H + 1])         // closure: harvest
+            for (size_t i = 0; i < stride; ++i)
+              if (row[i]) lres[i] = mod ? (lres[i] + row[i]) % mod : lres[i] + row[i];
+          const std::uint32_t occ = boundaryOcc(sig, H);
+          forEachViableMask(sig, H, maxn - ms, [&](unsigned mask) {
+            Sig out;
+            if (stepColumnSquare8(sig, H, mask, out) != Outcome::Alive) return;
+            const int cells = __builtin_popcount(mask);
+            if (ms + cells + completionLowerBound(out.b, H) > maxn) return;
+            const int compsNew = boundaryComps(out, H);
+            const int dE4 = closedEulerDelta4(occ, mask, H, conn);
+            if (dE4 & 3) {
+              std::fprintf(stderr, "euler delta not /4: %d\n", dE4); std::abort();
+            }
+            const int dHoles = (compsNew - comps) - dE4 / 4;
+            const int sh = FlatDB::hashSig(out) & (S - 1);
+            std::lock_guard<std::mutex> lk(mu[sh]);
+            u64* dst = nextS[sh].slot(out);
+            for (int sz = 0; sz + cells <= maxn; ++sz)
+              for (int h = 0; h < Kp; ++h) {
+                const u64 v = row[sz * Kp + h];
+                if (!v) continue;
+                const int nh = h + dHoles;
+                if (nh >= Kp) {
+                  if (hdrop) continue;
+                  std::fprintf(stderr,
+                      "hole index out of range: %d (Kmax=%d); raise --kmax\n", nh, Kmax);
+                  std::abort();
+                }
+                u64& cell = dst[(sz + cells) * Kp + nh];
+                cell = mod ? (cell + v) % mod : cell + v;
+              }
+          });
+        });
+    };
+    std::vector<std::thread> th;
+    for (int t = 0; t < nthreads; ++t) th.emplace_back(worker, t);
+    for (auto& x : th) x.join();
+    for (int t = 0; t < nthreads; ++t)               // reduce per-thread harvests
+      for (size_t i = 0; i < stride; ++i)
+        result[i] = mod ? (result[i] + localRes[t][i]) % mod
+                        : result[i] + localRes[t][i];
+    std::swap(dbS, nextS);
+  }
+}
+
 // Accumulate height-H contributions into result[size*Kp + holes], Kp = Kmax+1.
 // mod > 0 reduces every count mod `mod` (B_{H,k}(n) mod p, no overflow -> any n,
 // for mod-p GF recovery, #5b); mod == 0 is the exact u64 path (unchanged). All
@@ -94,9 +184,14 @@ inline std::uint32_t boundaryOcc(const Sig& sig, int H) {
 // (holes only seal, never reopen) -- a partial state already over Kmax can never
 // produce a final animal with <= Kmax holes. Lets a small Kmax bound RAM to
 // O(D_H * maxn * Kmax) so high maxn (many GF terms) fits in memory. #5b.
+// nthreads > 1 dispatches to the sharded MT sweep above (bit-identical output).
 inline void sweepSquare8HeightHoles(int H, int maxn, int Kmax, Conn conn,
                                     std::vector<u64>& result, u64 mod = 0,
-                                    bool hdrop = false) {
+                                    bool hdrop = false, int nthreads = 1) {
+  if (nthreads > 1) {
+    sweepSquare8HeightHolesMT(H, maxn, Kmax, conn, result, nthreads, mod, hdrop);
+    return;
+  }
   const int Kp = Kmax + 1;
   const size_t stride = static_cast<size_t>(maxn + 1) * Kp;
   HoleDB db(stride), next(stride);
@@ -148,11 +243,14 @@ inline void sweepSquare8HeightHoles(int H, int maxn, int Kmax, Conn conn,
   }
 }
 
-// Full (size, #holes) distribution summed over heights, sizes 1..maxn.
-inline std::vector<u64> sweepSquare8Holes(int maxn, int Kmax, Conn conn) {
+// Full (size, #holes) distribution summed over heights, sizes 1..maxn. Heights
+// run sequentially (cross-height parallelism would multiply peak RAM); the work
+// inside the dominant height is parallelized by nthreads.
+inline std::vector<u64> sweepSquare8Holes(int maxn, int Kmax, Conn conn,
+                                          int nthreads = 1) {
   const int Kp = Kmax + 1;
   std::vector<u64> result(static_cast<size_t>(maxn + 1) * Kp, 0);
   for (int H = 1; H <= maxn; ++H)
-    sweepSquare8HeightHoles(H, maxn, Kmax, conn, result);
+    sweepSquare8HeightHoles(H, maxn, Kmax, conn, result, 0, false, nthreads);
   return result;
 }
