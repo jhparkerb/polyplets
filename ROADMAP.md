@@ -58,11 +58,13 @@ H=5 k=0..3, **H=6 k=0..6** (76 GFs so far); **H=7 k=0..2 running** (N=3400). Ord
 law order(H,k) = c_H·(k+1), c = 6,20,68,185,537 for H=3..7 — clean per-hole order
 increment. Feasibility frontier (N≤4096): H=6 reaches k≤10, H=7 k≤2, H=8 k=0 only,
 H≥9 blocked (order(9,0) needs N≈9000).
-REMAINING for #28: (i) n≥15 production run for the new hole terms (big n=19 still
-ayr/#20, ~60–75 GB); (ii) companion 8-bg convention (needs a 4-adjacency
-component tally — deferred); (iii) **H=8 k=0 hole GF — DEFERRED until a(20)
-finishes and frees the cores** (~20 h single-threaded: D_8=1604 → ~½ h/sweep ×
-~30 primes; run `python3 gf/hole_modp_recover.py 8 8 3400 0 30`, appends).
+REMAINING for #28: (i) n≥15 production run for the new hole terms — **the n=18
+exact hole count is RUNNING on ayr now** (`tma_holes square8 18 --holes`); full
+n=19 (~60–75 GB) fits ayr's 78 GB directly (no #20 needed); (ii) companion 8-bg
+convention (needs a 4-adjacency component tally — deferred); (iii) **H=8 k=0 hole
+GF — SUSPENDED mid-run, awaiting CONT** (the 14 stopped `--only-height 8 --holes
+--modp` mod-p sweeps on gympie; jasonp resumes them when h19 frees the cores;
+`python3 gf/hole_modp_recover.py 8 8 3400 0 30`, appends).
 NOTE: `build/tma_holes` is the current holes+modp engine (built from live source);
 production `build/tma` is still the OLD pre-holes binary running a(20) — rebuild
 (`make build/tma`) once it frees.
@@ -93,23 +95,39 @@ gympie-friendly, runnable now.
 
 **#21 — Extend + reproduce all three sequences.**
 Push a(20)+ for fixed/free/one-sided polyplets and confirm each with a second
-method on a different architecture (cross-ISA decorrelation). a(20) is partway
-done (single-method candidate). The cross-ISA reproduction is the remaining
-confidence step. **Needs ayr (busy until ~June 27); dalby off-limits.**
+method on a different architecture (cross-ISA decorrelation). **a(20) =
+1,025,573,519,362,016 is assembled as a candidate** (RESULTS.md R4, 2026-06-20):
+n≤18 == published, a(19) reproduced, height-19 already cross-ISA on ayr, and a
+fixed-height-GF series cross-check passes for heights 1–10. Remaining for
+confirmed: gympie's own height-19 byte check (running) + ISA-decorrelated rerun
+of heights 11–18,20 — **that rerun is IN PROGRESS on ayr now** (`a20cross`
+driver, all-x86/GCC reassembly; assemble + compare to 1,025,573,519,362,016 on
+completion). **ayr available 2026-06-20** (freed early; was ~June 27); dalby
+off-limits.
 → Produces more terms (extended b-files); feeds #25 and #17.
 
-**#19 — Benchmark engines + reach projection.**
-Measure each engine's real throughput/memory and project how far each can push
-(a(n) and the GF heights) on available hardware. Largely characterized already
-(complexity.md, scaling.md); the open piece is a clean defensible projection.
-→ Decides whether #20 is worth building; informs #21, #28.
+**#19 — Benchmark engines + reach projection. DONE (2026-06-20).**
+Measured the diagonal RAM driver (tallest strip) from two terms (a19, a20):
+peak_states grows ×2.42/term, ≈270–320 B/state. Projection in `reach.md`:
+**a(21) fits ayr's 78 GB (~35–41 GB, no backend); a(22) is the first term that
+requires the out-of-core store (#20) at ~85–100 GB.** Separately the hole-GF wall
+is recurrence order ∝ height (a time limit, not RAM).
+→ Pins #20's trigger to a(22); informs #21, #28.
 
-**#20 — Out-of-core transfer-matrix backend.**
-The transfer matrix is RAM-bound (≈12.5 GB at a(19)). An on-disk/mmap state store
-breaks that wall, unlocking a(22)+ and relieving the memory pressure of full-n=19
-hole stratification. The designed-to-be-replaced state store makes this a
-drop-in. Premature until #19 says it's worth it.
-→ Enables deeper #21 and the RAM-heavy half of #28.
+**#20 — Past the RAM wall: COMPRESSION FIRST, out-of-core deferred.**
+The transfer matrix is RAM-bound (reach.md: a(22) ≈ 97 GB > ayr 78 GB). **Recast
+2026-06-20** (`docs/state-store-compression.md`): the byte teardown shows the
+per-state **counts row is 85%** of the footprint (a full u64 per cell-count
+n=0…maxn). Compressing it — **ranged counts row** (exploit the size-budget prune;
+×1.5–2.5), load factor 0.7→0.85 (~12%), u32 counts for mod-p runs — stacks to
+≈2.2×, which drops a(22) to ~45 GB and **likely removes the need for the
+out-of-core store entirely for a(22)**. Compression also buys headroom + speed for
+the hole runs now. The true out-of-core backend (external hash-partitioned
+aggregation, NOT mmap) is deferred to **a(23)+**, where it's unavoidable. Next
+concrete step: an instrumented count-row-width measurement, queued for the next
+free gympie core window. All edits post-a(20)-confirmation; gates stay
+byte-identical.
+→ Compression unlocks a(22) on ayr; out-of-core only for a(23)+.
 
 **#17 — Paper + public repo drop (LAST).**
 Fold everything into the write-up: a(19) + free/one-sided, hole sequences, the
@@ -130,7 +148,7 @@ result. This closes the venue fork.
 ## Dependency graph
 
 ```
-LEGEND:  A --> B  = A feeds / enables B          ((ayr)) = needs ayr (~Jun 27)
+LEGEND:  A --> B  = A feeds / enables B          ((ayr)) = needs ayr (AVAILABLE NOW)
 
   -- start-now on gympie ------------------------------------------+
   |  #27 sampling-scaling --------------------------------------+  |
@@ -138,10 +156,10 @@ LEGEND:  A --> B  = A feeds / enables B          ((ayr)) = needs ayr (~Jun 27)
   |  #19 benchmark/reach --> #20 out-of-core --+               |  |
   +---------------------------------------------+--------------+--+
                                                 |              |
-            #20 (RAM wall broken) --------------+              |
-                                                v              |
-   ((ayr)) --> #21 extend a(20)+, cross-ISA --> more terms     |
-   ((ayr)) --> #28 full n=19 holes  <----------+               |
+            #20 (RAM wall) -- a(22)+ only, off critical path   |
+                                                               |
+   ((ayr NOW)) --> #21 extend a(20)+, cross-ISA --> more terms |
+   ((ayr NOW)) --> #28 full n=19 holes (fits 78 GB directly)   |
                           |                                    |
    #24 holes (done<=14) --+                                    |
                           v                                    |
@@ -155,13 +173,18 @@ LEGEND:  A --> B  = A feeds / enables B          ((ayr)) = needs ayr (~Jun 27)
 ```
 
 ## Leverage points & critical path
-- **#19 → #20** decides the out-of-core build; **#20 is the multiplier** — it
-  unlocks both deeper a(n) (#21) and the RAM for full n=19 holes (#28).
-- **ayr (~June 27)** gates the heavy compute (#21 cross-ISA + a(20)+, full-n=19
-  #28). Until then, gympie runs the light independent work: **#27**, the **small-H
-  hole-GF prototype** (#28's gympie half), and **#19**.
+- **ayr is the multiplier now, not #20.** As of 2026-06-20 ayr (78 GB) is
+  available, so the heavy compute (#21 cross-ISA a(20)+, full-n=19 #28) runs on
+  ayr directly. **#20 (out-of-core) drops off the critical path** — needed only
+  for a(22)+ beyond 78 GB. #19's reach projection still informs *when* a(22)+
+  forces #20, but no longer gates the current terms.
+- **Heavy compute is live on ayr:** #21's all-x86 a(20) reassembly (`a20cross`)
+  and #28(i)'s n=18 exact hole count are both running; #28(iii)'s H=8 hole GF is
+  suspended on gympie awaiting CONT. gympie also runs the light independent work
+  (#27 sampling-scaling, small-H hole GFs).
 - **#25 is the convergence point** — it consumes hole sequences (#28),
   atom-degree/order sequences (#26, done), and extended b-files (#21); then
   everything plus #27's scaling flows into **#17, strictly last.**
-- **Critical path to publication:** #19 → #20 → (ayr) #21/#28 → #25 → #17, with
-  #27 and the gympie-side hole prototype running in parallel throughout.
+- **Critical path to publication:** (ayr, now) #21/#28 → #25 → #17, with #27 and
+  the gympie-side hole prototype running in parallel. #19 → #20 is a parallel
+  side-track for the a(22)+ frontier, no longer blocking.

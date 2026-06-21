@@ -1,4 +1,4 @@
-# HANDOFF — a(19) confirmed; a(20) candidate assembling on gympie
+# HANDOFF — a(19) confirmed; a(20) candidate blocked only on height-19 on gympie
 
 Polyomino project at `/Users/jasonp/src/polyominoes` (read `ROADMAP.md`,
 `method-a19.md`, and `RESULTS.md` first). Subject: fixed polyplets / king-move
@@ -20,16 +20,26 @@ this is the gympie-side single-method run — the cross-ISA reproduction is the
 remaining confirmation step and needs ayr, busy until ~June 27).
 
 - Per-height jobs write `runs/a20/h<H>.out` (format `"n count"` = byHeight[H][n]).
-- **Heights 1–18 are complete.** Height 20 is **running now**
-  (`build/tma square8 20 --only-height 20 --threads 6`, PID 79582).
-- **Height 19 is not yet started** — no `h19.out`, no process. It still needs
-  to be launched before a(20) can be assembled.
+- **Heights 1–18 and 20 are complete.** Height 20 finished 2026-06-20 06:43
+  (`h20.out`: byHeight[20][20] = 1,162,261,467).
+- **Height 19 is running now** — the sole remaining blocker
+  (`build/tma square8 20 --only-height 19 --threads 6`, PID 85504, started
+  2026-06-20 06:43). `h19.out`/`h19.log` stay empty until it finishes; no
+  intermediate progress markers, so no measured ETA.
 - Assemble once h19 and h20 are both non-empty: a(20) = Σ over H=1..20 of
   byHeight[H][20], reading h1..h20.out. Verify n≤18 against `fixtures/b006770.txt`
   and a(19) against the confirmed **151,609,203,011,580**; report any mismatch
   loudly (a low value would indicate an inadmissible size-budget prune).
+- **ASSEMBLED 2026-06-20: a(20) = 1,025,573,519,362,016** (candidate). Used ayr's
+  height-19 (`runs/a20/h19.ayr.out`, byHeight[19][20]=19,586,258,055) so as not to
+  wait on gympie's still-running h19. Checks passed: n≤18 == `fixtures/b006770.txt`,
+  a(19) == 151,609,203,011,580, bignum-exact. Recorded RESULTS.md R4 + ledger.
+- Independent GF cross-check passed (2026-06-20): `results/fixed_height_gfs.txt`
+  (fixed-height GFs H=1..10, recovered on ayr) expands to match the `byHeight[H][n]`
+  columns exactly for H=1..10, n≤20.
 - Result tier: a(20) is a **candidate** (single method) until an ISA-decorrelated
-  rerun on ayr reproduces it. Do not submit; record in the ledger as candidate.
+  rerun on ayr reproduces heights 11–18,20 *and* gympie's own h19 byte-matches
+  ayr's. Do not submit until confirmed.
 
 ## Notes
 
