@@ -456,14 +456,50 @@ $n>81$ but does not change the regime.
 % the a(25) lower bound. Re-run the coefficient extraction and update the 59% and
 % the a(25)>= ... figure when those GFs land.
 
-% TODO(a20): a(20) is reachable by the same machinery but is NOT yet computed --
-% the per-height assembly is missing the height-19 stratum (runs/a20 has H=1..18,20).
-% Once h19 completes and a(20) is assembled+confirmed, insert its value into the
-% abstract, Table~\ref{tab:terms}, the growth-ratio discussion, and verify_claims.py.
-\paragraph{Next term.}
-\textbf{TODO ($a(20)$):} the same machinery reaches $a(20)$; that computation is in
-progress (the height-$19$ stratum is still pending) and no value is stated here
-until it is complete and cross-checked.
+\paragraph{Next term: $a(20)$ (candidate).}
+The same height decomposition reaches $a(20)=\sum_{H=1}^{20}B_H(20)$. Assembling
+the per-height transfer-matrix counts gives
+\begin{equation}
+  a(20) = \num{1025573519362016}\qquad(\text{candidate}).
+\end{equation}
+The value passes every internal check available short of a second full
+computation. The assembly reproduces all published terms $n\le18$ of A006770 and
+the dual-method-confirmed $a(19)=\num{151609203011580}$ exactly, which excludes an
+inadmissible size-budget prune (such an error would surface as a deficit at
+$n\le19$). The heaviest stratum, $B_{19}(20)=\num{19586258055}$ (peak
+boundary-state count $\num{23975127}$), was computed on the x86/GCC host
+independently of the rest, decorrelating the one height large enough to conceal a
+pruning error; and the strata $H\le10$ were additionally cross-checked against the
+recovered rational fixed-height generating functions, whose series expansions
+reproduce $B_H(20)$ exactly. The implied growth ratio
+$a(20)/a(19)\approx6.7646$ continues the monotone climb of successive ratios.
+We nonetheless mark $a(20)$ a \emph{candidate} rather than confirmed: a full
+ISA-decorrelated recount of the remaining strata is in progress, and until it
+agrees the value rests on a single computation for those heights. It is stated
+here but kept out of the abstract and Table~\ref{tab:terms}, and not submitted to
+the OEIS, pending confirmation by the protocol of Section~\ref{sec:confirm}.
+
+The same Burnside assembly gives the $n=20$ companions (likewise candidates,
+inheriting $a(20)$'s status): from $R_{90}=\num{1630}$, $R_{180}=\num{69068156}$,
+$H=\num{26676346}$, $D=\num{23620398}$ one obtains
+$\mathrm{Free}(20)=\num{128196711128365}$,
+$\mathrm{OneSided}(20)=\num{256393397108358}$, bilateral
+$\tfrac12(H+D)=\num{25148372}$, and asymmetric $\num{128196685979993}$. Here
+$20\equiv0\pmod4$, so $R_{90}$ is nonzero, unlike $n=19$.
+
+\paragraph{Reach.}
+The engine's memory is set by its tallest strip, whose peak boundary-state count
+grows by a measured factor $\approx\!2.42$ per term ($22.1$\,M states at $n=19$,
+$53.6$\,M at $n=20$) at $\approx\!300$ bytes per state. Extrapolating, the heaviest
+stratum of $a(21)$ needs $\approx\!35$--$40$\,GB---reachable on present
+hardware---while $a(22)$ needs $\approx\!90$\,GB, the first term to require an
+out-of-core state store. The fixed-(height,\,\#holes) generating functions face a
+separate limit: their recurrence order grows with height, so series length, not
+memory, bounds them above $H\approx8$.
+% TODO(a20-confirm): when the all-x86/GCC reassembly matches 1025573519362016 and
+% gympie's own height-19 recount byte-matches B_19(20)=19586258055, promote a(20)
+% to confirmed -- add it to the abstract, Table~\ref{tab:terms}, the growth-ratio
+% line, the A006770 b-file, and verify_claims.py.
 
 \section{Data and code availability}
 \label{sec:availability}
