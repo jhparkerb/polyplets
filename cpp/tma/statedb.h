@@ -71,6 +71,23 @@ struct FlatDB {
   bool empty() const { return cnt == 0; }
   void clear() { std::fill(used.begin(), used.end(), 0); cnt = 0; }
 
+  // Pre-size (on a fresh/empty store) to hold ~nStates without growing. grow()
+  // moves the old arrays aside and allocates the new 2x arrays before freeing the
+  // old, so the doubling rehash momentarily holds both -- typically the RSS
+  // high-water. Reserving to a measured/predicted peak skips every grow (no
+  // transient, no rehash cost). Safe: over-reserve wastes a little, under-reserve
+  // just grows as before. Must be called before any insert (resets to empty).
+  void reserve(size_t nStates) {
+    size_t want = cap;
+    while ((nStates + 1) * 10 >= want * 7) want <<= 1;
+    if (want == cap) return;
+    cap = want;
+    keys.resize(cap);
+    vals.resize(cap * stride);
+    used.assign(cap, 0);
+    cnt = 0;
+  }
+
   // Visit each live entry as (key, counts row) -- the only read-back path, so
   // callers never touch the slot layout (keys/vals/used/stride) directly.
   template <class F>

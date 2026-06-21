@@ -27,9 +27,11 @@
 // Count fixed polyplets of height exactly H (sizes 0..maxn), returned as a
 // byHeight row. Updates res.peakStates/peakHeight (the memory high-water mark).
 inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
-                                 const std::function<void(int, u64)>& onColumn = {}) {
+                                 const std::function<void(int, u64)>& onColumn = {},
+                                 size_t reserveStates = 0) {
   Counts row(maxn + 1, 0);
   FlatDB db(maxn), next(maxn);
+  if (reserveStates) { db.reserve(reserveStates); next.reserve(reserveStates); }
   Sig seed;
   std::memset(seed.b, 0, SIGMAX);
   db.slot(seed)[0] = 1;
@@ -78,7 +80,8 @@ inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
 // states); no variable-width tricks, since the target machine has the RAM.
 inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
                                    SweepResults& res,
-                                   const std::function<void(int, u64)>& onColumn = {}) {
+                                   const std::function<void(int, u64)>& onColumn = {},
+                                   size_t reserveStates = 0) {
   Counts row(maxn + 1, 0);
   int S = 64;
   while (S < 128 * nthreads) S <<= 1;  // shards: power of two, >> nthreads
@@ -86,6 +89,10 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
   dbS.reserve(S);
   nextS.reserve(S);
   for (int s = 0; s < S; ++s) { dbS.emplace_back(maxn); nextS.emplace_back(maxn); }
+  if (reserveStates) {                 // pre-size each shard to its share of the peak
+    const size_t per = reserveStates / static_cast<size_t>(S) + 1;
+    for (int s = 0; s < S; ++s) { dbS[s].reserve(per); nextS[s].reserve(per); }
+  }
   std::vector<std::mutex> mu(S);
 
   Sig seed;
@@ -135,9 +142,11 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
 
 // One height, serial or multithreaded by `nthreads`.
 inline Counts heightRow(int H, int maxn, int nthreads, SweepResults& res,
-                        const std::function<void(int, u64)>& onColumn = {}) {
-  return nthreads > 1 ? sweepSquare8HeightMT(H, maxn, nthreads, res, onColumn)
-                      : sweepSquare8Height(H, maxn, res, onColumn);
+                        const std::function<void(int, u64)>& onColumn = {},
+                        size_t reserveStates = 0) {
+  return nthreads > 1
+             ? sweepSquare8HeightMT(H, maxn, nthreads, res, onColumn, reserveStates)
+             : sweepSquare8Height(H, maxn, res, onColumn, reserveStates);
 }
 
 inline SweepResults sweepSquare8(int maxn, int nthreads = 1) {

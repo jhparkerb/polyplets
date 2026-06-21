@@ -133,6 +133,12 @@ def main():
     gate.check(base == ck1 and ck1 == ck2,
           f"J holes ckpt  square8 n<={depth_j} write+resume == plain")
 
+    # K. --reserve N pre-sizes the store (to skip the doubling-grow transient) but
+    #    must not change the result -- it's pure allocation strategy.
+    resv = parse_counts(run(TMA_HOLES, "square8", depth_i, "--holes", "--reserve", "200000"))
+    gate.check(base == resv,
+          f"K holes resv  square8 n<={depth_i} --reserve == plain")
+
     return gate.verdict("TMA")
 
 

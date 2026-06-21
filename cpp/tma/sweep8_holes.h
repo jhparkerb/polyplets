@@ -54,6 +54,19 @@ struct HoleDB {
   }
   bool empty() const { return cnt == 0; }
   void clear() { std::fill(used.begin(), used.end(), 0); cnt = 0; }
+  // Pre-size (empty store) to hold ~nStates without growing -- skips the doubling
+  // rehash whose transient (old + new arrays at once) is typically the RSS peak.
+  // Same contract as FlatDB::reserve: call before any insert.
+  void reserve(size_t nStates) {
+    size_t want = cap;
+    while ((nStates + 1) * 10 >= want * 7) want <<= 1;
+    if (want == cap) return;
+    cap = want;
+    keys.resize(cap);
+    vals.resize(cap * stride);
+    used.assign(cap, 0);
+    cnt = 0;
+  }
   template <class F> void for_each(F&& fn) const {
     for (size_t i = 0; i < cap; ++i) if (used[i]) fn(keys[i], &vals[i * stride]);
   }
@@ -98,7 +111,7 @@ inline std::uint32_t boundaryOcc(const Sig& sig, int H) {
 // exact n=18 hole-count, otherwise one core).
 inline void sweepSquare8HeightHolesMT(int H, int maxn, int Kmax, Conn conn,
                                       std::vector<u64>& result, int nthreads,
-                                      u64 mod, bool hdrop) {
+                                      u64 mod, bool hdrop, size_t reserveStates = 0) {
   const int Kp = Kmax + 1;
   const size_t stride = static_cast<size_t>(maxn + 1) * Kp;
   int S = 64;
@@ -107,6 +120,10 @@ inline void sweepSquare8HeightHolesMT(int H, int maxn, int Kmax, Conn conn,
   dbS.reserve(S);
   nextS.reserve(S);
   for (int s = 0; s < S; ++s) { dbS.emplace_back(stride); nextS.emplace_back(stride); }
+  if (reserveStates) {                 // pre-size each shard to its share of the peak
+    const size_t per = reserveStates / static_cast<size_t>(S) + 1;
+    for (int s = 0; s < S; ++s) { dbS[s].reserve(per); nextS[s].reserve(per); }
+  }
   std::vector<std::mutex> mu(S);
 
   Sig seed;
@@ -187,14 +204,17 @@ inline void sweepSquare8HeightHolesMT(int H, int maxn, int Kmax, Conn conn,
 // nthreads > 1 dispatches to the sharded MT sweep above (bit-identical output).
 inline void sweepSquare8HeightHoles(int H, int maxn, int Kmax, Conn conn,
                                     std::vector<u64>& result, u64 mod = 0,
-                                    bool hdrop = false, int nthreads = 1) {
+                                    bool hdrop = false, int nthreads = 1,
+                                    size_t reserveStates = 0) {
   if (nthreads > 1) {
-    sweepSquare8HeightHolesMT(H, maxn, Kmax, conn, result, nthreads, mod, hdrop);
+    sweepSquare8HeightHolesMT(H, maxn, Kmax, conn, result, nthreads, mod, hdrop,
+                              reserveStates);
     return;
   }
   const int Kp = Kmax + 1;
   const size_t stride = static_cast<size_t>(maxn + 1) * Kp;
   HoleDB db(stride), next(stride);
+  if (reserveStates) { db.reserve(reserveStates); next.reserve(reserveStates); }
   Sig seed; std::memset(seed.b, 0, SIGMAX);
   db.slot(seed)[0] = 1;  // size 0, holes 0
 
@@ -247,10 +267,12 @@ inline void sweepSquare8HeightHoles(int H, int maxn, int Kmax, Conn conn,
 // run sequentially (cross-height parallelism would multiply peak RAM); the work
 // inside the dominant height is parallelized by nthreads.
 inline std::vector<u64> sweepSquare8Holes(int maxn, int Kmax, Conn conn,
-                                          int nthreads = 1) {
+                                          int nthreads = 1,
+                                          size_t reserveStates = 0) {
   const int Kp = Kmax + 1;
   std::vector<u64> result(static_cast<size_t>(maxn + 1) * Kp, 0);
   for (int H = 1; H <= maxn; ++H)
-    sweepSquare8HeightHoles(H, maxn, Kmax, conn, result, 0, false, nthreads);
+    sweepSquare8HeightHoles(H, maxn, Kmax, conn, result, 0, false, nthreads,
+                            reserveStates);
   return result;
 }

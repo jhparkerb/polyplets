@@ -191,6 +191,8 @@ int main(int argc, char** argv) {
   int nthreads = 1, onlyHeight = 0;
   u64 modp = 0;  // --modp P: count B_{H,k}(n) mod P (holes path, #5b GF recovery)
   bool hdrop = false;  // --hdrop: drop holes > kmax (exact for k<=kmax, bounds RAM)
+  u64 reserveStates = 0;  // --reserve N: pre-size the state store to ~N states (skip
+                          // the doubling-grow transient; pass the calibrated peak)
   for (int i = 3; i < argc; ++i) {
     if (std::strcmp(argv[i], "--per-height") == 0) {
       perHeight = true;
@@ -211,6 +213,8 @@ int main(int argc, char** argv) {
       modp = static_cast<u64>(std::atoll(argv[++i]));
     } else if (std::strcmp(argv[i], "--hdrop") == 0) {
       hdrop = true;
+    } else if (std::strcmp(argv[i], "--reserve") == 0 && i + 1 < argc) {
+      reserveStates = static_cast<u64>(std::strtoull(argv[++i], nullptr, 10));
     } else {
       std::fprintf(stderr, "unknown arg: %s\n", argv[i]);
       return 2;
@@ -269,7 +273,7 @@ int main(int argc, char** argv) {
               " threads=" + std::to_string(nthreads));
       std::vector<u64> row(static_cast<size_t>(maxn + 1) * Kp, 0);
       sweepSquare8HeightHoles(onlyHeight, maxn, kmax, Conn::FG8, row, modp, hdrop,
-                              nthreads);
+                              nthreads, static_cast<size_t>(reserveStates));
       rep.done("result=ok");
       for (int n = 1; n <= maxn; ++n)
         for (int k = 0; k <= kmax; ++k) {
@@ -284,7 +288,8 @@ int main(int argc, char** argv) {
                         "threads=" + std::to_string(nthreads));
       for (int H = 1; H <= maxn; ++H) {
         std::vector<u64> row(static_cast<size_t>(maxn + 1) * Kp, 0);
-        sweepSquare8HeightHoles(H, maxn, kmax, Conn::FG8, row, 0, false, nthreads);
+        sweepSquare8HeightHoles(H, maxn, kmax, Conn::FG8, row, 0, false, nthreads,
+                                static_cast<size_t>(reserveStates));
         rep.beat(H, "height=" + std::to_string(H), true);
         for (int n = 1; n <= maxn; ++n)
           for (int k = 0; k <= kmax; ++k) {
@@ -311,7 +316,7 @@ int main(int argc, char** argv) {
           const bool resumed = loadHoleHeight(checkpointDir, H, Kp, hrow);
           if (!resumed) {
             sweepSquare8HeightHoles(H, maxn, kmax, Conn::FG8, hrow, modp, hdrop,
-                                    nthreads);
+                                    nthreads, static_cast<size_t>(reserveStates));
             saveHoleHeight(checkpointDir, H, maxn, Kp, hrow);
           }
           for (size_t i = 0; i < dist.size(); ++i)
@@ -320,7 +325,8 @@ int main(int argc, char** argv) {
                           (resumed ? " resumed=1" : ""), true);
         }
       } else {
-        dist = sweepSquare8Holes(maxn, kmax, Conn::FG8, nthreads);
+        dist = sweepSquare8Holes(maxn, kmax, Conn::FG8, nthreads,
+                                 static_cast<size_t>(reserveStates));
       }
       rep.done("result=ok");
       for (int n = 1; n <= maxn; ++n)
@@ -351,7 +357,8 @@ int main(int argc, char** argv) {
           rep.beat(col, "col=" + std::to_string(col) + " states=" +
                             std::to_string(live) + " peak_states=" +
                             std::to_string(res.peakStates));
-        });
+        },
+        static_cast<size_t>(reserveStates));
     for (int n = 1; n <= maxn; ++n) res.totals[n] = res.byHeight[onlyHeight][n];
     rep.done("result=" + std::to_string(static_cast<unsigned long long>(
                              res.byHeight[onlyHeight][maxn])),
