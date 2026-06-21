@@ -16,6 +16,7 @@ CLI under test: tma LATTICE MAXN [--per-height] [--holes]
 
 import os
 import shutil
+import subprocess
 import sys
 
 from common import ROOT, Gate, parse_counts, read_bfile, run
@@ -138,6 +139,25 @@ def main():
     resv = parse_counts(run(TMA_HOLES, "square8", depth_i, "--holes", "--reserve", "200000"))
     gate.check(base == resv,
           f"K holes resv  square8 n<={depth_i} --reserve == plain")
+
+    # L. intra-height checkpoint: a single --only-height sweep killed mid-height
+    #    (env hook _Exit's right after the column-k save) resumes from the on-disk
+    #    boundary state to a byte-identical result -- for serial AND MT.
+    depth_l, H_l, kill_col = 14, 10, 5
+    ckdir = os.path.join(ROOT, "runs", "ckpt", "gate_ih")
+    base_l = run(TMA_HOLES, "square8", depth_l, "--only-height", H_l)  # clean baseline
+    for threads in (1, 4):
+        shutil.rmtree(ckdir, ignore_errors=True)
+        argv = [TMA_HOLES, "square8", str(depth_l), "--only-height", str(H_l),
+                "--threads", str(threads), "--checkpoint", ckdir]
+        env = dict(os.environ, TMA_CKPT_SECS="0", TMA_CKPT_MIN_STATES="0",
+                   TMA_CKPT_KILL_AT_COL=str(kill_col))
+        killed = subprocess.run(argv, capture_output=True, text=True, env=env)
+        banked = os.path.exists(os.path.join(ckdir, "ckpt"))
+        resumed = subprocess.run(argv, capture_output=True, text=True)  # no kill env
+        gate.check(killed.returncode == 137 and banked and resumed.stdout == base_l,
+              f"L ihckpt T={threads}  square8 n<={depth_l} kill@col{kill_col} resume == clean")
+    shutil.rmtree(ckdir, ignore_errors=True)
 
     return gate.verdict("TMA")
 

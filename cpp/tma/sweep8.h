@@ -14,6 +14,9 @@
 
 #pragma once
 
+#include <chrono>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <functional>
 #include <mutex>
@@ -21,6 +24,7 @@
 #include <utility>
 #include <vector>
 
+#include "checkpoint.h"
 #include "statedb.h"
 #include "transition_square8.h"
 
@@ -28,20 +32,53 @@
 // byHeight row. Updates res.peakStates/peakHeight (the memory high-water mark).
 inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
                                  const std::function<void(int, u64)>& onColumn = {},
-                                 size_t reserveStates = 0) {
+                                 size_t reserveStates = 0,
+                                 const CkptCtl* ckpt = nullptr) {
   Counts row(maxn + 1, 0);
   FlatDB db(maxn), next(maxn);
   if (reserveStates) { db.reserve(reserveStates); next.reserve(reserveStates); }
-  Sig seed;
-  std::memset(seed.b, 0, SIGMAX);
-  db.slot(seed)[0] = 1;
+  const CkptMeta meta{maxn, H, 0, 0, 0, 1, 0, static_cast<u64>(maxn + 1)};
 
-  for (int col = 0; col <= maxn && !db.empty(); ++col) {
+  int startCol = 0;
+  bool resumed = false;
+  if (ckpt) {  // resume mid-height from a column-boundary checkpoint, if present
+    std::int32_t cn = 0, ph = 0; u64 pk = 0;
+    const CkptStatus st = tmaCkptLoad(
+        *ckpt, meta,
+        [&](const Sig& sig, const u64* r) {
+          std::memcpy(db.slot(sig), r, static_cast<size_t>(maxn + 1) * sizeof(u64));
+        },
+        row.data(), static_cast<u64>(maxn + 1), cn, pk, ph);
+    if (st == CkptStatus::Refuse) {
+      std::fprintf(stderr, "checkpoint %s/ckpt refused (param mismatch or corrupt)\n",
+                   ckpt->dir.c_str());
+      std::exit(2);
+    }
+    if (st == CkptStatus::Loaded) {
+      startCol = cn; res.peakStates = pk; res.peakHeight = ph; resumed = true;
+      std::fprintf(stderr, "resumed col=%d states=%zu (height %d)\n", startCol,
+                   db.size(), H);
+    }
+  }
+  if (!resumed) {  // fresh start: seed the empty boundary (NEVER on resume)
+    Sig seed;
+    std::memset(seed.b, 0, SIGMAX);
+    db.slot(seed)[0] = 1;
+  }
+
+  auto lastSave = std::chrono::steady_clock::now();
+  for (int col = startCol; col <= maxn && !db.empty(); ++col) {
     if (db.size() > res.peakStates) {
       res.peakStates = db.size();
       res.peakHeight = H;
     }
     if (onColumn) onColumn(col, db.size());  // liveness/ETA hook (no-op if unset)
+    if (ckpt && col > 0 && db.size() >= ckpt->minStates && ckptDue(*ckpt, lastSave))
+      if (tmaCkptSave(*ckpt, meta, db.size(),
+                      [&](auto&& emit) { db.for_each(emit); }, row.data(),
+                      static_cast<u64>(maxn + 1), col, res.peakStates,
+                      res.peakHeight))
+        ckptTestKill(col);
     next.clear();
     db.for_each([&](const Sig& sig, const u64* counts) {
       const int ms = minSizeRow(counts, maxn);
@@ -81,7 +118,8 @@ inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
 inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
                                    SweepResults& res,
                                    const std::function<void(int, u64)>& onColumn = {},
-                                   size_t reserveStates = 0) {
+                                   size_t reserveStates = 0,
+                                   const CkptCtl* ckpt = nullptr) {
   Counts row(maxn + 1, 0);
   int S = 64;
   while (S < 128 * nthreads) S <<= 1;  // shards: power of two, >> nthreads
@@ -94,17 +132,51 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
     for (int s = 0; s < S; ++s) { dbS[s].reserve(per); nextS[s].reserve(per); }
   }
   std::vector<std::mutex> mu(S);
+  const CkptMeta meta{maxn, H, 0, 0, 0, nthreads, 0, static_cast<u64>(maxn + 1)};
 
-  Sig seed;
-  std::memset(seed.b, 0, SIGMAX);
-  dbS[FlatDB::hashSig(seed) & (S - 1)].slot(seed)[0] = 1;
+  int startCol = 0;
+  bool resumed = false;
+  if (ckpt) {  // resume: re-route each saved entry to its shard via hashSig
+    std::int32_t cn = 0, ph = 0; u64 pk = 0;
+    const CkptStatus st = tmaCkptLoad(
+        *ckpt, meta,
+        [&](const Sig& sig, const u64* r) {
+          std::memcpy(dbS[FlatDB::hashSig(sig) & (S - 1)].slot(sig), r,
+                      static_cast<size_t>(maxn + 1) * sizeof(u64));
+        },
+        row.data(), static_cast<u64>(maxn + 1), cn, pk, ph);
+    if (st == CkptStatus::Refuse) {
+      std::fprintf(stderr, "checkpoint %s/ckpt refused (param mismatch or corrupt)\n",
+                   ckpt->dir.c_str());
+      std::exit(2);
+    }
+    if (st == CkptStatus::Loaded) {
+      startCol = cn; res.peakStates = pk; res.peakHeight = ph; resumed = true;
+      std::fprintf(stderr, "resumed col=%d (height %d, %d threads)\n", startCol, H,
+                   nthreads);
+    }
+  }
+  if (!resumed) {
+    Sig seed;
+    std::memset(seed.b, 0, SIGMAX);
+    dbS[FlatDB::hashSig(seed) & (S - 1)].slot(seed)[0] = 1;
+  }
 
-  for (int col = 0; col <= maxn; ++col) {
+  auto lastSave = std::chrono::steady_clock::now();
+  for (int col = startCol; col <= maxn; ++col) {
     u64 total = 0;
     for (int s = 0; s < S; ++s) total += dbS[s].size();
     if (total == 0) break;
     if (total > res.peakStates) { res.peakStates = total; res.peakHeight = H; }
     if (onColumn) onColumn(col, total);  // liveness/ETA hook (no-op if unset)
+    if (ckpt && col > 0 && total >= ckpt->minStates && ckptDue(*ckpt, lastSave))
+      if (tmaCkptSave(*ckpt, meta, total,
+                      [&](auto&& emit) {
+                        for (int s = 0; s < S; ++s) dbS[s].for_each(emit);
+                      },
+                      row.data(), static_cast<u64>(maxn + 1), col, res.peakStates,
+                      res.peakHeight))
+        ckptTestKill(col);
     for (int s = 0; s < S; ++s) nextS[s].clear();
 
     std::vector<Counts> localRow(nthreads, Counts(maxn + 1, 0));
@@ -143,10 +215,11 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
 // One height, serial or multithreaded by `nthreads`.
 inline Counts heightRow(int H, int maxn, int nthreads, SweepResults& res,
                         const std::function<void(int, u64)>& onColumn = {},
-                        size_t reserveStates = 0) {
+                        size_t reserveStates = 0, const CkptCtl* ckpt = nullptr) {
   return nthreads > 1
-             ? sweepSquare8HeightMT(H, maxn, nthreads, res, onColumn, reserveStates)
-             : sweepSquare8Height(H, maxn, res, onColumn, reserveStates);
+             ? sweepSquare8HeightMT(H, maxn, nthreads, res, onColumn, reserveStates,
+                                    ckpt)
+             : sweepSquare8Height(H, maxn, res, onColumn, reserveStates, ckpt);
 }
 
 inline SweepResults sweepSquare8(int maxn, int nthreads = 1) {

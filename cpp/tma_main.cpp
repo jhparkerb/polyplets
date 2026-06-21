@@ -5,6 +5,10 @@
 //   --checkpoint DIR (square8): persist each strip height as it finishes and
 //     resume completed heights on restart -- so a crash mid-run costs one
 //     height, not the whole multi-day sweep. Heights are independent sub-sums.
+//     With --only-height, this ALSO checkpoints WITHIN that one height at column
+//     boundaries (DIR/ckpt, atomic) and resumes mid-height -- so a kill of an
+//     18 h diagonal job costs one cadence interval, not the whole height. Knobs:
+//     TMA_CKPT_SECS (cadence, default 1800), TMA_CKPT_MIN_STATES (skip below).
 
 #include <cstdio>
 #include <cstdlib>
@@ -348,17 +352,30 @@ int main(int argc, char** argv) {
     SweepResults res;
     res.byHeight.assign(maxn + 1, Counts(maxn + 1, 0));
     res.totals.assign(maxn + 1, 0);
+    // intra-height checkpoint: --checkpoint DIR resumes this single height's sweep
+    // from the last column boundary (env knobs TMA_CKPT_SECS / TMA_CKPT_MIN_STATES).
+    CkptCtl ckctl;
+    const CkptCtl* ckptPtr = nullptr;
+    if (!checkpointDir.empty()) {
+      fs::create_directories(checkpointDir);
+      ckctl.dir = checkpointDir;
+      if (const char* e = std::getenv("TMA_CKPT_SECS")) ckctl.everySeconds = std::atof(e);
+      if (const char* e = std::getenv("TMA_CKPT_MIN_STATES"))
+        ckctl.minStates = std::strtoull(e, nullptr, 10);
+      ckptPtr = &ckctl;
+    }
     obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-N" +
                           std::to_string(maxn),
                       maxn, "height=" + std::to_string(onlyHeight) + " threads=" +
-                          std::to_string(nthreads));
+                          std::to_string(nthreads) +
+                          (ckptPtr ? std::string(" ckpt=1") : std::string()));
     res.byHeight[onlyHeight] = heightRow(
         onlyHeight, maxn, nthreads, res, [&](int col, u64 live) {
           rep.beat(col, "col=" + std::to_string(col) + " states=" +
                             std::to_string(live) + " peak_states=" +
                             std::to_string(res.peakStates));
         },
-        static_cast<size_t>(reserveStates));
+        static_cast<size_t>(reserveStates), ckptPtr);
     for (int n = 1; n <= maxn; ++n) res.totals[n] = res.byHeight[onlyHeight][n];
     rep.done("result=" + std::to_string(static_cast<unsigned long long>(
                              res.byHeight[onlyHeight][maxn])),
