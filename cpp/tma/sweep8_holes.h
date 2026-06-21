@@ -59,7 +59,7 @@ struct HoleDB {
   // Same contract as FlatDB::reserve: call before any insert.
   void reserve(size_t nStates) {
     size_t want = cap;
-    while ((nStates + 1) * 10 >= want * 7) want <<= 1;
+    while ((nStates + 1) * 100 >= want * 85) want <<= 1;
     if (want == cap) return;
     cap = want;
     keys.resize(cap);
@@ -78,7 +78,7 @@ struct HoleDB {
       if (ou[i]) { u64* d = slot(ok[i]); std::memcpy(d, &ov[i * stride], stride * sizeof(u64)); }
   }
   u64* slot(const Sig& k) {
-    if ((cnt + 1) * 10 >= cap * 7) grow();
+    if ((cnt + 1) * 100 >= cap * 85) grow();
     size_t h = FlatDB::hashSig(k) & (cap - 1);
     while (used[h]) { if (keys[h] == k) return &vals[h * stride]; h = (h + 1) & (cap - 1); }
     used[h] = 1; keys[h] = k; ++cnt;

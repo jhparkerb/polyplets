@@ -54,7 +54,8 @@ inline void addCounts(StateDB& db, const std::string& sig, const Counts& src,
 // rows live in one contiguous u64 array, `stride` (= maxn+1) apart; the row is
 // zeroed on first insert, so clear() only has to reset the `used` flags (values
 // are never bulk-zeroed, which would dominate at tens of millions of slots).
-// Capacity is a power of two; grows by doubling at load factor 0.7.
+// Capacity is a power of two; grows by doubling at load factor 0.85 (linear
+// probing with FNV-1a is fine that dense; steady slack ~1.43x -> ~1.18x).
 struct FlatDB {
   std::vector<Sig> keys;
   std::vector<u64> vals;
@@ -79,7 +80,7 @@ struct FlatDB {
   // just grows as before. Must be called before any insert (resets to empty).
   void reserve(size_t nStates) {
     size_t want = cap;
-    while ((nStates + 1) * 10 >= want * 7) want <<= 1;
+    while ((nStates + 1) * 100 >= want * 85) want <<= 1;
     if (want == cap) return;
     cap = want;
     keys.resize(cap);
@@ -122,7 +123,7 @@ struct FlatDB {
 
   // Find or insert; returns a pointer to the counts row (zeroed on insert).
   u64* slot(const Sig& k) {
-    if ((cnt + 1) * 10 >= cap * 7) grow();
+    if ((cnt + 1) * 100 >= cap * 85) grow();
     size_t h = hashSig(k) & (cap - 1);
     while (used[h]) {
       if (keys[h] == k) return &vals[h * stride];
