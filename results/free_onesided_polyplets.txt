@@ -19,3 +19,4 @@ computing symmetric counts to n=19 (C++)...
  17           417546684096           835091956750  ok vs A030222
  18          2808898025438          5617792259411  NEW TERM
  19         18951156321090         37902303297525  NEW TERM
+ 20        128196711128365        256393397108358  CANDIDATE (rests on Fixed(20) candidate)

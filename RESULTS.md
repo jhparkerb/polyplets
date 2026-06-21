@@ -86,11 +86,60 @@ split 7×64, `runs/a19-A/`. Ledger: `campaign_complete` entry for a19-A.
 
 ---
 
+## R4 — Fixed polyplets, a(20) of A006770
+
+**Value:** a(20) = 1,025,573,519,362,016
+**Status:** **candidate** (single-method assembly; awaiting full ISA-decorrelated
+reproduction — see "Remaining" below)
+
+**What it is:** the number of fixed (translation-distinct) king-move animals of
+20 cells — the next term past the now-confirmed a(19) (R1).
+
+**Depends on:**
+- the column transfer-matrix engine `cpp/tma/` (`build/tma`), the same
+  algorithm-independent method that confirmed R1 — no animal ever generated;
+- per-height jobs `runs/a20/h<H>.out` (`"n count"` = byHeight[H][n]);
+- assembly a(n) = Σ_H byHeight[H][n] over H=1..20.
+
+**How computed:** heights 1–18 and 20 on **gympie** (Apple clang / ARM);
+height 19 (the heaviest, peak_states 23,975,127) on **ayr** (x86 / GCC),
+harvested to `runs/a20/h19.ayr.out` (byHeight[19][20] = 19,586,258,055).
+Assembled on gympie 2026-06-20.
+
+**Why we trust it so far:**
+- the assembly reproduces **all 18 published terms** of A006770 exactly
+  (n≤18 == `fixtures/b006770.txt`) *and* the confirmed a(19) =
+  151,609,203,011,580 — a low value would have flagged an inadmissible
+  size-budget prune, so the prune is admissible;
+- arbitrary-precision (Python) re-sum confirms the value exactly;
+- **independent GF cross-check (2026-06-20):** the recovered rational
+  generating functions G_H(x)=P_H(x)/Q_H(x) for heights H=1..10
+  (`results/fixed_height_gfs.txt`, recovered on ayr by mod-p transfer matrix +
+  Berlekamp–Massey + CRT — a different downstream from explicit enumeration)
+  expand to series that match the gympie `byHeight[H][n]` columns **exactly for
+  all n≤20**. Heights 11–20 have no GF in that file and are not GF-checked.
+
+**Remaining for "confirmed":**
+- gympie's own height-19 recount is running (PID 85504); when it lands it gives
+  a same-height cross-ISA byte check against ayr's 19,586,258,055.
+- heights 11–18 and 20 currently rest on a single method/machine (gympie);
+  full confidence wants an ISA-decorrelated reproduction of those heights (ayr,
+  ~June 27). Not submitted until then.
+
+---
+
 ## R2 — Free polyplets, Free(18) and Free(19) of A030222
 
 **Value:** Free(18) = 2,808,898,025,438; **Free(19) = 18,951,156,321,090**
-**Status:** **computed** (validated method; second decorrelated run recommended
-before submit). Free(19) additionally rests on the now-**confirmed** Fixed(19).
+**Status:** **confirmed** (2026-06-20) — the symmetric counts are now
+ISA-decorrelated (ayr x86/GCC byte-matches gympie clang/ARM for n≤20; see
+Reproduction below), resting on confirmed Fixed(18) (b-file) and Fixed(19) (R1,
+dual-method). Both Free(18) and Free(19) are confirmed new terms.
+**Extension (2026-06-20, candidate):** Free(20) = 128,196,711,128,365 — assembled
+by Burnside from the n=20 symmetry counts (r90=1630, r180=69,068,156,
+axis=26,676,346, diag=23,620,398; `runs/sym20/`) and the **candidate** Fixed(20);
+inherits Fixed(20)'s tier (candidate until that confirms). Formula self-tested
+against the confirmed n=19 row; integral; symmetric correction +21,208,113.
 
 **What it is:** the number of king-move animals counted up to rotation and
 reflection — A030222, which ended at n=17 (since 2002). Free(18) and Free(19)
@@ -126,8 +175,13 @@ are both new terms.
   diag=8,923,786, r90=none (19≢0,1 mod 4). A different-language reimplementation
   agreeing catches implementation/algorithmic bugs a recompile would not, so
   this is a real upgrade over a single engine.
-- REMAINING for full "confirmed": a hardware/ISA-decorrelated run (the x86/GCC
-  build on ayr, available ~June 27) — cheap (minutes; the counters are √-rare).
+- DONE (2026-06-20): the hardware/ISA-decorrelated run completed (ahead of the
+  ~June 27 estimate). ayr's x86/GCC `symcount_fast` reproduces all four symmetric
+  counts **byte-identical** to gympie's clang/ARM build for every n≤20
+  (`runs/sym20/{r90,r180,hmirror,dmirror}.out`, diffed). With Fixed already
+  confirmed, **Free(18), Free(19) and OneSided(18), OneSided(19) are now fully
+  confirmed**; only Free(20)/OneSided(20) remain candidate, through the candidate
+  Fixed(20).
 
 ---
 
@@ -138,15 +192,20 @@ are both new terms.
 **Status:** **computed** — note: **no OEIS sequence for one-sided polyplets
 exists**, so the *entire* sequence n≥1 is new (the n≤17 values have no external
 sequence to match, only internal consistency).
+**Extension (2026-06-20, candidate):** OneSided(20) = 256,393,397,108,358 — same
+Burnside pipeline (rotations only), rests on candidate Fixed(20); integral and
+satisfies Free(20) ≤ OneSided(20) ≤ 2·Free(20).
 
 **Depends on / how computed:** same pipeline as R2 (Burnside, but with only the
 rotation terms: OneSided = (Fixed + 2·R90 + R180)/4).
 
-**Why we trust it:** the same symmetric counters validated in R2; every value
-is integral (the /4 divides cleanly, a necessary condition) and satisfies
-Free ≤ OneSided ≤ 2·Free. Weaker than R2 (no external sequence anchors it), so
-treat as **computed** pending an independent re-run, and ideally cross-check a
-few small terms by exhaustive enumeration before submitting a new sequence.
+**Why we trust it:** the same symmetric counters validated in R2 — now
+ISA-decorrelated (ayr x86/GCC == gympie clang/ARM, n≤20); every value is integral
+(the /4 divides cleanly, a necessary condition) and satisfies
+Free ≤ OneSided ≤ 2·Free. Still weaker than R2 (no external sequence anchors it),
+so ideally cross-check a few small terms by exhaustive enumeration before
+submitting a new sequence. OneSided(18), OneSided(19) inherit the confirmed Fixed
+and ISA-confirmed symcounts; OneSided(20) stays candidate via Fixed(20).
 
 ---
 

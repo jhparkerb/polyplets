@@ -1,0 +1,12 @@
+# M(n) = max enclosed empty area over fixed n-cell polyplets (4-connected-background convention).
+# build/g2 square8 N --maxhole, 4-way --split (S=8), combined by elementwise max.
+1 0
+2 0
+3 0
+4 1
+5 1
+6 2
+7 3
+8 5
+9 6
+10 8
