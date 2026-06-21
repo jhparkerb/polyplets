@@ -1,8 +1,9 @@
 # OEIS submission drafts
 
 Staged drafts in OEIS **internal format** (`%I %S %T %U %N %C %D %H %F %e %Y %K %O %A %E`).
-**Nothing here is submitted.** Live submission to oeis.org requires explicit signed
-orders + the 24-h cooling-off (ROADMAP #25). These files are a reviewable staging area.
+**Nothing here is submitted.** These are reviewable, staged drafts; jasonp pushes the
+actual submission to oeis.org — Claude prepares and stages, never submits to an external
+service (see ROADMAP #25). Normal care for outward-facing steps; no signoff ceremony.
 
 ## Files
 - `A######.txt` — an **existing** OEIS entry we extend. Commit history per file:
@@ -29,13 +30,13 @@ real OEIS contributor name before any submission.
 ## Status
 | file | status |
 |---|---|
-| A006770 (fixed) | extend: +a(19) confirmed; a(20) pending h19 assembly |
-| A030222 (free) | extend: +a(18),a(19) |
-| A030233 (one-sided) | extend: +a(18),a(19) |
+| A006770 (fixed) | extend: +a(19) confirmed; a(20) candidate, cross-ISA confirmation running |
+| A030222 (free) | extend: +a(18),a(19) confirmed |
+| A030233 (one-sided) | extend: +a(18),a(19) confirmed |
 | A030234/A030235 (symmetric) | pending: verify our bilateral-symmetry counts first |
-| draft hole triangle T(n,k) | new (4-bg convention), exact through n=16 |
-| draft A_0 (hole-free), A_1 (one-hole) | new, **novelty-confirmed via Superseeker (2026-06-19)**; b-files `b-draft-A0-holefree.txt` (n=1..16), `b-draft-A1-onehole.txt` (n=4..16) ready; submission-ready pending sign-off. These ARE columns k=0,1 of the triangle (standalone per the OEIS triangle+headline-columns idiom; A_2,A_3,... are NOT minted separately) |
-| draft M(n) = max hole AREA (draft-maxholearea.txt) | new; a DISTINCT statistic (max enclosed empty *area*, not a column of the count triangle); few terms, extendable |
+| draft hole triangle T(n,k) | new (4-bg convention), **exact through n=18; rows n=15..18 cross-ISA confirmed** |
+| draft A_0 (hole-free), A_1 (one-hole) | new, **novelty-confirmed via Superseeker (2026-06-19)**; b-files `b-draft-A0-holefree.txt` (n=1..18), `b-draft-A1-onehole.txt` (n=4..18), **n=15..18 cross-ISA confirmed**; submission-ready. These ARE columns k=0,1 of the triangle (standalone per the OEIS triangle+headline-columns idiom; A_2,A_3,... are NOT minted separately) |
+| draft M(n) = max hole AREA (draft-maxholearea.txt) | new; a DISTINCT statistic (max enclosed empty *area*, not a column of the count triangle); **exact to n=14, diamond-tight at n=4,8,12** |
 
 ## Novelty re-checks (OEIS, 2026-06-19)
 - **A_0 (hole-free) and A_1 (one-hole): confirmed not in OEIS via Superseeker**
@@ -48,10 +49,16 @@ real OEIS contributor name before any submission.
 - Triangle T(n,k): covered by the A_0/A_1 column lookups — Superseeker's own advice
   is to look up an array's rows/columns/diagonals, not the flattened array; no
   separate flattened-triangle lookup needed.
-- M(n) (max hole area; NOT a triangle column): definition is new, but the 9-term
-  data 0,0,0,1,1,2,3,5,6 matches 16 unrelated short sequences. Disambiguate by
-  extending the terms: `build/g2 square8 N --maxhole` (C++ Redelmeier+flood, the
-  4-connected-background primary convention) now computes M(n) exactly past n=9.
+- M(n) (max hole area; NOT a triangle column): definition is new, and the prior 9-term
+  prefix 0,0,0,1,1,2,3,5,6 matched 16 unrelated short sequences -- now **disambiguated by
+  extension to 14 terms** (0,0,0,1,1,2,3,5,6,8,10,13,15,18) via `maxhole_split` (C++
+  Redelmeier+flood, 4-connected-background primary convention).
+- **Lifetime-3 byproducts (results/lifetime3-proof.md), Superseeker 2026-06-21:**
+  (a) atom degrees `1 2 4 9 29 68 181 462 1254 3289` (deg N_H; verified to 181, last 3
+  law-derived) -- **Superseeker returned no match: NOVEL** (the "does not directly appear"
+  reply is the complete run -- direct lookup + the full T001-T115 transform battery +
+  closed-form search). (b) GF orders `1 3 7 15 42 106 278 711 1897 5005` (deg Q_H, all
+  recovered) -- to send after the 1/hour gap. Stage both drafts once (b) is also clear.
 - (Lesson from A030233: always search before claiming novelty.)
 
 OEIS content is under the OEIS End-User License; baselines are copied here for
