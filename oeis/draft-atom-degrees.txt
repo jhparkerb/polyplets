@@ -1,0 +1,10 @@
+%I Axxxxxe
+%S Axxxxxe 1,2,4,9,29,68,181,462,1254,3289
+%N Axxxxxe Degree of the "atom" polynomial N_H(x) in the lifetime-3 factorization of the fixed-height polyplet generating-function denominators: N_H = gcd(Q_H, Q_{H+1}, Q_{H+2}), the reduced denominator of the unanchored height-H strip generating function for polyplets (A006770).
+%C Axxxxxe N_H is the reduced denominator of V_H(x) = Sum_{n>=1} V_H(n)*x^n, where V_H(n) is the number of n-cell polyplets placed in a height-H strip with every vertical position counted separately. The fixed-height GF denominator degrees [draft Axxxxxd] satisfy deg Q_H = deg N_{H-2} + deg N_{H-1} + deg N_H, so each atom N_H appears in exactly three consecutive Q_H ("lifetime 3"). See Axxxxxd for the second-difference explanation, B_H = V_H - 2*V_{H-1} + V_{H-2}.
+%C Axxxxxe Growth is geometric, deg N_H ~ 2.6 * deg N_{H-1}. a(1..7) = 1, 2, 4, 9, 29, 68, 181 are computed directly (verified; results/lifetime3-proof.md); a(8..10) = 462, 1254, 3289 follow from the lifetime-3 degree law, which is verified for H <= 7 and observed-not-proved beyond. - _[submitter]_, 2026
+%H Axxxxxe Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet</a>.
+%Y Axxxxxe Cf. A006770 (fixed polyplets), Axxxxxd (GF denominator orders deg Q_H).
+%K Axxxxxe nonn,hard,more
+%O Axxxxxe 1,2
+%A Axxxxxe _[submitter]_, 2026

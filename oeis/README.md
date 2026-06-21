@@ -37,6 +37,8 @@ real OEIS contributor name before any submission.
 | draft hole triangle T(n,k) | new (4-bg convention), **exact through n=18; rows n=15..18 cross-ISA confirmed** |
 | draft A_0 (hole-free), A_1 (one-hole) | new, **novelty-confirmed via Superseeker (2026-06-19)**; b-files `b-draft-A0-holefree.txt` (n=1..18), `b-draft-A1-onehole.txt` (n=4..18), **n=15..18 cross-ISA confirmed**; submission-ready. These ARE columns k=0,1 of the triangle (standalone per the OEIS triangle+headline-columns idiom; A_2,A_3,... are NOT minted separately) |
 | draft M(n) = max hole AREA (draft-maxholearea.txt) | new; a DISTINCT statistic (max enclosed empty *area*, not a column of the count triangle); **exact to n=14, diamond-tight at n=4,8,12** |
+| draft GF orders deg Q_H (draft-gf-orders.txt) | new, **Superseeker-novel**; 1,3,7,15,42,...,5005 (fixed-height GF denominator orders); lifetime-3 law |
+| draft atom degrees deg N_H (draft-atom-degrees.txt) | new, **Superseeker-novel**; 1,2,4,9,29,...,3289 (the lifetime-3 atoms); H<=7 verified, H>=8 law-derived |
 
 ## Novelty re-checks (OEIS, 2026-06-19)
 - **A_0 (hole-free) and A_1 (one-hole): confirmed not in OEIS via Superseeker**
@@ -53,12 +55,12 @@ real OEIS contributor name before any submission.
   prefix 0,0,0,1,1,2,3,5,6 matched 16 unrelated short sequences -- now **disambiguated by
   extension to 14 terms** (0,0,0,1,1,2,3,5,6,8,10,13,15,18) via `maxhole_split` (C++
   Redelmeier+flood, 4-connected-background primary convention).
-- **Lifetime-3 byproducts (results/lifetime3-proof.md), Superseeker 2026-06-21:**
-  (a) atom degrees `1 2 4 9 29 68 181 462 1254 3289` (deg N_H; verified to 181, last 3
-  law-derived) -- **Superseeker returned no match: NOVEL** (the "does not directly appear"
-  reply is the complete run -- direct lookup + the full T001-T115 transform battery +
-  closed-form search). (b) GF orders `1 3 7 15 42 106 278 711 1897 5005` (deg Q_H, all
-  recovered) -- to send after the 1/hour gap. Stage both drafts once (b) is also clear.
+- **Lifetime-3 byproducts (results/lifetime3-proof.md), Superseeker 2026-06-21 -- BOTH NOVEL.**
+  (a) atom degrees `1 2 4 9 29 68 181 462 1254 3289` (deg N_H) and (b) GF orders
+  `1 3 7 15 42 106 278 711 1897 5005` (deg Q_H) each returned no match from
+  superseeker-reply@oeis.org -- the complete run (direct lookup + the full T001-T115
+  transform battery + closed-form search). **Staged: `draft-atom-degrees.txt` (Axxxxxe),
+  `draft-gf-orders.txt` (Axxxxxd).**
 - (Lesson from A030233: always search before claiming novelty.)
 
 OEIS content is under the OEIS End-User License; baselines are copied here for
