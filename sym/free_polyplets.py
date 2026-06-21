@@ -10,8 +10,11 @@ A030222 on the overlap (n<=17) before reporting any new term, so a wrong
 symmetric count or a wrong Fixed(19) candidate is caught against external
 truth.
 
-Usage: free_polyplets.py MAXN [FIXED_19]
-  FIXED_19 optionally supplies the (candidate) a(19) so Free(19) can be formed.
+Usage: free_polyplets.py MAXN [n=FIXED ...]
+  Extra fixed terms beyond the b-file (which ends at n=18), given as "n=value"
+  pairs -- e.g. "19=151609203011580 20=1025573519362016" to fold in the
+  a(19)/a(20) candidates so Free/One-sided can be formed there. A bare value is
+  back-compat for n=19.
 """
 
 import os
@@ -29,21 +32,43 @@ FAST = os.path.join(ROOT, "build", "symcount_fast")
 TYPES = ["r90", "r180", "hmirror", "dmirror"]
 
 
+def _parse_counts(text):
+    d = {}
+    for line in text.splitlines():
+        p = line.split()
+        if len(p) == 2 and p[0].lstrip("-").isdigit():   # skip any comment/banner
+            d[int(p[0])] = int(p[1])
+    return d
+
+
 def sym_counts(t, maxn):
     out = subprocess.run([FAST, t, str(maxn)], capture_output=True, text=True,
                          check=True).stdout
-    d = {}
-    for line in out.strip().splitlines():
-        n, c = line.split()
-        d[int(n)] = int(c)
-    return d
+    return _parse_counts(out)
+
+
+def sym_counts_from_dir(t, d):
+    """Read a symmetry type's counts from a prior run's <type>.out (e.g. the
+    cross-ISA-confirmed runs/sym20/), instead of recomputing via symcount_fast."""
+    with open(os.path.join(d, f"{t}.out")) as f:
+        return _parse_counts(f.read())
 
 
 def main():
     maxn = int(sys.argv[1])
-    fixed = read_bfile("b006770.txt")
-    if len(sys.argv) > 2:
-        fixed[19] = int(sys.argv[2])
+    fixed = read_bfile("b006770.txt")          # known fixed counts a(n), n <= 18
+    from_dir = None
+    rest = sys.argv[2:]
+    if "--from-dir" in rest:                    # read counts from prior .out files
+        j = rest.index("--from-dir")
+        from_dir = rest[j + 1]
+        rest = rest[:j] + rest[j + 2:]
+    for a in rest:                              # fold in candidates beyond the b-file
+        if "=" in a:
+            n_, v_ = a.split("=", 1)
+            fixed[int(n_)] = int(v_)
+        else:
+            fixed[19] = int(a)                 # bare value = a(19), back-compat
     free_known = read_bfile("b030222.txt")
 
     sys.stdout.write(obs.file_header("free_polyplets", f"free-N{maxn}", __file__))
@@ -51,8 +76,10 @@ def main():
     with obs.Reporter(f"free-N{maxn}", script=__file__, total=len(TYPES)) as rep:
         sym = {}
         for i, t in enumerate(TYPES):           # the C++ counter is the long pole
-            sym[t] = sym_counts(t, maxn)
-            rep.beat(done=i + 1, force=True, type=t)
+            sym[t] = (sym_counts_from_dir(t, from_dir) if from_dir
+                      else sym_counts(t, maxn))
+            rep.beat(done=i + 1, force=True, type=t,
+                     src=("file" if from_dir else "cpp"))
 
         def g(t, n):
             return sym[t].get(n, 0)
