@@ -321,10 +321,13 @@ additive index via the Euler characteristic ($\#\text{holes}=1-\chi$ for a
 connected animal, $\chi$ accumulated by local $2\times2$ bit-quad increments);
 the resulting counts are exact, byte-identical to an independent per-animal flood
 fill for $n\le14$, and have row sums equal to A006770 (including the confirmed
-$a(19)$). We have them exact through $n=16$ (Table~\ref{tab:holes}).
-% TODO(holes-n18): extend the triangle / A_0 / A_1 to n=18 (ayr all-heights exact
-% run); update Table~\ref{tab:holes}, this sentence, and verify_claims.py on arrival.
-\textbf{[TODO: extend to $n=18$; the all-heights exact run is in progress.]}
+$a(19)$). We have them exact through $n=18$ (Table~\ref{tab:holes}): at $n=18$ the
+hole-free polyplets number $A_0(18)=\num{16503616943998}$ and the one-hole
+polyplets $A_1(18)=\num{4970078092354}$, with a maximum of $10$ holes. The
+per-animal flood that independently checks the low rows caps at $n=14$; the rows
+$n=15$--$18$ are confirmed instead by a second-architecture recount (clang/ARM
+against the GCC/x86 run, byte-identical across the whole triangle), so no row rests
+on a single engine.
 
 \begin{table}[H]
   \centering\small
@@ -341,9 +344,9 @@ $a(19)$). We have them exact through $n=16$ (Table~\ref{tab:holes}).
   \end{tabular}
   \caption{The hole triangle $T(n,k)$ (number of fixed $n$-cell polyplets with
   exactly $k$ holes; $4$-connected-background convention), rows $n=4$--$8$; full
-  data, exact through $n=16$, is in the repository. The hole-free column $k=0$ is
-  $1,4,20,109,622,3664,22094,135609,\dots$ and the one-hole column $k=1$ is
-  $1,16,166,1456,11788,\dots$ (onset $n=4$); both are absent from OEIS.}
+  data, exact through $n=18$, is in the repository. The hole-free column $k=0$ is
+  $1,4,20,109,622,3664,22094,135609,843941,\dots$ and the one-hole column $k=1$ is
+  $1,16,166,1456,11788,91300,\dots$ (onset $n=4$); both are absent from OEIS.}
   % TODO(oeis-Anums): the hole triangle T(n,k) and its columns A_0 (hole-free) and
   % A_1 (one-hole) are drafted in oeis/ but not yet submitted/assigned. When OEIS
   % assigns A-numbers, replace "absent from OEIS" here with the live references and
@@ -358,17 +361,18 @@ $4r$ cells on $|x|+|y|=r$ is king-connected and seals the $2r^2-2r+1$ cells insi
 it, so $M(4r)\ge 2r^2-2r+1$ (the centered square numbers,
 \href{https://oeis.org/A001844}{A001844}: $1,5,13,25,41,\dots$), while the
 discrete vertex-isoperimetric inequality~\cite{wangwang} bounds $M(n)$ above by
-$O(n^2)$. Brute force gives the exact values $M(1{:}9)=0,0,0,1,1,2,3,5,6$, which
-the diamond attains at $n=4$ and $8$. We conjecture the diamond is optimal---that
-is, $M(n)\sim n^2/8$, twice the polyomino rate $\sim n^2/16$ since only king
-animals can run diagonal walls---but the exact values for $n>9$ remain open.
-% TODO(M-extend): exact M(n) known to n=9; now computable past that with the C++
-% Redelmeier+flood enumerator `build/g2 square8 N --maxhole` (4-conn-bg primary;
-% --maxhole8 for 8-conn). Run for n=10..13(+14 via --split) -> update the visible
-% M(1:9) list and "n>9 remain open" here, the draft-maxholearea.txt b-file, and
-% verify_claims.py. Extending the terms (a) tests diamond-optimality and (b)
-% disambiguates M(n) from the 16 unrelated OEIS short sequences sharing the prefix
-% 0,0,0,1,1,2,3,5,6. Settling M(n) ~ n^2/8 still needs a proof.
+$O(n^2)$. Brute force gives the exact values $M(1{:}14)=0,0,0,1,1,2,3,5,6,8,10,13,15,18$,
+which the diamond attains at $n=4$, $8$, and $12$ (there $M=1,5,13$ meet
+$2r^2-2r+1$ at $r=1,2,3$)---every multiple-of-four term computed so far meets the
+diamond bound, evidence for its optimality. We conjecture the diamond is
+optimal---that is, $M(n)\sim n^2/8$, twice the polyomino rate $\sim n^2/16$ since
+only king animals can run diagonal walls---but the exact values for $n>14$ remain
+open and a proof of $M(n)\sim n^2/8$ is still wanted. Extending past the prior
+$n=9$ also disambiguates $M(n)$ from the unrelated short OEIS sequences sharing the
+prefix $0,0,0,1,1,2,3,5,6$.
+% TODO(M-extend): exact to n=14 now; M(15),M(16) computing on gympie (maxhole_split
+% --split). On arrival bump M(1:14)->M(1:16) and "n>14"->"n>16"; if M(16)=25 the
+% diamond is tight at n=16 too (r=4: 2*16-8+1=25). Sync verify_claims.py + b-file.
 
 \section{Generating functions by height}
 \label{sec:gf}
@@ -377,18 +381,16 @@ For a \emph{fixed} bounding-box height $H$, the strip transfer matrix has a
 bounded state space, so $\byH(n)$ satisfies a finite-order linear recurrence and
 its generating function $G_H(x)=\sum_n \byH(n)\,x^n=P_H(x)/Q_H(x)$ is
 rational~\cite{stanley}. We
-recover these exactly for $H\le9$ by Berlekamp--Massey over $\mathbb{Z}/p\mathbb{Z}$
+recover these exactly for $H\le10$ by Berlekamp--Massey over $\mathbb{Z}/p\mathbb{Z}$
 for several primes followed by CRT (lifting past the $64$-bit wall, the term
 counts being too large for machine integers), each accepted only when the fitted
 recurrence reproduces held-out terms. The orders of $Q_H$ are
-$1,3,7,15,42,106,278,711,1897$ for $H=1,\dots,9$; the growing recurrence
-order---hence the number of terms
-the recovery needs---is what bounds the reach (not memory), and we give $G_H$
-through $H=9$.
-% TODO(gf-H10): G_10 recovery is in progress (ayr, plain fixed-height GF run,
-% logged in results/; needs order ~4900 terms). On arrival, bump "through H=9" to
-% "through H=10", add the order to the 1,3,7,15,42,106,278,711,1897 list and to
-% verify_claims.py, and note c_H may gain a value if the hole-resolved H=10 lands.
+$1,3,7,15,42,106,278,711,1897,5005$ for $H=1,\dots,10$; the growing recurrence
+order---hence the number of terms the recovery needs---is what bounds the reach
+(not memory), and we give $G_H$ through $H=10$. The $H=10$ recovery, needing
+$\sim\!10{,}000$ terms, was itself reproduced on a second architecture (clang/ARM
+against the GCC/x86 run, byte-identical), so the GFs are cross-checked, not
+single-engine.
 As an example,
 \[
   G_3(x)=\frac{9x^3-8x^4-2x^5+4x^6+x^7}{1-7x+15x^2-9x^3-3x^4+5x^5-x^6-x^7}.
@@ -400,11 +402,8 @@ is the $[q^k]$ coefficient of a rational bivariate $G_H(x,q)$, hence rational. A
 mod-$p$ version of the hole transfer matrix (counts reduced modulo $p$, with
 partial states beyond the target $k$ dropped---exact since holes only seal, never
 reopen, as columns are added) yields arbitrarily many terms; we recover $G_{H,k}$
-for $H\le6$ (all reachable $k$) and the first rows $k\le2$ at $H=7$, each validated
-against a fresh prime, e.g.\
-% TODO(gf-H8): H=8 k=0 is in (order 1499 -> provisional c_8=1499 from the single
-% row, as c_7 was before its k=1,2 landed). Recovering H=8 k=1,2 would confirm c_8
-% and let us extend the c_H list to H=8. H=7 (k=0,1,2) already confirmed c_7=537.
+for $H\le6$ (all reachable $k$), the rows $k\le2$ at $H=7$, and the single row $k=0$
+at $H=8$, each validated against a fresh prime, e.g.\
 \[
   G_{3,1}(x)=\frac{x^4+2x^5-2x^7-x^8}
   {1-8x+20x^2-14x^3-8x^4+18x^5+3x^6-16x^7+6x^8+6x^9-3x^{10}-2x^{11}+x^{12}}.
@@ -412,7 +411,10 @@ against a fresh prime, e.g.\
 Across the recovered range the order of $G_{H,k}$ grows linearly in $k$, of the
 form $c_H(k+1)$ with $c_H=6,20,68,185,537$ for $H=3,\dots,7$; at $H=7$ the rows
 $k=0,1,2$ have orders $537,1074,1611$, so two independent slopes both give
-$c_7=537$. This order law is \emph{observed, not proved}. Summed
+$c_7=537$. The single recovered row at $H=8$ ($k=0$, order $1499$) gives a
+provisional $c_8=1499$; its $k\ge1$ rows lie past the recovery's term-length reach,
+so $c_8$ is not yet pinned by a second slope (as $c_7$ was not, before its $k=1,2$
+rows landed). This order law is \emph{observed, not proved}. Summed
 over all heights, the columns $A_k(x)=\sum_H G_{H,k}(x)$, like $a(x)$ itself, are
 not expected to be D-finite, so the rationality is genuinely a fixed-height
 phenomenon. The fixed-height GFs also give, for any $n$, the exact contribution of
@@ -444,17 +446,17 @@ extensive, not vanishing, feature. These are measured trends, not asymptotic
 statements.
 
 \paragraph{Rigorous lower bounds on $a(n)$.}
-Summing the fixed-height GFs gives $a(n)\ge\sum_{H\le 9}\byH(n)$ exactly, for any
+Summing the fixed-height GFs gives $a(n)\ge\sum_{H\le 10}\byH(n)$ exactly, for any
 $n$, by extracting coefficients from rational functions---a rigorous lower bound
 computable in polynomial time where direct enumeration is hopeless. It captures
-$59\%$ of $a(19)$ and, e.g., gives $a(25)\ge \num{4380493652795380053}$. The bound
-is rigorous but loosens as $n$ grows (height $\le9$ is a shrinking fraction).
+$74.9\%$ of $a(19)$ and, e.g., gives $a(25)\ge \num{6657105903966723073}$. The bound
+is rigorous but loosens as $n$ grows (height $\le10$ is a shrinking fraction).
 Transpose symmetry doubles the count of animals thin in either dimension for
-$n>81$ but does not change the regime.
-% TODO(bound-tighten): the H<=9 bound captures 59% of a(19); recovering G_10
-% (in progress, see gf-H10 above) and G_11 would raise the captured fraction and
-% the a(25) lower bound. Re-run the coefficient extraction and update the 59% and
-% the a(25)>= ... figure when those GFs land.
+$n>100$ but does not change the regime.
+% TODO(bound-tighten): H<=10 now (G_10 landed) -> captures 74.9% of a(19),
+% a(25)>=6657105903966723073, both from paper/gf_bound.py (which reproduces the
+% prior sum_{H<=9}@n=25 = 4380493652795380053 and B_H(19)==byHeight, as a check).
+% Recovering G_11 would raise both further.
 
 \paragraph{Next term: $a(20)$ (candidate).}
 The same height decomposition reaches $a(20)=\sum_{H=1}^{20}B_H(20)$. Assembling

@@ -132,16 +132,19 @@ bil19 = F(Hsym + D, 2)
 chk("bilateral(19)=(H+D)/2=9344655", bil19.denominator==1 and int(bil19)==9344655)
 chk("asymmetric(19)=Free-bilateral=18951146976435", int(free)-int(bil19)==18951146976435)
 
-# Maximum hole area M(n): values, centered-square formula, isoperimetric bound
-M = [0,0,0,1,1,2,3,5,6]   # n=1..9 (now exact via build/g2 --maxhole, C++ Redelmeier+flood)
-chk("M(4)=1=2*1^2-2*1+1", M[3]==1==2*1-2*1+1)
-chk("M(8)=5=2*2^2-2*2+1", M[7]==5==2*4-2*2+1)
-chk("M(n)<=floor(n^2/8), n=1..9", all(M[n-1] <= n*n//8 for n in range(1,10)))
-# the C++ enumerator (4-connected-background primary convention) must reproduce M(1..9)
-if os.path.exists(G2):
-    mout = subprocess.run([G2,"square8","9","--maxhole"],capture_output=True,text=True).stdout
-    mvals = [int(l.split()[1]) for l in mout.split("\n") if l.strip()]
-    chk("build/g2 --maxhole reproduces M(1..9)", mvals==M, str(mvals))
+# Maximum hole area M(n): values to n=14 (results/maxhole.txt), diamond bound, isoperimetric
+M = [0,0,0,1,1,2,3,5,6,8,10,13,15,18]   # n=1..14 (maxhole_split, 4-conn-bg primary)
+chk("M(4)=1=2*1^2-2*1+1",   M[3]==1==2*1-2*1+1)
+chk("M(8)=5=2*2^2-2*2+1",   M[7]==5==2*4-2*2+1)
+chk("M(12)=13=2*3^2-2*3+1", M[11]==13==2*9-6+1)   # diamond tight at the n=12 4r-point
+chk("M(n)<=floor(n^2/8), n=1..14", all(M[n-1] <= n*n//8 for n in range(1,15)))
+# results/maxhole.txt (the maxhole_split output) must reproduce M(1..14)
+mh = os.path.join(ROOT, "results", "maxhole.txt")
+if os.path.exists(mh):
+    mv = {int(l.split()[0]): int(l.split()[1]) for l in open(mh)
+          if l.split() and l.split()[0].isdigit()}
+    chk("maxhole.txt reproduces M(1..14)",
+        [mv.get(n) for n in range(1,15)]==M, str([mv.get(n) for n in range(1,15)]))
 
 # GF transcriptions: paper coefficients must match the recovered data files
 def gf_block(path, header):
@@ -163,9 +166,35 @@ def order_of(path, header):
     for line in open(os.path.join(ROOT, path)):
         if line.startswith(header) and "order=" in line:
             return int(line.split("order=")[1].split()[0])
-orders = [order_of("results/fixed_height_gfs.txt", f"H={H} ") for H in range(1,10)]
-chk("fixed-height orders H=1..9 = 1,3,7,15,42,106,278,711,1897",
-    orders==[1,3,7,15,42,106,278,711,1897], str(orders))
+orders = [order_of("results/fixed_height_gfs.txt", f"H={H} ") for H in range(1,11)]
+chk("fixed-height orders H=1..10 = 1,3,7,15,42,106,278,711,1897,5005",
+    orders==[1,3,7,15,42,106,278,711,1897,5005], str(orders))
+
+# Rigorous lower bound  a(n) >= sum_{H<=10} [x^n] G_H  (cf. paper/gf_bound.py): expand the
+# recovered GFs as exact integer power series; check captured fraction + the a(25) bound.
+import ast
+def _gf_series(Pc, Qc, N):
+    b = [0]*(N+1)
+    for m in range(N+1):
+        v = Pc[m] if m < len(Pc) else 0
+        for j in range(1, min(m, len(Qc)-1)+1): v -= Qc[j]*b[m-j]
+        b[m] = v
+    return b
+_gfs, _H, _P = {}, None, None
+for line in open(os.path.join(ROOT, "results", "fixed_height_gfs.txt")):
+    s = line.strip()
+    if s.startswith("H="):   _H = int(s.split()[0].split("=")[1])
+    elif s.startswith("P:"): _P = ast.literal_eval(s[2:].strip())
+    elif s.startswith("Q:"): _gfs[_H] = (_P, ast.literal_eval(s[2:].strip()))
+_ser = {H: _gf_series(Pc, Qc, 25) for H, (Pc, Qc) in _gfs.items()}
+chk("GF-expanded B_H(19) == byHeight, H=1..10", all(_ser[H][19] == BH[H] for H in range(1, 11)))
+chk("bound sanity: sum_{H<=9} @ n=25 == prior 4380493652795380053",
+    sum(_ser[H][25] for H in range(1, 10)) == 4380493652795380053)
+chk("a(25) lower bound (H<=10) == 6657105903966723073",
+    sum(_ser[H][25] for H in range(1, 11)) == 6657105903966723073)
+chk("H<=10 captures 74.9% of a(19)",
+    round(F(100*sum(_ser[H][19] for H in range(1, 11)), A[19]), 1) == F(749, 10))
+
 for H,c in [(3,6),(4,20),(5,68),(6,185),(7,537)]:
     s = order_of("results/hole_gfs.txt", f"H={H} k=2 ") - \
         order_of("results/hole_gfs.txt", f"H={H} k=1 ")
@@ -182,10 +211,31 @@ if os.path.exists(G2):
                   7:{0:22094,1:1456,2:42}, 8:{0:135609,1:11788,2:538,3:6}}
     for n,row in paper_rows.items():
         chk(f"hole-triangle row n={n}", all(h4[n].get(k,0)==v for k,v in row.items()))
-    chk("A_0 caption seq n=1..8",
-        [h4[n].get(0,0) for n in range(1,9)]==[1,4,20,109,622,3664,22094,135609])
-    chk("A_1 caption seq n=4..8",
-        [h4[n].get(1,0) for n in range(4,9)]==[1,16,166,1456,11788])
+    chk("A_0 caption seq n=1..9",
+        [h4[n].get(0,0) for n in range(1,10)]==[1,4,20,109,622,3664,22094,135609,843941])
+    chk("A_1 caption seq n=4..9",
+        [h4[n].get(1,0) for n in range(4,10)]==[1,16,166,1456,11788,91300])
+
+# Hole triangle extended to n=18 (transfer matrix; the flood oracle caps at n=14) and
+# its cross-ISA confirmation: dalby clang/ARM == ayr gcc/x86, byte-identical.
+hn18 = os.path.join(ROOT, "results", "holes_n18.txt")
+if os.path.exists(hn18):
+    T18 = {}
+    for line in open(hn18):
+        p = line.split()
+        if len(p) == 3 and p[0].isdigit():
+            T18.setdefault(int(p[0]), {})[int(p[1])] = int(p[2])
+    chk("A_0(18)==16503616943998", T18[18].get(0) == 16503616943998)
+    chk("A_1(18)==4970078092354",  T18[18].get(1) == 4970078092354)
+    chk("max holes at n=18 is 10", max(T18[18]) == 10)
+    chk("hole rows sum to a(n), n=1..18", all(sum(T18[n].values()) == A[n] for n in range(1, 19)))
+    dn18 = os.path.join(ROOT, "results", "holes_n18.dalby.txt")
+    if os.path.exists(dn18):
+        def _norm(path):
+            return sorted((int(p[0]), int(p[1]), int(p[2])) for p in
+                          (l.split() for l in open(path)) if len(p) == 3 and p[0].isdigit())
+        chk("holes n<=18 cross-ISA byte-identical (dalby clang/ARM == ayr gcc/x86)",
+            _norm(hn18) == _norm(dn18))
 
 # Companions table: bilaterally-symmetric (A030234) and asymmetric (A030235) at
 # n=18,19, regenerated from the mirror sub-counts via symcount_fast
