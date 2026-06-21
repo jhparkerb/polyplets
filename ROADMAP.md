@@ -58,9 +58,12 @@ H=5 k=0..3, **H=6 k=0..6** (76 GFs so far); **H=7 k=0..2 running** (N=3400). Ord
 law order(H,k) = c_H·(k+1), c = 6,20,68,185,537 for H=3..7 — clean per-hole order
 increment. Feasibility frontier (N≤4096): H=6 reaches k≤10, H=7 k≤2, H=8 k=0 only,
 H≥9 blocked (order(9,0) needs N≈9000).
-REMAINING for #28: (i) n≥15 production run for the new hole terms — **the n=18
-exact hole count is RUNNING on ayr now** (`tma_holes square8 18 --holes`); full
-n=19 (~60–75 GB) fits ayr's 78 GB directly (no #20 needed); (ii) companion 8-bg
+REMAINING for #28: (i) **DONE 2026-06-21: n=18 exact hole count complete**
+(`results/holes_n18.txt`; 44h single-core on ayr, peak 74.6 GB, exit 0;
+sum-invariant per-n == A006770 a(18), n≤14 == the flood oracle; hole-free
+A_0(18)=16,503,616,943,998, one-hole A_1(18)=4,970,078,092,354, max 10 holes).
+Full n=19 (~60–75 GB) is the next run — now ~10× faster + resumable on the new
+MT/checkpoint/reserve engine. (ii) companion 8-bg
 convention (needs a 4-adjacency component tally — deferred); (iii) **H=8 k=0 hole
 GF — SUSPENDED mid-run, awaiting CONT** (the 14 stopped `--only-height 8 --holes
 --modp` mod-p sweeps on gympie; jasonp resumes them when h19 frees the cores;
