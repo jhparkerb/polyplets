@@ -66,6 +66,11 @@ build/tma: cpp/tma_main.cpp cpp/tma/*.h | build
 build/tma_holes: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_main.cpp -o $@
 
+# R3: u32 mod-p plain-a(n) sweep test harness (tests/gate_modp.py). Half-width
+# (uint32) counts rows -> ~1.7x less RAM; CRT over primes recovers exact a(n).
+build/tma_modp_test: cpp/tma_modp_test.cpp cpp/tma/*.h | build
+	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_modp_test.cpp -o $@
+
 build/tma_asan: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer -pthread cpp/tma_main.cpp -o $@
