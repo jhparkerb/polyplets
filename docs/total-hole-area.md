@@ -32,3 +32,16 @@ diamond (k=1, no inner walls). ∎
 - The whole argument is the single-hole proof (`docs/diamond-optimality.md`) applied to
   the holes' *union* — the only new input is "P's outer boundary is one simple cycle
   enclosing the union," again the discrete Jordan curve theorem.
+
+## A different extremal: max hole COUNT, maxh(n) ~ (√n − 1)²
+The maximum *number* of holes behaves oppositely. From the same enumeration,
+`maxh(n) = 0,0,0,1,1,2,2,3,4` (n=1..9). The optimum is the **even sublattice of a
+diamond**: take all cells with x+y even inside |x|+|y| ≤ m (these are mutually
+king-connected via (±1,±1) steps); every odd interior cell (x+y odd, |x|+|y| ≤ m−1) has
+its four rook-neighbours even, so it is a 1-cell hole. For even m this gives
+**n = (m+1)² cells enclosing h = m² holes**, so `maxh((m+1)²) ≥ m² = (√n − 1)²` — and at
+m=2 it is 9 cells, 4 holes = maxh(9). Thus `maxh(n) ~ (√n − 1)² ~ n − 2√n`: *almost every
+cell encloses its own hole* (h/n → 1), the polar opposite of the single big diamond
+(~n²/8 area, one hole). Conjecture: this even-sublattice packing is optimal for all n; the
+exact formula + the matching upper bound (an Euler/packing argument, `cpp/tma/euler.h`
+machinery) are the next step. The construction (lower bound) is clean.
