@@ -90,6 +90,17 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~12:45 — T3 ✓✓ PROVEN: M(4r)=2r²−2r+1 (diamond optimal) [explore/theorem-diamond]
+- **Genuinely new theorem, clean rigorous proof** (`docs/diamond-optimality.md`). The
+  L¹ diamond is the *exact* (not just asymptotic) max-hole optimum at every perimeter 4r.
+- Engine: in (u,v)=(x+y,x−y) every king step has **|Δu|+|Δv| = 2**, so any closed
+  king-wall has length ≥ W_u+W_v; enclosure ⇒ W_u≥a+2, W_v≥c+2 ⇒ 4r ≥ a+c+4; the hole
+  fits its (u,v) box (≤⌈(a+1)(c+1)/2⌉ even-sublattice cells), maximized by the square =
+  diamond. Unique optimum; only non-elementary step is the discrete Jordan curve thm.
+- Verified r=1..6 (`experiments/diamond_verify.py`); matches M(4r) data r=1..4; predicts
+  M(20)=41, M(24)=61. Discrete exact counterpart to the Busemann/Strang asymptotic
+  isoperimetric result the paper cites. **Two novel theorems today: T3 and T4.**
+
 ### 2026-06-22 ~12:15 — B (Phase 3.2) blocked drain-and-free store [explore/reach-blocked-store]
 - `cpp/tma/sweep8_blocked.h`: db/next are S hash-partitions; a column drains db
   partition-by-partition, `freeMem()`-ing each as consumed while next accumulates →
