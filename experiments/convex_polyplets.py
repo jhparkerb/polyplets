@@ -12,18 +12,24 @@ def canon(cells):
     return frozenset((x - mx, y - my) for x, y in cells)
 
 
-def hv_convex(cells):
+def _runs(groups):
+    return all(max(v) - min(v) + 1 == len(v) for v in groups.values())
+
+
+def hv_convex(cells):                       # every row + every column a gap-free run
     rows = {}; cols = {}
     for x, y in cells:
         rows.setdefault(y, []).append(x)
         cols.setdefault(x, []).append(y)
-    for v in rows.values():
-        if max(v) - min(v) + 1 != len(v):   # row must be a gap-free run
-            return False
-    for v in cols.values():
-        if max(v) - min(v) + 1 != len(v):
-            return False
-    return True
+    return _runs(rows) and _runs(cols)
+
+
+def diag_convex(cells):                     # every diagonal (u=x+y) + anti-diagonal a run
+    diags = {}; antis = {}
+    for x, y in cells:
+        diags.setdefault(x + y, []).append(x)
+        antis.setdefault(x - y, []).append(x)
+    return _runs(diags) and _runs(antis)
 
 
 NMAX = 9
@@ -39,13 +45,15 @@ for s in range(2, NMAX + 1):
                     nxt.add(canon(shape | {c}))
     level[s] = nxt
 
-print(" n   #fixed polyplets   A006770   ok?   HV-convex")
-hv = []
+print(" n   #fixed polyplets   A006770   ok?   HV-convex   diag-convex")
+hv = []; dg = []
 for s in range(1, NMAX + 1):
     tot = len(level[s])
     ok = (tot == A006770[s - 1])
     h = sum(1 for sh in level[s] if hv_convex(sh))
-    hv.append(h)
-    print(f" {s}      {tot:8d}      {A006770[s-1]:8d}   {'OK' if ok else 'BAD'}   {h:6d}")
-print("\nHV-convex fixed polyplets, n=1..%d:" % NMAX)
-print(", ".join(map(str, hv)))
+    d = sum(1 for sh in level[s] if diag_convex(sh))
+    hv.append(h); dg.append(d)
+    print(f" {s}      {tot:8d}      {A006770[s-1]:8d}   {'OK' if ok else 'BAD'}   "
+          f"{h:6d}      {d:6d}")
+print("\nHV-convex fixed polyplets,   n=1..%d:" % NMAX, ", ".join(map(str, hv)))
+print("diagonally-convex fixed polyplets, n=1..%d:" % NMAX, ", ".join(map(str, dg)))
