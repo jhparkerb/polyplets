@@ -131,6 +131,15 @@ these lean that way. Tagged by cost. **B1 already computed** (the demonstration)
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~19:00 ET -- lambda UPPER bound tightened 15.83 -> 10.354 (verified)
+Eden/Klarner-Rivest spanning-encoding (Barequet-Shalah, arXiv:1906.11447): each non-root king cell
+encodes only its UNDETERMINED king-neighbors (need-set 5 diagonal / 3 edge) -> injection into
+weighted trees -> lambda <= 1/x* (encoding-GF branch point). Uniform: lambda <= 3125/256 = 12.207
+(closed form). Directional: lambda <= 10.354 -- INDEPENDENTLY re-derived (2-type reduction matches
+the 8-type; square sanity = Eden 27/4 = 6.75). Rigorous interval now [6.54, 10.354]; the weak upper
+side is finally under 11. experiments/lambda_upper_bound.py.
+
+
 ### 2026-06-22 ~18:30 ET -- three fresh hunts: hole-free growth gap, novel sequences, king p_c
 - **Hole-stratified growth (NEW, verify)**: the hole-free subclass A_0(n) grows STRICTLY SLOWER.
   A_0(n)/a(n) decays EXPONENTIALLY ~0.978^n (decisive: RMS 2e-5 exponential vs 1.8e-3 stretched,

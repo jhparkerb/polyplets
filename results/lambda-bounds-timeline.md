@@ -58,3 +58,11 @@ number z = 8 (the 8 king-moves), so this is a QUALITATIVE statement lambda < ~8.
 lambda=4.06 > z=4, slightly above; holds for triangular 5.18<6 and king 7.1<8). Notably this
 heuristic (~8) is far closer to the truth than our rigorous UPPER bound (15.83) -- underscoring
 that the upper side is loose and a real upper-bound method landing near ~8 would be the new win.
+
+## Upper bound tightened (2026-06-22): 15.83 -> 10.354
+| Year | Upper  | method |
+|------|--------|--------|
+| 2026 | 15.83  | ancestor-exclusion (floor ~15.56) |
+| 2026 | 12.207 | uniform twig (1+x)^5 = 3125/256 (closed form) |
+| 2026 | 10.354 | directional twig (Eden/Klarner-Rivest/Barequet-Shalah encoding); VERIFIED |
+Rigorous interval now [6.54, 10.354] (was [6.54, 15.83]). The iterated-twig method would push the upper bound toward ~8.

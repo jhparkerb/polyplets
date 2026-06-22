@@ -106,3 +106,14 @@ asymptotic form, neither has converged, and a(20) is a candidate. The ~0.5% agre
 from-below/from-above drift SUGGEST lambda ~ 7.13, but lambda is NOT proven to lie in [7.12,7.155]
 and could be slightly outside. Best point estimate ~7.13, no defensible error bar. Tightening
 requires more confirmed terms (lower bound) + a real upper-bound method (15.83 is far too loose).
+
+## Upper bound improved: lambda <= 10.354 (2026-06-22, twig encoding, VERIFIED)
+Replaces the loose 15.83 (ancestor-exclusion floor ~15.56). Method: Eden/Klarner-Rivest
+spanning-encoding (Barequet-Shalah, arXiv:1906.11447) -- each non-root king cell encodes only its
+UNDETERMINED king-neighbors (need-set 5 diagonal / 3 edge discoverer); injection into weighted
+encoding-trees gives lambda <= 1/x* (GF branch point). Uniform (1+x)^5: lambda <= 3125/256 =
+12.207 (closed form). Directional (edge-need-3 / diagonal-need-5): lambda <= 10.354. INDEPENDENTLY
+VERIFIED -- the 2-type reduction matches the 8-type computation, and the framework reproduces the
+square Eden value 27/4 = 6.75 exactly. experiments/lambda_upper_bound.py.
+NEW RIGOROUS INTERVAL: [6.54, 10.354]. Reaching ~8 needs the heavy iterated-twig enumeration
+(Barequet-Shalah) -- a real compute project, out of scope for now.
