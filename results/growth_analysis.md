@@ -19,3 +19,17 @@ slope λθ) plus the first-order extrapolant n·r(n)−(n−1)·r(n−1) → λ.
   longer series than we have.
 - TODO at write-up: compare λ_king ≈ 7.10 against any published king-lattice /
   polyplet growth-constant estimate (don't assert novelty for the constant).
+
+## Rigorous bounds (the sandwich around the numerical estimate)
+The ratio analysis ESTIMATES λ ≈ 7.10; it proves nothing. Two rigorous bounds
+bracket it:
+- **Lower:** a(n) is supermultiplicative (king-adjacent concatenation), so
+  a(n)^{1/n} increases to λ ⇒ λ ≥ a(20)^{1/20} ≈ **5.6** (loose; the sequence
+  approaches λ slowly from below, which is why the ratios already read ~6.5–6.6).
+- **Upper:** the spanning-tree / direction-labelled-tree overcount gives
+  λ ≤ **7⁷/6⁶ = 17.6529** (the king analogue of the classic 3³/2²=6.75 polyomino
+  tree bound). Proof in `docs/lambda-bound.md` (branch explore/theorem-lambda-bound).
+
+So **5.6 ≤ λ_king ≤ 17.65 rigorously, ≈ 7.10 numerically.** The upper bound is
+~2.5× the estimate; a Klarner–Rivest twig refinement (it sharpens 6.75 → 4.65 for
+polyominoes) is the path to tighten it.
