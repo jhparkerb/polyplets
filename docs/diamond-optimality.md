@@ -59,6 +59,27 @@ W_u has total |Δu|-variation ≥ 2W_u). Therefore
 sublattice — exactly the diamond `B_{r−1}`, with wall the sphere `S_r`. So the diamond
 is the *unique* optimum (up to translation), and M(4r) = 2r²−2r+1.
 
+## All n at once (T5): M(n) = ⌈⌊(n−2)²/4⌋/2⌉
+
+Nothing above used n ≡ 0 (mod 4) until the final AM–GM. For **any** n the same two steps
+give the *exact* maximum hole:
+
+- **Upper bound.** `a + c ≤ n − 4` (step i, unchanged), so with `p = a+1, q = c+1`,
+  `p + q ≤ n − 2` and `|H| ≤ ⌈pq/2⌉`. The max of `pq` over positive integers with
+  `p + q ≤ S` is `⌊S²/4⌋` (balanced split), so `|H| ≤ ⌈⌊(n−2)²/4⌋/2⌉`.
+- **Lower bound.** The balanced rectangular L¹-diamond — the (u,v)-box of sides
+  `⌊(n−2)/2⌋ × ⌈(n−2)/2⌉` on the even sublattice — is enclosed by its rook-outer
+  boundary, a single king-loop of **exactly n** cells (tight, by the same saturation),
+  enclosing `⌈⌊(n−2)²/4⌋/2⌉` cells. (The only n where the loop uses fewer than n cells is
+  **n=5**, where M(5)=M(4)=1 is flat and the 5th cell is necessarily wasted.) Verified by
+  explicit construction + flood-fill for all n=4..40 in `experiments/maxhole_formula.py`.
+
+Hence, for all `n ≥ 4`, `M(n) = ⌈⌊(n−2)²/4⌋/2⌉`, i.e. by residue
+`M(4r)=2r²−2r+1, M(4r+1)=2r²−r, M(4r+2)=2r², M(4r+3)=2r²+r` — matching every
+exactly-enumerated value (`results/maxhole.txt`, n=4..16). This **closes T5** (the full
+maxhole sequence in closed form) and predicts M(20)=41, M(24)=61, …; a candidate OEIS
+formula and a paper result (the discrete exact isoperimetric law).
+
 ## Remarks
 
 - The whole proof is elementary except the one invocation of the discrete Jordan-curve
