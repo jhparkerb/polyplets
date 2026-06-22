@@ -19,6 +19,7 @@
 #include "obs.h"
 #include "tma/sweep.h"
 #include "tma/sweep8.h"
+#include "tma/sweep8_modp.h"
 #include "tma/sweep8_holes.h"
 #include "tma/sweep8_perim.h"
 
@@ -194,6 +195,8 @@ int main(int argc, char** argv) {
   std::string checkpointDir;
   int nthreads = 1, onlyHeight = 0;
   u64 modp = 0;  // --modp P: count B_{H,k}(n) mod P (holes path, #5b GF recovery)
+  bool fold = false;  // --fold: R1 vertical-mirror fold (~2x fewer states); composes with --modp
+                      // on the plain a(n) --only-height path (R1xR3 reach engine, ~4x less RAM)
   bool hdrop = false;  // --hdrop: drop holes > kmax (exact for k<=kmax, bounds RAM)
   u64 reserveStates = 0;  // --reserve N: pre-size the state store to ~N states (skip
                           // the doubling-grow transient; pass the calibrated peak)
@@ -215,6 +218,8 @@ int main(int argc, char** argv) {
       onlyHeight = std::atoi(argv[++i]);
     } else if (std::strcmp(argv[i], "--modp") == 0 && i + 1 < argc) {
       modp = static_cast<u64>(std::atoll(argv[++i]));
+    } else if (std::strcmp(argv[i], "--fold") == 0) {
+      fold = true;
     } else if (std::strcmp(argv[i], "--hdrop") == 0) {
       hdrop = true;
     } else if (std::strcmp(argv[i], "--reserve") == 0 && i + 1 < argc) {
@@ -360,6 +365,25 @@ int main(int argc, char** argv) {
   // column: col/maxn is the denominator, live-state count the liveness, and the
   // ETA is self-computed from the measured column rate.
   if (onlyHeight > 0) {
+    if (modp > 0) {
+      // R1xR3 production reach path: fold + u32 mod-p sweep of one strip height -- emits
+      // "n B_H(n) mod p". CRT over 2-3 primes (scripts/an_modp_crt.sh) recovers the exact
+      // B_H(n); summing over H gives a(n). ~4x less RAM than the exact u64 sweep.
+      u64 peak = 0;
+      const std::vector<std::uint32_t> row = sweepSquare8HeightModP(
+          onlyHeight, maxn, static_cast<std::uint32_t>(modp), fold, peak);
+      obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-modp-N" +
+                            std::to_string(maxn),
+                        maxn, "height=" + std::to_string(onlyHeight) + " modp=" +
+                                  std::to_string(modp) + " fold=" +
+                                  std::to_string(fold ? 1 : 0));
+      rep.done("result=" + std::to_string(static_cast<unsigned long long>(row[maxn])),
+               "peak_states=" +
+                   std::to_string(static_cast<unsigned long long>(peak)));
+      for (int n = 1; n <= maxn; ++n)
+        std::printf("%d %u\n", n, row[n]);
+      return 0;
+    }
     SweepResults res;
     res.byHeight.assign(maxn + 1, Counts(maxn + 1, 0));
     res.totals.assign(maxn + 1, 0);
