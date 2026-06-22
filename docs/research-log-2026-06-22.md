@@ -138,9 +138,11 @@ Worked the round-2 ideas on per-topic branches (merge the best at 8pm ET).
 - **T6 ★ — diagonal-contact density c ≈ 0.743** [`explore/theorem-contact-density`]: a new
   lattice constant; mean #contacts of a uniform n-cell polyplet ~ 0.743·n (first differences
   of the mean converge cleanly). Rigorous value via a contact-marked TM is future work.
-- **B2 ★ — symmetry premium** [`explore/theorem-sym-maxhole`]: the maxhole optimum is always
-  symmetric (M_sym=M(n)); conjecture **M_asym(n)=M(n−1)** (the best asymmetric n-cell shape
-  is one diamond-step behind), verified n≤9, lower bound constructive.
+- **B2 (mixed) — symmetry premium** [`explore/theorem-sym-maxhole`]: ★ clean fact — **the
+  maxhole optimum is always symmetric** (M_sym=M(n), through n=10). ✗ the tempting
+  `M_asym(n)=M(n−1)` conjecture (held n≤9) was **REFUTED at n=10** (M_asym(10)=7, not 6) —
+  a small-n coincidence; M_asym lags by an irregular premium with no closed form. Good
+  refute-then-prove catch (the n=10 extension killed it).
 - **B3 ✗ (honest negative)** [`explore/seq-king-perimeter`]: min king-perimeter(n) =
   A027709(n)+4 — a clean king-vs-rook isoperimetric identity, but a trivial shift, so NOT a
   new sequence. Recorded as an identity, not staged.
@@ -154,7 +156,7 @@ Worked the round-2 ideas on per-topic branches (merge the best at 8pm ET).
 - **T7 skipped** (the λ tree-bound is fundamentally loose; deeper memory only nudges 16.63).
   **C1 deferred** — H=11 GF recovery (deg ≈13000, ~26k mod-p terms + BM) is a ~1–2h job;
   noted as launchable (would extend orders/atoms to H=11 and unlock the (3a) check at H=9).
-- B2's `M_asym(n)=M(n−1)` conjecture is getting an n=10 brute-force check (running at wrap).
+- (n=10 brute-force came back and refuted B2's formula — folded into the B2 line above.)
 
 ### 2026-06-22 ~16:30 — T1 (the "hard" one) ADVANCED: lifetime-3 lemma (3a) to H≤8 [explore/theorem-t1-irreducibility]
 - T1's only open content is lemma (3a) "the unanchored-strip atom N_H is irreducible over
