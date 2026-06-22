@@ -35,8 +35,11 @@ count *type*, R2 changes the row *storage*):
 Stack (4 orthogonal axes — key / count-type / row-storage / when-to-free):
 **R1×R2×R3×B ≈ 10–14× less RAM** → a(23) comfortable on dalby, a(24)/a(25) in reach,
 a(26) plausible. R1 alone already makes a(21)/a(22) in-budget; the parallel folded
-driver `scripts/an_fold_parallel.sh` is ready (not launched). B is also the out-of-core
-(Phase 4) seam — a drained partition could spill to disk instead of freeing.
+driver `scripts/an_fold_parallel.sh` is ready (not launched). B is the out-of-core
+(Phase 4) seam — and **Phase 4 is now IMPLEMENTED + gated** (`explore/reach-blocked-store`,
+`cpp/tma/sweep8_ooc.h`, `make gate-ooc`): db/next spill to disk as S partitions, RAM ≈
+peak/S, **reach bounded by disk not RAM**. Above the in-RAM stack this removes the ceiling
+entirely (a(26)+ on a big disk). Gate: OOC a(n)==exact, S-independent.
 
 Plus, separable:
 - **T4** (`explore/theorem-lambda-bound`): rigorous **λ_polyplet ≤ 7⁷/6⁶ = 17.65**,
@@ -89,6 +92,23 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
 ---
 
 ## Worklog (newest first)
+
+### 2026-06-22 ~15:30 — Phase 4 IMPLEMENTED (out-of-core) + two new sequences [reach-blocked-store, seq-knight, seq-contacts]
+- **Phase 4 out-of-core sweep — built, gated, GREEN** (`cpp/tma/sweep8_ooc.h`,
+  `cpp/tma_ooc_test.cpp`, `tests/gate_ooc.py`, `make gate-ooc`): db and next live as S
+  disk partitions; per column, stream each db partition in (harvest + transitions append
+  `(target,row)` to S spill files), reduce each spill into a RAM FlatDB → next partition,
+  swap by rename. **~one partition resident at a time → RAM ≈ peak/S, reach disk-bound not
+  RAM-bound.** Gate: OOC a(n) == exact A006770 (n≤10), **S-independent** (S=4 ≡ S=16,
+  byte-identical), self-cleaning, strict `-Werror`. The reduce is `addCounts` exactly, so
+  it composes with R1/R2/R3 untouched. This is the capstone above the in-RAM stack — the
+  RAM ceiling is gone. (Design→working code; the biggest remaining reach item, closed.)
+- **Knight animals (S5)**: full polyknight counts (fixed 1,4,28,234,2162,20972,209608,
+  2135572; free 1,1,6,35,290,2680,26379,267598; n≤8) — exhaustive, Burnside-consistent.
+  Novelty unverified (`results/knight-animals.md`).
+- **Polyplets by diagonal-contact count (S3)**: T(n,d), row sums = A006770; total contacts
+  0,2,24,212,1700,13050,97856,723522,5300980. (T(n,0)=2, the two straight lines — a
+  reminder polyominoes carry diagonal contacts too.) `experiments/contact_counts.py`.
 
 ### 2026-06-22 ~14:30 — multi-hole → T3/T5 STRENGTHENED + style cleanup [explore/theorem-multihole]
 - Multi-hole investigation (looked dataless) **yielded a clean theorem**: the single
