@@ -39,7 +39,7 @@ https://oeis.org/history?user=Jason%20H%20Parker). Only new-draft `%A` lines and
 | A030234/A030235 (symmetric) | pending: verify our bilateral-symmetry counts first |
 | draft hole triangle T(n,k) | new (4-bg convention), **exact through n=18; rows n=15..18 cross-ISA confirmed** |
 | draft A_0 (hole-free), A_1 (one-hole) | new, **novelty-confirmed via Superseeker (2026-06-19)**; b-files `b-draft-A0-holefree.txt` (n=1..18), `b-draft-A1-onehole.txt` (n=4..18), **n=15..18 cross-ISA confirmed**; submission-ready. These ARE columns k=0,1 of the triangle (standalone per the OEIS triangle+headline-columns idiom; A_2,A_3,... are NOT minted separately) |
-| draft M(n) = max hole AREA (draft-maxholearea.txt) | new; a DISTINCT statistic (max enclosed empty *area*, not a column of the count triangle); **exact to n=14, diamond-tight at n=4,8,12** |
+| draft M(n) = max hole AREA (draft-maxholearea.txt) | new; a DISTINCT statistic (max enclosed empty *area*, not a column of the count triangle); **exact to n=16, diamond-tight at n=4,8,12,16** |
 | draft GF orders deg Q_H (draft-gf-orders.txt) | new, **Superseeker-novel**; 1,3,7,15,42,...,5005 (fixed-height GF denominator orders); lifetime-3 law |
 | draft atom degrees deg N_H (draft-atom-degrees.txt) | new, **Superseeker-novel**; 1,2,4,9,29,...,3289 (the lifetime-3 atoms); H<=7 verified, H>=8 law-derived |
 | draft free-polyplet symmetry classes (8: draft-sym-*.txt) | new, **plain-search novel** (Superseeker not yet run); the D4 exact-symmetry-group breakdown of A030222 to n=19 (asymmetric, axial, diagonal, C2, C4, D2-ortho, D2-diag, D4); validated (8 classes sum to A030222, 5 reflection classes sum to A030234); polyplet analogues of A006746/A006747/A006748/A006749/A056877/A056878/A142886/A144553, none of which had a polyplet counterpart |
@@ -57,7 +57,7 @@ https://oeis.org/history?user=Jason%20H%20Parker). Only new-draft `%A` lines and
   separate flattened-triangle lookup needed.
 - M(n) (max hole area; NOT a triangle column): definition is new, and the prior 9-term
   prefix 0,0,0,1,1,2,3,5,6 matched 16 unrelated short sequences -- now **disambiguated by
-  extension to 14 terms** (0,0,0,1,1,2,3,5,6,8,10,13,15,18) via `maxhole_split` (C++
+  extension to 16 terms** (0,0,0,1,1,2,3,5,6,8,10,13,15,18,21,25) via `maxhole_split` (C++
   Redelmeier+flood, 4-connected-background primary convention).
 - **Lifetime-3 byproducts (results/lifetime3-proof.md), Superseeker 2026-06-21 -- BOTH NOVEL.**
   (a) atom degrees `1 2 4 9 29 68 181 462 1254 3289` (deg N_H) and (b) GF orders

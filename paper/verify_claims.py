@@ -132,19 +132,20 @@ bil19 = F(Hsym + D, 2)
 chk("bilateral(19)=(H+D)/2=9344655", bil19.denominator==1 and int(bil19)==9344655)
 chk("asymmetric(19)=Free-bilateral=18951146976435", int(free)-int(bil19)==18951146976435)
 
-# Maximum hole area M(n): values to n=14 (results/maxhole.txt), diamond bound, isoperimetric
-M = [0,0,0,1,1,2,3,5,6,8,10,13,15,18]   # n=1..14 (maxhole_split, 4-conn-bg primary)
+# Maximum hole area M(n): values to n=16 (results/maxhole.txt), diamond bound, isoperimetric
+M = [0,0,0,1,1,2,3,5,6,8,10,13,15,18,21,25]   # n=1..16 (maxhole_split, 4-conn-bg primary)
 chk("M(4)=1=2*1^2-2*1+1",   M[3]==1==2*1-2*1+1)
 chk("M(8)=5=2*2^2-2*2+1",   M[7]==5==2*4-2*2+1)
 chk("M(12)=13=2*3^2-2*3+1", M[11]==13==2*9-6+1)   # diamond tight at the n=12 4r-point
-chk("M(n)<=floor(n^2/8), n=1..14", all(M[n-1] <= n*n//8 for n in range(1,15)))
-# results/maxhole.txt (the maxhole_split output) must reproduce M(1..14)
+chk("M(16)=25=2*4^2-2*4+1", M[15]==25==2*16-8+1)  # diamond tight at the n=16 4r-point too
+chk("M(n)<=floor(n^2/8), n=1..16", all(M[n-1] <= n*n//8 for n in range(1,17)))
+# results/maxhole.txt (the maxhole_split output) must reproduce M(1..16)
 mh = os.path.join(ROOT, "results", "maxhole.txt")
 if os.path.exists(mh):
     mv = {int(l.split()[0]): int(l.split()[1]) for l in open(mh)
           if l.split() and l.split()[0].isdigit()}
-    chk("maxhole.txt reproduces M(1..14)",
-        [mv.get(n) for n in range(1,15)]==M, str([mv.get(n) for n in range(1,15)]))
+    chk("maxhole.txt reproduces M(1..16)",
+        [mv.get(n) for n in range(1,17)]==M, str([mv.get(n) for n in range(1,17)]))
 
 # GF transcriptions: paper coefficients must match the recovered data files
 def gf_block(path, header):
