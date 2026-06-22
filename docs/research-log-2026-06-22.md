@@ -131,6 +131,25 @@ these lean that way. Tagged by cost. **B1 already computed** (the demonstration)
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~16:00 ET — D1 (the C++ stats lever) settles b2 + kills c=3/4; reach repointed
+- **Realized the Python->C++ lever** (memory [[cpp-not-python-for-compute]]): added per-animal
+  stats to the Redelmeier engine -- `g2 --maxhole-strat` (D4 symmetry -> M_asym; exactly-k-hole
+  area -> M_k) and `g2 --contacts` (diagonal-contact distribution). Verified == the Python
+  results, then went where Python couldn't.
+- **b2 SETTLED** (`explore/cpp-stats-engine`): M_asym(n) to n=12 in 4 min. M_asym=M(n-1) is
+  CONCLUSIVELY REFUTED (n=10,11,12 -> 7,9,11 vs M(n-1)=6,8,10); the real M_asym ~ M(n)-{1,2},
+  irregular, no closed form. Multihole M_k to n=12 (still non-monotone). `results/maxhole-stratified.txt`.
+- **c=3/4 REFUTED**: the diagonal-contact density c ~ 0.742, NOT 3/4 -- the mean's first
+  differences PEAK at 0.7428 (n=8-10) then DECLINE (n<=14). Not a nice fraction.
+  `results/contact-density.txt`.
+- **REACH repointed (jasonp ok'd killing a(21)/a(22))**: a(21) on dalby was bandwidth-bound
+  (~30 of 80 cores effective on the 4-channel wall) AND premature (a(20) not yet confirmed --
+  recount still on ayr). Killed it; dalby now runs **D1-at-scale** (`scripts/g2_split.sh`, g2
+  --split, COMPUTE-bound so it fills all 80 cores) -- `--maxhole-strat` to n<=15.
+- **C3 concluded earlier**: R1xR3 (fold x u32-modp) the practical ~4x engine; R2/ranged a bad
+  lever (~100x compute for ~2x RAM, profiled).
+
+
 ### 2026-06-22 — C3 CONCLUDED: R1xR3 is the practical merged engine; R2 (ranged) is a BAD lever
 - Built **R1xR2xR3** (`explore/reach-fold-ranged`, `cpp/tma/sweep8_merged.h`, gate GREEN ==
   exact via CRT) and confirmed **R1xR3** (`explore/reach-modp-u32`, `sweep8_modp.h --fold`,
