@@ -90,6 +90,24 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~13:00 — T5 ✓✓ PROVEN + maxhole OEIS upgraded + fresh idea-list (#3 brainstorm)
+- **T5** [`explore/theorem-diamond`]: the T3 framework generalizes to **all n** →
+  **M(n) = ⌈⌊(n−2)²/4⌋/2⌉** exactly (`docs/diamond-optimality.md`), verified by explicit
+  construction + flood-fill n=4..40 (`experiments/maxhole_formula.py`). Three novel
+  theorems today: T3, T4, T5.
+- **maxhole OEIS draft upgraded** (`oeis/draft-maxholearea.txt`): conjecture-with-bounds
+  → **proven exact closed form for all n** (was "n>16 only bounds"); extended a(1..30),
+  added %F, downgraded keyword hard→easy. Ready for jasonp to submit.
+- **Fresh ideas (brainstorm, post-today):**
+  - ☐ **Multi-hole M_k(n)** — max total area of k holes with n cells; the (u,v)
+    L=W_u+W_v machinery should extend (shared walls). Generalizes T3/T5. *Tractable.*
+  - ☐ **Min king-perimeter polyplet** — the dual (smallest king-boundary of an n-cell
+    polyplet) via the same |Δu|+|Δv|=2 identity; new extremal sequence + isoperimetric thm.
+  - ☐ **(u,v) diagonal transfer matrix** — would a 45°-rotated sweep have fewer boundary
+    states? Speculative 5th reach axis.
+  - ☐ **T2** (hole-GF order k-dependence) — conjecture from `results/hole_gfs.txt`.
+  - ☐ **Convex polyplets (S4)** — HV-convex king-animal counts; likely novel sequence.
+
 ### 2026-06-22 ~12:45 — T3 ✓✓ PROVEN: M(4r)=2r²−2r+1 (diamond optimal) [explore/theorem-diamond]
 - **Genuinely new theorem, clean rigorous proof** (`docs/diamond-optimality.md`). The
   L¹ diamond is the *exact* (not just asymptotic) max-hole optimum at every perimeter 4r.
