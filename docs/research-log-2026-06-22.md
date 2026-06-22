@@ -79,6 +79,19 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~11:45 — R1×R2 composition VALIDATED + T4 tightened
+- **R1×R2 stack** [`explore/reach-fold-ranged`]: folded+ranged sweep (foldSig the target
+  in both ranged passes). **GATE: folded-ranged a(n) == exact, n=1..12.** Memory
+  **MULTIPLIES** — at N=14 the fold halves states (259422→129935, **1.997×**) AND ranged
+  halves the rows → combined store 57.6→28.8 MB (2.0× on top of ranged, **~4× vs exact
+  full-row**). So the levers stack multiplicatively, empirically. (R1×R3 already gated via
+  the modp gate; R2×R3 by orthogonality — key/type/storage are independent axes.)
+- **T4 tightened** [`explore/theorem-lambda-bound`]: **λ_polyplet ≤ 16.63** (was 17.65) via
+  a grandparent-overlap constraint — a 64-state transfer matrix on consecutive edge
+  directions (avg 6.625 child-dirs vs 7), x_c≈0.06013 (`experiments/lambda_tighten.py`).
+  Rigorous (valid ⊆ grandparent-constrained ⊆ all trees). Systematic edge-history
+  tightening → true λ≈7.1, but diminishing per-step gains (overlaps are longer-range).
+
 ### 2026-06-22 ~11:00 — R2 ★ IMPLEMENTED: two-pass ranged counts-row [explore/reach-ranged-impl]
 - `cpp/tma/sweep8_ranged.h`: per-state row stored only on its support `[minSize,maxn]`.
   Two passes/column (pass 1 sizes each target's minSize, pass 2 accumulates into
