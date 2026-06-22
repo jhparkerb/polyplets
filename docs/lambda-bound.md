@@ -85,10 +85,15 @@ exact data gives `λ ≥ a(20)^{1/20} ≈ 5.6` and the ratios `a(n)/a(n−1) ≈
   states drop to 6 child-directions (avg 6.625), and its growth constant gives
   **λ_polyplet ≤ 16.63** (`x_c ≈ 0.060130`, `experiments/lambda_tighten.py`) — a
   rigorous improvement on 17.65 (valid trees ⊆ grandparent-constrained ⊆ all trees).
-  Extending the edge-history (great-grandparent, …) drives the bound toward the true
-  λ≈7.1 but with **diminishing per-step gains** — overlaps are dominated by
-  longer-range self-avoidance, so the modest 2-step gain (17.65→16.63) is expected; a
-  full Klarner–Rivest twig/perimeter treatment (as it sharpens the polyomino bound
-  6.75 → 4.65) is the route to a substantially tighter constant.
+- **Deeper edge-history, computed** (`experiments/lambda_tighten_deep.py`). Forbidding the
+  child cell from coinciding with any of the last `d` ancestors (state = length-`d`
+  direction history; still a rigorous over-count, monotone tighter in `d`) gives, for
+  d = 1,2,3,4: **17.65, 16.63, 16.09, 15.83**. Per-step gains halve (1.02, 0.54, 0.27 —
+  ratio ≈ ½), so the ancestor-exclusion family **saturates at ≈ 15.56**, still ~2× the
+  true λ≈7.1 — it never excludes *non-ancestor* (sibling/cousin) overlaps. So **d=4 gives
+  a rigorous `λ_polyplet ≤ 15.83`**, a real but modest improvement on 16.63, and the
+  method has a hard floor near 15.5. A full Klarner–Rivest twig/perimeter treatment (which
+  sharpens the polyomino bound 6.75 → 4.65) is where the next *substantial* gain lives —
+  not more history.
 - **Status.** Rigorous and, as far as we know, the first explicit upper bound on
   the polyplet growth constant. Candidate for the paper's asymptotics section.
