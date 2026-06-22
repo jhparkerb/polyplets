@@ -12,6 +12,23 @@ def canon(cells):
     return frozenset((x - mx, y - my) for x, y in cells)
 
 
+def _tup(cells):                            # translate-canonical SORTED tuple (total order;
+    mx = min(x for x, y in cells); my = min(y for x, y in cells)   # frozenset < is subset!)
+    return tuple(sorted((x - mx, y - my) for x, y in cells))
+
+
+def d4_canon(cells):                        # free: lexmin sorted-tuple over the 8 D4 images
+    best = None
+    c = set(cells)
+    for _ in range(4):
+        for img in (c, {(-x, y) for x, y in c}):
+            k = _tup(img)
+            if best is None or k < best:
+                best = k
+        c = {(y, -x) for x, y in c}          # rotate 90
+    return best
+
+
 def _runs(groups):
     return all(max(v) - min(v) + 1 == len(v) for v in groups.values())
 
@@ -45,15 +62,22 @@ for s in range(2, NMAX + 1):
                     nxt.add(canon(shape | {c}))
     level[s] = nxt
 
-print(" n   #fixed polyplets   A006770   ok?   HV-convex   diag-convex")
-hv = []; dg = []
+A030222 = [1, 2, 5, 22, 94, 524, 3031, 18770, 118133]  # FREE polyplets, n=1..9 (sanity)
+print(" n  #fixed  A006770 ok?  HVfix diagfix | #free A030222 ok?  HVfree diagfree")
+hv = []; dg = []; hvf = []; dgf = []
 for s in range(1, NMAX + 1):
-    tot = len(level[s])
-    ok = (tot == A006770[s - 1])
-    h = sum(1 for sh in level[s] if hv_convex(sh))
-    d = sum(1 for sh in level[s] if diag_convex(sh))
-    hv.append(h); dg.append(d)
-    print(f" {s}      {tot:8d}      {A006770[s-1]:8d}   {'OK' if ok else 'BAD'}   "
-          f"{h:6d}      {d:6d}")
-print("\nHV-convex fixed polyplets,   n=1..%d:" % NMAX, ", ".join(map(str, hv)))
-print("diagonally-convex fixed polyplets, n=1..%d:" % NMAX, ", ".join(map(str, dg)))
+    fixed = level[s]
+    h = sum(1 for sh in fixed if hv_convex(sh))
+    d = sum(1 for sh in fixed if diag_convex(sh))
+    free = {d4_canon(sh) for sh in fixed}                       # dedup up to D4
+    hf = len({d4_canon(sh) for sh in fixed if hv_convex(sh)})   # convexity is D4-invariant
+    df = len({d4_canon(sh) for sh in fixed if diag_convex(sh)})
+    hv.append(h); dg.append(d); hvf.append(hf); dgf.append(df)
+    okx = 'OK' if len(fixed) == A006770[s - 1] else 'BAD'
+    okf = 'OK' if len(free) == A030222[s - 1] else 'BAD'
+    print(f" {s} {len(fixed):8d} {okx:3s} {h:5d} {d:6d} | {len(free):6d} {okf:3s} "
+          f"{hf:5d} {df:6d}")
+print("\nHV-convex   FIXED:", ", ".join(map(str, hv)))
+print("HV-convex   FREE: ", ", ".join(map(str, hvf)))
+print("diag-convex FIXED:", ", ".join(map(str, dg)))
+print("diag-convex FREE: ", ", ".join(map(str, dgf)))
