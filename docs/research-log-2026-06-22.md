@@ -146,9 +146,15 @@ Worked the round-2 ideas on per-topic branches (merge the best at 8pm ET).
   new sequence. Recorded as an identity, not staged.
 - **maxhole-optimal multiplicity ✗** [`explore/seq-maxhole-mult`]: 1,16,4,4,1,4 — irregular,
   not a clean sequence. (Datum: the n=8 diamond is the UNIQUE optimum.)
+- **hole density ★ — d_hole ≈ 0.0231 holes/cell** [`explore/analysis-holefree-fraction`]:
+  mined the existing n≤18 hole data. Mean #holes of a uniform polyplet ~ 0.0231·n (first
+  differences converge cleanly, best-converged constant of the day). Plus: the **hole-free
+  fraction A_0/a → 0** sub-exponentially (1.0 → 0.734 at n=18) — almost every large polyplet
+  has a hole. Companion to T6 (contact density): polyplets are contact-dense, hole-sparse.
 - **T7 skipped** (the λ tree-bound is fundamentally loose; deeper memory only nudges 16.63).
   **C1 deferred** — H=11 GF recovery (deg ≈13000, ~26k mod-p terms + BM) is a ~1–2h job;
   noted as launchable (would extend orders/atoms to H=11 and unlock the (3a) check at H=9).
+- B2's `M_asym(n)=M(n−1)` conjecture is getting an n=10 brute-force check (running at wrap).
 
 ### 2026-06-22 ~16:30 — T1 (the "hard" one) ADVANCED: lifetime-3 lemma (3a) to H≤8 [explore/theorem-t1-irreducibility]
 - T1's only open content is lemma (3a) "the unanchored-strip atom N_H is irreducible over
