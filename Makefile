@@ -70,6 +70,11 @@ build/tma_asan: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer -pthread cpp/tma_main.cpp -o $@
 
+# R2: ranged counts-row sweep test harness (tests/gate_ranged.py). Each per-state row
+# stored only on its support [minSize,maxn] -> ~2x less store; exact totals (no CRT).
+build/tma_ranged_test: cpp/tma_ranged_test.cpp cpp/tma/*.h | build
+	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_ranged_test.cpp -o $@
+
 build/tma_tsan: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=thread \
 	    -fno-omit-frame-pointer -pthread cpp/tma_main.cpp -o $@
