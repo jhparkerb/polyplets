@@ -40,6 +40,7 @@ real OEIS contributor name before any submission.
 | draft M(n) = max hole AREA (draft-maxholearea.txt) | new; a DISTINCT statistic (max enclosed empty *area*, not a column of the count triangle); **exact to n=14, diamond-tight at n=4,8,12** |
 | draft GF orders deg Q_H (draft-gf-orders.txt) | new, **Superseeker-novel**; 1,3,7,15,42,...,5005 (fixed-height GF denominator orders); lifetime-3 law |
 | draft atom degrees deg N_H (draft-atom-degrees.txt) | new, **Superseeker-novel**; 1,2,4,9,29,...,3289 (the lifetime-3 atoms); H<=7 verified, H>=8 law-derived |
+| draft free-polyplet symmetry classes (8: draft-sym-*.txt) | new, **plain-search novel** (Superseeker not yet run); the D4 exact-symmetry-group breakdown of A030222 to n=19 (asymmetric, axial, diagonal, C2, C4, D2-ortho, D2-diag, D4); validated (8 classes sum to A030222, 5 reflection classes sum to A030234); polyplet analogues of A006746/A006747/A006748/A006749/A056877/A056878/A142886/A144553, none of which had a polyplet counterpart |
 
 ## Novelty re-checks (OEIS, 2026-06-19)
 - **A_0 (hole-free) and A_1 (one-hole): confirmed not in OEIS via Superseeker**
@@ -62,6 +63,13 @@ real OEIS contributor name before any submission.
   superseeker-reply@oeis.org -- the complete run (direct lookup + the full T001-T115
   transform battery + closed-form search). **Staged: `draft-atom-degrees.txt` (Axxxxxe),
   `draft-gf-orders.txt` (Axxxxxd).**
+- **Free-polyplet symmetry classes (8), 2026-06-21:** the D4 exact-symmetry-group
+  breakdown of A030222. Each class's distinctive term-window returns "No results" on
+  the OEIS consecutive-term search (only the coarse A030234/A030235 split existed for
+  polyplets). Plain-search clean; a Superseeker pass per class is the gold standard
+  still to run before submission. Derivation (`sym/symmetry_classes.py`) is validated:
+  the 8 classes sum to A030222(n) and the five reflection classes to A030234(n) for all
+  n <= 19 (the latter is the proven bilateral = (H+D)/2 identity).
 - (Lesson from A030233: always search before claiming novelty.)
 
 OEIS content is under the OEIS End-User License; baselines are copied here for
