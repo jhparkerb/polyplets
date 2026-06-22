@@ -2,10 +2,10 @@
 %S Axxxxxa 1,4,20,109,622,3664,22094,135609,843941,5310754,33724862,215793158,
 %T Axxxxxa 1389673091,8998648488,58548155506,382526638033,2508473632910,16503616943998
 %N Axxxxxa Number of fixed n-cell polyplets (A006770) with no holes (hole-free), 4-connected-background convention.
-%C Axxxxxa Column k=0 of the polyplets-by-number-of-holes triangle [draft Axxxxxx]. Equals A006770(n) for n <= 3 and A006770(n) minus the number of holed n-polyplets for n >= 4; the smallest holed polyplet is the 4-cell diamond, so a(4) = A006770(4) - 1 = 109. - _[submitter]_, 2026
-%C Axxxxxa Exact via the column transfer matrix (#28), validated byte-identical to the per-animal flood (n<=14), with a(n) + (holed polyplets) = A006770(n); terms through n=18, of which n=15..18 are independently reproduced on a second CPU architecture (clang/ARM vs gcc/x86, byte-identical). - _[submitter]_, 2026
+%C Axxxxxa Column k=0 of the polyplets-by-number-of-holes triangle [draft Axxxxxx]. Equals A006770(n) for n <= 3 and A006770(n) minus the number of holed n-polyplets for n >= 4; the smallest holed polyplet is the 4-cell diamond, so a(4) = A006770(4) - 1 = 109. - _Jason H Parker_, 2026
+%C Axxxxxa Exact via the column transfer matrix (#28), validated byte-identical to the per-animal flood (n<=14), with a(n) + (holed polyplets) = A006770(n); terms through n=18, of which n=15..18 are independently reproduced on a second CPU architecture (clang/ARM vs gcc/x86, byte-identical). - _Jason H Parker_, 2026
 %H Axxxxxa Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet</a>.
 %Y Axxxxxa Cf. A006770 (all fixed polyplets), Axxxxxx (triangle by #holes), A030222.
 %K Axxxxxa nonn,hard
 %O Axxxxxa 1,2
-%A Axxxxxa _[submitter]_, 2026
+%A Axxxxxa _Jason H Parker_, 2026

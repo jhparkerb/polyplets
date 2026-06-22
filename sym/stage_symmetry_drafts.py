@@ -68,7 +68,7 @@ for key, col, name, analogue in CLASSES:
         f"The five reflection-containing classes (axial, diagonal, two-axis, two-diagonal, "
         f"full) sum to A030234 (bilaterally symmetric); the other three (asymmetric, "
         f"180-degree, 90-degree) sum to A030235. Polyplet analogue of {analogue} "
-        f"(polyominoes). - _[submitter]_, 2026",
+        f"(polyominoes). - _Jason H Parker_, 2026",
         f"%F Axxxxx-{key} Obtained via the table of marks of the square symmetry group "
         f"D4 from the counts of fixed polyplets (A006770) invariant under each subgroup. "
         f"The 8 symmetry classes partition A030222(n), and the five reflection classes "
@@ -77,7 +77,7 @@ for key, col, name, analogue in CLASSES:
         f"(fixed polyplets), {analogue} (polyomino analogue).",
         f"%K Axxxxx-{key} nonn,more",
         f"%O Axxxxx-{key} 1,{offset2(data)}",
-        f"%A Axxxxx-{key} _[submitter]_, 2026",
+        f"%A Axxxxx-{key} _Jason H Parker_, 2026",
     ]
     path = os.path.join(OUT, f"draft-sym-{key}.txt")
     with open(path, "w") as f:

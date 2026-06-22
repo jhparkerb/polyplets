@@ -55,7 +55,7 @@ self-tested against the confirmed n=19 row.
 ## Promotion checklist (when the gates clear)
 
 1. Append the five b-file lines above to their `oeis/` b-files / `%S%T%U` data.
-2. Add `a(20) from _[submitter]_, 2026` to each `%E` line.
+2. Add `a(20) from _Jason H Parker_, 2026` to each `%E` line.
 3. Flip RESULTS.md R2/R3/R4 to confirmed; ledger `verified` events.
 4. Add a(20) to the paper abstract + Table~\ref{tab:terms} + growth-ratio line,
    and to `verify_claims.py`.

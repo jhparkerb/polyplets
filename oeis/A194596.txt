@@ -15,4 +15,4 @@
 %K A194596 nonn,more
 %O A194596 1,3
 %A A194596 _Jani Melik_, Aug 30 2011
-%E A194596 a(18)-a(19) from _[submitter]_, Jun 21 2026
+%E A194596 a(18)-a(19) from _Jason H Parker_, Jun 21 2026

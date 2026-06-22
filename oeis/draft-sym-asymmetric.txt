@@ -1,9 +1,9 @@
 %I Axxxxx-asymmetric
 %S Axxxxx-asymmetric 0,0,1,8,68,439,2872,18230,117126,754946,4909229,32127085,211595641,1401049465,9321183002,62271374805,417544893490,2808891678794,18951144432919
 %N Axxxxx-asymmetric Number of asymmetric free polyplets with n cells (king-move animals, A030222, with trivial symmetry group).
-%C Axxxxx-asymmetric A polyplet (polyking) is a set of unit cells joined through shared edges or corners. The square symmetry group D4 partitions the free polyplets A030222 into 8 classes by exact symmetry group; this is one of them. The five reflection-containing classes (axial, diagonal, two-axis, two-diagonal, full) sum to A030234 (bilaterally symmetric); the other three (asymmetric, 180-degree, 90-degree) sum to A030235. Polyplet analogue of A006749 (polyominoes). - _[submitter]_, 2026
+%C Axxxxx-asymmetric A polyplet (polyking) is a set of unit cells joined through shared edges or corners. The square symmetry group D4 partitions the free polyplets A030222 into 8 classes by exact symmetry group; this is one of them. The five reflection-containing classes (axial, diagonal, two-axis, two-diagonal, full) sum to A030234 (bilaterally symmetric); the other three (asymmetric, 180-degree, 90-degree) sum to A030235. Polyplet analogue of A006749 (polyominoes). - _Jason H Parker_, 2026
 %F Axxxxx-asymmetric Obtained via the table of marks of the square symmetry group D4 from the counts of fixed polyplets (A006770) invariant under each subgroup. The 8 symmetry classes partition A030222(n), and the five reflection classes sum to A030234(n); both checked for all n <= 19.
 %Y Axxxxx-asymmetric Cf. A030222 (free polyplets), A030234, A030235, A006770 (fixed polyplets), A006749 (polyomino analogue).
 %K Axxxxx-asymmetric nonn,more
 %O Axxxxx-asymmetric 1,4
-%A Axxxxx-asymmetric _[submitter]_, 2026
+%A Axxxxx-asymmetric _Jason H Parker_, 2026

@@ -24,8 +24,10 @@ service (see ROADMAP #25). Normal care for outward-facing steps; no signoff cere
   enumerations + an algorithm-independent transfer-matrix recount agree.
 
 ## Bylines
-Author/extender bylines use the placeholder `_[submitter]_` — replace with the
-real OEIS contributor name before any submission.
+Author/extender bylines are `_Jason H Parker_` (OEIS contributor,
+https://oeis.org/history?user=Jason%20H%20Parker). Only new-draft `%A` lines and our
+`%E` extension credits carry this name; the original `%A` authors of extended entries
+(Sloane, Cook, Wilson, Melik, ...) are preserved.
 
 ## Status
 | file | status |
