@@ -46,7 +46,7 @@ cell encloses its own hole* (h/n → 1), the polar opposite of the single big di
 
 **Exact formula, PROVEN: `maxh(n) = n + 1 − P(n)/2`**, where `P(n) =` A027709, the minimum
 perimeter of an n-cell polyomino. (Verified against the brute-force counts for all n≤9;
-it gives maxh(10..16) = 4,4,5,6,6,7,9.)
+it gives maxh(10..16) = 4,5,6,6,7,8,9.)
 
 *Proof.* For maximum count every hole is a single empty cell (smaller holes ⇒ more of
 them). The foreground even sublattice `{x+y even}` with king-adjacency is itself a unit
@@ -61,4 +61,4 @@ this is `m² = (√n−1)²`. ∎
 
 So both extremals fall to the lattice geometry: the single diamond maximizes hole AREA
 (`~n²/8`, T3/T5), and the even-sublattice min-perimeter polyomino maximizes hole COUNT
-(`n+1−A027709(n)/2 ~ n`). A clean candidate OEIS sequence (`0,0,0,1,1,2,2,3,4,4,4,5,6,…`).
+(`n+1−A027709(n)/2 ~ n`). A clean candidate OEIS sequence (`0,0,0,1,1,2,2,3,4,4,5,6,6,7,8,9,…`).

@@ -1,5 +1,5 @@
 %I Axxxxxj
-%S Axxxxxj 0,0,0,1,1,2,2,3,4,4,4,5,6,6,7,9,9,9,10,12
+%S Axxxxxj 0,0,0,1,1,2,2,3,4,4,5,6,6,7,8,9,9,10,11,12
 %N Axxxxxj Maximum number of holes of an n-cell polyplet: the largest count of bounded 4-connected components of the complement, over all fixed n-cell king-move animals (A006770).
 %F Axxxxxj a(n) = n + 1 - A027709(n)/2, where A027709(n) is the minimum perimeter of an n-cell polyomino. (A027709 is even, so this is an integer.)
 %C Axxxxxj A polyplet (polyking) is a set of unit cells connected through edges or corners; a hole is a bounded component of the 4-connected background. To MAXIMIZE the hole COUNT every hole is a single empty cell. The area-maximizing one diamond (cf. the max-hole-AREA sequence) is the opposite extreme: here one wants as MANY holes as possible, each minimal.
