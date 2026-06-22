@@ -33,7 +33,7 @@
 inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
                                  const std::function<void(int, u64)>& onColumn = {},
                                  size_t reserveStates = 0,
-                                 const CkptCtl* ckpt = nullptr) {
+                                 const CkptCtl* ckpt = nullptr, bool fold = false) {
   Counts row(maxn + 1, 0);
   FlatDB db(maxn), next(maxn);
   if (reserveStates) { db.reserve(reserveStates); next.reserve(reserveStates); }
@@ -100,6 +100,7 @@ inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
         // (ms + cells); if it plus the admissible completion bound already
         // exceeds maxn, no size it carries can finish in budget -> drop.
         if (ms + cells + completionLowerBound(out.b, H) > maxn) return;
+        if (fold) foldSig(out, H);  // R1: store the orbit-canonical sig (vertical mirror)
         addCounts(next, out, counts, cells, maxn);
       });
     });
@@ -119,7 +120,7 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
                                    SweepResults& res,
                                    const std::function<void(int, u64)>& onColumn = {},
                                    size_t reserveStates = 0,
-                                   const CkptCtl* ckpt = nullptr) {
+                                   const CkptCtl* ckpt = nullptr, bool fold = false) {
   Counts row(maxn + 1, 0);
   int S = 64;
   while (S < 128 * nthreads) S <<= 1;  // shards: power of two, >> nthreads
@@ -196,6 +197,7 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
             if (stepColumnSquare8(sig, H, mask, out) != Outcome::Alive) return;
             const int cells = __builtin_popcount(mask);
             if (ms + cells + completionLowerBound(out.b, H) > maxn) return;
+            if (fold) foldSig(out, H);  // R1: canonicalize before sharding/storing
             const int sh = FlatDB::hashSig(out) & (S - 1);
             std::lock_guard<std::mutex> lk(mu[sh]);
             addCounts(nextS[sh], out, counts, cells, maxn);
@@ -215,11 +217,12 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
 // One height, serial or multithreaded by `nthreads`.
 inline Counts heightRow(int H, int maxn, int nthreads, SweepResults& res,
                         const std::function<void(int, u64)>& onColumn = {},
-                        size_t reserveStates = 0, const CkptCtl* ckpt = nullptr) {
+                        size_t reserveStates = 0, const CkptCtl* ckpt = nullptr,
+                        bool fold = false) {
   return nthreads > 1
              ? sweepSquare8HeightMT(H, maxn, nthreads, res, onColumn, reserveStates,
-                                    ckpt)
-             : sweepSquare8Height(H, maxn, res, onColumn, reserveStates, ckpt);
+                                    ckpt, fold)
+             : sweepSquare8Height(H, maxn, res, onColumn, reserveStates, ckpt, fold);
 }
 
 inline SweepResults sweepSquare8(int maxn, int nthreads = 1) {

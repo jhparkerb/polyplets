@@ -48,6 +48,29 @@ inline void canonicalizeSig(unsigned char* b, int H) {
   }
 }
 
+// R1 symmetry fold. Vertical (top<->bottom) reflection of a boundary signature:
+// reverse the H row bytes, swap the two touch flags, recanonicalize the labels.
+// An involution; equivalent partial animals map to reflected boundaries.
+inline Sig reflectSig(const Sig& s, int H) {
+  Sig r;
+  std::memcpy(r.b, s.b, SIGMAX);
+  for (int i = 0; i < H; ++i) r.b[i] = s.b[H - 1 - i];
+  r.b[H] = s.b[H + 1];                    // swap touched-top / touched-bottom
+  r.b[H + 1] = s.b[H];
+  canonicalizeSig(r.b, H);
+  return r;
+}
+
+// Fold a signature to its orbit's canonical representative min(s, reflect(s))
+// (lexicographic over the fixed SIGMAX bytes). Storing only canonical sigs and
+// summing into them is the orbit-sum DP: ~2x fewer live states and ~2x fewer
+// source transitions, byte-identical totals (the strip's vertical mirror is a
+// symmetry of fixed counting). Validated in experiments/r1_sym_fold_check.py.
+inline void foldSig(Sig& s, int H) {
+  Sig r = reflectSig(s, H);
+  if (std::memcmp(r.b, s.b, SIGMAX) < 0) s = r;
+}
+
 // std::string form (square-4 path): same relabeling as canonicalizeSig.
 inline std::string canonicalize(std::string sig, int H) {
   canonicalizeSig(reinterpret_cast<unsigned char*>(&sig[0]), H);

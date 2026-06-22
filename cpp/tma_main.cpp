@@ -197,6 +197,7 @@ int main(int argc, char** argv) {
   bool hdrop = false;  // --hdrop: drop holes > kmax (exact for k<=kmax, bounds RAM)
   u64 reserveStates = 0;  // --reserve N: pre-size the state store to ~N states (skip
                           // the doubling-grow transient; pass the calibrated peak)
+  bool fold = false;      // --fold: R1 vertical-mirror state fold (~2x mem + ~2x compute)
   for (int i = 3; i < argc; ++i) {
     if (std::strcmp(argv[i], "--per-height") == 0) {
       perHeight = true;
@@ -219,6 +220,8 @@ int main(int argc, char** argv) {
       hdrop = true;
     } else if (std::strcmp(argv[i], "--reserve") == 0 && i + 1 < argc) {
       reserveStates = static_cast<u64>(std::strtoull(argv[++i], nullptr, 10));
+    } else if (std::strcmp(argv[i], "--fold") == 0) {
+      fold = true;
     } else {
       std::fprintf(stderr, "unknown arg: %s\n", argv[i]);
       return 2;
@@ -386,7 +389,7 @@ int main(int argc, char** argv) {
                             std::to_string(live) + " peak_states=" +
                             std::to_string(res.peakStates));
         },
-        static_cast<size_t>(reserveStates), ckptPtr);
+        static_cast<size_t>(reserveStates), ckptPtr, fold);
     for (int n = 1; n <= maxn; ++n) res.totals[n] = res.byHeight[onlyHeight][n];
     rep.done("result=" + std::to_string(static_cast<unsigned long long>(
                              res.byHeight[onlyHeight][maxn])),
