@@ -51,4 +51,23 @@ Status key: ☐ idea · ⚔ refute-attempted · ✓ survived refute · ✗ refut
 ---
 
 ## Worklog (newest first)
-(entries appended as ideas are attempted)
+
+### 2026-06-22 ~08:30 — R1 (symmetry fold) ✓ validated [branch explore/reach-symmetry-fold]
+- Column-sweep prototype (`experiments/r1_sym_fold_check.py`): the premise
+  **count(Sig) == count(R·Sig)** (R = vertical top↔bottom reflection, flags swapped)
+  **HOLDS at every column, every height** tested. DP matches a(n) exactly for n≤9
+  (n≥10 shortfall = 3 heights the Python prototype OOM-killed, not a math error).
+- **Fold factor → 1.95×** for the tall strips that dominate memory.
+- Orbit-DP ⇒ the fold is **~2× memory AND ~2× compute** (process canonical sources
+  only, ×2 weight for non-palindromes; mirror's transitions hit the same canonical
+  targets). Verdict: real breakthrough candidate. **Next: port to `build/tma`** (the
+  MT sharded sweep), gate against the unfolded engine, benchmark.
+
+### per-state memory investigation (decides which terms fit which machine)
+- `FlatDB` is lean (0.85 load, ~236 B/slot raw at maxn=20). The "2.5 KB/state" in the
+  a20 driver comment is almost certainly the **holes** engine (2-D (size×holes) row),
+  not the plain a(n) sweep. Live read of `build/tma --only-height 14 N=17`: ~800 B/state
+  at col 2 (incl. base) — far below 2.5 KB. Measuring the peak to settle plain-a(n)
+  bytes/state → tells us if a(21)~39GB, a(22)~94GB fit dalby directly (good scenario).
+- **dalby is fully idle right now** (122 GB free, 80 cores, 0 CADO procs) — the big
+  resource for directly running a(21)/a(22), and R1 unlocks a(23).
