@@ -45,6 +45,7 @@ struct CkptMeta {
   std::int32_t nthreads = 0;
   std::uint8_t lattice = 0;           // 0 = plain a(n), 1 = holes
   u64 stride = 0;                     // u64s per counts row
+  std::uint8_t fold = 0;              // 1 = R1 vertical-mirror fold (canonical sigs)
 };
 
 enum class CkptStatus { None, Loaded, Refuse };  // no file / resumed / abort
@@ -108,11 +109,11 @@ inline bool tmaCkptSave(const CkptCtl& ctl, const CkptMeta& m, u64 nEntries,
   tmackpt_detail::Writer w{f};
 
   w.put("TMCK", 4);
-  std::uint32_t fmtver = 1; w.putv(fmtver);
+  std::uint32_t fmtver = 2; w.putv(fmtver);  // 2: added m.fold to the guard
   char gitrev[40] = {0}; std::strncpy(gitrev, GIT_REV, sizeof gitrev - 1);
   w.put(gitrev, sizeof gitrev);
   std::uint8_t byteorder = 1; w.putv(byteorder);  // little-endian
-  w.putv(m.lattice);
+  w.putv(m.lattice); w.putv(m.fold);
   w.putv(m.maxn); w.putv(m.H); w.putv(m.kmax); w.putv(m.modp);
   w.putv(m.hdrop); w.putv(m.nthreads);
   w.putv(colNext); w.putv(peakStates); w.putv(peakHeight);
@@ -151,14 +152,15 @@ inline CkptStatus tmaCkptLoad(const CkptCtl& ctl, const CkptMeta& expect, Sink&&
   std::uint32_t fmtver; r.getv(fmtver);
   char gitrev[40]; r.get(gitrev, sizeof gitrev);
   std::uint8_t byteorder; r.getv(byteorder);
-  std::uint8_t lattice; r.getv(lattice);
+  std::uint8_t lattice, fold; r.getv(lattice); r.getv(fold);
   std::int32_t maxn, H, kmax; u64 modp; std::uint8_t hdrop; std::int32_t nthreads;
   r.getv(maxn); r.getv(H); r.getv(kmax); r.getv(modp); r.getv(hdrop); r.getv(nthreads);
   std::int32_t cn; u64 pk; std::int32_t ph; u64 stride, nEntries;
   r.getv(cn); r.getv(pk); r.getv(ph); r.getv(stride); r.getv(nEntries);
 
-  if (!r.ok || std::memcmp(magic, "TMCK", 4) != 0 || fmtver != 1 || byteorder != 1 ||
-      lattice != expect.lattice || maxn != expect.maxn || H != expect.H ||
+  if (!r.ok || std::memcmp(magic, "TMCK", 4) != 0 || fmtver != 2 || byteorder != 1 ||
+      lattice != expect.lattice || fold != expect.fold ||
+      maxn != expect.maxn || H != expect.H ||
       kmax != expect.kmax || modp != expect.modp || hdrop != expect.hdrop ||
       stride != expect.stride) {
     std::fclose(f);
