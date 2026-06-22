@@ -43,3 +43,15 @@ in budget, a(24)/a(25) plausible); Phase-4 out-of-core removes the ceiling. R2 (
 confirmed compute trap (~100x). Engines built + gated on branches reach-modp-u32 (R3),
 reach-blocked-store (B + OOC), reach-symmetry-fold (R1); unmerged. DEPLOY = merge + a production
 driver that runs one sweep per CRT prime and combines.
+
+## Literature check (2026-06-22) — novelty caveat
+The asymptotic FORM (theta=1, a_n ~ C lambda^n / n, log divergence) is ESTABLISHED 2D
+lattice-animal universality (Jensen & Guttmann, cond-mat/0007238; square tau=4.062570(8)) --
+so theta=1 here is EXPECTED, not a finding; the g -> -1 fit only re-confirms known universality.
+The king/NNN lambda VALUE is published in Mertens 1990 (J. Stat. Phys. 58, 1095) and
+Mertens-Lautenbacher 1991 (the source of the A006770 enumeration), but both are paywalled,
+Mertens' data page is unreachable, and OEIS carries no estimate -- the published figure could not
+be retrieved here. NET: our 7.12-7.155 (n<=20, two methods) is consistent-with-universality but
+UNCONFIRMED against the literature value. TO CLOSE: obtain the Mertens 1990 king growth constant
+and check ours matches/improves it. (3 of the 4 thread-hunt findings turned out known/expected;
+the genuine keeper is the reach lever R1xR3xB -> ~+2.2 terms.)
