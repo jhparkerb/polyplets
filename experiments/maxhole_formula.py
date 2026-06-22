@@ -80,6 +80,7 @@ for n in range(4, 41):
     tight = "tight" if len(wall) == n else f"pad+{n - len(wall)}"
     print(f"{n:3d}  {M:4d}  {len(hole):5d}  {len(wall):4d}    {str(kc):5s}     "
           f"{str(tr):5s}   {tight:6s}  {'OK' if ok else 'FAIL'}")
-print("\nlower bound M(n) achieved (<=n-cell loop enclosing M(n)) for all n in 4..40:",
+print()
+print("lower bound M(n) achieved (<=n-cell loop enclosing M(n)) for all n in 4..40:",
       "YES" if allok else "NO")
 print("=> with the proven upper bound, M(n) = ceil(floor((n-2)^2/4)/2) EXACTLY for all n>=4.")

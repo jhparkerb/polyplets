@@ -11,7 +11,8 @@ print("(1) |du|+|dv| = 2 for all 8 king steps:  OK")
 
 # (2) diamonds
 M = {4: 1, 8: 5, 12: 13, 16: 25}  # exact, results/maxhole.txt
-print("\n r  |sphere S_r|  hole |B_{r-1}|  a+c  W_u+W_v  4r  matches M(4r)?")
+print()
+print(" r  |sphere S_r|  hole |B_{r-1}|  a+c  W_u+W_v  4r  matches M(4r)?")
 for r in range(1, 7):
     sphere = [(x, y) for x in range(-r, r + 1) for y in range(-r, r + 1)
               if abs(x) + abs(y) == r]
@@ -28,4 +29,5 @@ for r in range(1, 7):
     print(f" {r}     {len(sphere):3d}        {len(ball):4d}        {a+c:3d}   "
           f"{Wu+Wv:4d}    {n:3d}   {'OK' if ok else 'FAIL'}"
           + (f"  (M({n})={M[n]})" if n in M else ""))
-print("\nAll diamonds saturate |C| = W_u+W_v = a+c+4 = 4r and enclose 2r^2-2r+1.")
+print()
+print("All diamonds saturate |C| = W_u+W_v = a+c+4 = 4r and enclose 2r^2-2r+1.")
