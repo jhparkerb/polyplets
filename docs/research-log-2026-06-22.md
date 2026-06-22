@@ -4,7 +4,9 @@ Goal: find new theorems / conjectures / **code**, refute-then-prove each, and fo
 try to show it can't work before implementing + small-scale testing. **Primary focus:
 reach — compute more a(n) terms on current hardware.** Secondary: new non-trivial
 sequences. Branches per topic (`explore/<topic>`), merge as needed. Machines: gympie +
-ayr spare cores (do NOT disturb the a(20) recount on ayr; dalby is on CADO, off-limits).
+ayr spare cores (do NOT disturb the a(20) recount on ayr) + **dalby AVAILABLE** (122GB/80c
+idle — the big-RAM reach machine; the earlier "on CADO, off-limits" note was STALE and
+wrongly idled it most of the day; jasonp confirmed it was free since goal-set).
 
 Status key: ☐ idea · ⚔ refute-attempted · ✓ survived refute · ✗ refuted/dead ·
 🔬 implemented+tested · ★ merge-worthy.
@@ -128,6 +130,20 @@ these lean that way. Tagged by cost. **B1 already computed** (the demonstration)
 ---
 
 ## Worklog (newest first)
+
+### 2026-06-22 ~14:35 ET — DALBY PIVOT: real reach terms launched (the primary goal cashing in)
+- **The big miss, owned:** dalby (122GB/80c) was available since goal-set, but the log/memory
+  said "on CADO, off-limits" (STALE) — so it sat idle at load 0.00 most of the day while I did
+  small math, when REACH was the primary goal and dalby is *the* reach machine. jasonp caught
+  it. Records corrected (memory `machine-availability-2026-06`, this header).
+- **a(21) launched** on dalby (tmux session 0, window `a21`): `build/tma square8 21 --fold
+  --checkpoint runs/ckpt_a21 --threads 32`. Folded gate-confirmed there (a(12)=257105146 ✓).
+  ~33GB, per-height resumable, obs heartbeat live. Multi-hour (tall heights dominate); runs
+  past 8pm ET by design ("floor not ceiling"). dalby clock is UTC+02:00 (6h ahead of ET).
+- **a(22) next**, after a(21): peak ≈ 2.42× a(21) ⇒ ~80GB, fits the 122GB ceiling with ~40GB
+  headroom — will confirm from a(21)'s measured peak before committing (RAM-borderline care).
+- Lesson for the records: a stale "off-limits" flag is as costly as a wrong result — it
+  silently misallocated the whole day's primary-goal compute.
 
 ### 2026-06-22 ~17:30 — brainstorm round 2 worked: 3 keepers + 2 honest negatives
 Worked the round-2 ideas on per-topic branches (merge the best at 8pm ET).
