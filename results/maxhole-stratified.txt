@@ -1,0 +1,31 @@
+# Stratified maxhole, computed by  build/g2 square8 N --maxhole-strat  (D1: the C++
+# statistics pass on the Redelmeier engine -- per-animal D4 symmetry + exactly-k-hole area).
+# Columns:  n  M(n)  M_asym(n)  M_1(n) M_2(n) ...   where
+#   M(n)      = max enclosed hole area over all fixed n-cell polyplets (= the diamond, T5)
+#   M_asym(n) = max hole area over ASYMMETRIC (trivial-D4-stabilizer) polyplets
+#   M_k(n)    = max TOTAL hole area over polyplets with EXACTLY k holes
+# (n=4..12; 4 min single-thread, vs Python's ~15 min just for n=10. Use --split for n>12.)
+4  1  0   1
+5  1  1   1
+6  2  1   2 2
+7  3  2   3 2
+8  5  3   5 3 3
+9  6  5   6 4 3 4
+10 8  7   8 6 5 4
+11 10 9   10 7 7 5 5
+12 13 11  13 9 8 6 5 6
+
+## b2 SETTLED
+M_asym(n) = 0,0,0,0,1,1,2,3,5,7,9,11 (n=1..12). The earlier conjecture M_asym(n)=M(n-1)
+held only n<=9 (a coincidence) and is conclusively REFUTED: at n=10,11,12 M_asym = 7,9,11
+while M(n-1) = 6,8,10. The real M_asym hugs M(n) at an IRREGULAR gap of 1-2
+(M-M_asym = 1,0,1,1,2,1,1,1,2 for n=4..12) -- no clean closed form. Durable facts: the
+maxhole optimum is always symmetric (M_sym=M), and asymmetry costs a small irregular premium.
+
+## multihole M_k (C2)
+The per-k maxima are NON-monotone in k and have no evident closed form (e.g. n=12:
+M_1..M_6 = 13,9,8,6,5,6 -- M_6 > M_5). Extends the earlier n<=9 brute force to n=12.
+
+## build note
+build/g2 must be compiled with clang directly (the Makefile's gcc-only -Wno-error=restrict
+breaks clang); clang doesn't trip the -Wrestrict false positive, so it's a no-op loss.

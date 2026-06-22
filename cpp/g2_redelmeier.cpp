@@ -23,6 +23,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "obs.h"  // shared observability/provenance runtime (docs/observability.md)
 
@@ -112,6 +113,15 @@ struct Counter {
   bool maxHoleCheck = false;
   bool maxHole8 = false;                     // background flood 8-connected?
   std::vector<u64> maxAreaBySize;            // [size] -> max enclosed empty area
+
+  // optional STRATIFIED maxhole (--maxhole-strat, implies maxHoleCheck): M_asym(n) = max
+  // hole area among ASYMMETRIC (trivial-D4-stabilizer) animals; M_k(n) = max total hole
+  // area over animals with EXACTLY k holes. Reuses the flood/placed machinery.
+  bool maxHoleStrat = false;
+  std::vector<u64> maxAreaAsym;              // [size] -> max hole area, asymmetric only
+  std::vector<u64> maxAreaByK;               // [size*kStride + k] -> max total area, k holes
+  int kStride = 0;
+  std::vector<int> symX, symY, symTX, symTY; // scratch for the D4 symmetry check
 
   static int findp(int* p, int x) { while (p[x] != x) { p[x] = p[p[x]]; x = p[x]; } return x; }
 
@@ -281,6 +291,43 @@ struct Counter {
     if (maxHoleCheck) {
       maxAreaBySize.assign(maxn + 1, 0);
     }
+    if (maxHoleStrat) {
+      kStride = maxn + 1;
+      maxAreaByK.assign(static_cast<size_t>(maxn + 1) * kStride, 0);
+      maxAreaAsym.assign(maxn + 1, 0);
+    }
+  }
+
+  // True iff the animal has trivial D4 stabilizer (no nontrivial rotation/reflection maps
+  // it onto itself up to translation) -- i.e. its free orbit has full size 8.
+  bool isAsymmetric() {
+    static const int T[8][4] = {           // (x,y) -> (a*x+b*y, c*x+d*y)
+        {1, 0, 0, 1}, {0, -1, 1, 0}, {-1, 0, 0, -1}, {0, 1, -1, 0},
+        {-1, 0, 0, 1}, {1, 0, 0, -1}, {0, 1, 1, 0}, {0, -1, -1, 0}};
+    symX.resize(size); symY.resize(size);
+    for (int i = 0; i < size; ++i) { symX[i] = xOf[placed[i]]; symY[i] = yOf[placed[i]]; }
+    auto canon = [&](const std::vector<int>& X, const std::vector<int>& Y) {
+      int mnx = X[0], mny = Y[0];
+      for (int i = 1; i < size; ++i) {
+        if (X[i] < mnx) mnx = X[i];
+        if (Y[i] < mny) mny = Y[i];
+      }
+      std::vector<long long> key(size);
+      for (int i = 0; i < size; ++i)
+        key[i] = static_cast<long long>(X[i] - mnx) * 256 + (Y[i] - mny);
+      std::sort(key.begin(), key.end());
+      return key;
+    };
+    const std::vector<long long> orig = canon(symX, symY);
+    symTX.resize(size); symTY.resize(size);
+    for (int t = 1; t < 8; ++t) {
+      for (int i = 0; i < size; ++i) {
+        symTX[i] = T[t][0] * symX[i] + T[t][1] * symY[i];
+        symTY[i] = T[t][2] * symX[i] + T[t][3] * symY[i];
+      }
+      if (canon(symTX, symTY) == orig) return false;   // a nontrivial symmetry fixes it
+    }
+    return true;
   }
 
   void record() {
@@ -308,6 +355,17 @@ struct Counter {
     if (maxHoleCheck) {
       const u64 a = static_cast<u64>(holeArea());
       if (a > maxAreaBySize[size]) maxAreaBySize[size] = a;
+    }
+    if (maxHoleStrat) {
+      const u64 area = static_cast<u64>(holeArea());
+      if (area > 0) {                          // hole-free animals contribute nothing here
+        const int k = countHoles();            // k >= 1
+        const size_t kid = static_cast<size_t>(size) * kStride + k;
+        if (area > maxAreaByK[kid]) maxAreaByK[kid] = area;
+        // the (expensive) D4 check runs ONLY for an animal that would beat the asym
+        // record -- short-circuit on area first, so it fires a handful of times per size.
+        if (area > maxAreaAsym[size] && isAsymmetric()) maxAreaAsym[size] = area;
+      }
     }
   }
 
@@ -413,6 +471,8 @@ int main(int argc, char** argv) {
       c.maxHoleCheck = true;
     } else if (std::strcmp(argv[i], "--maxhole8") == 0) {
       c.maxHoleCheck = true; c.maxHole8 = true;
+    } else if (std::strcmp(argv[i], "--maxhole-strat") == 0) {
+      c.maxHoleCheck = true; c.maxHoleStrat = true;
     } else if (std::strcmp(argv[i], "--split") == 0 && i + 3 < argc) {
       c.splitS  = std::atoi(argv[i + 1]);
       c.splitK  = std::strtoull(argv[i + 2], nullptr, 10);
@@ -467,6 +527,22 @@ int main(int argc, char** argv) {
         if (v) std::printf("%d %d %llu\n", n, h,
                            static_cast<unsigned long long>(v));
       }
+  } else if (c.maxHoleStrat) {
+    // "n M(n) M_asym(n) M_1(n) M_2(n) ..."  (M_asym = max hole area over asymmetric
+    // animals; M_k = max total hole area over animals with exactly k holes).
+    std::printf("# n M(n) M_asym(n) M_1(n) M_2(n) ...\n");
+    for (int n = 1; n <= c.maxn; ++n) {
+      int kmax = 0;
+      for (int k = 1; k < c.kStride; ++k)
+        if (c.maxAreaByK[static_cast<size_t>(n) * c.kStride + k]) kmax = k;
+      std::printf("%d %llu %llu", n,
+                  static_cast<unsigned long long>(c.maxAreaBySize[n]),
+                  static_cast<unsigned long long>(c.maxAreaAsym[n]));
+      for (int k = 1; k <= kmax; ++k)
+        std::printf(" %llu", static_cast<unsigned long long>(
+                                 c.maxAreaByK[static_cast<size_t>(n) * c.kStride + k]));
+      std::printf("\n");
+    }
   } else if (c.maxHoleCheck) {
     // "n  M(n)"; M(n) = max enclosed empty area over all n-cell polyplets.
     // Across --split workers, combine by taking the elementwise MAX (not sum).
