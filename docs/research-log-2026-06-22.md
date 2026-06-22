@@ -90,6 +90,21 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~14:00 — Phase 4 design + two new convex sequences (S4)
+- **Phase 4 out-of-core design** [`explore/reach-blocked-store`, `docs/out-of-core-phase4.md`]:
+  external-memory column sweep (stream db partitions from disk, append target
+  contributions to next-buckets, reduce each in a RAM-sized FlatDB, swap by rename).
+  Peak RAM O(peakStates/S), unbounded reach (a(26)~0.45TB with R1+R2+R3). B is the seam;
+  feasibility established by the checkpoint serializer. Design only.
+- **HV-convex polyplets** [`explore/seq-convex`]: 1,4,16,61,221,766,2566,8390,26982 —
+  king animals with every row+column a gap-free run. **Diagonally-convex polyplets**
+  (the (u,v)-convex analogue): 1,4,20,106,562,2912,14652,71533,339515. Both verified
+  against A006770 (n≤9) by exhaustive enumeration; OEIS drafts staged. Completes S4.
+- **Goal now comprehensively covered:** reach (R1/R2/R3/B + Phase 4 design), theorems
+  (T2 structural, T3/T5 proven, T4 proven+tightened), sequences (maxhole proven formula,
+  HV-convex, diag-convex). Remaining: T1 (hard-open), Phase 4 *implementation*, free-convex
+  variants (minor), multi-hole (no accessible data).
+
 ### 2026-06-22 ~13:30 — T2 ✓ structural law: geometric k-hole denominators [explore/conjecture-hole-order]
 - The k-hole GF order is exactly linear in k: **order(G_{H,k}) = m_H·(k+1)** (H=3..7),
   and for H≥5 the slope = the hole-free order, so **order = (k+1)·order(G_{H,0})**.
