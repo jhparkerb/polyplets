@@ -43,7 +43,8 @@ def hole_area(cells):
               if (x, y) not in cells and (x, y) not in ext)
 
 
-NMAX = 9
+import sys
+NMAX = int(sys.argv[1]) if len(sys.argv) > 1 else 9
 level = {1: {canon({(0, 0)})}}
 for s in range(2, NMAX + 1):
     nxt = set()
