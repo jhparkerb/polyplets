@@ -93,6 +93,21 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~16:30 — T1 (the "hard" one) ADVANCED: lifetime-3 lemma (3a) to H≤8 [explore/theorem-t1-irreducibility]
+- T1's only open content is lemma (3a) "the unanchored-strip atom N_H is irreducible over
+  Q", stuck at **H≤6** because N_H = gcd(Q_H,Q_{H+1},Q_{H+2}) over Q has runaway rational
+  coefficients (the gcd blowup). **Mod-p removes the blowup**, and a clean certificate
+  avoids needing the rare prime whose reduction is irreducible: a rational factor of degree
+  k is a subset-sum of the mod-p factor degrees for EVERY prime, so intersecting subset-sums
+  over a few primes to {0,deg} **proves irreducibility over Q**.
+- **N_7 (deg 181) and N_8 (deg 462): PROVED irreducible over Q** (4 primes each). So (3a)
+  now holds **H≤8** (was H≤6). Also **de-extrapolates deg N_8 = 462** (atom_degrees.py had
+  it only by the degree law). And **Q_H squarefree extended to H≤10** (all recovered data),
+  via gcd(Q_H,Q_H')=const mod p. `experiments/t1_irreducibility.py`, `results/lifetime3-proof.md`.
+- The general (all-H) statement still needs the Perron-primitive-element / Galois argument
+  — but both H≤6 claims are now mechanized + pushed to the edge of the GF data. The one
+  genuinely-hard-open item finally moved.
+
 ### 2026-06-22 ~15:30 — Phase 4 IMPLEMENTED (out-of-core) + two new sequences [reach-blocked-store, seq-knight, seq-contacts]
 - **Phase 4 out-of-core sweep — built, gated, GREEN** (`cpp/tma/sweep8_ooc.h`,
   `cpp/tma_ooc_test.cpp`, `tests/gate_ooc.py`, `make gate-ooc`): db and next live as S
