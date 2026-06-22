@@ -75,9 +75,20 @@ exact data gives `λ ≥ a(20)^{1/20} ≈ 5.6` and the ratios `a(n)/a(n−1) ≈
   `z=6` (triangular) → `5^5/4^4 = 12.21`, `z=8` (king) → 17.65. Only Step 1's
   spanning-tree injection and Step 2's parent-direction exclusion are used.
 - **Looseness.** `17.65` is ~2.5× the empirical `λ ≈ 7`; the slack is entirely in
-  Step 2's discarded no-overlap constraint. A Klarner–Rivest "twig"/perimeter
-  refinement (as it sharpens the polyomino bound 6.75 → 4.65) would tighten it; a
-  first cheap improvement: also forbid, for each child, the directions whose cell
-  coincides with an already-placed sibling-subtree cell at distance ≤ √2.
+  Step 2's discarded no-overlap constraint. It tightens systematically by forbidding
+  longer-range overlaps in the tree, via a transfer matrix on consecutive edge
+  directions.
+- **Tightening (grandparent step), computed.** A child also never coincides with the
+  **grandparent** cell `G = N−u−w` (`u` = parent→node, `w` = grandparent→parent king
+  vectors): that forbids child direction `c = −(u+w)` exactly when `u+w` is itself a
+  king-step. This is a 64-state system `T_{u,w}=x·∏_{c allowed}(1+T_{c,u})`; 24 of 64
+  states drop to 6 child-directions (avg 6.625), and its growth constant gives
+  **λ_polyplet ≤ 16.63** (`x_c ≈ 0.060130`, `experiments/lambda_tighten.py`) — a
+  rigorous improvement on 17.65 (valid trees ⊆ grandparent-constrained ⊆ all trees).
+  Extending the edge-history (great-grandparent, …) drives the bound toward the true
+  λ≈7.1 but with **diminishing per-step gains** — overlaps are dominated by
+  longer-range self-avoidance, so the modest 2-step gain (17.65→16.63) is expected; a
+  full Klarner–Rivest twig/perimeter treatment (as it sharpens the polyomino bound
+  6.75 → 4.65) is the route to a substantially tighter constant.
 - **Status.** Rigorous and, as far as we know, the first explicit upper bound on
   the polyplet growth constant. Candidate for the paper's asymptotics section.
