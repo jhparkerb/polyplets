@@ -11,6 +11,33 @@ Status key: ☐ idea · ⚔ refute-attempted · ✓ survived refute · ✗ refut
 
 ---
 
+## Deliverables (leverage map) — what shipped today, separable or stackable
+
+Three **independent, composable** reach memory-levers (each gated against the exact
+engine; orthogonal by construction — R1 canonicalizes the Sig *key*, R3 changes the
+count *type*, R2 changes the row *storage*):
+
+| lever | branch | win | cost | gate |
+|-------|--------|-----|------|------|
+| **R1** vertical-mirror fold | `explore/reach-symmetry-fold` | ~2× RAM **+ ~2× compute** | — | folded==exact, in `build/tma --fold`, checkpoint-safe |
+| **R3** u32 mod-p + CRT | `explore/reach-modp-u32` | ~1.7× RAM | 2–3× (per prime) | CRT==exact, ±fold |
+| **R2** ranged counts-row | `explore/reach-ranged-impl` | ~2× store / 1.56×+ RSS | ~2× (two-pass) | ranged==exact |
+
+Stack (orthogonal): **R1×R2×R3 ≈ 5–7× less RAM** → a(23) comfortable on dalby,
+a(24)/a(25) in reach. R1 alone already makes a(21)/a(22) in-budget; the parallel
+folded driver `scripts/an_fold_parallel.sh` is ready (not launched).
+
+Plus, separable:
+- **T4** (`explore/theorem-lambda-bound`): rigorous **λ_polyplet ≤ 7⁷/6⁶ = 17.65**,
+  bracketing the numerical λ≈7.10 (`results/growth_analysis.md` rigorous sandwich).
+- R2 **assessment** (`explore/reach-ranged-row`): the measure-first probe + writeup.
+- Minor: `results/king_not_rook.py` (a(n)−A001168, a trivial difference — noted, not pushed).
+
+Deploy TODOs (for when terms are actually wanted): MT the R2/R3 serial sweeps; a CRT
+driver for R3; merge the levers into one engine. Each lever stands alone today.
+
+---
+
 ## Engine facts (the surface these ideas act on)
 - `cpp/tma/statedb.h`: `FlatDB` = open hash map, `Sig` keys + one flat `vals` array of
   `cap × stride` **u64**, `stride = maxn+1` (the counts-by-size row). Footprint ≈
