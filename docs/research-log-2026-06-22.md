@@ -52,6 +52,24 @@ Status key: ☐ idea · ⚔ refute-attempted · ✓ survived refute · ✗ refut
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~09:45 — T4 ✓ rigorous λ_polyplet ≤ 17.653 [explore/theorem-lambda-bound]
+- `docs/lambda-bound.md`: **λ_polyplet ≤ 7⁷/6⁶ = 17.6529** via spanning-tree →
+  direction-labelled-tree overcount (king analogue of the classic 3³/2²=6.75
+  polyomino tree bound; each tree node has 7 free child-directions after excluding
+  toward-parent). Rigorous; loose (empirical λ≈7, data gives λ ≥ a(20)^{1/20} ≈ 5.6).
+  First explicit upper bound on the polyplet growth constant. Generalizes to any
+  coordination z: (z−1)^{z−1}/(z−2)^{z−2}. Paper-candidate (asymptotics §).
+
+### 2026-06-22 ~09:30 — R3 ★ u32 mod-p plain sweep, ~1.7× less RAM [explore/reach-modp-u32]
+- `cpp/tma/sweep8_modp.h`: counts rows as **uint32** (half the u64 row) → ~1.7×
+  less RAM (row is ~84% of footprint). Counts mod p; CRT over 2-3 ~31-bit primes
+  recovers exact a(n) (fits u64 for n≤~50). Self-contained u32 FlatDB — the gated
+  exact engine is untouched.
+- **GATE GREEN** (`tests/gate_modp.py`): CRT of 3 primes == exact a(n), n=1..12,
+  unfolded AND `--fold`. Correct by construction (mod-p addition is a homomorphism).
+- **Composes with R1: R1×R3 ≈ 3.4× less RAM** → a(23) (~190 GB folded) fits dalby
+  (122 GB). Deploy TODO: MT version (current sweep is serial) + a CRT driver script.
+
 ### 2026-06-22 ~09:00 — R1 ★ IMPLEMENTED + GATED in build/tma [explore/reach-symmetry-fold]
 - `build/tma … --only-height H --fold`. The C++ port turned out to be tiny: the orbit-
   sum scheme = **canonicalize the output Sig (`foldSig`) before storing it**. Seeding
