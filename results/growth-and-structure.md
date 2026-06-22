@@ -95,3 +95,14 @@ papers, or web/percolation searches; (2) ours uses n<=20, more terms than the be
 enumeration (n<=18), so it is plausibly the sharpest current estimate; (3) I have not seen the
 Rands-Welsh / ancestor-exclusion bounds applied to the king lattice specifically. Treat all of the
 above as "no published value located," NOT a priority claim.
+
+## Clarification: 7.12-7.155 is an ESTIMATE spread, NOT a bracket containing lambda
+The only interval PROVEN to contain lambda is the rigorous [6.54, 15.83]. The 7.12-7.155 is the
+spread between two EXTRAPOLATIONS, neither a bound: (a) series-ratio of a(n)/a(n-1) -- the
+1/n-corrected fit gives ~7.10-7.12 and is still drifting UP as the window narrows (not converged);
+(b) GF-pole Neville on the per-height rates lambda_H (the lambda_H ARE rigorous lower bounds, 5.99
+at H=10; their Neville extrapolation gives ~7.155, drifting DOWN). Both assume the theta=1
+asymptotic form, neither has converged, and a(20) is a candidate. The ~0.5% agreement +
+from-below/from-above drift SUGGEST lambda ~ 7.13, but lambda is NOT proven to lie in [7.12,7.155]
+and could be slightly outside. Best point estimate ~7.13, no defensible error bar. Tightening
+requires more confirmed terms (lower bound) + a real upper-bound method (15.83 is far too loose).
