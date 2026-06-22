@@ -169,6 +169,12 @@ def order_of(path, header):
 orders = [order_of("results/fixed_height_gfs.txt", f"H={H} ") for H in range(1,11)]
 chk("fixed-height orders H=1..10 = 1,3,7,15,42,106,278,711,1897,5005",
     orders==[1,3,7,15,42,106,278,711,1897,5005], str(orders))
+# lifetime-3: atom degrees deg N_H = deg Q_H - deg N_{H-1} - deg N_{H-2} reproduce the
+# proof's verified values (paper, GF section "Denominator structure")
+_N = [0, 0]
+for _q in orders: _N.append(_q - _N[-1] - _N[-2])
+chk("lifetime-3 atom degrees (H<=7) == 1,2,4,9,29,68,181",
+    _N[2:9] == [1, 2, 4, 9, 29, 68, 181], str(_N[2:9]))
 
 # Rigorous lower bound  a(n) >= sum_{H<=10} [x^n] G_H  (cf. paper/gf_bound.py): expand the
 # recovered GFs as exact integer power series; check captured fraction + the a(25) bound.

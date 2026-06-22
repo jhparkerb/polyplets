@@ -396,6 +396,24 @@ As an example,
   G_3(x)=\frac{9x^3-8x^4-2x^5+4x^6+x^7}{1-7x+15x^2-9x^3-3x^4+5x^5-x^6-x^7}.
 \]
 
+\paragraph{Denominator structure (lifetime three).}
+The orders are not arbitrary: each denominator factors as
+$Q_H=N_{H-2}\,N_{H-1}\,N_H$ into pairwise-coprime \emph{atoms} $N_H$, so every
+irreducible factor of any $Q_H$ divides exactly \emph{three} consecutive
+denominators. The reason is a second difference. Let $V_H(n)$ count the $n$-cell
+polyplets placed in an $H$-row strip with vertical position recorded; a
+height-exactly-$g$ animal has $H-g+1$ such positions---a linear ramp in $H$---so
+$B_H=V_H-2V_{H-1}+V_{H-2}$, and $V_H$ is rational with reduced denominator $N_H$.
+Hence $Q_H\mid N_{H-2}N_{H-1}N_H$ (a ``$\le 3$'' window, elementary and general),
+with equality once the atoms are coprime---each $N_H$ irreducible, which we verify
+for $H\le6$. The ``three'' is the width of the difference, not a feature of king
+adjacency: the rook, the king, and even the column-skipping knight all share
+lifetime three, with lattice-specific atoms. Two further integer sequences, both
+absent from OEIS, fall out: the orders $\deg Q_H=1,3,7,15,42,106,278,711,1897,5005$
+and the atom degrees $\deg N_H=1,2,4,9,29,68,181,\dots$ (each about $2.6$ times the
+last). The $\le 3$ window is rigorous; that the lifetime is \emph{exactly} three
+rests on the atom-irreducibility, verified but not proved.
+
 \paragraph{Hole-resolved.}
 Refining by hole count makes each fixed-$(H,k)$ row C-finite as well: $G_{H,k}(x)$
 is the $[q^k]$ coefficient of a rational bivariate $G_H(x,q)$, hence rational. A
