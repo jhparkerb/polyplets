@@ -1,0 +1,11 @@
+%I Axxxxxh
+%S Axxxxxh 1,4,16,61,221,766,2566,8390,26982
+%N Axxxxxh Number of fixed HV-convex polyplets with n cells: king-move animals (A006770) every row and every column of which is a contiguous (gap-free) run of cells.
+%C Axxxxxh A polyplet (polyking) is a set of unit cells connected through edges or corners. HV-convex = horizontally and vertically convex: in each occupied row the cells form a single gap-free run, and likewise in each occupied column. Because polyplet cells need only be king-connected (not edge-connected), this class is strictly larger than HV-convex polyominoes -- e.g. a two-cell diagonal is an HV-convex polyplet but not a polyomino.
+%C Axxxxxh "Fixed" means counted up to translation only (not rotation or reflection), as in A006770. Computed by exhaustive enumeration of all fixed polyplets via canonical growth, with the per-size totals verified against A006770 through n=9 (experiments/convex_polyplets.py). - _Jason H Parker_, 2026
+%e Axxxxxh a(2)=4: the two cells placed horizontally, vertically, or along either diagonal -- each row and column is a run of length 1 or 2.
+%e Axxxxxh a(3)=16: of the 20 fixed 3-cell polyplets (A006770(3)=20), the four "bent" placements that leave a gap in some row or column (e.g. cells at (0,0),(1,1),(2,0): row 0 occupies x=0 and x=2 with a hole at x=1) are not HV-convex; the other 16 are.
+%Y Axxxxxh Cf. A006770 (all fixed polyplets), A030222 (free polyplets). HV-convex polyomino analogue (edge-connected version) is the corresponding restriction of A001168.
+%K Axxxxxh nonn
+%O Axxxxxh 1,2
+%A Axxxxxh _Jason H Parker_, 2026
