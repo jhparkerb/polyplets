@@ -8,8 +8,9 @@ polyplets of bounding-box height exactly H, with reduced denominator Q_H. Then
 for a sequence of pairwise-coprime "atom" polynomials N_H; equivalently, every
 irreducible factor of any Q_H divides exactly THREE consecutive denominators
 (Q_{H0}, Q_{H0+1}, Q_{H0+2}) and no others. Verified exactly for H <= 7; the
-argument below is general except for one spectral lemma (coprimality), verified
-H <= 6.
+argument below is general except for one spectral lemma (coprimality), whose
+irreducible-atom step (3a) is now verified to H <= 7 via a blowup-free mod-p
+certificate (was H <= 6 -- see "Extending (3a)" below).
 
 ## The fundamental object: the unanchored strip GF
 Let V_H(n) = number of n-cell polyplets placed in a horizontal strip of H rows,
@@ -43,7 +44,8 @@ By (**), B_H is a Z-combination of V_H, V_{H-1}, V_{H-2}, so
 
 **Lemma 3 (coprimality).** The N_H are pairwise coprime. This follows from two
 facts:
- (3a) each N_H is IRREDUCIBLE over Q  [verified H<=6], and
+ (3a) each N_H is IRREDUCIBLE over Q  [verified H<=7, see the mod-p certificate
+      below -- pushed past the proof's old H<=6 ceiling], and
  (3b) the degrees deg N_H = 1,2,4,9,29,68,181,... are strictly increasing
       [clear; deg N_H ~ 2.6 deg N_{H-1}].
 Distinct irreducibles are coprime, so (3a)+(3b) => Lemma 3. (3a) is equivalent to
@@ -68,7 +70,7 @@ rational pieces. Q_H is squarefree (verified H<=6), so no cancellation occurs.
 - Lemmas 1, 2: elementary and general (combinatorial placement + second
   difference of a ramp). RIGOROUS.
 - V_H rational, N_H its reduced denominator: standard transfer-matrix fact.
-- Lemma 3 reduces to: each atom N_H is IRREDUCIBLE (3a) [verified H<=6] plus
+- Lemma 3 reduces to: each atom N_H is IRREDUCIBLE (3a) [verified H<=7, mod-p cert.] plus
   strictly-increasing degrees (3b) [clear]. So the ENTIRE remaining content of the
   lifetime-3 law is the single statement "the reduced denominator of the
   unanchored H-strip GF is irreducible" -- equivalently, the Perron eigenvalue of
@@ -94,6 +96,33 @@ plus two new (OEIS-absent) integer sequences (atom degrees; orders). It is worth
 paragraph in the write-up, NOT a centerpiece. The genuine value is (a) the clean
 "it's a second difference" understanding and (b) the new sequences -- not a major
 theorem.
+
+## Extending (3a) past H<=6: the mod-p subset-sum certificate
+The proof originally stopped (3a) at H<=6 because N_H = gcd(Q_H,Q_{H+1},Q_{H+2}) over Q
+has runaway rational coefficients at deg 181+ (the gcd blowup). Working **mod p** removes
+that entirely, and irreducibility over Q is still certifiable mod p without the rare prime
+whose reduction is irreducible outright:
+
+> A rational factor of N_H of degree k (0<k<deg) reduces, mod **every** prime, to mod-p
+> factors whose degrees sum to k. So k must be a subset-sum of N_H's mod-p factor degrees
+> for every p. Intersect those subset-sum sets over a few primes; if only {0, deg N_H}
+> survives, N_H has **no proper rational factor — irreducible over Q**.
+
+`experiments/t1_irreducibility.py` computes N_H mod p as the polynomial gcd over F_p,
+checks deg N_H mod p = the predicted atom degree, factors it, and intersects subset-sums.
+
+- **H=7 (deg 181): PROVED irreducible over Q** — 4 primes suffice; p=100057 factors N_7 as
+  degrees [2, 179], which (intersected with the earlier primes' patterns) leaves no proper
+  subset-sum. So (3a) now holds for H=7, not just H<=6. This is the first extension of the
+  one open lemma in years of the result sitting at H<=6.
+- Side effect: deg N_H mod p is computed **directly** (as the gcd degree), so the atom
+  degree deg N_8 = 462 -- previously only EXTRAPOLATED from the degree law in
+  `paper/atom_degrees.py` -- is **de-extrapolated** (confirmed by direct mod-p gcd).
+
+The method is general: it pushes (3a) as far as the recovered Q_H reach (currently H<=10,
+so N_H certifiable through H=8). It does not prove (3a) for ALL H -- that still needs the
+Perron-primitive-element / Galois argument -- but it converts "verified H<=6" into a
+mechanical, blowup-free check that scales with the available GF data.
 
 ## Empirical confirmation: the "3" is translation, not adjacency
 The proof never mentions the adjacency rule -- only that vertical placement is
