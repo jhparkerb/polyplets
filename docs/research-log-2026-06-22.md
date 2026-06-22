@@ -13,6 +13,14 @@ Status key: ☐ idea · ⚔ refute-attempted · ✓ survived refute · ✗ refut
 
 ## Deliverables (leverage map) — what shipped today, separable or stackable
 
+**Honest framing:** R1/R2/R3 are NOT new ideas — they are Phases 1–3 of
+`docs/frontier-revision-plan.md` (R1 = its Phase 3.1 vertical-flip fold, flagged there
+as "the single most error-prone change"; R2+R3 = its verbatim "ranged + u32-modp + CRT
+confirmable-a(22) recipe"). Today's contribution is **executing, gating, measuring, and
+confirming-they-stack** — turning a written plan into validated code with measured
+wins. The one genuinely new result is **T4** (the explicit polyplet λ bound +
+tightening — not in any plan).
+
 Three **independent, composable** reach memory-levers (each gated against the exact
 engine; orthogonal by construction — R1 canonicalizes the Sig *key*, R3 changes the
 count *type*, R2 changes the row *storage*):
