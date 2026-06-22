@@ -129,6 +129,27 @@ these lean that way. Tagged by cost. **B1 already computed** (the demonstration)
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~17:30 — brainstorm round 2 worked: 3 keepers + 2 honest negatives
+Worked the round-2 ideas on per-topic branches (merge the best at 8pm ET).
+- **B1 ★ — min-n(k) = fewest cells for k holes** [`explore/seq-minhole-cells`]: OEIS draft
+  staged, 4,6,8,9,11,12,14,15,16,18,19,20,22,23,24,25 (inverse of the proven
+  maxh=n+1−A027709(n)/2). *Also caught + fixed a hand-typed A027709 error* that had
+  corrupted the maxh-count draft / note tabulations past n=10 (formula+proof were fine).
+- **T6 ★ — diagonal-contact density c ≈ 0.743** [`explore/theorem-contact-density`]: a new
+  lattice constant; mean #contacts of a uniform n-cell polyplet ~ 0.743·n (first differences
+  of the mean converge cleanly). Rigorous value via a contact-marked TM is future work.
+- **B2 ★ — symmetry premium** [`explore/theorem-sym-maxhole`]: the maxhole optimum is always
+  symmetric (M_sym=M(n)); conjecture **M_asym(n)=M(n−1)** (the best asymmetric n-cell shape
+  is one diamond-step behind), verified n≤9, lower bound constructive.
+- **B3 ✗ (honest negative)** [`explore/seq-king-perimeter`]: min king-perimeter(n) =
+  A027709(n)+4 — a clean king-vs-rook isoperimetric identity, but a trivial shift, so NOT a
+  new sequence. Recorded as an identity, not staged.
+- **maxhole-optimal multiplicity ✗** [`explore/seq-maxhole-mult`]: 1,16,4,4,1,4 — irregular,
+  not a clean sequence. (Datum: the n=8 diamond is the UNIQUE optimum.)
+- **T7 skipped** (the λ tree-bound is fundamentally loose; deeper memory only nudges 16.63).
+  **C1 deferred** — H=11 GF recovery (deg ≈13000, ~26k mod-p terms + BM) is a ~1–2h job;
+  noted as launchable (would extend orders/atoms to H=11 and unlock the (3a) check at H=9).
+
 ### 2026-06-22 ~16:30 — T1 (the "hard" one) ADVANCED: lifetime-3 lemma (3a) to H≤8 [explore/theorem-t1-irreducibility]
 - T1's only open content is lemma (3a) "the unanchored-strip atom N_H is irreducible over
   Q", stuck at **H≤6** because N_H = gcd(Q_H,Q_{H+1},Q_{H+2}) over Q has runaway rational
