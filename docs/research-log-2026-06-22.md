@@ -96,7 +96,13 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
   beating every multi-hole split (`docs/total-hole-area.md`). Same (u,v) proof applied to
   the holes' *union* (outer boundary ⇒ a_union+c_union ≤ n−4). Verified n≤9
   (`experiments/multihole.py`); per-k M_k(n) non-monotone (M_3(9)=3<M_4(9)=4), no closed
-  form — only the total is clean. A 5th piece of new mathematics today.
+  form — only the total is clean.
+- **maxh(n) PROVEN** (max hole COUNT, the opposite extremal): via Pick's theorem on the
+  even sublattice (≅ rotated unit square lattice; 1-cell holes = interior vertices),
+  **maxh(n) = n + 1 − A027709(n)/2** (A027709 = min polyomino perimeter). Matches brute
+  force n≤9; extends 10..16 = 4,4,5,6,6,7,9. Single diamond maximizes hole AREA (~n²/8),
+  even-sublattice min-perimeter polyomino maximizes hole COUNT (~n). **Two more proven
+  theorems** (M_total, maxh) — six pieces of new mathematics today.
 - **Style:** purged every leading-`\n` in strings across all my today's scripts; saved
   the (strong) preference to memory. (jasonp pet peeve.)
 
