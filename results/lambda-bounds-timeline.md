@@ -31,3 +31,18 @@ papers, or web/percolation searches; (2) ours uses n<=20, more terms than the be
 enumeration (n<=18), so it is plausibly the sharpest current estimate; (3) I have not seen the
 Rands-Welsh / ancestor-exclusion bounds applied to the king lattice specifically. Treat all of the
 above as "no published value located," NOT a priority claim.
+
+## Per-publication view (best estimate = ratio of the two largest terms that paper establishes)
+| Year | Lower | Best estimate (a_n/a_{n-1}) | Upper | Publication (max n) |
+|------|-------|------------------------------|-------|---------------------|
+| 1990 | 6.387 | 6.621 | --    | Mertens, fast enumeration algorithm (n=14) |
+| 2024 | 6.516 | 6.727 | --    | Tremblay-Vernay, generation of discrete figures (n=18) |
+| 2026 | 6.540 | 6.747 | 15.83 | this work (n=19, confirmed) |
+| 2026 | 6.563 | 6.765 | 15.83 | this work (n=20, candidate) |
+
+True value lambda ~ 7.12-7.155. Best-estimate column = raw consecutive ratio (trivial; what each
+paper de-facto established). Lower column = Rands-Welsh bound those same terms SUPPORT (deterministic
+in the data) -- but the pre-2026 rows are RETROACTIVE: Mertens and Tremblay-Vernay published only the
+counts, no bound was drawn until this work. Upper = ancestor-exclusion (method-based, not term-based),
+so it appears only when computed (2026). Both estimate and lower bound approach lambda from below as
+terms are added; the upper bound is the weak side.
