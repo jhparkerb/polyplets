@@ -46,3 +46,15 @@ in the data) -- but the pre-2026 rows are RETROACTIVE: Mertens and Tremblay-Vern
 counts, no bound was drawn until this work. Upper = ancestor-exclusion (method-based, not term-based),
 so it appears only when computed (2026). Both estimate and lower bound approach lambda from below as
 terms are added; the upper bound is the weak side.
+
+## Prior qualitative handle: Mertens-Lautenbacher 1991, p.670
+Their introduction DOES reference the growth constant: "The time required for a complete
+enumeration of lattice animals up to a size s grows roughly like ~ lambda^s, where lambda is
+somewhat below the coordination number of the lattice." For the king lattice the coordination
+number z = 8 (the 8 king-moves), so this is a QUALITATIVE statement lambda < ~8. Our 7.12-7.15
+(= 0.89*z) is consistent and makes it QUANTITATIVE. So the literature had a qualitative handle
+(lambda ~ somewhat below 8) -- we are not "first to consider lambda," only first to pin a number
++ a rigorous bracket. Caveats: it's a timing heuristic, and lambda < z is NOT rigorous (square:
+lambda=4.06 > z=4, slightly above; holds for triangular 5.18<6 and king 7.1<8). Notably this
+heuristic (~8) is far closer to the truth than our rigorous UPPER bound (15.83) -- underscoring
+that the upper side is loose and a real upper-bound method landing near ~8 would be the new win.
