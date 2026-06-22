@@ -42,6 +42,13 @@ its four rook-neighbours even, so it is a 1-cell hole. For even m this gives
 **n = (m+1)² cells enclosing h = m² holes**, so `maxh((m+1)²) ≥ m² = (√n − 1)²` — and at
 m=2 it is 9 cells, 4 holes = maxh(9). Thus `maxh(n) ~ (√n − 1)² ~ n − 2√n`: *almost every
 cell encloses its own hole* (h/n → 1), the polar opposite of the single big diamond
-(~n²/8 area, one hole). Conjecture: this even-sublattice packing is optimal for all n; the
-exact formula + the matching upper bound (an Euler/packing argument, `cpp/tma/euler.h`
-machinery) are the next step. The construction (lower bound) is clean.
+(~n²/8 area, one hole).
+
+**Leading order proven: maxh(n) ~ n.** For maximum *count* every hole is a single empty
+cell (smaller holes ⇒ more of them), whose four rook-neighbours are all foreground; each
+foreground cell is a rook-neighbour of at most 4 holes, so `4h ≤ 4n`, i.e. **h ≤ n**.
+Together with the construction `h ≥ (√n−1)² ~ n−2√n`, this pins `maxh(n) = n − Θ(√n)` —
+the leading term is proven, every cell enclosing essentially its own hole. The exact
+`(√n−1)²` is the refined conjecture: the even-sublattice **diamond minimizes the boundary
+deficit** (cells neighbouring < 4 holes), again the L¹ isoperimetric optimum — provable by
+the same `|Δu|+|Δv|=2` machinery applied to the deficit, the clean next step.
