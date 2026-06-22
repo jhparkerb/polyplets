@@ -123,6 +123,13 @@ struct Counter {
   int kStride = 0;
   std::vector<int> symX, symY, symTX, symTY; // scratch for the D4 symmetry check
 
+  // optional (size, #diagonal-contacts) distribution (--contacts). A diagonal contact is a
+  // king-but-not-rook adjacency: a pair of cells at offset (+-1,+-1). Density test (c=3/4?).
+  bool contactsCheck = false;
+  std::vector<u64> byContacts;
+  int contactStride = 0;
+  int diagOff[4] = {0};                      // the 4 diagonal neighbour deltas (grid-index)
+
   static int findp(int* p, int x) { while (p[x] != x) { p[x] = p[p[x]]; x = p[x]; } return x; }
 
   // Connected components of the current animal under the given 4 offsets.
@@ -262,11 +269,13 @@ struct Counter {
     reachedUndo.reserve(static_cast<size_t>(maxn) * deg + 8);
     bySize.assign(maxn + 1, 0);
     byBox.assign((maxn + 1) * (maxn + 1) * (maxn + 1), 0);
-    if (connCheck || perimCheck || holesCheck || maxHoleCheck) {
+    if (connCheck || perimCheck || holesCheck || maxHoleCheck || contactsCheck) {
       inAnimal.assign(cells, 0);
       placed.clear();
       placed.reserve(maxn + 1);
       rookOff[0] = 1; rookOff[1] = -1; rookOff[2] = gridW; rookOff[3] = -gridW;
+      diagOff[0] = gridW + 1; diagOff[1] = gridW - 1;
+      diagOff[2] = -gridW + 1; diagOff[3] = -gridW - 1;
     }
     if (connCheck) {
       rookConn.assign(maxn + 1, 0);
@@ -295,6 +304,10 @@ struct Counter {
       kStride = maxn + 1;
       maxAreaByK.assign(static_cast<size_t>(maxn + 1) * kStride, 0);
       maxAreaAsym.assign(maxn + 1, 0);
+    }
+    if (contactsCheck) {
+      contactStride = 4 * maxn + 1;            // #diagonal contacts <= 2*size <= 2*maxn
+      byContacts.assign(static_cast<size_t>(maxn + 1) * contactStride, 0);
     }
   }
 
@@ -349,6 +362,13 @@ struct Counter {
       const int perim = 4 * size - adjsum;       // exposed unit edges
       byPerim[size * perimStride + perim] += 1;
     }
+    if (contactsCheck) {
+      int diagsum = 0;
+      for (int i = 0; i < size; ++i)
+        for (int k = 0; k < 4; ++k)
+          if (inAnimal[placed[i] + diagOff[k]]) ++diagsum;
+      byContacts[static_cast<size_t>(size) * contactStride + diagsum / 2] += 1;  // pair = 2
+    }
     if (holesCheck) {
       byHoles[size * holeStride + countHoles()] += 1;
     }
@@ -383,7 +403,7 @@ struct Counter {
       if (x > maxx) maxx = x;
       if (y > maxy) maxy = y;
       ++size;
-      if (connCheck || perimCheck || holesCheck || maxHoleCheck) {
+      if (connCheck || perimCheck || holesCheck || maxHoleCheck || contactsCheck) {
         inAnimal[j] = 1; placed.push_back(j);
         if (connCheck) pidx[j] = size - 1;
       }
@@ -421,7 +441,7 @@ struct Counter {
 
       // unplace; (x,y) keeps status 1 so later iterations and deeper
       // levels of this loop never re-add it -- the tried-set rule
-      if (connCheck || perimCheck || holesCheck || maxHoleCheck) { inAnimal[placed.back()] = 0; placed.pop_back(); }
+      if (connCheck || perimCheck || holesCheck || maxHoleCheck || contactsCheck) { inAnimal[placed.back()] = 0; placed.pop_back(); }
       --size;
       minx = sminx; maxx = smaxx; maxy = smaxy;
     }
@@ -473,6 +493,8 @@ int main(int argc, char** argv) {
       c.maxHoleCheck = true; c.maxHole8 = true;
     } else if (std::strcmp(argv[i], "--maxhole-strat") == 0) {
       c.maxHoleCheck = true; c.maxHoleStrat = true;
+    } else if (std::strcmp(argv[i], "--contacts") == 0) {
+      c.contactsCheck = true;
     } else if (std::strcmp(argv[i], "--split") == 0 && i + 3 < argc) {
       c.splitS  = std::atoi(argv[i + 1]);
       c.splitK  = std::strtoull(argv[i + 2], nullptr, 10);
@@ -526,6 +548,14 @@ int main(int argc, char** argv) {
         const u64 v = c.byHoles[n * c.holeStride + h];
         if (v) std::printf("%d %d %llu\n", n, h,
                            static_cast<unsigned long long>(v));
+      }
+  } else if (c.contactsCheck) {
+    // "n  contacts  count"; sum over contacts of count == bySize[n]. Total diagonal contacts
+    // and the per-cell density c (= mean #contacts / n -> ?) follow from this distribution.
+    for (int n = 1; n <= c.maxn; ++n)
+      for (int d = 0; d < c.contactStride; ++d) {
+        const u64 v = c.byContacts[static_cast<size_t>(n) * c.contactStride + d];
+        if (v) std::printf("%d %d %llu\n", n, d, static_cast<unsigned long long>(v));
       }
   } else if (c.maxHoleStrat) {
     // "n M(n) M_asym(n) M_1(n) M_2(n) ..."  (M_asym = max hole area over asymmetric

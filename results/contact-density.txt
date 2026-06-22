@@ -1,0 +1,10 @@
+# Diagonal-contact density of polyplets: c ~ 0.742, NOT 3/4.
+# build/g2 square8 N --contacts  (exact distribution "n d count"; n<=14 here, fast -- no flood).
+# Total diagonal contacts (verified vs the n<=9 brute force 0,2,24,212,1700,13050,97856,723522,5300980):
+#   n=10..14: 38596432, 279766956, 2021191858, 14565432968, 104757627096
+# Mean #contacts/animal, first differences -> the density c:
+#   n :  2      3      4      5      6      7      8      9     10     11     12     13     14
+#   d : .5000 .7000 .7273 .7373 .7410 .7423 .7428 .7428 .7428 .7426 .7425 .7423 .7422
+# The differences PEAK at ~0.7428 (n=8-10) then DECLINE -> c ~ 0.742. The tempting c=3/4=0.75
+# conjecture is REFUTED: the diagonal-contact density is ~0.742, not a nice fraction. (The
+# earlier n<=9 estimate 0.743 sat right at the peak, which is why it looked headed for 3/4.)
