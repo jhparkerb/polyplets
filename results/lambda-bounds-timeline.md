@@ -18,3 +18,16 @@ Series ESTIMATE (not a bound): lambda ~ 7.12-7.155 (2D lattice-animal universali
 Current rigorous interval: **[6.54, 15.83]**. The lower bound climbs toward lambda with each new
 a(n) term (Rands-Welsh: 6.42 @ n<=15, 6.49 @ 17, 6.54 @ 19); the upper bound is the weak side and
 needs a different method to tighten. Scripts: experiments/lambda_lower_bound.py, lambda_series.py.
+
+## Correction (2026-06-22): "first" overclaim withdrawn
+Computing lambda from a(n)/a(n-1) is trivial, so a priority claim is unwarranted -- an informal
+lambda ~ 7 very likely exists somewhere not surfaced here. Honest nuance: the communities holding
+king-lattice data optimized DIFFERENT quantities. Percolation work targets the threshold p_c
+(Mertens 1990 even tabulates the nnSquare mean-cluster-size series S(p)=sum b_r p^r, but its
+singularity is p_c, NOT 1/lambda); the enumeration papers report only counts. So the *animal
+growth constant* lambda may be genuinely under-attended for the king lattice -- but that is not
+"first". Defensible claims only: (1) no lambda VALUE was found in OEIS, the Mertens enumeration
+papers, or web/percolation searches; (2) ours uses n<=20, more terms than the best PUBLISHED
+enumeration (n<=18), so it is plausibly the sharpest current estimate; (3) I have not seen the
+Rands-Welsh / ancestor-exclusion bounds applied to the king lattice specifically. Treat all of the
+above as "no published value located," NOT a priority claim.

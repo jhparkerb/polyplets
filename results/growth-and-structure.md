@@ -82,3 +82,16 @@ published growth constant for the king lattice. Our lambda ~ 7.12-7.155, rigorou
 [6.54, 15.83], and the Rands-Welsh lower bound 6.540 are -- as far as the OEIS references and an
 exhaustive web search show -- the FIRST characterization of it. (The theta=1 universality FORM
 remains known/expected per Jensen-Guttmann; the king VALUE and bounds are the novel part.)
+
+## Correction (2026-06-22): "first" overclaim withdrawn
+Computing lambda from a(n)/a(n-1) is trivial, so a priority claim is unwarranted -- an informal
+lambda ~ 7 very likely exists somewhere not surfaced here. Honest nuance: the communities holding
+king-lattice data optimized DIFFERENT quantities. Percolation work targets the threshold p_c
+(Mertens 1990 even tabulates the nnSquare mean-cluster-size series S(p)=sum b_r p^r, but its
+singularity is p_c, NOT 1/lambda); the enumeration papers report only counts. So the *animal
+growth constant* lambda may be genuinely under-attended for the king lattice -- but that is not
+"first". Defensible claims only: (1) no lambda VALUE was found in OEIS, the Mertens enumeration
+papers, or web/percolation searches; (2) ours uses n<=20, more terms than the best PUBLISHED
+enumeration (n<=18), so it is plausibly the sharpest current estimate; (3) I have not seen the
+Rands-Welsh / ancestor-exclusion bounds applied to the king lattice specifically. Treat all of the
+above as "no published value located," NOT a priority claim.
