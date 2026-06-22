@@ -7,6 +7,18 @@ slow, but unbounded. **B is precisely its seam**: B already drains the db store 
 partition at a time and frees each; Phase 4 just *spills to disk* instead of freeing, and
 *streams back* instead of holding everything resident.
 
+> **STATUS: IMPLEMENTED + GATED** (`cpp/tma/sweep8_ooc.h`, `cpp/tma_ooc_test.cpp`,
+> `tests/gate_ooc.py`, `make gate-ooc`). db and next live as S partition files; per column
+> the db partitions are streamed in one at a time (harvest + transitions append
+> `(target,row)` contributions to S spill files), then each spill is reduced into a
+> RAM-sized FlatDB and written back as the next partition, then swapped by rename. Only
+> ~one partition is resident at a time → peak RAM ≈ peak/S. Verified: out-of-core a(n) ==
+> exact A006770 (n≤10) **and independent of S** (S=4 ≡ S=16, byte-identical), scratch
+> self-cleaning. The reduce is `addCounts` exactly (duplicate-Sig contributions sum via
+> `slot()`), so it composes with R1/R2/R3 unchanged. Serial + naive I/O (a per-record row
+> buffer, S open spill files) — correct first; production tuning (buffered/batched
+> records, larger S with a file-handle pool, overlap I/O with compute) is the next pass.
+
 ## Feasibility — already established
 A FlatDB partition round-trips to disk **byte-identically**: `cpp/tma/checkpoint.h`
 (`tmaCkptSave`/`tmaCkptLoad`) serializes the live `(Sig, counts-row)` set with an atomic

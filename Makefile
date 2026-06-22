@@ -11,10 +11,10 @@ GIT_DIRTY  := $(shell test -n "$$(git status --porcelain 2>/dev/null)" && echo -
 BUILD_TIME := $(shell date +%Y-%m-%dT%H:%M:%S%z)
 CXXFLAGS += -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
 
-.PHONY: gates gate-g1 gate-g2 gate-euler clean
+.PHONY: gates gate-g1 gate-g2 gate-euler gate-ooc clean
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-g3 gate-tma gate-s2 gate-e0 gate-sym gate-euler
+gates: gate-g1 gate-g2 gate-g3 gate-tma gate-s2 gate-e0 gate-sym gate-euler gate-ooc
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
@@ -74,6 +74,15 @@ build/tma_asan: cpp/tma_main.cpp cpp/tma/*.h | build
 # hash-partition as drained -> peak ~1x (next) not ~2x; ~1.94x RSS at N=14.
 build/tma_blocked_test: cpp/tma_blocked_test.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_blocked_test.cpp -o $@
+
+# Phase 4: out-of-core sweep (tests/gate_ooc.py). db/next live as S disk partitions,
+# ~one resident at a time -> RAM ~ peak/S, reach bounded by disk not RAM. Gate: OOC
+# a(n) == exact A006770 AND independent of the partition count S.
+gate-ooc: build/tma_ooc_test
+	python3 tests/gate_ooc.py
+
+build/tma_ooc_test: cpp/tma_ooc_test.cpp cpp/tma/*.h | build
+	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
 build/tma_tsan: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=thread \
