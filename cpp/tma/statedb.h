@@ -71,6 +71,16 @@ struct FlatDB {
   size_t size() const { return cnt; }
   bool empty() const { return cnt == 0; }
   void clear() { std::fill(used.begin(), used.end(), 0); cnt = 0; }
+  // Release the big arrays back to the OS (down to a minimal reusable state). The
+  // blocked sweep frees each db partition the moment it has been drained, so the peak
+  // is ~1x (next) instead of db+next ~2x. clear() only resets the used flags (keeps
+  // memory); freeMem() actually returns it.
+  void freeMem() {
+    keys = std::vector<Sig>(16);
+    vals = std::vector<u64>(16 * stride);
+    used = std::vector<uint8_t>(16, 0);
+    cap = 16; cnt = 0;
+  }
 
   // Pre-size (on a fresh/empty store) to hold ~nStates without growing. grow()
   // moves the old arrays aside and allocates the new 2x arrays before freeing the

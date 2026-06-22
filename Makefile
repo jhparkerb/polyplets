@@ -70,6 +70,11 @@ build/tma_asan: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer -pthread cpp/tma_main.cpp -o $@
 
+# Phase 3.2: blocked drain-and-free store test (tests/gate_blocked.py). Frees each db
+# hash-partition as drained -> peak ~1x (next) not ~2x; ~1.94x RSS at N=14.
+build/tma_blocked_test: cpp/tma_blocked_test.cpp cpp/tma/*.h | build
+	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_blocked_test.cpp -o $@
+
 build/tma_tsan: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -g -O1 -fsanitize=thread \
 	    -fno-omit-frame-pointer -pthread cpp/tma_main.cpp -o $@
