@@ -33,6 +33,7 @@ real OEIS contributor name before any submission.
 | A006770 (fixed) | extend: +a(19) confirmed; a(20) candidate, cross-ISA confirmation running |
 | A030222 (free) | extend: +a(18),a(19) confirmed |
 | A030233 (one-sided) | extend: +a(18),a(19) confirmed |
+| A194596 (free, non-polyomino) | extend: +a(18),a(19) confirmed (= A030222 - A000105, per the entry's own formula); a(20)=128193840456415 candidate |
 | A030234/A030235 (symmetric) | pending: verify our bilateral-symmetry counts first |
 | draft hole triangle T(n,k) | new (4-bg convention), **exact through n=18; rows n=15..18 cross-ISA confirmed** |
 | draft A_0 (hole-free), A_1 (one-hole) | new, **novelty-confirmed via Superseeker (2026-06-19)**; b-files `b-draft-A0-holefree.txt` (n=1..18), `b-draft-A1-onehole.txt` (n=4..18), **n=15..18 cross-ISA confirmed**; submission-ready. These ARE columns k=0,1 of the triangle (standalone per the OEIS triangle+headline-columns idiom; A_2,A_3,... are NOT minted separately) |
