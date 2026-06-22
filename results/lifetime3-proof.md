@@ -9,8 +9,9 @@ for a sequence of pairwise-coprime "atom" polynomials N_H; equivalently, every
 irreducible factor of any Q_H divides exactly THREE consecutive denominators
 (Q_{H0}, Q_{H0+1}, Q_{H0+2}) and no others. Verified exactly for H <= 7; the
 argument below is general except for one spectral lemma (coprimality), whose
-irreducible-atom step (3a) is now verified to H <= 7 via a blowup-free mod-p
-certificate (was H <= 6 -- see "Extending (3a)" below).
+irreducible-atom step (3a) is now verified to H <= 8, and squarefreeness of Q_H
+to H <= 10, via blowup-free mod-p certificates (both were H <= 6 -- see
+"Extending (3a)" below).
 
 ## The fundamental object: the unanchored strip GF
 Let V_H(n) = number of n-cell polyplets placed in a horizontal strip of H rows,
@@ -44,7 +45,7 @@ By (**), B_H is a Z-combination of V_H, V_{H-1}, V_{H-2}, so
 
 **Lemma 3 (coprimality).** The N_H are pairwise coprime. This follows from two
 facts:
- (3a) each N_H is IRREDUCIBLE over Q  [verified H<=7, see the mod-p certificate
+ (3a) each N_H is IRREDUCIBLE over Q  [verified H<=8, see the mod-p certificate
       below -- pushed past the proof's old H<=6 ceiling], and
  (3b) the degrees deg N_H = 1,2,4,9,29,68,181,... are strictly increasing
       [clear; deg N_H ~ 2.6 deg N_{H-1}].
@@ -64,19 +65,19 @@ deg Q_H = deg N_H+deg N_{H-1}+deg N_{H-2}) is the statement that the second diff
 H<=5: for each atom N_k the three partial-fraction residues of G_k, G_{k+1},
 G_{k+2} over N_k sum to zero -- i.e. every atom-pole CANCELS in the full GF
 a(x) = sum_H G_H, which is why a(x) (believed non-D-finite) is not a tame sum of
-rational pieces. Q_H is squarefree (verified H<=6), so no cancellation occurs.
+rational pieces. Q_H is squarefree (verified H<=10, mod-p), so no cancellation occurs.
 
 ## Status
 - Lemmas 1, 2: elementary and general (combinatorial placement + second
   difference of a ramp). RIGOROUS.
 - V_H rational, N_H its reduced denominator: standard transfer-matrix fact.
-- Lemma 3 reduces to: each atom N_H is IRREDUCIBLE (3a) [verified H<=7, mod-p cert.] plus
+- Lemma 3 reduces to: each atom N_H is IRREDUCIBLE (3a) [verified H<=8, mod-p cert.] plus
   strictly-increasing degrees (3b) [clear]. So the ENTIRE remaining content of the
   lifetime-3 law is the single statement "the reduced denominator of the
   unanchored H-strip GF is irreducible" -- equivalently, the Perron eigenvalue of
   the strip transfer matrix is a primitive element of the reduced-GF number field.
   A clean Perron-Frobenius / Galois target.
-- squarefreeness of Q_H (no second-difference cancellation): VERIFIED H<=6;
+- squarefreeness of Q_H (no second-difference cancellation): VERIFIED H<=10 (mod-p);
   follows once the three atoms are coprime (3a+3b) and each genuinely appears.
 
 **Punchline.** The "3" is the width of a second finite difference: a height-exactly
@@ -111,16 +112,23 @@ whose reduction is irreducible outright:
 `experiments/t1_irreducibility.py` computes N_H mod p as the polynomial gcd over F_p,
 checks deg N_H mod p = the predicted atom degree, factors it, and intersects subset-sums.
 
-- **H=7 (deg 181): PROVED irreducible over Q** — 4 primes suffice; p=100057 factors N_7 as
-  degrees [2, 179], which (intersected with the earlier primes' patterns) leaves no proper
-  subset-sum. So (3a) now holds for H=7, not just H<=6. This is the first extension of the
-  one open lemma in years of the result sitting at H<=6.
-- Side effect: deg N_H mod p is computed **directly** (as the gcd degree), so the atom
-  degree deg N_8 = 462 -- previously only EXTRAPOLATED from the degree law in
-  `paper/atom_degrees.py` -- is **de-extrapolated** (confirmed by direct mod-p gcd).
+- **H=7 (deg 181): PROVED irreducible over Q** — 4 primes; p=100057 factors N_7 as degrees
+  [2, 179], collapsing the surviving subset-sums to none.
+- **H=8 (deg 462): PROVED irreducible over Q** — 4 primes; the subset-sums fall 30 -> 6 ->
+  2 -> 0, p=100057 giving [3, 25, 55, 70, 309]. So (3a) now holds **H<=8**, not just H<=6.
+- Side effect: deg N_H mod p is computed **directly** (as the gcd degree), so deg N_8 = 462
+  -- previously only EXTRAPOLATED from the degree law in `paper/atom_degrees.py` -- is
+  **de-extrapolated** (direct mod-p gcd).
 
-The method is general: it pushes (3a) as far as the recovered Q_H reach (currently H<=10,
-so N_H certifiable through H=8). It does not prove (3a) for ALL H -- that still needs the
+**Squarefreeness** (the proof's other H<=6 claim) extends even further, and trivially:
+Q_H squarefree <=> gcd(Q_H, Q_H') constant, and squarefree mod p => squarefree over Q.
+Checked for **all H<=10** (every recovered denominator) -- all squarefree. So the only
+content not yet pinned for the recovered range is reduced to nothing extra: with (3a) and
+squarefreeness both holding to the data's edge, lifetime-3 is fully verified H<=8 and the
+"<=3 window" half is general.
+
+The method is general: it pushes (3a) as far as the recovered Q_H reach (H<=10, so N_H
+certifiable through H=8). It does not prove (3a) for ALL H -- that still needs the
 Perron-primitive-element / Galois argument -- but it converts "verified H<=6" into a
 mechanical, blowup-free check that scales with the available GF data.
 
@@ -132,7 +140,7 @@ neighborhood is taller. A "reach-2" lattice (neighbors within +/-1 column and
 steps, a 5-row-tall neighborhood) gives DIFFERENT atoms:
     king    deg N_H = 1, 2, 4, 9, 29, 68, 181
     reach-2 deg N_H = 1, 2, 3, 5, 10, 17, 39
-yet the SAME lifetime 3 (deg Q_H = deg N_H+deg N_{H-1}+deg N_{H-2}, verified H<=7). If the
+yet the SAME lifetime 3 (deg Q_H = deg N_H+deg N_{H-1}+deg N_{H-2}, verified H<=8). If the
 "3" came from the neighborhood's vertical reach (2*reach+1), reach-2 would give
 lifetime 5; it gives 3. (gf_modp gained a vertical-reach parameter for this;
 rook -- cross-column same row only -- likewise gives lifetime 3, but rook doesn't

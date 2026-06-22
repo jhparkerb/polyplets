@@ -45,11 +45,24 @@ def subset_sums(degs):
     return reach
 
 
+# Q_H squarefree (the proof's other H<=6 claim): gcd(Q_H, Q_H') is constant. Squarefree
+# mod p => squarefree over Q (a square factor over Q would survive reduction at a good p).
+# Blowup-free, so it runs for every available H (here H<=10).
+def squarefree_check(p=100003):
+    print(f"Q_H squarefree mod p={p} (extends the proof's H<=6):")
+    for H in sorted(Q):
+        f = Pmod(Q[H], p)
+        sf = f.gcd(f.diff(x)).degree() == 0
+        print(f"  H={H:2d}: deg Q={len(Q[H]) - 1:4d}  squarefree: {sf}")
+
+
 # Rigorous mod-p irreducibility certificate: any rational factor of N_H of degree k
 # (0<k<deg) reduces, mod EVERY prime, to a set of mod-p factors whose degrees sum to k.
 # So k must be a subset-sum of the mod-p factor degrees for every prime. Intersect those
 # subset-sum sets over several primes; if only {0, deg} survive, N_H has no proper rational
 # factor -> IRREDUCIBLE over Q. (No need for the rare prime that is irreducible outright.)
+squarefree_check()
+print()
 targets = [int(a) for a in sys.argv[1:]] or [7]
 NPRIMES = 8
 for H in targets:
