@@ -131,6 +131,15 @@ these lean that way. Tagged by cost. **B1 already computed** (the demonstration)
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~19:30 ET -- R1xR3 reach engine DEPLOYED to production (gated end-to-end)
+On branch deploy/reach-modp: wired the plain-a(n) --modp + --fold path into tma_main.cpp (routes to
+sweepSquare8HeightModP, ~4x less RAM) + a CRT driver (scripts/an_modp_crt.sh: 3 primes near 2^31,
+per-height fold+modp sweeps -> a(n) mod p -> CRT -> exact a(n)). GATED: an_modp_crt.sh 12 --fold ==
+A006770 (n<=12) exactly; per-height modp+fold output == exact B_H(n) mod p. The R1(fold) x R3(u32
+mod-p) reach engine is production-ready. Remaining: compose B (blocked store, ->~8x total) +
+parallelize the (H,p) sweeps for the real run (gated on a(20) confirming).
+
+
 ### 2026-06-22 ~19:00 ET -- lambda UPPER bound tightened 15.83 -> 10.354 (verified)
 Eden/Klarner-Rivest spanning-encoding (Barequet-Shalah, arXiv:1906.11447): each non-root king cell
 encodes only its UNDETERMINED king-neighbors (need-set 5 diagonal / 3 edge) -> injection into
