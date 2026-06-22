@@ -131,6 +131,24 @@ these lean that way. Tagged by cost. **B1 already computed** (the demonstration)
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~18:30 ET -- three fresh hunts: hole-free growth gap, novel sequences, king p_c
+- **Hole-stratified growth (NEW, verify)**: the hole-free subclass A_0(n) grows STRICTLY SLOWER.
+  A_0(n)/a(n) decays EXPONENTIALLY ~0.978^n (decisive: RMS 2e-5 exponential vs 1.8e-3 stretched,
+  3.6e-3 power), so lambda_0 ~ 6.95 < lambda ~ 7.11. OPPOSITE the square lattice (where the
+  simply-connected subclass shares lambda, sub-exponential decay). [Decay fit robust; the
+  square-contrast premise should be double-checked.] Mean hole count E[k] ~ 0.023n (linear) ->
+  animals "typically holey" only around n >= 45.
+- **Novel OEIS sequences** (build/g2 statistics, each verified vs OEIS term-by-term): holes_zero
+  (hole-free count 1,4,20,109,622,3664,22094,135609,...), holes_one, box_square (square bounding
+  box), holes_maxh (max # distinct holes; distinct from A337601 at n=13) -- submission candidates.
+  Confirmed identities: max-hole AREA = round((n-2)^2/8) = A001971 shifted; max-perimeter polyplets
+  = A001168 (fixed polyominoes); min-perimeter = A027709.
+- **King site-percolation threshold (validation)**: p_c ~ 0.406 +/- 0.001 from Mertens' nnSquare
+  S(p) series (Dlog-Pade), exponent gamma ~ 43/18 -- MATCHES published 0.4071 (Malarz-Galam 2005,
+  Phys.Rev.E 71:016125). Clean cross-check of the king machinery; not novel (MC has more digits).
+- (gympie cleanup: killed an orphaned R2 `tma_rangestat 16 20` background job, 7h25m runaway.)
+
+
 ### 2026-06-22 ~18:00 ET -- lambda (growth constant) characterized; lit-check + epistemics
 - **Lit check** (papers/ now holds Mertens 1990 + Mertens-Lautenbacher 1991): NO published king
   growth constant. Both are enumeration-only. Mertens 1990 Table I = the A006770 source (king
