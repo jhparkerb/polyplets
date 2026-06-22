@@ -55,3 +55,18 @@ be retrieved here. NET: our 7.12-7.155 (n<=20, two methods) is consistent-with-u
 UNCONFIRMED against the literature value. TO CLOSE: obtain the Mertens 1990 king growth constant
 and check ours matches/improves it. (3 of the 4 thread-hunt findings turned out known/expected;
 the genuine keeper is the reach lever R1xR3xB -> ~+2.2 terms.)
+
+## Rigorous bounds on lambda (2026-06-22)
+- LOWER (NEW, narrowed): Rands-Welsh / concatenation argument on the confirmed n<=19 series --
+  the method Jensen used for the square lattice (tau >= 3.903). A*(u)=1/(1-P(u)) with
+  p_n=[u^n]P >= 0 (renewal, verified to n=19); the positive root u* of the truncated P_N(u)=1
+  gives lambda >= 1/u*. Result: **lambda >= 6.540** (n<=19, rigorous); 6.563 with the a(20)
+  candidate. IMPROVES with terms (6.424 @ n<=15, 6.488 @ 17, 6.540 @ 19) -> converges up to
+  lambda; a(21)/a(22) push it past ~6.6. Up from strip lambda_10 = 5.99 and Fekete
+  a(20)^(1/20) = 5.63. Script: experiments/lambda_lower_bound.py.
+- UPPER: lambda <= 15.83 (ancestor-exclusion, branch explore/theorem-lambda-bound, at its method
+  floor ~15.56). LOOSE -- 2.2x the estimate; the weak side. A polyomino-style twig/Eden upper
+  bound (~14% over truth on the square) would be the way to tighten it (-> ~8 if comparable).
+- RIGOROUS INTERVAL: [6.54, 15.83]; series ESTIMATE 7.12-7.155 sits just above the (now ~0.92*lambda)
+  lower bound. Narrowing further: more a(n) terms lift the lower bound; a better upper-bound method
+  is the open task.
