@@ -87,9 +87,11 @@ these lean that way. Tagged by cost. **B1 already computed** (the demonstration)
 
 *Sequences (mostly derivable, cheap):*
 - **B1 — min-n(k) = fewest cells to enclose k holes** = min{n : maxh(n) ≥ k}, the inverse
-  of today's proven `maxh(n)=n+1−A027709(n)/2`. **Computed:** 4,6,8,9,12,13,15,16,16,19,20,
-  20,23,24,24 (k=1..15). Note the plateaus (…,16,16,… / …,20,20,… / …,24,24,…) where maxh
-  jumps by 2 (square n=16,20,24). Clean, proven, OEIS-stageable.
+  of today's proven `maxh(n)=n+1−A027709(n)/2`. **Computed:** 4,6,8,9,11,12,14,15,16,18,19,
+  20,22,23,24,25 (k=1..16), strictly increasing (maxh increments by 0/1, so every k is
+  attained). Clean, proven, OEIS-staged (`oeis/draft-minhole-cells.txt`, branch
+  `explore/seq-minhole-cells`). [A027709 = 2·⌈2√n⌉ — an earlier hand-typed array of it was
+  wrong past n=10; corrected here and in the maxh-count draft.]
 - **B2 — symmetry-restricted maxhole**: max hole area among polyplets of a FIXED symmetry
   class. The diamond is D4-symmetric so M(n) is unchanged for the symmetric classes, but the
   *asymmetric* (trivial-stabilizer) max could be strictly smaller — a new gap to measure.
