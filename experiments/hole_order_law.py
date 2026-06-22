@@ -27,5 +27,6 @@ for H in sorted(data):
     print(f" {H}    {m:5d}    {b:4d}    {'YES' if clean else ('lin k>=1' if exact_linear else 'NO')}"
           f"        {data[H].get(0,'?'):>4}     {ATOM.get(H+1,'?')}")
 
-print("\nslope sequence m_H (H=3,4,5,6):", [data[H][sorted(data[H])[-1]] -
+print()
+print("slope sequence m_H (H=3,4,5,6):", [data[H][sorted(data[H])[-1]] -
       data[H][sorted(data[H])[-2]] for H in sorted(data) if len(data[H]) >= 2])
