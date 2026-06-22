@@ -131,6 +131,24 @@ these lean that way. Tagged by cost. **B1 already computed** (the demonstration)
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~18:00 ET -- lambda (growth constant) characterized; lit-check + epistemics
+- **Lit check** (papers/ now holds Mertens 1990 + Mertens-Lautenbacher 1991): NO published king
+  growth constant. Both are enumeration-only. Mertens 1990 Table I = the A006770 source (king
+  counts to n=14, == ours exactly -- engine cross-check vs the primary source). M-L 1991 does the
+  TRIANGULAR lattice + only a QUALITATIVE heuristic "lambda somewhat below the coordination number"
+  (king z=8 -> lambda<~8). So no prior NUMBER -- not "first to consider lambda", first to pin one.
+- **Estimate** lambda ~ 7.13: two NON-converged extrapolations -- series-ratio a(n)/a(n-1) (1/n
+  fit ~7.10-7.12, drifting up) and GF-pole Neville on lambda_H (~7.155, drifting down) -- agree to
+  ~0.5%, match theta=1 universality (Jensen-Guttmann). [7.12,7.155] is an estimate SPREAD, NOT a
+  proven bracket; lambda could sit slightly outside.
+- **Rigorous** lambda in [6.54, 15.83]: lower = Rands-Welsh concatenation on confirmed n<=19 (up
+  from strip 5.99 / Fekete 5.63; climbs with terms); upper = ancestor-exclusion (loose -- Mertens'
+  heuristic ~8 is far closer; a real upper-bound method is the open win).
+- Records: results/growth-and-structure.md, results/lambda-bounds-timeline.md,
+  experiments/lambda_series.py + lambda_lower_bound.py. Two overclaims (universality, "first")
+  withdrawn and corrected.
+
+
 ### 2026-06-22 ~16:00 ET — D1 (the C++ stats lever) settles b2 + kills c=3/4; reach repointed
 - **Realized the Python->C++ lever** (memory [[cpp-not-python-for-compute]]): added per-animal
   stats to the Redelmeier engine -- `g2 --maxhole-strat` (D4 symmetry -> M_asym; exactly-k-hole
