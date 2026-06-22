@@ -29,6 +29,17 @@ def d4_canon(cells):                        # free: lexmin sorted-tuple over the
     return best
 
 
+def c4_canon(cells):                        # one-sided: lexmin over the 4 rotations only
+    best = None
+    c = set(cells)
+    for _ in range(4):
+        k = _tup(c)
+        if best is None or k < best:
+            best = k
+        c = {(y, -x) for x, y in c}
+    return best
+
+
 def _runs(groups):
     return all(max(v) - min(v) + 1 == len(v) for v in groups.values())
 
@@ -64,7 +75,7 @@ for s in range(2, NMAX + 1):
 
 A030222 = [1, 2, 5, 22, 94, 524, 3031, 18770, 118133]  # FREE polyplets, n=1..9 (sanity)
 print(" n  #fixed  A006770 ok?  HVfix diagfix | #free A030222 ok?  HVfree diagfree")
-hv = []; dg = []; hvf = []; dgf = []
+hv = []; dg = []; hvf = []; dgf = []; hvo = []; dgo = []
 for s in range(1, NMAX + 1):
     fixed = level[s]
     h = sum(1 for sh in fixed if hv_convex(sh))
@@ -72,12 +83,18 @@ for s in range(1, NMAX + 1):
     free = {d4_canon(sh) for sh in fixed}                       # dedup up to D4
     hf = len({d4_canon(sh) for sh in fixed if hv_convex(sh)})   # convexity is D4-invariant
     df = len({d4_canon(sh) for sh in fixed if diag_convex(sh)})
+    ho = len({c4_canon(sh) for sh in fixed if hv_convex(sh)})   # one-sided (rotations only)
+    do = len({c4_canon(sh) for sh in fixed if diag_convex(sh)})
+    hvo.append(ho); dgo.append(do)
     hv.append(h); dg.append(d); hvf.append(hf); dgf.append(df)
     okx = 'OK' if len(fixed) == A006770[s - 1] else 'BAD'
     okf = 'OK' if len(free) == A030222[s - 1] else 'BAD'
     print(f" {s} {len(fixed):8d} {okx:3s} {h:5d} {d:6d} | {len(free):6d} {okf:3s} "
           f"{hf:5d} {df:6d}")
-print("\nHV-convex   FIXED:", ", ".join(map(str, hv)))
-print("HV-convex   FREE: ", ", ".join(map(str, hvf)))
-print("diag-convex FIXED:", ", ".join(map(str, dg)))
-print("diag-convex FREE: ", ", ".join(map(str, dgf)))
+print()
+print("HV-convex   FIXED:    ", ", ".join(map(str, hv)))
+print("HV-convex   ONE-SIDED:", ", ".join(map(str, hvo)))
+print("HV-convex   FREE:     ", ", ".join(map(str, hvf)))
+print("diag-convex FIXED:    ", ", ".join(map(str, dg)))
+print("diag-convex ONE-SIDED:", ", ".join(map(str, dgo)))
+print("diag-convex FREE:     ", ", ".join(map(str, dgf)))

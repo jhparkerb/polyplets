@@ -4,7 +4,7 @@
 %C Axxxxxi A polyplet (polyking) is a set of unit cells connected through edges or corners. In the rotated coordinates (u,v) = (x+y, x-y) the king animal must be convex along both u and v: each diagonal x+y=const and each antidiagonal x-y=const meets the figure in a single gap-free run. This is the diagonal analogue of HV-convexity (Axxxxxh); for king animals it is the less restrictive of the two, since cells extend naturally along diagonals.
 %C Axxxxxi a(3)=20=A006770(3): every 3-cell polyplet is diagonally convex. "Fixed" = up to translation only. Computed by exhaustive enumeration of fixed polyplets (canonical growth), per-size totals verified against A006770 through n=9 (experiments/convex_polyplets.py). - _Jason H Parker_, 2026
 %e Axxxxxi a(4)=106: of the 110 fixed 4-cell polyplets, the 4 with a broken diagonal (some line x+y=c or x-y=c occupied non-consecutively) are excluded.
-%C Axxxxxi The FREE version (up to the 8 symmetries of D4) is 1, 2, 5, 21, 83, 400, 1889, 9114, 42702 (n=1..9), whose D4 sum-check is consistent with A030222.
+%C Axxxxxi Companion counts (n=1..9): one-sided (up to rotation) 1, 2, 6, 33, 147, 758, 3692, 18040, 85026; free (up to D4) 1, 2, 5, 21, 83, 400, 1889, 9114, 42702. Their symmetry sum-checks are consistent with A030222.
 %Y Axxxxxi Cf. A006770 (all fixed polyplets), Axxxxxh (HV-convex polyplets), A030222 (free polyplets).
 %K Axxxxxi nonn
 %O Axxxxxi 1,2

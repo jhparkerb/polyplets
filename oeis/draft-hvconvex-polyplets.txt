@@ -5,7 +5,7 @@
 %C Axxxxxh "Fixed" means counted up to translation only (not rotation or reflection), as in A006770. Computed by exhaustive enumeration of all fixed polyplets via canonical growth, with the per-size totals verified against A006770 through n=9 (experiments/convex_polyplets.py). - _Jason H Parker_, 2026
 %e Axxxxxh a(2)=4: the two cells placed horizontally, vertically, or along either diagonal -- each row and column is a run of length 1 or 2.
 %e Axxxxxh a(3)=16: of the 20 fixed 3-cell polyplets (A006770(3)=20), the four "bent" placements that leave a gap in some row or column (e.g. cells at (0,0),(1,1),(2,0): row 0 occupies x=0 and x=2 with a hole at x=1) are not HV-convex; the other 16 are.
-%C Axxxxxh The FREE version (up to the 8 symmetries of D4) is 1, 2, 4, 13, 35, 113, 344, 1104, 3445 (n=1..9), whose D4 sum-check is consistent with A030222.
+%C Axxxxxh Companion counts (n=1..9): one-sided (up to rotation) 1, 2, 5, 20, 60, 208, 657, 2157, 6799; free (up to D4) 1, 2, 4, 13, 35, 113, 344, 1104, 3445. Their symmetry sum-checks are consistent with A030222.
 %Y Axxxxxh Cf. A006770 (all fixed polyplets), A030222 (free polyplets), Axxxxxi (diagonally-convex polyplets). HV-convex polyomino analogue (edge-connected version) is the corresponding restriction of A001168.
 %K Axxxxxh nonn
 %O Axxxxxh 1,2
