@@ -59,13 +59,15 @@ for _ in range(N + 1):                      # one pass fixes one more coefficien
     T = newT
 
 tot = [sum(T[s][n] for s in states) for n in range(N + 1)]
-print("\nratio t_n/t_(n-1) -> lambda_bound (converges from below):")
+print()
+print("ratio t_n/t_(n-1) -> lambda_bound (converges from below):")
 prev = None
 for n in range(40, N + 1, 4):
     r = tot[n] / tot[n - 1]
     print(f"  n={n:3d}  ratio={r:.4f}")
     prev = r
-print(f"\nclassic tree bound 7^7/6^6 = {7**7/6**6:.4f}")
+print()
+print(f"classic tree bound 7^7/6^6 = {7**7/6**6:.4f}")
 
 # Pin lambda_bound = 1/x_c rigorously-in-spirit: the scalar fixed point y_s = x*prod(1+y_t)
 # has a finite positive solution iff x <= x_c; the largest x that stays bounded gives
