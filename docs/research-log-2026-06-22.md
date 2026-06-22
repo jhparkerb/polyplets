@@ -52,6 +52,23 @@ Status key: ☐ idea · ⚔ refute-attempted · ✓ survived refute · ✗ refut
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~11:00 — R2 ★ IMPLEMENTED: two-pass ranged counts-row [explore/reach-ranged-impl]
+- `cpp/tma/sweep8_ranged.h`: per-state row stored only on its support `[minSize,maxn]`.
+  Two passes/column (pass 1 sizes each target's minSize, pass 2 accumulates into
+  pre-sized ranged runs — the support widens under accumulation, so one pass can't
+  size it). **GATE GREEN** (`tests/gate_ranged.py`): ranged a(n)==exact, n=1..13.
+  Correct by construction (the omitted [0,minSize) entries are all zero).
+- Memory: **~2.2× store-bytes**; real RSS **1.56× at N=13** (base-diluted), rising
+  with N toward the store ratio. Three fixes walked it up from 1.27×: arena reserve,
+  index pre-size, **buffer reuse** (no per-column realloc — the FlatDB swap+clear
+  trick). Compute ~2× (two-pass), offset by R1's 2× speedup.
+- **Composes: R1×R2×R3 ≈ 5–7× less RAM.** The three reach levers stack.
+
+### 2026-06-22 ~10:15 — R2 assessment: ranged-row CONFIRMED ~2× [explore/reach-ranged-row]
+- `cpp/tma_rangestat.cpp`: footprintFactor 1.68→2.01 (N=12→15), rowFactor up to 3.3
+  (rows ~70% empty prefix at the peak). The refute FAILED — biggest single lever,
+  grows with N. Led directly to the implementation above (`docs/ranged-row-r2.md`).
+
 ### 2026-06-22 ~09:45 — T4 ✓ rigorous λ_polyplet ≤ 17.653 [explore/theorem-lambda-bound]
 - `docs/lambda-bound.md`: **λ_polyplet ≤ 7⁷/6⁶ = 17.6529** via spanning-tree →
   direction-labelled-tree overcount (king analogue of the classic 3³/2²=6.75
