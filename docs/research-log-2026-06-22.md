@@ -90,6 +90,16 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~14:30 — multi-hole → T3/T5 STRENGTHENED + style cleanup [explore/theorem-multihole]
+- Multi-hole investigation (looked dataless) **yielded a clean theorem**: the single
+  diamond maximizes **TOTAL** enclosed area over ALL holes — `M_total(n) = M(n)` —
+  beating every multi-hole split (`docs/total-hole-area.md`). Same (u,v) proof applied to
+  the holes' *union* (outer boundary ⇒ a_union+c_union ≤ n−4). Verified n≤9
+  (`experiments/multihole.py`); per-k M_k(n) non-monotone (M_3(9)=3<M_4(9)=4), no closed
+  form — only the total is clean. A 5th piece of new mathematics today.
+- **Style:** purged every leading-`\n` in strings across all my today's scripts; saved
+  the (strong) preference to memory. (jasonp pet peeve.)
+
 ### 2026-06-22 ~14:00 — Phase 4 design + two new convex sequences (S4)
 - **Phase 4 out-of-core design** [`explore/reach-blocked-store`, `docs/out-of-core-phase4.md`]:
   external-memory column sweep (stream db partitions from disk, append target
