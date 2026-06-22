@@ -90,6 +90,18 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~13:30 — T2 ✓ structural law: geometric k-hole denominators [explore/conjecture-hole-order]
+- The k-hole GF order is exactly linear in k: **order(G_{H,k}) = m_H·(k+1)** (H=3..7),
+  and for H≥5 the slope = the hole-free order, so **order = (k+1)·order(G_{H,0})**.
+- **Upgraded from fit to verified structure:** the denominators are a GEOMETRIC
+  progression — `Q_{H,k}·Q_{H,k+2} = Q_{H,k+1}²` for **66/66 cases** (H=3..6, all k),
+  i.e. `Q_{H,k} = α_H·R_H^k` (deg R_H = m_H). The order law is now a *corollary* of a
+  verified structural fact, the single-q-pole signature `G_H(x,q)=A/(Q_0−qB)`. Not a
+  power of Q_0 (base ≠ geometric factor unless H≥5). `docs/hole-gf-order-law.md`,
+  `experiments/hole_q_power.py`. Open: identify R_H from the q-marked transfer matrix.
+- **Closes the theorem/conjecture slate: T2 (structure), T3+T5 (maxhole, proven),
+  T4 (λ bound, proven+tightened). Only T1 (lifetime-3 exactness) remains "hard".**
+
 ### 2026-06-22 ~13:00 — T5 ✓✓ PROVEN + maxhole OEIS upgraded + fresh idea-list (#3 brainstorm)
 - **T5** [`explore/theorem-diamond`]: the T3 framework generalizes to **all n** →
   **M(n) = ⌈⌊(n−2)²/4⌋/2⌉** exactly (`docs/diamond-optimality.md`), verified by explicit
