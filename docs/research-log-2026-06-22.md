@@ -21,7 +21,7 @@ count *type*, R2 changes the row *storage*):
 |-------|--------|-----|------|------|
 | **R1** vertical-mirror fold | `explore/reach-symmetry-fold` | ~2× RAM **+ ~2× compute** | — | folded==exact, in `build/tma --fold`, checkpoint-safe |
 | **R3** u32 mod-p + CRT | `explore/reach-modp-u32` | ~1.7× RAM | 2–3× (per prime) | CRT==exact, ±fold |
-| **R2** ranged counts-row | `explore/reach-ranged-impl` | ~2× store / 1.56×+ RSS | ~2× (two-pass) | ranged==exact |
+| **R2** ranged counts-row | `explore/reach-ranged-impl` | **~2× RSS** (1.56× N=13 → **1.93× N=14**, →2× at scale) | ~2× (two-pass) | ranged==exact |
 
 Stack (orthogonal): **R1×R2×R3 ≈ 5–7× less RAM** → a(23) comfortable on dalby,
 a(24)/a(25) in reach. R1 alone already makes a(21)/a(22) in-budget; the parallel
@@ -85,10 +85,11 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
   pre-sized ranged runs — the support widens under accumulation, so one pass can't
   size it). **GATE GREEN** (`tests/gate_ranged.py`): ranged a(n)==exact, n=1..13.
   Correct by construction (the omitted [0,minSize) entries are all zero).
-- Memory: **~2.2× store-bytes**; real RSS **1.56× at N=13** (base-diluted), rising
-  with N toward the store ratio. Three fixes walked it up from 1.27×: arena reserve,
-  index pre-size, **buffer reuse** (no per-column realloc — the FlatDB swap+clear
-  trick). Compute ~2× (two-pass), offset by R1's 2× speedup.
+- Memory: **~2.2× store-bytes**; real RSS **1.56× (N=13) → 1.93× (N=14)** — the
+  ratio climbs to ~2× as N grows (base dilution fades, rows grow), matching R1. Three
+  fixes walked it up from 1.27×: arena reserve, index pre-size, **buffer reuse** (no
+  per-column realloc — the FlatDB swap+clear trick). Compute ~2× (two-pass), offset
+  by R1's 2× speedup.
 - **Composes: R1×R2×R3 ≈ 5–7× less RAM.** The three reach levers stack.
 
 ### 2026-06-22 ~10:15 — R2 assessment: ranged-row CONFIRMED ~2× [explore/reach-ranged-row]
