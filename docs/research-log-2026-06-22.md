@@ -52,6 +52,20 @@ Status key: ☐ idea · ⚔ refute-attempted · ✓ survived refute · ✗ refut
 
 ## Worklog (newest first)
 
+### 2026-06-22 ~09:00 — R1 ★ IMPLEMENTED + GATED in build/tma [explore/reach-symmetry-fold]
+- `build/tma … --only-height H --fold`. The C++ port turned out to be tiny: the orbit-
+  sum scheme = **canonicalize the output Sig (`foldSig`) before storing it**. Seeding
+  from the palindromic empty boundary + canonicalizing every target gives orbit-sums
+  automatically; harvest stays weight-1. signature.h: `reflectSig`/`foldSig`;
+  sweep8.h: one `if(fold) foldSig(out,H);` in each of serial+MT before `addCounts`.
+- **GATE: folded B_H == unfolded for all H at N=12** (full-row diff). Correct.
+- **Measured (H=13, N=16, 8 threads): 113.5s→58.0s (1.96× faster), peak 162572→81632
+  (1.99× fewer states).** So ~2× memory AND ~2× compute, as derived.
+- Reach impact: a(21) ~65→33 GB & ~halved time (now in-budget on ayr/dalby); a(22)
+  ~157→79 GB (fits dalby's 122 GB). a(23) ~190 GB folded — needs one more 2× (R2/R3).
+- TODO before a long folded run: add `fold` to the checkpoint meta guard (else an
+  unfolded resume of a folded ckpt corrupts). Then launch a(21) folded on dalby.
+
 ### 2026-06-22 ~08:30 — R1 (symmetry fold) ✓ validated [branch explore/reach-symmetry-fold]
 - Column-sweep prototype (`experiments/r1_sym_fold_check.py`): the premise
   **count(Sig) == count(R·Sig)** (R = vertical top↔bottom reflection, flags swapped)
