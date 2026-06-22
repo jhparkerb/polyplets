@@ -81,6 +81,40 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
 - **S4 — convex subclasses** (row/col/diagonally-convex polyplets; some already in OEIS).
 - **S5 — full sequences for the knight / reach-2 lattices** (engines exist: `gf_knight.cpp`).
 
+## Brainstorm round 2 — fresh ideas after the first sweep (2026-06-22 ~17:00)
+Generated post-completion; the maxhole/(u,v) and lifetime-3 veins turned out richest, so
+these lean that way. Tagged by cost. **B1 already computed** (the demonstration).
+
+*Sequences (mostly derivable, cheap):*
+- **B1 — min-n(k) = fewest cells to enclose k holes** = min{n : maxh(n) ≥ k}, the inverse
+  of today's proven `maxh(n)=n+1−A027709(n)/2`. **Computed:** 4,6,8,9,12,13,15,16,16,19,20,
+  20,23,24,24 (k=1..15). Note the plateaus (…,16,16,… / …,20,20,… / …,24,24,…) where maxh
+  jumps by 2 (square n=16,20,24). Clean, proven, OEIS-stageable.
+- **B2 — symmetry-restricted maxhole**: max hole area among polyplets of a FIXED symmetry
+  class. The diamond is D4-symmetric so M(n) is unchanged for the symmetric classes, but the
+  *asymmetric* (trivial-stabilizer) max could be strictly smaller — a new gap to measure.
+- **B3 — minimum KING-perimeter polyplet** (the A027709 analogue for polykings); feeds a
+  king-lattice Pick/maxhole story.
+
+*Theorems / conjectures:*
+- **T6 — diagonal-contact CLT**: #diagonal-contacts of a uniform n-cell polyplet → Normal
+  with mean ~c·n; c (the asymptotic contact density) is a new lattice constant, gettable
+  from a contact-marked transfer matrix and the standard TM central limit theorem. Concrete,
+  provable.
+- **T7 — tighten λ ≤ 16.63** toward the true λ≈7.10 (the gap is embarrassing); a longer-twig
+  / correlation-length transfer-matrix bound. Even λ≤12 is progress.
+- **T8 — (u,v) maxhole for higher-reach lattices** (knight / reach-2): does the isoperimetric
+  diamond argument carry over? The lifetime-3 work already showed these lattices share the
+  vertical-translation structure.
+- **T9 — G_H: Gal(N_H)=S_{deg N_H}** (today's T1 reframing) — now strongly evidenced; worth
+  stating as a standalone conjecture (implies the open lifetime-3 lemma).
+
+*Code / compute:*
+- **C1 — extend GF recovery to H=11,12**: more atom degrees + orders → longer OEIS sequences
+  AND two more independent tests of lifetime-3 / G_H. Feasible (gf_modp + Berlekamp-Massey).
+- **C2 — multi-hole M_k(n) to n≤11**: more data on the non-monotone per-k maxima.
+- **C3 — merged R1×R2×R3×B engine** for actual deployment (integration, not research).
+
 ## THEOREM / CONJECTURE ideas
 - **T1 — lifetime-3 exactness** (atom coprimality / Q_H squarefree, H>7). Hard.
 - **T2 — the c_H(k+1) hole-GF order law.**
