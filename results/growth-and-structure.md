@@ -70,3 +70,15 @@ the genuine keeper is the reach lever R1xR3xB -> ~+2.2 terms.)
 - RIGOROUS INTERVAL: [6.54, 15.83]; series ESTIMATE 7.12-7.155 sits just above the (now ~0.92*lambda)
   lower bound. Narrowing further: more a(n) terms lift the lower bound; a better upper-bound method
   is the open task.
+
+## Literature check RESOLVED (2026-06-22, both papers obtained -> papers/)
+Read Mertens 1990 (J.Stat.Phys 58:1095) and Mertens-Lautenbacher 1991 (66:669) in full. NEITHER
+estimates a growth constant -- both are enumeration/algorithm papers (counts + perimeter
+polynomials). Mertens 1990 Table I gives the king (nnSquare) counts to s=14 == our a(1..14)
+exactly (the A006770 source; clean cross-check of our engine vs the primary source).
+Mertens-Lautenbacher 1991 does the TRIANGULAR lattice, not the king. They explicitly leave the
+"analytic asymptotic theory of lattice animals" as open future work. CONCLUSION: there is NO
+published growth constant for the king lattice. Our lambda ~ 7.12-7.155, rigorous interval
+[6.54, 15.83], and the Rands-Welsh lower bound 6.540 are -- as far as the OEIS references and an
+exhaustive web search show -- the FIRST characterization of it. (The theta=1 universality FORM
+remains known/expected per Jensen-Guttmann; the king VALUE and bounds are the novel part.)
