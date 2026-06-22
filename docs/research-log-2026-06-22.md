@@ -30,10 +30,13 @@ count *type*, R2 changes the row *storage*):
 | **R1** vertical-mirror fold | `explore/reach-symmetry-fold` | ~2× RAM **+ ~2× compute** | — | folded==exact, in `build/tma --fold`, checkpoint-safe |
 | **R3** u32 mod-p + CRT | `explore/reach-modp-u32` | ~1.7× RAM | 2–3× (per prime) | CRT==exact, ±fold |
 | **R2** ranged counts-row | `explore/reach-ranged-impl` | **~2× RSS** (1.56× N=13 → **1.93× N=14**, →2× at scale) | ~2× (two-pass) | ranged==exact |
+| **B** blocked drain-and-free (Phase 3.2) | `explore/reach-blocked-store` | **~2× RSS** off the double-buffer (1.94× N=14; use large S) | ~1× (single pass) | blocked==exact |
 
-Stack (orthogonal): **R1×R2×R3 ≈ 5–7× less RAM** → a(23) comfortable on dalby,
-a(24)/a(25) in reach. R1 alone already makes a(21)/a(22) in-budget; the parallel
-folded driver `scripts/an_fold_parallel.sh` is ready (not launched).
+Stack (4 orthogonal axes — key / count-type / row-storage / when-to-free):
+**R1×R2×R3×B ≈ 10–14× less RAM** → a(23) comfortable on dalby, a(24)/a(25) in reach,
+a(26) plausible. R1 alone already makes a(21)/a(22) in-budget; the parallel folded
+driver `scripts/an_fold_parallel.sh` is ready (not launched). B is also the out-of-core
+(Phase 4) seam — a drained partition could spill to disk instead of freeing.
 
 Plus, separable:
 - **T4** (`explore/theorem-lambda-bound`): rigorous **λ_polyplet ≤ 7⁷/6⁶ = 17.65**,
@@ -86,6 +89,17 @@ driver for R3; merge the levers into one engine. Each lever stands alone today.
 ---
 
 ## Worklog (newest first)
+
+### 2026-06-22 ~12:15 — B (Phase 3.2) blocked drain-and-free store [explore/reach-blocked-store]
+- `cpp/tma/sweep8_blocked.h`: db/next are S hash-partitions; a column drains db
+  partition-by-partition, `freeMem()`-ing each as consumed while next accumulates →
+  live peak ~1× (next) not db+next (~2×). statedb.h: `FlatDB::freeMem()` returns RAM.
+- **GATE GREEN**: blocked a(n) == exact. **RSS 1.94× at N=14** (~2× off the
+  double-buffer). Lesson: the win needs partitions above the allocator's return-to-OS
+  threshold — 1.03× at N=13 (small-alloc artifact) → 1.94× at N=14; and MORE partitions
+  = finer draining = better (S=8 → 1.63×, S=64 → 1.94×). Use large S for reach.
+- **4th independent lever** (the when-to-free axis) → R1×R2×R3×B ≈ **10–14× RAM**. Also
+  the out-of-core (Phase 4) seam. (Per `frontier-revision-plan.md` Phase 3.2.)
 
 ### 2026-06-22 ~11:45 — R1×R2 composition VALIDATED + T4 tightened
 - **R1×R2 stack** [`explore/reach-fold-ranged`]: folded+ranged sweep (foldSig the target
