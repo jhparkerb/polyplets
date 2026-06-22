@@ -37,7 +37,8 @@ inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
   Counts row(maxn + 1, 0);
   FlatDB db(maxn), next(maxn);
   if (reserveStates) { db.reserve(reserveStates); next.reserve(reserveStates); }
-  const CkptMeta meta{maxn, H, 0, 0, 0, 1, 0, static_cast<u64>(maxn + 1)};
+  const CkptMeta meta{maxn,    H, 0, 0, 0, 1, 0, static_cast<u64>(maxn + 1),
+                      static_cast<std::uint8_t>(fold ? 1 : 0)};
 
   int startCol = 0;
   bool resumed = false;
@@ -133,7 +134,8 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
     for (int s = 0; s < S; ++s) { dbS[s].reserve(per); nextS[s].reserve(per); }
   }
   std::vector<std::mutex> mu(S);
-  const CkptMeta meta{maxn, H, 0, 0, 0, nthreads, 0, static_cast<u64>(maxn + 1)};
+  const CkptMeta meta{maxn,    H, 0, 0, 0, nthreads, 0, static_cast<u64>(maxn + 1),
+                      static_cast<std::uint8_t>(fold ? 1 : 0)};
 
   int startCol = 0;
   bool resumed = false;
