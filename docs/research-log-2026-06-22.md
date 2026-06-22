@@ -131,6 +131,20 @@ these lean that way. Tagged by cost. **B1 already computed** (the demonstration)
 
 ## Worklog (newest first)
 
+### 2026-06-22 — C3 CONCLUDED: R1xR3 is the practical merged engine; R2 (ranged) is a BAD lever
+- Built **R1xR2xR3** (`explore/reach-fold-ranged`, `cpp/tma/sweep8_merged.h`, gate GREEN ==
+  exact via CRT) and confirmed **R1xR3** (`explore/reach-modp-u32`, `sweep8_modp.h --fold`,
+  gate GREEN +/-fold == exact).
+- **Profiling verdict (the real result):** R2/ranged is a BAD lever. N=14 wall: ranged 348s
+  vs flat-modp 86s vs flat-exact ~4s -> ~100x compute for ~2x RAM (super-linear: two-pass +
+  per-column arena rebuild + double hashing). **DROP it.**
+- **Practical reach stack = R1xR3 (fold x u32-modp, flat): ~4x RAM, gated, deployable.** Gets
+  a(23) (~115GB folded -> ~58GB) onto dalby. This **corrects the earlier "R1xR2xR3xB ~10-14x"
+  claim** -- R2's compute is disqualifying; the real practical multiplier is ~4x (R1xR3), or
+  ~8x adding B (blocked, RSS-only, no compute cost). Quick win: addCountsModP32 uses `% p`;
+  conditional-subtract halves it. Deploy path for a(23): R1xR3 in a per-prime driver + CRT.
+
+
 ### 2026-06-22 ~14:35 ET — DALBY PIVOT: real reach terms launched (the primary goal cashing in)
 - **The big miss, owned:** dalby (122GB/80c) was available since goal-set, but the log/memory
   said "on CADO, off-limits" (STALE) — so it sat idle at load 0.00 most of the day while I did
