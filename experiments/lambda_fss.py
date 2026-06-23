@@ -58,7 +58,7 @@ def main():
     lam = {H: lambda_H(Ps[H], Qs[H]) for H in Hs}
     # GF-free rungs from experiments/lambda_ladder_fast.py (Aitken, N=120): extends the
     # ladder past the H<=10 GFs (the H=11 GF recovery failed; the fast path bypasses it).
-    lam.update({11: 6.11591, 12: 6.21937})   # 13: pending the 1-way run
+    lam.update({11: 6.11591, 12: 6.21937, 13: 6.30668})  # fast-ladder Aitken, N=120
     Hs = sorted(lam)
     print("Per-height growth constants lambda_H = 1/rho_H:")
     for H in Hs:
