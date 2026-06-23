@@ -4,7 +4,24 @@ _Written 2026-06-22 ~22:00 ET, end of an autonomous multi-task push. Three jobs 
 gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section first if you just
 `/clear`ed — the background completion waiters do NOT survive a clear and must be re-created._
 
-## CURRENT STATE 2026-06-23 ~17:00 ET (LATEST — supersedes everything below)
+## CURRENT STATE 2026-06-23 ~18:30 ET (LATEST — supersedes everything below)
+- **modp sweep now MULTITHREADED + LOCK-FREE** (reach branch, commit 9e4c69b). The per-(H,p)
+  reach sweep was single-threaded -> a(21)/a(22) heavy heights (H13-17) are cpu-HOURS each,
+  serial, so --jobs alone left the long pole serial. Added sweepSquare8HeightModPMT: two
+  parallel passes/column (expand into per-thread dest shards, then parallel merge), NO mutex.
+  Byte-identical to serial (H=1..14, fold+nofold) + end-to-end CRT a(12)/a(14) correct.
+  gympie H=11 N=21: 2.0x (locked) -> **3.16x (lock-free)** at T=8, sys 29s->0.05s; plateaus
+  ~T=4 on gympie. `scripts/a21_reach.py` (gympie orchestrator) + `scripts/mt_scaling.sh`.
+- **PER-BOX THREAD KNEE — measure each box, don't assume.** ayr = Threadripper 2990WX, **4 NUMA
+  nodes** (0-7/8-15/16-23/24-31); locked version capped ~2.5x at T=8 there. ayr lock-free curve
+  was MEASURING at session end (window 3:mtscale). **DALBY STILL TODO**: 80-core ARM, never tested
+  -- after n=19 holes finishes, deploy lock-free reach (bundle+fetch+make) and run mt_scaling.sh
+  to find dalby's optimum thread count + confirm lock-free is byte-identical on ARM. See
+  [[rebuild-remote-after-engine-edit]] (rebuild remote before benchmarking).
+- **a(21)/a(22) PLAN** (gympie small+medium heights, ayr+dalby heavy tail; dalby ZERO-RISK =
+  holes-only until n=19 done): blocked on knowing each box's thread knee. a21_reach.py still
+  uses --blocked (serial); switch production to --threads (non-blocked MT) sized to each box's
+  knee x jobs = cores. NOT yet launched -- a(21) is hour-plus, a(22) many hours even MT.
 - **a(20) CONFIRMED = 1,025,573,519,362,016.** ayr per-height run: h1..h19 measured
   (sum=1,025,572,357,100,549) + **h20 = 3^19 = 1,162,261,467 closed form** -> exact match.
   square8 IS the 8-neighbour (king/polyplet) lattice; the top height H=N is ALWAYS the
