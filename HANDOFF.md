@@ -1,64 +1,100 @@
 # HANDOFF — for the next session
 
-_Written 2026-06-22 evening, end of a long autonomous-push session. (The previous HANDOFF.md was
-deleted in an earlier cleanup commit 8ed3137; this is a fresh one.)_
+_Written 2026-06-22 ~22:00 ET, end of an autonomous multi-task push. Three jobs running across
+gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section first if you just
+`/clear`ed — the background completion waiters do NOT survive a clear and must be re-created._
 
 ## Machines RIGHT NOW — 3 jobs running
-- **gympie** (local, `~/src/polyominoes`): **C1 — H=11 fixed-height GF recovery**. 8 `gf_modp`
-  workers, ~5h in, 10/11 heights done (H=11 still computing). Appends H=11 to
-  `results/fixed_height_gfs.txt` on completion. Load ~8.5 (within the 10 perf-core cap). Payoff:
-  extends lifetime-3 + the GF-pole data, adds lambda_11 (sharpens the lambda bracket a touch).
-- **dalby** (`~/src/polyominoes`): **D1-at-scale — `scripts/g2_split.sh 16 --maxhole-strat max`**.
-  80 g2 workers (full machine), tmux session 0 window `d1strat`. Result -> 
-  `runs/gsplit_maxholestrat_N16/combined.txt` (M(n), M_asym(n), M_k(n) to n=16). Heavy n=16 flood.
-- **ayr** (`~/polyominoes`): **a(20) CONFIRMATION recount** — `build/tma square8 20 --only-height
-  {18,20} --checkpoint runs/a20/ckpt_h{18,20}` (PIDs 995469/996158). Confirms/refutes the candidate
-  **a(20) = 1,025,573,519,362,016**. THE gating item for any new reach term.
+- **gympie** (local, `~/src/polyominoes`): **C1 — H=11 fixed-height GF recovery**, nearly done.
+  `bash` driver **pid 77451** in tmux session 0 window `2:c1-h11`, running
+  `python3 gf/modp_recover.py 11 11 48 | tee runs/c1_h11.log` (8-way, 48 prime sweeps). Down to
+  ~3 `gf_modp` workers (final shards), then the Python does GF reconstruction and **appends H=11**
+  to `results/fixed_height_gfs.txt` (currently ends at H=10). When it lands → fold in **lambda_11**
+  + the perf cores free. **DO NOT TOUCH C1.**
+- **ayr** (`~/polyominoes`): **a(20) CONFIRMATION recount** — driver **pid 995458**
+  (`runs/a20/parallel.pid`), tmux session 0 window `1:a20par` (pane 995439). Workers: pid 995469
+  (`--only-height 18`), pid 996158 (`--only-height 20`). Heights 15/16/17 DONE
+  (10204408045521 / 3357266652450 / 860061675780); **h18 + h20 still running** (~1.3 days in).
+  THE gating item — confirms/refutes **a(20) = 1,025,573,519,362,016**; unblocks a(21).
+- **dalby** (`~/src/polyominoes`, FQDN **dalby.jhpb.org** — the short alias does NOT resolve):
+  **n=17/18 exact hole-count BENCHMARK** (de-risks the n=19 run). tmux session 0 window
+  `2:holesbench`, **pane pid 1409709** running
+  `bash scripts/dalby_holes_perheight.sh 17 2 16 && … 18 2 16` → `runs/holes_bench.log`.
+  Per-height outputs in `runs/holes_n{17,18}_ph/`. On finish: cross-check
+  `results/holes_n18.dalby.txt == results/holes_n18.txt` (ayr) + measure heaviest-height RSS →
+  decides whether to commit dalby to the multi-day n=19 run. **dalby was "free for the day"
+  (2026-06-22) — the real availability WINDOW is an open question (it may go back to factoring).**
 
-## Session deliverables (all committed)
-### lambda (king-lattice growth constant) — characterized
-- Estimate **lambda ~ 7.13** — two NON-converged extrapolations; **[7.12,7.155] is an estimate
-  spread, NOT a proven bracket** (see clarification in `results/growth-and-structure.md`).
-- **Rigorous interval [6.54, 10.354]** — both ends improved this session:
-  - lower 5.99 -> **6.540** (Rands-Welsh concatenation on confirmed n<=19; `experiments/lambda_lower_bound.py`)
-  - upper 15.83 -> **10.354** (Eden/twig encoding, independently verified; `experiments/lambda_upper_bound.py`)
-- Lit check: **no published king growth constant** (Mertens papers in `papers/` are enumeration-only;
-  M-L 1991 only a qualitative "lambda below coordination z=8"). NOT a priority claim — treat as
-  "no published value located." Records: `results/growth-and-structure.md`, `lambda-bounds-timeline.md`.
-### Reach engine — R1xR3 DEPLOYED + gated (branch `deploy/reach-modp`)
-- `cpp/tma_main.cpp`: `--only-height H --modp P --fold` -> `sweepSquare8HeightModP` (~4x less RAM).
-- `scripts/an_modp_crt.sh`: per-height fold+modp sweeps over 3 primes -> CRT -> exact a(n).
-  **GATED: `an_modp_crt.sh 12 --fold` == A006770 (n<=12).**
-- REMAINING: compose **B** (blocked store, `sweep8_blocked.h` on `explore/reach-blocked-store` -> ~8x)
-  + parallelize the (H,p) sweeps. The actual reach RUN waits on a(20) confirming (ayr).
-### Fresh hunts (research log 2026-06-22)
-- **Hole-stratified growth (VERIFY before using)**: hole-free A_0 grows STRICTLY slower — A_0/a
-  decays exponentially ~0.978^n -> lambda_0 ~ 6.95 < lambda ~ 7.11. Opposite the square lattice;
-  the decay fit is solid but the square-contrast premise needs a double-check.
-- **Novel OEIS sequences (submission candidates)**: hole-free count (1,4,20,109,622,3664,...),
-  one-hole, square-bounding-box, max-distinct-holes. Confirmed identities: maxhole-area =
-  A001971-shifted, max-perim = A001168, min-perim = A027709.
-- King site-percolation threshold p_c ~ 0.406 (validation; matches published 0.4071, Malarz-Galam).
-### C++ stats engine D1 (branch `explore/cpp-stats-engine`)
-- `g2 --maxhole-strat` (M_asym, M_k) + `--contacts`. Settled b2 (M_asym=M(n-1) REFUTED); c=3/4
-  refuted (contact density ~0.742). `results/maxhole-stratified.txt`, `contact-density.txt`.
+## WAITERS — re-create these after `/clear` (3 background tasks)
+Completion waiters are background Bash tasks; they die on `/clear`. Re-establish each as a
+**`run_in_background: true`** Bash task (the remote ones also need **`dangerouslyDisableSandbox:
+true`** for network). gympie MUST use **`gtail`** not `tail` (BSD `tail` lacks `--pid` and fires a
+FALSE "finished" — cost a bogus signal this session). First check whether a job already finished
+(then skip its waiter and do the follow-up instead).
 
-## Branches (unmerged)
-- `deploy/reach-modp` — R1xR3 reach engine (gated). **The keeper for reach.**
-- `explore/cpp-stats-engine` — g2 stats (b2, c, contacts).
-- `explore/reach-blocked-store` — B (blocked store) + Phase-4 OOC, to compose with R1xR3.
-- `explore/theorem-lambda-bound` — the old 15.83 upper bound (now superseded by 10.354).
+**1. gympie C1** (local; skip if `grep '^H=11' results/fixed_height_gfs.txt` already present):
+```
+P=$(pgrep -f 'modp_recover.py 11 11 48' | sort -n | head -1); [ -n "$P" ] && gtail --pid=$P -f /dev/null; echo "C1 H=11 FINISHED - gympie perf cores free"
+```
+
+**2. ayr a(20)** (remote; bg + dangerouslyDisableSandbox). Re-find the driver pid from the pidfile:
+```
+AP=$(ssh ayr 'cat ~/polyominoes/runs/a20/parallel.pid'); ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ayr "tail --pid=$AP -f /dev/null"; echo "ayr a20 FINISHED"
+```
+
+**3. dalby holes benchmark** (remote; bg + dangerouslyDisableSandbox). Re-find the pane pid:
+```
+DP=$(ssh dalby.jhpb.org "tmux list-windows -t 0 -F '#{window_name} #{pane_pid}' | awk '/holesbench/{print \$2}'"); ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 dalby.jhpb.org "tail --pid=$DP -f /dev/null"; echo "dalby holes n17+n18 benchmark FINISHED"
+```
+(Linux boxes: plain GNU `tail --pid` is fine — `gtail` is a gympie-only requirement.)
+
+## Session deliverables (ALL COMMITTED on master, except reach which is on its branch)
+- **Reach engine — B composed with R1xR3 + parallelized** (`6f2a3a4` on branch
+  **`deploy/reach-modp-blocked`**, built in worktree `~/src/polyominoes-reach`). `--blocked S`
+  (drain-and-free partitioned u32/fold/modp store, ~2x less RAM on top of R1xR3) +
+  `an_modp_crt.sh --jobs J --blocked S` (parallel independent (H,p) sweeps). **GATED**: 24/24
+  byte-identical per-height (H∈{1,4,7,10}×fold×S∈{4,8,16}) + 3 end-to-end CRT configs == A006770.
+  Fires a(21) once a(20) confirms.
+- **lambda upper bound 10.354 → 9.355** (`ab6c4c8`) — iterated ancestor-exclusion (depth-5),
+  validated on the square anchor (Eden 6.75 → 5.16). Rigorous interval now **[6.54, 9.355]**.
+  PLATEAUS ~9.3 → reaching ~8 needs the **empty-cell-propagation** refinement (future work).
+  `experiments/lambda_upper_bound_iterated.py` (numpy; runs on ayr).
+- **lambda_0 correction** (`ab6c4c8`) — hole-free gap (λ₀~6.93 < λ~7.10) VERIFIED, but the
+  "opposite the square lattice" framing was FALSE (both lattices decay ~0.977ⁿ).
+  `results/lambda0-verification.md`.
+- **OEIS — 4 sequences staged** (`d6f966f`, `submissions/oeis/`): hole-free, one-hole,
+  **square-bbox (now computed to n=16** via ayr `--split`; marginal == A006770 ✓**)**,
+  max-distinct-holes. 1/2/4 Superseeker-confirmed novel; **square-bbox novelty check still owed**
+  (lookup string in `submissions/oeis/README.md`). jasonp submits.
+- **dalby queue plan** (`f8dd46e`, `docs/dalby-queue-plan.md`) — n=19 hole-count ranked #1.
+- **D1 fold-in** (`f8dd46e`, `results/maxhole-stratified-N16.dalby.txt`) — M_k(n) to n=16 from the
+  finished dalby g2_split run.
 
 ## NEXT SESSION — pick up here
-1. **Fold in the 3 jobs** when they land: C1 (H=11 -> lifetime-3 + lambda_11), dalby (M_k to n=16),
-   **ayr (a(20) CONFIRMATION — the big one; unblocks new reach terms)**.
-2. **Reach engine**: compose B (-> ~8x RAM) + parallelize; then, once a(20) is confirmed, run a(21)
-   with the R1xR3(xB) engine.
-3. **OEIS**: prep the 4 novel sequences for submission (jasonp pushes the button).
-4. **Verify** the hole-free lambda_0 < lambda gap (contradicts the square lattice).
-5. (Optional) push the lambda upper bound toward ~8 via the heavy iterated-twig method.
+1. **When C1 lands**: fold in **lambda_11** (H=11 GF → lifetime-3 + sharper lambda bracket); perf
+   cores then free → heavier gympie work OK (but keep it brief/targeted/RAM-light, see constraints).
+2. **When a(20) confirms** (ayr): **run a(21)** with the `deploy/reach-modp-blocked` engine — THE
+   reach goal. (Build in the worktree; an_modp_crt.sh with --fold --blocked --jobs.)
+3. **When the dalby benchmark lands**: cross-check n=18 == ayr + read heaviest-height RSS; **decide
+   n=19** (needs MAXJOBS×RSS < 125 GiB AND a confirmed multi-day dalby window).
+4. **OEIS**: run the square-bbox Superseeker novelty check, then submit all 4 (jasonp).
+5. **(Open research) lambda → ~8**: the empty-cell-propagation upper-bound refinement.
+6. **(Ready) Reach**: compose Phase-4 OOC (`explore/reach-blocked-store`) on top of R1xR3xB for
+   even bigger terms.
+
+## Branches (unmerged)
+- `deploy/reach-modp-blocked` — **THE reach keeper** (R1xR3 + B + parallel, gated). Worktree at
+  `~/src/polyominoes-reach`.
+- `deploy/reach-modp` — prior R1xR3 (superseded by the above).
+- `explore/reach-blocked-store` — Phase-4 OOC, to compose next.
+- `explore/cpp-stats-engine` — g2 stats / maxhole-stratified (n<=12; the n=16 extension is on
+  master as `results/maxhole-stratified-N16.dalby.txt`).
 
 ## Standing constraints
-- gympie 10 perf-core HARD cap; never pkill/killall (explicit PIDs); long jobs in tmux foreground;
-  no orphaned background jobs (left an R2 `tma_rangestat` running 7h this session — killed).
-- Claude preps OEIS/paper; jasonp pushes submit. Publishing is jasonp's call.
+- **gympie**: nothing heavy until C1's perf cores free; thereafter CPU is fine **only if brief,
+  targeted, RAM-light** (commits/scp/small combines always OK) — no fat probes that spin the fan or
+  risk OOM-killing a long job. The `ulimit -v` RAM guard does NOT work on macOS (silently ignored),
+  so you cannot cap a reach probe's RAM that way — pick a size known to fit, or run it on ayr/dalby.
+- **gtail not tail** for gympie `--pid` waiters (see [[long-jobs-tmux-not-nohup]]).
+- 10 perf-core cap; never pkill/killall (explicit numeric PIDs); long jobs in tmux foreground.
+- Claude preps OEIS/paper/repo; **jasonp pushes submit / external sends**. Publishing is his call.
