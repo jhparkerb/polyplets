@@ -224,11 +224,18 @@ my challenge ("isotropy forces ->1") was WRONG: w,h are comparable random variab
 whose ratio has limiting mean >1, so typical king-animals stay mildly elongated. Modest
 but real, and a corrected prediction.
 
-### #8 STARTED 2026-06-23: knight growth ~11-12, not pinned (needs more terms)
-Biased estimator on the 8-term knight series (1,4,28,234,2162,20972,209608,2135572):
-lam_n plateaus ~11.6 but ratios still climbing -> lambda_knight ~ 11-12, NOT converged
-at 8 terms (as challenged). To pin it: extend the knight series via gf_knight per-height
-GF recovery + FSS, or a knight Redelmeier. Left as the next compute step for #8.
+### #8 DONE 2026-06-23: knight-animal growth constant lambda_knight ~ 10-12
+Two independent estimates via the fast-lambda machinery (experiments/lambda_ladder_fast.py
+now takes POLY_GF_ENGINE; build/gf_knight is the knight fixed-height engine):
+- Fixed-height ladder lambda_H^knight (H=3..7, gf_knight's cap): 3.890, 5.196, 6.210,
+  6.983, 7.594 (increments shrink ~0.78x/step). Geometric-tail extrapolation ->
+  **lambda_knight ~ 9.9** (power-law tail unreliable: alpha=1.36 near divergence, only
+  4 increments).
+- Direct 8-term Redelmeier series, biased ratio -> plateaus ~**11.6** (unconverged).
+So **lambda_knight ~ 10-12**, not sharply pinned (H<=7 cap + 8-term series). Well above
+king's 7.11 -- knight's spread-out neighbours cause less self-crowding, so faster growth.
+A genuinely new lattice constant (knight-animal growth is not a standard published value).
+Sharpening would need gf_knight extended past H=7 or a knight Redelmeier to higher n.
 
 ### #13, #15, #17 DONE 2026-06-23 (experiments/sample_structure.py, existing samples)
 Analyzed the existing 10k n=19 uniform samples (results/a19_samples.txt) -- no new
