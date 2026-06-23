@@ -1,3 +1,7 @@
+# NOT READY FOR SUBMISSION (2026-06-23): the paper (paper/a19-polyplets.tex, footnote
+# near l.405) asserts this sequence is NOT in OEIS. Submitting it would contradict that
+# published claim, so do NOT submit without first discussing with the OEIS editors and
+# reconciling the paper wording. jasonp's call.
 %I Axxxxxe
 %S Axxxxxe 1,2,4,9,29,68,181,462,1254,3289
 %N Axxxxxe Degree of the "atom" polynomial N_H(x) in the lifetime-3 factorization of the fixed-height polyplet generating-function denominators: N_H = gcd(Q_H, Q_{H+1}, Q_{H+2}), the reduced denominator of the unanchored height-H strip generating function for polyplets (A006770).

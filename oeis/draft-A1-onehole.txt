@@ -1,3 +1,5 @@
+# SUPERSEDED (2026-06-23): canonical draft is submissions/oeis/2-onehole/. Do NOT
+# submit from this older master (would duplicate); kept only as working history.
 %I Axxxxxb
 %S Axxxxxb 1,16,166,1456,11788,91300,688034,5091820,37209939,269452496,
 %T Axxxxxb 1937956658,13865448048,98796744112,701664375696,4970078092354

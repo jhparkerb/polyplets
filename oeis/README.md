@@ -5,6 +5,17 @@ Staged drafts in OEIS **internal format** (`%I %S %T %U %N %C %D %H %F %e %Y %K 
 actual submission to oeis.org — Claude prepares and stages, never submits to an external
 service (see ROADMAP #25). Normal care for outward-facing steps; no signoff ceremony.
 
+## Submission-status flags (2026-06-23 dedup pass)
+A double-check for duplicate/contradictory submissions flagged these (markers are in the
+file headers):
+- `draft-maxholearea.txt` — **NOT FOR SUBMISSION**: max-hole AREA = A001971-shifted
+  (KNOWN); submitting duplicates A001971. Stale; excluded from the curated submissions/oeis/ 4.
+- `draft-A0-holefree.txt`, `draft-A1-onehole.txt` — **SUPERSEDED** by the canonical
+  `submissions/oeis/{1-holefree,2-onehole}/` (refined comments). Don't submit from both.
+- `draft-gf-orders.txt`, `draft-atom-degrees.txt` — **NOT READY**: the paper asserts
+  these are not in OEIS; submitting contradicts it. Discuss with OEIS editors first (jasonp).
+- The curated 4 in `submissions/oeis/` are internally clean and distinct.
+
 ## Files
 - `A######.txt` — an **existing** OEIS entry we extend. Commit history per file:
   1. first commit = the entry **verbatim** from OEIS (`?fmt=text`), unmodified;

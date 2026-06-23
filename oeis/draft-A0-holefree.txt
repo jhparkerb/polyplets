@@ -1,3 +1,5 @@
+# SUPERSEDED (2026-06-23): canonical draft is submissions/oeis/1-holefree/. Do NOT
+# submit from this older master (would duplicate); kept only as working history.
 %I Axxxxxa
 %S Axxxxxa 1,4,20,109,622,3664,22094,135609,843941,5310754,33724862,215793158,
 %T Axxxxxa 1389673091,8998648488,58548155506,382526638033,2508473632910,16503616943998
