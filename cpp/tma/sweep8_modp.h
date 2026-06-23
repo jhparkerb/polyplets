@@ -12,6 +12,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <mutex>
 #include <thread>
@@ -97,26 +98,37 @@ inline void addCountsModP32(FlatDB32& db, const Sig& sig, const std::uint32_t* s
           (static_cast<std::uint64_t>(dst[n + shift]) + src[n]) % p);
 }
 
-// Multithreaded strip-height sweep mod p -- the sharded mirror of the exact engine's
-// sweepSquare8HeightMT, adapted to FlatDB32 + mod-p accumulation. db/next are S hash
-// shards (S = 128*nthreads, power of two); each column, thread t drains source shards
-// t,t+T,... and routes every output to dest shard hashSig(out)&(S-1) under that shard's
-// mutex. Source shards are thread-partitioned so reads need no lock. The comps==1
-// harvest goes to a per-thread u64 row (raw sum can't overflow at our state counts),
-// reduced mod p once per column when merged into `row`. Correctness vs the serial path
-// is by construction (sharding does not change which states/counts are produced) and is
-// gated byte-identical per (H,p,fold).
+// Multithreaded strip-height sweep mod p -- LOCK-FREE. The per-output mutex of a naive
+// sharded mirror caps scaling at ~2.5x on this DP (measured: 19-30s sys time = futex
+// contention, and more shards barely helps -> it is the lock OP, not collisions). So we
+// avoid shared writes entirely: each column has two parallel passes with a join between.
+//   PASS 1 (expand): thread t drains source shards t,t+T,... and routes every output to
+//     its OWN per-thread dest shards loc[t][sh] -- no other thread touches loc[t], so no
+//     lock. comps==1 harvest -> per-thread u64 row (raw sum can't overflow at our counts).
+//   PASS 2 (merge): thread u owns dest shards u,u+T,... ; it clears db[s] and folds in
+//     loc[0..T-1][s] (mod p) -- each db[s] written by exactly one thread, each loc[t][s]
+//     read by exactly one thread, so again no lock. db is reused as the merge target, so
+//     after pass 2 it holds the next column (no swap). Costs a second insert per state
+//     (loc then db) but removes all contention. Correctness is by construction (which
+//     states/counts are produced is independent of sharding/threading) and gated
+//     byte-identical vs the serial path per (H,p,fold).
 inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
                                                            std::uint32_t p, bool fold,
                                                            u64& peakStates,
                                                            int nthreads) {
   std::vector<std::uint32_t> row(maxn + 1, 0);
   int S = 64;
-  while (S < 128 * nthreads) S <<= 1;  // shards: power of two, >> nthreads
-  std::vector<FlatDB32> dbS, nextS;
-  dbS.reserve(S); nextS.reserve(S);
-  for (int s = 0; s < S; ++s) { dbS.emplace_back(maxn); nextS.emplace_back(maxn); }
-  std::vector<std::mutex> mu(S);
+  int shardMult = 16;  // TMA_SHARD_MULT: dest shards per thread (>= for merge balance)
+  if (const char* e = std::getenv("TMA_SHARD_MULT")) shardMult = std::atoi(e);
+  while (S < shardMult * nthreads) S <<= 1;  // shards: power of two, >> nthreads
+  std::vector<FlatDB32> dbS;
+  dbS.reserve(S);
+  for (int s = 0; s < S; ++s) dbS.emplace_back(maxn);
+  std::vector<std::vector<FlatDB32>> loc(nthreads);  // loc[t][s]: thread t's dest shards
+  for (int t = 0; t < nthreads; ++t) {
+    loc[t].reserve(S);
+    for (int s = 0; s < S; ++s) loc[t].emplace_back(maxn);
+  }
   { Sig seed; std::memset(seed.b, 0, SIGMAX);
     dbS[FlatDB::hashSig(seed) & (S - 1)].slot(seed)[0] = 1u % p; }
 
@@ -125,11 +137,13 @@ inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
     for (int s = 0; s < S; ++s) total += dbS[s].size();
     if (total == 0) break;
     if (total > peakStates) peakStates = total;
-    for (int s = 0; s < S; ++s) nextS[s].clear();
+    for (int t = 0; t < nthreads; ++t)
+      for (int s = 0; s < S; ++s) loc[t][s].clear();
 
     std::vector<std::vector<u64>> localRow(nthreads, std::vector<u64>(maxn + 1, 0));
-    auto worker = [&](int t) {
+    auto expand = [&](int t) {
       std::vector<u64>& lrow = localRow[t];
+      std::vector<FlatDB32>& mine = loc[t];
       for (int s = t; s < S; s += nthreads)  // thread t owns source shards t,t+T,...
         dbS[s].for_each([&](const Sig& sig, const std::uint32_t* counts) {
           const int ms = minSizeRow32(counts, maxn);
@@ -146,20 +160,33 @@ inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
             const int cells = __builtin_popcount(mask);
             if (ms + cells + completionLowerBound(out.b, H) > maxn) return;
             if (fold) foldSig(out, H);
-            const int sh = FlatDB::hashSig(out) & (S - 1);
-            std::lock_guard<std::mutex> lk(mu[sh]);
-            addCountsModP32(nextS[sh], out, counts, cells, maxn, p);
+            addCountsModP32(mine[FlatDB::hashSig(out) & (S - 1)], out, counts, cells,
+                            maxn, p);  // thread-local: no lock
           });
         });
     };
     std::vector<std::thread> th;
-    for (int t = 0; t < nthreads; ++t) th.emplace_back(worker, t);
+    for (int t = 0; t < nthreads; ++t) th.emplace_back(expand, t);
     for (auto& x : th) x.join();
+    th.clear();
+
+    // merge each dest shard (one owner thread) into dbS -> next column, no lock, no swap
+    auto merge = [&](int u) {
+      for (int s = u; s < S; s += nthreads) {
+        dbS[s].clear();
+        for (int t = 0; t < nthreads; ++t)
+          loc[t][s].for_each([&](const Sig& sig, const std::uint32_t* c) {
+            addCountsModP32(dbS[s], sig, c, 0, maxn, p);
+          });
+      }
+    };
+    for (int u = 0; u < nthreads; ++u) th.emplace_back(merge, u);
+    for (auto& x : th) x.join();
+
     for (int t = 0; t < nthreads; ++t)
       for (int n = 1; n <= maxn; ++n)
         row[n] = static_cast<std::uint32_t>(
             (static_cast<u64>(row[n]) + localRow[t][n]) % p);
-    std::swap(dbS, nextS);
   }
   return row;
 }
