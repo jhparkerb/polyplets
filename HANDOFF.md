@@ -4,6 +4,26 @@ _Written 2026-06-22 ~22:00 ET, end of an autonomous multi-task push. Three jobs 
 gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section first if you just
 `/clear`ed — the background completion waiters do NOT survive a clear and must be re-created._
 
+## SESSION UPDATE 2026-06-23 (autonomous, jasonp asleep)
+- **dalby n=19 hole count LAUNCHED + fitting** (driver pid 1423357; see dalby bullet).
+  Reshaped from ~105 GiB to ~41 GiB peak via a **per-height kmax schedule**
+  (kmax(H)=min(13,(N-H)+2), provably exact, validated byte-identical on an n=16 gate
+  vs holes_n16.txt). THREADS=8 (benchmarked MT floor), MAXJOBS=6. ~67% headroom.
+- **lambda upper bound depth-6 = 9.322** saved (results/lambda_upper_depth_sweep.txt).
+- **New-directions enqueued items worked** (docs/new-directions-2026-06-22.md, all
+  committed): DONE #5 (site-perimeter + FIRST cross-SOURCE validation vs Mertens 1990,
+  exact n=11/12/13; +min/max site-perim sequences), #9 (DA pipeline validated on
+  king/triangular/cubic lattices), #10 (bbox aspect -> const ~1.4), #11 (free/one-sided
+  amplitude ratios -> 1/8,1/4; tied to sqrt(lambda)), #13/#15/#17 (hole-area / rook-comp
+  / gluing-graph from existing samples: 74% tree gluing-graphs, 90% area-1 holes). #1
+  closed (both structural seqs Superseeker-novel). #8 knight started (~11-12, unconverged).
+  STILL OPEN (need engine/code, deferred): #12 convex GFs, #14 contact density, #16 A389193.
+- **New experiments/**: lambda_fss.py, series_da.py (lambda=7.110), subclass_growth.py
+  (lambda_0=6.94), lattice_da.py, amplitude_ratios.py, sample_structure.py.
+- **gympie also running** n=14 site-perim (tmux window sp14, pid 28682) alongside C1.
+- **Found issue**: `make build/g2` fails under clang (Makefile -Wno-error=restrict);
+  validated via direct compile. Needs a compiler-conditional guard (jasonp).
+
 ## Machines RIGHT NOW — 3 jobs running
 - **gympie** (local, `~/src/polyominoes`): **C1 — H=11 fixed-height GF recovery**, nearly done.
   `bash` driver **pid 77451** in tmux session 0 window `2:c1-h11`, running
