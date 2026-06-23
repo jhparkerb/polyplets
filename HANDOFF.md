@@ -12,12 +12,28 @@ gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section f
   Byte-identical to serial (H=1..14, fold+nofold) + end-to-end CRT a(12)/a(14) correct.
   gympie H=11 N=21: 2.0x (locked) -> **3.16x (lock-free)** at T=8, sys 29s->0.05s; plateaus
   ~T=4 on gympie. `scripts/a21_reach.py` (gympie orchestrator) + `scripts/mt_scaling.sh`.
-- **PER-BOX THREAD KNEE — measure each box, don't assume.** ayr = Threadripper 2990WX, **4 NUMA
-  nodes** (0-7/8-15/16-23/24-31); locked version capped ~2.5x at T=8 there. ayr lock-free curve
-  was MEASURING at session end (window 3:mtscale). **DALBY STILL TODO**: 80-core ARM, never tested
-  -- after n=19 holes finishes, deploy lock-free reach (bundle+fetch+make) and run mt_scaling.sh
-  to find dalby's optimum thread count + confirm lock-free is byte-identical on ARM. See
-  [[rebuild-remote-after-engine-edit]] (rebuild remote before benchmarking).
+- **PRODUCTION SCALING CONFIG (measured, locked):** strided lock-free engine (commit 9e4c69b)
+  + **`--threads 20`** + **`TMA_SHARD_MULT=32`** + (ayr only) **`numactl --interleave=all`** -->
+  **~13.5s/heavy-sweep (H=11 N=21) on BOTH ayr and dalby, ~10x over serial.** Verified 3 reps
+  each, stable. Engine deployed+built strided on ayr (~/polyominoes) and dalby (worktree
+  ~/src/polyominoes-reach). gympie stays strided too.
+  - **AVOID power-of-2 thread counts.** T=8/16/32 are ~2x SLOWER than T=12/18/20/24 -- a stable,
+    architecture-INDEPENDENT effect (reproduced on ayr 4-node x86 AND dalby 1-node ARM, so NOT
+    NUMA). Disproven causes: NUMA (dalby single-node shows it too), stride-aliasing (block-assignment
+    fix made it WORSE at the optimum: 13.7->17.4, reverted), pure shard count (T=16/S=512 slow but
+    T=18/S=512 fast). Mechanism UNEXPLAINED -- just use T=20. Block-assignment commit was reverted;
+    9e4c69b (strided two-pass lock-free) is the keeper.
+  - **ayr NUMA:** 4 nodes (0-7/8-15/16-23/24-31). Migration is harmless IFF memory is interleaved;
+    `--interleave=all` removes the first-touch roulette (stable). CPU affinity (taskset) adds nothing
+    over interleave. Node-PINNED (`--cpunodebind=i --membind=i --threads 8`) = stable 43s/node ->
+    4 concurrent = throughput alternative. dalby (1 node, 128GB) needs no numactl.
+  - **GOTCHA:** tma Makefile tracks tma_main.cpp only, NOT headers -> `rm build/tma` after a header
+    edit or you ship a stale binary (bit us on ayr). See [[rebuild-remote-after-engine-edit]].
+- **NEXT (production wiring, not yet done):** point a21_reach.py at `--threads 20 TMA_SHARD_MULT=32`
+  (drop `--blocked`; non-blocked MT is the path), interleave on ayr; jobs x threads = 1 sweep on
+  ayr(32c, leaves spare), 4 concurrent on dalby(80c=4x20). Then launch a(21)/a(22). dalby reach is
+  gated ZERO-RISK behind n=19 holes (still running, ~16.5h); the scaling tests ran careful
+  (ulimit -v 32G, <=T20) alongside holes -- modp RSS is only ~57MB so holes was never at risk.
 - **a(21)/a(22) PLAN** (gympie small+medium heights, ayr+dalby heavy tail; dalby ZERO-RISK =
   holes-only until n=19 done): blocked on knowing each box's thread knee. a21_reach.py still
   uses --blocked (serial); switch production to --threads (non-blocked MT) sized to each box's
