@@ -33,7 +33,8 @@ invariant — a strictly stronger correctness signal than the cross-ISA gates.
 ## Candidate new sequences (from n<=13 data)
 - **max site-perimeter(n) = 4n+4** exactly (8,12,16,20,...,56 for n=1..13). Clean
   closed form (the sparsest king-connected arrangement).
-- **min site-perimeter(n) = 8,10,12,12,14,14,16,16,16,18,18,18,20** (n=1..13) — the
+- **min site-perimeter(n) = 8,10,12,12,14,14,16,16,16,18,18,18,20,20** (n=1..14; n=14
+  is NEW, beyond Mertens' published s<=13, validated by sum==a(14)=11208974860) — the
   king-lattice site-perimeter ISOPERIMETRIC sequence (most-compact animals; a
   site-perimeter analog of A027709 min-polyomino-perimeter). Square blocks k x k hit
   4k+4 at n=k^2 (n=1,4,9 -> 8,12,16). The genuinely interesting one; OEIS candidate.
