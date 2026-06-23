@@ -229,6 +229,23 @@ Biased estimator on the 8-term knight series (1,4,28,234,2162,20972,209608,21355
 lam_n plateaus ~11.6 but ratios still climbing -> lambda_knight ~ 11-12, NOT converged
 at 8 terms (as challenged). To pin it: extend the knight series via gf_knight per-height
 GF recovery + FSS, or a knight Redelmeier. Left as the next compute step for #8.
+
+### #13, #15, #17 DONE 2026-06-23 (experiments/sample_structure.py, existing samples)
+Analyzed the existing 10k n=19 uniform samples (results/a19_samples.txt) -- no new
+sampling. Parser self-validates: #15 rook-component mean = 10.067 (matches the known
+10.07 in sample_stats.md).
+- #15 rook-component count: mean 10.07, distribution peaks at 10, range 2..19.
+- #17 gluing-graph (nodes=rook-pieces, edges=diagonal contacts between them): mean
+  cycles (E-V+1) = 0.30, **74.4% of king-animals have a TREE gluing graph**; 21% one
+  cycle, tail to 4. New structural descriptor.
+- #13 hole-area distribution: 89.7% of holes are single cells (area 1), 5.6% area 2,
+  decaying; mean hole area 1.20; one area-16 outlier. Holes are overwhelmingly minimal.
+
+## Remaining enqueued (need engine/code work, deferred -- not rushed unattended)
+- #12 convex-subclass GFs: extend the convex series to ~40 terms, then guess algebraic GF.
+- #14 exact diagonal-contact density: needs a contact-marked transfer matrix (C++).
+- #16 extend A389193: needs square4 (rook) hole-counting in the TM (engine errors
+  "--holes is supported for square8 only").
 4. Polish: #3 amplitude C (2-param fit), #4 large-k & #11 C2 (parity) once reach extends n.
 
 ## Artifacts
