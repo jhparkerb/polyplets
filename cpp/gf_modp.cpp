@@ -143,7 +143,24 @@ int main(int argc, char** argv) {
   std::vector<std::int64_t> rowptr;
   std::vector<std::uint32_t> eto;
   std::vector<std::uint8_t> eadd;
-  for (size_t s = 0; s < states.size(); ++s) {           // states grows during the loop
+  // PASS 1: discover all states (intern) + COUNT edges, so we can reserve EXACTLY.
+  // Without this, push_back's doubling realloc holds old+new during the copy and
+  // spikes peak RSS ~2.8GB over the genuine ~6.7GB edge list at H=13 (the "blowup").
+  size_t Ecount = 0;
+  for (size_t s = 0; s < states.size(); ++s) {           // states grows via intern()
+    const State st = states[s];
+    for (int m2 = 1; m2 <= full; ++m2) {
+      u64 lab2;
+      if (step(st.mask, st.lab, m2, &lab2)) {
+        intern(m2, lab2, st.tT || (m2 & top), st.tB || (m2 & bot));
+        ++Ecount;
+      }
+    }
+  }
+  const int S = (int)states.size();
+  eto.reserve(Ecount); eadd.reserve(Ecount); rowptr.reserve(S + 1);
+  // PASS 2: fill CSR (states complete -> intern is pure lookup; no growth, no realloc)
+  for (int s = 0; s < S; ++s) {
     rowptr.push_back((std::int64_t)eto.size());          // source s's edges start here
     const State st = states[s];
     for (int m2 = 1; m2 <= full; ++m2) {
@@ -154,7 +171,6 @@ int main(int argc, char** argv) {
     }
   }
   rowptr.push_back((std::int64_t)eto.size());            // sentinel
-  const int S = (int)states.size();
   const size_t E = eto.size();
   std::fprintf(stderr, "states=%d edges=%zu edge_bytes=%.2fGB (CSR 5B/edge)\n",
                S, E, 5.0 * E / (1<<30));
