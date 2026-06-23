@@ -15,14 +15,18 @@ gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section f
   -- the recovered GF, expanded, disagrees with the engine at a fresh prime, so it is
   WRONG. **Do NOT fold in lambda_11 or the H=11 lifetime-3/atom extension** until a
   clean rerun. Diagnosis: `need = order//110 + 12 = 133` CRT primes was likely
-  marginally short for the order-13381 Q_11's largest coefficients (~10^1043), so CRT
-  wrapped (N = 2*order+30 = 26792 terms had margin, so terms are the less-likely
-  cause). RECOMMENDED FIX (jasonp's call, gympie now free): rerun forcing more primes,
-  e.g. `python3 gf/modp_recover.py 11 11 180`, AFTER clearing only the coarse
-  checkpoint key `runs/ckpt/fixedgf-H11_11/.../H11-gf` (the per-prime sweeps at N=26792
-  are cached and reused -> only ~47 new prime sweeps compute, a few hours not 15h).
-  Or bump the `need` constant (110 -> ~90) in modp_recover.py. lambda_fss.py now SKIPS
-  validated=False heights so it isn't corrupted (still BST 7.221 on H<=10).
+  short for the order-13381 Q_11 coefficients, so CRT wrapped. CONFIRMED (cheap check,
+  no compute): max Q coeff = 1241 digits = EXACTLY the 133-prime product ceiling, and
+  3371/13382 coeffs sit within 30 digits of it -- textbook wraparound. True max coeff
+  > 1241 digits (the 0.078*deg=1043 estimate under-predicts at H=11); order 13381 is
+  fine (clean single-prime BM). >133 primes needed by an UNKNOWN margin. RECOMMENDED
+  FIX (jasonp's call, gympie now free): rerun with generous primes, e.g.
+  `python3 gf/modp_recover.py 11 11 250` (ceiling ~2333 digits), AFTER clearing only
+  the coarse H11-gf checkpoint key in `runs/ckpt/fixedgf-H11_11/` (per-prime sweeps at
+  N=26792 are cached + reused -> only ~117 new sweeps, gympie 8-way ~hours). BETTER
+  long-term fix: make modp_recover.py grow primes + retry until validated=True, instead
+  of the fixed `need = order//110 + 12` that silently wrapped. lambda_fss.py now SKIPS
+  validated=False heights (BST 7.221 on H<=10). lambda_11 + H=11 lifetime-3 stay BLOCKED.
 - **New-directions enqueued items worked** (docs/new-directions-2026-06-22.md, all
   committed): DONE #5 (site-perimeter + FIRST cross-SOURCE validation vs Mertens 1990,
   exact n=11/12/13; +min/max site-perim sequences), #9 (DA pipeline validated on
