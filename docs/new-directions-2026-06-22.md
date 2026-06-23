@@ -216,6 +216,19 @@ project's FIRST agreement with an external published source on a computed invari
 (all prior gates are cross-ISA, which can't catch shared-spec errors). The top-ranked
 enqueued item, delivered. Min-site-perimeter-per-n + the (n,t) triangle beyond n=13 are
 OEIS candidates. Found issue: Makefile -Wno-error=restrict breaks clang build (noted).
+
+### #10 DONE 2026-06-23: mean bbox aspect ratio -> constant ~1.4 (NOT 1)
+Exact (n,w,h) via g2 --per-box: mean max(w,h)/min(w,h) = 1.50 (n=2) decreasing slowly
+to 1.457 (n=12), 1.42 at n=19 (sampler). Converges to a CONSTANT ~1.4, not 1 --
+my challenge ("isotropy forces ->1") was WRONG: w,h are comparable random variables
+whose ratio has limiting mean >1, so typical king-animals stay mildly elongated. Modest
+but real, and a corrected prediction.
+
+### #8 STARTED 2026-06-23: knight growth ~11-12, not pinned (needs more terms)
+Biased estimator on the 8-term knight series (1,4,28,234,2162,20972,209608,2135572):
+lam_n plateaus ~11.6 but ratios still climbing -> lambda_knight ~ 11-12, NOT converged
+at 8 terms (as challenged). To pin it: extend the knight series via gf_knight per-height
+GF recovery + FSS, or a knight Redelmeier. Left as the next compute step for #8.
 4. Polish: #3 amplitude C (2-param fit), #4 large-k & #11 C2 (parity) once reach extends n.
 
 ## Artifacts
