@@ -4,6 +4,43 @@ _Written 2026-06-22 ~22:00 ET, end of an autonomous multi-task push. Three jobs 
 gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section first if you just
 `/clear`ed — the background completion waiters do NOT survive a clear and must be re-created._
 
+## CURRENT STATE 2026-06-23 ~10:48 ET (LATEST — supersedes the "RIGHT NOW"/WAITERS sections far below)
+THREE jobs running; their background waiters DIE on /clear — re-create each:
+- **ayr lambda_13** (fast-lambda ladder rung): python pid **1012515**, tmux sess 0 win
+  `lam13`, log `runs/lambda13_ayr.log`, MAXJOBS=6. Waiter:
+  `ssh ayr "tail --pid=1012515 -f /dev/null"`. **DEADLINE-KILL 12:30pm ET** if still
+  running (then give up on lambda_13): re-create = sleep to 12:30 then
+  `ssh ayr 'kill $(pgrep -f "lambda_ladder_fast.py 13|gf_modp 13")'`. On normal finish:
+  read lambda_13 from the log, add to the FAST dict in experiments/lambda_fss.py, re-run FSS.
+- **dalby n=19 holes**: driver pid **1423357**, 17/19 done (h18,h19 left; h19 long pole).
+  Waiter: `ssh dalby.jhpb.org "tail --pid=1423357 -f /dev/null"`. On finish: combine ->
+  results/holes_n19.dalby.txt, sum-check sum_k == a(19)=151609203011580.
+- **ayr a(20)**: driver pid **995458**, h20 running (h15-18 done). Waiter:
+  `ssh ayr "tail --pid=995458 -f /dev/null"`. On finish: assemble all heights, compare
+  to a(20)=1,025,573,519,362,016 -> if confirmed, RUN a(21) (the reach goal).
+
+DELIVERABLES THIS SESSION (all committed on master):
+- **lambda = 7.110 +/- 0.005** via differential approximants + theta=-1 biased ratio
+  (experiments/series_da.py); FSS strip ladder extended to H<=13 (lambda_11=6.116,
+  lambda_12=6.219, 13 pending) -> ~7.4-7.6 trending to 7.11, broken BST replaced
+  (lambda_fss.py). Also lambda_0=6.94, amplitude C~0.19, lambda_k=lambda, symmetric
+  ~sqrt(lambda), knight lambda~10-12 (subclass_growth.py, lattice_da.py,
+  amplitude_ratios.py, lambda_ladder_fast.py [POLY_GF_ENGINE-aware]).
+- **site-perimeter** added to g2 + FIRST cross-SOURCE validation vs Mertens 1990
+  (results/site_perimeter*.txt, .md); #13/#15/#17 structural stats from existing samples.
+- **gf_modp memory fixed**: CSR edge list + two-pass exact reserve -> H=13 peak 17->6.8GB,
+  N-independent (results/modp_recover_profile.md). modp_recover.py: adaptive prime growth
+  (fixes the H=11 CRT-wrap that failed C1) + parallel BM + P-hoist (results: 4.6h->min).
+- **OEIS dedup pass** (oeis/README.md + in-file markers): maxholearea=known A001971
+  (not for submission), A0/A1 masters superseded by submissions/oeis/, gf-orders +
+  atom-degrees marked NOT-READY (paper says not-in-OEIS -> discuss with OEIS editors first).
+- Full idea-list ledger + falsifications in docs/new-directions-2026-06-22.md.
+
+NEXT: fold lambda_13 into FSS; sum-check n=19; on a(20) confirm -> a(21); editorial OEIS
+calls (orders/atoms submit-vs-paper, maxholearea delete, square-bbox #3 Superseeker) = jasonp.
+Remaining idea items needing code: #12 convex GFs, #14 contact density, #16 A389193;
+quick: reach-2 growth via `gf_modp H N P 2` + lambda_ladder_fast.
+
 ## SESSION UPDATE 2026-06-23 (autonomous, jasonp asleep)
 - **dalby n=19 hole count LAUNCHED + fitting** (driver pid 1423357; see dalby bullet).
   Reshaped from ~105 GiB to ~41 GiB peak via a **per-height kmax schedule**
