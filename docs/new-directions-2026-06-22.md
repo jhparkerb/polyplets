@@ -189,6 +189,16 @@ Near-free cluster (run first, no disturbance to live jobs): #1,#2,#3,#4,#6,#7(re
    validation + extends a published table. Needs a small g2 addition.
 2. **#1 OEIS lookup** (jasonp) — near-free, just needs the real query channel.
 3. **#8 knight/reach-2 growth** — reuse the DA/biased machine on a new lattice.
+
+### #9 DONE 2026-06-23 (experiments/lattice_da.py): DA pipeline cross-validated
+Applied the biased-ratio + Dlog-Pade machine to published Mertens-1990 series for
+other lattices -- all reproduce literature lambda, confirming the pipeline behind our
+king-lattice lambda=7.110, lambda_0=6.94, etc.:
+  king(=our a(n))  biased 7.113  (lit 7.11)
+  triangular       biased 5.184  (lit 5.18)  -- 19 terms, essentially exact
+  cubic/3D polycube biased 8.353 (lit 8.34)  -- 15 terms, theta=-3/2
+These are KNOWN constants (validation, not new sequences), as challenged. Value =
+external confidence in the DA results.
 4. Polish: #3 amplitude C (2-param fit), #4 large-k & #11 C2 (parity) once reach extends n.
 
 ## Artifacts

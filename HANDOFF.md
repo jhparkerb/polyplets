@@ -29,10 +29,17 @@ gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section f
   headroom and ONLY if the top heights run MAXJOBS=1 (the default per-height MAXJOBS=2
   does NOT fit n=19 — two big heights concurrently is ~170 GiB). n=18 total wall was
   ~4.8h at MAXJOBS=2; n=19 with top heights serialized ~ a full day.
-  **DECISION PENDING jasonp: (a) is the dalby window still open for ~1 day (it was "free
-  for 2026-06-22"; now 06-23 — may have reverted to factoring), and (b) approve the
-  tuned schedule (MAXJOBS=2 for h<=16, MAXJOBS=1 for h17-19; checkpoint/resume on for
-  OOM safety).**
+  **n=19 LAUNCHED 2026-06-23 ~07:18 (jasonp approved ~1-day window).** Driver pid
+  **1423357**, tmux session 0 window `n19holes`, `runs/holes_n19.log`. Reshaped to fit
+  with big headroom via a **per-height kmax schedule** kmax(H)=min(13,(N-H)+2) in
+  dalby_holes_perheight.sh — provably exact (hdrop drops only unreachable k; validated
+  byte-identical on the n=16 gate vs holes_n16.txt). This collapses the tall heights
+  (which dominate D_H but hold ~0 holes) ~5-7x: projected ~10-11 GiB each, first-wave
+  realistic peak ~41 GiB. **THREADS=8** (benchmarked floor: 2->4 1.35x, 4->8 1.29x,
+  8->16 NO gain -- MT saturates at 8), **MAXJOBS=6**. Observed 12.4 GB at 1:14 elapsed,
+  110 GB free -> fitting (~67% headroom). On finish: combine ->
+  results/holes_n19.dalby.txt, cross-check sum==a(19)=151609203011580, compare to ayr
+  if/when ayr produces n19. SSD/out-of-core NOT needed (kmax schedule solved it).
 
 ## WAITERS — re-create these after `/clear` (3 background tasks)
 Completion waiters are background Bash tasks; they die on `/clear`. Re-establish each as a
