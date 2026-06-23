@@ -122,6 +122,75 @@ error bar. Fold into the paper's growth section (#17) and the lambda timeline.
    isolates the needed quantity. Medium cost; turns a conjecture into a theorem-track
    number.
 
+## Broad brainstorm — 20 ideas, ranked + challenged (2026-06-22)
+
+Promise = value x tractability x P(works). Challenged most->least; kills at bottom.
+
+ 1. OEIS lookup of structural seqs (orders 1,3,7,15,42,106..; atoms 1,2,4,9,29,68..) — SURVIVES (near-free, do first)
+ 2. lambda_0 (hole-free) via DA/biased — SURVIVES (cheap, sharpens ~6.93, gives lambda_0/lambda)
+ 3. critical amplitude C in a(n)~C lam^n/n — SURVIVES (cheap, never reported)
+ 4. lambda_k per-hole-class growth, test lambda_k=lambda — SURVIVES for small k (data-limited large k)
+ 5. site-perimeter + first cross-SOURCE check vs Mertens 1990 — SURVIVES (catches shared-spec bugs)
+ 6. nu radius-of-gyration exponent (R_g~n^nu, ~0.6403) — SURVIVES W/ CAVEAT (confirms class, won't pin nu)
+ 7. symmetric-subclass growth ~sqrt(lambda)~2.667 — SURVIVES (unmeasured for polyplets)
+ 8. knight/reach-2 growth via DA+FSS — SURVIVES (medium cost, new lattice constant)
+ 9. triangular-lattice DA — SURVIVES as pipeline VALIDATION (known lambda), not discovery
+10. bounding-box aspect-ratio fluctuation — SURVIVES, modest (mean->1 trivial)
+11. free/one-sided amplitude ratio ->1/8 — SURVIVES, LOW marginal (ratio preordained)
+12. convex-subclass GFs (algebraic) — SURVIVES as two-step (extend series to ~40 then guess)
+13. hole-AREA distribution — SURVIVES cheap (sampler), modest
+14. exact diagonal-contact density (T6) via marked TM — SURVIVES, mediocre cost/value (engine work)
+15. mean rook-components constant — SURVIVES via sampling; exact deferred (engine)
+16. extend A389193 via square4 holes — SURVIVES, low novelty; verify engine support
+17. gluing-graph statistic (tree vs cycles) — SURVIVES, exploratory, unclear payoff
+18. subleading correction exponent Delta — KILLED (20 terms insufficient; unreachable)
+19. reach-r family (general r) — KILLED/DEFER (needs new 2D engine; speculative)
+20. fractal dim / limit shape — KILLED (no limit shape exists; subsumed by nu, #6)
+
+Near-free cluster (run first, no disturbance to live jobs): #1,#2,#3,#4,#6,#7(recon),#11.
+#2/#3/#4/#7 are the SAME biased-DA machine pointed at different subsequences.
+
+## Cluster results — executed 2026-06-22 (experiments/subclass_growth.py)
+
+- **#2 lambda_0 (hole-free):** biased(theta=-1) ratio 6.955, Dlog-Pade 6.92 ->
+  **lambda_0 ≈ 6.94 (6.92–6.96)**, lambda_0/lambda = 0.978. Sharpens the prior crude
+  "~6.93 ratio" into a two-method triangulation; confirms the 0.977 ratio. WIN.
+- **#4 lambda_k = lambda test:** k=1 -> 7.118, k=2 -> 7.05 (both ≈ lambda=7.110);
+  k=3 -> 6.06 but only 10 terms with ratios still steeply climbing (unreliable).
+  **Conclusion: lambda_k = lambda supported for k=1,2** (holes don't change the
+  exponential rate, as universality predicts); k>=3 needs more n. Structural win.
+- **#3 critical amplitude C:** C_n = a(n)*n/lambda^n rises slowly 0.185->0.188
+  (n=12..20); 1/n extrapolation **C ≈ 0.19** -- first-ever estimate of this
+  amplitude, not yet converged (sensitive to lambda). Completes a(n) ~ C lambda^n/n.
+- **#11 symmetric ~ sqrt(lambda):** mirror_ortho -> 2.571, mirror_diag -> 2.618,
+  both approaching **sqrt(lambda) = 2.667** from below. Confirms reflection-symmetric
+  polyplets grow as sqrt(lambda). (C2 -> 1.80 is garbage: C2 counts are parity-sparse,
+  ratios meaningless; redo C2 with parity-aware handling.)
+- **#6 nu (R_g exponent): ALREADY DONE** -- results/scaling_study.md fit R_g~n^nu
+  over n=8,11,14,19 giving **nu ≈ 0.683** ("finite-size-inflated, consistent with the
+  universal 0.6408"). At its ceiling without larger/more sample sizes; not worth redoing.
+- **#7 site-perimeter + Mertens cross-source: PROMOTED to high value.** Mertens 1990
+  (papers/Mertens1990...pdf) Table I "nnSquare" column IS the king lattice = our a(n)
+  to n=14; his perimeter polynomials D_s(q) are the SITE-perimeter distribution
+  (percolation t = empty neighbours), tabulated for the king lattice in Appendix A.
+  So: add site-perimeter to g2 (a few lines; g2 currently does only EDGE perimeter),
+  cross-validate against Mertens Appendix A (first cross-SOURCE check, catches
+  shared-spec bugs cross-ISA cannot), then EXTEND his king perimeter polynomials past
+  n=14. Table II gives a second king-lattice series (mean cluster size S(p), r<=13).
+- **#1 OEIS lookup: INCONCLUSIVE / enqueue for jasonp.** oeis.org blocks automated
+  fetch (403); WebSearch returned HALLUCINATED matches (A000929 partitions, A275490
+  5D-pyramidal) that cannot fit -- both our sequences grow ~2.6^n, those don't. Needs
+  a real oeis.org lookup or Superseeker (jasonp). Sequences: orders
+  1,3,7,15,42,106,278,711,1897,5005 ; atom degrees 1,2,4,9,29,68,181,462,1254,3289.
+
+### Next-pick ranking after the cluster
+1. **#7 site-perimeter + Mertens** — now the standout: new invariant + cross-source
+   validation + extends a published table. Needs a small g2 addition.
+2. **#1 OEIS lookup** (jasonp) — near-free, just needs the real query channel.
+3. **#8 knight/reach-2 growth** — reuse the DA/biased machine on a new lattice.
+4. Polish: #3 amplitude C (2-param fit), #4 large-k & #11 C2 (parity) once reach extends n.
+
 ## Artifacts
 - `experiments/lambda_fss.py`   — FSS/BST extrapolation of the lambda_H ladder.
 - `experiments/series_da.py`    — Dlog-Padé + inhomogeneous DA: lambda, theta, a(21)/a(22) prediction.
+- `experiments/subclass_growth.py` — lambda_0, lambda_k, amplitude C, sqrt(lambda) symmetric (items #2,#3,#4,#11).
