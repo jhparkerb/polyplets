@@ -86,6 +86,18 @@ def find_order(H):
             return order_of(bm_modp(s, PRIMES[0])[0]), N
         N *= 2
 
+def pconv_modp(Qp, s, p, d):
+    """numerator column mod p: P_p[k] = sum_{i<=min(k,d)} Qp[i]*s[k-i] mod p, k=0..d.
+    Qp is Q already reduced mod p (small ints) -- module-level so a Pool can run one
+    prime per worker (the per-prime columns are independent)."""
+    col = [0] * (d + 1)
+    for k in range(d + 1):
+        acc = 0
+        for i in range(min(k, d) + 1):
+            acc += Qp[i] * s[k - i]
+        col[k] = acc % p
+    return col
+
 def crt(rems, mods):
     x, M = 0, 1
     for r, p in zip(rems, mods):
@@ -166,7 +178,11 @@ def main():
                                 seq_modp, [(H, N, PRIMES[ki]) for ki in miss])):
                             ckpt.save(f"H{H}-N{N}-p{PRIMES[ki]}", s)
                             seqs[ki] = s
-                Cs = [bm_modp(seqs[k], PRIMES[k]) for k in range(len(PRIMES))]
+                # Berlekamp-Massey per prime: independent -> PARALLEL (was a serial list
+                # comp; ~1.5h serial at H=11). Reuse the sweep worker pool.
+                with Pool(_nproc) as _pool:
+                    Cs = _pool.starmap(bm_modp,
+                                       [(seqs[k], PRIMES[k]) for k in range(len(PRIMES))])
                 Ls = [order_of(C) for C, _ in Cs]
                 if len(set(Ls)) != 1:
                     rep.event("order_disagree", H=H, orders=str(Ls))  # needs more N, not primes
@@ -175,11 +191,16 @@ def main():
                 # denominator Q[0..d] by CRT (Q[0]=1), symmetric lift; numerator P next
                 Q = [1] + [sym(*crt([Cs[k][0][i] for k in range(len(PRIMES))], PRIMES))
                            for i in range(1, d + 1)]
-                P = []
-                for k in range(d + 1):
-                    rems = [sum(Q[i] % p * seqs[ki][k - i] for i in range(min(k, d) + 1)) % p
-                            for ki, p in enumerate(PRIMES)]
-                    P.append(sym(*crt(rems, PRIMES)))
+                # numerator P[k] = sum_{i<=min(k,d)} Q[i]*B(k-i), deg P <= d. PER PRIME:
+                # pre-reduce Q mod p ONCE (the old code recomputed Q[i]%p -- a ~1200-digit
+                # bignum mod -- inside the k,prime,i triple loop, ~1.2e10 times = ~4.6h at
+                # H=11), then convolve with that prime's B mod p using small ints.
+                Qp_all = [[qi % p for qi in Q] for p in PRIMES]   # reduce Q mod p once
+                with Pool(_nproc) as _pool:                       # one prime per worker
+                    Pmod = _pool.starmap(pconv_modp,
+                        [(Qp_all[ki], seqs[ki], PRIMES[ki], d) for ki in range(len(PRIMES))])
+                P = [sym(*crt([Pmod[ki][k] for ki in range(len(PRIMES))], PRIMES))
+                     for k in range(d + 1)]
                 while len(P) > 1 and P[-1] == 0: P.pop()   # trim leading-zero high terms
                 # validate the FULL GF against a fresh prime (the soundness gate): expand
                 # P/Q as a power series and compare to the engine's sequence.
