@@ -1,0 +1,12 @@
+%I Axxxxxc
+%S Axxxxxc 1,2,6,36,148,882,4648,27025,159490,951160,5803942,35903114,
+%T Axxxxxc 223968746,1411623422,8978749222,57490061438
+%N Axxxxxc Number of fixed n-cell polyplets (A006770) whose minimal bounding box is a square (width = height).
+%C Axxxxxc A polyplet (or polyking) is a set of unit cells connected through edges or corners (king moves); A006770 counts the fixed (translations-only) ones. Here we count those whose minimal axis-aligned bounding box has equal width and height.
+%C Axxxxxc Summing this subclass over all bounding-box shapes recovers A006770: sum over (w,h) of the by-bounding-box counts equals A006770(n). The diagonal w = h is this sequence.
+%C Axxxxxc Computed by direct Redelmeier enumeration of fixed polyplets, binning each by its bounding-box (width, height); the full (w,h) marginal was checked to equal A006770(n) term-by-term through n = 16. - _Jason H Parker_, 2026
+%H Axxxxxc Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet</a>.
+%Y Axxxxxc Cf. A006770 (all fixed polyplets), A030222 (free polyplets).
+%K Axxxxxc nonn,hard,more
+%O Axxxxxc 1,2
+%A Axxxxxc _Jason H Parker_, 2026

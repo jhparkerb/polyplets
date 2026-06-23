@@ -1,0 +1,12 @@
+%I Axxxxxb
+%S Axxxxxb 1,16,166,1456,11788,91300,688034,5091820,37209939,269452496,
+%T Axxxxxb 1937956658,13865448048,98796744112,701664375696,4970078092354
+%N Axxxxxb Number of fixed n-cell polyplets (A006770) with exactly one hole (4-connected-background convention).
+%C Axxxxxb A polyplet (or polyking) is a set of unit cells connected through edges or corners (king moves); A006770 counts the fixed ones. A hole is a bounded 4-connected component of the empty background. This counts those polyplets with exactly one such hole.
+%C Axxxxxb Column k=1 of the polyplets-by-number-of-holes triangle [draft Axxxxxx]. First nonzero at n=4 (the 4-cell diamond, the unique smallest holed polyplet). - _Jason H Parker_, 2026
+%C Axxxxxb Exact via a column transfer matrix carrying the Euler characteristic as a hole index (project thread #28), validated byte-identical to a per-animal background flood fill (n <= 14); terms given through n = 18, with n = 15..18 independently reproduced on a second CPU architecture (clang/ARM vs gcc/x86, byte-identical). The fixed-bounding-box-height contributions are rational; e.g. the height-3 one-hole animals have g.f. (x^4 + 2*x^5 - 2*x^7 - x^8)/(1 - 8*x + 20*x^2 - 14*x^3 - 8*x^4 + 18*x^5 + 3*x^6 - 16*x^7 + 6*x^8 + 6*x^9 - 3*x^10 - 2*x^11 + x^12). - _Jason H Parker_, 2026
+%H Axxxxxb Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet</a>.
+%Y Axxxxxb Cf. A006770 (all fixed polyplets), Axxxxxx (triangle by number of holes), Axxxxxa (hole-free).
+%K Axxxxxb nonn,hard
+%O Axxxxxb 4,2
+%A Axxxxxb _Jason H Parker_, 2026

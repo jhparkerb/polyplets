@@ -1,0 +1,13 @@
+%I Axxxxxj
+%S Axxxxxj 0,0,0,1,1,2,2,3,4,4,5,6,6,7,8,9,9,10,11,12,12,13,14,15,16,
+%T Axxxxxj 16,17,18,19,20
+%N Axxxxxj Maximum number of holes of an n-cell polyplet: the largest count of bounded 4-connected components of the complement, over all fixed n-cell king-move animals (A006770).
+%F Axxxxxj a(n) = n + 1 - A027709(n)/2, where A027709(n) is the minimum perimeter of an n-cell polyomino. (A027709 is even, so this is an integer.)
+%C Axxxxxj A polyplet (polyking) is a set of unit cells connected through edges or corners; a hole is a bounded component of the 4-connected background. To MAXIMIZE the hole COUNT every hole is a single empty cell. The area-maximizing one diamond (cf. the max-hole-AREA sequence) is the opposite extreme: here one wants as MANY holes as possible, each minimal.
+%C Axxxxxj The optimum is the even sublattice {x+y even} of a compact region: those cells are king-connected (via the (1,1),(1,-1),... steps) and form a unit square lattice rotated 45 degrees, on which each odd interior cell becomes a 1-cell hole. By Pick's theorem the number of such holes equals the number of interior vertices, n - P/2 + 1, maximized by the minimum-perimeter polyomino P = A027709. Hence a(n) = n + 1 - A027709(n)/2, proven for all n; matches exhaustive enumeration through n=9. At perfect squares n=(m+1)^2 this is m^2. So a(n) ~ n: almost every cell encloses its own hole, in contrast to the single large diamond's ~n^2/8 area. - _Jason H Parker_, 2026
+%e Axxxxxj a(9)=4: the nine cells with x+y even inside |x|+|y|<=2 (a 3 X 3 block in the rotated lattice) enclose the 4 cells (1,0),(-1,0),(0,1),(0,-1) as separate 1-cell holes.
+%C Axxxxxj Distinct from the maximum-hole sequence A337601 (maximum holes of an n-omino): the two agree on the short prefix but diverge by n=13 (here a(13)=6), since the king (corner-connected) lattice permits a denser even-sublattice packing than the edge-connected polyomino lattice. - _Jason H Parker_, 2026
+%Y Axxxxxj Cf. A006770 (fixed polyplets), A027709 (minimum polyomino perimeter), A337601 (maximum holes of a polyomino), and the max-hole-AREA companion (the L1 diamond sequence).
+%K Axxxxxj nonn,easy
+%O Axxxxxj 1,6
+%A Axxxxxj _Jason H Parker_, 2026
