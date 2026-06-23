@@ -177,11 +177,12 @@ Near-free cluster (run first, no disturbance to live jobs): #1,#2,#3,#4,#6,#7(re
   cross-validate against Mertens Appendix A (first cross-SOURCE check, catches
   shared-spec bugs cross-ISA cannot), then EXTEND his king perimeter polynomials past
   n=14. Table II gives a second king-lattice series (mean cluster size S(p), r<=13).
-- **#1 OEIS lookup: INCONCLUSIVE / enqueue for jasonp.** oeis.org blocks automated
-  fetch (403); WebSearch returned HALLUCINATED matches (A000929 partitions, A275490
-  5D-pyramidal) that cannot fit -- both our sequences grow ~2.6^n, those don't. Needs
-  a real oeis.org lookup or Superseeker (jasonp). Sequences: orders
-  1,3,7,15,42,106,278,711,1897,5005 ; atom degrees 1,2,4,9,29,68,181,462,1254,3289.
+- **#1 OEIS lookup: DONE -- both NOVEL (Superseeker-confirmed, jasonp 2026-06-23).**
+  NEITHER structural sequence is in OEIS: GF recurrence orders
+  1,3,7,15,42,106,278,711,1897,5005 NOR atom degrees 1,2,4,9,29,68,181,462,1254,3289.
+  Two more candidate-new sequences for the #25 OEIS batch. (My in-session lookup was
+  inconclusive -- oeis.org 403s automation, WebSearch hallucinated non-matches -- but
+  the sequences had already been Superseeker-checked.)
 
 ### Next-pick ranking after the cluster
 1. **#7 site-perimeter + Mertens** — now the standout: new invariant + cross-source
