@@ -149,6 +149,25 @@ the 8-type; square sanity = Eden 27/4 = 6.75). Rigorous interval now [6.54, 10.3
 side is finally under 11. experiments/lambda_upper_bound.py.
 
 
+### 2026-06-22 ~21:30 ET -- lambda UPPER bound tightened again 10.354 -> 9.355 (ITERATED, verified)
+The 10.354 is just the DEPTH-1 case of an iterated ancestor-exclusion. In the BFS spanning-tree
+encoding a cell C can be the discoverer of a neighbor q only if NO proper ancestor of C is
+adjacent-or-equal to q (an ancestor is shallower in the BFS, so q's parent has depth <= that
+ancestor's +1 <= depth(C) < depth(C)+1 -- q cannot be C's child). Track the last d discoverer
+directions as the cell type; exclude every child-slot adjacent to ANY of the d ancestors. This only
+ever drops PROVABLY-impossible children, so it stays a valid upper bound and tightens monotonically:
+king 10.354 (d1) -> 9.482 (d2=d3) -> 9.399 (d4) -> **9.355 (d5)**. VALIDATED on the square anchor
+(L1 adjacency): depth-1 = Eden 27/4 = 6.7500 exactly, then 6.75 -> 5.219 -> 5.163, staying above the
+true 4.0626 (and above Klarner-Rivest's stronger 4.649 -- ancestor-exclusion is weaker than KR's
+empty-cell method). The bound PLATEAUS ~9.3: deeper exclusion will NOT reach the ~8 heuristic; that
+needs propagating known-EMPTY frontier cells, not just occupied ancestors (future work). New rigorous
+interval **[6.54, 9.355]**. Ran on ayr (8^d cell-types, king to d5 = 32768; numpy-vectorized, self-
+checks the square anchor each run). experiments/lambda_upper_bound_iterated.py.
+- BUGFIX during this: the first draft used Chebyshev (king, L-inf) adjacency for BOTH lattices, so the
+  square anchor read a nonsense 2.0; king was unaffected (L-inf IS king adjacency, depth-1 = 10.354
+  reproduced). Parametrized adjacency per lattice (king L-inf, square L1); square anchor then correct.
+
+
 ### 2026-06-22 ~18:30 ET -- three fresh hunts: hole-free growth gap, novel sequences, king p_c
 - **Hole-stratified growth (NEW, verify)**: the hole-free subclass A_0(n) grows STRICTLY SLOWER.
   A_0(n)/a(n) decays EXPONENTIALLY ~0.978^n (decisive: RMS 2e-5 exponential vs 1.8e-3 stretched,
@@ -156,6 +175,17 @@ side is finally under 11. experiments/lambda_upper_bound.py.
   simply-connected subclass shares lambda, sub-exponential decay). [Decay fit robust; the
   square-contrast premise should be double-checked.] Mean hole count E[k] ~ 0.023n (linear) ->
   animals "typically holey" only around n >= 45.
+  - **CORRECTION 2026-06-22 evening (verified, results/lambda0-verification.md)**: the polyplet
+    result STANDS (lambda_0 ~ 6.93 < lambda ~ 7.10, ratio ~0.977, exponential beats power over
+    n=4..18) but the **"OPPOSITE the square lattice" framing is FALSE**. Pulling A006724 (hole-free
+    square polyominoes) vs A001168 directly: the square lattice shows the SAME exponential decay,
+    base ~0.977 -- essentially identical to the king lattice, same arched residual. No paper in
+    papers/ asserts equal hole-free growth; the premise was a confusion with shared universality
+    EXPONENTS / SAP asymptotics. Honest headline: hole-free animals grow exponentially slower on
+    BOTH lattices by nearly the same factor (~0.977) -- an AGREEMENT, not a contrast. Also: the
+    per-step decay base is not perfectly constant (bottoms at n=15-16, ticks up), so "pure
+    geometric / decisive" is an idealization; a geometric x power n^0.016 fits ~3x better but the
+    exponent is ~0, so exponential-dominated base ~0.977 is the right reading.
 - **Novel OEIS sequences** (build/g2 statistics, each verified vs OEIS term-by-term): holes_zero
   (hole-free count 1,4,20,109,622,3664,22094,135609,...), holes_one, box_square (square bounding
   box), holes_maxh (max # distinct holes; distinct from A337601 at n=13) -- submission candidates.

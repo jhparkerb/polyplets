@@ -15,7 +15,8 @@ polyominoes), applied here to the king lattice for the first time.
 | 2026 | 15.83  | **6.54** | this work -- Rands-Welsh concatenation (Rands & Welsh 1981 method) on the confirmed n<=19 series |
 
 Series ESTIMATE (not a bound): lambda ~ 7.12-7.155 (2D lattice-animal universality, theta=1).
-Current rigorous interval: **[6.54, 15.83]**. The lower bound climbs toward lambda with each new
+Current rigorous interval: **[6.54, 9.355]** (see the upper-bound section below for the 15.83 ->
+10.354 -> 9.355 progression). The lower bound climbs toward lambda with each new
 a(n) term (Rands-Welsh: 6.42 @ n<=15, 6.49 @ 17, 6.54 @ 19); the upper bound is the weak side and
 needs a different method to tighten. Scripts: experiments/lambda_lower_bound.py, lambda_series.py.
 
@@ -59,10 +60,23 @@ lambda=4.06 > z=4, slightly above; holds for triangular 5.18<6 and king 7.1<8). 
 heuristic (~8) is far closer to the truth than our rigorous UPPER bound (15.83) -- underscoring
 that the upper side is loose and a real upper-bound method landing near ~8 would be the new win.
 
-## Upper bound tightened (2026-06-22): 15.83 -> 10.354
+## Upper bound tightened (2026-06-22): 15.83 -> 10.354 -> 9.355
 | Year | Upper  | method |
 |------|--------|--------|
 | 2026 | 15.83  | ancestor-exclusion (floor ~15.56) |
 | 2026 | 12.207 | uniform twig (1+x)^5 = 3125/256 (closed form) |
-| 2026 | 10.354 | directional twig (Eden/Klarner-Rivest/Barequet-Shalah encoding); VERIFIED |
-Rigorous interval now [6.54, 10.354] (was [6.54, 15.83]). The iterated-twig method would push the upper bound toward ~8.
+| 2026 | 10.354 | directional twig = depth-1 ancestor-exclusion (Eden/Klarner-Rivest/Barequet-Shalah); VERIFIED |
+| 2026 | **9.355** | **ITERATED (depth-5) ancestor-exclusion**; VERIFIED -- experiments/lambda_upper_bound_iterated.py |
+Rigorous interval now **[6.54, 9.355]** (was [6.54, 10.354]).
+
+**Iterated ancestor-exclusion (2026-06-22 eve).** The depth-1 directional twig (10.354) generalizes:
+a BFS-tree cell C can discover neighbor q only if NO proper ancestor of C is adjacent-or-equal to q
+(an ancestor has smaller BFS depth, so reaches q first). Tracking the last d discoverer-directions
+as the cell type and excluding child-slots adjacent to ANY of the d ancestors gives a monotone,
+rigorously-valid tightening sequence (we only ever drop provably-impossible children):
+king 10.354 (d1) -> 9.482 (d2,d3) -> 9.399 (d4) -> **9.355 (d5)**. VALIDATED on the square lattice
+anchor: depth-1 = Eden 27/4 = 6.7500 exactly, decreasing 6.75 -> 5.219 -> 5.163 with depth (stays
+above the true 4.0626; remains above Klarner-Rivest's stronger 4.649, since pure ancestor-exclusion
+is weaker than KR's empty-cell method). The bound PLATEAUS ~9.3 -- so reaching the ~8 heuristic needs
+a stronger refinement (propagating known-EMPTY frontier cells, not just occupied ancestors), not more
+depth. Self-checking script with the square anchor; runs on ayr (8^d types, king to d5 = 32768).

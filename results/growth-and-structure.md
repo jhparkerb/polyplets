@@ -67,7 +67,8 @@ the genuine keeper is the reach lever R1xR3xB -> ~+2.2 terms.)
 - UPPER: lambda <= 15.83 (ancestor-exclusion, branch explore/theorem-lambda-bound, at its method
   floor ~15.56). LOOSE -- 2.2x the estimate; the weak side. A polyomino-style twig/Eden upper
   bound (~14% over truth on the square) would be the way to tighten it (-> ~8 if comparable).
-- RIGOROUS INTERVAL: [6.54, 15.83]; series ESTIMATE 7.12-7.155 sits just above the (now ~0.92*lambda)
+- RIGOROUS INTERVAL: [6.54, 15.83] (SUPERSEDED -> [6.54, 9.355]; see the two upper-bound sections
+  below); series ESTIMATE 7.12-7.155 sits just above the (now ~0.92*lambda)
   lower bound. Narrowing further: more a(n) terms lift the lower bound; a better upper-bound method
   is the open task.
 
@@ -97,7 +98,8 @@ Rands-Welsh / ancestor-exclusion bounds applied to the king lattice specifically
 above as "no published value located," NOT a priority claim.
 
 ## Clarification: 7.12-7.155 is an ESTIMATE spread, NOT a bracket containing lambda
-The only interval PROVEN to contain lambda is the rigorous [6.54, 15.83]. The 7.12-7.155 is the
+The only interval PROVEN to contain lambda is the rigorous [6.54, 9.355] (tightened from 15.83;
+see below). The 7.12-7.155 is the
 spread between two EXTRAPOLATIONS, neither a bound: (a) series-ratio of a(n)/a(n-1) -- the
 1/n-corrected fit gives ~7.10-7.12 and is still drifting UP as the window narrows (not converged);
 (b) GF-pole Neville on the per-height rates lambda_H (the lambda_H ARE rigorous lower bounds, 5.99
@@ -117,3 +119,15 @@ VERIFIED -- the 2-type reduction matches the 8-type computation, and the framewo
 square Eden value 27/4 = 6.75 exactly. experiments/lambda_upper_bound.py.
 NEW RIGOROUS INTERVAL: [6.54, 10.354]. Reaching ~8 needs the heavy iterated-twig enumeration
 (Barequet-Shalah) -- a real compute project, out of scope for now.
+
+## Upper bound improved again: lambda <= 9.355 (2026-06-22 eve, ITERATED, VERIFIED)
+The 10.354 above is the depth-1 case of an iterated ancestor-exclusion: a BFS-tree cell can
+discover a neighbor only if no PROPER ANCESTOR is adjacent-or-equal to it (the ancestor, being
+shallower, reaches it first). Tracking the last d discoverer-directions as the cell type and
+excluding child-slots adjacent to any of the d ancestors is a monotone, rigorously-valid tightening
+(only provably-impossible children are dropped). King: 10.354 (d1) -> 9.482 (d2/d3) -> 9.399 (d4) ->
+**9.355 (d5)**. VALIDATED on the square anchor (depth-1 = Eden 27/4 = 6.7500 exact; 6.75 -> 5.22 ->
+5.16 with depth, staying above true 4.0626). NEW RIGOROUS INTERVAL: **[6.54, 9.355]**. The bound
+PLATEAUS near 9.3, so the ~8 heuristic is NOT reachable by deeper ancestor-exclusion -- it needs the
+stronger empty-cell-propagation refinement (track known-EMPTY frontier cells, not just occupied
+ancestors). experiments/lambda_upper_bound_iterated.py (self-checks against the square anchor).
