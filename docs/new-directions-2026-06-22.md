@@ -199,6 +199,14 @@ king-lattice lambda=7.110, lambda_0=6.94, etc.:
   cubic/3D polycube biased 8.353 (lit 8.34)  -- 15 terms, theta=-3/2
 These are KNOWN constants (validation, not new sequences), as challenged. Value =
 external confidence in the DA results.
+
+### #11 DONE 2026-06-23 (experiments/amplitude_ratios.py)
+8*free/a -> 1.0000003 and 4*onesided/a -> 1.0000001 at n=19: amplitude ratios are
+1/8 (D4) and 1/4 (rotation group), as expected. biased lambda fixed/free/one-sided =
+7.111/7.113/7.112 -- all share lambda. BONUS tying #7<->#11: the amplitude-ratio
+residual |8free/a - 1| decays with base 0.387 ~ 1/sqrt(lambda)=0.375, i.e. the
+symmetric subclasses (which grow as sqrt(lambda), #7) ARE the leading correction to
+free/one-sided. Low marginal value as challenged, but the cross-link is clean.
 4. Polish: #3 amplitude C (2-param fit), #4 large-k & #11 C2 (parity) once reach extends n.
 
 ## Artifacts
