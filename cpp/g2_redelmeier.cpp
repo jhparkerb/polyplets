@@ -104,6 +104,14 @@ struct Counter {
   u64 hstamp = 0;
   std::vector<int> floodStk;               // flood-fill work stack
 
+  // optional (size, site-perimeter) joint distribution (off by default). The site
+  // perimeter is the number of distinct EMPTY king-(8-)adjacent cells of the animal
+  // -- the percolation perimeter for the king/nnSquare lattice. Cross-SOURCE check
+  // vs Mertens 1990 Table IVB (published polynomials), unlike our edge-perimeter.
+  bool siteperimCheck = false;
+  std::vector<u64> bySiteperim;             // [size*spStride + siteperim]
+  int spStride = 0;
+
   // optional max enclosed empty AREA per size (M(n), off by default). Uses the
   // same exterior-flood machinery as countHoles(), but SUMS the enclosed empty
   // cells (total hole area) instead of counting components, and keeps the running
@@ -252,7 +260,7 @@ struct Counter {
     reachedUndo.reserve(static_cast<size_t>(maxn) * deg + 8);
     bySize.assign(maxn + 1, 0);
     byBox.assign((maxn + 1) * (maxn + 1) * (maxn + 1), 0);
-    if (connCheck || perimCheck || holesCheck || maxHoleCheck) {
+    if (connCheck || perimCheck || holesCheck || maxHoleCheck || siteperimCheck) {
       inAnimal.assign(cells, 0);
       placed.clear();
       placed.reserve(maxn + 1);
@@ -273,7 +281,11 @@ struct Counter {
       holeStride = maxn + 1;                    // #holes <= size <= maxn
       byHoles.assign((maxn + 1) * holeStride, 0);
     }
-    if (holesCheck || maxHoleCheck) {
+    if (siteperimCheck) {
+      spStride = 8 * maxn + 1;                  // site-perimeter < 8*size
+      bySiteperim.assign((maxn + 1) * spStride, 0);
+    }
+    if (holesCheck || maxHoleCheck || siteperimCheck) {
       hseen.assign(cells, 0);
       hstamp = 0;
       floodStk.reserve(static_cast<size_t>(maxn) * 4 + 16);
@@ -309,6 +321,16 @@ struct Counter {
       const u64 a = static_cast<u64>(holeArea());
       if (a > maxAreaBySize[size]) maxAreaBySize[size] = a;
     }
+    if (siteperimCheck) {
+      ++hstamp;                                  // dedup empty neighbours per animal
+      int sp = 0;
+      for (int i = 0; i < size; ++i)
+        for (int k = 0; k < deg; ++k) {          // deg king-neighbour offsets
+          const int nb = placed[i] + dj[k];
+          if (!inAnimal[nb] && hseen[nb] != hstamp) { hseen[nb] = hstamp; ++sp; }
+        }
+      bySiteperim[size * spStride + sp] += 1;
+    }
   }
 
   void search(const int* untriedIn, int numUntried) {
@@ -325,7 +347,7 @@ struct Counter {
       if (x > maxx) maxx = x;
       if (y > maxy) maxy = y;
       ++size;
-      if (connCheck || perimCheck || holesCheck || maxHoleCheck) {
+      if (connCheck || perimCheck || holesCheck || maxHoleCheck || siteperimCheck) {
         inAnimal[j] = 1; placed.push_back(j);
         if (connCheck) pidx[j] = size - 1;
       }
@@ -363,7 +385,7 @@ struct Counter {
 
       // unplace; (x,y) keeps status 1 so later iterations and deeper
       // levels of this loop never re-add it -- the tried-set rule
-      if (connCheck || perimCheck || holesCheck || maxHoleCheck) { inAnimal[placed.back()] = 0; placed.pop_back(); }
+      if (connCheck || perimCheck || holesCheck || maxHoleCheck || siteperimCheck) { inAnimal[placed.back()] = 0; placed.pop_back(); }
       --size;
       minx = sminx; maxx = smaxx; maxy = smaxy;
     }
@@ -381,7 +403,7 @@ int main(int argc, char** argv) {
   if (argc < 3) {
     std::fprintf(stderr,
         "usage: %s {square4|square8|tri6} MAXN [--per-box] [--rook-bishop] "
-        "[--perimeter] [--holes|--holes8] [--maxhole|--maxhole8] "
+        "[--perimeter] [--siteperim] [--holes|--holes8] [--maxhole|--maxhole8] "
         "[--split S K IDX]\n",
         argv[0]);
     return 2;
@@ -413,6 +435,8 @@ int main(int argc, char** argv) {
       c.maxHoleCheck = true;
     } else if (std::strcmp(argv[i], "--maxhole8") == 0) {
       c.maxHoleCheck = true; c.maxHole8 = true;
+    } else if (std::strcmp(argv[i], "--siteperim") == 0) {
+      c.siteperimCheck = true;
     } else if (std::strcmp(argv[i], "--split") == 0 && i + 3 < argc) {
       c.splitS  = std::atoi(argv[i + 1]);
       c.splitK  = std::strtoull(argv[i + 2], nullptr, 10);
@@ -465,6 +489,15 @@ int main(int argc, char** argv) {
       for (int h = 0; h < c.holeStride; ++h) {
         const u64 v = c.byHoles[n * c.holeStride + h];
         if (v) std::printf("%d %d %llu\n", n, h,
+                           static_cast<unsigned long long>(v));
+      }
+  } else if (c.siteperimCheck) {
+    // "n  site-perimeter  count"; site-perim = # distinct empty king-neighbours.
+    // Sum over sp == bySize[n]. Cross-check vs Mertens 1990 Table IVB (nnSquare).
+    for (int n = 1; n <= c.maxn; ++n)
+      for (int p = 0; p < c.spStride; ++p) {
+        const u64 v = c.bySiteperim[n * c.spStride + p];
+        if (v) std::printf("%d %d %llu\n", n, p,
                            static_cast<unsigned long long>(v));
       }
   } else if (c.maxHoleCheck) {

@@ -207,6 +207,15 @@ external confidence in the DA results.
 residual |8free/a - 1| decays with base 0.387 ~ 1/sqrt(lambda)=0.375, i.e. the
 symmetric subclasses (which grow as sqrt(lambda), #7) ARE the leading correction to
 free/one-sided. Low marginal value as challenged, but the cross-link is clean.
+
+### #5 DONE 2026-06-23 (cpp/g2_redelmeier.cpp --siteperim; results/site_perimeter.md)
+Implemented site-perimeter (# distinct empty king-neighbours = percolation perimeter)
+in g2 and **cross-SOURCE validated vs Mertens 1990 Table IVB (nnSquare)**: n=11 matches
+s=11 EXACTLY (all 31 coeffs t=18..48, sum=a(11)), n=12 matches s=12 exactly. The
+project's FIRST agreement with an external published source on a computed invariant
+(all prior gates are cross-ISA, which can't catch shared-spec errors). The top-ranked
+enqueued item, delivered. Min-site-perimeter-per-n + the (n,t) triangle beyond n=13 are
+OEIS candidates. Found issue: Makefile -Wno-error=restrict breaks clang build (noted).
 4. Polish: #3 amplitude C (2-param fit), #4 large-k & #11 C2 (parity) once reach extends n.
 
 ## Artifacts
