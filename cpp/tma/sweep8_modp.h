@@ -35,6 +35,16 @@ struct FlatDB32 {
   size_t size() const { return cnt; }
   bool empty() const { return cnt == 0; }
   void clear() { std::fill(used.begin(), used.end(), 0); cnt = 0; }
+  // clear() only zeroes the used flags; freeMem() actually RETURNS the backing
+  // storage to the allocator (shrink to the 16-slot seed). The blocked store
+  // (B, sweep8_modp_blocked.h) calls this on a db partition the instant it is
+  // drained, so the live high-water is ~1x (next) rather than db+next.
+  void freeMem() {
+    keys = std::vector<Sig>(16);
+    vals = std::vector<std::uint32_t>(16 * stride);
+    used = std::vector<std::uint8_t>(16, 0);
+    cap = 16; cnt = 0;
+  }
 
   template <class F>
   void for_each(F&& fn) const {

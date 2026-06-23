@@ -20,6 +20,7 @@
 #include "tma/sweep.h"
 #include "tma/sweep8.h"
 #include "tma/sweep8_modp.h"
+#include "tma/sweep8_modp_blocked.h"
 #include "tma/sweep8_holes.h"
 #include "tma/sweep8_perim.h"
 
@@ -198,6 +199,9 @@ int main(int argc, char** argv) {
   bool fold = false;  // --fold: R1 vertical-mirror fold (~2x fewer states); composes with --modp
                       // on the plain a(n) --only-height path (R1xR3 reach engine, ~4x less RAM)
   bool hdrop = false;  // --hdrop: drop holes > kmax (exact for k<=kmax, bounds RAM)
+  int blockedS = 0;    // --blocked S: B (blocked store) on the modp reach path -- S
+                       // hash partitions, drained-and-freed per column (~2x less RAM,
+                       // composes with --fold/--modp). 0 = off. Rounded up to pow2.
   u64 reserveStates = 0;  // --reserve N: pre-size the state store to ~N states (skip
                           // the doubling-grow transient; pass the calibrated peak)
   for (int i = 3; i < argc; ++i) {
@@ -222,6 +226,10 @@ int main(int argc, char** argv) {
       fold = true;
     } else if (std::strcmp(argv[i], "--hdrop") == 0) {
       hdrop = true;
+    } else if (std::strcmp(argv[i], "--blocked") == 0 && i + 1 < argc) {
+      int s = std::atoi(argv[++i]);
+      blockedS = 1;
+      while (blockedS < s) blockedS <<= 1;  // round up to a power of two (mask requires it)
     } else if (std::strcmp(argv[i], "--reserve") == 0 && i + 1 < argc) {
       reserveStates = static_cast<u64>(std::strtoull(argv[++i], nullptr, 10));
     } else {
@@ -369,17 +377,29 @@ int main(int argc, char** argv) {
       // R1xR3 production reach path: fold + u32 mod-p sweep of one strip height -- emits
       // "n B_H(n) mod p". CRT over 2-3 primes (scripts/an_modp_crt.sh) recovers the exact
       // B_H(n); summing over H gives a(n). ~4x less RAM than the exact u64 sweep.
-      u64 peak = 0;
-      const std::vector<std::uint32_t> row = sweepSquare8HeightModP(
-          onlyHeight, maxn, static_cast<std::uint32_t>(modp), fold, peak);
+      u64 peak = 0, peakBytes = 0;
+      const std::vector<std::uint32_t> row =
+          blockedS > 0
+              ? sweepSquare8HeightModPBlocked(onlyHeight, maxn,
+                                              static_cast<std::uint32_t>(modp), fold,
+                                              blockedS, peak, peakBytes)
+              : sweepSquare8HeightModP(onlyHeight, maxn,
+                                       static_cast<std::uint32_t>(modp), fold, peak);
       obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-modp-N" +
                             std::to_string(maxn),
                         maxn, "height=" + std::to_string(onlyHeight) + " modp=" +
                                   std::to_string(modp) + " fold=" +
-                                  std::to_string(fold ? 1 : 0));
+                                  std::to_string(fold ? 1 : 0) +
+                                  (blockedS > 0 ? " blocked=" + std::to_string(blockedS)
+                                                : ""));
       rep.done("result=" + std::to_string(static_cast<unsigned long long>(row[maxn])),
                "peak_states=" +
-                   std::to_string(static_cast<unsigned long long>(peak)));
+                   std::to_string(static_cast<unsigned long long>(peak)) +
+                   (blockedS > 0
+                        ? " peak_store_mb=" +
+                              std::to_string(static_cast<unsigned long long>(
+                                  peakBytes >> 20))
+                        : ""));
       for (int n = 1; n <= maxn; ++n)
         std::printf("%d %u\n", n, row[n]);
       return 0;
