@@ -17,13 +17,22 @@ gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section f
   (10204408045521 / 3357266652450 / 860061675780); **h18 + h20 still running** (~1.3 days in).
   THE gating item — confirms/refutes **a(20) = 1,025,573,519,362,016**; unblocks a(21).
 - **dalby** (`~/src/polyominoes`, FQDN **dalby.jhpb.org** — the short alias does NOT resolve):
-  **n=17/18 exact hole-count BENCHMARK** (de-risks the n=19 run). tmux session 0 window
-  `2:holesbench`, **pane pid 1409709** running
-  `bash scripts/dalby_holes_perheight.sh 17 2 16 && … 18 2 16` → `runs/holes_bench.log`.
-  Per-height outputs in `runs/holes_n{17,18}_ph/`. On finish: cross-check
-  `results/holes_n18.dalby.txt == results/holes_n18.txt` (ayr) + measure heaviest-height RSS →
-  decides whether to commit dalby to the multi-day n=19 run. **dalby was "free for the day"
-  (2026-06-22) — the real availability WINDOW is an open question (it may go back to factoring).**
+  **n=17/18 hole-count BENCHMARK — DONE 2026-06-23 ~05:39 dalby time, exit 0.** Both
+  `results/holes_n17.dalby.txt` (84 rows) and `results/holes_n18.dalby.txt` (95 rows)
+  complete. **CROSS-CHECK PASSED: `holes_n18.dalby.txt` == `holes_n18.txt` (ayr)
+  byte-for-byte** (cross-ISA ARM/clang vs x86/gcc). n=17 dalby is new (no ayr n17 to
+  compare yet). tmux window `2:holesbench` now idle. **RESULT — the benchmark corrected
+  the n=19 projection: heaviest n=18 height is h18 = 46.4 GiB (47562.9 MB), NOT the
+  ~28.8 GB the ROADMAP assumed (that was h17 = 29460.7 MB). Heaviest-height grows
+  2.26x/term (h17@n17 20.5 GiB -> h18@n18 46.4 GiB), so n=19's heaviest height (h19)
+  projects to ~105-111 GiB.** That FITS dalby (122 GiB avail) but only with ~10-15 GiB
+  headroom and ONLY if the top heights run MAXJOBS=1 (the default per-height MAXJOBS=2
+  does NOT fit n=19 — two big heights concurrently is ~170 GiB). n=18 total wall was
+  ~4.8h at MAXJOBS=2; n=19 with top heights serialized ~ a full day.
+  **DECISION PENDING jasonp: (a) is the dalby window still open for ~1 day (it was "free
+  for 2026-06-22"; now 06-23 — may have reverted to factoring), and (b) approve the
+  tuned schedule (MAXJOBS=2 for h<=16, MAXJOBS=1 for h17-19; checkpoint/resume on for
+  OOM safety).**
 
 ## WAITERS — re-create these after `/clear` (3 background tasks)
 Completion waiters are background Bash tasks; they die on `/clear`. Re-establish each as a
@@ -42,7 +51,7 @@ P=$(pgrep -f 'modp_recover.py 11 11 48' | sort -n | head -1); [ -n "$P" ] && gta
 AP=$(ssh ayr 'cat ~/polyominoes/runs/a20/parallel.pid'); ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 ayr "tail --pid=$AP -f /dev/null"; echo "ayr a20 FINISHED"
 ```
 
-**3. dalby holes benchmark** (remote; bg + dangerouslyDisableSandbox). Re-find the pane pid:
+**3. dalby holes benchmark — DONE 2026-06-23, do NOT re-create this waiter** (kept for reference):
 ```
 DP=$(ssh dalby.jhpb.org "tmux list-windows -t 0 -F '#{window_name} #{pane_pid}' | awk '/holesbench/{print \$2}'"); ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 dalby.jhpb.org "tail --pid=$DP -f /dev/null"; echo "dalby holes n17+n18 benchmark FINISHED"
 ```
@@ -75,8 +84,10 @@ DP=$(ssh dalby.jhpb.org "tmux list-windows -t 0 -F '#{window_name} #{pane_pid}' 
    cores then free → heavier gympie work OK (but keep it brief/targeted/RAM-light, see constraints).
 2. **When a(20) confirms** (ayr): **run a(21)** with the `deploy/reach-modp-blocked` engine — THE
    reach goal. (Build in the worktree; an_modp_crt.sh with --fold --blocked --jobs.)
-3. **When the dalby benchmark lands**: cross-check n=18 == ayr + read heaviest-height RSS; **decide
-   n=19** (needs MAXJOBS×RSS < 125 GiB AND a confirmed multi-day dalby window).
+3. **dalby benchmark DONE (2026-06-23)**: n=18 == ayr byte-identical; heaviest height
+   corrected to h18=46.4 GiB → n=19 heaviest ~105-111 GiB (see dalby bullet). **n=19 is
+   feasible on dalby but TIGHT (MAXJOBS=1 at top, ~10-15 GiB headroom) and gated on
+   jasonp confirming a ~1-day dalby window.** Awaiting his go/no-go + schedule approval.
 4. **OEIS**: run the square-bbox Superseeker novelty check, then submit all 4 (jasonp).
 5. **(Open research) lambda → ~8**: the empty-cell-propagation upper-bound refinement.
 6. **(Ready) Reach**: compose Phase-4 OOC (`explore/reach-blocked-store`) on top of R1xR3xB for
