@@ -374,6 +374,25 @@ int main(int argc, char** argv) {
   // ETA is self-computed from the measured column rate.
   if (onlyHeight > 0) {
     if (modp > 0) {
+      // Top strip height H==N: a trivial closed form, not worth sweeping the largest,
+      // emptiest strip. A height-N king-polyomino of N cells has exactly one cell per
+      // row, and each of the N-1 inter-row steps shifts the column by -1/0/+1 (8-neighbour
+      // adjacency), so B_N(N) = 3^(N-1) (fixed: the first cell is translation-normalised);
+      // n<N cannot span N rows, so B_N(n<N)=0. Byte-identical to the real --only-height N
+      // sweep (verified n<=8); for a(20) this replaced a ~2-day h20 sweep.
+      if (onlyHeight == maxn) {
+        u64 v = 1 % modp;
+        const u64 base = 3 % modp;
+        for (int e = 0; e < maxn - 1; ++e) v = (v * base) % modp;
+        obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-modp-N" +
+                              std::to_string(maxn),
+                          0, "height=" + std::to_string(onlyHeight) + " modp=" +
+                                 std::to_string(modp) + " closed_form=3^(N-1)");
+        rep.done("result=" + std::to_string(static_cast<unsigned long long>(v)));
+        for (int n = 1; n < maxn; ++n) std::printf("%d %u\n", n, 0u);
+        std::printf("%d %u\n", maxn, static_cast<std::uint32_t>(v));
+        return 0;
+      }
       // R1xR3 production reach path: fold + u32 mod-p sweep of one strip height -- emits
       // "n B_H(n) mod p". CRT over 2-3 primes (scripts/an_modp_crt.sh) recovers the exact
       // B_H(n); summing over H gives a(n). ~4x less RAM than the exact u64 sweep.
