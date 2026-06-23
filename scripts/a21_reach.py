@@ -1,158 +1,161 @@
 #!/usr/bin/env python3
-# Reach driver for a(N) with a LIVE, self-calibrated ETA -- the a(20) h20 sweep sat
-# 35h on a single per-column heartbeat with a meaningless col/maxn ETA; this never
-# happens here. a(N) = sum_H B_H(N), recovered exactly by CRT over 3 primes near 2^31.
-# The N*3 (H,p) mod-p sweeps are independent, so we run JOBS at once.
+# Reach driver for a(N): runs a SUBSET of the N*3 independent (H,p) mod-p sweeps on ONE
+# machine, idempotently, with the production scaling config. a(N) = sum_H B_H(N),
+# recovered exactly by CRT over 3 primes near 2^31.
 #
-# ETA model (jasonp's "max of per-sweep ETAs", self-calibrated):
-#   every (H,p) sweep at a fixed height costs ~the same regardless of prime, so the
-#   FIRST completion at height H calibrates the cost of that height's remaining primes.
-#   Heights not yet seen fall back to a measured cost curve. The job ETA is the long
-#   pole: max(remaining time of any single in-flight/queued sweep, total remaining
-#   work / JOBS). No col/maxn fiction -- it is anchored to measured per-height times.
+# MULTI-MACHINE: run this on each box over DISJOINT --heights (each writes its own
+# rows_p{p}_H{H}.txt), collect all rows into one DIR, then run once more with no
+# --no-crt (all sweeps already done -> it skips them and just CRT-combines + gates).
 #
-# USAGE: a21_reach.py [N=21] [JOBS=8]
+# PRODUCTION CONFIG (measured, see HANDOFF): --threads 20 + --shardmult 32 + (ayr only)
+# --numa "numactl --interleave=all" -> ~10x per heavy sweep. Power-of-two thread counts
+# are ~2x SLOWER (architecture-independent) -- use 20. Light heights (small H) are
+# sub-second: run them --threads 1-4 --jobs (many) to fill cores; heavy heights -->
+# --threads 20 --jobs 1 (ayr, 32c) or 4 (dalby, 80c).
+#
+# ETA: self-calibrated -- each height's first finished prime sets the cost of its
+# remaining primes; the job ETA is the long pole. Rough until the first heavy height
+# of the run completes (no prior N=22 timings exist), then accurate.
+#
+# USAGE: a21_reach.py N [--heights LO-HI] [--jobs J] [--threads T] [--shardmult M]
+#                       [--numa "PREFIX"] [--primes K] [--no-crt] [--fresh]
+import argparse
 import os
 import subprocess
 import sys
 import time
 
-N = int(sys.argv[1]) if len(sys.argv) > 1 else 21
-JOBS = int(sys.argv[2]) if len(sys.argv) > 2 else 8
-# 3rd arg = number of primes (default 3 = exact CRT; 1 = fast cost-curve calibration,
-# emits a(N) mod p only -- used to measure the real per-height curve before the run).
-NPRIMES = int(sys.argv[3]) if len(sys.argv) > 3 else 3
-PRIMES = [2147483647, 2147483629, 2147483587][:NPRIMES]
+ap = argparse.ArgumentParser()
+ap.add_argument("N", type=int)
+ap.add_argument("--heights", default=None, help="LO-HI height window (default 1..N)")
+ap.add_argument("--jobs", type=int, default=1, help="concurrent sweeps on this box")
+ap.add_argument("--threads", type=int, default=20, help="threads per sweep (avoid pow2)")
+ap.add_argument("--shardmult", type=int, default=32, help="TMA_SHARD_MULT")
+ap.add_argument("--numa", default="", help="prefix, e.g. 'numactl --interleave=all'")
+ap.add_argument("--primes", type=int, default=3, help="3=exact CRT; 1=mod-p calibration")
+ap.add_argument("--no-crt", action="store_true", help="produce rows only (multi-machine)")
+ap.add_argument("--fresh", action="store_true", help="wipe rows first (default: resume)")
+args = ap.parse_args()
+
+N = args.N
+PRIMES = [2147483647, 2147483629, 2147483587][:args.primes]
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIR = os.path.join(HERE, f"runs/anmodp_N{N}")
 TMA = os.path.join(HERE, "build/tma")
-
-# Measured N=21 single-prime fallback curve (seconds), only used until a height
-# self-calibrates from its own first completion. Heights above the measured range
-# extrapolate the observed ~5x/step climb; the model is replaced by reality fast.
-FALLBACK = {h: 0.2 for h in range(1, 9)}
-FALLBACK.update({9: 1.7, 10: 8.6, 11: 45.0})
-for h in range(12, N + 1):
-    FALLBACK[h] = FALLBACK[h - 1] * 5.0  # climbs, then the real time corrects it
-FALLBACK[N] = 0.05  # top height H==N is the 3^(N-1) closed form -- instant
+LO, HI = (int(x) for x in args.heights.split("-")) if args.heights else (1, N)
+NUMA = args.numa.split()
 
 os.makedirs(DIR, exist_ok=True)
-for f in os.listdir(DIR):  # fresh: stale rows_*/hb_* would double-count or mislead
-    if f.startswith(("rows_p", "hb_p")):
-        os.remove(os.path.join(DIR, f))
+if args.fresh:
+    for f in os.listdir(DIR):
+        if f.startswith(("rows_p", "hb_p")):
+            os.remove(os.path.join(DIR, f))
 with open(os.path.join(DIR, "driver.pid"), "w") as f:
     f.write(str(os.getpid()) + "\n")
 
-# Build the task list. Interleave primes within each height so a height calibrates
-# its siblings quickly; ascending height keeps the cheap ones first.
-tasks = [(H, p) for H in range(1, N + 1) for p in PRIMES]
+
+def rows_path(H, p):
+    return os.path.join(DIR, f"rows_p{p}_H{H}.txt")
+
+
+def done_already(H, p):  # idempotent skip: non-empty rows file == that sweep is done
+    fp = rows_path(H, p)
+    return os.path.exists(fp) and os.path.getsize(fp) > 0
+
+
+# this box's task list: (H,p) in the height window, minus any already complete
+tasks = [(H, p) for H in range(LO, HI + 1) for p in PRIMES if not done_already(H, p)]
 TOTAL = len(tasks)
 
 
 def launch(H, p):
-    out = open(os.path.join(DIR, f"rows_p{p}_H{H}.txt"), "w")
+    out = open(rows_path(H, p), "w")
     hb = open(os.path.join(DIR, f"hb_p{p}_H{H}.log"), "w")
-    proc = subprocess.Popen(
-        [TMA, "square8", str(N), "--only-height", str(H), "--modp", str(p),
-         "--fold", "--blocked", "8"], stdout=out, stderr=hb)
-    return proc, out, hb
+    cmd = NUMA + [TMA, "square8", str(N), "--only-height", str(H), "--modp", str(p),
+                  "--fold", "--threads", str(args.threads)]
+    env = dict(os.environ, TMA_SHARD_MULT=str(args.shardmult))
+    return subprocess.Popen(cmd, stdout=out, stderr=hb, env=env), out, hb
 
 
 t0 = time.time()
-print(f">>> a({N}) reach: {TOTAL} sweeps ({N} heights x {len(PRIMES)} primes), "
-      f"JOBS={JOBS}, pid={os.getpid()}  {time.strftime('%Y-%m-%dT%H:%M:%S%z')}",
+print(f">>> a({N}) reach: heights {LO}-{HI} x {len(PRIMES)} primes = {TOTAL} sweeps to "
+      f"run, jobs={args.jobs} threads={args.threads} shardmult={args.shardmult} "
+      f"numa='{args.numa}' pid={os.getpid()}  {time.strftime('%Y-%m-%dT%H:%M:%S%z')}",
       flush=True)
 
-running = {}          # (H,p) -> (proc, out, hb, start)
-done_dur = {}         # H -> list of measured durations (one per finished prime)
-started = {}          # (H,p) -> start time (for in-flight remaining calc)
+running, done_dur, started = {}, {}, {}
 idx, completed = 0, 0
 last_print = 0.0
+FALLBACK = 60.0  # flat seed for unstarted heights; self-calibration overrides per height
 
 
 def predict(H):
+    if H == N:
+        return 0.05  # H==N is the 3^(N-1) closed form -- instant
     if H in done_dur:
         return sum(done_dur[H]) / len(done_dur[H])
-    return FALLBACK.get(H, 1.0)
+    return FALLBACK
 
 
 def eta_seconds():
     now = time.time()
-    # remaining time of in-flight sweeps (their predicted dur minus elapsed, >=0)
     inflight = [max(0.0, predict(H) - (now - st)) for (H, _p), st in started.items()
                 if (H, _p) in running]
-    queued = [predict(H) for (H, p) in tasks[idx:]]
+    queued = [predict(H) for (H, _p) in tasks[idx:]]
     pole = max(inflight + queued + [0.0])
-    work_remaining = sum(inflight) + sum(queued)
-    return max(pole, work_remaining / JOBS)
+    return max(pole, (sum(inflight) + sum(queued)) / args.jobs)
 
 
 while idx < TOTAL or running:
-    while idx < TOTAL and len(running) < JOBS:
+    while idx < TOTAL and len(running) < args.jobs:
         H, p = tasks[idx]
-        proc, out, hb = launch(H, p)
-        running[(H, p)] = (proc, out, hb)
+        running[(H, p)] = launch(H, p)
         started[(H, p)] = time.time()
         idx += 1
-    # reap finished
     for key in list(running):
         proc, out, hb = running[key]
         if proc.poll() is not None:
             out.close(); hb.close()
-            H, p = key
-            dur = time.time() - started[key]
-            done_dur.setdefault(H, []).append(dur)
+            done_dur.setdefault(key[0], []).append(time.time() - started[key])
             completed += 1
             del running[key]
     now = time.time()
-    if now - last_print >= 5.0:
+    if now - last_print >= 5.0 and TOTAL:
         last_print = now
-        el = now - t0
-        eta = eta_seconds()
         runlist = ",".join(f"H{H}@{int(now - started[(H, p)])}s"
                            for (H, p) in sorted(running)) or "-"
-        fin = time.strftime("%H:%M:%S", time.localtime(now + eta))
-        print(f"    [{int(el):5d}s] done {completed:2d}/{TOTAL}  "
-              f"running: {runlist}  ETA ~{int(eta)}s (~{fin})", flush=True)
+        eta = eta_seconds()
+        print(f"    [{int(now - t0):5d}s] done {completed:2d}/{TOTAL}  running: "
+              f"{runlist}  ETA ~{int(eta)}s (~{time.strftime('%H:%M:%S', time.localtime(now + eta))})",
+              flush=True)
     time.sleep(0.5)
 
-el = time.time() - t0
-if NPRIMES == 1:  # calibration mode: report the measured per-height cost curve
-    print(f">>> calibration curve (N={N}, single prime, {int(el)}s total):", flush=True)
-    for H in sorted(done_dur):
-        print(f"    H={H:2d}  {sum(done_dur[H])/len(done_dur[H]):8.2f}s", flush=True)
-print(f">>> all {TOTAL} sweeps done in {int(el)}s; CRT-combining  "
+print(f">>> this box done: {completed} sweeps in {int(time.time() - t0)}s  "
       f"{time.strftime('%Y-%m-%dT%H:%M:%S%z')}", flush=True)
 
-# CRT combine -> exact a(1..N) diagonal
+if args.no_crt:
+    sys.exit(0)
+
+# CRT-combine over ALL rows present in DIR -> exact a(1..N) diagonal, then gate.
 cc = subprocess.run(
     [sys.executable, os.path.join(HERE, "scripts/crt_combine.py"), DIR, str(N)]
     + [str(p) for p in PRIMES], capture_output=True, text=True)
 sys.stdout.write(cc.stdout)
-a = {}
-for ln in cc.stdout.splitlines():
-    x = ln.split()
-    if len(x) == 2:
-        a[int(x[0])] = int(x[1])
+a = {int(x[0]): int(x[1]) for x in (ln.split() for ln in cc.stdout.splitlines())
+     if len(x) == 2}
 
-# built-in correctness gate: the diagonal includes already-confirmed lower terms.
-# Only meaningful with the full 3-prime CRT (exact); with fewer primes the values
-# are mod-p, so skip the gate (this is a cost-curve / mod-p calibration pass).
-KNOWN = {12: 257105146, 20: 1025573519362016}
+KNOWN = {12: 257105146, 14: 11208974860, 20: 1025573519362016}
 EXACT = len(PRIMES) >= 3
 ok = True
 if EXACT:
     for n, v in KNOWN.items():
         if n <= N:
-            if a.get(n) == v:
-                print(f"    gate ok: a({n}) = {v}", flush=True)
-            else:
-                print(f"!!! GATE FAIL a({n})={a.get(n)} != {v}", flush=True)
-                ok = False
+            print(f"    gate ok: a({n}) = {v}" if a.get(n) == v
+                  else f"!!! GATE FAIL a({n})={a.get(n)} != {v}", flush=True)
+            ok = ok and a.get(n) == v
 else:
-    print(f"    (single/2-prime mode: values are mod p, gate skipped)", flush=True)
-
-tag = ("VALIDATED" if ok else "UNVALIDATED -- gate fail") if EXACT else "mod-p only"
-print(f">>> a({N}) = {a.get(N)}   [{tag}]", flush=True)
-if N - 1 in a and a.get(N - 1):
-    print(f">>> ratio a({N})/a({N-1}) = {a[N] / a[N-1]:.4f}", flush=True)
+    print("    (<3 primes: values are mod p, gate skipped)", flush=True)
+print(f">>> a({N}) = {a.get(N)}   "
+      f"[{('VALIDATED' if ok else 'GATE FAIL') if EXACT else 'mod-p only'}]", flush=True)
+if a.get(N - 1):
+    print(f">>> ratio a({N})/a({N-1}) = {a[N] / a[N - 1]:.4f}", flush=True)
