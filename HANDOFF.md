@@ -4,19 +4,26 @@ _Written 2026-06-22 ~22:00 ET, end of an autonomous multi-task push. Three jobs 
 gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section first if you just
 `/clear`ed — the background completion waiters do NOT survive a clear and must be re-created._
 
-## CURRENT STATE 2026-06-23 ~12:00 ET (LATEST — supersedes the "RIGHT NOW"/WAITERS sections far below)
-- **lambda_13 DONE + FOLDED IN** (commit c5e604d): fast-ladder Aitken=6.30668 (N=120),
-  added to the FAST dict in experiments/lambda_fss.py. Confirmed Aitken-field (H=11 Aitken
-  re-run reproduces the recorded 6.11591). FSS deltas keep decaying (0.124->0.103->0.087);
-  high-Hmin increment-decay fits ~7.36, consistent with the DA lambda=7.110. No more rungs queued.
-TWO jobs still running; their background waiters DIE on /clear — re-create each (use the
-**literal numeric pid**, NOT $(cat parallel.pid) — that pidfile has a CRLF \r that breaks tail):
-- **dalby n=19 holes**: driver pid **1423357**, h18+h19 left (h19 long pole; h16/h17 done
-  ~16:00 dalby). Waiter: `ssh dalby.jhpb.org "tail --pid=1423357 -f /dev/null"`. On finish:
+## CURRENT STATE 2026-06-23 ~17:00 ET (LATEST — supersedes everything below)
+- **a(20) CONFIRMED = 1,025,573,519,362,016.** ayr per-height run: h1..h19 measured
+  (sum=1,025,572,357,100,549) + **h20 = 3^19 = 1,162,261,467 closed form** -> exact match.
+  square8 IS the 8-neighbour (king/polyplet) lattice; the top height H=N is ALWAYS the
+  trivial closed form 3^(N-1) (one cell/row, 3 king-shifts per inter-row step, fixed).
+  ayr h20 sweep (a 2-day grind recomputing 3^19) was KILLED at 12:43 ET. **ayr now IDLE.**
+- **ENGINE CHANGE (reach branch deploy/reach-modp-blocked, commit 8eec9d0)**: tma modp
+  --only-height N now short-circuits H==N to 3^(N-1) instead of sweeping. Byte-identical
+  (verified n=6,8,12,20), end-to-end reach CRT a(12)=257105146==master. Does NOT touch the
+  24/24 per-height gate. Built in the gympie worktree ~/src/polyominoes-reach.
+- **a(21) LIVE-ETA ORCHESTRATOR built**: scripts/a21_reach.py (reach worktree). Runs the
+  N*3 (H,p) modp sweeps JOBS-parallel on GYMPIE (modp engine is MB-light, fits the 10-core
+  cap -- no ayr needed), prints a continuously-updated SELF-CALIBRATED max-ETA (each height's
+  first prime calibrates its remaining primes; 3rd CLI arg = #primes, =1 for a cost-curve
+  calibration pass). Built-in gate: the CRT diagonal must reproduce a(20)/a(12). Tested
+  N=14 VALIDATED (a(14)=11208974860). **a(21) single-prime CALIBRATION running on gympie**
+  (measures the real per-height curve -> bake as fallback -> launch full 3-prime run).
+- **dalby n=19 holes STILL RUNNING**: driver pid **1423357**, h18+h19 left (h19 long pole;
+  h15/16/17 done). Waiter: `ssh dalby.jhpb.org "tail --pid=1423357 -f /dev/null"`. On finish:
   combine -> results/holes_n19.dalby.txt, sum-check sum_k == a(19)=151609203011580.
-- **ayr a(20)**: driver pid **995458** (~1.9 days in), h18+h20 running (h15-17 done). Waiter:
-  `ssh ayr "tail --pid=995458 -f /dev/null"`. On finish: assemble all heights, compare
-  to a(20)=1,025,573,519,362,016 -> if confirmed, RUN a(21) (the reach goal).
 
 DELIVERABLES THIS SESSION (all committed on master):
 - **lambda = 7.110 +/- 0.005** via differential approximants + theta=-1 biased ratio
