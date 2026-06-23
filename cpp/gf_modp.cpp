@@ -137,18 +137,27 @@ int main(int argc, char** argv) {
   for (int m = 1; m <= full; ++m)
     { startIds.push_back(intern(m, colLabels(m), m & top, m & bot)); startCells.push_back(__builtin_popcount(m)); }
 
-  std::vector<int> efrom, eto, eadd;                     // flat edge list
+  // CSR edge list grouped by source state. The loop emits edges in source order, so
+  // efrom is implicit -> store S+1 row offsets instead of an int per edge. eadd is a
+  // popcount in [1,H] (uint8); eto a state index (uint32). 12 B/edge -> 5 B/edge.
+  std::vector<std::int64_t> rowptr;
+  std::vector<std::uint32_t> eto;
+  std::vector<std::uint8_t> eadd;
   for (size_t s = 0; s < states.size(); ++s) {           // states grows during the loop
+    rowptr.push_back((std::int64_t)eto.size());          // source s's edges start here
     const State st = states[s];
     for (int m2 = 1; m2 <= full; ++m2) {
       u64 lab2;
       if (!step(st.mask, st.lab, m2, &lab2)) continue;
       int t = intern(m2, lab2, st.tT || (m2 & top), st.tB || (m2 & bot));
-      efrom.push_back((int)s); eto.push_back(t); eadd.push_back(__builtin_popcount(m2));
+      eto.push_back((std::uint32_t)t); eadd.push_back((std::uint8_t)__builtin_popcount(m2));
     }
   }
+  rowptr.push_back((std::int64_t)eto.size());            // sentinel
   const int S = (int)states.size();
-  const size_t E = efrom.size();
+  const size_t E = eto.size();
+  std::fprintf(stderr, "states=%d edges=%zu edge_bytes=%.2fGB (CSR 5B/edge)\n",
+               S, E, 5.0 * E / (1<<30));
 
   // terminal = single component (max label 0) AND both flags
   std::vector<char> terminal(S);
@@ -171,11 +180,15 @@ int main(int argc, char** argv) {
     std::fill(bn, bn + S, 0);                       // reuse the slot from n-Wn
     for (size_t i = 0; i < startIds.size(); ++i)    // single-column base cases
       if (startCells[i] == n) bn[startIds[i]] = (bn[startIds[i]] + 1) % P;
-    for (size_t e = 0; e < E; ++e)                  // extend by one column
-      if (n - eadd[e] >= 1) {
-        u64 v = rowOf(n - eadd[e])[efrom[e]];
+    for (int s = 0; s < S; ++s) {                   // CSR: edges grouped by source s
+      u64 vk[16];                                   // rowOf(n-k)[s], k=1..H -- read once
+      for (int k = 1; k <= H; ++k) vk[k] = (n - k >= 1) ? rowOf(n - k)[s] : 0;
+      const std::int64_t e0 = rowptr[s], e1 = rowptr[s + 1];
+      for (std::int64_t e = e0; e < e1; ++e) {      // extend by one column
+        u64 v = vk[eadd[e]];
         if (v) bn[eto[e]] = (bn[eto[e]] + v) % P;
       }
+    }
     u64 acc = 0;
     for (int s = 0; s < S; ++s) if (terminal[s] && bn[s]) acc = (acc + bn[s]) % P;
     res[n] = acc;
