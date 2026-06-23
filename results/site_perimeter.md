@@ -30,9 +30,14 @@ invariant — a strictly stronger correctness signal than the cross-ISA gates.
 - Frontier: g2 is per-animal Redelmeier, so ~n<=13-14 single-core (a(14)~1.1e10).
   Higher n would need a site-perimeter-marked transfer matrix (future).
 
-## Candidate new sequence
-The minimum site-perimeter per n (the most compact king-animals) and the full
-(n,t) triangle beyond Mertens' n=13 are OEIS candidates — stage in the #25 batch.
+## Candidate new sequences (from n<=13 data)
+- **max site-perimeter(n) = 4n+4** exactly (8,12,16,20,...,56 for n=1..13). Clean
+  closed form (the sparsest king-connected arrangement).
+- **min site-perimeter(n) = 8,10,12,12,14,14,16,16,16,18,18,18,20** (n=1..13) — the
+  king-lattice site-perimeter ISOPERIMETRIC sequence (most-compact animals; a
+  site-perimeter analog of A027709 min-polyomino-perimeter). Square blocks k x k hit
+  4k+4 at n=k^2 (n=1,4,9 -> 8,12,16). The genuinely interesting one; OEIS candidate.
+- The full (n,t) triangle beyond Mertens' n=13 is also new. Stage in the #25 batch.
 
 ## Build note (found issue)
 `make build/g2` fails under clang on gympie: the Makefile passes `-Wno-error=restrict`
