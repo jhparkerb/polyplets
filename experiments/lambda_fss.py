@@ -20,7 +20,9 @@ def load_PQ():
     for line in open("results/fixed_height_gfs.txt"):
         m = re.match(r"H=(\d+)\s+order", line)
         if m:
-            H = int(m.group(1))
+            # skip unvalidated heights (e.g. H=11 validated=False, 2026-06-23) --
+            # an unvalidated GF has wrong coefficients, would corrupt the FSS.
+            H = int(m.group(1)) if "validated=False" not in line else None
         elif line.startswith("P:") and H is not None:
             Ps[H] = [int(x) for x in re.findall(r"-?\d+", line.split(":",1)[1])]
         elif line.startswith("Q:") and H is not None:

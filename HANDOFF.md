@@ -10,6 +10,19 @@ gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section f
   (kmax(H)=min(13,(N-H)+2), provably exact, validated byte-identical on an n=16 gate
   vs holes_n16.txt). THREADS=8 (benchmarked MT floor), MAXJOBS=6. ~67% headroom.
 - **lambda upper bound depth-6 = 9.322** saved (results/lambda_upper_depth_sweep.txt).
+- **C1 (H=11 fixed-height GF) FINISHED but FAILED VALIDATION** (2026-06-23 05:10,
+  15h wall). `results/fixed_height_gfs.txt` now has `H=11 order=13381 validated=False`
+  -- the recovered GF, expanded, disagrees with the engine at a fresh prime, so it is
+  WRONG. **Do NOT fold in lambda_11 or the H=11 lifetime-3/atom extension** until a
+  clean rerun. Diagnosis: `need = order//110 + 12 = 133` CRT primes was likely
+  marginally short for the order-13381 Q_11's largest coefficients (~10^1043), so CRT
+  wrapped (N = 2*order+30 = 26792 terms had margin, so terms are the less-likely
+  cause). RECOMMENDED FIX (jasonp's call, gympie now free): rerun forcing more primes,
+  e.g. `python3 gf/modp_recover.py 11 11 180`, AFTER clearing only the coarse
+  checkpoint key `runs/ckpt/fixedgf-H11_11/.../H11-gf` (the per-prime sweeps at N=26792
+  are cached and reused -> only ~47 new prime sweeps compute, a few hours not 15h).
+  Or bump the `need` constant (110 -> ~90) in modp_recover.py. lambda_fss.py now SKIPS
+  validated=False heights so it isn't corrupted (still BST 7.221 on H<=10).
 - **New-directions enqueued items worked** (docs/new-directions-2026-06-22.md, all
   committed): DONE #5 (site-perimeter + FIRST cross-SOURCE validation vs Mertens 1990,
   exact n=11/12/13; +min/max site-perim sequences), #9 (DA pipeline validated on
