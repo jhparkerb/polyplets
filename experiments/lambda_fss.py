@@ -68,37 +68,34 @@ def main():
     L = np.array([lam[H] for H in Hs], float)
     Harr = np.array(Hs, float)
 
-    # --- BST / Bulirsch-Stoer-Henkel extrapolation table (sequence accel.) ---
-    # T_0(H) = lam_H; T_{k}(H) = T_{k-1}(H+1) +
-    #   (T_{k-1}(H+1)-T_{k-1}(H)) / ( ((H+w)/(H+w+k))^? ... )
-    # Use the classic BST with free exponent w: choose w minimizing last-column spread.
-    def bst(seq, w):
-        n = len(seq)
-        T = [list(seq)]
-        for k in range(1, n):
-            prev = T[k-1]
-            row = []
-            for i in range(n-k):
-                num = prev[i+1]-prev[i]
-                ratio = ((i+1+w)/(i+1+w+1))**(k-1) if False else ((k)/(k+1))
-                # standard BST recurrence:
-                denom = ( ( (i+1+w)/(i+w) )**( (k) ) - 1.0 )
-                if abs(denom) < 1e-15:
-                    row.append(prev[i+1]); continue
-                row.append(prev[i+1] + num/denom)
-            T.append(row)
-        return T
-    # search w
-    best=None
-    for w in np.linspace(0.1, 4.0, 400):
-        T = bst(L, w)
-        tail = T[-1][0] if T[-1] else float('nan')
-        t2  = T[-2][-1] if len(T)>=2 and T[-2] else float('nan')
-        spread = abs(tail-t2)
-        if np.isfinite(spread) and (best is None or spread<best[0]):
-            best=(spread, w, tail)
     print()
-    print(f"BST extrapolation: lambda_infty ~ {best[2]:.5f}  (w={best[1]:.3f}, last-step move {best[0]:.2e})")
+    # --- robust extrapolation. The ladder converges as a POWER LAW (the old free-w BST
+    # found degenerate optima -> garbage 5.889 < lam_12). Increments d_H = lam_H-lam_{H-1}
+    # decay ~ C*H^{-alpha}; fit alpha,C on the tail (log-log) and SUM the remaining tail:
+    # lambda_infty = lam_last + sum_{H>last} C*H^{-alpha}. (Valid only if alpha>1.) ---
+    dH = np.array([lam[H]-lam[H-1] for H in Hs if H-1 in lam])
+    nH = np.array([float(H) for H in Hs if H-1 in lam])
+    last = Hs[-1]
+    for Hmin in (4, 6, 8):
+        m = nH >= Hmin
+        if m.sum() < 3: continue
+        slope, c0 = np.polyfit(np.log(nH[m]), np.log(dH[m]), 1)
+        alpha, C = -slope, np.exp(c0)
+        if alpha <= 1.0:
+            print(f"increment-decay (H>={Hmin}): alpha={alpha:.2f}<=1 -> tail diverges "
+                  "(too few rungs to bound lambda_infty)")
+            continue
+        tail = float(np.sum(C * np.arange(last+1, 200000, dtype=float)**(-alpha)))
+        print(f"increment-decay (H>={Hmin}): alpha={alpha:.3f}  lambda_infty ~ {lam[last]+tail:.4f}")
+    # iterated Aitken delta^2 (robust accelerator; under-extrapolates power-law but
+    # never diverges -> a sanity floor)
+    def aitken(s):
+        return [s[i] - (s[i+1]-s[i])**2/(s[i+2]-2*s[i+1]+s[i])
+                for i in range(len(s)-2) if abs(s[i+2]-2*s[i+1]+s[i]) > 1e-12]
+    a = list(L)
+    for _ in range(3):
+        if len(a) >= 3: a = aitken(a)
+    if a: print(f"iterated Aitken: lambda_infty >~ {a[-1]:.4f}  (floor; power-law undersells)")
 
     # --- power-law fits lambda_infty - lam_H = A H^{-p}, grid over (lambda_infty,p) ---
     # For a guessed Linf and p, regress log(Linf-lam_H) ~ log A - p log H; pick Linf,p
