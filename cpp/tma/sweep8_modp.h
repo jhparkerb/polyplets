@@ -13,6 +13,8 @@
 
 #include <cstdint>
 #include <cstring>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 #include "signature.h"
@@ -95,11 +97,82 @@ inline void addCountsModP32(FlatDB32& db, const Sig& sig, const std::uint32_t* s
           (static_cast<std::uint64_t>(dst[n + shift]) + src[n]) % p);
 }
 
+// Multithreaded strip-height sweep mod p -- the sharded mirror of the exact engine's
+// sweepSquare8HeightMT, adapted to FlatDB32 + mod-p accumulation. db/next are S hash
+// shards (S = 128*nthreads, power of two); each column, thread t drains source shards
+// t,t+T,... and routes every output to dest shard hashSig(out)&(S-1) under that shard's
+// mutex. Source shards are thread-partitioned so reads need no lock. The comps==1
+// harvest goes to a per-thread u64 row (raw sum can't overflow at our state counts),
+// reduced mod p once per column when merged into `row`. Correctness vs the serial path
+// is by construction (sharding does not change which states/counts are produced) and is
+// gated byte-identical per (H,p,fold).
+inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
+                                                           std::uint32_t p, bool fold,
+                                                           u64& peakStates,
+                                                           int nthreads) {
+  std::vector<std::uint32_t> row(maxn + 1, 0);
+  int S = 64;
+  while (S < 128 * nthreads) S <<= 1;  // shards: power of two, >> nthreads
+  std::vector<FlatDB32> dbS, nextS;
+  dbS.reserve(S); nextS.reserve(S);
+  for (int s = 0; s < S; ++s) { dbS.emplace_back(maxn); nextS.emplace_back(maxn); }
+  std::vector<std::mutex> mu(S);
+  { Sig seed; std::memset(seed.b, 0, SIGMAX);
+    dbS[FlatDB::hashSig(seed) & (S - 1)].slot(seed)[0] = 1u % p; }
+
+  for (int col = 0; col <= maxn; ++col) {
+    u64 total = 0;
+    for (int s = 0; s < S; ++s) total += dbS[s].size();
+    if (total == 0) break;
+    if (total > peakStates) peakStates = total;
+    for (int s = 0; s < S; ++s) nextS[s].clear();
+
+    std::vector<std::vector<u64>> localRow(nthreads, std::vector<u64>(maxn + 1, 0));
+    auto worker = [&](int t) {
+      std::vector<u64>& lrow = localRow[t];
+      for (int s = t; s < S; s += nthreads)  // thread t owns source shards t,t+T,...
+        dbS[s].for_each([&](const Sig& sig, const std::uint32_t* counts) {
+          const int ms = minSizeRow32(counts, maxn);
+          if (ms < 0) return;
+          int comps = 0;
+          for (int j = 0; j < H; ++j)
+            if (sig.b[j] > comps) comps = sig.b[j];
+          if (comps == 1 && sig.b[H] && sig.b[H + 1])
+            for (int n = 1; n <= maxn; ++n)
+              if (counts[n]) lrow[n] += counts[n];
+          forEachViableMask(sig, H, maxn - ms, [&](unsigned mask) {
+            Sig out;
+            if (stepColumnSquare8(sig, H, mask, out) != Outcome::Alive) return;
+            const int cells = __builtin_popcount(mask);
+            if (ms + cells + completionLowerBound(out.b, H) > maxn) return;
+            if (fold) foldSig(out, H);
+            const int sh = FlatDB::hashSig(out) & (S - 1);
+            std::lock_guard<std::mutex> lk(mu[sh]);
+            addCountsModP32(nextS[sh], out, counts, cells, maxn, p);
+          });
+        });
+    };
+    std::vector<std::thread> th;
+    for (int t = 0; t < nthreads; ++t) th.emplace_back(worker, t);
+    for (auto& x : th) x.join();
+    for (int t = 0; t < nthreads; ++t)
+      for (int n = 1; n <= maxn; ++n)
+        row[n] = static_cast<std::uint32_t>(
+            (static_cast<u64>(row[n]) + localRow[t][n]) % p);
+    std::swap(dbS, nextS);
+  }
+  return row;
+}
+
 // One strip height mod p: B_H(n) mod p for n=0..maxn. fold=true applies the R1
 // vertical-mirror fold. peakStates is updated with this height's high-water mark.
+// nthreads>1 selects the sharded multithreaded path (above); nthreads<=1 keeps the
+// serial path byte-identical for the gated callers.
 inline std::vector<std::uint32_t> sweepSquare8HeightModP(int H, int maxn,
                                                          std::uint32_t p, bool fold,
-                                                         u64& peakStates) {
+                                                         u64& peakStates,
+                                                         int nthreads = 1) {
+  if (nthreads > 1) return sweepSquare8HeightModPMT(H, maxn, p, fold, peakStates, nthreads);
   std::vector<std::uint32_t> row(maxn + 1, 0);
   FlatDB32 db(maxn), next(maxn);
   Sig seed;
