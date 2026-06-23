@@ -135,18 +135,24 @@ for ln in cc.stdout.splitlines():
     if len(x) == 2:
         a[int(x[0])] = int(x[1])
 
-# built-in correctness gate: the diagonal includes already-confirmed lower terms
+# built-in correctness gate: the diagonal includes already-confirmed lower terms.
+# Only meaningful with the full 3-prime CRT (exact); with fewer primes the values
+# are mod-p, so skip the gate (this is a cost-curve / mod-p calibration pass).
 KNOWN = {12: 257105146, 20: 1025573519362016}
+EXACT = len(PRIMES) >= 3
 ok = True
-for n, v in KNOWN.items():
-    if n <= N and a.get(n) != v:
-        print(f"!!! GATE FAIL a({n})={a.get(n)} != {v}", flush=True)
-        ok = False
-for n, v in KNOWN.items():
-    if n <= N and a.get(n) == v:
-        print(f"    gate ok: a({n}) = {v}", flush=True)
+if EXACT:
+    for n, v in KNOWN.items():
+        if n <= N:
+            if a.get(n) == v:
+                print(f"    gate ok: a({n}) = {v}", flush=True)
+            else:
+                print(f"!!! GATE FAIL a({n})={a.get(n)} != {v}", flush=True)
+                ok = False
+else:
+    print(f"    (single/2-prime mode: values are mod p, gate skipped)", flush=True)
 
-print(f">>> a({N}) = {a.get(N)}   [{'VALIDATED' if ok else 'UNVALIDATED -- gate fail'}]",
-      flush=True)
+tag = ("VALIDATED" if ok else "UNVALIDATED -- gate fail") if EXACT else "mod-p only"
+print(f">>> a({N}) = {a.get(N)}   [{tag}]", flush=True)
 if N - 1 in a and a.get(N - 1):
     print(f">>> ratio a({N})/a({N-1}) = {a[N] / a[N-1]:.4f}", flush=True)
