@@ -4,18 +4,17 @@ _Written 2026-06-22 ~22:00 ET, end of an autonomous multi-task push. Three jobs 
 gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section first if you just
 `/clear`ed — the background completion waiters do NOT survive a clear and must be re-created._
 
-## CURRENT STATE 2026-06-23 ~10:48 ET (LATEST — supersedes the "RIGHT NOW"/WAITERS sections far below)
-THREE jobs running; their background waiters DIE on /clear — re-create each:
-- **ayr lambda_13** (fast-lambda ladder rung): python pid **1012515**, tmux sess 0 win
-  `lam13`, log `runs/lambda13_ayr.log`, MAXJOBS=6. Waiter:
-  `ssh ayr "tail --pid=1012515 -f /dev/null"`. **DEADLINE-KILL 12:30pm ET** if still
-  running (then give up on lambda_13): re-create = sleep to 12:30 then
-  `ssh ayr 'kill $(pgrep -f "lambda_ladder_fast.py 13|gf_modp 13")'`. On normal finish:
-  read lambda_13 from the log, add to the FAST dict in experiments/lambda_fss.py, re-run FSS.
-- **dalby n=19 holes**: driver pid **1423357**, 17/19 done (h18,h19 left; h19 long pole).
-  Waiter: `ssh dalby.jhpb.org "tail --pid=1423357 -f /dev/null"`. On finish: combine ->
-  results/holes_n19.dalby.txt, sum-check sum_k == a(19)=151609203011580.
-- **ayr a(20)**: driver pid **995458**, h20 running (h15-18 done). Waiter:
+## CURRENT STATE 2026-06-23 ~12:00 ET (LATEST — supersedes the "RIGHT NOW"/WAITERS sections far below)
+- **lambda_13 DONE + FOLDED IN** (commit c5e604d): fast-ladder Aitken=6.30668 (N=120),
+  added to the FAST dict in experiments/lambda_fss.py. Confirmed Aitken-field (H=11 Aitken
+  re-run reproduces the recorded 6.11591). FSS deltas keep decaying (0.124->0.103->0.087);
+  high-Hmin increment-decay fits ~7.36, consistent with the DA lambda=7.110. No more rungs queued.
+TWO jobs still running; their background waiters DIE on /clear — re-create each (use the
+**literal numeric pid**, NOT $(cat parallel.pid) — that pidfile has a CRLF \r that breaks tail):
+- **dalby n=19 holes**: driver pid **1423357**, h18+h19 left (h19 long pole; h16/h17 done
+  ~16:00 dalby). Waiter: `ssh dalby.jhpb.org "tail --pid=1423357 -f /dev/null"`. On finish:
+  combine -> results/holes_n19.dalby.txt, sum-check sum_k == a(19)=151609203011580.
+- **ayr a(20)**: driver pid **995458** (~1.9 days in), h18+h20 running (h15-17 done). Waiter:
   `ssh ayr "tail --pid=995458 -f /dev/null"`. On finish: assemble all heights, compare
   to a(20)=1,025,573,519,362,016 -> if confirmed, RUN a(21) (the reach goal).
 
