@@ -139,55 +139,74 @@ def main():
                 continue
             order, _ = find_order(H)
             N = 2 * order + 30
-            # CRT pool must outrun the coefficients: log10|coeff| ~ 0.078 * deg (roots
-            # ~ lambda^deg), so primes needed ~ deg/110. Auto-grow if under-provisioned
-            # (40 primes silently failed H=10, deg 5005 ~ 1e390 > 40-prime ceiling).
-            need = order // 110 + 12
-            if len(PRIMES) < need:
-                PRIMES = _primes_below(1 << 31, need)
-            # per-prime sweeps are independent + CPU-bound -> process pool (one core
-            # each), capped by POLY_MAX_WORKERS. Fine checkpoint: load banked sweeps,
-            # compute only the misses, bank each as it lands.
-            _nproc = min(len(PRIMES), os.cpu_count() or 4,
-                         int(os.environ.get("POLY_MAX_WORKERS", 1 << 30)))
-            seqs = [ckpt.get_or_none(f"H{H}-N{N}-p{p}") for p in PRIMES]
-            miss = [ki for ki, s in enumerate(seqs) if s is None]
-            if miss:
-                with Pool(min(_nproc, len(miss))) as _pool:
-                    for ki, s in zip(miss, _pool.starmap(
-                            seq_modp, [(H, N, PRIMES[ki]) for ki in miss])):
-                        ckpt.save(f"H{H}-N{N}-p{PRIMES[ki]}", s)
-                        seqs[ki] = s
-            Cs = [bm_modp(seqs[k], PRIMES[k]) for k in range(len(PRIMES))]
-            Ls = [order_of(C) for C, _ in Cs]
-            if len(set(Ls)) != 1:
-                rep.event("order_disagree", H=H, orders=str(Ls))  # rerun needed
+            # CRT pool must outrun the coefficient magnitudes (log10|coeff| grows ~
+            # linearly in deg). A FIXED estimate is unsafe: `need = order//110 + 12`
+            # silently WRAPPED at H=11 (deg 13381) -- 133 primes too few, CRT produced
+            # garbage that only the fresh-prime check caught, after a 15h run. So now
+            # ADAPTIVE: start at the estimate, then GROW primes + retry until the GF
+            # VALIDATES against an independent prime (a wrapped reconstruction fails that
+            # ~2^-31 of the time). Per-prime sweeps are cached by (H,N,p) and reused
+            # across rounds + runs, so each prime's sweep is computed at most once.
+            # POLY_GF_START forces a low start (test the growth path on a small height).
+            np_try = int(os.environ.get("POLY_GF_START", 0)) or \
+                     max(len(PRIMES), order // 110 + 12)
+            np_cap = 3 * (order // 110 + 12) + 50   # backstop; report if hit unvalidated
+            ok = False; Ls = [0]; d = 0; P = [0]; Q = [1]
+            while True:
+                PRIMES = _primes_below(1 << 31, np_try)
+                # per-prime sweeps: independent, CPU-bound -> process pool; load banked,
+                # compute only misses, bank each (cheap on rerun/regrow).
+                _nproc = min(len(PRIMES), os.cpu_count() or 4,
+                             int(os.environ.get("POLY_MAX_WORKERS", 1 << 30)))
+                seqs = [ckpt.get_or_none(f"H{H}-N{N}-p{p}") for p in PRIMES]
+                miss = [ki for ki, s in enumerate(seqs) if s is None]
+                if miss:
+                    with Pool(min(_nproc, len(miss))) as _pool:
+                        for ki, s in zip(miss, _pool.starmap(
+                                seq_modp, [(H, N, PRIMES[ki]) for ki in miss])):
+                            ckpt.save(f"H{H}-N{N}-p{PRIMES[ki]}", s)
+                            seqs[ki] = s
+                Cs = [bm_modp(seqs[k], PRIMES[k]) for k in range(len(PRIMES))]
+                Ls = [order_of(C) for C, _ in Cs]
+                if len(set(Ls)) != 1:
+                    rep.event("order_disagree", H=H, orders=str(Ls))  # needs more N, not primes
+                    break
+                d = Ls[0]
+                # denominator Q[0..d] by CRT (Q[0]=1), symmetric lift; numerator P next
+                Q = [1] + [sym(*crt([Cs[k][0][i] for k in range(len(PRIMES))], PRIMES))
+                           for i in range(1, d + 1)]
+                P = []
+                for k in range(d + 1):
+                    rems = [sum(Q[i] % p * seqs[ki][k - i] for i in range(min(k, d) + 1)) % p
+                            for ki, p in enumerate(PRIMES)]
+                    P.append(sym(*crt(rems, PRIMES)))
+                while len(P) > 1 and P[-1] == 0: P.pop()   # trim leading-zero high terms
+                # validate the FULL GF against a fresh prime (the soundness gate): expand
+                # P/Q as a power series and compare to the engine's sequence.
+                vp = VAL_PRIME
+                sv = ckpt.get_or_none(f"H{H}-N{N}-val{vp}")
+                if sv is None:
+                    sv = seq_modp(H, N, vp)
+                    ckpt.save(f"H{H}-N{N}-val{vp}", sv)
+                b = [0] * (N + 1)
+                for n in range(N + 1):
+                    v = (P[n] if n < len(P) else 0)
+                    for i in range(1, d + 1):
+                        if n - i >= 0: v -= Q[i] * b[n - i]
+                    b[n] = v % vp
+                ok = all(b[n] == sv[n] % vp for n in range(N + 1))
+                # wrap diagnostic: a sound result has max|coeff| well below M/2 =
+                # (prod primes)/2; near-ceiling coeffs are the wraparound signature.
+                M = 1
+                for p in PRIMES: M *= p
+                maxc = max((abs(c) for c in Q + P), default=0)
+                rep.event("crt_round", H=H, primes=len(PRIMES), order=d, validated=ok,
+                          coeff_digits=len(str(maxc)), ceil_digits=len(str(M // 2)))
+                if ok or np_try >= np_cap:
+                    break
+                np_try = int(np_try * 1.4) + 8          # grow + retry (sweeps cached)
+            if len(set(Ls)) != 1:                       # order disagreement: skip height
                 continue
-            d = Ls[0]
-            # denominator Q[0..d] by CRT (Q[0]=1), symmetric lift
-            Q = [1] + [sym(*crt([Cs[k][0][i] for k in range(len(PRIMES))], PRIMES))
-                       for i in range(1, d + 1)]
-            # numerator P[k] = sum_{i<=min(k,d)} Q[i] B_H(k-i), deg P <= d, also by CRT
-            P = []
-            for k in range(d + 1):
-                rems = [sum(Q[i] % p * seqs[ki][k - i] for i in range(min(k, d) + 1)) % p
-                        for ki, p in enumerate(PRIMES)]
-                P.append(sym(*crt(rems, PRIMES)))
-            while len(P) > 1 and P[-1] == 0: P.pop()   # trim leading-zero high terms
-            # validate the FULL GF against a fresh prime: expand P/Q as a power series
-            # and compare to the engine's sequence.
-            vp = VAL_PRIME
-            sv = ckpt.get_or_none(f"H{H}-N{N}-val{vp}")
-            if sv is None:
-                sv = seq_modp(H, N, vp)
-                ckpt.save(f"H{H}-N{N}-val{vp}", sv)
-            b = [0] * (N + 1)
-            for n in range(N + 1):
-                v = (P[n] if n < len(P) else 0)
-                for i in range(1, d + 1):
-                    if n - i >= 0: v -= Q[i] * b[n - i]
-                b[n] = v % vp
-            ok = all(b[n] == sv[n] % vp for n in range(N + 1))
             hlines = [f"H={H}  order={d}  validated={ok}", f"P: {P}", f"Q: {Q}", ""]
             ckpt.save(f"H{H}-gf", {"lines": hlines, "nval": int(ok)})
             body += hlines
@@ -199,7 +218,14 @@ def main():
         with open(path, "a" if Hmin > 1 else "w") as out:   # single assembled write
             out.write("\n".join(header + body) + "\n")
         rep.done(result=nval, resumed=ckpt.n_resumed, out=path)
-    ckpt.clear()
+    # Keep the cache if ANY height failed validation: the per-prime sweeps are the
+    # expensive part (hours), and a rerun must reuse them. (The OLD unconditional
+    # clear() discarded H=11's 133 sweeps after it finished validated=False -> 15h lost.)
+    if nval == (Hmax - Hmin + 1):
+        ckpt.clear()
+    else:
+        print(f"# {nval}/{Hmax - Hmin + 1} heights validated; KEEPING checkpoints in "
+              f"{ckpt.dir} for reuse on rerun", file=sys.stderr)
 
 if __name__ == "__main__":
     main()
