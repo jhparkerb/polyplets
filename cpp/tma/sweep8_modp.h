@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <functional>
 #include <mutex>
 #include <thread>
 #include <vector>
@@ -112,10 +113,9 @@ inline void addCountsModP32(FlatDB32& db, const Sig& sig, const std::uint32_t* s
 //     (loc then db) but removes all contention. Correctness is by construction (which
 //     states/counts are produced is independent of sharding/threading) and gated
 //     byte-identical vs the serial path per (H,p,fold).
-inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
-                                                           std::uint32_t p, bool fold,
-                                                           u64& peakStates,
-                                                           int nthreads) {
+inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(
+    int H, int maxn, std::uint32_t p, bool fold, u64& peakStates, int nthreads,
+    const std::function<void(int, u64)>& onCol = {}) {
   std::vector<std::uint32_t> row(maxn + 1, 0);
   int S = 64;
   int shardMult = 16;  // TMA_SHARD_MULT: dest shards per thread (>= for merge balance)
@@ -137,6 +137,7 @@ inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
     for (int s = 0; s < S; ++s) total += dbS[s].size();
     if (total == 0) break;
     if (total > peakStates) peakStates = total;
+    if (onCol) onCol(col, total);
     for (int t = 0; t < nthreads; ++t)
       for (int s = 0; s < S; ++s) loc[t][s].clear();
 
@@ -195,11 +196,11 @@ inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
 // vertical-mirror fold. peakStates is updated with this height's high-water mark.
 // nthreads>1 selects the sharded multithreaded path (above); nthreads<=1 keeps the
 // serial path byte-identical for the gated callers.
-inline std::vector<std::uint32_t> sweepSquare8HeightModP(int H, int maxn,
-                                                         std::uint32_t p, bool fold,
-                                                         u64& peakStates,
-                                                         int nthreads = 1) {
-  if (nthreads > 1) return sweepSquare8HeightModPMT(H, maxn, p, fold, peakStates, nthreads);
+inline std::vector<std::uint32_t> sweepSquare8HeightModP(
+    int H, int maxn, std::uint32_t p, bool fold, u64& peakStates, int nthreads = 1,
+    const std::function<void(int, u64)>& onCol = {}) {
+  if (nthreads > 1)
+    return sweepSquare8HeightModPMT(H, maxn, p, fold, peakStates, nthreads, onCol);
   std::vector<std::uint32_t> row(maxn + 1, 0);
   FlatDB32 db(maxn), next(maxn);
   Sig seed;
@@ -207,6 +208,7 @@ inline std::vector<std::uint32_t> sweepSquare8HeightModP(int H, int maxn,
   db.slot(seed)[0] = 1u % p;
   for (int col = 0; col <= maxn && !db.empty(); ++col) {
     if (db.size() > peakStates) peakStates = db.size();
+    if (onCol) onCol(col, db.size());
     next.clear();
     db.for_each([&](const Sig& sig, const std::uint32_t* counts) {
       const int ms = minSizeRow32(counts, maxn);

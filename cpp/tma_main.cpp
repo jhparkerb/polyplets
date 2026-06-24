@@ -397,14 +397,6 @@ int main(int argc, char** argv) {
       // "n B_H(n) mod p". CRT over 2-3 primes (scripts/an_modp_crt.sh) recovers the exact
       // B_H(n); summing over H gives a(n). ~4x less RAM than the exact u64 sweep.
       u64 peak = 0, peakBytes = 0;
-      const std::vector<std::uint32_t> row =
-          blockedS > 0
-              ? sweepSquare8HeightModPBlocked(onlyHeight, maxn,
-                                              static_cast<std::uint32_t>(modp), fold,
-                                              blockedS, peak, peakBytes)
-              : sweepSquare8HeightModP(onlyHeight, maxn,
-                                       static_cast<std::uint32_t>(modp), fold, peak,
-                                       nthreads);
       obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-modp-N" +
                             std::to_string(maxn),
                         maxn, "height=" + std::to_string(onlyHeight) + " modp=" +
@@ -413,6 +405,22 @@ int main(int argc, char** argv) {
                                   std::to_string(nthreads) +
                                   (blockedS > 0 ? " blocked=" + std::to_string(blockedS)
                                                 : ""));
+      // Per-column progress -> the Reporter throttles to OBS_HEARTBEAT_S (default 45s;
+      // set 300 for these multi-hour height sweeps). col/maxn drives the fraction + ETA.
+      auto onCol = [&](int col, u64 states) {
+        rep.beat(static_cast<double>(col),
+                 "col=" + std::to_string(col) + "/" + std::to_string(maxn) +
+                     " states=" +
+                     std::to_string(static_cast<unsigned long long>(states)));
+      };
+      const std::vector<std::uint32_t> row =
+          blockedS > 0
+              ? sweepSquare8HeightModPBlocked(onlyHeight, maxn,
+                                              static_cast<std::uint32_t>(modp), fold,
+                                              blockedS, peak, peakBytes)
+              : sweepSquare8HeightModP(onlyHeight, maxn,
+                                       static_cast<std::uint32_t>(modp), fold, peak,
+                                       nthreads, onCol);
       rep.done("result=" + std::to_string(static_cast<unsigned long long>(row[maxn])),
                "peak_states=" +
                    std::to_string(static_cast<unsigned long long>(peak)) +

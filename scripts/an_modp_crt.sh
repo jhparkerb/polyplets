@@ -12,19 +12,24 @@
 # checked and a non-zero sweep aborts the run; (4) crt_combine.py then validates every
 # output is complete before combining. A crashed/raced sweep can never be summed as a zero.
 #
-# USAGE: scripts/an_modp_crt.sh N [--fold|--nofold] [--jobs J] [--blocked S]
-#   defaults: --fold, --jobs 1 (serial -- this is the gate default), --blocked off
+# USAGE: scripts/an_modp_crt.sh N [--fold|--nofold] [--jobs J] [--blocked S] [--threads T]
+#   defaults: --fold, --jobs 1 (serial -- this is the gate default), --blocked off, --threads 1
+#   --threads T runs each (H,p) sweep MULTITHREADED (T threads); combine with a small --jobs
+#   (e.g. --jobs 4 --threads 20 on an 80-core box) to MT the heavy heights so the wall is the
+#   heaviest sweep / ~8-10x rather than the heaviest sweep serial. POLY_HEARTBEAT_S sets the
+#   per-sweep progress cadence (default 45s; use 300 for multi-hour height sweeps).
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
 N="${1:?N}"; shift || true
-FOLD="--fold"; JOBS=1; BLOCKED=""
+FOLD="--fold"; JOBS=1; BLOCKED=""; THREADS=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --fold)    FOLD="--fold" ;;
     --nofold)  FOLD="" ;;
     --jobs)    JOBS="$2"; shift ;;
     --blocked) BLOCKED="--blocked $2"; shift ;;
+    --threads) THREADS="--threads $2"; shift ;;
     *) echo "unknown arg: $1" >&2; exit 2 ;;
   esac
   shift
@@ -46,7 +51,7 @@ rm -f "$DIR"/rows_p*_H*.txt "$DIR"/hb_p*_H*.log   # fresh -- stale files would m
 fail=0; launched=0
 for p in $PRIMES; do
   for H in $(seq 1 "$N"); do
-    build/tma square8 "$N" --only-height "$H" --modp "$p" $FOLD $BLOCKED \
+    build/tma square8 "$N" --only-height "$H" --modp "$p" $FOLD $BLOCKED $THREADS \
       > "$DIR/rows_p${p}_H${H}.txt" 2> "$DIR/hb_p${p}_H${H}.log" &
     launched=$((launched + 1))
     if [ "$launched" -ge "$JOBS" ]; then wait -n || fail=1; launched=$((launched - 1)); fi
