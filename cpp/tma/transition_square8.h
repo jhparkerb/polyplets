@@ -83,16 +83,28 @@ namespace s8 {
 template <class F>
 inline void viableRec(int r, int H, unsigned mask, int bits, std::uint32_t cov,
                       std::uint32_t all, const std::uint32_t* rowSup,
-                      const std::uint32_t* sufSup, int budget, F& fn) {
+                      const std::uint32_t* sufSup, int budget, bool topBase, F& fn) {
   if ((cov | sufSup[r]) != all) return;  // remaining rows can't cover all comps
+  // Reach prune (in-generator slice of the post-step completionLowerBound check). The animal
+  // must extend up to the strip top, costing >= topReach future cells; if even bits+topReach
+  // overshoots budget, NO mask in this subtree survives the post-step check, so cut here.
+  // topReach (when the top is not yet touched) = tr, the topmost occupied row = lowest set
+  // bit (fixed once set) or >= r while the mask is still empty. Since the full check adds
+  // bottomReach+connectivity (>= 0), this prunes a strict SUBSET -> kept set & output are
+  // byte-identical, but the recursion stops descending doomed branches (76% of leaves were
+  // discarded here post-hoc; the dominant cost is the descent itself).
+  if (!(topBase || (mask & 1u))) {
+    const int lbTop = mask ? __builtin_ctz(mask) : r;
+    if (bits + lbTop > budget) return;
+  }
   if (r == H) {
     if (mask) fn(mask);
     return;
   }
-  viableRec(r + 1, H, mask, bits, cov, all, rowSup, sufSup, budget, fn);  // 0
-  if (bits + 1 <= budget)                                                 // 1
+  viableRec(r + 1, H, mask, bits, cov, all, rowSup, sufSup, budget, topBase, fn);  // 0
+  if (bits + 1 <= budget)                                                          // 1
     viableRec(r + 1, H, mask | (1u << r), bits + 1, cov | rowSup[r], all, rowSup,
-              sufSup, budget, fn);
+              sufSup, budget, topBase, fn);
 }
 }  // namespace s8
 
@@ -109,5 +121,5 @@ inline void forEachViableMask(const Sig& old, int H, int budget, F&& fn) {
   }
   sufSup[H] = 0;
   for (int r = H - 1; r >= 0; --r) sufSup[r] = sufSup[r + 1] | rowSup[r];
-  s8::viableRec(0, H, 0u, 0, 0u, all, rowSup, sufSup, budget, fn);
+  s8::viableRec(0, H, 0u, 0, 0u, all, rowSup, sufSup, budget, old.b[H] != 0, fn);
 }
