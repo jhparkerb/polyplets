@@ -157,3 +157,19 @@ out-of-core / mmap spill (#20), windowed counts rows (84% of footprint; research
   heaviest height-sweep (anchored: a(21) ran under ~30 GB) ⇒ fits dalby comfortably, ayr for most
   heights. So a(22)'s gate is time + distribution, not memory. **Verify the reach peak empirically
   on a heavy a(22) height before launch (measure, don't trust the estimate).**
+
+## Compute phase EXHAUSTED + a(22) feasibility (revised, measured)
+- **05 two-ended reach prune — DEAD END** (`deadend/05-two-ended-reach`, de00d3c). Byte-identical
+  (10/10 + re-verified vs live 04 binary), prunes ~11% fewer viableRec nodes, but **~2% SLOWER at
+  H=13 N=18** (441→451s) and noise at H=11 N=20: the interleaved-order overhead (order[] indirection,
+  decided-mask, clz) exceeds the savings on cheap discarded nodes. Reach-prune family CLOSED at **04**
+  (top-down topReach, ~4% heavy). Node-count is not wall-time — benchmark decided.
+- **D9: compute phase exhausted.** Banked/available: MT ~3× · reach-prune ~4% (heavy) · PGO ~2.7%
+  (gcc boxes). Struck/dead: L1, L2, march, mtune, 05; <1%: 06/09. No candidate ≥1% remains.
+- **a(22) RAM feasibility — REVISED (measured, dalby N=20 per-height):** reach engine per-height RSS
+  is **MB-scale** (H=13 N=20 = 167 MB, ~103K states; curve still climbing to the peak height ~H14–16).
+  The 183 GB / out-of-core wall was the *exact* engine's whole-N peak; the *reach* engine runs each
+  height as a small separate sweep. a(22) per-height extrapolates to a **few GB** ⇒ **fits every box;
+  dalby (122 GB free, 80c) runs the whole job trivially.** a(22)'s only gate is TIME + distribution
+  balancing — no out-of-core, no memory concern. `peak_states` per height = the cost-model shape.
+- (Tooling: obs `wall_s=0.0` on the MT path is a reporting bug — use `cpu_s` / `/usr/bin/time`.)
