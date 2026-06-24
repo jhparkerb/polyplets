@@ -83,3 +83,25 @@ Phase-timing (D1) + T-sweep + S-sweep + per-thread busy (D2), dual-arch (gympie/
 - **P1 single-thread IPC~2 / C1 branch:** not yet measured (perf branch-misses) — secondary; the MT cap (B1) dominates.
 - **FIX:** dynamic shard assignment (atomic next-shard counter / work-stealing) replacing static stride
   ownership. Byte-identical (only thread→shard mapping changes). Next candidate to implement+gate.
+
+## COUNTERFACTUAL on the fix (executed) — BOTH per-sweep fixes ruled out
+Per-shard work distribution probe (floorPenalty = best-achievable-by-reassignment / perfect-ideal):
+- gympie T8 S32: floorPenalty **3.23×**, and current expand == flooredIdeal → **reassignment headroom ≈ 0**.
+- ayr T20: floorPenalty **2.17× (S32) → 1.48× (S512+, plateau)**. The heavy shard is *partly* multi-Sig
+  (finer shards split that) + a residual **monster-Sig floor (~1.48×)** that no sharding touches.
+- BUT finer shards raise per-shard store overhead (clear + scan of T×S mostly-empty shards) faster than
+  the compute floor falls → **net WORSE wall** (S512 12.7s > S32 11.1s, from the earlier S-sweep).
+
+**Verdicts:**
+- **Work-stealing / reassignment — RULED OUT** (~no win; current static ≈ the heaviest-shard floor).
+- **Finer shards — RULED OUT** (compute floor drops, store overhead eats it; wall doesn't improve).
+- **Per-sweep MT is genuinely floored ~10–11×** (heaviest shard + a monster-Sig core); not simply fixable
+  (only intra-Sig parallelism would beat it — hard/dangerous, deferred).
+
+**THE LEVER (revised): multi-sweep concurrency (P3), not per-sweep MT.** a(22) = 66 independent (H,p)
+sweeps; run many concurrently (`--jobs`, separate processes, no shared barrier, NOT bandwidth-bound) →
+all cores fill via independent work, and the ~10× per-sweep cap is irrelevant to the job. The a(22) wall
+≈ total-work / cores, bounded only by the single heaviest (H,p) sweep's ~10× latency in the tail.
+**Next: verify P3 scales ~linearly with concurrent sweeps** (it should — bandwidth-free) — that, not
+per-sweep MT, sets the real a(22) wall. (The "hold before implementing work-stealing" call was correct:
+it would not have helped, and neither would the simpler shard-bump.)
