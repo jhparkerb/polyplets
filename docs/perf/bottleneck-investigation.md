@@ -105,3 +105,21 @@ all cores fill via independent work, and the ~10× per-sweep cap is irrelevant t
 **Next: verify P3 scales ~linearly with concurrent sweeps** (it should — bandwidth-free) — that, not
 per-sweep MT, sets the real a(22) wall. (The "hold before implementing work-stealing" call was correct:
 it would not have helped, and neither would the simpler shard-bump.)
+
+## P3 (multi-sweep concurrency) — MEASURED, the a(22) execution model
+Identical independent serial sweeps (H=11 N=18), batch wall vs J. eff = solo/batch.
+- **dalby (80c, 1 NUMA): PERFECT 100% to J=76** (batch flat at ~82s, J=1→76). No aggregate
+  contention. → a(22) = ~76 concurrent sweeps, linear. Per-sweep MT cap (~10×) IRRELEVANT.
+- **ayr (2990WX 32c, GPU-off): smooth fabric gradient** 100/95/86/78/72/77/55/45% at
+  J=1/8/16/24/31/32/40/48. No oversubscription cliff (J=31≈J=32); peak ~J=31-32 ≈ **24 effective cores**.
+- **gympie (~4 effective)** — its own perf-core limit.
+
+**ayr ceiling PINNED with counters (corrects earlier "aggregate bandwidth" — that was WRONG):**
+- amd_df DRAM channels at J=31: ~1.75 GB/s of a ~40-85 GB/s ceiling = **~3% utilization → NOT
+  DRAM-bandwidth-bound.**
+- l3_misses sublinear (~×6-8 for 31× sweeps) → **L3 / Infinity-Fabric latency** (2990WX: 4 dies,
+  only 2 with memory controllers; cross-die coherence). Intrinsic to the chip.
+- GPU A/B (srsieve2cl paused): +5-10 points only (J=8 82→95, J=31 67→72) — minor, not the cause.
+
+**Effective-core budget for a(22): dalby 76 + ayr ~24 + gympie ~4 ≈ 104.** dalby is the workhorse;
+multi-sweep concurrency is the lever; per-sweep imbalance is moot. Q1/Q2 now computable on this footing.
