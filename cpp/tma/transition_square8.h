@@ -79,26 +79,60 @@ inline Outcome stepColumnSquare8(const Sig& old, int H, unsigned mask, Sig& out)
 // components exist) are never generated. A mask "covers" component L iff it sets
 // a row adjacent (r-1,r,r+1) to an L-cell, i.e. iff some new cell touches L,
 // i.e. iff L is not stranded; step() still re-checks, so it stays the authority.
+// Candidate 05, "two-ended reach prune". Rows are visited in INTERLEAVED order
+// (0, H-1, 1, H-2, ...) so that both the strip-top row 0 and the strip-bottom
+// row H-1 are decided at depths 0 and 1 -- pinning BOTH ends of the eventual
+// animal's vertical span as early as possible. We then carry the existing
+// in-generator TOP-reach prune AND a symmetric BOTTOM-reach prune:
+//
+//   lbTop = min over completions of topReach    (band of rows < tr)
+//   lbBot = min over completions of bottomReach  (band of rows > br)
+//
+// where topReach/bottomReach are the disjoint forced-cell bands from
+// completionLowerBound (signature.h). Concretely, with clearedMask = the rows
+// already DECIDED-CLEARED (visited, bit not set):
+//   lbTop = topBase ? 0 : (lowest row index not in clearedMask)
+//   lbBot = botBase ? 0 : (H-1 - highest row index in [0,H-1] not in clearedMask)
+// An undecided low/high row keeps the corresponding bound at 0 (a completion
+// could still set row 0 / row H-1, zeroing that reach), so the bound is a true
+// lower bound over the whole subtree. Since lbTop bounds rows < tr and lbBot
+// bounds rows > br are DISJOINT bands, lbTop + lbBot <= topReach + bottomReach
+// <= completionLowerBound; pruning on bits + lbTop + lbBot > budget therefore
+// removes a STRICT SUBSET of what the post-step check already discards ->
+// byte-identical output, only the enumeration order of fn() calls changes.
 namespace s8 {
 template <class F>
-inline void viableRec(int r, int H, unsigned mask, int bits, std::uint32_t cov,
-                      std::uint32_t all, const std::uint32_t* rowSup,
-                      const std::uint32_t* sufSup, int budget, F& fn) {
-  if ((cov | sufSup[r]) != all) return;  // remaining rows can't cover all comps
-  if (r == H) {
+inline void viableRec(int d, int H, unsigned mask, int bits, std::uint32_t cov,
+                      std::uint32_t all, std::uint32_t decided, const int* order,
+                      const std::uint32_t* rowSup, const std::uint32_t* sufSup,
+                      int budget, bool topBase, bool botBase, F& fn) {
+  if ((cov | sufSup[d]) != all) return;  // remaining rows can't cover all comps
+  // Two-ended reach prune: in-generator slice of the post-step
+  // completionLowerBound check, here for BOTH the top and bottom forced bands.
+  const std::uint32_t cleared = decided & ~mask;        // rows decided-cleared
+  const std::uint32_t notCleared = (~cleared) & ((H < 32) ? ((1u << H) - 1) : ~0u);
+  if (notCleared) {  // some row still set-or-settable (else subtree is empty)
+    const int lbTop = topBase ? 0 : __builtin_ctz(notCleared);
+    const int lbBot = botBase ? 0 : (H - 1 - (31 - __builtin_clz(notCleared)));
+    if (bits + lbTop + lbBot > budget) return;
+  }
+  if (d == H) {
     if (mask) fn(mask);
     return;
   }
-  viableRec(r + 1, H, mask, bits, cov, all, rowSup, sufSup, budget, fn);  // 0
-  if (bits + 1 <= budget)                                                 // 1
-    viableRec(r + 1, H, mask | (1u << r), bits + 1, cov | rowSup[r], all, rowSup,
-              sufSup, budget, fn);
+  const int r = order[d];
+  const std::uint32_t dec = decided | (1u << r);
+  viableRec(d + 1, H, mask, bits, cov, all, dec, order, rowSup, sufSup, budget,
+            topBase, botBase, fn);                                       // r = 0
+  if (bits + 1 <= budget)                                                // r = 1
+    viableRec(d + 1, H, mask | (1u << r), bits + 1, cov | rowSup[r], all, dec,
+              order, rowSup, sufSup, budget, topBase, botBase, fn);
 }
 }  // namespace s8
 
 template <class F>
 inline void forEachViableMask(const Sig& old, int H, int budget, F&& fn) {
-  std::uint32_t all = 0, rowSup[SIGMAX], sufSup[SIGMAX + 1];
+  std::uint32_t all = 0, rowSup[SIGMAX];
   for (int i = 0; i < H; ++i)
     if (old.b[i]) all |= 1u << old.b[i];
   for (int r = 0; r < H; ++r) {
@@ -107,7 +141,16 @@ inline void forEachViableMask(const Sig& old, int H, int budget, F&& fn) {
       if (rr >= 0 && rr < H && old.b[rr]) s |= 1u << old.b[rr];
     rowSup[r] = s;
   }
+  // Interleaved visitation order: 0, H-1, 1, H-2, 2, ... (lo and hi closing in).
+  int order[SIGMAX];
+  for (int lo = 0, hi = H - 1, d = 0; lo <= hi;) {
+    order[d++] = lo++;
+    if (lo <= hi) order[d++] = hi--;
+  }
+  // sufSup[d] = OR of rowSup over rows visited at depth d..H-1 (still remaining).
+  std::uint32_t sufSup[SIGMAX + 1];
   sufSup[H] = 0;
-  for (int r = H - 1; r >= 0; --r) sufSup[r] = sufSup[r + 1] | rowSup[r];
-  s8::viableRec(0, H, 0u, 0, 0u, all, rowSup, sufSup, budget, fn);
+  for (int d = H - 1; d >= 0; --d) sufSup[d] = sufSup[d + 1] | rowSup[order[d]];
+  s8::viableRec(0, H, 0u, 0, 0u, all, 0u, order, rowSup, sufSup, budget,
+                old.b[H] != 0, old.b[H + 1] != 0, fn);
 }
