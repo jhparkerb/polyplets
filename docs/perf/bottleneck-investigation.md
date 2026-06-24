@@ -69,3 +69,17 @@ loc[t]); (4) join; (5) PASS2 merge (spawn T threads; each folds loc[0..T-1][s] i
   highest-prior structural causes (B3 merge, B4 spawn, B9 serial) in a single measurement, cross-checked
   on dalby + ayr. Then D3 (T×S surface) and D4 (single-thread perf). Refine from there; do not commit a
   fix until the phase-timing names the dominant term with a number.
+
+## RESOLUTION (executed — metric-backed)
+Phase-timing (D1) + T-sweep + S-sweep + per-thread busy (D2), dual-arch (gympie/ayr):
+- **RULED OUT** (phase-timing, both arches, H=11 & H=13): B2 barrier, B3 merge (0.04–0.95s, ~0–1%),
+  B4 spawn (merge incl. spawn = ~0%), B5 clear, B9 serial prologue (~0.00s). ~94–99% is the EXPAND pass.
+- **B1 LOAD IMBALANCE — CONFIRMED, the cap.** Per-thread busy (ayr H=11 N=20 T20): expand ≈ max-thread
+  (10.85≈10.41), imbal=max/mean = 2.3× (S32) to 4.2× (S16/S64), min=0.00 (idle threads), mean≈4.5s
+  constant. The pass waits for the busiest thread; configs only re-alias which threads get heavy shards
+  (non-monotonic S/T zigzags ⇒ aliasing of static `thread t owns {t,t+T,…}` × hash skew + per-Sig work variance).
+- **Upside:** balanced mean 4.5s ⇒ ~25× at T20 (vs ~10× now); at dalby T80 ~76× (vs ~8–10×). Imbalance
+  costs ~2.4× (T20) to ~7× (T80) — the largest lever, on the confirmed bottleneck.
+- **P1 single-thread IPC~2 / C1 branch:** not yet measured (perf branch-misses) — secondary; the MT cap (B1) dominates.
+- **FIX:** dynamic shard assignment (atomic next-shard counter / work-stealing) replacing static stride
+  ownership. Byte-identical (only thread→shard mapping changes). Next candidate to implement+gate.
