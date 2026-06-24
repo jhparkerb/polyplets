@@ -80,8 +80,10 @@ through the hardened driver.
 "Stop after two dead ends" was premature. Instrumenting the mask pipeline
 (`MASKSTATS`, H=12 N=16, throwaway):
 ```
-gen=188.7M  alive=188.7M (alive/gen=1.000)  kept=44.8M (kept/gen=0.238)
+H=12 N=16:  gen=188.7M  alive=188.7M (1.000)  kept=44.8M  (kept/gen=0.238, 76% wasted)
+H=13 N=18:  gen=1.24B    alive=1.24B   (1.000)  kept=341M  (kept/gen=0.275, 72.5% wasted)
 ```
+Holds at a ~6× larger sweep (per the larger-n rule) — not a small-n artifact.
 - **alive/gen = 1.000** — `stepColumnSquare8` NEVER returns Dead; its union-find strandedness
   re-check is redundant (the generator's coverage prune is already sufficient). [minor: step ~1%]
 - **kept/gen = 0.238** — **76% of generated masks are discarded by the `completionLowerBound`
