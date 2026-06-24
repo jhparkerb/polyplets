@@ -123,3 +123,18 @@ Identical independent serial sweeps (H=11 N=18), batch wall vs J. eff = solo/bat
 
 **Effective-core budget for a(22): dalby 76 + ayr ~24 + gympie ~4 ≈ 104.** dalby is the workhorse;
 multi-sweep concurrency is the lever; per-sweep imbalance is moot. Q1/Q2 now computable on this footing.
+
+## DEFERRED LEVER (pinned 2026-06-24) — intra-signature parallelism
+We shard the expand pass BETWEEN boundary signatures but never WITHIN one. The per-sweep ~10× MT
+cap is load imbalance from a few "monster" signatures whose mask fan-out (`forEachViableMask`)
+dwarfs the rest — work-stealing/finer-shards couldn't beat it because the monster is one
+indivisible unit. The untried decomposition: **split a single heavy signature's mask enumeration
+across threads.** This is the ONLY identified lever that could raise the per-HEIGHT (long-pole)
+ceiling — relevant only when the single heaviest height-sweep, not multi-sweep concurrency, is the
+binding constraint on wall time (i.e. for a(n) where one height dominates and few heights exist).
+Unmeasured; revisit then. Related deferred gaps from the same session: (1) the per-COLUMN heartbeat
+is too coarse for high-H sweeps (few, long columns — they sit inside one column for minutes with no
+beat; `col/maxn` also misreports since they empty near col ~maxn−H+1, not maxn) → needs a
+within-column beat (every N states) + a real-column-count denominator; (2) height-dependent
+scheduling (serial-concurrent for the cheap bulk, MT only the heaviest heights) beats a flat
+`--jobs/--threads` config, but no driver does it yet.
