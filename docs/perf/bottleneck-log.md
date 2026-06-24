@@ -53,6 +53,21 @@ Hypotheses to verify scientifically; none assumed. ROI = rough speedup × confid
   cheaper — e.g. iterative bit-enumeration to kill the per-node recursion overhead, and/or a
   tighter generator. Reproduce = profile (done); fix = next iteration.
 
+## Phase 2 input — per-box MT thread knee (H=11 N=20, default shardmult)
+| box | T=1 | T=4 | T=8 | T=16 | knee | cores |
+|-----|-----|-----|-----|------|------|-------|
+| gympie | 51 s | 17.5 s (3.0×) | 17.0 s | — | ~T4 | 10 |
+| ayr | 114 s | 37.4 s (3.0×) | 35.8 s | 34.0 s (3.4×) | ~T8 | 32 |
+| dalby | 127 s | 39.7 s (3.2×) | 38.3 s | 36.1 s (3.5×) | ~T8 | 80 |
+
+Per-core speed differs ~2.2× (gympie fastest). Memory-bandwidth-bound: ~3–3.4× and flat past
+the knee at default shards (the T=20 + `TMA_SHARD_MULT=32` regime that reached ~10× is a
+separate future candidate — NUMA-stable via `--interleave=all` on ayr). For distribution,
+throughput ≈ (cores/knee-threads)/(knee-time): dalby ≫ gympie ≈ ayr. **Next: per-HEIGHT cost
+curves per box** (the standard benchmark is one point; heavy heights cost minutes-to-hours),
+then a validated cost model → assignment so all boxes finish within 10% → distributed a(22)
+through the hardened driver.
+
 ## Fixes (chronological)
 | # | level | candidate | benchmark | before → after | commit/tag | status |
 |---|-------|-----------|-----------|----------------|------------|--------|
