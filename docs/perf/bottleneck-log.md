@@ -112,3 +112,32 @@ after the higher levels are surveyed) the **achievable** large win is **L7 — p
 (within-host MT, then multi-machine), re-derived *with the discipline + the hardened driver*
 this time (the lock-free MT was already validated byte-identical; per-box thread knee and the
 NUMA `--interleave=all` finding were measured). That is the next phase of work.
+
+## Survey #2 — parallel brainstorm panel (5 agents, ~100s)
+Two distractions struck rigorously; a reframing; a scored byte-identical queue.
+
+**Struck (don't pursue):**
+- **L1 (2 primes) — fundamentally blocked, not a method gap.** The CRT threshold P^(1/22) =
+  7.053 lies *below* the true growth constant λ≈7.10, so a(22)≈λ²² already exceeds the 2-prime
+  product; no exponential-form bound (λⁿ, site-perimeter 4n+4 ⇒ a(22)≤7.6e18>P, per-step ratio)
+  can prove a(22)<P. The slack is the sub-exponential θ≈−1 correction, which no rigorous tool
+  captures. 62-bit-prime pair sidesteps the bound but costs 128-bit modmul + 2× RAM (≈ wash).
+- **L2 (fixed-width TM) — no win.** Our engine *is* a boundary TM (per strip height); fixed-width
+  is the transpose ⇒ identical states/RAM/compute by lattice symmetry. Strip sweeps count disjoint
+  animal sets (no shared substrate to save), and the fixed strip dim is what enables the size prune.
+
+**Reframing — a(22) is RAM-bound (~120–183 GB > ayr's 78 GB), not time-bound** (results/reach_projection.md
+marks it out-of-core). Binding levers for a(22) *running*: single-buffer the db/next pass (~2×),
+out-of-core / mmap spill (#20), windowed counts rows (84% of footprint; research-grade). Memory ≥ compute.
+
+**Candidate queue (byte-identical, scored best-first):**
+| id | level | candidate | est. | effort | note |
+|----|-------|-----------|------|--------|------|
+| 05 | 3 algo | two-ended reach prune (pin tr & br; prune bits+topReach+bottomReach>budget) | 40–65% of the 76% gen waste | med | **measure-first** (attribute discard to top/bottom/band); subsumes 04 |
+| 06 | 3 algo | delete strandedness Dead-check (PROVEN dead: coverage prune ⟺ alive, both directions) | ~0.3–0.5%, free | low | + debug assert to lock generator/step invariant; benefits all 5 callers |
+| 07 | 6 syssw | PGO (`-fprofile-generate`→`use`) | ~5–15% | med | per-box (train+measure same box); targets the branch-heavy 99% |
+| 08 | 6 syssw | `-mtune=native` (the safe half of failed `-march`) | ~1–3% | trivial | per-box; bench-triad |
+| 09 | 3 algo | fuse canonicalizeSig 2nd relabel into UF labeling | ~0.5–0.8% | med | byte-identical; compounds with 06 |
+| (mem) | 2/3 | single-buffer db/next; windowed rows | up to ~2× RAM | med/high | the a(22)-enabling lever — pursue once compute settles |
+
+04 (topReach-only) measured marginal: gympie ~2%, ayr ~2.8%, dalby ~noise — NOT merged; superseded by 05.
