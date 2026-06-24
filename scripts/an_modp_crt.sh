@@ -4,8 +4,13 @@
 # CRT across 3 primes near 2^31 recovers exact a(n). The N*3 (H,p) sweeps are INDEPENDENT,
 # so --jobs J runs J of them at once (each writes its own rows_p${p}_H${H}.txt -- no shared
 # append, no interleave). --blocked S adds B (the drained/partitioned store): ~2x less RAM
-# per worker, composing with --fold (R1) and --modp (R3). RAM budget = J x per-worker-peak,
-# so pick J for the machine (gympie<=10 cores, ayr 32, dalby ~25-35 bandwidth-bound).
+# per worker, composing with --fold (R1) and --modp (R3). RAM budget = J x per-worker-peak.
+#
+# HARDENED (no silent failures): (1) an atomic mkdir-lock prevents a second run from
+# clobbering rows files on the same dir (the race that once corrupted output); (2) each
+# sweep's stderr is kept in hb_p{p}_H{H}.log for debugging; (3) every sweep's EXIT CODE is
+# checked and a non-zero sweep aborts the run; (4) crt_combine.py then validates every
+# output is complete before combining. A crashed/raced sweep can never be summed as a zero.
 #
 # USAGE: scripts/an_modp_crt.sh N [--fold|--nofold] [--jobs J] [--blocked S]
 #   defaults: --fold, --jobs 1 (serial -- this is the gate default), --blocked off
@@ -26,20 +31,31 @@ while [ $# -gt 0 ]; do
 done
 
 PRIMES="2147483647 2147483629 2147483587"
-DIR="runs/anmodp_N$N"; mkdir -p "$DIR"; echo $$ > "$DIR/driver.pid"
-rm -f "$DIR"/rows_p*_H*.txt   # fresh -- stale per-(H,p) files would double-count
+DIR="runs/anmodp_N$N"; mkdir -p "$DIR"
+# Atomic lock: a second run on the same N fails fast instead of racing the rows files.
+if ! mkdir "$DIR/.lock" 2>/dev/null; then
+  echo "ERROR: $DIR/.lock held -- another run on N=$N is active (or stale; rmdir to clear)" >&2
+  exit 3
+fi
+trap 'rmdir "$DIR/.lock" 2>/dev/null' EXIT
+echo $$ > "$DIR/driver.pid"
+rm -f "$DIR"/rows_p*_H*.txt "$DIR"/hb_p*_H*.log   # fresh -- stale files would mislead
 
-# Run the N*3 independent (H,p) sweeps with at most JOBS concurrent. wait -n frees a
-# slot as soon as ANY worker finishes (no fixed-batch barrier); no pkill anywhere.
-running=0
+# Run the N*3 independent (H,p) sweeps, at most JOBS concurrent. wait -n frees a slot as a
+# worker finishes AND yields its exit status; any non-zero status is recorded.
+fail=0; launched=0
 for p in $PRIMES; do
   for H in $(seq 1 "$N"); do
     build/tma square8 "$N" --only-height "$H" --modp "$p" $FOLD $BLOCKED \
-      2>/dev/null > "$DIR/rows_p${p}_H${H}.txt" &
-    running=$((running + 1))
-    if [ "$running" -ge "$JOBS" ]; then wait -n; running=$((running - 1)); fi
+      > "$DIR/rows_p${p}_H${H}.txt" 2> "$DIR/hb_p${p}_H${H}.log" &
+    launched=$((launched + 1))
+    if [ "$launched" -ge "$JOBS" ]; then wait -n || fail=1; launched=$((launched - 1)); fi
   done
 done
-wait
+while [ "$launched" -gt 0 ]; do wait -n || fail=1; launched=$((launched - 1)); done
+if [ "$fail" -ne 0 ]; then
+  echo "ERROR: >=1 sweep exited non-zero (see $DIR/hb_*.log)" >&2
+  exit 4
+fi
 
 python3 scripts/crt_combine.py "$DIR" "$N" $PRIMES

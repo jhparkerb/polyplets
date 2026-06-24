@@ -19,11 +19,15 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 .PHONY: gates gate-g1 gate-g2 gate-euler clean
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-g3 gate-tma gate-s2 gate-e0 gate-sym gate-euler
+gates: gate-g1 gate-g2 gate-g3 gate-tma gate-s2 gate-e0 gate-sym gate-euler gate-driver
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
 	python3 tests/gate_g1.py
+
+# Gate DRIVER: reach driver/combine reject crashed/raced/corrupt sweeps (no silent zeros)
+gate-driver: build/tma
+	python3 tests/gate_driver_robust.py
 
 # Gate G2: C++ Redelmeier engine vs oracle + fixtures (+ split, + sanitizers)
 gate-g2: build/g2 build/g2_asan
