@@ -146,9 +146,11 @@ out-of-core / mmap spill (#20), windowed counts rows (84% of footprint; research
   reached the top). Banked. Reach-prune **family CLOSED** by measure-first: discards are ~7×
   cheaper than avg (04 catches 18% of discards → 2–4% wall; two-ended 05 caps at 26% of discards
   → ~+2% over 04 for medium effort, poor ROI — not built unless the loop needs it for exhaustion).
-- **07 PGO — gympie ~0%** (51.77→51.84, noise; byte-identical). The recursion's branches are
-  data-dependent, nothing for PGO to bias. Cross-checking gcc/x86 on ayr (+ 08 `-mtune`) before
-  closing the System-SW level (which already has `-march` −5%).
+- **07 PGO — arch-dependent: gympie (clang/ARM) ~0%, ayr (gcc/x86) ~2.7%** (114.1→111.0).
+  Data-dependent branches give clang nothing to bias, but gcc/x86 PGO gains ~2.7%. **Per-box
+  keeper for the gcc boxes** — available as a build option for distribution (two-phase build:
+  instrument→train→use; byte-identical). **08 `-mtune` — dead (~0% ayr)**. System-SW level CLOSED
+  (`-march` −5%, `-mtune` ~0%, PGO ~2.7% gcc-only).
 - **a(22) FEASIBILITY (the "ready to start" gate): YES on dalby, no out-of-core.** Box RAM: gympie
   24 / ayr 78 / **dalby 125 GB (122 free), 80 cores**. The 183 GB / #20 wall is the *exact* engine;
   the *reach* engine (fold + u32 + blocked ≈ 3.4× less, run per-height) peaks ~50–70 GB on its
