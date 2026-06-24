@@ -57,8 +57,9 @@ Hypotheses to verify scientifically; none assumed. ROI = rough speedup × confid
 | # | level | candidate | benchmark | before → after | commit/tag | status |
 |---|-------|-----------|-----------|----------------|------------|--------|
 | — | — | Phase 0 baseline + driver hardening | — | — | 0e7e29a | baseline |
-| 01 | 4 code | iterative viableRec (kill recursion overhead) | H=11 N=20 | 51.0s → 50.4s | `deadend/01-viablerec-iterative` | **dead end** — ~noise; cost is per-node arithmetic × node count, not call overhead |
-| 02 | 6 syssw | `-march=native` | H=11 N=20 | 51.0s → 53.4s | (no source change) | **dead end** — ~5% *slower* (worse codegen for branchy int loop) |
+| 01 | 4 code | iterative viableRec (kill recursion overhead) | H=11 N=20 | 51.0s → 50.4s | `deadend/01-viablerec-iterative` | **dead end** — ~0% + clear mechanism (per-node cost constant, compiler already optimizes the recursion); no plausible scale effect → N=20 rules it out |
+| 02 | 6 syssw | `-march=native` | H=11 N=20 | 51.0s → 53.4s | (no source change) | **dead end** — −5% regression; decisive at N=20 |
+| 03 | 7 parallel | within-host lock-free MT (`--threads`) | H=11 N=20 | 51.0s → **17.5s (T4)** | ef4a82a (merged) | **WIN ~3×** — byte-identical; the achievable lever |
 
 ## Phase 1 status — single-machine mechanical levers EXHAUSTED
 The hot path (`forEachViableMask`, ~99%) is the per-state viable-mask enumeration, which is
