@@ -37,9 +37,21 @@ Hypotheses to verify scientifically; none assumed. ROI = rough speedup × confid
 | 6 System SW | `-march=native`, LTO, PGO | small-med | trivial | med | cheap; measure each |
 | 7 HW/Parallel | within-host MT, then multi-machine | large (aggregate) | med | high | **LAST** — only after L1–6 marginal; re-derived with method this time |
 
-**Survey #1 verdict (to act on first):** start at **Level 1 — drop to 2 primes** (trivial,
-~33% free, high confidence) after proving the a(22) bound; then **profile the standard
-benchmark** to confirm whether the **`% p` reduction (Level 4)** is the next-biggest lever.
+**Survey #1 verdict — then UPDATED by reasoning + profiling (the method working):**
+- **Level 1 (2 primes): downgraded — blocked on a non-trivial proof.** 2-prime CRT (∏≈4.6e18)
+  is exact only if a(22) < 4.6e18. Best *rigorous* bound is a(n) ≤ λⁿ with proven λ ≤ 9.355 ⇒
+  a(22) ≤ 2.3e21 > ∏. Not provably safe without a tighter bound (need rigorous λ < 7.05, vs
+  true ≈6.8). Effort↑, parked as a sub-proof, not free.
+- **Level 4 (`% p` reduction): REFUTED by profiling.** A `-g` sample of the standard benchmark
+  (gympie, H=12 N=20) puts ~99% of samples in `s8::viableRec` (transition_square8.h:92);
+  `addCountsModP32`'s `% p` (sweep8_modp.h:128) is ~10 samples (≈0.2%). Optimizing it would
+  have been today's anti-pattern (tuning ~nothing).
+- **TRUE hotspot (profiled): the viable-mask enumeration** `forEachViableMask`/`viableRec`
+  (transition_square8.h:82–113) — the binary recursion that generates, per state, every
+  next-column cell-mask with popcount≤budget that strands no component (up to ~2^H leaves).
+  **This is the next candidate** (Level 3 Algo/DS + Level 4 code): make that enumeration
+  cheaper — e.g. iterative bit-enumeration to kill the per-node recursion overhead, and/or a
+  tighter generator. Reproduce = profile (done); fix = next iteration.
 
 ## Fixes (chronological)
 | # | level | candidate | benchmark | before → after | commit | status |
