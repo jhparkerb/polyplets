@@ -76,11 +76,28 @@ through the hardened driver.
 | 02 | 6 syssw | `-march=native` | H=11 N=20 | 51.0s → 53.4s | (no source change) | **dead end** — −5% regression; decisive at N=20 |
 | 03 | 7 parallel | within-host lock-free MT (`--threads`) | H=11 N=20 | 51.0s → **17.5s (T4)** | ef4a82a (merged) | **WIN ~3×** — byte-identical; the achievable lever |
 
-## Phase 1 status — single-machine mechanical levers EXHAUSTED
-The hot path (`forEachViableMask`, ~99%) is the per-state viable-mask enumeration, which is
-**inherent to the sum-over-heights column transfer matrix**. Mechanical tuning of it yields
-nothing (iterative ~0%, `-march=native` −5%, `% p` ~0.2%). The remaining single-machine
-candidates are NOT cheap:
+## Survey #2 — re-profiling: single-machine is NOT exhausted (correction)
+"Stop after two dead ends" was premature. Instrumenting the mask pipeline
+(`MASKSTATS`, H=12 N=16, throwaway):
+```
+gen=188.7M  alive=188.7M (alive/gen=1.000)  kept=44.8M (kept/gen=0.238)
+```
+- **alive/gen = 1.000** — `stepColumnSquare8` NEVER returns Dead; its union-find strandedness
+  re-check is redundant (the generator's coverage prune is already sufficient). [minor: step ~1%]
+- **kept/gen = 0.238** — **76% of generated masks are discarded by the `completionLowerBound`
+  budget check AFTER generation.** Generation is the 99%, so this is wasted traversal.
+  **Candidate 04 (next):** push the *reach* part of `completionLowerBound` into `viableRec`.
+  `tr`/`br` (top/bottom occupied rows) = lowest/highest mask bits, and the top/bottom markers
+  come from `old`+mask edges — so `topReach+bottomReach` is a valid LOWER bound on the full
+  `completionLowerBound`, computable during generation. Pruning the recursion on it is a strict
+  subset of the existing post-step prune ⇒ **byte-identical by construction**, but cuts up to
+  ~4× of the generation work (the 99% hot path) ⇒ potentially a large win, compounding with MT.
+  Effort: medium (must bound `br` correctly mid-recursion); gate: byte-identical + `make gates`.
+
+## Phase 1 status (revised) — a real candidate remains
+The hot path (`forEachViableMask`, ~99%) is the per-state viable-mask enumeration. Mechanical
+*mechanics* tuning yields nothing (iterative ~0%, `-march` −5%, `% p` ~0.2%), BUT the generator
+is **76% wasteful** (candidate 04 above) — a real algorithmic win, not research-grade. Beyond it:
 - **L1 (2 primes, ~33%)** — blocked on a rigorous a(22) < 4.6e18 bound; best proven bound
   (λ≤9.355 ⇒ a(22)≤2.3e21) is far too loose; needs λ<7.05 ≈ the true value (research-grade).
 - **L2 (fixed-width transfer matrix, Jensen/Conway)** — potentially the only large
