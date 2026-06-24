@@ -140,4 +140,18 @@ out-of-core / mmap spill (#20), windowed counts rows (84% of footprint; research
 | 09 | 3 algo | fuse canonicalizeSig 2nd relabel into UF labeling | ~0.5–0.8% | med | byte-identical; compounds with 06 |
 | (mem) | 2/3 | single-buffer db/next; windowed rows | up to ~2× RAM | med/high | the a(22)-enabling lever — pursue once compute settles |
 
-04 (topReach-only) measured marginal: gympie ~2%, ayr ~2.8%, dalby ~noise — NOT merged; superseded by 05.
+## Loop progress (live)
+- **04 reach-prune MERGED** (c2bf4b8). Scales with depth (validates the larger-n rule): gympie
+  ~2% / ayr ~2.7% @ H=11 N=20, but **ayr ~4.2% @ H=13 N=18** (more deep-strip columns haven't
+  reached the top). Banked. Reach-prune **family CLOSED** by measure-first: discards are ~7×
+  cheaper than avg (04 catches 18% of discards → 2–4% wall; two-ended 05 caps at 26% of discards
+  → ~+2% over 04 for medium effort, poor ROI — not built unless the loop needs it for exhaustion).
+- **07 PGO — gympie ~0%** (51.77→51.84, noise; byte-identical). The recursion's branches are
+  data-dependent, nothing for PGO to bias. Cross-checking gcc/x86 on ayr (+ 08 `-mtune`) before
+  closing the System-SW level (which already has `-march` −5%).
+- **a(22) FEASIBILITY (the "ready to start" gate): YES on dalby, no out-of-core.** Box RAM: gympie
+  24 / ayr 78 / **dalby 125 GB (122 free), 80 cores**. The 183 GB / #20 wall is the *exact* engine;
+  the *reach* engine (fold + u32 + blocked ≈ 3.4× less, run per-height) peaks ~50–70 GB on its
+  heaviest height-sweep (anchored: a(21) ran under ~30 GB) ⇒ fits dalby comfortably, ayr for most
+  heights. So a(22)'s gate is time + distribution, not memory. **Verify the reach peak empirically
+  on a heavy a(22) height before launch (measure, don't trust the estimate).**
