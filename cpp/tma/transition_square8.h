@@ -79,23 +79,6 @@ inline Outcome stepColumnSquare8(const Sig& old, int H, unsigned mask, Sig& out)
 // components exist) are never generated. A mask "covers" component L iff it sets
 // a row adjacent (r-1,r,r+1) to an L-cell, i.e. iff some new cell touches L,
 // i.e. iff L is not stranded; step() still re-checks, so it stays the authority.
-namespace s8 {
-template <class F>
-inline void viableRec(int r, int H, unsigned mask, int bits, std::uint32_t cov,
-                      std::uint32_t all, const std::uint32_t* rowSup,
-                      const std::uint32_t* sufSup, int budget, F& fn) {
-  if ((cov | sufSup[r]) != all) return;  // remaining rows can't cover all comps
-  if (r == H) {
-    if (mask) fn(mask);
-    return;
-  }
-  viableRec(r + 1, H, mask, bits, cov, all, rowSup, sufSup, budget, fn);  // 0
-  if (bits + 1 <= budget)                                                 // 1
-    viableRec(r + 1, H, mask | (1u << r), bits + 1, cov | rowSup[r], all, rowSup,
-              sufSup, budget, fn);
-}
-}  // namespace s8
-
 template <class F>
 inline void forEachViableMask(const Sig& old, int H, int budget, F&& fn) {
   std::uint32_t all = 0, rowSup[SIGMAX], sufSup[SIGMAX + 1];
@@ -109,5 +92,23 @@ inline void forEachViableMask(const Sig& old, int H, int budget, F&& fn) {
   }
   sufSup[H] = 0;
   for (int r = H - 1; r >= 0; --r) sufSup[r] = sufSup[r + 1] | rowSup[r];
-  s8::viableRec(0, H, 0u, 0, 0u, all, rowSup, sufSup, budget, fn);
+
+  // Iterative DFS (was the recursive s8::viableRec): the recursion re-passed all 10 args
+  // per node (H, all, rowSup, sufSup, budget, fn are invariant) and profiled at ~99% of
+  // runtime. Here the invariants stay in locals and only the 4 changing values ride a
+  // small explicit stack. The enumerated mask SET is identical (visit order differs, but
+  // the result row is order-independent -- addition mod p commutes), so output is
+  // byte-identical. Stack depth of a binary DFS is <= H+1 <= SIGMAX+1.
+  struct Frame { int r; unsigned mask; int bits; std::uint32_t cov; };
+  Frame stk[2 * SIGMAX + 4];
+  int sp = 0;
+  stk[sp++] = Frame{0, 0u, 0, 0u};
+  while (sp) {
+    const Frame f = stk[--sp];
+    if ((f.cov | sufSup[f.r]) != all) continue;  // remaining rows can't cover all comps
+    if (f.r == H) { if (f.mask) fn(f.mask); continue; }
+    stk[sp++] = Frame{f.r + 1, f.mask, f.bits, f.cov};  // exclude row r
+    if (f.bits + 1 <= budget)                            // include row r
+      stk[sp++] = Frame{f.r + 1, f.mask | (1u << f.r), f.bits + 1, f.cov | rowSup[f.r]};
+  }
 }
