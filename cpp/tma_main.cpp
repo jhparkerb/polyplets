@@ -403,12 +403,14 @@ int main(int argc, char** argv) {
                                               static_cast<std::uint32_t>(modp), fold,
                                               blockedS, peak, peakBytes)
               : sweepSquare8HeightModP(onlyHeight, maxn,
-                                       static_cast<std::uint32_t>(modp), fold, peak);
+                                       static_cast<std::uint32_t>(modp), fold, peak,
+                                       nthreads);
       obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-modp-N" +
                             std::to_string(maxn),
                         maxn, "height=" + std::to_string(onlyHeight) + " modp=" +
                                   std::to_string(modp) + " fold=" +
-                                  std::to_string(fold ? 1 : 0) +
+                                  std::to_string(fold ? 1 : 0) + " threads=" +
+                                  std::to_string(nthreads) +
                                   (blockedS > 0 ? " blocked=" + std::to_string(blockedS)
                                                 : ""));
       rep.done("result=" + std::to_string(static_cast<unsigned long long>(row[maxn])),
