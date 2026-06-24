@@ -54,6 +54,26 @@ Hypotheses to verify scientifically; none assumed. ROI = rough speedup × confid
   tighter generator. Reproduce = profile (done); fix = next iteration.
 
 ## Fixes (chronological)
-| # | level | candidate | benchmark | before → after | commit | status |
-|---|-------|-----------|-----------|----------------|--------|--------|
-| — | — | (Phase 0 baseline + driver hardening) | — | — | 11124c9, 0e7e29a | baseline |
+| # | level | candidate | benchmark | before → after | commit/tag | status |
+|---|-------|-----------|-----------|----------------|------------|--------|
+| — | — | Phase 0 baseline + driver hardening | — | — | 0e7e29a | baseline |
+| 01 | 4 code | iterative viableRec (kill recursion overhead) | H=11 N=20 | 51.0s → 50.4s | `deadend/01-viablerec-iterative` | **dead end** — ~noise; cost is per-node arithmetic × node count, not call overhead |
+| 02 | 6 syssw | `-march=native` | H=11 N=20 | 51.0s → 53.4s | (no source change) | **dead end** — ~5% *slower* (worse codegen for branchy int loop) |
+
+## Phase 1 status — single-machine mechanical levers EXHAUSTED
+The hot path (`forEachViableMask`, ~99%) is the per-state viable-mask enumeration, which is
+**inherent to the sum-over-heights column transfer matrix**. Mechanical tuning of it yields
+nothing (iterative ~0%, `-march=native` −5%, `% p` ~0.2%). The remaining single-machine
+candidates are NOT cheap:
+- **L1 (2 primes, ~33%)** — blocked on a rigorous a(22) < 4.6e18 bound; best proven bound
+  (λ≤9.355 ⇒ a(22)≤2.3e21) is far too loose; needs λ<7.05 ≈ the true value (research-grade).
+- **L2 (fixed-width transfer matrix, Jensen/Conway)** — potentially the only large
+  single-machine win; a major rewrite with different RAM profile. Back-of-envelope needed.
+- **L3 (better boundary state / cheaper enumeration)** — research-grade, uncertain.
+
+**Verdict:** by D9, the cheap levers are < 1% / negative, and the big single-machine levers
+(L1/L2/L3) are high-effort/research-grade. Per Bentley ("most speedup for least effort,"
+after the higher levels are surveyed) the **achievable** large win is **L7 — parallelism**
+(within-host MT, then multi-machine), re-derived *with the discipline + the hardened driver*
+this time (the lock-free MT was already validated byte-identical; per-box thread knee and the
+NUMA `--interleave=all` finding were measured). That is the next phase of work.
