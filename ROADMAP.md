@@ -172,6 +172,22 @@ fills those columns for all n at once. Cross-check: row-20 sum (GF H<=9 + notch 
 3^19 at H=20) must equal a(20)=1,025,573,519,362,016. DO NOT publish the triangle with the
 notch unfilled.
 
+**#32 — Meet-in-the-middle height scheduling for a(22)+ (manual coordination).**
+The fixed per-box height split (ayr=low heights, dalby=high) needs a split-POINT guess; guess
+wrong and one box idles while the other grinds (live risk on the a(21) run). Better: ayr claims
+heights ASCENDING from H=1 (lightest), dalby claims DESCENDING from the pole H=N-1 (heaviest;
+H=N is the cheap 3^(N-1) closed form, handled separately), and they meet in the middle. It is
+SELF-BALANCING: dalby (80c, ~2.5x ayr's 32c) plus the ~2.4x/height geometric cost means dalby
+naturally takes just the top handful that dominate the total work while ayr sweeps the many
+light heights -- the meeting point equalizes wall times with NO cost estimate needed. The cost
+profile is unimodal (peaks at the pole H=N-1, not the top). Coordination is MANUAL by design --
+orchestrator + jasonp hand the next inward height to whichever box finishes first. "Pets not
+cattle": for two boxes / ~100 cores a distributed claim registry is over-engineering, and a
+claim happens only once per height-completion (hours apart for the heavy heights), so a
+human/orchestrator in the loop is fine; no shared FS or real-time protocol required. Fallback
+if even manual hand-off is unwanted: a balanced STATIC split computed from the cost curve (the
+geometric growth makes the exact split point insensitive). Apply when a(22) is launched.
+
 **#17 — Paper + public repo drop (LAST).**
 Fold everything into the write-up: a(19) + free/one-sided, hole sequences, the
 fixed-height GFs and lifetime-3 (honestly weighted — see results/lifetime3-proof.md),
