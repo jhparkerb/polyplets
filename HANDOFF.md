@@ -1,16 +1,22 @@
 # HANDOFF — for the next session
 
-## 2026-06-25 15:07 EDT — a(21) RUNNING (split ayr+dalby, u64 lock-free, no CRT)
+## 2026-06-25 16:37 EDT — a(21) RUNNING (split ayr+dalby, u64 lock-free+dynamic, no CRT)
 
-- **a(21) IS RUNNING** as of **2026-06-25 ~15:07 EDT**, rev **73d84a0** (lock-free exact MT
-  engine + per-column PROGRESS heartbeat). [Relaunched from the 14:44 start to add the
-  heartbeat; that earlier run was stopped clean and its run dir wiped — no stale state.]
+- **a(21) IS RUNNING** as of **2026-06-25 ~16:37 EDT**, rev **a244aee** (lock-free exact MT
+  engine + dynamic shard dispatch + per-column PROGRESS heartbeat). [Several relaunches from
+  the 14:44 start to land the heartbeat then the dynamic-dispatch fix and tune the config;
+  each prior run was stopped clean + run dir wiped — no stale state.]
   Split with NO CRT (a(21)≈6.9e15 < 2^64, one u64 sweep/height):
-  - **dalby** (`dalby.jhpb.org`, 80c): the top two computed heights **H20 (pole) + H19**,
-    `MAXJOBS=2 THREADS=40 TMA_SHARD_MULT=32` (~75/80c). driver pid **9673**, window `0:a21`.
-  - **ayr** (32c): heights **H1–H18**, `MAXJOBS=2 THREADS=14 TMA_SHARD_MULT=32`, NUMA-interleave
-    (~28/32c). driver pid **1191958**, window `0:a21`.
+  - **dalby** (`dalby.jhpb.org`, 80c): heavy queue **H20,19,18,17**, `MAXJOBS=2 THREADS=40
+    TMA_SHARD_MULT=32`. driver pid **23616**, window `0:a21`. **Confirmed 99.9% saturated**
+    (H20≈36c + H19≈39c) — dynamic dispatch + the heavy heights' near-linear scaling fill the box.
+  - **ayr** (32c): light tail **H1–H16**, `MAXJOBS=2 THREADS=14 TMA_SHARD_MULT=32`,
+    NUMA-interleave (~28/32c). driver pid **1193201**, window `0:a21`.
   - **H21 = closed form 3^20 = 3,486,784,401** (added by hand when combining).
+  - **Config rationale (measured):** exact two-pass scales near-linearly to T=64+ on heavy
+    heights (~15 states/s/thread, no knee — scripts/exact_knee.sh on H19/N20); SHARD_MULT=32
+    is best, not worst (scripts/exact_tune.sh). Small heights are work-limited (cap ~5 cores),
+    which is why a(18)-scale shakedowns look half-idle — a scale artifact, not a bug.
   - **Heartbeat:** `runs/a21fold/h$H.log` gets `PROGRESS H=.. col=.. (%) rate=../s eta_col=..s`
     every 150s once a column runs that long (TMA_PROGRESS=1, on by default in the driver).
     Read eta_col there for the real wall — do NOT fabricate an ETA.
