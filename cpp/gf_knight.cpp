@@ -31,6 +31,10 @@
 using u64 = std::uint64_t;
 static int H;
 
+// TODO(simplify): uf_find/uf_union/rowsOf/packCanon and the whole BFS+CSR+rolling-window
+// DP skeleton here are near-verbatim copies of gf_modp.cpp (they differ only in the
+// boundary-state model and step() adjacency). If a third lattice/reach variant lands,
+// extract a transfer-frame header templated on State + step; for two files it's borderline.
 static int uf_find(int* p,int x){ while(p[x]!=x){p[x]=p[p[x]];x=p[x];} return x; }
 static void uf_union(int* p,int a,int b){int ra=uf_find(p,a),rb=uf_find(p,b); if(ra!=rb)p[ra]=rb;}
 static int rowsOf(int m,int* r){ int k=0; for(int i=0;i<H;++i) if(m>>i&1) r[k++]=i; return k; }

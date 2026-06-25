@@ -165,6 +165,24 @@ static void emit(const SweepResults& res, int maxn, bool perHeight) {
   }
 }
 
+// Fill `ctl` from --checkpoint DIR + the TMA_CKPT_* env knobs; returns &ctl when a
+// checkpoint dir was given (else nullptr). Dedups the two identical intra-height setups.
+static const CkptCtl* setupCkpt(const std::string& dir, CkptCtl& ctl) {
+  if (dir.empty()) return nullptr;
+  fs::create_directories(dir);
+  ctl.dir = dir;
+  if (const char* e = std::getenv("TMA_CKPT_SECS")) ctl.everySeconds = std::atof(e);
+  if (const char* e = std::getenv("TMA_CKPT_MIN_STATES"))
+    ctl.minStates = std::strtoull(e, nullptr, 10);
+  return &ctl;
+}
+
+// TODO(simplify): main() routes ~13 flags through a deep nested if/else cascade
+// (perim / holes{only-height,per-height,ckpt} / only-height{modp{bbox,closed-form,blocked},
+// exact} / global-ckpt / plain), where flag compatibility is enforced by POSITION in the
+// cascade rather than validated. Deeper form: parse into a Config, pick a mode enum once
+// (with an explicit compat check), dispatch one function per mode. Larger refactor -- its
+// own focused pass, gate-protected.
 int main(int argc, char** argv) {
   proctitle::init(argc, argv);  // capture argv span for the htop title (before parsing overwrites)
   if (argc < 3) {
@@ -286,16 +304,8 @@ int main(int argc, char** argv) {
     // one strip height so a LOW height sweeps cheaply to high n (the all-heights
     // sweep would explode); emits "H n holes count", same as --per-height for 1 H.
     if (onlyHeight > 0) {
-      CkptCtl ckctl;
-      const CkptCtl* ckptPtr = nullptr;
-      if (!checkpointDir.empty()) {  // intra-height resume for this single height
-        fs::create_directories(checkpointDir);
-        ckctl.dir = checkpointDir;
-        if (const char* e = std::getenv("TMA_CKPT_SECS")) ckctl.everySeconds = std::atof(e);
-        if (const char* e = std::getenv("TMA_CKPT_MIN_STATES"))
-          ckctl.minStates = std::strtoull(e, nullptr, 10);
-        ckptPtr = &ckctl;
-      }
+      CkptCtl ckctl;  // intra-height resume for this single height
+      const CkptCtl* ckptPtr = setupCkpt(checkpointDir, ckctl);
       obs::Reporter rep(
           "tma-holes-H" + std::to_string(onlyHeight) + "-N" +
               std::to_string(maxn) + "-k" + std::to_string(kmax),
@@ -459,15 +469,7 @@ int main(int argc, char** argv) {
     // intra-height checkpoint: --checkpoint DIR resumes this single height's sweep
     // from the last column boundary (env knobs TMA_CKPT_SECS / TMA_CKPT_MIN_STATES).
     CkptCtl ckctl;
-    const CkptCtl* ckptPtr = nullptr;
-    if (!checkpointDir.empty()) {
-      fs::create_directories(checkpointDir);
-      ckctl.dir = checkpointDir;
-      if (const char* e = std::getenv("TMA_CKPT_SECS")) ckctl.everySeconds = std::atof(e);
-      if (const char* e = std::getenv("TMA_CKPT_MIN_STATES"))
-        ckctl.minStates = std::strtoull(e, nullptr, 10);
-      ckptPtr = &ckctl;
-    }
+    const CkptCtl* ckptPtr = setupCkpt(checkpointDir, ckctl);
     obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-N" +
                           std::to_string(maxn),
                       maxn, "height=" + std::to_string(onlyHeight) + " threads=" +
