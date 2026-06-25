@@ -208,17 +208,24 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
                       row.data(), static_cast<u64>(maxn + 1), col, res.peakStates,
                       res.peakHeight))
         ckptTestKill(col);
-    for (int t = 0; t < nthreads; ++t)
-      for (int s = 0; s < S; ++s) loc[t][s].clear();
-
     std::vector<Counts> localRow(nthreads, Counts(maxn + 1, 0));
-    // PASS 1 (expand): thread t drains source shards t,t+T,... into its OWN dest shards
-    // loc[t][*] (no shared writes -> no lock); comps==1 closures harvest to localRow[t].
+    // PASS 1 (expand): threads pull source shards from a shared atomic cursor (DYNAMIC, not a
+    // static t,t+T,... stride). Per-state work varies wildly on tall strips (a signature may
+    // expand over very many or very few viable masks), so a static 1/T slice left light-shard
+    // threads idle while stragglers ground on -- measured ~34% of dalby idle at T=40. Dynamic
+    // grab keeps every thread fed until the last ~T shards. Each thread routes outputs to its
+    // OWN dest shards loc[t][*] (no shared writes -> no lock) and harvests comps==1 to
+    // localRow[t]; the result is independent of which thread drew a source shard (PASS 2 sums
+    // all loc[t] per dest), so it stays byte-identical. Each thread also clears its own dest
+    // shards here (was a serial pre-loop over all nthreads*S shards on one core).
+    std::atomic<int> nextSrc{0};
     auto expand = [&](int t) {
       Counts& lrow = localRow[t];
       std::vector<FlatDB>& mine = loc[t];
+      for (int s = 0; s < S; ++s) mine[s].clear();
       u64 ld = 0;  // source states processed by this thread (progress, flushed every 256)
-      for (int s = t; s < S; s += nthreads) {  // thread t owns source shards t,t+T,
+      int s;
+      while ((s = nextSrc.fetch_add(1, std::memory_order_relaxed)) < S) {
         dbS[s].for_each([&](const Sig& sig, const u64* counts) {
           if (prog && (++ld & 255u) == 0) g_done.fetch_add(256, std::memory_order_relaxed);
           const int ms = minSizeRow(counts, maxn);
@@ -273,11 +280,15 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
     th.clear();
     if (prog) { monRun.store(false); mon.join(); }
 
-    // PASS 2 (merge): thread u owns dest shards u,u+T,...; clears dbS[s] and folds in
-    // loc[0..T-1][s] (one writer per dbS[s], one reader per loc[t][s] -> no lock). dbS is
-    // reused as the merge target, so it holds the next column after this -- no swap.
-    auto merge = [&](int u) {
-      for (int s = u; s < S; s += nthreads) {
+    // PASS 2 (merge): threads pull dest shards from a shared atomic cursor (DYNAMIC, same
+    // reason as expand). For dest shard s: clear dbS[s] and fold in loc[0..T-1][s]. Each
+    // dest shard is handled by exactly one thread, so dbS[s] has one writer and loc[*][s]
+    // one reader -> no lock. dbS is reused as the merge target, so it holds the next column
+    // after this -- no swap.
+    std::atomic<int> nextDst{0};
+    auto merge = [&](int) {
+      int s;
+      while ((s = nextDst.fetch_add(1, std::memory_order_relaxed)) < S) {
         dbS[s].clear();
         for (int t = 0; t < nthreads; ++t)
           loc[t][s].for_each([&](const Sig& sig, const u64* c) {
