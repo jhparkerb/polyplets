@@ -11,14 +11,23 @@ GIT_DIRTY  := $(shell test -n "$$(git status --porcelain 2>/dev/null)" && echo -
 BUILD_TIME := $(shell date +%Y-%m-%dT%H:%M:%S%z)
 CXXFLAGS += -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
 
+# -Wno-error=restrict is a gcc-only workaround (gcc-12 false positive on the
+# Redelmeier generator, see build/g2 below). clang rejects the unknown flag, so
+# apply it only when the compiler is gcc; empty for clang.
+RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),,-Wno-error=restrict)
+
 .PHONY: gates gate-g1 gate-g2 gate-euler clean
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-g3 gate-tma gate-s2 gate-e0 gate-sym gate-euler
+gates: gate-g1 gate-g2 gate-g3 gate-tma gate-s2 gate-e0 gate-sym gate-euler gate-driver
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
 	python3 tests/gate_g1.py
+
+# Gate DRIVER: reach driver/combine reject crashed/raced/corrupt sweeps (no silent zeros)
+gate-driver: build/tma
+	python3 tests/gate_driver_robust.py
 
 # Gate G2: C++ Redelmeier engine vs oracle + fixtures (+ split, + sanitizers)
 gate-g2: build/g2 build/g2_asan
@@ -31,7 +40,7 @@ build:
 # positive in <bits/char_traits.h> (bogus -Wrestrict on std::string ops; clang and
 # gcc-15 don't trip it). Scoped here so -Werror stays strict everywhere else.
 build/g2: cpp/g2_redelmeier.cpp | build
-	$(CXX) $(CXXFLAGS) -Wno-error=restrict -O3 $< -o $@
+	$(CXX) $(CXXFLAGS) $(RESTRICT_FLAG) -O3 $< -o $@
 
 # fixed-height transfer matrix over Z/pZ, for generating-function recovery
 build/gf_modp: cpp/gf_modp.cpp | build
@@ -42,7 +51,7 @@ build/gf_knight: cpp/gf_knight.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
 build/g2_asan: cpp/g2_redelmeier.cpp | build
-	$(CXX) $(CXXFLAGS) -Wno-error=restrict -g -O1 -fsanitize=address,undefined \
+	$(CXX) $(CXXFLAGS) $(RESTRICT_FLAG) -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer $< -o $@
 
 # Gate Euler: hole-accounting helper (#28) vs flood oracle, before engine wiring

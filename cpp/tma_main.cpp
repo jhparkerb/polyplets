@@ -19,6 +19,8 @@
 #include "obs.h"
 #include "tma/sweep.h"
 #include "tma/sweep8.h"
+#include "tma/sweep8_modp.h"
+#include "tma/sweep8_modp_blocked.h"
 #include "tma/sweep8_holes.h"
 #include "tma/sweep8_perim.h"
 
@@ -194,9 +196,16 @@ int main(int argc, char** argv) {
   std::string checkpointDir;
   int nthreads = 1, onlyHeight = 0;
   u64 modp = 0;  // --modp P: count B_{H,k}(n) mod P (holes path, #5b GF recovery)
+  bool fold = false;  // --fold: R1 vertical-mirror fold (~2x fewer states); composes with --modp
+                      // on the plain a(n) --only-height path (R1xR3 reach engine, ~4x less RAM)
   bool hdrop = false;  // --hdrop: drop holes > kmax (exact for k<=kmax, bounds RAM)
+  int blockedS = 0;    // --blocked S: B (blocked store) on the modp reach path -- S
+                       // hash partitions, drained-and-freed per column (~2x less RAM,
+                       // composes with --fold/--modp). 0 = off. Rounded up to pow2.
   u64 reserveStates = 0;  // --reserve N: pre-size the state store to ~N states (skip
                           // the doubling-grow transient; pass the calibrated peak)
+  bool bbox = false;  // --bbox: with --only-height H --modp P, emit "H W n B_{H,W}(n) mod P"
+                      // (bounding-box stratified: height EXACTLY H, width EXACTLY W).
   for (int i = 3; i < argc; ++i) {
     if (std::strcmp(argv[i], "--per-height") == 0) {
       perHeight = true;
@@ -215,10 +224,18 @@ int main(int argc, char** argv) {
       onlyHeight = std::atoi(argv[++i]);
     } else if (std::strcmp(argv[i], "--modp") == 0 && i + 1 < argc) {
       modp = static_cast<u64>(std::atoll(argv[++i]));
+    } else if (std::strcmp(argv[i], "--fold") == 0) {
+      fold = true;
     } else if (std::strcmp(argv[i], "--hdrop") == 0) {
       hdrop = true;
+    } else if (std::strcmp(argv[i], "--blocked") == 0 && i + 1 < argc) {
+      int s = std::atoi(argv[++i]);
+      blockedS = 1;
+      while (blockedS < s) blockedS <<= 1;  // round up to a power of two (mask requires it)
     } else if (std::strcmp(argv[i], "--reserve") == 0 && i + 1 < argc) {
       reserveStates = static_cast<u64>(std::strtoull(argv[++i], nullptr, 10));
+    } else if (std::strcmp(argv[i], "--bbox") == 0) {
+      bbox = true;
     } else {
       std::fprintf(stderr, "unknown arg: %s\n", argv[i]);
       return 2;
@@ -360,6 +377,80 @@ int main(int argc, char** argv) {
   // column: col/maxn is the denominator, live-state count the liveness, and the
   // ETA is self-computed from the measured column rate.
   if (onlyHeight > 0) {
+    if (modp > 0) {
+      if (bbox) {
+        // Bounding-box stratified: emit "H W n B_{H,W}(n) mod P" for every nonzero entry.
+        // Width == column at harvest (leftmost pinned at col 0). Sum_W recovers B_H(n).
+        u64 peak = 0;
+        const auto bbw = sweepSquare8HeightWidthModP(
+            onlyHeight, maxn, static_cast<std::uint32_t>(modp), peak);
+        obs::Reporter rep("tma-bbox-H" + std::to_string(onlyHeight) + "-N" +
+                              std::to_string(maxn),
+                          maxn, "height=" + std::to_string(onlyHeight) + " modp=" +
+                                    std::to_string(modp) + " bbox=1");
+        unsigned long long emitted = 0;
+        for (int W = 1; W <= maxn; ++W)
+          for (int n = 1; n <= maxn; ++n)
+            if (bbw[W][n]) {
+              std::printf("%d %d %d %u\n", onlyHeight, W, n, bbw[W][n]);
+              ++emitted;
+            }
+        rep.done("rows=" + std::to_string(emitted),
+                 "peak_states=" +
+                     std::to_string(static_cast<unsigned long long>(peak)));
+        return 0;
+      }
+      // Top strip height H==N: a trivial closed form, not worth sweeping the largest,
+      // emptiest strip. A height-N king-polyomino of N cells has exactly one cell per
+      // row, and each of the N-1 inter-row steps shifts the column by -1/0/+1 (8-neighbour
+      // adjacency), so B_N(N) = 3^(N-1) (fixed: the first cell is translation-normalised);
+      // n<N cannot span N rows, so B_N(n<N)=0. Byte-identical to the real --only-height N
+      // sweep (verified n<=8); for a(20) this replaced a ~2-day h20 sweep.
+      if (onlyHeight == maxn) {
+        u64 v = 1 % modp;
+        const u64 base = 3 % modp;
+        for (int e = 0; e < maxn - 1; ++e) v = (v * base) % modp;
+        obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-modp-N" +
+                              std::to_string(maxn),
+                          0, "height=" + std::to_string(onlyHeight) + " modp=" +
+                                 std::to_string(modp) + " closed_form=3^(N-1)");
+        rep.done("result=" + std::to_string(static_cast<unsigned long long>(v)));
+        for (int n = 1; n < maxn; ++n) std::printf("%d %u\n", n, 0u);
+        std::printf("%d %u\n", maxn, static_cast<std::uint32_t>(v));
+        return 0;
+      }
+      // R1xR3 production reach path: fold + u32 mod-p sweep of one strip height -- emits
+      // "n B_H(n) mod p". CRT over 2-3 primes (scripts/an_modp_crt.sh) recovers the exact
+      // B_H(n); summing over H gives a(n). ~4x less RAM than the exact u64 sweep.
+      u64 peak = 0, peakBytes = 0;
+      const std::vector<std::uint32_t> row =
+          blockedS > 0
+              ? sweepSquare8HeightModPBlocked(onlyHeight, maxn,
+                                              static_cast<std::uint32_t>(modp), fold,
+                                              blockedS, peak, peakBytes)
+              : sweepSquare8HeightModP(onlyHeight, maxn,
+                                       static_cast<std::uint32_t>(modp), fold, peak,
+                                       nthreads);
+      obs::Reporter rep("tma-H" + std::to_string(onlyHeight) + "-modp-N" +
+                            std::to_string(maxn),
+                        maxn, "height=" + std::to_string(onlyHeight) + " modp=" +
+                                  std::to_string(modp) + " fold=" +
+                                  std::to_string(fold ? 1 : 0) + " threads=" +
+                                  std::to_string(nthreads) +
+                                  (blockedS > 0 ? " blocked=" + std::to_string(blockedS)
+                                                : ""));
+      rep.done("result=" + std::to_string(static_cast<unsigned long long>(row[maxn])),
+               "peak_states=" +
+                   std::to_string(static_cast<unsigned long long>(peak)) +
+                   (blockedS > 0
+                        ? " peak_store_mb=" +
+                              std::to_string(static_cast<unsigned long long>(
+                                  peakBytes >> 20))
+                        : ""));
+      for (int n = 1; n <= maxn; ++n)
+        std::printf("%d %u\n", n, row[n]);
+      return 0;
+    }
     SweepResults res;
     res.byHeight.assign(maxn + 1, Counts(maxn + 1, 0));
     res.totals.assign(maxn + 1, 0);
