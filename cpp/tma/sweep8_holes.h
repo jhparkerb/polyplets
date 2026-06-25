@@ -89,6 +89,11 @@ struct HoleDB {
 };
 
 // Component count of a canonical boundary = its max label.
+// TODO(simplify): this helper is under-applied -- the same `max over sig.b[0..H)` loop is
+// open-coded ~7 times (sweep8.h, sweep8_modp.h x3, sweep8_modp_blocked.h, sample8.h), and
+// the closure predicate `comps==1 && sig.b[H] && sig.b[H+1]` is likewise duplicated (a 3rd
+// spelling as validClosure() in sample8.h). Promote boundaryComps + an isClosedAnimal()
+// to signature.h and call them everywhere. Pure refactor (gate-protected), no output change.
 inline int boundaryComps(const Sig& sig, int H) {
   int c = 0;
   for (int j = 0; j < H; ++j) if (sig.b[j] > c) c = sig.b[j];

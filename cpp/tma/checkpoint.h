@@ -97,6 +97,11 @@ struct Reader {
 // entry (caller supplies db.for_each / a loop over shards). Returns false on any
 // I/O failure WITHOUT disturbing the prior DIR/ckpt -- a failed checkpoint must
 // never kill the job.
+// TODO(simplify): peakHeight is derivable, not state -- every checkpoint lives inside a
+// single-height sweep, so on resume it is always exactly meta.H (already in the header and
+// gated). It could be dropped from the save/load signatures and the on-disk format
+// (restore res.peakHeight = H after Loaded), removing a param here and two locals at each
+// of the ~5 call sites. Format change => bump fmtver; do it separate from a sweep pass.
 template <class EntrySource>
 inline bool tmaCkptSave(const CkptCtl& ctl, const CkptMeta& m, u64 nEntries,
                         EntrySource&& forEachEntry, const u64* accum, u64 accumLen,

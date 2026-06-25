@@ -56,6 +56,14 @@ inline void addCounts(StateDB& db, const std::string& sig, const Counts& src,
 // are never bulk-zeroed, which would dominate at tens of millions of slots).
 // Capacity is a power of two; grows by doubling at load factor 0.85 (linear
 // probing with FNV-1a is fine that dense; steady slack ~1.43x -> ~1.18x).
+//
+// TODO(simplify): this open-addressing store is copied four times -- FlatDB (here),
+// FlatDB32 (sweep8_modp.h, u32 vals), and HoleDB/PerimDB (sweep8_holes/perim.h, caller
+// stride). They differ only in value type and fixed-vs-passed stride => one template
+// OAMap<V>. The copies have already DRIFTED: PerimDB grows at load factor 0.70
+// (sweep8_perim.h: cap*7) while everyone else uses 0.85 -- exactly the divergence a
+// single template would prevent. Store-first refactor (pure plumbing, for_each-only read
+// contract => cannot change byte-output); do it gate-protected, separate from a sweep.
 struct FlatDB {
   std::vector<Sig> keys;
   std::vector<u64> vals;

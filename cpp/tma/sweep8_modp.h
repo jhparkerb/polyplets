@@ -92,6 +92,12 @@ inline int minSizeRow32(const std::uint32_t* c, int maxn) {
 
 // dst[n+shift] = (dst[n+shift] + src[n]) mod p. src,dst < p < 2^31 so the u64
 // intermediate never overflows.
+// TODO(simplify/efficiency): in the lock-free MT merge pass each destination cell receives
+// <= nthreads addends (each already < p), but this reduces `% p` on EVERY add. Since
+// nthreads*2^31 fits u64, the merge could raw-accumulate the <=T thread-local addends and
+// reduce once per cell -- matching the deferral pass-1's localRow already uses. Modest win
+// (enumeration dominates per the CRT study), and it touches gated mod-p arithmetic, so
+// gate-protect it separately.
 inline void addCountsModP32(FlatDB32& db, const Sig& sig, const std::uint32_t* src,
                             int shift, int maxn, std::uint32_t p) {
   std::uint32_t* dst = db.slot(sig);
