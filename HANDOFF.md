@@ -1,14 +1,19 @@
 # HANDOFF — for the next session
 
-## 2026-06-25 14:44 EDT — a(21) LAUNCHED (split ayr+dalby, u64 lock-free, no CRT)
+## 2026-06-25 15:07 EDT — a(21) RUNNING (split ayr+dalby, u64 lock-free, no CRT)
 
-- **a(21) IS RUNNING** as of **2026-06-25 ~14:44 EDT**, rev **38ca4d8** (lock-free exact MT
-  engine). Split with NO CRT (a(21)≈6.9e15 < 2^64, one u64 sweep/height):
+- **a(21) IS RUNNING** as of **2026-06-25 ~15:07 EDT**, rev **73d84a0** (lock-free exact MT
+  engine + per-column PROGRESS heartbeat). [Relaunched from the 14:44 start to add the
+  heartbeat; that earlier run was stopped clean and its run dir wiped — no stale state.]
+  Split with NO CRT (a(21)≈6.9e15 < 2^64, one u64 sweep/height):
   - **dalby** (`dalby.jhpb.org`, 80c): the top two computed heights **H20 (pole) + H19**,
-    `MAXJOBS=2 THREADS=40 TMA_SHARD_MULT=32` (~75/80c). driver pid **9098**, window `0:a21`.
+    `MAXJOBS=2 THREADS=40 TMA_SHARD_MULT=32` (~75/80c). driver pid **9673**, window `0:a21`.
   - **ayr** (32c): heights **H1–H18**, `MAXJOBS=2 THREADS=14 TMA_SHARD_MULT=32`, NUMA-interleave
-    (~28/32c). driver pid **1191524**, window `0:a21`.
+    (~28/32c). driver pid **1191958**, window `0:a21`.
   - **H21 = closed form 3^20 = 3,486,784,401** (added by hand when combining).
+  - **Heartbeat:** `runs/a21fold/h$H.log` gets `PROGRESS H=.. col=.. (%) rate=../s eta_col=..s`
+    every 150s once a column runs that long (TMA_PROGRESS=1, on by default in the driver).
+    Read eta_col there for the real wall — do NOT fabricate an ETA.
 - **COMBINE when both finish:** sum all `runs/a21fold/h*.out` (col-2 at n=21) across BOTH
   boxes (rsync dalby's + ayr's run dirs together), ADD 3^20, then GATE the total against
   a(20)=1,025,573,519,362,016 (ratio sanity) and re-derive a(12)/a(14) as engine self-checks.
