@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "checkpoint.h"
+#include "proctitle.h"
 #include "statedb.h"
 #include "transition_square8.h"
 
@@ -166,12 +167,15 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
   }
 
   auto lastSave = std::chrono::steady_clock::now();
+  proctitle::setShardTotal(static_cast<u64>(S));  // within-column progress denominator
   for (int col = startCol; col <= maxn; ++col) {
     u64 total = 0;
     for (int s = 0; s < S; ++s) total += dbS[s].size();
     if (total == 0) break;
     if (total > res.peakStates) { res.peakStates = total; res.peakHeight = H; }
     if (onColumn) onColumn(col, total);  // liveness/ETA hook (no-op if unset)
+    proctitle::setCol(col);              // process-title: column index
+    proctitle::resetShards();            // process-title: within-column bar restarts at 0
     if (ckpt && col > 0 && total >= ckpt->minStates && ckptDue(*ckpt, lastSave))
       if (tmaCkptSave(*ckpt, meta, total,
                       [&](auto&& emit) {
@@ -185,7 +189,7 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
     std::vector<Counts> localRow(nthreads, Counts(maxn + 1, 0));
     auto worker = [&](int t) {
       Counts& lrow = localRow[t];
-      for (int s = t; s < S; s += nthreads)  // thread t owns source shards t,t+T,
+      for (int s = t; s < S; s += nthreads) {  // thread t owns source shards t,t+T,
         dbS[s].for_each([&](const Sig& sig, const u64* counts) {
           const int ms = minSizeRow(counts, maxn);
           if (ms < 0) return;
@@ -205,6 +209,8 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
             addCounts(nextS[sh], out, counts, cells, maxn);
           });
         });
+        proctitle::shardDone();  // process-title: one shard of this column finished
+      }
     };
     std::vector<std::thread> th;
     for (int t = 0; t < nthreads; ++t) th.emplace_back(worker, t);

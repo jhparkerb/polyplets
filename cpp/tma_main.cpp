@@ -15,6 +15,7 @@
 #include <cstring>
 #include <filesystem>
 #include <string>
+#include <thread>
 
 #include "obs.h"
 #include "tma/sweep.h"
@@ -165,6 +166,7 @@ static void emit(const SweepResults& res, int maxn, bool perHeight) {
 }
 
 int main(int argc, char** argv) {
+  proctitle::init(argc, argv);  // capture argv span for the htop title (before parsing overwrites)
   if (argc < 3) {
     std::fprintf(stderr,
                  "usage: %s {square4|square8} MAXN [--per-height] "
@@ -471,13 +473,17 @@ int main(int argc, char** argv) {
                       maxn, "height=" + std::to_string(onlyHeight) + " threads=" +
                           std::to_string(nthreads) +
                           (ckptPtr ? std::string(" ckpt=1") : std::string()));
+    // htop process title: "tma a(N) H<h> c=<col>/<maxn> ~<pct>%", refreshed ~1.5s
+    std::thread titleThread = proctitle::start(maxn, onlyHeight, maxn);
     res.byHeight[onlyHeight] = heightRow(
         onlyHeight, maxn, nthreads, res, [&](int col, u64 live) {
+          proctitle::setCol(col);  // covers the serial path (MT path also sets it)
           rep.beat(col, "col=" + std::to_string(col) + " states=" +
                             std::to_string(live) + " peak_states=" +
                             std::to_string(res.peakStates));
         },
         static_cast<size_t>(reserveStates), ckptPtr, fold);
+    proctitle::stop(titleThread);
     for (int n = 1; n <= maxn; ++n) res.totals[n] = res.byHeight[onlyHeight][n];
     rep.done("result=" + std::to_string(static_cast<unsigned long long>(
                              res.byHeight[onlyHeight][maxn])),
