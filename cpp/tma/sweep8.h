@@ -111,13 +111,17 @@ inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
   return row;
 }
 
-// Multithreaded version of one height. Same algorithm, but each column's output
-// map is split into S shards (by signature hash) each under its own mutex, and
-// the source states are fanned across `nthreads` workers. Routing is by the same
-// hashSig, and per-shard counts only ever ACCUMULATE (commutative), so the
-// result is bit-identical to sweepSquare8Height regardless of interleaving -- the
-// gate checks exactly that. Memory ~ serial (the shards together hold the same
-// states); no variable-width tricks, since the target machine has the RAM.
+// Multithreaded version of one height -- LOCK-FREE two-pass (ported from the modp path,
+// sweepSquare8HeightModPMT; a per-output mutex caps this DP at ~2.3x and REGRESSES past
+// ~12 threads -- measured exact-vs-modp, runs/exact_mt_scaling). Each column:
+//   PASS 1 (expand): thread t drains source shards t,t+T,... and routes every output to
+//     its OWN per-thread dest shards loc[t][sh] -- no other thread touches loc[t], no lock.
+//   PASS 2 (merge): thread u owns dest shards u,u+T,...; it clears dbS[s] and folds in
+//     loc[0..T-1][s]. Each dbS[s] written by one thread, each loc[t][s] read by one -> no
+//     lock. dbS is reused as the merge target (becomes the next column), so no swap.
+// Counts only ACCUMULATE (commutative+associative), so the result is bit-identical to the
+// serial sweepSquare8Height regardless of sharding/threading -- gate case M checks exactly
+// that. Memory ~ (1 + 1/nthreads)x serial (dbS plus the thread-local dest slices).
 inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
                                    SweepResults& res,
                                    const std::function<void(int, u64)>& onColumn = {},
@@ -125,16 +129,24 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
                                    const CkptCtl* ckpt = nullptr, bool fold = false) {
   Counts row(maxn + 1, 0);
   int S = 64;
-  while (S < 128 * nthreads) S <<= 1;  // shards: power of two, >> nthreads
-  std::vector<FlatDB> dbS, nextS;
+  int shardMult = 16;  // TMA_SHARD_MULT: dest shards per thread (>= for merge balance)
+  if (const char* e = std::getenv("TMA_SHARD_MULT")) shardMult = std::atoi(e);
+  while (S < shardMult * nthreads) S <<= 1;  // shards: power of two, >> nthreads
+  std::vector<FlatDB> dbS;
   dbS.reserve(S);
-  nextS.reserve(S);
-  for (int s = 0; s < S; ++s) { dbS.emplace_back(maxn); nextS.emplace_back(maxn); }
+  for (int s = 0; s < S; ++s) dbS.emplace_back(maxn);
+  std::vector<std::vector<FlatDB>> loc(nthreads);  // loc[t][s]: thread t's private dest shards
+  for (int t = 0; t < nthreads; ++t) {
+    loc[t].reserve(S);
+    for (int s = 0; s < S; ++s) loc[t].emplace_back(maxn);
+  }
   if (reserveStates) {                 // pre-size each shard to its share of the peak
     const size_t per = reserveStates / static_cast<size_t>(S) + 1;
-    for (int s = 0; s < S; ++s) { dbS[s].reserve(per); nextS[s].reserve(per); }
+    for (int s = 0; s < S; ++s) {
+      dbS[s].reserve(per);             // dbS holds the whole column; loc[t][s] only t's slice
+      for (int t = 0; t < nthreads; ++t) loc[t][s].reserve(per / nthreads + 1);
+    }
   }
-  std::vector<std::mutex> mu(S);
   const CkptMeta meta{maxn,    H, 0, 0, 0, nthreads, 0, static_cast<u64>(maxn + 1),
                       static_cast<std::uint8_t>(fold ? 1 : 0)};
 
@@ -184,11 +196,15 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
                       row.data(), static_cast<u64>(maxn + 1), col, res.peakStates,
                       res.peakHeight))
         ckptTestKill(col);
-    for (int s = 0; s < S; ++s) nextS[s].clear();
+    for (int t = 0; t < nthreads; ++t)
+      for (int s = 0; s < S; ++s) loc[t][s].clear();
 
     std::vector<Counts> localRow(nthreads, Counts(maxn + 1, 0));
-    auto worker = [&](int t) {
+    // PASS 1 (expand): thread t drains source shards t,t+T,... into its OWN dest shards
+    // loc[t][*] (no shared writes -> no lock); comps==1 closures harvest to localRow[t].
+    auto expand = [&](int t) {
       Counts& lrow = localRow[t];
+      std::vector<FlatDB>& mine = loc[t];
       for (int s = t; s < S; s += nthreads) {  // thread t owns source shards t,t+T,
         dbS[s].for_each([&](const Sig& sig, const u64* counts) {
           const int ms = minSizeRow(counts, maxn);
@@ -204,20 +220,34 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
             const int cells = __builtin_popcount(mask);
             if (ms + cells + completionLowerBound(out.b, H) > maxn) return;
             if (fold) foldSig(out, H);  // R1: canonicalize before sharding/storing
-            const int sh = FlatDB::hashSig(out) & (S - 1);
-            std::lock_guard<std::mutex> lk(mu[sh]);
-            addCounts(nextS[sh], out, counts, cells, maxn);
+            addCounts(mine[FlatDB::hashSig(out) & (S - 1)], out, counts, cells, maxn);
           });
         });
-        proctitle::shardDone();  // process-title: one shard of this column finished
+        proctitle::shardDone();  // process-title: one source shard of this column expanded
       }
     };
     std::vector<std::thread> th;
-    for (int t = 0; t < nthreads; ++t) th.emplace_back(worker, t);
+    for (int t = 0; t < nthreads; ++t) th.emplace_back(expand, t);
     for (auto& x : th) x.join();
+    th.clear();
+
+    // PASS 2 (merge): thread u owns dest shards u,u+T,...; clears dbS[s] and folds in
+    // loc[0..T-1][s] (one writer per dbS[s], one reader per loc[t][s] -> no lock). dbS is
+    // reused as the merge target, so it holds the next column after this -- no swap.
+    auto merge = [&](int u) {
+      for (int s = u; s < S; s += nthreads) {
+        dbS[s].clear();
+        for (int t = 0; t < nthreads; ++t)
+          loc[t][s].for_each([&](const Sig& sig, const u64* c) {
+            addCounts(dbS[s], sig, c, 0, maxn);
+          });
+      }
+    };
+    for (int u = 0; u < nthreads; ++u) th.emplace_back(merge, u);
+    for (auto& x : th) x.join();
+
     for (int t = 0; t < nthreads; ++t)
       for (int n = 1; n <= maxn; ++n) row[n] += localRow[t][n];
-    std::swap(dbS, nextS);
   }
   return row;
 }
