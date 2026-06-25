@@ -477,7 +477,7 @@ int main(int argc, char** argv) {
                             std::to_string(live) + " peak_states=" +
                             std::to_string(res.peakStates));
         },
-        static_cast<size_t>(reserveStates), ckptPtr);
+        static_cast<size_t>(reserveStates), ckptPtr, fold);
     for (int n = 1; n <= maxn; ++n) res.totals[n] = res.byHeight[onlyHeight][n];
     rep.done("result=" + std::to_string(static_cast<unsigned long long>(
                              res.byHeight[onlyHeight][maxn])),
