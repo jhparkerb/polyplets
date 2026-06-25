@@ -1,0 +1,58 @@
+# crt_counter_bench  R=24 nstates=3e6  secs/cfg=0.40
+u8   b= 8 P=251          D= 2 style=noreduce   Macc/s=    23.6  ns/accum=42.460  GB/s=  1.70  chk=71496046
+u8   b= 8 P=251          D= 2 style=naivemod   Macc/s=    17.8  ns/accum=56.270  GB/s=  1.28  chk=70039390
+u8   b= 8 P=251          D= 2 style=condsub    Macc/s=    20.3  ns/accum=49.341  GB/s=  1.46  chk=70039390
+u8   b= 8 P=251          D= 2 style=deferred   Macc/s=    18.4  ns/accum=54.251  GB/s=  1.33  chk=70039390
+u8   b= 8 P=251          D= 4 style=noreduce   Macc/s=    23.9  ns/accum=41.898  GB/s=  1.72  chk=35705291
+u8   b= 8 P=251          D= 4 style=naivemod   Macc/s=    18.1  ns/accum=55.399  GB/s=  1.30  chk=35004836
+u8   b= 8 P=251          D= 4 style=condsub    Macc/s=    20.6  ns/accum=48.565  GB/s=  1.48  chk=35004836
+u8   b= 8 P=251          D= 4 style=deferred   Macc/s=    21.1  ns/accum=47.486  GB/s=  1.52  chk=35004836
+u8   b= 8 P=251          D= 8 style=noreduce   Macc/s=    23.3  ns/accum=42.926  GB/s=  1.68  chk=35720691
+u8   b= 8 P=251          D= 8 style=naivemod   Macc/s=    17.9  ns/accum=55.875  GB/s=  1.29  chk=35046448
+u8   b= 8 P=251          D= 8 style=condsub    Macc/s=    19.8  ns/accum=50.545  GB/s=  1.42  chk=35046448
+u8   b= 8 P=251          D= 8 style=deferred   Macc/s=    23.6  ns/accum=42.284  GB/s=  1.70  chk=35046448
+u8   b= 8 P=251          D=16 style=noreduce   Macc/s=    23.4  ns/accum=42.735  GB/s=  1.68  chk=35736767
+u8   b= 8 P=251          D=16 style=naivemod   Macc/s=    17.9  ns/accum=55.775  GB/s=  1.29  chk=35061178
+u8   b= 8 P=251          D=16 style=condsub    Macc/s=    19.7  ns/accum=50.818  GB/s=  1.42  chk=35061178
+u8   b= 8 P=251          D=16 style=deferred   Macc/s=    25.4  ns/accum=39.338  GB/s=  1.83  chk=35061178
+u16  b=16 P=65521        D= 2 style=noreduce   Macc/s=    18.2  ns/accum=55.050  GB/s=  2.62  chk=18388650234
+u16  b=16 P=65521        D= 2 style=naivemod   Macc/s=    15.2  ns/accum=65.772  GB/s=  2.19  chk=18383796336
+u16  b=16 P=65521        D= 2 style=condsub    Macc/s=    16.9  ns/accum=59.028  GB/s=  2.44  chk=18383796336
+u16  b=16 P=65521        D= 2 style=deferred   Macc/s=    16.2  ns/accum=61.682  GB/s=  2.33  chk=18383796336
+u16  b=16 P=65521        D= 4 style=noreduce   Macc/s=    19.1  ns/accum=52.358  GB/s=  2.75  chk=9187254997
+u16  b=16 P=65521        D= 4 style=naivemod   Macc/s=    15.3  ns/accum=65.186  GB/s=  2.21  chk=9185950391
+u16  b=16 P=65521        D= 4 style=condsub    Macc/s=    17.0  ns/accum=58.966  GB/s=  2.44  chk=9185950391
+u16  b=16 P=65521        D= 4 style=deferred   Macc/s=    17.2  ns/accum=58.137  GB/s=  2.48  chk=9185950391
+u16  b=16 P=65521        D= 8 style=noreduce   Macc/s=    19.0  ns/accum=52.733  GB/s=  2.73  chk=9182102278
+u16  b=16 P=65521        D= 8 style=naivemod   Macc/s=    15.3  ns/accum=65.171  GB/s=  2.21  chk=9180411123
+u16  b=16 P=65521        D= 8 style=condsub    Macc/s=    17.0  ns/accum=58.937  GB/s=  2.44  chk=9180411123
+u16  b=16 P=65521        D= 8 style=deferred   Macc/s=    18.8  ns/accum=53.099  GB/s=  2.71  chk=9180411123
+u16  b=16 P=65521        D=16 style=noreduce   Macc/s=    19.1  ns/accum=52.338  GB/s=  2.75  chk=9171089043
+u16  b=16 P=65521        D=16 style=naivemod   Macc/s=    15.4  ns/accum=64.853  GB/s=  2.22  chk=9171601945
+u16  b=16 P=65521        D=16 style=condsub    Macc/s=    17.0  ns/accum=58.822  GB/s=  2.45  chk=9171601945
+u16  b=16 P=65521        D=16 style=deferred   Macc/s=    20.3  ns/accum=49.202  GB/s=  2.93  chk=9171601945
+u32  b=32 P=2147483647   D= 2 style=noreduce   Macc/s=    16.0  ns/accum=62.372  GB/s=  4.62  chk=1203770424832000
+u32  b=32 P=2147483647   D= 2 style=naivemod   Macc/s=    13.9  ns/accum=71.971  GB/s=  4.00  chk=301130127653650
+u32  b=32 P=2147483647   D= 2 style=condsub    Macc/s=    15.7  ns/accum=63.856  GB/s=  4.51  chk=602260255307300
+u32  b=32 P=2147483647   D= 2 style=deferred   Macc/s=    17.2  ns/accum=58.144  GB/s=  4.95  chk=602260255307300
+u32  b=32 P=2147483647   D= 4 style=noreduce   Macc/s=    17.1  ns/accum=58.600  GB/s=  4.91  chk=602109827821942
+u32  b=32 P=2147483647   D= 4 style=naivemod   Macc/s=    14.0  ns/accum=71.282  GB/s=  4.04  chk=300624598899078
+u32  b=32 P=2147483647   D= 4 style=condsub    Macc/s=    15.8  ns/accum=63.410  GB/s=  4.54  chk=300624598899078
+u32  b=32 P=2147483647   D= 4 style=deferred   Macc/s=    28.1  ns/accum=35.549  GB/s=  8.10  chk=300624598899078
+u32  b=32 P=2147483647   D= 8 style=noreduce   Macc/s=    17.3  ns/accum=57.925  GB/s=  4.97  chk=600748221526485
+u32  b=32 P=2147483647   D= 8 style=naivemod   Macc/s=    13.9  ns/accum=71.688  GB/s=  4.02  chk=300405454465311
+u32  b=32 P=2147483647   D= 8 style=condsub    Macc/s=    15.8  ns/accum=63.138  GB/s=  4.56  chk=300405454465311
+u32  b=32 P=2147483647   D= 8 style=deferred   Macc/s=    29.5  ns/accum=33.868  GB/s=  8.50  chk=300405454465311
+u32  b=32 P=2147483647   D=16 style=noreduce   Macc/s=    17.3  ns/accum=57.753  GB/s=  4.99  chk=601088211554243
+u32  b=32 P=2147483647   D=16 style=naivemod   Macc/s=    14.1  ns/accum=71.114  GB/s=  4.05  chk=300990258749617
+u32  b=32 P=2147483647   D=16 style=condsub    Macc/s=    15.8  ns/accum=63.191  GB/s=  4.56  chk=300990258749617
+u32  b=32 P=2147483647   D=16 style=deferred   Macc/s=    31.4  ns/accum=31.834  GB/s=  9.05  chk=300990258749617
+u64  b=64 P=0            D= 2 style=noreduce   Macc/s=    13.7  ns/accum=73.149  GB/s=  7.87  chk=8510421270325506189
+u64  b=64 P=0            D= 2 style=deferred   Macc/s=     8.2  ns/accum=122.032  GB/s=  4.72  chk=8510421270325506189
+u64  b=64 P=0            D= 4 style=noreduce   Macc/s=    16.1  ns/accum=62.004  GB/s=  9.29  chk=3029630968583953136
+u64  b=64 P=0            D= 4 style=deferred   Macc/s=     8.3  ns/accum=120.163  GB/s=  4.79  chk=3029630968583953136
+u64  b=64 P=0            D= 8 style=noreduce   Macc/s=    16.3  ns/accum=61.359  GB/s=  9.39  chk=1734771117840307758
+u64  b=64 P=0            D= 8 style=deferred   Macc/s=     8.3  ns/accum=120.967  GB/s=  4.76  chk=1734771117840307758
+u64  b=64 P=0            D=16 style=noreduce   Macc/s=    16.4  ns/accum=61.116  GB/s=  9.42  chk=14049258740588563514
+u64  b=64 P=0            D=16 style=deferred   Macc/s=     8.3  ns/accum=120.577  GB/s=  4.78  chk=14049258740588563514
+# done

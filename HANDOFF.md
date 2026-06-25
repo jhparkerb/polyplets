@@ -1,14 +1,18 @@
 # HANDOFF — for the next session
 
-## 2026-06-25 ~13:15 dalby — REAL a(22) LAUNCHED + the u64-fold optimization (TOP)
+## 2026-06-25 — STATUS CORRECTION: NO frontier jobs are running (TOP)
 
-- **The real a(22) is RUNNING on dalby:** `a21_reach.py 22 --jobs 1 --threads 40 --primes 3`,
-  driver pid in `runs/anmodp_N22/driver.pid`, log `runs/a22_REAL.log`, tmux window `a22_REAL`.
-  jobs=1 = strictly sequential → only ONE heavy sweep resident (≤84 GB) → **zero OOM risk**,
-  auto-CRT-gated == a(20) at the end. **Conservative ~9–10 days** (heavy tail H17–21 ×3 runs
-  sequentially; the ~6-day forecast needs RAM-aware overlap of H20 beside the pole, which I
-  judged too risky to run unattended — 84+29 GB is too close to 122).
-- **THE optimization to swap in (jasonp's catch — a real ~2-day path):** the 3 primes
+- **NOTHING is running.** There is **no a(22) job on dalby** and **no a(21) job on ayr** —
+  both were killed. Earlier handoff text claiming either was live has been removed; do not
+  trust any "RUNNING"/"LAUNCHED" wording elsewhere in this file without re-checking the box.
+- **a(21) is NOT computed.** Confirmed sequence stops at **a(20) = 1,025,573,519,362,016**.
+- **a(21) checkpoint on ayr (resumable, but barely helps):** 3-prime CRT run in
+  `~/polyominoes/runs/anmodp_N21/` (primes 2147483587/629/647) banked **H1–H15 for all three
+  primes** + H21 (free closed form), then died entering **H16**. Driver pid 1155662 is dead.
+  The orchestrator resumes by skipping banked heights → restarts at H16. BUT it died right
+  before the hard part: the pole is **H20**, and H16–H20 (per-height ~2.7×/H) are entirely
+  unrun. Resuming saves only the ~12–14 h of cheap low heights (~1–2 % of total work).
+- **u64-exact path for a(21)/a(22) (no CRT):** the 3 primes
   needn't serialize — the boundary-state enumeration is modulus-independent, and a(22) <
   2⁶⁴, so **one u64-exact sweep per height (no mod-p, no CRT)** does the expensive work once
   instead of 3×, AND removes the whole 3-prime RAM-juggling / scheduling problem. Verified:
@@ -17,11 +21,11 @@
   to the u64 MT path (or u64 to the folded mod-p MT path `sweepSquare8HeightModPMT`).** Then
   pole ≈ 7×10⁷ folded states × u64 rows ≈ ~98 GB (fits), ONE sweep ≈ ~2 days, job ≈ ~2 days.
   **Do it carefully + gate END-TO-END == a(20)=1,025,573,519,362,016 before trusting it**, then
-  kill the running mod-p job (resumable — rows banked) and relaunch with u64-fold. This was
-  NOT done tonight (new MT engine = too risky to rush into a multi-day launch). Notes that
-  drove the mod-p choice (RAM hedge): `docs/frontier-revision-plan.md:117-127`.
-- Forecast doc `~/src/polyominoes-reach/docs/a22-forecast.md` says ~5–6 d (the achievable-
-  with-overlap number); the running job is the safe ~9–10 d baseline; u64-fold → ~2 d.
+  relaunch with u64-fold. The new MT engine is unbuilt — too risky to rush into a multi-day
+  launch. Notes that drove the mod-p choice (RAM hedge): `docs/frontier-revision-plan.md:117-127`.
+- Forecast doc `~/src/polyominoes-reach/docs/a22-forecast.md` estimates a(22) ~5–6 d (overlap)
+  / ~9–10 d (safe sequential) for the 3-prime mod-p path; u64-fold → ~2 d. NONE of these has
+  been launched.
 
 ## 2026-06-25 ~04:00 dalby (a(22) forecast + diagonal-sweep investigation)
 
@@ -35,7 +39,7 @@
   2.41×/N law, 6 ladder points N13–18); per-state cost grows 1.81×/N (no saturation,
   structural mask-enumeration); the live H21@N22 run sustains **~38 cores**; MT engine
   byte-identical-gated; end-to-end a(12) reproduces.
-- **Pending tightening:** N20 pole sweep (H19@N20) still RUNNING on dalby (~3h in) — gives a
+- **Pending tightening:** N20 pole sweep (H19@N20) [KILLED — not running] would give a
   5th→2-step extrapolation anchor. Waiter set earlier; if lost, re-create: it writes
   `runs/a22_forecast/n20_pole.log`. When it lands, fold its cpu_s/ratio into the forecast
   (should confirm ~4.45×/N) and tighten the ~2-day pole number.
@@ -79,8 +83,8 @@ library lookups. Filed 6 PDFs this session (Barequet-Moffie 2007, Mertens 1990,
 Mertens-Lautenbacher 1991, Read 1962, Klarner 1967, Klarner-Rivest 1973). Still missing:
 Conway 1995 ×2, Enting 1980, Aleksandrowicz-Barequet; check-free: Tremblay-Vernay (RAIRO).
 
-**dalby running now:** N20 pole sweep (H19, ~3h in); N22 climb (banking rows, at H15, single
-prime — NOT the real job, just forecast data). gympie: idle (bbox/probe builds only).
+**dalby (historical, since KILLED — nothing running):** had been doing an N20 pole sweep and
+an N22 forecast climb; both dead. gympie: idle.
 
 ---
 
