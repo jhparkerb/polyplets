@@ -1,6 +1,29 @@
 # HANDOFF — for the next session
 
-## 2026-06-25 ~04:00 dalby (LATEST — a(22) forecast + diagonal-sweep investigation)
+## 2026-06-25 ~13:15 dalby — REAL a(22) LAUNCHED + the u64-fold optimization (TOP)
+
+- **The real a(22) is RUNNING on dalby:** `a21_reach.py 22 --jobs 1 --threads 40 --primes 3`,
+  driver pid in `runs/anmodp_N22/driver.pid`, log `runs/a22_REAL.log`, tmux window `a22_REAL`.
+  jobs=1 = strictly sequential → only ONE heavy sweep resident (≤84 GB) → **zero OOM risk**,
+  auto-CRT-gated == a(20) at the end. **Conservative ~9–10 days** (heavy tail H17–21 ×3 runs
+  sequentially; the ~6-day forecast needs RAM-aware overlap of H20 beside the pole, which I
+  judged too risky to run unattended — 84+29 GB is too close to 122).
+- **THE optimization to swap in (jasonp's catch — a real ~2-day path):** the 3 primes
+  needn't serialize — the boundary-state enumeration is modulus-independent, and a(22) <
+  2⁶⁴, so **one u64-exact sweep per height (no mod-p, no CRT)** does the expensive work once
+  instead of 3×, AND removes the whole 3-prime RAM-juggling / scheduling problem. Verified:
+  the u64 engine `sweepSquare8HeightMT` (sweep8.h) is exact + MT and gated == mod-p, BUT
+  **lacks the R1 fold** → 2× states → won't fit 122 GB as-is. **The needed change: add fold
+  to the u64 MT path (or u64 to the folded mod-p MT path `sweepSquare8HeightModPMT`).** Then
+  pole ≈ 7×10⁷ folded states × u64 rows ≈ ~98 GB (fits), ONE sweep ≈ ~2 days, job ≈ ~2 days.
+  **Do it carefully + gate END-TO-END == a(20)=1,025,573,519,362,016 before trusting it**, then
+  kill the running mod-p job (resumable — rows banked) and relaunch with u64-fold. This was
+  NOT done tonight (new MT engine = too risky to rush into a multi-day launch). Notes that
+  drove the mod-p choice (RAM hedge): `docs/frontier-revision-plan.md:117-127`.
+- Forecast doc `~/src/polyominoes-reach/docs/a22-forecast.md` says ~5–6 d (the achievable-
+  with-overlap number); the running job is the safe ~9–10 d baseline; u64-fold → ~2 d.
+
+## 2026-06-25 ~04:00 dalby (a(22) forecast + diagonal-sweep investigation)
 
 **THE GOAL (ongoing): tell jasonp how long a(22) actually takes.** Current answer:
 
