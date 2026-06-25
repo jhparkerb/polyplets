@@ -1,13 +1,14 @@
 # a(22) on dalby — runtime forecast
 
-_Settled overnight 2026-06-24/25 by direct measurement on dalby. Headline: **a(22) is a
-~5-day run (range 3–7); the single H21 pole sweep is ~2 days.** Corroborating point N19
-landing tightens the cpu(N) extrapolation. All scripts in `scripts/a22_*`; raw measurements
-in `runs/a22_forecast/`._
+_Settled overnight 2026-06-24/25 by direct measurement on dalby; anchored to the N20 pole
+sweep (landed 2026-06-25). Headline: **a(22) ≈ ~6 days (3-prime job, range ~4–7); the single
+H21 pole sweep is ~2 days.** pole_cpu(22) ≈ 6.7×10⁶ cpu-s (2-step extrapolation off the 6-point
+H=N−1 ladder, §4a) ÷ ~38 cores ≈ 2 days/pole; the 3 primes serialize on RAM → ~6 days. All
+scripts in `scripts/a22_*`; raw measurements in `runs/a22_forecast/`._
 
 ## Bottom line — a(22) on dalby is a **multi-day** run (settled by direct measurement)
 
-- **The single H21 pole sweep (one prime): ~2 days** (≈45 h) = pole_cpu(22) ≈ 6.2×10⁶ cpu-s
+- **The single H21 pole sweep (one prime): ~2 days** (≈45 h) = pole_cpu(22) ≈ 6.7×10⁶ cpu-s
   (ladder cpu(N) trend, §4a) ÷ the **~38 cores the pole sweep actually sustains** (measured
   directly on the live H21@N22 run, §4b — far above the ladder's ~8× because the huge sweep
   finally has work to fill threads).
@@ -114,12 +115,14 @@ measured N=13–16, σ negligible — 4 points on a straight line).
 | 17 | 820 620 | 3 630.3 | 4.49 | 4.42 ms (×1.83) |
 | 18 | 2 009 135 | 16 056.6 | 4.42 | 7.99 ms (×1.81) |
 | 19 | 4 909 876 | 72 113.0 | 4.49 | 14.69 ms (×1.84) |
+| 20 | 11 991 314 | 328 568.6 | 4.56 | 27.4 ms (×1.86) |
 
-cpu(N) climbs a **steady 4.45×/N** (states ×2.44 × per-state ×1.82; per-state ratio flat at
-1.82/1.83/1.81/1.84 over **5 points — no saturation**, structural: `forEachViableMask` is
-exponential in the frontier height H). Extrapolating N=19→22 (just **3 steps**):
-**pole_cpu(22) ≈ 72 113 × 4.45³ ≈ 6.4×10⁶ cpu-s ≈ 1 780 cpu-hr.** (N20 pole sweep running
-→ 2-step.)
+cpu(N) climbs a **steady ~4.5×/N** (states ×2.44 × per-state ×1.85; per-state ratio
+1.82/1.83/1.81/1.84/**1.86** over **6 points — no saturation; cpu-ratio if anything creeps UP
+at N20**, structural: `forEachViableMask` is exponential in the frontier height H).
+Extrapolating N=20→22 (just **2 steps**): **pole_cpu(22) ≈ 328 569 × 4.5² ≈ 6.7×10⁶ cpu-s ≈
+1 850 cpu-hr** (pole_states(22) ≈ 1.20×10⁷ × 2.44² ≈ 7.1×10⁷, consistent). The N20 anchor
+confirms the laws and cuts the extrapolation from 3 steps to 2 — no saturation relief.
 
 (b) **Pole-sweep parallelism, measured directly** by running the real H21@N22 sweep:
 it sustains **~38 cores** (3 449–3 751 % CPU over minutes) — *far* above the ladder's 8×,
@@ -139,8 +142,8 @@ gives ~3×2 d ≈ 6 d (+ the H20/H19 tails overlapping on spare cores). RAM-awar
 pulls it toward ~3–4 d. The wall is **the heavy-prime schedule against RAM**, not single-
 sweep speed.
 
-_Corroboration in flight: ladder N19 (5th cpu point, ~45 min) tightens the 4.44×/N
-extrapolation from 4→3 steps._
+_Anchored to N20 (6th cpu point, landed): 2-step extrapolation, laws confirmed, the 4.5×/N
+trend holds with no saturation._
 
 **3-prime RAM caveat (the scheduling tension):** each pole sweep ≈ 75 GB at t40
 (~1.1 KB/state × 6.9×10⁷; per-thread shard maps dominate the overhead). 3 concurrent at t40
