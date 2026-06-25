@@ -1,5 +1,66 @@
 # HANDOFF — for the next session
 
+## 2026-06-25 ~04:00 dalby (LATEST — a(22) forecast + diagonal-sweep investigation)
+
+**THE GOAL (ongoing): tell jasonp how long a(22) actually takes.** Current answer:
+
+- **a(22) on dalby ≈ ~5–6 days** (3 mod-p primes). Single pole sweep H21 ≈ ~2 days; the
+  3 pole primes **serialize** (RAM-confirmed: 84 GB each at t40, only 1 fits 122 GB; lower
+  threads fit 2 but are 2.5× slower — net loss). Full writeup + all numbers:
+  **`~/src/polyominoes-reach/docs/a22-forecast.md`** (the deliverable; read this first).
+- Basis (all measured this session): pole = H=N−1 = H21; pole_states(22)=6.9e7 (rock-steady
+  2.41×/N law, 6 ladder points N13–18); per-state cost grows 1.81×/N (no saturation,
+  structural mask-enumeration); the live H21@N22 run sustains **~38 cores**; MT engine
+  byte-identical-gated; end-to-end a(12) reproduces.
+- **Pending tightening:** N20 pole sweep (H19@N20) still RUNNING on dalby (~3h in) — gives a
+  5th→2-step extrapolation anchor. Waiter set earlier; if lost, re-create: it writes
+  `runs/a22_forecast/n20_pole.log`. When it lands, fold its cpu_s/ratio into the forecast
+  (should confirm ~4.45×/N) and tighten the ~2-day pole number.
+- Forecast scripts: `scripts/a21_reach.py` (orchestrator), `a22_pole_ladder.sh`,
+  `a22_pole_forecast.py`, `a22_mt_gate.sh`, `a22_ram_threads2.sh` — all in reach worktree.
+
+**Big tangent — diagonal/4-direction transfer matrix (mostly a DEFLATION, recorded so we
+don't re-chase it):**
+- We explored a 45°/anti-diagonal sweep + 4-direction bounding-box split hoping for
+  λ^(n/2). **Recalibration: our column TM is ALREADY at √λ per term (~2.42, < √λ≈2.665).**
+  The exponent-halving is already banked by the boundary merge. A diagonal sweep's real job
+  is "beat 2.42," not "beat 7.1" — a marginal nibble, not a revolution.
+- **Our OWN repo already had this:** `results/tma_state_growth.md:18-24` records the killer
+  (king diagonals span n×n → can't bound swept height); `docs/frontier-revision-plan.md:45-54`
+  is an unrun "Phase 0.1 FLM scaling" GO/NO-GO gate = exactly this question, never answered;
+  `docs/research-log-2026-06-22.md:382` has the `☐ (u,v) diagonal TM` checkbox.
+- Measured (proxy): diagonal middle-cut signature base 2.76 vs column 3.22 (gap widening to
+  n=9) — hints ~30% sparser, BUT the proxy ≠ engine peak, and the worst-case (max(w,h)) may
+  kill it at the peak. The ONLY clean reason it might win: (u,v)=(x+y,x−y) rotation maps the
+  worst-case king diagonal onto an axis line. Deciding it needs a diagonal state-counter
+  built (compute) — the unresolved Phase 0.1 gate. Probes: `experiments/diag_width_probe.cpp`
+  (max-ext ~0.77n, occupancy ⌈n/2⌉), `experiments/frontier_rank_probe.py`.
+- **Literature (3 agents):** bounding-box/smaller-dim = standard (Conway/Jensen finite-lattice
+  method). Diagonal sweep for GENERAL animals = appears novel (lit only does it for
+  diagonally-convex subclasses). **King-polyplet TM enumeration = entirely novel; no published
+  king growth constant.** A006770 sits at a(18) (Tremblay–Vernay 2024, Redelmeier/BFS
+  generation Θ(λ^n)) — **we already hold a(19),a(20) via our √λ TM, so we're past the world
+  record and a(22) is a genuine frontier comp with the best-known method.** Forecast premise
+  intact. Full citations in the 3 agent reports (this session's transcript).
+
+**bbox feature (validated, useful byproduct):** added `--bbox` to the reach tma engine →
+B_{H,W}(n) (bounding-box-stratified polyplet counts, refines A006770). Validated: Σ_W=B_H(n),
+transpose symmetry B_{H,W}=B_{W,H} (0 asymmetric), Σ=a(12)/a(14). CRT-exact driver
+`scripts/bbox_crt.py`; exact tables `results/bbox_polyplets_n12.txt`, `..._n14_exact.txt`.
+Costs ~3×a(n) (no speedup — diagonals defeat the half-height trick). **On branch
+`feature/bbox-polyplets` in the reach worktree, UNCOMMITTED** (bbox engine + TMA_PROGRESS
+counter in sweep8_modp.h + forecast doc + probes). COMMIT IT before any branch switch.
+
+**Papers:** `papers/MISSING.md` is now a live list of un-findable citations for jasonp's
+library lookups. Filed 6 PDFs this session (Barequet-Moffie 2007, Mertens 1990,
+Mertens-Lautenbacher 1991, Read 1962, Klarner 1967, Klarner-Rivest 1973). Still missing:
+Conway 1995 ×2, Enting 1980, Aleksandrowicz-Barequet; check-free: Tremblay-Vernay (RAIRO).
+
+**dalby running now:** N20 pole sweep (H19, ~3h in); N22 climb (banking rows, at H15, single
+prime — NOT the real job, just forecast data). gympie: idle (bbox/probe builds only).
+
+---
+
 _Written 2026-06-22 ~22:00 ET, end of an autonomous multi-task push. Three jobs running across
 gympie/ayr/dalby; all session deliverables committed. Read the WAITERS section first if you just
 `/clear`ed — the background completion waiters do NOT survive a clear and must be re-created._
