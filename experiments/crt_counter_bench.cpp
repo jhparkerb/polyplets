@@ -28,7 +28,6 @@
 #include <vector>
 #include <random>
 #include <chrono>
-#include <string>
 
 using std::uint8_t; using std::uint16_t; using std::uint32_t; using std::uint64_t;
 
@@ -94,7 +93,7 @@ void run(const char* wname, int bbits, FILE* out, std::mt19937& rng) {
   std::vector<T> pool(static_cast<size_t>(nstates) * R);
   {
     std::uniform_int_distribution<uint64_t> ud(0, p ? p - 1 : 0xffffffffffffffffull);
-    for (auto& x : pool) x = static_cast<T>(p ? ud(rng) : ud(rng));
+    for (auto& x : pool) x = static_cast<T>(ud(rng));  // ud already encodes the p range
   }
   for (int D : {2, 4, 8, 16}) {
     std::vector<uint32_t> srcIdx(static_cast<size_t>(nstates) * D);

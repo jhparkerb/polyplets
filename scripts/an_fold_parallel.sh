@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# TODO(simplify): shares its per-height launch / slot-gate / resume / combine-awk
+# skeleton with scripts/dalby_holes_perheight.sh and an_modp_crt.sh; the genuinely-new
+# bit is the RAM-floor gate. Could be one parameterized driver (engine + flags + combine).
 # Per-height PARALLEL a(N), R1-FOLDED.  Computes B_H(N) for every strip height H
 # with the vertical-mirror state fold (--fold: ~2x less RAM and ~2x faster, gated
 # folded==unfolded), checkpointed per height.  a(N) = sum_H B_H(N).

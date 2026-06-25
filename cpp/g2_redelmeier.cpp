@@ -137,6 +137,7 @@ struct Counter {
   std::vector<u64> byContacts;
   int contactStride = 0;
   int diagOff[4] = {0};                      // the 4 diagonal neighbour deltas (grid-index)
+  bool needsCells = false;                   // any analysis needing inAnimal/placed (set in init)
 
   static int findp(int* p, int x) { while (p[x] != x) { p[x] = p[p[x]]; x = p[x]; } return x; }
 
@@ -257,6 +258,8 @@ struct Counter {
   static bool allowed(int x, int y) { return y > 0 || (y == 0 && x >= 0); }
 
   void init() {
+    needsCells = connCheck || perimCheck || holesCheck || maxHoleCheck ||
+                 siteperimCheck || contactsCheck;  // (maxHoleStrat rides maxHoleCheck)
     gridW = 2 * maxn + 3;
     const int gridH = maxn + 3;                  // rows y = -1 .. maxn+1
     const int cells = gridW * gridH;
@@ -277,7 +280,7 @@ struct Counter {
     reachedUndo.reserve(static_cast<size_t>(maxn) * deg + 8);
     bySize.assign(maxn + 1, 0);
     byBox.assign((maxn + 1) * (maxn + 1) * (maxn + 1), 0);
-    if (connCheck || perimCheck || holesCheck || maxHoleCheck || siteperimCheck || contactsCheck) {
+    if (needsCells) {
       inAnimal.assign(cells, 0);
       placed.clear();
       placed.reserve(maxn + 1);
@@ -325,6 +328,8 @@ struct Counter {
 
   // True iff the animal has trivial D4 stabilizer (no nontrivial rotation/reflection maps
   // it onto itself up to translation) -- i.e. its free orbit has full size 8.
+  // TODO(simplify): this D4 transform table + canon duplicate the affine-transform
+  // machinery in cpp/sym/symcount_fast.cpp; a shared D4/affine header would unify them.
   bool isAsymmetric() {
     static const int T[8][4] = {           // (x,y) -> (a*x+b*y, c*x+d*y)
         {1, 0, 0, 1}, {0, -1, 1, 0}, {-1, 0, 0, -1}, {0, 1, -1, 0},
@@ -399,6 +404,9 @@ struct Counter {
       bySiteperim[size * spStride + sp] += 1;
     }
     if (maxHoleStrat) {
+      // TODO(simplify): holeArea() then countHoles() flood the same animal twice; a
+      // combined flood returning (area, #holes) would halve this path's per-record cost.
+      // Deferred -- must keep the holes8 vs maxHole8 background-degree choice consistent.
       const u64 area = static_cast<u64>(holeArea());
       if (area > 0) {                          // hole-free animals contribute nothing here
         const int k = countHoles();            // k >= 1
@@ -425,7 +433,7 @@ struct Counter {
       if (x > maxx) maxx = x;
       if (y > maxy) maxy = y;
       ++size;
-      if (connCheck || perimCheck || holesCheck || maxHoleCheck || siteperimCheck || contactsCheck) {
+      if (needsCells) {
         inAnimal[j] = 1; placed.push_back(j);
         if (connCheck) pidx[j] = size - 1;
       }
@@ -463,7 +471,7 @@ struct Counter {
 
       // unplace; (x,y) keeps status 1 so later iterations and deeper
       // levels of this loop never re-add it -- the tried-set rule
-      if (connCheck || perimCheck || holesCheck || maxHoleCheck || siteperimCheck || contactsCheck) { inAnimal[placed.back()] = 0; placed.pop_back(); }
+      if (needsCells) { inAnimal[placed.back()] = 0; placed.pop_back(); }
       --size;
       minx = sminx; maxx = smaxx; maxy = smaxy;
     }
