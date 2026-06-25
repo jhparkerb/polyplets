@@ -17,6 +17,7 @@ set -u
 cd "$(dirname "$0")/.."
 N=${1:-17}; H=${2:-13}; shift 2 2>/dev/null || true
 THREADS="${*:-1 12 20}"
+ENGINES="${ENGINES:-exact modp}"  # set ENGINES=exact to re-measure just the ported path
 P=2147483647
 out="runs/exact_mt_scaling/N${N}_H${H}.log"; mkdir -p "$(dirname "$out")"
 
@@ -37,7 +38,7 @@ run_one() {  # engine T extra-flags...
   awk -v rss="$hwm" 'BEGIN{printf "%.1f", rss/1024}'
 }
 
-for eng in exact modp; do
+for eng in $ENGINES; do
   flags=(); [ "$eng" = modp ] && flags=(--modp "$P")
   base=""
   for T in $THREADS; do
