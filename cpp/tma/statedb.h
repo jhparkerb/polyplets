@@ -57,7 +57,8 @@ inline void addCounts(StateDB& db, const std::string& sig, const Counts& src,
 // Capacity is a power of two; grows by doubling at load factor 0.85 (linear
 // probing with FNV-1a is fine that dense; steady slack ~1.43x -> ~1.18x).
 //
-// TODO(simplify): this open-addressing store is copied four times -- FlatDB (here),
+// TODO(simplify) [ROADMAP #30, HIGH PRIORITY, scheduled once a(21) is in-hand]:
+// this open-addressing store is copied four times -- FlatDB (here),
 // FlatDB32 (sweep8_modp.h, u32 vals), and HoleDB/PerimDB (sweep8_holes/perim.h, caller
 // stride). They differ only in value type and fixed-vs-passed stride => one template
 // OAMap<V>. The copies have already DRIFTED: PerimDB grows at load factor 0.70

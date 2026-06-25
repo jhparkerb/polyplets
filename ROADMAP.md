@@ -137,6 +137,22 @@ free gympie core window. All edits post-a(20)-confirmation; gates stay
 byte-identical.
 → Compression unlocks a(22) on ayr; out-of-core only for a(23)+.
 
+**#30 — Unify the open-addressing state store (HIGH PRIORITY, scheduled: once a(21)
+is in-hand).** The engine copies the same open-addressing map FOUR times — `FlatDB`
+(statedb.h), `FlatDB32` (sweep8_modp.h), and `HoleDB`/`PerimDB` (sweep8_holes/perim.h)
+— differing only in value type and fixed-vs-passed stride. They have ALREADY DRIFTED:
+`PerimDB` grows at load factor 0.70 while everyone else uses 0.85 (the 0.7→0.85 tune
+touched only `FlatDB`). Collapse to one `OAMap<V>` template (pure plumbing, `for_each`
+read-only contract ⇒ cannot change byte-output). Do it gate-protected with the FULL
+suite (a(12)/a(14) CRT, fold==unfold, byte-identical-to-serial), NOT in a cleanup sweep
+— which is why it's a scheduled thread, not done inline. **Gated to start only after
+a(21) lands**, so the refactor never sits between us and the next term. In-code pointer:
+`TODO(simplify)` at cpp/tma/statedb.h. Related lower-priority engine TODOs surfaced by
+the same review (do alongside or after): promote `boundaryComps`/`isClosedAnimal` to
+signature.h (under-applied ~7×), drop the derivable `peakHeight` from the checkpoint
+format, defer the per-addend `% p` in the modp MT merge to one reduction per cell.
+→ Removes the silent-drift hazard before the engine is pushed harder for a(22)+.
+
 **#17 — Paper + public repo drop (LAST).**
 Fold everything into the write-up: a(19) + free/one-sided, hole sequences, the
 fixed-height GFs and lifetime-3 (honestly weighted — see results/lifetime3-proof.md),
