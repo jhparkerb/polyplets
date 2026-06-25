@@ -1,11 +1,25 @@
 # HANDOFF — for the next session
 
-## 2026-06-25 — STATUS CORRECTION: NO frontier jobs are running (TOP)
+## 2026-06-25 14:44 EDT — a(21) LAUNCHED (split ayr+dalby, u64 lock-free, no CRT)
 
-- **NOTHING is running.** There is **no a(22) job on dalby** and **no a(21) job on ayr** —
-  both were killed. Earlier handoff text claiming either was live has been removed; do not
-  trust any "RUNNING"/"LAUNCHED" wording elsewhere in this file without re-checking the box.
-- **a(21) is NOT computed.** Confirmed sequence stops at **a(20) = 1,025,573,519,362,016**.
+- **a(21) IS RUNNING** as of **2026-06-25 ~14:44 EDT**, rev **38ca4d8** (lock-free exact MT
+  engine). Split with NO CRT (a(21)≈6.9e15 < 2^64, one u64 sweep/height):
+  - **dalby** (`dalby.jhpb.org`, 80c): the top two computed heights **H20 (pole) + H19**,
+    `MAXJOBS=2 THREADS=40 TMA_SHARD_MULT=32` (~75/80c). driver pid **9098**, window `0:a21`.
+  - **ayr** (32c): heights **H1–H18**, `MAXJOBS=2 THREADS=14 TMA_SHARD_MULT=32`, NUMA-interleave
+    (~28/32c). driver pid **1191524**, window `0:a21`.
+  - **H21 = closed form 3^20 = 3,486,784,401** (added by hand when combining).
+- **COMBINE when both finish:** sum all `runs/a21fold/h*.out` (col-2 at n=21) across BOTH
+  boxes (rsync dalby's + ayr's run dirs together), ADD 3^20, then GATE the total against
+  a(20)=1,025,573,519,362,016 (ratio sanity) and re-derive a(12)/a(14) as engine self-checks.
+  Each box writes a labeled `a21.partial`; the real a(21) is the sum of both partials + 3^20.
+- **Watch:** proctitle (`ps -eo args | grep 'tma a('`) shows per-height column/percent;
+  per-height detail in `runs/a21fold/h$H.log`; driver events in `runs/a21fold/driver.log`.
+  Wall is set by dalby's H20 pole. Do NOT fabricate an ETA — read the heartbeats.
+- **Engine note:** the exact MT path is now the lock-free two-pass (was mutex-bound,
+  regressed past T~12); measured ~1.76x faster at T=20, gate GREEN (case M byte-identical).
+- **a(21) was NOT computed before this run.** Confirmed prior sequence stopped at
+  **a(20) = 1,025,573,519,362,016**.
 - **a(21) checkpoint on ayr (resumable, but barely helps):** 3-prime CRT run in
   `~/polyominoes/runs/anmodp_N21/` (primes 2147483587/629/647) banked **H1–H15 for all three
   primes** + H21 (free closed form), then died entering **H16**. Driver pid 1155662 is dead.
