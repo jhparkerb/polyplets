@@ -153,6 +153,25 @@ signature.h (under-applied ~7×), drop the derivable `peakHeight` from the check
 format, defer the per-addend `% p` in the modp MT merge to one reduction per cell.
 → Removes the silent-drift hazard before the engine is pushed harder for a(22)+.
 
+**#31 — Polyplet by-height triangle T(n,H), and fill its notch before publishing
+(feeds #25/#17).** T(n,H) = # fixed n-cell king-polyplets of height exactly H (the
+width-marginal of the bbox table B_{H,W}(n)). Confirmed NOVEL: the triangle, its
+row-flattening, the H=2/H=3 columns, and the T(n,n-1) sub-diagonal all return no OEIS
+results; only the row sums (A006770) and edges (left=1=A000012, right diag=3^(n-1)=A000244)
+are present. Clean structure: rows sum to A006770, left edge 1, right diagonal 3^(n-1).
+Strong OEIS-submission candidate (jasonp pushes the button).
+WHAT'S IN HAND NOW: columns H=1..9 for ALL n via the validated fixed-height GFs
+(results/fixed_height_gf.md; series-expand G_H); complete rows n<=14 from the exact bbox
+tables; the diagonal 3^(n-1); and (soon) the complete row n=21 from the running a(21) job
+(it computes every height). gympie filled the notch H=10..15 at N=20 (runs/notch/notch.log).
+**THE REMAINING HOLE (publish gate): the ~9 cells H=16..19 for n in {17,18,19,20}** — these
+are a(20)'s heavy heads, ~5.6x/height cost (months on gympie's cores). Fill them on
+dalby/ayr once a(21) frees them (lighter than the a(21) heights already run there, ~<1 h
+total), OR recover the fixed-height GFs for H=10..19 (mod-p; orders known to H=10) which
+fills those columns for all n at once. Cross-check: row-20 sum (GF H<=9 + notch H=10..19 +
+3^19 at H=20) must equal a(20)=1,025,573,519,362,016. DO NOT publish the triangle with the
+notch unfilled.
+
 **#17 — Paper + public repo drop (LAST).**
 Fold everything into the write-up: a(19) + free/one-sided, hole sequences, the
 fixed-height GFs and lifetime-3 (honestly weighted — see results/lifetime3-proof.md),

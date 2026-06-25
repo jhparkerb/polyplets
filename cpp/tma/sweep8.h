@@ -112,17 +112,23 @@ inline Counts sweepSquare8Height(int H, int maxn, SweepResults& res,
   return row;
 }
 
-// Multithreaded version of one height -- LOCK-FREE two-pass (ported from the modp path,
-// sweepSquare8HeightModPMT; a per-output mutex caps this DP at ~2.3x and REGRESSES past
-// ~12 threads -- measured exact-vs-modp, runs/exact_mt_scaling). Each column:
-//   PASS 1 (expand): thread t drains source shards t,t+T,... and routes every output to
-//     its OWN per-thread dest shards loc[t][sh] -- no other thread touches loc[t], no lock.
-//   PASS 2 (merge): thread u owns dest shards u,u+T,...; it clears dbS[s] and folds in
-//     loc[0..T-1][s]. Each dbS[s] written by one thread, each loc[t][s] read by one -> no
-//     lock. dbS is reused as the merge target (becomes the next column), so no swap.
+// Multithreaded version of one height -- LOCK-FREE, dynamic-dispatch, BATCHED-merge. Threads
+// expand into private scratch (no per-insert lock; a mutex capped this DP at ~2.3x and
+// regressed past ~12 threads -- runs/exact_mt_scaling), but the scratch is merged into a
+// single next-column map every batch so it can't blow up RAM. Each column, for nBatches
+// batches of source shards:
+//   PASS 1 (expand): each thread dynamically grabs source shards in the batch (atomic cursor,
+//     not a static stride -- static left light-shard threads idle, ~34% of dalby at T=40) and
+//     routes outputs to its OWN loc[t][sh] -- no shared write, no lock.
+//   PASS 2 (merge): each thread dynamically grabs dest shards and folds this batch's
+//     loc[*][s] into the single nextDB[s] (accumulate); one writer per nextDB[s], batches
+//     sequential -> no lock. nextDB swaps into dbS at column end.
+// Why batched: a single end-of-column merge let loc hold the WHOLE next column duplicated
+// ~indeg-times (one partial copy per contributing thread) -> ~30x the column -> OOM on the
+// heavy a(21) heights. Batching caps loc to ~1/nBatches of that; peak ~ dbS + nextDB +
+// loc_batch ~ 2x the column, INDEPENDENT of thread count (TMA_MERGE_BATCHES, default 16).
 // Counts only ACCUMULATE (commutative+associative), so the result is bit-identical to the
-// serial sweepSquare8Height regardless of sharding/threading -- gate case M checks exactly
-// that. Memory ~ (1 + 1/nthreads)x serial (dbS plus the thread-local dest slices).
+// serial sweepSquare8Height regardless of sharding/threading/batching -- gate case M checks it.
 inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
                                    SweepResults& res,
                                    const std::function<void(int, u64)>& onColumn = {},
@@ -133,20 +139,25 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
   int shardMult = 16;  // TMA_SHARD_MULT: dest shards per thread (>= for merge balance)
   if (const char* e = std::getenv("TMA_SHARD_MULT")) shardMult = std::atoi(e);
   while (S < shardMult * nthreads) S <<= 1;  // shards: power of two, >> nthreads
-  std::vector<FlatDB> dbS;
-  dbS.reserve(S);
-  for (int s = 0; s < S; ++s) dbS.emplace_back(maxn);
-  std::vector<std::vector<FlatDB>> loc(nthreads);  // loc[t][s]: thread t's private dest shards
+  // dbS = current column (source); nextDB = the single accumulating next column (NO per-thread
+  // duplication). loc[t] = thread t's private expand scratch, flushed into nextDB once per
+  // BATCH, so it only ever holds ~1/nBatches of the column's duplicated outputs -- this is what
+  // bounds RAM (a single end-of-column merge let loc hold ~indeg x the column => OOM on heavy
+  // heights). Peak ~ dbS + nextDB + loc_batch ~ 2x the column, independent of thread count.
+  int nBatches = 16;  // TMA_MERGE_BATCHES: more batches -> lower peak loc RAM, same total work
+  if (const char* e = std::getenv("TMA_MERGE_BATCHES")) { int v = std::atoi(e); if (v > 0) nBatches = v; }
+  if (nBatches > S) nBatches = S;
+  std::vector<FlatDB> dbS, nextDB;
+  dbS.reserve(S); nextDB.reserve(S);
+  for (int s = 0; s < S; ++s) { dbS.emplace_back(maxn); nextDB.emplace_back(maxn); }
+  std::vector<std::vector<FlatDB>> loc(nthreads);  // loc[t][s]: thread t's private expand scratch
   for (int t = 0; t < nthreads; ++t) {
     loc[t].reserve(S);
     for (int s = 0; s < S; ++s) loc[t].emplace_back(maxn);
   }
-  if (reserveStates) {                 // pre-size each shard to its share of the peak
+  if (reserveStates) {                 // pre-size dbS/nextDB to the peak; loc stays small (batched)
     const size_t per = reserveStates / static_cast<size_t>(S) + 1;
-    for (int s = 0; s < S; ++s) {
-      dbS[s].reserve(per);             // dbS holds the whole column; loc[t][s] only t's slice
-      for (int t = 0; t < nthreads; ++t) loc[t][s].reserve(per / nthreads + 1);
-    }
+    for (int s = 0; s < S; ++s) { dbS[s].reserve(per); nextDB[s].reserve(per); }
   }
   const CkptMeta meta{maxn,    H, 0, 0, 0, nthreads, 0, static_cast<u64>(maxn + 1),
                       static_cast<std::uint8_t>(fold ? 1 : 0)};
@@ -209,48 +220,11 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
                       res.peakHeight))
         ckptTestKill(col);
     std::vector<Counts> localRow(nthreads, Counts(maxn + 1, 0));
-    // PASS 1 (expand): threads pull source shards from a shared atomic cursor (DYNAMIC, not a
-    // static t,t+T,... stride). Per-state work varies wildly on tall strips (a signature may
-    // expand over very many or very few viable masks), so a static 1/T slice left light-shard
-    // threads idle while stragglers ground on -- measured ~34% of dalby idle at T=40. Dynamic
-    // grab keeps every thread fed until the last ~T shards. Each thread routes outputs to its
-    // OWN dest shards loc[t][*] (no shared writes -> no lock) and harvests comps==1 to
-    // localRow[t]; the result is independent of which thread drew a source shard (PASS 2 sums
-    // all loc[t] per dest), so it stays byte-identical. Each thread also clears its own dest
-    // shards here (was a serial pre-loop over all nthreads*S shards on one core).
-    std::atomic<int> nextSrc{0};
-    auto expand = [&](int t) {
-      Counts& lrow = localRow[t];
-      std::vector<FlatDB>& mine = loc[t];
-      for (int s = 0; s < S; ++s) mine[s].clear();
-      u64 ld = 0;  // source states processed by this thread (progress, flushed every 256)
-      int s;
-      while ((s = nextSrc.fetch_add(1, std::memory_order_relaxed)) < S) {
-        dbS[s].for_each([&](const Sig& sig, const u64* counts) {
-          if (prog && (++ld & 255u) == 0) g_done.fetch_add(256, std::memory_order_relaxed);
-          const int ms = minSizeRow(counts, maxn);
-          if (ms < 0) return;
-          int comps = 0;
-          for (int j = 0; j < H; ++j)
-            if (sig.b[j] > comps) comps = sig.b[j];
-          if (comps == 1 && sig.b[H] && sig.b[H + 1])
-            for (int n = 1; n <= maxn; ++n) lrow[n] += counts[n];
-          forEachViableMask(sig, H, maxn - ms, [&](unsigned mask) {
-            Sig out;
-            if (stepColumnSquare8(sig, H, mask, out) != Outcome::Alive) return;
-            const int cells = __builtin_popcount(mask);
-            if (ms + cells + completionLowerBound(out.b, H) > maxn) return;
-            if (fold) foldSig(out, H);  // R1: canonicalize before sharding/storing
-            addCounts(mine[FlatDB::hashSig(out) & (S - 1)], out, counts, cells, maxn);
-          });
-        });
-        proctitle::shardDone();  // process-title: one source shard of this column expanded
-      }
-      if (prog) g_done.fetch_add(ld & 255u, std::memory_order_relaxed);  // flush remainder
-    };
+    for (int s = 0; s < S; ++s) nextDB[s].clear();  // the single accumulating next column
+
+    // per-column heartbeat: ONE monitor spans the whole column (all batches); g_done
+    // accumulates across batches. Pulses states/s + per-column ETA every progSecs.
     std::vector<std::thread> th;
-    // per-column heartbeat: a monitor pulses (states/s, %, per-column ETA) every progSecs
-    // while this column expands; joined at the barrier so it never overlaps the merge.
     std::atomic<bool> monRun{true};
     std::thread mon;
     if (prog) {
@@ -275,29 +249,71 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
         }
       });
     }
-    for (int t = 0; t < nthreads; ++t) th.emplace_back(expand, t);
-    for (auto& x : th) x.join();
-    th.clear();
-    if (prog) { monRun.store(false); mon.join(); }
 
-    // PASS 2 (merge): threads pull dest shards from a shared atomic cursor (DYNAMIC, same
-    // reason as expand). For dest shard s: clear dbS[s] and fold in loc[0..T-1][s]. Each
-    // dest shard is handled by exactly one thread, so dbS[s] has one writer and loc[*][s]
-    // one reader -> no lock. dbS is reused as the merge target, so it holds the next column
-    // after this -- no swap.
-    std::atomic<int> nextDst{0};
-    auto merge = [&](int) {
-      int s;
-      while ((s = nextDst.fetch_add(1, std::memory_order_relaxed)) < S) {
-        dbS[s].clear();
-        for (int t = 0; t < nthreads; ++t)
-          loc[t][s].for_each([&](const Sig& sig, const u64* c) {
-            addCounts(dbS[s], sig, c, 0, maxn);
+    // Process the column's source shards in nBatches batches. Per batch: each thread expands
+    // its dynamically-grabbed share of the batch's source shards into private loc[t] (no
+    // shared writes -> no lock; per-state work varies wildly on tall strips, so dynamic grab
+    // beats a static stride -- it kept ~34% of dalby idle at T=40), harvesting comps==1 to
+    // localRow[t]; then the lock-free merge folds this batch's loc[*][s] into the single
+    // nextDB[s] (accumulate) and the next batch reuses loc. So loc only ever holds ~1/nBatches
+    // of the column's per-thread-duplicated outputs -- a single end-of-column merge let loc
+    // grow to ~indeg x the column and OOM'd the heavy a(21) heights. Output is independent of
+    // which thread/batch drew a source shard (every contribution sums into nextDB), so it
+    // stays byte-identical to the serial sweep (gate case M).
+    std::atomic<int> nextSrc{0}, nextDst{0};
+    for (int b = 0; b < nBatches; ++b) {
+      const int lo = static_cast<int>(static_cast<long long>(b) * S / nBatches);
+      const int hi = static_cast<int>(static_cast<long long>(b + 1) * S / nBatches);
+      nextSrc.store(lo, std::memory_order_relaxed);
+      auto expand = [&](int t) {
+        Counts& lrow = localRow[t];
+        std::vector<FlatDB>& mine = loc[t];
+        for (int s = 0; s < S; ++s) mine[s].clear();  // fresh scratch each batch
+        u64 ld = 0;
+        int s;
+        while ((s = nextSrc.fetch_add(1, std::memory_order_relaxed)) < hi) {
+          dbS[s].for_each([&](const Sig& sig, const u64* counts) {
+            if (prog && (++ld & 255u) == 0) g_done.fetch_add(256, std::memory_order_relaxed);
+            const int ms = minSizeRow(counts, maxn);
+            if (ms < 0) return;
+            int comps = 0;
+            for (int j = 0; j < H; ++j)
+              if (sig.b[j] > comps) comps = sig.b[j];
+            if (comps == 1 && sig.b[H] && sig.b[H + 1])
+              for (int n = 1; n <= maxn; ++n) lrow[n] += counts[n];
+            forEachViableMask(sig, H, maxn - ms, [&](unsigned mask) {
+              Sig out;
+              if (stepColumnSquare8(sig, H, mask, out) != Outcome::Alive) return;
+              const int cells = __builtin_popcount(mask);
+              if (ms + cells + completionLowerBound(out.b, H) > maxn) return;
+              if (fold) foldSig(out, H);  // R1: canonicalize before sharding/storing
+              addCounts(mine[FlatDB::hashSig(out) & (S - 1)], out, counts, cells, maxn);
+            });
           });
-      }
-    };
-    for (int u = 0; u < nthreads; ++u) th.emplace_back(merge, u);
-    for (auto& x : th) x.join();
+          proctitle::shardDone();  // process-title: one source shard expanded
+        }
+        if (prog) g_done.fetch_add(ld & 255u, std::memory_order_relaxed);
+      };
+      for (int t = 0; t < nthreads; ++t) th.emplace_back(expand, t);
+      for (auto& x : th) x.join();
+      th.clear();
+
+      nextDst.store(0, std::memory_order_relaxed);
+      auto merge = [&](int) {  // fold this batch's loc into the accumulating nextDB
+        int s;
+        while ((s = nextDst.fetch_add(1, std::memory_order_relaxed)) < S) {
+          for (int t = 0; t < nthreads; ++t)
+            loc[t][s].for_each([&](const Sig& sig, const u64* c) {
+              addCounts(nextDB[s], sig, c, 0, maxn);
+            });
+        }
+      };
+      for (int u = 0; u < nthreads; ++u) th.emplace_back(merge, u);
+      for (auto& x : th) x.join();
+      th.clear();
+    }
+    if (prog) { monRun.store(false); mon.join(); }
+    std::swap(dbS, nextDB);  // nextDB now holds this column's output -> becomes the source
 
     for (int t = 0; t < nthreads; ++t)
       for (int n = 1; n <= maxn; ++n) row[n] += localRow[t][n];
