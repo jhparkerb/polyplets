@@ -12,17 +12,23 @@
   The orchestrator resumes by skipping banked heights → restarts at H16. BUT it died right
   before the hard part: the pole is **H20**, and H16–H20 (per-height ~2.7×/H) are entirely
   unrun. Resuming saves only the ~12–14 h of cheap low heights (~1–2 % of total work).
-- **u64-exact path for a(21)/a(22) (no CRT):** the 3 primes
+- **u64-exact path for a(21)/a(22) (no CRT) — BUILT, the fold landed:** the 3 primes
   needn't serialize — the boundary-state enumeration is modulus-independent, and a(22) <
   2⁶⁴, so **one u64-exact sweep per height (no mod-p, no CRT)** does the expensive work once
-  instead of 3×, AND removes the whole 3-prime RAM-juggling / scheduling problem. Verified:
-  the u64 engine `sweepSquare8HeightMT` (sweep8.h) is exact + MT and gated == mod-p, BUT
-  **lacks the R1 fold** → 2× states → won't fit 122 GB as-is. **The needed change: add fold
-  to the u64 MT path (or u64 to the folded mod-p MT path `sweepSquare8HeightModPMT`).** Then
-  pole ≈ 7×10⁷ folded states × u64 rows ≈ ~98 GB (fits), ONE sweep ≈ ~2 days, job ≈ ~2 days.
-  **Do it carefully + gate END-TO-END == a(20)=1,025,573,519,362,016 before trusting it**, then
-  relaunch with u64-fold. The new MT engine is unbuilt — too risky to rush into a multi-day
-  launch. Notes that drove the mod-p choice (RAM hedge): `docs/frontier-revision-plan.md:117-127`.
+  instead of 3×, AND removes the whole 3-prime RAM-juggling / scheduling problem. The R1
+  fold is now wired into the exact MT path (`sweepSquare8HeightMT`, sweep8.h:206 calls
+  `foldSig`); it came in via the `explore/reach-symmetry-fold` merge (1c92d7d). Earlier
+  HANDOFF text claiming the exact path "lacks the R1 fold" was STALE — disregard it.
+  Re-gated 2026-06-25: a(12)/a(14) folded==unfolded exact; at a heavy mid-height (H13/N16)
+  the fold halves work (states 162572→81632, RSS 78.5→42.8 MB, cpu 212→97s). The launch
+  driver `scripts/an_fold_parallel.sh` already drives `--only-height H --fold` on this path.
+  Still gate END-TO-END == a(20)=1,025,573,519,362,016 once the full run lands.
+- **KNOWN LEVER (under investigation 2026-06-25): the exact MT path is mutex-locked, not
+  lock-free.** `sweepSquare8HeightMT` (sweep8.h:208) takes `lock_guard<mutex> mu[sh]` per
+  state-insert and ignores `TMA_SHARD_MULT`; the lock-free two-pass that gave 3.16× on
+  gympie lives ONLY in the modp path (`sweep8_modp.h`). Measuring exact-vs-modp scaling at
+  T=20 to decide whether to port the two-pass before launch. If contention-bound, the port
+  is the biggest a(21) wall-time lever.
 - Forecast doc `~/src/polyominoes-reach/docs/a22-forecast.md` estimates a(22) ~5–6 d (overlap)
   / ~9–10 d (safe sequential) for the 3-prime mod-p path; u64-fold → ~2 d. NONE of these has
   been launched.
