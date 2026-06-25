@@ -11,7 +11,10 @@
 // CRT(sum_H B_H(n) mod p_i) == exact a(n).
 #pragma once
 
+#include <atomic>
+#include <chrono>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <mutex>
@@ -132,6 +135,12 @@ inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
   { Sig seed; std::memset(seed.b, 0, SIGMAX);
     dbS[FlatDB::hashSig(seed) & (S - 1)].slot(seed)[0] = 1u % p; }
 
+  // TMA_PROGRESS=1: emit per-column expand throughput (source states processed/s) to
+  // stderr every ~10s. Observability for heavy sweeps; zero cost when unset.
+  const char* progEnv = std::getenv("TMA_PROGRESS");
+  const bool prog = progEnv && std::atoi(progEnv) > 0;
+  std::atomic<u64> g_done{0};
+
   for (int col = 0; col <= maxn; ++col) {
     u64 total = 0;
     for (int s = 0; s < S; ++s) total += dbS[s].size();
@@ -141,11 +150,15 @@ inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
       for (int s = 0; s < S; ++s) loc[t][s].clear();
 
     std::vector<std::vector<u64>> localRow(nthreads, std::vector<u64>(maxn + 1, 0));
+    g_done.store(0, std::memory_order_relaxed);
     auto expand = [&](int t) {
       std::vector<u64>& lrow = localRow[t];
       std::vector<FlatDB32>& mine = loc[t];
+      u64 ld = 0;
       for (int s = t; s < S; s += nthreads)  // thread t owns source shards t,t+T,...
         dbS[s].for_each([&](const Sig& sig, const std::uint32_t* counts) {
+          if (prog && (++ld & 255u) == 0)
+            g_done.fetch_add(256, std::memory_order_relaxed);  // fine-grained for costly states
           const int ms = minSizeRow32(counts, maxn);
           if (ms < 0) return;
           int comps = 0;
@@ -164,11 +177,36 @@ inline std::vector<std::uint32_t> sweepSquare8HeightModPMT(int H, int maxn,
                             maxn, p);  // thread-local: no lock
           });
         });
+      if (prog) g_done.fetch_add(ld & 8191u, std::memory_order_relaxed);
     };
     std::vector<std::thread> th;
+    std::atomic<bool> monRun{true};
+    std::thread mon;
+    if (prog) {
+      const u64 src = total;
+      const int curCol = col;
+      mon = std::thread([&monRun, &g_done, src, curCol]() {
+        using namespace std::chrono;
+        auto t0 = steady_clock::now();
+        while (monRun.load(std::memory_order_relaxed)) {
+          for (int i = 0; i < 100 && monRun.load(std::memory_order_relaxed); ++i)
+            std::this_thread::sleep_for(milliseconds(100));
+          const double el = duration_cast<duration<double>>(steady_clock::now() - t0).count();
+          const u64 d = g_done.load(std::memory_order_relaxed);
+          if (el > 0)
+            std::fprintf(stderr,
+                         "PROGRESS col=%d src=%llu done=%llu (%.2f%%) rate=%.0f/s "
+                         "elapsed=%.0fs eta_col=%.0fs\n",
+                         curCol, (unsigned long long)src, (unsigned long long)d,
+                         src ? 100.0 * d / src : 0.0, d / el, el,
+                         d > 0 ? (src - d) * el / d : 0.0);
+        }
+      });
+    }
     for (int t = 0; t < nthreads; ++t) th.emplace_back(expand, t);
     for (auto& x : th) x.join();
     th.clear();
+    if (prog) { monRun.store(false); mon.join(); }
 
     // merge each dest shard (one owner thread) into dbS -> next column, no lock, no swap
     auto merge = [&](int u) {
@@ -231,4 +269,47 @@ inline std::vector<std::uint32_t> sweepSquare8HeightModP(int H, int maxn,
     std::swap(db, next);
   }
   return row;
+}
+
+// Bounding-box stratified count: bbw[W][n] = #{polyplets of height EXACTLY H, width EXACTLY
+// W, n cells} mod p. Width == the loop column `col` at harvest: the leftmost column is pinned
+// at 0 (viableRec never emits an empty column, so no empty leading column is possible) and a
+// completed animal is harvested at the column where its rightmost cells lie, i.e. col == its
+// width. Identical sweep to sweepSquare8HeightModP except the harvest bins by `col` instead of
+// summing; so Sum_W bbw[W][n] == B_H(n) exactly (a built-in check), and bbw[W][n] (from the
+// height-H sweep) == transpose of the height-W sweep by the 90-degree lattice symmetry.
+// Serial; bbox tables are only run at modest n. No fold (it would collapse widths we keep).
+inline std::vector<std::vector<std::uint32_t>> sweepSquare8HeightWidthModP(
+    int H, int maxn, std::uint32_t p, u64& peakStates) {
+  std::vector<std::vector<std::uint32_t>> bbw(
+      maxn + 1, std::vector<std::uint32_t>(maxn + 1, 0));
+  FlatDB32 db(maxn), next(maxn);
+  Sig seed;
+  std::memset(seed.b, 0, SIGMAX);
+  db.slot(seed)[0] = 1u % p;
+  for (int col = 0; col <= maxn && !db.empty(); ++col) {
+    if (db.size() > peakStates) peakStates = db.size();
+    next.clear();
+    db.for_each([&](const Sig& sig, const std::uint32_t* counts) {
+      const int ms = minSizeRow32(counts, maxn);
+      if (ms < 0) return;
+      int comps = 0;
+      for (int j = 0; j < H; ++j)
+        if (sig.b[j] > comps) comps = sig.b[j];
+      if (comps == 1 && sig.b[H] && sig.b[H + 1])
+        for (int n = 1; n <= maxn; ++n)
+          if (counts[n])
+            bbw[col][n] = static_cast<std::uint32_t>(
+                (static_cast<u64>(bbw[col][n]) + counts[n]) % p);  // width == col
+      forEachViableMask(sig, H, maxn - ms, [&](unsigned mask) {
+        Sig out;
+        if (stepColumnSquare8(sig, H, mask, out) != Outcome::Alive) return;
+        const int cells = __builtin_popcount(mask);
+        if (ms + cells + completionLowerBound(out.b, H) > maxn) return;
+        addCountsModP32(next, out, counts, cells, maxn, p);
+      });
+    });
+    std::swap(db, next);
+  }
+  return bbw;
 }

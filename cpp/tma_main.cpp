@@ -204,6 +204,8 @@ int main(int argc, char** argv) {
                        // composes with --fold/--modp). 0 = off. Rounded up to pow2.
   u64 reserveStates = 0;  // --reserve N: pre-size the state store to ~N states (skip
                           // the doubling-grow transient; pass the calibrated peak)
+  bool bbox = false;  // --bbox: with --only-height H --modp P, emit "H W n B_{H,W}(n) mod P"
+                      // (bounding-box stratified: height EXACTLY H, width EXACTLY W).
   for (int i = 3; i < argc; ++i) {
     if (std::strcmp(argv[i], "--per-height") == 0) {
       perHeight = true;
@@ -232,6 +234,8 @@ int main(int argc, char** argv) {
       while (blockedS < s) blockedS <<= 1;  // round up to a power of two (mask requires it)
     } else if (std::strcmp(argv[i], "--reserve") == 0 && i + 1 < argc) {
       reserveStates = static_cast<u64>(std::strtoull(argv[++i], nullptr, 10));
+    } else if (std::strcmp(argv[i], "--bbox") == 0) {
+      bbox = true;
     } else {
       std::fprintf(stderr, "unknown arg: %s\n", argv[i]);
       return 2;
@@ -374,6 +378,28 @@ int main(int argc, char** argv) {
   // ETA is self-computed from the measured column rate.
   if (onlyHeight > 0) {
     if (modp > 0) {
+      if (bbox) {
+        // Bounding-box stratified: emit "H W n B_{H,W}(n) mod P" for every nonzero entry.
+        // Width == column at harvest (leftmost pinned at col 0). Sum_W recovers B_H(n).
+        u64 peak = 0;
+        const auto bbw = sweepSquare8HeightWidthModP(
+            onlyHeight, maxn, static_cast<std::uint32_t>(modp), peak);
+        obs::Reporter rep("tma-bbox-H" + std::to_string(onlyHeight) + "-N" +
+                              std::to_string(maxn),
+                          maxn, "height=" + std::to_string(onlyHeight) + " modp=" +
+                                    std::to_string(modp) + " bbox=1");
+        unsigned long long emitted = 0;
+        for (int W = 1; W <= maxn; ++W)
+          for (int n = 1; n <= maxn; ++n)
+            if (bbw[W][n]) {
+              std::printf("%d %d %d %u\n", onlyHeight, W, n, bbw[W][n]);
+              ++emitted;
+            }
+        rep.done("rows=" + std::to_string(emitted),
+                 "peak_states=" +
+                     std::to_string(static_cast<unsigned long long>(peak)));
+        return 0;
+      }
       // Top strip height H==N: a trivial closed form, not worth sweeping the largest,
       // emptiest strip. A height-N king-polyomino of N cells has exactly one cell per
       // row, and each of the N-1 inter-row steps shifts the column by -1/0/+1 (8-neighbour
