@@ -170,6 +170,23 @@ def main():
           f"L ihckpt holes square8 n<={depth_l} kill@col{kill_col} resume == clean")
     shutil.rmtree(ckdir, ignore_errors=True)
 
+    # M. R1 vertical-mirror fold (exact u64 path): --fold must be byte-identical to the
+    #    unfolded counts at every n. The a(21)/a(22) launch runs the per-height FOLDED
+    #    exact path (an_fold_parallel.sh -> --only-height H --fold), so this guards the
+    #    production engine directly -- full sweep serial+MT, and the only-height unit.
+    depth_m = 14
+    plain_m = parse_counts(run(TMA, "square8", depth_m))
+    for threads in (1, 4):
+        fold_m = parse_counts(run(TMA, "square8", depth_m, "--fold", "--threads", str(threads)))
+        gate.check(fold_m == plain_m,
+              f"M fold T={threads}    square8 n<={depth_m} --fold == unfolded")
+    H_m = 11  # a heavy mid-height, the exact unit the driver invokes
+    base_oh = parse_counts(run(TMA, "square8", depth_m, "--only-height", str(H_m)))
+    fold_oh = parse_counts(run(TMA, "square8", depth_m, "--only-height", str(H_m),
+                               "--fold", "--threads", "4"))
+    gate.check(fold_oh == base_oh,
+          f"M fold only-h  square8 n<={depth_m} H{H_m} --fold MT == unfolded")
+
     return gate.verdict("TMA")
 
 
