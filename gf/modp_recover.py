@@ -46,6 +46,18 @@ def _primes_below(below, count):
 PRIMES = _primes_below(1 << 31, 40)
 VAL_PRIME = _primes_below(1 << 30, 1)[0]   # fresh prime for validation, disjoint
 
+
+def series_matches(P, Q, d, val_seq, N, vp):
+    """Soundness gate: expand the rational GF P/Q as a power series mod vp and compare
+    to val_seq. Shared by the fixed-height and hole-slice mod-p recoverers."""
+    b = [0] * (N + 1)
+    for n in range(N + 1):
+        v = P[n] if n < len(P) else 0
+        for i in range(1, d + 1):
+            if n - i >= 0: v -= Q[i] * b[n - i]
+        b[n] = v % vp
+    return all(b[n] == val_seq[n] % vp for n in range(N + 1))
+
 def seq_modp(H, N, p):
     out = subprocess.run([GF, str(H), str(N), str(p)], capture_output=True, text=True).stdout
     d = {0: 0}
@@ -209,13 +221,7 @@ def main():
                 if sv is None:
                     sv = seq_modp(H, N, vp)
                     ckpt.save(f"H{H}-N{N}-val{vp}", sv)
-                b = [0] * (N + 1)
-                for n in range(N + 1):
-                    v = (P[n] if n < len(P) else 0)
-                    for i in range(1, d + 1):
-                        if n - i >= 0: v -= Q[i] * b[n - i]
-                    b[n] = v % vp
-                ok = all(b[n] == sv[n] % vp for n in range(N + 1))
+                ok = series_matches(P, Q, d, sv, N, vp)
                 # wrap diagnostic: a sound result has max|coeff| well below M/2 =
                 # (prod primes)/2; near-ceiling coeffs are the wraparound signature.
                 M = 1

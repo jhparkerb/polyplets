@@ -21,7 +21,7 @@ import subprocess
 from multiprocessing import Pool
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from modp_recover import _primes_below, bm_modp, order_of, crt, sym
+from modp_recover import _primes_below, bm_modp, order_of, crt, sym, series_matches
 from recover import poly  # single-source the GF pretty-printer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -83,14 +83,7 @@ def recover_slice(seqs, val_seq, N):
     while len(P) > 1 and P[-1] == 0:
         P.pop()
     # validate full GF P/Q as a power series against a fresh prime
-    b = [0] * (N + 1)
-    for n in range(N + 1):
-        v = P[n] if n < len(P) else 0
-        for j in range(1, d + 1):
-            if n - j >= 0:
-                v -= Q[j] * b[n - j]
-        b[n] = v % VAL_PRIME
-    ok = all(b[n] == val_seq[n] % VAL_PRIME for n in range(N + 1))
+    ok = series_matches(P, Q, d, val_seq, N, VAL_PRIME)
     return ("ok", d, P, Q, ok)
 
 

@@ -6,6 +6,7 @@
 # USAGE: scripts/a22_ram_threads2.sh 16 17  2>&1 | tee runs/a22_forecast/ram_threads2.log
 set -u
 cd "$(dirname "$0")/.."
+mkdir -p runs/a22_forecast   # this script writes runs/a22_forecast/.rt_out_$$ directly
 H=${1:?}; N=${2:?}; P=2147483647
 echo "=== RAM(GB) vs threads  H=$H N=$N  $(date -Is) ==="
 echo "threads  peak_rss_GB  wall_s  bytes_per_state(KB)"

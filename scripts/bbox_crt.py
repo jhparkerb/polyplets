@@ -23,9 +23,14 @@ def run(p, h):
     out = subprocess.run([TMA, "square8", str(N), "--only-height", str(h),
                           "--modp", str(p), "--bbox"],
                          capture_output=True, text=True, cwd=ROOT)
+    if out.returncode != 0:  # never sum a crashed sweep as zero (the wrong-a(n) bug class)
+        sys.exit(f"tma_bbox failed (rc={out.returncode}) h={h} p={p}: {out.stderr[:200]}")
     d = {}
     for line in out.stdout.splitlines():
-        H, W, n, v = map(int, line.split())
+        parts = line.split()
+        if len(parts) != 4:
+            continue
+        H, W, n, v = map(int, parts)
         d[(H, W, n)] = v
     return d
 

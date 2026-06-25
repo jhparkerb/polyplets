@@ -152,8 +152,8 @@ def gf_block(path, header):
     P = Q = None; want = False
     for line in open(os.path.join(ROOT, path)):
         if line.startswith(header): want = True; continue
-        if want and line.startswith("P: "): P = eval(line[3:])
-        if want and line.startswith("Q: "): Q = eval(line[3:]); break
+        if want and line.startswith("P: "): P = ast.literal_eval(line[3:])
+        if want and line.startswith("Q: "): Q = ast.literal_eval(line[3:]); break
     return P, Q
 P3, Q3 = gf_block("results/fixed_height_gfs.txt", "H=3 ")
 chk("G_3 numerator transcription",   P3==[0,0,0,9,-8,-2,4,1])
