@@ -36,6 +36,9 @@ cd "$(dirname "$0")/.."
 
 N="${1:?usage: an_fold_parallel.sh N [MAXJOBS] [THREADS] [MIN_FREE_GB]}"
 MAXJOBS="${2:-4}"; THREADS="${3:-20}"; MIN_FREE_GB="${4:-25}"
+# Per-column heartbeat to each height's stderr log (PROGRESS col=.. rate=../s eta_col=..),
+# every TMA_PROGRESS_SECS (default 150). On by default for these multi-day runs; overridable.
+export TMA_PROGRESS="${TMA_PROGRESS:-1}"
 # HEIGHTS: which strip heights this box computes (default all, heaviest first). Override to
 # a subset to split the work across machines without overlap. See header.
 HEIGHTS="${HEIGHTS:-$(seq "$N" -1 1)}"

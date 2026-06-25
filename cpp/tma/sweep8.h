@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -180,6 +181,17 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
 
   auto lastSave = std::chrono::steady_clock::now();
   proctitle::setShardTotal(static_cast<u64>(S));  // within-column progress denominator
+
+  // TMA_PROGRESS=1: log per-column expand throughput (states processed/s, % of the column,
+  // per-column ETA) to stderr -> h$H.log, for reading the wall of a multi-day run. Interval
+  // TMA_PROGRESS_SECS (default 150s); a fresh monitor runs per column, so fast early columns
+  // emit nothing and only the heavy columns pulse. Zero cost when unset.
+  const char* progEnv = std::getenv("TMA_PROGRESS");
+  const bool prog = progEnv && std::atoi(progEnv) > 0;
+  int progSecs = 150;
+  if (const char* e = std::getenv("TMA_PROGRESS_SECS")) { int v = std::atoi(e); if (v > 0) progSecs = v; }
+  std::atomic<u64> g_done{0};
+
   for (int col = startCol; col <= maxn; ++col) {
     u64 total = 0;
     for (int s = 0; s < S; ++s) total += dbS[s].size();
@@ -205,8 +217,10 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
     auto expand = [&](int t) {
       Counts& lrow = localRow[t];
       std::vector<FlatDB>& mine = loc[t];
+      u64 ld = 0;  // source states processed by this thread (progress, flushed every 256)
       for (int s = t; s < S; s += nthreads) {  // thread t owns source shards t,t+T,
         dbS[s].for_each([&](const Sig& sig, const u64* counts) {
+          if (prog && (++ld & 255u) == 0) g_done.fetch_add(256, std::memory_order_relaxed);
           const int ms = minSizeRow(counts, maxn);
           if (ms < 0) return;
           int comps = 0;
@@ -225,11 +239,39 @@ inline Counts sweepSquare8HeightMT(int H, int maxn, int nthreads,
         });
         proctitle::shardDone();  // process-title: one source shard of this column expanded
       }
+      if (prog) g_done.fetch_add(ld & 255u, std::memory_order_relaxed);  // flush remainder
     };
     std::vector<std::thread> th;
+    // per-column heartbeat: a monitor pulses (states/s, %, per-column ETA) every progSecs
+    // while this column expands; joined at the barrier so it never overlaps the merge.
+    std::atomic<bool> monRun{true};
+    std::thread mon;
+    if (prog) {
+      g_done.store(0, std::memory_order_relaxed);
+      const u64 src = total;
+      const int curCol = col, curH = H, ds = progSecs;
+      mon = std::thread([&monRun, &g_done, src, curCol, curH, ds]() {
+        using namespace std::chrono;
+        auto t0 = steady_clock::now();
+        while (monRun.load(std::memory_order_relaxed)) {
+          for (int i = 0; i < ds * 10 && monRun.load(std::memory_order_relaxed); ++i)
+            std::this_thread::sleep_for(milliseconds(100));
+          if (!monRun.load(std::memory_order_relaxed)) break;
+          const double el = duration_cast<duration<double>>(steady_clock::now() - t0).count();
+          const u64 d = g_done.load(std::memory_order_relaxed);
+          std::fprintf(stderr,
+                       "PROGRESS H=%d col=%d src=%llu done=%llu (%.2f%%) rate=%.0f/s "
+                       "elapsed=%.0fs eta_col=%.0fs\n",
+                       curH, curCol, (unsigned long long)src, (unsigned long long)d,
+                       src ? 100.0 * d / src : 0.0, el > 0 ? d / el : 0.0, el,
+                       d > 0 ? (src - d) * el / d : 0.0);
+        }
+      });
+    }
     for (int t = 0; t < nthreads; ++t) th.emplace_back(expand, t);
     for (auto& x : th) x.join();
     th.clear();
+    if (prog) { monRun.store(false); mon.join(); }
 
     // PASS 2 (merge): thread u owns dest shards u,u+T,...; clears dbS[s] and folds in
     // loc[0..T-1][s] (one writer per dbS[s], one reader per loc[t][s] -> no lock). dbS is
