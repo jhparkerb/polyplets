@@ -65,6 +65,10 @@ Consolidated: M1+M2+M3 → "the work-unit queue"; I1+I3 → "the work-stealing p
    land; trust the planner once it's within ~±30%.
 
 ## Unexplored axes (negative space, 2026-06-25) — candidates, not yet scored
+> **Each idea below (and the 3 open empirical questions above) now has a kill-test +
+> improvement-ladder playbook in `docs/frontier/` — see `docs/frontier/README.md` for the
+> verdict-lean table and the cheapest-and-decisive do-first ordering (2026-06-26).**
+
 1. **Do less work, not just spread it** — state compression (sparse counts rows, packed
    signatures) + more symmetry reduction. Directly attacks RAM (the binding constraint);
    orthogonal to all scheduling. Never touched.
