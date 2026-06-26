@@ -116,9 +116,21 @@ the backend — is the actual bet; per-state random ops over disk OR network are
 - **Motzkin-path boundary encoding = Jensen's thesis** — the concrete instance of compression
   #1: encode boundary connectivity as a Motzkin-like string (count ~ Motzkin numbers).
 - **Barequet & Ben-Shachar, ALENEX 2024:** fixed-polyomino record **n=70** via a **45°-rotated**
-  transfer matrix on only **32 GB RAM**. OPEN QUESTION: does the 45°-rotation transfer to
-  KING-polyplets? Earlier "diagonal deflation" said no (king diagonals span n×n) — RE-DERIVE,
-  don't trust the note, given the size of this win.
+  transfer matrix on only **32 GB RAM**. PARKED IDEA (on the pile, not dismissed): re-checked our
+  prior "diagonal deflation" 2026-06-25 and it does NOT settle this —
+    - what we rigorously killed was the *transpose height-cap* (⌈n/2⌉) trick, which B-BS does NOT
+      use (they rotate the sweep direction, not the box);
+    - the actual *single 45°/(u,v) sweep* is an **unchecked box** in research-log-2026-06-22.md
+      ("would a 45° sweep have fewer boundary states?"), with an unfollowed lead pointing the
+      right way: under (u,v)=(x+y,x−y) every king step has |Δu|+|Δv|=2, so king-polyplets live on
+      the **even sublattice** (half the points, cleaner box);
+    - the deflation's premise ("we're already at the √λ floor, so rotation is marginal") is
+      *contradicted* by B-BS getting 14 extra terms from rotation (it goes below straight √λ);
+    - the one proxy we measured leans the OTHER way: middle-cut base 2.76 diagonal vs 3.22 column.
+  THE EXPERIMENT (never run, = frontier-revision-plan §0.1, "the biggest unknown"): build the
+  (u,v) anti-diagonal single-sweep state counter and measure its growth base vs the column TM's
+  **2.44** at small n. <2.44 → the RAM cliff moves out and chunks of this machinery become
+  unnecessary; ≥2.44 → retire it WITH numbers. Afternoon job on gympie. Parked for now.
 - **Calibration:** ordinary polyominoes hit the RAM wall ~n=60 on 512 GB *with* Motzkin
   compression → RAM is the universal frontier constraint (validates the whole framing).
 
