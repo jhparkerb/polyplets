@@ -82,3 +82,31 @@ but cannot push the ceiling.
   for a column vs a diagonal decomposition. Hold Round 2 until A confirms or falls.
 
 _Status: Round 1 closed; diagonal-confirmation running 2026-06-26. Round 2 gated on it._
+
+## Settled engineering conventions (jasonp, 2026-06-26)
+How the next system is built and kept from blurring into mud. Researched: spec-driven
+development ([spec-kit](https://github.com/github/spec-kit/blob/main/spec-driven.md)),
+evolutionary-architecture fitness functions, AiiDA-style provenance.
+- **Executable invariants over discipline.** Every architectural/correctness invariant is a
+  build-FAILING gate (a *fitness function*), not a documented agreement. The byte-identical-to-
+  dense gate is the template; extend to module-boundary tests and **cross-decomposition agreement**
+  (column and diagonal must produce the identical triangle — a validation no dense baseline gives).
+- **Code is built incrementally + tested, NOT regenerated from docs.** Design docs drive *intent
+  and boundaries*; gates *enforce* them; regeneration is reserved for the derivable shell, never the
+  tested core. Generate-only REJECTED — even SDD's best practitioners (Harper Reed) patch-with-tests;
+  the teeth are the gates, not the regeneration. The hard-won core (closure math, lock-free merge,
+  fold, CRT/u128) lives in specific tested code with git-bisectable trust.
+- **Binary provenance — rev in the filename.** Binaries carry the short git rev in their NAME
+  (`tma-<rev>`, `-dirty` if the tree isn't clean); they already stamp the rev in `event=start`, keep
+  both (filename = at-a-glance + survives-without-logs; embedded = ground truth). `build/tma`
+  convenience symlink ok; rev-named files live under `build/<rev>/` or get pruned.
+- **Exit accounting (clean exit).** Every binary emits `cpu_s`, `wall_s`, `peak_rss` on normal exit
+  (`tma` already does via `event=done` / `getrusage ru_maxrss`). Work = make it uniform across all
+  binaries and land it durably, not just stderr.
+- **Abnormal exit → accounting folds into the checkpoint.** Checkpoint stores `(cpu_so_far,
+  wall_so_far, rss_max_so_far)`; resume seeds from them and keeps accumulating — cpu/wall SUM,
+  peak-RSS MAX — so the final `event=done` reports the true total across the crash. Accounting
+  granularity then equals work granularity (a crash loses exactly the accounting for the work it
+  also lost). Costs a 3-field checkpoint-format bump.
+- **NOT doing:** whole-hog provenance manifests (AiiDA-style DB). The above is the deliberate 80/20:
+  "account for every binary we ran and what it cost" without standing up a provenance system.
