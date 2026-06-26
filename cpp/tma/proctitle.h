@@ -77,14 +77,11 @@ inline std::string format(int N, int H) {
   const int maxn = g_maxn.load(std::memory_order_relaxed);
   const u64 sd = g_shardDone.load(std::memory_order_relaxed);
   const u64 st = g_shardTot.load(std::memory_order_relaxed);
-  // NB: no '/' anywhere in the title -- htop/btop strip the program path by default and a
-  // slash (e.g. "c=3/21") gets mistaken for a path separator, truncating the display to the
-  // "basename" after it ("21 ~87%"). Use ':' for the column-of-total separator instead.
   if (st > 0)
-    std::snprintf(buf, sizeof buf, "tma a(%d) H%d c=%d:%d ~%d%%", N, H, col, maxn,
+    std::snprintf(buf, sizeof buf, "tma a(%d) H%d c=%d/%d ~%d%%", N, H, col, maxn,
                   static_cast<int>(sd * 100 / st));
   else
-    std::snprintf(buf, sizeof buf, "tma a(%d) H%d c=%d:%d", N, H, col, maxn);
+    std::snprintf(buf, sizeof buf, "tma a(%d) H%d c=%d/%d", N, H, col, maxn);
   return buf;
 }
 
