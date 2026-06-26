@@ -188,6 +188,14 @@ human/orchestrator in the loop is fine; no shared FS or real-time protocol requi
 if even manual hand-off is unwanted: a balanced STATIC split computed from the cost curve (the
 geometric growth makes the exact split point insensitive). Apply when a(22) is launched.
 
+**#33 — Harden an_fold_parallel.sh kill (trap + reap children).** The driver launches each
+height as a detached `( build/tma ... ) &` subshell, so `kill $(cat driver.pid)` -- exactly
+what the driver's own KILL note tells you to run -- kills ONLY the driver; the tma sweeps
+orphan (reparented to init) and keep grinding. Hit live 2026-06-25; the reliable stop was
+killing the tma PIDs directly. Fix: a `trap` on TERM/INT/EXIT that reaps the child sweeps
+(kill the process group, or track child PIDs in an array and signal them), and correct the
+KILL note. Small; do when not mid-run (don't churn the driver under a live a(21)).
+
 **#17 — Paper + public repo drop (LAST).**
 Fold everything into the write-up: a(19) + free/one-sided, hole sequences, the
 fixed-height GFs and lifetime-3 (honestly weighted — see results/lifetime3-proof.md),
