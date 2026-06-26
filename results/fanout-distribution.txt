@@ -1,0 +1,9 @@
+# fanout_probe square8 n=18 H=11 -- per-column fan-out distribution (2026-06-26)
+# build: g++ -std=c++20 -O3 -o build/fanout_probe experiments/fanout_probe.cpp
+# correctness: full sweep sums to A006770 through a(12)=257105146 (probe --validate 12)
+
+col  states  total_fanout  mean  median  max  cv  max/median  top1%  shardcv@1k  shardcv@10k
+4    29036   25752281      887   960     2032 0.56 2.12x       2.2%   0.27        0.06
+6    29012   9897377       341   232     1984 0.93 8.55x       4.7%   0.40        0.11
+8    27093   1811872       67    20      1024 1.64 51.2x       9.6%   0.85        0.25
+10   12418   202924        16    2       294  2.13 147x        13.7%  0.87        0.68

@@ -156,6 +156,19 @@ states become irreducible mini-stragglers and the barrier unpredictability creep
   range).
 - **Why saved not run:** load-bearing for the work-stealing scheduler design but not urgent — parked
   to keep the big-picture conversation moving. Run before committing to that scheduler.
+- **RESOLVED 2026-06-26 — GO (no mask-splitting needed), with a small-shard refinement.** Probe
+  (`experiments/fanout_probe.cpp`, validated Σ_H=a(n) through a(14)) measured per-source-state fan-out
+  at (n=18, H=11). The FALLBACK triggers are NOT met anywhere: top 1% of states carry only **9.6–13.7%**
+  of total work (no power-law; top 0.1% ≤1.8%), the largest single state is **≤1.9% of a 1k-shard** (no
+  monster), max fan-out is **14% of 2^H** in pruning-active columns. So **work-stealing over
+  hash-sharded states suffices; the mask-splitting fallback is unnecessary.** The nuance the prediction
+  missed: roughness is **column-dependent** — early columns tame (max/median ~2×, σ/μ 0.56) but late,
+  pruning-active columns rough (max/median up to **147×**, per-shard cv still 0.68 even at S=10k) because
+  they hold few states (~12k) AND low median fan-out (2). Those rough columns are CHEAP, though (low
+  state-count × low fan-out ≈ 1% of total work). **Design consequence: shards must be SMALL (S≈1k) and
+  DYNAMIC (atomic-cursor work-stealing, not static striding — static would tail-stall on late columns);
+  scale shard size to the column's state count.** This *validates* the work-stealing choice rather than
+  merely permitting it — a static partition would have stalled on the late columns.
 
 ## Architecture — component map (B-as-a-library, external merge-sort core)
 Settled direction, 2026-06-26 design conversation. **Granularity: shard, not height** — height is
