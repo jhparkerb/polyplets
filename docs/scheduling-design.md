@@ -84,6 +84,18 @@ Consolidated: M1+M2+M3 → "the work-unit queue"; I1+I3 → "the work-stealing p
    all n at once (vs per-cell sweeps); concrete bridge to the triangle work.
 8. **Meta: are we over-computing?** — minimal-path question for the paper/OEIS goal vs the full
    triangle + holes + GFs we're generating.
+9. **`__uint128_t` counters — CRT-free exact counting to ~a(48).** a(n) overflows u64 at a(26)
+   (a(25)≈1.5e19 < 2^64 < a(26)≈1e20) but doesn't reach 2^128≈3.4e38 until ~a(48). So a 128-bit
+   counter gives EXACT counts, NO CRT, in a SINGLE enumeration pass, across the whole reachable
+   frontier. Cheap on all our boxes: `__uint128_t` is double-width arithmetic, not bignum — add
+   = 2 instrs (add+adc), multiply uses the native 64×64→128 widening mul (x86 MUL/MULX, ARM64
+   MUL+UMULH); the only missing hardware op is 128÷64 division, which counting never does.
+   THE CONTEST (worth a head-to-head when we pass a(25)): u128 single-counter vs the SETTLED
+   interleaved-31-bit-CRT (crt-counter-shaping.md, which already pays enumeration once with k
+   small counters). Roughly a wash on speed; u128 wins on SIMPLICITY — no CRT lift, no prime
+   pool, no composite-prime footgun ("2147483479 is composite and silently corrupts"), exact
+   integer falls straight out. Tangential: for GF recovery, 128-bit only buys 63-bit CRT primes
+   (~half the prime count), NOT a single prime — H=10 coeffs are ~2^1300, need full bignum.
 
 ## Strategic staging — the RAM cliff sets the agenda (2026-06-25)
 Pole-sweep RAM, from the measured ~580 B/state (source+dest, no per-thread duplication — i.e.
