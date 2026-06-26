@@ -128,21 +128,24 @@ the backend — is the actual bet; per-state random ops over disk OR network are
 - **Motzkin-path boundary encoding = Jensen's thesis** — the concrete instance of compression
   #1: encode boundary connectivity as a Motzkin-like string (count ~ Motzkin numbers).
 - **Barequet & Ben-Shachar, ALENEX 2024:** fixed-polyomino record **n=70** via a **45°-rotated**
-  transfer matrix on only **32 GB RAM**. PARKED IDEA (on the pile, not dismissed): re-checked our
-  prior "diagonal deflation" 2026-06-25 and it does NOT settle this —
-    - what we rigorously killed was the *transpose height-cap* (⌈n/2⌉) trick, which B-BS does NOT
-      use (they rotate the sweep direction, not the box);
-    - the actual *single 45°/(u,v) sweep* is an **unchecked box** in research-log-2026-06-22.md
-      ("would a 45° sweep have fewer boundary states?"), with an unfollowed lead pointing the
-      right way: under (u,v)=(x+y,x−y) every king step has |Δu|+|Δv|=2, so king-polyplets live on
-      the **even sublattice** (half the points, cleaner box);
-    - the deflation's premise ("we're already at the √λ floor, so rotation is marginal") is
-      *contradicted* by B-BS getting 14 extra terms from rotation (it goes below straight √λ);
-    - the one proxy we measured leans the OTHER way: middle-cut base 2.76 diagonal vs 3.22 column.
-  THE EXPERIMENT (never run, = frontier-revision-plan §0.1, "the biggest unknown"): build the
-  (u,v) anti-diagonal single-sweep state counter and measure its growth base vs the column TM's
-  **2.44** at small n. <2.44 → the RAM cliff moves out and chunks of this machinery become
-  unnecessary; ≥2.44 → retire it WITH numbers. Afternoon job on gympie. Parked for now.
+  transfer matrix on only **32 GB RAM**. **RESOLVED 2026-06-26 — NO-GO for king-polyplets, with
+  numbers** (experiments/phase01_width_probe.cpp, the frontier-revision-plan §0.1 GO/NO-GO):
+    - Redelmeier-enumerated every king-polyplet, measured the worst-case swept width of our
+      column+transpose sweep `max min(H,W)` vs B-BS's 45° rotation `max min(Dmain,Danti)`.
+      **Both = n exactly, every n** (n=1..13, perfectly regular) — the rotation gives ZERO
+      worst-case improvement; it's *worse* on the mean (rotated-width mean 6.74 vs 5.20 at n=11,
+      gap widening) because king diagonals blow the rotated bbox to ~2n wide (Dmn/Dan=21 vs H/W=11).
+    - **Structural reason** (now concrete, not a cached dismissal): at every n there are
+      king-polyplets that are width-n in BOTH boxes — the down-right staircase (H=W=n) saturates
+      the upright box, an X-shape saturates the rotated one. B-BS wins for ORDINARY polyominoes
+      precisely because their diagonals aren't edge-connected, so no such staircase exists.
+      King-connectivity is exactly what defeats the rotation.
+    - Caveat / only-remaining-out: worst-case width = peak frontier *size*, not the distinct
+      *state*-count (the 2.44 base). But both worst-case (n=n, tied) AND mean (rotation worse)
+      point the same way, so the state-count can't plausibly rescue it. The 2.76-vs-3.22 middle-cut
+      proxy that once leaned the other way was occupancy-only and is superseded by this. **Retired.**
+    - The 4-direction *routing* idea (max4 = `max min(H,W,Dmain,Danti)`, grows ~n−2) is a DIFFERENT
+      thing — it needs per-animal direction choice, not a single TM — and stays out of scope.
 - **Calibration:** ordinary polyominoes hit the RAM wall ~n=60 on 512 GB *with* Motzkin
   compression → RAM is the universal frontier constraint (validates the whole framing).
 
