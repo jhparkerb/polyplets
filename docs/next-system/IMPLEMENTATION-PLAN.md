@@ -234,16 +234,54 @@ wall-clock checkpoint/resume. **Entry:** M1 green. This is the largest milestone
 **Objective:** decide a(23) fits before launching it (NFR-2: never lose work to a misprediction).
 **Entry:** M3 green.
 
-- **T3.5 Sizing.** *(S)*
-  - Build: project a(23) peak live states and total spill volume from the ~110 B/state floor (C-3) ×
-    measured state-growth (2.43×/N pole, a22-forecast), plus the merge transient (~2× column). Pick the box:
-    dalby first; if it doesn't fit RAM+NVMe with margin, spec a rented large cloud VM (acceptable fallback,
-    PRD §4) and only commit when the fit is **certain**. Set governor wall/disk budgets from the projection.
-  - Gate: a written sizing in `data/manifests/` (projected peak states, spill GB, chosen box, headroom
-    margin, governor limits) reviewed before launch; explicit go/no-go.
-  - Adverse: projection says it doesn't fit any available box with margin ⇒ **stop and replan** (defer to
-    multi-box, or to the sig 4-bit pack which buys ~2× state bytes) rather than launch-and-hope. A
-    misprediction must revise the plan, never crash a multi-day run (NFR-2).
+- **T3.5 Sizing.** *(S)* — **WORKED 2026-06-26; verdict GO on dalby, no cloud needed.** Re-run this
+  projection against live a(20–22) numbers before launch; the structure and verdict below stand unless an
+  anchor moves materially.
+
+  **Anchors (all measured, `docs/a22-forecast.md`):** pole = H=N−1; pole_states(22) = 6.63×10⁷ (firm
+  log-linear fit, ratio 2.414/N, σ negligible); pole_cpu(22) ≈ 6.7×10⁶ cpu-s **per prime/pass**; per-state
+  cost ×1.81/N, pole_cpu ×4.44/N. peak_states is **build-independent** (forecast §3) — the distinct-signature
+  count is identical for the modp engine and the new exact engine, so the law transfers directly. Bytes/state
+  is the measured ~130 B deployed floor (NEXT-SYSTEM §B). dalby: 122 GB RAM, **`/` ~376 GB free** (NVMe-RAID1).
+
+  | quantity | value | basis |
+  |---|---|---|
+  | pole height (a23) | **H22** | H=N−1 (H23 = free closed form 3²²) |
+  | pole_states(23) | **1.60×10⁸** | 6.63×10⁷ × 2.414 (one term past the fit) |
+  | bytes/state (u64 ranged) | **~130 B** | 0.56·23≈13 entries ×8 + sig 24 + lo/len 2 (a23 < a25 ⇒ u64 valid) |
+  | pole column on disk | **20.8 GB** | states × bytes |
+  | **peak working disk (incremental merge)** | **~95 GB** | source(21) + ~2.5× col intermediate(52) + emerging next(21) |
+  | peak working disk (batch merge, worst case) | ~190 GB | source(21) + raw map output (pass/state≈8 × 130 B, no incremental dedup) |
+  | dalby free disk | 376 GB | measured `/` |
+  | **→ disk verdict** | **FITS, 2–4× margin** | binding only if heights kept resident concurrently — run heights sequentially so peak = pole working set |
+  | peak RAM (working) | ~40–50 GB | ram_budget × ~76 workers + merge heap — and spill-bounded regardless |
+  | dalby free RAM | 122 GB | measured |
+  | **→ RAM verdict** | **FITS, not binding** | the spill engine caps RAM by `ram_budget`, never the column |
+  | pole_cpu(23) | 2.97×10⁷ cpu-s | 6.7×10⁶ × 4.44 (one exact pass, not 3 primes) |
+  | total a(23) cpu (all H) | 3.83×10⁷ cpu-s | pole × ~1.29 (pole-dominated height sum) |
+  | wall @ ~76 eff cores | **~5.8 days** | cross-process regime (process-per-unit ⇒ the independent-sweep scaling, not the 38× in-process cap) |
+  | wall @ ~38 eff cores | ~11.7 days | if cross-process only reaches the old in-process cap |
+  | **→ wall verdict** | **days → ~2 weeks; the binding/uncertain axis** | NFR-3 aspiration (not correctness); bounded-safe via checkpoint+governor |
+
+  **Verdict — GO on dalby; cloud fallback NOT required for a(23).** Disk fits with 2–4× margin (376 GB vs
+  ~95–190 GB peak), RAM is never binding (spill-bounded), and by M4 the a(22) frontier job has long since
+  freed the box (M3 depends on a(22) landing). The **only uncertain axis is wall time** (~6 days if
+  cross-process parallelism delivers ~76 effective cores — the new engine's whole reason for existing — vs
+  ~12 days if it only matches the old 38× cap). That uncertainty is an NFR-3 *aspiration*, not a correctness
+  risk, and is bounded-safe: a slow run still checkpoints, resumes, and finishes. **Free headroom in hand:**
+  R1 fold (on in v1) ~halves pole_states → ~10 GB column and ~½ the disk; the sig 4-bit pack (deferred) is a
+  further ~2× state-byte lever if ever needed.
+
+  - **Build:** before launch, re-run this projection against the just-landed a(20/21/22) peak_states + pole
+    wall to confirm the 2.414/N and 4.44/N laws haven't bent at the top; set governor disk budget ≈ 300 GB
+    (80% of free, generous over the ~95–190 GB peak) and a wall-cadence checkpoint interval (e.g. 15 min).
+  - **Gate:** the refreshed sizing (this table, re-anchored) reviewed; explicit go/no-go recorded in
+    `data/manifests/a23-sizing.md`. Current verdict: **GO, dalby.**
+  - **Adverse:** if a refreshed anchor pushes peak working disk past ~300 GB (e.g. pass/state higher than 8,
+    or fold disabled) ⇒ enforce **incremental merge** (cap intermediate at ~2.5× column, the ~95 GB regime)
+    before considering the cloud fallback; if even that doesn't fit ⇒ enable the sig 4-bit pack (~2× bytes)
+    or rent a large-NVMe cloud VM, committing only when the fit is **certain** (PRD §4). A misprediction
+    revises the plan; it never crashes a multi-day run (NFR-2) — the governor stops cleanly at the budget.
 
 ## M4 — a(23) record term *(AC-4)*
 
