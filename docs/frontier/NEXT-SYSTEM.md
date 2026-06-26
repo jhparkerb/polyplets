@@ -180,6 +180,21 @@ states become irreducible mini-stragglers and the barrier unpredictability creep
   enough to dilute it (free at 10⁸-state columns). Still DYNAMIC (cvKey~0.9 static is badly balanced;
   dalby sustains ~38× on the real pole, proving dynamic dispatch absorbs it). The max/MEDIAN blow-up
   (≈400) is the median collapsing — *divisible* spread, work-stealing's job — not the indivisible monster.
+- **Certainty / independent sanity checks (2026-06-26).** The GO above leans on an 8-step extrapolation,
+  so it's cross-checked two ways that are NOT more rungs:
+  1. **Structural hard bound (applied, passes).** Masks-examined per state **≤ 2^H** (only 2^H next-column
+     patterns exist) — a ceiling from structure, not a trend. mean cost is *growing* (~×1.25/H → ~600 at
+     H=21), so **max/mean ≤ 2^H/mean ≈ 3,400 at H=21** even if the worst state saturates 2^H (it doesn't —
+     mx/ceil is ~0.4 and falling). The empirical extrapolation gave ~225; the ceiling says ≤3,400; the true
+     value is bracketed between, and BOTH are below the danger threshold (max/mean ≈ shard-state-count ≈
+     17k–170k). Two independent methods (empirical trend + first-principles ceiling) converge on GO — that
+     convergence is the confidence. **The one failure mode (mean *collapsing* at high H) is structurally
+     precluded:** numerator is ceiling-bound, denominator only grows (more boundary cells → more masks/state).
+  2. **Real-engine cross-check (available, not yet pulled).** The actual engine sustains ~38× on the real
+     pole at H≈18–19 (nearer production than the probe), and the perf campaign pinned that cap to *hardware*
+     (Infinity-Fabric), explicitly NOT monster imbalance. A monster problem would show heavy-tailed per-thread
+     runtimes + a far-below-38× cap. TODO if more assurance wanted: pull the per-thread imbalance signature
+     from the existing perf data (heavy tail = monster; flat-but-capped = confirms-not-monster) — no new compute.
 
 ## Architecture — component map (B-as-a-library, external merge-sort core)
 Settled direction, 2026-06-26 design conversation. **Granularity: shard, not height** — height is
