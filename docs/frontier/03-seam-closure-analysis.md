@@ -85,5 +85,37 @@ i.e. the RSS blowup is exactly what external-memory sort is designed to stream a
   break-even cold-fraction. **This is the next measurement** — and with S≈1.0 the compute side is
   already free, so C2 alone decides 03.
 
-**Verdict: 03 GO, gate-1 cleared with full margin. 02/05/M5 stay gated on C2 (the bandwidth test),
-not on compute.**
+## C2 RESULT (measured 2026-06-26, dalby NVMe-RAID1 + membw) — STRONGLY FAVORABLE
+The bandwidth probe (`experiments/membw.cpp` + `dd` direct I/O; dalby storage = md-RAID1 of two
+NVMe, ext4):
+
+| regime | bandwidth | paid by |
+|--------|----------:|---------|
+| sequential RAM | 15.8 GB/s | sort engine in-RAM (map + merge stream) |
+| **random RAM** | **0.76 GB/s** | **hash engine** find-or-insert into a >cache table |
+| sequential NVMe write | 1.5 GB/s | sort engine spill |
+| sequential NVMe read | 3.1 GB/s | sort engine merge-read |
+
+Two findings:
+1. **Random RAM is 21× slower than sequential RAM** (0.76 vs 15.8 GB/s). That gap IS the hash
+   engine's structural tax — every find-or-insert into a frontier table bigger than cache pays it.
+2. **Sequential NVMe (1.5–3.1 GB/s) beats random RAM (0.76 GB/s) by 2–4×.** So the sort engine
+   *spilling to disk* moves data faster than the hash engine moves it through RAM. The break-even
+   cold-fraction is **f\*>1** — i.e. even 100%-spilled sequential sort out-bandwidths the hash
+   engine's random RAM; there is no cold-fraction at which disk-sort loses on data movement.
+
+**a(24) tractability:** the ~240 GB pole, external-merged at 1.5 w / 3.1 r GB/s, is ~4 min of I/O
+per full read+write pass; a few passes ⇒ tens of minutes of spill I/O per heavy column — a minor
+fraction of the multi-day *compute* (the shared map). **The a(24) cliff is I/O-crossable on
+existing NVMe.**
+
+**Caveat (the honest bound):** gympie's small-n S≈1.0 had the hash table cache-resident (store ~3%
+of wall, map dominates). The 21× random/sequential gap predicts the hash store balloons once the
+table exceeds cache (the a(23)/a(24) pole: ~100–240 GB), so **S should swing in sort's favor at
+the pole** — but that exact crossover is what the a(23) testbed measures, not something to claim
+from n=15. C2 says *build it*; the testbed says *by how much*.
+
+**Verdict: 03 GO — gate-1 (compute, S≈1.0), gate-2 (no random lookup), AND C2 (sequential I/O
+out-bandwidths random RAM) all cleared. The one-bet is greenlit: build the external sort engine on
+the a(23) testbed. 02's *sequential*-spill path is unblocked (its random-spill stays dead); 05/M5
+ride the same restructure.**

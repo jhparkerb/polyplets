@@ -22,7 +22,7 @@ dead-on-arrival check) above the fuller kill-test below — the "smoke" column f
 |---|------|---------|-------------------------|------------------|------|
 | [01](01-state-compression.md) | state compression + symmetry | RAM/state (~580 B) | `--profile-rows`: mean row width ≈ maxn ⇒ already dense (min) | FLM bend-vs-shift envelope + `--profile-rows` (free) | **BUILD, cap hopes** — constant-factor ~+1.3 terms unless FLM bends the curve |
 | [02](02-out-of-core-spill.md) | out-of-core / disk spill | RAM cliff | target term fits box RAM? ⇒ disk moot (subtraction) | random-IOPS back-of-envelope (free) | **NO-GO raw** — collapses into 03; a backend, not a bet |
-| [03](03-sort-transition-engine.md) | sort/merge transition engine | RAM + distribution | whiteboard: seam-closure as sort+merge w/o random lookup? (1h) | in-RAM sort-vs-hash prototype @ n=14–16 (S) | **GATE-1 PASS** (S≈1.0, compute-free; [seam-closure](03-seam-closure-analysis.md)) — C2 bandwidth test next decides it |
+| [03](03-sort-transition-engine.md) | sort/merge transition engine | RAM + distribution | whiteboard: seam-closure as sort+merge w/o random lookup? (1h) | in-RAM sort-vs-hash prototype @ n=14–16 (S) | **GREENLIT** ([gates 1/2/C2 all pass](03-seam-closure-analysis.md)): S≈1.0, seq NVMe 1.5–3.1 > random RAM 0.76 GB/s — build on a(23) testbed |
 | [04](04-adaptive-per-column-config.md) | per-column (T,B,K) | wall + RAM headroom | h##.log: rate/src vary >2× across cols? (PASSES, free) | parse existing a(21) per-column logs (free) | **MARGINAL** but near-free test — gated at ~15% |
 | [05](05-elastic-cloud-resources.md) | cloud burst / elastic | the cliff, with $ | roadmap target > a(23)? else dead (one look) | access-pattern gate + $ envelope (free) | **NO-GO until 03 lands AND a(24)+** |
 | [06](06-continuous-verification.md) | continuous validation | wasted-rerun risk | `--modp` total readable mid-sweep? (yes, by construction) | mod-p shadow power + overhead @ small h (S) | **GO-lean** — de-risks the multi-day pole runs |
@@ -33,11 +33,15 @@ dead-on-arrival check) above the fuller kill-test below — the "smoke" column f
 | [oq2](oq2-m4-checkpoint-portability.md) | cross-arch checkpoint | sticky-pole imbalance | `tmaCkptLoad` returns Loaded (not Refuse) cross-arch? (2m) | dalby→ayr resume, byte-identical (S) | **UNCERTAIN, test-first** — gates M4 *and* M5 |
 | [oq3](oq3-cost-model-calibration.md) | cost-model calibration | scheduling + honest ETAs | frozen H19 prediction lands within ±30%? (one residual) | predict a(21) heights, compare as they land (free) | **GO-lean, near-free** — but data is PERISHABLE |
 
-## The one bet, restated
+## The one bet, restated — NOW VALIDATED (2026-06-26)
 02, 05, and M5 are leaves that all reduce to **03**'s access-pattern restructure
 (random find-or-insert → sequential/sort/batched). Once that lands, the storage backend
 (local disk · cloud KV · network shards) is a swappable deployment choice. **03 is the
 only one of the four with a real empirical kill-test** — do it, and 02/05/M5 fall out.
+**Status: 03's kill-test PASSED** ([03-seam-closure-analysis.md](03-seam-closure-analysis.md)) —
+sort+merge is compute-free (S≈1.0) and sequential NVMe (1.5–3.1 GB/s) out-bandwidths the hash
+engine's random RAM (0.76 GB/s) by 2–4×, so the a(24) cliff is I/O-crossable. The bet is greenlit;
+the build target is the **a(23) testbed** (scheduling-design §staging). 02/05/M5 unblocked behind it.
 
 ## Gate DAG (don't-start-X-until-Y)
 Hard edges — do NOT start the blocked node until the blocker's number is in:
