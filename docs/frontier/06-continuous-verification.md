@@ -8,6 +8,13 @@ A days-long pole sweep is validated only at the END (gate_tma.py: byte-identical
 ## Why it might matter here
 The pole sweep for a(21) runs **days** (a22-forecast: ~2 days/pole, ~5–6 d for 3 primes). A corruption found at the gate costs that entire wall. If a continuous invariant fires at, say, column c of ~N columns, it saves the remaining (N−c)/N of the run — for a mid-run hit, ~half the wall. The lever is only worth building if (a) the cheap invariant actually catches a single-state corruption and (b) it costs <~10% so it's a monitor, not a re-run.
 
+## Smoke test (dead-on-arrival)
+Confirm the `--modp` shadow exposes a running total readable mid-sweep at all — it does:
+it's the accumulating count carried through the validated transition. So a per-column
+observable to cross-check against **exists by construction**; dead-on-arrival only if
+there were no mid-sweep observable. (There is — proceed to the power half of the kill-test,
+which is the real risk.) One look at the shadow engine, no run.
+
 ## Kill-test — quickest path to INFEASIBLE
 **Question it answers:** does a continuously-runnable invariant exist that is BOTH discriminating (catches a single-state count error, not just an OOM/crash) AND cheap (<~10–15% overhead)? Test the cheaper requirement's *power* first — power is the thing that can fail silently.
 **Setup:** two free, no-build measurements on gympie at a small height (e.g. `tma square8 14 --only-height 13`):

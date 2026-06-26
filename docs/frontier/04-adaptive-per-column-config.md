@@ -21,6 +21,13 @@ is "fill idle cores on the cheap two-thirds of every height" + "don't carry peak
 RAM through the cheap columns." Whether that's 5% or 30% is exactly what the kill-test
 measures — no projection.
 
+## Smoke test (dead-on-arrival)
+From an existing `h##.log` alone: do rate (states/s) and `src` vary >~2× across a height's
+columns? If columns are uniform there's nothing to adapt. The logs already show rate
+295→77 within col1 and src 52× col1→col2, so this **PASSES** — the wall half of the lever
+has real variance. (The RAM-headroom half needs the per-column RSS sampler — see
+results/oq3-04-data-collection.md.) Free, no run.
+
 ## Kill-test — quickest path to INFEASIBLE
 **Question it answers:** is the gap between the *best per-column* config and the *fixed*
 config large enough to bother — or do early and peak columns want essentially the same
@@ -38,10 +45,17 @@ compute.
 **Measure:** (a) modelled wall reduction on the critical-path height from per-column T/K
 vs fixed; (b) peak-RAM headroom (GB) freed by not carrying peak-config B/K through the
 light columns.
-**NO-GO if:** early-vs-peak optimal config barely differs — modelled wall reduction
-< ~15% AND RAM headroom < ~15–20% of the pole. Decisive because adaptive config adds
-control-logic surface (and an OOM footgun if K mis-times the peak); below ~15% it isn't
-worth that risk against a fixed config that already works.
+**Two gates — do NOT conflate "variance exists" with "gap is exploitable":**
+  - **G1 (free/passive, from logs + sampler):** does the config-OPTIMUM vary across columns
+    *at all*? If early and peak columns want essentially the same (T,B,K), there is no gap
+    to chase — **NO-GO** here, no replay needed. (The smoke test shows rate/src variance,
+    but variance in *load* is not yet variance in *optimal config* — G1 is the latter.)
+  - **G2 (active, only if G1 passes):** quantify the GAP — replay ONE column under 2–3
+    candidate configs and measure the actual wall/RAM delta vs fixed. **NO-GO if** modelled
+    wall reduction < ~15% AND RAM headroom < ~15–20% of the pole.
+Decisive because adaptive config adds control-logic surface (and an OOM footgun if K
+mis-times the peak); below ~15% *measured gap* it isn't worth that risk against a fixed
+config that already works. A config-optimum that doesn't move (G1) is the cheaper kill.
 
 ## Substantial-improvement ladder (must clear ALL)
 - **C1 — ≥15% wall reduction on the critical-path height OR ≥ ~Y GB peak-RAM headroom**

@@ -18,6 +18,14 @@ engine **is** that restructure. It also de-risks the I7 hot-slot contention
 question (scheduling-design §"Open empirical questions" #1) by eliminating shared
 mutable slots entirely. Nothing else unlocks M5 or a(24)+.
 
+## Smoke test (dead-on-arrival)
+Whiteboard, ~1 h, no code: can connectivity-closure (the boundary-partition merge at the
+column seam) be expressed as **sort + merge WITHOUT a random mid-stream lookup**? If it
+structurally needs random access mid-merge, the contention-free / external-memory claim
+dies before any prototype — gate 2 of the kill-test is already lost on paper, and 02/05/M5
+stay blocked regardless of the sort-vs-hash speed. Settle this seam question first; the
+states/sec prototype only matters if the access pattern survives it.
+
 ## Kill-test — quickest path to INFEASIBLE
 **Question it answers:** is one column transition done as in-memory sort+merge
 within striking distance (≤~3–4×) of the existing hash engine's states/sec, AND
@@ -32,10 +40,17 @@ access-pattern. Cost: a few hundred lines + an afternoon, no production risk.
 (2) whether the boundary-partition merge at the seam (connectivity-closure) can be
 done by **co-sorting on the partition key and merging**, or whether it demands a
 random lookup *mid-merge*.
-**NO-GO if (gate 1):** in-memory sort+merge is **>~3–4× slower** than hashing —
-because external memory, even *free*, only repays a slowdown if the streaming win
-covers it; a 4× compute penalty means the disk/network version starts already
-underwater vs the in-RAM hash engine, and there is no win left to bank.
+**NO-GO if (gate 1) — break-even, not a fixed ratio:** MEASURE the in-RAM slowdown
+**S** of sort-vs-hash on the identical column. The external-memory win pays only if the
+**cold-state fraction f** (states that miss RAM and hit disk) times the disk/RAM latency
+ratio L is repaid by sort's sequential locality. Sort's whole edge is converting f random
+4 KB seeks into sequential streaming (~GB/s, IOPS-irrelevant); so the implied **break-even
+cold fraction is f\* where f\*·L ≈ S** — below f\* the streaming win can't cover the sort
+penalty, above it sort wins. Report **S AND the implied break-even f\***; **NO-GO if the
+measured access locality can't reach f\*** (i.e. the real cold fraction at the pole stays
+under f\*, so there's no disk traffic to convert). *Fallback rule of thumb:* S beyond ~4×
+is almost certainly underwater at any plausible f, but the real test is the break-even,
+not the fixed ratio.
 **NO-GO if (gate 2):** connectivity-closure needs a random find mid-merge — then
 the contention-free / distributes-cleanly claim is false (you've reintroduced the
 random op the whole bet exists to remove), and #2/#5/M5 all stay blocked.
@@ -66,6 +81,9 @@ docs/state-store-compression.md) — sorted fixed-width records compress well �
 with the cost model. It does NOT conflict with the work-unit queue (it changes the
 leaf operation, not the scheduling). Ordering: **build/prototype this FIRST**;
 everything downstream waits on its two gates.
+- **Gate:** **blocks 02, 05, and M5** (02-out-of-core-spill.md, 05-elastic-cloud-resources.md,
+  M5 distributed single-height) — they are backends of this access-pattern restructure; do
+  not build them until 03's number is in.
 
 ## If it passes: effort & where it lands
 Kill-test prototype: **S (ESTIMATE)**. Production in-memory engine (C1): **M**.

@@ -24,6 +24,12 @@ recovery, 128-bit buys only 63-bit CRT primes (~half the prime count), NOT a sin
 prime — H=10 coeffs are ~2¹³⁰⁰ and need full bignum (§9 of scheduling-design). So this
 is not a GF tool.
 
+## Smoke test (dead-on-arrival)
+Does `__uint128_t` compile and produce a correct widening add (and, if ever hit, multiply)
+in the hot loop on BOTH arm64 (gympie) and x86 (ayr)? A ~10-line test: a `__uint128_t` row,
+add+adc in the inner loop, compare a few accumulations against a u64 reference. If either
+ISA lacks it or miscompiles, u128 is dead before the full bench. Minutes per box.
+
 ## Kill-test — quickest path to INFEASIBLE
 **Question it answers:** is u128 single-counter increment+widening throughput within
 striking distance of interleaved-31-bit-CRT on the hot row-add loop — on BOTH ISAs?

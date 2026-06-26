@@ -8,6 +8,13 @@ A height's intra-height checkpoint (checkpoint.h: header + nEntries·(Sig+counts
 ## Why it might matter here
 The height is the **coarse cross-box atom** (scheduling-design §"unifying model": columns are sequential, the frontier lives on the box running that height). Once the pole H=N−1 dominates (~2.4×/height geometric), the only way to rebalance gympie/ayr/dalby is to move or split THAT height — M4/M5. Both are gated on this one fact: is the on-disk state arch-portable? checkpoint.h *claims* logical-set portability (read via `for_each`, MT re-routes by `hashSig & (S-1)`), but the format is little-endian-stamped (`byteorder=1`, L120) and never tested across a real endian/layout/struct-padding boundary. dalby (aarch64) and ayr (x86-64) are the exact pair that proves or breaks it.
 
+## Smoke test (dead-on-arrival)
+Does `tmaCkptLoad` return `Loaded` (not `Refuse`) when handed a checkpoint written on the
+OTHER arch — *before* any byte-identity check? A ~2-min load attempt reveals an arch-stamped
+format (the `byteorder=1` header, L120) without running a full cross-box sweep. If it
+`Refuse`s on sight, the format is endian/layout-locked and an arch-portable serialization
+is a prerequisite — re-prices M4/M5 immediately, no resume needed.
+
 ## Kill-test — quickest path to INFEASIBLE
 **Question it answers:** does a checkpoint written on dalby (aarch64) resume on ayr (x86-64) to a BYTE-IDENTICAL final count vs a same-box run?
 **Setup:** pick a small/cheap height so the round-trip is minutes, not days (e.g. `tma square8 14 --only-height 13 --checkpoint DIR`, TMA_CKPT_SECS small so it actually writes). On dalby: run to a mid-height checkpoint, kill via the existing `TMA_CKPT_KILL_AT_COL` hook (checkpoint.h L206). `scp` DIR/ckpt to ayr. On ayr: resume from the copied ckpt to completion. Baseline: a full same-box run on each. (Rebuild on each box first — stale-binary footgun, per the rebuild-remote rule.)
@@ -22,6 +29,7 @@ The height is the **coarse cross-box atom** (scheduling-design §"unifying model
 
 ## Composition / foreclosures
 - **Gates M4 AND M5** — both sit in §Survivors; neither proceeds at its current estimate until this passes.
+- **Gate (chain):** the **smoke test (loads cross-arch) blocks the kill-test (byte-identical), which blocks M4 and M5.** A `Refuse` on load kills the cheap path before any resume; only a `Loaded` justifies the byte-identity round-trip, and only a byte-identical pass unblocks M4/M5 at their cheap estimate.
 - **Composes with the "one bet"** (scheduling-design §"One bet"): M5's distribution rides the SAME sequential/sort/batched restructure as out-of-core (02) and the sort engine (03) — a portable checkpoint is the wire format that restructure ships. Build the portable format once, it serves migration, distribution, and disk-spill.
 - **Forecloses I6** (GPU/SIMD/new decomposition, §Excluded DEFER): heterogeneous on-device state can't migrate or distribute, so I6 and M4/M5 are mutually exclusive — confirming portability strengthens the case to keep state CPU-homogeneous.
 - **Independent of** compression (01) and verification (06): they observe/shrink state; this moves it.

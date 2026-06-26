@@ -20,6 +20,12 @@ row rightward by a fixed multiplier. It does NOT change the **2.42×/term** pole
 sets where the cliff is. So compression buys ~1 term and **moves the a(24) cliff to ~a(25)
 — it does not remove it.**
 
+## Smoke test (dead-on-arrival)
+`--profile-rows` histogram of the live count-row width (`hi−lo+1`) on ONE small column.
+If mean width ≈ maxn the store is **already dense** — the ranged-row win is ~0 before any
+packing, and the whole §0.2 lever is moot. Minutes, one gympie core, no build. (This is
+strictly cheaper than §0.1's FLM envelope; run it first to kill the ranged-row half.)
+
 ## Kill-test — quickest path to INFEASIBLE
 **Question it answers:** is there a compression that BENDS the 2.42×/term curve, or are
 all the planned levers merely SHIFTS (≈1 term, no scaling change)?
@@ -67,6 +73,9 @@ absent that, this idea is explicitly a strong constant-factor win, not a cliff-r
   the in-RAM 2× and the **out-of-core precursor** for docs/frontier/02-out-of-core-spill.md
   — build it once, it pays both. Ordering: Phase 1 ranged → Phase 2 u32+CRT → Phase 3
   structural; the blocked store is the bridge to #2/#3.
+- **Gate (internal):** the §0.1 **FLM bend-vs-shift** kill-test gates the *verdict* — BEND
+  reorders the whole plan (game-changer), SHIFT caps it at the banked +1.3-term constant
+  factor. Run §0.1 before claiming compression is anything but a constant-factor win.
 
 ## If it passes: effort & where it lands
 **M–L (ESTIMATE)** — ranged row is the keystone drop-in (M); u32+CRT (S–M); symmetry fold

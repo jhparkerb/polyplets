@@ -18,6 +18,13 @@ it pays for the **mid-heavy notch** heights (H≈10..19) that the running a(21) 
 by cell. The lever is real only where the order stays small enough that "2r terms × prime
 count" sweeps cost less than sweeping the notch cells directly.
 
+## Smoke test (dead-on-arrival)
+One division: recovery_terms(H) ≈ 2·order(H) vs the handful of notch cells to fill
+directly. H=10: ~10⁴ sweeps vs ~4 cells. **Dead-on-arrival for any H where 2·order(H) ≫
+cells-to-fill** — i.e. all H≥10 (order 5005+ at H=10, growing ~2.6×/H). Here the smoke IS
+basically the kill-test, it's that cheap: the order sequence is already validated, so the
+verdict is one arithmetic comparison, no envelope.
+
 ## Kill-test — quickest path to INFEASIBLE
 **Question it answers:** at notch height H, does recovering G_H cost LESS than directly
 sweeping the ~handful of notch cells B_H(n) that the triangle actually needs?

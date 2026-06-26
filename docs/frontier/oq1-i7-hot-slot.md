@@ -19,6 +19,12 @@ runs single-box at all. **Highest-stakes idea in the set.** The risk it trades f
 (low-comps boundaries that many sources fan into), and a mutex version already capped
 this DP at ~2.3× and regressed past ~12 threads (sweep8.h comment, runs/exact_mt_scaling).
 
+## Smoke test (dead-on-arrival)
+On a toy column, does a trivial 2-thread atomic-CAS-insert map beat a single mutex-guarded
+map? If even 2 threads don't win against one mutex, the lock-free design dies before the
+full contention sweep — no `ConcDB`, no heavy-column run on dalby needed. A small standalone
+harness, not the engine; minutes. (The mutex history says 2 threads is the cheap first cut.)
+
 ## Kill-test — quickest path to INFEASIBLE
 **Question it answers:** does atomic accumulate on the hottest output states serialize
 throughput by more than the 1-copy RAM win is worth — i.e. does contention, not
@@ -60,6 +66,9 @@ RAM-cliff target with #2 (out-of-core) and state compression (#1) — but I7 is 
 if it fails does a(23) fall back to those. Composes cleanly with adaptive per-column
 config (04-adaptive-per-column-config.md): a 1-copy table changes the per-column RAM
 curve the schedule keys on. Orthogonal to the counter-width work (modp/u128).
+- **Gate:** oq1's result **gates the a(23) engine choice** (informs, does not block other
+  ideas) — a PASS lands a(23) single-box on dalby via the I7 1-copy table; a FAIL redirects
+  a(23) RAM onto compression (01) / out-of-core (02).
 
 ## If it passes: effort & where it lands
 **M (ESTIMATE)** — ConcDB is a sibling of the existing FlatDB open-addressing store; the

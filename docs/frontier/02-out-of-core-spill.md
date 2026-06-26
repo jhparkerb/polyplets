@@ -14,6 +14,12 @@ staging"): a(24)~232 GB > dalby 122 GB. If RAW spill worked, the cliff would
 just vanish — backend swap, no engine rewrite. So it is worth one decisive
 arithmetic check before any build, precisely because the payoff is so large.
 
+## Smoke test (dead-on-arrival)
+30-second version of the IOPS envelope: is the working set even bigger than box RAM at
+the target term? a(22) fits ~40 GB; a(23) lean ~96 GB fits dalby. **If the term we want
+fits RAM, disk is moot** — dead-on-arrival unless the target term exceeds box RAM. One
+subtraction (projected pole bytes vs box GB), no envelope arithmetic needed.
+
 ## Kill-test — quickest path to INFEASIBLE
 **Question it answers:** does the pole column's random find-or-insert pattern
 survive being backed by NVMe, or does seek latency blow the wall up by >10×?
@@ -61,6 +67,8 @@ Shares the "one bet" with #3 (sort engine), #5 (cloud KV), M5 (distributed
 single-height). It **forecloses nothing** and **leads nothing**: it cannot be
 built before #3 (the kill-test proves RAW spill dead). Ordering: #3 first, then
 this is a backend choice (local NVMe) alongside cloud KV / sharded RAM.
+- **Gate:** **blocked-by 03** (03-sort-transition-engine.md) — this is a backend of 03's
+  access-pattern restructure; do not build until 03's number is in.
 
 ## If it passes: effort & where it lands
 **S (ESTIMATE)** *given #3 already exists* — wiring a sorted-run spill directory

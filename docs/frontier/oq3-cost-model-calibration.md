@@ -8,6 +8,12 @@ A closed-form model predicting **cost(H,N)** (wall) and **RAM(H,N,config)** (pea
 ## Why it might matter here
 The cliff decisions are RAM-driven and made BEFORE launch: a(22) ~40 GB (current engine), a(23) ~96 GB (fits dalby ONLY with the lean I7), a(24) ~232 GB (no single box) — scheduling-design's own table. Pick the wrong box/engine and you OOM-kill days in (as happened 2026-06-25). The model is what turns "probably fits dalby" into a pre-launch number, and what makes the heartbeat's `eta=` a derived quantity instead of a guess. a22-forecast already does this BY HAND ("~5–6 days, range 4–7"); the question is whether a closed form is accurate enough to trust as machinery.
 
+## Smoke test (dead-on-arrival)
+Already underway (results/oq3-04-data-collection.md). Smoke = do the frozen H19 predictions
+land within ±30% when H19 finishes? One height settles whether the model is in the right
+ballpark **before** waiting for all four heights. A single residual, no new compute — the
+predictions are already recorded.
+
 ## Kill-test — quickest path to INFEASIBLE
 **Question it answers:** after fitting to the early/light a(21) heights, does the model predict each remaining a(21) height's wall AND peak RAM within ±30%?
 **Setup:** NEARLY FREE — uses the RUNNING a(21) job, no new compute. Before each height lands, record the model's predicted wall + predicted peak RAM (closed form from H, N=21, config: the per-height 2.4× wall law, the ~580 B/state × predicted-states RAM law). As heights complete, log actual wall (heartbeat) and actual peak RSS (`/usr/bin/time -l` / ram_guard.sh sampling). Fit the constants on the first few completed heights; predict the rest forward.

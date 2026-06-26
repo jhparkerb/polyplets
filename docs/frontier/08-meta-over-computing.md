@@ -18,6 +18,14 @@ RAM). The holes engine is 2D and *more* RAM-hungry than the spine. So the option
 aren't free riders — they inflate the binding constraint. If the paper doesn't need them at
 the frontier, trimming directly relieves RAM and wall at the pole.
 
+## Smoke test (dead-on-arrival)
+Read the OEIS b-file format + the submission draft's central claim (~30 min reading). If
+the draft cites only a(n), the triangle / holes / GF are non-load-bearing **trim
+candidates** — and trimming is live. Dead-on-arrival *for trimming* only if the paper's
+thesis turns out to depend on them (a stated claim needing B_H(n) at frontier height). The
+draft's promotion checklist is five b-file lines with no triangle/holes/GF row, so trim is
+on the table — proceed to the full requirements audit.
+
 ## Kill-test — quickest path to INFEASIBLE
 **Question it answers:** are the triangle / holes / GFs load-bearing for the paper's
 *claims* and the OEIS submission, or are they enrichment that can ride below the frontier?

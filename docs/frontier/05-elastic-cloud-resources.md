@@ -13,6 +13,12 @@ staging"). A 256 GB+ cloud VM holds the a(24) pole that dalby (122 GB) cannot.
 But cloud capacity is only *capacity* if the access pattern survives the network —
 which is exactly the "one bet," so this idea is **gated on #3**, not independent.
 
+## Smoke test (dead-on-arrival)
+Is there any target term that NO owned box fits? a(23) lean fits dalby (with the I7
+1-copy table); a(24) (~232 GB) fits nothing owned. So: **does the roadmap target exceed
+a(23)?** If the frontier goal stops at a(23), cloud is dead-on-arrival — owned hardware
+covers it and renting is pure waste (prong b). One look at the roadmap target, no spend.
+
 ## Kill-test — quickest path to INFEASIBLE (two prongs, fail-either)
 **Question it answers:** does cloud add *capacity* (GO) or merely *latency* (dead),
 and if capacity, is it cheaper than the owned box it replaces?
@@ -59,6 +65,8 @@ sharded-owned-RAM — same restructured engine, different storage deployment. It
 forecloses nothing; it is itself foreclosed until #3 passes AND owned boxes are
 exhausted. Ordering: last of the three (#3 → then #2/M5 on owned hardware → cloud
 only when owned RAM truly runs out).
+- **Gate:** **blocked-by 03** (03-sort-transition-engine.md) — this is a backend of 03's
+  access-pattern restructure; do not build until 03's number is in.
 
 ## If it passes: effort & where it lands
 **M (ESTIMATE)** *given #3 exists* — a remote/object-store backend behind the
