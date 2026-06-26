@@ -16,7 +16,9 @@ CXXFLAGS += -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
 # apply it only when the compiler is gcc; empty for clang.
 RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),,-Wno-error=restrict)
 
-.PHONY: gates gate-g1 gate-g2 gate-euler clean
+.PHONY: gates gate-g1 gate-g2 gate-euler clean \
+        ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
+        ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0
 
 # All currently existing gates
 gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-euler gate-driver
@@ -103,6 +105,49 @@ build/subgraph_count: cpp/sym/subgraph_count.cpp | build
 # Gate S2: free/one-sided Burnside counts vs A000105/A030222 (oracle-grade)
 gate-s2:
 	python3 tests/gate_s2.py
+
+# ─── Next-system (ns-*) targets ──────────────────────────────────────────────
+# All new-system code lives under core/ worker/ orchestrator/ verify/ test/.
+# Oracle (build/tma, build/g2) stays in cpp/; both coexist.
+
+NSFLAGS = -std=c++20 -Wall -Wextra -Werror \
+          -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
+
+build/ns:
+	mkdir -p build/ns
+
+# ns-gates: all new-system gates
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold
+
+ns-gate-math: build/ns/gate_math
+	./build/ns/gate_math
+
+build/ns/gate_math: test/gate_math.cpp core/signature.h core/transition.h | build/ns
+	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+
+# Architecture fitness: Go boundary tests
+ns-gate-arch:
+	go test ./verify/arch/... -count=1
+
+# Regression gate (AC-0): driver0 reproduces T(n,H) byte-identical to oracle, n≤14
+ns-gate-regression: build/ns/driver0
+	./build/ns/driver0 --maxn 14
+
+# Fold gate: fold==unfold byte-identical
+ns-gate-fold: build/ns/driver0
+	./build/ns/driver0 --maxn 12 --fold-check
+
+build/ns/driver0: test/driver0.cpp core/libenum.h core/run.h core/mapreduce.h \
+                  core/counter.h core/classifier.h | build/ns
+	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+
+build/ns/map_worker: worker/map_worker.cpp core/libenum.h core/run.h core/mapreduce.h \
+                     core/counter.h core/classifier.h | build/ns
+	$(CXX) $(NSFLAGS) -O3 -I. $< -o $@
+
+build/ns/merge_worker: worker/merge_worker.cpp core/libenum.h core/run.h core/mapreduce.h \
+                       core/counter.h core/classifier.h | build/ns
+	$(CXX) $(NSFLAGS) -O3 -I. $< -o $@
 
 clean:
 	rm -rf build
