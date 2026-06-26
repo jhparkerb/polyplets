@@ -84,3 +84,46 @@ Consolidated: M1+M2+M3 → "the work-unit queue"; I1+I3 → "the work-stealing p
    all n at once (vs per-cell sweeps); concrete bridge to the triangle work.
 8. **Meta: are we over-computing?** — minimal-path question for the paper/OEIS goal vs the full
    triangle + holes + GFs we're generating.
+
+## Strategic staging — the RAM cliff sets the agenda (2026-06-25)
+Pole-sweep RAM, from the measured ~580 B/state (source+dest, no per-thread duplication — i.e.
+the lean I7 engine) and the 2.41×/N pole law:
+
+| term | pole states | lean sweep RAM | single box (dalby 122 GB)? |
+|------|------------:|---------------:|----------------------------|
+| a(22) | 6.9×10⁷ | ~40 GB | fits easily (current engine) |
+| a(23) | 1.7×10⁸ | ~96 GB | fits **only with I7** (lean); batched engine ~150 GB → OOM |
+| a(24) | 4.0×10⁸ | ~232 GB | does **not** fit any single box |
+
+**The cliff is a(24), not a(23).** Decision (jasonp):
+- **a(22):** current engine.
+- **a(23):** I7 is what makes it RAM-resident at all (lean single shared table), MAXJOBS=1.
+  **Use a(23) as the TESTBED for the new architecture** — prove the sort/stream engine,
+  out-of-core, distribution, and compression on a job that still *fits*, so failures are cheap.
+  Do NOT squeeze the current engine over an epic, hope-for-the-best a(24)+ run. "Probably more
+  than I7 will be required" — a(23) is where we trial the a(24)/a(25) ideas.
+- **a(24)+:** the sort/stream restructure is mandatory; storage backend becomes a deployment
+  choice. Compression slides every row rightward.
+
+## One bet, not four
+#2 (disk-spill), #3 (sort engine), #5 (cloud Redis/Bigtable), and M5 (distributed) all require
+the SAME thing: restructure the column transition from random find-or-insert into **batched /
+sequential / sort** operations. Once that's done, the storage backend is a swappable deployment
+choice (local disk · cloud KV · sharded across machines). The access-pattern restructure — not
+the backend — is the actual bet; per-state random ops over disk OR network are equally fatal.
+
+## Literature anchors (papers/refs-transfer-matrix.md, saved 2026-06-25)
+- **Motzkin-path boundary encoding = Jensen's thesis** — the concrete instance of compression
+  #1: encode boundary connectivity as a Motzkin-like string (count ~ Motzkin numbers).
+- **Barequet & Ben-Shachar, ALENEX 2024:** fixed-polyomino record **n=70** via a **45°-rotated**
+  transfer matrix on only **32 GB RAM**. OPEN QUESTION: does the 45°-rotation transfer to
+  KING-polyplets? Earlier "diagonal deflation" said no (king diagonals span n×n) — RE-DERIVE,
+  don't trust the note, given the size of this win.
+- **Calibration:** ordinary polyominoes hit the RAM wall ~n=60 on 512 GB *with* Motzkin
+  compression → RAM is the universal frontier constraint (validates the whole framing).
+
+## #7 status: DORMANT — lit-checked, do not revive without new evidence
+Meet-in-the-middle transfer matrix gives no speedup here (the seam = the peak frontier, not a
+small matching key; it holds ~2× peak RAM; plus connectivity-closure at the seam). The lit
+search found no MITM-TM for polyominoes, and the SOTA (Jensen → Barequet, n=70) is
+one-directional under extreme optimization pressure — strong negative evidence.
