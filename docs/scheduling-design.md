@@ -148,6 +148,15 @@ the backend — is the actual bet; per-state random ops over disk OR network are
       *state*-count (the 2.44 base). But both worst-case (n=n, tied) AND mean (rotation worse)
       point the same way, so the state-count can't plausibly rescue it. The 2.76-vs-3.22 middle-cut
       proxy that once leaned the other way was occupancy-only and is superseded by this. **Retired.**
+    - **REOPENED 2026-06-26 — retirement was premature, by our own caveat.** We retired on worst-case
+      *width* while flagging that the real cost is the distinct *state*-count, "which can't plausibly
+      rescue it" — but we never measured it. We did now (`experiments/phase02_statecount_probe.cpp`):
+      the diagonal cut's distinct-partition base is **~2.04 vs the column's ~2.42** at equal width over
+      king-polyplets n≤12 — the "middle-cut proxy that leaned the other way" was pointing at something
+      real. A state-count *signal*, not yet a built TM; a correct king diagonal transfer matrix
+      (Σ==a(n), real peak-state base) is under adversarial confirmation (`docs/frontier/NEXT-SYSTEM.md`).
+      If confirmed it bends the growth exponent — the one lever that moves the feasibility ceiling.
+      Do NOT cite this as a settled NO-GO.
     - The 4-direction *routing* idea (max4 = `max min(H,W,Dmain,Danti)`, grows ~n−2) is a DIFFERENT
       thing — it needs per-animal direction choice, not a single TM — and stays out of scope.
 - **Calibration:** ordinary polyominoes hit the RAM wall ~n=60 on 512 GB *with* Motzkin

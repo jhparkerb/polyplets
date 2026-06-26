@@ -62,6 +62,54 @@ Diagonal grows ×2.42/term (and the height-step ratio is itself drifting up,
 - **a(23)+** is far past 78 GB; needs #20 plus likely more than one machine's
   disk, or a fundamentally cheaper representation.
 
+## FLM verdict (Phase 0.1, 2026-06-26): width-bounding BENDS the state base — SURVIVOR
+
+The phase01 worst-case-WIDTH test (maxHW=maxDD=n) killed the 45° rotation on peak
+frontier *size*. But that is not the incumbent's cost driver — the **distinct
+boundary-SIGNATURE base** (the 2.42/term peak_states growth) is. phase01 itself
+flagged the state-count as "the careful follow-up." It has now been run
+(`experiments/phase02_statecount_probe.cpp`): Redelmeier-enumerate every king-polyplet,
+and for each internal cut record the canonical connectivity partition of the frontier
+(the exact TM state, perp-gaps preserved), two ways — **column cut x=c (height-bounded,
+= incumbent)** vs **diagonal cut x−y=c (width-bounded, = B-BS 45°)** — peak over cut of
+distinct signatures, per term:
+
+| n | col_states | col ratio | diag_states | diag ratio | colW=diaW |
+|---|-----------:|:---------:|------------:|:----------:|:---------:|
+| 8 | 344 | 2.511 | 81 | 2.077 | 7 |
+| 9 | 858 | 2.494 | 168 | 2.074 | 8 |
+| 10 | 2129 | 2.481 | 345 | 2.054 | 9 |
+| 11 | 5260 | 2.471 | 706 | 2.046 | 10 |
+| 12 | 12947 | **2.461** | 1443 | **2.044** | 11 |
+
+- **The proxy is validated:** col base → 2.46 and descending toward the engine's
+  measured 2.42 (it's a strict over-estimate that converges from above). Same
+  measurement on the diagonal cut.
+- **Width-bounding gives a strictly smaller base: ~2.04 vs ~2.42**, stable over 6
+  terms, NOT converging upward, gap slightly *widening*. The peak frontier WIDTH is
+  identical (colW=diaW=n−1, reproducing phase01) — so at equal frontier size the
+  diagonal cut realizes far fewer distinct connectivity partitions. The corroborating
+  direct-TM-state probe (`phase03_tmstate_probe.cpp`) shows the same lean in its growth
+  region (window-bounded, so only directional, not asymptotic).
+- **Cost consequence, with numbers.** Per-term: RAM ∝ states-per-cut = base^n; time ∝
+  cuts × states ≈ (cuts)·base^n. Diagonal pays ~2× the cuts (extent Danti≈2n vs n) but
+  base 2.04 vs 2.42 ⇒ ratio (2.42/2.04)^n. At **a(22): (2.42/2.04)^22 ≈ 36× less peak
+  RAM, ~18× less time** (after the 2× cut penalty); the gap grows ~1.19×/term. This
+  reframes the a(24) RAM cliff: a 45° king engine would push it out **~2 full terms**.
+- **What the repo's prior NO-GO got wrong:** it dismissed the rotation on worst-case
+  *width* and asserted "the state-count can't plausibly rescue it." Measured, the
+  state-count says the opposite. The width tie and the state-base gap are both real;
+  they measure different things, and the cost driver is the latter.
+- **Caveat — this is a state-count signal, not a built engine.** It does not yet account
+  for: (a) the connectivity-closure / touch-flag bookkeeping a correct 45° king TM needs
+  (a constant factor, same shape as the column engine's, not a base change); (b) whether
+  the diagonal transition's *branching* (king back-adjacency j∈{i−1,i} on the anti-
+  diagonal) admits the same lock-free batched-merge engine. **Verdict: SURVIVOR — the
+  only candidate measured to bend the base. Next test (specified, ~1–2 wk): build a
+  minimal 45° king column-transition mirroring `sweep8.h`, validate Σ_cut == a(n) for
+  n≤13, and confirm the peak distinct-state ratio of the REAL engine lands ~2.05.** This
+  reopens what frontier-revision-plan §0.1 had gated NO-GO.
+
 ## Caveats
 
 - Two diagonal data points (a19, a20) fix the ratio at 2.42; the slowly-rising
