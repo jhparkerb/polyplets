@@ -110,3 +110,37 @@ evolutionary-architecture fitness functions, AiiDA-style provenance.
   also lost). Costs a 3-field checkpoint-format bump.
 - **NOT doing:** whole-hog provenance manifests (AiiDA-style DB). The above is the deliberate 80/20:
   "account for every binary we ran and what it cost" without standing up a provenance system.
+
+## Work-safety & predictability (design model, 2026-06-26 conversation)
+Touchstone (jasonp): never lose significant work to a mispredicted size/time. Reframe: you can't
+predict an exponential, so make work-safety NOT depend on prediction.
+- **Predictions are advisory, never load-bearing.** A wrong prediction revises a *plan*, never causes
+  a crash or lost work. (Spill: RAM surprise → spill, don't die. Budget governor: wall/disk surprise
+  → checkpoint+stop, don't OOM.)
+- **Bounded loss by construction.** Loss ≤ one checkpoint interval, by *wall-clock* cadence — NOT
+  structural boundary. (Today's bug: column-boundary-only checkpointing means a ~day-long pole column
+  saves nothing mid-flight; H19 lost ~6 h to exactly this on 2026-06-26.) The sort engine's spilled
+  sorted runs ARE a continuous mid-column checkpoint, for free.
+- **Work unit = map a source-frontier slice → a sorted run.** Splitting a unit = partitioning a sorted
+  key-range (trivial; a hash table can't). Runs are simultaneously checkpoint + resume-state +
+  unit-output. "Self-checkpointing process" and "server hands out units" are the SAME machinery at 1
+  vs many workers → single-box work-stealing pool now, multi-box later, no rewrite, no network in v1.
+- **Splitting is for parallelism, NOT survival** (spill+checkpoint give safety without it). Do it
+  *dynamically* (steal a hot unit's remaining range) to dodge prediction entirely.
+- **Barrier-straggler hole + closure:** the column merge is a hard barrier; a straggler map-unit idles
+  the rest, sneaking unpredictability back as utilization. Closed by (a) mid-flight stealable tails on
+  the map (wall → total/N regardless of split), (b) output-range partitioned-merge (sample for even
+  cut points), (c) optional v2 pipelining of merge(c)→map(c+1). Residual unpredictability is
+  advisory-only (scheduling), not load-bearing.
+
+### OPEN investigation idea — per-state map-cost distribution (saved 2026-06-26, run later)
+**The one load-bearing assumption** under the entire straggler-closure: *no single source state is a
+monster.* Work-stealing subdivides only down to one state, so the grain floor = the most expensive
+single state's map cost. Bounded/low-variance → stealing balances everything. **Heavy-tailed → a few
+states become irreducible mini-stragglers and the barrier unpredictability creeps back.**
+- **Smoke test (cheap, falsifiable):** instrument the current engine to histogram per-source-state
+  fan-out (viable-mask / successor count, or map µs) over a real heavy column. Tight → closure holds;
+  heavy tail → need a deeper mitigation (split a hot state's *mask enumeration*, not just the source
+  range).
+- **Why saved not run:** load-bearing for the work-stealing scheduler design but not urgent — parked
+  to keep the big-picture conversation moving. Run before committing to that scheduler.
