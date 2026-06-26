@@ -196,6 +196,36 @@ states become irreducible mini-stragglers and the barrier unpredictability creep
      runtimes + a far-below-38× cap. TODO if more assurance wanted: pull the per-thread imbalance signature
      from the existing perf data (heavy tail = monster; flat-but-capped = confirms-not-monster) — no new compute.
 
+## Worker threading model (decided 2026-06-26): SINGLE-THREADED workers, parallelism cross-process
+Each C++ worker maps ONE shard single-threaded (`read shard → map → write run → exit`); ALL parallelism
+is the Go orchestrator spawning many workers + stealing tails. No threads/locks/shared-state in the core.
+- **Empirical clincher:** dalby scales **100% linear to 76 *independent* sweeps** but a single MT sweep
+  caps at **~38×** (the cap is the shared-state contention — lock-free merge, shared nextDB, memory — that
+  separate processes don't have). Cross-process is *faster*, not just simpler.
+- Keeps the core at its ~600-line target (no hot-path threading), makes the process the fault/checkpoint
+  boundary, keeps GC in Go off the hot path. Spawn cost is <0.1% at 10k–100k-state shards (seconds of work),
+  and production columns (10⁸ states) give thousands of shards ≫ 76 cores. Same for merge workers
+  (single-threaded, each owns an output key-range).
+
+## Migration / build sequence (decided 2026-06-26): bottom-up, gated, OLD ENGINE AS ORACLE
+Rule: the current engine runs a(21)/a(22) **uninterrupted**; the new one is built in parallel and the old
+engine is its test oracle through a(22). No big-bang cutover. Each phase gated byte-identical before the next:
+0. **`libenum` core** — extract the validated transition + signature canon from today's `cpp/tma/`, write the
+   NEW part (sort/merge over runs) behind the library API. Gate: link-test reproduces a(n) small-n,
+   byte-identical to today. *(Riskiest piece first.)*
+1. **Single-process end-to-end** — worker + trivial driver, spill to disk, no orchestrator. Gate: a(18–20)
+   byte-identical. *(Proves the sort/spill engine.)*
+2. **Go orchestrator** — cross-process workers, work-stealing, budget governor, wall-clock checkpoint/resume.
+   Gate: same a(n) parallel AND resumable (kill+resume byte-identical).
+3. **a(22) cross-check** — new engine's a(22) must equal the old engine's. *The trust milestone* — new==old on
+   the last term the old engine can reach.
+4. **a(23) on the new engine** — first term only the new engine fits; no old oracle, so it leans on the
+   validation stack (small-n regression + row-sum + mod-p shadow + publish-and-verify). a(23) is the testbed
+   *because it still fits a box* — failures cheap and re-runnable.
+5. **a(24)+** — add distribution/cloud as components only when the cliff demands (scale-by-replacement).
+The de-risking core is #3: don't *trust* the new engine for a(23) on faith — prove it equals the old on a(22)
+first. The old engine earns retirement by being out-reproduced, not merely replaced.
+
 ## Architecture — component map (B-as-a-library, external merge-sort core)
 Settled direction, 2026-06-26 design conversation. **Granularity: shard, not height** — height is
 maxed (it's already the current engine's coarse atom, can't be split across boxes). The system is
