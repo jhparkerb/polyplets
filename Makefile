@@ -19,7 +19,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 .PHONY: gates gate-g1 gate-g2 gate-euler clean
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-g3 gate-tma gate-s2 gate-e0 gate-sym gate-euler gate-driver
+gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-euler gate-driver
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
@@ -69,9 +69,8 @@ build/tma: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_main.cpp -o $@
 
 # Holes + mod-p engine: SAME source as build/tma (the --holes / --modp paths live
-# in tma_main.cpp). Kept as a separate named binary because the hole drivers
-# (gf/hole_recover.py, gf/hole_modp_recover.py) and the exact hole-count runs
-# invoke build/tma_holes by name.
+# in tma_main.cpp). Kept as a separate named binary because the exact hole-count
+# runs invoke build/tma_holes by name.
 build/tma_holes: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_main.cpp -o $@
 
@@ -104,13 +103,6 @@ build/subgraph_count: cpp/sym/subgraph_count.cpp | build
 # Gate S2: free/one-sided Burnside counts vs A000105/A030222 (oracle-grade)
 gate-s2:
 	python3 tests/gate_s2.py
-
-# Gate G3: Go harness -- format, vet, tests (uses build/g2 where present)
-gate-g3: build/g2
-	cd harness && test -z "$$(gofmt -l .)" && go vet ./... && go test ./...
-
-harness/harness: harness/*.go
-	cd harness && go build -o harness .
 
 clean:
 	rm -rf build
