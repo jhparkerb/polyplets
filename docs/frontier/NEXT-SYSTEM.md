@@ -209,3 +209,17 @@ consistency + spot-checks + others' recompute, not a cheap full proof. Honest fr
 the record term has NO independent computation yet (nobody else can run it either) — it rests on
 method-proof + internal consistency + the publishable dataset, the accepted status of any record's
 leading edge.
+
+## On-disk format readability (decided 2026-06-26)
+Principle: **a format's text budget scales with how often a human/verifier reads it vs how often the
+machine streams it.**
+- **Human-readable text:** results (triangle T(n,H), b-file), all metadata (checkpoint *headers*,
+  provenance manifest, config), verification artifacts (mod-p residues). Small or rarely-streamed →
+  text is ~free and buys grep/diff/eyeball/publish, and directly serves the publish-and-verify
+  validation strategy (a skeptic needs no special tooling). A readable checkpoint header alone would
+  have made this session's H19 rev/staleness debugging a one-line `cat`.
+- **Documented simple binary + a `dump`/`--text` render tool:** the hot bulk — spilled sorted runs and
+  checkpoint *bodies* (the frontier states). Text there costs ~2–4× the bytes AND throttles the GB/s
+  sequential spill (text encode/decode ≫ memcpy; the sort key is a binary memcmp). Keep packed; a
+  `runcat`-style tool renders any run on demand (the git-object / `git cat-file` model) → inspectable
+  and parseable-by-anyone via `formats.md`, so nothing is ever opaque, but the machine streams it fast.
