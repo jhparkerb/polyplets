@@ -1,0 +1,20 @@
+=== COST H-LADDER  square8 ===
+cost metric = masks EXAMINED (stepColumnSquare8 calls); fan-out = successors PASSED (Alive+budget)
+
+---- H=8  maxn=13  (2^H ceiling = 256) ----
+  live cols 0..13; pruning-active band [5,13]; sampling cols: 5(1600) 6(1572) 7(1233) 8(652)
+  col  states    exam/state  pass/state ex/pass   max/med   monstr1k  top1%     top.1%    mx/ceil  cvKey1k  cvRnd1k  cvKey10k us/st   
+  5    1600      115.27      54.61      2.11      2.0       0.0021    0.0210    0.0027    0.96484  0.4167   0.2439   0.0000   12.872  
+  6    1572      75.49       23.78      3.17      3.7       0.0032    0.0308    0.0040    0.93359  0.5004   0.2547   0.0000   8.127   
+  7    1233      42.35       10.86      3.90      10.2      0.0051    0.0525    0.0082    0.83984  0.8019   0.5903   0.0000   4.382   
+  8    652       25.67       6.56       3.92      23.4      0.0112    0.0746    0.0112    0.73047  0.0000   0.0000   0.0000   2.513   
+
+---- H=11  maxn=16  (2^H ceiling = 2048) ----
+  live cols 0..16; pruning-active band [7,16]; sampling cols: 7(21748) 8(11417) 9(5039) 10(2133)
+  col  states    exam/state  pass/state ex/pass   max/med   monstr1k  top1%     top.1%    mx/ceil  cvKey1k  cvRnd1k  cvKey10k us/st   
+  7    21748     218.80      22.51      9.72      29.0      0.0088    0.0719    0.0085    0.93604  0.6508   0.0655   0.7477   29.830  
+  8    11417     135.37      13.70      9.88      67.4      0.0129    0.1040    0.0135    0.85547  0.8521   0.1658   0.8810   18.117  
+  9    5039      94.20       9.78       9.63      104.1     0.0166    0.1284    0.0197    0.76221  0.9645   0.4200   0.0000   12.384  
+  10   2133      65.59       7.17       9.15      154.9     0.0189    0.1567    0.0266    0.60498  0.8479   0.5605   0.0000   8.416   
+
+---- H=14  maxn=18  (2^H ceiling = 16384) ----

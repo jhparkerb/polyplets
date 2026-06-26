@@ -169,6 +169,17 @@ states become irreducible mini-stragglers and the barrier unpredictability creep
   DYNAMIC (atomic-cursor work-stealing, not static striding — static would tail-stall on late columns);
   scale shard size to the column's state count.** This *validates* the work-stealing choice rather than
   merely permitting it — a static partition would have stalled on the late columns.
+- **H-LADDER follow-up 2026-06-26 (`experiments/cost_ladder.cpp`, masks-EXAMINED cost, fixed maxn=16):
+  GO confirmed at scale, with one correction.** The shard-relevant ratio max/MEAN climbs **18.9 → 24.6
+  → 31.5 at H=11/12/13** — a stable **~×1.28/H** (not accelerating). Extrapolated to production: max/mean
+  ~227 at H=21, ~470 at H=24. But a production pole column is 1.7×10⁸–4×10⁸ states → shards of 17k–170k
+  states → the monster (one indivisible state) is only **0.1–1.3% of a shard.** The FALLBACK triggers
+  when max/mean approaches shard-state-count (10⁴–10⁵); we're at 200–500, a **20–500× margin** robust to
+  extrapolation error. **No mask-splitting.** CORRECTION to the line above: shards should be **~10k–100k
+  states, NOT ~1k** — `monster_fraction ∝ 1/S`, so fine shards *inflate* the monster; you want them big
+  enough to dilute it (free at 10⁸-state columns). Still DYNAMIC (cvKey~0.9 static is badly balanced;
+  dalby sustains ~38× on the real pole, proving dynamic dispatch absorbs it). The max/MEDIAN blow-up
+  (≈400) is the median collapsing — *divisible* spread, work-stealing's job — not the indivisible monster.
 
 ## Architecture — component map (B-as-a-library, external merge-sort core)
 Settled direction, 2026-06-26 design conversation. **Granularity: shard, not height** — height is
