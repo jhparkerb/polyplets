@@ -156,3 +156,56 @@ states become irreducible mini-stragglers and the barrier unpredictability creep
   range).
 - **Why saved not run:** load-bearing for the work-stealing scheduler design but not urgent — parked
   to keep the big-picture conversation moving. Run before committing to that scheduler.
+
+## Architecture — component map (B-as-a-library, external merge-sort core)
+Settled direction, 2026-06-26 design conversation. **Granularity: shard, not height** — height is
+maxed (it's already the current engine's coarse atom, can't be split across boxes). The system is
+the **map-reduce SHAPE done as a parallel external merge-sort — NOT a map-reduce framework.**
+- *Why no framework:* (1) our map is a ~µs C++ kernel over a packed state, so framework per-record
+  bookkeeping dwarfs it (tiny-task overhead); (2) a column sweep is N *iterative* MR jobs (col c→c+1)
+  and frameworks are iteration-unaware. Go MapReduce libs are educational; Dataflow/Spark are
+  wrong-granularity + cloud cost. Right prior art = **external sorting** (run-gen → spill → k-way
+  merge), thin and ownable.
+
+Components & contracts:
+- **`libenum` (C++ library, ~400 ln — the single-source-of-truth core):** `map_shard(in_run,cfg)→out_run`,
+  `merge(runs,key_ranges)→runs`; classifier (triangle = count by (n,H)) and counter (u64/u128) are
+  **templates**; column decomposition is static (diagonal falsified). NO main, NO I/O policy, NO
+  scheduling. **Its public API IS the fitness-function seam.**
+- **C++ worker-main (~50 ln):** links libenum; reads a run-path + cfg, calls map/merge, writes a run +
+  exit-accounting. The process wrapper.
+- **Go orchestrator:** scheduler + work-stealing queue · budget governor (graceful stop) · store
+  interface (local NVMe v1 → distributed → cloud) · checkpoint cadence/bookkeeping · telemetry
+  aggregation · run manifest. Spawns workers; owns ALL liveness/safety. Replaces today's bash drivers.
+- **Go verifier (separate tool):** reads published runs/subtotals/mod-p residues, checks consistency,
+  spot-checks by re-running sampled shards.
+
+**Cardinal rule (carve in stone): the orchestrator touches RUNS (files), never individual states.**
+The C++ worker is the only thing that ever sees a state, and it sees millions per call in a tight
+loop. That one boundary keeps framework overhead ~0%, IS the `libenum` API seam, AND is the
+fault/checkpoint boundary (worker = dumb fast process that maps a shard and dies; Go owns restart).
+Spilled sorted runs are simultaneously output + checkpoint + resume-state + work-unit.
+
+*Off the table:* MapReduce/Dataflow/Spark frameworks (granularity + iteration mismatch). Durable-task
+orchestration (Temporal/Cadence) is the right CATEGORY only if managed durability is ever wanted —
+later/multi-box, needs server+DB; v1 hand-rolls the thin conductor.
+
+## Validation strategy (pinned 2026-06-26)
+"Proof" is a category error: prove the **algorithm** (transfer-matrix bijection — provable, expected
+in the writeup); validate the **execution** EMPIRICALLY (a proven algorithm + buggy code = a wrong
+"proven" number). Literature standard (Jensen/Guttmann, polyominoes→n=46) = method-proof + layered
+empirical confidence, reported as computed-with-checks, not a theorem; OEIS hosts computed-not-proved
+terms. Choose layers by **failure mode**:
+- gross bug → small-n byte-identical regression + triangle row-sum + growth-ratio smoothness (free).
+- arithmetic/transient → multi-prime mod-p + CRT consistency (cheap; modp engine exists). *(run-twice-
+  same-code is subsumed by this — skip it.)*
+- algorithm-logic → the correctness proof (necessary, insufficient alone).
+- impl-logic → a cleanly-independent second implementation, OR the published-dataset-anyone-can-check
+  — the ONLY things that catch an impl bug.
+**Decided emphasis: publish dataset + manifest + checkpoints + an independent verifier** (modern gold
+standard, Pythagorean/Keller-style "check it yourself"), reinforced by the cheap consistency layers.
+Caveat: counting has no succinct certificate (verify ≈ recompute), so the published verifier enables
+consistency + spot-checks + others' recompute, not a cheap full proof. Honest frontier-term status:
+the record term has NO independent computation yet (nobody else can run it either) — it rests on
+method-proof + internal consistency + the publishable dataset, the accepted status of any record's
+leading edge.
