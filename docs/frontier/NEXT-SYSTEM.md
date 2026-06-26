@@ -113,6 +113,13 @@ evolutionary-architecture fitness functions, AiiDA-style provenance.
   peak-RSS MAX — so the final `event=done` reports the true total across the crash. Accounting
   granularity then equals work granularity (a crash loses exactly the accounting for the work it
   also lost). Costs a 3-field checkpoint-format bump.
+- **Language (working decision, 2026-06-26): C++ core + Go for everything operational** —
+  orchestration, scheduler/governor, telemetry, validation/verifier harness, cross-machine. Go
+  replaces BOTH Python and bash → two compiled languages, no interpreted glue. Process boundary
+  between them (no cgo/FFI), GC confined to the non-hot Go layer. Go `math/big` covers CRT/bignum
+  natively. A real CAS (PARI/Sage/FLINT) only as an isolated standalone tool if symbolic GF work is
+  ever revived — never Python-as-default. Migration incremental, next-system only (don't touch the
+  running a(21) machinery). Rust ruled out: unknown to us, core is small + works, rewrite buys nothing.
 - **NOT doing:** whole-hog provenance manifests (AiiDA-style DB). The above is the deliberate 80/20:
   "account for every binary we ran and what it cost" without standing up a provenance system.
 
