@@ -35,6 +35,8 @@
 #include <cstring>
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
+#include <functional>
 using namespace std;
 
 static int N;          // size budget
