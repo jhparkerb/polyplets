@@ -56,15 +56,17 @@ configuration, per the component design — NEXT-SYSTEM.md "Architecture"):
 
 - **FR-O1 — By-height triangle T(n,H)** *(spine, primary).* `a(n) = Σ_H T(n,H)`. The irreducible-minimum
   output; everything else is layered on it.
-- **FR-O2 — Hole-count distribution.** Per-(n, hole-count) breakdown, reusing the existing Euler/hole
-  accounting (`cpp/tma/euler.h`). In scope for v1.
-- **FR-O3 — Generating-function recovery (fixed-height, mod-p).** The mod-p column engine path
-  recovering fixed-height GFs. In scope for v1.
+- **FR-O2 — Hole-count distribution** *(required).* Per-(n, hole-count) breakdown, reusing the existing
+  Euler/hole accounting (`cpp/tma/euler.h`). Important to jasonp — a v1 ship requirement for the terms in
+  range (blocks AC-6), not merely best-effort.
+- **FR-O3 — Generating-function recovery (fixed-height, mod-p)** *(best-effort).* The mod-p column engine
+  path recovering fixed-height GFs. Very desirable but **non-blocking**: build the seam and produce GFs
+  where they fit; a(23) + triangle + holes + verifier may ship without it.
 
 > Note (carried to DESIGN): O2 and O3 are additional classifier/counter configurations over the one core
-> transition, gated the same way as O1 — not separate engines. They must not compromise the O1 spine; if
-> either ever costs the core flexibility, the design record's standing rule is to drop it (NEXT-SYSTEM.md
-> "Design philosophy"). v1 carries all three; the kill-switch is the contingency, not the plan.
+> transition, gated the same way as O1 — not separate engines. Priority order if either costs the core
+> flexibility (design-record standing rule, NEXT-SYSTEM.md "Design philosophy"): drop **O3 (GF) first**,
+> keep O2 (holes); the O1 triangle spine is never dropped. The kill-switch is the contingency, not the plan.
 
 ## 4. Users & operating context
 
@@ -75,6 +77,10 @@ configuration, per the component design — NEXT-SYSTEM.md "Architecture"):
   Hard constraint: v1 work must not disturb the running frontier jobs.
 - **Operation is interactive + long-running:** an operator launches a run, monitors telemetry, and may
   kill/resume across days. No unattended cloud autoscaling in v1.
+- **a(23) target box = dalby** (big-RAM reach box), sized from the ~110 B/state floor (C-3). **A rented
+  large cloud VM is an acceptable fallback** *iff* pre-launch sizing makes the fit certain — the engine
+  must therefore stay box-agnostic (no dalby-specific assumptions baked into the core); box choice is a
+  launch-time decision, not a design-time one.
 - **Verifier audience:** a future skeptic (OEIS reviewer, another researcher) who has the published
   dataset and `formats.md` but not our hardware or code.
 
@@ -119,9 +125,11 @@ configuration, per the component design — NEXT-SYSTEM.md "Architecture"):
   decompositions exist) cross-decomposition agreement. A failing invariant fails the build.
 - NFR-2 **Work-safety:** no mispredicted size/time ever causes a crash or work loss beyond one
   checkpoint interval. Predictions revise plans, never correctness.
-- NFR-3 **Performance envelope:** a(23) must *fit and finish* on a single available box within an
-  operator-tolerable wall (days, not weeks) using NVMe spill; the system need not beat the compute
-  ceiling (a(25)/a(26)) — only fit the v1 target term efficiently.
+- NFR-3 **Performance envelope:** a(23) should *fit and finish* on a single box within an
+  operator-tolerable wall — **target days, not weeks** (achievability is open: a(21) already takes days,
+  and a(23) is ~2 growth-terms larger). This is an aspiration that shapes how hard the design leans on
+  cross-process scaling, **not** a correctness requirement — a slow-but-correct a(23) still ships. The
+  system need not beat the compute ceiling (a(25)/a(26)) — only fit the v1 target term.
 - NFR-4 **Evolvability:** counter, store, and classifier seams are clean interfaces; swapping one is a
   drop-in that does not touch the tested transition/signature core (G7).
 - NFR-5 **Small tested core:** the single-source-of-truth C++ core (`libenum`) stays near its ~400–600
@@ -164,8 +172,8 @@ v1 is accepted when each milestone gate passes (these become the IMPLEMENTATION-
 - AC-4 **Record term (G3):** new engine computes a(23), resumably, on a single box.
 - AC-5 **Deliverable (G6):** a(23) ships with triangle + dataset + manifest + residues + independent
   verifier, all documented in `formats.md`; the verifier passes on the published artifacts.
-- AC-6 **Outputs (FR-O2/O3):** hole-count distribution and fixed-height GF recovery produced and
-  cross-checked for the terms in range.
+- AC-6 **Outputs (FR-O2):** hole-count distribution produced and cross-checked for the terms in range
+  (required). GF recovery (FR-O3) is best-effort — shipped if it fits, does not block v1.
 
 ## 9. Risks & pre-planned responses (advisory; expanded in the plan)
 
@@ -173,10 +181,10 @@ v1 is accepted when each milestone gate passes (these become the IMPLEMENTATION-
 |------|--------|----------------------|
 | Straggler/barrier imbalance sneaks unpredictability back as low utilization | per-worker runtime heavy tail; merge waits on one map | mid-flight stealable tails; output-range partitioned merge; (v2) merge(c)→map(c+1) pipelining |
 | Monster state defeats work-stealing (verdict says no) | a shard's max/mean approaches its state count | already bounded 20–500× below threshold; fallback = split a hot state's mask enumeration (designed, not built) |
-| a(23) doesn't fit the chosen box's RAM+NVMe | spill volume projection exceeds disk | size from the ~110 B/state floor before launch; pick the box by measured headroom; governor stops gracefully if wrong |
+| a(23) doesn't fit dalby's RAM+NVMe | spill volume projection exceeds disk | size from the ~110 B/state floor before launch; if dalby can't fit, rent a large cloud VM (acceptable fallback) once sizing makes the fit certain; governor stops gracefully if wrong mid-run |
 | Counter overflow near the u64 edge | target term > a(25) validity | FR-7 refuses/widens at start; u128 is the drop-in |
 | New engine disagrees with old at a(22) | AC-3 fails | do NOT proceed to a(23); bisect via byte-identical small-n gates + mod-p shadow until new==old |
-| GF/holes path compromises the core | core flexibility cost shows up | standing kill-switch: drop O2/O3 from v1 (design-record rule), keep the triangle spine |
+| GF/holes path compromises the core | core flexibility cost shows up | priority-ordered kill-switch: drop O3 (GF, best-effort) first; keep O2 (holes, required) and the O1 triangle spine |
 
 ## 10. Out of scope for v1 (deferred, not cut — the scale-by-replacement ladder)
 
