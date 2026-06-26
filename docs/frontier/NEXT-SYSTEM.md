@@ -74,14 +74,19 @@ base** — exactly what A's diagonal candidate claims. The sort/spill engine let
 but cannot push the ceiling.
 
 ## Updated dimension status
-- **A:** SURVIVOR (diagonal, base ~2.04) — pending engine-level confirmation. Incumbent column sweep
-  is the fallback. *This is the pivotal open question.*
+- **A:** RESOLVED 2026-06-26 — **diagonal FALSIFIED, column sweep stands.** A correct king diagonal TM
+  (Σ==a(n) through n=11, `experiments/diag_king_tm.cpp`) measures base **~4.52, not 2.04** — *worse*
+  than column's 2.42 (≈ its square). The 2.04 was a phantom: the probe omitted the king corner-link
+  that jumps TWO diagonals, so a correct TM must carry a 2-diagonal boundary → squared base. **No
+  base-reducer found; the ceiling (a(25)/a(26)) stands.** The column decomposition is the next
+  system's static core (no decomposition-pluggability earned — like the classifier, the one
+  alternative is dead/obsolete).
 - **B:** CONFIRMED — target ~110 B/state; ranged-row is the keystone constant-factor (~1.9×).
 - **J:** CONFIRMED — ceiling a(25)/a(26) on the column base; growth-base is the sole ceiling lever.
 - **C/E/F/H (Round 2):** now CONDITIONAL on A — the engine/parallelism/distribution/seams differ
   for a column vs a diagonal decomposition. Hold Round 2 until A confirms or falls.
 
-_Status: Round 1 closed; diagonal-confirmation running 2026-06-26. Round 2 gated on it._
+_Status: Round 1 closed; diagonal FALSIFIED 2026-06-26 (column stands, no base-reducer found). Round 2 (engine/parallelism/distribution/seams) UNGATED — proceeds on the column decomposition._
 
 ## Settled engineering conventions (jasonp, 2026-06-26)
 How the next system is built and kept from blurring into mud. Researched: spec-driven

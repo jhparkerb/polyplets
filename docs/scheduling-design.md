@@ -157,6 +157,15 @@ the backend — is the actual bet; per-state random ops over disk OR network are
       (Σ==a(n), real peak-state base) is under adversarial confirmation (`docs/frontier/NEXT-SYSTEM.md`).
       If confirmed it bends the growth exponent — the one lever that moves the feasibility ceiling.
       Do NOT cite this as a settled NO-GO.
+    - **RE-RETIRED 2026-06-26 — confirmation FALSIFIED the 2.04.** A *correct* anti-diagonal king TM
+      (gated Σ==a(n) through n=11, `experiments/diag_king_tm.cpp`) measures real peak-state base
+      **~4.52, not 2.04** — *worse* than column's 2.42 (≈ its square). Structural reason: the king
+      corner move (±1,±1) jumps TWO anti-diagonals, so a correct diagonal TM must carry a **2-diagonal
+      boundary (2W slots)** → the partition count squares → base ~2.4²≈4.5. The 2.04 probe
+      (`phase03`, `BACK_DIA={-1,0}`) omitted the D−2 corner link, modelling an INVALID king adjacency
+      that under-counts state. The width NO-GO stands, now reinforced by a correct state-count.
+      **SETTLED: the column sweep is optimal among these for king. Lesson: a partition-count proxy can
+      mislead — only a TM gated on Σ==a(n) settles a decomposition's base.**
     - The 4-direction *routing* idea (max4 = `max min(H,W,Dmain,Danti)`, grows ~n−2) is a DIFFERENT
       thing — it needs per-animal direction choice, not a single TM — and stays out of scope.
 - **Calibration:** ordinary polyominoes hit the RAM wall ~n=60 on 512 GB *with* Motzkin
