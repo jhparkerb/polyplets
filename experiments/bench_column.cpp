@@ -6,11 +6,19 @@
 // idea (03 sort, oq1 lock-free, 01 compression, 09 u128) collapses to "a Backend +
 // a row in one table" instead of a bespoke prototype.
 //
-// MVP SCOPE (this file): the `hash` baseline backend only -- the current FlatDB
-// store (cpp/tma/statedb.h). The other backends are declared in the Backend seam
-// and left as clearly-marked stubs (sort/concurrent/compressed/u128). The 03 sort
-// kill-test needs the in-RAM slowdown S = (sort states/sec)/(hash states/sec); we
-// print states/sec PROMINENTLY so that ratio is one division once `sort` lands.
+// SCOPE (this file): the `hash` baseline backend (the current FlatDB store,
+// cpp/tma/statedb.h) AND the `sort` backend (03's sort+merge reduce). The other
+// backends are declared in the Backend seam and left as clearly-marked stubs
+// (concurrent/compressed/u128). The 03 sort kill-test needs the in-RAM slowdown
+// S = (sort states/sec)/(hash states/sec); we print states/sec PROMINENTLY so
+// that ratio is one division. FINDING (n=14,15 on gympie): S~=1.0 -- the wall is
+// dominated by the SHARED map body (stepColumnSquare8/forEachViableMask closure
+// math, ~96-97% of the transition); sort's reduce (sort+merge) is only ~3% and
+// hash's find-or-insert is a comparably small slice, so swapping the store barely
+// moves the wall. The sort reduce IS heavier per-emitted-record at larger m (the
+// O(m log m) tax shows as ~66ns->73ns/emitted from n=14->15) but stays a small
+// fraction of total. Caveat: in-RAM only -- this is gate-1 compute tax, not the
+// external-memory verdict (the real engine spills sorted runs to NVMe).
 //
 // ----- ENGINE-COUPLING NOTE (what we did vs the ideal isolated transition) -----
 // The spec wants ONE column transition invoked in isolation. The production engine
@@ -114,6 +122,91 @@ struct HashBackend {
   template <class F> void for_each(F&& fn) const { db.for_each(std::forward<F>(fn)); }
   size_t size() const { return db.size(); }
   void clear() { db.clear(); }
+};
+
+// SortBackend: the 03 sort/merge store. The transition body is UNCHANGED -- it
+// still calls slot(out) per (source-state x viable-mask) and accumulates the
+// shifted source row into the returned pointer. The semantic difference is that
+// slot() here does NOT find-or-insert: it APPENDS a fresh (sig, count_vec) record
+// to a flat emission vector and returns that record's (zeroed) row. So after the
+// map every successor contribution is one row in `emit`, with duplicate out_sigs
+// scattered throughout (no consolidation during the map -- no random lookup, the
+// whole point of 03). consolidate() then does the reduce-by-key as a pure
+// sort+merge: sort `emit` by out_sig under the SAME total order the oracle uses
+// (memcmp over SIGMAX), then merge adjacent equal sigs by fixed-width vector-add
+// of their count rows. After consolidate(), for_each/size mirror the hash backend
+// exactly, so the oracle and the table apply byte-for-byte unchanged.
+struct SortBackend {
+  int maxn;
+  size_t stride;                 // maxn+1, to match FlatDB row width
+  std::vector<Sig> sigs;         // one entry per emitted contribution (pre-merge)
+  std::vector<u64> rows;         // flat count rows, `stride` apart, parallel to sigs
+  // post-consolidate view (filled by consolidate()):
+  std::vector<Sig> outSigs;
+  std::vector<u64> outRows;
+  size_t outCnt = 0;
+  bool consolidated = false;
+
+  explicit SortBackend(int maxn_) : maxn(maxn_), stride(maxn_ + 1) {}
+
+  void reserve(size_t n) {
+    // n is the number of SOURCE states; each fans out over several masks, so the
+    // emission count is a multiple of it. Reserve generously to skip reallocs
+    // (this is the in-RAM materialization the task wants quantified).
+    sigs.reserve(n * 8);
+    rows.reserve(n * 8 * stride);
+  }
+
+  // MAP-step slot(): append a fresh record, return its zeroed row. No lookup.
+  u64* slot(const Sig& k) {
+    sigs.push_back(k);
+    const size_t off = rows.size();
+    rows.resize(off + stride, 0);   // value-init zeros the new row
+    return &rows[off];
+  }
+
+  // REDUCE step: sort the emissions by out_sig (oracle's total order), then merge
+  // adjacent equal sigs by summing their count rows. Output is the sorted, merged
+  // (sig, row) column -- identical content to the hash backend's output column.
+  void consolidate() {
+    const size_t m = sigs.size();
+    // Argsort indices by sig (memcmp), so we move small indices, not whole rows.
+    std::vector<std::uint32_t> idx(m);
+    for (size_t i = 0; i < m; ++i) idx[i] = static_cast<std::uint32_t>(i);
+    std::sort(idx.begin(), idx.end(), [&](std::uint32_t a, std::uint32_t b) {
+      return std::memcmp(sigs[a].b, sigs[b].b, SIGMAX) < 0;
+    });
+    // Merge runs of equal sigs, vector-adding their rows.
+    outSigs.clear();
+    outRows.clear();
+    outSigs.reserve(m);
+    outRows.reserve(m * stride);
+    outCnt = 0;
+    size_t i = 0;
+    while (i < m) {
+      const Sig& key = sigs[idx[i]];
+      outSigs.push_back(key);
+      const size_t base = outRows.size();
+      outRows.resize(base + stride, 0);
+      u64* acc = &outRows[base];
+      size_t j = i;
+      while (j < m && std::memcmp(sigs[idx[j]].b, key.b, SIGMAX) == 0) {
+        const u64* r = &rows[static_cast<size_t>(idx[j]) * stride];
+        for (size_t n = 0; n < stride; ++n) acc[n] += r[n];
+        ++j;
+      }
+      ++outCnt;
+      i = j;
+    }
+  }
+
+  size_t size() const { return outCnt; }
+  size_t emitted() const { return sigs.size(); }
+
+  template <class F> void for_each(F&& fn) const {
+    for (size_t i = 0; i < outCnt; ++i)
+      fn(outSigs[i], &outRows[i * stride]);
+  }
 };
 
 // ---- STUB backends (declared in the seam, not yet implemented) ----------------
@@ -330,41 +423,64 @@ static int doBench(const char* inPath, const std::string& backend,
                "backend=%s\n",
                H, maxn, hdr.col, (unsigned long long)src.size(), backend.c_str());
 
-  // Dispatch. MVP: hash only; others are clean stubs.
-  if (backend == "sort")
-    stubBackend("sort", "03", "in-RAM sort-vs-hash slowdown S at n=14-16");
+  // Dispatch. hash + sort implemented; others are clean stubs.
   if (backend == "concurrent")
     stubBackend("concurrent", "oq1", "lock-free shared table scaling at full T");
   if (backend == "compressed")
     stubBackend("compressed", "01", "bytes/state cut under packing, byte-identical");
   if (backend == "u128")
     stubBackend("u128", "09", "u128-row store stays exact within traffic budget");
-  if (backend != "hash") {
+  if (backend != "hash" && backend != "sort") {
     std::fprintf(stderr, "unknown backend '%s'\n", backend.c_str());
     return 2;
   }
 
-  // --- hash backend: run ONE transition, timed. ---
-  HashBackend dst(maxn);
-  dst.reserve(src.size() * 3 + 16);  // pre-size to skip grows (FlatDB::reserve)
-  Counts harvest(maxn + 1, 0);
-  auto t0 = std::chrono::steady_clock::now();
-  transitionColumn(src, dst, H, maxn, fold, harvest);
-  auto t1 = std::chrono::steady_clock::now();
-  const double secs = std::chrono::duration<double>(t1 - t0).count();
-
+  // --- run ONE transition, timed; backend selects the store/reduce. ---
   Metrics m;
-  m.transitionSecs = secs;
-  m.outStates = dst.size();
-  m.statesPerSec = secs > 0 ? dst.size() / secs : 0;
+  std::vector<Entry> outv;
+  std::uint64_t emitted = 0;     // sort-only: pre-merge emission count
+  if (backend == "hash") {
+    HashBackend dst(maxn);
+    dst.reserve(src.size() * 3 + 16);  // pre-size to skip grows (FlatDB::reserve)
+    Counts harvest(maxn + 1, 0);
+    auto t0 = std::chrono::steady_clock::now();
+    transitionColumn(src, dst, H, maxn, fold, harvest);
+    auto t1 = std::chrono::steady_clock::now();
+    m.transitionSecs = std::chrono::duration<double>(t1 - t0).count();
+    m.outStates = dst.size();
+    m.bytesPerState = dst.size()
+        ? static_cast<double>(dst.db.cap) *
+              (sizeof(Sig) + dst.db.stride * sizeof(u64) + 1) / dst.size()
+        : 0;
+    outv = drainSorted(dst, maxn);
+  } else {  // sort
+    SortBackend dst(maxn);
+    dst.reserve(src.size());
+    Counts harvest(maxn + 1, 0);
+    // Time map (emit) + reduce (sort+merge) together: that is the full column
+    // transition cost the S ratio compares against hash's find-or-insert.
+    auto t0 = std::chrono::steady_clock::now();
+    transitionColumn(src, dst, H, maxn, fold, harvest);  // map: emit, no lookup
+    auto tm = std::chrono::steady_clock::now();
+    dst.consolidate();                                   // reduce: sort+merge
+    auto t1 = std::chrono::steady_clock::now();
+    m.transitionSecs = std::chrono::duration<double>(t1 - t0).count();
+    std::fprintf(stderr, "sort split: map(emit)=%.4fs reduce(sort+merge)=%.4fs\n",
+                 std::chrono::duration<double>(tm - t0).count(),
+                 std::chrono::duration<double>(t1 - tm).count());
+    m.outStates = dst.size();
+    emitted = dst.emitted();
+    // bytes/state: the materialized pre-merge emission buffer is the in-RAM tax.
+    m.bytesPerState = dst.size()
+        ? static_cast<double>(dst.emitted()) *
+              (sizeof(Sig) + dst.stride * sizeof(u64)) / dst.size()
+        : 0;
+    outv = drainSorted(dst, maxn);
+  }
+  m.statesPerSec = m.transitionSecs > 0 ? m.outStates / m.transitionSecs : 0;
   m.peakRSS = peakRSSBytes();
-  m.bytesPerState = dst.size()
-      ? static_cast<double>(dst.db.cap) * (sizeof(Sig) + dst.db.stride * sizeof(u64) + 1) /
-            dst.size()
-      : 0;
 
   // --- oracle: serialize sorted-by-sig and hash; compare to the `hash` reference. ---
-  std::vector<Entry> outv = drainSorted(dst, maxn);
   const std::uint64_t outHash = hashSorted(outv, maxn);
   const std::string refPath = std::string(inPath) + ".hash";
   bool oraclePass = true;
@@ -389,13 +505,14 @@ static int doBench(const char* inPath, const std::string& backend,
   }
 
   // --- emit one kill-safe line (printed + appended+flushed to --out). ---
-  char line[512];
+  char line[640];
   std::snprintf(line, sizeof line,
                 "backend=%-10s H=%d maxn=%d col=%d src_states=%llu out_states=%llu "
-                "states_per_sec=%.3e transition_s=%.4f peak_rss_mb=%.1f "
+                "emitted=%llu states_per_sec=%.3e transition_s=%.4f peak_rss_mb=%.1f "
                 "bytes_per_state=%.1f oracle=%s out_hash=%llu\n",
                 backend.c_str(), H, maxn, hdr.col,
                 (unsigned long long)src.size(), (unsigned long long)m.outStates,
+                (unsigned long long)emitted,
                 m.statesPerSec, m.transitionSecs, m.peakRSS / 1048576.0,
                 m.bytesPerState, oraclePass ? "PASS" : "FAIL",
                 (unsigned long long)outHash);
