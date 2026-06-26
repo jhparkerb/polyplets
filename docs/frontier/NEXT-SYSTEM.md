@@ -223,3 +223,36 @@ machine streams it.**
   sequential spill (text encode/decode ≫ memcpy; the sort key is a binary memcmp). Keep packed; a
   `runcat`-style tool renders any run on demand (the git-object / `git cat-file` model) → inspectable
   and parseable-by-anyone via `formats.md`, so nothing is ever opaque, but the machine streams it fast.
+
+## Data formats (decided 2026-06-26)
+Guiding principle: **compute-bound ⇒ favor simple + correct over byte-squeezing.** Squeeze only behind
+the localized `libenum` serialize/deserialize, and only if a profile ever says bandwidth-bound (the
+ceiling analysis says it never will).
+
+**Sorted run (hot bulk) — fixed-width KEY + variable-width VALUE per record:**
+```
+[ sig: H+2 bytes (canonical RGS + 2 touch flags) | lo:u8 | len:u8 | counts[len]: len*W bytes LE ]
+   |---- KEY: memcmp-sortable, fixed per height-sweep ----|   |---- VALUE: ranged count-vec (W=8 u64 / 16 u128) ----|
+```
+- Key = the canonical signature; it IS the state (no separate key), doubles as the sort key; memcmp
+  gives order + equality; byte-array so endian-neutral. Merge of equal keys = union [lo,hi] + add.
+- Value = ranged (contiguous nonzero window ~0.56*n wide). At H=21: ~23+2+12*8 ~= 121 B/record, matching
+  the independently-derived ~110 B/state floor.
+- **Sig encoding: byte-per-cell (H+2) for v1; order-preserving bit-pack LATER** (fixed 4-bit fields,
+  MSB-first, still memcmp-sortable, no unpack to compare/merge) ~= H/2 B. The ~1.3-bit/cell info floor
+  (~H/6) needs rank-encoding (deeper squeeze, not planned). Packing is ~compute-free (merge never
+  unpacks; only a map worker unpacks source labels, a shift+mask dwarfed by the transition), so it's a
+  contained later swap deferred purely to keep v1 core code minimal. *(No sub-H cute encoding: king
+  boundary partitions CROSS, so Motzkin/balanced-parens is a square-4 win, not ours.)*
+
+**Run file: PPM-style text header + binary body** (one artifact, head-able): `POLYRUN 1` then
+`height/budget/counter/classifier/records/rev/byteorder` lines, blank line, binary records sorted
+ascending by sig, trailing 8-byte body CRC. Counter width self-described (u64 to a(25), u128 to a(48);
+never bignum, unreachable).
+
+**Checkpoint = text** (the bulk IS the runs already on disk): `POLYCKPT` header naming done runs, the
+in-flight worker shards + cursors, and the `acct` line (cpu_s SUM, wall_s SUM, rss_max MAX = the
+resume fold-in). A readable header alone would have made this session's H19 staleness debug a `cat`.
+
+**Text artifacts:** triangle (`# n H T(n,H)`, a(n)=sum_H), provenance manifest, mod-p residues
+(`n prime residue`) — greppable/diffable/publishable, feeding publish-and-verify validation.
