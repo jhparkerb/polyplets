@@ -36,12 +36,33 @@ H20+H19 share 80 cores, so observed walls run longer than uncontended). cpu-s + 
 ## Early reality-check (live, NOT yet validated — peak not reached)
 - **peak_states model looks good:** H19 col2 `src`=1.13×10⁷ ≈ predicted peak 1.16×10⁷.
   Caveat: unknown whether col2 is H19's peak column — watch later columns before crediting it.
-- **bytes/state → RAM model looks LOW:** live RSS is H20 ~50.8 GB @ col2/21 (~24%), H19
-  ~56 GB @ col2 (~43%) — already **~4–5× the predicted peak RAM**, and neither is at its peak
-  column yet. Strong early signal the ~1086 B/state figure under-models the batched t40
-  config (resident = src + dest-under-construction + 40 threads × B=4 merge buffers). The
-  sampler will pin the true peak bytes/state per height. **This gap is the oq3 finding** —
-  the model locates the pole (states) well but mis-sizes its RAM under production config.
+- **RAM ran ~4–5× my frozen per-height *prediction* — but the bytes/state CONSTANT is fine;
+  the prediction method was wrong (corrected below in Recalibration).** Live RSS H19 ~56 GB @
+  col2 vs my frozen 12.6 GB looks alarming, but 12.6 GB = peak_states(1.16×10⁷)×1086 B used a
+  *resident-multiple of 1* — whereas resident RAM holds **src + the growing dest** at the
+  transition. H19 col2: src=1.13×10⁷, dest-under-construction ≈ several×10⁷ → resident ≈
+  5×10⁷ states × 1086 B ≈ **55 GB**, which matches the observed 56 GB at ~1086 B/state. So the
+  per-state cost is ~right; my peak-RAM *derivation* under-counted by ignoring src+dest.
+
+## Cliff recalibration (provisional, 2026-06-26) — foundation HOLDS, earlier alarm RETRACTED
+**Correction:** the "~4–5× under-models RAM" I flagged earlier was a *prediction* error, not a
+cost-model flaw. Two fixes:
+1. **bytes/state is sound.** Independent anchor from the new harness (`bench_column`, n=14,
+   single-thread, unfolded): **781.6 B/state** — same order as the lean-engine ~580 B figure (a
+   bit higher at small n, less amortized). The batched-production ~1086 B (a(22) pole, measured
+   75 GB/6.9×10⁷) reconciles with the live a(21) RSS once resident states are counted right (above).
+2. **peak RAM = peak_RESIDENT_states × bytes/state**, where peak_resident ≈ peak_states × a
+   *resident-multiple* (~2–3 across the heaviest src+dest+batch transition), **not × 1**. My frozen
+   table applied ×1, hence the under-count. The forecast's cliff table did NOT — it was built from
+   *measured* pole RAM, so it already bakes the multiple in.
+**Therefore the cliff table stands:** lean ~580–780 B/state → a(23) pole 1.7×10⁸ ≈ 100 GB (fits
+dalby only with I7), a(24) pole 4.0×10⁸ ≈ 240 GB (fits no box) → **cliff stays at a(24)**;
+batched ~1100–1560 B/state → a(23) ≈ 220 GB → OOM without I7, exactly as scheduling-design says.
+PLAN.md staging is **unchanged** (no re-stage).
+**Firms at H20 peak:** when the pole hits its heaviest column, `max(rss_kb)` ÷ peak resident
+states (heartbeat `src` + measured dest) pins the resident-multiple and the true bytes/state
+under production config — the one number that would move the cliff if it surprises. **This is the
+live oq3 deliverable.**
 
 ## Offline analysis recipe (run after the fold)
 **oq3:** per height, `peak_RAM = max(rss_kb)` from telemetry.csv; `wall` = final `elapsed`

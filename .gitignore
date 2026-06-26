@@ -10,3 +10,8 @@ harness/harness
 # macOS filesystem cruft (esp. ._* AppleDouble files from Mac->Linux copies)
 .DS_Store
 ._*
+
+# generated bench_column fixtures/results (regenerable)
+experiments/*.bin
+experiments/*.bin.hash
+experiments/bench_column_results.txt
