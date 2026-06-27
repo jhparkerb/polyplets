@@ -140,6 +140,19 @@ func sweepHeight(
 	var acct Acct
 	lastCkpt := time.Now()
 
+	// forwardCheckpoint writes a checkpoint at a completed-column boundary and
+	// fires the afterColumn test seam.  Every forward (non-error) checkpoint
+	// goes through here, so the seam can never drift out of sync with a new
+	// call site; the cancel/error paths call writeCheckpoint directly and
+	// deliberately skip the notification (the test drives cancellation through
+	// afterColumn, so notifying there would recurse).
+	forwardCheckpoint := func(col int, frontier []string) {
+		writeCheckpoint(H, col, frontier, hTri)
+		if cfg.afterColumn != nil {
+			cfg.afterColumn(H, col)
+		}
+	}
+
 	for col := startCol; col <= cfg.Maxn; col++ {
 		if len(frontier) == 0 {
 			break
@@ -167,7 +180,7 @@ func sweepHeight(
 		// fails (or is cancelled), the checkpoint at col-1 has correct hTri.
 		// A failed merge causes us to checkpoint at col-1 with unchanged hTri;
 		// the resume will re-run this col from scratch.
-		mergeOuts, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts)
+		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts)
 		if err != nil {
 			// hTri does NOT include current col's contributions.
 			writeCheckpoint(H, col-1, frontier, hTri)
@@ -190,23 +203,15 @@ func sweepHeight(
 		oldMapOuts := mapOuts
 		frontier = mergeOuts
 
-		// Count total records in new frontier.
-		totalRecs := uint64(0)
-		for _, p := range frontier {
-			if recs, err := readRecordCount(p); err == nil {
-				totalRecs += recs
-			}
-		}
+		// totalRecs is the new frontier's record count, summed by the merge
+		// workers (no re-read of the files they just wrote).
 		fmt.Printf("H=%d col=%d frontier_records=%d acct=%s\n", H, col, totalRecs, acct)
 
 		if totalRecs == 0 {
 			// Height exhausted: write a "height-done" checkpoint with nil frontier
 			// BEFORE GC so the stale per-column checkpoint (which named oldFrontier
 			// files) is superseded before those files are deleted.
-			writeCheckpoint(H, col, nil, hTri)
-			if cfg.afterColumn != nil {
-				cfg.afterColumn(H, col)
-			}
+			forwardCheckpoint(col, nil)
 			for _, p := range oldFrontier {
 				os.Remove(p)
 			}
@@ -221,11 +226,8 @@ func sweepHeight(
 		// Include hTri so the current height's in-progress contributions are saved.
 		interval := cfg.CheckpointEvery
 		if interval == 0 || time.Since(lastCkpt) >= interval {
-			writeCheckpoint(H, col, frontier, hTri)
+			forwardCheckpoint(col, frontier)
 			lastCkpt = time.Now()
-			if cfg.afterColumn != nil {
-				cfg.afterColumn(H, col)
-			}
 		}
 
 		// GC only after checkpoint is written.
@@ -257,13 +259,8 @@ func mapPhase(
 	if err != nil {
 		return nil, nil, Acct{}, err
 	}
-	actualUnits := len(cuts) + 1
-	los := make([]string, actualUnits)
-	his := make([]string, actualUnits)
-	for i, c := range cuts {
-		his[i] = c
-		los[i+1] = c
-	}
+	los, his := cutsToBounds(cuts)
+	actualUnits := len(los)
 
 	type unitResult struct {
 		idx     int
@@ -326,10 +323,10 @@ func mergePhase(
 	cfg SweepConfig,
 	H, col int,
 	mapOuts []string,
-) ([]string, Acct, error) {
+) ([]string, uint64, Acct, error) {
 
 	if len(mapOuts) == 0 {
-		return nil, Acct{}, nil
+		return nil, 0, Acct{}, nil
 	}
 
 	numRanges := cfg.Cores
@@ -342,15 +339,10 @@ func mergePhase(
 
 	cuts, err := SampleKeysMulti(mapOuts, H, numRanges-1)
 	if err != nil {
-		return nil, Acct{}, err
+		return nil, 0, Acct{}, err
 	}
-	actualRanges := len(cuts) + 1
-	los := make([]string, actualRanges)
-	his := make([]string, actualRanges)
-	for i, c := range cuts {
-		his[i] = c
-		los[i+1] = c
-	}
+	los, his := cutsToBounds(cuts)
+	actualRanges := len(los)
 
 	type rangeResult struct {
 		idx     int
@@ -386,25 +378,31 @@ func mergePhase(
 	wg.Wait()
 
 	var outPaths []string
+	var totalRecs uint64
 	var acct Acct
 	for _, rr := range results {
 		if rr.err != nil {
-			return nil, Acct{}, fmt.Errorf("merge range %d: %w", rr.idx, rr.err)
+			return nil, 0, Acct{}, fmt.Errorf("merge range %d: %w", rr.idx, rr.err)
 		}
 		if rr.result.OutRecords > 0 {
 			outPaths = append(outPaths, rr.outPath)
+			totalRecs += rr.result.OutRecords
 		} else {
 			os.Remove(rr.outPath)
 		}
 		acct.Add(rr.result.Acct)
 	}
-	return outPaths, acct, nil
+	return outPaths, totalRecs, acct, nil
 }
 
-func readRecordCount(path string) (uint64, error) {
-	hdr, _, err := ParseHeader(path)
-	if err != nil {
-		return 0, err
+// cutsToBounds turns N-1 sorted cut keys into N (lo,hi) hex bounds: unit i
+// covers [los[i], his[i]), with open ends ("") at the extremes.
+func cutsToBounds(cuts []string) (los, his []string) {
+	los = make([]string, len(cuts)+1)
+	his = make([]string, len(cuts)+1)
+	for i, c := range cuts {
+		his[i] = c
+		los[i+1] = c
 	}
-	return hdr.Records, nil
+	return los, his
 }

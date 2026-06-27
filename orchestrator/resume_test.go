@@ -15,7 +15,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"testing"
 )
 
@@ -114,29 +113,9 @@ func checkTriangle(t *testing.T, ctx string, known, got []uint64) {
 func loadKnownTriangle(t *testing.T) []uint64 {
 	t.Helper()
 	path := filepath.Join("..", "fixtures", "b006770.txt")
-	data, err := os.ReadFile(path)
+	known, err := LoadKnown(path)
 	if err != nil {
 		t.Fatalf("read fixture %s: %v", path, err)
-	}
-	known := []uint64{0}
-	for _, line := range strings.Split(string(data), "\n") {
-		line = strings.TrimSpace(line)
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		f := strings.Fields(line)
-		if len(f) < 2 {
-			continue
-		}
-		n, e1 := strconv.Atoi(f[0])
-		v, e2 := strconv.ParseUint(f[1], 10, 64)
-		if e1 != nil || e2 != nil || n < 0 {
-			continue
-		}
-		for n >= len(known) {
-			known = append(known, 0)
-		}
-		known[n] = v
 	}
 	if len(known) <= resumeMaxn {
 		t.Fatalf("fixture has too few values: got %d, need > %d", len(known), resumeMaxn)

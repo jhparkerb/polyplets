@@ -18,13 +18,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"math"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"runtime"
-	"strconv"
-	"strings"
 	"syscall"
 	"time"
 
@@ -139,8 +136,8 @@ func main() {
 	}
 
 	// Compare against known a(n) from fixtures.
-	known := loadKnown("fixtures/b006770.txt")
-	if len(known) <= 1 {
+	known, err := orchestrator.LoadKnown("fixtures/b006770.txt")
+	if err != nil || len(known) <= 1 {
 		fmt.Fprintln(os.Stderr, "orchestrate: no known values from fixtures/b006770.txt (run from repo root)")
 		os.Exit(1)
 	}
@@ -168,34 +165,6 @@ func main() {
 	}
 }
 
-func loadKnown(path string) []uint64 {
-	known := []uint64{0}
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return known
-	}
-	for _, line := range strings.Split(string(data), "\n") {
-		line = strings.TrimSpace(line)
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		parts := strings.Fields(line)
-		if len(parts) < 2 {
-			continue
-		}
-		n, err1 := strconv.Atoi(parts[0])
-		v, err2 := strconv.ParseUint(parts[1], 10, 64)
-		if err1 != nil || err2 != nil || n < 0 {
-			continue
-		}
-		for n >= len(known) {
-			known = append(known, 0)
-		}
-		known[n] = v
-	}
-	return known
-}
-
 func gitRev() string {
 	// Best-effort: read from the binary embed if available, else "unknown".
 	// The Makefile injects GIT_REV into C++ binaries via -D; Go doesn't have
@@ -204,20 +173,14 @@ func gitRev() string {
 }
 
 func findWorkers() orchestrator.WorkerBin {
-	// Try build/ns/ relative to cwd.
-	candidates := []string{"build/ns", "../../build/ns"}
-	for _, dir := range candidates {
-		m := filepath.Join(dir, "map_worker")
-		if _, err := os.Stat(m); err == nil {
-			return orchestrator.WorkerBin{
-				MapWorker:   m,
-				MergeWorker: filepath.Join(dir, "merge_worker"),
-			}
+	// Try build/ns/ relative to cwd, then two levels up (when run from the
+	// package dir).  repoRoot "." and "../.." map to those two locations.
+	for _, repoRoot := range []string{".", "../.."} {
+		bin := orchestrator.DefaultWorkerBin(repoRoot)
+		if _, err := os.Stat(bin.MapWorker); err == nil {
+			return bin
 		}
 	}
 	// Fall back to PATH lookup.
 	return orchestrator.WorkerBin{MapWorker: "map_worker", MergeWorker: "merge_worker"}
 }
-
-// Ensure math is imported (used indirectly via formatting).
-var _ = math.Pi
