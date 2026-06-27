@@ -305,13 +305,9 @@ std::pair<size_t, size_t> map_shard_file(
   // Final spill or direct write.
   do_spill();  // flush remaining buf to a spill file
 
-  // Merge all spill files into out_path.
-  size_t out_bytes = mergeRunFiles<W>(spill_files, H, "", "", out_path, rev);
+  // Merge all spill files into out_path (record count threaded out of the merge).
+  auto [out_bytes, out_recs] = mergeRunFiles<W>(spill_files, H, "", "", out_path, rev);
   (void)out_bytes;
-
-  // Count output records.
-  RunFileReader<W> counter(out_path, H);
-  size_t out_recs = counter.records();
 
   // Delete temp spill files.
   for (const auto& sf : spill_files)

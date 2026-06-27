@@ -24,6 +24,7 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "core/run.h"
@@ -154,6 +155,7 @@ class RunFileWriter {
   }
 
   bool ok() const { return fp_ != nullptr; }
+  size_t records() const { return record_count_; }
 
  private:
   int H_;
@@ -291,12 +293,14 @@ class RunFileReader {
 //
 // K-way merge of sorted POLYRUN files into one output file.
 // Skips records with sig < lo_hex (if non-empty); stops at sig >= hi_hex.
-// Returns total body bytes written to out_path.
+// Returns {body bytes written, record count} for out_path (count threaded out
+// of the writer so callers never reopen the file just to count it).
 
 template <class W>
-size_t mergeRunFiles(const std::vector<std::string>& in_paths, int H,
-                     const std::string& lo_hex, const std::string& hi_hex,
-                     const std::string& out_path, const std::string& rev = "") {
+std::pair<size_t, size_t> mergeRunFiles(
+    const std::vector<std::string>& in_paths, int H,
+    const std::string& lo_hex, const std::string& hi_hex,
+    const std::string& out_path, const std::string& rev = "") {
   const int keyLen = H + 2;
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};
@@ -361,5 +365,6 @@ size_t mergeRunFiles(const std::vector<std::string>& in_paths, int H,
     writer.append(top.rec);
   }
 
-  return writer.finalize();
+  size_t body_bytes = writer.finalize();
+  return {body_bytes, writer.records()};
 }

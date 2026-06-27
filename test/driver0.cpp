@@ -47,13 +47,7 @@ static std::vector<uint64_t> sweepHeight(int H, int maxn, bool fold) {
   using W = u64;
 
   // Seed: one source state (empty boundary, counts[0]=1)
-  Run<W> frontier;
-  {
-    RunRecord<W> seed;
-    std::memset(seed.sig.b, 0, SIGMAX);
-    seed.H = H; seed.lo = 0; seed.len = 1; seed.counts = {W{1}};
-    frontier.push_back(seed);
-  }
+  Run<W> frontier{seedRecord<W>(H)};
 
   ShardCfg cfg{.H=H, .maxn=maxn, .fold=fold};
   TriangleRow<W> triangle(H, maxn);

@@ -9,70 +9,21 @@
 // spill, writes one sorted POLYRUN output run.  Emits accounting + triangle
 // contributions to stdout.
 
-#include <cassert>
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <ctime>
 #include <string>
 #include <vector>
 
-#ifdef __APPLE__
-#include <sys/resource.h>
-#else
-#include <sys/resource.h>
-#endif
-
 #include "core/libenum.h"
+#include "worker/worker_util.h"
 
 // ─── SIGTERM handling ─────────────────────────────────────────────────────────
 // map_shard_file checks this flag after each spill and may abort early in M2+.
 // For M1, we just let the current operation complete naturally.
 static volatile std::sig_atomic_t g_terminate = 0;
 static void on_sigterm(int) { g_terminate = 1; }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-static std::vector<std::string> splitComma(const std::string& s) {
-  std::vector<std::string> parts;
-  size_t start = 0;
-  while (true) {
-    size_t pos = s.find(',', start);
-    if (pos == std::string::npos) {
-      parts.push_back(s.substr(start));
-      break;
-    }
-    parts.push_back(s.substr(start, pos - start));
-    start = pos + 1;
-  }
-  return parts;
-}
-
-static double wallSeconds() {
-  struct timespec ts;
-  clock_gettime(CLOCK_MONOTONIC, &ts);
-  return static_cast<double>(ts.tv_sec) + static_cast<double>(ts.tv_nsec) * 1e-9;
-}
-
-static double cpuSeconds() {
-  struct rusage ru;
-  getrusage(RUSAGE_SELF, &ru);
-  return static_cast<double>(ru.ru_utime.tv_sec) +
-         static_cast<double>(ru.ru_utime.tv_usec) * 1e-6 +
-         static_cast<double>(ru.ru_stime.tv_sec) +
-         static_cast<double>(ru.ru_stime.tv_usec) * 1e-6;
-}
-
-static double peakRssMB() {
-  struct rusage ru;
-  getrusage(RUSAGE_SELF, &ru);
-#ifdef __APPLE__
-  return static_cast<double>(ru.ru_maxrss) / (1024.0 * 1024.0);
-#else
-  return static_cast<double>(ru.ru_maxrss) / 1024.0;
-#endif
-}
 
 int main(int argc, char** argv) {
   std::signal(SIGTERM, on_sigterm);

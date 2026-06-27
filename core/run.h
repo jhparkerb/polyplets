@@ -132,6 +132,16 @@ inline bool recordLess(const RunRecord<W>& a, const RunRecord<W>& b) {
   return std::memcmp(a.sig.b, b.sig.b, static_cast<size_t>(a.H + 2)) < 0;
 }
 
+// The seed state of a height-sweep: the empty boundary (all-zero sig) with one
+// partial animal of zero cells (counts[0]=1). Column 0 of every height H.
+template <class W>
+inline RunRecord<W> seedRecord(int H) {
+  RunRecord<W> seed;
+  std::memset(seed.sig.b, 0, SIGMAX);
+  seed.H = H; seed.lo = 0; seed.len = 1; seed.counts = {W{1}};
+  return seed;
+}
+
 // ─── In-memory run: a sorted vector of RunRecords ────────────────────────────
 
 template <class W>

@@ -11,55 +11,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <ctime>
 #include <string>
 #include <vector>
 
-#include <sys/resource.h>
-
 #include "core/libenum.h"
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-static std::vector<std::string> splitComma(const std::string& s) {
-  std::vector<std::string> parts;
-  size_t start = 0;
-  while (true) {
-    size_t pos = s.find(',', start);
-    if (pos == std::string::npos) {
-      parts.push_back(s.substr(start));
-      break;
-    }
-    parts.push_back(s.substr(start, pos - start));
-    start = pos + 1;
-  }
-  return parts;
-}
-
-static double wallSeconds() {
-  struct timespec ts;
-  clock_gettime(CLOCK_MONOTONIC, &ts);
-  return static_cast<double>(ts.tv_sec) + static_cast<double>(ts.tv_nsec) * 1e-9;
-}
-
-static double cpuSeconds() {
-  struct rusage ru;
-  getrusage(RUSAGE_SELF, &ru);
-  return static_cast<double>(ru.ru_utime.tv_sec) +
-         static_cast<double>(ru.ru_utime.tv_usec) * 1e-6 +
-         static_cast<double>(ru.ru_stime.tv_sec) +
-         static_cast<double>(ru.ru_stime.tv_usec) * 1e-6;
-}
-
-static double peakRssMB() {
-  struct rusage ru;
-  getrusage(RUSAGE_SELF, &ru);
-#ifdef __APPLE__
-  return static_cast<double>(ru.ru_maxrss) / (1024.0 * 1024.0);
-#else
-  return static_cast<double>(ru.ru_maxrss) / 1024.0;
-#endif
-}
+#include "worker/worker_util.h"
 
 int main(int argc, char** argv) {
   std::string in_str, out_path, klo_hex, khi_hex, rev;
@@ -91,11 +47,7 @@ int main(int argc, char** argv) {
   const double t0_wall = wallSeconds();
   const double t0_cpu  = cpuSeconds();
 
-  size_t body_bytes = mergeRunFiles<u64>(in_paths, H, klo_hex, khi_hex, out_path, rev);
-
-  // Count output records from the produced file.
-  RunFileReader<u64> counter(out_path, H);
-  size_t out_recs = counter.records();
+  auto [body_bytes, out_recs] = mergeRunFiles<u64>(in_paths, H, klo_hex, khi_hex, out_path, rev);
 
   const double cpu_s  = cpuSeconds()  - t0_cpu;
   const double wall_s = wallSeconds() - t0_wall;

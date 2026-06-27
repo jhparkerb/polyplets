@@ -16,23 +16,20 @@
 //   ./driver1 --maxn 18 --ram 67108864 --spill /some/nvme/dir --compare
 
 #include <algorithm>
-#include <cassert>
+#include <cerrno>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <numeric>
 #include <string>
 #include <vector>
 
-#ifdef __APPLE__
+#include <sys/stat.h>
 #include <unistd.h>
-#else
-#include <unistd.h>
-#endif
 
 #include "core/libenum.h"
+#include "worker/worker_util.h"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -52,21 +49,12 @@ static std::vector<uint64_t> loadKnown(const char* path) {
   return known;
 }
 
-static double wallSeconds() {
-  struct timespec ts;
-  clock_gettime(CLOCK_MONOTONIC, &ts);
-  return static_cast<double>(ts.tv_sec) + static_cast<double>(ts.tv_nsec) * 1e-9;
-}
-
 // Write the seed state (empty boundary, counts[0]=1) to a POLYRUN file.
 static std::string writeSeed(const std::string& dir, int H, int maxn,
                              const std::string& rev) {
   std::string path = dir + "/seed_h" + std::to_string(H) + ".bin";
   RunFileWriter<u64> w(path, H, maxn, "", "", rev);
-  RunRecord<u64> seed;
-  std::memset(seed.sig.b, 0, SIGMAX);
-  seed.H = H; seed.lo = 0; seed.len = 1; seed.counts = {u64{1}};
-  w.append(seed);
+  w.append(seedRecord<u64>(H));
   w.finalize();
   return path;
 }
@@ -101,13 +89,10 @@ int main(int argc, char** argv) {
     spill_dir = "/tmp/ns_driver1_" + std::to_string(static_cast<long>(getpid()));
   }
 
-  // Create spill dir if needed.
-  {
-    std::string cmd = "mkdir -p " + spill_dir;
-    if (std::system(cmd.c_str()) != 0) {
-      std::fprintf(stderr, "driver1: cannot create spill dir %s\n", spill_dir.c_str());
-      return 1;
-    }
+  // Create spill dir if needed (ignore EEXIST).
+  if (mkdir(spill_dir.c_str(), 0777) != 0 && errno != EEXIST) {
+    std::perror(("driver1: cannot create spill dir " + spill_dir).c_str());
+    return 1;
   }
 
   const char* rev = GIT_REV;
