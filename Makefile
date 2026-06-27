@@ -21,7 +21,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify \
         ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
-        build/ns/orchestrate build/ns/runcat build/ns/gate_holes build/ns/verify
+        build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/gate_holes build/ns/verify
 
 # All currently existing gates
 gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-euler gate-driver
@@ -165,6 +165,9 @@ build/ns/orchestrate: orchestrator/cmd/orchestrate/main.go orchestrator/*.go | b
 
 build/ns/runcat: orchestrator/cmd/runcat/main.go orchestrator/*.go | build/ns
 	go build -o $@ ./orchestrator/cmd/runcat/
+
+build/ns/predict: orchestrator/cmd/predict/main.go orchestrator/*.go | build/ns
+	go build -o $@ ./orchestrator/cmd/predict/
 
 # AC-2a: parallel (cores=4) == serial (cores=1) for n≤14
 ns-gate-parallel: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker

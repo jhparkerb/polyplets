@@ -147,6 +147,54 @@ func (t *telemetry) writeProfile() error {
 	return os.Rename(tmp, t.outPath)
 }
 
+// ProfileMeta holds the header fields of a cost profile.
+type ProfileMeta struct {
+	Maxn  int
+	Cores int
+}
+
+// ReadCostProfileFull reads a cost profile into its rows and header metadata.
+// Used by the a-priori predictor, which needs frontier/rss columns the live-ETA
+// LoadCostProfile path discards.
+func ReadCostProfileFull(path string) ([]ColumnCost, ProfileMeta, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, ProfileMeta{}, err
+	}
+	var rows []ColumnCost
+	var meta ProfileMeta
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimRight(line, "\r")
+		if strings.HasPrefix(line, "#") {
+			for _, f := range strings.Fields(line) {
+				if v, ok := strings.CutPrefix(f, "maxn="); ok {
+					meta.Maxn, _ = strconv.Atoi(v)
+				} else if v, ok := strings.CutPrefix(f, "cores="); ok {
+					meta.Cores, _ = strconv.Atoi(v)
+				}
+			}
+			continue
+		}
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+		f := strings.Fields(line)
+		if len(f) < 7 {
+			continue
+		}
+		var c ColumnCost
+		c.H, _ = strconv.Atoi(f[0])
+		c.Col, _ = strconv.Atoi(f[1])
+		c.FrontierIn, _ = strconv.ParseUint(f[2], 10, 64)
+		c.FrontierOut, _ = strconv.ParseUint(f[3], 10, 64)
+		c.WallS, _ = strconv.ParseFloat(f[4], 64)
+		c.CPUS, _ = strconv.ParseFloat(f[5], 64)
+		c.RSSMax, _ = strconv.ParseFloat(f[6], 64)
+		rows = append(rows, c)
+	}
+	return rows, meta, nil
+}
+
 // LoadCostProfile reads a cost profile and returns (H,col)->wall_s plus the total.
 func LoadCostProfile(path string) (map[[2]int]float64, float64, error) {
 	data, err := os.ReadFile(path)
