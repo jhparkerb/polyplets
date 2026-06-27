@@ -72,8 +72,8 @@ a small computational milestone. The fixed-polyomino sequence
 furthest~\cite{redelmeier,jensen2003,barequet}; the fixed-polyplet sequence
 A006770 had been recorded through $n=18$.
 
-This note reports and confirms the next term, $a(19)$, and then develops several
-further results about polyplets that the same machinery yields: the
+This note reports and confirms the next two terms, $a(19)$ and $a(20)$, and then
+develops several further results about polyplets that the same machinery yields: the
 hole-stratified counts (Section~\ref{sec:holes}), exact fixed-height generating
 functions (Section~\ref{sec:gf}), and a sampling/scaling portrait with rigorous
 bounds (Section~\ref{sec:sampling}). It is an amateur contribution carried out
@@ -81,7 +81,9 @@ with substantial AI assistance (Section~\ref{sec:ai}); its value lies not in
 algorithmic novelty but in independent, cross-checked computation. Since a single
 $15$-digit count from one program is properly a conjecture, $a(19)$ is computed
 twice, by two algorithms that share no counting logic, on different hardware and
-compilers, both reproducing the entire published range.
+compilers, both reproducing the entire published range; $a(20)$, beyond the
+explicit generator's reach, is the column transfer matrix's value, re-derived
+independently by a separate engine.
 
 \section{Definitions}
 \label{sec:object}
@@ -522,14 +524,15 @@ memory, bounds them above $H\approx8$.
 \label{sec:availability}
 
 The source (both engines, the hole and mod-$p$ generating-function machinery, the
-sampler, the symmetric enumerator, the test gates), b-files for $n=1,\dots,19$ of
-A006770 and A030222 (and extended terms for A030233/A030234/A030235), the
-per-height rows $\byH(19)$, the hole triangle and its columns, the recovered
-generating functions, the sample and its statistics, and a JSON provenance ledger
-are in the accompanying repository. The cross-checks are encoded as runnable gates
-and a self-contained checker re-verifies every numerical claim in this paper, so a
-reader can regenerate the b-files and reproduce the results with the included
-harness.
+sampler, the symmetric enumerator, the test gates), the b-files for A006770 and the
+companion sequences (A030222/A030233/A030234/A030235), the per-height rows
+$\byH(n)$, and a JSON provenance ledger are in the accompanying repository; the hole
+triangle and its columns, the recovered fixed-height generating functions, and the
+sample and its statistics are regenerated on demand by the included tools (and the
+exact rows used in this paper are committed alongside it). The cross-checks are
+encoded as runnable gates, and a self-contained checker (\texttt{verify\_claims.py})
+re-verifies the paper's numerical claims against the committed and regenerated data,
+so a reader can reproduce the b-files and results with the included harness.
 
 \section{Author's note: use of AI}
 \label{sec:ai}
