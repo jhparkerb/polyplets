@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -51,7 +52,9 @@ type MergeArgs struct {
 }
 
 // RunMapWorker spawns a map_worker, waits for it, and returns the parsed result.
-func RunMapWorker(ctx context.Context, bin WorkerBin, a MapArgs) (WorkerResult, error) {
+// onProgress (may be nil) is called with the worker's cumulative processed-record
+// count as event=progress lines stream in.
+func RunMapWorker(ctx context.Context, bin WorkerBin, a MapArgs, onProgress func(uint64)) (WorkerResult, error) {
 	fold := "0"
 	if a.Fold {
 		fold = "1"
@@ -77,7 +80,7 @@ func RunMapWorker(ctx context.Context, bin WorkerBin, a MapArgs) (WorkerResult, 
 	if a.Rev != "" {
 		args = append(args, "--rev", a.Rev)
 	}
-	return runWorker(ctx, bin.MapWorker, args)
+	return runWorker(ctx, bin.MapWorker, args, onProgress)
 }
 
 // RunMergeWorker spawns a merge_worker, waits for it, and returns the parsed result.
@@ -99,10 +102,10 @@ func RunMergeWorker(ctx context.Context, bin WorkerBin, a MergeArgs) (WorkerResu
 	if a.Rev != "" {
 		args = append(args, "--rev", a.Rev)
 	}
-	return runWorker(ctx, bin.MergeWorker, args)
+	return runWorker(ctx, bin.MergeWorker, args, nil)
 }
 
-func runWorker(ctx context.Context, binary string, args []string) (WorkerResult, error) {
+func runWorker(ctx context.Context, binary string, args []string, onProgress func(uint64)) (WorkerResult, error) {
 	cmd := exec.CommandContext(ctx, binary, args...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -114,10 +117,19 @@ func runWorker(ctx context.Context, binary string, args []string) (WorkerResult,
 		return WorkerResult{}, fmt.Errorf("spawn %s: %w", filepath.Base(binary), err)
 	}
 
+	// Stream stdout live: event=progress lines feed onProgress and are NOT
+	// retained; everything else (tri rows, event=done) is collected for parsing.
 	var lines []string
 	sc := bufio.NewScanner(stdout)
 	for sc.Scan() {
-		lines = append(lines, sc.Text())
+		line := sc.Text()
+		if onProgress != nil && strings.HasPrefix(line, "event=progress") {
+			if n, ok := parseProcessed(line); ok {
+				onProgress(n)
+			}
+			continue
+		}
+		lines = append(lines, line)
 	}
 
 	if err := cmd.Wait(); err != nil {
@@ -126,4 +138,16 @@ func runWorker(ctx context.Context, binary string, args []string) (WorkerResult,
 
 	result := ParseWorkerOutput(lines)
 	return result, nil
+}
+
+// parseProcessed extracts the cumulative processed count from an event=progress
+// line: "event=progress processed=<N> elapsed_s=<t>".
+func parseProcessed(line string) (uint64, bool) {
+	for _, f := range strings.Fields(line) {
+		if v, ok := strings.CutPrefix(f, "processed="); ok {
+			n, err := strconv.ParseUint(v, 10, 64)
+			return n, err == nil
+		}
+	}
+	return 0, false
 }

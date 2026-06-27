@@ -12,9 +12,11 @@ package orchestrator
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 )
 
@@ -37,6 +39,11 @@ type telemetry struct {
 	outPath  string
 	cols     []ColumnCost
 	clock    func() time.Time // injectable for tests; defaults to time.Now
+	hbEvery  time.Duration    // heartbeat cadence (POLY_HEARTBEAT_SECS, default 30s)
+
+	// processed is the live count of input records consumed across the running
+	// map units of the current column, fed by worker event=progress lines.
+	processed atomic.Uint64
 
 	// Reference profile for live ETA: (H,col) -> predicted wall seconds.
 	ref      map[[2]int]float64
@@ -52,12 +59,27 @@ func newTelemetry(cfg SweepConfig, t0 time.Time) (*telemetry, error) {
 	if out == "" {
 		out = cfg.RunDir + "/cost_profile.tsv"
 	}
+	// Heartbeat cadence defaults to sqrt(checkpoint interval) in seconds: the
+	// number of heartbeats between checkpoints is then ~sqrt(checkpoint_s) — a
+	// bounded count that stays sparse as the checkpoint interval grows (e.g. a
+	// 900s checkpoint → 30s heartbeat → ~30 heartbeats/checkpoint). Env override
+	// (POLY_HEARTBEAT_SECS) wins, mainly for tests.
+	hb := 30 * time.Second
+	if cfg.CheckpointEvery > 0 {
+		hb = time.Duration(math.Sqrt(cfg.CheckpointEvery.Seconds()) * float64(time.Second))
+	}
+	if s := os.Getenv("POLY_HEARTBEAT_SECS"); s != "" {
+		if v, err := strconv.ParseFloat(s, 64); err == nil && v > 0 {
+			hb = time.Duration(v * float64(time.Second))
+		}
+	}
 	t := &telemetry{
 		t0:      t0,
 		cores:   cfg.Cores,
 		maxn:    cfg.Maxn,
 		outPath: out,
 		clock:   time.Now,
+		hbEvery: hb,
 	}
 	if cfg.CostProfileRef != "" {
 		ref, total, err := LoadCostProfile(cfg.CostProfileRef)
@@ -99,6 +121,85 @@ func (t *telemetry) observe(c ColumnCost) {
 
 	if err := t.writeProfile(); err != nil {
 		fmt.Fprintf(os.Stderr, "telemetry: write profile: %v\n", err)
+	}
+}
+
+// addProcessed bumps the live input-record counter for the running column.
+// Fed by worker event=progress lines streamed from map units.
+func (t *telemetry) addProcessed(delta uint64) {
+	if t == nil {
+		return
+	}
+	t.processed.Add(delta)
+}
+
+// progressFunc returns a fresh per-unit callback that converts a map worker's
+// cumulative processed-record count into deltas on the shared column counter.
+// Returns nil for a nil telemetry (runWorker treats nil as "no streaming").
+func (t *telemetry) progressFunc() func(uint64) {
+	if t == nil {
+		return nil
+	}
+	var last uint64
+	return func(cumulative uint64) {
+		if cumulative >= last {
+			t.addProcessed(cumulative - last)
+			last = cumulative
+		}
+	}
+}
+
+// startColumn launches a background heartbeat for the column that is about to
+// run and returns a stop function (idempotent-safe: call exactly once).  The
+// heartbeat reports elapsed time, the aggregate records/s pulse from the
+// workers, and — if a reference profile predicts this column — a within-column
+// fraction (elapsed / predicted wall).  In fast runs (sub-cadence columns) it
+// never fires, so tests stay quiet.
+func (t *telemetry) startColumn(H, col int) func() {
+	if t == nil {
+		return func() {}
+	}
+	t.processed.Store(0)
+	start := t.clock()
+	predWall, hasRef := 0.0, false
+	if t.ref != nil {
+		if w, ok := t.ref[[2]int{H, col}]; ok && w > 0 {
+			predWall, hasRef = w, true
+		}
+	}
+	stop := make(chan struct{})
+	go func() {
+		tick := time.NewTicker(t.hbEvery)
+		defer tick.Stop()
+		for {
+			select {
+			case <-stop:
+				return
+			case <-tick.C:
+				el := t.clock().Sub(start).Seconds()
+				proc := t.processed.Load()
+				rate := 0.0
+				if el > 0 {
+					rate = float64(proc) / el
+				}
+				if hasRef {
+					frac := math.Min(el/predWall, 0.999)
+					fmt.Printf("event=heartbeat H=%d col=%d elapsed_s=%.0f processed=%d "+
+						"rate_per_s=%.0f pred_wall_s=%.0f frac=%.3f\n",
+						H, col, el, proc, rate, predWall, frac)
+				} else {
+					fmt.Printf("event=heartbeat H=%d col=%d elapsed_s=%.0f processed=%d "+
+						"rate_per_s=%.0f\n", H, col, el, proc, rate)
+				}
+			}
+		}
+	}()
+	var once bool
+	return func() {
+		if !once {
+			once = true
+			close(stop)
+		}
 	}
 }
 

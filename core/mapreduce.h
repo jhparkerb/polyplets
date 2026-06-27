@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
+#include <functional>
 #include <queue>
 #include <string>
 #include <unistd.h>
@@ -201,7 +202,8 @@ std::pair<size_t, size_t> map_shard_file(
     const std::string& lo_hex,
     const std::string& hi_hex,
     Output& out_classified,
-    const std::string& rev = "") {
+    const std::string& rev = "",
+    const std::function<void(size_t)>& on_progress = {}) {
 
   const int H      = cfg.H;
   const int maxn   = cfg.maxn;
@@ -267,7 +269,13 @@ std::pair<size_t, size_t> map_shard_file(
   };
 
   // Stream records from heap, apply map logic.
+  size_t processed = 0;
   while (!heap.empty()) {
+    // Periodic progress pulse (~every 2^18 source keys); the callback throttles
+    // by wall time and emits event=progress.  Cheap: a mask test per iteration.
+    if (on_progress && (++processed & ((1u << 18) - 1)) == 0)
+      on_progress(processed);
+
     FileCursor top = heap.top();
     heap.pop();
 

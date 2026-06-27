@@ -86,29 +86,41 @@ int main(int argc, char** argv) {
   const double t0_wall = wallSeconds();
   const double t0_cpu  = cpuSeconds();
 
+  // Throttled progress emitter: at most one event=progress line every ~2s.
+  // The orchestrator streams these to drive the within-column heartbeat.
+  double last_emit = t0_wall;
+  auto on_progress = [&](size_t n) {
+    const double now = wallSeconds();
+    if (now - last_emit >= 2.0) {
+      last_emit = now;
+      std::printf("event=progress processed=%zu elapsed_s=%.1f\n", n, now - t0_wall);
+      std::fflush(stdout);
+    }
+  };
+
   size_t spill_bytes, out_recs;
 
   if (holes) {
     if (counter_arg == "u128") {
       HolesRow<u128> hrow(H, maxn, maxholes);
       std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyHoles>(
-          in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev);
+          in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev, on_progress);
       printHolesRows(H, maxn, hrow.byNHoles);
     } else {
       HolesRow<u64> hrow(H, maxn, maxholes);
       std::tie(spill_bytes, out_recs) = map_shard_file<u64, ClassifyHoles>(
-          in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev);
+          in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev, on_progress);
       printHolesRows(H, maxn, hrow.byNHoles);
     }
   } else if (counter_arg == "u128") {
     TriangleRow<u128> triangle(H, maxn);
     std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyTriangle>(
-        in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev);
+        in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev, on_progress);
     printTriangleRows(H, maxn, triangle.row);
   } else {
     TriangleRow<u64> triangle(H, maxn);
     std::tie(spill_bytes, out_recs) = map_shard_file<u64, ClassifyTriangle>(
-        in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev);
+        in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev, on_progress);
     printTriangleRows(H, maxn, triangle.row);
   }
 

@@ -178,10 +178,12 @@ func sweepHeight(
 
 		frontierIn := sumFrontierRecords(frontier)
 		colStart := time.Now()
+		stopHB := tel.startColumn(H, col)
 
 		// MAP PHASE
-		mapOuts, triContribs, mapAcct, err := mapPhase(ctx, cfg, H, col, frontier)
+		mapOuts, triContribs, mapAcct, err := mapPhase(ctx, cfg, H, col, frontier, tel)
 		if err != nil {
+			stopHB()
 			// hTri does NOT yet include current col's contributions.
 			writeCheckpoint(H, col-1, frontier, hTri)
 			return hTri, acct, fmt.Errorf("H=%d col=%d map: %w", H, col, err)
@@ -194,6 +196,7 @@ func sweepHeight(
 		// A failed merge causes us to checkpoint at col-1 with unchanged hTri;
 		// the resume will re-run this col from scratch.
 		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts)
+		stopHB()
 		if err != nil {
 			// hTri does NOT include current col's contributions.
 			writeCheckpoint(H, col-1, frontier, hTri)
@@ -272,6 +275,7 @@ func mapPhase(
 	cfg SweepConfig,
 	H, col int,
 	frontier []string,
+	tel *telemetry,
 ) ([]string, []map[int]map[int]uint64, Acct, error) {
 
 	// Units are decoupled from concurrency: numUnits = Cores*UnitMult finer
@@ -322,7 +326,7 @@ func mapPhase(
 				HiHex:    his[idx],
 				Rev:      cfg.Rev,
 			}
-			r, err := RunMapWorker(ctx, cfg.Bin, a)
+			r, err := RunMapWorker(ctx, cfg.Bin, a, tel.progressFunc())
 			results[idx] = unitResult{idx: idx, outPath: outPath, result: r, err: err}
 		}(i)
 	}
