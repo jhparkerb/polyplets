@@ -16,7 +16,10 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdio>
 #include <queue>
+#include <string>
+#include <unistd.h>
 #include <vector>
 
 #include "core/signature.h"
@@ -29,6 +32,8 @@ struct ShardCfg {
   int H;       // height of this sweep
   int maxn;    // maximum cell count (budget)
   bool fold;   // apply R1 vertical-mirror fold
+  size_t ram_budget_bytes = 0;  // 0 = no spill (M0 in-RAM mode)
+  std::string spill_dir;
 };
 
 // ─── map_shard ────────────────────────────────────────────────────────────────
@@ -149,4 +154,168 @@ Run<W> mergeRuns(std::vector<Run<W>>& runs) {
     result.push_back(std::move(combined));
   }
   return result;
+}
+
+// ─── runfile.h is included below; mergeRunFiles forwarded for callers ─────────
+#include "core/runfile.h"
+
+// ─── map_shard_file ──────────────────────────────────────────────────────────
+//
+// File-backed version of map_shard: reads from POLYRUN files, spills to disk
+// when the in-memory buffer exceeds cfg.ram_budget_bytes, and produces one
+// sorted POLYRUN output file.  Returns {total_spill_bytes, output_record_count}.
+
+template <class W, class Classifier, class Output>
+std::pair<size_t, size_t> map_shard_file(
+    const std::vector<std::string>& in_paths,
+    const ShardCfg& cfg,
+    const std::string& out_path,
+    const std::string& lo_hex,
+    const std::string& hi_hex,
+    Output& out_classified,
+    const std::string& rev = "") {
+
+  const int H    = cfg.H;
+  const int maxn = cfg.maxn;
+
+  // Key-bound parsing.
+  const int keyLen = H + 2;
+  uint8_t lo_sig[SIGMAX] = {};
+  uint8_t hi_sig[SIGMAX] = {};
+  bool has_lo = !lo_hex.empty() && hexToBytes(lo_hex, lo_sig, keyLen);
+  bool has_hi = !hi_hex.empty() && hexToBytes(hi_hex, hi_sig, keyLen);
+
+  // Open all input files.
+  std::vector<std::unique_ptr<RunFileReader<W>>> readers;
+  readers.reserve(in_paths.size());
+  for (const auto& p : in_paths)
+    readers.push_back(std::make_unique<RunFileReader<W>>(p, H));
+
+  // K-way heap over RunFileReaders.
+  struct FileCursor {
+    RunRecord<W> rec;
+    int idx;
+    bool operator>(const FileCursor& o) const {
+      return std::memcmp(rec.sig.b, o.rec.sig.b,
+                         static_cast<size_t>(rec.H + 2)) > 0;
+    }
+  };
+  using MinHeap = std::priority_queue<FileCursor, std::vector<FileCursor>,
+                                      std::greater<FileCursor>>;
+  MinHeap heap;
+  for (int i = 0; i < static_cast<int>(readers.size()); ++i) {
+    FileCursor c;
+    c.idx = i;
+    if (readers[i]->next(c.rec))
+      heap.push(std::move(c));
+  }
+
+  // In-memory accumulation buffer + spill tracking.
+  Run<W> buf;
+  size_t buf_bytes = 0;
+  std::vector<std::string> spill_files;
+  size_t total_spill_bytes = 0;
+  int spill_seq = 0;
+
+  // Conservative record size estimate for budget tracking.
+  const size_t record_est = static_cast<size_t>(H + 4) +
+                            static_cast<size_t>(maxn) * sizeof(W);
+
+  auto do_spill = [&]() {
+    if (buf.empty()) return;
+    sortRun(buf);
+    deduplicateRun(buf);
+    std::string spill_path = cfg.spill_dir + "/spill_" +
+                             std::to_string(static_cast<long>(getpid())) +
+                             "_" + std::to_string(spill_seq++) + ".bin";
+    RunFileWriter<W> sw(spill_path, H, maxn, "", "", rev);
+    for (const auto& r : buf) sw.append(r);
+    size_t sb = sw.finalize();
+    total_spill_bytes += sb;
+    spill_files.push_back(spill_path);
+    buf.clear();
+    buf_bytes = 0;
+  };
+
+  // Stream records from heap, apply map logic.
+  while (!heap.empty()) {
+    FileCursor top = heap.top();
+    heap.pop();
+
+    {
+      FileCursor nc;
+      nc.idx = top.idx;
+      if (readers[top.idx]->next(nc.rec))
+        heap.push(std::move(nc));
+    }
+
+    // Range filter.
+    if (has_lo &&
+        std::memcmp(top.rec.sig.b, lo_sig, static_cast<size_t>(keyLen)) < 0)
+      continue;
+    if (has_hi &&
+        std::memcmp(top.rec.sig.b, hi_sig, static_cast<size_t>(keyLen)) >= 0)
+      break;
+
+    // Combine equal-key records from heap.
+    while (!heap.empty()) {
+      if (std::memcmp(top.rec.sig.b, heap.top().rec.sig.b,
+                      static_cast<size_t>(keyLen)) != 0) break;
+      FileCursor eq = heap.top();
+      heap.pop();
+      top.rec.combine(eq.rec);
+      FileCursor nc;
+      nc.idx = eq.idx;
+      if (readers[eq.idx]->next(nc.rec))
+        heap.push(std::move(nc));
+    }
+
+    const RunRecord<W>& rec = top.rec;
+    const int ms = rec.minSize();
+    if (ms < 0) continue;
+
+    Classifier::complete(rec.sig, H, rec, out_classified);
+
+    forEachViableMask(rec.sig, H, maxn - ms, [&](unsigned mask) {
+      Sig out_sig;
+      if (stepColumnSquare8(rec.sig, H, mask, out_sig) != Outcome::Alive) return;
+
+      const int cells = __builtin_popcount(mask);
+      if (ms + cells + completionLowerBound(out_sig.b, H) > maxn) return;
+
+      if (cfg.fold) foldSig(out_sig, H);
+
+      RunRecord<W> succ;
+      succ.sig = out_sig;
+      succ.H   = H;
+      const int new_lo = static_cast<int>(rec.lo) + cells;
+      if (new_lo > maxn) return;
+      succ.lo  = static_cast<uint8_t>(new_lo);
+      const int new_len = std::min<int>(rec.len, maxn - new_lo + 1);
+      succ.len = static_cast<uint8_t>(new_len);
+      succ.counts.assign(rec.counts.begin(), rec.counts.begin() + new_len);
+      buf.push_back(std::move(succ));
+      buf_bytes += record_est;
+    });
+
+    if (cfg.ram_budget_bytes > 0 && buf_bytes > cfg.ram_budget_bytes)
+      do_spill();
+  }
+
+  // Final spill or direct write.
+  do_spill();  // flush remaining buf to a spill file
+
+  // Merge all spill files into out_path.
+  size_t out_bytes = mergeRunFiles<W>(spill_files, H, "", "", out_path, rev);
+  (void)out_bytes;
+
+  // Count output records.
+  RunFileReader<W> counter(out_path, H);
+  size_t out_recs = counter.records();
+
+  // Delete temp spill files.
+  for (const auto& sf : spill_files)
+    std::remove(sf.c_str());
+
+  return {total_spill_bytes, out_recs};
 }

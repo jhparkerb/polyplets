@@ -55,7 +55,7 @@ static std::vector<uint64_t> sweepHeight(int H, int maxn, bool fold) {
     frontier.push_back(seed);
   }
 
-  ShardCfg cfg{H, maxn, fold};
+  ShardCfg cfg{.H=H, .maxn=maxn, .fold=fold};
   TriangleRow<W> triangle(H, maxn);
 
   for (int col = 0; col <= maxn && !frontier.empty(); ++col) {

@@ -121,7 +121,7 @@ build/ns:
 	mkdir -p build/ns
 
 # ns-gates: all new-system gates
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill
 
 ns-gate-math: build/ns/gate_math
 	./build/ns/gate_math
@@ -149,6 +149,18 @@ build/ns/map_worker: worker/map_worker.cpp $(NS_HEADERS) | build/ns
 
 build/ns/merge_worker: worker/merge_worker.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O3 -I. $< -o $@
+
+build/ns/driver1: test/driver1.cpp $(NS_HEADERS) | build/ns
+	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+
+# M1 gate: spill-backed driver, n<=14, ram=1 MB forces spill even at this small scale
+ns-gate-spill: build/ns/driver1
+	mkdir -p /tmp/ns_m1_gate && ./build/ns/driver1 --maxn 14 --ram 1048576 --spill /tmp/ns_m1_gate --compare
+
+# AC-1 long-run gate (manual invocation; hours to days depending on maxn and box):
+#   ./build/ns/driver1 --maxn 18 --ram 67108864 --spill /some/nvme/dir --compare
+ns-gate-resume:
+	@echo "AC-1 gate (long): ./build/ns/driver1 --maxn 18 --ram 67108864 --spill /tmp/ns_ac1 --compare"
 
 clean:
 	rm -rf build
