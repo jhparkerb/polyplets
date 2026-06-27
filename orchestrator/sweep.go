@@ -30,6 +30,8 @@ type SweepConfig struct {
 	CheckpointEvery time.Duration // wall cadence for checkpoints (0 = every column)
 	Rev             string        // git rev for POLYRUN headers
 	CounterWidth    string        // "u64" or "u128"; empty = default (u64)
+	CostProfileOut  string        // where to emit the cost profile (default: <RunDir>/cost_profile.tsv)
+	CostProfileRef  string        // optional reference profile to drive the live ETA
 	Bin             WorkerBin
 
 	// afterColumn, if non-nil, is called after each forward checkpoint is
@@ -90,6 +92,11 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		}
 	}
 
+	tel, err := newTelemetry(cfg, time.Now())
+	if err != nil {
+		return nil, err
+	}
+
 	for H := startH; H <= maxn; H++ {
 		startCol := 0
 		var frontier []string
@@ -106,7 +113,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			frontier = []string{seed}
 		}
 
-		hTri, hAcct, err := sweepHeight(ctx, cfg, H, startCol, frontier, writeCheckpoint)
+		hTri, hAcct, err := sweepHeight(ctx, cfg, H, startCol, frontier, writeCheckpoint, tel)
 
 		// Accumulate this height's contributions before handling the error,
 		// so the checkpoint written on cancellation includes them.
@@ -136,6 +143,7 @@ func sweepHeight(
 	H, startCol int,
 	frontier []string,
 	writeCheckpoint func(H, col int, frontier []string, hTri []uint64),
+	tel *telemetry,
 ) ([]uint64, Acct, error) {
 
 	hTri := make([]uint64, cfg.Maxn+1) // contributions from this height only
@@ -167,6 +175,9 @@ func sweepHeight(
 			return hTri, acct, ctx.Err()
 		default:
 		}
+
+		frontierIn := sumFrontierRecords(frontier)
+		colStart := time.Now()
 
 		// MAP PHASE
 		mapOuts, triContribs, mapAcct, err := mapPhase(ctx, cfg, H, col, frontier)
@@ -205,9 +216,20 @@ func sweepHeight(
 		oldMapOuts := mapOuts
 		frontier = mergeOuts
 
-		// totalRecs is the new frontier's record count, summed by the merge
-		// workers (no re-read of the files they just wrote).
-		fmt.Printf("H=%d col=%d frontier_records=%d acct=%s\n", H, col, totalRecs, acct)
+		// Per-column telemetry: orchestrator wall-clock for this column's
+		// map+merge, with frontier sizes for the cost model and live ETA.
+		colWall := time.Since(colStart).Seconds()
+		var colAcct Acct
+		colAcct.Add(mapAcct)
+		colAcct.Add(mergeAcct)
+		tel.observe(ColumnCost{
+			H: H, Col: col,
+			FrontierIn:  frontierIn,
+			FrontierOut: totalRecs,
+			WallS:       colWall,
+			CPUS:        colAcct.CPUS,
+			RSSMax:      colAcct.RSSMax,
+		})
 
 		if totalRecs == 0 {
 			// Height exhausted: write a "height-done" checkpoint with nil frontier
@@ -401,6 +423,21 @@ func mergePhase(
 		acct.Add(rr.result.Acct)
 	}
 	return outPaths, totalRecs, acct, nil
+}
+
+// sumFrontierRecords totals the record counts across frontier run files, read
+// cheaply from POLYRUN headers (no body scan).  Used as the per-column input
+// size for the cost model.
+func sumFrontierRecords(frontier []string) uint64 {
+	var n uint64
+	for _, p := range frontier {
+		hdr, _, err := ParseHeader(p)
+		if err != nil {
+			continue
+		}
+		n += hdr.Records
+	}
+	return n
 }
 
 // unitMult returns the configured units-per-core, defaulting to 1.

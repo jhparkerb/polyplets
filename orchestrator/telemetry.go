@@ -1,0 +1,177 @@
+// telemetry.go — per-column cost telemetry, cost-profile emission, and a live
+// ETA driven by an optional reference profile.
+//
+// Every run EMITS a cost profile (per-(H,col) wall + frontier sizes) to the run
+// dir; the a-priori predictor scales one of these to the target n to produce a
+// reference profile for the next run.  A run that LOADS a reference profile
+// reports a live, self-correcting ETA against it.  Without a reference, the run
+// still emits per-column telemetry but makes no ETA claim (honest: the first run
+// of a sequence has nothing to predict from).
+package orchestrator
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+)
+
+// ColumnCost is the measured cost of one completed column.
+type ColumnCost struct {
+	H, Col      int
+	FrontierIn  uint64  // records entering the column (map input)
+	FrontierOut uint64  // records leaving the column (new frontier)
+	WallS       float64 // orchestrator wall-clock for map+merge of this column
+	CPUS        float64 // summed worker cpu seconds
+	RSSMax      float64 // peak worker RSS (MB) this column
+}
+
+// telemetry accumulates ColumnCosts, emits structured progress, writes the cost
+// profile, and (if a reference profile is loaded) reports a live ETA.
+type telemetry struct {
+	t0       time.Time
+	cores    int
+	maxn     int
+	outPath  string
+	cols     []ColumnCost
+	clock    func() time.Time // injectable for tests; defaults to time.Now
+
+	// Reference profile for live ETA: (H,col) -> predicted wall seconds.
+	ref      map[[2]int]float64
+	refTotal float64 // Σ ref over all (H,col)
+	refBasis string  // provenance of the reference (path / description)
+	donePred float64 // Σ ref wall for completed columns
+	doneAct  float64 // Σ actual wall for completed columns
+}
+
+// newTelemetry builds a telemetry sink.  refPath may be "" (no live ETA).
+func newTelemetry(cfg SweepConfig, t0 time.Time) (*telemetry, error) {
+	out := cfg.CostProfileOut
+	if out == "" {
+		out = cfg.RunDir + "/cost_profile.tsv"
+	}
+	t := &telemetry{
+		t0:      t0,
+		cores:   cfg.Cores,
+		maxn:    cfg.Maxn,
+		outPath: out,
+		clock:   time.Now,
+	}
+	if cfg.CostProfileRef != "" {
+		ref, total, err := LoadCostProfile(cfg.CostProfileRef)
+		if err != nil {
+			return nil, fmt.Errorf("load reference profile %s: %w", cfg.CostProfileRef, err)
+		}
+		t.ref = ref
+		t.refTotal = total
+		t.refBasis = cfg.CostProfileRef
+		fmt.Printf("apriori basis=%s apriori_wall_s=%.0f apriori_eta_at=%s\n",
+			cfg.CostProfileRef, total, t0.Add(time.Duration(total*float64(time.Second))).Format(time.RFC3339))
+	}
+	return t, nil
+}
+
+// observe records one completed column, emits telemetry + ETA, and rewrites the
+// profile file.  A nil receiver is a no-op so callers need not guard.
+func (t *telemetry) observe(c ColumnCost) {
+	if t == nil {
+		return
+	}
+	t.cols = append(t.cols, c)
+
+	cum := 0.0
+	for _, cc := range t.cols {
+		cum += cc.WallS
+	}
+	fmt.Printf("event=column H=%d col=%d frontier_in=%d frontier_out=%d "+
+		"wall_s=%.2f cum_wall_s=%.1f cpu_s=%.1f rss_max_mb=%.1f\n",
+		c.H, c.Col, c.FrontierIn, c.FrontierOut, c.WallS, cum, c.CPUS, c.RSSMax)
+
+	if t.ref != nil {
+		if pred, ok := t.ref[[2]int{c.H, c.Col}]; ok {
+			t.donePred += pred
+			t.doneAct += c.WallS
+		}
+		t.emitETA()
+	}
+
+	if err := t.writeProfile(); err != nil {
+		fmt.Fprintf(os.Stderr, "telemetry: write profile: %v\n", err)
+	}
+}
+
+// emitETA prints a cost-weighted done fraction and a self-corrected ETA.
+func (t *telemetry) emitETA() {
+	if t.refTotal <= 0 {
+		return
+	}
+	correction := 1.0
+	if t.donePred > 0 {
+		correction = t.doneAct / t.donePred // actual vs predicted pace so far
+	}
+	doneFrac := t.donePred / t.refTotal
+	remainingPred := t.refTotal - t.donePred
+	if remainingPred < 0 {
+		remainingPred = 0
+	}
+	etaRemain := remainingPred * correction
+	etaAt := t.clock().Add(time.Duration(etaRemain * float64(time.Second)))
+	fmt.Printf("event=eta done_frac=%.4f eta_remaining_s=%.0f eta_at=%s "+
+		"pace=%.2f basis=ref\n",
+		doneFrac, etaRemain, etaAt.Format(time.RFC3339), correction)
+}
+
+// writeProfile rewrites the full cost profile (atomic via temp+rename).
+func (t *telemetry) writeProfile() error {
+	tmp := t.outPath + ".tmp"
+	f, err := os.Create(tmp)
+	if err != nil {
+		return err
+	}
+	w := bufio.NewWriter(f)
+	fmt.Fprintf(w, "# cost_profile maxn=%d cores=%d\n", t.maxn, t.cores)
+	fmt.Fprintf(w, "# H\tcol\tfrontier_in\tfrontier_out\twall_s\tcpu_s\trss_max_mb\n")
+	for _, c := range t.cols {
+		fmt.Fprintf(w, "%d\t%d\t%d\t%d\t%.3f\t%.3f\t%.1f\n",
+			c.H, c.Col, c.FrontierIn, c.FrontierOut, c.WallS, c.CPUS, c.RSSMax)
+	}
+	if err := w.Flush(); err != nil {
+		f.Close()
+		return err
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+	return os.Rename(tmp, t.outPath)
+}
+
+// LoadCostProfile reads a cost profile and returns (H,col)->wall_s plus the total.
+func LoadCostProfile(path string) (map[[2]int]float64, float64, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, 0, err
+	}
+	ref := make(map[[2]int]float64)
+	var total float64
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		f := strings.Fields(line)
+		if len(f) < 5 {
+			continue
+		}
+		H, e1 := strconv.Atoi(f[0])
+		col, e2 := strconv.Atoi(f[1])
+		wall, e3 := strconv.ParseFloat(f[4], 64)
+		if e1 != nil || e2 != nil || e3 != nil {
+			continue
+		}
+		ref[[2]int{H, col}] = wall
+		total += wall
+	}
+	return ref, total, nil
+}

@@ -42,6 +42,8 @@ func main() {
 	resume := flag.Bool("resume", false, "resume from checkpoint")
 	compare := flag.Bool("compare", false, "compare final total to fixtures/b006770.txt")
 	workersDir := flag.String("workers-dir", "", "directory containing map_worker/merge_worker binaries")
+	costProfileOut := flag.String("cost-profile-out", "", "emit per-column cost profile here (default: <run-dir>/cost_profile.tsv)")
+	costProfileRef := flag.String("cost-profile-ref", "", "reference cost profile to drive the live ETA")
 	flag.Parse()
 
 	pid := os.Getpid()
@@ -91,6 +93,8 @@ func main() {
 		CheckpointPath:  *ckptPath,
 		CheckpointEvery: time.Duration(float64(time.Second) * *ckptEvery),
 		Rev:             rev,
+		CostProfileOut:  *costProfileOut,
+		CostProfileRef:  *costProfileRef,
 		Bin:             bin,
 	}
 
