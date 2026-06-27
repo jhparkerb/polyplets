@@ -22,6 +22,7 @@ type SweepConfig struct {
 	Maxn            int
 	Fold            bool
 	Cores           int           // max concurrent workers
+	UnitMult        int           // work units per core (default 1); units = Cores*UnitMult, concurrency stays Cores
 	RAM             uint64        // bytes per map_worker spill budget
 	RunDir          string        // directory for all run files
 	SpillDir        string        // directory for map_worker internal spills
@@ -251,7 +252,11 @@ func mapPhase(
 	frontier []string,
 ) ([]string, []map[int]map[int]uint64, Acct, error) {
 
-	numUnits := cfg.Cores
+	// Units are decoupled from concurrency: numUnits = Cores*UnitMult finer
+	// key-ranges, but the semaphore below still caps concurrency at Cores.
+	// Finer units let a core that finishes early pull the next queued unit
+	// instead of idling to the barrier (approximates work-stealing).
+	numUnits := cfg.Cores * unitMult(cfg)
 	if numUnits < 1 {
 		numUnits = 1
 	}
@@ -331,7 +336,7 @@ func mergePhase(
 		return nil, 0, Acct{}, nil
 	}
 
-	numRanges := cfg.Cores
+	numRanges := cfg.Cores * unitMult(cfg)
 	if numRanges < 1 {
 		numRanges = 1
 	}
@@ -396,6 +401,14 @@ func mergePhase(
 		acct.Add(rr.result.Acct)
 	}
 	return outPaths, totalRecs, acct, nil
+}
+
+// unitMult returns the configured units-per-core, defaulting to 1.
+func unitMult(cfg SweepConfig) int {
+	if cfg.UnitMult < 1 {
+		return 1
+	}
+	return cfg.UnitMult
 }
 
 // cutsToBounds turns N-1 sorted cut keys into N (lo,hi) hex bounds: unit i

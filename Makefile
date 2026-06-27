@@ -172,6 +172,11 @@ ns-gate-parallel: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 	./build/ns/orchestrate --maxn 14 --cores 4 --ram 67108864 \
 	    --run-dir /tmp/ns_m2_parallel --spill-dir /tmp/ns_m2_parallel/spill \
 	    --checkpoint /tmp/ns_m2_parallel/POLYCKPT --checkpoint-every 0 --compare
+	# unit-mult invariance: more units than cores must produce identical totals.
+	rm -rf /tmp/ns_m2_parallel && mkdir -p /tmp/ns_m2_parallel/spill
+	./build/ns/orchestrate --maxn 14 --cores 4 --unit-mult 4 --ram 67108864 \
+	    --run-dir /tmp/ns_m2_parallel --spill-dir /tmp/ns_m2_parallel/spill \
+	    --checkpoint /tmp/ns_m2_parallel/POLYCKPT --checkpoint-every 0 --compare
 
 # AC-2b: resume from EVERY checkpoint boundary reproduces the serial result.
 # Exhaustive (not random): the test enumerates each (H,col) checkpoint, cancels
