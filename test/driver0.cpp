@@ -23,14 +23,24 @@
 
 #include "core/libenum.h"
 
-// Known a(n) for n=1..18 from fixtures/b006770.txt
-static const uint64_t KNOWN[] = {
-  0, // index 0 unused
-  1, 4, 20, 110, 638, 3832, 23592, 147941,
-  940982, 6053180, 39299408, 257105146, 1692931066, 11208974860ULL,
-  74570549714ULL, 498174818986ULL, 3340366308393ULL, 22471158811164ULL,
-};
-static const int N_KNOWN = static_cast<int>(sizeof(KNOWN) / sizeof(KNOWN[0])) - 1;
+// Load known a(n) from an OEIS b-file ("n value" per line, '#'-comment lines
+// skipped, e.g. fixtures/b006770.txt). Returns a vector indexed by n (entry 0
+// unused); size 1 (no data) if the file is absent or has no numeric rows.
+static std::vector<uint64_t> loadKnown(const char* path) {
+  std::vector<uint64_t> known(1, 0); // index 0 unused
+  FILE* f = std::fopen(path, "r");
+  if (!f) return known;
+  char line[256];
+  while (std::fgets(line, sizeof line, f)) {
+    int n; unsigned long long v;
+    if (std::sscanf(line, "%d %llu", &n, &v) == 2 && n >= 0) {
+      if (n >= static_cast<int>(known.size())) known.resize(n + 1, 0);
+      known[n] = v;
+    }
+  }
+  std::fclose(f);
+  return known;
+}
 
 // One height-sweep: returns the triangle row T[n] for height H over n=0..maxn.
 static std::vector<uint64_t> sweepHeight(int H, int maxn, bool fold) {
@@ -51,18 +61,30 @@ static std::vector<uint64_t> sweepHeight(int H, int maxn, bool fold) {
   for (int col = 0; col <= maxn && !frontier.empty(); ++col) {
     // The whole frontier is one shard (in-RAM, no partitioning yet).
     // map_shard drives completion (classify) side and returns successor run.
-    Run<W> next = map_shard<W, ClassifyTriangle>(frontier, cfg, triangle);
-    frontier = std::move(next);
+    frontier = map_shard<W, ClassifyTriangle>(frontier, cfg, triangle);
   }
 
   return triangle.row; // indexed [0..maxn]
 }
 
+// Sweep every height and sum the rows into the triangle total T[n] = Σ_H T(n,H).
+// If allRows is non-null, each height's row is stored there for later output.
+static std::vector<uint64_t> accumTriangle(
+    int maxn, bool fold, std::vector<std::vector<uint64_t>>* allRows = nullptr) {
+  std::vector<uint64_t> total(maxn + 1, 0);
+  for (int H = 1; H <= maxn; ++H) {
+    auto row = sweepHeight(H, maxn, fold);
+    for (int n = 0; n <= maxn; ++n) total[n] += row[n];
+    if (allRows) (*allRows)[H] = std::move(row);
+  }
+  return total;
+}
+
 int main(int argc, char** argv) {
-  int  maxn     = 14;
-  bool fold     = false;
+  int  maxn      = 14;
+  bool fold      = false;
   bool foldCheck = false;
-  const char* oracleTma = nullptr;
+  const char* oracleTma = nullptr; // reserved for future oracle-diff mode
   const char* outFile   = nullptr;
 
   for (int i = 1; i < argc; ++i) {
@@ -72,38 +94,17 @@ int main(int argc, char** argv) {
       fold = true;
     else if (!std::strcmp(argv[i], "--fold-check"))
       foldCheck = true;
-    else if (!std::strcmp(argv[i], "--oracle-tma") && i + 1 < argc) {
-      oracleTma = argv[++i]; (void)oracleTma; // reserved for future oracle-diff mode
-    }
+    else if (!std::strcmp(argv[i], "--oracle-tma") && i + 1 < argc)
+      oracleTma = argv[++i];
     else if (!std::strcmp(argv[i], "--out") && i + 1 < argc)
       outFile = argv[++i];
   }
-
-  // Accumulate the full triangle: T[n] = Σ_H T(n,H)
-  std::vector<uint64_t> total(maxn + 1, 0);
-  // triangle rows for output (if requested)
-  std::vector<std::vector<uint64_t>> allRows(maxn + 1);
-
-  for (int H = 1; H <= maxn; ++H) {
-    auto row = sweepHeight(H, maxn, fold);
-    for (int n = 0; n <= maxn; ++n) {
-      total[n] += row[n];
-      if (H <= maxn) allRows[H] = row;
-    }
-  }
+  (void)oracleTma;
 
   if (foldCheck) {
-    // Verify fold == unfold for n <= maxn
-    std::vector<uint64_t> totalUnfold(maxn + 1, 0);
-    for (int H = 1; H <= maxn; ++H) {
-      auto row = sweepHeight(H, maxn, false);
-      for (int n = 0; n <= maxn; ++n) totalUnfold[n] += row[n];
-    }
-    std::vector<uint64_t> totalFold(maxn + 1, 0);
-    for (int H = 1; H <= maxn; ++H) {
-      auto row = sweepHeight(H, maxn, true);
-      for (int n = 0; n <= maxn; ++n) totalFold[n] += row[n];
-    }
+    // Verify fold == unfold byte-identical for all n <= maxn.
+    const auto totalUnfold = accumTriangle(maxn, false);
+    const auto totalFold   = accumTriangle(maxn, true);
     bool ok = true;
     for (int n = 1; n <= maxn; ++n) {
       if (totalFold[n] != totalUnfold[n]) {
@@ -118,6 +119,9 @@ int main(int argc, char** argv) {
     return 0;
   }
 
+  std::vector<std::vector<uint64_t>> allRows(maxn + 1);
+  const auto total = accumTriangle(maxn, fold, &allRows);
+
   // Write triangle if output file requested
   if (outFile) {
     FILE* f = std::fopen(outFile, "w");
@@ -129,13 +133,21 @@ int main(int argc, char** argv) {
     std::fclose(f);
   }
 
-  // Verify against known a(n)
+  // Verify against known a(n) from the pinned b-file fixture.
+  const auto known = loadKnown("fixtures/b006770.txt");
+  const int nKnown = static_cast<int>(known.size()) - 1;
+  if (nKnown < 1) {
+    std::fprintf(stderr,
+                 "FAIL: no known values loaded from fixtures/b006770.txt "
+                 "(run from repo root); nothing to verify against\n");
+    return 1;
+  }
   bool allOk = true;
-  for (int n = 1; n <= std::min(maxn, N_KNOWN); ++n) {
-    const bool ok = (total[n] == KNOWN[n]);
+  for (int n = 1; n <= std::min(maxn, nKnown); ++n) {
+    const bool ok = (total[n] == known[n]);
     std::printf("n=%2d  a(n)=%llu  known=%llu  %s\n",
                 n, (unsigned long long)total[n],
-                (unsigned long long)KNOWN[n], ok ? "OK" : "FAIL");
+                (unsigned long long)known[n], ok ? "OK" : "FAIL");
     if (!ok) allOk = false;
   }
   if (!allOk) return 1;

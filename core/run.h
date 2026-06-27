@@ -45,19 +45,28 @@ struct RunRecord {
 
   // Merge o INTO this record (range-union + componentwise add).
   // Both must share the same key. The associative reduce op.
+  // TODO(perf, M1+): combine runs once per duplicate-key collision per column;
+  // when the union only extends the existing high end (new_lo == lo) the merged
+  // buffer can be grown in place instead of allocated fresh. Deferred until the
+  // at-scale spill engine lands and the allocation actually shows up in a profile.
   void combine(const RunRecord& o) {
     assert(sameKey(o) && H == o.H);
     if (o.len == 0) return;
     if (len == 0) { lo = o.lo; len = o.len; counts = o.counts; return; }
-    const uint8_t new_lo  = std::min(lo, o.lo);
-    const uint8_t new_end = std::max<uint8_t>(lo + len, o.lo + o.len);
-    const uint8_t new_len = new_end - new_lo;
+    // Compute the union window in int; the byte-wide lo/len fields can only
+    // hold n<=255, which the caller guarantees (n<=25 for u64 counters).
+    const int new_lo  = std::min<int>(lo, o.lo);
+    const int new_end = std::max<int>(lo + len, o.lo + o.len);
+    const int new_len = new_end - new_lo;
+    assert(new_end <= 256 && "count-vec window exceeded byte range");
     std::vector<W> merged(new_len, W{0});
     for (int i = 0; i < len; ++i)
       merged[(lo + i) - new_lo] += counts[i];
     for (int i = 0; i < o.len; ++i)
       merged[(o.lo + i) - new_lo] += o.counts[i];
-    lo = new_lo; len = new_len; counts = std::move(merged);
+    lo = static_cast<uint8_t>(new_lo);
+    len = static_cast<uint8_t>(new_len);
+    counts = std::move(merged);
   }
 
   // Return the minimum n index with a nonzero count (-1 if empty).

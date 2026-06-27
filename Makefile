@@ -113,6 +113,10 @@ gate-s2:
 NSFLAGS = -std=c++20 -Wall -Wextra -Werror \
           -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
 
+# Every ns binary is header-only against core/; depend on the whole set so an
+# edit to any header (incl. the trusted-math copies) triggers the right rebuilds.
+NS_HEADERS = $(wildcard core/*.h)
+
 build/ns:
 	mkdir -p build/ns
 
@@ -122,7 +126,7 @@ ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold
 ns-gate-math: build/ns/gate_math
 	./build/ns/gate_math
 
-build/ns/gate_math: test/gate_math.cpp core/signature.h core/transition.h | build/ns
+build/ns/gate_math: test/gate_math.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 # Architecture fitness: Go boundary tests
@@ -137,16 +141,13 @@ ns-gate-regression: build/ns/driver0
 ns-gate-fold: build/ns/driver0
 	./build/ns/driver0 --maxn 12 --fold-check
 
-build/ns/driver0: test/driver0.cpp core/libenum.h core/run.h core/mapreduce.h \
-                  core/counter.h core/classifier.h | build/ns
+build/ns/driver0: test/driver0.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
-build/ns/map_worker: worker/map_worker.cpp core/libenum.h core/run.h core/mapreduce.h \
-                     core/counter.h core/classifier.h | build/ns
+build/ns/map_worker: worker/map_worker.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O3 -I. $< -o $@
 
-build/ns/merge_worker: worker/merge_worker.cpp core/libenum.h core/run.h core/mapreduce.h \
-                       core/counter.h core/classifier.h | build/ns
+build/ns/merge_worker: worker/merge_worker.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O3 -I. $< -o $@
 
 clean:

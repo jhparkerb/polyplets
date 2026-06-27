@@ -47,7 +47,12 @@ Run<W> map_shard(const Run<W>& src, const ShardCfg& cfg, Output& out_classified)
   const int H    = cfg.H;
   const int maxn = cfg.maxn;
   Run<W> buf;
+  buf.reserve(src.size()); // at least one successor per source; skips early doublings
 
+  // TODO(perf, M1+): the inner lambda allocates succ.counts per successor (millions
+  // at scale) and the trailing sortRun re-sorts data the sorted frontier already
+  // partly orders. Hoist a reusable scratch record and replace sort+dedup with a
+  // structure-aware k-way merge once the spill engine makes this the bottleneck.
   for (const auto& rec : src) {
     // minimum cells already placed
     const int ms = rec.minSize();
@@ -94,7 +99,8 @@ Run<W> map_shard(const Run<W>& src, const ShardCfg& cfg, Output& out_classified)
 
 template <class W>
 Run<W> mergeRuns(std::vector<Run<W>>& runs) {
-  // Cursor into one run: (run_index, record_index)
+  // Cursor into one run: (run_index, record_index). Holds a raw pointer into
+  // runs[i]; `runs` and its inner vectors must NOT be resized during the merge.
   struct Cursor {
     int run;
     size_t pos;
@@ -107,12 +113,15 @@ Run<W> mergeRuns(std::vector<Run<W>>& runs) {
 
   using MinHeap = std::priority_queue<Cursor, std::vector<Cursor>, std::greater<Cursor>>;
   MinHeap heap;
+  size_t totalRecords = 0;
   for (int i = 0; i < static_cast<int>(runs.size()); ++i) {
+    totalRecords += runs[i].size();
     if (!runs[i].empty())
       heap.push({i, 0, &runs[i][0]});
   }
 
   Run<W> result;
+  result.reserve(totalRecords); // exact upper bound: merge only ever combines keys
   while (!heap.empty()) {
     Cursor top = heap.top(); heap.pop();
     RunRecord<W> combined = *top.rec;

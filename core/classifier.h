@@ -7,9 +7,9 @@
 //   ClassifyTriangle — O1: T(n,H) for each (n, H). a(n) = Σ_H T(n,H).
 //   ClassifyHoles    — O2: per (n, H, holes). Reuses euler.h closedEulerDelta4.
 //
-// Usage: map_shard<Counter, Classifier>(...)
-// The Classifier must provide:
-//   void complete(const Sig&, int H, int col, const RunRecord<Word>&, Output&)
+// Usage: map_shard<W, Classifier>(src, cfg, output)
+// The Classifier must provide a static method:
+//   void complete(const Sig&, int H, const RunRecord<W>&, Output&)
 // where Output accumulates the result for the whole height-sweep.
 
 #pragma once
