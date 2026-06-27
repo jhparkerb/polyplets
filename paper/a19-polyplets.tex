@@ -507,11 +507,16 @@ $a(23)$, at $\approx\!230$\,GB, is the first to require an out-of-core state sto
 separate limit: their recurrence order grows with height, so series length, not
 memory, bounds them above $H\approx8$.
 % TODO(a20-confirm): a(20) is written as CONFIRMED in anticipation -- title, abstract,
-% boxed value, Tables 1-2, growth ratios, and this section all now state it. The gating
-% recount (the all-x86/GCC reassembly of the remaining strata) is STILL RUNNING on ayr.
-% BEFORE the paper is final/submitted: confirm it completed and matches 1025573519362016
-% (and B_19(20)=19586258055); then add a(20) to the A006770 b-file and verify_claims.py.
-% If it does NOT match, REVERT every a(20) promotion above back to candidate.
+% boxed value, Tables 1-2, growth ratios, and this section all now state it. The original
+% gating recount (the all-x86/GCC reassembly of the remaining strata on ayr) was
+% SUPERSEDED by the 2026-06-27 cutover to the next-system spill engine. a(20) is now
+% independently re-derived as a byproduct of the a(21) run (launched 2026-06-27 on dalby):
+% that run computes the full triangle, so a(20) = Sum_H T(20,H) falls out and is checked by
+% `build/ns/combine --maxn 20 --compare` against the A006770 b-file, with the per-height
+% rows cross-checked against the old engine's salvaged h1..h17 (scripts/ns_crosscheck.sh).
+% BEFORE final/submit: confirm that compare matches 1025573519362016 (and B_19(20)=19586258055);
+% then add a(20) [and a(21), if it lands] to the b-file and verify_claims.py. If it does NOT
+% match, REVERT every a(20) promotion above back to candidate.
 
 \section{Data and code availability}
 \label{sec:availability}
