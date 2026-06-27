@@ -495,7 +495,10 @@ func Run(cfg Config) []CheckResult {
 	return results
 }
 
-// checkGrowthRatio verifies a(n+1)/a(n) is in [3.5, 4.9] for consecutive pairs.
+// checkGrowthRatio verifies a(n+1)/a(n) is in [3.9, 7.2] for consecutive pairs.
+// A006770's ratios climb monotonically from ~4.0 (a2/a1) toward the growth
+// constant lambda ~ 7.10; high-n pairs sit at ~6.7-6.8 (a21/a20 ~ 6.78). The
+// band brackets the smallest legitimate ratio below and the asymptote above.
 func checkGrowthRatio(sums map[int]uint64) []CheckResult {
 	// Collect sorted keys with nonzero values.
 	var ns []int
@@ -528,8 +531,8 @@ func checkGrowthRatio(sums map[int]uint64) []CheckResult {
 			continue
 		}
 		ratio := vb / va
-		if ratio < 3.5 || ratio > 4.9 {
-			results = append(results, fail("growth", fmt.Sprintf("a(%d)/a(%d)=%.4f outside [3.5,4.9]", b, a, ratio)))
+		if ratio < 3.9 || ratio > 7.2 {
+			results = append(results, fail("growth", fmt.Sprintf("a(%d)/a(%d)=%.4f outside [3.9,7.2]", b, a, ratio)))
 			anyFail = true
 		}
 	}
