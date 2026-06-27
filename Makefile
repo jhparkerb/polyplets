@@ -18,7 +18,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 
 .PHONY: gates gate-g1 gate-g2 gate-euler clean \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
-        ns-gate-parallel ns-gate-resume-fuzz \
+        ns-gate-parallel ns-gate-resume-boundaries \
         ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
         build/ns/orchestrate
 
@@ -123,7 +123,7 @@ build/ns:
 	mkdir -p build/ns
 
 # ns-gates: all new-system gates
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-fuzz
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries
 
 ns-gate-math: build/ns/gate_math
 	./build/ns/gate_math
@@ -169,9 +169,11 @@ ns-gate-parallel: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 	    --run-dir /tmp/ns_m2_parallel --spill-dir /tmp/ns_m2_parallel/spill \
 	    --checkpoint /tmp/ns_m2_parallel/POLYCKPT --checkpoint-every 0 --compare
 
-# AC-2b: kill+resume gives byte-identical result (25 random-delay trials, maxn=8)
-ns-gate-resume-fuzz: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
-	bash tests/gate_ns_resume.sh 25 8 4
+# AC-2b: resume from EVERY checkpoint boundary reproduces the serial result.
+# Exhaustive (not random): the test enumerates each (H,col) checkpoint, cancels
+# there via an in-package test seam, resumes, and compares. See resume_test.go.
+ns-gate-resume-boundaries: build/ns/map_worker build/ns/merge_worker
+	go test ./orchestrator/ -run TestKillResumeAllBoundaries -v
 
 # AC-1 long-run gate (manual invocation; hours to days depending on maxn and box):
 #   ./build/ns/driver1 --maxn 18 --ram 67108864 --spill /some/nvme/dir --compare

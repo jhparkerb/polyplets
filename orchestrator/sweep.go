@@ -29,6 +29,14 @@ type SweepConfig struct {
 	CheckpointEvery time.Duration // wall cadence for checkpoints (0 = every column)
 	Rev             string        // git rev for POLYRUN headers
 	Bin             WorkerBin
+
+	// afterColumn, if non-nil, is called after each forward checkpoint is
+	// written (one per completed column, plus the height-done checkpoint).
+	// Unexported test seam: cmd/orchestrate (package main) cannot set it, so
+	// it is invisible to the production CLI.  resume_test.go uses it to cancel
+	// the run at each successive checkpoint boundary and assert that resuming
+	// from there reproduces the serial result.
+	afterColumn func(H, col int)
 }
 
 // SweepResult is the output of a complete run over all heights.
@@ -196,6 +204,9 @@ func sweepHeight(
 			// BEFORE GC so the stale per-column checkpoint (which named oldFrontier
 			// files) is superseded before those files are deleted.
 			writeCheckpoint(H, col, nil, hTri)
+			if cfg.afterColumn != nil {
+				cfg.afterColumn(H, col)
+			}
 			for _, p := range oldFrontier {
 				os.Remove(p)
 			}
@@ -212,6 +223,9 @@ func sweepHeight(
 		if interval == 0 || time.Since(lastCkpt) >= interval {
 			writeCheckpoint(H, col, frontier, hTri)
 			lastCkpt = time.Now()
+			if cfg.afterColumn != nil {
+				cfg.afterColumn(H, col)
+			}
 		}
 
 		// GC only after checkpoint is written.
