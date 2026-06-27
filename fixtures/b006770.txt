@@ -1,4 +1,5 @@
 # A006770 (b-file synthesized from sequence entry)
+# n=19 cross-ISA + transfer-matrix confirmed; n=20 column transfer-matrix (docs/a20-submission-draft.md)
 1 1
 2 4
 3 20
@@ -17,3 +18,5 @@
 16 498174818986
 17 3340366308393
 18 22471158811164
+19 151609203011580
+20 1025573519362016
