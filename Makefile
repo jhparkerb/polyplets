@@ -18,7 +18,9 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 
 .PHONY: gates gate-g1 gate-g2 gate-euler clean \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
-        ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0
+        ns-gate-parallel ns-gate-resume-fuzz \
+        ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
+        build/ns/orchestrate
 
 # All currently existing gates
 gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-euler gate-driver
@@ -121,7 +123,7 @@ build/ns:
 	mkdir -p build/ns
 
 # ns-gates: all new-system gates
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-fuzz
 
 ns-gate-math: build/ns/gate_math
 	./build/ns/gate_math
@@ -156,6 +158,20 @@ build/ns/driver1: test/driver1.cpp $(NS_HEADERS) | build/ns
 # M1 gate: spill-backed driver, n<=14, ram=1 MB forces spill even at this small scale
 ns-gate-spill: build/ns/driver1
 	mkdir -p /tmp/ns_m1_gate && ./build/ns/driver1 --maxn 14 --ram 1048576 --spill /tmp/ns_m1_gate --compare
+
+build/ns/orchestrate: orchestrator/cmd/orchestrate/main.go orchestrator/*.go | build/ns
+	go build -o $@ ./orchestrator/cmd/orchestrate/
+
+# AC-2a: parallel (cores=4) == serial (cores=1) for n≤14
+ns-gate-parallel: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
+	rm -rf /tmp/ns_m2_parallel && mkdir -p /tmp/ns_m2_parallel/spill
+	./build/ns/orchestrate --maxn 14 --cores 4 --ram 67108864 \
+	    --run-dir /tmp/ns_m2_parallel --spill-dir /tmp/ns_m2_parallel/spill \
+	    --checkpoint /tmp/ns_m2_parallel/POLYCKPT --checkpoint-every 0 --compare
+
+# AC-2b: kill+resume gives byte-identical result (25 random-delay trials, maxn=8)
+ns-gate-resume-fuzz: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
+	bash tests/gate_ns_resume.sh 25 8 4
 
 # AC-1 long-run gate (manual invocation; hours to days depending on maxn and box):
 #   ./build/ns/driver1 --maxn 18 --ram 67108864 --spill /some/nvme/dir --compare
