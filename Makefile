@@ -161,7 +161,7 @@ ns-gate-spill: build/ns/driver1
 	mkdir -p /tmp/ns_m1_gate && ./build/ns/driver1 --maxn 14 --ram 1048576 --spill /tmp/ns_m1_gate --compare
 
 build/ns/orchestrate: orchestrator/cmd/orchestrate/main.go orchestrator/*.go | build/ns
-	go build -o $@ ./orchestrator/cmd/orchestrate/
+	go build -ldflags "-X main.gitRev=$(GIT_REV)$(GIT_DIRTY)" -o $@ ./orchestrator/cmd/orchestrate/
 
 build/ns/runcat: orchestrator/cmd/runcat/main.go orchestrator/*.go | build/ns
 	go build -o $@ ./orchestrator/cmd/runcat/

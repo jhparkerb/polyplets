@@ -90,7 +90,7 @@ func main() {
 		bin = findWorkers()
 	}
 
-	rev := gitRev()
+	rev := gitRev
 
 	cfg := orchestrator.SweepConfig{
 		Maxn:            *maxn,
@@ -219,12 +219,10 @@ func parseHeights(arg string, maxn int) ([]int, error) {
 	return out, nil
 }
 
-func gitRev() string {
-	// Best-effort: read from the binary embed if available, else "unknown".
-	// The Makefile injects GIT_REV into C++ binaries via -D; Go doesn't have
-	// that path, but we can shell out if needed. For M2, "unknown" is fine.
-	return "unknown"
-}
+// gitRev is stamped at build time via -ldflags "-X main.gitRev=...". The
+// Makefile passes the same $(GIT_REV)$(GIT_DIRTY) it bakes into the C++ workers
+// so a run's provenance traces to an exact (possibly -dirty) tree.
+var gitRev = "unknown"
 
 func findWorkers() orchestrator.WorkerBin {
 	// Try build/ns/ relative to cwd, then two levels up (when run from the
