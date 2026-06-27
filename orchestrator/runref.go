@@ -25,9 +25,18 @@ type PolyrunHeader struct {
 	Height  int
 	Maxn    int
 	Records uint64
+	Counter string // "u64" or "u128"
 	KeyLo   string
 	KeyHi   string
 	Rev     string
+}
+
+// WordBytes returns the byte width of one count value (8 for u64, 16 for u128).
+func (h PolyrunHeader) WordBytes() int {
+	if h.Counter == "u128" {
+		return 16
+	}
+	return 8
 }
 
 // ParseHeader reads a POLYRUN header and returns it with the byte offset
@@ -64,6 +73,8 @@ func ParseHeader(path string) (PolyrunHeader, int64, error) {
 			hdr.Maxn, _ = strconv.Atoi(v)
 		case "records":
 			hdr.Records, _ = strconv.ParseUint(strings.TrimSpace(v), 10, 64)
+		case "counter":
+			hdr.Counter = strings.TrimSpace(v)
 		case "keylo":
 			hdr.KeyLo = v
 		case "keyhi":
@@ -99,8 +110,9 @@ func SampleKeys(path string, H, numCuts int) ([]string, error) {
 		return nil, err
 	}
 
-	// Stream records (variable-length: keyLen + 2 + len*8 bytes for u64).
+	// Stream records (variable-length: keyLen + 2 + len*wordBytes bytes).
 	keyLen := H + 2
+	wordBytes := hdr.WordBytes()
 	stride := int(hdr.Records) / (numCuts + 1)
 	if stride < 1 {
 		stride = 1
@@ -117,8 +129,8 @@ func SampleKeys(path string, H, numCuts int) ([]string, error) {
 			break
 		}
 		length := int(meta[1])
-		// Skip count bytes (u64 = 8 B each).
-		if _, err := io.CopyN(io.Discard, f, int64(length*8)); err != nil {
+		// Skip count bytes (wordBytes per entry).
+		if _, err := io.CopyN(io.Discard, f, int64(length*wordBytes)); err != nil {
 			break
 		}
 		idx++
@@ -231,8 +243,18 @@ func bytesToHex(b []byte) string {
 }
 
 // WriteSeedPolyrun writes a seed POLYRUN file for height H (col 0: empty boundary,
-// counts[0]=1).  The record count is known upfront so no fseek is needed.
-func WriteSeedPolyrun(path, rev string, H, maxn int) error {
+// counts[0]=1).  counter is "u64" or "u128" (empty = "u64").
+// The record count is known upfront so no fseek is needed.
+func WriteSeedPolyrun(path, rev string, H, maxn int, counter ...string) error {
+	counterTag := "u64"
+	if len(counter) > 0 && counter[0] == "u128" {
+		counterTag = "u128"
+	}
+	wordBytes := 8
+	if counterTag == "u128" {
+		wordBytes = 16
+	}
+
 	f, err := os.Create(path)
 	if err != nil {
 		return err
@@ -246,7 +268,7 @@ func WriteSeedPolyrun(path, rev string, H, maxn int) error {
 	fmt.Fprintf(f, "POLYRUN 1\n")
 	fmt.Fprintf(f, "height %d\n", H)
 	fmt.Fprintf(f, "maxn %d\n", maxn)
-	fmt.Fprintf(f, "counter u64\n")
+	fmt.Fprintf(f, "counter %s\n", counterTag)
 	fmt.Fprintf(f, "classifier triangle\n")
 	fmt.Fprintf(f, "keylo \n")
 	fmt.Fprintf(f, "keyhi \n")
@@ -255,15 +277,16 @@ func WriteSeedPolyrun(path, rev string, H, maxn int) error {
 	fmt.Fprintf(f, "byteorder 1\n")
 	fmt.Fprintf(f, "\n")
 
-	// One binary record: sig=(H+2 zero bytes), lo=0, len=1, counts[0]=1 LE u64.
+	// One binary record: sig=(H+2 zero bytes), lo=0, len=1, counts[0]=1 LE.
 	keyLen := H + 2
-	body := make([]byte, keyLen+2+8)
+	body := make([]byte, keyLen+2+wordBytes)
 	// body[0..keyLen-1] = 0 (sig)
 	// body[keyLen] = 0 (lo)
 	// body[keyLen+1] = 1 (len)
 	body[keyLen+1] = 1
-	// body[keyLen+2..keyLen+9] = 1 as LE u64
+	// body[keyLen+2..keyLen+wordBytes+1] = 1 as LE value
 	binary.LittleEndian.PutUint64(body[keyLen+2:], 1)
+	// for u128, the upper 8 bytes remain zero (already zero-initialized)
 
 	crc := fnv1a64(body)
 	crcBytes := make([]byte, 8)

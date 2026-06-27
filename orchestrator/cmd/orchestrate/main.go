@@ -33,6 +33,7 @@ func main() {
 	fold := flag.Bool("fold", true, "R1 vertical-mirror fold")
 	cores := flag.Int("cores", runtime.NumCPU(), "max parallel workers")
 	ram := flag.Uint64("ram", 128<<20, "map_worker spill budget in bytes")
+	counter := flag.String("counter", "u64", "counter width: u64 or u128")
 	runDir := flag.String("run-dir", "", "directory for run files (default: auto in /tmp)")
 	spillDir := flag.String("spill-dir", "", "directory for map_worker internal spills")
 	ckptPath := flag.String("checkpoint", "", "checkpoint path (default: <run-dir>/POLYCKPT)")
@@ -82,6 +83,7 @@ func main() {
 		Fold:            *fold,
 		Cores:           *cores,
 		RAM:             *ram,
+		CounterWidth:    *counter,
 		RunDir:          *runDir,
 		SpillDir:        *spillDir,
 		CheckpointPath:  *ckptPath,
@@ -90,8 +92,8 @@ func main() {
 		Bin:             bin,
 	}
 
-	fmt.Printf("orchestrate maxn=%d fold=%v cores=%d ram=%d run_dir=%s rev=%s\n",
-		*maxn, *fold, *cores, *ram, *runDir, rev)
+	fmt.Printf("orchestrate maxn=%d fold=%v cores=%d ram=%d counter=%s run_dir=%s rev=%s\n",
+		*maxn, *fold, *cores, *ram, *counter, *runDir, rev)
 
 	// Resume from checkpoint if requested.
 	var ckpt *orchestrator.Checkpoint

@@ -18,7 +18,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 
 .PHONY: gates gate-g1 gate-g2 gate-euler clean \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
-        ns-gate-parallel ns-gate-resume-boundaries \
+        ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 \
         ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
         build/ns/orchestrate
 
@@ -123,7 +123,7 @@ build/ns:
 	mkdir -p build/ns
 
 # ns-gates: all new-system gates
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128
 
 ns-gate-math: build/ns/gate_math
 	./build/ns/gate_math
@@ -174,6 +174,14 @@ ns-gate-parallel: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 # there via an in-package test seam, resumes, and compares. See resume_test.go.
 ns-gate-resume-boundaries: build/ns/map_worker build/ns/merge_worker
 	go test ./orchestrator/ -run TestKillResumeAllBoundaries -v
+
+# T3.1 gate (AC-3 prerequisite): u128 counter produces byte-identical totals to u64 for n<=14.
+# Runs the full orchestrator with --counter u128 and compares against known a(n) fixtures.
+ns-gate-u128: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
+	rm -rf /tmp/ns_m3_u128 && mkdir -p /tmp/ns_m3_u128/spill
+	./build/ns/orchestrate --maxn 14 --counter u128 --cores 4 --ram 67108864 \
+	    --run-dir /tmp/ns_m3_u128 --spill-dir /tmp/ns_m3_u128/spill \
+	    --checkpoint /tmp/ns_m3_u128/POLYCKPT --checkpoint-every 0 --compare
 
 # AC-1 long-run gate (manual invocation; hours to days depending on maxn and box):
 #   ./build/ns/driver1 --maxn 18 --ram 67108864 --spill /some/nvme/dir --compare

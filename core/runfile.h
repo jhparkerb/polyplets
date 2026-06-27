@@ -29,6 +29,12 @@
 
 #include "core/run.h"
 
+// ─── Counter name ─────────────────────────────────────────────────────────────
+
+template <class W> inline constexpr const char* counterTag();
+template <> inline constexpr const char* counterTag<u64>()  { return "u64"; }
+template <> inline constexpr const char* counterTag<u128>() { return "u128"; }
+
 // ─── Hex helpers ──────────────────────────────────────────────────────────────
 
 inline std::string bytesToHex(const uint8_t* b, int n) {
@@ -170,7 +176,7 @@ class RunFileWriter {
     std::fprintf(fp_, "POLYRUN 1\n");
     std::fprintf(fp_, "height %d\n", H);
     std::fprintf(fp_, "maxn %d\n", maxn);
-    std::fprintf(fp_, "counter u64\n");
+    std::fprintf(fp_, "counter %s\n", counterTag<W>());
     std::fprintf(fp_, "classifier triangle\n");
     std::fprintf(fp_, "keylo %s\n", lo_hex.c_str());
     std::fprintf(fp_, "keyhi %s\n", hi_hex.c_str());

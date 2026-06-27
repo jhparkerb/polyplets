@@ -28,6 +28,7 @@ type SweepConfig struct {
 	CheckpointPath  string        // path to write/read POLYCKPT
 	CheckpointEvery time.Duration // wall cadence for checkpoints (0 = every column)
 	Rev             string        // git rev for POLYRUN headers
+	CounterWidth    string        // "u64" or "u128"; empty = default (u64)
 	Bin             WorkerBin
 
 	// afterColumn, if non-nil, is called after each forward checkpoint is
@@ -98,7 +99,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			resume = nil
 		} else {
 			seed := filepath.Join(cfg.RunDir, fmt.Sprintf("seed_h%d.bin", H))
-			if err := WriteSeedPolyrun(seed, cfg.Rev, H, maxn); err != nil {
+			if err := WriteSeedPolyrun(seed, cfg.Rev, H, maxn, cfg.CounterWidth); err != nil {
 				return nil, fmt.Errorf("H=%d: write seed: %w", H, err)
 			}
 			frontier = []string{seed}
@@ -289,6 +290,7 @@ func mapPhase(
 				RAM:      cfg.RAM,
 				SpillDir: cfg.SpillDir,
 				OutPath:  outPath,
+				Counter:  cfg.CounterWidth,
 				LoHex:    los[idx],
 				HiHex:    his[idx],
 				Rev:      cfg.Rev,
@@ -367,6 +369,7 @@ func mergePhase(
 				InPaths: mapOuts,
 				H:       H,
 				OutPath: outPath,
+				Counter: cfg.CounterWidth,
 				KLoHex:  los[idx],
 				KHiHex:  his[idx],
 				Rev:     cfg.Rev,

@@ -3,7 +3,7 @@
 // Usage:
 //   map_worker --in PATH[,PATH,...] --H N --maxn N [--fold 0|1]
 //              --ram BYTES --spill DIR --out PATH
-//              [--lo HEX] [--hi HEX] [--rev GITREV]
+//              [--counter u64|u128] [--lo HEX] [--hi HEX] [--rev GITREV]
 //
 // Reads POLYRUN source run(s), applies the king-column transition with disk
 // spill, writes one sorted POLYRUN output run.  Emits accounting + triangle
@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
 
   // ─── Arg parsing ────────────────────────────────────────────────────────────
   std::string in_str, out_path, spill_dir, lo_hex, hi_hex, rev;
+  std::string counter_arg = "u64";
   int H = 0, maxn = 0, fold = 0;
   size_t ram_bytes = 128ULL * 1024 * 1024;  // 128 MB default
 
@@ -37,16 +38,17 @@ int main(int argc, char** argv) {
     auto arg = [&](const char* flag) {
       return std::strcmp(argv[i], flag) == 0 && i + 1 < argc;
     };
-    if (arg("--in"))    in_str    = argv[++i];
-    else if (arg("--H"))     H         = std::atoi(argv[++i]);
-    else if (arg("--maxn"))  maxn      = std::atoi(argv[++i]);
-    else if (arg("--fold"))  fold      = std::atoi(argv[++i]);
-    else if (arg("--ram"))   ram_bytes = static_cast<size_t>(std::strtoull(argv[++i], nullptr, 10));
-    else if (arg("--spill")) spill_dir = argv[++i];
-    else if (arg("--out"))   out_path  = argv[++i];
-    else if (arg("--lo"))    lo_hex    = argv[++i];
-    else if (arg("--hi"))    hi_hex    = argv[++i];
-    else if (arg("--rev"))   rev       = argv[++i];
+    if (arg("--in"))          in_str      = argv[++i];
+    else if (arg("--H"))      H           = std::atoi(argv[++i]);
+    else if (arg("--maxn"))   maxn        = std::atoi(argv[++i]);
+    else if (arg("--fold"))   fold        = std::atoi(argv[++i]);
+    else if (arg("--ram"))    ram_bytes   = static_cast<size_t>(std::strtoull(argv[++i], nullptr, 10));
+    else if (arg("--spill"))  spill_dir   = argv[++i];
+    else if (arg("--out"))    out_path    = argv[++i];
+    else if (arg("--counter"))counter_arg = argv[++i];
+    else if (arg("--lo"))     lo_hex      = argv[++i];
+    else if (arg("--hi"))     hi_hex      = argv[++i];
+    else if (arg("--rev"))    rev         = argv[++i];
     else {
       std::fprintf(stderr, "map_worker: unknown arg: %s\n", argv[i]);
       return 1;
@@ -56,6 +58,10 @@ int main(int argc, char** argv) {
   if (in_str.empty() || H <= 0 || maxn <= 0 || out_path.empty() || spill_dir.empty()) {
     std::fprintf(stderr,
       "map_worker: required: --in --H --maxn --ram --spill --out\n");
+    return 1;
+  }
+  if (counter_arg != "u64" && counter_arg != "u128") {
+    std::fprintf(stderr, "map_worker: --counter must be u64 or u128\n");
     return 1;
   }
 
@@ -72,19 +78,30 @@ int main(int argc, char** argv) {
   const double t0_wall = wallSeconds();
   const double t0_cpu  = cpuSeconds();
 
-  TriangleRow<u64> triangle(H, maxn);
-  auto [spill_bytes, out_recs] = map_shard_file<u64, ClassifyTriangle>(
-      in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev);
+  size_t spill_bytes, out_recs;
+
+  if (counter_arg == "u128") {
+    TriangleRow<u128> triangle(H, maxn);
+    std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyTriangle>(
+        in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev);
+    char buf[41];
+    for (int n = 1; n <= maxn; ++n) {
+      if (triangle.row[n] != u128{0})
+        std::printf("tri %d %d %s\n", H, n, u128Dec(triangle.row[n], buf));
+    }
+  } else {
+    TriangleRow<u64> triangle(H, maxn);
+    std::tie(spill_bytes, out_recs) = map_shard_file<u64, ClassifyTriangle>(
+        in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev);
+    for (int n = 1; n <= maxn; ++n) {
+      if (triangle.row[n] != u64{0})
+        std::printf("tri %d %d %llu\n", H, n, (unsigned long long)triangle.row[n]);
+    }
+  }
 
   const double cpu_s  = cpuSeconds()  - t0_cpu;
   const double wall_s = wallSeconds() - t0_wall;
   const double rss_mb = peakRssMB();
-
-  // Emit triangle contributions (non-zero entries).
-  for (int n = 1; n <= maxn; ++n) {
-    if (triangle.row[n] != u64{0})
-      std::printf("tri %d %d %llu\n", H, n, (unsigned long long)triangle.row[n]);
-  }
 
   // Emit accounting line.
   std::printf("event=done cpu_s=%.3f wall_s=%.3f peak_rss_mb=%.1f "

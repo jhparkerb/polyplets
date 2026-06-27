@@ -33,6 +33,7 @@ type MapArgs struct {
 	RAM      uint64 // bytes
 	SpillDir string
 	OutPath  string
+	Counter  string // "u64" or "u128"; empty = default (u64)
 	LoHex    string // empty = no lower bound
 	HiHex    string // empty = no upper bound
 	Rev      string
@@ -43,6 +44,7 @@ type MergeArgs struct {
 	InPaths []string
 	H       int
 	OutPath string
+	Counter string // "u64" or "u128"; empty = default (u64)
 	KLoHex  string
 	KHiHex  string
 	Rev     string
@@ -63,6 +65,9 @@ func RunMapWorker(ctx context.Context, bin WorkerBin, a MapArgs) (WorkerResult, 
 		"--spill", a.SpillDir,
 		"--out", a.OutPath,
 	}
+	if a.Counter != "" {
+		args = append(args, "--counter", a.Counter)
+	}
 	if a.LoHex != "" {
 		args = append(args, "--lo", a.LoHex)
 	}
@@ -81,6 +86,9 @@ func RunMergeWorker(ctx context.Context, bin WorkerBin, a MergeArgs) (WorkerResu
 		"--in", strings.Join(a.InPaths, ","),
 		"--H", fmt.Sprint(a.H),
 		"--out", a.OutPath,
+	}
+	if a.Counter != "" {
+		args = append(args, "--counter", a.Counter)
 	}
 	if a.KLoHex != "" {
 		args = append(args, "--klo", a.KLoHex)

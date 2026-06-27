@@ -46,6 +46,15 @@ inline double cpuSeconds() {
          static_cast<double>(ru.ru_stime.tv_usec) * 1e-6;
 }
 
+// Print an unsigned __int128 as decimal.  Returns pointer into buf[0..41).
+inline const char* u128Dec(unsigned __int128 v, char buf[41]) {
+  buf[40] = '\0';
+  int pos = 40;
+  if (v == 0) { buf[--pos] = '0'; return buf + pos; }
+  while (v > 0) { buf[--pos] = '0' + static_cast<int>(v % 10); v /= 10; }
+  return buf + pos;
+}
+
 // Peak resident set size in MB. ru_maxrss is bytes on macOS, KB on Linux.
 inline double peakRssMB() {
   struct rusage ru;
