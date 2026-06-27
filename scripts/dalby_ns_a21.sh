@@ -9,7 +9,7 @@
 
 set -euo pipefail
 
-REPO=~/src/polyominoes
+REPO=$(cd "$(dirname "$0")/.." && pwd)
 BIN=$REPO/build/ns/orchestrate
 RUNDIR=$REPO/runs/ns_a21
 SPILL=$RUNDIR/spill

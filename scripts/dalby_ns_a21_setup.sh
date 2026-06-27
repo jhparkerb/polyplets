@@ -8,18 +8,17 @@
 set -euo pipefail
 
 H20_PID=${1:?usage: $0 <H20_pid>}
-REPO=~/src/polyominoes
+REPO=$(cd "$(dirname "$0")/.." && pwd)
 
 echo "=== dalby_ns_a21_setup start $(date -Iseconds) ==="
+echo "repo: $REPO"
 echo "waiting for H20 pid $H20_PID to exit..."
 
-gtail --pid="$H20_PID" -f /dev/null 2>/dev/null || true
+tail --pid="$H20_PID" -f /dev/null
 
 echo "H20 done $(date -Iseconds)"
 
 cd "$REPO"
-git fetch origin next-system
-git checkout next-system
 git log --oneline -1
 
 echo "building new engine..."
