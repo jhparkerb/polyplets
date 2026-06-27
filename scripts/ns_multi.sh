@@ -38,7 +38,8 @@ for spec in "$@"; do
   H="${spec%%:*}"; C="${spec##*:}"
   d="$ROOT/inst${i}"; mkdir -p "$d/spill"
   echo "launch inst$i heights=$H cores=$C" | tee -a "$LOG"
-  "$REPO/build/ns/orchestrate" --maxn "$N" --heights "$H" --cores "$C" --ram "$RAM" \
+  "$REPO/build/ns/orchestrate" --maxn "$N" --heights "$H" --cores "$C" \
+    --unit-mult "${MULT:-4}" --ram "$RAM" \
     --run-dir "$d" --spill-dir "$d/spill" --per-height-out "$ROOT/perheight" \
     --checkpoint "$d/CK" --checkpoint-every 300 --cost-profile-out "$d/profile.tsv" \
     > "$d/run.log" 2>&1 &
