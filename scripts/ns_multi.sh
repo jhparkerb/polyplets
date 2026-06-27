@@ -35,10 +35,11 @@ echo "ns_multi rev=$REV host=$(hostname -s) N=$N ram_per_worker_gb=$RAMW_GB inst
 pids=(); labels=()
 i=0
 for spec in "$@"; do
-  H="${spec%%:*}"; C="${spec##*:}"
+  IFS=':' read -r H C NICE <<< "$spec"   # spec = HEIGHTS:CORES[:NICE]
+  NICE="${NICE:-0}"
   d="$ROOT/inst${i}"; mkdir -p "$d/spill"
-  echo "launch inst$i heights=$H cores=$C" | tee -a "$LOG"
-  "$REPO/build/ns/orchestrate" --maxn "$N" --heights "$H" --cores "$C" \
+  echo "launch inst$i heights=$H cores=$C nice=$NICE" | tee -a "$LOG"
+  nice -n "$NICE" "$REPO/build/ns/orchestrate" --maxn "$N" --heights "$H" --cores "$C" \
     --unit-mult "${MULT:-4}" --ram "$RAM" \
     --run-dir "$d" --spill-dir "$d/spill" --per-height-out "$ROOT/perheight" \
     --checkpoint "$d/CK" --checkpoint-every 300 --cost-profile-out "$d/profile.tsv" \
