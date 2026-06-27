@@ -25,7 +25,7 @@ RAMW_GB="${2:?ram per worker GB}"
 ROOT="${3:?run root}"
 shift 3
 [ "$#" -ge 1 ] || { echo "need at least one HEIGHTS:CORES spec"; exit 2; }
-RAM=$(( RAMW_GB * 1024 * 1024 * 1024 ))
+RAM=$(awk "BEGIN{printf \"%d\", $RAMW_GB * 1024 * 1024 * 1024}")  # GB (fractional ok, e.g. 0.5 for oversubscription)
 
 rm -rf "$ROOT"; mkdir -p "$ROOT/perheight"
 REV="$(git -C "$REPO" rev-parse --short HEAD)"
