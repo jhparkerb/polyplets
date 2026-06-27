@@ -35,7 +35,8 @@ func main() {
 	maxn := flag.Int("maxn", 16, "max cell count")
 	fold := flag.Bool("fold", true, "R1 vertical-mirror fold")
 	cores := flag.Int("cores", runtime.NumCPU(), "max parallel workers")
-	unitMult := flag.Int("unit-mult", 1, "work units per core (units = cores*unit-mult; concurrency stays cores)")
+	unitMult := flag.Int("unit-mult", 1, "MAP work units per core (units = cores*unit-mult; concurrency stays cores)")
+	mergeMult := flag.Int("merge-mult", 0, "MERGE ranges per core (0 = follow --unit-mult; set low, e.g. 1, to cut merge fan-in)")
 	ram := flag.Uint64("ram", 128<<20, "map_worker spill budget in bytes")
 	counter := flag.String("counter", "u64", "counter width: u64 or u128")
 	runDir := flag.String("run-dir", "", "directory for run files (default: auto in /tmp)")
@@ -97,6 +98,7 @@ func main() {
 		Fold:            *fold,
 		Cores:           *cores,
 		UnitMult:        *unitMult,
+		MergeMult:       *mergeMult,
 		RAM:             *ram,
 		CounterWidth:    *counter,
 		RunDir:          *runDir,
@@ -111,8 +113,8 @@ func main() {
 		Bin:             bin,
 	}
 
-	fmt.Printf("orchestrate maxn=%d fold=%v cores=%d unit_mult=%d ram=%d counter=%s run_dir=%s rev=%s\n",
-		*maxn, *fold, *cores, *unitMult, *ram, *counter, *runDir, rev)
+	fmt.Printf("orchestrate maxn=%d fold=%v cores=%d unit_mult=%d merge_mult=%d ram=%d counter=%s run_dir=%s rev=%s\n",
+		*maxn, *fold, *cores, *unitMult, *mergeMult, *ram, *counter, *runDir, rev)
 
 	// Resume from checkpoint if requested.
 	var ckpt *orchestrator.Checkpoint

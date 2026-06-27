@@ -22,7 +22,8 @@ type SweepConfig struct {
 	Maxn            int
 	Fold            bool
 	Cores           int           // max concurrent workers
-	UnitMult        int           // work units per core (default 1); units = Cores*UnitMult, concurrency stays Cores
+	UnitMult        int           // MAP work units per core (default 1); units = Cores*UnitMult, concurrency stays Cores
+	MergeMult       int           // MERGE ranges per core (0 = follow UnitMult); set low to cut the (cores*mult)^2 merge fan-in
 	RAM             uint64        // bytes per map_worker spill budget
 	RunDir          string        // directory for all run files
 	SpillDir        string        // directory for map_worker internal spills
@@ -400,7 +401,7 @@ func mergePhase(
 		return nil, 0, Acct{}, nil
 	}
 
-	numRanges := cfg.Cores * unitMult(cfg)
+	numRanges := cfg.Cores * mergeMult(cfg)
 	if numRanges < 1 {
 		numRanges = 1
 	}
@@ -511,12 +512,22 @@ func sumFrontierRecords(frontier []string) uint64 {
 	return n
 }
 
-// unitMult returns the configured units-per-core, defaulting to 1.
+// unitMult returns the configured MAP units-per-core, defaulting to 1.
 func unitMult(cfg SweepConfig) int {
 	if cfg.UnitMult < 1 {
 		return 1
 	}
 	return cfg.UnitMult
+}
+
+// mergeMult returns the MERGE ranges-per-core. It follows --unit-mult unless
+// MergeMult is set, letting map run at high granularity (fill cores) while merge
+// runs at low granularity (fewer ranges → less (cores*mult)^2 fan-in I/O).
+func mergeMult(cfg SweepConfig) int {
+	if cfg.MergeMult >= 1 {
+		return cfg.MergeMult
+	}
+	return unitMult(cfg)
 }
 
 // cutsToBounds turns N-1 sorted cut keys into N (lo,hi) hex bounds: unit i
