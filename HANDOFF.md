@@ -1,6 +1,41 @@
-# HANDOFF — 2026-06-27 ~11:00 EDT
+# HANDOFF — 2026-06-27 PM EDT
 
-## What's running
+## 2026-06-27 PM — cut dalby over to the new engine
+
+Decision (jasonp): stop the old-engine a(21) on **dalby** and run a(21) on the new
+engine instead; old campaign was ~4–6 weeks (dalby H20→H19 serialized + ayr H18).
+
+- **dalby**: old H20 + driver + all waiters/telemetry KILLED; box idle (verified
+  RAM 78→1 GB). The new-engine a(21) will run here once the probe passes.
+- **ayr**: UNTOUCHED — H17/H18 keep running as the independent old-engine
+  cross-check (extends per-cell agreement through H18; H1–16 already saved).
+- **Salvaged**: `runs/a21fold/h1..h16.out` on ayr = full per-cell T(n,H) for H≤16
+  (verified Σ T(21,H1–16) = a21.partial = 6,937,832,928,078,101). ~99.8% of a(21)'s
+  mass, per-cell. Only H19/H20 frontier cells will rest on the new engine alone.
+
+### New-engine work this session (next-system, all committed, gates green)
+
+- `--unit-mult` (decouple units from cores; semaphore stays = cores).
+- Per-column cost telemetry + cost profile + live calibrated ETA (`--cost-profile-ref`).
+- Within-column heartbeat (worker pulse + orchestrator ticker; cadence = √checkpoint).
+- A-priori predictor (`build/ns/predict`): scales a profile to target n; validated
+  by predicting a(20) from a(19).
+- Multi-machine height-split (`--heights`, `--per-height-out`, `build/ns/combine`,
+  `scripts/ns_heightsplit.sh`) — Phase B, for a(22)/a(23); `ns-gate-split` PASS.
+- Fixtures extended with a(19)=151609203011580, a(20)=1025573519362016.
+
+### Next: probe then gated a(21) launch
+
+- `scripts/ns_probe.sh` (dalby): a(19) at unit-mult 1/4/8 → pick fastest, then a(20)
+  at best mult with predicted reference profile. Validates core utilization,
+  per-term R, predictor error, and correctness (--compare on known a19/a20).
+- **a(21) launch gate**: a19 AND a20 --compare PASS, predictor within tolerance,
+  projected wall ≲36h, fits 125 GB, telemetry live. Else hold.
+- Need to push next-system to origin + build on dalby before the probe.
+
+---
+
+## What's running (pre-cutover snapshot — dalby section now stale)
 
 ### Old engine a(21) — split ayr + dalby, weeks from done
 
