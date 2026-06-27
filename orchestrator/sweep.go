@@ -32,6 +32,8 @@ type SweepConfig struct {
 	CounterWidth    string        // "u64" or "u128"; empty = default (u64)
 	CostProfileOut  string        // where to emit the cost profile (default: <RunDir>/cost_profile.tsv)
 	CostProfileRef  string        // optional reference profile to drive the live ETA
+	Heights         []int         // subset of heights to sweep (empty = 1..Maxn); for multi-machine split
+	PerHeightOut    string        // dir to write per-height h<H>.out files (empty = none)
 	Bin             WorkerBin
 
 	// afterColumn, if non-nil, is called after each forward checkpoint is
@@ -56,7 +58,16 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	triangle := make([]uint64, maxn+1)
 	var acct Acct
 
-	startH := 1
+	// Heights to sweep: an explicit subset (multi-machine split) or all 1..maxn.
+	heights := cfg.Heights
+	if len(heights) == 0 {
+		heights = make([]int, 0, maxn)
+		for H := 1; H <= maxn; H++ {
+			heights = append(heights, H)
+		}
+	}
+
+	startIdx := 0
 	if resume != nil {
 		acct = resume.Acct
 		// Restore the accumulated triangle from the checkpoint.
@@ -65,7 +76,13 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 				triangle[n] = v
 			}
 		}
-		startH = resume.H
+		// Resume at the list position matching the checkpoint height.
+		for i, H := range heights {
+			if H == resume.H {
+				startIdx = i
+				break
+			}
+		}
 	}
 
 	// writeCheckpoint writes a POLYCKPT with the outer triangle + the current
@@ -97,7 +114,8 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		return nil, err
 	}
 
-	for H := startH; H <= maxn; H++ {
+	for hi := startIdx; hi < len(heights); hi++ {
+		H := heights[hi]
 		startCol := 0
 		var frontier []string
 
@@ -126,6 +144,14 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 
 		if err != nil {
 			return nil, err
+		}
+
+		// Per-height row (multi-machine combine + direct cross-check vs the old
+		// engine's h<H>.out). Written only on a fully completed height.
+		if cfg.PerHeightOut != "" {
+			if werr := writePerHeight(cfg.PerHeightOut, H, maxn, hTri); werr != nil {
+				fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
+			}
 		}
 	}
 
@@ -427,6 +453,35 @@ func mergePhase(
 		acct.Add(rr.result.Acct)
 	}
 	return outPaths, totalRecs, acct, nil
+}
+
+// writePerHeight writes one height's T(n,H) row to <dir>/h<H>.out as "n value"
+// lines for n=1..maxn (matching the old engine's per-height output, so the two
+// can be byte-compared cell by cell).
+func writePerHeight(dir string, H, maxn int, hTri []uint64) error {
+	if err := os.MkdirAll(dir, 0o777); err != nil {
+		return err
+	}
+	path := filepath.Join(dir, fmt.Sprintf("h%d.out", H))
+	tmp := path + ".tmp"
+	f, err := os.Create(tmp)
+	if err != nil {
+		return err
+	}
+	for n := 1; n <= maxn; n++ {
+		var v uint64
+		if n < len(hTri) {
+			v = hTri[n]
+		}
+		if _, err := fmt.Fprintf(f, "%d %d\n", n, v); err != nil {
+			f.Close()
+			return err
+		}
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+	return os.Rename(tmp, path)
 }
 
 // sumFrontierRecords totals the record counts across frontier run files, read

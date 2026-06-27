@@ -22,6 +22,9 @@ import (
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"sort"
+	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -44,7 +47,15 @@ func main() {
 	workersDir := flag.String("workers-dir", "", "directory containing map_worker/merge_worker binaries")
 	costProfileOut := flag.String("cost-profile-out", "", "emit per-column cost profile here (default: <run-dir>/cost_profile.tsv)")
 	costProfileRef := flag.String("cost-profile-ref", "", "reference cost profile to drive the live ETA")
+	heightsArg := flag.String("heights", "", "subset of heights to sweep, e.g. 1-12 or 17,19,20 (default: all 1..maxn; for multi-machine split)")
+	perHeightOut := flag.String("per-height-out", "", "dir to write per-height h<H>.out rows (for combine + old-engine cross-check)")
 	flag.Parse()
+
+	heights, herr := parseHeights(*heightsArg, *maxn)
+	if herr != nil {
+		fmt.Fprintf(os.Stderr, "orchestrate: --heights: %v\n", herr)
+		os.Exit(2)
+	}
 
 	pid := os.Getpid()
 
@@ -95,6 +106,8 @@ func main() {
 		Rev:             rev,
 		CostProfileOut:  *costProfileOut,
 		CostProfileRef:  *costProfileRef,
+		Heights:         heights,
+		PerHeightOut:    *perHeightOut,
 		Bin:             bin,
 	}
 
@@ -171,6 +184,54 @@ func main() {
 		fmt.Printf("gate_parallel FAIL\n")
 		os.Exit(1)
 	}
+}
+
+// parseHeights parses "1-12", "17,19,20", or "" (= all 1..maxn) into a sorted,
+// deduplicated, validated height list.
+func parseHeights(arg string, maxn int) ([]int, error) {
+	if strings.TrimSpace(arg) == "" {
+		return nil, nil // empty = all heights (Run fills 1..maxn)
+	}
+	seen := map[int]bool{}
+	var out []int
+	add := func(h int) error {
+		if h < 1 || h > maxn {
+			return fmt.Errorf("height %d out of range 1..%d", h, maxn)
+		}
+		if !seen[h] {
+			seen[h] = true
+			out = append(out, h)
+		}
+		return nil
+	}
+	for _, part := range strings.Split(arg, ",") {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		if lo, hi, ok := strings.Cut(part, "-"); ok {
+			a, e1 := strconv.Atoi(strings.TrimSpace(lo))
+			b, e2 := strconv.Atoi(strings.TrimSpace(hi))
+			if e1 != nil || e2 != nil || a > b {
+				return nil, fmt.Errorf("bad range %q", part)
+			}
+			for h := a; h <= b; h++ {
+				if err := add(h); err != nil {
+					return nil, err
+				}
+			}
+		} else {
+			h, err := strconv.Atoi(part)
+			if err != nil {
+				return nil, fmt.Errorf("bad height %q", part)
+			}
+			if err := add(h); err != nil {
+				return nil, err
+			}
+		}
+	}
+	sort.Ints(out)
+	return out, nil
 }
 
 func gitRev() string {

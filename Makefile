@@ -21,7 +21,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify \
         ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
-        build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/gate_holes build/ns/verify
+        build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
 # All currently existing gates
 gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-euler gate-driver
@@ -169,6 +169,9 @@ build/ns/runcat: orchestrator/cmd/runcat/main.go orchestrator/*.go | build/ns
 build/ns/predict: orchestrator/cmd/predict/main.go orchestrator/*.go | build/ns
 	go build -o $@ ./orchestrator/cmd/predict/
 
+build/ns/combine: orchestrator/cmd/combine/main.go orchestrator/*.go | build/ns
+	go build -o $@ ./orchestrator/cmd/combine/
+
 # AC-2a: parallel (cores=4) == serial (cores=1) for n≤14
 ns-gate-parallel: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 	rm -rf /tmp/ns_m2_parallel && mkdir -p /tmp/ns_m2_parallel/spill
@@ -180,6 +183,16 @@ ns-gate-parallel: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
 	./build/ns/orchestrate --maxn 14 --cores 4 --unit-mult 4 --ram 67108864 \
 	    --run-dir /tmp/ns_m2_parallel --spill-dir /tmp/ns_m2_parallel/spill \
 	    --checkpoint /tmp/ns_m2_parallel/POLYCKPT --checkpoint-every 0 --compare
+
+# Multi-machine height-split: two disjoint height subsets, combined, must equal
+# the serial total.  Also exercises --per-height-out and combine's coverage check.
+ns-gate-split: build/ns/orchestrate build/ns/combine build/ns/map_worker build/ns/merge_worker
+	rm -rf /tmp/ns_split && mkdir -p /tmp/ns_split/A/spill /tmp/ns_split/B/spill
+	./build/ns/orchestrate --maxn 14 --cores 4 --heights 1-7 --per-height-out /tmp/ns_split/outA \
+	    --run-dir /tmp/ns_split/A --spill-dir /tmp/ns_split/A/spill --checkpoint /tmp/ns_split/A/CK --checkpoint-every 0
+	./build/ns/orchestrate --maxn 14 --cores 4 --heights 8-14 --per-height-out /tmp/ns_split/outB \
+	    --run-dir /tmp/ns_split/B --spill-dir /tmp/ns_split/B/spill --checkpoint /tmp/ns_split/B/CK --checkpoint-every 0
+	./build/ns/combine --in /tmp/ns_split/outA,/tmp/ns_split/outB --maxn 14 --compare --require-cover
 
 # AC-2b: resume from EVERY checkpoint boundary reproduces the serial result.
 # Exhaustive (not random): the test enumerates each (H,col) checkpoint, cancels
