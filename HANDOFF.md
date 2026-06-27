@@ -1,5 +1,38 @@
 # HANDOFF — 2026-06-27 PM EDT
 
+## 2026-06-27 ~18:00 — a(21) LAUNCHED (new engine, single-instance, dalby)
+
+**Running:** `scripts/ns_a21.sh 4 runs/ns_probe/n18_m4/profile.tsv 80 1 6.76` in dalby
+tmux `0:a21`, pane 993720, log `runs/ns_a21_launch.log`, run dir `runs/ns_a21/`.
+Config: maxn=21, cores=80, **unit-mult=4**, ram=1 GB/worker, per-height-out,
+checkpoint 900s, cost-profile-ref scaled from a(18). rev `35eb9e1`.
+A-priori ETA **7.4 d (eta 2026-07-05)** — conservative (a18-basis); likely faster.
+
+- **WATCH (the scale unknown): disk/spill volume.** No predictor estimate; 346 GB
+  free on /. RAM should stay ~80 GB (spill-bounded by the 1 GB/worker budget) — the
+  predictor's "232 GB peak RSS" is an artifact (it scales per-worker RSS ignoring
+  spill). Stress peaks at the middle heights (~day 2-3). If disk→full or RAM→125 GB:
+  SIGTERM the orchestrate (checkpoints), retune (lower --ram or --cores), `--resume`.
+- **No `--compare` on the run** (a21 not in fixtures → would FAIL at n=21).
+- **Post-run validation:** `combine --in runs/ns_a21/perheight --maxn 21` → a(21);
+  then `combine --maxn 20 --compare` (n≤20 vs fixtures) + `ns_crosscheck.sh` vs the
+  old engine's salvaged h1..h16 (and ayr's h17, done) + growth gate (a21/a20 ≈ 6.78).
+
+### Utilization exploration findings (a(18), why single-instance)
+- Map scales with mult (48-72 cores, NOT bandwidth-bound); **merge structurally
+  under-utilizes (~34 cores)** — fan-in I/O + load imbalance. Within-height tuning
+  (unit-mult, merge-mult) caps ~35.
+- Cross-height overlap (batch model) helps: 2×80 **oversubscribed = 52 cores / 32%
+  faster** — but **bounded by RAM/spill**, not CPU (3×/niced-crew collapsed to 26 on
+  a spill-I/O storm; nice/cgroups arbitrate but don't create I/O capacity).
+- **At a(21) (300× frontiers) spill dominates** → a18 overstates achievable a21
+  utilization; oversubscription would amplify spill. Hence single-instance with
+  generous RAM. a(21) itself is the definitive spill-at-scale measurement that
+  decides the a(22)/a(23) answer: **shared-pool scheduler** (one process, shared RAM,
+  controlled in-flight heights, sequential-friendly merge) vs cgroups-niced-crew stopgap.
+- New flags this session: `--merge-mult` (decouple merge ranges), map/merge phase-split
+  telemetry, `scripts/ns_multi.sh` (multi-instance harness w/ nice). All committed.
+
 ## 2026-06-27 PM — cut dalby over to the new engine
 
 Decision (jasonp): stop the old-engine a(21) on **dalby** and run a(21) on the new
