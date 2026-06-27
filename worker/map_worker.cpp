@@ -84,19 +84,12 @@ int main(int argc, char** argv) {
     TriangleRow<u128> triangle(H, maxn);
     std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyTriangle>(
         in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev);
-    char buf[41];
-    for (int n = 1; n <= maxn; ++n) {
-      if (triangle.row[n] != u128{0})
-        std::printf("tri %d %d %s\n", H, n, u128Dec(triangle.row[n], buf));
-    }
+    printTriangleRows(H, maxn, triangle.row);
   } else {
     TriangleRow<u64> triangle(H, maxn);
     std::tie(spill_bytes, out_recs) = map_shard_file<u64, ClassifyTriangle>(
         in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev);
-    for (int n = 1; n <= maxn; ++n) {
-      if (triangle.row[n] != u64{0})
-        std::printf("tri %d %d %llu\n", H, n, (unsigned long long)triangle.row[n]);
-    }
+    printTriangleRows(H, maxn, triangle.row);
   }
 
   const double cpu_s  = cpuSeconds()  - t0_cpu;

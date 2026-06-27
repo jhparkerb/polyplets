@@ -250,10 +250,7 @@ func WriteSeedPolyrun(path, rev string, H, maxn int, counter ...string) error {
 	if len(counter) > 0 && counter[0] == "u128" {
 		counterTag = "u128"
 	}
-	wordBytes := 8
-	if counterTag == "u128" {
-		wordBytes = 16
-	}
+	wordBytes := (PolyrunHeader{Counter: counterTag}).WordBytes()
 
 	f, err := os.Create(path)
 	if err != nil {

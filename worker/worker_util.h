@@ -55,6 +55,19 @@ inline const char* u128Dec(unsigned __int128 v, char buf[41]) {
   return buf + pos;
 }
 
+// Emit "tri H n value\n" for every nonzero entry in a TriangleRow.
+template <class T>
+inline void printTriangleRows(int H, int maxn, const std::vector<T>& row) {
+  char buf[41];
+  for (int n = 1; n <= maxn; ++n) {
+    if (row[n] == T{0}) continue;
+    if constexpr (sizeof(T) == 16)
+      std::printf("tri %d %d %s\n", H, n, u128Dec(row[n], buf));
+    else
+      std::printf("tri %d %d %llu\n", H, n, (unsigned long long)row[n]);
+  }
+}
+
 // Peak resident set size in MB. ru_maxrss is bytes on macOS, KB on Linux.
 inline double peakRssMB() {
   struct rusage ru;
