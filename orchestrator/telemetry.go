@@ -38,6 +38,7 @@ type telemetry struct {
 	maxn     int
 	outPath  string
 	cols     []ColumnCost
+	cumWall  float64          // running Σ WallS over observed columns
 	clock    func() time.Time // injectable for tests; defaults to time.Now
 	hbEvery  time.Duration    // heartbeat cadence (POLY_HEARTBEAT_SECS, default 30s)
 
@@ -102,14 +103,11 @@ func (t *telemetry) observe(c ColumnCost) {
 		return
 	}
 	t.cols = append(t.cols, c)
+	t.cumWall += c.WallS
 
-	cum := 0.0
-	for _, cc := range t.cols {
-		cum += cc.WallS
-	}
 	fmt.Printf("event=column H=%d col=%d frontier_in=%d frontier_out=%d "+
 		"wall_s=%.2f cum_wall_s=%.1f cpu_s=%.1f rss_max_mb=%.1f\n",
-		c.H, c.Col, c.FrontierIn, c.FrontierOut, c.WallS, cum, c.CPUS, c.RSSMax)
+		c.H, c.Col, c.FrontierIn, c.FrontierOut, c.WallS, t.cumWall, c.CPUS, c.RSSMax)
 
 	if t.ref != nil {
 		if pred, ok := t.ref[[2]int{c.H, c.Col}]; ok {
@@ -297,30 +295,17 @@ func ReadCostProfileFull(path string) ([]ColumnCost, ProfileMeta, error) {
 }
 
 // LoadCostProfile reads a cost profile and returns (H,col)->wall_s plus the total.
+// It is the live-ETA view over ReadCostProfileFull's rows.
 func LoadCostProfile(path string) (map[[2]int]float64, float64, error) {
-	data, err := os.ReadFile(path)
+	rows, _, err := ReadCostProfileFull(path)
 	if err != nil {
 		return nil, 0, err
 	}
-	ref := make(map[[2]int]float64)
+	ref := make(map[[2]int]float64, len(rows))
 	var total float64
-	for _, line := range strings.Split(string(data), "\n") {
-		line = strings.TrimSpace(line)
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		f := strings.Fields(line)
-		if len(f) < 5 {
-			continue
-		}
-		H, e1 := strconv.Atoi(f[0])
-		col, e2 := strconv.Atoi(f[1])
-		wall, e3 := strconv.ParseFloat(f[4], 64)
-		if e1 != nil || e2 != nil || e3 != nil {
-			continue
-		}
-		ref[[2]int{H, col}] = wall
-		total += wall
+	for _, c := range rows {
+		ref[[2]int{c.H, c.Col}] = c.WallS
+		total += c.WallS
 	}
 	return ref, total, nil
 }

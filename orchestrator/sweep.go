@@ -189,6 +189,11 @@ func sweepHeight(
 		}
 	}
 
+	// frontierIn is this column's map input size. It equals the previous
+	// column's frontier_out (totalRecs), so we read headers only once (the seed
+	// or resume frontier) and carry the count forward — no per-column re-read.
+	frontierIn := sumFrontierRecords(frontier)
+
 	for col := startCol; col <= cfg.Maxn; col++ {
 		if len(frontier) == 0 {
 			break
@@ -202,7 +207,6 @@ func sweepHeight(
 		default:
 		}
 
-		frontierIn := sumFrontierRecords(frontier)
 		colStart := time.Now()
 		stopHB := tel.startColumn(H, col)
 
@@ -259,6 +263,7 @@ func sweepHeight(
 			CPUS:        colAcct.CPUS,
 			RSSMax:      colAcct.RSSMax,
 		})
+		frontierIn = totalRecs // next column's input = this column's output
 
 		if totalRecs == 0 {
 			// Height exhausted: write a "height-done" checkpoint with nil frontier

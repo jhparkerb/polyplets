@@ -163,22 +163,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	allOK := true
-	for n := 1; n <= *maxn; n++ {
-		got := result.Triangle[n]
-		want := uint64(0)
-		if n < len(known) {
-			want = known[n]
-		}
-		ok := got == want
-		status := "OK"
-		if !ok {
-			status = "FAIL"
-			allOK = false
-		}
-		fmt.Printf("n=%2d  a(n)=%d  known=%d  %s\n", n, got, want, status)
-	}
-	if allOK {
+	if orchestrator.CompareToKnown(*maxn, result.Triangle, known) {
 		fmt.Printf("gate_parallel PASS (maxn=%d)\n", *maxn)
 	} else {
 		fmt.Printf("gate_parallel FAIL\n")

@@ -2,10 +2,35 @@
 package orchestrator
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
 )
+
+// CompareToKnown prints "n=.. a(n)=.. known=.. OK|FAIL" for n=1..maxn and
+// returns whether every entry matched. Shared by the orchestrate --compare path
+// and the combine tool; each caller prints its own PASS/FAIL summary line.
+func CompareToKnown(maxn int, triangle, known []uint64) bool {
+	allOK := true
+	for n := 1; n <= maxn; n++ {
+		var got uint64
+		if n < len(triangle) {
+			got = triangle[n]
+		}
+		var want uint64
+		if n < len(known) {
+			want = known[n]
+		}
+		status := "OK"
+		if got != want {
+			status = "FAIL"
+			allOK = false
+		}
+		fmt.Printf("n=%2d  a(n)=%d  known=%d  %s\n", n, got, want, status)
+	}
+	return allOK
+}
 
 // LoadKnown parses an OEIS b-file (lines "<n> <a(n)>", '#' comments ignored)
 // into a slice indexed by n, with index 0 seeded to 0.  Used by the production

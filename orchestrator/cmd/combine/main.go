@@ -152,20 +152,7 @@ func compareKnown(maxn int, triangle []uint64) int {
 		fmt.Fprintln(os.Stderr, "combine: no known values (run from repo root)")
 		return 1
 	}
-	allOK := true
-	for n := 1; n <= maxn; n++ {
-		want := uint64(0)
-		if n < len(known) {
-			want = known[n]
-		}
-		status := "OK"
-		if triangle[n] != want {
-			status = "FAIL"
-			allOK = false
-		}
-		fmt.Printf("n=%2d  a(n)=%d  known=%d  %s\n", n, triangle[n], want, status)
-	}
-	if allOK {
+	if orchestrator.CompareToKnown(maxn, triangle, known) {
 		fmt.Printf("combine_compare PASS (maxn=%d)\n", maxn)
 		return 0
 	}
