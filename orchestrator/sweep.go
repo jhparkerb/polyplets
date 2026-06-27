@@ -219,6 +219,8 @@ func sweepHeight(
 			return hTri, acct, fmt.Errorf("H=%d col=%d map: %w", H, col, err)
 		}
 		acct.Add(mapAcct)
+		mapWall := time.Since(colStart).Seconds()
+		mergeStart := time.Now()
 
 		// MERGE PHASE (frontier files still alive — not GC'd yet).
 		// Accumulate triContribs ONLY after merge succeeds, so that if merge
@@ -251,6 +253,7 @@ func sweepHeight(
 
 		// Per-column telemetry: orchestrator wall-clock for this column's
 		// map+merge, with frontier sizes for the cost model and live ETA.
+		mergeWall := time.Since(mergeStart).Seconds()
 		colWall := time.Since(colStart).Seconds()
 		var colAcct Acct
 		colAcct.Add(mapAcct)
@@ -262,6 +265,10 @@ func sweepHeight(
 			WallS:       colWall,
 			CPUS:        colAcct.CPUS,
 			RSSMax:      colAcct.RSSMax,
+			MapWallS:    mapWall,
+			MapCPUS:     mapAcct.CPUS,
+			MergeWallS:  mergeWall,
+			MergeCPUS:   mergeAcct.CPUS,
 		})
 		frontierIn = totalRecs // next column's input = this column's output
 

@@ -26,8 +26,15 @@ type ColumnCost struct {
 	FrontierIn  uint64  // records entering the column (map input)
 	FrontierOut uint64  // records leaving the column (new frontier)
 	WallS       float64 // orchestrator wall-clock for map+merge of this column
-	CPUS        float64 // summed worker cpu seconds
+	CPUS        float64 // summed worker cpu seconds (map+merge)
 	RSSMax      float64 // peak worker RSS (MB) this column
+	// Phase split: the map and merge phases run sequentially, so cpu/wall per
+	// phase separates "map starved" from "merge dragging the blend". Effective
+	// cores in a phase = phase_cpu / phase_wall.
+	MapWallS   float64
+	MapCPUS    float64
+	MergeWallS float64
+	MergeCPUS  float64
 }
 
 // telemetry accumulates ColumnCosts, emits structured progress, writes the cost
@@ -106,8 +113,10 @@ func (t *telemetry) observe(c ColumnCost) {
 	t.cumWall += c.WallS
 
 	fmt.Printf("event=column H=%d col=%d frontier_in=%d frontier_out=%d "+
-		"wall_s=%.2f cum_wall_s=%.1f cpu_s=%.1f rss_max_mb=%.1f\n",
-		c.H, c.Col, c.FrontierIn, c.FrontierOut, c.WallS, t.cumWall, c.CPUS, c.RSSMax)
+		"wall_s=%.2f cum_wall_s=%.1f cpu_s=%.1f rss_max_mb=%.1f "+
+		"map_wall_s=%.2f map_cpu_s=%.1f merge_wall_s=%.2f merge_cpu_s=%.1f\n",
+		c.H, c.Col, c.FrontierIn, c.FrontierOut, c.WallS, t.cumWall, c.CPUS, c.RSSMax,
+		c.MapWallS, c.MapCPUS, c.MergeWallS, c.MergeCPUS)
 
 	if t.ref != nil {
 		if pred, ok := t.ref[[2]int{c.H, c.Col}]; ok {
