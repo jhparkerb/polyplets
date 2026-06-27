@@ -87,7 +87,18 @@ struct ClassifyHoles {
   template <class W>
   static void complete(const Sig& sig, int H, const RunRecord<W>& rec,
                        HolesRow<W>& out) {
-    // Full implementation: see T5.4. Skeleton placeholder.
-    (void)sig; (void)H; (void)rec; (void)out;
+    // completion predicate: exactly one component, touching both top and bottom
+    int comps = 0;
+    for (int j = 0; j < H; ++j)
+      if (sig.b[j] > comps) comps = sig.b[j];
+    if (comps != 1 || !sig.b[H] || !sig.b[H + 1]) return;
+    // holes count is in sig.b[H+2] (the extended key byte)
+    const int holes = static_cast<int>(sig.b[H + 2]);
+    for (int i = 0; i < rec.len; ++i) {
+      const int n = static_cast<int>(rec.lo) + i;
+      if (n < 1 || n >= static_cast<int>(out.byNHoles.size())) continue;
+      if (holes >= static_cast<int>(out.byNHoles[n].size())) continue;
+      out.byNHoles[n][holes] += rec.counts[i];
+    }
   }
 };

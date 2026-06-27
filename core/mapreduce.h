@@ -34,6 +34,7 @@ struct ShardCfg {
   bool fold;   // apply R1 vertical-mirror fold
   size_t ram_budget_bytes = 0;  // 0 = no spill (M0 in-RAM mode)
   std::string spill_dir;
+  int keyLen = 0;  // 0 = use H+2 (triangle); H+3 for holes path
 };
 
 // ─── map_shard ────────────────────────────────────────────────────────────────
@@ -49,8 +50,10 @@ struct ShardCfg {
 
 template <class W, class Classifier, class Output>
 Run<W> map_shard(const Run<W>& src, const ShardCfg& cfg, Output& out_classified) {
-  const int H    = cfg.H;
-  const int maxn = cfg.maxn;
+  const int H      = cfg.H;
+  const int maxn   = cfg.maxn;
+  const int kLen   = (cfg.keyLen != 0) ? cfg.keyLen : H + 2;
+  const bool holes = (kLen == H + 3);
   Run<W> buf;
   buf.reserve(src.size()); // at least one successor per source; skips early doublings
 
@@ -66,6 +69,13 @@ Run<W> map_shard(const Run<W>& src, const ShardCfg& cfg, Output& out_classified)
     // completion test: single component touching both top and bottom
     Classifier::complete(rec.sig, H, rec, out_classified);
 
+    // occupancy bitmask of the current boundary column (for holes accounting)
+    uint32_t oldOcc = 0;
+    if (holes) {
+      for (int r = 0; r < H; ++r)
+        if (rec.sig.b[r] != 0) oldOcc |= (1u << r);
+    }
+
     // enumerate viable masks and map each one
     forEachViableMask(rec.sig, H, maxn - ms, [&](unsigned mask) {
       Sig out_sig;
@@ -78,8 +88,26 @@ Run<W> map_shard(const Run<W>& src, const ShardCfg& cfg, Output& out_classified)
 
       // build the successor RunRecord: shift the ranged count-vec by `cells`
       RunRecord<W> succ;
-      succ.sig = out_sig;
-      succ.H   = H;
+      succ.sig    = out_sig;
+      succ.H      = H;
+      succ.keyLen = kLen;
+
+      // holes path: accumulate Euler delta into sig.b[H+2]
+      if (holes) {
+        const int delta4 = closedEulerDelta4(oldOcc, static_cast<uint32_t>(mask), H,
+                                             Conn::FG8);
+        // comps delta = comps_new - comps_old
+        int comps_old = 0, comps_new = 0;
+        for (int r = 0; r < H; ++r) {
+          if (rec.sig.b[r] > comps_old)   comps_old = rec.sig.b[r];
+          if (out_sig.b[r] > comps_new)   comps_new = out_sig.b[r];
+        }
+        // dHoles = (comps_new - comps_old) - delta4/4
+        const int dHoles = (comps_new - comps_old) - delta4 / 4;
+        succ.sig.b[H + 2] = static_cast<uint8_t>(
+            static_cast<int>(rec.sig.b[H + 2]) + dHoles);
+      }
+
       // new lo = rec.lo + cells; clip window to stay within [0..maxn]
       const int new_lo = static_cast<int>(rec.lo) + cells;
       if (new_lo > maxn) return; // entire window out of budget
@@ -112,7 +140,7 @@ Run<W> mergeRuns(std::vector<Run<W>>& runs) {
     const RunRecord<W>* rec;
     bool operator>(const Cursor& o) const {
       return std::memcmp(rec->sig.b, o.rec->sig.b,
-                         static_cast<size_t>(rec->H + 2)) > 0;
+                         static_cast<size_t>(rec->keyLen)) > 0;
     }
   };
 
@@ -142,7 +170,7 @@ Run<W> mergeRuns(std::vector<Run<W>>& runs) {
     while (!heap.empty()) {
       Cursor nxt = heap.top();
       if (std::memcmp(combined.sig.b, nxt.rec->sig.b,
-                      static_cast<size_t>(combined.H + 2)) != 0) break;
+                      static_cast<size_t>(combined.keyLen)) != 0) break;
       heap.pop();
       combined.combine(*nxt.rec);
       ++nxt.pos;
@@ -175,11 +203,12 @@ std::pair<size_t, size_t> map_shard_file(
     Output& out_classified,
     const std::string& rev = "") {
 
-  const int H    = cfg.H;
-  const int maxn = cfg.maxn;
+  const int H      = cfg.H;
+  const int maxn   = cfg.maxn;
+  const bool holes = (cfg.keyLen == H + 3);
 
   // Key-bound parsing.
-  const int keyLen = H + 2;
+  const int keyLen = (cfg.keyLen != 0) ? cfg.keyLen : H + 2;
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};
   bool has_lo = !lo_hex.empty() && hexToBytes(lo_hex, lo_sig, keyLen);
@@ -189,7 +218,7 @@ std::pair<size_t, size_t> map_shard_file(
   std::vector<std::unique_ptr<RunFileReader<W>>> readers;
   readers.reserve(in_paths.size());
   for (const auto& p : in_paths)
-    readers.push_back(std::make_unique<RunFileReader<W>>(p, H));
+    readers.push_back(std::make_unique<RunFileReader<W>>(p, H, keyLen));
 
   // K-way heap over RunFileReaders.
   struct FileCursor {
@@ -197,7 +226,7 @@ std::pair<size_t, size_t> map_shard_file(
     int idx;
     bool operator>(const FileCursor& o) const {
       return std::memcmp(rec.sig.b, o.rec.sig.b,
-                         static_cast<size_t>(rec.H + 2)) > 0;
+                         static_cast<size_t>(rec.keyLen)) > 0;
     }
   };
   using MinHeap = std::priority_queue<FileCursor, std::vector<FileCursor>,
@@ -228,7 +257,7 @@ std::pair<size_t, size_t> map_shard_file(
     std::string spill_path = cfg.spill_dir + "/spill_" +
                              std::to_string(static_cast<long>(getpid())) +
                              "_" + std::to_string(spill_seq++) + ".bin";
-    RunFileWriter<W> sw(spill_path, H, maxn, "", "", rev);
+    RunFileWriter<W> sw(spill_path, H, maxn, "", "", rev, keyLen);
     for (const auto& r : buf) sw.append(r);
     size_t sb = sw.finalize();
     total_spill_bytes += sb;
@@ -276,6 +305,13 @@ std::pair<size_t, size_t> map_shard_file(
 
     Classifier::complete(rec.sig, H, rec, out_classified);
 
+    // occupancy bitmask of the current boundary column (for holes accounting)
+    uint32_t oldOcc = 0;
+    if (holes) {
+      for (int r = 0; r < H; ++r)
+        if (rec.sig.b[r] != 0) oldOcc |= (1u << r);
+    }
+
     forEachViableMask(rec.sig, H, maxn - ms, [&](unsigned mask) {
       Sig out_sig;
       if (stepColumnSquare8(rec.sig, H, mask, out_sig) != Outcome::Alive) return;
@@ -286,8 +322,24 @@ std::pair<size_t, size_t> map_shard_file(
       if (cfg.fold) foldSig(out_sig, H);
 
       RunRecord<W> succ;
-      succ.sig = out_sig;
-      succ.H   = H;
+      succ.sig    = out_sig;
+      succ.H      = H;
+      succ.keyLen = keyLen;
+
+      // holes path: accumulate Euler delta into sig.b[H+2]
+      if (holes) {
+        const int delta4 = closedEulerDelta4(oldOcc, static_cast<uint32_t>(mask), H,
+                                             Conn::FG8);
+        int comps_old = 0, comps_new = 0;
+        for (int r = 0; r < H; ++r) {
+          if (rec.sig.b[r] > comps_old)  comps_old = rec.sig.b[r];
+          if (out_sig.b[r] > comps_new)  comps_new = out_sig.b[r];
+        }
+        const int dHoles = (comps_new - comps_old) - delta4 / 4;
+        succ.sig.b[H + 2] = static_cast<uint8_t>(
+            static_cast<int>(rec.sig.b[H + 2]) + dHoles);
+      }
+
       const int new_lo = static_cast<int>(rec.lo) + cells;
       if (new_lo > maxn) return;
       succ.lo  = static_cast<uint8_t>(new_lo);
@@ -306,7 +358,7 @@ std::pair<size_t, size_t> map_shard_file(
   do_spill();  // flush remaining buf to a spill file
 
   // Merge all spill files into out_path (record count threaded out of the merge).
-  auto [out_bytes, out_recs] = mergeRunFiles<W>(spill_files, H, "", "", out_path, rev);
+  auto [out_bytes, out_recs] = mergeRunFiles<W>(spill_files, H, "", "", out_path, rev, keyLen);
   (void)out_bytes;
 
   // Delete temp spill files.

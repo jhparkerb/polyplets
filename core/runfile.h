@@ -87,10 +87,12 @@ template <class W>
 class RunFileWriter {
  public:
   // Real writer: opens file, writes header with placeholder record count.
+  // keyLen defaults to 0 which means H+2 (triangle path); pass H+3 for holes.
   RunFileWriter(const std::string& path, int H, int maxn,
                 const std::string& lo_hex, const std::string& hi_hex,
-                const std::string& rev = "")
-      : H_(H), fp_(nullptr), record_count_(0), body_bytes_(0),
+                const std::string& rev = "", int keyLen = 0)
+      : H_(H), keyLen_((keyLen == 0) ? H + 2 : keyLen),
+        fp_(nullptr), record_count_(0), body_bytes_(0),
         crc_(FNV_OFFSET), records_offset_(0) {
     fp_ = std::fopen(path.c_str(), "wb");
     if (!fp_) {
@@ -102,7 +104,7 @@ class RunFileWriter {
 
   // Default constructor: no-op.
   RunFileWriter()
-      : H_(0), fp_(nullptr), record_count_(0), body_bytes_(0),
+      : H_(0), keyLen_(2), fp_(nullptr), record_count_(0), body_bytes_(0),
         crc_(FNV_OFFSET), records_offset_(0) {}
 
   ~RunFileWriter() {
@@ -114,16 +116,15 @@ class RunFileWriter {
 
   void append(const RunRecord<W>& r) {
     if (!fp_) return;
-    const int keyLen = H_ + 2;
-    std::fwrite(r.sig.b, 1, static_cast<size_t>(keyLen), fp_);
+    std::fwrite(r.sig.b, 1, static_cast<size_t>(keyLen_), fp_);
     uint8_t lo  = r.lo;
     uint8_t len = r.len;
     std::fwrite(&lo,  1, 1, fp_);
     std::fwrite(&len, 1, 1, fp_);
-    crc_ = fnv1a64_update(crc_, r.sig.b, static_cast<size_t>(keyLen));
+    crc_ = fnv1a64_update(crc_, r.sig.b, static_cast<size_t>(keyLen_));
     crc_ = fnv1a64_update(crc_, &lo,  1);
     crc_ = fnv1a64_update(crc_, &len, 1);
-    body_bytes_ += static_cast<size_t>(keyLen) + 2;
+    body_bytes_ += static_cast<size_t>(keyLen_) + 2;
     for (int i = 0; i < r.len; ++i) {
       W v = r.counts[i];
       uint8_t bytes[sizeof(W)];
@@ -165,6 +166,7 @@ class RunFileWriter {
 
  private:
   int H_;
+  int keyLen_;
   FILE* fp_;
   size_t record_count_;
   size_t body_bytes_;
@@ -195,8 +197,10 @@ class RunFileWriter {
 template <class W>
 class RunFileReader {
  public:
-  RunFileReader(const std::string& path, int H)
-      : H_(H), fp_(nullptr), records_(0), records_read_(0),
+  // keyLen defaults to 0 which means H+2 (triangle path); pass H+3 for holes.
+  RunFileReader(const std::string& path, int H, int keyLen = 0)
+      : H_(H), keyLen_((keyLen == 0) ? H + 2 : keyLen),
+        fp_(nullptr), records_(0), records_read_(0),
         crc_(FNV_OFFSET) {
     fp_ = std::fopen(path.c_str(), "rb");
     if (!fp_) {
@@ -220,11 +224,10 @@ class RunFileReader {
 
   bool next(RunRecord<W>& out) {
     if (!fp_ || records_read_ >= records_) return false;
-    const int keyLen = H_ + 2;
     out.sig = Sig{};
-    if (std::fread(out.sig.b, 1, static_cast<size_t>(keyLen), fp_)
-        != static_cast<size_t>(keyLen)) return false;
-    crc_ = fnv1a64_update(crc_, out.sig.b, static_cast<size_t>(keyLen));
+    if (std::fread(out.sig.b, 1, static_cast<size_t>(keyLen_), fp_)
+        != static_cast<size_t>(keyLen_)) return false;
+    crc_ = fnv1a64_update(crc_, out.sig.b, static_cast<size_t>(keyLen_));
 
     uint8_t lo = 0, len = 0;
     if (std::fread(&lo,  1, 1, fp_) != 1) return false;
@@ -232,9 +235,10 @@ class RunFileReader {
     crc_ = fnv1a64_update(crc_, &lo,  1);
     crc_ = fnv1a64_update(crc_, &len, 1);
 
-    out.H   = H_;
-    out.lo  = lo;
-    out.len = len;
+    out.H      = H_;
+    out.keyLen = keyLen_;
+    out.lo     = lo;
+    out.len    = len;
     out.counts.resize(len);
     for (int i = 0; i < len; ++i) {
       uint8_t bytes[sizeof(W)];
@@ -252,9 +256,11 @@ class RunFileReader {
 
   size_t records() const { return records_; }
   int    H()       const { return H_; }
+  int    keyLen()  const { return keyLen_; }
 
  private:
   int H_;
+  int keyLen_;
   FILE* fp_;
   size_t records_;
   size_t records_read_;
@@ -302,12 +308,14 @@ class RunFileReader {
 // Returns {body bytes written, record count} for out_path (count threaded out
 // of the writer so callers never reopen the file just to count it).
 
+// keyLen defaults to 0 which means H+2 (triangle path); pass H+3 for holes.
 template <class W>
 std::pair<size_t, size_t> mergeRunFiles(
     const std::vector<std::string>& in_paths, int H,
     const std::string& lo_hex, const std::string& hi_hex,
-    const std::string& out_path, const std::string& rev = "") {
-  const int keyLen = H + 2;
+    const std::string& out_path, const std::string& rev = "",
+    int keyLen = 0) {
+  if (keyLen == 0) keyLen = H + 2;
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};
   bool has_lo = !lo_hex.empty() && hexToBytes(lo_hex, lo_sig, keyLen);
@@ -316,14 +324,14 @@ std::pair<size_t, size_t> mergeRunFiles(
   std::vector<std::unique_ptr<RunFileReader<W>>> readers;
   readers.reserve(in_paths.size());
   for (const auto& p : in_paths)
-    readers.push_back(std::make_unique<RunFileReader<W>>(p, H));
+    readers.push_back(std::make_unique<RunFileReader<W>>(p, H, keyLen));
 
   struct Cursor {
     RunRecord<W> rec;
     int idx;
     bool operator>(const Cursor& o) const {
       return std::memcmp(rec.sig.b, o.rec.sig.b,
-                         static_cast<size_t>(rec.H + 2)) > 0;
+                         static_cast<size_t>(rec.keyLen)) > 0;
     }
   };
   using MinHeap = std::priority_queue<Cursor, std::vector<Cursor>,
@@ -336,7 +344,7 @@ std::pair<size_t, size_t> mergeRunFiles(
       heap.push(std::move(c));
   }
 
-  RunFileWriter<W> writer(out_path, H, 0, lo_hex, hi_hex, rev);
+  RunFileWriter<W> writer(out_path, H, 0, lo_hex, hi_hex, rev, keyLen);
 
   while (!heap.empty()) {
     Cursor top = heap.top();

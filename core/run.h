@@ -32,15 +32,16 @@ using u128 = unsigned __int128;
 // Templated on the word width W (u64 or u128).
 template <class W>
 struct RunRecord {
-  Sig    sig;          // canonical signature (H+2 bytes used, rest zero)
+  Sig    sig;          // canonical signature (keyLen bytes used, rest zero)
   int    H;            // height (needed to interpret sig and lo/len)
+  int    keyLen;       // key length in bytes: H+2 for triangle, H+3 for holes
   uint8_t lo;         // first nonzero index in counts[]
   uint8_t len;        // number of nonzero entries
   std::vector<W> counts; // counts[lo .. lo+len), dense over the window
 
-  // True if both records share the same key (same sig bytes for this H).
+  // True if both records share the same key (same sig bytes for keyLen).
   bool sameKey(const RunRecord& o) const {
-    return std::memcmp(sig.b, o.sig.b, static_cast<size_t>(H + 2)) == 0;
+    return std::memcmp(sig.b, o.sig.b, static_cast<size_t>(keyLen)) == 0;
   }
 
   // Merge o INTO this record (range-union + componentwise add).
@@ -50,7 +51,7 @@ struct RunRecord {
   // buffer can be grown in place instead of allocated fresh. Deferred until the
   // at-scale spill engine lands and the allocation actually shows up in a profile.
   void combine(const RunRecord& o) {
-    assert(sameKey(o) && H == o.H);
+    assert(sameKey(o) && H == o.H && keyLen == o.keyLen);
     if (o.len == 0) return;
     if (len == 0) { lo = o.lo; len = o.len; counts = o.counts; return; }
     // Compute the union window in int; the byte-wide lo/len fields can only
@@ -82,7 +83,7 @@ struct RunRecord {
 // Append one record to a byte buffer in the binary run format.
 template <class W>
 inline void serializeRecord(const RunRecord<W>& r, std::vector<uint8_t>& buf) {
-  const int keyLen = r.H + 2;
+  const int keyLen = r.keyLen;
   buf.insert(buf.end(), r.sig.b, r.sig.b + keyLen);
   buf.push_back(r.lo);
   buf.push_back(r.len);
@@ -98,10 +99,11 @@ inline void serializeRecord(const RunRecord<W>& r, std::vector<uint8_t>& buf) {
 
 // Deserialize one record from raw bytes at *pos; advance *pos past it.
 // Returns false if there are insufficient bytes (end-of-run).
+// keyLen defaults to 0 which means H+2 (triangle path).
 template <class W>
 inline bool deserializeRecord(const uint8_t* data, size_t size, size_t* pos,
-                              int H, RunRecord<W>& out) {
-  const int keyLen = H + 2;
+                              int H, RunRecord<W>& out, int keyLen = 0) {
+  if (keyLen == 0) keyLen = H + 2;
   const size_t minBytes = static_cast<size_t>(keyLen) + 2; // sig + lo + len
   if (*pos + minBytes > size) return false;
 
@@ -109,7 +111,8 @@ inline bool deserializeRecord(const uint8_t* data, size_t size, size_t* pos,
   // zero-pad the unused SIGMAX tail (invariant: unused bytes always 0)
   std::memset(out.sig.b + keyLen, 0, SIGMAX - keyLen);
   *pos += keyLen;
-  out.H   = H;
+  out.H      = H;
+  out.keyLen = keyLen;
   out.lo  = data[(*pos)++];
   out.len = data[(*pos)++];
 
@@ -125,20 +128,25 @@ inline bool deserializeRecord(const uint8_t* data, size_t size, size_t* pos,
   return true;
 }
 
-// ─── Sort-key comparison (memcmp on the sig bytes for this H) ─────────────────
+// ─── Sort-key comparison (memcmp on the sig bytes for keyLen) ─────────────────
 
 template <class W>
 inline bool recordLess(const RunRecord<W>& a, const RunRecord<W>& b) {
-  return std::memcmp(a.sig.b, b.sig.b, static_cast<size_t>(a.H + 2)) < 0;
+  return std::memcmp(a.sig.b, b.sig.b, static_cast<size_t>(a.keyLen)) < 0;
 }
 
 // The seed state of a height-sweep: the empty boundary (all-zero sig) with one
 // partial animal of zero cells (counts[0]=1). Column 0 of every height H.
+// keyLen defaults to 0 which means H+2 (triangle path); pass H+3 for holes.
 template <class W>
-inline RunRecord<W> seedRecord(int H) {
+inline RunRecord<W> seedRecord(int H, int keyLen = 0) {
   RunRecord<W> seed;
   std::memset(seed.sig.b, 0, SIGMAX);
-  seed.H = H; seed.lo = 0; seed.len = 1; seed.counts = {W{1}};
+  seed.H      = H;
+  seed.keyLen = (keyLen == 0) ? H + 2 : keyLen;
+  seed.lo     = 0;
+  seed.len    = 1;
+  seed.counts = {W{1}};
   return seed;
 }
 
@@ -179,12 +187,14 @@ inline std::vector<uint8_t> serializeRun(const Run<W>& run) {
 }
 
 // Deserialize an entire Run from bytes.
+// keyLen defaults to 0 which means H+2 (triangle path).
 template <class W>
-inline Run<W> deserializeRun(const uint8_t* data, size_t size, int H) {
+inline Run<W> deserializeRun(const uint8_t* data, size_t size, int H,
+                              int keyLen = 0) {
   Run<W> run;
   size_t pos = 0;
   RunRecord<W> rec;
-  while (deserializeRecord(data, size, &pos, H, rec))
+  while (deserializeRecord(data, size, &pos, H, rec, keyLen))
     run.push_back(rec);
   return run;
 }

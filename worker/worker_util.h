@@ -68,6 +68,23 @@ inline void printTriangleRows(int H, int maxn, const std::vector<T>& row) {
   }
 }
 
+// Emit "holes H n k count\n" for every nonzero entry in a HolesRow.
+template <class T>
+inline void printHolesRows(int H, int maxn, const std::vector<std::vector<T>>& byNHoles) {
+  char buf[41];
+  for (int n = 1; n <= maxn; ++n) {
+    if (n >= static_cast<int>(byNHoles.size())) break;
+    for (int k = 0; k < static_cast<int>(byNHoles[n].size()); ++k) {
+      if (byNHoles[n][k] == T{0}) continue;
+      if constexpr (sizeof(T) == 16)
+        std::printf("holes %d %d %d %s\n", H, n, k, u128Dec(byNHoles[n][k], buf));
+      else
+        std::printf("holes %d %d %d %llu\n", H, n, k,
+                    (unsigned long long)byNHoles[n][k]);
+    }
+  }
+}
+
 // Peak resident set size in MB. ru_maxrss is bytes on macOS, KB on Linux.
 inline double peakRssMB() {
   struct rusage ru;

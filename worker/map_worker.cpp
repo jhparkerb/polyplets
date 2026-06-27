@@ -31,12 +31,15 @@ int main(int argc, char** argv) {
   // ─── Arg parsing ────────────────────────────────────────────────────────────
   std::string in_str, out_path, spill_dir, lo_hex, hi_hex, rev;
   std::string counter_arg = "u64";
-  int H = 0, maxn = 0, fold = 0;
+  int H = 0, maxn = 0, fold = 0, holes = 0;
   size_t ram_bytes = 128ULL * 1024 * 1024;  // 128 MB default
 
   for (int i = 1; i < argc; ++i) {
     auto arg = [&](const char* flag) {
       return std::strcmp(argv[i], flag) == 0 && i + 1 < argc;
+    };
+    auto flag = [&](const char* name) {
+      return std::strcmp(argv[i], name) == 0;
     };
     if (arg("--in"))          in_str      = argv[++i];
     else if (arg("--H"))      H           = std::atoi(argv[++i]);
@@ -49,6 +52,7 @@ int main(int argc, char** argv) {
     else if (arg("--lo"))     lo_hex      = argv[++i];
     else if (arg("--hi"))     hi_hex      = argv[++i];
     else if (arg("--rev"))    rev         = argv[++i];
+    else if (flag("--holes")) holes       = 1;
     else {
       std::fprintf(stderr, "map_worker: unknown arg: %s\n", argv[i]);
       return 1;
@@ -67,12 +71,16 @@ int main(int argc, char** argv) {
 
   const auto in_paths = splitComma(in_str);
 
+  // maxholes: conservative upper bound; polyplets can tile holes densely.
+  const int maxholes = maxn;
+
   ShardCfg cfg;
   cfg.H                = H;
   cfg.maxn             = maxn;
   cfg.fold             = fold != 0;
   cfg.ram_budget_bytes = ram_bytes;
   cfg.spill_dir        = spill_dir;
+  if (holes) cfg.keyLen = H + 3;
 
   // ─── Run ────────────────────────────────────────────────────────────────────
   const double t0_wall = wallSeconds();
@@ -80,7 +88,19 @@ int main(int argc, char** argv) {
 
   size_t spill_bytes, out_recs;
 
-  if (counter_arg == "u128") {
+  if (holes) {
+    if (counter_arg == "u128") {
+      HolesRow<u128> hrow(H, maxn, maxholes);
+      std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyHoles>(
+          in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev);
+      printHolesRows(H, maxn, hrow.byNHoles);
+    } else {
+      HolesRow<u64> hrow(H, maxn, maxholes);
+      std::tie(spill_bytes, out_recs) = map_shard_file<u64, ClassifyHoles>(
+          in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev);
+      printHolesRows(H, maxn, hrow.byNHoles);
+    }
+  } else if (counter_arg == "u128") {
     TriangleRow<u128> triangle(H, maxn);
     std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyTriangle>(
         in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev);
