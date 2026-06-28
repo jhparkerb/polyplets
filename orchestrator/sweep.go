@@ -24,6 +24,7 @@ type SweepConfig struct {
 	Cores           int           // max concurrent workers
 	UnitMult        int           // MAP work units per core (default 1); units = Cores*UnitMult, concurrency stays Cores
 	MergeMult       int           // MERGE ranges per core (0 = follow UnitMult); set low to cut the (cores*mult)^2 merge fan-in
+	OverlapHeights  int           // heights to sweep CONCURRENTLY sharing one Cores-wide pool (0/1 = sequential). Hides one height's low-util merge behind another's map. No mid-run checkpoint in this mode.
 	RAM             uint64        // bytes per map_worker spill budget
 	RunDir          string        // directory for all run files
 	SpillDir        string        // directory for map_worker internal spills
@@ -115,6 +116,15 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		return nil, err
 	}
 
+	// Shared Cores-wide worker pool. In overlap mode several heights draw from it
+	// concurrently, so a height's low-utilization merge phase runs alongside
+	// another's map phase rather than idling the box.
+	sem := make(chan struct{}, cfg.Cores)
+
+	if cfg.OverlapHeights > 1 {
+		return runOverlap(ctx, cfg, heights[startIdx:], triangle, acct, tel, sem)
+	}
+
 	for hi := startIdx; hi < len(heights); hi++ {
 		H := heights[hi]
 		startCol := 0
@@ -132,7 +142,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			frontier = []string{seed}
 		}
 
-		hTri, hAcct, err := sweepHeight(ctx, cfg, H, startCol, frontier, writeCheckpoint, tel)
+		hTri, hAcct, err := sweepHeight(ctx, cfg, H, startCol, frontier, writeCheckpoint, tel, sem)
 
 		// Accumulate this height's contributions before handling the error,
 		// so the checkpoint written on cancellation includes them.
@@ -159,6 +169,73 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	return &SweepResult{Triangle: triangle, Acct: acct}, nil
 }
 
+// runOverlap sweeps heights CONCURRENTLY — cfg.OverlapHeights at a time, all
+// drawing from the single Cores-wide pool `sem` — so one height's
+// low-utilization merge phase overlaps another height's map phase instead of
+// idling cores. Heights are independent, so the totals are identical to the
+// sequential path; results accumulate under `mu`. No mid-run checkpoint here
+// (resuming K in-flight heights is deferred): on failure, re-run. This is the
+// throughput/benchmark path; the sequential Run loop stays the resumable
+// production path. Caller guarantees cfg.OverlapHeights >= 2.
+func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
+	triangle []uint64, acct Acct, tel *telemetry, sem chan struct{}) (*SweepResult, error) {
+
+	var mu sync.Mutex
+	var firstErr error
+	noopCkpt := func(int, int, []string, []uint64) {} // overlap mode: no mid-run checkpoint
+	heightSem := make(chan struct{}, cfg.OverlapHeights)
+	var wg sync.WaitGroup
+
+	for _, H := range heights {
+		wg.Add(1)
+		go func(H int) {
+			defer wg.Done()
+			select {
+			case heightSem <- struct{}{}:
+			case <-ctx.Done():
+				return
+			}
+			defer func() { <-heightSem }()
+
+			seed := filepath.Join(cfg.RunDir, fmt.Sprintf("seed_h%d.bin", H))
+			if err := WriteSeedPolyrun(seed, cfg.Rev, H, cfg.Maxn, cfg.CounterWidth); err != nil {
+				mu.Lock()
+				if firstErr == nil {
+					firstErr = fmt.Errorf("H=%d seed: %w", H, err)
+				}
+				mu.Unlock()
+				return
+			}
+			hTri, hAcct, err := sweepHeight(ctx, cfg, H, 0, []string{seed}, noopCkpt, tel, sem)
+
+			mu.Lock()
+			for n, v := range hTri {
+				if n >= 0 && n <= cfg.Maxn {
+					triangle[n] += v
+				}
+			}
+			acct.Add(hAcct)
+			if err != nil && firstErr == nil {
+				firstErr = fmt.Errorf("H=%d: %w", H, err)
+			}
+			mu.Unlock()
+			if err != nil {
+				return
+			}
+			if cfg.PerHeightOut != "" {
+				if werr := writePerHeight(cfg.PerHeightOut, H, cfg.Maxn, hTri); werr != nil {
+					fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
+				}
+			}
+		}(H)
+	}
+	wg.Wait()
+	if firstErr != nil {
+		return nil, firstErr
+	}
+	return &SweepResult{Triangle: triangle, Acct: acct}, nil
+}
+
 // sweepHeight sweeps one height H from startCol.
 // Returns the triangle contributions from this height, accumulated accounting,
 // and any error (ctx.Err() on cancellation).
@@ -171,6 +248,7 @@ func sweepHeight(
 	frontier []string,
 	writeCheckpoint func(H, col int, frontier []string, hTri []uint64),
 	tel *telemetry,
+	sem chan struct{},
 ) ([]uint64, Acct, error) {
 
 	hTri := make([]uint64, cfg.Maxn+1) // contributions from this height only
@@ -212,7 +290,7 @@ func sweepHeight(
 		stopHB := tel.startColumn(H, col)
 
 		// MAP PHASE
-		mapOuts, triContribs, mapAcct, err := mapPhase(ctx, cfg, H, col, frontier, tel)
+		mapOuts, triContribs, mapAcct, err := mapPhase(ctx, cfg, H, col, frontier, tel, sem)
 		if err != nil {
 			stopHB()
 			// hTri does NOT yet include current col's contributions.
@@ -228,7 +306,7 @@ func sweepHeight(
 		// fails (or is cancelled), the checkpoint at col-1 has correct hTri.
 		// A failed merge causes us to checkpoint at col-1 with unchanged hTri;
 		// the resume will re-run this col from scratch.
-		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts)
+		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem)
 		stopHB()
 		if err != nil {
 			// hTri does NOT include current col's contributions.
@@ -315,6 +393,7 @@ func mapPhase(
 	H, col int,
 	frontier []string,
 	tel *telemetry,
+	sem chan struct{},
 ) ([]string, []map[int]map[int]uint64, Acct, error) {
 
 	// Units are decoupled from concurrency: numUnits = Cores*UnitMult finer
@@ -341,7 +420,8 @@ func mapPhase(
 	}
 	results := make([]unitResult, actualUnits)
 
-	sem := make(chan struct{}, cfg.Cores)
+	// sem (the Cores-wide worker pool) is shared across concurrently-running
+	// heights in overlap mode, so the global core budget is respected.
 	var wg sync.WaitGroup
 	for i := 0; i < actualUnits; i++ {
 		wg.Add(1)
@@ -395,6 +475,7 @@ func mergePhase(
 	cfg SweepConfig,
 	H, col int,
 	mapOuts []string,
+	sem chan struct{},
 ) ([]string, uint64, Acct, error) {
 
 	if len(mapOuts) == 0 {
@@ -424,7 +505,9 @@ func mergePhase(
 	}
 	results := make([]rangeResult, actualRanges)
 
-	sem := make(chan struct{}, cfg.Cores)
+	// sem (the Cores-wide worker pool) is shared across concurrently-running
+	// heights in overlap mode; here one height's merge can fill cores a
+	// concurrent height's map phase has freed.
 	var wg sync.WaitGroup
 	for i := 0; i < actualRanges; i++ {
 		wg.Add(1)

@@ -16,6 +16,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -44,6 +45,7 @@ type telemetry struct {
 	cores    int
 	maxn     int
 	outPath  string
+	mu       sync.Mutex       // guards observe() state when heights run concurrently (overlap mode)
 	cols     []ColumnCost
 	cumWall  float64          // running Σ WallS over observed columns
 	clock    func() time.Time // injectable for tests; defaults to time.Now
@@ -109,6 +111,8 @@ func (t *telemetry) observe(c ColumnCost) {
 	if t == nil {
 		return
 	}
+	t.mu.Lock()
+	defer t.mu.Unlock()
 	t.cols = append(t.cols, c)
 	t.cumWall += c.WallS
 
