@@ -1,4 +1,4 @@
-<!-- scaling | commit 2c5e3e7-dirty | gympie | 2026-06-21T08:31:50-04:00 | job=scaling-8000
+<!-- scaling | commit a393e53-dirty | gympie | 2026-06-28T10:46:24-04:00 | job=scaling-8000
      source: /Users/jasonp/src/polyominoes/sampling/scaling.py -->
 # Cross-n scaling of uniform-random polyplets (#27)
 
