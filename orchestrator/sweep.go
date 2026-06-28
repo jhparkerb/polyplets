@@ -467,6 +467,15 @@ func mapPhase(
 		}
 		triContribs = append(triContribs, ur.result.TriContribs)
 		acct.Add(ur.result.Acct)
+		// Per-unit cost trace for scheduling research (#32/LPT): result-invariant,
+		// gated off by default so production logs stay clean. Records the unit's
+		// key-range and measured cost to test whether per-unit cost is predictable
+		// (e.g. column-to-column by key region).
+		if os.Getenv("POLY_UNIT_LOG") != "" {
+			fmt.Printf("event=unit H=%d col=%d u=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f\n",
+				H, col, ur.idx, los[ur.idx], his[ur.idx],
+				ur.result.OutRecords, ur.result.Acct.CPUS, ur.result.Acct.WallS)
+		}
 	}
 	return outPaths, triContribs, acct, nil
 }
