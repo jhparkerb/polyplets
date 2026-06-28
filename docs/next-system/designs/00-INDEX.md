@@ -30,6 +30,7 @@ cells will rest on the new engine alone.
 | 4 | [02-progress-eta.md](02-progress-eta.md) | A-priori predictor + live calibrated ETA + within-column heartbeat | ~1 day | **all of it before launch** |
 | 3 | [03-probe-calibration.md](03-probe-calibration.md) | Measure util/scaling on a(19)/a(20); decide work-stealing; validate predictor | ~1–3h wall | after 2 & 4 |
 | 5 | [04-multi-machine-height-split.md](04-multi-machine-height-split.md) | Per-height split across machines + combine | ~half day | Phase B (during a(21) run) |
+| 32 | [07-height-scheduling.md](07-height-scheduling.md) | Cross-machine height-assignment scheme (Q2‖Cmax): LPT/dynamic-pull beat meet-in-the-middle; calculator + sims | paper (no compute) | a(22)/M4 |
 
 ## Sequencing and gates
 
