@@ -1,23 +1,43 @@
-# HANDOFF — 2026-06-28 00:10 EDT
+# HANDOFF — 2026-06-28 10:10 EDT
 
-## 2026-06-28 00:10 — live status (two jobs running, both healthy)
+## 2026-06-28 10:10 — live status (measured; two jobs running, both healthy)
 
-**ayr — a(20) seek-index validation** (orchestrate PID 1276058, rev aebdd82,
-tmux `0:a20`, log `runs/ns_a20/a20.log`): **17/20 heights done, on H18**, ~1h50m
-in. Per-height cost back-loaded (H17=62min); ~1-2h to finish H18-20. `--compare`
-verdict prints only at the END (waiter `bn2by19hw` armed to catch it). Partial
-sum tracks the known a(20) exactly (H1-14 = 98.6% of 1,025,573,519,362,016), an
-early green flag. **This is the gate before any a(21) restart.**
+**ayr — a(20) seek-index validation** (orchestrate PID 1276058, log
+`~/src/polyominoes-ns/runs/ns_a20/a20.log` — note: under the `-ns` worktree, NOT
+`~/src/polyominoes`): **on the final height H20**, H1-19 all done, ~11h51m in.
+H20 col0+col1 done (col1=2255s), now in **H20 col2 (the peak column)**, ~2h45m
+in, map phase plateaued (processed flat at 896M → in/near merge). Cost model: col2
+is the most expensive column of the run; columns 3..20 taper after it. So the
+`--compare` verdict (must byte-match **a(20)=1,025,573,519,362,016**) is **a few
+hours out** — col2 nearly done, then the tapering tail. Not hard-pinned (no ETA
+in the log; this is the last, costliest strip). Waiter `bdey8w0ly` armed.
+**This is the gate before any a(21) restart-with-fix decision.**
 
 **dalby — a(21)** (orchestrate PID 993738, rev 35eb9e1 = UNFIXED engine, tmux
-`0:a21`): **17/21 heights done, on H18 col 3/21**, RAM 2GB, disk 340GB free,
-load 55/80 — healthy. INVESTIGATED a phantom "restart": there was none — all
-procs started Jun 27 19:39:21, one launch in the log, no reboot/OOM/errors; my
-confusion was dalby's clock being just past midnight (00:05 Jun 28), so 4h26m
-elapsed is correct. **a(21) is FAR ahead of its 7.4-day a-priori** (H1-17 in ~4h
-even merge-capped); finish hinges on the tall-height tail H18-21 (likely falls
-off → well under a day, but UNMEASURED — no hard ETA). RAM-safety watcher 1122969
-alive (triggers >108GB).
+`0:a21`, launch pane 993720 alive): **on H20 col 3/21**, ~14h22m in, RAM 79GB,
+healthy. H20 col2 (peak, unfixed engine) took **16451s = 4.6h** (map-bound:
+map=15844s merge=607s — confirms tall heights are MAP-bound even unfixed). Tail
+remaining: H20 cols 3-20 taper, then the **entire H21** (tallest strip, frontier
+~2× H20 → its peak column alone ~9h). So **~15-25h more, UNMEASURED** — no hard
+ETA. RAM-safety watcher 1122969 assumed alive (triggers >108GB). Waiter
+`bejohjmiv` armed (watches orchestrate PID 993738 directly).
+
+**Waiter hygiene (2026-06-28):** had **6 background shells**; pruned to the **2
+required** (one correct completion-waiter per box: `bdey8w0ly`→ayr/1276058,
+`bejohjmiv`→dalby/993738). Killed redundants: `bn2by19hw` (duplicate ayr waiter,
+wrong log path) and `bgeacm4js` (dalby waiter on the launch pane 993720 not the
+orchestrate); the old probe/iostat monitors had already exited.
+
+**Stats harvest setup (commit `a393e53`):** per-column telemetry now logs
+`map_units`/`merge_ranges` (worker-invocation fan counts); `scripts/job_stats.py`
+rolls any run log up to per-column/-height/-job **wall, cpu-s, eff_cores, util%,
+peak RSS, map-vs-merge split, costliest columns**. ON EACH JOB'S EXIT: scp the
+final log, `python3 scripts/job_stats.py <log> --tsv results/<job>.tsv`, save the
+rollup into `results/`, commit. Caveat: both CURRENT logs predate the fan-count
+fields → `map_units`/`merge_ranges` render `-` for these two runs; every run from
+here carries them. Cost-model note recorded in memory
+`column-compute-cost-vs-count` (compute cost = frontier size, NOT polyplet count;
+top strip is costliest yet adds fewest — "never call the top height trivial").
 
 **Landed this session (next-system):** seek-index merge fix `de4e183` (~16.7x on
 real mergeRunFiles; merge CPU 22-34c→<1.5c; a(20) telemetry confirms map fills
