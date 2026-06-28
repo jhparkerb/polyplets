@@ -1,4 +1,36 @@
-# HANDOFF — 2026-06-28 10:10 EDT
+# HANDOFF — 2026-06-28 (afternoon)
+
+## 2026-06-28 PM — a(20) PASSED + an engine-architecture analysis session
+
+**a(20) seek-index validation PASSED** (waiter `bdey8w0ly` fired): new engine ==
+old a(20) = **1,025,573,519,362,016** byte-identical. The seek-index merge fix is
+**validated at scale** (multi-GB files, >2GB seeks) — the gate before trusting the
+engine for records. Stats harvested to `results/ns_a20/` (16.5h wall, 73% util,
+merge 2.9% of wall, costliest H20c2=19,800s). a(20) `--per-height-out` also yields
+the full T(n,H)≤20 triangle (fills the #31 notch — verify when convenient).
+
+**dalby a(21)** (PID 993738, unfixed engine) is on **H21 — the pole, last height**.
+Per-column cost is front-loaded: a few heavy columns (col2≈the costliest of the run,
+~9h on the unfixed engine) then the frontier collapses ×0.42/col and the last ~15
+columns finish in minutes. **Do NOT restart** (the fix would save nothing this late;
+it's near done). Waiter `bejohjmiv` armed. Live straggler tails on H21 peak columns
+are expected (1 of 80 workers grinding) — not a hang.
+
+**Analysis output this session (committed; no engine code changed, live runs
+untouched): designs/07–10 + tooling.** Conclusions now in memory
+[[engine-utilization-and-scheduling]] and [[merge-shuffle-ranking-locality]]:
+- **#32 height scheduling (07):** LPT/dynamic-pull beat meet-in-the-middle (which is
+  47% bad); `scripts/heightsplit_plan.py`.
+- **Straggler tail (08):** the real utilization lever (~18% map-wall, grows); fix =
+  **work-stealing T2.3**, NOT LPT unit-ordering nor finer `--unit-mult` (both
+  measured-rejected). Tools: `POLY_UNIT_LOG`, `scripts/{unit_cost_analysis,sched_sim}.py`.
+- **Cost model (09):** frontier collapses ×0.42/col past peak; cost front-loaded in
+  cols 0–4; `active_width+H≈N+6` empirical, mechanism OPEN (king-diagonal refuted the
+  cell-budget story).
+- **Shuffle/ranking/locality (10):** the merge all-to-all is conserved; a DENSE RGS
+  ranking EXISTS → hash-resident shuffle-free frontier viable through ~a21 (=#20 RAM
+  wall); a LOCAL/banded ranking cannot (expansion) → don't chase a partition-preserving
+  encoding. Papers saved to `papers/` (MapReduce + twisted-cylinders).
 
 ## 2026-06-28 10:10 — live status (measured; two jobs running, both healthy)
 
