@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="980" viewBox="0 0 720 980" font-family="Helvetica,Arial,sans-serif">
+<defs><marker id="m_flow" markerWidth="8" markerHeight="8" refX="6.5" refY="3" orient="auto"><path d="M0,0 L6.5,3 L0,6 Z" fill="#1f6fd0"/></marker><marker id="m_all" markerWidth="8" markerHeight="8" refX="6.5" refY="3" orient="auto"><path d="M0,0 L6.5,3 L0,6 Z" fill="#e07b00"/></marker><marker id="m_comp" markerWidth="8" markerHeight="8" refX="6.5" refY="3" orient="auto"><path d="M0,0 L6.5,3 L0,6 Z" fill="#119911"/></marker></defs>
+<rect x="0" y="0" width="720" height="980" rx="0" fill="#fff" stroke="#fff" stroke-width="1.3"/>
+<text x="360" y="28" font-family="Helvetica,Arial,sans-serif" font-size="17" text-anchor="middle" font-weight="bold" fill="#111">fold engine — data flow for one height of a(n)</text>
+<text x="360" y="46" font-family="Helvetica,Arial,sans-serif" font-size="11.5" text-anchor="middle" font-weight="normal" fill="#555" font-style="italic">(real a(20) H20 frontier sizes; every height runs this independently)</text>
+<rect x="180" y="60" width="140" height="30" rx="7" fill="#d9f2d9" stroke="#333" stroke-width="1.3"/>
+<text x="250" y="80" font-family="Helvetica,Arial,sans-serif" font-size="12.5" text-anchor="middle" font-weight="bold" fill="#111">SEED · 1 state</text>
+<line x1="250" y1="108" x2="250" y2="130" stroke="#1f6fd0" stroke-width="2.2" marker-end="url(#m_flow)"/>
+<text x="262" y="124" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" font-weight="normal" fill="#1f6fd0">frontier 1</text>
+<rect x="120" y="132" width="260" height="150" rx="7" fill="#fcfcff" stroke="#99a" stroke-width="1.3"/>
+<text x="132" y="152" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="start" font-weight="bold" fill="#111">col 0</text>
+<rect x="140" y="164" width="220" height="34" rx="7" fill="#ffe7c2" stroke="#333" stroke-width="1.3"/>
+<text x="250" y="179" font-family="Helvetica,Arial,sans-serif" font-size="11.5" text-anchor="middle" font-weight="normal" fill="#111">MAP — U=120 units (parallel)</text>
+<rect x="152" y="184" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="178" y="184" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="204" y="184" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="230" y="184" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="256" y="184" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="282" y="184" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="308" y="184" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="334" y="184" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<line x1="250" y1="202" x2="250" y2="224" stroke="#e07b00" stroke-width="2.4" marker-end="url(#m_all)"/>
+<text x="264" y="217" font-family="Helvetica,Arial,sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#e07b00">all-to-all (keys scatter)</text>
+<rect x="140" y="228" width="220" height="34" rx="7" fill="#ffd1d1" stroke="#333" stroke-width="1.3"/>
+<text x="250" y="243" font-family="Helvetica,Arial,sans-serif" font-size="11.5" text-anchor="middle" font-weight="normal" fill="#111">MERGE — R=120 ranges (parallel)</text>
+<rect x="152" y="248" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="178" y="248" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="204" y="248" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="230" y="248" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="256" y="248" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="282" y="248" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="308" y="248" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="334" y="248" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<line x1="380" y1="245" x2="470" y2="245" stroke="#119911" stroke-width="1.8" marker-end="url(#m_comp)"/>
+<text x="388" y="240" font-family="Helvetica,Arial,sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#119911">completed</text>
+<text x="262" y="298" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" font-weight="normal" fill="#1f6fd0">frontier 524,799</text>
+<line x1="250" y1="306" x2="250" y2="328" stroke="#1f6fd0" stroke-width="2.2" marker-end="url(#m_flow)"/>
+<text x="262" y="322" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" font-weight="normal" fill="#1f6fd0">frontier 524,799</text>
+<rect x="120" y="330" width="260" height="150" rx="7" fill="#fcfcff" stroke="#99a" stroke-width="1.3"/>
+<text x="132" y="350" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="start" font-weight="bold" fill="#111">col 1</text>
+<rect x="140" y="362" width="220" height="34" rx="7" fill="#ffe7c2" stroke="#333" stroke-width="1.3"/>
+<text x="250" y="377" font-family="Helvetica,Arial,sans-serif" font-size="11.5" text-anchor="middle" font-weight="normal" fill="#111">MAP — U=120 units (parallel)</text>
+<rect x="152" y="382" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="178" y="382" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="204" y="382" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="230" y="382" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="256" y="382" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="282" y="382" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="308" y="382" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="334" y="382" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<line x1="250" y1="400" x2="250" y2="422" stroke="#e07b00" stroke-width="2.4" marker-end="url(#m_all)"/>
+<text x="264" y="415" font-family="Helvetica,Arial,sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#e07b00">all-to-all (keys scatter)</text>
+<rect x="140" y="426" width="220" height="34" rx="7" fill="#ffd1d1" stroke="#333" stroke-width="1.3"/>
+<text x="250" y="441" font-family="Helvetica,Arial,sans-serif" font-size="11.5" text-anchor="middle" font-weight="normal" fill="#111">MERGE — R=120 ranges (parallel)</text>
+<rect x="152" y="446" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="178" y="446" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="204" y="446" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="230" y="446" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="256" y="446" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="282" y="446" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="308" y="446" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="334" y="446" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<line x1="380" y1="443" x2="470" y2="443" stroke="#119911" stroke-width="1.8" marker-end="url(#m_comp)"/>
+<text x="388" y="438" font-family="Helvetica,Arial,sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#119911">completed</text>
+<text x="262" y="496" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" font-weight="normal" fill="#1f6fd0">frontier 27,308,254</text>
+<line x1="250" y1="504" x2="250" y2="526" stroke="#1f6fd0" stroke-width="2.2" marker-end="url(#m_flow)"/>
+<text x="262" y="520" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" font-weight="normal" fill="#1f6fd0">frontier 27,308,254</text>
+<rect x="120" y="528" width="260" height="150" rx="7" fill="#fcfcff" stroke="#99a" stroke-width="1.3"/>
+<text x="132" y="548" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="start" font-weight="bold" fill="#111">col 2  ◀ peak</text>
+<rect x="140" y="560" width="220" height="34" rx="7" fill="#ffe7c2" stroke="#333" stroke-width="1.3"/>
+<text x="250" y="575" font-family="Helvetica,Arial,sans-serif" font-size="11.5" text-anchor="middle" font-weight="normal" fill="#111">MAP — U=120 units (parallel)</text>
+<rect x="152" y="580" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="178" y="580" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="204" y="580" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="230" y="580" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="256" y="580" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="282" y="580" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="308" y="580" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<rect x="334" y="580" width="18" height="9" rx="2" fill="#fff" stroke="#c89" stroke-width="0.8"/>
+<line x1="250" y1="598" x2="250" y2="620" stroke="#e07b00" stroke-width="2.4" marker-end="url(#m_all)"/>
+<text x="264" y="613" font-family="Helvetica,Arial,sans-serif" font-size="10.5" text-anchor="start" font-weight="normal" fill="#e07b00">all-to-all (keys scatter)</text>
+<rect x="140" y="624" width="220" height="34" rx="7" fill="#ffd1d1" stroke="#333" stroke-width="1.3"/>
+<text x="250" y="639" font-family="Helvetica,Arial,sans-serif" font-size="11.5" text-anchor="middle" font-weight="normal" fill="#111">MERGE — R=120 ranges (parallel)</text>
+<rect x="152" y="644" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="178" y="644" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="204" y="644" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="230" y="644" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="256" y="644" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="282" y="644" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="308" y="644" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<rect x="334" y="644" width="18" height="9" rx="2" fill="#fff" stroke="#c66" stroke-width="0.8"/>
+<line x1="380" y1="641" x2="470" y2="641" stroke="#119911" stroke-width="1.8" marker-end="url(#m_comp)"/>
+<text x="388" y="636" font-family="Helvetica,Arial,sans-serif" font-size="10" text-anchor="start" font-weight="normal" fill="#119911">completed</text>
+<text x="262" y="694" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" font-weight="normal" fill="#1f6fd0">frontier 13,478,564</text>
+<line x1="250" y1="698" x2="250" y2="724" stroke="#1f6fd0" stroke-width="2.2" marker-end="url(#m_flow)"/>
+<text x="250" y="742" font-family="Helvetica,Arial,sans-serif" font-size="11.5" text-anchor="middle" font-weight="normal" fill="#a00">⋮  cols 3,4,…  — frontier collapses ×0.42 per column</text>
+<text x="250" y="758" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#a00" font-style="italic">(the cliff: cols 6+ are a rounding error)</text>
+<rect x="470" y="132" width="200" height="570" rx="7" fill="#cfe8ff" stroke="#333" stroke-width="1.3"/>
+<text x="570" y="152" font-family="Helvetica,Arial,sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#111">T(n, H)</text>
+<text x="570" y="170" font-family="Helvetica,Arial,sans-serif" font-size="10.5" text-anchor="middle" font-weight="normal" fill="#333">running total of</text>
+<text x="570" y="184" font-family="Helvetica,Arial,sans-serif" font-size="10.5" text-anchor="middle" font-weight="normal" fill="#333">completed n-cell</text>
+<text x="570" y="198" font-family="Helvetica,Arial,sans-serif" font-size="10.5" text-anchor="middle" font-weight="normal" fill="#333">polyplets of height H</text>
+<line x1="570" y1="702" x2="570" y2="782" stroke="#119911" stroke-width="2.2" marker-end="url(#m_flow)"/>
+<rect x="230" y="782" width="340" height="0" rx="0" fill="#fff" stroke="#fff" stroke-width="1.3"/>
+<rect x="170" y="782" width="380" height="44" rx="7" fill="#e7d9f7" stroke="#333" stroke-width="1.3"/>
+<text x="360" y="802" font-family="Helvetica,Arial,sans-serif" font-size="13.5" text-anchor="middle" font-weight="bold" fill="#111">a(n) = Σ over H=1..n  of  T(n, H)</text>
+<text x="360" y="819" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="middle" font-weight="normal" fill="#444" font-style="italic">every height H is an INDEPENDENT copy of this flow</text>
+<line x1="570" y1="782" x2="470" y2="782" stroke="#119911" stroke-width="2.2" marker-end="url(#m_flow)"/>
+<text x="40" y="852" font-family="Helvetica,Arial,sans-serif" font-size="12" text-anchor="start" font-weight="bold" fill="#111">arrows:</text>
+<line x1="40" y1="872" x2="74" y2="872" stroke="#1f6fd0" stroke-width="2.4" marker-end="url(#m_flow)"/>
+<text x="82" y="876" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" font-weight="normal" fill="#111">frontier flows down (sequential: col→col)</text>
+<line x1="40" y1="892" x2="74" y2="892" stroke="#e07b00" stroke-width="2.4" marker-end="url(#m_all)"/>
+<text x="82" y="896" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" font-weight="normal" fill="#111">MAP→MERGE all-to-all (the bipartite fan-in)</text>
+<line x1="40" y1="912" x2="74" y2="912" stroke="#119911" stroke-width="2.4" marker-end="url(#m_comp)"/>
+<text x="82" y="916" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" font-weight="normal" fill="#111">completed polyplets → the count</text>
+</svg>

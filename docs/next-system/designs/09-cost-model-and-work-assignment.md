@@ -1,4 +1,4 @@
-# 09 — a-priori cost model from the cell-budget law, and how to assign work
+# 09 — a-priori cost model from the frontier profile, and how to assign work
 
 The per-column cost of the fold engine is **predictable from first principles** —
 no calibration run. This turns work-assignment (#32 cross-machine split, within-box
@@ -14,15 +14,23 @@ whole sweep that frontier obeys:
 1. **Geometric collapse.** Past its peak, a height's frontier shrinks by a constant
    factor **ρ ≈ 0.42 per column** (0.41 for tall strips, ~0.47 for short), nearly
    height-independent. The "cliff" past col 5–6 is just ρ⁶ ≈ 0.5%.
-2. **Cell-budget width law.** Active columns (frontier ≥ 1% of peak) obey
-   **active_width + H ≈ N + 6** (N = maxn = 21). Measured `active+H` = 26–27 across
-   H = 8..20. Every row of height costs ~one column of width: a polyplet spends ≥H of
-   its ≤N cells spanning the height, leaving ≤(N−H) to fund horizontal extent. Tall
-   strips are intrinsically narrow.
-3. **Peak grows ~geometrically, bending at the top.** peak_frontier(H)/peak(H−1) is
-   ~2.6× through the mid heights, then **bends down** toward the pole as the width
-   budget vanishes: 2.42 (H16) → 2.17 (H18) → 1.92 (H19) → **1.84 (H20)**. So the top
-   heights are large but *less* dominant than a flat 2.4× would say.
+2. **Width-of-mass shrinks with height (empirical curve — mechanism OPEN).** Columns
+   carrying real frontier *mass* (≥ 1% of peak) obey **active_width + H ≈ N + 6**
+   (measured 26–27 across H = 8..20): taller strips concentrate their mass in fewer
+   columns. This is a statement about where the *count mass* sits, **not** a width
+   ceiling — the maximum width is always ~N for *every* height. A king-diagonal
+   advances one row AND one column per cell, so n cells buy height n and width n at
+   once (the 4×4 diagonal is height 4, width 4, n=4). ⚠ An earlier draft "explained"
+   this by a cell budget ("≥H cells for height ⇒ ≤N−H for width"); the diagonal
+   **refutes** that — cells do double duty. Why the bulk is narrower for tall H is
+   **not yet derived**; use active_width+H≈N+6 as a fitted curve (good for sizing),
+   not a mechanism.
+3. **Peak grows ~geometrically, bending at the top (empirical).** peak_frontier(H)/
+   peak(H−1) is ~2.6× through the mid heights, then **bends down** toward the pole:
+   2.42 (H16) → 2.17 (H18) → 1.92 (H19) → **1.84 (H20)**. So the top heights are large
+   but *less* dominant than a flat 2.4× would say. (Reason for the bend is the same
+   open question as part 2 — it is a measured fact, not the refuted width-budget
+   story.)
 
 Consequence: cost is **front-loaded** — 74–87% of a tall strip's wall lands in cols
 ≤ peak+1 (peak col ≈ 2–4, drifting earlier for tall H). Cols 6→21 are a rounding
@@ -93,14 +101,16 @@ height's independent peak-column map instead of waiting. That is the real target
 bigger than "ramp as the cliff drops," and bounded by RAM, which is why it pairs with
 the governor and (designs/08) work-stealing, not replaces them.
 
-**5. New candidate lever — cost-aware partitioning (testable).** The cell-budget law
-suggests a state's branching cost rises with its *remaining* budget (more cells left ⇒
-more viable extensions). If per-state cost is estimable from a cheap budget proxy
-(lowest-n with nonzero count, off the counts vector), partition units by predicted
-**cost** rather than equal **count** — pre-balancing the units and shrinking the
-straggler tail *at the partition stage*, potentially obviating work-stealing on the
-cheaper columns. Motivated by the law, not yet proven at the per-state level: test by
-adding a budget proxy to the `POLY_UNIT_LOG` trace and correlating with `cpu_s`.
+**5. New candidate lever — cost-aware partitioning (speculative, testable).** A state's
+branching cost *may* rise with its remaining cell budget (more cells left ⇒ more viable
+extensions) — a plausible per-state effect, standing on its own, NOT on the refuted
+width law above. If per-state cost is estimable from a cheap proxy (lowest-n with
+nonzero count, off the counts vector), partition units by predicted **cost** instead of
+equal **count**, pre-balancing the units. Caveat from designs/08 Finding 5: the
+heaviness is *concentrated* in a few states, so cost-aware cuts could balance *across*
+units but still can't subdivide a single super-heavy state — it complements
+work-stealing, it doesn't replace it. Unproven; test by adding a budget proxy to the
+`POLY_UNIT_LOG` trace and correlating with `cpu_s`.
 
 ## Priority for a(22)/a(23)
 
