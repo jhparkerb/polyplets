@@ -279,10 +279,10 @@ func sweepHeight(
 			// files) is superseded before those files are deleted.
 			forwardCheckpoint(col, nil)
 			for _, p := range oldFrontier {
-				os.Remove(p)
+				removeRun(p)
 			}
 			for _, p := range oldMapOuts {
-				os.Remove(p)
+				removeRun(p)
 			}
 			frontier = nil
 			break
@@ -298,10 +298,10 @@ func sweepHeight(
 
 		// GC only after checkpoint is written.
 		for _, p := range oldFrontier {
-			os.Remove(p)
+			removeRun(p)
 		}
 		for _, p := range oldMapOuts {
-			os.Remove(p)
+			removeRun(p)
 		}
 	}
 
@@ -381,7 +381,7 @@ func mapPhase(
 		if ur.result.OutRecords > 0 {
 			outPaths = append(outPaths, ur.outPath)
 		} else {
-			os.Remove(ur.outPath)
+			removeRun(ur.outPath)
 		}
 		triContribs = append(triContribs, ur.result.TriContribs)
 		acct.Add(ur.result.Acct)
@@ -461,7 +461,7 @@ func mergePhase(
 			outPaths = append(outPaths, rr.outPath)
 			totalRecs += rr.result.OutRecords
 		} else {
-			os.Remove(rr.outPath)
+			removeRun(rr.outPath)
 		}
 		acct.Add(rr.result.Acct)
 	}
@@ -510,6 +510,12 @@ func sumFrontierRecords(frontier []string) uint64 {
 		n += hdr.Records
 	}
 	return n
+}
+
+// removeRun deletes a run file together with its sparse-index sidecar (if any).
+func removeRun(p string) {
+	os.Remove(p)
+	os.Remove(p + ".idx")
 }
 
 // unitMult returns the configured MAP units-per-core, defaulting to 1.

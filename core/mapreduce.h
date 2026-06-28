@@ -259,7 +259,7 @@ std::pair<size_t, size_t> map_shard_file(
     std::string spill_path = cfg.spill_dir + "/spill_" +
                              std::to_string(static_cast<long>(getpid())) +
                              "_" + std::to_string(spill_seq++) + ".bin";
-    RunFileWriter<W> sw(spill_path, H, maxn, "", "", rev, keyLen);
+    RunFileWriter<W> sw(spill_path, H, maxn, "", "", rev, keyLen, /*write_index=*/false);
     for (const auto& r : buf) sw.append(r);
     size_t sb = sw.finalize();
     total_spill_bytes += sb;

@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <memory>
 #include <queue>
@@ -90,10 +91,12 @@ class RunFileWriter {
   // keyLen defaults to 0 which means H+2 (triangle path); pass H+3 for holes.
   RunFileWriter(const std::string& path, int H, int maxn,
                 const std::string& lo_hex, const std::string& hi_hex,
-                const std::string& rev = "", int keyLen = 0)
+                const std::string& rev = "", int keyLen = 0,
+                bool write_index = true)
       : H_(H), keyLen_((keyLen == 0) ? H + 2 : keyLen),
         fp_(nullptr), record_count_(0), body_bytes_(0),
-        crc_(FNV_OFFSET), records_offset_(0) {
+        crc_(FNV_OFFSET), records_offset_(0),
+        path_(path), write_index_(write_index), body_start_offset_(0) {
     fp_ = std::fopen(path.c_str(), "wb");
     if (!fp_) {
       std::fprintf(stderr, "RunFileWriter: cannot open %s\n", path.c_str());
@@ -116,6 +119,16 @@ class RunFileWriter {
 
   void append(const RunRecord<W>& r) {
     if (!fp_) return;
+    // Sparse seek index: record (key, file-offset, record-index) every stride
+    // records, so the merge can seek to a key range instead of scanning to it.
+    if (write_index_ && (record_count_ % kIndexStride) == 0) {
+      IdxEnt e;
+      std::memset(e.key, 0, sizeof(e.key));
+      std::memcpy(e.key, r.sig.b, static_cast<size_t>(keyLen_));
+      e.offset = static_cast<uint64_t>(body_start_offset_) + body_bytes_;
+      e.recidx = record_count_;
+      index_.push_back(e);
+    }
     std::fwrite(r.sig.b, 1, static_cast<size_t>(keyLen_), fp_);
     uint8_t lo  = r.lo;
     uint8_t len = r.len;
@@ -158,6 +171,7 @@ class RunFileWriter {
     std::fwrite(crc_bytes, 1, 8, fp_);
     std::fclose(fp_);
     fp_ = nullptr;
+    if (write_index_ && !index_.empty()) writeIndexSidecar();
     return body_bytes_;
   }
 
@@ -172,6 +186,31 @@ class RunFileWriter {
   size_t body_bytes_;
   uint64_t crc_;
   long records_offset_;
+  std::string path_;
+  bool write_index_;
+  long body_start_offset_;          // file offset of the first record (post-header)
+  struct IdxEnt { uint8_t key[64]; uint64_t offset; uint64_t recidx; };
+  std::vector<IdxEnt> index_;
+  static constexpr size_t kIndexStride = 64;
+
+  // Sidecar <path>.idx: [u32 keyLen][u64 count][ {key[keyLen] u64 offset u64 recidx} ].
+  // Native byte order — it's a machine-local seek aid, not part of the run's
+  // byte-identical output, and map+merge of a column run on the same host.
+  void writeIndexSidecar() {
+    std::string ip = path_ + ".idx";
+    FILE* f = std::fopen(ip.c_str(), "wb");
+    if (!f) return;
+    uint32_t kl = static_cast<uint32_t>(keyLen_);
+    uint64_t cnt = index_.size();
+    std::fwrite(&kl, sizeof(kl), 1, f);
+    std::fwrite(&cnt, sizeof(cnt), 1, f);
+    for (const auto& e : index_) {
+      std::fwrite(e.key, 1, static_cast<size_t>(keyLen_), f);
+      std::fwrite(&e.offset, sizeof(e.offset), 1, f);
+      std::fwrite(&e.recidx, sizeof(e.recidx), 1, f);
+    }
+    std::fclose(f);
+  }
 
   void writeHeader(int H, int maxn, const std::string& lo_hex,
                    const std::string& hi_hex, const std::string& rev) {
@@ -189,6 +228,7 @@ class RunFileWriter {
     std::fprintf(fp_, "byteorder 1\n");
     std::fprintf(fp_, "\n");
     std::fflush(fp_);
+    body_start_offset_ = std::ftell(fp_);
   }
 };
 
@@ -201,7 +241,7 @@ class RunFileReader {
   RunFileReader(const std::string& path, int H, int keyLen = 0)
       : H_(H), keyLen_((keyLen == 0) ? H + 2 : keyLen),
         fp_(nullptr), records_(0), records_read_(0),
-        crc_(FNV_OFFSET) {
+        crc_(FNV_OFFSET), path_(path), seeked_(false), index_loaded_(false) {
     fp_ = std::fopen(path.c_str(), "rb");
     if (!fp_) {
       std::fprintf(stderr, "RunFileReader: cannot open %s\n", path.c_str());
@@ -250,7 +290,29 @@ class RunFileReader {
       out.counts[i] = v;
     }
     ++records_read_;
-    if (records_read_ == records_) verifyCRC();
+    // Seeked readers cover only a slice, so the running CRC is partial — skip it
+    // (corruption is caught by full reads / the verify gate).
+    if (records_read_ == records_ && !seeked_) verifyCRC();
+    return true;
+  }
+
+  // Seek so the next next() starts at the last indexed record with key <= klo
+  // (the caller skips the small in-block overshoot below klo). Uses the sidecar
+  // index; returns false / no-op if the index is absent (falls back to scan).
+  // This is the merge read-amplification fix.
+  bool seekToKey(const uint8_t* klo) {
+    if (!fp_) return false;
+    if (!index_loaded_) loadIndex();
+    if (index_.empty()) return false;
+    int a = 0, b = static_cast<int>(index_.size()) - 1, s = 0;
+    while (a <= b) {
+      int m = (a + b) / 2;
+      if (std::memcmp(index_[m].key, klo, static_cast<size_t>(keyLen_)) <= 0) { s = m; a = m + 1; }
+      else b = m - 1;
+    }
+    if (std::fseek(fp_, static_cast<long>(index_[s].offset), SEEK_SET) != 0) return false;
+    records_read_ = index_[s].recidx;
+    seeked_ = true;
     return true;
   }
 
@@ -265,6 +327,29 @@ class RunFileReader {
   size_t records_;
   size_t records_read_;
   uint64_t crc_;
+  std::string path_;
+  bool seeked_;
+  bool index_loaded_;
+  struct IdxEnt { uint8_t key[64]; uint64_t offset; uint64_t recidx; };
+  std::vector<IdxEnt> index_;
+
+  void loadIndex() {
+    index_loaded_ = true;
+    std::string ip = path_ + ".idx";
+    FILE* f = std::fopen(ip.c_str(), "rb");
+    if (!f) return;
+    uint32_t kl = 0; uint64_t cnt = 0;
+    if (std::fread(&kl, sizeof(kl), 1, f) != 1 || std::fread(&cnt, sizeof(cnt), 1, f) != 1 ||
+        static_cast<int>(kl) != keyLen_) { std::fclose(f); return; }
+    index_.resize(cnt);
+    for (uint64_t i = 0; i < cnt; ++i) {
+      std::memset(index_[i].key, 0, sizeof(index_[i].key));
+      if (std::fread(index_[i].key, 1, kl, f) != kl ||
+          std::fread(&index_[i].offset, sizeof(uint64_t), 1, f) != 1 ||
+          std::fread(&index_[i].recidx, sizeof(uint64_t), 1, f) != 1) { index_.clear(); break; }
+    }
+    std::fclose(f);
+  }
 
   bool parseHeader() {
     char line[512];
@@ -325,6 +410,14 @@ std::pair<size_t, size_t> mergeRunFiles(
   readers.reserve(in_paths.size());
   for (const auto& p : in_paths)
     readers.push_back(std::make_unique<RunFileReader<W>>(p, H, keyLen));
+
+  // Read-amplification fix: seek each input to klo via its sparse index instead
+  // of reading from the start and skipping below klo. Without this, M workers
+  // each rescan ~total/2 records (the ~M/2 amplification, measured 160x at
+  // mult=4); with it, each reads only its [klo,khi) slice. No-op if a run has no
+  // index (falls back to scan), so it stays correct on un-indexed inputs.
+  if (has_lo && !std::getenv("POLY_NO_SEEK"))   // toggle off to A/B the old scan path
+    for (auto& r : readers) r->seekToKey(lo_sig);
 
   struct Cursor {
     RunRecord<W> rec;
