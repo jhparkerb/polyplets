@@ -75,15 +75,23 @@ to the **next** height's map — progressively more each column as the cliff dro
 is a shared global work-pool pulling the highest-value ready work across all in-flight
 heights (the "shared-pool scheduler"), not the static K-at-a-time `--overlap-heights`.
 
-**The cliff shape makes this RAM-safe for free.** Ramping the next height up *exactly
-as the current collapses* overlaps one height's PEAK with another's cheap TAIL (tiny
-frontier ⇒ tiny working set) — never peak-with-peak, which would double peak RAM. So
-staggering by the collapse is simultaneously utilization-optimal **and**
-memory-bounded; the cost model proves the two goals coincide. This is the direct fix
-for the **live 5–7% tail-utilization trough** (a height's tail idles the box today
-only because the next height hasn't been started). Concretely: keep a running estimate
-of free cores from the model, and the moment a height passes its peak, begin pulling
-the next height's peak-column map onto the freeing cores.
+**RAM is the binding constraint, NOT free — measured.** The batch-overlap experiment
+gained ~32% (≈52/80 eff cores) but was **spill/RAM-bounded**: 3× oversubscription
+collapsed to 26 cores on a spill storm, and at a(21)+ scale spill dominates (overlap
+*amplifies* it). The cliff buys RAM-safety only for the *cheap-tail + expensive-peak*
+pairing; the top heights are **adjacent and both expensive**, so pipelining them
+overlaps two long peaks → peak-with-peak working set → blowup. The governor must
+actively cap concurrent peak RAM; staggering by the cliff helps at the margin, it does
+not make overlap free.
+
+**And aim it at the right idle.** The cliff-tail is cheap by construction, so
+backfilling *it* recovers little wall. The idle worth filling is the **peak-column
+straggler tails + the map→merge barrier** — that is the live 5–7% trough (ayr was
+stuck in H20 *col2*'s straggler tail, a peak column, not the tail). The shared pool
+fixes that too: when a peak column's stragglers leave cores idle, they pull the next
+height's independent peak-column map instead of waiting. That is the real target —
+bigger than "ramp as the cliff drops," and bounded by RAM, which is why it pairs with
+the governor and (designs/08) work-stealing, not replaces them.
 
 **5. New candidate lever — cost-aware partitioning (testable).** The cell-budget law
 suggests a state's branching cost rises with its *remaining* budget (more cells left ⇒
