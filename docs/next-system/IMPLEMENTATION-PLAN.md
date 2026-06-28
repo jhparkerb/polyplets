@@ -1,6 +1,8 @@
 # IMPLEMENTATION-PLAN — Next-system polyplet enumerator (v1)
 
-Status: DRAFT 2026-06-26 · Third of the build trilogy. Inputs: [`PRD.md`](PRD.md) (requirements,
+Status: DRAFT 2026-06-26 (re-indexed 2026-06-28: the old-engine a(21)/a(22) campaign was retired, so the
+oracle ceiling dropped to a(20)-full / a(21)-partial and the trust milestone moved a(22)→a(20); see M3/M4) ·
+Third of the build trilogy. Inputs: [`PRD.md`](PRD.md) (requirements,
 acceptance gates AC-0…6), [`DESIGN.md`](DESIGN.md) (architecture, API, formats, gate set),
 [`docs/frontier/NEXT-SYSTEM.md`](../frontier/NEXT-SYSTEM.md) (closed design space). This document
 sequences the build into milestones at **Sonnet-executable grain**, each task carrying its functional
@@ -15,19 +17,22 @@ checkpoint and a **pre-documented response to adverse results**.
   pre-planned response — follow it before improvising).
 - **Reuse, don't reinvent.** Transition/signature/prune/fold come from today's `cpp/tma/` **verbatim**
   (DESIGN §0). If you find yourself rewriting the king-closure math, stop — you're off-plan.
-- **The old engine is the oracle** (through a(22)). "Byte-identical to old engine" means: run the old
+- **The old engine is the oracle** (through **a(20) in full**, and **a(21) only partially** — the salvaged
+  per-cell heights H≤17; the old-engine a(21)/a(22) frontier campaign was retired in favor of this engine, so
+  **no old a(22) oracle exists**). "Byte-identical to old engine" means: run the old
   `build/tma square8 N` (or its per-height triangle) and `diff` the T(n,H) output exactly.
 - **Complexity tags** (S/M/L) hint relative effort for sequencing only — they are NOT schedule/ETA
   estimates (no fabricated ETAs).
 
 ## Operating guardrails (do not violate)
 
-- **G-A The running a(21)/a(22) frontier jobs are untouchable.** They run on dalby/ayr on `master`. All
-  v1 work is on the `next-system` branch and on *free* cores only. Never restart/disturb a healthy
-  frontier job (correctness-or-dead-box bar only). Honor gympie's 10-perf-core cap and ayr's 78 GB /
-  32-core budget when picking where to run gates.
+- **G-A The running frontier jobs are untouchable.** As of 2026-06-28 these are **new-engine** runs
+  (a(20) seek-index at-scale validation on ayr, a(21) on dalby), launched from the `polyominoes-ns`
+  worktrees — the old-engine a(21)/a(22) campaign was retired. Never restart/disturb a healthy frontier
+  job (correctness-or-dead-box bar only). Honor gympie's 10-perf-core cap and ayr's 78 GB / 32-core
+  budget when picking where to run gates.
 - **G-B No >1 hr compute job without explicit beg-and-agree** (consult `docs/job-checklist.md` first).
-  This gates M3's a(22) cross-check and M4's a(23) run specifically.
+  This gates the M4 record runs (a(21) already approved + running; a(22)/a(23) each need it).
 - **G-C Rev-stamped binaries.** Every build carries the git rev (`-dirty` if the tree differs) in
   filename and `event=start`. A gate run with a dirty tree is for iteration only; milestone-closing gate
   runs use a committed tree.
@@ -41,9 +46,9 @@ checkpoint and a **pre-documented response to adverse results**.
 | **M0** | `libenum` core (riskiest first) | AC-0 | in-process map+merge reproduces T(n,H) byte-identical, n≤14 | L |
 | **M1** | single-process end-to-end + NVMe spill | AC-1 | a(18)–a(20) byte-identical with real disk spill | M |
 | **M2** | Go orchestrator (parallel + resumable) | AC-2 | parallel == serial AND kill+resume byte-identical | L |
-| **M3** | a(22) cross-check (the trust milestone) | AC-3 | new a(22) == old a(22) | M |
+| **M3** | a(20)/a(21) cross-check (the trust milestone) | AC-3 | new a(20) == old a(20) byte-identical (+ a(21) partial-height cross-check) | M |
 | **M3.5** | a(23) sizing pre-flight | — | documented fit + box chosen + go/no-go | S |
-| **M4** | a(23) record term | AC-4 | a(23) computed, resumably, internal checks pass | M |
+| **M4** | record terms a(21)→a(23) (a(21) first) | AC-4 | each computed resumably, internal checks pass | M |
 | **M5** | deliverable + outputs (holes req, GF best-effort) | AC-5,6 | verifier passes on published dataset; holes cross-checked | L |
 
 ---
@@ -201,11 +206,18 @@ wall-clock checkpoint/resume. **Entry:** M1 green. This is the largest milestone
   - Adverse: bursty/√ progress is expected (heavy-tailed cost) — surface it as cost-weighted, don't "smooth"
     it into a false-confidence linear bar.
 - **Exit gate M2:** AC-2 green (parallel == serial AND kill+resume byte-identical, accounting correct).
+- **Post-M2 perf (landed during M3 validation, gate-protected, result-invariant):** the seek-index merge
+  fix (`de4e183` — sparse `key→offset` `.idx` sidecar + `seekToKey`, ~16.7× on `mergeRunFiles`; all gates
+  byte-identical) and cross-height overlap (`c619107` — `--overlap-heights K`, hides merge idle behind the
+  next height's map; K=1 = sequential, unchanged). Neither changes T(n,H); both are NFR-3 throughput.
 
-## M3 — a(22) cross-check: the trust milestone *(AC-3)*
+## M3 — a(20)/a(21) cross-check: the trust milestone *(AC-3)*
 
-**Objective:** prove new == old on the last term the old engine reaches. **Entry:** M2 green. **G-B applies**
-(a(22) is a >1 hr job → beg-and-agree, job-checklist).
+**Objective:** prove new == old on the terms the old engine reaches — **a(20) in full (byte-identical)** and
+**a(21) partially** (the salvaged heights H≤17). The old-engine a(21)/a(22) frontier campaign was retired
+mid-build (replaced by this engine on dalby), so the originally-planned "new a(22) == old a(22)" gate is moot
+— there is no old a(22). Trust therefore rests on the **a(20) byte-match + a(21) partial-row cross-check +
+the internal consistency layers** (mod-p CRT, row-sum, growth). **Entry:** M2 green.
 
 - **T3.1 `Counter<u128>` drop-in.** *(S)*
   - Build: the u128 counter template + run-header width `u128` (the swap, DESIGN §10). u128 add/widening
@@ -213,21 +225,28 @@ wall-clock checkpoint/resume. **Entry:** M1 green. This is the largest milestone
   - Gate: u128 a(n) == u64 a(n) for n in u64 range, byte-identical totals.
   - Adverse: cross-ISA byte-diff ⇒ endianness in the value codec (must be LE per §9); the sig key is
     already endian-neutral (byte array).
-- **T3.2 a(20)/a(21) full cross-check.** *(M)*
-  - Build: run the new engine at a(20), a(21) on free cores.
-  - Gate: T(n,H) byte-identical to the old engine for both.
+- **T3.2 a(20) byte-match + a(21) partial cross-check. *(M — IN FLIGHT 2026-06-28)***
+  - Build: run the new engine at a(20) and a(21) on free cores. **a(20) validating now on ayr** (the
+    seek-index at-scale gate, `--compare` vs 1,025,573,519,362,016); **a(21) computing now on dalby**.
+  - Gate (**AC-3**): a(20) T(n,H) **byte-identical to the old engine in full**; a(21) T(n,H) byte-identical to
+    the old engine's **salvaged heights H≤17** (no full old a(21) exists), plus `combine --maxn 20 --compare`,
+    growth-ratio, and the mod-p CRT shadow for the remaining a(21) heights.
   - Adverse: mismatch here (not at small n) ⇒ a scale-only bug: spill volume, u128 boundary, or a unit-
     partition edge that only appears with many units. Diff the per-(n,H) row to find the first divergent H.
-- **T3.3 a(22) cross-check.** *(M — gated by G-B)*
-  - Build: run new-engine a(22); compare to the old engine's a(22) (the frontier job's result, once it
-    lands, or a dedicated run).
-  - Gate (**AC-3**): new a(22) T(n,H) == old a(22) T(n,H), exactly. **The old engine earns retirement here.**
-  - Adverse: **any disagreement halts the ladder — do NOT proceed to a(23).** Playbook: (1) confirm both on
-    a clean rev (G-C); (2) `gate_modp` shadow on both — if mod-p agrees but full disagrees, suspect a
-    counting-width/overflow issue, not the transition; (3) bisect down in n until they agree, the first
-    divergent n localizes it; (4) the new engine is wrong until proven otherwise (the old engine is the
-    validated oracle).
-- **Exit gate M3:** AC-3 green. This is the de-risking core of the whole plan.
+- **T3.3 (was: a(22) cross-check) — RETIRED: no old a(22) oracle.** *(superseded)*
+  - The old-engine a(21)/a(22) campaign was retired mid-build, so the planned "new a(22) == old a(22)" diff
+    cannot run. **AC-3 is satisfied by T3.2** (a(20) full byte-match + a(21) partial cross-check). a(22) is no
+    longer a *cross-check* term — it becomes the second new **record** term (M4), validated by internal
+    consistency (mod-p CRT, row-sum, growth), not an old-engine diff.
+  - **The old engine earns retirement at a(20)/a(21)** (T3.2), not a(22).
+  - Adverse (carried forward to every record term): **any internal-consistency disagreement halts the
+    ladder.** (1) confirm a clean rev (G-C); (2) `gate_modp` shadow — if mod-p CRT disagrees with the full
+    count, suspect a counting-width/overflow issue, not the transition; (3) bisect down in n until the
+    consistency layers agree, the first divergent n localizes it; (4) the new engine is wrong until proven
+    otherwise.
+- **Exit gate M3:** AC-3 green = a(20) byte-identical to the old engine **+** a(21) partial-height
+  cross-check pass (T3.2). This is the de-risking core of the whole plan; from a(21) onward the engine runs
+  without a full external oracle.
 
 ## M3.5 — a(23) sizing pre-flight *(go/no-go before spending compute)*
 
@@ -264,8 +283,9 @@ wall-clock checkpoint/resume. **Entry:** M1 green. This is the largest milestone
   | **→ wall verdict** | **days → ~2 weeks; the binding/uncertain axis** | NFR-3 aspiration (not correctness); bounded-safe via checkpoint+governor |
 
   **Verdict — GO on dalby; cloud fallback NOT required for a(23).** Disk fits with 2–4× margin (376 GB vs
-  ~95–190 GB peak), RAM is never binding (spill-bounded), and by M4 the a(22) frontier job has long since
-  freed the box (M3 depends on a(22) landing). The **only uncertain axis is wall time** (~6 days if
+  ~95–190 GB peak), RAM is never binding (spill-bounded), and by the time a(23) runs the box is long since
+  free (a(23) follows a(21) then a(22) on the same box, sequentially). The **only uncertain axis is wall
+  time** (~6 days if
   cross-process parallelism delivers ~76 effective cores — the new engine's whole reason for existing — vs
   ~12 days if it only matches the old 38× cap). That uncertainty is an NFR-3 *aspiration*, not a correctness
   risk, and is bounded-safe: a slow run still checkpoints, resumes, and finishes. **Free headroom in hand:**
@@ -283,15 +303,18 @@ wall-clock checkpoint/resume. **Entry:** M1 green. This is the largest milestone
     or rent a large-NVMe cloud VM, committing only when the fit is **certain** (PRD §4). A misprediction
     revises the plan; it never crashes a multi-day run (NFR-2) — the governor stops cleanly at the budget.
 
-## M4 — a(23) record term *(AC-4)*
+## M4 — record terms a(21) → a(23) *(AC-4)*
 
-**Objective:** compute the first term only the new engine reaches. **Entry:** M3.5 go. **G-B applies.**
+**Objective:** compute the terms beyond the old engine's full reach — **a(21) first** (running on dalby now;
+the first record, partially cross-checked at H≤17), then a(22) and a(23). **Entry:** M3 trust gate (a(20)
+byte-match) green; a(22)/a(23) additionally gated on their M3.5 sizing pre-flight. **G-B applies** (each is a
+>1 hr job → beg-and-agree, job-checklist).
 
-- **T4.1 Launch + operate a(23).** *(M — long run, operated per job-checklist)*
-  - Build: run a(23) on the chosen box, one tmux window, foreground-visible with tee; governor on;
-    wall-cadence checkpoints; resume-on-interrupt exercised at least once deliberately early to confirm the
-    real run is resumable (FR-4).
-  - Gate (**AC-4**): a(23) = Σ_H T(n,H) computed to completion, resumably.
+- **T4.1 Launch + operate each record term (a(21) → a(23)).** *(M — long run, operated per job-checklist)*
+  - Build: run the term on the chosen box, one tmux window, foreground-visible with tee; governor on;
+    wall-cadence checkpoints; resume-on-interrupt confirmed (FR-4). **a(21) is operating now on dalby** (rev
+    35eb9e1, per-height-out, 15-min checkpoints); a(22)/a(23) follow, each after its M3.5 sizing.
+  - Gate (**AC-4**): each a(n) = Σ_H T(n,H) computed to completion, resumably.
   - Adverse: (a) **counter near u64 edge** — a(23) is well below a(25), u64 valid; but FR-7 must have refused
     a too-narrow counter at start. (b) **doesn't fit despite M3.5** — governor checkpoints + stops; replan
     box (cloud fallback) and resume from checkpoint, no lost work. (c) **box dies** — resume from last
@@ -307,18 +330,21 @@ wall-clock checkpoint/resume. **Entry:** M1 green. This is the largest milestone
 
 ## M5 — deliverable + outputs *(AC-5 publish-and-verify; AC-6 holes required, GF best-effort)*
 
-**Objective:** package a(23) as a publicly verifiable dataset and produce the holes/GF outputs.
-**Entry:** M4 green. (Parts run in parallel with M4's long compute.)
+**Objective:** package the record terms as a publicly verifiable dataset and produce the holes/GF outputs.
+**Entry:** M4 green — but several tasks were **front-loaded**: as of 2026-06-28 **T5.1–T5.4 are DONE**
+(`formats.md`; `manifest.go`+`runcat`; the `verify/` tool, `ns-gate-verify`; the holes classifier,
+`ns-gate-holes` byte-identical to `build/tma_holes` at n=14) and **T5.5 (GF) is DEFERRED** (net-loss until
+~a(48); see `designs/05-deferred-and-closed.md`). (Parts run in parallel with M4's long compute.)
 
-- **T5.1 `formats.md` — the published format spec.** *(S)*
+- **T5.1 `formats.md` — the published format spec.** *(S — **DONE**)*
   - Build: document every byte of run/checkpoint/triangle/manifest/residue formats (DESIGN §9) so a skeptic
     with no code can parse the dataset.
   - Gate: a fresh reader (or `runcat` written only from `formats.md`) parses a published run correctly.
-- **T5.2 `manifest.go` + residues + `runcat` dump tool.** *(M)*
+- **T5.2 `manifest.go` + residues + `runcat` dump tool.** *(M — **DONE**)*
   - Build: per-a(n) provenance manifest (rev, cpu·s, wall, peak RSS, spill bytes, run list + CRCs); mod-p
     residue emission; `runcat --text` renders any binary run.
   - Gate: manifest cross-references resolve (every listed run exists, CRC matches); `runcat` round-trips.
-- **T5.3 `verify/` independent tool *(AC-5)*.** *(L)*
+- **T5.3 `verify/` independent tool *(AC-5)*.** *(L — **DONE**, `ns-gate-verify`)*
   - Build: the separate Go verifier (DESIGN §12) — consistency (row-sum, mod-p CRT, growth smoothness),
     integrity (CRCs, manifest cross-refs), spotcheck (re-run sampled shards via a fresh `map_worker`, diff
     to published runs). Reads only `data/` + `formats.md`.
@@ -326,14 +352,14 @@ wall-clock checkpoint/resume. **Entry:** M1 green. This is the largest milestone
     caught (negative test).
   - Adverse: spotcheck mismatch ⇒ either the published run is stale (rev skew — check manifest rev) or the
     verifier's worker build differs; pin both to the same rev (G-C) before trusting the diff.
-- **T5.4 Holes classifier (O2 — REQUIRED, blocks AC-6).** *(M)*
+- **T5.4 Holes classifier (O2 — REQUIRED, blocks AC-6).** *(M — **DONE**, `ns-gate-holes`)*
   - Build: `Classifier<holes>` keying completion by (n,H,holes) using `closedEulerDelta4` (`euler.h`,
     reused) carried in the value (DESIGN §3,10). Same engine, new classifier template.
   - Gate (**AC-6**): hole-count distribution byte-identical to the **old engine's `--holes`** for small n
     (the old engine is still the oracle for holes); produced for the terms in range up to a(23).
   - Adverse: mismatch ⇒ the hole accounting carried in the ranged value desynced from the count — verify
     the Euler delta is accumulated under the same reduce (associative) as counts; small-n diff localizes.
-- **T5.5 GF recovery (O3 — BEST-EFFORT, non-blocking).** *(M)*
+- **T5.5 GF recovery (O3 — BEST-EFFORT, non-blocking).** *(M — **DEFERRED**, net-loss until ~a(48))*
   - Build: `Counter<ModP>` + `Classifier<gf>` accumulating per-(H,n) residues; CRT recovery of fixed-height
     GFs (the mod-p path, reused concept).
   - Gate: recovered GF reproduces known fixed-height series at small H; best-effort for higher H within
@@ -362,21 +388,23 @@ Cross-referenced from tasks; the standing responses to the failure classes:
    full count suspect; re-run under sanitizers; never publish until CRT agrees.
 6. **Doesn't fit the box** → governor checkpoints + stops (never OOM); replan box (cloud fallback) or apply
    the sig 4-bit pack; resume from checkpoint. A misprediction revises the plan, never loses work.
-7. **a(22) cross-check fails (AC-3)** → HALT the ladder. The new engine is wrong until proven otherwise;
-   do not compute a(23) on a disagreeing engine. (Playbook in T3.3.)
+7. **a(20)/a(21) cross-check fails (AC-3), or any record term's internal-consistency check fails** → HALT
+   the ladder. The new engine is wrong until proven otherwise; do not compute the next term on a disagreeing
+   engine. (Playbook in T3.2/T3.3.)
 8. **GF (O3) misbehaves** → priority kill-switch: drop O3, keep triangle + holes; ship v1; defer GF.
 
 ## Validation ladder (which gate catches which failure — recap of DESIGN §11)
 
 gross bug → `gate_regression`/`gate_fold`/`gate_rowsum` (M0–M1) · checkpoint bug → `gate_resume` (M2) ·
 boundary erosion → `arch_fitness` (all) · arithmetic/transient → `gate_modp` (M3–M4) · impl bug → the
-**cross-engine a(22) gate** (M3) + the **published-dataset verifier** (M5). a(23)'s leading-edge trust =
-method-proof + internal consistency + publishable recompute (no external oracle exists — accepted status).
+**cross-engine a(20)/a(21) gate** (M3) + the **published-dataset verifier** (M5). a(21+)'s leading-edge trust
+= method-proof + internal consistency + publishable recompute (no full external oracle beyond a(20)/a(21)-
+partial — accepted status).
 
 ## Traceability (task → requirement/AC)
 
 T0.* → AC-0, FR-1, NFR-5 · T1.* → AC-1, FR-2 · T2.1→FR-store · T2.2/2.3→FR-5,AC-2 · T2.4→FR-5 ·
-T2.5→FR-6,NFR-2 · T2.6→FR-3,4,9,10,AC-2 · T2.7→NFR-6 · T3.1→FR-7 · T3.3→AC-3,G2 · T3.5→NFR-2,NFR-3 ·
+T2.5→FR-6,NFR-2 · T2.6→FR-3,4,9,10,AC-2 · T2.7→NFR-6 · T3.1→FR-7 · T3.2→AC-3,G2 (T3.3 retired — no old a(22)) · T3.5→NFR-2,NFR-3 ·
 T4.1→AC-4,G3,G4 · T4.2→FR-8,NFR-1 · T5.1/5.2→FR-11,12 · T5.3→FR-13,AC-5,G6 · T5.4→FR-O2,AC-6 ·
 T5.5→FR-O3.
 
