@@ -32,6 +32,7 @@ cells will rest on the new engine alone.
 | 5 | [04-multi-machine-height-split.md](04-multi-machine-height-split.md) | Per-height split across machines + combine | ~half day | Phase B (during a(21) run) |
 | 32 | [07-height-scheduling.md](07-height-scheduling.md) | Cross-machine height-assignment scheme (Q2‖Cmax): LPT/dynamic-pull beat meet-in-the-middle; calculator + sims | paper (no compute) | a(22)/M4 |
 | T2.3 | [08-straggler-tail-sizing.md](08-straggler-tail-sizing.md) | Map straggler tail sized (~18% of map-wall, growing); work-stealing beats predictive LPT 92% vs 71%, predictor-free; per-unit trace tools + sched_sim | measured (gympie probes) | a(22)/M4 |
+| 32+ | [09-cost-model-and-work-assignment.md](09-cost-model-and-work-assignment.md) | A-priori per-(H,col) cost model from the cell-budget law (active_width+H≈N+6, ×0.42/col collapse); cross-height feed-forward ramp (RAM-safe peak↔tail overlap), exact #32 split, atomic H_max·col2 floor | derived (a21 profile) | a(22)/M4 |
 
 ## Sequencing and gates
 
