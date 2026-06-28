@@ -75,6 +75,28 @@ the dominant straggler that reordering can only *move*. This is the canonical
 non-clairvoyant result (Blumofe–Leiserson work-stealing; MapReduce speculative
 execution): when sizes are unpredictable, go reactive, not predictive.
 
+## Finding 5 — finer static units (unit-mult) make it WORSE, not better
+
+The roadmap gated work-stealing on "only if high unit-mult can't fix the tail."
+Tested directly: a(18) at mult=16 vs the mult=4 baseline (both spill, `--compare`
+PASS):
+
+| | mult=4 | mult=16 | pre-registered |
+|---|--:|--:|--:|
+| wall | 3434s | **3759s (+9.5%)** | predicted *down* |
+| as-emitted makespan / ideal | 1.215× | **1.780×** | predicted ~1.03–1.05× |
+| straggler floor (max/ideal) | 0.84 | **0.92** | predicted ~0.2 |
+
+Refining the static partition does not *divide* the heavy work, it **isolates** it:
+the pathological states collapse into one giant unit (0.92× a packed column) while
+the rest go trivial, and that lone unit strands cores worse than the coarser binning
+did. The heaviness is **concentrated by key, not spread** — the floor already being
+0.84 at mult=4 was the tell. A *key-based* static cut cannot subdivide it; only a
+*cursor-based* cut of the running straggler's remaining range (work-stealing) can. On
+the same mult=16 trace, `sched_sim` steal still reaches 1.008× (99%). **This closes
+the question: unit-mult cannot fix the tail, so work-stealing is necessary, not
+optional.**
+
 ## Verdict
 
 - **Build reactive work-stealing / tail-split (plan T2.3).** Worth **~18% of
