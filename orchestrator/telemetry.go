@@ -36,6 +36,11 @@ type ColumnCost struct {
 	MapCPUS    float64
 	MergeWallS float64
 	MergeCPUS  float64
+	// Worker-invocation counts: map units fanned out this column, and merge
+	// ranges fanned in. Feed the post-run stats harvest (scripts/job_stats.py)
+	// so per-column parallelism is an observed datum, not derived from config.
+	NMapUnits    int
+	NMergeRanges int
 }
 
 // telemetry accumulates ColumnCosts, emits structured progress, writes the cost
@@ -118,9 +123,10 @@ func (t *telemetry) observe(c ColumnCost) {
 
 	fmt.Printf("event=column H=%d col=%d frontier_in=%d frontier_out=%d "+
 		"wall_s=%.2f cum_wall_s=%.1f cpu_s=%.1f rss_max_mb=%.1f "+
-		"map_wall_s=%.2f map_cpu_s=%.1f merge_wall_s=%.2f merge_cpu_s=%.1f\n",
+		"map_wall_s=%.2f map_cpu_s=%.1f merge_wall_s=%.2f merge_cpu_s=%.1f "+
+		"map_units=%d merge_ranges=%d\n",
 		c.H, c.Col, c.FrontierIn, c.FrontierOut, c.WallS, t.cumWall, c.CPUS, c.RSSMax,
-		c.MapWallS, c.MapCPUS, c.MergeWallS, c.MergeCPUS)
+		c.MapWallS, c.MapCPUS, c.MergeWallS, c.MergeCPUS, c.NMapUnits, c.NMergeRanges)
 
 	if t.ref != nil {
 		if pred, ok := t.ref[[2]int{c.H, c.Col}]; ok {

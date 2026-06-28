@@ -344,10 +344,12 @@ func sweepHeight(
 			WallS:       colWall,
 			CPUS:        colAcct.CPUS,
 			RSSMax:      colAcct.RSSMax,
-			MapWallS:    mapWall,
-			MapCPUS:     mapAcct.CPUS,
-			MergeWallS:  mergeWall,
-			MergeCPUS:   mergeAcct.CPUS,
+			MapWallS:     mapWall,
+			MapCPUS:      mapAcct.CPUS,
+			MergeWallS:   mergeWall,
+			MergeCPUS:    mergeAcct.CPUS,
+			NMapUnits:    len(mapOuts),
+			NMergeRanges: len(mergeOuts),
 		})
 		frontierIn = totalRecs // next column's input = this column's output
 
