@@ -1,4 +1,44 @@
-# HANDOFF — 2026-06-27 PM EDT
+# HANDOFF — 2026-06-28 00:10 EDT
+
+## 2026-06-28 00:10 — live status (two jobs running, both healthy)
+
+**ayr — a(20) seek-index validation** (orchestrate PID 1276058, rev aebdd82,
+tmux `0:a20`, log `runs/ns_a20/a20.log`): **17/20 heights done, on H18**, ~1h50m
+in. Per-height cost back-loaded (H17=62min); ~1-2h to finish H18-20. `--compare`
+verdict prints only at the END (waiter `bn2by19hw` armed to catch it). Partial
+sum tracks the known a(20) exactly (H1-14 = 98.6% of 1,025,573,519,362,016), an
+early green flag. **This is the gate before any a(21) restart.**
+
+**dalby — a(21)** (orchestrate PID 993738, rev 35eb9e1 = UNFIXED engine, tmux
+`0:a21`): **17/21 heights done, on H18 col 3/21**, RAM 2GB, disk 340GB free,
+load 55/80 — healthy. INVESTIGATED a phantom "restart": there was none — all
+procs started Jun 27 19:39:21, one launch in the log, no reboot/OOM/errors; my
+confusion was dalby's clock being just past midnight (00:05 Jun 28), so 4h26m
+elapsed is correct. **a(21) is FAR ahead of its 7.4-day a-priori** (H1-17 in ~4h
+even merge-capped); finish hinges on the tall-height tail H18-21 (likely falls
+off → well under a day, but UNMEASURED — no hard ETA). RAM-safety watcher 1122969
+alive (triggers >108GB).
+
+**Landed this session (next-system):** seek-index merge fix `de4e183` (~16.7x on
+real mergeRunFiles; merge CPU 22-34c→<1.5c; a(20) telemetry confirms map fills
+~27/30 but merge now LATENCY-bound, idling box 24-45% of wall) → next lever is
+cross-height **overlap** `c619107` (`--overlap-heights K`, K=1=sequential
+unchanged; validated correct + race-clean; hides merge idle behind another
+height's map). `experiments/merge_{read,strategy,engine}_bench.cpp`,
+`docs/next-system/designs/06`.
+
+**DECISION PENDING on a(20) verdict:**
+- a(20) `--compare` **PASS** → seek-index earned the record. a(21) is only hours
+  in → cross-compile c619107 orchestrate on gympie + ship to ayr-style, **restart
+  a(21) on dalby with the fix** (~3x faster on a validated engine). Bring to
+  jasonp first.
+- a(20) **FAIL/mismatch** → seek-index has a scale bug → do NOT touch a(21);
+  debug the seek path.
+
+**Also ready (deferred to after a(20)):** overlap re-test on ayr via
+`scripts/ns_overlap_ayr.sh 4` (needs c619107 cross-compiled+shipped first) to
+measure the utilization win vs the sequential a(20). ayr old-engine H18
+cross-check was killed (a(21) old-engine cross-check caps at H1-17, ample).
 
 ## 2026-06-27 ~22:11 — seek-index merge fix + a(20) validation on ayr
 
