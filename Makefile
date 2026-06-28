@@ -16,7 +16,7 @@ CXXFLAGS += -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
 # apply it only when the compiler is gcc; empty for clang.
 RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),,-Wno-error=restrict)
 
-.PHONY: gates gate-g1 gate-g2 gate-euler clean \
+.PHONY: gates gate-g1 gate-g2 gate-euler clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify \
@@ -218,6 +218,26 @@ ns-gate-verify: build/ns/verify build/ns/orchestrate build/ns/map_worker build/n
 
 build/ns/verify: verify/cmd/verify/main.go verify/*.go | build/ns
 	go build -o $@ ./verify/cmd/verify/
+
+# ─── install ─────────────────────────────────────────────────────────────────
+# Copy the ns binaries to $(PREFIX) (default ~/bin) with this build's git
+# short-rev appended: orchestrate-<rev>, map_worker-<rev>, merge_worker-<rev>, …
+# Rev-suffixed names mean a rebuild at a NEW commit writes new files and never
+# clobbers a binary an in-flight run is still spawning (workers respawn every
+# column). Discipline: launch real runs from the installed ~/bin/<name>-<rev>
+# paths and treat build/ns/ as scratch; then `make install` of a newer rev,
+# even mid-run, only touches scratch + new files. An installed orchestrate-<rev>
+# auto-finds its same-rev map_worker/merge_worker siblings — no --workers-dir.
+PREFIX ?= $(HOME)/bin
+INSTALL_REV := $(GIT_REV)$(GIT_DIRTY)
+NS_INSTALL_BINS := orchestrate map_worker merge_worker runcat predict combine verify
+
+install: $(addprefix build/ns/,$(NS_INSTALL_BINS))
+	mkdir -p $(PREFIX)
+	@for b in $(NS_INSTALL_BINS); do \
+	    cp -f build/ns/$$b $(PREFIX)/$$b-$(INSTALL_REV) && \
+	    echo "installed $(PREFIX)/$$b-$(INSTALL_REV)"; \
+	done
 
 build/ns/gate_holes: test/gate_holes.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@

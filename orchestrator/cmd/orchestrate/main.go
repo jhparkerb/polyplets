@@ -229,7 +229,22 @@ func parseHeights(arg string, maxn int) ([]int, error) {
 var gitRev = "unknown"
 
 func findWorkers() orchestrator.WorkerBin {
-	// Try build/ns/ relative to cwd, then two levels up (when run from the
+	// Installed layout (`make install`): ~/bin/orchestrate-<rev> sits beside
+	// ~/bin/map_worker-<rev> / merge_worker-<rev>. Prefer the same-rev siblings
+	// next to this executable so a run launched from an installed, rev-suffixed
+	// orchestrate spawns exactly the workers it was built against — even while a
+	// different rev runs concurrently. gitRev already carries any -dirty suffix.
+	if exe, err := os.Executable(); err == nil && gitRev != "unknown" {
+		dir := filepath.Dir(exe)
+		bin := orchestrator.WorkerBin{
+			MapWorker:   filepath.Join(dir, "map_worker-"+gitRev),
+			MergeWorker: filepath.Join(dir, "merge_worker-"+gitRev),
+		}
+		if _, err := os.Stat(bin.MapWorker); err == nil {
+			return bin
+		}
+	}
+	// Dev tree: build/ns/ relative to cwd, then two levels up (when run from the
 	// package dir).  repoRoot "." and "../.." map to those two locations.
 	for _, repoRoot := range []string{".", "../.."} {
 		bin := orchestrator.DefaultWorkerBin(repoRoot)
