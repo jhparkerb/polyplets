@@ -1,5 +1,34 @@
 # HANDOFF — 2026-06-27 PM EDT
 
+## 2026-06-27 ~22:11 — seek-index merge fix + a(20) validation on ayr
+
+**The merge bottleneck is fixed in code.** `mergeRunFiles` re-read ~M/2× the
+frontier (skip-to-klo from the start of every input; measured 160× at mult=4 —
+the in-memory amplification that capped merge at ~22-34 cores while map hit
+55-66; confirmed by dalby's live capture: disk idle `r/s=0` at the middle
+heights, so membw-bound, not I/O). Fix = sparse `key→offset` `.idx` sidecar +
+`RunFileReader::seekToKey` + `mergeRunFiles` seeks to klo. **16.7× on the real
+`mergeRunFiles`** (A/B, `experiments/merge_engine_bench.cpp`); profiling confirms
+the old hotspot was `__pop_heap`/`__sift_up`/`next`/`fread` (the discarded
+prefix). Result-invariant: parallel/spill/holes/resume gates all PASS
+byte-identical. Commit `de4e183`; alternatives (bucketed shuffle = cloud
+shuffle; hierarchical merge) in `docs/next-system/designs/06`.
+
+**RUNNING — a(20) at-scale validation on ayr** (x86): `scripts/ns_a20_ayr.sh`,
+tmux `0:a20`, orchestrate **PID 1276058** rev `aebdd82`, cores=30 mult=4,
+`--compare` (must byte-match a(20)=1,025,573,519,362,016) + per-height-out, ckpt
+900s, log `runs/ns_a20/a20.log`. Waiter armed. Predicted ~15-20 h (→ ~2026-06-28
+PM). Purpose: prove the seek-index correct at a(20) scale (multi-GB files, >2GB
+`fseek`) — which the a14-a17 gates can't reach — **before** it's trusted for the
+a(21) record. Bonus: cross-ISA (x86 vs dalby arm) + x86 re-benchmark.
+- ayr setup: old-engine H18 cross-check **killed** (was col 3/21, weeks out;
+  a(21) old-engine cross-check now caps at H1-17 — 17 independent rows, ample).
+  ayr's system Go (1.19.8) too old → orchestrate **cross-compiled on gympie**
+  (CGO_ENABLED=0 linux/amd64, static) + workers built native; a(13) smoke PASS.
+- **Plan:** if a(20) byte-matches, the fix has earned the record → **restart a(21)
+  on dalby with the fix** (a(21) is only hours in; ~3× faster on a validated
+  engine). If a(20) mismatches, the fix has a scale bug — do NOT touch a(21).
+
 ## 2026-06-27 ~18:00 — a(21) LAUNCHED (new engine, single-instance, dalby)
 
 **Running:** `scripts/ns_a21.sh 4 runs/ns_probe/n18_m4/profile.tsv 80 1 6.76` in dalby
