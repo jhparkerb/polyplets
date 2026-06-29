@@ -271,3 +271,23 @@ they earn it.
   translation quotient, bbox height). Start with **T(n,n−1)** (clean
   first-principles proof); **T(n,n−2)** leans on brute-forced gadget weights
   (339, 66) which become `decide`/`Finset.card` lemmas rather than gaps.
+
+- **Bounding-box refinement `T(n,h,c)`** (n cells, bbox exactly h rows × c cols)
+  as a lens on the parked B(y). Three facts shape it:
+  - **Transpose symmetry** `T(n,h,c)=T(n,c,h)` (king-adjacency is coordinate-swap
+    symmetric). King *diagonals* span both directions, so the width ceiling is
+    sharp (c near max ⇒ ~one cell/column). Hence **"c near the ceiling" is just
+    the height-diagonal T(n,n−k) rotated 90°** — already done (defect gas,
+    `T-n-nm{1,2}`); nothing new there.
+  - **"c small" is classically closed** — fixed-width king-animals have rational
+    GFs (transfer matrix on a ~2^c interface, Klarner–Rivest). The strip version
+    (fix h, free width) is exactly the repo's **fixed-height GFs, H≤10**.
+    "Fits-within h×c" vs "exactly h×c" are linked by 2-D inclusion–exclusion, so
+    **same closed-form class** — relabeling, not a new door.
+  - **The dense corner** n≈h·c (few empty cells) is a holes defect gas → the
+    existing holes thread (#24/#28).
+  - **The one real lever:** refine the defect *clusters* by column-width. Each
+    fixed-width piece is likely rational; B(y)'s non-closure would then be a sum
+    over *unbounded* width of rationals (→ non-D-finite). This **explains** B(y)'s
+    resistance (see `T-n-nm2-and-general.md` §5) even if it doesn't close it.
+    Pure-math, off the a(n) frontier path — same category as B(y).
