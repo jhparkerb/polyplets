@@ -132,6 +132,13 @@ ns-gate-math: build/ns/gate_math
 build/ns/gate_math: test/gate_math.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
+# Run-file on-disk format gate: atomic publish, sub-CRC, header/.idx magic.
+ns-gate-runfile: build/ns/gate_runfile
+	./build/ns/gate_runfile
+
+build/ns/gate_runfile: test/gate_runfile.cpp $(NS_HEADERS) | build/ns
+	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+
 # Architecture fitness: Go boundary tests
 ns-gate-arch:
 	go test ./verify/arch/... -count=1

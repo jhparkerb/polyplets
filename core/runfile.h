@@ -96,10 +96,15 @@ class RunFileWriter {
       : H_(H), keyLen_((keyLen == 0) ? H + 2 : keyLen),
         fp_(nullptr), record_count_(0), body_bytes_(0),
         crc_(FNV_OFFSET), records_offset_(0),
-        path_(path), write_index_(write_index), body_start_offset_(0) {
-    fp_ = std::fopen(path.c_str(), "wb");
+        path_(path), tmp_path_(path + ".tmp"),
+        write_index_(write_index), body_start_offset_(0) {
+    // Atomic publish (B4): stream to a temp file and rename onto the final path
+    // in finalize().  A kill mid-write then leaves only a stale .tmp; the real
+    // path never holds a placeholder record-count or a short CRC (which a seeked
+    // read, skipping the body CRC, would otherwise consume as garbage).
+    fp_ = std::fopen(tmp_path_.c_str(), "wb");
     if (!fp_) {
-      std::fprintf(stderr, "RunFileWriter: cannot open %s\n", path.c_str());
+      std::fprintf(stderr, "RunFileWriter: cannot open %s\n", tmp_path_.c_str());
       return;
     }
     writeHeader(H, maxn, lo_hex, hi_hex, rev);
@@ -171,7 +176,17 @@ class RunFileWriter {
     std::fwrite(crc_bytes, 1, 8, fp_);
     std::fclose(fp_);
     fp_ = nullptr;
-    if (write_index_ && !index_.empty()) writeIndexSidecar();
+    // Publish the index sidecar first (to its own temp, then rename), then the
+    // data file last: the data file's appearance at the final path is the commit
+    // point, and by then its .idx is already in place.  Clear any stale .idx if
+    // this run is too small to warrant one.
+    if (write_index_ && !index_.empty()) {
+      writeIndexSidecar();
+      std::rename((path_ + ".idx.tmp").c_str(), (path_ + ".idx").c_str());
+    } else {
+      std::remove((path_ + ".idx").c_str());
+    }
+    std::rename(tmp_path_.c_str(), path_.c_str());
     return body_bytes_;
   }
 
@@ -187,6 +202,7 @@ class RunFileWriter {
   uint64_t crc_;
   long records_offset_;
   std::string path_;
+  std::string tmp_path_;
   bool write_index_;
   long body_start_offset_;          // file offset of the first record (post-header)
   struct IdxEnt { uint8_t key[64]; uint64_t offset; uint64_t recidx; };
@@ -197,7 +213,7 @@ class RunFileWriter {
   // Native byte order — it's a machine-local seek aid, not part of the run's
   // byte-identical output, and map+merge of a column run on the same host.
   void writeIndexSidecar() {
-    std::string ip = path_ + ".idx";
+    std::string ip = path_ + ".idx.tmp";
     FILE* f = std::fopen(ip.c_str(), "wb");
     if (!f) return;
     uint32_t kl = static_cast<uint32_t>(keyLen_);
