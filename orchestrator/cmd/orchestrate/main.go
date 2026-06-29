@@ -60,6 +60,12 @@ func main() {
 		os.Exit(2)
 	}
 
+	// FR-7: refuse before spawning workers if the counter is too narrow for maxn.
+	if err := orchestrator.CheckCounterWidth(*counter, *maxn); err != nil {
+		fmt.Fprintf(os.Stderr, "orchestrate: %v\n", err)
+		os.Exit(2)
+	}
+
 	pid := os.Getpid()
 
 	// Default directories.

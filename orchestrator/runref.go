@@ -385,6 +385,27 @@ func bytesToHex(b []byte) string {
 	return string(s)
 }
 
+// CheckCounterWidth refuses at start (FR-7) if the configured counter word
+// cannot hold a(maxn). Per DESIGN/counter.h, exact counting is valid to a(25)
+// with u64 and to ~a(48) with u128; beyond that the count wraps silently (only
+// detectable post-hoc via the mod-p shadow), so the orchestrator must refuse
+// before spawning workers rather than run for hours and produce a wrong number.
+func CheckCounterWidth(counter string, maxn int) error {
+	var limit int
+	switch counter {
+	case "", "u64":
+		counter, limit = "u64", 25
+	case "u128":
+		limit = 48
+	default:
+		return fmt.Errorf("CheckCounterWidth: unknown counter %q (want u64 or u128)", counter)
+	}
+	if maxn > limit {
+		return fmt.Errorf("counter %s holds exact counts only to a(%d), but maxn=%d; use a wider --counter", counter, limit, maxn)
+	}
+	return nil
+}
+
 // WriteSeedPolyrun writes a seed POLYRUN file for height H (col 0: empty boundary,
 // counts[0]=1).  counter is "u64" or "u128" (empty = "u64").
 // The record count is known upfront so no fseek is needed.

@@ -20,6 +20,30 @@ func TestRejectUnknownCounter(t *testing.T) {
 	}
 }
 
+// TestCounterWidthGuard proves the FR-7 refuse-at-start guard rejects a maxn
+// the counter cannot hold exactly: u64 is valid to a(25), u128 to ~a(48).
+// Without the guard an overflowing run starts and wraps silently.
+func TestCounterWidthGuard(t *testing.T) {
+	mustErr := func(counter string, maxn int) {
+		if err := CheckCounterWidth(counter, maxn); err == nil {
+			t.Errorf("CheckCounterWidth(%q, %d) = nil; want overflow refusal", counter, maxn)
+		}
+	}
+	mustOK := func(counter string, maxn int) {
+		if err := CheckCounterWidth(counter, maxn); err != nil {
+			t.Errorf("CheckCounterWidth(%q, %d) = %v; want nil", counter, maxn, err)
+		}
+	}
+	mustOK("u64", 20)   // a(20) fits u64
+	mustOK("u64", 25)   // boundary: still exact
+	mustErr("u64", 26)  // overflows u64
+	mustErr("u64", 30)  // well past
+	mustOK("u128", 30)  // fits u128
+	mustOK("u128", 48)  // boundary
+	mustErr("u128", 49) // overflows u128
+	mustErr("u127", 10) // unknown tag
+}
+
 // TestRejectZeroCores proves Run refuses Cores<1 instead of silently
 // undercounting. With Cores==0 the worker pool spawns zero goroutines, so every
 // map phase produces no output and Run returns a too-low triangle with a nil
