@@ -86,3 +86,38 @@ question whether they are algebraic.
 **Validity reminder for wiring:** `T(n,n−k)` holds for `n ≥ 2k+1`; the engine must
 fall back to a real sweep when `maxn < 2k+1` (irrelevant at the frontier, where
 maxn ≥ 20 ≫ 2k+1 for the small k we free).
+
+## 4. The defect gas is a partition structure (the proof skeleton for all k)
+
+Brute-forcing the **cluster decomposition** of height-(n−k) animals (a *cluster*
+= a maximal run of consecutive multi-cell rows; its *excess* = Σ(cells−1)) makes
+the general structure concrete. For k=3 the cluster-excess multisets that occur
+are exactly
+
+$$\{3\},\quad \{2,1\},\quad \{1,1,1\}\ =\ \textbf{the partitions of }3,$$
+
+and nothing else (verified n=5…9). In general:
+
+> **An animal of excess k has defect clusters whose excesses form a partition
+> λ ⊢ k.** A partition with **p parts** = p non-adjacent clusters placed on the
+> n-chain ⇒ a contribution of **degree p** in n. Hence `deg P_k = k` (from
+> λ=1ᵏ), leading coefficient `c_1^k/k! = 25^k/k!` (k separated doubles), and
+> `P_k = Σ_{λ⊢k} (∏ cluster weights)·(placement polynomial)`.
+
+This is the exponential formula for a cluster gas — it is *why* `S(y)=A(y)e^{nB(y)}`,
+with **B(y) = the single-cluster (connected) generating function**. The proven
+single-cluster weights so far (excess j, summed over cluster types):
+
+| excess j | cluster types | interior weight c_j | boundary |
+|---|---|---|---|
+| 1 | double | **25** | 5 |
+| 2 | triple (49) + adjacent-double-pair (339) | **388** | 73 |
+| 3 | quad-row + triple·double-adj + three-doubles-adj | (catalog in progress) | — |
+
+**Consequence.** Proving any fixed k is *mechanical*: catalogue that k's cluster
+weights (a finite enumeration, the §1 method per cluster type) and assemble over
+partitions. k=0,1,2 done; k=3 is decomposed (above) and one catalog step from
+proven. The *open* prize remains closing **B(y)** in elementary/algebraic form —
+the single-cluster GF — which would deliver every k at once; the cluster weights
+25, 388, … are its (positive-integer) building blocks and a better target for
+pattern-recognition than B(y)'s signed rationals.
