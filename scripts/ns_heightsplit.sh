@@ -22,6 +22,7 @@ RAM_GB="${4:?ram budget per worker, GB}"
 RUNROOT="${5:?run root dir}"
 UNIT_MULT="${6:-1}"
 REF_PROFILE="${7:-}"
+STEAL_GRAIN="${8:-0}"   # >0 (e.g. 0.05) recovers the column straggler tail; 0 = off
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOST="$(hostname -s)"
@@ -34,8 +35,10 @@ mkdir -p "$SPILL" "$PERHEIGHT"
 
 REFARG=()
 [ -n "$REF_PROFILE" ] && REFARG=(--cost-profile-ref "$REF_PROFILE")
+STEALARG=()
+[ "$STEAL_GRAIN" != "0" ] && STEALARG=(--steal-grain "$STEAL_GRAIN")
 
-echo "ns_heightsplit host=$HOST maxn=$MAXN heights=$HEIGHTS cores=$CORES unit_mult=$UNIT_MULT ram_gb=$RAM_GB"
+echo "ns_heightsplit host=$HOST maxn=$MAXN heights=$HEIGHTS cores=$CORES unit_mult=$UNIT_MULT ram_gb=$RAM_GB steal=$STEAL_GRAIN"
 echo "rundir=$RUNDIR perheight=$PERHEIGHT"
 
 exec "$REPO/build/ns/orchestrate" \
@@ -45,4 +48,4 @@ exec "$REPO/build/ns/orchestrate" \
     --per-height-out "$PERHEIGHT" \
     --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 900 \
     --cost-profile-out "$RUNDIR/cost_profile.tsv" \
-    "${REFARG[@]}"
+    "${STEALARG[@]}" "${REFARG[@]}"
