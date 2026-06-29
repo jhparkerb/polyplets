@@ -185,6 +185,13 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			continue
 		}
 
+		// Trivial low strips H==1 and H==2 also have closed forms (C2);
+		// contribute them directly instead of spawning a worker per column.
+		if H == 1 || H == 2 {
+			contributeLowHeight(H, maxn, triangle, cfg)
+			continue
+		}
+
 		startCol := 0
 		var frontier []string
 
@@ -859,6 +866,50 @@ func topHeightClosedForm(maxn int) uint64 {
 		v *= 3
 	}
 	return v
+}
+
+// lowHeightRow returns the closed-form T(n,H) row for the trivial low strips
+// H==1 and H==2, indexed by n (0 outside 1..maxn / below H):
+//   T(n,1) = 1               (a single row of n cells)
+//   T(n,2): T(2,2)=3, T(3,2)=10, T(n,2)=2·T(n-1,2)+T(n-2,2)+4  (n>=4)
+// Returns nil for any other H. Both are verified exact against the a(20)
+// triangle (results/ns_a20/Tnh_triangle.txt).
+func lowHeightRow(H, maxn int) []uint64 {
+	if H != 1 && H != 2 {
+		return nil
+	}
+	row := make([]uint64, maxn+1)
+	if H == 1 {
+		for n := 1; n <= maxn; n++ {
+			row[n] = 1
+		}
+		return row
+	}
+	for n := 2; n <= maxn; n++ {
+		switch n {
+		case 2:
+			row[n] = 3
+		case 3:
+			row[n] = 10
+		default:
+			row[n] = 2*row[n-1] + row[n-2] + 4
+		}
+	}
+	return row
+}
+
+// contributeLowHeight adds the closed-form row for H==1 or H==2 to the triangle
+// (and writes its per-height row if requested), doing no map/merge.
+func contributeLowHeight(H, maxn int, triangle []uint64, cfg SweepConfig) {
+	row := lowHeightRow(H, maxn)
+	for n := 1; n <= maxn && n < len(triangle); n++ {
+		triangle[n] += row[n]
+	}
+	if cfg.PerHeightOut != "" {
+		if werr := writePerHeight(cfg.PerHeightOut, H, maxn, row); werr != nil {
+			fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
+		}
+	}
 }
 
 // contributeTopHeight adds the closed-form top strip T(maxn,maxn) to the
