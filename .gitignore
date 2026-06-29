@@ -15,3 +15,7 @@ harness/harness
 experiments/*.bin
 experiments/*.bin.hash
 experiments/bench_column_results.txt
+
+# clangd compile DB — host-specific absolute paths; regenerate via `make compile-commands`
+compile_commands.json
+.cache/

@@ -1,2 +1,25 @@
+# clangd fallback config. The robust source of truth is compile_commands.json
+# (run `make compile-commands`); this file makes clangd correct even before that
+# is generated, and mirrors the build's gate so warnings surface as must-fix
+# errors.
+#
+# Why each flag:
+#   -I<repo root>  absolute on purpose — clangd resolves a relative `-I.` against
+#                  its own cwd (often the edited file's dir), not the repo root,
+#                  so `-I.` left `#include "core/run.h"` unresolved and cascaded
+#                  fake "undeclared identifier" errors (u64/Sig/RunRecord/SIGMAX).
+#   -std=c++20 -xc++   match the build; -xc++ forces C++ for the .h headers.
+#   -Wall -Wextra -Werror   mirror the Makefile gate: a real warning shows as an
+#                  editor error, never an ignorable squiggle.
+#   -DGIT_REV/-DBUILD_TIME   make injects these per build; define them (value is
+#                  irrelevant to analysis) so they don't read as undeclared.
 CompileFlags:
-  Add: [-I., -std=c++20]
+  Add:
+    - -I/Users/jasonp/src/polyominoes
+    - -std=c++20
+    - -xc++
+    - -Wall
+    - -Wextra
+    - -Werror
+    - -DGIT_REV="dev"
+    - -DBUILD_TIME="dev"

@@ -128,6 +128,13 @@ build/ns:
 # regression in those paths (BUGS-OF-SHAME A4/A5/B*/D6) can't rot undetected.
 ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-runfile ns-gate-holes ns-gate-verify ns-gate-split
 
+# clangd compile DB (host-specific, git-ignored): resolves project includes and
+# gives every header a real TU's flags, killing phantom "core/run.h not found" /
+# undeclared-identifier LSP diagnostics. Regenerate after adding/removing a .cpp.
+.PHONY: compile-commands
+compile-commands:
+	./scripts/gen_compile_commands.sh
+
 # Full Go test suite: orchestrator (sweep/guards/combine/runcat/topheight/
 # lowheight/resume) + verify (CRC backstop). Locks in the campaign's Go gates,
 # including the combine-integrity checks (A5) — no separate ns-gate-combine.
