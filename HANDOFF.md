@@ -1,4 +1,115 @@
-# HANDOFF — 2026-06-28 (afternoon)
+# HANDOFF — 2026-06-29
+
+## 2026-06-29 — audit campaign DONE + process changes + dalby straggler note
+
+### Audit actioned (supersedes the "not yet actioned" section below)
+`BUGS-OF-SHAME.md` → **`AUDIT-2026-06-28.md`** (renamed `3e27f68`), with a per-item
+disposition table (commit hash next to each fix). Worked the whole audit on
+`next-system`: **20 fix commits, each test-first with the failing test captured
+in the commit log**, plus the rename and 3 process commits. WS (T2.3) and A1 are
+now committed (`b8b448b`, `2d782e2`) — supersedes "Uncommitted work … NOT
+committed" below.
+- **FIXED:** A1, A3, A5, A7, B1, B2, B4, B6, B7, B8, C2, D1, D2, D5, D6, Lenient
+  Cat, Fail-Open Counter, Silent Truncator (+ A2 refuse-at-start guard, B3
+  verify-tool contract).
+- **DEFERRED (recorded in the doc):** A4+D7 (holes through the orchestrator), C1
+  (fitted T(n,n−1) — until derived/validated), A2 big.Int widening (a26+), A6
+  (mod-p producer). **SKIPPED:** Wrong Room, B9.
+- Plus a tail-end finale: clangd LSP false positives killed (`6b3bd7a`) — see
+  `compile_commands.json` generator + `.clangd`.
+
+### Process changes (catch regressions fast)
+- **Pre-push fast gate:** `make install-hooks` → `core.hooksPath=.githooks` → runs
+  `make ns-gate-fast` (~16s, measured). No GitHub Actions.
+- **`make ns-gate-closedform`** — invariant gate asserting known closed forms are
+  contributed directly, never enumerated (the tripwire the H=maxn incident lacked).
+- **`docs/engineering-standards.md`** — fail-closed defaults + red-first fixes.
+- **`docs/job-checklist.md` item 4** — explicit gate: deployed binary's `GIT_REV`
+  is clean AND contains the change you intend (the A1 provenance lesson).
+
+### dalby a(21) — LIVE STATE re-measured 2026-06-29 ~01:53 (STRAGGLER TAIL)
+orchestrate PID **993738** alive, **1d 06:12** elapsed, still **H21 col2**. But
+it is now in a **single-core straggler tail**: exactly one `map_worker`
+(PID 1297398) at **99.9% CPU for 10h31m**, **load avg 1.00 on the 80-core box**
+(79 cores idle). `processed` is **FROZEN at 9,083,027,456** across every heartbeat
+for 10.5h+; the heartbeat carries **no `eta=`**, so no ETA can be quoted. This is
+precisely the straggler tail T2.3 work-stealing fixes, on the H=maxn top strip A1
+makes free — but the running binary (`35eb9e1`) predates both. Per do-not-restart
+(correctness-or-dead-box only), NOT touched; flagged for jasonp's call. Disk 341 GB
+free. Waiter `bw113qsu5`.
+
+---
+
+# HANDOFF — 2026-06-28 (late evening)
+
+## 2026-06-28 ~23:00 — LIVE STATE: jobs + operational concerns
+
+### Running jobs (measured)
+
+- **dalby — a(21), new engine, rev `35eb9e1` (UNFIXED).** orchestrate PID
+  **993738**, **1d 03h20m** in, on **H21 col2** (the pole; col2 ≈ the costliest
+  column of the run), elapsed_s≈27600 (~7.7h into col2), `processed` near-flat at
+  9.08B (merge/tail of col2), RAM 3 GB used / 121 GB avail, disk 342 GB free.
+  Healthy. **DO NOT RESTART** (correctness-or-dead-box only; it's deep into the
+  pole). After col2 the frontier collapses ×0.42/col and cols 3–20 finish fast,
+  then the run is done. Completion waiter: **`bw113qsu5`** = `tail --pid 993738`
+  on dalby (supersedes any stale pre-compaction `bejohjmiv`). NOTE: this run
+  still brute-forces H21 (= 3^20 closed form) — see BUGS-OF-SHAME A1; we are NOT
+  touching it.
+  - Post-run: `combine --in runs/ns_a21/perheight --maxn 21` → a(21); cross-check
+    vs ayr salvaged h1–16/h17; growth gate a21/a20 ≈ 6.78.
+
+- **ayr — work-stealing A/B benchmark (a(17), unit-mult=1).** `scripts/ns_steal_ab.sh
+  17 8 1 128 0.05`, script PID **1377714**, tmux `0:steal`, ~1h in; OFF phase
+  done, ON phase running (~H15). Completion waiter: **`b4lj97lo3`** = `tail --pid
+  1377714` on ayr — will fire with the mult=1 headline. (The earlier mult=4 A/B
+  finished: byte-identical both ways, but only **0.3%** map-wall recovered —
+  stealing is defeated by high unit-mult; this mult=1 rerun tests the low-mult
+  regime where stealing should engage continuously. See BUGS-OF-SHAME D2.)
+
+- **gympie — idle** (local dev box). 10-perf-core cap.
+
+### Waiter inventory (only these two; no pollers)
+- `bw113qsu5` → dalby a(21) orchestrate 993738 (tail --pid).
+- `b4lj97lo3` → ayr A/B script 1377714 (tail --pid).
+- Killed this session: an orphaned ayr `until grep` poll loop (PID 1380036) that
+  survived a `TaskStop` as a remote orphan — violated the no-polling directive.
+
+### Uncommitted work on gympie (next-system, HEAD `952b111`) — NOT committed
+Working tree (8 modified + 3 untracked); this is real, gated work sitting uncommitted:
+- **Top-height closed-form fix** (`orchestrator/sweep.go`: `contributeTopHeight`/
+  `topHeightClosedForm` + `mapPhase` guard; `orchestrator/topheight_test.go`):
+  H==maxn now injects T(n,n)=3^(n-1) with NO map/merge. Gates green
+  (ns-gate-parallel a14 closed-form PASS, full orchestrator suite ok). This is
+  BUGS-OF-SHAME **A1** — uncommitted; the running dalby binary lacks it.
+- **Work-stealing (T2.3)** across `core/mapreduce.h`, `worker/map_worker.cpp`
+  (clean SIGTERM stop-at-cursor + `seekToKey`), `orchestrator/{worker,accounting,
+  runref,sweep,telemetry}.go`, CLI `--steal-grain`. Correctness PROVEN
+  result-invariant (a17 11 steals byte-identical; a16 rebuilt byte-identical; all
+  byte-identity + resume gates pass with steal off). Measured win is config-
+  dependent (≈0 at unit-mult=4; mult=1 rerun in flight on ayr).
+- **`scripts/ns_steal_ab.sh`** (A/B harness), **`BUGS-OF-SHAME.md`** (the audit).
+
+### Top operational concern: BUGS-OF-SHAME.md (audit, not yet actioned)
+Full audit at repo root. Highest-priority items, in fix order:
+1. **A1** commit the top-height fix (it exists only in the working tree).
+2. **A2/A3** silent wrong answers: `--counter u128` truncates to u64 in the Go
+   result pipeline; the FR-7 counter-overflow "refuse at start" guard is
+   documented in `core/counter.h` but unimplemented.
+3. **A4** holes are unreachable through the orchestrator (lost capability vs old
+   `build/tma_holes`); keyLen hardcoded H+2, no `--holes` in MapArgs/merge_worker.
+4. **A5** `combine` has no integrity guard (the old `gate-driver` bug class);
+   **B1** resume trusts CLI flags over the checkpoint; **B2** `--require-cover`
+   defaults false.
+5. **D1** designs 07/09 cost model is anchored on H=N being ~55% — but H=N is now
+   the free closed form; re-derive with H=N removed (real pole is H=N−1), which
+   unlocks **C1** the T(n,n−1)=(25n−45)·3^(n−4) closed form (~24% of wall, fit not
+   yet derived — validate before a record run).
+
+### dalby stale ayr deploy note
+ayr's `~/src/polyominoes-ns` worktree has the uncommitted sources rsync'd in
+(for the A/B) + a cross-compiled `orchestrate` (rev label `952b111-steal`); its
+git HEAD is older. This is benchmark-only; reconcile when committing.
 
 ## 2026-06-28 PM — a(20) PASSED + an engine-architecture analysis session
 
