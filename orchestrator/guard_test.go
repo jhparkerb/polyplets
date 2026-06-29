@@ -34,6 +34,22 @@ func TestResumeConfigGuard(t *testing.T) {
 	mismatch("height-not-in-list", func(c *Checkpoint) { c.H = 5 })
 }
 
+// TestResultWidthGuard proves the orchestrator refuses a maxn the uint64 result
+// pipeline cannot hold (a(25) is the last value below 2^64), regardless of
+// --counter, instead of silently dropping the overflowing tri rows in
+// accounting and reporting a too-low a(n).
+func TestResultWidthGuard(t *testing.T) {
+	if err := CheckResultWidth(25); err != nil {
+		t.Errorf("CheckResultWidth(25) = %v; want nil", err)
+	}
+	if err := CheckResultWidth(26); err == nil {
+		t.Errorf("CheckResultWidth(26) = nil; want refusal (uint64 pipeline overflows past a(25))")
+	}
+	if err := CheckResultWidth(40); err == nil {
+		t.Errorf("CheckResultWidth(40) = nil; want refusal")
+	}
+}
+
 // TestRejectUnknownCounter proves the seed writer refuses an unrecognized
 // --counter tag instead of silently falling back to u64. A typo like "u127"
 // would otherwise write a u64 seed with no error, so a run meant to be u128

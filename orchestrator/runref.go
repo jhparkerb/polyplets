@@ -406,6 +406,24 @@ func CheckCounterWidth(counter string, maxn int) error {
 	return nil
 }
 
+// resultPipelineMaxN is the largest maxn the Go result pipeline can hold
+// exactly. accounting (TriContribs), the triangle, combine, and verify are all
+// uint64; a(25) is the last a(n) below 2^64. Widening this path to big.Int
+// (BUGS-OF-SHAME A2) lifts the cap toward the counter limit.
+const resultPipelineMaxN = 25
+
+// CheckResultWidth refuses at start if maxn exceeds what the Go result pipeline
+// can represent, regardless of --counter. The map_workers may count in u128, but
+// accounting parses tri rows with ParseUint(_, 64) and silently DROPS a row that
+// overflows u64 (the `if err == nil` skip) — a too-low a(n) with no signal.
+// Until the pipeline is widened, refuse rather than miscount.
+func CheckResultWidth(maxn int) error {
+	if maxn > resultPipelineMaxN {
+		return fmt.Errorf("the Go result pipeline holds exact counts only to a(%d) (uint64); maxn=%d would silently drop overflowing tri rows — widen the pipeline to big.Int (BUGS-OF-SHAME A2) first", resultPipelineMaxN, maxn)
+	}
+	return nil
+}
+
 // WriteSeedPolyrun writes a seed POLYRUN file for height H (col 0: empty boundary,
 // counts[0]=1).  counter is "u64" or "u128" (empty = "u64").
 // The record count is known upfront so no fseek is needed.
