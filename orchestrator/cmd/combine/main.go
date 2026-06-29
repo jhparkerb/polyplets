@@ -23,11 +23,16 @@ import (
 	"polyominoes/orchestrator"
 )
 
+// requireCoverDefault is the default for --require-cover. A missing height shard
+// (e.g. a bad rsync) otherwise sums to a confidently-printed, too-low a(n), so
+// coverage is enforced by default; pass --require-cover=false to opt out.
+const requireCoverDefault = true
+
 func main() {
 	inArg := flag.String("in", "", "comma-separated dirs containing h<H>.out files (required)")
 	maxn := flag.Int("maxn", 0, "max n (required)")
 	compare := flag.Bool("compare", false, "compare a(n) to fixtures/b006770.txt")
-	requireCover := flag.Bool("require-cover", false, "fail unless heights 1..maxn are all present exactly once")
+	requireCover := flag.Bool("require-cover", requireCoverDefault, "fail unless heights 1..maxn are all present exactly once")
 	out := flag.String("out", "", "write the combined triangle here (n value lines)")
 	flag.Parse()
 
@@ -36,57 +41,13 @@ func main() {
 		os.Exit(2)
 	}
 
-	triangle := make([]uint64, *maxn+1)
-	heightSrc := map[int]string{} // H -> first dir that supplied it
-	var dup bool
-
-	for _, dir := range strings.Split(*inArg, ",") {
-		dir = strings.TrimSpace(dir)
-		if dir == "" {
-			continue
-		}
-		paths, _ := filepath.Glob(filepath.Join(dir, "h*.out"))
-		for _, p := range paths {
-			H, ok := heightFromName(p)
-			if !ok {
-				continue
-			}
-			if prev, seen := heightSrc[H]; seen {
-				fmt.Fprintf(os.Stderr, "combine: ERROR height %d in both %s and %s (double-count)\n", H, prev, dir)
-				dup = true
-				continue
-			}
-			heightSrc[H] = dir
-			if err := addRow(p, *maxn, triangle); err != nil {
-				fmt.Fprintf(os.Stderr, "combine: %s: %v\n", p, err)
-				os.Exit(1)
-			}
-		}
-	}
-	if dup {
+	triangle, have, err := runCombine(strings.Split(*inArg, ","), *maxn, *requireCover)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "combine: %v\n", err)
 		os.Exit(1)
 	}
 
-	// Coverage report.
-	var have []int
-	for H := range heightSrc {
-		have = append(have, H)
-	}
-	sort.Ints(have)
 	fmt.Printf("combine: %d heights present: %v\n", len(have), have)
-	if *requireCover {
-		var missing []int
-		for H := 1; H <= *maxn; H++ {
-			if _, ok := heightSrc[H]; !ok {
-				missing = append(missing, H)
-			}
-		}
-		if len(missing) > 0 {
-			fmt.Fprintf(os.Stderr, "combine: ERROR missing heights %v\n", missing)
-			os.Exit(1)
-		}
-	}
-
 	for n := 1; n <= *maxn; n++ {
 		fmt.Printf("a(%d) = %d\n", n, triangle[n])
 	}
@@ -101,6 +62,53 @@ func main() {
 	if *compare {
 		os.Exit(compareKnown(*maxn, triangle))
 	}
+}
+
+// runCombine sums each dir's h<H>.out rows into the triangle, rejecting a height
+// supplied by two dirs (double-count) and — when requireCover — any gap in
+// 1..maxn. Returns the triangle and the sorted set of heights present.
+func runCombine(dirs []string, maxn int, requireCover bool) (triangle []uint64, have []int, err error) {
+	triangle = make([]uint64, maxn+1)
+	heightSrc := map[int]string{} // H -> first dir that supplied it
+
+	for _, dir := range dirs {
+		dir = strings.TrimSpace(dir)
+		if dir == "" {
+			continue
+		}
+		paths, _ := filepath.Glob(filepath.Join(dir, "h*.out"))
+		for _, p := range paths {
+			H, ok := heightFromName(p)
+			if !ok {
+				continue
+			}
+			if prev, seen := heightSrc[H]; seen {
+				return nil, nil, fmt.Errorf("height %d in both %s and %s (double-count)", H, prev, dir)
+			}
+			heightSrc[H] = dir
+			if e := addRow(p, maxn, triangle); e != nil {
+				return nil, nil, fmt.Errorf("%s: %w", p, e)
+			}
+		}
+	}
+
+	for H := range heightSrc {
+		have = append(have, H)
+	}
+	sort.Ints(have)
+
+	if requireCover {
+		var missing []int
+		for H := 1; H <= maxn; H++ {
+			if _, ok := heightSrc[H]; !ok {
+				missing = append(missing, H)
+			}
+		}
+		if len(missing) > 0 {
+			return nil, nil, fmt.Errorf("missing heights %v", missing)
+		}
+	}
+	return triangle, have, nil
 }
 
 func heightFromName(path string) (int, bool) {
