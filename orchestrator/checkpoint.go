@@ -33,6 +33,11 @@ type Checkpoint struct {
 	Triangle []uint64
 	Acct     Acct
 	Written  time.Time
+	// Run config stamped at write time so resume can hard-fail on a mismatched
+	// CLI (a different --maxn/--counter/--fold silently corrupts the triangle).
+	Maxn    int
+	Counter string // normalized "u64"/"u128"
+	Fold    bool
 }
 
 // Write serializes the checkpoint to path atomically (write-then-rename).
@@ -46,6 +51,7 @@ func (ck *Checkpoint) Write(path string) error {
 	fmt.Fprintf(f, "POLYCKPT 1\n")
 	fmt.Fprintf(f, "H %d\n", ck.H)
 	fmt.Fprintf(f, "col %d\n", ck.Col)
+	fmt.Fprintf(f, "config maxn=%d counter=%s fold=%v\n", ck.Maxn, ck.Counter, ck.Fold)
 	fmt.Fprintf(f, "frontier %s\n", strings.Join(ck.Frontier, " "))
 	fmt.Fprintf(f, "acct cpu_s=%.6f wall_s=%.6f rss_max_mb=%.3f\n",
 		ck.Acct.CPUS, ck.Acct.WallS, ck.Acct.RSSMax)
@@ -89,6 +95,8 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 			ck.H, _ = strconv.Atoi(v)
 		case "col":
 			ck.Col, _ = strconv.Atoi(v)
+		case "config":
+			parseConfig(v, ck)
 		case "frontier":
 			if v != "" {
 				ck.Frontier = strings.Fields(v)
@@ -113,6 +121,23 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 		return nil, fmt.Errorf("empty POLYCKPT file: %s", path)
 	}
 	return ck, sc.Err()
+}
+
+func parseConfig(s string, ck *Checkpoint) {
+	for _, field := range strings.Fields(s) {
+		k, v, ok := strings.Cut(field, "=")
+		if !ok {
+			continue
+		}
+		switch k {
+		case "maxn":
+			ck.Maxn, _ = strconv.Atoi(v)
+		case "counter":
+			ck.Counter = v
+		case "fold":
+			ck.Fold = v == "true"
+		}
+	}
 }
 
 func parseAcct(s string, a *Acct) {

@@ -55,6 +55,40 @@ type SweepResult struct {
 	Acct     Acct
 }
 
+// counterName normalizes a counter-width tag, mapping "" to the u64 default.
+func counterName(c string) string {
+	if c == "" {
+		return "u64"
+	}
+	return c
+}
+
+// checkResumeConfig hard-fails a resume whose checkpoint was written under a
+// different run config. A mismatched --maxn/--counter/--fold silently corrupts
+// the triangle (B1); a --heights list that no longer contains the checkpoint
+// height makes startIdx fall back to 0 and re-sweep completed heights, double-
+// counting (B7). Both must abort rather than produce a wrong answer.
+func checkResumeConfig(cfg SweepConfig, resume *Checkpoint, heights []int) error {
+	if resume == nil {
+		return nil
+	}
+	if resume.Maxn != cfg.Maxn {
+		return fmt.Errorf("resume: checkpoint maxn=%d != --maxn %d", resume.Maxn, cfg.Maxn)
+	}
+	if want, got := counterName(cfg.CounterWidth), counterName(resume.Counter); got != want {
+		return fmt.Errorf("resume: checkpoint counter=%s != --counter %s", got, want)
+	}
+	if resume.Fold != cfg.Fold {
+		return fmt.Errorf("resume: checkpoint fold=%v != --fold %v", resume.Fold, cfg.Fold)
+	}
+	for _, H := range heights {
+		if H == resume.H {
+			return nil
+		}
+	}
+	return fmt.Errorf("resume: checkpoint H=%d not in --heights %v (would re-sweep from the start and double-count)", resume.H, heights)
+}
+
 // Run executes the full height-sweep (H=1..maxn) and returns the triangle.
 // If resume is non-nil, it skips already-completed heights and restores acct.
 func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult, error) {
@@ -76,6 +110,10 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		for H := 1; H <= maxn; H++ {
 			heights = append(heights, H)
 		}
+	}
+
+	if err := checkResumeConfig(cfg, resume, heights); err != nil {
+		return nil, err
 	}
 
 	startIdx := 0
@@ -114,6 +152,9 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			Frontier: frontier,
 			Triangle: combined,
 			Acct:     acct,
+			Maxn:     cfg.Maxn,
+			Counter:  counterName(cfg.CounterWidth),
+			Fold:     cfg.Fold,
 		}
 		if err := ck.Write(cfg.CheckpointPath); err != nil {
 			fmt.Fprintf(os.Stderr, "checkpoint write: %v\n", err)

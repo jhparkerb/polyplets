@@ -9,6 +9,31 @@ import (
 	"testing"
 )
 
+// TestResumeConfigGuard proves a resume hard-fails when the checkpoint's
+// stamped config (maxn/counter/fold) disagrees with the CLI, or when the
+// checkpoint height is no longer in the --heights list (B7: startIdx would fall
+// back to 0 and double-count completed heights). A matching resume must pass.
+func TestResumeConfigGuard(t *testing.T) {
+	cfg := SweepConfig{Maxn: 20, CounterWidth: "u64", Fold: true}
+	heights := []int{17, 18, 19, 20}
+	base := &Checkpoint{H: 18, Maxn: 20, Counter: "u64", Fold: true}
+
+	if err := checkResumeConfig(cfg, base, heights); err != nil {
+		t.Errorf("matching resume rejected: %v", err)
+	}
+	mismatch := func(name string, mutate func(*Checkpoint)) {
+		c := *base
+		mutate(&c)
+		if checkResumeConfig(cfg, &c, heights) == nil {
+			t.Errorf("%s mismatch not caught", name)
+		}
+	}
+	mismatch("maxn", func(c *Checkpoint) { c.Maxn = 16 })
+	mismatch("counter", func(c *Checkpoint) { c.Counter = "u128" })
+	mismatch("fold", func(c *Checkpoint) { c.Fold = false })
+	mismatch("height-not-in-list", func(c *Checkpoint) { c.H = 5 })
+}
+
 // TestRejectUnknownCounter proves the seed writer refuses an unrecognized
 // --counter tag instead of silently falling back to u64. A typo like "u127"
 // would otherwise write a u64 seed with no error, so a run meant to be u128
