@@ -84,6 +84,13 @@ inline uint64_t fnv1a64_update(uint64_t hash, const void* data, size_t len) {
 
 // ─── RunFileWriter ────────────────────────────────────────────────────────────
 
+// .idx sidecar self-describing header (D6): magic + format version + byteorder,
+// so a stale, truncated, or wrong-ISA sidecar is recognized and ignored (the
+// reader falls back to a full scan) instead of producing a wrong seek.
+inline constexpr uint32_t kRunIndexMagic   = 0x49594C50u; // 'PLYI', little-endian
+inline constexpr uint16_t kRunIndexVersion = 1;
+inline constexpr uint8_t  kRunByteOrderLE  = 1;
+
 template <class W>
 class RunFileWriter {
  public:
@@ -216,6 +223,12 @@ class RunFileWriter {
     std::string ip = path_ + ".idx.tmp";
     FILE* f = std::fopen(ip.c_str(), "wb");
     if (!f) return;
+    uint32_t magic = kRunIndexMagic;
+    uint16_t ver   = kRunIndexVersion;
+    uint8_t  bo    = kRunByteOrderLE;
+    std::fwrite(&magic, sizeof(magic), 1, f);
+    std::fwrite(&ver,   sizeof(ver),   1, f);
+    std::fwrite(&bo,    sizeof(bo),    1, f);
     uint32_t kl = static_cast<uint32_t>(keyLen_);
     uint64_t cnt = index_.size();
     std::fwrite(&kl, sizeof(kl), 1, f);
@@ -359,6 +372,15 @@ class RunFileReader {
     std::string ip = path_ + ".idx";
     FILE* f = std::fopen(ip.c_str(), "rb");
     if (!f) return;
+    // Validate the self-describing header; a stale / foreign / truncated sidecar
+    // is ignored so the read falls back to a full scan rather than mis-seeking.
+    uint32_t magic = 0; uint16_t ver = 0; uint8_t bo = 0;
+    if (std::fread(&magic, sizeof(magic), 1, f) != 1 ||
+        std::fread(&ver,   sizeof(ver),   1, f) != 1 ||
+        std::fread(&bo,    sizeof(bo),    1, f) != 1 ||
+        magic != kRunIndexMagic || ver != kRunIndexVersion || bo != kRunByteOrderLE) {
+      std::fclose(f); return;
+    }
     uint32_t kl = 0; uint64_t cnt = 0;
     if (std::fread(&kl, sizeof(kl), 1, f) != 1 || std::fread(&cnt, sizeof(cnt), 1, f) != 1 ||
         static_cast<int>(kl) != keyLen_) { std::fclose(f); return; }
@@ -375,6 +397,8 @@ class RunFileReader {
   bool parseHeader() {
     char line[512];
     bool saw_polyrun = false;
+    bool byteorder_ok = true;
+    bool counter_ok = true;
     while (std::fgets(line, sizeof(line), fp_)) {
       size_t ln = std::strlen(line);
       while (ln > 0 && (line[ln-1] == '\n' || line[ln-1] == '\r'))
@@ -384,9 +408,17 @@ class RunFileReader {
         saw_polyrun = true;
       else if (std::strncmp(line, "records ", 8) == 0)
         records_ = static_cast<size_t>(std::strtoull(line + 8, nullptr, 10));
-      // height, maxn, counter, classifier, keylo, keyhi, rev, byteorder: ignored
+      else if (std::strncmp(line, "byteorder ", 10) == 0)
+        // Self-describing (D6): the body is canonically little-endian; a file
+        // claiming any other order is rejected rather than silently misread.
+        byteorder_ok = (std::atoi(line + 10) == kRunByteOrderLE);
+      else if (std::strncmp(line, "counter ", 8) == 0)
+        // Reject a counter tag that doesn't match this reader's word width
+        // (e.g. reading a u128 file as u64) instead of misparsing the records.
+        counter_ok = (std::strcmp(line + 8, counterTag<W>()) == 0);
+      // height, maxn, classifier, keylo, keyhi, rev: not validated here
     }
-    return saw_polyrun;
+    return saw_polyrun && byteorder_ok && counter_ok;
   }
 
   void verifyCRC() {

@@ -3,15 +3,69 @@
 // sub-CRC on seeked reads (B3), and header/.idx magic+byteorder (D6).
 
 #include <cassert>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <vector>
 #include <sys/stat.h>
 #include "core/runfile.h"
 
 static bool exists(const std::string& p) {
   struct stat st;
   return ::stat(p.c_str(), &st) == 0;
+}
+
+static std::vector<uint8_t> readAll(const std::string& p) {
+  FILE* f = std::fopen(p.c_str(), "rb");
+  assert(f);
+  std::fseek(f, 0, SEEK_END);
+  long n = std::ftell(f);
+  std::fseek(f, 0, SEEK_SET);
+  std::vector<uint8_t> b(static_cast<size_t>(n));
+  assert(std::fread(b.data(), 1, b.size(), f) == b.size());
+  std::fclose(f);
+  return b;
+}
+
+static void writeAll(const std::string& p, const std::vector<uint8_t>& b) {
+  FILE* f = std::fopen(p.c_str(), "wb");
+  assert(f);
+  std::fwrite(b.data(), 1, b.size(), f);
+  std::fclose(f);
+}
+
+// Replace the first occurrence of `from` (a header token) with `to` of equal
+// length, so byte offsets are preserved.
+static void tamper(const std::string& path, const std::string& from,
+                   const std::string& to) {
+  assert(from.size() == to.size());
+  auto b = readAll(path);
+  std::string s(b.begin(), b.end());
+  auto pos = s.find(from);
+  assert(pos != std::string::npos);
+  std::memcpy(b.data() + pos, to.data(), to.size());
+  writeAll(path, b);
+}
+
+// writeRun streams n records of height H to path and finalizes.
+static void writeRun(const std::string& path, int H, int n) {
+  std::remove(path.c_str());
+  std::remove((path + ".idx").c_str());
+  RunFileWriter<u64> w(path, H, 8, "", "", "test");
+  assert(w.ok());
+  for (int i = 0; i < n; ++i) {
+    RunRecord<u64> r;
+    std::memset(r.sig.b, 0, SIGMAX);
+    r.sig.b[0] = static_cast<uint8_t>(i / 256);
+    r.sig.b[1] = static_cast<uint8_t>(i % 256);
+    r.H = H;
+    r.lo = 0;
+    r.len = 1;
+    r.counts = {static_cast<u64>(i + 1)};
+    w.append(r);
+  }
+  w.finalize();
 }
 
 static void appendN(RunFileWriter<u64>& w, int n) {
@@ -54,7 +108,50 @@ static void testAtomicPublish() {
   std::remove((path + ".idx").c_str());
 }
 
+// D6 (.idx self-describing): the index sidecar must begin with a magic word so
+// a stale / wrong-format / wrong-ISA sidecar is recognized and ignored rather
+// than mis-seeked. Pre-fix the file began with the raw keyLen (5), not a magic.
+static void testIndexHasMagic() {
+  const std::string path = "/tmp/gate_runfile_magic.bin";
+  writeRun(path, 3, 200); // > stride, so a sidecar exists
+  auto idx = readAll(path + ".idx");
+  assert(idx.size() >= 4);
+  uint32_t magic;
+  std::memcpy(&magic, idx.data(), 4);
+  assert(magic == 0x49594C50u && "B/D6: .idx does not start with the 'PLYI' magic");
+  std::remove(path.c_str());
+  std::remove((path + ".idx").c_str());
+}
+
+// D6 (header self-describing): parseHeader must validate byteorder, not ignore
+// it. A file claiming a foreign byte order must be rejected (ok()==false).
+static void testHeaderRejectsBadByteorder() {
+  const std::string path = "/tmp/gate_runfile_bo.bin";
+  writeRun(path, 3, 4);
+  tamper(path, "byteorder 1", "byteorder 9");
+  RunFileReader<u64> r(path, 3);
+  assert(!r.ok() && "D6: reader accepted a foreign byteorder");
+  std::remove(path.c_str());
+  std::remove((path + ".idx").c_str());
+}
+
+// D6 (header self-describing): parseHeader must reject a counter tag that does
+// not match the reader's word width (reading a u128 file as u64 = silent
+// misparse). u64's tag is "u64"; tampering it must be caught.
+static void testHeaderRejectsCounterMismatch() {
+  const std::string path = "/tmp/gate_runfile_ctr.bin";
+  writeRun(path, 3, 4);
+  tamper(path, "counter u64", "counter u12"); // != "u64", same length
+  RunFileReader<u64> r(path, 3);
+  assert(!r.ok() && "D6: reader accepted a mismatched counter tag");
+  std::remove(path.c_str());
+  std::remove((path + ".idx").c_str());
+}
+
 int main() {
   testAtomicPublish();
+  testIndexHasMagic();
+  testHeaderRejectsBadByteorder();
+  testHeaderRejectsCounterMismatch();
   std::puts("gate_runfile PASS");
 }
