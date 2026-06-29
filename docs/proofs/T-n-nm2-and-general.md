@@ -115,17 +115,34 @@ of the cluster GF for all excess*: `Σ_e (2e+3)² yᵉ` is rational. (Interior =
 boundary² because the two neighbour sides are independent, each contributing the
 2e+3 single-neighbour factor.)
 
-Proven single-cluster **interior** weights by (excess e, span s):
+Proven single-cluster **interior** weights by (excess e, span s) (brute force):
 
-| e \ s | 1 (single row) | 2 (two adj rows) | 3 (three adj rows) | total cₑ |
+| e \ s | 1 (single row) | 2 (two adj rows) | 3 | 4 |
 |---|---|---|---|---|
-| 1 | 25 | — | — | **25** |
-| 2 | 49 | 339 | — | **388** |
-| 3 | 81 | 1860 | 4778 | **6719** |
+| 1 | 25 | — | — | — |
+| 2 | 49 | 339 | — | — |
+| 3 | 81 | 1860 | 4778 | — |
+| 4 | 121 | 7311 | 45226 | — |
 
-The span-1 column is `(2e+3)²` (closed). The multi-span columns (339, 1860, 4778 …)
-are the remaining hard part — no obvious pattern yet; they are the genuinely
-combinatorial core of B(y).
+- **Span 1 (single row) = `(2e+3)²`** — closed, verified e=1…4 (25,49,81,121).
+  The boundary weight is `2e+3`. The partition structure reappears at k=4
+  (multisets {4},{3,1},{2,2},{2,1,1} — partitions of 4, those that fit the rows).
+- **Multi-span columns** show **no recognizable closed form** so far. A focused
+  local gadget enumerator (single | multi | multi | single, wide column window —
+  a too-narrow window silently *under*-counts, so it must be validated against the
+  exhaustive brute force, which it now is) extends span-2 to
+  **Wi(e,2) = 339, 1860, 7311, 25080** (e=2…5). Normalised by 3ᵉ these are
+  37.7, 68.9, 90.3, 103.2 — increasing and decelerating (so ~C·3ᵉ asymptotically,
+  i.e. a *sum* of geometric terms / rational GF), but **no low-order linear
+  recurrence fits 4 points**, and span-3 (4778, 45226) has even fewer. A span-s
+  cluster of excess e is a coupled stack of s adjacent multi-cell rows — the
+  genuine combinatorial core of B(y), still open.
+
+**State of the hunt:** the span-1 column is closed ((2e+3)²); the multi-span
+columns need either many more points (push the validated enumerator to e=8–10 per
+span and fit a rational GF) or a structural insight into the inter-row coupling.
+Until then, each fixed k is provable by cataloguing its (finitely many) cluster
+weights and assembling over partitions — k=0,1,2 done, k=3,4 catalogued.
 
 **Consequence.** Proving any fixed k is *mechanical*: catalogue that k's cluster
 weights (a finite enumeration, the §1 method per cluster type) and assemble over
