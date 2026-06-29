@@ -4,6 +4,51 @@ Working design record for organizing the per-height column sweeps across cores a
 machines, for a(22) and especially a(24)+. Captures what survived, what we cut and WHY
 (so we stop re-litigating), and the open empirical questions.
 
+## ⚠ 2026-06-29 — AT-SCALE FINDING: work-stealing (T2.3) does NOT engage
+
+**The straggler-tail fix doesn't fire at frontier scale.** First live test was the
+a(23) run (dalby H17, `--steal-grain 0.05`, 80 cores): the 46-min peak column ran at
+**60% map utilization (~40% of core-time idle), `steals=0`** — confirmed *not*
+spill-bound (124 MB spill, 37/128 GB RAM). The "92–97% recovery" in the note below
+was from the **simulator** (`sched_sim.py` on a16/a18 probes), never a live run; a(23)
+falsifies it for the implemented mechanism.
+
+**Root cause — the stealer measures the wrong quantity.** Both the eligibility test
+and the grain floor size remaining work by **unread input keys**
+(`runningUnit.remaining() = estTotal − processed`, both *input records*; `sweep.go`).
+But a column's cost is concentrated in **a few compute-heavy keys** (frontier records
+that explode into huge output), exactly as the note says ("concentrated by key"). Two
+compounding failures, both observed:
+
+1. **Invisible.** By the time cores idle (the tail), the straggler has already *read*
+   most of its keys, so `remaining()` (unread keys) falls below the grain floor
+   (~2625 recs) → `pickVictim` skips it as "almost done," though its remaining
+   *compute* (expanding the heavy keys it already consumed) is the entire bottleneck.
+2. **Uninterruptible.** `map_worker` honors the SIGTERM stop only "at the next key
+   boundary" (`g_terminate` checked between keys). A worker grinding inside *one* heavy
+   key's expansion cannot be cut — and when the straggler **is** a single pathological
+   key (the note's own diagnosis), there is no key-range left to split at all.
+
+So the simulator's premise — "split the straggler's remaining key-range" — is unmet:
+at nomination time there is sub-grain key-range left, and the residual cost is a single
+uncuttable key. Net: no eligible victim → `steals=0` → the ~18%→larger tail is
+unrecovered on the critical path (H17/H18 are dalby's whole wall).
+
+**Correctness:** unaffected — stealing is pure speed. a(23) was **not** restarted
+(optimization is never grounds to restart a healthy frontier run).
+
+**Fix directions (a24+, build off a live run):**
+- Size remaining work by **compute/expansion**, not unread keys — e.g. output-records
+  rate or projected `frontier_out` — so a heavy-key straggler stays steal-eligible
+  past the input-key grain floor.
+- Cut the **initial** units by a compute estimate so heavy keys are isolated into their
+  own small units (finish without tailing). NB: distinct from finer `--unit-mult`,
+  correctly rejected below — that shrinks record-ranges without isolating heavy keys.
+- A much smaller `--steal-grain` recovers *multi-light-key* tails but not the
+  *single-heavy-key* stall (#2 needs genuine mid-key interruption — hard).
+- Until then, treat the straggler tail as **unmitigated**, not "fixed by T2.3," when
+  forecasting wall and choosing splits (it makes a fast second box more attractive).
+
 ## The problem
 Minimize **makespan** of the ~N per-height sweeps. Jobs are **geometric** in cost
 (~2.4×/height, ~4.3×/N), so a handful dominate; **RAM is the binding constraint** (it
