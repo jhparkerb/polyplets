@@ -129,6 +129,14 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 
 	for hi := startIdx; hi < len(heights); hi++ {
 		H := heights[hi]
+
+		// Top strip H==maxn is the closed-form diagonal T(maxn,maxn)=3^(maxn-1);
+		// contribute it directly — no map/merge (see contributeTopHeight).
+		if H == maxn {
+			contributeTopHeight(maxn, triangle, cfg)
+			continue
+		}
+
 		startCol := 0
 		var frontier []string
 
@@ -198,6 +206,14 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 				return
 			}
 			defer func() { <-heightSem }()
+
+			// Top strip: closed-form diagonal, no map/merge (see Run).
+			if H == cfg.Maxn {
+				mu.Lock()
+				contributeTopHeight(cfg.Maxn, triangle, cfg)
+				mu.Unlock()
+				return
+			}
 
 			seed := filepath.Join(cfg.RunDir, fmt.Sprintf("seed_h%d.bin", H))
 			if err := WriteSeedPolyrun(seed, cfg.Rev, H, cfg.Maxn, cfg.CounterWidth); err != nil {
@@ -438,6 +454,13 @@ func mapPhase(
 	tel *telemetry,
 	sem chan struct{},
 ) ([]string, []map[int]map[int]uint64, Acct, error) {
+
+	// Invariant: column work must never start at the top strip — H==maxn is
+	// contributed in closed form (contributeTopHeight) and must be short-circuited
+	// before any sweep. Tripping this means that short-circuit was bypassed.
+	if H == cfg.Maxn {
+		return nil, nil, Acct{}, fmt.Errorf("mapPhase: column work started at top height H=%d (maxn=%d); closed-form short-circuit was bypassed", H, cfg.Maxn)
+	}
 
 	numUnits := cfg.Cores * unitMult(cfg)
 	if numUnits < 1 {
@@ -774,6 +797,36 @@ func sumFrontierRecords(frontier []string) uint64 {
 func removeRun(p string) {
 	os.Remove(p)
 	os.Remove(p + ".idx")
+}
+
+// topHeightClosedForm returns T(maxn,maxn) = 3^(maxn-1), the count of fixed
+// polyplets whose bounding box is exactly maxn tall under an maxn-cell budget:
+// one cell per row, three horizontal offsets at each of the maxn-1 steps.
+func topHeightClosedForm(maxn int) uint64 {
+	if maxn <= 0 {
+		return 0
+	}
+	v := uint64(1)
+	for i := 0; i < maxn-1; i++ {
+		v *= 3
+	}
+	return v
+}
+
+// contributeTopHeight adds the closed-form top strip T(maxn,maxn) to the
+// triangle (and writes its per-height row if requested), doing no map/merge.
+func contributeTopHeight(maxn int, triangle []uint64, cfg SweepConfig) {
+	v := topHeightClosedForm(maxn)
+	if maxn < len(triangle) {
+		triangle[maxn] += v
+	}
+	if cfg.PerHeightOut != "" {
+		hTri := make([]uint64, maxn+1)
+		hTri[maxn] = v
+		if werr := writePerHeight(cfg.PerHeightOut, maxn, maxn, hTri); werr != nil {
+			fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", maxn, werr)
+		}
+	}
 }
 
 // unitMult returns the configured MAP units-per-core, defaulting to 1.
