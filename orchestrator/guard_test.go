@@ -69,6 +69,27 @@ func TestCounterWidthGuard(t *testing.T) {
 	mustErr("u127", 10) // unknown tag
 }
 
+// TestMapWorkerFailsOnMissingInput proves a map_worker whose input frontier
+// file can't be opened exits nonzero, instead of treating the unreadable file
+// as empty and silently dropping its records (a frontier file lost to a GC race
+// would otherwise vanish from the count with no signal).
+func TestMapWorkerFailsOnMissingInput(t *testing.T) {
+	dir := t.TempDir()
+	a := MapArgs{
+		InPaths:  []string{filepath.Join(dir, "does_not_exist.bin")},
+		H:        3,
+		Maxn:     8,
+		Fold:     true,
+		RAM:      4 << 20,
+		SpillDir: dir,
+		OutPath:  filepath.Join(dir, "out.bin"),
+	}
+	_, err := RunMapWorker(context.Background(), DefaultWorkerBin(".."), a, nil, nil)
+	if err == nil {
+		t.Fatalf("map_worker returned success on a missing input file (silent data loss)")
+	}
+}
+
 // TestRejectZeroCores proves Run refuses Cores<1 instead of silently
 // undercounting. With Cores==0 the worker pool spawns zero goroutines, so every
 // map phase produces no output and Run returns a too-low triangle with a nil

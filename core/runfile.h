@@ -316,6 +316,11 @@ class RunFileReader {
     return true;
   }
 
+  // ok() is false if the file could not be opened or its header was bad. A
+  // legitimately empty run file still opens (ok()==true, records()==0), so this
+  // distinguishes "no data" from "could not read" — the latter must abort the
+  // worker rather than silently contribute zero records.
+  bool   ok()      const { return fp_ != nullptr; }
   size_t records() const { return records_; }
   int    H()       const { return H_; }
   int    keyLen()  const { return keyLen_; }

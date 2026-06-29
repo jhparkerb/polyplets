@@ -238,6 +238,13 @@ std::pair<size_t, size_t> map_shard_file(
   readers.reserve(in_paths.size());
   for (const auto& p : in_paths) {
     readers.push_back(std::make_unique<RunFileReader<W>>(p, H, keyLen));
+    // A frontier input that can't be opened (e.g. lost to a GC race) must abort
+    // the worker, not be silently treated as an empty file — otherwise its
+    // records vanish from the count with no signal.
+    if (!readers.back()->ok()) {
+      std::fprintf(stderr, "map_shard_file: cannot read input %s\n", p.c_str());
+      std::exit(1);
+    }
     if (has_lo) readers.back()->seekToKey(lo_sig);
   }
 

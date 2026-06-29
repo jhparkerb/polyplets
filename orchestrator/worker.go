@@ -3,6 +3,7 @@ package orchestrator
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"fmt"
 	"os/exec"
@@ -115,7 +116,12 @@ func runWorker(ctx context.Context, binary string, args []string, onProgress fun
 	if err != nil {
 		return WorkerResult{}, err
 	}
-	cmd.Stderr = nil // discard stderr (workers write diagnostics there)
+	// Capture stderr so a worker's failure diagnostic (e.g. "cannot read input")
+	// surfaces in the returned error instead of being discarded. Workers write
+	// nothing here in normal operation (progress goes to stdout), so this stays
+	// small.
+	var stderrBuf bytes.Buffer
+	cmd.Stderr = &stderrBuf
 
 	if err := cmd.Start(); err != nil {
 		return WorkerResult{}, fmt.Errorf("spawn %s: %w", filepath.Base(binary), err)
@@ -153,6 +159,9 @@ func runWorker(ctx context.Context, binary string, args []string, onProgress fun
 	err = cmd.Wait()
 	close(done) // release the stop watcher
 	if err != nil {
+		if diag := strings.TrimSpace(stderrBuf.String()); diag != "" {
+			return WorkerResult{}, fmt.Errorf("%s: %w: %s", filepath.Base(binary), err, diag)
+		}
 		return WorkerResult{}, fmt.Errorf("%s: %w", filepath.Base(binary), err)
 	}
 
