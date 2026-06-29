@@ -319,8 +319,14 @@ class RunFileReader {
       out.counts[i] = v;
     }
     ++records_read_;
-    // Seeked readers cover only a slice, so the running CRC is partial — skip it
-    // (corruption is caught by full reads / the verify gate).
+    // CRC contract (B3): a seeked reader covers only a key-slice, so its running
+    // CRC is partial and CANNOT match the whole-body trailer — the body CRC is
+    // therefore verified ONLY on a full (non-seeked) read to completion. Bounded
+    // units and merges seek, so production reads intentionally skip it here. The
+    // corruption backstop for those is an out-of-band FULL read: verify.go
+    // (independent, recomputes the whole-body FNV and FAILS on mismatch) and
+    // runcat (per-file, exits nonzero on mismatch). B4's atomic publish removes
+    // the torn-file hazard that made a skipped seek-read dangerous.
     if (records_read_ == records_ && !seeked_) verifyCRC();
     return true;
   }
