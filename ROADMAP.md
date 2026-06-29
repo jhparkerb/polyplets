@@ -255,3 +255,19 @@ LEGEND:  A --> B  = A feeds / enables B          ((ayr)) = needs ayr (AVAILABLE 
 - **Critical path to publication:** (ayr, now) #21/#28 → #25 → #17, with #27 and
   the gympie-side hole prototype running in parallel. #19 → #20 is a parallel
   side-track for the a(22)+ frontier, no longer blocking.
+
+## Maybe pile (unscheduled, low-commitment)
+
+Things worth doing someday; not on any critical path. Pull onto a thread if/when
+they earn it.
+
+- **Lean formalization of T(n,n−1) and T(n,n−2)** (`docs/proofs/T-n-nm1.md`,
+  `T-n-nm2-and-general.md`). Statements are concrete finite combinatorics; the
+  arithmetic is trivial for Lean. Payoff: *certify* the one subtle step —
+  connectivity ⇔ every consecutive row-pair shares a king-link, incl. the gap-2
+  bridge (where the C1 first attempt undercounted, 312 vs 480). The cost is mostly
+  upfront infrastructure — Mathlib has no polyominoes, so build the king-animal
+  model (finite subsets of ℤ², king-adjacency `SimpleGraph`, connectivity,
+  translation quotient, bbox height). Start with **T(n,n−1)** (clean
+  first-principles proof); **T(n,n−2)** leans on brute-forced gadget weights
+  (339, 66) which become `decide`/`Finset.card` lemmas rather than gaps.
