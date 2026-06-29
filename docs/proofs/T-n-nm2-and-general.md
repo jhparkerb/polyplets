@@ -108,11 +108,24 @@ This is the exponential formula for a cluster gas — it is *why* `S(y)=A(y)e^{n
 with **B(y) = the single-cluster (connected) generating function**. The proven
 single-cluster weights so far (excess j, summed over cluster types):
 
-| excess j | cluster types | interior weight c_j | boundary |
-|---|---|---|---|
-| 1 | double | **25** | 5 |
-| 2 | triple (49) + adjacent-double-pair (339) | **388** | 73 |
-| 3 | quad-row + triple·double-adj + three-doubles-adj | (catalog in progress) | — |
+**Single-row defects are exactly squares.** A single row of e+1 cells (excess e,
+span 1) has boundary weight **2e+3** and interior weight **(2e+3)²** — verified
+e=1,2,3 (double 5/25, triple 7/49, quad 9/81). This *closes the span-1 sub-family
+of the cluster GF for all excess*: `Σ_e (2e+3)² yᵉ` is rational. (Interior =
+boundary² because the two neighbour sides are independent, each contributing the
+2e+3 single-neighbour factor.)
+
+Proven single-cluster **interior** weights by (excess e, span s):
+
+| e \ s | 1 (single row) | 2 (two adj rows) | 3 (three adj rows) | total cₑ |
+|---|---|---|---|---|
+| 1 | 25 | — | — | **25** |
+| 2 | 49 | 339 | — | **388** |
+| 3 | 81 | 1860 | 4778 | **6719** |
+
+The span-1 column is `(2e+3)²` (closed). The multi-span columns (339, 1860, 4778 …)
+are the remaining hard part — no obvious pattern yet; they are the genuinely
+combinatorial core of B(y).
 
 **Consequence.** Proving any fixed k is *mechanical*: catalogue that k's cluster
 weights (a finite enumeration, the §1 method per cluster type) and assemble over
