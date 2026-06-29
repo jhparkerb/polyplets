@@ -27,16 +27,21 @@ committed" below.
 - **`docs/job-checklist.md` item 4** — explicit gate: deployed binary's `GIT_REV`
   is clean AND contains the change you intend (the A1 provenance lesson).
 
-### dalby a(21) — LIVE STATE re-measured 2026-06-29 ~01:53 (STRAGGLER TAIL)
-orchestrate PID **993738** alive, **1d 06:12** elapsed, still **H21 col2**. But
-it is now in a **single-core straggler tail**: exactly one `map_worker`
-(PID 1297398) at **99.9% CPU for 10h31m**, **load avg 1.00 on the 80-core box**
-(79 cores idle). `processed` is **FROZEN at 9,083,027,456** across every heartbeat
-for 10.5h+; the heartbeat carries **no `eta=`**, so no ETA can be quoted. This is
-precisely the straggler tail T2.3 work-stealing fixes, on the H=maxn top strip A1
-makes free — but the running binary (`35eb9e1`) predates both. Per do-not-restart
-(correctness-or-dead-box only), NOT touched; flagged for jasonp's call. Disk 341 GB
-free. Waiter `bw113qsu5`.
+### dalby a(21) — COMPLETED 2026-06-29T07:29:44-04:00 ✅
+**a(21) = 6,954,084,405,510,437** (new frontier term). orchestrate 993738 exited
+clean (status 0) after ~35.8 h wall; all three waiters fired (`bejohjmiv` stale,
+`bw113qsu5`, and this session's `b5c4r8lw5`). Recorded in **`results/ns_a21/`**
+(triangle.txt + perheight h1–21 + PROVENANCE.md).
+- **Validated:** a(1)–a(19) match the A006770 b-file exactly; a(20) matches the
+  prior validated run; growth a21/a20 = 6.78068; **h1–h17 byte-identical between
+  dalby and ayr** (sha256, independent runs).
+- **NOT yet independently certified:** the novel high heights **h18–h21 are
+  single-source** (dalby only; ayr salvage stops at h17). Needs the mod-p shadow
+  (A6, deferred) or an independent reimplementation before OEIS-final. Per
+  validate-before-record, a(21) is **our computed value, certification pending**.
+- Note: this ran on the UNFIXED `35eb9e1` (brute-forced the H21 closed form → the
+  long straggler tail). A re-run on a current binary (A1 + work-stealing) would be
+  far cheaper but isn't needed for the value. **Publishing is jasonp's call.**
 
 ---
 
