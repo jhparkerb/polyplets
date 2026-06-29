@@ -151,3 +151,56 @@ proven. The *open* prize remains closing **B(y)** in elementary/algebraic form �
 the single-cluster GF — which would deliver every k at once; the cluster weights
 25, 388, … are its (positive-integer) building blocks and a better target for
 pattern-recognition than B(y)'s signed rationals.
+
+## 5. Closing B(y): the attempt, and why it is parked (2026-06-29)
+
+We tried to close B(y) and reached a clean **negative** result: no
+low-complexity closed form exists at any precision the available data can reach.
+
+**Two normalisations, both extracted to their data ceiling.**
+
+1. *Constant-excess diagonal* `S(y)=Σ_k P_k(n)yᵏ = A(y)e^{nB(y)}`. `P_k` needs
+   `n≥2k+1`, so the a(21) triangle pins `b_1…b_6` outright and `b_7` only with the
+   proven `25ᵏ/k!` leading coefficient assumed — **7 terms**, hard cap.
+   - `B(y) = 25y − (209/2)y² + (4474/3)y³ − (22701/4)y⁴ + 16144y⁵ + (15126941/3)y⁶ − (687296991/7)y⁷ + …`
+   - Cross-check: both `e^{B(y)}` and `A(y)` land in `ℤ[[y]]` — a six-/seven-fold
+     integrality check that validates every rational `a_k,b_k`.
+     `e^B = 1,25,208,1483,20688,130208,5519404,36500568,…`;
+     `A = 1,−45,567,−5490,73035,641466,−44582436,1539013905,…`.
+
+2. *Fixed-height per-row ratio* `λ_raw(y)=Z_N/Z_{N−1}`,
+   `Z_N(y)=Σ_e T(N+e,N)yᵉ`. This is the **wide** slice (T(20,8) exists where the
+   diagonal T(n,n−8) would need n=25), and `λ_raw` *converges* in N — giving **9
+   converged terms** from the same a(21) data, two past the diagonal:
+   - `λ_raw = 3, 25/3, 833/27, 32708/243, 1426141/2187, 66608903/19683,
+     1088429260/59049, 55307294057/531441, 2888944079197/4782969,
+     462665755865681/129140163` (denominators are pure powers of 3).
+   - `b_raw_k=[yᵏ]log λ_raw`: `25/9, 347/54, 51274/2187, 2737861/26244,
+     3381871/6561, 1446596374/531441, 168016103639/11160261,
+     3295403161157/38263752, 1762540314602707/3486784401`.
+   - Ceiling: `b_raw_k` converges only for `N≳k+1` while `Z_N` is known only to
+     order `21−N`; the two collide at **k=9** (k=10 would need N≥12 with order≥10,
+     impossible within a(21)).
+
+**The negatives.**
+- *OEIS / Superseeker:* empty for every integer sequence tried — interior cluster
+  weights (339,1860,7311,25080), `e^B` coeffs, `A(y)` coeffs, `λ_raw` numerators.
+- *Equation-guessing* (algebraic `P(f,y)=0` and linear ODE `Σ pⱼ(y)f⁽ʲ⁾=0`, all
+  forms with #unknowns ≤ #data so the fit is *falsifiable*): **every testable form
+  returns the trivial solution only** — no relation — on 8 terms of `e^B`/`A` and
+  on 10 terms of `λ_raw`. The simplest surviving forms (algebraic deg-(2,2),
+  2nd-order ODE deg-2) are excluded outright.
+
+**Conclusion.** B(y) shows **no algebraic or D-finite closed form** of any
+complexity reachable from ≤10 terms, in either normalisation. This matches the
+literature — polyomino growth series are routinely non-D-finite (the full
+polyomino GF is conjectured so). Going further needs ~15–20 terms, which requires
+driving the engine into the expensive tall-strip / high-excess region (H≈14–18)
+for a poor-prior, high-degree fit.
+
+**Status: parked, not blocking.** The *practical* value of B(y) is already banked
+— the proven diagonals free the expensive **top** heights (k≤4 wired into the
+engine; k≤7 data-pinned as cross-checks). Full B(y) closure would only
+formula-free the *cheap* low heights. So closing B(y) is a pure-math open question,
+not on the a(n) record path. Reproduce the extraction with
+`experiments/braw_from_data.py` against the per-height files in `results/ns_a21/`.
