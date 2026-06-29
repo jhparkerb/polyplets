@@ -1,5 +1,27 @@
 # HANDOFF — 2026-06-29
 
+## 2026-06-29 ~13:57 EDT — a(23) frontier run LAUNCHED (dalby + ayr split) 🚀
+
+Rev **`6db27b5`** (clean, native build both hosts; ayr got Go 1.26 in `$HOME/go`).
+Disjoint height-split, combine on completion. a(21)/a(22) are free byproducts.
+
+- **dalby**: heights **17–23**, 80c, PID **1458809**, tmux `0:a23`, waiter
+  `bo0e6di6b`. Sweeps H=17,18 (the cost); injects H=19–23 (k≤4 diagonals).
+  `~/src/polyominoes-ns/runs/ns_a23`, log `runs/ns_a23/dalby.log`.
+- **ayr**: heights **1–16**, 30c, PID **1396930**, tmux `0:a23`, waiter
+  `beu50rd3c`. Cheap bulk; flew to H=10 in 13 s. `runs/ns_a23`, `ayr.log`.
+- **Split rationale:** with k≤4 injection the cost concentrates in the tall swept
+  heights (H=18 ≈44%, H=17 ≈26%, halving below). dalby (80c) takes the two
+  monsters + free injected; ayr (30c) takes 1–16 → wall ≈ max(hosts), dalby
+  (H=18) the critical path.
+- **Config:** u64, unit-mult 4, **steal-grain 0.05**, ram 1 GB/worker (spills to
+  disk beyond). Disk free: dalby 346 GB, ayr 396 GB.
+- **Calibration:** clean a(20) = **2h25m** on dalby (PASS, byte-validated). a(23)
+  est. multi-day.
+- **On completion:** `rsync` both `perheight/` → one dir →
+  `combine --require-cover --compare` (byte-checks a(1..21) prefix; a(22),a(23)
+  are new). Tier: **computed, pending certification** — high heights single-source.
+
 ## 2026-06-29 — audit campaign DONE + process changes + dalby straggler note
 
 ### Audit actioned (supersedes the "not yet actioned" section below)
