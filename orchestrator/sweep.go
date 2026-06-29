@@ -193,6 +193,13 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			continue
 		}
 
+		// Strip H==maxn-2 is closed-form (k=2, proven). maxn>=7 keeps the
+		// smallest 3-power (3^(maxn-7)) non-negative; below that it is swept.
+		if H == maxn-2 && maxn >= 7 {
+			contributeHeightNminus2(maxn, triangle, cfg)
+			continue
+		}
+
 		// Trivial low strips H==1 and H==2 also have closed forms (C2);
 		// contribute them directly instead of spawning a worker per column.
 		if H == 1 || H == 2 {
@@ -280,6 +287,12 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 			if H == cfg.Maxn-1 && cfg.Maxn >= 4 {
 				mu.Lock()
 				contributePoleHeight(cfg.Maxn, triangle, cfg)
+				mu.Unlock()
+				return
+			}
+			if H == cfg.Maxn-2 && cfg.Maxn >= 7 {
+				mu.Lock()
+				contributeHeightNminus2(cfg.Maxn, triangle, cfg)
 				mu.Unlock()
 				return
 			}
@@ -960,6 +973,35 @@ func contributePoleHeight(maxn int, triangle []uint64, cfg SweepConfig) {
 	}
 	if maxn < len(triangle) {
 		triangle[maxn] += row[maxn]
+	}
+	if cfg.PerHeightOut != "" {
+		if werr := writePerHeight(cfg.PerHeightOut, H, maxn, row); werr != nil {
+			fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
+		}
+	}
+}
+
+// contributeHeightNminus2 adds the closed-form strip H=maxn-2 (the third
+// diagonal, k=2, proven) to the triangle, doing no map/merge. The strip spans
+// n in {maxn-2, maxn-1, maxn}:
+//
+//	T(maxn-2,maxn-2) = 3^(maxn-3)                                 (diagonal)
+//	T(maxn-1,maxn-2) = (25(maxn-1)-45)*3^(maxn-5)                 (C1 at n=maxn-1)
+//	T(maxn,  maxn-2) = (625*maxn^2-2459*maxn+1134)/2 * 3^(maxn-7) (proven, n>=5)
+//
+// Caller guarantees maxn>=7 (so 3^(maxn-7)>=1). The numerator 625n^2-2459n+1134
+// is always even (n^2-n is even). ns-gate-closedform pins all three against the
+// triangle.
+func contributeHeightNminus2(maxn int, triangle []uint64, cfg SweepConfig) {
+	H := maxn - 2
+	row := make([]uint64, maxn+1)
+	row[H] = pow3(maxn - 3)
+	row[maxn-1] = uint64(25*(maxn-1)-45) * pow3(maxn-5)
+	row[maxn] = uint64((625*maxn*maxn-2459*maxn+1134)/2) * pow3(maxn-7)
+	for _, n := range []int{H, maxn - 1, maxn} {
+		if n < len(triangle) {
+			triangle[n] += row[n]
+		}
 	}
 	if cfg.PerHeightOut != "" {
 		if werr := writePerHeight(cfg.PerHeightOut, H, maxn, row); werr != nil {
