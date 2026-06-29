@@ -126,7 +126,29 @@ build/ns:
 # ns-gates: all new-system gates. Includes the runfile-format, holes, verify,
 # height-split, and full-Go-suite gates that existed but were not wired in, so a
 # regression in those paths (BUGS-OF-SHAME A4/A5/B*/D6) can't rot undetected.
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-runfile ns-gate-holes ns-gate-verify ns-gate-split
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-runfile ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split
+
+# Fast gate subset for the pre-push hook (.githooks/pre-push). Targets well under
+# 30s: the full Go suite (guards / combine / runcat / closed-form / resume) plus
+# the sub-second C++ format+arith gates. The heavy C++ sweeps (spill, parallel,
+# holes, maxn=14 regression) stay in `make ns-gates`, run before a release or by
+# hand. Order: cheapest, most-targeted tripwires first so a regression fails fast.
+ns-gate-fast: ns-gate-closedform ns-gate-math ns-gate-runfile ns-gate-go
+
+# Closed-form invariant gate: assert the engine contributes every KNOWN closed
+# form (top strip H=N=3^(N-1); low strips T(n,1)=1, T(n,2) recurrence) DIRECTLY,
+# never by enumerating a column — the exact tripwire the H=maxn brute-force
+# incident lacked. Add a case here whenever a new closed form or conservation law
+# is established (see docs/engineering-standards.md).
+ns-gate-closedform:
+	go test ./orchestrator/ -run 'TestTopHeight|TestLowHeight' -count=1
+
+# Point git at the committed hooks dir so the pre-push gate runs without copying
+# anything into .git. Idempotent; re-run once after cloning.
+.PHONY: install-hooks
+install-hooks:
+	git config core.hooksPath .githooks
+	@echo "hooks installed (.githooks); pre-push now runs 'make ns-gate-fast'"
 
 # clangd compile DB (host-specific, git-ignored): resolves project includes and
 # gives every header a real TU's flags, killing phantom "core/run.h not found" /

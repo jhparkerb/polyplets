@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Pre-push gate: run the fast regression subset before anything leaves the
+# machine. Targets the classes this repo has actually shipped — closed-form
+# brute-force, silent-wrong guards, combine/runfile integrity (see
+# AUDIT-2026-06-28.md). Install once with `make install-hooks`.
+#
+# Genuine emergency bypass: `git push --no-verify` — then fix what you skipped.
+set -euo pipefail
+root="$(git rev-parse --show-toplevel)"
+echo "pre-push: make ns-gate-fast"
+exec make -C "$root" ns-gate-fast
