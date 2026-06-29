@@ -58,6 +58,13 @@ type SweepResult struct {
 // Run executes the full height-sweep (H=1..maxn) and returns the triangle.
 // If resume is non-nil, it skips already-completed heights and restores acct.
 func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult, error) {
+	// Refuse-at-start: a cap-0 worker pool spawns no goroutines and silently
+	// undercounts (firstErr stays nil); a negative cap panics later. Reject both
+	// here with one check rather than miscount or crash mid-run.
+	if cfg.Cores < 1 {
+		return nil, fmt.Errorf("Cores must be >= 1, got %d", cfg.Cores)
+	}
+
 	maxn := cfg.Maxn
 	triangle := make([]uint64, maxn+1)
 	var acct Acct
