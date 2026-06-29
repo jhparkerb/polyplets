@@ -390,8 +390,15 @@ func bytesToHex(b []byte) string {
 // The record count is known upfront so no fseek is needed.
 func WriteSeedPolyrun(path, rev string, H, maxn int, counter ...string) error {
 	counterTag := "u64"
-	if len(counter) > 0 && counter[0] == "u128" {
-		counterTag = "u128"
+	if len(counter) > 0 && counter[0] != "" {
+		switch counter[0] {
+		case "u64", "u128":
+			counterTag = counter[0]
+		default:
+			// Fail loud: an unknown tag (typo) must not silently default to u64
+			// and miscount a run that was meant to be wider.
+			return fmt.Errorf("WriteSeedPolyrun: unknown counter %q (want u64 or u128)", counter[0])
+		}
 	}
 	wordBytes := (PolyrunHeader{Counter: counterTag}).WordBytes()
 

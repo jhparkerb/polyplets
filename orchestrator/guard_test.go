@@ -5,8 +5,20 @@ package orchestrator
 
 import (
 	"context"
+	"path/filepath"
 	"testing"
 )
+
+// TestRejectUnknownCounter proves the seed writer refuses an unrecognized
+// --counter tag instead of silently falling back to u64. A typo like "u127"
+// would otherwise write a u64 seed with no error, so a run meant to be u128
+// could miscount with no signal.
+func TestRejectUnknownCounter(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "seed_h3.bin")
+	if err := WriteSeedPolyrun(path, "test", 3, 8, "u127"); err == nil {
+		t.Fatalf(`WriteSeedPolyrun(counter="u127") returned nil error; want rejection of the unknown tag`)
+	}
+}
 
 // TestRejectZeroCores proves Run refuses Cores<1 instead of silently
 // undercounting. With Cores==0 the worker pool spawns zero goroutines, so every
