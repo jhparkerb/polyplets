@@ -1,5 +1,12 @@
 # 09 — a-priori cost model from the frontier profile, and how to assign work
 
+> **Correction (2026-06-29, D1):** like 07, the work-assignment analysis here
+> treats H=N as the dominant atomic job. H=N is the **closed-form** top strip
+> (`contributeTopHeight`, A1) and carries zero compute. Drop it from the cost
+> vector; the pole is **H=N−1** (~53% of computed work). See the correction box
+> at the top of [07-height-scheduling.md](07-height-scheduling.md) for the
+> re-derived shares. The makespan-floor numbers below predate this.
+
 The per-column cost of the fold engine is **predictable from first principles** —
 no calibration run. This turns work-assignment (#32 cross-machine split, within-box
 resource concentration, overlap timing) from "measure or guess" into "compute," and

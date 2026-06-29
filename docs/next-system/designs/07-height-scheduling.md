@@ -5,6 +5,32 @@ minimize wall time. Supersedes the "meet-in-the-middle" sketch in ROADMAP #32,
 which the simulation below shows is the *worst* dynamic option (up to 47% over
 ideal). Calculator: `scripts/heightsplit_plan.py`.
 
+> **Correction (2026-06-29, BUGS-OF-SHAME D1): the cost vector below is anchored
+> on a phantom job — re-derive it with H=N removed.**
+>
+> This doc puts ~55% of the run on H=N and builds the makespan-floor / atomicity
+> argument around it ("the **atomicity of H=N** (~55%)"). But H=N is **not
+> computed** — it is the closed-form diagonal T(N,N)=3^(N−1), contributed
+> directly by `contributeTopHeight` with no map/merge (A1). Likewise H=1 and H=2
+> are closed forms (C2). So H=N must be **dropped from the schedulable cost
+> vector entirely**; whichever box "gets H=N" gets ~0 work, not 55%.
+>
+> Re-derived shares of the *computed* work (old of-total ≈ {H=N 55, H=N−1 24,
+> H=N−2 10, tail 11}; drop H=N=55, renormalize over the remaining 45):
+>
+> | height | old % of total | % of computed work (H=N removed) |
+> |---|---|---|
+> | H=N   | ~55 | **0 (closed form)** |
+> | H=N−1 | ~24 | **~53 ← the real pole** |
+> | H=N−2 | ~10 | ~22 |
+> | tail  | ~11 | ~25 |
+>
+> So the atomic job that constrains the split is **H=N−1, ~53% of the computed
+> work**, not H=N. The makespan-floor, LPT, and meet-in-the-middle analyses below
+> must be re-run on this vector (the scheduler that wins can change). If C1 lands
+> (T(n,n−1) closed form), H=N−1 is *also* free and the pole moves to H=N−2.
+> Everything from here down predates this correction.
+
 ## The cost structure decides everything
 
 The fold engine computes each bounding-box height H as an **independent** sweep,
