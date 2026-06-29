@@ -31,12 +31,14 @@ func main() {
 		fmt.Fprintln(os.Stderr, "usage: runcat <file.bin> [<file.bin> ...]")
 		os.Exit(1)
 	}
+	exit := 0
 	for _, path := range os.Args[1:] {
 		if err := catFile(path); err != nil {
 			fmt.Fprintf(os.Stderr, "runcat: %s: %v\n", path, err)
-			os.Exit(1)
+			exit = 1
 		}
 	}
+	os.Exit(exit)
 }
 
 func catFile(path string) error {
@@ -51,7 +53,7 @@ func catFile(path string) error {
 	fmt.Printf("# keylo=%s keyhi=%s\n", hdr.KeyLo, hdr.KeyHi)
 
 	// CRC check.
-	crcStatus := crcCheck(path)
+	crcStatus, crcOK := crcCheck(path)
 	fmt.Printf("# CRC: %s\n", crcStatus)
 
 	f, err := os.Open(path)
@@ -119,14 +121,20 @@ func catFile(path string) error {
 	}
 
 	fmt.Printf("# total: %d records\n", count)
+	if !crcOK {
+		// The mismatch was already printed on the "# CRC:" line; surface it as a
+		// process failure so a corrupt run file can't pass unnoticed (exit 0).
+		return fmt.Errorf("CRC mismatch")
+	}
 	return nil
 }
 
-// crcCheck verifies the stored FNV-1a-64 CRC against the body bytes.
-func crcCheck(path string) string {
+// crcCheck verifies the stored FNV-1a-64 CRC against the body bytes, returning a
+// human-readable status and whether it matched.
+func crcCheck(path string) (status string, ok bool) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return fmt.Sprintf("ERROR: %v", err)
+		return fmt.Sprintf("ERROR: %v", err), false
 	}
 	// Find header end: first \n\n.
 	start := -1
@@ -137,15 +145,15 @@ func crcCheck(path string) string {
 		}
 	}
 	if start < 0 || len(data)-start < 8 {
-		return "ERROR: cannot locate body"
+		return "ERROR: cannot locate body", false
 	}
 	body := data[start : len(data)-8]
 	stored := binary.LittleEndian.Uint64(data[len(data)-8:])
 	computed := fnv1a64(body)
 	if computed == stored {
-		return "OK"
+		return "OK", true
 	}
-	return fmt.Sprintf("MISMATCH: computed=%016x stored=%016x", computed, stored)
+	return fmt.Sprintf("MISMATCH: computed=%016x stored=%016x", computed, stored), false
 }
 
 const fnvOffset uint64 = 14695981039346656037
