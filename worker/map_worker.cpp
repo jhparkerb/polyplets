@@ -19,9 +19,14 @@
 #include "core/libenum.h"
 #include "worker/worker_util.h"
 
-// ─── SIGTERM handling ─────────────────────────────────────────────────────────
-// map_shard_file checks this flag after each spill and may abort early in M2+.
-// For M1, we just let the current operation complete naturally.
+// ─── SIGTERM handling: cooperative work-stealing stop (DESIGN 08, T2.3) ──────
+// The orchestrator raises SIGTERM to ask this straggler to stop EARLY and hand
+// its remaining key-range to idle cores.  map_shard_file watches g_terminate,
+// stops reading at the next key boundary (the cursor), and finalizes a fully
+// valid sorted output over [lo, cursor); the cursor comes back in stop_key.
+// This is a clean, successful exit (status 0) — distinct from a hard SIGKILL
+// (used by the orchestrator's ctx-cancel for checkpoint/shutdown), which is
+// uncatchable and discards the partial column for a later --resume.
 static volatile std::sig_atomic_t g_terminate = 0;
 static void on_sigterm(int) { g_terminate = 1; }
 
@@ -99,28 +104,33 @@ int main(int argc, char** argv) {
   };
 
   size_t spill_bytes, out_recs;
+  std::string stop_key;  // set iff SIGTERM stopped us early (work-stealing cursor)
 
   if (holes) {
     if (counter_arg == "u128") {
       HolesRow<u128> hrow(H, maxn, maxholes);
       std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyHoles>(
-          in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev, on_progress);
+          in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev, on_progress,
+          &g_terminate, &stop_key);
       printHolesRows(H, maxn, hrow.byNHoles);
     } else {
       HolesRow<u64> hrow(H, maxn, maxholes);
       std::tie(spill_bytes, out_recs) = map_shard_file<u64, ClassifyHoles>(
-          in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev, on_progress);
+          in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev, on_progress,
+          &g_terminate, &stop_key);
       printHolesRows(H, maxn, hrow.byNHoles);
     }
   } else if (counter_arg == "u128") {
     TriangleRow<u128> triangle(H, maxn);
     std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyTriangle>(
-        in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev, on_progress);
+        in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev, on_progress,
+        &g_terminate, &stop_key);
     printTriangleRows(H, maxn, triangle.row);
   } else {
     TriangleRow<u64> triangle(H, maxn);
     std::tie(spill_bytes, out_recs) = map_shard_file<u64, ClassifyTriangle>(
-        in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev, on_progress);
+        in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev, on_progress,
+        &g_terminate, &stop_key);
     printTriangleRows(H, maxn, triangle.row);
   }
 
@@ -128,10 +138,14 @@ int main(int argc, char** argv) {
   const double wall_s = wallSeconds() - t0_wall;
   const double rss_mb = peakRssMB();
 
-  // Emit accounting line.
+  // Emit accounting line.  stop_key is non-empty iff we stopped early at a
+  // work-stealing cursor: the output covers [lo, stop_key) and the orchestrator
+  // requeues [stop_key, hi).  Empty stop_key = ran to natural completion.
   std::printf("event=done cpu_s=%.3f wall_s=%.3f peak_rss_mb=%.1f "
-              "records=%zu spill_bytes=%zu\n",
-              cpu_s, wall_s, rss_mb, out_recs, spill_bytes);
+              "records=%zu spill_bytes=%zu stop_key=%s\n",
+              cpu_s, wall_s, rss_mb, out_recs, spill_bytes, stop_key.c_str());
 
-  return g_terminate ? 1 : 0;
+  // A cooperative early stop is a SUCCESS (status 0): the partial output is
+  // complete and valid over its range.  Only a real failure returns nonzero.
+  return 0;
 }

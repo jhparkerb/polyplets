@@ -190,6 +190,149 @@ func SampleKeysMulti(paths []string, H, numCuts int) ([]string, error) {
 	return out, nil
 }
 
+// SplitRangeByIndex picks numCuts keys that divide (loHex, hiHex) into
+// numCuts+1 roughly record-equal sub-ranges, for splitting a work-stealing
+// straggler's remaining range across idle cores.  It reads only the sparse
+// .idx sidecars (one entry per 64 records), never the run bodies, so it is
+// cheap even on a multi-GB frontier — steals happen in the column tail, and
+// re-reading the frontier per steal would defeat the purpose.
+//
+// Cuts are strictly inside (lo, hi) and ascending, so every sub-range is
+// non-empty.  Returns fewer than numCuts (possibly zero) when the indexes hold
+// too few in-range samples to cut finely — the caller then steals less (or not
+// at all), which is the correct degenerate behaviour.
+func SplitRangeByIndex(frontier []string, H int, loHex, hiHex string, numCuts int) ([]string, error) {
+	if numCuts <= 0 {
+		return nil, nil
+	}
+	keyLen := H + 2
+	loB, hasLo := hexBytes(loHex, keyLen)
+	hiB, hasHi := hexBytes(hiHex, keyLen)
+
+	// Gather in-range index keys across all frontier files. Frontier (merge
+	// output) files are disjoint key ranges, so a simple sorted union of their
+	// in-range index keys is record-balanced (uniform 1-per-64 stride per file).
+	var keys []string
+	seen := make(map[string]bool)
+	for _, p := range frontier {
+		ks, err := indexKeysInRange(p+".idx", keyLen, loB, hasLo, hiB, hasHi)
+		if err != nil {
+			continue // missing/short index → just contributes no cut candidates
+		}
+		for _, k := range ks {
+			if !seen[k] {
+				seen[k] = true
+				keys = append(keys, k)
+			}
+		}
+	}
+	if len(keys) == 0 {
+		return nil, nil
+	}
+	sort.Strings(keys)
+
+	if len(keys) <= numCuts {
+		return keys, nil
+	}
+	out := make([]string, numCuts)
+	stride := len(keys) / (numCuts + 1)
+	if stride < 1 {
+		stride = 1
+	}
+	for i := range out {
+		idx := (i + 1) * stride
+		if idx >= len(keys) {
+			idx = len(keys) - 1
+		}
+		out[i] = keys[idx]
+	}
+	return out, nil
+}
+
+// indexKeysInRange reads a .idx sidecar and returns the hex keys that fall in
+// (lo, hi) — strictly greater than lo (a cut equal to lo would leave an empty
+// first piece) and, if hi is set, strictly less than hi.
+// Sidecar format (native byte order): [u32 keyLen][u64 count]{key[keyLen], u64 offset, u64 recidx}*.
+func indexKeysInRange(idxPath string, keyLen int, lo []byte, hasLo bool, hi []byte, hasHi bool) ([]string, error) {
+	f, err := os.Open(idxPath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	br := bufio.NewReader(f)
+
+	var kl uint32
+	var cnt uint64
+	if err := binary.Read(br, binary.LittleEndian, &kl); err != nil {
+		return nil, err
+	}
+	if err := binary.Read(br, binary.LittleEndian, &cnt); err != nil {
+		return nil, err
+	}
+	if int(kl) != keyLen {
+		return nil, fmt.Errorf("idx keyLen %d != %d", kl, keyLen)
+	}
+	entry := make([]byte, int(kl)+16) // key + u64 offset + u64 recidx
+	key := entry[:kl]
+	var keys []string
+	for i := uint64(0); i < cnt; i++ {
+		if _, err := io.ReadFull(br, entry); err != nil {
+			break
+		}
+		if hasLo && bytesCompare(key, lo) <= 0 {
+			continue
+		}
+		if hasHi && bytesCompare(key, hi) >= 0 {
+			continue
+		}
+		keys = append(keys, bytesToHex(key))
+	}
+	return keys, nil
+}
+
+// hexBytes decodes a hex key to keyLen bytes; ok=false for an empty/short hex
+// (an open range end).
+func hexBytes(hexStr string, keyLen int) ([]byte, bool) {
+	if len(hexStr) != keyLen*2 {
+		return nil, false
+	}
+	b := make([]byte, keyLen)
+	for i := 0; i < keyLen; i++ {
+		var hi, lo byte
+		if !hexNibble(hexStr[i*2], &hi) || !hexNibble(hexStr[i*2+1], &lo) {
+			return nil, false
+		}
+		b[i] = hi<<4 | lo
+	}
+	return b, true
+}
+
+func hexNibble(c byte, out *byte) bool {
+	switch {
+	case c >= '0' && c <= '9':
+		*out = c - '0'
+	case c >= 'a' && c <= 'f':
+		*out = c - 'a' + 10
+	case c >= 'A' && c <= 'F':
+		*out = c - 'A' + 10
+	default:
+		return false
+	}
+	return true
+}
+
+func bytesCompare(a, b []byte) int {
+	for i := 0; i < len(a) && i < len(b); i++ {
+		if a[i] != b[i] {
+			if a[i] < b[i] {
+				return -1
+			}
+			return 1
+		}
+	}
+	return len(a) - len(b)
+}
+
 // VerifyCRC reads a POLYRUN file and checks its FNV-1a-64 body CRC.
 // A mismatch is fatal: corrupt data must never silently proceed.
 func VerifyCRC(path string) error {

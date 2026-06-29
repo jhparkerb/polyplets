@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -24,6 +25,7 @@ type SweepConfig struct {
 	Cores           int           // max concurrent workers
 	UnitMult        int           // MAP work units per core (default 1); units = Cores*UnitMult, concurrency stays Cores
 	MergeMult       int           // MERGE ranges per core (0 = follow UnitMult); set low to cut the (cores*mult)^2 merge fan-in
+	StealGrain      float64       // map work-stealing grain as a fraction of a core's fair share (0 = off; design sweet spot ≈ 0.05). When a core idles in the column tail, the longest-remaining unit is stopped at a cursor and its remainder split across idle cores.
 	OverlapHeights  int           // heights to sweep CONCURRENTLY sharing one Cores-wide pool (0/1 = sequential). Hides one height's low-util merge behind another's map. No mid-run checkpoint in this mode.
 	RAM             uint64        // bytes per map_worker spill budget
 	RunDir          string        // directory for all run files
@@ -388,7 +390,46 @@ func sweepHeight(
 	return hTri, acct, nil
 }
 
-// mapPhase runs one map_worker per key-range unit in parallel.
+// mapUnit is one key-range work item: process [lo, hi) of the source frontier.
+type mapUnit struct {
+	idx      int
+	lo, hi   string // hex key bounds; "" = open end
+	estTotal uint64 // estimated input records in [lo,hi) — drives the grain floor
+	noSteal  bool   // un-splittable remnant of an earlier steal; never steal again
+}
+
+// runningUnit tracks an in-flight map unit so the stealer can size its remaining
+// work and signal it to stop at a cursor.
+type runningUnit struct {
+	u         mapUnit
+	processed *atomic.Uint64 // cumulative input records this worker has consumed
+	stop      chan struct{}  // closed once to request a cooperative stop
+	stopped   bool           // guarded by the scheduler mutex; set when stop is closed
+}
+
+// remaining estimates the input records this unit has left (clamped at 0).
+func (r *runningUnit) remaining() uint64 {
+	p := r.processed.Load()
+	if p >= r.u.estTotal {
+		return 0
+	}
+	return r.u.estTotal - p
+}
+
+// mapPhase maps the source frontier to the next column via a dynamic work-stealing
+// pool (DESIGN 08, T2.3).  numUnits = Cores*UnitMult key-range units seed a pull
+// queue worked by Cores goroutines.  When the queue drains and a core goes idle
+// while another unit is still grinding (the straggler tail), the idle worker
+// signals the longest-remaining unit to stop at a key cursor; that unit finalizes
+// a valid output over [lo,cursor) and the remainder [cursor,hi) is split across
+// the idle cores.  Splitting the RUNNING straggler's cursor — not a finer static
+// cut — is what the design shows is necessary (heaviness concentrates by key, so
+// static subdivision isolates rather than divides it).  Result-invariant: the
+// merge recombines by output key regardless of how input work was partitioned.
+//
+// Stealing is gated on cfg.StealGrain>0 and disabled under overlap (where the
+// shared pool's idle-core accounting wouldn't be local).  With it off, this is a
+// plain pull queue — the same work partition as before.
 func mapPhase(
 	ctx context.Context,
 	cfg SweepConfig,
@@ -398,86 +439,209 @@ func mapPhase(
 	sem chan struct{},
 ) ([]string, []map[int]map[int]uint64, Acct, error) {
 
-	// Units are decoupled from concurrency: numUnits = Cores*UnitMult finer
-	// key-ranges, but the semaphore below still caps concurrency at Cores.
-	// Finer units let a core that finishes early pull the next queued unit
-	// instead of idling to the barrier (approximates work-stealing).
 	numUnits := cfg.Cores * unitMult(cfg)
 	if numUnits < 1 {
 		numUnits = 1
 	}
-
 	cuts, err := SampleKeysMulti(frontier, H, numUnits-1)
 	if err != nil {
 		return nil, nil, Acct{}, err
 	}
 	los, his := cutsToBounds(cuts)
-	actualUnits := len(los)
+	n0 := len(los)
 
-	type unitResult struct {
-		idx     int
-		outPath string
-		result  WorkerResult
-		err     error
+	// Grain floor in records: don't steal a remnant smaller than StealGrain of a
+	// core's fair share (design sweet spot ≈ 0.05).  0 ⇒ stealing off.
+	frontierIn := sumFrontierRecords(frontier)
+	var grainRecs uint64
+	stealOn := cfg.StealGrain > 0 && cfg.Cores > 1 && cfg.OverlapHeights <= 1
+	if stealOn && frontierIn > 0 {
+		grainRecs = uint64(cfg.StealGrain * float64(frontierIn) / float64(cfg.Cores))
 	}
-	results := make([]unitResult, actualUnits)
 
-	// sem (the Cores-wide worker pool) is shared across concurrently-running
-	// heights in overlap mode, so the global core budget is respected.
-	var wg sync.WaitGroup
-	for i := 0; i < actualUnits; i++ {
-		wg.Add(1)
-		go func(idx int) {
-			defer wg.Done()
-			sem <- struct{}{}
-			defer func() { <-sem }()
+	var (
+		mu          sync.Mutex
+		cond        = sync.NewCond(&mu)
+		queue       []mapUnit
+		inflight    = map[int]*runningUnit{}
+		outstanding = n0 // queued + in-flight units not yet terminal
+		nextIdx     = n0 // next unique unit id (for steal children)
+		firstErr    error
 
-			outPath := filepath.Join(cfg.RunDir,
-				fmt.Sprintf("map_h%d_c%d_u%d.bin", H, col, idx))
-			a := MapArgs{
-				InPaths:  frontier,
-				H:        H,
-				Maxn:     cfg.Maxn,
-				Fold:     cfg.Fold,
-				RAM:      cfg.RAM,
-				SpillDir: cfg.SpillDir,
-				OutPath:  outPath,
-				Counter:  cfg.CounterWidth,
-				LoHex:    los[idx],
-				HiHex:    his[idx],
-				Rev:      cfg.Rev,
+		outPaths    []string
+		triContribs []map[int]map[int]uint64
+		acct        Acct
+	)
+	estPer := uint64(1)
+	if n0 > 0 {
+		estPer = frontierIn / uint64(n0)
+	}
+	for i := 0; i < n0; i++ {
+		queue = append(queue, mapUnit{idx: i, lo: los[i], hi: his[i], estTotal: estPer})
+	}
+
+	// Cancel siblings on the first error so a failed unit doesn't leave a column
+	// half-mapped with cores still busy.
+	mctx, mcancel := context.WithCancel(ctx)
+	defer mcancel()
+
+	// pickVictim returns the longest-remaining steal-eligible in-flight unit, or
+	// nil. Caller holds mu. Eligible = making progress, not already stopped, not
+	// flagged un-splittable, and with more than a grain of work left.
+	pickVictim := func() *runningUnit {
+		if grainRecs == 0 {
+			return nil
+		}
+		var best *runningUnit
+		var bestRem uint64
+		for _, r := range inflight {
+			if r.stopped || r.u.noSteal || r.processed.Load() == 0 {
+				continue
 			}
-			r, err := RunMapWorker(ctx, cfg.Bin, a, tel.progressFunc())
-			results[idx] = unitResult{idx: idx, outPath: outPath, result: r, err: err}
-		}(i)
+			if rem := r.remaining(); rem > grainRecs && rem > bestRem {
+				bestRem, best = rem, r
+			}
+		}
+		return best
+	}
+
+	var wg sync.WaitGroup
+	for w := 0; w < cfg.Cores; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for {
+				mu.Lock()
+				for {
+					if firstErr != nil || outstanding == 0 {
+						mu.Unlock()
+						return
+					}
+					if len(queue) > 0 {
+						break
+					}
+					// Idle with work still running: become a thief — nominate the
+					// fattest straggler to stop, then wait for its children.
+					if v := pickVictim(); v != nil {
+						v.stopped = true
+						close(v.stop)
+					}
+					cond.Wait()
+				}
+				u := queue[len(queue)-1]
+				queue = queue[:len(queue)-1]
+				r := &runningUnit{u: u, processed: new(atomic.Uint64), stop: make(chan struct{})}
+				inflight[u.idx] = r
+				mu.Unlock()
+
+				sem <- struct{}{}
+				outPath := filepath.Join(cfg.RunDir,
+					fmt.Sprintf("map_h%d_c%d_u%d.bin", H, col, u.idx))
+				a := MapArgs{
+					InPaths: frontier, H: H, Maxn: cfg.Maxn, Fold: cfg.Fold,
+					RAM: cfg.RAM, SpillDir: cfg.SpillDir, OutPath: outPath,
+					Counter: cfg.CounterWidth, LoHex: u.lo, HiHex: u.hi, Rev: cfg.Rev,
+				}
+				res, runErr := RunMapWorker(mctx, cfg.Bin, a, unitProgress(tel, r.processed), r.stop)
+				<-sem
+
+				mu.Lock()
+				delete(inflight, u.idx)
+				if runErr != nil {
+					if firstErr == nil {
+						firstErr = fmt.Errorf("unit %d [%s,%s): %w", u.idx, u.lo, u.hi, runErr)
+						mcancel()
+					}
+					cond.Broadcast()
+					mu.Unlock()
+					continue
+				}
+				if res.OutRecords > 0 {
+					outPaths = append(outPaths, outPath)
+				} else {
+					removeRun(outPath)
+				}
+				triContribs = append(triContribs, res.TriContribs)
+				acct.Add(res.Acct)
+				if os.Getenv("POLY_UNIT_LOG") != "" {
+					fmt.Printf("event=unit H=%d col=%d u=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f stop_key=%s\n",
+						H, col, u.idx, u.lo, u.hi, res.OutRecords, res.Acct.CPUS, res.Acct.WallS, res.StopKey)
+				}
+
+				// Did this unit stop early at a steal cursor? If so requeue the
+				// remainder [cursor,hi), split across the idle cores.
+				if res.StopKey != "" && res.StopKey != u.hi {
+					children := splitRemainder(frontier, H, res.StopKey, u.hi,
+						cfg.Cores-len(inflight), r.remaining(), grainRecs, &nextIdx)
+					queue = append(queue, children...)
+					outstanding += len(children) - 1 // this unit done; children added
+					tel.steal()
+					if os.Getenv("POLY_UNIT_LOG") != "" {
+						fmt.Printf("event=steal H=%d col=%d victim_u=%d cursor=%s children=%d rem=%d\n",
+							H, col, u.idx, res.StopKey, len(children), r.remaining())
+					}
+				} else {
+					outstanding-- // ran to completion
+				}
+				cond.Broadcast()
+				mu.Unlock()
+			}
+		}()
 	}
 	wg.Wait()
 
-	var outPaths []string
-	var triContribs []map[int]map[int]uint64
-	var acct Acct
-	for _, ur := range results {
-		if ur.err != nil {
-			return nil, nil, Acct{}, fmt.Errorf("unit %d: %w", ur.idx, ur.err)
-		}
-		if ur.result.OutRecords > 0 {
-			outPaths = append(outPaths, ur.outPath)
-		} else {
-			removeRun(ur.outPath)
-		}
-		triContribs = append(triContribs, ur.result.TriContribs)
-		acct.Add(ur.result.Acct)
-		// Per-unit cost trace for scheduling research (#32/LPT): result-invariant,
-		// gated off by default so production logs stay clean. Records the unit's
-		// key-range and measured cost to test whether per-unit cost is predictable
-		// (e.g. column-to-column by key region).
-		if os.Getenv("POLY_UNIT_LOG") != "" {
-			fmt.Printf("event=unit H=%d col=%d u=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f\n",
-				H, col, ur.idx, los[ur.idx], his[ur.idx],
-				ur.result.OutRecords, ur.result.Acct.CPUS, ur.result.Acct.WallS)
-		}
+	if firstErr != nil {
+		return nil, nil, Acct{}, firstErr
 	}
 	return outPaths, triContribs, acct, nil
+}
+
+// splitRemainder divides a stopped straggler's remaining range [cursor,hi) into
+// up to freeCores+1 record-balanced child units (half-split when freeCores is 0).
+// It returns at least one child so no work is dropped; if the .idx samples can't
+// be cut (a narrow range), it returns the single range flagged noSteal so the
+// stealer won't thrash on it.  Each child inherits an even share of the parent's
+// remaining estimate.  Caller holds the scheduler mutex (mutates *nextIdx).
+func splitRemainder(frontier []string, H int, cursor, hi string, freeCores int,
+	remaining, grainRecs uint64, nextIdx *int) []mapUnit {
+
+	parts := freeCores + 1
+	if parts < 2 {
+		parts = 2
+	}
+	// Don't carve pieces below the grain floor.
+	if grainRecs > 0 {
+		if maxParts := int(remaining / grainRecs); maxParts >= 1 && parts > maxParts {
+			parts = maxParts
+		}
+	}
+	var cutKeys []string
+	if parts >= 2 {
+		cutKeys, _ = SplitRangeByIndex(frontier, H, cursor, hi, parts-1)
+	}
+	los, his := splitBounds(cursor, hi, cutKeys)
+	est := remaining / uint64(len(los))
+	if est == 0 {
+		est = 1
+	}
+	out := make([]mapUnit, len(los))
+	for i := range los {
+		out[i] = mapUnit{idx: *nextIdx, lo: los[i], hi: his[i], estTotal: est,
+			noSteal: len(cutKeys) == 0} // single un-splittable remnant: don't re-steal
+		*nextIdx++
+	}
+	return out
+}
+
+// splitBounds turns cut keys inside (lo,hi) into contiguous [lo,hi) sub-ranges.
+func splitBounds(lo, hi string, cuts []string) (los, his []string) {
+	los = append(los, lo)
+	for _, c := range cuts {
+		his = append(his, c)
+		los = append(los, c)
+	}
+	his = append(his, hi)
+	return los, his
 }
 
 // mergePhase merges all map outputs into a new frontier via parallel merge workers.

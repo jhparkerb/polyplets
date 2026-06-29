@@ -60,6 +60,10 @@ type telemetry struct {
 	// map units of the current column, fed by worker event=progress lines.
 	processed atomic.Uint64
 
+	// steals counts work-stealing tail-splits performed in the current column
+	// (reset per column in startColumn); surfaced in the heartbeat.
+	steals atomic.Uint64
+
 	// Reference profile for live ETA: (H,col) -> predicted wall seconds.
 	ref      map[[2]int]float64
 	refTotal float64 // Σ ref over all (H,col)
@@ -166,6 +170,29 @@ func (t *telemetry) progressFunc() func(uint64) {
 	}
 }
 
+// steal records one work-stealing tail-split in the current column.  Nil-safe.
+func (t *telemetry) steal() {
+	if t == nil {
+		return
+	}
+	t.steals.Add(1)
+}
+
+// unitProgress wraps the shared column heartbeat callback so a single map
+// worker's cumulative processed count is ALSO recorded on its own atomic — the
+// stealer reads this to size each in-flight unit's remaining work.  Always
+// returns a non-nil callback (it must capture `processed` even when telemetry
+// is nil).
+func unitProgress(t *telemetry, processed *atomic.Uint64) func(uint64) {
+	tf := t.progressFunc()
+	return func(cumulative uint64) {
+		processed.Store(cumulative)
+		if tf != nil {
+			tf(cumulative)
+		}
+	}
+}
+
 // startColumn launches a background heartbeat for the column that is about to
 // run and returns a stop function (idempotent-safe: call exactly once).  The
 // heartbeat reports elapsed time, the aggregate records/s pulse from the
@@ -177,6 +204,7 @@ func (t *telemetry) startColumn(H, col int) func() {
 		return func() {}
 	}
 	t.processed.Store(0)
+	t.steals.Store(0)
 	start := t.clock()
 	predWall, hasRef := 0.0, false
 	if t.ref != nil {
@@ -195,6 +223,7 @@ func (t *telemetry) startColumn(H, col int) func() {
 			case <-tick.C:
 				el := t.clock().Sub(start).Seconds()
 				proc := t.processed.Load()
+				steals := t.steals.Load()
 				rate := 0.0
 				if el > 0 {
 					rate = float64(proc) / el
@@ -202,11 +231,11 @@ func (t *telemetry) startColumn(H, col int) func() {
 				if hasRef {
 					frac := math.Min(el/predWall, 0.999)
 					fmt.Printf("event=heartbeat H=%d col=%d elapsed_s=%.0f processed=%d "+
-						"rate_per_s=%.0f pred_wall_s=%.0f frac=%.3f\n",
-						H, col, el, proc, rate, predWall, frac)
+						"rate_per_s=%.0f steals=%d pred_wall_s=%.0f frac=%.3f\n",
+						H, col, el, proc, rate, steals, predWall, frac)
 				} else {
 					fmt.Printf("event=heartbeat H=%d col=%d elapsed_s=%.0f processed=%d "+
-						"rate_per_s=%.0f\n", H, col, el, proc, rate)
+						"rate_per_s=%.0f steals=%d\n", H, col, el, proc, rate, steals)
 				}
 			}
 		}

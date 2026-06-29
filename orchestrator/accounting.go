@@ -34,8 +34,12 @@ type WorkerResult struct {
 	TriContribs map[int]map[int]uint64
 	OutRecords  uint64
 	SpillBytes  uint64
-	Acct        Acct
-	Err         error
+	// StopKey is non-empty iff a map_worker stopped early at a work-stealing
+	// cursor: its output covers [lo, StopKey) and the orchestrator must requeue
+	// [StopKey, hi).  Empty = the worker ran its whole [lo, hi) to completion.
+	StopKey string
+	Acct    Acct
+	Err     error
 }
 
 // ParseWorkerOutput parses all lines of worker stdout into a WorkerResult.
@@ -82,6 +86,8 @@ func parseEventDone(line string, r *WorkerResult) {
 			r.OutRecords, _ = strconv.ParseUint(v, 10, 64)
 		case "spill_bytes":
 			r.SpillBytes, _ = strconv.ParseUint(v, 10, 64)
+		case "stop_key":
+			r.StopKey = v
 		}
 	}
 }

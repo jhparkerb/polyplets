@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 )
 
 // WorkerBin holds paths to the compiled worker binaries.
@@ -54,7 +55,10 @@ type MergeArgs struct {
 // RunMapWorker spawns a map_worker, waits for it, and returns the parsed result.
 // onProgress (may be nil) is called with the worker's cumulative processed-record
 // count as event=progress lines stream in.
-func RunMapWorker(ctx context.Context, bin WorkerBin, a MapArgs, onProgress func(uint64)) (WorkerResult, error) {
+// stop (may be nil) is the work-stealing signal: when it is closed (or receives
+// a value), the worker is sent SIGTERM, which it treats as a cooperative stop —
+// it finalizes a valid partial output and reports its cursor in result.StopKey.
+func RunMapWorker(ctx context.Context, bin WorkerBin, a MapArgs, onProgress func(uint64), stop <-chan struct{}) (WorkerResult, error) {
 	fold := "0"
 	if a.Fold {
 		fold = "1"
@@ -80,7 +84,7 @@ func RunMapWorker(ctx context.Context, bin WorkerBin, a MapArgs, onProgress func
 	if a.Rev != "" {
 		args = append(args, "--rev", a.Rev)
 	}
-	return runWorker(ctx, bin.MapWorker, args, onProgress)
+	return runWorker(ctx, bin.MapWorker, args, onProgress, stop)
 }
 
 // RunMergeWorker spawns a merge_worker, waits for it, and returns the parsed result.
@@ -102,10 +106,10 @@ func RunMergeWorker(ctx context.Context, bin WorkerBin, a MergeArgs) (WorkerResu
 	if a.Rev != "" {
 		args = append(args, "--rev", a.Rev)
 	}
-	return runWorker(ctx, bin.MergeWorker, args, nil)
+	return runWorker(ctx, bin.MergeWorker, args, nil, nil)
 }
 
-func runWorker(ctx context.Context, binary string, args []string, onProgress func(uint64)) (WorkerResult, error) {
+func runWorker(ctx context.Context, binary string, args []string, onProgress func(uint64), stop <-chan struct{}) (WorkerResult, error) {
 	cmd := exec.CommandContext(ctx, binary, args...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -115,6 +119,20 @@ func runWorker(ctx context.Context, binary string, args []string, onProgress fun
 
 	if err := cmd.Start(); err != nil {
 		return WorkerResult{}, fmt.Errorf("spawn %s: %w", filepath.Base(binary), err)
+	}
+
+	// Work-stealing: forward a stop request to the worker as SIGTERM, which it
+	// catches as a cooperative early stop (exit 0 with a cursor).  The watcher
+	// exits when the process does (done is closed after Wait), so it never leaks.
+	done := make(chan struct{})
+	if stop != nil {
+		go func() {
+			select {
+			case <-stop:
+				_ = cmd.Process.Signal(syscall.SIGTERM)
+			case <-done:
+			}
+		}()
 	}
 
 	// Stream stdout live: event=progress lines feed onProgress and are NOT
@@ -132,7 +150,9 @@ func runWorker(ctx context.Context, binary string, args []string, onProgress fun
 		lines = append(lines, line)
 	}
 
-	if err := cmd.Wait(); err != nil {
+	err = cmd.Wait()
+	close(done) // release the stop watcher
+	if err != nil {
 		return WorkerResult{}, fmt.Errorf("%s: %w", filepath.Base(binary), err)
 	}
 

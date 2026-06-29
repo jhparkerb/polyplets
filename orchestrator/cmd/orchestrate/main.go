@@ -37,6 +37,7 @@ func main() {
 	cores := flag.Int("cores", runtime.NumCPU(), "max parallel workers")
 	unitMult := flag.Int("unit-mult", 1, "MAP work units per core (units = cores*unit-mult; concurrency stays cores)")
 	mergeMult := flag.Int("merge-mult", 0, "MERGE ranges per core (0 = follow --unit-mult; set low, e.g. 1, to cut merge fan-in)")
+	stealGrain := flag.Float64("steal-grain", 0, "MAP work-stealing grain as a fraction of a core's fair share (0 = off; ~0.05 recovers the straggler tail). When a core idles in the column tail, the longest-remaining unit is stopped at a key cursor and its remainder split across idle cores.")
 	overlapHeights := flag.Int("overlap-heights", 1, "heights to sweep concurrently sharing one cores-wide pool (1 = sequential; >1 hides merge idle behind another height's map; no mid-run checkpoint)")
 	ram := flag.Uint64("ram", 128<<20, "map_worker spill budget in bytes")
 	counter := flag.String("counter", "u64", "counter width: u64 or u128")
@@ -100,6 +101,7 @@ func main() {
 		Cores:           *cores,
 		UnitMult:        *unitMult,
 		MergeMult:       *mergeMult,
+		StealGrain:      *stealGrain,
 		OverlapHeights:  *overlapHeights,
 		RAM:             *ram,
 		CounterWidth:    *counter,

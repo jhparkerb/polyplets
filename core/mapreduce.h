@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <csignal>
 #include <cstdio>
 #include <functional>
 #include <queue>
@@ -203,7 +204,17 @@ std::pair<size_t, size_t> map_shard_file(
     const std::string& hi_hex,
     Output& out_classified,
     const std::string& rev = "",
-    const std::function<void(size_t)>& on_progress = {}) {
+    const std::function<void(size_t)>& on_progress = {},
+    const volatile std::sig_atomic_t* stop_flag = nullptr,
+    std::string* stop_key_hex = nullptr) {
+
+  // Work-stealing (DESIGN 08, T2.3): when the orchestrator detects this unit is
+  // the straggler holding up a column's tail, it raises *stop_flag (via SIGTERM).
+  // We finish the input key currently being merged, stop reading at the next
+  // key boundary (the cursor), and finalize a fully valid sorted output over
+  // [lo, cursor).  The orchestrator requeues [cursor, hi) to idle cores.  The
+  // map output is unchanged (merge recombines by output key), so this is
+  // result-invariant — only the partition of work across processes differs.
 
   const int H      = cfg.H;
   const int maxn   = cfg.maxn;
@@ -216,11 +227,19 @@ std::pair<size_t, size_t> map_shard_file(
   bool has_lo = !lo_hex.empty() && hexToBytes(lo_hex, lo_sig, keyLen);
   bool has_hi = !hi_hex.empty() && hexToBytes(hi_hex, hi_sig, keyLen);
 
-  // Open all input files.
+  // Open all input files.  If this is a bounded unit, seek each reader to lo via
+  // the sparse .idx sidecar (same as mergeRunFiles): a key-range unit then skips
+  // its [start, lo) prefix instead of scanning+discarding it.  This makes the
+  // base case cheaper AND keeps work-stealing cheap — a requeued [cursor, hi)
+  // sub-unit seeks straight to cursor rather than re-reading the whole prefix.
+  // seekToKey lands at-or-before lo (no index → no-op); the range filter below
+  // remains the exact correctness boundary.
   std::vector<std::unique_ptr<RunFileReader<W>>> readers;
   readers.reserve(in_paths.size());
-  for (const auto& p : in_paths)
+  for (const auto& p : in_paths) {
     readers.push_back(std::make_unique<RunFileReader<W>>(p, H, keyLen));
+    if (has_lo) readers.back()->seekToKey(lo_sig);
+  }
 
   // K-way heap over RunFileReaders.
   struct FileCursor {
@@ -271,10 +290,30 @@ std::pair<size_t, size_t> map_shard_file(
   // Stream records from heap, apply map logic.
   size_t processed = 0;
   while (!heap.empty()) {
-    // Periodic progress pulse (~every 2^18 source keys); the callback throttles
+    // Periodic progress pulse (~every 2^14 source keys); the callback throttles
     // by wall time and emits event=progress.  Cheap: a mask test per iteration.
-    if (on_progress && (++processed & ((1u << 18) - 1)) == 0)
+    // The stride is well below a typical unit's key count so even slow,
+    // heavy-per-key units pulse — the orchestrator needs that signal both for
+    // the heartbeat and to size in-flight units for work-stealing.
+    if (on_progress && (++processed & ((1u << 14) - 1)) == 0) {
       on_progress(processed);
+      // Cooperative stop point (work-stealing): break at a key boundary so the
+      // output covers [lo, cursor) exactly.  Checked on the same throttle as
+      // progress so the per-iteration cost stays a single mask test.
+      if (stop_flag && *stop_flag && stop_key_hex) {
+        const uint8_t* cur = heap.top().rec.sig.b;
+        // Past the upper bound already → nothing left in range; ran to completion.
+        if (has_hi && std::memcmp(cur, hi_sig, static_cast<size_t>(keyLen)) >= 0)
+          break;
+        // Before the lower bound → no in-range work done yet; requeue [lo, hi)
+        // whole (report lo) so we neither double-count nor leave a gap.
+        if (has_lo && std::memcmp(cur, lo_sig, static_cast<size_t>(keyLen)) < 0)
+          *stop_key_hex = lo_hex;
+        else
+          *stop_key_hex = bytesToHex(cur, keyLen);
+        break;
+      }
+    }
 
     FileCursor top = heap.top();
     heap.pop();
