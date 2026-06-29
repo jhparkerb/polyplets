@@ -141,7 +141,7 @@ ns-gate-fast: ns-gate-closedform ns-gate-math ns-gate-runfile ns-gate-go
 # incident lacked. Add a case here whenever a new closed form or conservation law
 # is established (see docs/engineering-standards.md).
 ns-gate-closedform:
-	go test ./orchestrator/ -run 'TestTopHeight|TestLowHeight' -count=1
+	go test ./orchestrator/ -run 'TestTopHeight|TestLowHeight|TestPoleHeight' -count=1
 
 # Point git at the committed hooks dir so the pre-push gate runs without copying
 # anything into .git. Idempotent; re-run once after cloning.

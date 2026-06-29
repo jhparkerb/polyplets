@@ -185,6 +185,14 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			continue
 		}
 
+		// Pole strip H==maxn-1 is closed-form (C1, proven); contribute it
+		// directly — it is ~24% of run wall. (maxn>=4 keeps H=maxn-1>=3 distinct
+		// from the H=1/H=2 low strips and 3^(maxn-4) non-negative.)
+		if H == maxn-1 && maxn >= 4 {
+			contributePoleHeight(maxn, triangle, cfg)
+			continue
+		}
+
 		// Trivial low strips H==1 and H==2 also have closed forms (C2);
 		// contribute them directly instead of spawning a worker per column.
 		if H == 1 || H == 2 {
@@ -262,10 +270,22 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 			}
 			defer func() { <-heightSem }()
 
-			// Top strip: closed-form diagonal, no map/merge (see Run).
+			// Closed-form strips: contribute directly, no map/merge (see Run).
 			if H == cfg.Maxn {
 				mu.Lock()
 				contributeTopHeight(cfg.Maxn, triangle, cfg)
+				mu.Unlock()
+				return
+			}
+			if H == cfg.Maxn-1 && cfg.Maxn >= 4 {
+				mu.Lock()
+				contributePoleHeight(cfg.Maxn, triangle, cfg)
+				mu.Unlock()
+				return
+			}
+			if H == 1 || H == 2 {
+				mu.Lock()
+				contributeLowHeight(H, cfg.Maxn, triangle, cfg)
 				mu.Unlock()
 				return
 			}
@@ -904,6 +924,42 @@ func contributeLowHeight(H, maxn int, triangle []uint64, cfg SweepConfig) {
 	row := lowHeightRow(H, maxn)
 	for n := 1; n <= maxn && n < len(triangle); n++ {
 		triangle[n] += row[n]
+	}
+	if cfg.PerHeightOut != "" {
+		if werr := writePerHeight(cfg.PerHeightOut, H, maxn, row); werr != nil {
+			fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
+		}
+	}
+}
+
+// pow3 returns 3^k for k>=0 (0 for k<0).
+func pow3(k int) uint64 {
+	v := uint64(1)
+	for i := 0; i < k; i++ {
+		v *= 3
+	}
+	return v
+}
+
+// contributePoleHeight adds the closed-form pole strip H=maxn-1 to the triangle
+// (and writes its per-height row), doing no map/merge. The strip occupies n in
+// {maxn-1, maxn}:
+//
+//	T(maxn-1, maxn-1) = 3^(maxn-2)              (the diagonal, = T(H,H))
+//	T(maxn,   maxn-1) = (25*maxn-45)*3^(maxn-4) (C1, proven; docs/proofs/T-n-nm1.md)
+//
+// Caller guarantees maxn>=4. ns-gate-closedform pins both formulas against the
+// triangle so a derivation error can never reach a result.
+func contributePoleHeight(maxn int, triangle []uint64, cfg SweepConfig) {
+	H := maxn - 1
+	row := make([]uint64, maxn+1)
+	row[H] = pow3(maxn - 2)
+	row[maxn] = uint64(25*maxn-45) * pow3(maxn-4)
+	if H < len(triangle) {
+		triangle[H] += row[H]
+	}
+	if maxn < len(triangle) {
+		triangle[maxn] += row[maxn]
 	}
 	if cfg.PerHeightOut != "" {
 		if werr := writePerHeight(cfg.PerHeightOut, H, maxn, row); werr != nil {
