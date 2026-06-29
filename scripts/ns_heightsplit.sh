@@ -22,7 +22,7 @@ RAM_GB="${4:?ram budget per worker, GB}"
 RUNROOT="${5:?run root dir}"
 UNIT_MULT="${6:-1}"
 REF_PROFILE="${7:-}"
-STEAL_GRAIN="${8:-0}"   # >0 (e.g. 0.05) recovers the column straggler tail; 0 = off
+STEAL_GRAIN="${8:-${STEAL_GRAIN:-0}}"   # arg8 or $STEAL_GRAIN env; >0 (e.g. 0.05) recovers the straggler tail; 0 = off
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOST="$(hostname -s)"
