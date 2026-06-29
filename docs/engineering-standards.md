@@ -45,17 +45,18 @@ form*. Anything we can state as an invariant is a free, fast tripwire.
   Ship the tripwire *with* the fix; a fix without a regression test is how the
   same bug comes back. (The audit campaign retrofitted this 20×; do it up front.)
 
-## 4. (OPEN) Don't run a record job from an uncommitted build
+## 4. Don't run a record job from a stale or uncommitted build
 
-*Not yet adopted — enforcement undecided.* The A1 incident's root was a fix that
-existed but was never committed, so it never reached the deployment. The build
-already stamps `GIT_REV` with a `-dirty` suffix when the tree differs from HEAD.
-Two candidate enforcements, to be chosen:
-- a checklist line in [job-checklist.md](job-checklist.md) (provenance section)
-  — "binary rev is clean, not `-dirty`"; lightweight, fits the existing
-  pre-launch ritual; or
-- a startup guard in `orchestrate` that refuses a real run on a `-dirty` rev
-  unless `--allow-dirty` — stronger, but easy to habitually bypass.
+The A1 incident's root was a fix that existed but was never committed, so it
+never reached the deployment (a remote box ran a clean-but-*stale* binary). The
+build stamps `GIT_REV` with `-dirty` when the tree differs from HEAD.
+
+Enforced as a **pre-launch checklist gate**, not a code guard — chosen
+deliberately: a code guard you bypass with `--allow-dirty` every time trains you
+to ignore it, and a code guard can't catch the clean-but-stale-remote case that
+actually bit us (only a human verifying "is my fix *in* this binary?" can). See
+[job-checklist.md](job-checklist.md) item 4: before any run whose result you keep,
+confirm the deployed binary's rev is clean **and** contains the change you intend.
 
 ## What these do NOT cover
 

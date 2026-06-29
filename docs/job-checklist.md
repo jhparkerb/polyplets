@@ -32,6 +32,17 @@ purpose, lost provenance.** Don't launch until every box is checked.
    should do the same (cheap via `obs.py`) but it's nice-to-have, not a gate.
    Binaries go in `build/`, never `/tmp`. See `docs/observability.md`.
 
+   - **Clean, current rev — explicit gate for any run whose result you'll keep.**
+     Before launching, read the *deployed* binary's stamped `GIT_REV` and confirm
+     it is **(a) clean** — no `-dirty` suffix (a `-dirty` stamp means uncommitted
+     changes that won't survive the run) — **and (b) actually contains the change
+     you intend to run.** (b) is the one that bit us: the **A1 incident**
+     (AUDIT-2026-06-28) was a correct fix sitting *uncommitted* on one host while
+     a remote box ran a clean-but-*stale* binary with the old behavior. After any
+     engine edit: commit, then rebuild+redeploy on the target box (a stale binary
+     silently ignores new flags/fixes), then re-read the rev. A clean stamp that
+     doesn't match HEAD-with-your-fix is the same failure wearing a clean suit.
+
 5. **Recoverable — long/important jobs MUST checkpoint and resume.** Not optional:
    a kill or a lost conflict must cost one unit, not the whole run. A job that
    can't checkpoint is **badly behaved — a defect to fix before running it long,
