@@ -123,8 +123,16 @@ NS_HEADERS = $(wildcard core/*.h)
 build/ns:
 	mkdir -p build/ns
 
-# ns-gates: all new-system gates
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128
+# ns-gates: all new-system gates. Includes the runfile-format, holes, verify,
+# height-split, and full-Go-suite gates that existed but were not wired in, so a
+# regression in those paths (BUGS-OF-SHAME A4/A5/B*/D6) can't rot undetected.
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-runfile ns-gate-holes ns-gate-verify ns-gate-split
+
+# Full Go test suite: orchestrator (sweep/guards/combine/runcat/topheight/
+# lowheight/resume) + verify (CRC backstop). Locks in the campaign's Go gates,
+# including the combine-integrity checks (A5) — no separate ns-gate-combine.
+ns-gate-go:
+	go test ./orchestrator/... ./verify/...
 
 ns-gate-math: build/ns/gate_math
 	./build/ns/gate_math
