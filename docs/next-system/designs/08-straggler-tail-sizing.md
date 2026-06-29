@@ -75,6 +75,18 @@ the dominant straggler that reordering can only *move*. This is the canonical
 non-clairvoyant result (Blumofe–Leiserson work-stealing; MapReduce speculative
 execution): when sizes are unpredictable, go reactive, not predictive.
 
+> **Caveat (BUGS-OF-SHAME D2): the 86–97% is an idealized-sim upper bound, not
+> what the shipped trigger delivers.** `sched_sim.py` assumes a steal can fire
+> the instant a core idles. The shipped trigger (`mapPhase`, T2.3) only nominates
+> a victim when the **queue drains** — and a high `--unit-mult` keeps the queue
+> full, so stealing never engages until the very end. The a(17) A/B confirms it:
+> at unit-mult=4 stealing recovered only **~0.3%** of map-wall (queue never
+> drained), versus the continuous engagement the sim assumes. The win is real
+> **only at low unit-mult** (mult=1, where the queue drains early and stealing
+> runs through the tail). So: run the steal regime at **unit-mult=1**, and read
+> 86–97% as the ceiling, not the delivered number. The unit-mult × stealing
+> interaction is not modelled in `sched_sim.py`.
+
 ## Finding 5 — finer static units (unit-mult) make it WORSE, not better
 
 The roadmap gated work-stealing on "only if high unit-mult can't fix the tail."

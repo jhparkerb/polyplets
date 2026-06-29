@@ -129,3 +129,14 @@ work-stealing, it doesn't replace it. Unproven; test by adding a budget proxy to
 4. Tail unit-capping (remove the over-partition tax) — cheap, do alongside.
 The atomic H_max·col2 floor bounds all of it; intra-column distribution stays parked
 for a real cluster (a24+).
+
+> **Caveat (BUGS-OF-SHAME D5): `--overlap-heights` (lever 3) forfeits BOTH
+> checkpointing and work-stealing — don't recommend it for a multi-day record
+> run unmodified.** `runOverlap` uses `noopCkpt` (no mid-run checkpoint: a crash
+> re-runs every in-flight height from scratch), and stealing is gated
+> `OverlapHeights<=1` (so lever 3 disables lever 2). "On failure re-run" violates
+> the bounded-loss NFR for an a(22)/a(23) run measured in days. Before overlap is
+> a real throughput lever it needs resumable in-flight heights (deferred) or must
+> be confined to short heights whose re-run cost is acceptable. Also note lever 2
+> here is "~18%" because it is *map-phase-internal only*, post the seek-index
+> merge fix (06) — see the D3 note on assembling the combined post-fix budget.
