@@ -193,10 +193,11 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			continue
 		}
 
-		// Strip H==maxn-2 is closed-form (k=2, proven). maxn>=7 keeps the
-		// smallest 3-power (3^(maxn-7)) non-negative; below that it is swept.
-		if H == maxn-2 && maxn >= 7 {
-			contributeHeightNminus2(maxn, triangle, cfg)
+		// Strips H==maxn-k for k=2,3,4 are closed-form (proven diagonals). The
+		// guard maxn>=3k+1 keeps the smallest 3-power (3^(maxn-1-3k), at n=maxn)
+		// non-negative; below that the strip is swept. Frees the top 5 heights.
+		if k := maxn - H; k >= 2 && k <= 4 && maxn >= 3*k+1 {
+			contributeDiagonalStrip(maxn, k, triangle, cfg)
 			continue
 		}
 
@@ -290,9 +291,9 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 				mu.Unlock()
 				return
 			}
-			if H == cfg.Maxn-2 && cfg.Maxn >= 7 {
+			if k := cfg.Maxn - H; k >= 2 && k <= 4 && cfg.Maxn >= 3*k+1 {
 				mu.Lock()
-				contributeHeightNminus2(cfg.Maxn, triangle, cfg)
+				contributeDiagonalStrip(cfg.Maxn, k, triangle, cfg)
 				mu.Unlock()
 				return
 			}
@@ -981,24 +982,40 @@ func contributePoleHeight(maxn int, triangle []uint64, cfg SweepConfig) {
 	}
 }
 
-// contributeHeightNminus2 adds the closed-form strip H=maxn-2 (the third
-// diagonal, k=2, proven) to the triangle, doing no map/merge. The strip spans
-// n in {maxn-2, maxn-1, maxn}:
-//
-//	T(maxn-2,maxn-2) = 3^(maxn-3)                                 (diagonal)
-//	T(maxn-1,maxn-2) = (25(maxn-1)-45)*3^(maxn-5)                 (C1 at n=maxn-1)
-//	T(maxn,  maxn-2) = (625*maxn^2-2459*maxn+1134)/2 * 3^(maxn-7) (proven, n>=5)
-//
-// Caller guarantees maxn>=7 (so 3^(maxn-7)>=1). The numerator 625n^2-2459n+1134
-// is always even (n^2-n is even). ns-gate-closedform pins all three against the
-// triangle.
-func contributeHeightNminus2(maxn int, triangle []uint64, cfg SweepConfig) {
-	H := maxn - 2
+// diagonalCell returns T(n, n-j), the j-th height-diagonal, for the PROVEN
+// diagonals j=0..4 (docs/proofs/T-n-nm1.md, T-n-nm2-and-general.md). Each is a
+// degree-j polynomial in n times a power of 3; the numerators are integer-exact
+// (each is divisible by the stated denominator for all valid n). Valid for
+// n >= 2j+1 (so the 3-power exponent is non-negative); callers guarantee it.
+// int64 holds every intermediate for n up to the u64 result-pipeline cap (a25).
+func diagonalCell(n, j int) uint64 {
+	N := int64(n)
+	switch j {
+	case 0:
+		return pow3(n - 1)
+	case 1:
+		return uint64(25*N-45) * pow3(n-4)
+	case 2:
+		return uint64((625*N*N-2459*N+1134)/2) * pow3(n-7)
+	case 3:
+		return uint64((15625*N*N*N-100050*N*N+122213*N-32940)/6) * pow3(n-10)
+	case 4:
+		return uint64((390625*N*N*N*N-3596250*N*N*N+8099843*N*N-6462882*N+1752840)/24) * pow3(n-13)
+	}
+	panic("diagonalCell: unsupported diagonal j")
+}
+
+// contributeDiagonalStrip adds the closed-form strip H=maxn-k (the k-th
+// diagonal, k=0..4) to the triangle, doing no map/merge. The strip carries k+1
+// cells: T(n, maxn-k) for n=maxn-k..maxn, where the offset j=n-(maxn-k) makes
+// each cell the j-th diagonal at n, = diagonalCell(n, j). Callers guarantee
+// maxn >= 2k+1 so every cell is in its validity range.
+func contributeDiagonalStrip(maxn, k int, triangle []uint64, cfg SweepConfig) {
+	H := maxn - k
 	row := make([]uint64, maxn+1)
-	row[H] = pow3(maxn - 3)
-	row[maxn-1] = uint64(25*(maxn-1)-45) * pow3(maxn-5)
-	row[maxn] = uint64((625*maxn*maxn-2459*maxn+1134)/2) * pow3(maxn-7)
-	for _, n := range []int{H, maxn - 1, maxn} {
+	for j := 0; j <= k; j++ {
+		n := maxn - k + j
+		row[n] = diagonalCell(n, j)
 		if n < len(triangle) {
 			triangle[n] += row[n]
 		}

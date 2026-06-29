@@ -12,31 +12,26 @@ import (
 	"testing"
 )
 
-// TestHeightNm2Formula pins all three strip cells against known triangle values
-// — the correctness gate (a wrong k=2 formula is caught regardless of the proof).
+// TestHeightNm2Formula pins the proven diagonals diagonalCell(n,j), j=0..4,
+// against known triangle values (at valid n >= 3j+1) — the correctness gate:
+// a wrong diagonal formula is caught regardless of the proof.
 func TestHeightNm2Formula(t *testing.T) {
 	cases := []struct {
-		maxn               int
-		wantDiag           uint64 // T(maxn-2,maxn-2)
-		wantSub1, wantSub2 uint64 // T(maxn-1,maxn-2), T(maxn,maxn-2)
+		n, j int
+		want uint64
 	}{
-		{7, 81, 729, 7273},          // T(5,5)=3^4, T(6,5)=945? -> see below
-		{8, 243, 3510, 32193},       // T(6,6)=243, T(7,6)=3510, T(8,6)=32193
-		{21, pow3(18), 0, 0},        // diagonal only checked structurally at 21
+		{8, 0, 2187},        // T(8,8)=3^7
+		{8, 1, 12555},       // T(8,7)
+		{7, 2, 7273},        // T(7,5)
+		{8, 2, 32193},       // T(8,6)
+		{10, 3, 1134865},    // T(10,7)
+		{11, 3, 5001114},    // T(11,8)
+		{13, 4, 189262009},  // T(13,9)
+		{14, 4, 829622715},  // T(14,10)
 	}
-	// exact triangle values: maxn=7 -> T(5,5)=81, T(6,5)=945, T(7,5)=7273.
-	cases[0].wantSub1, cases[0].wantSub2 = 945, 7273
 	for _, c := range cases {
-		tri := make([]uint64, c.maxn+1)
-		contributeHeightNminus2(c.maxn, tri, SweepConfig{})
-		if tri[c.maxn-2] != c.wantDiag {
-			t.Errorf("maxn=%d diag T(%d,%d)=%d want %d", c.maxn, c.maxn-2, c.maxn-2, tri[c.maxn-2], c.wantDiag)
-		}
-		if c.wantSub1 != 0 && tri[c.maxn-1] != c.wantSub1 {
-			t.Errorf("maxn=%d T(%d,%d)=%d want %d", c.maxn, c.maxn-1, c.maxn-2, tri[c.maxn-1], c.wantSub1)
-		}
-		if c.wantSub2 != 0 && tri[c.maxn] != c.wantSub2 {
-			t.Errorf("maxn=%d T(%d,%d)=%d want %d", c.maxn, c.maxn, c.maxn-2, tri[c.maxn], c.wantSub2)
+		if got := diagonalCell(c.n, c.j); got != c.want {
+			t.Errorf("diagonalCell(%d,%d) = T(%d,%d) = %d, want %d", c.n, c.j, c.n, c.n-c.j, got, c.want)
 		}
 	}
 }
