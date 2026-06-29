@@ -129,6 +129,10 @@ func main() {
 		Bin:             bin,
 	}
 
+	if adv := orchestrator.RAMAdvisory(*ram); adv != "" {
+		fmt.Fprintln(os.Stderr, "orchestrate:", adv)
+	}
+
 	fmt.Printf("orchestrate maxn=%d fold=%v cores=%d unit_mult=%d merge_mult=%d ram=%d counter=%s run_dir=%s rev=%s\n",
 		*maxn, *fold, *cores, *unitMult, *mergeMult, *ram, *counter, *runDir, rev)
 

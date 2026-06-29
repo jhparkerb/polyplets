@@ -406,6 +406,21 @@ func CheckCounterWidth(counter string, maxn int) error {
 	return nil
 }
 
+// ramThrashFloor is the --ram below which map_worker spills constantly even on a
+// modest real sweep. The 128 MB default is fine for the small gates but thrashes
+// a real run; every launch script overrides it, so a naive direct caller gets a
+// warning rather than a silently slow run.
+const ramThrashFloor = 1 << 30 // 1 GiB
+
+// RAMAdvisory returns a non-empty warning if --ram is small enough to force
+// spill-thrash, else "".
+func RAMAdvisory(ram uint64) string {
+	if ram < ramThrashFloor {
+		return fmt.Sprintf("warning: --ram %d is below %d (1 GiB) and will spill-thrash a real sweep; pass a realistic --ram (several GiB)", ram, ramThrashFloor)
+	}
+	return ""
+}
+
 // resultPipelineMaxN is the largest maxn the Go result pipeline can hold
 // exactly. accounting (TriContribs), the triangle, combine, and verify are all
 // uint64; a(25) is the last a(n) below 2^64. Widening this path to big.Int

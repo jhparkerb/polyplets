@@ -34,6 +34,17 @@ func TestResumeConfigGuard(t *testing.T) {
 	mismatch("height-not-in-list", func(c *Checkpoint) { c.H = 5 })
 }
 
+// TestRAMAdvisory proves a spill-thrashing --ram earns a warning, while a
+// realistic value is silent.
+func TestRAMAdvisory(t *testing.T) {
+	if RAMAdvisory(128<<20) == "" {
+		t.Errorf("RAMAdvisory(128MiB) = \"\"; want a spill-thrash warning")
+	}
+	if msg := RAMAdvisory(4 << 30); msg != "" {
+		t.Errorf("RAMAdvisory(4GiB) = %q; want no warning", msg)
+	}
+}
+
 // TestResultWidthGuard proves the orchestrator refuses a maxn the uint64 result
 // pipeline cannot hold (a(25) is the last value below 2^64), regardless of
 // --counter, instead of silently dropping the overflowing tri rows in
