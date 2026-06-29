@@ -121,12 +121,22 @@ func heightFromName(path string) (int, bool) {
 	return H, err == nil
 }
 
-// addRow adds one h<H>.out file's "n value" rows into the triangle.
+// addRow adds one h<H>.out file's "n value" rows into the triangle, refusing a
+// shard that is truncated, all-zero, or carries data past maxn:
+//   - missing the n==maxn row  => truncated/corrupt (shards are written n=1..maxn
+//     atomically, so a short file is a partial rsync or disk corruption);
+//   - every count zero          => empty/zeroed shard (each height has T(H,H)>0);
+//   - a nonzero n>maxn row       => --maxn is smaller than the data, which would
+//     silently drop the high-n rows (Silent Truncator).
+// Without these, a damaged shard sums to a confidently-printed, too-low a(n).
 func addRow(path string, maxn int, triangle []uint64) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}
+	sawMaxn := false
+	nonzero := false
+	overflowN := 0
 	for _, line := range strings.Split(string(data), "\n") {
 		f := strings.Fields(line)
 		if len(f) < 2 {
@@ -134,10 +144,31 @@ func addRow(path string, maxn int, triangle []uint64) error {
 		}
 		n, e1 := strconv.Atoi(f[0])
 		v, e2 := strconv.ParseUint(f[1], 10, 64)
-		if e1 != nil || e2 != nil || n < 1 || n > maxn {
+		if e1 != nil || e2 != nil || n < 1 {
 			continue
 		}
+		if n > maxn {
+			if v != 0 && n > overflowN {
+				overflowN = n
+			}
+			continue
+		}
+		if n == maxn {
+			sawMaxn = true
+		}
+		if v != 0 {
+			nonzero = true
+		}
 		triangle[n] += v
+	}
+	if overflowN > 0 {
+		return fmt.Errorf("%s: contains n=%d > maxn=%d with a nonzero count; --maxn too small (data would be dropped)", filepath.Base(path), overflowN, maxn)
+	}
+	if !sawMaxn {
+		return fmt.Errorf("%s: missing the n=%d row (truncated/corrupt shard)", filepath.Base(path), maxn)
+	}
+	if !nonzero {
+		return fmt.Errorf("%s: all counts zero (empty/corrupt shard)", filepath.Base(path))
 	}
 	return nil
 }
