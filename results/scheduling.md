@@ -85,6 +85,16 @@ dead lever — it was blind, not ineffective, and once given a usable signal it
 delivers a substantial win on a dominant-height-alone scenario, the exact
 shape of a(24)/a(25)'s endgame.
 
+**Confirmed the win IS utilization, not some other effect** (sampled live
+worker occupancy every 0.5s, not inferred): **CPU-seconds were ~identical**
+(618.8 vs 618.5 — steal does not redo or add work) while **occupancy rose
+51.3% → 68.7%**. The occupancy timeline shows exactly why: steal=off has a
+long ragged tail repeatedly dropping to 1–3/8 cores busy (H13's imbalanced
+units finishing at different times with nothing to fill the gap); steal=on
+holds 5–8/8 through that same window before finishing sooner. With CPU-seconds
+flat, the wall reduction has nowhere else to come from — same work, spread
+across more simultaneously-busy cores.
+
 ## The irreducible floor
 
 Even at 100% bulk utilization, the wall can't drop below the tallest height's
