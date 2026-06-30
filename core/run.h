@@ -61,10 +61,21 @@ struct RunRecord {
     const int new_len = new_end - new_lo;
     assert(new_end <= 256 && "count-vec window exceeded byte range");
     std::vector<W> merged(new_len, W{0});
-    for (int i = 0; i < len; ++i)
-      merged[(lo + i) - new_lo] += counts[i];
-    for (int i = 0; i < o.len; ++i)
-      merged[(o.lo + i) - new_lo] += o.counts[i];
+    // Silent Carry: guard the accumulation against unsigned wrap. A u64 run taken
+    // past its range (a cell count > 2^64) would silently produce a wrong record;
+    // assert instead so a wrong --counter fails loud (slot < prev means it wrapped).
+    for (int i = 0; i < len; ++i) {
+      W& slot = merged[(lo + i) - new_lo];
+      W prev = slot;
+      slot += counts[i];
+      assert(slot >= prev && "count overflow in combine (need wider --counter)");
+    }
+    for (int i = 0; i < o.len; ++i) {
+      W& slot = merged[(o.lo + i) - new_lo];
+      W prev = slot;
+      slot += o.counts[i];
+      assert(slot >= prev && "count overflow in combine (need wider --counter)");
+    }
     lo = static_cast<uint8_t>(new_lo);
     len = static_cast<uint8_t>(new_len);
     counts = std::move(merged);
