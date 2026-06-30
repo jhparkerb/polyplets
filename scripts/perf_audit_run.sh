@@ -38,15 +38,23 @@ PSPID=$!
   done ) > "$LOGDIR/psi.log" &
 PSIPID=$!
 
-# perf stat over the WHOLE run, system-wide, sampled in 30s windows (avoid one
-# giant unreadable aggregate; each window's IPC/cache/branch numbers land in
-# its own block).
-( while true; do
-    timeout 30 perf stat -a -e cycles,instructions,cache-references,cache-misses,branch-instructions,branch-misses -- sleep 30 2>>"$LOGDIR/perf_stat.log" || true
-  done ) &
-PERFPID=$!
+# perf stat: test access ONCE before looping. Cloud VMs commonly wall off
+# hardware PMU counters from guests (perf_event_paranoid set restrictively, no
+# sudo to lower it) -- confirmed exactly that on dalby (paranoid=3, "No
+# supported events found"). Looping a failing perf call is pointless spam, not
+# a real busy-wait (the loop itself would never block on anything), but still
+# wasteful -- skip the whole mechanism if the one-shot probe fails.
+PERFPID=""
+if timeout 2 perf stat -a -- sleep 1 >/dev/null 2>"$LOGDIR/perf_probe.log"; then
+  ( while true; do
+      timeout 30 perf stat -a -e cycles,instructions,cache-references,cache-misses,branch-instructions,branch-misses -- sleep 30 2>>"$LOGDIR/perf_stat.log" || true
+    done ) &
+  PERFPID=$!
+else
+  echo "perf stat: hardware counters unavailable (see perf_probe.log) -- skipped" | tee "$LOGDIR/perf_stat.log"
+fi
 
-echo "monitors: vmstat=$VMPID iostat=$IOPID mpstat=$MPPID pidstat=$PSPID psi=$PSIPID perf=$PERFPID"
+echo "monitors: vmstat=$VMPID iostat=$IOPID mpstat=$MPPID pidstat=$PSPID psi=$PSIPID perf=${PERFPID:-none}"
 echo "$VMPID $IOPID $MPPID $PSPID $PSIPID $PERFPID" > "$LOGDIR/monitor_pids.txt"
 
 T0=$(date +%s)
@@ -61,7 +69,7 @@ T1=$(date +%s)
 echo "=== orchestrate exited rc=$RC after $((T1-T0))s : $(date -Iseconds) ==="
 
 # Stop the monitors.
-kill $VMPID $IOPID $MPPID $PSPID $PSIPID $PERFPID 2>/dev/null || true
+kill $VMPID $IOPID $MPPID $PSPID $PSIPID ${PERFPID:-} 2>/dev/null || true
 wait 2>/dev/null || true
 
 echo "=== done. logs in $LOGDIR, run output in $RUNDIR ==="
