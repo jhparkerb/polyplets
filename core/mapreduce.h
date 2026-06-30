@@ -142,8 +142,7 @@ Run<W> mergeRuns(std::vector<Run<W>>& runs) {
     size_t pos;
     const RunRecord<W>* rec;
     bool operator>(const Cursor& o) const {
-      return std::memcmp(rec->sig.b, o.rec->sig.b,
-                         static_cast<size_t>(rec->keyLen)) > 0;
+      return sigCmp(rec->sig.b, o.rec->sig.b, rec->keyLen) > 0;
     }
   };
 
@@ -172,8 +171,7 @@ Run<W> mergeRuns(std::vector<Run<W>>& runs) {
     // drain all equal-key records from the heap into combined
     while (!heap.empty()) {
       Cursor nxt = heap.top();
-      if (std::memcmp(combined.sig.b, nxt.rec->sig.b,
-                      static_cast<size_t>(combined.keyLen)) != 0) break;
+      if (sigCmp(combined.sig.b, nxt.rec->sig.b, combined.keyLen) != 0) break;
       heap.pop();
       combined.combine(*nxt.rec);
       ++nxt.pos;
@@ -254,8 +252,7 @@ std::pair<size_t, size_t> map_shard_file(
     RunRecord<W> rec;
     int idx;
     bool operator>(const FileCursor& o) const {
-      return std::memcmp(rec.sig.b, o.rec.sig.b,
-                         static_cast<size_t>(rec.keyLen)) > 0;
+      return sigCmp(rec.sig.b, o.rec.sig.b, rec.keyLen) > 0;
     }
   };
   using MinHeap = std::priority_queue<FileCursor, std::vector<FileCursor>,
@@ -349,11 +346,11 @@ std::pair<size_t, size_t> map_shard_file(
       if (stop_flag && *stop_flag && stop_key_hex) {
         const uint8_t* cur = heap.top().rec.sig.b;
         // Past the upper bound already → nothing left in range; ran to completion.
-        if (has_hi && std::memcmp(cur, hi_sig, static_cast<size_t>(keyLen)) >= 0)
+        if (has_hi && sigCmp(cur, hi_sig, keyLen) >= 0)
           break;
         // Before the lower bound → no in-range work done yet; requeue [lo, hi)
         // whole (report lo) so we neither double-count nor leave a gap.
-        if (has_lo && std::memcmp(cur, lo_sig, static_cast<size_t>(keyLen)) < 0)
+        if (has_lo && sigCmp(cur, lo_sig, keyLen) < 0)
           *stop_key_hex = lo_hex;
         else
           *stop_key_hex = bytesToHex(cur, keyLen);
@@ -373,16 +370,15 @@ std::pair<size_t, size_t> map_shard_file(
 
     // Range filter.
     if (has_lo &&
-        std::memcmp(top.rec.sig.b, lo_sig, static_cast<size_t>(keyLen)) < 0)
+        sigCmp(top.rec.sig.b, lo_sig, keyLen) < 0)
       continue;
     if (has_hi &&
-        std::memcmp(top.rec.sig.b, hi_sig, static_cast<size_t>(keyLen)) >= 0)
+        sigCmp(top.rec.sig.b, hi_sig, keyLen) >= 0)
       break;
 
     // Combine equal-key records from heap.
     while (!heap.empty()) {
-      if (std::memcmp(top.rec.sig.b, heap.top().rec.sig.b,
-                      static_cast<size_t>(keyLen)) != 0) break;
+      if (sigCmp(top.rec.sig.b, heap.top().rec.sig.b, keyLen) != 0) break;
       FileCursor eq = heap.top();
       heap.pop();
       top.rec.combine(eq.rec);

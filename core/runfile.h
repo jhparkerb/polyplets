@@ -360,7 +360,7 @@ class RunFileReader {
     while (a <= b) {
       long m = (a + b) / 2;
       if (!keyAt(m)) { std::fclose(f); return false; }
-      if (std::memcmp(key, klo, static_cast<size_t>(keyLen_)) <= 0) { s = m; a = m + 1; }
+      if (sigCmp(key, klo, keyLen_) <= 0) { s = m; a = m + 1; }
       else b = m - 1;
     }
     uint64_t offset = 0, recidx = 0;                       // entry s's offset + recidx
@@ -477,8 +477,7 @@ std::pair<size_t, size_t> mergeRunFiles(
     RunRecord<W> rec;
     int idx;
     bool operator>(const Cursor& o) const {
-      return std::memcmp(rec.sig.b, o.rec.sig.b,
-                         static_cast<size_t>(rec.keyLen)) > 0;
+      return sigCmp(rec.sig.b, o.rec.sig.b, rec.keyLen) > 0;
     }
   };
   using MinHeap = std::priority_queue<Cursor, std::vector<Cursor>,
@@ -514,10 +513,10 @@ std::pair<size_t, size_t> mergeRunFiles(
     }
 
     if (has_lo &&
-        std::memcmp(top.rec.sig.b, lo_sig, static_cast<size_t>(keyLen)) < 0)
+        sigCmp(top.rec.sig.b, lo_sig, keyLen) < 0)
       continue;
     if (has_hi &&
-        std::memcmp(top.rec.sig.b, hi_sig, static_cast<size_t>(keyLen)) >= 0)
+        sigCmp(top.rec.sig.b, hi_sig, keyLen) >= 0)
       break;
 
 #ifdef POLY_PROFILE
@@ -525,8 +524,7 @@ std::pair<size_t, size_t> mergeRunFiles(
     const double _tc = prof::now();
 #endif
     while (!heap.empty()) {
-      if (std::memcmp(top.rec.sig.b, heap.top().rec.sig.b,
-                      static_cast<size_t>(keyLen)) != 0) break;
+      if (sigCmp(top.rec.sig.b, heap.top().rec.sig.b, keyLen) != 0) break;
       Cursor eq = heap.top();
       heap.pop();
       top.rec.combine(eq.rec);

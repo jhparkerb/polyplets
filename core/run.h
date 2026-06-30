@@ -41,7 +41,7 @@ struct RunRecord {
 
   // True if both records share the same key (same sig bytes for keyLen).
   bool sameKey(const RunRecord& o) const {
-    return std::memcmp(sig.b, o.sig.b, static_cast<size_t>(keyLen)) == 0;
+    return sigCmp(sig.b, o.sig.b, keyLen) == 0;
   }
 
   // Merge o INTO this record (range-union + componentwise add).
@@ -165,7 +165,7 @@ inline bool deserializeRecord(const uint8_t* data, size_t size, size_t* pos,
 
 template <class W>
 inline bool recordLess(const RunRecord<W>& a, const RunRecord<W>& b) {
-  return std::memcmp(a.sig.b, b.sig.b, static_cast<size_t>(a.keyLen)) < 0;
+  return sigCmp(a.sig.b, b.sig.b, a.keyLen) < 0;
 }
 
 // The seed state of a height-sweep: the empty boundary (all-zero sig) with one
