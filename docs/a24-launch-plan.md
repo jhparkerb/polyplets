@@ -46,6 +46,11 @@ measured × g (g≈1.8): H16=81, H15=29, H14=10, H13≈4, H3–12≈3.
 
 Floor is H16-on-dalby. dalby & ayr land together ≈ **2.4 h**.
 
+> **Resourcing note:** ayr is currently running the a(23) H17/H18 cross-ISA
+> verify (do NOT preempt it — it's the independent certification of a(23)). So
+> the 3-box split is gated on that finishing. Until then, use the **dalby-solo
+> fallback** below, or wait for the watcher to report ayr free.
+
 **Home-only fallback (no dalby):** ayr `3-15` (~3 h) — H16 on ayr is 81/18.6 =
 4.4 h, so home-only is ~4.5 h. Feasible; dalby's cores earn their keep on H16.
 
