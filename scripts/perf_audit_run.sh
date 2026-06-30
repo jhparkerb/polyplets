@@ -38,14 +38,16 @@ PSPID=$!
   done ) > "$LOGDIR/psi.log" &
 PSIPID=$!
 
-# perf stat: test access ONCE before looping. Cloud VMs commonly wall off
-# hardware PMU counters from guests (perf_event_paranoid set restrictively, no
-# sudo to lower it) -- confirmed exactly that on dalby (paranoid=3, "No
-# supported events found"). Looping a failing perf call is pointless spam, not
-# a real busy-wait (the loop itself would never block on anything), but still
-# wasteful -- skip the whole mechanism if the one-shot probe fails.
+# perf stat: test access ONCE before looping. NOTE: probe with the EXACT event
+# list we intend to use, not perf's bare default group -- on dalby the bare
+# default group fails ("No supported events found", even at paranoid=0)
+# because one event in perf's default set isn't available, but the explicit
+# list below (generic hw-event aliases, which perf maps onto whatever PMU the
+# host exposes -- here, ARM PMUv3) works fine at paranoid=0. Looping a failing
+# perf call is pointless spam, not a real busy-wait (the loop itself would
+# never block on anything), but still wasteful -- skip if the probe fails.
 PERFPID=""
-if timeout 2 perf stat -a -- sleep 1 >/dev/null 2>"$LOGDIR/perf_probe.log"; then
+if timeout 2 perf stat -a -e cycles,instructions,cache-references,cache-misses,branch-instructions,branch-misses -- sleep 1 >/dev/null 2>"$LOGDIR/perf_probe.log"; then
   ( while true; do
       timeout 30 perf stat -a -e cycles,instructions,cache-references,cache-misses,branch-instructions,branch-misses -- sleep 30 2>>"$LOGDIR/perf_stat.log" || true
     done ) &
