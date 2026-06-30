@@ -14,6 +14,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -201,6 +202,13 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 				}
 			}
 		}
+		// Long-pole-first: sweep the TALLEST heights first so the critical-path
+		// height (the longest serial column chain) starts at t=0 and overlaps the
+		// whole run, instead of trailing as a lone tail at the end when nothing is
+		// left to fill the cores behind its light merges. runOverlap acquires the
+		// height pool in this order, so the order is honored deterministically.
+		pending = append([]int(nil), pending...)
+		sort.Sort(sort.Reverse(sort.IntSlice(pending)))
 		return runOverlap(ctx, cfg, pending, triangle, acct, tel, sem)
 	}
 
@@ -329,14 +337,19 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 	}
 
 	for _, H := range heights {
+		// Acquire the height-pool slot HERE, in loop order, so the long-pole-first
+		// ordering set by the caller is honored deterministically (rather than
+		// left to which goroutine the scheduler runs first). Stop launching once
+		// ctx is cancelled.
+		select {
+		case heightSem <- struct{}{}:
+		case <-ctx.Done():
+			wg.Wait()
+			return nil, context.Canceled
+		}
 		wg.Add(1)
 		go func(H int) {
 			defer wg.Done()
-			select {
-			case heightSem <- struct{}{}:
-			case <-ctx.Done():
-				return
-			}
 			defer func() { <-heightSem }()
 
 			// Closed-form strips: contribute directly, no map/merge (see Run).
