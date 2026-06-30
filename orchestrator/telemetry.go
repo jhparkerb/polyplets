@@ -10,7 +10,6 @@
 package orchestrator
 
 import (
-	"bufio"
 	"fmt"
 	"math"
 	"os"
@@ -140,7 +139,7 @@ func (t *telemetry) observe(c ColumnCost) {
 		t.emitETA()
 	}
 
-	if err := t.writeProfile(); err != nil {
+	if err := t.appendProfileRow(c); err != nil {
 		fmt.Fprintf(os.Stderr, "telemetry: write profile: %v\n", err)
 	}
 }
@@ -270,28 +269,24 @@ func (t *telemetry) emitETA() {
 		doneFrac, etaRemain, etaAt.Format(time.RFC3339), correction)
 }
 
-// writeProfile rewrites the full cost profile (atomic via temp+rename).
-func (t *telemetry) writeProfile() error {
-	tmp := t.outPath + ".tmp"
-	f, err := os.Create(tmp)
+// appendProfileRow appends one column's cost row — O(1) per column, vs the old
+// full rewrite which was O(cols²) over the run and held the lock longer (Profile
+// Rewrite). The header is written only when the file is empty, so a resumed run
+// extends the existing profile instead of truncating it to the post-resume cols.
+// Observability-only: a partial last line on a crash is harmless.
+func (t *telemetry) appendProfileRow(c ColumnCost) error {
+	f, err := os.OpenFile(t.outPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		return err
 	}
-	w := bufio.NewWriter(f)
-	fmt.Fprintf(w, "# cost_profile maxn=%d cores=%d\n", t.maxn, t.cores)
-	fmt.Fprintf(w, "# H\tcol\tfrontier_in\tfrontier_out\twall_s\tcpu_s\trss_max_mb\n")
-	for _, c := range t.cols {
-		fmt.Fprintf(w, "%d\t%d\t%d\t%d\t%.3f\t%.3f\t%.1f\n",
-			c.H, c.Col, c.FrontierIn, c.FrontierOut, c.WallS, c.CPUS, c.RSSMax)
+	defer f.Close()
+	if st, err := f.Stat(); err == nil && st.Size() == 0 {
+		fmt.Fprintf(f, "# cost_profile maxn=%d cores=%d\n", t.maxn, t.cores)
+		fmt.Fprintf(f, "# H\tcol\tfrontier_in\tfrontier_out\twall_s\tcpu_s\trss_max_mb\n")
 	}
-	if err := w.Flush(); err != nil {
-		f.Close()
-		return err
-	}
-	if err := f.Close(); err != nil {
-		return err
-	}
-	return os.Rename(tmp, t.outPath)
+	_, err = fmt.Fprintf(f, "%d\t%d\t%d\t%d\t%.3f\t%.3f\t%.1f\n",
+		c.H, c.Col, c.FrontierIn, c.FrontierOut, c.WallS, c.CPUS, c.RSSMax)
+	return err
 }
 
 // ProfileMeta holds the header fields of a cost profile.
