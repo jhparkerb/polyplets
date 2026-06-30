@@ -27,7 +27,7 @@ type SweepConfig struct {
 	UnitMult        int           // MAP work units per core (default 1); units = Cores*UnitMult, concurrency stays Cores
 	MergeMult       int           // MERGE ranges per core (0 = follow UnitMult); set low to cut the (cores*mult)^2 merge fan-in
 	StealGrain      float64       // map work-stealing grain as a fraction of a core's fair share (0 = off; design sweet spot ≈ 0.05). When a core idles in the column tail, the longest-remaining unit is stopped at a cursor and its remainder split across idle cores.
-	OverlapHeights  int           // heights to sweep CONCURRENTLY sharing one Cores-wide pool (0/1 = sequential). Hides one height's low-util merge behind another's map. No mid-run checkpoint in this mode.
+	OverlapHeights  int           // heights to sweep CONCURRENTLY sharing one Cores-wide pool (0/1 = sequential). Hides one height's low-util merge behind another's map. Checkpoints at HEIGHT boundaries (the completed-height set), not per column.
 	RAM             uint64        // bytes per map_worker spill budget
 	RunDir          string        // directory for all run files
 	SpillDir        string        // directory for map_worker internal spills
@@ -48,6 +48,11 @@ type SweepConfig struct {
 	// the run at each successive checkpoint boundary and assert that resuming
 	// from there reproduces the serial result.
 	afterColumn func(H, col int)
+
+	// afterHeight, if non-nil, is called in overlap mode after a height
+	// completes and its height-boundary checkpoint is written. Unexported test
+	// seam (overlap_resume_test.go cancels the run after the k-th completion).
+	afterHeight func(H int)
 }
 
 // SweepResult is the output of a complete run over all heights.
@@ -81,6 +86,12 @@ func checkResumeConfig(cfg SweepConfig, resume *Checkpoint, heights []int) error
 	}
 	if resume.Fold != cfg.Fold {
 		return fmt.Errorf("resume: checkpoint fold=%v != --fold %v", resume.Fold, cfg.Fold)
+	}
+	// Overlap-form checkpoint (Done set): resume skips completed heights by set
+	// membership, not by a single resume.H, so the H-in-heights check below does
+	// not apply.
+	if len(resume.Done) > 0 {
+		return nil
 	}
 	for _, H := range heights {
 		if H == resume.H {
@@ -173,7 +184,24 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	sem := make(chan struct{}, cfg.Cores)
 
 	if cfg.OverlapHeights > 1 {
-		return runOverlap(ctx, cfg, heights[startIdx:], triangle, acct, tel, sem)
+		// Resume in overlap mode is by completed-height SET: drop the Done heights
+		// (their contributions are already restored into `triangle` above) and
+		// sweep the rest. A height that was in flight at the crash is absent from
+		// Done, so it re-runs from scratch — no double-count, no gap.
+		pending := heights
+		if resume != nil && len(resume.Done) > 0 {
+			done := make(map[int]bool, len(resume.Done))
+			for _, H := range resume.Done {
+				done[H] = true
+			}
+			pending = nil
+			for _, H := range heights {
+				if !done[H] {
+					pending = append(pending, H)
+				}
+			}
+		}
+		return runOverlap(ctx, cfg, pending, triangle, acct, tel, sem)
 	}
 
 	for hi := startIdx; hi < len(heights); hi++ {
@@ -255,18 +283,50 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 // drawing from the single Cores-wide pool `sem` — so one height's
 // low-utilization merge phase overlaps another height's map phase instead of
 // idling cores. Heights are independent, so the totals are identical to the
-// sequential path; results accumulate under `mu`. No mid-run checkpoint here
-// (resuming K in-flight heights is deferred): on failure, re-run. This is the
-// throughput/benchmark path; the sequential Run loop stays the resumable
-// production path. Caller guarantees cfg.OverlapHeights >= 2.
+// sequential path; results accumulate under `mu`. Checkpoints are written at
+// HEIGHT boundaries (markDone snapshots the completed-height set + triangle);
+// resume skips the done heights and re-runs any that were in flight at the
+// crash from scratch — no mid-HEIGHT (column) resume here. Caller guarantees
+// cfg.OverlapHeights >= 2.
 func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 	triangle []uint64, acct Acct, tel *telemetry, sem chan struct{}) (*SweepResult, error) {
 
 	var mu sync.Mutex
 	var firstErr error
-	noopCkpt := func(int, int, []string, []uint64) {} // overlap mode: no mid-run checkpoint
+	noopCkpt := func(int, int, []string, []uint64) {} // overlap: no MID-height checkpoint
 	heightSem := make(chan struct{}, cfg.OverlapHeights)
 	var wg sync.WaitGroup
+
+	// Height-boundary checkpoint: heights complete out of order here, so the
+	// resumable unit is the SET of completed heights (not a single H/col). When a
+	// height finishes, markDone (caller holds mu, has already folded the height's
+	// contribution into triangle) records it and snapshots {done-set, triangle,
+	// acct} to POLYCKPT. On resume the done heights are skipped and the rest —
+	// including any that were in flight at the crash — re-run from scratch.
+	doneHeights := []int{}
+	markDone := func(H int) {
+		doneHeights = append(doneHeights, H)
+		if cfg.CheckpointPath == "" {
+			return
+		}
+		ck := &Checkpoint{
+			H: -1, Col: -1,
+			Done:     append([]int(nil), doneHeights...),
+			Triangle: append([]uint64(nil), triangle...),
+			Acct:     acct,
+			Maxn:     cfg.Maxn,
+			Counter:  counterName(cfg.CounterWidth),
+			Fold:     cfg.Fold,
+		}
+		if err := ck.Write(cfg.CheckpointPath); err != nil {
+			fmt.Fprintf(os.Stderr, "overlap checkpoint H=%d: %v\n", H, err)
+		}
+	}
+	fireAfterHeight := func(H int) {
+		if cfg.afterHeight != nil {
+			cfg.afterHeight(H)
+		}
+	}
 
 	for _, H := range heights {
 		wg.Add(1)
@@ -280,28 +340,37 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 			defer func() { <-heightSem }()
 
 			// Closed-form strips: contribute directly, no map/merge (see Run).
+			// Each is a completed height -> markDone + checkpoint under mu.
 			if H == cfg.Maxn {
 				mu.Lock()
 				contributeTopHeight(cfg.Maxn, triangle, cfg)
+				markDone(H)
 				mu.Unlock()
+				fireAfterHeight(H)
 				return
 			}
 			if H == cfg.Maxn-1 && cfg.Maxn >= 4 {
 				mu.Lock()
 				contributePoleHeight(cfg.Maxn, triangle, cfg)
+				markDone(H)
 				mu.Unlock()
+				fireAfterHeight(H)
 				return
 			}
 			if k := cfg.Maxn - H; k >= 2 && k <= 7 && cfg.Maxn >= 3*k+1 {
 				mu.Lock()
 				contributeDiagonalStrip(cfg.Maxn, k, triangle, cfg)
+				markDone(H)
 				mu.Unlock()
+				fireAfterHeight(H)
 				return
 			}
 			if H == 1 || H == 2 {
 				mu.Lock()
 				contributeLowHeight(H, cfg.Maxn, triangle, cfg)
+				markDone(H)
 				mu.Unlock()
+				fireAfterHeight(H)
 				return
 			}
 
@@ -317,19 +386,27 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 			hTri, hAcct, err := sweepHeight(ctx, cfg, H, 0, []string{seed}, noopCkpt, tel, sem)
 
 			mu.Lock()
+			// Only fold a height's contribution in (and mark it done) if it
+			// COMPLETED. A cancelled height returns a partial hTri; adding it would
+			// corrupt the triangle and, worse, leak into the next completed height's
+			// checkpoint snapshot. On error we record firstErr and leave H un-done
+			// so resume re-runs it from scratch.
+			if err != nil {
+				if firstErr == nil {
+					firstErr = fmt.Errorf("H=%d: %w", H, err)
+				}
+				mu.Unlock()
+				return
+			}
 			for n, v := range hTri {
 				if n >= 0 && n <= cfg.Maxn {
 					triangle[n] += v
 				}
 			}
 			acct.Add(hAcct)
-			if err != nil && firstErr == nil {
-				firstErr = fmt.Errorf("H=%d: %w", H, err)
-			}
+			markDone(H)
 			mu.Unlock()
-			if err != nil {
-				return
-			}
+			fireAfterHeight(H)
 			if cfg.PerHeightOut != "" {
 				if werr := writePerHeight(cfg.PerHeightOut, H, cfg.Maxn, hTri); werr != nil {
 					fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)

@@ -27,6 +27,11 @@ type Checkpoint struct {
 	H        int
 	Col      int      // last COMPLETED column (-1 = none yet)
 	Frontier []string // paths to current frontier run files
+	// Done is the SET of fully-completed heights in OVERLAP mode (where heights
+	// finish out of order, so a single H/col can't express progress). When Done
+	// is non-empty the checkpoint is the overlap form: H/Col/Frontier are unused
+	// (H=-1) and resume skips the Done heights, re-running the rest from scratch.
+	Done []int
 	// Triangle holds the accumulated Σ_H T(n,H) for all COMPLETED heights
 	// before H, plus contributions from completed columns within H.
 	// Indexed by n; len = maxn+1.
@@ -53,6 +58,13 @@ func (ck *Checkpoint) Write(path string) error {
 	fmt.Fprintf(f, "col %d\n", ck.Col)
 	fmt.Fprintf(f, "config maxn=%d counter=%s fold=%v\n", ck.Maxn, ck.Counter, ck.Fold)
 	fmt.Fprintf(f, "frontier %s\n", strings.Join(ck.Frontier, " "))
+	if len(ck.Done) > 0 {
+		ds := make([]string, len(ck.Done))
+		for i, H := range ck.Done {
+			ds[i] = strconv.Itoa(H)
+		}
+		fmt.Fprintf(f, "done %s\n", strings.Join(ds, " "))
+	}
 	fmt.Fprintf(f, "acct cpu_s=%.6f wall_s=%.6f rss_max_mb=%.3f\n",
 		ck.Acct.CPUS, ck.Acct.WallS, ck.Acct.RSSMax)
 	// Sparse triangle: only non-zero entries.
@@ -100,6 +112,12 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 		case "frontier":
 			if v != "" {
 				ck.Frontier = strings.Fields(v)
+			}
+		case "done":
+			for _, f := range strings.Fields(v) {
+				if H, err := strconv.Atoi(f); err == nil {
+					ck.Done = append(ck.Done, H)
+				}
 			}
 		case "acct":
 			parseAcct(v, &ck.Acct)
