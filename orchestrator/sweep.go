@@ -11,6 +11,7 @@ package orchestrator
 import (
 	"context"
 	"fmt"
+	"math/big"
 	"os"
 	"path/filepath"
 	"sync"
@@ -196,7 +197,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		// Strips H==maxn-k for k=2,3,4 are closed-form (proven diagonals). The
 		// guard maxn>=3k+1 keeps the smallest 3-power (3^(maxn-1-3k), at n=maxn)
 		// non-negative; below that the strip is swept. Frees the top 5 heights.
-		if k := maxn - H; k >= 2 && k <= 6 && maxn >= 3*k+1 {
+		if k := maxn - H; k >= 2 && k <= 7 && maxn >= 3*k+1 {
 			contributeDiagonalStrip(maxn, k, triangle, cfg)
 			continue
 		}
@@ -291,7 +292,7 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 				mu.Unlock()
 				return
 			}
-			if k := cfg.Maxn - H; k >= 2 && k <= 6 && cfg.Maxn >= 3*k+1 {
+			if k := cfg.Maxn - H; k >= 2 && k <= 7 && cfg.Maxn >= 3*k+1 {
 				mu.Lock()
 				contributeDiagonalStrip(cfg.Maxn, k, triangle, cfg)
 				mu.Unlock()
@@ -1016,16 +1017,16 @@ func contributePoleHeight(maxn int, triangle []uint64, cfg SweepConfig) {
 	}
 }
 
-// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..6
+// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..7
 // (docs/proofs/T-n-nm1.md, T-n-nm2-and-general.md). j=0,1,2 are proven from first
-// principles; j=3..6 are data-pinned from the a(20)/a(21) triangle (leading 25^j/j!,
-// integer-exact). Each is a degree-j polynomial in n times a power of 3; the
-// numerator is divisible by j! for all valid n (verified), so the Go integer
-// division is exact. Requires n >= 3j+1 so the exponent n-1-3j is non-negative
-// (pow3 has no negative powers); the maxn>=3k+1 strip dispatch guarantees it for
-// every injected cell. int64 holds every intermediate for n up to a25 (the u64
-// result-pipeline cap). NOTE: j=3..6 are validated at scale by the a(23) sweep
-// (its swept H=16..18 == k=5..7) before any record run injects them.
+// principles; j=3..7 are data-pinned from the triangle (leading 25^j/j!,
+// integer-exact) and VALIDATED at scale by the a(23) sweep (its swept H=16..18 ==
+// k=5..7 reproduce the formulas exactly). Each is a degree-j polynomial in n times a
+// power of 3; the numerator is divisible by j! for all valid n (verified), so the
+// integer division is exact. Requires n >= 3j+1 so the exponent n-1-3j is
+// non-negative (pow3 has no negative powers); the maxn>=3k+1 strip dispatch
+// guarantees it. j<=6 stay in int64 through a25; j=7's coefficients overflow int64
+// at n>=22, so case 7 builds the numerator in big.Int.
 func diagonalCell(n, j int) uint64 {
 	N := int64(n)
 	switch j {
@@ -1043,6 +1044,20 @@ func diagonalCell(n, j int) uint64 {
 		return uint64((9765625*N*N*N*N*N-120546875*N*N*N*N+425836625*N*N*N-650171245*N*N+422003550*N+76975920)/120) * pow3(n-16)
 	case 6:
 		return uint64((244140625*N*N*N*N*N*N-3861328125*N*N*N*N*N+19486496875*N*N*N*N-47366857935*N*N*N+55373728180*N*N+946828380*N-32099353920)/720) * pow3(n-19)
+	case 7:
+		// k=7 coefficients overflow int64 at n>=22 (6103515625*n^7 > 2^63), so the
+		// numerator is built in big.Int (Horner). P_7 is data-pinned and validated at
+		// scale by the a(23) swept H=16 row (T(23,16)=4492550651512074,
+		// T(22,15)=1035856891052731). Called only for the j=7 strip cell at
+		// n=maxn>=22, so pow3(n-22) has a non-negative exponent.
+		num := big.NewInt(6103515625)
+		for _, c := range []int64{-119765625000, 812310625000, -2839739579250, 5194366339015, -1878923357430, -6841564107480, 7756630081200} {
+			num.Mul(num, big.NewInt(N))
+			num.Add(num, big.NewInt(c))
+		}
+		num.Quo(num, big.NewInt(5040))
+		num.Mul(num, new(big.Int).SetUint64(pow3(n-22)))
+		return num.Uint64()
 	}
 	panic("diagonalCell: unsupported diagonal j")
 }

@@ -32,6 +32,8 @@ func TestHeightNm2Formula(t *testing.T) {
 		{21, 5, 40713857307270},  // T(21,16)
 		{19, 6, 5776897734667},   // T(19,13)  (k=6, data-pinned; n=3j+1 boundary)
 		{21, 6, 106805460671316}, // T(21,15)
+		{22, 7, 1035856891052731}, // T(22,15)  (k=7, big.Int; pinned+validated by a(23))
+		{23, 7, 4492550651512074}, // T(23,16)
 	}
 	for _, c := range cases {
 		if got := diagonalCell(c.n, c.j); got != c.want {
