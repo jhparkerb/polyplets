@@ -59,8 +59,17 @@ fi
 echo "monitors: vmstat=$VMPID iostat=$IOPID mpstat=$MPPID pidstat=$PSPID psi=$PSIPID perf=${PERFPID:-none}"
 echo "$VMPID $IOPID $MPPID $PSPID $PSIPID $PERFPID" > "$LOGDIR/monitor_pids.txt"
 
+# --ram is a PER-WORKER spill budget, and --cores bounds concurrent OS
+# processes, not aggregate RAM: each of up to 80 concurrent workers can
+# independently buffer up to --ram bytes before spilling. A flat "generous"
+# 8GiB here (80 x 8GiB = 640GB worst case against a 125GB box) caused a real
+# kernel OOM-kill on 2026-06-30 that took out a map_worker and, via a global
+# (non-cgroup-scoped) OOM event, the operator's entire tmux server. Sized
+# correctly now: (total_RAM * margin) / cores = (125GiB * 0.6) / 80 ~ 0.94GiB;
+# using a flat 1GiB, comfortably inside that bound. See feedback memory
+# ram-budget-divide-by-cores.
 T0=$(date +%s)
-./build/ns/orchestrate --maxn 24 --cores 80 --ram 8589934592 --unit-mult 4 \
+./build/ns/orchestrate --maxn 24 --cores 80 --ram 1073741824 --unit-mult 4 \
   --heights 1-15 --overlap-heights 15 --steal-grain 0.05 \
   --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" \
   --per-height-out "$RUNDIR/perheight" \
