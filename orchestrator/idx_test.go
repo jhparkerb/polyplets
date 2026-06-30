@@ -53,7 +53,7 @@ func TestIdxReaderSkipsCppMagicHeader(t *testing.T) {
 	if !okLo || !okHi {
 		t.Fatal("hexBytes setup failed")
 	}
-	got, err := indexKeysInRange(idxPath, keyLen, lo, true, hi, true)
+	got, err := indexKeysInRange(idxPath, keyLen, lo, true, hi, true, 10)
 	if err != nil {
 		t.Fatalf("indexKeysInRange errored on a valid C++ .idx (Magic Misread): %v", err)
 	}
@@ -65,6 +65,53 @@ func TestIdxReaderSkipsCppMagicHeader(t *testing.T) {
 		if got[i] != want[i] {
 			t.Fatalf("key %d: got %s want %s", i, got[i], want[i])
 		}
+	}
+}
+
+// TestIndexKeysInRangeBinarySearch — correctness guard for the Steal Sort fix:
+// the binary-search + stride must return only valid in-range, ascending keys.
+// (Cuts become steal-child range boundaries, so a wrong cut would miscount.)
+func TestIndexKeysInRangeBinarySearch(t *testing.T) {
+	dir := t.TempDir()
+	H := 3
+	keyLen := H + 2 // 5
+	var keys [][]byte
+	for v := 1; v <= 20; v++ {
+		keys = append(keys, []byte{0, 0, 0, 0, byte(v * 10)}) // 10,20,...,200 ascending
+	}
+	idxPath := dir + "/run.bin.idx"
+	writeCppIdx(t, idxPath, keyLen, keys)
+
+	lo, _ := hexBytes("0000000037", keyLen) // 0x37 = 55
+	hi, _ := hexBytes("000000009b", keyLen) // 0x9b = 155
+	got, err := indexKeysInRange(idxPath, keyLen, lo, true, hi, true, 4)
+	if err != nil {
+		t.Fatalf("indexKeysInRange: %v", err)
+	}
+	if len(got) == 0 || len(got) > 4 {
+		t.Fatalf("got %d keys, want 1..4: %v", len(got), got)
+	}
+	for i, h := range got {
+		b, _ := hexBytes(h, keyLen)
+		v := int(b[4])
+		if v <= 55 || v >= 155 { // strictly inside (lo, hi)
+			t.Errorf("key %s (v=%d) out of range (55,155)", h, v)
+		}
+		if v%10 != 0 { // must be one of the real index keys
+			t.Errorf("key %s (v=%d) is not a real index key", h, v)
+		}
+		if i > 0 {
+			pb, _ := hexBytes(got[i-1], keyLen)
+			if int(pb[4]) >= v {
+				t.Errorf("keys not strictly ascending: %v", got)
+			}
+		}
+	}
+	// empty range → no keys.
+	loE, _ := hexBytes("0000000045", keyLen) // 69
+	hiE, _ := hexBytes("0000000046", keyLen) // 70 (exclusive) → nothing in (69,70)
+	if e, _ := indexKeysInRange(idxPath, keyLen, loE, true, hiE, true, 4); len(e) != 0 {
+		t.Errorf("empty range returned %v", e)
 	}
 }
 

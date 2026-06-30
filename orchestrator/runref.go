@@ -269,7 +269,7 @@ func SplitRangeByIndex(frontier []string, H int, loHex, hiHex string, numCuts in
 	var keys []string
 	seen := make(map[string]bool)
 	for _, p := range frontier {
-		ks, err := indexKeysInRange(p+".idx", keyLen, loB, hasLo, hiB, hasHi)
+		ks, err := indexKeysInRange(p+".idx", keyLen, loB, hasLo, hiB, hasHi, numCuts)
 		if err != nil {
 			continue // missing/short index → just contributes no cut candidates
 		}
@@ -347,31 +347,65 @@ func readIndexHeader(br *bufio.Reader, wantKeyLen int) (uint64, error) {
 	return cnt, nil
 }
 
-func indexKeysInRange(idxPath string, keyLen int, lo []byte, hasLo bool, hi []byte, hasHi bool) ([]string, error) {
+// indexKeysInRange returns up to maxKeys evenly-spaced .idx keys strictly inside
+// (lo, hi). Entries are ascending by key, so it BINARY-SEARCHES the in-range span
+// and SEEKS to ~maxKeys strided entries — O(log cnt + maxKeys) reads, never the
+// whole index (the Steal Sort fix). maxKeys<=0 means unbounded.
+func indexKeysInRange(idxPath string, keyLen int, lo []byte, hasLo bool, hi []byte, hasHi bool, maxKeys int) ([]string, error) {
 	f, err := os.Open(idxPath)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
-	br := bufio.NewReader(f)
-	cnt, err := readIndexHeader(br, keyLen)
+	cnt, err := readIndexHeader(bufio.NewReader(f), keyLen)
 	if err != nil {
 		return nil, err
 	}
-	entry := make([]byte, keyLen+16) // key + u64 offset + u64 recidx
-	key := entry[:keyLen]
+	if cnt == 0 {
+		return nil, nil
+	}
+	entryLen := int64(keyLen + 16)
+	buf := make([]byte, keyLen)
+	at := func(i uint64) ([]byte, bool) {
+		if _, err := f.ReadAt(buf, int64(idxHeaderBytes)+int64(i)*entryLen); err != nil {
+			return nil, false
+		}
+		return buf, true
+	}
+	// [loIdx, hiIdx) = entries with key > lo and key < hi (entries ascending).
+	loIdx := uint64(0)
+	if hasLo {
+		loIdx = uint64(sort.Search(int(cnt), func(i int) bool {
+			k, ok := at(uint64(i))
+			return ok && bytesCompare(k, lo) > 0
+		}))
+	}
+	hiIdx := cnt
+	if hasHi {
+		hiIdx = uint64(sort.Search(int(cnt), func(i int) bool {
+			k, ok := at(uint64(i))
+			return ok && bytesCompare(k, hi) >= 0
+		}))
+	}
+	if loIdx >= hiIdx {
+		return nil, nil
+	}
+	stride := uint64(1)
+	if span := hiIdx - loIdx; maxKeys > 0 && span > uint64(maxKeys) {
+		stride = span / uint64(maxKeys)
+	}
 	var keys []string
-	for i := uint64(0); i < cnt; i++ {
-		if _, err := io.ReadFull(br, entry); err != nil {
+	for i := loIdx; i < hiIdx; i += stride {
+		k, ok := at(i)
+		if !ok {
 			break
 		}
-		if hasLo && bytesCompare(key, lo) <= 0 {
-			continue
+		if h := bytesToHex(k); len(keys) == 0 || keys[len(keys)-1] != h {
+			keys = append(keys, h)
 		}
-		if hasHi && bytesCompare(key, hi) >= 0 {
-			continue
+		if maxKeys > 0 && len(keys) >= maxKeys {
+			break
 		}
-		keys = append(keys, bytesToHex(key))
 	}
 	return keys, nil
 }
