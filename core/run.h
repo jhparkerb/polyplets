@@ -60,10 +60,32 @@ struct RunRecord {
     const int new_end = std::max<int>(lo + len, o.lo + o.len);
     const int new_len = new_end - new_lo;
     assert(new_end <= 256 && "count-vec window exceeded byte range");
+
+    // Grow-in-place when this record already starts at or before o (new_lo == lo):
+    // no left-shift is needed, so we extend our OWN counts buffer at the high end
+    // (a no-op when o is fully within our window) and add o in. This avoids the
+    // fresh allocate-copy-free that dominated merge CPU (combine was ~58% of merge
+    // wall and alloc-bound — results/merge-ledger.md A5 / the run.h:51 lever). When
+    // the same record accumulates many collisions (the k-way merge / dedup pattern)
+    // the buffer grows once and every subsequent in-window combine is zero-alloc.
+    // Silent Carry: guard each add against unsigned wrap; slot < prev means a u64
+    // count exceeded 2^64 and the --counter is too narrow — fail loud.
+    if (new_lo == lo) {
+      if (new_len > len) counts.resize(new_len, W{0});  // append zeros; lower entries keep index
+      const int off = static_cast<int>(o.lo) - lo;
+      for (int i = 0; i < o.len; ++i) {
+        W& slot = counts[off + i];
+        W prev = slot;
+        slot += o.counts[i];
+        assert(slot >= prev && "count overflow in combine (need wider --counter)");
+      }
+      len = static_cast<uint8_t>(new_len);
+      return;
+    }
+
+    // Left-extension (o starts before this): the existing entries would shift, so
+    // build the union buffer fresh. Rarer than the in-place case above.
     std::vector<W> merged(new_len, W{0});
-    // Silent Carry: guard the accumulation against unsigned wrap. A u64 run taken
-    // past its range (a cell count > 2^64) would silently produce a wrong record;
-    // assert instead so a wrong --counter fails loud (slot < prev means it wrapped).
     for (int i = 0; i < len; ++i) {
       W& slot = merged[(lo + i) - new_lo];
       W prev = slot;

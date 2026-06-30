@@ -136,3 +136,27 @@ materialization (would have shown as RSS tracking input size; it didn't).
 `std::vector<W>` create/destroy. One refactor (a reusable counts buffer that grows
 in place when the window only extends) attacks **map's ~14%** *and* **merge's 58%**.
 Highest-ROI single change surfaced by the profiling.
+
+### Fix LANDED — combine grow-in-place (run.h:53)
+
+Implemented red-first (test/gate_run.cpp `testCombineNoAlloc`: 1000 in-window
+combines must do **0** heap allocations; was red at 1000). When `new_lo == lo`
+(this record starts at or before the incoming one — the dominant case in both the
+k-way merge accumulator and `deduplicateRun`), `combine` now extends its **own**
+`counts` buffer at the high end (a no-op when the incoming window is contained) and
+adds in place, instead of allocate-copy-free. The left-extension case (`o.lo < lo`)
+still builds fresh. Byte-exact: a14/a16(spill-heavy)/a18 `--compare` all PASS;
+`ns-gate-run` wired into `ns-gates` + `ns-gate-fast`.
+
+**Measured impact (maxn 18, gympie):** map `sort+dedup+write` phase dropped
+**39% → 32%** of hot-column wall (the tight `deduplicateRun` combine loop — clean
+win, no heap ops to dilute it). The standalone column-merge `combine_s` bucket
+moved only 58→56% — but that bucket also times the per-record **heap drain**
+(pop/push/next), which my timer can't separate from `combine()`; at maxn 18 the
+windows are tiny (~few words) so the eliminated malloc is a small slice. The
+mechanism is proven zero-alloc; the **wall payoff scales with window size and K**,
+so the real gain is at a(25) (len≈14, K≈320), not at this calibration size.
+**Map's per-successor alloc (the ~14% in map-profile B2) is NOT addressed** — it
+needs a counts arena (each of N coexisting `buf` records owns its vector;
+`push_back` moves ownership, so a scratch record can't help). Deferred: bigger
+change with a RAM-footprint tradeoff.
