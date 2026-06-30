@@ -34,10 +34,18 @@ for finite n). Full assembled sequence in `a_n.txt`; triangle T(n,H) in `triangl
   for n≥22), so wiring k=7 into `diagonalCell` needs a `big.Int` path — unlike
   k≤6, which stay in int64 through a25.
 
+## Cross-ISA verify — COMPLETE, PASSED (2026-07-01)
+
+ayr independently recomputed H17 and H18 (`ns_a23_verify`, x86-64, different
+machine and ISA than the original dalby run) — the two most expensive swept
+heights, the ones most likely to expose a transient/ISA-specific bug. Total wall
+82,146s (≈22.8h). **Every value matches byte-exact**, n=17..23 on both heights,
+e.g. T(23,17)=1821918690703296, T(23,18)=619065902379384 — identical to the
+dalby-sourced `triangle.txt`. This is the independent certification a(23)'s
+record values were waiting on.
+
 ## Pending
-- **Cross-ISA verify**: ayr is independently recomputing H17/H18 (`ns_a23_verify`,
-  different arch) as a second source for the two most expensive swept heights; H17
-  done, H18 still running. Compare on completion.
-- **Certification** of the novel terms (mod-p shadow / independent reimpl) per the
-  a23-readiness note — single-source-with-cross-ISA is the current confidence floor.
+- **Certification** of the novel terms (mod-p shadow / independent reimpl) per
+  the a23-readiness note — cross-ISA passing raises confidence beyond
+  single-source but is not a substitute for an independent reimplementation.
 - **OEIS**: extend the A006770 b-file with a(22), a(23) (jasonp's button).
