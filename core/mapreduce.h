@@ -194,6 +194,30 @@ Run<W> mergeRuns(std::vector<Run<W>>& runs) {
 // when the in-memory buffer exceeds cfg.ram_budget_bytes, and produces one
 // sorted POLYRUN output file.  Returns {total_spill_bytes, output_record_count}.
 
+// Progress-pulse stride: how many source keys between opportunities to report
+// progress / check the work-stealing stop flag (mapPhase's `processed` and
+// `stealEligible` are fed ONLY from these pulses, via the orchestrator parsing
+// "event=progress" lines — see orchestrator/telemetry.go unitProgress). MUST
+// stay well below realistic per-unit key counts or a unit's processed count
+// never leaves 0 for its entire life, making it permanently ineligible for
+// stealing regardless of how slow it runs (results/scheduling.md, the
+// overlap+steal coexistence investigation). Was 1<<14=16384, ABOVE typical
+// per-unit counts at both test scale (~12K, maxn20) and a24/a25 production
+// scale (H16 ~18K, only ~1.1x the old stride) — i.e. it almost never fired.
+// Microbenchmarked (scripts/, not committed): the bitmask check + occasional
+// wallSeconds() poll cost the same (~0.7-0.85 ns/record, noise-level) from
+// stride 2^14 down to 2^6 — the cost concern that motivated the old large
+// value was unfounded. 1<<10=1024 is ~16x finer, giving ~10-18 pulse
+// opportunities across a realistic unit's life at both scales (each still
+// gated by the worker's own 2s print throttle, worker/map_worker.cpp).
+static constexpr unsigned kProgressStrideMask = (1u << 10) - 1;
+// Compile-time tripwire: a future "just bump it for fewer interrupts" edit
+// must not silently regress past realistic per-unit record counts (~12K test
+// scale, ~18K a24/a25 production scale) and go blind again. 4096 leaves >=2
+// pulse opportunities even at the smallest scale measured.
+static_assert(kProgressStrideMask + 1 <= 4096,
+              "progress-pulse stride too coarse: see kProgressStrideMask comment");
+
 template <class W, class Classifier, class Output>
 std::pair<size_t, size_t> map_shard_file(
     const std::vector<std::string>& in_paths,
@@ -333,12 +357,12 @@ std::pair<size_t, size_t> map_shard_file(
 #ifdef POLY_PROFILE
     const double _tr = prof::now();
 #endif
-    // Periodic progress pulse (~every 2^14 source keys); the callback throttles
-    // by wall time and emits event=progress.  Cheap: a mask test per iteration.
-    // The stride is well below a typical unit's key count so even slow,
-    // heavy-per-key units pulse — the orchestrator needs that signal both for
-    // the heartbeat and to size in-flight units for work-stealing.
-    if (on_progress && (++processed & ((1u << 14) - 1)) == 0) {
+    // Periodic progress pulse (every kProgressStrideMask+1 source keys); the
+    // callback throttles by wall time and emits event=progress.  Cheap: a mask
+    // test per iteration (measured noise-level cost regardless of stride; see
+    // kProgressStrideMask's comment).  The orchestrator needs this signal both
+    // for the heartbeat and to size in-flight units for work-stealing.
+    if (on_progress && (++processed & kProgressStrideMask) == 0) {
       on_progress(processed);
       // Cooperative stop point (work-stealing): break at a key boundary so the
       // output covers [lo, cursor) exactly.  Checked on the same throttle as
