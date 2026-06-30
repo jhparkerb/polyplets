@@ -275,7 +275,7 @@ class RunFileReader {
   RunFileReader(const std::string& path, int H, int keyLen = 0)
       : H_(H), keyLen_((keyLen == 0) ? H + 2 : keyLen),
         fp_(nullptr), records_(0), records_read_(0),
-        crc_(FNV_OFFSET), path_(path), seeked_(false), index_loaded_(false) {
+        crc_(FNV_OFFSET), path_(path), seeked_(false) {
     fp_ = std::fopen(path.c_str(), "rb");
     if (!fp_) {
       std::fprintf(stderr, "RunFileReader: cannot open %s\n", path.c_str());
@@ -337,21 +337,45 @@ class RunFileReader {
   }
 
   // Seek so the next next() starts at the last indexed record with key <= klo
-  // (the caller skips the small in-block overshoot below klo). Uses the sidecar
-  // index; returns false / no-op if the index is absent (falls back to scan).
-  // This is the merge read-amplification fix.
+  // (the caller skips the small in-block overshoot below klo). BINARY-SEARCHES the
+  // .idx sidecar ON DISK (fixed-width entries → direct offsets) — never loads the
+  // whole index into RAM (Index Slurp). Returns false / no-op if the index is
+  // absent (the caller falls back to a scan).
   bool seekToKey(const uint8_t* klo) {
     if (!fp_) return false;
-    if (!index_loaded_) loadIndex();
-    if (index_.empty()) return false;
-    int a = 0, b = static_cast<int>(index_.size()) - 1, s = 0;
+    FILE* f = std::fopen((path_ + ".idx").c_str(), "rb");
+    if (!f) return false;
+    uint32_t magic = 0; uint16_t ver = 0; uint8_t bo = 0; uint32_t kl = 0; uint64_t cnt = 0;
+    if (std::fread(&magic, sizeof(magic), 1, f) != 1 || std::fread(&ver, sizeof(ver), 1, f) != 1 ||
+        std::fread(&bo, sizeof(bo), 1, f) != 1 || magic != kRunIndexMagic ||
+        ver != kRunIndexVersion || bo != kRunByteOrderLE ||
+        std::fread(&kl, sizeof(kl), 1, f) != 1 || std::fread(&cnt, sizeof(cnt), 1, f) != 1 ||
+        static_cast<int>(kl) != keyLen_ || cnt == 0) {
+      std::fclose(f); return false;
+    }
+    const long hdr = 19;                                   // magic4+ver2+bo1+keyLen4+count8
+    const long entryLen = static_cast<long>(keyLen_) + 16; // key + u64 offset + u64 recidx
+    uint8_t key[64];
+    auto keyAt = [&](long i) -> bool {
+      return std::fseek(f, hdr + i * entryLen, SEEK_SET) == 0 &&
+             std::fread(key, 1, static_cast<size_t>(keyLen_), f) == static_cast<size_t>(keyLen_);
+    };
+    long a = 0, b = static_cast<long>(cnt) - 1, s = 0;     // last entry with key <= klo
     while (a <= b) {
-      int m = (a + b) / 2;
-      if (std::memcmp(index_[m].key, klo, static_cast<size_t>(keyLen_)) <= 0) { s = m; a = m + 1; }
+      long m = (a + b) / 2;
+      if (!keyAt(m)) { std::fclose(f); return false; }
+      if (std::memcmp(key, klo, static_cast<size_t>(keyLen_)) <= 0) { s = m; a = m + 1; }
       else b = m - 1;
     }
-    if (std::fseek(fp_, static_cast<long>(index_[s].offset), SEEK_SET) != 0) return false;
-    records_read_ = index_[s].recidx;
+    uint64_t offset = 0, recidx = 0;                       // entry s's offset + recidx
+    if (std::fseek(f, hdr + s * entryLen + keyLen_, SEEK_SET) != 0 ||
+        std::fread(&offset, sizeof(offset), 1, f) != 1 ||
+        std::fread(&recidx, sizeof(recidx), 1, f) != 1) {
+      std::fclose(f); return false;
+    }
+    std::fclose(f);
+    if (std::fseek(fp_, static_cast<long>(offset), SEEK_SET) != 0) return false;
+    records_read_ = recidx;
     seeked_ = true;
     return true;
   }
@@ -374,36 +398,6 @@ class RunFileReader {
   uint64_t crc_;
   std::string path_;
   bool seeked_;
-  bool index_loaded_;
-  struct IdxEnt { uint8_t key[64]; uint64_t offset; uint64_t recidx; };
-  std::vector<IdxEnt> index_;
-
-  void loadIndex() {
-    index_loaded_ = true;
-    std::string ip = path_ + ".idx";
-    FILE* f = std::fopen(ip.c_str(), "rb");
-    if (!f) return;
-    // Validate the self-describing header; a stale / foreign / truncated sidecar
-    // is ignored so the read falls back to a full scan rather than mis-seeking.
-    uint32_t magic = 0; uint16_t ver = 0; uint8_t bo = 0;
-    if (std::fread(&magic, sizeof(magic), 1, f) != 1 ||
-        std::fread(&ver,   sizeof(ver),   1, f) != 1 ||
-        std::fread(&bo,    sizeof(bo),    1, f) != 1 ||
-        magic != kRunIndexMagic || ver != kRunIndexVersion || bo != kRunByteOrderLE) {
-      std::fclose(f); return;
-    }
-    uint32_t kl = 0; uint64_t cnt = 0;
-    if (std::fread(&kl, sizeof(kl), 1, f) != 1 || std::fread(&cnt, sizeof(cnt), 1, f) != 1 ||
-        static_cast<int>(kl) != keyLen_) { std::fclose(f); return; }
-    index_.resize(cnt);
-    for (uint64_t i = 0; i < cnt; ++i) {
-      std::memset(index_[i].key, 0, sizeof(index_[i].key));
-      if (std::fread(index_[i].key, 1, kl, f) != kl ||
-          std::fread(&index_[i].offset, sizeof(uint64_t), 1, f) != 1 ||
-          std::fread(&index_[i].recidx, sizeof(uint64_t), 1, f) != 1) { index_.clear(); break; }
-    }
-    std::fclose(f);
-  }
 
   bool parseHeader() {
     char line[512];
