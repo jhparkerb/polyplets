@@ -115,6 +115,7 @@ class RunFileWriter {
       return;
     }
     writeHeader(H, maxn, lo_hex, hi_hex, rev);
+    if (write_index_) openIndexSidecar();
   }
 
   // Default constructor: no-op.
@@ -124,6 +125,7 @@ class RunFileWriter {
 
   ~RunFileWriter() {
     if (fp_) std::fclose(fp_);
+    if (idx_fp_) std::fclose(idx_fp_);
   }
 
   RunFileWriter(const RunFileWriter&) = delete;
@@ -133,13 +135,14 @@ class RunFileWriter {
     if (!fp_) return;
     // Sparse seek index: record (key, file-offset, record-index) every stride
     // records, so the merge can seek to a key range instead of scanning to it.
-    if (write_index_ && (record_count_ % kIndexStride) == 0) {
-      IdxEnt e;
-      std::memset(e.key, 0, sizeof(e.key));
-      std::memcpy(e.key, r.sig.b, static_cast<size_t>(keyLen_));
-      e.offset = static_cast<uint64_t>(body_start_offset_) + body_bytes_;
-      e.recidx = record_count_;
-      index_.push_back(e);
+    if (idx_fp_ && (record_count_ % kIndexStride) == 0) {
+      // Stream one index entry straight to the .idx sidecar — no in-RAM buffer.
+      uint64_t offset = static_cast<uint64_t>(body_start_offset_) + body_bytes_;
+      uint64_t recidx = record_count_;
+      std::fwrite(r.sig.b, 1, static_cast<size_t>(keyLen_), idx_fp_);
+      std::fwrite(&offset, sizeof(offset), 1, idx_fp_);
+      std::fwrite(&recidx, sizeof(recidx), 1, idx_fp_);
+      ++index_count_;
     }
     std::fwrite(r.sig.b, 1, static_cast<size_t>(keyLen_), fp_);
     uint8_t lo  = r.lo;
@@ -187,10 +190,16 @@ class RunFileWriter {
     // data file last: the data file's appearance at the final path is the commit
     // point, and by then its .idx is already in place.  Clear any stale .idx if
     // this run is too small to warrant one.
-    if (write_index_ && !index_.empty()) {
-      writeIndexSidecar();
+    if (idx_fp_ && index_count_ > 0) {
+      // Backpatch the entry count into the header, then commit the sidecar.
+      if (std::fseek(idx_fp_, kIdxCountOffset, SEEK_SET) == 0)
+        std::fwrite(&index_count_, sizeof(index_count_), 1, idx_fp_);
+      std::fclose(idx_fp_);
+      idx_fp_ = nullptr;
       std::rename((path_ + ".idx.tmp").c_str(), (path_ + ".idx").c_str());
     } else {
+      if (idx_fp_) { std::fclose(idx_fp_); idx_fp_ = nullptr; }
+      std::remove((path_ + ".idx.tmp").c_str());
       std::remove((path_ + ".idx").c_str());
     }
     std::rename(tmp_path_.c_str(), path_.c_str());
@@ -212,33 +221,29 @@ class RunFileWriter {
   std::string tmp_path_;
   bool write_index_;
   long body_start_offset_;          // file offset of the first record (post-header)
-  struct IdxEnt { uint8_t key[64]; uint64_t offset; uint64_t recidx; };
-  std::vector<IdxEnt> index_;
+  FILE* idx_fp_ = nullptr;        // streamed .idx sidecar (no in-RAM index buffer)
+  uint64_t index_count_ = 0;      // entries streamed to idx_fp_
   static constexpr size_t kIndexStride = 64;
+  static constexpr long kIdxCountOffset = 11; // count field: magic4+ver2+bo1+keyLen4
 
-  // Sidecar <path>.idx: [u32 keyLen][u64 count][ {key[keyLen] u64 offset u64 recidx} ].
-  // Native byte order — it's a machine-local seek aid, not part of the run's
-  // byte-identical output, and map+merge of a column run on the same host.
-  void writeIndexSidecar() {
-    std::string ip = path_ + ".idx.tmp";
-    FILE* f = std::fopen(ip.c_str(), "wb");
-    if (!f) return;
+  // Open the <path>.idx.tmp sidecar and write its header with a PLACEHOLDER count
+  // (backpatched in finalize). Entries are then streamed in append() — there is no
+  // in-RAM index buffer (Index Hoard: records/64 × 80B held to finalize was an OOM
+  // lever at scale). Format unchanged: [u32 magic][u16 ver][u8 bo][u32 keyLen]
+  // [u64 count]{ key[keyLen] u64 offset u64 recidx }*, native byte order.
+  void openIndexSidecar() {
+    idx_fp_ = std::fopen((path_ + ".idx.tmp").c_str(), "wb");
+    if (!idx_fp_) return;
     uint32_t magic = kRunIndexMagic;
     uint16_t ver   = kRunIndexVersion;
     uint8_t  bo    = kRunByteOrderLE;
-    std::fwrite(&magic, sizeof(magic), 1, f);
-    std::fwrite(&ver,   sizeof(ver),   1, f);
-    std::fwrite(&bo,    sizeof(bo),    1, f);
-    uint32_t kl = static_cast<uint32_t>(keyLen_);
-    uint64_t cnt = index_.size();
-    std::fwrite(&kl, sizeof(kl), 1, f);
-    std::fwrite(&cnt, sizeof(cnt), 1, f);
-    for (const auto& e : index_) {
-      std::fwrite(e.key, 1, static_cast<size_t>(keyLen_), f);
-      std::fwrite(&e.offset, sizeof(e.offset), 1, f);
-      std::fwrite(&e.recidx, sizeof(e.recidx), 1, f);
-    }
-    std::fclose(f);
+    uint32_t kl    = static_cast<uint32_t>(keyLen_);
+    uint64_t cnt   = 0; // placeholder
+    std::fwrite(&magic, sizeof(magic), 1, idx_fp_);
+    std::fwrite(&ver,   sizeof(ver),   1, idx_fp_);
+    std::fwrite(&bo,    sizeof(bo),    1, idx_fp_);
+    std::fwrite(&kl,    sizeof(kl),    1, idx_fp_);
+    std::fwrite(&cnt,   sizeof(cnt),   1, idx_fp_);
   }
 
   void writeHeader(int H, int maxn, const std::string& lo_hex,
