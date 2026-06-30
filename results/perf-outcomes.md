@@ -11,6 +11,11 @@ is the acceptance gate for anything that touches the sort/merge/combine path.
 | **`combine` grow-in-place** (run.h) | 0 allocs on the in-window path (was 1 malloc+copy+free/collision); map sort+dedup phase 39%→32% at maxn18 | red-first `gate_run` + a14/a16/a18 |
 | **`sigCmp`** 8-byte-chunk key compare (signature.h) | **1.29–1.52×** on the sort + merge-heap comparator (13 sites) | microbench same-order=1; a14/a18 |
 
+**At-scale gate (validate-before-record).** a(20) `--compare` through the full
+stack (combine + sigCmp + `--overlap-heights 13` + height-boundary checkpoints,
+@ f40e12b): byte-exact a(1..20) incl **a(20)=1025573519362016**, gate_parallel
+PASS, wall 118.9s/8 cores. The engine is cleared for the a(24)/a(25) runs.
+
 **End-to-end validation (the check that mattered).** Microbench wins can wash out
 in production (the counts pool did). A/B of the full `next-system` engine
 (combine+sigCmp) vs the pre-perf baseline (e694a39) on real multi-process
