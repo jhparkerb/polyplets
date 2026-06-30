@@ -274,9 +274,14 @@ std::pair<size_t, size_t> map_shard_file(
   size_t total_spill_bytes = 0;
   int spill_seq = 0;
 
-  // Conservative record size estimate for budget tracking.
-  const size_t record_est = static_cast<size_t>(H + 4) +
-                            static_cast<size_t>(maxn) * sizeof(W);
+  // Per-record RESIDENT-RAM estimate for the spill trigger. Must reflect the
+  // actual std::vector<RunRecord> footprint, not wire size: the object itself
+  // (Sig + fields + the vector control block) + the heap-allocated counts vector
+  // (<= maxn words) + allocator overhead. The old estimate charged only H+4 +
+  // maxn*W (wire size), undercounting the ~96-byte object, so the buffer overshot
+  // --ram before do_spill() fired (Budget Blind: an OOM lever at scale).
+  const size_t record_est = sizeof(RunRecord<W>) +
+                            static_cast<size_t>(maxn) * sizeof(W) + 32;
 
   auto do_spill = [&]() {
     if (buf.empty()) return;
