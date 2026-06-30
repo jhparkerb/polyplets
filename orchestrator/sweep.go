@@ -27,7 +27,7 @@ type SweepConfig struct {
 	Cores           int           // max concurrent workers
 	UnitMult        int           // MAP work units per core (default 1); units = Cores*UnitMult, concurrency stays Cores
 	MergeMult       int           // MERGE ranges per core (0 = follow UnitMult); set low to cut the (cores*mult)^2 merge fan-in
-	StealGrain      float64       // map work-stealing grain as a fraction of a core's fair share (0 = off; design sweet spot ≈ 0.05). When a core idles in the column tail, the longest-remaining unit is stopped at a cursor and its remainder split across idle cores.
+	StealGrain      float64       // map work-stealing grain as a fraction of a core's fair share (0 = off; design sweet spot ≈ 0.05). When a core idles in the column tail, the longest-remaining unit is stopped at a cursor and its remainder split across idle cores. Coexists with OverlapHeights: dynamically gated to fire only once a height is the pool's sole occupant (see stealAllowed) — safe in the common endgame where the dominant height outlives its siblings.
 	OverlapHeights  int           // heights to sweep CONCURRENTLY sharing one Cores-wide pool (0/1 = sequential). Hides one height's low-util merge behind another's map. Checkpoints at HEIGHT boundaries (the completed-height set), not per column.
 	RAM             uint64        // bytes per map_worker spill budget
 	RunDir          string        // directory for all run files
@@ -179,6 +179,16 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		return nil, err
 	}
 
+	// activeHeights counts heights CURRENTLY sweeping (between entering and
+	// leaving sweepHeight). The sequential path below sets it to 1 once and never
+	// touches it again — exactly one height sweeps at a time by construction, so
+	// it's always 1, the same value sequential mode has always implicitly had.
+	// runOverlap increments/decrements it around each height's real sweepHeight
+	// call; mapPhase's steal gate (stealAllowed) reads it live to allow stealing
+	// once a height becomes the pool's sole occupant (the overlap+steal coexist
+	// fix — see stealAllowed's doc).
+	activeHeights := new(atomic.Int32)
+
 	// Shared Cores-wide worker pool. In overlap mode several heights draw from it
 	// concurrently, so a height's low-utilization merge phase runs alongside
 	// another's map phase rather than idling the box.
@@ -209,8 +219,13 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		// height pool in this order, so the order is honored deterministically.
 		pending = append([]int(nil), pending...)
 		sort.Sort(sort.Reverse(sort.IntSlice(pending)))
-		return runOverlap(ctx, cfg, pending, triangle, acct, tel, sem)
+		return runOverlap(ctx, cfg, pending, triangle, acct, tel, sem, activeHeights)
 	}
+
+	// Sequential mode sweeps exactly one height at a time by construction, so
+	// activeHeights is always 1 here — set once, never touched again (no per-
+	// height inc/dec needed; see the activeHeights comment above).
+	activeHeights.Store(1)
 
 	for hi := startIdx; hi < len(heights); hi++ {
 		H := heights[hi]
@@ -260,7 +275,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			frontier = []string{seed}
 		}
 
-		hTri, hAcct, err := sweepHeight(ctx, cfg, H, startCol, frontier, writeCheckpoint, tel, sem)
+		hTri, hAcct, err := sweepHeight(ctx, cfg, H, startCol, frontier, writeCheckpoint, tel, sem, activeHeights)
 
 		// Accumulate this height's contributions before handling the error,
 		// so the checkpoint written on cancellation includes them.
@@ -296,8 +311,15 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 // resume skips the done heights and re-runs any that were in flight at the
 // crash from scratch — no mid-HEIGHT (column) resume here. Caller guarantees
 // cfg.OverlapHeights >= 2.
+//
+// activeHeights tracks how many heights are CURRENTLY between entering and
+// leaving sweepHeight (real column work; the closed-form short-circuits below
+// never touch it, since they don't draw from `sem` at all). mapPhase's
+// work-stealing reads it live to allow stealing once a height becomes the
+// pool's sole occupant — the overlap+steal coexistence fix (see stealAllowed).
 func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
-	triangle []uint64, acct Acct, tel *telemetry, sem chan struct{}) (*SweepResult, error) {
+	triangle []uint64, acct Acct, tel *telemetry, sem chan struct{},
+	activeHeights *atomic.Int32) (*SweepResult, error) {
 
 	var mu sync.Mutex
 	var firstErr error
@@ -396,7 +418,11 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 				mu.Unlock()
 				return
 			}
-			hTri, hAcct, err := sweepHeight(ctx, cfg, H, 0, []string{seed}, noopCkpt, tel, sem)
+			// This height now starts drawing real (map/merge) work from the shared
+			// pool — count it as active for the steal gate's duration.
+			activeHeights.Add(1)
+			hTri, hAcct, err := sweepHeight(ctx, cfg, H, 0, []string{seed}, noopCkpt, tel, sem, activeHeights)
+			activeHeights.Add(-1)
 
 			mu.Lock()
 			// Only fold a height's contribution in (and mark it done) if it
@@ -447,6 +473,7 @@ func sweepHeight(
 	writeCheckpoint func(H, col int, frontier []string, hTri []uint64),
 	tel *telemetry,
 	sem chan struct{},
+	activeHeights *atomic.Int32,
 ) ([]uint64, Acct, error) {
 
 	hTri := make([]uint64, cfg.Maxn+1) // contributions from this height only
@@ -488,7 +515,7 @@ func sweepHeight(
 		stopHB := tel.startColumn(H, col)
 
 		// MAP PHASE
-		mapOuts, triContribs, mapAcct, err := mapPhase(ctx, cfg, H, col, frontier, tel, sem)
+		mapOuts, triContribs, mapAcct, err := mapPhase(ctx, cfg, H, col, frontier, tel, sem, activeHeights)
 		if err != nil {
 			stopHB()
 			// hTri does NOT yet include current col's contributions.
@@ -630,6 +657,30 @@ func stealEligible(r *runningUnit, grainRecs uint64) bool {
 	return rem > grainRecs && rem >= 2*indexStride
 }
 
+// stealAllowed reports whether work-stealing may fire RIGHT NOW. A height's own
+// "queue empty, a goroutine is about to go idle" signal is LOCAL to that height —
+// it only equals BOX-WIDE idleness when this height is the SOLE occupant of the
+// shared core pool (sem). In overlap mode with sibling heights still active, a
+// "locally idle" goroutine may really be blocked on sem behind another height's
+// units; stealing then would interrupt a legitimately-running straggler to hand
+// its remainder to a goroutine that isn't actually free — paying the
+// stop+finalize+respawn cost for zero real concurrency gained.
+//
+// Once every sibling height has finished — the common endgame: the dominant
+// height (e.g. H16) outlives every cheap one — local idle becomes EXACTLY box
+// idle, the same condition sequential mode always has, so stealing is fully safe
+// there. This is what lets overlap and stealing coexist instead of being
+// mutually exclusive: each height's mapPhase re-checks this on every steal
+// decision (not once at column start), because columns can run for HOURS and the
+// height landscape changes underneath a single long column.
+//
+// activeHeights nil means "no dynamic tracking" (steal unconditionally allowed,
+// subject to the other gates) — used by callers that don't run heights
+// concurrently and so never need the check.
+func stealAllowed(activeHeights *atomic.Int32) bool {
+	return activeHeights == nil || activeHeights.Load() <= 1
+}
+
 // stealScore ranks steal-eligible victims; the highest-scoring is stolen. We want
 // the unit with the most WALL TIME left, not the most records — a compute-heavy
 // straggler (a few pathological keys) can have few records remaining yet dominate
@@ -660,8 +711,10 @@ func stealScore(r *runningUnit, now time.Time) float64 {
 // static subdivision isolates rather than divides it).  Result-invariant: the
 // merge recombines by output key regardless of how input work was partitioned.
 //
-// Stealing is gated on cfg.StealGrain>0 and disabled under overlap (where the
-// shared pool's idle-core accounting wouldn't be local).  With it off, this is a
+// Stealing is gated on cfg.StealGrain>0 and, dynamically, on activeHeights (see
+// stealAllowed): it only fires while this height is the sole occupant of the
+// shared pool, which is always true in sequential mode and becomes true in
+// overlap mode once sibling heights finish.  With StealGrain off, this is a
 // plain pull queue — the same work partition as before.
 func mapPhase(
 	ctx context.Context,
@@ -670,6 +723,7 @@ func mapPhase(
 	frontier []string,
 	tel *telemetry,
 	sem chan struct{},
+	activeHeights *atomic.Int32,
 ) ([]string, []map[int]map[int]uint64, Acct, error) {
 
 	// Invariant: column work must never start at the top strip — H==maxn is
@@ -691,11 +745,13 @@ func mapPhase(
 	n0 := len(los)
 
 	// Grain floor in records: don't steal a remnant smaller than StealGrain of a
-	// core's fair share (design sweet spot ≈ 0.05).  0 ⇒ stealing off.
+	// core's fair share (design sweet spot ≈ 0.05).  0 ⇒ stealing off.  The
+	// activeHeights dynamic gate (stealAllowed) is checked separately, per
+	// decision, in pickVictim — not folded in here, since it can change mid-column.
 	frontierIn := sumFrontierRecords(frontier)
 	var grainRecs uint64
-	stealOn := cfg.StealGrain > 0 && cfg.Cores > 1 && cfg.OverlapHeights <= 1
-	if stealOn && frontierIn > 0 {
+	stealConfigured := cfg.StealGrain > 0 && cfg.Cores > 1
+	if stealConfigured && frontierIn > 0 {
 		grainRecs = uint64(cfg.StealGrain * float64(frontierIn) / float64(cfg.Cores))
 	}
 
@@ -729,7 +785,7 @@ func mapPhase(
 	// WALL TIME left (stealScore), or nil. Caller holds mu. Eligible = making
 	// progress, not already stopped, not un-splittable, > a grain of work left.
 	pickVictim := func() *runningUnit {
-		if grainRecs == 0 {
+		if grainRecs == 0 || !stealAllowed(activeHeights) {
 			return nil
 		}
 		now := time.Now()
