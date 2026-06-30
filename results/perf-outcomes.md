@@ -18,20 +18,22 @@ is the acceptance gate for anything that touches the sort/merge/combine path.
 | **Indirect sort** (sort an index array, permute once) | Measured **0.61× — slower**. `std::sort` already moves the cheap 72-byte records well; the permute's random access + index-sort overhead lose. |
 | **Radix sort** of the terminal buffer | Out-of-place radix needs an N-record temp buffer — extra RAM at the exact moment the buffer is at `--ram` (the spill trigger). Conflicts with the spill purpose; in-place (American-flag) is bug-prone for a correctness-critical sort. Not worth it given the indirect-sort result shows record-movement isn't the bottleneck. |
 | **`combine` left-extension in-place** (`o.lo < lo`) | Rare case; in-place needs a right-shift `memmove` + selective zeroing — bug-prone for a marginal gain. Kept the fresh-alloc fallback. |
+| **Counts pool / arena** (the headline ~14% candidate) | Built on a worktree (`PoolAlloc<W>`, thread-local free-list by size, byte-exact a14/a16/a18). A/B'd vs baseline on real multi-process orchestrate runs: **0.5% slower at production ram, 0.9% slower multi-spill** — a consistent small *loss*. The system allocator already keeps per-size-class thread-cache freelists for these millions of identical small allocations, so a userspace pool just duplicates it with extra indirection. The "14%" was a `driver1` single-process leaf-sample artifact, **not a production wall cost**. Worktree abandoned, not merged. A true bump-arena would only save the malloc *call* overhead (already small in production) at a RAM/lifecycle cost — not worth it. |
 
 ## Deferred — real win, but blast radius too large for a pre-record rush
 
 | Candidate | Measured potential | Why deferred |
 |---|---|---|
 | **Hardware CRC32C** instead of byte-wise FNV-1a | **10.6×** on the hash (1.0 → 10.6 GB/s); `__attribute__((target("crc"/"sse4.2")))` needs **no global build flags** (compiles clean on arm64 + x86-64) | It's a checksum **format change**. The checksum is consumed by 7 Go files (verify, runcat, manifest, runref, idx_test, crc_test) + 2 C++ (runfile.h, checkpoint.h). Shipping it safely means a back-compat format-version dispatch across **both languages** so existing a(23) run files + checkpoints still verify. ~5% of total compute for a 9-file cross-language change. Do it as a focused effort with its own validation, not bundled in. |
-| **Counts arena / pooled allocator** | ~14% of map cycles (the per-successor `counts` malloc; `free` measured ~4× `malloc`) | Changes the type of `RunRecord::counts` — the core record used by serialize/deserialize/combine/map/merge. Highest-value remaining item, but it's a core-type change that can only be validated to a18 here, not a25 scale. The "validate-at-scale-before-record" discipline says don't churn the record type right before a record run without a dedicated validation pass. |
 
 ## Bottom line
 
-Two clean wins shipped (combine, sigCmp). The terminal sort — the biggest single
-*map* cost the profiling surfaced — does **not** beat `std::sort` by the obvious
-routes (measured). The two genuinely-valuable remaining levers (CRC32C ~5%, counts
-arena ~14%) are both wide-blast-radius changes whose risk, this close to a record
-run, is the user's call. None of these is order-of-magnitude: the
-**a(24)→a(25) ladder + k=8 injection (~38% wall)** remains the dominant lever and
-carries zero engine risk.
+Two clean wins shipped (combine, sigCmp). Everything else the profiling pointed
+at was measured and **did not pan out**: the terminal sort doesn't beat
+`std::sort`; the counts pool (the headline ~14% candidate) is a measured *loss* in
+production because the system allocator already pools same-size small allocations.
+The one remaining real lever, CRC32C (~5%), is a cross-language format change held
+for a focused effort. Net: the engine was already well-tuned — the profiling's
+biggest apparent levers were artifacts of single-process micro-profiling, and the
+real win is the **a(24)→a(25) ladder + k=8 injection (~38% wall)**, which carries
+zero engine risk.
