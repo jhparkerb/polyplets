@@ -16,8 +16,6 @@ import (
 type RunRef struct {
 	Path    string
 	Records uint64
-	KeyLo   string // hex, empty = start of key space
-	KeyHi   string // hex, empty = end of key space
 }
 
 // PolyrunHeader holds parsed POLYRUN file header fields.
@@ -285,22 +283,7 @@ func SplitRangeByIndex(frontier []string, H int, loHex, hiHex string, numCuts in
 	}
 	sort.Strings(keys)
 
-	if len(keys) <= numCuts {
-		return keys, nil
-	}
-	out := make([]string, numCuts)
-	stride := len(keys) / (numCuts + 1)
-	if stride < 1 {
-		stride = 1
-	}
-	for i := range out {
-		idx := (i + 1) * stride
-		if idx >= len(keys) {
-			idx = len(keys) - 1
-		}
-		out[i] = keys[idx]
-	}
-	return out, nil
+	return subsampleEvenly(keys, numCuts), nil
 }
 
 // indexKeysInRange reads a .idx sidecar and returns the hex keys that fall in

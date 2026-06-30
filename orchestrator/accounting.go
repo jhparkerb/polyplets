@@ -39,7 +39,6 @@ type WorkerResult struct {
 	// [StopKey, hi).  Empty = the worker ran its whole [lo, hi) to completion.
 	StopKey string
 	Acct    Acct
-	Err     error
 }
 
 // ParseWorkerOutput parses all lines of worker stdout into a WorkerResult.

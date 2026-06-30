@@ -50,7 +50,6 @@ type telemetry struct {
 	maxn     int
 	outPath  string
 	mu       sync.Mutex       // guards observe() state when heights run concurrently (overlap mode)
-	cols     []ColumnCost
 	cumWall  float64          // running Σ WallS over observed columns
 	clock    func() time.Time // injectable for tests; defaults to time.Now
 	hbEvery  time.Duration    // heartbeat cadence (POLY_HEARTBEAT_SECS, default 30s)
@@ -121,7 +120,6 @@ func (t *telemetry) observe(c ColumnCost) {
 	}
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	t.cols = append(t.cols, c)
 	t.cumWall += c.WallS
 
 	fmt.Printf("event=column H=%d col=%d frontier_in=%d frontier_out=%d "+

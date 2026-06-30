@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <algorithm>
 #include <cstdio>
 #include <cstdint>
 #include <cstdlib>
@@ -90,6 +89,8 @@ inline uint64_t fnv1a64_update(uint64_t hash, const void* data, size_t len) {
 inline constexpr uint32_t kRunIndexMagic   = 0x49594C50u; // 'PLYI', little-endian
 inline constexpr uint16_t kRunIndexVersion = 1;
 inline constexpr uint8_t  kRunByteOrderLE  = 1;
+inline constexpr long kRunIndexCountOffset = 11;                     // magic4+ver2+bo1+keyLen4
+inline constexpr long kRunIndexHeaderLen   = kRunIndexCountOffset + 8; // + count8
 
 template <class W>
 class RunFileWriter {
@@ -117,11 +118,6 @@ class RunFileWriter {
     writeHeader(H, maxn, lo_hex, hi_hex, rev);
     if (write_index_) openIndexSidecar();
   }
-
-  // Default constructor: no-op.
-  RunFileWriter()
-      : H_(0), keyLen_(2), fp_(nullptr), record_count_(0), body_bytes_(0),
-        crc_(FNV_OFFSET), records_offset_(0) {}
 
   ~RunFileWriter() {
     if (fp_) std::fclose(fp_);
@@ -192,7 +188,7 @@ class RunFileWriter {
     // this run is too small to warrant one.
     if (idx_fp_ && index_count_ > 0) {
       // Backpatch the entry count into the header, then commit the sidecar.
-      if (std::fseek(idx_fp_, kIdxCountOffset, SEEK_SET) == 0)
+      if (std::fseek(idx_fp_, kRunIndexCountOffset, SEEK_SET) == 0)
         std::fwrite(&index_count_, sizeof(index_count_), 1, idx_fp_);
       std::fclose(idx_fp_);
       idx_fp_ = nullptr;
@@ -224,7 +220,6 @@ class RunFileWriter {
   FILE* idx_fp_ = nullptr;        // streamed .idx sidecar (no in-RAM index buffer)
   uint64_t index_count_ = 0;      // entries streamed to idx_fp_
   static constexpr size_t kIndexStride = 64;
-  static constexpr long kIdxCountOffset = 11; // count field: magic4+ver2+bo1+keyLen4
 
   // Open the <path>.idx.tmp sidecar and write its header with a PLACEHOLDER count
   // (backpatched in finalize). Entries are then streamed in append() — there is no
@@ -353,7 +348,7 @@ class RunFileReader {
         static_cast<int>(kl) != keyLen_ || cnt == 0) {
       std::fclose(f); return false;
     }
-    const long hdr = 19;                                   // magic4+ver2+bo1+keyLen4+count8
+    const long hdr = kRunIndexHeaderLen;
     const long entryLen = static_cast<long>(keyLen_) + 16; // key + u64 offset + u64 recidx
     uint8_t key[64];
     auto keyAt = [&](long i) -> bool {

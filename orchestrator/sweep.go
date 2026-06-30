@@ -933,11 +933,7 @@ func topHeightClosedForm(maxn int) uint64 {
 	if maxn <= 0 {
 		return 0
 	}
-	v := uint64(1)
-	for i := 0; i < maxn-1; i++ {
-		v *= 3
-	}
-	return v
+	return pow3(maxn - 1)
 }
 
 // lowHeightRow returns the closed-form T(n,H) row for the trivial low strips
