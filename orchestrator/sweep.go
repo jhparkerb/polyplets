@@ -510,6 +510,7 @@ type runningUnit struct {
 	processed *atomic.Uint64 // cumulative input records this worker has consumed
 	stop      chan struct{}  // closed once to request a cooperative stop
 	stopped   bool           // guarded by the scheduler mutex; set when stop is closed
+	started   time.Time      // when this unit went in-flight (for rate-based sizing)
 }
 
 // remaining estimates the input records this unit has left (clamped at 0).
@@ -536,6 +537,25 @@ func stealEligible(r *runningUnit, grainRecs uint64) bool {
 	}
 	rem := r.remaining()
 	return rem > grainRecs && rem >= 2*indexStride
+}
+
+// stealScore ranks steal-eligible victims; the highest-scoring is stolen. We want
+// the unit with the most WALL TIME left, not the most records — a compute-heavy
+// straggler (a few pathological keys) can have few records remaining yet dominate
+// the column tail. Score = estimated seconds remaining = records_left / rate,
+// where rate = processed / elapsed.
+func stealScore(r *runningUnit, now time.Time) float64 {
+	rem := float64(r.remaining())
+	elapsed := now.Sub(r.started).Seconds()
+	p := r.processed.Load()
+	if p == 0 || elapsed <= 0 {
+		return rem // not enough signal yet → fall back to records
+	}
+	rate := float64(p) / elapsed
+	if rate <= 0 {
+		return rem
+	}
+	return rem / rate
 }
 
 // mapPhase maps the source frontier to the next column via a dynamic work-stealing
@@ -614,21 +634,22 @@ func mapPhase(
 	mctx, mcancel := context.WithCancel(ctx)
 	defer mcancel()
 
-	// pickVictim returns the longest-remaining steal-eligible in-flight unit, or
-	// nil. Caller holds mu. Eligible = making progress, not already stopped, not
-	// flagged un-splittable, and with more than a grain of work left.
+	// pickVictim returns the steal-eligible in-flight unit with the most estimated
+	// WALL TIME left (stealScore), or nil. Caller holds mu. Eligible = making
+	// progress, not already stopped, not un-splittable, > a grain of work left.
 	pickVictim := func() *runningUnit {
 		if grainRecs == 0 {
 			return nil
 		}
+		now := time.Now()
 		var best *runningUnit
-		var bestRem uint64
+		var bestScore float64
 		for _, r := range inflight {
 			if !stealEligible(r, grainRecs) {
 				continue
 			}
-			if rem := r.remaining(); rem > bestRem {
-				bestRem, best = rem, r
+			if sc := stealScore(r, now); sc > bestScore {
+				bestScore, best = sc, r
 			}
 		}
 		return best
@@ -659,7 +680,7 @@ func mapPhase(
 				}
 				u := queue[len(queue)-1]
 				queue = queue[:len(queue)-1]
-				r := &runningUnit{u: u, processed: new(atomic.Uint64), stop: make(chan struct{})}
+				r := &runningUnit{u: u, processed: new(atomic.Uint64), stop: make(chan struct{}), started: time.Now()}
 				inflight[u.idx] = r
 				mu.Unlock()
 

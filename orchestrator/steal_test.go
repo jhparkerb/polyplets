@@ -3,6 +3,7 @@ package orchestrator
 import (
 	"sync/atomic"
 	"testing"
+	"time"
 )
 
 // unit builds a runningUnit with the given remaining/processed input records.
@@ -36,5 +37,23 @@ func TestStealEligibleSkipsUnsplittable(t *testing.T) {
 	// no progress yet (processed=0) → ineligible (can't size it).
 	if stealEligible(unit(1000, 0), grain) {
 		t.Fatalf("a unit with no progress must be ineligible")
+	}
+}
+
+// TestStealScorePrefersComputeHeavy — RED before the tail-miss fix.
+// Victim selection must size by WALL TIME remaining, not records: a compute-heavy
+// straggler (few records left, slow rate) must outscore a record-heavy fast unit.
+// Pre-fix, stealScore ranked by remaining records, so the fast unit won.
+func TestStealScorePrefersComputeHeavy(t *testing.T) {
+	now := time.Now()
+	// record-heavy but FAST: 200 records left, 800 processed in 8s → ~100/s → ~2s left.
+	fast := unit(200, 800)
+	fast.started = now.Add(-8 * time.Second)
+	// compute-heavy STRAGGLER: 100 records left, 100 processed in 100s → ~1/s → ~100s left.
+	slow := unit(100, 100)
+	slow.started = now.Add(-100 * time.Second)
+	if stealScore(slow, now) <= stealScore(fast, now) {
+		t.Fatalf("compute-heavy straggler (more wall time left) must outscore the record-heavy one: slow=%.1f fast=%.1f",
+			stealScore(slow, now), stealScore(fast, now))
 	}
 }
