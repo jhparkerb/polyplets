@@ -120,24 +120,37 @@ func sampleIndexKeys(idxPath string, keyLen, numCuts int) ([]string, error) {
 		return nil, err
 	}
 	defer f.Close()
-	br := bufio.NewReader(f)
-	cnt, err := readIndexHeader(br, keyLen)
+	cnt, err := readIndexHeader(bufio.NewReader(f), keyLen)
 	if err != nil {
 		return nil, err
 	}
-	entry := make([]byte, keyLen+16)
-	key := entry[:keyLen]
+	if cnt <= 1 {
+		return nil, nil // only the record-0 entry → nothing interior to cut on
+	}
+	// SEEK to ~numCuts evenly-spaced interior entries — O(numCuts) reads, never the
+	// whole index (entries are fixed width, so position i is a direct offset).
+	// Entry 0 (the run minimum) is skipped: j starts at 1.
+	entryLen := int64(keyLen + 16)
+	key := make([]byte, keyLen)
+	stride := cnt / uint64(numCuts+1)
+	if stride < 1 {
+		stride = 1
+	}
 	var keys []string
-	for i := uint64(0); i < cnt; i++ {
-		if _, err := io.ReadFull(br, entry); err != nil {
+	for j := 1; j <= numCuts; j++ {
+		i := uint64(j) * stride
+		if i >= cnt {
+			i = cnt - 1
+		}
+		off := int64(idxHeaderBytes) + int64(i)*entryLen
+		if _, err := f.ReadAt(key, off); err != nil {
 			break
 		}
-		if i == 0 {
-			continue // drop record-0 key (run minimum → empty first partition)
+		if h := bytesToHex(key); len(keys) == 0 || keys[len(keys)-1] != h {
+			keys = append(keys, h) // dedup adjacent (strides can clamp to cnt-1)
 		}
-		keys = append(keys, bytesToHex(key))
 	}
-	return subsampleEvenly(keys, numCuts), nil
+	return keys, nil
 }
 
 // sampleBodyKeys is the fallback when the .idx is absent/unreadable: a buffered
@@ -300,6 +313,7 @@ const (
 	idxMagic       = 0x49594C50 // 'PLYI', little-endian
 	idxVersion     = 1
 	idxByteOrderLE = 1
+	idxHeaderBytes = 19 // magic4 + ver2 + bo1 + keyLen4 + count8 (packed, no padding)
 )
 
 // readIndexHeader reads + validates the .idx self-describing header (the single
