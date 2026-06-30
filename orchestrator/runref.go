@@ -89,6 +89,10 @@ func ParseHeader(path string) (PolyrunHeader, int64, error) {
 // SampleKeys samples up to numCuts evenly-spaced sig keys from a POLYRUN file
 // for input-space partitioning.  Returns hex-encoded keys; len <= numCuts.
 // Caller converts into unit boundaries: unit i covers [cuts[i-1], cuts[i]).
+//
+// Fast path: the .idx sidecar already holds one key per 64 records (evenly
+// spaced) — sample from it and never touch the multi-GB body.  Falls back to a
+// buffered body scan only when no usable .idx is present.
 func SampleKeys(path string, H, numCuts int) ([]string, error) {
 	if numCuts <= 0 {
 		return nil, nil
@@ -100,7 +104,45 @@ func SampleKeys(path string, H, numCuts int) ([]string, error) {
 	if hdr.Records == 0 || hdr.Height != H {
 		return nil, nil
 	}
+	keyLen := H + 2
+	if cuts, err := sampleIndexKeys(path+".idx", keyLen, numCuts); err == nil && len(cuts) > 0 {
+		return cuts, nil
+	}
+	return sampleBodyKeys(path, bodyOff, keyLen, hdr.WordBytes(), int(hdr.Records), numCuts)
+}
 
+// sampleIndexKeys returns up to numCuts evenly-spaced interior keys from the
+// .idx sidecar, reading no run body.  The first index entry (record 0) is
+// dropped so a cut never equals the run's minimum key (empty first piece).
+func sampleIndexKeys(idxPath string, keyLen, numCuts int) ([]string, error) {
+	f, err := os.Open(idxPath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	br := bufio.NewReader(f)
+	cnt, err := readIndexHeader(br, keyLen)
+	if err != nil {
+		return nil, err
+	}
+	entry := make([]byte, keyLen+16)
+	key := entry[:keyLen]
+	var keys []string
+	for i := uint64(0); i < cnt; i++ {
+		if _, err := io.ReadFull(br, entry); err != nil {
+			break
+		}
+		if i == 0 {
+			continue // drop record-0 key (run minimum → empty first partition)
+		}
+		keys = append(keys, bytesToHex(key))
+	}
+	return subsampleEvenly(keys, numCuts), nil
+}
+
+// sampleBodyKeys is the fallback when the .idx is absent/unreadable: a buffered
+// streaming scan of the run body (variable-length: keyLen + 2 + len*wordBytes).
+func sampleBodyKeys(path string, bodyOff int64, keyLen, wordBytes, records, numCuts int) ([]string, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -109,11 +151,8 @@ func SampleKeys(path string, H, numCuts int) ([]string, error) {
 	if _, err := f.Seek(bodyOff, io.SeekStart); err != nil {
 		return nil, err
 	}
-
-	// Stream records (variable-length: keyLen + 2 + len*wordBytes bytes).
-	keyLen := H + 2
-	wordBytes := hdr.WordBytes()
-	stride := int(hdr.Records) / (numCuts + 1)
+	br := bufio.NewReader(f)
+	stride := records / (numCuts + 1)
 	if stride < 1 {
 		stride = 1
 	}
@@ -122,15 +161,14 @@ func SampleKeys(path string, H, numCuts int) ([]string, error) {
 	var cuts []string
 	idx := 0
 	for {
-		if _, err := io.ReadFull(f, sig); err != nil {
+		if _, err := io.ReadFull(br, sig); err != nil {
 			break
 		}
-		if _, err := io.ReadFull(f, meta); err != nil {
+		if _, err := io.ReadFull(br, meta); err != nil {
 			break
 		}
 		length := int(meta[1])
-		// Skip count bytes (wordBytes per entry).
-		if _, err := io.CopyN(io.Discard, f, int64(length*wordBytes)); err != nil {
+		if _, err := io.CopyN(io.Discard, br, int64(length*wordBytes)); err != nil {
 			break
 		}
 		idx++
@@ -139,6 +177,26 @@ func SampleKeys(path string, H, numCuts int) ([]string, error) {
 		}
 	}
 	return cuts, nil
+}
+
+// subsampleEvenly returns up to numCuts evenly-spaced interior elements of keys.
+func subsampleEvenly(keys []string, numCuts int) []string {
+	if len(keys) <= numCuts {
+		return keys
+	}
+	out := make([]string, numCuts)
+	stride := len(keys) / (numCuts + 1)
+	if stride < 1 {
+		stride = 1
+	}
+	for i := range out {
+		idx := (i + 1) * stride
+		if idx >= len(keys) {
+			idx = len(keys) - 1
+		}
+		out[i] = keys[idx]
+	}
+	return out
 }
 
 // SampleKeysMulti samples cut points across multiple POLYRUN files.
@@ -170,24 +228,7 @@ func SampleKeysMulti(paths []string, H, numCuts int) ([]string, error) {
 	}
 	// Sort lexicographically; hex-encoded sigs sort the same as the raw bytes.
 	sort.Strings(all)
-
-	if len(all) <= numCuts {
-		return all, nil
-	}
-	// Subsample evenly.
-	out := make([]string, numCuts)
-	stride := len(all) / (numCuts + 1)
-	if stride < 1 {
-		stride = 1
-	}
-	for i := range out {
-		idx := (i + 1) * stride
-		if idx >= len(all) {
-			idx = len(all) - 1
-		}
-		out[i] = all[idx]
-	}
-	return out, nil
+	return subsampleEvenly(all, numCuts), nil
 }
 
 // SplitRangeByIndex picks numCuts keys that divide (loHex, hiHex) into

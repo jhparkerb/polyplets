@@ -3,7 +3,9 @@ package orchestrator
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"os"
+	"sort"
 	"testing"
 )
 
@@ -62,6 +64,56 @@ func TestIdxReaderSkipsCppMagicHeader(t *testing.T) {
 	for i := range want {
 		if got[i] != want[i] {
 			t.Fatalf("key %d: got %s want %s", i, got[i], want[i])
+		}
+	}
+}
+
+// writeHeaderOnly writes a POLYRUN with a valid text header claiming `records`
+// records but NO binary body — so a code path that scans the body finds nothing,
+// while one that reads the .idx still works.
+func writeHeaderOnly(t *testing.T, path string, H, maxn, records int) {
+	t.Helper()
+	var b bytes.Buffer
+	fmt.Fprintf(&b, "POLYRUN 1\nheight %d\nmaxn %d\ncounter u64\nclassifier triangle\n", H, maxn)
+	fmt.Fprintf(&b, "keylo \nkeyhi \nrecords %018d\nrev test\nbyteorder 1\n\n", records)
+	if err := os.WriteFile(path, b.Bytes(), 0o644); err != nil {
+		t.Fatalf("write header: %v", err)
+	}
+}
+
+// TestSampleKeysUsesIndexNotBody — RED before the Body Crawl fix.
+// SampleKeys must sample from the .idx sidecar, not scan the multi-GB body.
+// The run has a header claiming 1000 records but NO body, and a complete .idx;
+// the body-scanning code returns zero cuts, the .idx code returns real cuts.
+func TestSampleKeysUsesIndexNotBody(t *testing.T) {
+	dir := t.TempDir()
+	H := 3
+	keyLen := H + 2
+	path := dir + "/run.bin"
+	writeHeaderOnly(t, path, H, 6, 1000) // claims 1000 records, writes NO body
+
+	var keys [][]byte
+	idxSet := map[string]bool{}
+	for v := byte(1); v <= 8; v++ {
+		k := []byte{0, 0, 0, 0, v}
+		keys = append(keys, k)
+		idxSet[bytesToHex(k)] = true
+	}
+	writeCppIdx(t, path+".idx", keyLen, keys)
+
+	cuts, err := SampleKeys(path, H, 3)
+	if err != nil {
+		t.Fatalf("SampleKeys: %v", err)
+	}
+	if len(cuts) == 0 {
+		t.Fatalf("SampleKeys returned no cuts — it scanned the (absent) body instead of the .idx (Body Crawl)")
+	}
+	if !sort.StringsAreSorted(cuts) {
+		t.Errorf("cuts not sorted: %v", cuts)
+	}
+	for _, c := range cuts {
+		if !idxSet[c] {
+			t.Errorf("cut %s is not one of the .idx keys", c)
 		}
 	}
 }
