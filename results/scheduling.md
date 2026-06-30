@@ -64,15 +64,26 @@ had no signal to act on regardless of overlap.
 **This isn't just a small-n artifact.** At a(24)/a(25) production scale (H16
 frontier ≈ 4.7M, 256 units on dalby) each unit holds ≈18.4K records — only
 **~1.1× the stride**. A unit there gets at most 0–1 progress pulses in its entire
-run, leaving the same blind spot. **So stealing is likely to still measure ~0
-effect at a(24)/a(25)'s actual scale, unless either the stride is lowered or
-unit-mult is reduced** (fewer, fatter units — but that trades away map
-parallelism). This is the real explanation for "work-stealing does ~nothing,"
-superseding the earlier "no straggler at this scale" guess — and it's a
-follow-on fix (lowering the C++ stride), not bundled into the coexistence gate:
-it touches a hot worker loop and needs its own perf validation (more frequent
-progress emission has a small but real per-unit overhead cost to confirm is
-still cheap).
+run, leaving the same blind spot — the real explanation for "work-stealing does
+~nothing" all session, superseding the earlier "no straggler at this scale" guess.
+
+### Fixed — stride lowered 16384 → 1024, with a real measured payoff
+
+Microbenchmarked first: the bitmask check + occasional `wallSeconds()` poll cost
+the **same** (~0.7–0.85 ns/record, noise-level) from stride 2¹⁴ down to 2⁶ — the
+perf concern that justified the old large stride was unfounded, so there was no
+real tradeoff to make. Lowered to **1024** (named `kProgressStrideMask`,
+core/mapreduce.h), with a compile-time tripwire (`static_assert ≤ 4096`,
+verified to actually fire against a regression) so it can't silently regress.
+
+**Live effect on the exact isolated H3+H13 scenario**: steals went from **0 →
+15**, concentrated exactly on H13's lone columns. **Wall-clock A/B (3 reps,
+steal off vs on, same scenario, fixed stride): 151.4s → 98.5s — a real 35%
+reduction (1.54×).** Byte-exact throughout (a14, a18, full a(20) `--compare`
+with overlap+steal+the new stride all active). Work-stealing is no longer a
+dead lever — it was blind, not ineffective, and once given a usable signal it
+delivers a substantial win on a dominant-height-alone scenario, the exact
+shape of a(24)/a(25)'s endgame.
 
 ## The irreducible floor
 
