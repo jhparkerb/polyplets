@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "core/run.h"
+#include "core/profile.h"
 
 // ─── Counter name ─────────────────────────────────────────────────────────────
 
@@ -492,7 +493,16 @@ std::pair<size_t, size_t> mergeRunFiles(
 
   RunFileWriter<W> writer(out_path, H, 0, lo_hex, hi_hex, rev, keyLen);
 
+#ifdef POLY_PROFILE
+  // Split the merge into read+heap (memcmp), combine, and write (FNV+fwrite).
+  double prof_read_s = 0, prof_combine_s = 0, prof_write_s = 0;
+  uint64_t prof_combines = 0;
+  const double prof_t0 = prof::now();
+#endif
   while (!heap.empty()) {
+#ifdef POLY_PROFILE
+    const double _tr = prof::now();
+#endif
     Cursor top = heap.top();
     heap.pop();
 
@@ -510,6 +520,10 @@ std::pair<size_t, size_t> mergeRunFiles(
         std::memcmp(top.rec.sig.b, hi_sig, static_cast<size_t>(keyLen)) >= 0)
       break;
 
+#ifdef POLY_PROFILE
+    prof_read_s += prof::now() - _tr;
+    const double _tc = prof::now();
+#endif
     while (!heap.empty()) {
       if (std::memcmp(top.rec.sig.b, heap.top().rec.sig.b,
                       static_cast<size_t>(keyLen)) != 0) break;
@@ -520,11 +534,34 @@ std::pair<size_t, size_t> mergeRunFiles(
       nc.idx = eq.idx;
       if (readers[eq.idx]->next(nc.rec))
         heap.push(std::move(nc));
+#ifdef POLY_PROFILE
+      ++prof_combines;
+#endif
     }
 
+#ifdef POLY_PROFILE
+    prof_combine_s += prof::now() - _tc;
+    const double _tw = prof::now();
+#endif
     writer.append(top.rec);
+#ifdef POLY_PROFILE
+    prof_write_s += prof::now() - _tw;
+#endif
   }
 
   size_t body_bytes = writer.finalize();
+#ifdef POLY_PROFILE
+  {
+    char line[512];
+    std::snprintf(line, sizeof(line),
+      "mergephase site=%s H=%d K=%zu out_recs=%zu combines=%llu "
+      "read_s=%.4f combine_s=%.4f write_s=%.4f total_s=%.4f peak_rss_mb=%.1f",
+      prof::site(), H, in_paths.size(), writer.records(),
+      (unsigned long long)prof_combines,
+      prof_read_s, prof_combine_s, prof_write_s, prof::now() - prof_t0,
+      prof::peakRssMB());
+    prof::emit(line);
+  }
+#endif
   return {body_bytes, writer.records()};
 }

@@ -83,9 +83,56 @@ log K) vs write-FNV (A4) vs combine (A5) at realistic K≈320 — that is exactl
 Track B measures. No RAM surprise is expected; if Track B shows RSS tracking total
 input size, that contradicts A1 and means a hidden materialization to hunt.
 
-## Track B — dynamic profile (PENDING)
+## Track B — dynamic profile (COMPLETE)
 
-Needs the K-sweep runs (K ∈ {4,16,64,256}) with `-DMERGE_PROFILE` timers +
-perf/heaptrack, per the plan: compare-vs-combine-vs-write split, RSS-vs-K and
-RSS-vs-bytes curves (confirm the flat A1 prediction), and whether write-FNV (A4)
-is the dominant frame at K≈320.
+Method: same `-DPOLY_PROFILE` timers (core/profile.h) in `mergeRunFiles`, driven by
+real orchestrate sweeps at maxn 16/18. The clean **column-fan-in** merges are
+isolated as the `mergephase K>1, out_recs>1000` lines of the no-spill (2 GB ram)
+run — in that run every map_worker does exactly one K=1 terminal merge, so all
+substantive (K>1) merges are the standalone `merge_worker` column merges. n=123
+such merges, meanK=5.8, 566 K output records.
+
+### B1. CPU split — combine dominates, NOT heap-memcmp (revises A2 guess)
+
+| Phase (timer) | share | what it is |
+|---|---|---|
+| **combine** | **58%** | `RunRecord::combine` — fresh `merged` vector per equal-key collision |
+| **write** (FNV-1a + fwrite) | **23%** | hashing every output body byte |
+| read + heap (memcmp) | **19%** | the k-way heap |
+
+Measured **2.36 combines per output record** at meanK=5.8 — most keys appear in
+several shards and get combined, each a malloc. The `sample` profile corroborates:
+`combine` + alloc/free are a large block; `memcmp` is present but not dominant.
+
+**Finding 5 (new): the merge is combine-bound, and combine is alloc-bound (A5).**
+Track A guessed heap-memcmp would dominate; measurement says **combine 58%**, and
+combine's cost is its per-collision `std::vector` allocation (run.h:63, the run.h:51
+"grow in place when `new_lo==lo`" TODO). **This makes A5 the #1 merge lever**, and
+**A4 (write-FNV, 23%) the #2** — both confirmed real, both grow with K (more shards
+→ more combines/record and more output). At a(25)'s K≈320 the combine share rises
+further, so the merge is *not* asymptotically free on CPU — it's alloc-bound.
+
+### B2. Memory — A1 confirmed (flat, trivial)
+
+The `mergephase` lines carry the process peak RSS; for the standalone column merges
+it never moved off the few-MB floor (the 1909 MB values in the table are the shared
+`driver1` process max, not merge-attributable). Combined with the **code-proof in
+A1** (≤ K cursor records + stdio buffers, no result vector), merge RAM is confirmed
+**flat in total bytes, ~K·4 KB** — a non-issue even at K≈320 (~1.3 MB). No hidden
+materialization (would have shown as RSS tracking input size; it didn't).
+
+### B-verdicts vs Track A
+- A1 (streaming, flat RAM) — **confirmed** (code-proof + no RSS growth).
+- A3 (seek-index kills read-amp) — **confirmed by code**; not re-timed (the no-`lo`
+  spill-merges don't seek, the bounded column merges do — the 19% read share is
+  already post-seek and small).
+- A2 guess (memcmp-dominant) — **wrong**; it's **combine-dominant (58%)**.
+- A4 (write-FNV non-trivial) — **confirmed, 23%**.
+- A5 (combine per-collision alloc) — **confirmed as the #1 lever** (2.36 allocs/rec).
+
+### Joint lever (map + merge)
+`combine`'s grow-in-place fix (run.h:51) and map's scratch-successor fix
+(mapreduce.h:64) are the **same allocation pattern** — millions of tiny
+`std::vector<W>` create/destroy. One refactor (a reusable counts buffer that grows
+in place when the window only extends) attacks **map's ~14%** *and* **merge's 58%**.
+Highest-ROI single change surfaced by the profiling.

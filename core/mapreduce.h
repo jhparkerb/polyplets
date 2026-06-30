@@ -28,6 +28,7 @@
 #include "core/transition.h"
 #include "core/run.h"
 #include "core/classifier.h"
+#include "core/profile.h"
 
 // Configuration for one shard map pass.
 struct ShardCfg {
@@ -274,6 +275,17 @@ std::pair<size_t, size_t> map_shard_file(
   size_t total_spill_bytes = 0;
   int spill_seq = 0;
 
+#ifdef POLY_PROFILE
+  // Coarse phase wall-time + counters (Track B). Times the get-next-source-record
+  // path (read+heap+combine), the map body (classify+enumerate+step+build), the
+  // spills, and the final merge separately. Plus the decisive Finding-1/2 numbers:
+  // model buf_bytes vs the ACTUAL resident buf footprint at the largest spill.
+  double prof_read_s = 0, prof_map_s = 0, prof_spill_s = 0, prof_merge_s = 0;
+  uint64_t prof_src = 0, prof_masks = 0, prof_succ = 0;
+  size_t prof_max_model = 0, prof_max_actual = 0, prof_max_size = 0, prof_max_cap = 0;
+  const double prof_t0 = prof::now();
+#endif
+
   // Per-record RESIDENT-RAM estimate for the spill trigger. Must reflect the
   // actual std::vector<RunRecord> footprint, not wire size: the object itself
   // (Sig + fields + the vector control block) + the heap-allocated counts vector
@@ -285,6 +297,22 @@ std::pair<size_t, size_t> map_shard_file(
 
   auto do_spill = [&]() {
     if (buf.empty()) return;
+#ifdef POLY_PROFILE
+    // Measure the real resident footprint of buf right before it drains: the
+    // backing-array capacity (geometric-doubling slack, Finding 2a) + every
+    // counts allocation's capacity. Compare to buf_bytes (the record_est model).
+    {
+      size_t actual = buf.capacity() * sizeof(RunRecord<W>);
+      for (const auto& r : buf) actual += r.counts.capacity() * sizeof(W);
+      if (actual > prof_max_actual) {
+        prof_max_actual = actual;
+        prof_max_model  = buf_bytes;
+        prof_max_size   = buf.size();
+        prof_max_cap    = buf.capacity();
+      }
+    }
+    const double _ts = prof::now();
+#endif
     sortRun(buf);
     deduplicateRun(buf);
     std::string spill_path = cfg.spill_dir + "/spill_" +
@@ -297,11 +325,17 @@ std::pair<size_t, size_t> map_shard_file(
     spill_files.push_back(spill_path);
     buf.clear();
     buf_bytes = 0;
+#ifdef POLY_PROFILE
+    prof_spill_s += prof::now() - _ts;
+#endif
   };
 
   // Stream records from heap, apply map logic.
   size_t processed = 0;
   while (!heap.empty()) {
+#ifdef POLY_PROFILE
+    const double _tr = prof::now();
+#endif
     // Periodic progress pulse (~every 2^14 source keys); the callback throttles
     // by wall time and emits event=progress.  Cheap: a mask test per iteration.
     // The stride is well below a typical unit's key count so even slow,
@@ -362,6 +396,11 @@ std::pair<size_t, size_t> map_shard_file(
     const int ms = rec.minSize();
     if (ms < 0) continue;
 
+#ifdef POLY_PROFILE
+    prof_read_s += prof::now() - _tr;
+    ++prof_src;
+    const double _tm = prof::now();
+#endif
     Classifier::complete(rec.sig, H, rec, out_classified);
 
     // occupancy bitmask of the current boundary column (for holes accounting)
@@ -372,6 +411,9 @@ std::pair<size_t, size_t> map_shard_file(
     }
 
     forEachViableMask(rec.sig, H, maxn - ms, [&](unsigned mask) {
+#ifdef POLY_PROFILE
+      ++prof_masks;
+#endif
       Sig out_sig;
       if (stepColumnSquare8(rec.sig, H, mask, out_sig) != Outcome::Alive) return;
 
@@ -407,8 +449,14 @@ std::pair<size_t, size_t> map_shard_file(
       succ.counts.assign(rec.counts.begin(), rec.counts.begin() + new_len);
       buf.push_back(std::move(succ));
       buf_bytes += record_est;
+#ifdef POLY_PROFILE
+      ++prof_succ;
+#endif
     });
 
+#ifdef POLY_PROFILE
+    prof_map_s += prof::now() - _tm;
+#endif
     if (cfg.ram_budget_bytes > 0 && buf_bytes > cfg.ram_budget_bytes)
       do_spill();
   }
@@ -417,8 +465,26 @@ std::pair<size_t, size_t> map_shard_file(
   do_spill();  // flush remaining buf to a spill file
 
   // Merge all spill files into out_path (record count threaded out of the merge).
+#ifdef POLY_PROFILE
+  const double _tmg = prof::now();
+#endif
   auto [out_bytes, out_recs] = mergeRunFiles<W>(spill_files, H, "", "", out_path, rev, keyLen);
   (void)out_bytes;
+#ifdef POLY_PROFILE
+  prof_merge_s += prof::now() - _tmg;
+  {
+    char line[512];
+    std::snprintf(line, sizeof(line),
+      "mapphase H=%d maxn=%d src=%llu masks=%llu succ=%llu spills=%d out_recs=%zu "
+      "read_s=%.4f map_s=%.4f spill_s=%.4f merge_s=%.4f total_s=%.4f peak_rss_mb=%.1f "
+      "model_bytes=%zu actual_bytes=%zu buf_size=%zu buf_cap=%zu",
+      H, maxn, (unsigned long long)prof_src, (unsigned long long)prof_masks,
+      (unsigned long long)prof_succ, spill_seq, out_recs,
+      prof_read_s, prof_map_s, prof_spill_s, prof_merge_s, prof::now() - prof_t0,
+      prof::peakRssMB(), prof_max_model, prof_max_actual, prof_max_size, prof_max_cap);
+    prof::emit(line);
+  }
+#endif
 
   // Delete temp spill files.
   for (const auto& sf : spill_files)
