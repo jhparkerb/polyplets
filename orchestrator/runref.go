@@ -252,7 +252,46 @@ func SplitRangeByIndex(frontier []string, H int, loHex, hiHex string, numCuts in
 // indexKeysInRange reads a .idx sidecar and returns the hex keys that fall in
 // (lo, hi) — strictly greater than lo (a cut equal to lo would leave an empty
 // first piece) and, if hi is set, strictly less than hi.
-// Sidecar format (native byte order): [u32 keyLen][u64 count]{key[keyLen], u64 offset, u64 recidx}*.
+// Sidecar format MUST match core/runfile.h writeIndexSidecar:
+//   magic(u32 'PLYI') ver(u16) bo(u8) keyLen(u32) count(u64), little-endian,
+//   then count × { key[keyLen] u64 offset u64 recidx }.
+const (
+	idxMagic       = 0x49594C50 // 'PLYI', little-endian
+	idxVersion     = 1
+	idxByteOrderLE = 1
+)
+
+// readIndexHeader reads + validates the .idx self-describing header (the single
+// place that knows the on-disk layout) and returns the entry count.
+func readIndexHeader(br *bufio.Reader, wantKeyLen int) (uint64, error) {
+	var magic, kl uint32
+	var ver uint16
+	var bo uint8
+	var cnt uint64
+	if err := binary.Read(br, binary.LittleEndian, &magic); err != nil {
+		return 0, err
+	}
+	if err := binary.Read(br, binary.LittleEndian, &ver); err != nil {
+		return 0, err
+	}
+	if err := binary.Read(br, binary.LittleEndian, &bo); err != nil {
+		return 0, err
+	}
+	if magic != idxMagic || ver != idxVersion || bo != idxByteOrderLE {
+		return 0, fmt.Errorf("idx bad header: magic=%#x ver=%d bo=%d", magic, ver, bo)
+	}
+	if err := binary.Read(br, binary.LittleEndian, &kl); err != nil {
+		return 0, err
+	}
+	if err := binary.Read(br, binary.LittleEndian, &cnt); err != nil {
+		return 0, err
+	}
+	if int(kl) != wantKeyLen {
+		return 0, fmt.Errorf("idx keyLen %d != %d", kl, wantKeyLen)
+	}
+	return cnt, nil
+}
+
 func indexKeysInRange(idxPath string, keyLen int, lo []byte, hasLo bool, hi []byte, hasHi bool) ([]string, error) {
 	f, err := os.Open(idxPath)
 	if err != nil {
@@ -260,20 +299,12 @@ func indexKeysInRange(idxPath string, keyLen int, lo []byte, hasLo bool, hi []by
 	}
 	defer f.Close()
 	br := bufio.NewReader(f)
-
-	var kl uint32
-	var cnt uint64
-	if err := binary.Read(br, binary.LittleEndian, &kl); err != nil {
+	cnt, err := readIndexHeader(br, keyLen)
+	if err != nil {
 		return nil, err
 	}
-	if err := binary.Read(br, binary.LittleEndian, &cnt); err != nil {
-		return nil, err
-	}
-	if int(kl) != keyLen {
-		return nil, fmt.Errorf("idx keyLen %d != %d", kl, keyLen)
-	}
-	entry := make([]byte, int(kl)+16) // key + u64 offset + u64 recidx
-	key := entry[:kl]
+	entry := make([]byte, keyLen+16) // key + u64 offset + u64 recidx
+	key := entry[:keyLen]
 	var keys []string
 	for i := uint64(0); i < cnt; i++ {
 		if _, err := io.ReadFull(br, entry); err != nil {
