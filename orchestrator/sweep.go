@@ -521,6 +521,23 @@ func (r *runningUnit) remaining() uint64 {
 	return r.u.estTotal - p
 }
 
+// indexStride mirrors core/runfile.h kIndexStride: the .idx holds one key per
+// indexStride records, so a remnant needs ≥2 strides to contain an interior cut.
+const indexStride = 64
+
+// stealEligible reports whether an in-flight unit is worth stealing: making
+// progress, not already stopped/un-splittable, MORE than a grain of work left,
+// AND at least 2 index strides of records remaining so the .idx can actually cut
+// the remnant. Without the last clause the stealer stops a victim it then cannot
+// split, paying the stop+respawn overhead for zero fan-out (Stop-Then-Shrug).
+func stealEligible(r *runningUnit, grainRecs uint64) bool {
+	if r.stopped || r.u.noSteal || r.processed.Load() == 0 {
+		return false
+	}
+	rem := r.remaining()
+	return rem > grainRecs && rem >= 2*indexStride
+}
+
 // mapPhase maps the source frontier to the next column via a dynamic work-stealing
 // pool (DESIGN 08, T2.3).  numUnits = Cores*UnitMult key-range units seed a pull
 // queue worked by Cores goroutines.  When the queue drains and a core goes idle
@@ -607,10 +624,10 @@ func mapPhase(
 		var best *runningUnit
 		var bestRem uint64
 		for _, r := range inflight {
-			if r.stopped || r.u.noSteal || r.processed.Load() == 0 {
+			if !stealEligible(r, grainRecs) {
 				continue
 			}
-			if rem := r.remaining(); rem > grainRecs && rem > bestRem {
+			if rem := r.remaining(); rem > bestRem {
 				bestRem, best = rem, r
 			}
 		}
