@@ -196,7 +196,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		// Strips H==maxn-k for k=2,3,4 are closed-form (proven diagonals). The
 		// guard maxn>=3k+1 keeps the smallest 3-power (3^(maxn-1-3k), at n=maxn)
 		// non-negative; below that the strip is swept. Frees the top 5 heights.
-		if k := maxn - H; k >= 2 && k <= 4 && maxn >= 3*k+1 {
+		if k := maxn - H; k >= 2 && k <= 6 && maxn >= 3*k+1 {
 			contributeDiagonalStrip(maxn, k, triangle, cfg)
 			continue
 		}
@@ -291,7 +291,7 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 				mu.Unlock()
 				return
 			}
-			if k := cfg.Maxn - H; k >= 2 && k <= 4 && cfg.Maxn >= 3*k+1 {
+			if k := cfg.Maxn - H; k >= 2 && k <= 6 && cfg.Maxn >= 3*k+1 {
 				mu.Lock()
 				contributeDiagonalStrip(cfg.Maxn, k, triangle, cfg)
 				mu.Unlock()
@@ -1020,12 +1020,16 @@ func contributePoleHeight(maxn int, triangle []uint64, cfg SweepConfig) {
 	}
 }
 
-// diagonalCell returns T(n, n-j), the j-th height-diagonal, for the PROVEN
-// diagonals j=0..4 (docs/proofs/T-n-nm1.md, T-n-nm2-and-general.md). Each is a
-// degree-j polynomial in n times a power of 3; the numerators are integer-exact
-// (each is divisible by the stated denominator for all valid n). Valid for
-// n >= 2j+1 (so the 3-power exponent is non-negative); callers guarantee it.
-// int64 holds every intermediate for n up to the u64 result-pipeline cap (a25).
+// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..6
+// (docs/proofs/T-n-nm1.md, T-n-nm2-and-general.md). j=0,1,2 are proven from first
+// principles; j=3..6 are data-pinned from the a(20)/a(21) triangle (leading 25^j/j!,
+// integer-exact). Each is a degree-j polynomial in n times a power of 3; the
+// numerator is divisible by j! for all valid n (verified), so the Go integer
+// division is exact. Requires n >= 3j+1 so the exponent n-1-3j is non-negative
+// (pow3 has no negative powers); the maxn>=3k+1 strip dispatch guarantees it for
+// every injected cell. int64 holds every intermediate for n up to a25 (the u64
+// result-pipeline cap). NOTE: j=3..6 are validated at scale by the a(23) sweep
+// (its swept H=16..18 == k=5..7) before any record run injects them.
 func diagonalCell(n, j int) uint64 {
 	N := int64(n)
 	switch j {
@@ -1039,6 +1043,10 @@ func diagonalCell(n, j int) uint64 {
 		return uint64((15625*N*N*N-100050*N*N+122213*N-32940)/6) * pow3(n-10)
 	case 4:
 		return uint64((390625*N*N*N*N-3596250*N*N*N+8099843*N*N-6462882*N+1752840)/24) * pow3(n-13)
+	case 5:
+		return uint64((9765625*N*N*N*N*N-120546875*N*N*N*N+425836625*N*N*N-650171245*N*N+422003550*N+76975920)/120) * pow3(n-16)
+	case 6:
+		return uint64((244140625*N*N*N*N*N*N-3861328125*N*N*N*N*N+19486496875*N*N*N*N-47366857935*N*N*N+55373728180*N*N+946828380*N-32099353920)/720) * pow3(n-19)
 	}
 	panic("diagonalCell: unsupported diagonal j")
 }

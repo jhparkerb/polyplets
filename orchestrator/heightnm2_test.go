@@ -28,6 +28,10 @@ func TestHeightNm2Formula(t *testing.T) {
 		{11, 3, 5001114},    // T(11,8)
 		{13, 4, 189262009},  // T(13,9)
 		{14, 4, 829622715},  // T(14,10)
+		{16, 5, 32703766750},     // T(16,11)  (k=5, data-pinned; n=3j+1 boundary)
+		{21, 5, 40713857307270},  // T(21,16)
+		{19, 6, 5776897734667},   // T(19,13)  (k=6, data-pinned; n=3j+1 boundary)
+		{21, 6, 106805460671316}, // T(21,15)
 	}
 	for _, c := range cases {
 		if got := diagonalCell(c.n, c.j); got != c.want {
