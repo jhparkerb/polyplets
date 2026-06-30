@@ -11,6 +11,16 @@ is the acceptance gate for anything that touches the sort/merge/combine path.
 | **`combine` grow-in-place** (run.h) | 0 allocs on the in-window path (was 1 malloc+copy+free/collision); map sort+dedup phase 39%→32% at maxn18 | red-first `gate_run` + a14/a16/a18 |
 | **`sigCmp`** 8-byte-chunk key compare (signature.h) | **1.29–1.52×** on the sort + merge-heap comparator (13 sites) | microbench same-order=1; a14/a18 |
 
+**End-to-end validation (the check that mattered).** Microbench wins can wash out
+in production (the counts pool did). A/B of the full `next-system` engine
+(combine+sigCmp) vs the pre-perf baseline (e694a39) on real multi-process
+orchestrate maxn18, 4 reps each: **−7.3% wall at 2 GB ram (43.6→40.4s), −6.6% at
+256 MB (41.7→39.0s)**, tight variance. So the two shipped changes deliver a real,
+consistent ~7% production speedup — they did NOT wash out. (Re-profiling the phase
+*splits* after these changes would only show enum even more dominant and a smaller
+remaining surface — it wouldn't flip any reject/defer decision, since those were
+measured against the post-change binary and our changes only made things faster.)
+
 ## Measured and REJECTED (no win / wrong tradeoff)
 
 | Candidate | Why not |
