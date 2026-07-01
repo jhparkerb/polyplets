@@ -248,7 +248,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		// Strips H==maxn-k for k=2,3,4 are closed-form (proven diagonals). The
 		// guard maxn>=3k+1 keeps the smallest 3-power (3^(maxn-1-3k), at n=maxn)
 		// non-negative; below that the strip is swept. Frees the top 5 heights.
-		if k := maxn - H; k >= 2 && k <= 7 && maxn >= 3*k+1 {
+		if k := maxn - H; k >= 2 && k <= 8 && maxn >= 3*k+1 {
 			contributeDiagonalStrip(maxn, k, triangle, cfg)
 			continue
 		}
@@ -392,7 +392,7 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 				fireAfterHeight(H)
 				return
 			}
-			if k := cfg.Maxn - H; k >= 2 && k <= 7 && cfg.Maxn >= 3*k+1 {
+			if k := cfg.Maxn - H; k >= 2 && k <= 8 && cfg.Maxn >= 3*k+1 {
 				mu.Lock()
 				contributeDiagonalStrip(cfg.Maxn, k, triangle, cfg)
 				markDone(H)
@@ -1163,16 +1163,19 @@ func contributePoleHeight(maxn int, triangle []uint64, cfg SweepConfig) {
 	}
 }
 
-// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..7
+// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..8
 // (docs/proofs/T-n-nm1.md, T-n-nm2-and-general.md). j=0,1,2 are proven from first
-// principles; j=3..7 are data-pinned from the triangle (leading 25^j/j!,
-// integer-exact) and VALIDATED at scale by the a(23) sweep (its swept H=16..18 ==
-// k=5..7 reproduce the formulas exactly). Each is a degree-j polynomial in n times a
-// power of 3; the numerator is divisible by j! for all valid n (verified), so the
-// integer division is exact. Requires n >= 3j+1 so the exponent n-1-3j is
-// non-negative (pow3 has no negative powers); the maxn>=3k+1 strip dispatch
-// guarantees it. j<=6 stay in int64 through a25; j=7's coefficients overflow int64
-// at n>=22, so case 7 builds the numerator in big.Int.
+// principles; j=3..8 are data-pinned from the triangle (leading 25^j/j!,
+// integer-exact) and VALIDATED at scale by the a(23)/a(24) sweeps (their swept
+// H=16..18 == k=5..7 reproduce the formulas exactly; j=8 is pinned from a(24)'s
+// T(24,16), which matched the pre-a(24) falsifiable sum-of-roots prediction
+// exactly -- see results/k8-pinning.md, scripts/pin_diagonal_k8_final.py). Each
+// is a degree-j polynomial in n times a power of 3; the numerator is divisible
+// by j! for all valid n (verified), so the integer division is exact. Requires
+// n >= 3j+1 so the exponent n-1-3j is non-negative (pow3 has no negative
+// powers); the maxn>=3k+1 strip dispatch guarantees it. j<=6 stay in int64
+// through a25; j=7,8's coefficients overflow int64 at the n they're used at, so
+// cases 7 and 8 build the numerator in big.Int.
 func diagonalCell(n, j int) uint64 {
 	N := int64(n)
 	switch j {
@@ -1203,6 +1206,22 @@ func diagonalCell(n, j int) uint64 {
 		}
 		num.Quo(num, big.NewInt(5040))
 		num.Mul(num, new(big.Int).SetUint64(pow3(n-22)))
+		return num.Uint64()
+	case 8:
+		// k=8 coefficients overflow int64 at the n they're used at (a25's
+		// maxn=25), so the numerator is built in big.Int (Horner), same as
+		// case 7. P_8 is pinned from a(24)'s real T(24,16)=42594477635772598
+		// (n=17..24, 8 points, leading coeff fixed at 25^8/8! by the confirmed
+		// conjecture) -- see scripts/pin_diagonal_k8_final.py, whose fit
+		// reproduces all 8 defining points exactly and whose result matches
+		// the pre-a(24) falsifiable sum-of-roots prediction exactly.
+		num := big.NewInt(152587890625)
+		for _, c := range []int64{-3625976562500, 31658675781250, -149222374175000, 391357255277905, -350057694296660, -718224955399380, 2136536485853040, -923712586957440} {
+			num.Mul(num, big.NewInt(N))
+			num.Add(num, big.NewInt(c))
+		}
+		num.Quo(num, big.NewInt(40320))
+		num.Mul(num, new(big.Int).SetUint64(pow3(n-25)))
 		return num.Uint64()
 	}
 	panic("diagonalCell: unsupported diagonal j")

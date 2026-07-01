@@ -34,6 +34,16 @@ func TestHeightNm2Formula(t *testing.T) {
 		{21, 6, 106805460671316}, // T(21,15)
 		{22, 7, 1035856891052731}, // T(22,15)  (k=7, big.Int; pinned+validated by a(23))
 		{23, 7, 4492550651512074}, // T(23,16)
+		{24, 7, 19111727676683781}, // T(24,17)  (k=7, validated by a(24))
+		// k=8, big.Int; pinned by a(24)'s T(24,16) (results/k8-pinning.md,
+		// scripts/pin_diagonal_k8_final.py). j=8 is only ever invoked at
+		// n=25 (case 8 requires n>=3*8+1=25 for its pow3 exponent to be
+		// non-negative; the maxn>=3k+1 strip dispatch guarantees this).
+		// T(25,17) is a genuine EXTRAPOLATION beyond the 8 fitting points
+		// (n=17..24) -- this pins the Go transcription against the Python
+		// fit's own output, not an independent confirmation; a(25)'s own
+		// sweep of H=17 is the actual confirmation, same as a(24) was for k=7.
+		{25, 8, 187767529262410933}, // T(25,17)
 	}
 	for _, c := range cases {
 		if got := diagonalCell(c.n, c.j); got != c.want {
