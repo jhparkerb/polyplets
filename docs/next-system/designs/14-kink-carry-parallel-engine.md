@@ -7,10 +7,11 @@ duplication grows `~S^0.7-0.8`, no plateau, eating most of the kernel's win
 at production shard counts. **Option A is GO on volume**
 (`results/kink-carry-optionA-volume.md`): H merge barriers per column move
 *less* total data than today's one big barrier, and the margin widens with H
-(0.20× at H8 down to ~0.009× at H14, extrapolated). Real per-barrier
-orchestration overhead is unmeasured (needs the wired engine) but not
-expected to erase a 10-100× volume win. Proceeding to Phase 1 scoped to
-Option A: barrier = stage boundary, not column boundary.
+(0.20× at H8 down to ~0.009× at H14, extrapolated). **Per-barrier fixed
+overhead bounded from production telemetry** at ~6-30ms
+(`results/kink-carry-optionA-barrier-overhead.md`) — negligible × H.
+Proceeding to Phase 1 scoped to Option A: barrier = stage boundary, not
+column boundary.
 
 ## What changes and what does not
 
@@ -54,10 +55,14 @@ the margin widens with H (0.20× at H8 → ~0.009× at H14, extrapolated), becau
 stage size is flat ~3.6× the frontier while today's single barrier carries
 `Σ masks`. Zero duplication by construction — every stage is exact.
 
-Open (not yet measured, needs the wired engine): real per-barrier
-orchestration overhead (dispatch/sync/wait) × H vs production's existing
-per-column barrier cost, and whether H small barriers serialize worker
-idle time worse than one big barrier does today.
+Per-barrier fixed overhead bounded from real production telemetry
+(`results/kink-carry-optionA-barrier-overhead.md`): tail columns with
+near-zero frontier isolate the fixed floor of a full map+merge round-trip at
+~6-30ms on dalby. `H × that` is well under a second per column — negligible
+against both the volume win above and peak-column wall times measured in
+hours. Still open, deferred to the Phase 2 wired-engine gate: whether H
+small barriers serialize worker idle time worse than one big one — a
+scheduling question the fixed-cost bound doesn't answer.
 
 Rejected:
 - **Option B (shard sources, private per-shard stage DP):** duplication grows
@@ -94,9 +99,16 @@ telemetry.
   at every H tested, and the ratio shrinks with H (0.20× at H8 → ~0.009× at
   H14, extrapolated). Zero duplication by construction. Full data:
   `results/kink-carry-optionA-volume.md`. **Decision: Option A chosen.**
-  Real per-barrier orchestration overhead (dispatch/sync/wait × H) is
-  unmeasured — not visible to a serial probe, deferred to Phase 2/3 once the
-  engine is wired.
+- **0.1c Per-barrier fixed overhead. DONE — bounded, negligible.** No new
+  code: mined `results/ns_a26/cost_profile.tsv` and
+  `results/ns_a27/cost_profile_dalby.tsv` for tail columns (frontier→0),
+  which isolate the fixed floor of a real map+merge round-trip (dispatch,
+  fork/exec, sync, barrier) from volume cost. Floors at **~6-30ms** on
+  dalby, consistent across two heights/runs. `H × that ≈ 0.2-0.5s` added
+  fixed tax per column at H16 — negligible against the 100-300× volume
+  reduction from 0.1b and against peak-column wall times measured in hours.
+  Full data: `results/kink-carry-optionA-barrier-overhead.md`. Closes the
+  open question from 0.1b without needing the wired engine.
 - **0.2 Production record format.** Confirm the ~3.6× intermediate factor and
   the per-worker RAM projection hold with **ranged u128 rows** (not the probe's
   full u64 rows) at H16 shape. Establishes the real bytes/intermediate-state.
