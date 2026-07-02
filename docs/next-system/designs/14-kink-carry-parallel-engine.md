@@ -114,24 +114,39 @@ telemetry.
   full u64 rows) at H16 shape. Establishes the real bytes/intermediate-state.
 - Deliverable: numbers appended to `results/kink-carry.md`; go/no-go on B.
 
-### Phase 1 — Stage kernel as a `map_shard` variant (library only)
+### Phase 1 — Stage kernel as a `map_shard` variant (library only). DONE
 - Option A means the column loop itself gains a level: instead of 1
   map-then-merge per column, it runs **H sequential stage-map-then-merge
-  cycles**. Port the single-stage fan-out (`occupy in {0,1}`, union-find,
-  canonicalize) into `map_shard_stage<W, Classifier>` in `core/`, consuming a
+  cycles**. Ported the single-stage fan-out (`occupy in {0,1}`, union-find,
+  canonicalize) into `core/kink.h`: `kinkStageTransition` (the per-record
+  transition, extracted so `experiments/kink_tm/kink_tm.cpp`'s `kinkSweep`
+  calls the SAME function — probe and port can't drift apart) and
+  `map_shard_stage<W>` (the ranged-`RunRecord` adaptation, mirroring how
+  `core/mapreduce.h`'s `map_shard` adapts `forEachViableMask`). Consumes a
   shard of the *current stage's* table (mixed-state key: boundary + carry
-  byte + touch flags) and producing a sorted `Run` of that shard's successor
-  records — same `Run<W>`/`mergeRuns` contract as today, just keyed on the
-  stage's mixed state instead of the end-of-column state. Reuse `Sig`,
-  `canonicalizeSig`, `completionLowerBound`/`foldSig` (end-of-column stage
-  only), the classifier hooks.
+  byte + touch flags, keyLen H+4) and produces a sorted `Run` of that shard's
+  successor records — same `Run<W>`/`mergeRuns` contract as today, just keyed
+  on the stage's mixed state instead of the end-of-column state.
+  `Classifier`/column-boundary harvest+finalize (canonicalizeSig/
+  completionLowerBound/foldSig at end-of-column) are NOT part of this
+  function — those are column-boundary concerns, Phase 2 wiring.
 - **Scope v1 = triangle only.** The holes path uses `sig.b[H+2]` for the Euler
   hole count, which the kink state needs for the carry — conflict. Holes stay on
   the column kernel (they are an a19/a20-era concern, off the a(30) path).
-- Red-first tests: for random stage-table shards at H=4..10, `map_shard_stage`
-  output is byte-identical to running the unsharded `kinkSweep` stage
-  transition on the same table. Orchestrator still calls the old path; this
-  phase ships dark.
+- Red-first tests: `test/gate_kink.cpp` (`make ns-gate-kink`, wired into
+  `ns-gates`/`ns-gate-fast`). For random stage-table shards at H=4..10:
+  (1) `map_shard_stage`'s ranged output matches ground truth — the same
+  source records expanded to dense per-n vectors and run through
+  `kinkStageTransition` directly, no windowing; (2) shard invariance — split
+  a table into shards, `map_shard_stage` each, `mergeRuns` — byte-identical to
+  running the whole table at once (the actual Option A parallelism claim).
+  Verified red: injecting a windowing bug (dropping the lo-shift) fails the
+  gate; a bug inside the *shared* `kinkStageTransition` itself is (correctly)
+  out of this gate's scope — that's covered by `kink_tm`'s existing
+  whole-column byte-match gate, re-run clean after the extraction
+  (`kink_tm 8 16`, `kink_tm 10 18`: "counts identical", numbers unchanged from
+  `results/kink-carry.md`). Orchestrator still calls the old path; this phase
+  ships dark.
 
 ### Phase 2 — Wire behind `--kernel`, gate at a(20)
 - Orchestrator column loop grows a stage sub-loop under `--kernel kink`: H

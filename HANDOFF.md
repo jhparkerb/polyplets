@@ -1,5 +1,58 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (later night) — Design 14 Phase 1 DONE: stage kernel ported to core/
+
+Branch **`kink-carry`**, building on the Phase 0 tip below. a(28)[ayr]/a(29)[dalby]
+still running untouched (see launch entry further down).
+
+**Phase 1 (library only, ships dark) is done and gated green.** New
+`core/kink.h`:
+- `kinkStageTransition` — the per-record kink-carry stage fan-out (`occupy in
+  {0,1}`, union-find over N/W/NW/SW, canonicalize, stranding check on the
+  outgoing carry), extracted from `experiments/kink_tm/kink_tm.cpp`'s
+  `kinkSweep`. The probe now calls this SAME function (refactor only, no
+  logic change) so the probe and the port can never drift apart — re-ran the
+  probe's own whole-column byte-match gate after the extraction (`kink_tm 8
+  16`, `kink_tm 10 18`) and the numbers are unchanged from `results/kink-carry.md`.
+- `map_shard_stage<W>` — adapts `kinkStageTransition` from single dense
+  per-state count vectors to the production ranged `RunRecord<W>` window
+  format (same lo/len shift-and-clip idea `core/mapreduce.h`'s `map_shard`
+  uses for `forEachViableMask`). Consumes a shard of the *current stage's*
+  mixed-state table (keyLen H+4: boundary + carry byte + touch/placed flags)
+  and produces that shard's successor `Run<W>` for stage+1 — same
+  `Run<W>`/`mergeRuns` contract as today.
+- **Classifier / column-boundary harvest+seed+finalize (canonicalizeSig,
+  completionLowerBound prune, foldSig, classify) are NOT in this function** —
+  those are column-boundary concerns and are Phase 2 wiring, not built yet.
+
+**Red-first gate:** `test/gate_kink.cpp` (`make ns-gate-kink`, now in both
+`ns-gates` and `ns-gate-fast` — cheap, ~0.1s). For random synthetic
+stage-table shards at H=4..10 (3 stage positions x 3 trials each): (1)
+`map_shard_stage`'s ranged output matches ground truth (same records expanded
+to dense per-n vectors, run through `kinkStageTransition` directly, no
+windowing) and (2) shard invariance — splitting a table into shards, mapping
+each independently, and merging via `mergeRuns` is byte-identical to running
+the whole table at once (the actual Option A parallelism claim this whole
+design rests on). Verified red: injecting a windowing bug (dropping the
+lo-shift) fails the gate. A bug inside the *shared* `kinkStageTransition`
+itself is correctly out of this gate's scope — that's `kink_tm`'s own
+whole-column-vs-baseline gate's job (still green, see above).
+
+Design doc (`docs/next-system/designs/14-kink-carry-parallel-engine.md`)
+Phase 1 section updated to DONE with these specifics.
+
+### NEXT: Phase 2 — wire `map_shard_stage` behind `--kernel kink`, gate at a(20)
+Per the design doc: orchestrator column loop grows a stage sub-loop (H cycles
+of partition-by-key → parallel `map_shard_stage` → merge → next stage), then
+the existing end-of-column harvest/prune/fold (still needs building: the
+column-start seed-from-column-table step and the end-of-column
+drop-carry+stranding+canonicalize+prune+fold+classify step — neither exists
+in `core/` yet, only the mid-column per-stage transition does).
+`map_worker --kernel kink|column` (default column). Checkpoint granularity
+becomes stage-level. Gate: full `a(20) --kernel kink --compare` byte-matches
+both the b-file and a whole-column a(20) run. Do not skip ahead past this
+gate before Phase 3 (dalby-scale validation, a24 byte-match).
+
 ## 2026-07-02 (night) — Design 14 (parallel kink-carry) Phase 0 fully de-risked; start Phase 1
 
 Branch **`kink-carry`** (off master `b6dcfaf`, NOT pushed), tip `e3c330c`. a(28)

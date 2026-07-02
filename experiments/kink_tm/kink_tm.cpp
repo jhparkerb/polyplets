@@ -46,6 +46,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "core/kink.h"
 #include "core/signature.h"
 #include "core/transition.h"
 
@@ -85,28 +86,6 @@ struct KinkStats {
   double secs = 0;
 };
 
-static void canonMixed(Sig& s, int H) {
-  unsigned char map[256] = {0};
-  unsigned char next = 1;
-  for (int i = 0; i < H; ++i) {
-    const unsigned char v = s.b[i];
-    if (v == 0) continue;
-    if (map[v] == 0) map[v] = next++;
-    s.b[i] = map[v];
-  }
-  const unsigned char c = s.b[H + 2];
-  if (c != 0) {
-    if (map[c] == 0) map[c] = next++;
-    s.b[H + 2] = map[c];
-  }
-}
-
-static bool labelInState(const Sig& s, int H, unsigned char L) {
-  for (int i = 0; i < H; ++i)
-    if (s.b[i] == L) return true;
-  return s.b[H + 2] == L;
-}
-
 static KinkStats kinkSweep(int H, int maxn) {
   using DB = std::unordered_map<Sig, std::vector<u64>, SigHash>;
   KinkStats st;
@@ -118,8 +97,6 @@ static KinkStats kinkSweep(int H, int maxn) {
   std::memset(seed.b, 0, SIGMAX);
   col[seed] = std::vector<u64>(maxn + 1, 0);
   col[seed][0] = 1;
-
-  int uf[2 * SIGMAX];
 
   for (int c = 0; c <= maxn && !col.empty(); ++c) {
     if (col.size() > st.peakColStates) st.peakColStates = col.size();
@@ -147,55 +124,17 @@ static KinkStats kinkSweep(int H, int maxn) {
           if (counts[n]) { ms = n; break; }
         if (ms < 0) continue;
 
-        // Choice 1: leave (col, r) empty. Outgoing carry = old b[r-1] value
-        // is s.b[H+2]; it is replaced by old b[r]... but b[r] must become the
-        // new cell's value (0). Save old b[r] as the new carry, then check
-        // the OUTGOING carry's component for stranding.
-        for (int occupy = 0; occupy < 2; ++occupy) {
-          if (occupy && ms + 1 > maxn) break;  // budget: cannot place
-          Sig t = s;
-          unsigned char newLabel = 0;
-          if (occupy) {
-            // Union-find over labels 1..H+? plus the new cell (slot 0).
-            for (int i = 0; i < 2 * SIGMAX; ++i) uf[i] = i;
-            auto uadd = [&](unsigned char L) {
-              if (L) { int a=s8::find(uf,0), b=s8::find(uf,L); if(a!=b) uf[a]=b; }
-            };
-            if (r > 0) uadd(s.b[r - 1]);          // N (new column cell)
-            uadd(s.b[r]);                          // W (old, pre-overwrite)
-            uadd(s.b[H + 2]);                      // NW = carry
-            if (r + 1 < H) uadd(s.b[r + 1]);       // SW (old)
-            // Relabel: every label in the state that joins the new cell's
-            // component gets one label; pick a fresh scratch label 200+.
-            const int root = s8::find(uf, 0);
-            unsigned char fresh = 200;
-            for (int i = 0; i < H; ++i)
-              if (t.b[i] && s8::find(uf, t.b[i]) == root) t.b[i] = fresh;
-            if (t.b[H + 2] && s8::find(uf, t.b[H + 2]) == root)
-              t.b[H + 2] = fresh;
-            newLabel = fresh;
-          }
-          // Advance kink: outgoing carry = t.b[H+2] (already relabeled),
-          // incoming carry = old value at row r (t.b[r] pre-overwrite).
-          const unsigned char outgoing = t.b[H + 2];
-          t.b[H + 2] = t.b[r];
-          t.b[r] = occupy ? newLabel : 0;
-          if (occupy) {
-            if (r == 0) t.b[H] = 1;
-            if (r == H - 1) t.b[H + 1] = 1;
-            t.b[H + 3] = 1;
-          }
-          // Stranding: the outgoing carry's component is now unreachable if
-          // its label appears nowhere else in the state.
-          if (outgoing != 0 && !labelInState(t, H, outgoing)) continue;
-          canonMixed(t, H);
+        // Per-stage fan-out (occupy in {0,1}, union-find, canonicalize,
+        // stranding check) lives in core/kink.h as kinkStageTransition --
+        // shared with the ported map_shard_stage so the probe and the port
+        // can never drift apart.
+        kinkStageTransition(s, H, r, ms, maxn, [&](const Sig& t, int shift) {
           ++st.transitions;
           auto& dst = nextStage[t];
           if (dst.empty()) dst.assign(maxn + 1, 0);
-          const int shift = occupy ? 1 : 0;
           for (int n = 0; n + shift <= maxn; ++n)
             if (counts[n]) dst[n + shift] += counts[n];
-        }
+        });
       }
       std::swap(stage, nextStage);
     }
@@ -209,7 +148,7 @@ static KinkStats kinkSweep(int H, int maxn) {
       Sig t = s;
       t.b[H + 2] = 0;
       t.b[H + 3] = 0;
-      if (outgoing != 0 && !labelInState(t, H, outgoing)) continue;
+      if (outgoing != 0 && !labelInMixedState(t, H, outgoing)) continue;
       int ms = -1;
       for (int n = 0; n <= maxn; ++n)
         if (counts[n]) { ms = n; break; }

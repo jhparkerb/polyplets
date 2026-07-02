@@ -19,7 +19,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 .PHONY: gates gate-g1 gate-g2 gate-euler clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
-        ns-gate-verify \
+        ns-gate-verify ns-gate-kink \
         ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
@@ -150,14 +150,14 @@ build/ns:
 # ns-gates: all new-system gates. Includes the runfile-format, holes, verify,
 # height-split, and full-Go-suite gates that existed but were not wired in, so a
 # regression in those paths (BUGS-OF-SHAME A4/A5/B*/D6) can't rot undetected.
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink
 
 # Fast gate subset for the pre-push hook (.githooks/pre-push). Targets well under
 # 30s: the full Go suite (guards / combine / runcat / closed-form / resume) plus
 # the sub-second C++ format+arith gates. The heavy C++ sweeps (spill, parallel,
 # holes, maxn=14 regression) stay in `make ns-gates`, run before a release or by
 # hand. Order: cheapest, most-targeted tripwires first so a regression fails fast.
-ns-gate-fast: ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile ns-gate-go
+ns-gate-fast: ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile ns-gate-go ns-gate-kink
 
 # Closed-form invariant gate: assert the engine contributes every KNOWN closed
 # form (top strip H=N=3^(N-1); low strips T(n,1)=1, T(n,2) recurrence) DIRECTLY,
@@ -199,6 +199,14 @@ ns-gate-run: build/ns/gate_run
 	./build/ns/gate_run
 
 build/ns/gate_run: test/gate_run.cpp $(NS_HEADERS) | build/ns
+	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+
+# Kink-carry stage kernel gate (Design 14 Phase 1): map_shard_stage (core/kink.h)
+# vs ground truth (unwindowed kinkStageTransition) + shard-invariance.
+ns-gate-kink: build/ns/gate_kink
+	./build/ns/gate_kink
+
+build/ns/gate_kink: test/gate_kink.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 # Run-file on-disk format gate: atomic publish, sub-CRC, header/.idx magic.
