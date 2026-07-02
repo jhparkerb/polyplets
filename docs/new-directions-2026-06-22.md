@@ -166,9 +166,11 @@ Near-free cluster (run first, no disturbance to live jobs): #1,#2,#3,#4,#6,#7(re
   both approaching **sqrt(lambda) = 2.667** from below. Confirms reflection-symmetric
   polyplets grow as sqrt(lambda). (C2 -> 1.80 is garbage: C2 counts are parity-sparse,
   ratios meaningless; redo C2 with parity-aware handling.)
-- **#6 nu (R_g exponent): ALREADY DONE** -- results/scaling_study.md fit R_g~n^nu
+- **#6 nu (R_g exponent): ALREADY DONE** -- the cross-n scaling study fit R_g~n^nu
   over n=8,11,14,19 giving **nu ≈ 0.683** ("finite-size-inflated, consistent with the
   universal 0.6408"). At its ceiling without larger/more sample sizes; not worth redoing.
+  (results/scaling_study.md + sampling/scaling.py were retired in the branch-cut
+  research-corpus cleanup 91bdcdc; recover from `git show 91bdcdc^:results/scaling_study.md`.)
 - **#7 site-perimeter + Mertens cross-source: PROMOTED to high value.** Mertens 1990
   (papers/Mertens1990...pdf) Table I "nnSquare" column IS the king lattice = our a(n)
   to n=14; his perimeter polynomials D_s(q) are the SITE-perimeter distribution
