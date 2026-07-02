@@ -1255,6 +1255,19 @@ var diagCoeffTable = map[int]diagCoeffs{
 		"1450416433150453125", "-3370526923710995055", "-1108292379978242050", "31805482385795516100",
 		"-69735093253554241800", "32190356082435763680", "25618243319042572800",
 	}, 3628800},
+	// j=11: P_11, fully derived and validated (scripts/derive_p11.py). The
+	// validated P_9 and P_10 fits pin the shared universal series symbols
+	// {a7..a10,b8..b10} exactly, so 10 of 12 coefficients emerge clean from
+	// theory alone; only a11,b11 (degrees n^0,n^1) needed new data, supplied by
+	// the two fresh sweeps T(26,15)=5614506356004078534 (results/ns_a26) and
+	// T(27,16)=27798973373501478242 (results/ns_a27). The three a25 diagonal-11
+	// points n=23,24,25 (held out of both the fit and the shared-symbol solve)
+	// matched exactly; leading coeff 25^11/11! confirmed independently.
+	11: {[]string{
+		"2384185791015625", "-91056823730468750", "1437517181396484375", "-13264842209179687500",
+		"76160367268876171875", "-243501035699144280750", "120586120186765409825", "2497738719648063722600",
+		"-9207797682124933481700", "10269478266342644052000", "3325021854753536899200", "5868473845727607206400",
+	}, 39916800},
 }
 
 // hornerDiag evaluates a diagCoeffs' numerator at N via big.Int Horner,
@@ -1298,16 +1311,16 @@ func applyPow3(num *big.Int, e int) *big.Int {
 }
 
 // diagonalStripValid reports whether the k-th diagonal strip (H=maxn-k) can
-// be filled by diagonalCell instead of a real column sweep. k<=10 now that
-// P9/P10 are wired (case 9, case 10). The true structural threshold is
-// n>=2k+1 (docs/proofs/T-n-nm2-and-general.md); both sweep.go dispatch sites
-// (sequential and overlap) must use this single helper so a future threshold
-// or k-range change can't apply to only one path.
+// be filled by diagonalCell instead of a real column sweep. k<=11 now that
+// P9/P10/P11 are wired (case 9, case 10, case 11). The true structural
+// threshold is n>=2k+1 (docs/proofs/T-n-nm2-and-general.md); both sweep.go
+// dispatch sites (sequential and overlap) must use this single helper so a
+// future threshold or k-range change can't apply to only one path.
 func diagonalStripValid(maxn, k int) bool {
-	return k >= 2 && k <= 10 && maxn >= 2*k+1
+	return k >= 2 && k <= 11 && maxn >= 2*k+1
 }
 
-// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..10
+// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..11
 // (docs/proofs/T-n-nm1.md, T-n-nm2-and-general.md). j=0,1,2 are proven from first
 // principles; j=3..10 are data-pinned from the triangle (leading 25^j/j!,
 // integer-exact) and VALIDATED at scale by the a(23)/a(24)/a25 sweeps (their
