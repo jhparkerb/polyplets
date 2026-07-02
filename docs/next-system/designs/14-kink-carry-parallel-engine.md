@@ -1,8 +1,13 @@
 # Design 14 — Parallel Kink-Carry engine
 
-**Status: PLAN (2026-07-02).** Smoke-tested serial kernel in
-`experiments/kink_tm/`, results in `results/kink-carry.md`. This doc is the
-build plan to turn that kernel into the production parallel engine.
+**Status: REDESIGN NEEDED (2026-07-02).** Smoke-tested serial kernel in
+`experiments/kink_tm/`, results in `results/kink-carry.md` — that win stands.
+**Phase 0.1 ran and Option B (below) is NO-GO**: shard duplication grows
+`~S^0.7-0.8`, no plateau, eating most of the kernel's win at production shard
+counts (128-320). Data + verdict in
+`results/kink-carry-shard-duplication.md`. Phases 1-4 as written assume
+Option B and need revision (Option A / hybrid / analytic shard bound) before
+proceeding — do not start Phase 1 on this doc's original text.
 
 ## What changes and what does not
 
@@ -71,13 +76,17 @@ Phase 3.
 ## Milestones (red-first; each gate byte-identical, not approximate)
 
 ### Phase 0 — De-risk by measurement (no production code)
-- **0.1 Duplication curve.** Extend `experiments/kink_tm/` to shard sources S
-  ways, run S independent kink DPs, and report `Σ intermediate work / single-DP
-  intermediate work` and peak per-shard RAM vs S, at H14/maxn=26 and
-  H16/maxn=29. Gate: sharded end-of-column output still sums to the correct
-  T(n,H). **Decision:** duplication < ~2× at the shard counts a top height
-  needs (≈ cores·unit-mult) → Option B. Else scope Option A to the top height.
-- **0.2 Production record format.** Confirm the ~3.6× intermediate factor and
+- **0.1 Duplication curve. DONE — NO-GO for Option B.** Measured
+  (`experiments/kink_tm/kink_shard_probe.cpp`, H=8/12, `--keyrange` and
+  `--hash`, gated byte-identical at every S): duplication grows
+  `~S^0.7-0.8` with no plateau (1.5× at S=2 → 8.1× at S=32, H=12,
+  key-range). Does not hold to the < ~2× bar at production shard counts
+  (128-320). Full data: `results/kink-carry-shard-duplication.md`.
+  **Decision taken: Option B rejected as scoped.** Next step is to scope
+  Option A (per-stage sharding, H barriers/column — zero duplication) or a
+  hybrid/analytic approach, NOT to proceed to Phase 1 on Option B.
+- **0.2 Production record format.** (deferred — moot until a shard strategy
+  passes 0.1; revisit once Option A or a hybrid is measured.) Confirm the ~3.6× intermediate factor and
   the per-worker RAM projection hold with **ranged u128 rows** (not the probe's
   full u64 rows) at H16 shape. Establishes the real bytes/intermediate-state.
 - Deliverable: numbers appended to `results/kink-carry.md`; go/no-go on B.
