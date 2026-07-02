@@ -46,10 +46,6 @@ struct RunRecord {
 
   // Merge o INTO this record (range-union + componentwise add).
   // Both must share the same key. The associative reduce op.
-  // TODO(perf, M1+): combine runs once per duplicate-key collision per column;
-  // when the union only extends the existing high end (new_lo == lo) the merged
-  // buffer can be grown in place instead of allocated fresh. Deferred until the
-  // at-scale spill engine lands and the allocation actually shows up in a profile.
   void combine(const RunRecord& o) {
     assert(sameKey(o) && H == o.H && keyLen == o.keyLen);
     if (o.len == 0) return;

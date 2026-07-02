@@ -459,7 +459,7 @@ func VerifyCRC(path string) error {
 	}
 	body := data[start : len(data)-8]
 	stored := binary.LittleEndian.Uint64(data[len(data)-8:])
-	computed := fnv1a64(body)
+	computed := Fnv1a64(body)
 	if computed != stored {
 		return fmt.Errorf("CRC MISMATCH %s: computed %016x stored %016x", path, computed, stored)
 	}
@@ -469,7 +469,10 @@ func VerifyCRC(path string) error {
 const fnvOffset uint64 = 14695981039346656037
 const fnvPrime uint64 = 1099511628211
 
-func fnv1a64(data []byte) uint64 {
+// Fnv1a64 computes the FNV-1a-64 hash used for POLYRUN body CRCs. Exported
+// so cmd/runcat can share this instead of carrying its own copy (simplify
+// pass: the two were byte-for-byte identical).
+func Fnv1a64(data []byte) uint64 {
 	h := fnvOffset
 	for _, b := range data {
 		h ^= uint64(b)
@@ -603,7 +606,7 @@ func WriteSeedPolyrun(path, rev string, H, maxn int, counter ...string) error {
 	binary.LittleEndian.PutUint64(body[keyLen+2:], 1)
 	// for u128, the upper 8 bytes remain zero (already zero-initialized)
 
-	crc := fnv1a64(body)
+	crc := Fnv1a64(body)
 	crcBytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(crcBytes, crc)
 

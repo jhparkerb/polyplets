@@ -149,21 +149,9 @@ func crcCheck(path string) (status string, ok bool) {
 	}
 	body := data[start : len(data)-8]
 	stored := binary.LittleEndian.Uint64(data[len(data)-8:])
-	computed := fnv1a64(body)
+	computed := orchestrator.Fnv1a64(body)
 	if computed == stored {
 		return "OK", true
 	}
 	return fmt.Sprintf("MISMATCH: computed=%016x stored=%016x", computed, stored), false
-}
-
-const fnvOffset uint64 = 14695981039346656037
-const fnvPrime uint64 = 1099511628211
-
-func fnv1a64(data []byte) uint64 {
-	h := fnvOffset
-	for _, b := range data {
-		h ^= uint64(b)
-		h *= fnvPrime
-	}
-	return h
 }
