@@ -112,6 +112,30 @@ func TestCombineAcceptsValidShards(t *testing.T) {
 	}
 }
 
+// TestFirstNonMonotoneCatchesWrap encodes the a26 stale-u64-combine near-miss:
+// a(26) ~1.03e20 summed by a stale u64 binary wrapped mod 2^64 to below a(25).
+// The monotone-growth guard must flag it (fixed-polyplet counts strictly rise),
+// and must pass a genuinely increasing prefix. Red before firstNonMonotone.
+func TestFirstNonMonotoneCatchesWrap(t *testing.T) {
+	mk := func(vals ...string) []*big.Int {
+		tri := make([]*big.Int, len(vals))
+		for i, s := range vals {
+			tri[i], _ = new(big.Int).SetString(s, 10)
+		}
+		return tri
+	}
+	// index n holds a(n); index 0 unused.
+	good := mk("0", "1", "4", "20", "110", "638")
+	if got := firstNonMonotone(good, 5); got != 0 {
+		t.Fatalf("strictly-increasing prefix: firstNonMonotone=%d, want 0", got)
+	}
+	// a(25) then a(26)-wrapped (< a(25)): must flag n=2 (the wrapped index).
+	wrapped := mk("0", "14994811325186658577", "10373793478466395812")
+	if got := firstNonMonotone(wrapped, 2); got != 2 {
+		t.Fatalf("wrapped a(26): firstNonMonotone=%d, want 2", got)
+	}
+}
+
 // TestCombineWidth proves a cell value exceeding 2^64-1 (BUGS-OF-SHAME A2)
 // combines to its exact big.Int sum rather than silently wrapping, dropping,
 // or erroring. 3^45 alone already exceeds 2^64 (~1.8e19); the value is split

@@ -53,6 +53,22 @@ func main() {
 		fmt.Printf("a(%d) = %d\n", n, triangle[n])
 	}
 
+	// Monotone-growth guard. The fixed-polyplet count a(n) is strictly
+	// increasing, so a(n) <= a(n-1) can only mean a counter overflow (the a26
+	// stale-u64-combine near-miss: a26 ~1.03e20 wrapped mod 2^64 to below a25)
+	// or missing data. Refuse a full-cover triangle that violates it rather than
+	// print a confidently-wrong, too-low a(n). Only enforced under --require-cover
+	// (a partial combine can legitimately be incomplete).
+	if *requireCover {
+		if n := firstNonMonotone(triangle, *maxn); n > 0 {
+			fmt.Fprintf(os.Stderr, "combine: REFUSING — non-monotone a(n) at n=%d: "+
+				"a(%d)=%d <= a(%d)=%d. The count is strictly increasing, so this is a "+
+				"counter overflow (stale u64 combine binary? rebuild it) or missing data, "+
+				"not a valid result.\n", n, n, triangle[n], n-1, triangle[n-1])
+			os.Exit(1)
+		}
+	}
+
 	if *out != "" {
 		if err := writeTriangle(*out, *maxn, triangle); err != nil {
 			fmt.Fprintf(os.Stderr, "combine: write %s: %v\n", *out, err)
@@ -113,6 +129,21 @@ func runCombine(dirs []string, maxn int, requireCover bool) (triangle []*big.Int
 		}
 	}
 	return triangle, have, nil
+}
+
+// firstNonMonotone returns the smallest n in [2,maxn] with a(n) <= a(n-1)
+// (both positive), or 0 if a(1..maxn) is strictly increasing. Skips leading
+// zeros so a not-yet-populated prefix doesn't false-trip.
+func firstNonMonotone(triangle []*big.Int, maxn int) int {
+	for n := 2; n <= maxn; n++ {
+		if triangle[n-1].Sign() <= 0 || triangle[n].Sign() <= 0 {
+			continue
+		}
+		if triangle[n].Cmp(triangle[n-1]) <= 0 {
+			return n
+		}
+	}
+	return 0
 }
 
 func heightFromName(path string) (int, bool) {
