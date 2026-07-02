@@ -1,5 +1,19 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 — a(27) dalby+ayr split STAGED (not launched)
+
+Scripts `scripts/{dalby,ayr,combine}_a27.sh` (rev incl. `9892168`), pushed +
+pre-synced to ayr. **ayr prepped**: built native at `246cb09` via `$HOME/go/bin`
+go1.26 (the cross-compile memory was wrong — corrected); smoke-tested a1–18 =
+b-file at both u64 **and** u128.
+- Split: **dalby** H16 (68% of cost) + all closed-form heights (H1,2,17–27);
+  **ayr** swept tail H3–15. Est ~4h wall (vs ~5h dalby-solo). u128.
+- **Before launch:** rebalance the height split against a26's real
+  `cost_profile.tsv` (a26 sweeps H1–15 @ maxn26 → near-exact H3–15 costs);
+  move H14/H15 dalby↔ayr if the halves are unbalanced. Then combine on dalby
+  via `combine_a27.sh` (rsyncs ayr rows, `--require-cover` H1..27).
+- a27 needs only P9/P10 (already wired); P11 not required until a28.
+
 ## 2026-07-02 ~07:37 EDT — a(26) frontier run LAUNCHED (dalby-solo) 🚀
 
 Rev **`246cb09`** (clean, native build on dalby `~/src/polyominoes-ns`).
