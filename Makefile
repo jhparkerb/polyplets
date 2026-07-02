@@ -116,6 +116,18 @@ gate-s2:
 NSFLAGS = -std=c++20 -Wall -Wextra -Werror \
           -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
 
+# zstd spill compression (POLY_ZSTD): the map/merge workers compress internal
+# spill files. libzstd headers live in /usr/include on Linux and /opt/local on
+# macOS/MacPorts. Only the C++ workers link it (orchestrate is Go and never
+# touches libzstd). A build without these flags still compiles — spill files are
+# then written plain (see core/runfile.h).
+ZSTD_CFLAGS  := -DPOLY_ZSTD
+ZSTD_LDFLAGS := -lzstd
+ifeq ($(shell uname -s),Darwin)
+  ZSTD_CFLAGS  += -I/opt/local/include
+  ZSTD_LDFLAGS := -L/opt/local/lib -lzstd
+endif
+
 # Every ns binary is header-only against core/; depend on the whole set so an
 # edit to any header (incl. the trusted-math copies) triggers the right rebuilds.
 NS_HEADERS = $(wildcard core/*.h)
@@ -126,7 +138,7 @@ build/ns:
 # ns-gates: all new-system gates. Includes the runfile-format, holes, verify,
 # height-split, and full-Go-suite gates that existed but were not wired in, so a
 # regression in those paths (BUGS-OF-SHAME A4/A5/B*/D6) can't rot undetected.
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split
 
 # Fast gate subset for the pre-push hook (.githooks/pre-push). Targets well under
 # 30s: the full Go suite (guards / combine / runcat / closed-form / resume) plus
@@ -184,6 +196,19 @@ ns-gate-runfile: build/ns/gate_runfile
 build/ns/gate_runfile: test/gate_runfile.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
+# Spill-compression gate: zstd round-trip + POLYRUN 2/compression 1 header +
+# on-disk shrink; then a NO-POLY_ZSTD build must REJECT the compressed file.
+# (The ZSTD binary leaves the compressed file for the noz binary to reject.)
+ns-gate-spill-zstd: build/ns/gate_spill_zstd build/ns/gate_spill_zstd_noz
+	./build/ns/gate_spill_zstd
+	./build/ns/gate_spill_zstd_noz
+
+build/ns/gate_spill_zstd: test/gate_spill_zstd.cpp $(NS_HEADERS) | build/ns
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
+
+build/ns/gate_spill_zstd_noz: test/gate_spill_zstd_noz.cpp $(NS_HEADERS) | build/ns
+	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+
 # Architecture fitness: Go boundary tests
 ns-gate-arch:
 	go test ./verify/arch/... -count=1
@@ -200,10 +225,10 @@ build/ns/driver0: test/driver0.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 build/ns/map_worker: worker/map_worker.cpp $(NS_HEADERS) | build/ns
-	$(CXX) $(NSFLAGS) -O3 -I. $< -o $@
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O3 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 build/ns/merge_worker: worker/merge_worker.cpp $(NS_HEADERS) | build/ns
-	$(CXX) $(NSFLAGS) -O3 -I. $< -o $@
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O3 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 build/ns/driver1: test/driver1.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@

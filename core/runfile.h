@@ -30,6 +30,31 @@
 #include "core/run.h"
 #include "core/profile.h"
 
+#ifdef POLY_ZSTD
+#include <zstd.h>
+#endif
+
+// ─── Spill compression (POLY_ZSTD) ────────────────────────────────────────────
+//
+// Internal spill files (do_spill, write_index=false, read back sequentially by
+// mergeRunFiles) may be zstd-compressed to dissolve the map-phase disk write
+// throttle. Signaled in the text header by "POLYRUN 2" + a "compression 1" line;
+// the body is then a single zstd frame (checksum-enabled) INSTEAD of the plain
+// records + FNV trailer. Plain files stay "POLYRUN 1" with no compression line —
+// byte-identical to before — and old readers/tools still parse them.
+//
+// A bounded block buffer keeps memory flat regardless of file size. Compression
+// level is POLY_SPILL_ZSTD_LEVEL (default 3). A build WITHOUT POLY_ZSTD errors
+// clearly on a compressed file rather than misreading it.
+
+inline constexpr size_t kSpillBlockBytes = 256 * 1024;
+
+inline int spillZstdLevel() {
+  const char* e = std::getenv("POLY_SPILL_ZSTD_LEVEL");
+  if (e && *e) { int v = std::atoi(e); if (v != 0) return v; }
+  return 3;
+}
+
 // ─── Counter name ─────────────────────────────────────────────────────────────
 
 template <class W> inline constexpr const char* counterTag();
@@ -101,12 +126,15 @@ class RunFileWriter {
   RunFileWriter(const std::string& path, int H, int maxn,
                 const std::string& lo_hex, const std::string& hi_hex,
                 const std::string& rev = "", int keyLen = 0,
-                bool write_index = true)
+                bool write_index = true, bool compress = false)
       : H_(H), keyLen_((keyLen == 0) ? H + 2 : keyLen),
         fp_(nullptr), record_count_(0), body_bytes_(0),
         crc_(FNV_OFFSET), records_offset_(0),
         path_(path), tmp_path_(path + ".tmp"),
-        write_index_(write_index), body_start_offset_(0) {
+        write_index_(write_index), compress_(compress), body_start_offset_(0) {
+#ifndef POLY_ZSTD
+    compress_ = false;  // no zstd in this build: only the plain path exists
+#endif
     // Atomic publish (B4): stream to a temp file and rename onto the final path
     // in finalize().  A kill mid-write then leaves only a stale .tmp; the real
     // path never holds a placeholder record-count or a short CRC (which a seeked
@@ -116,6 +144,14 @@ class RunFileWriter {
       std::fprintf(stderr, "RunFileWriter: cannot open %s\n", tmp_path_.c_str());
       return;
     }
+#ifdef POLY_ZSTD
+    if (compress_) {
+      cctx_ = ZSTD_createCStream();
+      ZSTD_CCtx_setParameter(cctx_, ZSTD_c_compressionLevel, spillZstdLevel());
+      ZSTD_CCtx_setParameter(cctx_, ZSTD_c_checksumFlag, 1);
+      obuf_.resize(kSpillBlockBytes);
+    }
+#endif
     writeHeader(H, maxn, lo_hex, hi_hex, rev);
     if (write_index_) openIndexSidecar();
   }
@@ -123,6 +159,9 @@ class RunFileWriter {
   ~RunFileWriter() {
     if (fp_) std::fclose(fp_);
     if (idx_fp_) std::fclose(idx_fp_);
+#ifdef POLY_ZSTD
+    if (cctx_) ZSTD_freeCStream(cctx_);
+#endif
   }
 
   RunFileWriter(const RunFileWriter&) = delete;
@@ -141,15 +180,11 @@ class RunFileWriter {
       std::fwrite(&recidx, sizeof(recidx), 1, idx_fp_);
       ++index_count_;
     }
-    std::fwrite(r.sig.b, 1, static_cast<size_t>(keyLen_), fp_);
+    emit(r.sig.b, static_cast<size_t>(keyLen_));
     uint8_t lo  = r.lo;
     uint8_t len = r.len;
-    std::fwrite(&lo,  1, 1, fp_);
-    std::fwrite(&len, 1, 1, fp_);
-    crc_ = fnv1a64_update(crc_, r.sig.b, static_cast<size_t>(keyLen_));
-    crc_ = fnv1a64_update(crc_, &lo,  1);
-    crc_ = fnv1a64_update(crc_, &len, 1);
-    body_bytes_ += static_cast<size_t>(keyLen_) + 2;
+    emit(&lo,  1);
+    emit(&len, 1);
     for (int i = 0; i < r.len; ++i) {
       W v = r.counts[i];
       uint8_t bytes[sizeof(W)];
@@ -157,9 +192,7 @@ class RunFileWriter {
         bytes[b] = static_cast<uint8_t>(v & 0xff);
         v >>= 8;
       }
-      std::fwrite(bytes, 1, sizeof(W), fp_);
-      crc_ = fnv1a64_update(crc_, bytes, sizeof(W));
-      body_bytes_ += sizeof(W);
+      emit(bytes, sizeof(W));
     }
     ++record_count_;
   }
@@ -168,19 +201,27 @@ class RunFileWriter {
   // Returns body bytes written.
   size_t finalize() {
     if (!fp_) return 0;
+#ifdef POLY_ZSTD
+    // Flush the zstd frame (ZSTD_e_end writes the checksum epilogue) so all body
+    // bytes are on disk before we seek back into the header to patch the count.
+    if (compress_) compressFinish();
+#endif
     if (std::fseek(fp_, records_offset_, SEEK_SET) != 0)
       std::fprintf(stderr, "RunFileWriter: fseek failed\n");
     else
       std::fprintf(fp_, "%018zu", record_count_);
-    if (std::fseek(fp_, 0, SEEK_END) != 0)
-      std::fprintf(stderr, "RunFileWriter: fseek-end failed\n");
-    uint64_t crc = crc_;
-    uint8_t crc_bytes[8];
-    for (int i = 0; i < 8; ++i) {
-      crc_bytes[i] = static_cast<uint8_t>(crc & 0xff);
-      crc >>= 8;
+    // Compressed files carry no FNV trailer — zstd's frame checksum replaces it.
+    if (!compress_) {
+      if (std::fseek(fp_, 0, SEEK_END) != 0)
+        std::fprintf(stderr, "RunFileWriter: fseek-end failed\n");
+      uint64_t crc = crc_;
+      uint8_t crc_bytes[8];
+      for (int i = 0; i < 8; ++i) {
+        crc_bytes[i] = static_cast<uint8_t>(crc & 0xff);
+        crc >>= 8;
+      }
+      std::fwrite(crc_bytes, 1, 8, fp_);
     }
-    std::fwrite(crc_bytes, 1, 8, fp_);
     std::fclose(fp_);
     fp_ = nullptr;
     // Publish the index sidecar first (to its own temp, then rename), then the
@@ -217,10 +258,61 @@ class RunFileWriter {
   std::string path_;
   std::string tmp_path_;
   bool write_index_;
+  bool compress_;
   long body_start_offset_;          // file offset of the first record (post-header)
   FILE* idx_fp_ = nullptr;        // streamed .idx sidecar (no in-RAM index buffer)
   uint64_t index_count_ = 0;      // entries streamed to idx_fp_
   static constexpr size_t kIndexStride = 64;
+#ifdef POLY_ZSTD
+  ZSTD_CStream* cctx_ = nullptr;
+  std::vector<char> obuf_;        // bounded compressed-output block buffer
+#endif
+
+  // Emit body bytes: plain files fwrite + fold the FNV CRC; compressed files feed
+  // the zstd stream (no per-byte CRC — the frame checksum covers integrity).
+  void emit(const void* p, size_t n) {
+#ifdef POLY_ZSTD
+    if (compress_) {
+      ZSTD_inBuffer in{p, n, 0};
+      while (in.pos < in.size) {
+        ZSTD_outBuffer out{obuf_.data(), obuf_.size(), 0};
+        size_t r = ZSTD_compressStream2(cctx_, &out, &in, ZSTD_e_continue);
+        if (ZSTD_isError(r)) {
+          std::fprintf(stderr, "RunFileWriter: zstd compress: %s\n",
+                       ZSTD_getErrorName(r));
+          return;
+        }
+        if (out.pos) std::fwrite(obuf_.data(), 1, out.pos, fp_);
+      }
+      body_bytes_ += n;
+      return;
+    }
+#endif
+    std::fwrite(p, 1, n, fp_);
+    crc_ = fnv1a64_update(crc_, p, n);
+    body_bytes_ += n;
+  }
+
+#ifdef POLY_ZSTD
+  // Flush the zstd frame to completion (writes any buffered output + checksum).
+  void compressFinish() {
+    if (!cctx_) return;
+    ZSTD_inBuffer in{nullptr, 0, 0};
+    size_t rem;
+    do {
+      ZSTD_outBuffer out{obuf_.data(), obuf_.size(), 0};
+      rem = ZSTD_compressStream2(cctx_, &out, &in, ZSTD_e_end);
+      if (ZSTD_isError(rem)) {
+        std::fprintf(stderr, "RunFileWriter: zstd flush: %s\n",
+                     ZSTD_getErrorName(rem));
+        break;
+      }
+      if (out.pos) std::fwrite(obuf_.data(), 1, out.pos, fp_);
+    } while (rem != 0);
+    ZSTD_freeCStream(cctx_);
+    cctx_ = nullptr;
+  }
+#endif
 
   // Open the <path>.idx.tmp sidecar and write its header with a PLACEHOLDER count
   // (backpatched in finalize). Entries are then streamed in append() — there is no
@@ -244,7 +336,10 @@ class RunFileWriter {
 
   void writeHeader(int H, int maxn, const std::string& lo_hex,
                    const std::string& hi_hex, const std::string& rev) {
-    std::fprintf(fp_, "POLYRUN 1\n");
+    // Plain files stay "POLYRUN 1" with no compression line (byte-identical to
+    // the pre-compression format); compressed spills bump to "POLYRUN 2" and add
+    // a "compression 1" line before the blank header terminator.
+    std::fprintf(fp_, "POLYRUN %d\n", compress_ ? 2 : 1);
     std::fprintf(fp_, "height %d\n", H);
     std::fprintf(fp_, "maxn %d\n", maxn);
     std::fprintf(fp_, "counter %s\n", counterTag<W>());
@@ -256,6 +351,7 @@ class RunFileWriter {
     std::fprintf(fp_, "records 000000000000000000\n");
     std::fprintf(fp_, "rev %s\n", rev.empty() ? "unknown" : rev.c_str());
     std::fprintf(fp_, "byteorder 1\n");
+    if (compress_) std::fprintf(fp_, "compression 1\n");
     std::fprintf(fp_, "\n");
     std::fflush(fp_);
     body_start_offset_ = std::ftell(fp_);
@@ -271,7 +367,8 @@ class RunFileReader {
   RunFileReader(const std::string& path, int H, int keyLen = 0)
       : H_(H), keyLen_((keyLen == 0) ? H + 2 : keyLen),
         fp_(nullptr), records_(0), records_read_(0),
-        crc_(FNV_OFFSET), path_(path), seeked_(false) {
+        crc_(FNV_OFFSET), path_(path), seeked_(false),
+        version_(1), compressed_(false) {
     fp_ = std::fopen(path.c_str(), "rb");
     if (!fp_) {
       std::fprintf(stderr, "RunFileReader: cannot open %s\n", path.c_str());
@@ -287,6 +384,9 @@ class RunFileReader {
 
   ~RunFileReader() {
     if (fp_) std::fclose(fp_);
+#ifdef POLY_ZSTD
+    if (dctx_) ZSTD_freeDStream(dctx_);
+#endif
   }
 
   RunFileReader(const RunFileReader&) = delete;
@@ -295,15 +395,11 @@ class RunFileReader {
   bool next(RunRecord<W>& out) {
     if (!fp_ || records_read_ >= records_) return false;
     out.sig = Sig{};
-    if (std::fread(out.sig.b, 1, static_cast<size_t>(keyLen_), fp_)
-        != static_cast<size_t>(keyLen_)) return false;
-    crc_ = fnv1a64_update(crc_, out.sig.b, static_cast<size_t>(keyLen_));
+    if (!bodyRead(out.sig.b, static_cast<size_t>(keyLen_))) return false;
 
     uint8_t lo = 0, len = 0;
-    if (std::fread(&lo,  1, 1, fp_) != 1) return false;
-    if (std::fread(&len, 1, 1, fp_) != 1) return false;
-    crc_ = fnv1a64_update(crc_, &lo,  1);
-    crc_ = fnv1a64_update(crc_, &len, 1);
+    if (!bodyRead(&lo,  1)) return false;
+    if (!bodyRead(&len, 1)) return false;
 
     out.H      = H_;
     out.keyLen = keyLen_;
@@ -312,8 +408,7 @@ class RunFileReader {
     out.counts.resize(len);
     for (int i = 0; i < len; ++i) {
       uint8_t bytes[sizeof(W)];
-      if (std::fread(bytes, 1, sizeof(W), fp_) != sizeof(W)) return false;
-      crc_ = fnv1a64_update(crc_, bytes, sizeof(W));
+      if (!bodyRead(bytes, sizeof(W))) return false;
       W v{0};
       for (size_t b = 0; b < sizeof(W); ++b)
         v |= static_cast<W>(bytes[b]) << (8 * b);
@@ -328,7 +423,16 @@ class RunFileReader {
     // (independent, recomputes the whole-body FNV and FAILS on mismatch) and
     // runcat (per-file, exits nonzero on mismatch). B4's atomic publish removes
     // the torn-file hazard that made a skipped seek-read dangerous.
-    if (records_read_ == records_ && !seeked_) verifyCRC();
+    if (records_read_ == records_ && !seeked_) {
+#ifdef POLY_ZSTD
+      // Compressed files: no FNV trailer. Drain the frame epilogue so zstd
+      // validates its checksum (replaces the FNV backstop for these files).
+      if (compressed_) zfinish();
+      else verifyCRC();
+#else
+      verifyCRC();
+#endif
+    }
     return true;
   }
 
@@ -394,6 +498,69 @@ class RunFileReader {
   uint64_t crc_;
   std::string path_;
   bool seeked_;
+  int  version_;
+  bool compressed_;
+#ifdef POLY_ZSTD
+  ZSTD_DStream* dctx_ = nullptr;
+  std::vector<char> cbuf_;          // bounded compressed-input block buffer
+  ZSTD_inBuffer in_{nullptr, 0, 0}; // persists leftover compressed bytes across reads
+  size_t zhint_ = 1;                // last ZSTD_decompressStream return; 0 = frame done
+#endif
+
+  // Read body bytes: plain files fread + fold the FNV CRC; compressed files pull
+  // decompressed bytes from the zstd stream (refilling the input block as needed).
+  bool bodyRead(void* dst, size_t n) {
+#ifdef POLY_ZSTD
+    if (compressed_) {
+      ZSTD_outBuffer out{dst, n, 0};
+      while (out.pos < n) {
+        if (in_.pos == in_.size) {
+          size_t r = std::fread(cbuf_.data(), 1, cbuf_.size(), fp_);
+          in_.src = cbuf_.data(); in_.size = r; in_.pos = 0;
+          if (r == 0) return false;  // needed more but hit EOF (truncated frame)
+        }
+        zhint_ = ZSTD_decompressStream(dctx_, &out, &in_);
+        if (ZSTD_isError(zhint_)) {
+          std::fprintf(stderr, "RunFileReader: zstd decompress: %s\n",
+                       ZSTD_getErrorName(zhint_));
+          return false;
+        }
+      }
+      return true;
+    }
+#endif
+    if (std::fread(dst, 1, n, fp_) != n) return false;
+    crc_ = fnv1a64_update(crc_, dst, n);
+    return true;
+  }
+
+#ifdef POLY_ZSTD
+  // After the last record, consume the frame epilogue so zstd verifies the frame
+  // checksum. A clean frame ends with ZSTD_decompressStream returning 0.
+  void zfinish() {
+    if (!dctx_) return;
+    // The last record's decompress may already have completed the frame (and
+    // validated the checksum) — zhint_==0 then, nothing more to do. Otherwise
+    // push the remaining epilogue bytes until zstd reports the frame complete.
+    char scratch[16];
+    while (zhint_ != 0) {
+      if (in_.pos == in_.size) {
+        size_t r = std::fread(cbuf_.data(), 1, cbuf_.size(), fp_);
+        in_.src = cbuf_.data(); in_.size = r; in_.pos = 0;
+        if (r == 0) break;
+      }
+      ZSTD_outBuffer out{scratch, sizeof(scratch), 0};
+      zhint_ = ZSTD_decompressStream(dctx_, &out, &in_);
+      if (ZSTD_isError(zhint_)) {
+        std::fprintf(stderr, "RunFileReader: zstd frame check: %s\n",
+                     ZSTD_getErrorName(zhint_));
+        return;
+      }
+    }
+    if (zhint_ != 0)
+      std::fprintf(stderr, "RunFileReader: zstd frame incomplete at EOF\n");
+  }
+#endif
 
   bool parseHeader() {
     char line[512];
@@ -405,8 +572,13 @@ class RunFileReader {
       while (ln > 0 && (line[ln-1] == '\n' || line[ln-1] == '\r'))
         line[--ln] = '\0';
       if (ln == 0) break;  // blank line = end of header
-      if (std::strncmp(line, "POLYRUN ", 8) == 0)
+      if (std::strncmp(line, "POLYRUN ", 8) == 0) {
         saw_polyrun = true;
+        version_ = std::atoi(line + 8);
+      }
+      else if (std::strncmp(line, "compression ", 12) == 0)
+        // Absent = 0 (plain, old files). 1 = zstd frame body.
+        compressed_ = (std::atoi(line + 12) == 1);
       else if (std::strncmp(line, "records ", 8) == 0)
         records_ = static_cast<size_t>(std::strtoull(line + 8, nullptr, 10));
       else if (std::strncmp(line, "byteorder ", 10) == 0)
@@ -418,6 +590,19 @@ class RunFileReader {
         // (e.g. reading a u128 file as u64) instead of misparsing the records.
         counter_ok = (std::strcmp(line + 8, counterTag<W>()) == 0);
       // height, maxn, classifier, keylo, keyhi, rev: not validated here
+    }
+    if (compressed_) {
+#ifdef POLY_ZSTD
+      dctx_ = ZSTD_createDStream();
+      ZSTD_initDStream(dctx_);
+      cbuf_.resize(kSpillBlockBytes);
+      in_ = ZSTD_inBuffer{cbuf_.data(), 0, 0};
+#else
+      std::fprintf(stderr,
+                   "RunFileReader: %s is zstd-compressed but this build lacks "
+                   "POLY_ZSTD (rebuild with -DPOLY_ZSTD -lzstd)\n", path_.c_str());
+      return false;
+#endif
     }
     return saw_polyrun && byteorder_ok && counter_ok;
   }
