@@ -34,7 +34,7 @@ func TestDiagonalStripValidTrueThreshold(t *testing.T) {
 	if diagonalStripValid(18, 9) {
 		t.Errorf("diagonalStripValid(18, 9) = true; want false (18 < 2*9+1=19)")
 	}
-	// k=11 (P_11, now wired): a28 (maxn=28) must be able to use it (28 >= 2*11+1=23,
+	// k=11 (P_11, wired): a28 (maxn=28) must be able to use it (28 >= 2*11+1=23,
 	// keeping a28's top real height at H=maxn-11 rather than a new column tier).
 	if !diagonalStripValid(28, 11) {
 		t.Errorf("diagonalStripValid(28, 11) = false; want true (28 >= 2*11+1=23; a28 must be able to use P_11's shortcut)")
@@ -42,10 +42,18 @@ func TestDiagonalStripValidTrueThreshold(t *testing.T) {
 	if diagonalStripValid(22, 11) {
 		t.Errorf("diagonalStripValid(22, 11) = true; want false (22 < 2*11+1=23)")
 	}
-	// k=12 is out of range until P_12 is derived and wired — diagonalStripValid
-	// must refuse it regardless of maxn, since diagonalCell has no case 12.
-	if diagonalStripValid(100, 12) {
-		t.Errorf("diagonalStripValid(100, 12) = true; want false (k=12/P_12 not wired into diagonalCell yet)")
+	// k=12 (P_12, now wired): a29 (maxn=29) must be able to use it (29 >= 2*12+1=25),
+	// keeping a29's top real height at H=maxn-12, same tier as a28.
+	if !diagonalStripValid(29, 12) {
+		t.Errorf("diagonalStripValid(29, 12) = false; want true (29 >= 2*12+1=25; a29 must be able to use P_12's shortcut)")
+	}
+	if diagonalStripValid(24, 12) {
+		t.Errorf("diagonalStripValid(24, 12) = true; want false (24 < 2*12+1=25)")
+	}
+	// k=13 is out of range until P_13 is derived and wired — diagonalStripValid
+	// must refuse it regardless of maxn, since diagonalCell has no case 13.
+	if diagonalStripValid(100, 13) {
+		t.Errorf("diagonalStripValid(100, 13) = true; want false (k=13/P_13 not wired into diagonalCell yet)")
 	}
 }
 
