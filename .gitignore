@@ -20,3 +20,6 @@ experiments/bench_column_results.txt
 compile_commands.json
 .cache/
 experiments/frontier_svd/frontier_*.txt
+
+# probe/validation run dumps (regenerable)
+experiments/**/*.out
