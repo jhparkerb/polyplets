@@ -53,6 +53,24 @@ func TestHeightNm2Formula(t *testing.T) {
 		// that the division path is correct, not just non-panicking. Source:
 		// results/ns_a25/swept_rows.txt ===H9=== block, n=17.
 		{17, 8, 603392972436}, // T(17,9)
+		// j=9 (P_9): held-out real points n=19..25, source
+		// results/ns_a25/swept_rows.txt. n=19=2*9+1 is the true validity
+		// boundary (exponent 19-1-27=-9, exercises applyPow3's negative path).
+		{19, 9, 24014057424024},    // T(19,10)
+		{20, 9, 132107598093637},   // T(20,11)
+		{21, 9, 694918765309300},   // T(21,12)
+		{22, 9, 3521085234178586},  // T(22,13)
+		{23, 9, 17278818571437182}, // T(23,14)
+		{24, 9, 82463515269090962}, // T(24,15)
+		{25, 9, 384025992867882686}, // T(25,16)
+		// j=10 (P_10): held-out real points n=21..25, source
+		// results/ns_a25/swept_rows.txt. n=21=2*10+1 is the true validity
+		// boundary (exponent 21-1-30=-10).
+		{21, 10, 962797249464752},    // T(21,11)
+		{22, 10, 5257610926802452},   // T(22,12)
+		{23, 10, 27605091155079103},  // T(23,13)
+		{24, 10, 140166422140948001}, // T(24,14)
+		{25, 10, 691293861738937174}, // T(25,15)
 	}
 	for _, c := range cases {
 		want := new(big.Int).SetUint64(c.want)

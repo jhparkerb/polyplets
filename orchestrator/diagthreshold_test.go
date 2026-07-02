@@ -12,9 +12,10 @@ import (
 )
 
 // TestDiagonalStripValidTrueThreshold is the single most load-bearing test in
-// this change: it's the concrete claim that a future term can use a wired
-// diagonal shortcut well below the old n>=3k+1 guard, as long as the true
-// n>=2k+1 threshold is satisfied.
+// this change: it's the concrete claim that a26 (maxn=26) can use P9's
+// diagonal shortcut at all. Under the old guard (maxn>=3k+1), k=9 at maxn=26
+// was rejected (26 < 3*9+1=28) even though the true threshold (maxn>=2*9+1=19)
+// is satisfied.
 func TestDiagonalStripValidTrueThreshold(t *testing.T) {
 	// k=8 at maxn=17 (=2*8+1): true threshold says valid; old 3k+1=25 guard
 	// would have rejected it. diagonalStripValid must accept it.
@@ -24,10 +25,19 @@ func TestDiagonalStripValidTrueThreshold(t *testing.T) {
 	if diagonalStripValid(16, 8) {
 		t.Errorf("diagonalStripValid(16, 8) = true; want false (16 < 2*8+1=17)")
 	}
-	// k=9 is out of range until P_9 is wired into diagCoeffTable —
-	// diagonalStripValid must refuse it regardless of maxn.
-	if diagonalStripValid(26, 9) {
-		t.Errorf("diagonalStripValid(26, 9) = true; want false (k=9/P_9 not wired into diagonalCell yet)")
+	// k=9 (P_9, now wired): a26 (maxn=26) must be able to use it, even though
+	// 26 < 3*9+1=28 (the old guard would have wrongly rejected this — this is
+	// the concrete claim that made the whole guard-threshold fix worthwhile).
+	if !diagonalStripValid(26, 9) {
+		t.Errorf("diagonalStripValid(26, 9) = false; want true (26 >= 2*9+1=19; a26 must be able to use P_9's shortcut)")
+	}
+	if diagonalStripValid(18, 9) {
+		t.Errorf("diagonalStripValid(18, 9) = true; want false (18 < 2*9+1=19)")
+	}
+	// k=11 is out of range until P_11 is derived and wired — diagonalStripValid
+	// must refuse it regardless of maxn, since diagonalCell has no case 11.
+	if diagonalStripValid(100, 11) {
+		t.Errorf("diagonalStripValid(100, 11) = true; want false (k=11/P_11 not wired into diagonalCell yet)")
 	}
 }
 

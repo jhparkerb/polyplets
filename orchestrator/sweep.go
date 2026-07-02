@@ -1197,49 +1197,81 @@ func contributePoleHeight(maxn int, triangle []*big.Int, cfg SweepConfig) {
 }
 
 // diagCoeffs holds one Pk's integer-numerator Horner coefficients (leading
-// term first) and the factorial divisor k!. T(n,n-k) = (Horner(coeffs)/kfact)
-// * 3^(n-1-3k). Populated by diagCoeffTable below.
+// term first, decimal strings — P10's constant term already exceeds int64,
+// so a literal []int64 would silently fail to compile for it and would
+// truncate for wider future Pk's) and the factorial divisor k!.
+// T(n,n-k) = (Horner(coeffs)/kfact) * 3^(n-1-3k). Populated by
+// diagCoeffTable below.
 type diagCoeffs struct {
-	coeffs []int64
+	coeffs []string
 	kfact  int64
 }
 
-// diagCoeffTable holds j=1..8's coefficients (j=0 is the trivial pow3(n-1)
+// diagCoeffTable holds j=1..10's coefficients (j=0 is the trivial pow3(n-1)
 // case, handled separately). Source: docs/proofs/T-n-nm1.md,
 // T-n-nm2-and-general.md (j=1,2 proven; j=3..6 data-pinned, exact in int64
-// through the n these were originally used at) and
-// scripts/pin_diagonal_k8_final.py / derive-p{7,8} pipeline (j=7,8,
-// big.Int-only from the start since their coefficients overflow int64 at the
-// n they're used at). All cases now share one big.Int Horner evaluator
-// (hornerDiag) instead of j=1..6 doing native int64/uint64 arithmetic, since
-// the guard-threshold fix (n>=2k+1, see applyPow3) invokes j=1..6 at larger n
-// than before where int64 would overflow.
+// through the n these were originally used at); j=7,8 from
+// scripts/pin_diagonal_k8_final.py / the derive-p{7,8} pipeline (big.Int-only
+// from the start since their coefficients overflow int64 at the n they're
+// used at); j=9,10 from scripts/derive_p9.py + scripts/derive_p10.py, freshly
+// re-run via scripts/show_p9_p10_p11.py and copied verbatim (P_9: 6 of 10
+// coefficients from theory alone, 4 from 4 of 7 real points n=19-22, 3 held
+// out n=23-25 matched exactly; P_10: 7 of 11 from theory+the b7 recovered
+// from P_9's own n^3 coefficient, 4 from 4 of 5 structurally-valid real
+// points n=21-24, 1 held out n=25 matched exactly — see
+// docs/a26-a30-diagonal-plan.md). All cases share one big.Int Horner
+// evaluator (hornerDiag) instead of j=1..6 doing native int64/uint64
+// arithmetic, since the guard-threshold fix (n>=2k+1, see applyPow3) invokes
+// j=1..6 at larger n than before where int64 would overflow, and P_10's
+// constant term already exceeds int64 outright.
 var diagCoeffTable = map[int]diagCoeffs{
-	1: {[]int64{25, -45}, 1},
-	2: {[]int64{625, -2459, 1134}, 2},
-	3: {[]int64{15625, -100050, 122213, -32940}, 6},
-	4: {[]int64{390625, -3596250, 8099843, -6462882, 1752840}, 24},
-	5: {[]int64{9765625, -120546875, 425836625, -650171245, 422003550, 76975920}, 120},
-	6: {[]int64{244140625, -3861328125, 19486496875, -47366857935, 55373728180, 946828380, -32099353920}, 720},
+	1: {[]string{"25", "-45"}, 1},
+	2: {[]string{"625", "-2459", "1134"}, 2},
+	3: {[]string{"15625", "-100050", "122213", "-32940"}, 6},
+	4: {[]string{"390625", "-3596250", "8099843", "-6462882", "1752840"}, 24},
+	5: {[]string{"9765625", "-120546875", "425836625", "-650171245", "422003550", "76975920"}, 120},
+	6: {[]string{"244140625", "-3861328125", "19486496875", "-47366857935", "55373728180", "946828380", "-32099353920"}, 720},
 	// j=7: P_7 is data-pinned and validated at scale by the a(23) swept H=16
 	// row (T(23,16)=4492550651512074, T(22,15)=1035856891052731).
-	7: {[]int64{6103515625, -119765625000, 812310625000, -2839739579250, 5194366339015, -1878923357430, -6841564107480, 7756630081200}, 5040},
+	7: {[]string{"6103515625", "-119765625000", "812310625000", "-2839739579250", "5194366339015", "-1878923357430", "-6841564107480", "7756630081200"}, 5040},
 	// j=8: P_8 is pinned from a(24)'s real T(24,16)=42594477635772598 (n=17..24,
 	// 8 points, leading coeff fixed at 25^8/8! by the confirmed conjecture) --
 	// see scripts/pin_diagonal_k8_final.py, whose fit reproduces all 8 defining
 	// points exactly and whose result matches the pre-a(24) falsifiable
 	// sum-of-roots prediction exactly.
-	8: {[]int64{152587890625, -3625976562500, 31658675781250, -149222374175000, 391357255277905, -350057694296660, -718224955399380, 2136536485853040, -923712586957440}, 40320},
+	8: {[]string{"152587890625", "-3625976562500", "31658675781250", "-149222374175000", "391357255277905", "-350057694296660", "-718224955399380", "2136536485853040", "-923712586957440"}, 40320},
+	// j=9: P_9, fully derived and validated (scripts/derive_p9.py,
+	// scripts/derive_p9_calibrate.py). Leading coeff 25^9/9! emerged
+	// independently, not assumed.
+	9: {[]string{
+		"3814697265625", "-107720947265625", "1172546074218750", "-7126125723281250",
+		"25246485663128625", "-39217219391133945", "-44784313962337720", "312218815384892340",
+		"-359168984859479760", "17928204588927360",
+	}, 362880},
+	// j=10: P_10, fully derived and validated (scripts/derive_p10.py).
+	// Leading coeff 25^10/10! confirmed independently.
+	10: {[]string{
+		"95367431640625", "-3151702880859375", "41724067382812500", "-316409147402343750",
+		"1450416433150453125", "-3370526923710995055", "-1108292379978242050", "31805482385795516100",
+		"-69735093253554241800", "32190356082435763680", "25618243319042572800",
+	}, 3628800},
 }
 
 // hornerDiag evaluates a diagCoeffs' numerator at N via big.Int Horner,
 // divides exactly by kfact, and applies 3^exp (exp may be negative — see
 // applyPow3).
 func hornerDiag(N int64, c diagCoeffs, exp int) *big.Int {
-	num := big.NewInt(c.coeffs[0])
-	for _, coef := range c.coeffs[1:] {
+	num := new(big.Int)
+	if _, ok := num.SetString(c.coeffs[0], 10); !ok {
+		panic("hornerDiag: bad coefficient literal " + c.coeffs[0])
+	}
+	for _, coefStr := range c.coeffs[1:] {
+		coef, ok := new(big.Int).SetString(coefStr, 10)
+		if !ok {
+			panic("hornerDiag: bad coefficient literal " + coefStr)
+		}
 		num.Mul(num, big.NewInt(N))
-		num.Add(num, big.NewInt(coef))
+		num.Add(num, coef)
 	}
 	num.Quo(num, big.NewInt(c.kfact))
 	return applyPow3(num, exp)
@@ -1266,27 +1298,29 @@ func applyPow3(num *big.Int, e int) *big.Int {
 }
 
 // diagonalStripValid reports whether the k-th diagonal strip (H=maxn-k) can
-// be filled by diagonalCell instead of a real column sweep. k<=8 until
-// P9/P10 are wired into diagCoeffTable. The true structural threshold is
+// be filled by diagonalCell instead of a real column sweep. k<=10 now that
+// P9/P10 are wired (case 9, case 10). The true structural threshold is
 // n>=2k+1 (docs/proofs/T-n-nm2-and-general.md); both sweep.go dispatch sites
 // (sequential and overlap) must use this single helper so a future threshold
 // or k-range change can't apply to only one path.
 func diagonalStripValid(maxn, k int) bool {
-	return k >= 2 && k <= 8 && maxn >= 2*k+1
+	return k >= 2 && k <= 10 && maxn >= 2*k+1
 }
 
-// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..8
+// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..10
 // (docs/proofs/T-n-nm1.md, T-n-nm2-and-general.md). j=0,1,2 are proven from first
-// principles; j=3..8 are data-pinned from the triangle (leading 25^j/j!,
-// integer-exact) and VALIDATED at scale by the a(23)/a(24) sweeps (their swept
-// H=16..18 == k=5..7 reproduce the formulas exactly; j=8 is pinned from a(24)'s
-// T(24,16), which matched the pre-a(24) falsifiable sum-of-roots prediction
-// exactly -- see results/k8-pinning.md, scripts/pin_diagonal_k8_final.py). Each
-// is a degree-j polynomial in n times a power of 3; the numerator is divisible
-// by j! for all valid n (verified), so the integer division is exact. The true
-// validity threshold is n >= 2j+1 (docs/proofs/T-n-nm2-and-general.md); below
-// n=3j+1 the exponent n-1-3j is negative, handled by applyPow3's exact
-// division path. diagonalStripValid's dispatch guard guarantees n >= 2j+1.
+// principles; j=3..10 are data-pinned from the triangle (leading 25^j/j!,
+// integer-exact) and VALIDATED at scale by the a(23)/a(24)/a25 sweeps (their
+// swept H=16..18 == k=5..7 reproduce the formulas exactly; j=8 is pinned from
+// a(24)'s T(24,16), matched the pre-a(24) falsifiable sum-of-roots prediction
+// exactly -- see results/k8-pinning.md, scripts/pin_diagonal_k8_final.py; j=9
+// and j=10 are P_9/P_10 from scripts/derive_p9.py / derive_p10.py, see
+// diagCoeffTable). Each is a degree-j polynomial in n times a power of 3; the
+// numerator is divisible by j! for all valid n (verified), so the integer
+// division is exact. The true validity threshold is n >= 2j+1
+// (docs/proofs/T-n-nm2-and-general.md); below n=3j+1 the exponent n-1-3j is
+// negative, handled by applyPow3's exact division path. diagonalStripValid's
+// dispatch guard guarantees n >= 2j+1.
 func diagonalCell(n, j int) *big.Int {
 	if j == 0 {
 		return pow3(n - 1)
