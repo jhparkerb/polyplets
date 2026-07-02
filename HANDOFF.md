@@ -1,5 +1,24 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 ~07:37 EDT — a(26) frontier run LAUNCHED (dalby-solo) 🚀
+
+Rev **`246cb09`** (clean, native build on dalby `~/src/polyominoes-ns`).
+First term of the docs/a26-a30-diagonal-plan.md push. `scripts/dalby_a26.sh`.
+
+- **dalby**: orchestrate PID **2086881**, tmux `0:a26`, waiter `bbxvuyztq`
+  (tail --pid). `--maxn 26 --counter u128 --overlap-heights 14 --cores 80
+  --unit-mult 4 --steal-grain 0.05 --ram 1GiB/worker`.
+- **Shape:** real sweep H1–15 (top real H=15); closed-form inject H16–24
+  (k=2..10 diagonals, P9/P10 now wired) + pole H25 + top H26. First run on
+  the widened big.Int result pipeline + u128 counter (a25 was the u64 ceiling).
+- **Predicted cost:** ~303K cpu-s, ~1.1h wall @ 80 cores (plan cost table).
+- **Byproduct:** real T(26,15) → closes one of P11's 2 missing equations.
+- **On completion:** validate a1–20 vs b-file prefix, a21–25 vs
+  results/ns_a2{1..5}/RESULT.md; record a(26) + perheight in results/ns_a26/.
+  Tier: computed, pending certification (high heights single-source).
+
+
+
 ## 2026-06-29 ~13:57 EDT — a(23) frontier run LAUNCHED (dalby + ayr split) 🚀
 
 Rev **`6db27b5`** (clean, native build both hosts; ayr got Go 1.26 in `$HOME/go`).
