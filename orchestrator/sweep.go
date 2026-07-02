@@ -24,6 +24,7 @@ import (
 type SweepConfig struct {
 	Maxn            int
 	Fold            bool
+	Kernel          string // "column" (default) or "kink"; empty = "column"
 	Cores           int           // max concurrent workers
 	UnitMult        int           // MAP work units per core (default 1); units = Cores*UnitMult, concurrency stays Cores
 	MergeMult       int           // MERGE ranges per core (0 = follow UnitMult); set low to cut the (cores*mult)^2 merge fan-in
@@ -96,6 +97,14 @@ func counterName(c string) string {
 	return c
 }
 
+// kernelName normalizes a kernel tag, mapping "" to the column default.
+func kernelName(k string) string {
+	if k == "" {
+		return "column"
+	}
+	return k
+}
+
 // checkResumeConfig hard-fails a resume whose checkpoint was written under a
 // different run config. A mismatched --maxn/--counter/--fold silently corrupts
 // the triangle (B1); a --heights list that no longer contains the checkpoint
@@ -113,6 +122,9 @@ func checkResumeConfig(cfg SweepConfig, resume *Checkpoint, heights []int) error
 	}
 	if resume.Fold != cfg.Fold {
 		return fmt.Errorf("resume: checkpoint fold=%v != --fold %v", resume.Fold, cfg.Fold)
+	}
+	if want, got := kernelName(cfg.Kernel), kernelName(resume.Kernel); got != want {
+		return fmt.Errorf("resume: checkpoint kernel=%s != --kernel %s", got, want)
 	}
 	// Overlap-form checkpoint (Done set): resume skips completed heights by set
 	// membership, not by a single resume.H, so the H-in-heights check below does
@@ -195,6 +207,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			Maxn:     cfg.Maxn,
 			Counter:  counterName(cfg.CounterWidth),
 			Fold:     cfg.Fold,
+			Kernel:   kernelName(cfg.Kernel),
 		}
 		if err := ck.Write(cfg.CheckpointPath); err != nil {
 			fmt.Fprintf(os.Stderr, "checkpoint write: %v\n", err)
@@ -373,6 +386,7 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 			Maxn:     cfg.Maxn,
 			Counter:  counterName(cfg.CounterWidth),
 			Fold:     cfg.Fold,
+			Kernel:   kernelName(cfg.Kernel),
 		}
 		if err := ck.Write(cfg.CheckpointPath); err != nil {
 			fmt.Fprintf(os.Stderr, "overlap checkpoint H=%d: %v\n", H, err)

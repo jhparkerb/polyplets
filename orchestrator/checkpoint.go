@@ -44,6 +44,7 @@ type Checkpoint struct {
 	Maxn    int
 	Counter string // normalized "u64"/"u128"
 	Fold    bool
+	Kernel  string // normalized "column"/"kink"
 }
 
 // Write serializes the checkpoint to path atomically (write-then-rename).
@@ -57,7 +58,7 @@ func (ck *Checkpoint) Write(path string) error {
 	fmt.Fprintf(f, "POLYCKPT 1\n")
 	fmt.Fprintf(f, "H %d\n", ck.H)
 	fmt.Fprintf(f, "col %d\n", ck.Col)
-	fmt.Fprintf(f, "config maxn=%d counter=%s fold=%v\n", ck.Maxn, ck.Counter, ck.Fold)
+	fmt.Fprintf(f, "config maxn=%d counter=%s fold=%v kernel=%s\n", ck.Maxn, ck.Counter, ck.Fold, kernelName(ck.Kernel))
 	fmt.Fprintf(f, "frontier %s\n", strings.Join(ck.Frontier, " "))
 	if len(ck.Done) > 0 {
 		ds := make([]string, len(ck.Done))
@@ -157,6 +158,8 @@ func parseConfig(s string, ck *Checkpoint) {
 			ck.Counter = v
 		case "fold":
 			ck.Fold = v == "true"
+		case "kernel":
+			ck.Kernel = v
 		}
 	}
 }

@@ -68,6 +68,10 @@ func TestCheckpointRoundtrip(t *testing.T) {
 		Frontier: []string{"/tmp/a.bin", "/tmp/b.bin"},
 		Triangle: triangle,
 		Acct:     Acct{CPUS: 1.5, WallS: 2.1, RSSMax: 9.9},
+		Maxn:     20,
+		Counter:  "u128",
+		Fold:     true,
+		Kernel:   "kink",
 	}
 
 	if err := orig.Write(path); err != nil {
@@ -87,6 +91,10 @@ func TestCheckpointRoundtrip(t *testing.T) {
 	}
 	if len(got.Frontier) != len(orig.Frontier) {
 		t.Errorf("Frontier len: got %d want %d", len(got.Frontier), len(orig.Frontier))
+	}
+	if got.Maxn != orig.Maxn || got.Counter != orig.Counter || got.Fold != orig.Fold || got.Kernel != orig.Kernel {
+		t.Errorf("config: got maxn=%d counter=%s fold=%v kernel=%s; want maxn=%d counter=%s fold=%v kernel=%s",
+			got.Maxn, got.Counter, got.Fold, got.Kernel, orig.Maxn, orig.Counter, orig.Fold, orig.Kernel)
 	}
 	for n, v := range triangle {
 		if v.Sign() == 0 {
