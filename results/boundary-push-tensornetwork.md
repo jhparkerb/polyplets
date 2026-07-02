@@ -10,17 +10,21 @@ the SVD across the balanced central cut.
 
 ## Result — MEASURED, decisive
 
-| H | frontier states | exact rank χ (central cut) | χ²/frontier | MPS cost H·χ² | vs frontier |
+| H | frontier states | exact rank χ (central cut) | χ²/frontier | MPS cost H·χ² | front/MPS |
 |---|---|---|---|---|---|
-| 8  | 1,604  | 21  | 0.275 | 3,528   | 0.45× (worse) |
-| 10 | 11,005 | 51  | 0.236 | 25,000  | 0.44× (worse) |
-| 12 | 68,343 | 127 | 0.236 | 178,608 | 0.38× (worse) |
+| 8  | 1,604   | 21  | 0.28 | 3,528   | 0.45× (worse) |
+| 10 | 11,005  | 51  | 0.24 | 25,000  | 0.44× (worse) |
+| 12 | 68,343  | 127 | 0.24 | 178,608 | 0.38× (worse) |
+| 14 | 161,357 | 298 | 0.55 | 623,294 | 0.26× (worse) |
 
-**χ²/frontier is flat at ~0.24**, so the bond dimension is
-**χ ≈ ½·√(frontier) = λ^(H/4)** — exactly the square root of the frontier size.
-Then MPS storage `H·χ² ≈ 0.24·H·frontier` is *strictly worse* than the explicit
-frontier, by a growing factor ~H. The singular values decay slowly (at H=12 the
-2nd/1st ratio is 0.60; χ_eff(1e-6)=122 ≈ the full rank 127 — almost no decay).
+The exact bond dimension χ grows exponentially: 21→51→127→298, ratio ~2.4 per
++2 in H (χ ~ λ^(H/4), the *square root* of the frontier λ^(H/2)). So
+χ² is a large fraction of the frontier itself (0.24–0.55; the H=14 point is
+inflated because that dump was at maxn=16, off the true peak column). Either
+way **MPS storage H·χ² is 2–5× the explicit frontier and the front/MPS ratio
+falls monotonically 0.45→0.26** as H grows — MPS loses by more, not less. The
+singular values barely decay (H=12: 2nd/1st = 0.60; χ_eff(1e-6)=122 ≈ full rank
+127).
 
 **Why:** the entanglement is *connectivity* entanglement. Cutting the boundary
 splits non-crossing-partition components; the rank at the cut = the number of
