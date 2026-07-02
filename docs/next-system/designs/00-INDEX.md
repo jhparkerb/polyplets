@@ -34,6 +34,7 @@ cells will rest on the new engine alone.
 | T2.3 | [08-straggler-tail-sizing.md](08-straggler-tail-sizing.md) | Map straggler tail sized (~18% of map-wall, growing); work-stealing beats predictive LPT 92% vs 71%, predictor-free; per-unit trace tools + sched_sim | measured (gympie probes) | a(22)/M4 |
 | 32+ | [09-cost-model-and-work-assignment.md](09-cost-model-and-work-assignment.md) | A-priori per-(H,col) cost model from the a21 frontier profile (×0.42/col collapse; active_width+H≈N+6 empirical, mechanism open — diagonal refutes the cell-budget story); RAM-bounded cross-height pool, exact #32 split, atomic H_max·col2 floor | derived (a21 profile) | a(22)/M4 |
 | 20± | [10-shuffle-ranking-locality.md](10-shuffle-ranking-locality.md) | Can the merge shuffle become N independent sorts? Dense RGS ranking EXISTS (retracts earlier claim) ⇒ in-RAM hash-resident frontier is shuffle-free through ~a21; a LOCAL/banded ranking cannot exist (expansion) ⇒ out-of-core forces the shuffle. Lit: papers/ MapReduce + twisted-cylinders | literature dig | a(22)/#20 |
+| **14** | [**14-kink-carry-parallel-engine.md**](14-kink-carry-parallel-engine.md) | **Replace the whole-column map with the cell-at-a-time kink-carry kernel: per-term compute base ~4.4→~2.5, end-of-column volume ~1000× smaller, spill mostly gone. Drop-in `map_shard` variant behind `--kernel`; merge/orchestrator/checkpoint/P_k reused. Smoke-tested 29×@H12/~55×@H14 ([[kink-carry-base-change]], results/kink-carry.md).** | **large (phased)** | **a(30)+ push** |
 
 ## Sequencing and gates
 
