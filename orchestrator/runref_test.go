@@ -34,7 +34,7 @@ func TestSampleKeysMultiSorted(t *testing.T) {
 		t.Fatalf("WriteSeedPolyrun B: %v", err)
 	}
 
-	cuts, err := SampleKeysMulti([]string{pathA, pathB}, H, 3)
+	cuts, err := SampleKeysMulti([]string{pathA, pathB}, H, H+2, 3)
 	if err != nil {
 		t.Fatalf("SampleKeysMulti: %v", err)
 	}

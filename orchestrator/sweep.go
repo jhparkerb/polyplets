@@ -763,7 +763,7 @@ func mapPhase(
 	if numUnits < 1 {
 		numUnits = 1
 	}
-	cuts, err := SampleKeysMulti(frontier, H, numUnits-1)
+	cuts, err := SampleKeysMulti(frontier, H, columnKeyLen(H), numUnits-1)
 	if err != nil {
 		return nil, nil, Acct{}, err
 	}
@@ -940,7 +940,7 @@ func splitRemainder(frontier []string, H int, cursor, hi string, freeCores int,
 	}
 	var cutKeys []string
 	if parts >= 2 {
-		cutKeys, _ = SplitRangeByIndex(frontier, H, cursor, hi, parts-1)
+		cutKeys, _ = SplitRangeByIndex(frontier, H, columnKeyLen(H), cursor, hi, parts-1)
 	}
 	los, his := splitBounds(cursor, hi, cutKeys)
 	est := remaining / uint64(len(los))
@@ -988,7 +988,7 @@ func mergePhase(
 		numRanges = len(mapOuts)
 	}
 
-	cuts, err := SampleKeysMulti(mapOuts, H, numRanges-1)
+	cuts, err := SampleKeysMulti(mapOuts, H, columnKeyLen(H), numRanges-1)
 	if err != nil {
 		return nil, 0, Acct{}, err
 	}

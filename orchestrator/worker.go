@@ -51,6 +51,7 @@ type MergeArgs struct {
 	KLoHex  string
 	KHiHex  string
 	Rev     string
+	KeyLen  int // 0 = merge_worker's own H+2 default; kink stage tables pass H+4
 }
 
 // RunMapWorker spawns a map_worker, waits for it, and returns the parsed result.
@@ -106,6 +107,9 @@ func RunMergeWorker(ctx context.Context, bin WorkerBin, a MergeArgs) (WorkerResu
 	}
 	if a.Rev != "" {
 		args = append(args, "--rev", a.Rev)
+	}
+	if a.KeyLen != 0 {
+		args = append(args, "--keylen", fmt.Sprint(a.KeyLen))
 	}
 	return runWorker(ctx, bin.MergeWorker, args, nil, nil)
 }

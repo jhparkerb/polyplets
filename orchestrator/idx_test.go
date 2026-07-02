@@ -148,12 +148,48 @@ func TestSampleKeysUsesIndexNotBody(t *testing.T) {
 	}
 	writeCppIdx(t, path+".idx", keyLen, keys)
 
-	cuts, err := SampleKeys(path, H, 3)
+	cuts, err := SampleKeys(path, H, keyLen, 3)
 	if err != nil {
 		t.Fatalf("SampleKeys: %v", err)
 	}
 	if len(cuts) == 0 {
 		t.Fatalf("SampleKeys returned no cuts — it scanned the (absent) body instead of the .idx (Body Crawl)")
+	}
+	if !sort.StringsAreSorted(cuts) {
+		t.Errorf("cuts not sorted: %v", cuts)
+	}
+}
+
+// TestSampleKeysExplicitKeyLen — RED before de-hardcoding SampleKeys off an
+// internal H+2 assumption (Design 14 Phase 2, step 2.1). SampleKeys must use
+// the caller-supplied keyLen, not silently re-derive H+2, so it works on the
+// kink kernel's H+4-keyed mixed-state stage tables. Builds a run+idx pair at
+// keyLen=H+4 (kink's width) and asserts SampleKeys reads it correctly; before
+// the fix this failed with "idx keyLen 9 != 7" (SampleKeys passing the wrong,
+// internally-derived keyLen into sampleIndexKeys/readIndexHeader).
+func TestSampleKeysExplicitKeyLen(t *testing.T) {
+	dir := t.TempDir()
+	H := 5
+	keyLen := kinkKeyLen(H) // H+4 = 9, distinct from the column kernel's H+2 = 7
+	path := dir + "/stage.bin"
+	writeHeaderOnly(t, path, H, 10, 1000)
+
+	var keys [][]byte
+	idxSet := map[string]bool{}
+	for v := byte(1); v <= 8; v++ {
+		k := make([]byte, keyLen)
+		k[keyLen-1] = v
+		keys = append(keys, k)
+		idxSet[bytesToHex(k)] = true
+	}
+	writeCppIdx(t, path+".idx", keyLen, keys)
+
+	cuts, err := SampleKeys(path, H, keyLen, 3)
+	if err != nil {
+		t.Fatalf("SampleKeys at keyLen=%d: %v", keyLen, err)
+	}
+	if len(cuts) == 0 {
+		t.Fatalf("SampleKeys returned no cuts at keyLen=%d", keyLen)
 	}
 	if !sort.StringsAreSorted(cuts) {
 		t.Errorf("cuts not sorted: %v", cuts)

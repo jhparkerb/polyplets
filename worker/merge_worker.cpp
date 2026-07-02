@@ -3,10 +3,17 @@
 // Usage:
 //   merge_worker --in PATH[,PATH,...] --H N --out PATH
 //                [--counter u64|u128] [--klo HEX] [--khi HEX] [--rev GITREV]
+//                [--keylen N]
 //
 // K-way merges a set of sorted POLYRUN files into one output file, optionally
 // restricting to the output key range [klo, khi).  Pure function of inputs
 // (idempotent, safe to re-run on resume).
+//
+// --keylen overrides the run's key width in bytes; 0 (default, unset) keeps
+// mergeRunFiles's own H+2 derivation (the column kernel's end-of-column
+// sigs). The kink kernel's mixed-state stage tables are keyed on H+4 and
+// pass --keylen explicitly — merge_worker itself has no kernel awareness,
+// it just merges whatever fixed-width keys the caller tells it about.
 
 #include <cstdio>
 #include <cstdlib>
@@ -21,6 +28,7 @@ int main(int argc, char** argv) {
   std::string in_str, out_path, klo_hex, khi_hex, rev;
   std::string counter_arg = "u64";
   int H = 0;
+  int keyLen = 0;
 
   for (int i = 1; i < argc; ++i) {
     auto arg = [&](const char* flag) {
@@ -33,6 +41,7 @@ int main(int argc, char** argv) {
     else if (arg("--klo"))     klo_hex     = argv[++i];
     else if (arg("--khi"))     khi_hex     = argv[++i];
     else if (arg("--rev"))     rev         = argv[++i];
+    else if (arg("--keylen"))  keyLen      = std::atoi(argv[++i]);
     else {
       std::fprintf(stderr, "merge_worker: unknown arg: %s\n", argv[i]);
       return 1;
@@ -56,10 +65,10 @@ int main(int argc, char** argv) {
   size_t body_bytes, out_recs;
   if (counter_arg == "u128") {
     std::tie(body_bytes, out_recs) =
-        mergeRunFiles<u128>(in_paths, H, klo_hex, khi_hex, out_path, rev);
+        mergeRunFiles<u128>(in_paths, H, klo_hex, khi_hex, out_path, rev, keyLen);
   } else {
     std::tie(body_bytes, out_recs) =
-        mergeRunFiles<u64>(in_paths, H, klo_hex, khi_hex, out_path, rev);
+        mergeRunFiles<u64>(in_paths, H, klo_hex, khi_hex, out_path, rev, keyLen);
   }
 
   const double cpu_s  = cpuSeconds()  - t0_cpu;
