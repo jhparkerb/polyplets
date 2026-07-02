@@ -61,7 +61,7 @@ Both algorithmic-breakthrough probes now have measured-negative verdicts:
 Together they say **the exponential frontier is intrinsic** — the √λ diagonal
 sweep is essentially optimal among the recurrence/GF and tensor-network families.
 So the path to a(28)–a(30) faster is **engineering, not a new algorithm**:
-the audit's I/O/alloc wins, the kinkless reverse-signature merge (~2× at the
+the audit's I/O/alloc wins, the #12 u64-per-state record shrink (~2× at the
 spill peak — the top un-banked lever), and cross-machine splitting. Knowing the
 wall is real is itself worth the probe: it says don't burn a(28)–a(30)'s
 schedule hunting a closed form or a compression that the data rules out.

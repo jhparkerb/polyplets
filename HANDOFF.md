@@ -26,8 +26,9 @@ now present). a18 `--compare` PASS on both before launch.
 
 **RESEARCH THREAD (while they run):** eke more from the engine / investigate new
 approaches. Reach base-reduction is closed (45° diagonal FALSIFIED, [[column-tm-already-sqrt-lambda]]);
-open levers to weigh: ranged-row ~1.9x constant-factor (measured, not deployed),
-queued #12 u64-per-state (halves RAM/spill), and any fresh angle.
+open levers to weigh: #12 u64-per-state (halves RAM/spill; top un-banked lever),
+and any fresh angle. (Ranged rows are ALREADY the shipped ns record format —
+core/run.h `[sig|lo:u8|len:u8|counts]` — the ~1.9x is banked, don't re-chase.)
 
 ## 2026-07-02 (later) — P_11 CLOSED → a(28) unblocked ✅
 

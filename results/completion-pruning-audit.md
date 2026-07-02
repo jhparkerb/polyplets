@@ -1,5 +1,10 @@
 # Completion-pruning audit (queue #4)
 
+> **SUPERSEDED 2026-07-02** by [[completion-oracle]]
+> (results/completion-oracle.md): the headroom below was measured against the
+> TRUE minimum-completion oracle — ceiling ~2-4% of records, 0% of peak
+> states. Closed, do not build.
+
 **2026-07-02.** Does our `completionLowerBound` (cpp/tma/signature.h:113) match
 Barequet's completion-budget prune (their §4.1, the lever that kept A(70) in
 32 GB)?
