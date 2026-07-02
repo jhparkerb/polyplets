@@ -1,5 +1,34 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (post-/clear) — a(28) landed on ayr; dalby a(29) still running
+
+**a(28) = 4824589228356722264087** (first sextillion term) was sitting
+unrecorded on ayr — `scripts/ayr_a28.sh` had completed (all 28 heights
+present, no live process, run.log ends with the final `wall=11723.8s`
+summary line) while ayr's worktree had since moved to `kink-carry` for
+Phase 2 gate work, so nobody had gone back to combine+bank it. Recomputed
+via `combine -in runs/ns_a28/perheight -maxn 28`: a(1)-a(20) byte-match the
+b-file, a(21)-a(27) match certified `results/ns_a2{1..7}` exactly, growth
+a28/a27 = 6.8616 (monotone). Banked to `results/ns_a28/` (triangle.txt,
+PROVENANCE.md, perheight/, cost_profile_ayr.tsv) this session, not yet
+committed. Tier: computed, single-source, pending certification — same as
+a26/a27 before it. **ayr is now free** (job long done); its worktree is
+still on `kink-carry` rev `30c5580` and needs resync to `next-system`
+before its next production a(n) run.
+
+**dalby a(29)** (orchestrate PID 2243059) is still on H16, now col=6 (H15
+finished last session), rate declining column-tail-like (same shape H15
+col5 showed on this same box, and H15 tail showed on ayr's a28 run) —
+normal, not stuck. No `eta=` field in this engine's heartbeat, so no ETA
+quoted. A persistent Monitor is armed against this PID's run.log to notify
+on completion; do not poll manually.
+
+**Design 14 Phase 3** (`orchestrate --maxn 24 --kernel kink --compare` on
+dalby) is still queued behind dalby's a(29) — needs explicit go-ahead once
+dalby frees up, per standing job-launch rule.
+
+---
+
 ## 2026-07-02 (session end, pre-/clear) — SAVE-STATE
 
 **Branch `kink-carry`, tip `b3ff955`, pushed to origin. Tree clean** (one
