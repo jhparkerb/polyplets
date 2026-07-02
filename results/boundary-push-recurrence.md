@@ -49,6 +49,21 @@ under-determined beyond H3).
    tricks are near-exhausted, frontier compression is where a breakthrough
    would have to come from.
 
+## Follow-up: is there a 2D accelerator? (`holonomic2d_probe.py`) — NO
+
+Pushed the idea further rather than discarding it: searched for a joint 2D
+P-recursive relation `sum c[i,j,d,e] n^d H^e T(n-i,H-j) = 0` (fit on n≤maxn-2,
+required to verify on held-out largest-n cells, mod-p). **None exists** up to
+shifts (4,3) and coefficient degrees (3 in n, 2 in H).
+
+Meaning: T(n,H) is **not 2D-holonomic** — there is no global "compute the
+expensive frontier cell from its cheaper neighbours" recurrence. The 1-D slices
+are each holonomic (diagonal = closed form; row = high-order C-finite) but they
+do not knit into a joint D-finite structure. This *rigorously bounds* the
+recurrence/GF family of accelerators: the diagonal closed forms are essentially
+all of it. Confirms the remaining hope must attack the frontier representation
+itself (tensor-network / MPS), which is orthogonal to holonomy.
+
 ## Caveats / honest limits
 
 - Orders past ~11 are lower bounds (need more n per H than we have).
