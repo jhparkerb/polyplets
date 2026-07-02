@@ -1,5 +1,109 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (late night) — Design 14 Phase 2: 2.1-2.4 DONE, paused before 2.5
+
+Branch **`kink-carry`**, tip `8561103`. Tree is CLEAN at this commit (an
+in-progress 2.5 edit — one line adding `Kernel string` to `SweepConfig` in
+`orchestrator/sweep.go` — was reverted per jasonp's request rather than left
+half-done; nothing uncommitted). a(28)[ayr] finished cleanly during this
+session (rc=0, ~3h15m wall, see its own note below) — combine/validate is
+still outstanding and is jasonp's call, not touched here. a(29)[dalby]
+status not rechecked this session.
+
+**Plan file**: `/Users/jasonp/.claude/plans/declarative-wobbling-canyon.md`
+has the full Phase 2 sequencing (2.1 through 2.9) approved by jasonp,
+including three decisions locked in before coding started:
+- Extend `mapPhase`/`mergePhase` in place with additive keyLen/Stage params
+  (not a private fork) for 2.6.
+- In-RAM-only seed/finalize for Phase 2; file-backed variants deferred to
+  Phase 3.
+- Column-level checkpointing for Phase 2; stage-level deferred.
+
+**Steps 2.1-2.4 done, each its own commit, each gated green
+(`make ns-gates`, full suite, ~4.5min):**
+- **2.1** `ca9a524` — de-hardcoded `keyLen` in `orchestrator/runref.go`'s
+  `SampleKeys`/`SampleKeysMulti`/`SplitRangeByIndex` (was hardcoded H+2
+  internally); added `columnKeyLen(H)`/`kinkKeyLen(H)` Go helpers; threaded
+  explicit `columnKeyLen(H)` through the 3 production call sites in
+  `sweep.go` (byte-identical no-op for the column kernel). Added optional
+  `--keylen`/`MergeArgs.KeyLen` to `merge_worker.cpp`/`worker.go`.
+- **2.2** `8a50a04` — new `core/kink_column.h`: `kinkSeedStage0` (column
+  start: harvest via `Classifier::complete`, then seed stage 0 — order-
+  preserving constant 2-byte key suffix, no sort/dedup needed) and
+  `kinkFinalizeColumn` (column end: drop carry with stranding check,
+  canonicalize, admissibility-prune, R1-fold, dedup — no classify, harvest
+  already happened at seed). Re-read `experiments/kink_tm/kink_tm.cpp`'s
+  `kinkSweep()` column loop directly to settle a design-doc ambiguity:
+  harvest is at column START not column end. Gate: `test/gate_kink_column.cpp`
+  (`make ns-gate-kink-column`), red-verified two ways (dropping seed's
+  classify call fails to compile via `-Werror`; skipping the stranding
+  check compiles but fails the gate with a record mismatch).
+- **2.3** `3c8db4d` — `map_shard_stage_file<W>` in `core/kink.h`: file-backed
+  spilling twin of Phase 1's `map_shard_stage`, mirroring
+  `map_shard_file`'s shell (K-way heap, spill, progress pulse, SIGTERM
+  stop-key) but no Classifier/Output param, `kinkKeyLen(H)` threaded
+  explicitly everywhere including into `mergeRunFiles`'s final-write call.
+  `KinkStageCfg` gained `ram_budget_bytes`/`spill_dir` fields. New
+  `kKinkProgressStrideMask` (distinctly named — `map_worker.cpp` includes
+  both `mapreduce.h` and `kink.h` in the same TU as of 2.4, so
+  `mapreduce.h`'s `kProgressStrideMask` can't be reused without a name
+  collision). Gate: `test/gate_kink_stage_file.cpp`, red-verified (dropping
+  explicit keyLen from the final `mergeRunFiles` call corrupts every record
+  read back — CRC mismatches). SIGTERM stop-key round-tripping explicitly
+  deferred to 2.4's CLI-level gate (driven by a real subprocess, not
+  synthesized in-process).
+- **2.4** `8561103` — `map_worker.cpp` CLI wiring: `--kernel column|kink`
+  (default `column`) + `--stage seed|<int>|finalize`. `seed`/`finalize` are
+  in-RAM (new `readRangedRunFiles`/`writeRunFile` helpers in
+  `map_worker.cpp`, mirroring `map_shard_file`'s range-filter/output shape,
+  still respect `--lo`/`--hi`); the mid-column `<int>` stage is file-backed
+  via 2.3's `map_shard_stage_file`. Rejects `--holes` with `--kernel kink`.
+  Gate: `test/gate_kink_worker_cli.cpp` drives the REAL compiled binary
+  (not the functions directly) through seed→H stages→finalize for one real
+  column from a genuine seed record, byte-matches `--kernel column` on the
+  same input. Red-verified at the wiring layer (wrong keyLen on seed's
+  output write corrupts the whole chain, caught immediately) — deep
+  logic-correctness red-verification lives in 2.2's gate instead, since a
+  genuine empty-seed sweep at this small scale doesn't reach the stranding
+  edge case synthetic random states in `gate_kink_column.cpp` do.
+
+### NEXT: 2.5 — Go orchestrator `Kernel` field threading
+Per the plan file: `SweepConfig.Kernel string` (empty="column");
+`Checkpoint.Kernel string` added to the struct and the
+`config maxn=... kernel=%s` line in `orchestrator/checkpoint.go`, parsed in
+`parseConfig`; `checkResumeConfig` (`orchestrator/sweep.go:104-129`) gets a
+fail-closed guard (`resume.Kernel != cfg.Kernel`) alongside the existing
+maxn/counter/fold checks, red-first tested the same way those are (grep for
+their existing test, mirror it — likely `resume_test.go`). `MapArgs.Kernel`/
+`MapArgs.Stage` threaded into `RunMapWorker`'s CLI arg assembly
+(`orchestrator/worker.go`). `cmd/orchestrate/main.go`: `--kernel` flag,
+default `column`, validated against `{"column","kink"}`, copied into
+`SweepConfig`. Gate: Go unit tests only (checkpoint round-trip with `Kernel`
+set + a resume-kernel-mismatch fail-closed test) — no real sweep yet.
+
+**Then 2.6** (the big one): extend `mapPhase`/`mergePhase` with additive
+keyLen/Stage-selector params, new `sweepHeightKink` function (parallel to
+`sweepHeight`, not a modification — isolates risk since it's unreachable
+except via the still-dark `--kernel kink` flag), `Run`/`runOverlap` gain a
+one-line kernel dispatch. Gate: the cheap pre-check —
+`orchestrator/kink_sweep_test.go` comparing `sweepHeightKink` vs
+`sweepHeight` triangle rows at small (H,maxn) pairs (e.g. H=6/maxn=14,
+H=10/maxn=20) against a real built `map_worker`/`merge_worker` — run this
+BEFORE committing to the full a(20) gate (2.7/2.8 in the plan file).
+
+Full sequencing 2.5 through 2.9 (incl. the a(20) gate requiring explicit
+go-ahead before launch) is in the plan file; don't skip ahead of it.
+
+## 2026-07-02 (night, earlier) — a(28) orchestrate on ayr EXITED rc=0
+
+`ayr a28 orchestrate 1596596 EXITED at 2026-07-02T17:35:24-04:00`, wall
+≈11724s (~3h15m), per the tmux waiter log. **Not yet combined/validated** —
+that's `combine --maxn 28 --in runs/ns_a28/<box>/perheight` + the a1-27
+prefix/growth checks per the standing recipe (see the a28 launch entry
+below), and it's jasonp's call when to run it, not done automatically here.
+dalby's a(29) run status was not rechecked this session.
+
+
 ## 2026-07-02 (later night) — Design 14 Phase 1 DONE: stage kernel ported to core/
 
 Branch **`kink-carry`**, building on the Phase 0 tip below. a(28)[ayr]/a(29)[dalby]
