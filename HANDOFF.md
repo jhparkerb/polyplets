@@ -1,5 +1,54 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (later still) — Design 14 Phase 2: 2.5-2.6 DONE, next up 2.7
+
+Branch **`kink-carry`**, tip `3eed44b`. Tree clean. dalby a(29) still running
+untouched throughout (see its own note below); no other live jobs.
+
+- **2.5** `dafda52` — `SweepConfig.Kernel`/`Checkpoint.Kernel` ("column"
+  default, "kink"), `checkResumeConfig` fail-closed guard on kernel mismatch,
+  `MapArgs.Kernel`/`Stage` threaded into `RunMapWorker`'s CLI args, `--kernel`
+  flag on `cmd/orchestrate` (validated `column`/`kink`). Gate: Go unit tests
+  (checkpoint round-trip + `TestResumeKernelMismatch`).
+- **2.6** `3eed44b` — `mapPhase`/`mergePhase` extended with additive
+  `keyLen`/`stage` params (default = today's column-kernel values, proven
+  byte-identical by the unchanged full gate suite); `Run`/`runOverlap` get a
+  one-line `sweepHeightFn` dispatch on `cfg.Kernel`. New `sweepHeightKink`:
+  per column, one seed round (H+2->H+4, harvests via classify), H mid-column
+  stage rounds (H+4->H+4), one finalize round (H+4->H+2) — barriers at every
+  stage (Option A) instead of once per column. Work-stealing gated off for
+  seed/finalize (in-RAM, no SIGTERM stop protocol), stays on for the
+  file-backed mid-column stages. **Fixed a real bug found while writing
+  this**: map/merge output filenames were keyed only on `(H,col,idx)`, which
+  every round of a kink column shares — a later round's merge would
+  overwrite an earlier round's still-live output, and column-boundary GC
+  would delete a just-produced round's table because it aliased the
+  previous round's name. Both now tag the filename with the round's stage
+  string. Gate: new `orchestrator/kink_sweep_test.go` drives `sweepHeight`
+  and `sweepHeightKink` through the real compiled workers at H=6/maxn=14 and
+  H=10/maxn=20 (off Run's closed-form short-circuits) and diffs the
+  resulting triangle rows byte-for-byte — PASS at both. Full `make ns-gates`
+  green (4m38s) after each commit.
+
+### NEXT: 2.7 — per-height triangle diff tool
+Per the plan file (`/Users/jasonp/.claude/plans/declarative-wobbling-canyon.md`):
+no existing tool does a cell-by-cell T(n,H) comparison between two
+`--per-height-out` directories (`combine` only sums-and-compares the final
+`a(n)` total). Add a small comparison mode — new flag on `combine` or a
+standalone script — diffing two `h<H>.out` directory sets row-by-row,
+failing loud on any mismatch. No compute job, no go-ahead needed.
+
+**Then 2.8 — the real gate (needs explicit go-ahead before launch):**
+`orchestrate --maxn 20 --kernel kink --compare` (byte-matches the b-file)
+**and** the 2.7 tool diffing kink's `--per-height-out` against a
+`--kernel column` a(20) run's, cell by cell. Ships dark (`--kernel` default
+stays `column`) until this is green. Confirm with jasonp immediately before
+this specific launch even though it's short (a(20) scale, not production).
+2.9 closes out: design doc + this handoff updated to Phase 3 (dalby-scale
+a(24) validation).
+
+---
+
 ## 2026-07-02 (late night) — Design 14 Phase 2: 2.1-2.4 DONE, paused before 2.5
 
 Branch **`kink-carry`**, tip `8561103`. Tree is CLEAN at this commit (an
