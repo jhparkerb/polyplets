@@ -1,5 +1,42 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (latest) — Design 14 Phase 2 DONE — a(20) --kernel kink gate PASS
+
+Branch **`kink-carry`**, tip `30c5580` (pushed to origin). Tree clean.
+dalby a(29) still running untouched; no other live jobs.
+
+**2.8 gate ran on ayr with jasonp's go-ahead** (`scripts/kink_gate_a20.sh`,
+~30s wall): both `orchestrate --maxn 20 --kernel kink --compare` and the
+`--kernel column` baseline byte-matched the b-file (a(1..20)), and
+`combine --diff-b` confirmed **every T(n,H) cell identical between the two
+kernels for H=1..20**, not just the summed total. Full Phase 2 (2.1–2.8) is
+done; design doc `docs/next-system/designs/14-kink-carry-parallel-engine.md`
+updated to status "PHASE 2 DONE" with the settled implementation shape
+(harvest-at-seed, column-level checkpointing, the filename-collision bug
+found and fixed in 2.6 — see the doc's Phase 2 section for detail).
+`--kernel` CLI default stays `column`; kink is reachable only by explicit
+flag, so production a(n) runs are untouched.
+
+**ayr note:** its `~/src/polyominoes-ns` worktree is now on `kink-carry`
+(rev `30c5580`) with a freshly rebuilt map_worker/merge_worker/orchestrate/
+combine — NOT `next-system`. Re-sync to `next-system` before ayr's next
+production a(n) run.
+
+### NEXT: Phase 3 — dalby-scale a(24) validation
+Per the design doc: `orchestrate --maxn 24 --kernel kink --compare` on
+dalby (a24 is certified) byte-matching the full triangle and every T(n,H)
+against banked `results/ns_a24/`. This run doubles as the independent
+reimplementation the a(23) validation plan
+([[a23-readiness-and-validation]]) names as the closure for the
+shared-enumeration-bug gap — retroactively hardens a(21)-a(29). Also:
+measure real wall/per-height cost/intermediate RAM and retune
+unit-mult/overlap-heights/steal-grain under the new (map-cheap,
+merge-barrier-dominated) cost shape — the column-kernel defaults don't
+necessarily carry over. This is a real compute job at a24 scale: needs the
+standing job-launch go-ahead before running, same as always.
+
+---
+
 ## 2026-07-02 (still later) — Design 14 Phase 2: 2.7 DONE, 2.8 needs go-ahead
 
 Branch **`kink-carry`**, tip `abd7228`. Tree clean.

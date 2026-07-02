@@ -1,6 +1,7 @@
 # Design 14 — Parallel Kink-Carry engine
 
-**Status: OPTION A CHOSEN (2026-07-02).** Smoke-tested serial kernel in
+**Status: PHASE 2 DONE (2026-07-02) — a(20) gate PASS, next is Phase 3
+(dalby-scale a(24) validation).** Smoke-tested serial kernel in
 `experiments/kink_tm/`, results in `results/kink-carry.md` — that win stands.
 **Option B is NO-GO** (`results/kink-carry-shard-duplication.md`): shard
 duplication grows `~S^0.7-0.8`, no plateau, eating most of the kernel's win
@@ -148,16 +149,48 @@ telemetry.
   `results/kink-carry.md`). Orchestrator still calls the old path; this phase
   ships dark.
 
-### Phase 2 — Wire behind `--kernel`, gate at a(20)
-- Orchestrator column loop grows a stage sub-loop under `--kernel kink`: H
-  cycles of (partition current stage table by key → parallel
-  `map_shard_stage` → merge → next stage), then the existing end-of-column
-  harvest/prune/fold. `map_worker --kernel kink|column` (default column).
-  Checkpoint granularity becomes stage-level (finer than today's
-  column-level — strictly easier to resume). Telemetry gains a per-stage
-  breakdown; steal cursor is a stage-local key boundary (see below).
-- **Gate:** full a(20) `--kernel kink --compare` byte-matches the b-file AND a
-  whole-column a(20) run — the entire triangle and every T(n,H) identical.
+### Phase 2 — Wire behind `--kernel`, gate at a(20) — DONE (2026-07-02)
+Landed as 9 gated commits on branch `kink-carry` (2.1 `ca9a524` through 2.8
+`30c5580`), each red-first tested with its own gate green before the next
+step. Actual shape, settled with jasonp before coding (see the plan file
+`declarative-wobbling-canyon.md` for the full sequencing):
+- **Harvest happens at column START, not column end** (re-read
+  `kink_tm.cpp`'s `kinkSweep` directly to settle this — the design prose
+  above was ambiguous). A column is: one **seed** round (H+2-keyed source →
+  classify/harvest → H+4-keyed stage-0 table, order-preserving 2-byte
+  suffix append, no sort needed), H **mid-column stage** rounds (H+4→H+4,
+  `map_shard_stage_file` — file-backed, spills, supports the SIGTERM
+  work-stealing cursor), one **finalize** round (H+4→H+2: stranding-checked
+  carry drop, canonicalize, `completionLowerBound` prune, fold, dedup — no
+  classify, harvest already happened at seed).
+- **In-RAM seed/finalize, file-backed mid-column stages** (the locked-in
+  Phase 2 scope; file-backed seed/finalize deferred to Phase 3's dalby-scale
+  RAM pressure). Work-stealing is off for seed/finalize (no SIGTERM
+  cooperative-stop protocol there) but on for the mid-column stages.
+- **Checkpoint granularity is column-level**, not stage-level as originally
+  sketched above — the locked-in decision was to match today's granularity
+  for Phase 2 and defer stage-level checkpointing as a later refinement; a
+  crash mid-column re-runs the column's whole stage sequence from its seed.
+- `mapPhase`/`mergePhase` extended in place with additive `keyLen`/`stage`
+  params (not a private fork) — default values reproduce the column
+  kernel's exact prior behavior, proven by the unchanged full gate suite.
+  New `sweepHeightKink` (parallel to `sweepHeight`, not a modification);
+  `Run`/`runOverlap` dispatch on `cfg.Kernel` via a `sweepHeightFn` value.
+- **Real bug caught while wiring 2.6**: map/merge output filenames were
+  keyed only on `(H,col,idx)`, shared by every round of a kink column — a
+  later round's merge would overwrite an earlier round's still-live output,
+  and column-boundary GC would delete a just-produced round's table because
+  it aliased the previous round's name. Fixed by tagging the filename with
+  the round's stage string; column-kernel filenames are unaffected
+  (`stage==""`).
+- New `combine --diff-b` (2.7): the per-height cell-by-cell diff tool the
+  gate below needs — nothing prior did better than a summed-total check.
+- **Gate (2.8), PASS on ayr 2026-07-02:** `orchestrate --maxn 20 --kernel
+  kink --compare` byte-matched the b-file, `orchestrate --maxn 20` (column)
+  also byte-matched, and `combine --diff-b` confirmed every single
+  `T(n,H)` cell identical between the two kernels for H=1..20 — not just
+  the summed a(n) total. `--kernel` CLI default stays `column`; kink is
+  reachable only by explicit flag.
 
 ### Phase 3 — Validate at scale + tune (dalby)
 - a(24) `--kernel kink --compare` on dalby (a24 is certified): byte-match the
