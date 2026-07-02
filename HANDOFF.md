@@ -1,5 +1,32 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (later) — P_11 CLOSED → a(28) unblocked ✅
+
+Commit `2ddd474` on next-system. **The a(28) coding blocker (task #13) is done.**
+
+- **P_11(n) fully derived + validated** (`scripts/derive_p11.py`, analog of
+  derive_p9/p10). The validated P_9+P_10 fits pin the shared series symbols
+  {a7..a10,b8..b10} exactly → **10 of 12 P_11 coeffs clean from theory**; only
+  a11,b11 needed data, from the 2 new sweeps T(26,15)+T(27,16). **Held-out a25
+  diagonal-11 points n=23,24,25 all matched**; leading coeff 25^11/11! confirmed.
+- **Wired:** `orchestrator/sweep.go` diagCoeffTable **case 11** + guard
+  `diagonalStripValid` extended to **k<=11** (maxn>=2*11+1=23). Keeps a28 top
+  real height at **H=maxn-11 (cheap same-tier)**.
+- **Red-first tests:** `orchestrator/diag_p11_test.go` (pins diagonalCell(n,11)
+  on all 5 real pts, 3 held out; drives contributeDiagonalStrip k=11 at maxn=28;
+  guard at 22/23/28) + `diagthreshold_test.go` updated (k=11 valid, k=12 new
+  boundary). Both panic pre-wiring (verified). ns-gate-fast + closedform green.
+- **Note:** the classic "a20 --compare byte-match" step is moot for this change —
+  at maxn=20 the k=11 strip is below its 2k+1=23 threshold and never dispatches,
+  so a20 output is byte-identical by construction. The maxn=28 strip-contribution
+  integration test covers the path a20 can't reach.
+
+### IMMEDIATE NEXT (gated on jasonp's go): launch a(28) — first sextillion
+Same recipe as the "THEN: launch a28" block below (now unblocked). Before launch:
+sync dalby+ayr to next-system `2ddd474`, **rebuild WITH compression** (both boxes
+have libzstd-dev), dalby+ayr split like a27, u128, rebalance from a27 cost
+profile. a28 ≈ 4.8e21. Requires explicit assent (a(n)-push launch rule).
+
 ## 2026-07-02 (late) — SESSION SAVE-STATE (before Claude Code binary update)
 
 **No live jobs. dalby + ayr both FREE.** a(26) and a(27) both landed this session.
