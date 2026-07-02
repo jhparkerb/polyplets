@@ -272,10 +272,9 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			continue
 		}
 
-		// Strips H==maxn-k for k=2,3,4 are closed-form (proven diagonals). The
-		// guard maxn>=3k+1 keeps the smallest 3-power (3^(maxn-1-3k), at n=maxn)
-		// non-negative; below that the strip is swept. Frees the top 5 heights.
-		if k := maxn - H; k >= 2 && k <= 8 && maxn >= 3*k+1 {
+		// Strips H==maxn-k are closed-form (proven/data-pinned diagonals); see
+		// diagonalStripValid for the true n>=2k+1 validity threshold.
+		if k := maxn - H; diagonalStripValid(maxn, k) {
 			contributeDiagonalStrip(maxn, k, triangle, cfg)
 			continue
 		}
@@ -419,7 +418,7 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 				fireAfterHeight(H)
 				return
 			}
-			if k := cfg.Maxn - H; k >= 2 && k <= 8 && cfg.Maxn >= 3*k+1 {
+			if k := cfg.Maxn - H; diagonalStripValid(cfg.Maxn, k) {
 				mu.Lock()
 				contributeDiagonalStrip(cfg.Maxn, k, triangle, cfg)
 				markDone(H)
@@ -1234,8 +1233,8 @@ var diagCoeffTable = map[int]diagCoeffs{
 }
 
 // hornerDiag evaluates a diagCoeffs' numerator at N via big.Int Horner,
-// divides exactly by kfact, and multiplies by 3^exp (exp assumed >= 0 here;
-// the guard-threshold fix adds a negative-exponent path via applyPow3).
+// divides exactly by kfact, and applies 3^exp (exp may be negative — see
+// applyPow3).
 func hornerDiag(N int64, c diagCoeffs, exp int) *big.Int {
 	num := big.NewInt(c.coeffs[0])
 	for _, coef := range c.coeffs[1:] {
@@ -1243,8 +1242,37 @@ func hornerDiag(N int64, c diagCoeffs, exp int) *big.Int {
 		num.Add(num, big.NewInt(coef))
 	}
 	num.Quo(num, big.NewInt(c.kfact))
-	num.Mul(num, pow3(exp))
-	return num
+	return applyPow3(num, exp)
+}
+
+// applyPow3 multiplies num by 3^e (e>=0) or divides it exactly by 3^(-e)
+// (e<0). The true diagonal validity threshold is n>=2k+1
+// (docs/proofs/T-n-nm2-and-general.md), much looser than the old n>=3k+1
+// dispatch guard — that guard existed only because pow3 had no
+// negative-exponent path. In the n<3k+1 region the exponent n-1-3k is
+// negative, but the numerator is proven exactly divisible by 3^|exponent|
+// there; a nonzero remainder means a derivation or dispatch bug (invoked
+// outside the proven-valid regime), not a value to silently round, so this
+// panics rather than truncate.
+func applyPow3(num *big.Int, e int) *big.Int {
+	if e >= 0 {
+		return num.Mul(num, pow3(e))
+	}
+	q, r := new(big.Int).QuoRem(num, pow3(-e), new(big.Int))
+	if r.Sign() != 0 {
+		panic(fmt.Sprintf("applyPow3: %s not exactly divisible by 3^%d (remainder %s) — derivation or dispatch bug, or called outside the proven n>=2k+1 regime", num, -e, r))
+	}
+	return q
+}
+
+// diagonalStripValid reports whether the k-th diagonal strip (H=maxn-k) can
+// be filled by diagonalCell instead of a real column sweep. k<=8 until
+// P9/P10 are wired into diagCoeffTable. The true structural threshold is
+// n>=2k+1 (docs/proofs/T-n-nm2-and-general.md); both sweep.go dispatch sites
+// (sequential and overlap) must use this single helper so a future threshold
+// or k-range change can't apply to only one path.
+func diagonalStripValid(maxn, k int) bool {
+	return k >= 2 && k <= 8 && maxn >= 2*k+1
 }
 
 // diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..8
@@ -1255,9 +1283,10 @@ func hornerDiag(N int64, c diagCoeffs, exp int) *big.Int {
 // T(24,16), which matched the pre-a(24) falsifiable sum-of-roots prediction
 // exactly -- see results/k8-pinning.md, scripts/pin_diagonal_k8_final.py). Each
 // is a degree-j polynomial in n times a power of 3; the numerator is divisible
-// by j! for all valid n (verified), so the integer division is exact. Requires
-// n >= 3j+1 so the exponent n-1-3j is non-negative (pow3 has no negative
-// powers); the maxn>=3k+1 strip dispatch guarantees it.
+// by j! for all valid n (verified), so the integer division is exact. The true
+// validity threshold is n >= 2j+1 (docs/proofs/T-n-nm2-and-general.md); below
+// n=3j+1 the exponent n-1-3j is negative, handled by applyPow3's exact
+// division path. diagonalStripValid's dispatch guard guarantees n >= 2j+1.
 func diagonalCell(n, j int) *big.Int {
 	if j == 0 {
 		return pow3(n - 1)

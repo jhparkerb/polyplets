@@ -37,14 +37,22 @@ func TestHeightNm2Formula(t *testing.T) {
 		{23, 7, 4492550651512074}, // T(23,16)
 		{24, 7, 19111727676683781}, // T(24,17)  (k=7, validated by a(24))
 		// k=8, big.Int; pinned by a(24)'s T(24,16) (results/k8-pinning.md,
-		// scripts/pin_diagonal_k8_final.py). j=8 is only ever invoked at
-		// n=25 (case 8 requires n>=3*8+1=25 for its pow3 exponent to be
-		// non-negative; the maxn>=3k+1 strip dispatch guarantees this).
+		// scripts/pin_diagonal_k8_final.py). Historically (a24/a25) only ever
+		// invoked at n=25, back when the dispatch guard required n>=3*8+1=25;
+		// the true validity threshold is n>=2*8+1=17 (applyPow3 handles the
+		// resulting negative pow3 exponent below n=25 via exact division).
 		// T(25,17) is a genuine EXTRAPOLATION beyond the 8 fitting points
 		// (n=17..24) -- this pins the Go transcription against the Python
 		// fit's own output, not an independent confirmation; a(25)'s own
 		// sweep of H=17 is the actual confirmation, same as a(24) was for k=7.
 		{25, 8, 187767529262410933}, // T(25,17)
+		// n=17=2*8+1: the true validity threshold, well below the old n>=25
+		// (3*8+1) guard. Exercises applyPow3's negative-exponent division
+		// path for the first time on a REAL value (exponent 17-1-24=-8), not
+		// just a self-consistency check -- this is the load-bearing proof
+		// that the division path is correct, not just non-panicking. Source:
+		// results/ns_a25/swept_rows.txt ===H9=== block, n=17.
+		{17, 8, 603392972436}, // T(17,9)
 	}
 	for _, c := range cases {
 		want := new(big.Int).SetUint64(c.want)
