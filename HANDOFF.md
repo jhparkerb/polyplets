@@ -1,5 +1,27 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 — a(26) LANDED + a(27) split LAUNCHED 🚀
+
+**a(26) = 102607513847014153892** (new term). dalby-solo, ~68min, u128, rev
+`246cb09`. Validated: a1-20 = b-file, a21-25 = certified, growth 6.8429. Recorded
+`results/ns_a26/` + PROVENANCE. T(26,15)=5614506356004078534 → closes one P11 eqn.
+NEAR-MISS: stale u64 combine binary wrapped the first a(26) (caught by
+growth check); rebuilt combine → correct. See task #9 (guard) + PROVENANCE.
+
+**a(27) split RUNNING** (rev `b390518`, both machines clean tree, all binaries
+incl. combine rebuilt):
+- **dalby**: H16 + closed-forms H1,2,17-27. orchestrate PID **2215524**, tmux
+  `0:a27`, waiter `brd3728nl`. (orchestrate baked rev shows "unknown" — built
+  without -ldflags gitRev; workers correctly stamped b390518, tree clean, so
+  provenance holds. Minor; not worth restarting.)
+- **ayr**: swept tail H3-15. PID **1523246**, tmux `0:a27`, waiter `bq1cp0wn9`.
+- Est ~3.4h wall (ayr-bound H3-15; dalby H16 ~2.8h). Cost check confirmed the
+  staged split is optimal (moving H15 to dalby is worse).
+- **On completion:** `combine_a27.sh` on dalby (rsyncs ayr rows, --require-cover).
+  Uses FRESH combine. Validate a1-26 prefix + growth ~6.84.
+
+---
+
 ## 2026-07-02 — a(27) dalby+ayr split STAGED (not launched)
 
 Scripts `scripts/{dalby,ayr,combine}_a27.sh` (rev incl. `9892168`), pushed +
