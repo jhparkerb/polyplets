@@ -165,7 +165,10 @@ func runWorker(ctx context.Context, binary string, args []string, onProgress fun
 		return WorkerResult{}, fmt.Errorf("%s: %w", filepath.Base(binary), err)
 	}
 
-	result := ParseWorkerOutput(lines)
+	result, perr := ParseWorkerOutput(lines)
+	if perr != nil {
+		return WorkerResult{}, fmt.Errorf("%s: %w", filepath.Base(binary), perr)
+	}
 	return result, nil
 }
 

@@ -3,6 +3,7 @@ package orchestrator
 
 import (
 	"fmt"
+	"math/big"
 	"strconv"
 	"strings"
 )
@@ -31,7 +32,7 @@ func (a Acct) String() string {
 type WorkerResult struct {
 	// Triangle contributions from map_worker (H -> n -> value).
 	// Empty for merge_worker.
-	TriContribs map[int]map[int]uint64
+	TriContribs map[int]map[int]*big.Int
 	OutRecords  uint64
 	SpillBytes  uint64
 	// StopKey is non-empty iff a map_worker stopped early at a work-stealing
@@ -42,22 +43,34 @@ type WorkerResult struct {
 }
 
 // ParseWorkerOutput parses all lines of worker stdout into a WorkerResult.
-// Lines may be "tri H n V" (map_worker) or "event=done key=value...".
-func ParseWorkerOutput(lines []string) WorkerResult {
-	r := WorkerResult{TriContribs: make(map[int]map[int]uint64)}
+// Lines may be "tri H n V" (map_worker) or "event=done key=value...". A
+// malformed "tri" line is a hard error (fail-closed) rather than a silent
+// skip: a worker only ever emits well-formed tri lines, so a bad one means
+// real corruption, not a value to quietly drop (BUGS-OF-SHAME A2 — the old
+// code additionally silent-dropped any value too wide for uint64; big.Int
+// has no width limit, so that specific failure mode no longer exists at all,
+// but a genuinely non-numeric value must still fail loud).
+func ParseWorkerOutput(lines []string) (WorkerResult, error) {
+	r := WorkerResult{TriContribs: make(map[int]map[int]*big.Int)}
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if strings.HasPrefix(line, "tri ") {
 			var H, n int
 			var vs string
-			if _, err := fmt.Sscanf(line, "tri %d %d %s", &H, &n, &vs); err == nil {
-				v, err := strconv.ParseUint(vs, 10, 64)
-				if err == nil {
-					if r.TriContribs[H] == nil {
-						r.TriContribs[H] = make(map[int]uint64)
-					}
-					r.TriContribs[H][n] += v
-				}
+			if _, err := fmt.Sscanf(line, "tri %d %d %s", &H, &n, &vs); err != nil {
+				return WorkerResult{}, fmt.Errorf("malformed tri line %q: %w", line, err)
+			}
+			v, ok := new(big.Int).SetString(vs, 10)
+			if !ok {
+				return WorkerResult{}, fmt.Errorf("malformed tri value %q in line %q", vs, line)
+			}
+			if r.TriContribs[H] == nil {
+				r.TriContribs[H] = make(map[int]*big.Int)
+			}
+			if cur, seen := r.TriContribs[H][n]; seen {
+				cur.Add(cur, v)
+			} else {
+				r.TriContribs[H][n] = v
 			}
 			continue
 		}
@@ -65,7 +78,7 @@ func ParseWorkerOutput(lines []string) WorkerResult {
 			parseEventDone(line, &r)
 		}
 	}
-	return r
+	return r, nil
 }
 
 func parseEventDone(line string, r *WorkerResult) {

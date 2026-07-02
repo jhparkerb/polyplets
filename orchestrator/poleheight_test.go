@@ -7,6 +7,7 @@ package orchestrator
 
 import (
 	"context"
+	"math/big"
 	"testing"
 )
 
@@ -18,21 +19,21 @@ func TestPoleHeightFormula(t *testing.T) {
 	// results/ns_a20/Tnh_triangle.txt.
 	cases := []struct {
 		maxn       int
-		wantDiag   uint64 // T(maxn-1, maxn-1) = 3^(maxn-2)
-		wantSubdia uint64 // T(maxn, maxn-1) = (25*maxn-45)*3^(maxn-4)
+		wantDiag   *big.Int // T(maxn-1, maxn-1) = 3^(maxn-2)
+		wantSubdia *big.Int // T(maxn, maxn-1) = (25*maxn-45)*3^(maxn-4)
 	}{
-		{4, 9, 55},        // T(3,3)=9,    T(4,3)=55
-		{5, 27, 240},      // T(4,4)=27,   T(5,4)=240
-		{8, 729, 12555},   // T(7,7)=729,  T(8,7)=12555
-		{21, pow3(19), 61987278240}, // T(20,20)=3^19, T(21,20)=61,987,278,240
+		{4, big.NewInt(9), big.NewInt(55)},                       // T(3,3)=9,    T(4,3)=55
+		{5, big.NewInt(27), big.NewInt(240)},                     // T(4,4)=27,   T(5,4)=240
+		{8, big.NewInt(729), big.NewInt(12555)},                  // T(7,7)=729,  T(8,7)=12555
+		{21, pow3(19), big.NewInt(61987278240)}, // T(20,20)=3^19, T(21,20)=61,987,278,240
 	}
 	for _, c := range cases {
-		tri := make([]uint64, c.maxn+1)
+		tri := newBigRow(c.maxn + 1)
 		contributePoleHeight(c.maxn, tri, SweepConfig{})
-		if tri[c.maxn-1] != c.wantDiag {
+		if tri[c.maxn-1].Cmp(c.wantDiag) != 0 {
 			t.Errorf("maxn=%d: T(%d,%d)=%d want %d", c.maxn, c.maxn-1, c.maxn-1, tri[c.maxn-1], c.wantDiag)
 		}
-		if tri[c.maxn] != c.wantSubdia {
+		if tri[c.maxn].Cmp(c.wantSubdia) != 0 {
 			t.Errorf("maxn=%d: T(%d,%d)=%d want %d", c.maxn, c.maxn, c.maxn-1, tri[c.maxn], c.wantSubdia)
 		}
 	}

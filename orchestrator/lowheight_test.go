@@ -7,6 +7,7 @@ package orchestrator
 
 import (
 	"context"
+	"math/big"
 	"testing"
 )
 
@@ -17,7 +18,7 @@ func TestLowHeightFormula(t *testing.T) {
 	// T(n,1) = 1 for every n.
 	r1 := lowHeightRow(1, maxn)
 	for n := 1; n <= maxn; n++ {
-		if r1[n] != 1 {
+		if r1[n].Cmp(big.NewInt(1)) != 0 {
 			t.Errorf("T(%d,1)=%d want 1", n, r1[n])
 		}
 	}
@@ -26,7 +27,7 @@ func TestLowHeightFormula(t *testing.T) {
 		9: 2376, 10: 5739, 11: 13858, 12: 33459}
 	r2 := lowHeightRow(2, maxn)
 	for n, want := range wantH2 {
-		if r2[n] != want {
+		if r2[n].Cmp(new(big.Int).SetUint64(want)) != 0 {
 			t.Errorf("T(%d,2)=%d want %d", n, r2[n], want)
 		}
 	}

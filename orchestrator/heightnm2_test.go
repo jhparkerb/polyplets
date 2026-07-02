@@ -9,6 +9,7 @@ package orchestrator
 
 import (
 	"context"
+	"math/big"
 	"testing"
 )
 
@@ -46,7 +47,8 @@ func TestHeightNm2Formula(t *testing.T) {
 		{25, 8, 187767529262410933}, // T(25,17)
 	}
 	for _, c := range cases {
-		if got := diagonalCell(c.n, c.j); got != c.want {
+		want := new(big.Int).SetUint64(c.want)
+		if got := diagonalCell(c.n, c.j); got.Cmp(want) != 0 {
 			t.Errorf("diagonalCell(%d,%d) = T(%d,%d) = %d, want %d", c.n, c.j, c.n, c.n-c.j, got, c.want)
 		}
 	}

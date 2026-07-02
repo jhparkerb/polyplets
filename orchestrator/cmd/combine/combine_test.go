@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/big"
 	"os"
 	"path/filepath"
 	"strings"
@@ -108,5 +109,31 @@ func TestCombineAcceptsValidShards(t *testing.T) {
 	}
 	if _, _, err := runCombine([]string{dir}, 4, true); err != nil {
 		t.Fatalf("valid shards rejected: %v", err)
+	}
+}
+
+// TestCombineWidth proves a cell value exceeding 2^64-1 (BUGS-OF-SHAME A2)
+// combines to its exact big.Int sum rather than silently wrapping, dropping,
+// or erroring. 3^45 alone already exceeds 2^64 (~1.8e19); the value is split
+// across two shards (heights 1 and 2, both contributing to n=2=maxn) so
+// addRow's accumulation itself is exercised twice on the same triangle cell,
+// not just the parse of a single wide literal.
+func TestCombineWidth(t *testing.T) {
+	// 3^45 = 92709463147897837085761925410587, split as two summands that
+	// add back to it exactly.
+	partA, _ := new(big.Int).SetString("50000000000000000000000000000000", 10)
+	partB, _ := new(big.Int).SetString("42709463147897837085761925410587", 10)
+	want := new(big.Int).Add(partA, partB)
+
+	dir := t.TempDir()
+	writeFile(t, dir, 1, fmt.Sprintf("1 0\n2 %s\n", partA))
+	writeFile(t, dir, 2, fmt.Sprintf("1 0\n2 %s\n", partB))
+
+	tri, _, err := runCombine([]string{dir}, 2, false)
+	if err != nil {
+		t.Fatalf("runCombine: %v", err)
+	}
+	if tri[2].Cmp(want) != 0 {
+		t.Fatalf("combine width: got %s want %s (a uint64 pipeline would have wrapped or errored)", tri[2], want)
 	}
 }

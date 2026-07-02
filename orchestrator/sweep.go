@@ -58,8 +58,34 @@ type SweepConfig struct {
 
 // SweepResult is the output of a complete run over all heights.
 type SweepResult struct {
-	Triangle []uint64 // Triangle[n] = Σ_H T(n,H)
+	Triangle []*big.Int // Triangle[n] = Σ_H T(n,H)
 	Acct     Acct
+}
+
+// newBigRow returns a zero-filled []*big.Int of length n, with every slot a
+// distinct non-nil *big.Int (a nil slot panics on .Add). Centralizing this
+// keeps the "no nil slots" invariant in one place instead of repeated at
+// every triangle/row allocation site.
+func newBigRow(n int) []*big.Int {
+	row := make([]*big.Int, n)
+	for i := range row {
+		row[i] = new(big.Int)
+	}
+	return row
+}
+
+// copyBigRow deep-copies a []*big.Int row so the result doesn't alias the
+// source's *big.Int pointers (mutating one via .Add must not mutate both).
+func copyBigRow(src []*big.Int) []*big.Int {
+	dst := make([]*big.Int, len(src))
+	for i, v := range src {
+		if v == nil {
+			dst[i] = new(big.Int)
+		} else {
+			dst[i] = new(big.Int).Set(v)
+		}
+	}
+	return dst
 }
 
 // counterName normalizes a counter-width tag, mapping "" to the u64 default.
@@ -113,7 +139,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	}
 
 	maxn := cfg.Maxn
-	triangle := make([]uint64, maxn+1)
+	triangle := newBigRow(maxn + 1)
 	var acct Acct
 
 	// Heights to sweep: an explicit subset (multi-machine split) or all 1..maxn.
@@ -132,10 +158,12 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	startIdx := 0
 	if resume != nil {
 		acct = resume.Acct
-		// Restore the accumulated triangle from the checkpoint.
+		// Restore the accumulated triangle from the checkpoint. Copy each
+		// value rather than aliasing the checkpoint's *big.Int pointers, since
+		// triangle[n] is mutated in place (.Add) below.
 		for n, v := range resume.Triangle {
-			if n <= maxn {
-				triangle[n] = v
+			if n <= maxn && v != nil {
+				triangle[n] = new(big.Int).Set(v)
 			}
 		}
 		// Resume at the list position matching the checkpoint height.
@@ -150,13 +178,12 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	// writeCheckpoint writes a POLYCKPT with the outer triangle + the current
 	// height's partial contributions (hTri).  Both are needed: the outer triangle
 	// holds completed heights; hTri holds the current height's progress so far.
-	writeCheckpoint := func(H, col int, frontier []string, hTri []uint64) {
+	writeCheckpoint := func(H, col int, frontier []string, hTri []*big.Int) {
 		// Combine outer accumulated triangle with current height's contribution.
-		combined := make([]uint64, len(triangle))
-		copy(combined, triangle)
+		combined := copyBigRow(triangle)
 		for n, v := range hTri {
-			if n < len(combined) {
-				combined[n] += v
+			if n < len(combined) && v != nil {
+				combined[n].Add(combined[n], v)
 			}
 		}
 		ck := &Checkpoint{
@@ -281,7 +308,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		// so the checkpoint written on cancellation includes them.
 		for n, v := range hTri {
 			if n <= maxn {
-				triangle[n] += v
+				triangle[n].Add(triangle[n], v)
 			}
 		}
 		acct.Add(hAcct)
@@ -318,12 +345,12 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 // work-stealing reads it live to allow stealing once a height becomes the
 // pool's sole occupant — the overlap+steal coexistence fix (see stealAllowed).
 func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
-	triangle []uint64, acct Acct, tel *telemetry, sem chan struct{},
+	triangle []*big.Int, acct Acct, tel *telemetry, sem chan struct{},
 	activeHeights *atomic.Int32) (*SweepResult, error) {
 
 	var mu sync.Mutex
 	var firstErr error
-	noopCkpt := func(int, int, []string, []uint64) {} // overlap: no MID-height checkpoint
+	noopCkpt := func(int, int, []string, []*big.Int) {} // overlap: no MID-height checkpoint
 	heightSem := make(chan struct{}, cfg.OverlapHeights)
 	var wg sync.WaitGroup
 
@@ -342,7 +369,7 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 		ck := &Checkpoint{
 			H: -1, Col: -1,
 			Done:     append([]int(nil), doneHeights...),
-			Triangle: append([]uint64(nil), triangle...),
+			Triangle: copyBigRow(triangle),
 			Acct:     acct,
 			Maxn:     cfg.Maxn,
 			Counter:  counterName(cfg.CounterWidth),
@@ -439,7 +466,7 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 			}
 			for n, v := range hTri {
 				if n >= 0 && n <= cfg.Maxn {
-					triangle[n] += v
+					triangle[n].Add(triangle[n], v)
 				}
 			}
 			acct.Add(hAcct)
@@ -470,13 +497,13 @@ func sweepHeight(
 	cfg SweepConfig,
 	H, startCol int,
 	frontier []string,
-	writeCheckpoint func(H, col int, frontier []string, hTri []uint64),
+	writeCheckpoint func(H, col int, frontier []string, hTri []*big.Int),
 	tel *telemetry,
 	sem chan struct{},
 	activeHeights *atomic.Int32,
-) ([]uint64, Acct, error) {
+) ([]*big.Int, Acct, error) {
 
-	hTri := make([]uint64, cfg.Maxn+1) // contributions from this height only
+	hTri := newBigRow(cfg.Maxn + 1) // contributions from this height only
 	var acct Acct
 	lastCkpt := time.Now()
 
@@ -545,7 +572,7 @@ func sweepHeight(
 			for _, nm := range hm {
 				for n, v := range nm {
 					if n >= 0 && n <= cfg.Maxn {
-						hTri[n] += v
+						hTri[n].Add(hTri[n], v)
 					}
 				}
 			}
@@ -724,7 +751,7 @@ func mapPhase(
 	tel *telemetry,
 	sem chan struct{},
 	activeHeights *atomic.Int32,
-) ([]string, []map[int]map[int]uint64, Acct, error) {
+) ([]string, []map[int]map[int]*big.Int, Acct, error) {
 
 	// Invariant: column work must never start at the top strip — H==maxn is
 	// contributed in closed form (contributeTopHeight) and must be short-circuited
@@ -765,7 +792,7 @@ func mapPhase(
 		firstErr    error
 
 		outPaths    []string
-		triContribs []map[int]map[int]uint64
+		triContribs []map[int]map[int]*big.Int
 		acct        Acct
 	)
 	estPer := uint64(1)
@@ -1026,7 +1053,7 @@ func mergePhase(
 // writePerHeight writes one height's T(n,H) row to <dir>/h<H>.out as "n value"
 // lines for n=1..maxn (matching the old engine's per-height output, so the two
 // can be byte-compared cell by cell).
-func writePerHeight(dir string, H, maxn int, hTri []uint64) error {
+func writePerHeight(dir string, H, maxn int, hTri []*big.Int) error {
 	if err := os.MkdirAll(dir, 0o777); err != nil {
 		return err
 	}
@@ -1037,8 +1064,8 @@ func writePerHeight(dir string, H, maxn int, hTri []uint64) error {
 		return err
 	}
 	for n := 1; n <= maxn; n++ {
-		var v uint64
-		if n < len(hTri) {
+		v := big.NewInt(0)
+		if n < len(hTri) && hTri[n] != nil {
 			v = hTri[n]
 		}
 		if _, err := fmt.Fprintf(f, "%d %d\n", n, v); err != nil {
@@ -1076,9 +1103,9 @@ func removeRun(p string) {
 // topHeightClosedForm returns T(maxn,maxn) = 3^(maxn-1), the count of fixed
 // polyplets whose bounding box is exactly maxn tall under an maxn-cell budget:
 // one cell per row, three horizontal offsets at each of the maxn-1 steps.
-func topHeightClosedForm(maxn int) uint64 {
+func topHeightClosedForm(maxn int) *big.Int {
 	if maxn <= 0 {
-		return 0
+		return big.NewInt(0)
 	}
 	return pow3(maxn - 1)
 }
@@ -1089,25 +1116,28 @@ func topHeightClosedForm(maxn int) uint64 {
 //   T(n,2): T(2,2)=3, T(3,2)=10, T(n,2)=2·T(n-1,2)+T(n-2,2)+4  (n>=4)
 // Returns nil for any other H. Both are verified exact against the a(20)
 // triangle (results/ns_a20/Tnh_triangle.txt).
-func lowHeightRow(H, maxn int) []uint64 {
+func lowHeightRow(H, maxn int) []*big.Int {
 	if H != 1 && H != 2 {
 		return nil
 	}
-	row := make([]uint64, maxn+1)
+	row := newBigRow(maxn + 1)
 	if H == 1 {
 		for n := 1; n <= maxn; n++ {
-			row[n] = 1
+			row[n].SetInt64(1)
 		}
 		return row
 	}
 	for n := 2; n <= maxn; n++ {
 		switch n {
 		case 2:
-			row[n] = 3
+			row[n].SetInt64(3)
 		case 3:
-			row[n] = 10
+			row[n].SetInt64(10)
 		default:
-			row[n] = 2*row[n-1] + row[n-2] + 4
+			// row[n] = 2*row[n-1] + row[n-2] + 4
+			row[n].Lsh(row[n-1], 1)
+			row[n].Add(row[n], row[n-2])
+			row[n].Add(row[n], big.NewInt(4))
 		}
 	}
 	return row
@@ -1115,10 +1145,10 @@ func lowHeightRow(H, maxn int) []uint64 {
 
 // contributeLowHeight adds the closed-form row for H==1 or H==2 to the triangle
 // (and writes its per-height row if requested), doing no map/merge.
-func contributeLowHeight(H, maxn int, triangle []uint64, cfg SweepConfig) {
+func contributeLowHeight(H, maxn int, triangle []*big.Int, cfg SweepConfig) {
 	row := lowHeightRow(H, maxn)
 	for n := 1; n <= maxn && n < len(triangle); n++ {
-		triangle[n] += row[n]
+		triangle[n].Add(triangle[n], row[n])
 	}
 	if cfg.PerHeightOut != "" {
 		if werr := writePerHeight(cfg.PerHeightOut, H, maxn, row); werr != nil {
@@ -1127,12 +1157,16 @@ func contributeLowHeight(H, maxn int, triangle []uint64, cfg SweepConfig) {
 	}
 }
 
-// pow3 returns 3^k for k>=0 (0 for k<0).
-func pow3(k int) uint64 {
-	v := uint64(1)
-	for i := 0; i < k; i++ {
-		v *= 3
+// pow3 returns 3^k as a *big.Int, for k>=0 (0 for k<0). Negative-exponent
+// division (needed once the true n>=2k+1 diagonal threshold is wired) is
+// handled by applyPow3, not here — see the guard-threshold fix.
+func pow3(k int) *big.Int {
+	v := big.NewInt(1)
+	if k < 0 {
+		return v
 	}
+	three := big.NewInt(3)
+	v.Exp(three, big.NewInt(int64(k)), nil)
 	return v
 }
 
@@ -1145,22 +1179,72 @@ func pow3(k int) uint64 {
 //
 // Caller guarantees maxn>=4. ns-gate-closedform pins both formulas against the
 // triangle so a derivation error can never reach a result.
-func contributePoleHeight(maxn int, triangle []uint64, cfg SweepConfig) {
+func contributePoleHeight(maxn int, triangle []*big.Int, cfg SweepConfig) {
 	H := maxn - 1
-	row := make([]uint64, maxn+1)
+	row := newBigRow(maxn + 1)
 	row[H] = pow3(maxn - 2)
-	row[maxn] = uint64(25*maxn-45) * pow3(maxn-4)
+	row[maxn] = new(big.Int).Mul(big.NewInt(int64(25*maxn-45)), pow3(maxn-4))
 	if H < len(triangle) {
-		triangle[H] += row[H]
+		triangle[H].Add(triangle[H], row[H])
 	}
 	if maxn < len(triangle) {
-		triangle[maxn] += row[maxn]
+		triangle[maxn].Add(triangle[maxn], row[maxn])
 	}
 	if cfg.PerHeightOut != "" {
 		if werr := writePerHeight(cfg.PerHeightOut, H, maxn, row); werr != nil {
 			fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
 		}
 	}
+}
+
+// diagCoeffs holds one Pk's integer-numerator Horner coefficients (leading
+// term first) and the factorial divisor k!. T(n,n-k) = (Horner(coeffs)/kfact)
+// * 3^(n-1-3k). Populated by diagCoeffTable below.
+type diagCoeffs struct {
+	coeffs []int64
+	kfact  int64
+}
+
+// diagCoeffTable holds j=1..8's coefficients (j=0 is the trivial pow3(n-1)
+// case, handled separately). Source: docs/proofs/T-n-nm1.md,
+// T-n-nm2-and-general.md (j=1,2 proven; j=3..6 data-pinned, exact in int64
+// through the n these were originally used at) and
+// scripts/pin_diagonal_k8_final.py / derive-p{7,8} pipeline (j=7,8,
+// big.Int-only from the start since their coefficients overflow int64 at the
+// n they're used at). All cases now share one big.Int Horner evaluator
+// (hornerDiag) instead of j=1..6 doing native int64/uint64 arithmetic, since
+// the guard-threshold fix (n>=2k+1, see applyPow3) invokes j=1..6 at larger n
+// than before where int64 would overflow.
+var diagCoeffTable = map[int]diagCoeffs{
+	1: {[]int64{25, -45}, 1},
+	2: {[]int64{625, -2459, 1134}, 2},
+	3: {[]int64{15625, -100050, 122213, -32940}, 6},
+	4: {[]int64{390625, -3596250, 8099843, -6462882, 1752840}, 24},
+	5: {[]int64{9765625, -120546875, 425836625, -650171245, 422003550, 76975920}, 120},
+	6: {[]int64{244140625, -3861328125, 19486496875, -47366857935, 55373728180, 946828380, -32099353920}, 720},
+	// j=7: P_7 is data-pinned and validated at scale by the a(23) swept H=16
+	// row (T(23,16)=4492550651512074, T(22,15)=1035856891052731).
+	7: {[]int64{6103515625, -119765625000, 812310625000, -2839739579250, 5194366339015, -1878923357430, -6841564107480, 7756630081200}, 5040},
+	// j=8: P_8 is pinned from a(24)'s real T(24,16)=42594477635772598 (n=17..24,
+	// 8 points, leading coeff fixed at 25^8/8! by the confirmed conjecture) --
+	// see scripts/pin_diagonal_k8_final.py, whose fit reproduces all 8 defining
+	// points exactly and whose result matches the pre-a(24) falsifiable
+	// sum-of-roots prediction exactly.
+	8: {[]int64{152587890625, -3625976562500, 31658675781250, -149222374175000, 391357255277905, -350057694296660, -718224955399380, 2136536485853040, -923712586957440}, 40320},
+}
+
+// hornerDiag evaluates a diagCoeffs' numerator at N via big.Int Horner,
+// divides exactly by kfact, and multiplies by 3^exp (exp assumed >= 0 here;
+// the guard-threshold fix adds a negative-exponent path via applyPow3).
+func hornerDiag(N int64, c diagCoeffs, exp int) *big.Int {
+	num := big.NewInt(c.coeffs[0])
+	for _, coef := range c.coeffs[1:] {
+		num.Mul(num, big.NewInt(N))
+		num.Add(num, big.NewInt(coef))
+	}
+	num.Quo(num, big.NewInt(c.kfact))
+	num.Mul(num, pow3(exp))
+	return num
 }
 
 // diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..8
@@ -1173,58 +1257,16 @@ func contributePoleHeight(maxn int, triangle []uint64, cfg SweepConfig) {
 // is a degree-j polynomial in n times a power of 3; the numerator is divisible
 // by j! for all valid n (verified), so the integer division is exact. Requires
 // n >= 3j+1 so the exponent n-1-3j is non-negative (pow3 has no negative
-// powers); the maxn>=3k+1 strip dispatch guarantees it. j<=6 stay in int64
-// through a25; j=7,8's coefficients overflow int64 at the n they're used at, so
-// cases 7 and 8 build the numerator in big.Int.
-func diagonalCell(n, j int) uint64 {
-	N := int64(n)
-	switch j {
-	case 0:
+// powers); the maxn>=3k+1 strip dispatch guarantees it.
+func diagonalCell(n, j int) *big.Int {
+	if j == 0 {
 		return pow3(n - 1)
-	case 1:
-		return uint64(25*N-45) * pow3(n-4)
-	case 2:
-		return uint64((625*N*N-2459*N+1134)/2) * pow3(n-7)
-	case 3:
-		return uint64((15625*N*N*N-100050*N*N+122213*N-32940)/6) * pow3(n-10)
-	case 4:
-		return uint64((390625*N*N*N*N-3596250*N*N*N+8099843*N*N-6462882*N+1752840)/24) * pow3(n-13)
-	case 5:
-		return uint64((9765625*N*N*N*N*N-120546875*N*N*N*N+425836625*N*N*N-650171245*N*N+422003550*N+76975920)/120) * pow3(n-16)
-	case 6:
-		return uint64((244140625*N*N*N*N*N*N-3861328125*N*N*N*N*N+19486496875*N*N*N*N-47366857935*N*N*N+55373728180*N*N+946828380*N-32099353920)/720) * pow3(n-19)
-	case 7:
-		// k=7 coefficients overflow int64 at n>=22 (6103515625*n^7 > 2^63), so the
-		// numerator is built in big.Int (Horner). P_7 is data-pinned and validated at
-		// scale by the a(23) swept H=16 row (T(23,16)=4492550651512074,
-		// T(22,15)=1035856891052731). Called only for the j=7 strip cell at
-		// n=maxn>=22, so pow3(n-22) has a non-negative exponent.
-		num := big.NewInt(6103515625)
-		for _, c := range []int64{-119765625000, 812310625000, -2839739579250, 5194366339015, -1878923357430, -6841564107480, 7756630081200} {
-			num.Mul(num, big.NewInt(N))
-			num.Add(num, big.NewInt(c))
-		}
-		num.Quo(num, big.NewInt(5040))
-		num.Mul(num, new(big.Int).SetUint64(pow3(n-22)))
-		return num.Uint64()
-	case 8:
-		// k=8 coefficients overflow int64 at the n they're used at (a25's
-		// maxn=25), so the numerator is built in big.Int (Horner), same as
-		// case 7. P_8 is pinned from a(24)'s real T(24,16)=42594477635772598
-		// (n=17..24, 8 points, leading coeff fixed at 25^8/8! by the confirmed
-		// conjecture) -- see scripts/pin_diagonal_k8_final.py, whose fit
-		// reproduces all 8 defining points exactly and whose result matches
-		// the pre-a(24) falsifiable sum-of-roots prediction exactly.
-		num := big.NewInt(152587890625)
-		for _, c := range []int64{-3625976562500, 31658675781250, -149222374175000, 391357255277905, -350057694296660, -718224955399380, 2136536485853040, -923712586957440} {
-			num.Mul(num, big.NewInt(N))
-			num.Add(num, big.NewInt(c))
-		}
-		num.Quo(num, big.NewInt(40320))
-		num.Mul(num, new(big.Int).SetUint64(pow3(n-25)))
-		return num.Uint64()
 	}
-	panic("diagonalCell: unsupported diagonal j")
+	c, ok := diagCoeffTable[j]
+	if !ok {
+		panic("diagonalCell: unsupported diagonal j")
+	}
+	return hornerDiag(int64(n), c, n-1-3*j)
 }
 
 // contributeDiagonalStrip adds the closed-form strip H=maxn-k (the k-th
@@ -1232,14 +1274,14 @@ func diagonalCell(n, j int) uint64 {
 // cells: T(n, maxn-k) for n=maxn-k..maxn, where the offset j=n-(maxn-k) makes
 // each cell the j-th diagonal at n, = diagonalCell(n, j). Callers guarantee
 // maxn >= 2k+1 so every cell is in its validity range.
-func contributeDiagonalStrip(maxn, k int, triangle []uint64, cfg SweepConfig) {
+func contributeDiagonalStrip(maxn, k int, triangle []*big.Int, cfg SweepConfig) {
 	H := maxn - k
-	row := make([]uint64, maxn+1)
+	row := newBigRow(maxn + 1)
 	for j := 0; j <= k; j++ {
 		n := maxn - k + j
 		row[n] = diagonalCell(n, j)
 		if n < len(triangle) {
-			triangle[n] += row[n]
+			triangle[n].Add(triangle[n], row[n])
 		}
 	}
 	if cfg.PerHeightOut != "" {
@@ -1251,13 +1293,13 @@ func contributeDiagonalStrip(maxn, k int, triangle []uint64, cfg SweepConfig) {
 
 // contributeTopHeight adds the closed-form top strip T(maxn,maxn) to the
 // triangle (and writes its per-height row if requested), doing no map/merge.
-func contributeTopHeight(maxn int, triangle []uint64, cfg SweepConfig) {
+func contributeTopHeight(maxn int, triangle []*big.Int, cfg SweepConfig) {
 	v := topHeightClosedForm(maxn)
 	if maxn < len(triangle) {
-		triangle[maxn] += v
+		triangle[maxn].Add(triangle[maxn], v)
 	}
 	if cfg.PerHeightOut != "" {
-		hTri := make([]uint64, maxn+1)
+		hTri := newBigRow(maxn + 1)
 		hTri[maxn] = v
 		if werr := writePerHeight(cfg.PerHeightOut, maxn, maxn, hTri); werr != nil {
 			fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", maxn, werr)

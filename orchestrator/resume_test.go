@@ -12,6 +12,7 @@ package orchestrator
 
 import (
 	"context"
+	"math/big"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -92,25 +93,25 @@ func baseCfg(t *testing.T, dir string) SweepConfig {
 	}
 }
 
-func checkTriangle(t *testing.T, ctx string, known, got []uint64) {
+func checkTriangle(t *testing.T, ctx string, known, got []*big.Int) {
 	t.Helper()
 	for n := 1; n <= resumeMaxn; n++ {
-		want := uint64(0)
-		if n < len(known) {
+		want := big.NewInt(0)
+		if n < len(known) && known[n] != nil {
 			want = known[n]
 		}
-		g := uint64(0)
-		if n < len(got) {
+		g := big.NewInt(0)
+		if n < len(got) && got[n] != nil {
 			g = got[n]
 		}
-		if g != want {
+		if g.Cmp(want) != 0 {
 			t.Fatalf("%s: n=%d a(n)=%d known=%d", ctx, n, g, want)
 		}
 	}
 }
 
 // loadKnownTriangle reads the same fixture the production --compare uses.
-func loadKnownTriangle(t *testing.T) []uint64 {
+func loadKnownTriangle(t *testing.T) []*big.Int {
 	t.Helper()
 	path := filepath.Join("..", "fixtures", "b006770.txt")
 	known, err := LoadKnown(path)

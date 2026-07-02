@@ -1,6 +1,7 @@
 package orchestrator
 
 import (
+	"math/big"
 	"sort"
 	"testing"
 )
@@ -53,10 +54,13 @@ func TestCheckpointRoundtrip(t *testing.T) {
 	dir := t.TempDir()
 	path := dir + "/POLYCKPT"
 
-	triangle := make([]uint64, 15)
-	triangle[1] = 1
-	triangle[5] = 638
-	triangle[14] = 11208974860
+	triangle := make([]*big.Int, 15)
+	for i := range triangle {
+		triangle[i] = new(big.Int)
+	}
+	triangle[1].SetInt64(1)
+	triangle[5].SetInt64(638)
+	triangle[14].SetInt64(11208974860)
 
 	orig := &Checkpoint{
 		H:        7,
@@ -85,12 +89,12 @@ func TestCheckpointRoundtrip(t *testing.T) {
 		t.Errorf("Frontier len: got %d want %d", len(got.Frontier), len(orig.Frontier))
 	}
 	for n, v := range triangle {
-		if v == 0 {
+		if v.Sign() == 0 {
 			continue
 		}
-		if n >= len(got.Triangle) || got.Triangle[n] != v {
-			got_v := uint64(0)
-			if n < len(got.Triangle) {
+		if n >= len(got.Triangle) || got.Triangle[n] == nil || got.Triangle[n].Cmp(v) != 0 {
+			got_v := big.NewInt(0)
+			if n < len(got.Triangle) && got.Triangle[n] != nil {
 				got_v = got.Triangle[n]
 			}
 			t.Errorf("triangle[%d]: got %d want %d", n, got_v, v)
@@ -109,7 +113,7 @@ func TestCheckpointNilFrontier(t *testing.T) {
 		H:        14,
 		Col:      14,
 		Frontier: nil,
-		Triangle: []uint64{0, 1, 4, 20},
+		Triangle: []*big.Int{big.NewInt(0), big.NewInt(1), big.NewInt(4), big.NewInt(20)},
 		Acct:     Acct{},
 	}
 
@@ -125,7 +129,7 @@ func TestCheckpointNilFrontier(t *testing.T) {
 	if len(got.Frontier) != 0 {
 		t.Errorf("Frontier should be nil/empty, got %v", got.Frontier)
 	}
-	if got.Triangle[3] != 20 {
+	if got.Triangle[3].Cmp(big.NewInt(20)) != 0 {
 		t.Errorf("triangle[3]: got %d want 20", got.Triangle[3])
 	}
 }

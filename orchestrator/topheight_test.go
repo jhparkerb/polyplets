@@ -7,6 +7,7 @@ package orchestrator
 
 import (
 	"context"
+	"math/big"
 	"path/filepath"
 	"testing"
 )
@@ -18,7 +19,8 @@ func TestTopHeightClosedForm(t *testing.T) {
 		want uint64
 	}{{1, 1}, {2, 3}, {3, 9}, {4, 27}, {5, 81}, {8, 2187}, {14, 1594323}}
 	for _, c := range cases {
-		if got := topHeightClosedForm(c.n); got != c.want {
+		want := new(big.Int).SetUint64(c.want)
+		if got := topHeightClosedForm(c.n); got.Cmp(want) != 0 {
 			t.Errorf("topHeightClosedForm(%d)=%d want %d", c.n, got, c.want)
 		}
 	}
@@ -54,7 +56,7 @@ func TestTopHeightNoWorkers(t *testing.T) {
 	if err != nil {
 		t.Fatalf("top strip H=%d spawned a worker (or failed): %v", maxn, err)
 	}
-	if res.Triangle[maxn] != want {
+	if res.Triangle[maxn].Cmp(big.NewInt(want)) != 0 {
 		t.Fatalf("T(%d,%d)=%d want %d", maxn, maxn, res.Triangle[maxn], want)
 	}
 }

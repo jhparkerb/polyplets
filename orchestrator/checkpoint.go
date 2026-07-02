@@ -15,6 +15,7 @@ package orchestrator
 import (
 	"bufio"
 	"fmt"
+	"math/big"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -35,7 +36,7 @@ type Checkpoint struct {
 	// Triangle holds the accumulated Σ_H T(n,H) for all COMPLETED heights
 	// before H, plus contributions from completed columns within H.
 	// Indexed by n; len = maxn+1.
-	Triangle []uint64
+	Triangle []*big.Int
 	Acct     Acct
 	Written  time.Time
 	// Run config stamped at write time so resume can hard-fail on a mismatched
@@ -69,7 +70,7 @@ func (ck *Checkpoint) Write(path string) error {
 		ck.Acct.CPUS, ck.Acct.WallS, ck.Acct.RSSMax)
 	// Sparse triangle: only non-zero entries.
 	for n, v := range ck.Triangle {
-		if v != 0 {
+		if v != nil && v.Sign() != 0 {
 			fmt.Fprintf(f, "tri %d %d\n", n, v)
 		}
 	}
@@ -123,16 +124,18 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 			parseAcct(v, &ck.Acct)
 		case "tri":
 			parts := strings.Fields(v)
-			if len(parts) == 2 {
-				n, err1 := strconv.Atoi(parts[0])
-				val, err2 := strconv.ParseUint(parts[1], 10, 64)
-				if err1 == nil && err2 == nil {
-					for n >= len(ck.Triangle) {
-						ck.Triangle = append(ck.Triangle, 0)
-					}
-					ck.Triangle[n] = val
-				}
+			if len(parts) != 2 {
+				return nil, fmt.Errorf("%s: malformed tri line %q", path, line)
 			}
+			n, err1 := strconv.Atoi(parts[0])
+			val, ok := new(big.Int).SetString(parts[1], 10)
+			if err1 != nil || !ok || n < 0 {
+				return nil, fmt.Errorf("%s: malformed tri line %q", path, line)
+			}
+			for n >= len(ck.Triangle) {
+				ck.Triangle = append(ck.Triangle, new(big.Int))
+			}
+			ck.Triangle[n] = val
 		}
 	}
 	if !sawHeader {

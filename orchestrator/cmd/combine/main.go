@@ -14,6 +14,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/big"
 	"os"
 	"path/filepath"
 	"sort"
@@ -67,8 +68,11 @@ func main() {
 // runCombine sums each dir's h<H>.out rows into the triangle, rejecting a height
 // supplied by two dirs (double-count) and — when requireCover — any gap in
 // 1..maxn. Returns the triangle and the sorted set of heights present.
-func runCombine(dirs []string, maxn int, requireCover bool) (triangle []uint64, have []int, err error) {
-	triangle = make([]uint64, maxn+1)
+func runCombine(dirs []string, maxn int, requireCover bool) (triangle []*big.Int, have []int, err error) {
+	triangle = make([]*big.Int, maxn+1)
+	for i := range triangle {
+		triangle[i] = new(big.Int)
+	}
 	heightSrc := map[int]string{} // H -> first dir that supplied it
 
 	for _, dir := range dirs {
@@ -129,7 +133,7 @@ func heightFromName(path string) (int, bool) {
 //   - a nonzero n>maxn row       => --maxn is smaller than the data, which would
 //     silently drop the high-n rows (Silent Truncator).
 // Without these, a damaged shard sums to a confidently-printed, too-low a(n).
-func addRow(path string, maxn int, triangle []uint64) error {
+func addRow(path string, maxn int, triangle []*big.Int) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return err
@@ -143,12 +147,12 @@ func addRow(path string, maxn int, triangle []uint64) error {
 			continue
 		}
 		n, e1 := strconv.Atoi(f[0])
-		v, e2 := strconv.ParseUint(f[1], 10, 64)
-		if e1 != nil || e2 != nil || n < 1 {
-			continue
+		v, ok := new(big.Int).SetString(f[1], 10)
+		if e1 != nil || !ok || n < 1 {
+			return fmt.Errorf("%s: malformed row %q", filepath.Base(path), line)
 		}
 		if n > maxn {
-			if v != 0 && n > overflowN {
+			if v.Sign() != 0 && n > overflowN {
 				overflowN = n
 			}
 			continue
@@ -156,10 +160,10 @@ func addRow(path string, maxn int, triangle []uint64) error {
 		if n == maxn {
 			sawMaxn = true
 		}
-		if v != 0 {
+		if v.Sign() != 0 {
 			nonzero = true
 		}
-		triangle[n] += v
+		triangle[n].Add(triangle[n], v)
 	}
 	if overflowN > 0 {
 		return fmt.Errorf("%s: contains n=%d > maxn=%d with a nonzero count; --maxn too small (data would be dropped)", filepath.Base(path), overflowN, maxn)
@@ -173,7 +177,7 @@ func addRow(path string, maxn int, triangle []uint64) error {
 	return nil
 }
 
-func writeTriangle(path string, maxn int, triangle []uint64) error {
+func writeTriangle(path string, maxn int, triangle []*big.Int) error {
 	f, err := os.Create(path)
 	if err != nil {
 		return err
@@ -185,7 +189,7 @@ func writeTriangle(path string, maxn int, triangle []uint64) error {
 	return nil
 }
 
-func compareKnown(maxn int, triangle []uint64) int {
+func compareKnown(maxn int, triangle []*big.Int) int {
 	known, err := orchestrator.LoadKnown("fixtures/b006770.txt")
 	if err != nil || len(known) <= 1 {
 		fmt.Fprintln(os.Stderr, "combine: no known values (run from repo root)")

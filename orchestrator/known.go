@@ -3,6 +3,7 @@ package orchestrator
 
 import (
 	"fmt"
+	"math/big"
 	"os"
 	"strconv"
 	"strings"
@@ -11,19 +12,19 @@ import (
 // CompareToKnown prints "n=.. a(n)=.. known=.. OK|FAIL" for n=1..maxn and
 // returns whether every entry matched. Shared by the orchestrate --compare path
 // and the combine tool; each caller prints its own PASS/FAIL summary line.
-func CompareToKnown(maxn int, triangle, known []uint64) bool {
+func CompareToKnown(maxn int, triangle, known []*big.Int) bool {
 	allOK := true
 	for n := 1; n <= maxn; n++ {
-		var got uint64
-		if n < len(triangle) {
+		got := big.NewInt(0)
+		if n < len(triangle) && triangle[n] != nil {
 			got = triangle[n]
 		}
-		var want uint64
-		if n < len(known) {
+		want := big.NewInt(0)
+		if n < len(known) && known[n] != nil {
 			want = known[n]
 		}
 		status := "OK"
-		if got != want {
+		if got.Cmp(want) != 0 {
 			status = "FAIL"
 			allOK = false
 		}
@@ -35,12 +36,12 @@ func CompareToKnown(maxn int, triangle, known []uint64) bool {
 // LoadKnown parses an OEIS b-file (lines "<n> <a(n)>", '#' comments ignored)
 // into a slice indexed by n, with index 0 seeded to 0.  Used by the production
 // --compare path and the resume gate to check the computed triangle.
-func LoadKnown(path string) ([]uint64, error) {
+func LoadKnown(path string) ([]*big.Int, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	known := []uint64{0}
+	known := []*big.Int{big.NewInt(0)}
 	for _, line := range strings.Split(string(data), "\n") {
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
@@ -51,12 +52,12 @@ func LoadKnown(path string) ([]uint64, error) {
 			continue
 		}
 		n, err1 := strconv.Atoi(parts[0])
-		v, err2 := strconv.ParseUint(parts[1], 10, 64)
-		if err1 != nil || err2 != nil || n < 0 {
+		v, ok := new(big.Int).SetString(parts[1], 10)
+		if err1 != nil || !ok || n < 0 {
 			continue
 		}
 		for n >= len(known) {
-			known = append(known, 0)
+			known = append(known, big.NewInt(0))
 		}
 		known[n] = v
 	}
