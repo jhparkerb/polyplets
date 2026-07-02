@@ -1,13 +1,16 @@
 # Design 14 — Parallel Kink-Carry engine
 
-**Status: REDESIGN NEEDED (2026-07-02).** Smoke-tested serial kernel in
+**Status: OPTION A CHOSEN (2026-07-02).** Smoke-tested serial kernel in
 `experiments/kink_tm/`, results in `results/kink-carry.md` — that win stands.
-**Phase 0.1 ran and Option B (below) is NO-GO**: shard duplication grows
-`~S^0.7-0.8`, no plateau, eating most of the kernel's win at production shard
-counts (128-320). Data + verdict in
-`results/kink-carry-shard-duplication.md`. Phases 1-4 as written assume
-Option B and need revision (Option A / hybrid / analytic shard bound) before
-proceeding — do not start Phase 1 on this doc's original text.
+**Option B is NO-GO** (`results/kink-carry-shard-duplication.md`): shard
+duplication grows `~S^0.7-0.8`, no plateau, eating most of the kernel's win
+at production shard counts. **Option A is GO on volume**
+(`results/kink-carry-optionA-volume.md`): H merge barriers per column move
+*less* total data than today's one big barrier, and the margin widens with H
+(0.20× at H8 down to ~0.009× at H14, extrapolated). Real per-barrier
+orchestration overhead is unmeasured (needs the wired engine) but not
+expected to erase a 10-100× volume win. Proceeding to Phase 1 scoped to
+Option A: barrier = stage boundary, not column boundary.
 
 ## What changes and what does not
 
@@ -36,82 +39,96 @@ the spill/zstd machinery (now rarely triggered), and the diagonal P_k closed
 forms (orthogonal — they still cap the top swept height; the two wins compose
 multiplicatively).
 
-## The parallelisation choice (Option B: shard sources, private stage DP)
+## The parallelisation choice (Option A: shard each stage, H barriers/column)
 
-A map unit stays what it is today: **a key-range of the source frontier.** The
-worker runs the *entire H-stage kink DP on its shard, privately in RAM*, and
-emits that shard's end-of-column states as a sorted Run. The merge barrier then
-combines end-of-column states across units exactly as today (same key, same
-`combine`). No new barrier, no orchestrator restruct, no merge change.
+Each of the H stages within a column is sharded for parallel compute (key-range
+split, same partitioning production already does), fanned out independently
+(fan-out 2, purely local — no duplication risk since a state's successors
+depend only on itself), then **merged back into one canonical stage table**
+before the next stage starts. H barriers per column instead of today's one.
 
-The **only** new inefficiency: intermediate mixed-boundary states that would
-merge *across shards* mid-column do not — each shard rebuilds its own
-intermediates. Because intermediates are cheap (fan-out 2, polynomial) and
-never leave the worker, bounded duplication here is acceptable against a 150×
-win. The exact duplication-vs-shard-count curve is the Phase-0 de-risk
-measurement and sets the unit-size sweet spot.
+Measured (`results/kink-carry-optionA-volume.md`, using `kinkSweep`'s existing
+`stageStateSum` counter — no new code needed): total volume moved across all H
+barriers is *already smaller* than today's single whole-column barrier, and
+the margin widens with H (0.20× at H8 → ~0.009× at H14, extrapolated), because
+stage size is flat ~3.6× the frontier while today's single barrier carries
+`Σ masks`. Zero duplication by construction — every stage is exact.
 
-Rejected alternatives:
-- **Option A (shard each stage, H barriers/column):** zero intermediate
-  duplication but H merge barriers per column instead of 1. Held in reserve
-  *scoped to the top height only*, if Phase 0 shows duplication is bad at the
-  shard counts the top height needs.
+Open (not yet measured, needs the wired engine): real per-barrier
+orchestration overhead (dispatch/sync/wait) × H vs production's existing
+per-column barrier cost, and whether H small barriers serialize worker
+idle time worse than one big barrier does today.
+
+Rejected:
+- **Option B (shard sources, private per-shard stage DP):** duplication grows
+  `~S^0.7-0.8` with no plateau, NO-GO at production shard counts
+  (`results/kink-carry-shard-duplication.md`).
 - **Sibling engine:** duplicates the orchestrator/merge/test harness for no
-  benefit. Option B is a drop-in `map_shard` variant, so it lives in-tree
-  behind a `--kernel` flag, default-off until byte-match validated — the same
-  pattern the holes/perim variants used.
+  benefit. Option A lives in-tree behind a `--kernel` flag, default-off until
+  byte-match validated — the same pattern the holes/perim variants used.
 
 ## Work-stealing under the kink kernel
 
-Today a steal splits a unit's remaining **key-range** at a cursor; correct
-because map is per-source independent. Under kink, a stolen sub-unit is simply
-**a smaller source-shard run through its own independent kink DP** — the
-un-started sources past the cursor become a new unit. The existing SIGTERM →
-stop-at-source-boundary → `StopKey` = last-source-consumed machinery carries
-over unchanged; the only semantic shift is the cursor is a *source* boundary,
-not an *output-key* boundary. Steal adds intermediate duplication (another
-independent sub-DP), same category of cost as Option B's sharding — measured in
-Phase 3.
+Under Option A a steal happens **within a stage**, same shape as today: split
+the stage-shard's remaining key-range at a cursor, un-started keys become a
+new unit. No duplication — a stolen sub-shard is still just a smaller local
+fan-out into the same merge barrier, not an independent private DP. The
+existing SIGTERM → stop-at-boundary → `StopKey` machinery carries over
+unchanged; the boundary is a stage-local key cursor instead of a column-level
+one. Cheaper than Option B's steal story would have been (no rediscovery
+cost) — nothing new to measure here beyond the existing steal-overhead
+telemetry.
 
 ## Milestones (red-first; each gate byte-identical, not approximate)
 
 ### Phase 0 — De-risk by measurement (no production code)
-- **0.1 Duplication curve. DONE — NO-GO for Option B.** Measured
+- **0.1 Duplication curve (Option B). DONE — NO-GO.** Measured
   (`experiments/kink_tm/kink_shard_probe.cpp`, H=8/12, `--keyrange` and
   `--hash`, gated byte-identical at every S): duplication grows
   `~S^0.7-0.8` with no plateau (1.5× at S=2 → 8.1× at S=32, H=12,
   key-range). Does not hold to the < ~2× bar at production shard counts
   (128-320). Full data: `results/kink-carry-shard-duplication.md`.
-  **Decision taken: Option B rejected as scoped.** Next step is to scope
-  Option A (per-stage sharding, H barriers/column — zero duplication) or a
-  hybrid/analytic approach, NOT to proceed to Phase 1 on Option B.
-- **0.2 Production record format.** (deferred — moot until a shard strategy
-  passes 0.1; revisit once Option A or a hybrid is measured.) Confirm the ~3.6× intermediate factor and
+- **0.1b Merge-barrier volume (Option A). DONE — GO.** Measured
+  (`experiments/kink_tm/kink_tm.cpp`, `stageStateSum` counter, H=8/10/12/14):
+  total volume across all H barriers is smaller than today's single barrier
+  at every H tested, and the ratio shrinks with H (0.20× at H8 → ~0.009× at
+  H14, extrapolated). Zero duplication by construction. Full data:
+  `results/kink-carry-optionA-volume.md`. **Decision: Option A chosen.**
+  Real per-barrier orchestration overhead (dispatch/sync/wait × H) is
+  unmeasured — not visible to a serial probe, deferred to Phase 2/3 once the
+  engine is wired.
+- **0.2 Production record format.** Confirm the ~3.6× intermediate factor and
   the per-worker RAM projection hold with **ranged u128 rows** (not the probe's
   full u64 rows) at H16 shape. Establishes the real bytes/intermediate-state.
 - Deliverable: numbers appended to `results/kink-carry.md`; go/no-go on B.
 
-### Phase 1 — Kink kernel as a `map_shard` variant (library only)
-- Port `kinkSweep` into `map_shard_kink<W, Classifier>` in `core/`, consuming a
-  source Run (a shard) and producing the **identical** `Run<W>` contract as
-  `map_shard`. Reuse `Sig`, ranged rows, `foldSig` (end-of-column only),
-  `completionLowerBound`, `canonicalizeSig`, the classifier hooks. Intermediates
-  live in a private in-RAM open-addressing map (mixed-state key: boundary +
-  carry byte + placed bit; never keyed for merge, never written).
+### Phase 1 — Stage kernel as a `map_shard` variant (library only)
+- Option A means the column loop itself gains a level: instead of 1
+  map-then-merge per column, it runs **H sequential stage-map-then-merge
+  cycles**. Port the single-stage fan-out (`occupy in {0,1}`, union-find,
+  canonicalize) into `map_shard_stage<W, Classifier>` in `core/`, consuming a
+  shard of the *current stage's* table (mixed-state key: boundary + carry
+  byte + touch flags) and producing a sorted `Run` of that shard's successor
+  records — same `Run<W>`/`mergeRuns` contract as today, just keyed on the
+  stage's mixed state instead of the end-of-column state. Reuse `Sig`,
+  `canonicalizeSig`, `completionLowerBound`/`foldSig` (end-of-column stage
+  only), the classifier hooks.
 - **Scope v1 = triangle only.** The holes path uses `sig.b[H+2]` for the Euler
   hole count, which the kink state needs for the carry — conflict. Holes stay on
   the column kernel (they are an a19/a20-era concern, off the a(30) path).
-- Red-first tests: for random source shards at H=4..10, `map_shard_kink` output
-  (end-of-column states, per-n counts, per-height T(n,H)) is byte-identical to
-  `map_shard`. Orchestrator still calls the old path; this phase ships dark.
+- Red-first tests: for random stage-table shards at H=4..10, `map_shard_stage`
+  output is byte-identical to running the unsharded `kinkSweep` stage
+  transition on the same table. Orchestrator still calls the old path; this
+  phase ships dark.
 
 ### Phase 2 — Wire behind `--kernel`, gate at a(20)
-- `map_worker --kernel kink|column` (default column); `orchestrate --kernel`
-  plumbed through `SweepConfig`. Worker reads its source shard, runs the kink
-  kernel, writes the end-of-column Run as today. Merge, checkpoint (column
-  boundary; kink is atomic within a column, so resume granularity is coarser —
-  fine), telemetry unchanged.
-- Work-stealing: cursor at source boundary (above). Reuse `StopKey` path.
+- Orchestrator column loop grows a stage sub-loop under `--kernel kink`: H
+  cycles of (partition current stage table by key → parallel
+  `map_shard_stage` → merge → next stage), then the existing end-of-column
+  harvest/prune/fold. `map_worker --kernel kink|column` (default column).
+  Checkpoint granularity becomes stage-level (finer than today's
+  column-level — strictly easier to resume). Telemetry gains a per-stage
+  breakdown; steal cursor is a stage-local key boundary (see below).
 - **Gate:** full a(20) `--kernel kink --compare` byte-matches the b-file AND a
   whole-column a(20) run — the entire triangle and every T(n,H) identical.
 

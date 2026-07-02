@@ -291,9 +291,10 @@ int main(int argc, char** argv) {
     // (results/ns_a2*/perheight/hH.out).
     KinkStats kink = kinkSweep(H, maxn);
     std::printf("H=%d maxn=%d kink-only\n", H, maxn);
-    std::printf("kink-carry  : %10.3fs  transitions  %12llu  peak-interm %9zu  peak-col %9zu\n",
+    std::printf("kink-carry  : %10.3fs  transitions  %12llu  peak-interm %9zu  peak-col %9zu  stageStateSum %14llu\n",
                 kink.secs, (unsigned long long)kink.transitions,
-                kink.peakStates, kink.peakColStates);
+                kink.peakStates, kink.peakColStates,
+                (unsigned long long)kink.stageStateSum);
     for (int n = 1; n <= maxn; ++n)
       std::printf("%d %llu\n", n, (unsigned long long)kink.row[n]);
     return 0;
@@ -314,13 +315,15 @@ int main(int argc, char** argv) {
   std::printf("H=%d maxn=%d\n", H, maxn);
   std::printf("whole-column: %10.3fs  kept-records %12llu  peak-states %9zu\n",
               base.secs, (unsigned long long)base.emitted, base.peakStates);
-  std::printf("kink-carry  : %10.3fs  transitions  %12llu  peak-interm %9zu  peak-col %9zu\n",
+  std::printf("kink-carry  : %10.3fs  transitions  %12llu  peak-interm %9zu  peak-col %9zu  stageStateSum %14llu\n",
               kink.secs, (unsigned long long)kink.transitions, kink.peakStates,
-              kink.peakColStates);
+              kink.peakColStates, (unsigned long long)kink.stageStateSum);
   std::printf("ratios      : time %.2fx   records/transitions %.2fx   interm/col-states %.2fx\n",
               base.secs / kink.secs,
               (double)base.emitted / (double)kink.transitions,
               (double)kink.peakStates / (double)base.peakStates);
+  std::printf("Option-A merge volume (stageStateSum) vs whole-column single-barrier volume (kept-records): %.4fx\n",
+              (double)kink.stageStateSum / (double)base.emitted);
   std::printf("T(n,%d):", H);
   for (int n = maxn - 2; n <= maxn; ++n)
     std::printf(" n=%d %llu", n, (unsigned long long)kink.row[n]);
