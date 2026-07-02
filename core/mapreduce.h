@@ -481,15 +481,33 @@ std::pair<size_t, size_t> map_shard_file(
       do_spill();
   }
 
-  // Final spill or direct write.
-  do_spill();  // flush remaining buf to a spill file
-
-  // Merge all spill files into out_path (record count threaded out of the merge).
+  // Final write. Fast path: a column that fit in RAM (no mid-stream spill) is
+  // sorted+deduped and written STRAIGHT to out_path with its index, skipping
+  // the write-a-lone-spill-then-read-it-back-through-mergeRunFiles round trip
+  // (a full extra write + full read of the whole column output, for nothing).
+  // On the spill-bound engine most columns never spill mid-stream, so this
+  // halves their output I/O. Byte-identical: do_spill already sorts+dedups, and
+  // mergeRunFiles over one already-deduped run just copies it out with maxn=0
+  // in the header -- exactly what this direct write produces. POLY_NO_FASTPATH
+  // forces the old path for A/B byte-compare (mirrors POLY_NO_SEEK).
 #ifdef POLY_PROFILE
   const double _tmg = prof::now();
 #endif
-  auto [out_bytes, out_recs] = mergeRunFiles<W>(spill_files, H, "", "", out_path, rev, keyLen);
-  (void)out_bytes;
+  size_t out_recs;
+  if (spill_files.empty() && !std::getenv("POLY_NO_FASTPATH")) {
+    sortRun(buf);
+    deduplicateRun(buf);
+    RunFileWriter<W> ow(out_path, H, 0, "", "", rev, keyLen, /*write_index=*/true);
+    for (const auto& r : buf) ow.append(r);
+    ow.finalize();
+    out_recs = buf.size();
+    buf.clear();
+  } else {
+    do_spill();  // flush remaining buf to a final spill file
+    auto [out_bytes, merged] = mergeRunFiles<W>(spill_files, H, "", "", out_path, rev, keyLen);
+    (void)out_bytes;
+    out_recs = merged;
+  }
 #ifdef POLY_PROFILE
   prof_merge_s += prof::now() - _tmg;
   {
