@@ -1,5 +1,57 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (session end, pre-/clear) — SAVE-STATE
+
+**Branch `kink-carry`, tip `b3ff955`, pushed to origin. Tree clean** (one
+untracked file `autonomy` at repo root, not created by this session — leave
+it, don't delete without checking with jasonp).
+
+### Live jobs
+- **dalby — a(29)**, orchestrate PID **2243059**, ~4h44m in, healthy (RSS
+  106MB, low CPU%% between heartbeats is normal — heartbeats show real
+  progress: H16 col6, rate ~4-5k rec/s). H15 has finished; only H16 (the top
+  real height) is left grinding. Launch estimate was ~4-5h wall, so this is
+  in the expected final stretch. **Do not touch** (correctness-or-dead-box
+  bar only, per standing rule). No armed waiter from this session — if you
+  want a completion notification, arm one against PID 2243059 on dalby.
+- **ayr — free.** Its `~/src/polyominoes-ns` worktree is on `kink-carry`
+  (rev `30c5580`, map_worker/merge_worker/orchestrate/combine freshly
+  rebuilt there) — **NOT** `next-system`. Re-sync to `next-system` before
+  ayr's next production a(n) run.
+- **gympie — idle** (local dev box, this session's work happened here).
+
+### What finished this session: Design 14 Phase 2, all of it (2.1-2.9)
+Kink-carry parallel engine wired behind `--kernel kink` (default stays
+`column` — production untouched). Sequence: 2.1 keyLen de-hardcoding, 2.2
+`core/kink_column.h` seed/finalize, 2.3 file-backed stage kernel, 2.4
+map_worker CLI wiring, 2.5 Go `Kernel` field threading, 2.6 `mapPhase`/
+`mergePhase` extension + `sweepHeightKink` (caught and fixed a real
+filename-collision bug along the way), 2.7 `combine --diff-b` per-height
+cell-diff tool, 2.8 **the real gate — PASS on ayr**: a(20) `--kernel kink
+--compare` byte-matches the b-file, and every single `T(n,H)` cell matches
+the column kernel for H=1..20 (not just the summed total). 2.9 closed out
+the design doc (`docs/next-system/designs/14-kink-carry-parallel-engine.md`,
+status now "PHASE 2 DONE") and this file. Each step was its own commit,
+red-first tested, full `make ns-gates` green before moving on.
+
+### NEXT: Phase 3 — dalby-scale a(24) validation (needs go-ahead)
+`orchestrate --maxn 24 --kernel kink --compare` on dalby, byte-matching the
+full triangle + every T(n,H) against banked `results/ns_a24/`. Doubles as
+the independent-reimplementation closure the a(23) validation plan names
+([[a23-readiness-and-validation]]) — retroactively hardens a(21)-a(29).
+Also retune unit-mult/overlap-heights/steal-grain under the new cost shape
+(map now cheap, merge-barrier-dominated) rather than assuming the
+column-kernel defaults carry over. Real compute job — needs explicit
+go-ahead, and dalby is busy with a(29) until that finishes.
+
+### Loose end, not urgent
+A stray background-task notification arrived this session for a task
+("H=14 oracle probe") this session never started and produced no output.
+Not investigated — harmless, but flag it if it recurs or if jasonp knows
+what it was.
+
+---
+
 ## 2026-07-02 (latest) — Design 14 Phase 2 DONE — a(20) --kernel kink gate PASS
 
 Branch **`kink-carry`**, tip `30c5580` (pushed to origin). Tree clean.
