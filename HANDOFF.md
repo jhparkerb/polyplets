@@ -1,5 +1,34 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (evening) — a(28) + a(29) LAUNCHED (concurrent, one term per box) 🚀
+
+Both deployed at rev **`7e28071`** (next-system; P9..P12 wired + simplify cleanup),
+rebuilt **WITH zstd spill compression** (POLY_ZSTD on both boxes; ayr libzstd-dev
+now present). a18 `--compare` PASS on both before launch.
+
+- **ayr — a(28)** ≈ 4.8e21 (FIRST SEXTILLION): `scripts/ayr_a28.sh`, solo, maxn=28,
+  top real height **H15** (a26-tier). orchestrate PID **1596596**, tmux `0:a28`,
+  waiter `bpbb4nhsu` (tail --pid). 32c, u128, 1GiB/worker (32GiB cap, fits 78),
+  overlap 13, ckpt 300s. Est ~3h.
+- **dalby — a(29)** ≈ 3.3e22: `scripts/dalby_a29.sh`, solo, maxn=29, top real
+  height **H16** (a27-tier). orchestrate PID **2243059**, tmux `0:a29`, waiter
+  `bpgekpfwf`. 80c, u128, 1GiB/worker (~80GiB cap, fits 125; measured 38G used
+  early), overlap 14, ckpt 300s. Est ~4-5h.
+- **Deploy note:** dalby fetches github over **https** (git@ publickey fails);
+  ayr fetches over **git@ ssh** (https prompts for creds). Don't cross them.
+- **On completion (each):** `build/ns/combine --maxn N --in runs/ns_aN/<box>/perheight`
+  → a(N); validate a1-20 vs b-file (combine --compare auto) + a21-27 vs
+  results/ns_a2{1..7}/ by hand + monotone-growth guard + growth ~6.86. Record
+  results/ns_a2{8,9}/, tier computed (single-source high heights, cert pending).
+- **Byproducts:** a28 gives T(28,16) (diagonal-12, n=28) and a29 gives T(29,16/17)
+  → diagonal-12 point at n=28,29 + diagonal-13 points → enough to validate **P_13**
+  (needs diag-13 at n>=27; a27 gave n=27, a28/a29 give n=28,29 → 3 pts).
+
+**RESEARCH THREAD (while they run):** eke more from the engine / investigate new
+approaches. Reach base-reduction is closed (45° diagonal FALSIFIED, [[column-tm-already-sqrt-lambda]]);
+open levers to weigh: ranged-row ~1.9x constant-factor (measured, not deployed),
+queued #12 u64-per-state (halves RAM/spill), and any fresh angle.
+
 ## 2026-07-02 (later) — P_11 CLOSED → a(28) unblocked ✅
 
 Commit `2ddd474` on next-system. **The a(28) coding blocker (task #13) is done.**
