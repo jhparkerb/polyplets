@@ -33,10 +33,20 @@
 #pragma once
 
 #include <algorithm>
+#include <csignal>
 #include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <functional>
+#include <memory>
+#include <queue>
+#include <string>
+#include <unistd.h>
+#include <vector>
 
 #include "core/run.h"
+#include "core/runfile.h"
 #include "core/signature.h"
 #include "core/transition.h"
 
@@ -138,6 +148,8 @@ struct KinkStageCfg {
   int H;      // height of this sweep
   int maxn;   // maximum cell count (budget)
   int stage;  // stage index r in [0, H): the new-column row placed this stage
+  size_t ram_budget_bytes = 0;  // 0 = no spill (map_shard_stage_file only)
+  std::string spill_dir;
 };
 
 // map_shard_stage: one micro-stage of the kink-carry sweep (Design 14 Phase
@@ -182,4 +194,187 @@ Run<W> map_shard_stage(const Run<W>& src, const KinkStageCfg& cfg) {
   sortRun(buf);
   deduplicateRun(buf);
   return buf;
+}
+
+// Progress-pulse stride for map_shard_stage_file, mirroring
+// core/mapreduce.h's kProgressStrideMask (distinct name: map_worker.cpp
+// includes both headers in the same TU once --kernel kink dispatches
+// alongside the column kernel, so the two constants must not collide).
+static constexpr unsigned kKinkProgressStrideMask = (1u << 10) - 1;
+
+// File-backed version of map_shard_stage (Design 14 Phase 2.3): reads a
+// shard of the current stage's mixed-state table from POLYRUN files (keyLen
+// kinkKeyLen(H)), spills to disk past cfg's RAM budget, and writes one
+// sorted POLYRUN output file for stage+1. Mirrors map_shard_file's shell
+// (K-way heap over RunFileReader, spill/RAM-budget, progress pulse,
+// cooperative SIGTERM stop-key) but with no Classifier/Output param (stage
+// steps never classify -- harvest lives in kinkSeedStage0) and the inner
+// per-record body replaced by kinkStageTransition. Returns {total_spill_bytes,
+// output_record_count}.
+template <class W>
+std::pair<size_t, size_t> map_shard_stage_file(
+    const std::vector<std::string>& in_paths,
+    const KinkStageCfg& cfg,
+    const std::string& out_path,
+    const std::string& lo_hex,
+    const std::string& hi_hex,
+    const std::string& rev = "",
+    const std::function<void(size_t)>& on_progress = {},
+    const volatile std::sig_atomic_t* stop_flag = nullptr,
+    std::string* stop_key_hex = nullptr) {
+  const int H    = cfg.H;
+  const int maxn = cfg.maxn;
+  const int r    = cfg.stage;
+  const int keyLen = kinkKeyLen(H);
+
+  uint8_t lo_sig[SIGMAX] = {};
+  uint8_t hi_sig[SIGMAX] = {};
+  bool has_lo = !lo_hex.empty() && hexToBytes(lo_hex, lo_sig, keyLen);
+  bool has_hi = !hi_hex.empty() && hexToBytes(hi_hex, hi_sig, keyLen);
+
+  std::vector<std::unique_ptr<RunFileReader<W>>> readers;
+  readers.reserve(in_paths.size());
+  for (const auto& p : in_paths) {
+    readers.push_back(std::make_unique<RunFileReader<W>>(p, H, keyLen));
+    if (!readers.back()->ok()) {
+      std::fprintf(stderr, "map_shard_stage_file: cannot read input %s\n",
+                   p.c_str());
+      std::exit(1);
+    }
+    if (has_lo) readers.back()->seekToKey(lo_sig);
+  }
+
+  struct FileCursor {
+    RunRecord<W> rec;
+    int idx;
+    bool operator>(const FileCursor& o) const {
+      return sigCmp(rec.sig.b, o.rec.sig.b, rec.keyLen) > 0;
+    }
+  };
+  using MinHeap = std::priority_queue<FileCursor, std::vector<FileCursor>,
+                                      std::greater<FileCursor>>;
+  MinHeap heap;
+  for (int i = 0; i < static_cast<int>(readers.size()); ++i) {
+    FileCursor c;
+    c.idx = i;
+    if (readers[i]->next(c.rec))
+      heap.push(std::move(c));
+  }
+
+  Run<W> buf;
+  size_t buf_bytes = 0;
+  std::vector<std::string> spill_files;
+  size_t total_spill_bytes = 0;
+  int spill_seq = 0;
+
+  const size_t record_est = sizeof(RunRecord<W>) +
+                            static_cast<size_t>(maxn) * sizeof(W) + 32;
+
+  auto do_spill = [&]() {
+    if (buf.empty()) return;
+    sortRun(buf);
+    deduplicateRun(buf);
+    std::string spill_path = cfg.spill_dir + "/spill_" +
+                             std::to_string(static_cast<long>(getpid())) +
+                             "_" + std::to_string(spill_seq++) + ".bin";
+    bool spill_compress = false;
+#ifdef POLY_ZSTD
+    spill_compress = !std::getenv("POLY_NO_SPILL_ZSTD");
+#endif
+    RunFileWriter<W> sw(spill_path, H, maxn, "", "", rev, keyLen,
+                        /*write_index=*/false, /*compress=*/spill_compress);
+    for (const auto& r : buf) sw.append(r);
+    size_t sb = sw.finalize();
+    total_spill_bytes += sb;
+    spill_files.push_back(spill_path);
+    buf.clear();
+    buf_bytes = 0;
+  };
+
+  size_t processed = 0;
+  while (!heap.empty()) {
+    if (on_progress && (++processed & kKinkProgressStrideMask) == 0) {
+      on_progress(processed);
+      if (stop_flag && *stop_flag && stop_key_hex) {
+        const uint8_t* cur = heap.top().rec.sig.b;
+        if (has_hi && sigCmp(cur, hi_sig, keyLen) >= 0)
+          break;
+        if (has_lo && sigCmp(cur, lo_sig, keyLen) < 0)
+          *stop_key_hex = lo_hex;
+        else
+          *stop_key_hex = bytesToHex(cur, keyLen);
+        break;
+      }
+    }
+
+    FileCursor top = heap.top();
+    heap.pop();
+
+    {
+      FileCursor nc;
+      nc.idx = top.idx;
+      if (readers[top.idx]->next(nc.rec))
+        heap.push(std::move(nc));
+    }
+
+    if (has_lo && sigCmp(top.rec.sig.b, lo_sig, keyLen) < 0)
+      continue;
+    if (has_hi && sigCmp(top.rec.sig.b, hi_sig, keyLen) >= 0)
+      break;
+
+    while (!heap.empty()) {
+      if (sigCmp(top.rec.sig.b, heap.top().rec.sig.b, keyLen) != 0) break;
+      FileCursor eq = heap.top();
+      heap.pop();
+      top.rec.combine(eq.rec);
+      FileCursor nc;
+      nc.idx = eq.idx;
+      if (readers[eq.idx]->next(nc.rec))
+        heap.push(std::move(nc));
+    }
+
+    const RunRecord<W>& rec = top.rec;
+    const int ms = rec.minSize();
+    if (ms < 0) continue;
+
+    kinkStageTransition(rec.sig, H, r, ms, maxn, [&](const Sig& t, int shift) {
+      const int new_lo = static_cast<int>(rec.lo) + shift;
+      if (new_lo > maxn) return;
+      const int new_len = std::min<int>(rec.len, maxn - new_lo + 1);
+
+      RunRecord<W> succ;
+      succ.sig    = t;
+      succ.H      = H;
+      succ.keyLen = keyLen;
+      succ.lo     = static_cast<uint8_t>(new_lo);
+      succ.len    = static_cast<uint8_t>(new_len);
+      succ.counts.assign(rec.counts.begin(), rec.counts.begin() + new_len);
+      buf.push_back(std::move(succ));
+      buf_bytes += record_est;
+    });
+
+    if (cfg.ram_budget_bytes > 0 && buf_bytes > cfg.ram_budget_bytes)
+      do_spill();
+  }
+
+  size_t out_recs;
+  if (spill_files.empty() && !std::getenv("POLY_NO_FASTPATH")) {
+    sortRun(buf);
+    deduplicateRun(buf);
+    RunFileWriter<W> ow(out_path, H, 0, "", "", rev, keyLen, /*write_index=*/true);
+    for (const auto& r : buf) ow.append(r);
+    ow.finalize();
+    out_recs = buf.size();
+    buf.clear();
+  } else {
+    do_spill();
+    auto [out_bytes, merged] = mergeRunFiles<W>(spill_files, H, "", "", out_path, rev, keyLen);
+    (void)out_bytes;
+    out_recs = merged;
+  }
+
+  for (const auto& sf : spill_files)
+    std::remove(sf.c_str());
+
+  return {total_spill_bytes, out_recs};
 }

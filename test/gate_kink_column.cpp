@@ -218,7 +218,7 @@ static void testAgainstGroundTruth() {
         TriangleRow<W> out(H, maxn);
         Run<W> stage = kinkSeedStage0<W, ClassifyTriangle>(src, H, out);
         for (int r = 0; r < H; ++r) {
-          KinkStageCfg cfg{H, maxn, r};
+          KinkStageCfg cfg{H, maxn, r, 0, ""};
           stage = map_shard_stage(stage, cfg);
         }
         Run<W> next = kinkFinalizeColumn(stage, H, maxn, fold);

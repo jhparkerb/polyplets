@@ -159,7 +159,7 @@ static void testAgainstGroundTruthAndSharding() {
     for (int stage : {0, H / 2, H - 1}) {
       for (int trial = 0; trial < 3; ++trial) {
         Run<W> src = randomStageTable(rng, H, maxn, 30);
-        KinkStageCfg cfg{H, maxn, stage};
+        KinkStageCfg cfg{H, maxn, stage, 0, ""};
 
         // 1. Ground truth (no windowing) vs map_shard_stage (windowed).
         DenseMap ref = referenceStageStep(src, H, stage, maxn);
