@@ -1,5 +1,12 @@
 # Cloud burst sizing — cost-optimal, zero-waste
 
+> **DECIDED 2026-07-02: NOT pursuing cloud.** jasonp will not pay $900+ to save
+> ~6 days. The analysis below shows cloud buys earlier-finish at ~$7–8/hour on
+> the big box — above his willingness to pay, so it's never worth it at any term
+> size. **a28–a30 run at home (dalby+ayr), $0, and a30 takes its few days.** Doc
+> kept for the reasoning (single-height floor, decision-form calculator) in case
+> the calculus ever changes; do not re-pitch cloud.
+
 **2026-07-02.** Goal: accelerate a29/a30 with cloud compute, optimized for cost
 *and* ~zero false starts / wasted jobs. The zero-waste priority drives the whole
 shape: **do not pre-commit a30 cloud spend; stage and calibrate first.**
