@@ -1,5 +1,30 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (still later) — Design 14 Phase 2: 2.7 DONE, 2.8 needs go-ahead
+
+Branch **`kink-carry`**, tip `abd7228`. Tree clean.
+
+- **2.7** `abd7228` — `combine --diff-b DIR[,...]`: compares `--in`'s
+  per-height `h<H>.out` rows against another dir set CELL BY CELL (every
+  `T(n,H)`), not just the summed `a(n)` total the normal mode checks. Missing
+  height on either side, or any differing cell, fails loud with a per-height
+  report. Red-first (`TestRunDiffCatchesCellMismatch`/`MissingHeight`
+  verified to fail against a broken `runDiff` first). Full `make ns-gates`
+  green.
+
+### NEXT: 2.8 — the real gate, NEEDS EXPLICIT GO-AHEAD before launch
+Per the plan file: `orchestrate --maxn 20 --kernel kink --compare` (byte-matches
+the b-file) **and** `combine --diff-b` diffing kink's `--per-height-out`
+against a `--kernel column` a(20) run's, cell by cell. Short (a(20) scale),
+but per the standing job-launch rule this specific launch needs jasonp's
+explicit assent first — ask before running it, don't just launch. `--kernel`
+CLI default stays `column` until this is green, so nothing in production is
+at risk either way. 2.9 (close-out) is just doc updates once 2.8 passes:
+design doc Phase 2 -> DONE, this handoff's NEXT -> Phase 3 (dalby-scale a(24)
+validation).
+
+---
+
 ## 2026-07-02 (later still) — Design 14 Phase 2: 2.5-2.6 DONE, next up 2.7
 
 Branch **`kink-carry`**, tip `3eed44b`. Tree clean. dalby a(29) still running
