@@ -1,5 +1,56 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (night) — Design 14 (parallel kink-carry) Phase 0 fully de-risked; start Phase 1
+
+Branch **`kink-carry`** (off master `b6dcfaf`, NOT pushed), tip `e3c330c`. a(28)
+[ayr] + a(29) [dalby] still running untouched throughout — see the launch entry
+below; do not touch them, only correctness/dead-box justifies it.
+
+**The research-goal thread** (`/goal`: find a sub-exponential-base algorithmic
+win) found one: **Kink Carry** — cell-at-a-time boundary sweep (literature-
+standard TM, carrying the one king-adjacency NW cell the whole-column engine
+was avoiding) instead of whole-column transfer. Serial win is real and
+production-validated: `results/kink-carry.md` — 29x@H12, ~55x@H14 (measured),
+extrapolated ~150-200x@H16, compute base ~4.4->~2.5/term. Gated byte-identical
+against `results/ns_a27/perheight/h{12,14}.out`.
+
+**Parallelization now fully resolved — Option A, GO on all three axes:**
+- Option B (shard sources, private per-shard DP) — **NO-GO**: duplication
+  grows ~S^0.7-0.8 unbounded, `results/kink-carry-shard-duplication.md`.
+- Option A (shard *each stage*, H merge barriers/column instead of 1) —
+  **GO on volume**: total data moved across all H barriers is already less
+  than today's ONE barrier, gap widens with H (0.20x@H8 -> ~0.009x@H14
+  extrap). No new code — reused `kinkSweep`'s existing `stageStateSum`
+  counter. `results/kink-carry-optionA-volume.md`.
+  - **GO on fixed overhead**: mined real dalby telemetry (`ns_a26`/`ns_a27`
+    `cost_profile*.tsv` tail columns, frontier->0) for the fixed floor of a
+    map+merge round-trip: ~6-30ms. `H x that` < 1s/column, negligible vs the
+    100-300x volume win and hour-scale peak-column walls. No wired engine
+    needed to get this number. `results/kink-carry-optionA-barrier-overhead.md`.
+
+**Design doc updated and current:** `docs/next-system/designs/14-kink-carry-parallel-engine.md`,
+status **"OPTION A CHOSEN"**. Phase 0 (0.1/0.1b/0.1c) all DONE. Phase 1/2 text
+already rewritten for Option A's actual shape: the column loop gains an
+inner stage sub-loop (H sequential stage-map-then-merge cycles instead of 1
+map-then-merge), barrier = stage boundary not column boundary. Read that doc's
+Phase 1 section before writing code — it has the concrete plan (port the
+single-stage fan-out into `map_shard_stage<W,Classifier>`, keyed on the mixed
+boundary+carry+touch-flags state, same `Run<W>`/`mergeRuns` contract, v1 scope
+= triangle only, holes stays on the column kernel — `sig.b[H+2]` conflicts
+with the carry byte).
+
+### NEXT: Phase 1 — port the stage kernel into `core/` (library only, ships dark)
+Per the design doc: `map_shard_stage<W, Classifier>` in `core/`, consuming a
+shard of the current stage's mixed-state table, producing that shard's
+successor records as a sorted `Run`. Red-first tests at H=4..10: byte-identical
+to the unsharded `kinkSweep` stage transition on random stage-table shards.
+Orchestrator still calls the old column path — this phase does not touch a(n)
+production runs. `experiments/kink_tm/kink_tm.cpp` is the reference
+implementation to port from (the serial `kinkSweep` stage-transition body).
+Do not skip ahead to Phase 2 wiring before Phase 1's own byte-match gate is
+green. Consider whether to merge `kink-carry` back to `next-system`/`master`
+before or after Phase 1 lands (not yet decided).
+
 ## 2026-07-02 (evening) — a(28) + a(29) LAUNCHED (concurrent, one term per box) 🚀
 
 Both deployed at rev **`7e28071`** (next-system; P9..P12 wired + simplify cleanup),
