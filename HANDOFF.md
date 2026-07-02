@@ -1,5 +1,56 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (late) — SESSION SAVE-STATE (before Claude Code binary update)
+
+**No live jobs. dalby + ayr both FREE.** a(26) and a(27) both landed this session.
+
+### Frontier state
+- **a(26) = 102607513847014153892** — landed, `results/ns_a26/`. T(26,15)=5614506356004078534.
+- **a(27) = 703126792093436034256** — landed, `results/ns_a27/`. dalby+ayr split (H16
+  3.76h / H3-15 2.7h), rev `b390518`, u128, guarded combine. growth 6.8526.
+  **T(27,16) = 27798973373501478242.**
+- Both P11 equations now in hand (T(26,15) + T(27,16)).
+
+### IMMEDIATE NEXT (task #13, in_progress): close P11 → unlock a28
+1. `scripts/derive_p11_sizing.py` — solve P11 fully (7/12 coeffs from theory + the
+   2 new points). Held-out validate.
+2. Wire `orchestrator/sweep.go` `diagonalCell` **case 11**; extend `diagonalStripValid`
+   guard to **k<=11**. Red-first test (heightnm2 style) + a20 --compare byte-match.
+3. Closing P11 keeps a28 top-real-height at **H16 (cheap same-tier)** not H17 (new ~3x
+   tier). a28 ≈ 4.8e21 = **first sextillion** term.
+
+### THEN: launch a28 (next term)
+- Sync dalby+ayr to latest next-system (`b14e0b1` + P11 commit), **rebuild WITH
+  compression** — BOTH boxes now have libzstd-dev (ayr installed 2026-07-02). Makefile
+  auto-detects zstd → POLY_ZSTD on both. Default spill level 3 (26x).
+- a28 dalby+ayr split like a27 (dalby H16 + closed-forms, ayr H3-15). Rebalance
+  from a27 cost profile. u128. Standing user auth covers a(n)≤a30 launches.
+
+### Engine changes THIS SESSION (on next-system, pushed origin `b14e0b1`) — NOT yet on dalby/ayr
+- **Single-spill fast-path** (core/mapreduce.h) — skip self-merge when a column fits RAM. Validated a20 byte-identical. ~2%.
+- **combine monotone-growth guard** (orchestrator/cmd/combine) — fail-closed on a(n)<=a(n-1); caught the a26 stale-u64 near-miss. Red-first test.
+- **zstd spill compression** (POLY_ZSTD, core/runfile.h, spill files only) — 26x@zstd-3, validated byte-identical incl resume + many-blocks. `ns-gate-spill-zstd`.
+- **Clean-room verifier** (experiments/cleanroom/cleanroom_verify.cpp) — independent DSU transfer-matrix, matches triangle to n<=14. 2nd independent kernel check.
+- dalby worktree ~`fd578de` (guarded combine built); ayr ~`b390518`. Both need sync+rebuild for a28.
+
+### Queued levers (measured, not yet built)
+- **#12 u64-per-state records** (u128 row accumulator) — MEASURED per-state max 40 bits at a27 → halve RAM/spill, spill less, raise --ram. After compression deploys. Sequence after #13 (shares mapreduce.h/classifier.h). SAFETY: per-state u64 not provably overflow-free at a30 (aggregate grows); combine() fail-loud guard aborts-not-corrupts; re-measure a29 per-state max before a30.
+
+### Measured DEAD-ENDS this session (don't re-attempt — see results/ + memories)
+- 2D-holonomic accelerator: NONE (results/boundary-push-recurrence.md).
+- Tensor-network frontier compression: chi^2~frontier, MPS loses (results/boundary-push-tensornetwork.md).
+- Map arena allocator: counts.assign 2/3405 samples, negligible (results/map-body-profile.md).
+- viableRec: ~20% branch-mispredict INTRINSIC, cache fine (2.6% L1), const fine, PGO no-go on dalby, context-struct arg-pack measured NEUTRAL/-0.15% ([[pgo-no-go-dalby]]).
+- Cloud burst: DECIDED no ([[no-cloud-burst]]).
+- Completion-pruning (#4): headroom exists (79% multi-comp) but high-risk, oracle-gated, deferred.
+
+### New memories this session
+no-cloud-burst, ask-for-missing-libs, no-root-without-asking (HARD: no sudo on ayr w/o asking), pgo-no-go-dalby. Updated a24-a25-state (now a24-a27).
+
+---
+
+## 2026-06-29 — earlier
+
 ## 2026-07-02 — a(26) LANDED + a(27) split LAUNCHED 🚀
 
 **a(26) = 102607513847014153892** (new term). dalby-solo, ~68min, u128, rev
