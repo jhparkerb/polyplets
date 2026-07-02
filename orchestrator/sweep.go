@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -234,6 +235,14 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	// another's map phase rather than idling the box.
 	sem := make(chan struct{}, cfg.Cores)
 
+	// Kernel dispatch: sweepHeight (whole-column) unless --kernel kink selects
+	// sweepHeightKink (per-cell boundary sweep). Both share sweepHeightFn's
+	// signature so the sequential and overlap paths below need no other change.
+	sweepFn := sweepHeight
+	if kernelName(cfg.Kernel) == "kink" {
+		sweepFn = sweepHeightKink
+	}
+
 	if cfg.OverlapHeights > 1 {
 		// Resume in overlap mode is by completed-height SET: drop the Done heights
 		// (their contributions are already restored into `triangle` above) and
@@ -259,7 +268,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		// height pool in this order, so the order is honored deterministically.
 		pending = append([]int(nil), pending...)
 		sort.Sort(sort.Reverse(sort.IntSlice(pending)))
-		return runOverlap(ctx, cfg, pending, triangle, acct, tel, sem, activeHeights)
+		return runOverlap(ctx, cfg, pending, triangle, acct, tel, sem, activeHeights, sweepFn)
 	}
 
 	// Sequential mode sweeps exactly one height at a time by construction, so
@@ -314,7 +323,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			frontier = []string{seed}
 		}
 
-		hTri, hAcct, err := sweepHeight(ctx, cfg, H, startCol, frontier, writeCheckpoint, tel, sem, activeHeights)
+		hTri, hAcct, err := sweepFn(ctx, cfg, H, startCol, frontier, writeCheckpoint, tel, sem, activeHeights)
 
 		// Accumulate this height's contributions before handling the error,
 		// so the checkpoint written on cancellation includes them.
@@ -358,7 +367,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 // pool's sole occupant — the overlap+steal coexistence fix (see stealAllowed).
 func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 	triangle []*big.Int, acct Acct, tel *telemetry, sem chan struct{},
-	activeHeights *atomic.Int32) (*SweepResult, error) {
+	activeHeights *atomic.Int32, sweepFn sweepHeightFn) (*SweepResult, error) {
 
 	var mu sync.Mutex
 	var firstErr error
@@ -461,7 +470,7 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 			// This height now starts drawing real (map/merge) work from the shared
 			// pool — count it as active for the steal gate's duration.
 			activeHeights.Add(1)
-			hTri, hAcct, err := sweepHeight(ctx, cfg, H, 0, []string{seed}, noopCkpt, tel, sem, activeHeights)
+			hTri, hAcct, err := sweepFn(ctx, cfg, H, 0, []string{seed}, noopCkpt, tel, sem, activeHeights)
 			activeHeights.Add(-1)
 
 			mu.Lock()
@@ -499,6 +508,21 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 	}
 	return &SweepResult{Triangle: triangle, Acct: acct}, nil
 }
+
+// sweepHeightFn is the shape shared by sweepHeight (column kernel) and
+// sweepHeightKink (kink kernel), so Run/runOverlap's one-line kernel dispatch
+// (see cfg.Kernel) can select between them without any other change to the
+// sequential or overlap driving code.
+type sweepHeightFn func(
+	ctx context.Context,
+	cfg SweepConfig,
+	H, startCol int,
+	frontier []string,
+	writeCheckpoint func(H, col int, frontier []string, hTri []*big.Int),
+	tel *telemetry,
+	sem chan struct{},
+	activeHeights *atomic.Int32,
+) ([]*big.Int, Acct, error)
 
 // sweepHeight sweeps one height H from startCol.
 // Returns the triangle contributions from this height, accumulated accounting,
@@ -555,7 +579,7 @@ func sweepHeight(
 		stopHB := tel.startColumn(H, col)
 
 		// MAP PHASE
-		mapOuts, triContribs, mapAcct, err := mapPhase(ctx, cfg, H, col, frontier, tel, sem, activeHeights)
+		mapOuts, triContribs, mapAcct, err := mapPhase(ctx, cfg, H, col, frontier, tel, sem, activeHeights, columnKeyLen(H), "")
 		if err != nil {
 			stopHB()
 			// hTri does NOT yet include current col's contributions.
@@ -571,7 +595,7 @@ func sweepHeight(
 		// fails (or is cancelled), the checkpoint at col-1 has correct hTri.
 		// A failed merge causes us to checkpoint at col-1 with unchanged hTri;
 		// the resume will re-run this col from scratch.
-		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem)
+		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem, columnKeyLen(H), "")
 		stopHB()
 		if err != nil {
 			// hTri does NOT include current col's contributions.
@@ -648,6 +672,181 @@ func sweepHeight(
 		for _, p := range oldMapOuts {
 			removeRun(p)
 		}
+	}
+
+	return hTri, acct, nil
+}
+
+// removeRuns deletes each run file (with its .idx sidecar) in paths.
+func removeRuns(paths []string) {
+	for _, p := range paths {
+		removeRun(p)
+	}
+}
+
+// sweepHeightKink sweeps one height H from startCol using the kink kernel
+// (Design 14): a column is one H+2-keyed "seed" round (harvest this column's
+// completions, append the carry/touch suffix, keyLen H+2->H+4), H sequential
+// H+4-keyed mid-column stage rounds (the per-cell king-adjacency transfer),
+// and one H+4-keyed "finalize" round (drop the carry with a stranding check,
+// canonicalize/prune/fold, keyLen H+4->H+2) — a barrier at every stage instead
+// of once per column (Phase 0's Option A). Checkpointing is column-level only
+// (the locked-in Phase 2 decision): a crash mid-column re-runs the whole
+// column's stage sequence from its seed, same as sweepHeight re-runs a whole
+// column's single map+merge round.
+//
+// Mirrors sweepHeight's shape exactly (same signature via sweepHeightFn, same
+// cancellation/error/checkpoint/GC structure) so the two can share Run's and
+// runOverlap's driving code; the only real difference is the inner stage loop
+// between a column's map and its next-column frontier.
+func sweepHeightKink(
+	ctx context.Context,
+	cfg SweepConfig,
+	H, startCol int,
+	frontier []string,
+	writeCheckpoint func(H, col int, frontier []string, hTri []*big.Int),
+	tel *telemetry,
+	sem chan struct{},
+	activeHeights *atomic.Int32,
+) ([]*big.Int, Acct, error) {
+
+	hTri := newBigRow(cfg.Maxn + 1)
+	var acct Acct
+	lastCkpt := time.Now()
+
+	forwardCheckpoint := func(col int, frontier []string) {
+		writeCheckpoint(H, col, frontier, hTri)
+		if cfg.afterColumn != nil {
+			cfg.afterColumn(H, col)
+		}
+	}
+
+	frontierIn := sumFrontierRecords(frontier)
+	inKeyLen := columnKeyLen(H)
+	stageKeyLen := kinkKeyLen(H)
+
+	for col := startCol; col <= cfg.Maxn; col++ {
+		if len(frontier) == 0 {
+			break
+		}
+
+		select {
+		case <-ctx.Done():
+			writeCheckpoint(H, col-1, frontier, hTri)
+			return hTri, acct, ctx.Err()
+		default:
+		}
+
+		colStart := time.Now()
+		stopHB := tel.startColumn(H, col)
+		var colAcct Acct
+		var colMapWall, colMergeWall, colMapCPU, colMergeCPU float64
+		var nMapUnits, nMergeRanges int
+
+		// runRound executes one map+merge round of the column's stage sequence
+		// and folds its accounting into colAcct/colMap*/colMerge*. name is only
+		// used in error messages.
+		runRound := func(name string, in []string, mapKeyLen int, stage string, mergeKeyLen int) ([]string, []map[int]map[int]*big.Int, error) {
+			t0 := time.Now()
+			mapOuts, triContribs, mapAcct, err := mapPhase(ctx, cfg, H, col, in, tel, sem, activeHeights, mapKeyLen, stage)
+			if err != nil {
+				return nil, nil, fmt.Errorf("H=%d col=%d kink %s map: %w", H, col, name, err)
+			}
+			colAcct.Add(mapAcct)
+			colMapWall += time.Since(t0).Seconds()
+			colMapCPU += mapAcct.CPUS
+			nMapUnits += len(mapOuts)
+			t1 := time.Now()
+			mergeOuts, _, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem, mergeKeyLen, stage)
+			removeRuns(mapOuts)
+			if err != nil {
+				return nil, nil, fmt.Errorf("H=%d col=%d kink %s merge: %w", H, col, name, err)
+			}
+			colAcct.Add(mergeAcct)
+			colMergeWall += time.Since(t1).Seconds()
+			colMergeCPU += mergeAcct.CPUS
+			nMergeRanges += len(mergeOuts)
+			return mergeOuts, triContribs, nil
+		}
+
+		// Seed: H+2 -> H+4, harvests this column's completions (classify happens
+		// here, at column START — see the design doc's kink_tm.cpp re-read).
+		stageTable, triContribs, err := runRound("seed", frontier, inKeyLen, "seed", stageKeyLen)
+		if err != nil {
+			stopHB()
+			writeCheckpoint(H, col-1, frontier, hTri)
+			return hTri, acct, err
+		}
+		for _, hm := range triContribs {
+			for _, nm := range hm {
+				for n, v := range nm {
+					if n >= 0 && n <= cfg.Maxn {
+						hTri[n].Add(hTri[n], v)
+					}
+				}
+			}
+		}
+
+		// H mid-column stage rounds: H+4 -> H+4, the per-cell king-adjacency
+		// carry transfer (core/kink.h's kinkStageTransition via
+		// map_shard_stage_file).
+		for r := 0; r < H; r++ {
+			next, _, err := runRound(fmt.Sprintf("stage %d", r), stageTable, stageKeyLen, strconv.Itoa(r), stageKeyLen)
+			removeRuns(stageTable)
+			if err != nil {
+				stopHB()
+				writeCheckpoint(H, col-1, frontier, hTri)
+				return hTri, acct, err
+			}
+			stageTable = next
+		}
+
+		// Finalize: H+4 -> H+2, drop the carry (stranding-checked), canonicalize,
+		// prune, fold — this column's contribution to the next column's frontier.
+		nextFrontier, _, err := runRound("finalize", stageTable, stageKeyLen, "finalize", inKeyLen)
+		removeRuns(stageTable)
+		stopHB()
+		if err != nil {
+			writeCheckpoint(H, col-1, frontier, hTri)
+			return hTri, acct, err
+		}
+
+		acct.Add(colAcct)
+		totalRecs := sumFrontierRecords(nextFrontier)
+		colWall := time.Since(colStart).Seconds()
+		tel.observe(ColumnCost{
+			H: H, Col: col,
+			FrontierIn:   frontierIn,
+			FrontierOut:  totalRecs,
+			WallS:        colWall,
+			CPUS:         colAcct.CPUS,
+			RSSMax:       colAcct.RSSMax,
+			MapWallS:     colMapWall,
+			MapCPUS:      colMapCPU,
+			MergeWallS:   colMergeWall,
+			MergeCPUS:    colMergeCPU,
+			NMapUnits:    nMapUnits,
+			NMergeRanges: nMergeRanges,
+		})
+		frontierIn = totalRecs
+
+		oldFrontier := frontier
+		frontier = nextFrontier
+
+		if totalRecs == 0 {
+			forwardCheckpoint(col, nil)
+			removeRuns(oldFrontier)
+			frontier = nil
+			break
+		}
+
+		interval := cfg.CheckpointEvery
+		if interval == 0 || time.Since(lastCkpt) >= interval {
+			forwardCheckpoint(col, frontier)
+			lastCkpt = time.Now()
+		}
+
+		removeRuns(oldFrontier)
 	}
 
 	return hTri, acct, nil
@@ -756,6 +955,18 @@ func stealScore(r *runningUnit, now time.Time) float64 {
 // shared pool, which is always true in sequential mode and becomes true in
 // overlap mode once sibling heights finish.  With StealGrain off, this is a
 // plain pull queue — the same work partition as before.
+//
+// keyLen is the key width of frontier (the round's INPUT table); it drives
+// SampleKeysMulti/splitRemainder and is always explicit so a kink-kernel round
+// reading an H+4-keyed stage table isn't silently sampled at the column
+// kernel's H+2 default. stage selects the kink kernel round ("" = column
+// kernel, unchanged behavior; "seed"/"finalize"/an int stage index = kink)
+// and is passed straight through to MapArgs.Kernel/Stage. Work-stealing is
+// additionally gated off for "seed"/"finalize": those rounds run in-RAM
+// (Phase 2 decision) and don't implement the SIGTERM cooperative-stop
+// protocol the mid-column int-stage rounds (map_shard_stage_file) support, so
+// stopping one would kill it outright rather than yield a valid partial
+// output.
 func mapPhase(
 	ctx context.Context,
 	cfg SweepConfig,
@@ -764,6 +975,8 @@ func mapPhase(
 	tel *telemetry,
 	sem chan struct{},
 	activeHeights *atomic.Int32,
+	keyLen int,
+	stage string,
 ) ([]string, []map[int]map[int]*big.Int, Acct, error) {
 
 	// Invariant: column work must never start at the top strip — H==maxn is
@@ -773,11 +986,16 @@ func mapPhase(
 		return nil, nil, Acct{}, fmt.Errorf("mapPhase: column work started at top height H=%d (maxn=%d); closed-form short-circuit was bypassed", H, cfg.Maxn)
 	}
 
+	kernel := ""
+	if stage != "" {
+		kernel = "kink"
+	}
+
 	numUnits := cfg.Cores * unitMult(cfg)
 	if numUnits < 1 {
 		numUnits = 1
 	}
-	cuts, err := SampleKeysMulti(frontier, H, columnKeyLen(H), numUnits-1)
+	cuts, err := SampleKeysMulti(frontier, H, keyLen, numUnits-1)
 	if err != nil {
 		return nil, nil, Acct{}, err
 	}
@@ -790,7 +1008,7 @@ func mapPhase(
 	// decision, in pickVictim — not folded in here, since it can change mid-column.
 	frontierIn := sumFrontierRecords(frontier)
 	var grainRecs uint64
-	stealConfigured := cfg.StealGrain > 0 && cfg.Cores > 1
+	stealConfigured := cfg.StealGrain > 0 && cfg.Cores > 1 && stage != "seed" && stage != "finalize"
 	if stealConfigured && frontierIn > 0 {
 		grainRecs = uint64(cfg.StealGrain * float64(frontierIn) / float64(cfg.Cores))
 	}
@@ -872,12 +1090,22 @@ func mapPhase(
 				mu.Unlock()
 
 				sem <- struct{}{}
-				outPath := filepath.Join(cfg.RunDir,
-					fmt.Sprintf("map_h%d_c%d_u%d.bin", H, col, u.idx))
+				outName := fmt.Sprintf("map_h%d_c%d_u%d.bin", H, col, u.idx)
+				if stage != "" {
+					// Distinguish a kink column's seed/stage-r/finalize rounds, which
+					// otherwise all reuse the same (H,col,idx) filename and would
+					// collide — the next round's map phase would read a file its own
+					// merge phase is about to overwrite, and GC would delete a
+					// just-produced round's output because it shares the prior
+					// round's name.
+					outName = fmt.Sprintf("map_h%d_c%d_k%s_u%d.bin", H, col, stage, u.idx)
+				}
+				outPath := filepath.Join(cfg.RunDir, outName)
 				a := MapArgs{
 					InPaths: frontier, H: H, Maxn: cfg.Maxn, Fold: cfg.Fold,
 					RAM: cfg.RAM, SpillDir: cfg.SpillDir, OutPath: outPath,
 					Counter: cfg.CounterWidth, LoHex: u.lo, HiHex: u.hi, Rev: cfg.Rev,
+					Kernel: kernel, Stage: stage,
 				}
 				res, runErr := RunMapWorker(mctx, cfg.Bin, a, unitProgress(tel, r.processed), r.stop)
 				<-sem
@@ -908,7 +1136,7 @@ func mapPhase(
 				// Did this unit stop early at a steal cursor? If so requeue the
 				// remainder [cursor,hi), split across the idle cores.
 				if res.StopKey != "" && res.StopKey != u.hi {
-					children := splitRemainder(frontier, H, res.StopKey, u.hi,
+					children := splitRemainder(frontier, H, keyLen, res.StopKey, u.hi,
 						cfg.Cores-len(inflight), r.remaining(), grainRecs, &nextIdx)
 					queue = append(queue, children...)
 					outstanding += len(children) - 1 // this unit done; children added
@@ -939,7 +1167,7 @@ func mapPhase(
 // be cut (a narrow range), it returns the single range flagged noSteal so the
 // stealer won't thrash on it.  Each child inherits an even share of the parent's
 // remaining estimate.  Caller holds the scheduler mutex (mutates *nextIdx).
-func splitRemainder(frontier []string, H int, cursor, hi string, freeCores int,
+func splitRemainder(frontier []string, H, keyLen int, cursor, hi string, freeCores int,
 	remaining, grainRecs uint64, nextIdx *int) []mapUnit {
 
 	parts := freeCores + 1
@@ -954,7 +1182,7 @@ func splitRemainder(frontier []string, H int, cursor, hi string, freeCores int,
 	}
 	var cutKeys []string
 	if parts >= 2 {
-		cutKeys, _ = SplitRangeByIndex(frontier, H, columnKeyLen(H), cursor, hi, parts-1)
+		cutKeys, _ = SplitRangeByIndex(frontier, H, keyLen, cursor, hi, parts-1)
 	}
 	los, his := splitBounds(cursor, hi, cutKeys)
 	est := remaining / uint64(len(los))
@@ -982,12 +1210,22 @@ func splitBounds(lo, hi string, cuts []string) (los, his []string) {
 }
 
 // mergePhase merges all map outputs into a new frontier via parallel merge workers.
+// keyLen is the key width of mapOuts (this round's OUTPUT table) — the column
+// kernel and the kink kernel's finalize round both produce H+2-keyed records,
+// but kink's seed and mid-column stage rounds produce H+4-keyed ones, so this
+// is always passed explicitly rather than derived from H (see mapPhase's
+// keyLen doc for why an implicit default is unsafe here). stage tags the
+// output filename ("" = column kernel, unchanged naming); a kink column runs
+// several rounds at the same (H,col) and the rounds' outputs would otherwise
+// collide on name (see mapPhase's matching outName comment).
 func mergePhase(
 	ctx context.Context,
 	cfg SweepConfig,
 	H, col int,
 	mapOuts []string,
 	sem chan struct{},
+	keyLen int,
+	stage string,
 ) ([]string, uint64, Acct, error) {
 
 	if len(mapOuts) == 0 {
@@ -1002,7 +1240,7 @@ func mergePhase(
 		numRanges = len(mapOuts)
 	}
 
-	cuts, err := SampleKeysMulti(mapOuts, H, columnKeyLen(H), numRanges-1)
+	cuts, err := SampleKeysMulti(mapOuts, H, keyLen, numRanges-1)
 	if err != nil {
 		return nil, 0, Acct{}, err
 	}
@@ -1028,8 +1266,11 @@ func mergePhase(
 			sem <- struct{}{}
 			defer func() { <-sem }()
 
-			outPath := filepath.Join(cfg.RunDir,
-				fmt.Sprintf("merge_h%d_c%d_r%d.bin", H, col, idx))
+			outName := fmt.Sprintf("merge_h%d_c%d_r%d.bin", H, col, idx)
+			if stage != "" {
+				outName = fmt.Sprintf("merge_h%d_c%d_k%s_r%d.bin", H, col, stage, idx)
+			}
+			outPath := filepath.Join(cfg.RunDir, outName)
 			a := MergeArgs{
 				InPaths: mapOuts,
 				H:       H,
@@ -1038,6 +1279,7 @@ func mergePhase(
 				KLoHex:  los[idx],
 				KHiHex:  his[idx],
 				Rev:     cfg.Rev,
+				KeyLen:  keyLen,
 			}
 			r, err := RunMergeWorker(ctx, cfg.Bin, a)
 			results[idx] = rangeResult{idx: idx, outPath: outPath, result: r, err: err}
