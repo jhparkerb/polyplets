@@ -86,20 +86,42 @@ Run ON THE CLOUD BOX, cheap (~$30–60 total, minutes-to-hours):
 Only after 1–5 pass does the real top-height run start. This is the "zero false
 starts" gate: the expensive run never begins on an unproven box.
 
-## 6. Cost envelope (ranged; replace with a29-calibrated numbers)
+## 6. The go/no-go, in decision form: "finish a30 M hours earlier for D dollars"
 
-Top height on `hpc7a.96xlarge` (192 cores, ~80% eff ≈ 154 eff cores), $7.5/hr:
+`experiments/cloud_tradeoff.py TOP_CPU_S` prints this table. Because both the
+hours saved (M) and the dollars (D) scale with the same top-height cpu-s, the
+**cost per hour saved is ~constant per box** — set by the speedup ratio, not the
+term size. That makes the choice crisp:
 
-| a30 top-height cpu-s | cloud wall | cloud cost | vs dalby-home wall |
-|---|---|---|---|
-| cheap ~5M | ~9h | ~$70 | ~22h (home fine — skip cloud) |
-| mid ~20M | ~36h | ~$270 | ~87h (3.6d) |
-| expensive ~60M | ~108h (4.5d) | ~$810 | ~260h (11d) |
+a30 top-height on each box vs the dalby home floor (64 eff cores = 80×0.80):
 
-Plus ~$30–60 preflight. So the realistic a30 cloud spend is **~$100–800**,
-resolved to a point estimate once a29 measures the top-height cost. If a29 shows
-the cheap path, **cloud may be unnecessary** and a30 finishes at home in a couple
-of days for $0.
+| a30 top-height | box | M earlier | D cost | $/hr saved |
+|---|---|---|---|---|
+| **cheap ~5M** | hpc7a 192c | 11 h | $128 | $11 |
+| | 256c | 13 h | $142 | $11 |
+| | c7i 96c+SMT | 5 h | $196 | $42 |
+| **mid ~20M** | hpc7a 192c | 46 h | $360 | $8 |
+| | 256c | 53 h | $417 | $8 |
+| | c7i 96c+SMT | 19 h | $636 | $34 |
+| **expensive ~60M** | hpc7a 192c | 136 h | $980 | $7 |
+| | 256c | 160 h | $1152 | $7 |
+| | c7i 96c+SMT | 56 h | $1807 | $32 |
+
+Two facts pop out:
+1. **The big box is the only good deal.** hpc7a/256c buy earlier-finish at
+   **~$7–11/hour**; the c7i (small speedup over dalby) costs **~$32–42/hour** —
+   never use it. Speedup ratio, not raw price, is what makes hours cheap.
+2. **$/hr-saved is roughly flat across term sizes** (~$7 for hpc7a), so the
+   decision is scale-free: "am I willing to pay ~$7–8 per hour to pull the a30
+   finish in?" times however many hours the measured a30 turns out to need.
+
+Preflight (~$50, §5) is folded into D and amortizes on larger terms. eff-cores
+here are PLACEHOLDERS — the §5 a27 calibration replaces 0.70 with the measured
+number before any real spend (high-core efficiency is unproven until measured).
+
+If a29 shows the cheap path (~5M top height), a30 is ~22h at home — likely just
+run it home for **$0** rather than pay $128 to save 11h. The bigger the term,
+the more the ~$7/hour deal is worth taking.
 
 ## 7. Recommendation
 
