@@ -65,8 +65,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "orchestrate: %v\n", err)
 		os.Exit(2)
 	}
-	// A2: the uint64 Go result pipeline caps exact maxn at a(25) regardless of
-	// --counter (a wider counter buys nothing until the pipeline is widened).
+	// A2: belt-and-suspenders — the Go result pipeline is big.Int (unbounded)
+	// post-widening, so this only catches maxn past u128's exact range even
+	// when --counter itself isn't checked for some reason; CheckCounterWidth
+	// above is the primary, --counter-aware guard.
 	if err := orchestrator.CheckResultWidth(*maxn); err != nil {
 		fmt.Fprintf(os.Stderr, "orchestrate: %v\n", err)
 		os.Exit(2)

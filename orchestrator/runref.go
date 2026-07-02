@@ -488,18 +488,27 @@ func bytesToHex(b []byte) string {
 	return string(s)
 }
 
+// u64ExactMaxN and u128ExactMaxN are the largest maxn each counter word can
+// hold exactly (per DESIGN/counter.h); beyond that the count wraps silently
+// (only detectable post-hoc via the mod-p shadow). Shared by CheckCounterWidth
+// and resultPipelineMaxN (via u128ExactMaxN) so the two guards can't drift
+// apart the way the two independently-hardcoded diagonal dispatch guards
+// once did (see diagonalStripValid).
+const (
+	u64ExactMaxN  = 25
+	u128ExactMaxN = 48
+)
+
 // CheckCounterWidth refuses at start (FR-7) if the configured counter word
-// cannot hold a(maxn). Per DESIGN/counter.h, exact counting is valid to a(25)
-// with u64 and to ~a(48) with u128; beyond that the count wraps silently (only
-// detectable post-hoc via the mod-p shadow), so the orchestrator must refuse
-// before spawning workers rather than run for hours and produce a wrong number.
+// cannot hold a(maxn), so the orchestrator refuses before spawning workers
+// rather than run for hours and produce a wrong number.
 func CheckCounterWidth(counter string, maxn int) error {
 	var limit int
 	switch counter {
 	case "", "u64":
-		counter, limit = "u64", 25
+		counter, limit = "u64", u64ExactMaxN
 	case "u128":
-		limit = 48
+		limit = u128ExactMaxN
 	default:
 		return fmt.Errorf("CheckCounterWidth: unknown counter %q (want u64 or u128)", counter)
 	}
@@ -525,19 +534,21 @@ func RAMAdvisory(ram uint64) string {
 }
 
 // resultPipelineMaxN is the largest maxn the Go result pipeline can hold
-// exactly. accounting (TriContribs), the triangle, combine, and verify are all
-// uint64; a(25) is the last a(n) below 2^64. Widening this path to big.Int
-// (BUGS-OF-SHAME A2) lifts the cap toward the counter limit.
-const resultPipelineMaxN = 25
+// exactly. BUGS-OF-SHAME A2 widened accounting/triangle/checkpoint/known/
+// combine from uint64 to big.Int, so the Go side itself is now unbounded; the
+// real remaining ceiling is the widest counter available (u128, exact to
+// u128ExactMaxN), not a Go-side type limit.
+const resultPipelineMaxN = u128ExactMaxN
 
-// CheckResultWidth refuses at start if maxn exceeds what the Go result pipeline
-// can represent, regardless of --counter. The map_workers may count in u128, but
-// accounting parses tri rows with ParseUint(_, 64) and silently DROPS a row that
-// overflows u64 (the `if err == nil` skip) — a too-low a(n) with no signal.
-// Until the pipeline is widened, refuse rather than miscount.
+// CheckResultWidth refuses at start if maxn exceeds what the Go result
+// pipeline can represent under the CONFIGURED counter width. Post-A2 this
+// mirrors CheckCounterWidth's cap rather than an independent Go-side limit —
+// kept as a belt-and-suspenders check since CheckResultWidth doesn't take
+// --counter, so it can only enforce the widest (u128) ceiling; a u64 run past
+// a(25) is still caught by CheckCounterWidth.
 func CheckResultWidth(maxn int) error {
 	if maxn > resultPipelineMaxN {
-		return fmt.Errorf("the Go result pipeline holds exact counts only to a(%d) (uint64); maxn=%d would silently drop overflowing tri rows — widen the pipeline to big.Int (BUGS-OF-SHAME A2) first", resultPipelineMaxN, maxn)
+		return fmt.Errorf("maxn=%d exceeds a(%d), the widest counter's (u128) exact range", maxn, resultPipelineMaxN)
 	}
 	return nil
 }
