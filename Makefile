@@ -119,13 +119,25 @@ NSFLAGS = -std=c++20 -Wall -Wextra -Werror \
 # zstd spill compression (POLY_ZSTD): the map/merge workers compress internal
 # spill files. libzstd headers live in /usr/include on Linux and /opt/local on
 # macOS/MacPorts. Only the C++ workers link it (orchestrate is Go and never
-# touches libzstd). A build without these flags still compiles — spill files are
-# then written plain (see core/runfile.h).
-ZSTD_CFLAGS  := -DPOLY_ZSTD
-ZSTD_LDFLAGS := -lzstd
+# touches libzstd). AUTO-DETECTED: if the dev header is absent (e.g. ayr, which
+# has libzstd runtime but not -dev), POLY_ZSTD is left off and spill files are
+# written plain (see core/runfile.h) — the build still compiles cleanly.
 ifeq ($(shell uname -s),Darwin)
-  ZSTD_CFLAGS  += -I/opt/local/include
-  ZSTD_LDFLAGS := -L/opt/local/lib -lzstd
+  ZSTD_HDR := /opt/local/include/zstd.h
+else
+  ZSTD_HDR := /usr/include/zstd.h
+endif
+ifneq ($(wildcard $(ZSTD_HDR)),)
+  ZSTD_CFLAGS  := -DPOLY_ZSTD
+  ZSTD_LDFLAGS := -lzstd
+  ifeq ($(shell uname -s),Darwin)
+    ZSTD_CFLAGS  += -I/opt/local/include
+    ZSTD_LDFLAGS := -L/opt/local/lib -lzstd
+  endif
+else
+  ZSTD_CFLAGS  :=
+  ZSTD_LDFLAGS :=
+  $(info NOTE: zstd dev header not found ($(ZSTD_HDR)); building without spill compression)
 endif
 
 # Every ns binary is header-only against core/; depend on the whole set so an
