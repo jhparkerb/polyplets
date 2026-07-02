@@ -1333,7 +1333,7 @@ func diagonalCell(n, j int) *big.Int {
 }
 
 // contributeDiagonalStrip adds the closed-form strip H=maxn-k (the k-th
-// diagonal, k=0..4) to the triangle, doing no map/merge. The strip carries k+1
+// diagonal, k=0..10) to the triangle, doing no map/merge. The strip carries k+1
 // cells: T(n, maxn-k) for n=maxn-k..maxn, where the offset j=n-(maxn-k) makes
 // each cell the j-th diagonal at n, = diagonalCell(n, j). Callers guarantee
 // maxn >= 2k+1 so every cell is in its validity range.
