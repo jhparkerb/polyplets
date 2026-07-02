@@ -55,7 +55,7 @@ def Pk_poly(K, a_syms, b_syms):
     la = la + sum(a_syms[j] * y**j for j in a_syms)
     bs = bs + sum(b_syms[j] * y**j for j in b_syms)
     A = sp.series(sp.exp(la), y, 0, K + 1).removeO()
-    S = sp.expand(sp.series(A * sp.exp(n * bs), y, 0, K + 1).removeO())
+    S = sp.series(A * sp.exp(n * bs), y, 0, K + 1).removeO()
     return sp.Poly(sp.expand(S.coeff(y, K)), n)
 
 
@@ -138,11 +138,15 @@ shared = [a7, a8, a9, a10, b8, b9, b10]
 all_eqs = eqs9 + eqs10
 print(f"\n{len(all_eqs)} equations in {len(shared)} shared unknowns "
       f"(OVER-determined by {len(all_eqs) - len(shared)}).")
-sol_shared = sp.solve(all_eqs, shared, dict=True)
-assert len(sol_shared) == 1, f"shared system not uniquely solvable: {sol_shared}"
-sol_shared = sol_shared[0]
+# The shared symbols enter every y^K coefficient LINEARLY (any product lands at
+# y-degree >= 14, above the K<=12 truncation), so this is a linear system —
+# linsolve is far faster than the general solver on these large rationals, and
+# returns EmptySet if the (over-determined) system is inconsistent.
+sol_set = sp.linsolve(all_eqs, shared)
+assert len(sol_set) == 1, f"shared system not uniquely solvable/consistent: {sol_set}"
+sol_shared = dict(zip(shared, next(iter(sol_set))))
 # consistency: every equation must hold under the solution
-consistent = all(sp.simplify(e.lhs.subs(sol_shared) - e.rhs) == 0 for e in all_eqs)
+consistent = all(sp.expand(e.lhs.subs(sol_shared) - e.rhs) == 0 for e in all_eqs)
 print(f"All {len(all_eqs)} equations consistent under the unique solution: {consistent}")
 assert consistent, "P_9/P_10 banked equations are INCONSISTENT -- stop."
 print("\nSolved shared symbols (universal series coefficients):")

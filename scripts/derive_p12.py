@@ -43,7 +43,7 @@ def Pk_poly(K, syms_a, syms_b):
     bs = (sum(rat(b_known[j]) * y**j for j in range(1, 7)) + b7_val * y**7
           + sum(syms_b[j] * y**j for j in syms_b))
     A = sp.series(sp.exp(la), y, 0, K + 1).removeO()
-    S = sp.expand(sp.series(A * sp.exp(n * bs), y, 0, K + 1).removeO())
+    S = sp.series(A * sp.exp(n * bs), y, 0, K + 1).removeO()
     return sp.Poly(sp.expand(S.coeff(y, K)), n)
 
 
@@ -73,7 +73,10 @@ def fit_unclean(poly, k, unknown_syms, data):
     unclean, clean = [], {}
     for p in range(k, -1, -1):
         c = sp.expand(poly.coeff_monomial(n**p) if p > 0 else poly.coeff_monomial(1))
-        (unclean.append(p) if (c.free_symbols & unknown_syms) else clean.__setitem__(p, c))
+        if c.free_symbols & unknown_syms:
+            unclean.append(p)
+        else:
+            clean[p] = c
     unclean = sorted(unclean)
     known_part = sum(sp.nsimplify(clean[p]) * n**p for p in clean)
     csyms = {p: sp.Symbol(f"c{p}") for p in unclean}
@@ -111,10 +114,14 @@ for K, sa, sb in banked_specs:
 
 shared = [a[7], a[8], a[9], a[10], a[11], b[8], b[9], b[10], b[11]]
 print(f"\n{len(all_eqs)} equations in {len(shared)} shared unknowns.")
-sol_shared = sp.solve(all_eqs, shared, dict=True)
-assert len(sol_shared) == 1, f"shared system not uniquely solvable: {sol_shared}"
-sol_shared = sol_shared[0]
-consistent = all(sp.simplify(e.lhs.subs(sol_shared) - e.rhs) == 0 for e in all_eqs)
+# The shared symbols enter every y^K coefficient LINEARLY (any product lands at
+# y-degree >= 14, above the K<=12 truncation), so this is a linear system —
+# linsolve is far faster than the general solver on these large rationals, and
+# returns EmptySet if the (over-determined) system is inconsistent.
+sol_set = sp.linsolve(all_eqs, shared)
+assert len(sol_set) == 1, f"shared system not uniquely solvable/consistent: {sol_set}"
+sol_shared = dict(zip(shared, next(iter(sol_set))))
+consistent = all(sp.expand(e.lhs.subs(sol_shared) - e.rhs) == 0 for e in all_eqs)
 print(f"All {len(all_eqs)} equations consistent under the unique solution: {consistent}")
 assert consistent
 print("Shared symbols solved (a7..a11, b8..b11).")
@@ -124,8 +131,8 @@ print("=" * 72)
 print("Stage 2: substitute shared symbols into P_12; only a12,b12 remain")
 print("=" * 72)
 
-p12 = Pk_poly(12, {**{j: a[j] for j in range(7, 13)}},
-              {**{j: b[j] for j in range(8, 13)}})
+p12 = Pk_poly(12, {j: a[j] for j in range(7, 13)},
+              {j: b[j] for j in range(8, 13)})
 unknowns12 = {a[12], b[12]}
 known_part12 = sp.Integer(0)
 unclean12 = {}
