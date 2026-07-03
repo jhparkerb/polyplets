@@ -1,5 +1,72 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-03 (pre-/clear SNAPSHOT) — successive-term loop + related-seq prep
+
+**The loop (jasonp's cadence): bank -> predict next -> apply a perf change ->
+run -> repeat up the ladder.** `scripts/dalby_term.sh N` = generic kink run +
+validate. Ceiling ~a34-a35 without deriving P13 (top-height sweep dominates);
+deadline 2026-07-06.
+
+### Live jobs (3, all monitored)
+- **dalby: a31** (`dalby_term.sh 31`, kink + unit-cap). At snapshot ~1h40m in,
+  grinding H18 (top height, ~16M frontier peak, ~600-750s/col). Predicted
+  ~2.4h but running HOTTER (~3-3.5h likely; H18 ratio still accelerating).
+  Monitor armed. When it lands: bank results/ns_a31/ (triangle+PROVENANCE+
+  perheight+cost_profile), validate (a1-20 b-file, a21-30 banked, growth),
+  then predict a32 + run it.
+- **ayr: a30 H17 independent verify** (`ayr_a30_h17_verify.sh`, COLUMN kernel,
+  x86, vs dalby's ARM kink) -- cross-ISA + cross-kernel. col0 matched
+  (65791). Mismatch monitor silent = still agreeing. Stop it when we need ayr
+  for concurrent terms (two-terms-on-two-boxes, a28/a29-style).
+- **gympie: sym_extend to n=22** (`sym_extend.sh 22`, ~6h, r180 the pole) for
+  the related-sequence symmetric counts.
+
+### Terms banked this session
+a26-a30 all landed. **a(30) = 227969227118066423789154** (kink, growth 6.8779),
+results/ns_a30/. a31 in flight.
+
+### Perf (task #3, optimize kink) -- IN PROGRESS, incremental
+- DONE round 1: **unit-cap** (43e3b9d) -- cap map units by frontier size;
+  killed the frontier-independent 320-worker fan-out (tail columns were
+  spawning ~6000 workers for a few-hundred states). Gate-verified + a20
+  --compare byte-clean.
+- DEFERRED (big lever): persistent-worker rearchitecture for the inter-round
+  barrier idle + merge ceiling (~18 cores). Target it off a30's
+  cost_profile.tsv. Merge stuck ~16-19 eff cores; map ~68 burst but ~25 avg
+  (19 stage-round barriers at H18). See task #3 + design doc backlog.
+
+### Related sequences (A030222/33/34/35, A194596) -- PARTIALLY done
+- Derive from Fixed(A006770) + symmetric counts via Burnside. Combiner
+  `scripts/derive_related.py` WRITTEN + PROVEN (reproduces all 95 known OEIS
+  terms + a20 draft). Runs on a sym dir -> emits validated new terms.
+- **WALL:** symmetric counts (symcount_fast, orbit-graph Redelmeier) cap at
+  ~n=22-23 (~2.6x/term; n=30 ~500 days). Efficient symmetric engine UNBUILT.
+  So related seqs will trail Fixed by ~8 terms. See
+  [[related-seqs-symcount-wall]].
+- DONE: A006770 b-file (results/b006770_upload.txt) -> n=30 + provenance
+  header; oeis/A006770.txt %C+%E. Labeling: uniform TM+kink-carry method;
+  independent (2-algorithm) confirmation frontier = n=19; a20-a30
+  single-algorithm.
+- TODO after sym22 lands: run `derive_related.py runs/sym22` -> n=20-22 terms
+  for the 5 related seqs; update their b-files (results/b*_upload.txt) +
+  oeis/A0302*.txt (%S/%T/%U as fits, %C+%E provenance) in ONE pass.
+
+### Paper -- DEFERRED (jasonp's call)
+Fuller `paper/a19-polyplets.tex` revision waits until we STOP computing terms
+(end-of-project). Just track it.
+
+### Task list (survives here since /clear drops it)
+1. [done] validate kink-carry via a29    2. [done] simplify kink
+3. [IN PROGRESS] optimize kink (unit-cap done; persistent-worker deferred)
+4. [done] run a30 + P_k (T(30,17) is a P13 data point)
+5. [IN PROGRESS] ayr validate a30 H17 (running)
+6. [IN PROGRESS] loop: as many terms as possible before 2026-07-06 (a31 running)
+7. [done] github on all hosts
+
+Branch kink-carry, all pushed to origin (tip ~64dea50+). All 3 boxes on github.
+
+---
+
 ## 2026-07-03 — kink-carry VALIDATED at a29 scale (Phase 3 done)
 
 `orchestrate --maxn 29 --kernel kink` on dalby (u128, 80 cores, **wall
