@@ -83,11 +83,27 @@ lemma canonical_fiber_nonempty {n H : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCan
   obtain ⟨c, hcS, hc⟩ := canonical_row_occupied hS h0 hH
   exact ⟨c, by rw [Finset.mem_filter]; exact ⟨hcS, hc⟩⟩
 
+/-- **Step (c), forward.** In a canonical polyplet, any two consecutive occupied
+rows `t`, `t+1` are directly king-linked: some `a, b ∈ S` with `a.2 = t`,
+`b.2 = t+1`, `kingAdj a b`. (King-connectivity forces an edge across the
+`t`/`t+1` cut; a king edge across it lands exactly on the two rows.) The reverse
+direction — reconstructing connectivity from per-row links — is deferred to the
+step (e) bijection. -/
+lemma canonical_consecutive_rows_linked {n H : ℕ} {S : Finset (ℤ × ℤ)}
+    (hS : IsCanonical n H S) {t : ℤ} (h0 : 0 ≤ t) (hH : t + 1 ≤ (H : ℤ) - 1) :
+    ∃ a b, a ∈ S ∧ b ∈ S ∧ kingAdj a b ∧ a.2 = t ∧ b.2 = t + 1 := by
+  obtain ⟨pmin, hminS, hmin⟩ := hS.2.2.2.2.2.1
+  obtain ⟨pmax, hmaxS, hmax⟩ := hS.2.2.2.2.2.2.2
+  have hconn := hS.2.1 pmin hminS pmax hmaxS
+  exact exists_adj_cross_of_reflTransGen Prod.snd (fun _ _ hab => hab.2.2)
+    hconn (by omega) (by omega)
+
 /-- A `ℕ`-valued sum over a finset equals `1` iff exactly one summand is `1` and
 the rest are `0`. -/
-private theorem exists_unique_of_sum_eq_one {β : Type*} [DecidableEq β]
+private theorem exists_unique_of_sum_eq_one {β : Type*}
     {s : Finset β} {f : β → ℕ} (hsum : ∑ b ∈ s, f b = 1) :
     ∃ a ∈ s, f a = 1 ∧ ∀ b ∈ s, b ≠ a → f b = 0 := by
+  classical
   obtain ⟨a, ha, hfa⟩ :=
     Finset.exists_ne_zero_of_sum_ne_zero (s := s) (f := f) (by omega)
   have hle : f a ≤ ∑ b ∈ s, f b := Finset.single_le_sum (fun i _ => Nat.zero_le _) ha

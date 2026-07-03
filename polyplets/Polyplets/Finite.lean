@@ -53,6 +53,28 @@ lemma exists_y_eq_of_cross {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ
     (hp : p.2 ≤ k) (hq : k + 1 ≤ q.2) : ∃ c ∈ S, c.2 = k :=
   exists_proj_eq_of_cross Prod.snd (fun _ _ hab => hab.2.2) h hp hq
 
+/-- **The crossing step is a king edge.** Strengthening `exists_proj_eq_of_cross`
+to return the whole boundary-crossing *edge*: a king path from `proj ≤ k` to
+`proj ≥ k+1` contains a king-adjacent pair `a, b ∈ S` with `proj a = k` and
+`proj b = k+1` (the step can only move `proj` by one, so it lands squarely on
+the boundary). This is the forward half of the row-connectivity picture. -/
+lemma exists_adj_cross_of_reflTransGen {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
+    (proj : ℤ × ℤ → ℤ)
+    (hlip : ∀ a b : ℤ × ℤ, kingAdj a b → |proj a - proj b| ≤ 1)
+    (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q)
+    (hp : proj p ≤ k) (hq : k + 1 ≤ proj q) :
+    ∃ a b, a ∈ S ∧ b ∈ S ∧ kingAdj a b ∧ proj a = k ∧ proj b = k + 1 := by
+  revert hq
+  induction h with
+  | refl => intro hq; exact absurd hq (by omega)
+  | @tail b c _ hbc ih =>
+      intro hq
+      by_cases hb : k + 1 ≤ proj b
+      · exact ih hb
+      · have h2 := hlip b c hbc.2.2
+        rw [abs_le] at h2
+        exact ⟨b, c, hbc.1, hbc.2.1, hbc.2.2, by omega, by omega⟩
+
 /-- **Uniform width bound.** In a canonical polyplet of `n` cells, every cell's
 x-coordinate is at most `n - 1`: the columns `0, 1, …, p.1` are all occupied
 (no skipped columns, by `exists_x_eq_of_cross` from the anchored `x = 0` cell),

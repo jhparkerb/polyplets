@@ -64,8 +64,10 @@ theorem T_n_nm1 (n : ℕ) (hn : 4 ≤ n) :
     --       (`canonical_row_occupied`), rows = [0,n-2] exactly, and the
     --       pigeonhole `row_profile_one_doubled` (exactly one row holds two
     --       cells, every other exactly one).
-    --   (c) Connectivity ⟺ every consecutive row pair shares a king-adjacent
-    --       cross-pair (king steps span ±1 row; all rows occupied).
+    --   (c) ~ Connectivity ⟹ every consecutive row pair shares a king-adjacent
+    --       cross-pair — forward direction done (`RowProfile.lean`,
+    --       `canonical_consecutive_rows_linked`). Reverse (links ⟹ connected)
+    --       deferred to the (e) construction.
     --   (d) The doubled row's two cells are at column gap 1 or 2 (gap ≥ 3
     --       disconnects).
     --   (e) Bijection to (doubled-row position × gap × offset chain), giving
