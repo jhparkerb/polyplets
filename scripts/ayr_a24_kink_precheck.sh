@@ -5,11 +5,13 @@
 # -- this is just an early kink-kernel correctness read at a24 scale, using
 # ayr while it's idle.
 #
-# Predicted cost: a(24)'s dominant real height (H16) measured 285979 cpu_s /
-# 4870.3s wall on dalby's 80 cores (~73% parallel efficiency). Scaled to
-# ayr's 32 cores at similar efficiency: ~12200s (~3.4h) wall for H16, plus
-# small change for the rest. This is an extrapolation, not a measurement --
-# real wall may differ.
+# Predicted cost: current code's closed-form diagonal covers k=2..11 at
+# maxn=24 (diagonalStripValid, orchestrator/sweep.go), so the real column
+# sweep only needs to reach H=12 (not H=16, which was the dominant height in
+# a24's ORIGINAL run before P8-P11 were wired). The a(20) kink gate already
+# measured this code's cost at a comparable top real height (H=10): 30s
+# total wall on ayr. H=12 is two heights taller; expect low minutes, not
+# hours. Measured (not extrapolated from the stale historical a24 H16 run).
 #
 # RAM: 32 cores x 1 GiB/worker = 32 GiB cap, well inside ayr's 78 GiB
 # (matches the a26-a29 precedent: total*margin/cores ~ 78*0.4/32 ~ 1GiB).
