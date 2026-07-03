@@ -991,7 +991,20 @@ func mapPhase(
 		kernel = "kink"
 	}
 
+	// Units seed a Cores-wide pull queue (each = one map_worker fork+exec). The
+	// default Cores*UnitMult over-provisions a SMALL frontier: SampleKeysMulti
+	// would still cut it into that many ranges and we'd spawn a worker per range,
+	// most handling near-zero records. Measured at a30 H17: declining/tail columns
+	// fork+exec'd ~6000 workers to transform a few hundred states. Cap units so
+	// each carries >= minPerUnit records; peak/mid columns (large frontier) keep
+	// the full count and are unaffected. Partition count doesn't affect the
+	// result, so this is behavior-preserving.
+	frontierIn := sumFrontierRecords(frontier)
 	numUnits := cfg.Cores * unitMult(cfg)
+	const minPerUnit = 2048
+	if capUnits := int((frontierIn + minPerUnit - 1) / minPerUnit); capUnits < numUnits {
+		numUnits = capUnits
+	}
 	if numUnits < 1 {
 		numUnits = 1
 	}
@@ -1006,7 +1019,6 @@ func mapPhase(
 	// core's fair share (design sweet spot ≈ 0.05).  0 ⇒ stealing off.  The
 	// activeHeights dynamic gate (stealAllowed) is checked separately, per
 	// decision, in pickVictim — not folded in here, since it can change mid-column.
-	frontierIn := sumFrontierRecords(frontier)
 	var grainRecs uint64
 	stealConfigured := cfg.StealGrain > 0 && cfg.Cores > 1 && stage != "seed" && stage != "finalize"
 	if stealConfigured && frontierIn > 0 {
