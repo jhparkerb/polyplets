@@ -753,33 +753,51 @@ func sweepHeightKink(
 
 		// runRound executes one map+merge round of the column's stage sequence
 		// and folds its accounting into colAcct/colMap*/colMerge*. name is only
-		// used in error messages.
-		runRound := func(name string, in []string, mapKeyLen int, stage string, mergeKeyLen int) ([]string, []map[int]map[int]*big.Int, error) {
+		// used in error messages and per-round telemetry. When mergeless is set
+		// (the seed round only), the merge barrier is skipped: kinkSeedStage0
+		// appends a CONSTANT key suffix, so each map unit's output covers a
+		// disjoint key range and is internally sorted+deduplicated — their
+		// concatenation IS the sorted stage-0 table, and a merge would be a pure
+		// pass-through fork over the column's largest frontier (invariant gated
+		// in test/gate_kink_column.cpp testSeedOutputSortedAndUnique).
+		runRound := func(name string, in []string, mapKeyLen int, stage string, mergeKeyLen int, mergeless bool) ([]string, []map[int]map[int]*big.Int, error) {
+			frontierRecs := sumFrontierRecords(in)
 			t0 := time.Now()
 			mapOuts, triContribs, mapAcct, err := mapPhase(ctx, cfg, H, col, in, tel, sem, activeHeights, mapKeyLen, stage)
 			if err != nil {
 				return nil, nil, fmt.Errorf("H=%d col=%d kink %s map: %w", H, col, name, err)
 			}
+			roundMapWall := time.Since(t0).Seconds()
 			colAcct.Add(mapAcct)
-			colMapWall += time.Since(t0).Seconds()
+			colMapWall += roundMapWall
 			colMapCPU += mapAcct.CPUS
 			nMapUnits += len(mapOuts)
+
+			if mergeless {
+				tel.observeRound(H, col, name, frontierRecs, roundMapWall, mapAcct.CPUS, 0, 0, len(mapOuts), 0)
+				return mapOuts, triContribs, nil
+			}
+
 			t1 := time.Now()
 			mergeOuts, _, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem, mergeKeyLen, stage)
 			removeRuns(mapOuts)
 			if err != nil {
 				return nil, nil, fmt.Errorf("H=%d col=%d kink %s merge: %w", H, col, name, err)
 			}
+			roundMergeWall := time.Since(t1).Seconds()
 			colAcct.Add(mergeAcct)
-			colMergeWall += time.Since(t1).Seconds()
+			colMergeWall += roundMergeWall
 			colMergeCPU += mergeAcct.CPUS
 			nMergeRanges += len(mergeOuts)
+			tel.observeRound(H, col, name, frontierRecs, roundMapWall, mapAcct.CPUS, roundMergeWall, mergeAcct.CPUS, len(mapOuts), len(mergeOuts))
 			return mergeOuts, triContribs, nil
 		}
 
 		// Seed: H+2 -> H+4, harvests this column's completions (classify happens
-		// here, at column START — see the design doc's kink_tm.cpp re-read).
-		stageTable, triContribs, err := runRound("seed", frontier, inKeyLen, "seed", stageKeyLen)
+		// here, at column START — see the design doc's kink_tm.cpp re-read). The
+		// merge is skipped (mergeless): the constant-suffix transform leaves the
+		// per-unit map outputs already sorted + collision-free across ranges.
+		stageTable, triContribs, err := runRound("seed", frontier, inKeyLen, "seed", stageKeyLen, true)
 		if err != nil {
 			stopHB()
 			writeCheckpoint(H, col-1, frontier, hTri)
@@ -791,7 +809,7 @@ func sweepHeightKink(
 		// carry transfer (core/kink.h's kinkStageTransition via
 		// map_shard_stage_file).
 		for r := 0; r < H; r++ {
-			next, _, err := runRound(fmt.Sprintf("stage %d", r), stageTable, stageKeyLen, strconv.Itoa(r), stageKeyLen)
+			next, _, err := runRound(fmt.Sprintf("stage%d", r), stageTable, stageKeyLen, strconv.Itoa(r), stageKeyLen, false)
 			removeRuns(stageTable)
 			if err != nil {
 				stopHB()
@@ -803,7 +821,7 @@ func sweepHeightKink(
 
 		// Finalize: H+4 -> H+2, drop the carry (stranding-checked), canonicalize,
 		// prune, fold — this column's contribution to the next column's frontier.
-		nextFrontier, _, err := runRound("finalize", stageTable, stageKeyLen, "finalize", inKeyLen)
+		nextFrontier, _, err := runRound("finalize", stageTable, stageKeyLen, "finalize", inKeyLen, false)
 		removeRuns(stageTable)
 		stopHB()
 		if err != nil {

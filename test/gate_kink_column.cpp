@@ -205,6 +205,39 @@ static void assertRowEqual(const std::vector<W>& a, const std::vector<W>& b,
   }
 }
 
+// Invariant the orchestrator's seed-round merge-skip depends on: because
+// kinkSeedStage0 appends a CONSTANT 2-byte suffix, a src that is sorted +
+// deduplicated at H+2 yields a stage-0 table already sorted + collision-free
+// at H+4. This lets sweepHeightKink hand the per-range seed map outputs
+// straight to stage 0 (disjoint key ranges, each internally sorted) with no
+// merge barrier. If this ever failed, that concatenation would be unsorted or
+// carry duplicate keys and the sweep would miscount. The threat is a seed that
+// MUTATES the boundary prefix (b[0..H)) — canonicalize/relabel/drop a cell —
+// which can collide or reorder distinct source keys; a varying SUFFIX cannot
+// (it sorts after the already-distinct prefix). Red-verified: zeroing a prefix
+// byte in kinkSeedStage0 makes the strict-increase check below fire.
+static void testSeedOutputSortedAndUnique() {
+  std::mt19937 rng(20260703u);
+  for (int H = 4; H <= 10; ++H) {
+    const int maxn = H + 4;
+    for (int trial = 0; trial < 5; ++trial) {
+      Run<W> src = randomColumnTable(rng, H, maxn, 40);  // sorted+deduped @ H+2
+      TriangleRow<W> out(H, maxn);
+      Run<W> stage0 = kinkSeedStage0<W, ClassifyTriangle>(src, H, out);
+      const int kLen = kinkKeyLen(H);
+      for (size_t i = 1; i < stage0.size(); ++i) {
+        if (sigCmp(stage0[i - 1].sig.b, stage0[i].sig.b, kLen) >= 0) {
+          std::fprintf(stderr,
+                       "gate_kink_column FAIL (seed-sorted-unique): H=%d "
+                       "records %zu,%zu not strictly increasing at keyLen %d\n",
+                       H, i - 1, i, kLen);
+          std::abort();
+        }
+      }
+    }
+  }
+}
+
 static void testAgainstGroundTruth() {
   std::mt19937 rng(20260702u);
   for (int H = 4; H <= 10; ++H) {
@@ -232,5 +265,6 @@ static void testAgainstGroundTruth() {
 
 int main() {
   testAgainstGroundTruth();
+  testSeedOutputSortedAndUnique();
   std::puts("gate_kink_column PASS");
 }
