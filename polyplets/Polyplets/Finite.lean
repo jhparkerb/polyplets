@@ -22,20 +22,36 @@ lies in the box `[0, n-1] × [0, H-1]`. The height bounds are handed to us by
 
 namespace Polyplets
 
-/-- **King paths don't skip columns.** If a king path inside `S` runs from a
-cell with `x ≤ k` to a cell with `x ≥ k+1`, then some cell of `S` sits exactly
-at `x = k`: the step that crosses the `k`/`k+1` boundary lands on it. -/
-lemma exists_x_eq_of_cross {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
+/-- **King paths don't skip a coordinate value.** For any `1`-Lipschitz
+coordinate `proj` (king steps move it by at most one), if a king path inside `S`
+runs from a cell with `proj ≤ k` to a cell with `proj ≥ k+1`, then some cell of
+`S` sits exactly at `proj = k`: the step crossing the `k`/`k+1` boundary lands
+on it. Instantiated at `Prod.fst`/`Prod.snd` for columns and rows below. -/
+lemma exists_proj_eq_of_cross {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
+    (proj : ℤ × ℤ → ℤ)
+    (hlip : ∀ a b : ℤ × ℤ, kingAdj a b → |proj a - proj b| ≤ 1)
     (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q)
-    (hp : p.1 ≤ k) (hq : k + 1 ≤ q.1) : ∃ c ∈ S, c.1 = k := by
+    (hp : proj p ≤ k) (hq : k + 1 ≤ proj q) : ∃ c ∈ S, proj c = k := by
   revert hq
   induction h with
   | refl => intro hq; exact absurd hq (by omega)
   | @tail b c _ hbc ih =>
       intro hq
-      by_cases hb : k + 1 ≤ b.1
+      by_cases hb : k + 1 ≤ proj b
       · exact ih hb
-      · exact ⟨b, hbc.1, by have h2 := hbc.2.2.2.1; rw [abs_le] at h2; omega⟩
+      · exact ⟨b, hbc.1, by have h2 := hlip b c hbc.2.2; rw [abs_le] at h2; omega⟩
+
+/-- Column specialization of `exists_proj_eq_of_cross` (`proj = Prod.fst`). -/
+lemma exists_x_eq_of_cross {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
+    (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q)
+    (hp : p.1 ≤ k) (hq : k + 1 ≤ q.1) : ∃ c ∈ S, c.1 = k :=
+  exists_proj_eq_of_cross Prod.fst (fun _ _ hab => hab.2.1) h hp hq
+
+/-- Row specialization of `exists_proj_eq_of_cross` (`proj = Prod.snd`). -/
+lemma exists_y_eq_of_cross {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
+    (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q)
+    (hp : p.2 ≤ k) (hq : k + 1 ≤ q.2) : ∃ c ∈ S, c.2 = k :=
+  exists_proj_eq_of_cross Prod.snd (fun _ _ hab => hab.2.2) h hp hq
 
 /-- **Uniform width bound.** In a canonical polyplet of `n` cells, every cell's
 x-coordinate is at most `n - 1`: the columns `0, 1, …, p.1` are all occupied

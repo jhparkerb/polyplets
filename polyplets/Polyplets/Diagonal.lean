@@ -60,9 +60,10 @@ theorem T_n_nm1 (n : ℕ) (hn : 4 ≤ n) :
     --     `T_eq_toFinset_card` (so `T` is a genuine `Finset.card`, above).
     -- The remaining combinatorial core (docs/proofs/T-n-nm1.md), still to
     -- formalize as reusable infrastructure:
-    --   (b) Row profile: for each row y, its set of x-coordinates. Structure
-    --       lemma — height n-1 with n cells forces all n-1 rows occupied and
-    --       *exactly one* row doubled, the rest singletons.
+    --   (b) ✓ Row profile — `Polyplets/RowProfile.lean`: all n-1 rows occupied
+    --       (`canonical_row_occupied`), rows = [0,n-2] exactly, and the
+    --       pigeonhole `row_profile_one_doubled` (exactly one row holds two
+    --       cells, every other exactly one).
     --   (c) Connectivity ⟺ every consecutive row pair shares a king-adjacent
     --       cross-pair (king steps span ±1 row; all rows occupied).
     --   (d) The doubled row's two cells are at column gap 1 or 2 (gap ≥ 3
