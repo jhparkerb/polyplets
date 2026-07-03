@@ -3,7 +3,7 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Mathlib
+import Polyplets.Defs
 
 /-!
 # Diagonal closed forms for fixed polyplets (A006770)
@@ -32,10 +32,9 @@ Paper proofs:
   leans on is the open prize (see the Fable review, 2026-07-03).
 
 ## Roadmap
-0. Replace the `opaque T` placeholder with the real definition: the king graph
-   on `ℤ × ℤ`, `SimpleGraph.Connected` on the induced subgraph over a `Finset`,
-   a canonical translate to pin the up-to-translation quotient, and
-   bounding-box height. (This file only *states* the targets.)
+0. ✓ **Done** — `T` is defined in `Polyplets/Defs.lean` (king adjacency,
+   `ReflTransGen` connectivity staying inside the set, origin-anchored
+   canonical form, `ncard`). Validated by `Polyplets/Sanity.lean` (`T 1 1 = 1`).
 1. Prove `T_n_nm1` (`k = 1`).
 2. Prove `T_n_nm2` (`k = 2`).
 3. State and prove the general-`k` factorization lemma — the real theorem the
@@ -43,13 +42,6 @@ Paper proofs:
 -/
 
 namespace Polyplets
-
-/-- Number of fixed polyplets of `n` cells whose bounding box has height
-exactly `H`.
-
-**PLACEHOLDER.** Roadmap step 0 replaces this `opaque` stub with the real
-`Finset (ℤ × ℤ)` definition; every theorem below is `sorry` until then. -/
-opaque T : ℕ → ℕ → ℕ
 
 /-- **k = 1 diagonal.** `T(n, n-1) = (25n - 45) · 3^(n-4)` for `n ≥ 4`
 (the statement is true for `n ≥ 3` via the negative exponent; we take the
