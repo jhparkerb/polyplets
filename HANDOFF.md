@@ -1,5 +1,33 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-03 — kink-carry VALIDATED at a29 scale (Phase 3 done)
+
+`orchestrate --maxn 29 --kernel kink` on dalby (u128, 80 cores, **wall
+1932s / ~32min**), then `combine --diff-b` vs the banked column-kernel
+`results/ns_a29/perheight`: **combine_diff PASS (29 heights)** — every
+T(n,H) cell H=1..29 matches. Kink is a genuinely independent transition
+impl (per-cell union-find + NW carry vs per-column), so a full cell match
+is the independent-reimplementation closure the a23-validation plan names —
+retroactively hardens a21-a29 and clears kink for a30. (The TOTAL_MISMATCH
+in the run log was a CRLF artifact in the banked triangle.txt — fixed
+ab55eb4; diff -w IDENTICAL; the per-cell diff is authoritative.) a24 kink
+total also matched certified earlier.
+
+**Perf (for optimize task):** kink a29 = **13.6x faster wall** (32min vs
+column's 7.28h) and **~46x less CPU** (42k vs 1.96M cpu-s). Wall win < CPU
+win because of process churn — H16 fans out ~5760 worker spawns/column
+(~18x the column kernel), so only ~28 of 80 cores effective. Fixing churn
+(batch stage-rounds per worker / persistent workers) is the lever; at full
+utilization a29 kink would be ~10min.
+
+Scripts: `scripts/kink_validate.sh` (kink run + cell-diff vs existing
+column per-height). Pushed to origin (kink-carry). dalby still on bundles
+(passphrase-agent fix pending, jasonp does when dalby idle).
+
+Next per plan: simplify kink code → optimize (churn) → a30.
+
+---
+
 ## 2026-07-03 — gate hardening: ns-gate-spill "failure" was fd limit, not kink-carry
 
 While starting Design 14 Phase 3 (validate kink-carry via a(29)), `make
