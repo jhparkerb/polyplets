@@ -229,3 +229,32 @@ step. Actual shape, settled with jasonp before coding (see the plan file
 - Spill/zstd on the frontier path: intermediates stay in RAM; only the
   (~1000× smaller) end-of-column frontier can spill, and only past the D_H RAM
   wall (~a35+). Spill becomes a distant-scale concern, not a per-term cost.
+
+## Simplification backlog (deferred from the 2026-07-03 /simplify pass)
+Recorded rather than applied — each touches the a29-validated kink path, so
+they wait for a deliberate Phase-3/4 touch of these files, not a cleanup pass.
+- **Typed round descriptor (altitude).** `orchestrator/sweep.go`'s `stage
+  string` is an untyped sentinel doing triple duty: kernel selection
+  (`stage != ""` → kink), output-filename disambiguation (mapPhase/mergePhase),
+  and the steal gate (`stage != "seed" && stage != "finalize"`). Replace with a
+  `round{ keyLen int; stage string; steal bool }` built once per round at the
+  `sweepHeightKink` call site and threaded as one value, so mapPhase/mergePhase
+  read fields instead of pattern-matching the string across the Go/C++ boundary.
+  Folds in the "seed/finalize aren't SIGTERM-stoppable" invariant as the
+  explicit `steal` flag, and lets `MapArgs.Kernel` (derived from `Stage != ""`)
+  be dropped.
+- **Shared map-shard shell (reuse).** `core/kink.h map_shard_stage_file`
+  re-implements `core/mapreduce.h map_shard_file`'s whole shell (do_spill lambda,
+  K-way heap merge/dedup, progress-pulse + SIGTERM stop-key, single-spill
+  fast-path) — only the per-record body differs (kinkStageTransition vs the
+  column transition, no Classifier). A templated shell parameterised on the
+  emit step would remove the two-copies-must-evolve-together tax (the zstd flag
+  + fast-path already had to be patched into both). Large, hot-path — defer.
+- **columnKeyLen(H) in core/kink.h.** C++ hardcodes bare `H + 2` (map_worker.cpp
+  ~227,233,245,249) where Go has a named `columnKeyLen`; add the symmetric
+  helper next to `kinkKeyLen` so the key-width literals are named. Trivial rename.
+- **Shared kink test-util header.** SigLess/DenseMap/toDense are duplicated
+  across the four `test/gate_kink*` gates; extract to `test/kink_test_util.h`.
+  NOTE the divergences to reconcile first: gate_kink_column has a no-carry
+  `randomMixedState` (H+2 world) and gate_kink_worker_cli uses a 2-arg
+  `assertDenseEqual` vs the others' 3-arg. Tests-only, low risk once reconciled.

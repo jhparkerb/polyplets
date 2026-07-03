@@ -76,6 +76,22 @@ func newBigRow(n int) []*big.Int {
 	return row
 }
 
+// addTriContribs folds a column's per-cell triangle contributions into the
+// running height row hTri, dropping any n outside [0, maxn]. Shared by the
+// column and kink sweep drivers (which both accumulate contributions only
+// after the column's merge succeeds).
+func addTriContribs(hTri []*big.Int, triContribs []map[int]map[int]*big.Int, maxn int) {
+	for _, hm := range triContribs {
+		for _, nm := range hm {
+			for n, v := range nm {
+				if n >= 0 && n <= maxn {
+					hTri[n].Add(hTri[n], v)
+				}
+			}
+		}
+	}
+}
+
 // copyBigRow deep-copies a []*big.Int row so the result doesn't alias the
 // source's *big.Int pointers (mutating one via .Add must not mutate both).
 func copyBigRow(src []*big.Int) []*big.Int {
@@ -605,15 +621,7 @@ func sweepHeight(
 		acct.Add(mergeAcct)
 
 		// Both map and merge succeeded: now accumulate this col's contributions.
-		for _, hm := range triContribs {
-			for _, nm := range hm {
-				for n, v := range nm {
-					if n >= 0 && n <= cfg.Maxn {
-						hTri[n].Add(hTri[n], v)
-					}
-				}
-			}
-		}
+		addTriContribs(hTri, triContribs, cfg.Maxn)
 
 		oldFrontier := frontier
 		oldMapOuts := mapOuts
@@ -777,15 +785,7 @@ func sweepHeightKink(
 			writeCheckpoint(H, col-1, frontier, hTri)
 			return hTri, acct, err
 		}
-		for _, hm := range triContribs {
-			for _, nm := range hm {
-				for n, v := range nm {
-					if n >= 0 && n <= cfg.Maxn {
-						hTri[n].Add(hTri[n], v)
-					}
-				}
-			}
-		}
+		addTriContribs(hTri, triContribs, cfg.Maxn)
 
 		// H mid-column stage rounds: H+4 -> H+4, the per-cell king-adjacency
 		// carry transfer (core/kink.h's kinkStageTransition via

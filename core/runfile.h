@@ -376,7 +376,7 @@ class RunFileReader {
       : H_(H), keyLen_((keyLen == 0) ? H + 2 : keyLen),
         fp_(nullptr), records_(0), records_read_(0),
         crc_(FNV_OFFSET), path_(path), seeked_(false),
-        version_(1), compressed_(false) {
+        compressed_(false) {
     fp_ = std::fopen(path.c_str(), "rb");
     if (!fp_) {
       std::fprintf(stderr, "RunFileReader: cannot open %s\n", path.c_str());
@@ -506,7 +506,6 @@ class RunFileReader {
   uint64_t crc_;
   std::string path_;
   bool seeked_;
-  int  version_;
   bool compressed_;
 #ifdef POLY_ZSTD
   ZSTD_DStream* dctx_ = nullptr;
@@ -582,7 +581,6 @@ class RunFileReader {
       if (ln == 0) break;  // blank line = end of header
       if (std::strncmp(line, "POLYRUN ", 8) == 0) {
         saw_polyrun = true;
-        version_ = std::atoi(line + 8);
       }
       else if (std::strncmp(line, "compression ", 12) == 0)
         // Absent = 0 (plain, old files). 1 = zstd frame body.
