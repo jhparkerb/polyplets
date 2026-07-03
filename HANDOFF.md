@@ -1,5 +1,36 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-02 (later) — a(29) lands, dalby free; a24 kink precheck PASSED
+
+**a(29) = 33145129805782422061325** landed dalby-solo (PID 2243059, rev
+`7e28071`), wall **26202.2s (~7.28h)**, 80 cores. Combined+validated:
+a(1)-a(20) byte-match the b-file, a(21)-a(28) match certified results
+(including this session's a28), growth a29/a28 = 6.8700 (monotone, still
+rising toward λ≈7.1). Banked to `results/ns_a29/` and committed
+(`74478be`), not yet pushed. **dalby is now free**, no live jobs.
+
+**Design 14 Phase 3 ayr pre-check PASSED** while waiting on dalby:
+`scripts/ayr_a24_kink_precheck.sh` ran `orchestrate --maxn 24 --kernel
+kink` on ayr, rc=0 in **232s**. Total value byte-matched
+`results/ns_a24/a_n.txt`. Note this ran fast because current code's
+closed-form diagonal (P8-P11, k=2..12) now covers heights down to H=13 at
+maxn=24 — the real sweep only needed to reach H=12, unlike the *historical*
+column-kernel a(24) run (predates P8-P11) whose dominant real height was
+H16. Don't reuse that old H16 timing as a cost basis for kink-kernel runs
+on current code — the closed-form coverage has grown since. This was a
+total-value check only, not the full per-height cell diff (`combine
+--diff-b`) the formal Phase 3 gate does.
+
+**Both dalby and ayr are free now.** Next candidates: Design 14 Phase 3
+proper (dalby-scale `--kernel kink --compare`, full cell diff + retune) or
+a(30) per [[a26-a30-diagonal-plan]] ([[a26-a30-diagonal-plan]] memory) —
+either needs jasonp's go-ahead before launching (both would run >1h).
+ayr's worktree is still on `kink-carry` (rev `30c5580`) — resync to
+`next-system` before its next production a(n) run, if that's what's picked
+next.
+
+---
+
 ## 2026-07-02 (post-/clear) — a(28) landed on ayr; dalby a(29) still running
 
 **a(28) = 4824589228356722264087** (first sextillion term) was sitting
