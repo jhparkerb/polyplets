@@ -48,7 +48,33 @@ namespace Polyplets
 clean `n ≥ 4` regime here). Paper proof: `docs/proofs/T-n-nm1.md`. -/
 theorem T_n_nm1 (n : ℕ) (hn : 4 ≤ n) :
     (T n (n - 1) : ℚ) = (25 * (n : ℚ) - 45) * (3 : ℚ) ^ ((n : ℤ) - 4) := by
-  sorry
+  -- Combinatorial heart (docs/proofs/T-n-nm1.md): the ℕ-valued count. All the
+  -- real work — one doubled row, gap ∈ {1,2}, offset-chain product — is here.
+  have hcount : T n (n - 1) = (25 * n - 45) * 3 ^ (n - 4) := by
+    rw [T]
+    -- Goal: `{S | IsCanonical n (n-1) S}.ncard = (25n - 45) * 3^(n-4)`.
+    -- The combinatorial core (docs/proofs/T-n-nm1.md), still to formalize as
+    -- reusable infrastructure:
+    --   (a) Finiteness: the canonical set is finite (cells bounded by
+    --       0 ≤ x, 0 ≤ y ≤ n-2, and x ≤ n-1 by connectivity + n cells), so
+    --       `.ncard` is a genuine `Finset.card`.
+    --   (b) Row profile: for each row y, its set of x-coordinates. Structure
+    --       lemma — height n-1 with n cells forces all n-1 rows occupied and
+    --       *exactly one* row doubled, the rest singletons.
+    --   (c) Connectivity ⟺ every consecutive row pair shares a king-adjacent
+    --       cross-pair (king steps span ±1 row; all rows occupied).
+    --   (d) The doubled row's two cells are at column gap 1 or 2 (gap ≥ 3
+    --       disconnects).
+    --   (e) Bijection to (doubled-row position × gap × offset chain), giving
+    --       (16+9)(n-3)·3^(n-4) + (4+1)·2·3·3^(n-4) = (25n-45)·3^(n-4).
+    sorry
+  -- Bridge the ℕ identity to the ℚ goal.
+  rw [hcount]
+  have hz : (n : ℤ) - 4 = ((n - 4 : ℕ) : ℤ) := by omega
+  rw [hz, zpow_natCast, Nat.cast_mul, Nat.cast_sub (by omega : 45 ≤ 25 * n),
+    Nat.cast_pow]
+  push_cast
+  ring
 
 /-- **k = 2 diagonal.** `T(n, n-2) = ½(625n² - 2459n + 1134) · 3^(n-7)` for
 `n ≥ 5`. Paper proof: `docs/proofs/T-n-nm2-and-general.md` §1 — a proof modulo
