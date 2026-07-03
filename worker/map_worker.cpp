@@ -45,6 +45,7 @@
 #include <string>
 #include <vector>
 
+#include "core/fdlimit.h"
 #include "core/kink.h"
 #include "core/kink_column.h"
 #include "core/libenum.h"
@@ -106,6 +107,7 @@ static volatile std::sig_atomic_t g_terminate = 0;
 static void on_sigterm(int) { g_terminate = 1; }
 
 int main(int argc, char** argv) {
+  raiseFdLimitToHard();  // the spill/merge path fans out to many open files
   std::signal(SIGTERM, on_sigterm);
 
   // ─── Arg parsing ────────────────────────────────────────────────────────────

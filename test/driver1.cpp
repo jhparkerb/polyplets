@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "core/fdlimit.h"
 #include "core/libenum.h"
 #include "worker/worker_util.h"
 
@@ -62,6 +63,7 @@ static std::string writeSeed(const std::string& dir, int H, int maxn,
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 int main(int argc, char** argv) {
+  raiseFdLimitToHard();  // the spill/merge path fans out to many open files
   int  maxn     = 14;
   bool fold     = false;
   bool compare  = true;

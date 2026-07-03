@@ -21,10 +21,12 @@
 #include <string>
 #include <vector>
 
+#include "core/fdlimit.h"
 #include "core/libenum.h"
 #include "worker/worker_util.h"
 
 int main(int argc, char** argv) {
+  raiseFdLimitToHard();  // the spill/merge path fans out to many open files
   std::string in_str, out_path, klo_hex, khi_hex, rev;
   std::string counter_arg = "u64";
   int H = 0;
