@@ -1,5 +1,45 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-03 — gate hardening: ns-gate-spill "failure" was fd limit, not kink-carry
+
+While starting Design 14 Phase 3 (validate kink-carry via a(29)), `make
+ns-gates` on dalby appeared to fail `ns-gate-spill` (wrong a(11)=39242406).
+**kink-carry was NOT the cause.** Controlled A/B (scripts/gate_spill_ab.sh,
+same box/gcc): `next-system` fails it IDENTICALLY. Root cause = `ulimit -n
+1024`: the `--ram 1MB` gate forces >1024 simultaneous spill files, fopen
+fails. Proven: `ulimit -n 8192` -> gate passes, spill bytes = 567231991
+(matches gympie's correct-behavior reference). Does not affect production
+(1GB/worker -> few big files; a(29) validated fine).
+
+It exposed a real **fail-OPEN** bug though: `core/runfile.h`
+RunFileWriter/mergeRunFiles silently DROPPED data on open failure (append()
+no-op'd, finalize() returned 0) -> plausible undercount with no signal. For
+a(30)+ (no --compare oracle) that's a silent-corruption hazard, violating
+the fail-closed rule.
+
+**Fixed + committed on kink-carry** (red->green->headroom in git log):
+- `77102d7` RED: gate_runfile fork-based fail-closed tests (writer + merge
+  open-failure must abort). Failing at that commit by construction.
+- `9ee3050` GREEN: RunFileWriter constructor + mergeRunFiles now `exit(1)`
+  on open failure instead of dropping data.
+- `f75c0b7` `core/fdlimit.h` `raiseFdLimitToHard()` (setrlimit soft->hard,
+  no root; both boxes' hard cap >=524288), called from driver1/map_worker/
+  merge_worker main().
+- `5aec4cf` the A/B diagnostic script.
+
+**VERIFIED:** full `make ns-gates` GREEN on dalby (gcc 15) at default
+`ulimit -n 1024` — gate_spill + gate_runfile + all four kink gates pass.
+dalby is at kink-carry `5aec4cf`. **ayr is stale** (kink-carry `30c5580`,
+lacks these fixes) — sync before it does any task-5 work.
+
+**Not yet done:** the actual dalby-scale a(29)/a24 `--kernel kink` cell-diff
+run (the real Phase 3 validation) — a compute job needing go-ahead. Nothing
+capability-blocks trusting kink-carry: the a(20) `--kernel kink --compare`
+production-path gate already passed. Nothing pushed to origin (github sync
+broken on all boxes — task #1).
+
+---
+
 ## 2026-07-02 (later) — a(29) lands, dalby free; a24 kink precheck PASSED
 
 **a(29) = 33145129805782422061325** landed dalby-solo (PID 2243059, rev
