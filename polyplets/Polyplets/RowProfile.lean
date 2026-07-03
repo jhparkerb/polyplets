@@ -152,4 +152,29 @@ theorem row_profile_one_doubled {n : ℕ} {S : Finset (ℤ × ℤ)} (hn : 2 ≤ 
     have := hg1 y hyR
     omega
 
+/-- **Step (d)/(e) prep: the two doubled cells.** Materializes the doubled row's
+two cells as an ordered pair `c1.1 < c2.1`, both in `S` on row `y0`, together
+with the characterization that they are the *only* cells on that row. -/
+theorem row_profile_doubled_cells {n : ℕ} {S : Finset (ℤ × ℤ)} (hn : 2 ≤ n)
+    (hS : IsCanonical n (n - 1) S) :
+    ∃ y0 ∈ Finset.Icc (0 : ℤ) ((↑(n - 1) : ℤ) - 1), ∃ c1 c2 : ℤ × ℤ,
+      c1 ∈ S ∧ c2 ∈ S ∧ c1.2 = y0 ∧ c2.2 = y0 ∧ c1.1 < c2.1 ∧
+      (∀ c ∈ S, c.2 = y0 → c = c1 ∨ c = c2) := by
+  obtain ⟨y0, hy0R, hy0two, _⟩ := row_profile_one_doubled hn hS
+  rw [Finset.card_eq_two] at hy0two
+  obtain ⟨a, b, hab, hfilter⟩ := hy0two
+  have ha : a ∈ S.filter (fun c => c.2 = y0) := by rw [hfilter]; simp
+  have hb : b ∈ S.filter (fun c => c.2 = y0) := by rw [hfilter]; simp
+  rw [Finset.mem_filter] at ha hb
+  have hmem : ∀ c ∈ S, c.2 = y0 → c = a ∨ c = b := by
+    intro c hcS hcy
+    have hc : c ∈ S.filter (fun c => c.2 = y0) := Finset.mem_filter.mpr ⟨hcS, hcy⟩
+    rw [hfilter, Finset.mem_insert, Finset.mem_singleton] at hc
+    exact hc
+  have hne1 : a.1 ≠ b.1 := fun h => hab (Prod.ext_iff.mpr ⟨h, ha.2.trans hb.2.symm⟩)
+  refine ⟨y0, hy0R, ?_⟩
+  rcases lt_or_gt_of_ne hne1 with h | h
+  · exact ⟨a, b, ha.1, hb.1, ha.2, hb.2, h, hmem⟩
+  · exact ⟨b, a, hb.1, ha.1, hb.2, ha.2, h, fun c hcS hcy => (hmem c hcS hcy).symm⟩
+
 end Polyplets
