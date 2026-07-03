@@ -80,6 +80,10 @@ struct Counter {
   std::vector<int> stamp;        // BFS visited stamp per cell
   int curStamp = 0;
   std::vector<int> bfsStack;     // reused BFS work buffer (no per-node alloc)
+  std::vector<int> list;         // shared untried pool (no per-node alloc): a
+                                 // node owns list[start..end); its children
+                                 // append new neighbours past end, so each
+                                 // child's untried range stays contiguous.
   std::vector<u64> counts;
 
   int cellIdx(int x, int y) const { return (y - lo) * gridW + (x - lo); }
@@ -182,24 +186,28 @@ struct Counter {
     }
   }
 
-  void search(int root, std::vector<int> untried, int w) {
+  // Allocation-free Redelmeier over the shared `list` pool. This node owns the
+  // untried range list[start..end); it tries each candidate forward, appending
+  // a candidate's newly-reached neighbours past the current end so the child's
+  // untried range list[i+1..newEnd) is a single contiguous slice — no per-node
+  // vector copy (the old `next = untried` + `newly` was ~3 heap allocs/node).
+  // On backtrack the appended tail is unmarked and truncated. Forward vs the
+  // old LIFO order changes traversal, not the multiset of animals counted.
+  void search(int root, int start, int w) {
     if (connectedAndAnchored()) counts[w] += 1;
-    while (!untried.empty()) {
-      const int v = untried.back(); untried.pop_back();
+    const int end = static_cast<int>(list.size());
+    for (int i = start; i < end; ++i) {
+      const int v = list[i];
       const int nw = w + weight[v];
-      if (nw <= maxn) {
-        std::vector<int> next = untried;
-        std::vector<int> newly;
-        for (int u : adj[v]) {
-          if (u > root && !reached[u]) {
-            reached[u] = 1; newly.push_back(u); next.push_back(u);
-          }
-        }
-        addOrbit(v);
-        search(root, std::move(next), nw);
-        removeOrbit(v);
-        for (int u : newly) reached[u] = 0;
+      if (nw > maxn) continue;
+      for (int u : adj[v]) {
+        if (u > root && !reached[u]) { reached[u] = 1; list.push_back(u); }
       }
+      addOrbit(v);
+      search(root, i + 1, nw);
+      removeOrbit(v);
+      for (int k = end; k < static_cast<int>(list.size()); ++k) reached[list[k]] = 0;
+      list.resize(end);
     }
   }
 
@@ -211,16 +219,18 @@ struct Counter {
     reached.assign(V, 0);
     curStamp = 0;
     curCells.clear();
+    list.clear();
+    list.reserve(V);
     for (int r = 0; r < V; ++r) {
       if (weight[r] > maxn) continue;
       for (int i = 0; i < V; ++i) reached[i] = 0;
       reached[r] = 1;
       addOrbit(r);
-      std::vector<int> untried;
+      list.clear();
       for (int u : adj[r]) {
-        if (u > r && !reached[u]) { reached[u] = 1; untried.push_back(u); }
+        if (u > r && !reached[u]) { reached[u] = 1; list.push_back(u); }
       }
-      search(r, std::move(untried), weight[r]);
+      search(r, 0, weight[r]);
       removeOrbit(r);
     }
   }
