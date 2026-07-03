@@ -177,4 +177,24 @@ theorem row_profile_doubled_cells {n : ℕ} {S : Finset (ℤ × ℤ)} (hn : 2 �
   · exact ⟨a, b, ha.1, hb.1, ha.2, hb.2, h, hmem⟩
   · exact ⟨b, a, hb.1, ha.1, hb.2, ha.2, h, fun c hcS hcy => (hmem c hcS hcy).symm⟩
 
+/-- **Step (d), neighbor confinement.** If a row `y0` holds exactly two cells
+`c1, c2` at column gap `≥ 2`, then any king-neighbour `b ∈ S` of `c1` lies in an
+*adjacent* row (`y0 ± 1`): it can't be on row `y0` (the only same-row candidate
+is `c2`, too far to be adjacent). This is the local fact behind the gap `≤ 2`
+disconnection — a would-be split cell's only bridges are the single cells in the
+neighbouring rows. -/
+lemma neighbor_off_row_of_gap {S : Finset (ℤ × ℤ)} {c1 c2 b : ℤ × ℤ} {y0 : ℤ}
+    (hc1 : c1.2 = y0) (hgap : c1.1 + 2 ≤ c2.1)
+    (honly : ∀ c ∈ S, c.2 = y0 → c = c1 ∨ c = c2)
+    (hbS : b ∈ S) (hadj : kingAdj c1 b) : b.2 = y0 - 1 ∨ b.2 = y0 + 1 := by
+  have hy : |c1.2 - b.2| ≤ 1 := hadj.2.2
+  rw [abs_le] at hy
+  by_cases hby : b.2 = y0
+  · exfalso
+    rcases honly b hbS hby with rfl | rfl
+    · exact hadj.1 rfl
+    · have hx : |c1.1 - b.1| ≤ 1 := hadj.2.1
+      rw [abs_le] at hx; omega
+  · omega
+
 end Polyplets
