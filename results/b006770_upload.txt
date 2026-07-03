@@ -1,4 +1,4 @@
-# A006770: number of fixed n-celled polyplets (king-move animals). a(1)-a(30).
+# A006770: number of fixed n-celled polyplets (king-move animals). a(1)-a(31).
 # Method (uniform): column/kink-carry transfer-matrix engine. Each maxn=N run
 # recomputes the whole height triangle T(n,H) -- low heights swept directly,
 # top heights via validated closed-form height-diagonals (P8-P12) -- and
@@ -6,7 +6,7 @@
 # through n=N-1.
 # Independent (two-algorithm) confirmation frontier: a(1)-a(19). a(19) agreed
 # byte-for-byte between Redelmeier generation and transfer matrix (same
-# SHA256). a(20)-a(30) are single-algorithm (transfer matrix / kink-carry):
+# SHA256). a(20)-a(31) are single-algorithm (transfer matrix / kink-carry):
 # cross-ISA (ARM+x86) and cross-run consistent, but NOT algorithm-independently
 # confirmed -- Redelmeier is O(a(n)) and infeasible past n ~ 19-20.
 # - Jason H Parker, 2026
@@ -40,3 +40,4 @@
 28 4824589228356722264087
 29 33145129805782422061325
 30 227969227118066423789154
+31 1569631619081324581014300
