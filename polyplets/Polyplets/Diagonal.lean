@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Polyplets.Defs
+import Polyplets.Finite
 
 /-!
 # Diagonal closed forms for fixed polyplets (A006770)
@@ -51,13 +52,14 @@ theorem T_n_nm1 (n : ℕ) (hn : 4 ≤ n) :
   -- Combinatorial heart (docs/proofs/T-n-nm1.md): the ℕ-valued count. All the
   -- real work — one doubled row, gap ∈ {1,2}, offset-chain product — is here.
   have hcount : T n (n - 1) = (25 * n - 45) * 3 ^ (n - 4) := by
-    rw [T]
-    -- Goal: `{S | IsCanonical n (n-1) S}.ncard = (25n - 45) * 3^(n-4)`.
-    -- The combinatorial core (docs/proofs/T-n-nm1.md), still to formalize as
-    -- reusable infrastructure:
-    --   (a) Finiteness: the canonical set is finite (cells bounded by
-    --       0 ≤ x, 0 ≤ y ≤ n-2, and x ≤ n-1 by connectivity + n cells), so
-    --       `.ncard` is a genuine `Finset.card`.
+    rw [T_eq_toFinset_card]
+    -- Goal: `(canonical_finite n (n-1)).toFinset.card = (25n - 45) * 3^(n-4)`.
+    -- (a) ✓ Finiteness — `Polyplets/Finite.lean`: `canonical_finite` (the set is
+    --     contained in the box `[0,n-1] × [0,H-1]`, via the king-connectivity
+    --     width bound `canonical_x_le` / `exists_x_eq_of_cross`) and
+    --     `T_eq_toFinset_card` (so `T` is a genuine `Finset.card`, above).
+    -- The remaining combinatorial core (docs/proofs/T-n-nm1.md), still to
+    -- formalize as reusable infrastructure:
     --   (b) Row profile: for each row y, its set of x-coordinates. Structure
     --       lemma — height n-1 with n cells forces all n-1 rows occupied and
     --       *exactly one* row doubled, the rest singletons.
