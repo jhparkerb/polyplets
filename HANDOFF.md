@@ -1,5 +1,62 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-03 (evening) — a(32) landed; P_14/P_15 derived; a(33) staged
+
+Frontier **a(32) = 10818203977457804418974036** banked+validated
+(results/ns_a32/, b-file to n=32, growth 6.8922). Close target ~2026-07-06.
+
+### Threads in dependency order
+
+**Critical path (term chase) — each needs the one above it:**
+1. **a(33) launch** — STAGED, awaiting trigger. Prereq P_14 ✓ (derived, not yet
+   wired); dalby free. Plan below. Run produces T(33,18).
+2. **P_15 validation** — needs a(33). T(33,18) is a diagonal-15 point
+   (33−18=15) — the independent holdout P_15 currently lacks. Check
+   `P_15(33) == T(33,18)·3^13`.
+3. **a(34) launch** — needs validated P_15. Wire case 15, top real H18, ~3h.
+4. **P_16** — needs a(34) data (diag-16 points n=33,34) OR transfer-matrix K=16.
+
+**Independent / parallel (no cross-deps):**
+- **Symmetry job (ayr)** — `sym_extend 23` LIVE in tmux (r90+dmirror done
+  ~9084s, r180 pole grinding ~3h in). Waiter `b884wneol`. On done →
+  `derive_related.py runs/sym23` → A030222/33/34/35 + A194596 to n=23.
+- **Fast P_k deriver** (`scripts/derive_pk_fast.py`, `fb8ab6f`) — exp
+  recurrence, 0.06s, reproduces wired P_13 exactly; source of **P_14** (solid, 2
+  holdout) + **P_15** (self-checks only, no holdout yet). Replaces sympy chain.
+- **Option 5 / transfer matrix** (`scripts/diag_transfer_gen.py`, `573c0a6`) —
+  connectivity transfer matrix, derives P_k from rules (no data); validated thru
+  P_3 (b_2=−209/2 fell out). Alternative route to P_16+ without runs; needs K=16
+  optimization (state explosion ~7×/k). Not needed for near-term close. Also the
+  constructive existence proof.
+- **Lean proof** (branch `lean-diagonal-proofs`) — (a) finiteness, (b) row
+  profile, (c-fwd), (d-local) done + green; remain (c-rev), (d-global gap≤2),
+  (e) offset-chain count. See `polyplets/PROOF-STATUS.md`.
+- **dalby H17 cross-kernel verify** — STOPPED, checkpointed, 3/31 cols matched
+  (column vs kink, x86 vs ARM). Resumable via `--resume`; off critical path.
+
+### Cost model (a32 per-height wall) — top real height = N − K − 1
+H18=7516s H17=2010s H16=630s H15=362s … each ~3.7× the next. Cumulative by top
+height: H16~0.4h · H17~0.9h · H18~3.0h · H19~10.8h · H20~40h.
+- a(33): P13→H19 10.8h | +P14→H18 3.0h | +P15→H17 0.9h.
+- a(34): +P14→H19 10.8h | +P15→H18 3.0h.
+Data ceiling = **P_15** (derivable k ≤ (n_max−2)/2 = 15). P_16 needs a(34).
+
+### a(33) launch plan (STAGED — do NOT arm without go)
+1. `orchestrator/sweep.go`: add `diagCoeffTable` `14:` (the
+   `derive_pk_fast … 14` block, denom `87178291200` = 14!); bump
+   `diagonalStripValid` `k <= 13` → `k <= 14`. **Not** case 15 — P_15 held out
+   so H18 sweeps and yields T(33,18).
+2. Commit on `kink-carry`, push origin.
+3. dalby: `git fetch` + ff-only; rebuild orchestrate (native Go, no cross-compile).
+4. Gate: closed-form gate / small `--compare` confirms P_14 coeffs before the
+   real run (catches a wiring typo cheaply).
+5. Launch `scripts/dalby_term.sh 33` in tmux session 0, foreground + tee'd; arm
+   `tail --pid` waiter. Expect top real H18, ~3h, ~6GB; auto-validates a1–a32.
+6. Post: pull T(33,18), validate P_15; bank results/ns_a33/; b-file + provenance;
+   if P_15 checks out, wire case 15 for a(34).
+
+---
+
 ## 2026-07-03 (pre-/clear SNAPSHOT) — successive-term loop + related-seq prep
 
 **The loop (jasonp's cadence): bank -> predict next -> apply a perf change ->
