@@ -39,10 +39,15 @@ inline std::string iso_of(std::time_t t) {
   std::tm tm{};
   localtime_r(&t, &tm);
   char buf[40];
-  std::strftime(buf, sizeof buf, "%Y-%m-%dT%H:%M:%S%z", &tm);
-  std::string s(buf);
-  if (s.size() >= 5) s.insert(s.size() - 2, ":");   // -0400 -> -04:00
-  return s;
+  const size_t len =
+      std::strftime(buf, sizeof buf, "%Y-%m-%dT%H:%M:%S%z", &tm);
+  if (len >= 5) {  // -0400 -> -04:00 (in the buffer: string::insert trips
+    buf[len + 1] = '\0';  // GCC 12's bogus -Wrestrict, PR 105651)
+    buf[len] = buf[len - 1];
+    buf[len - 1] = buf[len - 2];
+    buf[len - 2] = ':';
+  }
+  return std::string(buf);
 }
 inline std::string now_iso() { return iso_of(std::time(nullptr)); }
 
