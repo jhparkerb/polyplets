@@ -45,8 +45,9 @@ def load_oeis_terms(anum):
     return {offset + i: v for i, v in enumerate(vals)}
 
 def main():
-    symdir = sys.argv[1] if len(sys.argv) > 1 else 'runs/sym20'
-    symdir = os.path.join(ROOT, symdir)
+    if len(sys.argv) != 2:
+        raise SystemExit("usage: derive_related.py <symdir>  e.g. runs/sym24")
+    symdir = os.path.join(ROOT, sys.argv[1])
 
     fixed = load_nv(os.path.join(ROOT, 'results/ns_a34/triangle.txt'))
     a105  = load_nv(os.path.join(ROOT, 'fixtures/b000105.txt'))  # free polyominoes

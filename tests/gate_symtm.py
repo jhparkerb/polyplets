@@ -6,8 +6,8 @@ symmetry type (Hall of Mirrors thread).
 symtm builds symmetric animals from ~n/2 free cells via the production
 column transition, so it reaches n~34; symcount_fast is the independently
 validated explicit counter (gate_sym: brute oracle + Burnside/A030222).
-Identical 'n count' output to GATE_MAXN, live-run, is the bar. Types are
-gated as their symtm mode lands: hmirror now; r180, dmirror to follow.
+Identical 'n count' output to GATE_MAXN, live-run, is the bar, for all
+three symtm modes.
 """
 
 import os

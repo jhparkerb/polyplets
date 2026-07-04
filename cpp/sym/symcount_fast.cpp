@@ -246,7 +246,6 @@ struct Counter {
     curStamp = 0;
     curCells.clear();
     list.clear();
-    list.reserve(V);
     if (nthreads < 1) nthreads = 1;
 
     std::atomic<int> nextR{0};

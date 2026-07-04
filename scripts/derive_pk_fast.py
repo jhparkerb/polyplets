@@ -123,6 +123,6 @@ def emit_go(P, k):
 
 if __name__ == "__main__":
     kmax = int(sys.argv[1]) if len(sys.argv) > 1 else 15
-    P, c = derive(kmax)
+    P, _ = derive(kmax)
     for k in (int(x) for x in sys.argv[2:]):
         emit_go(P, k)

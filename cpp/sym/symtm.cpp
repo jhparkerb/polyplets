@@ -118,8 +118,26 @@ static bool closable(const Sig& s, int H) {
 //     band (old states are palindromic, labels mirror) — charged 2x at the
 //     moment pair i is set; the single central band is charged 1x at the
 //     leaf.
+// Mirror-pair label support, shared by the palindromic and middle-mask
+// generators: pairSup[i] = old labels king-adjacent to row i or its mirror
+// (setting pair i covers exactly these), sufSup[i] = union over pairs >= i
+// (what the remaining pairs could still cover).
+static void pairSupport(const Sig& s, int H, int half, std::uint32_t* pairSup,
+                        std::uint32_t* sufSup) {
+  std::uint32_t rowSup[SIGMAX];
+  for (int r = 0; r < H; ++r) {
+    std::uint32_t sup = 0;
+    for (int rr = r - 1; rr <= r + 1; ++rr)
+      if (rr >= 0 && rr < H && s.b[rr]) sup |= 1u << s.b[rr];
+    rowSup[r] = sup;
+  }
+  for (int i = 0; i < half; ++i) pairSup[i] = rowSup[i] | rowSup[H - 1 - i];
+  sufSup[half] = 0;
+  for (int i = half - 1; i >= 0; --i) sufSup[i] = sufSup[i + 1] | pairSup[i];
+}
+
 struct PalinCtx {
-  int H, half, maxBudget;
+  int H, half;
   bool touched;
   std::uint32_t all;
   std::uint32_t pairSup[SIGMAX], sufSup[SIGMAX + 1];
@@ -165,11 +183,9 @@ static void forEachPalinMask(const Sig& old, int H, int budget, F&& fn) {
   PalinCtx cx;
   cx.H = H;
   cx.half = (H + 1) / 2;
-  cx.maxBudget = budget;
   cx.touched = old.b[H] != 0;
   cx.all = 0;
   cx.rowOcc = 0;
-  std::uint32_t rowSup[SIGMAX];
   int minRow[SIGMAX], maxRow[SIGMAX], maxLab = 0;
   for (int L = 0; L < SIGMAX; ++L) { minRow[L] = SIGMAX; maxRow[L] = -1; }
   for (int r = 0; r < H; ++r) {
@@ -187,17 +203,7 @@ static void forEachPalinMask(const Sig& old, int H, int budget, F&& fn) {
       if (minRow[L] <= a && maxRow[L] > m) m = maxRow[L];
     cx.spanMax[a] = m;
   }
-  for (int r = 0; r < H; ++r) {
-    std::uint32_t s = 0;
-    for (int rr = r - 1; rr <= r + 1; ++rr)
-      if (rr >= 0 && rr < H && old.b[rr]) s |= 1u << old.b[rr];
-    rowSup[r] = s;
-  }
-  for (int i = 0; i < cx.half; ++i)
-    cx.pairSup[i] = rowSup[i] | rowSup[H - 1 - i];
-  cx.sufSup[cx.half] = 0;
-  for (int i = cx.half - 1; i >= 0; --i)
-    cx.sufSup[i] = cx.sufSup[i + 1] | cx.pairSup[i];
+  pairSupport(old, H, cx.half, cx.pairSup, cx.sufSup);
   palinRec(cx, 0, budget, 0u, 0ull, 0, -1, fn);
 }
 
@@ -393,18 +399,7 @@ static void forEachMiddleMask(const Sig& s, int H, int budget, u64 forced,
   cx.all = 0;
   for (int r = 0; r < H; ++r)
     if (s.b[r]) cx.all |= 1u << s.b[r];
-  std::uint32_t rowSup[SIGMAX];
-  for (int r = 0; r < H; ++r) {
-    std::uint32_t sup = 0;
-    for (int rr = r - 1; rr <= r + 1; ++rr)
-      if (rr >= 0 && rr < H && s.b[rr]) sup |= 1u << s.b[rr];
-    rowSup[r] = sup;
-  }
-  for (int i = 0; i < cx.half; ++i)
-    cx.pairSup[i] = rowSup[i] | rowSup[H - 1 - i];
-  cx.sufSup[cx.half] = 0;
-  for (int i = cx.half - 1; i >= 0; --i)
-    cx.sufSup[i] = cx.sufSup[i + 1] | cx.pairSup[i];
+  pairSupport(s, H, cx.half, cx.pairSup, cx.sufSup);
   midRec(cx, 0, budget, 0u, 0ull, 0, fn);
 }
 
@@ -449,7 +444,7 @@ using RDB = std::unordered_map<Sig, RVal, SigHash>;
 // the node instead of post-step is what stops the descent through doomed
 // subtrees. fn(mask, cells).
 struct R180Gen {
-  int H, half, budget, ms2, maxn, colDebt2;
+  int H, budget, ms2, maxn, colDebt2;
   u64 pairsAll;
   std::uint32_t all;
   std::uint32_t rowSup[SIGMAX], sufSup[SIGMAX + 1];
@@ -484,12 +479,11 @@ static void forEachR180Mask(const Sig& s, int H, int budget, int ms2, int maxn,
                             int colDebt, u64 covBase, F&& fn) {
   R180Gen cx;
   cx.H = H;
-  cx.half = (H + 1) / 2;
   cx.budget = budget;
   cx.ms2 = ms2;
   cx.maxn = maxn;
   cx.colDebt2 = 2 * (colDebt > 0 ? colDebt : 0);
-  cx.pairsAll = (1ull << cx.half) - 1;
+  cx.pairsAll = (1ull << ((H + 1) / 2)) - 1;
   cx.all = 0;
   for (int r = 0; r < H; ++r)
     if (s.b[r]) cx.all |= 1u << s.b[r];
@@ -702,7 +696,7 @@ static Outcome dmStep(const Sig& old, int k, int S, u64 mask, Sig& out) {
 //     k: the corner directly, an arm bit via its row-arm mirror (k+p,k).)
 //   - old-label coverage: strict subset of dmStep's stranding rejection.
 struct DmGen {
-  int k, S, Anew, ms, maxn;
+  int k, Anew, ms, maxn;
   bool touched;
   u64 covRows;     // rows covered before this hook (prune-only, OR-merged)
   u64 allRows;     // bits 0..S-1
@@ -741,7 +735,6 @@ static void forEachDmMask(const Sig& s, int k, int S, int ms, int maxn,
                           u64 covRows, F&& fn) {
   DmGen cx;
   cx.k = k;
-  cx.S = S;
   cx.Anew = S - 1 - k;
   cx.ms = ms;
   cx.maxn = maxn;
@@ -924,7 +917,6 @@ int main(int argc, char** argv) {
                  argv[0], argv[0]);
     return 2;
   }
-  auto* sweep = type == "hmirror" ? sweepHmirror : sweepR180;
   const int maxn = std::atoi(argv[2]);
   if (maxn < 1 || maxn > 34) {  // dmirror layout caps the bbox at 34
     std::fprintf(stderr, "MAXN out of range (1..34)\n");
@@ -980,6 +972,7 @@ int main(int argc, char** argv) {
   // over roots: threads pull strip indices off an atomic counter, tallest
   // (most expensive) strips first so the stragglers start earliest, and
   // reduce thread-local totals under a mutex.
+  auto* sweep = type == "hmirror" ? sweepHmirror : sweepR180;
   std::vector<u64> total(maxn + 1, 0);
   std::atomic<int> nextIdx{0};
   std::atomic<int> beats{0};

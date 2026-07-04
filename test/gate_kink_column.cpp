@@ -24,7 +24,6 @@
 // check) makes this gate fail.
 
 #include <algorithm>
-#include <cassert>
 #include <cstdio>
 #include <cstring>
 #include <map>
