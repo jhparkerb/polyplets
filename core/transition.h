@@ -36,7 +36,11 @@ inline void unite(int* p, int a, int b) {
 // signature is written to `out`; Dead means the mask strands an old component.
 // Closing the animal (the old mask==0 case) is handled by the caller, which
 // already knows the component count -- so this stays purely the extend step.
-inline Outcome stepColumnSquare8(const Sig& old, int H, unsigned mask, Sig& out) {
+// Templated on the mask word so a POLY_SIGMAX-raised TU (cpp/sym/symtm.cpp,
+// H up to 34) can pass uint64_t; every production call site passes unsigned
+// and deduces the exact prior instantiation.
+template <class M = unsigned>
+inline Outcome stepColumnSquare8(const Sig& old, int H, M mask, Sig& out) {
   // union-find slots: new-column row r -> r ; old label L -> H + L. Indices
   // stay < 2*SIGMAX (H <= 30, labels <= H), so stack arrays -- no per-call heap
   // allocation, which dominated the hot path when these were std::vector.

@@ -27,7 +27,15 @@ enum class Outcome { Alive, Dead, Complete };
 // open-addressing map instead of unordered_map<string,...> (no per-state
 // allocation, no pointer chasing). Same byte layout as the std::string
 // signature above; square-4 keeps using the string form.
-static constexpr int SIGMAX = 32;
+//
+// POLY_SIGMAX override: a standalone single-TU binary may #define it before
+// including this header to raise the cap (cpp/sym/symtm.cpp needs H up to
+// maxn=34 for the tall-skinny symmetric strips). Production TUs leave it
+// unset and get the exact prior 32.
+#ifndef POLY_SIGMAX
+#define POLY_SIGMAX 32
+#endif
+static constexpr int SIGMAX = POLY_SIGMAX;
 struct Sig {
   unsigned char b[SIGMAX];
   bool operator==(const Sig& o) const {

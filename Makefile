@@ -25,7 +25,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-euler gate-driver
+gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
@@ -94,6 +94,14 @@ build/tma_sample: cpp/tma_sample.cpp cpp/tma/*.h | build
 
 build/symcount_fast: cpp/sym/symcount_fast.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
+
+# Symmetric transfer-matrix counter (Hall of Mirrors): symmetric counts to n~34
+build/symtm: cpp/sym/symtm.cpp core/signature.h core/transition.h | build
+	$(CXX) $(CXXFLAGS) -O3 -pthread -I. cpp/sym/symtm.cpp -o $@
+
+# Gate symtm: TM symmetric counter vs symcount_fast (cross-algorithm, live)
+gate-symtm: build/symtm build/symcount_fast
+	python3 tests/gate_symtm.py
 
 # Gate sym: symmetric-polyplet counters (4 types) + free count vs A030222
 gate-sym: build/symcount_fast
