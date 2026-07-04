@@ -1584,6 +1584,22 @@ var diagCoeffTable = map[int]diagCoeffs{
 		"-78302966517647904123999050", "242568775590879458927220300", "-252892500470648129748781800", "630295671430278785315535840",
 		"-4709212944929227143077529600", "8516420444581467205615027200",
 	}, 6227020800},
+	// j=14: P_14, derived via scripts/derive_pk_fast.py (exp recurrence). The
+	// validated P_9..P_13 fits pin the shared symbols {a7..a13,b8..b13}
+	// exactly, so 13 of 15 coefficients come clean from theory; only a14,b14
+	// (degrees n^0,n^1) needed new data, fit from T(29,15) and T(30,16)
+	// (results/ns_a29, results/ns_a30). The two later diagonal-14 points
+	// T(31,17) and T(32,18) (results/ns_a31, results/ns_a32), held out of the
+	// fit, both matched exactly; leading coeff 25^14/14! confirmed. Wiring it
+	// makes H=maxn-14 closed-form, keeping a(33)'s top real height at H18
+	// (H19 without it). P_15 is deliberately NOT wired: it is held out so a(33)
+	// sweeps H18 and yields the independent holdout point T(33,18).
+	14: {[]string{
+		"37252902984619140625", "-2072393894195556640625", "50912246036529541015625", "-761843525055694580078125",
+		"7524678110464896240234375", "-48052027303805350998046875", "157448856577961057749371875", "276655470142052990154351185",
+		"-5583936647603503419750059540", "25191124931485376140721243800", "-47958023503387714879301084400", "118184880567640594471489711440",
+		"-979514007904340174674683668160", "3638916058760447487430557542400", "-4028797193164605150126008371200",
+	}, 87178291200},
 }
 
 // hornerDiag evaluates a diagCoeffs' numerator at N via big.Int Horner,
@@ -1627,13 +1643,13 @@ func applyPow3(num *big.Int, e int) *big.Int {
 }
 
 // diagonalStripValid reports whether the k-th diagonal strip (H=maxn-k) can
-// be filled by diagonalCell instead of a real column sweep. k<=13 now that
-// P9..P13 are wired (case 9..13). The true structural threshold is n>=2k+1
+// be filled by diagonalCell instead of a real column sweep. k<=14 now that
+// P9..P14 are wired (case 9..14). The true structural threshold is n>=2k+1
 // (docs/proofs/T-n-nm2-and-general.md); both sweep.go dispatch sites
 // (sequential and overlap) must use this single helper so a future threshold
 // or k-range change can't apply to only one path.
 func diagonalStripValid(maxn, k int) bool {
-	return k >= 2 && k <= 13 && maxn >= 2*k+1
+	return k >= 2 && k <= 14 && maxn >= 2*k+1
 }
 
 // diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..12
