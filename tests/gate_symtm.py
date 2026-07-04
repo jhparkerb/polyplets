@@ -16,7 +16,7 @@ import subprocess
 from common import ROOT, Gate
 
 GATE_MAXN = 18  # symcount_fast hmirror@18 ~4s on gympie; @20 is 33s, too slow
-TYPES = ["hmirror"]
+TYPES = ["hmirror", "r180"]
 
 SYMTM = os.path.join(ROOT, "build", "symtm")
 FAST = os.path.join(ROOT, "build", "symcount_fast")
