@@ -63,6 +63,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <tuple>
 #include <unordered_map>
 #include <vector>
 
@@ -779,6 +780,15 @@ static void forEachDmMask(const Sig& s, int k, int S, int ms, int maxn,
 // arm pairs 2) — no transpose doubling: each dmirror-fixed animal is built
 // exactly once.
 //
+// RAM is the binding resource at the fat strips (the n=32 push), so two
+// bookkeeping moves shrink the peak, both byte-neutral:
+//   - count vectors are OFFSET by the hook floor: a state in db at loop k
+//     has ms >= k (hooks 0..k-1 are each nonempty), so c[i] holds n = k+i
+//     and the k dead zero entries are never allocated;
+//   - source states are ERASED as consumed: once a thread has fully
+//     processed a db entry it deletes it, so freed nodes recycle into the
+//     next-frontier and the peak is ~max(|db|,|next|), not their sum.
+//
 // Unlike hmirror/r180, dmirror is threaded INSIDE the strip: the fattest
 // strip is ~16% of the whole sweep's cpu, so with strip-level parallelism
 // alone it floors the wall (measured on the ayr n=28 run: total cpu on
@@ -803,16 +813,17 @@ static StripStats sweepDmirror(int S, int maxn, int T, std::vector<u64>& total,
   std::memset(seed.b, 0, SIGMAX);
   {
     RVal& sv = db[0][seed];
-    sv.c.assign(maxn + 1, 0);
+    sv.c.assign(1, 0);  // floor 0: c[i] <-> n = i
     sv.c[0] = 1;
   }
   std::vector<std::mutex> mus(NSH);
   std::mutex stripMu;
   std::vector<u64> stripTot(maxn + 1, 0);
   for (int k = 0; k <= S; ++k) {
-    std::vector<std::pair<const Sig*, const RVal*>> work;
-    for (auto& shard : db)
-      for (auto& kv : shard) work.emplace_back(&kv.first, &kv.second);
+    // db entries at loop k have count floor k: c[i] <-> n = k + i.
+    std::vector<std::tuple<const Sig*, const RVal*, int>> work;
+    for (int sh = 0; sh < NSH; ++sh)
+      for (auto& kv : db[sh]) work.emplace_back(&kv.first, &kv.second, sh);
     if (work.empty()) break;
     st.stateSum += work.size();
     for (auto& shard : next) shard.clear();
@@ -823,19 +834,27 @@ static StripStats sweepDmirror(int S, int maxn, int T, std::vector<u64>& total,
       u64 mySteps = 0, myDead = 0, myKept = 0;
       size_t i;
       while ((i = cursor.fetch_add(1)) < work.size()) {
-        const Sig& sig = *work[i].first;
-        const RVal& val = *work[i].second;
+        const Sig& sig = *std::get<0>(work[i]);
+        const RVal& val = *std::get<1>(work[i]);
         const std::vector<u64>& counts = val.c;
+        const int clen = static_cast<int>(counts.size());
         int ms = -1;
-        for (int n = 0; n <= maxn; ++n)
-          if (counts[n]) { ms = n; break; }
-        if (ms < 0) continue;
+        for (int i2 = 0; i2 < clen; ++i2)
+          if (counts[i2]) { ms = k + i2; break; }
+        auto consumed = [&]() {  // done with this entry: free it now
+          const int sh = std::get<2>(work[i]);
+          const Sig key = sig;
+          std::lock_guard<std::mutex> lk(mus[sh]);
+          db[sh].erase(key);
+        };
+        if (ms < 0) { consumed(); continue; }
         if (closableDm(sig))
-          for (int n = 1; n <= maxn; ++n) lt[n] += counts[n];
-        if (k == S) continue;
+          for (int i2 = 0; i2 < clen; ++i2)
+            if (k + i2 >= 1) lt[k + i2] += counts[i2];
+        if (k == S) { consumed(); continue; }
         // Rows < k can no longer gain a cell; an uncovered one disconnects
         // every completion (harvest's single-label check is the authority).
-        if (~val.cov & ((1ull << k) - 1)) continue;
+        if (~val.cov & ((1ull << k) - 1)) { consumed(); continue; }
         auto emit = [&](u64 mask, int w) {
           ++mySteps;
           Sig out;
@@ -861,12 +880,14 @@ static StripStats sweepDmirror(int S, int maxn, int T, std::vector<u64>& total,
           const int sh = static_cast<int>((SigHash{}(out) >> 32) % NSH);
           std::lock_guard<std::mutex> lk(mus[sh]);
           RVal& dst = next[sh][out];
-          if (dst.c.empty()) dst.c.assign(maxn + 1, 0);
+          if (dst.c.empty()) dst.c.assign(maxn - k, 0);  // floor k+1
           dst.cov |= cov;
-          for (int n = 0; n + w <= maxn; ++n)
-            if (counts[n]) dst.c[n + w] += counts[n];
+          // src c[i2] <-> n = k+i2; dst floor k+1: n+w <-> index i2+w-1.
+          for (int i2 = 0; i2 < clen && k + i2 + w <= maxn; ++i2)
+            if (counts[i2]) dst.c[i2 + w - 1] += counts[i2];
         };
         forEachDmMask(sig, k, S, ms, maxn, val.cov, emit);
+        consumed();
       }
       steps += mySteps;
       dead += myDead;
