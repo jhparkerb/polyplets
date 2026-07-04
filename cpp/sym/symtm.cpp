@@ -29,14 +29,31 @@
 // bottom), so the sweep uses the general mask generator with its top-reach
 // prune disabled and a glue-aware completion bound (see sweepR180).
 //
-// H runs to maxn=34, past the production caps (SIGMAX=32 key bytes, u32
-// masks): POLY_SIGMAX=40 below raises the sig, and stepColumnSquare8 /
+// dmirror mode: transpose invariance (the diagonal axis always passes
+// through cells, so there is one placement class and the bbox is forced
+// square SxS, S up to maxn — the main diagonal is an n-cell dmirror-fixed
+// animal). Sweep HOOKS k=0,1,... (cells with min(x,y)=k) inside an outer
+// loop over the exact bbox S: the hook frontier is one hook in absolute
+// coordinates, and king adjacency only ever reaches the next hook. The row
+// arm of a symmetric animal is the mirror of its column arm, so masks
+// enumerate (corner, column arm) only — but the STATE stores the hook
+// UNFOLDED (corner + column arm + row arm labels). That deviates from
+// docs/dmirror-design.md's folded selfPaired-bit state, which is
+// under-specified: a component can straddle the diagonal without touching
+// it, so its mirror can be a SECOND visible column-arm label — the pairing
+// is a general involution on labels, not one bit per label. Unfolding makes
+// the union-find run on real adjacencies and the pairing bookkeeping
+// disappears; symmetry stays enforced by construction (see sweepDmirror).
+//
+// H (and the dmirror bbox S) runs to maxn=34, past the production caps
+// (SIGMAX=32 key bytes, u32 masks): POLY_SIGMAX=70 below fits the unfolded
+// dmirror hook (34 + 33 label bytes + flag), and stepColumnSquare8 /
 // forEachViableMask are instantiated at uint64_t masks.
 //
-// CLI:  symtm {hmirror|r180} MAXN [THREADS]   -> "n count" lines.
+// CLI:  symtm {hmirror|r180|dmirror} MAXN [THREADS]   -> "n count" lines.
 // Gate: tests/gate_symtm.py (live cross-algorithm diff vs symcount_fast).
 
-#define POLY_SIGMAX 40
+#define POLY_SIGMAX 70
 
 #include <atomic>
 #include <cstdint>
@@ -416,8 +433,8 @@ static void forEachMiddleMask(const Sig& s, int H, int budget, u64 forced,
 // the centre row has a distinct mirror), so the state owes
 // 2*min(topGap, botGap) future n on top of its banked 2*(ms+cells).
 struct RVal {
-  std::vector<u64> c;  // counts by LEFT cells
-  u64 cov = 0;         // covered row pairs (optimistic across merges)
+  std::vector<u64> c;  // counts by LEFT cells (dmirror: by full n)
+  u64 cov = 0;         // covered row pairs / rows (optimistic across merges)
 };
 using RDB = std::unordered_map<Sig, RVal, SigHash>;
 
@@ -555,16 +572,284 @@ static StripStats sweepR180(int H, int maxn, std::vector<u64>& total) {
   return st;
 }
 
+// --------------------------------------------------------------- dmirror --
+//
+// Hook sweep inside an outer loop over the exact bbox S: hook k = cells
+// with min(x,y)=k, swept k=0..S-1; the hook frontier is one hook in
+// absolute coordinates and king adjacency only ever reaches the next hook.
+// (A merged single-sweep variant without the S loop — implicit bbox,
+// harvest on connectivity alone — was built and byte-matched too, but
+// MEASURED SLOWER at every point (n=20 serial 12.5s vs 7.1s; n=24 10t
+// >120s vs 92s): the exact-S touch debt prunes more than strip-merging
+// dedups, and strips parallelize for free. Recover it from git history if
+// ever needed.)
+//
+// Sig layout (POLY_SIGMAX=70): b[0] = corner label (cell (k,k)), b[i] =
+// column-arm position i (cell (k,k+i)) for i=1..33, b[DM_ROW+i] = row-arm
+// position i (cell (k+i,k)); b[DM_TOUCH] = touched-outer flag (some cell
+// reached absolute coordinate S-1; by symmetry row S-1 iff column S-1).
+// Masks: bit 0 = corner (weight 1, its own mirror), bit p>=1 = the PAIR
+// {(k,k+p),(k+p,k)} (weight 2) — the row arm always carries the mirrored
+// column mask, which is what enforces the symmetry. Exactness of the SxS
+// bbox: hook 0 nonempty (masks are never empty) gives min row = min col =
+// 0; DM_TOUCH gives max = S-1; arms are bounded by S-1-k.
+//
+// Labels are components of the partial animal (hooks < k) restricted to
+// the current hook; every component must keep a hook cell or it is
+// stranded (future hooks are >= 2 away from hook k-1 in some coordinate) —
+// the standard death. A state is closable iff ONE label overall and
+// touched: an uncovered bbox row r would put cells on both sides (row 0
+// via hook 0, row S-1 via touch) with no king path across, so it forces
+// >= 2 boundary labels (or an earlier stranding) and closability is
+// faithful without a coverage authority — row coverage rides as a
+// prune-only OR-merged bitmask exactly like r180's cov.
+static constexpr int DM_ROW = 34;    // row-arm byte offset (b[35..67])
+static constexpr int DM_TOUCH = 68;  // touched-outer flag byte
+
+static bool closableDm(const Sig& s) {
+  if (!s.b[DM_TOUCH]) return false;
+  int mx = 0;
+  for (int i = 0; i < DM_TOUCH; ++i)
+    if (s.b[i] > mx) mx = s.b[i];
+  return mx == 1;  // canonical labels: max label == component count
+}
+
+// Step hook k-1 -> hook k (S is the coordinate cap: arms run to absolute
+// coordinate S-1, and the sweep passes S = maxn). New-cell adjacencies to
+// the old hook, in arm coordinates (old position i = (k-1, k-1+i)): a new arm
+// cell (k, k+j) sees old positions j..j+2 on ITS OWN arm only; the new
+// corner (k,k) is the one +-2 stencil — it sees old col 0..2 AND old row
+// 1..2 (five cells). Within the new hook the arms chain vertically and
+// {corner, col 1, row 1} are mutually adjacent (col 1 = (k,k+1) and row 1
+// = (k+1,k) are diagonal neighbours even without the corner). Union-find
+// slots: new corner 0, new col j -> j, new row j -> 40+j, old label L ->
+// 80+L (components per hook <= ~35, an independent set of two 33-paths + a
+// corner, so labels fit both the slot space and a u64 bitmask).
+static Outcome dmStep(const Sig& old, int k, int S, u64 mask, Sig& out) {
+  const int Anew = S - 1 - k, Aold = S - k;
+  int p[160];
+  for (int i = 0; i < 160; ++i) p[i] = i;
+  auto oldCol = [&](int i) -> int {
+    return (i >= 0 && i <= Aold && i <= 33) ? old.b[i] : 0;
+  };
+  auto oldRow = [&](int i) -> int {
+    return (i >= 1 && i <= Aold && i <= 33) ? old.b[DM_ROW + i] : 0;
+  };
+  if (mask & 1) {
+    for (int i = 0; i <= 2; ++i)
+      if (const int L = oldCol(i)) s8::unite(p, 0, 80 + L);
+    for (int i = 1; i <= 2; ++i)
+      if (const int L = oldRow(i)) s8::unite(p, 0, 80 + L);
+  }
+  for (int j = 1; j <= Anew; ++j) {
+    if (!((mask >> j) & 1)) continue;
+    for (int i = j; i <= j + 2; ++i) {
+      if (const int L = oldCol(i)) s8::unite(p, j, 80 + L);
+      if (const int L = oldRow(i)) s8::unite(p, 40 + j, 80 + L);
+    }
+    if (j > 1 && ((mask >> (j - 1)) & 1)) {
+      s8::unite(p, j, j - 1);
+      s8::unite(p, 40 + j, 40 + j - 1);
+    }
+  }
+  if (mask & 2) {
+    s8::unite(p, 1, 41);  // col 1 <-> row 1 (diagonal neighbours)
+    if (mask & 1) s8::unite(p, 0, 1);
+  }
+  bool rootNew[160] = {false};
+  if (mask & 1) rootNew[s8::find(p, 0)] = true;
+  for (int j = 1; j <= Anew; ++j)
+    if ((mask >> j) & 1) {
+      rootNew[s8::find(p, j)] = true;
+      rootNew[s8::find(p, 40 + j)] = true;
+    }
+  for (int i = 0; i <= Aold; ++i) {
+    if (const int L = oldCol(i))
+      if (!rootNew[s8::find(p, 80 + L)]) return Outcome::Dead;
+    if (const int L = oldRow(i))
+      if (!rootNew[s8::find(p, 80 + L)]) return Outcome::Dead;
+  }
+  std::memset(out.b, 0, SIGMAX);
+  unsigned char lab[160] = {0};
+  unsigned char nextL = 1;
+  auto assign = [&](int node) -> unsigned char {
+    const int r = s8::find(p, node);
+    if (!lab[r]) lab[r] = nextL++;
+    return lab[r];
+  };
+  if (mask & 1) out.b[0] = assign(0);
+  for (int j = 1; j <= Anew; ++j)
+    if ((mask >> j) & 1) out.b[j] = assign(j);
+  for (int j = 1; j <= Anew; ++j)
+    if ((mask >> j) & 1) out.b[DM_ROW + j] = assign(40 + j);
+  out.b[DM_TOUCH] = (old.b[DM_TOUCH] || ((mask >> Anew) & 1)) ? 1 : 0;
+  return Outcome::Alive;
+}
+
+// Hook-k masks worth stepping, with the r180 lesson applied: all prunes IN
+// the recursion. Positions are decided DESCENDING (Anew..0) so the touch
+// debt is fixed at the first set bit. Debts, each admissible and merged by
+// max (one future corner-chain to (S-1,S-1) both touches and covers every
+// remaining row at 1 cell per hook, so they share their cheapest witness):
+//   - touch: an untouched state whose topmost mask position is t owes
+//     >= Anew - t future cells (absolute reach grows by <= 1 per hook, on
+//     either the arm (+2/step) or the diagonal (+1/step)); while no bit is
+//     set, the optimistic top is the current position p.
+//   - rows: bbox row r > k+p can no longer be covered by this mask; each
+//     uncovered one needs a distinct future cell (a cell covers exactly one
+//     row). Rows <= k+p are coverable by the remaining positions and get
+//     charged through the mask weight itself. (Any nonempty mask covers row
+//     k: the corner directly, an arm bit via its row-arm mirror (k+p,k).)
+//   - old-label coverage: strict subset of dmStep's stranding rejection.
+struct DmGen {
+  int k, S, Anew, ms, maxn;
+  bool touched;
+  u64 covRows;     // rows covered before this hook (prune-only, OR-merged)
+  u64 allRows;     // bits 0..S-1
+  u64 all;         // old labels
+  u64 posSup[35];  // old labels king-adjacent to new position p
+  u64 preSup[35];  // union of posSup[0..p] (positions still undecided)
+};
+
+template <class F>
+static void dmRec(const DmGen& cx, int p, u64 mask, int w, u64 labCov,
+                  u64 rows, int topSet, F& fn) {
+  if ((labCov | (p >= 0 ? cx.preSup[p] : 0)) != cx.all) return;
+  int debt = 0;
+  if (!cx.touched && topSet != cx.Anew)
+    debt = cx.Anew - (topSet >= 0 ? topSet : (p > 0 ? p : 0));
+  const int base = cx.k + (p > 0 ? p : 0);
+  const u64 unc =
+      cx.allRows & ~(cx.covRows | rows) & ~((1ull << (base + 1)) - 1);
+  const int dCov = __builtin_popcountll(unc);
+  if (dCov > debt) debt = dCov;
+  if (cx.ms + w + debt > cx.maxn) return;
+  if (p < 0) {
+    if (mask) fn(mask, w);
+    return;
+  }
+  dmRec(cx, p - 1, mask, w, labCov, rows, topSet, fn);  // position p empty
+  const int wp = p ? 2 : 1;
+  if (cx.ms + w + wp <= cx.maxn)
+    dmRec(cx, p - 1, mask | (1ull << p), w + wp, labCov | cx.posSup[p],
+          rows | (1ull << cx.k) | (1ull << (cx.k + p)),
+          topSet >= 0 ? topSet : p, fn);
+}
+
+template <class F>
+static void forEachDmMask(const Sig& s, int k, int S, int ms, int maxn,
+                          u64 covRows, F&& fn) {
+  DmGen cx;
+  cx.k = k;
+  cx.S = S;
+  cx.Anew = S - 1 - k;
+  cx.ms = ms;
+  cx.maxn = maxn;
+  cx.touched = s.b[DM_TOUCH] != 0;
+  cx.covRows = covRows;
+  cx.allRows = (1ull << S) - 1;
+  const int Aold = S - k;
+  auto lb = [&](int idx) -> u64 {
+    const unsigned char L = s.b[idx];
+    return L ? (1ull << L) : 0;
+  };
+  cx.all = 0;
+  for (int i = 0; i <= Aold && i <= 33; ++i) cx.all |= lb(i);
+  for (int i = 1; i <= Aold && i <= 33; ++i) cx.all |= lb(DM_ROW + i);
+  for (int p = 0; p <= cx.Anew; ++p) {
+    u64 sup = 0;
+    if (p == 0) {
+      for (int i = 0; i <= 2 && i <= Aold && i <= 33; ++i) sup |= lb(i);
+      for (int i = 1; i <= 2 && i <= Aold && i <= 33; ++i)
+        sup |= lb(DM_ROW + i);
+    } else {
+      for (int i = p; i <= p + 2 && i <= Aold && i <= 33; ++i)
+        sup |= lb(i) | lb(DM_ROW + i);
+    }
+    cx.posSup[p] = sup;
+  }
+  cx.preSup[0] = cx.posSup[0];
+  for (int p = 1; p <= cx.Anew; ++p)
+    cx.preSup[p] = cx.preSup[p - 1] | cx.posSup[p];
+  dmRec(cx, cx.Anew, 0ull, 0, 0ull, 0ull, -1, fn);
+}
+
+// One exact-SxS bbox of the dmirror count: sweep hooks k=0..S-1 (db at k
+// holds animals over hooks < k), harvesting closable states at every k and
+// once more after the last hook. Counts are indexed by full n (corner 1,
+// arm pairs 2) — no transpose doubling: each dmirror-fixed animal is built
+// exactly once.
+static StripStats sweepDmirror(int S, int maxn, std::vector<u64>& total) {
+  StripStats st;
+  RDB db, next;
+  Sig seed;
+  std::memset(seed.b, 0, SIGMAX);
+  db[seed].c.assign(maxn + 1, 0);
+  db[seed].c[0] = 1;
+  for (int k = 0; k <= S && !db.empty(); ++k) {
+    st.stateSum += db.size();
+    next.clear();
+    for (auto& [sig, val] : db) {
+      const std::vector<u64>& counts = val.c;
+      int ms = -1;
+      for (int n = 0; n <= maxn; ++n)
+        if (counts[n]) { ms = n; break; }
+      if (ms < 0) continue;
+      if (closableDm(sig))
+        for (int n = 1; n <= maxn; ++n) total[n] += counts[n];
+      if (k == S) continue;
+      // Rows < k can no longer gain a cell; an uncovered one disconnects
+      // every completion (the harvest single-label check is the authority).
+      if (~val.cov & ((1ull << k) - 1)) continue;
+      auto emit = [&](u64 mask, int w) {
+        ++st.steps;
+        Sig out;
+        if (dmStep(sig, k, S, mask, out) != Outcome::Alive) {
+          ++st.dead;
+          return;
+        }
+        u64 cov = val.cov | (1ull << k);
+        for (int q = 1; q <= S - 1 - k; ++q)
+          if ((mask >> q) & 1) cov |= 1ull << (k + q);
+        int owed = 0;  // post-step authority for the generator's debts
+        if (!out.b[DM_TOUCH]) {
+          int top = 0;
+          for (int q = S - 1 - k; q >= 0; --q)
+            if ((mask >> q) & 1) { top = q; break; }
+          owed = S - 1 - k - top;
+        }
+        const int unc = __builtin_popcountll(((1ull << S) - 1) & ~cov &
+                                             ~((1ull << (k + 1)) - 1));
+        if (unc > owed) owed = unc;
+        if (ms + w + owed > maxn) return;
+        ++st.kept;
+        RVal& dst = next[out];
+        if (dst.c.empty()) dst.c.assign(maxn + 1, 0);
+        dst.cov |= cov;
+        for (int n = 0; n + w <= maxn; ++n)
+          if (counts[n]) dst.c[n + w] += counts[n];
+      };
+      forEachDmMask(sig, k, S, ms, maxn, val.cov, emit);
+    }
+    std::swap(db, next);
+  }
+  return st;
+}
+
 int main(int argc, char** argv) {
   const std::string type = argc >= 2 ? argv[1] : "";
-  if (argc < 3 || argc > 4 || (type != "hmirror" && type != "r180")) {
-    std::fprintf(stderr, "usage: %s {hmirror|r180} MAXN [THREADS]\n", argv[0]);
+  if (argc < 3 || argc > 4 ||
+      (type != "hmirror" && type != "r180" && type != "dmirror")) {
+    std::fprintf(stderr, "usage: %s {hmirror|r180|dmirror} MAXN [THREADS]\n",
+                 argv[0]);
     return 2;
   }
-  auto* sweep = type == "hmirror" ? sweepHmirror : sweepR180;
+  auto* sweep = type == "hmirror" ? sweepHmirror
+                : type == "r180"  ? sweepR180
+                                  : sweepDmirror;
   const int maxn = std::atoi(argv[2]);
-  if (maxn < 1 || maxn > SIGMAX - 2) {
-    std::fprintf(stderr, "MAXN out of range (1..%d)\n", SIGMAX - 2);
+  if (maxn < 1 || maxn > 34) {  // dmirror layout caps the bbox at 34
+    std::fprintf(stderr, "MAXN out of range (1..34)\n");
     return 2;
   }
   int nthreads = argc == 4 ? std::atoi(argv[3]) : 1;
