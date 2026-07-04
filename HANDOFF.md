@@ -63,8 +63,13 @@ session-by-session logs pruned 2026-07-04; recover from git history if needed.)
     collapsed the tall strips (n=20: 79.9s→0.93s). n=34 running on dalby.
   - **r90**: n=34 banked (`runs/sym34/r90.out`, gympie, 5.9s).
   - **dmirror**: not built — the remaining blocker for A030222/34/35 at n=34;
-    hook-sweep design discussed 2026-07-04 (L-shells, folded arm state,
-    selfPaired bit, ±2 corner stencil).
+    full design + r180 lessons banked in `docs/dmirror-design.md`.
+- **Session waiters do not survive a context clear** — after one, check the
+  dalby jobs directly: `ps -p 2994466 2996883` on dalby, outputs under
+  `~/src/polyominoes/runs/sym34/{hmirror,r180}.{out,err}`. Completion drill
+  per job: diff the n≤24 prefix vs `runs/sym24/<type>.out`, copy the .out to
+  gympie `runs/sym34/`, then `scripts/derive_related.py` once all four types
+  (or the subset for A030233: r90+r180) are in.
 
 ## Open independent threads
 - **Lean proof** (branch `lean-diagonal-proofs`, `polyplets/PROOF-STATUS.md`):
