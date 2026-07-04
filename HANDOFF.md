@@ -1,5 +1,50 @@
 # HANDOFF — 2026-06-29
 
+## 2026-07-04 — a(33)+a(34) landed; TERM CHASE PARKED; landing begins
+
+**Frontier now a(34) = 515316838423862758858377704** (banked+validated,
+growth 6.9048). Term chase **parked at a(34)** per the close plan
+(publishing target 2026-07-06). Everything below this section is prior history.
+
+### What landed overnight (all committed + pushed, branch kink-carry)
+- **a(33) = 74631481980411777590683952** — `results/ns_a33/` (commit 916438f).
+  ~3.39h, top real H18. Validated a1-20 vs b-file, a21-32 vs banked, growth
+  6.8987. **T(33,18) matched the held-out P_15 prediction exactly** → P_15
+  independently validated.
+- **a(34) = 515316838423862758858377704** — `results/ns_a34/` (commit 9dd81a5).
+  ~3.70h, top real H18. Validated a1-33 exact, growth 6.9048. T(34,18) is a
+  P_16 fit input (no closed-form holdout; validated by prefix+growth).
+- **P_14, P_15 wired** (commits dcd7da4, d1b6bcb) — diagCoeffTable cases 14,15;
+  diagonalStripValid k<=15; red-first diag_p14/p15 tests. Each dropped the top
+  real height a tier (kept a33/a34 at H18 ~3.4h instead of H19 ~11h).
+- **Related seqs → n=23** — A030222/33/34/35 + A194596, Burnside-combined from
+  ayr `sym_extend 23`, all 95 known OEIS terms match. `results/related-seqs-n23.md`
+  (commit 388f8e9). ayr now FREE.
+- **Steal-tail diagnostic** — `results/steal-tail-h18.md` (commit 7420138):
+  work-stealing fired 0× on a32; root-caused to the record-based grainRecs
+  eligibility floor missing compute-heavy stragglers. NOT deployed (banked only).
+
+### Data ceiling reached
+P_16 is derivable now (fit from T(33,17)+T(34,18)) but has **no independent
+holdout** until a(35) — the diagonal-polynomial route has caught up to the data.
+Deriving further terms needs either a new sweep (a35: top real H19 ≈ 11h with
+P_15, or ~3.4h if P_16 wired — but P_16 then has no holdout) or the
+transfer-matrix Option 5 for P_16+. Not planned pre-close.
+
+### LANDING — proposed plan for the 2026-07-06 publish (jasonp to steer)
+Do together; nothing here started autonomously. Rough order:
+1. **Code tidy** — `/simplify` over the P14/P15/banking delta since the
+   `simplified` tag (natural breakpoint). Clean untracked cruft: `autonomy/`
+   (empty), `polyplets/.lake` (Lean build cache — gitignore it).
+2. **OEIS** — b-file for A006770 (fixed polyplets) to n=34; upload files for the
+   five related seqs to n=23. **Submission is jasonp's call** (prep only here).
+3. **Paper** — status/pass per ROADMAP.md; paper is last.
+4. **Repo** — README/HANDOFF/ROADMAP coherence; results/ provenance complete.
+5. **Optional** — ayr independent (cross-kernel/ISA) reconfirm of a(34)'s top
+   height for a "verified" tier, if wanted before publish.
+
+---
+
 ## 2026-07-03 (evening) — a(32) landed; P_14/P_15 derived; a(33) staged
 
 Frontier **a(32) = 10818203977457804418974036** banked+validated
