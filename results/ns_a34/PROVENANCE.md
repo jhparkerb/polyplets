@@ -28,8 +28,13 @@
     T(34,18) is a *fit* input, not a prediction). Unlike a(33) (whose
     T(33,18) matched the held-out P_15), a(34)'s top cell is validated only
     by the banked-prefix + growth checks. T(34,18) now enables P_16.
-- **Tier:** computed, single-source (high heights not independently
-  reconfirmed). The kink kernel is the a29 cell-diff-validated independent
-  reimplementation of the column kernel, so the method is cross-checked;
-  this specific term is one-algorithm. Term chase parked here (2026-07-04)
-  per the close plan.
+- **Cross-ISA verify (2026-07-04, ayr):** full recompute on ayr (x86_64,
+  32 cores, ~13.5h) from the same rev, `A34_VERIFY_PASS` — triangle
+  n=1..34 **byte-identical** to the banked dalby (ARM) run, including
+  T(34,18). Same algorithm, independent hardware/ISA/toolchain: rules out
+  machine-, arch-, and build-specific corruption (not a second algorithm).
+- **Tier:** computed, single-source-algorithm, cross-ISA-verified. The
+  kink kernel is the a29 cell-diff-validated independent reimplementation
+  of the column kernel, so the method is cross-checked; this specific term
+  is one-algorithm. Term chase parked here (2026-07-04) per the close
+  plan.

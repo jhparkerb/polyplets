@@ -20,15 +20,19 @@ session-by-session logs pruned 2026-07-04; recover from git history if needed.)
   (`results/related-seqs-n24.md`). Burnside from Fixed (A006770) + symmetric
   counts; all 95 known OEIS terms re-validated.
 
-## Live job
-- **ayr — a(34) cross-ISA verify** (`scripts/ayr_a34_verify.sh`): independent
-  x86 re-run (native `~/go/bin/go` 1.24 build; kink kernel; 32 cores) that
-  byte-compares the full triangle n=1..34 to the banked dalby (ARM) result.
-  orchestrate PID **2279208**, tmux `0:a34verify`, waiter **byv55t00t**. At last
-  check ~2.9h in, grinding the H18 peak (frontier shape matches dalby). ~6h to
-  go. On completion: expect `A34_VERIFY_PASS` → note it in a34 PROVENANCE
-  (upgrades to compiler/hardware-independent; still not a different *algorithm*).
-- **dalby — FREE.** gympie — local dev box.
+## Live jobs (Hall of Mirrors — symmetric TM pushes to n=34)
+- **dalby — symtm hmirror 34** (`scripts/symtm_run.sh hmirror 34 32`): PID
+  2994466, tmux `0:hm34`, rev `f306aa31`, → `runs/sym34/hmirror.out`. Predicted
+  ~1-1.5h wall / 15-25GB; at 13:22 was 28/34 strips, self-ETA ~13:32, RSS 8GB.
+  On completion: diff n≤24 prefix vs `runs/sym24/hmirror.out`, copy to gympie.
+- **dalby — symtm r180 34** (`scripts/symtm_run.sh r180 34 32`): PID 2996883,
+  tmux `0:r18034`, rev `7bc042e5`, → `runs/sym34/r180.out`. Predicted ~2.5h cpu
+  / ~15-30min wall at 32 threads / ~7-20GB (gympie ladder n=26/28/30). Same
+  completion drill. r180 unlocks **A030233 (one-sided) at n=34** (needs only
+  r90+r180; r90 already banked in gympie `runs/sym34/r90.out`).
+- **ayr — a(34) cross-ISA verify: DONE, `A34_VERIFY_PASS`** — x86 triangle
+  n=1..34 byte-identical to banked dalby (ARM); folded into a34 PROVENANCE.
+  ayr now FREE.
 
 ## Data ceiling (why the term chase is parked)
 - **P_16 is derivable** (fit from T(33,17)+T(34,18), self-consistent — verified)
@@ -50,11 +54,17 @@ session-by-session logs pruned 2026-07-04; recover from git history if needed.)
   (all four types over roots; mirror types were the pole, now ~90× faster):
   n=24 was ~2.2h. **n=25 ≈ 5.5h, n=26 ≈ 14h, n=27 ≈ 35h, n=28+ infeasible** for
   the close.
-- A proper **symmetric transfer-matrix engine** (reuse the kink/column
-  frontier-connectivity core with per-symmetry boundary conditions; hmirror
-  easy, r180 medium, dmirror hard, r90 leave-as-is) would take these to n=34 —
-  but it's a **multi-week post-close project**, not a close-window task. Known
-  solved in the literature (Jensen finite-lattice TM).
+- The symmetric transfer-matrix engine **exists now**: `cpp/sym/symtm.cpp`
+  (Hall of Mirrors), gated live vs symcount_fast (`tests/gate_symtm.py`) and
+  byte-matched to the banked `runs/sym24/` oracles.
+  - **hmirror**: palindromic-column sweep — n=34 running on dalby.
+  - **r180**: left-half sweep + self-glue (seam union-find; palindromic middle
+    column for odd widths), transpose-restricted to W≥H (weight 2/1) which
+    collapsed the tall strips (n=20: 79.9s→0.93s). n=34 running on dalby.
+  - **r90**: n=34 banked (`runs/sym34/r90.out`, gympie, 5.9s).
+  - **dmirror**: not built — the remaining blocker for A030222/34/35 at n=34;
+    hook-sweep design discussed 2026-07-04 (L-shells, folded arm state,
+    selfPaired bit, ±2 corner stencil).
 
 ## Open independent threads
 - **Lean proof** (branch `lean-diagonal-proofs`, `polyplets/PROOF-STATUS.md`):
