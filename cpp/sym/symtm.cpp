@@ -614,8 +614,7 @@ static bool closableDm(const Sig& s) {
   return mx == 1;  // canonical labels: max label == component count
 }
 
-// Step hook k-1 -> hook k (S is the coordinate cap: arms run to absolute
-// coordinate S-1, and the sweep passes S = maxn). New-cell adjacencies to
+// Step hook k-1 -> hook k of the exact-SxS sweep. New-cell adjacencies to
 // the old hook, in arm coordinates (old position i = (k-1, k-1+i)): a new arm
 // cell (k, k+j) sees old positions j..j+2 on ITS OWN arm only; the new
 // corner (k,k) is the one +-2 stencil — it sees old col 0..2 AND old row
@@ -779,85 +778,182 @@ static void forEachDmMask(const Sig& s, int k, int S, int ms, int maxn,
 // once more after the last hook. Counts are indexed by full n (corner 1,
 // arm pairs 2) — no transpose doubling: each dmirror-fixed animal is built
 // exactly once.
-static StripStats sweepDmirror(int S, int maxn, std::vector<u64>& total) {
+//
+// Unlike hmirror/r180, dmirror is threaded INSIDE the strip: the fattest
+// strip is ~16% of the whole sweep's cpu, so with strip-level parallelism
+// alone it floors the wall (measured on the ayr n=28 run: total cpu on
+// target but the tail all single-threaded). The db is sharded by hash;
+// per hook, threads pull source states off an atomic cursor and insert
+// stepped states into per-shard maps under per-shard mutexes — the totals
+// are u64 sums, so scheduling order cannot change any result byte. The
+// shard index uses the hash's HIGH bits: unordered_map's bucket choice
+// uses the low bits, and reusing them would leave each shard's map with a
+// correlated, mostly-empty bucket array on power-of-two implementations.
+// Tiny hooks skip the thread spawn (work < 256 states).
+static StripStats sweepDmirror(int S, int maxn, int T, std::vector<u64>& total,
+                               std::mutex& totMu) {
   StripStats st;
-  RDB db, next;
+  // Shards >> threads: every kept transition inserts under a shard mutex,
+  // so at shards == T the locks serialize the sweep (measured: n=24 @10t
+  // took 5 min vs 92s strip-parallel). At 64x oversharding the collision
+  // rate is ~T/(64T); the residual cost is the uncontended lock (~10%).
+  const int NSH = 64 * T;
+  std::vector<RDB> db(NSH), next(NSH);
   Sig seed;
   std::memset(seed.b, 0, SIGMAX);
-  db[seed].c.assign(maxn + 1, 0);
-  db[seed].c[0] = 1;
-  for (int k = 0; k <= S && !db.empty(); ++k) {
-    st.stateSum += db.size();
-    next.clear();
-    for (auto& [sig, val] : db) {
-      const std::vector<u64>& counts = val.c;
-      int ms = -1;
-      for (int n = 0; n <= maxn; ++n)
-        if (counts[n]) { ms = n; break; }
-      if (ms < 0) continue;
-      if (closableDm(sig))
-        for (int n = 1; n <= maxn; ++n) total[n] += counts[n];
-      if (k == S) continue;
-      // Rows < k can no longer gain a cell; an uncovered one disconnects
-      // every completion (the harvest single-label check is the authority).
-      if (~val.cov & ((1ull << k) - 1)) continue;
-      auto emit = [&](u64 mask, int w) {
-        ++st.steps;
-        Sig out;
-        if (dmStep(sig, k, S, mask, out) != Outcome::Alive) {
-          ++st.dead;
-          return;
-        }
-        u64 cov = val.cov | (1ull << k);
-        for (int q = 1; q <= S - 1 - k; ++q)
-          if ((mask >> q) & 1) cov |= 1ull << (k + q);
-        int owed = 0;  // post-step authority for the generator's debts
-        if (!out.b[DM_TOUCH]) {
-          int top = 0;
-          for (int q = S - 1 - k; q >= 0; --q)
-            if ((mask >> q) & 1) { top = q; break; }
-          owed = S - 1 - k - top;
-        }
-        const int unc = __builtin_popcountll(((1ull << S) - 1) & ~cov &
-                                             ~((1ull << (k + 1)) - 1));
-        if (unc > owed) owed = unc;
-        if (ms + w + owed > maxn) return;
-        ++st.kept;
-        RVal& dst = next[out];
-        if (dst.c.empty()) dst.c.assign(maxn + 1, 0);
-        dst.cov |= cov;
-        for (int n = 0; n + w <= maxn; ++n)
-          if (counts[n]) dst.c[n + w] += counts[n];
-      };
-      forEachDmMask(sig, k, S, ms, maxn, val.cov, emit);
-    }
-    std::swap(db, next);
+  {
+    RVal& sv = db[0][seed];
+    sv.c.assign(maxn + 1, 0);
+    sv.c[0] = 1;
   }
+  std::vector<std::mutex> mus(NSH);
+  std::mutex stripMu;
+  std::vector<u64> stripTot(maxn + 1, 0);
+  for (int k = 0; k <= S; ++k) {
+    std::vector<std::pair<const Sig*, const RVal*>> work;
+    for (auto& shard : db)
+      for (auto& kv : shard) work.emplace_back(&kv.first, &kv.second);
+    if (work.empty()) break;
+    st.stateSum += work.size();
+    for (auto& shard : next) shard.clear();
+    std::atomic<size_t> cursor{0};
+    std::atomic<u64> steps{0}, dead{0}, kept{0};
+    auto body = [&]() {
+      std::vector<u64> lt(maxn + 1, 0);
+      u64 mySteps = 0, myDead = 0, myKept = 0;
+      size_t i;
+      while ((i = cursor.fetch_add(1)) < work.size()) {
+        const Sig& sig = *work[i].first;
+        const RVal& val = *work[i].second;
+        const std::vector<u64>& counts = val.c;
+        int ms = -1;
+        for (int n = 0; n <= maxn; ++n)
+          if (counts[n]) { ms = n; break; }
+        if (ms < 0) continue;
+        if (closableDm(sig))
+          for (int n = 1; n <= maxn; ++n) lt[n] += counts[n];
+        if (k == S) continue;
+        // Rows < k can no longer gain a cell; an uncovered one disconnects
+        // every completion (harvest's single-label check is the authority).
+        if (~val.cov & ((1ull << k) - 1)) continue;
+        auto emit = [&](u64 mask, int w) {
+          ++mySteps;
+          Sig out;
+          if (dmStep(sig, k, S, mask, out) != Outcome::Alive) {
+            ++myDead;
+            return;
+          }
+          u64 cov = val.cov | (1ull << k);
+          for (int q = 1; q <= S - 1 - k; ++q)
+            if ((mask >> q) & 1) cov |= 1ull << (k + q);
+          int owed = 0;  // post-step authority for the generator's debts
+          if (!out.b[DM_TOUCH]) {
+            int top = 0;
+            for (int q = S - 1 - k; q >= 0; --q)
+              if ((mask >> q) & 1) { top = q; break; }
+            owed = S - 1 - k - top;
+          }
+          const int unc = __builtin_popcountll(((1ull << S) - 1) & ~cov &
+                                               ~((1ull << (k + 1)) - 1));
+          if (unc > owed) owed = unc;
+          if (ms + w + owed > maxn) return;
+          ++myKept;
+          const int sh = static_cast<int>((SigHash{}(out) >> 32) % NSH);
+          std::lock_guard<std::mutex> lk(mus[sh]);
+          RVal& dst = next[sh][out];
+          if (dst.c.empty()) dst.c.assign(maxn + 1, 0);
+          dst.cov |= cov;
+          for (int n = 0; n + w <= maxn; ++n)
+            if (counts[n]) dst.c[n + w] += counts[n];
+        };
+        forEachDmMask(sig, k, S, ms, maxn, val.cov, emit);
+      }
+      steps += mySteps;
+      dead += myDead;
+      kept += myKept;
+      std::lock_guard<std::mutex> lk(stripMu);
+      for (int n = 0; n <= maxn; ++n) stripTot[n] += lt[n];
+    };
+    if (T > 1 && work.size() >= 256) {
+      std::vector<std::thread> pool;
+      pool.reserve(T);
+      for (int t = 0; t < T; ++t) pool.emplace_back(body);
+      for (auto& th : pool) th.join();
+    } else {
+      body();
+    }
+    st.steps += steps.load();
+    st.dead += dead.load();
+    st.kept += kept.load();
+    db.swap(next);
+  }
+  std::lock_guard<std::mutex> lk(totMu);
+  for (int n = 0; n <= maxn; ++n) total[n] += stripTot[n];
   return st;
 }
 
 int main(int argc, char** argv) {
   const std::string type = argc >= 2 ? argv[1] : "";
-  if (argc < 3 || argc > 4 ||
-      (type != "hmirror" && type != "r180" && type != "dmirror")) {
-    std::fprintf(stderr, "usage: %s {hmirror|r180|dmirror} MAXN [THREADS]\n",
-                 argv[0]);
+  const bool isDm = type == "dmirror";
+  if (argc < 3 || argc > (isDm ? 6 : 4) ||
+      (type != "hmirror" && type != "r180" && !isDm)) {
+    std::fprintf(stderr,
+                 "usage: %s {hmirror|r180} MAXN [THREADS]\n"
+                 "       %s dmirror MAXN [THREADS [SMIN SMAX]]\n",
+                 argv[0], argv[0]);
     return 2;
   }
-  auto* sweep = type == "hmirror" ? sweepHmirror
-                : type == "r180"  ? sweepR180
-                                  : sweepDmirror;
+  auto* sweep = type == "hmirror" ? sweepHmirror : sweepR180;
   const int maxn = std::atoi(argv[2]);
   if (maxn < 1 || maxn > 34) {  // dmirror layout caps the bbox at 34
     std::fprintf(stderr, "MAXN out of range (1..34)\n");
     return 2;
   }
-  int nthreads = argc == 4 ? std::atoi(argv[3]) : 1;
+  int nthreads = argc >= 4 ? std::atoi(argv[3]) : 1;
   if (nthreads < 1) nthreads = 1;
+  // dmirror strip range: farm exact-bbox strips across machines; the
+  // partial totals of disjoint ranges sum to the full count.
+  int smin = 1, smax = maxn;
+  if (isDm && argc == 6) {
+    smin = std::atoi(argv[4]);
+    smax = std::atoi(argv[5]);
+    if (smin < 1 || smax > maxn || smin > smax) {
+      std::fprintf(stderr, "bad strip range %d..%d (need 1<=SMIN<=SMAX<=MAXN)\n",
+                   smin, smax);
+      return 2;
+    }
+  }
 
-  obs::Reporter rep("symtm-" + type + "-N" + std::to_string(maxn),
-                    static_cast<double>(maxn),
-                    "type=" + type + " threads=" + std::to_string(nthreads));
+  obs::Reporter rep(
+      "symtm-" + type + "-N" + std::to_string(maxn),
+      static_cast<double>(isDm ? smax - smin + 1 : maxn),
+      "type=" + type + " threads=" + std::to_string(nthreads) +
+          (isDm ? " strips=" + std::to_string(smin) + ".." +
+                      std::to_string(smax)
+                : ""));
+
+  if (isDm) {
+    // Strips run SEQUENTIALLY, tallest (most expensive) first, each using
+    // every thread internally — the fat strips are what floor the wall.
+    std::vector<u64> total(maxn + 1, 0);
+    std::mutex totMu;
+    int beats = 0;
+    for (int S = smax; S >= smin; --S) {
+      const StripStats st = sweepDmirror(S, maxn, nthreads, total, totMu);
+      rep.beat(++beats,
+               "S=" + std::to_string(S) +
+                   " states=" + std::to_string(st.stateSum) +
+                   " steps=" + std::to_string(st.steps) +
+                   " dead=" + std::to_string(st.dead) +
+                   " kept=" + std::to_string(st.kept),
+               /*force=*/true);
+    }
+    for (int n = 1; n <= maxn; ++n)
+      if (total[n])
+        std::printf("%d %llu\n", n, static_cast<unsigned long long>(total[n]));
+    rep.done("result=ok");
+    return 0;
+  }
 
   // Strips are independent; parallelize over H exactly as symcount_fast does
   // over roots: threads pull strip indices off an atomic counter, tallest
