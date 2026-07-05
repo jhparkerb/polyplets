@@ -67,7 +67,8 @@ of the height triangle (an exponential/cumulant law with two new constants
 per level---empirically pinned and validated on every held-out term, not
 proved), a conjectural quasi-polynomial law for the diagonals of the
 symmetric-fixed-point triangle (period two, degree $k$, with
-generating-function numerators satisfying $N_k(\pm1)=(\pm2)^k$), a hole-count
+generating-function numerators satisfying $N_k(\pm1)=(\pm2)^k$, $k\ge1$), a
+hole-count
 stratification of A006770, exact fixed-height generating functions, the
 extremal maximum hole area ($\sim n^2/8$), and rigorous lower bounds on
 $a(n)$. Results computed and
@@ -244,9 +245,10 @@ $\theta$ between $-0.94$ and $-0.96$) for windows starting at $n=10$, $15$,
 $20$, $25$ and ending at $34$; the upward drift with window start is the
 signature of an unmodelled confluent correction. Refitting with a confluent
 term, $r_n=\lambda(1+\theta/n+c/n^{1+\Delta_1})$, with $\Delta_1$ scanned on
-a grid, the exponent $\Delta_1=\tfrac12$ is decisively preferred by
-residuals (three orders of magnitude below the alternatives on every
-window) and removes the drift: $\lambda=7.1109$--$7.1111$ across the same
+a grid, the exponent $\Delta_1=\tfrac12$ gives the smallest residuals on
+every window (by factors from ${\sim}5$ on the shortest window to
+${\sim}350$ on the longest) and removes the drift:
+$\lambda=7.1109$--$7.1111$ across the same
 four windows, with $\theta$ between $-1.02$ and $-1.03$---consistent with
 the universal two-dimensional lattice-animal value
 $\theta=-1$~\cite{jensen2001}, which the fit was free to miss. We
@@ -649,12 +651,17 @@ that agree exactly.
   \label{tab:dmpk}
 \end{table}
 
-In the generating-function basis the structure is crisper: with
-$G_k(x)=\sum_S d(S,S+k)\,x^S$,
+In the generating-function basis the structure is crisper. Let $G_k$ be
+the generating function of the polynomial law itself,
+$G_k(x)=\sum_{S\ge0} P_k(S)\,x^S$ with $P_k$ evaluated per parity; its
+coefficients agree with the counts $d(S,S+k)$ at every in-regime $S$ (the
+finitely many pre-onset counts deviate from the polynomials, so the raw
+counting series differs from $G_k$ by an additive polynomial of degree
+below the onset, which does not affect the pole structure). Then
 \[
   G_k(x)\;=\;\frac{N_k(x)}{(1-x)^{k+1}(1+x)^{k}},\qquad
   N_k \in \mathbb{Z}[x],\ \deg N_k = 2k,\qquad
-  N_k(\pm1)=(\pm2)^k .
+  N_k(\pm1)=(\pm2)^k \ (k\ge1).
 \]
 The integer numerators, for the record:
 \begin{align*}
@@ -674,7 +681,7 @@ coefficients against exact diagonal counts, and the boundary values
 \emph{emerged} from its output, exactly as they hold on the pinned rows
 $k\le4$---where every coefficient is fixed by exact differencing with
 surplus holdout points and no overfitting account is available. Its
-status is an observed regularity across all six levels, with the caveat
+status is an observed regularity across levels $k=1..5$, with the caveat
 that at $k=5$ it is only as trustworthy as the fitted row itself.
 The boundary values say the dominant single-defect family has two species per
 odd footprint; the next layer of the peeled numerators follows linear-in-$k$
@@ -946,9 +953,13 @@ $a(25)\ge\num{6657105903966723073}$; the exact value
 $\num{14994811325186658577}$, computed later by Method~C, confirms it (the
 bound captured $44\%$)---a retrospective certification of the GF machinery.
 The bound remains available for any $n$ beyond the current frontier, though
-its capture fraction shrinks as taller strips dominate.
-% TODO(gf-bound-n35plus): recompute the showcase bound at n=35 or 40 via
-% paper/gf_bound.py and quote the capture fraction against a(34)'s trend.
+its capture fraction shrinks as taller strips dominate: against the exact
+values it captures $44\%$ at $n=25$ but only $16\%$ at $n=34$. Beyond the
+frontier it gives
+$a(35)\ge\num{507142944262215078226758378}\approx5.07\times10^{26}$ and
+$a(40)\ge\num{4266005101622209395058618248135}\approx4.27\times10^{30}$,
+exact integers from rational arithmetic
+(\texttt{paper/gf\_bound.py}).
 
 \section{Sampling portrait}
 \label{sec:sampling}

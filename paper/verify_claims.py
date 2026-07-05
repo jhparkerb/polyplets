@@ -6,7 +6,7 @@ Regenerates the hole tables and the 3^(H-1) closed form from build/g2, reads the
 b-files for the published terms, and checks the transcribed paper tables against
 all of it. Run from the repo root after `make build/g2`:  python3 paper/verify_claims.py
 """
-import os, subprocess, glob
+import ast, os, re, subprocess, glob
 from fractions import Fraction as F
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -179,7 +179,6 @@ chk("lifetime-3 atom degrees (H<=7) == 1,2,4,9,29,68,181",
 
 # Rigorous lower bound  a(n) >= sum_{H<=10} [x^n] G_H  (cf. paper/gf_bound.py): expand the
 # recovered GFs as exact integer power series; check captured fraction + the a(25) bound.
-import ast
 def _gf_series(Pc, Qc, N):
     b = [0]*(N+1)
     for m in range(N+1):
@@ -263,6 +262,219 @@ if os.path.exists(SC):
         chk(f"asymmetric({n})=Free-bilateral={asym}", freeN[n] - b == asym)
 else:
     print("  (skipping symmetric n=18,19 checks: build/symcount_fast not found)")
+
+# === Claims of the full computational report (a(34) era, 2026-07) ===
+# These parse the report's tables straight out of the .tex, so transcription
+# errors in the paper are caught, then validate against the banked data.
+
+TEX = open(os.path.join(ROOT, "paper", "polyplets-report.tex")).read()
+
+def table_text(label):
+    i = TEX.find("\\label{%s}" % label)
+    assert i >= 0, label
+    return TEX[TEX.rfind("\\begin{table}", 0, i):TEX.find("\\end{table}", i)]
+
+def table_rows(label):
+    """Rows of integers from a tabular body (\\num{} unwrapped, --- -> None)."""
+    rows = []
+    for line in table_text(label).splitlines():
+        if "multicolumn" in line or "&" not in line:
+            continue
+        s = re.sub(r"\\num\{(\d+)\}", r"\1", line)
+        s = re.sub(r"\\(textbf|mathbf)", "", s)
+        cells = [c.strip(" ${}\\") for c in s.split("&")]
+        row = []
+        for c in cells:
+            if c == "---":
+                row.append(None)
+            elif re.fullmatch(r"\d+", c):
+                row.append(int(c))
+        if len(row) >= 2:
+            rows.append(row)
+    return rows
+
+TRI = load("results/ns_a34/triangle.txt")          # a(n) totals to 34
+chk("triangle totals extend b-file", all(TRI[n] == A[n] for n in A))
+
+# tab:terms -- all 34 values vs the banked totals
+terms = {}
+for row in table_rows("tab:terms"):
+    for i in range(0, len(row) - 1, 2):
+        terms[row[i]] = row[i + 1]
+chk("tab:terms has n=1..34", sorted(terms) == list(range(1, 35)))
+for n, v in sorted(terms.items()):
+    chk(f"tab:terms a({n}) vs banked", TRI.get(n) == v, f"paper {v} vs {TRI.get(n)}")
+
+# growth paragraph: quoted ratios and both lambda fits recomputed
+r34 = {n: TRI[n] / TRI[n - 1] for n in range(2, 35)}
+for n, q in ((20, 6.765), (27, 6.853), (34, 6.905)):
+    chk(f"quoted ratio r_{n}~{q}", round(r34[n], 3) == q, f"{r34[n]:.4f}")
+
+def lstsq(rows_, rhs):
+    m = len(rows_[0])
+    Aq = [[sum(rr[p] * rr[q] for rr in rows_) for q in range(m)] for p in range(m)]
+    bq = [sum(rr[p] * y for rr, y in zip(rows_, rhs)) for p in range(m)]
+    for col in range(m):
+        piv = max(range(col, m), key=lambda i: abs(Aq[i][col]))
+        Aq[col], Aq[piv] = Aq[piv], Aq[col]
+        bq[col], bq[piv] = bq[piv], bq[col]
+        for i in range(m):
+            if i != col and Aq[i][col]:
+                f_ = Aq[i][col] / Aq[col][col]
+                Aq[i] = [x - f_ * y for x, y in zip(Aq[i], Aq[col])]
+                bq[i] -= f_ * bq[col]
+    return [bq[i] / Aq[i][i] for i in range(m)]
+
+lam2q = [7.101, 7.104, 7.105, 7.106]
+for s, q in zip((10, 15, 20, 25), lam2q):
+    ns = range(s, 35)
+    lam, lt = lstsq([[1.0, 1.0 / n] for n in ns], [r34[n] for n in ns])
+    chk(f"2-param lambda window {s}..34 == {q}", round(lam, 3) == q, f"{lam:.4f}")
+    chk(f"2-param theta window {s}..34 rounds into [-0.96,-0.94]",
+        -0.96 <= round(lt / lam, 2) <= -0.94)
+rss = {}
+for D1 in (0.5, 1.0):
+    for s in (10, 15, 20, 25):
+        ns = range(s, 35)
+        sol = lstsq([[1.0, 1.0 / n, 1.0 / n ** (1 + D1)] for n in ns],
+                    [r34[n] for n in ns])
+        lam, th = sol[0], sol[1] / sol[0]
+        res = sum((sol[0] + sol[1] / n + sol[2] / n ** (1 + D1) - r34[n]) ** 2
+                  for n in ns)
+        rss[(D1, s)] = res
+        if D1 == 0.5:
+            chk(f"3-param lambda window {s}..34 in [7.1109,7.1111]",
+                7.1109 <= round(lam, 4) <= 7.1111, f"{lam:.5f}")
+            chk(f"3-param theta window {s}..34 in [-1.03,-1.02]",
+                -1.03 <= round(th, 2) <= -1.02, f"{th:.4f}")
+chk("Delta1=1/2 beats Delta1=1 on every window (~5x shortest, ~350x longest)",
+    all(rss[(0.5, s)] * 5 <= rss[(1.0, s)] for s in (10, 15, 20, 25))
+    and rss[(0.5, 10)] * 350 <= rss[(1.0, 10)])
+
+# tab:byheight34 -- swept heights vs run data; whole column sums to a(34)
+bh34 = {row[i]: row[i + 1] for row in table_rows("tab:byheight34")
+        for i in range(0, len(row) - 1, 2)}
+chk("tab:byheight34 has H=1..34", sorted(bh34) == list(range(1, 35)))
+chk("tab:byheight34 sums to a(34)", sum(bh34.values()) == TRI[34])
+chk("T(34,34)==3^33", bh34[34] == 3 ** 33)
+inj = sum(v for h, v in bh34.items() if h >= 19)
+chk("injected share H>=19 rounds to 6.5%", round(100 * inj / TRI[34], 1) == 6.5)
+for h in range(3, 19):
+    ph = os.path.join(ROOT, "results", "ns_a34", "perheight", f"h{h}.out")
+    if os.path.exists(ph):
+        chk(f"T(34,{h}) vs perheight run data", load(f"results/ns_a34/perheight/h{h}.out").get(34) == bh34[h])
+
+# symmetry counts: tab:symcounts vs banked engine outputs; Burnside companions
+S34 = {t: load(f"runs/sym34/{t}.out") for t in ("r90", "r180", "hmirror")} \
+    if os.path.exists(os.path.join(ROOT, "runs", "sym34", "r90.out")) else None
+DM = load("runs/sym32/dmirror.out") \
+    if os.path.exists(os.path.join(ROOT, "runs", "sym32", "dmirror.out")) else None
+if S34 and DM:
+    for row in table_rows("tab:symcounts"):
+        n, r9, r1, hm = row[0], row[1], row[2], row[3]
+        d = row[4] if len(row) > 4 else None
+        chk(f"tab:symcounts R90({n})", S34["r90"].get(n, 0) == r9)
+        chk(f"tab:symcounts R180({n})", S34["r180"].get(n, 0) == r1)
+        chk(f"tab:symcounts H({n})", S34["hmirror"].get(n, 0) == hm)
+        if d is not None:
+            chk(f"tab:symcounts D({n})", DM.get(n) == d, f"paper {d} vs {DM.get(n)}")
+
+    B233 = load("results/b030233_upload.txt")
+    ones_rows = {row[i]: row[i + 1] for row in table_rows("tab:onesided")
+                 for i in range(0, len(row) - 1, 2)}
+    for n, v in sorted(ones_rows.items()):
+        num = TRI[n] + 2 * S34["r90"].get(n, 0) + S34["r180"].get(n, 0)
+        chk(f"tab:onesided({n}) == Burnside/4", num % 4 == 0 and num // 4 == v)
+        if n <= 33:
+            chk(f"b030233({n}) == table", B233.get(n) == v)
+
+    B = {s: load(f"results/b{s}_upload.txt")
+         for s in ("030222", "030234", "030235", "194596")}
+    A105 = load("fixtures/b000105.txt")
+    for row in table_rows("tab:companions"):
+        n, fr, bi, asy, fnp = row
+        num = (TRI[n] + 2 * S34["r90"].get(n, 0) + S34["r180"].get(n, 0)
+               + 2 * S34["hmirror"].get(n, 0) + 2 * DM.get(n, 0))
+        chk(f"tab:companions free({n})", num % 8 == 0 and num // 8 == fr)
+        chk(f"tab:companions bilat({n})",
+            (S34["hmirror"].get(n, 0) + DM.get(n, 0)) % 2 == 0
+            and (S34["hmirror"].get(n, 0) + DM.get(n, 0)) // 2 == bi)
+        chk(f"tab:companions asym({n})", fr - bi == asy)
+        chk(f"tab:companions freenonpoly({n})", fr - A105[n] == fnp)
+        for s, v in (("030222", fr), ("030234", bi), ("030235", asy), ("194596", fnp)):
+            chk(f"b{s}({n}) == table", B[s].get(n) == v)
+else:
+    print("  (skipping symmetry/companion checks: runs/sym34 or runs/sym32 absent)")
+
+# dmirror diagonal quasi-polynomials (tab:dmpk) and GF numerators N_k
+strips = glob.glob(os.path.join(ROOT, "runs", "sym32", "dmirror.S*.out"))
+if strips:
+    dd = {}
+    for f in strips:
+        S = int(re.search(r"S(\d+)\.out", f).group(1))
+        for line in open(f):
+            p = line.split()
+            if len(p) == 2 and p[0].isdigit():
+                dd[(S, int(p[0]))] = int(p[1])
+    # P_k per parity: coefficient lists (constant first), Fractions
+    PK = {  # (k, parity 0=even,1=odd): coeffs
+        (0, 0): [2], (0, 1): [2],
+        (1, 0): [6, 1], (1, 1): [7, 1],
+        (2, 0): [12, 7, F(1, 2)], (2, 1): [F(27, 2), 6, F(1, 2)],
+        (3, 0): [50, F(40, 3), 3, F(1, 6)],
+        (3, 1): [F(93, 2), F(83, 6), F(7, 2), F(1, 6)],
+        (4, 0): [180, 33, F(28, 3), F(3, 2), F(1, 24)],
+        (4, 1): [F(1367, 8), F(119, 3), F(97, 12), F(4, 3), F(1, 24)],
+        (5, 0): [570, F(2278, 15), F(55, 3), 4, F(5, 12), F(1, 120)],
+        (5, 1): [F(4545, 8), F(18869, 120), F(185, 12), F(19, 4), F(11, 24), F(1, 120)],
+    }
+    for (k, par), cs in sorted(PK.items()):
+        onset = 2 * k + 2 + par
+        pts = [(S, v) for (S, n), v in dd.items()
+               if n - S == k and S % 2 == par and S >= onset]
+        good = all(sum(c * S ** i for i, c in enumerate(cs)) == v for S, v in pts)
+        chk(f"tab:dmpk P_{k} {'even' if par==0 else 'odd'} on {len(pts)} points",
+            len(pts) >= 3 and good)
+    # N_k transcriptions: series of N_k/((1-x)^(k+1)(1+x)^k) == d(S,S+k) for ALL S
+    NK = {0: [2], 1: [6, 2, -6], 2: [12, 8, -16, -8, 8],
+          3: [50, 14, -124, -8, 110, 2, -36],
+          4: [180, 40, -644, -54, 942, 12, -600, 2, 138],
+          5: [570, 176, -2610, -520, 4996, 764, -4816, -496, 2282, 108, -422]}
+    for k, N in NK.items():
+        den = [1]
+        for _ in range(k + 1):          # (1-x)^{k+1}
+            den = [a - (den[i - 1] if i else 0)
+                   for i, a in enumerate(den + [0])]
+        for _ in range(k):              # (1+x)^k
+            den = [a + (den[i - 1] if i else 0)
+                   for i, a in enumerate(den + [0])]
+        top = 32 - k
+        b = []
+        for m in range(top + 1):
+            v = N[m] if m < len(N) else 0
+            for j in range(1, min(m, len(den) - 1) + 1):
+                v -= den[j] * b[m - j]
+            b.append(v)
+        # G_k generates the polynomial law P_k(S) at every S; its coefficients
+        # agree with the raw counts exactly in-regime (S >= onset per parity).
+        chk(f"N_{k} series == P_k(S) extension, S<= {top}",
+            all(b[S] == sum(c * S ** i for i, c in
+                            enumerate(PK[(k, S % 2)]))
+                for S in range(0, top + 1)))
+        chk(f"N_{k} series == d(S,S+k) in-regime, S<= {top}",
+            all(b[S] == dd.get((S, S + k), 0)
+                for S in range(2 * k + 2, top + 1)))
+        if k >= 1:  # boundary law is k>=1 (N_0=2 is the two-spine factor)
+            chk(f"N_{k}(1)==2^{k}", sum(N) == 2 ** k)
+            chk(f"N_{k}(-1)==(-2)^{k}",
+                sum(c * (-1) ** i for i, c in enumerate(N)) == (-2) ** k)
+        chk(f"deg N_{k}==2k", len(N) - 1 == 2 * k)
+else:
+    print("  (skipping dmirror P_k / N_k checks: runs/sym32 strips absent)")
+
+# Conjecture 1: M(n) = round((n-2)^2/8) = A001971(n-2) on all known values
+chk("M(n)==round((n-2)^2/8) for n=1..16",
+    all(M[n - 1] == ((n - 2) ** 2 + 4) // 8 for n in range(1, 17)))
 
 print(f"\n{ok} checks passed, {bad} failed.")
 raise SystemExit(1 if bad else 0)
