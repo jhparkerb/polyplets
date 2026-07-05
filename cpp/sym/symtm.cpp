@@ -72,6 +72,8 @@
 #include "../obs.h"
 
 using u64 = std::uint64_t;
+using u32 = std::uint32_t;
+using u8 = std::uint8_t;
 
 struct SigHash {
   size_t operator()(const Sig& s) const {
@@ -793,6 +795,130 @@ static void forEachDmMask(const Sig& s, int k, int S, int ms, int maxn,
 // uses the low bits, and reusing them would leave each shard's map with a
 // correlated, mostly-empty bucket array on power-of-two implementations.
 // Tiny hooks skip the thread spawn (work < 256 states).
+// Compact frontier shard (Shrink Ray). The unordered_map<Sig,RVal>
+// frontier OOMed dalby at n=32: hash node + full-width heap count vector
+// cost ~300B+/state (S=31 measured 79.1GB peak; S=30 died >124GB). Flat
+// storage instead:
+//   ent - fixed 88-byte entries: cov(u64) off(u32) lo,len(u8) sig(70B) pad
+//   idx - open-addressing table (pow2, load <= 1/2) of entry indices,
+//         probed with the LOW hash bits (shard selection uses the high 32)
+//   cnt - one arena; an entry's counts live at [off, off+len),
+//         absolute n = floor + lo + j
+// Ranged blocks bank profile_rows' measured 0.56x mean occupied width. lo
+// is exact -- every contributor is nonzero at its own lo, by induction
+// from the seed: a contribution whose lo element would land past maxn is
+// pruned before insert (ms + w + owed > maxn) -- so ms = floor + lo with
+// no scan, and the all-zero-entry case cannot form. len is slack-rounded
+// (up to a multiple of 4, capped at the floor width) so cross-source
+// merges nearly always extend in place; a genuine widening reallocates at
+// the arena tip and orphans the old block until the shard is freed.
+// Entries are never deleted individually: a consuming thread owns a whole
+// source shard, harvests + expands every entry, then frees the shard --
+// the same erase-as-consumed RAM shape at 1/(64T) granularity, except the
+// memory actually returns (per-node erase never gave malloc pages back).
+struct DmShard {
+  static constexpr u32 EMPTY = 0xFFFFFFFFu;
+  static constexpr int COV = 0, OFF = 8, LO = 12, LEN = 13, SIGOFF = 14,
+                       STRIDE = 88;
+  std::vector<u8> ent;
+  std::vector<u32> idx;
+  std::vector<u64> cnt;
+  u32 n = 0;
+
+  u8* e(u32 i) { return ent.data() + static_cast<size_t>(i) * STRIDE; }
+  const u8* e(u32 i) const {
+    return ent.data() + static_cast<size_t>(i) * STRIDE;
+  }
+
+  // Vector doubling would overshoot the peak-hook RSS by up to 2x; grow at
+  // ~1.25x instead (allocation count stays logarithmic).
+  template <class V>
+  static void grow(V& v, size_t need) {
+    if (v.capacity() < need) v.reserve(need + need / 4 + 64);
+  }
+
+  static u64 rawHash(const u8* b) {
+    u64 h = 1469598103934665603ull;
+    for (int i = 0; i < SIGMAX; ++i) { h ^= b[i]; h *= 1099511628211ull; }
+    return h;
+  }
+
+  void rehash(u32 cap) {  // cap = new pow2 table size
+    idx.assign(cap, EMPTY);
+    for (u32 i = 0; i < n; ++i) {
+      u32 s = static_cast<u32>(rawHash(e(i) + SIGOFF)) & (cap - 1);
+      while (idx[s] != EMPTY) s = (s + 1) & (cap - 1);
+      idx[s] = i;
+    }
+  }
+
+  // Merge one kept transition: counts c[0..m) land at floor-relative
+  // indices dlo..dlo+m-1 (all < wcap, the floor's width cap). Caller holds
+  // this shard's mutex.
+  void add(const Sig& key, u64 h, u64 cov, const u64* c, int m, int dlo,
+           int wcap) {
+    if (idx.empty()) rehash(1024);
+    else if (2ull * (n + 1) > idx.size()) rehash(2 * static_cast<u32>(idx.size()));
+    const u32 mask = static_cast<u32>(idx.size()) - 1;
+    u32 s = static_cast<u32>(h) & mask;
+    while (idx[s] != EMPTY) {
+      u8* p = e(idx[s]);
+      if (!std::memcmp(p + SIGOFF, key.b, SIGMAX)) {
+        u64 ecov;
+        std::memcpy(&ecov, p + COV, 8);
+        ecov |= cov;
+        std::memcpy(p + COV, &ecov, 8);
+        u32 off;
+        std::memcpy(&off, p + OFF, 4);
+        const int elo = p[LO], elen = p[LEN];
+        if (dlo >= elo && dlo + m <= elo + elen) {
+          u64* dst = cnt.data() + off + (dlo - elo);
+          for (int j = 0; j < m; ++j) dst[j] += c[j];
+        } else {  // widen: union range, slack-rounded, at the arena tip
+          const int nlo = dlo < elo ? dlo : elo;
+          const int hi0 = elo + elen, hi1 = dlo + m;
+          int nlen = (hi0 > hi1 ? hi0 : hi1) - nlo;
+          nlen = (nlen + 3) & ~3;
+          if (nlen > wcap - nlo) nlen = wcap - nlo;
+          const size_t noff = cnt.size();
+          grow(cnt, noff + nlen);
+          cnt.resize(noff + nlen, 0);
+          std::memcpy(cnt.data() + noff + (elo - nlo), cnt.data() + off,
+                      static_cast<size_t>(elen) * 8);
+          u64* dst = cnt.data() + noff + (dlo - nlo);
+          for (int j = 0; j < m; ++j) dst[j] += c[j];
+          const u32 noff32 = static_cast<u32>(noff);
+          std::memcpy(p + OFF, &noff32, 4);
+          p[LO] = static_cast<u8>(nlo);
+          p[LEN] = static_cast<u8>(nlen);
+        }
+        return;
+      }
+      s = (s + 1) & mask;
+    }
+    int alen = (m + 3) & ~3;  // new entry, slack for future merges
+    if (alen > wcap - dlo) alen = wcap - dlo;
+    const size_t noff = cnt.size();
+    if (noff + alen > 0xFFFFFF00ull) {  // u32 arena offsets: loud, not wrong
+      std::fprintf(stderr, "DmShard arena overflow\n");
+      std::abort();
+    }
+    grow(cnt, noff + alen);
+    cnt.resize(noff + alen, 0);
+    std::memcpy(cnt.data() + noff, c, static_cast<size_t>(m) * 8);
+    grow(ent, static_cast<size_t>(n + 1) * STRIDE);
+    ent.resize(static_cast<size_t>(n + 1) * STRIDE, 0);
+    u8* p = e(n);
+    std::memcpy(p + COV, &cov, 8);
+    const u32 noff32 = static_cast<u32>(noff);
+    std::memcpy(p + OFF, &noff32, 4);
+    p[LO] = static_cast<u8>(dlo);
+    p[LEN] = static_cast<u8>(alen);
+    std::memcpy(p + SIGOFF, key.b, SIGMAX);
+    idx[s] = n++;
+  }
+};
+
 static StripStats sweepDmirror(int S, int maxn, int T, std::vector<u64>& total,
                                std::mutex& totMu) {
   StripStats st;
@@ -801,86 +927,84 @@ static StripStats sweepDmirror(int S, int maxn, int T, std::vector<u64>& total,
   // took 5 min vs 92s strip-parallel). At 64x oversharding the collision
   // rate is ~T/(64T); the residual cost is the uncontended lock (~10%).
   const int NSH = 64 * T;
-  std::vector<RDB> db(NSH), next(NSH);
+  std::vector<DmShard> db(NSH), next(NSH);
   Sig seed;
   std::memset(seed.b, 0, SIGMAX);
   {
-    RVal& sv = db[0][seed];
-    sv.c.assign(1, 0);  // floor 0: c[i] <-> n = i
-    sv.c[0] = 1;
+    const u64 one = 1;  // floor 0, lo 0: the empty prefix, n = 0
+    db[0].add(seed, SigHash{}(seed), 0, &one, 1, 0, maxn + 1);
   }
   std::vector<std::mutex> mus(NSH);
   std::mutex stripMu;
   std::vector<u64> stripTot(maxn + 1, 0);
   for (int k = 0; k <= S; ++k) {
-    // db entries at loop k have count floor k: c[i] <-> n = k + i.
-    std::vector<std::tuple<const Sig*, const RVal*, int>> work;
-    for (int sh = 0; sh < NSH; ++sh)
-      for (auto& kv : db[sh]) work.emplace_back(&kv.first, &kv.second, sh);
-    if (work.empty()) break;
-    st.stateSum += work.size();
-    for (auto& shard : next) shard.clear();
-    std::atomic<size_t> cursor{0};
+    // db entries at loop k have count floor k: n = k + lo + j.
+    u64 live = 0;
+    for (const auto& sh : db) live += sh.n;
+    if (!live) break;
+    st.stateSum += live;
+    std::atomic<int> cursor{0};
     std::atomic<u64> steps{0}, dead{0}, kept{0};
+    const int wcap = maxn - k;  // dst floor k+1: index j valid iff j < wcap
     auto body = [&]() {
       std::vector<u64> lt(maxn + 1, 0);
       u64 mySteps = 0, myDead = 0, myKept = 0;
-      size_t i;
-      while ((i = cursor.fetch_add(1)) < work.size()) {
-        const Sig& sig = *std::get<0>(work[i]);
-        const RVal& val = *std::get<1>(work[i]);
-        const std::vector<u64>& counts = val.c;
-        const int clen = static_cast<int>(counts.size());
-        int ms = -1;
-        for (int i2 = 0; i2 < clen; ++i2)
-          if (counts[i2]) { ms = k + i2; break; }
-        auto consumed = [&]() {  // done with this entry: free it now
-          const int sh = std::get<2>(work[i]);
-          const Sig key = sig;
-          std::lock_guard<std::mutex> lk(mus[sh]);
-          db[sh].erase(key);
-        };
-        if (ms < 0) { consumed(); continue; }
-        if (closableDm(sig))
-          for (int i2 = 0; i2 < clen; ++i2)
-            if (k + i2 >= 1) lt[k + i2] += counts[i2];
-        if (k == S) { consumed(); continue; }
-        // Rows < k can no longer gain a cell; an uncovered one disconnects
-        // every completion (harvest's single-label check is the authority).
-        if (~val.cov & ((1ull << k) - 1)) { consumed(); continue; }
-        auto emit = [&](u64 mask, int w) {
-          ++mySteps;
-          Sig out;
-          if (dmStep(sig, k, S, mask, out) != Outcome::Alive) {
-            ++myDead;
-            return;
-          }
-          u64 cov = val.cov | (1ull << k);
-          for (int q = 1; q <= S - 1 - k; ++q)
-            if ((mask >> q) & 1) cov |= 1ull << (k + q);
-          int owed = 0;  // post-step authority for the generator's debts
-          if (!out.b[DM_TOUCH]) {
-            int top = 0;
-            for (int q = S - 1 - k; q >= 0; --q)
-              if ((mask >> q) & 1) { top = q; break; }
-            owed = S - 1 - k - top;
-          }
-          const int unc = __builtin_popcountll(((1ull << S) - 1) & ~cov &
-                                               ~((1ull << (k + 1)) - 1));
-          if (unc > owed) owed = unc;
-          if (ms + w + owed > maxn) return;
-          ++myKept;
-          const int sh = static_cast<int>((SigHash{}(out) >> 32) % NSH);
-          std::lock_guard<std::mutex> lk(mus[sh]);
-          RVal& dst = next[sh][out];
-          if (dst.c.empty()) dst.c.assign(maxn - k, 0);  // floor k+1
-          dst.cov |= cov;
-          // src c[i2] <-> n = k+i2; dst floor k+1: n+w <-> index i2+w-1.
-          for (int i2 = 0; i2 < clen && k + i2 + w <= maxn; ++i2)
-            if (counts[i2]) dst.c[i2 + w - 1] += counts[i2];
-        };
-        forEachDmMask(sig, k, S, ms, maxn, val.cov, emit);
-        consumed();
+      int si;
+      while ((si = cursor.fetch_add(1)) < NSH) {
+        DmShard& src = db[si];
+        for (u32 ei = 0; ei < src.n; ++ei) {
+          const u8* p = src.e(ei);
+          Sig sig;
+          std::memcpy(sig.b, p + DmShard::SIGOFF, SIGMAX);
+          u64 cov0;
+          std::memcpy(&cov0, p + DmShard::COV, 8);
+          u32 off;
+          std::memcpy(&off, p + DmShard::OFF, 4);
+          const int slo = p[DmShard::LO], slen = p[DmShard::LEN];
+          const u64* counts = src.cnt.data() + off;
+          const int ms = k + slo;  // lo is exact: counts[0] != 0
+          if (closableDm(sig))
+            for (int j = 0; j < slen; ++j)
+              if (counts[j] && ms + j >= 1) lt[ms + j] += counts[j];
+          if (k == S) continue;
+          // Rows < k can no longer gain a cell; an uncovered one
+          // disconnects every completion (harvest's single-label check is
+          // the authority).
+          if (~cov0 & ((1ull << k) - 1)) continue;
+          auto emit = [&](u64 mask, int w) {
+            ++mySteps;
+            Sig out;
+            if (dmStep(sig, k, S, mask, out) != Outcome::Alive) {
+              ++myDead;
+              return;
+            }
+            u64 cov = cov0 | (1ull << k);
+            for (int q = 1; q <= S - 1 - k; ++q)
+              if ((mask >> q) & 1) cov |= 1ull << (k + q);
+            int owed = 0;  // post-step authority for the generator's debts
+            if (!out.b[DM_TOUCH]) {
+              int top = 0;
+              for (int q = S - 1 - k; q >= 0; --q)
+                if ((mask >> q) & 1) { top = q; break; }
+              owed = S - 1 - k - top;
+            }
+            const int unc = __builtin_popcountll(((1ull << S) - 1) & ~cov &
+                                                 ~((1ull << (k + 1)) - 1));
+            if (unc > owed) owed = unc;
+            if (ms + w + owed > maxn) return;
+            ++myKept;
+            // src n = k+slo+j; dst floor k+1: same n+w at index slo+w-1+j.
+            const int dlo = slo + w - 1;
+            int m = slen;
+            if (m > wcap - dlo) m = wcap - dlo;  // >= 1: ms + w <= maxn
+            const u64 h = SigHash{}(out);
+            const int sh = static_cast<int>((h >> 32) % NSH);
+            std::lock_guard<std::mutex> lk(mus[sh]);
+            next[sh].add(out, h, cov, counts, m, dlo, wcap);
+          };
+          forEachDmMask(sig, k, S, ms, maxn, cov0, emit);
+        }
+        src = DmShard();  // consumed: free the whole shard now
       }
       steps += mySteps;
       dead += myDead;
@@ -888,7 +1012,7 @@ static StripStats sweepDmirror(int S, int maxn, int T, std::vector<u64>& total,
       std::lock_guard<std::mutex> lk(stripMu);
       for (int n = 0; n <= maxn; ++n) stripTot[n] += lt[n];
     };
-    if (T > 1 && work.size() >= 256) {
+    if (T > 1 && live >= 256) {
       std::vector<std::thread> pool;
       pool.reserve(T);
       for (int t = 0; t < T; ++t) pool.emplace_back(body);
