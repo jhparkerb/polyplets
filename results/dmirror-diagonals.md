@@ -79,3 +79,29 @@ parked.
 
 **Usable weak law**: deg(P_even - P_odd) = k-1 held at k=1..3; check it
 on every future pin as a cheap structural alarm.
+
+## Pattern hunt in the GF basis (2026-07-05, later)
+
+The cumulants u_j, v_j of the exp fit (scripts/dmirror_pk_exp.py) are
+messy -- expected, since they are the log of a SUM of families. The
+patterns live in the rational-GF basis G_k(x) = sum_S d(S,S+k) x^S:
+
+1. **Denominator law**: G_k = N_k(x) / ((1-x)^(k+1) (1+x)^k), N_k integer,
+   deg 2k. Verified exactly k=0..5.
+2. **Boundary values**: N_k(1) = 2^k and N_k(-1) = (-2)^k for all k>=1.
+   Equivalently N_k - (2x)^k is divisible by (1-x^2). Reading: the
+   dominant weight-1 defect family is TWO species per odd footprint
+   (2(x+x^3+x^5+...) = 2x/(1-x^2) per defect), which integrates to the
+   bulk density 1 seen as P_1's S-coefficient. jasonp's A-B leading
+   structure, in closed form across all k.
+3. **Second layer**: R_k = (N_k - (2x)^k)/(1-x^2) has R_k(1)/2^k =
+   3,3,3,4,5 (k=1..5) and R_k(-1)/(-2)^k = k-3 exactly for k=2..5 --
+   linear-in-k laws signalling a double pole at z=1/(2x) in the level
+   variable, i.e. interacting defect pairs.
+4. **Refusals (exact)**: no bivariate rational closure sum_k N_k z^k =
+   P/D with z-deg(D) <= 3, x-deg <= 6 -- overdetermined Gaussian
+   elimination contradicts. Each weight level carries genuinely NEW
+   gadget species, exactly like the all-polyplet P_k family where every
+   level needs its fresh cumulant pair (a_k, b_k). The pattern is the
+   FORM (denominator law + boundary values + 2-per-level freshness), not
+   a closed form across k.
