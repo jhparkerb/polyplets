@@ -26,6 +26,7 @@
 \newcommand{\tierone}{\textsf{T1}}
 \newcommand{\tiertwo}{\textsf{T2}}
 \newcommand{\tierthree}{\textsf{T3}}
+\newcommand{\tiertwominus}{\textsf{T2}$^{-}$}
 \newtheorem{conjecture}{Conjecture}
 \newtheorem{openproblem}[conjecture]{Open Problem}
 
@@ -58,13 +59,15 @@ protocol except that its top diagonal has no held-out closed form, which we
 state rather than paper over. The one-sided companion A030233 is extended to
 $n=34$; the free, bilateral, and asymmetric companions (A030222, A030234,
 A030235, A194596) to the reach of the diagonal-mirror symmetry count. Along the
-way the machinery yields structural results: exact closed forms for the
-diagonals of the height triangle (an exponential/cumulant law with two new
-constants per level), a quasi-polynomial law for the diagonals of the
-symmetric-fixed-point triangle (period two, degree $k$, with generating-function
-numerators satisfying $N_k(\pm1)=(\pm2)^k$), a hole-count stratification of
-A006770, exact fixed-height generating functions, the extremal maximum hole
-area ($\sim n^2/8$), and rigorous lower bounds on $a(n)$. Results computed and
+way the machinery yields structural results: closed forms for the diagonals
+of the height triangle (an exponential/cumulant law with two new constants
+per level---empirically pinned and validated on every held-out term, not
+proved), a conjectural quasi-polynomial law for the diagonals of the
+symmetric-fixed-point triangle (period two, degree $k$, with
+generating-function numerators satisfying $N_k(\pm1)=(\pm2)^k$), a hole-count
+stratification of A006770, exact fixed-height generating functions, the
+extremal maximum hole area ($\sim n^2/8$), and rigorous lower bounds on
+$a(n)$. Results computed and
 validated but not proved are labeled as such; all code, data, and a
 claim-verifier are released.
 \end{abstract}
@@ -100,12 +103,12 @@ structural observations about the diagonals of king-animal triangles
         % TODO(n32-companions): the dmirror n=32 strip farm completes today;
         % insert the four companion values at n=25..32 when banked, and
         % update the reach statement. n=33 (T3, P_4-assisted) is running.
-  \item Exact closed forms for the height-triangle diagonals
-        $T(n,n-k)$, $k\le15$, via an exponential/cumulant law, used both to
-        accelerate the sweeps and---critically---as \emph{held-out per-term
-        checks} of the frontier terms (Sections~\ref{sec:diagonals},
-        \ref{sec:confirm}).
-  \item A quasi-polynomial law for the diagonals of the diagonal-mirror
+  \item Closed forms, empirically pinned and holdout-validated (not
+        proved), for the height-triangle diagonals $T(n,n-k)$, $k\le15$,
+        via an exponential/cumulant law, used both to accelerate the sweeps
+        and---critically---as \emph{held-out per-term checks} of the
+        frontier terms (Sections~\ref{sec:diagonals}, \ref{sec:confirm}).
+  \item A conjectural quasi-polynomial law for the diagonals of the diagonal-mirror
         symmetry triangle, with pinned polynomials, forward confirmations,
         and generating-function structure (Section~\ref{sec:diagonals}).
   \item A hole-count stratification of A006770 exact through $n=18$, the
@@ -136,15 +139,21 @@ later terms rest on decorrelation rather than algorithmic independence.
     strata with \emph{held-out} diagonal closed forms $P_k$ (fitted on
     earlier terms, predicting cells of later ones); modular/CRT internal
     consistency. Covers $a(20)$--$a(33)$ and the symmetry counts
-    $25\le n\le32$. $a(34)$ is \tiertwo{} \emph{minus} the held-out check:
-    its top cell would need $P_{16}$, which has no independent holdout
-    until $a(35)$ exists. We flag this explicitly wherever $a(34)$ appears. \\
+    $25\le n\le32$. \\
+    \tiertwominus{} & \tiertwo{} \emph{minus} the held-out diagonal check.
+    Covers exactly one number, $a(34)$: its top surviving stratum would be
+    checked by $P_{16}$, which has no independent holdout until $a(35)$
+    exists. It gets its own tag so the weaker standard is never silently
+    absorbed into \tiertwo{}. \\
     \tierthree{} & Exact computation composed with \emph{empirically pinned
     but unproven} quasi-polynomial formulas (the diagonal-mirror $P_k$ of
     Section~\ref{sec:diagonals}, each pinned with holdout hits and confirmed
-    forward on strips computed after pinning). Planned for the $n=33$
-    companions; no \tierthree{} value is presented as established in this
-    paper without its label. \\
+    forward on strips computed after pinning). The failure mode is specific
+    and stated: an onset shift or degree transition beyond the pinned range
+    would silently corrupt exactly the substituted strips; the forward
+    confirmations bound this risk but cannot eliminate it. Planned for the
+    $n=33$ companions; no \tierthree{} value is presented as established in
+    this paper without its label. \\
     \bottomrule
   \end{tabular}
   \caption{Confidence tiers used throughout. Conservative reading: \tierone{}
@@ -194,8 +203,8 @@ which enters the companion counts by Burnside's lemma
 
 Table~\ref{tab:terms} gives the full sequence. Terms $n\le18$ reproduce
 A006770 exactly; $a(19)$--$a(34)$ are new. $a(19)$ is \tierone{};
-$a(20)$--$a(33)$ are \tiertwo{}; $a(34)$ is \tiertwo{} without the held-out
-diagonal check (Table~\ref{tab:tiers}), the most exposed number in this paper.
+$a(20)$--$a(33)$ are \tiertwo{}; $a(34)$ is \tiertwominus{}
+(Table~\ref{tab:tiers}), the most exposed number in this paper.
 
 \begin{table}[H]
   \centering
@@ -225,18 +234,23 @@ diagonal check (Table~\ref{tab:tiers}), the most exposed number in this paper.
   \end{tabular}
   \caption{Fixed polyplets $a(n)$, $n=1,\dots,34$. Terms $1$--$18$ match the
   published A006770; boldface terms are new. Tiers: $a(19)$ \tierone{};
-  $a(20)$--$a(33)$ \tiertwo{}; $a(34)$ \tiertwo{} minus the held-out diagonal
-  check.}
+  $a(20)$--$a(33)$ \tiertwo{}; $a(34)$ \tiertwominus{}.}
   \label{tab:terms}
 \end{table}
 
 \paragraph{Growth.}
 The successive ratios climb slowly: $a(20)/a(19)\approx6.765$,
-$a(27)/a(26)\approx6.853$, $a(34)/a(33)\approx6.905$. Ratio extrapolation over
-the full range gives a growth constant near $\lambda\approx7.1$ with critical
-exponent $\theta\approx-1$, consistent with the universal value for
-two-dimensional lattice animals~\cite{jensen2001}. As in the shorter series,
-this is a heuristic estimate, not a bound.
+$a(27)/a(26)\approx6.853$, $a(34)/a(33)\approx6.905$. Fitting the standard
+ratio ansatz $r_n=a(n)/a(n{-}1)=\lambda(1+\theta/n)$ by least squares over
+trailing windows gives estimates that are stable in the third decimal:
+$\lambda=7.101$, $7.104$, $7.105$, $7.106$ (with $\theta=-0.94$ to $-0.96$)
+for the windows starting at $n=10$, $15$, $20$, $25$ and ending at $34$. The
+slight upward drift with window start is the visible confluent correction;
+the exponent is consistent with the universal two-dimensional lattice-animal
+value $\theta=-1$~\cite{jensen2001}. We accordingly estimate
+$\lambda\approx7.10$--$7.11$, and emphasise that this is a fit without error
+control---no differential-approximant analysis has been attempted---so it is
+an estimate, not a bound.
 
 \paragraph{One-sided companion.}
 The one-sided count (A030233) needs, besides the fixed count, only the
@@ -431,7 +445,11 @@ designed around the weakest link at each stage.
         $T(33,18)$ exactly. $a(34)$'s top cell would need $P_{16}$, which
         can be fitted but has no independent holdout until $a(35)$; we
         therefore do not count it as a check, and $a(34)$ carries the weaker
-        tier.
+        tier \tiertwominus{}. Two mitigations are worth stating precisely:
+        the diagonals $k\le15$ of $a(34)$ itself \emph{are} $P_k$-checked,
+        and $a(34)$'s top surviving stratum runs the same code path that
+        $P_{15}$ certified at $a(33)$---what lacks certification is its
+        execution at the larger size, not the path.
   \item \textbf{Modular consistency.} Production sweeps run with residue
         counters and CRT reconstruction; independent residue systems must
         agree, catching overflow and transient corruption (not shared
