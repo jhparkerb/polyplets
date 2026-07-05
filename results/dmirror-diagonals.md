@@ -47,3 +47,35 @@ strips:
 Each new P_k must clear the same bar before use: constant tail, holdout
 hits back to onset, and forward confirmation on at least one strip it did
 not pin on.
+
+## Coefficient structure (2026-07-05, follow-up)
+
+Probing jasonp's conjecture that the S^(k-1) coefficient decomposes as
+A - B (free placements minus a correction for impossible placements):
+
+**Leading orders: confirmed, with a twist.** P_1 is the single-defect
+census: one bulk weight-1 defect type (the S coefficient is exactly 1)
+plus 6/7 corner variants. The naive independence prediction for k=2 even
+is (S+6)^2/2! = S^2/2 + 6S + 18; the pinned polynomial is S^2/2 + 7S + 12.
+Residual = +S - 6: the +S term is a genuine weight-2 bulk defect type that
+no product of singles generates (the A side, and it is a NEW gadget, not
+multinomial bookkeeping), and the -6 absorbs collisions/end effects (the
+B side). So A - B is the right first cut at S^(k-1).
+
+**The two-spine defect gas is falsified at k=3.** Exact parity
+differences P_even - P_odd have degree 0, 1, 2 at k = 1, 2, 3 -- i.e.,
+deg = k-1. A defect gas over the two ground spines (main diagonal:
+transpose fixes every site, plain polynomial; anti-diagonal: defects come
+in center-mirrored pairs) caps the parity-dependent degree at floor(k/2)
+-- degree 1 at k=3, contradicting the measured 2. So additional
+length-free families exist. Candidate: anti-diagonal EXCURSIONS -- odd-
+length anti-diagonal segments crossing the main spine (transpose-
+symmetric as a unit), reconnected by weighted clusters at both ends; the
+excursion's length is free, so each one contributes a factor ~S at fixed
+weight, and its odd-length constraint carries the parity sign. The full
+derivation is a segment grammar (regular language over main-runs,
+anti-excursions, connectors, defects), not a one-line gas -- paper-scale,
+parked.
+
+**Usable weak law**: deg(P_even - P_odd) = k-1 held at k=1..3; check it
+on every future pin as a cheap structural alarm.
