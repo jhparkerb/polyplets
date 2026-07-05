@@ -1,6 +1,6 @@
 # Paper restructure plan — 2026-07-05
 
-The current draft (a19-polyplets.tex) headlines a(19)/a(20). The project now
+The current draft (polyplets-report.tex) headlines a(19)/a(20). The project now
 holds a(34) — sixteen new terms — plus the companion sequences to n=32/33
 (34 for one-sided), two engines the paper never mentions, and a new piece of
 mathematics (the diagonal quasi-polynomial structure, both triangles). The

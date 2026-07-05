@@ -32,7 +32,8 @@
 
 \title{\textbf{Fixed polyplets through $a(34)$: sixteen new terms of OEIS
 A006770, their symmetry companions, and the diagonal structure of king-animal
-triangles}}
+triangles}\\[4pt]
+\large A computational report}
 \author{Jason Parker \texttt{<jasonp@panix.com>}\\[2pt]
 \small Independent researcher (unaffiliated)}
 \date{July 2026}
@@ -86,12 +87,16 @@ term is a small computational milestone. The fixed-polyomino sequence
 furthest~\cite{redelmeier,jensen2003,barequet}; the fixed-polyplet sequence
 A006770 had been recorded through $n=18$.
 
-This paper reports the terms $a(19)$ through $a(34)$ and the results that grew
-out of computing them. It is an amateur contribution carried out with
-substantial AI assistance (Section~\ref{sec:ai}); its value lies not in
-algorithmic novelty but in independent, cross-checked computation, and in two
-structural observations about the diagonals of king-animal triangles
-(Section~\ref{sec:diagonals}) that the long computation forced into view.
+This document is a \emph{computational report}: its claims are numbers, the
+provenance and verification of those numbers, and the empirical structure
+found in them. It reports the terms $a(19)$ through $a(34)$ and the results
+that grew out of computing them, including two structural observations about
+the diagonals of king-animal triangles (Section~\ref{sec:diagonals}), stated
+as validated conjectures since proofs are not attempted here. It is an
+amateur contribution carried out with substantial AI assistance
+(Section~\ref{sec:ai}). The data appears in the document as well as the
+repository: a report's job is to be usable by the next person to attempt
+these computations.
 
 \paragraph{Contributions.}
 \begin{enumerate}
@@ -243,8 +248,9 @@ The successive ratios climb slowly: $a(20)/a(19)\approx6.765$,
 $a(27)/a(26)\approx6.853$, $a(34)/a(33)\approx6.905$. Fitting the standard
 ratio ansatz $r_n=a(n)/a(n{-}1)=\lambda(1+\theta/n)$ by least squares over
 trailing windows gives estimates that are stable in the third decimal:
-$\lambda=7.101$, $7.104$, $7.105$, $7.106$ (with $\theta=-0.94$ to $-0.96$)
-for the windows starting at $n=10$, $15$, $20$, $25$ and ending at $34$. The
+$\lambda=7.101$, $7.104$, $7.105$, $7.106$ (with $\theta$ between $-0.94$
+and $-0.96$) for windows starting at $n=10$, $15$, $20$, $25$ and ending at
+$34$. The
 slight upward drift with window start is the visible confluent correction;
 the exponent is consistent with the universal two-dimensional lattice-animal
 value $\theta=-1$~\cite{jensen2001}. We accordingly estimate
@@ -368,6 +374,45 @@ duplicated inputs.
 Each production run reproduces the complete triangle---every $T(n,H)$ for all
 smaller $n$---so each new term arrives with a full-chain regression against
 everything already known, including the \tierone{} range.
+Table~\ref{tab:byheight34} gives the height decomposition of the frontier
+term; heights $17$ and $18$ are the last real sweeps (the diagonals
+$k\le15$, i.e.\ $H\ge19$, come from the closed forms of
+Section~\ref{sec:heightdiag} and were spot-checked against real sweeps at
+smaller~$n$).
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{r r @{\quad}|@{\quad} r r}
+    \toprule
+    $H$ & $T(34,H)$ & $H$ & $T(34,H)$\\
+    \midrule
+    1  & \num{1}                          & 18 & \num{23288787870043631158670332}\\
+    2  & \num{8822750406819}              & 19 & \num{15111742807653801090985593}\\
+    3  & \num{1450547121316690736}        & 20 & \num{9061341124316405172057950}\\
+    4  & \num{997738306231538048056}      & 21 & \num{5002581174202331698460002}\\
+    5  & \num{54325938673309776005354}    & 22 & \num{2531214280334205695134436}\\
+    6  & \num{718450867038312966264504}   & 23 & \num{1167265695441145358152351}\\
+    7  & \num{3938007987492904266811062}  & 24 & \num{487286890123087057884426}\\
+    8  & \num{12136378135639937908810168} & 25 & \num{182652546462335637272478}\\
+    9  & \num{25406165739609109253893844} & 26 & \num{60863544290648528714052}\\
+    10 & \num{40756412152266215827765016} & 27 & \num{17807197708330934888844}\\
+    11 & \num{54159404667976998554266361} & 28 & \num{4502990884375275679854}\\
+    12 & \num{62670808373359868559352846} & 29 & \num{964076818028408805330}\\
+    13 & \num{65125540284467338650988595} & 30 & \num{169895606813568532170}\\
+    14 & \num{61866157347759886121825501} & 31 & \num{23657686681679437077}\\
+    15 & \num{54235518293248262678336909} & 32 & \num{2440297953560629818}\\
+    16 & \num{44075625952411715905525520} & 33 & \num{165742361336192445}\\
+    17 & \num{33255837131885526055333731} & 34 & \num{5559060566555523}\\
+    \midrule
+    \multicolumn{4}{r}{$\sum_H T(34,H) = \num{515316838423862758858377704}$}\\
+    \bottomrule
+  \end{tabular}
+  \caption{The height decomposition of $a(34)$, peaking at $H=13$. The
+  extreme diagonal is the closed form $T(H,H)=3^{H-1}$
+  ($T(34,34)=3^{33}$).}
+  \label{tab:byheight34}
+\end{table}
 
 \subsection{Method D: symmetric transfer matrices (the companions)}
 \label{sec:methodD}
@@ -534,15 +579,19 @@ that agree exactly.
     3 & $\tfrac16S^3+3S^2+\tfrac{40}{3}S+50$ &
         $\tfrac16S^3+\tfrac72S^2+\tfrac{83}{6}S+\tfrac{93}{2}$\\
     4 & $\tfrac1{24}S^4+\tfrac32S^3+\tfrac{28}{3}S^2+33S+180$ &
-        \emph{(pins on in-flight data)}\\
+        $\tfrac1{24}S^4+\tfrac43S^3+\tfrac{97}{12}S^2+\tfrac{119}{3}S+\tfrac{1367}{8}$\,$^\dagger$\\
+    5 & $\tfrac1{120}S^5+\tfrac5{12}S^4+4S^3+\tfrac{55}{3}S^2+\tfrac{2278}{15}S+570$\,$^\dagger$ &
+        $\tfrac1{120}S^5+\tfrac{11}{24}S^4+\tfrac{19}{4}S^3+\tfrac{185}{12}S^2+\tfrac{18869}{120}S+\tfrac{4545}{8}$\,$^\dagger$\\
     \bottomrule
   \end{tabular}
-  \caption{Pinned diagonal-mirror diagonal polynomials $d(S,S+k)$, valid from
-  the stated onsets. Every polynomial was pinned on the highest-$S$ points
-  then required to reproduce all earlier in-regime points (holdout), and
-  $k\le3$ additionally hit strips computed after pinning (forward
-  confirmation). Fitted-but-less-witnessed levels ($P_4$ odd, $P_5$) live in
-  the repository with their witness counts and are not tabulated here.}
+  \caption{Diagonal-mirror diagonal polynomials $d(S,S+k)$, valid from the
+  stated onsets. Every polynomial was pinned on the highest-$S$ points then
+  required to reproduce all earlier in-regime points (holdout); $k\le3$
+  additionally hit strips computed after pinning (forward confirmation), and
+  $P_4$ (even) is pinned by two independent methods that agree exactly.
+  Entries marked $^\dagger$ are fitted through the cumulant form of the
+  repository's exp-fitter with fewer exact witnesses ($9$ at level~4, $4$ at
+  level~5) and should be treated as one grade weaker than the pinned rows.}
   \label{tab:dmpk}
 \end{table}
 % TODO(pk-status): P_4 odd pins when the ayr S=23 strip lands (in flight);
@@ -556,6 +605,18 @@ $G_k(x)=\sum_S d(S,S+k)\,x^S$,
   N_k \in \mathbb{Z}[x],\ \deg N_k = 2k,\qquad
   N_k(\pm1)=(\pm2)^k .
 \]
+The integer numerators, for the record:
+\begin{align*}
+  N_0 &= 2\\
+  N_1 &= 6+2x-6x^2\\
+  N_2 &= 12+8x-16x^2-8x^3+8x^4\\
+  N_3 &= 50+14x-124x^2-8x^3+110x^4+2x^5-36x^6\\
+  N_4 &= 180+40x-644x^2-54x^3+942x^4+12x^5-600x^6+2x^7+138x^8\\
+  N_5 &= 570+176x-2610x^2-520x^3+4996x^4+764x^5-4816x^6-496x^7\\
+      &\qquad +2282x^8+108x^9-422x^{10}
+\end{align*}
+($N_4, N_5$ inherit the $^\dagger$ status of their polynomials in
+Table~\ref{tab:dmpk}).
 The boundary values say the dominant single-defect family has two species per
 odd footprint; the next layer of the peeled numerators follows linear-in-$k$
 laws, the signature of interacting defect pairs. Exact overdetermined
@@ -606,11 +667,39 @@ free/bilateral/asymmetric companions (A030222, A030234, A030235) and the
 free-non-polyomino difference A194596 additionally need $D$, the
 diagonal-mirror count, whose exact-bounding-box sweep is the costliest
 symmetry (Section~\ref{sec:methodD}): $D$ is banked through $n=28$
-($D(28)=\num{47198412763}$).
-% TODO(n32-companions): replace with the final n=32 values (farm completes
-% today): dmirror(32), then A030222/A030234/A030235/A194596 for n=25..32,
-% as a table mirroring Table~\ref{tab:onesided}. n=33 values, if included,
-% are T3 (P_4-assisted strips S>=29) and must carry the label.
+($D(28)=\num{47198412763}$). Table~\ref{tab:symcounts} records the
+symmetry fixed-point counts themselves, which are of independent interest
+(each is an OEIS-eligible sequence).
+% TODO(n32-companions): the dmirror n=32 farm completes today: fill the D
+% column for n=29..32, then add the companion table
+% A030222/A030234/A030235/A194596 for n=25..32 mirroring
+% Table~\ref{tab:onesided}. n=33 values, if included, are T3 (P_4-assisted
+% strips S>=29) and must carry the label.
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{r r r r r}
+    \toprule
+    $n$ & $R_{90}$ & $R_{180}$ & $H$ (axis) & $D$ (diagonal)\\
+    \midrule
+    25 & \num{6731}   & \num{3161384353}     & \num{2965640141}     & \num{2636626551}\\
+    26 & 0            & \num{21807864380}    & \num{8118079636}     & \num{7015813156}\\
+    27 & 0            & \num{21570502908}    & \num{20086237186}    & \num{17714707000}\\
+    28 & \num{62587}  & \num{149423372035}   & \num{55006721709}    & \num{47198412763}\\
+    29 & \num{40607}  & \num{147600215717}   & \num{136445497555}   & ---\\
+    30 & 0            & \num{1026290399226}  & \num{373785638266}   & ---\\
+    31 & 0            & \num{1012501939560}  & \num{929270191286}   & ---\\
+    32 & \num{398124} & \num{7063812264280}  & \num{2546382907164}  & ---\\
+    33 & \num{250098} & \num{6960731505456}  & \num{6343327587938}  & ---\\
+    34 & 0            & \num{48710062997772} & \num{17385821908346} & ---\\
+    \bottomrule
+  \end{tabular}
+  \caption{Symmetry fixed-point counts, $n=25$--$34$ (\tierone{} to $n=24$
+  via the dual-engine gate; \tiertwo{} here). $R_{90}=0$ unless
+  $n\equiv0,1\pmod4$. The $D$ column is banked through $n=28$; $n=29$--$32$
+  land with the in-flight strip farm.}
+  \label{tab:symcounts}
+\end{table}
 
 \paragraph{The bilateral identity.}
 The bilateral count equals $\tfrac12(H+D)$ exactly, by a double count. Write
@@ -773,12 +862,17 @@ These are heuristic observations, not estimates with error control.
 \section{Reach and limits}
 \label{sec:reach}
 
-Method C's measured cost grows $\approx2.5\times$ per term in compute, with
-the frontier spilled to disk, so each further term of A006770 is a
-roughly-fixed multiple of the last. $a(35)$ is within hardware reach but
-faces a verification gap rather than a compute gap: its top diagonal cell
-would be checked by $P_{16}$, which cannot be independently held out until
-$a(35)$ itself exists. The symmetric counts scale as
+Method C's cost structure is set by its tallest surviving sweep height: at
+fixed $H$ the strip's state space is bounded and cost grows only about
+linearly in $n$, while adding a unit of height multiplies it by roughly the
+per-height frontier growth. With the diagonals $k\le15$ in closed form, the
+tallest real sweep stayed at $H=18$ from $a(33)$ to $a(34)$, and the banked
+totals grew gently ($22$ to $59$ core-hours over $a(30)$--$a(34)$; see
+Appendix~\ref{sec:profile}). $a(35)$ is therefore within easy hardware
+reach---an $H=19$ sweep at roughly $3\times$ the $H=18$ cost---but faces a
+verification gap rather than a compute gap: either sweep $H=19$ for real and
+check it against nothing, or wire $P_{16}$, which cannot be independently
+held out until $a(35)$ itself exists. The symmetric counts scale as
 $\sqrt{a}$-class problems and reached $n=34$ for three of the four types;
 the diagonal-mirror type, whose forced-square bounding box compresses least,
 is the binding constraint on the remaining companions---its per-strip RAM
@@ -833,6 +927,27 @@ All machines are commodity hardware owned and operated by the author:
 \emph{gympie} (Apple silicon, 10 performance cores, 24\,GB), \emph{ayr}
 (AMD x86-64, 32 cores, 78\,GB), \emph{dalby} (Arm Neoverse-N1, 80 cores,
 128\,GB).
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{l r r r}
+    \toprule
+    term (full triangle, Method C, dalby) & wall (h) & core-hours & peak RSS (GB)\\
+    \midrule
+    $a(30)$ & 1.0 & 22.1 & 1.7\\
+    $a(31)$ & 2.8 & 44.8 & 5.8\\
+    $a(32)$ & 3.0 & 49.0 & 5.6\\
+    $a(33)$ & 3.4 & 53.5 & 5.9\\
+    $a(34)$ & 3.7 & 58.5 & 6.3\\
+    \bottomrule
+  \end{tabular}
+  \caption{Banked per-term cost profiles for the uniform final-engine runs
+  (earlier terms were computed by intermediate engine generations and are
+  not directly comparable). The gentle growth reflects the closed-form
+  diagonals holding the tallest real sweep at $H=18$ throughout this range;
+  RAM stays small because the frontier spills to disk.}
+  \label{tab:costs}
+\end{table}
 
 \begin{itemize}
   \item \textbf{$a(34)$, full triangle (Method C, dalby):} wall

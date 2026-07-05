@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify every arithmetic / algebraic claim in a19-polyplets.tex.
+"""Verify every arithmetic / algebraic claim in polyplets-report.tex.
 
 Exact integer/rational arithmetic only (stdlib Fraction); no external packages.
 Regenerates the hole tables and the 3^(H-1) closed form from build/g2, reads the
