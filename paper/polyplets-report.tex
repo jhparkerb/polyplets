@@ -55,9 +55,11 @@ this kind are only as good as their verification, every number in this paper
 carries an explicit confidence tier: $a(19)$ is confirmed by two algorithms
 sharing no counting logic; $a(20)$--$a(33)$ by a single algorithm family
 decorrelated across architectures and cross-checked per term against held-out
-closed forms for the top diagonals of the height triangle; $a(34)$ by the same
-protocol except that its top diagonal has no held-out closed form, which we
-state rather than paper over. The one-sided companion A030233 is extended to
+closed forms for the top diagonals of the height triangle (once certified by
+a live held-out prediction, those forms also supply the tallest, sparsest
+strata---$6.5\%$ of $a(34)$ arrives through them, a dependency quantified
+exactly in the text); $a(34)$'s own top diagonal has no held-out closed
+form, which we state rather than paper over. The one-sided companion A030233 is extended to
 $n=34$; the free, bilateral, and asymmetric companions (A030222, A030234,
 A030235, A194596) to the reach of the diagonal-mirror symmetry count. Along the
 way the machinery yields structural results: closed forms for the diagonals
@@ -175,7 +177,7 @@ Fix the square lattice $\mathbb{Z}^2$ and call its unit squares \emph{cells}. A
 Under \textbf{rook} (edge) adjacency the animals are \emph{polyominoes}; under
 \textbf{king} (edge-or-corner) adjacency they are \emph{polyplets}. Every
 polyomino is a polyplet but not conversely: two cells touching only at a corner
-form a polyplet and not a polyomino (Figure~\ref{fig:specimen}). One subtlety: a
+form a polyplet and not a polyomino. One subtlety: a
 polyplet connected \emph{purely} by diagonals lives on a single checkerboard
 colour class, itself a square lattice, so such a shape is a polyomino in
 disguise. A genuinely king shape mixes edge and corner contacts.
@@ -188,16 +190,6 @@ and bounding-box height exactly $H$, so $a(n)=\sum_H T(n,H)$), and, for each
 symmetry $g$ of the square, the count of fixed animals invariant under $g$,
 which enters the companion counts by Burnside's lemma
 (Section~\ref{sec:companions}).
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.36\textwidth]{../results/a19_specimen.png}
-  \caption{A $19$-cell fixed polyplet (drawn uniformly at random; bounding box
-  $11\times 10$). Under rook adjacency it splits into nine pieces, so the
-  diagonal corner-contacts alone hold it together---a polyplet, not a
-  polyomino.}
-  \label{fig:specimen}
-\end{figure}
 
 \section{Headline results}
 \label{sec:result}
@@ -349,6 +341,16 @@ only when its boundary is a single component---partial states that can never
 reconnect are pruned. A size-budget prune drops any state whose cells-so-far
 plus an \emph{admissible} lower bound on cells-still-needed exceeds $n$.
 
+Concretely, a state is a fixed-width byte string: one byte per strip row
+holding the cell's connected-component label ($0$ for empty), with labels
+\emph{canonically renumbered in first-occurrence order} after every
+transition---the normalization that prevents equivalent partitions from
+proliferating as distinct states---plus the two touch flags; the value
+attached to a state is its vector of counts by size. States live in a flat
+open-addressing hash map keyed by that string (about $300$ bytes per state
+including counts at production sizes). The full layout is in the release's
+\texttt{core/signature.h}.
+
 Method B confirmed $a(19)$ against Method A (byte-identical totals) and
 carried the sequence into the early twenties before its state space---which
 keeps a whole column of connectivity alive per step---outgrew memory.
@@ -358,27 +360,68 @@ keeps a whole column of connectivity alive per step---outgrew memory.
 
 The production engine for $a(24)$--$a(34)$ replaces the column step with a
 \emph{cell-at-a-time} step: the boundary advances one cell per transition,
-carrying a staircase frontier with a north-west \emph{carry} cell that
-preserves king connectivity across the kink in the staircase. The finer step
-multiplies the number of transitions but shrinks the live state space and,
-decisively, the volume that must be reshuffled between passes (measured
-speedups over Method B grow from $\sim$29$\times$ at $H=12$ to
-$\sim$200$\times$ at $H=16$, with per-term cost growth
-$\approx2.5\times$). At frontier sizes beyond RAM the state map spills to
-disk: the frontier is hash-sharded, expanded shard by shard, and merged by
-external passes, so the binding resource is disk bandwidth rather than
-memory. Heights remain independent jobs; per-height results are banked with
-their provenance and re-summed by a combiner that refuses partial or
-duplicated inputs.
+so the frontier is a staircase---$r$ cells of the new column above $H-r$
+cells of the old---plus one retained north-west \emph{carry} cell, kept
+because king adjacency lets the next cell reach diagonally back across the
+kink in the staircase; without it the step would sever connectivity
+information the lattice still provides. The state encoding is as in
+Method~B (canonical component-label bytes over the staircase cells and the
+carry, touch flags, counts), and each transition decides a single cell,
+resolving connectivity by union--find over its at-most-three placed
+neighbours. The finer step multiplies the number of transitions but shrinks
+the live state space and, decisively, the volume that must be reshuffled
+between passes (measured speedups over Method B grow from $\sim$29$\times$
+at $H=12$ to $\sim$200$\times$ at $H=16$). At frontier sizes beyond RAM the
+state map spills to disk: the frontier is hash-sharded, expanded shard by
+shard, and merged by external passes, so the binding resource is disk
+bandwidth rather than memory. Heights remain independent jobs; per-height
+results are banked with their provenance and re-summed by a combiner that
+refuses partial or duplicated inputs.
+
+\paragraph{I/O integrity.}
+A multi-hour external shuffle is itself a failure surface, so the disk
+layer is engineered to fail closed rather than lose states silently. Every
+spill file carries a self-describing header (magic, format version, byte
+order, key width, and the \emph{record count}, so truncation---including
+the short writes produced by resource exhaustion---is detected on read
+rather than absorbed); readers and the merge refuse malformed or
+count-mismatched inputs; the per-height combiner refuses missing, empty,
+or duplicated shards and takes a lock against concurrent runs on the same
+directory; and kept artifacts are listed in a manifest with per-file
+checksums. These refusal paths are not assumed to work: the release's gate
+suite fault-injects each failure mode (truncated file, missing shard,
+duplicated rows, held lock) and requires the pipeline to abort loudly.
 
 Each production run reproduces the complete triangle---every $T(n,H)$ for all
 smaller $n$---so each new term arrives with a full-chain regression against
 everything already known, including the \tierone{} range.
+
+\paragraph{Which cells are computed and which are injected.}
+This must be stated exactly, because the headline totals contain both. For
+$a(34)$, heights $3\le H\le18$ were swept for real ($93.5\%$ of the total);
+$H=1,2$ are elementary closed forms; and $H\ge19$---the diagonals
+$k\le15$---were \emph{injected} from the fitted closed forms of
+Section~\ref{sec:heightdiag}, contributing $6.5\%$ of $a(34)$. The
+analogous split holds for the preceding terms, the injection boundary
+advancing as each new $P_k$ is certified (at $a(30)$: real sweep
+$H\!=\!3$--$17$, closed forms elsewhere). The
+discipline governing injection is strict and uniform: a $P_k$ is fitted on
+real-swept cells of earlier terms, must reproduce every other real-swept
+cell on its diagonal (holdout), must then predict the \emph{next} term's
+real-swept cell on that diagonal exactly---the newest diagonal is always
+swept for real once more before its formula is trusted---and only after
+surviving that live prediction is it injected for subsequent terms. An
+injected formula failing at larger $n$ would therefore have to pass a
+genuine forward prediction and then break one term later without warning;
+possible, unproven-formula risk being what it is, but the exposure is
+quantified ($6.5\%$ of the frontier term) and every injected formula
+carries at least one live held-out success. Readers who want totals free
+of any formula assistance may sum Table~\ref{tab:byheight34}'s rows
+$H\le18$ against the banked per-height data; the \tierone{}/\tiertwo{}
+range $n\le19$ contains no injected cells at all.
+
 Table~\ref{tab:byheight34} gives the height decomposition of the frontier
-term; heights $17$ and $18$ are the last real sweeps (the diagonals
-$k\le15$, i.e.\ $H\ge19$, come from the closed forms of
-Section~\ref{sec:heightdiag} and were spot-checked against real sweeps at
-smaller~$n$).
+term with the computed/injected boundary as stated above.
 
 \begin{table}[H]
   \centering
@@ -569,6 +612,7 @@ that agree exactly.
 
 \begin{table}[H]
   \centering\small
+  \renewcommand{\arraystretch}{1.5}
   \begin{tabular}{c l l}
     \toprule
     $k$ & even $S$ & odd $S$\\
@@ -615,7 +659,7 @@ The integer numerators, for the record:
   N_5 &= 570+176x-2610x^2-520x^3+4996x^4+764x^5-4816x^6-496x^7\\
       &\qquad +2282x^8+108x^9-422x^{10}
 \end{align*}
-($N_4, N_5$ inherit the $^\dagger$ status of their polynomials in
+($N_4$ and $N_5$ are fitted rather than pinned, like their rows in
 Table~\ref{tab:dmpk}).
 The boundary values say the dominant single-defect family has two species per
 odd footprint; the next layer of the peeled numerators follows linear-in-$k$
@@ -624,19 +668,22 @@ elimination \emph{refutes} any low-order bivariate rational closure across
 $k$ (each level carries genuinely new defect species), and the parity
 structure of the $k=3$ level refutes the naive two-ground-state defect gas:
 additional length-free families (anti-diagonal excursions crossing the main
-spine) are present. A full derivation would be a segment-grammar argument,
-which we sketch without carrying out: for $S$ beyond the onset, every
-$d$-symmetric animal of $S+k$ cells should parse uniquely as a word over a
-finite alphabet of segment types---maximal main-diagonal runs, transpose-
-symmetric anti-diagonal excursions (necessarily of odd length), and a
-bounded catalogue of connector and defect clusters of total weight
-$k$---with the free segment lengths as the only unbounded data. Counting
-words of a regular language with $j$ free lengths and fixed total weight
-gives a polynomial of degree $j$ in $S$, and the odd-length constraint on
-excursions is what injects the period-two parity dependence; the degree and
-onset laws would then follow from the maximum number of independent free
-lengths at weight $k$. Making the parse unique (and bounding the connector
-catalogue) is the part left open.
+spine) are present. A proof is not attempted, and we are explicit about
+what one would require. The natural strategy is a decomposition argument:
+show that every sufficiently large animal on this diagonal splits, in
+exactly one way, into a bounded set of local pieces (stretches of clean
+diagonal, the excursions above, and small clusters carrying the $k$ extra
+cells), so that counting animals reduces to counting arrangements of pieces
+along a line. Decompositions of that kind yield rational generating
+functions; but rationality alone does not give quasi-polynomiality---for
+that, every pole of $G_k$ must lie at a root of unity, and the specific law
+observed here demands the poles sit at $x=\pm1$ with multiplicities exactly
+$k{+}1$ and $k$. Nothing in the decomposition picture forces those
+multiplicities; they are measured facts a proof would have to reproduce,
+presumably from the count of independent free lengths available at weight
+$k$. So the strategy is recorded as a strategy: the honest state of
+knowledge is the validated data above, including the parity anomaly that
+already ruled out the naive version of the argument.
 
 All of Section~\ref{sec:dmdiag} is computed and validated, not proved. Its
 practical role is sharp: the sparse strips ($S\ge29$ at $n\ge33$) are
@@ -741,21 +788,35 @@ hole-free and one-hole columns are absent from OEIS (checked by Superseeker);
 b-files are prepared in the release.
 
 \begin{table}[H]
-  \centering\small
-  \begin{tabular}{r r r r r}
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{r r r r r r r r r r r r}
     \toprule
-    $n$ & $k=0$ & $k=1$ & $k=2$ & $k=3$\\
+    $n$ & $k=0$ & $k=1$ & $k=2$ & $k=3$ & $k=4$ & $k=5$ & $k=6$ & $k=7$ & $k=8$ & $k=9$ & $k=10$\\
     \midrule
-    4 & \num{109}    & \num{1}     &           & \\
-    5 & \num{622}    & \num{16}    &           & \\
-    6 & \num{3664}   & \num{166}   & \num{2}   & \\
-    7 & \num{22094}  & \num{1456}  & \num{42}  & \\
-    8 & \num{135609} & \num{11788} & \num{538} & \num{6}\\
+    1 & \num{1} &  &  &  &  &  &  &  &  &  &  \\
+    2 & \num{4} &  &  &  &  &  &  &  &  &  &  \\
+    3 & \num{20} &  &  &  &  &  &  &  &  &  &  \\
+    4 & \num{109} & \num{1} &  &  &  &  &  &  &  &  &  \\
+    5 & \num{622} & \num{16} &  &  &  &  &  &  &  &  &  \\
+    6 & \num{3664} & \num{166} & \num{2} &  &  &  &  &  &  &  &  \\
+    7 & \num{22094} & \num{1456} & \num{42} &  &  &  &  &  &  &  &  \\
+    8 & \num{135609} & \num{11788} & \num{538} & \num{6} &  &  &  &  &  &  &  \\
+    9 & \num{843941} & \num{91300} & \num{5596} & \num{144} & \num{1} &  &  &  &  &  &  \\
+    10 & \num{5310754} & \num{688034} & \num{52268} & \num{2082} & \num{42} &  &  &  &  &  &  \\
+    11 & \num{33724862} & \num{5091820} & \num{457754} & \num{24144} & \num{820} & \num{8} &  &  &  &  &  \\
+    12 & \num{215793158} & \num{37209939} & \num{3841776} & \num{248526} & \num{11482} & \num{263} & \num{2} &  &  &  &  \\
+    13 & \num{1389673091} & \num{269452496} & \num{31290820} & \num{2374520} & \num{135235} & \num{4808} & \num{96} &  &  &  &  \\
+    14 & \num{8998648488} & \num{1937956658} & \num{249306876} & \num{21556520} & \num{1437090} & \num{67020} & \num{2186} & \num{22} &  &  &  \\
+    15 & \num{58548155506} & \num{13865448048} & \num{1953275736} & \num{188568632} & \num{14261808} & \num{804084} & \num{35086} & \num{808} & \num{6} &  &  \\
+    16 & \num{382526638033} & \num{98796744112} & \num{15103433472} & \num{1603972074} & \num{134769521} & \num{8779911} & \num{465138} & \num{16410} & \num{314} & \num{1} &  \\
+    17 & \num{2508473632910} & \num{701664375696} & \num{115556223626} & \num{13348948048} & \num{1227552608} & \num{89826208} & \num{5490242} & \num{251104} & \num{7847} & \num{104} &  \\
+    18 & \num{16503616943998} & \num{4970078092354} & \num{876484089730} & \num{109173877126} & \num{10866411352} & \num{876032532} & \num{59950610} & \num{3272674} & \num{137298} & \num{3460} & \num{30} \\
     \bottomrule
-  \end{tabular}
-  \caption{The hole triangle $T_{\mathrm{hole}}(n,k)$ ($4$-connected-background
-  convention), rows $n=4$--$8$; full data, exact through $n=18$, is in the
-  release.}
+  \end{tabular}}
+  \caption{The complete hole triangle $T_{\mathrm{hole}}(n,k)$
+  ($4$-connected-background convention), exact through $n=18$; row sums
+  equal A006770.}
   \label{tab:holes}
 \end{table}
 
@@ -773,20 +834,26 @@ animals can run the diagonal walls the $L^1$ ball requires.
 
 Brute force gives the exact values
 $M(1{:}16)=0,0,0,1,1,2,3,5,6,8,10,13,15,18,21,25$, which the diamond attains
-at $n=4,8,12,16$.
+at $n=4,8,12,16$. In fact all sixteen values fit a single closed form: they
+coincide with \emph{the nearest integer to $(n-2)^2/8$}---the sequence
+\href{https://oeis.org/A001971}{A001971} shifted by two---which agrees with
+the diamond exactly at every multiple of four, since
+$\bigl[(4r-2)^2/8\bigr] = 2r^2-2r+1$.
 
 \begin{conjecture}
 \label{conj:diamond}
-$M(4r)=2r^2-2r+1$ for all $r\ge1$; that is, the diamond wall is exactly (not
-just asymptotically) optimal at every multiple of four, as verified here for
-$r\le4$.
+$M(n)=\left\lfloor \tfrac{(n-2)^2}{8}+\tfrac12 \right\rfloor$ for all
+$n\ge1$ (equivalently $M(n)=\mathrm{A001971}(n-2)$), verified here for
+$n\le16$. In particular the diamond wall is exactly---not just
+asymptotically---optimal at every multiple of four, and away from multiples
+of four the optimum tracks the same isoperimetric quota with a two-cell
+corner correction.
 \end{conjecture}
 
 \begin{openproblem}
 \label{op:mn}
-Determine $M(n)$ for $n>16$, in particular its behaviour away from multiples
-of four, where the wall must spend cells that cannot enlarge the
-isoperimetric core.
+Prove Conjecture~\ref{conj:diamond}, or extend the verification past
+$n=16$; the first untested value is the prediction $M(17)=28$.
 \end{openproblem}
 
 \section{Generating functions by height, and rigorous bounds}
@@ -846,7 +913,11 @@ portrait stays at that scale.)
 
 We validated the sampler on $a(19)$: an independent king-move BFS confirmed
 every specimen was connected, and the sampled distribution of heights
-reproduced $T(19,H)/a(19)$. A $10{,}000$-specimen sample shows the typical
+reproduced $T(19,H)/a(19)$. Ten thousand samples against a state space of
+$1.5\times10^{14}$ can rule out only gross bias; no goodness-of-fit power is
+claimed against subtle non-uniformity in the transition probabilities, and
+the portrait below should be read at that resolution---qualitative
+character, not calibrated statistics. A $10{,}000$-specimen sample shows the typical
 $19$-cell polyplet is \emph{sparse, branchy, corner-glued}: about ten
 rook-connected pieces held together mostly by corners ($59\%$ of contacts),
 $\sim\!25\%$ box density, and a $28\%$ chance of enclosing a hole. It is
