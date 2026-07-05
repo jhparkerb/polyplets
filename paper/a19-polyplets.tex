@@ -8,6 +8,7 @@
 % ---------------------------------------------------------------------------
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb}
+\usepackage{amsthm}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{numprint}
@@ -25,6 +26,8 @@
 \newcommand{\tierone}{\textsf{T1}}
 \newcommand{\tiertwo}{\textsf{T2}}
 \newcommand{\tierthree}{\textsf{T3}}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{openproblem}[conjecture]{Open Problem}
 
 \title{\textbf{Fixed polyplets through $a(34)$: sixteen new terms of OEIS
 A006770, their symmetry companions, and the diagonal structure of king-animal
@@ -542,8 +545,19 @@ elimination \emph{refutes} any low-order bivariate rational closure across
 $k$ (each level carries genuinely new defect species), and the parity
 structure of the $k=3$ level refutes the naive two-ground-state defect gas:
 additional length-free families (anti-diagonal excursions crossing the main
-spine) are present. A full derivation would be a segment-grammar argument and
-is left open.
+spine) are present. A full derivation would be a segment-grammar argument,
+which we sketch without carrying out: for $S$ beyond the onset, every
+$d$-symmetric animal of $S+k$ cells should parse uniquely as a word over a
+finite alphabet of segment types---maximal main-diagonal runs, transpose-
+symmetric anti-diagonal excursions (necessarily of odd length), and a
+bounded catalogue of connector and defect clusters of total weight
+$k$---with the free segment lengths as the only unbounded data. Counting
+words of a regular language with $j$ free lengths and fixed total weight
+gives a polynomial of degree $j$ in $S$, and the odd-length constraint on
+excursions is what injects the period-two parity dependence; the degree and
+onset laws would then follow from the maximum number of independent free
+lengths at weight $k$. Making the parse unique (and bounding the connector
+catalogue) is the part left open.
 
 All of Section~\ref{sec:dmdiag} is computed and validated, not proved. Its
 practical role is sharp: the sparse strips ($S\ge29$ at $n\ge33$) are
@@ -652,9 +666,21 @@ animals can run the diagonal walls the $L^1$ ball requires.
 
 Brute force gives the exact values
 $M(1{:}16)=0,0,0,1,1,2,3,5,6,8,10,13,15,18,21,25$, which the diamond attains
-at $n=4,8,12,16$. The exact value of $M(n)$ for $n>16$, its behaviour away
-from multiples of four, and whether the diamond is exactly (not just
-asymptotically) optimal remain open.
+at $n=4,8,12,16$.
+
+\begin{conjecture}
+\label{conj:diamond}
+$M(4r)=2r^2-2r+1$ for all $r\ge1$; that is, the diamond wall is exactly (not
+just asymptotically) optimal at every multiple of four, as verified here for
+$r\le4$.
+\end{conjecture}
+
+\begin{openproblem}
+\label{op:mn}
+Determine $M(n)$ for $n>16$, in particular its behaviour away from multiples
+of four, where the wall must spend cells that cannot enlarge the
+isoperimetric core.
+\end{openproblem}
 
 \section{Generating functions by height, and rigorous bounds}
 \label{sec:gf}
@@ -779,6 +805,39 @@ the central claims do not rest on the correctness of any single
 \emph{program}. They do rest, past $n=19$, on a single algorithm family;
 the tier system exists so that dependence is never hidden. All code and data
 are released for independent checking.
+
+\appendix
+\section{Computational profile}
+\label{sec:profile}
+
+For future benchmarking, the measured costs of the headline computations.
+All machines are commodity hardware owned and operated by the author:
+\emph{gympie} (Apple silicon, 10 performance cores, 24\,GB), \emph{ayr}
+(AMD x86-64, 32 cores, 78\,GB), \emph{dalby} (Arm Neoverse-N1, 80 cores,
+128\,GB).
+
+\begin{itemize}
+  \item \textbf{$a(34)$, full triangle (Method C, dalby):} wall
+        $\approx3.7$\,h across all 34 heights; $\approx59$ core-hours; peak
+        resident memory $6.4$\,GB (the frontier spills to disk, so RAM
+        stays small; the tallest surviving real sweep height dominates,
+        $\sim70\%$ of the wall). The cross-ISA recount on ayr reproduced
+        the triangle byte-identically.
+  \item \textbf{Diagonal-mirror symmetry count, $n=32$ (Method D, farmed):}
+        the six deepest exact-bounding-box strips ($S=26$--$31$, dalby)
+        cost $3.0$\,M CPU-seconds $\approx835$ core-hours with per-strip
+        peak memory up to $82.7$\,GB---an order of magnitude more compute
+        than $a(34)$ itself, which is why the quasi-polynomials of
+        Section~\ref{sec:dmdiag} matter: they replace exactly the strips
+        whose memory grows fastest.
+        % TODO(n32-cost): add the ayr tail (S<=25) totals when the farm
+        % completes, and the n=33 run's totals when banked.
+  \item \textbf{Symmetric counts at $n=34$ (Method D):} axis mirror
+        $\approx3.3$\,h wall / $53$\,k CPU-seconds / $8.2$\,GB;
+        $180^\circ$ rotation $\approx51$\,min wall / $18$\,k CPU-seconds /
+        $8.5$\,GB (both dalby); the $90^\circ$ count runs in seconds on
+        gympie.
+\end{itemize}
 
 \begin{thebibliography}{9}
 
