@@ -29,6 +29,24 @@ k=4 is degree 4 but its constant tail still spans pre-onset points at
 S<=26 reach; the n=32 farm's S=26..28 strips (in flight) are the exact
 points that clean and pin it.
 
+**Update 2026-07-05 (n=32 farm complete, all 32 strips):** P_4 now pinned
+on BOTH parities (dmirror_diagonals.py: 10 class-polynomials across
+k=0..4; the S=23 strip supplied the odd-parity pin):
+
+    P_4 even = S^4/24 + 3S^3/2 + 28S^2/3 + 33S + 180
+    P_4 odd  = S^4/24 + 4S^3/3 + 97S^2/12 + 119S/3 + 1367/8
+
+The exp fitter (dmirror_pk_exp.py 6) reproduces the SAME P_5 as the
+earlier 4-witness fit, now with 6 exact witnesses per level-5 solve --
+forward confirmation by new data:
+
+    P_5 even = S^5/120 + 5S^4/12 + 4S^3 + 55S^2/3 + 2278S/15 + 570
+    P_5 odd  = S^5/120 + 11S^4/24 + 19S^3/4 + 185S^2/12 + 18869S/120 + 4545/8
+
+Level 6 still refuses (no consistent fit within degree caps) -- honest;
+its points come only with the n=33/34 runs. The weak law
+deg(P_even - P_odd) = k-1 holds at k=4 (deg 3) and k=5 (deg 4).
+
 ## Why this matters (the n=33/34 ladder)
 
 The sweep's cost is upside down in the sparse regime: strip S=31 at n=32

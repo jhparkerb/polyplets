@@ -25,6 +25,25 @@ file headers):
 - `draft-<name>.txt` — a **new** sequence we propose. Placeholder A-number
   (`Axxxxxx`) until OEIS assigns one.
 
+## Pre-submission checklist (from jasonp's past OEIS review threads, 2019-2025)
+Each of these caused editor pushback on a real past submission; check every
+staged change against all four before jasonp submits:
+1. **Extend cross-referenced sequences together.** If a new term of X implies
+   a new term of a %Y-linked sequence (as A102976 implied A101841), stage both
+   in the same batch — an editor WILL ask.
+2. **Sign per the style sheet, with a real date.** `- _Jason H Parker_, Mon DD
+   YYYY` — full month-day-year, and the date must be the day the change is
+   actually proposed on oeis.org (Heinz: "date was not correct"). Before
+   submitting on a different day than staged, update every new signature date.
+3. **Respect each entry's own offset/indexing.** Related sequences can index
+   differently (A101841 vs A102976); number claimed new terms against the
+   target entry's %O and current last term — never "added a(14)" when that
+   entry's latest is a(13).
+4. **Additions only — never remove or rewrite existing content.** Existing
+   comments, %E history, links stay verbatim (Heinz on A000522: "You removed
+   the old comment ... this is not ok"). Our own staged-but-unsubmitted text
+   may be edited freely; anything live on OEIS may not.
+
 ## Provenance legend (for commit messages / %C)
 - **flood** — per-animal 4-connected-background flood fill, exact, n ≤ 14.
 - **engine** — column transfer matrix with Euler/hole accounting (`cpp/tma`,

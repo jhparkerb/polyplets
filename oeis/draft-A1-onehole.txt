@@ -4,10 +4,10 @@
 %S Axxxxxb 1,16,166,1456,11788,91300,688034,5091820,37209939,269452496,
 %T Axxxxxb 1937956658,13865448048,98796744112,701664375696,4970078092354
 %N Axxxxxb Number of fixed n-cell polyplets (A006770) with exactly one hole (4-connected-background convention).
-%C Axxxxxb Column k=1 of the polyplets-by-number-of-holes triangle [draft Axxxxxx]. First nonzero at n=4 (the 4-cell diamond, the unique smallest holed polyplet). - _Jason H Parker_, 2026
+%C Axxxxxb Column k=1 of the polyplets-by-number-of-holes triangle [draft Axxxxxx]. First nonzero at n=4 (the 4-cell diamond, the unique smallest holed polyplet). - _Jason H Parker_, Jul 05 2026
 %C Axxxxxb Exact via the column transfer matrix (#28), validated byte-identical to the per-animal flood (n<=14); terms through n=18, with n=15..18 independently reproduced on a second CPU architecture (clang/ARM vs gcc/x86, byte-identical). The fixed-bounding-box-height contributions are rational; e.g. height-3 one-hole animals have G.f. (x^4+2x^5-2x^7-x^8)/(1-8x+20x^2-14x^3-8x^4+18x^5+3x^6-16x^7+6x^8+6x^9-3x^10-2x^11+x^12).
 %H Axxxxxb Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet</a>.
 %Y Axxxxxb Cf. A006770, Axxxxxx (triangle by #holes), Axxxxxa (hole-free).
 %K Axxxxxb nonn,hard
 %O Axxxxxb 4,2
-%A Axxxxxb _Jason H Parker_, 2026
+%A Axxxxxb _Jason H Parker_, Jul 05 2026

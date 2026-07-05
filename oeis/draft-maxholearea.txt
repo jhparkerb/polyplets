@@ -16,4 +16,4 @@
 %Y Axxxxxc Cf. A006770 (fixed polyplets), A001844 (centered squares; equals a(4r)), A002620 (quarter-squares; a(n)=ceil(A002620(n-2)/2)).
 %K Axxxxxc nonn,easy
 %O Axxxxxc 1,6
-%A Axxxxxc _Jason H Parker_, 2026
+%A Axxxxxc _Jason H Parker_, Jul 05 2026

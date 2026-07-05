@@ -16,7 +16,7 @@
 # was computed by the same engine but its top swept cell has no held-out
 # closed-form cross-check until a(35), so it is one grade weaker; see the
 # entry Comments. Independent confirmation welcome.
-# - Jason H Parker, 2026
+# - Jason H Parker, Jul 05 2026
 1 1
 2 4
 3 20
