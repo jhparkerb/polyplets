@@ -20,19 +20,20 @@ session-by-session logs pruned 2026-07-04; recover from git history if needed.)
   (`results/related-seqs-n24.md`). Burnside from Fixed (A006770) + symmetric
   counts; all 95 known OEIS terms re-validated.
 
-## Live jobs (Hall of Mirrors — symmetric TM pushes to n=34)
-- **dalby — symtm hmirror 34** (`scripts/symtm_run.sh hmirror 34 32`): PID
-  2994466, tmux `0:hm34`, rev `f306aa31`, → `runs/sym34/hmirror.out`. Predicted
-  ~1-1.5h wall / 15-25GB; at 13:22 was 28/34 strips, self-ETA ~13:32, RSS 8GB.
-  On completion: diff n≤24 prefix vs `runs/sym24/hmirror.out`, copy to gympie.
-- **dalby — symtm r180 34** (`scripts/symtm_run.sh r180 34 32`): PID 2996883,
-  tmux `0:r18034`, rev `7bc042e5`, → `runs/sym34/r180.out`. Predicted ~2.5h cpu
-  / ~15-30min wall at 32 threads / ~7-20GB (gympie ladder n=26/28/30). Same
-  completion drill. r180 unlocks **A030233 (one-sided) at n=34** (needs only
-  r90+r180; r90 already banked in gympie `runs/sym34/r90.out`).
-- **ayr — a(34) cross-ISA verify: DONE, `A34_VERIFY_PASS`** — x86 triangle
-  n=1..34 byte-identical to banked dalby (ARM); folded into a34 PROVENANCE.
-  ayr now FREE.
+## Live jobs (2026-07-05; hmirror/r180/r90 n=34 all DONE and banked)
+- **dalby — dmirror n=33 direct strips** (`scripts/dmirror_strips.sh 33 80 28
+  27 .. 1`): driver PID 3035912, tmux `0:dm33`, rev `b358e397` (Shrink Ray),
+  → `runs/sym33/dmirror.S*.out`. Predicted ~9.5M cpu-s ≈ 33h wall, peak strip
+  (S=28, first) ~80-95GB. Purpose: n=33 related-seqs term — strips S>=29 come
+  from pinned P_4 closed forms (results/dmirror-diagonals.md); this run also
+  yields the k=5 points that pin P_5 → n=34. Kill = numeric PID per strip;
+  resume = rerun missing strips.
+- **ayr — dmirror n=32 tail** (`scripts/dmirror_strips.sh 32 32 25 .. 1`):
+  driver PID 3024316, tmux `0:dm32c`, rev `b358e39`, S=25/24 done, S=23
+  running ~07:38. dalby's half (S=26..32) done + banked on gympie. On ayr
+  completion: scp strips → gympie `runs/sym32/`, `dmirror_sum.py 32`, prefix
+  validate vs runs/sym24+sym28, `derive_related.py` → A030222/34/35/194596
+  through n=32.
 
 ## Data ceiling (why the term chase is parked)
 - **P_16 is derivable** (fit from T(33,17)+T(34,18), self-consistent — verified)
