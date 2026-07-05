@@ -415,7 +415,11 @@ injected formula failing at larger $n$ would therefore have to pass a
 genuine forward prediction and then break one term later without warning;
 possible, unproven-formula risk being what it is, but the exposure is
 quantified ($6.5\%$ of the frontier term) and every injected formula
-carries at least one live held-out success. Readers who want totals free
+carries at least one live held-out success. In particular $P_{16}$---the
+one formula in the family with no independent holdout---is \emph{not}
+used in $a(34)$: it plays no role as an injected value, only as the
+absent cross-check on the top directly-swept cell $T(34,18)$, which is
+what the \tiertwominus{} grade records. Readers who want totals free
 of any formula assistance may sum Table~\ref{tab:byheight34}'s rows
 $H\le18$ against the banked per-height data; the \tierone{}/\tiertwo{}
 range $n\le19$ contains no injected cells at all.
@@ -660,7 +664,14 @@ The integer numerators, for the record:
       &\qquad +2282x^8+108x^9-422x^{10}
 \end{align*}
 ($N_4$ and $N_5$ are fitted rather than pinned, like their rows in
-Table~\ref{tab:dmpk}).
+Table~\ref{tab:dmpk}). The boundary condition $N_k(\pm1)=(\pm2)^k$ was at
+no point imposed on any fit: the fitter solves only for polynomial
+coefficients against exact diagonal counts, and the boundary values
+\emph{emerged} from its output, exactly as they hold on the pinned rows
+$k\le3$---where every coefficient is fixed by exact differencing with
+surplus holdout points and no overfitting account is available. Its
+status is an observed regularity across all six levels, with the caveat
+that at $k=4,5$ it is only as trustworthy as the fitted rows themselves.
 The boundary values say the dominant single-defect family has two species per
 odd footprint; the next layer of the peeled numerators follows linear-in-$k$
 laws, the signature of interacting defect pairs. Exact overdetermined
