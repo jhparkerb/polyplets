@@ -1,93 +1,87 @@
-# HANDOFF — 2026-07-04
+# HANDOFF — 2026-07-05
 
 Frontier **a(34) = 515316838423862758858377704**, banked+validated, term chase
-**parked** per the 2026-07-06 close plan. Branch `kink-carry`, tip `56beca5`,
-all pushed to origin. Durable facts live in `MEMORY.md`, `results/*.md`,
-`ROADMAP.md`, and git history — this file is just the live state. (Older
-session-by-session logs pruned 2026-07-04; recover from git history if needed.)
+**parked** per the 2026-07-06 close plan. Branch `kink-carry`, all pushed to
+origin. Durable facts live in `MEMORY.md`, `results/*.md`, `ROADMAP.md`, and
+git history — this file is just the live state.
 
 ## Frontier / what's banked
 - **a(1)…a(34)** all banked under `results/ns_a{n}/` (triangle, PROVENANCE,
   perheight, cost_profile). a(1)-a(20) match the b-file; a(21)-a(34) chain-match
-  each prior term; growth monotone ~6.90 climbing toward λ≈7.1.
-  - a(33) = 74631481980411777590683952 (`results/ns_a33/`).
-  - a(34) = 515316838423862758858377704 (`results/ns_a34/`).
+  each prior term; ayr cross-ISA verify folded into a34 PROVENANCE.
 - **Diagonal closed forms P_2…P_15 wired** (`orchestrator/sweep.go`
-  diagCoeffTable, `diagonalStripValid` k≤15). Each P_k drops the top real sweep
-  height a tier; P_15 kept a(33)/a(34) topping at H18 (~3.4h) instead of H19
-  (~11h). Fast deriver `scripts/derive_pk_fast.py` (exp recurrence).
-- **Related sequences A030222/A030233/A030234/A030235/A194596 → n=24**
-  (`results/related-seqs-n24.md`). Burnside from Fixed (A006770) + symmetric
-  counts; all 95 known OEIS terms re-validated.
+  diagCoeffTable, `diagonalStripValid` k≤15); deriver `scripts/derive_pk_fast.py`.
+- **Symmetric counts (Hall of Mirrors, `cpp/sym/symtm.cpp`)** — all four types
+  built, gated (`tests/gate_symtm.py`) and byte-matched to `runs/sym24/`:
+  - **r90, r180, hmirror: n=34 banked** (gympie `runs/sym34/`;
+    r180(34)=48710062997772, hmirror(34)=17385821908346).
+  - **dmirror**: n≤28 banked (`runs/sym28/dmirror.out`, dmirror(28)=
+    47198412763); n=32 farm nearly complete (see live jobs). Engine is the
+    **Shrink Ray** compact-frontier rewrite (b358e39): flat sharded storage,
+    ~1.6× RAM + ~2× speed vs the unordered_map frontier that OOMed dalby.
+- **Related sequences**: **A030233 (one-sided) derived+validated to n=34**
+  (128829209605977867230343869 at n=34; needs only Fixed+r90+r180). The
+  D-dependent four (A030222/34/35/194596) stand at n=24 banked
+  (`results/related-seqs-n24.md`); n=32 lands with the ayr tail, n=33 with
+  the dalby run. Combiner `scripts/derive_related.py` (per-sequence reach,
+  validates every known OEIS term, /4 and /8 divisibility asserts).
+- **dmirror diagonal quasi-polynomials** (`results/dmirror-diagonals.md`):
+  d(S,S+k) is period-2 quasi-polynomial, degree k per parity class, leading
+  S^k/k!, onset ≈2k+2. **P_0..P_4 pinned** (P_4-even also cross-validated by
+  two independent methods), **P_4-odd + P_5 both parities fitted** via the
+  cumulant/exp form (`scripts/dmirror_pk_exp.py`, 4-9 exact witnesses).
+  GF-basis structure: G_k = N_k(x)/((1-x)^(k+1)(1+x)^k), N_k(±1) = (±2)^k;
+  no low-order bivariate closure (each level carries fresh gadget content).
+  These formulas replace the RAM-impossible sparse strips: n=33 needs only
+  P_4 (direct S≤28), n=34 only P_5 (direct S≤28).
 
-## Live jobs (2026-07-05; hmirror/r180/r90 n=34 all DONE and banked)
+## Live jobs (2026-07-05 morning)
 - **dalby — dmirror n=33 direct strips** (`scripts/dmirror_strips.sh 33 80 28
-  27 .. 1`): driver PID 3035912, tmux `0:dm33`, rev `b358e397` (Shrink Ray),
+  27 .. 1`): driver PID 3035912, tmux `0:dm33`, rev `b358e397`,
   → `runs/sym33/dmirror.S*.out`. Predicted ~9.5M cpu-s ≈ 33h wall, peak strip
-  (S=28, first) ~80-95GB. Purpose: n=33 related-seqs term — strips S>=29 come
-  from pinned P_4 closed forms (results/dmirror-diagonals.md); this run also
-  yields the k=5 points that pin P_5 → n=34. Kill = numeric PID per strip;
-  resume = rerun missing strips.
+  (S=28, runs first) ~80-95GB vs 125GB + 64GB swapfile (`/swapfile2`, added
+  2026-07-05). Purpose: n=33 related-seqs terms — strips S≥29 come from P_4
+  closed forms; the run also yields the k=5 points that pin P_5 → n=34.
+  Kill = numeric strip PID; resume = rerun missing strips.
 - **ayr — dmirror n=32 tail** (`scripts/dmirror_strips.sh 32 32 25 .. 1`):
-  driver PID 3024316, tmux `0:dm32c`, rev `b358e39`, S=25/24 done, S=23
-  running ~07:38. dalby's half (S=26..32) done + banked on gympie. On ayr
-  completion: scp strips → gympie `runs/sym32/`, `dmirror_sum.py 32`, prefix
-  validate vs runs/sym24+sym28, `derive_related.py` → A030222/34/35/194596
-  through n=32.
+  driver PID 3024316, tmux `0:dm32c`, rev `b358e39`. S=25/24 done (banked on
+  gympie), S=23 running as of 07:38. dalby's half S=26..32 done + banked.
+- **Completion drills** (waiters do not survive a context clear — check
+  directly: dalby `ps -p 3035912`, ayr `ps -p 3024316`):
+  - ayr n=32 done → scp `runs/sym32/dmirror.S*.out` to gympie,
+    `python3 scripts/dmirror_sum.py 32`, prefix-validate vs runs/sym24 (n≤24)
+    and runs/sym28 (n≤28), `derive_related.py runs/sym32`-style combine (needs
+    a symdir with all four types' counts — copy/symlink alongside sym34 data),
+    rerun `dmirror_diagonals.py` + `dmirror_pk_exp.py` (pins P_4-odd via S=23,
+    forward-tests P_5, attempts level 6). Bank a related-seqs results doc.
+  - dalby n=33 done → same prefix validations, P_5 pins conventionally from
+    its k=5 points, assemble n=33 = P_4 formulas (S≥29) + direct strips, then
+    decide n=34 (formulas S≥29 via P_5 + direct S≤28 at maxn=34; S=28@34
+    budget-6 strip est ~90-160GB — the one marginal strip, swap covers).
 
 ## Data ceiling (why the term chase is parked)
-- **P_16 is derivable** (fit from T(33,17)+T(34,18), self-consistent — verified)
-  but has **no independent holdout** until a(35). The diagonal-polynomial route
-  has caught up to the data, so a(34)'s top cell has no closed-form cross-check
-  (unlike a(33), whose T(33,18) matched the held-out P_15 exactly).
-- More terms would need a fresh sweep (a35: H19 ~11h with P_15, or H18 ~3.4h if
-  P_16 wired — but then P_16 has no holdout). Not planned pre-close.
-- **Transfer-matrix Option 5** (`scripts/diag_transfer_gen.py`) as an
-  independent P_k route is **infeasible in practice**: state count grows ~7.4×/k
-  (59→437→… measured), so K=16 ≈ 9×10¹³ states. Dead end without a rewritten
-  engine. (Its low-K output agrees with our P_2 in-regime — a good sanity check.)
-
-## Extending the related sequences (optional; cost-bound, not correctness-bound)
-- Gated **only by the symmetric counts**: Fixed reaches n=34, free polyominoes
-  (A000105) n=59, symmetry counts n=24 — the gate. So they can go to n=34 in
-  principle.
-- `symcount_fast` is explicit Redelmeier — ~2.5×/term. Threaded `sym_extend.sh`
-  (all four types over roots; mirror types were the pole, now ~90× faster):
-  n=24 was ~2.2h. **n=25 ≈ 5.5h, n=26 ≈ 14h, n=27 ≈ 35h, n=28+ infeasible** for
-  the close.
-- The symmetric transfer-matrix engine **exists now**: `cpp/sym/symtm.cpp`
-  (Hall of Mirrors), gated live vs symcount_fast (`tests/gate_symtm.py`) and
-  byte-matched to the banked `runs/sym24/` oracles.
-  - **hmirror**: palindromic-column sweep — n=34 running on dalby.
-  - **r180**: left-half sweep + self-glue (seam union-find; palindromic middle
-    column for odd widths), transpose-restricted to W≥H (weight 2/1) which
-    collapsed the tall strips (n=20: 79.9s→0.93s). n=34 running on dalby.
-  - **r90**: n=34 banked (`runs/sym34/r90.out`, gympie, 5.9s).
-  - **dmirror**: not built — the remaining blocker for A030222/34/35 at n=34;
-    full design + r180 lessons banked in `docs/dmirror-design.md`.
-- **Session waiters do not survive a context clear** — after one, check the
-  dalby jobs directly: `ps -p 2994466 2996883` on dalby, outputs under
-  `~/src/polyominoes/runs/sym34/{hmirror,r180}.{out,err}`. Completion drill
-  per job: diff the n≤24 prefix vs `runs/sym24/<type>.out`, copy the .out to
-  gympie `runs/sym34/`, then `scripts/derive_related.py` once all four types
-  (or the subset for A030233: r90+r180) are in.
+- **P_16 is derivable** (fit from T(33,17)+T(34,18), self-consistent) but has
+  **no independent holdout** until a(35); a(34)'s top cell has no closed-form
+  cross-check. More terms need a fresh sweep — not planned pre-close.
+- **Transfer-matrix Option 5** (`scripts/diag_transfer_gen.py`) infeasible:
+  state count ~7.4×/k. Dead end without a rewritten engine.
 
 ## Open independent threads
 - **Lean proof** (branch `lean-diagonal-proofs`, `polyplets/PROOF-STATUS.md`):
   (a) finiteness, (b) row profile, (c-fwd), (d-local) done+green; remain
   (c-rev), (d-global gap≤2), (e) offset-chain count.
-- **Steal-tail diagnostic** (`results/steal-tail-h18.md`): work-stealing fired
-  0× on a32; root-caused to the record-based `grainRecs` eligibility floor
-  missing compute-heavy stragglers. Banked, **not deployed** (trusted config).
+- **Steal-tail diagnostic** (`results/steal-tail-h18.md`): banked, not
+  deployed (trusted config).
 
 ## Landing plan for the 2026-07-06 publish (jasonp steers; nothing auto-started)
-1. **Code tidy** — `/simplify` over the delta since the `simplified` tag. Clean
-   untracked cruft: `autonomy/` (empty), `polyplets/.lake` (Lean build cache →
-   gitignore).
-2. **OEIS prep** — b-file for A006770 to n=34; upload files for the five related
-   seqs to n=24 (only b030222 exists, and only to n=19). **Submission is
-   jasonp's call** — prep only.
-3. **Paper** — `paper/a19-polyplets.tex` revision (was deferred until the term
-   chase stopped — now). Paper is last per ROADMAP.
-4. **Repo** — README/HANDOFF/ROADMAP coherence; results/ provenance complete.
-5. **Verify** — fold the ayr a(34) cross-ISA verdict into a34's provenance.
+1. ~~Code tidy~~ **DONE 2026-07-04**: `simplified` tag moved to c567893; full
+   gate suite repaired (three casualties of the 91bdcdc cleanup restored) and
+   GREEN end-to-end. Still open: gitignore `polyplets/.lake`, clean `autonomy/`.
+2. **OEIS prep** — b-file for A006770 to n=34; b-files for the five related
+   seqs (A030233 to n=34; the other four to n=32/33 as the runs land).
+   **Submission is jasonp's call** — prep only.
+3. **Paper** — `paper/a19-polyplets.tex` revision. The dmirror diagonal
+   P_k structure (results/dmirror-diagonals.md) may merit a section or a
+   separate note.
+4. **Repo** — README/HANDOFF/ROADMAP coherence; results/ provenance complete;
+   related-seqs results doc for the final reach.
