@@ -69,6 +69,16 @@ git history — this file is just the live state.
   18:13. Peak-RAM risk is behind us; remaining strips shrink (ayr did all
   of S≤25 at n=32 in ~15h wall). Kill = numeric strip PID; resume = rerun
   missing strips.
+- **ayr — dmirror n=33 cross-ISA recompute** (`scripts/dmirror_strips.sh 33
+  32 25 24 23 22 21 20`): driver PID 3054773, tmux `0:dm33x`, rev `b358e39`,
+  started 2026-07-06 00:47 → ayr `runs/sym33/dmirror.S*.out`. Purpose:
+  independent x86 recount of strips dalby (ARM) computes — byte-compare per
+  strip when both exist. S>=26 excluded (dalby peaks 86.8-126GB > ayr 78GB
+  budget; ayr S=25 predicted ~<65GB from dalby's live 44GB@2.6h). Kill after
+  current strip when dalby's farm lands; then **M(17) launches on ayr**
+  (measured prediction: single-core n=13 maxhole = 25.4min -> ~835 core-h
+  ~26-30h wall on 32 cores; sampling/maxhole_split.py 17 32; tests
+  Conjecture 1's first prediction M(17)=28).
 - ~~ayr n=32 tail~~ **DONE 2026-07-05 11:50** — drill executed: strips scp'd,
   sum + prefix validations PASS, companions derived+banked
   (results/related-seqs-n32.md), P_4-odd PINNED, P_5 forward-confirmed
