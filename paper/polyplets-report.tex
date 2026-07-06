@@ -156,9 +156,10 @@ later terms rest on decorrelation rather than algorithmic independence.
     forward on strips computed after pinning). The failure mode is specific
     and stated: an onset shift or degree transition beyond the pinned range
     would silently corrupt exactly the substituted strips; the forward
-    confirmations bound this risk but cannot eliminate it. Planned for the
-    $n=33$ companions; no \tierthree{} value is presented as established in
-    this paper without its label. \\
+    confirmations bound this risk but cannot eliminate it. Used for the
+    $n=33$ companions ($D(33)$ and the four $D$-dependent values); no
+    \tierthree{} value is presented as established in this paper without
+    its label. \\
     \bottomrule
   \end{tabular}
   \caption{Confidence tiers used throughout. Conservative reading: \tierone{}
@@ -633,21 +634,22 @@ that agree exactly.
         $\tfrac16S^3+\tfrac72S^2+\tfrac{83}{6}S+\tfrac{93}{2}$\\
     4 & $\tfrac1{24}S^4+\tfrac32S^3+\tfrac{28}{3}S^2+33S+180$ &
         $\tfrac1{24}S^4+\tfrac43S^3+\tfrac{97}{12}S^2+\tfrac{119}{3}S+\tfrac{1367}{8}$\\
-    5 & $\tfrac1{120}S^5+\tfrac5{12}S^4+4S^3+\tfrac{55}{3}S^2+\tfrac{2278}{15}S+570$\,$^\dagger$ &
+    5 & $\tfrac1{120}S^5+\tfrac5{12}S^4+4S^3+\tfrac{55}{3}S^2+\tfrac{2278}{15}S+570$ &
         $\tfrac1{120}S^5+\tfrac{11}{24}S^4+\tfrac{19}{4}S^3+\tfrac{185}{12}S^2+\tfrac{18869}{120}S+\tfrac{4545}{8}$\,$^\dagger$\\
     \bottomrule
   \end{tabular}
   \caption{Diagonal-mirror diagonal polynomials $d(S,S+k)$, valid from the
-  stated onsets. Every polynomial through $k=4$ was pinned by exact
+  stated onsets. Every polynomial except $k=5$ odd was pinned by exact
   differencing on the highest-$S$ points, required to reproduce all earlier
   in-regime points (holdout), and confirmed on strips computed after
-  pinning ($P_4$ odd pinned by the completed $n=32$ farm's $S=23$ strip;
-  $P_4$ even also by two independent methods that agree exactly).
-  Entries marked $^\dagger$ ($k=5$) are fitted through the cumulant form of
-  the repository's exp-fitter with $6$ exact surplus witnesses per parity
-  (a fit first made with $4$ witnesses and left unchanged by the two
-  strips that landed afterwards) and should be treated as one grade weaker
-  than the pinned rows.}
+  pinning ($P_4$ odd pinned by the $n=32$ farm's $S=23$ strip; $P_4$ even
+  also by two independent methods that agree exactly; $P_5$ even pinned by
+  the $n=33$ farm's $k=5$ points, identically reproducing the earlier
+  cumulant-form fit). The one entry marked $^\dagger$ ($k=5$ odd) is
+  fitted through the repository's exp-fitter with $7$ exact surplus
+  witnesses (a fit first made with $4$ witnesses and left unchanged by
+  the strips that landed afterwards) and should be treated as one grade
+  weaker than the pinned rows.}
   \label{tab:dmpk}
 \end{table}
 
@@ -673,8 +675,8 @@ The integer numerators, for the record:
   N_5 &= 570+176x-2610x^2-520x^3+4996x^4+764x^5-4816x^6-496x^7\\
       &\qquad +2282x^8+108x^9-422x^{10}
 \end{align*}
-($N_5$ is fitted rather than pinned, like its row in
-Table~\ref{tab:dmpk}; $N_4$ is pinned now that both $P_4$ parities are).
+($N_5$ rests in part on the fitted $P_5$-odd row of Table~\ref{tab:dmpk},
+so it remains one grade weaker; $N_4$ is fully pinned).
 The boundary condition $N_k(\pm1)=(\pm2)^k$ was at
 no point imposed on any fit: the fitter solves only for polynomial
 coefficients against exact diagonal counts, and the boundary values
@@ -735,12 +737,24 @@ The one-sided extension to $n=34$ is Table~\ref{tab:onesided}. The
 free/bilateral/asymmetric companions (A030222, A030234, A030235) and the
 free-non-polyomino difference A194596 additionally need $D$, the
 diagonal-mirror count, whose exact-bounding-box sweep is the costliest
-symmetry (Section~\ref{sec:methodD}): $D$ reaches $n=32$
+symmetry (Section~\ref{sec:methodD}): $D$ is exact through $n=32$
 ($D(32)=\num{2156235549286}$), which caps these four companions at
-$n=32$. Table~\ref{tab:companions} gives the new values;
-Table~\ref{tab:symcounts} records the symmetry fixed-point counts
+$n=32$ within \tiertwo{}. Table~\ref{tab:companions} gives the new
+values; Table~\ref{tab:symcounts} records the symmetry fixed-point counts
 themselves, which are of independent interest (each is an OEIS-eligible
 sequence).
+
+One further term of each exists at the \tierthree{} grade, via the hybrid
+$D(33)$ of Table~\ref{tab:symcounts} (direct strips $S\le28$ plus pinned
+closed forms for the fifteen sparse cells):
+\begin{align*}
+  \text{A030222}(33)&=\num{9328935247555296909698722}\\
+  \text{A030234}(33)&=\num{5909238725043}\\
+  \text{A030235}(33)&=\num{9328935247549387670973679}\\
+  \text{A194596}(33)&=\num{9328935102907028734392020}
+\end{align*}
+These are conjecture-assisted and are staged for OEIS as comments only,
+never as b-file data.
 
 \begin{table}[H]
   \centering\footnotesize
@@ -782,16 +796,19 @@ sequence).
     30 & 0            & \num{1026290399226}  & \num{373785638266}   & \num{318558058108}\\
     31 & 0            & \num{1012501939560}  & \num{929270191286}   & \num{807550483468}\\
     32 & \num{398124} & \num{7063812264280}  & \num{2546382907164}  & \num{2156235549286}\\
-    33 & \num{250098} & \num{6960731505456}  & \num{6343327587938}  & ---\\
+    33 & \num{250098} & \num{6960731505456}  & \num{6343327587938}  & \num{5475149862148}\,$^{\ddagger}$\\
     34 & 0            & \num{48710062997772} & \num{17385821908346} & ---\\
     \bottomrule
   \end{tabular}
   \caption{Symmetry fixed-point counts, $n=25$--$34$ (\tierone{} to $n=24$
   via the dual-engine gate; \tiertwo{} here). $R_{90}=0$ unless
-  $n\equiv0,1\pmod4$. The $D$ column reaches $n=32$ (strip farm across two
-  machines, disjoint exact-bounding-box strips summing exactly;
-  prefix-matches the $n\le24$ oracle range and the $n\le28$ prior run);
-  $n=33$ is in flight.}
+  $n\equiv0,1\pmod4$. The $D$ column is exact through $n=32$ (strip farm
+  across two machines, disjoint exact-bounding-box strips summing exactly;
+  prefix-matches the $n\le24$ oracle range and the $n\le28$ prior run).
+  $^{\ddagger}$$D(33)$ is \tierthree{}: direct strips $S\le28$ (each
+  prefix-matching the $n=32$ farm exactly) plus the pinned closed forms
+  $P_0$--$P_4$ for the fifteen sparse cells $S\ge29$, the forms first
+  required to reproduce all $124$ in-regime direct cells on the overlap.}
   \label{tab:symcounts}
 \end{table}
 
@@ -1098,8 +1115,12 @@ All machines are commodity hardware owned and operated by the author:
         $a(34)$ itself, which is why the quasi-polynomials of
         Section~\ref{sec:dmdiag} matter: they replace exactly the strips
         whose memory grows fastest.
-        % TODO(n33-cost): add the dalby n=33 direct-strip totals when
-        % that run lands.
+  \item \textbf{Diagonal-mirror count, $n=33$ direct strips (for the
+        \tierthree{} assembly):} all $28$ strips $S\le28$ on dalby,
+        $24.0$\,h wall sequential, $6.71$\,M CPU-seconds $\approx1864$
+        core-hours, peak strip RSS $126.2$\,GB ($S=28$; the strips
+        $S\ge29$ that the closed forms replace would have exceeded the
+        machine outright).
   \item \textbf{Symmetric counts at $n=34$ (Method D):} axis mirror
         $\approx3.3$\,h wall / $53$\,k CPU-seconds / $8.2$\,GB;
         $180^\circ$ rotation $\approx51$\,min wall / $18$\,k CPU-seconds /

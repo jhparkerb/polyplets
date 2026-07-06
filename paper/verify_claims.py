@@ -369,6 +369,12 @@ S34 = {t: load(f"runs/sym34/{t}.out") for t in ("r90", "r180", "hmirror")} \
     if os.path.exists(os.path.join(ROOT, "runs", "sym34", "r90.out")) else None
 DM = load("runs/sym32/dmirror.out") \
     if os.path.exists(os.path.join(ROOT, "runs", "sym32", "dmirror.out")) else None
+# D(33) in tab:symcounts is the T3 hybrid (direct strips + pinned closed
+# forms, scripts/dmirror_hybrid_sum.py); validate it against that assembly.
+if DM is not None and os.path.exists(os.path.join(ROOT, "runs", "sym33", "dmirror.out")):
+    DM33 = load("runs/sym33/dmirror.out")
+    chk("hybrid dmirror.out prefix-matches n<=32", all(DM33[n] == DM[n] for n in DM))
+    DM = DM33
 if S34 and DM:
     for row in table_rows("tab:symcounts"):
         n, r9, r1, hm = row[0], row[1], row[2], row[3]

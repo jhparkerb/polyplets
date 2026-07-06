@@ -5,6 +5,7 @@
 %N A030235 Number of n-celled polyplets without bilateral symmetry.
 %C A030235 a(n) = A030222(n) - A030234(n) (free polyplets minus those with bilateral symmetry); a(18) and a(19) follow from the extended A030222 and A030234. - _Jason H Parker_, Jul 05 2026
 %C A030235 a(20)-a(32) follow from the extended A030222 and A030234; see those entries' Comments for provenance and confidence. - _Jason H Parker_, Jul 05 2026
+%C A030235 Conjecturally a(33) = 9328935247549387670973679: the diagonal-mirror fixed-point count D(33) it requires was assembled from exact strip computations plus empirically pinned but unproven quasi-polynomial formulas for the sparsest strips (validated against every directly computed overlap cell, but conjecture-assisted nonetheless); kept as a comment rather than b-file data. Independent confirmation welcome. - _Jason H Parker_, Jul 06 2026
 %H A030235 Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet.</a>
 %Y A030235 Cf. A030222.
 %K A030235 nonn,hard

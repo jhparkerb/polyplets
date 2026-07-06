@@ -3,6 +3,7 @@
 %T A194596 1400292492,9318028028,62259251309,417496576187,2808705403386,
 %U A194596 18950413696858
 %C A194596 a(20)-a(32) (in the b-file) computed as A030222(n) - A000105(n) from the extended A030222; see that entry's Comments for provenance and confidence. - _Jason H Parker_, Jul 05 2026
+%C A194596 Conjecturally a(33) = 9328935102907028734392020: the diagonal-mirror fixed-point count D(33) it requires was assembled from exact strip computations plus empirically pinned but unproven quasi-polynomial formulas for the sparsest strips (validated against every directly computed overlap cell, but conjecture-assisted nonetheless); kept as a comment rather than b-file data. Independent confirmation welcome. - _Jason H Parker_, Jul 06 2026
 %N A194596 Number of free polyplets with n cells that are not polyominoes.
 %H A194596 Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet</a>.
 %F A194596 a(n) = A030222(n) - A000105(n).
