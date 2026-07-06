@@ -35,18 +35,25 @@ BH19 = {1: 1, 2: 15994426, 3: 12736006193, 4: 452027455240, 5: 3469435781222,
         6: 10975452058596, 7: 20257323484797, 8: 26611876627714,
         9: 27701775032858, 10: 24014057424024}
 
+A25 = 14994811325186658577
+A34 = 515316838423862758858377704
+
 gfs = parse_gfs()
-N = 25
+N = 40
 ser = {H: series(P, Q, N) for H, (P, Q) in gfs.items()}
 print(f"heights recovered: {sorted(ser)}")
 print("=== cross-check GF-expanded B_H(19) vs byHeight ===")
 for H in sorted(ser):
     got, exp = ser[H][19], BH19.get(H)
     print(f"  H={H:2d}: {got}  {'ok' if exp is None or got == exp else 'MISMATCH '+str(exp)}")
-for n in (19, 25):
+for n in (19, 25, 34, 35, 40):
     s9 = sum(ser[H][n] for H in range(1, 10) if H in ser)
     s10 = sum(ser[H][n] for H in range(1, 11) if H in ser)
     print(f"=== n={n}:  sum_H<=9 = {s9}")
     print(f"          sum_H<=10 = {s10}")
     if n == 19:
         print(f"   captured: H<=9 = {100*s9/A19:.1f}%,  H<=10 = {100*s10/A19:.1f}%")
+    if n == 25:
+        print(f"   captured vs a(25): {100*s10/A25:.1f}%")
+    if n == 34:
+        print(f"   captured vs a(34): {100*s10/A34:.1f}%")
