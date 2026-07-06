@@ -38,23 +38,37 @@ git history — this file is just the live state.
   be set to the actual submission day. Submission is jasonp's.
 - **dmirror diagonal quasi-polynomials** (`results/dmirror-diagonals.md`):
   d(S,S+k) is period-2 quasi-polynomial, degree k per parity class, leading
-  S^k/k!, onset ≈2k+2. **P_0..P_4 pinned** (P_4-even also cross-validated by
-  two independent methods), **P_4-odd + P_5 both parities fitted** via the
-  cumulant/exp form (`scripts/dmirror_pk_exp.py`, 4-9 exact witnesses).
-  GF-basis structure: G_k = N_k(x)/((1-x)^(k+1)(1+x)^k), N_k(±1) = (±2)^k;
-  no low-order bivariate closure (each level carries fresh gadget content).
+  S^k/k!, onset ≈2k+2. **P_0..P_4 pinned BOTH parities** (P_4-odd pinned by
+  the completed n=32 farm's S=23 strip; P_4-even also cross-validated by two
+  independent methods); **P_5 both parities fitted** via the cumulant/exp
+  form (`scripts/dmirror_pk_exp.py`), now with 6 exact witnesses/parity —
+  unchanged from the 4-witness fit (forward confirmation); level 6 refuses.
+  GF-basis structure: G_k = N_k(x)/((1-x)^(k+1)(1+x)^k), N_k(±1) = (±2)^k
+  for k≥1; G_k generates the polynomial law (raw counts agree in-regime
+  only — paper wording fixed accordingly). No low-order bivariate closure.
   These formulas replace the RAM-impossible sparse strips: n=33 needs only
   P_4 (direct S≤28), n=34 only P_5 (direct S≤28).
+- **Paper (`paper/polyplets-report.tex`)**: computational-report form,
+  through five external review rounds + one big self-check round.
+  Growth §3 upgraded to the confluent 3-param fit (Δ₁=1/2, λ≈7.111,
+  θ→-1.02 emergent; `paper/lambda_fit.py`). GF bound recomputed beyond
+  frontier (a(35)≥5.07e26, a(40)≥4.27e30; 16% capture at 34).
+  **`paper/verify_claims.py` re-targeted at the full report — 397 checks
+  GREEN** (parses tables from the .tex; caught + fixed 3 overclaims:
+  G_k definition, residual-factor claim, N_k boundary k≥1). Restored
+  91bdcdc-deleted data files it needs (results/fixed_height_gfs.txt etc.).
+  Remaining TODO: n33-cost (job-gated).
 
-## Live jobs (2026-07-05 midday)
+## Live jobs (2026-07-05 evening)
 - **dalby — dmirror n=33 direct strips** (`scripts/dmirror_strips.sh 33 80 28
   27 .. 1`): driver PID 3035912, tmux `0:dm33`, rev `b358e397`,
-  → `runs/sym33/dmirror.S*.out`. Started 07:41; S=28 (the big first strip)
-  at ~4h had RSS 114.9GB vs predicted 80-95 (125GB + 64GB `/swapfile2` —
-  fine but WATCH). Predicted ~9.5M cpu-s ≈ 33h wall total. Purpose: n=33
-  related-seqs terms — strips S≥29 come from P_4 closed forms; the run also
-  yields the k=5 points that pin P_5 → n=34.
-  Kill = numeric strip PID; resume = rerun missing strips.
+  → `runs/sym33/dmirror.S*.out`. Started 07:41. **S=28 DONE** 13:28 (5.8h
+  wall, 1.61M cpu-s, peak RSS 126.2GB — brushed into swap, fine; column
+  d(28,28..33) = 2,34,600,6434,66960,506530; n≤32 prefix matches the n=32
+  farm's S=28 exactly). **S=27 DONE** 18:13 (~4.75h). S=26 running since
+  18:13. Peak-RAM risk is behind us; remaining strips shrink (ayr did all
+  of S≤25 at n=32 in ~15h wall). Kill = numeric strip PID; resume = rerun
+  missing strips.
 - ~~ayr n=32 tail~~ **DONE 2026-07-05 11:50** — drill executed: strips scp'd,
   sum + prefix validations PASS, companions derived+banked
   (results/related-seqs-n32.md), P_4-odd PINNED, P_5 forward-confirmed
@@ -80,15 +94,26 @@ git history — this file is just the live state.
 - **Steal-tail diagnostic** (`results/steal-tail-h18.md`): banked, not
   deployed (trusted config).
 
-## Landing plan for the 2026-07-06 publish (jasonp steers; nothing auto-started)
-1. ~~Code tidy~~ **DONE 2026-07-04**: `simplified` tag moved to c567893; full
-   gate suite repaired (three casualties of the 91bdcdc cleanup restored) and
-   GREEN end-to-end. Still open: gitignore `polyplets/.lake`, clean `autonomy/`.
-2. **OEIS prep** — b-file for A006770 to n=34; b-files for the five related
-   seqs (A030233 to n=34; the other four to n=32/33 as the runs land).
-   **Submission is jasonp's call** — prep only.
-3. **Paper** — `paper/polyplets-report.tex` revision. The dmirror diagonal
-   P_k structure (results/dmirror-diagonals.md) may merit a section or a
-   separate note.
-4. **Repo** — README/HANDOFF/ROADMAP coherence; results/ provenance complete;
-   related-seqs results doc for the final reach.
+## OEIS submission readiness (supersedes the hard 2026-07-06 date)
+Batch is staged and checklist-clean, but **submission is now gated on
+jasonp's own readiness process, at his insistence** — the OEIS AI policy
+makes the author personally responsible for correctness, and editors now
+routinely ask "how much of this is AI-generated?". Research on the policy
++ accepted/rejected precedents: `docs/oeis-ai-policy.md`.
+- **The viva** (local-only files, deliberately uncommitted, in
+  .git/info/exclude: docs/viva-exam.md, viva-reserve.md [chmod 000],
+  viva-state.md, drill1-counting.md): exam taken 2026-07-05, 56.5/100 vs
+  bar (>=80, no core question below half). Drill 1 (counting arguments)
+  nearly done — only exercise A2 outstanding; drill 2 (tier system +
+  validation architecture, report §1+§5 explain-back) not started; cold
+  retake variants after a spacing gap. **Full grading state:
+  docs/viva-state.md** (local).
+- Before submitting, also: jasonp rewrites all staged %C lines in his own
+  words (Claude meaning-checks only); signature dates -> actual
+  submission day; pink-box replies are jasonp's alone, always.
+
+## Remaining work ledger
+1. Housekeeping: gitignore `polyplets/.lake`, clean `autonomy/`.
+2. dalby n=33 completion drill (above), then the n=34 dmirror decision.
+3. Paper: TODO(n33-cost) after the run; final read-through.
+4. Viva drills + retakes, %C authorship pass, then jasonp submits.
