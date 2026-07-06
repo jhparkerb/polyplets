@@ -1,10 +1,9 @@
-# DESIGN — Next-system polyplet enumerator (v1)
+# Engine design — the production polyplet enumerator
 
-Status: DRAFT 2026-06-26 · Second of the build trilogy. Inputs: [`PRD.md`](PRD.md) (requirements),
-[`docs/frontier/NEXT-SYSTEM.md`](../frontier/NEXT-SYSTEM.md) (the closed design space),
-[`docs/layout.md`](../layout.md) (the file-layout sketch). This document turns the requirements into a
-**concrete, buildable architecture**: exact interfaces, algorithms, on-disk byte layouts, the
-worker↔orchestrator protocol, and the gate set. The IMPLEMENTATION-PLAN then sequences building it.
+Status: as built (the engine that computed a(21)-a(34)). Written 2026-06-26
+as the build design; the planning trilogy around it (PRD, implementation
+plan, and the frontier investigation corpus it cites) was removed at
+project close and lives in git history.
 
 Design rule throughout: **re-express the validated engine, do not reinvent it.** Every transition,
 signature, prune, and fold below is lifted from the working `cpp/tma/` code (cited inline); the *new*

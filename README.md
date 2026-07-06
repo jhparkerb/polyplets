@@ -28,7 +28,7 @@ claims more than its tier.
 | `scripts/` | the general toolchain: production runners (`dalby_term.sh`, `symtm_run.sh`, `dmirror_strips.sh`), derivers (`derive_pk_fast.py`, `dmirror_diagonals.py`, `derive_related.py`), assembly (`dmirror_sum.py`, `dmirror_hybrid_sum.py`), independent confirmation (`g2_campaign.sh`) |
 | `tests/` | the gate suite (red-first, fail-closed; `make gates`) |
 | `oeis/`, `submissions/` | staged OEIS extensions and new-sequence drafts (nothing auto-submitted) |
-| `docs/` | reference docs: engineering standards, observability contract, job checklist, formats, glossary, engine + dmirror design |
+| `docs/` | reference docs: engineering standards, observability contract, job checklist, formats, glossary, engine + dmirror design, proofs |
 | `papers/` | the cited literature (PDFs) |
 
 One-shot launch scripts, per-term plans, and the research-log corpus that

@@ -967,12 +967,11 @@ Summing the fixed-height GFs gives $a(n)\ge\sum_{H\le 10}T(n,H)$ exactly for
 any $n$, by extracting coefficients from rational functions. When this bound
 was computed, $a(25)$ was out of reach and the bound gave
 $a(25)\ge\num{6657105903966723073}$; the exact value
-$\num{14994811325186658577}$, computed later by Method~C, confirms it (the
-bound captured $44\%$)---a retrospective certification of the GF machinery.
-The bound remains available for any $n$ beyond the current frontier, though
-its capture fraction shrinks as taller strips dominate: against the exact
-values it captures $44\%$ at $n=25$ but only $16\%$ at $n=34$. Beyond the
-frontier it gives
+$\num{14994811325186658577}$, computed later by Method~C, confirms it---a
+retrospective certification of the GF machinery. The bound remains
+available for any $n$ beyond the current frontier, though its capture
+fraction shrinks as taller strips dominate: $44\%$ of the exact value at
+$n=25$, $16\%$ at $n=34$. Beyond the frontier it gives
 $a(35)\ge\num{507142944262215078226758378}\approx5.07\times10^{26}$ and
 $a(40)\ge\num{4266005101622209395058618248135}\approx4.27\times10^{30}$,
 exact integers from rational arithmetic
@@ -989,24 +988,16 @@ $a(19)$/$a(20)$ stage with Method B, whose per-state completion counts the
 sampler needs; the production spill engine does not retain them, so the
 portrait stays at that scale.)
 
-We validated the sampler on $a(19)$: an independent king-move BFS confirmed
-every specimen was connected, and the sampled distribution of heights
-reproduced $T(19,H)/a(19)$. Ten thousand samples against a state space of
-$1.5\times10^{14}$ can rule out only gross bias; no goodness-of-fit power is
-claimed against subtle non-uniformity in the transition probabilities, and
-the portrait below should be read at that resolution---qualitative
-character, not calibrated statistics. A $10{,}000$-specimen sample shows the typical
-$19$-cell polyplet is \emph{sparse, branchy, corner-glued}: about ten
-rook-connected pieces held together mostly by corners ($59\%$ of contacts),
-$\sim\!25\%$ box density, and a $28\%$ chance of enclosing a hole. It is
-essentially never a polyomino: the exact frequency
-$A001168(19)/a(19)\approx4\times10^{-5}$ predicts about $0.4$ such specimens
-per $10{,}000$, and none appeared. Sampling at several sizes
-($n=8,\dots,19$) and fitting the radius of gyration gives $R_g\sim n^{\nu}$
-with $\nu\approx0.68$, above the accepted two-dimensional value
-$\nu\approx0.6408$~\cite{jensen2001} as a fit over so short a range should
-be; the holed fraction rises from $8.3\%$ to $28.3\%$ over $n=8\to19$.
-These are heuristic observations, not estimates with error control.
+Ten thousand samples against a state space of $1.5\times10^{14}$ can rule
+out only gross bias (every specimen king-connected by independent BFS,
+sampled heights reproducing $T(19,H)/a(19)$); the portrait should be read
+at that resolution---qualitative character, not calibrated statistics.
+The typical $19$-cell polyplet is \emph{sparse, branchy, corner-glued}:
+about ten rook-connected pieces held together mostly by corners ($59\%$
+of contacts), $\sim\!25\%$ box density, and a $28\%$ chance of enclosing
+a hole---rising from $8.3\%$ at $n=8$. It is essentially never a
+polyomino: the exact frequency $A001168(19)/a(19)\approx4\times10^{-5}$
+predicts about $0.4$ such specimens per $10{,}000$, and none appeared.
 
 \section{Reach and limits}
 \label{sec:reach}
@@ -1042,11 +1033,6 @@ accompanying repository; derived artifacts are regenerated on demand by the
 included tools. The cross-checks are encoded as runnable gates, and a
 self-contained checker re-verifies the paper's numerical claims against the
 committed and regenerated data.
-% TODO(verify-claims): paper/verify_claims.py still targets the a(19)/a(20)
-% claim set; re-point it at this paper's tables (a(n) to 34, A030233 to 34,
-% the n=32 companions when banked, P_k tables) before submission.
-% (b-files staged 2026-07-05: A006770+A030233 to a(33) with a(34) as a
-% conjectured OEIS comment; the four D-dependent companions to n=32.)
 
 \section{Author's note: use of AI}
 \label{sec:ai}
