@@ -36,7 +36,6 @@ Polyomino/animal enumeration:
   jensen_benzenoid_parallel.pdf            Jensen, parallel enumeration of benzenoid hydrocarbons.
   efficient_enumeration_algorithms_2016.pdf  Efficient enumeration algorithms survey/paper (2016).
   tremblay_vernay.pdf                      Tremblay & Vernay, On the generation of discrete figures with connectivity constraints, RAIRO-TIA 58 (2024). (Source of A006770's a(18); cited in the OEIS entry.)
-  417190.pdf                               UNIDENTIFIED scan (2.9MB, no text layer) — jasonp: identify or delete.
 
 Distributed-computing background (engine design era):
   dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).
@@ -46,5 +45,6 @@ Distributed-computing background (engine design era):
 
 Other:
   refs-transfer-matrix.md                  reading notes on the transfer-matrix literature.
+  417190.pdf                               Bentley, Programming Pearls (full-text scan; personal copy, unrelated to the bibliography).
 
 MISSING.md — wanted papers we could not obtain (for library lookup).
