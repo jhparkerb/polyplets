@@ -74,11 +74,14 @@ git history — this file is just the live state.
   started 2026-07-06 00:47 → ayr `runs/sym33/dmirror.S*.out`. Purpose:
   independent x86 recount of strips dalby (ARM) computes — byte-compare per
   strip when both exist. S>=26 excluded (dalby peaks 86.8-126GB > ayr 78GB
-  budget; ayr S=25 predicted ~<65GB from dalby's live 44GB@2.6h). Kill after
-  current strip when dalby's farm lands; then **M(17) launches on ayr**
-  (measured prediction: single-core n=13 maxhole = 25.4min -> ~835 core-h
-  ~26-30h wall on 32 cores; sampling/maxhole_split.py 17 32; tests
-  Conjecture 1's first prediction M(17)=28).
+  budget; ayr S=25 measured 51GB@5.8h). PLAN CHANGE 2026-07-06 morning:
+  ayr keeps grinding the full S<=25 tail (extend queue below S=20 when it
+  drains) — cross-ISA for every strip that fits its RAM. **M(17) runs on
+  DALBY instead** once its farm lands + drill done (~835 core-h measured
+  from ayr n=13 calibration = 25.4min single-core -> ~11-14h on 80 cores;
+  `python3 sampling/maxhole_split.py 17 78`; g2 rebuilt on dalby at
+  72d1204e, maxhole smoke-tested; tests Conjecture 1's first prediction
+  M(17)=28).
 - ~~ayr n=32 tail~~ **DONE 2026-07-05 11:50** — drill executed: strips scp'd,
   sum + prefix validations PASS, companions derived+banked
   (results/related-seqs-n32.md), P_4-odd PINNED, P_5 forward-confirmed
