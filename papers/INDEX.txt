@@ -45,6 +45,5 @@ Distributed-computing background (engine design era):
 
 Other:
   refs-transfer-matrix.md                  reading notes on the transfer-matrix literature.
-  417190.pdf                               Bentley, Programming Pearls (full-text scan; personal copy, unrelated to the bibliography).
 
 MISSING.md — wanted papers we could not obtain (for library lookup).
