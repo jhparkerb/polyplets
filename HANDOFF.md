@@ -80,10 +80,13 @@ git history — this file is just the live state.
   exp fit; P_5-odd stays fitted, 7 witnesses; level 6 refuses); paper
   updated (D(33) ‡ cell, companions block, n=33 cost, dagger narrowed),
   verify_claims 398 GREEN.
-- **n=34 dmirror decision (open, jasonp's call):** path = P_5 formulas
-  S>=29 + direct S<=28 at maxn=34; S=28@34 est ~90-160GB (swap covers);
-  CAVEAT: odd sparse cells rest on FITTED P_5-odd — one grade weaker than
-  the n=33 assembly. Term chase for a(35)+ stays parked.
+- **n=34 dmirror: DECLINED 2026-07-06** (jasonp, at the close deadline).
+  Measured n=33 peaks supersede the old ~90-160GB estimate: S=28@34 (k<=6)
+  extrapolates to ~175-200GB and S=27@34 (k<=7) similar, vs dalby's 189GB
+  incl. swap — marginal-to-infeasible, and P_6 (the formula escape) is
+  unpinnable without n=34 data (circular). If ever revisited: probe
+  S=28@34 alone first. The related-seqs reach is final at n=32 (T2) /
+  n=33 (T3, comments); term chase for a(35)+ stays parked.
 
 ## Data ceiling (why the term chase is parked)
 - **P_16 is derivable** (fit from T(33,17)+T(34,18), self-consistent) but has
