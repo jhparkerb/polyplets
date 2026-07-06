@@ -59,39 +59,31 @@ git history — this file is just the live state.
   91bdcdc-deleted data files it needs (results/fixed_height_gfs.txt etc.).
   Remaining TODO: n33-cost (job-gated).
 
-## Live jobs (2026-07-05 evening)
-- **dalby — dmirror n=33 direct strips** (`scripts/dmirror_strips.sh 33 80 28
-  27 .. 1`): driver PID 3035912, tmux `0:dm33`, rev `b358e397`,
-  → `runs/sym33/dmirror.S*.out`. Started 07:41. **S=28 DONE** 13:28 (5.8h
-  wall, 1.61M cpu-s, peak RSS 126.2GB — brushed into swap, fine; column
-  d(28,28..33) = 2,34,600,6434,66960,506530; n≤32 prefix matches the n=32
-  farm's S=28 exactly). **S=27 DONE** 18:13 (~4.75h). S=26 running since
-  18:13. Peak-RAM risk is behind us; remaining strips shrink (ayr did all
-  of S≤25 at n=32 in ~15h wall). Kill = numeric strip PID; resume = rerun
-  missing strips.
-- **ayr — dmirror n=33 cross-ISA recompute** (`scripts/dmirror_strips.sh 33
-  32 25 24 23 22 21 20`): driver PID 3054773, tmux `0:dm33x`, rev `b358e39`,
-  started 2026-07-06 00:47 → ayr `runs/sym33/dmirror.S*.out`. Purpose:
-  independent x86 recount of strips dalby (ARM) computes — byte-compare per
-  strip when both exist. S>=26 excluded (dalby peaks 86.8-126GB > ayr 78GB
-  budget; ayr S=25 measured 51GB@5.8h). PLAN CHANGE 2026-07-06 morning:
-  ayr keeps grinding the full S<=25 tail (extend queue below S=20 when it
-  drains) — cross-ISA for every strip that fits its RAM. **M(17) runs on
-  DALBY instead** once its farm lands + drill done (~835 core-h measured
-  from ayr n=13 calibration = 25.4min single-core -> ~11-14h on 80 cores;
-  `python3 sampling/maxhole_split.py 17 78`; g2 rebuilt on dalby at
-  72d1204e, maxhole smoke-tested; tests Conjecture 1's first prediction
-  M(17)=28).
-- ~~ayr n=32 tail~~ **DONE 2026-07-05 11:50** — drill executed: strips scp'd,
-  sum + prefix validations PASS, companions derived+banked
-  (results/related-seqs-n32.md), P_4-odd PINNED, P_5 forward-confirmed
-  (6 witnesses), level 6 refuses, paper tables filled. ayr is FREE.
-- **dalby n=33 completion drill** (waiter bihhw0fbn; if dead: `ps -p
-  3035912`): prefix validations, P_5 pins conventionally from its k=5
-  points, assemble n=33 = P_4 formulas (S≥29) + direct strips (T3 label),
-  companions n=33 as OEIS comment-only + paper note, n=33-cost paper TODO,
-  then decide n=34 (formulas S≥29 via P_5 + direct S≤28 at maxn=34; S=28@34
-  budget-6 strip est ~90-160GB — the one marginal strip, swap covers).
+## Live jobs (2026-07-06 morning)
+- **dalby — M(17) max-hole-area sweep** (`python3 sampling/maxhole_split.py
+  17 78`): driver PID 3089094, tmux `0:m17`, g2 rev `72d1204e`, log
+  `runs/m17/driver.log`, per-worker checkpoints `runs/ckpt/` (kill = resume
+  cheaply). Predicted ~835 core-h (measured n=13 calibration) ≈ 11-14h on
+  78 workers → lands tonight. Tests Conjecture 1's first prediction
+  M(17)=28; writes results/maxhole.txt on dalby (pull + commit from here).
+- **ayr — dmirror n=33 cross-ISA recompute** (tmux `0:dm33x`, driver PID
+  3054773): S=25 running since 00:47 (~8.5h, slower cores). Queue S=25..20;
+  EXTEND downward when it drains. Per-strip drill: byte-compare ayr's
+  dmirror.S*.out vs dalby's (gympie runs/sym33/) — x86 vs ARM.
+- ~~dalby n=33 direct strips~~ **DONE 2026-07-06 07:39** (24.0h wall,
+  6.71M cpu-s, peak 126.2GB) — **completion drill EXECUTED**: strips on
+  gympie runs/sym33/, all n<=32 prefixes byte-match n=32 farm (413/413);
+  **D(33)=5475149862148** via fail-closed `scripts/dmirror_hybrid_sum.py`
+  (closed forms reproduced 124 overlap cells before supplying 15 sparse
+  cells); companions n=33 (T3) banked results/related-seqs-n33.md + staged
+  as conjectured OEIS comments; **P_5-even conventionally PINNED** (equals
+  exp fit; P_5-odd stays fitted, 7 witnesses; level 6 refuses); paper
+  updated (D(33) ‡ cell, companions block, n=33 cost, dagger narrowed),
+  verify_claims 398 GREEN.
+- **n=34 dmirror decision (open, jasonp's call):** path = P_5 formulas
+  S>=29 + direct S<=28 at maxn=34; S=28@34 est ~90-160GB (swap covers);
+  CAVEAT: odd sparse cells rest on FITTED P_5-odd — one grade weaker than
+  the n=33 assembly. Term chase for a(35)+ stays parked.
 
 ## Data ceiling (why the term chase is parked)
 - **P_16 is derivable** (fit from T(33,17)+T(34,18), self-consistent) but has
