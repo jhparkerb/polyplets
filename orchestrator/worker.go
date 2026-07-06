@@ -40,6 +40,8 @@ type MapArgs struct {
 	LoHex    string // empty = no lower bound
 	HiHex    string // empty = no upper bound
 	Rev      string
+	Kernel   string // "column" (default) or "kink"; empty = column
+	Stage    string // kink kernel only: "seed", "finalize", or an int stage index
 }
 
 // MergeArgs is the full argument set for one merge_worker invocation.
@@ -51,6 +53,7 @@ type MergeArgs struct {
 	KLoHex  string
 	KHiHex  string
 	Rev     string
+	KeyLen  int // 0 = merge_worker's own H+2 default; kink stage tables pass H+4
 }
 
 // RunMapWorker spawns a map_worker, waits for it, and returns the parsed result.
@@ -85,6 +88,12 @@ func RunMapWorker(ctx context.Context, bin WorkerBin, a MapArgs, onProgress func
 	if a.Rev != "" {
 		args = append(args, "--rev", a.Rev)
 	}
+	if a.Kernel != "" && a.Kernel != "column" {
+		args = append(args, "--kernel", a.Kernel)
+	}
+	if a.Stage != "" {
+		args = append(args, "--stage", a.Stage)
+	}
 	return runWorker(ctx, bin.MapWorker, args, onProgress, stop)
 }
 
@@ -106,6 +115,9 @@ func RunMergeWorker(ctx context.Context, bin WorkerBin, a MergeArgs) (WorkerResu
 	}
 	if a.Rev != "" {
 		args = append(args, "--rev", a.Rev)
+	}
+	if a.KeyLen != 0 {
+		args = append(args, "--keylen", fmt.Sprint(a.KeyLen))
 	}
 	return runWorker(ctx, bin.MergeWorker, args, nil, nil)
 }

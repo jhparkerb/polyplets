@@ -142,6 +142,25 @@ func (t *telemetry) observe(c ColumnCost) {
 	}
 }
 
+// observeRound emits one per-round cost line for the kink kernel, where a
+// column is H+2 map+merge rounds (seed, H stage rounds, finalize) rather than
+// the column kernel's single round. The aggregate ColumnCost row folds all of
+// them together, hiding WHICH round carries the merge-barrier wall the
+// persistent-worker rearchitecture targets; this breaks it out per round.
+// Stdout-only (event=kink_round) — it does NOT touch cost_profile.tsv, whose
+// schema the a-priori predictor reads, so it is pure observability. Nil-safe.
+func (t *telemetry) observeRound(H, col int, round string, frontierIn uint64,
+	mapWall, mapCPU, mergeWall, mergeCPU float64, mapUnits, mergeRanges int) {
+	if t == nil {
+		return
+	}
+	fmt.Printf("event=kink_round H=%d col=%d round=%s frontier_in=%d "+
+		"map_wall_s=%.3f map_cpu_s=%.3f merge_wall_s=%.3f merge_cpu_s=%.3f "+
+		"map_units=%d merge_ranges=%d\n",
+		H, col, round, frontierIn, mapWall, mapCPU, mergeWall, mergeCPU,
+		mapUnits, mergeRanges)
+}
+
 // addProcessed bumps the live input-record counter for the running column.
 // Fed by worker event=progress lines streamed from map units.
 func (t *telemetry) addProcessed(delta uint64) {

@@ -50,10 +50,34 @@ func TestDiagonalStripValidTrueThreshold(t *testing.T) {
 	if diagonalStripValid(24, 12) {
 		t.Errorf("diagonalStripValid(24, 12) = true; want false (24 < 2*12+1=25)")
 	}
-	// k=13 is out of range until P_13 is derived and wired — diagonalStripValid
-	// must refuse it regardless of maxn, since diagonalCell has no case 13.
-	if diagonalStripValid(100, 13) {
-		t.Errorf("diagonalStripValid(100, 13) = true; want false (k=13/P_13 not wired into diagonalCell yet)")
+	// k=13 (P_13, now wired): a32 (maxn=32) must be able to use it (32 >= 2*13+1=27),
+	// dropping a32's top real height a tier (H=maxn-13=H19 becomes closed-form).
+	if !diagonalStripValid(32, 13) {
+		t.Errorf("diagonalStripValid(32, 13) = false; want true (32 >= 2*13+1=27; a32 must be able to use P_13's shortcut)")
+	}
+	if diagonalStripValid(26, 13) {
+		t.Errorf("diagonalStripValid(26, 13) = true; want false (26 < 2*13+1=27)")
+	}
+	// k=14 (P_14, now wired): a33 (maxn=33) must be able to use it (33 >= 2*14+1=29),
+	// keeping a33's top real height at H=maxn-15=H18 (H=maxn-14=H19 becomes closed-form).
+	if !diagonalStripValid(33, 14) {
+		t.Errorf("diagonalStripValid(33, 14) = false; want true (33 >= 2*14+1=29; a33 must be able to use P_14's shortcut)")
+	}
+	if diagonalStripValid(28, 14) {
+		t.Errorf("diagonalStripValid(28, 14) = true; want false (28 < 2*14+1=29)")
+	}
+	// k=15 (P_15, now wired): a34 (maxn=34) must be able to use it (34 >= 2*15+1=31),
+	// keeping a34's top real height at H=maxn-16=H18 (H=maxn-15=H19 becomes closed-form).
+	if !diagonalStripValid(34, 15) {
+		t.Errorf("diagonalStripValid(34, 15) = false; want true (34 >= 2*15+1=31; a34 must be able to use P_15's shortcut)")
+	}
+	if diagonalStripValid(30, 15) {
+		t.Errorf("diagonalStripValid(30, 15) = true; want false (30 < 2*15+1=31)")
+	}
+	// k=16 is out of range until P_16 is derived and wired — diagonalStripValid
+	// must refuse it regardless of maxn, since diagonalCell has no case 16.
+	if diagonalStripValid(100, 16) {
+		t.Errorf("diagonalStripValid(100, 16) = true; want false (k=16/P_16 not wired into diagonalCell yet)")
 	}
 }
 

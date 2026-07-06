@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 #include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include "core/runfile.h"
 
 static bool exists(const std::string& p) {
@@ -148,10 +150,67 @@ static void testHeaderRejectsCounterMismatch() {
   std::remove((path + ".idx").c_str());
 }
 
+// Run body() in a forked child; return its exit code, or -1 if it died by a
+// signal. Lets us assert a fail-closed abort without taking down the gate.
+static int runInChild(void (*body)()) {
+  std::fflush(nullptr);
+  pid_t pid = fork();
+  assert(pid >= 0 && "fork failed");
+  if (pid == 0) {
+    body();          // a fail-closed path exits/aborts here and never returns
+    _exit(0);        // body returned normally → child reports success
+  }
+  int status = 0;
+  assert(waitpid(pid, &status, 0) == pid);
+  if (WIFEXITED(status)) return WEXITSTATUS(status);
+  return -1;  // signal (e.g. abort())
+}
+
+// FAIL-CLOSED (fd-exhaustion / ENOSPC / bad spill dir): a RunFileWriter that
+// cannot open its file must ABORT, not silently swallow every appended record
+// (which yields a plausible-looking UNDERCOUNT with no oracle to catch it —
+// the exact way an fd-limited spill run produced a wrong a(11)). The path
+// below lives under a directory that does not exist, so fopen() fails.
+static void writerOnUnopenablePath() {
+  RunFileWriter<u64> w("/nonexistent_dir_zzz/gate_runfile_failclosed.bin",
+                       3, 8, "", "", "test");
+  RunRecord<u64> r;
+  std::memset(r.sig.b, 0, SIGMAX);
+  r.lo = 0; r.len = 1; r.counts.assign(1, u64{1});
+  w.append(r);       // pre-fix: no-op (fp_ null) → record lost, child exits 0
+  w.finalize();
+}
+static void testWriterOpenFailureAborts() {
+  // rc>0 = clean nonzero exit (the desired fail-closed abort); rc==0 =
+  // silent drop (the pre-fix bug); rc==-1 = crash (also unacceptable).
+  const int rc = runInChild(writerOnUnopenablePath);
+  assert(rc > 0 &&
+         "fail-closed: RunFileWriter open failure must abort, not drop data");
+}
+
+// FAIL-CLOSED (merge side): mergeRunFiles over an input that cannot be opened
+// must abort, not treat the missing shard as empty (its records would vanish
+// from the merged count). Mirrors the ok()+exit checks the map-phase readers
+// already have.
+static void mergeOnMissingInput() {
+  std::vector<std::string> in = {"/nonexistent_dir_zzz/no_such_shard.bin"};
+  mergeRunFiles<u64>(in, 3, "", "", "/tmp/gate_runfile_merge_out.bin", "test");
+}
+static void testMergeReaderOpenFailureAborts() {
+  const int rc = runInChild(mergeOnMissingInput);
+  assert(rc > 0 &&
+         "fail-closed: mergeRunFiles open failure must abort, not drop a shard");
+  std::remove("/tmp/gate_runfile_merge_out.bin");
+}
+
 int main() {
   testAtomicPublish();
   testIndexHasMagic();
   testHeaderRejectsBadByteorder();
   testHeaderRejectsCounterMismatch();
+  // Fail-closed spill I/O. These intentionally trigger "cannot open" on stderr
+  // in the forked child — that noise is the behavior under test, not an error.
+  testWriterOpenFailureAborts();
+  testMergeReaderOpenFailureAborts();
   std::puts("gate_runfile PASS");
 }

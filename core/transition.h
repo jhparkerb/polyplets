@@ -36,7 +36,11 @@ inline void unite(int* p, int a, int b) {
 // signature is written to `out`; Dead means the mask strands an old component.
 // Closing the animal (the old mask==0 case) is handled by the caller, which
 // already knows the component count -- so this stays purely the extend step.
-inline Outcome stepColumnSquare8(const Sig& old, int H, unsigned mask, Sig& out) {
+// Templated on the mask word so a POLY_SIGMAX-raised TU (cpp/sym/symtm.cpp,
+// H up to 34) can pass uint64_t; every production call site passes unsigned
+// and deduces the exact prior instantiation.
+template <class M = unsigned>
+inline Outcome stepColumnSquare8(const Sig& old, int H, M mask, Sig& out) {
   // union-find slots: new-column row r -> r ; old label L -> H + L. Indices
   // stay < 2*SIGMAX (H <= 30, labels <= H), so stack arrays -- no per-call heap
   // allocation, which dominated the hot path when these were std::vector.
@@ -80,8 +84,8 @@ inline Outcome stepColumnSquare8(const Sig& old, int H, unsigned mask, Sig& out)
 // a row adjacent (r-1,r,r+1) to an L-cell, i.e. iff some new cell touches L,
 // i.e. iff L is not stranded; step() still re-checks, so it stays the authority.
 namespace s8 {
-template <class F>
-inline void viableRec(int r, int H, unsigned mask, int bits, std::uint32_t cov,
+template <class M, class F>
+inline void viableRec(int r, int H, M mask, int bits, std::uint32_t cov,
                       std::uint32_t all, const std::uint32_t* rowSup,
                       const std::uint32_t* sufSup, int budget, bool topBase, F& fn) {
   if ((cov | sufSup[r]) != all) return;  // remaining rows can't cover all comps
@@ -94,7 +98,8 @@ inline void viableRec(int r, int H, unsigned mask, int bits, std::uint32_t cov,
   // byte-identical, but the recursion stops descending doomed branches (76% of leaves were
   // discarded here post-hoc; the dominant cost is the descent itself).
   if (!(topBase || (mask & 1u))) {
-    const int lbTop = mask ? __builtin_ctz(mask) : r;
+    const int lbTop =
+        mask ? __builtin_ctzll(static_cast<unsigned long long>(mask)) : r;
     if (bits + lbTop > budget) return;
   }
   if (r == H) {
@@ -103,12 +108,15 @@ inline void viableRec(int r, int H, unsigned mask, int bits, std::uint32_t cov,
   }
   viableRec(r + 1, H, mask, bits, cov, all, rowSup, sufSup, budget, topBase, fn);  // 0
   if (bits + 1 <= budget)                                                          // 1
-    viableRec(r + 1, H, mask | (1u << r), bits + 1, cov | rowSup[r], all, rowSup,
-              sufSup, budget, topBase, fn);
+    viableRec(r + 1, H, static_cast<M>(mask | (M(1) << r)), bits + 1,
+              cov | rowSup[r], all, rowSup, sufSup, budget, topBase, fn);
 }
 }  // namespace s8
 
-template <class F>
+// Templated on the mask word like stepColumnSquare8 (and for the same TU:
+// symtm's r180 strips reach H=34, past u32). Production call sites leave M
+// at the default unsigned and are unchanged.
+template <class M = unsigned, class F>
 inline void forEachViableMask(const Sig& old, int H, int budget, F&& fn) {
   std::uint32_t all = 0, rowSup[SIGMAX], sufSup[SIGMAX + 1];
   for (int i = 0; i < H; ++i)
@@ -121,5 +129,6 @@ inline void forEachViableMask(const Sig& old, int H, int budget, F&& fn) {
   }
   sufSup[H] = 0;
   for (int r = H - 1; r >= 0; --r) sufSup[r] = sufSup[r + 1] | rowSup[r];
-  s8::viableRec(0, H, 0u, 0, 0u, all, rowSup, sufSup, budget, old.b[H] != 0, fn);
+  s8::viableRec(0, H, M(0), 0, 0u, all, rowSup, sufSup, budget, old.b[H] != 0,
+                fn);
 }

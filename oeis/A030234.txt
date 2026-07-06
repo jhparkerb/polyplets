@@ -2,11 +2,14 @@
 %S A030234 1,2,4,10,22,57,131,344,810,2144,5127,13645,32984,88133,214768,575578,
 %T A030234 1411442,3791465,9344655
 %N A030234 Number of n-celled polyplets having bilateral symmetry.
-%C A030234 a(18) and a(19) computed as (E(n) + G(n))/2, where E(n), G(n) are the numbers of fixed n-cell polyplets invariant under an edge-mirror resp. a diagonal-mirror reflection (cpp/sym/symcount_fast); this identity was verified against all known terms a(1..17). - _Jason H Parker_, 2026
+%C A030234 a(18) and a(19) computed as (E(n) + G(n))/2, where E(n), G(n) are the numbers of fixed n-cell polyplets invariant under an edge-mirror resp. a diagonal-mirror reflection (cpp/sym/symcount_fast); this identity was verified against all known terms a(1..17). - _Jason H Parker_, Jul 05 2026
+%C A030234 a(20)-a(32) (in the b-file) computed by the same identity from symmetric transfer-matrix engines (validated against a symmetry-classified direct enumeration for n <= 24; the /2 integrality holds at every n). - _Jason H Parker_, Jul 05 2026
+%C A030234 Conjecturally a(33) = 5909238725043: the diagonal-mirror fixed-point count D(33) it requires was assembled from exact strip computations plus empirically pinned but unproven quasi-polynomial formulas for the sparsest strips (validated against every directly computed overlap cell, but conjecture-assisted nonetheless); kept as a comment rather than b-file data. Independent confirmation welcome. - _Jason H Parker_, Jul 06 2026
 %H A030234 Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet.</a>
 %Y A030234 Cf. A030222.
 %K A030234 nonn,hard
 %O A030234 1,2
 %A A030234 _David W. Wilson_
 %E A030234 More terms from _Joseph Myers_, Sep 26 2002
-%E A030234 a(18)-a(19) from _Jason H Parker_, 2026
+%E A030234 a(18)-a(19) from _Jason H Parker_, Jul 05 2026
+%E A030234 a(20)-a(32) from _Jason H Parker_, Jul 05 2026 (symmetric transfer matrices; see Comments)

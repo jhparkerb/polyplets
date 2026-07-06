@@ -1,6 +1,6 @@
 # Glossary
 
-Brief reference for terms used in `research-options.md` and the plan documents.
+Brief reference for terms used across the repo's docs and results notes.
 
 **animal** (lattice animal) — A finite connected cluster on a lattice, under
 whatever adjacency rule the family specifies (see *connectivity*); the

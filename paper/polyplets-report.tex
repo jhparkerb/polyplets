@@ -1,0 +1,1186 @@
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+%  Fixed polyplets through a(34): sixteen new terms of A006770, symmetry
+%  companions, and the diagonal structure of king-animal triangles.
+%  (Restructured 2026-07-05 per paper/restructure-plan.md: results first,
+%  explicit confidence tiers, methods as an escalation ladder.)
+% ---------------------------------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{numprint}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{flafter}   % a float never appears before the text that introduces it
+\usepackage{float}     % [H] pins tables/figures exactly where written
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\setlength{\intextsep}{16pt plus 3pt minus 3pt}
+
+\npthousandsep{,}
+\npfourdigitsep
+\newcommand{\num}[1]{\numprint{#1}}
+\newcommand{\byH}{\ensuremath{B_H}}
+\newcommand{\tierone}{\textsf{T1}}
+\newcommand{\tiertwo}{\textsf{T2}}
+\newcommand{\tierthree}{\textsf{T3}}
+\newcommand{\tiertwominus}{\textsf{T2}$^{-}$}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{openproblem}[conjecture]{Open Problem}
+
+\title{\textbf{Fixed polyplets through $a(34)$: sixteen new terms of OEIS
+A006770, their symmetry companions, and the diagonal structure of king-animal
+triangles}\\[4pt]
+\large A computational report}
+\author{Jason Parker \texttt{<jasonp@panix.com>}\\[2pt]
+\small Independent researcher (unaffiliated)}
+\date{July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+A \emph{polyplet} (king-move animal) is a finite set of unit cells of the square
+lattice connected through shared edges or corners. OEIS sequence
+\href{https://oeis.org/A006770}{A006770} counts the \emph{fixed} polyplets of $n$
+cells, previously known through $n=18$. We report sixteen new terms, through
+\[
+  a(34) = \num{515316838423862758858377704},
+\]
+each computed from scratch and reproducing every prior term. Because claims of
+this kind are only as good as their verification, every number in this paper
+carries an explicit confidence tier: $a(19)$ is confirmed by two algorithms
+sharing no counting logic; $a(20)$--$a(33)$ by a single algorithm family
+decorrelated across architectures and cross-checked per term against held-out
+closed forms for the top diagonals of the height triangle (once certified by
+a live held-out prediction, those forms also supply the tallest, sparsest
+strata---$6.5\%$ of $a(34)$ arrives through them, a dependency quantified
+exactly in the text); $a(34)$'s own top diagonal has no held-out closed
+form, which we state rather than paper over. The one-sided companion A030233 is extended to
+$n=34$; the free, bilateral, and asymmetric companions (A030222, A030234,
+A030235, A194596) to the reach of the diagonal-mirror symmetry count. Along the
+way the machinery yields structural results: closed forms for the diagonals
+of the height triangle (an exponential/cumulant law with two new constants
+per level---empirically pinned and validated on every held-out term, not
+proved), a conjectural quasi-polynomial law for the diagonals of the
+symmetric-fixed-point triangle (period two, degree $k$, with
+generating-function numerators satisfying $N_k(\pm1)=(\pm2)^k$, $k\ge1$), a
+hole-count
+stratification of A006770, exact fixed-height generating functions, the
+extremal maximum hole area ($\sim n^2/8$), and rigorous lower bounds on
+$a(n)$. Results computed and
+validated but not proved are labeled as such; all code, data, and a
+claim-verifier are released.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+The enumeration of lattice animals---finite connected sets of cells on a regular
+lattice---is a classical problem at the meeting point of combinatorics and
+statistical physics~\cite{klarner,jensen2001}. On the square lattice the two
+standard families are \emph{polyominoes}, connected through shared edges, and
+\emph{polyplets}, connected through shared edges or corners. The fixed counts
+grow exponentially, so exact values are known only for modest $n$ and each new
+term is a small computational milestone. The fixed-polyomino sequence
+(\href{https://oeis.org/A001168}{A001168}) has been pushed
+furthest~\cite{redelmeier,jensen2003,barequet}; the fixed-polyplet sequence
+A006770 had been recorded through $n=18$.
+
+This document is a \emph{computational report}: its claims are numbers, the
+provenance and verification of those numbers, and the empirical structure
+found in them. It reports the terms $a(19)$ through $a(34)$ and the results
+that grew out of computing them, including two structural observations about
+the diagonals of king-animal triangles (Section~\ref{sec:diagonals}), stated
+as validated conjectures since proofs are not attempted here. It is an
+amateur contribution carried out with substantial AI assistance
+(Section~\ref{sec:ai}). The data appears in the document as well as the
+repository: a report's job is to be usable by the next person to attempt
+these computations.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+  \item Sixteen new terms of A006770, $a(19)$--$a(34)$
+        (Section~\ref{sec:result}).
+  \item The one-sided companion A030233 to $n=34$; the free/bilateral/
+        asymmetric companions A030222, A030234, A030235, and A194596 to
+        $n=32$ (Section~\ref{sec:companions}).
+  \item Closed forms, empirically pinned and holdout-validated (not
+        proved), for the height-triangle diagonals $T(n,n-k)$, $k\le15$,
+        via an exponential/cumulant law, used both to accelerate the sweeps
+        and---critically---as \emph{held-out per-term checks} of the
+        frontier terms (Sections~\ref{sec:diagonals}, \ref{sec:confirm}).
+  \item A conjectural quasi-polynomial law for the diagonals of the diagonal-mirror
+        symmetry triangle, with pinned polynomials, forward confirmations,
+        and generating-function structure (Section~\ref{sec:diagonals}).
+  \item A hole-count stratification of A006770 exact through $n=18$, the
+        extremal hole area $M(n)\sim n^2/8$, exact fixed-height generating
+        functions for $H\le10$, rigorous lower bounds, and a uniform-sampling
+        portrait (Sections~\ref{sec:holes}--\ref{sec:sampling}).
+\end{enumerate}
+
+\paragraph{Confidence tiers.}
+Since a single long count from one program is properly a conjecture, every
+numeric claim below is tagged with one of three tiers, and the results tables
+repeat the tags. The tiers are honest about an asymmetry: past Redelmeier's
+reach no second counting \emph{algorithm} for the full sequence exists, so the
+later terms rest on decorrelation rather than algorithmic independence.
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{l p{0.72\textwidth}}
+    \toprule
+    tier & meaning \\
+    \midrule
+    \tierone{} & Two algorithms sharing no counting logic agree, each
+    reproducing the full published range. Covers $a(1)$--$a(19)$; the
+    symmetry counts to $n=24$; everything derived only from these. \\
+    \tiertwo{} & One counting algorithm, decorrelated and cross-checked:
+    full chain-reproduction of all prior terms on every run; independent
+    recount on a second architecture/compiler; agreement of the top height
+    strata with \emph{held-out} diagonal closed forms $P_k$ (fitted on
+    earlier terms, predicting cells of later ones); modular/CRT internal
+    consistency. Covers $a(20)$--$a(33)$ and the symmetry counts
+    $25\le n\le32$. \\
+    \tiertwominus{} & \tiertwo{} \emph{minus} the held-out diagonal check.
+    Covers exactly one number, $a(34)$: its top surviving stratum would be
+    checked by $P_{16}$, which has no independent holdout until $a(35)$
+    exists. It gets its own tag so the weaker standard is never silently
+    absorbed into \tiertwo{}. \\
+    \tierthree{} & Exact computation composed with \emph{empirically pinned
+    but unproven} quasi-polynomial formulas (the diagonal-mirror $P_k$ of
+    Section~\ref{sec:diagonals}, each pinned with holdout hits and confirmed
+    forward on strips computed after pinning). The failure mode is specific
+    and stated: an onset shift or degree transition beyond the pinned range
+    would silently corrupt exactly the substituted strips; the forward
+    confirmations bound this risk but cannot eliminate it. Used for the
+    $n=33$ companions ($D(33)$ and the four $D$-dependent values); no
+    \tierthree{} value is presented as established in this paper without
+    its label. \\
+    \bottomrule
+  \end{tabular}
+  \caption{Confidence tiers used throughout. Conservative reading: \tierone{}
+  is confirmed; \tiertwo{} is a decorrelated single-method result;
+  \tierthree{} is conjecture-assisted and labeled as such.}
+  \label{tab:tiers}
+\end{table}
+
+\section{Definitions}
+\label{sec:object}
+
+Fix the square lattice $\mathbb{Z}^2$ and call its unit squares \emph{cells}. A
+\emph{lattice animal} is a finite, nonempty, adjacency-connected set of cells.
+Under \textbf{rook} (edge) adjacency the animals are \emph{polyominoes}; under
+\textbf{king} (edge-or-corner) adjacency they are \emph{polyplets}. Every
+polyomino is a polyplet but not conversely: two cells touching only at a corner
+form a polyplet and not a polyomino. One subtlety: a
+polyplet connected \emph{purely} by diagonals lives on a single checkerboard
+colour class, itself a square lattice, so such a shape is a polyomino in
+disguise. The remark is purely illustrative: the companion arithmetic of
+Section~\ref{sec:companions} operates on the full king-move class under
+$D_4$ and never decomposes by colour class. A genuinely king shape mixes
+edge and corner contacts.
+
+Animals are counted \textbf{fixed} (up to translation; rotations and
+reflections distinct), \textbf{one-sided} (up to translation and rotation), or
+\textbf{free} (up to all isometries). A006770 is the fixed count. Two
+triangles refine it: the \emph{height triangle} $T(n,H)$ (animals of $n$ cells
+and bounding-box height exactly $H$, so $a(n)=\sum_H T(n,H)$), and, for each
+symmetry $g$ of the square, the count of fixed animals invariant under $g$,
+which enters the companion counts by Burnside's lemma
+(Section~\ref{sec:companions}).
+
+\section{Headline results}
+\label{sec:result}
+
+\begin{equation}
+  \boxed{\,a(34) = \num{515316838423862758858377704}\,}
+\end{equation}
+
+Table~\ref{tab:terms} gives the full sequence. Terms $n\le18$ reproduce
+A006770 exactly; $a(19)$--$a(34)$ are new. $a(19)$ is \tierone{};
+$a(20)$--$a(33)$ are \tiertwo{}; $a(34)$ is \tiertwominus{}
+(Table~\ref{tab:tiers}), the most exposed number in this paper.
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{r r @{\quad}|@{\quad} r r}
+    \toprule
+    $n$ & $a(n)$ & $n$ & $a(n)$\\
+    \midrule
+    1  & \num{1}              & 18 & \num{22471158811164}\\
+    2  & \num{4}              & \textbf{19} & $\mathbf{\num{151609203011580}}$\\
+    3  & \num{20}             & \textbf{20} & $\mathbf{\num{1025573519362016}}$\\
+    4  & \num{110}            & \textbf{21} & $\mathbf{\num{6954084405510437}}$\\
+    5  & \num{638}            & \textbf{22} & $\mathbf{\num{47255332844367680}}$\\
+    6  & \num{3832}           & \textbf{23} & $\mathbf{\num{321749260511448732}}$\\
+    7  & \num{23592}          & \textbf{24} & $\mathbf{\num{2194666793369310473}}$\\
+    8  & \num{147941}         & \textbf{25} & $\mathbf{\num{14994811325186658577}}$\\
+    9  & \num{940982}         & \textbf{26} & $\mathbf{\num{102607513847014153892}}$\\
+    10 & \num{6053180}        & \textbf{27} & $\mathbf{\num{703126792093436034256}}$\\
+    11 & \num{39299408}       & \textbf{28} & $\mathbf{\num{4824589228356722264087}}$\\
+    12 & \num{257105146}      & \textbf{29} & $\mathbf{\num{33145129805782422061325}}$\\
+    13 & \num{1692931066}     & \textbf{30} & $\mathbf{\num{227969227118066423789154}}$\\
+    14 & \num{11208974860}    & \textbf{31} & $\mathbf{\num{1569631619081324581014300}}$\\
+    15 & \num{74570549714}    & \textbf{32} & $\mathbf{\num{10818203977457804418974036}}$\\
+    16 & \num{498174818986}   & \textbf{33} & $\mathbf{\num{74631481980411777590683952}}$\\
+    17 & \num{3340366308393}  & \textbf{34} & $\mathbf{\num{515316838423862758858377704}}$\\
+    \bottomrule
+  \end{tabular}
+  \caption{Fixed polyplets $a(n)$, $n=1,\dots,34$. Terms $1$--$18$ match the
+  published A006770; boldface terms are new. Tiers: $a(19)$ \tierone{};
+  $a(20)$--$a(33)$ \tiertwo{}; $a(34)$ \tiertwominus{}.}
+  \label{tab:terms}
+\end{table}
+
+\paragraph{Growth.}
+The successive ratios $r_n=a(n)/a(n{-}1)$ climb slowly:
+$r_{20}\approx6.765$, $r_{27}\approx6.853$, $r_{34}\approx6.905$. Fitting
+the two-parameter ansatz $r_n=\lambda(1+\theta/n)$ by least squares over
+trailing windows gives $\lambda=7.101$, $7.104$, $7.105$, $7.106$ (with
+$\theta$ between $-0.94$ and $-0.96$) for windows starting at $n=10$, $15$,
+$20$, $25$ and ending at $34$; the upward drift with window start is the
+signature of an unmodelled confluent correction. Refitting with a confluent
+term, $r_n=\lambda(1+\theta/n+c/n^{1+\Delta_1})$, with $\Delta_1$ scanned on
+a grid, the exponent $\Delta_1=\tfrac12$ gives the smallest residuals on
+every window (by factors from ${\sim}5$ on the shortest window to
+${\sim}350$ on the longest) and removes the drift:
+$\lambda=7.1109$--$7.1111$ across the same
+four windows, with $\theta$ between $-1.02$ and $-1.03$---consistent with
+the universal two-dimensional lattice-animal value
+$\theta=-1$~\cite{jensen2001}, which the fit was free to miss. We
+accordingly estimate $\lambda\approx7.111$, and emphasise that this is a
+fit without error control---no differential-approximant analysis has been
+attempted---so it is an estimate, not a bound.
+
+\paragraph{One-sided companion.}
+The one-sided count (A030233) needs, besides the fixed count, only the
+$90^\circ$- and $180^\circ$-rotation fixed-point counts
+(Section~\ref{sec:companions}), both of which reach $n=34$; hence fifteen new
+terms, through
+\[
+  \mathrm{OneSided}(34)=\num{128829209605977867230343869}.
+\]
+Table~\ref{tab:onesided} lists them. The remaining companions also need the
+mirror counts and are bounded by the diagonal-mirror count's reach
+(Section~\ref{sec:companions}).
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{r r @{\quad}|@{\quad} r r}
+    \toprule
+    $n$ & A030233$(n)$ & $n$ & A030233$(n)$\\
+    \midrule
+    20 & \num{256393397108358}      & 28 & \num{1206147307126536440324}\\
+    21 & \num{1738521118535082}     & 29 & \num{8286282451482505589564}\\
+    22 & \num{11813833328245848}    & 30 & \num{56992306779773178547095}\\
+    23 & \num{80437315244081648}    & 31 & \num{392407904770584270738465}\\
+    24 & \num{548666699140240976}   & 32 & \num{2704550994366217058008641}\\
+    25 & \num{3748702832087014098}  & 33 & \num{18657870495104684580672401}\\
+    26 & \num{25651878467205504568} & 34 & \num{128829209605977867230343869}\\
+    27 & \num{175781698028751634291}& & \\
+    \bottomrule
+  \end{tabular}
+  \caption{New terms of the one-sided count A030233 (previously known to
+  $n=19$ via this project's earlier terms; to $n=17$ before that). Tier:
+  \tierone{} through $n=24$, \tiertwo{} beyond ($n=34$ inherits the fixed
+  count's $a(34)$ caveat). Every derivation validates the $/4$ integrality of
+  the Burnside numerator and every published OEIS term.}
+  \label{tab:onesided}
+\end{table}
+
+\section{Methods: an escalation ladder}
+\label{sec:methods}
+
+Four methods computed these numbers; each subsection states what ran out and
+what replaced it. All engines share three disciplines: exact integer
+arithmetic; every production run re-derives \emph{all} smaller terms, so a
+regression anywhere in range is visible; and admissible pruning only (a prune
+may only ever \emph{lose} animals, so reproducing the published range
+certifies that it lost none).
+
+\subsection{Method A: direct enumeration (to $n=19$)}
+\label{sec:methodA}
+
+Redelmeier's backtracking enumeration~\cite{redelmeier}, adapted to king
+adjacency, grows every animal exactly once from an anchored cell: it maintains
+an ordered frontier of \emph{untried} neighbours and recurses, with the
+standard rule that a cell once placed or rejected at a level is excluded from
+deeper levels. The recursion tallies by size; no animal is stored. Being
+embarrassingly parallel by sub-tree, the count was run as two decorrelated
+campaigns---on Apple silicon (Apple~clang, frontier split $7\times64$) and
+AMD/x86 (GCC, split $8\times96$). The per-size outputs are
+\textbf{byte-identical}. Because the two campaigns differ in hardware,
+compiler, and scheduling and the arithmetic is exact integer addition, a
+transient or platform-specific fault in one is overwhelmingly unlikely to be
+mirrored digit-for-digit in the other; the error mode they cannot jointly
+catch is a bug in the shared \emph{algorithm}, which is what Method~B rules
+out at $n\le19$.
+
+\subsection{Method B: the column transfer matrix (to $n\approx23$)}
+\label{sec:methodB}
+
+The second method counts the same animals by an entirely different principle:
+dynamic programming over the connectivity of a moving boundary, with no animal
+materialised---a king adaptation of the transfer-matrix / finite-lattice
+technique for polyominoes~\cite{jensen2001,jensen2003,bousquet}. Animals of
+bounding-box height exactly $H$ are counted separately, so
+$a(n)=\sum_{H=1}^{n}T(n,H)$; the heights are independent, checkpointable
+sub-problems.
+
+Within a height, confine the animal to an $H$-row strip and sweep columns left
+to right. A \emph{boundary signature}---the occupancy of the most recent
+column, a partition of its filled cells into the partial animal's connected
+components, and two flags for whether rows $0$ and $H-1$ have yet been
+touched---is a Markov state, since a future cell attaches only to the current
+column or later. Because king adjacency reaches the diagonal neighbours
+$(c{-}1,r{\pm}1)$, the transfer moves an \emph{entire column} at once, keeping
+the previous column wholly present; connectivity across the step is resolved
+by union--find. Three invariants make accepted sweeps biject with fixed
+polyplets: the first column is column $0$ (no horizontal double-counting); an
+animal is tallied only with both touch-flags set (height exactly $H$); and
+only when its boundary is a single component---partial states that can never
+reconnect are pruned. A size-budget prune drops any state whose cells-so-far
+plus an \emph{admissible} lower bound on cells-still-needed exceeds $n$.
+
+Concretely, a state is a fixed-width byte string: one byte per strip row
+holding the cell's connected-component label ($0$ for empty), with labels
+\emph{canonically renumbered in first-occurrence order} after every
+transition---the normalization that prevents equivalent partitions from
+proliferating as distinct states---plus the two touch flags; the value
+attached to a state is its vector of counts by size. States live in a flat
+open-addressing hash map keyed by that string (about $300$ bytes per state
+including counts at production sizes). The full layout is in the release's
+\texttt{core/signature.h}.
+
+Method B confirmed $a(19)$ against Method A (byte-identical totals) and
+carried the sequence into the early twenties before its state space---which
+keeps a whole column of connectivity alive per step---outgrew memory.
+
+\subsection{Method C: the cell-at-a-time transfer matrix (to $n=34$)}
+\label{sec:methodC}
+
+The production engine for $a(24)$--$a(34)$ replaces the column step with a
+\emph{cell-at-a-time} step: the boundary advances one cell per transition,
+so the frontier is a staircase---$r$ cells of the new column above $H-r$
+cells of the old---plus one retained north-west \emph{carry} cell, kept
+because king adjacency lets the next cell reach diagonally back across the
+kink in the staircase; without it the step would sever connectivity
+information the lattice still provides. The state encoding is as in
+Method~B (canonical component-label bytes over the staircase cells and the
+carry, touch flags, counts), and each transition decides a single cell,
+resolving connectivity by union--find over its at-most-three placed
+neighbours. The finer step multiplies the number of transitions but shrinks
+the live state space and, decisively, the volume that must be reshuffled
+between passes (measured speedups over Method B grow from $\sim$29$\times$
+at $H=12$ to $\sim$200$\times$ at $H=16$). At frontier sizes beyond RAM the
+state map spills to disk: the frontier is hash-sharded, expanded shard by
+shard, and merged by external passes, so the binding resource is disk
+bandwidth rather than memory. Heights remain independent jobs; per-height
+results are banked with their provenance and re-summed by a combiner that
+refuses partial or duplicated inputs.
+
+\paragraph{I/O integrity.}
+A multi-hour external shuffle is itself a failure surface, so the disk
+layer is engineered to fail closed rather than lose states silently. Every
+spill file carries a self-describing header (magic, format version, byte
+order, key width, and the \emph{record count}, so truncation---including
+the short writes produced by resource exhaustion---is detected on read
+rather than absorbed); readers and the merge refuse malformed or
+count-mismatched inputs; the per-height combiner refuses missing, empty,
+or duplicated shards and takes a lock against concurrent runs on the same
+directory; and kept artifacts are listed in a manifest with per-file
+checksums. These refusal paths are not assumed to work: the release's gate
+suite fault-injects each failure mode (truncated file, missing shard,
+duplicated rows, held lock) and requires the pipeline to abort loudly.
+
+Each production run reproduces the complete triangle---every $T(n,H)$ for all
+smaller $n$---so each new term arrives with a full-chain regression against
+everything already known, including the \tierone{} range.
+
+\paragraph{Which cells are computed and which are injected.}
+This must be stated exactly, because the headline totals contain both. For
+$a(34)$, heights $3\le H\le18$ were swept for real ($93.5\%$ of the total);
+$H=1,2$ are elementary closed forms; and $H\ge19$---the diagonals
+$k\le15$---were \emph{injected} from the fitted closed forms of
+Section~\ref{sec:heightdiag}, contributing $6.5\%$ of $a(34)$. The
+analogous split holds for the preceding terms, the injection boundary
+advancing as each new $P_k$ is certified (at $a(30)$: real sweep
+$H\!=\!3$--$17$, closed forms elsewhere). The
+discipline governing injection is strict and uniform: a $P_k$ is fitted on
+real-swept cells of earlier terms, must reproduce every other real-swept
+cell on its diagonal (holdout), must then predict the \emph{next} term's
+real-swept cell on that diagonal exactly---the newest diagonal is always
+swept for real once more before its formula is trusted---and only after
+surviving that live prediction is it injected for subsequent terms. An
+injected formula failing at larger $n$ would therefore have to pass a
+genuine forward prediction and then break one term later without warning;
+possible, unproven-formula risk being what it is, but the exposure is
+quantified ($6.5\%$ of the frontier term) and every injected formula
+carries at least one live held-out success. In particular $P_{16}$---the
+one formula in the family with no independent holdout---is \emph{not}
+used in $a(34)$: it plays no role as an injected value, only as the
+absent cross-check on the top directly-swept cell $T(34,18)$, which is
+what the \tiertwominus{} grade records. Readers who want totals free
+of any formula assistance may sum Table~\ref{tab:byheight34}'s rows
+$H\le18$ against the banked per-height data; the \tierone{}/\tiertwo{}
+range $n\le19$ contains no injected cells at all.
+
+Table~\ref{tab:byheight34} gives the height decomposition of the frontier
+term with the computed/injected boundary as stated above.
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{r r @{\quad}|@{\quad} r r}
+    \toprule
+    $H$ & $T(34,H)$ & $H$ & $T(34,H)$\\
+    \midrule
+    1  & \num{1}                          & 18 & \num{23288787870043631158670332}\\
+    2  & \num{8822750406819}              & 19 & \num{15111742807653801090985593}\\
+    3  & \num{1450547121316690736}        & 20 & \num{9061341124316405172057950}\\
+    4  & \num{997738306231538048056}      & 21 & \num{5002581174202331698460002}\\
+    5  & \num{54325938673309776005354}    & 22 & \num{2531214280334205695134436}\\
+    6  & \num{718450867038312966264504}   & 23 & \num{1167265695441145358152351}\\
+    7  & \num{3938007987492904266811062}  & 24 & \num{487286890123087057884426}\\
+    8  & \num{12136378135639937908810168} & 25 & \num{182652546462335637272478}\\
+    9  & \num{25406165739609109253893844} & 26 & \num{60863544290648528714052}\\
+    10 & \num{40756412152266215827765016} & 27 & \num{17807197708330934888844}\\
+    11 & \num{54159404667976998554266361} & 28 & \num{4502990884375275679854}\\
+    12 & \num{62670808373359868559352846} & 29 & \num{964076818028408805330}\\
+    13 & \num{65125540284467338650988595} & 30 & \num{169895606813568532170}\\
+    14 & \num{61866157347759886121825501} & 31 & \num{23657686681679437077}\\
+    15 & \num{54235518293248262678336909} & 32 & \num{2440297953560629818}\\
+    16 & \num{44075625952411715905525520} & 33 & \num{165742361336192445}\\
+    17 & \num{33255837131885526055333731} & 34 & \num{5559060566555523}\\
+    \midrule
+    \multicolumn{4}{r}{$\sum_H T(34,H) = \num{515316838423862758858377704}$}\\
+    \bottomrule
+  \end{tabular}
+  \caption{The height decomposition of $a(34)$, peaking at $H=13$. The
+  extreme diagonal is the closed form $T(H,H)=3^{H-1}$
+  ($T(34,34)=3^{33}$).}
+  \label{tab:byheight34}
+\end{table}
+
+\subsection{Method D: symmetric transfer matrices (the companions)}
+\label{sec:methodD}
+
+The companion counts need, for each symmetry $g$ of the square, the number of
+fixed animals invariant under $g$. An animal fixed by $g$ is determined by a
+fundamental-domain slice of itself, so these counts behave like
+$\sqrt{a(n)}$-scale problems and can reach $n=34$ where the full count cannot
+be re-derived independently. Two engines compute them:
+
+\begin{itemize}
+  \item An \emph{orbit-graph Redelmeier} enumerator (explicit, per-animal):
+        growth over cell-orbits under $\langle g\rangle$. Being explicit it is
+        the cross-algorithm oracle, and it carried all four symmetry types to
+        $n=24$.
+  \item A family of \emph{symmetric transfer matrices}, one per conjugacy
+        class: a palindromic-column sweep for the axis mirror; a half-plane
+        sweep with a self-gluing seam for the $180^\circ$ rotation (with a
+        transpose restriction, counting each animal from its wide
+        orientation, that collapses the tall strips); and, for the diagonal
+        mirror, an exact-bounding-box \emph{hook} sweep---the frontier is the
+        L-shaped shell of a growing square, swept corner outward, with the
+        mirror symmetry enforced by construction. The $90^\circ$ count, whose
+        invariant animals have $\sim n/4$ free cells, stays within the
+        explicit enumerator's reach through $n=34$.
+\end{itemize}
+
+The two engines agree---live, in the release's test gate---for every type at
+small $n$, and byte-identical at the $n=24$ oracle; beyond $n=24$ the
+transfer-matrix values are single-algorithm (\tiertwo{}), validated by prefix
+against the oracle range on every run. The diagonal-mirror sweep is the
+expensive one (its bounding box is forced square, so the frontier compresses
+least); its production form stores the frontier in flat sharded arrays with
+ranged count vectors, and farms disjoint exact-bounding-box strips across
+machines, the partial totals summing exactly by construction; the completed
+$n=32$ farm (32 strips across two machines) prefix-matches both the
+$n\le24$ oracle range and the earlier $n\le28$ run exactly.
+
+\subsection{Method E: diagonal closed forms}
+\label{sec:methodE}
+
+The top diagonals of the height triangle---$T(n,n-k)$ for small $k$, the
+tallest, sparsest strips---are the most expensive cells of a sweep and the
+least populated. They turn out to have exact closed forms
+(Section~\ref{sec:diagonals}): for each $k\le15$ a polynomial law, fitted from
+two data points and then \emph{validated on held-out terms}, replaces the top
+real sweep height. Beyond the speedup, these closed forms are per-term
+independent checks of the production engine: a polynomial pinned on terms
+$\le n_0$ that predicts a frontier cell of term $n_0{+}1$ exactly is evidence
+no single-engine recount can provide. The same idea applied to the
+diagonal-mirror triangle yields the quasi-polynomials that will assist the
+$n=33$ companions (\tierthree{} when used).
+
+\section{Validation architecture}
+\label{sec:confirm}
+
+The verification burden shifts across the sequence, and the checks are
+designed around the weakest link at each stage.
+
+\begin{itemize}
+  \item \textbf{External truth.} Every method reproduces A006770 exactly for
+        every $n\le18$, on every production run (the triangle re-derives all
+        smaller terms as a by-product).
+  \item \textbf{Method A $=$ Method B at $a(19)$.} Byte-identical totals from
+        algorithmically disjoint counters---the \tierone{} anchor.
+  \item \textbf{Cross-architecture recounts.} $a(34)$'s full triangle was
+        recomputed on a second architecture and compiler (x86/GCC against
+        ARM/clang production) and is byte-identical, row by row. Earlier
+        terms had per-term recounts of the heaviest strata.
+  \item \textbf{Held-out diagonal closed forms.} For each $k\le15$, $P_k$
+        was fitted on the smallest admissible terms and then required to
+        reproduce every later term's cell $T(n,n-k)$ exactly. The flagship
+        instance: $P_{15}$, pinned before $a(33)$ existed, predicted
+        $T(33,18)$ exactly. $a(34)$'s top cell would need $P_{16}$, which
+        can be fitted but has no independent holdout until $a(35)$; we
+        therefore do not count it as a check, and $a(34)$ carries the weaker
+        tier \tiertwominus{}. Two mitigations are worth stating precisely:
+        the diagonals $k\le15$ of $a(34)$ itself \emph{are} $P_k$-checked,
+        and $a(34)$'s top surviving stratum runs the same code path that
+        $P_{15}$ certified at $a(33)$---what lacks certification is its
+        execution at the larger size, not the path.
+  \item \textbf{Modular consistency.} Production sweeps run with residue
+        counters and CRT reconstruction; independent residue systems must
+        agree, catching overflow and transient corruption (not shared
+        enumeration bugs, which the items above target).
+  \item \textbf{Structural cross-checks.} The transfer matrices'
+        (height,\,size) and (size,\,perimeter) marginals match the explicit
+        enumeration's; rook- and bishop-connected sub-counts reproduce
+        A001168; the $H$-cell height-$H$ diagonal is exactly $3^{H-1}$;
+        Burnside numerators satisfy their $/4$ and $/8$ integrality at every
+        term.
+  \item \textbf{Fault injection.} Planted errors are caught (a dropped
+        diagonal at $n=2$, a doubled count at $n=1$, a prune off-by-one at
+        $n=10$) while a provably count-preserving change survives---the
+        checks fail on wrong programs and pass on right ones.
+  \item \textbf{Hygiene.} The engines are AddressSanitizer/UBSan clean; the
+        multithreaded paths are bit-identical to serial; every kept result
+        traces to a clean-tree commit stamp in a provenance ledger, and the
+        cross-checks are encoded as gates that run before release.
+\end{itemize}
+
+\section{The diagonal structure of king-animal triangles}
+\label{sec:diagonals}
+
+Both triangles in this paper---the height triangle of the full count and the
+exact-bounding-box triangle of the diagonal-mirror count---turn out to have
+exactly solvable top diagonals. We record the laws, the fitting discipline,
+and what is proved versus pinned.
+
+\subsection{The height triangle: an exponential/cumulant law}
+\label{sec:heightdiag}
+
+A height-$H$ animal of exactly $H$ cells is one cell per row drifting by
+$\{-1,0,+1\}$: $T(H,H)=3^{H-1}$. On the diagonal $k=n-H$ ($k$ cells above
+minimum), the normalized counts
+$P_k(n) = T(n,\,n-k)\,\cdot 3^{\,1+3k-n}$
+satisfy
+\[
+  P_k(n) \;=\; [y^k]\,\exp\!\Big(\sum_{j\ge1}(a_j+b_j\,n)\,y^j\Big),
+\]
+an exponential of \emph{cumulants linear in $n$}: $b_j$ is the per-site
+density of connected weight-$j$ defect clusters against the random-walk
+background, $a_j$ the boundary correction---so each level costs exactly two
+new constants, fitted from two data points and validated on all others. The
+leading coefficient is $25^k/k!$ (twenty-five single-defect species per walk
+site, an integer the fit must and does reproduce at every level), and $P_k$
+times $k!$ must be integral. Levels $k\le15$ are fitted, validated, and wired
+into production (Section~\ref{sec:methodE}); each was pinned on the earliest
+admissible terms and holds on every later one. The cumulant form is standard
+polymer-gas combinatorics; we have not proved the linearity of the cumulants
+for this family, and treat the law as empirically exact within its validated
+range.
+
+\subsection{The diagonal-mirror triangle: quasi-polynomials, period two}
+\label{sec:dmdiag}
+
+Let $d(S,n)$ count the diagonal-mirror-fixed polyplets with $n$ cells and
+bounding box exactly $S\times S$ (the box is forced square). The minimal such
+animal is a bare diagonal, $n=S$, and there are exactly two ground states
+(main and anti-diagonal). On the diagonal $k=n-S$ the data show, and exact
+difference tables confirm over every available point:
+\[
+  d(S,\,S+k)\ \text{is quasi-polynomial in } S \text{ of period two and
+  degree } k \text{ per parity class},
+\]
+with leading coefficient $S^k/k!$ and empirical onset $S\ge 2k+2$ (even) /
+$2k+3$ (odd). The pinned polynomials for $k\le3$
+(Table~\ref{tab:dmpk}), with $4$--$12$ holdout hits each, were subsequently
+confirmed \emph{forward} on strips computed hours later on different hardware
+($P_1$ hit $d(31,32)=38$; $P_2$ hit $d(30,32)=672$; $P_3$ hit
+$d(29,32)=7456$); $P_4$ (even class) is pinned by two independent methods
+that agree exactly.
+
+\begin{table}[H]
+  \centering\small
+  \renewcommand{\arraystretch}{1.5}
+  \begin{tabular}{c l l}
+    \toprule
+    $k$ & even $S$ & odd $S$\\
+    \midrule
+    0 & $2$ & $2$\\
+    1 & $S+6$ & $S+7$\\
+    2 & $\tfrac12S^2+7S+12$ & $\tfrac12S^2+6S+\tfrac{27}{2}$\\
+    3 & $\tfrac16S^3+3S^2+\tfrac{40}{3}S+50$ &
+        $\tfrac16S^3+\tfrac72S^2+\tfrac{83}{6}S+\tfrac{93}{2}$\\
+    4 & $\tfrac1{24}S^4+\tfrac32S^3+\tfrac{28}{3}S^2+33S+180$ &
+        $\tfrac1{24}S^4+\tfrac43S^3+\tfrac{97}{12}S^2+\tfrac{119}{3}S+\tfrac{1367}{8}$\\
+    5 & $\tfrac1{120}S^5+\tfrac5{12}S^4+4S^3+\tfrac{55}{3}S^2+\tfrac{2278}{15}S+570$ &
+        $\tfrac1{120}S^5+\tfrac{11}{24}S^4+\tfrac{19}{4}S^3+\tfrac{185}{12}S^2+\tfrac{18869}{120}S+\tfrac{4545}{8}$\,$^\dagger$\\
+    \bottomrule
+  \end{tabular}
+  \caption{Diagonal-mirror diagonal polynomials $d(S,S+k)$, valid from the
+  stated onsets. Every polynomial except $k=5$ odd was pinned by exact
+  differencing on the highest-$S$ points, required to reproduce all earlier
+  in-regime points (holdout), and confirmed on strips computed after
+  pinning ($P_4$ odd pinned by the $n=32$ farm's $S=23$ strip; $P_4$ even
+  also by two independent methods that agree exactly; $P_5$ even pinned by
+  the $n=33$ farm's $k=5$ points, identically reproducing the earlier
+  cumulant-form fit). The one entry marked $^\dagger$ ($k=5$ odd) is
+  fitted through the repository's exp-fitter with $7$ exact surplus
+  witnesses (a fit first made with $4$ witnesses and left unchanged by
+  the strips that landed afterwards) and should be treated as one grade
+  weaker than the pinned rows.}
+  \label{tab:dmpk}
+\end{table}
+
+In the generating-function basis the structure is crisper. Let $G_k$ be
+the generating function of the polynomial law itself,
+$G_k(x)=\sum_{S\ge0} P_k(S)\,x^S$ with $P_k$ evaluated per parity; its
+coefficients agree with the counts $d(S,S+k)$ at every in-regime $S$ (the
+finitely many pre-onset counts deviate from the polynomials, so the raw
+counting series differs from $G_k$ by an additive polynomial of degree
+below the onset, which does not affect the pole structure). Then
+\[
+  G_k(x)\;=\;\frac{N_k(x)}{(1-x)^{k+1}(1+x)^{k}},\qquad
+  N_k \in \mathbb{Z}[x],\ \deg N_k = 2k,\qquad
+  N_k(\pm1)=(\pm2)^k \ (k\ge1).
+\]
+The integer numerators, for the record:
+\begin{align*}
+  N_0 &= 2\\
+  N_1 &= 6+2x-6x^2\\
+  N_2 &= 12+8x-16x^2-8x^3+8x^4\\
+  N_3 &= 50+14x-124x^2-8x^3+110x^4+2x^5-36x^6\\
+  N_4 &= 180+40x-644x^2-54x^3+942x^4+12x^5-600x^6+2x^7+138x^8\\
+  N_5 &= 570+176x-2610x^2-520x^3+4996x^4+764x^5-4816x^6-496x^7\\
+      &\qquad +2282x^8+108x^9-422x^{10}
+\end{align*}
+($N_5$ rests in part on the fitted $P_5$-odd row of Table~\ref{tab:dmpk},
+so it remains one grade weaker; $N_4$ is fully pinned).
+The boundary condition $N_k(\pm1)=(\pm2)^k$ was at
+no point imposed on any fit: the fitter solves only for polynomial
+coefficients against exact diagonal counts, and the boundary values
+\emph{emerged} from its output, exactly as they hold on the pinned rows
+$k\le4$---where every coefficient is fixed by exact differencing with
+surplus holdout points and no overfitting account is available. Its
+status is an observed regularity across levels $k=1..5$, with the caveat
+that at $k=5$ it is only as trustworthy as the fitted row itself.
+The boundary values say the dominant single-defect family has two species per
+odd footprint; the next layer of the peeled numerators follows linear-in-$k$
+laws, the signature of interacting defect pairs. Exact overdetermined
+elimination \emph{refutes} any low-order bivariate rational closure across
+$k$ (each level carries genuinely new defect species), and the parity
+structure of the $k=3$ level refutes the naive two-ground-state defect gas:
+additional length-free families (anti-diagonal excursions crossing the main
+spine) are present. A proof is not attempted, and we are explicit about
+what one would require. The natural strategy is a decomposition argument:
+show that every sufficiently large animal on this diagonal splits, in
+exactly one way, into a bounded set of local pieces (stretches of clean
+diagonal, the excursions above, and small clusters carrying the $k$ extra
+cells), so that counting animals reduces to counting arrangements of pieces
+along a line. Decompositions of that kind yield rational generating
+functions; but rationality alone does not give quasi-polynomiality---for
+that, every pole of $G_k$ must lie at a root of unity, and the specific law
+observed here demands the poles sit at $x=\pm1$ with multiplicities exactly
+$k{+}1$ and $k$. Nothing in the decomposition picture forces those
+multiplicities; they are measured facts a proof would have to reproduce,
+presumably from the count of independent free lengths available at weight
+$k$. So the strategy is recorded as a strategy: the honest state of
+knowledge is the validated data above, including the parity anomaly that
+already ruled out the naive version of the argument.
+
+All of Section~\ref{sec:dmdiag} is computed and validated, not proved. Its
+practical role is sharp: the sparse strips ($S\ge29$ at $n\ge33$) are
+precisely the RAM-expensive ones---one strip burned $\sim$$62$ CPU-hours and
+$79$\,GB to produce the two numbers $d(31,31)=2$, $d(31,32)=38$ that $P_0$
+and $P_1$ now give for free---so the pinned polynomials replace exactly the
+strips that hardware cannot reach, at the price of the \tierthree{} label.
+
+\section{Companion sequences}
+\label{sec:companions}
+
+Counting the same cells under coarser equivalences gives the free, one-sided,
+and symmetry-typed companions, all from the fixed count by Burnside's lemma
+over the square's symmetry group $D_4$:
+\[
+  \mathrm{Free}=\tfrac18(\mathrm{Fixed}+2R_{90}+R_{180}+2H+2D),\qquad
+  \mathrm{OneSided}=\tfrac14(\mathrm{Fixed}+2R_{90}+R_{180}),
+\]
+where $R_{90},R_{180},H,D$ count the animals fixed by a $90^\circ$ rotation,
+a $180^\circ$ rotation, an axis reflection, and a diagonal reflection
+(Method~D). At $n=34$: $R_{90}=0$ (invariance needs $n\equiv0,1\pmod4$;
+$34\equiv2$), $R_{180}=\num{48710062997772}$, $H=\num{17385821908346}$. The
+derivations assert the $/4$ and $/8$ integrality of the numerators at every
+$n$ and validate every published OEIS term of all five companion sequences.
+
+The one-sided extension to $n=34$ is Table~\ref{tab:onesided}. The
+free/bilateral/asymmetric companions (A030222, A030234, A030235) and the
+free-non-polyomino difference A194596 additionally need $D$, the
+diagonal-mirror count, whose exact-bounding-box sweep is the costliest
+symmetry (Section~\ref{sec:methodD}): $D$ is exact through $n=32$
+($D(32)=\num{2156235549286}$), which caps these four companions at
+$n=32$ within \tiertwo{}. Table~\ref{tab:companions} gives the new
+values; Table~\ref{tab:symcounts} records the symmetry fixed-point counts
+themselves, which are of independent interest (each is an OEIS-eligible
+sequence).
+
+One further term of each exists at the \tierthree{} grade, via the hybrid
+$D(33)$ of Table~\ref{tab:symcounts} (direct strips $S\le28$ plus pinned
+closed forms for the fifteen sparse cells):
+\begin{align*}
+  \text{A030222}(33)&=\num{9328935247555296909698722}\\
+  \text{A030234}(33)&=\num{5909238725043}\\
+  \text{A030235}(33)&=\num{9328935247549387670973679}\\
+  \text{A194596}(33)&=\num{9328935102907028734392020}
+\end{align*}
+These are conjecture-assisted and are staged for OEIS as comments only,
+never as b-file data.
+
+\begin{table}[H]
+  \centering\footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{r r r r r}
+    \toprule
+    $n$ & A030222 (free) & A030234 (bilat.) & A030235 (asym.) & A194596\\
+    \midrule
+    25 & \num{1874351417444073722}    & \num{2801133346}    & \num{1874351414642940376}    & \num{1874348860217028958}\\
+    26 & \num{12825939237386225482}   & \num{7566946396}    & \num{12825939229819279086}   & \num{12825929238297403407}\\
+    27 & \num{87890849023826053192}   & \num{18900472093}   & \num{87890849004925581099}   & \num{87890809870815114705}\\
+    28 & \num{603073653588819503780}  & \num{51102567236}   & \num{603073653537716936544}  & \num{603073500077718909177}\\
+    29 & \num{4143141225805220756331} & \num{127935923098}  & \num{4143141225677284833233} & \num{4143140623183267694353}\\
+    30 & \num{28496153390059675197641} & \num{346171848187} & \num{28496153389713503349454} & \num{28496151021712637626389}\\
+    31 & \num{196203952385726340537921} & \num{868410337377} & \num{196203952384857930200544} & \num{196203943068019810549971}\\
+    32 & \num{1352275497184284183618433} & \num{2351309228225} & \num{1352275497181932874390208} & \num{1352275460489267191905554}\\
+    \bottomrule
+  \end{tabular}}
+  \caption{The four $D$-dependent companions, $n=25$--$32$ ($n=20$--$24$
+  are in the repository ledger). \tiertwo{}, inheriting from the fixed
+  count and the symmetry counts; the derivation validates every published
+  OEIS term of all five companions and asserts the $/8$, $/4$, $/2$
+  integralities at every $n$.}
+  \label{tab:companions}
+\end{table}
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{r r r r r}
+    \toprule
+    $n$ & $R_{90}$ & $R_{180}$ & $H$ (axis) & $D$ (diagonal)\\
+    \midrule
+    25 & \num{6731}   & \num{3161384353}     & \num{2965640141}     & \num{2636626551}\\
+    26 & 0            & \num{21807864380}    & \num{8118079636}     & \num{7015813156}\\
+    27 & 0            & \num{21570502908}    & \num{20086237186}    & \num{17714707000}\\
+    28 & \num{62587}  & \num{149423372035}   & \num{55006721709}    & \num{47198412763}\\
+    29 & \num{40607}  & \num{147600215717}   & \num{136445497555}   & \num{119426348641}\\
+    30 & 0            & \num{1026290399226}  & \num{373785638266}   & \num{318558058108}\\
+    31 & 0            & \num{1012501939560}  & \num{929270191286}   & \num{807550483468}\\
+    32 & \num{398124} & \num{7063812264280}  & \num{2546382907164}  & \num{2156235549286}\\
+    33 & \num{250098} & \num{6960731505456}  & \num{6343327587938}  & \num{5475149862148}\,$^{\ddagger}$\\
+    34 & 0            & \num{48710062997772} & \num{17385821908346} & ---\\
+    \bottomrule
+  \end{tabular}
+  \caption{Symmetry fixed-point counts, $n=25$--$34$ (\tierone{} to $n=24$
+  via the dual-engine gate; \tiertwo{} here). $R_{90}=0$ unless
+  $n\equiv0,1\pmod4$. The $D$ column is exact through $n=32$ (strip farm
+  across two machines, disjoint exact-bounding-box strips summing exactly;
+  prefix-matches the $n\le24$ oracle range and the $n\le28$ prior run).
+  $^{\ddagger}$$D(33)$ is \tierthree{}: direct strips $S\le28$ (each
+  prefix-matching the $n=32$ farm exactly) plus the pinned closed forms
+  $P_0$--$P_4$ for the fifteen sparse cells $S\ge29$, the forms first
+  required to reproduce all $124$ in-regime direct cells on the overlap.}
+  \label{tab:symcounts}
+\end{table}
+
+\paragraph{The bilateral identity.}
+The bilateral count equals $\tfrac12(H+D)$ exactly, by a double count. Write
+the symmetry group of a fixed polyplet as a subgroup $K\le D_4$. If $K$
+contains a reflection, its rotations form an index-$2$ subgroup, so exactly
+half of $K$'s elements are reflections; otherwise $K$ has none. Count the
+incidences $(A,m)$ of a fixed animal $A$ with a reflection
+$m\in\operatorname{Stab}(A)$ in two ways. Summed over the four reflections it
+is $2H+2D$, since conjugate reflections have equal fixed-counts. Summed over
+free classes, a class with stabilizer order $|K|$ contains $8/|K|$ fixed
+animals, each with $|K|/2$ reflections in its stabilizer when the class is
+bilateral (and none otherwise)---so exactly $4$ incidences per bilateral
+class. Hence $2H+2D=4\cdot(\text{bilateral classes})$. This was also checked
+numerically against every published term of A030234.
+
+\section{Hole stratification}
+\label{sec:holes}
+
+A \emph{hole} of a polyplet is a bounded connected component of its
+complement. For king (8-connected) foreground the topologically consistent
+choice is \textbf{4-connected} background: a single diagonal staircase of
+cells then seals a region (its corner gaps are not 4-passable), matching the
+Jordan-curve picture and the convention of
+\href{https://oeis.org/A389193}{A389193} for ordinary polyominoes.
+
+We stratify A006770 by hole count: let $T_{\mathrm{hole}}(n,k)$ be the number
+of fixed $n$-cell polyplets with exactly $k$ holes, so
+$\sum_k T_{\mathrm{hole}}(n,k)=a(n)$. The column transfer matrix carries $k$
+as a second additive index via the Euler characteristic
+($\#\text{holes}=1-\chi$ for a connected animal, $\chi$ accumulated by local
+$2\times2$ bit-quad increments~\cite{gray}). The running $\chi$ tally is a
+sum of local contributions and is \emph{interpreted} only when an animal is
+complete, at which point every cavity is either enclosed by foreground (a
+hole) or open to the exterior (contributing nothing to $1-\chi$); an
+unfinished bay on the active frontier never enters a reported count, so no
+open/closed disambiguation is required mid-sweep. The resulting counts are
+exact,
+byte-identical to an independent per-animal flood fill for $n\le14$, and have
+row sums equal to A006770. The triangle is exact through $n=18$; rows
+$15$--$18$, beyond the flood oracle, are confirmed by a second-architecture
+recount (clang/ARM against GCC/x86, byte-identical), so no row rests on a
+single engine. At $n=18$ there are $\num{16503616943998}$ hole-free polyplets
+and $\num{4970078092354}$ with a single hole, the maximum being $10$. The
+hole-free and one-hole columns are absent from OEIS (checked by Superseeker);
+b-files are prepared in the release.
+
+\begin{table}[H]
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{r r r r r r r r r r r r}
+    \toprule
+    $n$ & $k=0$ & $k=1$ & $k=2$ & $k=3$ & $k=4$ & $k=5$ & $k=6$ & $k=7$ & $k=8$ & $k=9$ & $k=10$\\
+    \midrule
+    1 & \num{1} &  &  &  &  &  &  &  &  &  &  \\
+    2 & \num{4} &  &  &  &  &  &  &  &  &  &  \\
+    3 & \num{20} &  &  &  &  &  &  &  &  &  &  \\
+    4 & \num{109} & \num{1} &  &  &  &  &  &  &  &  &  \\
+    5 & \num{622} & \num{16} &  &  &  &  &  &  &  &  &  \\
+    6 & \num{3664} & \num{166} & \num{2} &  &  &  &  &  &  &  &  \\
+    7 & \num{22094} & \num{1456} & \num{42} &  &  &  &  &  &  &  &  \\
+    8 & \num{135609} & \num{11788} & \num{538} & \num{6} &  &  &  &  &  &  &  \\
+    9 & \num{843941} & \num{91300} & \num{5596} & \num{144} & \num{1} &  &  &  &  &  &  \\
+    10 & \num{5310754} & \num{688034} & \num{52268} & \num{2082} & \num{42} &  &  &  &  &  &  \\
+    11 & \num{33724862} & \num{5091820} & \num{457754} & \num{24144} & \num{820} & \num{8} &  &  &  &  &  \\
+    12 & \num{215793158} & \num{37209939} & \num{3841776} & \num{248526} & \num{11482} & \num{263} & \num{2} &  &  &  &  \\
+    13 & \num{1389673091} & \num{269452496} & \num{31290820} & \num{2374520} & \num{135235} & \num{4808} & \num{96} &  &  &  &  \\
+    14 & \num{8998648488} & \num{1937956658} & \num{249306876} & \num{21556520} & \num{1437090} & \num{67020} & \num{2186} & \num{22} &  &  &  \\
+    15 & \num{58548155506} & \num{13865448048} & \num{1953275736} & \num{188568632} & \num{14261808} & \num{804084} & \num{35086} & \num{808} & \num{6} &  &  \\
+    16 & \num{382526638033} & \num{98796744112} & \num{15103433472} & \num{1603972074} & \num{134769521} & \num{8779911} & \num{465138} & \num{16410} & \num{314} & \num{1} &  \\
+    17 & \num{2508473632910} & \num{701664375696} & \num{115556223626} & \num{13348948048} & \num{1227552608} & \num{89826208} & \num{5490242} & \num{251104} & \num{7847} & \num{104} &  \\
+    18 & \num{16503616943998} & \num{4970078092354} & \num{876484089730} & \num{109173877126} & \num{10866411352} & \num{876032532} & \num{59950610} & \num{3272674} & \num{137298} & \num{3460} & \num{30} \\
+    \bottomrule
+  \end{tabular}}
+  \caption{The complete hole triangle $T_{\mathrm{hole}}(n,k)$
+  ($4$-connected-background convention), exact through $n=18$; row sums
+  equal A006770.}
+  \label{tab:holes}
+\end{table}
+
+\paragraph{Maximum hole area.}
+How much empty area can $n$ cells enclose? Let $M(n)$ be the maximum number
+of enclosed empty cells over all $n$-cell polyplets. A diamond (L$^1$-ball)
+wall of $4r$ cells on $|x|+|y|=r$ is king-connected and seals the $2r^2-2r+1$
+cells inside it, so $M(4r)\ge 2r^2-2r+1$ (the centered square numbers,
+\href{https://oeis.org/A001844}{A001844}). This diamond is asymptotically
+optimal: when the boundary is measured in the king ($L^\infty$, Chebyshev)
+metric, the area-maximizing shape is the diamond, the $L^1$ ball dual to the
+$L^\infty$ square (Busemann's isoperimetrix~\cite{strang}). Hence
+$M(n)\sim n^2/8$, twice the polyomino rate $\sim n^2/16$, since only king
+animals can run the diagonal walls the $L^1$ ball requires.
+
+Brute force gives the exact values
+$M(1{:}16)=0,0,0,1,1,2,3,5,6,8,10,13,15,18,21,25$, which the diamond attains
+at $n=4,8,12,16$. In fact all sixteen values fit a single closed form: they
+coincide with \emph{the nearest integer to $(n-2)^2/8$}---the sequence
+\href{https://oeis.org/A001971}{A001971} shifted by two---which agrees with
+the diamond exactly at every multiple of four, since
+$\bigl[(4r-2)^2/8\bigr] = 2r^2-2r+1$.
+
+\begin{conjecture}
+\label{conj:diamond}
+$M(n)=\left\lfloor \tfrac{(n-2)^2}{8}+\tfrac12 \right\rfloor$ for all
+$n\ge1$ (equivalently $M(n)=\mathrm{A001971}(n-2)$), verified here for
+$n\le16$. In particular the diamond wall is exactly---not just
+asymptotically---optimal at every multiple of four, and away from multiples
+of four the optimum tracks the same isoperimetric quota with a two-cell
+corner correction.
+\end{conjecture}
+
+\begin{openproblem}
+\label{op:mn}
+Prove Conjecture~\ref{conj:diamond}, or extend the verification past
+$n=16$; the first untested value is the prediction $M(17)=28$.
+\end{openproblem}
+
+\section{Generating functions by height, and rigorous bounds}
+\label{sec:gf}
+
+For a fixed bounding-box height $H$, the strip transfer matrix has a bounded
+state space, so $T(n,H)$ satisfies a finite-order linear recurrence and its
+generating function $G_H(x)=P_H(x)/Q_H(x)$ is rational~\cite{stanley}. We
+recover these exactly for $H\le10$ by Berlekamp--Massey~\cite{massey} over
+$\mathbb{Z}/p\mathbb{Z}$ for several primes followed by CRT, each accepted
+only when the fitted recurrence reproduces held-out terms. The denominators
+$Q_H$ have orders\footnote{These orders are $3$-term running sums of
+\emph{atom} degrees $1,2,4,9,29,68,181,\dots$: each $Q_H$ factors as
+$N_{H-2}N_{H-1}N_H$, where $N_H$ is the denominator of the height-$H$ strip
+generating function. The divisibility direction is algebraic, not
+empirical: exact-height counts are second differences of strip counts, so
+$Q_H \mid N_{H-2}N_{H-1}N_H$ by construction, for any finite-range animal
+class. What is observed rather than proved is the absence of cancellation
+(equality, so that every irreducible factor divides exactly three
+consecutive $Q_H$), verified here for $H\le7$; a failure at larger $H$
+could only \emph{shrink} $Q_H$, never introduce factors outside the three
+atoms. Neither degree sequence appears in OEIS (Superseeker-checked).} $1,3,7,15,42,106,278,711,1897,5005$ for
+$H=1,\dots,10$; the $H=10$ recovery, needing $\sim\!10{,}000$ series terms,
+was reproduced on a second architecture byte-identically. As an example,
+\[
+  G_3(x)=\frac{9x^3-8x^4-2x^5+4x^6+x^7}{1-7x+15x^2-9x^3-3x^4+5x^5-x^6-x^7}.
+\]
+
+\paragraph{Hole-resolved.}
+Refining by hole count keeps each fixed-$(H,k)$ row C-finite: we recover
+$G_{H,k}$ for $H\le6$ (all reachable $k$), the rows $k\le2$ at $H=7$, and the
+row $k=0$ at $H=8$, each validated against a fresh prime. Across the
+recovered rows the order of $G_{H,k}$ grows about linearly in $k$ (for
+$H=3,\dots,7$ it fits $c_H(k+1)$ with $c_H=6,20,68,185,537$)---recorded as an
+empirical regularity. Summed over all heights the columns, like $a(x)$
+itself, are not expected to be D-finite, so the rationality is genuinely a
+fixed-height phenomenon.
+
+\paragraph{Rigorous lower bounds.}
+Summing the fixed-height GFs gives $a(n)\ge\sum_{H\le 10}T(n,H)$ exactly for
+any $n$, by extracting coefficients from rational functions. When this bound
+was computed, $a(25)$ was out of reach and the bound gave
+$a(25)\ge\num{6657105903966723073}$; the exact value
+$\num{14994811325186658577}$, computed later by Method~C, confirms it---a
+retrospective certification of the GF machinery. The bound remains
+available for any $n$ beyond the current frontier, though its capture
+fraction shrinks as taller strips dominate: $44\%$ of the exact value at
+$n=25$, $16\%$ at $n=34$. Beyond the frontier it gives
+$a(35)\ge\num{507142944262215078226758378}\approx5.07\times10^{26}$ and
+$a(40)\ge\num{4266005101622209395058618248135}\approx4.27\times10^{30}$,
+exact integers from rational arithmetic
+(\texttt{paper/gf\_bound.py}).
+
+\section{Sampling portrait}
+\label{sec:sampling}
+
+The counting DP doubles as an exact uniform sampler~\cite{nijenhuis}: a
+single forward pass through the transfer matrix, selecting each successive
+column with probability proportional to the number of completions it admits,
+draws an animal uniformly at random. (The portrait below was made at the
+$a(19)$/$a(20)$ stage with Method B, whose per-state completion counts the
+sampler needs; the production spill engine does not retain them, so the
+portrait stays at that scale.)
+
+Ten thousand samples against a state space of $1.5\times10^{14}$ can rule
+out only gross bias (every specimen king-connected by independent BFS,
+sampled heights reproducing $T(19,H)/a(19)$); the portrait should be read
+at that resolution---qualitative character, not calibrated statistics.
+The typical $19$-cell polyplet is \emph{sparse, branchy, corner-glued}:
+about ten rook-connected pieces held together mostly by corners ($59\%$
+of contacts), $\sim\!25\%$ box density, and a $28\%$ chance of enclosing
+a hole---rising from $8.3\%$ at $n=8$. It is essentially never a
+polyomino: the exact frequency $A001168(19)/a(19)\approx4\times10^{-5}$
+predicts about $0.4$ such specimens per $10{,}000$, and none appeared.
+
+\section{Reach and limits}
+\label{sec:reach}
+
+Method C's cost structure is set by its tallest surviving sweep height: at
+fixed $H$ the strip's state space is bounded and cost grows only about
+linearly in $n$, while adding a unit of height multiplies it by roughly the
+per-height frontier growth. With the diagonals $k\le15$ in closed form, the
+tallest real sweep stayed at $H=18$ from $a(33)$ to $a(34)$, and the banked
+totals grew gently ($22$ to $59$ core-hours over $a(30)$--$a(34)$; see
+Appendix~\ref{sec:profile}). $a(35)$ is therefore within easy hardware
+reach---an $H=19$ sweep at roughly $3\times$ the $H=18$ cost---but faces a
+verification gap rather than a compute gap: either sweep $H=19$ for real and
+check it against nothing, or wire $P_{16}$, which cannot be independently
+held out until $a(35)$ itself exists. The symmetric counts scale as
+$\sqrt{a}$-class problems and reached $n=34$ for three of the four types;
+the diagonal-mirror type, whose forced-square bounding box compresses least,
+is the binding constraint on the remaining companions---its per-strip RAM
+peaked at $83$\,GB at $n=32$ after a compact-frontier rewrite (flat sharded
+arrays, ranged count vectors, $\approx1.6\times$ RAM and $\approx2\times$
+speed over the hash-map frontier it replaced), and the pinned
+quasi-polynomials of Section~\ref{sec:dmdiag} substitute for the strips
+beyond hardware at $n\ge33$ under the \tierthree{} label.
+
+\section{Data and code availability}
+\label{sec:availability}
+
+The source (all engines and gates), the per-height triangle rows for every
+term through $n=34$ with per-term provenance ledgers, the b-files for
+A006770 and the companion sequences, the hole triangle and its columns, the
+recovered generating functions, and the sample statistics are in the
+accompanying repository; derived artifacts are regenerated on demand by the
+included tools. The cross-checks are encoded as runnable gates, and a
+self-contained checker re-verifies the paper's numerical claims against the
+committed and regenerated data.
+
+\section{Author's note: use of AI}
+\label{sec:ai}
+
+This is an amateur contribution by an unaffiliated author in collaboration
+with an AI assistant (Anthropic's Claude Code, using the Claude Opus~4.8 and
+Claude Fable~5 models over the project's lifetime), which helped with
+algorithm design, implementation, running the computations, and drafting.
+The author set the goals, made the design and verification decisions, owns
+and operated the machines, inspected the results, and is responsible for
+their correctness.
+
+The verification protocol of Section~\ref{sec:confirm}---independent
+algorithms where they exist, decorrelated recounts and held-out closed-form
+checks where they do not, and explicit confidence tiers throughout---ensures
+the central claims do not rest on the correctness of any single
+\emph{program}. They do rest, past $n=19$, on a single algorithm family;
+the tier system exists so that dependence is never hidden. All code and data
+are released for independent checking.
+
+\appendix
+\section{Computational profile}
+\label{sec:profile}
+
+For future benchmarking, the measured costs of the headline computations.
+All machines are commodity hardware owned and operated by the author:
+\emph{gympie} (Apple silicon, 10 performance cores, 24\,GB), \emph{ayr}
+(AMD x86-64, 32 cores, 78\,GB), \emph{dalby} (Arm Neoverse-N1, 80 cores,
+128\,GB).
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{l r r r}
+    \toprule
+    term (full triangle, Method C, dalby) & wall (h) & core-hours & peak RSS (GB)\\
+    \midrule
+    $a(30)$ & 1.0 & 22.1 & 1.7\\
+    $a(31)$ & 2.8 & 44.8 & 5.8\\
+    $a(32)$ & 3.0 & 49.0 & 5.6\\
+    $a(33)$ & 3.4 & 53.5 & 5.9\\
+    $a(34)$ & 3.7 & 58.5 & 6.3\\
+    \bottomrule
+  \end{tabular}
+  \caption{Banked per-term cost profiles for the uniform final-engine runs
+  (earlier terms were computed by intermediate engine generations and are
+  not directly comparable). The gentle growth reflects the closed-form
+  diagonals holding the tallest real sweep at $H=18$ throughout this range;
+  RAM stays small because the frontier spills to disk.}
+  \label{tab:costs}
+\end{table}
+
+\begin{itemize}
+  \item \textbf{$a(34)$, full triangle (Method C, dalby):} wall
+        $\approx3.7$\,h across all 34 heights; $\approx59$ core-hours; peak
+        resident memory $6.4$\,GB (the frontier spills to disk, so RAM
+        stays small; the tallest surviving real sweep height dominates,
+        $\sim70\%$ of the wall). The cross-ISA recount on ayr reproduced
+        the triangle byte-identically.
+  \item \textbf{Diagonal-mirror symmetry count, $n=32$ (Method D, farmed):}
+        the six deepest exact-bounding-box strips ($S=26$--$31$, dalby)
+        cost $3.0$\,M CPU-seconds $\approx835$ core-hours with per-strip
+        peak memory up to $82.7$\,GB; the remaining $25$ strips
+        ($S\le25$, ayr) another $1.7$\,M CPU-seconds $\approx476$
+        core-hours ($15.4$\,h wall sequential, per-strip peak
+        $38.8$\,GB). In total an order of magnitude more compute than
+        $a(34)$ itself, which is why the quasi-polynomials of
+        Section~\ref{sec:dmdiag} matter: they replace exactly the strips
+        whose memory grows fastest.
+  \item \textbf{Diagonal-mirror count, $n=33$ direct strips (for the
+        \tierthree{} assembly):} all $28$ strips $S\le28$ on dalby,
+        $24.0$\,h wall sequential, $6.71$\,M CPU-seconds $\approx1864$
+        core-hours, peak strip RSS $126.2$\,GB ($S=28$; the strips
+        $S\ge29$ that the closed forms replace would have exceeded the
+        machine outright).
+  \item \textbf{Symmetric counts at $n=34$ (Method D):} axis mirror
+        $\approx3.3$\,h wall / $53$\,k CPU-seconds / $8.2$\,GB;
+        $180^\circ$ rotation $\approx51$\,min wall / $18$\,k CPU-seconds /
+        $8.5$\,GB (both dalby); the $90^\circ$ count runs in seconds on
+        gympie.
+\end{itemize}
+
+\begin{thebibliography}{9}
+
+\bibitem{redelmeier}
+D.~H. Redelmeier,
+\emph{Counting polyominoes: yet another attack},
+Discrete Mathematics \textbf{36}(2) (1981), 191--203.
+
+\bibitem{klarner}
+D.~A. Klarner,
+\emph{Cell growth problems},
+Canadian Journal of Mathematics \textbf{19} (1967), 851--863.
+
+\bibitem{jensen2001}
+I.~Jensen,
+\emph{Enumerations of lattice animals and trees},
+Journal of Statistical Physics \textbf{102}(3--4) (2001), 865--881.
+
+\bibitem{jensen2003}
+I.~Jensen,
+\emph{Counting polyominoes: a parallel implementation for cluster computing},
+in \emph{Computational Science --- ICCS 2003}, LNCS \textbf{2659}, Springer,
+2003, pp.~203--212.
+
+\bibitem{bousquet}
+M.~Bousquet-M\'elou,
+\emph{A method for the enumeration of various classes of column-convex polygons},
+Discrete Mathematics \textbf{154}(1--3) (1996), 1--25.
+
+\bibitem{nijenhuis}
+A.~Nijenhuis and H.~S. Wilf,
+\emph{Combinatorial Algorithms for Computers and Calculators}, 2nd~ed.,
+Academic Press, 1978, pp.~99--116.
+
+\bibitem{stanley}
+R.~P. Stanley,
+\emph{Enumerative Combinatorics, Volume~1}, 2nd~ed.,
+Cambridge University Press, 2012 (rational generating functions,
+quasi-polynomials, and the transfer-matrix method, Ch.~4).
+
+\bibitem{massey}
+J.~L. Massey,
+\emph{Shift-register synthesis and BCH decoding},
+IEEE Transactions on Information Theory \textbf{15}(1) (1969), 122--127.
+
+\bibitem{gray}
+S.~B. Gray,
+\emph{Local properties of binary images in two dimensions},
+IEEE Transactions on Computers \textbf{C-20}(5) (1971), 551--561.
+
+\bibitem{barequet}
+G.~Barequet, G.~Rote, and M.~Shalah,
+\emph{$\lambda > 4$: an improved lower bound on the growth constant of polyominoes},
+Communications of the ACM \textbf{59}(7) (2016), 88--95.
+
+\bibitem{strang}
+G.~Strang,
+\emph{Maximum area with Minkowski measures of perimeter},
+Proceedings of the Royal Society of Edinburgh Section A: Mathematics
+\textbf{138}(1) (2008), 189--199.
+
+\bibitem{oeis}
+OEIS Foundation Inc.,
+\emph{The On-Line Encyclopedia of Integer Sequences} (2026),
+sequences A006770, A030222, A030233, A030234, A030235, A194596, A001168,
+A389193, A001844.
+\url{https://oeis.org}.
+
+\end{thebibliography}
+
+\end{document}

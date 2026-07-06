@@ -14,7 +14,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <algorithm>
+#include <atomic>
+#include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "../obs.h"  // shared observability/provenance runtime (docs/observability.md)
@@ -80,6 +83,10 @@ struct Counter {
   std::vector<int> stamp;        // BFS visited stamp per cell
   int curStamp = 0;
   std::vector<int> bfsStack;     // reused BFS work buffer (no per-node alloc)
+  std::vector<int> list;         // shared untried pool (no per-node alloc): a
+                                 // node owns list[start..end); its children
+                                 // append new neighbours past end, so each
+                                 // child's untried range stays contiguous.
   std::vector<u64> counts;
 
   int cellIdx(int x, int y) const { return (y - lo) * gridW + (x - lo); }
@@ -182,28 +189,55 @@ struct Counter {
     }
   }
 
-  void search(int root, std::vector<int> untried, int w) {
+  // Allocation-free Redelmeier over the shared `list` pool. This node owns the
+  // untried range list[start..end); it tries each candidate forward, appending
+  // a candidate's newly-reached neighbours past the current end so the child's
+  // untried range list[i+1..newEnd) is a single contiguous slice — no per-node
+  // vector copy (the old `next = untried` + `newly` was ~3 heap allocs/node).
+  // On backtrack the appended tail is unmarked and truncated. Forward vs the
+  // old LIFO order changes traversal, not the multiset of animals counted.
+  void search(int root, int start, int w) {
     if (connectedAndAnchored()) counts[w] += 1;
-    while (!untried.empty()) {
-      const int v = untried.back(); untried.pop_back();
+    const int end = static_cast<int>(list.size());
+    for (int i = start; i < end; ++i) {
+      const int v = list[i];
       const int nw = w + weight[v];
-      if (nw <= maxn) {
-        std::vector<int> next = untried;
-        std::vector<int> newly;
-        for (int u : adj[v]) {
-          if (u > root && !reached[u]) {
-            reached[u] = 1; newly.push_back(u); next.push_back(u);
-          }
-        }
-        addOrbit(v);
-        search(root, std::move(next), nw);
-        removeOrbit(v);
-        for (int u : newly) reached[u] = 0;
+      if (nw > maxn) continue;
+      for (int u : adj[v]) {
+        if (u > root && !reached[u]) { reached[u] = 1; list.push_back(u); }
       }
+      addOrbit(v);
+      search(root, i + 1, nw);
+      removeOrbit(v);
+      for (int k = end; k < static_cast<int>(list.size()); ++k) reached[list[k]] = 0;
+      list.resize(end);
     }
   }
 
-  void runPlacement(const std::vector<Aff>& group) {
+  // Enumerate every animal rooted at orbit r (the min-index orbit it contains,
+  // via the u>root guard). Self-contained: resets reached, seeds the untried
+  // pool from r's neighbours, sweeps, unwinds. Roots are independent, so this
+  // is the unit of parallelism.
+  void runRoot(int r) {
+    const int V = static_cast<int>(orbitCells.size());
+    if (weight[r] > maxn) return;
+    for (int i = 0; i < V; ++i) reached[i] = 0;
+    reached[r] = 1;
+    addOrbit(r);
+    list.clear();
+    for (int u : adj[r]) {
+      if (u > r && !reached[u]) { reached[u] = 1; list.push_back(u); }
+    }
+    search(r, 0, weight[r]);
+    removeOrbit(r);
+  }
+
+  // Parallel over roots: each thread takes an independent copy of the (cheap,
+  // read-only-after-build) orbit graph + its own search buffers, and pulls
+  // roots off an atomic counter. Dynamic pull because subtree sizes vary
+  // wildly (a centred animal's root is its upper-left orbit; low-index roots
+  // reach far more than edge ones). Thread-local counts reduce under a mutex.
+  void runPlacementParallel(const std::vector<Aff>& group, int nthreads) {
     buildOrbits(group);
     const int V = static_cast<int>(orbitCells.size());
     present.assign(gridCells, 0);
@@ -211,18 +245,24 @@ struct Counter {
     reached.assign(V, 0);
     curStamp = 0;
     curCells.clear();
-    for (int r = 0; r < V; ++r) {
-      if (weight[r] > maxn) continue;
-      for (int i = 0; i < V; ++i) reached[i] = 0;
-      reached[r] = 1;
-      addOrbit(r);
-      std::vector<int> untried;
-      for (int u : adj[r]) {
-        if (u > r && !reached[u]) { reached[u] = 1; untried.push_back(u); }
-      }
-      search(r, std::move(untried), weight[r]);
-      removeOrbit(r);
-    }
+    list.clear();
+    if (nthreads < 1) nthreads = 1;
+
+    std::atomic<int> nextR{0};
+    std::mutex reduceMu;
+    auto body = [&]() {
+      Counter w = *this;                 // independent buffers + graph copy
+      w.counts.assign(maxn + 1, 0);
+      w.list.reserve(V);
+      int r;
+      while ((r = nextR.fetch_add(1)) < V) w.runRoot(r);
+      std::lock_guard<std::mutex> lk(reduceMu);
+      for (int n = 0; n <= maxn; ++n) counts[n] += w.counts[n];
+    };
+    std::vector<std::thread> pool;
+    pool.reserve(nthreads);
+    for (int t = 0; t < nthreads; ++t) pool.emplace_back(body);
+    for (auto& th : pool) th.join();
   }
 };
 
@@ -230,13 +270,21 @@ const int Counter::KDX[8] = {1, 1, 1, 0, 0, -1, -1, -1};
 const int Counter::KDY[8] = {1, 0, -1, 1, -1, 1, 0, -1};
 
 int main(int argc, char** argv) {
-  if (argc != 3) {
-    std::fprintf(stderr, "usage: %s {r90|r180|hmirror|dmirror} MAXN\n", argv[0]);
+  if (argc < 3 || argc > 4) {
+    std::fprintf(stderr,
+                 "usage: %s {r90|r180|hmirror|dmirror} MAXN [THREADS]\n",
+                 argv[0]);
     return 2;
   }
   SymType type = makeType(argv[1]);
   const int maxn = std::atoi(argv[2]);
-  if (maxn < 1 || maxn > 30) { std::fprintf(stderr, "MAXN out of range\n"); return 2; }
+  if (maxn < 1 || maxn > 40) { std::fprintf(stderr, "MAXN out of range\n"); return 2; }
+
+  int nthreads = argc == 4 ? std::atoi(argv[3]) : 0;
+  if (nthreads <= 0) {
+    nthreads = static_cast<int>(std::thread::hardware_concurrency());
+    if (nthreads < 1) nthreads = 1;
+  }
 
   Counter c;
   c.maxn = maxn;
@@ -251,10 +299,11 @@ int main(int argc, char** argv) {
   obs::Reporter rep("symcount-" + std::string(argv[1]) + "-N" +
                         std::to_string(maxn),
                     static_cast<double>(type.placements.size()),
-                    "type=" + std::string(argv[1]));
+                    "type=" + std::string(argv[1]) +
+                        " threads=" + std::to_string(nthreads));
   int pi = 0;
   for (const Placement& p : type.placements) {
-    c.runPlacement(p.group);
+    c.runPlacementParallel(p.group, nthreads);
     ++pi;
     rep.beat(pi, "placement=" + std::to_string(pi));
   }

@@ -52,7 +52,13 @@ func main() {
 	costProfileRef := flag.String("cost-profile-ref", "", "reference cost profile to drive the live ETA")
 	heightsArg := flag.String("heights", "", "subset of heights to sweep, e.g. 1-12 or 17,19,20 (default: all 1..maxn; for multi-machine split)")
 	perHeightOut := flag.String("per-height-out", "", "dir to write per-height h<H>.out rows (for combine + old-engine cross-check)")
+	kernel := flag.String("kernel", "column", "sweep kernel: column (default) or kink")
 	flag.Parse()
+
+	if *kernel != "column" && *kernel != "kink" {
+		fmt.Fprintf(os.Stderr, "orchestrate: --kernel must be column or kink, got %q\n", *kernel)
+		os.Exit(2)
+	}
 
 	heights, herr := parseHeights(*heightsArg, *maxn)
 	if herr != nil {
@@ -128,6 +134,7 @@ func main() {
 		CostProfileRef:  *costProfileRef,
 		Heights:         heights,
 		PerHeightOut:    *perHeightOut,
+		Kernel:          *kernel,
 		Bin:             bin,
 	}
 
@@ -135,8 +142,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, "orchestrate:", adv)
 	}
 
-	fmt.Printf("orchestrate maxn=%d fold=%v cores=%d unit_mult=%d merge_mult=%d ram=%d counter=%s run_dir=%s rev=%s\n",
-		*maxn, *fold, *cores, *unitMult, *mergeMult, *ram, *counter, *runDir, rev)
+	fmt.Printf("orchestrate maxn=%d fold=%v cores=%d unit_mult=%d merge_mult=%d ram=%d counter=%s kernel=%s run_dir=%s rev=%s\n",
+		*maxn, *fold, *cores, *unitMult, *mergeMult, *ram, *counter, *kernel, *runDir, rev)
 
 	// Resume from checkpoint if requested.
 	var ckpt *orchestrator.Checkpoint

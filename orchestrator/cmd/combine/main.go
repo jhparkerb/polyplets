@@ -9,6 +9,12 @@
 //
 // Usage:
 //   combine --in dirA[,dirB,...] --maxn 21 [--compare] [--require-cover] [--out triangle.txt]
+//
+// Design 14 Phase 2.7 diff mode — compares two --per-height-out directory
+// sets CELL BY CELL (every T(n,H), not just the summed a(n) total the mode
+// above checks), e.g. a --kernel kink run against a --kernel column run at
+// the same maxn:
+//   combine --in dirA[,...] --diff-b dirB[,...] --maxn 20
 package main
 
 import (
@@ -35,11 +41,24 @@ func main() {
 	compare := flag.Bool("compare", false, "compare a(n) to fixtures/b006770.txt")
 	requireCover := flag.Bool("require-cover", requireCoverDefault, "fail unless heights 1..maxn are all present exactly once")
 	out := flag.String("out", "", "write the combined triangle here (n value lines)")
+	diffB := flag.String("diff-b", "", "Phase 2.7 diff mode: compare --in's per-height rows against this comma-separated dir set, cell by cell (every T(n,H)); ignores --compare/--require-cover/--out")
 	flag.Parse()
 
 	if *inArg == "" || *maxn == 0 {
 		fmt.Fprintln(os.Stderr, "combine: --in and --maxn are required")
 		os.Exit(2)
+	}
+
+	if *diffB != "" {
+		ok, err := runDiff(strings.Split(*inArg, ","), strings.Split(*diffB, ","), *maxn)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "combine: %v\n", err)
+			os.Exit(1)
+		}
+		if !ok {
+			os.Exit(1)
+		}
+		return
 	}
 
 	triangle, have, err := runCombine(strings.Split(*inArg, ","), *maxn, *requireCover)
@@ -81,16 +100,21 @@ func main() {
 	}
 }
 
-// runCombine sums each dir's h<H>.out rows into the triangle, rejecting a height
-// supplied by two dirs (double-count) and — when requireCover — any gap in
-// 1..maxn. Returns the triangle and the sorted set of heights present.
-func runCombine(dirs []string, maxn int, requireCover bool) (triangle []*big.Int, have []int, err error) {
-	triangle = make([]*big.Int, maxn+1)
-	for i := range triangle {
-		triangle[i] = new(big.Int)
+// newBigRow returns a zero-filled []*big.Int of length n with every slot a
+// distinct non-nil *big.Int (a nil slot panics on .Add).
+func newBigRow(n int) []*big.Int {
+	row := make([]*big.Int, n)
+	for i := range row {
+		row[i] = new(big.Int)
 	}
-	heightSrc := map[int]string{} // H -> first dir that supplied it
+	return row
+}
 
+// collectHeightFiles globs h<H>.out under each dir and returns H -> path,
+// rejecting a height supplied by two dirs (double-count) so the caller never
+// silently sums (or diffs) the same shard twice under two different names.
+func collectHeightFiles(dirs []string) (map[int]string, error) {
+	files := map[int]string{}
 	for _, dir := range dirs {
 		dir = strings.TrimSpace(dir)
 		if dir == "" {
@@ -102,17 +126,29 @@ func runCombine(dirs []string, maxn int, requireCover bool) (triangle []*big.Int
 			if !ok {
 				continue
 			}
-			if prev, seen := heightSrc[H]; seen {
-				return nil, nil, fmt.Errorf("height %d in both %s and %s (double-count)", H, prev, dir)
+			if prev, seen := files[H]; seen {
+				return nil, fmt.Errorf("height %d in both %s and %s (double-count)", H, prev, p)
 			}
-			heightSrc[H] = dir
-			if e := addRow(p, maxn, triangle); e != nil {
-				return nil, nil, fmt.Errorf("%s: %w", p, e)
-			}
+			files[H] = p
 		}
 	}
+	return files, nil
+}
 
-	for H := range heightSrc {
+// runCombine sums each dir's h<H>.out rows into the triangle, rejecting a height
+// supplied by two dirs (double-count) and — when requireCover — any gap in
+// 1..maxn. Returns the triangle and the sorted set of heights present.
+func runCombine(dirs []string, maxn int, requireCover bool) (triangle []*big.Int, have []int, err error) {
+	triangle = newBigRow(maxn + 1)
+
+	heightFiles, err := collectHeightFiles(dirs)
+	if err != nil {
+		return nil, nil, err
+	}
+	for H, p := range heightFiles {
+		if e := addRow(p, maxn, triangle); e != nil {
+			return nil, nil, fmt.Errorf("%s: %w", p, e)
+		}
 		have = append(have, H)
 	}
 	sort.Ints(have)
@@ -120,7 +156,7 @@ func runCombine(dirs []string, maxn int, requireCover bool) (triangle []*big.Int
 	if requireCover {
 		var missing []int
 		for H := 1; H <= maxn; H++ {
-			if _, ok := heightSrc[H]; !ok {
+			if _, ok := heightFiles[H]; !ok {
 				missing = append(missing, H)
 			}
 		}
@@ -129,6 +165,76 @@ func runCombine(dirs []string, maxn int, requireCover bool) (triangle []*big.Int
 		}
 	}
 	return triangle, have, nil
+}
+
+// runDiff compares two --per-height-out directory sets CELL BY CELL: every
+// T(n,H) for every height present on either side, not just the summed a(n)
+// total runCombine checks. Prints a per-height report and returns whether
+// every height matched exactly (present on both sides, every cell equal).
+func runDiff(aDirs, bDirs []string, maxn int) (bool, error) {
+	aFiles, err := collectHeightFiles(aDirs)
+	if err != nil {
+		return false, fmt.Errorf("side A: %w", err)
+	}
+	bFiles, err := collectHeightFiles(bDirs)
+	if err != nil {
+		return false, fmt.Errorf("side B: %w", err)
+	}
+
+	heights := map[int]bool{}
+	for H := range aFiles {
+		heights[H] = true
+	}
+	for H := range bFiles {
+		heights[H] = true
+	}
+	var sorted []int
+	for H := range heights {
+		sorted = append(sorted, H)
+	}
+	sort.Ints(sorted)
+
+	ok := true
+	for _, H := range sorted {
+		ap, aOK := aFiles[H]
+		bp, bOK := bFiles[H]
+		switch {
+		case !aOK:
+			fmt.Printf("H=%d: MISSING on A side (B has %s)\n", H, bp)
+			ok = false
+			continue
+		case !bOK:
+			fmt.Printf("H=%d: MISSING on B side (A has %s)\n", H, ap)
+			ok = false
+			continue
+		}
+		rowA := newBigRow(maxn + 1)
+		rowB := newBigRow(maxn + 1)
+		if e := addRow(ap, maxn, rowA); e != nil {
+			return false, fmt.Errorf("A %s: %w", ap, e)
+		}
+		if e := addRow(bp, maxn, rowB); e != nil {
+			return false, fmt.Errorf("B %s: %w", bp, e)
+		}
+		mismatches := 0
+		for n := 1; n <= maxn; n++ {
+			if rowA[n].Cmp(rowB[n]) != 0 {
+				fmt.Printf("H=%d n=%d: A=%d B=%d MISMATCH\n", H, n, rowA[n], rowB[n])
+				mismatches++
+				ok = false
+			}
+		}
+		if mismatches == 0 {
+			fmt.Printf("H=%d: OK (%d cells)\n", H, maxn)
+		}
+	}
+
+	if ok {
+		fmt.Printf("combine_diff PASS (%d heights, maxn=%d)\n", len(sorted), maxn)
+	} else {
+		fmt.Printf("combine_diff FAIL\n")
+	}
+	return ok, nil
 }
 
 // firstNonMonotone returns the smallest n in [2,maxn] with a(n) <= a(n-1)

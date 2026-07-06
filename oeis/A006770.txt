@@ -4,7 +4,9 @@
 %U A006770 22471158811164,151609203011580
 %N A006770 Number of fixed n-celled polyominoes which need only touch at corners.
 %C A006770 Also known as fixed polyplets. - _David Bevan_, Jul 28 2009
-%C A006770 a(19) = 151609203011580 confirmed by two architecture-decorrelated Redelmeier enumerations (clang/ARM and GCC/x86, byte-identical) together with an algorithm-independent column transfer-matrix recount that agrees term-for-term through n=18. - _Jason H Parker_, 2026
+%C A006770 a(19) = 151609203011580 confirmed by two architecture-decorrelated Redelmeier enumerations (clang/ARM and GCC/x86, byte-identical) together with an algorithm-independent column transfer-matrix recount that agrees term-for-term through n=18. - _Jason H Parker_, Jul 05 2026
+%C A006770 a(20)-a(33) (in the b-file) were computed by the same column/kink-carry transfer-matrix engine: each run recomputes the whole height triangle T(n,H) -- low heights by direct sweep, top heights by validated closed-form height-diagonals -- byte-matching all prior terms, with cross-ISA (ARM+x86) recounts, and with each term's newest height-diagonal cell predicted exactly by a closed form fitted only on earlier terms (a(33)'s top swept cell matches the held-out formula P_15). These are single-algorithm results; two-algorithm independent confirmation (the standard met at a(19): Redelmeier generation and transfer matrix agreeing) currently reaches only n=19, since Redelmeier generation is O(a(n)) and infeasible beyond n ~ 20. - _Jason H Parker_, Jul 05 2026
+%C A006770 Conjecturally a(34) = 515316838423862758858377704, computed by the same engine and cross-checked the same way EXCEPT that its top swept cell has no held-out closed-form prediction until a(35) is computed; it is therefore one grade weaker than a(20)-a(33) and is left here as a comment rather than placed in the b-file. Independent confirmation (or an editor's judgment) welcome. - _Jason H Parker_, Jul 05 2026
 %D A006770 D. H. Redelmeier, personal communication.
 %D A006770 N. J. A. Sloane and Simon Plouffe, The Encyclopedia of Integer Sequences, Academic Press, 1995 (includes this sequence).
 %H A006770 M. F. Hasler, <a href="/A006770/a006770.png">Illustration of the A006770(3)=20 fixed 3-polyplets</a>, Sep 29 2014.
@@ -22,4 +24,5 @@
 %A A006770 _N. J. A. Sloane_
 %E A006770 One more term from _Joseph Myers_, Sep 26 2002
 %E A006770 a(18) from Tremblay and Vernay added by _Andrei Zabolotskii_, Dec 02 2025
-%E A006770 a(19) from _Jason H Parker_, 2026
+%E A006770 a(19) from _Jason H Parker_, Jul 05 2026
+%E A006770 a(20)-a(33) from _Jason H Parker_, Jul 05 2026 (transfer matrix + kink-carry; single-algorithm, see Comments)

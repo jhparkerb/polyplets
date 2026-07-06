@@ -141,8 +141,16 @@ class RunFileWriter {
     // read, skipping the body CRC, would otherwise consume as garbage).
     fp_ = std::fopen(tmp_path_.c_str(), "wb");
     if (!fp_) {
+      // FAIL-CLOSED: a writer that can't open its file has nowhere legitimate
+      // to go — limping on with fp_==nullptr makes append()/finalize() silently
+      // discard every record, yielding a plausible-looking UNDERCOUNT with no
+      // signal (the exact failure an fd-exhausted spill produced). Unlike the
+      // reader (whose !ok() also covers a legitimately-rejected foreign/corrupt
+      // header, so its call sites decide), a failed writer open is never
+      // tolerable, so we abort here rather than trust every call site to check
+      // ok().  See core/fdlimit.h for why the fd limit is raised to avoid this.
       std::fprintf(stderr, "RunFileWriter: cannot open %s\n", tmp_path_.c_str());
-      return;
+      std::exit(1);
     }
 #ifdef POLY_ZSTD
     if (compress_) {
@@ -368,7 +376,7 @@ class RunFileReader {
       : H_(H), keyLen_((keyLen == 0) ? H + 2 : keyLen),
         fp_(nullptr), records_(0), records_read_(0),
         crc_(FNV_OFFSET), path_(path), seeked_(false),
-        version_(1), compressed_(false) {
+        compressed_(false) {
     fp_ = std::fopen(path.c_str(), "rb");
     if (!fp_) {
       std::fprintf(stderr, "RunFileReader: cannot open %s\n", path.c_str());
@@ -498,7 +506,6 @@ class RunFileReader {
   uint64_t crc_;
   std::string path_;
   bool seeked_;
-  int  version_;
   bool compressed_;
 #ifdef POLY_ZSTD
   ZSTD_DStream* dctx_ = nullptr;
@@ -574,7 +581,6 @@ class RunFileReader {
       if (ln == 0) break;  // blank line = end of header
       if (std::strncmp(line, "POLYRUN ", 8) == 0) {
         saw_polyrun = true;
-        version_ = std::atoi(line + 8);
       }
       else if (std::strncmp(line, "compression ", 12) == 0)
         // Absent = 0 (plain, old files). 1 = zstd frame body.
@@ -647,8 +653,17 @@ std::pair<size_t, size_t> mergeRunFiles(
 
   std::vector<std::unique_ptr<RunFileReader<W>>> readers;
   readers.reserve(in_paths.size());
-  for (const auto& p : in_paths)
+  for (const auto& p : in_paths) {
     readers.push_back(std::make_unique<RunFileReader<W>>(p, H, keyLen));
+    // FAIL-CLOSED: a merge input that can't be opened must abort, not be
+    // treated as an empty shard — its records would vanish from the merged
+    // count with no signal. Matches the map-phase reader checks
+    // (core/mapreduce.h, core/kink.h, worker/map_worker.cpp).
+    if (!readers.back()->ok()) {
+      std::fprintf(stderr, "mergeRunFiles: cannot read input %s\n", p.c_str());
+      std::exit(1);
+    }
+  }
 
   // Read-amplification fix: seek each input to klo via its sparse index instead
   // of reading from the start and skipping below klo. Without this, M workers

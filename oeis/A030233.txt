@@ -3,11 +3,14 @@
 %T A030233 423241426,2802300793,18642694440,124544085550,835091956750,
 %U A030233 5617792259411,37902303297525
 %N A030233 Number of n-celled one-sided polyplets.
-%C A030233 a(18) and a(19) computed via Burnside's lemma over the rotation group C4 (one-sided count = (fixed + 2*r90 + r180)/4) from the fixed-polyplet counts A006770 and rotation fixed-point counts; a(19) rests on the independently confirmed A006770(19) = 151609203011580. - _Jason H Parker_, 2026
+%C A030233 a(18) and a(19) computed via Burnside's lemma over the rotation group C4 (one-sided count = (fixed + 2*r90 + r180)/4) from the fixed-polyplet counts A006770 and rotation fixed-point counts; a(19) rests on the independently confirmed A006770(19) = 151609203011580. - _Jason H Parker_, Jul 05 2026
+%C A030233 a(20)-a(33) (in the b-file) derived by the same Burnside identity from A006770(20)-A006770(33) and rotation fixed-point counts computed by symmetric transfer-matrix engines (validated against a symmetry-classified direct enumeration for n <= 24; the /4 divisibility holds at every n). Confidence inherits from A006770's single-algorithm terms; see that entry's Comments. - _Jason H Parker_, Jul 05 2026
+%C A030233 Conjecturally a(34) = 128829209605977867230343869, inheriting the one-grade-weaker status of the conjectured A006770(34) (see that entry's Comments); left as a comment rather than placed in the b-file. - _Jason H Parker_, Jul 05 2026
 %H A030233 Eric Weisstein's World of Mathematics, <a href="https://mathworld.wolfram.com/Polyplet.html">Polyplet.</a>
 %Y A030233 Cf. A030222.
 %K A030233 nonn,hard
 %O A030233 1,2
 %A A030233 _David W. Wilson_
 %E A030233 More terms from _Joseph Myers_, Sep 26 2002
-%E A030233 a(18)-a(19) from _Jason H Parker_, 2026
+%E A030233 a(18)-a(19) from _Jason H Parker_, Jul 05 2026
+%E A030233 a(20)-a(33) from _Jason H Parker_, Jul 05 2026 (Burnside from A006770 + rotation fixed-point counts; see Comments)

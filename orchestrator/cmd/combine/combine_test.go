@@ -161,3 +161,67 @@ func TestCombineWidth(t *testing.T) {
 		t.Fatalf("combine width: got %s want %s (a uint64 pipeline would have wrapped or errored)", tri[2], want)
 	}
 }
+
+// TestRunDiffMatches proves two identical per-height directory sets diff
+// clean — the baseline runCombine's summed-total check can't distinguish
+// (Design 14 2.7: cell-by-cell, not just the sum).
+func TestRunDiffMatches(t *testing.T) {
+	a, b := t.TempDir(), t.TempDir()
+	for H := 1; H <= 4; H++ {
+		writeShard(t, a, H, 4)
+		writeShard(t, b, H, 4)
+	}
+	ok, err := runDiff([]string{a}, []string{b}, 4)
+	if err != nil {
+		t.Fatalf("runDiff: %v", err)
+	}
+	if !ok {
+		t.Fatalf("runDiff on identical shard sets: got FAIL, want PASS")
+	}
+}
+
+// TestRunDiffCatchesCellMismatch proves a single differing T(n,H) cell fails
+// the diff even though the two sides' SUMMED a(n) totals could plausibly
+// still match (the whole point of a cell-by-cell check over runCombine's
+// summed-total one). Red before runDiff: a same-total, different-shape pair
+// (kink kernel producing the right a(n) via a wrong per-height split) is
+// exactly the bug class this tool exists to catch.
+func TestRunDiffCatchesCellMismatch(t *testing.T) {
+	a, b := t.TempDir(), t.TempDir()
+	writeRawShard(t, a, 2, [][2]int{{1, 0}, {2, 1}, {3, 1}, {4, 1}})
+	writeRawShard(t, b, 2, [][2]int{{1, 0}, {2, 1}, {3, 1}, {4, 2}}) // n=4 differs
+	writeShard(t, a, 1, 4)
+	writeShard(t, b, 1, 4)
+	writeShard(t, a, 3, 4)
+	writeShard(t, b, 3, 4)
+	writeShard(t, a, 4, 4)
+	writeShard(t, b, 4, 4)
+
+	ok, err := runDiff([]string{a}, []string{b}, 4)
+	if err != nil {
+		t.Fatalf("runDiff: %v", err)
+	}
+	if ok {
+		t.Fatalf("runDiff missed a differing T(4,2) cell (got PASS, want FAIL)")
+	}
+}
+
+// TestRunDiffCatchesMissingHeight proves a height present on only one side
+// fails the diff rather than being silently skipped.
+func TestRunDiffCatchesMissingHeight(t *testing.T) {
+	a, b := t.TempDir(), t.TempDir()
+	for H := 1; H <= 4; H++ {
+		writeShard(t, a, H, 4)
+		if H == 3 {
+			continue // b is missing height 3
+		}
+		writeShard(t, b, H, 4)
+	}
+	ok, err := runDiff([]string{a}, []string{b}, 4)
+	if err != nil {
+		t.Fatalf("runDiff: %v", err)
+	}
+	if ok {
+		t.Fatalf("runDiff missed a height present only on the A side (got PASS, want FAIL)")
+	}
+}

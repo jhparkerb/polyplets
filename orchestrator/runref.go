@@ -37,6 +37,13 @@ func (h PolyrunHeader) WordBytes() int {
 	return 8
 }
 
+// columnKeyLen returns the whole-column kernel's end-of-column sig key width
+// (boundary + touch-top + touch-bottom) for height H. kinkKeyLen returns the
+// kink kernel's mixed-state stage key width (boundary + touch flags + carry
+// byte + placed-any flag), mirroring core/kink.h's kinkKeyLen.
+func columnKeyLen(H int) int { return H + 2 }
+func kinkKeyLen(H int) int   { return H + 4 }
+
 // ParseHeader reads a POLYRUN header and returns it with the byte offset
 // where the binary body begins.
 func ParseHeader(path string) (PolyrunHeader, int64, error) {
@@ -88,10 +95,14 @@ func ParseHeader(path string) (PolyrunHeader, int64, error) {
 // for input-space partitioning.  Returns hex-encoded keys; len <= numCuts.
 // Caller converts into unit boundaries: unit i covers [cuts[i-1], cuts[i]).
 //
+// keyLen is the run's key width in bytes (H+2 for the column kernel's
+// end-of-column sigs, H+4 for the kink kernel's mixed-state stage keys) —
+// callers must pass it explicitly, it is not derived from H.
+//
 // Fast path: the .idx sidecar already holds one key per 64 records (evenly
 // spaced) — sample from it and never touch the multi-GB body.  Falls back to a
 // buffered body scan only when no usable .idx is present.
-func SampleKeys(path string, H, numCuts int) ([]string, error) {
+func SampleKeys(path string, H, keyLen, numCuts int) ([]string, error) {
 	if numCuts <= 0 {
 		return nil, nil
 	}
@@ -102,7 +113,6 @@ func SampleKeys(path string, H, numCuts int) ([]string, error) {
 	if hdr.Records == 0 || hdr.Height != H {
 		return nil, nil
 	}
-	keyLen := H + 2
 	if cuts, err := sampleIndexKeys(path+".idx", keyLen, numCuts); err == nil && len(cuts) > 0 {
 		return cuts, nil
 	}
@@ -215,18 +225,19 @@ func subsampleEvenly(keys []string, numCuts int) []string {
 // IMPORTANT: map output files have OVERLAPPING output key ranges (multiple workers
 // can emit the same successor key), so the file list is NOT in sorted key order.
 // We must sort the combined samples before subsampling to get valid partition cuts.
-func SampleKeysMulti(paths []string, H, numCuts int) ([]string, error) {
+// keyLen: see SampleKeys.
+func SampleKeysMulti(paths []string, H, keyLen, numCuts int) ([]string, error) {
 	if numCuts <= 0 {
 		return nil, nil
 	}
 	if len(paths) == 1 {
-		return SampleKeys(paths[0], H, numCuts)
+		return SampleKeys(paths[0], H, keyLen, numCuts)
 	}
 	// Collect samples from all files and deduplicate.
 	var all []string
 	seen := make(map[string]bool)
 	for _, p := range paths {
-		c, err := SampleKeys(p, H, numCuts)
+		c, err := SampleKeys(p, H, keyLen, numCuts)
 		if err != nil {
 			return nil, err
 		}
@@ -253,11 +264,11 @@ func SampleKeysMulti(paths []string, H, numCuts int) ([]string, error) {
 // non-empty.  Returns fewer than numCuts (possibly zero) when the indexes hold
 // too few in-range samples to cut finely — the caller then steals less (or not
 // at all), which is the correct degenerate behaviour.
-func SplitRangeByIndex(frontier []string, H int, loHex, hiHex string, numCuts int) ([]string, error) {
+// keyLen: see SampleKeys.
+func SplitRangeByIndex(frontier []string, H, keyLen int, loHex, hiHex string, numCuts int) ([]string, error) {
 	if numCuts <= 0 {
 		return nil, nil
 	}
-	keyLen := H + 2
 	loB, hasLo := hexBytes(loHex, keyLen)
 	hiB, hasHi := hexBytes(hiHex, keyLen)
 

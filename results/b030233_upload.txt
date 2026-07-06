@@ -1,0 +1,47 @@
+# A030233: number of n-celled one-sided polyplets. a(1)-a(33).
+# Burnside over the rotation group C4: a(n) = (F + 2*R90 + R180)/4, where F is
+# the fixed count A006770 and R90, R180 are the counts of fixed polyplets
+# invariant under 90- and 180-degree rotation, computed by symmetric
+# transfer-matrix engines (cpp/sym/symtm.cpp) and validated against a direct
+# symmetry-classified Redelmeier enumeration for n <= 24. a(1)-a(19) match the
+# existing OEIS terms exactly; the /4 divisibility holds at every n as a
+# structural check.
+# Confidence inherits from A006770: a(20)-a(33) rest on the single-algorithm
+# (but multiply cross-checked) fixed counts; see A006770's b-file header.
+# a(34) = 128829209605977867230343869 is deliberately NOT in this b-file:
+# it inherits the one-grade-weaker status of A006770(34); see Comments.
+# Independent confirmation welcome.
+# - Jason H Parker, Jul 05 2026
+1 1
+2 2
+3 6
+4 34
+5 166
+6 991
+7 5931
+8 37196
+9 235456
+10 1514618
+11 9826177
+12 64284947
+13 423241426
+14 2802300793
+15 18642694440
+16 124544085550
+17 835091956750
+18 5617792259411
+19 37902303297525
+20 256393397108358
+21 1738521118535082
+22 11813833328245848
+23 80437315244081648
+24 548666699140240976
+25 3748702832087014098
+26 25651878467205504568
+27 175781698028751634291
+28 1206147307126536440324
+29 8286282451482505589564
+30 56992306779773178547095
+31 392407904770584270738465
+32 2704550994366217058008641
+33 18657870495104684580672401

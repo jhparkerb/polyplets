@@ -1,0 +1,42 @@
+# A030234: number of n-celled polyplets with bilateral symmetry. a(1)-a(32).
+# Derived by Burnside over D4 from the fixed count A006770 and symmetric
+# fixed-point counts (r90, r180, axis-mirror, diagonal-mirror) computed by
+# symmetric transfer-matrix engines; identities validated against every known
+# OEIS term of all five related sequences and integrality (/8, /2) asserted
+# at every n. Reach is capped at n=32 by the diagonal-mirror count.
+# Confidence inherits from A006770: a(1)-a(19) two-algorithm confirmed;
+# a(20)-a(32) single-algorithm (multiply cross-checked); see A006770's
+# b-file header. Independent confirmation welcome.
+# - Jason H Parker, Jul 05 2026
+1 1
+2 2
+3 4
+4 10
+5 22
+6 57
+7 131
+8 344
+9 810
+10 2144
+11 5127
+12 13645
+13 32984
+14 88133
+15 214768
+16 575578
+17 1411442
+18 3791465
+19 9344655
+20 25148372
+21 62241818
+22 167756802
+23 416661638
+24 1124396044
+25 2801133346
+26 7566946396
+27 18900472093
+28 51102567236
+29 127935923098
+30 346171848187
+31 868410337377
+32 2351309228225

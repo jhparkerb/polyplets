@@ -34,6 +34,34 @@ func TestResumeConfigGuard(t *testing.T) {
 	mismatch("height-not-in-list", func(c *Checkpoint) { c.H = 5 })
 }
 
+// TestResumeKernelMismatch proves a resume hard-fails when the checkpoint was
+// written under a different --kernel than the CLI (a column-kernel checkpoint
+// resumed under --kernel kink, or vice versa, would silently reinterpret
+// keyLen/stage state and corrupt the triangle). Both explicit "column" and the
+// empty-string default must be treated as equivalent.
+func TestResumeKernelMismatch(t *testing.T) {
+	heights := []int{17, 18, 19, 20}
+
+	columnCfg := SweepConfig{Maxn: 20, CounterWidth: "u64", Fold: true}
+	kinkCfg := SweepConfig{Maxn: 20, CounterWidth: "u64", Fold: true, Kernel: "kink"}
+
+	columnCkpt := &Checkpoint{H: 18, Maxn: 20, Counter: "u64", Fold: true}
+	kinkCkpt := &Checkpoint{H: 18, Maxn: 20, Counter: "u64", Fold: true, Kernel: "kink"}
+
+	if err := checkResumeConfig(columnCfg, columnCkpt, heights); err != nil {
+		t.Errorf("matching column resume rejected: %v", err)
+	}
+	if err := checkResumeConfig(kinkCfg, kinkCkpt, heights); err != nil {
+		t.Errorf("matching kink resume rejected: %v", err)
+	}
+	if err := checkResumeConfig(kinkCfg, columnCkpt, heights); err == nil {
+		t.Errorf("column checkpoint resumed under --kernel kink not caught")
+	}
+	if err := checkResumeConfig(columnCfg, kinkCkpt, heights); err == nil {
+		t.Errorf("kink checkpoint resumed under --kernel column not caught")
+	}
+}
+
 // TestRAMAdvisory proves a spill-thrashing --ram earns a warning, while a
 // realistic value is silent.
 func TestRAMAdvisory(t *testing.T) {
