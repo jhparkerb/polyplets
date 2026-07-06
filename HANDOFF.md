@@ -1,9 +1,12 @@
 # HANDOFF — 2026-07-05
 
 Frontier **a(34) = 515316838423862758858377704**, banked+validated, term chase
-**parked** per the 2026-07-06 close plan. Branch `kink-carry`, all pushed to
-origin. Durable facts live in `MEMORY.md`, `results/*.md`, `README.md`, and
-git history — this file is just the live state.
+**parked**. **MERGED TO MASTER 2026-07-06** (master is the repo's public
+face; kink-carry remains the working branch). Big tidy DONE — README.md is
+the fork-and-reproduce entry point. Durable facts live in `MEMORY.md`,
+`results/*.md`, `README.md`, and git history — this file is the live state.
+Pending jasonp: rename the GitHub repo (polyominoes -> polyplets) via web
+UI; then Claude updates remotes on all hosts (dir renames wait for jobs).
 
 ## Frontier / what's banked
 - **a(1)…a(34)** all banked under `results/ns_a{n}/` (triangle, PROVENANCE,
