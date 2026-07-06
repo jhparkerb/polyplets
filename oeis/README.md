@@ -3,18 +3,14 @@
 Staged drafts in OEIS **internal format** (`%I %S %T %U %N %C %D %H %F %e %Y %K %O %A %E`).
 **Nothing here is submitted.** These are reviewable, staged drafts; jasonp pushes the
 actual submission to oeis.org — Claude prepares and stages, never submits to an external
-service (see ROADMAP #25). Normal care for outward-facing steps; no signoff ceremony.
+service. Normal care for outward-facing steps; no signoff ceremony.
 
-## Submission-status flags (2026-06-23 dedup pass)
-A double-check for duplicate/contradictory submissions flagged these (markers are in the
-file headers):
-- `draft-maxholearea.txt` — **NOT FOR SUBMISSION**: max-hole AREA = A001971-shifted
-  (KNOWN); submitting duplicates A001971. Stale; excluded from the curated submissions/oeis/ 4.
-- `draft-A0-holefree.txt`, `draft-A1-onehole.txt` — **SUPERSEDED** by the canonical
-  `submissions/oeis/{1-holefree,2-onehole}/` (refined comments). Don't submit from both.
-- `draft-gf-orders.txt`, `draft-atom-degrees.txt` — **NOT READY**: the paper asserts
-  these are not in OEIS; submitting contradicts it. Discuss with OEIS editors first (jasonp).
-- The curated 4 in `submissions/oeis/` are internally clean and distinct.
+## Submission-status flags
+- `draft-gf-orders.txt`, `draft-atom-degrees.txt` — **NOT READY**: the report
+  asserts these are not in OEIS; submitting contradicts it. Discuss with OEIS
+  editors first (jasonp).
+- Superseded drafts (maxholearea, standalone A_0/A_1) were removed 2026-07-06;
+  the canonical versions live in `submissions/oeis/`. Git history has them.
 
 ## Files
 - `A######.txt` — an **existing** OEIS entry we extend. Commit history per file:
@@ -59,20 +55,17 @@ https://oeis.org/history?user=Jason%20H%20Parker). Only new-draft `%A` lines and
 `%E` extension credits carry this name; the original `%A` authors of extended entries
 (Sloane, Cook, Wilson, Melik, ...) are preserved.
 
-## Status
+## Status (2026-07-06, close)
 | file | status |
 |---|---|
-| A006770 (fixed) | extend: +a(19) confirmed; a(20) candidate, cross-ISA confirmation running |
-| A030222 (free) | extend: +a(18),a(19) confirmed |
-| A030233 (one-sided) | extend: +a(18),a(19) confirmed |
-| A194596 (free, non-polyomino) | extend: +a(18),a(19) confirmed (= A030222 - A000105, per the entry's own formula); a(20)=128193840456415 candidate |
-| A030234/A030235 (symmetric) | pending: verify our bilateral-symmetry counts first |
-| draft hole triangle T(n,k) | new (4-bg convention), **exact through n=18; rows n=15..18 cross-ISA confirmed** |
-| draft A_0 (hole-free), A_1 (one-hole) | new, **novelty-confirmed via Superseeker (2026-06-19)**; b-files `b-draft-A0-holefree.txt` (n=1..18), `b-draft-A1-onehole.txt` (n=4..18), **n=15..18 cross-ISA confirmed**; submission-ready. These ARE columns k=0,1 of the triangle (standalone per the OEIS triangle+headline-columns idiom; A_2,A_3,... are NOT minted separately) |
-| draft M(n) = max hole AREA (draft-maxholearea.txt) | new; a DISTINCT statistic (max enclosed empty *area*, not a column of the count triangle); **exact to n=16, diamond-tight at n=4,8,12,16** |
-| draft GF orders deg Q_H (draft-gf-orders.txt) | new, **Superseeker-novel**; 1,3,7,15,42,...,5005 (fixed-height GF denominator orders); lifetime-3 law |
-| draft atom degrees deg N_H (draft-atom-degrees.txt) | new, **Superseeker-novel**; 1,2,4,9,29,...,3289 (the lifetime-3 atoms); H<=7 verified, H>=8 law-derived |
-| draft free-polyplet symmetry classes (8: draft-sym-*.txt) | new, **plain-search novel** (Superseeker not yet run); the D4 exact-symmetry-group breakdown of A030222 to n=19 (asymmetric, axial, diagonal, C2, C4, D2-ortho, D2-diag, D4); validated (8 classes sum to A030222, 5 reflection classes sum to A030234); polyplet analogues of A006746/A006747/A006748/A006749/A056877/A056878/A142886/A144553, none of which had a polyplet counterpart |
+| A006770 (fixed) | staged: b-file to a(33) (T2); a(34) as conjectured %C comment |
+| A030233 (one-sided) | staged: b-file to a(33); a(34) as conjectured %C comment |
+| A030222/A030234/A030235/A194596 | staged: b-files to n=32 (T2); n=33 as conjectured %C comments (T3, D(33) hybrid) |
+| draft hole triangle T(n,k) | new (4-bg convention), exact through n=18, rows 15-18 cross-ISA confirmed |
+| draft GF orders / atom degrees | Superseeker-novel; NOT READY (see flags) |
+| draft free-polyplet symmetry classes (8: draft-sym-*.txt) | new, plain-search novel; D4 breakdown of A030222 to n=19, validated (classes sum to A030222/A030234) |
+
+Submission is jasonp's, gated on the readiness process in HANDOFF.md.
 
 ## Novelty re-checks (OEIS, 2026-06-19)
 - **A_0 (hole-free) and A_1 (one-hole): confirmed not in OEIS via Superseeker**

@@ -2,7 +2,7 @@
 
 Frontier **a(34) = 515316838423862758858377704**, banked+validated, term chase
 **parked** per the 2026-07-06 close plan. Branch `kink-carry`, all pushed to
-origin. Durable facts live in `MEMORY.md`, `results/*.md`, `ROADMAP.md`, and
+origin. Durable facts live in `MEMORY.md`, `results/*.md`, `README.md`, and
 git history — this file is just the live state.
 
 ## Frontier / what's banked
@@ -121,7 +121,12 @@ routinely ask "how much of this is AI-generated?". Research on the policy
   submission day; pink-box replies are jasonp's alone, always.
 
 ## Remaining work ledger
-1. Housekeeping: gitignore `polyplets/.lake`, clean `autonomy/`.
-2. dalby n=33 completion drill (above), then the n=34 dmirror decision.
-3. Paper: TODO(n33-cost) after the run; final read-through.
+1. ~~Housekeeping~~ DONE 2026-07-06 (the big tidy: process docs, one-shot
+   scripts, experiments/, stale drafts, autonomy/, polyplets/ removed;
+   README.md replaces ROADMAP.md as the repo face).
+2. M(17) on dalby lands tonight -> paper Conjecture-1 note + maxhole.txt.
+3. Paper: final read-through after the tidy passes.
 4. Viva drills + retakes, %C authorship pass, then jasonp submits.
+5. **Lessons-learned document** (jasonp + Claude collaboration) — after
+   compute and paper are done, BEFORE submitting. jasonp's explicit ask
+   2026-07-06.
