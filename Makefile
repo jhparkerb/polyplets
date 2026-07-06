@@ -53,9 +53,6 @@ build/gf_modp: cpp/gf_modp.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
 # fixed-height KNIGHT-animal transfer matrix over Z/pZ (horizontal-reach test)
-build/gf_knight: cpp/gf_knight.cpp | build
-	$(CXX) $(CXXFLAGS) -O3 $< -o $@
-
 build/g2_asan: cpp/g2_redelmeier.cpp | build
 	$(CXX) $(CXXFLAGS) $(RESTRICT_FLAG) -g -O1 -fsanitize=address,undefined \
 	    -fno-omit-frame-pointer $< -o $@
