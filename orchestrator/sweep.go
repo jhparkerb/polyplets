@@ -1180,6 +1180,19 @@ func mapPhase(
 				bestScore, best = sc, r
 			}
 		}
+		if os.Getenv("POLY_STEAL_DEBUG") != "" {
+			var oldest *runningUnit
+			for _, r := range inflight {
+				if oldest == nil || r.started.Before(oldest.started) {
+					oldest = r
+				}
+			}
+			if oldest != nil {
+				rem := oldest.remaining()
+				fmt.Printf("event=pickvictim H=%d col=%d stage=%s elapsed_oldest=%.3f processed=%d estTotal=%d rem=%d grainRecs=%d grainSeconds=%.6f score=%.3f picked=%v inflight=%d\n",
+					H, col, stage, now.Sub(oldest.started).Seconds(), oldest.processed.Load(), oldest.u.estTotal, rem, grainRecs, grainSeconds, stealScore(oldest, now), best == oldest, len(inflight))
+			}
+		}
 		return best
 	}
 
