@@ -63,17 +63,20 @@ jobs finish (their cwd lives there).
   91bdcdc-deleted data files it needs (results/fixed_height_gfs.txt etc.).
   Remaining TODO: n33-cost (job-gated).
 
-## Live jobs (2026-07-06 morning)
-- **dalby — M(17) max-hole-area sweep** (`python3 sampling/maxhole_split.py
-  17 78`): driver PID 3089094, tmux `0:m17`, g2 rev `72d1204e`, log
-  `runs/m17/driver.log`, per-worker checkpoints `runs/ckpt/` (kill = resume
-  cheaply). Predicted ~835 core-h (measured n=13 calibration) ≈ 11-14h on
-  78 workers → lands tonight. Tests Conjecture 1's first prediction
-  M(17)=28; writes results/maxhole.txt on dalby (pull + commit from here).
-- **ayr — dmirror n=33 cross-ISA recompute** (tmux `0:dm33x`, driver PID
-  3054773): S=25 running since 00:47 (~8.5h, slower cores). Queue S=25..20;
-  EXTEND downward when it drains. Per-strip drill: byte-compare ayr's
-  dmirror.S*.out vs dalby's (gympie runs/sym33/) — x86 vs ARM.
+## Jobs landed (2026-07-07 early morning; both started 2026-07-06)
+- **dalby — M(17) max-hole-area sweep DONE 2026-07-07 04:27** (78-way
+  split, wall 74,870s ≈ 20.8h, 4.928M cpu-s ≈ 1369 core-h). **Result:
+  M(17)=28 — confirms Conjecture 1's prediction exactly** (fitted on
+  n≤16, no forward test until this run). results/maxhole.txt pulled to
+  the Mac (was stale at n≤16 locally, now synced through n=17). Paper
+  updated (`paper/polyplets-report.tex`, the M(n) paragraph + Conjecture
+  1 + open problem block): verified range n≤16→n≤17, next untested
+  prediction is now M(18)=32 (exact, no rounding ambiguity).
+- **ayr — dmirror n=33 cross-ISA recompute DONE 2026-07-07 03:34**
+  (queue S=25,24,23,22,21,20 fully drained). **Cross-ISA byte-compare
+  (ayr x86 vs dalby ARM): ALL SIX STRIPS MATCH** (S=25 matched earlier;
+  S=24..20 matched this morning) — closes the "S≤25 compare pending"
+  item in `results/related-seqs-n33.md`.
 - ~~dalby n=33 direct strips~~ **DONE 2026-07-06 07:39** (24.0h wall,
   6.71M cpu-s, peak 126.2GB) — **completion drill EXECUTED**: strips on
   gympie runs/sym33/, all n<=32 prefixes byte-match n=32 farm (413/413);
@@ -128,7 +131,8 @@ routinely ask "how much of this is AI-generated?". Research on the policy
 1. ~~Housekeeping~~ DONE 2026-07-06 (the big tidy: process docs, one-shot
    scripts, experiments/, stale drafts, autonomy/, polyplets/ removed;
    README.md replaces ROADMAP.md as the repo face).
-2. M(17) on dalby lands tonight -> paper Conjecture-1 note + maxhole.txt.
+2. ~~M(17) on dalby~~ DONE 2026-07-07 04:27 — M(17)=28 confirmed, paper
+   Conjecture-1 note + maxhole.txt updated (see "Jobs landed" above).
 3. Paper: final read-through after the tidy passes.
 4. Viva drills + retakes, %C authorship pass, then jasonp submits.
 5. **Lessons-learned document** (jasonp + Claude collaboration) — after
