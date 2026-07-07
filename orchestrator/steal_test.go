@@ -131,6 +131,43 @@ func TestStealEligibleWallTimeFloor(t *testing.T) {
 	}
 }
 
+// TestRemainingFallsBackWhenEstimateGrosslyExceeded — measured regression
+// test for the actual dominant bug (found via a real dalby H17 column, worse
+// than the record-vs-wall-time floor issue above): every unit is seeded with
+// the SAME flat estTotal (frontierIn/n0), but SampleKeysMulti's record-
+// quantile cuts from a sampled index can badly misjudge a skewed key
+// distribution. Measured: unit 319 (the last, open-ended [lo,"") range) on
+// dalby H17 col3 held up to ~590M records against a ~64K flat estimate — a
+// ~9000x miss. Pre-fix, remaining() clamped to 0 the instant processed
+// exceeded that too-low estimate, making the unit look FINISHED and
+// permanently invisible to the stealer for the rest of its run — explaining
+// why zero steals fired despite an obvious, wall-clock-dominating imbalance.
+func TestRemainingFallsBackWhenEstimateGrosslyExceeded(t *testing.T) {
+	// Grossly undersized estimate (100), wildly overshot (50000 processed,
+	// 500x) -- the monster-unit case. Must report a large nonzero remaining,
+	// not 0, so the stealer keeps seeing it as a live, steal-worthy victim.
+	p := new(atomic.Uint64)
+	p.Store(50000)
+	monster := &runningUnit{u: mapUnit{estTotal: 100}, processed: p}
+	if rem := monster.remaining(); rem == 0 {
+		t.Fatalf("a unit that overshot its estimate by 500x must not report remaining()=0 (invisible to the stealer)")
+	} else if rem != 50000 {
+		t.Fatalf("expected the fallback to report processed (50000) as remaining, got %d", rem)
+	}
+
+	// Ordinary near-done overshoot (estimate 1000, processed 1200, 1.2x) --
+	// must NOT trigger the fallback; every normal unit's last progress pulse
+	// before finishing routinely overshoots its rough average estimate by a
+	// few percent, and treating that as "steal-worthy" would spuriously flag
+	// every unit's final instant.
+	p2 := new(atomic.Uint64)
+	p2.Store(1200)
+	normal := &runningUnit{u: mapUnit{estTotal: 1000}, processed: p2}
+	if rem := normal.remaining(); rem != 0 {
+		t.Fatalf("an ordinary ~20%% overshoot at completion must still report remaining()=0 (near-done), got %d", rem)
+	}
+}
+
 // TestRefGrainSecondsStableAcrossElapsedTime — measured regression test for
 // the bug the FIRST version of the wall-time floor shipped with (caught on a
 // real dalby H17 column, results/steal-tail-h18.md): using

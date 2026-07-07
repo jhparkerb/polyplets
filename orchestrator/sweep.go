@@ -888,13 +888,41 @@ type runningUnit struct {
 	started   time.Time      // when this unit went in-flight (for rate-based sizing)
 }
 
-// remaining estimates the input records this unit has left (clamped at 0).
+// remaining estimates the input records this unit has left. Every unit is
+// seeded with the SAME flat estTotal (frontierIn/n0, mapPhase's estPer) —
+// SampleKeysMulti cuts by record-quantile from a SAMPLED index, and a skewed
+// key distribution can make one range (typically the last, open-ended [lo,""))
+// hold far more real records than that average predicts. Measured: dalby
+// H17 col3's kink stage rounds routinely gave unit 319 (hi="") tens of
+// millions of records against a ~64K flat estimate, once even ~590M against
+// ~64K — a ~9000x miss. Once processed exceeds a too-low estTotal, clamping
+// to 0 makes such a unit look FINISHED and permanently invisible to the
+// stealer for the rest of its run, even with millions of records left — the
+// real reason zero steals fired on a real H17/H18-shaped column despite an
+// obvious, massive, wall-clock-dominating imbalance (not the record-vs-wall-
+// time floor distinction the earlier version of this fix targeted, which was
+// real but not what was actually starving this run). Falling back to `p`
+// itself once the estimate is exceeded keeps the unit visible with a
+// remaining estimate that tracks how long it's already run (so its implied
+// stealScore keeps growing the longer it actually goes), instead of
+// vanishing from consideration the moment a bad a-priori guess is crossed.
 func (r *runningUnit) remaining() uint64 {
 	p := r.processed.Load()
-	if p >= r.u.estTotal {
+	if p < r.u.estTotal {
+		return r.u.estTotal - p
+	}
+	// p >= estTotal: the flat a-priori estimate undercounted this unit's real
+	// range. Only treat this as "still going, unknown remainder" once
+	// processed has meaningfully overshot the estimate (2x) — an ordinary,
+	// correctly-sized unit's LAST progress pulse before finishing often
+	// overshoots its rough average estimate by a few percent (real per-unit
+	// sizes vary around the mean), and that shouldn't spuriously flag every
+	// normal unit's final instant as steal-worthy. Below 2x, treat it as
+	// genuinely near-done (the pre-fix behavior).
+	if p < 2*r.u.estTotal {
 		return 0
 	}
-	return r.u.estTotal - p
+	return p
 }
 
 // indexStride mirrors core/runfile.h kIndexStride: the .idx holds one key per
