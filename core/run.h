@@ -20,6 +20,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstring>
+#include <memory_resource>
 #include <vector>
 
 #include "core/signature.h"
@@ -33,11 +34,28 @@ using u128 = unsigned __int128;
 template <class W>
 struct RunRecord {
   Sig    sig;          // canonical signature (keyLen bytes used, rest zero)
-  int    H;            // height (needed to interpret sig and lo/len)
-  int    keyLen;       // key length in bytes: H+2 for triangle, H+3 for holes
+  // H, keyLen: bounded <=SIGMAX-2 (<=38 even at the keyLen=H+4 kink-stage
+  // width), so uint8_t is exact, not lossy -- was `int`, wasting 6 bytes/record
+  // (measured: sizeof(RunRecord)=72->64) purely on alignment padding a value
+  // that never exceeds 38. See results/hotpath-optim.md.
+  uint8_t H;            // height (needed to interpret sig and lo/len)
+  uint8_t keyLen;       // key length in bytes: H+2 for triangle, H+3 for holes
   uint8_t lo;         // first nonzero index in counts[]
   uint8_t len;        // number of nonzero entries
-  std::vector<W> counts; // counts[lo .. lo+len), dense over the window
+  // pmr::vector, not std::vector: lets the map hot loop (mapreduce.h,
+  // kink.h) construct successor records against a monotonic_buffer_resource
+  // arena scoped to one spill epoch, instead of one malloc/free per
+  // successor (measured: 415.8M allocations in a34's swept portion,
+  // ~14% of map cycles, map-profile.md B2). Default-constructed (no
+  // allocator argument) it behaves EXACTLY like std::vector -- uses the
+  // global default_resource, same semantics, same cost, zero change for
+  // every other call site (deserializeRecord, seedRecord, tests, ...).
+  // Only map_shard_file/map_shard_stage_file opt into the arena, via the
+  // allocator-aware constructor below.
+  std::pmr::vector<W> counts; // counts[lo .. lo+len), dense over the window
+
+  RunRecord() = default;
+  explicit RunRecord(std::pmr::memory_resource* mr) : counts(mr) {}
 
   // True if both records share the same key (same sig bytes for keyLen).
   bool sameKey(const RunRecord& o) const {
@@ -81,7 +99,10 @@ struct RunRecord {
 
     // Left-extension (o starts before this): the existing entries would shift, so
     // build the union buffer fresh. Rarer than the in-place case above.
-    std::vector<W> merged(new_len, W{0});
+    // Same allocator as `counts` (arena-aware if this record is): keeps the
+    // rare left-extension path in the same epoch's pool instead of falling
+    // back to the global allocator underneath a pmr-typed field.
+    std::pmr::vector<W> merged(new_len, W{0}, counts.get_allocator());
     for (int i = 0; i < len; ++i) {
       W& slot = merged[(lo + i) - new_lo];
       W prev = slot;

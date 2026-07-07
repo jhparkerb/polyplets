@@ -270,6 +270,15 @@ std::pair<size_t, size_t> map_shard_stage_file(
   const size_t record_est = sizeof(RunRecord<W>) +
                             static_cast<size_t>(maxn) * sizeof(W) + 32;
 
+  // Successor-counts arena -- same rationale as mapreduce.h's map_shard_file
+  // (map-profile.md B2): one bump-allocator per spill epoch instead of one
+  // malloc/free per successor. Released at each do_spill(), matching
+  // buf.clear()'s epoch boundary.
+  const size_t arena_hint = cfg.ram_budget_bytes > 0
+                                 ? cfg.ram_budget_bytes
+                                 : (size_t{64} << 20);
+  std::pmr::monotonic_buffer_resource succArena(arena_hint);
+
   auto do_spill = [&]() {
     if (buf.empty()) return;
     sortRun(buf);
@@ -289,6 +298,7 @@ std::pair<size_t, size_t> map_shard_stage_file(
     spill_files.push_back(spill_path);
     buf.clear();
     buf_bytes = 0;
+    succArena.release();
   };
 
   size_t processed = 0;
@@ -342,7 +352,7 @@ std::pair<size_t, size_t> map_shard_stage_file(
       if (new_lo > maxn) return;
       const int new_len = std::min<int>(rec.len, maxn - new_lo + 1);
 
-      RunRecord<W> succ;
+      RunRecord<W> succ(&succArena);
       succ.sig    = t;
       succ.H      = H;
       succ.keyLen = keyLen;
