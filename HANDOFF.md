@@ -1,4 +1,4 @@
-# HANDOFF — 2026-07-05
+# HANDOFF — 2026-07-07
 
 Frontier **a(34) = 515316838423862758858377704**, banked+validated, term chase
 **parked**. **MERGED TO MASTER 2026-07-06** (master is the repo's public
@@ -8,6 +8,10 @@ the fork-and-reproduce entry point. Durable facts live in `MEMORY.md`,
 GitHub repo RENAMED to `jhparkerb/polyplets` 2026-07-06; remotes updated
 on all three hosts. Local dirs stay `~/src/polyominoes` until the running
 jobs finish (their cwd lives there).
+
+**No live jobs right now** — dalby and ayr both idle, all three machines'
+working trees clean. Everything below is either fully landed or explicitly
+parked with a reason, not silently stalled.
 
 ## Frontier / what's banked
 - **a(1)…a(34)** all banked under `results/ns_a{n}/` (triangle, PROVENANCE,
@@ -95,6 +99,86 @@ jobs finish (their cwd lives there).
   S=28@34 alone first. The related-seqs reach is final at n=32 (T2) /
   n=33 (T3, comments); term chase for a(35)+ stays parked.
 
+## Engine hot-path optimization (2026-07-07, branch `tm-hotpath-optim`)
+
+Pushed to origin, NOT merged (jasonp's call whether/when). Two real,
+gate+ASan-validated fixes on top of `kink-carry`'s `0fe41b4`:
+1. `RunRecord.H`/`.keyLen`: `int`->`uint8_t` (bounded <=38, never lossy).
+   `sizeof(RunRecord<W>)` 72->64 bytes, compiler-verified.
+2. `succ.counts` in both hot paths (`map_shard_file`, `map_shard_stage_file`)
+   now allocates from a `std::pmr::monotonic_buffer_resource` scoped to one
+   spill epoch instead of the default allocator (map-profile.md's B2
+   finding: 415.8M allocations counted in a34's swept portion, ~14% of map
+   cycles predicted).
+
+**Measured, not assumed:** on gympie (macOS/clang) fix 2 was a small
+*regression* (~2-3% slower, likely `polymorphic_allocator`'s virtual-
+dispatch overhead beating macOS's already-fast small-object allocator).
+On **dalby** (Linux/ARM/g++, the actual production target) combined
+fixes 1+2 gave a real, reproducible **4.47% speedup** (2 reps each,
+n=28, `baseline_times=[259.9,260]` vs `fixed_times=[248.65,249]`).
+Environment mattered more than the fix itself.
+
+**Reach extrapolation** (a34's real 3.70h/80-core baseline, 4.4x/term
+growth, applying the measured 4.47%): **a(36) fits in a week, a(37)
+does not, on every configuration** (dalby-alone or full 122-core fleet,
+optimized or not) -- 1.9-3.0 days for a(36) either way, 8.2-13.1 days
+for a(37) either way. The optimization shifts wall time by a few hours
+per row, never crosses the a(36)/a(37) boundary. An earlier version of
+this table had an off-by-one loop bug that mislabeled a(37) as
+reachable at 45.0h (that was actually a(36)'s wall) -- corrected, this
+version is right.
+
+A scary-looking multi-minute hang on gympie during gate-suite
+re-validation turned out to be **not a bug**: driver1's `--ram 1MB`
+forced-constant-spilling test legitimately takes ~4.5 minutes under
+system contention (XProtect was pegging two cores at the time), not an
+infinite loop. Confirmed by running the identical gate suite + ASan on
+idle dalby: all gates PASS clean, including `gate_spill` and
+`ns-gate-asan` on both kernels. Lesson: an unexplained slowdown on a
+loaded/contended dev machine isn't automatically a code defect --
+cross-check on the actual clean target environment before concluding
+there's a bug.
+
+**Terminal-sort investigation: fully closed, not abandoned.** The
+codebase's own `map-profile.md` flags the terminal `sortRun` as the
+next-biggest cost (~19-39% of hot-column wall) after the alloc fix.
+Three genuinely different attacks were tested against REAL captured
+signature data (dumped via a temporary, since-reverted debug hook) and
+all three came back measured-negative, not just "seemed hard":
+- **Radix bucket by leading signature byte**: real data shows severe
+  skew (only 2/256 buckets ever populated) -- signature bytes are a
+  restricted growth string (RGS) encoding of a partition, which has a
+  hard mathematical bound (byte[i] <= 1+max(byte[0..i))), verified
+  against ~5M real records (1 violation, parse-boundary noise). This
+  isn't an implementation quirk, it's inherent to RGS; reordering which
+  cell maps to which byte position does not help.
+- **Recursive (multi-level) radix bucketing**, jasonp's suggestion to
+  exploit the skew via recursion: measured at depths 1-4, total cost
+  (sort-cost + partition-pass cost) stays flat at 99.9-100.9% of plain
+  sort. Sort-cost alone does shrink as predicted, but partition-pass
+  cost grows right alongside it and eats the saving.
+- **Hash-bucket for balance + k-way merge** (near-perfect balance,
+  stddev 7,629 vs 140k-197k for raw bytes): PROVEN algebraically, not
+  just measured, to never beat plain comparison sort -- N*log2(N/K) +
+  N*log2(K) = N*log2(N) exactly, independent of K, so bucketing can
+  only match plain sort minus the extra O(N) routing-pass overhead.
+  General fact, not specific to this encoding: bucketing can't beat the
+  N log N comparison-sort floor unless key width is genuinely bounded
+  independent of N, which ours isn't (needs ~log(N) bits to distinguish
+  N growing frontier states).
+- **Generation-order "nearly sorted" hypothesis** (successors might
+  arrive close to sorted, making an adaptive sort cheap): measured on
+  real data, 1.84M ascending runs out of ~5M records, mean run length
+  2.71 -- barely above the ~2.0 expected for a PURE RANDOM permutation.
+  Real but weak structure, ~6.5% theoretical ceiling before accounting
+  for the overhead of tracking 1.84M run boundaries.
+
+**Net: nothing left on the terminal-sort lever that survives contact
+with real numbers.** If revisited, the honest starting point is that
+all four natural attacks are closed, not unexplored -- a fifth idea
+would need to be a genuinely different shape, not a variant of these.
+
 ## Data ceiling (why the term chase is parked)
 - **P_16 is derivable** (fit from T(33,17)+T(34,18), self-consistent) but has
   **no independent holdout** until a(35); a(34)'s top cell has no closed-form
@@ -137,8 +221,25 @@ routinely ask "how much of this is AI-generated?". Research on the policy
    README.md replaces ROADMAP.md as the repo face).
 2. ~~M(17) on dalby~~ DONE 2026-07-07 04:27 — M(17)=28 confirmed, paper
    Conjecture-1 note + maxhole.txt updated (see "Jobs landed" above).
-3. Paper: final read-through after the tidy passes.
-4. Viva drills + retakes, %C authorship pass, then jasonp submits.
-5. **Lessons-learned document** (jasonp + Claude collaboration) — after
+3. ~~Engine hot-path optimization pass~~ DONE 2026-07-07 — branch
+   `tm-hotpath-optim` pushed, validated (dalby gates+ASan clean), real
+   4.47% win measured, reach ceiling confirmed unchanged (a36 yes/a37
+   no either way). NOT merged -- jasonp's call. Terminal-sort lever
+   fully investigated and closed (see section above); nothing else
+   queued there.
+4. Paper: final read-through after the tidy passes.
+5. Viva: cold retakes (V8/V12/V13 drill-1-flavor, V18/V19/V20 drill-2-
+   flavor per docs/viva-state.md), then %C authorship pass (jasonp's own
+   words), then jasonp submits.
+6. **Lessons-learned document** (jasonp + Claude collaboration) — after
    compute and paper are done, BEFORE submitting. jasonp's explicit ask
    2026-07-06.
+
+## Starting a fresh session from here
+Read this file first, then `MEMORY.md`'s index (auto-loaded) for standing
+practices. The two active branches: `kink-carry` (general work, docs,
+paper, results -- this file lives here) and `tm-hotpath-optim` (engine
+optimization, pushed, unmerged, nothing pending on it). No open threads
+need immediate action; next steps are entirely jasonp's pacing (viva
+retakes, whether/when to merge the optimization branch, whether to revisit
+a35+ compute at all given the reach ceiling above).
