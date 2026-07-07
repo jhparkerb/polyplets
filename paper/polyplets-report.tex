@@ -548,10 +548,17 @@ designed around the weakest link at each stage.
         and $a(34)$'s top surviving stratum runs the same code path that
         $P_{15}$ certified at $a(33)$---what lacks certification is its
         execution at the larger size, not the path.
-  \item \textbf{Modular consistency.} Production sweeps run with residue
-        counters and CRT reconstruction; independent residue systems must
-        agree, catching overflow and transient corruption (not shared
-        enumeration bugs, which the items above target).
+  \item \textbf{Modular consistency (design capability, not a production
+        gate).} A residue-counter/CRT-reconstruction path exists and is
+        regression-tested (independent residue systems must agree, which
+        would catch overflow and transient corruption---not shared
+        enumeration bugs, which the items above target), but it has only
+        been exercised at small $n$, not against any production frontier
+        sweep $a(20)$--$a(34)$. Overflow protection for the reported terms
+        instead comes from the items already listed above (cross-machine
+        and cross-algorithm recount, u128-vs-u64 comparison at the sizes
+        where both are feasible) plus the structural and fault-injection
+        checks below.
   \item \textbf{Structural cross-checks.} The transfer matrices'
         (height,\,size) and (size,\,perimeter) marginals match the explicit
         enumeration's; rook- and bishop-connected sub-counts reproduce
@@ -562,7 +569,11 @@ designed around the weakest link at each stage.
         diagonal at $n=2$, a doubled count at $n=1$, a prune off-by-one at
         $n=10$) while a provably count-preserving change survives---the
         checks fail on wrong programs and pass on right ones.
-  \item \textbf{Hygiene.} The engines are AddressSanitizer/UBSan clean; the
+  \item \textbf{Hygiene.} Every engine---the legacy oracles and the
+        production map/merge workers (both the column and cell-at-a-time
+        kernels)---is AddressSanitizer/UBSan clean at gate scale (small
+        $n$, against fixtures; the sanitizer build compiles the same
+        source the $-O3$ production binary does, unmodified); the
         multithreaded paths are bit-identical to serial; every kept result
         traces to a clean-tree commit stamp in a provenance ledger, and the
         cross-checks are encoded as gates that run before release.

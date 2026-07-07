@@ -20,7 +20,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
-        ns-gate-kink-worker-cli \
+        ns-gate-kink-worker-cli ns-gate-asan \
         ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
@@ -156,7 +156,7 @@ build/ns:
 # ns-gates: all new-system gates. Includes the runfile-format, holes, verify,
 # height-split, and full-Go-suite gates that existed but were not wired in, so a
 # regression in those paths (BUGS-OF-SHAME A4/A5/B*/D6) can't rot undetected.
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-asan
 
 # Fast gate subset for the pre-push hook (.githooks/pre-push). Targets well under
 # 30s: the full Go suite (guards / combine / runcat / closed-form / resume) plus
@@ -282,6 +282,36 @@ build/ns/map_worker: worker/map_worker.cpp $(NS_HEADERS) | build/ns
 
 build/ns/merge_worker: worker/merge_worker.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O3 -I. $< -o $@ $(ZSTD_LDFLAGS)
+
+# ASan/UBSan builds of the ACTUAL production workers (map_worker/merge_worker,
+# both kernels) — see gate-tma/gate-g2 for the same pattern on the oracle
+# engines. Separate build dir so --workers-dir can point orchestrate at these
+# without disturbing the -O3 production binaries.
+build/ns_asan:
+	mkdir -p build/ns_asan
+
+build/ns_asan/map_worker: worker/map_worker.cpp $(NS_HEADERS) | build/ns_asan
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -g -O1 -fsanitize=address,undefined \
+	    -fno-omit-frame-pointer -I. $< -o $@ $(ZSTD_LDFLAGS)
+
+build/ns_asan/merge_worker: worker/merge_worker.cpp $(NS_HEADERS) | build/ns_asan
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -g -O1 -fsanitize=address,undefined \
+	    -fno-omit-frame-pointer -I. $< -o $@ $(ZSTD_LDFLAGS)
+
+# ASan/UBSan gate: the real map_worker/merge_worker (both column and kink
+# kernels) under sanitizers, small n, --compare against fixtures. This is what
+# makes the paper's "engines are ASan/UBSan clean" claim actually cover the
+# production pipeline, not just the legacy oracle binaries (build/tma_asan,
+# build/g2_asan).
+ns-gate-asan: build/ns_asan/map_worker build/ns_asan/merge_worker build/ns/orchestrate
+	rm -rf /tmp/ns_asan_column && mkdir -p /tmp/ns_asan_column/spill
+	./build/ns/orchestrate --maxn 14 --cores 4 --ram 67108864 --workers-dir build/ns_asan \
+	    --run-dir /tmp/ns_asan_column --spill-dir /tmp/ns_asan_column/spill \
+	    --checkpoint /tmp/ns_asan_column/POLYCKPT --checkpoint-every 0 --compare
+	rm -rf /tmp/ns_asan_kink && mkdir -p /tmp/ns_asan_kink/spill
+	./build/ns/orchestrate --maxn 14 --cores 4 --ram 67108864 --kernel kink --workers-dir build/ns_asan \
+	    --run-dir /tmp/ns_asan_kink --spill-dir /tmp/ns_asan_kink/spill \
+	    --checkpoint /tmp/ns_asan_kink/POLYCKPT --checkpoint-every 0 --compare
 
 build/ns/driver1: test/driver1.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
