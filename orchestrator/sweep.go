@@ -934,6 +934,32 @@ func stealEligible(r *runningUnit, grainRecs uint64, grainSeconds float64, now t
 	return grainSeconds > 0 && stealScore(r, now) > grainSeconds
 }
 
+// refGrainSeconds converts grainRecs into a wall-time grain using the
+// observed pace of units that have already FINISHED (completedRecords over
+// the SUM of their own individual durations) — NOT total-done over elapsed
+// wall time since the round started. That distinction is load-bearing: a
+// cumulative-since-start average is diluted by however long the CURRENT
+// straggler has been idling everyone else, so it shrinks — and grainSeconds
+// grows — the longer the tail runs, making the eligibility bar harder to
+// clear exactly when a real straggler is dragging on. Pace-of-the-finished
+// is stable regardless of how long we've been waiting on whoever's still
+// running (see TestRefGrainSecondsStableAcrossElapsedTime — this is a
+// measured-regression test, not a hypothetical: the cumulative-elapsed
+// formula measured zero steals on a real H17 column with a textbook
+// flat-cpu/growing-wall straggler, see results/steal-tail-h18.md).
+// Returns 0 (disables the wall-time slow path, record-only fallback) until
+// at least one unit has finished.
+func refGrainSeconds(grainRecs uint64, completedRecords uint64, completedSeconds float64) float64 {
+	if completedSeconds <= 0 {
+		return 0
+	}
+	refRate := float64(completedRecords) / completedSeconds
+	if refRate <= 0 {
+		return 0
+	}
+	return float64(grainRecs) / refRate
+}
+
 // stealAllowed reports whether work-stealing may fire RIGHT NOW. A height's own
 // "queue empty, a goroutine is about to go idle" signal is LOCAL to that height —
 // it only equals BOX-WIDE idleness when this height is the SOLE occupant of the
@@ -1063,16 +1089,23 @@ func mapPhase(
 		grainRecs = uint64(cfg.StealGrain * float64(frontierIn) / float64(cfg.Cores))
 	}
 
-	// phaseStart/completedProcessed track this mapPhase call's POOL-WIDE
-	// average pace (records/s across every unit, fast and slow alike),
-	// independent of any single unit's own rate. It's the reference the
+	// completedRecords/completedSeconds track the pace of units that have
+	// already FINISHED this mapPhase call: sum(records processed) /
+	// sum(each finished unit's own wall duration). This — not a cumulative
+	// totalDone/elapsedSincePhaseStart average — is the reference the
 	// wall-time steal floor (stealEligible's slow path) converts grainRecs
-	// into seconds against — deliberately NOT the victim's own rate, which
-	// would make the comparison tautological (rem/rate > grainRecs/rate
-	// reduces to rem > grainRecs for any rate). completedProcessed retains
-	// the contribution of units that have already exited inflight.
-	phaseStart := time.Now()
-	completedProcessed := new(atomic.Uint64)
+	// into seconds against. A cumulative-since-start average is
+	// self-defeating: as a straggler drags on, elapsed keeps growing while
+	// total-done plateaus, so the "average" DEGRADES the longer the tail
+	// runs, inflating grainSeconds and making the bar harder to clear
+	// exactly when it matters most (measured: real H17 telemetry showed
+	// zero steals with that formula despite a textbook flat-cpu/growing-wall
+	// straggler). Finished-units-only pace isn't diluted by an ongoing
+	// straggler's elapsed time, only by how fast NORMAL units actually ran.
+	// Both vars are mutated/read only while `mu` is held (see call sites),
+	// so no atomics needed.
+	var completedRecords uint64
+	var completedSeconds float64
 
 	var (
 		mu          sync.Mutex
@@ -1108,20 +1141,7 @@ func mapPhase(
 			return nil
 		}
 		now := time.Now()
-		// Pool-wide reference rate: everything completed so far, plus every
-		// in-flight unit's current cumulative, over elapsed phase time. Fast
-		// units dominate this average (there are many more of them than
-		// stragglers), so it tracks "normal" pace, not the victim's own.
-		var grainSeconds float64
-		if elapsed := now.Sub(phaseStart).Seconds(); elapsed > 0 {
-			totalDone := completedProcessed.Load()
-			for _, r := range inflight {
-				totalDone += r.processed.Load()
-			}
-			if refRate := float64(totalDone) / elapsed; refRate > 0 {
-				grainSeconds = float64(grainRecs) / refRate
-			}
-		}
+		grainSeconds := refGrainSeconds(grainRecs, completedRecords, completedSeconds)
 		var best *runningUnit
 		var bestScore float64
 		for _, r := range inflight {
@@ -1186,7 +1206,8 @@ func mapPhase(
 				<-sem
 
 				mu.Lock()
-				completedProcessed.Add(r.processed.Load())
+				completedRecords += r.processed.Load()
+				completedSeconds += time.Since(r.started).Seconds()
 				delete(inflight, u.idx)
 				if runErr != nil {
 					if firstErr == nil {

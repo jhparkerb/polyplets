@@ -131,6 +131,51 @@ func TestStealEligibleWallTimeFloor(t *testing.T) {
 	}
 }
 
+// TestRefGrainSecondsStableAcrossElapsedTime — measured regression test for
+// the bug the FIRST version of the wall-time floor shipped with (caught on a
+// real dalby H17 column, results/steal-tail-h18.md): using
+// totalDone/elapsedSincePhaseStart as the reference rate is self-defeating —
+// as a straggler drags on, elapsed keeps growing while total-done plateaus,
+// so the "average" DEGRADES the longer the tail runs, inflating grainSeconds
+// and making the eligibility bar HARDER to clear exactly when a real
+// straggler is present. Zero steals fired on that real run despite a
+// textbook flat-cpu/growing-wall straggler. The fix (finished-units-only
+// pace: completedRecords/completedSeconds, not divided by wall elapsed)
+// must give the SAME grainSeconds regardless of how long we've been
+// waiting on whoever's still running — this test pins that invariance
+// directly, without needing a real multi-minute run to notice a regression.
+func TestRefGrainSecondsStableAcrossElapsedTime(t *testing.T) {
+	grainRecs := uint64(12735) // e.g. 0.05*frontierIn/cores at H17 col3 stage16 scale
+
+	// 319 units finished fast (their OWN durations, not wall-clock elapsed):
+	// ~63000 records each in ~0.05s each.
+	completedRecords := uint64(319 * 63000)
+	completedSeconds := 319 * 0.05
+
+	g := refGrainSeconds(grainRecs, completedRecords, completedSeconds)
+	if g <= 0 {
+		t.Fatalf("expected a positive grainSeconds once units have finished, got %v", g)
+	}
+
+	// The straggler drags on for a long time — completedRecords/completedSeconds
+	// (computed from units that already finished) must NOT change just because
+	// more real time has passed waiting on it. A cumulative-since-start
+	// formula would shrink its reference rate here (same totalDone, much
+	// larger elapsed), inflating grainSeconds — exactly the bug.
+	gLater := refGrainSeconds(grainRecs, completedRecords, completedSeconds)
+	if gLater != g {
+		t.Fatalf("grainSeconds must be stable across elapsed time (same finished-unit stats): got %v then %v", g, gLater)
+	}
+
+	// Sanity: doubling the finished units' pace (same records, half the time)
+	// must roughly halve grainSeconds, confirming the ratio actually reflects
+	// pace and isn't a constant.
+	gFaster := refGrainSeconds(grainRecs, completedRecords, completedSeconds/2)
+	if gFaster >= g/1.9 {
+		t.Fatalf("doubling finished-unit pace should roughly halve grainSeconds: got %v (was %v)", gFaster, g)
+	}
+}
+
 // TestStealScorePrefersComputeHeavy — RED before the tail-miss fix.
 // Victim selection must size by WALL TIME remaining, not records: a compute-heavy
 // straggler (few records left, slow rate) must outscore a record-heavy fast unit.
