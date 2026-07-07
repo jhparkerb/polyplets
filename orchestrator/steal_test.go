@@ -21,21 +21,22 @@ func unit(remaining, processed uint64) *runningUnit {
 func TestStealEligibleSkipsUnsplittable(t *testing.T) {
 	grain := uint64(10)
 
+	now := time.Now()
 	// remaining=50: above the grain (10) but below 2*indexStride (128) → too
 	// small to split → must be ineligible (the Stop-Then-Shrug case).
-	if stealEligible(unit(50, 100), grain) {
+	if stealEligible(unit(50, 100), grain, 0, now) {
 		t.Fatalf("stole an unsplittable remnant (50 records < 2*indexStride=%d) — Stop-Then-Shrug", 2*indexStride)
 	}
 	// remaining=1000: above grain AND ≥2 strides → splittable → eligible.
-	if !stealEligible(unit(1000, 100), grain) {
+	if !stealEligible(unit(1000, 100), grain, 0, now) {
 		t.Fatalf("a large splittable remnant should be steal-eligible")
 	}
-	// at the grain floor → ineligible.
-	if stealEligible(unit(10, 100), grain) {
+	// at the grain floor → ineligible (no wall-time signal to override it).
+	if stealEligible(unit(10, 100), grain, 0, now) {
 		t.Fatalf("remnant at the grain floor must be ineligible")
 	}
 	// no progress yet (processed=0) → ineligible (can't size it).
-	if stealEligible(unit(1000, 0), grain) {
+	if stealEligible(unit(1000, 0), grain, 0, now) {
 		t.Fatalf("a unit with no progress must be ineligible")
 	}
 }
@@ -85,6 +86,48 @@ func TestStealAllowedGatesOnActiveHeights(t *testing.T) {
 	// concurrently.
 	if !stealAllowed(nil) {
 		t.Fatalf("nil activeHeights must allow stealing unconditionally")
+	}
+}
+
+// TestStealEligibleWallTimeFloor — RED before the record-floor fix
+// (results/steal-tail-h18.md). A compute-heavy straggler with few RECORDS
+// left but a rate far below the pool average must still be eligible: its
+// remaining WALL TIME (at its own slow rate) can exceed the grain even
+// though its remaining record count does not. Pre-fix, stealEligible only
+// checked rem>grainRecs, so a34/a32's H18 tail (a handful of pathological
+// keys, low records/high compute) never cleared the bar and stealScore
+// never got a chance to rank it.
+func TestStealEligibleWallTimeFloor(t *testing.T) {
+	now := time.Now()
+	grainRecs := uint64(500) // e.g. StealGrain*frontierIn/cores
+
+	// Compute-heavy straggler: 200 records left (below grainRecs=500, but
+	// above the 2*indexStride=128 splittability floor), processed 200 in
+	// 400s (~0.5/s) => ~400s of wall time still left.
+	slow := unit(200, 200)
+	slow.started = now.Add(-400 * time.Second)
+
+	// grainSeconds=10: a "grain" at the pool's average pace is only 10s, so
+	// this straggler's ~400s remaining clears the wall-time floor even
+	// though its 200 remaining records don't clear the 500-record floor.
+	if !stealEligible(slow, grainRecs, 10, now) {
+		t.Fatalf("a low-record/high-cost straggler (~400s left) must be eligible under a small wall-time grain (10s), even though rem=200 < grainRecs=500")
+	}
+
+	// A genuinely near-finished, fast unit (same 200 records left, but
+	// processed 2000 in 2s => ~0.2s left at its own pace) must stay
+	// ineligible even with the same wall-time grain — the fix must not make
+	// everything eligible.
+	fast := unit(200, 2000)
+	fast.started = now.Add(-2 * time.Second)
+	if stealEligible(fast, grainRecs, 10, now) {
+		t.Fatalf("a near-finished fast unit must remain ineligible under the wall-time floor too")
+	}
+
+	// grainSeconds<=0 (no reference rate yet, e.g. column just started) must
+	// fall back to the pure record-based check, not treat everyone as eligible.
+	if stealEligible(slow, grainRecs, 0, now) {
+		t.Fatalf("with no usable reference rate (grainSeconds<=0), must fall back to the record floor, not admit everyone")
 	}
 }
 

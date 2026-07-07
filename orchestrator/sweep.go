@@ -902,16 +902,36 @@ func (r *runningUnit) remaining() uint64 {
 const indexStride = 64
 
 // stealEligible reports whether an in-flight unit is worth stealing: making
-// progress, not already stopped/un-splittable, MORE than a grain of work left,
-// AND at least 2 index strides of records remaining so the .idx can actually cut
-// the remnant. Without the last clause the stealer stops a victim it then cannot
-// split, paying the stop+respawn overhead for zero fan-out (Stop-Then-Shrug).
-func stealEligible(r *runningUnit, grainRecs uint64) bool {
+// progress, not already stopped/un-splittable, and at least 2 index strides of
+// records remaining so the .idx can actually cut the remnant (without this
+// clause the stealer stops a victim it then cannot split, paying the
+// stop+respawn overhead for zero fan-out — Stop-Then-Shrug). Above that floor,
+// eligibility is granted by EITHER of two signals:
+//
+//   - the fast path: remaining RECORDS alone exceed grainRecs (the common
+//     case — cheap to check, no rate math needed).
+//   - the slow path: this unit's remaining record count is small, but at its
+//     OWN observed rate the remaining WALL TIME exceeds grainSeconds. This is
+//     the fix for results/steal-tail-h18.md's diagnosed miss — a
+//     compute-heavy straggler (a handful of pathological keys) can have few
+//     records left yet dominate the column tail; the record-only floor
+//     filtered it out before stealScore's own wall-time ranking ever saw it.
+//
+// grainSeconds<=0 (no usable pool-wide reference rate yet, e.g. column just
+// started) disables the slow path, NOT the whole check — falls back to
+// record-only, same as before this fix.
+func stealEligible(r *runningUnit, grainRecs uint64, grainSeconds float64, now time.Time) bool {
 	if r.stopped || r.u.noSteal || r.processed.Load() == 0 {
 		return false
 	}
 	rem := r.remaining()
-	return rem > grainRecs && rem >= 2*indexStride
+	if rem < 2*indexStride {
+		return false
+	}
+	if rem > grainRecs {
+		return true
+	}
+	return grainSeconds > 0 && stealScore(r, now) > grainSeconds
 }
 
 // stealAllowed reports whether work-stealing may fire RIGHT NOW. A height's own
@@ -1043,6 +1063,17 @@ func mapPhase(
 		grainRecs = uint64(cfg.StealGrain * float64(frontierIn) / float64(cfg.Cores))
 	}
 
+	// phaseStart/completedProcessed track this mapPhase call's POOL-WIDE
+	// average pace (records/s across every unit, fast and slow alike),
+	// independent of any single unit's own rate. It's the reference the
+	// wall-time steal floor (stealEligible's slow path) converts grainRecs
+	// into seconds against — deliberately NOT the victim's own rate, which
+	// would make the comparison tautological (rem/rate > grainRecs/rate
+	// reduces to rem > grainRecs for any rate). completedProcessed retains
+	// the contribution of units that have already exited inflight.
+	phaseStart := time.Now()
+	completedProcessed := new(atomic.Uint64)
+
 	var (
 		mu          sync.Mutex
 		cond        = sync.NewCond(&mu)
@@ -1077,10 +1108,24 @@ func mapPhase(
 			return nil
 		}
 		now := time.Now()
+		// Pool-wide reference rate: everything completed so far, plus every
+		// in-flight unit's current cumulative, over elapsed phase time. Fast
+		// units dominate this average (there are many more of them than
+		// stragglers), so it tracks "normal" pace, not the victim's own.
+		var grainSeconds float64
+		if elapsed := now.Sub(phaseStart).Seconds(); elapsed > 0 {
+			totalDone := completedProcessed.Load()
+			for _, r := range inflight {
+				totalDone += r.processed.Load()
+			}
+			if refRate := float64(totalDone) / elapsed; refRate > 0 {
+				grainSeconds = float64(grainRecs) / refRate
+			}
+		}
 		var best *runningUnit
 		var bestScore float64
 		for _, r := range inflight {
-			if !stealEligible(r, grainRecs) {
+			if !stealEligible(r, grainRecs, grainSeconds, now) {
 				continue
 			}
 			if sc := stealScore(r, now); sc > bestScore {
@@ -1141,6 +1186,7 @@ func mapPhase(
 				<-sem
 
 				mu.Lock()
+				completedProcessed.Add(r.processed.Load())
 				delete(inflight, u.idx)
 				if runErr != nil {
 					if firstErr == nil {
