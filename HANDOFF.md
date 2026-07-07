@@ -117,12 +117,16 @@ routinely ask "how much of this is AI-generated?". Research on the policy
 + accepted/rejected precedents: `docs/oeis-ai-policy.md`.
 - **The viva** (local-only files, deliberately uncommitted, in
   .git/info/exclude: docs/viva-exam.md, viva-reserve.md [chmod 000],
-  viva-state.md, drill1-counting.md): exam taken 2026-07-05, 56.5/100 vs
-  bar (>=80, no core question below half). Drill 1 (counting arguments)
-  nearly done — only exercise A2 outstanding; drill 2 (tier system +
-  validation architecture, report §1+§5 explain-back) not started; cold
-  retake variants after a spacing gap. **Full grading state:
-  docs/viva-state.md** (local).
+  viva-state.md, drill1-counting.md, drill2-tiers.md): exam taken
+  2026-07-05, 56.5/100 vs bar (>=80, no core question below half).
+  **Drill 1 (counting arguments) DONE 2026-07-06** — all of A1/A2/B1/B2/
+  C1/C2 closed. **Drill 2 (tiers + validation) graded 2026-07-06/07** —
+  D1 tier definitions done (one contested point resolved, jasonp's
+  answer stands); E1 shared-logic mitigations strong but missing the
+  held-out P_k item; F1 mod-p mechanism correct but doesn't name the
+  reimplementation as the closing answer. Cold retake variants still
+  pending after a spacing gap. **Full grading state: docs/viva-state.md**
+  (local).
 - Before submitting, also: jasonp rewrites all staged %C lines in his own
   words (Claude meaning-checks only); signature dates -> actual
   submission day; pink-box replies are jasonp's alone, always.
