@@ -6,7 +6,7 @@ whole-run utilization, per jasonp's 2026-07-07 `/goal`) lives on
 stays parked per the 2026-07-07 entry below; this is a separate,
 reopened thread specifically for utilization.
 
-**5 bottlenecks found and solved, deployed to `scripts/dalby_term.sh`,
+**6 bottlenecks found and solved, deployed to `scripts/dalby_term.sh`,
 each independently real-dalby-validated with correct output:**
 
 1. **Straggler Tail** — `--overlap-heights` was only ever measured at a
@@ -37,24 +37,29 @@ each independently real-dalby-validated with correct output:**
    worker CLIs). 6.2% faster wall, 7.7% fewer CPU-seconds at maxn=30, zero
    orphaned processes after normal exit or a real SIGTERM.
 
-**The honest, important caveat: at real production scale (maxn=33), all 5
-fixes COMBINED only bought 0.6% (6842.7s -> 6803.2s).** H17 (the dominant
-real-swept height) consumes nearly the entire wall clock once it's the
-pool's sole occupant — none of the 5 fixes touch that specific floor. A
-sub-record interrupt (checking the cooperative-stop flag mid-record, not
-just between records) is likely still the highest-value remaining lever,
-but the FIRST attempt to cost it out this round targeted the wrong
-function (`forEachViableMask`/`viableRec`, `core/transition.h` — that's
-the **column kernel**'s enumeration, unused by production's `--kernel
-kink`; caught and corrected same session, see
-`results/sub-record-interrupt-design.md`'s correction note). Kink's real
-hot path, `kinkStageTransition` (`core/kink.h:98`), is a simple bounded
-`for (occupy in {0,1})` loop — no recursive tree, no combinatorial
-enumeration. **What actually causes unit 319's measured 100x+ wall-time
-variance at similar-to-lower record counts in the kink kernel is still
-open and unexplained** — needs fresh investigation starting from
-`kinkStageTransition` and `map_shard_stage_file`, not the column kernel's
-code.
+**Bottlenecks #1-#5 combined only bought 0.6% at real maxn=33 scale**
+(6842.7s -> 6803.2s) — H17 (the dominant real-swept height) consumed
+nearly the entire wall clock once it was the pool's sole occupant, and
+none of those 5 touched that specific floor. Chased a sub-record
+interrupt design (`forEachViableMask`/`viableRec`) that turned out to
+target the wrong function entirely (that's the **column kernel**'s
+enumeration, unused by production's `--kernel kink`; caught and corrected
+same session, `results/sub-record-interrupt-design.md`). Real data then
+showed the actual pattern: concurrency collapsed progressively across a
+column's own kink-sweep stages (~43 active cores early, ~2.5 late, at
+near-constant frontier size) — not a single pathological unit. A first
+real fix attempt (`recordLess` lo-tiebreak, avoiding `combine()`'s
+expensive left-extension path) was real but only bought 0.07% at scale.
+
+**6. Kink-Stage Concurrency Collapse — the actual fix**: `--unit-mult 8`
+(up from 4). Genuinely untested territory, not a dead-end retry — the one
+prior "finer unit-mult rejected" memory finding was measured on the OLD
+engine (pre-kink-carry), the same mistargeting class already caught once
+this round. Real maxn=33 confirmation: **6798.6s -> 5674.2s (16.5%
+faster), utilization 10.2%->12.4%** — the first real-scale utilization
+GAIN this entire round, and the first fix that demonstrably moves H17's
+dominant floor rather than only helping a secondary cost swallowed by it.
+Best win of the session.
 
 **Also found, separately flagged, NOT this session's fault, NOT fixed**:
 a real, pre-existing correctness bug — real `SIGTERM` + `--resume` on the
