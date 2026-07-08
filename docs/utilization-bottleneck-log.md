@@ -148,3 +148,24 @@ not a numbered bottleneck.
   `start_unix` field (orchestrator/sweep.go): exact per-unit (start, wall_s)
   intervals straight from the orchestrator, zero sampling error, works at
   any scale. Preferred over external sampling going forward.
+
+### Real production-scale confirmation (maxn=32, this round)
+
+Full real run via `scripts/dalby_term.sh 32` (the actual production driver,
+not a diagnostic toy run): wall=834.1s, cpu_s=29350.3, **utilization 44.0%**
+— consistent with (and better than) the maxn=30 A/B, confirming the
+overlap-heights win holds and grows at larger scale, not just at the one
+tested size.
+
+This run also surfaced (and got fixed, not counted as a numbered
+bottleneck — it's a validation-script correctness bug, not an idle-core
+one) a real defect: `dalby_term.sh`'s per-term banked-value lookup died
+under `set -e` at n=22 (no `results/ns_a22/` dir exists — a22's value only
+exists embedded inside `ns_a23`'s differently-formatted triangle), silently
+truncating validation for every later term in the very first real use of
+the generalized script. Fixed: skip gracefully (missing dir, or a
+non-2-column format) instead of crashing or, worse, naively summing a
+3-column triangle in awk floating point (confirmed to lose precision past
+~16 digits: a23 came out `...768` instead of the correct `...732`).
+Re-validated against the maxn=32 run's actual output: full a(21)-a(31)
+pass, `MISMATCH=0`.
