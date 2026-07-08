@@ -16,7 +16,7 @@ tried (good or bad).
 
 | # | Bottleneck | Status | Win |
 |---|---|---|---|
-| 1 | Straggler Tail | partially solved | overlap-heights: +9pp on measured H16+H17 pair (24.7%->33.0%), full-sweep deploy pending |
+| 1 | Straggler Tail | solved (overlap-heights=all, deployed) | 1.82x wall-clock, 21.6%->38.8% util, real maxn=30 A/B, correct output |
 | 2 | TBD | — | — |
 
 ## Bottleneck #1: Straggler Tail
@@ -80,30 +80,41 @@ attempted here.
     remaining levers are overlap-heights (solved) and sub-record interrupt
     (deferred, own investigation).
 
-## Bottleneck #2: Map/Merge Round Serialization (candidate, under test)
+## Bottleneck #1 continued: overlap-heights was under-configured
 
-Exact per-unit instrumentation (`POLY_UNIT_LOG=1`, `scripts/analyze_unit_concurrency.py`
-— see Measurement tooling below) on a real maxn=26 column showed: within a
-single height's own round sequence (seed, stage0..stageN, finalize), map-unit
-concurrency is high while map units are actually running (mean ~45/80 cores
-during active map time) but **map is only active ~22% of a column's wall** —
-the other ~78% is inter-round merge, where map concurrency is exactly zero
-(H13 col4: active_time=0.88s of 4.09s span, gaps up to 0.3s each, 14 gaps).
+Exact per-unit instrumentation (`POLY_UNIT_LOG=1`, `scripts/analyze_unit_concurrency.py`)
+on a real maxn=26 column showed map-unit concurrency is high while units are
+actually running but map is only active ~22% of a column's wall — the rest
+is inter-round merge with zero map concurrency (H13 col4: active 0.88s of
+4.09s span). This is the same mechanism `results/scheduling.md` already
+named ("Why merge is not cores-wide (and overlap exists)"), whose own
+recommendation is **`--overlap-heights = number of swept heights owned`**,
+not the small fixed 2 the original fix deployed (`utilization-fix-and-ceiling.md`
+only ever measured the H16+H17 pair).
 
-This is very likely NOT a new bottleneck — `results/scheduling.md` already
-names and explains this exact mechanism ("Why merge is not cores-wide (and
-overlap exists)") and its own recommendation is **`--overlap-heights =
-(number of swept heights owned)`**, i.e. overlap ALL heights, not a small
-fixed number. Bottleneck #1's deployed fix used `--overlap-heights 2`
-(the only pair actually measured in `utilization-fix-and-ceiling.md`), which
-is far more conservative than this doc's own prior recommendation.
-**Currently testing**: real maxn=29 benchmark run (`runs/ns_a29_bench`,
-~20-25 min, current production config) as the reference; next step is the
-same config swept with `--overlap-heights` set to the full owned-height count
-to see whether raising it past 2 recovers more of this gap. If it does, this
-folds into Bottleneck #1's overlap-heights fix (a config change, not new
-code) rather than being its own bottleneck #2 — will reclassify after the
-comparison.
+**Real dalby A/B, same code/range (maxn=30, real sweep now only H3-H15 --
+diagonalStripValid's k-range grew to <=15 since a30 was first computed, so
+the OLD PROVENANCE.md wall (3711s, H3-H17) is stale and not comparable):**
+
+| overlap-heights | wall | cpu_s | utilization | a(30) |
+|---|---:|---:|---:|---|
+| 1 (sequential) | 689.6s | 11926.6 | 21.6% | 227969227118066423789154 (correct) |
+| 15 (all owned) | 378.2s | 11742.2 | 38.8% | 227969227118066423789154 (correct) |
+
+**1.82x wall-clock speedup, near-doubled utilization, near-identical
+CPU-seconds (packing, not redoing work), byte-identical correct output both
+configs.** Deployed: `scripts/dalby_term.sh` now passes `--overlap-heights
+"$N"` (over-provisioning the height pool past the real count is harmless —
+RAM co-resident for all real-swept heights measured <100MB).
+
+**Process note:** a mid-investigation dead end almost got mistaken for a
+correctness bug — the first oh=15 run appeared to stop sweeping at H15
+instead of the expected H17, which looked like data loss. Root cause was
+just the closed-form coverage growing since the original a30 run, not a bug;
+resolved by getting a same-code oh=1 baseline before drawing any conclusion.
+Lesson: **always get an apples-to-apples same-code baseline before trusting
+a dramatic-looking speedup number** — logged as its own process reminder,
+not a numbered bottleneck.
 
 ### Dead-end tooling attempts (measurement, not a bottleneck)
 

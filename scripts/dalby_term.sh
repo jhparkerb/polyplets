@@ -5,11 +5,15 @@
 # diagonals cover H(N-2)..H(N-12); real sweep is H3..H(N-13) (top real height
 # grows +1 per term). counter=u128. RAM 80c x 1GiB (kink is RAM-light).
 #
-# --overlap-heights 2: sweeps 2 heights concurrently in one core pool, hiding
-# a straggler height's idle tail behind another height's map work. Measured
-# real dalby H16+H17 win: 24.7%->33.0% utilization, byte-identical CPU-seconds
-# (results/utilization-fix-and-ceiling.md). Checkpoints at height boundaries
-# (gated: orchestrator/overlap_resume_test.go), not per-column.
+# --overlap-heights N: sweeps ALL owned heights concurrently in one core pool
+# (results/scheduling.md's own recommendation -- "overlap = number of swept
+# heights owned"; overshooting the real count is harmless, RAM co-resident
+# for all real-swept heights is <100MB, see docs/utilization-bottleneck-log.md
+# Bottleneck #2). Validated real dalby maxn=30 A/B on identical code+range
+# (H3-H15 real sweep): overlap=1 689.6s/21.6% util vs overlap=15 378.2s/38.8%
+# util, near-identical CPU-seconds (11926.6 vs 11742.2), byte-identical
+# a(30)=227969227118066423789154 both configs. Checkpoints at height
+# boundaries (gated: orchestrator/overlap_resume_test.go), not per-column.
 #
 # Resume: dalby_term.sh N --resume
 set -e
@@ -28,7 +32,7 @@ RESUME_FLAG=""
 T0=$(date +%s)
 ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
   --cores 80 --ram 1073741824 --unit-mult 4 --steal-grain 0.05 \
-  --overlap-heights 2 \
+  --overlap-heights "$N" \
   --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" \
   --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 300 $RESUME_FLAG \
   --per-height-out runs/ns_a${N}/perheight \
