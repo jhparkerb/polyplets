@@ -1,14 +1,15 @@
 # HANDOFF — 2026-07-08 (utilization redesign, branch `redesign`)
 
-**In progress, NOT yet merged, deliberately opt-in.** Per jasonp's
-2026-07-08 `/goal` ("redesign the software... especially look at ways to
-re-shard the work so units can be more independent... no options off the
-table... fix this once and for all"), branched off `master@79b0cce`
-(post the `steal-wall-time-floor` merge below). That prior session's 8
+**NOT yet merged; a real, first-class production kernel, still opt-in
+by flag (not the default).** Per jasonp's 2026-07-08 `/goal` ("redesign
+the software... especially look at ways to re-shard the work so units
+can be more independent... no options off the table... fix this once
+and for all"), branched off `master@79b0cce` (post the
+`steal-wall-time-floor` merge below). That prior session's 8
 bottlenecks were scheduling fixes on top of the existing per-round
-barrier structure; this session found and validated the structural
-alternative `results/kink-carry.md`'s own "Caveats" section named but
-never measured.
+barrier structure; this session found, validated, and fully deployed
+the structural alternative `results/kink-carry.md`'s own "Caveats"
+section named but never measured.
 
 **The finding**: today's kink-carry column sweep synchronizes ALL
 workers at every one of a column's H+1 rounds (seed, H mid-column stage
@@ -48,12 +49,20 @@ unmodified finalize step. H+1 barriers per column become 1.
    bug here too: `sweepHeight` deletes its own frontier files as normal
    per-column cleanup, so the reference and sharded runs need separate
    seed copies, not a shared path.
-4. `orchestrator/cmd/orchestrate` — `--sharded-validate K
-   --sharded-validate-height H`: a real, user-invokable CLI flag,
-   smoke-tested via the actual compiled binary
-   (`SHARDED_VALIDATE_PASS H=8 maxn=18 K=8 wall=0.914s`, also confirmed at
-   `H=12 maxn=22 K=16 wall=112.8s`). Writes no checkpoint/combine output,
-   does not touch `sweepHeightKink`'s production dispatch at all.
+4. `orchestrator/cmd/orchestrate` — `--kernel kink-sharded --sharded-k K`
+   is now a REAL, first-class production kernel option on normal
+   `orchestrate` runs, dispatched from `Run()` exactly like `column`/
+   `kink` (`sweepHeightKinkSharded` conforms to `sweepHeightFn`: real
+   column-granularity checkpoint writes, ctx cancellation, telemetry).
+   Verified through the project's own AC-2 gate pattern, via the actual
+   compiled binary:
+   `orchestrate --kernel kink-sharded --sharded-k 8 --maxn 16 --compare`
+   → `gate_parallel PASS (maxn=16)`, every known a(n) exact; a real
+   SIGTERM-mid-run + `--resume --compare` at maxn=20 also → PASS. The
+   earlier `--sharded-validate K --sharded-validate-height H` side tool
+   still exists (quick single-height check, writes no checkpoint) and
+   now calls the same production `sweepHeightKinkSharded`, not a
+   separate driver.
 
 Full `make ns-gates` (both ASan kernels) and `go test ./...` clean at
 every commit.
@@ -62,18 +71,24 @@ every commit.
 shards / measured duplication factor D): K=8→~3.1x, K=16→~5.0x,
 K=32→~8.7x, K=64→~15.7x.
 
-**Deliberately NOT done yet, scoped as follow-up given the stakes** (this
+**Still NOT the default kernel** — `--kernel kink-sharded` must be
+requested explicitly; `column`/`kink` remain untouched and unaffected.
+**Deliberately not yet done, scoped as follow-up given the stakes** (this
 computes real a(n) values, per the standing "validate at scale before
-record" practice): wiring into `sweepHeightKink`'s default dispatch path
-(today it's opt-in, reachable only via `--sharded-validate` or direct Go
-calls); checkpoint/resume/telemetry integration for the sharded path;
-validation past H=10 or against real (not synthetic/small-seed) frontier
-data — real frontiers are RGS-skewed, expected to show worse duplication
-than the uniform-random test data above; holes-path support (triangle
-only, matching the rest of the kink kernel). The `permissiveBudget`
-safety mechanism in `core/kink.h` also remains unproven-necessary by any
-test built so far (see `core/kink_sharded.h`'s "HONEST STATUS" comment)
-— kept on by default regardless, given the risk asymmetry.
+record" practice): validation past H=12/maxn=22 or against real (not
+synthetic/small-seed) frontier data — real frontiers are RGS-skewed,
+expected to show worse duplication than the uniform-random test data
+above; holes-path support (triangle only, matching the rest of the kink
+kernel); work-stealing (the sharded path dispatches raw worker calls
+directly, bypassing `mapPhase`'s steal machinery entirely — a scope gap,
+not a correctness one). The `permissiveBudget` safety mechanism in
+`core/kink.h` also remains unproven-necessary by any test built so far
+(see `core/kink_sharded.h`'s "HONEST STATUS" comment) — kept on by
+default regardless, given the risk asymmetry. Before this could be
+recommended as the default for a real dalby a(n) push: real-scale
+duplication measurement (the actual lever this whole redesign turns on)
+and a head-to-head wall-clock comparison against `kink` at real H/maxn,
+not just correctness.
 
 ---
 
