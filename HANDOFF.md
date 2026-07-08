@@ -51,9 +51,9 @@ unmodified finalize step. H+1 barriers per column become 1.
 4. `orchestrator/cmd/orchestrate` — `--sharded-validate K
    --sharded-validate-height H`: a real, user-invokable CLI flag,
    smoke-tested via the actual compiled binary
-   (`SHARDED_VALIDATE_PASS H=8 maxn=18 K=8 wall=0.914s`). Writes no
-   checkpoint/combine output, does not touch `sweepHeightKink`'s
-   production dispatch at all.
+   (`SHARDED_VALIDATE_PASS H=8 maxn=18 K=8 wall=0.914s`, also confirmed at
+   `H=12 maxn=22 K=16 wall=112.8s`). Writes no checkpoint/combine output,
+   does not touch `sweepHeightKink`'s production dispatch at all.
 
 Full `make ns-gates` (both ASan kernels) and `go test ./...` clean at
 every commit.
