@@ -22,6 +22,7 @@
 // rationale; same fix, same reasoning, applied here).
 
 #include <cctype>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -32,6 +33,17 @@
 #include "core/fdlimit.h"
 #include "core/libenum.h"
 #include "worker/worker_util.h"
+
+// ─── SIGTERM handling: cooperative work-stealing stop ────────────────────────
+// Same mechanism as map_worker.cpp's g_terminate/on_sigterm (see that file's
+// comment for the full rationale): the orchestrator raises SIGTERM to ask a
+// straggler merge range to stop early and hand its remainder to idle cores.
+// mergeRunFiles' resume semantics are simpler than map's -- see
+// core/runfile.h's comment on the terminate/stop_key_out params -- stopping
+// early just means "re-merge with lo_hex=stop_key," no partial-tree-state
+// problem to solve.
+static volatile std::sig_atomic_t g_terminate = 0;
+static void on_sigterm(int) { g_terminate = 1; }
 
 // runOneRequest does everything a one-shot merge_worker invocation always
 // did: parse one request's args, merge the shard files, emit accounting.
@@ -75,22 +87,45 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
   const double t0_wall = wallSeconds();
   const double t0_cpu  = cpuSeconds();
 
+  // Throttled progress emitter, same shape and same reasoning as
+  // map_worker.cpp's: first call fires immediately (not gated by elapsed
+  // time), so a merge range's processed>0 becomes visible to the
+  // orchestrator's stealEligible within one progress stride, not up to 2s
+  // late (see map_worker.cpp's on_progress comment for the full story).
+  double last_emit = t0_wall;
+  bool emitted_once = false;
+  auto on_progress = [&](size_t n_done) {
+    const double now = wallSeconds();
+    if (!emitted_once || now - last_emit >= 2.0) {
+      emitted_once = true;
+      last_emit = now;
+      std::printf("event=progress processed=%zu elapsed_s=%.1f\n", n_done, now - t0_wall);
+      std::fflush(stdout);
+    }
+  };
+
   size_t body_bytes, out_recs;
+  std::string stop_key;  // set iff SIGTERM stopped us early (work-stealing cursor)
   if (counter_arg == "u128") {
-    std::tie(body_bytes, out_recs) =
-        mergeRunFiles<u128>(in_paths, H, klo_hex, khi_hex, out_path, rev, keyLen);
+    std::tie(body_bytes, out_recs) = mergeRunFiles<u128>(
+        in_paths, H, klo_hex, khi_hex, out_path, rev, keyLen,
+        on_progress, &g_terminate, &stop_key);
   } else {
-    std::tie(body_bytes, out_recs) =
-        mergeRunFiles<u64>(in_paths, H, klo_hex, khi_hex, out_path, rev, keyLen);
+    std::tie(body_bytes, out_recs) = mergeRunFiles<u64>(
+        in_paths, H, klo_hex, khi_hex, out_path, rev, keyLen,
+        on_progress, &g_terminate, &stop_key);
   }
 
   const double cpu_s  = cpuSeconds()  - t0_cpu;
   const double wall_s = wallSeconds() - t0_wall;
   const double rss_mb = peakRssMB();
 
+  // stop_key non-empty iff SIGTERM stopped us early (work-stealing cursor):
+  // the output covers [klo, stop_key) and the orchestrator requeues
+  // [stop_key, khi) -- same accounting-line contract as map_worker.cpp.
   std::printf("event=done cpu_s=%.3f wall_s=%.3f peak_rss_mb=%.1f "
-              "records=%zu spill_bytes=%zu\n",
-              cpu_s, wall_s, rss_mb, out_recs, body_bytes);
+              "records=%zu spill_bytes=%zu stop_key=%s\n",
+              cpu_s, wall_s, rss_mb, out_recs, body_bytes, stop_key.c_str());
   return 0;
 }
 
@@ -110,6 +145,7 @@ static std::vector<std::string> tokenizeLine(const std::string& line) {
 
 int main(int argc, char** argv) {
   raiseFdLimitToHard();  // the spill/merge path fans out to many open files
+  std::signal(SIGTERM, on_sigterm);
 
   std::vector<std::string> tokens(argv + 1, argv + argc);
   bool persistent = false;
@@ -125,6 +161,7 @@ int main(int argc, char** argv) {
   std::string line;
   while (std::getline(std::cin, line)) {
     if (line.empty()) continue;
+    g_terminate = 0;  // a prior request's SIGTERM must not bleed into the next
     const int rc = runOneRequest(tokenizeLine(line));
     if (rc != 0) return rc;
     std::fflush(stdout);

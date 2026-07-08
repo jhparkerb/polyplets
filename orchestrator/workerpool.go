@@ -216,8 +216,9 @@ func (p *WorkerPool) RunMap(a MapArgs, onProgress func(uint64), stop <-chan stru
 }
 
 // RunMerge sends one merge_worker request to a pooled persistent process.
-// Same signature/semantics as the old RunMergeWorker.
-func (p *WorkerPool) RunMerge(a MergeArgs) (WorkerResult, error) {
+// Same signature/semantics as the old RunMergeWorker, now with the same
+// work-stealing onProgress/stop contract as RunMap.
+func (p *WorkerPool) RunMerge(a MergeArgs, onProgress func(uint64), stop <-chan struct{}) (WorkerResult, error) {
 	s := p.checkout()
 	defer p.checkin(s)
 	if s.mergeProc == nil {
@@ -227,7 +228,7 @@ func (p *WorkerPool) RunMerge(a MergeArgs) (WorkerResult, error) {
 		}
 		s.mergeProc = proc
 	}
-	return s.mergeProc.runRequest(mergeArgsLine(a), nil, nil)
+	return s.mergeProc.runRequest(mergeArgsLine(a), onProgress, stop)
 }
 
 // Close tears down every started process (idle slots that never launched a

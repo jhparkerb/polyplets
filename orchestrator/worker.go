@@ -97,8 +97,12 @@ func RunMapWorker(ctx context.Context, bin WorkerBin, a MapArgs, onProgress func
 	return runWorker(ctx, bin.MapWorker, args, onProgress, stop)
 }
 
-// RunMergeWorker spawns a merge_worker, waits for it, and returns the parsed result.
-func RunMergeWorker(ctx context.Context, bin WorkerBin, a MergeArgs) (WorkerResult, error) {
+// RunMergeWorker spawns a merge_worker, waits for it, and returns the parsed
+// result. onProgress/stop have the same work-stealing contract as
+// RunMapWorker (may be nil): stop closing sends SIGTERM, which merge_worker
+// treats as a cooperative early stop, reporting its cursor in
+// result.StopKey (Bottleneck: Merge Range Straggler).
+func RunMergeWorker(ctx context.Context, bin WorkerBin, a MergeArgs, onProgress func(uint64), stop <-chan struct{}) (WorkerResult, error) {
 	args := []string{
 		"--in", strings.Join(a.InPaths, ","),
 		"--H", fmt.Sprint(a.H),
@@ -119,7 +123,7 @@ func RunMergeWorker(ctx context.Context, bin WorkerBin, a MergeArgs) (WorkerResu
 	if a.KeyLen != 0 {
 		args = append(args, "--keylen", fmt.Sprint(a.KeyLen))
 	}
-	return runWorker(ctx, bin.MergeWorker, args, nil, nil)
+	return runWorker(ctx, bin.MergeWorker, args, onProgress, stop)
 }
 
 func runWorker(ctx context.Context, binary string, args []string, onProgress func(uint64), stop <-chan struct{}) (WorkerResult, error) {

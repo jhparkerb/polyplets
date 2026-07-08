@@ -617,7 +617,7 @@ func sweepHeight(
 		// fails (or is cancelled), the checkpoint at col-1 has correct hTri.
 		// A failed merge causes us to checkpoint at col-1 with unchanged hTri;
 		// the resume will re-run this col from scratch.
-		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem, columnKeyLen(H), "")
+		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem, activeHeights, columnKeyLen(H), "")
 		stopHB()
 		if err != nil {
 			// hTri does NOT include current col's contributions.
@@ -785,7 +785,7 @@ func sweepHeightKink(
 			}
 
 			t1 := time.Now()
-			mergeOuts, _, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem, mergeKeyLen, stage)
+			mergeOuts, _, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem, activeHeights, mergeKeyLen, stage)
 			removeRuns(mapOuts)
 			if err != nil {
 				return nil, nil, fmt.Errorf("H=%d col=%d kink %s merge: %w", H, col, name, err)
@@ -1371,12 +1371,24 @@ func splitBounds(lo, hi string, cuts []string) (los, his []string) {
 // output filename ("" = column kernel, unchanged naming); a kink column runs
 // several rounds at the same (H,col) and the rounds' outputs would otherwise
 // collide on name (see mapPhase's matching outName comment).
+// mergePhase merges via the same dynamic queue+work-stealing pool as
+// mapPhase (Bottleneck: Merge Range Straggler — merge ranges are split by
+// SampleKeysMulti exactly like map units and suffer the same RGS-driven
+// cost skew, but until this fix merge had ZERO rebalancing: all ranges
+// launched as fixed goroutines up front with no requeue path, so whichever
+// range was intrinsically expensive just ran alone while idle cores waited
+// — the same "one process busy in htop" shape map had before its own
+// steal-eligibility bug was fixed, just with no mechanism at all here
+// rather than a broken one). Reuses mapUnit/runningUnit/splitRemainder
+// (all already generic key-range types, not map-specific) against mapOuts
+// as the source files instead of frontier.
 func mergePhase(
 	ctx context.Context,
 	cfg SweepConfig,
 	H, col int,
 	mapOuts []string,
 	sem chan struct{},
+	activeHeights *atomic.Int32,
 	keyLen int,
 	stage string,
 ) ([]string, uint64, Acct, error) {
@@ -1385,6 +1397,7 @@ func mergePhase(
 		return nil, 0, Acct{}, nil
 	}
 
+	totalIn := sumFrontierRecords(mapOuts)
 	numRanges := cfg.Cores * mergeMult(cfg)
 	if numRanges < 1 {
 		numRanges = 1
@@ -1398,74 +1411,173 @@ func mergePhase(
 		return nil, 0, Acct{}, err
 	}
 	los, his := cutsToBounds(cuts)
-	actualRanges := len(los)
+	n0 := len(los)
 
-	type rangeResult struct {
-		idx     int
-		outPath string
-		result  WorkerResult
-		err     error
+	var grainRecs uint64
+	stealConfigured := cfg.StealGrain > 0 && cfg.Cores > 1
+	if stealConfigured && totalIn > 0 {
+		grainRecs = uint64(cfg.StealGrain * float64(totalIn) / float64(cfg.Cores))
 	}
-	results := make([]rangeResult, actualRanges)
 
-	// sem (the Cores-wide worker pool) is shared across concurrently-running
-	// heights in overlap mode; here one height's merge can fill cores a
-	// concurrent height's map phase has freed.
+	var completedRecords uint64
+	var completedSeconds float64
+	stealDebug := os.Getenv("POLY_STEAL_DEBUG") != ""
 	unitLog := os.Getenv("POLY_UNIT_LOG") != ""
-	var wg sync.WaitGroup
-	for i := 0; i < actualRanges; i++ {
-		wg.Add(1)
-		go func(idx int) {
-			defer wg.Done()
 
-			outName := fmt.Sprintf("merge_h%d_c%d_r%d.bin", H, col, idx)
-			if stage != "" {
-				outName = fmt.Sprintf("merge_h%d_c%d_k%s_r%d.bin", H, col, stage, idx)
+	var (
+		mu          sync.Mutex
+		cond        = sync.NewCond(&mu)
+		queue       []mapUnit
+		inflight    = map[int]*runningUnit{}
+		outstanding = n0
+		nextIdx     = n0
+		firstErr    error
+
+		outPaths  []string
+		totalRecs uint64
+		acct      Acct
+	)
+	estPer := uint64(1)
+	if n0 > 0 {
+		estPer = totalIn / uint64(n0)
+	}
+	for i := 0; i < n0; i++ {
+		queue = append(queue, mapUnit{idx: i, lo: los[i], hi: his[i], estTotal: estPer})
+	}
+
+	mctx, mcancel := context.WithCancel(ctx)
+	defer mcancel()
+
+	pickVictim := func() *runningUnit {
+		if grainRecs == 0 || !stealAllowed(activeHeights) {
+			return nil
+		}
+		now := time.Now()
+		grainSeconds := refGrainSeconds(grainRecs, completedRecords, completedSeconds)
+		var best *runningUnit
+		var bestScore float64
+		for _, r := range inflight {
+			if !stealEligible(r, grainRecs, grainSeconds, now) {
+				continue
 			}
-			outPath := filepath.Join(cfg.RunDir, outName)
-			a := MergeArgs{
-				InPaths: mapOuts,
-				H:       H,
-				OutPath: outPath,
-				Counter: cfg.CounterWidth,
-				KLoHex:  los[idx],
-				KHiHex:  his[idx],
-				Rev:     cfg.Rev,
-				KeyLen:  keyLen,
+			if sc := stealScore(r, now); sc > bestScore {
+				bestScore, best = sc, r
 			}
-			started := time.Now()
-			var r WorkerResult
-			var err error
-			if cfg.Pool != nil {
-				r, err = cfg.Pool.RunMerge(a)
-			} else {
-				sem <- struct{}{}
-				r, err = RunMergeWorker(ctx, cfg.Bin, a)
-				<-sem
+		}
+		if stealDebug {
+			var oldest *runningUnit
+			for _, r := range inflight {
+				if oldest == nil || r.started.Before(oldest.started) {
+					oldest = r
+				}
 			}
-			if unitLog {
-				fmt.Printf("event=mergerange H=%d col=%d r=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f start_unix=%.6f\n",
-					H, col, idx, los[idx], his[idx], r.OutRecords, r.Acct.CPUS, r.Acct.WallS, float64(started.UnixNano())/1e9)
+			if oldest != nil {
+				rem := oldest.remaining()
+				fmt.Printf("event=pickvictim-merge H=%d col=%d elapsed_oldest=%.3f processed=%d estTotal=%d rem=%d grainRecs=%d grainSeconds=%.6f score=%.3f picked=%v inflight=%d\n",
+					H, col, now.Sub(oldest.started).Seconds(), oldest.processed.Load(), oldest.u.estTotal, rem, grainRecs, grainSeconds, stealScore(oldest, now), best == oldest, len(inflight))
 			}
-			results[idx] = rangeResult{idx: idx, outPath: outPath, result: r, err: err}
-		}(i)
+		}
+		return best
+	}
+
+	var wg sync.WaitGroup
+	for w := 0; w < cfg.Cores; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for {
+				mu.Lock()
+				for {
+					if firstErr != nil || outstanding == 0 {
+						mu.Unlock()
+						return
+					}
+					if len(queue) > 0 {
+						break
+					}
+					if v := pickVictim(); v != nil {
+						v.stopped = true
+						close(v.stop)
+					}
+					cond.Wait()
+				}
+				u := queue[len(queue)-1]
+				queue = queue[:len(queue)-1]
+				r := &runningUnit{u: u, processed: new(atomic.Uint64), stop: make(chan struct{}), started: time.Now()}
+				inflight[u.idx] = r
+				mu.Unlock()
+
+				outName := fmt.Sprintf("merge_h%d_c%d_r%d.bin", H, col, u.idx)
+				if stage != "" {
+					outName = fmt.Sprintf("merge_h%d_c%d_k%s_r%d.bin", H, col, stage, u.idx)
+				}
+				outPath := filepath.Join(cfg.RunDir, outName)
+				a := MergeArgs{
+					InPaths: mapOuts,
+					H:       H,
+					OutPath: outPath,
+					Counter: cfg.CounterWidth,
+					KLoHex:  u.lo,
+					KHiHex:  u.hi,
+					Rev:     cfg.Rev,
+					KeyLen:  keyLen,
+				}
+				var res WorkerResult
+				var runErr error
+				if cfg.Pool != nil {
+					res, runErr = cfg.Pool.RunMerge(a, unitProgress(nil, r.processed), r.stop)
+				} else {
+					sem <- struct{}{}
+					res, runErr = RunMergeWorker(mctx, cfg.Bin, a, unitProgress(nil, r.processed), r.stop)
+					<-sem
+				}
+				if unitLog {
+					fmt.Printf("event=mergerange H=%d col=%d r=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f start_unix=%.6f stop_key=%s\n",
+						H, col, u.idx, u.lo, u.hi, res.OutRecords, res.Acct.CPUS, res.Acct.WallS, float64(r.started.UnixNano())/1e9, res.StopKey)
+				}
+
+				mu.Lock()
+				completedRecords += r.processed.Load()
+				completedSeconds += time.Since(r.started).Seconds()
+				delete(inflight, u.idx)
+				if runErr != nil {
+					if firstErr == nil {
+						firstErr = fmt.Errorf("merge range %d [%s,%s): %w", u.idx, u.lo, u.hi, runErr)
+						mcancel()
+					}
+					cond.Broadcast()
+					mu.Unlock()
+					continue
+				}
+				if res.OutRecords > 0 {
+					outPaths = append(outPaths, outPath)
+					totalRecs += res.OutRecords
+				} else {
+					removeRun(outPath)
+				}
+				acct.Add(res.Acct)
+
+				if res.StopKey != "" && res.StopKey != u.hi {
+					children := splitRemainder(mapOuts, H, keyLen, res.StopKey, u.hi,
+						cfg.Cores-len(inflight), r.remaining(), grainRecs, &nextIdx)
+					queue = append(queue, children...)
+					outstanding += len(children) - 1
+					if unitLog {
+						fmt.Printf("event=steal-merge H=%d col=%d victim_r=%d cursor=%s children=%d rem=%d\n",
+							H, col, u.idx, res.StopKey, len(children), r.remaining())
+					}
+				} else {
+					outstanding--
+				}
+				cond.Broadcast()
+				mu.Unlock()
+			}
+		}()
 	}
 	wg.Wait()
 
-	var outPaths []string
-	var totalRecs uint64
-	var acct Acct
-	for _, rr := range results {
-		if rr.err != nil {
-			return nil, 0, Acct{}, fmt.Errorf("merge range %d: %w", rr.idx, rr.err)
-		}
-		if rr.result.OutRecords > 0 {
-			outPaths = append(outPaths, rr.outPath)
-			totalRecs += rr.result.OutRecords
-		} else {
-			removeRun(rr.outPath)
-		}
-		acct.Add(rr.result.Acct)
+	if firstErr != nil {
+		return nil, 0, Acct{}, firstErr
 	}
 	return outPaths, totalRecs, acct, nil
 }
