@@ -224,3 +224,69 @@ here, and both improved. Deployed: `scripts/dalby_term.sh` now passes
 Next step: with both map's straggler tail (overlap-heights) and merge's
 fan-out overhead (merge-mult) addressed, run a fresh real production-scale
 measurement to see what now dominates.
+
+## Bottleneck #1, real production-scale follow-up (maxn=33): floor confirmed worse at scale
+
+Real production run via `dalby_term.sh 33` (both Bottleneck #1 and #2 fixes
+deployed): full validation passes end-to-end (a1-a33 all correct,
+`A33_VALIDATE_PASS`), confirming the earlier `dalby_term.sh` fix holds up on
+a genuinely new term. But **utilization measured 6.34%** on fresh data —
+much worse than a32's 44.0%.
+
+**False alarm ruled out first:** `cost_profile.tsv` uses append-mode
+(`orchestrator/telemetry.go`, `os.O_APPEND`) and `runs/ns_a33/` had stale
+rows from an earlier, pre-session a33 computation (before P13-15 closed-form
+were wired) mixed in with fresh rows — `run.log` (freshly truncated per
+run) confirmed zero real H18 events this run, contradicting the stale
+tsv's H18 rows. Real analysis used only `run.log`'s `event=column` lines.
+**Action item, not yet done:** `dalby_term.sh` should truncate/move aside a
+stale run-dir before reuse rather than relying on `mkdir -p`, so a future
+utilization measurement doesn't require this same manual disambiguation.
+
+**Real cause: Bottleneck #1's floor (Straggler Tail) gets worse as N grows,
+exactly as `design-08` Finding 3 predicted ("tail worsens with height").**
+H17 (the real top height at maxn=33) alone accounts for 6839.6s of the
+6842.7s total wall — it now dominates so completely that overlap-heights
+has almost nothing left to hide it behind. Per-unit instrumentation
+(`analyze_unit_concurrency.py` on H17 col5) confirms the same mechanism
+already diagnosed under Bottleneck #1: unit 319 (the last, open-ended
+key-range unit) tops the wall_s ranking in 9 of 10 rounds sampled, with
+wildly non-record-proportional cost (out_records ranging 4M-957M with no
+correlation to wall_s) — successor-count explosion is a property of which
+specific states land in that range, not of input balance. **Also newly
+observed: the same last-bucket pattern shows up in merge ranges too**
+(merge range 79/80, the open-ended one, tops every round sampled, though
+only ~2.1% of column wall vs map's ~8% — present but much less severe on
+the merge side). Folding this into Bottleneck #1 rather than a new
+bottleneck, since it's the identical root mechanism (SampleKeysMulti's
+open-ended last bucket + data-dependent successor-count variance), just now
+confirmed to also touch merge, not only map.
+
+**Two known dead ends reconfirmed applicable, not re-tested (per
+[[engine-utilization-and-scheduling]] in memory: finer unit-mult and plain
+LPT were already measured-rejected for this exact mechanism in a prior
+session) — do not re-attempt either for Bottleneck #1.**
+
+**The only remaining lever for this floor is the sub-record interrupt
+(checking the cooperative-stop flag inside `forEachViableMask`'s recursion,
+not just between records) already flagged as its own investigation.**
+Traced the call sites (`core/mapreduce.h:83,454`) and confirmed a
+lower-risk variant isn't available: the `fn` callback per emitted mask
+can't unilaterally stop the enclosing recursion without a flag check inside
+`viableRec` itself (`core/transition.h`), which is exactly the "invasive,
+regression risk on the 99% of non-pathological records" scope already
+flagged. Deliberately NOT attempted this round — it needs its own
+dedicated investigation with full gate/ASan/parallel validation and a real
+dalby A/B before trusting it, not a rushed change late in an already-long
+session. Left as a scoped, well-evidenced future item, not silently
+dropped.
+
+### Dead-end solutions tried (this round)
+
+- **checkpoint-overhead** (hypothesis: `--checkpoint-every 300`'s periodic
+  big.Int triangle serialization + file I/O measurably steals wall time):
+  real dalby A/B, maxn=30/overlap=15/merge-mult=1, `--checkpoint-every 300`
+  vs effectively off (`999999`): 305.7s vs 303.9s — **statistically
+  identical, confirmed negligible at these run lengths in one fast
+  (~5 min) test.** Do not re-investigate checkpoint frequency as a
+  utilization lever at this scale.

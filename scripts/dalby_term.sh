@@ -35,11 +35,20 @@ N="$1"
 RUNDIR=runs/ns_a${N}/dalby
 mkdir -p "$RUNDIR/spill" runs/ns_a${N}/perheight
 
-echo "=== a${N} KINK run starting: $(date -Iseconds) ==="
-echo "rev: $(git rev-parse --short HEAD)"
-
 RESUME_FLAG=""
 [ "$2" = "--resume" ] && RESUME_FLAG="--resume"
+
+# cost_profile.tsv is append-only (orchestrator/telemetry.go), so a fresh
+# (non-resume) run into a reused RUNDIR would silently mix stale rows from
+# any earlier run into this run's utilization numbers (bit us once this
+# round: a stale a33 cost_profile.tsv from before P13-15 closed-form were
+# wired made a genuinely-fixed height look like it was still real-swept --
+# docs/utilization-bottleneck-log.md). Resume must NOT touch it (or the
+# checkpoint/spill state); only clear it on a fresh start.
+[ -z "$RESUME_FLAG" ] && rm -f "$RUNDIR/cost_profile.tsv"
+
+echo "=== a${N} KINK run starting: $(date -Iseconds) ==="
+echo "rev: $(git rev-parse --short HEAD)"
 
 T0=$(date +%s)
 ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
