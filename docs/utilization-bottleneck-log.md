@@ -446,3 +446,13 @@ clean checkout), so not caused by this work. Full writeup:
 usage comment now warns about this explicitly. Not investigated further
 this round — flagged clearly rather than bundled into an unrelated fix or
 silently dropped.
+
+**Follow-up allocation fix (same theme as #4, not a new bottleneck):** a
+fresh heap profile taken WITH `--persistent-workers` enabled (the earlier
+profile predates this feature and is stale for reasoning about what's left
+— `os/exec`'s per-spawn machinery is gone entirely, as expected) found the
+new `workerProc.runRequest` code itself allocating: `requestLine+"\n"`
+copies the whole request line just to append one byte, once per work unit.
+Fixed with two separate writes (the `"\n"` is a zero-allocation string
+literal). Confirmed via before/after profile: `runRequest` drops off the
+top-allocator list entirely.
