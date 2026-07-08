@@ -50,6 +50,16 @@ RESUME_FLAG=""
 echo "=== a${N} KINK run starting: $(date -Iseconds) ==="
 echo "rev: $(git rev-parse --short HEAD)"
 
+# GOGC=1000: default GOGC (100) gave ~8000 GC cycles in a 5-minute run
+# (GODEBUG=gctrace=1 measured, tiny 8MB heap goal churning constantly,
+# Go's own self-reported ~5% CPU in GC) despite RAM never being a remote
+# concern (dalby has 122GB; even GOGC=1000's bigger heap goal stays under
+# 1GB). Bottleneck #3 (GC Churn). Real dalby A/B, maxn=30/overlap=15/
+# merge-mult=1: default 303.9s -> GOGC=400 288.7s -> GOGC=1000 283.4s
+# (diminishing returns past 400, settled on 1000) -- 6.7% faster overall,
+# correct a(30) at every setting.
+export GOGC=1000
+
 T0=$(date +%s)
 ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
   --cores 80 --ram 1073741824 --unit-mult 4 --merge-mult 1 --steal-grain 0.05 \

@@ -18,7 +18,8 @@ tried (good or bad).
 |---|---|---|---|
 | 1 | Straggler Tail | solved (overlap-heights=all, deployed) | 1.82x wall-clock, 21.6%->38.8% util, real maxn=30 A/B, correct output |
 | 2 | Merge Fan-Out Overhead | solved (merge-mult=1, deployed) | 19% wall-clock, 37% fewer CPU-seconds, real maxn=30 A/B, correct output |
-| 3 | TBD | — | — |
+| 3 | GC Churn | solved (GOGC=1000, deployed) | 6.7% wall-clock, real maxn=30 A/B, correct output |
+| 4 | TBD | — | — |
 
 ## Bottleneck #1: Straggler Tail
 
@@ -290,3 +291,36 @@ dropped.
   identical, confirmed negligible at these run lengths in one fast
   (~5 min) test.** Do not re-investigate checkpoint frequency as a
   utilization lever at this scale.
+
+## Bottleneck #3: GC Churn — SOLVED
+
+With the sub-record interrupt lever deliberately deferred (see above, too
+invasive to rush) and the map/merge straggler mechanism fully exhausted for
+this session, looked at a genuinely different layer: the Go orchestrator
+itself, not the C++ workers. `GODEBUG=gctrace=1` on a real dalby run
+(maxn=30, overlap=15, merge-mult=1) showed **8063 GC cycles in a ~305s
+run** (~26/sec) against a tiny 8MB heap goal — constant churn, Go's own
+self-reported ~5% CPU spent in GC. RAM was never remotely a concern (dalby
+has 122GB; even a much bigger heap goal is trivial), so the default GOGC=100
+threshold was needlessly aggressive for this workload's allocation pattern
+(lots of small, short-lived objects from goroutine/channel/map-unit
+bookkeeping, not a large working set).
+
+**Real dalby A/B, same code/config (maxn=30, overlap-heights=15,
+merge-mult=1):**
+
+| GOGC | wall | cpu_s | a(30) |
+|---|---:|---:|---|
+| 100 (default) | 303.9s | 7377.7 | correct |
+| 400 | 288.7s | 7688.9 | correct |
+| 1000 (deployed) | 283.4s | 7762.4 | correct |
+
+**6.7% wall-clock win end to end** (matches the self-reported ~5% GC
+overhead closely), diminishing returns past 400 so settled on 1000 rather
+than chasing marginal gains further (e.g. `GOGC=off` risks unbounded growth
+on a long production run for no measurable further win at this scale).
+Deployed: `scripts/dalby_term.sh` now sets `export GOGC=1000`.
+
+This is the first bottleneck this round found on the Go/orchestrator side
+rather than the C++ engine or scheduling logic — a genuinely different
+layer, not a variant of Bottlenecks #1/#2's mechanisms.
