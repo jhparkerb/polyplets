@@ -483,3 +483,15 @@ the whole budget.
 highest-value remaining lever for real production scale, dwarfing
 everything else combined.** Everything else accessible without that
 change has been found and correctly wrung dry.
+
+### Dead-end solutions tried (post-persistent-workers sweep)
+
+- **spill-zstd-toggle** (`POLY_NO_SPILL_ZSTD=1` vs default-on, same maxn=30/
+  persistent-workers/GOGC=1000 config): 264.7s vs 265.0s — statistically
+  identical. Inconclusive by scale, not a real dead end yet: a30 barely
+  spills at all (peak RSS well under the 1GiB budget), so this doesn't
+  test the real question (does compression help/hurt when H17-scale
+  spilling is actually substantial, confirmed via real RSS hitting 5.5GB
+  at maxn=33). Untested at the scale where it would matter — not
+  re-attempted this round given the ~1.9h cost per a33-scale trial, but
+  don't treat the a30 result as a real answer either way.
