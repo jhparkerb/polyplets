@@ -19,7 +19,8 @@ tried (good or bad).
 | 1 | Straggler Tail | solved (overlap-heights=all, deployed) | 1.82x wall-clock, 21.6%->38.8% util, real maxn=30 A/B, correct output |
 | 2 | Merge Fan-Out Overhead | solved (merge-mult=1, deployed) | 19% wall-clock, 37% fewer CPU-seconds, real maxn=30 A/B, correct output |
 | 3 | GC Churn | solved (GOGC=1000, deployed) | 6.7% wall-clock, real maxn=30 A/B, correct output |
-| 4 | TBD | — | — |
+| 4 | Allocation Overhead | solved (readIndexHeader fix, deployed) | 55%->lower share of a 20GB/run heap profile; real root cause behind #3's symptom |
+| 5 | Process-Per-Unit Spawn | solved (--persistent-workers, deployed) | 6.2% wall-clock, 7.7% fewer CPU-seconds, real maxn=30 A/B, correct output, zero orphaned processes |
 
 ## Bottleneck #1: Straggler Tail
 
@@ -339,3 +340,109 @@ layer, not a variant of Bottlenecks #1/#2's mechanisms.
   unit-mult) — finer map splitting still helps the many non-dominant
   columns even though it can't fix the dominant straggler's floor. Do not
   retry lowering `--unit-mult` below 4.
+
+## Bottleneck #4: Allocation Overhead — SOLVED
+
+`GODEBUG=gctrace=1` on a real dalby run (maxn=30/overlap=15/merge-mult=1)
+showed 8063 GC cycles in ~305s against a tiny 8MB heap goal. Bottleneck #3
+tuned `GOGC=1000` around this symptom; jasonp's direct pushback ("rather
+than tune I think you have to get to the bottom of why it was firing so
+often") led to root-causing it with a real heap-alloc profile
+(`POLY_MEMPROFILE`, `runtime/pprof.WriteHeapProfile`, gated diagnostic in
+`orchestrator/cmd/orchestrate/main.go`).
+
+**Root cause: `readIndexHeader` allocated a full 4KB `bufio.Reader` just to
+decode a 19-byte fixed header, at two call sites that then never touched
+the reader again** (everything else uses positioned `f.ReadAt`) —
+`SampleKeysMulti` alone was 55% of a real run's total allocation (11.7GB of
+21.4GB). Fixed: `readIndexHeader` now takes a plain `io.Reader` and decodes
+the header via one `io.ReadFull` into a stack array — one syscall, zero
+heap allocation, replacing 5 buffered `binary.Read` calls through a wasted
+buffer. Also right-sized `ParseHeader`'s buffer (256 bytes, not 4KB, for a
+genuinely-streamed but tiny text header) after a follow-up profile showed
+it as the new #4 allocator.
+
+**Fast local iteration loop**, also built this round per jasonp's direct
+feedback that a ~5min dalby round-trip is far too slow for allocation
+questions: `orchestrator/sample_bench_test.go` (`go test -bench
+-benchmem`) exercises the exact hot path against a realistic local fixture
+(6400-entry `.idx`) in ~0.5s total. Use this for future allocation
+iteration; reserve real dalby runs for confirming a promising local result
+at production scale.
+
+At `maxn=30` with `GOGC=1000` already masking most of the symptom, the
+wall-clock delta from this fix alone was flat (282.5s vs 283.4s, noise) —
+expected, since GOGC=1000 already suppressed most GC overhead; the value
+is in cutting real allocation volume/syscalls (matters more at larger
+scale and independent of GOGC tuning), not in this specific benchmark's
+wall-clock. Verified via a second heap profile that the fix actually
+reduced `sampleIndexKeys`'s allocation footprint (~24% cumulative
+reduction) — a before/after comparison, not just a plausible-sounding
+change.
+
+## Bottleneck #5: Process-Per-Unit Spawn — SOLVED
+
+jasonp's standing, repeated point (not a new observation from me): map and
+merge workers run for a fraction of a second each and pay real fork+exec
+startup cost every single time, spawned fresh per work unit — thousands of
+times per real run, purely because that's architecturally simpler than a
+real worker pool. Circled for the whole project's history, never done.
+
+**Fix, two halves:**
+
+- **C++ (`worker/map_worker.cpp`, `worker/merge_worker.cpp`)**: refactored
+  the one-shot request handling into `runOneRequest(tokens)`, callable
+  either from argv (unchanged one-shot path, byte-for-byte the prior
+  behavior) or in a loop reading whitespace-tokenized request lines from
+  stdin (`--persistent`), one request per line, until EOF. `g_terminate`
+  resets between requests so a prior request's SIGTERM can't bleed into
+  the next one. Gated: `test/gate_persistent_worker.cpp` drives the real
+  compiled binaries — the full kink seed/stage/finalize chain for one
+  column through ONE persistent process (vs H+2 spawns), byte-matched
+  against the column-kernel one-shot path; RED confirmed by reverting the
+  feature (real "unknown arg: --persistent" failure) before wiring into
+  `ns-gates`/`ns-gate-fast`. Also covers merge_worker and two independent
+  columns/merges replayed through one process (no state bleed).
+
+- **Go (`orchestrator/workerpool.go`)**: `WorkerPool` holds `size` slots,
+  each lazily starting at most one persistent map_worker + one persistent
+  merge_worker and keeping them alive for the pool's whole lifetime. A slot
+  is one concurrency unit whether serving a map or merge request —
+  preserves the exact same Cores-wide concurrency ceiling the old shared
+  `sem` channel gave (map and merge compete for the same budget under
+  overlap-heights; two separate pools would have doubled it). Wired into
+  `mapPhase`/`mergePhase` via a new `cfg.Pool` field (nil-safe, falls back
+  to the original exec-per-unit path unchanged) and a new
+  `--persistent-workers` CLI flag.
+
+**Caught and fixed while validating**: a leftover, unconditional `sem <-
+struct{}{}` at the old map dispatch site that I forgot to remove when
+adding the pool branch — double-acquired (or in the pool path, acquired
+and never released) the Cores-wide semaphore, deadlocking
+`TestHeightNm2NoColumnWork` under `go test`. Confirmed by reverting
+`sweep.go` alone (test passed clean without the change, hung with it) —
+a real bug, not a flaky test.
+
+**Real dalby A/B, same code/config (maxn=30, overlap-heights=15,
+merge-mult=1, GOGC=1000):**
+
+| | wall | cpu_s | a(30) |
+|---|---:|---:|---|
+| exec-per-unit (default) | 282.5s | 7755.3 | correct |
+| --persistent-workers | 265.0s | 7155.8 | correct |
+
+**6.2% faster wall-clock, 7.7% fewer CPU-seconds, correct output, zero
+orphaned map_worker/merge_worker processes** after both a normal exit and
+a real SIGTERM (checked via `ps` on dalby). Deployed:
+`scripts/dalby_term.sh` now passes `--persistent-workers`.
+
+**Found and separately flagged, not fixed here**: while validating kill+
+resume specifically under `--persistent-workers`, found a real,
+**pre-existing** correctness bug — real SIGTERM + `--resume` on the kink
+kernel produces wrong `a(n)` values (consistent over-count). Confirmed
+present identically without `--persistent-workers` (exec-per-unit path,
+clean checkout), so not caused by this work. Full writeup:
+`results/kink-resume-sigterm-bug.md`. `scripts/dalby_term.sh`'s `--resume`
+usage comment now warns about this explicitly. Not investigated further
+this round — flagged clearly rather than bundled into an unrelated fix or
+silently dropped.

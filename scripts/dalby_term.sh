@@ -28,6 +28,11 @@
 # regression despite the lower ratio.)
 #
 # Resume: dalby_term.sh N --resume
+# ** --resume is currently UNSAFE for this kernel: real SIGTERM + resume on
+# ** the kink kernel has a confirmed, pre-existing correctness bug (wrong
+# ** a(n), consistent over-count) -- results/kink-resume-sigterm-bug.md.
+# ** Not caused by anything in this script; not yet fixed. Do not trust a
+# ** resumed run's output without independently re-validating it.
 set -e
 cd ~/src/polyominoes-ns
 N="$1"
@@ -60,10 +65,17 @@ echo "rev: $(git rev-parse --short HEAD)"
 # correct a(30) at every setting.
 export GOGC=1000
 
+# --persistent-workers: a pool of long-lived --persistent map_worker/
+# merge_worker processes fed one request per work item over a pipe, instead
+# of a fresh fork+exec per unit (thousands of sub-second spawns per real
+# run). Bottleneck #5. Validated real dalby A/B, maxn=30/overlap=15/
+# merge-mult=1/GOGC=1000: 282.5s/7755.3 cpu_s -> 265.0s/7155.8 cpu_s --
+# 6.2% faster wall, 7.7% fewer CPU-seconds, correct a(30), zero orphaned
+# processes after normal exit or a real SIGTERM.
 T0=$(date +%s)
 ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
   --cores 80 --ram 1073741824 --unit-mult 4 --merge-mult 1 --steal-grain 0.05 \
-  --overlap-heights "$N" \
+  --overlap-heights "$N" --persistent-workers \
   --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" \
   --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 300 $RESUME_FLAG \
   --per-height-out runs/ns_a${N}/perheight \
