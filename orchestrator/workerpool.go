@@ -74,8 +74,16 @@ func startPersistentWorker(ctx context.Context, binary string) (*workerProc, err
 // this one request so it can't fire against a LATER request reusing the
 // same slot.
 func (w *workerProc) runRequest(requestLine string, onProgress func(uint64), stop <-chan struct{}) (WorkerResult, error) {
-	if _, err := io.WriteString(w.stdin, requestLine+"\n"); err != nil {
+	// Two writes, not one requestLine+"\n" concatenation: the "\n" is a
+	// static string literal (zero allocation), while "+" would allocate a
+	// fresh copy of the whole line just to append one byte -- real cost at
+	// this call frequency (once per work unit), found via a real heap-alloc
+	// profile with --persistent-workers enabled.
+	if _, err := io.WriteString(w.stdin, requestLine); err != nil {
 		return WorkerResult{}, fmt.Errorf("write request: %w", err)
+	}
+	if _, err := io.WriteString(w.stdin, "\n"); err != nil {
+		return WorkerResult{}, fmt.Errorf("write request newline: %w", err)
 	}
 
 	done := make(chan struct{})
