@@ -1396,6 +1396,7 @@ func mergePhase(
 	// sem (the Cores-wide worker pool) is shared across concurrently-running
 	// heights in overlap mode; here one height's merge can fill cores a
 	// concurrent height's map phase has freed.
+	unitLog := os.Getenv("POLY_UNIT_LOG") != ""
 	var wg sync.WaitGroup
 	for i := 0; i < actualRanges; i++ {
 		wg.Add(1)
@@ -1419,7 +1420,12 @@ func mergePhase(
 				Rev:     cfg.Rev,
 				KeyLen:  keyLen,
 			}
+			started := time.Now()
 			r, err := RunMergeWorker(ctx, cfg.Bin, a)
+			if unitLog {
+				fmt.Printf("event=mergerange H=%d col=%d r=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f start_unix=%.6f\n",
+					H, col, idx, los[idx], his[idx], r.OutRecords, r.Acct.CPUS, r.Acct.WallS, float64(started.UnixNano())/1e9)
+			}
 			results[idx] = rangeResult{idx: idx, outPath: outPath, result: r, err: err}
 		}(i)
 	}
