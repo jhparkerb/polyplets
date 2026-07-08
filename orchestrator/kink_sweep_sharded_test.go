@@ -16,6 +16,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -69,6 +70,7 @@ func runOneHeightSharded(t *testing.T, H, maxn, K int) []*big.Int {
 		SpillDir: spill,
 		Rev:      "test",
 		Bin:      DefaultWorkerBin(".."),
+		ShardedK: K,
 	}
 
 	seed := filepath.Join(dir, "seed.bin")
@@ -76,11 +78,16 @@ func runOneHeightSharded(t *testing.T, H, maxn, K int) []*big.Int {
 		t.Fatalf("WriteSeedPolyrun: %v", err)
 	}
 
+	tel, err := newTelemetry(cfg, time.Now())
+	if err != nil {
+		t.Fatalf("newTelemetry: %v", err)
+	}
 	sem := make(chan struct{}, cfg.Cores)
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cancel()
+	activeHeights := new(atomic.Int32)
+	activeHeights.Store(1)
+	noopCkpt := func(int, int, []string, []*big.Int) {}
 
-	hTri, err := sweepHeightKinkSharded(ctx, cfg, H, maxn, K, []string{seed}, sem)
+	hTri, _, err := sweepHeightKinkSharded(context.Background(), cfg, H, 0, []string{seed}, noopCkpt, tel, sem, activeHeights)
 	if err != nil {
 		t.Fatalf("sweepHeightKinkSharded(H=%d,maxn=%d,K=%d): %v", H, maxn, K, err)
 	}

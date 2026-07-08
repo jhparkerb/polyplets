@@ -54,13 +54,18 @@ func main() {
 	costProfileRef := flag.String("cost-profile-ref", "", "reference cost profile to drive the live ETA")
 	heightsArg := flag.String("heights", "", "subset of heights to sweep, e.g. 1-12 or 17,19,20 (default: all 1..maxn; for multi-machine split)")
 	perHeightOut := flag.String("per-height-out", "", "dir to write per-height h<H>.out rows (for combine + old-engine cross-check)")
-	kernel := flag.String("kernel", "column", "sweep kernel: column (default) or kink")
+	kernel := flag.String("kernel", "column", "sweep kernel: column (default), kink, or kink-sharded (redesign branch: K-shard-private column sweep, one merge point per column instead of H+1 barriers -- requires --sharded-k; see core/kink_sharded.h)")
+	shardedK := flag.Int("sharded-k", 0, "shard count per column for --kernel kink-sharded (required if that kernel is selected)")
 	shardedValidateK := flag.Int("sharded-validate", 0, "VALIDATION ONLY (redesign branch, not a production mode): if >0, run a real height sweep two ways -- the standard column kernel and the sharded-private kink design (core/kink_sharded.h) with this many shards -- report whether their triangle rows match exactly, then exit. Writes no checkpoint/combine output. Requires --sharded-validate-height.")
 	shardedValidateHeight := flag.Int("sharded-validate-height", 0, "height to validate with --sharded-validate (required if --sharded-validate is set)")
 	flag.Parse()
 
-	if *kernel != "column" && *kernel != "kink" {
-		fmt.Fprintf(os.Stderr, "orchestrate: --kernel must be column or kink, got %q\n", *kernel)
+	if *kernel != "column" && *kernel != "kink" && *kernel != "kink-sharded" {
+		fmt.Fprintf(os.Stderr, "orchestrate: --kernel must be column, kink, or kink-sharded, got %q\n", *kernel)
+		os.Exit(2)
+	}
+	if *kernel == "kink-sharded" && *shardedK < 1 {
+		fmt.Fprintln(os.Stderr, "orchestrate: --kernel kink-sharded requires --sharded-k >= 1")
 		os.Exit(2)
 	}
 
@@ -139,6 +144,7 @@ func main() {
 		Heights:         heights,
 		PerHeightOut:    *perHeightOut,
 		Kernel:          *kernel,
+		ShardedK:        *shardedK,
 		Bin:             bin,
 	}
 

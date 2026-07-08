@@ -163,25 +163,123 @@ func sweepColumnSharded(
 	return nextFrontier, triContribs, acct, nil
 }
 
-// sweepHeightKinkSharded drives a whole height's column-by-column sweep
-// using sweepColumnSharded, mirroring sweepHeightKink's own outer column
-// loop shape but WITHOUT its checkpoint/resume/telemetry/overlap-heights
-// machinery -- this is a validation driver (see ValidateShardedHeight
-// below), not a production dispatch path. Wiring the sharded design into
-// sweepHeightKink's full machinery is deliberately a separate, later step
-// once this has been validated at real scale.
-func sweepHeightKinkSharded(ctx context.Context, cfg SweepConfig, H, maxn, K int, seed []string, sem chan struct{}) ([]*big.Int, error) {
-	hTri := newBigRow(maxn + 1)
-	frontier := seed
-	for col := 0; col <= maxn && len(frontier) > 0; col++ {
-		next, triContribs, _, err := sweepColumnSharded(ctx, cfg, H, col, K, frontier, sem)
-		if err != nil {
-			return nil, fmt.Errorf("col=%d: %w", col, err)
+// sweepHeightKinkSharded sweeps one height H from startCol using the
+// sharded-private kink kernel (redesign branch, core/kink_sharded.h): each
+// column runs via sweepColumnSharded (cfg.ShardedK parallel shards, one
+// merge point) instead of sweepHeightKink's H+1-barrier-per-column round
+// sequence. Conforms to sweepHeightFn exactly (real checkpoint writes,
+// ctx cancellation, telemetry) so it's a genuine, dispatchable production
+// kernel via --kernel kink-sharded -- not a side validation-only path.
+// Checkpointing is column-level, same granularity as sweepHeight/
+// sweepHeightKink: a crash mid-column re-runs that column's shard sweep
+// from its own start (idempotent -- shard sweeps and the merge+finalize
+// step are pure functions of their inputs).
+func sweepHeightKinkSharded(
+	ctx context.Context,
+	cfg SweepConfig,
+	H, startCol int,
+	frontier []string,
+	writeCheckpoint func(H, col int, frontier []string, hTri []*big.Int),
+	tel *telemetry,
+	sem chan struct{},
+	activeHeights *atomic.Int32,
+) ([]*big.Int, Acct, error) {
+
+	if H == cfg.Maxn {
+		return nil, Acct{}, fmt.Errorf("sweepHeightKinkSharded: column work started at top height H=%d (maxn=%d); closed-form short-circuit was bypassed", H, cfg.Maxn)
+	}
+	K := cfg.ShardedK
+	if K < 1 {
+		K = 1
+	}
+
+	hTri := newBigRow(cfg.Maxn + 1)
+	var acct Acct
+	lastCkpt := time.Now()
+
+	forwardCheckpoint := func(col int, frontier []string) {
+		writeCheckpoint(H, col, frontier, hTri)
+		if cfg.afterColumn != nil {
+			cfg.afterColumn(H, col)
 		}
-		addTriContribs(hTri, triContribs, maxn)
+	}
+
+	for col := startCol; col <= cfg.Maxn; col++ {
+		if len(frontier) == 0 {
+			break
+		}
+
+		select {
+		case <-ctx.Done():
+			writeCheckpoint(H, col-1, frontier, hTri)
+			return hTri, acct, ctx.Err()
+		default:
+		}
+
+		colStart := time.Now()
+		stopHB := tel.startColumn(H, col)
+		frontierIn := sumFrontierRecords(frontier)
+
+		next, triContribs, colAcct, err := sweepColumnSharded(ctx, cfg, H, col, K, frontier, sem)
+		stopHB()
+		if err != nil {
+			// hTri does NOT yet include current col's contributions.
+			writeCheckpoint(H, col-1, frontier, hTri)
+			return hTri, acct, fmt.Errorf("H=%d col=%d sharded: %w", H, col, err)
+		}
+		acct.Add(colAcct)
+
+		// Both the shard sweep and finalize succeeded: now accumulate this
+		// col's contributions, same ordering sweepHeight/sweepHeightKink use
+		// so a failed column never gets double- or half-counted on resume.
+		addTriContribs(hTri, triContribs, cfg.Maxn)
+
+		oldFrontier := frontier
+		frontierOut := sumFrontierRecords(next)
+		colWall := time.Since(colStart).Seconds()
+
+		// Per-column telemetry: no separate map/merge phase split here (the
+		// sharded design's one shard-dispatch + one finalize call isn't the
+		// same map/merge shape sweepHeight/sweepHeightKink report), so the
+		// K shard calls are reported under Map* and the single finalize call
+		// under Merge* -- an honest approximation of the same two-phase
+		// shape, not a fabricated breakdown.
+		tel.observe(ColumnCost{
+			H: H, Col: col,
+			FrontierIn:   frontierIn,
+			FrontierOut:  frontierOut,
+			WallS:        colWall,
+			CPUS:         colAcct.CPUS,
+			RSSMax:       colAcct.RSSMax,
+			MapWallS:     colWall,
+			MapCPUS:      colAcct.CPUS,
+			NMapUnits:    K,
+			NMergeRanges: 1,
+		})
+
+		if frontierOut == 0 {
+			// Height exhausted: write a "height-done" checkpoint with nil
+			// frontier BEFORE GC, same ordering sweepHeight/sweepHeightKink use.
+			forwardCheckpoint(col, nil)
+			for _, p := range oldFrontier {
+				removeRun(p)
+			}
+			frontier = nil
+			break
+		}
+
+		interval := cfg.CheckpointEvery
+		if interval == 0 || time.Since(lastCkpt) >= interval {
+			forwardCheckpoint(col, next)
+			lastCkpt = time.Now()
+		}
+
+		for _, p := range oldFrontier {
+			removeRun(p)
+		}
 		frontier = next
 	}
-	return hTri, nil
+	return hTri, acct, nil
 }
 
 // ValidateShardedHeight runs ONE real height sweep two ways -- the
@@ -220,7 +318,9 @@ func ValidateShardedHeight(ctx context.Context, cfg SweepConfig, H, K int, seed 
 		return false, nil, fmt.Errorf("reference sweepHeight: %w", err)
 	}
 
-	shTri, err := sweepHeightKinkSharded(ctx, cfg, H, cfg.Maxn, K, shSeed, sem)
+	shCfg := cfg
+	shCfg.ShardedK = K
+	shTri, _, err := sweepHeightKinkSharded(ctx, shCfg, H, 0, shSeed, noopCkpt, tel, sem, activeHeights)
 	if err != nil {
 		return false, nil, fmt.Errorf("sharded sweep: %w", err)
 	}

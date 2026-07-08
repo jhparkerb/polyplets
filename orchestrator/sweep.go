@@ -25,7 +25,8 @@ import (
 type SweepConfig struct {
 	Maxn            int
 	Fold            bool
-	Kernel          string // "column" (default) or "kink"; empty = "column"
+	Kernel          string // "column" (default), "kink", or "kink-sharded"; empty = "column"
+	ShardedK        int    // kink-sharded kernel only: shard count per column (core/kink_sharded.h)
 	Cores           int           // max concurrent workers
 	UnitMult        int           // MAP work units per core (default 1); units = Cores*UnitMult, concurrency stays Cores
 	MergeMult       int           // MERGE ranges per core (0 = follow UnitMult); set low to cut the (cores*mult)^2 merge fan-in
@@ -258,11 +259,17 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	sem := make(chan struct{}, cfg.Cores)
 
 	// Kernel dispatch: sweepHeight (whole-column) unless --kernel kink selects
-	// sweepHeightKink (per-cell boundary sweep). Both share sweepHeightFn's
-	// signature so the sequential and overlap paths below need no other change.
+	// sweepHeightKink (per-cell boundary sweep) or --kernel kink-sharded selects
+	// sweepHeightKinkSharded (redesign branch: K-shard-private column sweep,
+	// one merge point per column instead of H+1 barriers — see
+	// core/kink_sharded.h). All three share sweepHeightFn's signature so the
+	// sequential and overlap paths below need no other change.
 	sweepFn := sweepHeight
-	if kernelName(cfg.Kernel) == "kink" {
+	switch kernelName(cfg.Kernel) {
+	case "kink":
 		sweepFn = sweepHeightKink
+	case "kink-sharded":
+		sweepFn = sweepHeightKinkSharded
 	}
 
 	if cfg.OverlapHeights > 1 {
