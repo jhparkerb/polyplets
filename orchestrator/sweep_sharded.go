@@ -23,9 +23,13 @@ package orchestrator
 import (
 	"context"
 	"fmt"
+	"io"
 	"math/big"
+	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
+	"time"
 )
 
 // sweepColumnSharded runs ONE kink column via the sharded-private design:
@@ -157,4 +161,118 @@ func sweepColumnSharded(
 	}
 
 	return nextFrontier, triContribs, acct, nil
+}
+
+// sweepHeightKinkSharded drives a whole height's column-by-column sweep
+// using sweepColumnSharded, mirroring sweepHeightKink's own outer column
+// loop shape but WITHOUT its checkpoint/resume/telemetry/overlap-heights
+// machinery -- this is a validation driver (see ValidateShardedHeight
+// below), not a production dispatch path. Wiring the sharded design into
+// sweepHeightKink's full machinery is deliberately a separate, later step
+// once this has been validated at real scale.
+func sweepHeightKinkSharded(ctx context.Context, cfg SweepConfig, H, maxn, K int, seed []string, sem chan struct{}) ([]*big.Int, error) {
+	hTri := newBigRow(maxn + 1)
+	frontier := seed
+	for col := 0; col <= maxn && len(frontier) > 0; col++ {
+		next, triContribs, _, err := sweepColumnSharded(ctx, cfg, H, col, K, frontier, sem)
+		if err != nil {
+			return nil, fmt.Errorf("col=%d: %w", col, err)
+		}
+		addTriContribs(hTri, triContribs, maxn)
+		frontier = next
+	}
+	return hTri, nil
+}
+
+// ValidateShardedHeight runs ONE real height sweep two ways -- the
+// standard column kernel (sweepHeight, the trusted reference) and the
+// sharded-private kink design (sweepHeightKinkSharded, K shards) -- and
+// reports whether their triangle rows match exactly. Exported so
+// cmd/orchestrate can offer a real CLI entry point for validating this
+// design at whatever scale the caller chooses, without touching
+// sweepHeightKink's production dispatch path or writing any checkpoint/
+// combine output. mismatches, if any, are one string per differing n:
+// "n=<n>: reference=<v> sharded=<v>".
+func ValidateShardedHeight(ctx context.Context, cfg SweepConfig, H, K int, seed []string, sem chan struct{}) (match bool, mismatches []string, err error) {
+	tel, err := newTelemetry(cfg, time.Now())
+	if err != nil {
+		return false, nil, fmt.Errorf("telemetry: %w", err)
+	}
+	activeHeights := new(atomic.Int32)
+	activeHeights.Store(1)
+	noopCkpt := func(int, int, []string, []*big.Int) {}
+
+	// Both sweeps consume (and eventually delete, via removeRuns) their own
+	// frontier files as they iterate columns -- give each its own copy of
+	// the seed so the reference run's normal cleanup can't delete the
+	// sharded run's input out from under it.
+	refSeed, err := copySeedFiles(seed, "ref")
+	if err != nil {
+		return false, nil, fmt.Errorf("copy seed for reference: %w", err)
+	}
+	shSeed, err := copySeedFiles(seed, "sharded")
+	if err != nil {
+		return false, nil, fmt.Errorf("copy seed for sharded: %w", err)
+	}
+
+	refTri, _, err := sweepHeight(ctx, cfg, H, 0, refSeed, noopCkpt, tel, sem, activeHeights)
+	if err != nil {
+		return false, nil, fmt.Errorf("reference sweepHeight: %w", err)
+	}
+
+	shTri, err := sweepHeightKinkSharded(ctx, cfg, H, cfg.Maxn, K, shSeed, sem)
+	if err != nil {
+		return false, nil, fmt.Errorf("sharded sweep: %w", err)
+	}
+
+	for n := 1; n <= cfg.Maxn; n++ {
+		rv := bigOrZero(refTri, n)
+		sv := bigOrZero(shTri, n)
+		if rv.Cmp(sv) != 0 {
+			mismatches = append(mismatches, fmt.Sprintf("n=%d: reference=%s sharded=%s", n, rv, sv))
+		}
+	}
+	return len(mismatches) == 0, mismatches, nil
+}
+
+func bigOrZero(row []*big.Int, n int) *big.Int {
+	if n < len(row) && row[n] != nil {
+		return row[n]
+	}
+	return new(big.Int)
+}
+
+// copySeedFiles copies each path in `paths` (and its .idx sidecar, if
+// present) to a fresh "<original>.<suffix>copy" path, so two independent
+// sweeps can each consume (and eventually delete, via the normal
+// removeRuns cleanup every sweepHeightFn does as it advances columns)
+// their own frontier files without racing each other.
+func copySeedFiles(paths []string, suffix string) ([]string, error) {
+	out := make([]string, len(paths))
+	for i, p := range paths {
+		dst := p + "." + suffix + "copy"
+		if err := copyFile(p, dst); err != nil {
+			return nil, err
+		}
+		if err := copyFile(p+".idx", dst+".idx"); err != nil && !os.IsNotExist(err) {
+			return nil, err
+		}
+		out[i] = dst
+	}
+	return out, nil
+}
+
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, err = io.Copy(out, in)
+	return err
 }

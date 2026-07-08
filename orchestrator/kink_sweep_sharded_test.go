@@ -20,27 +20,6 @@ import (
 	"time"
 )
 
-// sweepHeightKinkSharded drives a whole height's column-by-column sweep
-// using sweepColumnSharded (K shards, one merge point) instead of
-// sweepHeightKink's per-round mapPhase/mergePhase barriers. Test-only
-// glue: this is deliberately NOT promoted to production dispatch (no
-// checkpoint/resume, no telemetry, no overlap-heights) -- it exists only
-// to drive sweepColumnSharded across a real multi-column height for
-// validation, matching kink_sweep_test.go's runOneHeight harness shape.
-func sweepHeightKinkSharded(ctx context.Context, cfg SweepConfig, H, maxn, K int, seed []string, sem chan struct{}) ([]*big.Int, error) {
-	hTri := newBigRow(maxn + 1)
-	frontier := seed
-	for col := 0; col <= maxn && len(frontier) > 0; col++ {
-		next, triContribs, _, err := sweepColumnSharded(ctx, cfg, H, col, K, frontier, sem)
-		if err != nil {
-			return nil, fmt.Errorf("col=%d: %w", col, err)
-		}
-		addTriContribs(hTri, triContribs, maxn)
-		frontier = next
-	}
-	return hTri, nil
-}
-
 func TestKinkSweepShardedMatchesColumnSweep(t *testing.T) {
 	cases := []struct {
 		H, maxn, K int
@@ -72,7 +51,8 @@ func TestKinkSweepShardedMatchesColumnSweep(t *testing.T) {
 
 // runOneHeightSharded is runOneHeight's counterpart for the sharded
 // design: same real-seed, real-compiled-worker setup, driven via
-// sweepHeightKinkSharded instead of a sweepHeightFn.
+// sweepHeightKinkSharded (orchestrator/sweep_sharded.go) instead of a
+// sweepHeightFn.
 func runOneHeightSharded(t *testing.T, H, maxn, K int) []*big.Int {
 	t.Helper()
 	dir := t.TempDir()
@@ -105,4 +85,42 @@ func runOneHeightSharded(t *testing.T, H, maxn, K int) []*big.Int {
 		t.Fatalf("sweepHeightKinkSharded(H=%d,maxn=%d,K=%d): %v", H, maxn, K, err)
 	}
 	return hTri
+}
+
+// TestValidateShardedHeight exercises the EXPORTED entry point
+// cmd/orchestrate's --sharded-validate flag calls -- same real-worker
+// setup, but through the public API surface instead of the internal
+// sweepHeightKinkSharded driver directly.
+func TestValidateShardedHeight(t *testing.T) {
+	dir := t.TempDir()
+	spill := filepath.Join(dir, "spill")
+	if err := os.MkdirAll(spill, 0o777); err != nil {
+		t.Fatalf("mkdir spill: %v", err)
+	}
+	const H, maxn, K = 8, 16, 8
+	cfg := SweepConfig{
+		Maxn:     maxn,
+		Fold:     true,
+		Cores:    4,
+		RAM:      4 << 20,
+		RunDir:   dir,
+		SpillDir: spill,
+		Rev:      "test",
+		Bin:      DefaultWorkerBin(".."),
+	}
+	seed := filepath.Join(dir, "seed.bin")
+	if err := WriteSeedPolyrun(seed, cfg.Rev, H, maxn, cfg.CounterWidth); err != nil {
+		t.Fatalf("WriteSeedPolyrun: %v", err)
+	}
+	sem := make(chan struct{}, cfg.Cores)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	match, mismatches, err := ValidateShardedHeight(ctx, cfg, H, K, []string{seed}, sem)
+	if err != nil {
+		t.Fatalf("ValidateShardedHeight: %v", err)
+	}
+	if !match {
+		t.Fatalf("ValidateShardedHeight(H=%d,maxn=%d,K=%d) mismatches: %v", H, maxn, K, mismatches)
+	}
 }
