@@ -672,3 +672,29 @@ now: locally and structurally) but isn't the DOMINANT driver of the 16x
 per-stage wall-time growth observed earlier — something else is, still
 unidentified. Deployed anyway (real, harmless, small win); the search for
 the actual dominant driver continues.
+
+### Reconciling the fix's real-scale flatness: what the data actually shows
+
+`map_cpu_s` stays roughly flat-to-declining across stages 6-16 (113-135
+cpu-s) while `map_wall_s` climbs 2.7x (17.3s -> 45.6s) for the SAME
+near-constant frontier_in. If per-record cost were rising uniformly
+across all 320 units, cpu_s would climb too (more total work, same
+concurrency ratio) — it doesn't. **This means the imbalance is about
+WHICH units end up expensive, not a uniform per-record slowdown** —
+consistent with the combine() fix (which reduces a uniform per-collision
+cost) barely moving wall-clock: it doesn't change WHICH key ranges end up
+disproportionately loaded, just makes each of them somewhat cheaper.
+
+This converges on the same root cause already named for Bottleneck #1
+(`SampleKeysMulti` splits by record COUNT, blind to COST) and the
+already-confirmed-inherent RGS structural skew (terminal-sort
+investigation, 4 dead ends). Both accessible fixes for THIS specific
+manifestation — finer splitting (dead end, already rejected) and
+reducing per-collision cost (real but insufficient, this section) — are
+now tried. **What's left is not a quick fix**: either a genuinely
+different, cost-aware splitting strategy (a real architecture change,
+out of scope for this round) or a kink-specific sub-record interrupt
+(different in shape from the column-kernel design already ruled
+mistargeted — kink's `kinkStageTransition` is cheap, so an interrupt
+would need to act at the shard-level sort/dedup boundary, not the
+per-record transition; not designed this round).
