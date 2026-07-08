@@ -213,12 +213,26 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
   const double t0_wall = wallSeconds();
   const double t0_cpu  = cpuSeconds();
 
-  // Throttled progress emitter: at most one event=progress line every ~2s.
-  // The orchestrator streams these to drive the within-column heartbeat.
+  // Throttled progress emitter: at most one event=progress line every ~2s,
+  // EXCEPT the very first call, which fires immediately regardless of
+  // elapsed time. The orchestrator streams these to drive the within-column
+  // heartbeat AND gates work-stealing eligibility on processed>0
+  // (stealEligible, orchestrator/sweep.go) -- with the old unconditional 2s
+  // throttle, any unit whose whole runtime was under 2s reported
+  // processed=0 for its entire life, making it permanently un-stealable no
+  // matter how much of the pool was waiting on it (found investigating why
+  // a single-unit-inflight column with idle thief-workers spinning on
+  // pickVictim never actually stole anything: picked=false because
+  // processed=0 the whole time, elapsed well under 2s). The wall-time-floor
+  // fix (Bottleneck #1, commit 208864b) never reached this -- it only
+  // patched stealEligible's record-count gate, downstream of this earlier,
+  // harder processed==0 early return.
   double last_emit = t0_wall;
+  bool emitted_once = false;
   auto on_progress = [&](size_t n) {
     const double now = wallSeconds();
-    if (now - last_emit >= 2.0) {
+    if (!emitted_once || now - last_emit >= 2.0) {
+      emitted_once = true;
       last_emit = now;
       std::printf("event=progress processed=%zu elapsed_s=%.1f\n", n, now - t0_wall);
       std::fflush(stdout);
