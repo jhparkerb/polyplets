@@ -24,11 +24,18 @@ using Clock = std::chrono::steady_clock;
 
 // Builds a sorted Run<W> of `n` records over `distinctKeys` distinct sig
 // values (so avg collisions per key = n/distinctKeys), each with a count-vec
-// window of `width` entries -- mimicking a real kink stage table shard.
+// window of `width` entries at a RANDOMIZED offset -- mimicking a real kink
+// stage table shard, where different records' ranged windows start at
+// different `lo` offsets (a flat lo=0 for every record, an earlier version
+// of this benchmark's bug, never exercises combine()'s left-extension path
+// at all regardless of sort order -- caught by the fix showing no
+// measurable difference on the flawed version, a real "the fix did
+// nothing" signal that was itself the tell).
 static Run<W> makeRun(int H, int keyLen, size_t n, size_t distinctKeys, int width,
-                       unsigned seed) {
+                       int maxLoSpread, unsigned seed) {
   std::mt19937 rng(seed);
   std::uniform_int_distribution<int> keyDist(0, static_cast<int>(distinctKeys) - 1);
+  std::uniform_int_distribution<int> loDist(0, maxLoSpread);
   Run<W> run;
   run.reserve(n);
   for (size_t i = 0; i < n; ++i) {
@@ -39,7 +46,7 @@ static Run<W> makeRun(int H, int keyLen, size_t n, size_t distinctKeys, int widt
     // Encode k into the first bytes of sig (deterministic, sortable).
     r.sig.b[0] = static_cast<unsigned char>((k >> 8) & 0xff);
     r.sig.b[1] = static_cast<unsigned char>(k & 0xff);
-    r.lo = 0;
+    r.lo = static_cast<uint8_t>(loDist(rng));
     r.len = static_cast<uint8_t>(width);
     r.counts.assign(width, W(1));
     run.push_back(std::move(r));
@@ -85,7 +92,10 @@ int main() {
   };
 
   for (auto& sc : scenarios) {
-    Run<W> base = makeRun(H, keyLen, n, sc.distinctKeys, sc.width, 42);
+    // lo spread of 3x width: windows overlap variably, so combine() calls
+    // within a collision group hit both the grow-in-place and (pre-fix)
+    // left-extension paths, matching a real ranged count-vec's lo variance.
+    Run<W> base = makeRun(H, keyLen, n, sc.distinctKeys, sc.width, sc.width * 3, 42);
     size_t outSize = base.size(); // will shrink after dedup; probe separately
     {
       Run<W> probe = base;

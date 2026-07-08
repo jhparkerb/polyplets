@@ -192,7 +192,24 @@ inline bool deserializeRecord(const uint8_t* data, size_t size, size_t* pos,
 
 template <class W>
 inline bool recordLess(const RunRecord<W>& a, const RunRecord<W>& b) {
-  return sigCmp(a.sig.b, b.sig.b, a.keyLen) < 0;
+  const int c = sigCmp(a.sig.b, b.sig.b, a.keyLen);
+  if (c != 0) return c < 0;
+  // Tiebreak by lo: std::sort isn't stable, so without this, same-key
+  // collision groups land in arbitrary lo order after sortRun.
+  // deduplicateRun's combine() has a cheap grow-in-place path (new_lo==lo)
+  // and an expensive left-extension path (fresh alloc + full copy,
+  // triggered whenever an incoming record's lo is BEFORE the accumulator's
+  // current lo). With lo ascending within a key group, the accumulator's lo
+  // is always the group minimum, so every combine sees o.lo >= lo and the
+  // expensive path can never fire for this call site. Confirmed the
+  // mechanism first with a real benchmark (experiments/bench_dedup.cpp) --
+  // collision rate x window width was shown to compound combine() cost;
+  // this is the fix for why, not a guess (docs/utilization-bottleneck-log.md
+  // Bottleneck #6). mergeRunFiles' cross-file k-way merge doesn't get the
+  // full benefit (per-file order still depends on which file a record came
+  // from) but each file's OWN prior sortRun already carries this tiebreak,
+  // so it's a pure win with no downside there either.
+  return a.lo < b.lo;
 }
 
 // The seed state of a height-sweep: the empty boundary (all-zero sig) with one
