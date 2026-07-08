@@ -1134,6 +1134,7 @@ func mapPhase(
 	// so no atomics needed.
 	var completedRecords uint64
 	var completedSeconds float64
+	stealDebug := os.Getenv("POLY_STEAL_DEBUG") != ""
 
 	var (
 		mu          sync.Mutex
@@ -1180,7 +1181,7 @@ func mapPhase(
 				bestScore, best = sc, r
 			}
 		}
-		if os.Getenv("POLY_STEAL_DEBUG") != "" {
+		if stealDebug {
 			var oldest *runningUnit
 			for _, r := range inflight {
 				if oldest == nil || r.started.Before(oldest.started) {

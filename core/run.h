@@ -128,6 +128,16 @@ struct RunRecord {
   }
 };
 
+// Successor-counts arena sizing (map-profile.md B2): the map hot loop
+// (mapreduce.h's map_shard_file, kink.h's map_shard_stage_file) bump-allocates
+// RunRecord::counts from a std::pmr::monotonic_buffer_resource sized to the
+// spill/ram budget, one arena per spill epoch instead of one malloc/free per
+// successor. Both call sites compute the same fallback-when-unbounded chunk
+// size; shared here so the fallback constant has one home.
+inline size_t succArenaHint(size_t ram_budget_bytes) {
+  return ram_budget_bytes > 0 ? ram_budget_bytes : (size_t{64} << 20);
+}
+
 // ─── Serialization ────────────────────────────────────────────────────────────
 
 // Append one record to a byte buffer in the binary run format.

@@ -274,10 +274,7 @@ std::pair<size_t, size_t> map_shard_stage_file(
   // (map-profile.md B2): one bump-allocator per spill epoch instead of one
   // malloc/free per successor. Released at each do_spill(), matching
   // buf.clear()'s epoch boundary.
-  const size_t arena_hint = cfg.ram_budget_bytes > 0
-                                 ? cfg.ram_budget_bytes
-                                 : (size_t{64} << 20);
-  std::pmr::monotonic_buffer_resource succArena(arena_hint);
+  std::pmr::monotonic_buffer_resource succArena(succArenaHint(cfg.ram_budget_bytes));
 
   auto do_spill = [&]() {
     if (buf.empty()) return;

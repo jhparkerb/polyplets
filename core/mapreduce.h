@@ -304,10 +304,7 @@ std::pair<size_t, size_t> map_shard_file(
   // fast paths, no element-wise fallback). Released (not just cleared) right
   // after each do_spill() write-out, matching buf.clear()'s epoch boundary --
   // bulk-freeing beats N individual frees, same asymmetry as the malloc side.
-  const size_t arena_hint = cfg.ram_budget_bytes > 0
-                                 ? cfg.ram_budget_bytes
-                                 : (size_t{64} << 20);
-  std::pmr::monotonic_buffer_resource succArena(arena_hint);
+  std::pmr::monotonic_buffer_resource succArena(succArenaHint(cfg.ram_budget_bytes));
 
 #ifdef POLY_PROFILE
   // Coarse phase wall-time + counters (Track B). Times the get-next-source-record
