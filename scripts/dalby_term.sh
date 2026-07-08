@@ -9,11 +9,23 @@
 # (results/scheduling.md's own recommendation -- "overlap = number of swept
 # heights owned"; overshooting the real count is harmless, RAM co-resident
 # for all real-swept heights is <100MB, see docs/utilization-bottleneck-log.md
-# Bottleneck #2). Validated real dalby maxn=30 A/B on identical code+range
+# Bottleneck #1). Validated real dalby maxn=30 A/B on identical code+range
 # (H3-H15 real sweep): overlap=1 689.6s/21.6% util vs overlap=15 378.2s/38.8%
 # util, near-identical CPU-seconds (11926.6 vs 11742.2), byte-identical
 # a(30)=227969227118066423789154 both configs. Checkpoints at height
 # boundaries (gated: orchestrator/overlap_resume_test.go), not per-column.
+#
+# --merge-mult 1: caps merge fan-out at 1 range/core (80) instead of
+# following --unit-mult (320). Per-merge-range wall_s barely correlates with
+# record count (Pearson r=0.24 on real data) -- most of each ~37ms range is
+# fixed process-spawn overhead, not proportional work (Bottleneck #2).
+# Validated real dalby A/B, maxn=30/overlap=15, identical code: merge-mult=4
+# (implicit default) 377.7s wall/11670.5 cpu_s vs merge-mult=1 305.7s
+# wall/7291.7 cpu_s -- 19% faster wall, 37% less total CPU-seconds, correct
+# a(30) both. (Utilization ratio itself dips slightly, 38.6%->29.8%: fewer
+# concurrent ranges fill the pool less densely even though there's less
+# total waste -- a real net win on wall-clock and CPU-seconds, not a
+# regression despite the lower ratio.)
 #
 # Resume: dalby_term.sh N --resume
 set -e
@@ -31,7 +43,7 @@ RESUME_FLAG=""
 
 T0=$(date +%s)
 ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
-  --cores 80 --ram 1073741824 --unit-mult 4 --steal-grain 0.05 \
+  --cores 80 --ram 1073741824 --unit-mult 4 --merge-mult 1 --steal-grain 0.05 \
   --overlap-heights "$N" \
   --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" \
   --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 300 $RESUME_FLAG \

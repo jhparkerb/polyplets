@@ -17,7 +17,8 @@ tried (good or bad).
 | # | Bottleneck | Status | Win |
 |---|---|---|---|
 | 1 | Straggler Tail | solved (overlap-heights=all, deployed) | 1.82x wall-clock, 21.6%->38.8% util, real maxn=30 A/B, correct output |
-| 2 | TBD | — | — |
+| 2 | Merge Fan-Out Overhead | solved (merge-mult=1, deployed) | 19% wall-clock, 37% fewer CPU-seconds, real maxn=30 A/B, correct output |
+| 3 | TBD | — | — |
 
 ## Bottleneck #1: Straggler Tail
 
@@ -169,3 +170,57 @@ non-2-column format) instead of crashing or, worse, naively summing a
 ~16 digits: a23 came out `...768` instead of the correct `...732`).
 Re-validated against the maxn=32 run's actual output: full a(21)-a(31)
 pass, `MISMATCH=0`.
+
+## Bottleneck #2: Merge Fan-Out Overhead — SOLVED
+
+Real a30 data (`mergecheck` run) showed merge's own active-window
+concurrency was only ~15/80 cores (cpu/wall ratio) even with overlap-heights
+deployed. Two hypotheses tested:
+
+**Hypothesis A — same key-range imbalance as map's Straggler Tail (REJECTED
+quickly).** Added `event=mergerange` instrumentation (`POLY_UNIT_LOG=1`,
+reused the existing env var rather than adding a new one) to log each merge
+range's exact (start, wall_s). Real data (H15 col4, 5120 ranges across the
+column's rounds): the single largest range was only **0.1% of the column's
+total merge wall** — ranges are well-balanced, not a straggler at all.
+Dead end, logged so it's not retried.
+
+**Hypothesis B — fixed per-process spawn overhead dominates small merge
+ranges (CONFIRMED).** Same data: wall_s barely correlates with out_records
+(**Pearson r=0.24**) — a range with 1206 records takes ~0.035s, one with
+31745 records (26x more) takes only ~0.09s (3x). Most of each ~37ms range is
+constant overhead (process spawn + file-open), not proportional work. The
+engine already anticipated this: `--merge-mult` exists specifically "to cut
+merge fan-in" (code comment, `orchestrator/sweep.go`'s `mergeMult`), but the
+production driver never set it, so it silently followed `--unit-mult` (4x
+the fan-out map needs, since map genuinely benefits from fine granularity
+while merge doesn't).
+
+**Real dalby A/B, same code/range (maxn=30, overlap-heights=15):**
+
+| merge-mult | wall | cpu_s | utilization | a(30) |
+|---|---:|---:|---:|---|
+| 4 (implicit default, = unit-mult) | 377.7s | 11670.5 | 38.6% | correct |
+| 1 (deployed) | 305.7s | 7291.7 | 29.8% | correct |
+
+**19% faster wall-clock, 37% fewer total CPU-seconds, correct output both.**
+Note the utilization *ratio* itself went down (38.6%->29.8%) even though
+this is a real win — cutting spawn overhead removes real (if unproductive)
+CPU-seconds, which mechanically can lower a crude cpu/wall ratio without the
+outcome being worse; wall-clock and total CPU-seconds are the truer signals
+here, and both improved. Deployed: `scripts/dalby_term.sh` now passes
+`--merge-mult 1`.
+
+### Dead-end solutions tried (Bottleneck #2)
+
+- **merge-range-imbalance** (hypothesis A above): merge ranges from
+  `SampleKeysMulti` are well-balanced (unlike map's), rejected by real
+  per-range data in one measurement pass. Do not re-investigate merge-side
+  balance — the imbalance mechanism from Bottleneck #1 does not transfer to
+  merge.
+
+## Bottleneck #3: (not yet identified)
+
+Next step: with both map's straggler tail (overlap-heights) and merge's
+fan-out overhead (merge-mult) addressed, run a fresh real production-scale
+measurement to see what now dominates.
