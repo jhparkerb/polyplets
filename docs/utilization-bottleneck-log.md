@@ -620,3 +620,31 @@ separately from `sortRun`'s, per stage, on a real kink run (or a
 synthetic benchmark reusing the `bench_viablemask.cpp`-style
 minimum-of-N-trials methodology against `core/run.h`'s actual functions,
 not `core/transition.h`'s).
+
+### Attempted: combine()/dedup collision-rate hypothesis, real not synthetic
+
+Built `experiments/bench_dedup.cpp` (same minimum-of-7-trials methodology,
+this time verified against `core/run.h`'s real `deduplicateRun`/`combine`)
+to test the lead above directly: does dedup-collision RATE compound with
+count-vec WIDTH the way theorized?
+
+**Confirmed, real numbers** (65,625 records/unit, matching one H17 unit's
+real share of a ~21M frontier at 320 units):
+
+| scenario | collision rate | width | dedup time (best of 7) |
+|---|---:|---:|---:|
+| low-collision, narrow | 1x (no collisions) | 4 | 1.23 ms |
+| low-collision, wide | 1x | 30 | 1.49 ms |
+| high-collision, narrow | 20x | 4 | 1.12 ms (collisions alone are CHEAPER — fewer surviving records) |
+| high-collision, wide | 20x | 30 | **2.71 ms** |
+
+**Collision rate and width compound, not add**: high-collision+wide is
+2.4x slower than high-collision+narrow (2.71 vs 1.12) and 1.8x slower
+than low-collision+wide (2.71 vs 1.49) — confirms the mechanism is real
+and measurable, not speculation. **Does not yet fully explain the
+observed 16x production wall-time jump** (2.9s->48.0s at near-constant
+frontier_in) on its own — this synthetic test's 20x collision rate and
+30-wide window are plausible but not verified against REAL late-stage
+kink data (actual collision rate and width were not extracted from the
+a33 run; that's the natural next step, not done this round). Logged as a
+confirmed-real, partially-explaining mechanism, not a closed case.
