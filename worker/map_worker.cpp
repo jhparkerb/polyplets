@@ -38,10 +38,12 @@
 // accumulator collides with the kink carry byte at the same sig offset,
 // see core/kink.h).
 
+#include <cctype>
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -106,10 +108,18 @@ static size_t writeRunFile(const Run<W>& run, const std::string& out_path,
 static volatile std::sig_atomic_t g_terminate = 0;
 static void on_sigterm(int) { g_terminate = 1; }
 
-int main(int argc, char** argv) {
-  raiseFdLimitToHard();  // the spill/merge path fans out to many open files
-  std::signal(SIGTERM, on_sigterm);
-
+// runOneRequest does everything a one-shot map_worker invocation always did:
+// parse one request's args, do the map/merge-shard work, emit accounting.
+// Factored out of main() so --persistent (below) can call it once per line
+// read from stdin instead of once per process -- eliminating the fork+exec
+// cost paid on every single work unit (thousands of sub-second invocations
+// per real run; confirmed the dominant real cost via a real heap-alloc
+// profile plus direct observation, not a hunch -- see
+// docs/utilization-bottleneck-log.md Bottleneck #5).
+// `tokens` is the flag/value list with no program name (argv+1..argc in the
+// one-shot path; a tokenized stdin line in persistent mode) -- byte-for-byte
+// the same flags, same semantics, same output contract either way.
+static int runOneRequest(const std::vector<std::string>& tokens) {
   // ─── Arg parsing ────────────────────────────────────────────────────────────
   std::string in_str, out_path, spill_dir, lo_hex, hi_hex, rev;
   std::string counter_arg = "u64";
@@ -118,29 +128,30 @@ int main(int argc, char** argv) {
   int H = 0, maxn = 0, fold = 0, holes = 0;
   size_t ram_bytes = 128ULL * 1024 * 1024;  // 128 MB default
 
-  for (int i = 1; i < argc; ++i) {
+  const int n = static_cast<int>(tokens.size());
+  for (int i = 0; i < n; ++i) {
     auto arg = [&](const char* flag) {
-      return std::strcmp(argv[i], flag) == 0 && i + 1 < argc;
+      return tokens[i] == flag && i + 1 < n;
     };
     auto flag = [&](const char* name) {
-      return std::strcmp(argv[i], name) == 0;
+      return tokens[i] == name;
     };
-    if (arg("--in"))          in_str      = argv[++i];
-    else if (arg("--H"))      H           = std::atoi(argv[++i]);
-    else if (arg("--maxn"))   maxn        = std::atoi(argv[++i]);
-    else if (arg("--fold"))   fold        = std::atoi(argv[++i]);
-    else if (arg("--ram"))    ram_bytes   = static_cast<size_t>(std::strtoull(argv[++i], nullptr, 10));
-    else if (arg("--spill"))  spill_dir   = argv[++i];
-    else if (arg("--out"))    out_path    = argv[++i];
-    else if (arg("--counter"))counter_arg = argv[++i];
-    else if (arg("--lo"))     lo_hex      = argv[++i];
-    else if (arg("--hi"))     hi_hex      = argv[++i];
-    else if (arg("--rev"))    rev         = argv[++i];
-    else if (arg("--kernel")) kernel_arg  = argv[++i];
-    else if (arg("--stage"))  stage_arg   = argv[++i];
+    if (arg("--in"))          in_str      = tokens[++i];
+    else if (arg("--H"))      H           = std::atoi(tokens[++i].c_str());
+    else if (arg("--maxn"))   maxn        = std::atoi(tokens[++i].c_str());
+    else if (arg("--fold"))   fold        = std::atoi(tokens[++i].c_str());
+    else if (arg("--ram"))    ram_bytes   = static_cast<size_t>(std::strtoull(tokens[++i].c_str(), nullptr, 10));
+    else if (arg("--spill"))  spill_dir   = tokens[++i];
+    else if (arg("--out"))    out_path    = tokens[++i];
+    else if (arg("--counter"))counter_arg = tokens[++i];
+    else if (arg("--lo"))     lo_hex      = tokens[++i];
+    else if (arg("--hi"))     hi_hex      = tokens[++i];
+    else if (arg("--rev"))    rev         = tokens[++i];
+    else if (arg("--kernel")) kernel_arg  = tokens[++i];
+    else if (arg("--stage"))  stage_arg   = tokens[++i];
     else if (flag("--holes")) holes       = 1;
     else {
-      std::fprintf(stderr, "map_worker: unknown arg: %s\n", argv[i]);
+      std::fprintf(stderr, "map_worker: unknown arg: %s\n", tokens[i].c_str());
       return 1;
     }
   }
@@ -304,5 +315,52 @@ int main(int argc, char** argv) {
 
   // A cooperative early stop is a SUCCESS (status 0): the partial output is
   // complete and valid over its range.  Only a real failure returns nonzero.
+  return 0;
+}
+
+// Whitespace-split a stdin request line into tokens. Paths are orchestrator-
+// constructed (run-dir/spill-dir-relative filenames), never contain spaces,
+// so this simple split is exact -- no quoting support needed, matching argv's
+// own space-delimited contract for this same flag set today.
+static std::vector<std::string> tokenizeLine(const std::string& line) {
+  std::vector<std::string> tokens;
+  size_t i = 0;
+  while (i < line.size()) {
+    while (i < line.size() && std::isspace(static_cast<unsigned char>(line[i]))) ++i;
+    size_t start = i;
+    while (i < line.size() && !std::isspace(static_cast<unsigned char>(line[i]))) ++i;
+    if (i > start) tokens.push_back(line.substr(start, i - start));
+  }
+  return tokens;
+}
+
+int main(int argc, char** argv) {
+  raiseFdLimitToHard();  // the spill/merge path fans out to many open files
+  std::signal(SIGTERM, on_sigterm);
+
+  std::vector<std::string> tokens(argv + 1, argv + argc);
+
+  // --persistent: read one whitespace-tokenized request per line from stdin
+  // and process it with runOneRequest, looping until EOF, instead of a
+  // single argv-derived request. Fully opt-in and backward compatible: the
+  // one-shot path below is untouched. See runOneRequest's comment for why.
+  bool persistent = false;
+  std::vector<std::string> filtered;
+  filtered.reserve(tokens.size());
+  for (auto& t : tokens) {
+    if (t == "--persistent") persistent = true;
+    else filtered.push_back(t);
+  }
+
+  if (!persistent) return runOneRequest(filtered);
+
+  std::string line;
+  while (std::getline(std::cin, line)) {
+    if (line.empty()) continue;
+    g_terminate = 0;  // a prior request's SIGTERM must not bleed into the next
+    const int rc = runOneRequest(tokenizeLine(line));
+    if (rc != 0) return rc;  // a real failure exits, same as the one-shot path
+    std::fflush(stdout);
+  }
   return 0;
 }
