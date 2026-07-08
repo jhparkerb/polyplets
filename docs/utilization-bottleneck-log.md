@@ -277,6 +277,14 @@ dalby A/B before trusting it, not a rushed change late in an already-long
 session. Left as a scoped, well-evidenced future item, not silently
 dropped.
 
+**CORRECTION, later in the same round:** `forEachViableMask`/`viableRec`
+turned out to be the wrong target entirely — that's the column kernel's
+enumeration (`core/mapreduce.h`'s `map_shard_file`), which production's
+`--kernel kink` never calls. Kink's real hot path is `kinkStageTransition`
+(`core/kink.h:98`), a bounded `for (occupy in {0,1})` loop with no
+recursive tree. See the "Bottleneck #6 attempt" section below for the full
+correction and what's actually still open.
+
 ### Dead-end solutions tried (this round)
 
 - **checkpoint-overhead** (hypothesis: `--checkpoint-every 300`'s periodic
@@ -489,3 +497,50 @@ change has been found and correctly wrung dry.
   at maxn=33). Untested at the scale where it would matter — not
   re-attempted this round given the ~1.9h cost per a33-scale trial, but
   don't treat the a30 result as a real answer either way.
+
+## Bottleneck #6 attempt: sub-record interrupt — WRONG TARGET, corrected mid-investigation
+
+The "Implication" paragraph above and the earlier "only remaining lever"
+analysis under Bottleneck #1 both name `forEachViableMask`/`viableRec`
+(`core/transition.h`) as the mechanism to fix. **This is wrong.** That
+function is the **column kernel**'s enumeration path
+(`core/mapreduce.h`'s `map_shard_file`) — production's `--kernel kink`
+(everything `dalby_term.sh` runs, every real dalby A/B this whole round)
+never calls it. Kink's actual per-record hot path is
+`kinkStageTransition` (`core/kink.h:98`): a bounded `for (occupy in
+{0,1})` loop over at most 2 choices, O(H)-ish work per call (a small
+union-find reset, `canonMixed`, `labelInMixedState`, both O(H) scans) —
+**no recursive tree, no combinatorial mask enumeration, nothing like
+`viableRec`'s "76% of leaves pruned" story at all.**
+
+Caught by actually reading `core/kink.h` line by line while about to
+implement the fix (prompted by a stop-hook rejection correctly pointing
+out the lever hadn't been implemented) — `grep -n "forEachViableMask"
+core/kink.h` returns nothing; the function simply isn't there. A local
+benchmark (`experiments/bench_viablemask.cpp`) and a full design writeup
+(`results/sub-record-interrupt-design.md`) were built around the wrong
+function before this was caught. Both are corrected in place (marked
+"WRONG TARGET" at the top) rather than deleted, since the measurement
+methodology is still valid and worth keeping as a pattern — just not the
+conclusions.
+
+**What's actually still open, unexplained, and not investigated**: unit
+319 (H17 col5, maxn=33) measured wall-time uncorrelated with record count
+under the KINK kernel specifically — 4M records taking 46s, 957M records
+taking only 21s (Pearson-style anti-correlation, not the "successor
+explosion" story that would fit a mask-tree kernel). With
+`kinkStageTransition` confirmed O(H)-bounded per call, the real
+explanation must be something else: candidates not yet checked include
+`RunRecord::counts.assign()`'s cost scaling with a record's ranged-window
+width (`rec.len`, up to `maxn`), the shard-level `sortRun`/`deduplicateRun`
+cost at the end of `map_shard_stage_file` (a whole-buffer cost, not
+per-record, but could dominate for shards whose buffer ends up large),
+or something in the SIGTERM/steal bookkeeping unrelated to enumeration
+cost per se. **This needs fresh investigation starting from
+`kinkStageTransition` and `map_shard_stage_file` directly** — not a
+continuation of the column-kernel analysis above.
+
+Whoever picks this up: verify against the ACTUAL kernel in use
+(`grep -n <function> core/kink.h`, or better, an actual call-stack/profile
+from a real kink run) before writing a benchmark or design doc, the way
+this round did not, until an hour was already spent on the wrong target.

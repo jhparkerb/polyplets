@@ -1,10 +1,21 @@
-// bench_viablemask.cpp -- local, fast benchmark for forEachViableMask
-// (core/transition.h), to measure the overhead of adding a cooperative-stop
-// check inside viableRec's recursion (Bottleneck #6 candidate: sub-record
-// interrupt granularity, docs/utilization-bottleneck-log.md). Not wired into
-// any gate -- throwaway measurement tool, matching the "tighten the
-// feedback loop" push: this answers "is a stop-check overhead-safe" in
-// seconds locally, instead of a multi-hour real dalby A/B.
+// bench_viablemask.cpp -- WRONG TARGET, kept for the record + methodology.
+//
+// This benchmarks forEachViableMask/viableRec (core/transition.h), the
+// COLUMN kernel's enumeration mechanism (core/mapreduce.h's map_shard_file).
+// Production uses --kernel kink (scripts/dalby_term.sh), whose actual hot
+// path is kinkStageTransition (core/kink.h:98) -- a simple `for (occupy in
+// {0,1})` loop, O(1)/O(H)-bounded, no recursive tree at all. The numbers
+// below are real but answer a question about code nothing in production
+// runs. See results/sub-record-interrupt-design.md's correction note.
+//
+// The METHODOLOGY (local throwaway C++ benchmark, minimum-of-N-trials, a
+// volatile sink to defeat dead-code elimination -- caught a real 0.0000
+// ns/call artifact from an under-specified baseline lambda, see git log)
+// is still the right approach for the real question: what in
+// kinkStageTransition's bounded per-record path causes unit 319's measured
+// 100x+ wall-time variance at similar-to-lower record counts. Whoever
+// picks that up should write a NEW benchmark against kinkStageTransition
+// directly, not extend this one.
 //
 // Build: c++ -std=c++20 -O3 -I. experiments/bench_viablemask.cpp -o /tmp/bench_vm
 // Run:   /tmp/bench_vm

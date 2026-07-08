@@ -40,19 +40,21 @@ each independently real-dalby-validated with correct output:**
 **The honest, important caveat: at real production scale (maxn=33), all 5
 fixes COMBINED only bought 0.6% (6842.7s -> 6803.2s).** H17 (the dominant
 real-swept height) consumes nearly the entire wall clock once it's the
-pool's sole occupant — none of the 5 fixes touch that specific floor. The
-sub-record interrupt (checking the cooperative-stop flag inside
-`forEachViableMask`/`viableRec`'s recursion, not just between records) is
-now clearly the single highest-value remaining lever. **Measured, not
-implemented**: a local throwaway benchmark
-(`experiments/bench_viablemask.cpp`) found the check itself costs ~10.7%
-on all enumeration everywhere (real, not negligible) — and a harder,
-unsolved problem underneath: there's no clean "resume cursor" for a
-partial pruned-recursion-tree traversal the way there is for a
-between-records key cursor. Full analysis:
-`results/sub-record-interrupt-design.md`. Deliberately not attempted this
-round — real risk of a silent wrong-`a(n)` bug if rushed, needs its own
-dedicated resume-state design + red-first mid-record test.
+pool's sole occupant — none of the 5 fixes touch that specific floor. A
+sub-record interrupt (checking the cooperative-stop flag mid-record, not
+just between records) is likely still the highest-value remaining lever,
+but the FIRST attempt to cost it out this round targeted the wrong
+function (`forEachViableMask`/`viableRec`, `core/transition.h` — that's
+the **column kernel**'s enumeration, unused by production's `--kernel
+kink`; caught and corrected same session, see
+`results/sub-record-interrupt-design.md`'s correction note). Kink's real
+hot path, `kinkStageTransition` (`core/kink.h:98`), is a simple bounded
+`for (occupy in {0,1})` loop — no recursive tree, no combinatorial
+enumeration. **What actually causes unit 319's measured 100x+ wall-time
+variance at similar-to-lower record counts in the kink kernel is still
+open and unexplained** — needs fresh investigation starting from
+`kinkStageTransition` and `map_shard_stage_file`, not the column kernel's
+code.
 
 **Also found, separately flagged, NOT this session's fault, NOT fixed**:
 a real, pre-existing correctness bug — real `SIGTERM` + `--resume` on the

@@ -1,3 +1,18 @@
+**CORRECTION (2026-07-08, later session):** the two `forEachViableMask`
+references below (in "The prediction, and the concrete reasons behind
+it") are wrong — that function is the column kernel's enumeration
+mechanism (`core/mapreduce.h`), not used by `--kernel kink`, which every
+real run in this doc actually used. Kink's own per-record hot path is
+`kinkStageTransition` (`core/kink.h:98`), a simple bounded `for (occupy in
+{0,1})` loop with no recursive tree at all — the "pathological-record
+enumeration explosion" story doesn't apply to it as described. The
+`core/kink.h:296` cooperative-stop-check citation itself is correct (that
+line is real and does what's described); only the parenthetical function
+name naming what it can't reach mid-record is wrong. See
+`results/sub-record-interrupt-design.md`'s own correction note for the
+full story — this doc's floor/ceiling analysis and the three real
+scheduler-fix findings elsewhere in this doc are unaffected.
+
 # Utilization: what got fixed, what didn't, and the achievable ceiling
 
 **Date:** 2026-07-07. Branch `steal-wall-time-floor` (4 commits, all gated:

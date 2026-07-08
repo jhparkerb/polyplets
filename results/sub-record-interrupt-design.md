@@ -1,4 +1,27 @@
-# Sub-record interrupt: measured cost, and why it's not a quick fix
+**CORRECTION (same session, found ~20 min after writing this doc): the
+entire analysis below targets the wrong function.** `forEachViableMask`/
+`s8::viableRec` (`core/transition.h`) is the **column kernel**'s
+enumeration mechanism (`map_shard_file`, `core/mapreduce.h`), which
+production does **not** use. `--kernel kink` (what `dalby_term.sh` and
+every real dalby run in this round actually ran) uses
+`kinkStageTransition` (`core/kink.h:98`) instead — a simple `for (occupy
+in {0,1})` loop, **O(1)/O(H)-bounded per call, no recursive tree, no
+combinatorial mask enumeration at all**. There is no analog of
+`viableRec`'s "76% of leaves pruned, dominant cost is the descent" story
+in the kink kernel's actual hot path. The ~10.7% overhead number and the
+"no clean resume cursor for a partial tree" problem below are real
+findings **about the column kernel**, which is not the bottleneck anyone
+is trying to fix here. Kept below for the record (the methodology --
+local throwaway benchmark before touching dalby -- is still the right
+approach) but **do not act on the numbers or conclusions as if they
+apply to `--kernel kink`.** The real question -- what in
+`kinkStageTransition`'s O(H)-bounded per-record path (or elsewhere in
+`map_shard_stage_file`) causes unit 319's measured 100x+ wall-time
+variance at similar-to-lower record counts -- is open, not this.
+
+---
+
+# Sub-record interrupt: measured cost, and why it's not a quick fix (WRONG TARGET, see correction above)
 
 **Status: measured and scoped, NOT implemented.** This is the design/cost
 analysis for the highest-value remaining utilization lever
