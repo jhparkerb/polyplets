@@ -648,3 +648,26 @@ frontier_in) on its own — this synthetic test's 20x collision rate and
 kink data (actual collision rate and width were not extracted from the
 a33 run; that's the natural next step, not done this round). Logged as a
 confirmed-real, partially-explaining mechanism, not a closed case.
+
+### Real production-scale result: recordLess lo-tiebreak fix (deployed, honest)
+
+Real dalby A/B via `dalby_term.sh 33` (all 5 solved bottlenecks + this
+fix vs. the same-config pre-fix baseline): full validation passes,
+correct `a(33)=74631481980411777590683952`.
+
+**wall: 6803.2s -> 6798.6s (0.07% faster). cpu_s: 55825.9 -> 55440.2
+(0.69% less). Essentially flat at real production scale**, despite a
+real, validated ~7.4% local-benchmark improvement in the specific
+high-collision+wide scenario the fix targets.
+
+Not a wasted fix — it's real, correctness-verified (full `make ns-gates`
+including both ASan kernels), a genuine small CPU-time win, and worth
+keeping deployed (zero measured downside, real theoretical upside). But
+it does NOT solve the dominant wall-clock problem: most of its CPU
+savings land on cores that were already idle (H17's utilization is only
+~10%), not on the critical path that actually gates when the column
+finishes. The collision-rate x width mechanism is real (confirmed twice
+now: locally and structurally) but isn't the DOMINANT driver of the 16x
+per-stage wall-time growth observed earlier — something else is, still
+unidentified. Deployed anyway (real, harmless, small win); the search for
+the actual dominant driver continues.
