@@ -20,6 +20,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstring>
+#include <memory_resource>
 #include <vector>
 
 #include "core/signature.h"
@@ -33,11 +34,28 @@ using u128 = unsigned __int128;
 template <class W>
 struct RunRecord {
   Sig    sig;          // canonical signature (keyLen bytes used, rest zero)
-  int    H;            // height (needed to interpret sig and lo/len)
-  int    keyLen;       // key length in bytes: H+2 for triangle, H+3 for holes
+  // H, keyLen: bounded <=SIGMAX-2 (<=38 even at the keyLen=H+4 kink-stage
+  // width), so uint8_t is exact, not lossy -- was `int`, wasting 6 bytes/record
+  // (measured: sizeof(RunRecord)=72->64) purely on alignment padding a value
+  // that never exceeds 38. See results/hotpath-optim.md.
+  uint8_t H;            // height (needed to interpret sig and lo/len)
+  uint8_t keyLen;       // key length in bytes: H+2 for triangle, H+3 for holes
   uint8_t lo;         // first nonzero index in counts[]
   uint8_t len;        // number of nonzero entries
-  std::vector<W> counts; // counts[lo .. lo+len), dense over the window
+  // pmr::vector, not std::vector: lets the map hot loop (mapreduce.h,
+  // kink.h) construct successor records against a monotonic_buffer_resource
+  // arena scoped to one spill epoch, instead of one malloc/free per
+  // successor (measured: 415.8M allocations in a34's swept portion,
+  // ~14% of map cycles, map-profile.md B2). Default-constructed (no
+  // allocator argument) it behaves EXACTLY like std::vector -- uses the
+  // global default_resource, same semantics, same cost, zero change for
+  // every other call site (deserializeRecord, seedRecord, tests, ...).
+  // Only map_shard_file/map_shard_stage_file opt into the arena, via the
+  // allocator-aware constructor below.
+  std::pmr::vector<W> counts; // counts[lo .. lo+len), dense over the window
+
+  RunRecord() = default;
+  explicit RunRecord(std::pmr::memory_resource* mr) : counts(mr) {}
 
   // True if both records share the same key (same sig bytes for keyLen).
   bool sameKey(const RunRecord& o) const {
@@ -81,7 +99,10 @@ struct RunRecord {
 
     // Left-extension (o starts before this): the existing entries would shift, so
     // build the union buffer fresh. Rarer than the in-place case above.
-    std::vector<W> merged(new_len, W{0});
+    // Same allocator as `counts` (arena-aware if this record is): keeps the
+    // rare left-extension path in the same epoch's pool instead of falling
+    // back to the global allocator underneath a pmr-typed field.
+    std::pmr::vector<W> merged(new_len, W{0}, counts.get_allocator());
     for (int i = 0; i < len; ++i) {
       W& slot = merged[(lo + i) - new_lo];
       W prev = slot;
@@ -106,6 +127,16 @@ struct RunRecord {
     return -1;
   }
 };
+
+// Successor-counts arena sizing (map-profile.md B2): the map hot loop
+// (mapreduce.h's map_shard_file, kink.h's map_shard_stage_file) bump-allocates
+// RunRecord::counts from a std::pmr::monotonic_buffer_resource sized to the
+// spill/ram budget, one arena per spill epoch instead of one malloc/free per
+// successor. Both call sites compute the same fallback-when-unbounded chunk
+// size; shared here so the fallback constant has one home.
+inline size_t succArenaHint(size_t ram_budget_bytes) {
+  return ram_budget_bytes > 0 ? ram_budget_bytes : (size_t{64} << 20);
+}
 
 // ─── Serialization ────────────────────────────────────────────────────────────
 
@@ -161,7 +192,24 @@ inline bool deserializeRecord(const uint8_t* data, size_t size, size_t* pos,
 
 template <class W>
 inline bool recordLess(const RunRecord<W>& a, const RunRecord<W>& b) {
-  return sigCmp(a.sig.b, b.sig.b, a.keyLen) < 0;
+  const int c = sigCmp(a.sig.b, b.sig.b, a.keyLen);
+  if (c != 0) return c < 0;
+  // Tiebreak by lo: std::sort isn't stable, so without this, same-key
+  // collision groups land in arbitrary lo order after sortRun.
+  // deduplicateRun's combine() has a cheap grow-in-place path (new_lo==lo)
+  // and an expensive left-extension path (fresh alloc + full copy,
+  // triggered whenever an incoming record's lo is BEFORE the accumulator's
+  // current lo). With lo ascending within a key group, the accumulator's lo
+  // is always the group minimum, so every combine sees o.lo >= lo and the
+  // expensive path can never fire for this call site. Confirmed the
+  // mechanism first with a real benchmark (experiments/bench_dedup.cpp) --
+  // collision rate x window width was shown to compound combine() cost;
+  // this is the fix for why, not a guess (docs/utilization-bottleneck-log.md
+  // Bottleneck #6). mergeRunFiles' cross-file k-way merge doesn't get the
+  // full benefit (per-file order still depends on which file a record came
+  // from) but each file's OWN prior sortRun already carries this tiebreak,
+  // so it's a pure win with no downside there either.
+  return a.lo < b.lo;
 }
 
 // The seed state of a height-sweep: the empty boundary (all-zero sig) with one

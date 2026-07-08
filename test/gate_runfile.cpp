@@ -203,6 +203,100 @@ static void testMergeReaderOpenFailureAborts() {
   std::remove("/tmp/gate_runfile_merge_out.bin");
 }
 
+// RED-FIRST (Bottleneck: Merge Range Straggler, merge work-stealing):
+// mergeRunFiles' stop/resume contract is "output covers [lo, stop_key);
+// re-merge with lo_hex=stop_key covers the rest" -- forcing a stop with
+// terminate pre-set to 1 (fires at the first progress stride, written=1024)
+// and then resuming must reproduce byte-identical total output to an
+// uninterrupted merge over the same inputs. A wrong stop_key boundary
+// (off-by-one, wrong sig, etc.) would silently duplicate or drop records --
+// exactly the failure mode results/sub-record-interrupt-design.md flagged
+// as the reason NOT to build this for kink's mask enumeration; merge's
+// simpler seek-based resume avoids that class of bug, but the boundary
+// arithmetic itself still needs a real test, not just an argument.
+static void testMergeStopResumeMatchesUninterrupted() {
+  const std::string in1 = "/tmp/gate_runfile_stopresume_in1.bin";
+  const std::string in2 = "/tmp/gate_runfile_stopresume_in2.bin";
+  const std::string full = "/tmp/gate_runfile_stopresume_full.bin";
+  const std::string part1 = "/tmp/gate_runfile_stopresume_part1.bin";
+  const std::string part2 = "/tmp/gate_runfile_stopresume_part2.bin";
+
+  // Two disjoint-keyspace inputs, enough records (> one progress stride) to
+  // give the stop point somewhere genuinely mid-merge, not at the very end.
+  {
+    RunFileWriter<u64> w1(in1, 3, 8, "", "", "test");
+    for (int i = 0; i < 3000; i += 2) {
+      RunRecord<u64> r;
+      std::memset(r.sig.b, 0, SIGMAX);
+      r.sig.b[0] = static_cast<uint8_t>(i / 256);
+      r.sig.b[1] = static_cast<uint8_t>(i % 256);
+      r.lo = 0; r.len = 1; r.counts = {static_cast<u64>(i + 1)};
+      w1.append(r);
+    }
+    w1.finalize();
+    RunFileWriter<u64> w2(in2, 3, 8, "", "", "test");
+    for (int i = 1; i < 3000; i += 2) {
+      RunRecord<u64> r;
+      std::memset(r.sig.b, 0, SIGMAX);
+      r.sig.b[0] = static_cast<uint8_t>(i / 256);
+      r.sig.b[1] = static_cast<uint8_t>(i % 256);
+      r.lo = 0; r.len = 1; r.counts = {static_cast<u64>(i + 1)};
+      w2.append(r);
+    }
+    w2.finalize();
+  }
+  std::vector<std::string> ins = {in1, in2};
+
+  // Reference: full, uninterrupted merge.
+  auto [full_bytes, full_recs] = mergeRunFiles<u64>(ins, 3, "", "", full, "test");
+  assert(full_recs == 3000);
+
+  // Interrupted: terminate pre-set so the FIRST stride check fires.
+  volatile std::sig_atomic_t terminate = 1;
+  std::string stop_key;
+  auto [p1_bytes, p1_recs] = mergeRunFiles<u64>(
+      ins, 3, "", "", part1, "test", 0, {}, &terminate, &stop_key);
+  assert(!stop_key.empty() && "stop should have fired on the first stride");
+  assert(p1_recs > 0 && p1_recs < 3000 && "partial output should be a strict subset");
+
+  // Resume: re-merge the SAME inputs from stop_key to the end.
+  auto [p2_bytes, p2_recs] = mergeRunFiles<u64>(ins, 3, stop_key, "", part2, "test");
+  (void)full_bytes; (void)p1_bytes; (void)p2_bytes;
+
+  assert(p1_recs + p2_recs == full_recs &&
+         "stop+resume record count must equal the uninterrupted total");
+
+  // Byte-for-byte: concatenated [part1, part2] output bodies (via a plain
+  // record-by-record re-merge, since RunFileReader hides the header/CRC
+  // framing) must match the reference exactly -- no duplicated or dropped
+  // records, no reordering.
+  RunFileReader<u64> rf(full, 3), r1(part1, 3), r2(part2, 3);
+  assert(rf.ok() && r1.ok() && r2.ok());
+  RunRecord<u64> a, b;
+  size_t checked = 0;
+  bool in_part1 = true;
+  while (rf.next(a)) {
+    bool got = in_part1 ? r1.next(b) : r2.next(b);
+    if (!got && in_part1) {
+      in_part1 = false;
+      got = r2.next(b);
+    }
+    assert(got && "reference has more records than part1+part2");
+    assert(sigCmp(a.sig.b, b.sig.b, a.keyLen) == 0 &&
+           "stop+resume record key mismatch vs uninterrupted merge");
+    assert(a.counts == b.counts &&
+           "stop+resume record counts mismatch vs uninterrupted merge");
+    ++checked;
+  }
+  assert(checked == full_recs);
+
+  std::remove(in1.c_str()); std::remove((in1 + ".idx").c_str());
+  std::remove(in2.c_str()); std::remove((in2 + ".idx").c_str());
+  std::remove(full.c_str()); std::remove((full + ".idx").c_str());
+  std::remove(part1.c_str()); std::remove((part1 + ".idx").c_str());
+  std::remove(part2.c_str()); std::remove((part2 + ".idx").c_str());
+}
+
 int main() {
   testAtomicPublish();
   testIndexHasMagic();
@@ -212,5 +306,6 @@ int main() {
   // in the forked child — that noise is the behavior under test, not an error.
   testWriterOpenFailureAborts();
   testMergeReaderOpenFailureAborts();
+  testMergeStopResumeMatchesUninterrupted();
   std::puts("gate_runfile PASS");
 }

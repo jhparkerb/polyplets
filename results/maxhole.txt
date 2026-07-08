@@ -1,7 +1,7 @@
-# maxhole_split | commit bf11e1a-dirty | gympie | 2026-06-22T01:00:07-04:00 | job=maxhole-N16
-# source: /Users/jasonp/src/polyominoes/sampling/maxhole_split.py
+# maxhole_split | commit 72d1204e-dirty | dalby | 2026-07-07T04:27:53-04:00 | job=maxhole-N17
+# source: /home/jasonp/src/polyominoes/sampling/maxhole_split.py
 # M(n) = max enclosed empty area over fixed n-cell polyplets (4-connected-background convention).
-# build/g2 square8 N --maxhole, 8-way --split (S=8), combined by elementwise max.
+# build/g2 square8 N --maxhole, 78-way --split (S=8), combined by elementwise max.
 1 0
 2 0
 3 0
@@ -18,3 +18,4 @@
 14 18
 15 21
 16 25
+17 28

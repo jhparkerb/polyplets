@@ -38,10 +38,12 @@
 // accumulator collides with the kink carry byte at the same sig offset,
 // see core/kink.h).
 
+#include <cctype>
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -95,21 +97,28 @@ static size_t writeRunFile(const Run<W>& run, const std::string& out_path,
   return w.finalize();
 }
 
-// ─── SIGTERM handling: cooperative work-stealing stop (DESIGN 08, T2.3) ──────
-// The orchestrator raises SIGTERM to ask this straggler to stop EARLY and hand
-// its remaining key-range to idle cores.  map_shard_file watches g_terminate,
-// stops reading at the next key boundary (the cursor), and finalizes a fully
-// valid sorted output over [lo, cursor); the cursor comes back in stop_key.
-// This is a clean, successful exit (status 0) — distinct from a hard SIGKILL
-// (used by the orchestrator's ctx-cancel for checkpoint/shutdown), which is
-// uncatchable and discards the partial column for a later --resume.
-static volatile std::sig_atomic_t g_terminate = 0;
-static void on_sigterm(int) { g_terminate = 1; }
+// SIGTERM handling (cooperative work-stealing stop, DESIGN 08, T2.3) is
+// shared with merge_worker.cpp: see worker_util.h's g_workerTerminate/
+// installWorkerSigtermHandler. map_shard_file watches g_workerTerminate,
+// stops reading at the next key boundary (the cursor), and finalizes a
+// fully valid sorted output over [lo, cursor); the cursor comes back in
+// stop_key. This is a clean, successful exit (status 0) — distinct from a
+// hard SIGKILL (used by the orchestrator's ctx-cancel for checkpoint/
+// shutdown), which is uncatchable and discards the partial column for a
+// later --resume.
 
-int main(int argc, char** argv) {
-  raiseFdLimitToHard();  // the spill/merge path fans out to many open files
-  std::signal(SIGTERM, on_sigterm);
-
+// runOneRequest does everything a one-shot map_worker invocation always did:
+// parse one request's args, do the map/merge-shard work, emit accounting.
+// Factored out of main() so --persistent (below) can call it once per line
+// read from stdin instead of once per process -- eliminating the fork+exec
+// cost paid on every single work unit (thousands of sub-second invocations
+// per real run; confirmed the dominant real cost via a real heap-alloc
+// profile plus direct observation, not a hunch -- see
+// docs/utilization-bottleneck-log.md Bottleneck #5).
+// `tokens` is the flag/value list with no program name (argv+1..argc in the
+// one-shot path; a tokenized stdin line in persistent mode) -- byte-for-byte
+// the same flags, same semantics, same output contract either way.
+static int runOneRequest(const std::vector<std::string>& tokens) {
   // ─── Arg parsing ────────────────────────────────────────────────────────────
   std::string in_str, out_path, spill_dir, lo_hex, hi_hex, rev;
   std::string counter_arg = "u64";
@@ -118,29 +127,30 @@ int main(int argc, char** argv) {
   int H = 0, maxn = 0, fold = 0, holes = 0;
   size_t ram_bytes = 128ULL * 1024 * 1024;  // 128 MB default
 
-  for (int i = 1; i < argc; ++i) {
+  const int n = static_cast<int>(tokens.size());
+  for (int i = 0; i < n; ++i) {
     auto arg = [&](const char* flag) {
-      return std::strcmp(argv[i], flag) == 0 && i + 1 < argc;
+      return tokens[i] == flag && i + 1 < n;
     };
     auto flag = [&](const char* name) {
-      return std::strcmp(argv[i], name) == 0;
+      return tokens[i] == name;
     };
-    if (arg("--in"))          in_str      = argv[++i];
-    else if (arg("--H"))      H           = std::atoi(argv[++i]);
-    else if (arg("--maxn"))   maxn        = std::atoi(argv[++i]);
-    else if (arg("--fold"))   fold        = std::atoi(argv[++i]);
-    else if (arg("--ram"))    ram_bytes   = static_cast<size_t>(std::strtoull(argv[++i], nullptr, 10));
-    else if (arg("--spill"))  spill_dir   = argv[++i];
-    else if (arg("--out"))    out_path    = argv[++i];
-    else if (arg("--counter"))counter_arg = argv[++i];
-    else if (arg("--lo"))     lo_hex      = argv[++i];
-    else if (arg("--hi"))     hi_hex      = argv[++i];
-    else if (arg("--rev"))    rev         = argv[++i];
-    else if (arg("--kernel")) kernel_arg  = argv[++i];
-    else if (arg("--stage"))  stage_arg   = argv[++i];
+    if (arg("--in"))          in_str      = tokens[++i];
+    else if (arg("--H"))      H           = std::atoi(tokens[++i].c_str());
+    else if (arg("--maxn"))   maxn        = std::atoi(tokens[++i].c_str());
+    else if (arg("--fold"))   fold        = std::atoi(tokens[++i].c_str());
+    else if (arg("--ram"))    ram_bytes   = static_cast<size_t>(std::strtoull(tokens[++i].c_str(), nullptr, 10));
+    else if (arg("--spill"))  spill_dir   = tokens[++i];
+    else if (arg("--out"))    out_path    = tokens[++i];
+    else if (arg("--counter"))counter_arg = tokens[++i];
+    else if (arg("--lo"))     lo_hex      = tokens[++i];
+    else if (arg("--hi"))     hi_hex      = tokens[++i];
+    else if (arg("--rev"))    rev         = tokens[++i];
+    else if (arg("--kernel")) kernel_arg  = tokens[++i];
+    else if (arg("--stage"))  stage_arg   = tokens[++i];
     else if (flag("--holes")) holes       = 1;
     else {
-      std::fprintf(stderr, "map_worker: unknown arg: %s\n", argv[i]);
+      std::fprintf(stderr, "map_worker: unknown arg: %s\n", tokens[i].c_str());
       return 1;
     }
   }
@@ -202,12 +212,26 @@ int main(int argc, char** argv) {
   const double t0_wall = wallSeconds();
   const double t0_cpu  = cpuSeconds();
 
-  // Throttled progress emitter: at most one event=progress line every ~2s.
-  // The orchestrator streams these to drive the within-column heartbeat.
+  // Throttled progress emitter: at most one event=progress line every ~2s,
+  // EXCEPT the very first call, which fires immediately regardless of
+  // elapsed time. The orchestrator streams these to drive the within-column
+  // heartbeat AND gates work-stealing eligibility on processed>0
+  // (stealEligible, orchestrator/sweep.go) -- with the old unconditional 2s
+  // throttle, any unit whose whole runtime was under 2s reported
+  // processed=0 for its entire life, making it permanently un-stealable no
+  // matter how much of the pool was waiting on it (found investigating why
+  // a single-unit-inflight column with idle thief-workers spinning on
+  // pickVictim never actually stole anything: picked=false because
+  // processed=0 the whole time, elapsed well under 2s). The wall-time-floor
+  // fix (Bottleneck #1, commit 208864b) never reached this -- it only
+  // patched stealEligible's record-count gate, downstream of this earlier,
+  // harder processed==0 early return.
   double last_emit = t0_wall;
+  bool emitted_once = false;
   auto on_progress = [&](size_t n) {
     const double now = wallSeconds();
-    if (now - last_emit >= 2.0) {
+    if (!emitted_once || now - last_emit >= 2.0) {
+      emitted_once = true;
       last_emit = now;
       std::printf("event=progress processed=%zu elapsed_s=%.1f\n", n, now - t0_wall);
       std::fflush(stdout);
@@ -256,11 +280,11 @@ int main(int argc, char** argv) {
       if (counter_arg == "u128") {
         std::tie(spill_bytes, out_recs) = map_shard_stage_file<u128>(
             in_paths, kcfg, out_path, lo_hex, hi_hex, rev, on_progress,
-            &g_terminate, &stop_key);
+            &g_workerTerminate, &stop_key);
       } else {
         std::tie(spill_bytes, out_recs) = map_shard_stage_file<u64>(
             in_paths, kcfg, out_path, lo_hex, hi_hex, rev, on_progress,
-            &g_terminate, &stop_key);
+            &g_workerTerminate, &stop_key);
       }
     }
   } else if (holes) {
@@ -268,26 +292,26 @@ int main(int argc, char** argv) {
       HolesRow<u128> hrow(H, maxn, maxholes);
       std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyHoles>(
           in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev, on_progress,
-          &g_terminate, &stop_key);
+          &g_workerTerminate, &stop_key);
       printHolesRows(H, maxn, hrow.byNHoles);
     } else {
       HolesRow<u64> hrow(H, maxn, maxholes);
       std::tie(spill_bytes, out_recs) = map_shard_file<u64, ClassifyHoles>(
           in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev, on_progress,
-          &g_terminate, &stop_key);
+          &g_workerTerminate, &stop_key);
       printHolesRows(H, maxn, hrow.byNHoles);
     }
   } else if (counter_arg == "u128") {
     TriangleRow<u128> triangle(H, maxn);
     std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyTriangle>(
         in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev, on_progress,
-        &g_terminate, &stop_key);
+        &g_workerTerminate, &stop_key);
     printTriangleRows(H, maxn, triangle.row);
   } else {
     TriangleRow<u64> triangle(H, maxn);
     std::tie(spill_bytes, out_recs) = map_shard_file<u64, ClassifyTriangle>(
         in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev, on_progress,
-        &g_terminate, &stop_key);
+        &g_workerTerminate, &stop_key);
     printTriangleRows(H, maxn, triangle.row);
   }
 
@@ -305,4 +329,11 @@ int main(int argc, char** argv) {
   // A cooperative early stop is a SUCCESS (status 0): the partial output is
   // complete and valid over its range.  Only a real failure returns nonzero.
   return 0;
+}
+
+// Whitespace-split a stdin request line into tokens. Paths are orchestrator-
+int main(int argc, char** argv) {
+  raiseFdLimitToHard();  // the spill/merge path fans out to many open files
+  installWorkerSigtermHandler();
+  return runWorkerMain(argc, argv, runOneRequest);
 }

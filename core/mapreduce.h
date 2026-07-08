@@ -296,6 +296,16 @@ std::pair<size_t, size_t> map_shard_file(
   size_t total_spill_bytes = 0;
   int spill_seq = 0;
 
+  // Successor-counts arena (map-profile.md B2: succ.counts.assign() was the
+  // sole per-successor heap allocation, ~14% of map cycles; measured 415.8M
+  // allocations in a34's swept portion). Bump-allocates from a chunk sized
+  // to the spill budget; every succ this epoch shares it (all with EQUAL
+  // pmr allocators, so pmr::vector's move/swap/assign all take their normal
+  // fast paths, no element-wise fallback). Released (not just cleared) right
+  // after each do_spill() write-out, matching buf.clear()'s epoch boundary --
+  // bulk-freeing beats N individual frees, same asymmetry as the malloc side.
+  std::pmr::monotonic_buffer_resource succArena(succArenaHint(cfg.ram_budget_bytes));
+
 #ifdef POLY_PROFILE
   // Coarse phase wall-time + counters (Track B). Times the get-next-source-record
   // path (read+heap+combine), the map body (classify+enumerate+step+build), the
@@ -356,6 +366,7 @@ std::pair<size_t, size_t> map_shard_file(
     spill_files.push_back(spill_path);
     buf.clear();
     buf_bytes = 0;
+    succArena.release();  // bulk-free this epoch's succ.counts allocations
 #ifdef POLY_PROFILE
     prof_spill_s += prof::now() - _ts;
 #endif
@@ -452,7 +463,7 @@ std::pair<size_t, size_t> map_shard_file(
 
       if (cfg.fold) foldSig(out_sig, H);
 
-      RunRecord<W> succ;
+      RunRecord<W> succ(&succArena);  // arena-backed counts (map-profile.md B2)
       succ.sig    = out_sig;
       succ.H      = H;
       succ.keyLen = keyLen;

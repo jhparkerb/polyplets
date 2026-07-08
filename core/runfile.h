@@ -17,10 +17,12 @@
 
 #pragma once
 
+#include <csignal>
 #include <cstdio>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <functional>
 #include <memory>
 #include <queue>
 #include <string>
@@ -638,13 +640,34 @@ class RunFileReader {
 // Returns {body bytes written, record count} for out_path (count threaded out
 // of the writer so callers never reopen the file just to count it).
 
+// Progress/stop stride for mergeRunFiles' cooperative interrupt -- same
+// 1024 cadence as core/kink.h's kKinkProgressStrideMask, for the same
+// reason (cheap enough to check every time; a counter/gate around it costs
+// more than the check itself, see experiments/bench_viablemask.cpp's
+// counter-gating finding).
+static constexpr unsigned kMergeProgressStrideMask = (1u << 10) - 1;
+
 // keyLen defaults to 0 which means H+2 (triangle path); pass H+3 for holes.
+//
+// terminate/stop_key_out (both optional, nullptr = no steal support, the
+// original behavior): mergeRunFiles is a k-way heap merge, so unlike a
+// mid-record enumeration (kink's viableRec-shaped problem, deliberately
+// NOT given an interrupt point -- see results/sub-record-interrupt-design.md),
+// its "resume" semantics are simple and already native to this function:
+// stopping early just means "everything with sig < stop_key has been
+// written; call mergeRunFiles again with lo_hex=stop_key to cover the
+// rest" -- exactly the seekToKey fast path this function already uses for
+// its normal lo bound. No partial-tree-state problem, no new resume
+// concept needed.
 template <class W>
 std::pair<size_t, size_t> mergeRunFiles(
     const std::vector<std::string>& in_paths, int H,
     const std::string& lo_hex, const std::string& hi_hex,
     const std::string& out_path, const std::string& rev = "",
-    int keyLen = 0) {
+    int keyLen = 0,
+    const std::function<void(size_t)>& on_progress = {},
+    volatile std::sig_atomic_t* terminate = nullptr,
+    std::string* stop_key_out = nullptr) {
   if (keyLen == 0) keyLen = H + 2;
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};
@@ -698,6 +721,7 @@ std::pair<size_t, size_t> mergeRunFiles(
   uint64_t prof_combines = 0;
   const double prof_t0 = prof::now();
 #endif
+  size_t written = 0;
   while (!heap.empty()) {
 #ifdef POLY_PROFILE
     const double _tr = prof::now();
@@ -718,6 +742,20 @@ std::pair<size_t, size_t> mergeRunFiles(
     if (has_hi &&
         sigCmp(top.rec.sig.b, hi_sig, keyLen) >= 0)
       break;
+
+    // Cooperative stop (work-stealing): checked at the same cadence as the
+    // progress callback, BEFORE this record's combine/write, so [lo,
+    // stop_key) is exactly what's been written when we break -- the
+    // resumer re-merges the same inputs with lo_hex=stop_key, using the
+    // seekToKey fast path above, same as any other range boundary.
+    const bool atStride = (written & kMergeProgressStrideMask) == 0;
+    if (terminate && atStride && written > 0 && *terminate) {
+      if (stop_key_out) *stop_key_out = bytesToHex(top.rec.sig.b, keyLen);
+      break;
+    }
+    if (on_progress && atStride) {
+      on_progress(written);
+    }
 
 #ifdef POLY_PROFILE
     prof_read_s += prof::now() - _tr;
@@ -742,6 +780,7 @@ std::pair<size_t, size_t> mergeRunFiles(
     const double _tw = prof::now();
 #endif
     writer.append(top.rec);
+    ++written;
 #ifdef POLY_PROFILE
     prof_write_s += prof::now() - _tw;
 #endif

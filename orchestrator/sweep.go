@@ -43,6 +43,12 @@ type SweepConfig struct {
 	Heights         []int         // subset of heights to sweep (empty = 1..Maxn); for multi-machine split
 	PerHeightOut    string        // dir to write per-height h<H>.out files (empty = none)
 	Bin             WorkerBin
+	// Pool, if non-nil, dispatches map/merge work to a WorkerPool of
+	// persistent processes (Bottleneck #5) instead of spawning a fresh
+	// map_worker/merge_worker per unit. Optional and nil-safe: callers that
+	// don't set it (tests, gates) get the original exec-per-unit behavior
+	// unchanged. The production CLI (cmd/orchestrate) sets it.
+	Pool *WorkerPool
 
 	// afterColumn, if non-nil, is called after each forward checkpoint is
 	// written (one per completed column, plus the height-done checkpoint).
@@ -611,7 +617,7 @@ func sweepHeight(
 		// fails (or is cancelled), the checkpoint at col-1 has correct hTri.
 		// A failed merge causes us to checkpoint at col-1 with unchanged hTri;
 		// the resume will re-run this col from scratch.
-		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem, columnKeyLen(H), "")
+		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, tel, sem, activeHeights, columnKeyLen(H), "")
 		stopHB()
 		if err != nil {
 			// hTri does NOT include current col's contributions.
@@ -779,7 +785,7 @@ func sweepHeightKink(
 			}
 
 			t1 := time.Now()
-			mergeOuts, _, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem, mergeKeyLen, stage)
+			mergeOuts, _, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, tel, sem, activeHeights, mergeKeyLen, stage)
 			removeRuns(mapOuts)
 			if err != nil {
 				return nil, nil, fmt.Errorf("H=%d col=%d kink %s merge: %w", H, col, name, err)
@@ -888,13 +894,41 @@ type runningUnit struct {
 	started   time.Time      // when this unit went in-flight (for rate-based sizing)
 }
 
-// remaining estimates the input records this unit has left (clamped at 0).
+// remaining estimates the input records this unit has left. Every unit is
+// seeded with the SAME flat estTotal (frontierIn/n0, mapPhase's estPer) —
+// SampleKeysMulti cuts by record-quantile from a SAMPLED index, and a skewed
+// key distribution can make one range (typically the last, open-ended [lo,""))
+// hold far more real records than that average predicts. Measured: dalby
+// H17 col3's kink stage rounds routinely gave unit 319 (hi="") tens of
+// millions of records against a ~64K flat estimate, once even ~590M against
+// ~64K — a ~9000x miss. Once processed exceeds a too-low estTotal, clamping
+// to 0 makes such a unit look FINISHED and permanently invisible to the
+// stealer for the rest of its run, even with millions of records left — the
+// real reason zero steals fired on a real H17/H18-shaped column despite an
+// obvious, massive, wall-clock-dominating imbalance (not the record-vs-wall-
+// time floor distinction the earlier version of this fix targeted, which was
+// real but not what was actually starving this run). Falling back to `p`
+// itself once the estimate is exceeded keeps the unit visible with a
+// remaining estimate that tracks how long it's already run (so its implied
+// stealScore keeps growing the longer it actually goes), instead of
+// vanishing from consideration the moment a bad a-priori guess is crossed.
 func (r *runningUnit) remaining() uint64 {
 	p := r.processed.Load()
-	if p >= r.u.estTotal {
+	if p < r.u.estTotal {
+		return r.u.estTotal - p
+	}
+	// p >= estTotal: the flat a-priori estimate undercounted this unit's real
+	// range. Only treat this as "still going, unknown remainder" once
+	// processed has meaningfully overshot the estimate (2x) — an ordinary,
+	// correctly-sized unit's LAST progress pulse before finishing often
+	// overshoots its rough average estimate by a few percent (real per-unit
+	// sizes vary around the mean), and that shouldn't spuriously flag every
+	// normal unit's final instant as steal-worthy. Below 2x, treat it as
+	// genuinely near-done (the pre-fix behavior).
+	if p < 2*r.u.estTotal {
 		return 0
 	}
-	return r.u.estTotal - p
+	return p
 }
 
 // indexStride mirrors core/runfile.h kIndexStride: the .idx holds one key per
@@ -902,16 +936,62 @@ func (r *runningUnit) remaining() uint64 {
 const indexStride = 64
 
 // stealEligible reports whether an in-flight unit is worth stealing: making
-// progress, not already stopped/un-splittable, MORE than a grain of work left,
-// AND at least 2 index strides of records remaining so the .idx can actually cut
-// the remnant. Without the last clause the stealer stops a victim it then cannot
-// split, paying the stop+respawn overhead for zero fan-out (Stop-Then-Shrug).
-func stealEligible(r *runningUnit, grainRecs uint64) bool {
+// progress, not already stopped/un-splittable, and at least 2 index strides of
+// records remaining so the .idx can actually cut the remnant (without this
+// clause the stealer stops a victim it then cannot split, paying the
+// stop+respawn overhead for zero fan-out — Stop-Then-Shrug). Above that floor,
+// eligibility is granted by EITHER of two signals:
+//
+//   - the fast path: remaining RECORDS alone exceed grainRecs (the common
+//     case — cheap to check, no rate math needed).
+//   - the slow path: this unit's remaining record count is small, but at its
+//     OWN observed rate the remaining WALL TIME exceeds grainSeconds. This is
+//     the fix for results/steal-tail-h18.md's diagnosed miss — a
+//     compute-heavy straggler (a handful of pathological keys) can have few
+//     records left yet dominate the column tail; the record-only floor
+//     filtered it out before stealScore's own wall-time ranking ever saw it.
+//
+// grainSeconds<=0 (no usable pool-wide reference rate yet, e.g. column just
+// started) disables the slow path, NOT the whole check — falls back to
+// record-only, same as before this fix.
+func stealEligible(r *runningUnit, grainRecs uint64, grainSeconds float64, now time.Time) bool {
 	if r.stopped || r.u.noSteal || r.processed.Load() == 0 {
 		return false
 	}
 	rem := r.remaining()
-	return rem > grainRecs && rem >= 2*indexStride
+	if rem < 2*indexStride {
+		return false
+	}
+	if rem > grainRecs {
+		return true
+	}
+	return grainSeconds > 0 && stealScore(r, now) > grainSeconds
+}
+
+// refGrainSeconds converts grainRecs into a wall-time grain using the
+// observed pace of units that have already FINISHED (completedRecords over
+// the SUM of their own individual durations) — NOT total-done over elapsed
+// wall time since the round started. That distinction is load-bearing: a
+// cumulative-since-start average is diluted by however long the CURRENT
+// straggler has been idling everyone else, so it shrinks — and grainSeconds
+// grows — the longer the tail runs, making the eligibility bar harder to
+// clear exactly when a real straggler is dragging on. Pace-of-the-finished
+// is stable regardless of how long we've been waiting on whoever's still
+// running (see TestRefGrainSecondsStableAcrossElapsedTime — this is a
+// measured-regression test, not a hypothetical: the cumulative-elapsed
+// formula measured zero steals on a real H17 column with a textbook
+// flat-cpu/growing-wall straggler, see results/steal-tail-h18.md).
+// Returns 0 (disables the wall-time slow path, record-only fallback) until
+// at least one unit has finished.
+func refGrainSeconds(grainRecs uint64, completedRecords uint64, completedSeconds float64) float64 {
+	if completedSeconds <= 0 {
+		return 0
+	}
+	refRate := float64(completedRecords) / completedSeconds
+	if refRate <= 0 {
+		return 0
+	}
+	return float64(grainRecs) / refRate
 }
 
 // stealAllowed reports whether work-stealing may fire RIGHT NOW. A height's own
@@ -985,6 +1065,21 @@ func stealScore(r *runningUnit, now time.Time) float64 {
 // protocol the mid-column int-stage rounds (map_shard_stage_file) support, so
 // stopping one would kill it outright rather than yield a valid partial
 // output.
+//
+// TODO(scheduler-unification): mapPhase and mergePhase's queue+pickVictim+
+// thief-goroutine scheduler bodies are ~90% structurally identical (a
+// /simplify pass on the merge-steal work found this independently from 3 of
+// 4 review angles) -- differing only in per-unit dispatch (MapArgs/RunMap
+// vs MergeArgs/RunMerge), the source-file list used for split math
+// (frontier vs mapOuts), and a few map-only extras (H==maxn short-circuit,
+// unitMult/minPerUnit capping, triContribs, the seed/finalize
+// stealConfigured exclusion above). A shared `runStealPool` parameterized
+// by a per-unit dispatch closure would cut this to ~one scheduler instead
+// of two hand-synced copies -- worth doing, but deliberately NOT done as
+// part of the merge-steal work itself (concurrency-critical code, real
+// regression risk, needs its own careful pass with full gate+ASan+real
+// dalby validation, not a bolt-on cleanup while both copies were still
+// fresh and only just validated at production scale).
 func mapPhase(
 	ctx context.Context,
 	cfg SweepConfig,
@@ -1043,6 +1138,26 @@ func mapPhase(
 		grainRecs = uint64(cfg.StealGrain * float64(frontierIn) / float64(cfg.Cores))
 	}
 
+	// completedRecords/completedSeconds track the pace of units that have
+	// already FINISHED this mapPhase call: sum(records processed) /
+	// sum(each finished unit's own wall duration). This — not a cumulative
+	// totalDone/elapsedSincePhaseStart average — is the reference the
+	// wall-time steal floor (stealEligible's slow path) converts grainRecs
+	// into seconds against. A cumulative-since-start average is
+	// self-defeating: as a straggler drags on, elapsed keeps growing while
+	// total-done plateaus, so the "average" DEGRADES the longer the tail
+	// runs, inflating grainSeconds and making the bar harder to clear
+	// exactly when it matters most (measured: real H17 telemetry showed
+	// zero steals with that formula despite a textbook flat-cpu/growing-wall
+	// straggler). Finished-units-only pace isn't diluted by an ongoing
+	// straggler's elapsed time, only by how fast NORMAL units actually ran.
+	// Both vars are mutated/read only while `mu` is held (see call sites),
+	// so no atomics needed.
+	var completedRecords uint64
+	var completedSeconds float64
+	stealDebug := os.Getenv("POLY_STEAL_DEBUG") != ""
+	unitLog := os.Getenv("POLY_UNIT_LOG") != ""
+
 	var (
 		mu          sync.Mutex
 		cond        = sync.NewCond(&mu)
@@ -1077,14 +1192,28 @@ func mapPhase(
 			return nil
 		}
 		now := time.Now()
+		grainSeconds := refGrainSeconds(grainRecs, completedRecords, completedSeconds)
 		var best *runningUnit
 		var bestScore float64
 		for _, r := range inflight {
-			if !stealEligible(r, grainRecs) {
+			if !stealEligible(r, grainRecs, grainSeconds, now) {
 				continue
 			}
 			if sc := stealScore(r, now); sc > bestScore {
 				bestScore, best = sc, r
+			}
+		}
+		if stealDebug {
+			var oldest *runningUnit
+			for _, r := range inflight {
+				if oldest == nil || r.started.Before(oldest.started) {
+					oldest = r
+				}
+			}
+			if oldest != nil {
+				rem := oldest.remaining()
+				fmt.Printf("event=pickvictim H=%d col=%d stage=%s elapsed_oldest=%.3f processed=%d estTotal=%d rem=%d grainRecs=%d grainSeconds=%.6f score=%.3f picked=%v inflight=%d\n",
+					H, col, stage, now.Sub(oldest.started).Seconds(), oldest.processed.Load(), oldest.u.estTotal, rem, grainRecs, grainSeconds, stealScore(oldest, now), best == oldest, len(inflight))
 			}
 		}
 		return best
@@ -1119,7 +1248,6 @@ func mapPhase(
 				inflight[u.idx] = r
 				mu.Unlock()
 
-				sem <- struct{}{}
 				outName := fmt.Sprintf("map_h%d_c%d_u%d.bin", H, col, u.idx)
 				if stage != "" {
 					// Distinguish a kink column's seed/stage-r/finalize rounds, which
@@ -1137,10 +1265,21 @@ func mapPhase(
 					Counter: cfg.CounterWidth, LoHex: u.lo, HiHex: u.hi, Rev: cfg.Rev,
 					Kernel: kernel, Stage: stage,
 				}
-				res, runErr := RunMapWorker(mctx, cfg.Bin, a, unitProgress(tel, r.processed), r.stop)
-				<-sem
+				var res WorkerResult
+				var runErr error
+				if cfg.Pool != nil {
+					// The pool's own checkout/checkin IS the Cores-wide gate here
+					// (mirrors sem's capacity exactly) -- no sem, no fork+exec.
+					res, runErr = cfg.Pool.RunMap(a, unitProgress(tel, r.processed), r.stop)
+				} else {
+					sem <- struct{}{}
+					res, runErr = RunMapWorker(mctx, cfg.Bin, a, unitProgress(tel, r.processed), r.stop)
+					<-sem
+				}
 
 				mu.Lock()
+				completedRecords += r.processed.Load()
+				completedSeconds += time.Since(r.started).Seconds()
 				delete(inflight, u.idx)
 				if runErr != nil {
 					if firstErr == nil {
@@ -1158,9 +1297,9 @@ func mapPhase(
 				}
 				triContribs = append(triContribs, res.TriContribs)
 				acct.Add(res.Acct)
-				if os.Getenv("POLY_UNIT_LOG") != "" {
-					fmt.Printf("event=unit H=%d col=%d u=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f stop_key=%s\n",
-						H, col, u.idx, u.lo, u.hi, res.OutRecords, res.Acct.CPUS, res.Acct.WallS, res.StopKey)
+				if unitLog {
+					fmt.Printf("event=unit H=%d col=%d u=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f start_unix=%.6f stop_key=%s\n",
+						H, col, u.idx, u.lo, u.hi, res.OutRecords, res.Acct.CPUS, res.Acct.WallS, float64(r.started.UnixNano())/1e9, res.StopKey)
 				}
 
 				// Did this unit stop early at a steal cursor? If so requeue the
@@ -1171,7 +1310,7 @@ func mapPhase(
 					queue = append(queue, children...)
 					outstanding += len(children) - 1 // this unit done; children added
 					tel.steal()
-					if os.Getenv("POLY_UNIT_LOG") != "" {
+					if unitLog {
 						fmt.Printf("event=steal H=%d col=%d victim_u=%d cursor=%s children=%d rem=%d\n",
 							H, col, u.idx, res.StopKey, len(children), r.remaining())
 					}
@@ -1197,6 +1336,24 @@ func mapPhase(
 // be cut (a narrow range), it returns the single range flagged noSteal so the
 // stealer won't thrash on it.  Each child inherits an even share of the parent's
 // remaining estimate.  Caller holds the scheduler mutex (mutates *nextIdx).
+//
+// TODO(idx-caching): this calls SplitRangeByIndex -> indexKeysInRange, which
+// opens and binary-searches every file in `frontier`/`mapOuts` FROM SCRATCH
+// on every single steal, while still holding the scheduler mutex (blocking
+// every other pool goroutine for that I/O). Cheap when steals are rare, but
+// merge-steal now fires hundreds of times per column on a real production
+// column (measured this session) -- that's thousands of redundant file
+// opens/seeks per phase call for a fixed file set that doesn't change
+// across steals within one mapPhase/mergePhase invocation. Two independent
+// fixes, either worth doing on its own: (1) parse each .idx sidecar once
+// per phase call into an in-memory sorted key slice and bisect that on
+// subsequent steals instead of reopening the file; (2) compute `children`
+// outside the mutex (copy the fields this function needs, unlock, split,
+// relock only to splice into queue/outstanding) so the I/O doesn't block
+// the whole pool regardless. Not done here (found via a /simplify pass
+// after merge-steal was already validated at real dalby scale) -- real,
+// worth a dedicated follow-up, not a scope-creep addition to a cleanup
+// pass on already-working code.
 func splitRemainder(frontier []string, H, keyLen int, cursor, hi string, freeCores int,
 	remaining, grainRecs uint64, nextIdx *int) []mapUnit {
 
@@ -1248,12 +1405,25 @@ func splitBounds(lo, hi string, cuts []string) (los, his []string) {
 // output filename ("" = column kernel, unchanged naming); a kink column runs
 // several rounds at the same (H,col) and the rounds' outputs would otherwise
 // collide on name (see mapPhase's matching outName comment).
+// mergePhase merges via the same dynamic queue+work-stealing pool as
+// mapPhase (Bottleneck: Merge Range Straggler — merge ranges are split by
+// SampleKeysMulti exactly like map units and suffer the same RGS-driven
+// cost skew, but until this fix merge had ZERO rebalancing: all ranges
+// launched as fixed goroutines up front with no requeue path, so whichever
+// range was intrinsically expensive just ran alone while idle cores waited
+// — the same "one process busy in htop" shape map had before its own
+// steal-eligibility bug was fixed, just with no mechanism at all here
+// rather than a broken one). Reuses mapUnit/runningUnit/splitRemainder
+// (all already generic key-range types, not map-specific) against mapOuts
+// as the source files instead of frontier.
 func mergePhase(
 	ctx context.Context,
 	cfg SweepConfig,
 	H, col int,
 	mapOuts []string,
+	tel *telemetry,
 	sem chan struct{},
+	activeHeights *atomic.Int32,
 	keyLen int,
 	stage string,
 ) ([]string, uint64, Acct, error) {
@@ -1262,6 +1432,7 @@ func mergePhase(
 		return nil, 0, Acct{}, nil
 	}
 
+	totalIn := sumFrontierRecords(mapOuts)
 	numRanges := cfg.Cores * mergeMult(cfg)
 	if numRanges < 1 {
 		numRanges = 1
@@ -1275,62 +1446,174 @@ func mergePhase(
 		return nil, 0, Acct{}, err
 	}
 	los, his := cutsToBounds(cuts)
-	actualRanges := len(los)
+	n0 := len(los)
 
-	type rangeResult struct {
-		idx     int
-		outPath string
-		result  WorkerResult
-		err     error
+	var grainRecs uint64
+	stealConfigured := cfg.StealGrain > 0 && cfg.Cores > 1
+	if stealConfigured && totalIn > 0 {
+		grainRecs = uint64(cfg.StealGrain * float64(totalIn) / float64(cfg.Cores))
 	}
-	results := make([]rangeResult, actualRanges)
 
-	// sem (the Cores-wide worker pool) is shared across concurrently-running
-	// heights in overlap mode; here one height's merge can fill cores a
-	// concurrent height's map phase has freed.
+	var completedRecords uint64
+	var completedSeconds float64
+	stealDebug := os.Getenv("POLY_STEAL_DEBUG") != ""
+	unitLog := os.Getenv("POLY_UNIT_LOG") != ""
+
+	var (
+		mu          sync.Mutex
+		cond        = sync.NewCond(&mu)
+		queue       []mapUnit
+		inflight    = map[int]*runningUnit{}
+		outstanding = n0
+		nextIdx     = n0
+		firstErr    error
+
+		outPaths  []string
+		totalRecs uint64
+		acct      Acct
+	)
+	estPer := uint64(1)
+	if n0 > 0 {
+		estPer = totalIn / uint64(n0)
+	}
+	for i := 0; i < n0; i++ {
+		queue = append(queue, mapUnit{idx: i, lo: los[i], hi: his[i], estTotal: estPer})
+	}
+
+	mctx, mcancel := context.WithCancel(ctx)
+	defer mcancel()
+
+	pickVictim := func() *runningUnit {
+		if grainRecs == 0 || !stealAllowed(activeHeights) {
+			return nil
+		}
+		now := time.Now()
+		grainSeconds := refGrainSeconds(grainRecs, completedRecords, completedSeconds)
+		var best *runningUnit
+		var bestScore float64
+		for _, r := range inflight {
+			if !stealEligible(r, grainRecs, grainSeconds, now) {
+				continue
+			}
+			if sc := stealScore(r, now); sc > bestScore {
+				bestScore, best = sc, r
+			}
+		}
+		if stealDebug {
+			var oldest *runningUnit
+			for _, r := range inflight {
+				if oldest == nil || r.started.Before(oldest.started) {
+					oldest = r
+				}
+			}
+			if oldest != nil {
+				rem := oldest.remaining()
+				fmt.Printf("event=pickvictim-merge H=%d col=%d elapsed_oldest=%.3f processed=%d estTotal=%d rem=%d grainRecs=%d grainSeconds=%.6f score=%.3f picked=%v inflight=%d\n",
+					H, col, now.Sub(oldest.started).Seconds(), oldest.processed.Load(), oldest.u.estTotal, rem, grainRecs, grainSeconds, stealScore(oldest, now), best == oldest, len(inflight))
+			}
+		}
+		return best
+	}
+
 	var wg sync.WaitGroup
-	for i := 0; i < actualRanges; i++ {
+	for w := 0; w < cfg.Cores; w++ {
 		wg.Add(1)
-		go func(idx int) {
+		go func() {
 			defer wg.Done()
-			sem <- struct{}{}
-			defer func() { <-sem }()
+			for {
+				mu.Lock()
+				for {
+					if firstErr != nil || outstanding == 0 {
+						mu.Unlock()
+						return
+					}
+					if len(queue) > 0 {
+						break
+					}
+					if v := pickVictim(); v != nil {
+						v.stopped = true
+						close(v.stop)
+					}
+					cond.Wait()
+				}
+				u := queue[len(queue)-1]
+				queue = queue[:len(queue)-1]
+				r := &runningUnit{u: u, processed: new(atomic.Uint64), stop: make(chan struct{}), started: time.Now()}
+				inflight[u.idx] = r
+				mu.Unlock()
 
-			outName := fmt.Sprintf("merge_h%d_c%d_r%d.bin", H, col, idx)
-			if stage != "" {
-				outName = fmt.Sprintf("merge_h%d_c%d_k%s_r%d.bin", H, col, stage, idx)
+				outName := fmt.Sprintf("merge_h%d_c%d_r%d.bin", H, col, u.idx)
+				if stage != "" {
+					outName = fmt.Sprintf("merge_h%d_c%d_k%s_r%d.bin", H, col, stage, u.idx)
+				}
+				outPath := filepath.Join(cfg.RunDir, outName)
+				a := MergeArgs{
+					InPaths: mapOuts,
+					H:       H,
+					OutPath: outPath,
+					Counter: cfg.CounterWidth,
+					KLoHex:  u.lo,
+					KHiHex:  u.hi,
+					Rev:     cfg.Rev,
+					KeyLen:  keyLen,
+				}
+				var res WorkerResult
+				var runErr error
+				if cfg.Pool != nil {
+					res, runErr = cfg.Pool.RunMerge(a, unitProgress(nil, r.processed), r.stop)
+				} else {
+					sem <- struct{}{}
+					res, runErr = RunMergeWorker(mctx, cfg.Bin, a, unitProgress(nil, r.processed), r.stop)
+					<-sem
+				}
+				if unitLog {
+					fmt.Printf("event=mergerange H=%d col=%d r=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f start_unix=%.6f stop_key=%s\n",
+						H, col, u.idx, u.lo, u.hi, res.OutRecords, res.Acct.CPUS, res.Acct.WallS, float64(r.started.UnixNano())/1e9, res.StopKey)
+				}
+
+				mu.Lock()
+				completedRecords += r.processed.Load()
+				completedSeconds += time.Since(r.started).Seconds()
+				delete(inflight, u.idx)
+				if runErr != nil {
+					if firstErr == nil {
+						firstErr = fmt.Errorf("merge range %d [%s,%s): %w", u.idx, u.lo, u.hi, runErr)
+						mcancel()
+					}
+					cond.Broadcast()
+					mu.Unlock()
+					continue
+				}
+				if res.OutRecords > 0 {
+					outPaths = append(outPaths, outPath)
+					totalRecs += res.OutRecords
+				} else {
+					removeRun(outPath)
+				}
+				acct.Add(res.Acct)
+
+				if res.StopKey != "" && res.StopKey != u.hi {
+					children := splitRemainder(mapOuts, H, keyLen, res.StopKey, u.hi,
+						cfg.Cores-len(inflight), r.remaining(), grainRecs, &nextIdx)
+					queue = append(queue, children...)
+					outstanding += len(children) - 1
+					tel.steal()
+					if unitLog {
+						fmt.Printf("event=steal-merge H=%d col=%d victim_r=%d cursor=%s children=%d rem=%d\n",
+							H, col, u.idx, res.StopKey, len(children), r.remaining())
+					}
+				} else {
+					outstanding--
+				}
+				cond.Broadcast()
+				mu.Unlock()
 			}
-			outPath := filepath.Join(cfg.RunDir, outName)
-			a := MergeArgs{
-				InPaths: mapOuts,
-				H:       H,
-				OutPath: outPath,
-				Counter: cfg.CounterWidth,
-				KLoHex:  los[idx],
-				KHiHex:  his[idx],
-				Rev:     cfg.Rev,
-				KeyLen:  keyLen,
-			}
-			r, err := RunMergeWorker(ctx, cfg.Bin, a)
-			results[idx] = rangeResult{idx: idx, outPath: outPath, result: r, err: err}
-		}(i)
+		}()
 	}
 	wg.Wait()
 
-	var outPaths []string
-	var totalRecs uint64
-	var acct Acct
-	for _, rr := range results {
-		if rr.err != nil {
-			return nil, 0, Acct{}, fmt.Errorf("merge range %d: %w", rr.idx, rr.err)
-		}
-		if rr.result.OutRecords > 0 {
-			outPaths = append(outPaths, rr.outPath)
-			totalRecs += rr.result.OutRecords
-		} else {
-			removeRun(rr.outPath)
-		}
-		acct.Add(rr.result.Acct)
+	if firstErr != nil {
+		return nil, 0, Acct{}, firstErr
 	}
 	return outPaths, totalRecs, acct, nil
 }

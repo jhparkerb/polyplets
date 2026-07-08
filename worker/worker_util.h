@@ -6,8 +6,13 @@
 
 #pragma once
 
+#include <cctype>
+#include <csignal>
+#include <cstdio>
 #include <cstring>
 #include <ctime>
+#include <functional>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -94,4 +99,104 @@ inline double peakRssMB() {
 #else
   return static_cast<double>(ru.ru_maxrss) / 1024.0;
 #endif
+}
+
+// ─── SIGTERM handling: cooperative work-stealing stop ────────────────────────
+// Shared by map_worker.cpp and merge_worker.cpp (identical in both before
+// this extraction): the orchestrator raises SIGTERM to ask a straggler unit
+// to stop early and hand its remainder to idle cores. `g_workerTerminate`
+// (a `volatile sig_atomic_t`, the only signal-safe flag width) is checked
+// cooperatively inside the hot loop; the SIGTERM handler itself just sets
+// the flag, does not exit -- a clean, successful stop (status 0) is
+// distinct from a hard SIGKILL (uncatchable, discards the partial output
+// for a later --resume). Each worker binary gets its own copy of this flag
+// (separate processes, separate translation units), so no cross-binary
+// aliasing risk despite the shared header.
+inline volatile std::sig_atomic_t g_workerTerminate = 0;
+inline void onWorkerSigterm(int) { g_workerTerminate = 1; }
+inline void installWorkerSigtermHandler() {
+  std::signal(SIGTERM, onWorkerSigterm);
+}
+
+// Throttled progress emitter: at most one "event=progress processed=N
+// elapsed_s=T" line every ~2s, EXCEPT the very first call, which fires
+// immediately regardless of elapsed time. The orchestrator streams these
+// to drive the within-column heartbeat AND gates work-stealing eligibility
+// on processed>0 (stealEligible, orchestrator/sweep.go) -- with a flat 2s
+// throttle including the first call, any unit whose whole runtime fell
+// under 2s reported processed=0 for its entire life, making it permanently
+// un-stealable no matter how much of the pool was waiting on it (found
+// investigating why work-stealing measured near-zero even with an idle
+// pool and a lone straggler: picked=false because processed=0 the whole
+// time). Construct one per request (not once per process): `t0` should be
+// the request's own start time, and `emitted_once` must reset per request
+// so a fast request doesn't inherit a slow one's "already emitted" state.
+class ThrottledProgressEmitter {
+ public:
+  explicit ThrottledProgressEmitter(double t0) : t0_(t0), lastEmit_(t0) {}
+
+  void operator()(size_t processed) {
+    const double now = wallSeconds();
+    if (!emittedOnce_ || now - lastEmit_ >= 2.0) {
+      emittedOnce_ = true;
+      lastEmit_ = now;
+      std::printf("event=progress processed=%zu elapsed_s=%.1f\n", processed, now - t0_);
+      std::fflush(stdout);
+    }
+  }
+
+ private:
+  double t0_;
+  double lastEmit_;
+  bool emittedOnce_ = false;
+};
+
+// Whitespace-split a stdin request line into tokens. Paths in this codebase
+// are always constructed (run-dir/spill-dir-relative filenames), never
+// contain spaces, so this simple split is exact -- no quoting support
+// needed, matching argv's own space-delimited contract for the same flag
+// set used one-shot.
+inline std::vector<std::string> tokenizeLine(const std::string& line) {
+  std::vector<std::string> tokens;
+  size_t i = 0;
+  while (i < line.size()) {
+    while (i < line.size() && std::isspace(static_cast<unsigned char>(line[i]))) ++i;
+    size_t start = i;
+    while (i < line.size() && !std::isspace(static_cast<unsigned char>(line[i]))) ++i;
+    if (i > start) tokens.push_back(line.substr(start, i - start));
+  }
+  return tokens;
+}
+
+// Shared driver for both worker CLIs' main(): parses argv for --persistent,
+// and either runs runOneRequest once (one-shot, the original per-process
+// contract) or loops over stdin lines calling it (persistent mode,
+// resetting g_workerTerminate between requests so a prior request's
+// SIGTERM doesn't bleed into the next -- see g_workerTerminate's comment).
+// Callers still call installWorkerSigtermHandler() and raiseFdLimitToHard()
+// themselves before this (the latter kept out of worker_util.h to preserve
+// its "no core/ dependency" contract stated at the top of this file).
+inline int runWorkerMain(
+    int argc, char** argv,
+    const std::function<int(const std::vector<std::string>&)>& runOneRequest) {
+  std::vector<std::string> tokens(argv + 1, argv + argc);
+  bool persistent = false;
+  std::vector<std::string> filtered;
+  filtered.reserve(tokens.size());
+  for (auto& t : tokens) {
+    if (t == "--persistent") persistent = true;
+    else filtered.push_back(t);
+  }
+
+  if (!persistent) return runOneRequest(filtered);
+
+  std::string line;
+  while (std::getline(std::cin, line)) {
+    if (line.empty()) continue;
+    g_workerTerminate = 0;
+    const int rc = runOneRequest(tokenizeLine(line));
+    if (rc != 0) return rc;  // a real failure exits, same as the one-shot path
+    std::fflush(stdout);
+  }
+  return 0;
 }

@@ -1,0 +1,49 @@
+Reference-paper archive for paper/polyplets-report.tex
+(PDFs are gitignored local copies; this index and MISSING.md are tracked.)
+
+== Cited in the report's bibliography ==
+
+bibkey       file                                       citation
+----------   ----------------------------------------   ---------------------------------------------------------
+redelmeier   redelmeier_1981.pdf (+ .txt)               Redelmeier, Counting polyominoes: yet another attack, Discrete Math. 36(2) (1981) 191-203.
+klarner      klarner.pdf                                Klarner, Cell growth problems, Canad. J. Math. 19 (1967) 851-863.
+jensen2001   jensen_lattice_animals.pdf                 Jensen, Enumerations of lattice animals and trees, J. Stat. Phys. 102(3-4) (2001) 865-881.
+jensen2003   jensen_counting_polyominoes_parallel.pdf   Jensen, Counting polyominoes: a parallel implementation for cluster computing, ICCS 2003, LNCS 2659, 203-212.
+bousquet     bousquet.pdf                               Bousquet-Melou, A method for the enumeration of various classes of column-convex polygons, Discrete Math. 154 (1996) 1-25.
+nijenhuis    nijenhuis.pdf                              Nijenhuis & Wilf, Combinatorial Algorithms for Computers and Calculators, 2nd ed., Academic Press, 1978 (SELECT, pp. 99-116).
+stanley      stanley.pdf                                Stanley, Enumerative Combinatorics Vol. 1, 2nd ed., Cambridge UP, 2012 (Theorem 4.1.1).
+barequet     barequet.pdf                               Barequet, Rote, Shalah, lambda > 4: An improved lower bound on the growth constant of polyominoes, CACM 59(7) (2016) 88-95.
+strang       strang.pdf                                 Strang, Maximum area with Minkowski measures of perimeter, Proc. R. Soc. Edinb. A 138(1) (2008) 189-199.
+massey       massey.pdf                                 Massey, Shift-register synthesis and BCH decoding, IEEE Trans. Inf. Theory 15(1) (1969) 122-127.
+gray         gray.pdf                                   Gray, Local properties of binary images in two dimensions, IEEE Trans. Computers C-20(5) (1971) 551-561.
+(oeis in the bibliography = the OEIS website, not a paper.)
+
+== Background research, not cited ==
+
+Polyomino/animal enumeration:
+  read_1962_cell_growth.pdf                Read, Contributions to the cell growth problem, Canad. J. Math. 14 (1962) 1-20.
+  klarner_rivest_1973_upper_bound.pdf      Klarner & Rivest, A procedure for improving the upper bound for the number of n-ominoes (1973).
+  mertens_1990_lattice_animals.pdf         Mertens, Lattice animals: a fast enumeration algorithm and new perimeter polynomials, J. Stat. Phys. 58 (1990). (Cited in the OEIS A006770 entry.)
+  mertens_lautenbacher_1991_parallel.pdf   Mertens & Lautenbacher, Counting lattice animals: a parallel attack, J. Stat. Phys. 66 (1992).
+  1106.1078.pdf                            Luther & Mertens, Counting lattice animals in high dimensions, arXiv:1106.1078 (2011).
+  cond-mat_0301468.pdf                     Jensen, A parallel algorithm for the enumeration of self-avoiding polygons on the square lattice, arXiv:cond-mat/0301468 (2003).
+  counting_polyominoes_revisited.pdf       Barequet & Ben-Shachar, Counting polyominoes, revisited (TOPP problem 37 line of work).
+  shirakawa_n59.pdf                        Enumeration of polyominoes up to size n=59 (per PDF title).
+  barequet_moffie_2007_jensen_complexity.pdf  Barequet & Moffie, On the complexity of Jensen's algorithm for counting fixed polyominoes (2007).
+  barequet_rote_twisted_cylinders.pdf      Barequet & Rote, lambda bounds via twisted cylinders.
+  voge_guttmann_2003.pdf                   Voge & Guttmann (2003), polygon/animal series analysis.
+  guttmann_series_appendix.pdf             Guttmann, series-analysis appendix (differential approximants background).
+  jensen_benzenoid_parallel.pdf            Jensen, parallel enumeration of benzenoid hydrocarbons.
+  efficient_enumeration_algorithms_2016.pdf  Efficient enumeration algorithms survey/paper (2016).
+  tremblay_vernay.pdf                      Tremblay & Vernay, On the generation of discrete figures with connectivity constraints, RAIRO-TIA 58 (2024). (Source of A006770's a(18); cited in the OEIS entry.)
+
+Distributed-computing background (engine design era):
+  dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).
+  afrati_dassarma_2013_mapreduce_cost_bounds.pdf  Afrati et al., MapReduce cost bounds.
+  bu_2010_haloop.pdf                       Bu et al., HaLoop (2010).
+  zaharia_2012_spark_rdd.pdf               Zaharia et al., Spark RDDs (NSDI 2012).
+
+Other:
+  refs-transfer-matrix.md                  reading notes on the transfer-matrix literature.
+
+MISSING.md — wanted papers we could not obtain (for library lookup).

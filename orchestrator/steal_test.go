@@ -21,21 +21,22 @@ func unit(remaining, processed uint64) *runningUnit {
 func TestStealEligibleSkipsUnsplittable(t *testing.T) {
 	grain := uint64(10)
 
+	now := time.Now()
 	// remaining=50: above the grain (10) but below 2*indexStride (128) → too
 	// small to split → must be ineligible (the Stop-Then-Shrug case).
-	if stealEligible(unit(50, 100), grain) {
+	if stealEligible(unit(50, 100), grain, 0, now) {
 		t.Fatalf("stole an unsplittable remnant (50 records < 2*indexStride=%d) — Stop-Then-Shrug", 2*indexStride)
 	}
 	// remaining=1000: above grain AND ≥2 strides → splittable → eligible.
-	if !stealEligible(unit(1000, 100), grain) {
+	if !stealEligible(unit(1000, 100), grain, 0, now) {
 		t.Fatalf("a large splittable remnant should be steal-eligible")
 	}
-	// at the grain floor → ineligible.
-	if stealEligible(unit(10, 100), grain) {
+	// at the grain floor → ineligible (no wall-time signal to override it).
+	if stealEligible(unit(10, 100), grain, 0, now) {
 		t.Fatalf("remnant at the grain floor must be ineligible")
 	}
 	// no progress yet (processed=0) → ineligible (can't size it).
-	if stealEligible(unit(1000, 0), grain) {
+	if stealEligible(unit(1000, 0), grain, 0, now) {
 		t.Fatalf("a unit with no progress must be ineligible")
 	}
 }
@@ -85,6 +86,130 @@ func TestStealAllowedGatesOnActiveHeights(t *testing.T) {
 	// concurrently.
 	if !stealAllowed(nil) {
 		t.Fatalf("nil activeHeights must allow stealing unconditionally")
+	}
+}
+
+// TestStealEligibleWallTimeFloor — RED before the record-floor fix
+// (results/steal-tail-h18.md). A compute-heavy straggler with few RECORDS
+// left but a rate far below the pool average must still be eligible: its
+// remaining WALL TIME (at its own slow rate) can exceed the grain even
+// though its remaining record count does not. Pre-fix, stealEligible only
+// checked rem>grainRecs, so a34/a32's H18 tail (a handful of pathological
+// keys, low records/high compute) never cleared the bar and stealScore
+// never got a chance to rank it.
+func TestStealEligibleWallTimeFloor(t *testing.T) {
+	now := time.Now()
+	grainRecs := uint64(500) // e.g. StealGrain*frontierIn/cores
+
+	// Compute-heavy straggler: 200 records left (below grainRecs=500, but
+	// above the 2*indexStride=128 splittability floor), processed 200 in
+	// 400s (~0.5/s) => ~400s of wall time still left.
+	slow := unit(200, 200)
+	slow.started = now.Add(-400 * time.Second)
+
+	// grainSeconds=10: a "grain" at the pool's average pace is only 10s, so
+	// this straggler's ~400s remaining clears the wall-time floor even
+	// though its 200 remaining records don't clear the 500-record floor.
+	if !stealEligible(slow, grainRecs, 10, now) {
+		t.Fatalf("a low-record/high-cost straggler (~400s left) must be eligible under a small wall-time grain (10s), even though rem=200 < grainRecs=500")
+	}
+
+	// A genuinely near-finished, fast unit (same 200 records left, but
+	// processed 2000 in 2s => ~0.2s left at its own pace) must stay
+	// ineligible even with the same wall-time grain — the fix must not make
+	// everything eligible.
+	fast := unit(200, 2000)
+	fast.started = now.Add(-2 * time.Second)
+	if stealEligible(fast, grainRecs, 10, now) {
+		t.Fatalf("a near-finished fast unit must remain ineligible under the wall-time floor too")
+	}
+
+	// grainSeconds<=0 (no reference rate yet, e.g. column just started) must
+	// fall back to the pure record-based check, not treat everyone as eligible.
+	if stealEligible(slow, grainRecs, 0, now) {
+		t.Fatalf("with no usable reference rate (grainSeconds<=0), must fall back to the record floor, not admit everyone")
+	}
+}
+
+// TestRemainingFallsBackWhenEstimateGrosslyExceeded — measured regression
+// test for the actual dominant bug (found via a real dalby H17 column, worse
+// than the record-vs-wall-time floor issue above): every unit is seeded with
+// the SAME flat estTotal (frontierIn/n0), but SampleKeysMulti's record-
+// quantile cuts from a sampled index can badly misjudge a skewed key
+// distribution. Measured: unit 319 (the last, open-ended [lo,"") range) on
+// dalby H17 col3 held up to ~590M records against a ~64K flat estimate — a
+// ~9000x miss. Pre-fix, remaining() clamped to 0 the instant processed
+// exceeded that too-low estimate, making the unit look FINISHED and
+// permanently invisible to the stealer for the rest of its run — explaining
+// why zero steals fired despite an obvious, wall-clock-dominating imbalance.
+func TestRemainingFallsBackWhenEstimateGrosslyExceeded(t *testing.T) {
+	// Grossly undersized estimate (100), wildly overshot (50000 processed,
+	// 500x) -- the monster-unit case. Must report a large nonzero remaining,
+	// not 0, so the stealer keeps seeing it as a live, steal-worthy victim.
+	p := new(atomic.Uint64)
+	p.Store(50000)
+	monster := &runningUnit{u: mapUnit{estTotal: 100}, processed: p}
+	if rem := monster.remaining(); rem == 0 {
+		t.Fatalf("a unit that overshot its estimate by 500x must not report remaining()=0 (invisible to the stealer)")
+	} else if rem != 50000 {
+		t.Fatalf("expected the fallback to report processed (50000) as remaining, got %d", rem)
+	}
+
+	// Ordinary near-done overshoot (estimate 1000, processed 1200, 1.2x) --
+	// must NOT trigger the fallback; every normal unit's last progress pulse
+	// before finishing routinely overshoots its rough average estimate by a
+	// few percent, and treating that as "steal-worthy" would spuriously flag
+	// every unit's final instant.
+	p2 := new(atomic.Uint64)
+	p2.Store(1200)
+	normal := &runningUnit{u: mapUnit{estTotal: 1000}, processed: p2}
+	if rem := normal.remaining(); rem != 0 {
+		t.Fatalf("an ordinary ~20%% overshoot at completion must still report remaining()=0 (near-done), got %d", rem)
+	}
+}
+
+// TestRefGrainSecondsStableAcrossElapsedTime — measured regression test for
+// the bug the FIRST version of the wall-time floor shipped with (caught on a
+// real dalby H17 column, results/steal-tail-h18.md): using
+// totalDone/elapsedSincePhaseStart as the reference rate is self-defeating —
+// as a straggler drags on, elapsed keeps growing while total-done plateaus,
+// so the "average" DEGRADES the longer the tail runs, inflating grainSeconds
+// and making the eligibility bar HARDER to clear exactly when a real
+// straggler is present. Zero steals fired on that real run despite a
+// textbook flat-cpu/growing-wall straggler. The fix (finished-units-only
+// pace: completedRecords/completedSeconds, not divided by wall elapsed)
+// must give the SAME grainSeconds regardless of how long we've been
+// waiting on whoever's still running — this test pins that invariance
+// directly, without needing a real multi-minute run to notice a regression.
+func TestRefGrainSecondsStableAcrossElapsedTime(t *testing.T) {
+	grainRecs := uint64(12735) // e.g. 0.05*frontierIn/cores at H17 col3 stage16 scale
+
+	// 319 units finished fast (their OWN durations, not wall-clock elapsed):
+	// ~63000 records each in ~0.05s each.
+	completedRecords := uint64(319 * 63000)
+	completedSeconds := 319 * 0.05
+
+	g := refGrainSeconds(grainRecs, completedRecords, completedSeconds)
+	if g <= 0 {
+		t.Fatalf("expected a positive grainSeconds once units have finished, got %v", g)
+	}
+
+	// The straggler drags on for a long time — completedRecords/completedSeconds
+	// (computed from units that already finished) must NOT change just because
+	// more real time has passed waiting on it. A cumulative-since-start
+	// formula would shrink its reference rate here (same totalDone, much
+	// larger elapsed), inflating grainSeconds — exactly the bug.
+	gLater := refGrainSeconds(grainRecs, completedRecords, completedSeconds)
+	if gLater != g {
+		t.Fatalf("grainSeconds must be stable across elapsed time (same finished-unit stats): got %v then %v", g, gLater)
+	}
+
+	// Sanity: doubling the finished units' pace (same records, half the time)
+	// must roughly halve grainSeconds, confirming the ratio actually reflects
+	// pace and isn't a constant.
+	gFaster := refGrainSeconds(grainRecs, completedRecords, completedSeconds/2)
+	if gFaster >= g/1.9 {
+		t.Fatalf("doubling finished-unit pace should roughly halve grainSeconds: got %v (was %v)", gFaster, g)
 	}
 }
 

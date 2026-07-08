@@ -53,7 +53,15 @@ func ParseHeader(path string) (PolyrunHeader, int64, error) {
 	}
 	defer f.Close()
 
-	br := bufio.NewReader(f)
+	// Small explicit buffer, not bufio.NewReader's 4KB default: the text
+	// header is a handful of short "key value" lines (height/maxn/records/
+	// counter/keylo/keyhi/rev), a few hundred bytes at most, but ParseHeader
+	// is called once per SampleKeys call -- i.e. once per file per map/merge
+	// round -- so the oversized default buffer showed up as the largest
+	// remaining allocator in a real heap profile after fixing the two
+	// wasted-reader call sites above (docs/utilization-bottleneck-log.md
+	// Bottleneck #4).
+	br := bufio.NewReaderSize(f, 256)
 	var hdr PolyrunHeader
 	var offset int64
 
@@ -128,7 +136,7 @@ func sampleIndexKeys(idxPath string, keyLen, numCuts int) ([]string, error) {
 		return nil, err
 	}
 	defer f.Close()
-	cnt, err := readIndexHeader(bufio.NewReader(f), keyLen)
+	cnt, err := readIndexHeader(f, keyLen)
 	if err != nil {
 		return nil, err
 	}
@@ -311,30 +319,28 @@ const (
 )
 
 // readIndexHeader reads + validates the .idx self-describing header (the single
-// place that knows the on-disk layout) and returns the entry count.
-func readIndexHeader(br *bufio.Reader, wantKeyLen int) (uint64, error) {
-	var magic, kl uint32
-	var ver uint16
-	var bo uint8
-	var cnt uint64
-	if err := binary.Read(br, binary.LittleEndian, &magic); err != nil {
+// place that knows the on-disk layout) and returns the entry count. Takes a
+// plain io.Reader (an *os.File works directly, no buffering) and reads the
+// fixed idxHeaderBytes in one call: this is a hot path (called once per
+// SampleKeysMulti/indexKeysInRange invocation -- every map/merge round of
+// every column of every height), and the two callers that read only this
+// header before switching to positioned f.ReadAt calls were each allocating
+// a full bufio.Reader (4KB default buffer) just to decode 19 bytes, then
+// discarding it -- confirmed via a real heap-alloc profile as ~35% of a real
+// run's total allocation (docs/utilization-bottleneck-log.md Bottleneck #4).
+func readIndexHeader(r io.Reader, wantKeyLen int) (uint64, error) {
+	var hdr [idxHeaderBytes]byte
+	if _, err := io.ReadFull(r, hdr[:]); err != nil {
 		return 0, err
 	}
-	if err := binary.Read(br, binary.LittleEndian, &ver); err != nil {
-		return 0, err
-	}
-	if err := binary.Read(br, binary.LittleEndian, &bo); err != nil {
-		return 0, err
-	}
+	magic := binary.LittleEndian.Uint32(hdr[0:4])
+	ver := binary.LittleEndian.Uint16(hdr[4:6])
+	bo := hdr[6]
 	if magic != idxMagic || ver != idxVersion || bo != idxByteOrderLE {
 		return 0, fmt.Errorf("idx bad header: magic=%#x ver=%d bo=%d", magic, ver, bo)
 	}
-	if err := binary.Read(br, binary.LittleEndian, &kl); err != nil {
-		return 0, err
-	}
-	if err := binary.Read(br, binary.LittleEndian, &cnt); err != nil {
-		return 0, err
-	}
+	kl := binary.LittleEndian.Uint32(hdr[7:11])
+	cnt := binary.LittleEndian.Uint64(hdr[11:19])
 	if int(kl) != wantKeyLen {
 		return 0, fmt.Errorf("idx keyLen %d != %d", kl, wantKeyLen)
 	}
@@ -351,7 +357,7 @@ func indexKeysInRange(idxPath string, keyLen int, lo []byte, hasLo bool, hi []by
 		return nil, err
 	}
 	defer f.Close()
-	cnt, err := readIndexHeader(bufio.NewReader(f), keyLen)
+	cnt, err := readIndexHeader(f, keyLen)
 	if err != nil {
 		return nil, err
 	}

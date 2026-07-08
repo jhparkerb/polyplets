@@ -548,10 +548,17 @@ designed around the weakest link at each stage.
         and $a(34)$'s top surviving stratum runs the same code path that
         $P_{15}$ certified at $a(33)$---what lacks certification is its
         execution at the larger size, not the path.
-  \item \textbf{Modular consistency.} Production sweeps run with residue
-        counters and CRT reconstruction; independent residue systems must
-        agree, catching overflow and transient corruption (not shared
-        enumeration bugs, which the items above target).
+  \item \textbf{Modular consistency (design capability, not a production
+        gate).} A residue-counter/CRT-reconstruction path exists and is
+        regression-tested (independent residue systems must agree, which
+        would catch overflow and transient corruption---not shared
+        enumeration bugs, which the items above target), but it has only
+        been exercised at small $n$, not against any production frontier
+        sweep $a(20)$--$a(34)$. Overflow protection for the reported terms
+        instead comes from the items already listed above (cross-machine
+        and cross-algorithm recount, u128-vs-u64 comparison at the sizes
+        where both are feasible) plus the structural and fault-injection
+        checks below.
   \item \textbf{Structural cross-checks.} The transfer matrices'
         (height,\,size) and (size,\,perimeter) marginals match the explicit
         enumeration's; rook- and bishop-connected sub-counts reproduce
@@ -562,7 +569,11 @@ designed around the weakest link at each stage.
         diagonal at $n=2$, a doubled count at $n=1$, a prune off-by-one at
         $n=10$) while a provably count-preserving change survives---the
         checks fail on wrong programs and pass on right ones.
-  \item \textbf{Hygiene.} The engines are AddressSanitizer/UBSan clean; the
+  \item \textbf{Hygiene.} Every engine---the legacy oracles and the
+        production map/merge workers (both the column and cell-at-a-time
+        kernels)---is AddressSanitizer/UBSan clean at gate scale (small
+        $n$, against fixtures; the sanitizer build compiles the same
+        source the $-O3$ production binary does, unmodified); the
         multithreaded paths are bit-identical to serial; every kept result
         traces to a clean-tree commit stamp in a provenance ledger, and the
         cross-checks are encoded as gates that run before release.
@@ -903,27 +914,34 @@ $M(n)\sim n^2/8$, twice the polyomino rate $\sim n^2/16$, since only king
 animals can run the diagonal walls the $L^1$ ball requires.
 
 Brute force gives the exact values
-$M(1{:}16)=0,0,0,1,1,2,3,5,6,8,10,13,15,18,21,25$, which the diamond attains
-at $n=4,8,12,16$. In fact all sixteen values fit a single closed form: they
-coincide with \emph{the nearest integer to $(n-2)^2/8$}---the sequence
-\href{https://oeis.org/A001971}{A001971} shifted by two---which agrees with
-the diamond exactly at every multiple of four, since
+$M(1{:}17)=0,0,0,1,1,2,3,5,6,8,10,13,15,18,21,25,28$, which the diamond
+attains at $n=4,8,12,16$. In fact all seventeen values fit a single closed
+form: they coincide with \emph{the nearest integer to $(n-2)^2/8$}---the
+sequence \href{https://oeis.org/A001971}{A001971} shifted by two---which
+agrees with the diamond exactly at every multiple of four, since
 $\bigl[(4r-2)^2/8\bigr] = 2r^2-2r+1$.
 
 \begin{conjecture}
 \label{conj:diamond}
 $M(n)=\left\lfloor \tfrac{(n-2)^2}{8}+\tfrac12 \right\rfloor$ for all
 $n\ge1$ (equivalently $M(n)=\mathrm{A001971}(n-2)$), verified here for
-$n\le16$. In particular the diamond wall is exactly---not just
+$n\le17$. In particular the diamond wall is exactly---not just
 asymptotically---optimal at every multiple of four, and away from multiples
 of four the optimum tracks the same isoperimetric quota with a two-cell
 corner correction.
 \end{conjecture}
 
+$M(17)=28$ was the first genuinely untested prediction of this conjecture
+(fitted on $n\le16$, with no forward confirmation until this run): a
+78-way split of the exact ($n{=}17$) hole-area sweep, combined by
+elementwise maximum, confirms it exactly---the conjecture's first real
+forward test since it was stated, not just another point it was fit to.
+
 \begin{openproblem}
 \label{op:mn}
 Prove Conjecture~\ref{conj:diamond}, or extend the verification past
-$n=16$; the first untested value is the prediction $M(17)=28$.
+$n=17$; the first untested value is now the prediction $M(18)=32$
+(exact, no rounding: $(18-2)^2/8 = 32$).
 \end{openproblem}
 
 \section{Generating functions by height, and rigorous bounds}
