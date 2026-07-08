@@ -617,7 +617,7 @@ func sweepHeight(
 		// fails (or is cancelled), the checkpoint at col-1 has correct hTri.
 		// A failed merge causes us to checkpoint at col-1 with unchanged hTri;
 		// the resume will re-run this col from scratch.
-		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem, activeHeights, columnKeyLen(H), "")
+		mergeOuts, totalRecs, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, tel, sem, activeHeights, columnKeyLen(H), "")
 		stopHB()
 		if err != nil {
 			// hTri does NOT include current col's contributions.
@@ -785,7 +785,7 @@ func sweepHeightKink(
 			}
 
 			t1 := time.Now()
-			mergeOuts, _, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, sem, activeHeights, mergeKeyLen, stage)
+			mergeOuts, _, mergeAcct, err := mergePhase(ctx, cfg, H, col, mapOuts, tel, sem, activeHeights, mergeKeyLen, stage)
 			removeRuns(mapOuts)
 			if err != nil {
 				return nil, nil, fmt.Errorf("H=%d col=%d kink %s merge: %w", H, col, name, err)
@@ -1065,6 +1065,21 @@ func stealScore(r *runningUnit, now time.Time) float64 {
 // protocol the mid-column int-stage rounds (map_shard_stage_file) support, so
 // stopping one would kill it outright rather than yield a valid partial
 // output.
+//
+// TODO(scheduler-unification): mapPhase and mergePhase's queue+pickVictim+
+// thief-goroutine scheduler bodies are ~90% structurally identical (a
+// /simplify pass on the merge-steal work found this independently from 3 of
+// 4 review angles) -- differing only in per-unit dispatch (MapArgs/RunMap
+// vs MergeArgs/RunMerge), the source-file list used for split math
+// (frontier vs mapOuts), and a few map-only extras (H==maxn short-circuit,
+// unitMult/minPerUnit capping, triContribs, the seed/finalize
+// stealConfigured exclusion above). A shared `runStealPool` parameterized
+// by a per-unit dispatch closure would cut this to ~one scheduler instead
+// of two hand-synced copies -- worth doing, but deliberately NOT done as
+// part of the merge-steal work itself (concurrency-critical code, real
+// regression risk, needs its own careful pass with full gate+ASan+real
+// dalby validation, not a bolt-on cleanup while both copies were still
+// fresh and only just validated at production scale).
 func mapPhase(
 	ctx context.Context,
 	cfg SweepConfig,
@@ -1141,6 +1156,7 @@ func mapPhase(
 	var completedRecords uint64
 	var completedSeconds float64
 	stealDebug := os.Getenv("POLY_STEAL_DEBUG") != ""
+	unitLog := os.Getenv("POLY_UNIT_LOG") != ""
 
 	var (
 		mu          sync.Mutex
@@ -1281,7 +1297,7 @@ func mapPhase(
 				}
 				triContribs = append(triContribs, res.TriContribs)
 				acct.Add(res.Acct)
-				if os.Getenv("POLY_UNIT_LOG") != "" {
+				if unitLog {
 					fmt.Printf("event=unit H=%d col=%d u=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f start_unix=%.6f stop_key=%s\n",
 						H, col, u.idx, u.lo, u.hi, res.OutRecords, res.Acct.CPUS, res.Acct.WallS, float64(r.started.UnixNano())/1e9, res.StopKey)
 				}
@@ -1294,7 +1310,7 @@ func mapPhase(
 					queue = append(queue, children...)
 					outstanding += len(children) - 1 // this unit done; children added
 					tel.steal()
-					if os.Getenv("POLY_UNIT_LOG") != "" {
+					if unitLog {
 						fmt.Printf("event=steal H=%d col=%d victim_u=%d cursor=%s children=%d rem=%d\n",
 							H, col, u.idx, res.StopKey, len(children), r.remaining())
 					}
@@ -1320,6 +1336,24 @@ func mapPhase(
 // be cut (a narrow range), it returns the single range flagged noSteal so the
 // stealer won't thrash on it.  Each child inherits an even share of the parent's
 // remaining estimate.  Caller holds the scheduler mutex (mutates *nextIdx).
+//
+// TODO(idx-caching): this calls SplitRangeByIndex -> indexKeysInRange, which
+// opens and binary-searches every file in `frontier`/`mapOuts` FROM SCRATCH
+// on every single steal, while still holding the scheduler mutex (blocking
+// every other pool goroutine for that I/O). Cheap when steals are rare, but
+// merge-steal now fires hundreds of times per column on a real production
+// column (measured this session) -- that's thousands of redundant file
+// opens/seeks per phase call for a fixed file set that doesn't change
+// across steals within one mapPhase/mergePhase invocation. Two independent
+// fixes, either worth doing on its own: (1) parse each .idx sidecar once
+// per phase call into an in-memory sorted key slice and bisect that on
+// subsequent steals instead of reopening the file; (2) compute `children`
+// outside the mutex (copy the fields this function needs, unlock, split,
+// relock only to splice into queue/outstanding) so the I/O doesn't block
+// the whole pool regardless. Not done here (found via a /simplify pass
+// after merge-steal was already validated at real dalby scale) -- real,
+// worth a dedicated follow-up, not a scope-creep addition to a cleanup
+// pass on already-working code.
 func splitRemainder(frontier []string, H, keyLen int, cursor, hi string, freeCores int,
 	remaining, grainRecs uint64, nextIdx *int) []mapUnit {
 
@@ -1387,6 +1421,7 @@ func mergePhase(
 	cfg SweepConfig,
 	H, col int,
 	mapOuts []string,
+	tel *telemetry,
 	sem chan struct{},
 	activeHeights *atomic.Int32,
 	keyLen int,
@@ -1562,6 +1597,7 @@ func mergePhase(
 						cfg.Cores-len(inflight), r.remaining(), grainRecs, &nextIdx)
 					queue = append(queue, children...)
 					outstanding += len(children) - 1
+					tel.steal()
 					if unitLog {
 						fmt.Printf("event=steal-merge H=%d col=%d victim_r=%d cursor=%s children=%d rem=%d\n",
 							H, col, u.idx, res.StopKey, len(children), r.remaining())

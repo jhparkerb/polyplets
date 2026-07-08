@@ -748,12 +748,12 @@ std::pair<size_t, size_t> mergeRunFiles(
     // stop_key) is exactly what's been written when we break -- the
     // resumer re-merges the same inputs with lo_hex=stop_key, using the
     // seekToKey fast path above, same as any other range boundary.
-    if (terminate && (written & kMergeProgressStrideMask) == 0 && written > 0 &&
-        *terminate) {
+    const bool atStride = (written & kMergeProgressStrideMask) == 0;
+    if (terminate && atStride && written > 0 && *terminate) {
       if (stop_key_out) *stop_key_out = bytesToHex(top.rec.sig.b, keyLen);
       break;
     }
-    if (on_progress && (written & kMergeProgressStrideMask) == 0) {
+    if (on_progress && atStride) {
       on_progress(written);
     }
 

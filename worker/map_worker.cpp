@@ -97,16 +97,15 @@ static size_t writeRunFile(const Run<W>& run, const std::string& out_path,
   return w.finalize();
 }
 
-// ─── SIGTERM handling: cooperative work-stealing stop (DESIGN 08, T2.3) ──────
-// The orchestrator raises SIGTERM to ask this straggler to stop EARLY and hand
-// its remaining key-range to idle cores.  map_shard_file watches g_terminate,
-// stops reading at the next key boundary (the cursor), and finalizes a fully
-// valid sorted output over [lo, cursor); the cursor comes back in stop_key.
-// This is a clean, successful exit (status 0) — distinct from a hard SIGKILL
-// (used by the orchestrator's ctx-cancel for checkpoint/shutdown), which is
-// uncatchable and discards the partial column for a later --resume.
-static volatile std::sig_atomic_t g_terminate = 0;
-static void on_sigterm(int) { g_terminate = 1; }
+// SIGTERM handling (cooperative work-stealing stop, DESIGN 08, T2.3) is
+// shared with merge_worker.cpp: see worker_util.h's g_workerTerminate/
+// installWorkerSigtermHandler. map_shard_file watches g_workerTerminate,
+// stops reading at the next key boundary (the cursor), and finalizes a
+// fully valid sorted output over [lo, cursor); the cursor comes back in
+// stop_key. This is a clean, successful exit (status 0) — distinct from a
+// hard SIGKILL (used by the orchestrator's ctx-cancel for checkpoint/
+// shutdown), which is uncatchable and discards the partial column for a
+// later --resume.
 
 // runOneRequest does everything a one-shot map_worker invocation always did:
 // parse one request's args, do the map/merge-shard work, emit accounting.
@@ -281,11 +280,11 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
       if (counter_arg == "u128") {
         std::tie(spill_bytes, out_recs) = map_shard_stage_file<u128>(
             in_paths, kcfg, out_path, lo_hex, hi_hex, rev, on_progress,
-            &g_terminate, &stop_key);
+            &g_workerTerminate, &stop_key);
       } else {
         std::tie(spill_bytes, out_recs) = map_shard_stage_file<u64>(
             in_paths, kcfg, out_path, lo_hex, hi_hex, rev, on_progress,
-            &g_terminate, &stop_key);
+            &g_workerTerminate, &stop_key);
       }
     }
   } else if (holes) {
@@ -293,26 +292,26 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
       HolesRow<u128> hrow(H, maxn, maxholes);
       std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyHoles>(
           in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev, on_progress,
-          &g_terminate, &stop_key);
+          &g_workerTerminate, &stop_key);
       printHolesRows(H, maxn, hrow.byNHoles);
     } else {
       HolesRow<u64> hrow(H, maxn, maxholes);
       std::tie(spill_bytes, out_recs) = map_shard_file<u64, ClassifyHoles>(
           in_paths, cfg, out_path, lo_hex, hi_hex, hrow, rev, on_progress,
-          &g_terminate, &stop_key);
+          &g_workerTerminate, &stop_key);
       printHolesRows(H, maxn, hrow.byNHoles);
     }
   } else if (counter_arg == "u128") {
     TriangleRow<u128> triangle(H, maxn);
     std::tie(spill_bytes, out_recs) = map_shard_file<u128, ClassifyTriangle>(
         in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev, on_progress,
-        &g_terminate, &stop_key);
+        &g_workerTerminate, &stop_key);
     printTriangleRows(H, maxn, triangle.row);
   } else {
     TriangleRow<u64> triangle(H, maxn);
     std::tie(spill_bytes, out_recs) = map_shard_file<u64, ClassifyTriangle>(
         in_paths, cfg, out_path, lo_hex, hi_hex, triangle, rev, on_progress,
-        &g_terminate, &stop_key);
+        &g_workerTerminate, &stop_key);
     printTriangleRows(H, maxn, triangle.row);
   }
 
@@ -350,7 +349,7 @@ static std::vector<std::string> tokenizeLine(const std::string& line) {
 
 int main(int argc, char** argv) {
   raiseFdLimitToHard();  // the spill/merge path fans out to many open files
-  std::signal(SIGTERM, on_sigterm);
+  installWorkerSigtermHandler();
 
   std::vector<std::string> tokens(argv + 1, argv + argc);
 
@@ -371,7 +370,7 @@ int main(int argc, char** argv) {
   std::string line;
   while (std::getline(std::cin, line)) {
     if (line.empty()) continue;
-    g_terminate = 0;  // a prior request's SIGTERM must not bleed into the next
+    g_workerTerminate = 0;  // a prior request's SIGTERM must not bleed into the next
     const int rc = runOneRequest(tokenizeLine(line));
     if (rc != 0) return rc;  // a real failure exits, same as the one-shot path
     std::fflush(stdout);

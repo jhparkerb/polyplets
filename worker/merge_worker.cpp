@@ -34,16 +34,12 @@
 #include "core/libenum.h"
 #include "worker/worker_util.h"
 
-// ─── SIGTERM handling: cooperative work-stealing stop ────────────────────────
-// Same mechanism as map_worker.cpp's g_terminate/on_sigterm (see that file's
-// comment for the full rationale): the orchestrator raises SIGTERM to ask a
-// straggler merge range to stop early and hand its remainder to idle cores.
-// mergeRunFiles' resume semantics are simpler than map's -- see
-// core/runfile.h's comment on the terminate/stop_key_out params -- stopping
-// early just means "re-merge with lo_hex=stop_key," no partial-tree-state
-// problem to solve.
-static volatile std::sig_atomic_t g_terminate = 0;
-static void on_sigterm(int) { g_terminate = 1; }
+// SIGTERM handling (cooperative work-stealing stop) is shared with
+// map_worker.cpp: see worker_util.h's g_workerTerminate/
+// installWorkerSigtermHandler. mergeRunFiles' resume semantics are simpler
+// than map's -- see core/runfile.h's comment on the terminate/
+// stop_key_out params -- stopping early just means "re-merge with
+// lo_hex=stop_key," no partial-tree-state problem to solve.
 
 // runOneRequest does everything a one-shot merge_worker invocation always
 // did: parse one request's args, merge the shard files, emit accounting.
@@ -87,33 +83,22 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
   const double t0_wall = wallSeconds();
   const double t0_cpu  = cpuSeconds();
 
-  // Throttled progress emitter, same shape and same reasoning as
-  // map_worker.cpp's: first call fires immediately (not gated by elapsed
-  // time), so a merge range's processed>0 becomes visible to the
-  // orchestrator's stealEligible within one progress stride, not up to 2s
-  // late (see map_worker.cpp's on_progress comment for the full story).
-  double last_emit = t0_wall;
-  bool emitted_once = false;
-  auto on_progress = [&](size_t n_done) {
-    const double now = wallSeconds();
-    if (!emitted_once || now - last_emit >= 2.0) {
-      emitted_once = true;
-      last_emit = now;
-      std::printf("event=progress processed=%zu elapsed_s=%.1f\n", n_done, now - t0_wall);
-      std::fflush(stdout);
-    }
-  };
+  // Throttled progress emitter (worker_util.h): first call fires
+  // immediately (not gated by elapsed time), so a merge range's
+  // processed>0 becomes visible to the orchestrator's stealEligible within
+  // one progress stride, not up to 2s late.
+  ThrottledProgressEmitter on_progress(t0_wall);
 
   size_t body_bytes, out_recs;
   std::string stop_key;  // set iff SIGTERM stopped us early (work-stealing cursor)
   if (counter_arg == "u128") {
     std::tie(body_bytes, out_recs) = mergeRunFiles<u128>(
         in_paths, H, klo_hex, khi_hex, out_path, rev, keyLen,
-        on_progress, &g_terminate, &stop_key);
+        on_progress, &g_workerTerminate, &stop_key);
   } else {
     std::tie(body_bytes, out_recs) = mergeRunFiles<u64>(
         in_paths, H, klo_hex, khi_hex, out_path, rev, keyLen,
-        on_progress, &g_terminate, &stop_key);
+        on_progress, &g_workerTerminate, &stop_key);
   }
 
   const double cpu_s  = cpuSeconds()  - t0_cpu;
@@ -145,7 +130,7 @@ static std::vector<std::string> tokenizeLine(const std::string& line) {
 
 int main(int argc, char** argv) {
   raiseFdLimitToHard();  // the spill/merge path fans out to many open files
-  std::signal(SIGTERM, on_sigterm);
+  installWorkerSigtermHandler();
 
   std::vector<std::string> tokens(argv + 1, argv + argc);
   bool persistent = false;
@@ -161,7 +146,7 @@ int main(int argc, char** argv) {
   std::string line;
   while (std::getline(std::cin, line)) {
     if (line.empty()) continue;
-    g_terminate = 0;  // a prior request's SIGTERM must not bleed into the next
+    g_workerTerminate = 0;  // a prior request's SIGTERM must not bleed into the next
     const int rc = runOneRequest(tokenizeLine(line));
     if (rc != 0) return rc;
     std::fflush(stdout);
