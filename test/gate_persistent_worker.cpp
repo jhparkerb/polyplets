@@ -13,7 +13,8 @@
 //
 // Also covers: two independent one-shot columns replayed through a single
 // persistent process (proves no state bleeds between requests -- the
-// g_terminate reset and per-request local variables).
+// g_terminate reset and per-request local variables), and merge_worker's
+// --persistent mode (two independent merges through one process).
 
 #include <cstdio>
 #include <cstdlib>
@@ -217,10 +218,63 @@ static void testTwoIndependentColumnsNoBleed() {
   runOrDie("rm -rf " + dir);
 }
 
+// merge_worker --persistent: two independent one-shot merges (single-file
+// k-way "merges", enough to exercise the CLI/persistent plumbing -- the
+// k-way merge logic itself is covered elsewhere) through one process,
+// checked against one-shot merge_worker.
+static void testMergeWorkerPersistentNoBleed() {
+  const std::string dir = "/tmp/gate_persistent_worker_merge";
+  runOrDie("rm -rf " + dir + " && mkdir -p " + dir);
+
+  const int H1 = 4, maxn1 = 8;
+  const int H2 = 6, maxn2 = 10;
+  const std::string in1 = dir + "/in1.bin";
+  const std::string in2 = dir + "/in2.bin";
+  {
+    RunFileWriter<W> w(in1, H1, maxn1, "", "", "test");
+    w.append(seedRecord<W>(H1));
+    w.finalize();
+  }
+  {
+    RunFileWriter<W> w(in2, H2, maxn2, "", "", "test");
+    w.append(seedRecord<W>(H2));
+    w.finalize();
+  }
+
+  const std::string bin = "./build/ns/merge_worker";
+  const std::string out1p = dir + "/out1_persistent.bin";
+  const std::string out2p = dir + "/out2_persistent.bin";
+  const std::string out1o = dir + "/out1_oneshot.bin";
+  const std::string out2o = dir + "/out2_oneshot.bin";
+
+  const std::string reqPath = dir + "/requests.txt";
+  {
+    std::ofstream f(reqPath);
+    writeLine(f, "--in " + in1 + " --H " + std::to_string(H1) +
+                 " --counter u64 --out " + out1p);
+    writeLine(f, "--in " + in2 + " --H " + std::to_string(H2) +
+                 " --counter u64 --out " + out2p);
+  }
+  runOrDie(bin + " --persistent < " + reqPath + " > " + dir + "/persistent.log");
+
+  runOrDie(bin + " --in " + in1 + " --H " + std::to_string(H1) +
+           " --counter u64 --out " + out1o + " > " + dir + "/oneshot1.log");
+  runOrDie(bin + " --in " + in2 + " --H " + std::to_string(H2) +
+           " --counter u64 --out " + out2o + " > " + dir + "/oneshot2.log");
+
+  assertDenseEqual(readDense(out1p, H1, H1 + 2, maxn1),
+                    readDense(out1o, H1, H1 + 2, maxn1), "merge-req1-vs-oneshot1");
+  assertDenseEqual(readDense(out2p, H2, H2 + 2, maxn2),
+                    readDense(out2o, H2, H2 + 2, maxn2), "merge-req2-vs-oneshot2");
+
+  runOrDie("rm -rf " + dir);
+}
+
 int main() {
   for (int H : {4, 6, 8}) {
     testPersistentKinkChainMatchesColumnKernel(H, H + 4);
   }
   testTwoIndependentColumnsNoBleed();
+  testMergeWorkerPersistentNoBleed();
   std::puts("gate_persistent_worker PASS");
 }

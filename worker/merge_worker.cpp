@@ -14,10 +14,18 @@
 // sigs). The kink kernel's mixed-state stage tables are keyed on H+4 and
 // pass --keylen explicitly — merge_worker itself has no kernel awareness,
 // it just merges whatever fixed-width keys the caller tells it about.
+//
+// --persistent: read one whitespace-tokenized request per line from stdin
+// and process it, looping until EOF, instead of a single argv-derived
+// request -- eliminates the fork+exec cost paid on every single merge
+// range (see map_worker.cpp's runOneRequest comment for the full
+// rationale; same fix, same reasoning, applied here).
 
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -25,27 +33,30 @@
 #include "core/libenum.h"
 #include "worker/worker_util.h"
 
-int main(int argc, char** argv) {
-  raiseFdLimitToHard();  // the spill/merge path fans out to many open files
+// runOneRequest does everything a one-shot merge_worker invocation always
+// did: parse one request's args, merge the shard files, emit accounting.
+// `tokens` is the flag/value list with no program name.
+static int runOneRequest(const std::vector<std::string>& tokens) {
   std::string in_str, out_path, klo_hex, khi_hex, rev;
   std::string counter_arg = "u64";
   int H = 0;
   int keyLen = 0;
 
-  for (int i = 1; i < argc; ++i) {
+  const int n = static_cast<int>(tokens.size());
+  for (int i = 0; i < n; ++i) {
     auto arg = [&](const char* flag) {
-      return std::strcmp(argv[i], flag) == 0 && i + 1 < argc;
+      return tokens[i] == flag && i + 1 < n;
     };
-    if (arg("--in"))           in_str      = argv[++i];
-    else if (arg("--H"))       H           = std::atoi(argv[++i]);
-    else if (arg("--out"))     out_path    = argv[++i];
-    else if (arg("--counter")) counter_arg = argv[++i];
-    else if (arg("--klo"))     klo_hex     = argv[++i];
-    else if (arg("--khi"))     khi_hex     = argv[++i];
-    else if (arg("--rev"))     rev         = argv[++i];
-    else if (arg("--keylen"))  keyLen      = std::atoi(argv[++i]);
+    if (arg("--in"))           in_str      = tokens[++i];
+    else if (arg("--H"))       H           = std::atoi(tokens[++i].c_str());
+    else if (arg("--out"))     out_path    = tokens[++i];
+    else if (arg("--counter")) counter_arg = tokens[++i];
+    else if (arg("--klo"))     klo_hex     = tokens[++i];
+    else if (arg("--khi"))     khi_hex     = tokens[++i];
+    else if (arg("--rev"))     rev         = tokens[++i];
+    else if (arg("--keylen"))  keyLen      = std::atoi(tokens[++i].c_str());
     else {
-      std::fprintf(stderr, "merge_worker: unknown arg: %s\n", argv[i]);
+      std::fprintf(stderr, "merge_worker: unknown arg: %s\n", tokens[i].c_str());
       return 1;
     }
   }
@@ -80,5 +91,43 @@ int main(int argc, char** argv) {
   std::printf("event=done cpu_s=%.3f wall_s=%.3f peak_rss_mb=%.1f "
               "records=%zu spill_bytes=%zu\n",
               cpu_s, wall_s, rss_mb, out_recs, body_bytes);
+  return 0;
+}
+
+// Whitespace-split a stdin request line into tokens (paths never contain
+// spaces -- see map_worker.cpp's tokenizeLine for the same contract).
+static std::vector<std::string> tokenizeLine(const std::string& line) {
+  std::vector<std::string> tokens;
+  size_t i = 0;
+  while (i < line.size()) {
+    while (i < line.size() && std::isspace(static_cast<unsigned char>(line[i]))) ++i;
+    size_t start = i;
+    while (i < line.size() && !std::isspace(static_cast<unsigned char>(line[i]))) ++i;
+    if (i > start) tokens.push_back(line.substr(start, i - start));
+  }
+  return tokens;
+}
+
+int main(int argc, char** argv) {
+  raiseFdLimitToHard();  // the spill/merge path fans out to many open files
+
+  std::vector<std::string> tokens(argv + 1, argv + argc);
+  bool persistent = false;
+  std::vector<std::string> filtered;
+  filtered.reserve(tokens.size());
+  for (auto& t : tokens) {
+    if (t == "--persistent") persistent = true;
+    else filtered.push_back(t);
+  }
+
+  if (!persistent) return runOneRequest(filtered);
+
+  std::string line;
+  while (std::getline(std::cin, line)) {
+    if (line.empty()) continue;
+    const int rc = runOneRequest(tokenizeLine(line));
+    if (rc != 0) return rc;
+    std::fflush(stdout);
+  }
   return 0;
 }

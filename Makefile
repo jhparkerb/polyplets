@@ -246,7 +246,7 @@ build/ns/gate_kink_worker_cli: test/gate_kink_worker_cli.cpp $(NS_HEADERS) | bui
 # through a full kink seed/stage/finalize chain over ONE process (stdin-fed
 # requests) and byte-matches the column-kernel one-shot path; also checks
 # two independent columns replayed through one process don't bleed state.
-ns-gate-persistent-worker: build/ns/gate_persistent_worker build/ns/map_worker
+ns-gate-persistent-worker: build/ns/gate_persistent_worker build/ns/map_worker build/ns/merge_worker
 	./build/ns/gate_persistent_worker
 
 build/ns/gate_persistent_worker: test/gate_persistent_worker.cpp $(NS_HEADERS) | build/ns
