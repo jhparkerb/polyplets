@@ -56,7 +56,18 @@ done
 echo "=== validate a(21)-a($((N-1))) vs banked ==="
 for n in $(seq 21 $((N-1))); do
   got=$(awk -v n=$n '$1==n{print $2}' "$RUNDIR/a_n.txt")
-  bank=$(awk -v n=$n '$1==n{print $2}' results/ns_a${n}/triangle.txt 2>/dev/null)
+  bank=""
+  # Not every n has its own results/ns_a{n}/ dir (e.g. a22 has none). And a
+  # few (ns_a23, ns_a24) store the detailed n/H/T(n,H) triangle instead of
+  # the plain "n a(n)" format -- summing that safely needs bigint (awk's
+  # $3+=... silently loses precision past ~16 digits, confirmed: a23 comes
+  # out ...768 instead of the correct ...732), so only trust the plain
+  # 2-column format here; anything else skips gracefully rather than risk a
+  # false MISMATCH from a precision-lossy sum, or `set -e` tripping on a
+  # missing file.
+  if [ -f "results/ns_a${n}/triangle.txt" ] && [ "$(awk 'NR==1{print NF; exit}' "results/ns_a${n}/triangle.txt")" = "2" ]; then
+    bank=$(awk -v n=$n '$1==n{print $2}' "results/ns_a${n}/triangle.txt")
+  fi
   [ -z "$bank" ] && { echo "a($n): no banked value"; continue; }
   if [ "$got" = "$bank" ]; then echo "a($n)=$got OK"; else echo "a($n)=$got MISMATCH (banked=$bank)"; MISMATCH=1; fi
 done
