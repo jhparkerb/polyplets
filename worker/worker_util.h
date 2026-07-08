@@ -6,10 +6,13 @@
 
 #pragma once
 
+#include <cctype>
 #include <csignal>
 #include <cstdio>
 #include <cstring>
 #include <ctime>
+#include <functional>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -147,3 +150,53 @@ class ThrottledProgressEmitter {
   double lastEmit_;
   bool emittedOnce_ = false;
 };
+
+// Whitespace-split a stdin request line into tokens. Paths in this codebase
+// are always constructed (run-dir/spill-dir-relative filenames), never
+// contain spaces, so this simple split is exact -- no quoting support
+// needed, matching argv's own space-delimited contract for the same flag
+// set used one-shot.
+inline std::vector<std::string> tokenizeLine(const std::string& line) {
+  std::vector<std::string> tokens;
+  size_t i = 0;
+  while (i < line.size()) {
+    while (i < line.size() && std::isspace(static_cast<unsigned char>(line[i]))) ++i;
+    size_t start = i;
+    while (i < line.size() && !std::isspace(static_cast<unsigned char>(line[i]))) ++i;
+    if (i > start) tokens.push_back(line.substr(start, i - start));
+  }
+  return tokens;
+}
+
+// Shared driver for both worker CLIs' main(): parses argv for --persistent,
+// and either runs runOneRequest once (one-shot, the original per-process
+// contract) or loops over stdin lines calling it (persistent mode,
+// resetting g_workerTerminate between requests so a prior request's
+// SIGTERM doesn't bleed into the next -- see g_workerTerminate's comment).
+// Callers still call installWorkerSigtermHandler() and raiseFdLimitToHard()
+// themselves before this (the latter kept out of worker_util.h to preserve
+// its "no core/ dependency" contract stated at the top of this file).
+inline int runWorkerMain(
+    int argc, char** argv,
+    const std::function<int(const std::vector<std::string>&)>& runOneRequest) {
+  std::vector<std::string> tokens(argv + 1, argv + argc);
+  bool persistent = false;
+  std::vector<std::string> filtered;
+  filtered.reserve(tokens.size());
+  for (auto& t : tokens) {
+    if (t == "--persistent") persistent = true;
+    else filtered.push_back(t);
+  }
+
+  if (!persistent) return runOneRequest(filtered);
+
+  std::string line;
+  while (std::getline(std::cin, line)) {
+    if (line.empty()) continue;
+    g_workerTerminate = 0;
+    const int rc = runOneRequest(tokenizeLine(line));
+    if (rc != 0) return rc;  // a real failure exits, same as the one-shot path
+    std::fflush(stdout);
+  }
+  return 0;
+}

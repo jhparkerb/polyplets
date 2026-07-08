@@ -332,48 +332,8 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
 }
 
 // Whitespace-split a stdin request line into tokens. Paths are orchestrator-
-// constructed (run-dir/spill-dir-relative filenames), never contain spaces,
-// so this simple split is exact -- no quoting support needed, matching argv's
-// own space-delimited contract for this same flag set today.
-static std::vector<std::string> tokenizeLine(const std::string& line) {
-  std::vector<std::string> tokens;
-  size_t i = 0;
-  while (i < line.size()) {
-    while (i < line.size() && std::isspace(static_cast<unsigned char>(line[i]))) ++i;
-    size_t start = i;
-    while (i < line.size() && !std::isspace(static_cast<unsigned char>(line[i]))) ++i;
-    if (i > start) tokens.push_back(line.substr(start, i - start));
-  }
-  return tokens;
-}
-
 int main(int argc, char** argv) {
   raiseFdLimitToHard();  // the spill/merge path fans out to many open files
   installWorkerSigtermHandler();
-
-  std::vector<std::string> tokens(argv + 1, argv + argc);
-
-  // --persistent: read one whitespace-tokenized request per line from stdin
-  // and process it with runOneRequest, looping until EOF, instead of a
-  // single argv-derived request. Fully opt-in and backward compatible: the
-  // one-shot path below is untouched. See runOneRequest's comment for why.
-  bool persistent = false;
-  std::vector<std::string> filtered;
-  filtered.reserve(tokens.size());
-  for (auto& t : tokens) {
-    if (t == "--persistent") persistent = true;
-    else filtered.push_back(t);
-  }
-
-  if (!persistent) return runOneRequest(filtered);
-
-  std::string line;
-  while (std::getline(std::cin, line)) {
-    if (line.empty()) continue;
-    g_workerTerminate = 0;  // a prior request's SIGTERM must not bleed into the next
-    const int rc = runOneRequest(tokenizeLine(line));
-    if (rc != 0) return rc;  // a real failure exits, same as the one-shot path
-    std::fflush(stdout);
-  }
-  return 0;
+  return runWorkerMain(argc, argv, runOneRequest);
 }

@@ -90,6 +90,15 @@ static void writeLine(std::ofstream& f, const std::string& line) {
   f << line << "\n";
 }
 
+// Writes a single-seed-record run file at `path` -- the same 3-line
+// RunFileWriter/append/finalize pattern every test below needs as its
+// starting input.
+static void writeSeed(const std::string& path, int H, int maxn) {
+  RunFileWriter<W> w(path, H, maxn, "", "", "test");
+  w.append(seedRecord<W>(H));
+  w.finalize();
+}
+
 // Drives the kink seed->H stages->finalize chain for one column through ONE
 // persistent map_worker process (all H+2 requests queued as stdin lines up
 // front), and checks the result matches the column-kernel one-shot path.
@@ -98,11 +107,7 @@ static void testPersistentKinkChainMatchesColumnKernel(int H, int maxn) {
   runOrDie("rm -rf " + dir + " && mkdir -p " + dir);
 
   const std::string seedPath = dir + "/seed.bin";
-  {
-    RunFileWriter<W> w(seedPath, H, maxn, "", "", "test");
-    w.append(seedRecord<W>(H));
-    w.finalize();
-  }
+  writeSeed(seedPath, H, maxn);
 
   const std::string bin = "./build/ns/map_worker";
   const std::string common = " --H " + std::to_string(H) +
@@ -174,16 +179,8 @@ static void testTwoIndependentColumnsNoBleed() {
   const int H2 = 6, maxn2 = 10;
   const std::string seed1 = dir + "/seed1.bin";
   const std::string seed2 = dir + "/seed2.bin";
-  {
-    RunFileWriter<W> w(seed1, H1, maxn1, "", "", "test");
-    w.append(seedRecord<W>(H1));
-    w.finalize();
-  }
-  {
-    RunFileWriter<W> w(seed2, H2, maxn2, "", "", "test");
-    w.append(seedRecord<W>(H2));
-    w.finalize();
-  }
+  writeSeed(seed1, H1, maxn1);
+  writeSeed(seed2, H2, maxn2);
 
   const std::string bin = "./build/ns/map_worker";
   const std::string out1p = dir + "/out1_persistent.bin";
@@ -230,16 +227,8 @@ static void testMergeWorkerPersistentNoBleed() {
   const int H2 = 6, maxn2 = 10;
   const std::string in1 = dir + "/in1.bin";
   const std::string in2 = dir + "/in2.bin";
-  {
-    RunFileWriter<W> w(in1, H1, maxn1, "", "", "test");
-    w.append(seedRecord<W>(H1));
-    w.finalize();
-  }
-  {
-    RunFileWriter<W> w(in2, H2, maxn2, "", "", "test");
-    w.append(seedRecord<W>(H2));
-    w.finalize();
-  }
+  writeSeed(in1, H1, maxn1);
+  writeSeed(in2, H2, maxn2);
 
   const std::string bin = "./build/ns/merge_worker";
   const std::string out1p = dir + "/out1_persistent.bin";

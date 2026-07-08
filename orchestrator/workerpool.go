@@ -29,7 +29,6 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
-	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -133,11 +132,20 @@ func (w *workerProc) runRequest(requestLine string, onProgress func(uint64), sto
 	return result, nil
 }
 
-func (w *workerProc) close() {
+// signalShutdown sends EOF (the worker's persistent loop exits cleanly on
+// stdin close) without blocking for exit. Split from wait() so Close() can
+// signal every process before waiting on any of them -- see Close's comment.
+func (w *workerProc) signalShutdown() {
 	if w == nil {
 		return
 	}
-	_ = w.stdin.Close() // EOF -> the worker's persistent loop exits cleanly
+	_ = w.stdin.Close()
+}
+
+func (w *workerProc) wait() {
+	if w == nil {
+		return
+	}
 	_ = w.cmd.Wait()
 }
 
@@ -232,74 +240,31 @@ func (p *WorkerPool) RunMerge(a MergeArgs, onProgress func(uint64), stop <-chan 
 }
 
 // Close tears down every started process (idle slots that never launched a
-// worker cost nothing extra to close).
+// worker cost nothing extra to close). Two-phase: signal every process's
+// stdin closed FIRST (all children start exiting concurrently in the OS),
+// THEN wait on each. A single-phase close-then-wait-per-slot would make
+// total shutdown time the SUM of every process's exit latency instead of
+// the max -- real, since Close() runs synchronously before the run's wall
+// clock is reported (orchestrate/main.go), directly padding the measured
+// number on every --persistent-workers run (found via /simplify, not a
+// hypothetical: this is a utilization-sensitive branch where that padding
+// mattered to what was being measured).
 func (p *WorkerPool) Close() {
-	for i := 0; i < p.size; i++ {
-		s := <-p.slots
-		s.mapProc.close()
-		s.mergeProc.close()
+	slots := make([]*slot, p.size)
+	for i := range slots {
+		slots[i] = <-p.slots
+		slots[i].mapProc.signalShutdown()
+		slots[i].mergeProc.signalShutdown()
+	}
+	for _, s := range slots {
+		s.mapProc.wait()
+		s.mergeProc.wait()
 	}
 }
 
-// mapArgsLine/mergeArgsLine build the same flag/value tokens
-// RunMapWorker/RunMergeWorker used to pass as argv, space-joined into one
-// request line -- byte-identical flag set, just newline-delimited instead
-// of process-per-call.
-func mapArgsLine(a MapArgs) string {
-	fold := "0"
-	if a.Fold {
-		fold = "1"
-	}
-	parts := []string{
-		"--in", strings.Join(a.InPaths, ","),
-		"--H", strconv.Itoa(a.H),
-		"--maxn", strconv.Itoa(a.Maxn),
-		"--fold", fold,
-		"--ram", strconv.FormatUint(a.RAM, 10),
-		"--spill", a.SpillDir,
-		"--out", a.OutPath,
-	}
-	if a.Counter != "" {
-		parts = append(parts, "--counter", a.Counter)
-	}
-	if a.LoHex != "" {
-		parts = append(parts, "--lo", a.LoHex)
-	}
-	if a.HiHex != "" {
-		parts = append(parts, "--hi", a.HiHex)
-	}
-	if a.Rev != "" {
-		parts = append(parts, "--rev", a.Rev)
-	}
-	if a.Kernel != "" && a.Kernel != "column" {
-		parts = append(parts, "--kernel", a.Kernel)
-	}
-	if a.Stage != "" {
-		parts = append(parts, "--stage", a.Stage)
-	}
-	return strings.Join(parts, " ")
-}
-
-func mergeArgsLine(a MergeArgs) string {
-	parts := []string{
-		"--in", strings.Join(a.InPaths, ","),
-		"--H", strconv.Itoa(a.H),
-		"--out", a.OutPath,
-	}
-	if a.Counter != "" {
-		parts = append(parts, "--counter", a.Counter)
-	}
-	if a.KLoHex != "" {
-		parts = append(parts, "--klo", a.KLoHex)
-	}
-	if a.KHiHex != "" {
-		parts = append(parts, "--khi", a.KHiHex)
-	}
-	if a.Rev != "" {
-		parts = append(parts, "--rev", a.Rev)
-	}
-	if a.KeyLen != 0 {
-		parts = append(parts, "--keylen", strconv.Itoa(a.KeyLen))
-	}
-	return strings.Join(parts, " ")
-}
+// mapArgsLine/mergeArgsLine space-join mapArgsTokens/mergeArgsTokens
+// (worker.go -- the single source of truth for this flag set, shared with
+// RunMapWorker/RunMergeWorker's one-shot exec.Cmd args) into one
+// --persistent request line.
+func mapArgsLine(a MapArgs) string     { return strings.Join(mapArgsTokens(a), " ") }
+func mergeArgsLine(a MergeArgs) string { return strings.Join(mergeArgsTokens(a), " ") }

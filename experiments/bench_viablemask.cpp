@@ -76,75 +76,30 @@ static void bench(const char* label, int reps, long long callsPerRep, F&& body) 
 // observable effect and deleted it outright, invalidating the comparison).
 static volatile unsigned g_sink = 0;
 
-// A local copy of s8::viableRec (core/transition.h) with ONE added check at
-// the top of the function: this is the version that could actually abort a
-// pathological tree walk early (a lambda-side check, benchmarked above,
-// cannot -- returning from the lambda doesn't stop viableRec's SIBLING
-// branches from being explored). Copied here rather than modifying the
-// production file, so this stays a pure measurement with zero risk to the
-// real code until a decision is made from real numbers.
-template <class M, class F>
-static void viableRecChecked(int r, int H, M mask, int bits, std::uint32_t cov,
-                              std::uint32_t all, const std::uint32_t* rowSup,
-                              const std::uint32_t* sufSup, int budget,
-                              bool topBase, F& fn) {
-  if (g_terminate) return;  // <-- the one added line
-  if ((cov | sufSup[r]) != all) return;
-  if (!(topBase || (mask & 1u))) {
-    const int lbTop =
-        mask ? __builtin_ctzll(static_cast<unsigned long long>(mask)) : r;
-    if (bits + lbTop > budget) return;
-  }
-  if (r == H) {
-    if (mask) fn(mask);
-    return;
-  }
-  viableRecChecked(r + 1, H, mask, bits, cov, all, rowSup, sufSup, budget, topBase, fn);
-  if (bits + 1 <= budget)
-    viableRecChecked(r + 1, H, static_cast<M>(mask | (M(1) << r)), bits + 1,
-                      cov | rowSup[r], all, rowSup, sufSup, budget, topBase, fn);
-}
-
-template <class M = unsigned, class F>
-static void forEachViableMaskChecked(const Sig& old, int H, int budget, F&& fn) {
-  std::uint32_t all = 0, rowSup[SIGMAX], sufSup[SIGMAX + 1];
-  for (int i = 0; i < H; ++i)
-    if (old.b[i]) all |= 1u << old.b[i];
-  for (int r = 0; r < H; ++r) {
-    std::uint32_t s = 0;
-    for (int rr = r - 1; rr <= r + 1; ++rr)
-      if (rr >= 0 && rr < H && old.b[rr]) s |= 1u << old.b[rr];
-    rowSup[r] = s;
-  }
-  sufSup[H] = 0;
-  for (int r = H - 1; r >= 0; --r) sufSup[r] = sufSup[r + 1] | rowSup[r];
-  viableRecChecked<M>(0, H, M(0), 0, 0u, all, rowSup, sufSup, budget, old.b[H] != 0, fn);
-}
-
-// Count recursive NODE visits (not just emitted leaves) to show why a
-// per-node check is a different cost profile than a per-leaf check.
-static long long countNodes(int r, int H, unsigned mask, int bits, std::uint32_t cov,
-                             std::uint32_t all, const std::uint32_t* rowSup,
-                             const std::uint32_t* sufSup, int budget, bool topBase) {
-  if ((cov | sufSup[r]) != all) return 1;
-  if (!(topBase || (mask & 1u))) {
-    const int lbTop = mask ? __builtin_ctzll(static_cast<unsigned long long>(mask)) : r;
-    if (bits + lbTop > budget) return 1;
-  }
-  if (r == H) return 1;
-  long long n = 1;
-  n += countNodes(r + 1, H, mask, bits, cov, all, rowSup, sufSup, budget, topBase);
-  if (bits + 1 <= budget)
-    n += countNodes(r + 1, H, mask | (1u << r), bits + 1, cov | rowSup[r], all,
-                     rowSup, sufSup, budget, topBase);
-  return n;
-}
+// NOTE (trimmed via /simplify): an earlier version of this file also
+// carried a local copy of s8::viableRec with an added per-node check
+// (viableRecChecked/forEachViableMaskChecked) plus a countNodes tree-visit
+// counter, to test whether a recursion-level interrupt point was cheap
+// enough to be worth building for forEachViableMask. Since this whole file
+// is now WRONG TARGET (see the header note -- kink's real hot path,
+// kinkStageTransition, has no recursive tree to interrupt at all), that
+// apparatus was exploratory scaffolding for a question that no longer
+// applies here, not part of the reusable benchmark methodology. Dropped
+// rather than kept as dead code; git history has the full version if
+// someone building a kinkStageTransition-targeted benchmark wants the
+// pattern for reference.
 
 int main() {
   const int H = 20;
   Sig sig = makeSig(H);
   const int budget = H; // generous, allow most masks to be viable
-  const int reps = 2000;
+  // reps=50 (was 2000): at H=20 each forEachViableMask call visits ~2M tree
+  // nodes (see the emitted ratio line), so 2000 reps x 7 trials x 6 variants
+  // was ~168B node visits -- several CPU-minutes for a "throwaway, iterate
+  // fast" benchmark. min-of-N-trials only needs enough reps per trial to
+  // amortize timer overhead, not thousands; found while re-verifying this
+  // file post-/simplify (it looked hung, wasn't -- just this expensive).
+  const int reps = 50;
 
   // Count calls once up front (same every rep, deterministic).
   long long callsPerRep = 0;
@@ -173,25 +128,6 @@ int main() {
       });
     });
   }
-
-  std::uint32_t all = 0, rowSup[SIGMAX], sufSup[SIGMAX + 1];
-  for (int i = 0; i < H; ++i)
-    if (sig.b[i]) all |= 1u << sig.b[i];
-  for (int r = 0; r < H; ++r) {
-    std::uint32_t s = 0;
-    for (int rr = r - 1; rr <= r + 1; ++rr)
-      if (rr >= 0 && rr < H && sig.b[rr]) s |= 1u << sig.b[rr];
-    rowSup[r] = s;
-  }
-  sufSup[H] = 0;
-  for (int r = H - 1; r >= 0; --r) sufSup[r] = sufSup[r + 1] | rowSup[r];
-  long long nodes = countNodes(0, H, 0u, 0, 0u, all, rowSup, sufSup, budget, sig.b[H] != 0);
-  std::printf("(tree nodes visited per call: %lld, vs %lld emitted leaves -- ratio %.1fx)\n",
-              nodes, callsPerRep, callsPerRep ? double(nodes) / double(callsPerRep) : 0.0);
-
-  bench("recursion check", reps, callsPerRep, [&] {
-    forEachViableMaskChecked(sig, H, budget, [&](unsigned m) { g_sink = m; });
-  });
 
   return 0;
 }
