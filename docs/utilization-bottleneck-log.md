@@ -324,3 +324,18 @@ Deployed: `scripts/dalby_term.sh` now sets `export GOGC=1000`.
 This is the first bottleneck this round found on the Go/orchestrator side
 rather than the C++ engine or scheduling logic — a genuinely different
 layer, not a variant of Bottlenecks #1/#2's mechanisms.
+
+### Dead-end solutions tried (config-tuning sweep, this round)
+
+- **steal-disable** (`--steal-grain 0` vs `0.05`, same GOGC=1000/overlap=15/
+  merge-mult=1 config): 281.6s vs 283.4s — statistically identical, noise-
+  level. Confirms steal is now essentially inert (consistent with the
+  Bottleneck #1 floor diagnosis: nominated steals rarely/never actually
+  complete), but disabling it doesn't cost or save anything measurable
+  either. Not deployed either way; no clear win to bank.
+- **coarser-unit-mult** (`--unit-mult 2` vs `4`, same other config): 384.5s
+  vs 283.4s — a clean **35% regression**. Map, unlike merge, does NOT
+  benefit from coarser granularity (merge-mult's fix does not transfer to
+  unit-mult) — finer map splitting still helps the many non-dominant
+  columns even though it can't fix the dominant straggler's floor. Do not
+  retry lowering `--unit-mult` below 4.
