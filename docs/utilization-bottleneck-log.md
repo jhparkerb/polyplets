@@ -544,3 +544,54 @@ Whoever picks this up: verify against the ACTUAL kernel in use
 (`grep -n <function> core/kink.h`, or better, an actual call-stack/profile
 from a real kink run) before writing a benchmark or design doc, the way
 this round did not, until an hour was already spent on the wrong target.
+
+### Real data on what actually happens (kink kernel, corrected target)
+
+Round-level data for H17 col5 (maxn=33), `frontier_in` vs `map_wall_s`/
+`map_cpu_s` (cpu/wall = average concurrent cores, out of 80):
+
+| round | frontier_in | map_wall_s | map_cpu_s | avg cores active |
+|---|---:|---:|---:|---:|
+| stage1 | 9,587,734 | 1.024 | 60.446 | ~59 |
+| stage4 | 19,641,706 | 2.951 | 127.722 | ~43 |
+| stage6 | 20,717,652 | 17.270 | 135.514 | ~7.8 |
+| stage8 | 20,943,386 | 25.058 | 131.604 | ~5.2 |
+| stage12 | 21,068,044 | 36.426 | 115.683 | ~3.2 |
+| stage16 | 21,364,246 | 45.584 | 112.973 | ~2.5 |
+
+**Frontier size stays roughly flat from stage4 onward (~20-21M) while
+concurrency collapses from ~43 cores to ~2.5** — a systematic trend across
+the column's OWN stage sequence, not a single "unit 319 is pathological"
+story (that framing, from earlier in this round, conflated an
+across-round aggregate with a real per-unit anomaly). `map_units=320` and
+total `map_cpu_s` stay roughly similar across stages (113-135) while wall
+climbs 16x for near-constant input — the SAME total work is concentrating
+onto fewer and fewer of the 320 units as the sweep goes deeper.
+
+This is consistent with, not a new discovery contradicting, the
+already-established RGS structural-skew finding from the OLD engine's
+terminal-sort investigation (`HANDOFF.md`'s "terminal-sort investigation:
+fully closed" section, 4 named dead ends, confirmed inherent not an
+implementation quirk): signature bytes are a restricted-growth-string
+encoding of a partition, and as MORE cells get placed deeper into a
+sweep, `SampleKeysMulti`'s even-by-COUNT split increasingly fails to
+correspond to even-by-COST distribution, because the state space's
+"shape" (how much genuine choice/cost-diversity remains per key) changes
+with how constrained the signature already is. **Not re-attempting the 4
+already-rejected re-encoding approaches** (recursive radix bucketing,
+hash-bucket+k-way-merge, generation-order nearly-sorted, multi-level
+radix) — those were proven, not just measured, to not help this class of
+skew.
+
+**What's still genuinely open**: whether `kinkStageTransition` itself
+(confirmed O(H)-bounded, cheap) or something downstream in
+`map_shard_stage_file` (the shard-level `sortRun`/`deduplicateRun`,
+spill I/O, or `RunRecord::counts.assign()`'s width-dependent cost) is
+where the CONCENTRATED cost actually lands for the units that end up
+dominating late-stage rounds. Not pinned down this round — the
+STRUCTURAL cause (RGS-driven skew, already established) is now
+correctly connected to the KINK kernel's real behavior, but the specific
+CODE-LEVEL cost driver within a slow unit needs its own profiling pass
+(e.g. `perf record` on a real dalby run isolating one late-stage kink
+unit, or per-call instrumentation inside `map_shard_stage_file` itself)
+before a fix can be designed.
