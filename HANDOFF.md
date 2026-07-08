@@ -1,12 +1,14 @@
 # HANDOFF — 2026-07-08 (utilization work, branch `steal-wall-time-floor`)
 
-**Not yet merged to kink-carry/master.** This session's work (a(n) engine
-whole-run utilization, per jasonp's 2026-07-07 `/goal`) lives on
-`steal-wall-time-floor`, branched from `kink-carry@2cb81a4`. Term chase
-stays parked per the 2026-07-07 entry below; this is a separate,
-reopened thread specifically for utilization.
+**Ready to merge to kink-carry/master, pending jasonp's review.** This
+session's work (a(n) engine whole-run utilization, per jasonp's
+2026-07-07 `/goal`, cleared 2026-07-08) lives on `steal-wall-time-floor`,
+branched from `kink-carry@2cb81a4`. Term chase stays parked; this was a
+separate, reopened thread specifically for utilization. Full `make
+ns-gates` (both ASan kernels) and `go test ./...` clean at every commit;
+a `/simplify` pass has run on the newest (steal-related) code.
 
-**6 bottlenecks found and solved, deployed to `scripts/dalby_term.sh`,
+**8 bottlenecks found and solved, deployed to `scripts/dalby_term.sh`,
 each independently real-dalby-validated with correct output:**
 
 1. **Straggler Tail** — `--overlap-heights` was only ever measured at a
@@ -59,7 +61,44 @@ this round. Real maxn=33 confirmation: **6798.6s -> 5674.2s (16.5%
 faster), utilization 10.2%->12.4%** — the first real-scale utilization
 GAIN this entire round, and the first fix that demonstrably moves H17's
 dominant floor rather than only helping a secondary cost swallowed by it.
-Best win of the session.
+
+**7. Stealing Silently Broken — the real reason #1's steal attempts
+measured nothing.** Investigating why `htop` kept showing one process busy
+found the actual root cause: `stealEligible`'s `processed>0` gate was
+permanently blocked for any unit finishing under 2s, because the C++
+progress emitter unconditionally throttled its first report to a 2s
+cadence. Bottleneck #1's three "fixes" (commits 208864b/9c5edc4/22b0206)
+were all correct but downstream of this — the eligibility/scoring logic
+was never the real blocker. Fix: first progress report fires immediately.
+Real H17-isolated A/B: steals=0 before, 9468 steals after, 3523.9s total
+(map-steal alone).
+
+**8. Merge Range Straggler — merge had ZERO rebalancing, the whole
+session.** Every prior fix only ever touched map; merge ranges launched as
+fixed goroutines with no requeue path at all. Added the same
+terminate/stop_key/on_progress work-stealing machinery `mergeRunFiles`
+needed (simpler resume semantics than kink's mask enumeration — no
+partial-tree-state problem, just "re-merge with lo_hex=stop_key") plus a
+full `mergePhase` rewrite to a queue+steal pool. Real H17-isolated A/B:
+**3523.9s (map-steal only) -> 3103.2s (map+merge steal), 11.9% further
+improvement**, byte-identical H17 output confirmed correct.
+
+**Best wins of the session, found only after jasonp pushed back hard on
+the pace/depth up to that point** — both were real, previously-invisible
+mechanisms hiding behind misdiagnosed or absent instrumentation, not
+tuning knobs.
+
+A `/simplify` pass on the #7/#8 diff (4 parallel review angles) found and
+fixed a real gap: merge-side steals weren't being counted in telemetry at
+all (`mergePhase` never took a `*telemetry` param). Also deduped SIGTERM
+handling + the progress emitter (previously copy-pasted verbatim between
+`map_worker.cpp` and `merge_worker.cpp`) into `worker/worker_util.h`.
+Deferred as documented TODOs (`orchestrator/sweep.go`): unifying
+`mapPhase`/`mergePhase`'s ~90%-duplicated scheduler bodies, and
+`splitRemainder`'s `.idx` I/O held under the scheduler mutex on every
+steal (now hit hundreds of times per column) — both real, both flagged
+by the review, both deliberately not attempted mid-cleanup on code just
+validated at production scale.
 
 **Also found, separately flagged, NOT this session's fault, NOT fixed**:
 a real, pre-existing correctness bug — real `SIGTERM` + `--resume` on the

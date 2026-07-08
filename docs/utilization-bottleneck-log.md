@@ -22,6 +22,8 @@ tried (good or bad).
 | 4 | Allocation Overhead | solved (readIndexHeader fix, deployed) | 55%->lower share of a 20GB/run heap profile; real root cause behind #3's symptom |
 | 5 | Process-Per-Unit Spawn | solved (--persistent-workers, deployed) | 6.2% wall-clock, 7.7% fewer CPU-seconds, real maxn=30 A/B, correct output, zero orphaned processes |
 | 6 | Kink-Stage Concurrency Collapse | SOLVED (unit-mult=8, deployed) | 16.5% wall-clock at REAL a33 scale (6798.6s->5674.2s), utilization 10.2%->12.4% (first real-scale util GAIN this round), correct output. Best win of the session. |
+| 7 | Stealing Silently Broken (progress-throttle gate) | SOLVED (first-progress-report fires immediately, deployed) | Real H17-isolated A/B: map-steal alone measured "steals=0 for 173s" before the fix -> after, 3523.9s total with 9468 steals firing, byte-identical output. `stealEligible`'s `processed>0` gate was permanently blocked by a 2s-unconditional progress-report throttle -- units finishing faster than 2s never registered any progress, so work-stealing had been silently inert this entire session despite 3 prior "fix" commits (208864b/9c5edc4/22b0206) that only ever reached downstream logic. |
+| 8 | Merge Range Straggler (no rebalancing at all) | SOLVED (merge-side work-stealing, deployed) | Merge had ZERO rebalancing mechanism before this fix (all ranges launched as fixed goroutines, no requeue path). Added the same terminate/stop_key/on_progress machinery to `mergeRunFiles` + a full queue+steal `mergePhase` rewrite. Real H17-isolated A/B: 3523.9s (map-steal only) -> 3103.2s (map+merge steal), 11.9% further improvement, byte-identical H17 output confirmed, 10448 total steal events. |
 
 ## Bottleneck #1: Straggler Tail
 
@@ -747,3 +749,42 @@ sort+dedup cost (however skewed by RGS structure) stays smaller and more
 units finish quickly, recovering some of the concurrency that was
 collapsing to ~2.5 cores. Not proven mechanistically, but the real result
 speaks for itself.
+
+## Session close (2026-07-08): 8 bottlenecks solved, ready to merge
+
+Goal cleared by jasonp after this round. Final tally: 8 named, real
+bottlenecks found and solved, every one deployed and independently
+validated with correct output. The two biggest wins came last and were
+found only after direct, hard pushback from jasonp on the pace and depth
+of the investigation up to that point:
+
+- **#7 (Stealing Silently Broken)**: the whole session's earlier
+  "work-stealing measures ~zero effect" conclusion (bottleneck #1's three
+  "dead-end" fixes) was itself misdiagnosed — the eligibility/scoring
+  logic was never the real blocker; a progress-report throttle bug
+  upstream of all of it silently prevented `processed>0` from ever being
+  true for fast-finishing units, permanently blocking their eligibility.
+- **#8 (Merge Range Straggler)**: merge had no rebalancing mechanism at
+  all until this round — every prior fix in this log only ever touched
+  map.
+
+Combined, real H17-isolated production-scale A/B (unit-mult=8 +
+persistent-workers + all prior fixes, same code except the steal fixes):
+**map-steal-only 3523.9s -> map+merge-steal 3103.2s**, both far below any
+earlier full-run number this session measured for the same real work.
+
+A `/simplify` pass (4 parallel review angles) on the map/merge-steal
+diff found and fixed: merge steals weren't being counted in telemetry
+(`mergePhase` never took a `*telemetry` param — fixed), SIGTERM handling
+and the progress emitter were duplicated verbatim between `map_worker.cpp`
+and `merge_worker.cpp` (now shared via `worker_util.h`), and a couple of
+trivial redundancies. Two larger findings — `mapPhase`/`mergePhase`'s
+scheduler bodies being ~90% structurally duplicated, and `splitRemainder`
+doing `.idx` I/O while holding the scheduler mutex on every steal (now
+hit hundreds of times per column) — were deliberately deferred as
+documented TODOs in `orchestrator/sweep.go`, not attempted under a
+cleanup pass on code just validated at production scale.
+
+Full `make ns-gates` (including both ASan kernels) and `go test ./...`
+clean throughout. Branch `steal-wall-time-floor`, ready to merge into
+`kink-carry`/master pending jasonp's review.
