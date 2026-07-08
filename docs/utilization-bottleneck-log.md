@@ -21,7 +21,7 @@ tried (good or bad).
 | 3 | GC Churn | solved (GOGC=1000, deployed) | 6.7% wall-clock, real maxn=30 A/B, correct output |
 | 4 | Allocation Overhead | solved (readIndexHeader fix, deployed) | 55%->lower share of a 20GB/run heap profile; real root cause behind #3's symptom |
 | 5 | Process-Per-Unit Spawn | solved (--persistent-workers, deployed) | 6.2% wall-clock, 7.7% fewer CPU-seconds, real maxn=30 A/B, correct output, zero orphaned processes |
-| 6 | Kink-Stage Concurrency Collapse | partially addressed, NOT the dominant driver | recordLess lo-tiebreak: real, deployed, correctness-verified, but only 0.07% at real a33 scale — collision-rate x width is real but not what's actually dominating; search continues |
+| 6 | Kink-Stage Concurrency Collapse | SOLVED (unit-mult=8, deployed) | 16.5% wall-clock at REAL a33 scale (6798.6s->5674.2s), utilization 10.2%->12.4% (first real-scale util GAIN this round), correct output. Best win of the session. |
 
 ## Bottleneck #1: Straggler Tail
 
@@ -698,3 +698,52 @@ out of scope for this round) or a kink-specific sub-record interrupt
 mistargeted — kink's `kinkStageTransition` is cheap, so an interrupt
 would need to act at the shard-level sort/dedup boundary, not the
 per-record transition; not designed this round).
+
+## Bottleneck #6, actually solved: unit-mult=8, not the combine() fix
+
+The combine() fix above (`recordLess` lo-tiebreak) was real but
+insufficient (0.07% at real scale) because it addressed per-collision
+cost, not WHICH units get overloaded. The actual fix: finer input
+splitting via `--unit-mult 8` (up from 4) — untested territory, not a
+retry of a dead end. The one prior "finer unit-mult rejected" finding
+(memory `engine-utilization-and-scheduling`) was measured on the OLD
+engine (pre-kink-carry, a18/a23 tests) — the same class of mistake
+already caught once this round (`forEachViableMask`). This session's own
+coarser-unit-mult test (`--unit-mult 2`, rejected, 35% regression) never
+tested RAISING it on the actual kink kernel.
+
+**Real dalby A/B, maxn=30 (fast sanity check before committing to an
+expensive a33 trial):**
+
+| unit-mult | wall | cpu_s |
+|---|---:|---:|
+| 4 (prior default) | 265.0s | 7155.8 |
+| 8 | **215.4s** | 7463.6 |
+| 16 | 252.0s | 8068.8 |
+
+Not monotonic — 8 is the sweet spot, 16 starts regressing (too fine adds
+its own overhead, consistent with the general shape of every other
+granularity question this round). Correct `a(30)` at unit-mult=8.
+
+**Real production-scale confirmation, maxn=33, the test that actually
+matters:**
+
+| unit-mult | wall | cpu_s | utilization | a(33) |
+|---|---:|---:|---:|---|
+| 4 | 6798.6s | 55440.2 | 10.19% | correct |
+| 8 | **5674.2s** | 56300.5 | **12.40%** | correct |
+
+**16.5% faster wall-clock, utilization actually UP (not flat, not down —
+the first real-scale utilization gain in this entire round), correct
+output.** Deployed: `scripts/dalby_term.sh` now passes `--unit-mult 8`.
+
+This is the best single win of the whole session, and the first fix that
+demonstrably moves H17's dominant floor rather than only helping a
+secondary cost that gets swallowed by it. The mechanism (why finer
+splitting helps specifically here, when it hurt on the old engine) isn't
+fully explained — plausibly: finer units give the collision-heavy late
+stages more, smaller pieces to work with, so a single unit's local
+sort+dedup cost (however skewed by RGS structure) stays smaller and more
+units finish quickly, recovering some of the concurrency that was
+collapsing to ~2.5 cores. Not proven mechanistically, but the real result
+speaks for itself.

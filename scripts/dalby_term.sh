@@ -72,9 +72,21 @@ export GOGC=1000
 # merge-mult=1/GOGC=1000: 282.5s/7755.3 cpu_s -> 265.0s/7155.8 cpu_s --
 # 6.2% faster wall, 7.7% fewer CPU-seconds, correct a(30), zero orphaned
 # processes after normal exit or a real SIGTERM.
+#
+# --unit-mult 8: Bottleneck #6 (Kink-Stage Concurrency Collapse). A prior
+# "finer unit-mult rejected" finding in memory was from the OLD engine
+# (pre-kink-carry, a18/a23), not re-verified against kink -- this session's
+# own coarser-unit-mult test (2, rejected) never tested RAISING it either.
+# Real dalby A/B, maxn=30: unit-mult=8 gives 215.4s vs unit-mult=4's 265.0s
+# (18.7% faster); unit-mult=16 regresses to 252.0s (sweet spot is 8, not
+# monotonic). REAL maxn=33 production confirmation: 6798.6s -> 5674.2s
+# (16.5% faster), utilization 10.2%->12.4% (the first real-scale
+# utilization GAIN this whole round), correct a(33). The best win of the
+# whole session, and the first fix that actually moves the H17 dominant
+# floor instead of only helping smaller/secondary costs.
 T0=$(date +%s)
 ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
-  --cores 80 --ram 1073741824 --unit-mult 4 --merge-mult 1 --steal-grain 0.05 \
+  --cores 80 --ram 1073741824 --unit-mult 8 --merge-mult 1 --steal-grain 0.05 \
   --overlap-heights "$N" --persistent-workers \
   --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" \
   --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 300 $RESUME_FLAG \
