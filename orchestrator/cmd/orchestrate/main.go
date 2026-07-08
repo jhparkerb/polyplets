@@ -40,6 +40,7 @@ func main() {
 	mergeMult := flag.Int("merge-mult", 0, "MERGE ranges per core (0 = follow --unit-mult; set low, e.g. 1, to cut merge fan-in)")
 	stealGrain := flag.Float64("steal-grain", 0, "MAP work-stealing grain as a fraction of a core's fair share (0 = off; ~0.05 recovers the straggler tail). When a core idles in the column tail, the longest-remaining unit is stopped at a key cursor and its remainder split across idle cores.")
 	overlapHeights := flag.Int("overlap-heights", 1, "heights to sweep concurrently sharing one cores-wide pool (1 = sequential; >1 hides merge idle behind another height's map; checkpoints at height boundaries, not per column)")
+	persistentWorkers := flag.Bool("persistent-workers", false, "dispatch map/merge work to a pool of long-lived --persistent map_worker/merge_worker processes instead of spawning fresh per unit (Bottleneck #5: eliminates fork+exec cost paid on every sub-second work item)")
 	ram := flag.Uint64("ram", 128<<20, "map_worker spill budget in bytes")
 	counter := flag.String("counter", "u64", "counter width: u64 or u128")
 	runDir := flag.String("run-dir", "", "directory for run files (default: auto in /tmp)")
@@ -168,9 +169,24 @@ func main() {
 		cancel()
 	}()
 
+	var pool *orchestrator.WorkerPool
+	if *persistentWorkers {
+		pool = orchestrator.NewWorkerPool(ctx, bin, *cores)
+		cfg.Pool = pool
+	}
+
 	t0 := time.Now()
 	result, err := orchestrator.Run(ctx, cfg, ckpt)
 	wall := time.Since(t0).Seconds()
+
+	// Close explicitly here, not via defer: several paths below call os.Exit,
+	// which skips deferred calls and would orphan the pool's persistent
+	// worker processes (each blocked forever on a stdin read that never
+	// comes). Closing right after Run() returns, before any exit path,
+	// guarantees it happens exactly once regardless of success/failure/exit.
+	if pool != nil {
+		pool.Close()
+	}
 
 	// Diagnostic only (POLY_MEMPROFILE=path): root-causing the GC-churn finding
 	// in docs/utilization-bottleneck-log.md Bottleneck #3 -- GOGC=1000 masks

@@ -43,6 +43,12 @@ type SweepConfig struct {
 	Heights         []int         // subset of heights to sweep (empty = 1..Maxn); for multi-machine split
 	PerHeightOut    string        // dir to write per-height h<H>.out files (empty = none)
 	Bin             WorkerBin
+	// Pool, if non-nil, dispatches map/merge work to a WorkerPool of
+	// persistent processes (Bottleneck #5) instead of spawning a fresh
+	// map_worker/merge_worker per unit. Optional and nil-safe: callers that
+	// don't set it (tests, gates) get the original exec-per-unit behavior
+	// unchanged. The production CLI (cmd/orchestrate) sets it.
+	Pool *WorkerPool
 
 	// afterColumn, if non-nil, is called after each forward checkpoint is
 	// written (one per completed column, plus the height-done checkpoint).
@@ -1226,7 +1232,6 @@ func mapPhase(
 				inflight[u.idx] = r
 				mu.Unlock()
 
-				sem <- struct{}{}
 				outName := fmt.Sprintf("map_h%d_c%d_u%d.bin", H, col, u.idx)
 				if stage != "" {
 					// Distinguish a kink column's seed/stage-r/finalize rounds, which
@@ -1244,8 +1249,17 @@ func mapPhase(
 					Counter: cfg.CounterWidth, LoHex: u.lo, HiHex: u.hi, Rev: cfg.Rev,
 					Kernel: kernel, Stage: stage,
 				}
-				res, runErr := RunMapWorker(mctx, cfg.Bin, a, unitProgress(tel, r.processed), r.stop)
-				<-sem
+				var res WorkerResult
+				var runErr error
+				if cfg.Pool != nil {
+					// The pool's own checkout/checkin IS the Cores-wide gate here
+					// (mirrors sem's capacity exactly) -- no sem, no fork+exec.
+					res, runErr = cfg.Pool.RunMap(a, unitProgress(tel, r.processed), r.stop)
+				} else {
+					sem <- struct{}{}
+					res, runErr = RunMapWorker(mctx, cfg.Bin, a, unitProgress(tel, r.processed), r.stop)
+					<-sem
+				}
 
 				mu.Lock()
 				completedRecords += r.processed.Load()
@@ -1403,8 +1417,6 @@ func mergePhase(
 		wg.Add(1)
 		go func(idx int) {
 			defer wg.Done()
-			sem <- struct{}{}
-			defer func() { <-sem }()
 
 			outName := fmt.Sprintf("merge_h%d_c%d_r%d.bin", H, col, idx)
 			if stage != "" {
@@ -1422,7 +1434,15 @@ func mergePhase(
 				KeyLen:  keyLen,
 			}
 			started := time.Now()
-			r, err := RunMergeWorker(ctx, cfg.Bin, a)
+			var r WorkerResult
+			var err error
+			if cfg.Pool != nil {
+				r, err = cfg.Pool.RunMerge(a)
+			} else {
+				sem <- struct{}{}
+				r, err = RunMergeWorker(ctx, cfg.Bin, a)
+				<-sem
+			}
 			if unitLog {
 				fmt.Printf("event=mergerange H=%d col=%d r=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f start_unix=%.6f\n",
 					H, col, idx, los[idx], his[idx], r.OutRecords, r.Acct.CPUS, r.Acct.WallS, float64(started.UnixNano())/1e9)
