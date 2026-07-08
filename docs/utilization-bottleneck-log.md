@@ -595,3 +595,28 @@ CODE-LEVEL cost driver within a slow unit needs its own profiling pass
 (e.g. `perf record` on a real dalby run isolating one late-stage kink
 unit, or per-call instrumentation inside `map_shard_stage_file` itself)
 before a fix can be designed.
+
+### Strongest lead for the open question above
+
+`deduplicateRun`'s `combine()` (`core/run.h`) was already investigated
+once (`results/merge-ledger.md` A5, referenced directly in `run.h`'s own
+comments as "the run.h:51 lever"): "combine was ~58% of merge wall and
+alloc-bound" — a grow-in-place fix for the allocation part is already
+landed (`run.h`'s `combine()` comment: "avoids the fresh
+allocate-copy-free that dominated merge CPU... the buffer grows once and
+every subsequent in-window combine is zero-alloc").
+
+**Plausible connection, not yet verified**: deeper sweep stages have more
+cells already placed, meaning more distinct predecessor boundary
+configurations can canonicalize to the SAME successor signature (less
+remaining distinguishing information = more collisions). If dedup
+collision RATE genuinely rises with stage depth, `deduplicateRun` does
+more total `combine()` work per unique key as the sweep progresses, even
+with the alloc fix already in place — consistent with the observed
+concurrency collapse being a late-stage phenomenon. **Not measured this
+round** — the next concrete step for whoever picks this up: instrument
+`deduplicateRun`'s combine-call count and total `combine()` time
+separately from `sortRun`'s, per stage, on a real kink run (or a
+synthetic benchmark reusing the `bench_viablemask.cpp`-style
+minimum-of-N-trials methodology against `core/run.h`'s actual functions,
+not `core/transition.h`'s).
