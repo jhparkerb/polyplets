@@ -21,6 +21,7 @@ tried (good or bad).
 | 3 | GC Churn | solved (GOGC=1000, deployed) | 6.7% wall-clock, real maxn=30 A/B, correct output |
 | 4 | Allocation Overhead | solved (readIndexHeader fix, deployed) | 55%->lower share of a 20GB/run heap profile; real root cause behind #3's symptom |
 | 5 | Process-Per-Unit Spawn | solved (--persistent-workers, deployed) | 6.2% wall-clock, 7.7% fewer CPU-seconds, real maxn=30 A/B, correct output, zero orphaned processes |
+| 6 | Kink-Stage Concurrency Collapse | partially addressed, NOT the dominant driver | recordLess lo-tiebreak: real, deployed, correctness-verified, but only 0.07% at real a33 scale — collision-rate x width is real but not what's actually dominating; search continues |
 
 ## Bottleneck #1: Straggler Tail
 
