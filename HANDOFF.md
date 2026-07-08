@@ -1,3 +1,72 @@
+# HANDOFF — 2026-07-08 (utilization work, branch `steal-wall-time-floor`)
+
+**Not yet merged to kink-carry/master.** This session's work (a(n) engine
+whole-run utilization, per jasonp's 2026-07-07 `/goal`) lives on
+`steal-wall-time-floor`, branched from `kink-carry@2cb81a4`. Term chase
+stays parked per the 2026-07-07 entry below; this is a separate,
+reopened thread specifically for utilization.
+
+**5 bottlenecks found and solved, deployed to `scripts/dalby_term.sh`,
+each independently real-dalby-validated with correct output:**
+
+1. **Straggler Tail** — `--overlap-heights` was only ever measured at a
+   fixed 2 (one pair); raised to "all owned heights" per
+   `results/scheduling.md`'s own original recommendation. 1.82x
+   wall-clock at maxn=30 (21.6%->38.8% util).
+2. **Merge Fan-Out Overhead** — merge was fanning out at map's granularity
+   (320-way) for no reason; `--merge-mult 1` cuts fan-out to 80-way. 19%
+   faster wall, 37% fewer CPU-seconds at maxn=30.
+3. **GC Churn** — `GOGC=1000` (default 100 was firing ~26 GCs/sec against
+   an 8MB heap goal for no reason; RAM was never remotely tight). 6.7%
+   faster wall at maxn=30.
+4. **Allocation Overhead** — the real root cause behind #3's symptom,
+   found via a real heap-alloc profile (`POLY_MEMPROFILE`, gated
+   diagnostic in `cmd/orchestrate/main.go`): `readIndexHeader` was
+   allocating a full 4KB `bufio.Reader` just to decode a 19-byte header,
+   at two call sites, 55% of a real run's total allocation. Fixed with a
+   single `io.ReadFull` into a stack array. Also right-sized
+   `ParseHeader`'s buffer. New fast local-iteration tool for this class of
+   question: `orchestrator/sample_bench_test.go` (`go test -bench
+   -benchmem`, ~0.5s vs a ~5min dalby round trip).
+5. **Process-Per-Unit Spawn** — jasonp's standing, repeated point (not new
+   from me): map/merge workers ran for a fraction of a second and paid
+   real fork+exec cost every single time, thousands of times per run.
+   `--persistent-workers` (new flag): a pool of long-lived `--persistent`
+   map_worker/merge_worker processes fed via stdin instead of spawned
+   fresh per unit (`orchestrator/workerpool.go` + the same feature in both
+   worker CLIs). 6.2% faster wall, 7.7% fewer CPU-seconds at maxn=30, zero
+   orphaned processes after normal exit or a real SIGTERM.
+
+**The honest, important caveat: at real production scale (maxn=33), all 5
+fixes COMBINED only bought 0.6% (6842.7s -> 6803.2s).** H17 (the dominant
+real-swept height) consumes nearly the entire wall clock once it's the
+pool's sole occupant — none of the 5 fixes touch that specific floor. The
+sub-record interrupt (checking the cooperative-stop flag inside
+`forEachViableMask`/`viableRec`'s recursion, not just between records) is
+now clearly the single highest-value remaining lever. **Measured, not
+implemented**: a local throwaway benchmark
+(`experiments/bench_viablemask.cpp`) found the check itself costs ~10.7%
+on all enumeration everywhere (real, not negligible) — and a harder,
+unsolved problem underneath: there's no clean "resume cursor" for a
+partial pruned-recursion-tree traversal the way there is for a
+between-records key cursor. Full analysis:
+`results/sub-record-interrupt-design.md`. Deliberately not attempted this
+round — real risk of a silent wrong-`a(n)` bug if rushed, needs its own
+dedicated resume-state design + red-first mid-record test.
+
+**Also found, separately flagged, NOT this session's fault, NOT fixed**:
+a real, pre-existing correctness bug — real `SIGTERM` + `--resume` on the
+kink kernel produces wrong `a(n)` values. Confirmed present identically
+without any of this session's changes. `results/kink-resume-sigterm-bug.md`
+has the full repro; `dalby_term.sh`'s `--resume` usage comment now warns
+about it. **Do not trust a resumed kink-kernel run's output without
+independently re-validating it** until this is fixed.
+
+Full bottleneck-by-bottleneck log with every dead end (named, so none get
+retried) and every real-dalby A/B: `docs/utilization-bottleneck-log.md`.
+
+---
+
 # HANDOFF — 2026-07-07
 
 Frontier **a(34) = 515316838423862758858377704**, banked+validated, term chase

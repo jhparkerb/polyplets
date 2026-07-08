@@ -221,12 +221,6 @@ here, and both improved. Deployed: `scripts/dalby_term.sh` now passes
   balance — the imbalance mechanism from Bottleneck #1 does not transfer to
   merge.
 
-## Bottleneck #3: (not yet identified)
-
-Next step: with both map's straggler tail (overlap-heights) and merge's
-fan-out overhead (merge-mult) addressed, run a fresh real production-scale
-measurement to see what now dominates.
-
 ## Bottleneck #1, real production-scale follow-up (maxn=33): floor confirmed worse at scale
 
 Real production run via `dalby_term.sh 33` (both Bottleneck #1 and #2 fixes
