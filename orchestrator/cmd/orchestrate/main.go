@@ -22,6 +22,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"runtime/pprof"
 	"sort"
 	"strconv"
 	"strings"
@@ -170,6 +171,20 @@ func main() {
 	t0 := time.Now()
 	result, err := orchestrator.Run(ctx, cfg, ckpt)
 	wall := time.Since(t0).Seconds()
+
+	// Diagnostic only (POLY_MEMPROFILE=path): root-causing the GC-churn finding
+	// in docs/utilization-bottleneck-log.md Bottleneck #3 -- GOGC=1000 masks
+	// frequent collection but doesn't explain WHY the allocation rate is high
+	// enough to trigger ~26 GCs/sec against an 8MB heap goal in the first
+	// place. runtime.GC() forces a final collection first so the profile
+	// reflects the run's actual allocation activity, not a stale snapshot.
+	if mp := os.Getenv("POLY_MEMPROFILE"); mp != "" {
+		if f, ferr := os.Create(mp); ferr == nil {
+			runtime.GC()
+			_ = pprof.WriteHeapProfile(f)
+			f.Close()
+		}
+	}
 
 	if err != nil {
 		// Context cancellation = graceful stop with checkpoint; not an error.
