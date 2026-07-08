@@ -80,8 +80,60 @@ attempted here.
     remaining levers are overlap-heights (solved) and sub-record interrupt
     (deferred, own investigation).
 
-## Bottleneck #2: (not yet identified)
+## Bottleneck #2: Map/Merge Round Serialization (candidate, under test)
 
-Next step: run a fresh whole-run/whole-column utilization profile with
-overlap-heights deployed to see what now dominates idle time once the
-Straggler Tail's recoverable component is captured.
+Exact per-unit instrumentation (`POLY_UNIT_LOG=1`, `scripts/analyze_unit_concurrency.py`
+— see Measurement tooling below) on a real maxn=26 column showed: within a
+single height's own round sequence (seed, stage0..stageN, finalize), map-unit
+concurrency is high while map units are actually running (mean ~45/80 cores
+during active map time) but **map is only active ~22% of a column's wall** —
+the other ~78% is inter-round merge, where map concurrency is exactly zero
+(H13 col4: active_time=0.88s of 4.09s span, gaps up to 0.3s each, 14 gaps).
+
+This is very likely NOT a new bottleneck — `results/scheduling.md` already
+names and explains this exact mechanism ("Why merge is not cores-wide (and
+overlap exists)") and its own recommendation is **`--overlap-heights =
+(number of swept heights owned)`**, i.e. overlap ALL heights, not a small
+fixed number. Bottleneck #1's deployed fix used `--overlap-heights 2`
+(the only pair actually measured in `utilization-fix-and-ceiling.md`), which
+is far more conservative than this doc's own prior recommendation.
+**Currently testing**: real maxn=29 benchmark run (`runs/ns_a29_bench`,
+~20-25 min, current production config) as the reference; next step is the
+same config swept with `--overlap-heights` set to the full owned-height count
+to see whether raising it past 2 recovers more of this gap. If it does, this
+folds into Bottleneck #1's overlap-heights fix (a config change, not new
+code) rather than being its own bottleneck #2 — will reclassify after the
+comparison.
+
+### Dead-end tooling attempts (measurement, not a bottleneck)
+
+- **small-maxn (~26) external ps-sampling, 1Hz** (`scripts/profile_concurrency.py`
+  v1): far too coarse — a whole small-maxn run finishes in ~2 minutes with
+  individual round-phases ~0.1-0.3s, so most 1s samples just miss any live
+  worker. Not usable below production scale.
+- **small-maxn external ps-sampling, 0.1Hz** (same script, faster interval):
+  still aliased — 96.6% of samples read zero map workers even during the
+  dominant height, both because per-unit runtime at tiny frontier sizes can
+  be sub-100ms (shorter than the sample gap) and because fork+exec of `ps`
+  itself is comparable overhead at that timescale. **Conclusion: external
+  process-count sampling is not a viable measurement method at small-maxn
+  scale, at any practical interval** — replaced by exact in-process
+  instrumentation instead (see below). Aggregate `cost_profile.tsv` numbers
+  (wall_s/cpu_s, measured inside the process, not sampled) remain valid at
+  small scale; only external concurrency *sampling* was the dead end.
+- **Repeated 2-minute toy-scale benchmark loop** (this session, several
+  maxn=26 runs comparing `--overlap-heights` 1/2/11): abandoned mid-attempt
+  per jasonp's direction — too noisy/small to trust for a real comparison;
+  replaced with one substantial (~20-25 min) real maxn=29 run as the
+  reference benchmark instead of stacking more tiny ones.
+
+### Measurement tooling added this round
+
+- `scripts/profile_concurrency.py`: external `/proc`-based worker-count
+  sampler, configurable interval. Useful at **production scale only** (a29+)
+  where per-unit runtime is seconds, not sub-100ms — not used for small-maxn
+  diagnostics after the dead end above.
+- `scripts/analyze_unit_concurrency.py` + `POLY_UNIT_LOG=1`'s new
+  `start_unix` field (orchestrator/sweep.go): exact per-unit (start, wall_s)
+  intervals straight from the orchestrator, zero sampling error, works at
+  any scale. Preferred over external sampling going forward.
