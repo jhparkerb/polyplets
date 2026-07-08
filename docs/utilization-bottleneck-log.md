@@ -456,3 +456,30 @@ copies the whole request line just to append one byte, once per work unit.
 Fixed with two separate writes (the `"\n"` is a zero-allocation string
 literal). Confirmed via before/after profile: `runRequest` drops off the
 top-allocator list entirely.
+
+## Real production-scale confirmation, all 5 fixes combined (maxn=33)
+
+Full real run via `scripts/dalby_term.sh 33` with every deployed fix live
+(overlap-heights=all, merge-mult=1, GOGC=1000, the allocation fixes,
+--persistent-workers): full validation passes (`A33_VALIDATE_PASS`,
+`a(33)=74631481980411777590683952`, matches the pre-session banked value).
+
+**Honest result: wall=6803.2s vs the pre-session baseline's 6842.7s —
+only 0.6% faster. Utilization 10.4%->10.3%, essentially flat.**
+
+This is not a failure of the fixes (each is independently real and
+correctness-verified at maxn=30 — 6-19% wins). It's a scale effect: at
+a33, H17 (the dominant real-swept height) consumes nearly the entire wall
+clock once it's the pool's sole occupant (no sibling height left to
+overlap into) — exactly the Straggler Tail floor already diagnosed under
+Bottleneck #1 and deliberately NOT attempted (the sub-record interrupt
+inside `forEachViableMask`/`viableRec`, flagged as needing its own
+dedicated, carefully-validated investigation, too invasive to rush).
+Bottlenecks #2-#5 all target costs that are real at small-to-medium scale
+but shrink to noise once a single height's own internal floor swallows
+the whole budget.
+
+**Implication: the sub-record interrupt is now clearly the single
+highest-value remaining lever for real production scale, dwarfing
+everything else combined.** Everything else accessible without that
+change has been found and correctly wrung dry.
