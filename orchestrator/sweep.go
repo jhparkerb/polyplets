@@ -1267,8 +1267,8 @@ func mapPhase(
 				triContribs = append(triContribs, res.TriContribs)
 				acct.Add(res.Acct)
 				if os.Getenv("POLY_UNIT_LOG") != "" {
-					fmt.Printf("event=unit H=%d col=%d u=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f stop_key=%s\n",
-						H, col, u.idx, u.lo, u.hi, res.OutRecords, res.Acct.CPUS, res.Acct.WallS, res.StopKey)
+					fmt.Printf("event=unit H=%d col=%d u=%d lo=%s hi=%s out_records=%d cpu_s=%.3f wall_s=%.3f start_unix=%.6f stop_key=%s\n",
+						H, col, u.idx, u.lo, u.hi, res.OutRecords, res.Acct.CPUS, res.Acct.WallS, float64(r.started.UnixNano())/1e9, res.StopKey)
 				}
 
 				// Did this unit stop early at a steal cursor? If so requeue the
