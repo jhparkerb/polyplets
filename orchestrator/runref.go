@@ -53,7 +53,15 @@ func ParseHeader(path string) (PolyrunHeader, int64, error) {
 	}
 	defer f.Close()
 
-	br := bufio.NewReader(f)
+	// Small explicit buffer, not bufio.NewReader's 4KB default: the text
+	// header is a handful of short "key value" lines (height/maxn/records/
+	// counter/keylo/keyhi/rev), a few hundred bytes at most, but ParseHeader
+	// is called once per SampleKeys call -- i.e. once per file per map/merge
+	// round -- so the oversized default buffer showed up as the largest
+	// remaining allocator in a real heap profile after fixing the two
+	// wasted-reader call sites above (docs/utilization-bottleneck-log.md
+	// Bottleneck #4).
+	br := bufio.NewReaderSize(f, 256)
 	var hdr PolyrunHeader
 	var offset int64
 
