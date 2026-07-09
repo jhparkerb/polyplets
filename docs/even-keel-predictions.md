@@ -47,6 +47,41 @@ overhead, not partitioning). If H16 NEW ≈ 45–50, the discount improves and
 H18 P6 tightens to ~50. Either way we learn it in 25 minutes instead of
 betting 5.2 hours.
 
+## H16 TIGHTENER RESULT (2026-07-09) — P4 revised DOWN, merge phase identified as next ceiling
+
+Ran the H16 A/B (`scripts/even_keel_ab.sh 16 34`, fresh OLD `aa4bbd29` vs
+NEW `934f8c0a`, `--overlap-heights 1 --heights 16`, revs verified in
+banners). Result:
+
+- **Correctness (P1): HELD.** `combine_diff PASS`, T(n,16) byte-identical.
+- **Whole-height: OLD wall 1172.5s / eff 12.24 → NEW wall 413.4s / eff
+  35.02 — 2.84x faster**, CPU conserved (14352→14476, +0.9%, P6 held).
+- **NEW fat-column eff ≈ 35.8, dead flat across col 3-20** (record-count
+  independent within H16). OLD fat-column ~9-13.
+- **Discount is CONSTANT, not improving:** H16 stage-table ~7.85M →
+  isolated ~74.7; NEW production 35.8 → discount **0.48** (H15 was 0.51).
+  The "improving discount" hypothesis is FALSIFIED.
+- **Root of the cap, from D3 telemetry (col 5):** map_eff_cores ~58-70
+  (balanced map is fixed, near isolated), **merge_eff_cores ~21-27** — the
+  MERGE phase is the residual bottleneck. Whole-column ~35 is the
+  wall-weighted blend of a ~66-core map and a ~22-core merge. The merge is
+  a k-way combine of 640 map-unit outputs into 80 ranges (merge-mult=1);
+  balancing its cuts (D2) did not lift it because its ceiling is the
+  merge-fan-in / range-count structure, not partition balance.
+
+**Consequence for P4 (H18):** the constant ~0.48 discount + the flat,
+record-independent NEW eff mean H18 will NOT reach the isolated 76. Revised
+prediction: **NEW H18 fat-column eff ≈ 36-39** (map ~66-70, merge ~22,
+blend ~37), wall speedup **~2.8-3.2x** (OLD degrades further at H18, so the
+ratio grows even as NEW's absolute plateaus). This is the "PARTIAL CONFIRM"
+outcome: a real, large win (~3x on the dominant height, byte-identical),
+but the isolated-stage 76 is capped in production by the merge phase.
+
+**Opens Even Keel D6:** parallelize/rebalance the merge phase (candidate
+levers: raise merge-mult now that cuts are balanced; or cut map unit count
+to reduce merge fan-in; measure merge_eff_cores as the target). The map is
+done; the merge is the next ~2x.
+
 ## Predictions (H18 @ maxn=34, fresh OLD binary vs even-keel, identical flags)
 
 **P1 — Correctness (non-negotiable).** NEW per-height T(n,18) output is
