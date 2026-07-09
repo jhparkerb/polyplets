@@ -44,19 +44,16 @@ func TestKinkSweepMatchesColumnSweep(t *testing.T) {
 	}
 }
 
-// baseSweepCfg returns the standard small-scale test SweepConfig (4 cores,
-// tiny RAM budget, fresh temp run/spill dirs) shared by runOneHeight and
-// runOneHeightOverlap (kink_sweep_fused_test.go) -- everything except the
-// kernel dispatch function and OverlapHeights/Bin, which callers set
-// themselves.
-func baseSweepCfg(t *testing.T, maxn int) SweepConfig {
+// runOneHeight drives sweepFn over a single real height H (real seed, real
+// compiled workers) and returns its triangle row (index n -> T(n,H)).
+func runOneHeight(t *testing.T, H, maxn int, sweepFn sweepHeightFn) []*big.Int {
 	t.Helper()
 	dir := t.TempDir()
 	spill := filepath.Join(dir, "spill")
 	if err := os.MkdirAll(spill, 0o777); err != nil {
 		t.Fatalf("mkdir spill: %v", err)
 	}
-	return SweepConfig{
+	cfg := SweepConfig{
 		Maxn:     maxn,
 		Fold:     true,
 		Cores:    4,
@@ -66,22 +63,8 @@ func baseSweepCfg(t *testing.T, maxn int) SweepConfig {
 		Rev:      "test",
 		Bin:      DefaultWorkerBin(".."),
 	}
-}
 
-// runOneHeight drives sweepFn over a single real height H (real seed, real
-// compiled workers) and returns its triangle row (index n -> T(n,H)).
-func runOneHeight(t *testing.T, H, maxn int, sweepFn sweepHeightFn) []*big.Int {
-	t.Helper()
-	return runOneHeightCfg(t, baseSweepCfg(t, maxn), H, maxn, sweepFn)
-}
-
-// runOneHeightCfg is runOneHeight with the SweepConfig supplied by the
-// caller (kink_sweep_fused_test.go varies OverlapHeights/Bin.FusedWorker on
-// top of baseSweepCfg's defaults, always against sweepHeightKink -- only the
-// kink kernel has a fused path to compare).
-func runOneHeightCfg(t *testing.T, cfg SweepConfig, H, maxn int, sweepFn sweepHeightFn) []*big.Int {
-	t.Helper()
-	seed := filepath.Join(cfg.RunDir, "seed.bin")
+	seed := filepath.Join(dir, "seed.bin")
 	if err := WriteSeedPolyrun(seed, cfg.Rev, H, maxn, cfg.CounterWidth); err != nil {
 		t.Fatalf("WriteSeedPolyrun: %v", err)
 	}

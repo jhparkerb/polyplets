@@ -17,11 +17,6 @@ import (
 type WorkerBin struct {
 	MapWorker   string
 	MergeWorker string
-	// FusedWorker is the Even Keel D6 fused-stage binary (worker/fused_stage.cpp).
-	// Empty is valid: fusedStagePhase is only ever called when cfg.OverlapHeights
-	// == 1 (DDF7), and callers that never opt into fusion (tests, gates, older
-	// workers-dir layouts) need not set it.
-	FusedWorker string
 }
 
 // DefaultWorkerBin returns WorkerBin pointing into build/ns/ relative to dir.
@@ -29,7 +24,6 @@ func DefaultWorkerBin(repoRoot string) WorkerBin {
 	return WorkerBin{
 		MapWorker:   filepath.Join(repoRoot, "build/ns/map_worker"),
 		MergeWorker: filepath.Join(repoRoot, "build/ns/merge_worker"),
-		FusedWorker: filepath.Join(repoRoot, "build/ns/fused_stage"),
 	}
 }
 
@@ -127,64 +121,6 @@ func mergeArgsTokens(a MergeArgs) []string {
 		args = append(args, "--keylen", fmt.Sprint(a.KeyLen))
 	}
 	return args
-}
-
-// FusedArgs is the full argument set for one fused_stage invocation (Even
-// Keel D6, worker/fused_stage.cpp). One call replaces an entire mapPhase +
-// mergePhase round for a mid-column kink stage: the worker reads the WHOLE
-// stage input itself (InPaths, unsharded -- fusion partitions only the
-// OUTPUT, per DDF1), so there is no Lo/Hi input-range pair the way
-// MapArgs has one.
-type FusedArgs struct {
-	InPaths   []string // the stage's full input frontier (not a shard of it)
-	H         int
-	Maxn      int
-	Stage     int      // mid-column stage index r in [0, H)
-	Counter   string   // "u64" or "u128"; empty = default (u64)
-	Cores     int      // thread count == output range count (DDF3/DDF4)
-	CutsHex   []string // len(Cores)-1 output-key cut points, ascending (DDF4)
-	OutPrefix string   // worker writes OutPrefix_u<idx>.bin (+.idx) per non-empty range
-	RAM       uint64   // DDF5 in-RAM ceiling in bytes; 0 = no check
-	Rev       string
-}
-
-func fusedArgsTokens(a FusedArgs) []string {
-	args := []string{
-		"--in", strings.Join(a.InPaths, ","),
-		"--H", fmt.Sprint(a.H),
-		"--maxn", fmt.Sprint(a.Maxn),
-		"--stage", fmt.Sprint(a.Stage),
-		"--out-prefix", a.OutPrefix,
-	}
-	if a.Counter != "" {
-		args = append(args, "--counter", a.Counter)
-	}
-	if a.Cores > 0 {
-		args = append(args, "--cores", fmt.Sprint(a.Cores))
-	}
-	if len(a.CutsHex) > 0 {
-		args = append(args, "--cuts", strings.Join(a.CutsHex, ","))
-	}
-	if a.RAM > 0 {
-		args = append(args, "--ram", fmt.Sprint(a.RAM))
-	}
-	if a.Rev != "" {
-		args = append(args, "--rev", a.Rev)
-	}
-	return args
-}
-
-// RunFusedWorker spawns a fused_stage worker, waits for it, and returns the
-// parsed result (OutRecords is the TOTAL across all output ranges; per-range
-// file existence, not a reported count, is how fusedStagePhase decides which
-// range paths are real -- see its comment). No onProgress/stop: fusion is
-// scoped to OverlapHeights==1 (DDF7), where work-stealing is not engaged
-// (stealAllowed requires exactly one active height AND grainRecs>0, but more
-// fundamentally fused_stage is one process using ALL cores itself, so there
-// is no idle sibling pool to steal into) — DDF8 spawns it fresh per stage,
-// full stop.
-func RunFusedWorker(ctx context.Context, bin string, a FusedArgs) (WorkerResult, error) {
-	return runWorker(ctx, bin, fusedArgsTokens(a), nil, nil)
 }
 
 // RunMapWorker spawns a map_worker, waits for it, and returns the parsed result.

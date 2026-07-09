@@ -156,14 +156,14 @@ build/ns:
 # ns-gates: all new-system gates. Includes the runfile-format, holes, verify,
 # height-split, and full-Go-suite gates that existed but were not wired in, so a
 # regression in those paths (BUGS-OF-SHAME A4/A5/B*/D6) can't rot undetected.
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-sharded ns-gate-kink-sharded-worker-cli ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan ns-gate-fused-stage ns-gate-fused-stage-tsan
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-sharded ns-gate-kink-sharded-worker-cli ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan
 
 # Fast gate subset for the pre-push hook (.githooks/pre-push). Targets well under
 # 30s: the full Go suite (guards / combine / runcat / closed-form / resume) plus
 # the sub-second C++ format+arith gates. The heavy C++ sweeps (spill, parallel,
 # holes, maxn=14 regression) stay in `make ns-gates`, run before a release or by
 # hand. Order: cheapest, most-targeted tripwires first so a regression fails fast.
-ns-gate-fast: ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile ns-gate-go ns-gate-kink ns-gate-kink-column ns-gate-kink-sharded ns-gate-kink-sharded-worker-cli ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-fused-stage
+ns-gate-fast: ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile ns-gate-go ns-gate-kink ns-gate-kink-column ns-gate-kink-sharded ns-gate-kink-sharded-worker-cli ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker
 
 # Closed-form invariant gate: assert the engine contributes every KNOWN closed
 # form (top strip H=N=3^(N-1); low strips T(n,1)=1, T(n,2) recurrence) DIRECTLY,
@@ -272,40 +272,6 @@ ns-gate-persistent-worker: build/ns/gate_persistent_worker build/ns/map_worker b
 	./build/ns/gate_persistent_worker
 
 build/ns/gate_persistent_worker: test/gate_persistent_worker.cpp $(NS_HEADERS) | build/ns
-	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
-
-# Even Keel D6: the fused stage worker (docs/even-keel-fusion-plan.md).
-# Production build (-O3, real worker binary the orchestrator dispatches).
-build/ns/fused_stage: worker/fused_stage.cpp worker/worker_io.h $(NS_HEADERS) | build/ns
-	$(CXX) $(NSFLAGS) -O3 -I. -pthread $< -o $@
-
-# F1 gate: fused_stage vs the existing map_worker+merge_worker path for one
-# real mid-column kink stage round, byte-identical output required (DDF9).
-ns-gate-fused-stage: build/ns/gate_fused_stage build/ns/map_worker build/ns/merge_worker build/ns/fused_stage
-	./build/ns/gate_fused_stage
-
-build/ns/gate_fused_stage: test/gate_fused_stage.cpp $(NS_HEADERS) | build/ns
-	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
-
-# ThreadSanitizer build of the ACTUAL fused_stage worker (DDF3: mandatory
-# before F5 -- the fusion's whole correctness case rests on "ownership-
-# transfer only, no shared mutable state during map or reduce"; TSan proves
-# it on the real binary instead of by inspection). Same flag pattern as
-# build/tma_tsan.
-build/ns_tsan:
-	mkdir -p build/ns_tsan
-
-build/ns_tsan/fused_stage: worker/fused_stage.cpp worker/worker_io.h $(NS_HEADERS) | build/ns_tsan
-	$(CXX) $(NSFLAGS) -g -O1 -fsanitize=thread -fno-omit-frame-pointer -I. -pthread $< -o $@
-
-# TSan gate: drive the real TSan fused_stage binary (test/gate_fused_stage_tsan.cpp
-# builds a real stage-0 table via map_worker, then execs the TSan binary with
-# cores=8 and multiple output ranges over real data) -- a clean exit means
-# ThreadSanitizer found no race in the map+scatter or reduce phases (DDF3).
-ns-gate-fused-stage-tsan: build/ns/gate_fused_stage_tsan build/ns/map_worker build/ns_tsan/fused_stage
-	./build/ns/gate_fused_stage_tsan
-
-build/ns/gate_fused_stage_tsan: test/gate_fused_stage_tsan.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 # Run-file on-disk format gate: atomic publish, sub-CRC, header/.idx magic.
@@ -456,7 +422,7 @@ build/ns/verify: verify/cmd/verify/main.go verify/*.go | build/ns
 # auto-finds its same-rev map_worker/merge_worker siblings — no --workers-dir.
 PREFIX ?= $(HOME)/bin
 INSTALL_REV := $(GIT_REV)$(GIT_DIRTY)
-NS_INSTALL_BINS := orchestrate map_worker merge_worker fused_stage runcat predict combine verify
+NS_INSTALL_BINS := orchestrate map_worker merge_worker runcat predict combine verify
 
 install: $(addprefix build/ns/,$(NS_INSTALL_BINS))
 	mkdir -p $(PREFIX)
