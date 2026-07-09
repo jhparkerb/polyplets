@@ -1,3 +1,29 @@
+# HANDOFF — 2026-07-09 (evening): a(35) RUNNING; simplify + SIGTERM fix landed
+
+**Live job.** `a(35)` is computing on **dalby**, tmux session 0 window `a35`,
+orchestrate **PID 1548108**, started ~2026-07-09 16:30 EDT, rev `b8f13d41`.
+Predicted **~16h wall** (a34's 3.70h × 4.4/term), ~80 GB peak RAM (1 GiB×80,
+kink is RAM-light), single uninterrupted overnight. Driver `scripts/dalby_term.sh
+35`; log `runs/ns_a35/{dalby/run.log,launch.log}`. Self-validates a(1)-a(34) vs
+banked at the end, prints `A35_VALIDATE_PASS`/`A35_DONE`. **Bonus:** a(35) is the
+first independent holdout for the fitted P_16 diagonal. Do NOT `--resume` on a
+crash-restart is fine (bug below is fixed) but a clean one-shot is preferred.
+
+**This session's landed work (all on master, pushed):**
+- `0f0d176` bake the four validated scheduling knobs (unit-mult=8, merge-mult=1,
+  steal-grain=0.05, persistent-workers) + GOGC=1000 in as engine DEFAULTS; flags
+  kept for gates/A-B. A bare `orchestrate --kernel kink` is now the deployed config.
+- `dd91550` **FIX the kink real-SIGTERM+resume over-count** (was open since 07-08):
+  seed-round contribution was folded into hTri before column completion, so a
+  mid-column kill's checkpoint (Col=col-1) double-counted on resume. Fixed by
+  deferring the fold to column completion. Red-first `TestKinkResumeMidColumn`
+  gated; real subprocess repro 5/5 (was 0/5). Resume is safe again.
+- `b8f13d41` remove dead code (deadcode analyzer): `manifest.go`, `SampleKeysMulti`,
+  `VerifyCRC`, `SpotcheckWithInput`, the two throwaway `experiments/` benches.
+- dalby returned to `master` (was on the stale `even-keel` branch).
+
+---
+
 # HANDOFF — 2026-07-09 (Even Keel D1-D5 landed, branch `even-keel`)
 
 `docs/even-keel-plan.md` fully executed: D1 `BalancedCutsMulti` (true
