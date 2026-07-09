@@ -59,15 +59,17 @@ mirror:
 
 **Isolating the tall height on tmpfs eliminates the wait:**
 
-- H18 alone, run-dir on `/dev/shm`: **iowait 0%**, and per-column:
-  - col 2: 254 s → **84 s (3.0×)**
-  - col 3: 719 s → **148 s (4.9×)**
-  - col 4: ~928 s → ~166 s (~5.6×)
-- Projected H18 total: 9,336 s → **~2,500–3,500 s (~3×)**.
-  <!-- FINAL: fill exact tmpfs total + byte-identical vs banked h18.out on completion -->
-- Footprint: H18-alone peaks ~30–38 GB — fits `/dev/shm`'s 63 GB.
-- The box sits ~**98% idle** during it: a single height doesn't fill 80 cores.
-  It's fast per-column (no disk wait) but leaves the machine nearly empty.
+- H18 alone, run-dir on `/dev/shm`: **iowait 0%**, and per-column 4.5–5.6× on
+  the expensive columns (col 4: 928 s → 166 s = 5.6×; col 3: 719 s → 148 s =
+  4.9×; col 8: 674 s → 151 s = 4.5×).
+- **H18 total: 9,336 s → 2,262 s = 4.13×.** Per-height output **byte-identical
+  to the banked `h18.out`** (`H18_BYTE_IDENTICAL PASS`) — running the height in
+  isolation on a different medium does not change the result.
+- Footprint: H18-alone peaks ~40 GB — fits `/dev/shm`'s 63 GB.
+- Once disk-free, H18-alone is **compute-bound** during the expensive columns
+  (**89% user CPU, 0% idle, 0% iowait**) — removing the I/O wait converted it
+  straight into useful compute. (A single mid-barrier sample can read ~idle,
+  but the wall-dominating columns are CPU-bound.)
 
 ## The architecture: split by height AND by medium, run concurrently
 
@@ -78,16 +80,20 @@ Two `orchestrate` processes on one box:
 - **Job B — the rest:** `--heights <rest>`, run-dir on **NVMe**. Gets the bulk
   of the cores, which Job A leaves idle.
 
-Run them **concurrently, not sequentially.** Different media, so they don't
-contend for disk; Job A's idle cores are exactly what Job B needs. Total wall ≈
-`max(A, B)` instead of `A + B`. Heights are independent, so the per-height
-outputs simply `combine` at the end — byte-identical to a single run
-(the kink kernel already supports `--heights` subsets for the multi-machine
-split; this is a run-orchestration change, **no kernel change**).
+Run them **concurrently, not sequentially.** They complement rather than
+contend: Job A, once disk-free, is **CPU-bound** and touches no disk; Job B is
+**disk-bound** on NVMe and its worker threads spend most of their time waiting
+on I/O, releasing CPU. Co-scheduling a CPU-bound and an I/O-bound job is the
+classic way to fill a box — A uses the cores B isn't using while B waits on the
+disk A isn't using. Total wall ≈ `max(A, B)` instead of `A + B`. Heights are
+independent, so the per-height outputs simply `combine` at the end —
+byte-identical to a single run (the kink kernel already supports `--heights`
+subsets for the multi-machine split; this is a run-orchestration change,
+**no kernel change**).
 
-Why concurrent beats sequential here: sequential would give up the overlap
-entirely (A finishes, *then* B), and A alone wastes 98% of the box. Concurrent
-recovers the cores for B while A races the critical path in RAM.
+Why concurrent beats sequential here: sequential would give up the co-schedule
+entirely (A finishes, *then* B), serializing ~5×-faster-A after B instead of
+hiding B's disk waits behind A's compute.
 
 ## a(35) execution
 
@@ -117,10 +123,22 @@ orchestrate --maxn 35 --heights 3-18 --kernel kink --counter u128 \
 combine -in runs/ns_a35/perheight -maxn 35 -out a_n.txt   # after both finish
 ```
 
-Projected win: the 70% critical path drops ~3×, and Job B (the remaining ~30%,
-NVMe) becomes the new bottleneck — **a(35) from ~16 h toward ~6–8 h.** Bonus:
-the tmpfs portion also escapes the RAID1 mirror's pure-waste double-write of
-ephemeral scratch.
+Projected win: the tall height (70% of the wall) drops **4.13×** (measured on
+a34's H18: 9,336 s → 2,262 s), so it stops being the bottleneck. Job B (the
+remaining heights on NVMe) becomes the new limiter. Two-media total ≈
+`max(Job A, Job B)`:
+
+- **a34 sanity check:** Job A (H18) = 2,262 s measured. Job B (H3–H17) was
+  ~3,965 s of column-wall in the contended run; alone on NVMe it's the limiter
+  at very roughly ~3.5–4 k s. So a34 two-media ≈ **~4,000 s vs 13,300 s ≈ 3.3×.**
+- **a(35):** the ~70% tall height (~11 h contended) → ~2.7 h on tmpfs; Job B
+  (~30%, NVMe, disk-bound among itself) becomes the limiter. Expect a(35) to
+  land **~5–8 h vs ~16 h**, pinned by Job B's wall (calibrate — see below).
+
+If Job B's footprint also fits the tmpfs (or a second one), putting it in RAM
+too makes *both* jobs compute-bound and pushes the total lower still. Bonus
+regardless: the tmpfs portion escapes the RAID1 mirror's pure-waste
+double-write of ephemeral scratch.
 
 ## To pin before launch (short calibrations, no full runs)
 
