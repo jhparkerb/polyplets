@@ -781,7 +781,11 @@ func sweepHeightKink(
 			res, ferr := RunFusedColumnWorker(ctx, cfg.Bin.FusedColumn, FusedColumnArgs{
 				InPaths: frontier, H: H, Maxn: cfg.Maxn, Cores: cfg.Cores, Fold: cfg.Fold,
 				Counter: counterName(cfg.CounterWidth), Cuts: cuts, OutPrefix: outPrefix,
-				Rev: cfg.Rev, RAM: cfg.RAM,
+				// The fused worker runs the WHOLE column in ONE process, so its
+				// RAM budget is the total (per-worker spill budget x cores), not
+				// the per-worker value -- otherwise a modest column trips the
+				// in-RAM ceiling that only really binds at frontier scale.
+				Rev: cfg.Rev, RAM: cfg.RAM * uint64(cfg.Cores),
 			})
 			stopHB()
 			if ferr != nil {
