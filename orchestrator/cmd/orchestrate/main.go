@@ -50,6 +50,7 @@ func main() {
 	resume := flag.Bool("resume", false, "resume from checkpoint")
 	compare := flag.Bool("compare", false, "compare final total to fixtures/b006770.txt")
 	workersDir := flag.String("workers-dir", "", "directory containing map_worker/merge_worker binaries")
+	requireFusion := flag.Bool("require-fusion", false, "Even Keel D6: fail loud at startup if --overlap-heights 1 is set but no fused_column binary was found, instead of silently using the map+merge path -- for A/B confirmation runs")
 	costProfileOut := flag.String("cost-profile-out", "", "emit per-column cost profile here (default: <run-dir>/cost_profile.tsv)")
 	costProfileRef := flag.String("cost-profile-ref", "", "reference cost profile to drive the live ETA")
 	heightsArg := flag.String("heights", "", "subset of heights to sweep, e.g. 1-12 or 17,19,20 (default: all 1..maxn; for multi-machine split)")
@@ -116,10 +117,23 @@ func main() {
 	if *workersDir != "" {
 		bin.MapWorker = filepath.Join(*workersDir, "map_worker")
 		bin.MergeWorker = filepath.Join(*workersDir, "merge_worker")
+		bin.FusedColumn = filepath.Join(*workersDir, "fused_column")
 	} else {
 		// Auto-detect: look for build/ns/ relative to the executable's parent
 		// or relative to cwd.
 		bin = findWorkers()
+	}
+	// Even Keel D6: engage per-column fusion only if the binary actually
+	// exists; otherwise fall back to the map+merge round path (so an A/B
+	// baseline that doesn't build fused_column stays on map+merge).
+	if bin.FusedColumn != "" {
+		if _, e := os.Stat(bin.FusedColumn); e != nil {
+			bin.FusedColumn = ""
+		}
+	}
+	if *requireFusion && bin.FusedColumn == "" && *overlapHeights == 1 {
+		fmt.Fprintln(os.Stderr, "orchestrate: --require-fusion set but no fused_column binary found (build build/ns/fused_column or drop --require-fusion)")
+		os.Exit(2)
 	}
 
 	rev := gitRev

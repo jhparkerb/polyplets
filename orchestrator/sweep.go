@@ -764,6 +764,64 @@ func sweepHeightKink(
 		var colMapWall, colMergeWall, colMapCPU, colMergeCPU float64
 		var nMapUnits, nMergeRanges int
 
+		// Even Keel D6: per-column fusion. One fused_column worker runs the
+		// whole column (seed + H stages + finalize) in RAM with no inter-stage
+		// files -- the fix for per-stage fusion's memory-bandwidth wall. Only
+		// when a fused_column binary is wired AND overlap is off (the fused
+		// worker uses all cores itself). Correctness is identical (same
+		// transition/combine/finalize); gated byte-identical.
+		if cfg.Bin.FusedColumn != "" && cfg.OverlapHeights == 1 {
+			outPrefix := filepath.Join(cfg.RunDir, fmt.Sprintf("fcol_h%d_c%d", H, col))
+			cuts, cerr := BalancedCutsMulti(frontier, inKeyLen, cfg.Cores-1)
+			if cerr != nil {
+				stopHB()
+				writeCheckpoint(H, col-1, frontier, hTri)
+				return hTri, acct, fmt.Errorf("H=%d col=%d fused cuts: %w", H, col, cerr)
+			}
+			res, ferr := RunFusedColumnWorker(ctx, cfg.Bin.FusedColumn, FusedColumnArgs{
+				InPaths: frontier, H: H, Maxn: cfg.Maxn, Cores: cfg.Cores, Fold: cfg.Fold,
+				Counter: counterName(cfg.CounterWidth), Cuts: cuts, OutPrefix: outPrefix,
+				Rev: cfg.Rev, RAM: cfg.RAM,
+			})
+			stopHB()
+			if ferr != nil {
+				writeCheckpoint(H, col-1, frontier, hTri)
+				return hTri, acct, fmt.Errorf("H=%d col=%d fused: %w", H, col, ferr)
+			}
+			var nextFrontier []string
+			for b := 0; b < cfg.Cores; b++ {
+				p := fmt.Sprintf("%s_u%d.bin", outPrefix, b)
+				if _, e := os.Stat(p); e == nil {
+					nextFrontier = append(nextFrontier, p)
+				}
+			}
+			addTriContribs(hTri, []map[int]map[int]*big.Int{res.TriContribs}, cfg.Maxn)
+			acct.Add(res.Acct)
+			totalRecs := sumFrontierRecords(nextFrontier)
+			colWall := time.Since(colStart).Seconds()
+			tel.observe(ColumnCost{
+				H: H, Col: col, FrontierIn: frontierIn, FrontierOut: totalRecs,
+				WallS: colWall, CPUS: res.Acct.CPUS, RSSMax: res.Acct.RSSMax,
+				MapWallS: colWall, MapCPUS: res.Acct.CPUS, NMapUnits: 1, NMergeRanges: 0,
+			})
+			frontierIn = totalRecs
+			oldFrontier := frontier
+			frontier = nextFrontier
+			if totalRecs == 0 {
+				forwardCheckpoint(col, nil)
+				removeRuns(oldFrontier)
+				frontier = nil
+				break
+			}
+			interval := cfg.CheckpointEvery
+			if interval == 0 || time.Since(lastCkpt) >= interval {
+				forwardCheckpoint(col, frontier)
+				lastCkpt = time.Now()
+			}
+			removeRuns(oldFrontier)
+			continue
+		}
+
 		// runRound executes one map+merge round of the column's stage sequence
 		// and folds its accounting into colAcct/colMap*/colMerge*. name is only
 		// used in error messages and per-round telemetry. When mergeless is set

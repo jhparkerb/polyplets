@@ -315,6 +315,10 @@ build/ns/map_worker: worker/map_worker.cpp $(NS_HEADERS) | build/ns
 build/ns/merge_worker: worker/merge_worker.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O3 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
+# Even Keel D6: per-column fused worker (worker/fused_column.cpp).
+build/ns/fused_column: worker/fused_column.cpp worker/worker_util.h $(NS_HEADERS) | build/ns
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O3 -I. -pthread $< -o $@ $(ZSTD_LDFLAGS)
+
 # ASan/UBSan builds of the ACTUAL production workers (map_worker/merge_worker,
 # both kernels) — see gate-tma/gate-g2 for the same pattern on the oracle
 # engines. Separate build dir so --workers-dir can point orchestrate at these

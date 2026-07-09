@@ -17,6 +17,11 @@ import (
 type WorkerBin struct {
 	MapWorker   string
 	MergeWorker string
+	// FusedColumn is the Even Keel D6 per-column fused worker
+	// (worker/fused_column.cpp): one process runs a whole column in RAM
+	// (seed + H stages + finalize, no inter-stage files). Empty => not
+	// wired; sweepHeightKink then uses the map+merge round path.
+	FusedColumn string
 }
 
 // DefaultWorkerBin returns WorkerBin pointing into build/ns/ relative to dir.
@@ -24,7 +29,52 @@ func DefaultWorkerBin(repoRoot string) WorkerBin {
 	return WorkerBin{
 		MapWorker:   filepath.Join(repoRoot, "build/ns/map_worker"),
 		MergeWorker: filepath.Join(repoRoot, "build/ns/merge_worker"),
+		FusedColumn: filepath.Join(repoRoot, "build/ns/fused_column"),
 	}
+}
+
+// FusedColumnArgs is the argument set for one fused_column invocation (Even
+// Keel D6 per-column fusion). One call replaces a whole column's seed + H
+// stage + finalize rounds.
+type FusedColumnArgs struct {
+	InPaths   []string // this column's frontier (H+2-keyed)
+	H, Maxn   int
+	Cores     int
+	Fold      bool
+	Counter   string // "u64" | "u128"
+	Cuts      []string // hex cut keys for partitioning the next frontier
+	OutPrefix string   // writes <OutPrefix>_u<b>.bin per range
+	Rev       string
+	RAM       uint64
+}
+
+func fusedColumnArgsTokens(a FusedColumnArgs) []string {
+	fold := "0"
+	if a.Fold {
+		fold = "1"
+	}
+	toks := []string{
+		"--in", strings.Join(a.InPaths, ","),
+		"--H", strconv.Itoa(a.H),
+		"--maxn", strconv.Itoa(a.Maxn),
+		"--cores", strconv.Itoa(a.Cores),
+		"--fold", fold,
+		"--counter", a.Counter,
+		"--out-prefix", a.OutPrefix,
+		"--rev", a.Rev,
+		"--ram", strconv.FormatUint(a.RAM, 10),
+	}
+	if len(a.Cuts) > 0 {
+		toks = append(toks, "--cuts", strings.Join(a.Cuts, ","))
+	}
+	return toks
+}
+
+// RunFusedColumnWorker spawns a fused_column worker, waits, and returns the
+// parsed result (TriContribs from the harvested triangle rows, Acct from
+// event=done). Output range files are <OutPrefix>_u<b>.bin.
+func RunFusedColumnWorker(ctx context.Context, bin string, a FusedColumnArgs) (WorkerResult, error) {
+	return runWorker(ctx, bin, fusedColumnArgsTokens(a), nil, nil)
 }
 
 // MapArgs is the full argument set for one map_worker invocation.
