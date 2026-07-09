@@ -4,6 +4,31 @@
 approved.** Phase 1 (radical simplification) has not started. This is
 Phase 2 design work.
 
+## THE BACK IS BREAKABLE — measured 2026-07-09 (`experiments/full_column_bench.cpp`)
+
+The decisive question — is H18's ~13.7-effective-core ceiling fundamental,
+or a partitioning artifact? — is answered. A real fat H18 stage (16M
+records, the REAL `kinkStageTransition` + `combine`, byte-identical output
+verified both ways) on dalby's 80 cores:
+
+- **BALANCED partition (record-quantile splitters): 74.6 of 80 effective
+  cores (93%).**
+- **UNBALANCED partition (even key-value ranges = the current engine's
+  open-ended-last-bucket straggler): 6.8 cores** — reproducing production's
+  measured ~13.7 ceiling.
+- Same data, same transition, **identical output (13,623,078 records
+  both)**.
+
+So the ceiling is a PARTITIONING artifact, not a limit. The record-level
+parallelism to fill the machine is already in the data (16M records); the
+current splitters pile it into a few fat buckets. Balancing the partition
+lifts a fat stage ~11x (6.8→74.6 cores). Fed back into the schedule model,
+H18's wall floor drops from 9,336s toward ~total-work/74.6 ≈ **1,720s**
+(the projected 4-6x on the dominant height, now measured). This needs no
+substrate rewrite (I/O is 7%, below) — it is Design α with a balanced
+partition, on the current process+file substrate. **This is the crux
+finding: the parallelism problem has a measured solution.**
+
 ## MEASURED VERDICT (2026-07-09, both Part-3 tests run on dalby)
 
 The two decisive tests the plan named were built and run on real dalby
