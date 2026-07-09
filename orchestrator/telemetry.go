@@ -125,9 +125,10 @@ func (t *telemetry) observe(c ColumnCost) {
 	fmt.Printf("event=column H=%d col=%d frontier_in=%d frontier_out=%d "+
 		"wall_s=%.2f cum_wall_s=%.1f cpu_s=%.1f rss_max_mb=%.1f "+
 		"map_wall_s=%.2f map_cpu_s=%.1f merge_wall_s=%.2f merge_cpu_s=%.1f "+
-		"map_units=%d merge_ranges=%d\n",
+		"map_units=%d merge_ranges=%d eff_cores=%.2f\n",
 		c.H, c.Col, c.FrontierIn, c.FrontierOut, c.WallS, t.cumWall, c.CPUS, c.RSSMax,
-		c.MapWallS, c.MapCPUS, c.MergeWallS, c.MergeCPUS, c.NMapUnits, c.NMergeRanges)
+		c.MapWallS, c.MapCPUS, c.MergeWallS, c.MergeCPUS, c.NMapUnits, c.NMergeRanges,
+		effCores(c.CPUS, c.WallS))
 
 	if t.ref != nil {
 		if pred, ok := t.ref[[2]int{c.H, c.Col}]; ok {
@@ -156,9 +157,20 @@ func (t *telemetry) observeRound(H, col int, round string, frontierIn uint64,
 	}
 	fmt.Printf("event=kink_round H=%d col=%d round=%s frontier_in=%d "+
 		"map_wall_s=%.3f map_cpu_s=%.3f merge_wall_s=%.3f merge_cpu_s=%.3f "+
-		"map_units=%d merge_ranges=%d\n",
+		"map_units=%d merge_ranges=%d map_eff_cores=%.2f merge_eff_cores=%.2f\n",
 		H, col, round, frontierIn, mapWall, mapCPU, mergeWall, mergeCPU,
-		mapUnits, mergeRanges)
+		mapUnits, mergeRanges, effCores(mapCPU, mapWall), effCores(mergeCPU, mergeWall))
+}
+
+// effCores is cpu_s/wall_s (NOT divided by cores): "how many cores were busy
+// on average", so a value near cfg.Cores means full utilization and a value
+// well below it is the partitioning-artifact signature Even Keel targets.
+// Guards divide-by-zero (a zero-wall round, e.g. an empty column) to 0.
+func effCores(cpuS, wallS float64) float64 {
+	if wallS <= 0 {
+		return 0
+	}
+	return cpuS / wallS
 }
 
 // addProcessed bumps the live input-record counter for the running column.
