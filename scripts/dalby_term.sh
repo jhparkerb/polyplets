@@ -34,7 +34,7 @@
 # ** Not caused by anything in this script; not yet fixed. Do not trust a
 # ** resumed run's output without independently re-validating it.
 set -e
-cd ~/src/polyominoes-ns
+cd ~/src/polyominoes
 N="$1"
 [ -n "$N" ] || { echo "usage: dalby_term.sh N [--resume]"; exit 2; }
 RUNDIR=runs/ns_a${N}/dalby

@@ -1,3 +1,77 @@
+# HANDOFF — 2026-07-08 (utilization-flag deployment audit, branch `redesign`)
+
+**Infrastructure-only, no term-chase compute.** Audited every real-sweep
+entry point under `scripts/` for the 5 utilization fixes validated on
+`scripts/dalby_term.sh` (`--overlap-heights`, `--merge-mult 1`,
+`--unit-mult 8`, `GOGC=1000`, `--persistent-workers`) — the a34
+whole-run 19.8% utilization figure predates all of them, and no
+end-to-end real-term run has confirmed the combined win at full
+production scale since. Only three scripts invoke `orchestrate` at all:
+`dalby_term.sh` (already fully wired), `scripts/bench_util.sh`, and
+`scripts/kink_validate.sh`. No dedicated ayr or gympie kink/orchestrate
+entry points exist — `dalby` is the sole real-sweep production machine
+for this engine (`[[machine-roles-an-push]]`); ayr's role is cross-ISA
+recompute verification, gympie is ancillary. `bench_util.sh` and
+`kink_validate.sh` both `cd ~/src/polyominoes-ns` like `dalby_term.sh`
+does, but on dalby that worktree currently sits on the (unmerged,
+dalby-local) `steal-wall-time-floor` branch, not `redesign` — the flags
+exist there too (redesign branched off master post that merge) but this
+path split is worth resolving before the next real term push.
+
+**Worktree split resolved.** `origin/steal-wall-time-floor` (dalby's
+`polyominoes-ns` checkout) has 0 commits not already in `origin/master`
+(confirmed via `git log origin/master..origin/steal-wall-time-floor`,
+empty) — it's a fully-merged, stale duplicate of work `redesign`
+already contains. Repointed all three scripts from
+`cd ~/src/polyominoes-ns` to `cd ~/src/polyominoes` (dalby's real
+`redesign` worktree, already built at `aa4bbd29`). Left the
+`polyominoes-ns` worktree itself in place, untouched — removing it was
+denied as an out-of-scope destructive action, so it now just sits
+unused; jasonp can retire it whenever convenient. Re-validated the same
+bounded maxn=20 `--compare` run in `~/src/polyominoes` directly: correct
+output, same interleaved-heights evidence `--overlap-heights` is live.
+
+**Gaps found and fixed:**
+- `kink_validate.sh` (production-scale independent-reimplementation
+  validator, real dalby compute) had none of the 5 fixes:
+  `--unit-mult 4` (stale pre-fix default), no `--merge-mult`, no
+  `--overlap-heights`, no `--persistent-workers`, no `GOGC`. Now matches
+  `dalby_term.sh` exactly: `--unit-mult 8 --merge-mult 1
+  --overlap-heights "$MAXN" --persistent-workers`, `GOGC=1000`, plus a
+  `--cost-profile-out` it wasn't writing before (needed to see the
+  effect at all).
+- `bench_util.sh` (bounded utilization A/B harness) had `--unit-mult 4`
+  hardcoded and no `--persistent-workers`/`GOGC`. Its `OVERLAP` and
+  `MERGE_MULT` were already script parameters (by design, for A/B'ing
+  those two specifically) so left as params; the other three are now
+  hardcoded to the production values for the same reason `MERGE_MULT`'s
+  own comment gives — a benchmark run that silently omits them isn't
+  actually comparable to production, and future A/B of one of them
+  specifically should edit the script deliberately.
+- `dalby_term.sh` — already fully wired, no changes.
+
+**Validated** on dalby (`~/src/polyominoes-ns`, `steal-wall-time-floor`
+build, same flags present): a bounded real `--compare` run, maxn=20,
+raw `orchestrate` invocation with the same flags now in both edited
+scripts — wall-clock ~2s, `gate_parallel PASS (maxn=20)`, all of
+a(1)..a(20) byte-exact against `fixtures/b006770.txt`. Flags confirmed
+live, not just accepted-and-ignored: the startup banner echoed
+`unit_mult=8 merge_mult=1`, and the first `cost_profile.tsv`/log rows
+show `H=8, H=5, H=7, H=3` seed events interleaved rather than strictly
+ascending — direct evidence `--overlap-heights` is sweeping heights
+concurrently, not sequentially. Scratch run dirs
+(`runs/util_flag_validate*`) and the stray uncommitted script edits used
+for this check were cleaned off dalby afterward; the real fix lands via
+this commit on `redesign`.
+
+**Not done, explicitly out of scope for this pass:** no real term-chase
+computation was started or resumed (parked, per standing instruction);
+`polyominoes-ns` worktree left in place on dalby rather than removed
+(deletion denied as destructive/out-of-scope) — dormant, safe to retire
+whenever jasonp wants.
+
+---
+
 # HANDOFF — 2026-07-08 (utilization redesign, branch `redesign`)
 
 **NOT yet merged; a real, first-class production kernel, still opt-in

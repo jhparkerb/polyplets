@@ -788,3 +788,31 @@ cleanup pass on code just validated at production scale.
 Full `make ns-gates` (including both ASan kernels) and `go test ./...`
 clean throughout. Branch `steal-wall-time-floor`, ready to merge into
 `kink-carry`/master pending jasonp's review.
+
+## Deployment audit (2026-07-08, branch `redesign`): entry points beyond dalby_term.sh
+
+The 5 fixes above (`--overlap-heights`, `--merge-mult 1`, `--unit-mult
+8`, `GOGC=1000`, `--persistent-workers`) were deployed to
+`scripts/dalby_term.sh` only. Every other `orchestrate`-invoking script
+was audited for the same gaps:
+
+- `scripts/kink_validate.sh` — real production-scale validation run,
+  had NONE of the 5 (stale `--unit-mult 4`, nothing else). Fixed to
+  match `dalby_term.sh` exactly, plus added `--cost-profile-out` (it
+  wrote none before, so a stale config would've been invisible).
+- `scripts/bench_util.sh` — A/B benchmarking harness. `OVERLAP` and
+  `MERGE_MULT` stay script parameters by design (that's what it A/Bs);
+  `--unit-mult` (4→8) and `--persistent-workers`/`GOGC` were hardcoded
+  to the production baseline, same reasoning as `MERGE_MULT`'s existing
+  comment — an A/B without the other proven wins as its baseline isn't
+  measuring against the real production config.
+- No ayr or gympie equivalents exist for this engine; dalby is the sole
+  real-sweep machine (`[[machine-roles-an-push]]`).
+
+Validated with a bounded real `--compare` run (maxn=20, ~2s, correct
+a(1)..a(20)) on dalby, both new flag sets live: startup banner echoed
+`unit_mult=8 merge_mult=1`, and interleaved `H=8,H=5,H=7,H=3` seed
+events in the very first log lines confirmed `--overlap-heights` is
+actually sweeping heights concurrently rather than the flag being
+silently ignored. Full details in `HANDOFF.md`'s
+"utilization-flag deployment audit" section.
