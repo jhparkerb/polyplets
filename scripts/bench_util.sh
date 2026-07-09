@@ -16,8 +16,16 @@
 #               different value deliberately to A/B against it, not by
 #               omission, so a benchmark run doesn't silently diverge from
 #               the production config it's meant to be compared against.
+#
+# unit-mult 8, --persistent-workers, GOGC=1000: same reasoning as MERGE_MULT
+# above -- these are the dalby_term.sh-validated production baseline
+# (docs/utilization-bottleneck-log.md Bottlenecks #3, #5, #6), not
+# parameters this script varies, so they're hardcoded rather than left at
+# stale pre-fix defaults. A future A/B of one of these specifically should
+# edit the script deliberately, the same way MERGE_MULT's comment asks for.
+export GOGC=1000
 set -e
-cd ~/src/polyominoes-ns
+cd ~/src/polyominoes
 LABEL="$1"; MAXN="$2"; HEIGHTS="$3"; OVERLAP="${4:-1}"; GRAIN="${5:-0.05}"; MERGE_MULT="${6:-1}"
 [ -n "$HEIGHTS" ] || { echo "usage: bench_util.sh LABEL MAXN HEIGHTS [OVERLAP] [STEAL_GRAIN] [MERGE_MULT]"; exit 2; }
 
@@ -28,8 +36,8 @@ mkdir -p "$RUNDIR/spill"
 echo "=== bench $LABEL: maxn=$MAXN heights=$HEIGHTS overlap=$OVERLAP grain=$GRAIN merge_mult=$MERGE_MULT unitlog=${POLY_UNIT_LOG:-0} rev=$(git rev-parse --short HEAD) $(date -Iseconds) ==="
 T0=$(date +%s)
 ./build/ns/orchestrate --maxn "$MAXN" --kernel kink --counter u128 \
-  --cores 80 --ram 1073741824 --unit-mult 4 --merge-mult "$MERGE_MULT" --steal-grain "$GRAIN" \
-  --overlap-heights "$OVERLAP" \
+  --cores 80 --ram 1073741824 --unit-mult 8 --merge-mult "$MERGE_MULT" --steal-grain "$GRAIN" \
+  --overlap-heights "$OVERLAP" --persistent-workers \
   --heights "$HEIGHTS" \
   --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" \
   --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 60 \

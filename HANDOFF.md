@@ -1,3 +1,205 @@
+# HANDOFF — 2026-07-09 (Even Keel D1-D5 landed, branch `even-keel`)
+
+`docs/even-keel-plan.md` fully executed: D1 `BalancedCutsMulti` (true
+record-quantile partition sampler reading the full `.idx` union, fixing
+`SampleKeysMulti`'s per-file-fixed-count under-sampling of fat files —
+commit `8aa2058`), D2 wired into `mapPhase`/`mergePhase` (`59fc834`), D3
+per-round/per-column `eff_cores` telemetry (`60dd2cde`), D4 `make
+ns-gates` + `go test ./...` clean, `a(1..14)` byte-identical, two-
+unit-mult invariant confirmed via `ns-gate-parallel`. D5 production
+confirmation ran on dalby (H=15 real-swept, maxn=30 — see
+`docs/full-utilization-redesign.md`'s "D5 confirmation" section for the
+full numbers and the corrected-height note): fat columns went from
+~20-24 to ~33-35 effective cores (of 80), whole-sweep wall-clock 204.3s
+-> 140.9s (1.45x), output byte-identical (`combine --diff-b` PASS). The
+empirical stop-condition did NOT fire — direction matches the 6.8->74.6
+benchmark, smaller magnitude explained by this run's smaller record
+count, not by the fix failing. All three commits pushed to
+`origin/even-keel`.
+
+# HANDOFF — 2026-07-08 (utilization-flag deployment audit, branch `redesign`)
+
+**Infrastructure-only, no term-chase compute.** Audited every real-sweep
+entry point under `scripts/` for the 5 utilization fixes validated on
+`scripts/dalby_term.sh` (`--overlap-heights`, `--merge-mult 1`,
+`--unit-mult 8`, `GOGC=1000`, `--persistent-workers`) — the a34
+whole-run 19.8% utilization figure predates all of them, and no
+end-to-end real-term run has confirmed the combined win at full
+production scale since. Only three scripts invoke `orchestrate` at all:
+`dalby_term.sh` (already fully wired), `scripts/bench_util.sh`, and
+`scripts/kink_validate.sh`. No dedicated ayr or gympie kink/orchestrate
+entry points exist — `dalby` is the sole real-sweep production machine
+for this engine (`[[machine-roles-an-push]]`); ayr's role is cross-ISA
+recompute verification, gympie is ancillary. `bench_util.sh` and
+`kink_validate.sh` both `cd ~/src/polyominoes-ns` like `dalby_term.sh`
+does, but on dalby that worktree currently sits on the (unmerged,
+dalby-local) `steal-wall-time-floor` branch, not `redesign` — the flags
+exist there too (redesign branched off master post that merge) but this
+path split is worth resolving before the next real term push.
+
+**Worktree split resolved.** `origin/steal-wall-time-floor` (dalby's
+`polyominoes-ns` checkout) has 0 commits not already in `origin/master`
+(confirmed via `git log origin/master..origin/steal-wall-time-floor`,
+empty) — it's a fully-merged, stale duplicate of work `redesign`
+already contains. Repointed all three scripts from
+`cd ~/src/polyominoes-ns` to `cd ~/src/polyominoes` (dalby's real
+`redesign` worktree, already built at `aa4bbd29`). Left the
+`polyominoes-ns` worktree itself in place, untouched — removing it was
+denied as an out-of-scope destructive action, so it now just sits
+unused; jasonp can retire it whenever convenient. Re-validated the same
+bounded maxn=20 `--compare` run in `~/src/polyominoes` directly: correct
+output, same interleaved-heights evidence `--overlap-heights` is live.
+
+**Gaps found and fixed:**
+- `kink_validate.sh` (production-scale independent-reimplementation
+  validator, real dalby compute) had none of the 5 fixes:
+  `--unit-mult 4` (stale pre-fix default), no `--merge-mult`, no
+  `--overlap-heights`, no `--persistent-workers`, no `GOGC`. Now matches
+  `dalby_term.sh` exactly: `--unit-mult 8 --merge-mult 1
+  --overlap-heights "$MAXN" --persistent-workers`, `GOGC=1000`, plus a
+  `--cost-profile-out` it wasn't writing before (needed to see the
+  effect at all).
+- `bench_util.sh` (bounded utilization A/B harness) had `--unit-mult 4`
+  hardcoded and no `--persistent-workers`/`GOGC`. Its `OVERLAP` and
+  `MERGE_MULT` were already script parameters (by design, for A/B'ing
+  those two specifically) so left as params; the other three are now
+  hardcoded to the production values for the same reason `MERGE_MULT`'s
+  own comment gives — a benchmark run that silently omits them isn't
+  actually comparable to production, and future A/B of one of them
+  specifically should edit the script deliberately.
+- `dalby_term.sh` — already fully wired, no changes.
+
+**Validated** on dalby (`~/src/polyominoes-ns`, `steal-wall-time-floor`
+build, same flags present): a bounded real `--compare` run, maxn=20,
+raw `orchestrate` invocation with the same flags now in both edited
+scripts — wall-clock ~2s, `gate_parallel PASS (maxn=20)`, all of
+a(1)..a(20) byte-exact against `fixtures/b006770.txt`. Flags confirmed
+live, not just accepted-and-ignored: the startup banner echoed
+`unit_mult=8 merge_mult=1`, and the first `cost_profile.tsv`/log rows
+show `H=8, H=5, H=7, H=3` seed events interleaved rather than strictly
+ascending — direct evidence `--overlap-heights` is sweeping heights
+concurrently, not sequentially. Scratch run dirs
+(`runs/util_flag_validate*`) and the stray uncommitted script edits used
+for this check were cleaned off dalby afterward; the real fix lands via
+this commit on `redesign`.
+
+**Not done, explicitly out of scope for this pass:** no real term-chase
+computation was started or resumed (parked, per standing instruction);
+`polyominoes-ns` worktree left in place on dalby rather than removed
+(deletion denied as destructive/out-of-scope) — dormant, safe to retire
+whenever jasonp wants.
+
+---
+
+# HANDOFF — 2026-07-08 (utilization redesign, branch `redesign`)
+
+**NOT yet merged; a real, first-class production kernel, still opt-in
+by flag (not the default).** Per jasonp's 2026-07-08 `/goal` ("redesign
+the software... especially look at ways to re-shard the work so units
+can be more independent... no options off the table... fix this once
+and for all"), branched off `master@79b0cce` (post the
+`steal-wall-time-floor` merge below). That prior session's 8
+bottlenecks were scheduling fixes on top of the existing per-round
+barrier structure; this session found, validated, and fully deployed
+the structural alternative `results/kink-carry.md`'s own "Caveats"
+section named but never measured.
+
+**The finding**: today's kink-carry column sweep synchronizes ALL
+workers at every one of a column's H+1 rounds (seed, H mid-column stage
+transitions, finalize) — a real barrier every round, not just a
+scheduling inefficiency. The alternative: split a column's source
+frontier into K independent shards up front, run each through seed + ALL
+H mid-column stages PRIVATELY (zero synchronization during this phase),
+merge all K shards' outputs exactly ONCE, then run the standard,
+unmodified finalize step. H+1 barriers per column become 1.
+
+**Built and validated at every layer, each independently gated**:
+1. `core/kink_sharded.h` — the core algorithm (`kinkPrivateShardSweep`,
+   `mergeAndFinalizeShardedColumn`). Traced and fixed a real correctness
+   landmine along the way: `kinkStageTransition`'s budget check consults
+   a record's own `ms`, which can be wrong on a not-yet-merged shard —
+   fixed via `KinkStageCfg::permissiveBudget`. Honestly documented as
+   "kept on as the safe default despite not yet finding a test case that
+   proves it's necessary" — the asymmetry (silent undercounting vs.
+   wasted compute) favors caution. `test/gate_kink_sharded.cpp`:
+   multi-column harvested-triangle-row chains (the correct bar — NOT
+   intermediate-table byte equality, which legitimately differs even at
+   K=1 depending on prune timing, traced to `completionLowerBound` being
+   a documented lower bound), 9 configs, all correct.
+2. `worker/map_worker.cpp` — `--kernel kink --stage sharded` CLI mode.
+   No new merge-worker mode needed: `--stage finalize` already merges
+   multiple `--in` paths before running finalize.
+   `test/gate_kink_sharded_worker_cli.cpp`: real subprocess, real file
+   I/O, quantile-based key cuts (blind evenly-spaced hex cuts degenerate
+   to one all-records shard — caught by checking each shard's own record
+   count, not assumed correct from a passing gate).
+3. `orchestrator/sweep_sharded.go` — `sweepColumnSharded` (Go dispatch:
+   K parallel `--stage sharded` calls + one `--stage finalize` merge) and
+   `ValidateShardedHeight` (exported comparison entry point).
+   `orchestrator/kink_sweep_sharded_test.go`: real compiled workers, real
+   multi-column sweeps, H=6/maxn=14 (K=4,K=8) and H=10/maxn=20 (K=8)
+   byte-match the standard column kernel exactly. Caught and fixed a real
+   bug here too: `sweepHeight` deletes its own frontier files as normal
+   per-column cleanup, so the reference and sharded runs need separate
+   seed copies, not a shared path.
+4. `orchestrator/cmd/orchestrate` — `--kernel kink-sharded --sharded-k K`
+   is now a REAL, first-class production kernel option on normal
+   `orchestrate` runs, dispatched from `Run()` exactly like `column`/
+   `kink` (`sweepHeightKinkSharded` conforms to `sweepHeightFn`: real
+   column-granularity checkpoint writes, ctx cancellation, telemetry).
+   Verified through the project's own AC-2 gate pattern, via the actual
+   compiled binary:
+   `orchestrate --kernel kink-sharded --sharded-k 8 --maxn 16 --compare`
+   → `gate_parallel PASS (maxn=16)`, every known a(n) exact; a real
+   SIGTERM-mid-run + `--resume --compare` at maxn=20 also → PASS. The
+   earlier `--sharded-validate K --sharded-validate-height H` side tool
+   still exists (quick single-height check, writes no checkpoint) and
+   now calls the same production `sweepHeightKinkSharded`, not a
+   separate driver.
+
+Full `make ns-gates` (both ASan kernels) and `go test ./...` clean at
+every commit.
+
+**Effective speedup estimate** (synthetic uniform-random test data, K
+shards / measured duplication factor D): K=8→~3.1x, K=16→~5.0x,
+K=32→~8.7x, K=64→~15.7x.
+
+**Still NOT the default kernel** — `--kernel kink-sharded` must be
+requested explicitly; `column`/`kink` remain untouched and unaffected.
+**Deliberately not yet done, scoped as follow-up given the stakes** (this
+computes real a(n) values, per the standing "validate at scale before
+record" practice): validation past H=12/maxn=22 or against real (not
+synthetic/small-seed) frontier data — real frontiers are RGS-skewed,
+expected to show worse duplication than the uniform-random test data
+above; holes-path support (triangle only, matching the rest of the kink
+kernel); work-stealing (the sharded path dispatches raw worker calls
+directly, bypassing `mapPhase`'s steal machinery entirely — a scope gap,
+not a correctness one). The `permissiveBudget` safety mechanism in
+`core/kink.h` also remains unproven-necessary by any test built so far
+(see `core/kink_sharded.h`'s "HONEST STATUS" comment) — kept on by
+default regardless, given the risk asymmetry. Before this could be
+recommended as the default for a real dalby a(n) push: real-scale
+duplication measurement (the actual lever this whole redesign turns on)
+and a head-to-head wall-clock comparison against `kink` at real H/maxn,
+not just correctness.
+
+**2026-07-08 update: first real-frontier validation, beyond H=12/maxn=22
+synthetic-adjacent scale.** `./build/ns/orchestrate --maxn 26 --counter
+u128 --sharded-validate 8 --sharded-validate-height 14 --run-dir
+runs/sharded_validate_h14_m26` (real seed-from-column-0 sweep, genuinely
+RGS-skewed frontier, not synthetic test data) —
+`SHARDED_VALIDATE_PASS H=14 maxn=26 K=8 wall=1331.470s`, correct triangle
+match. The run's own `cost_profile.tsv` splits reference vs. sharded
+cleanly (two 27-row column-0..26 blocks): **reference 1103.7s wall,
+sharded (K=8) 224.1s wall — a real 4.93x speedup**, *better* than the
+`K=8→~3.1x` synthetic-data estimate above. Still only one (H, maxn)
+point and still not a head-to-head at the actual dominant-height scale
+(H17/maxn=33-class, hours long) — but the first real-data confirmation
+that the redesign's core lever holds up outside synthetic test seeds,
+and holds up favorably.
+
+---
+
 # HANDOFF — 2026-07-08 (utilization work, branch `steal-wall-time-floor`)
 
 **Ready to merge to kink-carry/master, pending jasonp's review.** This

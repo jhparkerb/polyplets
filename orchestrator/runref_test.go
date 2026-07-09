@@ -1,7 +1,10 @@
 package orchestrator
 
 import (
+	"encoding/binary"
+	"fmt"
 	"math/big"
+	"os"
 	"sort"
 	"testing"
 )
@@ -46,6 +49,251 @@ func TestSampleKeysMultiSorted(t *testing.T) {
 	if len(cuts) > 3 {
 		t.Errorf("too many cuts: got %d, want ≤3", len(cuts))
 	}
+}
+
+// writeTestIdx writes a raw .idx sidecar at path+".idx" matching the on-disk
+// format in core/runfile.h (header: magic4+ver2+bo1+keyLen4+count8, then
+// count entries of keyLen key bytes + 8 offset + 8 recidx), with one entry
+// per kIndexStride(=64) records, exactly like the real writer. keyFn maps a
+// record index [0,records) to its keyLen-byte key. Offset/recidx values are
+// synthetic (only the key bytes matter to BalancedCutsMulti/SampleKeysMulti).
+func writeTestIdx(t *testing.T, path string, keyLen, records int, keyFn func(i int) []byte) {
+	t.Helper()
+	const stride = 64
+	f, err := os.Create(path + ".idx")
+	if err != nil {
+		t.Fatalf("create idx: %v", err)
+	}
+	defer f.Close()
+
+	var count uint64
+	for i := 0; i < records; i += stride {
+		count++
+	}
+
+	hdr := make([]byte, idxHeaderBytes)
+	binary.LittleEndian.PutUint32(hdr[0:4], idxMagic)
+	binary.LittleEndian.PutUint16(hdr[4:6], idxVersion)
+	hdr[6] = idxByteOrderLE
+	binary.LittleEndian.PutUint32(hdr[7:11], uint32(keyLen))
+	binary.LittleEndian.PutUint64(hdr[11:19], count)
+	if _, err := f.Write(hdr); err != nil {
+		t.Fatalf("write idx header: %v", err)
+	}
+
+	entry := make([]byte, keyLen+16)
+	for i := 0; i < records; i += stride {
+		key := keyFn(i)
+		if len(key) != keyLen {
+			t.Fatalf("keyFn returned %d bytes, want %d", len(key), keyLen)
+		}
+		copy(entry, key)
+		binary.LittleEndian.PutUint64(entry[keyLen:keyLen+8], uint64(i)*32) // fake offset
+		binary.LittleEndian.PutUint64(entry[keyLen+8:], uint64(i))          // recidx
+		if _, err := f.Write(entry); err != nil {
+			t.Fatalf("write idx entry: %v", err)
+		}
+	}
+}
+
+// writeTestRunHeader writes a minimal POLYRUN text header (no body/CRC) at
+// path, sufficient for ParseHeader + the .idx fast path (sampleIndexKeys
+// never touches the body). H must match the H passed to SampleKeys*.
+func writeTestRunHeader(t *testing.T, path string, H, records int) {
+	t.Helper()
+	f, err := os.Create(path)
+	if err != nil {
+		t.Fatalf("create run header: %v", err)
+	}
+	defer f.Close()
+	fmt.Fprintf(f, "POLYRUN 1\n")
+	fmt.Fprintf(f, "height %d\n", H)
+	fmt.Fprintf(f, "maxn 0\n")
+	fmt.Fprintf(f, "counter u64\n")
+	fmt.Fprintf(f, "classifier triangle\n")
+	fmt.Fprintf(f, "keylo \n")
+	fmt.Fprintf(f, "keyhi \n")
+	fmt.Fprintf(f, "records %018d\n", records)
+	fmt.Fprintf(f, "rev test\n")
+	fmt.Fprintf(f, "byteorder 1\n")
+	fmt.Fprintf(f, "\n")
+}
+
+// bucketOf returns the index of the half-open bucket [cuts[i-1], cuts[i])
+// (cutsToBounds' convention, sweep.go) that hex key k falls into.
+func bucketOf(cuts []string, k string) int {
+	return sort.Search(len(cuts), func(j int) bool { return cuts[j] > k })
+}
+
+// TestBalancedCutsRecordEqual is the red-first regression test for the root
+// cause: SampleKeysMulti samples numCuts keys PER FILE, so a big file (many
+// records) is under-sampled relative to a small file and its records
+// collapse into one bucket. BalancedCutsMulti must instead cut on true
+// global record-quantiles: every bucket within ±10% of total/numBuckets.
+func TestBalancedCutsRecordEqual(t *testing.T) {
+	dir := t.TempDir()
+	const keyLen = 2
+	// Both files must have MANY MORE .idx entries than numCuts, so old
+	// SampleKeysMulti's per-file quota (numCuts samples FROM EACH FILE,
+	// regardless of how many entries/records that file has) is the actual
+	// bottleneck being exercised -- not index granularity. A:B record
+	// ratio is 1:9 (10%/90% of total), mirroring "a file holding 590M
+	// records contributes the SAME numCuts samples as a file holding 64K".
+	const recsA = 6_400   // small file: 100 idx entries
+	const recsB = 57_600  // fat file: 900 idx entries -- the straggler
+	total := recsA + recsB
+	const numCuts = 9 // -> 10 buckets
+
+	// File A: keys spread over [0x0000, 0x1fff]. File B: keys spread over
+	// [0x2000, 0xffff]. Disjoint, monotonically increasing -- mirrors a
+	// realistic merge-input key partition.
+	keyFnA := func(i int) []byte {
+		v := uint16(i * 0x1fff / (recsA - 1))
+		return []byte{byte(v >> 8), byte(v)}
+	}
+	keyFnB := func(i int) []byte {
+		v := uint16(0x2000 + i*(0xffff-0x2000)/(recsB-1))
+		return []byte{byte(v >> 8), byte(v)}
+	}
+
+	const H = 5
+	pathA := dir + "/a.bin"
+	pathB := dir + "/b.bin"
+	writeTestRunHeader(t, pathA, H, recsA)
+	writeTestRunHeader(t, pathB, H, recsB)
+	writeTestIdx(t, pathA, keyLen, recsA, keyFnA)
+	writeTestIdx(t, pathB, keyLen, recsB, keyFnB)
+
+	// Full per-record key list, used to count records per bucket regardless
+	// of which sampler produced the cuts.
+	var allKeys []string
+	for i := 0; i < recsA; i++ {
+		allKeys = append(allKeys, bytesToHex(keyFnA(i)))
+	}
+	for i := 0; i < recsB; i++ {
+		allKeys = append(allKeys, bytesToHex(keyFnB(i)))
+	}
+
+	checkBalanced := func(t *testing.T, cuts []string) (ok bool, counts []int) {
+		counts = make([]int, len(cuts)+1)
+		for _, k := range allKeys {
+			counts[bucketOf(cuts, k)]++
+		}
+		want := float64(total) / float64(len(counts))
+		ok = true
+		for _, c := range counts {
+			if float64(c) < 0.9*want || float64(c) > 1.1*want {
+				ok = false
+			}
+		}
+		return ok, counts
+	}
+
+	t.Run("SampleKeysMulti_fails_documented_regression", func(t *testing.T) {
+		cuts, err := SampleKeysMulti([]string{pathA, pathB}, H, keyLen, numCuts)
+		if err != nil {
+			t.Fatalf("SampleKeysMulti: %v", err)
+		}
+		ok, counts := checkBalanced(t, cuts)
+		if ok {
+			t.Fatalf("SampleKeysMulti produced balanced cuts on this fixture -- the fixture no longer reproduces the per-file-fixed-count regression this test documents; counts=%v", counts)
+		}
+		t.Logf("confirmed regression: SampleKeysMulti buckets unbalanced, counts=%v (want ~%d each)", counts, total/len(counts))
+	})
+
+	t.Run("BalancedCutsMulti_passes", func(t *testing.T) {
+		cuts, err := BalancedCutsMulti([]string{pathA, pathB}, keyLen, numCuts)
+		if err != nil {
+			t.Fatalf("BalancedCutsMulti: %v", err)
+		}
+		if !sort.StringsAreSorted(cuts) {
+			t.Errorf("cuts not sorted: %v", cuts)
+		}
+		ok, counts := checkBalanced(t, cuts)
+		if !ok {
+			t.Errorf("buckets not balanced within ±10%% of %d: counts=%v cuts=%v", total/len(counts), counts, cuts)
+		}
+	})
+}
+
+// TestBalancedCutsSorted extends TestSampleKeysMultiSorted's invariant to
+// BalancedCutsMulti: cuts must be strictly ascending even when files'
+// key ranges interleave/overlap (as map outputs do).
+func TestBalancedCutsSorted(t *testing.T) {
+	dir := t.TempDir()
+	const keyLen = 1
+
+	pathA := dir + "/a.bin"
+	pathB := dir + "/b.bin"
+	// Interleaved: A has odd-ish keys, B has even-ish keys.
+	writeTestIdx(t, pathA, keyLen, 200, func(i int) []byte { return []byte{byte(2 * (i / 64))} })
+	writeTestIdx(t, pathB, keyLen, 200, func(i int) []byte { return []byte{byte(2*(i/64) + 1)} })
+
+	cuts, err := BalancedCutsMulti([]string{pathA, pathB}, keyLen, 3)
+	if err != nil {
+		t.Fatalf("BalancedCutsMulti: %v", err)
+	}
+	if !sort.StringsAreSorted(cuts) {
+		t.Errorf("cuts not sorted: %v", cuts)
+	}
+	for i := 1; i < len(cuts); i++ {
+		if cuts[i] == cuts[i-1] {
+			t.Errorf("cuts not strictly ascending (duplicate) at %d: %v", i, cuts)
+		}
+	}
+}
+
+// TestBalancedCutsDegenerate covers the degenerate-input contracts, which
+// must match SampleKeysMulti's: numCuts<=0 -> (nil,nil); a file with only
+// the entry-0 index contributes nothing; a missing index falls back to
+// SampleKeys (which itself returns (nil,nil) for a missing/unreadable run
+// file, so the union is empty -> (nil,nil)); empty paths -> (nil,nil).
+func TestBalancedCutsDegenerate(t *testing.T) {
+	dir := t.TempDir()
+	const keyLen = 2
+
+	t.Run("empty_paths", func(t *testing.T) {
+		cuts, err := BalancedCutsMulti(nil, keyLen, 5)
+		if err != nil || cuts != nil {
+			t.Errorf("got (%v, %v), want (nil, nil)", cuts, err)
+		}
+	})
+
+	t.Run("numCuts_zero", func(t *testing.T) {
+		path := dir + "/tiny.bin"
+		writeTestIdx(t, path, keyLen, 1, func(i int) []byte { return []byte{0, 0} })
+		cuts, err := BalancedCutsMulti([]string{path}, keyLen, 0)
+		if err != nil || cuts != nil {
+			t.Errorf("numCuts=0: got (%v, %v), want (nil, nil)", cuts, err)
+		}
+	})
+
+	t.Run("single_tiny_file_only_entry_zero", func(t *testing.T) {
+		// records=1 -> exactly one index entry (record 0), which is dropped
+		// as the run minimum -> no interior keys -> (nil, nil).
+		path := dir + "/onerecord.bin"
+		writeTestIdx(t, path, keyLen, 1, func(i int) []byte { return []byte{0x12, 0x34} })
+		cuts, err := BalancedCutsMulti([]string{path}, keyLen, 5)
+		if err != nil {
+			t.Fatalf("BalancedCutsMulti: %v", err)
+		}
+		if len(cuts) != 0 {
+			t.Errorf("expected no interior cuts from a single-entry index, got %v", cuts)
+		}
+	})
+
+	t.Run("missing_index_falls_back_to_SampleKeys", func(t *testing.T) {
+		// A path with no .idx at all and no run body either: SampleKeys
+		// returns an error from ParseHeader (file doesn't exist), so this
+		// file contributes nothing -- same tolerance as SplitRangeByIndex.
+		cuts, err := BalancedCutsMulti([]string{dir + "/does-not-exist.bin"}, keyLen, 5)
+		if err != nil {
+			t.Fatalf("BalancedCutsMulti: %v", err)
+		}
+		if cuts != nil {
+			t.Errorf("expected nil cuts for a wholly-missing file, got %v", cuts)
+		}
+	})
 }
 
 // TestCheckpointRoundtrip verifies that Write+Read preserves all fields

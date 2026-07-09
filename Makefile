@@ -19,7 +19,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 .PHONY: gates gate-g1 gate-g2 gate-euler clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
-        ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
+        ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-sharded ns-gate-kink-sharded-worker-cli ns-gate-kink-stage-file \
         ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan \
         ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
@@ -156,14 +156,14 @@ build/ns:
 # ns-gates: all new-system gates. Includes the runfile-format, holes, verify,
 # height-split, and full-Go-suite gates that existed but were not wired in, so a
 # regression in those paths (BUGS-OF-SHAME A4/A5/B*/D6) can't rot undetected.
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-sharded ns-gate-kink-sharded-worker-cli ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan
 
 # Fast gate subset for the pre-push hook (.githooks/pre-push). Targets well under
 # 30s: the full Go suite (guards / combine / runcat / closed-form / resume) plus
 # the sub-second C++ format+arith gates. The heavy C++ sweeps (spill, parallel,
 # holes, maxn=14 regression) stay in `make ns-gates`, run before a release or by
 # hand. Order: cheapest, most-targeted tripwires first so a regression fails fast.
-ns-gate-fast: ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile ns-gate-go ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker
+ns-gate-fast: ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile ns-gate-go ns-gate-kink ns-gate-kink-column ns-gate-kink-sharded ns-gate-kink-sharded-worker-cli ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker
 
 # Closed-form invariant gate: assert the engine contributes every KNOWN closed
 # form (top strip H=N=3^(N-1); low strips T(n,1)=1, T(n,2) recurrence) DIRECTLY,
@@ -222,6 +222,28 @@ ns-gate-kink-column: build/ns/gate_kink_column
 	./build/ns/gate_kink_column
 
 build/ns/gate_kink_column: test/gate_kink_column.cpp $(NS_HEADERS) | build/ns
+	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+
+# Sharded-private column sweep gate (redesign branch): core/kink_sharded.h's
+# H+1-barriers-to-1 design vs the standard barrier-per-stage path, checked
+# via a real multi-column harvested-triangle-row chain (see that file's
+# header comment for the correctness bar and why intermediate-table
+# byte-equality is NOT it).
+ns-gate-kink-sharded: build/ns/gate_kink_sharded
+	./build/ns/gate_kink_sharded
+
+build/ns/gate_kink_sharded: test/gate_kink_sharded.cpp $(NS_HEADERS) | build/ns
+	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+
+# Sharded-private column sweep CLI gate (redesign branch): map_worker's real
+# compiled binary, --kernel kink --stage sharded, driven as a subprocess --
+# the worker-CLI-level counterpart to ns-gate-kink-sharded's library-level
+# check. Needs build/ns/map_worker built first (real --lo/--hi key-range
+# dispatch + readRangedRunFiles' multi-file merge before finalize).
+ns-gate-kink-sharded-worker-cli: build/ns/gate_kink_sharded_worker_cli build/ns/map_worker
+	./build/ns/gate_kink_sharded_worker_cli
+
+build/ns/gate_kink_sharded_worker_cli: test/gate_kink_sharded_worker_cli.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 # Kink-carry file-backed stage gate (Design 14 Phase 2.3): map_shard_stage_file

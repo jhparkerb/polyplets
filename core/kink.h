@@ -150,6 +150,22 @@ struct KinkStageCfg {
   int stage;  // stage index r in [0, H): the new-column row placed this stage
   size_t ram_budget_bytes = 0;  // 0 = no spill (map_shard_stage_file only)
   std::string spill_dir;
+  // permissiveBudget: forces the per-record `ms` passed to kinkStageTransition
+  // to 0 instead of rec.minSize(), so the budget check (core/kink.h's
+  // `occupy && ms+1 > maxn`) never fires mid-sweep. REQUIRED for the
+  // sharded-private column design (core/kink_sharded.h): kinkStageTransition
+  // uses ms to decide whether a cell can still be placed at EVERY stage, not
+  // just the final admissibility prune -- a shard's own, not-yet-cross-shard-
+  // merged window can have a narrower true minSize than the real one, so
+  // using it directly can silently DROP a valid transition (found + verified
+  // via experiments/bench_shard_column.cpp's multi-column chain test).
+  // Correctness is restored by never pruning on the possibly-wrong per-shard
+  // ms and deferring ALL admissibility precision to the one true,
+  // fully-cross-shard-merged kinkFinalizeColumn call. Default false: the
+  // standard barrier-per-stage path (mapPhase/mergePhase, one shared table)
+  // already sees the fully-merged window at every stage, so its own ms is
+  // always correct and this flag must stay off there.
+  bool permissiveBudget = false;
 };
 
 // map_shard_stage: one micro-stage of the kink-carry sweep (Design 14 Phase
@@ -172,8 +188,9 @@ Run<W> map_shard_stage(const Run<W>& src, const KinkStageCfg& cfg) {
   buf.reserve(src.size() * 2);  // fan-out is at most 2 (occupy in {0,1})
 
   for (const auto& rec : src) {
-    const int ms = rec.minSize();
-    if (ms < 0) continue;  // empty count-vec (degenerate, skip)
+    const int trueMs = rec.minSize();
+    if (trueMs < 0) continue;  // empty count-vec (degenerate, skip)
+    const int ms = cfg.permissiveBudget ? 0 : trueMs;
 
     kinkStageTransition(rec.sig, H, r, ms, maxn, [&](const Sig& t, int shift) {
       const int new_lo = static_cast<int>(rec.lo) + shift;

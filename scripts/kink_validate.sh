@@ -13,8 +13,17 @@
 #   CERTFILE : optional 'n value' file to check the kink total against
 #
 # dalby: 80 cores, 1 GiB/worker (ram-budget-per-worker: 125GiB*0.6/80 ~ 0.94).
+#
+# Utilization flags brought up to the dalby_term.sh-validated production
+# config (docs/utilization-bottleneck-log.md, results/scheduling.md,
+# results/utilization-fix-and-ceiling.md) -- this is a real production-scale
+# sweep, not a small gate, so it pays the same fork/GC/merge-fanin/idle-pool
+# costs dalby_term.sh was fixed for: unit-mult 4->8, +merge-mult 1,
+# +overlap-heights (deliberate overshoot at MAXN, harmless per dalby_term.sh's
+# own overlap validation), +persistent-workers, +GOGC=1000.
+export GOGC=1000
 set -u
-cd ~/src/polyominoes-ns
+cd ~/src/polyominoes
 
 MAXN=$1; COUNTER=$2; REFDIR=$3; CERTFILE=${4:-}
 CORES=80; RAM=1073741824
@@ -29,10 +38,12 @@ echo "rev: $(git rev-parse --short HEAD)  ref: $REFDIR"
 
 # ── kink kernel run ────────────────────────────────────────────────────────
 ./build/ns/orchestrate --maxn "$MAXN" --kernel kink --counter "$COUNTER" \
-  --cores "$CORES" --ram "$RAM" --unit-mult 4 --steal-grain 0.05 \
+  --cores "$CORES" --ram "$RAM" --unit-mult 8 --merge-mult 1 --steal-grain 0.05 \
+  --overlap-heights "$MAXN" --persistent-workers \
   --run-dir "$RUN/kink_run" --spill-dir "$RUN/kink_run/spill" \
   --checkpoint "$RUN/kink_run/POLYCKPT" --checkpoint-every 300 \
   --per-height-out "$KINK" \
+  --cost-profile-out "$RUN/kink_run/cost_profile.tsv" \
   2>&1 | tee "$RUN/kink.log"
 KRC=${PIPESTATUS[0]}; [ "$KRC" = 0 ] || { echo "KINK_RUN_FAILED rc=$KRC"; exit 3; }
 
