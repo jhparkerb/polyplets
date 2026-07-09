@@ -54,18 +54,11 @@ func main() {
 	costProfileRef := flag.String("cost-profile-ref", "", "reference cost profile to drive the live ETA")
 	heightsArg := flag.String("heights", "", "subset of heights to sweep, e.g. 1-12 or 17,19,20 (default: all 1..maxn; for multi-machine split)")
 	perHeightOut := flag.String("per-height-out", "", "dir to write per-height h<H>.out rows (for combine + old-engine cross-check)")
-	kernel := flag.String("kernel", "column", "sweep kernel: column (default), kink, or kink-sharded (redesign branch: K-shard-private column sweep, one merge point per column instead of H+1 barriers -- requires --sharded-k; see core/kink_sharded.h)")
-	shardedK := flag.Int("sharded-k", 0, "shard count per column for --kernel kink-sharded (required if that kernel is selected)")
-	shardedValidateK := flag.Int("sharded-validate", 0, "VALIDATION ONLY (redesign branch, not a production mode): if >0, run a real height sweep two ways -- the standard column kernel and the sharded-private kink design (core/kink_sharded.h) with this many shards -- report whether their triangle rows match exactly, then exit. Writes no checkpoint/combine output. Requires --sharded-validate-height.")
-	shardedValidateHeight := flag.Int("sharded-validate-height", 0, "height to validate with --sharded-validate (required if --sharded-validate is set)")
+	kernel := flag.String("kernel", "column", "sweep kernel: kink (production per-cell boundary sweep) or column (the independent reference kernel, kept as the correctness oracle -- kink_validate.sh cross-checks kink against it)")
 	flag.Parse()
 
-	if *kernel != "column" && *kernel != "kink" && *kernel != "kink-sharded" {
-		fmt.Fprintf(os.Stderr, "orchestrate: --kernel must be column, kink, or kink-sharded, got %q\n", *kernel)
-		os.Exit(2)
-	}
-	if *kernel == "kink-sharded" && *shardedK < 1 {
-		fmt.Fprintln(os.Stderr, "orchestrate: --kernel kink-sharded requires --sharded-k >= 1")
+	if *kernel != "column" && *kernel != "kink" {
+		fmt.Fprintf(os.Stderr, "orchestrate: --kernel must be column or kink, got %q\n", *kernel)
 		os.Exit(2)
 	}
 
@@ -144,7 +137,6 @@ func main() {
 		Heights:         heights,
 		PerHeightOut:    *perHeightOut,
 		Kernel:          *kernel,
-		ShardedK:        *shardedK,
 		Bin:             bin,
 	}
 
@@ -154,43 +146,6 @@ func main() {
 
 	fmt.Printf("orchestrate maxn=%d fold=%v cores=%d unit_mult=%d merge_mult=%d ram=%d counter=%s kernel=%s run_dir=%s rev=%s\n",
 		*maxn, *fold, *cores, *unitMult, *mergeMult, *ram, *counter, *kernel, *runDir, rev)
-
-	// --sharded-validate: an early-exit validation mode for the redesign
-	// branch's sharded-private column sweep (core/kink_sharded.h). NOT a
-	// production dispatch path -- generates its own seed, runs both the
-	// standard column kernel and the sharded design for one real height,
-	// reports match/mismatch, and exits. Deliberately writes no
-	// checkpoint/combine output and does not touch sweepHeightKink at all.
-	if *shardedValidateK > 0 {
-		if *shardedValidateHeight <= 0 {
-			fmt.Fprintln(os.Stderr, "orchestrate: --sharded-validate requires --sharded-validate-height")
-			os.Exit(2)
-		}
-		H := *shardedValidateHeight
-		seedPath := filepath.Join(*runDir, "sharded_validate_seed.bin")
-		if err := orchestrator.WriteSeedPolyrun(seedPath, rev, H, *maxn, *counter); err != nil {
-			fmt.Fprintf(os.Stderr, "orchestrate: --sharded-validate: write seed: %v\n", err)
-			os.Exit(1)
-		}
-		sem := make(chan struct{}, *cores)
-		t0 := time.Now()
-		match, mismatches, err := orchestrator.ValidateShardedHeight(
-			context.Background(), cfg, H, *shardedValidateK, []string{seedPath}, sem)
-		wall := time.Since(t0).Seconds()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "orchestrate: --sharded-validate: %v\n", err)
-			os.Exit(1)
-		}
-		if !match {
-			fmt.Printf("SHARDED_VALIDATE_MISMATCH H=%d maxn=%d K=%d wall=%.3fs\n", H, *maxn, *shardedValidateK, wall)
-			for _, m := range mismatches {
-				fmt.Println("  " + m)
-			}
-			os.Exit(1)
-		}
-		fmt.Printf("SHARDED_VALIDATE_PASS H=%d maxn=%d K=%d wall=%.3fs\n", H, *maxn, *shardedValidateK, wall)
-		os.Exit(0)
-	}
 
 	// Resume from checkpoint if requested.
 	var ckpt *orchestrator.Checkpoint

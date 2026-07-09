@@ -50,7 +50,6 @@
 #include "core/fdlimit.h"
 #include "core/kink.h"
 #include "core/kink_column.h"
-#include "core/kink_sharded.h"
 #include "core/libenum.h"
 #include "worker/worker_util.h"
 
@@ -176,7 +175,7 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
                          "Euler accumulator collide at the same sig offset)\n");
     return 1;
   }
-  int kink_stage = -1;  // -1 = seed, -2 = finalize, -3 = sharded, >=0 = mid-column stage r
+  int kink_stage = -1;  // -1 = seed, -2 = finalize, >=0 = mid-column stage r
   if (kink) {
     if (stage_arg.empty()) {
       std::fprintf(stderr, "map_worker: --kernel kink requires --stage\n");
@@ -186,13 +185,11 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
       kink_stage = -1;
     } else if (stage_arg == "finalize") {
       kink_stage = -2;
-    } else if (stage_arg == "sharded") {
-      kink_stage = -3;
     } else {
       kink_stage = std::atoi(stage_arg.c_str());
       if (kink_stage < 0 || kink_stage >= H) {
         std::fprintf(stderr,
-          "map_worker: --stage must be seed, finalize, sharded, or an int in [0, H)\n");
+          "map_worker: --stage must be seed, finalize, or an int in [0, H)\n");
         return 1;
       }
     }
@@ -261,29 +258,6 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
         TriangleRow<u64> triangle(H, maxn);
         auto stage0 = kinkSeedStage0<u64, ClassifyTriangle>(src, H, triangle);
         out_recs = writeRunFile<u64>(stage0, out_path, H, kinkKeyLen(H), rev);
-        printTriangleRows(H, maxn, triangle.row);
-      }
-    } else if (kink_stage == -3) {
-      // sharded: H+2-keyed source (this shard's own key range) -> harvest +
-      // this shard's own PRIVATE full stage-H table (H+4-keyed, NOT
-      // finalized), running seed + ALL H mid-column stages in one call with
-      // no cross-shard merge at any point in between. See
-      // core/kink_sharded.h for the full design and the permissiveBudget
-      // correctness mechanism this relies on. The caller (orchestrator) is
-      // responsible for merging every shard's output and calling a single
-      // finalize round afterward (--stage finalize, unchanged) -- this mode
-      // only replaces seed+the H mid-column stage rounds, not finalize.
-      if (counter_arg == "u128") {
-        auto src = readRangedRunFiles<u128>(in_paths, H, H + 2, lo_hex, hi_hex);
-        TriangleRow<u128> triangle(H, maxn);
-        auto stageH = kinkPrivateShardSweep<u128, ClassifyTriangle>(src, H, maxn, triangle);
-        out_recs = writeRunFile<u128>(stageH, out_path, H, kinkKeyLen(H), rev);
-        printTriangleRows(H, maxn, triangle.row);
-      } else {
-        auto src = readRangedRunFiles<u64>(in_paths, H, H + 2, lo_hex, hi_hex);
-        TriangleRow<u64> triangle(H, maxn);
-        auto stageH = kinkPrivateShardSweep<u64, ClassifyTriangle>(src, H, maxn, triangle);
-        out_recs = writeRunFile<u64>(stageH, out_path, H, kinkKeyLen(H), rev);
         printTriangleRows(H, maxn, triangle.row);
       }
     } else if (kink_stage == -2) {
