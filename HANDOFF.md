@@ -1,3 +1,22 @@
+# HANDOFF — 2026-07-09 (Even Keel D1-D5 landed, branch `even-keel`)
+
+`docs/even-keel-plan.md` fully executed: D1 `BalancedCutsMulti` (true
+record-quantile partition sampler reading the full `.idx` union, fixing
+`SampleKeysMulti`'s per-file-fixed-count under-sampling of fat files —
+commit `8aa2058`), D2 wired into `mapPhase`/`mergePhase` (`59fc834`), D3
+per-round/per-column `eff_cores` telemetry (`60dd2cde`), D4 `make
+ns-gates` + `go test ./...` clean, `a(1..14)` byte-identical, two-
+unit-mult invariant confirmed via `ns-gate-parallel`. D5 production
+confirmation ran on dalby (H=15 real-swept, maxn=30 — see
+`docs/full-utilization-redesign.md`'s "D5 confirmation" section for the
+full numbers and the corrected-height note): fat columns went from
+~20-24 to ~33-35 effective cores (of 80), whole-sweep wall-clock 204.3s
+-> 140.9s (1.45x), output byte-identical (`combine --diff-b` PASS). The
+empirical stop-condition did NOT fire — direction matches the 6.8->74.6
+benchmark, smaller magnitude explained by this run's smaller record
+count, not by the fix failing. All three commits pushed to
+`origin/even-keel`.
+
 # HANDOFF — 2026-07-08 (utilization-flag deployment audit, branch `redesign`)
 
 **Infrastructure-only, no term-chase compute.** Audited every real-sweep

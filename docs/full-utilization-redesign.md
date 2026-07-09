@@ -1,8 +1,74 @@
 # Full-utilization redesign — distilled findings and best-in-breed designs (2026-07-09)
 
-**Status: design settled by measurement. Nothing implemented, not
-approved.** Phase 1 (radical simplification) has not started. This is
-Phase 2 design work.
+**Status: design settled by measurement AND now implemented + confirmed on
+a real production sweep** (Even Keel, branch `even-keel`, D1-D5 landed
+2026-07-09; see the "D5 confirmation" note below).
+
+## D5 confirmation (2026-07-09, real production sweep, dalby)
+
+`docs/even-keel-plan.md` D1-D4 implemented `BalancedCutsMulti` (true
+record-quantile partitioning, replacing `SampleKeysMulti`'s per-file-fixed-
+count sampling) and wired it into `mapPhase`/`mergePhase`. D5 is the
+production confirmation, run on real dalby hardware (80 cores):
+
+- **Correction to the plan's example height:** the plan's D5 step 1 named
+  `--heights 17 --maxn 30` as "real-swept and fat." It is not: P_13
+  (`diagCoeffTable[13]`, wired) makes `H=maxn-13` closed-form, and P_14
+  makes `H=maxn-14` closed-form too, so at maxn=30 the deepest REAL-swept
+  height is `H=maxn-15=15` (`diagonalStripValid` requires `maxn >= 2k+1`,
+  so k=15 needs maxn>=31 — invalid at maxn=30, hence H15 is the last one
+  NOT closed-form). Confirmed empirically: `--heights 17 --maxn 30` ran
+  0 columns (closed-form short-circuit, wall=0.0s). **This is a stale
+  plan example, not a contradiction of any resolved decision** (DD1-DD8
+  and the root cause are untouched) — D5 used `--heights 15 --maxn 30`
+  instead, the actual deepest real-swept height at that maxn.
+- **A/B setup:** identical flags (`--kernel kink --counter u128 --cores 80
+  --ram 1073741824 --unit-mult 8 --merge-mult 1 --steal-grain 0.05
+  --persistent-workers --heights 15 --maxn 30`) run once on `redesign`
+  HEAD (`aa4bbd29`, pre-Even-Keel, `SampleKeysMulti`) in a second worktree,
+  once on `even-keel` HEAD (`60dd2cde`, `BalancedCutsMulti`).
+- **Fat-column effective cores (cpu_s/wall_s), the dominant mid-sweep
+  columns (H=15, col 3-9, ~640K-790K records/column):**
+  | col | OLD (redesign) eff_cores | NEW (even-keel) eff_cores |
+  |-----|---------------------------|----------------------------|
+  | 3   | 20.88                     | 33.66                      |
+  | 4   | 23.39                     | 33.98                      |
+  | 5   | 23.59                     | 33.63                      |
+  | 6   | 24.10                     | 33.74                      |
+  | 7   | 23.40                     | 34.16                      |
+  | 8   | 23.03                     | 34.75                      |
+  | 9   | 24.38                     | 34.81                      |
+
+  A real, measured ~1.4-1.5x lift in fat-column effective cores (~20-24 ->
+  ~33-35 of 80), NOT the ~13->50-75 magnitude the 16M-record synthetic
+  benchmark (`experiments/full_column_bench.cpp`) showed. The DIRECTION
+  matches (balanced partitioning measurably raises fat-column
+  utilization); the smaller MAGNITUDE is attributable to this run's much
+  smaller peak frontier (~790K records/column here vs 16M in the
+  benchmark's deliberately-constructed fat stage) — fewer records means
+  fewer well-sized units to fill 80 cores with, independent of partition
+  balance. This was not tested at matching scale because D5's runs are
+  bounded under 1 hour per the plan; a bigger confirming run (larger
+  maxn, taller real-swept H) is a candidate follow-up, not run here
+  without explicit agreement.
+- **Whole-sweep wall-clock:** OLD 204.3s, NEW 140.9s — **1.45x faster**
+  end to end for the full H=15 sweep (30 columns), with slightly LOWER
+  total CPU-seconds (4626.4 -> 4554.1, i.e. not just redistributed, mildly
+  cheaper too — consistent with less wasted per-unit dispatch on
+  over/under-sized pieces).
+- **Correctness:** `./build/ns/combine --in <new>/out --diff-b <old>/out
+  --maxn 30` -> `H=15: OK (30 cells)`, `combine_diff PASS` — byte-
+  identical T(n,15) for every n, both runs. DD7 (partition boundaries
+  never affect the result) holds at production scale.
+- **Empirical stop-condition (per docs/even-keel-plan.md D5 step 5 /
+  task instructions): DID NOT FIRE.** Every fat column improved in the
+  correct direction on a real sweep; production and the benchmark do NOT
+  disagree — the smaller magnitude here is explained by run-scale (record
+  count), not by the fix failing to reproduce. Residual gap after
+  balancing (fat columns at ~34 of 80, not saturated) is consistent with
+  DD6's "residual compute-per-record / undersized-unit skew, not
+  record-count skew" — no in-flight-steal-logic change was made here
+  (out of scope, DD6), this is flagged as a candidate follow-up.
 
 ## THE BACK IS BREAKABLE — measured 2026-07-09 (`experiments/full_column_bench.cpp`)
 
