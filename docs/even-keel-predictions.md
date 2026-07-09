@@ -82,6 +82,42 @@ levers: raise merge-mult now that cuts are balanced; or cut map unit count
 to reduce merge fan-in; measure merge_eff_cores as the target). The map is
 done; the merge is the next ~2x.
 
+### D6 diagnosis (2026-07-09): both config knobs FALSIFIED — the merge cap is structural
+
+Swept both obvious levers on H16 (NEW/balanced, overlap-off), median
+`merge_eff_cores` of fat col 5:
+- **unit-mult 1/2/4/8** (merge fan-in 80→640): merge_eff **21.6/21.5/22.0/22.4**
+  — flat. Whole-height eff 37.6/36.7/36.0/34.8 (a small gain at um=1 from
+  map+dispatch, NOT merge).
+- **merge-mult 1/2/4/8** (80→640 ranges): merge_eff **21.6/21.4/21.5/21.8**
+  — flat. Whole-height eff 37.8/37.5/37.4/37.3 (slightly worse with more
+  ranges: per-range overhead).
+
+**Merge is pinned at ~22 cores independent of unit count AND range count.**
+Not fan-in, not range granularity, not balance (BalancedCutsMulti already
+balances the ranges by record). The mechanism: the merge moves the same
+byte volume as the map (reads ALL map output ~3.5GB, writes the frontier
+~1GB per round) but does only ~⅓ the CPU per byte (a k-way heap
+compare-and-copy vs the transition's real compute), so it saturates memory
+bandwidth at ~22 cores where the compute-bound map reaches ~66. **Config
+tuning cannot fix this; it needs a structural change.**
+
+**D6 is therefore a code project, not a knob:** eliminate the
+write-map-output-then-reread-it-all-in-a-separate-merge round trip — fuse
+the reduce so map output is scattered by final key-range and pre-combined
+(the shape `experiments/full_column_bench.cpp` used to hit 74, which never
+had a separate k-way merge phase). Expected payoff: whole-column eff from
+~37 toward map's ~66 (a further ~1.8x; the dominant height would then go
+from OLD ~9-13 to NEW ~55-66, the ~5-7x the isolated benchmark promised).
+Real worker-protocol change with real correctness risk — scoped as its own
+effort, not a same-session tweak.
+
+**Free win banked meanwhile:** with balanced cuts, unit-mult=1 marginally
+beats the deployed unit-mult=8 (37.6 vs 34.8 whole-height eff) AND shrinks
+merge fan-in — candidate default change (unit-mult=1 or 2), pending a
+compute-skew-straggler check at H18 scale (DD6: bigger units are more
+exposed to a single heavy record; the steal machinery must cover it).
+
 ## Predictions (H18 @ maxn=34, fresh OLD binary vs even-keel, identical flags)
 
 **P1 — Correctness (non-negotiable).** NEW per-height T(n,18) output is
