@@ -55,16 +55,6 @@ RESUME_FLAG=""
 echo "=== a${N} KINK run starting: $(date -Iseconds) ==="
 echo "rev: $(git rev-parse --short HEAD)"
 
-# GOGC=1000: default GOGC (100) gave ~8000 GC cycles in a 5-minute run
-# (GODEBUG=gctrace=1 measured, tiny 8MB heap goal churning constantly,
-# Go's own self-reported ~5% CPU in GC) despite RAM never being a remote
-# concern (dalby has 122GB; even GOGC=1000's bigger heap goal stays under
-# 1GB). Bottleneck #3 (GC Churn). Real dalby A/B, maxn=30/overlap=15/
-# merge-mult=1: default 303.9s -> GOGC=400 288.7s -> GOGC=1000 283.4s
-# (diminishing returns past 400, settled on 1000) -- 6.7% faster overall,
-# correct a(30) at every setting.
-export GOGC=1000
-
 # --persistent-workers: a pool of long-lived --persistent map_worker/
 # merge_worker processes fed one request per work item over a pipe, instead
 # of a fresh fork+exec per unit (thousands of sub-second spawns per real
@@ -84,10 +74,13 @@ export GOGC=1000
 # utilization GAIN this whole round), correct a(33). The best win of the
 # whole session, and the first fix that actually moves the H17 dominant
 # floor instead of only helping smaller/secondary costs.
+# unit-mult=8, merge-mult=1, steal-grain=0.05, persistent-workers, GOGC=1000
+# are now the ENGINE DEFAULTS (baked into orchestrate) -- no longer passed
+# here. --overlap-heights "$N" (all owned heights) stays: it is run-specific.
+# The commentary above records WHY those values were chosen.
 T0=$(date +%s)
 ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
-  --cores 80 --ram 1073741824 --unit-mult 8 --merge-mult 1 --steal-grain 0.05 \
-  --overlap-heights "$N" --persistent-workers \
+  --cores 80 --ram 1073741824 --overlap-heights "$N" \
   --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" \
   --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 300 $RESUME_FLAG \
   --per-height-out runs/ns_a${N}/perheight \

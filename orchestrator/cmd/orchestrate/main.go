@@ -22,6 +22,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 	"runtime/pprof"
 	"sort"
 	"strconv"
@@ -33,14 +34,27 @@ import (
 )
 
 func main() {
+	// GOGC=1000 baked in (the utilization work: default GOGC=100 churned
+	// ~8000 GC cycles against a tiny heap goal for no reason; RAM is never
+	// tight). An explicit GOGC env var still wins.
+	if os.Getenv("GOGC") == "" {
+		debug.SetGCPercent(1000)
+	}
+
 	maxn := flag.Int("maxn", 16, "max cell count")
 	fold := flag.Bool("fold", true, "R1 vertical-mirror fold")
 	cores := flag.Int("cores", runtime.NumCPU(), "max parallel workers")
-	unitMult := flag.Int("unit-mult", 1, "MAP work units per core (units = cores*unit-mult; concurrency stays cores)")
-	mergeMult := flag.Int("merge-mult", 0, "MERGE ranges per core (0 = follow --unit-mult; set low, e.g. 1, to cut merge fan-in)")
-	stealGrain := flag.Float64("steal-grain", 0, "MAP work-stealing grain as a fraction of a core's fair share (0 = off; ~0.05 recovers the straggler tail). When a core idles in the column tail, the longest-remaining unit is stopped at a key cursor and its remainder split across idle cores.")
-	overlapHeights := flag.Int("overlap-heights", 1, "heights to sweep concurrently sharing one cores-wide pool (1 = sequential; >1 hides merge idle behind another height's map; checkpoints at height boundaries, not per column)")
-	persistentWorkers := flag.Bool("persistent-workers", false, "dispatch map/merge work to a pool of long-lived --persistent map_worker/merge_worker processes instead of spawning fresh per unit (Bottleneck #5: eliminates fork+exec cost paid on every sub-second work item)")
+	// Scheduling knob DEFAULTS are the validated production values (the
+	// utilization work: docs/utilization-bottleneck-log.md). A bare
+	// `orchestrate --kernel kink` run gets the deployed config; the flags
+	// remain for A/B and for the ns-gate-split partition-invariance gate,
+	// which must be able to vary --unit-mult to prove partition boundaries
+	// never change the result.
+	unitMult := flag.Int("unit-mult", 8, "MAP work units per core (units = cores*unit-mult; concurrency stays cores)")
+	mergeMult := flag.Int("merge-mult", 1, "MERGE ranges per core (0 = follow --unit-mult; 1 cuts merge fan-in)")
+	stealGrain := flag.Float64("steal-grain", 0.05, "MAP work-stealing grain as a fraction of a core's fair share (0 = off; ~0.05 recovers the straggler tail). When a core idles in the column tail, the longest-remaining unit is stopped at a key cursor and its remainder split across idle cores.")
+	overlapHeights := flag.Int("overlap-heights", 1, "heights to sweep concurrently sharing one cores-wide pool (1 = sequential; >1 hides merge idle behind another height's map; checkpoints at height boundaries, not per column). Set to the number of swept heights for production.")
+	persistentWorkers := flag.Bool("persistent-workers", true, "dispatch map/merge work to a pool of long-lived --persistent map_worker/merge_worker processes instead of spawning fresh per unit (eliminates fork+exec cost paid on every sub-second work item)")
 	ram := flag.Uint64("ram", 128<<20, "map_worker spill budget in bytes")
 	counter := flag.String("counter", "u64", "counter width: u64 or u128")
 	runDir := flag.String("run-dir", "", "directory for run files (default: auto in /tmp)")
