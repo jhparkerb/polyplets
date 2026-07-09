@@ -261,6 +261,96 @@ func SampleKeysMulti(paths []string, H, keyLen, numCuts int) ([]string, error) {
 	return subsampleEvenly(all, numCuts), nil
 }
 
+// BalancedCutsMulti returns TRUE global record-quantile cut keys across
+// multiple POLYRUN files, fixing the imbalance in SampleKeysMulti: that
+// function samples numCuts keys PER FILE, so a file holding 590M records
+// contributes the same number of samples as a file holding 64K -- the big
+// file is under-sampled and its records collapse into one open-ended bucket
+// (the measured straggler, docs/full-utilization-redesign.md).
+//
+// Each .idx sidecar holds exactly one entry per 64 records (core/runfile.h
+// kIndexStride), uniformly spaced. The union of ALL files' FULL index
+// entries is therefore a uniform 1-per-64 sample of ALL records regardless
+// of key-range overlap: reading that full union, sorting it, and taking
+// evenly-spaced quantiles gives cuts on true record rank, not per-file rank.
+// A key that appears in several files' indexes is simply represented in
+// proportion to how many records carry it -- correct for record-balanced
+// cuts (a hot key gets finer cuts around it) -- so, unlike SampleKeysMulti,
+// this does NOT dedup across files.
+//
+// keyLen: see SampleKeys. H is intentionally omitted: the index format is
+// self-describing (readIndexHeader validates keyLen from the sidecar) and
+// never needs the caller's H on the fast path. numCuts<=0 returns (nil, nil).
+func BalancedCutsMulti(paths []string, keyLen, numCuts int) ([]string, error) {
+	if numCuts <= 0 {
+		return nil, nil
+	}
+	var all []string
+	for _, p := range paths {
+		keys, err := allIndexKeys(p+".idx", keyLen)
+		if err == nil && len(keys) > 0 {
+			all = append(all, keys...)
+			continue
+		}
+		// No usable .idx: fall back to SampleKeys's own body-scan path so a
+		// missing/unreadable sidecar degrades to today's behaviour instead of
+		// silently dropping the file's records from the quantile. Rare in
+		// practice -- production runs always write_index=true. H is read from
+		// the file's own header (self-consistent) rather than threaded through
+		// this function's signature.
+		hdr, _, herr := ParseHeader(p)
+		if herr != nil {
+			continue // unreadable file: contributes nothing, same tolerance as SplitRangeByIndex
+		}
+		fb, ferr := SampleKeys(p, hdr.Height, keyLen, numCuts)
+		if ferr != nil {
+			return nil, ferr
+		}
+		all = append(all, fb...)
+	}
+	if len(all) == 0 {
+		return nil, nil
+	}
+	sort.Strings(all)
+	return subsampleEvenly(all, numCuts), nil
+}
+
+// allIndexKeys reads the FULL union of a .idx sidecar's entries (not a
+// sparse sample of it -- that is the whole fix), dropping entry 0 (the run
+// minimum) so a cut never equals a run's first key, mirroring
+// sampleIndexKeys' "skip entry 0". Reads the entry block in one bulk
+// io.ReadFull, not one ReadAt per entry -- this is a hot path, called once
+// per file per map/merge round.
+func allIndexKeys(idxPath string, keyLen int) ([]string, error) {
+	f, err := os.Open(idxPath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	cnt, err := readIndexHeader(f, keyLen)
+	if err != nil {
+		return nil, err
+	}
+	if cnt <= 1 {
+		return nil, nil // only the record-0 entry → nothing interior to cut on
+	}
+	entryLen := keyLen + 16
+	n := int(cnt - 1) // drop entry 0
+	// Entry 0 lives at idxHeaderBytes; entries [1, cnt) follow contiguously.
+	if _, err := f.Seek(int64(idxHeaderBytes)+int64(entryLen), io.SeekStart); err != nil {
+		return nil, err
+	}
+	buf := make([]byte, n*entryLen)
+	if _, err := io.ReadFull(f, buf); err != nil {
+		return nil, err
+	}
+	keys := make([]string, 0, n)
+	for off := 0; off < len(buf); off += entryLen {
+		keys = append(keys, bytesToHex(buf[off:off+keyLen]))
+	}
+	return keys, nil
+}
+
 // SplitRangeByIndex picks numCuts keys that divide (loHex, hiHex) into
 // numCuts+1 roughly record-equal sub-ranges, for splitting a work-stealing
 // straggler's remaining range across idle cores.  It reads only the sparse
