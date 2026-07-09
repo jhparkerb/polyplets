@@ -1128,7 +1128,7 @@ func mapPhase(
 	if numUnits < 1 {
 		numUnits = 1
 	}
-	cuts, err := SampleKeysMulti(frontier, H, keyLen, numUnits-1)
+	cuts, err := BalancedCutsMulti(frontier, keyLen, numUnits-1)
 	if err != nil {
 		return nil, nil, Acct{}, err
 	}
@@ -1448,7 +1448,7 @@ func mergePhase(
 		numRanges = len(mapOuts)
 	}
 
-	cuts, err := SampleKeysMulti(mapOuts, H, keyLen, numRanges-1)
+	cuts, err := BalancedCutsMulti(mapOuts, keyLen, numRanges-1)
 	if err != nil {
 		return nil, 0, Acct{}, err
 	}
