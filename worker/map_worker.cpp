@@ -52,51 +52,12 @@
 #include "core/kink_column.h"
 #include "core/kink_sharded.h"
 #include "core/libenum.h"
+#include "worker/worker_io.h"
 #include "worker/worker_util.h"
 
-// Read+range-filter+merge a set of POLYRUN files into one sorted,
-// deduplicated in-RAM Run<W>, keyed at `keyLen`. The kink kernel's seed/
-// finalize steps are in-RAM (no spill, see file header); this is their read
-// side, mirroring map_shard_file's range-filter logic (core/mapreduce.h)
-// without the transition -- just merge-by-key over the input files.
-template <class W>
-static Run<W> readRangedRunFiles(const std::vector<std::string>& paths, int H,
-                                 int keyLen, const std::string& lo_hex,
-                                 const std::string& hi_hex) {
-  uint8_t lo_sig[SIGMAX] = {};
-  uint8_t hi_sig[SIGMAX] = {};
-  const bool has_lo = !lo_hex.empty() && hexToBytes(lo_hex, lo_sig, keyLen);
-  const bool has_hi = !hi_hex.empty() && hexToBytes(hi_hex, hi_sig, keyLen);
-  Run<W> run;
-  for (const auto& p : paths) {
-    RunFileReader<W> r(p, H, keyLen);
-    if (!r.ok()) {
-      std::fprintf(stderr, "map_worker: cannot read input %s\n", p.c_str());
-      std::exit(1);
-    }
-    if (has_lo) r.seekToKey(lo_sig);
-    RunRecord<W> rec;
-    while (r.next(rec)) {
-      if (has_lo && sigCmp(rec.sig.b, lo_sig, keyLen) < 0) continue;
-      if (has_hi && sigCmp(rec.sig.b, hi_sig, keyLen) >= 0) break;
-      run.push_back(std::move(rec));
-    }
-  }
-  sortRun(run);
-  deduplicateRun(run);
-  return run;
-}
-
-// Write an in-RAM Run<W> to a POLYRUN file with its .idx sidecar (so the
-// orchestrator's normal SampleKeys-based partitioning works on kink
-// seed/finalize outputs exactly as it does on column-kernel outputs).
-template <class W>
-static size_t writeRunFile(const Run<W>& run, const std::string& out_path,
-                           int H, int keyLen, const std::string& rev) {
-  RunFileWriter<W> w(out_path, H, 0, "", "", rev, keyLen, /*write_index=*/true);
-  for (const auto& r : run) w.append(r);
-  return w.finalize();
-}
+// readRangedRunFiles/writeRunFile (the kink kernel's seed/finalize in-RAM
+// read/write helpers) now live in worker/worker_io.h, shared with
+// worker/fused_stage.cpp (Even Keel D6) -- see that header's comment.
 
 // SIGTERM handling (cooperative work-stealing stop, DESIGN 08, T2.3) is
 // shared with merge_worker.cpp: see worker_util.h's g_workerTerminate/
