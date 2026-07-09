@@ -806,6 +806,32 @@ func sweepHeightKink(
 			return mergeOuts, triContribs, nil
 		}
 
+		// runFusedRound executes one mid-column stage round via the Even Keel D6
+		// fused worker (fusedStagePhase) instead of runRound's map+merge pair.
+		// Only reached when useFused is true (below): cfg.OverlapHeights == 1 AND
+		// a fused worker binary is configured (DDF7 fallback — callers that
+		// don't set cfg.Bin.FusedWorker, e.g. existing tests, keep the unmodified
+		// map+merge path with no code change on their part). merge_eff_cores is
+		// reported as 0 (mergeWall=0, mergeCPU=0): fusion collapses map+merge
+		// into one pass, there is no separate merge phase to report (DDF6).
+		runFusedRound := func(name string, in []string, stage int) ([]string, error) {
+			frontierRecs := sumFrontierRecords(in)
+			t0 := time.Now()
+			outPaths, roundAcct, err := fusedStagePhase(ctx, cfg, H, col, stage, in, stageKeyLen)
+			if err != nil {
+				return nil, fmt.Errorf("H=%d col=%d kink %s fused: %w", H, col, name, err)
+			}
+			roundWall := time.Since(t0).Seconds()
+			colAcct.Add(roundAcct)
+			colMapWall += roundWall
+			colMapCPU += roundAcct.CPUS
+			nMapUnits++
+			nMergeRanges += len(outPaths)
+			tel.observeRound(H, col, name, frontierRecs, roundWall, roundAcct.CPUS, 0, 0, 1, len(outPaths))
+			return outPaths, nil
+		}
+		useFused := cfg.OverlapHeights == 1 && cfg.Bin.FusedWorker != ""
+
 		// Seed: H+2 -> H+4, harvests this column's completions (classify happens
 		// here, at column START — see the design doc's kink_tm.cpp re-read). The
 		// merge is skipped (mergeless): the constant-suffix transform leaves the
@@ -822,7 +848,13 @@ func sweepHeightKink(
 		// carry transfer (core/kink.h's kinkStageTransition via
 		// map_shard_stage_file).
 		for r := 0; r < H; r++ {
-			next, _, err := runRound(fmt.Sprintf("stage%d", r), stageTable, stageKeyLen, strconv.Itoa(r), stageKeyLen, false)
+			var next []string
+			var err error
+			if useFused {
+				next, err = runFusedRound(fmt.Sprintf("stage%d", r), stageTable, r)
+			} else {
+				next, _, err = runRound(fmt.Sprintf("stage%d", r), stageTable, stageKeyLen, strconv.Itoa(r), stageKeyLen, false)
+			}
 			removeRuns(stageTable)
 			if err != nil {
 				stopHB()
@@ -1623,6 +1655,82 @@ func mergePhase(
 		return nil, 0, Acct{}, firstErr
 	}
 	return outPaths, totalRecs, acct, nil
+}
+
+// fusedStagePhase runs ONE mid-column kink stage round (Even Keel D6,
+// docs/even-keel-fusion-plan.md) as a single fused_stage worker invocation,
+// replacing mapPhase+mergePhase's fork-per-unit pair for stage rounds. Only
+// dispatched by sweepHeightKink when cfg.OverlapHeights == 1 and a fused
+// worker binary is configured (DDF7): the fused worker uses ALL cfg.Cores
+// threads itself in one process, incompatible with the multi-height overlap
+// scheduler sharing `sem` across heights mid-stage — so this function takes
+// no `sem`/`activeHeights` and does no queueing of its own, unlike
+// mapPhase/mergePhase.
+//
+// Output range cuts are computed via BalancedCutsMulti over the STAGE INPUT
+// `in` (DDF4) — the same call mergePhase makes, just fed the round's input
+// instead of the map output a fused round never materializes as separate
+// files. This is a deliberate, resolved looseness: DDF-correctness (see the
+// plan doc) does not depend on how well these cuts balance the OUTPUT key
+// distribution, only on their being cuts on WHOLE keys, which BalancedCutsMulti
+// always returns — an imperfect balance costs only performance, not
+// correctness. cfg.Cores-1 cuts are requested; BalancedCutsMulti may return
+// fewer for a small input (mirrors mapPhase/mergePhase's own n0 <= numUnits
+// handling), so the actual range count is len(cuts)+1, not necessarily
+// cfg.Cores.
+//
+// RAM ceiling (DDF5): the fused worker replaces up to cfg.Cores concurrent
+// map_worker processes (each budgeted cfg.RAM) with ONE process holding the
+// whole stage's working set, so its budget is cfg.RAM * cfg.Cores.
+//
+// Non-empty output range files are discovered by path existence (the fused
+// worker only writes a file for a range with >0 records — see
+// worker/fused_stage.cpp), mirroring mapPhase/mergePhase's "OutRecords > 0 ⇒
+// keep, else remove" filter without needing a per-range record count parsed
+// out of one aggregate accounting line.
+func fusedStagePhase(
+	ctx context.Context,
+	cfg SweepConfig,
+	H, col, stage int,
+	in []string,
+	keyLen int,
+) ([]string, Acct, error) {
+	if H == cfg.Maxn {
+		return nil, Acct{}, fmt.Errorf("fusedStagePhase: column work started at top height H=%d (maxn=%d); closed-form short-circuit was bypassed", H, cfg.Maxn)
+	}
+
+	cuts, err := BalancedCutsMulti(in, keyLen, cfg.Cores-1)
+	if err != nil {
+		return nil, Acct{}, err
+	}
+
+	outPrefix := filepath.Join(cfg.RunDir, fmt.Sprintf("fused_h%d_c%d_k%d", H, col, stage))
+	a := FusedArgs{
+		InPaths:   in,
+		H:         H,
+		Maxn:      cfg.Maxn,
+		Stage:     stage,
+		Counter:   cfg.CounterWidth,
+		Cores:     cfg.Cores,
+		CutsHex:   cuts,
+		OutPrefix: outPrefix,
+		RAM:       cfg.RAM * uint64(cfg.Cores),
+		Rev:       cfg.Rev,
+	}
+	res, err := RunFusedWorker(ctx, cfg.Bin.FusedWorker, a)
+	if err != nil {
+		return nil, Acct{}, fmt.Errorf("fused_stage H=%d col=%d stage=%d: %w", H, col, stage, err)
+	}
+
+	ranges := len(cuts) + 1
+	outPaths := make([]string, 0, ranges)
+	for i := 0; i < ranges; i++ {
+		p := fmt.Sprintf("%s_u%d.bin", outPrefix, i)
+		if _, statErr := os.Stat(p); statErr == nil {
+			outPaths = append(outPaths, p)
+		}
+	}
+	return outPaths, res.Acct, nil
 }
 
 // writePerHeight writes one height's T(n,H) row to <dir>/h<H>.out as "n value"

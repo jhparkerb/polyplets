@@ -40,6 +40,14 @@ func main() {
 	mergeMult := flag.Int("merge-mult", 0, "MERGE ranges per core (0 = follow --unit-mult; set low, e.g. 1, to cut merge fan-in)")
 	stealGrain := flag.Float64("steal-grain", 0, "MAP work-stealing grain as a fraction of a core's fair share (0 = off; ~0.05 recovers the straggler tail). When a core idles in the column tail, the longest-remaining unit is stopped at a key cursor and its remainder split across idle cores.")
 	overlapHeights := flag.Int("overlap-heights", 1, "heights to sweep concurrently sharing one cores-wide pool (1 = sequential; >1 hides merge idle behind another height's map; checkpoints at height boundaries, not per column)")
+	// TODO(jasonp, 2026-07-08): flip this default to true and require an
+	// explicit opt-OUT flag for transient (fork-per-unit) workers instead.
+	// Bottleneck #5 validated persistent workers as a real win with no
+	// known downside at production scale; transient workers are only still
+	// justified for one-off CLI/gate invocations (run once, not thousands
+	// of times) and as the no-setup fallback -- never for a real sweep.
+	// Not done in this commit: changing a long-standing default is its own
+	// decision, separate from the redesign work this flag got caught up in.
 	persistentWorkers := flag.Bool("persistent-workers", false, "dispatch map/merge work to a pool of long-lived --persistent map_worker/merge_worker processes instead of spawning fresh per unit (Bottleneck #5: eliminates fork+exec cost paid on every sub-second work item)")
 	ram := flag.Uint64("ram", 128<<20, "map_worker spill budget in bytes")
 	counter := flag.String("counter", "u64", "counter width: u64 or u128")
@@ -50,6 +58,7 @@ func main() {
 	resume := flag.Bool("resume", false, "resume from checkpoint")
 	compare := flag.Bool("compare", false, "compare final total to fixtures/b006770.txt")
 	workersDir := flag.String("workers-dir", "", "directory containing map_worker/merge_worker binaries")
+	requireFusion := flag.Bool("require-fusion", false, "Even Keel D6: fail loud at startup if --kernel kink --overlap-heights 1 is set but no fused_stage binary was found, instead of silently falling back to the old map+merge path (DDF7) -- use for A/B confirmation runs so a missing/stale build can't pass as a fusion result")
 	costProfileOut := flag.String("cost-profile-out", "", "emit per-column cost profile here (default: <run-dir>/cost_profile.tsv)")
 	costProfileRef := flag.String("cost-profile-ref", "", "reference cost profile to drive the live ETA")
 	heightsArg := flag.String("heights", "", "subset of heights to sweep, e.g. 1-12 or 17,19,20 (default: all 1..maxn; for multi-machine split)")
@@ -116,10 +125,24 @@ func main() {
 	if *workersDir != "" {
 		bin.MapWorker = filepath.Join(*workersDir, "map_worker")
 		bin.MergeWorker = filepath.Join(*workersDir, "merge_worker")
+		// fused_stage (Even Keel D6) is optional: only wire it up if the binary
+		// is actually present next to map_worker/merge_worker. Leaving
+		// bin.FusedWorker empty when it's missing is the DDF7 fallback path --
+		// sweepHeightKink only engages fusion when cfg.Bin.FusedWorker != "".
+		fw := filepath.Join(*workersDir, "fused_stage")
+		if _, err := os.Stat(fw); err == nil {
+			bin.FusedWorker = fw
+		}
 	} else {
 		// Auto-detect: look for build/ns/ relative to the executable's parent
 		// or relative to cwd.
 		bin = findWorkers()
+	}
+	if *requireFusion && *kernel == "kink" && *overlapHeights == 1 && bin.FusedWorker == "" {
+		fmt.Fprintf(os.Stderr, "orchestrate: --require-fusion set but no fused_stage binary found "+
+			"(checked %s); build it (make build/ns/fused_stage) or drop --require-fusion\n",
+			filepath.Join(*workersDir, "fused_stage"))
+		os.Exit(1)
 	}
 
 	rev := gitRev
@@ -344,6 +367,14 @@ func findWorkers() orchestrator.WorkerBin {
 			MergeWorker: filepath.Join(dir, "merge_worker-"+gitRev),
 		}
 		if _, err := os.Stat(bin.MapWorker); err == nil {
+			// fused_stage (Even Keel D6) is optional even in the installed,
+			// rev-suffixed layout: an install predating D6 has no
+			// fused_stage-<rev> sibling, and that's the DDF7 fallback, not
+			// an error.
+			fw := filepath.Join(dir, "fused_stage-"+gitRev)
+			if _, err := os.Stat(fw); err == nil {
+				bin.FusedWorker = fw
+			}
 			return bin
 		}
 	}
@@ -352,6 +383,9 @@ func findWorkers() orchestrator.WorkerBin {
 	for _, repoRoot := range []string{".", "../.."} {
 		bin := orchestrator.DefaultWorkerBin(repoRoot)
 		if _, err := os.Stat(bin.MapWorker); err == nil {
+			if _, err := os.Stat(bin.FusedWorker); err != nil {
+				bin.FusedWorker = "" // DDF7 fallback: no fused_stage build in this tree
+			}
 			return bin
 		}
 	}
