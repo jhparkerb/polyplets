@@ -367,8 +367,10 @@ ns-gate-split: build/ns/orchestrate build/ns/combine build/ns/map_worker build/n
 # AC-2b: resume from EVERY checkpoint boundary reproduces the serial result.
 # Exhaustive (not random): the test enumerates each (H,col) checkpoint, cancels
 # there via an in-package test seam, resumes, and compares. See resume_test.go.
+# TestKinkResumeMidColumn additionally covers a MID-column kill on the kink
+# kernel (the seed-contribution double-count regression, kink_resume_midcolumn_test.go).
 ns-gate-resume-boundaries: build/ns/map_worker build/ns/merge_worker
-	go test ./orchestrator/ -run TestKillResumeAllBoundaries -v
+	go test ./orchestrator/ -run 'TestKillResumeAllBoundaries|TestKinkResumeMidColumn' -v
 
 # T3.1 gate (AC-3 prerequisite): u128 counter produces byte-identical totals to u64 for n<=14.
 # Runs the full orchestrator with --counter u128 and compares against known a(n) fixtures.

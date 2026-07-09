@@ -28,11 +28,12 @@
 # regression despite the lower ratio.)
 #
 # Resume: dalby_term.sh N --resume
-# ** --resume is currently UNSAFE for this kernel: real SIGTERM + resume on
-# ** the kink kernel has a confirmed, pre-existing correctness bug (wrong
-# ** a(n), consistent over-count) -- results/kink-resume-sigterm-bug.md.
-# ** Not caused by anything in this script; not yet fixed. Do not trust a
-# ** resumed run's output without independently re-validating it.
+# The kink real-SIGTERM + resume over-count bug is FIXED (2026-07-09,
+# results/kink-resume-sigterm-bug.md: seed contributions are now folded into
+# hTri only after a column fully completes, so mid-column checkpoints are
+# consistent). This script runs overlap mode, whose height-set resume was
+# never affected anyway. Gated by TestKinkResumeMidColumn +
+# overlap_resume_test.go. Resume is safe again.
 set -e
 cd ~/src/polyominoes
 N="$1"

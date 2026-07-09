@@ -1,11 +1,45 @@
-# Kink kernel real-SIGTERM + resume: wrong a(n) values (open, unfixed)
+# Kink kernel real-SIGTERM + resume: wrong a(n) values (FIXED 2026-07-09)
 
 **Found:** 2026-07-08, while validating the persistent-workers change
 (docs/utilization-bottleneck-log.md Bottleneck #5). **Confirmed pre-existing**
 — reproduces identically on a clean checkout with none of this session's
 changes applied, so it is not something the persistent-workers work
-introduced. Not investigated further; flagged here rather than silently
-dropped or bundled into an unrelated fix.
+introduced.
+
+## Resolution (2026-07-09)
+
+**Root cause.** `sweepHeightKink` folded each column's seed-round completions
+into the running height row `hTri` immediately after the seed round, *before*
+the column's stage + finalize rounds ran. But every mid-column checkpoint —
+the ctx-cancel path at the top of the loop and the three per-round error paths
+— stamps `Col = col-1` and saves the *pre-column* input frontier. So if a
+SIGTERM landed after the seed round but before the column finished (the large
+majority of a column's wall time: the H stage rounds + finalize), the
+checkpoint's saved triangle already included column `col`'s seed contribution
+while its `Col` field claimed only `col-1` was done. On resume the sweep
+restarted at `col` from the input frontier, re-ran the seed round, and counted
+`col`'s completions a **second** time — a consistent over-count from the killed
+height upward, exactly as observed.
+
+The overlap path (`--overlap-heights`, production `dalby_term.sh`) was never
+affected: it checkpoints only at height boundaries via a completed-height SET
+and re-runs any in-flight height from scratch, so it never trusts a partial
+`hTri`. The bug was specific to the sequential single-height resume path.
+
+**Fix.** Defer the `addTriContribs(hTri, triContribs, ...)` fold until *after*
+the finalize round succeeds (orchestrator/sweep.go), so `hTri` only ever
+contains fully-completed columns and every mid-column checkpoint's saved
+triangle is consistent with its `Col = col-1`.
+
+**Gate.** `orchestrator/kink_resume_midcolumn_test.go`
+(`TestKinkResumeMidColumn`, wired into `ns-gate-resume-boundaries`) kills the
+run mid-column via a new `afterSeedRound` test seam, resumes, and asserts the
+triangle. RED before the fix (`n=3 a(n)=21 known=20`), green after. The real
+subprocess SIGTERM repro below now passes 5/5 (failed every time before).
+
+---
+
+## Original report (preserved)
 
 ## Repro
 

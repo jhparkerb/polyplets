@@ -62,6 +62,14 @@ type SweepConfig struct {
 	// completes and its height-boundary checkpoint is written. Unexported test
 	// seam (overlap_resume_test.go cancels the run after the k-th completion).
 	afterHeight func(H int)
+
+	// afterSeedRound, if non-nil, is called by sweepHeightKink right after a
+	// column's SEED round completes but before its stage/finalize rounds run —
+	// i.e. mid-column, the window in which a real SIGTERM triggers the
+	// error-path checkpoint. Unexported test seam: kink_resume_midcolumn_test.go
+	// cancels the run here to reproduce a real mid-column kill and assert the
+	// resumed triangle is correct (guards the seed-contribution double-count).
+	afterSeedRound func(H, col int)
 }
 
 // SweepResult is the output of a complete run over all heights.
@@ -811,7 +819,18 @@ func sweepHeightKink(
 			writeCheckpoint(H, col-1, frontier, hTri)
 			return hTri, acct, err
 		}
-		addTriContribs(hTri, triContribs, cfg.Maxn)
+		// NOTE: the seed round's triContribs are this column's completions, but
+		// they are NOT folded into hTri here — only after the whole column
+		// (stage + finalize rounds) succeeds, below. Folding early meant a
+		// mid-column error/cancellation checkpoint (all stamped Col=col-1 with
+		// the pre-column input frontier) carried hTri that already included this
+		// column, so a resume re-ran the column and double-counted its seed
+		// contribution — a consistent over-count from the killed height upward
+		// (results/kink-resume-sigterm-bug.md, kink_resume_midcolumn_test.go).
+
+		if cfg.afterSeedRound != nil {
+			cfg.afterSeedRound(H, col)
+		}
 
 		// H mid-column stage rounds: H+4 -> H+4, the per-cell king-adjacency
 		// carry transfer (core/kink.h's kinkStageTransition via
@@ -836,6 +855,11 @@ func sweepHeightKink(
 			writeCheckpoint(H, col-1, frontier, hTri)
 			return hTri, acct, err
 		}
+
+		// Column fully complete: NOW fold its seed-round completions into hTri.
+		// Every mid-column checkpoint above stamped Col=col-1, so hTri must not
+		// include column col until col is done — otherwise resume double-counts.
+		addTriContribs(hTri, triContribs, cfg.Maxn)
 
 		acct.Add(colAcct)
 		totalRecs := sumFrontierRecords(nextFrontier)
