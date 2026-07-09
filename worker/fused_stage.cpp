@@ -93,12 +93,45 @@ static int runFused(const std::vector<std::string>& inPaths, int H, int maxn, in
   const double t0Wall = wallSeconds();
   const double t0Cpu  = cpuSeconds();
 
-  // Read the WHOLE stage-input frontier (all of it, not a shard -- fusion
-  // replaces the per-unit INPUT partitioning of the old mapPhase with one
-  // process that partitions only the OUTPUT, per DDF1). Combines any
-  // same-key records across input files exactly as map_shard_stage_file's
-  // K-way heap combine does (worker_io.h's readRangedRunFiles).
-  Run<W> src = readRangedRunFiles<W>(inPaths, H, kLen, "", "");
+  // Read the WHOLE stage-input frontier, but in PARALLEL by key-range slice
+  // (one thread per slice, sliced on the same `cuts` the output uses). A
+  // single serial readRangedRunFiles (one k-way heap over all input) was the
+  // fused worker's real bottleneck: it collapsed the whole worker to ~5
+  // effective cores despite the map+reduce compute being fully parallel
+  // (measured H16 2026-07-09). readRangedRunFiles combines same-key records
+  // WITHIN each slice; cuts are whole-key boundaries so every key lives in
+  // exactly one slice -> concatenating the slices in ascending cut order is
+  // byte-identical to one whole-input read+combine, just cores-way parallel.
+  Run<W> src;
+  {
+    // nSlices MUST be cuts.size()+1: BalancedCutsMulti can return FEWER than
+    // cores-1 cuts on a small/low-cardinality input, and indexing cuts[t-1]
+    // for t beyond that would read out of bounds and produce OVERLAPPING
+    // slices -> double-counted records (exact-2x seen in the fused test).
+    // At frontier scale cuts.size()==cores-1 so this is still cores-way.
+    const size_t nCuts = cuts.size();
+    const int nSlices = static_cast<int>(nCuts) + 1;
+    std::vector<Run<W>> slices(static_cast<size_t>(nSlices));
+    std::vector<std::thread> pool;
+    pool.reserve(static_cast<size_t>(nSlices));
+    for (int t = 0; t < nSlices; ++t) {
+      pool.emplace_back([&, t]() {
+        const std::string lo = (t == 0) ? std::string()
+            : bytesToHex(cuts[static_cast<size_t>(t - 1)].b, kLen);
+        const std::string hi = (static_cast<size_t>(t) >= nCuts) ? std::string()
+            : bytesToHex(cuts[static_cast<size_t>(t)].b, kLen);
+        slices[static_cast<size_t>(t)] = readRangedRunFiles<W>(inPaths, H, kLen, lo, hi);
+      });
+    }
+    for (auto& th : pool) th.join();
+    size_t tot = 0;
+    for (const auto& s : slices) tot += s.size();
+    src.reserve(tot);
+    for (auto& s : slices) {
+      for (auto& rec : s) src.push_back(std::move(rec));
+      Run<W>().swap(s);  // free the slice as we drain it
+    }
+  }
 
   // DDF5: fail LOUD if the projected in-RAM working set exceeds the
   // caller's budget rather than silently OOMing. Working set ~= input +
@@ -180,6 +213,7 @@ static int runFused(const std::vector<std::string>& inPaths, int H, int maxn, in
   // thread (bk's own owner) -- ownership-transfer only, no locks.
   std::vector<Run<W>> buckets(static_cast<size_t>(ranges));
   std::vector<double> busyReduce(static_cast<size_t>(ranges), 0.0);
+  std::vector<size_t> recCount(static_cast<size_t>(ranges), 0);
   const auto reduceStart = Clock::now();
   {
     std::vector<std::thread> pool;
@@ -195,6 +229,16 @@ static int runFused(const std::vector<std::string>& inPaths, int H, int maxn, in
           for (auto& x : tl[static_cast<size_t>(t)][static_cast<size_t>(bk)]) B.push_back(std::move(x));
         sortRun(B);
         deduplicateRun(B);
+        // Write this range's file IN the reduce thread (fused reduce+write):
+        // the write loop was single-threaded, the other half of the serial
+        // I/O that pinned the worker to ~5 cores. Each range file is
+        // independent -> writing them concurrently, one per owning thread, is
+        // safe and byte-identical.
+        if (!B.empty()) {
+          const std::string path = outPrefix + "_u" + std::to_string(bk) + ".bin";
+          writeRunFile<W>(B, path, H, kLen, rev);
+          recCount[static_cast<size_t>(bk)] = B.size();
+        }
         busyReduce[static_cast<size_t>(bk)] += secs(a, Clock::now());
       });
     }
@@ -203,12 +247,7 @@ static int runFused(const std::vector<std::string>& inPaths, int H, int maxn, in
   const double reduceWall = secs(reduceStart, Clock::now());
 
   size_t totalRecs = 0;
-  for (int bk = 0; bk < ranges; ++bk) {
-    if (buckets[static_cast<size_t>(bk)].empty()) continue;
-    const std::string path = outPrefix + "_u" + std::to_string(bk) + ".bin";
-    writeRunFile<W>(buckets[static_cast<size_t>(bk)], path, H, kLen, rev);
-    totalRecs += buckets[static_cast<size_t>(bk)].size();
-  }
+  for (size_t c : recCount) totalRecs += c;
 
   double sumBusy = 0.0;
   for (double b : busyMap) sumBusy += b;
