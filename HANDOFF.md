@@ -164,6 +164,21 @@ duplication measurement (the actual lever this whole redesign turns on)
 and a head-to-head wall-clock comparison against `kink` at real H/maxn,
 not just correctness.
 
+**2026-07-08 update: first real-frontier validation, beyond H=12/maxn=22
+synthetic-adjacent scale.** `./build/ns/orchestrate --maxn 26 --counter
+u128 --sharded-validate 8 --sharded-validate-height 14 --run-dir
+runs/sharded_validate_h14_m26` (real seed-from-column-0 sweep, genuinely
+RGS-skewed frontier, not synthetic test data) —
+`SHARDED_VALIDATE_PASS H=14 maxn=26 K=8 wall=1331.470s`, correct triangle
+match. The run's own `cost_profile.tsv` splits reference vs. sharded
+cleanly (two 27-row column-0..26 blocks): **reference 1103.7s wall,
+sharded (K=8) 224.1s wall — a real 4.93x speedup**, *better* than the
+`K=8→~3.1x` synthetic-data estimate above. Still only one (H, maxn)
+point and still not a head-to-head at the actual dominant-height scale
+(H17/maxn=33-class, hours long) — but the first real-data confirmation
+that the redesign's core lever holds up outside synthetic test seeds,
+and holds up favorably.
+
 ---
 
 # HANDOFF — 2026-07-08 (utilization work, branch `steal-wall-time-floor`)
