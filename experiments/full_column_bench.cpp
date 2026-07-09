@@ -175,13 +175,27 @@ static Run<W> stageMapReduce(const Run<W>& src, int H, int maxn, int r, int kLen
 }
 
 // best-of-3 effective cores for one stage under a given partition scheme.
+// getrusage-based process CPU seconds, to expose that the wall-based
+// effCores (sum of per-thread WALL / region wall) OVERSTATES real parallelism
+// when threads block (memory bandwidth, allocator locks): real cores =
+// process CPU delta / region wall delta.
+#include <sys/resource.h>
+static double procCpu(){ struct rusage ru; getrusage(RUSAGE_SELF,&ru);
+  return ru.ru_utime.tv_sec+ru.ru_utime.tv_usec/1e6 + ru.ru_stime.tv_sec+ru.ru_stime.tv_usec/1e6; }
 static double bestEff(const Run<W>& stageTab,int H,int maxn,int r,int kOut,int threads,
-                      bool balanced,Run<W>* out){
-  double best=0;
+                      bool balanced,Run<W>* out,double* realEff){
+  double best=0,bestReal=0;
   for(int rep=0;rep<3;rep++){
-    double eff=0; Run<W> o=stageMapReduce(stageTab,H,maxn,r,kOut,threads,balanced,&eff);
+    double eff=0;
+    double c0=procCpu(); auto w0=std::chrono::steady_clock::now();
+    Run<W> o=stageMapReduce(stageTab,H,maxn,r,kOut,threads,balanced,&eff);
+    double cpu=procCpu()-c0;
+    double wall=std::chrono::duration<double>(std::chrono::steady_clock::now()-w0).count();
+    double re = wall>0 ? cpu/wall : 0;
     if(eff>best){best=eff; if(out)*out=std::move(o);}
+    if(re>bestReal) bestReal=re;
   }
+  if(realEff)*realEff=bestReal;
   return best;
 }
 
@@ -200,8 +214,9 @@ int main(int argc,char**argv){
   std::printf("stage table %zu records (%.2fs)\n",stageTab.size(),secs(t0,Clock::now()));
 
   Run<W> ob,ou;
-  double effB=bestEff(stageTab,g_H,g_maxn,r,kOut,g_threads,true,&ob);
-  double effU=bestEff(stageTab,g_H,g_maxn,r,kOut,g_threads,false,&ou);
+  double realB=0,realU=0;
+  double effB=bestEff(stageTab,g_H,g_maxn,r,kOut,g_threads,true,&ob,&realB);
+  double effU=bestEff(stageTab,g_H,g_maxn,r,kOut,g_threads,false,&ou,&realU);
 
   // verify balanced and unbalanced produce identical stage output
   bool ok=(ob.size()==ou.size());
@@ -210,7 +225,8 @@ int main(int argc,char**argv){
     for(size_t i=0;i<ob.size()&&ok;i++){ if(sigCmp(ob[i].sig.b,ou[i].sig.b,kOut)!=0||ob[i].lo!=ou[i].lo||ob[i].len!=ou[i].len)ok=false;
       else for(int k=0;k<ob[i].len;k++) if(ob[i].counts[k]!=ou[i].counts[k]){ok=false;break;} } }
   std::printf("VERIFY stage output identical: %s (%zu vs %zu)\n", ok?"YES":"*** DIFFER ***", ob.size(), ou.size());
-  std::printf("RESULT: effective cores  BALANCED=%.1f  UNBALANCED=%.1f  (of %d)\n", effB, effU, g_threads);
+  std::printf("RESULT (WALL-based, the old metric): BALANCED=%.1f UNBALANCED=%.1f\n", effB, effU);
+  std::printf("RESULT (REAL cpu/wall): BALANCED=%.1f UNBALANCED=%.1f (of %d)\n", realB, realU, g_threads);
   std::printf("        current production H18 ceiling ~13.7 cores; UNBALANCED reproduces that class, BALANCED = the fix\n");
   return ok?0:1;
 }
