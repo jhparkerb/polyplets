@@ -9,54 +9,12 @@ import (
 	"testing"
 )
 
-// TestSampleKeysMultiSorted verifies that SampleKeysMulti returns sorted cuts
-// even when input files have overlapping key ranges (as map outputs do).
-func TestSampleKeysMultiSorted(t *testing.T) {
-	dir := t.TempDir()
-
-	H := 3
-	maxn := 6
-
-	// Write two synthetic POLYRUN files with interleaved keys so the
-	// naive concatenation-without-sort would produce unsorted cuts.
-	//
-	// File A: keys 0x010100, 0x030100, 0x050100 (odd-ish sigs)
-	// File B: keys 0x020100, 0x040100, 0x060100 (even-ish sigs)
-	//
-	// We create these by calling WriteSeedPolyrun (which only writes one record,
-	// the zero-sig seed) and verify the function is at least callable without
-	// crashing.  A full binary-body test requires writing raw POLYRUN records,
-	// which is tested through integration via the orchestrate gate.
-
-	pathA := dir + "/a.bin"
-	pathB := dir + "/b.bin"
-	if err := WriteSeedPolyrun(pathA, "test", H, maxn); err != nil {
-		t.Fatalf("WriteSeedPolyrun A: %v", err)
-	}
-	if err := WriteSeedPolyrun(pathB, "test", H, maxn); err != nil {
-		t.Fatalf("WriteSeedPolyrun B: %v", err)
-	}
-
-	cuts, err := SampleKeysMulti([]string{pathA, pathB}, H, H+2, 3)
-	if err != nil {
-		t.Fatalf("SampleKeysMulti: %v", err)
-	}
-
-	// Verify that cuts are sorted (the core invariant).
-	if !sort.StringsAreSorted(cuts) {
-		t.Errorf("cuts not sorted: %v", cuts)
-	}
-	if len(cuts) > 3 {
-		t.Errorf("too many cuts: got %d, want ≤3", len(cuts))
-	}
-}
-
 // writeTestIdx writes a raw .idx sidecar at path+".idx" matching the on-disk
 // format in core/runfile.h (header: magic4+ver2+bo1+keyLen4+count8, then
 // count entries of keyLen key bytes + 8 offset + 8 recidx), with one entry
 // per kIndexStride(=64) records, exactly like the real writer. keyFn maps a
 // record index [0,records) to its keyLen-byte key. Offset/recidx values are
-// synthetic (only the key bytes matter to BalancedCutsMulti/SampleKeysMulti).
+// synthetic (only the key bytes matter to BalancedCutsMulti).
 func writeTestIdx(t *testing.T, path string, keyLen, records int, keyFn func(i int) []byte) {
 	t.Helper()
 	const stride = 64
@@ -125,20 +83,19 @@ func bucketOf(cuts []string, k string) int {
 	return sort.Search(len(cuts), func(j int) bool { return cuts[j] > k })
 }
 
-// TestBalancedCutsRecordEqual is the red-first regression test for the root
-// cause: SampleKeysMulti samples numCuts keys PER FILE, so a big file (many
-// records) is under-sampled relative to a small file and its records
-// collapse into one bucket. BalancedCutsMulti must instead cut on true
-// global record-quantiles: every bucket within ±10% of total/numBuckets.
+// TestBalancedCutsRecordEqual is the regression test for the root cause an
+// earlier per-file sampler had: it drew numCuts keys PER FILE, so a big file
+// (many records) was under-sampled relative to a small file and its records
+// collapsed into one bucket. BalancedCutsMulti instead cuts on true global
+// record-quantiles: every bucket within ±10% of total/numBuckets, even on a
+// heavily skewed file-size mix.
 func TestBalancedCutsRecordEqual(t *testing.T) {
 	dir := t.TempDir()
 	const keyLen = 2
-	// Both files must have MANY MORE .idx entries than numCuts, so old
-	// SampleKeysMulti's per-file quota (numCuts samples FROM EACH FILE,
-	// regardless of how many entries/records that file has) is the actual
-	// bottleneck being exercised -- not index granularity. A:B record
-	// ratio is 1:9 (10%/90% of total), mirroring "a file holding 590M
-	// records contributes the SAME numCuts samples as a file holding 64K".
+	// A:B record ratio is 1:9 (10%/90% of total) with both files holding many
+	// more .idx entries than numCuts -- the skew a per-file-fixed-count sampler
+	// mishandled ("a file holding 590M records gets the SAME numCuts samples as
+	// one holding 64K"). BalancedCutsMulti must balance it regardless.
 	const recsA = 6_400   // small file: 100 idx entries
 	const recsB = 57_600  // fat file: 900 idx entries -- the straggler
 	total := recsA + recsB
@@ -189,31 +146,17 @@ func TestBalancedCutsRecordEqual(t *testing.T) {
 		return ok, counts
 	}
 
-	t.Run("SampleKeysMulti_fails_documented_regression", func(t *testing.T) {
-		cuts, err := SampleKeysMulti([]string{pathA, pathB}, H, keyLen, numCuts)
-		if err != nil {
-			t.Fatalf("SampleKeysMulti: %v", err)
-		}
-		ok, counts := checkBalanced(t, cuts)
-		if ok {
-			t.Fatalf("SampleKeysMulti produced balanced cuts on this fixture -- the fixture no longer reproduces the per-file-fixed-count regression this test documents; counts=%v", counts)
-		}
-		t.Logf("confirmed regression: SampleKeysMulti buckets unbalanced, counts=%v (want ~%d each)", counts, total/len(counts))
-	})
-
-	t.Run("BalancedCutsMulti_passes", func(t *testing.T) {
-		cuts, err := BalancedCutsMulti([]string{pathA, pathB}, keyLen, numCuts)
-		if err != nil {
-			t.Fatalf("BalancedCutsMulti: %v", err)
-		}
-		if !sort.StringsAreSorted(cuts) {
-			t.Errorf("cuts not sorted: %v", cuts)
-		}
-		ok, counts := checkBalanced(t, cuts)
-		if !ok {
-			t.Errorf("buckets not balanced within ±10%% of %d: counts=%v cuts=%v", total/len(counts), counts, cuts)
-		}
-	})
+	cuts, err := BalancedCutsMulti([]string{pathA, pathB}, keyLen, numCuts)
+	if err != nil {
+		t.Fatalf("BalancedCutsMulti: %v", err)
+	}
+	if !sort.StringsAreSorted(cuts) {
+		t.Errorf("cuts not sorted: %v", cuts)
+	}
+	ok, counts := checkBalanced(t, cuts)
+	if !ok {
+		t.Errorf("buckets not balanced within ±10%% of %d: counts=%v cuts=%v", total/len(counts), counts, cuts)
+	}
 }
 
 // TestBalancedCutsSorted extends TestSampleKeysMultiSorted's invariant to

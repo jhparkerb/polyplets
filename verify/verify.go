@@ -12,7 +12,6 @@ import (
 	"io"
 	"math/rand"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -577,41 +576,4 @@ func spotcheckOne(cfg Config, mapWorker string, fe ManifestFileEntry) CheckResul
 	// a reliable way to find it without the checkpoint, so we skip with a warning.
 	_ = hdr
 	return warn("spotcheck", fmt.Sprintf("skip %s: prev-col run not available without checkpoint", fe.Path))
-}
-
-// SpotcheckWithInput re-runs a single run file given an explicit input run path.
-// This is exported for use by the gate test which can supply the input explicitly.
-func SpotcheckWithInput(mapWorker, inputPath, expectedPath string, H, maxn int, ramBytes int64) CheckResult {
-	tmpDir, err := os.MkdirTemp("", "ns_spotcheck_*")
-	if err != nil {
-		return warn("spotcheck", fmt.Sprintf("mktemp: %v", err))
-	}
-	defer os.RemoveAll(tmpDir)
-
-	outPath := filepath.Join(tmpDir, "out.polyrun")
-	cmd := exec.Command(mapWorker,
-		"--in", inputPath,
-		"--H", strconv.Itoa(H),
-		"--maxn", strconv.Itoa(maxn),
-		"--ram", strconv.FormatInt(ramBytes, 10),
-		"--spill", tmpDir,
-		"--out", outPath,
-	)
-	if out, err := cmd.CombinedOutput(); err != nil {
-		return warn("spotcheck", fmt.Sprintf("map_worker failed: %v\n%s", err, out))
-	}
-
-	// Compare byte-for-byte.
-	got, err := os.ReadFile(outPath)
-	if err != nil {
-		return warn("spotcheck", fmt.Sprintf("read output: %v", err))
-	}
-	want, err := os.ReadFile(expectedPath)
-	if err != nil {
-		return warn("spotcheck", fmt.Sprintf("read expected: %v", err))
-	}
-	if string(got) != string(want) {
-		return fail("spotcheck", fmt.Sprintf("%s: byte mismatch (got %d bytes, want %d bytes)", expectedPath, len(got), len(want)))
-	}
-	return pass("spotcheck", fmt.Sprintf("%s ok", expectedPath))
 }

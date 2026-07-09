@@ -228,45 +228,12 @@ func subsampleEvenly(keys []string, numCuts int) []string {
 	return out
 }
 
-// SampleKeysMulti samples cut points across multiple POLYRUN files.
-// The cuts are returned in ascending lexicographic order (the correct merge order).
-// IMPORTANT: map output files have OVERLAPPING output key ranges (multiple workers
-// can emit the same successor key), so the file list is NOT in sorted key order.
-// We must sort the combined samples before subsampling to get valid partition cuts.
-// keyLen: see SampleKeys.
-func SampleKeysMulti(paths []string, H, keyLen, numCuts int) ([]string, error) {
-	if numCuts <= 0 {
-		return nil, nil
-	}
-	if len(paths) == 1 {
-		return SampleKeys(paths[0], H, keyLen, numCuts)
-	}
-	// Collect samples from all files and deduplicate.
-	var all []string
-	seen := make(map[string]bool)
-	for _, p := range paths {
-		c, err := SampleKeys(p, H, keyLen, numCuts)
-		if err != nil {
-			return nil, err
-		}
-		for _, k := range c {
-			if !seen[k] {
-				seen[k] = true
-				all = append(all, k)
-			}
-		}
-	}
-	// Sort lexicographically; hex-encoded sigs sort the same as the raw bytes.
-	sort.Strings(all)
-	return subsampleEvenly(all, numCuts), nil
-}
-
 // BalancedCutsMulti returns TRUE global record-quantile cut keys across
-// multiple POLYRUN files, fixing the imbalance in SampleKeysMulti: that
-// function samples numCuts keys PER FILE, so a file holding 590M records
-// contributes the same number of samples as a file holding 64K -- the big
-// file is under-sampled and its records collapse into one open-ended bucket
-// (the measured straggler, docs/full-utilization-redesign.md).
+// multiple POLYRUN files. It replaced an earlier per-file sampler that drew a
+// fixed number of samples FROM EACH FILE, so a file holding 590M records
+// contributed the same number of samples as one holding 64K -- the big file
+// was under-sampled and its records collapsed into one open-ended bucket (the
+// measured straggler, docs/full-utilization-redesign.md).
 //
 // Each .idx sidecar holds exactly one entry per 64 records (core/runfile.h
 // kIndexStride), uniformly spaced. The union of ALL files' FULL index
@@ -541,36 +508,6 @@ func bytesCompare(a, b []byte) int {
 		}
 	}
 	return len(a) - len(b)
-}
-
-// VerifyCRC reads a POLYRUN file and checks its FNV-1a-64 body CRC.
-// A mismatch is fatal: corrupt data must never silently proceed.
-func VerifyCRC(path string) error {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return err
-	}
-	// Find header end (first blank line = \n\n).
-	start := -1
-	for i := 0; i < len(data)-1; i++ {
-		if data[i] == '\n' && data[i+1] == '\n' {
-			start = i + 2
-			break
-		}
-	}
-	if start < 0 {
-		return fmt.Errorf("VerifyCRC %s: no header end", path)
-	}
-	if len(data)-start < 8 {
-		return fmt.Errorf("VerifyCRC %s: body too short for CRC", path)
-	}
-	body := data[start : len(data)-8]
-	stored := binary.LittleEndian.Uint64(data[len(data)-8:])
-	computed := Fnv1a64(body)
-	if computed != stored {
-		return fmt.Errorf("CRC MISMATCH %s: computed %016x stored %016x", path, computed, stored)
-	}
-	return nil
 }
 
 const fnvOffset uint64 = 14695981039346656037
