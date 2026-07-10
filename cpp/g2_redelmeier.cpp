@@ -360,6 +360,12 @@ struct Counter {
     return true;
   }
 
+  // Hot path: called once per node (~1.2*a(n) times). The common run (aggregate
+  // or --per-box) touches only bySize / byBox, so keep just that inline and shove
+  // every optional analysis behind one predictable `needsCells` branch into an
+  // out-of-line body -- otherwise the compiler declines to inline record() at all
+  // (the analysis code makes it too big) and every node eats a real call plus a
+  // cascade of dead `if` tests. Measured: that cascade was ~35% of the aggregate run.
   void record() {
     bySize[size] += 1;
     if (perBox) {
@@ -367,6 +373,12 @@ struct Counter {
       int h = maxy + 1;                          // miny is always 0
       byBox[(size * (maxn + 1) + w) * (maxn + 1) + h] += 1;
     }
+    if (needsCells) recordAnalyses();
+  }
+
+  // Cold path: the optional (size,*) distributions. Kept out-of-line (noinline) so
+  // it never bloats record() back above the inliner's threshold.
+  __attribute__((noinline)) void recordAnalyses() {
     if (connCheck) {
       if (components(rookOff) == 1) rookConn[size] += 1;
       if (components(bishOff) == 1) bishopConn[size] += 1;
