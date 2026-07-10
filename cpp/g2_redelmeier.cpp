@@ -31,10 +31,16 @@ using u64 = std::uint64_t;
 
 struct Offset { int dx, dy; };
 
-static const Offset kSquare4[] = {{1,0},{-1,0},{0,1},{0,-1}};
-static const Offset kSquare8[] = {{1,0},{-1,0},{0,1},{0,-1},
-                                  {1,1},{1,-1},{-1,1},{-1,-1}};
-static const Offset kTri6[]    = {{1,0},{-1,0},{0,1},{0,-1},{1,-1},{-1,1}};
+// Offsets ordered by grid-index delta ascending (see kSquare8) so the neighbour
+// probes walk memory low-to-high.
+static const Offset kSquare4[] = {{0,-1},{-1,0},{1,0},{0,1}};
+// Ordered by grid-index delta (dy*gridW+dx) ascending: the 8 status[] probes in
+// the neighbour loop then walk memory low-to-high (bottom row, middle row, top
+// row), which streams/prefetches better. Order is enumeration-order only; the
+// counts are offset-order-independent (gate C confirms split-sum invariance).
+static const Offset kSquare8[] = {{-1,-1},{0,-1},{1,-1},{-1,0},
+                                  {1,0},{-1,1},{0,1},{1,1}};
+static const Offset kTri6[]    = {{0,-1},{1,-1},{-1,0},{1,0},{-1,1},{0,1}};
 
 struct Counter {
   // configuration
