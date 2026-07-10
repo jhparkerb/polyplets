@@ -11,10 +11,12 @@
 # (g2 --split contract, gate-g2 check C). RAM per worker is tiny (~3 MB), so K=80 is
 # ~250 MB total -- cores, not RAM, are the constraint.
 #
-# USAGE:  scripts/g2_wholerow.sh N [S] [K] [--per-box]
+# USAGE:  scripts/g2_wholerow.sh N [S] [K] [JOBS] [--per-box]
 #   N         target size (whole row: computes a(1..N))
-#   S         split size (default 10; a(S) subtrees round-robined over K workers)
-#   K         worker count (default nproc)
+#   S         split size (default 10; a(S) subtrees round-robined over K shards)
+#   K         shard count (default nproc). Oversplit K > cores for finer resume and
+#             a wave-by-wave progress signal (each shard is 1/K of the work).
+#   JOBS      max concurrent shards (default nproc) -- the actual core load
 #   --per-box emit "n w h count" and combine the full (w,h) histogram
 #
 # RESULT:   runs/g2row_N<N>[_perbox]/combined.txt   (a(N) is the n==N line[s])
@@ -26,20 +28,21 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-N="${1:?N}"; S="${2:-10}"; K="${3:-$(nproc)}"
+N="${1:?N}"; S="${2:-10}"; K="${3:-$(nproc)}"; JOBS="${4:-$(nproc)}"
+case "$JOBS" in ''|*[!0-9]*) JOBS="$(nproc)";; esac   # if arg 4 was a flag, fall back
 PERBOX=""; TAG=""
 for a in "${@:4}"; do [ "$a" = "--per-box" ] && { PERBOX="--per-box"; TAG="_perbox"; }; done
 
 DIR="runs/g2row_N${N}${TAG}"; mkdir -p "$DIR"; echo $$ > "$DIR/driver.pid"
 LOG="$DIR/driver.log"
-echo ">>> g2 whole-row N=$N S=$S K=$K perbox=${PERBOX:-no} @ $(date +%FT%T%z)" | tee -a "$LOG"
+echo ">>> g2 whole-row N=$N S=$S K=$K jobs=$JOBS perbox=${PERBOX:-no} @ $(date +%FT%T%z)" | tee -a "$LOG"
 echo ">>> g2 rev: $(build/g2 square8 1 2>&1 | grep -o 'git=[^ ]*' | head -1)" | tee -a "$LOG"
 START=$(date +%s)
 
 launched=0
 for IDX in $(seq 0 $((K - 1))); do
   if [ -f "$DIR/w$IDX.done" ]; then continue; fi        # resume: skip completed shard
-  while [ "$(jobs -rp | wc -l)" -ge "$K" ]; do wait -n; done
+  while [ "$(jobs -rp | wc -l)" -ge "$JOBS" ]; do wait -n; done
   ( build/g2 square8 "$N" $PERBOX --split "$S" "$K" "$IDX" > "$DIR/w$IDX.out" 2> "$DIR/w$IDX.log" \
       && touch "$DIR/w$IDX.done" ) &
   launched=$((launched + 1))
