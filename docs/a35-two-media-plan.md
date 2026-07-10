@@ -123,38 +123,44 @@ orchestrate --maxn 35 --heights 3-18 --kernel kink --counter u128 \
 combine -in runs/ns_a35/perheight -maxn 35 -out a_n.txt   # after both finish
 ```
 
-Projected win: the tall height (70% of the wall) drops **4.13×** (measured on
-a34's H18: 9,336 s → 2,262 s), so it stops being the bottleneck. Job B (the
-remaining heights on NVMe) becomes the new limiter. Two-media total ≈
-`max(Job A, Job B)`:
+**Measured win (a34 two-media calibration, 2026-07-09):**
 
-- **a34 sanity check:** Job A (H18) = 2,262 s measured. Job B (H3–H17) was
-  ~3,965 s of column-wall in the contended run; alone on NVMe it's the limiter
-  at very roughly ~3.5–4 k s. So a34 two-media ≈ **~4,000 s vs 13,300 s ≈ 3.3×.**
-- **a(35):** the ~70% tall height (~11 h contended) → ~2.7 h on tmpfs; Job B
-  (~30%, NVMe, disk-bound among itself) becomes the limiter. Expect a(35) to
-  land **~5–8 h vs ~16 h**, pinned by Job B's wall (calibrate — see below).
+Running H18 on `/dev/shm` concurrently with H3–H17 on NVMe, both `--cores 80`:
 
-If Job B's footprint also fits the tmpfs (or a second one), putting it in RAM
-too makes *both* jobs compute-bound and pushes the total lower still. Bonus
-regardless: the tmpfs portion escapes the RAID1 mirror's pure-waste
-double-write of ephemeral scratch.
+- **Total wall 2,883 s vs 13,300 s single-run = 4.6×** (a34: 3.70 h → 48 min).
+- Job A and Job B **both finished at 2,883 s** — near-perfect balance with no
+  core-split tuning; the OS co-scheduled the oversubscribed pair. Job B (NVMe)
+  is the limiter; Job A (H18/tmpfs, 2,262 s solo) fits inside it under sharing.
+- **All 16 real heights byte-identical to banked** (`TWO_MEDIA_CORRECT PASS`).
+- CPU over the run: **75% busy (61% user + 14% sys), iowait 10%, idle 15%** —
+  vs the single run's ~15% busy / ~60% iowait. The co-schedule fills the box:
+  with H18 off the disk, Job B's own contention drops, so it beats the estimate.
 
-## To pin before launch (short calibrations, no full runs)
+Extrapolated to a(35) (single-run ~16 h): **~3.5 h**, i.e. an overnight becomes
+an afternoon. The tall height is an even larger share at a35, so if anything the
+ratio holds or improves — pinned only by Job B's wall, which the a34 run shows
+co-schedules well. If Job B's tall members (H17/H16) also go on tmpfs, both jobs
+become compute-bound and it drops further. Bonus regardless: the tmpfs portion
+escapes the RAID1 mirror's pure-waste double-write of ephemeral scratch.
 
-1. **Core split C1/C2.** Job A is idle-heavy (~20 cores likely enough); give the
-   rest to Job B. Measure the split that balances the A and B walls.
-2. **Does H18 (a35's second height, 18%) also want tmpfs?** The top two heights
-   are 88%. If the ~90 GB tmpfs can hold both tall heights' footprints, put both
-   in RAM; otherwise just the tallest.
-3. **Concurrent-orchestrate coordination.** Two processes writing distinct
-   `--heights` to a shared `--per-height-out` (disjoint files) — confirm no
-   collision; else separate dirs + combine both.
-4. **Resume safety across two jobs.** Each job is independently checkpoint/
-   resumable (the mid-column over-count bug is fixed, commit `dd91550`); a
-   crash costs one job, not both. Job A on tmpfs is lost on a *reboot* (RAM) —
-   acceptable for a same-day run, but don't rely on tmpfs surviving a power event.
-5. **Root tmpfs mount** — jasonp, one command above.
+## Remaining before an a(35) launch
+
+1. ~~**Core split C1/C2.**~~ RESOLVED by the a34 calibration: both jobs at
+   `--cores 80` (oversubscribed) balanced to finish at the same instant; the
+   CPU-bound/I/O-bound pair co-schedules itself. Use `--cores 80` for both.
+2. ~~**Concurrent-orchestrate coordination.**~~ CONFIRMED: two processes wrote
+   distinct `--heights` (H18 vs H3–17) to a shared `--per-height-out` with no
+   collision, all outputs byte-identical.
+3. **Root tmpfs mount** — the one blocker. a34's tall height fit `/dev/shm`
+   (~40 GB); a(35)'s H19 (~76 GB) needs a root-mounted ~90 GB tmpfs (command
+   above). jasonp runs it.
+4. **Optional: second height on tmpfs.** The top two heights are 88%. If the
+   ~90 GB tmpfs holds both H19 and H18 footprints, put both in RAM to push
+   lower; otherwise just the tallest (already a 4.6× win at a34).
+5. **Resume safety.** Each job checkpoints/resumes independently (mid-column
+   over-count bug fixed, `dd91550`); a crash costs one job. Job A lives in RAM,
+   so it's lost on a *reboot* — fine for a ~3.5 h same-day run; don't rely on
+   tmpfs surviving a power event.
 
 ## What this does NOT do
 
