@@ -1,20 +1,25 @@
-# HANDOFF — 2026-07-10: a(36) RUNNING (varint engine, P16 wired); a(35) DONE
+# HANDOFF — 2026-07-10: a(36) DONE + VALIDATED; Atom Ledger banked
 
-**a(36) live (dalby+ayr disk-split).** Both jobs (re)started on the VARINT
-engine `f4edb3b` at **Fri 2026-07-10 09:19:38 EDT** (both PIDs, same second).
-Engine = P16 (`47e3347`: a(36) top real height H19, H20 closed-form) + LEB128
-varint counts (`f4edb3b`: ~2x less disk-write volume, validated byte-identical).
-This is a RESTART: the initial a(36) launch (pre-varint, ~1h in) was killed and
-relaunched with varint after measuring ~60% write reduction that holds to a(36).
-- **dalby** tmux `0:a36d`, PID **1579117**: `--heights 19` (real long pole, H19).
-  rev `f4edb3ba`. Post-varint: ~30% iowait (was ~70%), still the disk-bound long
-  pole (one huge frontier saturates its NVMe even at 40% byte volume).
-- **ayr** tmux `0:a36a`, PID **3144304**: `--heights 1-18,20-36` (real H3-18 +
-  closed forms incl H20=k16). rev `f4edb3b`. Post-varint: ~12% iowait, 71% CPU —
-  compute-bound (varint fully cured the multi-height contention here).
-- Finalize: scp ayr's 35 shards to dalby's 1 (h19), `combine -in perheight
-  -maxn 36`, validate a(1)-a(35). a(36)'s top cell T(36,20) is P16's prediction
-  (holdout-validated tier, same as a34/a35 tops). Bonus: T(36,20) enables P17.
+**a(36) = 24629107617723857143962968288** — banked `results/ns_a36/`
+(36 shards + triangle.txt + PROVENANCE.md, commit `5ec2458`). Varint engine
+`f4edb3b`, dalby+ayr disk-split, both launched 09:19:38 EDT 2026-07-10:
+- **ayr**: H1-18 real + H20-36 closed-form, wall 6988.2s (1.94h).
+- **dalby**: H19 real long pole, wall **11810.4s (3.28h)** — 2.13x faster than
+  a(35)'s H19 (25112s, pre-varint) despite one term higher. Varint is the win.
+- Validation: a(1)-a(35) exact match vs banked; fixture OK to its n=20 extent;
+  T(36,36)=3^35 and T(36,35)=P_1(36)*3^32 identities exact; k=16 diagonal
+  ratio trend smooth through the P16-generated T(36,20).
+- **P17 is now derivable+validatable**: real T(34,17), T(35,18) to fit,
+  real T(36,19) as holdout. Wiring P17 makes a(37)'s top real height H19.
+
+**Atom Ledger** (`results/triangle-structure.md`, commits `7a7a0f6`+`b2ede83`):
+the triangle's dependency structure is fully mapped. Strip counts C_H carry
+one new "atom" (char poly q_H, degrees 1,2,4,9,29,68) per height;
+p_H = q_H*q_{H-1}*q_{H-2} verified; root-separation theorem PROVES no
+bounded-depth cross-column relation exists at any polynomial/factorial
+coefficient class (depth >= 29 needed to touch column 5). Independent naive
+strip engine (H<=12-14) is the only second-source lever for the middle band:
+would take triangle double-coverage from 55.6% to ~85-90%.
 
 ---
 # a(35) DONE + VALIDATED (dalby+ayr disk-split)
