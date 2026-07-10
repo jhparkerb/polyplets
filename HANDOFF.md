@@ -396,6 +396,13 @@ working trees clean. Everything below is either fully landed or explicitly
 parked with a reason, not silently stalled.
 
 ## Frontier / what's banked
+- **IN FLIGHT (2026-07-10 ~18:04, dalby tmux `0:g2_a20`, pid in
+  `runs/g2row_N20/driver.pid`):** independent whole-row **a(20)** confirmation via
+  the optimized Redelmeier `build/g2` (rev 7eab237, ~10x faster than pre-2026-07-10;
+  see the `perf(g2)` commit run). `scripts/g2_wholerow.sh 20 10 800 80`, 80 cores,
+  ETA ~8h (calibrated: n=18 = 629s, a20/a18 = 45.6x). Purpose: move a(20) from
+  single-algorithm to **two-algorithm** (Redelmeier vs the TM engine). Resumable per
+  shard; result → `runs/g2row_N20/combined.txt`, expect a(20)=1025573519362016.
 - **a(1)…a(34)** all banked under `results/ns_a{n}/` (triangle, PROVENANCE,
   perheight, cost_profile). a(1)-a(20) match the b-file; a(21)-a(34) chain-match
   each prior term; ayr cross-ISA verify folded into a34 PROVENANCE.
