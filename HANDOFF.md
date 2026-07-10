@@ -1,13 +1,25 @@
-# HANDOFF — 2026-07-09 (evening): a(35) RUNNING; simplify + SIGTERM fix landed
+# HANDOFF — 2026-07-10: a(35) RUNNING as a dalby+ayr disk-split
 
-**Live job.** `a(35)` is computing on **dalby**, tmux session 0 window `a35`,
-orchestrate **PID 1548108**, started ~2026-07-09 16:30 EDT, rev `b8f13d41`.
-Predicted **~16h wall** (a34's 3.70h × 4.4/term), ~80 GB peak RAM (1 GiB×80,
-kink is RAM-light), single uninterrupted overnight. Driver `scripts/dalby_term.sh
-35`; log `runs/ns_a35/{dalby/run.log,launch.log}`. Self-validates a(1)-a(34) vs
-banked at the end, prints `A35_VALIDATE_PASS`/`A35_DONE`. **Bonus:** a(35) is the
-first independent holdout for the fitted P_16 diagonal. Do NOT `--resume` on a
-crash-restart is fine (bug below is fixed) but a clean one-shot is preferred.
+**Live jobs (2-machine split by height = split by DISK, no cross-contention).**
+- **dalby** tmux `0:a35d`, orchestrate **PID 1567910**: `--heights 1-2,19-35`
+  = H19 (the ~70% long pole) + closed forms. NVMe run-dir (scratch on DISK, not
+  tmpfs — no OOM). ~11h expected (H19 is the limiter). engine rev `b8f13d41`.
+- **ayr** tmux `0:a35a`, orchestrate **PID 3139168**: `--heights 3-18` = the
+  rest, on ayr's own disk. ~5h. engine rev `d6e5679` (native build, Go 1.24.13).
+- Driver both: `scripts/run_height_subset.sh N HEIGHTS CORES RAM`.
+- **Finalize when BOTH done:** scp ayr's `runs/ns_a35_split/perheight/*.out` to
+  dalby's same dir, then `combine -in <dir> -maxn 35` (errors on a missing
+  shard) + validate a(1)-a(34) vs banked. Then a(35) is trustworthy.
+- Predicted a(35) ~11h (vs ~16h single-machine) — the disk-split win.
+
+**History this session (see git):** simplify pass + SIGTERM-resume fix landed;
+two-media tmpfs idea gave 4.6x on a34 but OOM'd a35 (H19 > RAM, killed tmux) —
+FAILED, see docs/a35-two-media-plan.md ceiling note. Pivoted to the dalby+ayr
+disk-split (this run). a(35) is the first independent holdout for P_16.
+
+**dalby git note:** stuck at `b455b8ff` (github fetch prompts for the id_rsa
+passphrase; user ssh-agent not loaded in non-interactive ssh). run_height_subset.sh
+was scp'd in; the ENGINE binary (b8f13d41) is current, so results are clean.
 
 **This session's landed work (all on master, pushed):**
 - `0f0d176` bake the four validated scheduling knobs (unit-mult=8, merge-mult=1,
