@@ -1,7 +1,21 @@
 # a(35) two-media plan: the tall height in RAM, the rest on disk
 
-**Status:** proposed, backed by an a34 measurement (2026-07-09). Needs a root
-tmpfs mount and a short core-split calibration before an a(35) launch.
+> **⚠ FAILED FOR a(35) — RAM CEILING (2026-07-09). DO NOT RE-RUN ON THE 125 GB BOX.**
+> The launch OOM'd. a(35)'s tallest real height **H19 does not fit in RAM**: its
+> mid-stage frontier hit **89 M records / 82 GB of tmpfs at column 2 alone**
+> (still climbing — peak is mid-sweep), vs a34's H18 at 11.5 M / ~40 GB. That's
+> ~8× per height increment, not the ~2× extrapolated below. H19's working set is
+> ~150–200 GB, far over the box's 125 GB, so with swap removed the OOM killer
+> took the jobs **and the tmux server**.
+>
+> **Corrected scope:** the two-media/tmpfs win is real and measured **up to a34**
+> (4.6×, 48 min) — but only because a34's tall height fits RAM. It has a hard
+> ceiling at ~a34 on a 125 GB box. **a(35)'s critical-path height is intrinsically
+> disk-bound here; a(35) = ~16 h on NVMe (single-run).** Reviving tmpfs for a35+
+> needs a ~200 GB+ RAM machine, not just a bigger tmpfs. The a34 result and
+> reasoning below stand; the a(35) projection does not.
+
+**Status:** a34 measured (4.6×); a(35) FAILED (RAM ceiling, above).
 
 ## The finding
 

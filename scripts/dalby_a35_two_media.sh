@@ -32,6 +32,19 @@ TMPFS=/mnt/polytmp
 BASE=runs/ns_a35_2m
 PH=runs/ns_a35/perheight
 
+# HARD GUARD (added after the 2026-07-09 OOM): a35's tallest real height H19
+# does NOT fit RAM on this box -- its mid-stage frontier hit 89M records / 82 GB
+# tmpfs at column 2 alone (peak mid-sweep is higher; working set ~150-200 GB).
+# Running it here OOM'd the jobs AND the tmux server. Refuse unless the box has
+# the ~200 GB RAM H19 actually needs. For a35 on the 125 GB box, use the plain
+# single-run scripts/dalby_term.sh (NVMe, ~16 h). See docs/a35-two-media-plan.md.
+TOTAL_RAM_GB=$(free -g | awk 'NR==2{print $2}')
+if [ "${TOTAL_RAM_GB:-0}" -lt 200 ]; then
+  echo "FATAL: a35 H19 needs ~150-200 GB RAM; this box has ${TOTAL_RAM_GB} GB."
+  echo "This config OOM'd + killed tmux on 2026-07-09. Use scripts/dalby_term.sh 35 (plain NVMe) instead."
+  exit 2
+fi
+
 [ -d "$TMPFS" ] && touch "$TMPFS/.w" 2>/dev/null && rm -f "$TMPFS/.w" || { echo "FATAL: $TMPFS not mounted/writable"; exit 2; }
 rm -rf "$TMPFS"/* "$BASE"
 mkdir -p "$TMPFS/spill" "$BASE/nvme/spill" "$PH"
