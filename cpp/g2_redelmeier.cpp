@@ -249,6 +249,13 @@ struct Counter {
   int size = 0, minx = 0, maxx = 0, maxy = 0;
   u64 splitCtr = 0;
 
+  // When set, the level whose children are size==maxn is collapsed inline instead
+  // of recursing: every untried cell there IS one complete animal, so we count the
+  // whole batch without a child memcpy or per-cell place/unplace. Sound only when no
+  // per-cell analysis is active (those need the cell actually placed) and the split
+  // boundary is above the last level (so terminal cells carry no per-cell ownership).
+  bool termFast = false;
+
   // Row y=-1 exists in the grid as a blocked border: neighbor lookups are a
   // bare j + dj[k] with no coordinate check, so every cell a delta can reach
   // from a placeable cell must have a real, blocked entry.
@@ -469,7 +476,25 @@ struct Counter {
             untried[newCount++] = j2;
           }
         }
-        search(untried, newCount);
+        if (termFast && size + 1 == maxn) {
+          // Terminal batch: each of untried[0..newCount) placed as the last cell is
+          // a distinct maxn-cell animal. Count them all at once -- no recursion, no
+          // per-cell place/unplace. This is the most-visited level, so collapsing it
+          // removes the bulk of the child memcpys and terminal bookkeeping.
+          bySize[maxn] += static_cast<u64>(newCount);
+          if (perBox) {
+            const int mn1 = maxn + 1;
+            for (int t = 0; t < newCount; ++t) {
+              const int j2 = untried[t];
+              const int xx = xOf[j2], yy = yOf[j2];
+              const int w = (xx > maxx ? xx : maxx) - (xx < minx ? xx : minx) + 1;
+              const int h = (yy > maxy ? yy : maxy) + 1;   // miny is always 0
+              byBox[(maxn * mn1 + w) * mn1 + h] += 1;
+            }
+          }
+        } else {
+          search(untried, newCount);
+        }
         // The cells we just marked are exactly untried[numUntried..newCount); the
         // child works on its own memcpy'd copy and never writes through this buffer,
         // so those slots still hold them. Unmark by walking the slots -- no separate
@@ -488,6 +513,10 @@ struct Counter {
 
   void run() {
     init();
+    // Collapse the terminal level only when every animal is a plain count/box: any
+    // per-cell analysis needs the cell placed, and a split boundary at the last level
+    // (splitS == maxn) would need per-terminal-cell ownership the batch can't express.
+    termFast = !needsCells && (splitS == 0 || splitS < maxn);
     const int origin = cellIndex(0, 0);
     status[origin] = 1;
     search(&origin, 1);
