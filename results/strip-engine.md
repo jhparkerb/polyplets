@@ -43,11 +43,20 @@ every entry in columns H computed, at every n up to 36:
 | 10   | 315                      | ~5 s       |
 | 14   | (see strip_engine_run.log) | (running) |
 
-Zero mismatches. This is the first kink-independent confirmation of the
-triangle's middle band, raising second-source coverage of the 630-entry
-triangle from 55.6% (columns H<=4 recurrences + P_k diagonals) toward the
-~85-90% the H<=12-14 strip band provides (see the coverage map in
-`results/triangle-structure.md`).
+Zero mismatches. What this adds over the EXISTING independent checks: the
+project's Redelmeier enumerator (`build/g2 square8 --per-box`) already
+two-algorithm-confirms the fixed counts A006770 through n=19 (per the b-file
+provenance in `results/b030222_upload.txt`), but its cost is proportional to
+object count, so it stops at ~n=19-20. The strip TM's cost is ~2^H (independent
+of object count), so it EXTENDS independent per-column confirmation of the
+middle heights to n=20..36 — the region Redelmeier cannot reach. That is the
+strip engine's distinct contribution: columns H<=14/15 independently checked at
+large n, not a first check at small n. It raises second-source coverage of the
+630-entry triangle from 55.6% (columns H<=4 recurrences + P_k diagonals) toward
+~85-90% (see the coverage map in `results/triangle-structure.md`).
+
+Note: `build/g2` (cpp/g2_redelmeier.cpp) is the canonical, gated Redelmeier;
+prefer it over any ad hoc enumerator.
 
 ## Complexity (measured, C++)
 
