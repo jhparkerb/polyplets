@@ -63,7 +63,6 @@ struct Counter {
   // neighbors over those slots, clobbering state the parent still needs.
   static constexpr int kMaxN = 40;                // enforced in main()
   static constexpr int kMaxUntried = kMaxN * 8 + 8;
-  std::vector<int> reachedUndo;       // cells to unmark on unwind
 
   // results
   std::vector<u64> bySize;            // [n]
@@ -276,8 +275,6 @@ struct Counter {
         if (border || !allowed(x, y)) status[j] = 1;
       }
     for (int k = 0; k < deg; ++k) dj[k] = offs[k].dy * gridW + offs[k].dx;
-    reachedUndo.clear();
-    reachedUndo.reserve(static_cast<size_t>(maxn) * deg + 8);
     bySize.assign(maxn + 1, 0);
     byBox.assign((maxn + 1) * (maxn + 1) * (maxn + 1), 0);
     if (needsCells) {
@@ -465,20 +462,20 @@ struct Counter {
 
       if (descend && size < maxn) {
         int newCount = numUntried;
-        const size_t undoMark = reachedUndo.size();
         for (int k = 0; k < deg; ++k) {
           const int j2 = j + dj[k];
           if (!status[j2]) {
             status[j2] = 1;
             untried[newCount++] = j2;
-            reachedUndo.push_back(j2);
           }
         }
         search(untried, newCount);
-        while (reachedUndo.size() > undoMark) {
-          status[reachedUndo.back()] = 0;
-          reachedUndo.pop_back();
-        }
+        // The cells we just marked are exactly untried[numUntried..newCount); the
+        // child works on its own memcpy'd copy and never writes through this buffer,
+        // so those slots still hold them. Unmark by walking the slots -- no separate
+        // reachedUndo stack needed (removing it drops a std::vector push/pop per
+        // neighbour from the hot loop).
+        for (int t = numUntried; t < newCount; ++t) status[untried[t]] = 0;
       }
 
       // unplace; (x,y) keeps status 1 so later iterations and deeper
