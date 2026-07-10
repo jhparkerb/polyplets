@@ -1925,6 +1925,21 @@ var diagCoeffTable = map[int]diagCoeffs{
 		"-346618516939812097631010184825", "2203970151840239765899986819750", "-6398534829863605593928976949100", "17955993014682160383586429971000",
 		"-146852693386847802168160405132800", "824216279306486381670291956424000", "-1935618838774923672066722617670400", "1370506748049564268873803929856000",
 	}, 1307674368000},
+	// j=16: P_16, derived via scripts/derive_pk_fast.py. The validated P_9..P_15
+	// fits pin the shared symbols, so only a16,b16 needed new data, fit from
+	// T(33,17) and T(34,18) (results/ns_a33, results/ns_a34). The diagonal-16
+	// point T(35,19) = 121081244529132538941157409 (results/ns_a35), HELD OUT of
+	// the fit, matched the swept value exactly (a35 was run with P_16 unwired to
+	// produce this independent holdout — deriver holdout(1)=True); leading coeff
+	// 25^16/16! confirmed. Wiring it makes H=maxn-16 closed-form, keeping a(36)'s
+	// top real height at H19 (H20 without it).
+	16: {[]string{
+		"23283064365386962890625", "-1604855060577392578125000", "50296202898025512695312500", "-977645294998168945312500000",
+		"12866158692583824157714843750", "-115227786191848182480468750000", "627956075188775884851523437500", "-744604346962912741214695500000",
+		"-18856370906133182542352742484975", "168083439133981919034904849231800", "-683834540674642382762519712038200", "2295047561654327718980302632052800",
+		"-17913005887676406640071685928060400", "131791153675357698130550590831267200", "-488805850691225808484910594988268800", "759766595538270156033339090440755200",
+		"-219118392304691271841806767714304000",
+	}, 20922789888000},
 }
 
 // hornerDiag evaluates a diagCoeffs' numerator at N via big.Int Horner,
@@ -1968,13 +1983,13 @@ func applyPow3(num *big.Int, e int) *big.Int {
 }
 
 // diagonalStripValid reports whether the k-th diagonal strip (H=maxn-k) can
-// be filled by diagonalCell instead of a real column sweep. k<=15 now that
-// P9..P15 are wired (case 9..15). The true structural threshold is n>=2k+1
+// be filled by diagonalCell instead of a real column sweep. k<=16 now that
+// P9..P16 are wired (case 9..16). The true structural threshold is n>=2k+1
 // (docs/proofs/T-n-nm2-and-general.md); both sweep.go dispatch sites
 // (sequential and overlap) must use this single helper so a future threshold
 // or k-range change can't apply to only one path.
 func diagonalStripValid(maxn, k int) bool {
-	return k >= 2 && k <= 15 && maxn >= 2*k+1
+	return k >= 2 && k <= 16 && maxn >= 2*k+1
 }
 
 // diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..12
