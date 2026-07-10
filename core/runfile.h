@@ -196,13 +196,13 @@ class RunFileWriter {
     emit(&lo,  1);
     emit(&len, 1);
     for (int i = 0; i < r.len; ++i) {
-      W v = r.counts[i];
-      uint8_t bytes[sizeof(W)];
-      for (size_t b = 0; b < sizeof(W); ++b) {
-        bytes[b] = static_cast<uint8_t>(v & 0xff);
-        v >>= 8;
-      }
-      emit(bytes, sizeof(W));
+      // counts: LEB128 varint each (see encodeVarint in run.h). Max 19 bytes
+      // for u128; body_bytes_ tracks actual bytes so the .idx offset above stays
+      // exact and range-seeking is unaffected.
+      uint8_t vb[24];
+      size_t n = 0;
+      encodeVarint<W>(r.counts[i], [&](uint8_t b) { vb[n++] = b; });
+      emit(vb, n);
     }
     ++record_count_;
   }
@@ -417,11 +417,15 @@ class RunFileReader {
     out.len    = len;
     out.counts.resize(len);
     for (int i = 0; i < len; ++i) {
-      uint8_t bytes[sizeof(W)];
-      if (!bodyRead(bytes, sizeof(W))) return false;
-      W v{0};
-      for (size_t b = 0; b < sizeof(W); ++b)
-        v |= static_cast<W>(bytes[b]) << (8 * b);
+      // counts: LEB128 varint each; read byte-by-byte, bounds-checked by bodyRead.
+      W v = 0;
+      unsigned shift = 0;
+      uint8_t byte;
+      do {
+        if (!bodyRead(&byte, 1)) return false;
+        v |= (static_cast<W>(byte & 0x7f) << shift);
+        shift += 7;
+      } while (byte & 0x80);
       out.counts[i] = v;
     }
     ++records_read_;

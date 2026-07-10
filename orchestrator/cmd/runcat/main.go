@@ -68,7 +68,6 @@ func catFile(path string) error {
 
 	r := bufio.NewReader(f)
 	keyLen := hdr.Height + 2
-	wordBytes := hdr.WordBytes()
 	sig := make([]byte, keyLen)
 	meta := make([]byte, 2)
 
@@ -89,25 +88,11 @@ func catFile(path string) error {
 
 		counts := make([]string, length)
 		for i := range counts {
-			buf := make([]byte, wordBytes)
-			if _, err := io.ReadFull(r, buf); err != nil {
+			v, err := readVarintBig(r)
+			if err != nil {
 				break
 			}
-			if wordBytes == 8 {
-				v := binary.LittleEndian.Uint64(buf)
-				counts[i] = fmt.Sprintf("%d", v)
-			} else {
-				// u128: two LE u64 words
-				lo64 := binary.LittleEndian.Uint64(buf[:8])
-				hi64 := binary.LittleEndian.Uint64(buf[8:])
-				var b big.Int
-				b.SetUint64(hi64)
-				b.Lsh(&b, 64)
-				var lo128 big.Int
-				lo128.SetUint64(lo64)
-				b.Or(&b, &lo128)
-				counts[i] = b.String()
-			}
+			counts[i] = v.String()
 		}
 
 		fmt.Printf("sig=%s lo=%d len=%d counts=[%s]\n",
@@ -154,4 +139,22 @@ func crcCheck(path string) (status string, ok bool) {
 		return "OK", true
 	}
 	return fmt.Sprintf("MISMATCH: computed=%016x stored=%016x", computed, stored), false
+}
+
+// readVarintBig reads one LEB128 unsigned varint (core/run.h encodeVarint) as a
+// big.Int, so u128-scale counts print exactly. r must be an io.ByteReader.
+func readVarintBig(r io.ByteReader) (*big.Int, error) {
+	result := new(big.Int)
+	chunk := new(big.Int)
+	for shift := uint(0); ; shift += 7 {
+		b, err := r.ReadByte()
+		if err != nil {
+			return nil, err
+		}
+		chunk.SetUint64(uint64(b & 0x7f))
+		result.Or(result, chunk.Lsh(chunk, shift))
+		if b&0x80 == 0 {
+			return result, nil
+		}
+	}
 }

@@ -113,12 +113,17 @@ int main() {
   assert(phdr.find("compression") == std::string::npos &&
          "plain file must not carry a compression line");
 
-  // (3) compression really fired: on-disk compressed size << plain size.
+  // (3) compression really fired: on-disk compressed size meaningfully < plain.
+  // Threshold is >1.5x (zs < 2/3 ps), not the old >2x: run-file counts are now
+  // LEB128 varint (core/run.h), so the PLAIN file is already ~70% smaller than
+  // the old fixed-width format, leaving zstd less headroom (the sig stream and
+  // structured counts still compress, ~1.9x on this fixture). zstd-on-varint
+  // stacks on top of the varint win; it just isn't the 2x it was on fixed width.
   long zs = fileSize(zpath), ps = fileSize(ppath);
   std::printf("gate_spill_zstd: plain=%ld bytes zstd=%ld bytes (%.1fx)\n",
               ps, zs, ps / static_cast<double>(zs));
   assert(zs > 0 && ps > 0);
-  assert(zs * 2 < ps && "compressed spill not meaningfully smaller than plain");
+  assert(zs * 3 < ps * 2 && "compressed spill not meaningfully smaller than plain");
 
   // Leave zpath in place for gate_spill_zstd_noz (a build WITHOUT POLY_ZSTD must
   // reject it, not misread it); that step removes it.

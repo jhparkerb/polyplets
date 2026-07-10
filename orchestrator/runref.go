@@ -615,8 +615,6 @@ func WriteSeedPolyrun(path, rev string, H, maxn int, counter ...string) error {
 			return fmt.Errorf("WriteSeedPolyrun: unknown counter %q (want u64 or u128)", counter[0])
 		}
 	}
-	wordBytes := (PolyrunHeader{Counter: counterTag}).WordBytes()
-
 	f, err := os.Create(path)
 	if err != nil {
 		return err
@@ -639,16 +637,14 @@ func WriteSeedPolyrun(path, rev string, H, maxn int, counter ...string) error {
 	fmt.Fprintf(f, "byteorder 1\n")
 	fmt.Fprintf(f, "\n")
 
-	// One binary record: sig=(H+2 zero bytes), lo=0, len=1, counts[0]=1 LE.
+	// One binary record: sig=(H+2 zero bytes), lo=0, len=1, counts[0]=1 as a
+	// single-byte LEB128 varint (0x01), matching core/run.h encodeVarint. The
+	// counter tag in the header still selects the in-memory decode width.
 	keyLen := H + 2
-	body := make([]byte, keyLen+2+wordBytes)
-	// body[0..keyLen-1] = 0 (sig)
-	// body[keyLen] = 0 (lo)
-	// body[keyLen+1] = 1 (len)
-	body[keyLen+1] = 1
-	// body[keyLen+2..keyLen+wordBytes+1] = 1 as LE value
-	binary.LittleEndian.PutUint64(body[keyLen+2:], 1)
-	// for u128, the upper 8 bytes remain zero (already zero-initialized)
+	body := make([]byte, keyLen+2+1)
+	// body[0..keyLen-1] = 0 (sig); body[keyLen] = 0 (lo)
+	body[keyLen+1] = 1 // len = 1
+	body[keyLen+2] = 1 // counts[0] = 1 (varint single byte)
 
 	crc := Fnv1a64(body)
 	crcBytes := make([]byte, 8)

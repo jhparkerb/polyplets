@@ -241,32 +241,34 @@ func SumCountsInFile(path string) (map[int]uint64, uint64, error) {
 	}
 
 	keyLen := hdr.Height + 2
-	W := hdr.WordBytes()
 	sums := make(map[int]uint64)
 	var recCount uint64
 
+	br := bufio.NewReader(f)
 	sig := make([]byte, keyLen)
 	meta := make([]byte, 2)
-	// Read exactly hdr.Records records; the 8-byte CRC trailer follows immediately after.
+	// Read exactly hdr.Records records; the 8-byte CRC trailer follows immediately
+	// after. Counts are LEB128 varint (core/run.h encodeVarint == binary.Uvarint).
+	// Sums are u64: matches the pre-varint behavior, which read only the low 8
+	// bytes of each count; ReadUvarint errors on a >u64 value rather than
+	// silently truncating (verify runs at small scale where counts fit u64).
 	for recCount < hdr.Records {
-		if _, err := io.ReadFull(f, sig); err != nil {
+		if _, err := io.ReadFull(br, sig); err != nil {
 			if err == io.EOF || err == io.ErrUnexpectedEOF {
 				break
 			}
 			return nil, recCount, fmt.Errorf("reading sig in %s: %w", path, err)
 		}
-		if _, err := io.ReadFull(f, meta); err != nil {
+		if _, err := io.ReadFull(br, meta); err != nil {
 			return nil, recCount, fmt.Errorf("reading meta in %s: %w", path, err)
 		}
 		lo := int(meta[0])
 		length := int(meta[1])
-		countBuf := make([]byte, length*W)
-		if _, err := io.ReadFull(f, countBuf); err != nil {
-			return nil, recCount, fmt.Errorf("reading counts in %s: %w", path, err)
-		}
 		for i := 0; i < length; i++ {
-			off := i * W
-			val := binary.LittleEndian.Uint64(countBuf[off : off+8])
+			val, err := binary.ReadUvarint(br)
+			if err != nil {
+				return nil, recCount, fmt.Errorf("reading counts in %s: %w", path, err)
+			}
 			sums[lo+i] += val
 		}
 		recCount++
