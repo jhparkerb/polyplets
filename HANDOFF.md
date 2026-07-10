@@ -1,4 +1,21 @@
-# HANDOFF — 2026-07-10: a(35) DONE + VALIDATED (dalby+ayr disk-split)
+# HANDOFF — 2026-07-10: a(36) RUNNING (P16 wired); a(35) DONE
+
+**a(36) live (dalby+ayr disk-split, ~8h ETA).** P_16 validated by a(35)'s
+held-out T(35,19) (deriver holdout(1)=True) and WIRED (`47e3347`:
+diagCoeffTable[16], diagonalStripValid k<=16, diag_p16_test, go test + ns-gates
+green). So a(36)'s top real height is H19 (H20 now closed-form) — an ~8h split
+instead of ~18h.
+- **dalby** tmux `0:a36d`, PID **1577049**: `--heights 19` (real long pole).
+  Uses its CURRENT engine (`b8f13d41`, no P16 needed — H19 is a real sweep), so
+  no dalby rebuild (its git is stuck, see below).
+- **ayr** tmux `0:a36a`, PID **3143396**: `--heights 1-18,20-36` (real H3-18 +
+  closed forms incl H20=k16). Uses the **P16 engine** `47e3347` (clean rebuild).
+- Finalize: scp ayr's 35 shards to dalby's 1 (h19), `combine -in perheight
+  -maxn 36`, validate a(1)-a(35). a(36)'s top cell T(36,20) is P16's prediction
+  (holdout-validated tier, same as a34/a35 tops). Bonus: T(36,20) enables P17.
+
+---
+# a(35) DONE + VALIDATED (dalby+ayr disk-split)
 
 **a(35) = 3561147281381782175236253062** — banked `results/ns_a35/`,
 `A35_VALIDATE_PASS` (a(1)-a(34) all reproduce banked; growth 6.9106 → λ≈7.1).
