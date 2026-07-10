@@ -255,17 +255,14 @@ struct Counter {
   int size = 0, minx = 0, maxx = 0, maxy = 0;
   u64 splitCtr = 0;
 
-  // When set, the level whose children are size==maxn is collapsed inline instead
-  // of recursing: every untried cell there IS one complete animal, so we count the
-  // whole batch without a child memcpy or per-cell place/unplace. Sound only when no
-  // per-cell analysis is active (those need the cell actually placed) and the split
-  // boundary is above the last level (so terminal cells carry no per-cell ownership).
-  bool termFast = false;
-
   // Row y=-1 exists in the grid as a blocked border: neighbor lookups are a
   // bare j + dj[k] with no coordinate check, so every cell a delta can reach
   // from a placeable cell must have a real, blocked entry.
   int cellIndex(int x, int y) const { return (y + 1) * gridW + (x + maxn + 1); }
+
+  // Flat index into byBox for an (n-cell, w-wide, h-tall) box. One definition kept
+  // in lockstep with the byBox.assign((maxn+1)^3) allocation and every emit site.
+  int boxIndex(int n, int w, int h) const { return (n * (maxn + 1) + w) * (maxn + 1) + h; }
 
   static bool allowed(int x, int y) { return y > 0 || (y == 0 && x >= 0); }
 
@@ -486,7 +483,7 @@ struct Counter {
         if constexpr (PERBOX) {
           const int w = maxx - minx + 1;
           const int h = maxy + 1;                    // miny is always 0
-          bb[(size * (maxn + 1) + w) * (maxn + 1) + h] += 1;
+          bb[boxIndex(size, w, h)] += 1;
         }
         if constexpr (NEEDS) recordAnalyses();
       }
@@ -500,22 +497,27 @@ struct Counter {
             untried[newCount++] = j2;
           }
         }
+        // Terminal batch: when the children are the last (size==maxn) level, each of
+        // untried[0..newCount) placed as the last cell is a distinct maxn-cell animal.
+        // Count them all at once -- no recursion, no per-cell place/unplace. This is
+        // the most-visited level, so collapsing it removes the bulk of the child
+        // memcpys and terminal bookkeeping. Always sound under !NEEDS (needs the cell
+        // placed) except when a --split boundary sits AT the last level: then a
+        // terminal cell carries per-cell ownership the batch can't express, so under
+        // SPLIT it applies only when the boundary is strictly above maxn.
         bool batched = false;
         if constexpr (!NEEDS) {
-          if (termFast && size + 1 == maxn) {
-            // Terminal batch: each of untried[0..newCount) placed as the last cell is
-            // a distinct maxn-cell animal. Count them all at once -- no recursion, no
-            // per-cell place/unplace. This is the most-visited level, so collapsing it
-            // removes the bulk of the child memcpys and terminal bookkeeping.
+          bool canBatch = true;
+          if constexpr (SPLIT) canBatch = (splitS < maxn);
+          if (canBatch && size + 1 == maxn) {
             bs[maxn] += static_cast<u64>(newCount);
             if constexpr (PERBOX) {
-              const int mn1 = maxn + 1;
               for (int t = 0; t < newCount; ++t) {
                 const int j2 = untried[t];
                 const int xx = xo[j2], yy = yo[j2];
-                const int w = (xx > maxx ? xx : maxx) - (xx < minx ? xx : minx) + 1;
-                const int h = (yy > maxy ? yy : maxy) + 1;   // miny is always 0
-                bb[(maxn * mn1 + w) * mn1 + h] += 1;
+                const int w = std::max(xx, maxx) - std::min(xx, minx) + 1;
+                const int h = std::max(yy, maxy) + 1;   // miny is always 0
+                bb[boxIndex(maxn, w, h)] += 1;
               }
             }
             batched = true;
@@ -538,27 +540,29 @@ struct Counter {
     }
   }
 
-  // Pick the searchT instantiation matching the run's modes, then launch it. The
-  // flags are constant for the whole run, so this branch fans out exactly once.
+  // Turn the three run-constant modes into template arguments, one bool at a time,
+  // so the compiler generates the (DEG x PERBOX x NEEDS x SPLIT) cross-product and no
+  // instantiation can be mis-transcribed by hand. Each layer is a single branch that
+  // fans out once at launch. Adding a future flag is one more peel level, not a
+  // doubling of hand-aligned lines.
+  template <int DEG, bool PERBOX, bool NEEDS>
+  void dispatchSplit(const int* origin) {
+    if (splitS > 0) searchT<DEG, PERBOX, NEEDS, true>(origin, 1);
+    else            searchT<DEG, PERBOX, NEEDS, false>(origin, 1);
+  }
+  template <int DEG, bool PERBOX>
+  void dispatchNeeds(const int* origin) {
+    if (needsCells) dispatchSplit<DEG, PERBOX, true>(origin);
+    else            dispatchSplit<DEG, PERBOX, false>(origin);
+  }
   template <int DEG>
   void dispatchFlags(const int* origin) {
-    const bool P = perBox, N = needsCells, S = (splitS > 0);
-    if (!P && !N && !S) searchT<DEG, false, false, false>(origin, 1);
-    else if ( P && !N && !S) searchT<DEG, true,  false, false>(origin, 1);
-    else if (!P &&  N && !S) searchT<DEG, false, true,  false>(origin, 1);
-    else if ( P &&  N && !S) searchT<DEG, true,  true,  false>(origin, 1);
-    else if (!P && !N &&  S) searchT<DEG, false, false, true >(origin, 1);
-    else if ( P && !N &&  S) searchT<DEG, true,  false, true >(origin, 1);
-    else if (!P &&  N &&  S) searchT<DEG, false, true,  true >(origin, 1);
-    else                     searchT<DEG, true,  true,  true >(origin, 1);
+    if (perBox) dispatchNeeds<DEG, true>(origin);
+    else        dispatchNeeds<DEG, false>(origin);
   }
 
   void run() {
     init();
-    // Collapse the terminal level only when every animal is a plain count/box: any
-    // per-cell analysis needs the cell placed, and a split boundary at the last level
-    // (splitS == maxn) would need per-terminal-cell ownership the batch can't express.
-    termFast = !needsCells && (splitS == 0 || splitS < maxn);
     const int origin = cellIndex(0, 0);
     status[origin] = 1;
     if (deg == 4) dispatchFlags<4>(&origin);
@@ -706,7 +710,7 @@ int main(int argc, char** argv) {
     for (int n = 1; n <= c.maxn; ++n)
       for (int w = 1; w <= c.maxn; ++w)
         for (int h = 1; h <= c.maxn; ++h) {
-          const u64 v = c.byBox[(n * (c.maxn + 1) + w) * (c.maxn + 1) + h];
+          const u64 v = c.byBox[c.boxIndex(n, w, h)];
           if (v) std::printf("%d %d %d %llu\n", n, w, h,
                              static_cast<unsigned long long>(v));
         }
