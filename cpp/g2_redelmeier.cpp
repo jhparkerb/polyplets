@@ -436,6 +436,16 @@ struct Counter {
     int untried[kMaxUntried];
     std::memcpy(untried, untriedIn,
                 static_cast<size_t>(numUntried) * sizeof(int));
+    // Restrict-qualified raw handles for the hot arrays. status is char*, and char
+    // pointers legally alias everything, so without __restrict the compiler must
+    // treat every `st[j2]=1` as a possible write to bySize/byBox/xOf/dj and reload
+    // them; promising non-aliasing lets those stay in registers across the loop.
+    char* __restrict st = status.data();
+    const int* __restrict djp = dj;
+    u64* __restrict bs = bySize.data();
+    [[maybe_unused]] const int* __restrict xo = xOf.data();
+    [[maybe_unused]] const int* __restrict yo = yOf.data();
+    [[maybe_unused]] u64* __restrict bb = byBox.data();
     while (numUntried > 0) {
       const int j = untried[--numUntried];
 
@@ -443,7 +453,7 @@ struct Counter {
       [[maybe_unused]] int sminx = 0, smaxx = 0, smaxy = 0;
       if constexpr (TRACKBOX) {
         sminx = minx; smaxx = maxx; smaxy = maxy;
-        const int x = xOf[j], y = yOf[j];
+        const int x = xo[j], y = yo[j];
         if (x < minx) minx = x;
         if (x > maxx) maxx = x;
         if (y > maxy) maxy = y;
@@ -466,11 +476,11 @@ struct Counter {
         }
       }
       if (countIt) {
-        bySize[size] += 1;
+        bs[size] += 1;
         if constexpr (PERBOX) {
           const int w = maxx - minx + 1;
           const int h = maxy + 1;                    // miny is always 0
-          byBox[(size * (maxn + 1) + w) * (maxn + 1) + h] += 1;
+          bb[(size * (maxn + 1) + w) * (maxn + 1) + h] += 1;
         }
         if constexpr (NEEDS) recordAnalyses();
       }
@@ -478,9 +488,9 @@ struct Counter {
       if (descend && size < maxn) {
         int newCount = numUntried;
         for (int k = 0; k < DEG; ++k) {
-          const int j2 = j + dj[k];
-          if (!status[j2]) {
-            status[j2] = 1;
+          const int j2 = j + djp[k];
+          if (!st[j2]) {
+            st[j2] = 1;
             untried[newCount++] = j2;
           }
         }
@@ -491,15 +501,15 @@ struct Counter {
             // a distinct maxn-cell animal. Count them all at once -- no recursion, no
             // per-cell place/unplace. This is the most-visited level, so collapsing it
             // removes the bulk of the child memcpys and terminal bookkeeping.
-            bySize[maxn] += static_cast<u64>(newCount);
+            bs[maxn] += static_cast<u64>(newCount);
             if constexpr (PERBOX) {
               const int mn1 = maxn + 1;
               for (int t = 0; t < newCount; ++t) {
                 const int j2 = untried[t];
-                const int xx = xOf[j2], yy = yOf[j2];
+                const int xx = xo[j2], yy = yo[j2];
                 const int w = (xx > maxx ? xx : maxx) - (xx < minx ? xx : minx) + 1;
                 const int h = (yy > maxy ? yy : maxy) + 1;   // miny is always 0
-                byBox[(maxn * mn1 + w) * mn1 + h] += 1;
+                bb[(maxn * mn1 + w) * mn1 + h] += 1;
               }
             }
             batched = true;
@@ -511,7 +521,7 @@ struct Counter {
         // so those slots still hold them. Unmark by walking the slots -- no separate
         // reachedUndo stack needed (removing it drops a std::vector push/pop per
         // neighbour from the hot loop).
-        for (int t = numUntried; t < newCount; ++t) status[untried[t]] = 0;
+        for (int t = numUntried; t < newCount; ++t) st[untried[t]] = 0;
       }
 
       // unplace; (x,y) keeps status 1 so later iterations and deeper
