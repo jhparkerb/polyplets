@@ -60,8 +60,11 @@ static i128 parse_i128(const std::string& s) {
 
 struct Engine {
   int H, N;
-  // transition cache: state -> list of (add, newstate); plus closable flag.
-  std::unordered_map<u64, std::vector<std::pair<int, u64>>> trans;
+  // transition cache: state -> successor states + cell-count added, stored as
+  // PARALLEL arrays (u64 + uint8_t = 9 bytes/edge, vs 16 for a padded pair) so
+  // the cache stays in RAM at H=16 (~millions of states x ~thousands of edges).
+  struct TL { std::vector<u64> next; std::vector<uint8_t> add; };
+  std::unordered_map<u64, TL> trans;
   std::unordered_map<u64, char> closable;
 
   static inline int lab(u64 st, int r) { return int((st >> (4 * r)) & 0xF); }
@@ -123,16 +126,16 @@ struct Engine {
     return true;
   }
 
-  const std::vector<std::pair<int, u64>>& transitions(u64 st) {
+  const TL& transitions(u64 st) {
     auto it = trans.find(st);
     if (it != trans.end()) return it->second;
-    std::vector<std::pair<int, u64>> lst;
+    TL lst;
     int full = (1 << H) - 1;
     for (int S = 1; S <= full; ++S) {
       int add = __builtin_popcount(S);
       if (add > N - 1) continue;
       u64 ns;
-      if (step(st, S, ns)) lst.emplace_back(add, ns);
+      if (step(st, S, ns)) { lst.next.push_back(ns); lst.add.push_back((uint8_t)add); }
     }
     // closable = exactly one component in st
     int comps = 0; bool seen[9] = {false};
@@ -173,9 +176,9 @@ struct Engine {
         if (hi == 0 && vec[0] == 0) continue;
         const auto& tl = transitions(st);
         if (closable[st]) for (int n = 0; n <= N; ++n) if (vec[n]) C[n] += vec[n];
-        for (auto& pr : tl) {
-          int add = pr.first;
-          u64 ns = pr.second;
+        for (size_t e = 0; e < tl.next.size(); ++e) {
+          int add = tl.add[e];
+          u64 ns = tl.next[e];
           auto& nv = ndp[ns];
           if (nv.empty()) nv.assign(N + 1, 0);
           int lim = std::min(hi, N - add);
@@ -189,11 +192,34 @@ struct Engine {
 };
 
 int main(int argc, char** argv) {
-  if (argc < 3) { std::fprintf(stderr, "usage: strip_tm <Hmax> <Nmax> [banked_dir]\n"); return 1; }
+  // Single-height mode: compute only C_H(0..N) and write "n value" lines.
+  // Lets the three machines split heights and compose by differencing later.
+  if (argc >= 5 && std::string(argv[1]) == "single") {
+    int H = std::atoi(argv[2]);
+    int Nmax = std::atoi(argv[3]);
+    std::string out = argv[4];
+    if (H > 16) { std::fprintf(stderr, "H<=16 (state packing)\n"); return 1; }
+    std::printf("strip_tm single: H=%d Nmax=%d -> %s\n", H, Nmax, out.c_str());
+    std::fflush(stdout);
+    Engine e; e.H = H; e.N = Nmax;
+    auto t0 = std::chrono::steady_clock::now();
+    auto C = e.run();
+    double s = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+    std::printf("  C_%d computed in %.1fs (states cached: %zu)\n", H, s, e.trans.size());
+    std::ofstream f(out);
+    for (int n = 0; n <= Nmax; ++n) f << n << " " << i128str(C[n]) << "\n";
+    std::printf("  wrote C_%d(0..%d); head:", H, Nmax);
+    for (int n = H; n <= std::min(H + 3, Nmax); ++n) std::printf(" %s", i128str(C[n]).c_str());
+    std::printf("\n");
+    return 0;
+  }
+
+  if (argc < 3) { std::fprintf(stderr, "usage: strip_tm <Hmax> <Nmax> [banked_dir]\n"
+                                       "       strip_tm single <H> <Nmax> <outfile>\n"); return 1; }
   int Hmax = std::atoi(argv[1]);
   int Nmax = std::atoi(argv[2]);
   std::string bankdir = (argc > 3) ? argv[3] : "";
-  if (Hmax > 15) { std::fprintf(stderr, "Hmax<=15 (state packing)\n"); return 1; }
+  if (Hmax > 16) { std::fprintf(stderr, "Hmax<=16 (state packing)\n"); return 1; }
 
   std::printf("strip_tm (C++): Hmax=%d Nmax=%d\n", Hmax, Nmax);
   std::vector<std::vector<i128>> Ccols(Hmax + 1);
