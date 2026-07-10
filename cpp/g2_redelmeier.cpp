@@ -364,24 +364,10 @@ struct Counter {
     return true;
   }
 
-  // Hot path: called once per node (~1.2*a(n) times). The common run (aggregate
-  // or --per-box) touches only bySize / byBox, so keep just that inline and shove
-  // every optional analysis behind one predictable `needsCells` branch into an
-  // out-of-line body -- otherwise the compiler declines to inline record() at all
-  // (the analysis code makes it too big) and every node eats a real call plus a
-  // cascade of dead `if` tests. Measured: that cascade was ~35% of the aggregate run.
-  void record() {
-    bySize[size] += 1;
-    if (perBox) {
-      int w = maxx - minx + 1;
-      int h = maxy + 1;                          // miny is always 0
-      byBox[(size * (maxn + 1) + w) * (maxn + 1) + h] += 1;
-    }
-    if (needsCells) recordAnalyses();
-  }
-
-  // Cold path: the optional (size,*) distributions. Kept out-of-line (noinline) so
-  // it never bloats record() back above the inliner's threshold.
+  // Cold path: the optional (size,*) distributions, run once per counted node only
+  // when some analysis mode is active. searchT inlines the hot bySize/byBox writes
+  // directly; this stays out-of-line (noinline) so it never bloats the kernel. It
+  // runs under the NEEDS instantiation, where placed[]/inAnimal[]/box are maintained.
   __attribute__((noinline)) void recordAnalyses() {
     if (connCheck) {
       if (components(rookOff) == 1) rookConn[size] += 1;
@@ -435,7 +421,18 @@ struct Counter {
     }
   }
 
-  void search(const int* untriedIn, int numUntried) {
+  // The hot recursion. The run-constant modes are template parameters, so each
+  // instantiation is a straight-line kernel with the dead machinery compiled out:
+  //   DEG    - neighbour count (4/6/8) -> the neighbour loop unrolls, dj[] offsets fold
+  //   PERBOX - maintain/emit the (w,h) bounding-box histogram
+  //   NEEDS  - any per-cell analysis (holes/perim/... needs the cell actually placed)
+  //   SPLIT  - subtree partition for --split workers
+  // TRACKBOX folds in the fact that the analyses also read minx/maxx/maxy: in pure
+  // aggregate mode (no box, no analysis) the box save/update/restore is skipped
+  // entirely. run() dispatches to the right instantiation once.
+  template <int DEG, bool PERBOX, bool NEEDS, bool SPLIT>
+  void searchT(const int* untriedIn, int numUntried) {
+    constexpr bool TRACKBOX = PERBOX || NEEDS;
     int untried[kMaxUntried];
     std::memcpy(untried, untriedIn,
                 static_cast<size_t>(numUntried) * sizeof(int));
@@ -443,20 +440,23 @@ struct Counter {
       const int j = untried[--numUntried];
 
       // place the cell (status[j] is already 1; see comment at the field)
-      const int sminx = minx, smaxx = maxx, smaxy = maxy;
-      const int x = xOf[j], y = yOf[j];
-      if (x < minx) minx = x;
-      if (x > maxx) maxx = x;
-      if (y > maxy) maxy = y;
+      [[maybe_unused]] int sminx = 0, smaxx = 0, smaxy = 0;
+      if constexpr (TRACKBOX) {
+        sminx = minx; smaxx = maxx; smaxy = maxy;
+        const int x = xOf[j], y = yOf[j];
+        if (x < minx) minx = x;
+        if (x > maxx) maxx = x;
+        if (y > maxy) maxy = y;
+      }
       ++size;
-      if (needsCells) {
+      if constexpr (NEEDS) {
         inAnimal[j] = 1; placed.push_back(j);
         if (connCheck) pidx[j] = size - 1;
       }
 
       // split-mode ownership of this node and its subtree
       bool countIt = true, descend = true;
-      if (splitS > 0) {
+      if constexpr (SPLIT) {
         if (size < splitS) {
           countIt = (splitIdx == 0);
         } else if (size == splitS) {
@@ -465,36 +465,47 @@ struct Counter {
           descend = mine;
         }
       }
-      if (countIt) record();
+      if (countIt) {
+        bySize[size] += 1;
+        if constexpr (PERBOX) {
+          const int w = maxx - minx + 1;
+          const int h = maxy + 1;                    // miny is always 0
+          byBox[(size * (maxn + 1) + w) * (maxn + 1) + h] += 1;
+        }
+        if constexpr (NEEDS) recordAnalyses();
+      }
 
       if (descend && size < maxn) {
         int newCount = numUntried;
-        for (int k = 0; k < deg; ++k) {
+        for (int k = 0; k < DEG; ++k) {
           const int j2 = j + dj[k];
           if (!status[j2]) {
             status[j2] = 1;
             untried[newCount++] = j2;
           }
         }
-        if (termFast && size + 1 == maxn) {
-          // Terminal batch: each of untried[0..newCount) placed as the last cell is
-          // a distinct maxn-cell animal. Count them all at once -- no recursion, no
-          // per-cell place/unplace. This is the most-visited level, so collapsing it
-          // removes the bulk of the child memcpys and terminal bookkeeping.
-          bySize[maxn] += static_cast<u64>(newCount);
-          if (perBox) {
-            const int mn1 = maxn + 1;
-            for (int t = 0; t < newCount; ++t) {
-              const int j2 = untried[t];
-              const int xx = xOf[j2], yy = yOf[j2];
-              const int w = (xx > maxx ? xx : maxx) - (xx < minx ? xx : minx) + 1;
-              const int h = (yy > maxy ? yy : maxy) + 1;   // miny is always 0
-              byBox[(maxn * mn1 + w) * mn1 + h] += 1;
+        bool batched = false;
+        if constexpr (!NEEDS) {
+          if (termFast && size + 1 == maxn) {
+            // Terminal batch: each of untried[0..newCount) placed as the last cell is
+            // a distinct maxn-cell animal. Count them all at once -- no recursion, no
+            // per-cell place/unplace. This is the most-visited level, so collapsing it
+            // removes the bulk of the child memcpys and terminal bookkeeping.
+            bySize[maxn] += static_cast<u64>(newCount);
+            if constexpr (PERBOX) {
+              const int mn1 = maxn + 1;
+              for (int t = 0; t < newCount; ++t) {
+                const int j2 = untried[t];
+                const int xx = xOf[j2], yy = yOf[j2];
+                const int w = (xx > maxx ? xx : maxx) - (xx < minx ? xx : minx) + 1;
+                const int h = (yy > maxy ? yy : maxy) + 1;   // miny is always 0
+                byBox[(maxn * mn1 + w) * mn1 + h] += 1;
+              }
             }
+            batched = true;
           }
-        } else {
-          search(untried, newCount);
         }
+        if (!batched) searchT<DEG, PERBOX, NEEDS, SPLIT>(untried, newCount);
         // The cells we just marked are exactly untried[numUntried..newCount); the
         // child works on its own memcpy'd copy and never writes through this buffer,
         // so those slots still hold them. Unmark by walking the slots -- no separate
@@ -505,10 +516,25 @@ struct Counter {
 
       // unplace; (x,y) keeps status 1 so later iterations and deeper
       // levels of this loop never re-add it -- the tried-set rule
-      if (needsCells) { inAnimal[placed.back()] = 0; placed.pop_back(); }
+      if constexpr (NEEDS) { inAnimal[placed.back()] = 0; placed.pop_back(); }
       --size;
-      minx = sminx; maxx = smaxx; maxy = smaxy;
+      if constexpr (TRACKBOX) { minx = sminx; maxx = smaxx; maxy = smaxy; }
     }
+  }
+
+  // Pick the searchT instantiation matching the run's modes, then launch it. The
+  // flags are constant for the whole run, so this branch fans out exactly once.
+  template <int DEG>
+  void dispatchFlags(const int* origin) {
+    const bool P = perBox, N = needsCells, S = (splitS > 0);
+    if (!P && !N && !S) searchT<DEG, false, false, false>(origin, 1);
+    else if ( P && !N && !S) searchT<DEG, true,  false, false>(origin, 1);
+    else if (!P &&  N && !S) searchT<DEG, false, true,  false>(origin, 1);
+    else if ( P &&  N && !S) searchT<DEG, true,  true,  false>(origin, 1);
+    else if (!P && !N &&  S) searchT<DEG, false, false, true >(origin, 1);
+    else if ( P && !N &&  S) searchT<DEG, true,  false, true >(origin, 1);
+    else if (!P &&  N &&  S) searchT<DEG, false, true,  true >(origin, 1);
+    else                     searchT<DEG, true,  true,  true >(origin, 1);
   }
 
   void run() {
@@ -519,7 +545,9 @@ struct Counter {
     termFast = !needsCells && (splitS == 0 || splitS < maxn);
     const int origin = cellIndex(0, 0);
     status[origin] = 1;
-    search(&origin, 1);
+    if (deg == 4) dispatchFlags<4>(&origin);
+    else if (deg == 6) dispatchFlags<6>(&origin);
+    else dispatchFlags<8>(&origin);
   }
 };
 
