@@ -1,16 +1,19 @@
-# HANDOFF — 2026-07-10: a(35) RUNNING as a dalby+ayr disk-split
+# HANDOFF — 2026-07-10: a(35) DONE + VALIDATED (dalby+ayr disk-split)
 
-**Live jobs (2-machine split by height = split by DISK, no cross-contention).**
-- **dalby** tmux `0:a35d`, orchestrate **PID 1567910**: `--heights 1-2,19-35`
-  = H19 (the ~70% long pole) + closed forms. NVMe run-dir (scratch on DISK, not
-  tmpfs — no OOM). ~11h expected (H19 is the limiter). engine rev `b8f13d41`.
-- **ayr** tmux `0:a35a`, orchestrate **PID 3139168**: `--heights 3-18` = the
-  rest, on ayr's own disk. ~5h. engine rev `d6e5679` (native build, Go 1.24.13).
-- Driver both: `scripts/run_height_subset.sh N HEIGHTS CORES RAM`.
-- **Finalize when BOTH done:** scp ayr's `runs/ns_a35_split/perheight/*.out` to
-  dalby's same dir, then `combine -in <dir> -maxn 35` (errors on a missing
-  shard) + validate a(1)-a(34) vs banked. Then a(35) is trustworthy.
-- Predicted a(35) ~11h (vs ~16h single-machine) — the disk-split win.
+**a(35) = 3561147281381782175236253062** — banked `results/ns_a35/`,
+`A35_VALIDATE_PASS` (a(1)-a(34) all reproduce banked; growth 6.9106 → λ≈7.1).
+
+Computed via the **two-machine split-by-height = split-by-DISK** (the win: each
+machine's heights hit only its own disk, no cross-height I/O contention):
+- **dalby** (ARM, 80c, rev `b8f13d41`): `--heights 1-2,19-35` = H19 (long pole)
+  + closed forms. wall **25112s (~7.0h)**, NVMe (no tmpfs/OOM).
+- **ayr** (x86, 32c, rev `d6e5679`, native build): `--heights 3-18`. wall
+  **19831s (~5.5h)**.
+- Concurrent → **~7.0h total vs ~16h single-machine (~2.3x)**. Driver
+  `scripts/run_height_subset.sh`. Combine: scp'd ayr's 16 shards to dalby's 19,
+  `combine -in perheight -maxn 35`.
+- **Bonus available:** T(35,19) is a REAL swept value (P16 not wired) → first
+  independent holdout for the fitted P16 (not yet run). See results/ns_a35/PROVENANCE.md.
 
 **History this session (see git):** simplify pass + SIGTERM-resume fix landed;
 two-media tmpfs idea gave 4.6x on a34 but OOM'd a35 (H19 > RAM, killed tmux) —
