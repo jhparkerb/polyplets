@@ -219,6 +219,18 @@ neighbours go to the c-side, so they're empty in the `d`-piece.
   connectivity makes the convolution over-count looser than the 4-neighbour rook case
   (there the same method leaves ~14%: 4.63 vs true 4.06; here ~31%: 9.31 vs true 7.11).
 
+  #### EXACT rational certificate (Certificate Squeeze, Phase 1)
+  The 9.31 bound is now machine-checkable, not just numerical bisection.
+  `experiments/king_certificate.py` finds a rational super-solution u > 0 with
+  u_T ≥ F_x(u)_T for every type T (F_x = the system map at x); by monotonicity u
+  dominates every iterate, so the iteration is bounded at x and **λ ≤ 1/x** rigorously.
+  RD=3: x = 2147/20000, a 5930-component certificate (max denominator 10⁶), all
+  inequalities verified in exact `fractions.Fraction` arithmetic →
+  **λ ≤ 9.3153, PROVED (no floats in the chain).** (The tiny gap 9.3153 vs the
+  numerical 9.306 is a deliberate 0.1% safety margin `eps` so the super-solution has
+  room; shrink `eps` to tighten toward 9.306 at the cost of larger fixpoint values.)
+  RD=2 cross-check: x = 106251/10⁶ → λ ≤ 9.4117, PASS.
+
 - So the earlier "can't beat 12.2 generically" was right about the *generic*
   route, but the Bui-faithful route (correct case-routing + split types) DOES beat
   it and keeps improving with context. Target ~7.11 from above; realistic landing
