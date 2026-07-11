@@ -46,9 +46,12 @@ swapping its transition table.
 **growth constant** (Klarner's constant, λ; τ for polyhexes) — The limit
 a(n)^(1/n) as n → ∞: asymptotically, each extra cell multiplies the count by
 this factor. For polyominoes λ ≈ 4.0625696 (rigorously only 4.0025 < λ <
-4.5252); for polyhexes τ ≈ 5.1831478; for polyplets λ ≈ 7 (no precise
-published estimate; the term ratios are still rising through 6.73 at the
-current record n = 18).
+4.5252); for polyhexes τ ≈ 5.1831478; for polyplets λ ≈ 7.11 (estimate, no
+published value; Domb–Sykes/ratio fit on the 36 known terms plus an
+independent μ_H strip-extrapolation, both converging on ~7.11). Rigorously
+only λ ≥ 6.475 known (multi-directed king animals, Bacher; and the exact
+algebraic λ ≥ 3+2√2 ≈ 5.828 from directed king animals) — **no upper bound**
+for polyplets, ours or published.
 
 **Mason nomenclature (M90, M90V, M45, R180C, R180M, R180V, R90C, R90V)** —
 John Mason's labels for symmetry *placements*: the symmetry element (Mirror
