@@ -47,3 +47,37 @@ N=21: a(20)/Σa(1..20) = 1.0256e15/1.2036e15 = **85.2%**.
 | lever | N=15 s | vs base | N=16 s | kept? | notes |
 |---|---|---|---|---|---|
 | baseline 7eab237 | 167.1 | 1.00× | — | — | perf stat above |
+| L1 terminal pure-count | 95.0 | **1.76×** | — | ✅ | gate green; 85% of nodes → 8 loads+sum |
+| L1 + `-mcpu=neoverse-n1` | 95.2 | 1.76× | — | ❌ | no gain; gcc generic aarch64 already tuned |
+| + L3 constexpr offsets | 89.1 | **1.88×** | — | ✅ | +6.6%; folds dj[] into immediate offsets |
+| + L2 branchless probe | 89.4 | 1.87× | — | ❌ | neutral (P0 was right: not branch-bound); reverted |
+| + L4 u16 untried | 88.7 | 1.88× | — | ➖ | neutral on speed; kept (halves buffer footprint) |
+| + gcc PGO | 91.0 | 1.84× | — | ❌ | worse than gcc -O3; dead end (known pattern) |
+| + gcc `-mcpu=neoverse-n1` | 95.2 | — | — | ❌ | no gain |
+| + **clang++-19 -O3** | **81.3** | **2.06×** | — | ✅ | **+9.2% over gcc**; wired into Makefile (G2CXX) |
+| + clang PGO | ? | ? | — | ⏸ | blocked: needs libclang-rt-19-dev + llvm-19 on dalby |
+
+**Kernel levers settled at 2.06× (L1 + L3 + L4 + clang).** L2/L4/gcc-PGO/-mcpu
+measured neutral-or-worse. L5 (size-(maxn-2) fusion) estimated ~3% for real
+structural risk — skipped unless margin needed. clang PGO skipped (blocked on a
+dalby package, speculative ~5%, and would add per-box build complexity; the
+fleet already reaches ~14h).
+
+## Fleet per-core throughput (N=15 single-core wall, clang builds)
+
+| box | ISA | cores | N=15 wall | per-core vs dalby | dalby-core-equiv |
+|---|---|---|---|---|---|
+| dalby | Neoverse-N1 aarch64 | 80 | 81.3 s | 1.00x | 80 |
+| ayr | x86-64 | 32 | 63.5 s | 1.28x | 41 |
+| gympie | Apple Silicon (perf) | 10 | 27.1 s | 3.00x | 30 |
+| **fleet** | | 122 | | | **151** |
+
+Shard allocation proportional to dalby-core-equiv: **dalby 53% / ayr 27% / gympie 20%**.
+
+## ETA (optimized kernel 2.06x, a(21) = 6.7614x the row-20 work)
+
+- a(21) work = 7.23e6 dalby-core-s. **dalby-alone 26.1 h; fleet ~14 h** (<24h ok).
+- **Reach frontier:** a(22) = 6.78x a(21) -> **fleet ~3.9 days** (was ~15 days
+  dalby-alone pre-optimization) — now a feasible long run. a(23) ~27 days (no).
+  Optimization+fleet moves the whole-row two-algorithm confirmation frontier to
+  **21 (this run) and puts 22 in reach**. Re-confirm from the real a(21) run.

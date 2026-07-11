@@ -30,31 +30,67 @@ cd "$(dirname "$0")/.."
 
 N="${1:?N}"; S="${2:-10}"; K="${3:-$(nproc)}"; JOBS="${4:-$(nproc)}"
 case "$JOBS" in ''|*[!0-9]*) JOBS="$(nproc)";; esac   # if arg 4 was a flag, fall back
-PERBOX=""; TAG=""
-for a in "${@:4}"; do [ "$a" = "--per-box" ] && { PERBOX="--per-box"; TAG="_perbox"; }; done
+# Flags (any order after the positionals):
+#   --per-box            emit "n w h count", combine the full (w,h) histogram
+#   --range FROM TO      run only shards [FROM,TO) of the K split (fleet: give each
+#                        box a disjoint IDX range of the SAME N/S/K; split-sum
+#                        invariance makes the union exact regardless of which box
+#                        ran which shard). Default 0..K.
+#   --no-combine         run the shards but skip combine/verify (fleet: combine
+#                        centrally after gathering every box's w*.out; see
+#                        scripts/g2_combine.sh).
+PERBOX=""; TAG=""; NOCOMBINE=0; FROM=0; TO="$K"
+args=("$@"); i=0
+while [ $i -lt ${#args[@]} ]; do
+  case "${args[$i]}" in
+    --per-box)    PERBOX="--per-box"; TAG="_perbox";;
+    --no-combine) NOCOMBINE=1;;
+    --range)      FROM="${args[$((i+1))]}"; TO="${args[$((i+2))]}"; i=$((i+2));;
+  esac
+  i=$((i+1))
+done
+RANGE=$((TO - FROM))
 
 DIR="runs/g2row_N${N}${TAG}"; mkdir -p "$DIR"; echo $$ > "$DIR/driver.pid"
 LOG="$DIR/driver.log"
-echo ">>> g2 whole-row N=$N S=$S K=$K jobs=$JOBS perbox=${PERBOX:-no} @ $(date +%FT%T%z)" | tee -a "$LOG"
+echo ">>> g2 whole-row N=$N S=$S K=$K range=[$FROM,$TO) jobs=$JOBS perbox=${PERBOX:-no} host=$(hostname -s) @ $(date +%FT%T%z)" | tee -a "$LOG"
 echo ">>> g2 rev: $(build/g2 square8 1 2>&1 | grep -o 'git=[^ ]*' | head -1)" | tee -a "$LOG"
 START=$(date +%s)
 
+# Background ETA monitor: shards are near-uniform work, so done-count over elapsed
+# gives a real rate and a real eta (memory: surface-job-etas, no elapsed-only guesses).
+( while :; do
+    sleep 120
+    D=$(ls "$DIR"/w*.done 2>/dev/null | wc -l | tr -d ' ')
+    E=$(( $(date +%s) - START )); [ "$D" -gt 0 ] || continue
+    ETA=$(awk -v d="$D" -v e="$E" -v r="$RANGE" 'BEGIN{printf "%d", (r-d)*e/d}')
+    echo ">>> progress=$D/$RANGE elapsed=${E}s eta=${ETA}s @ $(date +%FT%T%z)" | tee -a "$LOG"
+  done ) &
+MONPID=$!
+
 launched=0
-for IDX in $(seq 0 $((K - 1))); do
+for IDX in $(seq "$FROM" $((TO - 1))); do
   if [ -f "$DIR/w$IDX.done" ]; then continue; fi        # resume: skip completed shard
-  while [ "$(jobs -rp | wc -l)" -ge "$JOBS" ]; do wait -n; done
+  while [ "$(jobs -rp | wc -l)" -ge "$((JOBS + 1))" ]; do wait -n; done   # +1 for the monitor
   ( build/g2 square8 "$N" $PERBOX --split "$S" "$K" "$IDX" > "$DIR/w$IDX.out" 2> "$DIR/w$IDX.log" \
       && touch "$DIR/w$IDX.done" ) &
   launched=$((launched + 1))
 done
-wait
+while [ "$(jobs -rp | wc -l)" -gt 1 ]; do wait -n; done   # all shards done (monitor still up)
+kill "$MONPID" 2>/dev/null; wait "$MONPID" 2>/dev/null
 WALL=$(( $(date +%s) - START ))
-echo ">>> $launched shards ran, ${WALL}s wall; combining @ $(date +%FT%T%z)" | tee -a "$LOG"
+echo ">>> $launched shards ran, ${WALL}s wall @ $(date +%FT%T%z)" | tee -a "$LOG"
 
-# every shard must have completed, or the sum is wrong
+# every shard in this box's range must have completed, or its partial sum is wrong
 missing=0
-for IDX in $(seq 0 $((K - 1))); do [ -f "$DIR/w$IDX.done" ] || { echo "!!! shard $IDX INCOMPLETE" | tee -a "$LOG"; missing=1; }; done
-[ "$missing" = 1 ] && { echo "!!! re-run to finish missing shards before trusting combined.txt" | tee -a "$LOG"; exit 3; }
+for IDX in $(seq "$FROM" $((TO - 1))); do [ -f "$DIR/w$IDX.done" ] || { echo "!!! shard $IDX INCOMPLETE" | tee -a "$LOG"; missing=1; }; done
+[ "$missing" = 1 ] && { echo "!!! re-run to finish missing shards" | tee -a "$LOG"; exit 3; }
+
+if [ "$NOCOMBINE" = 1 ]; then
+  echo ">>> range [$FROM,$TO) complete; --no-combine (combine centrally with scripts/g2_combine.sh) @ $(date +%FT%T%z)" | tee -a "$LOG"
+  exit 0
+fi
+echo ">>> combining @ $(date +%FT%T%z)" | tee -a "$LOG"
 
 python3 - "$DIR" "$PERBOX" > "$DIR/combined.txt" <<'PYEOF'
 import sys, glob, os
