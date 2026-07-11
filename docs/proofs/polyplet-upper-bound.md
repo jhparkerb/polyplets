@@ -170,14 +170,24 @@ Built and VERIFIED against brute force (`experiments/king_types.py`,
 - Auto-closure: 24 types (R=1) / 28 (with required-cell tracking). All recurrences
   verified valid over-counts.
 
-**BUT the bound is ~12.5–13 — WORSE than the crude 12.2.** A *generic* valid
-decomposition (case-on-all-subsets, re-mark lowest-left, small window) over-counts
-too much and the looseness compounds through the dominating system. Individual
-steps being provably-valid is NOT sufficient. Bui reaches 4.63 on rook with 6
-types because those types are *specifically engineered* so the compounding is
-controlled — that engineering (which cells to forbid/require in each reduced type,
-which cases to route through convolutions vs linear terms) is the real content,
-and porting it to king's diagonal geometry is genuine research, not mechanical.
+**BUT the bound is ~12.5 — WORSE than the crude 12.2, and MEASURED not to improve
+with more context:**
+
+| approach | types | bound |
+|---|---|---|
+| generic twig, R=1 | 28 | 12.50 |
+| generic twig, R=1 + required-tracking | 28 | 13.00 |
+| generic twig, R=2 | 8740 | 12.5382 |
+
+R=2 closes fast (8740 types, ~1s; `experiments/king_bound_fast.py`) — the earlier
+timeout was the O(types·polyplets) verification, not the closure. The R=1→R=2
+trend is flat-to-worse, so window size is provably NOT the lever; R=3 is pointless.
+A *generic* valid decomposition over-counts too much and it compounds through the
+dominating system — individual steps being provably-valid is NOT sufficient. Bui
+reaches 4.63 on rook with 6 types because those types are *specifically engineered*
+so the compounding CANCELS instead of compounds — choosing which cells to
+forbid/require and which cases go to convolutions vs linear terms. That
+hand-engineering, ported to king's diagonal geometry, is the real (unwalked) work.
 
 **Verdict:** the verification harness is banked and reusable (any proposed king
 system can be checked against ground truth in seconds). The crude `λ ≤ 12.2`
