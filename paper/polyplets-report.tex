@@ -257,6 +257,26 @@ accordingly estimate $\lambda\approx7.111$, and emphasise that this is a
 fit without error control---no differential-approximant analysis has been
 attempted---so it is an estimate, not a bound.
 
+\paragraph{A rigorous lower bound on $\lambda$.}
+The growth constant does admit a rigorous lower bound from a solvable
+subclass. Every \emph{directed} king animal---one with a bottom source from
+which every cell is reachable by steps in the upper half-plane cone
+$\{W,NW,N,NE,E\}$---is a polyplet, so its growth constant bounds $\lambda$ from
+below. Directed king animals are counted by Bacher~\cite{bacher} (OEIS
+A047781) through the algebraic generating function
+$\tfrac14\!\left((1+t)/\sqrt{1-6t+t^{2}}-1\right)$, whose dominant singularity
+at $t=3-2\sqrt2$ gives growth constant exactly $3+2\sqrt2\approx5.828$. Hence
+\[
+  \lambda \;\ge\; 3+2\sqrt2 \;\approx\; 5.828 .
+\]
+The bound is rigorous but far from tight: the directed count
+$d(23)=\num{14146164790774359}$ is only about $4.4\%$ of $a(23)$, a thin and
+structurally simple slice of all polyplets. Bacher's larger \emph{multi-directed}
+subclass, still contained in the polyplets, sharpens this to
+$\lambda\gtrsim6.475$ (Corollary~12 of~\cite{bacher}); that value rests on a
+numerical determination of the dominant singularity rather than an algebraic
+one, so $3+2\sqrt2$ remains the exact rigorous bound.
+
 \paragraph{One-sided companion.}
 The one-sided count (A030233) needs, besides the fixed count, only the
 $90^\circ$- and $180^\circ$-rotation fixed-point counts
@@ -1186,6 +1206,11 @@ G.~Barequet, G.~Rote, and M.~Shalah,
 \emph{$\lambda > 4$: an improved lower bound on the growth constant of polyominoes},
 Communications of the ACM \textbf{59}(7) (2016), 88--95.
 
+\bibitem{bacher}
+A.~Bacher,
+\emph{Directed and multi-directed animals in the king's lattice},
+arXiv:1301.1365 (2015).
+
 \bibitem{strang}
 G.~Strang,
 \emph{Maximum area with Minkowski measures of perimeter},
@@ -1196,7 +1221,7 @@ Proceedings of the Royal Society of Edinburgh Section A: Mathematics
 OEIS Foundation Inc.,
 \emph{The On-Line Encyclopedia of Integer Sequences} (2026),
 sequences A006770, A030222, A030233, A030234, A030235, A194596, A001168,
-A389193, A001844.
+A389193, A001844, A047781.
 \url{https://oeis.org}.
 
 \end{thebibliography}
