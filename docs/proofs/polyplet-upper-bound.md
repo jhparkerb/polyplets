@@ -65,17 +65,23 @@ superset of all polyplets. Refinements form a monotone decreasing sequence
 ### Stage 0 — crude counting (DONE, rigorous): λ ≤ 12.2
 The `C(5n,n)` argument above. No machinery. Bankable now.
 
-### Stage 1 — optimize the crude count (simple, valid, plateaus ~9–10)
-Tighten the "≤4 forward cells per inclusion." Track a SMALL local frontier state
-(the previous row's occupancy in a sliding window) in a transfer matrix, and
-count include/exclude decisions weighted by the ACTUAL forward-branching that the
-local state allows (many "ahead" king-neighbours are already on the frontier, so
-add 0 new). Dominant eigenvalue at spectral-radius-1 = ν₁.
-- **Valid because:** partial (windowed) frontier info can only OVER-estimate the
-  available extensions ⇒ over-counts the Redelmeier growth paths ⇒ ν₁ ≥ λ.
-- **Expected:** ν₁ ≈ 9–10 (perimeter is Θ(n), so this family plateaus there — it
-  cannot reach ~7.11). Effort: small; reuses nothing exotic.
-- **Lemma to pin:** "windowed branching ≥ true branching" (the validity core).
+### Stage 1 — optimize the crude count: NO simple valid improvement (checked 2026-07-11)
+Attempted: encode each animal by its Redelmeier growth TREE (each cell has ≤4
+forward king-neighbours ⇒ ≤4-ary tree, n nodes) ⇒ `λ ≤ 4⁴/3³ = 256/27 ≈ 9.48`.
+**INVALID.** Rook sanity check kills it: the same argument gives ordinary
+polyominoes `λ_poly ≤ 4`, but `λ_poly ≈ 4.06 > 4`. The growth tree is a SPANNING
+tree — it drops the animal's cycles, so animal→tree is NOT injective and
+`a(n) ≤ #trees` does not follow. Only the full decision SEQUENCE (records the
+exclude decisions on already-adjacent cells = the cycles) is injective, and that
+IS the `C(5n,n)` count → 12.2. So 12.2 is the clean crude ceiling; the tree
+shortcut is a mirage.
+
+The would-be fix — a transfer matrix on the generation QUEUE state — fails
+because that state is unbounded (queue length ∝ perimeter ∝ n). So there is NO
+simple finite-state valid bound between 12.2 and the real method. Stage 1
+collapses into Stage 2: the unbounded dimension is exactly what Klarner–Rivest's
+functional-equation trick exists to handle. (Lesson banked; sanity-check every
+candidate bound against the rook analog before quoting it.)
 
 ### Stage 2 — cross-section transfer matrix, unbounded height (tight, research)
 The Klarner–Rivest twig move: bound width-`w` classes with a transfer matrix on
