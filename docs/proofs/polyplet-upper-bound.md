@@ -83,23 +83,54 @@ collapses into Stage 2: the unbounded dimension is exactly what Klarner–Rivest
 functional-equation trick exists to handle. (Lesson banked; sanity-check every
 candidate bound against the rook analog before quoting it.)
 
-### Stage 2 — cross-section transfer matrix, unbounded height (tight, research)
-The Klarner–Rivest twig move: bound width-`w` classes with a transfer matrix on
-column cross-sections, RELAXING global connectivity to an over-count, and control
-the UNBOUNDED column height analytically (two-variable area/height GF, kernel
-method) rather than truncating — the truncation is exactly what made the strip
-`ν_H` invalid above. Widen `w` ⇒ ν_w ↘ λ.
-- **Reuses:** the `tma`/`strip_mu` king cross-section transfer kernels (frontier
-  connectivity partition); the upper-bound version swaps exact connectivity for a
-  bounded-rank relaxation and extracts the top eigenvalue.
-- **King-specific crux (the real work):** the diagonal column coupling and
-  corner seams in the relaxed connectivity, and the height-GF that keeps the
-  cross-section bounded without capping extent. This is the piece NOT yet pinned
-  — a valid finite construction for king adjacency has to be derived (port
-  Klarner–Rivest / Barequet–Shalah, whose published work skips the king lattice).
-- **Expected:** ν_w decreasing; realistically reaches ~7.5–8 at feasible widths
-  (like the μ_H lower side plateaus below λ). A genuine bracket
-  `6.5 ≲ λ ≲ 8`, tightening both ways with compute.
+### Method (corrected 2026-07-11 from the KR/Barequet-Shalah/Bui literature)
+NOT a column cross-section transfer matrix (my earlier guess). The real method is
+the **twig / BFS-spanning-tree encoding**:
+- Encode each animal by a canonical BFS from its corner cell → a unique sequence
+  of local "twigs" (the occupancy pattern of the newly-exposed neighbours at each
+  discovery step) from a finite alphabet. animal → sequence is INJECTIVE; not
+  every formal sequence is a valid animal ⇒ counting all formal sequences
+  over-counts. Unbounded size is handled by a geometric series (algebraic GF),
+  and the bound is the **diagonal of a 2-variable rational GF** `x/(1 − y·A(x))`
+  where `A(x)` sums the twig-alphabet weights.
+- **Eden level (= our Stage 0, now explained):** alphabet = all occupancy
+  patterns of the `K` newly-exposed neighbours ⇒ `A(x)=(1+x)^K`, diagonal
+  `~ C(Kn,n)` ⇒ `λ ≤ K^K/(K−1)^{K−1}`. Rook `K=3 → 6.75`; **king `K=5 → 12.2`**
+  — identical to our `C(5n,n)`. Good cross-check.
+
+### Stage 2 — tighten via context (the real work), TWO templates
+Both reduce the effective alphabet by exploiting that king diagonal coupling
+already DETERMINES some newly-exposed neighbours from earlier BFS steps, so fewer
+free bits per twig ⇒ smaller `A(x)` ⇒ smaller diagonal growth ⇒ tighter bound.
+
+- **(A) Klarner–Rivest "L-context" + cut hierarchy.** Reduces rook 6.75 → 4.83 →
+  (cut C_10) 4.65; Barequet–Shalah pushed to C_21 → 4.5252. Bound via the
+  discriminant/Sylvester determinant of the GF denominator. Heavy (millions–
+  trillions of twigs), computer search.
+- **(B) Bui's convolution-certificate method (RECOMMENDED port, arXiv:2510.06806).**
+  A small system of convolution GF inequalities over a handful of local
+  forbidden/free neighbourhood shapes ⇒ a single algebraic **kernel equation**;
+  the bound is proved by exhibiting a positive rational certificate satisfying the
+  inequality system — verifiable by ARITHMETIC, no residue calculus, no
+  high-degree root-finding. Polyiamond example: `z/x = 1+z+z²+z³` ⇒ root of
+  `2z³+z²−1` ⇒ `λ_T = 1+2z+3z² ≤ 3.6108`. Explicitly designed to be
+  lattice-agnostic ("applies elsewhere").
+
+**The load-bearing crux (NOT yet derived — do carefully, sanity-gate it):** the
+king-adjacency version of the "which neighbours are already determined at each BFS
+step" geometric lemma. King BFS discovers a cell whose already-visited context
+includes cells diagonal to *two* earlier cells — so the context window is a
+`3×3`-minus-centre-ish shape, not the rook L-tromino. Getting this case analysis
+right is the whole game (and where the Stage-1 tree bound went wrong). Derive the
+king twig alphabet / Bui neighbourhood shapes from it, write the king kernel
+equation, extract the bound. **Do NOT quote a number until it clears the rook
+sanity gate AND stays above our a(n) ratios (~6.9) and μ_13=6.306.**
+
+**Expected:** each context refinement drops the bound below 12.2 toward λ;
+realistically lands ~8–9 for modest context, tighter with the cut hierarchy /
+larger certificates (dalby-scale for the big ones). Gap vs the published
+polyhex/king absence: there is NO published king or polyhex upper bound, so any
+result here is novel.
 
 ### Stage 3 — the paper story
 `μ_H ≤ λ ≤ ν_w`, both from the SAME cross-section machinery (one relaxes toward
