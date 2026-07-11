@@ -75,6 +75,33 @@ def main():
     gate.check(summed == full,
           f"C split     {lattice} n<={maxn} S={S} K={K}: workers sum to full run")
 
+    # I. terminal pure-count path (L1). The aggregate counter takes the terminal
+    #    shortcut at size==maxn-1 (bs[maxn] += numUntried + DEG - sum(status));
+    #    the per-box counter does NOT (it needs each child's coordinates, so it
+    #    keeps the mark/push batch). They must still agree row-by-row -- a bug in
+    #    the pure-count arithmetic would diverge here. Then a --split whose
+    #    boundary sits AT maxn disables the shortcut (canCount = splitS<maxn is
+    #    false) and drives the per-cell split path through the terminal level; it
+    #    must still sum to the full run.
+    for lattice, depth in (("square8", 13), ("square4", 14), ("tri6", 13)):
+        agg = parse_counts(run(G2, lattice, depth))
+        pbox = parse_counts(run(G2, lattice, depth, "--per-box"))
+        rowsum = {}
+        for (n, w, h), c in pbox.items():
+            rowsum[(n,)] = rowsum.get((n,), 0) + c
+        gate.check(agg == rowsum,
+              f"I terminal  {lattice:8s} n<={depth}: aggregate(pure-count)==per-box rowsums")
+
+    mx = 9
+    full_m = parse_counts(run(G2, "square8", mx))
+    summed_m = {}
+    for idx in range(3):
+        part = parse_counts(run(G2, "square8", mx, "--split", mx, 3, idx))
+        for k, v in part.items():
+            summed_m[k] = summed_m.get(k, 0) + v
+    gate.check(summed_m == full_m,
+          f"I split@max square8 n<={mx} S={mx} K=3: boundary-at-maxn sums to full")
+
     # D. sanitizer build agrees and runs clean
     for lattice, depth in ASAN_CASES.items():
         opt = parse_counts(run(G2, lattice, depth))
