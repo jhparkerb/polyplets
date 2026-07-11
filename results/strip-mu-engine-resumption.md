@@ -13,7 +13,9 @@ connectivity transfer matrix M(x) has spectral radius 1. `mu_H < lambda` strictl
 1. **Rigorous lower bound on lambda**, improving with H. mu_13=6.306 (below the
    multi-directed 6.475). Extrapolated mu_16~6.50 BEATS 6.475; mu_18~6.59,
    mu_20~6.66 → best rigorous lower bound on lambda, ours, and certifiable
-   (Collatz-Wielandt, below).
+   (Collatz-Wielandt, below). Complementary rigorous UPPER bound lambda <= 9.3153
+   (exact certificate) brackets it: 5.828 <= lambda <= 9.3153. See
+   [../docs/proofs/polyplet-upper-bound.md](../docs/proofs/polyplet-upper-bound.md).
 2. **Independent lambda estimate**: finite-size extrapolation mu_H -> lambda
    corroborates the a(n)-ratio 7.111 from a different direction. Delivered at
    H<=13 (converging monotone to ~7.11); higher H sharpens it.

@@ -277,6 +277,29 @@ $\lambda\gtrsim6.475$ (Corollary~12 of~\cite{bacher}); that value rests on a
 numerical determination of the dominant singularity rather than an algebraic
 one, so $3+2\sqrt2$ remains the exact rigorous bound.
 
+\paragraph{A rigorous upper bound on $\lambda$.}
+No upper bound on $\lambda$ appears in the literature. We obtain one by a
+Bui-style finite-type convolution certificate~\cite{bui2025}: mark a cell of the
+animal, case on the occupancy of a single neighbour at a time, and record the
+resulting local patterns as a finite set of ``types'' whose generating functions
+satisfy a system of polynomial convolution inequalities
+$\varphi_T \le \varphi_{T'} + \varphi_{T'}\varphi_D$. A positive rational vector
+$u$ with $u_T \ge F_x(u)_T$ for every type---checked in exact rational
+arithmetic---proves the system bounded at $x$, hence $\lambda \le 1/x$. With a
+split window of radius $3$ (a $5930$-type system) the certificate $x=2147/20000$
+gives
+\[
+  \lambda \;\le\; \tfrac{20000}{2147} \;\approx\; 9.3153 ,
+\]
+verified with no floating point in the deductive chain. Together with the
+directed bound this brackets the growth constant two-sided,
+$3+2\sqrt2 \le \lambda \le 20000/2147$, i.e.\ $5.828 \le \lambda \le 9.315$,
+consistent with the numerical estimate $\lambda\approx7.111$. The gap reflects a
+structural limit: the convolution over-count grows with animal size (distant
+overlaps between the two factors), so finite-type methods of this class floor
+strictly above $\lambda$; the crude decision-tree bound $\lambda\le5^5/4^4\approx
+12.2$ is superseded.
+
 \paragraph{One-sided companion.}
 The one-sided count (A030233) needs, besides the fixed count, only the
 $90^\circ$- and $180^\circ$-rotation fixed-point counts
@@ -1210,6 +1233,12 @@ Communications of the ACM \textbf{59}(7) (2016), 88--95.
 A.~Bacher,
 \emph{Directed and multi-directed animals in the king's lattice},
 arXiv:1301.1365 (2015).
+
+\bibitem{bui2025}
+V.~Bui,
+\emph{A convolutional approach to bounding the number of polyominoes},
+arXiv:2511.00461 (2025); companion, \emph{A short proof of an upper bound on the
+growth constant of polyiamonds}, arXiv:2510.06806 (2025).
 
 \bibitem{strang}
 G.~Strang,

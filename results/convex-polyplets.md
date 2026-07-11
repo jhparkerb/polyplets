@@ -32,7 +32,9 @@ additive pieces below. The primary source is convex-mirage.
   Bender 2.30914 (convex polyominoes by area), Temperley column-convex 3.2056.
 - Framing as a λ lower bound: μ≈3.129 is a valid but WEAK lower bound on
   λ_polyplet (~7.11), far below the banked directed/multi-directed 5.828/6.475
-  (results/directed-king-animals.md). So convex is NOT useful as a bound.
+  (results/directed-king-animals.md) — which in turn sit inside the rigorous
+  two-sided bracket 5.828 ≤ λ ≤ 9.3153 (upper: ../docs/proofs/polyplet-upper-bound.md).
+  So convex is NOT useful as a bound.
 
 ## Status
 

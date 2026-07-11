@@ -49,9 +49,11 @@ this factor. For polyominoes λ ≈ 4.0625696 (rigorously only 4.0025 < λ <
 4.5252); for polyhexes τ ≈ 5.1831478; for polyplets λ ≈ 7.11 (estimate, no
 published value; Domb–Sykes/ratio fit on the 36 known terms plus an
 independent μ_H strip-extrapolation, both converging on ~7.11). Rigorously
-only λ ≥ 6.475 known (multi-directed king animals, Bacher; and the exact
-algebraic λ ≥ 3+2√2 ≈ 5.828 from directed king animals) — **no upper bound**
-for polyplets, ours or published.
+bracketed **5.828 ≤ λ ≤ 9.3153**: lower from king animals (exact algebraic
+3+2√2 ≈ 5.828 directed, and 6.475 multi-directed, Bacher); upper 9.3153 from a
+Bui-style finite-type convolution certificate, machine-verified in exact rational
+arithmetic (the first polyplet upper bound, ours — none published). Derivation:
+[proofs/polyplet-upper-bound.md](proofs/polyplet-upper-bound.md).
 
 **Mason nomenclature (M90, M90V, M45, R180C, R180M, R180V, R90C, R90V)** —
 John Mason's labels for symmetry *placements*: the symmetry element (Mirror

@@ -27,6 +27,11 @@ around H~16** and reaches **~6.6 by H~18-20** — which would be the **best rigo
 lower bound on lambda we have**, beating both Bacher bounds (directed 5.828,
 multi-directed 6.475), our own, and improvable with H.
 
+> These `mu_H` bounds squeeze lambda from BELOW. The complementary rigorous UPPER
+> bound is **lambda <= 9.3153** (Bui-style finite-type convolution certificate,
+> exact rational arithmetic), giving the two-sided bracket **5.828 <= lambda <=
+> 9.3153**. Derivation: [../docs/proofs/polyplet-upper-bound.md](../docs/proofs/polyplet-upper-bound.md).
+
    Current ladder tops at mu_11 = 6.1158 (still below 6.475 — need higher H to win).
 
 **2. Independent lambda estimate (delivered, H<=13).** Sliding 3-point power-law

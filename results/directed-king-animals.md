@@ -37,11 +37,16 @@ Directed ⊆ multi-directed ⊆ connected polyplets gives `μ_dir ≤ μ_multi �
 
 | bound | value | form | note |
 |---|---|---|---|
-| directed | 5.8284 | `3+2√2` (exact algebraic) | fully rigorous |
-| **multi-directed** | **6.4752** | `1/ρ_M`, `B(ρ_M)=1` | tighter, but numerical |
+| directed (lower) | 5.8284 | `3+2√2` (exact algebraic) | fully rigorous |
+| **multi-directed (lower)** | **6.4752** | `1/ρ_M`, `B(ρ_M)=1` | tighter, but numerical |
 | polyplet λ | ~7.11 | unknown | heuristic only |
+| **Bui certificate (upper)** | **9.3153** | `20000/2147`, exact cert | fully rigorous |
 
-These are the first *rigorous* statements we have about `λ_polyplet`.
+These are the first *rigorous* statements we have about `λ_polyplet`. Together with
+the **upper** bound they bracket it two-sided: **`5.8284 ≤ λ ≤ 9.3153`**, both sides
+rigorous (the upper side machine-verified in exact rational arithmetic). The upper
+bound is derived by a Bui-style finite-type convolution certificate — see
+[../docs/proofs/polyplet-upper-bound.md](../docs/proofs/polyplet-upper-bound.md).
 
 ## Trilogy (context)
 
