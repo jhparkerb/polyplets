@@ -132,6 +132,32 @@ larger certificates (dalby-scale for the big ones). Gap vs the published
 polyhex/king absence: there is NO published king or polyhex upper bound, so any
 result here is novel.
 
+### Machinery status (2026-07-11) — VALIDATED, king derivation is the only gap
+The extraction pipeline is built and validated on two lattices:
+- `experiments/kernel_bound.py`, `kernel_system.py` — single-kernel & full-system
+  singularity extraction; reproduce polyiamond `λ_T ≤ 3.6108`.
+- `experiments/certificate_bound.py` — Bui's monotone-iteration finder AND exact
+  rational certificate checker; reproduce the rook 6-type `λ₂ ≤ 4.63` (finder
+  4.6287; Bui's certificate x=100/463 verified exactly). **This is the tool to
+  reuse for king** — swap in the king twig system, run the finder, then harden to
+  an exact rational certificate.
+
+**The ONE remaining step — the king twig system** (careful; no published number
+to check against, so validity is on us):
+1. King BFS closure lemma: which of the 8 neighbours are already-determined at a
+   discovery step (rook's is "left + 3-below" = the L; king's is larger, includes
+   diagonals shared by two earlier cells). → the king forbidden-shape alphabet.
+2. King neighbourhood types (expect MORE than 6; diagonal occupancy doubles local
+   state) and their convolution inequalities — the cut/allocate step MUST stay an
+   over-count under corner (diagonal) seams, else it under-counts and the bound is
+   INVALID. Expect triple convolutions `Σ_{i+j+k}` (Bui's §4 already needs them).
+3. Feed the system to `certificate_bound.py`; SANITY-GATE: the result must be
+   `> a(n) ratios (~6.9)` and `> μ_13 = 6.306`, and an analogous rook re-derivation
+   must reproduce a TRUE polyomino bound (≥ 4.06). Only then quote a number.
+
+Rook 6-type system (the literal port template) is in
+`experiments/certificate_bound.py::rook_step`.
+
 ### Stage 3 — the paper story
 `μ_H ≤ λ ≤ ν_w`, both from the SAME cross-section machinery (one relaxes toward
 connectivity from a subset, one from a superset). First rigorous two-sided
