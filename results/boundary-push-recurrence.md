@@ -16,15 +16,15 @@ representation.
 
 Root is 3 (all multiplicity) → `poly(n)·3^n`.
 
-**CORRECTION 2026-07-10 (experiments/Pk_explicit.py, exact fit):** the eventual
-closed form is `T(n,n−k) = P_k(n)·3^n` with **degree(P_k) = k, order k+1**, onset
-`n = k+2` — NOT degree 2k. Verified trivially for k=1: `T(n,n−1)/3^n` has constant
-first difference `25/81`, i.e. exactly linear (`T(n,n−1)=5(5n−9)·3^{n−4}`, n≥3).
-The `2k+1` above is the minimal recurrence fitting the FULL diagonal **including
-the pre-onset transient point** at `n=k+1` (the `H=1` bar, which disobeys the
-closed form); absorbing that transient inflates the order, and the original note
-mis-read degree `2k` off it. Real degrees k=1..5: **1,2,3,4,5**. Leading coeff
-~`5^{2k}`, denom (Newton basis) `3^{3k+1}` (results/production-matrix-probe.md).
+**CORRECTION 2026-07-10:** the closed form is `T(n,n−k) = P_k(n)·3^{n-1-3k}` with
+**degree(P_k) = k** (NOT 2k), valid in the bulk **`n ≥ 2k+1`** (boundary terms
+below), leading coeff `25^k/k!`. This was ALREADY banked and (k≤2) PROVEN in
+`docs/proofs/T-n-nm2-and-general.md` and `results/k8-pinning.md`; boundary-push
+was the lone stale doc claiming degree `2k`. The `2k+1` in the table above is the
+minimal C-finite recurrence order fitting the full diagonal including its boundary
+region — from which the original note mis-inferred degree `2k`; the bulk
+polynomial degree is `k`. Real degrees k=1..8: 1..8. (An earlier version of this
+correction wrongly gave onset `k+2` and normalization `3^n`; both fixed here.)
 
 **Row slicing `T(n, H)` vs n — order grows fast; determined cases:**
 
@@ -45,12 +45,13 @@ under-determined beyond H3).
    √λ diagonal sweep + closed-form P_k work, and says no simple re-slicing beats
    it: the diagonal aligns with the 3^n geometric structure, rows do not.
 2. **The closed-form frontier is a linear treadmill.** Extending the closed-form
-   region by one diagonal (k→k+1) costs **1 more coefficient** (degree k→k+1, per
-   the 2026-07-10 correction above — NOT 2). Closed forms still shave only a
-   fixed-width slab off the top and do **not** collapse the exponential bulk, but
-   the per-diagonal cost is half what this note originally claimed — worth
-   re-checking against the a26–a30 plan's data economics (task: does that plan
-   assume degree 2k and thus over-provision witnesses?).
+   region by one diagonal (k→k+1) costs one more coefficient (degree k→k+1).
+   Closed forms shave only a fixed-width slab off the top and do **not** collapse
+   the exponential bulk. The a26–a30 economics are NOT affected by the old
+   degree-2k error: that machinery (`results/k8-pinning.md`) already uses degree
+   `k` correctly, and even fixes the known leading coeff `25^k/k!` to save one
+   witness — so P_k pins one computed term earlier (e.g. P_8 pins the instant
+   a(24) lands, short by exactly one point without the trick).
 3. **Therefore the real lever is orthogonal to slicing.** The row-direction
    complexity that grows (probably) exponentially in H *is* the frontier size.
    Attacking it needs a smaller *representation of the frontier itself*, not a

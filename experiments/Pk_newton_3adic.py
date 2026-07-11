@@ -23,7 +23,7 @@ def v3(x):
 print(" k | Newton-basis (Delta^j P_k) common denom | v3 | pure 3-power?")
 val = {}
 for k in range(0, 9):
-    # P_k(n) = T(n,n-k)/3^n on the polynomial regime n >= k+2 (H=n-k >= 2)
+    # P_k(n) = T(n,n-k)/3^n on the polynomial regime n >= 2k+1 (bulk; boundary terms below)
     n0 = k + 2
     need = 2 * k + 1
     ns = [n0 + i for i in range(need)]

@@ -46,14 +46,13 @@ numerator has `v₃=1` (`20688=3·6896`, `36500568=3·12166856`). `3^{3k+2}` is 
 clean invariant; the reduced denominators understate the regularity.
 
 NB: these `c_k` are the *production-matrix* band constants, NOT the a26–a30
-diagonal polynomials `P_k` (`T(n,n−k)=poly₂ₖ(n)·3ⁿ`). **Checked**
+diagonal polynomials `P_k` (`T(n,n−k)=poly_k(n)·3ⁿ (deg k, denom 3^{3k+1})`). **Checked**
 (`experiments/Pk_denominator_check.py`): `P_k` denominators do NOT follow
 `3^{3k+2}` and from k=2 up are **not even pure powers of 3** (they carry other
-primes — the factorial-type denominators of a degree-`2k` fit). `P_k` common
-denoms: `3¹, 3⁴, 3⁷·2, …`. So `3^{3k+2}` is a fact about `P`'s band only; the
-diagonal closed forms live on their own mixed denominators. (The fit also
-re-confirms `P_k` is exactly degree `2k`: matches all data past the single
-`n=k+1` boundary transient.)
+primes — the factorial-type denominators of a monomial-basis polynomial fit).
+`P_k` common denoms: `3¹, 3⁴, 3⁷·2, …`. So `3^{3k+2}` is a fact about `P`'s band
+only; the diagonal closed forms live on their own mixed denominators. (`P_k` is
+degree `k`, valid in the bulk `n≥2k+1` — proven, `docs/proofs/T-n-nm2-and-general.md`.)
 
 ## Diagonal vs band: shared 3-adic slope (the intrinsic invariant)
 
@@ -82,7 +81,7 @@ So the two objects share a 3-adic slope and differ by one tripling:
 
 `P` separates cleanly into the two halves we already knew:
 
-- **Eventually-constant band = the diagonal closed forms** (`T(n,n−k)=poly₂ₖ(n)·3ⁿ`).
+- **Eventually-constant band = the diagonal closed forms** (`T(n,n−k)=poly_k(n)·3ⁿ (deg k, denom 3^{3k+1})`).
   The superdiagonal `3` is the king-chain identity `T(n+1,n+1)=3·T(n,n)`; the band
   constants are the settled bulk's production rule = the diagonals we already
   exploit (a26–a30 plan). Surviving, usable structure.

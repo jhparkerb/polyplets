@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Explicit diagonal polynomials P_k and the anti-diagonal sequences.
-T(n,n-k) = P_k(n)*3^n, P_k degree 2k. Prints:
+T(n,n-k) = P_k(n)*3^n, P_k degree k. Prints:
   (a) the anti-diagonal integer sequence T(n,n-k) for OEIS lookup,
   (b) P_k(n) in monomial form (fractions),
   (c) the Newton-basis integer numerators  Delta^j P_k(n0) * 3^{3k+1}."""

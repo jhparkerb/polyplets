@@ -86,16 +86,23 @@ Confirmed NOT in OEIS (triangle + interior columns c=2,c=3; sonnet 2026-07-10).
 
 ## Candidate C (optional, lower priority): convex polyplets
 
+**PRIMARY SOURCE: `docs/proofs/convex-mirage.md`** (prior, deeper — has 38 terms,
+growth μ≈3.129, and the non-D-finite-by-area finding). Use its data, not the 10
+terms below.
+
 **Definition.** Number of fixed **HV-convex** king-connected animals (every row
 and every column a contiguous run; king-connected). Strictly larger than convex
 polyominoes (diagonal joins allowed, e.g. `{(0,0),(1,1)}`).
 
-**Data (n=1..10):** `1, 4, 16, 61, 221, 766, 2566, 8390, 26982, 85834`.
+**Data (38 terms in convex-mirage; first 10):** `1, 4, 16, 61, 221, 766, 2566,
+8390, 26982, 85834, 271174, 853111, …`.
 
 **Keywords:** nonn.  **Offset:** 1.
 **Cross-refs:** A006770 (superset), A067675 (convex polyominoes, subset).
-**Regenerate:** `experiments/convex_polyplets.py` (reproduces A006770 to n=10).
-Growth constant ~3.0-3.1 (weak λ lower bound). Confirmed NOT in OEIS.
+**Comment for submission:** non-D-finite by area (Convex Mirage); growth ~3.129.
+**Regenerate:** convex-mirage's row-transfer-matrix (reaches 38); the brute
+`experiments/convex_polyplets.py` here only cross-checks the first ~10.
+Confirmed NOT in OEIS.
 
 ---
 
