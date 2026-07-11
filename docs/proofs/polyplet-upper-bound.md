@@ -201,7 +201,23 @@ neighbours go to the c-side, so they're empty in the `d`-piece.
   |---|---|---|
   | 1 | 21 | 10.354 |
   | 2 | 185 | 9.402 |
-  | 3 | … | (sweeping) |
+  | 3 | 5930 | 9.306 |
+
+  Window lever SATURATES at ~9.3 (RD=2→3 moved only 0.096). Best banked: **λ ≤ 9.31**.
+
+  Both levers of this decomposition are now measured and exhausted:
+  - **window (RD):** saturates ~9.3.
+  - **cell-choice** (which free cell `d` to case on): NO EFFECT. ll / hr / diag / orth
+    orderings all give the identical 185-type closure and identical 9.4022 at RD=2 —
+    the closure saturates to the same set regardless of casing order, and the bound is a
+    spectral property of the closed system. Not a lever here (unlike in Bui's richer
+    multi-type systems). See `DORDER=` env in experiments/king_bui.py.
+
+  λ ≤ 9.31 is the floor of this single-cell-split decomposition. Going lower (toward the
+  polyomino-method-analogous ~8) would require Bui's full multi-type-with-certificate
+  apparatus — substantially more machinery, diminishing returns. The 8-neighbour
+  connectivity makes the convolution over-count looser than the 4-neighbour rook case
+  (there the same method leaves ~14%: 4.63 vs true 4.06; here ~31%: 9.31 vs true 7.11).
 
 - So the earlier "can't beat 12.2 generically" was right about the *generic*
   route, but the Bui-faithful route (correct case-routing + split types) DOES beat
