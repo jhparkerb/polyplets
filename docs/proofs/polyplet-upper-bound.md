@@ -179,15 +179,34 @@ with more context:**
 | generic twig, R=1 + required-tracking | 28 | 13.00 |
 | generic twig, R=2 | 8740 | 12.5382 |
 
-R=2 closes fast (8740 types, ~1s; `experiments/king_bound_fast.py`) — the earlier
-timeout was the O(types·polyplets) verification, not the closure. The R=1→R=2
-trend is flat-to-worse, so window size is provably NOT the lever; R=3 is pointless.
-A *generic* valid decomposition over-counts too much and it compounds through the
-dominating system — individual steps being provably-valid is NOT sufficient. Bui
-reaches 4.63 on rook with 6 types because those types are *specifically engineered*
-so the compounding CANCELS instead of compounds — choosing which cells to
-forbid/require and which cases go to convolutions vs linear terms. That
-hand-engineering, ported to king's diagonal geometry, is the real (unwalked) work.
+R=2 closes fast (8740 types, ~1s; `experiments/king_bound_fast.py`); window size
+is NOT the lever for the *generic* decomposition. The looseness was the
+**case-routing**: routing multi-neighbour cases as lossy linear re-marks instead
+of convolutions.
+
+### BREAKTHROUGH (2026-07-11): Bui mechanism ported → λ ≤ 10.35, verified
+`experiments/king_bui.py`. Case ONE free cell `d` at a time:
+`φ_T = φ_{T'} + φ_{T'}·φ_D` where `T' = T+{d forbidden}` and `D` = `d`'s split-off
+type. The `d`-empty branch is an EXACT partition (`{type-T, d empty} = type-T'`);
+the `d`-occupied branch is a valid split over-count. The key fix over the generic
+version: (1) multi-neighbour cases stay CONVOLUTIONS (preserve both pieces), not
+lossy re-marks; (2) the split-off type `D` knows that ALL of `c`'s other
+neighbours go to the c-side, so they're empty in the `d`-piece.
+- All recurrences verified valid over-counts against brute force (RD<=2); larger
+  RD valid by construction (more genuinely-empty cells in the split type = tighter,
+  still an over-count).
+- **Bound tightens with the split-window RD:**
+
+  | RD (split window) | types | λ ≤ |
+  |---|---|---|
+  | 1 | 21 | 10.354 |
+  | 2 | 185 | 9.402 |
+  | 3 | … | (sweeping) |
+
+- So the earlier "can't beat 12.2 generically" was right about the *generic*
+  route, but the Bui-faithful route (correct case-routing + split types) DOES beat
+  it and keeps improving with context. Target ~7.11 from above; realistic landing
+  ~8 for feasible RD. First-ever polyplet upper bound below the crude bound.
 
 **Verdict:** the verification harness is banked and reusable (any proposed king
 system can be checked against ground truth in seconds). The crude `λ ≤ 12.2`
