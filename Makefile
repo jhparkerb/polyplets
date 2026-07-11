@@ -16,6 +16,16 @@ CXXFLAGS += -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
 # apply it only when the compiler is gcc; empty for clang.
 RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),,-Wno-error=restrict)
 
+# The Redelmeier kernel (build/g2) is measurably faster built with clang on
+# aarch64: ~9% over gcc-15 on Neoverse-N1 (measured, results/terminal-velocity.md),
+# and gcc PGO / -mcpu gave nothing. Prefer clang for the OPTIMIZED g2 only, per
+# box (clang++-19 on dalby, clang++ on mac/gympie), falling back to $(CXX) where
+# clang is absent (e.g. ayr uses g++). g2_asan stays on $(CXX): keeping the two
+# builds on different compilers turns gate-g2 check D into a two-compiler count
+# cross-check for free.
+G2CXX := $(shell command -v clang++-19 2>/dev/null || command -v clang++ 2>/dev/null || echo $(CXX))
+G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),,-Wno-error=restrict)
+
 .PHONY: gates gate-g1 gate-g2 gate-euler clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
@@ -46,7 +56,7 @@ build:
 # positive in <bits/char_traits.h> (bogus -Wrestrict on std::string ops; clang and
 # gcc-15 don't trip it). Scoped here so -Werror stays strict everywhere else.
 build/g2: cpp/g2_redelmeier.cpp | build
-	$(CXX) $(CXXFLAGS) $(RESTRICT_FLAG) -O3 $< -o $@
+	$(G2CXX) $(CXXFLAGS) $(G2_RESTRICT) -O3 $< -o $@
 
 # fixed-height transfer matrix over Z/pZ, for generating-function recovery
 build/gf_modp: cpp/gf_modp.cpp | build
