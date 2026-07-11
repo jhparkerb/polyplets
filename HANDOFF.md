@@ -21,10 +21,11 @@ history — not repeated here. Read this file, then `MEMORY.md`'s index.
   pure-count (85% of nodes → branchless load+sum), L3 compile-time neighbour offsets,
   L4 u16 untried, clang++ build (Makefile G2CXX); L2/gcc-PGO/-mcpu measured
   neutral-or-worse, dropped. Ledger `results/terminal-velocity.md`.
-  - **Run:** `scripts/g2_fleet_launch.sh 22 12 24000` — dalby [0,12720)/80w,
-    ayr [12720,19200)/32w, gympie [19200,24000)/10w, each in tmux window `0:g2_a22`,
-    resumable, `runs/g2row_N22/`. a(22) subsumes a(21) (inner row 21), so this one
-    run banks BOTH.
+  - **Run:** tmux window `0:g2_a22` per box, resumable, `runs/g2row_N22/`. a(22)
+    subsumes a(21) (inner row 21), so this one run banks BOTH. **REBALANCED 16:40**
+    (single-core bench over-predicted all-core; ayr 2990WX split-NUMA is slow all-core
+    — see [[fleet-benchmark-allcore]]): now **dalby [0,14300)/80w, ayr [14300,19460)/32w,
+    gympie [19460,24000)/10w**, all finish ~129h ≈ **5.4 days (~2026-07-17)**.
   - **Validation (complete):** gate-g2 green incl. new pure-count check I; row-18 AND
     row-19 fleet runs match banked exactly across all 3 ISAs (pure-count validated at
     n=18,19; the path is n-independent). Fleet per-core 1.0/1.28/3.0 (dalby/ayr/gympie).

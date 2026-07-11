@@ -105,10 +105,25 @@ Shard allocation proportional to dalby-core-equiv: **dalby 53% / ayr 27% / gympi
 `scripts/g2_fleet_launch.sh 22 12 24000`: dalby [0,12720)/80w, ayr [12720,19200)/32w,
 gympie [19200,24000)/10w, tmux `0:g2_a22`, resumable, `runs/g2row_N22/`. K=24000 (finer
 than a(21)'s 2400 for a multi-day run: shard ~34min/dalby-core, tail straggle ~0.6%,
-redundant top-tree walk ~0.09%). Confirmed all 3 drivers alive + computing at launch.
-**ETA ~3.9 days (~2026-07-15).** Acceptance: rows 1..22 vs banked, **a(21)=6954084405510437,
+redundant top-tree walk ~0.09%). Acceptance: rows 1..22 vs banked, **a(21)=6954084405510437,
 a(22)=47255332844367680**. Both already TM-known; this is the independent Redelmeier
 two-algorithm confirmation, moving that frontier 20 → **22**.
+
+### Rebalanced 2026-07-11 16:40 (~2.9h in)
+**The 3.9-day estimate was wrong** — it extrapolated single-core N=15 benchmarks to
+all-core, which over-predicts throughput (shared memory bandwidth under all-core load).
+Measured all-core per-core rates: dalby 1.386 shards/h/core (holds — server Neoverse),
+**ayr 1.275 → all-core 0.92× dalby** (AMD Threadripper 2990WX: split-NUMA, half its
+cores reach memory over Infinity Fabric; single-core bench said 1.28×), gympie 2.62×
+(was 3.0×). Aggregate 188 shards/h → balanced floor ~5.3d, not 3.9d. Original
+53/27/20 split made ayr the long pole (~6.6d) with dalby idle ~1.8d at the end.
+**Fix:** re-partitioned into balanced contiguous ranges equalizing finish time
+(accounting for the ~242 shards ayr/gympie lose from their current position, redone
+by the box that now owns them — ~1% waste): **dalby [0,14300), ayr [14300,19460),
+gympie [19460,24000)**. All finish ~129h ≈ **5.4 days** (~2026-07-17). No progress
+lost (resumed from .done; ~120 in-flight shards redone). No contention on any box
+(each cleanly at full load). **Lesson:** benchmark fleet boxes under *all-core* load,
+not single-core, before allocating shares.
 
 ## a(21) launch runbook (fleet, tmux — for P4, on jasonp's go)
 
