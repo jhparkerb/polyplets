@@ -530,13 +530,20 @@ struct Counter {
           for (int k = 0; k < DEG; ++k) stale += st[j + DJ[k]];
           bs[maxn] += static_cast<u64>(numUntried + DEG - stale);
         } else {
+        // Branchless (L2): store each neighbour slot unconditionally, claim it
+        // only if the cell was fresh. status[] is 0/1 so `1 - st[j2]` is the
+        // claim bit; re-marking an already-1 cell is a no-op, and the unmark walk
+        // below touches only claimed slots [numUntried,newCount). The dead store
+        // into untried[newCount] for a stale cell needs one slot of slack past the
+        // claimed region -- kMaxUntried carries +8.
+        static_assert(kMaxUntried >= kMaxN * 8 + 8, "branchless probe slack");
         int newCount = numUntried;
         for (int k = 0; k < DEG; ++k) {
           const int j2 = j + DJ[k];
-          if (!st[j2]) {
-            st[j2] = 1;
-            untried[newCount++] = j2;
-          }
+          const int fresh = 1 - st[j2];
+          untried[newCount] = j2;
+          newCount += fresh;
+          st[j2] = 1;
         }
         // Terminal batch: when the children are the last (size==maxn) level, each of
         // untried[0..newCount) placed as the last cell is a distinct maxn-cell animal.
