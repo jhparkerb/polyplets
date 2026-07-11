@@ -98,7 +98,17 @@ Shard allocation proportional to dalby-core-equiv: **dalby 53% / ayr 27% / gympi
   stale`, u64, no overflow until 9.2e18 ≫ a(21)=7e15) is n-independent, so these
   two scale points fully cover the identical path at n=21. A dedicated row-20
   re-run is therefore optional (a third point, no new coverage).
-- **Row-19 fleet:** launched in tmux windows on all 3 boxes (see runbook below).
+- **Row-19 fleet: PASS.** All 19 rows match banked (a(19)=151609203011580), gathered
+  via `g2_fleet_gather.sh` (tar-per-box), 360/360 shards. Second scale point green.
+
+## a(22) LAUNCHED 2026-07-11 13:41 (jasonp's go; supersedes a(21) — a(22) subsumes it)
+`scripts/g2_fleet_launch.sh 22 12 24000`: dalby [0,12720)/80w, ayr [12720,19200)/32w,
+gympie [19200,24000)/10w, tmux `0:g2_a22`, resumable, `runs/g2row_N22/`. K=24000 (finer
+than a(21)'s 2400 for a multi-day run: shard ~34min/dalby-core, tail straggle ~0.6%,
+redundant top-tree walk ~0.09%). Confirmed all 3 drivers alive + computing at launch.
+**ETA ~3.9 days (~2026-07-15).** Acceptance: rows 1..22 vs banked, **a(21)=6954084405510437,
+a(22)=47255332844367680**. Both already TM-known; this is the independent Redelmeier
+two-algorithm confirmation, moving that frontier 20 → **22**.
 
 ## a(21) launch runbook (fleet, tmux — for P4, on jasonp's go)
 
