@@ -158,6 +158,33 @@ to check against, so validity is on us):
 Rook 6-type system (the literal port template) is in
 `experiments/certificate_bound.py::rook_step`.
 
+### King derivation attempt (2026-07-11) — machinery works, generic decomposition too loose
+Built and VERIFIED against brute force (`experiments/king_types.py`,
+`king_derive.py`, `king_bound.py`, `king_bound2.py`):
+- Enumerator reproduces A006770; base fact `A(n) ≤ G8(n) ≤ n·A(n)` holds
+  (`G8` = marked-cell type, forbid {W,SW,S,SE}), so `λ = growth(G8)`.
+- The G8 corner cell decomposes into **12 leaf cases + 3 cut cases** (the cuts are
+  exactly the NW-stranding shapes, verified — see the cut/leaf SVGs). Every leaf
+  reduction (`case_count(n) ≤ reduced_type(n−1)`) and every cut convolution
+  (`cut(n) ≤ Σ piece1(i)·piece2(j)`) is a numerically-verified valid over-count.
+- Auto-closure: 24 types (R=1) / 28 (with required-cell tracking). All recurrences
+  verified valid over-counts.
+
+**BUT the bound is ~12.5–13 — WORSE than the crude 12.2.** A *generic* valid
+decomposition (case-on-all-subsets, re-mark lowest-left, small window) over-counts
+too much and the looseness compounds through the dominating system. Individual
+steps being provably-valid is NOT sufficient. Bui reaches 4.63 on rook with 6
+types because those types are *specifically engineered* so the compounding is
+controlled — that engineering (which cells to forbid/require in each reduced type,
+which cases to route through convolutions vs linear terms) is the real content,
+and porting it to king's diagonal geometry is genuine research, not mechanical.
+
+**Verdict:** the verification harness is banked and reusable (any proposed king
+system can be checked against ground truth in seconds). The crude `λ ≤ 12.2`
+stands as the first upper bound. A *tight* bound (below 12.2, toward ~8–9) requires
+hand-engineering the king analog of Bui's 6-type system — a real derivation, not
+yet done. This is where the upper-bound effort actually is.
+
 ### Stage 3 — the paper story
 `μ_H ≤ λ ≤ ν_w`, both from the SAME cross-section machinery (one relaxes toward
 connectivity from a subset, one from a superset). First rigorous two-sided
