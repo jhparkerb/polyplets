@@ -5,7 +5,24 @@ full apparatus of Bui's papers (engineered multi-type inequality systems + exact
 certificates). Target λ ≤ 8.5; stretch λ ≤ 8.1 (the rook-gap analogy: Bui's method leaves
 ~14% on polyominoes, 4.63 vs 4.06; matching that here gives 7.11 × 1.14 ≈ 8.1).
 
-**Status: NOT STARTED — plan only.** Written 2026-07-11 for a later Opus session.
+**Status: EXECUTED 2026-07-11 through Phase 2. Phases 1–2 done; Phase 3 NOT pursued
+(measured negative — see verdict).**
+- **Phase 1 DONE:** exact rational certificate, λ ≤ 9.3153 proved in Fraction arithmetic
+  (`experiments/king_certificate.py`, RD=3, x=2147/20000, 5930 rationals). The banked
+  bound is now machine-checkable, no floats in the chain.
+- **Phase 2 DONE:** slack audit (`experiments/king_slack.py`). Verdict: the over-count is
+  diffuse (max 1.22, median 1.14, none >1.5), COMPOUNDING (+0.022/term — grows with n, so
+  non-local), and the anchor G8 is asymptotically clean (growth=λ). The growth-with-n is
+  the distant-overlap / connectivity-wall signature: finite-type convolution methods floor
+  ABOVE λ and cannot reach it. Lever 4 (per-type tuning) dead (no concentrated target);
+  lever 1 (multi-cell casing) only relocates the over-count (= king_derive, already ≈12.5).
+- **Phase 3 NOT pursued:** required-cell types (lever 2) hit the same wall; best case ~8.1
+  (polyomino method's gap), and king slack grows where rook's saturates, so 8-connectivity
+  is worse — 8.1 is optimistic. Multi-session + papers + invalid-bound risk for ≤1 term,
+  never λ. **Banked λ ≤ 9.3153 (exact) is the result.** Detail: docs/proofs/polyplet-upper-bound.md.
+
+--- ORIGINAL PLAN BELOW (kept for the record) ---
+
 Estimated effort: 2–4 focused sessions. Phase 1 is cheap and independently valuable;
 do it even if the rest is abandoned.
 

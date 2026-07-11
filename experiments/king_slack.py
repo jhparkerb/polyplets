@@ -2,13 +2,19 @@
 """Phase 2 of Certificate Squeeze: slack audit. Locate where the ~31% over-count lives
 before engineering tighter types (measure, don't reason).
 
-For each type T in the RD=2 system, slack(T,n) = rhs(T,n) / true_count(T,n) at n=8,9.
-rhs is the over-counting recurrence used in king_bui.py. slack=1 means that recurrence
-is exact; slack>1 is the looseness that inflates the bound. Also reports the base-fact
-slack G8(n)/A(n) (we bound G8; truth is A <= G8 <= n*A).
+For each type T in the RD=2 system, slack(T,n) = rhs(T,n) / true_count(T,n). slack=1
+means that recurrence is exact; slack>1 is the looseness that inflates the bound. Also
+reports the base-fact slack G8(n)/A(n) (we bound G8; truth is A <= G8 <= n*A).
 
-Usage: python3 -m experiments.king_slack
+Single-pass counting: each type's forbidden set is a set of offsets; a marked cell (P,c)
+counts for type T iff every offset in T is EMPTY at c. We compute, in one sweep over all
+(P,c), the empty-offset bitmask over the union of all offsets used, then add to every type
+whose mask is a subset. Types are grouped by which offsets they use so the per-(P,c) work
+is small.
+
+Usage: python3 -m experiments.king_slack [NMAX]
 """
+import sys, statistics as st
 from experiments.king_types import all_polyplets, type_count, OFF
 
 KING8 = [(1,0),(-1,0),(0,1),(0,-1),(1,1),(-1,1),(1,-1),(-1,-1)]
@@ -32,43 +38,59 @@ while q:
         if X not in seen: seen.add(X); q.append(X)
 print(f"RD={RD} system: {len(recur)} types")
 
-NMAX = 9
+NMAX = int(sys.argv[1]) if len(sys.argv) > 1 else 8
 lv = all_polyplets(NMAX)
-tc = {T: type_count(lv, forbid=tuple(T)) for T in recur}
+
+# ---- single-pass type counting ----
+# bit index for every offset that appears in any type
+OFFS = sorted(set().union(*[set(T) for T in recur]))
+bit = {o:i for i,o in enumerate(OFFS)}
+types = list(recur)
+tmask = {T: sum(1<<bit[o] for o in T) for T in types}
+tc = {T: {n:0 for n in lv} for T in types}
+# group types by the offsets they touch so we test few candidates per (P,c)
+for n, polys in lv.items():
+    acc = tc  # local ref
+    for P in polys:
+        cells = P
+        for (cx,cy) in cells:
+            # empty-offset mask: bit set if that offset is EMPTY around c
+            em = 0
+            for o,i in bit.items():
+                if (cx+o[0], cy+o[1]) not in cells: em |= 1<<i
+            for T in types:
+                if tmask[T] & em == tmask[T]:      # T subset of empty  => counts
+                    acc[T][n] += 1
+
 def rhs(T, n):
     r = recur[T]
     if r is None: return 1 if n == 1 else 0
     Tp, D = r
     return tc[Tp].get(n,0) + sum(tc[Tp].get(i,0)*tc[D].get(n-i,0) for i in range(1,n))
 
-# per-type slack at n=8,9
+nb, na = NMAX-1, NMAX       # slack reported at the top two sizes
 rows = []
 for T in recur:
     if recur[T] is None: continue
-    s8 = rhs(T,8)/tc[T][8] if tc[T][8] else float('nan')
-    s9 = rhs(T,9)/tc[T][9] if tc[T][9] else float('nan')
-    rows.append((s9, s8, len(T), T))
+    sa = rhs(T,na)/tc[T][na] if tc[T][na] else float('nan')
+    sb = rhs(T,nb)/tc[T][nb] if tc[T][nb] else float('nan')
+    rows.append((sa, sb, len(T), T))
 rows.sort(reverse=True)
 
-print("\ntop-15 loosest recurrences (slack = rhs/true):")
-print(f"{'slack@9':>9} {'slack@8':>9} {'|T|':>4}  forbidden offsets")
-for s9,s8,nt,T in rows[:15]:
-    print(f"{s9:9.4f} {s8:9.4f} {nt:4d}  {sorted(T)}")
+print(f"\ntop-15 loosest recurrences (slack = rhs/true):")
+print(f"{'slack@'+str(na):>9} {'slack@'+str(nb):>9} {'|T|':>4}  forbidden offsets")
+for sa,sb,nt,T in rows[:15]:
+    print(f"{sa:9.4f} {sb:9.4f} {nt:4d}  {sorted(T)}")
 
-import statistics as st
-sl9 = [r[0] for r in rows]
-print(f"\nslack@9 distribution over {len(sl9)} recurrences:")
-print(f"  max {max(sl9):.4f}  median {st.median(sl9):.4f}  min {min(sl9):.4f}")
-print(f"  #>1.5: {sum(1 for s in sl9 if s>1.5)}   #>1.2: {sum(1 for s in sl9 if s>1.2)}   #<=1.05 (near-exact): {sum(1 for s in sl9 if s<=1.05)}")
-
-# does slack grow with n? (diffuse+growing => intrinsic; flat => a few fixable types)
+sl = [r[0] for r in rows]
+print(f"\nslack@{na} distribution over {len(sl)} recurrences:")
+print(f"  max {max(sl):.4f}  median {st.median(sl):.4f}  min {min(sl):.4f}")
+print(f"  #>1.5: {sum(1 for s in sl if s>1.5)}   #>1.2: {sum(1 for s in sl if s>1.2)}   #<=1.05: {sum(1 for s in sl if s<=1.05)}")
 grow = [r[0]-r[1] for r in rows]
-print(f"  slack@9 - slack@8: max {max(grow):+.4f} median {st.median(grow):+.4f}  (growing => over-count compounds)")
+print(f"  slack@{na} - slack@{nb}: max {max(grow):+.4f} median {st.median(grow):+.4f}  (growing => compounds)")
 
-# base fact G8/A
-A = [len(lv[n]) for n in range(NMAX+1)]           # A(n) = a(n) polyplets
+A = {n: len(lv[n]) for n in lv}
 g8 = type_count(lv, forbid=tuple(G8))
 print("\nbase-fact slack  G8(n)/A(n)  (we bound G8; A <= G8 <= n*A):")
 for n in range(1, NMAX+1):
     print(f"  n={n}: A={A[n]:>8}  G8={g8.get(n,0):>9}  ratio {g8.get(n,0)/A[n]:.4f}")
-print("  ^ if G8/A grows ~linearly the anchor itself leaks a factor; if it flattens, G8 is a tight anchor.")

@@ -231,6 +231,35 @@ neighbours go to the c-side, so they're empty in the `d`-piece.
   room; shrink `eps` to tighten toward 9.306 at the cost of larger fixpoint values.)
   RD=2 cross-check: x = 106251/10⁶ → λ ≤ 9.4117, PASS.
 
+  #### Slack audit (Certificate Squeeze, Phase 2) — where the 31% lives
+  `experiments/king_slack.py` measures slack(T,n) = rhs(T,n)/true_count(T,n) for every
+  recurrence in the RD=2 system, against brute-force A006770 counts. Findings:
+  - **Diffuse, not concentrated.** Over 152 recurrences: max slack 1.222, median 1.144,
+    min 1.000; nothing above 1.5, only 4 above 1.2. The loosest are the far-reach split
+    (D) types (|T|≈10, window distance-2). No small set of "bad" types to hand-engineer —
+    fixing the top-4 barely moves the bound. **Lever 4 (per-type tuning) is dead.**
+  - **Grows with n:** slack@8−slack@7 ≈ +0.022/term (median). A purely *local* over-count
+    would be CONSTANT in n; growth means the over-count **accumulates with animal size** —
+    a global effect. This is the distant-overlap signature: in φ_{T'}·φ_D the d-piece and
+    c-side may wrap around and collide arbitrarily far from the cut, and no finite window
+    can forbid it. Same **connectivity wall** that saturated the RD lever (and every prior
+    algorithmic lever in this project).
+  - **Anchor is clean.** Base fact G8(n)/A(n) = 1.0,1.0,1.1,1.23,1.36,1.50,1.63 (n=1..7):
+    grows, but only as the polynomial prefactor allowed by G8 ≤ n·A, so growth(G8)=λ
+    exactly. The anchor leaks no exponential — all exponential looseness is the convolution.
+
+  **Phase 3 verdict (measured, not reasoned).** The over-count is intrinsic to finite-type
+  convolution: diffuse, compounding, non-local. Multi-cell exact casing (lever 1) only
+  RELOCATES it — that is precisely the `king_derive.py` leaf/cut structure, already
+  measured at ≈12.5 (worse). Required-cell types (lever 2) can make cuts LOCALLY exact but
+  cannot forbid distant overlaps, so they hit the same wall; best case is the polyomino
+  method's demonstrated gap (~14% ⇒ ~8.1), and the king slack GROWING with n (vs the rook
+  method's saturating slack) says 8-connectivity is genuinely worse — 8.1 is optimistic,
+  not guaranteed. Reaching ~8 would need the full hand-engineered required-cell apparatus
+  (needs Bui's papers, multi-session, real invalid-bound risk) for at most ~1 term and
+  never λ. **Recommendation: bank the exact λ ≤ 9.3153; do not sink multi-session effort
+  into Phase 3.** The connectivity wall is a hard floor for this method class.
+
 - So the earlier "can't beat 12.2 generically" was right about the *generic*
   route, but the Bui-faithful route (correct case-routing + split types) DOES beat
   it and keeps improving with context. Target ~7.11 from above; realistic landing
