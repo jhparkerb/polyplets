@@ -13,10 +13,10 @@ history — not repeated here. Read this file, then `MEMORY.md`'s index.
   wiring it makes a(37)'s top real height H19. **Atom Ledger** banked
   (`results/triangle-structure.md`): triangle dependency structure fully mapped,
   root-separation theorem proves no bounded-depth cross-column relation.
-- **In-flight / verify:** independent whole-row **a(20)** two-algorithm confirmation
-  (Redelmeier `build/g2` rev 7eab237 vs the TM engine), launched dalby tmux `0:g2_a20`
-  2026-07-10 ~18:04, ~8h ETA — **should be complete; verify `runs/g2row_N20/combined.txt`**
-  (expect a(20)=1025573519362016). Moves a(20) single- → two-algorithm.
+- **a(20) two-algorithm CONFIRMED 2026-07-11** (Redelmeier `build/g2` rev 7eab237 vs
+  the TM engine): whole row n≤20 matches banked exactly, 0 mismatches, 7.97h wall /
+  96.1% utilization on dalby. Banked `results/redelmeier_row20/`. Two-algorithm
+  frontier now **20**. Next: row 21 (<24h target) — plan `docs/terminal-velocity-plan.md`.
 
 ## Rigorous λ bounds (NEW 2026-07-11)
 - **Two-sided rigorous bracket 5.828 ≤ λ ≤ 9.3153**, numerical λ≈7.111 inside.

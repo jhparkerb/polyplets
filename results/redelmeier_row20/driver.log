@@ -1,0 +1,5 @@
+>>> g2 whole-row N=20 S=10 K=800 jobs=80 perbox=no @ 2026-07-10T18:03:39-0400
+>>> g2 rev: git=7eab2373
+>>> 800 shards ran, 28684s wall; combining @ 2026-07-11T02:01:43-0400
+>>> combined -> runs/g2row_N20/combined.txt @ 2026-07-11T02:01:43-0400
+>>> a(20) = 1025573519362016
