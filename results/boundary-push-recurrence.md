@@ -14,8 +14,17 @@ representation.
 |---|---|---|---|---|---|
 | min order | 1 | 3 | 5 | 7 | ≥9 (data-limited) |
 
-Root is 3 (all multiplicity) → `poly_{2k}(n)·3^n`. This *recovers the known
-closed-form structure exactly* (P_k has degree 2k) — the probe is calibrated.
+Root is 3 (all multiplicity) → `poly(n)·3^n`.
+
+**CORRECTION 2026-07-10 (experiments/Pk_explicit.py, exact fit):** the eventual
+closed form is `T(n,n−k) = P_k(n)·3^n` with **degree(P_k) = k, order k+1**, onset
+`n = k+2` — NOT degree 2k. Verified trivially for k=1: `T(n,n−1)/3^n` has constant
+first difference `25/81`, i.e. exactly linear (`T(n,n−1)=5(5n−9)·3^{n−4}`, n≥3).
+The `2k+1` above is the minimal recurrence fitting the FULL diagonal **including
+the pre-onset transient point** at `n=k+1` (the `H=1` bar, which disobeys the
+closed form); absorbing that transient inflates the order, and the original note
+mis-read degree `2k` off it. Real degrees k=1..5: **1,2,3,4,5**. Leading coeff
+~`5^{2k}`, denom (Newton basis) `3^{3k+1}` (results/production-matrix-probe.md).
 
 **Row slicing `T(n, H)` vs n — order grows fast; determined cases:**
 
@@ -36,11 +45,12 @@ under-determined beyond H3).
    √λ diagonal sweep + closed-form P_k work, and says no simple re-slicing beats
    it: the diagonal aligns with the 3^n geometric structure, rows do not.
 2. **The closed-form frontier is a linear treadmill.** Extending the closed-form
-   region by one diagonal (k→k+1) costs 2 more coefficients (order 2k+1→2k+3),
-   needing 2 more data points — which arrive from ~1 more computed term each.
-   So closed forms advance ~one diagonal per computed term; they shave a
-   fixed-width slab off the top, they do **not** collapse the exponential bulk.
-   (Matches the a26–a30 plan's "circular data" observation for P_11/P_12/P_13.)
+   region by one diagonal (k→k+1) costs **1 more coefficient** (degree k→k+1, per
+   the 2026-07-10 correction above — NOT 2). Closed forms still shave only a
+   fixed-width slab off the top and do **not** collapse the exponential bulk, but
+   the per-diagonal cost is half what this note originally claimed — worth
+   re-checking against the a26–a30 plan's data economics (task: does that plan
+   assume degree 2k and thus over-provision witnesses?).
 3. **Therefore the real lever is orthogonal to slicing.** The row-direction
    complexity that grows (probably) exponentially in H *is* the frontier size.
    Attacking it needs a smaller *representation of the frontier itself*, not a
