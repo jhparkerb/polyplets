@@ -81,3 +81,45 @@ Shard allocation proportional to dalby-core-equiv: **dalby 53% / ayr 27% / gympi
   dalby-alone pre-optimization) — now a feasible long run. a(23) ~27 days (no).
   Optimization+fleet moves the whole-row two-algorithm confirmation frontier to
   **21 (this run) and puts 22 in reach**. Re-confirm from the real a(21) run.
+
+## P3 — validation ladder
+
+- **gate-g2 GREEN** after every kept lever (fixtures/per-box/split/ASan/holes)
+  plus new **check I** (aggregate pure-count path == per-box row-sums for
+  square8/4/tri6; split-boundary-at-maxn sums to full).
+- **Row-18 fleet: PASS.** dalby[0,96) aarch64 + ayr[96,145) x86 + gympie[145,180)
+  Apple, K=180/S=10, gathered + centrally combined → all 18 rows match banked
+  (a(18)=22471158811164, 0 mismatch). Validates the L1 pure-count path at scale,
+  **cross-ISA agreement across 3 compilers/architectures**, and the fleet
+  gather/combine plumbing in one run.
+- **Key coverage note:** in a row-N run the pure-count path (L1) produces *only*
+  row N (it fires at size==N-1). So row-18 validated the pure-count producing
+  a(18); row-19 validates it producing a(19). The arithmetic (`numUntried + DEG -
+  stale`, u64, no overflow until 9.2e18 ≫ a(21)=7e15) is n-independent, so these
+  two scale points fully cover the identical path at n=21. A dedicated row-20
+  re-run is therefore optional (a third point, no new coverage).
+- **Row-19 fleet:** launched in tmux windows on all 3 boxes (see runbook below).
+
+## a(21) launch runbook (fleet, tmux — for P4, on jasonp's go)
+
+Launch pattern (worked out on row-18/19; `-t 0:` = session 0 next free window):
+```
+# per box, in its existing tmux session 0, foreground + tee, resumable:
+ssh <box> 'tmux new-window -t "0:" -n g2_a21 "cd ~/src/polyominoes && \
+  scripts/g2_wholerow.sh 21 12 2400 <JOBS> --range <FROM> <TO> --no-combine \
+  2>&1 | tee runs/g2row_N21.launch.log; exec bash"'
+```
+Ranges (K=2400, shares 53/27/20): **dalby [0,1272) JOBS=80**, **ayr [1272,1923)
+JOBS=32**, **gympie [1923,2400) JOBS=10**. Expected wall ~14h.
+
+**Waiting — robust, NOT `tail --pid`.** A single `tail --pid` over ssh can drop on
+a network blip and falsely report completion (seen on row-19). Use a poll-waiter
+(`/tmp/fleet_wait.sh` pattern) that per box checks: driver process dead AND the
+driver.log "range [..) complete" success line present AND all range `.done` there;
+declare done only when all three boxes satisfy all three. Poll ~5 min for a 14h run.
+
+**Gather — tar per box, NOT per-file scp.** 2400 shards × 2 files = 4800 tiny files;
+per-file scp is minutes-slow. On each box `tar czf /tmp/n21.tgz w*.out w*.done`,
+scp the one tarball, extract into a single local dir. Then
+`scripts/g2_combine.sh <dir> 21 2400` (verifies all 2400 shards present), and check
+rows 1..20 vs banked + row 21 == **6954084405510437**.

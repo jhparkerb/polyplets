@@ -14,9 +14,20 @@ history — not repeated here. Read this file, then `MEMORY.md`'s index.
   (`results/triangle-structure.md`): triangle dependency structure fully mapped,
   root-separation theorem proves no bounded-depth cross-column relation.
 - **a(20) two-algorithm CONFIRMED 2026-07-11** (Redelmeier `build/g2` rev 7eab237 vs
-  the TM engine): whole row n≤20 matches banked exactly, 0 mismatches, 7.97h wall /
-  96.1% utilization on dalby. Banked `results/redelmeier_row20/`. Two-algorithm
-  frontier now **20**. Next: row 21 (<24h target) — plan `docs/terminal-velocity-plan.md`.
+  the TM engine): whole row n≤20 matches banked exactly, 0 mismatches. Banked
+  `results/redelmeier_row20/`. Two-algorithm frontier now **20**.
+- **Terminal Velocity (a(21) whole-row push) — kernel optimized + fleet validated,
+  LAUNCH PENDING jasonp's go.** g2 kernel now **2.06× faster** (rev 7eab237→HEAD):
+  L1 terminal pure-count (85% of nodes → branchless load+sum), L3 compile-time
+  neighbour offsets, L4 u16 untried, built with clang++ (Makefile G2CXX). L2/gcc-PGO/
+  -mcpu measured neutral-or-worse and dropped. Ledger `results/terminal-velocity.md`.
+  Fleet (dalby 80 + ayr 32 + gympie 10 cores; per-core 1.0/1.28/3.0): **a(21) ETA
+  ~14h**, well under the <24h target (dalby-alone 26h). Row-18 fleet validated
+  (all 18 rows match banked across 3 ISAs); row-19 validating. Launch/gather via
+  `scripts/g2_fleet_launch.sh 21 12 2400` + `g2_fleet_gather.sh 21 2400`; robust
+  poll-waiter (NOT tail --pid). **Reach:** optimization+fleet puts a(22) whole-row
+  in reach at ~3.9 days (was ~15 days). Acceptance: rows 1..20 vs banked + row 21 ==
+  6954084405510437.
 
 ## Rigorous λ bounds (NEW 2026-07-11)
 - **Two-sided rigorous bracket 5.828 ≤ λ ≤ 9.3153**, numerical λ≈7.111 inside.
