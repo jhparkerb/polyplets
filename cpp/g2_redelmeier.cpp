@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <array>
 
 #include "obs.h"  // shared observability/provenance runtime (docs/observability.md)
 
@@ -33,14 +34,14 @@ struct Offset { int dx, dy; };
 
 // Offsets ordered by grid-index delta ascending (see kSquare8) so the neighbour
 // probes walk memory low-to-high.
-static const Offset kSquare4[] = {{0,-1},{-1,0},{1,0},{0,1}};
+static constexpr Offset kSquare4[] = {{0,-1},{-1,0},{1,0},{0,1}};
 // Ordered by grid-index delta (dy*gridW+dx) ascending: the 8 status[] probes in
 // the neighbour loop then walk memory low-to-high (bottom row, middle row, top
 // row), which streams/prefetches better. Order is enumeration-order only; the
 // counts are offset-order-independent (gate C confirms split-sum invariance).
-static const Offset kSquare8[] = {{-1,-1},{0,-1},{1,-1},{-1,0},
-                                  {1,0},{-1,1},{0,1},{1,1}};
-static const Offset kTri6[]    = {{0,-1},{1,-1},{-1,0},{1,0},{-1,1},{0,1}};
+static constexpr Offset kSquare8[] = {{-1,-1},{0,-1},{1,-1},{-1,0},
+                                      {1,0},{-1,1},{0,1},{1,1}};
+static constexpr Offset kTri6[]    = {{0,-1},{1,-1},{-1,0},{1,0},{-1,1},{0,1}};
 
 struct Counter {
   // configuration
@@ -58,7 +59,12 @@ struct Counter {
   // test a single add + load. A cell's status never changes while it is
   // placed: it was already 1 when it entered an untried list, and the
   // tried-set rule keeps it 1 after unplacement until its adder unwinds.
-  int gridW = 0;
+  // Fixed compile-time grid stride (L3): the neighbour deltas dj[k] = dy*gridW+dx
+  // then fold into immediate load offsets instead of being reloaded from the
+  // struct and added to j every node (the post-L1 hot spot). A row is 128 bytes
+  // = 2 cache lines; the 3-row neighbour stencil stays trivially L1-resident.
+  // Holds any maxn with 2*maxn+2 < 128, i.e. maxn <= 62 (binary caps at 40).
+  static constexpr int gridW = 128;
   std::vector<char> status;
   std::vector<int> xOf, yOf;          // coordinates of grid index j
   int dj[8] = {0};                    // neighbor deltas in grid-index space
@@ -269,7 +275,6 @@ struct Counter {
   void init() {
     needsCells = connCheck || perimCheck || holesCheck || maxHoleCheck ||
                  siteperimCheck || contactsCheck;  // (maxHoleStrat rides maxHoleCheck)
-    gridW = 2 * maxn + 3;
     const int gridH = maxn + 3;                  // rows y = -1 .. maxn+1
     const int cells = gridW * gridH;
     status.assign(cells, 0);
@@ -433,9 +438,22 @@ struct Counter {
   // TRACKBOX folds in the fact that the analyses also read minx/maxx/maxy: in pure
   // aggregate mode (no box, no analysis) the box save/update/restore is skipped
   // entirely. run() dispatches to the right instantiation once.
+  // Compile-time neighbour deltas in grid-index space, folded from the constexpr
+  // offset table and the fixed stride (L3). Used in the kernel so `j + DJ[k]`
+  // becomes an immediate load offset instead of a per-node reload+add of dj[].
+  // Value-identical to the member dj[] that init() computes for the analysis path.
+  template <int DEG>
+  static constexpr std::array<int, DEG> kDJ() {
+    std::array<int, DEG> d{};
+    const Offset* o = (DEG == 4) ? kSquare4 : (DEG == 6) ? kTri6 : kSquare8;
+    for (int k = 0; k < DEG; ++k) d[k] = o[k].dy * gridW + o[k].dx;
+    return d;
+  }
+
   template <int DEG, bool PERBOX, bool NEEDS, bool SPLIT>
   void searchT(const int* untriedIn, int numUntried) {
     constexpr bool TRACKBOX = PERBOX || NEEDS;
+    static constexpr std::array<int, DEG> DJ = kDJ<DEG>();
     int untried[kMaxUntried];
     std::memcpy(untried, untriedIn,
                 static_cast<size_t>(numUntried) * sizeof(int));
@@ -444,7 +462,6 @@ struct Counter {
     // treat every `st[j2]=1` as a possible write to bySize/byBox/xOf/dj and reload
     // them; promising non-aliasing lets those stay in registers across the loop.
     char* __restrict st = status.data();
-    const int* __restrict djp = dj;
     u64* __restrict bs = bySize.data();
     [[maybe_unused]] const int* __restrict xo = xOf.data();
     [[maybe_unused]] const int* __restrict yo = yOf.data();
@@ -510,12 +527,12 @@ struct Counter {
         }
         if (pureCount) {
           int stale = 0;
-          for (int k = 0; k < DEG; ++k) stale += st[j + djp[k]];
+          for (int k = 0; k < DEG; ++k) stale += st[j + DJ[k]];
           bs[maxn] += static_cast<u64>(numUntried + DEG - stale);
         } else {
         int newCount = numUntried;
         for (int k = 0; k < DEG; ++k) {
-          const int j2 = j + djp[k];
+          const int j2 = j + DJ[k];
           if (!st[j2]) {
             st[j2] = 1;
             untried[newCount++] = j2;
