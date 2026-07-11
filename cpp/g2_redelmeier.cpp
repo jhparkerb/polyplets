@@ -489,6 +489,30 @@ struct Counter {
       }
 
       if (descend && size < maxn) {
+        // Terminal-parent PURE COUNT: at a size-(maxn-1) node under plain
+        // aggregate counting (no per-box coords, no per-cell analysis), every
+        // child is a distinct maxn-cell animal and the child count is all we
+        // want. The marks/pushes such a node would make are never read (nothing
+        // recurses below it; the unmark walk erases them at once), and the DEG
+        // probed cells are pairwise distinct, so the child count is just the
+        // remaining siblings plus the fresh neighbours = numUntried + (DEG minus
+        // the number of already-blocked probed cells). status[] is only ever
+        // 0/1, so that is DEG - sum(st over the DEG neighbours): pure loads, no
+        // stores, no data branches, no recursion, no unmark. This is 85% of the
+        // work at the frontier (a(maxn-1)/Sum a(1..maxn-1)); collapsing it here
+        // is the dominant kernel win. The old batch below still handles PERBOX
+        // (it needs each child's coordinates) and the split-boundary-at-maxn case.
+        bool pureCount = false;
+        if constexpr (!PERBOX && !NEEDS) {
+          bool canCount = true;
+          if constexpr (SPLIT) canCount = (splitS < maxn);
+          pureCount = canCount && (size + 1 == maxn);
+        }
+        if (pureCount) {
+          int stale = 0;
+          for (int k = 0; k < DEG; ++k) stale += st[j + djp[k]];
+          bs[maxn] += static_cast<u64>(numUntried + DEG - stale);
+        } else {
         int newCount = numUntried;
         for (int k = 0; k < DEG; ++k) {
           const int j2 = j + djp[k];
@@ -530,6 +554,7 @@ struct Counter {
         // reachedUndo stack needed (removing it drops a std::vector push/pop per
         // neighbour from the hot loop).
         for (int t = numUntried; t < newCount; ++t) st[untried[t]] = 0;
+        }
       }
 
       // unplace; (x,y) keeps status 1 so later iterations and deeper
