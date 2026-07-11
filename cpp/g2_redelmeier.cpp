@@ -451,12 +451,14 @@ struct Counter {
   }
 
   template <int DEG, bool PERBOX, bool NEEDS, bool SPLIT>
-  void searchT(const int* untriedIn, int numUntried) {
+  void searchT(const std::uint16_t* untriedIn, int numUntried) {
     constexpr bool TRACKBOX = PERBOX || NEEDS;
     static constexpr std::array<int, DEG> DJ = kDJ<DEG>();
-    int untried[kMaxUntried];
+    // u16 untried entries (L4): grid indices are < 128*(maxn+3) <= 5504,
+    // so they fit uint16_t and the per-call memcpy of the untried list halves.
+    std::uint16_t untried[kMaxUntried];
     std::memcpy(untried, untriedIn,
-                static_cast<size_t>(numUntried) * sizeof(int));
+                static_cast<size_t>(numUntried) * sizeof(std::uint16_t));
     // Restrict-qualified raw handles for the hot arrays. status is char*, and char
     // pointers legally alias everything, so without __restrict the compiler must
     // treat every `st[j2]=1` as a possible write to bySize/byBox/xOf/dj and reload
@@ -530,20 +532,13 @@ struct Counter {
           for (int k = 0; k < DEG; ++k) stale += st[j + DJ[k]];
           bs[maxn] += static_cast<u64>(numUntried + DEG - stale);
         } else {
-        // Branchless (L2): store each neighbour slot unconditionally, claim it
-        // only if the cell was fresh. status[] is 0/1 so `1 - st[j2]` is the
-        // claim bit; re-marking an already-1 cell is a no-op, and the unmark walk
-        // below touches only claimed slots [numUntried,newCount). The dead store
-        // into untried[newCount] for a stale cell needs one slot of slack past the
-        // claimed region -- kMaxUntried carries +8.
-        static_assert(kMaxUntried >= kMaxN * 8 + 8, "branchless probe slack");
         int newCount = numUntried;
         for (int k = 0; k < DEG; ++k) {
           const int j2 = j + DJ[k];
-          const int fresh = 1 - st[j2];
-          untried[newCount] = j2;
-          newCount += fresh;
-          st[j2] = 1;
+          if (!st[j2]) {
+            st[j2] = 1;
+            untried[newCount++] = j2;
+          }
         }
         // Terminal batch: when the children are the last (size==maxn) level, each of
         // untried[0..newCount) placed as the last cell is a distinct maxn-cell animal.
@@ -595,24 +590,24 @@ struct Counter {
   // fans out once at launch. Adding a future flag is one more peel level, not a
   // doubling of hand-aligned lines.
   template <int DEG, bool PERBOX, bool NEEDS>
-  void dispatchSplit(const int* origin) {
+  void dispatchSplit(const std::uint16_t* origin) {
     if (splitS > 0) searchT<DEG, PERBOX, NEEDS, true>(origin, 1);
     else            searchT<DEG, PERBOX, NEEDS, false>(origin, 1);
   }
   template <int DEG, bool PERBOX>
-  void dispatchNeeds(const int* origin) {
+  void dispatchNeeds(const std::uint16_t* origin) {
     if (needsCells) dispatchSplit<DEG, PERBOX, true>(origin);
     else            dispatchSplit<DEG, PERBOX, false>(origin);
   }
   template <int DEG>
-  void dispatchFlags(const int* origin) {
+  void dispatchFlags(const std::uint16_t* origin) {
     if (perBox) dispatchNeeds<DEG, true>(origin);
     else        dispatchNeeds<DEG, false>(origin);
   }
 
   void run() {
     init();
-    const int origin = cellIndex(0, 0);
+    const std::uint16_t origin = static_cast<std::uint16_t>(cellIndex(0, 0));
     status[origin] = 1;
     if (deg == 4) dispatchFlags<4>(&origin);
     else if (deg == 6) dispatchFlags<6>(&origin);
