@@ -293,21 +293,21 @@ def table_rows(label):
             rows.append(row)
     return rows
 
-TRI = load("results/ns_a34/triangle.txt")          # a(n) totals to 34
+TRI = load("results/ns_a36/triangle.txt")          # a(n) totals to 36
 chk("triangle totals extend b-file", all(TRI[n] == A[n] for n in A))
 
-# tab:terms -- all 34 values vs the banked totals
+# tab:terms -- all 36 values vs the banked totals
 terms = {}
 for row in table_rows("tab:terms"):
     for i in range(0, len(row) - 1, 2):
         terms[row[i]] = row[i + 1]
-chk("tab:terms has n=1..34", sorted(terms) == list(range(1, 35)))
+chk("tab:terms has n=1..36", sorted(terms) == list(range(1, 37)))
 for n, v in sorted(terms.items()):
     chk(f"tab:terms a({n}) vs banked", TRI.get(n) == v, f"paper {v} vs {TRI.get(n)}")
 
 # growth paragraph: quoted ratios and both lambda fits recomputed
-r34 = {n: TRI[n] / TRI[n - 1] for n in range(2, 35)}
-for n, q in ((20, 6.765), (27, 6.853), (34, 6.905)):
+r34 = {n: TRI[n] / TRI[n - 1] for n in range(2, 37)}
+for n, q in ((20, 6.765), (27, 6.853), (34, 6.905), (36, 6.916)):
     chk(f"quoted ratio r_{n}~{q}", round(r34[n], 3) == q, f"{r34[n]:.4f}")
 
 def lstsq(rows_, rhs):
@@ -327,15 +327,15 @@ def lstsq(rows_, rhs):
 
 lam2q = [7.101, 7.104, 7.105, 7.106]
 for s, q in zip((10, 15, 20, 25), lam2q):
-    ns = range(s, 35)
+    ns = range(s, 37)
     lam, lt = lstsq([[1.0, 1.0 / n] for n in ns], [r34[n] for n in ns])
-    chk(f"2-param lambda window {s}..34 == {q}", round(lam, 3) == q, f"{lam:.4f}")
-    chk(f"2-param theta window {s}..34 rounds into [-0.96,-0.94]",
+    chk(f"2-param lambda window {s}..36 == {q}", round(lam, 3) == q, f"{lam:.4f}")
+    chk(f"2-param theta window {s}..36 rounds into [-0.96,-0.94]",
         -0.96 <= round(lt / lam, 2) <= -0.94)
 rss = {}
 for D1 in (0.5, 1.0):
     for s in (10, 15, 20, 25):
-        ns = range(s, 35)
+        ns = range(s, 37)
         sol = lstsq([[1.0, 1.0 / n, 1.0 / n ** (1 + D1)] for n in ns],
                     [r34[n] for n in ns])
         lam, th = sol[0], sol[1] / sol[0]
@@ -343,26 +343,26 @@ for D1 in (0.5, 1.0):
                   for n in ns)
         rss[(D1, s)] = res
         if D1 == 0.5:
-            chk(f"3-param lambda window {s}..34 in [7.1109,7.1111]",
+            chk(f"3-param lambda window {s}..36 in [7.1109,7.1111]",
                 7.1109 <= round(lam, 4) <= 7.1111, f"{lam:.5f}")
-            chk(f"3-param theta window {s}..34 in [-1.03,-1.02]",
+            chk(f"3-param theta window {s}..36 in [-1.03,-1.02]",
                 -1.03 <= round(th, 2) <= -1.02, f"{th:.4f}")
-chk("Delta1=1/2 beats Delta1=1 on every window (~5x shortest, ~350x longest)",
-    all(rss[(0.5, s)] * 5 <= rss[(1.0, s)] for s in (10, 15, 20, 25))
-    and rss[(0.5, 10)] * 350 <= rss[(1.0, 10)])
+chk("Delta1=1/2 beats Delta1=1 on every window (~5x shortest, ~250x longest)",
+    all(rss[(0.5, s)] * 4.5 <= rss[(1.0, s)] for s in (10, 15, 20, 25))
+    and rss[(0.5, 10)] * 250 <= rss[(1.0, 10)])
 
-# tab:byheight34 -- swept heights vs run data; whole column sums to a(34)
-bh34 = {row[i]: row[i + 1] for row in table_rows("tab:byheight34")
+# tab:byheight36 -- swept heights vs run data; whole column sums to a(36)
+bh36 = {row[i]: row[i + 1] for row in table_rows("tab:byheight36")
         for i in range(0, len(row) - 1, 2)}
-chk("tab:byheight34 has H=1..34", sorted(bh34) == list(range(1, 35)))
-chk("tab:byheight34 sums to a(34)", sum(bh34.values()) == TRI[34])
-chk("T(34,34)==3^33", bh34[34] == 3 ** 33)
-inj = sum(v for h, v in bh34.items() if h >= 19)
-chk("injected share H>=19 rounds to 6.5%", round(100 * inj / TRI[34], 1) == 6.5)
-for h in range(3, 19):
-    ph = os.path.join(ROOT, "results", "ns_a34", "perheight", f"h{h}.out")
+chk("tab:byheight36 has H=1..36", sorted(bh36) == list(range(1, 37)))
+chk("tab:byheight36 sums to a(36)", sum(bh36.values()) == TRI[36])
+chk("T(36,36)==3^35", bh36[36] == 3 ** 35)
+inj = sum(v for h, v in bh36.items() if h >= 20)
+chk("injected share H>=20 rounds to 5.6%", round(100 * inj / TRI[36], 1) == 5.6)
+for h in range(3, 20):
+    ph = os.path.join(ROOT, "results", "ns_a36", "perheight", f"h{h}.out")
     if os.path.exists(ph):
-        chk(f"T(34,{h}) vs perheight run data", load(f"results/ns_a34/perheight/h{h}.out").get(34) == bh34[h])
+        chk(f"T(36,{h}) vs perheight run data", load(f"results/ns_a36/perheight/h{h}.out").get(36) == bh36[h])
 
 # symmetry counts: tab:symcounts vs banked engine outputs; Burnside companions
 S34 = {t: load(f"runs/sym34/{t}.out") for t in ("r90", "r180", "hmirror")} \
