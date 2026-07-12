@@ -65,22 +65,33 @@ $$v_3\big(T(n,H)\big) \;=\; (3H-2n-1) \;+\; v_3\big(P_{n-H}(n)\big).$$
 - **`n=⌊3H/2⌋`:** by **(A1b)**, `H` odd ⟹ `n=3k+1`, exponent `0`, `v₃(P_k)=0`;
   `H` even ⟹ `n=3k`, exponent `-1`, `v₃(P_k)=1`. Either way `v₃(T)=0`. ✓
 
-So (A) — hence the `⌈(N-1)/3⌉` count, modulo (B) — follows from two number-theoretic
-facts about the cumulant polynomials `P_k(n)=[y^k]\exp\sum_j(a_j+b_j n)y^j`
-(leading coeff `25^k/k!`), **both verified `k≤17`/`k≤11`:**
-- **(A2) 3-integrality:** `v₃(P_k(n)) ≥ 0` for every integer `n≥2k+1` — i.e. `P_k`
-  maps integers to 3-adic integers despite the `k!` denominator. Equivalent form:
-  `3^{\,n-1-3k} \mid T(n,n-k)` for `n>3k+1` (the diagonal-`k` counts acquire growing
-  3-divisibility).
-- **(A1b) Boundary units:** the activation entries are coprime to 3:
-  `3∤T(3k+1,2k+1)` and `3∤T(3k,2k)` (equivalently `v₃(P_k(3k+1))=0`, `v₃(P_k(3k))=1`).
+### (A2) is PROVED — and it proves the lower half of (A)
+
+- **(A2) `P_k` is integer-valued (hence 3-integral). PROVED** (given the diagonal
+  closed form, i.e. `P_k` is a degree-`k` polynomial for `n≥2k+1`). The window
+  `[2k+1, 3k+1]` is **exactly `k+1` consecutive integers**, and on it
+  `P_k(n)=T(n,n-k)·3^{\,3k+1-n}` is (nonneg count)·(nonneg power of 3) `= ` an
+  integer. A degree-`k` polynomial integer at `k+1` consecutive integers is
+  integer-valued everywhere (Pólya) — despite the `25^k/k!` leading coefficient,
+  exactly like a binomial. Verified `P_k(n)∈ℤ` for all `n∈[-5,40]`, `k≤15`.
+- **Lower half of (A) now rigorous:** for `n<⌊3H/2⌋`, the pure exponent
+  `3H-2n-1 ≥ 1` (elementary) and `v₃(P_k(n)) ≥ 0` (A2) give `v₃(T(n,H)) ≥ 1` — the
+  column really is `≡0 mod 3` below the boundary.
+
+### What remains (conjectural)
+- **(A1b) Activation:** the two "just-switched-on" entries are coprime to 3 —
+  `3∤T(3k+1,2k+1)` and `3∤T(3k,2k)` (equivalently `v₃(P_k(3k+1))=0`,
+  `v₃(P_k(3k))=1`). Verified `k≤11`. This is the upper half of (A): it makes the
+  column nonzero exactly at `n=⌊3H/2⌋`.
+- **(B) Independence:** the activated columns (`⌊3H/2⌋≤N`) are linearly independent
+  mod 3. Verified `N≤36`.
+
+So the `⌈(N-1)/3⌉` count is now: **lower half of (A) proved**, and it reduces to
+**(A1b)** (two explicit entries coprime to 3) plus **(B)** (mod-3 independence).
 
 ## Still open
 
-- **Prove (A2) and (A1b)** (concrete 3-adic facts about the `P_k`; the cumulant
-  form + Legendre `v₃(k!)=(k-s₃(k))/2` are the tools) and **(B)** the mod-3
-  independence of activated columns. That closes the `⌈(N-1)/3⌉` count from first
-  principles.
+- Prove (A1b) and (B).
 - A formula for the individual exponents `e_i(N)` (the full 3-adic invariant
   factors, not just count/sum) — the mod-3 rank gives the count but not the higher
   3-adic structure; still no closed form.
