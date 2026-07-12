@@ -146,9 +146,11 @@ spine digit-product on all in-band cells).
   new-root contents psi_H (deg 1..3289, squarefree, lowest terms, H<=10);
   full non-D-finiteness conditional on deg psi -> infinity. H=11 banked GF
   found anomalous (validated=False, shares no roots with Q9Q10) — needs
-  re-recovery before any use. ACSV (added):
-  saddle-point on the grand form G(y)H(y)^n to prove the height-distribution
-  collapse profile on the tall flank. Then K1 (kernel on all-pairs gap walk,
+  re-recovery before any use. ACSV DONE
+  (appendix of results/height-distribution-collapse.md): tall-flank rate
+  function psi(alpha) = (1-3a)ln3 + Legendre(ln H); saddle reproduces exact
+  T(36,36-k) to ~1-3% for k=3..14, breaks at the alpha->1/2 band edge as
+  expected; experiments/flank_saddle.py. Then K1 (kernel on all-pairs gap walk,
   exact ~14.41), H2 (haruspicy on convex-by-area), K3 (exact convex mu,
   q-series). Garnish when idle: Sheffer/Riordan convolution identities for
   P_k as new cross-checks; p=2 spine considered-and-declined (3-powers are

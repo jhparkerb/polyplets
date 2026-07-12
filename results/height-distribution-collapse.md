@@ -74,3 +74,23 @@ shape collapse and the moment convergence (std/mean, skew of H/⟨H⟩) are new.
 Data `results/ns_a36/perheight/`; script `experiments/height_collapse.py`.
 Companion to [[hole-free-growth-constant]] (topological) and the diagonal closed
 forms (deterministic top of the triangle).
+
+
+## The tall flank is analytic: large-deviation rate from the grand form (2026-07-14)
+
+The extreme tall tail (H = (1-alpha)n, alpha < 1/2 -- beyond the bulk
+scaling window above) is governed by the now-proven diagonal law's grand
+form G(y)H(y)^n: by steepest descent,
+
+  (1/n) ln T(n,(1-alpha)n)  ->  psi(alpha) = (1-3 alpha) ln 3
+                                 + min_{y>0} [ ln H(y) - alpha ln y ],
+
+the Legendre transform of ln H. Numerically (18-term banked series,
+`experiments/flank_saddle.py`): the saddle-point evaluation with Gaussian
+prefactor reproduces the exact banked cells T(36, 36-k) to ~1-3% across
+k = 3..14 (ratio 1.028 -> 1.009, tightening as the saddle moves away from
+the truncation), degrading only at the band edge alpha -> 1/2 (k >= 15),
+where the law's onset boundary sits and G(y*) changes sign -- the expected
+breakdown. Status: semi-analytic (truncated series); the rate function
+itself is exact modulo H's coefficients, all of which are theorems of the
+gas up to k=5 and pinned to k=17.
