@@ -52,8 +52,9 @@ cells, previously known through $n=18$. We report sixteen new terms, through
 \]
 each computed from scratch and reproducing every prior term. Because claims of
 this kind are only as good as their verification, every number in this paper
-carries an explicit confidence tier: $a(19)$ is confirmed by two algorithms
-sharing no counting logic; $a(20)$--$a(33)$ by a single algorithm family
+carries an explicit confidence tier: $a(1)$--$a(22)$ are confirmed by two
+algorithms sharing no counting logic (direct enumeration and the transfer
+matrix); $a(23)$--$a(33)$ by a single algorithm family
 decorrelated across architectures and cross-checked per term against held-out
 closed forms for the top diagonals of the height triangle (once certified by
 a live held-out prediction, those forms also supply the tallest, sparsest
@@ -118,8 +119,8 @@ these computations.
         and generating-function structure (Section~\ref{sec:diagonals}).
   \item A hole-count stratification of A006770 exact through $n=18$, the
         extremal hole area $M(n)\sim n^2/8$, exact fixed-height generating
-        functions for $H\le10$, rigorous lower bounds, and a uniform-sampling
-        portrait (Sections~\ref{sec:holes}--\ref{sec:sampling}).
+        functions for $H\le10$, and rigorous lower bounds
+        (Sections~\ref{sec:holes}--\ref{sec:gf}).
 \end{enumerate}
 
 \paragraph{Confidence tiers.}
@@ -136,14 +137,15 @@ later terms rest on decorrelation rather than algorithmic independence.
     tier & meaning \\
     \midrule
     \tierone{} & Two algorithms sharing no counting logic agree, each
-    reproducing the full published range. Covers $a(1)$--$a(19)$; the
-    symmetry counts to $n=24$; everything derived only from these. \\
+    reproducing the full published range. Covers $a(1)$--$a(22)$ (direct
+    Redelmeier enumeration against the transfer matrix); the symmetry counts
+    to $n=24$; everything derived only from these. \\
     \tiertwo{} & One counting algorithm, decorrelated and cross-checked:
     full chain-reproduction of all prior terms on every run; independent
     recount on a second architecture/compiler; agreement of the top height
     strata with \emph{held-out} diagonal closed forms $P_k$ (fitted on
     earlier terms, predicting cells of later ones); modular/CRT internal
-    consistency. Covers $a(20)$--$a(33)$ and the symmetry counts
+    consistency. Covers $a(23)$--$a(33)$ and the symmetry counts
     $25\le n\le32$. \\
     \tiertwominus{} & \tiertwo{} \emph{minus} the held-out diagonal check.
     Covers exactly one number, $a(34)$: its top surviving stratum would be
@@ -201,8 +203,8 @@ which enters the companion counts by Burnside's lemma
 \end{equation}
 
 Table~\ref{tab:terms} gives the full sequence. Terms $n\le18$ reproduce
-A006770 exactly; $a(19)$--$a(34)$ are new. $a(19)$ is \tierone{};
-$a(20)$--$a(33)$ are \tiertwo{}; $a(34)$ is \tiertwominus{}
+A006770 exactly; $a(19)$--$a(34)$ are new. $a(19)$--$a(22)$ are \tierone{};
+$a(23)$--$a(33)$ are \tiertwo{}; $a(34)$ is \tiertwominus{}
 (Table~\ref{tab:tiers}), the most exposed number in this paper.
 
 \begin{table}[H]
@@ -232,8 +234,8 @@ $a(20)$--$a(33)$ are \tiertwo{}; $a(34)$ is \tiertwominus{}
     \bottomrule
   \end{tabular}
   \caption{Fixed polyplets $a(n)$, $n=1,\dots,34$. Terms $1$--$18$ match the
-  published A006770; boldface terms are new. Tiers: $a(19)$ \tierone{};
-  $a(20)$--$a(33)$ \tiertwo{}; $a(34)$ \tiertwominus{}.}
+  published A006770; boldface terms are new. Tiers: $a(19)$--$a(22)$ \tierone{};
+  $a(23)$--$a(33)$ \tiertwo{}; $a(34)$ \tiertwominus{}.}
   \label{tab:terms}
 \end{table}
 
@@ -252,10 +254,15 @@ ${\sim}350$ on the longest) and removes the drift:
 $\lambda=7.1109$--$7.1111$ across the same
 four windows, with $\theta$ between $-1.02$ and $-1.03$---consistent with
 the universal two-dimensional lattice-animal value
-$\theta=-1$~\cite{jensen2001}, which the fit was free to miss. We
-accordingly estimate $\lambda\approx7.111$, and emphasise that this is a
-fit without error control---no differential-approximant analysis has been
-attempted---so it is an estimate, not a bound.
+$\theta=-1$~\cite{jensen2001}, which the fit was free to miss. An
+independent first-order differential-approximant analysis of the series
+(calibrated to recover $\lambda$ and $\theta$ exactly from synthetic
+$n^\theta\lambda^n$ data, and stable across rescaling and the number of
+trailing terms used) locates the dominant singularity at
+$\lambda=7.110$ with exponent $\theta=-1.000$, corroborating both the
+estimate and the universal $\theta=-1$ by a route independent of the
+ratio fit. We accordingly estimate $\lambda\approx7.111$; this is an
+estimate, not a rigorous bound---the rigorous two-sided bracket follows.
 
 \paragraph{A rigorous lower bound on $\lambda$.}
 The growth constant does admit a rigorous lower bound from a solvable
@@ -347,7 +354,7 @@ regression anywhere in range is visible; and admissible pruning only (a prune
 may only ever \emph{lose} animals, so reproducing the published range
 certifies that it lost none).
 
-\subsection{Method A: direct enumeration (to $n=19$)}
+\subsection{Method A: direct enumeration (to $n=22$)}
 \label{sec:methodA}
 
 Redelmeier's backtracking enumeration~\cite{redelmeier}, adapted to king
@@ -362,8 +369,15 @@ AMD/x86 (GCC, split $8\times96$). The per-size outputs are
 compiler, and scheduling and the arithmetic is exact integer addition, a
 transient or platform-specific fault in one is overwhelmingly unlikely to be
 mirrored digit-for-digit in the other; the error mode they cannot jointly
-catch is a bug in the shared \emph{algorithm}, which is what Method~B rules
-out at $n\le19$.
+catch is a bug in the shared \emph{algorithm}, which is what the transfer
+matrix (Methods~B,~C) rules out by counting the same animals a completely
+different way. An optimized kernel (the terminal frontier level counted in
+bulk, compile-time neighbour offsets; ${\approx}2\times$ faster) run as a
+three-architecture fleet (ARM, x86, Apple silicon) extended the whole-row
+enumeration to $n=22$---byte-identical across machines and matching the
+transfer-matrix totals term for term. Direct enumeration and the transfer
+matrix are thus two independent algorithms agreeing through $a(22)$, which
+is the \tierone{} anchor.
 
 \subsection{Method B: the column transfer matrix (to $n\approx23$)}
 \label{sec:methodB}
@@ -471,8 +485,8 @@ used in $a(34)$: it plays no role as an injected value, only as the
 absent cross-check on the top directly-swept cell $T(34,18)$, which is
 what the \tiertwominus{} grade records. Readers who want totals free
 of any formula assistance may sum Table~\ref{tab:byheight34}'s rows
-$H\le18$ against the banked per-height data; the \tierone{}/\tiertwo{}
-range $n\le19$ contains no injected cells at all.
+$H\le18$ against the banked per-height data; the range $n\le19$ contains
+no injected cells at all.
 
 Table~\ref{tab:byheight34} gives the height decomposition of the frontier
 term with the computed/injected boundary as stated above.
@@ -573,8 +587,11 @@ designed around the weakest link at each stage.
   \item \textbf{External truth.} Every method reproduces A006770 exactly for
         every $n\le18$, on every production run (the triangle re-derives all
         smaller terms as a by-product).
-  \item \textbf{Method A $=$ Method B at $a(19)$.} Byte-identical totals from
-        algorithmically disjoint counters---the \tierone{} anchor.
+  \item \textbf{Direct enumeration $=$ transfer matrix through $a(22)$.}
+        Byte-identical totals from algorithmically disjoint counters: Method~A
+        against Method~B at $a(19)$, and---after the kernel speedup and the
+        three-architecture fleet run---direct whole-row enumeration against
+        Method~C's totals through $a(22)$. This is the \tierone{} anchor.
   \item \textbf{Cross-architecture recounts.} $a(34)$'s full triangle was
         recomputed on a second architecture and compiler (x86/GCC against
         ARM/clang production) and is byte-identical, row by row. Earlier
@@ -1038,28 +1055,6 @@ $a(40)\ge\num{4266005101622209395058618248135}\approx4.27\times10^{30}$,
 exact integers from rational arithmetic
 (\texttt{paper/gf\_bound.py}).
 
-\section{Sampling portrait}
-\label{sec:sampling}
-
-The counting DP doubles as an exact uniform sampler~\cite{nijenhuis}: a
-single forward pass through the transfer matrix, selecting each successive
-column with probability proportional to the number of completions it admits,
-draws an animal uniformly at random. (The portrait below was made at the
-$a(19)$/$a(20)$ stage with Method B, whose per-state completion counts the
-sampler needs; the production spill engine does not retain them, so the
-portrait stays at that scale.)
-
-Ten thousand samples against a state space of $1.5\times10^{14}$ can rule
-out only gross bias (every specimen king-connected by independent BFS,
-sampled heights reproducing $T(19,H)/a(19)$); the portrait should be read
-at that resolution---qualitative character, not calibrated statistics.
-The typical $19$-cell polyplet is \emph{sparse, branchy, corner-glued}:
-about ten rook-connected pieces held together mostly by corners ($59\%$
-of contacts), $\sim\!25\%$ box density, and a $28\%$ chance of enclosing
-a hole---rising from $8.3\%$ at $n=8$. It is essentially never a
-polyomino: the exact frequency $A001168(19)/a(19)\approx4\times10^{-5}$
-predicts about $0.4$ such specimens per $10{,}000$, and none appeared.
-
 \section{Reach and limits}
 \label{sec:reach}
 
@@ -1110,7 +1105,7 @@ The verification protocol of Section~\ref{sec:confirm}---independent
 algorithms where they exist, decorrelated recounts and held-out closed-form
 checks where they do not, and explicit confidence tiers throughout---ensures
 the central claims do not rest on the correctness of any single
-\emph{program}. They do rest, past $n=19$, on a single algorithm family;
+\emph{program}. They do rest, past $n=22$, on a single algorithm family;
 the tier system exists so that dependence is never hidden. All code and data
 are released for independent checking.
 
@@ -1202,11 +1197,6 @@ in \emph{Computational Science --- ICCS 2003}, LNCS \textbf{2659}, Springer,
 M.~Bousquet-M\'elou,
 \emph{A method for the enumeration of various classes of column-convex polygons},
 Discrete Mathematics \textbf{154}(1--3) (1996), 1--25.
-
-\bibitem{nijenhuis}
-A.~Nijenhuis and H.~S. Wilf,
-\emph{Combinatorial Algorithms for Computers and Calculators}, 2nd~ed.,
-Academic Press, 1978, pp.~99--116.
 
 \bibitem{stanley}
 R.~P. Stanley,
