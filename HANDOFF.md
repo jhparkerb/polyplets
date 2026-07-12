@@ -130,6 +130,13 @@ spine digit-product on all in-band cells).
   companions this session: [[hole-free-growth-constant]], [[height-distribution-collapse]],
   results/series-analysis-da.md (θ=−1).
 
+- **dm-mirror law proof program STARTED (2026-07-13):** `results/dm-diagonal-recon.md`,
+  `experiments/dm_sym_enum.py` (validated vs banked law). d(S,S)=2 PROVED
+  (permutation skeleton: monotone king permutations). Two-family dichotomy
+  refuted (anti-excursion family = the known parity anomaly); proof frame =
+  monotone phases + reversal clusters, program steps 1-4 in the recon doc.
+  Prize: retires the paper's last conjectural law + the T3 caveat.
+
 ## Remaining work ledger
 1. **Paper final read-through.**
 2. **Viva cold retakes**, then %C authorship pass (jasonp's own words), then jasonp submits.
