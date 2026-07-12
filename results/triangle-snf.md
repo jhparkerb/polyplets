@@ -89,9 +89,20 @@ $$v_3\big(T(n,H)\big) \;=\; (3H-2n-1) \;+\; v_3\big(P_{n-H}(n)\big).$$
 So the `⌈(N-1)/3⌉` count is now: **lower half of (A) proved**, and it reduces to
 **(A1b)** (two explicit entries coprime to 3) plus **(B)** (mod-3 independence).
 
+## RESOLVED (2026-07-12) — see `results/ternary-spine.md`
+
+**(A1b) and (B) are now PROVED** (modulo the diagonal law + a finitely-verified
+3-coefficient-identity ladder): H mod 3 is the root of the spine cubic
+`W³ = W² + t`, the activation entries compute in closed form by Lagrange
+inversion (`T(3k+1,2k+1) ≡ T(3k,2k) ≡ 1 mod 3`, `P_k(3k) ≡ 3 mod 9`), and (B)
+follows by echelon since the activation rows `⌊3H/2⌋` are strictly increasing.
+**The `⌈(N-1)/3⌉` count is a theorem** under that ladder. Full chain + verifier:
+`results/ternary-spine.md`, `experiments/ternary_spine.py` (15/15 green).
+
 ## Still open
 
-- Prove (A1b) and (B).
+- Prove the ladder itself (G ≡ 1 mod 9; H ≡ W mod 3; S ≡ t²+tW mod 3) — needs
+  the cluster combinatorics of the cumulants.
 - A formula for the individual exponents `e_i(N)` (the full 3-adic invariant
   factors, not just count/sum) — the mod-3 rank gives the count but not the higher
-  3-adic structure; still no closed form.
+  3-adic structure; the mod-9/27 lifts in ternary-spine.md are the natural attack.

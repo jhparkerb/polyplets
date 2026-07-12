@@ -14,13 +14,13 @@ the Smith invariant factors form a divisibility chain $d_1\mid\cdots\mid d_N$ wi
 $\prod d_i=|\det|$, so any prime $q\ne3$ dividing some $d_i$ would divide $d_N$ hence
 $|\det|$ — impossible. **Therefore every invariant factor is a power of 3 and the
 cokernel is a finite 3-group.** Done, for all $N$.
-- **STILL OPEN (the real content):** triangularity explains "all 3-powers" but NOT
-  the *exponent structure* — the number of nontrivial factors is
-  $\lceil(N-1)/3\rceil$ and the individual exponents $e_i(N)$ have no known formula.
-  Those depend on the arithmetic of the OFF-diagonal entries (gcds of minors), not
-  the diagonal, and the $/3$ in the count matches the 3-consecutive-atom column
-  factorization $p_H=q_Hq_{H-1}q_{H-2}$. That linkage — why exactly $\lceil(N-1)/3
-  \rceil$ nontrivial factors — is the genuine open problem here.
+- **RESOLVED 2026-07-12:** the $\lceil(N-1)/3\rceil$ count is now a **theorem**
+  (modulo the diagonal law + a finitely-verified ladder) — the mod-3 diagonal
+  family is governed by the spine cubic $W^3 = W^2 + t$ over $\mathbb F_3$, the
+  activation entries evaluate in closed form by Lagrange inversion, and echelon
+  independence finishes. See `results/ternary-spine.md` (proof chain + 15/15
+  verifier). Remaining open there: prove the ladder itself; individual exponents
+  $e_i(N)$ still have no formula (the mod-9/27 lifts are the attack).
 
 ### C2. A006770 is strictly log-convex
 $$a(n)^2 < a(n-1)\,a(n+1)\qquad(n\ge3),$$
