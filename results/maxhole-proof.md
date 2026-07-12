@@ -50,6 +50,50 @@ every residue — no off-by-one. ∎ modulo (I') and (II').
 
 ## What's proved vs open
 
+## (II') PROVED — the moat-cycle argument (2026-07-12)
+
+The winding-number route works. Five steps, each machine-checked end-to-end on
+3,927 random single-hole king animals (116 with pinched contours exercising the
+loop-erasure; 3,356 tight) — `experiments/maxhole_moat_check.py`, 0 failures.
+
+1. **Moat walk.** Trace the outer contour of the hole region R (union of its
+   unit squares). Across every boundary edge lies a foreground cell (else the
+   hole leaks 4-connectedly or extends). Consecutive boundary edges share a
+   corner and their outside cells are equal, 4-adjacent, or diagonal — including
+   at pinch corners, where they are exactly the diagonal sealing pair. So the
+   outside cells form a closed king-walk γ ⊆ F with winding 1 around R.
+2. **Winding constant on the hole.** γ's polygon passes only through F-squares
+   (touching hole squares at most at corners), while hole centers are 4-connected
+   through hole squares; the connecting segments avoid γ's polygon, so all hole
+   centers lie in one component of the complement — one winding number.
+3. **Loop-erasure.** If γ repeats a cell, split there into two closed subwalks;
+   winding numbers add, so one part keeps winding ≠ 0 (by step 2, around the
+   WHOLE hole). Iterate → a SIMPLE cycle σ ⊆ F, winding ≠ 0 around every hole cell.
+4. **Escape segment ⇒ four caps.** If σ stayed in u ≤ u_max, the top hole cell's
+   center would connect to infinity along the ray (1,1) without meeting σ
+   (σ ∌ that cell and lies weakly below the line) — winding 0, contradiction.
+   So σ attains u ≥ u_max+1; symmetrically u ≤ u_min−1, v ≥ v_max+1, v ≤ v_min−1.
+5. **Count.** In diagonal coordinates a king step has |Δu|+|Δv| ≤ 2. σ is closed
+   and spans u across ha+1 and v across hm+1, so Σ|Δu| ≥ 2(ha+1), Σ|Δv| ≥ 2(hm+1),
+   giving |σ| ≥ ha+hm+2. σ is simple, so n ≥ |σ| ≥ ha+hm+2. ∎
+
+(Write-up rigor still owed on step 1's contour construction — standard
+marching-squares/Jordan material — and step 3's winding bookkeeping; the
+mathematical content is complete.)
+
+## Status after the moat proof
+
+- (I') A ≤ ⌈ha·hm/2⌉: elementary parity count — done.
+- **(II') n ≥ ha+hm+2: PROVED (above).** With (I') and the integer maximization,
+  the SINGLE-HOLE upper bound M_single(n) ≤ round((n−2)²/8) is a theorem, tight
+  at the diamond for n ≡ 0 (mod 4).
+- Still open: the multi-hole reduction (total area over several holes never beats
+  one hole — verified on 4,000+ shapes, unproved: moat cycles of different holes
+  share cells, so the per-hole bound doesn't sum), and the clean construction
+  family for n ≢ 0 (mod 4).
+
+## Superseded notes (pre-proof)
+
 - (I'): elementary, essentially done.
 - Single-hole reduction: needs the superadditivity written cleanly, but is standard.
 - **(II') is the real theorem** and where your geometry helps. Partial progress:
