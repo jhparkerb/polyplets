@@ -196,6 +196,8 @@ combinatorics (40/40 with boundaries).
 
 - Symbolic closure of (⋆c) on the fixed point (finite algebra).
 - Two-row closed form generalizing (2s+1)² (weight table is raw material).
-- The convergence + boundary analysis for a full proof of the law
-  (the chain identity is the decomposition; what remains is the residue
-  extraction being exact per y-order beyond a computable threshold).
+- ~~The convergence + boundary analysis for a full proof of the law~~
+  **DONE 2026-07-12**: `docs/proofs/diagonal-law.md` — separation lemma +
+  chain identity + row bound (ℓ ≤ k) + partial fractions prove the law's
+  shape with sharp-shaped onset n ≥ 2k+1 and integer-valued P_k;
+  checker `experiments/diagonal_law_proof_check.py`.

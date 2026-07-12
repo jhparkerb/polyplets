@@ -100,7 +100,16 @@ close-out passes.
   equation matches all 18 coefficients; (⋆a) G≡1 mod 9 derived via boundary
   weights (single-row boundary weight 2s+1 — entry×exit factorization of
   (2s+1)²); (⋆c) verified to u³⁰⁰ on the pure-algebra mod-27 fixed point.
-  Open: symbolic (⋆c) closure; residue-extraction rigor; two-row closed form.
+  Open: symbolic (⋆c) closure; two-row closed form.
+- **DIAGONAL LAW SHAPE PROVED (2026-07-12):** `docs/proofs/diagonal-law.md`,
+  checker `experiments/diagonal_law_proof_check.py` (all green, k ≤ 3 exact).
+  Separation lemma (walk rows are cuts) + exact chain identity + row bound
+  (ℓ ≤ k) + partial fractions ⟹ T(n,n−k) = P_k(n)·3^{n−1−3k} for n ≥ 2k+1
+  with deg P_k ≤ k and **P_k integer-valued** (new, was only observed). Onset
+  matches observation exactly. Downstream: Ternary Spine / SNF / P_k machinery
+  conditionality collapses to the finitely many enumerated cluster weights.
+  Open: onset sharpness for general k (non-cancellation); monomial integer
+  coefficients of P_k (values proved, coefficients observed).
 - **Max-hole theorem M(n)=round((n−2)²/8) — STAGED for later examination**
   (`results/maxhole-proof.md`, figs `results/figs/maxhole_{ring,seal}.svg`, checker
   `experiments/maxhole_proof_check.py`). Near-complete proof: construction = diagonal

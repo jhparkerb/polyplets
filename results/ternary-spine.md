@@ -170,8 +170,12 @@ where the unproved/exposed cells live.
 - **Unconditional:** Prop. 1–2, the lower half of T4, the 3-power SNF fact, the
   echelon/counting reductions, and the Lagrange-inversion identities about $W$
   itself ($[t^k]W^{3k+1}=1$ etc. — these are theorems about the cubic, full stop).
-- **Conditional on the diagonal law** (paper-grade empirical, exact on every
-  holdout ever tried): everything quantified over all $k$.
+- **Conditional on the diagonal law**: everything quantified over all $k$.
+  **UPGRADE 2026-07-12: the law's SHAPE is now a THEOREM**
+  (`docs/proofs/diagonal-law.md`): polynomial × 3-power, deg ≤ k, onset
+  n ≥ 2k+1, P_k integer-valued — proved via the defect-gas chain identity +
+  partial fractions. What remains empirical is only the specific fitted P_k
+  values for k ≤ 17 (k ≤ 3 re-derived from cluster weights, exact).
 - **Conditional on the ladder $(\star a,b,c)$:** finitely many coefficient
   identities (verified through $y^{17}$; the digit formula then re-verified on
   342 independent triangle cells). **$(\star b)$ is now derived** from the
