@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="660" height="440" viewBox="0 0 660 440" font-family="sans-serif">
+<rect width="660" height="440" fill="#ffffff"/>
+<text x="330.0" y="24" text-anchor="middle" font-size="17" font-weight="bold" fill="#1a1a2e">Lemma (II'): n >= ha+hm+2   (16 = 7+7+2, tight)</text>
+<rect x="74" y="176" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="108" y="210" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="108" y="176" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="108" y="142" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="142" y="244" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="142" y="210" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="142" y="176" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="142" y="142" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="142" y="108" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="176" y="278" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="176" y="244" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="176" y="210" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="176" y="176" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="176" y="142" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="176" y="108" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="176" y="74" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="210" y="244" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="210" y="210" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="210" y="176" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="210" y="142" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="210" y="108" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="244" y="210" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="244" y="176" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="244" y="142" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="278" y="176" width="34" height="34" fill="#eef4ff" stroke="#c8c8d0" stroke-width="1" />
+<rect x="40" y="176" width="34" height="34" fill="#c0392b" stroke="#1a2547" stroke-width="1" />
+<rect x="74" y="210" width="34" height="34" fill="#c0392b" stroke="#1a2547" stroke-width="1" />
+<rect x="74" y="142" width="34" height="34" fill="#2b3a67" stroke="#1a2547" stroke-width="1" />
+<rect x="108" y="244" width="34" height="34" fill="#c0392b" stroke="#1a2547" stroke-width="1" />
+<rect x="108" y="108" width="34" height="34" fill="#2b3a67" stroke="#1a2547" stroke-width="1" />
+<rect x="142" y="278" width="34" height="34" fill="#c0392b" stroke="#1a2547" stroke-width="1" />
+<rect x="142" y="74" width="34" height="34" fill="#2b3a67" stroke="#1a2547" stroke-width="1" />
+<rect x="176" y="312" width="34" height="34" fill="#c0392b" stroke="#1a2547" stroke-width="1" />
+<rect x="176" y="40" width="34" height="34" fill="#c0392b" stroke="#1a2547" stroke-width="1" />
+<rect x="210" y="278" width="34" height="34" fill="#2b3a67" stroke="#1a2547" stroke-width="1" />
+<rect x="210" y="74" width="34" height="34" fill="#c0392b" stroke="#1a2547" stroke-width="1" />
+<rect x="244" y="244" width="34" height="34" fill="#2b3a67" stroke="#1a2547" stroke-width="1" />
+<rect x="244" y="108" width="34" height="34" fill="#c0392b" stroke="#1a2547" stroke-width="1" />
+<rect x="278" y="210" width="34" height="34" fill="#2b3a67" stroke="#1a2547" stroke-width="1" />
+<rect x="278" y="142" width="34" height="34" fill="#c0392b" stroke="#1a2547" stroke-width="1" />
+<rect x="312" y="176" width="34" height="34" fill="#c0392b" stroke="#1a2547" stroke-width="1" />
+<line x1="23.0" y1="125.0" x2="363.0" y2="465.0" stroke="#e08a00" stroke-width="1.5" stroke-dasharray="5,4"/>
+<line x1="23.0" y1="23.0" x2="363.0" y2="363.0" stroke="#e08a00" stroke-width="1.5" stroke-dasharray="5,4"/>
+<line x1="23.0" y1="-79.0" x2="363.0" y2="261.0" stroke="#e08a00" stroke-width="1.5" stroke-dasharray="5,4"/>
+<rect x="376" y="156" width="34" height="34" fill="#2b3a67" stroke="#1a2547" stroke-width="1" />
+<text x="418" y="176" font-size="14" fill="#222">2 per interior u-level</text>
+<rect x="376" y="196" width="34" height="34" fill="#c0392b" stroke="#1a2547" stroke-width="1" />
+<text x="418" y="216" font-size="14" fill="#222">u-extreme caps</text>
+<text x="376" y="266" font-size="13" fill="#555">Dashed = anti-diagonals</text>
+<text x="376" y="286" font-size="13" fill="#555">u = x+y = const. The hole</text>
+<text x="376" y="306" font-size="13" fill="#555">spans ha of them; each is</text>
+<text x="376" y="326" font-size="13" fill="#555">crossed by 2 ring cells,</text>
+<text x="376" y="346" font-size="13" fill="#555">+2 v-caps &#8594; ha+hm+2.</text>
+</svg>

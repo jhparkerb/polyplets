@@ -78,6 +78,18 @@ close-out passes.
   kernel, opt-in `--kernel kink-sharded`, real 4.93x at H14/maxn26, still not the default
   and not head-to-head'd at dominant-height scale).
 - **steal-tail diagnostic** (`results/steal-tail-h18.md`): banked, not deployed.
+- **Max-hole theorem M(n)=round((n−2)²/8) — STAGED for later examination**
+  (`results/maxhole-proof.md`, figs `results/figs/maxhole_{ring,seal}.svg`, checker
+  `experiments/maxhole_proof_check.py`). Near-complete proof: construction = diagonal
+  diamond ring (done for n≡0 mod 4); upper bound reduced to **one open lemma (II')
+  n≥ha+hm+2** (a closed king-curve enclosing an ha×hm diagonal region needs ≥ha+hm+2
+  cells). (I') + single-hole reduction + arithmetic in hand; both lemmas verified on
+  ~2400 single-hole polyplets (0 violations, tight on diamonds). Partial (II'):
+  foreground provably extends 1 step beyond the hole on all 4 sides; the sum (vs max)
+  needs a winding/Jordan-curve argument. Also open: clean elongated-diamond family for
+  n≢0 mod 4. Jasonp to examine the (II') winding argument. Session-research thread;
+  companions this session: [[hole-free-growth-constant]], [[height-distribution-collapse]],
+  results/series-analysis-da.md (θ=−1).
 
 ## Remaining work ledger
 1. **Paper final read-through.**
