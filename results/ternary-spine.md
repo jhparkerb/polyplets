@@ -140,6 +140,20 @@ Reading along rows instead of down columns:
   closed law for these spikes (the deficit-$d$ unit formulas, $d \ge 2$) is
   the open remainder of the Witt tower.
 
+### The frontier-parity law (jasonp, from the two staircases)
+
+The law's diagonal reach in row $n$ is $k_{\max}(n)=\lfloor(n{-}1)/2\rfloor$, which
+STALLS at even $n$ — the dashed boundary steps down without the band widening.
+Diagonal $k$ gets its two fit points at $n=2k{+}1,2k{+}2$ and its first holdout only
+at $n=2k{+}3$. Hence: a frontier term at even $n=2k{+}2$ has its top real-swept cell
+on a fit-only, uncheckable diagonal (the \tiertwominus{} situation — $a(34)$ with
+$P_{16}$, $a(36)$ with $P_{17}$; the exposed cells sit in the inner corners of the
+dashed staircase), while a frontier at odd $n=2k{+}3$ is self-certifying (its top
+cell IS the first holdout — $a(35)$ certifying $P_{16}$). Even frontiers mint the
+tier asterisk; odd frontiers retire it. Same motif as the spine staircase: the
+flat steps ($n\equiv2\bmod3$ for the spine, even $n$ for the law boundary) are
+where the unproved/exposed cells live.
+
 ## Honest accounting
 
 - **Unconditional:** Prop. 1–2, the lower half of T4, the 3-power SNF fact, the
