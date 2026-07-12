@@ -33,8 +33,37 @@ The number of **nontrivial** invariant factors (exponent > 0) is exactly
   Atom Ledger, and the 3-adic thread (`3^{n−1}` king chain, diagonal `3^{3k+1}`,
   production band `3^{3k+2}`) are one phenomenon: everything is at prime 3.
 
-## Open
+## Resolved / reduced (2026-07-11)
 
-- Prove SNF ⊆ 3-powers in general (the matrix's minors are all 3-smooth?).
-- Is there a formula for the individual exponents `e_i(N)`? (Not obvious from the
-  lists above; the largest and the count are clean, the middle ones less so.)
+- **SNF ⊆ 3-powers: PROVED (trivially).** `T(n,H)=0` for `H>n`, so `T_N` is
+  lower-triangular and `det T_N = ∏ T(n,n) = ∏ 3^{n-1} = 3^{N(N-1)/2}` — a pure
+  3-power. Invariant factors form a chain `d_1|…|d_N` with `∏d_i=|det|`, so any
+  prime `q≠3` dividing some `d_i` divides `d_N` hence `det` — impossible. Every
+  invariant factor is a 3-power; the cokernel is a finite 3-group. (For all `N`.)
+
+- **Nontrivial-factor count `⌈(N-1)/3⌉`: REDUCED to a clean activation law.**
+  Since the factors are 3-powers, the count `= N − rank(T_N mod 3) =
+  nullity(T_N mod 3)`. Computed: the mod-3 null space is spanned by exactly the
+  **zero columns** — column `H` of `T_N` that is `≡0 mod 3` in all rows `n≤N`.
+  A column first becomes nonzero mod 3 at row
+  $$f(H) = \lfloor 3H/2 \rfloor \qquad(\text{verified }H\le24,\ \text{i.e.}\
+  \min\{n:3\nmid T(n,H)\}=\lfloor3H/2\rfloor).$$
+  So column `H` is a zero column iff `⌊3H/2⌋>N`, and
+  `#{H≤N : ⌊3H/2⌋>N} = ⌈(N-1)/3⌉` (elementary; proved algebraically). Hence the
+  count reduces to **two claims, both verified to N=36:**
+  - **(A) Activation:** `v₃(T(n,H)) ≥ 1` for `n<⌊3H/2⌋`, and `=0` at `n=⌊3H/2⌋`.
+    Via the diagonal form `T(n,n-k)=P_k(n)·3^{n-1-3k}` (valid `n≥2k+1`, which holds
+    at the boundary since `H=⌊2n/3⌋≥(n+1)/2`), this is
+    `v₃(T(n,H)) = (3H-2n-1) + v₃(P_{n-H}(n))` — a statement about the 3-adic
+    valuation of the cumulant-law polynomials `P_k` (leading coeff `25^k/k!`,
+    `v₃ = -v₃(k!)`).
+  - **(B) Independence:** the activated columns (`⌊3H/2⌋≤N`) are linearly
+    independent mod 3 (equivalently, the null space has no vector off the zero
+    columns).
+
+## Still open
+
+- Prove (A) and (B) — that finishes the `⌈(N-1)/3⌉` count from first principles.
+- A formula for the individual exponents `e_i(N)` (the sorted 3-adic invariant
+  factors, not just their count/sum) — the mod-3 rank gives the count but not the
+  higher 3-adic structure; still no closed form.
