@@ -146,10 +146,8 @@ later terms rest on decorrelation rather than algorithmic independence.
     strata with \emph{held-out} diagonal closed forms $P_k$ (fitted on
     earlier terms, predicting cells of later ones); modular/CRT internal
     consistency. Covers $a(23)$--$a(35)$ and the symmetry counts
-    $25\le n\le32$. (One caveat, stated not hidden: $a(35)$'s independent
-    recount is \emph{partial}---a full same-heights cross-architecture
-    re-verify is pending---but its top real diagonal cell $T(35,19)$ is an
-    exact \emph{held-out} $P_{16}$ prediction, the strongest of the checks.) \\
+    $25\le n\le32$. (Caveat: $a(35)$'s independent recount is only
+    \emph{partial}; Section~\ref{sec:confirm}.) \\
     \tiertwominus{} & \tiertwo{} \emph{minus} the held-out diagonal check.
     Covers exactly one number, $a(36)$: its top real-swept stratum
     $T(36,19)$ would be checked by $P_{17}$, which has no independent holdout
@@ -487,11 +485,9 @@ possible, unproven-formula risk being what it is, but the exposure is
 quantified ($5.6\%$ of the frontier term) and every injected formula
 carries at least one live held-out success---in particular $P_{16}$, whose
 $a(35)$ holdout $T(35,19)$ it now predicts exactly, so its use in $a(36)$
-is fully certified. The one formula in the family with no independent
-holdout is $P_{17}$; it is \emph{not} used in $a(36)$ as an injected value,
-playing no role except as the absent cross-check on the top
-directly-swept cell $T(36,19)$, which is what the \tiertwominus{} grade
-records. Readers who want totals free
+is fully certified. (The one formula with no independent holdout, $P_{17}$,
+is \emph{not} injected; it is the absent check on $a(36)$'s top swept cell,
+the \tiertwominus{} grade of Section~\ref{sec:confirm}.) Readers who want totals free
 of any formula assistance may sum Table~\ref{tab:byheight36}'s rows
 $H\le19$ against the banked per-height data; the range $n\le19$ contains
 no injected cells at all.
@@ -1087,11 +1083,9 @@ tallest real sweep stayed at $H=18$ through $a(34)$ and rose to $H=19$ for
 $a(35)$ and $a(36)$ (the latter with $H=19$ split off to a second machine),
 and the banked totals grew gently (see Appendix~\ref{sec:profile}). Each
 further term is within easy hardware reach; the binding constraint is
-verification, not compute. $a(36)$ already exposes the pattern: its top real
-stratum $T(36,19)$ ($k=17$) can be checked only once $a(37)$ supplies the
-holdout for $P_{17}$, so $a(37)$ would be swept for real and would in turn
-retire the \tiertwominus{} grade from $a(36)$---the frontier is always one
-term ahead of its own closed-form certification. The symmetric counts scale as
+verification, not compute---the frontier is always one term ahead of its own
+closed-form certification, which is what the \tiertwominus{} grade on $a(36)$
+records (Section~\ref{sec:confirm}). The symmetric counts scale as
 $\sqrt{a}$-class problems and reached $n=34$ for three of the four types;
 the diagonal-mirror type, whose forced-square bounding box compresses least,
 is the binding constraint on the remaining companions---its per-strip RAM
