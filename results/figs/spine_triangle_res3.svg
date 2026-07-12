@@ -690,18 +690,23 @@
 <text x="870" y="122" font-size="12.5" fill="#6B7280" font-weight="normal">all &#8801; 0 (proved: exponent</text>
 <text x="870" y="138" font-size="12.5" fill="#6B7280" font-weight="normal">3H&#8722;2n&#8722;1 &#8805; 1 kills the cell)</text>
 <text x="870" y="170" font-size="12.5" fill="#1F2937" font-weight="bold">the spine n = &#8970;3H/2&#8971;:</text>
-<text x="870" y="186" font-size="12.5" fill="#6B7280" font-weight="normal">outlined; always &#8801; 1 (proved</text>
-<text x="870" y="202" font-size="12.5" fill="#6B7280" font-weight="normal">by Lagrange inversion)</text>
-<text x="870" y="234" font-size="12.5" fill="#1F2937" font-weight="bold">below the spine:</text>
-<text x="870" y="250" font-size="12.5" fill="#6B7280" font-weight="normal">mixed residues, given by the</text>
-<text x="870" y="266" font-size="12.5" fill="#6B7280" font-weight="normal">base-3 digit product in W</text>
-<text x="870" y="282" font-size="12.5" fill="#6B7280" font-weight="normal">(and deeper 3-adic layers)</text>
-<text x="870" y="314" font-size="12.5" fill="#1F2937" font-weight="bold">n = H diagonal:</text>
-<text x="870" y="330" font-size="12.5" fill="#6B7280" font-weight="normal">T(H,H) = 3<tspan font-size="9" baseline-shift="30%">H&#8722;1</tspan> &#8801; 0 for H &#8805; 2</text>
+<text x="870" y="186" font-size="12.5" fill="#6B7280" font-weight="normal">outlined; always &#8801; 1 (proved).</text>
+<text x="870" y="202" font-size="12.5" fill="#6B7280" font-weight="normal">First nonzero in its column</text>
+<text x="870" y="218" font-size="12.5" fill="#6B7280" font-weight="normal">AND last nonzero in its row.</text>
+<text x="870" y="250" font-size="12.5" fill="#1F2937" font-weight="bold">rows n &#8801; 2 (mod 3):</text>
+<text x="870" y="266" font-size="12.5" fill="#6B7280" font-weight="normal">no spine cell; their last</text>
+<text x="870" y="282" font-size="12.5" fill="#6B7280" font-weight="normal">nonzero is T(3m+2,2m+1) &#8801; 2</text>
+<text x="870" y="298" font-size="12.5" fill="#6B7280" font-weight="normal">(verified k&#8804;17; unproved)</text>
+<text x="870" y="330" font-size="12.5" fill="#1F2937" font-weight="bold">below the spine:</text>
+<text x="870" y="346" font-size="12.5" fill="#6B7280" font-weight="normal">mixed residues, given by the</text>
+<text x="870" y="362" font-size="12.5" fill="#6B7280" font-weight="normal">base-3 digit product in W</text>
+<text x="870" y="378" font-size="12.5" fill="#6B7280" font-weight="normal">(and deeper 3-adic layers)</text>
+<text x="870" y="410" font-size="12.5" fill="#1F2937" font-weight="bold">n = H diagonal:</text>
+<text x="870" y="426" font-size="12.5" fill="#6B7280" font-weight="normal">T(H,H) = 3<tspan font-size="9" baseline-shift="30%">H&#8722;1</tspan> &#8801; 0 for H &#8805; 2</text>
 <rect x="64" y="909" width="16" height="16" rx="3" fill="#E2E9F7" opacity="1"/><text x="88" y="922" font-size="13" fill="#1F2937">&#8801; 0 (mod 3)</text>
 <rect x="214" y="909" width="16" height="16" rx="3" fill="#2D5DB8" opacity="1"/><text x="238" y="922" font-size="13" fill="#1F2937">&#8801; 1</text>
 <rect x="304" y="909" width="16" height="16" rx="3" fill="#D97706" opacity="1"/><text x="328" y="922" font-size="13" fill="#1F2937">&#8801; 2</text>
-<rect x="394" y="909" width="16" height="16" rx="3" fill="#2D5DB8" opacity="1" stroke="#1F2937" stroke-width="1.8"/><text x="418" y="922" font-size="13" fill="#1F2937">spine n=&#8970;3H/2&#8971; (first nonzero in its column)</text>
-<rect x="764" y="909" width="16" height="16" rx="3" fill="#9CA3AF" opacity="0.55"/><text x="788" y="922" font-size="13" fill="#1F2937">outside the law</text>
+<rect x="394" y="909" width="16" height="16" rx="3" fill="#2D5DB8" opacity="1" stroke="#1F2937" stroke-width="1.8"/><text x="418" y="922" font-size="13" fill="#1F2937">spine n=&#8970;3H/2&#8971; (first nonzero in its column, last in its row)</text>
+<rect x="854" y="909" width="16" height="16" rx="3" fill="#9CA3AF" opacity="0.55"/><text x="878" y="922" font-size="13" fill="#1F2937">outside the law</text>
 <text x="64" y="952" font-size="12" fill="#6B7280">residues from the banked exact triangle (n,H &#8804; 36); every colored cell is reproduced by the digit-product formula in W (342/342)</text>
 </svg>

@@ -117,6 +117,29 @@ $= \#\{H \le N : \lfloor 3H/2\rfloor > N\} = \lceil (N{-}1)/3\rceil$
 - $T(39,26) \equiv 1 \pmod 3$ and $P_{13}(39) \equiv 3 \pmod 9$ (even spine).
 - Every future in-regime triangle cell mod 3 via T1's digit product.
 
+## Row reading (jasonp's observation) and the sleeve zeros
+
+Reading along rows instead of down columns:
+
+- **The spine is also the LAST nonzero of its row.** Right of the spine in row
+  $n$ means $n < \lfloor 3H/2\rfloor$ — the same proved zero region as "above
+  the spine in column $H$"; the two statements are transposes of one fact.
+- **Rows $n \equiv 2 \pmod 3$ have no spine cell.** Their last nonzero is the
+  deficit-2 cell, and empirically it is ALWAYS $\equiv 2$:
+  $$T(3m{+}2,\,2m{+}1) \equiv 2 \pmod 3\qquad(v_3(P_k(3k{-}1)) = 2,\ \text{unit }2,\ k=m{+}1).$$
+  Verified $k \le 17$ (banked rows $m \le 11$; rows 38, 41, 44, 47, 50 are
+  law-conditional predictions). So the last-nonzero residue of row $n$ cycles
+  $1,1,2$ with $n \bmod 3$. UNPROVED — needs the deficit-2 layer (one binomial
+  order past the even-spine proof; the mod-27/81 lifts are the ingredients).
+- **Sleeve zeros are valuation spikes.** A band cell left of the spine carries
+  forced deficit $d = 3k{+}1{-}n$; generically $v_3(P_k(n)) = d$ exactly (the
+  cell is a unit there) and a ZERO marks excess divisibility
+  $v_3(P_k(n)) > d$. Census (jasonp): first row with two zeros left of the
+  spine is $n=19$ ($v_3(P_7(19))=4>3$, $v_3(P_9(19))=10>9$); first adjacent
+  pair $n=30$; first three-in-total $n=35$; first three-in-a-row $n=36$. A
+  closed law for these spikes (the deficit-$d$ unit formulas, $d \ge 2$) is
+  the open remainder of the Witt tower.
+
 ## Honest accounting
 
 - **Unconditional:** Prop. 1–2, the lower half of T4, the 3-power SNF fact, the

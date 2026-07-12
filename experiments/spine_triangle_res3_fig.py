@@ -62,14 +62,19 @@ s += [note(MT + 10, INK, 'above the spine:', True),
       note(MT + 26, MUT, 'all &#8801; 0 (proved: exponent'),
       note(MT + 42, MUT, '3H&#8722;2n&#8722;1 &#8805; 1 kills the cell)'),
       note(MT + 74, INK, 'the spine n = &#8970;3H/2&#8971;:', True),
-      note(MT + 90, MUT, 'outlined; always &#8801; 1 (proved'),
-      note(MT + 106, MUT, 'by Lagrange inversion)'),
-      note(MT + 138, INK, 'below the spine:', True),
-      note(MT + 154, MUT, 'mixed residues, given by the'),
-      note(MT + 170, MUT, 'base-3 digit product in W'),
-      note(MT + 186, MUT, '(and deeper 3-adic layers)'),
-      note(MT + 218, INK, 'n = H diagonal:', True),
-      note(MT + 234, MUT, 'T(H,H) = 3<tspan font-size="9" baseline-shift="30%">H&#8722;1</tspan> &#8801; 0 for H &#8805; 2')]
+      note(MT + 90, MUT, 'outlined; always &#8801; 1 (proved).'),
+      note(MT + 106, MUT, 'First nonzero in its column'),
+      note(MT + 122, MUT, 'AND last nonzero in its row.'),
+      note(MT + 154, INK, 'rows n &#8801; 2 (mod 3):', True),
+      note(MT + 170, MUT, 'no spine cell; their last'),
+      note(MT + 186, MUT, 'nonzero is T(3m+2,2m+1) &#8801; 2'),
+      note(MT + 202, MUT, '(verified k&#8804;17; unproved)'),
+      note(MT + 234, INK, 'below the spine:', True),
+      note(MT + 250, MUT, 'mixed residues, given by the'),
+      note(MT + 266, MUT, 'base-3 digit product in W'),
+      note(MT + 282, MUT, '(and deeper 3-adic layers)'),
+      note(MT + 314, INK, 'n = H diagonal:', True),
+      note(MT + 330, MUT, 'T(H,H) = 3<tspan font-size="9" baseline-shift="30%">H&#8722;1</tspan> &#8801; 0 for H &#8805; 2')]
 
 ly = MT + N * STEP + 34
 def sw(x, color, op='1', stroke=''):
@@ -77,8 +82,8 @@ def sw(x, color, op='1', stroke=''):
 s.append(sw(ML, R0) + f'<text x="{ML+24}" y="{ly}" font-size="13" fill="{INK}">&#8801; 0 (mod 3)</text>')
 s.append(sw(ML + 150, R1) + f'<text x="{ML+174}" y="{ly}" font-size="13" fill="{INK}">&#8801; 1</text>')
 s.append(sw(ML + 240, R2) + f'<text x="{ML+264}" y="{ly}" font-size="13" fill="{INK}">&#8801; 2</text>')
-s.append(sw(ML + 330, R1, stroke=f' stroke="{INK}" stroke-width="1.8"') + f'<text x="{ML+354}" y="{ly}" font-size="13" fill="{INK}">spine n=&#8970;3H/2&#8971; (first nonzero in its column)</text>')
-s.append(sw(ML + 700, OUT, '0.55') + f'<text x="{ML+724}" y="{ly}" font-size="13" fill="{INK}">outside the law</text>')
+s.append(sw(ML + 330, R1, stroke=f' stroke="{INK}" stroke-width="1.8"') + f'<text x="{ML+354}" y="{ly}" font-size="13" fill="{INK}">spine n=&#8970;3H/2&#8971; (first nonzero in its column, last in its row)</text>')
+s.append(sw(ML + 790, OUT, '0.55') + f'<text x="{ML+814}" y="{ly}" font-size="13" fill="{INK}">outside the law</text>')
 s.append(f'<text x="{ML}" y="{ly+30}" font-size="12" fill="{MUT}">residues from the banked exact triangle (n,H &#8804; 36); every colored cell is reproduced by the digit-product formula in W (342/342)</text>')
 s.append('</svg>')
 
