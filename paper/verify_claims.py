@@ -478,9 +478,99 @@ if strips:
 else:
     print("  (skipping dmirror P_k / N_k checks: runs/sym32 strips absent)")
 
-# Conjecture 1: M(n) = round((n-2)^2/8) = A001971(n-2) on all known values
+# Theorem (single-hole) / Conjecture (multi-hole total): M(n) = round((n-2)^2/8)
 chk("M(n)==round((n-2)^2/8) for n=1..16",
     all(M[n - 1] == ((n - 2) ** 2 + 4) // 8 for n in range(1, 17)))
+
+# ---- Theorem 1 (diagonal law) + spine cubic + ab-initio constants ----------
+import sys
+sys.path.insert(0, os.path.join(ROOT, "experiments"))
+
+# (a) machine checks of the proof (rational structure, onset, sharpness k<=3)
+r = subprocess.run(["python3",
+                    os.path.join(ROOT, "experiments", "diagonal_law_proof_check.py")],
+                   capture_output=True, text=True)
+chk("diagonal-law proof checker ALL CHECKS PASS",
+    r.returncode == 0 and "ALL CHECKS PASS" in r.stdout, r.stdout[-200:])
+
+# (b) grand form ab initio through u^5 (h and g coefficients from cluster weights)
+try:
+    from cluster_weight_dp import check_grand_form, count_stack
+    check_grand_form()
+    chk("grand form (H,G) ab initio through u^5 from cluster weights", True)
+except AssertionError as e:
+    chk("grand form (H,G) ab initio through u^5 from cluster weights", False, str(e))
+
+# (c) single-row cluster weight (2s+1)^2, the 25=5^2 of the leading coefficient
+chk("single-row cluster weight == (2s+1)^2 for s=2..6",
+    all(count_stack([1, s, 1]) == (2 * s + 1) ** 2 for s in range(2, 7)))
+
+# (d) spine cubic: digit-product formula reproduces every in-band banked cell mod 3
+_ph = os.path.join(ROOT, "results", "ns_a36", "perheight")
+if os.path.isdir(_ph):
+    T3 = {}
+    for f in os.listdir(_ph):
+        if f.startswith("h") and f.endswith(".out"):
+            Hc = int(f[1:-4])
+            for line in open(os.path.join(_ph, f)):
+                a_, b_ = line.split()
+                T3[(int(a_), Hc)] = int(b_)
+    KX = 40
+    Wm = [1] + [0] * KX
+    for _ in range(KX + 2):
+        inv = [1] + [0] * KX
+        for m in range(1, KX + 1):
+            inv[m] = (-sum(Wm[i] * inv[m - i] for i in range(1, m + 1))) % 3
+        i2 = [sum(inv[i] * inv[m - i] for i in range(m + 1)) % 3
+              for m in range(KX + 1)]
+        Wn = [1] + [i2[m - 1] for m in range(1, KX + 1)]
+        if Wn == Wm:
+            break
+        Wm = Wn
+
+    def digit_product(n, kmax):
+        prod = [1] + [0] * kmax
+        i = 0
+        nn = n
+        while nn:
+            d = nn % 3
+            for _ in range(d):
+                new = [0] * (kmax + 1)
+                for a2 in range(kmax + 1):
+                    if prod[a2]:
+                        for b2 in range(0, kmax + 1 - a2, 3 ** i):
+                            if b2 % (3 ** i) == 0 and b2 // (3 ** i) <= KX:
+                                w = Wm[b2 // (3 ** i)]
+                                if w:
+                                    new[a2 + b2] = (new[a2 + b2] + prod[a2] * w) % 3
+                prod = new
+            nn //= 3
+            i += 1
+        return prod
+
+    okc = 0
+    badc = 0
+    for (n, Hc), t in T3.items():
+        k = n - Hc
+        if not (1 <= Hc <= n <= 36 and n <= 2 * Hc - 1):
+            continue
+        e = n - 1 - 3 * k
+        pk = digit_product(n, k)[k]
+        if e > 0:
+            want = 0 if pk == 0 else pk  # T = P_k*3^e: mod 3 == 0 always when e>0
+            good = (t % 3 == 0)
+            # and the stronger claim: P_k(n) mod 3 == digit product
+            good = good and (t % 3 ** e == 0) and ((t // 3 ** e) % 3 == pk)
+        elif e == 0:
+            good = (t % 3 == pk)
+        else:
+            good = (pk == 0)  # P_k = T*3^{|e|} == 0 mod 3
+        okc += good
+        badc += not good
+    chk(f"spine digit-product formula on all in-band banked cells ({okc} cells)",
+        badc == 0, f"{badc} mismatches")
+else:
+    print("  (skipping spine check: results/ns_a36/perheight absent)")
 
 print(f"\n{ok} checks passed, {bad} failed.")
 raise SystemExit(1 if bad else 0)

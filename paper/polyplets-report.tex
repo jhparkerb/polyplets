@@ -29,6 +29,7 @@
 \newcommand{\tiertwominus}{\textsf{T2}$^{-}$}
 \newtheorem{conjecture}{Conjecture}
 \newtheorem{openproblem}[conjecture]{Open Problem}
+\newtheorem{theorem}{Theorem}
 
 \title{\textbf{Fixed polyplets through $a(36)$: eighteen new terms of OEIS
 A006770, their symmetry companions, and the diagonal structure of king-animal
@@ -65,13 +66,18 @@ $n=34$; the free, bilateral, and asymmetric companions (A030222, A030234,
 A030235, A194596) to the reach of the diagonal-mirror symmetry count. Along the
 way the machinery yields structural results: closed forms for the diagonals
 of the height triangle (an exponential/cumulant law with two new constants
-per level---empirically pinned and validated on every held-out term, not
-proved), a conjectural quasi-polynomial law for the diagonals of the
+per level, whose polynomial-times-power-of-three shape, onset, and
+integrality are \emph{proved} here by an exact walk-plus-clusters
+decomposition, the first five levels' constants derived ab initio from
+finite cluster counts), the triangle's mod-3 structure (an algebraic
+``spine cubic'' $W^3=W^2+t$ over $\mathbb F_3$), a conjectural
+quasi-polynomial law for the diagonals of the
 symmetric-fixed-point triangle (period two, degree $k$, with
 generating-function numerators satisfying $N_k(\pm1)=(\pm2)^k$, $k\ge1$), a
 hole-count
 stratification of A006770, exact fixed-height generating functions, the
-extremal maximum hole area ($\sim n^2/8$), and rigorous lower bounds on
+extremal maximum hole area (proved exactly
+$\lfloor(n-2)^2/8\rceil$ for a single hole), and rigorous lower bounds on
 $a(n)$. Results computed and
 validated but not proved are labeled as such; all code, data, and a
 claim-verifier are released.
@@ -94,9 +100,11 @@ A006770 had been recorded through $n=18$.
 This document is a \emph{computational report}: its claims are numbers, the
 provenance and verification of those numbers, and the empirical structure
 found in them. It reports the terms $a(19)$ through $a(36)$ and the results
-that grew out of computing them, including two structural observations about
-the diagonals of king-animal triangles (Section~\ref{sec:diagonals}), stated
-as validated conjectures since proofs are not attempted here. It is an
+that grew out of computing them, including the diagonal law of the height
+triangle---whose shape is proved here via an exact walk-plus-clusters
+decomposition---its mod-3 algebraic structure, and a conjectural
+quasi-polynomial law for the diagonal-mirror triangle
+(Section~\ref{sec:diagonals}). It is an
 amateur contribution carried out with substantial AI assistance
 (Section~\ref{sec:ai}). The data appears in the document as well as the
 repository: a report's job is to be usable by the next person to attempt
@@ -109,16 +117,24 @@ these computations.
   \item The one-sided companion A030233 to $n=34$; the free/bilateral/
         asymmetric companions A030222, A030234, A030235, and A194596 to
         $n=32$ (Section~\ref{sec:companions}).
-  \item Closed forms, empirically pinned and holdout-validated (not
-        proved), for the height-triangle diagonals $T(n,n-k)$, $k\le15$,
-        via an exponential/cumulant law, used both to accelerate the sweeps
-        and---critically---as \emph{held-out per-term checks} of the
-        frontier terms (Sections~\ref{sec:diagonals}, \ref{sec:confirm}).
+  \item Closed forms for the height-triangle diagonals $T(n,n-k)$,
+        $k\le16$, via an exponential/cumulant law whose shape (polynomial
+        of degree $k$ times $3^{\,n-1-3k}$, onset $n\ge2k+1$, integer
+        values) is \emph{proved} by an exact walk-plus-clusters
+        decomposition, with levels $k\le5$ derived ab initio from finite
+        cluster counts and the fitted levels holdout-validated; used both
+        to accelerate the sweeps and---critically---as \emph{held-out
+        per-term checks} of the frontier terms
+        (Sections~\ref{sec:diagonals}, \ref{sec:confirm}). The triangle
+        mod~3 is governed by an algebraic spine cubic, with the Smith
+        normal form of the diagonal-polynomial matrix determined
+        (Section~\ref{sec:spine}).
   \item A conjectural quasi-polynomial law for the diagonals of the diagonal-mirror
         symmetry triangle, with pinned polynomials, forward confirmations,
         and generating-function structure (Section~\ref{sec:diagonals}).
   \item A hole-count stratification of A006770 exact through $n=18$, the
-        extremal hole area $M(n)\sim n^2/8$, exact fixed-height generating
+        extremal hole area (single-hole maximum proved exactly
+        $\lfloor(n-2)^2/8\rceil$, two-sided), exact fixed-height generating
         functions for $H\le10$, and rigorous lower bounds
         (Sections~\ref{sec:holes}--\ref{sec:gf}).
 \end{enumerate}
@@ -351,7 +367,9 @@ mirror counts and are bounded by the diagonal-mirror count's reach
 \section{Methods: an escalation ladder}
 \label{sec:methods}
 
-Four methods computed these numbers; each subsection states what ran out and
+Four counting methods (A--D) computed these numbers, and a fifth (E)
+replaced their most expensive cells with closed forms; each subsection
+states what ran out and
 what replaced it. All engines share three disciplines: exact integer
 arithmetic; every production run re-derives \emph{all} smaller terms, so a
 regression anywhere in range is visible; and admissible pruning only (a prune
@@ -572,14 +590,17 @@ $n\le24$ oracle range and the earlier $n\le28$ run exactly.
 
 The top diagonals of the height triangle---$T(n,n-k)$ for small $k$, the
 tallest, sparsest strips---are the most expensive cells of a sweep and the
-least populated. They turn out to have exact closed forms
-(Section~\ref{sec:diagonals}): for each $k\le15$ a polynomial law, fitted from
+least populated. They have exact closed forms
+(Section~\ref{sec:diagonals}; the polynomial law is proved,
+Theorem~\ref{thm:diaglaw}): for each $k\le16$ a polynomial, fitted from
 two data points and then \emph{validated on held-out terms}, replaces the top
 real sweep height. Beyond the speedup, these closed forms are per-term
 independent checks of the production engine: a polynomial pinned on terms
 $\le n_0$ that predicts a frontier cell of term $n_0{+}1$ exactly is evidence
-no single-engine recount can provide. The same idea applied to the
-diagonal-mirror triangle yields the quasi-polynomials that will assist the
+no single-engine recount can provide---and that role survives the law being
+proved, since a theorem about the triangle does not validate a program that
+computes it. The same idea applied to the
+diagonal-mirror triangle yields the quasi-polynomials that assist the
 $n=33$ companions (\tierthree{} when used).
 
 \section{Validation architecture}
@@ -679,12 +700,76 @@ background, $a_j$ the boundary correction---so each level costs exactly two
 new constants, fitted from two data points and validated on all others. The
 leading coefficient is $25^k/k!$ (twenty-five single-defect species per walk
 site, an integer the fit must and does reproduce at every level), and $P_k$
-times $k!$ must be integral. Levels $k\le15$ are fitted, validated, and wired
+times $k!$ must be integral. Levels $k\le16$ are fitted, validated, and wired
 into production (Section~\ref{sec:methodE}); each was pinned on the earliest
-admissible terms and holds on every later one. The cumulant form is standard
-polymer-gas combinatorics; we have not proved the linearity of the cumulants
-for this family, and treat the law as empirically exact within its validated
-range.
+admissible terms and holds on every later one.
+
+The law's shape is not an empirical regularity but a theorem:
+
+\begin{theorem}[diagonal law]
+\label{thm:diaglaw}
+For every $k\ge0$ there is a polynomial $q_k$ of degree $\le k$ with
+$T(H{+}k,\,H)=q_k(H)\,3^H$ for \emph{all} $H\ge k+1$---equivalently
+$T(n,n{-}k)=P_k(n)\,3^{\,n-1-3k}$ for all $n\ge 2k+1$ with
+$P_k(n)=3^{1+2k}q_k(n{-}k)$---and $P_k$ takes integer values at every
+integer.
+\end{theorem}
+
+The proof is an exact decomposition. Reading an animal row by row, a
+single-cell row is a cut vertex (a king step changes the row index by at
+most one), so every animal splits uniquely into a drift walk decorated by
+finitely many \emph{cluster} types (maximal runs of multi-cell rows), each
+with a finite configuration count; this gives an exact rational identity
+for $\sum_{n,H}T(n,H)\,y^{\,n-H}z^H$, verified cell-for-cell against the
+computed triangle including all boundary corrections. Every cluster row
+carries at least one surplus cell, so (rows) $\le$ (surplus), which caps the
+numerator degree at $2k+1$ over the pole $(1-3z)^{k+1}$; partial fractions
+then force the polynomial law with onset exactly $n\ge2k+1$ (the observed
+onset, now derived), and a $3$-adic bound on the change of basis gives the
+integrality. Cumulant linearity in $n$ is the residue resummation of the
+same identity. The full write-up and machine checks are in the repository
+(\texttt{docs/proofs/diagonal-law.md},
+\texttt{experiments/diagonal\_law\_proof\_check.py}). The constants
+themselves are finite local enumerations: the level-$\le5$ coefficients of
+both series in the grand form (in particular
+$h=25,208,1483,20688,130208$) are re-derived ab initio from the $31$
+cluster types of surplus $\le5$
+(\texttt{experiments/cluster\_weight\_dp.py}), and the single-row cluster
+weight is exactly $(2s{+}1)^2$ for an $s$-cell row---$25=5^2$ is the $s=2$
+case, and the interior weight factors as $(2s{+}1)$ per contact side.
+What remains fitted rather than derived is $P_k$ for $6\le k\le16$; with
+the theorem in hand those fits are interpolation of a known-shape form,
+and their held-out hits remain load-bearing as checks of the
+\emph{engine} rather than of the law.
+
+\subsection{The height triangle mod 3: the spine cubic}
+\label{sec:spine}
+
+Reducing the diagonal law modulo~3 collapses the cluster gas to a single
+species. In the law's units every cluster carries
+$3^{\,2k-\ell-1}$ ($k$ its surplus, $\ell$ its rows), and since each cluster
+row holds at least one surplus cell, $k\ge\ell$: the exponent is positive
+for every type except the bare two-cell row, whose weight $25\equiv1$. The
+surviving generating object is \emph{algebraic}: writing the cumulant
+series as $H(t)$, one gets $H\equiv W \pmod 3$ where
+\[
+  W^3 \;=\; W^2 + t \qquad\text{over } \mathbb F_3 .
+\]
+Consequences, each machine-verified on all $342$ in-band cells of the
+banked triangle: a base-3 digit-product formula
+$P_k(n)\bmod 3 = [y^k]\prod_i W(y^{3^i})^{n_i}$ (with $n=\sum n_i3^i$), so
+the triangle mod~3 is $3$-automatic with an explicit automaton; the spine
+entries $T(3k{+}1,2k{+}1)\equiv1$ (by Lagrange inversion in characteristic
+3, where $\varphi=(1-x)^3$ has vanishing derivative); and the Smith normal
+form of the $N\times N$ matrix of diagonal polynomials, which has exactly
+$\lceil (N-1)/3\rceil$ nontrivial invariant factors, all powers of $3$. The
+finitely many congruences supporting these statements ($G\equiv1\bmod 9$
+and the mod-9/mod-27 lifts of the cubic, e.g.\
+$H^3\equiv H^2+25t \bmod 9$) are \emph{derived} from the same cluster
+decomposition---mod~27 the master equation is a finite explicit equation in
+five integers---not observed. Details and verifiers:
+\texttt{results/ternary-spine.md}, \texttt{results/defect-gas.md},
+\texttt{experiments/ternary\_spine.py}, \texttt{experiments/defect\_gas.py}.
 
 \subsection{The diagonal-mirror triangle: quasi-polynomials, period two}
 \label{sec:dmdiag}
@@ -791,9 +876,14 @@ observed here demands the poles sit at $x=\pm1$ with multiplicities exactly
 $k{+}1$ and $k$. Nothing in the decomposition picture forces those
 multiplicities; they are measured facts a proof would have to reproduce,
 presumably from the count of independent free lengths available at weight
-$k$. So the strategy is recorded as a strategy: the honest state of
-knowledge is the validated data above, including the parity anomaly that
-already ruled out the naive version of the argument.
+$k$. For the \emph{height} triangle exactly this strategy has now been
+carried out (Theorem~\ref{thm:diaglaw}: the decomposition is walk plus
+clusters, and partial fractions do force the pole multiplicities); the
+diagonal-mirror analog would need the symmetric decomposition and the
+$x=\pm1$ pole locations, and remains open. So for this triangle the
+strategy is recorded as a strategy: the honest state of knowledge is the
+validated data above, including the parity anomaly that already ruled out
+the naive version of the argument.
 
 All of Section~\ref{sec:dmdiag} is computed and validated, not proved. Its
 practical role is sharp: the sparse strips ($S\ge29$ at $n\ge33$) are
@@ -996,27 +1086,55 @@ sequence \href{https://oeis.org/A001971}{A001971} shifted by two---which
 agrees with the diamond exactly at every multiple of four, since
 $\bigl[(4r-2)^2/8\bigr] = 2r^2-2r+1$.
 
-\begin{conjecture}
-\label{conj:diamond}
-$M(n)=\left\lfloor \tfrac{(n-2)^2}{8}+\tfrac12 \right\rfloor$ for all
-$n\ge1$ (equivalently $M(n)=\mathrm{A001971}(n-2)$), verified here for
-$n\le17$. In particular the diamond wall is exactly---not just
-asymptotically---optimal at every multiple of four, and away from multiples
-of four the optimum tracks the same isoperimetric quota with a two-cell
-corner correction.
-\end{conjecture}
+For a single hole the nearest-integer form is proved, two-sided:
 
-$M(17)=28$ was the first genuinely untested prediction of this conjecture
+\begin{theorem}[single-hole maximum]
+\label{thm:diamond}
+Over $n$-cell polyplets whose enclosed empty cells form one $4$-connected
+region, the maximum enclosed area is exactly
+$\left\lfloor (n-2)^2/8+\tfrac12\right\rfloor$ for every $n\ge4$.
+\end{theorem}
+
+\emph{Lower bound:} parity-aligned diagonal boxes. The $4$-neighbour ring
+of the diagonal box $u\in[0,a{-}1]$, $v\in[0,b{-}1]$ (diagonal coordinates
+$u=x{+}y$, $v=x{-}y$) has exactly $a{+}b{+}2$ cells, is king-connected, and
+encloses $\lceil ab/2\rceil$ cells; optimizing over $a{+}b=n{-}2$ attains
+the bound at every residue---the diamond is the $a=b$ case, and the
+``slightly asymmetric'' optima at $n\not\equiv0 \pmod 4$ are the boxes with
+$|a{-}b|\in\{1,2\}$. \emph{Upper bound:} a moat-cycle argument. The hole's
+contour induces a closed king-walk in the animal with winding number one
+about the hole; loop-erasure extracts a simple cycle that must pass beyond
+the hole's diagonal extent on all four sides, and since a king step moves
+$|\Delta u|+|\Delta v|\le2$, a closed cycle spanning diagonal ranges
+$h_a\times h_m$ needs at least $h_a{+}h_m{+}2$ cells. Combined with the
+parity count (area $\le\lceil h_a h_m/2\rceil$) and the integer
+maximization, the bound is exact at every $n$. Each step is machine-checked
+end-to-end on $3{,}927$ single-hole animals; write-up and checkers in
+\texttt{results/maxhole-proof.md}.
+
+$M(17)=28$ was the first genuinely untested prediction of the formula
 (fitted on $n\le16$, with no forward confirmation until this run): a
 78-way split of the exact ($n{=}17$) hole-area sweep, combined by
-elementwise maximum, confirms it exactly---the conjecture's first real
-forward test since it was stated, not just another point it was fit to.
+elementwise maximum, confirms it exactly---a real forward test, not
+another point it was fit to.
+
+\begin{conjecture}
+\label{conj:diamond}
+The same formula gives the maximum \emph{total} enclosed area over any
+number of holes: splitting area across several holes is never better.
+Verified exhaustively for $n\le17$ and on $6{,}000$ random multi-hole
+animals with zero violations.
+\end{conjecture}
 
 \begin{openproblem}
 \label{op:mn}
-Prove Conjecture~\ref{conj:diamond}, or extend the verification past
-$n=17$; the first untested value is now the prediction $M(18)=32$
-(exact, no rounding: $(18-2)^2/8 = 32$).
+Prove Conjecture~\ref{conj:diamond}. Filling the holes reduces it to an
+isoperimetric ``peeling'' inequality for hole-free animals---the interior
+of a hole-free animal has a $4$-shell at least $4$ smaller than the
+animal's own ($|{\rm shell}_4(I)|\le|S|-4$), which telescopes to the
+bound---verified on $7{,}645$ animals (zero violations, tight on
+onion-ring shapes) but open. The first untested value of the formula
+itself is $M(18)=32$ (exact, no rounding: $(18-2)^2/8=32$).
 \end{openproblem}
 
 \section{Generating functions by height, and rigorous bounds}
@@ -1099,7 +1217,7 @@ beyond hardware at $n\ge33$ under the \tierthree{} label.
 \label{sec:availability}
 
 The source (all engines and gates), the per-height triangle rows for every
-term through $n=34$ with per-term provenance ledgers, the b-files for
+term through $n=36$ with per-term provenance ledgers, the b-files for
 A006770 and the companion sequences, the hole triangle and its columns, the
 recovered generating functions, and the sample statistics are in the
 accompanying repository; derived artifacts are regenerated on demand by the
@@ -1164,6 +1282,13 @@ All machines are commodity hardware owned and operated by the author:
         stays small; the tallest surviving real sweep height dominates,
         $\sim70\%$ of the wall). The cross-ISA recount on ayr reproduced
         the triangle byte-identically.
+  \item \textbf{$a(36)$, full triangle (Method C, split across two
+        machines):} heights $H\le18$ and the injected range on ayr
+        ($1.94$\,h wall, $52$ core-hours, peak RSS $0.35$\,GB) in parallel
+        with the $H=19$ long pole on dalby ($3.28$\,h wall, $111$
+        core-hours, peak RSS $0.38$\,GB), under a run-file compression
+        (varint counts) that cut the long pole's wall $2.13\times$
+        relative to $a(35)$'s $H=19$ despite the larger term.
   \item \textbf{Diagonal-mirror symmetry count, $n=32$ (Method D, farmed):}
         the six deepest exact-bounding-box strips ($S=26$--$31$, dalby)
         cost $3.0$\,M CPU-seconds $\approx835$ core-hours with per-strip
@@ -1257,7 +1382,7 @@ Proceedings of the Royal Society of Edinburgh Section A: Mathematics
 OEIS Foundation Inc.,
 \emph{The On-Line Encyclopedia of Integer Sequences} (2026),
 sequences A006770, A030222, A030233, A030234, A030235, A194596, A001168,
-A389193, A001844, A047781.
+A389193, A001844, A001971, A047781.
 \url{https://oeis.org}.
 
 \end{thebibliography}

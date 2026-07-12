@@ -65,8 +65,12 @@ responsible; `docs/oeis-ai-policy.md`).
 Computational-report form, five external review rounds + self-check. Growth §3 confluent
 3-param fit (Δ₁=1/2, λ≈7.111). Now includes the rigorous **upper-bound** paragraph
 (above). `paper/verify_claims.py` — 397+ checks GREEN (parses tables from the .tex).
-Compiles clean (no undefined refs/citations). **TODO: final read-through** after the
-close-out passes.
+Compiles clean (no undefined refs/citations). **Final read-through DONE 2026-07-13**;
+now includes the diagonal-law THEOREM (thm:diaglaw), the spine-cubic subsection
+(sec:spine), the single-hole max-hole THEOREM (thm:diamond, multi-hole reduced to
+peeling as conjecture+open problem), k<=16 corrections, a(36) cost profile.
+verify_claims 406/406 (adds: proof checker, ab-initio grand form, (2s+1)^2,
+spine digit-product on all in-band cells).
 
 ## Open threads
 - **Lean proof** (branch `lean-diagonal-proofs`, `polyplets/PROOF-STATUS.md`):
