@@ -11,9 +11,9 @@ Mean bbox height vs n (mass-weighted by T(n,H)):
 - **`mean_H/n` falls monotonically** `0.745 (n=4) → 0.488 (n=18) → 0.375 (n=36)`.
   So typical height is a *shrinking* fraction of n → the mass is at
   **growing-but-sublinear height**, not `n/2` and not fixed small H.
-- Fitting `mean_H ~ c·n^ν`, the **local slope drifts `0.744 → 0.688`** over the
-  clean range n=4..19 (where H<=18 captures 100% of the mass), monotonically
-  decreasing toward the **universal 2D lattice-animal exponent `ν ≈ 0.6407`**.
+- Fitting `mean_H ~ c·n^ν`, the **local slope drifts down** monotonically toward the
+  **universal 2D lattice-animal exponent `ν ≈ 0.6407`** (original H≤18 run: 0.744→0.688
+  to n=19; full-triangle redo 2026-07-11: to 0.678 at n=36 — see the caveats update).
 - mode_H tracks mean_H (both `~ n^0.64`).
 
 ## Reading
@@ -28,12 +28,16 @@ Mean bbox height vs n (mass-weighted by T(n,H)):
 
 ## Caveats
 
-- Data truncated at H<=18, so `captured < 1` for n>19 (down to 0.905 at n=36);
-  those `mean_H` are slightly underestimated (missing high-H tail biases mean and
-  local-ν DOWN). The clean, unbiased range is n<=19. A paper-grade ν figure wants
-  the FULL height distribution (all H, via the transpose/full triangle).
-- n<=19 is small for asymptotics; finite-size corrections are large (local ν still
-  0.69 at n=19). The trend toward 0.6407 is unambiguous; the precise value is not
+- **UPDATE 2026-07-11:** the truncation caveat below is RESOLVED — the full
+  untruncated triangle T(n,H) (all H, n≤36, row sums verified == a(n)) is banked at
+  `results/ns_a36/perheight/`. Redone on the full data, mean-based local-ν drifts
+  0.712 (n=12) → 0.678 (n=36), same trend toward 0.6407, now clean to n=36 (no
+  high-H bias). The full-distribution analysis + a universal shape data-collapse are
+  in [[height-distribution-collapse]]. (The original run below used an H≤18 slice.)
+- ~~Data truncated at H<=18, so `captured < 1` for n>19; the clean range is n<=19.~~
+  (Superseded — see the update above; full triangle now used.)
+- n≤36 is still pre-asymptotic; finite-size corrections are large (effective ν ≈
+  0.68 at n=36). The trend toward 0.6407 is unambiguous; the precise value is not
   pinned here.
 
 ## Paper use
