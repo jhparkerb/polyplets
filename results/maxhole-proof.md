@@ -119,10 +119,35 @@ monotonicity this implies the multi-hole bound A ≤ round((n−2)²/8) outright
   shell 9, r_u+r_v = 8 > 7). The moat argument needs the wound set connected;
   a filled animal's interior needn't be. The area bound survives because
   scattered interiors are far from filling their diagonal box.
-- **Suggested route:** onion peeling — show the interior region's total 4-shell
-  is ≤ |shell(F′)| − 4; iterating gives Σ(m−4k) = the diamond count exactly.
-  Checker for A-side experiments: `experiments/maxhole_master_check.py` (inline
-  in session; the 6,000-shape verification).
+- **Peeling route (2026-07-12, pushed):** the master inequality follows from
+
+  > **PEELING LEMMA.** Hole-free F′ with shell S and interior I, |I| ≥ 2 ⟹
+  > |shell₄(I)| ≤ |S| − 4.
+
+  because the recursion f(m) ≤ (m−4) + f(m−4) with the (constructively realized)
+  bases f(4)=1, f(5)=1, f(6)=2, f(7)=3 telescopes to **exactly**
+  round((m−2)²/8) for every m (verified m ≤ 199; the interior decomposes into
+  hole-free king-components, and the inductive bound is superadditive so one
+  component is worst). Peeling verified on 7,645 filled animals + adversarial
+  families (combs, spirals, rectangles, diamonds): **0 violations**, tight
+  exactly on diagonal-boundary shapes (onion rings drop by 4 per layer).
+
+  **Decomposition of peeling into two verified sub-lemmas**
+  (`experiments/maxhole_peeling_check.py`):
+  - **(A-int)** each king-component J of an interior (|J| ≥ 2) has
+    |shell₄(J)| ≤ r_u(J) + r_v(J) − 2. *False for general king sets* (14-cell
+    counterexample found) but 0/7,599 on interior components with **6,744
+    tight** — erosion components are exactly the sets for which the diagonal
+    semi-perimeter is the right complexity measure. Open: why erosion tames the
+    boundary (the exposed sides of interior cells face S, whose cells face the
+    exterior — a two-layer rigidity not yet formalized).
+  - **(Σ)** Σ_j max(r_u,j + r_v,j − 2, 1) ≤ |S| − 4 (0/7,645, 885 tight).
+    The per-component moat-packing statement; each component's moat costs
+    r_u+r_v+2 but overlaps are bounded so the shell is charged only r_u+r_v−2
+    per component plus a global −4. Open: the packing argument.
+  - Also refuted en route (recorded to save future work): the union-range core
+    (two-lone-cells), the per-component sum Σ(r_u,j+r_v,j+2) ≤ |S| (7-cell
+    two-plus example), and claim (A) for general king-connected sets.
 
 ## Superseded notes (pre-proof)
 
