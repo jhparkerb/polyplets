@@ -5,23 +5,22 @@ theorems. Each is crisp and checkable; the first two are new this session.
 
 ## NEW conjectures (strong numerical evidence)
 
-### C1. The height-triangle determinant is a pure power of 3
-For the $N\times N$ matrix $T=[\,T(i,j)\,]_{1\le i,j\le N}$ (height triangle,
-$T(n,H)$),
-$$\det T_N \;=\; \pm\,3^{\,N(N-1)/2}.$$
-Verified $N\le18$ (exact; `experiments/`... via sympy). **This one identity implies
-the whole "everything at prime 3" structure** (`results/triangle-snf.md`): the Smith
-invariant factors form a divisibility chain $d_1\mid d_2\mid\cdots\mid d_N$, so if
-$\prod d_i=|\det|$ is a pure 3-power, every $d_i$ is a 3-power — hence the cokernel
-$\mathbb Z^N/T_N\mathbb Z^N$ is a finite 3-group. The exponent
-$N(N-1)/2=\sum_{n\le N}(n-1)$ is exactly the 3-valuation of the diagonal
-$\prod_n T(n,n)=\prod_n 3^{\,n-1}$.
-- **Attack:** show $T_N$ is unimodular over $\mathbb Z_p$ for every $p\ne3$
-  (equivalently $\det\not\equiv0\bmod p$), and that its Smith form over $\mathbb Z_3$
-  has diagonal $3^{e_i}$ with $\sum e_i=N(N-1)/2$. The "why 3": each row of a
-  height-$H$ animal is one cell drifting by $\{-1,0,+1\}$ (three choices), the source
-  of the $T(H,H)=3^{H-1}$ diagonal and, plausibly, of a base-3 factorization of the
-  whole triangle.
+### C1. "SNF is a 3-group" is PROVED (was mis-stated as a hard determinant identity)
+$T(n,H)=0$ for $H>n$ (an $n$-cell animal has height $\le n$), so $T_N$ is
+**lower-triangular** and $\det T_N=\prod_n T(n,n)=\prod_n 3^{\,n-1}=3^{N(N-1)/2}$ is
+immediate — not a conjecture. What it buys for free (settling
+`results/triangle-snf.md`'s first open bullet): the determinant is a pure 3-power,
+the Smith invariant factors form a divisibility chain $d_1\mid\cdots\mid d_N$ with
+$\prod d_i=|\det|$, so any prime $q\ne3$ dividing some $d_i$ would divide $d_N$ hence
+$|\det|$ — impossible. **Therefore every invariant factor is a power of 3 and the
+cokernel is a finite 3-group.** Done, for all $N$.
+- **STILL OPEN (the real content):** triangularity explains "all 3-powers" but NOT
+  the *exponent structure* — the number of nontrivial factors is
+  $\lceil(N-1)/3\rceil$ and the individual exponents $e_i(N)$ have no known formula.
+  Those depend on the arithmetic of the OFF-diagonal entries (gcds of minors), not
+  the diagonal, and the $/3$ in the count matches the 3-consecutive-atom column
+  factorization $p_H=q_Hq_{H-1}q_{H-2}$. That linkage — why exactly $\lceil(N-1)/3
+  \rceil$ nontrivial factors — is the genuine open problem here.
 
 ### C2. A006770 is strictly log-convex
 $$a(n)^2 < a(n-1)\,a(n+1)\qquad(n\ge3),$$
