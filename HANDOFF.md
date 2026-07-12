@@ -137,6 +137,23 @@ spine digit-product on all in-band cells).
   monotone phases + reversal clusters, program steps 1-4 in the recon doc.
   Prize: retires the paper's last conjectural law + the T3 caveat.
 
+- **Kernel/haruspicy/ACSV program (2026-07-14, in flight):** order K2 -> H1 ->
+  ACSV -> K1 -> H2 -> K3. K2 DONE (Temperley on column-convex polyplets =
+  rediscovery of A187077, pipeline validated; results/convex-polyplets.md).
+  H1 DONE (results/anisotropic-not-dfinite.md): pole-argument theorem
+  excludes y-ODEs for the height-anisotropic GF in quantified (order,
+  x-degree) boxes (up to r<=5 & D<=28 ... r=0 & D<=3288), from mod-p-certified
+  new-root contents psi_H (deg 1..3289, squarefree, lowest terms, H<=10);
+  full non-D-finiteness conditional on deg psi -> infinity. H=11 banked GF
+  found anomalous (validated=False, shares no roots with Q9Q10) — needs
+  re-recovery before any use. ACSV (added):
+  saddle-point on the grand form G(y)H(y)^n to prove the height-distribution
+  collapse profile on the tall flank. Then K1 (kernel on all-pairs gap walk,
+  exact ~14.41), H2 (haruspicy on convex-by-area), K3 (exact convex mu,
+  q-series). Garnish when idle: Sheffer/Riordan convolution identities for
+  P_k as new cross-checks; p=2 spine considered-and-declined (3-powers are
+  units mod 2, no collapse).
+
 ## Remaining work ledger
 1. **Paper final read-through.**
 2. **Viva cold retakes**, then %C authorship pass (jasonp's own words), then jasonp submits.
