@@ -286,6 +286,29 @@ so the hole-free triangle is mod-3 trivial in-band, and the full triangle's
 entire mod-3 structure (W³ = W² + t and everything downstream) lives in the
 hole-making configurations. Feeds the OEIS-staged A₀ column.
 
+## The hole-marked gas: (n, H, holes) stratification (2026-07-13)
+
+Give every decoration a hole marker z (pair-row weight 24 + z; triple
+47 + 2z; stacked pairs 304 + 33z + 2z²; boundary 5, 7, 62 + 4z). The
+z-marked master equation + boundary residue derive the complete
+hole-stratified diagonal laws, exact on all 26 banked hole-resolved GF
+cells (j ≤ k ≤ 2, H ≤ 7):
+
+$$P_1(n,z) = (24n-42) + z\,(n-3),$$
+$$P_2(n,z) = (288n^2-1113n+507) + z\,(24n^2-117n+75)
+           + z^2\,\tfrac{(n+6)(n-5)}{2}.$$
+
+**Mod-3 concentration theorem.** Mod 3 the marked equation collapses to
+H(u,z) ≡ W(zu) (only the pair-row survives and its z-content is z¹), so on
+diagonal k only the MAXIMAL-hole stratum j = k survives mod 3, and it
+inherits the spine cubic. Visible term-by-term above: every z⁰/z¹
+coefficient is divisible by 3. Sharpens "the spine is carried by
+hole-makers": to survive mod 3, every unit of surplus must bring its own
+hole. The one-hole diagonal is the pure placement law T₁(n,n−1) =
+(n−3)·3^{n−4}; the naive binomial guess for higher strata fails because
+clusters carry multiple holes (T₂(7,5) = 13 ≠ 1).
+Verifier: `experiments/hole_strata_gas.py`.
+
 ## Open
 - Two-row closed form generalizing (2s+1)² (weight table is raw material).
 - ~~The convergence + boundary analysis for a full proof of the law~~
