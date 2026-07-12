@@ -48,3 +48,14 @@ reference exactly; mu = 3.12894 confirmed. Structural note: the unbounded
 interval width is the same mechanism behind the all-pairs cluster family's
 non-C-finiteness (results/defect-gas.md, 2026-07-13) -- one phenomenon, two
 guises.
+
+**Perimeter counting (2026-07-13, `experiments/convex_perimeter.py`):** the
+mirage refines cleanly. By SEMIPERIMETER (= box W+H; for convex animals the
+edge-perimeter is 2(W+H)), king convex polyplets are **D-finite**: series
+1, 2, 9, 36, 154, 668, 2916, 12740, ... with a holdout-verified P-recurrence
+(order 5, degree 2, fitted s<=25 predicting 8 later terms, s<=36); the
+polyomino control reproduces A005436 exactly and its recurrence at (2,4)
+calibrates the guesser. Perimeter growth ratio ~4.13 and falling. So:
+**area wild (non-D-finite), perimeter tame (D-finite) — for both families**;
+convexity is a perimeter lever for king animals exactly as for polyominoes.
+The perimeter sequence is a second OEIS-eligible novel sequence.
