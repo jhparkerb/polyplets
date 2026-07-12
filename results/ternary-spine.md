@@ -41,7 +41,13 @@ $$\textstyle\sum_k P_k(n)\,y^k \;=\; G(y)\,H(y)^n .$$
 - $(\star a)$ $G \equiv 1 \pmod 9$ — verified: $v_3(G_j) \ge 2$, $j \le 17$.
 - $(\star b)$ $H \equiv W \pmod 3$ — verified on all 18 known coefficients, and
   the resulting digit formula reproduces **all 342 in-regime banked triangle
-  cells mod 3** using nothing but the cubic.
+  cells mod 3** using nothing but the cubic. **UPGRADE 2026-07-12: DERIVED**
+  from the defect gas (`results/defect-gas.md`): the master equation
+  $H = 1 + \sum_c \hat W_c u^{k_c} H^{-(k_c+\ell_c)}$ plus the valuation lemma
+  ($k \ge \ell$ per cluster $\Rightarrow$ only the bare pair-row survives mod 3)
+  gives $H^3 = H^2 + u$ over $\mathbb F_3$ as an all-orders statement — the
+  cubic is the gas of bare pair-rows. The mod-9 lift $H^3 \equiv H^2 + 7u$ and
+  a finite explicit mod-27 equation come from the same lemma.
 - $(\star c)$ $S := (H^3 - H(t^3))/3$ satisfies $S \equiv t^2 + tW \pmod 3$ —
   verified to $t^{17}$.
 
@@ -163,8 +169,10 @@ where the unproved/exposed cells live.
   holdout ever tried): everything quantified over all $k$.
 - **Conditional on the ladder $(\star a,b,c)$:** finitely many coefficient
   identities (verified through $y^{17}$; the digit formula then re-verified on
-  342 independent triangle cells). A proof of the ladder needs the cluster
-  combinatorics of the cumulants — the same open ground as the law itself.
+  342 independent triangle cells). **$(\star b)$ is now derived** from the
+  defect-gas master equation + valuation lemma (`results/defect-gas.md`,
+  2026-07-12), conditional only on the law + renewal formalism; $(\star a)$ and
+  $(\star c)$ still await the boundary-weight analysis.
 - Naming: the cubic $W^3 = W^2+t$ is Artin–Schreier-like; $H\bmod 3$ being
   algebraic makes the triangle mod 3 3-automatic (Christol), and T1 is the
   automaton made explicit.
