@@ -49,10 +49,11 @@ def next_rows(state, budget):
     cells, part = state
     lo, hi = min(cells), max(cells)
     res = {}
-    for s in range(1, budget + 2):
+    M = 3 + 2 * budget          # generous reach: pending blocks cost future surplus,
+    for s in range(1, budget + 2):   # and gaps may be bridged by cells ALREADY below
         sur = s - 1
         if sur > budget: continue
-        W = 2 + 3 * (s - 1)
+        W = M
         for nxt in combinations(range(lo - W, hi + W + 1), s):
             touch = lambda c, n: abs(c - n) <= 1
             if not any(touch(c, n) for c in cells for n in nxt): continue
@@ -176,3 +177,45 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# ---------------------------------------------------------------------------
+# THEOREM (single-row cluster weights): the interior weight of an s-cell
+# single-row cluster is (2s+1)^2, for all s >= 2.  PROOF: gaps of width 2 must
+# be bridged by the below-contact p or the above-contact q at the gap middle
+# (wider gaps need surplus cells, excluded at this weight); one cell bridges at
+# most one gap, so a row with j wide gaps contributes
+#   j=0: (s+2)^2      j=1: 2(s+3)-1      j=2: 2      j>=3: 0
+# and  (s+2)^2 + (s-1)(2s+5) + C(s-1,2)*2 = 4s^2+4s+1 = (2s+1)^2.  QED
+# (25 = 16+9 is the s=2 case; 49 = 25+11+11+2 the s=3 case.)
+# ---------------------------------------------------------------------------
+def single_row_weight(s):
+    import itertools as it
+    def blocks(cells):
+        cells = sorted(cells); out = []; cur = [cells[0]]
+        for c in cells[1:]:
+            if c == cur[-1] + 1: cur.append(c)
+            else: out.append(tuple(cur)); cur = [c]
+        out.append(tuple(cur)); return out
+    touch = lambda c, n: abs(c - n) <= 1
+    total = 0
+    for gaps in it.product((1, 2), repeat=s - 1):
+        T = [0]
+        for g in gaps: T.append(T[-1] + g)
+        B = blocks(T)
+        for p in range(-2, T[-1] + 3):
+            if not any(touch(t, p) for t in T): continue
+            for q in range(-2, T[-1] + 3):
+                if not any(touch(t, q) for t in T): continue
+                par = list(range(len(B)))
+                def find(x):
+                    while par[x] != x: par[x] = par[par[x]]; x = par[x]
+                    return x
+                def uni(a, b):
+                    ra, rb = find(a), find(b)
+                    if ra != rb: par[ra] = rb
+                for ext in (p, q):
+                    tb = [i for i, b in enumerate(B) if any(touch(c, ext) for c in b)]
+                    for i in range(len(tb) - 1): uni(tb[i], tb[i + 1])
+                if len({find(i) for i in range(len(B))}) == 1: total += 1
+    return total
