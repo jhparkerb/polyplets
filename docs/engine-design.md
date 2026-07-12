@@ -1,6 +1,7 @@
 # Engine design — the production polyplet enumerator
 
-Status: as built (the engine that computed a(21)-a(34)). Written 2026-06-26
+Status: as built (the engine that computed a(21)-a(36); a(35)/a(36) via the
+varint evolution of this run-file engine). Written 2026-06-26
 as the build design; the planning trilogy around it (PRD, implementation
 plan, and the frontier investigation corpus it cites) was removed at
 project close and lives in git history.

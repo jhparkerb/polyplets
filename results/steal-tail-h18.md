@@ -52,6 +52,11 @@ the stride.)
 
 ## Open question — is the tail splittable? (decides whether any fix helps)
 
+> **ANSWERED (see `results/utilization-fix-and-ceiling.md`):** effectively NO — via
+> the current between-records mechanism the tail is not usefully splittable; the
+> wall-estimate steal fix was built and bought ~nothing. Parking at a(34) was later
+> lifted (a(35), a(36) since banked). Original probe follows:
+
 Work-stealing splits a running straggler at a *record cursor*. If the tail is a
 handful of heavy-but-separable key ranges, cursor-splitting divides the work and
 the ~280s/column is recoverable (best case: H18 column ~731s → map_ideal 81s +

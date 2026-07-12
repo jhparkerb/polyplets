@@ -1,5 +1,11 @@
 # Pinning the k=8 height-diagonal (P₈)
 
+**UPDATE 2026-07-11 — RESOLVED.** a(24)…a(36) are all banked. The predicted
+**T(24,16) = 42 594 477 635 772 598 is CONFIRMED** (`results/ns_a36/perheight/h16.out`,
+n=24 row), so the sum-of-roots k=8 extrapolation below held exactly and **P₈ is
+pinned**. The "pins the instant a(24) lands" / a(25)-ladder framing below is the
+original pre-a(24) prospective note, kept as the derivation record.
+
 `T(n, n-k) = P_k(n)·3^(n-1-3k)`, P_k degree k, valid n ≥ 2k+1. Computed by
 `scripts/pin_diagonal_k8.py` (exact rational arithmetic on the a(23) triangle).
 

@@ -1,6 +1,8 @@
 # The Atom Ledger: dependency structure of the polyplet triangle T(n,H)
 
-Date: 2026-07-10. Data: the banked 35-row triangle `results/ns_a35/perheight/h{H}.out`
+Date: 2026-07-10 (analysis snapshot; a(36) is now also banked at `results/ns_a36/` —
+one more holdout row available, structural conclusions unchanged). Data: the banked
+35-row triangle `results/ns_a35/perheight/h{H}.out`
 (T(n,H) = # fixed polyplets of n cells with bounding-box height exactly H,
 a(n) = Σ_H T(n,H)). All findings below are exact-arithmetic, fit-early /
 validate-on-the-rest measurements — scripts in `experiments/triangle_relations.py`,

@@ -6,16 +6,18 @@
 // compare >= origin in that order; the classic untried/tried discipline does
 // the rest. Lattice-generic: the neighbor table is the only per-lattice part.
 //
-// CLI:  g2 LATTICE MAXN [--per-box] [--split S K IDX]
+// CLI:  g2 LATTICE MAXN [--per-box] [--split S K IDX] [analysis modes]
 //   aggregate mode: lines "n count"
 //   --per-box:      lines "n w h count"   (w,h = bounding box dims)
+//   analysis modes (see the usage string in main()): --rook-bishop, --perimeter,
+//       --siteperim, --holes/--holes8, --maxhole/--maxhole8/--maxhole-strat, --contacts
 //   --split S K IDX: deterministic subtree partition at animal size S into K
 //       classes; worker IDX counts its classes' subtrees, worker 0 also
 //       counts all nodes of size < S. Summing all workers' outputs
 //       elementwise must equal the unsplit run (gate check C).
 //
 // Counts are unsigned 64-bit; safe through ~9e18, far beyond any run this
-// binary will be asked to do (polyplet a(22) ~ 5e16).
+// binary will be asked to do (polyplet a(22) ~ 4.7e16).
 
 #include <cstdint>
 #include <cstdio>

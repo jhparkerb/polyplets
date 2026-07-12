@@ -21,8 +21,8 @@ P_0..P_4 for the 15 sparse cells S=29..33 (`scripts/dmirror_hybrid_sum.py
 Direct strips: dalby, 2026-07-05 07:41 -> 07-06 07:39 (24.0h wall,
 6.71M cpu-s ≈ 1864 core-h, peak strip RSS 126.2GB = S=28, brushed into
 swap). Every strip's n<=32 prefix byte-matches the n=32 farm (413
-entries, 0 mismatches). Cross-ISA: ayr (x86) is independently recomputing
-the S<=25 tail (in flight; S=25 compare pending).
+entries, 0 mismatches). Cross-ISA: ayr (x86) independently recomputed
+the S<=25 tail (compare completed; the n=33 result is banked and used downstream).
 
 ## The n=33 terms (T3)
 

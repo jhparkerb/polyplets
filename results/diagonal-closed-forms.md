@@ -12,7 +12,8 @@ k-th sub-diagonal (near-maximal height). `experiments/Pk_explicit.py`.
 `T(n,n-k) = P_k(n)·3^{n-1-3k}`, **degree(P_k) = k**, valid in the bulk
 **`n ≥ 2k+1`** (below that, boundary terms), leading coefficient **`25^k/k!`**.
 Proven k=0,1,2 from first principles; leading coeff verified k≤6 and confirmed
-k=3..7 (k=8 pins when a(24) lands). See:
+k=3..7; **k=8 pinned** (T(24,16) banked, `results/ns_a36/perheight/h16.out`;
+a(24)…a(36) all banked). See:
 - `docs/proofs/T-n-nm1.md`, `docs/proofs/T-n-nm2-and-general.md` (the proofs +
   "defect gas" structure),
 - `results/k8-pinning.md` (leading-coeff conjecture `[n^k]P_k = 25^k/k!`

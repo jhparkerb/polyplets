@@ -14,7 +14,7 @@ recurrences of order 1,3,7,15 for H=1..4 and nothing pinnable for H>=5):
       order; calibrate on H=2..4 where the answer is known);
   (D) strip cumulative sequences C_H(n) = sum_h (H-h+1) T(n,h) (what a naive
       height-<=H strip transfer matrix actually counts): minimal recurrences;
-  (E) second-source coverage count of the 35-row triangle
+  (E) second-source coverage count of the 36-row triangle
       (columns H<=4 by recurrence + diagonals covered by P_k closed forms).
 """
 import os, sys

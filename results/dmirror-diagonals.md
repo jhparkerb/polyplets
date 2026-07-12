@@ -1,5 +1,9 @@
 # dmirror strip diagonals are quasi-polynomial (P_k for Hall of Mirrors)
 
+> **OUTCOME (post-2026-07-05):** the n=33/34 ladder discussed below resolved as
+> n=32 T2 and n=33 T3 LANDED; **n=34 was declined final**. See related-seqs-n33.md.
+> "in flight" strip-farm references below are superseded by their inline updates.
+
 2026-07-05. d(S, n) = diagonal-symmetric king-animals with n cells and bbox
 exactly SxS (the dmirror strip counts). On the diagonal k = n - S, d(S, S+k)
 is quasi-polynomial in S with **period 2** (off-diagonal cells pair under

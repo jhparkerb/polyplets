@@ -15,8 +15,10 @@ sequences and asserts the /4 and /8 Burnside divisibilities at every n.
 Confidence: inherits A006770's tiers -- T1 through n=19, T2 (single-algorithm,
 multiply decorrelated) n=20..33; A030233(34) inherits a(34)'s T2- grade.
 
-Reach: A030233 to n=34; the other four (need D) to n=32. n=33 for the
-D-dependent four requires dmirror(33) = dalby's in-flight strip farm plus the
+Reach: A030233 to n=34; the other four (need D) to n=32. **UPDATE: dmirror(33)
+landed** and the four D-dependent terms at n=33 are banked (T3) — see
+`results/related-seqs-n33.md`. (Original:) n=33 for the
+D-dependent four requires dmirror(33) = dalby's strip farm plus the
 P_4 closed forms for S>=29 -- those terms will be conjecture-assisted (T3),
 comment-only for OEIS.
 

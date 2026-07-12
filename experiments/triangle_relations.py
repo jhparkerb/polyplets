@@ -2,14 +2,14 @@
 """Hunt for independent recurrences in the polyplet triangle T(n,H).
 
 T(n,H) = # polyplets of n cells with bounding-box height exactly H.
-a(n) = sum_H T(n,H). Full triangle banked in results/ns_a35/perheight/h{H}.out
-(each file lists `n  T(n,H)` for n=1..35).
+a(n) = sum_H T(n,H). Full triangle banked in results/ns_a36/perheight/h{H}.out
+(each file lists `n  T(n,H)`; frontier a(36); ns_a35/ also present as fallback).
 
 Goal: find relationships that let a column (or the whole triangle) be recomputed
 a *second* way -- independent of the kink transfer-matrix sweep -- for validation.
 
 This script:
-  (1) loads the full 35-row triangle, checks row sums == a(n);
+  (1) loads the full 36-row triangle, checks row sums == a(n);
   (2) per column H, finds the MINIMAL constant-coefficient linear recurrence the
       data supports, i.e. smallest d with c_1..c_d s.t.
           T(n,H) = sum_j c_j T(n-j,H)   for all n,
@@ -20,12 +20,12 @@ import glob, os, sys
 from fractions import Fraction as F
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-NMAX = 35
+NMAX = 36
 
 def load_triangle():
     T = {}  # (n,H) -> int
     for H in range(1, NMAX + 1):
-        f = os.path.join(ROOT, f"results/ns_a35/perheight/h{H}.out")
+        f = os.path.join(ROOT, f"results/ns_a36/perheight/h{H}.out")
         if not os.path.exists(f):
             continue
         with open(f) as fh:
@@ -90,7 +90,7 @@ def main():
     # (1) row-sum check
     print("== row-sum check (T sums vs a(n)) ==")
     bad = 0
-    afile = os.path.join(ROOT, "results/ns_a35/triangle.txt")
+    afile = os.path.join(ROOT, "results/ns_a36/triangle.txt")
     a = {}
     with open(afile) as fh:
         for line in fh:

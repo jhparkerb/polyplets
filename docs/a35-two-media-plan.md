@@ -14,6 +14,11 @@
 > disk-bound here; a(35) = ~16 h on NVMe (single-run).** Reviving tmpfs for a35+
 > needs a ~200 GB+ RAM machine, not just a bigger tmpfs. The a34 result and
 > reasoning below stand; the a(35) projection does not.
+>
+> **OUTCOME:** a(35) AND a(36) were subsequently banked via the **varint (LEB128)
+> engine** (~60% less disk write, two-machine split), attacking the disk-bound
+> premise directly — a(36)'s H19 long pole ran 3.28 h. This tmpfs two-media plan was
+> not the path taken for a35+.
 
 **Status:** a34 measured (4.6×); a(35) FAILED (RAM ceiling, above).
 

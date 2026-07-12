@@ -24,14 +24,14 @@ Decision 2026-07-10 (jasonp): SKIP the fast engine for now, bank. May resume.
 
 ## Exact ladder (validated, reproduce these)
 
-| H | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| mu_H | 2.4142136 | 3.4437184 | 4.1823214 | 4.7178013 | 5.1153245 | 5.4178476 | 5.6533728 | 5.8404579 | 5.9916958 | 6.1158416 | 6.2191246 | 6.3060713 |
+| H | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| mu_H | 2.4142136 | 3.4437184 | 4.1823214 | 4.7178013 | 5.1153245 | 5.4178476 | 5.6533728 | 5.8404579 | 5.9916958 | 6.1158416 | 6.2191246 | 6.3060713 | 6.3800344 |
 
 H<=11 independently cross-checked against fixed-height GF roots
 (1/smallest positive root of Q_H, `results/fixed_height_gfs.txt`,
-`experiments/mu_H_from_atoms.py`). H=14 was computing at bank time
-(`results/strip_mu_H14.log`); append when done.
+`experiments/mu_H_from_atoms.py`). H=14 **done: mu_14 = 6.3800344**
+(`results/strip_mu_H14.log`, 4851s).
 
 Extrapolation: `experiments/lambda_from_mu.py` (update the `mu` dict with new
 points). Sliding 3-point power-law fit `mu_H = lambda - c*H^{-p}` gave lambda

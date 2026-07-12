@@ -2,6 +2,10 @@
 # dalby_a35_two_media.sh -- compute a(35) via the two-media plan
 # (docs/a35-two-media-plan.md), then combine + validate.
 #
+# SUPERSEDED: the two-media (tmpfs) plan OOM'd at a(35) (H19 tall-height exceeded
+# RAM); a(35) was ultimately computed on NVMe (~16h), and a(35)/a(36) landed via the
+# varint engine (~60% less disk write). The capacity/ETA claims below did not hold.
+#
 # Two concurrent orchestrate processes, split by height AND by medium:
 #   Job A: the tallest real height H19 (~70% of the wall) -> run-dir on tmpfs
 #          (/mnt/polytmp, RAM). Disk-free -> ~4x faster (measured a34: 4.13x).

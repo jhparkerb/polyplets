@@ -3,6 +3,11 @@
 **Date:** 2026-07-07. Follow-on to `a34-utilization-postmortem.md`. Sketch only —
 no code changed, no job launched.
 
+> **SUPERSEDED:** the §2-3 a(34) impact estimates were replaced with MEASURED numbers
+> (the three scheduler fixes bought ~0) in `results/utilization-fix-and-ceiling.md`;
+> and the reach-ladder day-counts here are obsolete — a(36) is banked (H19 long pole
+> 3.28h via the varint engine, far under this sketch's projection).
+
 ## 1. The fix, scoped
 
 Two independent pieces, both small, both already have a home in the existing

@@ -1,7 +1,7 @@
 # Map profile — Quarry Survey results
 
 Plan: [designs/11-quarry-survey](../docs/next-system/designs/11-quarry-survey-map-profile.md).
-**Track A (static audit) — COMPLETE.** Track B (dynamic profile) — PENDING runs.
+**Track A (static audit) — COMPLETE. Track B (dynamic profile) — COMPLETE** (results below).
 
 ## Track A — static audit (no runs)
 

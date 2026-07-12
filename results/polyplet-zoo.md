@@ -4,8 +4,9 @@
 structural properties of king-connected polyplets (A006770). Organizes
 what's exactly tracked, what's sampled-only, what's discussed-but-not-built,
 how properties relate to each other, and rough size-n behavior. Growth
-constant throughout: lambda ~= 7.11 (Domb-Sykes fit on the 34 known terms,
-this session; matches the ~7.1 already in project memory).
+constant throughout: lambda ~= 7.11 (Domb-Sykes fit on the 36 known terms;
+matches the ~7.1 in project memory; independently confirmed lambda=7.110, theta=-1
+by differential approximants, results/series-analysis-da.md).
 
 ## Metric properties (geometry of the bounding box / cell placement)
 
@@ -20,8 +21,8 @@ this session; matches the ~7.1 already in project memory).
 
 | property | tracked? | range | asymptotic / rough proportion |
 |---|---|---|---|
-| **hole count** | exact, both oracle and production TM (`--holes`) | 0..~n/4ish (empirically small counts dominate) | hole-free fraction SHRINKS with n: ~73.4% at n=18 (16,503,616,943,998 / 22,471,158,811,164), falling as n grows -- more room for enclosed regions in bigger shapes |
-| **hole area (M(n) = max single-hole area)** | exact for n<=16 (M17 in flight tonight, dalby) | 0..~n^2/8 | conjectured M(n) ~ round((n-2)^2/8), A001971 shift; first untested prediction M(17)=28 |
+| **hole count** | exact, both oracle and production TM (`--holes`) | 0..~n/4ish (empirically small counts dominate) | hole-free fraction ~73.4% at n=18, decays EXPONENTIALLY: hole-free grows at lambda_0~6.94 < lambda, fraction ~ (lambda_0/lambda)^n ~ 0.978^n (results/hole-free-growth-constant.md) |
+| **hole area (M(n) = max single-hole area)** | exact for n<=17 (g2 --maxhole) | 0..~n^2/8 | M(n) = round((n-2)^2/8) confirmed to n=17 (M(17)=28), A001971 shift; near-complete proof results/maxhole-proof.md |
 | **interior cells (I)**: cells with all 4 rook-neighbors present | NOT directly tracked, but exactly bracketed by perimeter (this session) | 0..n | **n - P <= I <= n - P/4** (exact, provable); empirically the upper bound is tight for real large (spindly) shapes (mean slack 2.73 at n=12), lower bound is nearly useless (mean slack 25) |
 
 ## Edge-type / connectivity-flavor properties

@@ -1,5 +1,10 @@
 # Terminal Velocity — g2 kernel shakeout for whole-row a(21) < 24h on dalby
 
+> **UPDATE 2026-07-11:** the kernel optimization (2.06×) put a(22) in fleet reach, so
+> execution went straight to the **a(22)** whole-row run (which subsumes a(21) as an
+> inner row) — see `results/terminal-velocity.md`. The a(21)-specific goal/§7 launch
+> below is superseded by that a(22) run; two-algorithm frontier moves 20 → 22.
+
 Goal: independent whole-row Redelmeier confirmation of **a(21) = 6,954,084,405,510,437**
 (two-algorithm frontier 20 → 21) in **< 24h wall on dalby alone**. Requires a
 **≥ 2.25× kernel speedup**; target **2.5×+** for margin. Everything below is

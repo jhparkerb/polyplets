@@ -1,7 +1,7 @@
 # Merge ledger — Merge Ledger results
 
 Plan: [designs/12-merge-ledger](../docs/next-system/designs/12-merge-ledger-merge-profile.md).
-**Track A (static audit) — COMPLETE.** Track B (dynamic profile) — PENDING runs.
+**Track A (static audit) — COMPLETE. Track B (dynamic profile) — COMPLETE** (results below).
 
 ## Track A — static audit (no runs)
 

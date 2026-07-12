@@ -73,6 +73,6 @@ recurrence up to order 6 / degree 5.)
 - A **finishable, self-contained** result (unlike B(y), which is parked): a new
   integer sequence worth an OEIS/Superseeker lookup, plus the non-D-finite-by-area
   finding. Reproduce with `python3 experiments/convex_polyplets.py 38`.
-- **Off the a(25)-reach path** — pure math, for the paper, not the record.
+- **Off the a(n)-record path** — pure math, for the paper, not the record.
 - The transfer matrix itself *is* the efficient "solution" (μ ≈ 3.129 growth);
   there is just no D-finite coefficient formula by area.

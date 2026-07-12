@@ -1,8 +1,10 @@
 # dmirror TM design (Hall of Mirrors — the last symtm mode)
 
-State as of 2026-07-04: hmirror + r180 built, gated, n=34 runs launched.
-dmirror is the remaining blocker for A030222/A030234/A030235 (+A194596) at
-n=34. This is the design dig from 2026-07-04, pre-implementation.
+State as of 2026-07-04 (pre-implementation design dig): hmirror + r180 built, gated.
+dmirror was then the remaining blocker for A030222/A030234/A030235 (+A194596).
+**UPDATE: dmirror was subsequently built** — n=32 T2 and n=33 T3 landed (n=34 declined
+final); the four D-dependent related sequences are banked to n≤33 (see
+`results/related-seqs-n33.md`, MEMORY [[related-seqs-symcount-wall]]).
 
 ## Facts
 

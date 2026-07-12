@@ -1,6 +1,12 @@
 # Upper bound on the polyplet growth constant λ
 
-2026-07-11. There is currently NO published or project upper bound on
+> **OUTCOME (achieved below): λ ≤ 9.3153, PROVED** (exact rational Bui
+> convolution certificate; see the BREAKTHROUGH + Certificate-Squeeze sections).
+> The two-sided rigorous bracket is **5.828 ≤ λ ≤ 9.3153**. The intro/plan/crux/
+> "Verdict" text below is the ORIGINAL pre-breakthrough scaffolding, kept as the
+> derivation record — it says "not yet done"; it was done later in this same doc.
+
+2026-07-11. (Original intro:) There was no published or project upper bound on
 λ_polyplet (only lower: 6.475 multi-directed, 5.828 directed; estimate ~7.11).
 This note: a clean crude bound, and the design + crux for a tight one.
 
@@ -265,11 +271,11 @@ neighbours go to the c-side, so they're empty in the `d`-piece.
   it and keeps improving with context. Target ~7.11 from above; realistic landing
   ~8 for feasible RD. First-ever polyplet upper bound below the crude bound.
 
-**Verdict:** the verification harness is banked and reusable (any proposed king
-system can be checked against ground truth in seconds). The crude `λ ≤ 12.2`
-stands as the first upper bound. A *tight* bound (below 12.2, toward ~8–9) requires
-hand-engineering the king analog of Bui's 6-type system — a real derivation, not
-yet done. This is where the upper-bound effort actually is.
+**Verdict (updated):** the tight bound WAS derived — the king analog of Bui's
+system was hand-engineered and certificate-verified to **λ ≤ 9.3153** (see the
+BREAKTHROUGH + Certificate-Squeeze sections above). The verification harness is
+banked and reusable. (Original pre-breakthrough verdict: "crude 12.2 stands; a
+tight bound is not yet done" — superseded.)
 
 ### Stage 3 — the paper story
 `μ_H ≤ λ ≤ ν_w`, both from the SAME cross-section machinery (one relaxes toward

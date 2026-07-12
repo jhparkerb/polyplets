@@ -105,6 +105,11 @@ directly: `stage10..stage17` have map_cpu roughly flat (~350 cpu-s) while
 map_wall doubles (25s→52s) — a few units grinding on ~9 of 80 cores while the
 rest sit idle, for 8 of the column's 20 rounds.
 
+**UPDATE (superseded):** the wall-estimate `stealEligible` fix below WAS built (plus
+two more scheduler fixes) and measured **~zero effect** (24.7%→24.0%); the true floor
+is the sub-record interrupt granularity, effectively unsplittable. See
+`results/utilization-fix-and-ceiling.md`. The original diagnosis follows:
+
 **This is a real, scoped, already-understood bug — not an intrinsic limit.**
 The fix is narrow: make `stealEligible`'s floor wall-estimate-based (reuse
 `stealScore`'s own rate-based remaining-seconds estimate, or a cheap cost

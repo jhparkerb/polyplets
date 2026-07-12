@@ -36,8 +36,8 @@ transfer matrices are high-rank in the connectivity basis.
 
 **Exact MPS does not beat the current representation** — the frontier is already
 "maximally entangled" at the √ level; there is no low-rank structure to exploit
-with a site-ordered MPS. Confirmed flat over H=8,10,12 (H=14 pending, trend
-locked).
+with a site-ordered MPS. Confirmed flat over H=8,10,12,14 (H=14 = rank 298 in the
+table above; trend locked).
 
 **The one nonzero benefit:** at 1e-3 relative truncation, χ_eff drops to
 ~0.16·√frontier (H=12: 42 vs 127), giving H·χ² ≈ 3× *smaller* than the frontier

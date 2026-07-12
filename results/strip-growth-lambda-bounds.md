@@ -8,9 +8,9 @@ eigenvalue of the height-H strip transfer matrix = top root of atom `q_H` =
 
 ## The numbers (exact strip growth constants, H<=13)
 
-| H | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| mu_H | 2.4142 | 3.4437 | 4.1823 | 4.7178 | 5.1153 | 5.4178 | 5.6534 | 5.8405 | 5.9917 | 6.1158 | 6.2191 | 6.3061 |
+| H | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| mu_H | 2.4142 | 3.4437 | 4.1823 | 4.7178 | 5.1153 | 5.4178 | 5.6534 | 5.8405 | 5.9917 | 6.1158 | 6.2191 | 6.3061 | 6.3800 |
 
 H<=11 from fixed-height GF roots; **H=12,13 newly computed by power iteration on
 the strip transfer matrix** (`cpp/strip_mu.cpp`, `build/strip_mu`; validated: it
@@ -32,7 +32,7 @@ multi-directed 6.475), our own, and improvable with H.
 > exact rational arithmetic), giving the two-sided bracket **5.828 <= lambda <=
 > 9.3153**. Derivation: [../docs/proofs/polyplet-upper-bound.md](../docs/proofs/polyplet-upper-bound.md).
 
-   Current ladder tops at mu_11 = 6.1158 (still below 6.475 — need higher H to win).
+   Current ladder tops at mu_14 = 6.3800 (still below 6.475 — need higher H to win).
 
 **2. Independent lambda estimate (delivered, H<=13).** Sliding 3-point power-law
 fit `mu_H = lambda - c*H^{-p}` (`experiments/lambda_from_mu.py`) gives lambda
@@ -83,5 +83,5 @@ counts and gives:
 - **Speed gap:** the kink engine's first cut is `unordered_map`-bound (H=11 in
   100s, ~3.4x/H) -> H=16 ~12h. Correctness is done; reaching H=16 (mu~6.5, beats
   6.475) needs an indexed-array rewrite of the same logic (per-stage sparse
-  operators) — fast but another build increment. H=14 running now (extends the
-  exact ladder + sharpens the lambda estimate regardless).
+  operators) — fast but another build increment. H=14 **done: mu_14 = 6.3800344**
+  (`results/strip_mu_H14.log`, 4851s); still below 6.475 (need higher H to win).

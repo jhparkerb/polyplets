@@ -145,6 +145,11 @@ and one row deeper the confirmable mass falls off a cliff (n=22 edges only,
 whole rows in reach are **20 and 21**, and they are the highest-value runs
 available:
 
+> **UPDATE 2026-07-11:** the g2 kernel was then optimized 2.06× and the fleet
+> (dalby+ayr+gympie) added, which put **n=22 in reach** — a(20) is confirmed and
+> the **a(22)** whole-row is running (subsumes a(21)). The n=21 budget cap above is
+> superseded. See `docs/terminal-velocity-plan.md`, `results/terminal-velocity.md`.
+
 **Full row 20 (~1 day, full fleet):**
 - **a(20):** single-algorithm → two-algorithm confirmed (own provenance stops the
   two-algorithm line at n=19; this moves it to 20).

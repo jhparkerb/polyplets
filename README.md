@@ -5,7 +5,9 @@ cells on the square lattice where corner contact counts, OEIS
 [A006770](https://oeis.org/A006770). This repository extended the
 sequence from a(18) to
 
-    a(34) = 515316838423862758858377704
+    a(36) = 24629107617723857143962968288
+
+(the accompanying paper reports through a(34) = 515316838423862758858377704)
 
 together with its symmetry companions (free A030222, one-sided A030233,
 bilateral A030234, asymmetric A030235, free-non-polyomino A194596), a
@@ -57,11 +59,14 @@ provenance — which binary, which host, which validations — is in
 
 ## Confidence tiers (the short version)
 
-- **T1** a(1)–a(19): two algorithms sharing no counting logic agree.
-- **T2** a(20)–a(33): one algorithm family, multiply decorrelated
+- **T1** a(1)–a(20): two algorithms sharing no counting logic agree
+  (independent whole-row Redelmeier confirmed a(20), 2026-07-11; a(22) running).
+- **T2** a(21)–a(34): one algorithm family, multiply decorrelated
   (full-chain regression, cross-ISA recounts, held-out closed-form
-  diagonal checks, mod-p consistency).
-- **T2⁻** a(34): T2 minus the held-out diagonal check on its top cell.
+  diagonal checks, mod-p consistency). a(34)'s top-cell diagonal now has its
+  held-out check (a(35) supplies it).
+- **T2⁻** a(35)–a(36): T2 minus a full same-heights cross-ISA re-verify
+  (a(35) had only a partial cross-ISA; a(36)'s top cell awaits a(37)).
 - **T3** n=33 companions: exact computation composed with empirically
   pinned but unproven quasi-polynomial formulas — labeled, never silently.
 

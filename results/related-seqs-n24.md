@@ -38,6 +38,9 @@ Bilateral = (H + D)/2, Asym = Free − Bilateral, FreeNonPoly = Free − A000105
 | 24 | 274333350132318510 | 548666699140240976 | 1124396044 | 274333349007922466 | 274332695132618107 |
 
 ## Follow-up (jasonp's call — publishing)
+> **UPDATE:** these follow-ups are DONE — b-files for all six are staged
+> (`results/b*_upload.txt`), and the related series were extended well past n=24
+> (A030233 to n=34; the four D-dependent to n=32/33). See related-seqs-n32/n33.md.
 - Generate full OEIS-format b-files for all five (b030222 currently prepped only
   to n=19 in `results/b030222_upload.txt`; the other four have none yet).
 - Superseeker/OEIS submission is jasonp-triggered, not sent from here.

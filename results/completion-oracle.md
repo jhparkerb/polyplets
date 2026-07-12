@@ -24,7 +24,7 @@ maxn=29 → 1.81):
 | 8  | 15 | 826    | 87% | 1.000 | **1.007** |
 | 10 | 18 | 5,568  | 74% | 1.003 | **1.020** |
 | 12 | 22 | 39,507 | 60% | 1.003 | **1.037** |
-| 14 | 26 | (running, trend ~1.05-1.06 expected) | | | |
+| 14 | 26 | (not completed — probe closed at H=12; H=14 est. ~1.05-1.06) | | | |
 
 - `completionLowerBound` is **admissible everywhere** (0 violations,
   exhaustively per H — the first exhaustive admissibility proof of the
