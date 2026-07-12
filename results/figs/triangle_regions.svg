@@ -685,16 +685,16 @@
 <rect x="790" y="866" width="20" height="20" rx="3" fill="#93B4EC"/>
 <rect x="812" y="866" width="20" height="20" rx="3" fill="#93B4EC"/>
 <rect x="834" y="866" width="20" height="20" rx="3" fill="#EDAE6B"/>
+<path d="M 63.0 117.0 L 85.0 117.0 L 85.0 161.0 L 107.0 161.0 L 107.0 205.0 L 129.0 205.0 L 129.0 249.0 L 151.0 249.0 L 151.0 293.0 L 173.0 293.0 L 173.0 337.0 L 195.0 337.0 L 195.0 381.0 L 217.0 381.0 L 217.0 425.0 L 239.0 425.0 L 239.0 469.0 L 261.0 469.0 L 261.0 513.0 L 283.0 513.0 L 283.0 557.0 L 305.0 557.0 L 305.0 601.0 L 327.0 601.0 L 327.0 645.0 L 349.0 645.0 L 349.0 689.0 L 371.0 689.0 L 371.0 733.0 L 393.0 733.0 L 393.0 777.0 L 415.0 777.0 L 415.0 821.0 L 437.0 821.0 L 437.0 865.0 L 459.0 865.0 L 459.0 887.0 L 481.0 887.0" fill="none" stroke="#1F2937" stroke-width="2" stroke-dasharray="6,4" opacity="0.8"/>
 <rect x="416" y="822" width="20" height="20" rx="3" fill="none" stroke="#D97706" stroke-width="2.4"/>
 <rect x="438" y="844" width="20" height="20" rx="3" fill="none" stroke="#D97706" stroke-width="2.4"/>
 <rect x="460" y="866" width="20" height="20" rx="3" fill="none" stroke="#D97706" stroke-width="2.4"/>
-<path d="M 63.0 117.0 L 85.0 117.0 L 85.0 161.0 L 107.0 161.0 L 107.0 205.0 L 129.0 205.0 L 129.0 249.0 L 151.0 249.0 L 151.0 293.0 L 173.0 293.0 L 173.0 337.0 L 195.0 337.0 L 195.0 381.0 L 217.0 381.0 L 217.0 425.0 L 239.0 425.0 L 239.0 469.0 L 261.0 469.0 L 261.0 513.0 L 283.0 513.0 L 283.0 557.0 L 305.0 557.0 L 305.0 601.0 L 327.0 601.0 L 327.0 645.0 L 349.0 645.0 L 349.0 689.0 L 371.0 689.0 L 371.0 733.0 L 393.0 733.0 L 393.0 777.0 L 415.0 777.0 L 415.0 821.0 L 437.0 821.0 L 437.0 865.0 L 459.0 865.0 L 459.0 887.0 L 481.0 887.0" fill="none" stroke="#1F2937" stroke-width="2" stroke-dasharray="6,4" opacity="0.8"/>
 <line x1="316.0" y1="364.0" x2="316.0" y2="860.0" stroke="#1F2937" stroke-width="2.6" opacity="0.85" marker-end="url(#arr)"/>
-<text x="324.0" y="700.0" font-size="12" font-weight="bold" fill="#1F2937" transform="rotate(-90 324.0 700.0)" text-anchor="middle">TM sweep: one run per column</text>
+<text x="324.0" y="700.0" font-size="12" font-weight="bold" fill="#1F2937" paint-order="stroke" stroke="#FFFFFF" stroke-width="4" transform="rotate(-90 324.0 700.0)" text-anchor="middle">TM sweep: one run per column</text>
 <line x1="250.0" y1="458.0" x2="659.2" y2="867.2" stroke="#2D5DB8" stroke-width="2.6" opacity="0.9" marker-end="url(#arr)"/>
-<text x="502.0" y="648.0" font-size="12" font-weight="bold" fill="#2D5DB8" transform="rotate(45 502.0 648.0)" text-anchor="middle">P<tspan font-size="9" dy="3">8</tspan><tspan dy="-3"> law: onset cells imply the diagonal</tspan></text>
+<text x="502.0" y="648.0" font-size="12" font-weight="bold" fill="#2D5DB8" paint-order="stroke" stroke="#FFFFFF" stroke-width="4" transform="rotate(45 502.0 648.0)" text-anchor="middle">P<tspan font-size="9" dy="3">8</tspan><tspan dy="-3">&#160;law: onset cells imply the diagonal</tspan></text>
 <line x1="770" y1="788.0" x2="826" y2="788.0" stroke="#1F2937" stroke-width="2.6" opacity="0.85" marker-end="url(#arr)"/>
-<text x="832" y="792.0" font-size="12" font-weight="bold" fill="#1F2937">&#931;<tspan font-size="9" dy="3">H</tspan><tspan dy="-3"> = a(32)</tspan></text>
+<text x="832" y="792.0" font-size="12" font-weight="bold" fill="#1F2937">&#931;<tspan font-size="9" dy="3">H</tspan><tspan dy="-3">&#160;= a(32)</tspan></text>
 <text x="870" y="106" font-size="12.5" fill="#1F2937" font-weight="bold">one-line closed forms:</text>
 <text x="870" y="122" font-size="12.5" fill="#6B7280" font-weight="normal">T(n,1) = 1;  T(n,n) = 3&#8319;&#8315;&#185;</text>
 <text x="870" y="152" font-size="12.5" fill="#1F2937" font-weight="bold">diagonal-law band (n &#8804; 2H&#8722;1):</text>
@@ -717,9 +717,9 @@
 <text x="870" y="458" font-size="12.5" fill="#6B7280" font-weight="normal">from its first k+1 cells (n &#8805; 2k+1)</text>
 <text x="870" y="474" font-size="12.5" fill="#6B7280" font-weight="normal">black &#8594;: row sums give a(n)</text>
 <text x="870" y="504" font-size="12.5" fill="#1F2937" font-weight="bold">orange boxes (k = 17 diagonal):</text>
-<text x="870" y="520" font-size="12.5" fill="#6B7280" font-weight="normal">P&#8321;&#8327; fit at (34,17)+(35,18),</text>
+<text x="870" y="520" font-size="12.5" fill="#6B7280" font-weight="normal">P<tspan font-size="9.5" dy="3.5">17</tspan><tspan dy="-3.5">&#8203;</tspan> fit at (34,17)+(35,18),</text>
 <text x="870" y="536" font-size="12.5" fill="#6B7280" font-weight="normal">holdout (36,19) &#10003; &#8212; the trusted-</text>
-<text x="870" y="552" font-size="12.5" fill="#6B7280" font-weight="normal">P&#8321;&#8327; route to a(37) top heights</text>
+<text x="870" y="552" font-size="12.5" fill="#6B7280" font-weight="normal">P<tspan font-size="9.5" dy="3.5">17</tspan><tspan dy="-3.5">&#8203;</tspan> route to a(37) top heights</text>
 <text x="870" y="582" font-size="12.5" fill="#1F2937" font-weight="bold">mod-3 structure:</text>
 <text x="870" y="598" font-size="12.5" fill="#6B7280" font-weight="normal">see spine_triangle figures</text>
 <rect x="64" y="909" width="16" height="16" rx="3" fill="#EDAE6B"/><text x="88" y="922" font-size="13" fill="#1F2937">exact one-liners</text>

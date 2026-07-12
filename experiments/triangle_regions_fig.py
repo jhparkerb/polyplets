@@ -24,6 +24,7 @@ SIMPLE = "#EDAE6B"         # one-line closed forms: H=1, n=H
 OUTSIDE = "#F3F4F6"        # no closed form: TM/enumeration only
 INK = "#1F2937"; MUT = "#6B7280"; BLUE = "#2D5DB8"; ORG = "#D97706"
 SUB_K = '<tspan font-size="9.5" dy="3.5">k</tspan><tspan dy="-3.5">&#8203;</tspan>'
+SUB_17 = '<tspan font-size="9.5" dy="3.5">17</tspan><tspan dy="-3.5">&#8203;</tspan>'
 SUP_EXP = '<tspan font-size="9.5" dy="-4.5">n&#8722;1&#8722;3k</tspan><tspan dy="4.5">&#8203;</tspan>'
 
 
@@ -53,11 +54,6 @@ for n in range(1, N + 1):
             fill = OUTSIDE
         s.append(f'<rect x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="3" fill="{fill}"/>')
 
-# P17 fit/holdout trio outlined: (34,17) (35,18) (36,19)
-for n, Hc in ((34, 17), (35, 18), (36, 19)):
-    x = ML + (Hc - 1) * STEP; y = MT + (n - 1) * STEP
-    s.append(f'<rect x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="3" fill="none" stroke="{ORG}" stroke-width="2.4"/>')
-
 # dashed law boundary n = 2H-1
 pts = []
 for Hc in range(1, N + 1):
@@ -71,19 +67,25 @@ for Hc in range(1, N + 1):
 path = "M " + " L ".join(f"{x:.1f} {y:.1f}" for x, y in pts)
 s.append(f'<path d="{path}" fill="none" stroke="{INK}" stroke-width="2" stroke-dasharray="6,4" opacity="0.8"/>')
 
+# P17 fit/holdout trio outlined: (34,17) (35,18) (36,19)
+for n, Hc in ((34, 17), (35, 18), (36, 19)):
+    x = ML + (Hc - 1) * STEP; y = MT + (n - 1) * STEP
+    s.append(f'<rect x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="3" fill="none" stroke="{ORG}" stroke-width="2.4"/>')
+
+
 # ARROW 1: column-TM sweep down column H=12 (computes ALL n in one sweep)
 x = cx(12)
 s.append(f'<line x1="{x}" y1="{cy(13)-6}" x2="{x}" y2="{cy(35)+6}" stroke="{INK}" stroke-width="2.6" opacity="0.85" marker-end="url(#arr)"/>')
-s.append(f'<text x="{x+8}" y="{cy(28)}" font-size="12" font-weight="bold" fill="{INK}" transform="rotate(-90 {x+8} {cy(28)})" text-anchor="middle">TM sweep: one run per column</text>')
+s.append(f'<text x="{x+8}" y="{cy(28)}" font-size="12" font-weight="bold" fill="{INK}" paint-order="stroke" stroke="#FFFFFF" stroke-width="4" transform="rotate(-90 {x+8} {cy(28)})" text-anchor="middle">TM sweep: one run per column</text>')
 
 # ARROW 2: diagonal-law propagation along k = 8 (onset (17,9) -> (36,28))
 s.append(f'<line x1="{cx(9)}" y1="{cy(17)}" x2="{cx(27.6)}" y2="{cy(35.6)}" stroke="{BLUE}" stroke-width="2.6" opacity="0.9" marker-end="url(#arr)"/>')
-s.append(f'<text x="{cx(20)+10}" y="{cy(26)-8}" font-size="12" font-weight="bold" fill="{BLUE}" transform="rotate(45 {cx(20)+10} {cy(26)-8})" text-anchor="middle">P' + '<tspan font-size="9" dy="3">8</tspan><tspan dy="-3"> law: onset cells imply the diagonal</tspan>' + '</text>')
+s.append(f'<text x="{cx(20)+10}" y="{cy(26)-8}" font-size="12" font-weight="bold" fill="{BLUE}" paint-order="stroke" stroke="#FFFFFF" stroke-width="4" transform="rotate(45 {cx(20)+10} {cy(26)-8})" text-anchor="middle">P' + '<tspan font-size="9" dy="3">8</tspan><tspan dy="-3">&#160;law: onset cells imply the diagonal</tspan>' + '</text>')
 
 # ARROW 3: row sum -> a(n), row n=32
 y = cy(32)
 s.append(f'<line x1="{ML + 32*STEP + 2}" y1="{y}" x2="{ML + 32*STEP + 58}" y2="{y}" stroke="{INK}" stroke-width="2.6" opacity="0.85" marker-end="url(#arr)"/>')
-s.append(f'<text x="{ML + 32*STEP + 64}" y="{y+4}" font-size="12" font-weight="bold" fill="{INK}">&#931;<tspan font-size="9" dy="3">H</tspan><tspan dy="-3"> = a(32)</tspan></text>')
+s.append(f'<text x="{ML + 32*STEP + 64}" y="{y+4}" font-size="12" font-weight="bold" fill="{INK}">&#931;<tspan font-size="9" dy="3">H</tspan><tspan dy="-3">&#160;= a(32)</tspan></text>')
 
 ax = ML + N * STEP + 14
 def note(y, c, txt, bold=False):
@@ -110,9 +112,9 @@ s += [note(MT + 10, INK, 'one-line closed forms:', True),
       note(MT + 362, MUT, 'from its first k+1 cells (n &#8805; 2k+1)'),
       note(MT + 378, MUT, 'black &#8594;: row sums give a(n)'),
       note(MT + 408, INK, 'orange boxes (k = 17 diagonal):', True),
-      note(MT + 424, MUT, 'P&#8321;&#8327; fit at (34,17)+(35,18),'),
+      note(MT + 424, MUT, 'P' + SUB_17 + ' fit at (34,17)+(35,18),'),
       note(MT + 440, MUT, 'holdout (36,19) &#10003; &#8212; the trusted-'),
-      note(MT + 456, MUT, 'P&#8321;&#8327; route to a(37) top heights'),
+      note(MT + 456, MUT, 'P' + SUB_17 + ' route to a(37) top heights'),
       note(MT + 486, INK, 'mod-3 structure:', True),
       note(MT + 502, MUT, 'see spine_triangle figures')]
 
