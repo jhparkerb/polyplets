@@ -78,6 +78,12 @@ close-out passes.
   kernel, opt-in `--kernel kink-sharded`, real 4.93x at H14/maxn26, still not the default
   and not head-to-head'd at dominant-height scale).
 - **steal-tail diagnostic** (`results/steal-tail-h18.md`): banked, not deployed.
+- **Ternary Spine (2026-07-12, BANKED):** the height triangle mod 3 is governed by
+  the spine cubic **W³ = W² + t** over 𝔽₃ — digit-product law, first-nonzero-per-
+  column ≡ 1, and the **SNF count ⌈(N−1)/3⌉ PROVED** modulo the diagonal law + a
+  finitely-verified 3-item ladder. `results/ternary-spine.md`,
+  `experiments/ternary_spine.py` (15/15). Open: prove the ladder (cluster
+  combinatorics); individual SNF exponents. Candidate paper paragraph — jasonp's call.
 - **Max-hole theorem M(n)=round((n−2)²/8) — STAGED for later examination**
   (`results/maxhole-proof.md`, figs `results/figs/maxhole_{ring,seal}.svg`, checker
   `experiments/maxhole_proof_check.py`). Near-complete proof: construction = diagonal
