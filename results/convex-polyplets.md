@@ -40,5 +40,11 @@ additive pieces below. The primary source is convex-mirage.
 
 Convex polyplets are a real, novel-to-OEIS sequence but a documented tractability
 mirage (non-D-finite by area). If submitted (OEIS Candidate C, deferred), use
-convex-mirage's 38 terms + the non-D-finite finding, not this note's 10. TODO if
-ever revisited: restore the transfer-matrix `convex_polyplets.py` (38 terms).
+convex-mirage's 38 terms + the non-D-finite finding, not this note's 10.
+**TODO CLOSED 2026-07-13:** the transfer-matrix tool is restored as
+`experiments/convex_tm.py` (row intervals, unimodal-envelope phase automaton,
+unique parse); regenerates all 38 terms, first 20 matching convex-mirage's
+reference exactly; mu = 3.12894 confirmed. Structural note: the unbounded
+interval width is the same mechanism behind the all-pairs cluster family's
+non-C-finiteness (results/defect-gas.md, 2026-07-13) -- one phenomenon, two
+guises.
