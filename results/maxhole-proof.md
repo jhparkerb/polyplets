@@ -85,12 +85,44 @@ mathematical content is complete.)
 
 - (I') A ≤ ⌈ha·hm/2⌉: elementary parity count — done.
 - **(II') n ≥ ha+hm+2: PROVED (above).** With (I') and the integer maximization,
-  the SINGLE-HOLE upper bound M_single(n) ≤ round((n−2)²/8) is a theorem, tight
-  at the diamond for n ≡ 0 (mod 4).
-- Still open: the multi-hole reduction (total area over several holes never beats
-  one hole — verified on 4,000+ shapes, unproved: moat cycles of different holes
-  share cells, so the per-hole bound doesn't sum), and the clean construction
-  family for n ≢ 0 (mod 4).
+  the SINGLE-HOLE upper bound M_single(n) ≤ round((n−2)²/8) is a theorem.
+
+## The uniform construction (2026-07-12) — lower bound complete for ALL n
+
+**Parity-aligned diagonal-box holes.** Hole(a,b) = all cells with u ∈ [0,a−1],
+v ∈ [0,b−1] (corner-aligned so the populated parity class dominates: area
+⌈ab/2⌉); animal = its 4-neighbour ring, which has **exactly a+b+2 cells**, is
+king-connected, and encloses exactly the box. Choosing a+b = n−2 with the
+near-equal parity-optimal split achieves **round((n−2)²/8) for every n ≥ 4**
+(n=5 via the n=4 diamond plus one padding cell, M(5)=M(4)=1). Verified n ≤ 60,
+matching banked M(n) exactly for n ≤ 17: `experiments/maxhole_box_construction.py`.
+The diamond is the a=b odd case; the previously-mysterious "slightly asymmetric"
+optima at n ≢ 0 (mod 4) are just the boxes with |a−b| ∈ {1,2}.
+
+**⇒ M_single(n) = round((n−2)²/8) is now a two-sided theorem for all n.**
+
+## Multi-hole reduction (2026-07-12) — reformulated, verified, one clean target
+
+Fill the holes: F′ = F ∪ (holes) is a hole-free animal of size N = n + A. The
+holes avoid F′'s 4-shell (cells with a 4-neighbour in the exterior — else leak),
+so **A ≤ interior₄(F′)** and **n ≥ |shell₄(F′)|**. Everything then follows from
+one isoperimetric statement about hole-free animals:
+
+> **Master inequality (conjecture).** interior₄(F′) ≤ round((|shell₄(F′)|−2)²/8).
+
+Verified on 6,000 random filled animals, **0 violations, 1,028 tight cases**;
+solid diamonds are exactly tight (shell 4r, interior 2r²−2r+1). By n ≥ shell and
+monotonicity this implies the multi-hole bound A ≤ round((n−2)²/8) outright.
+- **Refuted route (recorded):** the range-form core "r_u+r_v ≤ shell−2 for the
+  interior's diagonal ranges" is FALSE for disconnected interiors — minimal
+  counterexample: two lone interior cells in separate lobes (11 filled cells,
+  shell 9, r_u+r_v = 8 > 7). The moat argument needs the wound set connected;
+  a filled animal's interior needn't be. The area bound survives because
+  scattered interiors are far from filling their diagonal box.
+- **Suggested route:** onion peeling — show the interior region's total 4-shell
+  is ≤ |shell(F′)| − 4; iterating gives Σ(m−4k) = the diamond count exactly.
+  Checker for A-side experiments: `experiments/maxhole_master_check.py` (inline
+  in session; the 6,000-shape verification).
 
 ## Superseded notes (pre-proof)
 
