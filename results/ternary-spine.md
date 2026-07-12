@@ -52,9 +52,10 @@ $$\textstyle\sum_k P_k(n)\,y^k \;=\; G(y)\,H(y)^n .$$
   cubic is the gas of bare pair-rows. The mod-9 lift $H^3 \equiv H^2 + 7u$ and
   a finite explicit mod-27 equation come from the same lemma.
 - $(\star c)$ $S := (H^3 - H(t^3))/3$ satisfies $S \equiv t^2 + tW \pmod 3$ —
-  verified to $t^{17}$. **UPGRADE 2026-07-12:** verified to $t^{300}$ on the
-  unique mod-27 fixed point of the defect-gas master equation (pure algebra,
-  no enumeration); symbolic closure is finite algebra, left open.
+  **PROVED 2026-07-13** (`results/defect-gas.md`): from the mod-9 cubic alone,
+  $H(t^3) \equiv H^2 + 25t - 3t^2 - 3tW \pmod 9$ (uniqueness of the cubic's
+  fixed point + a three-line 𝔽₃ cancellation). The entire ladder
+  $(\star a,b,c)$ is now symbolic — no empirical input remains.
 
 ## Theorems (under the law + ladder)
 

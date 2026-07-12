@@ -99,8 +99,9 @@ close-out passes.
   **spine cubic H³=H²+u DERIVED mod 3**, mod-9 lift derived, finite mod-27
   equation matches all 18 coefficients; (⋆a) G≡1 mod 9 derived via boundary
   weights (single-row boundary weight 2s+1 — entry×exit factorization of
-  (2s+1)²); (⋆c) verified to u³⁰⁰ on the pure-algebra mod-27 fixed point.
-  Open: symbolic (⋆c) closure; two-row closed form.
+  (2s+1)²); **(⋆c) PROVED 2026-07-13** (H(u³) ≡ H²+25u−3u²−3uW mod 9, from the
+  mod-9 cubic alone) — the whole ladder is now symbolic, zero empirical input.
+  Open: two-row closed form.
 - **DIAGONAL LAW SHAPE PROVED (2026-07-12):** `docs/proofs/diagonal-law.md`,
   checker `experiments/diagonal_law_proof_check.py` (all green, k ≤ 3 exact).
   Separation lemma (walk rows are cuts) + exact chain identity + row bound

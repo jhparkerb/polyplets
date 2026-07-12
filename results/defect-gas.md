@@ -180,21 +180,38 @@ What remains, (1+15uH⁻²)²(1−uH′/H) ≡ 1+50uH⁻² (mod 9), collapses to
 derived mod-9 cubic) plus its derivative identity (3H²−2H)H′ ≡ 25 gives
 H′(3H³−2H²) + 2H = 25H + 2H = 27H ≡ 0. ∎
 
-**(⋆c) upgraded.** The mod-27 master equation has a *unique* fixed point in
-(ℤ/27)[[u]] (u-adic contraction) — computable by pure algebra, no enumeration.
-(⋆b), the mod-9 lift, and (⋆c) S ≡ u² + uW (mod 3) all verified on it to
-**u³⁰⁰** (`check_ladder()`); 283 coefficients beyond anything enumerable. A
-fully symbolic closure of (⋆c) is finite algebra on the fixed point, left open.
+**(⋆c) CLOSED — symbolic proof (2026-07-13).** Let X ∈ (ℤ/9)[[u]] be the
+unique solution of X³ = X² + 25u with X(0) = 1 (the master equation mod 9;
+uniqueness via the fixed-point form X = 1 + 25uX⁻²), and W = X mod 3. Then
+
+$$H(u^3) \;\equiv\; X^2 + 25u - 3u^2 - 3uW \pmod 9,
+\qquad\text{hence}\qquad S = \tfrac{H^3 - H(u^3)}{3} \equiv u^2 + uW \pmod 3.$$
+
+*Proof.* (i) Y := H(u³) mod 9 satisfies Y³ = Y² + 25u³ with Y(0) = 1;
+dividing by the unit Y² gives the fixed-point form Y = 1 + 25u³Y⁻², whose
+coefficients are forced recursively — so that cubic + constant term pins Y
+uniquely. (ii) The candidate Y\* = X² + 25u + 3E with E = −u² − uW satisfies
+the same cubic: mod 9, (A+3E)³ ≡ A³ and (A+3E)² ≡ A² + 6AE, so with
+A = X² + 25u = X³ we get Y\*³ ≡ X⁹ and Y\*² ≡ X⁶ + 6EX³. Expanding
+X⁹ = (X²+25u)³ termwise mod 9 (3·25 ≡ 3, 3·625 ≡ 3, 25³ ≡ 1):
+X⁹ ≡ X⁶ + 3uX⁴ + 3u²X² + u³. Hence
+Y\*³ − Y\*² − 25u³ ≡ 3(uX⁴ + u²X² + u³ + EX³) (mod 9), and the bracket
+vanishes mod 3: with X ≡ W, X³ ≡ W² + u, X⁴ ≡ W² + u + uW,
+it collapses to uW² + u² − uW³ = uW² + u² − u(W²+u) = 0. (iii) By
+uniqueness Y = Y\*, and H³ − H(u³) ≡ X³ − Y\* = 3u² + 3uW. ∎
+
+Machine checks (`check_ladder()`): the closed-form identity holds on the
+pure-algebra fixed point to u³⁰⁰ and against the banked 18 coefficients;
+the bracket cancellation re-verified as an 𝔽₃ series identity.
 
 **Net effect on the Ternary Spine:** all three ladder items (⋆a,b,c) now stand
-on the defect gas — (⋆a) and (⋆b) symbolically, (⋆c) at u³⁰⁰ — so the Spine's
-conditionality collapses from "law + finitely-verified ladder" to
-"law + renewal chain formalism", and the chain identity itself is exact
-combinatorics (40/40 with boundaries).
+on the defect gas **symbolically** — the ladder is retired as an empirical
+input in full. The Spine's conditionality collapses from "law +
+finitely-verified ladder" to "law + renewal chain formalism", the chain
+identity is exact combinatorics (40/40 with boundaries), and the law's shape
+is a theorem (`docs/proofs/diagonal-law.md`).
 
 ## Open
-
-- Symbolic closure of (⋆c) on the fixed point (finite algebra).
 - Two-row closed form generalizing (2s+1)² (weight table is raw material).
 - ~~The convergence + boundary analysis for a full proof of the law~~
   **DONE 2026-07-12**: `docs/proofs/diagonal-law.md` — separation lemma +

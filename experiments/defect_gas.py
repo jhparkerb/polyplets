@@ -529,8 +529,19 @@ def check_ladder(KX=300):
     for m in range(KX):
         tgt[m + 1] = (tgt[m + 1] + W[m]) % 3
     assert S == tgt, "(*c)"
+
+    # (*c) CLOSED FORM (2026-07-13): H(u^3) == H^2 + 25u - 3u^2 - 3uW (mod 9)
+    H9 = [h % 9 for h in H]
+    H9sq = [sum(H9[i] * H9[m - i] for i in range(m + 1)) % 9
+            for m in range(KX + 1)]
+    rhs9 = list(H9sq)
+    rhs9[1] = (rhs9[1] + 25) % 9
+    rhs9[2] = (rhs9[2] - 3) % 9
+    for m in range(KX):
+        rhs9[m + 1] = (rhs9[m + 1] - 3 * W[m]) % 9
+    assert all(Hu3[m] % 9 == rhs9[m] for m in range(KX + 1)), "(*c) closed form"
     print(f"ladder on the mod-27 fixed point to u^{KX}: "
-          f"(*b), mod-9 lift, (*c) all OK")
+          f"(*b), mod-9 lift, (*c) + its closed form all OK")
 
 
 if __name__ == "__main__" and __import__("sys").argv[-1] == "ladder":
