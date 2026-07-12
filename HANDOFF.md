@@ -78,6 +78,13 @@ close-out passes.
   kernel, opt-in `--kernel kink-sharded`, real 4.93x at H14/maxn26, still not the default
   and not head-to-head'd at dominant-height scale).
 - **steal-tail diagnostic** (`results/steal-tail-h18.md`): banked, not deployed.
+- **a(37) costed, on the shelf (2026-07-12):** with the varint engine, ~3.5h wall
+  (~170 core-h, dalby H19 pole 3.4h + ayr H<=18, RAM ~400MB) if P17 is wired as
+  certified via the banked T(36,19) holdout (its fit uses the out-of-onset n=34
+  point); **~10h wall on the strict paper convention** (sweep H20 real ~9.8h pole
+  => certifies P17 unambiguously, retires a(36)'s T2-, ends the banked range
+  certified at an odd frontier per the frontier-parity law in
+  results/ternary-spine.md). Boxes busy with a(22) until ~07-17. jasonp's call.
 - **Ternary Spine (2026-07-12, BANKED):** the height triangle mod 3 is governed by
   the spine cubic **W³ = W² + t** over 𝔽₃ — digit-product law, first-nonzero-per-
   column ≡ 1, and the **SNF count ⌈(N−1)/3⌉ PROVED** modulo the diagonal law + a
