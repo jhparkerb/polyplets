@@ -150,9 +150,12 @@ spine digit-product on all in-band cells).
   (appendix of results/height-distribution-collapse.md): tall-flank rate
   function psi(alpha) = (1-3a)ln3 + Legendre(ln H); saddle reproduces exact
   T(36,36-k) to ~1-3% for k=3..14, breaks at the alpha->1/2 band edge as
-  expected; experiments/flank_saddle.py. Then K1 (kernel on all-pairs gap walk,
-  exact ~14.41), H2 (haruspicy on convex-by-area), K3 (exact convex mu,
-  q-series). Garnish when idle: Sheffer/Riordan convolution identities for
+  expected; experiments/flank_saddle.py. K1 PART 1 DONE
+  (experiments/allpairs_kernel.py): all-pairs family reformulated as an exact
+  two-class gap walk (J/P), validated l<=8; kernel structure measured (P-bulk
+  (1,2,3,2,1) steps +-2; J long jumps weight 8 + resets); part 2 = the
+  bivariate functional equation + kernel roots => exact ~14.41 constant.
+  Then H2 (haruspicy on convex-by-area), K3 (exact convex mu, q-series). Garnish when idle: Sheffer/Riordan convolution identities for
   P_k as new cross-checks; p=2 spine considered-and-declined (3-powers are
   units mod 2, no collapse).
 
