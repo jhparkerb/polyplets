@@ -85,6 +85,8 @@ close-out passes.
   => certifies P17 unambiguously, retires a(36)'s T2-, ends the banked range
   certified at an odd frontier per the frontier-parity law in
   results/ternary-spine.md). Boxes busy with a(22) until ~07-17. jasonp's call.
+  **P17-from-the-gas MEASURED DEAD 2026-07-13** (results/defect-gas.md): weight-DP
+  cost ~20x/k, k=17 ~10^17s; the strict H20 sweep is the only certification route.
 - **Ternary Spine (2026-07-12, BANKED):** the height triangle mod 3 is governed by
   the spine cubic **W³ = W² + t** over 𝔽₃ — digit-product law, first-nonzero-per-
   column ≡ 1, and the **SNF count ⌈(N−1)/3⌉ PROVED** modulo the diagonal law + a

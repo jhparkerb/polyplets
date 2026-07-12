@@ -211,6 +211,35 @@ finitely-verified ladder" to "law + renewal chain formalism", the chain
 identity is exact combinatorics (40/40 with boundaries), and the law's shape
 is a theorem (`docs/proofs/diagonal-law.md`).
 
+## The weight DP, k ≤ 5 ab initio, and the P₁₇ reach verdict (2026-07-13)
+
+**Row-transfer DP for weights** (`experiments/cluster_weight_dp.py`): counts a
+cluster's configurations without listing them (state = current row's cells +
+connectivity partition; stranded pending blocks pruned). Validated against all
+21 enumerated weights. Direct enumeration is Ω(W) = Ω(14^ℓ) for stacked pairs
+— hopeless past k ≈ 6 — and the DP smashes that floor: W(2,2,2,2) = 68,314 in
+milliseconds where enumeration needed hours, all-pairs k=6 (14,115,141) in 0.1s.
+
+**Grand form ab initio through u⁵.** With the full k ≤ 5 weight table (31
+types, `KNOWN_WEIGHTS`), the master equation gives
+H = [1, 25, 208, 1483, **20688, 130208**] and the boundary residue gives
+G = [1, −5, −62/9, −1625/81, **−56842/729, −2170913/6561**] — every
+coefficient matching the banked series exactly (`check_grand_form()`, runs in
+ms). Both halves of G·Hⁿ now derive from finite local enumerations through
+order 5. Boundary single-row pattern continues: (6,) has interior 169 = 13²,
+boundary 13 = 2s+1.
+
+**Reach measurement — P₁₇ from the gas is DEAD.** Full-tier DP cost:
+k=4: 3.1s, k=5: 65s, k=6: >530s (killed incomplete) — ≈20× per k in Python.
+Extrapolated to k=17: ~10¹⁷ s; a C++ rewrite (~100×) plus a thousand cores
+buys five orders and leaves centuries. Realistic reach: k ≈ 7 (Python,
+hours), k ≈ 9–10 (C++ effort). The strict H20 sweep (~10h) therefore remains
+the ONLY route to certifying P₁₇ for a(37); the gas route is priced out.
+(Two pathologies recorded: naive fixed-point iteration of μ in exact rationals
+blows up big-int sizes on pre-convergence garbage — solve order-by-order; and
+the u-series master-equation H is NOT the y-series chain μ — mixing them
+breaks the residue formula silently at order 1.)
+
 ## Open
 - Two-row closed form generalizing (2s+1)² (weight table is raw material).
 - ~~The convergence + boundary analysis for a full proof of the law~~
