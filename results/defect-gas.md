@@ -65,9 +65,40 @@ b₂ = −209/2 the net short-range correction assembled from 441, 1017, 625.
   a left/right contact-factor structure worth pinning (entry and exit factors
   agreeing by up-down symmetry).
 
+## THEOREM: single-row cluster weight = (2s+1)² (2026-07-12, proved)
+
+In natural units (a single-row cluster displaces 3² of walk freedom regardless
+of s — the ledger's 441 is 49·9, a normalization artifact), the interior weight
+of an s-cell row cluster is exactly $(2s+1)^2$:
+$$25 = 5^2\ (s{=}2),\quad 49 = 7^2\ (s{=}3),\quad 81 = 9^2\ (s{=}4),\quad
+121 = 11^2\ (s{=}5),\ \dots$$
+*Proof.* A width-2 gap in the row must be bridged by the below-contact $p$ or
+the above-contact $q$ standing at its middle (wider gaps need surplus cells,
+excluded at this weight); one cell bridges at most one gap. A row with $j$ wide
+gaps therefore contributes $(s{+}2)^2$ for $j{=}0$, $\;2(s{+}3){-}1$ for
+$j{=}1$, $\;2$ for $j{=}2$, nothing for $j\ge3$, and
+$$(s{+}2)^2 + (s{-}1)(2s{+}5) + \binom{s-1}{2}\cdot 2 = 4s^2+4s+1 = (2s+1)^2.\ \square$$
+(25 = 16+9 is the $s{=}2$ case; 49 = 25+11+11+2 the $s{=}3$ case. Verified
+numerically s ≤ 6.)
+
+**625 = 25² demystified.** Clusters at row-separation ≥ 1 compose as a Markov
+chain: each cluster's weight already includes its own entry/exit contacts, and
+the intervening walk chains them independently — so separation-≥1 weights
+factorize EXACTLY, and interaction is strictly a contact (separation-0)
+phenomenon. This is why the dilute-gas exponential form is the right ansatz.
+
+**K = 3 validated.** With corrected transfer windows, the row model reproduces
+the banked T(H+k, H) for k ≤ 3, H ≤ 8 exactly — the k=3 content of the law
+(h₃ = 1483) confirmed by the independent algorithm. Two window bugs found and
+fixed en route (recorded so nobody rediscovers them): naive spread caps and
+budget-based gap caps are both WRONG — gaps may be bridged by cells already
+placed below, and the only sound reach bound is the pending-block cost
+(carrying a disconnected block costs ≥ 1 surplus per row while it converges
+at ≤ 2 columns per row).
+
 ## Open
 
-- Derive 441 = 21² by hand (the triple-row case analysis, like 16+9).
-- Explain the exact 625 factorization at separation 1.
-- h₃ = 1483: extend the DP budget to K=3 and assemble the weight-3 ledger.
+- Multi-row cluster weights: adjacent pair-pair = 339 = 3·113 in natural units —
+  closed form / two-row generalization of (2s+1)²?
+- The weight-3 ledger (classification at K=3) and h₃'s anatomy.
 - The convergence + boundary analysis for a full proof of the law.
