@@ -126,8 +126,12 @@ many enumerated weights that enter each modulus (5 integers mod 27).
 ## What remains open (deliberately)
 
 - **Onset sharpness in general**: the theorem proves validity from n = 2k+1;
-  failure at n = 2k is a non-cancellation (deg D = k exactly), verified on
-  all banked data but not proved for all k.
+  failure at n = 2k is a non-cancellation (deg D = k exactly). Verified on
+  all banked data AND ab initio for k ≤ 5 from the weight table (deg R_k =
+  2k+1 exactly; leading coefficients 1, 4, −80, 1753, −40928, 987355 —
+  `experiments/spine_deeper.py`). Not proved for all k; note the natural
+  route (rational GF for the top coefficient) fails because the all-pairs
+  weight family is not C-finite (refuted at ℓ=16; unbounded gap walk).
 - Monomial integer coefficients of P_k (observed k ≤ 17; integer values
   proved above).
 - Closed forms for multi-row cluster weights (open question raised, not a

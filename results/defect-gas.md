@@ -240,6 +240,33 @@ blows up big-int sizes on pre-convergence garbage — solve order-by-order; and
 the u-series master-equation H is NOT the y-series chain μ — mixing them
 breaks the residue formula silently at order 1.)
 
+## Cross-pollination round (2026-07-13) — `experiments/spine_deeper.py`
+
+Applying the gas machinery to the open-problem list; all checks green:
+
+- **Onset sharpness ab initio, k ≤ 5.** deg R_k = 2k+1 exactly (leading
+  coefficients 1, 4, −80, 1753, −40928, 987355 — sign-alternating from k=2,
+  ratio drifting toward ~24). Two levels past what banked data could verify.
+  General-k proof still open, and now known to be harder than hoped: the
+  route via a rational top-coefficient GF dies because…
+- **The all-pairs weight family is NOT C-finite.** An order-7 recurrence fit
+  on ℓ ≤ 14 is refuted at ℓ = 16 (non-integer prediction). Structural
+  reason: the gap between pending blocks is an unbounded ±2 walk, so the
+  state space is infinite and the GF is at best algebraic. Growth ≈ 14.41
+  (ratios 14.398, 14.404, 14.405, 14.407 at ℓ = 7..10; W(2¹⁰) =
+  607,573,757,457). Kernel method = the open route to an exact constant.
+- **Mod-81 master equation, finite (six terms).** The four-pair stack enters
+  at Ŵ ≡ 27; everything else k ≥ 4 dies. Matches all banked coefficients;
+  unique fixed point.
+- **G mod 27 derived.** Only the pair-row boundary survives (v₃(B̂) ≥ k kills
+  k ≥ 2), the denominator keeps 50uH⁻² + 18u²H⁻³ + 18u³H⁻⁶; the residue
+  formula reproduces every banked g_j mod 27.
+- **The deficit-2 spine law T(3m+2, 2m+1) ≡ 2 (mod 3) — previously an
+  unproved observation — now holds on the fully-derived series for
+  m = 1..94** (P_{m+1}(3m+2) ≡ 18 mod 27 via the mod-27/81 fixed points +
+  derived G mod 27). Banked data could only reach m ≈ 11. Symbolic closure
+  is finite algebra of the same kind that closed (⋆c), left open.
+
 ## Open
 - Two-row closed form generalizing (2s+1)² (weight table is raw material).
 - ~~The convergence + boundary analysis for a full proof of the law~~

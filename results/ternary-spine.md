@@ -141,8 +141,11 @@ Reading along rows instead of down columns:
   $$T(3m{+}2,\,2m{+}1) \equiv 2 \pmod 3\qquad(v_3(P_k(3k{-}1)) = 2,\ \text{unit }2,\ k=m{+}1).$$
   Verified $k \le 17$ (banked rows $m \le 11$; rows 38, 41, 44, 47, 50 are
   law-conditional predictions). So the last-nonzero residue of row $n$ cycles
-  $1,1,2$ with $n \bmod 3$. UNPROVED — needs the deficit-2 layer (one binomial
-  order past the even-spine proof; the mod-27/81 lifts are the ingredients).
+  $1,1,2$ with $n \bmod 3$. **UPGRADE 2026-07-13:** holds on the fully-derived
+  series for $m = 1..94$ (`experiments/spine_deeper.py`): the mod-81 master
+  equation + derived $G \bmod 27$ give $P_{m+1}(3m{+}2) \equiv 18 \pmod{27}$
+  with no triangle data at all. Symbolic closure = finite algebra of the
+  (⋆c)-closure kind, still open; but the law is no longer data-limited.
 - **Sleeve zeros are valuation spikes.** A band cell left of the spine carries
   forced deficit $d = 3k{+}1{-}n$; generically $v_3(P_k(n)) = d$ exactly (the
   cell is a unit there) and a ZERO marks excess divisibility
