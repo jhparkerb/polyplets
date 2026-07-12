@@ -59,3 +59,15 @@ calibrates the guesser. Perimeter growth ratio ~4.13 and falling. So:
 **area wild (non-D-finite), perimeter tame (D-finite) — for both families**;
 convexity is a perimeter lever for king animals exactly as for polyominoes.
 The perimeter sequence is a second OEIS-eligible novel sequence.
+
+
+## K2: column-convex polyplets SOLVED — and already known (2026-07-14)
+
+Temperley method (catalytic last-column height; king-touch gives h+h'+1
+placements) closes to a 2x2 linear system:
+GF = x(1-x)^3/(1-7x+13x^2-10x^3+2x^4), growth 4.64468... (quartic root).
+Brute-validated n<=8. **Rediscovery: this is OEIS A187077** (row-convex
+polyplets, transpose-equivalent), same GF verbatim. Not submittable, but
+the pipeline (functional equation -> GF -> brute -> OEIS) is now validated
+end-to-end as the template for the kernel-method items (K1, K3).
+Tool: `experiments/colconvex_king.py`.
