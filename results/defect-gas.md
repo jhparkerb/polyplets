@@ -267,6 +267,25 @@ Applying the gas machinery to the open-problem list; all checks green:
   derived G mod 27). Banked data could only reach m ≈ 11. Symbolic closure
   is finite algebra of the same kind that closed (⋆c), left open.
 
+## The hole-free gas (2026-07-13) — `experiments/holefree_gas.py`
+
+The hole-free height triangle has its own diagonal law, derived ab initio:
+weights are the hole-free configuration counts (pair 25→**24** — the one
+holed config is the minimal diamond, gap pair bridged middle-below AND
+middle-above; triple 49→47; stacked pairs 339→304; boundary 5, 7 unchanged,
+62 for stacked pairs), and the master equation + boundary residue give
+
+$$P^0_1(n) = 24n - 42, \qquad P^0_2(n) = 288n^2 - 1113n + 507,$$
+
+exact against every banked hole-free fixed-height GF value (H ≤ 8, 5+3
+holdouts). Note 288 = 24²/2 — the ideal-gas square of the new density.
+
+**Structural corollary: the spine cubic is carried by the hole-makers.**
+24 ≡ 0 (mod 3): every hole-free surviving weight has positive 3-valuation,
+so the hole-free triangle is mod-3 trivial in-band, and the full triangle's
+entire mod-3 structure (W³ = W² + t and everything downstream) lives in the
+hole-making configurations. Feeds the OEIS-staged A₀ column.
+
 ## Open
 - Two-row closed form generalizing (2s+1)² (weight table is raw material).
 - ~~The convergence + boundary analysis for a full proof of the law~~
