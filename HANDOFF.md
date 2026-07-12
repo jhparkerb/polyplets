@@ -88,9 +88,19 @@ close-out passes.
 - **Ternary Spine (2026-07-12, BANKED):** the height triangle mod 3 is governed by
   the spine cubic **W³ = W² + t** over 𝔽₃ — digit-product law, first-nonzero-per-
   column ≡ 1, and the **SNF count ⌈(N−1)/3⌉ PROVED** modulo the diagonal law + a
-  finitely-verified 3-item ladder. `results/ternary-spine.md`,
-  `experiments/ternary_spine.py` (15/15). Open: prove the ladder (cluster
-  combinatorics); individual SNF exponents. Candidate paper paragraph — jasonp's call.
+  3-item ladder. `results/ternary-spine.md`, `experiments/ternary_spine.py` (15/15).
+  **Ladder RETIRED as empirical input 2026-07-12** by the defect gas (below).
+  Open: individual SNF exponents. Candidate paper paragraph — jasonp's call.
+- **Defect gas / MASTER EQUATION (2026-07-12, BANKED):** `results/defect-gas.md`,
+  `experiments/defect_gas.py` (row model + `master`/`ladder` checks). The diagonal
+  law's H is the grand-partition factor of a 1D cluster gas; exact chain identity
+  (40/40 vs banked triangle incl. boundaries); master equation
+  H = 1 + Σ Ŵ_c u^k H^-(k+ℓ) exact through u³; valuation lemma (k ≥ ℓ) ⟹
+  **spine cubic H³=H²+u DERIVED mod 3**, mod-9 lift derived, finite mod-27
+  equation matches all 18 coefficients; (⋆a) G≡1 mod 9 derived via boundary
+  weights (single-row boundary weight 2s+1 — entry×exit factorization of
+  (2s+1)²); (⋆c) verified to u³⁰⁰ on the pure-algebra mod-27 fixed point.
+  Open: symbolic (⋆c) closure; residue-extraction rigor; two-row closed form.
 - **Max-hole theorem M(n)=round((n−2)²/8) — STAGED for later examination**
   (`results/maxhole-proof.md`, figs `results/figs/maxhole_{ring,seal}.svg`, checker
   `experiments/maxhole_proof_check.py`). Near-complete proof: construction = diagonal

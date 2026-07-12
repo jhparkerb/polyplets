@@ -39,6 +39,9 @@ $$\textstyle\sum_k P_k(n)\,y^k \;=\; G(y)\,H(y)^n .$$
 ## The conditionality ladder (finitely verified; conjectural beyond $y^{17}$)
 
 - $(\star a)$ $G \equiv 1 \pmod 9$ — verified: $v_3(G_j) \ge 2$, $j \le 17$.
+  **UPGRADE 2026-07-12: DERIVED** — boundary-cluster residue formula for $G$
+  + boundary valuation lemma + an identity of the mod-9 cubic
+  (`results/defect-gas.md`).
 - $(\star b)$ $H \equiv W \pmod 3$ — verified on all 18 known coefficients, and
   the resulting digit formula reproduces **all 342 in-regime banked triangle
   cells mod 3** using nothing but the cubic. **UPGRADE 2026-07-12: DERIVED**
@@ -49,7 +52,9 @@ $$\textstyle\sum_k P_k(n)\,y^k \;=\; G(y)\,H(y)^n .$$
   cubic is the gas of bare pair-rows. The mod-9 lift $H^3 \equiv H^2 + 7u$ and
   a finite explicit mod-27 equation come from the same lemma.
 - $(\star c)$ $S := (H^3 - H(t^3))/3$ satisfies $S \equiv t^2 + tW \pmod 3$ —
-  verified to $t^{17}$.
+  verified to $t^{17}$. **UPGRADE 2026-07-12:** verified to $t^{300}$ on the
+  unique mod-27 fixed point of the defect-gas master equation (pure algebra,
+  no enumeration); symbolic closure is finite algebra, left open.
 
 ## Theorems (under the law + ladder)
 
@@ -171,8 +176,9 @@ where the unproved/exposed cells live.
   identities (verified through $y^{17}$; the digit formula then re-verified on
   342 independent triangle cells). **$(\star b)$ is now derived** from the
   defect-gas master equation + valuation lemma (`results/defect-gas.md`,
-  2026-07-12), conditional only on the law + renewal formalism; $(\star a)$ and
-  $(\star c)$ still await the boundary-weight analysis.
+  2026-07-12), conditional only on the law + renewal formalism; $(\star a)$
+  likewise derived (boundary weights), $(\star c)$ verified to $t^{300}$ on the
+  explicit mod-27 fixed point — the ladder as an empirical input is retired.
 - Naming: the cubic $W^3 = W^2+t$ is Artin–Schreier-like; $H\bmod 3$ being
   algebraic makes the triangle mod 3 3-automatic (Christol), and T1 is the
   automaton made explicit.

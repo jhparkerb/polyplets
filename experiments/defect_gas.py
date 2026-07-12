@@ -395,3 +395,147 @@ def check_master():
 
 if __name__ == "__main__" and __import__("sys").argv[-1] == "master":
     check_master()
+
+
+# ---------------------------------------------------------------------------
+# BOUNDARY WEIGHTS AND THE LADDER (2026-07-12).  Bottom-boundary cluster (no p
+# row; counted relative to the renewal q above): single-row s-cluster has
+# boundary weight 2s+1 -- the interior (2s+1)^2 literally factors entry x exit.
+# The chain identity with boundaries is EXACT (verified 40/40 vs the banked
+# triangle, k <= 3, H <= 10, including all boundary corrections):
+#   F(y,z) = Eb/(1 - 3z - sum Wint y^k z^(l+1)) * Et + pure-cluster poly,
+#   Eb = z(1 + sum Wb y^k z^l),  Et likewise with reversed clusters.
+# Residue extraction at z* = 1/mu gives the amplitude, hence
+#   G = eps_b eps_t (1 - wH') / (1 + sum (l+1) What u^k H^-(k+l)),
+#   eps = 1 + sum Bhat u^k H^-(k+l),  Bhat = Wb 3^(2k-l)
+# (verified exactly against known G through u^3).
+#
+# (*a) G == 1 (mod 9), DERIVED: boundary valuation v3(Bhat) >= 2k-l >= k kills
+# every boundary cluster mod 9 except the pair-row (Bhat = 15); the denominator
+# similarly reduces to 1 + 50u/H^2 (v3((l+1)What) >= 2 structurally, the l=k=2
+# case saved by the factor l+1 = 3).  The surviving identity
+#   (1 + 15u/H^2)^2 (1 - uH'/H) == 1 + 50u/H^2  (mod 9)
+# collapses to H^2 H' + 3uH' + 2H == 0 (mod 9), which follows from the mod-9
+# cubic H^3 = H^2 + 25u and its derivative: substituting u = 4(H^3 - H^2)
+# gives H'(3H^3 - 2H^2) + 2H = 25H + 2H = 27H == 0.  QED (mod law + chain).
+#
+# (*c) upgraded: the mod-27 master equation has a UNIQUE fixed point in
+# (Z/27)[[u]] (u-adic contraction), computable by pure algebra with no
+# enumeration; S = (H^3 - H(u^3))/3 == u^2 + uW (mod 3) verified on it to
+# u^300 (checked in check_ladder()).  All three ladder items of
+# results/ternary-spine.md now stand on the gas.
+# ---------------------------------------------------------------------------
+def boundary_weight(sizes, W=9):
+    """Bottom-boundary cluster weight: rows 1..m the cluster, row m+1 = q fixed."""
+    from itertools import combinations
+    from collections import deque
+
+    def connected(rows):
+        allc = [(x, r) for r, xs in rows.items() for x in xs]
+        S = set(allc); seen = {allc[0]}; dq = deque([allc[0]])
+        while dq:
+            x, r = dq.popleft()
+            for dx in (-1, 0, 1):
+                for dr in (-1, 0, 1):
+                    pt = (x + dx, r + dr)
+                    if (dx or dr) and pt in S and pt not in seen:
+                        seen.add(pt); dq.append(pt)
+        return len(seen) == len(S)
+
+    m = len(sizes); total = 0
+
+    def rec(i, rows, prev):
+        nonlocal total
+        if i == 0:
+            if connected(rows):
+                total += 1
+            return
+        lo, hi = min(prev), max(prev)
+        for T in combinations(range(lo - W, hi + W + 1), sizes[i - 1]):
+            if any(abs(a - b) <= 1 for a in prev for b in T):
+                rec(i - 1, {**rows, i - 1: set(T)}, T)
+
+    rec(m, {m: {0}}, (0,))
+    return total
+
+
+def check_ladder(KX=300):
+    """Iterate the mod-27 master equation as a pure-algebra fixed point and
+    verify the Ternary Spine ladder on it: (*b) H==W mod 3, the mod-9 lift,
+    and (*c) S == u^2 + uW mod 3 -- to u^KX, no enumeration involved."""
+    MOD = 27
+
+    def xmul(a, b):
+        out = [0] * (KX + 1)
+        for i, ai in enumerate(a):
+            if ai:
+                for j in range(KX + 1 - i):
+                    if b[j]:
+                        out[i + j] = (out[i + j] + ai * b[j]) % MOD
+        return out
+
+    def xinv(a, M=MOD):
+        r = [pow(a[0], -1, M)] + [0] * KX
+        for m in range(1, KX + 1):
+            r[m] = (-r[0] * sum(a[i] * r[m - i] for i in range(1, m + 1))) % M
+        return r
+
+    def xpow(a, p):
+        base = a if p >= 0 else xinv(a)
+        r = [1] + [0] * KX
+        q = abs(p)
+        while q:
+            if q & 1:
+                r = xmul(r, base)
+            base = xmul(base, base); q >>= 1
+        return r
+
+    H = [1] + [0] * KX
+    for _ in range(KX + 2):
+        rhs = [1] + [0] * KX
+        for w, k, p in ((25, 1, 2), (441, 2, 3), (1017, 2, 4), (43002 % 27, 3, 6)):
+            Hp = xpow(H, -p)
+            for m in range(KX + 1 - k):
+                rhs[m + k] = (rhs[m + k] + w * Hp[m]) % MOD
+        if rhs == H:
+            break
+        H = rhs
+
+    W = [1] + [0] * KX
+    for _ in range(KX + 2):
+        Wi = xinv([w % 3 for w in W], 3)
+        Wi2 = [0] * (KX + 1)
+        for i, a in enumerate(Wi):
+            if a:
+                for j in range(KX + 1 - i):
+                    if Wi[j]:
+                        Wi2[i + j] = (Wi2[i + j] + a * Wi[j]) % 3
+        Wn = [1] + [Wi2[m - 1] % 3 for m in range(1, KX + 1)]
+        if Wn == W:
+            break
+        W = Wn
+
+    assert all((H[m] - W[m]) % 3 == 0 for m in range(KX + 1)), "(*b)"
+    H2 = xmul(H, H); H3 = xmul(H2, H)
+    assert all((H3[m] - H2[m] - (25 if m == 1 else 0)) % 9 == 0
+               for m in range(KX + 1)), "mod-9 lift"
+    Hu3 = [0] * (KX + 1)
+    for m in range(KX // 3 + 1):
+        Hu3[3 * m] = H[m]
+    num = [(H3[m] - Hu3[m]) % 27 for m in range(KX + 1)]
+    assert all(x % 3 == 0 for x in num), "(*c) divisibility"
+    S = [(x // 3) % 3 for x in num]
+    tgt = [0] * (KX + 1); tgt[2] = 1
+    for m in range(KX):
+        tgt[m + 1] = (tgt[m + 1] + W[m]) % 3
+    assert S == tgt, "(*c)"
+    print(f"ladder on the mod-27 fixed point to u^{KX}: "
+          f"(*b), mod-9 lift, (*c) all OK")
+
+
+if __name__ == "__main__" and __import__("sys").argv[-1] == "ladder":
+    for s in ((2,), (3,), (4,), (2, 2)):
+        pass
+    assert [boundary_weight((s,)) for s in (2, 3, 4)] == [5, 7, 9]
+    assert boundary_weight((2, 2)) == 66
+    check_ladder()

@@ -154,8 +154,48 @@ ladder item (⋆b) H ≡ W mod 3 is no longer a finitely-verified input but a
 has its Chapter 1 written: h_k = finite cluster computation, demonstrated
 through k = 3.
 
+## BOUNDARY WEIGHTS: G derived, the whole ladder falls (2026-07-12)
+
+**Boundary weights.** A bottom-boundary cluster (no p row, counted relative to
+the renewal q above) has weight W^b; enumerated: single rows **5, 7, 9 = 2s+1**
+— the interior (2s+1)² literally factors as entry × exit — and (2,2) = 66,
+(2,3) = 177, (3,2) = 130, (2,2,2) = 919.
+
+**The chain identity with boundaries is EXACT**: with E_b = z(1 + ΣW^b yᵏzˡ),
+E_t its reversal, D = 1 − 3z − ΣW yᵏz^{ℓ+1}, and a pure-cluster polynomial,
+F(y,z) = E_b E_t/D + pure reproduces the banked triangle **40/40** (k ≤ 3,
+H ≤ 10, every boundary correction included). This is the complete combinatorial
+decomposition underlying the diagonal law: single-cell rows are renewal points;
+everything else is a finite catalogue of clusters.
+
+**G from the residue at z\* = 1/μ** (verified exactly against known G to u³):
+$$G \;=\; \frac{\varepsilon_b\,\varepsilon_t\,(1-wH')}{1+\sum_c(\ell_c{+}1)\hat W_c u^{k_c}H^{-(k_c+\ell_c)}},
+\qquad \varepsilon = 1+\sum_c \hat B_c u^{k_c}H^{-(k_c+\ell_c)},\ \ \hat B_c = W^b_c 3^{2k_c-\ell_c}.$$
+
+**(⋆a) G ≡ 1 (mod 9), DERIVED.** Boundary valuation v₃(B̂) ≥ 2k−ℓ ≥ k kills
+every boundary cluster mod 9 except the pair-row (B̂ = 15); the denominator
+reduces structurally to 1 + 50uH⁻² (the ℓ=k=2 case saved by its ℓ+1 = 3).
+What remains, (1+15uH⁻²)²(1−uH′/H) ≡ 1+50uH⁻² (mod 9), collapses to
+**H²H′ + 3uH′ + 2H ≡ 0 (mod 9)** — and substituting u = 4(H³−H²) (from the
+derived mod-9 cubic) plus its derivative identity (3H²−2H)H′ ≡ 25 gives
+H′(3H³−2H²) + 2H = 25H + 2H = 27H ≡ 0. ∎
+
+**(⋆c) upgraded.** The mod-27 master equation has a *unique* fixed point in
+(ℤ/27)[[u]] (u-adic contraction) — computable by pure algebra, no enumeration.
+(⋆b), the mod-9 lift, and (⋆c) S ≡ u² + uW (mod 3) all verified on it to
+**u³⁰⁰** (`check_ladder()`); 283 coefficients beyond anything enumerable. A
+fully symbolic closure of (⋆c) is finite algebra on the fixed point, left open.
+
+**Net effect on the Ternary Spine:** all three ladder items (⋆a,b,c) now stand
+on the defect gas — (⋆a) and (⋆b) symbolically, (⋆c) at u³⁰⁰ — so the Spine's
+conditionality collapses from "law + finitely-verified ladder" to
+"law + renewal chain formalism", and the chain identity itself is exact
+combinatorics (40/40 with boundaries).
+
 ## Open
 
-- Boundary weights → derive G (ladder item (⋆a) G ≡ 1 mod 9) the same way.
-- Two-row closed form generalizing (2s+1)² (table above is raw material).
-- The convergence + boundary analysis for a full proof of the law.
+- Symbolic closure of (⋆c) on the fixed point (finite algebra).
+- Two-row closed form generalizing (2s+1)² (weight table is raw material).
+- The convergence + boundary analysis for a full proof of the law
+  (the chain identity is the decomposition; what remains is the residue
+  extraction being exact per y-order beyond a computable threshold).
