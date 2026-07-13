@@ -71,3 +71,19 @@ polyplets, transpose-equivalent), same GF verbatim. Not submittable, but
 the pipeline (functional equation -> GF -> brute -> OEIS) is now validated
 end-to-end as the template for the kernel-method items (K1, K3).
 Tool: `experiments/colconvex_king.py`.
+
+
+## A187077 provenance check (2026-07-14)
+
+Worry raised and settled by measurement. Our column-convex GF agrees with
+(1) our functional equation, (2) our independent brute force (which also
+reproduces A006770 n<=8 as control), and (3) Bevan's 23 published terms.
+The OEIS entry's comment "Equivalent to a sequence of row-convex polyhexes
+(A059716)" is measurably WRONG in its plain reading: brute-forcing the hex
+lattice (control: all polyhexes == A001207 exactly) gives row-convex
+polyhexes == A059716 == 1,3,11,42,162,... != A187077 == 1,4,18,83,385,...
+Structural reason: a king row-interval has h+h'+1 placements against the
+next row; a hex brick-row has h+h'. The entry contains no derivation, so
+our Temperley derivation may be the only explicit one on record; a
+correction comment + derivation would be the valuable OEIS contribution
+here (jasonp's call).
