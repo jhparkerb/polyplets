@@ -180,9 +180,16 @@ spine digit-product on all in-band cells).
   P_k(n)*2^(n-1-3k), P_1 = 9n-15 (11 holdouts), same onset; single-row
   weights (s+1)^2, gap pairs impossible; **dyadic spine = the SAME cubic
   H^3 = H^2 + u over F_2** with G = 1 + uH^-3. Lattice picks the prime
-  (drift count) and density (contacts^2); the curve is invariant. Open:
-  polyiamonds; general unit-ness of contacts^2 mod b. Paper's not-D-finite
-  theorem landed (thm:notdfinite, verify_claims 407/407).
+  (drift count) and density (contacts^2); the curve is invariant. **UNIVERSAL THEOREM
+  PROVED 2026-07-15** (docs/proofs/universal-diagonal-law.md): for every
+  row-local lattice (|dy|<=1 adjacency, drift count b = |D|), T(H+k,H) =
+  q_k(H) b^H from H >= k+1 with integer-valued P_k (Theorem A), and mod any
+  prime p | b the spine is H^3 = H^2 + wu with w = W_pair mod p (Theorem B:
+  the curve is lattice-invariant; the lattice picks the prime and scaling).
+  Instances machine-checked: square b=1 (poly diagonals, density 4,
+  experiments/universal_law_check.py), hex b=2, king b=3 -- all with w=1.
+  Open: is w always a unit (or ever 0)? polyiamonds (needs row conventions).
+  Paper's not-D-finite theorem landed (thm:notdfinite, verify_claims 407/407).
 
 ## Remaining work ledger
 1. **Paper final read-through.**
