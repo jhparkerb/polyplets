@@ -156,7 +156,12 @@ spine digit-product on all in-band cells).
   (kappa=0.42109, kernel relation verified), P-plateau confirmed; algebraic
   but no low-degree form (PSLQ excludes deg<=10, coeffs<=1e10; two spurious
   fits exposed); exact elimination documented, not executed (low value).
-  Then H2 (haruspicy on convex-by-area), K3 (exact convex mu, q-series). Garnish when idle: Sheffer/Riordan convolution identities for
+  H2 DONE (results/convex-anisotropic.md): convex strip GFs recovered
+  exactly H<=7 (orders 1,3,7,14,25,36,53); finding = root RECYCLING (psi
+  degrees 1,2,3,5,7,6,8), opposite of the full family's separation -- weak
+  exclusion boxes only, Mirage unstrengthened, but sharpens that the H1
+  mechanism is special to the unrestricted family. K3 (exact convex mu,
+  q-series week-class) PARKED -- last open item of the program. Garnish when idle: Sheffer/Riordan convolution identities for
   P_k as new cross-checks; p=2 spine considered-and-declined (3-powers are
   units mod 2, no collapse).
 
