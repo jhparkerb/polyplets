@@ -70,9 +70,10 @@ per level, whose polynomial-times-power-of-three shape, onset, and
 integrality are \emph{proved} here by an exact walk-plus-clusters
 decomposition, the first five levels' constants derived ab initio from
 finite cluster counts), the triangle's mod-3 structure (an algebraic
-``spine cubic'' $W^3=W^2+t$ over $\mathbb F_3$), a conjectural
+``spine cubic'' $W^3=W^2+t$ over $\mathbb F_3$), a
 quasi-polynomial law for the diagonals of the
-symmetric-fixed-point triangle (period two, degree $k$, with
+symmetric-fixed-point triangle, likewise with proved shape
+(period two, degree $k$, with
 generating-function numerators satisfying $N_k(\pm1)=(\pm2)^k$, $k\ge1$), a
 hole-count
 stratification of A006770, exact fixed-height generating functions, the
@@ -102,8 +103,8 @@ provenance and verification of those numbers, and the empirical structure
 found in them. It reports the terms $a(19)$ through $a(36)$ and the results
 that grew out of computing them, including the diagonal law of the height
 triangle---whose shape is proved here via an exact walk-plus-clusters
-decomposition---its mod-3 algebraic structure, and a conjectural
-quasi-polynomial law for the diagonal-mirror triangle
+decomposition---its mod-3 algebraic structure, and the diagonal-mirror
+triangle's quasi-polynomial law, also proved in shape
 (Section~\ref{sec:diagonals}). It is an
 amateur contribution carried out with substantial AI assistance
 (Section~\ref{sec:ai}). The data appears in the document as well as the
@@ -129,9 +130,12 @@ these computations.
         mod~3 is governed by an algebraic spine cubic, with the Smith
         normal form of the diagonal-polynomial matrix determined
         (Section~\ref{sec:spine}).
-  \item A conjectural quasi-polynomial law for the diagonals of the diagonal-mirror
-        symmetry triangle, with pinned polynomials, forward confirmations,
-        and generating-function structure (Section~\ref{sec:diagonals}).
+  \item A quasi-polynomial law for the diagonals of the diagonal-mirror
+        symmetry triangle---period two, degree $k$---whose shape is likewise
+        \emph{proved} (segment grammar + one-parameter lattice-point
+        counting; onset and pole multiplicities remain validated data),
+        with pinned polynomials, forward confirmations, and
+        generating-function structure (Section~\ref{sec:diagonals}).
   \item A hole-count stratification of A006770 exact through $n=18$, the
         extremal hole area (single-hole maximum proved exactly
         $\lfloor(n-2)^2/8\rceil$, two-sided), exact fixed-height generating
@@ -169,13 +173,13 @@ later terms rest on decorrelation rather than algorithmic independence.
     $T(36,19)$ would be checked by $P_{17}$, which has no independent holdout
     until $a(37)$ exists. It gets its own tag so the weaker standard is never
     silently absorbed into \tiertwo{}. \\
-    \tierthree{} & Exact computation composed with \emph{empirically pinned
-    but unproven} quasi-polynomial formulas (the diagonal-mirror $P_k$ of
-    Section~\ref{sec:diagonals}, each pinned with holdout hits and confirmed
-    forward on strips computed after pinning). The failure mode is specific
-    and stated: an onset shift or degree transition beyond the pinned range
-    would silently corrupt exactly the substituted strips; the forward
-    confirmations bound this risk but cannot eliminate it. Used for the
+    \tierthree{} & Exact computation composed with the fitted diagonal-mirror
+    $P_k$ of Section~\ref{sec:diagonals} (each pinned with holdout hits and
+    confirmed forward on strips computed after pinning). The law's
+    quasi-polynomial shape and degree are now \emph{proved}, which
+    eliminates the degree-transition failure mode; what remains empirical
+    is the onset value, so an onset shift beyond the pinned range is the
+    one surviving (and bounded) risk. Used for the
     $n=33$ companions ($D(33)$ and the four $D$-dependent values); no
     \tierthree{} value is presented as established in this paper without
     its label. \\
@@ -874,18 +878,28 @@ functions; but rationality alone does not give quasi-polynomiality---for
 that, every pole of $G_k$ must lie at a root of unity, and the specific law
 observed here demands the poles sit at $x=\pm1$ with multiplicities exactly
 $k{+}1$ and $k$. Nothing in the decomposition picture forces those
-multiplicities; they are measured facts a proof would have to reproduce,
-presumably from the count of independent free lengths available at weight
-$k$. For the \emph{height} triangle exactly this strategy has now been
-carried out (Theorem~\ref{thm:diaglaw}: the decomposition is walk plus
-clusters, and partial fractions do force the pole multiplicities); the
-diagonal-mirror analog would need the symmetric decomposition and the
-$x=\pm1$ pole locations, and remains open. So for this triangle the
-strategy is recorded as a strategy: the honest state of knowledge is the
-validated data above, including the parity anomaly that already ruled out
-the naive version of the argument.
+multiplicities; they are measured facts a proof must reproduce from the
+count of independent free lengths available at weight $k$. This program
+has now been carried out for both triangles. For the \emph{height}
+triangle it is Theorem~\ref{thm:diaglaw}. For this triangle, the
+decomposition is a \emph{segment grammar}: reading rows, an animal at
+surplus $k$ splits into at most $2k{+}1$ perfect diagonal/anti-diagonal
+segments joined at defect clusters, with at most $2k$ direction reversals
+(each mirror-orbit of turns consumes cell surplus --- the reversal lemma,
+tight on the data); per combinatorial type the animals are the lattice
+points of a one-parameter polytope with coefficients in $\{1,2\}$, so
+each type contributes a period-two quasi-polynomial, and a telescoping
+rank argument caps the degree at $k$. Hence $d(S,S{+}k)$ is a period-two
+quasi-polynomial of degree $\le k$ for $S$ beyond an effective onset ---
+poles only at $x=\pm1$, of bounded order. The parity anomaly of the
+$k=3$ level is the grammar's anti-excursion classes, not an obstruction.
+What the proof does \emph{not} deliver is the sharp onset
+($2k{+}2$/$2k{+}3$) and the exact multiplicity split $(k{+}1,k)$; those
+remain validated data. Full write-up with the honest lemma-by-lemma
+grading: \texttt{docs/proofs/dm-diagonal-law.md}.
 
-All of Section~\ref{sec:dmdiag} is computed and validated, not proved. Its
+The specific polynomials of Section~\ref{sec:dmdiag} are computed and
+validated (the law's shape is proved as described above). Its
 practical role is sharp: the sparse strips ($S\ge29$ at $n\ge33$) are
 precisely the RAM-expensive ones---one strip burned $\sim$$62$ CPU-hours and
 $79$\,GB to produce the two numbers $d(31,31)=2$, $d(31,32)=38$ that $P_0$

@@ -130,7 +130,16 @@ spine digit-product on all in-band cells).
   companions this session: [[hole-free-growth-constant]], [[height-distribution-collapse]],
   results/series-analysis-da.md (θ=−1).
 
-- **dm-mirror law proof program STARTED (2026-07-13):** `results/dm-diagonal-recon.md`,
+- **dm-mirror law PROVED (shape) 2026-07-15** (docs/proofs/dm-diagonal-law.md):
+  segment grammar (<=2k+1 perfect diag/anti segments, reversal lemma tight) +
+  turn-orbit cost + type finiteness + one-parameter Ehrhart (period 2, coeffs
+  {1,2}) + telescoping rank bound => d(S,S+k) per-parity polynomial deg <= k
+  past an effective onset; poles only at +-1. NOT proved: sharp onset
+  2k+2/2k+3, multiplicity split (k+1,k) — data-grade, like king sharpness.
+  Referee pressure point: Lemma 5 (rank/telescoping). Paper updated in 5
+  places (abstract/intro/contributions/T3 tier/dmdiag section; T3
+  degree-transition failure mode eliminated, onset-shift mode remains,
+  bounded); verify_claims 407/407, compiles clean. Program history: `results/dm-diagonal-recon.md`,
   `experiments/dm_sym_enum.py` (validated vs banked law). d(S,S)=2 PROVED
   (permutation skeleton: monotone king permutations). Two-family dichotomy
   refuted (anti-excursion family = the known parity anomaly); proof frame =
