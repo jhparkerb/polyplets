@@ -593,6 +593,9 @@ func sweepHeight(
 	// column's frontier_out (totalRecs), so we read headers only once (the seed
 	// or resume frontier) and carry the count forward — no per-column re-read.
 	frontierIn := sumFrontierRecords(frontier)
+	// guard.protected starts at the entry frontier (what a resume checkpoint would
+	// name), so it is never GC'd until a later checkpoint supersedes it.
+	guard := &frontierGuard{protected: frontier}
 
 	for col := startCol; col <= cfg.Maxn; col++ {
 		if len(frontier) == 0 {
@@ -642,6 +645,9 @@ func sweepHeight(
 		oldFrontier := frontier
 		oldMapOuts := mapOuts
 		frontier = mergeOuts
+		// Map outputs are consumed by merge and never referenced by a checkpoint,
+		// so they are always safe to GC now.
+		removeRuns(oldMapOuts)
 
 		// Per-column telemetry: orchestrator wall-clock for this column's
 		// map+merge, with frontier sizes for the cost model and live ETA.
@@ -669,13 +675,11 @@ func sweepHeight(
 		if totalRecs == 0 {
 			// Height exhausted: write a "height-done" checkpoint with nil frontier
 			// BEFORE GC so the stale per-column checkpoint (which named oldFrontier
-			// files) is superseded before those files are deleted.
+			// files) is superseded before those files are deleted. The guard also
+			// releases any frontier retained across an earlier throttled gap.
 			forwardCheckpoint(col, nil)
-			for _, p := range oldFrontier {
-				removeRun(p)
-			}
-			for _, p := range oldMapOuts {
-				removeRun(p)
+			for _, del := range guard.afterColumn(true, oldFrontier, nil) {
+				removeRuns(del)
 			}
 			frontier = nil
 			break
@@ -683,18 +687,17 @@ func sweepHeight(
 
 		// Write per-column checkpoint BEFORE GC so resume can always find the frontier.
 		// Include hTri so the current height's in-progress contributions are saved.
+		// The write is interval-throttled; the guard defers GC of the consumed
+		// frontier until a checkpoint that no longer references it is persisted, so
+		// a throttled column never strands the last checkpoint's frontier.
 		interval := cfg.CheckpointEvery
-		if interval == 0 || time.Since(lastCkpt) >= interval {
+		wrote := interval == 0 || time.Since(lastCkpt) >= interval
+		if wrote {
 			forwardCheckpoint(col, frontier)
 			lastCkpt = time.Now()
 		}
-
-		// GC only after checkpoint is written.
-		for _, p := range oldFrontier {
-			removeRun(p)
-		}
-		for _, p := range oldMapOuts {
-			removeRun(p)
+		for _, del := range guard.afterColumn(wrote, oldFrontier, frontier) {
+			removeRuns(del)
 		}
 	}
 
@@ -706,6 +709,60 @@ func removeRuns(paths []string) {
 	for _, p := range paths {
 		removeRun(p)
 	}
+}
+
+// sameRunSet reports whether two frontier file lists name the same run set.
+func sameRunSet(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// frontierGuard decides which consumed frontier files are safe to delete so that
+// a crash-resume can always find the frontier named by the last *persisted*
+// checkpoint. Per-column checkpoints are interval-throttled, but each column
+// consumes its input frontier — so deleting that input unconditionally (the old
+// behavior) strands the last persisted checkpoint on files a later column already
+// deleted: resume then fails loudly with "cannot read input". The guard defers a
+// consumed frontier's deletion until a checkpoint that does NOT reference it has
+// been written, while still GCing unreferenced intermediate frontiers eagerly (no
+// disk leak across a run of throttled columns).
+//
+// protected is the frontier the on-disk checkpoint currently references; it is
+// seeded with the loop's entry frontier (what a resume checkpoint would name).
+type frontierGuard struct {
+	protected []string
+}
+
+// afterColumn records that a column consumed oldFrontier and produced newFrontier,
+// and whether a checkpoint naming newFrontier was just persisted. It returns the
+// frontier file sets that are now unreferenced and safe to delete, and updates the
+// protected set.
+func (g *frontierGuard) afterColumn(wroteCheckpoint bool, oldFrontier, newFrontier []string) [][]string {
+	if wroteCheckpoint {
+		// The new checkpoint references newFrontier, so both the just-consumed
+		// oldFrontier and the previously-protected frontier are now unreferenced.
+		var del [][]string
+		if len(g.protected) > 0 && !sameRunSet(g.protected, oldFrontier) {
+			del = append(del, g.protected)
+		}
+		del = append(del, oldFrontier)
+		g.protected = newFrontier
+		return del
+	}
+	// Checkpoint throttled: the on-disk checkpoint still references protected, so
+	// it must survive. Delete oldFrontier only when it is an unreferenced
+	// intermediate (not the protected set itself).
+	if sameRunSet(oldFrontier, g.protected) {
+		return nil
+	}
+	return [][]string{oldFrontier}
 }
 
 // sweepHeightKink sweeps one height H from startCol using the kink kernel
@@ -748,6 +805,9 @@ func sweepHeightKink(
 	frontierIn := sumFrontierRecords(frontier)
 	inKeyLen := columnKeyLen(H)
 	stageKeyLen := kinkKeyLen(H)
+	// See sweepHeight: defer frontier GC until a superseding checkpoint is written
+	// so a throttled column can't strand the last checkpoint's frontier.
+	guard := &frontierGuard{protected: frontier}
 
 	for col := startCol; col <= cfg.Maxn; col++ {
 		if len(frontier) == 0 {
@@ -885,18 +945,22 @@ func sweepHeightKink(
 
 		if totalRecs == 0 {
 			forwardCheckpoint(col, nil)
-			removeRuns(oldFrontier)
+			for _, del := range guard.afterColumn(true, oldFrontier, nil) {
+				removeRuns(del)
+			}
 			frontier = nil
 			break
 		}
 
 		interval := cfg.CheckpointEvery
-		if interval == 0 || time.Since(lastCkpt) >= interval {
+		wrote := interval == 0 || time.Since(lastCkpt) >= interval
+		if wrote {
 			forwardCheckpoint(col, frontier)
 			lastCkpt = time.Now()
 		}
-
-		removeRuns(oldFrontier)
+		for _, del := range guard.afterColumn(wrote, oldFrontier, frontier) {
+			removeRuns(del)
+		}
 	}
 
 	return hTri, acct, nil
