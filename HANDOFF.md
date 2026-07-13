@@ -108,6 +108,14 @@ spine digit-product on all in-band cells).
   (2s+1)²); **(⋆c) PROVED 2026-07-13** (H(u³) ≡ H²+25u−3u²−3uW mod 9, from the
   mod-9 cubic alone) — the whole ladder is now symbolic, zero empirical input.
   Open: two-row closed form.
+  **Deficit-2 law PROVED 2026-07-15** (experiments/deficit2_proof.py):
+  T(3m+2,2m+1) == 2 mod 3 for all m, via Lagrange-Buermann diagonal ->
+  rational identity on the mod-27 master curve -> exact polynomial division
+  (E monic in H, remainder 0). Row-reading picture fully theorem-grade; the
+  LB-to-curve-division method is reusable for any linear-family congruence.
+  Onset sharpness (general k) attempted, remains OPEN: leading coefficient
+  = signed composition of the (non-C-finite) all-pairs family — sign-definite
+  after (-1)^k twist on data, no proof.
 - **DIAGONAL LAW SHAPE PROVED (2026-07-12):** `docs/proofs/diagonal-law.md`,
   checker `experiments/diagonal_law_proof_check.py` (all green, k ≤ 3 exact).
   Separation lemma (walk rows are cuts) + exact chain identity + row bound

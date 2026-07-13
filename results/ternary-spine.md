@@ -139,13 +139,16 @@ Reading along rows instead of down columns:
 - **Rows $n \equiv 2 \pmod 3$ have no spine cell.** Their last nonzero is the
   deficit-2 cell, and empirically it is ALWAYS $\equiv 2$:
   $$T(3m{+}2,\,2m{+}1) \equiv 2 \pmod 3\qquad(v_3(P_k(3k{-}1)) = 2,\ \text{unit }2,\ k=m{+}1).$$
-  Verified $k \le 17$ (banked rows $m \le 11$; rows 38, 41, 44, 47, 50 are
-  law-conditional predictions). So the last-nonzero residue of row $n$ cycles
-  $1,1,2$ with $n \bmod 3$. **UPGRADE 2026-07-13:** holds on the fully-derived
-  series for $m = 1..94$ (`experiments/spine_deeper.py`): the mod-81 master
-  equation + derived $G \bmod 27$ give $P_{m+1}(3m{+}2) \equiv 18 \pmod{27}$
-  with no triangle data at all. Symbolic closure = finite algebra of the
-  (⋆c)-closure kind, still open; but the law is no longer data-limited.
+  **PROVED 2026-07-15** (`experiments/deficit2_proof.py`): the family GF
+  $D(v) = \sum_m P_{m+1}(3m{+}2)v^m$ is a diagonal of $G\,H^n$; formal
+  Lagrange–Bürmann over $\mathbb Z/27$ plus the parametrization $v = u/H^3$
+  turn the claim $D = 5 + 18v/(1-v)$ into a rational identity on the mod-27
+  master curve $E(H,u) = 0$, decided by exact polynomial division ($E$ monic
+  in $H$; remainder $\equiv 0$). So the last-nonzero residue of row $n$
+  provably cycles $1,1,2$ with $n \bmod 3$ — the full row-reading picture is
+  now theorem-grade (same conditional frame as the ladder: gas-derived
+  master equation + boundary residue). The diagonal-family method (LB to the
+  curve, then division) is reusable for any $(n,k)$-linear-family congruence.
 - **Sleeve zeros are valuation spikes.** A band cell left of the spine carries
   forced deficit $d = 3k{+}1{-}n$; generically $v_3(P_k(n)) = d$ exactly (the
   cell is a unit there) and a ZERO marks excess divisibility
