@@ -145,8 +145,12 @@ spine digit-product on all in-band cells).
   r heights); strip growth constants proven strictly monotone (PF route,
   verified exactly H<=10); atoms psi_1..psi_8 CERTIFIED IRREDUCIBLE (degrees
   1..462, multi-prime subset-sum certificates) => deg_Q(mu_H) = atom degree;
-  residual condition for full non-D-finiteness now a single crisp conjecture:
-  strip growth constants have unbounded algebraic degree. Also: pole-argument theorem
+  residual conjecture PROVED 2026-07-15 via Northcott finiteness (bounded
+  degree + bounded house + infinitude of distinct mu_H = contradiction):
+  **THEOREM: the height-anisotropic polyplet GF is NOT D-finite,
+  unconditional** — proof template lattice-universal (polyominoes by height
+  etc.); literature check flagged in papers/MISSING.md before claiming
+  novelty externally. Candidate paper paragraph — jasonp's call. Also: pole-argument theorem
   excludes y-ODEs for the height-anisotropic GF in quantified (order,
   x-degree) boxes (up to r<=5 & D<=28 ... r=0 & D<=3288), from mod-p-certified
   new-root contents psi_H (deg 1..3289, squarefree, lowest terms, H<=10);

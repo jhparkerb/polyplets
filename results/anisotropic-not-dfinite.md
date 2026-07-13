@@ -104,3 +104,74 @@ deg_Q(mu_H) = deg psi_H, growing at the measured rate ~sqrt(lambda) = 2.67
 per level (atom degree tracks frontier size). This conjecture — natural,
 spectral, and checked to degree 462 — is the entire distance between the
 quantified theorem and full non-D-finiteness.
+
+
+## THE UNCONDITIONAL THEOREM (2026-07-15): the attack succeeded
+
+The "one remaining condition" above FALLS: unbounded algebraic degree of
+the strip growth constants follows from strict monotonicity plus Northcott
+finiteness. Nothing empirical remains.
+
+**Theorem.** F(x,y) = sum_{n,H} T(n,H) x^n y^H is not D-finite.
+
+*Proof, assembled from four classical ingredients:*
+
+1. **(Fatou + rationality.)** Each G_H(x) = sum_n T(n,H) x^n is rational
+   (finite transfer matrix) with integer coefficients, so by Fatou's lemma
+   its lowest-terms denominator Q_H has Q_H(0) = 1 and integer
+   coefficients. The reversal of Q_H is monic integral, and its roots are
+   exactly the reciprocals 1/(poles of G_H). Hence mu_H := 1/(radius of
+   convergence of G_H) is an algebraic integer: the radius point of a
+   rational series is a pole, positive-real by Pringsheim (T >= 0), and its
+   minimal polynomial divides the monic reversal.
+
+2. **(House bound.)** Every pole of G_H has modulus >= the radius 1/mu_H,
+   by the definition of radius of convergence. So every Galois conjugate of
+   mu_H (a root of the reversal) has modulus <= mu_H: house(mu_H) = mu_H,
+   and mu_H < lambda <= 9.3153 (the banked rigorous bound; any crude bound
+   works).
+
+3. **(Strict monotonicity — Perron-Frobenius.)** Let nu_H be the growth of
+   the height-<=H strip counts, computed by the column-signature transfer
+   M_H(x) (Method B): states = boundary signatures under the
+   nonempty-column invariant; the signature digraph is strongly connected
+   (any state reaches the single-cell state by closing components with a
+   spanning column, and any state is reachable from it), so M_H(x) is
+   irreducible nonnegative for x > 0. M_H sits inside M_{H+1} as a proper
+   principal submatrix (signatures not using row H+1), and the extra states
+   connect through the explicit cycle single-cell -> full-(H+1)-column ->
+   single-cell. Deleting rows/columns of an irreducible nonnegative matrix
+   strictly decreases the Perron root, so rho_{H+1}(x) > rho_H(x) at every
+   x > 0; at x*_H (where rho_H = 1) this gives rho_{H+1}(x*_H) > 1, hence
+   x*_{H+1} < x*_H and nu_{H+1} > nu_H strictly. Exact-height counts are
+   second differences of strip counts, so (strictness => no cancellation)
+   mu_H = nu_H, the pole 1/mu_H of G_H is genuine, and the mu_H are
+   pairwise distinct, converging up to lambda. [Numerically confirmed
+   H <= 10; Pringsheim min-modulus confirmed H <= 6.]
+
+4. **(Northcott/Kronecker finiteness.)** For fixed D, an algebraic integer
+   of degree <= D with house <= B has minimal-polynomial coefficients
+   bounded by binom(D,k) B^k — finitely many integer polynomials, so
+   finitely many such numbers. With B = 9.3153: for every D, only finitely
+   many of the (infinitely many, distinct) mu_H can have degree <= D.
+   Therefore **deg_Q(mu_H) -> infinity**.
+
+5. **(Dichotomy theorem, above.)** A y-ODE of order r with x-degrees <= D
+   forces deg_Q(mu_H) <= D at all but at most r heights — contradicted by
+   (4) for every (r, D). (Wlog the ODE is over Q(x,y): F has rational
+   coefficients, and D-finiteness over C descends to the field of
+   definition.) QED
+
+**Scope.** The proof uses only: integer counts, per-height rationality,
+and strictly increasing bounded strip growth constants. It therefore
+applies verbatim to fixed POLYOMINOES by height (A001168's triangle),
+polyhexes, polyiamonds, and generally to any lattice-animal family with a
+column transfer matrix — a universal anisotropic non-D-finiteness
+criterion. We have not found this Northcott-plus-monotonicity argument in
+the literature (Rechnitzer's haruspicy proves the SAP analog by very
+different means); flagged in papers/MISSING.md for a literature check
+before any external claim of novelty.
+
+**Status ledger for this document:** the quantified psi-boxes and the
+irreducibility certificates above remain as concrete effective content;
+the conditional statements are all retired.

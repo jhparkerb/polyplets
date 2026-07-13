@@ -46,3 +46,14 @@ _(none outstanding — Barequet–Moffie 2007 and Mertens 1990 obtained 2026-06-
   klarner_1967_cell_growth_problems.pdf** (added 2026-06-25).
 - Also filed 2026-06-25: Mertens & Lautenbacher, "Counting Lattice Animals: A Parallel
   Attack," J. Stat. Phys. 66 (1992) 669 → mertens_lautenbacher_1991_parallel.pdf.
+
+## Northcott + monotonicity => anisotropic non-D-finiteness (2026-07-15)
+Need a literature check before claiming novelty: does the argument
+"y-slices rational/integer, strip growth constants strictly increasing and
+bounded => slice degrees unbounded by Northcott => two-variable GF not
+D-finite" appear anywhere? Closest known: A. Rechnitzer, "Haruspicy and
+anisotropic generating functions" (Adv. Appl. Math. 2003); "...2: bond
+animals" (2006); "...3: SAPs" (JCTA 2006). Also check: J. Bell / S. Gerhold
+/ M. Mezzarobba-adjacent non-D-finiteness criteria; Guttmann's solvability
+tests; Bousquet-Melou anisotropic surveys. If truly absent, this is a
+publishable stand-alone note.
