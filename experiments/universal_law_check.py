@@ -61,5 +61,62 @@ def main():
           "deg k from onset; P_1(n) = 4(n-2)  OK")
 
 
+def polyiamond_probe():
+    """Periodic extension: triangular lattice diagonal structure."""
+    def canon(cells):
+        mx = min(x for x, _ in cells)
+        my = min(y for _, y in cells)
+        dx = mx - ((mx + my) % 2)
+        return frozenset((x - dx, y - my) for x, y in cells)
+
+    def neighbors(c):
+        x, y = c
+        out = [(x - 1, y), (x + 1, y)]
+        out.append((x, y - 1) if (x + y) % 2 == 0 else (x, y + 1))
+        return out
+
+    NMAX = 12
+    seen = {canon({(0, 0)})}
+    frontier = list(seen)
+    T = defaultdict(int)
+    T[(1, 1)] = 1
+    tot = {1: 1}
+    while frontier:
+        new = []
+        for A in frontier:
+            if len(A) >= NMAX:
+                continue
+            cand = set()
+            for c in A:
+                for nb in neighbors(c):
+                    if nb not in A:
+                        cand.add(nb)
+            for c in cand:
+                B = canon(set(A) | {c})
+                if B not in seen:
+                    seen.add(B)
+                    new.append(B)
+        frontier = new
+        if new:
+            n = len(new[0])
+            tot[n] = len(new)
+            for A in new:
+                H = max(y for _, y in A) - min(y for _, y in A) + 1
+                T[(n, H)] += 1
+    # A001420 from n=2 (single-triangle orientation seed difference at n=1)
+    assert [tot[n] for n in range(2, 13)] == [3, 6, 14, 36, 94, 250, 675,
+                                              1838, 5053, 14016, 39169]
+    assert all(T[(2 * H - 2, H)] == 2 ** (H - 2) for H in range(2, 7))
+    assert all(T[(2 * H - 1, H)] == H * 2 ** (H - 1) for H in range(2, 7))
+    from fractions import Fraction as F
+    q = [F(T[(2 * H + 2 - 2 + 0, H)], 1) for H in range(3, 7)]
+    vals = [F(T[(2 * H, H)], 2 ** H) for H in range(3, 7)]
+    d2 = [vals[i + 2] - 2 * vals[i + 1] + vals[i] for i in range(2)]
+    assert len(set(d2)) == 1, d2
+    print("polyiamond periodic extension: T(2H-2,H)=2^(H-2), "
+          "T(2H-1,H)=H*2^(H-1), k=2 quadratic in T/2^H  OK")
+
+
 if __name__ == "__main__":
     main()
+    polyiamond_probe()

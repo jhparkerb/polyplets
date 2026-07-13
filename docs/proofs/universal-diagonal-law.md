@@ -90,11 +90,32 @@ Only the pair-row survives mod p, with weight What = W_pair. QED
 | king | 3 | n>=2k+1 | 25 = 5^2 | 25n-45 | H^3=H^2+u over F_3 (w=1) |
 
 Densities are squares (below-contacts x above-contacts, plus bridge terms
-where the lattice allows them: king's 25 = 16 + 9). In all three computed
-cases w = 1 exactly, so the unscaled cubic appears; whether w = 1 (or even
-w != 0) holds for every row-local lattice is OPEN -- W_pair is a sum of
-squares-and-bridges whose residue mod p | b has no obvious general reason
-to be a unit.
+where the lattice allows them: king's 25 = 16 + 9). The unit question is
+now SETTLED by synthetic-lattice computation (2026-07-15): the solid-pair
+term (b+1)^2 is always == 1 mod p | b, but the bridge terms need not
+vanish. Measured pair weights: D = interval of size b: W = 4, 9, 25, 45,
+69 for b = 1..5 -- at b = 5, w = 69 == 4 (mod 5): a unit but NOT 1, so the
+cubic appears with genuine scaling H^3 = H^2 + 4u. And D = {-2, 0, 2}
+(b = 3) gives W = 48 == 0 (mod 3): the DEGENERATE branch is realized by an
+actual lattice whose mod-3 band is trivial. Theorem B's statement (curve
+up to scaling when w != 0; trivial band when w == 0) is exactly sharp;
+"w = 1 always" is false.
+
+## Periodic extension: polyiamonds (data-grade, 2026-07-15)
+
+The triangular lattice is row-local only with period-2 x-translation
+(orientation parity), outside the theorem's literal class. The law
+extends: fixed polyiamonds (A001420 control, n <= 12) have minimal
+height-H animals with 2H-2 cells (up-down domino ground states) and
+
+  T(2H-2, H) = 2^(H-2),   T(2H-1, H) = H 2^(H-1),
+  T(2H-2+k, H) = q_k(H) 2^H with q_k rational of degree k
+  (k = 2: constant second differences, verified).
+
+So periodic row-local lattices obey the same law with b = per-period
+drift and rational q_k; proving the periodic version = rerunning the five
+steps with a transfer over one period (a matrix drift step). Left as the
+stated extension, not formalized.
 
 ## Scope notes
 
