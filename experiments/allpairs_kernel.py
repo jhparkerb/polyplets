@@ -90,8 +90,48 @@ def W_via_walk(l):
     return tot
 
 
+RHO_25 = "14.408713986270365838148040"   # 37-digit value in results/allpairs-kernel.md
+
+
+def spectral_check(gmax=60):
+    """Dominant eigenvalue + kernel relation (K1 part 2)."""
+    import mpmath as mp
+    mp.mp.dps = 35
+    states = ([(g, 'J') for g in range(1, gmax + 1)] +
+              [(g, 'P') for g in range(2, gmax + 1)])
+    idx = {s: i for i, s in enumerate(states)}
+    cols = []
+    for (g, c) in states:
+        tr = transitions(g, c, gmax)
+        cols.append([(idx[k], w) for k, w in tr.items() if k in idx])
+    N = len(states)
+    v = [mp.mpf(1)] * N
+    lam = mp.mpf(0)
+    for it in range(500):
+        w = [mp.mpf(0)] * N
+        for i in range(N):
+            if v[i]:
+                for j, t in cols[i]:
+                    w[j] += v[i] * t
+        lam_new = max(w)
+        w = [x / lam_new for x in w]
+        if it > 100 and abs(lam_new - lam) < mp.mpf(10) ** (-30):
+            lam, v = lam_new, w
+            break
+        lam, v = lam_new, w
+    # gmax=60 truncation is good to ~19 digits (error ~ kappa^gmax)
+    assert mp.nstr(lam, 19) == mp.nstr(mp.mpf(RHO_25), 19), mp.nstr(lam, 25)
+    fJ = [v[idx[(g, 'J')]] for g in range(1, gmax + 1)]
+    kappa = fJ[45] / fJ[44]
+    rel = kappa ** 2 + 2 * kappa + 3 + 2 / kappa + 1 / kappa ** 2
+    assert abs(rel - lam) < mp.mpf(10) ** (-9), abs(rel - lam)
+    print(f"spectral: rho = {mp.nstr(lam, 25)}, kernel relation OK "
+          f"(kappa = {mp.nstr(kappa, 12)})")
+
+
 if __name__ == "__main__":
     REF = [25, 339, 4778, 68314, 981085, 14115141, 203235615, 2927318947]
     got = [W_via_walk(l) for l in range(1, 9)]
     assert got == REF, got
     print("all-pairs gap walk == count_stack for l <= 8  OK")
+    spectral_check()
