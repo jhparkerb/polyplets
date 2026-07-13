@@ -175,6 +175,15 @@ spine digit-product on all in-band cells).
   P_k as new cross-checks; p=2 spine considered-and-declined (3-powers are
   units mod 2, no collapse).
 
+- **UNIVERSALITY (2026-07-15): the diagonal law holds on the hex lattice**
+  (results/hex-diagonal-law.md, experiments/hex_gas.py): T_hex(n,n-k) =
+  P_k(n)*2^(n-1-3k), P_1 = 9n-15 (11 holdouts), same onset; single-row
+  weights (s+1)^2, gap pairs impossible; **dyadic spine = the SAME cubic
+  H^3 = H^2 + u over F_2** with G = 1 + uH^-3. Lattice picks the prime
+  (drift count) and density (contacts^2); the curve is invariant. Open:
+  polyiamonds; general unit-ness of contacts^2 mod b. Paper's not-D-finite
+  theorem landed (thm:notdfinite, verify_claims 407/407).
+
 ## Remaining work ledger
 1. **Paper final read-through.**
 2. **Viva cold retakes**, then %C authorship pass (jasonp's own words), then jasonp submits.
