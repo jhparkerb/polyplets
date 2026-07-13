@@ -2065,11 +2065,13 @@ func diagonalStripValid(maxn, k int) bool {
 	return k >= 2 && k <= 16 && maxn >= 2*k+1
 }
 
-// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..12
+// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..16
 // (docs/proofs/T-n-nm1.md, T-n-nm2-and-general.md). j=0,1,2 are proven from first
-// principles; j=3..10 are data-pinned from the triangle (leading 25^j/j!,
-// integer-exact) and VALIDATED at scale by the a(23)/a(24)/a25 sweeps (their
-// swept H=16..18 == k=5..7 reproduce the formulas exactly; j=8 is pinned from
+// principles; j=3..16 are data-pinned from the triangle (leading 25^j/j!,
+// integer-exact), each holdout-validated (a diagonal deliberately swept unwired)
+// before wiring. j=3..10 were additionally VALIDATED at scale by the
+// a(23)/a(24)/a25 sweeps (their swept H=16..18 == k=5..7 reproduce the formulas
+// exactly; j=8 is pinned from
 // a(24)'s T(24,16), matched the pre-a(24) falsifiable sum-of-roots prediction
 // exactly -- see results/k8-pinning.md, scripts/pin_diagonal_k8_final.py; j=9
 // and j=10 are P_9/P_10 from scripts/derive_p9.py / derive_p10.py, see
@@ -2091,7 +2093,7 @@ func diagonalCell(n, j int) *big.Int {
 }
 
 // contributeDiagonalStrip adds the closed-form strip H=maxn-k (the k-th
-// diagonal, k=0..10) to the triangle, doing no map/merge. The strip carries k+1
+// diagonal, k=0..16) to the triangle, doing no map/merge. The strip carries k+1
 // cells: T(n, maxn-k) for n=maxn-k..maxn, where the offset j=n-(maxn-k) makes
 // each cell the j-th diagonal at n, = diagonalCell(n, j). Callers guarantee
 // maxn >= 2k+1 so every cell is in its validity range.
