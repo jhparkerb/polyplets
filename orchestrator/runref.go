@@ -124,7 +124,7 @@ func SampleKeys(path string, H, keyLen, numCuts int) ([]string, error) {
 	if cuts, err := sampleIndexKeys(path+".idx", keyLen, numCuts); err == nil && len(cuts) > 0 {
 		return cuts, nil
 	}
-	return sampleBodyKeys(path, bodyOff, keyLen, hdr.WordBytes(), int(hdr.Records), numCuts)
+	return sampleBodyKeys(path, bodyOff, keyLen, int(hdr.Records), numCuts)
 }
 
 // sampleIndexKeys returns up to numCuts evenly-spaced interior keys from the
@@ -169,9 +169,29 @@ func sampleIndexKeys(idxPath string, keyLen, numCuts int) ([]string, error) {
 	return keys, nil
 }
 
+// discardVarint consumes one LEB128 unsigned varint from br without
+// reconstructing its value. It is width-agnostic on purpose: unlike
+// binary.ReadUvarint (which errors on a value exceeding u64), it correctly skips
+// u128 counts at a26+ magnitudes -- we only need to advance past the record.
+func discardVarint(br io.ByteReader) error {
+	for {
+		b, err := br.ReadByte()
+		if err != nil {
+			return err
+		}
+		if b < 0x80 {
+			return nil
+		}
+	}
+}
+
 // sampleBodyKeys is the fallback when the .idx is absent/unreadable: a buffered
-// streaming scan of the run body (variable-length: keyLen + 2 + len*wordBytes).
-func sampleBodyKeys(path string, bodyOff int64, keyLen, wordBytes, records, numCuts int) ([]string, error) {
+// streaming scan of the run body. Record layout is keyLen + 2 meta bytes
+// (lo, length) + `length` LEB128 varint counts (core/run.h encodeVarint) -- the
+// counts are variable-width, so each is skipped by discardVarint, NOT by a fixed
+// length*wordBytes (the pre-varint layout, which desynced after the first record
+// and sampled garbage keys).
+func sampleBodyKeys(path string, bodyOff int64, keyLen, records, numCuts int) ([]string, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -197,7 +217,14 @@ func sampleBodyKeys(path string, bodyOff int64, keyLen, wordBytes, records, numC
 			break
 		}
 		length := int(meta[1])
-		if _, err := io.CopyN(io.Discard, br, int64(length*wordBytes)); err != nil {
+		bad := false
+		for i := 0; i < length; i++ {
+			if err := discardVarint(br); err != nil {
+				bad = true
+				break
+			}
+		}
+		if bad {
 			break
 		}
 		idx++
