@@ -104,6 +104,23 @@ func TestApplyPow3ExactnessAssertion(t *testing.T) {
 	applyPow3(big.NewInt(10), -1)
 }
 
+// TestHornerDiagKFactExactnessAssertion proves hornerDiag panics when the Horner
+// numerator is not exactly divisible by k!, rather than silently truncating it
+// with Quo — closing the fail-closed-armor gap the AUDIT-2026-07-13 pass found
+// (applyPow3 guards only the 3-power divide; on positive-exponent record cells it
+// merely multiplies, so this k!-divide is the only check on the divide path). A
+// coefficient-transcription error that breaks k!-divisibility must surface, not
+// bank a wrong cell.
+func TestHornerDiagKFactExactnessAssertion(t *testing.T) {
+	defer func() {
+		if recover() == nil {
+			t.Fatalf("hornerDiag(numerator not divisible by k!) did not panic")
+		}
+	}()
+	// Single coefficient => numerator == 1 at any N; k!=2 does not divide 1.
+	hornerDiag(7, diagCoeffs{coeffs: []string{"1"}, kfact: 2}, 0)
+}
+
 // TestApplyPow3PositiveExponentUnchanged is a refactor-safety net: the
 // pow3->applyPow3 swap in hornerDiag must not change behavior for the
 // existing non-negative-exponent cases (j=0..6, and j=7/8 at their original

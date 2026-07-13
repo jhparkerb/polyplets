@@ -2022,8 +2022,17 @@ func hornerDiag(N int64, c diagCoeffs, exp int) *big.Int {
 		num.Mul(num, big.NewInt(N))
 		num.Add(num, coef)
 	}
-	num.Quo(num, big.NewInt(c.kfact))
-	return applyPow3(num, exp)
+	// Divide by k! exactly. The numerator is a proven integer-valued polynomial,
+	// so k! always divides it for correct coefficients; a nonzero remainder means
+	// a coefficient-transcription or dispatch bug, and would otherwise be silently
+	// truncated into a wrong banked cell. Fail closed, mirroring applyPow3's guard
+	// (that guard alone doesn't cover this: for positive-exponent cells applyPow3
+	// only multiplies, so this k!-divide is the sole check on the divide path).
+	q, r := new(big.Int).QuoRem(num, big.NewInt(c.kfact), new(big.Int))
+	if r.Sign() != 0 {
+		panic(fmt.Sprintf("hornerDiag: numerator %s not exactly divisible by k!=%d at N=%d (remainder %s) — coefficient-transcription or dispatch bug", num, c.kfact, N, r))
+	}
+	return applyPow3(q, exp)
 }
 
 // applyPow3 multiplies num by 3^e (e>=0) or divides it exactly by 3^(-e)
