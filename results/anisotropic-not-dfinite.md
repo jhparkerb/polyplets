@@ -56,3 +56,51 @@ a(x) remains untouched.
 - H=11 anomaly recorded: the unvalidated Q₁₁ shares no roots with Q₉Q₁₀
   (mod p), inconsistent with the atom law — that banked entry deserves a
   re-recovery before use anywhere.
+
+
+## Unconditionalization push (2026-07-15): the dominant-pole dichotomy
+
+The ingredient list is now reduced to ONE crisp spectral statement.
+Additions certified in `experiments/anisotropic_dfinite.py`:
+
+- **Strict monotonicity (lemma).** The strip growth constants strictly
+  increase: mu_H = 1.0, 2.41421 (=1+sqrt2), 3.44372, 4.18232, 4.71780,
+  5.11532, 5.41785, 5.65337, 5.84046, 5.99170 (H = 1..10, exact-coefficient
+  evaluation; an earlier float artifact at H=9 corrected). Proof route:
+  Perron-Frobenius — the height-<=(H+1) signature transfer is irreducible on
+  its recurrent class and contains the height-<=H system as a proper
+  principal submatrix, so its dominant eigenvalue is strictly larger;
+  exact-height counts are second differences of strip counts, so no
+  cancellation and 1/mu_H is a genuine pole of G_H, distinct from every
+  pole of every G_j, j < H.
+
+- **Atom irreducibility (new hard data).** psi_H is IRREDUCIBLE over Q for
+  H = 1..8 (degrees 1, 2, 4, 9, 29, 68, 181, 462) — single-prime
+  certificates for H <= 4, multi-prime subset-sum-intersection certificates
+  for H = 5..8. Hence deg_Q(mu_H) = deg psi_H at every certified level.
+  (H = 9, 10 at degrees 1254, 3289 left uncertified — factoring cost.)
+  Side effect: irreducibility + positivity of the dominant root means, by
+  Galois conjugation, EVERY root of the atom is active in T(n,H) — the
+  Atom Ledger's minimality ingredient is no longer needed at these levels.
+
+**Theorem (dichotomy).** If F(x,y) is annihilated by a y-ODE of order r
+with x-degrees <= D, then deg_Q(mu_H) <= D for all but at most r values of
+H. Proof: at level H0, instance the coefficient relation at H = H0; every
+lower face is finite at x = 1/mu_{H0} (strict monotonicity), G_{H0} has a
+pole there, so c_0(1/mu_{H0}, H0) = 0. A rational polynomial of degree
+<= D cannot vanish at an algebraic number of degree > D, so
+deg_Q(mu_{H0}) > D forces c_0(., H0) == 0; r+1 such levels kill c_0 as a
+polynomial in H, and the face recursion reuses the same levels. QED
+
+**Corollary (boxes, self-contained ingredients).** No annihilating y-ODE
+with (r <= 4 & D <= 8), (r <= 3 & D <= 28), (r <= 2 & D <= 67),
+(r <= 1 & D <= 180), (r = 0 & D <= 461). Weaker than the psi-boxes above
+but resting only on monotonicity + irreducibility certificates.
+
+**The one remaining condition.** F is not y-D-finite provided
+limsup_H deg_Q(mu_H) = infinity — i.e. the strip growth constants have
+unbounded algebraic degree. Every certified level has
+deg_Q(mu_H) = deg psi_H, growing at the measured rate ~sqrt(lambda) = 2.67
+per level (atom degree tracks frontier size). This conjecture — natural,
+spectral, and checked to degree 462 — is the entire distance between the
+quantified theorem and full non-D-finiteness.

@@ -140,7 +140,13 @@ spine digit-product on all in-band cells).
 - **Kernel/haruspicy/ACSV program (2026-07-14, in flight):** order K2 -> H1 ->
   ACSV -> K1 -> H2 -> K3. K2 DONE (Temperley on column-convex polyplets =
   rediscovery of A187077, pipeline validated; results/convex-polyplets.md).
-  H1 DONE (results/anisotropic-not-dfinite.md): pole-argument theorem
+  H1 DONE + UNCONDITIONALIZATION PUSH 2026-07-15 (results/anisotropic-not-dfinite.md):
+  dominant-pole dichotomy theorem (y-D-finite => deg_Q(mu_H) <= D for all but
+  r heights); strip growth constants proven strictly monotone (PF route,
+  verified exactly H<=10); atoms psi_1..psi_8 CERTIFIED IRREDUCIBLE (degrees
+  1..462, multi-prime subset-sum certificates) => deg_Q(mu_H) = atom degree;
+  residual condition for full non-D-finiteness now a single crisp conjecture:
+  strip growth constants have unbounded algebraic degree. Also: pole-argument theorem
   excludes y-ODEs for the height-anisotropic GF in quantified (order,
   x-degree) boxes (up to r<=5 & D<=28 ... r=0 & D<=3288), from mod-p-certified
   new-root contents psi_H (deg 1..3289, squarefree, lowest terms, H<=10);
