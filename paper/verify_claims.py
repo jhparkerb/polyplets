@@ -482,6 +482,13 @@ else:
 chk("M(n)==round((n-2)^2/8) for n=1..16",
     all(M[n - 1] == ((n - 2) ** 2 + 4) // 8 for n in range(1, 17)))
 
+# ---- Theorem (not D-finite): monotonicity + irreducibility ingredients -----
+r2 = subprocess.run(["python3",
+                     os.path.join(ROOT, "experiments", "anisotropic_dfinite.py")],
+                    capture_output=True, text=True)
+chk("not-D-finite ingredients (psi, monotone mu, irreducibility) checker",
+    r2.returncode == 0 and "irreducible" in r2.stdout, r2.stdout[-200:])
+
 # ---- Theorem 1 (diagonal law) + spine cubic + ab-initio constants ----------
 import sys
 sys.path.insert(0, os.path.join(ROOT, "experiments"))

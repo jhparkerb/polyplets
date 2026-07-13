@@ -1169,9 +1169,97 @@ $G_{H,k}$ for $H\le6$ (all reachable $k$), the rows $k\le2$ at $H=7$, and the
 row $k=0$ at $H=8$, each validated against a fresh prime. Across the
 recovered rows the order of $G_{H,k}$ grows about linearly in $k$ (for
 $H=3,\dots,7$ it fits $c_H(k+1)$ with $c_H=6,20,68,185,537$)---recorded as an
-empirical regularity. Summed over all heights the columns, like $a(x)$
-itself, are not expected to be D-finite, so the rationality is genuinely a
-fixed-height phenomenon.
+empirical regularity. The rationality is genuinely a fixed-height
+phenomenon: the two-variable array is provably not D-finite, as we now
+show.
+
+\subsection{The by-height generating function is not D-finite}
+\label{sec:notdfinite}
+
+Let $F(x,y)=\sum_{n,H} T(n,H)\,x^n y^H$, so the fixed-height series
+$G_H(x)$ are its $y$-coefficients. $F$ fails to be D-finite (it satisfies
+no linear differential equation in $y$ with polynomial coefficients; since
+$F$ has rational coefficients, allowing complex coefficients changes
+nothing by descent to the field of definition). The proof combines four
+classical facts, each stated here in the form used; write
+$\mu_H$ for the growth constant of the height-$\le H$ strip counts,
+so $1/\mu_H$ is the radius of convergence of $G_{\le H}$ and, by the
+second-difference identity above, of $G_H$.
+
+\emph{(i) $\mu_H$ is an algebraic integer} (Fatou's lemma~\cite{fatou}: a
+rational power series with integer coefficients has a lowest-terms
+representation $P/Q$ with $P,Q\in\mathbb Z[x]$ and $Q(0)=1$). The
+reciprocals of the poles of $G_H$ are then roots of the monic integer
+reversal of $Q_H$; the radius point $1/\mu_H$ is itself a pole, located on
+the positive real axis by Pringsheim's theorem~\cite{flajolet} (the
+coefficients are nonnegative), so $\mu_H$ is a root of a monic integer
+polynomial.
+
+\emph{(ii) Every Galois conjugate of $\mu_H$ has modulus at most $\mu_H$.}
+The conjugates are among the reciprocal poles, and no pole has modulus
+below the radius of convergence, by the definition of the radius. In the
+standard terminology, the \emph{house} of the algebraic integer $\mu_H$
+equals $\mu_H$ itself, and $\mu_H<\lambda\le 20000/2147$ by the rigorous
+upper bound of Section~\ref{sec:result}.
+
+\emph{(iii) The $\mu_H$ are strictly increasing, hence pairwise distinct.}
+The column-signature transfer matrix of the height-$\le H$ strip
+(Section~\ref{sec:methodB}) is irreducible for $x>0$: from any signature
+one reaches the single-cell signature (close all components with a
+spanning column), and conversely any signature is reachable from it. The
+height-$\le H$ system is a proper principal submatrix of the
+height-$\le(H{+}1)$ system, connected to the new states through the cycle
+(single cell) $\to$ (full column) $\to$ (single cell); deleting
+rows and columns of an irreducible nonnegative matrix strictly decreases
+its Perron root~\cite{hornjohnson}, so the strip growth constants strictly
+increase. Strictness also rules out cancellation in the second
+differences, so $1/\mu_H$ is a genuine pole of $G_H$ and is not a pole of
+any $G_j$ with $j<H$. (Machine check: the ten exact denominators give
+$\mu_H = 1,\ 1{+}\sqrt2,\ 3.4437,\dots,5.9917$, strictly increasing.)
+
+\emph{(iv) Only finitely many algebraic integers have degree $\le D$ and
+house $\le B$} (Kronecker~\cite{kronecker}): the minimal polynomial has
+integer coefficients bounded by $\binom{D}{k}B^{k}$, leaving finitely many
+possibilities. With $B=20000/2147$ and the infinitely many distinct
+$\mu_H$ of (iii), it follows that $\deg_{\mathbb Q}\mu_H\to\infty$.
+
+\begin{theorem}
+\label{thm:notdfinite}
+$F(x,y)=\sum_{n,H}T(n,H)x^ny^H$ is not D-finite.
+\end{theorem}
+
+\emph{Proof.} Suppose $\sum_{i\le r}p_i(x,y)\,\partial_y^i F=0$ with
+$p_i\in\mathbb Q[x,y]$, not all zero, and let $D=\max_i\deg_x p_i$.
+Extracting $y$-coefficients gives, for every $N$, a relation
+$\sum_{\delta}c_\delta(x,N)\,G_{N-\delta}(x)=0$ over a finite window of
+$\delta$, where each $c_\delta(x,N)$ is polynomial in $N$ of degree $\le r$
+and in $x$ of degree $\le D$, and where the $c_\delta$ jointly determine
+the $p_i$ (falling factorials of $N$ are linearly independent). Anchor the
+window so that its top face is a level $H_0$: every other face refers to a
+lower height, where $G$ is finite at $x=1/\mu_{H_0}$ by (iii), while
+$G_{H_0}$ has a pole there --- so the top coefficient vanishes at
+$x=1/\mu_{H_0}$. A polynomial over $\mathbb Q$ of degree $\le D$ cannot
+vanish at an algebraic number of degree exceeding $D$, so at every level
+with $\deg_{\mathbb Q}\mu_{H_0}>D$ the top coefficient vanishes
+identically in $x$; at $r{+}1$ such levels (which exist by (iv)) it
+vanishes as a polynomial in $N$, i.e.\ the top face is identically zero.
+The next face becomes the top and the same levels kill it in turn; all
+faces vanish, so all $p_i=0$ --- a contradiction. $\square$
+
+Corroboration beyond the abstract argument: the new-root contents of the
+ten exact denominators have degrees $1,2,4,9,29,68,181,462,1254,3289$, and
+the first eight are certified irreducible over $\mathbb Q$ (single- and
+multi-prime factorization certificates), so
+$\deg_{\mathbb Q}\mu_8=462$ already---the degree growth that (iv)
+guarantees abstractly is visible concretely at rate
+$\approx\sqrt\lambda$ per level. The argument uses only integer counts,
+per-height rationality, and strictly increasing bounded strip constants,
+so it applies verbatim to fixed polyominoes, polyhexes, and polyiamonds by
+height. We have not located this argument in the literature (the closest
+result we know, non-D-finiteness of the anisotropic self-avoiding-polygon
+generating function, is proved by Rechnitzer's haruspicy~\cite{rechnitzer}
+by quite different means), and state it as ours with that caveat. The
+isotropic $a(x)$ remains open, exactly as in the polygon setting.
 
 \paragraph{Rigorous lower bounds.}
 Summing the fixed-height GFs gives $a(n)\ge\sum_{H\le 10}T(n,H)$ exactly for
@@ -1371,6 +1459,39 @@ V.~Bui,
 \emph{A convolutional approach to bounding the number of polyominoes},
 arXiv:2511.00461 (2025); companion, \emph{A short proof of an upper bound on the
 growth constant of polyiamonds}, arXiv:2510.06806 (2025).
+
+\bibitem{fatou}
+P.~Fatou,
+\emph{S\'eries trigonom\'etriques et s\'eries de Taylor},
+Acta Mathematica \textbf{30} (1906), 335--400 (the rational-series lemma:
+integer coefficients force a lowest-terms denominator with constant
+term~$1$).
+
+\bibitem{flajolet}
+P.~Flajolet and R.~Sedgewick,
+\emph{Analytic Combinatorics},
+Cambridge University Press, 2009 (Pringsheim's theorem, Thm.~IV.6).
+
+\bibitem{hornjohnson}
+R.~A. Horn and C.~R. Johnson,
+\emph{Matrix Analysis}, 2nd~ed.,
+Cambridge University Press, 2013 (Perron--Frobenius theory, Ch.~8; the
+strict submatrix inequality).
+
+\bibitem{kronecker}
+L.~Kronecker,
+\emph{Zwei S\"atze \"uber Gleichungen mit ganzzahligen Coefficienten},
+Journal f\"ur die reine und angewandte Mathematik \textbf{53} (1857),
+173--175 (finiteness of algebraic integers with bounded degree and
+bounded conjugates).
+
+\bibitem{rechnitzer}
+A.~Rechnitzer,
+\emph{Haruspicy and anisotropic generating functions},
+Advances in Applied Mathematics \textbf{30} (2003), 228--257; and
+\emph{Haruspicy 3: the anisotropic generating function of self-avoiding
+polygons is not D-finite},
+Journal of Combinatorial Theory Series A \textbf{113} (2006), 520--546.
 
 \bibitem{strang}
 G.~Strang,
