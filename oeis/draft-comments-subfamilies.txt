@@ -1,0 +1,66 @@
+# Comment-grade edits to EXISTING sequences (2026-07-14)
+#
+# Three small contributions from the subfamily sweep + A187077 provenance
+# check (results/king-subfamilies.md, results/convex-polyplets.md).
+# Per the OEIS AI policy and this repo's practice: jasonp rewrites in his
+# own words before submitting; the drafts below are meaning-checked
+# starting points, not paste-ready text. Verification for every claim is
+# in experiments/king_subfamilies.py, experiments/colconvex_king.py, and
+# the hex-lattice check recorded in results/convex-polyplets.md.
+
+================================================================
+A187077 (Number of row-convex polyplets with n cells)
+================================================================
+
+EDIT 1 -- correct the existing comment.
+Current: "Equivalent to a sequence of row-convex polyhexes (A059716)."
+Problem: row-convex polyhexes are counted by A059716 itself
+(1, 3, 11, 42, 162, ...), which differs from this sequence
+(1, 4, 18, 83, 385, ...) from the second term on; the generating
+functions also differ (denominator 1-6x+10x^2-7x^3+x^4 vs
+1-7x+13x^2-10x^3+2x^4). Verified by direct enumeration on both lattices
+(control: all fixed polyhexes reproduce A001207).
+Proposed replacement:
+  "Analogous to, but not equinumerous with, row-convex polyhexes
+   (A059716): a length-h row admits h+h'+1 king-lattice placements of a
+   length-h' row in the adjacent row, versus h+h' on the hexagonal
+   lattice."
+
+EDIT 2 -- add a derivation line to the Formula section.
+  "The g.f. follows by Temperley's method: with F(x,q) = Sum over these
+   polyplets of x^cells * q^(last row length), the h+h'+1 placement count
+   gives F(x,q) = t/(1-t) + A*t*(2-t)/(1-t)^2 + B*t/(1-t) with t = q*x,
+   A = F(x,1), B = F_q(x,1); solving the pair of equations at q=1 yields
+   A(x) = x*(1-x)^3/(1 - 7x + 13x^2 - 10x^3 + 2x^4)."
+
+================================================================
+A007052 (Number of order-consecutive partitions of n)
+================================================================
+
+ADD COMMENT (new lattice-animal interpretation; offset note: A007052 has
+offset 0, so a(n) counts animals with n+1 cells):
+  "a(n) is the number of directed column-convex fixed polyplets
+   (king-lattice animals: cells joined by edge or corner contact) with
+   n+1 cells: every column a contiguous interval and column bottoms
+   weakly increasing left to right. A height-h column admits h+1
+   king-compatible placements of the next column, independent of that
+   column's height, so Temperley's method gives the g.f.
+   x*(1-x)/(1-4x+2x^2) for the count by cells; the growth constant is
+   2+sqrt(2)."
+Optional Cf. additions: A006770, A187077.
+
+================================================================
+A225114 (Number of skew partitions of n whose diagrams have no empty
+rows and columns)
+================================================================
+
+ADD COMMENT (identity with a king-lattice family, with proof sketch):
+  "a(n) is also the number of fixed staircase polyplets (king-lattice
+   animals) with n cells: every column a contiguous interval, with both
+   the column bottoms and the column tops weakly increasing. These are
+   precisely the skew-partition diagrams counted here: monotone
+   boundaries make the columns a skew shape, and the no-empty-row
+   condition is equivalent to king-connectivity, since a row gap between
+   consecutive columns (bottom_{i+1} > top_i + 1) cannot be covered by
+   any other column when the boundaries are monotone."
+Optional Cf. additions: A006770, A187077, A007052.

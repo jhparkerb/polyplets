@@ -99,3 +99,12 @@ Submission is jasonp's, gated on the readiness process in HANDOFF.md.
 
 OEIS content is under the OEIS End-User License; baselines are copied here for
 drafting and are attributed to their original authors in the `%A`/`%E` lines.
+
+## Comment-grade edits to existing sequences (2026-07-14)
+
+`draft-comments-subfamilies.txt` — three small edits: A187077 (correct the
+polyhex-equivalence comment, add the Temperley derivation), A007052 (new
+lattice-animal interpretation: directed column-convex polyplets), A225114
+(identity: king staircases = skew shapes). Same authorship discipline as the
+main batch: rewrite in own words before submitting; verification in
+experiments/king_subfamilies.py + colconvex_king.py.
