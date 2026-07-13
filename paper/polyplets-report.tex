@@ -70,7 +70,9 @@ per level, whose polynomial-times-power-of-three shape, onset, and
 integrality are \emph{proved} here by an exact walk-plus-clusters
 decomposition, the first five levels' constants derived ab initio from
 finite cluster counts), the triangle's mod-3 structure (an algebraic
-``spine cubic'' $W^3=W^2+t$ over $\mathbb F_3$), a
+``spine cubic'' $W^3=W^2+t$ over $\mathbb F_3$ --- and both law and curve
+are proved lattice-universal, governing polyominoes and polyhexes with the
+prime set by the lattice's drift count), a
 quasi-polynomial law for the diagonals of the
 symmetric-fixed-point triangle, likewise with proved shape
 (period two, degree $k$, with
@@ -128,8 +130,9 @@ these computations.
         per-term checks} of the frontier terms
         (Sections~\ref{sec:diagonals}, \ref{sec:confirm}). The triangle
         mod~3 is governed by an algebraic spine cubic, with the Smith
-        normal form of the diagonal-polynomial matrix determined
-        (Section~\ref{sec:spine}).
+        normal form of the diagonal-polynomial matrix determined; law and
+        cubic are lattice-universal
+        (Sections~\ref{sec:spine}, \ref{sec:universal}).
   \item A quasi-polynomial law for the diagonals of the diagonal-mirror
         symmetry triangle---period two, degree $k$---whose shape is likewise
         \emph{proved} (segment grammar + one-parameter lattice-point
@@ -771,9 +774,43 @@ finitely many congruences supporting these statements ($G\equiv1\bmod 9$
 and the mod-9/mod-27 lifts of the cubic, e.g.\
 $H^3\equiv H^2+25t \bmod 9$) are \emph{derived} from the same cluster
 decomposition---mod~27 the master equation is a finite explicit equation in
-five integers---not observed. Details and verifiers:
+five integers---not observed. Reading along rows: the last nonzero residue
+of row $n$ cycles $1,1,2$ with $n \bmod 3$; the deficit-two case
+$T(3m{+}2,2m{+}1)\equiv2$ is proved for all $m$ by a reusable device---the
+family generating function is a diagonal of $G\,H^n$, formal
+Lagrange--B\"urmann over $\mathbb Z/27$ collapses it to a rational
+identity on the mod-27 master curve, and exact polynomial division (the
+curve relation is monic) decides it. Details and verifiers:
 \texttt{results/ternary-spine.md}, \texttt{results/defect-gas.md},
-\texttt{experiments/ternary\_spine.py}, \texttt{experiments/defect\_gas.py}.
+\texttt{experiments/ternary\_spine.py}, \texttt{experiments/defect\_gas.py},
+\texttt{experiments/deficit2\_proof.py}.
+
+\subsection{The diagonal law is lattice-universal}
+\label{sec:universal}
+
+Nothing in Theorem~\ref{thm:diaglaw} is specific to the king lattice. Call
+a lattice \emph{row-local} if its cells are indexed by $\mathbb Z^2$ with
+translation-invariant adjacency reaching at most one row up or down, and
+let $b$ be the number of up-neighbours of a cell (the drift count). The
+five steps of the proof carry over verbatim with $b$ in place of $3$:
+for every such lattice, $T(H{+}k,H)=q_k(H)\,b^H$ for all $H\ge k{+}1$ with
+$\deg q_k\le k$ and integer-valued $P_k=b^{1+2k}q_k$; and modulo any prime
+$p\mid b$ only the pair-row survives the valuation collapse, so the mod-$p$
+diagonal structure is governed by \emph{the same cubic} $H^3=H^2+wu$ over
+$\mathbb F_p$, with $w$ the pair-weight residue. Machine-checked
+instances: the square lattice ($b=1$: polyomino diagonals of A001168 are
+plain polynomials from the same onset, density $4=2^2$); the hexagonal
+lattice ($b=2$: $P_1=9n-15$ holdout-exact, density $9=3^2$, a
+\emph{dyadic} spine $H^3=H^2+u$ over $\mathbb F_2$); and the king lattice
+($b=3$, density $25=5^2$). The scaling $w$ is not always $1$: a
+contiguous five-neighbour lattice gives $w=4\pmod 5$, and the lattice with
+up-offsets $\{-2,0,2\}$ gives $w=0$ --- the degenerate branch, a lattice
+whose banded triangle is trivial mod~3. Polyiamonds (period-two row
+structure, outside the literal class) obey the analogous law with domino
+ground states, $T(2H{-}2,H)=2^{H-2}$ and $P_1=2H$, data-grade. The
+``Ternary'' Spine is thus the $p=3$ member of a lattice-indexed family;
+the curve is invariant, the lattice chooses the prime and the scaling.
+Proofs and checkers: \texttt{docs/proofs/universal-diagonal-law.md}.
 
 \subsection{The diagonal-mirror triangle: quasi-polynomials, period two}
 \label{sec:dmdiag}
@@ -1079,6 +1116,24 @@ b-files are prepared in the release.
   equal A006770.}
   \label{tab:holes}
 \end{table}
+
+\paragraph{The diagonal law is hole-graded.}
+The walk-plus-clusters theorem refines by holes in both senses. The
+hole-free height triangle has its own diagonal law with hole-free cluster
+weights (the pair-row loses exactly its one hole-making configuration,
+$25\to24$): $P^0_1(n)=24n-42$ and $P^0_2(n)=288n^2-1113n+507$, derived ab
+initio and exact against the recovered hole-free fixed-height generating
+functions. Marking every cluster by its hole count $z$ gives the full
+stratified laws --- $P_1(n,z)=(24n{-}42)+z(n{-}3)$, so the one-hole
+diagonal is the pure placement count $T_1(n,n{-}1)=(n{-}3)3^{n-4}$, and
+$P_2(n,z)$ likewise, exact on all $26$ banked hole-resolved cells. Mod~3
+the marked master equation collapses to $H(u,z)\equiv W(zu)$: on diagonal
+$k$ only the \emph{maximal-hole} stratum survives mod 3 and inherits the
+spine cubic --- every $z^0$ and $z^1$ coefficient above is divisible by 3.
+Since $24\equiv0\pmod 3$, the triangle's entire mod-3 structure is carried
+by the hole-making configurations: the spine lives in the holes.
+(\texttt{experiments/holefree\_gas.py},
+\texttt{experiments/hole\_strata\_gas.py}.)
 
 \paragraph{Maximum hole area.}
 How much empty area can $n$ cells enclose? Let $M(n)$ be the maximum number

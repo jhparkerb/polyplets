@@ -482,6 +482,17 @@ else:
 chk("M(n)==round((n-2)^2/8) for n=1..16",
     all(M[n - 1] == ((n - 2) ** 2 + 4) // 8 for n in range(1, 17)))
 
+# ---- second-wave checkers: universality, hole-graded laws, deficit-2 -------
+for script, tag in (("hex_gas.py", "hex law + dyadic spine"),
+                    ("universal_law_check.py", "square b=1 + polyiamond ext"),
+                    ("holefree_gas.py", "hole-free diagonal law"),
+                    ("hole_strata_gas.py", "hole-marked strata"),
+                    ("deficit2_proof.py", "deficit-2 symbolic proof")):
+    rr = subprocess.run(["python3", os.path.join(ROOT, "experiments", script)],
+                        capture_output=True, text=True)
+    chk(f"checker: {tag}", rr.returncode == 0 and "OK" in rr.stdout,
+        rr.stdout[-150:] + rr.stderr[-150:])
+
 # ---- Theorem (not D-finite): monotonicity + irreducibility ingredients -----
 r2 = subprocess.run(["python3",
                      os.path.join(ROOT, "experiments", "anisotropic_dfinite.py")],

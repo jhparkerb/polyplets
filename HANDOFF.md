@@ -65,7 +65,12 @@ responsible; `docs/oeis-ai-policy.md`).
 Computational-report form, five external review rounds + self-check. Growth §3 confluent
 3-param fit (Δ₁=1/2, λ≈7.111). Now includes the rigorous **upper-bound** paragraph
 (above). `paper/verify_claims.py` — 397+ checks GREEN (parses tables from the .tex).
-Compiles clean (no undefined refs/citations). **Final read-through DONE 2026-07-13**;
+Compiles clean (no undefined refs/citations). **FULLY CURRENT as of 2026-07-15**:
+second wave landed (sec:universal — lattice-universality of law+spine incl.
+w-counterexamples and polyiamond extension; hole-graded diagonal-law paragraph
+in sec:holes; deficit-2 proof note in sec:spine; abstract/contributions
+updated); verify_claims **412/412** (now runs hex/universal/holefree/
+hole-strata/deficit2 checkers). Earlier: **final read-through DONE 2026-07-13**;
 now includes the diagonal-law THEOREM (thm:diaglaw), the spine-cubic subsection
 (sec:spine), the single-hole max-hole THEOREM (thm:diamond, multi-hole reduced to
 peeling as conjecture+open problem), k<=16 corrections, a(36) cost profile.
@@ -207,6 +212,18 @@ spine digit-product on all in-band cells).
   experiments/universal_law_check.py), hex b=2, king b=3 -- all with w=1.
   Open: is w always a unit (or ever 0)? polyiamonds (needs row conventions).
   Paper's not-D-finite theorem landed (thm:notdfinite, verify_claims 407/407).
+
+- **Lessons-learned DRAFTED 2026-07-15** (docs/lessons-learned.md): six failure
+  classes, verification war stories, bug bestiary, process/ops/collaboration
+  lessons; sections marked [JP] are jasonp's to write.
+- **EVERYTHING ELSE BLOCKED OR COMPLETE (2026-07-15).** Blocked on time/boxes:
+  a(22) (~07-16; then gather+bank, frontier->22), H=11 GF re-recovery, a(37)
+  decision. Blocked on jasonp: viva -> OEIS batch + 3 comment drafts,
+  [JP] lessons sections, Northcott literature check (papers/MISSING.md),
+  paper scoping sign-off. Blocked on hard math (obstructions documented):
+  onset sharpness (king+dm), dm Lemma-5 hardening + multiplicity split,
+  max-hole peeling, SNF exponents, K3 exact convex mu, periodic-lattice
+  formalization.
 
 ## Remaining work ledger
 1. **Paper final read-through.**
