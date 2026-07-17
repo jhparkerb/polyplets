@@ -16,7 +16,7 @@ A001168, min-perimeter = A027709. Total fixed polyplet count = A006770.
 | 1 | Hole-free polyplet count | `1-holefree/` | 18 (n=1..18) | 1,2 | nonn,hard | READY — Superseeker-confirmed novel (2026-06-19) |
 | 2 | One-hole polyplet count | `2-onehole/` | 15 (n=4..18) | 4,2 | nonn,hard | READY — Superseeker-confirmed novel (2026-06-19) |
 | 3 | Square-bounding-box count | `3-square-bbox/` | 16 (n=1..16) | 1,2 | nonn,hard,more | READY — generated + marginal-verified to n=16 (ayr split run) 2026-06-22; Superseeker novelty check still owed |
-| 4 | Max-distinct-holes count | `4-max-holes/` | 30 (n=1..30) | 1,6 | nonn,easy | READY — proven closed form; distinct from A337601 |
+| 4 | Max-distinct-holes count | `4-max-holes/` | 30 (n=1..30) | 1,6 | nonn,easy | READY — proven closed form; A337601 overlap is coincidence (see below) |
 
 ## Per-sequence detail and provenance
 
@@ -58,7 +58,13 @@ A001168, min-perimeter = A027709. Total fixed polyplet count = A006770.
   polyplets. **Proven closed form** a(n) = n + 1 - A027709(n)/2 (Pick's theorem on
   the even sublattice / min-perimeter polyomino); brute-verified n<=9, formula exact
   for all n, so the b-file extends cleanly to n=30. Keyword `easy`.
-- Distinct from A337601 (max holes of a polyomino): diverges by n=13.
+- A337601 is NOT the polyomino max-holes analogue — it counts coprime triples
+  (verified against oeis.org 2026-07-16; an earlier draft mischaracterized it from a
+  prefix-search hit). The overlap is numeric coincidence: a(n) = A337601(n-1) for
+  n=1..12, diverging at a(13)=6 vs A337601(12)=8. The honest polyomino cross-ref is
+  A118797 (cells in smallest polyomino with n holes; A118797(1)=7 = the holey
+  heptomino, brute-confirmed, vs the 4-cell diamond here). No OEIS entry exists for
+  max-holes-of-an-n-omino itself.
 - Novelty: Superseeker-checked novel (per oeis/README provenance; prefix matched only
   unrelated short sequences before extension).
 
