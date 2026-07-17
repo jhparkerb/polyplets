@@ -21,7 +21,7 @@ for host in dalby.jhpb.org ayr gympie; do
   tar xzf "$DIR/$host.tgz" -C "$DIR"
   ssh "$host" "rm -f /tmp/${RUN}_gather.tgz"
 done
-echo ">>> gathered: out=$(ls "$DIR"/w*.out | wc -l | tr -d ' ') done=$(ls "$DIR"/w*.done | wc -l | tr -d ' ')  (expect $K)"
+echo ">>> gathered: out=$(find "$DIR" -name 'w*.out' | wc -l | tr -d ' ') done=$(find "$DIR" -name 'w*.done' | wc -l | tr -d ' ')  (expect $K)"
 
 scripts/g2_combine.sh "$DIR" "$N" "$K" $PERBOX
 echo ">>> combined dir: $DIR"

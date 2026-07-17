@@ -16,26 +16,14 @@ history — not repeated here. Read this file, then `MEMORY.md`'s index.
 - **a(20) two-algorithm CONFIRMED 2026-07-11** (Redelmeier `build/g2` rev 7eab237 vs
   the TM engine): whole row n≤20 matches banked exactly, 0 mismatches. Banked
   `results/redelmeier_row20/`. Two-algorithm frontier now **20**.
-- **Terminal Velocity — a(22) whole-row fleet run LAUNCHED 2026-07-11 13:41, ~3.9d
-  (ETA ~2026-07-15).** g2 kernel **2.06× faster** (rev 7eab237→HEAD): L1 terminal
-  pure-count (85% of nodes → branchless load+sum), L3 compile-time neighbour offsets,
-  L4 u16 untried, clang++ build (Makefile G2CXX); L2/gcc-PGO/-mcpu measured
-  neutral-or-worse, dropped. Ledger `results/terminal-velocity.md`.
-  - **Run:** tmux window `0:g2_a22` per box, resumable, `runs/g2row_N22/`. a(22)
-    subsumes a(21) (inner row 21), so this one run banks BOTH. **REBALANCED 16:40**
-    (single-core bench over-predicted all-core; ayr 2990WX split-NUMA is slow all-core
-    — see [[fleet-benchmark-allcore]]): now **dalby [0,14300)/80w, ayr [14300,19460)/32w,
-    gympie [19460,24000)/10w**, all finish ~129h ≈ **5.4 days (~2026-07-17)**.
-  - **Validation (complete):** gate-g2 green incl. new pure-count check I; row-18 AND
-    row-19 fleet runs match banked exactly across all 3 ISAs (pure-count validated at
-    n=18,19; the path is n-independent). Fleet per-core 1.0/1.28/3.0 (dalby/ayr/gympie).
-  - **On completion:** `scripts/g2_fleet_gather.sh 22 24000`, verify rows 1..22 vs
-    banked: **row 21 == 6954084405510437, row 22 == 47255332844367680** (both already
-    known from the TM engine; this is the independent Redelmeier two-algorithm
-    confirmation, not a first computation). Moves the two-algorithm confirmation
-    frontier 20 → **22** (subsumes 21). a(23) ~27d (impractical).
-  - **Monitor:** poll driver.log for `progress=/eta=` lines; robust poll-waiter
-    (NOT tail --pid — it dropped once on row-19). Resume: re-run the launch script.
+- **a(22) REDELMEIER CONFIRMATION COMPLETE 2026-07-16**
+  (results/redelmeier_row22/): fleet run finished cleanly on all three
+  boxes (~119h dalby / 116h ayr / 122h gympie, 5% spread — rebalance held);
+  all 24,000 shards gathered+combined; **every row n=1..22 matches banked
+  exactly** (row 21 = 6954084405510437, row 22 = 47255332844367680).
+  **Two-algorithm frontier now 22.** Boxes ALL FREE. Unblocked, jasonp's
+  call: a(37) (~3.5h trusted-P17 / ~10h strict) and the H=11 GF
+  re-recovery. Run history in results/terminal-velocity.md + provenance.
 
 ## Rigorous λ bounds (NEW 2026-07-11)
 - **Two-sided rigorous bracket 5.828 ≤ λ ≤ 9.3153**, numerical λ≈7.111 inside.
