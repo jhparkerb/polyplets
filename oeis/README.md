@@ -1,5 +1,9 @@
 # OEIS submission drafts
 
+**Scope, order, and readiness are decided in [`SUBMISSION.md`](SUBMISSION.md)**
+(the authoritative index + case file, 2026-07-16); this README keeps per-file
+detail and the pre-submission checklist.
+
 Staged drafts in OEIS **internal format** (`%I %S %T %U %N %C %D %H %F %e %Y %K %O %A %E`).
 **Nothing here is submitted.** These are reviewable, staged drafts; jasonp pushes the
 actual submission to oeis.org — Claude prepares and stages, never submits to an external

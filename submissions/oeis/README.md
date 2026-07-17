@@ -1,5 +1,9 @@
 # OEIS submission staging — 4 novel king-lattice (polyplet) sequences
 
+> Batch scope/order and the master checklist live in
+> [`oeis/SUBMISSION.md`](../../oeis/SUBMISSION.md) (this dir = its Wave 2,
+> together with the hole triangle draft in `oeis/`).
+
 Staged drafts in OEIS internal format (`%I %S %T %U %N %C %F %H %e %Y %K %O %A`)
 plus a b-file per sequence. **Nothing here is submitted.** jasonp pushes the actual
 submission to oeis.org; Claude only preps and stages.

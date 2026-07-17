@@ -37,9 +37,13 @@ history — not repeated here. Read this file, then `MEMORY.md`'s index.
   bib entry landed in `paper/polyplets-report.tex`.
 
 ## OEIS submission — gated on jasonp's viva
-Batch staged and checklist-clean (`oeis/README.md` checklist; b-files
-`results/b*_upload.txt` for all six sequences — A006770+A030233 to a(33), the four
-D-dependent to n=32; a(34)+ staged as conjectured comments). **Submission is jasonp's,
+**Master index + case file: `oeis/SUBMISSION.md`** (2026-07-16; wave structure,
+editor-facing argument facts, mechanical checklist, audit trail). Batch staged and
+audit-clean (b-files `results/b*_upload.txt` — A006770 to a(35), A030233 to a(34)
+[both promoted post-a(22)-confirmation + P_16 holdouts], the four D-dependent to
+n=32; a(36)/a(33) staged as conjectured comments). Full pre-submission audit
+2026-07-16: every staged term verified against live OEIS + banked data; one
+confabulated cross-ref (A337601) caught and fixed. **Submission is jasonp's,
 gated on his own readiness process** (OEIS AI policy makes the author personally
 responsible; `docs/oeis-ai-policy.md`).
 - **Viva** (local-only, git-excluded: docs/viva-exam.md, viva-reserve.md [chmod 000],
