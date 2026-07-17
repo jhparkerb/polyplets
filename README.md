@@ -7,9 +7,10 @@ sequence from a(18) to
 
     a(36) = 24629107617723857143962968288
 
-(the accompanying paper reports through a(34) = 515316838423862758858377704)
-
-together with its symmetry companions (free A030222, one-sided A030233,
+with a(1)–a(22) confirmed digit-for-digit by two independent algorithms
+sharing no counting logic (Redelmeier enumeration vs transfer matrix;
+three-architecture fleet run completed 2026-07-16), together with its
+symmetry companions (free A030222, one-sided A030233,
 bilateral A030234, asymmetric A030235, free-non-polyomino A194596), a
 hole-count stratification, fixed-height generating functions, and an
 empirical closed-form theory for the diagonals of two counting triangles.
