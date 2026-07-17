@@ -54,6 +54,9 @@ not "bulk."
 
 - **A: height triangle T(n,H)** (row sums A006770, diagonal 3^(n-1)) — strongest
   new-sequence candidate; the diagonal closed forms live in its comments.
+  Already staged as a skeleton: `oeis/draft-Tnh-triangle.txt` +
+  `oeis/b-draft-Tnh-triangle.txt` (20 rows / 210 cells, verified 2026-07-17:
+  row sums == A006770, T(n,n) == 3^(n-1), T(n,1) == 1).
 - **B: component triangle C(n,c)** (row sums A006770, both edge columns A001168).
 - **C (optional): HV-convex king animals** (38 terms, non-D-finite by area).
 
@@ -168,5 +171,15 @@ it requires trusting prose.
     reference was likewise resolved to A001971(n-2) (verified against
     exhaustive M(n) data, n ≤ 17).
 - **2026-07-16 a(22) fleet confirmation**: `results/redelmeier_row22/PROVENANCE.md`.
+- **2026-07-17 anti-confabulation sweep**: every real A-number cited in every
+  staged draft was fetched from oeis.org and its definition checked against the
+  claimed relationship — all 24 distinct A-numbers consistent (the sole failure,
+  A337601, was the one already caught and fixed). All eight sym-class ↔
+  polyomino-counterpart pairings correct; the 8-class sum == A030222 and the
+  5-reflection-class sum == A030234 re-verified numerically for all 19 terms;
+  A389193 is verified by the gate suite itself (gate H).
+- **2026-07-17 green board**: full `make ns-gates` suite GREEN (incl. the
+  newly-wired gate-g2); the paper's self-contained claim checker passes
+  412/412; the paper compiles warning-free.
 - Engine audits: `AUDIT-2026-06-28.md`, `AUDIT-2026-07-13.md` (all fixes
   red-first-tested; no banked value affected).
