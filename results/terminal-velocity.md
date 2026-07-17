@@ -125,6 +125,17 @@ lost (resumed from .done; ~120 in-flight shards redone). No contention on any bo
 (each cleanly at full load). **Lesson:** benchmark fleet boxes under *all-core* load,
 not single-core, before allocating shares.
 
+## a(22) COMPLETE 2026-07-16 — PASS (two-algorithm frontier now 22)
+All 24000 shards ran to `.done`; ranges tile [0,24000) exactly (dalby [0,14300)
+427974s wall, ayr [14300,19460) 418525s, gympie [19460,24000) 440745s — long pole
+gympie ~5.1d). Gathered all boxes' `w*.out`/`w*.done` to gympie via tar-over-`ssh -T`
+(rsync blocked by unclean remote shell banner), `scripts/g2_combine.sh runs/g2row_N22
+22 24000` → `combined.txt`. Full column rows 1..20 match published **A006769**
+(fixed polyplets) to the last digit; rows 21,22 match the banked TM values digit-for-
+digit: **a(21)=6954084405510437, a(22)=47255332844367680**. Growth smooth/monotone
+(a22/a21=6.7953, λ→~6.8). This closes the independent-reimplementation gap for a(21)
+and a(22): the Redelmeier oracle and the varint TM engine now agree at the frontier.
+
 ## a(21) launch runbook (fleet, tmux — for P4, on jasonp's go)
 
 Launch pattern (worked out on row-18/19; `-t 0:` = session 0 next free window):
