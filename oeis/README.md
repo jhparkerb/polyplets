@@ -55,11 +55,11 @@ https://oeis.org/history?user=Jason%20H%20Parker). Only new-draft `%A` lines and
 `%E` extension credits carry this name; the original `%A` authors of extended entries
 (Sloane, Cook, Wilson, Melik, ...) are preserved.
 
-## Status (2026-07-06, close)
+## Status (2026-07-16, post a(22) two-algorithm confirmation)
 | file | status |
 |---|---|
-| A006770 (fixed) | staged: b-file to a(33) (T2); a(34) as conjectured %C comment |
-| A030233 (one-sided) | staged: b-file to a(33); a(34) as conjectured %C comment |
+| A006770 (fixed) | staged: b-file to a(35) (T2; a(34) promoted by P_16 holdouts, a(35) top cell an exact P_16 forward prediction); a(36) as conjectured %C comment; a(1)-a(22) now two-algorithm (Redelmeier fleet, Jul 16) |
+| A030233 (one-sided) | staged: b-file to a(34) (promoted with A006770(34); Burnside arithmetic re-verified, R90(34)=0 structural); no conjectured comment left (reach cap) |
 | A030222/A030234/A030235/A194596 | staged: b-files to n=32 (T2); n=33 as conjectured %C comments (T3, D(33) hybrid) |
 | draft hole triangle T(n,k) | new (4-bg convention), exact through n=18, rows 15-18 cross-ISA confirmed |
 | draft GF orders / atom degrees | Superseeker-novel; NOT READY (see flags) |

@@ -1,22 +1,25 @@
-# A006770: number of fixed n-celled polyplets (king-move animals). a(1)-a(33).
+# A006770: number of fixed n-celled polyplets (king-move animals). a(1)-a(35).
 # Method (uniform): column/kink-carry transfer-matrix engine. Each maxn=N run
 # recomputes the whole height triangle T(n,H) -- low heights swept directly,
 # top heights via validated closed-form height-diagonals -- and byte-matches
-# the prior OEIS b-file through n=20 and all prior computed terms through
+# the live OEIS b-file (a(1)-a(18)) and all prior computed terms through
 # n=N-1.
-# Independent (two-algorithm) confirmation frontier: a(1)-a(19). a(19) agreed
-# byte-for-byte between Redelmeier generation and transfer matrix (same
-# SHA256). a(20)-a(33) are single-algorithm (transfer matrix / kink-carry):
-# cross-ISA (ARM+x86) and cross-run consistent, and each term's newest
-# height-diagonal cell is predicted exactly by a closed form fitted only on
-# earlier terms (a(33)'s top swept cell matches held-out P_15). NOT
-# algorithm-independently confirmed -- Redelmeier is O(a(n)) and infeasible
-# past n ~ 19-20.
-# a(34) = 515316838423862758858377704 is deliberately NOT in this b-file: it
-# was computed by the same engine but its top swept cell has no held-out
-# closed-form cross-check until a(35), so it is one grade weaker; see the
-# entry Comments. Independent confirmation welcome.
-# - Jason H Parker, Jul 05 2026
+# Independent (two-algorithm) confirmation frontier: a(1)-a(22). A three-
+# machine, three-architecture Redelmeier fleet run (24000 disjoint shards,
+# ~120 h wall per box, completed Jul 16 2026) reproduced every row n <= 22
+# digit-for-digit against the transfer-matrix values; the two counters share
+# no counting logic. a(23)-a(35) are single-algorithm (transfer matrix /
+# kink-carry): cross-ISA (ARM+x86) and cross-run consistent, and each term's
+# newest height-diagonal cell is predicted exactly by a closed form fitted
+# only on earlier terms (a(33)'s top swept cell matches held-out P_15; P_16,
+# fitted on a(33)-a(34), predicted the later holdouts T(35,19) and T(36,20)
+# exactly). NOT algorithm-independently confirmed -- Redelmeier is O(a(n))
+# and infeasible much past n ~ 22.
+# a(36) = 24629107617723857143962968288 is deliberately NOT in this b-file:
+# it was computed by the same engine but its top swept cell lies on diagonal
+# k=17, whose closed form has no held-out cross-check until a(37), so it is
+# one grade weaker; see the entry Comments. Independent confirmation welcome.
+# - Jason H Parker, Jul 16 2026
 1 1
 2 4
 3 20
@@ -50,3 +53,5 @@
 31 1569631619081324581014300
 32 10818203977457804418974036
 33 74631481980411777590683952
+34 515316838423862758858377704
+35 3561147281381782175236253062

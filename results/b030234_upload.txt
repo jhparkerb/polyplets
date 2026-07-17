@@ -4,10 +4,11 @@
 # symmetric transfer-matrix engines; identities validated against every known
 # OEIS term of all five related sequences and integrality (/8, /2) asserted
 # at every n. Reach is capped at n=32 by the diagonal-mirror count.
-# Confidence inherits from A006770: a(1)-a(19) two-algorithm confirmed;
-# a(20)-a(32) single-algorithm (multiply cross-checked); see A006770's
+# Confidence inherits from A006770: a(1)-a(22) two-algorithm confirmed
+# (Redelmeier fleet vs transfer matrix, Jul 16 2026); a(23)-a(32)
+# single-algorithm (multiply cross-checked); see A006770's
 # b-file header. Independent confirmation welcome.
-# - Jason H Parker, Jul 05 2026
+# - Jason H Parker, Jul 16 2026
 1 1
 2 2
 3 4
