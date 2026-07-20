@@ -6,3 +6,4 @@ import Polyplets.Graph
 import Polyplets.RowProfile
 import Polyplets.Separation
 import Polyplets.Sanity
+import Polyplets.Weights
