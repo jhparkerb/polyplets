@@ -14,71 +14,86 @@ H=5: polynomial C(-2,4)=5 vs true count 0 — only the SUM has onset k+1).
 The recursion below gets the onset by induction with exact bookkeeping,
 no cancellation argument needed.
 
-## The recursion
+## The recursion (v2 — corrected 2026-07-20, same day)
 
-Write c_k(H) := T(H+k, H) (canonical height-H animals, surplus k). Rows with
-one cell are walk rows; maximal runs of multi-rows are clusters (type c:
-row sizes s_1..s_ℓ ≥ 2, surplus k_c = Σ(s_i−1) ≥ ℓ_c). Weight constants
-(cardinalities of finite config sets, values never needed):
+v1 ran the recursion on c_k(H) := T(H+k,H) directly; that DOUBLE-COUNTS:
+peeling always produces a remainder whose top row is a walk row, so the
+recursion closes over walk-top animals only. Corrected system, verified on
+paper at T(4,3) = 15+25+15 = 55 ✓:
 
-- W_c  — interior: cluster + fixed walk cell p below + free walk cell q above,
-  connected; counts configs relative to p, including q's offset.
-- W^t_c — top-edge: same but nothing above.
+Primary object: **d_k(H)** := # canonical height-H surplus-k animals whose
+TOP row is a walk row (one cell). Rows with one cell are walk rows; maximal
+runs of multi-rows are clusters. Weights are aggregated by (rows ℓ, surplus
+j) only — NO per-type list catalogue is needed:
 
-**Peeling lemma.** For H ≥ k+2, case-split a surplus-k animal on its top
-structure (the three cases are exhaustive and disjoint at this height; a
-cluster touching the bottom would force H ≤ ℓ+1 ≤ k+1):
+- V(ℓ,j)  — interior weight: configs of a cluster spanning ℓ rows with
+  surplus j (each row ≥ 2 cells), plus fixed walk cell p=(0,0) directly
+  below, plus a free walk cell q directly above, all connected; counted
+  relative to p. Finite (x-spread < total cell count).
+- Vᵗ(ℓ,j) — top-edge weight: same without q.
 
-1. top row walk, second-top row walk: removing the top cell leaves a
-   height-(H−1) canonical animal (its neighbours below are the UNIQUE
-   second-top cell, so removal preserves connectivity — separation lemma);
-   the removed cell had exactly 3 offsets. Contributes 3·c_k(H−1).
-2. top row walk, cluster below it (with a walk row kept below the cluster):
-   peel walk+cluster together. Contributes Σ_c W_c · c_{k−k_c}(H−1−ℓ_c).
-3. top rows a cluster (walk row kept below): peel it.
-   Contributes Σ_c W^t_c · c_{k−k_c}(H−ℓ_c).
+**d-recursion** (peel the top of a walk-top animal; exhaustive disjoint split
+on the second-top row; valid for H ≥ k+2, where clusters cannot touch the
+bottom since ℓ ≤ j ≤ k ≤ H−2):
 
-> c_k(H) = 3·c_k(H−1) + Σ_c W_c·c_{k−k_c}(H−1−ℓ_c) + Σ_c W^t_c·c_{k−k_c}(H−ℓ_c)
+1. second-top row walk: peel the top cell — 3 offsets relative to the unique
+   second-top cell; remainder is walk-top, height H−1, same surplus
+   (connectivity of the remainder: separation lemma; the removed cell's only
+   S-neighbours are in the second-top row, which is a single cell).
+2. second-top row multi: peel top cell + the maximal cluster [b, H−2] under
+   it, down to the walk row b−1; the peeled data is exactly a V-config
+   (p = row-(b−1) cell, q = top cell); remainder is walk-top, height H−1−ℓ.
 
-for H ≥ k+2, sums over the finite catalogue of types with k_c ≤ k (note
-k_c ≥ 1, so all c-terms have strictly smaller surplus: the system is
-triangular).
+> d_k(H) = 3·d_k(H−1) + Σ_{j=1..k} Σ_{ℓ=1..j} V(ℓ,j)·d_{k−j}(H−1−ℓ),  H ≥ k+2
 
-Each case is a bijection: (peeled data) × (canonical remainder), with the
-remainder re-anchored in x (the one fiddly renormalization pattern, reused
-three times). Connectivity of the remainder = separation lemma; exhaustive
-disjoint cases = row-profile of the top rows.
+**c-identity** (split all animals by top row walk/multi; multi-top = top-edge
+cluster capping a walk-top remainder; valid for H ≥ k+1 — a pure cluster
+would need surplus ≥ H > k, and remainder height H−ℓ ≥ 1 holds):
+
+> c_k(H) = d_k(H) + Σ_{j=1..k} Σ_{ℓ=1..j} Vᵗ(ℓ,j)·d_{k−j}(H−ℓ),  H ≥ k+1
+
+Both sums are triangular (j ≥ 1 ⇒ strictly smaller surplus on the right).
+Each case is a bijection: (peeled data) × (walk-top remainder), remainder
+re-anchored in x (one renormalization pattern, reused three times: the
+recorded offsets are shift-invariant, so erase/shift and add/shift invert).
+Boundary absorption: at low H, walk-top animals over bottom-edge clusters
+(e.g. profile (2,1) at H=2) are simply members of d — no extra classes; the
+d-recursion is only ever INVOKED at H ≥ k+2 and the c-identity at H ≥ k+1,
+where the case analyses are exact.
 
 ## Shape by strong induction on k
 
-Base k=0: c_0(H) = 3^(H−1) (pure walk chain of offsets; direct bijection —
-this is also the P_0 production formula).
+Base k=0: d_0(H) = c_0(H) = 3^(H−1) for H ≥ 1 (free walk chain of offsets —
+also the P_0 production formula).
 
-Step: assume c_j(H) = q_j(H)·3^H (deg q_j ≤ j) for all j < k, H ≥ j+1. For
-H ≥ k+2 every c-term on the right is in its valid range: H−1−ℓ_c ≥
-k+1−ℓ_c ≥ k+1−k_c = (k−k_c)+1 — exact, no slack. So
+Step: assume d_j(H) = δ_j(H)·3^H (deg δ_j ≤ j) for all j < k and all
+H ≥ j+1. In the d-recursion at H ≥ k+2 every term is in range:
+H−1−ℓ ≥ k+1−ℓ ≥ k+1−j = (k−j)+1 — exact, no slack. So
 
-> c_k(H) = 3·c_k(H−1) + g(H)·3^H, g ∈ ℚ[H], deg g ≤ max(k−k_c) ≤ k−1.
+> d_k(H) = 3·d_k(H−1) + g(H)·3^H, g ∈ ℚ[H], deg g ≤ k−1.
 
-Telescoping from base H₀ = k+1: c_k(H) = 3^(H−H₀)·c_k(H₀) + Σ_{j=H₀+1}^H
-3^(H−j)·g(j)·3^j = 3^H·(const + Σ_{j≤H} g(j)), and a discrete antiderivative
-of a deg ≤ k−1 polynomial is deg ≤ k (binomial basis, hockey-stick
-Σ_{j} C(j,d) = C(H+1,d+1)). Hence c_k(H) = q_k(H)·3^H for ALL H ≥ k+1 —
-the base value is absorbed by the constant term, which is exactly why the
-onset is k+1 and not k+2. Degree ≤ k. ∎
+Telescoping from base H₀ = k+1: d_k(H) = 3^H·(3^(−H₀)·d_k(H₀) + Σ_{j=H₀+1}^H
+g(j)); a discrete antiderivative of a deg ≤ k−1 polynomial is deg ≤ k
+(binomial basis, hockey stick `Nat.sum_Icc_choose`). Hence d_k(H) =
+δ_k(H)·3^H for ALL H ≥ k+1 — the base value is absorbed by the constant
+term; that is exactly why the onset is k+1, not k+2. Then the c-identity
+gives, for H ≥ k+1 (every d-term again exactly in range,
+H−ℓ ≥ k+1−j = (k−j)+1):
 
-Integrality of P_k(n) = 3^(1+2k)·q_k(n−k): by the same induction q_k has
-3-power-bounded denominators in the binomial basis (each peel divides by at
-most 3^(1+ℓ) per unit of surplus...); do the bookkeeping in the induction —
-v₃(denominators) ≤ 1+2k suffices (doc step 6). Verify the constant for small
-k by native_decide before trusting the exponent.
+> q_k(H) = δ_k(H) + Σ_{j,ℓ} Vᵗ(ℓ,j)·δ_{k−j}(H−ℓ)·3^(−ℓ), deg ≤ k. ∎
 
-Sanity check (k=1, done on paper): catalogue = one type (single doubled row,
-ℓ=1). Recursion gives slope(q_1) = W/27 + W^t/9; known P_1 = 25n−45 forces
-W + 3·W^t = 25, and direct enumeration of the doubled-row configs gives
-W^t = 5, W = 10 — consistent, and 25 = 16+9, 5 = 4+1 are exactly the gadget
-multiplicities of docs/proofs/T-n-nm1.md. The Lean build will re-verify via
-native_decide weight enumeration where cheap.
+Integrality of P_k(n) = 3^(1+2k)·q_k(n−k): denominator bookkeeping through
+the same induction (each step divides by bounded 3-powers); target
+v₃(denom) ≤ 1+2k (doc step 6). Verify small-k constants by native_decide
+before trusting the exponent.
+
+Sanity check (k=1, done on paper, all three classes): V(1,1) = 25 (direct
+enumeration: 16 adjacent-pair configs + 9 gap-2 configs — exactly the 16+9
+gadgets of docs/proofs/T-n-nm1.md), Vᵗ(1,1) = 5 (= 4+1 gadgets). d_1(2) = 5;
+d-recursion gives d_1(H) = (25H−35)/27·3^H (d_1(3) = 40 = 15+25 ✓);
+c-identity gives q_1(H) = (25H−20)/27, i.e. T(H+1,H) = (25H−20)·3^(H−3) =
+P_1(n)·3^(n−4) with P_1(n) = 25n−45 ✓, and T(4,3) = 55 ✓, T(3,2) = 10 ✓
+(onset H = k+1 = 2 included).
 
 ## File plan (revised from PLAN.md)
 
@@ -86,11 +101,13 @@ native_decide weight enumeration where cheap.
   king graph; all path surgery via mathlib's SimpleGraph.Walk API
   (takeUntil/dropUntil), which is built for exactly this.
 - `Separation.lean` — walk row is a cut, both directions.
-- `Catalogue.lean` — cluster types at surplus ≤ k (2^(k−1) compositions),
-  weight config Finsets, finiteness (spread < cell-count bound, reuse
-  canonical_x_le pattern).
-- `Peel.lean` — the three peeling bijections + exhaustive/disjoint case split.
-- `Shape.lean` — the induction: recurrence ⇒ q_k, onset, degree, integrality.
+- `Weights.lean` — walk-top set D k H, config sets for V(ℓ,j)/Vᵗ(ℓ,j),
+  finiteness (spread < cell-count bound, reuse canonical_x_le pattern). No
+  list catalogue: weights aggregate by (ℓ, j) only.
+- `Peel.lean` — the three peeling bijections + exhaustive/disjoint case
+  split ⇒ the d-recursion (H ≥ k+2) and c-identity (H ≥ k+1).
+- `Shape.lean` — the induction: recurrence ⇒ δ_k then q_k, onset, degree,
+  integrality.
 - `Compute.lean` — computable Tc = T + native_decide (in progress).
 - `Pin.lean` — explicit P_k: shape + k+1 points; unconditional where points
   are native_decide-reachable, else conditional on banked values.
