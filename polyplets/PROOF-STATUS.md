@@ -1,68 +1,62 @@
-# Lean formalization status — `T(n, n-k)` diagonal closed forms
+# Lean formalization status — production diagonal formulas P_0..P_16
 
-Formalizing the diagonal closed forms for fixed polyplets (A006770) in Lean 4 +
-mathlib. Branch `lean-diagonal-proofs`. Paper proofs live in
-`docs/proofs/T-n-nm1.md` (k=1) and `docs/proofs/T-n-nm2-and-general.md` (k=2 +
-general sketch).
+Goal (2026-07-20, /goal active): Lean-prove the diagonal closed forms used by
+the production engine (`diagonalCell`, k = 0..16); where full proof is out of
+reach, prove as much as possible and state exactly what remains input.
+Scope/route decisions: `PLAN.md`. Architecture (the peeling recursion,
+replacing the paper's GF route): `DESIGN.md`. Pin inputs (production
+coefficients + banked onset points, fail-closed generated): `pin-data.md`.
 
-Build: `cd polyplets && lake build`. Green = only the intended `sorry`s below.
+Build: `cd polyplets && lake exe cache get` (once) then `lake build`.
+Green = only the intended `sorry`s listed below.
 
-## Definitions (`Polyplets/Defs.lean`) — DONE
+## Landed (sorry-free, green, all committed)
 
-- `kingAdj`, `KingConnected` (path via `Relation.ReflTransGen` staying in the set).
-- `IsCanonical n H S`: `n` cells, king-connected, origin-anchored
-  (`min x = min y = 0`), `max y = H-1`.
-- `T n H := {S | IsCanonical n H S}.ncard`.
-- Validated by `Sanity.lean`: `T 1 1 = 1` (fully proved).
+- `Defs.lean` — kingAdj, KingConnected, IsCanonical, T. (pre-goal)
+- `Finite.lean` — crossing lemmas, width bound, finiteness, T as Finset.card.
+- `RowProfile.lean` — row fibers, occupied-rows interval, step (b) one
+  doubled row, (c-fwd), (d-local) for the old k=1 route. (pre-goal)
+- `Compute.lean` — computable `Tc`, `Tc_eq_T`, decidable KingConnected via
+  bounded closure; native_decide validation vs banked triangle (n ≤ 5 wall
+  ~600k subsets; T(6,4), T(6,5) probed out-of-file, match).
+- `Graph.lean` — kingGraph SimpleGraph bridge, walk-support lemma.
+- `Separation.lean` — walk-row separation: generic glue, cut (boundary-dart
+  excision surgery), erase-top corollary. Subsumes old k=1 (c-rev) gap.
+- `Weights.lean` — walk-top counts `d k H`, aggregated cluster weights
+  `V ℓ j` / `Vt ℓ j` (by rows×surplus, no type catalogue), spread bounds,
+  native_decide values: V(1,1)=25, Vt(1,1)=5 (the 16+9 / 4+1 gadgets of
+  docs/proofs/T-n-nm1.md), V(1,2)=49, Vt(1,2)=7, V(2,2)=339, Vt(2,2)=66;
+  **identity gates PASS**: c-identity at T(5,3)=248 = 136+25+21+66 and
+  d-recursion at d_2(4)=1019 = 408+125+147+339 — the DESIGN v2 recursion is
+  numerically confirmed against banked data.
 
-## Target theorems (`Polyplets/Diagonal.lean`)
+## In progress
 
-- `T_n_nm1`: `T n (n-1) = (25n-45)·3^(n-4)` over ℚ.
-  The ℚ/`zpow` bridge is **proved**; the ℕ-count `hcount` is `sorry` — its goal
-  is now a concrete `Finset.card` (via `T_eq_toFinset_card`), reduced to the
-  offset-chain count (step (e) below).
-- `T_n_nm2`: `T n (n-2) = ½(625n²-2459n+1134)·3^(n-7)` — full `sorry`.
+- `Peel.lean` (agent grinding): the three peeling bijections ⇒
+  `d_rec` : d k H = 3·d k (H−1) + ΣΣ V·d (k−j) (H−1−ℓ)   (H ≥ k+2)
+  `c_ident`: T (H+k) H = d k H + ΣΣ Vt·d (k−j) (H−ℓ)      (H ≥ k+1)
+  The project's hardest step (x-renormalization round-trips).
 
-## Infrastructure proved (all sorry-free)
+## Remaining
 
-### `Polyplets/Finite.lean` — step (a)
-- `exists_proj_eq_of_cross` — king paths don't skip a 1-Lipschitz coordinate
-  value; `exists_x_eq_of_cross` / `exists_y_eq_of_cross` specializations.
-- `exists_adj_cross_of_reflTransGen` — returns the whole boundary-crossing edge.
-- `canonical_x_le` — uniform width bound `p.1 ≤ n-1`.
-- `canonical_finite` — the canonical family is finite (⊆ powerset of the box).
-- `T_eq_toFinset_card` — `T` is a genuine `Finset.card`.
+- `Shape.lean` — strong induction on k over the recurrence ⇒
+  T(H+k,H) = q_k(H)·3^H, deg ≤ k, onset H ≥ k+1 exactly; production form
+  P_k(n)·3^(n−1−3k) for n ≥ 2k+1; integrality free at integer n ≥ 2k+1
+  (stretch: all-ℤ via finite differences; stretch: leading coeff
+  (V(1,1)/27)^k/k! — closes the k=12 shortfall). Brief staged.
+- `Pin.lean` — explicit P_k per k (Lagrange uniqueness
+  `eq_of_degrees_lt_of_eval_finset_eq` + points):
+  - k ≤ 2 unconditional (points native_decide-verified; T(7,5) via the
+    proved recursion as evaluator, not brute force); k=3 attempt.
+  - k ≤ 11: conditional on banked triangle values (all points in
+    pin-data.md).
+  - k = 12..16: banked points fall short by 1/4/7/10/13 (triangle ends at
+    n=36) — partial pinning + explicit residual hypotheses; leading-coeff
+    stretch would close k=12.
+- `Diagonal.lean` — `T_n_nm1` (hcount sorry) and `T_n_nm2` (full sorry):
+  to be re-proved from Shape+Pin; the old direct gadget route (steps c-rev,
+  d-global, e) then optional/retired.
 
-### `Polyplets/RowProfile.lean` — steps (b), (c-fwd), (d-prep)
-- `canonical_row_occupied`, `canonical_rows_image`, `canonical_rows_card` — the
-  occupied rows are exactly `[0,H-1]`, count `H`.
-- `canonical_card_eq_row_sum`, `canonical_fiber_nonempty` — fiberwise cell count.
-- `exists_unique_of_sum_eq_one` — ℕ sum = 1 ⇒ unique nonzero term.
-- `row_profile_one_doubled` — **(b)**: for `H=n-1`, exactly one row is doubled,
-  the rest singletons.
-- `canonical_consecutive_rows_linked` — **(c) forward**: connectivity ⇒ each
-  consecutive occupied row pair is directly king-linked.
-- `row_profile_doubled_cells` — **(d)/(e) prep**: the doubled row's two cells as
-  an ordered pair `c1.1 < c2.1`, the only cells on that row.
-- `neighbor_off_row_of_gap` — **(d) local**: gap ≥ 2 ⇒ a doubled cell's
-  neighbours are off-row (in `y0 ± 1`).
+## Intended sorrys currently in tree
 
-## Remaining work (hard)
-
-1. **(c) reverse** — per-row links ⇒ `KingConnected`. Needed to *construct*
-   canonical sets in the (e) bijection. Requires assembling a path from the
-   consecutive-row links (all rows occupied).
-2. **(d) gap ≤ 2 disconnection** — `docs/proofs/T-n-nm1.md` §3. `neighbor_off_row_of_gap`
-   gives the local confinement; the global step is: if gap ≥ 3, the up-chain
-   (rows > y0) and down-chain (rows < y0) each reach row y0 only through one of
-   the two doubled cells (a king step can't jump from row y0+1 to y0-1), and with
-   gap ≥ 3 no single neighbour bridges both ⇒ two components. Needs the
-   up/down-chain connectivity structure + a cut/component argument.
-3. **(e) offset-chain count** — `docs/proofs/T-n-nm1.md` §4-5. The big one: a
-   bijection from canonical sets to (doubled-row position × gap × free 3-chain of
-   inter-row offsets) with the gadget multiplicities (16, 9, 4, 1), giving
-   `(16+9)(n-3)·3^(n-4) + (4+1)·2·3·3^(n-4) = (25n-45)·3^(n-4)`. This is what
-   closes `hcount`.
-
-`T_n_nm2` (k=2) reuses the same architecture with a two-defect row profile
-(one triple row or two doubled rows).
+- `Diagonal.lean:50` hcount (old k=1 route), `Diagonal.lean:87` T_n_nm2.
