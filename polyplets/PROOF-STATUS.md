@@ -59,9 +59,10 @@ Green = only the intended `sorry`s listed below.
     (~1.2·10⁸ candidates) stack-overflows as one native_decide, so it is
     chunked by leftmost cluster column into 15 per-file native_decides
     (`WeightsChunk*.lean`, partition lemma native_decide-free, histogram
-    cross-checked by scripts/gen_v33_chunks.py). Build with
-    `lake build Polyplets.Weights3Heavy` (~33 min measured-basis at
-    module-parallel width ≤ 9; Vᵗ 10m51s and d 12m19s measured single).
+    cross-checked by scripts/gen_v33_chunks.py). **BUILT 2026-07-21**
+    (`lake build Polyplets.Weights3Heavy`, ~37 min wall: chunks ≤ 856 s
+    parallel + assembly 1343 s) — `P3_pinned` is UNCONDITIONAL, axioms =
+    standard + the chunk/leaf native_decide values.
   - **k = 4..11 CONDITIONAL-ON-BANKED**: `Pk_pinned_of_banked`, hypotheses
     = the k+1 banked onset T-values (results/triangle.txt, two-algorithm
     provenance).
@@ -84,7 +85,7 @@ Shape/Peel/Separation themselves: no native_decide anywhere.
 - The **shape** of every production formula (deg ≤ k polynomial × 3-power,
   onset n ≥ 2k+1, integer-valued on ℤ) is a THEOREM for all k — this is the
   part that was conjectural before this branch.
-- Explicit P_k: proved outright k ≤ 2 (k=3 after the overnight heavy build);
+- Explicit P_k: proved outright k ≤ 3;
   k = 4..11 proved modulo the banked triangle values named in the
   hypotheses; k = 12..16 additionally require the flagged PREDICTED values —
   out of reach of any feasible computation (weight enumeration scales
