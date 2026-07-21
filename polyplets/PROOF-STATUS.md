@@ -45,27 +45,50 @@ Green = only the intended `sorry`s listed below.
   (= production's "leading 25^j/j!"; the earlier δ-form in the brief was
   wrong, caught in review).
 
-## In progress
+- `Weights3.lean` — j=3 light weight leaves (V(1,3)=81, Vᵗ(1,3)=9,
+  V(2,3)=1860, Vᵗ(2,3)=307; 207 s one-off compile).
+- `Pin.lean` — the endgame. Generic Lagrange pin lemma; recursion-evaluator
+  value theorems (T(6,4), T(7,5) via d_rec/c_ident — no big enumeration);
+  production polynomials transcribed by `scripts/gen_pin.py` from
+  pin-data.md with per-point norm_num guards. Per-k results:
+  - **k = 0, 1, 2 UNCONDITIONAL**: `P0_pinned`, `P1_pinned`/`P1_closed`,
+    `P2_pinned`/`P2_closed`.
+  - **k = 3**: `P3_pinned_of_heavy` (hypotheses = V 3 3 = 4778,
+    Vᵗ 3 3 = 919, d 3 4 = 4687); `Weights3Heavy.lean` (OUT of default
+    build) discharges them ⇒ unconditional `P3_pinned`. The V 3 3 check
+    (~1.2·10⁸ candidates) stack-overflows as one native_decide, so it is
+    chunked by leftmost cluster column into 15 per-file native_decides
+    (`WeightsChunk*.lean`, partition lemma native_decide-free, histogram
+    cross-checked by scripts/gen_v33_chunks.py). Build with
+    `lake build Polyplets.Weights3Heavy` (~33 min measured-basis at
+    module-parallel width ≤ 9; Vᵗ 10m51s and d 12m19s measured single).
+  - **k = 4..11 CONDITIONAL-ON-BANKED**: `Pk_pinned_of_banked`, hypotheses
+    = the k+1 banked onset T-values (results/triangle.txt, two-algorithm
+    provenance).
+  - **k = 12..16 PARTIAL**: `Pk_pinned_of_partial`, hypotheses = all
+    banked points (12/10/8/6/4) + the 1/4/7/10/13 beyond-banked points at
+    the production-PREDICTED values, explicitly flagged `-- PREDICTED` —
+    these are the precisely-stated residue of what n ≤ 36 data cannot pin.
+- `Diagonal.lean` — `T_n_nm1`/`T_n_nm2` re-proved from `P1_closed`/
+  `P2_closed`; **the tree is fully sorry-free**.
 
-- `Pin.lean` + `Weights3.lean` (agent): j=3 leaves, recursion-evaluator
-  value theorems, Lagrange pin lemma, per-k production theorems
-  (unconditional k ≤ 3 / conditional-on-banked k ≤ 11 / partial k = 12..16
-  with explicit predicted-value residual hypotheses).
+## Axiom audit
 
-## Remaining
-- `Pin.lean` — explicit P_k per k (Lagrange uniqueness
-  `eq_of_degrees_lt_of_eval_finset_eq` + points):
-  - k ≤ 2 unconditional (points native_decide-verified; T(7,5) via the
-    proved recursion as evaluator, not brute force); k=3 attempt.
-  - k ≤ 11: conditional on banked triangle values (all points in
-    pin-data.md).
-  - k = 12..16: banked points fall short by 1/4/7/10/13 (triangle ends at
-    n=36) — partial pinning + explicit residual hypotheses; leading-coeff
-    stretch would close k=12.
-- `Diagonal.lean` — `T_n_nm1` (hcount sorry) and `T_n_nm2` (full sorry):
-  to be re-proved from Shape+Pin; the old direct gadget route (steps c-rev,
-  d-global, e) then optional/retired.
+Conditional/partial tiers (k ≥ 4): pure [propext, Classical.choice,
+Quot.sound]. Unconditional tiers additionally carry the native_decide axiom
+exactly for the finitely many verified point/weight values they consume.
+Shape/Peel/Separation themselves: no native_decide anywhere.
 
-## Intended sorrys currently in tree
+## What is proved vs out of reach (goal answer)
 
-- `Diagonal.lean:50` hcount (old k=1 route), `Diagonal.lean:87` T_n_nm2.
+- The **shape** of every production formula (deg ≤ k polynomial × 3-power,
+  onset n ≥ 2k+1, integer-valued on ℤ) is a THEOREM for all k — this is the
+  part that was conjectural before this branch.
+- Explicit P_k: proved outright k ≤ 2 (k=3 after the overnight heavy build);
+  k = 4..11 proved modulo the banked triangle values named in the
+  hypotheses; k = 12..16 additionally require the flagged PREDICTED values —
+  out of reach of any feasible computation (weight enumeration scales
+  ~20×/k, measured dead by k ≥ 9; onset T-points need production-scale
+  sweeps beyond any certified evaluator). Extending the banked triangle to
+  n = 49 (a(37)..a(49) per-height sweeps) would upgrade k = 12..16 to
+  conditional-on-banked; n ≤ 36 caps full pinning at k = 11.
