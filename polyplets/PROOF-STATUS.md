@@ -30,20 +30,29 @@ Green = only the intended `sorry`s listed below.
   d-recursion at d_2(4)=1019 = 408+125+147+339 — the DESIGN v2 recursion is
   numerically confirmed against banked data.
 
-## In progress
-
-- `Peel.lean` (agent grinding): the three peeling bijections ⇒
+- `Peel.lean` — the three peeling bijections (card_nbij' with shift/xNorm
+  renormalization), 1748 lines, sorry-free:
   `d_rec` : d k H = 3·d k (H−1) + ΣΣ V·d (k−j) (H−1−ℓ)   (H ≥ k+2)
   `c_ident`: T (H+k) H = d k H + ΣΣ Vt·d (k−j) (H−ℓ)      (H ≥ k+1)
-  The project's hardest step (x-renormalization round-trips).
+  #print axioms: [propext, Classical.choice, Quot.sound] — fully deductive.
+- `Shape.lean` — **the diagonal law shape THEOREM**: `shape_d`, `shape`
+  (T(H+k,H) = q_k(H)·3^H, deg ≤ k, ALL H ≥ k+1), `shape_production`
+  (∃ P deg ≤ k: T(n,n−k) = P(n)·3^(n−1−3k) for n ≥ 2k+1, zpow +
+  subtraction-free companion), `production_int_onset` (+'), and stretch
+  `production_int_all` (P integer-valued on ALL of ℤ, finite differences).
+  Same clean axiom footprint — no native_decide anywhere in the proof path.
+  Leading-coeff stretch deferred; corrected target: P_k.coeff k = 25^k/k!
+  (= production's "leading 25^j/j!"; the earlier δ-form in the brief was
+  wrong, caught in review).
+
+## In progress
+
+- `Pin.lean` + `Weights3.lean` (agent): j=3 leaves, recursion-evaluator
+  value theorems, Lagrange pin lemma, per-k production theorems
+  (unconditional k ≤ 3 / conditional-on-banked k ≤ 11 / partial k = 12..16
+  with explicit predicted-value residual hypotheses).
 
 ## Remaining
-
-- `Shape.lean` — strong induction on k over the recurrence ⇒
-  T(H+k,H) = q_k(H)·3^H, deg ≤ k, onset H ≥ k+1 exactly; production form
-  P_k(n)·3^(n−1−3k) for n ≥ 2k+1; integrality free at integer n ≥ 2k+1
-  (stretch: all-ℤ via finite differences; stretch: leading coeff
-  (V(1,1)/27)^k/k! — closes the k=12 shortfall). Brief staged.
 - `Pin.lean` — explicit P_k per k (Lagrange uniqueness
   `eq_of_degrees_lt_of_eval_finset_eq` + points):
   - k ≤ 2 unconditional (points native_decide-verified; T(7,5) via the
