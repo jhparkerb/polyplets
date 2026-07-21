@@ -113,6 +113,11 @@ use values.)
 
 ## Corollary — the grand form G·H^n
 
+**Upgraded 2026-07-21: this corollary is now a standalone THEOREM with a
+full proof and sharp onset — `grand-form.md` (machine check:
+`experiments/grand_form_check.py`). The paragraph below is the original
+sketch.**
+
 D(z) has the single perturbed root z*(y) near 1/3 (unique as a formal
 series); the residue resummation of Step 5 across k gives formal series
 C(y), μ(y) = 1/z* with A_H(y) := Σ_k T(H+k,H) y^k = C(y)·μ(y)^H per y-order
