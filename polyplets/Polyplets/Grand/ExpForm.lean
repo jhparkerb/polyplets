@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Polyplets.Grand.Staircase
+import Polyplets.Sanity
 
 /-!
 # ExpForm: the grand form, formalized (unconditional)
@@ -30,7 +31,7 @@ The construction is entirely a sequence computation over `ℕ → ℚ`:
 The main theorem `grand_form` rides `base_match` (base) and `expStair` (step)
 through the SAME double induction as the μ-recursion. It audits to standard
 axioms only — no `native_decide` anywhere in its cone (the seed `T 1 1 = 1` is
-proved here by hand, `T_one_one`).
+the hand-proved `T_one_one` of `Sanity.lean`).
 -/
 
 namespace Polyplets
@@ -313,38 +314,6 @@ lemma expSeq_neg_b : expSeq (fun j => -bSeq j) = Wc := by
 lemma expSeq_neg_b_pow (p : ℕ) :
     expSeq (fun j => (p : ℚ) * (-bSeq j)) = convPow Wc p := by
   rw [expSeq_nsmul (fun j => -bSeq j) p, expSeq_neg_b]
-
-/-! ## The onset seed `T 1 1 = 1` (native_decide-free) -/
-
-/-- `T 1 1 = 1`, proved by hand so `grand_form`'s cone stays `native_decide`-free:
-the only canonical `1`-cell height-`1` polyplet is `{(0,0)}`. -/
-theorem T_one_one : T 1 1 = 1 := by
-  have hset : {S : Finset (ℤ × ℤ) | IsCanonical 1 1 S}
-      = {({((0 : ℤ), (0 : ℤ))} : Finset (ℤ × ℤ))} := by
-    ext S
-    simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
-    constructor
-    · rintro ⟨hcard, -, -, ⟨p, hpS, hpx⟩, hy0, -, hyle, -⟩
-      obtain ⟨a, rfl⟩ := Finset.card_eq_one.mp hcard
-      rw [Finset.mem_singleton] at hpS
-      have ha1 : a.1 = 0 := hpS ▸ hpx
-      have ha2ge : 0 ≤ a.2 := hy0 a (Finset.mem_singleton_self a)
-      have ha2le : a.2 ≤ 0 := by
-        have := hyle a (Finset.mem_singleton_self a); simpa using this
-      have : a = (0, 0) := Prod.ext ha1 (le_antisymm ha2le ha2ge)
-      rw [this]
-    · rintro rfl
-      refine ⟨rfl, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-      · intro p hp q hq
-        rw [Finset.mem_singleton] at hp hq
-        subst hp; subst hq; exact Relation.ReflTransGen.refl
-      · intro p hp; rw [Finset.mem_singleton] at hp; subst hp; norm_num
-      · exact ⟨(0, 0), Finset.mem_singleton_self _, rfl⟩
-      · intro p hp; rw [Finset.mem_singleton] at hp; subst hp; norm_num
-      · exact ⟨(0, 0), Finset.mem_singleton_self _, rfl⟩
-      · intro p hp; rw [Finset.mem_singleton] at hp; subst hp; norm_num
-      · exact ⟨(0, 0), Finset.mem_singleton_self _, by norm_num⟩
-  rw [T, hset, Set.ncard_singleton]
 
 /-! ## The level-solved cumulant `aSeq` and `expCoeff` -/
 

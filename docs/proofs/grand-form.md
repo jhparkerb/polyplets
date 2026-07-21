@@ -179,6 +179,21 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
    proof is formalized — that is the remaining gap, and it is now a
    formalization gap, not a mathematical one.
 
+## Formalization (2026-07-21)
+
+Formalized in Lean 4: `polyplets/Polyplets/Grand/` (plan
+`polyplets/GRANDFORM-PLAN.md`, briefs `polyplets/briefs/`). The proof was
+restructured for Lean as the **staircase route**: in sequence form, Steps
+1–3 collapse to a convolution fixed point (ν = z*, μ = 1/z*) plus one
+strong induction (`d_mu_rec`), and Step 5's Lagrange lemma becomes the `W`
+fixed point of `ExpForm.lean` — same theorem, no power-series ring.
+Audits (`Polyplets/Grand/Audit.lean`): `grand_form` (the exp-form above)
+and `T_staircase` depend on **standard axioms only**; `lead_coeff_25`
+(Corollary 2) adds the single `V_1_1` native_decide leaf; the production
+polynomials are pinned for k ≤ 16 from two real-swept cells per level
+(`P<k>_grand_of_banked`), retiring the Lean PREDICTED tier. The item
+"Lean formalization" below is CLOSED.
+
 ## What remains open (unchanged from diagonal-law.md)
 
 - Onset sharpness at n = 2k (failure below onset) — verified on banked data,

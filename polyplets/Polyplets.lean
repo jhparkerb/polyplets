@@ -3,6 +3,14 @@ import Polyplets.Defs
 import Polyplets.Diagonal
 import Polyplets.Finite
 import Polyplets.Graph
+import Polyplets.Grand.Audit
+import Polyplets.Grand.ExpForm
+import Polyplets.Grand.Lead
+import Polyplets.Grand.Mu
+import Polyplets.Grand.MuRec
+import Polyplets.Grand.PinGrand
+import Polyplets.Grand.Series
+import Polyplets.Grand.Staircase
 import Polyplets.Peel
 import Polyplets.Pin
 import Polyplets.RowProfile
