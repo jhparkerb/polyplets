@@ -7,4 +7,5 @@ import Polyplets.Peel
 import Polyplets.RowProfile
 import Polyplets.Separation
 import Polyplets.Sanity
+import Polyplets.Shape
 import Polyplets.Weights
