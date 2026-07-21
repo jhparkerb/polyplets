@@ -5,6 +5,7 @@ Authors: Jason H Parker
 -/
 import Polyplets.Defs
 import Polyplets.Finite
+import Polyplets.Pin
 
 /-!
 # Diagonal closed forms for fixed polyplets (A006770)
@@ -48,38 +49,8 @@ namespace Polyplets
 (the statement is true for `n ≥ 3` via the negative exponent; we take the
 clean `n ≥ 4` regime here). Paper proof: `docs/proofs/T-n-nm1.md`. -/
 theorem T_n_nm1 (n : ℕ) (hn : 4 ≤ n) :
-    (T n (n - 1) : ℚ) = (25 * (n : ℚ) - 45) * (3 : ℚ) ^ ((n : ℤ) - 4) := by
-  -- Combinatorial heart (docs/proofs/T-n-nm1.md): the ℕ-valued count. All the
-  -- real work — one doubled row, gap ∈ {1,2}, offset-chain product — is here.
-  have hcount : T n (n - 1) = (25 * n - 45) * 3 ^ (n - 4) := by
-    rw [T_eq_toFinset_card]
-    -- Goal: `(canonical_finite n (n-1)).toFinset.card = (25n - 45) * 3^(n-4)`.
-    -- (a) ✓ Finiteness — `Polyplets/Finite.lean`: `canonical_finite` (the set is
-    --     contained in the box `[0,n-1] × [0,H-1]`, via the king-connectivity
-    --     width bound `canonical_x_le` / `exists_x_eq_of_cross`) and
-    --     `T_eq_toFinset_card` (so `T` is a genuine `Finset.card`, above).
-    -- The remaining combinatorial core (docs/proofs/T-n-nm1.md), still to
-    -- formalize as reusable infrastructure:
-    --   (b) ✓ Row profile — `Polyplets/RowProfile.lean`: all n-1 rows occupied
-    --       (`canonical_row_occupied`), rows = [0,n-2] exactly, and the
-    --       pigeonhole `row_profile_one_doubled` (exactly one row holds two
-    --       cells, every other exactly one).
-    --   (c) ~ Connectivity ⟹ every consecutive row pair shares a king-adjacent
-    --       cross-pair — forward direction done (`RowProfile.lean`,
-    --       `canonical_consecutive_rows_linked`). Reverse (links ⟹ connected)
-    --       deferred to the (e) construction.
-    --   (d) The doubled row's two cells are at column gap 1 or 2 (gap ≥ 3
-    --       disconnects).
-    --   (e) Bijection to (doubled-row position × gap × offset chain), giving
-    --       (16+9)(n-3)·3^(n-4) + (4+1)·2·3·3^(n-4) = (25n-45)·3^(n-4).
-    sorry
-  -- Bridge the ℕ identity to the ℚ goal.
-  rw [hcount]
-  have hz : (n : ℤ) - 4 = ((n - 4 : ℕ) : ℤ) := by omega
-  rw [hz, zpow_natCast, Nat.cast_mul, Nat.cast_sub (by omega : 45 ≤ 25 * n),
-    Nat.cast_pow]
-  push_cast
-  ring
+    (T n (n - 1) : ℚ) = (25 * (n : ℚ) - 45) * (3 : ℚ) ^ ((n : ℤ) - 4) :=
+  P1_closed n (by omega)
 
 /-- **k = 2 diagonal.** `T(n, n-2) = ½(625n² - 2459n + 1134) · 3^(n-7)` for
 `n ≥ 5`. Paper proof: `docs/proofs/T-n-nm2-and-general.md` §1 — a proof modulo
@@ -87,7 +58,7 @@ a machine-verified gadget lemma. -/
 theorem T_n_nm2 (n : ℕ) (hn : 5 ≤ n) :
     (T n (n - 2) : ℚ)
       = (1 / 2) * (625 * (n : ℚ) ^ 2 - 2459 * (n : ℚ) + 1134)
-          * (3 : ℚ) ^ ((n : ℤ) - 7) := by
-  sorry
+          * (3 : ℚ) ^ ((n : ℤ) - 7) :=
+  P2_closed n hn
 
 end Polyplets

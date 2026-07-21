@@ -4,8 +4,10 @@ import Polyplets.Diagonal
 import Polyplets.Finite
 import Polyplets.Graph
 import Polyplets.Peel
+import Polyplets.Pin
 import Polyplets.RowProfile
 import Polyplets.Separation
 import Polyplets.Sanity
 import Polyplets.Shape
 import Polyplets.Weights
+import Polyplets.Weights3
