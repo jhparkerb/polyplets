@@ -109,6 +109,17 @@ def main() -> None:
         missing = [n for n in pin_pts if (n, n - k) not in tri]
         if missing:
             lines.append(f"  MISSING (beyond banked range): n={missing}")
+            lines.append(
+                "  PREDICTED values at missing points (production polynomial"
+                " evaluations, NOT banked data — usable only as explicit"
+                " residual hypotheses):"
+            )
+            for n in missing:
+                coeffs, kfact = table[k]
+                got = poly_value(coeffs, kfact, k, n)
+                if got.denominator != 1:
+                    sys.exit(f"non-integer prediction k={k} n={n}: {got}")
+                lines.append(f"  T({n},{n - k}) =pred= {got.numerator}")
         lines.append("")
     OUT.write_text("\n".join(lines))
     print(f"wrote {OUT}")
