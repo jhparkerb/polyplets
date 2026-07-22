@@ -6,8 +6,10 @@
 #   docs/lean-hostile-witness.md). The 2026-07-10 Hmax=14 run was stopped after
 #   C_13, so its end-of-run banked compare never executed; this run re-prints
 #   the per-height match counts for ALL H<=14 in one log.
-# Machine: gympie (local). Predicted cost: ~70 min wall (measured C_13=606s,
-#   ~5.7x/height => C_14~3450s), <2 GB RAM, 1 core.
+# Machine: dalby (128 GB). Predicted cost: ~40 GB RAM peak, 1 core, ~60-90 min
+#   wall. Basis: gympie attempt 2026-07-22 MEASURED ~38 GB footprint at C_14
+#   (24 GB box thrashed 2h+ in swap, killed) — the earlier "<2 GB" guess was
+#   wrong; C_13 = 604s measured, ~5.7x/height => C_14 ~1h of pure compute.
 # Command: build/strip_tm 14 36 results/ns_a36/perheight
 # Kill/resume: plain kill of the strip_tm PID; single-unit job, no checkpoint —
 #   a kill costs the whole run (~70 min), accepted for a one-off validation run.
