@@ -96,9 +96,10 @@ it requires trusting prose.
    a(1)–a(18) byte-match the live OEIS b-file.
 3. **Held-out closed-form predictions**: P_15, pinned before a(33) existed,
    predicted T(33,18) exactly; P_16, fitted on a(33)–a(34), predicted the
-   later holdouts T(35,19) and T(36,20) exactly. Terms whose newest cell lacks
-   such a holdout are *explicitly downgraded* (a(36) is a comment, not b-file
-   data).
+   later real-swept holdout T(35,19) exactly. (T(36,20) also matches, but it
+   was itself P_16-generated in the a(36) run, so it is a consistency check,
+   not a holdout.) Terms whose newest cell lacks such a holdout are
+   *explicitly downgraded* (a(36) is a comment, not b-file data).
 4. **Honest grading is built into the entries themselves**: the %C text and
    b-file headers state exactly which terms are two-algorithm, which are
    single-algorithm-multiply-cross-checked, and which are conjectured. Nothing

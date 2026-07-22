@@ -95,3 +95,30 @@ must give (quadratic in n)·3^(n−7). Empirically (fitted exact, n=5..20):
 The diagonal leading coefficients run 1, 25, 25²/2! = **25^k/k!**, with power
 3^(n−1−3k) — i.e. `T(n,n−k) ~ 3^(n−1)·(25n/27)^k / k!`, a Poisson/defect-gas
 structure. The general T(n,n−k) is the open target this method is meant to reach.
+
+## Formalization and supersession (2026-07-21)
+
+This proof is fully formalized in Lean 4: `polyplets/Polyplets/Diagonal.lean`
+re-proves `T_n_nm1` from `Pin.lean`'s `P1_closed`, with the gadget
+multiplicities 16+9 / 4+1 of §4 as the `native_decide` weight leaves
+V(1,1) = 25, Vᵗ(1,1) = 5 of `Weights.lean` (the same 25 = 16+9 split).
+
+§7's road map is CLOSED, beyond what this method was meant to reach:
+
+- T(n,n−2) is no longer "fitted" — the quadratic is proved
+  (`P2_closed`, and `T_n_nm2` in `Diagonal.lean`).
+- The general shape T(n,n−k) = P_k(n)·3^(n−1−3k), deg P_k ≤ k, onset
+  n ≥ 2k+1, is a theorem for ALL k (`Shape.lean`; paper proof
+  `diagonal-law.md`), and the defect-gas structure is exact: the
+  diagonals are the exp of affine cumulants (`grand-form.md`,
+  Lean `Grand/ExpForm.lean`, standard axioms only).
+- The Poisson leading coefficient is proved: deg P_k = k exactly and
+  [n^k]P_k = 25^k/k! for all k (`Grand/Lead.lean`, standard axioms +
+  the single V(1,1) leaf — the 25 of this file's §5).
+- Production P_1..P_16 are pinned for all n ≥ 2k+1 (`Grand/PinGrand.lean`):
+  k ≤ 3 outright, k = 4..16 as conditional theorems whose explicit
+  hypotheses are the two real-swept onset cells per level — engine values
+  assumed, not proved in Lean (levels ≥ 12 single-algorithm; see
+  `docs/lean-hostile-witness.md`).
+
+Status ledger: `polyplets/PROOF-STATUS.md`.

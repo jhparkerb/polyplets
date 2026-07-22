@@ -174,10 +174,10 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
    k = 10..16) now rest on: the real sweeps (H ≤ 19), the shape theorem
    (Lean, deductive), THIS theorem (paper level, machine-checked), and the
    banked 2-point solve inputs. The former free-standing assumption "the
-   defect gas is exactly linear" is discharged. The Lean tier for k = 12..16
-   still carries PREDICTED points (`polyplets/PROOF-STATUS.md`) until this
-   proof is formalized — that is the remaining gap, and it is now a
-   formalization gap, not a mathematical one.
+   defect gas is exactly linear" is discharged. The former Lean PREDICTED
+   tier for k = 12..16 is retired: this proof is formalized (§Formalization
+   below) and `P<k>_grand_of_banked` pins every level from two real-swept
+   cells with H ≤ 18 (`polyplets/PROOF-STATUS.md`).
 
 ## Formalization (2026-07-21)
 
@@ -200,6 +200,6 @@ polynomials are pinned for k ≤ 16 from two real-swept cells per level
   proved ab initio only k ≤ 5.
 - Monomial integer coefficients of P_k (values are integral; coefficient
   integrality observed k ≤ 17).
-- Lean formalization of this theorem (planned: the Step-1/Step-5 inductions
-  are elementary and native_decide-free; see PROOF-STATUS for the payoff —
-  k = 12..16 upgrade from PARTIAL to conditional-on-banked).
+
+(The Lean formalization of this theorem, formerly listed here, is CLOSED —
+see §Formalization above.)

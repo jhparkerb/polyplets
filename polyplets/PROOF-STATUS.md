@@ -17,8 +17,12 @@ Green = only the intended `sorry`s listed below.
 - `RowProfile.lean` — row fibers, occupied-rows interval, step (b) one
   doubled row, (c-fwd), (d-local) for the old k=1 route. (pre-goal)
 - `Compute.lean` — computable `Tc`, `Tc_eq_T`, decidable KingConnected via
-  bounded closure; native_decide validation vs banked triangle (n ≤ 5 wall
-  ~600k subsets; T(6,4), T(6,5) probed out-of-file, match).
+  bounded closure; native_decide validation vs banked triangle (sparse cells).
+- `ComputeBridge.lean` — completes the definitional bridge (hostile-witness
+  audit fix, 2026-07-21): every nonzero cell of rows n ≤ 5 plus T(6,4)=1480,
+  T(6,5)=945 as in-tree native_decide theorems (the n = 6 probes were
+  previously "verified out-of-file" prose only). Bridge = 17 kernel-recorded
+  nonzero cells, rows 1..5 complete.
 - `Graph.lean` — kingGraph SimpleGraph bridge, walk-support lemma.
 - `Separation.lean` — walk-row separation: generic glue, cut (boundary-dart
   excision surgery), erase-top corollary. Subsumes old k=1 (c-rev) gap.
@@ -41,9 +45,11 @@ Green = only the intended `sorry`s listed below.
   subtraction-free companion), `production_int_onset` (+'), and stretch
   `production_int_all` (P integer-valued on ALL of ℤ, finite differences).
   Same clean axiom footprint — no native_decide anywhere in the proof path.
-  Leading-coeff stretch deferred; corrected target: P_k.coeff k = 25^k/k!
-  (= production's "leading 25^j/j!"; the earlier δ-form in the brief was
-  wrong, caught in review).
+  Leading-coeff stretch: CLOSED by `Grand/Lead.lean` (`lead_coeff_25`,
+  `expPoly_natDegree_eq`, `shape_lead` — see Grand section). Historical
+  note: corrected target was P_k.coeff k = 25^k/k! (= production's
+  "leading 25^j/j!"; the earlier δ-form in the brief was wrong, caught in
+  review).
 
 - `Weights3.lean` — j=3 light weight leaves (V(1,3)=81, Vᵗ(1,3)=9,
   V(2,3)=1860, Vᵗ(2,3)=307; 207 s one-off compile).
@@ -123,11 +129,21 @@ Quot.sound]. Unconditional tiers additionally carry the native_decide axiom
 exactly for the finitely many verified point/weight values they consume.
 Shape/Peel/Separation themselves: no native_decide anywhere.
 
+**Enforced, not advisory (2026-07-21):** every `#print axioms` in
+`Grand/Audit.lean` is wrapped in `#guard_msgs` against the recorded expected
+output, so any axiom-set drift FAILS the build (hostile-witness audit fix;
+`docs/lean-hostile-witness.md`).
+
 ## What is proved vs out of reach (goal answer)
 
 - The **shape** of every production formula (deg ≤ k polynomial × 3-power,
   onset n ≥ 2k+1, integer-valued on ℤ) is a THEOREM for all k — this is the
   part that was conjectural before this branch.
+- The **degree and leading coefficient** are THEOREMS for all k
+  (`Grand/Lead.lean`): deg P_k = k exactly and [n^k]P_k = 25^k/k!
+  (`lead_coeff_25`, `expPoly_natDegree_eq`); `shape_lead` transfers both
+  to any shape witness. Axioms: standard + the single `V_1_1`
+  native_decide leaf.
 - Explicit P_k: proved outright k ≤ 3; k = 4..16 proved modulo TWO
   real-swept banked cells per level (`P<k>_grand_of_banked`, Grand tier —
   supersedes the older Lagrange tiers, whose text is kept below for

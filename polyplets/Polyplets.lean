@@ -1,4 +1,5 @@
 import Polyplets.Compute
+import Polyplets.ComputeBridge
 import Polyplets.Defs
 import Polyplets.Diagonal
 import Polyplets.Finite

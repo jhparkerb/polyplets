@@ -10,7 +10,11 @@ import Polyplets.Grand.PinGrand
 # Audit: the grand-form results in one place
 
 Single audit point for the staircase formalization (`GRANDFORM-PLAN.md`).
-Expected output, recorded in `PROOF-STATUS.md`:
+Every `#print axioms` below is wrapped in `#guard_msgs`, so the build FAILS
+if any axiom set drifts from the recorded expectation (previously these were
+advisory; hardened 2026-07-21, `docs/lean-hostile-witness.md`).
+
+Expected footprints, recorded in `PROOF-STATUS.md`:
 
 * `d_mu_rec`, `T_staircase`, `grand_form`, `grand_form_prod` —
   `[propext, Classical.choice, Quot.sound]` (standard only; no
@@ -25,13 +29,85 @@ Expected output, recorded in `PROOF-STATUS.md`:
 
 namespace Polyplets
 
+/-- info: 'Polyplets.d_mu_rec' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
 #print axioms d_mu_rec
+
+/-- info: 'Polyplets.T_staircase' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
 #print axioms T_staircase
+
+/-- info: 'Polyplets.grand_form' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
 #print axioms grand_form
+
+/-- info: 'Polyplets.grand_form_prod' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
 #print axioms grand_form_prod
+
+/--
+info: 'Polyplets.mu_one' depends on axioms: [propext, Classical.choice, Quot.sound, V_1_1._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
 #print axioms mu_one
+
+/--
+info: 'Polyplets.lead_coeff_25' depends on axioms: [propext, Classical.choice, Quot.sound, V_1_1._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
 #print axioms lead_coeff_25
+
+/--
+info: 'Polyplets.shape_lead' depends on axioms: [propext, Classical.choice, Quot.sound, V_1_1._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
 #print axioms shape_lead
+
+/--
+info: 'Polyplets.P16_grand_of_banked' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ CFGVchunk_card_n1._native.native_decide.ax_1_1,
+ CFGVchunk_card_n2._native.native_decide.ax_1_1,
+ CFGVchunk_card_n3._native.native_decide.ax_1_1,
+ CFGVchunk_card_n4._native.native_decide.ax_1_1,
+ CFGVchunk_card_n5._native.native_decide.ax_1_1,
+ CFGVchunk_card_n6._native.native_decide.ax_1_1,
+ CFGVchunk_card_n7._native.native_decide.ax_1_1,
+ CFGVchunk_card_p0._native.native_decide.ax_1_1,
+ CFGVchunk_card_p1._native.native_decide.ax_1_1,
+ CFGVchunk_card_p2._native.native_decide.ax_1_1,
+ CFGVchunk_card_p3._native.native_decide.ax_1_1,
+ CFGVchunk_card_p4._native.native_decide.ax_1_1,
+ CFGVchunk_card_p5._native.native_decide.ax_1_1,
+ CFGVchunk_card_p6._native.native_decide.ax_1_1,
+ CFGVchunk_card_p7._native.native_decide.ax_1_1,
+ T_1_1._native.native_decide.ax_1_1,
+ T_3_2._native.native_decide.ax_1_1,
+ T_4_3._native.native_decide.ax_1_1,
+ T_5_3._native.native_decide.ax_1_1,
+ V_1_1._native.native_decide.ax_1_1,
+ V_1_2._native.native_decide.ax_1_1,
+ V_1_3._native.native_decide.ax_1_1,
+ V_2_2._native.native_decide.ax_1_1,
+ V_2_3._native.native_decide.ax_1_1,
+ Vt_1_1._native.native_decide.ax_1_1,
+ Vt_1_2._native.native_decide.ax_1_1,
+ Vt_1_3._native.native_decide.ax_1_1,
+ Vt_2_2._native.native_decide.ax_1_1,
+ Vt_2_3._native.native_decide.ax_1_1,
+ Vt_3_3._native.native_decide.ax_1_1,
+ d_0_1._native.native_decide.ax_1_1,
+ d_0_2._native.native_decide.ax_1_1,
+ d_0_3._native.native_decide.ax_1_1,
+ d_0_4._native.native_decide.ax_1_1,
+ d_1_2._native.native_decide.ax_1_1,
+ d_1_3._native.native_decide.ax_1_1,
+ d_2_3._native.native_decide.ax_1_1,
+ d_2_4._native.native_decide.ax_1_1,
+ d_3_4._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
 #print axioms P16_grand_of_banked
 
 end Polyplets

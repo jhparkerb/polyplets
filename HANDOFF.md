@@ -1,4 +1,12 @@
-# HANDOFF — live state (updated 2026-07-11)
+# HANDOFF — live state (updated 2026-07-21)
+
+## Running now
+- **strip C_14 sweep** (gympie tmux 0:strip14, ~70 min from 2026-07-22T02:41Z,
+  `results/strip_C14_run.log`): full Hmax=14 strip-TM run vs banked triangle —
+  extends second-source per-cell confirmation H≤13 → H≤14, flipping PinGrand
+  anchors T(26,14)/T(27,14) to multi-source. Fix 7 of the hostile-witness audit
+  (`docs/lean-hostile-witness.md`); the 2026-07-10 run stopped after C_13 so its
+  banked compare never ran.
 
 Live state only. Completed compute sessions (a(35), Even Keel, the utilization
 redesign/deployment passes, the 2026-07-07 M(17)/dmirror/related-seqs jobs, the
