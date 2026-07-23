@@ -51,6 +51,11 @@
 
 inline constexpr size_t kSpillBlockBytes = 256 * 1024;
 
+// First body-read fill after open/seek; rawRead doubles from here up to
+// kSpillBlockBytes so streaming readers still amortize while one-record
+// peeks (merge heap-init at fan-in scale) stay cheap.
+inline constexpr size_t kFirstFillBytes = 8 * 1024;
+
 inline int spillZstdLevel() {
   const char* e = std::getenv("POLY_SPILL_ZSTD_LEVEL");
   if (e && *e) { int v = std::atoi(e); if (v != 0) return v; }
@@ -414,6 +419,12 @@ class RunFileReader {
       std::fprintf(stderr, "RunFileReader: cannot open %s\n", path.c_str());
       return;
     }
+    // Small stdio buffer: only the text header goes through stdio's buffer
+    // (body reads are explicit >=kFirstFillBytes freads, which glibc serves
+    // directly). The default 4KB buffer made every open cost a 4KB read —
+    // material at merge fan-in scale, where a round is ranges x inputs opens
+    // for one-record peeks (Fan-In Tax, results/fanin-tax.md).
+    std::setvbuf(fp_, nullptr, _IOFBF, 512);
     if (!parseHeader()) {
       std::fprintf(stderr, "RunFileReader: bad header in %s\n", path.c_str());
       std::fclose(fp_);
@@ -489,6 +500,10 @@ class RunFileReader {
     if (!fp_) return false;
     FILE* f = std::fopen((path_ + ".idx").c_str(), "rb");
     if (!f) return false;
+    // Each binary-search probe is a ~20-byte fread at a seeked offset; the
+    // default 4KB stdio buffer turned every probe into a 4KB read (~14 probes
+    // x 4KB per open at merge fan-in scale). 512B per probe is plenty.
+    std::setvbuf(f, nullptr, _IOFBF, 512);
     uint32_t magic = 0; uint16_t ver = 0; uint8_t bo = 0; uint32_t kl = 0; uint64_t cnt = 0;
     if (std::fread(&magic, sizeof(magic), 1, f) != 1 || std::fread(&ver, sizeof(ver), 1, f) != 1 ||
         std::fread(&bo, sizeof(bo), 1, f) != 1 || magic != kRunIndexMagic ||
@@ -520,6 +535,7 @@ class RunFileReader {
     std::fclose(f);
     if (std::fseek(fp_, static_cast<long>(offset), SEEK_SET) != 0) return false;
     rpos_ = rlen_ = 0;  // drop the block buffer: its bytes predate the seek
+    next_fill_ = kFirstFillBytes;  // post-seek reads are peek-sized until proven streaming
     records_read_ = recidx;
     seeked_ = true;
     return true;
@@ -546,6 +562,7 @@ class RunFileReader {
   bool compressed_;
   std::vector<uint8_t> rbuf_;       // plain-path block buffer (lazy, kSpillBlockBytes)
   size_t rpos_ = 0, rlen_ = 0;      // consumed / valid bytes in rbuf_
+  size_t next_fill_ = kFirstFillBytes;  // adaptive fill size, doubles to kSpillBlockBytes
 #ifdef POLY_ZSTD
   ZSTD_DStream* dctx_ = nullptr;
   std::vector<char> cbuf_;          // bounded compressed-input block buffer
@@ -586,7 +603,14 @@ class RunFileReader {
     while (n) {
       if (rpos_ == rlen_) {
         if (rbuf_.empty()) rbuf_.resize(kSpillBlockBytes);
-        rlen_ = std::fread(rbuf_.data(), 1, rbuf_.size(), fp_);
+        // Adaptive fill: start small after open/seek, double toward the full
+        // block. A streaming reader reaches kSpillBlockBytes within a few
+        // fills; a merge-fan-in peek (open, seek, read one record to seed the
+        // k-way heap) pays kFirstFillBytes instead of a full 256KB block —
+        // the dominant read volume at ranges x inputs opens per round
+        // (Fan-In Tax, results/fanin-tax.md).
+        rlen_ = std::fread(rbuf_.data(), 1, std::min(next_fill_, rbuf_.size()), fp_);
+        next_fill_ = std::min(next_fill_ * 2, rbuf_.size());
         rpos_ = 0;
         if (rlen_ == 0) return false;  // EOF/short file
       }
