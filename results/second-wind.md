@@ -63,9 +63,12 @@ components the fix doesn't touch). Honest range: **1.5–3x on the pole** →
 
 - **Trusted route** (P17 wired, real H3–H19, `dalby_term.sh 37`):
   pole **~1.2–2.5h**, low heights overlapped ≈ free → wall ≈ pole.
-- **Strict route** (adds real H20 = the P17 certification point; run
-  `--heights 20` separately or maxn-37-with-P17-unwired): H20 ≈ 2.1–2.2x
-  H19 ≈ 7–8h pre-buffered → **~2.5–5h** with the I/O win.
+- **Strict route** (adds real H20 = the P17 certification point):
+  `--max-diag-k 16` (new flag, gated by `maxdiagk_test.go`) forces the
+  H20 strip back to a real column sweep despite P17 being wired; the swept
+  T(37,20) is then compared against the P_17 closed form as its first
+  independent holdout. H20 ≈ 2.1–2.2x H19 ≈ 7–8h pre-buffered →
+  **~2.5–5h** with the I/O win.
 
 Either route is comfortably inside a day on dalby alone; both are cheaper
 than a(36)'s actual run was. ayr is not needed (dalby_term.sh is

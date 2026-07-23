@@ -41,6 +41,7 @@ type SweepConfig struct {
 	CostProfileOut  string        // where to emit the cost profile (default: <RunDir>/cost_profile.tsv)
 	CostProfileRef  string        // optional reference profile to drive the live ETA
 	Heights         []int         // subset of heights to sweep (empty = 1..Maxn); for multi-machine split
+	MaxDiagK        int           // cap on wired diagonal closed-forms (0 = all wired). Set to k-1 to force the H=Maxn-k strip back to a REAL column sweep — e.g. 16 makes a maxn=37 run sweep H20 for real (the strict route: the swept T(37,20) is P_17's first independent holdout)
 	PerHeightOut    string        // dir to write per-height h<H>.out files (empty = none)
 	Bin             WorkerBin
 	// Pool, if non-nil, dispatches map/merge work to a WorkerPool of
@@ -328,7 +329,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 
 		// Strips H==maxn-k are closed-form (proven/data-pinned diagonals); see
 		// diagonalStripValid for the true n>=2k+1 validity threshold.
-		if k := maxn - H; diagonalStripValid(maxn, k) {
+		if k := maxn - H; diagonalStripEnabled(cfg, k) {
 			contributeDiagonalStrip(maxn, k, triangle, cfg)
 			continue
 		}
@@ -473,7 +474,7 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 				fireAfterHeight(H)
 				return
 			}
-			if k := cfg.Maxn - H; diagonalStripValid(cfg.Maxn, k) {
+			if k := cfg.Maxn - H; diagonalStripEnabled(cfg, k) {
 				mu.Lock()
 				contributeDiagonalStrip(cfg.Maxn, k, triangle, cfg)
 				markDone(H)
@@ -2082,6 +2083,16 @@ func applyPow3(num *big.Int, e int) *big.Int {
 // or k-range change can't apply to only one path.
 func diagonalStripValid(maxn, k int) bool {
 	return k >= 2 && k <= 17 && maxn >= 2*k+1
+}
+
+// diagonalStripEnabled is the dispatch predicate both sweep paths
+// (sequential Run and runOverlap) must use: structural validity
+// (diagonalStripValid) AND the run's --max-diag-k cap. The cap exists so a
+// run can force a wired diagonal back to a real column sweep — the strict
+// route's certification mechanism (sweep H=maxn-k for real, then compare
+// against the P_k closed form it would have used).
+func diagonalStripEnabled(cfg SweepConfig, k int) bool {
+	return diagonalStripValid(cfg.Maxn, k) && (cfg.MaxDiagK == 0 || k <= cfg.MaxDiagK)
 }
 
 // diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..17

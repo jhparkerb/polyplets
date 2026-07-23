@@ -69,6 +69,7 @@ func main() {
 	heightsArg := flag.String("heights", "", "subset of heights to sweep, e.g. 1-12 or 17,19,20 (default: all 1..maxn; for multi-machine split)")
 	perHeightOut := flag.String("per-height-out", "", "dir to write per-height h<H>.out rows (for combine + old-engine cross-check)")
 	kernel := flag.String("kernel", "column", "sweep kernel: kink (production per-cell boundary sweep) or column (the independent reference kernel, kept as the correctness oracle -- kink_validate.sh cross-checks kink against it)")
+	maxDiagK := flag.Int("max-diag-k", 0, "cap on wired diagonal closed-forms (0 = all wired). Set to k-1 to force the H=maxn-k strip back to a REAL column sweep, e.g. 16 at maxn=37 sweeps H20 for real (the strict route; the swept T(37,20) is P_17's first independent holdout). A resumed run must pass the same value")
 	flag.Parse()
 
 	if *kernel != "column" && *kernel != "kink" {
@@ -151,6 +152,7 @@ func main() {
 		Heights:         heights,
 		PerHeightOut:    *perHeightOut,
 		Kernel:          *kernel,
+		MaxDiagK:        *maxDiagK,
 		Bin:             bin,
 	}
 
@@ -158,8 +160,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, "orchestrate:", adv)
 	}
 
-	fmt.Printf("orchestrate maxn=%d fold=%v cores=%d unit_mult=%d merge_mult=%d ram=%d counter=%s kernel=%s run_dir=%s rev=%s\n",
-		*maxn, *fold, *cores, *unitMult, *mergeMult, *ram, *counter, *kernel, *runDir, rev)
+	fmt.Printf("orchestrate maxn=%d fold=%v cores=%d unit_mult=%d merge_mult=%d ram=%d counter=%s kernel=%s max_diag_k=%d run_dir=%s rev=%s\n",
+		*maxn, *fold, *cores, *unitMult, *mergeMult, *ram, *counter, *kernel, *maxDiagK, *runDir, rev)
 
 	// Resume from checkpoint if requested.
 	var ckpt *orchestrator.Checkpoint
