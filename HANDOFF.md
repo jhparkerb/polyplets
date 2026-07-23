@@ -1,6 +1,18 @@
-# HANDOFF — live state (updated 2026-07-21)
+# HANDOFF — live state (updated 2026-07-22)
 
 ## Recently banked
+- **Second Wind (branch `second-wind`, 2026-07-22): a(37) engine-ready.**
+  (a) **P_17 WIRED** (diagCoeffTable[17], gated red-first) → a(37) top real
+  height H19; fit = T(35,18)+T(36,19), the only two in-onset points;
+  **correction**: T(34,17) is n=2k out-of-onset and does NOT lie on P_17
+  (sharp onset) — no independent P_17 holdout exists until a real H20 sweep.
+  (b) **Block-buffered run-file I/O**: stdio per-FIELD (worst per-varint-BYTE)
+  calls were ~90% of worker busy time; fix is format-identical, measured
+  **3.36x wall / 3.8x cpu** on the gympie H15/maxn30 bench; full ns-gates +
+  fresh a(20) --compare PASS. (c) a(37) plan + dalby checklist:
+  `results/second-wind.md`. Pending: dalby rebuild + bench A/B (needs
+  ssh-agent; jasonp travelling, ayr out of reach — dalby_term.sh is
+  dalby-solo anyway). Predicted a(37): trusted ~1.2-2.5h, strict ~2.5-5h.
 - **strip C_14 COMPLETE 2026-07-22** (dalby, 7.5h): 413 cells, **0 mismatch —
   columns H≤14 independently confirmed to n=36** (`results/strip_C14_run.log`,
   `results/strip-engine.md`). PinGrand anchors T(26,14)/T(27,14) now
@@ -89,13 +101,15 @@ spine digit-product on all in-band cells).
   kernel, opt-in `--kernel kink-sharded`, real 4.93x at H14/maxn26, still not the default
   and not head-to-head'd at dominant-height scale).
 - **steal-tail diagnostic** (`results/steal-tail-h18.md`): banked, not deployed.
-- **a(37) costed, on the shelf (2026-07-12):** with the varint engine, ~3.5h wall
-  (~170 core-h, dalby H19 pole 3.4h + ayr H<=18, RAM ~400MB) if P17 is wired as
-  certified via the banked T(36,19) holdout (its fit uses the out-of-onset n=34
-  point); **~10h wall on the strict paper convention** (sweep H20 real ~9.8h pole
-  => certifies P17 unambiguously, retires a(36)'s T2-, ends the banked range
-  certified at an odd frontier per the frontier-parity law in
-  results/ternary-spine.md). Boxes busy with a(22) until ~07-17. jasonp's call.
+- **a(37) READY on branch `second-wind` (2026-07-22, supersedes the 07-12
+  shelf costing):** P_17 wired (see Second Wind above; the 07-12 note's "fit
+  uses the out-of-onset n=34 point" was wrong — n=34 is off the polynomial,
+  sharp onset; fit is T(35,18)+T(36,19), no holdout until H20). Trusted
+  route = `dalby_term.sh 37` (~1.2-2.5h predicted post-I/O-fix); strict
+  route adds the real H20 sweep (~2.5-5h), which certifies P17, retires
+  a(36)'s T2-, and ends the banked range at an odd frontier
+  (frontier-parity law). jasonp's call which route; dalby deploy checklist
+  in results/second-wind.md.
   **P17-from-the-gas MEASURED DEAD 2026-07-13** (results/defect-gas.md): weight-DP
   cost ~20x/k, k=17 ~10^17s; the strict H20 sweep is the only certification route.
 - **Ternary Spine (2026-07-12, BANKED):** the height triangle mod 3 is governed by
