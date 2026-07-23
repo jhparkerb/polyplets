@@ -185,8 +185,9 @@ pinned tier are exactly as strong as the kink engine and no stronger.
    now 17 kernel-recorded nonzero cells.
 6. **Done** (paragraph rewrite incl. provenance grading; a fuller provenance
    table remains a paper-polish item).
-7. **Running** — full Hmax=14 strip sweep vs banked triangle launched on
-   gympie (tmux 0:strip14, `results/strip_C14_run.log`, ~70 min predicted);
-   also re-executes the banked compare for H ≤ 13 that the stopped 2026-07-10
-   run never reached. Result to be recorded in `results/strip-engine.md` on
-   completion.
+7. **Done (2026-07-22)** — full Hmax=14 strip sweep vs banked triangle:
+   **413 cells, 0 mismatches, columns H ≤ 14 independently confirmed to
+   n = 36** (`results/strip_C14_run.log`; ran on dalby after the gympie
+   attempt thrashed at a measured ~38 GB footprint). Anchors T(26,14) and
+   T(27,14) flip to MULTI-SOURCE; the single-algorithm set shrinks from 9
+   cells to the 7 of levels 13B–16. Recorded in `results/strip-engine.md`.

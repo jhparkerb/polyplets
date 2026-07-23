@@ -1,12 +1,14 @@
 # HANDOFF — live state (updated 2026-07-21)
 
-## Running now
-- **strip C_14 sweep** (gympie tmux 0:strip14, ~70 min from 2026-07-22T02:41Z,
-  `results/strip_C14_run.log`): full Hmax=14 strip-TM run vs banked triangle —
-  extends second-source per-cell confirmation H≤13 → H≤14, flipping PinGrand
-  anchors T(26,14)/T(27,14) to multi-source. Fix 7 of the hostile-witness audit
-  (`docs/lean-hostile-witness.md`); the 2026-07-10 run stopped after C_13 so its
-  banked compare never ran.
+## Recently banked
+- **strip C_14 COMPLETE 2026-07-22** (dalby, 7.5h): 413 cells, **0 mismatch —
+  columns H≤14 independently confirmed to n=36** (`results/strip_C14_run.log`,
+  `results/strip-engine.md`). PinGrand anchors T(26,14)/T(27,14) now
+  multi-source; single-algorithm anchor set down to 7 cells (levels 13B–16).
+  Hostile-witness audit + full fix list applied same day
+  (`docs/lean-hostile-witness.md`): Audit.lean now #guard_msgs-enforced,
+  ComputeBridge.lean completes the n≤6 definitional bridge. C_14 footprint
+  MEASURED ~38 GB (gympie attempt thrashed, killed) — C_15 ~200+ GB, off table.
 
 Live state only. Completed compute sessions (a(35), Even Keel, the utilization
 redesign/deployment passes, the 2026-07-07 M(17)/dmirror/related-seqs jobs, the

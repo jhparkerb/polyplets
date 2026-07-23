@@ -1,0 +1,36 @@
+=== strip full Hmax=14 N=36 host=dalby rev=80e8265c 2026-07-22T05:05:22Z ===
+=== cpp/strip_tm.cpp blob 1aa74af19cc9a2190f7572fdd8857f97ae6ed5d2 (file unmodified since 2026-07-10 run) ===
+strip_tm (C++): Hmax=14 Nmax=36
+  C_1  computed in     0.00s  (states cached: 1)
+  C_2  computed in     0.00s  (states cached: 3)
+  C_3  computed in     0.00s  (states cached: 8)
+  C_4  computed in     0.00s  (states cached: 20)
+  C_5  computed in     0.01s  (states cached: 50)
+  C_6  computed in     0.04s  (states cached: 126)
+  C_7  computed in     0.10s  (states cached: 322)
+  C_8  computed in     0.38s  (states cached: 834)
+  C_9  computed in     2.19s  (states cached: 2187)
+  C_10 computed in    13.35s  (states cached: 5797)
+  C_11 computed in    95.81s  (states cached: 15510)
+  C_12 computed in   616.51s  (states cached: 41834)
+  C_13 computed in  3282.19s  (states cached: 113632)
+  C_14 computed in 22918.74s  (states cached: 310556)
+
+vs banked triangle: 413 match, 0 MISMATCH
+  ALL AGREE -> columns H<=14 independently confirmed to n=36
+
+C_H head values (independent), n=H..H+3:
+  C_1 : 1 1 1 1
+  C_2 : 5 12 29 70
+  C_3 : 32 112 387 1333
+  C_4 : 222 944 3977 16670
+  C_5 : 1582 7566 36023 170752
+  C_6 : 11398 58886 303951 1564528
+  C_7 : 82478 449705 2455209 13389603
+  C_8 : 597646 3389630 19273655 109615868
+  C_9 : 4330612 25307152 148353217 870662365
+  C_10: 31360332 187593576 1125917309 6769323014
+  C_11: 226892984 1382845308 8456211399 51816502259
+  C_12: 1639950454 10148611024 63005872851 392020915500
+  C_13: 11841542090 74213253388 466528223735 2939292104228
+  C_14: 85422228248 541093990480 3437263912752 21882946691024

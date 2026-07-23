@@ -42,9 +42,18 @@ every entry in columns H computed, at every n up to 36:
 |------|--------------------------|------------|
 | 10   | 315                      | ~5 s       |
 | 13   | (see strip_engine_run.log; C_13 = 606s) | ~730 s |
+| 14   | **413, 0 mismatch, n≤36** (strip_C14_run.log, dalby 2026-07-22) | ~7.5 h dalby (C_14 = 22919s; dalby ≈ 5.4x slower/thread than gympie) |
 
-(The `strip_engine_run.log` run stopped after C_13; C_14 was not completed, so
-this second-source confirmation covers columns H≤13.)
+(The original `strip_engine_run.log` run stopped after C_13, so its end-of-run
+banked compare never executed and coverage stood at H≤13. The 2026-07-22 dalby
+run — hostile-witness audit fix 7, `docs/lean-hostile-witness.md` — completed
+C_14 and the full compare: columns H≤14 independently confirmed at every
+banked n≤36. A first attempt on gympie was killed after thrashing: C_14's
+measured footprint is ~38 GB, past gympie's 24 GB; RAM-size accordingly. This
+flips the PinGrand anchors T(26,14) and T(27,14) to multi-source; remaining
+single-algorithm anchors are the 7 cells of levels 13B..16: T(28,15),
+T(29,15), T(30,16), T(31,16), T(32,17), T(33,17), T(34,18). C_15 would need
+~200+ GB by the same growth — off the table on current hardware.)
 
 Zero mismatches. What this adds over the EXISTING independent checks: the
 project's Redelmeier enumerator (`build/g2 square8 --per-box`) already
