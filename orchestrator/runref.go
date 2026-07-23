@@ -685,3 +685,85 @@ func WriteSeedPolyrun(path, rev string, H, maxn int, counter ...string) error {
 	}
 	return f.Close()
 }
+
+// keyBounds is one input file's [keylo, keyhi) header stamp, decoded for
+// range-overlap tests. hasLo/hasHi false = that side open (bound absent from
+// the header -- e.g. a first/last merge range, or a file written before the
+// stamp existed).
+type keyBounds struct {
+	lo, hi       []byte
+	hasLo, hasHi bool
+}
+
+// loadKeyBounds parses each path's header once and returns its stamped key
+// bounds. One ParseHeader per file per round -- the whole point is that the
+// per-UNIT cost of consulting bounds must be zero syscalls.
+func loadKeyBounds(paths []string, keyLen int) []keyBounds {
+	bounds := make([]keyBounds, len(paths))
+	for i, p := range paths {
+		hdr, _, err := ParseHeader(p)
+		if err != nil {
+			continue // unreadable header = unstamped = never pruned
+		}
+		bounds[i].lo, bounds[i].hasLo = hexBytes(hdr.KeyLo, keyLen)
+		bounds[i].hi, bounds[i].hasHi = hexBytes(hdr.KeyHi, keyLen)
+	}
+	return bounds
+}
+
+// pruneByBounds returns the subset of paths whose stamped [keylo, keyhi)
+// overlaps the unit range [loHex, hiHex) ("" = open end). The writer stamps
+// the REQUESTED range, so every record in a file lies inside its stamp; a
+// file whose stamp misses the unit range cannot contribute a record and is
+// safely dropped (Fan-In Tax, results/fanin-tax.md). Unstamped files are
+// always kept. If nothing overlaps (a steal-child remnant can shrink past
+// every file), the FULL list is returned: the unit then range-filters to an
+// empty output, byte-identical to pre-prune behavior.
+func pruneByBounds(paths []string, bounds []keyBounds, loHex, hiHex string, keyLen int) []string {
+	uLo, hasULo := hexBytes(loHex, keyLen)
+	uHi, hasUHi := hexBytes(hiHex, keyLen)
+	kept := make([]string, 0, 4)
+	for i, p := range paths {
+		b := bounds[i]
+		if b.hasHi && hasULo && sigLE(b.hi, uLo) {
+			continue // file entirely below the unit ([lo,hi): hi==uLo excludes)
+		}
+		if b.hasLo && hasUHi && sigLE(uHi, b.lo) {
+			continue // file entirely above the unit
+		}
+		kept = append(kept, p)
+	}
+	if len(kept) == 0 {
+		return paths
+	}
+	return kept
+}
+
+// sigLE reports a <= b for equal-length key byte strings.
+func sigLE(a, b []byte) bool {
+	for i := range a {
+		if a[i] != b[i] {
+			return a[i] < b[i]
+		}
+	}
+	return true
+}
+
+// mergeRangeCount caps a round's merge fan-out so each range carries at
+// least minPerRange records, mirroring mapPhase's minPerUnit cap: a tiny
+// stage table must not be cut into cores*mult ranges each paying the full
+// per-range open-every-input cost (Fan-In Tax's merge half).
+func mergeRangeCount(base int, totalIn uint64, nOuts int) int {
+	const minPerRange = 2048
+	n := base
+	if capR := int((totalIn + minPerRange - 1) / minPerRange); capR < n {
+		n = capR
+	}
+	if n > nOuts {
+		n = nOuts
+	}
+	if n < 1 {
+		n = 1
+	}
+	return n
+}

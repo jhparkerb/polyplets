@@ -1219,6 +1219,13 @@ func mapPhase(
 	los, his := cutsToBounds(cuts)
 	n0 := len(los)
 
+	// Per-unit input pruning (Fan-In Tax, results/fanin-tax.md): frontier
+	// files are disjoint stamped ranges, so a unit needs only the ~1-2 files
+	// overlapping its [lo,hi) -- not all of them. One header parse per file
+	// here replaces (units x files) header+idx+buffer setups in the workers,
+	// measured ~75% of all worker CPU on dalby's H15/maxn30 bench.
+	inBounds := loadKeyBounds(frontier, keyLen)
+
 	// Grain floor in records: don't steal a remnant smaller than StealGrain of a
 	// core's fair share (design sweet spot ≈ 0.05).  0 ⇒ stealing off.  The
 	// activeHeights dynamic gate (stealAllowed) is checked separately, per
@@ -1351,7 +1358,8 @@ func mapPhase(
 				}
 				outPath := filepath.Join(cfg.RunDir, outName)
 				a := MapArgs{
-					InPaths: frontier, H: H, Maxn: cfg.Maxn, Fold: cfg.Fold,
+					InPaths: pruneByBounds(frontier, inBounds, u.lo, u.hi, keyLen),
+					H: H, Maxn: cfg.Maxn, Fold: cfg.Fold,
 					RAM: cfg.RAM, SpillDir: cfg.SpillDir, OutPath: outPath,
 					Counter: cfg.CounterWidth, LoHex: u.lo, HiHex: u.hi, Rev: cfg.Rev,
 					Kernel: kernel, Stage: stage,
@@ -1524,13 +1532,7 @@ func mergePhase(
 	}
 
 	totalIn := sumFrontierRecords(mapOuts)
-	numRanges := cfg.Cores * mergeMult(cfg)
-	if numRanges < 1 {
-		numRanges = 1
-	}
-	if numRanges > len(mapOuts) {
-		numRanges = len(mapOuts)
-	}
+	numRanges := mergeRangeCount(cfg.Cores*mergeMult(cfg), totalIn, len(mapOuts))
 
 	cuts, err := BalancedCutsMulti(mapOuts, keyLen, numRanges-1)
 	if err != nil {
