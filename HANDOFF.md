@@ -18,10 +18,16 @@
   cost) → a(40) only if H21's ~280-350GB fits (measure H20 footprint
   during a(38); dalby has 214G free + 68G of banked runs/ clutter).
   **LADDER RUNNING (launched 2026-07-23, jasonp-authorized through a(41)
-  contingent on measured disk fit ≥20% headroom):** a(37) live on dalby
-  (tmux 0:a37, orchestrate PID 2004951, rev 28e4056c, runs/ns_a37/,
-  du-monitored via 0:a37du → runs/ns_a37/dalby.rundir_size.log; predicted
-  1.5-3.5h). Sequence: a(37) → a(38) [real H20 certifies P17 holdout
+  contingent on measured disk fit ≥20% headroom):**
+  **a(37) BANKED 2026-07-23** = 170463735577007360431441250424
+  (results/ns_a37/ + PROVENANCE.md): dalby solo, rev 28e4056c, wall 13048s
+  (3.62h), cpu 580k s, rss 395MB, **disk peak 75.7GB measured** (du
+  telemetry) → a(38) H20 projection ~160-170GB, fits 281GB free with
+  headroom. A37_VALIDATE_PASS (b-file + banked chain), T(37,37)=3^36,
+  T(37,36)=P_1(37)·3^33, growth 6.9212 smooth. Real T(37,19) = first P_18
+  fit point in hand. One box did all heights one term higher in ~the time
+  a(36) needed two boxes in parallel.
+  Sequence: ~~a(37)~~ → a(38) [real H20 certifies P17 holdout
   T(37,20) + gives both P18 fit points] → wire P18 (derive_pk_fast.py 18,
   dry-run verified, red-first gate like P17) → a(39) → a(40)/a(41) iff
   H21 disk projection fits 281GB free with ≥20% headroom (else stop +
