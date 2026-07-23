@@ -1,0 +1,4 @@
+# cost_profile maxn=35 cores=80
+# H	col	frontier_in	frontier_out	wall_s	cpu_s	rss_max_mb
+19	0	1	262655	0.650	7.186	46.7
+19	1	262655	11313826	33.326	798.398	46.7

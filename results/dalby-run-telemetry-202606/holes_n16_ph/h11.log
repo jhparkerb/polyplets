@@ -1,0 +1,2 @@
+event=start job=tma-holes-H11-N16-k7 t=2026-06-23T06:31:26+02:00 git=2c5e3e7-dirty built=2026-06-21T14:57:01+0200 host=dalby height=11 hdrop=1 threads=16 ckpt=1
+event=done job=tma-holes-H11-N16-k7 t=2026-06-23T06:31:56+02:00 start=2026-06-23T06:31:26+02:00 wall_s=29.2 cpu_s=91.8 peak_rss_mb=195.3 result=ok

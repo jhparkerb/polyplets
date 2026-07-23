@@ -1,0 +1,4 @@
+>>> a(21) FOLDED start: MAXJOBS=2 THREADS=40 MIN_FREE=40GB heights=[20 19 18 17 ] rev=0f48081 @ 2026-06-25T20:13:55-04:00
+>>> launch h20 (free 123GB, 0 running) @ 2026-06-25T20:13:55-04:00
+>>> launch h19 (free 123GB, 1 running) @ 2026-06-25T20:13:55-04:00
+>>> h19 FAILED (see runs/a21fold/h19.log) @ 2026-06-26T03:23:39-04:00
