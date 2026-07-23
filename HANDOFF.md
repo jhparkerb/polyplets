@@ -15,6 +15,16 @@
   dalby checklist: `results/second-wind.md`. Pending: dalby rebuild + bench A/B (needs
   ssh-agent; jasonp travelling, ayr out of reach — dalby_term.sh is
   dalby-solo anyway). Predicted a(37): trusted ~1.2-2.5h, strict ~2.5-5h.
+  **Resume state 2026-07-22:** branch `second-wind` (7 commits off master
+  316b5ca) is LOCAL-ONLY on gympie — `git push -u origin second-wind` first
+  (needs agent), then the dalby checklist: fetch + checkout +
+  `make ns-gates && make install` on dalby, `bench_util.sh` A/B vs the
+  140.9s H15/maxn30 baseline to pin the real I/O-win factor, then
+  `dalby_term.sh 37` (trusted) or add `--max-diag-k 16` in the script's
+  orchestrate line (strict, real H20). Validation already banked on-branch:
+  full ns-gates, a(20) --compare, a(26) production-shape chain-match
+  (runs/second_wind_a26). The old dalby strip_tm tail-waiter died with the
+  network change — expected, its run was already banked.
 - **strip C_14 COMPLETE 2026-07-22** (dalby, 7.5h): 413 cells, **0 mismatch —
   columns H≤14 independently confirmed to n=36** (`results/strip_C14_run.log`,
   `results/strip-engine.md`). PinGrand anchors T(26,14)/T(27,14) now
