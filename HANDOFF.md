@@ -1,6 +1,26 @@
-# HANDOFF — live state (updated 2026-07-22)
+# HANDOFF — live state (updated 2026-07-23)
 
 ## Recently banked
+- **Fan-In Tax FIXED + branch deployed/validated on dalby (2026-07-23,
+  `results/fanin-tax.md`):** the dalby bench A/B exposed ~75% of worker CPU
+  going to (units x input-files) open/seek overhead + 256KB-peek reads +
+  mmap-threshold buffer churn + byte-at-a-time request getline — none of it
+  visible on gympie. Four fixes (orchestrator input pruning [red-first
+  test], merge-range record cap, adaptive peek reads, arena-sized buffers +
+  POSIX getline): dalby H15/maxn30 bench **336s/20.1k cpu-s → 104.5s/3.9k**
+  (3.2x wall, 5.2x cpu), now 1.35x FASTER than the pre-varint D5 baseline.
+  Validated: full ns-gates (55) per step + `dalby_term.sh 26` full
+  production-shape run on dalby (b-file n≤20 exact, chain exact,
+  A26_VALIDATE_PASS). gympie gains ~5% (its pair count was always small).
+  **Ladder insight:** a(38)'s intrinsic real H20 sweep yields T(37,20) =
+  P_17's first independent holdout AND both P_18 fit points — a(37)-strict
+  is subsumed; route = a(37) trusted → a(38) → wire P_18 → a(39) (~a(38)
+  cost) → a(40) only if H21's ~280-350GB fits (measure H20 footprint
+  during a(38); dalby has 214G free + 68G of banked runs/ clutter).
+  **a(37) launch attempted 2026-07-23, blocked by the permission
+  classifier — awaiting jasonp's explicit go** (>1hr frontier-job rule).
+  Everything else on the checklist is DONE: branch pushed, dalby rebuilt
+  clean (rev 58033a2f), bench A/B'd, production-shape validated.
 - **Second Wind (branch `second-wind`, 2026-07-22): a(37) engine-ready.**
   (a) **P_17 WIRED** (diagCoeffTable[17], gated red-first) → a(37) top real
   height H19; fit = T(35,18)+T(36,19), the only two in-onset points;
