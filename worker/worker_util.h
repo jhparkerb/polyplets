@@ -9,10 +9,10 @@
 #include <cctype>
 #include <csignal>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <functional>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -190,13 +190,21 @@ inline int runWorkerMain(
 
   if (!persistent) return runOneRequest(filtered);
 
-  std::string line;
-  while (std::getline(std::cin, line)) {
-    if (line.empty()) continue;
+  // POSIX getline, not std::getline(std::cin): cin's stdio_sync_filebuf pulls
+  // one BYTE per virtual underflow call, and a merge request line listing
+  // every map output of a round runs to tens of KB — measured as a top-3
+  // merge_worker cost at fan-in scale (Fan-In Tax, results/fanin-tax.md).
+  char* line = nullptr;
+  size_t cap = 0;
+  ssize_t n;
+  while ((n = getline(&line, &cap, stdin)) != -1) {
+    while (n > 0 && (line[n - 1] == '\n' || line[n - 1] == '\r')) line[--n] = '\0';
+    if (n == 0) continue;
     g_workerTerminate = 0;
     const int rc = runOneRequest(tokenizeLine(line));
-    if (rc != 0) return rc;  // a real failure exits, same as the one-shot path
+    if (rc != 0) { std::free(line); return rc; }  // real failure exits, same as one-shot
     std::fflush(stdout);
   }
+  std::free(line);
   return 0;
 }

@@ -602,15 +602,20 @@ class RunFileReader {
     uint8_t* d = static_cast<uint8_t*>(dst);
     while (n) {
       if (rpos_ == rlen_) {
-        if (rbuf_.empty()) rbuf_.resize(kSpillBlockBytes);
         // Adaptive fill: start small after open/seek, double toward the full
         // block. A streaming reader reaches kSpillBlockBytes within a few
         // fills; a merge-fan-in peek (open, seek, read one record to seed the
-        // k-way heap) pays kFirstFillBytes instead of a full 256KB block —
-        // the dominant read volume at ranges x inputs opens per round
-        // (Fan-In Tax, results/fanin-tax.md).
-        rlen_ = std::fread(rbuf_.data(), 1, std::min(next_fill_, rbuf_.size()), fp_);
-        next_fill_ = std::min(next_fill_ * 2, rbuf_.size());
+        // k-way heap) pays kFirstFillBytes instead of a full 256KB block.
+        // The BUFFER grows with the fill for the same reason: a fixed 256KB
+        // vector per reader put every allocation over glibc's mmap threshold,
+        // so ranges x inputs reader instances per round each paid an
+        // mmap+page-zero+munmap cycle (gdb-sampled as brk/sbrk churn in
+        // reader destructors; Fan-In Tax, results/fanin-tax.md). An 8KB peek
+        // buffer stays arena-served and gets reused across readers.
+        const size_t want = std::min(next_fill_, kSpillBlockBytes);
+        if (rbuf_.size() < want) rbuf_.resize(want);
+        rlen_ = std::fread(rbuf_.data(), 1, want, fp_);
+        next_fill_ = std::min(next_fill_ * 2, kSpillBlockBytes);
         rpos_ = 0;
         if (rlen_ == 0) return false;  // EOF/short file
       }
