@@ -42,9 +42,12 @@ compressed reads from a decompressed block buffer (killing the per-byte
 
 Measured (`scripts/gympie_bench_phase.sh`, H15/maxn30, 10 cores, production
 flags): **wall 335.1s → 99.8s (3.36x), cpu 2899 → 764 cpu-s (3.8x)**.
-Validation: full `make ns-gates` green (spill-zstd, resume-boundaries,
-parallel, verify corruption-detection, ASan) + a fresh full a(20) run
-`combine --compare` PASS (runs/second_wind_a20).
+Validation, three scales: full `make ns-gates` green (spill-zstd,
+resume-boundaries, parallel, verify corruption-detection, ASan); a fresh
+full a(20) run `combine --compare` PASS (runs/second_wind_a20); and a full
+**a(26) production-shape run** (kink, u128, overlap-heights, P-wired
+diagonals; 23.7s wall on gympie) with **a(20)–a(26) all matching banked
+`results/ns_a26/triangle.txt` exactly** (runs/second_wind_a26).
 
 Post-fix profile is balanced (reader ~303 / writer ~293 / transition ~150 /
 sort+moves ~250 samples; per-unit file opens now barely visible) — no
