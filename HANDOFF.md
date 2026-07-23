@@ -9,8 +9,10 @@
   (b) **Block-buffered run-file I/O**: stdio per-FIELD (worst per-varint-BYTE)
   calls were ~90% of worker busy time; fix is format-identical, measured
   **3.36x wall / 3.8x cpu** on the gympie H15/maxn30 bench; full ns-gates +
-  fresh a(20) --compare PASS. (c) a(37) plan + dalby checklist:
-  `results/second-wind.md`. Pending: dalby rebuild + bench A/B (needs
+  fresh a(20) --compare PASS. (c) **--max-diag-k** (gated): forces a wired
+  diagonal back to a real sweep — the strict route is `--max-diag-k 16` at
+  maxn=37 (real H20 = P_17's first independent holdout). (d) a(37) plan +
+  dalby checklist: `results/second-wind.md`. Pending: dalby rebuild + bench A/B (needs
   ssh-agent; jasonp travelling, ayr out of reach — dalby_term.sh is
   dalby-solo anyway). Predicted a(37): trusted ~1.2-2.5h, strict ~2.5-5h.
 - **strip C_14 COMPLETE 2026-07-22** (dalby, 7.5h): 413 cells, **0 mismatch —
