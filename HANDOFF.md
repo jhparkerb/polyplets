@@ -17,10 +17,18 @@
   is subsumed; route = a(37) trusted → a(38) → wire P_18 → a(39) (~a(38)
   cost) → a(40) only if H21's ~280-350GB fits (measure H20 footprint
   during a(38); dalby has 214G free + 68G of banked runs/ clutter).
-  **a(37) launch attempted 2026-07-23, blocked by the permission
-  classifier — awaiting jasonp's explicit go** (>1hr frontier-job rule).
-  Everything else on the checklist is DONE: branch pushed, dalby rebuilt
-  clean (rev 58033a2f), bench A/B'd, production-shape validated.
+  **LADDER RUNNING (launched 2026-07-23, jasonp-authorized through a(41)
+  contingent on measured disk fit ≥20% headroom):** a(37) live on dalby
+  (tmux 0:a37, orchestrate PID 2004951, rev 28e4056c, runs/ns_a37/,
+  du-monitored via 0:a37du → runs/ns_a37/dalby.rundir_size.log; predicted
+  1.5-3.5h). Sequence: a(37) → a(38) [real H20 certifies P17 holdout
+  T(37,20) + gives both P18 fit points] → wire P18 (derive_pk_fast.py 18,
+  dry-run verified, red-first gate like P17) → a(39) → a(40)/a(41) iff
+  H21 disk projection fits 281GB free with ≥20% headroom (else stop +
+  report). Fallback if a(38) projection >200GB: sweep H20 solo first.
+  dalby runs/ cleaned 2026-07-23 (68GB dead checkpoints/torn state;
+  telemetry rescued to results/dalby-run-telemetry-202606/, commit
+  4faa81a7) → 281GB free.
 - **Second Wind (branch `second-wind`, 2026-07-22): a(37) engine-ready.**
   (a) **P_17 WIRED** (diagCoeffTable[17], gated red-first) → a(37) top real
   height H19; fit = T(35,18)+T(36,19), the only two in-onset points;
