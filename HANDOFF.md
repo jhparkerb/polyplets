@@ -27,6 +27,9 @@
   T(37,36)=P_1(37)·3^33, growth 6.9212 smooth. Real T(37,19) = first P_18
   fit point in hand. One box did all heights one term higher in ~the time
   a(36) needed two boxes in parallel.
+  **a(38) live on dalby since 2026-07-23 ~16:2x EDT** (tmux 0:a38,
+  orchestrate PID 2012309, rev 8ce1bc5c, runs/ns_a38/, du monitor 0:a38du;
+  predicted 4-8h wall, disk peak ~160-170GB vs 281GB free).
   Sequence: ~~a(37)~~ → a(38) [real H20 certifies P17 holdout
   T(37,20) + gives both P18 fit points] → wire P18 (derive_pk_fast.py 18,
   dry-run verified, red-first gate like P17) → a(39) → a(40)/a(41) iff
