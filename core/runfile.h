@@ -167,7 +167,10 @@ class RunFileWriter {
   }
 
   ~RunFileWriter() {
-    if (fp_) std::fclose(fp_);
+    if (fp_) {
+      flushWBuf();  // abandoned writer (no finalize): don't strand buffered bytes
+      std::fclose(fp_);
+    }
     if (idx_fp_) std::fclose(idx_fp_);
 #ifdef POLY_ZSTD
     if (cctx_) ZSTD_freeCStream(cctx_);
@@ -190,20 +193,25 @@ class RunFileWriter {
       std::fwrite(&recidx, sizeof(recidx), 1, idx_fp_);
       ++index_count_;
     }
-    emit(r.sig.b, static_cast<size_t>(keyLen_));
-    uint8_t lo  = r.lo;
-    uint8_t len = r.len;
-    emit(&lo,  1);
-    emit(&len, 1);
+    // Assemble the whole record in a stack buffer and emit ONCE. Field-at-a-time
+    // emit() was ~10-35 stdio calls per record (worst: one per varint byte), and
+    // per-call FILE-lock + dispatch overhead dominated map/merge worker busy time
+    // (measured ~90% of busy samples on gympie, results/second-wind.md). Max
+    // record size: keyLen<=SIGMAX-2+... sig (<=34) + lo,len (2) + up to
+    // (maxn+1)<=40 counts x <=19 varint bytes = well under the 1KB below.
+    uint8_t rec[1024];
+    size_t n = 0;
+    std::memcpy(rec + n, r.sig.b, static_cast<size_t>(keyLen_));
+    n += static_cast<size_t>(keyLen_);
+    rec[n++] = r.lo;
+    rec[n++] = r.len;
     for (int i = 0; i < r.len; ++i) {
       // counts: LEB128 varint each (see encodeVarint in run.h). Max 19 bytes
       // for u128; body_bytes_ tracks actual bytes so the .idx offset above stays
       // exact and range-seeking is unaffected.
-      uint8_t vb[24];
-      size_t n = 0;
-      encodeVarint<W>(r.counts[i], [&](uint8_t b) { vb[n++] = b; });
-      emit(vb, n);
+      encodeVarint<W>(r.counts[i], [&](uint8_t b) { rec[n++] = b; });
     }
+    emit(rec, n);
     ++record_count_;
   }
 
@@ -216,6 +224,7 @@ class RunFileWriter {
     // bytes are on disk before we seek back into the header to patch the count.
     if (compress_) compressFinish();
 #endif
+    flushWBuf();
     if (std::fseek(fp_, records_offset_, SEEK_SET) != 0)
       std::fprintf(stderr, "RunFileWriter: fseek failed\n");
     else
@@ -272,14 +281,18 @@ class RunFileWriter {
   long body_start_offset_;          // file offset of the first record (post-header)
   FILE* idx_fp_ = nullptr;        // streamed .idx sidecar (no in-RAM index buffer)
   uint64_t index_count_ = 0;      // entries streamed to idx_fp_
+  std::vector<uint8_t> wbuf_;     // plain-path block buffer (lazy, kSpillBlockBytes)
+  size_t wpos_ = 0;               // bytes pending in wbuf_
   static constexpr size_t kIndexStride = 64;
 #ifdef POLY_ZSTD
   ZSTD_CStream* cctx_ = nullptr;
   std::vector<char> obuf_;        // bounded compressed-output block buffer
 #endif
 
-  // Emit body bytes: plain files fwrite + fold the FNV CRC; compressed files feed
+  // Emit body bytes: plain files buffer + fold the FNV CRC; compressed files feed
   // the zstd stream (no per-byte CRC — the frame checksum covers integrity).
+  // Plain-path bytes accumulate in wbuf_ and hit stdio one block at a time
+  // (flushWBuf), not one field at a time — see append()'s measurement note.
   void emit(const void* p, size_t n) {
 #ifdef POLY_ZSTD
     if (compress_) {
@@ -298,9 +311,26 @@ class RunFileWriter {
       return;
     }
 #endif
-    std::fwrite(p, 1, n, fp_);
+    if (wbuf_.empty()) wbuf_.resize(kSpillBlockBytes);
+    if (wpos_ + n > wbuf_.size()) flushWBuf();
+    if (n >= wbuf_.size()) {
+      // Oversized single emit (never happens for records, defensive): write direct.
+      std::fwrite(p, 1, n, fp_);
+    } else {
+      std::memcpy(wbuf_.data() + wpos_, p, n);
+      wpos_ += n;
+    }
     crc_ = fnv1a64_update(crc_, p, n);
     body_bytes_ += n;
+  }
+
+  // Flush the plain-path block buffer to stdio. Must run before any fseek on
+  // fp_ (finalize's count backpatch / CRC trailer) and before close.
+  void flushWBuf() {
+    if (wpos_) {
+      std::fwrite(wbuf_.data(), 1, wpos_, fp_);
+      wpos_ = 0;
+    }
   }
 
 #ifdef POLY_ZSTD
@@ -489,6 +519,7 @@ class RunFileReader {
     }
     std::fclose(f);
     if (std::fseek(fp_, static_cast<long>(offset), SEEK_SET) != 0) return false;
+    rpos_ = rlen_ = 0;  // drop the block buffer: its bytes predate the seek
     records_read_ = recidx;
     seeked_ = true;
     return true;
@@ -513,39 +544,85 @@ class RunFileReader {
   std::string path_;
   bool seeked_;
   bool compressed_;
+  std::vector<uint8_t> rbuf_;       // plain-path block buffer (lazy, kSpillBlockBytes)
+  size_t rpos_ = 0, rlen_ = 0;      // consumed / valid bytes in rbuf_
 #ifdef POLY_ZSTD
   ZSTD_DStream* dctx_ = nullptr;
   std::vector<char> cbuf_;          // bounded compressed-input block buffer
   ZSTD_inBuffer in_{nullptr, 0, 0}; // persists leftover compressed bytes across reads
   size_t zhint_ = 1;                // last ZSTD_decompressStream return; 0 = frame done
+  std::vector<uint8_t> dbuf_;       // decompressed-output block buffer (lazy)
+  size_t dpos_ = 0, dlen_ = 0;      // consumed / valid bytes in dbuf_
 #endif
 
-  // Read body bytes: plain files fread + fold the FNV CRC; compressed files pull
-  // decompressed bytes from the zstd stream (refilling the input block as needed).
+  // Read body bytes: plain files from a block buffer + fold the FNV CRC;
+  // compressed files from a decompressed block buffer fed by the zstd stream.
+  // Field-at-a-time fread (worst: one locked stdio call per varint BYTE) was
+  // ~60% of map-worker busy samples (results/second-wind.md); both paths now
+  // hit stdio/zstd one kSpillBlockBytes block at a time.
   bool bodyRead(void* dst, size_t n) {
 #ifdef POLY_ZSTD
     if (compressed_) {
-      ZSTD_outBuffer out{dst, n, 0};
-      while (out.pos < n) {
-        if (in_.pos == in_.size) {
-          size_t r = std::fread(cbuf_.data(), 1, cbuf_.size(), fp_);
-          in_.src = cbuf_.data(); in_.size = r; in_.pos = 0;
-          if (r == 0) return false;  // needed more but hit EOF (truncated frame)
-        }
-        zhint_ = ZSTD_decompressStream(dctx_, &out, &in_);
-        if (ZSTD_isError(zhint_)) {
-          std::fprintf(stderr, "RunFileReader: zstd decompress: %s\n",
-                       ZSTD_getErrorName(zhint_));
-          return false;
-        }
+      uint8_t* d = static_cast<uint8_t*>(dst);
+      while (n) {
+        if (dpos_ == dlen_ && !refillD()) return false;
+        size_t take = std::min(n, dlen_ - dpos_);
+        std::memcpy(d, dbuf_.data() + dpos_, take);
+        dpos_ += take; d += take; n -= take;
       }
       return true;
     }
 #endif
-    if (std::fread(dst, 1, n, fp_) != n) return false;
+    if (!rawRead(dst, n)) return false;
     crc_ = fnv1a64_update(crc_, dst, n);
     return true;
   }
+
+  // Serve n bytes from the plain-path block buffer without folding the CRC
+  // (verifyCRC uses this for the 8-byte trailer, which is not body). Refills
+  // rbuf_ with one big fread per block.
+  bool rawRead(void* dst, size_t n) {
+    uint8_t* d = static_cast<uint8_t*>(dst);
+    while (n) {
+      if (rpos_ == rlen_) {
+        if (rbuf_.empty()) rbuf_.resize(kSpillBlockBytes);
+        rlen_ = std::fread(rbuf_.data(), 1, rbuf_.size(), fp_);
+        rpos_ = 0;
+        if (rlen_ == 0) return false;  // EOF/short file
+      }
+      size_t take = std::min(n, rlen_ - rpos_);
+      std::memcpy(d, rbuf_.data() + rpos_, take);
+      rpos_ += take; d += take; n -= take;
+    }
+    return true;
+  }
+
+#ifdef POLY_ZSTD
+  // Refill the decompressed-output block buffer from the zstd stream (refilling
+  // the compressed-input block from the file as needed). Returns false if no
+  // more decompressed bytes are available (EOF/truncated frame).
+  bool refillD() {
+    if (dbuf_.empty()) dbuf_.resize(kSpillBlockBytes);
+    dpos_ = dlen_ = 0;
+    while (dlen_ == 0) {
+      if (in_.pos == in_.size) {
+        size_t r = std::fread(cbuf_.data(), 1, cbuf_.size(), fp_);
+        in_.src = cbuf_.data(); in_.size = r; in_.pos = 0;
+        if (r == 0) return false;  // needed more but hit EOF (truncated frame)
+      }
+      ZSTD_outBuffer out{dbuf_.data(), dbuf_.size(), 0};
+      zhint_ = ZSTD_decompressStream(dctx_, &out, &in_);
+      if (ZSTD_isError(zhint_)) {
+        std::fprintf(stderr, "RunFileReader: zstd decompress: %s\n",
+                     ZSTD_getErrorName(zhint_));
+        return false;
+      }
+      dlen_ = out.pos;
+      if (zhint_ == 0 && dlen_ == 0) return false;  // frame done, nothing left
+    }
+    return true;
+  }
+#endif
 
 #ifdef POLY_ZSTD
   // After the last record, consume the frame epilogue so zstd verifies the frame
@@ -622,7 +699,8 @@ class RunFileReader {
   void verifyCRC() {
     if (!fp_) return;
     uint8_t stored[8];
-    if (std::fread(stored, 1, 8, fp_) != 8) {
+    // rawRead, not fread: the trailer bytes are usually already in rbuf_.
+    if (!rawRead(stored, 8)) {
       std::fprintf(stderr, "RunFileReader: CRC missing or truncated\n");
       return;
     }
