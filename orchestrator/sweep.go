@@ -34,6 +34,7 @@ type SweepConfig struct {
 	RAM             uint64        // bytes per map_worker spill budget
 	RunDir          string        // directory for all run files
 	SpillDir        string        // directory for map_worker internal spills
+	FastMapDir      string        // optional tmpfs dir for transient map outputs (fastmap.go); "" = RunDir
 	CheckpointPath  string        // path to write/read POLYCKPT
 	CheckpointEvery time.Duration // wall cadence for checkpoints (0 = every column)
 	Rev             string        // git rev for POLYRUN headers
@@ -1226,6 +1227,16 @@ func mapPhase(
 	// measured ~75% of all worker CPU on dalby's H15/maxn30 bench.
 	inBounds := loadKeyBounds(frontier, keyLen)
 
+	// Transient map outputs: tmpfs when it comfortably fits this round's
+	// projection, else the run dir — decided fresh each round (fastmap.go).
+	mapDir := pickMapDirForRound(cfg.FastMapDir, cfg.RunDir, frontier)
+	if cfg.FastMapDir != "" && mapDir == cfg.RunDir {
+		// The interesting event is the FALLBACK: tmpfs routing is the
+		// configured intent, so silently landing on the slow path would make
+		// an unexplained slowdown undiagnosable from the log.
+		fmt.Printf("event=fastmap_fallback H=%d col=%d stage=%s\n", H, col, stage)
+	}
+
 	// Grain floor in records: don't steal a remnant smaller than StealGrain of a
 	// core's fair share (design sweet spot ≈ 0.05).  0 ⇒ stealing off.  The
 	// activeHeights dynamic gate (stealAllowed) is checked separately, per
@@ -1356,7 +1367,7 @@ func mapPhase(
 					// round's name.
 					outName = fmt.Sprintf("map_h%d_c%d_k%s_u%d.bin", H, col, stage, u.idx)
 				}
-				outPath := filepath.Join(cfg.RunDir, outName)
+				outPath := filepath.Join(mapDir, outName)
 				a := MapArgs{
 					InPaths: pruneByBounds(frontier, inBounds, u.lo, u.hi, keyLen),
 					H: H, Maxn: cfg.Maxn, Fold: cfg.Fold,

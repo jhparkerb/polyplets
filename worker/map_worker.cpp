@@ -92,7 +92,8 @@ static Run<W> readRangedRunFiles(const std::vector<std::string>& paths, int H,
 template <class W>
 static size_t writeRunFile(const Run<W>& run, const std::string& out_path,
                            int H, int keyLen, const std::string& rev) {
-  RunFileWriter<W> w(out_path, H, 0, "", "", rev, keyLen, /*write_index=*/true);
+  RunFileWriter<W> w(out_path, H, 0, "", "", rev, keyLen, /*write_index=*/true,
+                     /*compress=*/frontierZstd());
   for (const auto& r : run) w.append(r);
   return w.finalize();
 }

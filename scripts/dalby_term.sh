@@ -44,6 +44,20 @@ mkdir -p "$RUNDIR/spill" runs/ns_a${N}/perheight
 RESUME_FLAG=""
 [ "$2" = "--resume" ] && RESUME_FLAG="--resume"
 
+# Disk-IO levers (results/fanin-tax.md ladder section), opt-in via
+# FRONTIER_LEVERS=1 until a(39) validates them at production scale:
+#  - POLY_FRONTIER_ZSTD=1: block-framed zstd on map/merge outputs (~1.85x
+#    fewer bytes through the saturated NVMe mirror, measured on a(38) H20).
+#  - --fast-map-dir /dev/shm/ns_aN: transient map outputs never touch NVMe
+#    (they are ~half of all device reads+writes); per-round headroom check
+#    falls back to the run dir automatically.
+FASTMAP_FLAG=""
+if [ "${FRONTIER_LEVERS:-0}" = "1" ]; then
+  export POLY_FRONTIER_ZSTD=1
+  FASTMAP_FLAG="--fast-map-dir /dev/shm/ns_a${N}"
+  echo "frontier levers ON: POLY_FRONTIER_ZSTD=1 $FASTMAP_FLAG"
+fi
+
 # cost_profile.tsv is append-only (orchestrator/telemetry.go), so a fresh
 # (non-resume) run into a reused RUNDIR would silently mix stale rows from
 # any earlier run into this run's utilization numbers (bit us once this
@@ -82,7 +96,7 @@ echo "rev: $(git rev-parse --short HEAD)"
 T0=$(date +%s)
 ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
   --cores 80 --ram 1073741824 --overlap-heights "$N" \
-  --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" \
+  --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" $FASTMAP_FLAG \
   --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 300 $RESUME_FLAG \
   --per-height-out runs/ns_a${N}/perheight \
   --cost-profile-out "$RUNDIR/cost_profile.tsv" \

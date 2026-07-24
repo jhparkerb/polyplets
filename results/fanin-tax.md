@@ -74,6 +74,65 @@ full ns-gates (55) each step; `dalby_term.sh 26` full production-shape
 run on dalby — b-file a(1)-a(20) exact, chain a(21)/a(26) exact
 (A26_VALIDATE_PASS).
 
+## Follow-up thread: Mirror Toll (2026-07-23) — the pole saturates the NVMe mirror
+
+Live iostat during a(38)'s H20 pole: md3 (a RAID1 mirror — every byte
+written twice) pegged at **100% util, ~755MB/s writes + ~720MB/s reads
+concurrently, queue depth 120-170, w_await 17-26ms** — merge writers stall
+on the device. The since-boot average (37MB/s) hid this completely; the
+whole-run "tens of MB/s" reasoning was the same averaging mirage as the
+19.8%-utilization story. Hardware changes are off the table (jasonp), so
+two software levers, built + gated same day on branch `second-wind`:
+
+1. **Block-framed frontier zstd ("compression 2")**: map/merge outputs
+   (both previously plain; only the ~1MB internal spill was compressed)
+   get one independent zstd frame per idx stride (64 records), with .idx
+   entries pointing at frame starts — seekToKey works compressed. Whole-
+   file ratio measured 1.83x (zstd-1) / 1.86x (zstd-3) on a live a(38)
+   H20 merge file; 8KB frames give back some of that (re-measure at
+   scale). Opt-in: POLY_FRONTIER_ZSTD=1 (level via
+   POLY_FRONTIER_ZSTD_LEVEL, default 1). Go tools fail closed on
+   compressed bodies (SampleKeys idx-only, verify/runcat explicit errors).
+2. **--fast-map-dir (tmpfs map outputs)**: a map round's outputs are
+   read once by merge and deleted — ~half of ALL device reads+writes.
+   Routed to /dev/shm with a per-round statfs headroom check (2x
+   projection + 20%margin, fallback to run dir logged as
+   event=fastmap_fallback). Live shm residency at the H20 peak: ~10.5GB
+   vs 62GB /dev/shm. C++ writers now abort loudly on ANY short write
+   (writeOrDie) — an ENOSPC surprise kills the run instead of silently
+   undercounting.
+
+Combined projection: device traffic → ~25-30% of today's. Gates: full
+ns-suite green in BOTH modes (kink/worker gates now built with POLY_ZSTD —
+they previously silently skipped the compressed path), red-first
+gate_runfile block-compression tests, Go pickMapDir + fail-closed tests,
+end-to-end a(16) A/B byte-identical per-height files + b-file exact.
+
+**Three pathologies found + fixed via the gympie H15/maxn30 bench loop**
+(baseline 486s wall / 6.0k cpu-s; each step measured):
+
+| build                                | wall (s) | cpu-s  |
+|--------------------------------------|---------|--------|
+| first cut (256KB peeks, 1024-rec frames, per-open contexts) | 2283 | 19.8k |
+| + adaptive compressed-path fills (the Fan-In peek fix, replayed) | 1164 | 10.8k |
+| + frames = idx stride (64 rec: seek overshoot 63 rec, not 1023) | 1292 | 6.0k |
+| + pooled zstd contexts (mach_vm churn per open, sampled)        | **684** | **7.1k** |
+
+Residual on gympie: +41% wall / +20% cpu — gympie is CPU-starved (10
+cores, 80 workers) and pays zstd with no disk problem to solve, so this
+is the WORST case. The dalby decision needs a dalby A/B (idle cores +
+saturated mirror = opposite regime); run it between a(38) and a(39).
+Deploy plan: a(39) runs FRONTIER_LEVERS=1 (dalby_term.sh) as the at-scale
+validation against the banked a(1)-a(38) chain; flip the default after.
+
+**a(38) H20 reality check (8h in):** the pole is far heavier than the
+×2.15/height model predicted — frontier 127M records (2.8x H19's 45M
+peak), ~5.5ks/column at col 8/~39, eff_cores ~14, cpu/record ~1.6x H19's.
+The 4-8h wall prediction was wrong; measured pace points at ~30-40h
+total. Per-record cost GROWING with height is new information for the
+H21+ ladder economics (and strengthens the IO-lever case: the pole's
+eff_cores collapse is disk-stall).
+
 ## Consequences for the ladder
 
 - The buffered-IO "1.5-3x on the dalby pole" prediction in

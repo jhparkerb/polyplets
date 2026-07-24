@@ -35,13 +35,14 @@ func fnv1a64(data []byte) uint64 {
 
 // PolyrunHeader holds parsed POLYRUN file header fields.
 type PolyrunHeader struct {
-	Height  int
-	Maxn    int
-	Records uint64
-	Counter string // "u64" or "u128"
-	KeyLo   string
-	KeyHi   string
-	Rev     string
+	Height      int
+	Maxn        int
+	Records     uint64
+	Counter     string // "u64" or "u128"
+	KeyLo       string
+	KeyHi       string
+	Rev         string
+	Compression int // 0 plain, 1 single zstd frame, 2 block-framed zstd
 }
 
 // WordBytes returns the byte width of one count value.
@@ -94,6 +95,8 @@ func parsePolyrunHeader(path string) (PolyrunHeader, int64, error) {
 			hdr.KeyHi = v
 		case "rev":
 			hdr.Rev = v
+		case "compression":
+			hdr.Compression, _ = strconv.Atoi(strings.TrimSpace(v))
 		}
 	}
 	return hdr, offset, nil
@@ -230,6 +233,12 @@ func SumCountsInFile(path string) (map[int]uint64, uint64, error) {
 	hdr, bodyOff, err := parsePolyrunHeader(path)
 	if err != nil {
 		return nil, 0, err
+	}
+	// FAIL-CLOSED: a compressed body's bytes are not records — decoding them
+	// as varints yields garbage sums with no signal. This independent verifier
+	// deliberately has no zstd path; say so instead of misreading.
+	if hdr.Compression != 0 {
+		return nil, 0, fmt.Errorf("%s: compressed body (compression %d): this verifier cannot decode it — verify via the C++ readers (runcat) instead", path, hdr.Compression)
 	}
 	f, err := os.Open(path)
 	if err != nil {
@@ -403,7 +412,13 @@ func Run(cfg Config) []CheckResult {
 			continue
 		}
 
-		// CRC check
+		// CRC check. Compressed bodies carry zstd frame checksums instead of
+		// the FNV trailer — this verifier cannot check them; fail explicitly
+		// rather than compare FNV-of-zstd-bytes against frame-tail bytes.
+		if hdr.Compression != 0 {
+			results = append(results, fail("crc", fmt.Sprintf("%s: compressed body (compression %d): no FNV trailer to verify — use the C++ readers", fe.Path, hdr.Compression)))
+			continue
+		}
 		computed, err := ComputeBodyCRC(fe.Path, bodyOff)
 		if err != nil {
 			results = append(results, fail("crc", fmt.Sprintf("%s: %v", fe.Path, err)))

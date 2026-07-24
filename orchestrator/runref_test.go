@@ -332,3 +332,50 @@ func TestCheckpointNilFrontier(t *testing.T) {
 		t.Errorf("triangle[3]: got %d want 20", got.Triangle[3])
 	}
 }
+
+// TestSampleKeysCompressedBodyFailsClosed: a compressed run file with no
+// usable .idx must ERROR out of SampleKeys, never fall back to the body scan
+// — the Go side cannot decompress, and scanning zstd bytes as records would
+// sample garbage keys (silent mis-partitioning, the exact failure the D6
+// header checks exist to prevent).
+func TestSampleKeysCompressedBodyFailsClosed(t *testing.T) {
+	dir := t.TempDir()
+	path := dir + "/comp.bin"
+	f, err := os.Create(path)
+	if err != nil {
+		t.Fatalf("create: %v", err)
+	}
+	fmt.Fprintf(f, "POLYRUN 2\n")
+	fmt.Fprintf(f, "height 3\n")
+	fmt.Fprintf(f, "maxn 0\n")
+	fmt.Fprintf(f, "counter u64\n")
+	fmt.Fprintf(f, "classifier triangle\n")
+	fmt.Fprintf(f, "keylo \n")
+	fmt.Fprintf(f, "keyhi \n")
+	fmt.Fprintf(f, "records %018d\n", 128)
+	fmt.Fprintf(f, "rev test\n")
+	fmt.Fprintf(f, "byteorder 1\n")
+	fmt.Fprintf(f, "compression 2\n")
+	fmt.Fprintf(f, "\n")
+	// Body: bytes that are NOT valid records (zstd frame stand-in).
+	f.Write(make([]byte, 4096))
+	f.Close()
+	// No .idx sidecar: the index fast path is unavailable by construction.
+	if _, err := SampleKeys(path, 3, 5, 4); err == nil {
+		t.Fatalf("SampleKeys on a compressed body without .idx must fail closed, got nil error")
+	}
+
+	// A USABLE .idx with only the record-0 entry (any run under one index
+	// stride) is a legitimate "no interior cuts" answer for a compressed
+	// file: SampleKeys must return empty WITHOUT error — never body-scan,
+	// never fail a healthy tiny run (hit live: kink stage merges produce
+	// sub-64-record unit outputs constantly).
+	writeTestIdx(t, path, 5, 1, func(i int) []byte { return make([]byte, 5) })
+	cuts, err := SampleKeys(path, 3, 5, 4)
+	if err != nil {
+		t.Fatalf("SampleKeys on compressed body with 1-entry idx: want empty cuts + nil error, got err %v", err)
+	}
+	if len(cuts) != 0 {
+		t.Fatalf("want 0 cuts from a 1-entry idx, got %v", cuts)
+	}
+}

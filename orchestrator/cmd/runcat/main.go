@@ -46,6 +46,12 @@ func catFile(path string) error {
 	if err != nil {
 		return err
 	}
+	// FAIL-CLOSED: runcat decodes raw record bytes; a compressed body would be
+	// misread as garbage records rather than erroring. No Go zstd path here —
+	// say so. (C++ readers handle compressed files; see core/runfile.h.)
+	if hdr.Compression != 0 {
+		return fmt.Errorf("%s: compressed body (compression %d): runcat cannot decode it", path, hdr.Compression)
+	}
 
 	fmt.Printf("# POLYRUN run: %s\n", path)
 	fmt.Printf("# height=%d maxn=%d counter=%s classifier=triangle records=%d rev=%s\n",

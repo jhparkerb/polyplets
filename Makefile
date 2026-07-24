@@ -227,7 +227,7 @@ ns-gate-kink: build/ns/gate_kink
 	./build/ns/gate_kink
 
 build/ns/gate_kink: test/gate_kink.cpp $(NS_HEADERS) | build/ns
-	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # Kink-carry column-boundary gate (Design 14 Phase 2.2): kinkSeedStage0 +
 # kinkFinalizeColumn (core/kink_column.h) vs ground truth (unwindowed,
@@ -236,7 +236,7 @@ ns-gate-kink-column: build/ns/gate_kink_column
 	./build/ns/gate_kink_column
 
 build/ns/gate_kink_column: test/gate_kink_column.cpp $(NS_HEADERS) | build/ns
-	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # Kink-carry file-backed stage gate (Design 14 Phase 2.3): map_shard_stage_file
 # (core/kink.h) byte-matches the in-RAM map_shard_stage, both direct-write
@@ -245,7 +245,7 @@ ns-gate-kink-stage-file: build/ns/gate_kink_stage_file
 	./build/ns/gate_kink_stage_file
 
 build/ns/gate_kink_stage_file: test/gate_kink_stage_file.cpp $(NS_HEADERS) | build/ns
-	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # Kink-carry map_worker CLI gate (Design 14 Phase 2.4): drives the REAL
 # compiled map_worker binary through --kernel kink --stage seed/<r>/finalize
@@ -254,7 +254,7 @@ ns-gate-kink-worker-cli: build/ns/gate_kink_worker_cli build/ns/map_worker
 	./build/ns/gate_kink_worker_cli
 
 build/ns/gate_kink_worker_cli: test/gate_kink_worker_cli.cpp $(NS_HEADERS) | build/ns
-	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # Persistent-worker gate (Bottleneck #5): drives map_worker --persistent
 # through a full kink seed/stage/finalize chain over ONE process (stdin-fed
@@ -264,14 +264,16 @@ ns-gate-persistent-worker: build/ns/gate_persistent_worker build/ns/map_worker b
 	./build/ns/gate_persistent_worker
 
 build/ns/gate_persistent_worker: test/gate_persistent_worker.cpp $(NS_HEADERS) | build/ns
-	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
-# Run-file on-disk format gate: atomic publish, sub-CRC, header/.idx magic.
+# Run-file on-disk format gate: atomic publish, sub-CRC, header/.idx magic,
+# block-framed frontier compression (compression 2) round-trip + seek.
+# Built WITH the zstd flags so it gates the production configuration.
 ns-gate-runfile: build/ns/gate_runfile
 	./build/ns/gate_runfile
 
 build/ns/gate_runfile: test/gate_runfile.cpp $(NS_HEADERS) | build/ns
-	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
+	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # Spill-compression gate: zstd round-trip + POLYRUN 2/compression 1 header +
 # on-disk shrink; then a NO-POLY_ZSTD build must REJECT the compressed file.

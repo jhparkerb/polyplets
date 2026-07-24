@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cerrno>
 #include <csignal>
 #include <cstdio>
 #include <cstdint>
@@ -51,6 +52,24 @@
 
 inline constexpr size_t kSpillBlockBytes = 256 * 1024;
 
+// Block-framed frontier compression ("compression 2"): indexed files (map and
+// merge outputs — the frontier, ~all of a run's disk traffic) store the body as
+// INDEPENDENT zstd frames of kZstdBlockRecords records each, and every .idx
+// entry points at the enclosing frame's start. seekToKey then lands on a frame
+// boundary and decompression starts cleanly there — a single-frame body
+// ("compression 1", the unindexed internal spill path) cannot seek at all.
+//
+// Frame size = kIndexStride (64 records, ~8KB): every idx entry IS a frame
+// start, so a seeked reader's overshoot is <=63 records — identical to the
+// plain path. The first cut (1024-record frames for a better ratio) made every
+// (merge-range x input) open decompress up to 1023 overshoot records; at merge
+// fan-in scale that was GBs of pure skip work per round, measured as a 1.8x
+// merge-cpu regression on the gympie H15/maxn30 bench. The ratio cost of 8KB
+// frames is modest (sorted neighbors share key prefixes, so the redundancy
+// zstd exploits is local); the realized ratio is re-measured at scale on each
+// production run's rundir telemetry.
+inline constexpr size_t kZstdBlockRecords = 64;
+
 // First body-read fill after open/seek; rawRead doubles from here up to
 // kSpillBlockBytes so streaming readers still amortize while one-record
 // peeks (merge heap-init at fan-in scale) stay cheap.
@@ -61,6 +80,81 @@ inline int spillZstdLevel() {
   if (e && *e) { int v = std::atoi(e); if (v != 0) return v; }
   return 3;
 }
+
+// Frontier-compression opt-in: block-framed zstd on the indexed map/merge
+// outputs. OFF by default until validated at scale (the a(39) plan:
+// POLY_FRONTIER_ZSTD=1 in the run environment; flip the default only after a
+// full production run chain-validates). Distinct from internal-spill
+// compression, which is on by default and covered by POLY_NO_SPILL_ZSTD.
+inline bool frontierZstd() {
+#ifdef POLY_ZSTD
+  const char* e = std::getenv("POLY_FRONTIER_ZSTD");
+  return e && *e && std::strcmp(e, "0") != 0;
+#else
+  return false;
+#endif
+}
+
+// Frontier compression level: default 1, NOT spillZstdLevel()'s 3. Measured on
+// live a(38) H20 merge outputs: zstd-1 = 1.83x, zstd-3 = 1.86x — the ratio
+// gain is negligible while level 3 costs ~2-3x the compressor CPU, paid on
+// every map AND merge writer at frontier scale.
+inline int frontierZstdLevel() {
+  const char* e = std::getenv("POLY_FRONTIER_ZSTD_LEVEL");
+  if (e && *e) { int v = std::atoi(e); if (v != 0) return v; }
+  return 1;
+}
+
+#ifdef POLY_ZSTD
+// Thread-local zstd context pools. Creating a context allocates a multi-MB
+// workspace — an mmap-class allocation whose kernel-side cost showed up as
+// WALL (not cpu) at fan-in scale: (ranges x inputs) reader opens per round,
+// each paying mach_vm/page-fault traps on macOS's allocator (sampled:
+// mach_vm_reclaim under ZSTD_createDStream; the glibc-mmap-threshold Fan-In
+// Tax lesson replayed through zstd). Workers are single-threaded and
+// persistent, so a thread-local free list reaches steady state with zero
+// context allocation. A k-way merge holds many readers open concurrently —
+// hence a pool, not a single cached context.
+struct ZstdCtxPool {
+  std::vector<ZSTD_DStream*> d;
+  std::vector<ZSTD_CStream*> c;
+  ~ZstdCtxPool() {
+    for (auto* p : d) ZSTD_freeDStream(p);
+    for (auto* p : c) ZSTD_freeCStream(p);
+  }
+};
+inline ZstdCtxPool& zstdCtxPool() {
+  static thread_local ZstdCtxPool p;
+  return p;
+}
+inline ZSTD_DStream* acquireDStream() {
+  auto& pool = zstdCtxPool().d;
+  if (!pool.empty()) {
+    ZSTD_DStream* x = pool.back();
+    pool.pop_back();
+    ZSTD_DCtx_reset(x, ZSTD_reset_session_only);
+    return x;
+  }
+  return ZSTD_createDStream();
+}
+inline void releaseDStream(ZSTD_DStream* x) {
+  if (x) zstdCtxPool().d.push_back(x);
+}
+inline ZSTD_CStream* acquireCStream() {
+  auto& pool = zstdCtxPool().c;
+  if (!pool.empty()) {
+    ZSTD_CStream* x = pool.back();
+    pool.pop_back();
+    // Full reset: parameters (level, checksum) are re-set by each writer.
+    ZSTD_CCtx_reset(x, ZSTD_reset_session_and_parameters);
+    return x;
+  }
+  return ZSTD_createCStream();
+}
+inline void releaseCStream(ZSTD_CStream* x) {
+  if (x) zstdCtxPool().c.push_back(x);
+}
+#endif
 
 // ─── Counter name ─────────────────────────────────────────────────────────────
 
@@ -142,6 +236,11 @@ class RunFileWriter {
 #ifndef POLY_ZSTD
     compress_ = false;  // no zstd in this build: only the plain path exists
 #endif
+    // Indexed+compressed = block-framed ("compression 2"): the .idx must point
+    // at positions where decompression can start, so the body is framed per
+    // kZstdBlockRecords. Unindexed+compressed stays the single-frame spill
+    // format ("compression 1").
+    block_framed_ = compress_ && write_index_;
     // Atomic publish (B4): stream to a temp file and rename onto the final path
     // in finalize().  A kill mid-write then leaves only a stale .tmp; the real
     // path never holds a placeholder record-count or a short CRC (which a seeked
@@ -161,8 +260,9 @@ class RunFileWriter {
     }
 #ifdef POLY_ZSTD
     if (compress_) {
-      cctx_ = ZSTD_createCStream();
-      ZSTD_CCtx_setParameter(cctx_, ZSTD_c_compressionLevel, spillZstdLevel());
+      cctx_ = acquireCStream();
+      ZSTD_CCtx_setParameter(cctx_, ZSTD_c_compressionLevel,
+                             block_framed_ ? frontierZstdLevel() : spillZstdLevel());
       ZSTD_CCtx_setParameter(cctx_, ZSTD_c_checksumFlag, 1);
       obuf_.resize(kSpillBlockBytes);
     }
@@ -178,7 +278,7 @@ class RunFileWriter {
     }
     if (idx_fp_) std::fclose(idx_fp_);
 #ifdef POLY_ZSTD
-    if (cctx_) ZSTD_freeCStream(cctx_);
+    if (cctx_) releaseCStream(cctx_);
 #endif
   }
 
@@ -187,15 +287,31 @@ class RunFileWriter {
 
   void append(const RunRecord<W>& r) {
     if (!fp_) return;
+#ifdef POLY_ZSTD
+    // Block framing: end the open frame and start a new one every
+    // kZstdBlockRecords records. Must run BEFORE the index entry below so the
+    // entry records the new frame's start, not a mid-frame position.
+    if (block_framed_ && (record_count_ % kZstdBlockRecords) == 0) {
+      if (record_count_ > 0) compressEndFrame();
+      frame_offset_ = static_cast<uint64_t>(std::ftell(fp_));
+      frame_recidx_ = record_count_;
+    }
+#endif
     // Sparse seek index: record (key, file-offset, record-index) every stride
     // records, so the merge can seek to a key range instead of scanning to it.
+    // Block-framed files store the enclosing FRAME's start offset and first
+    // record index — the only positions a zstd body can start decoding from;
+    // the seeked reader then skips the in-frame overshoot exactly as the plain
+    // path skips its in-stride overshoot.
     if (idx_fp_ && (record_count_ % kIndexStride) == 0) {
       // Stream one index entry straight to the .idx sidecar — no in-RAM buffer.
-      uint64_t offset = static_cast<uint64_t>(body_start_offset_) + body_bytes_;
-      uint64_t recidx = record_count_;
-      std::fwrite(r.sig.b, 1, static_cast<size_t>(keyLen_), idx_fp_);
-      std::fwrite(&offset, sizeof(offset), 1, idx_fp_);
-      std::fwrite(&recidx, sizeof(recidx), 1, idx_fp_);
+      uint64_t offset = block_framed_
+          ? frame_offset_
+          : static_cast<uint64_t>(body_start_offset_) + body_bytes_;
+      uint64_t recidx = block_framed_ ? frame_recidx_ : record_count_;
+      writeOrDie(r.sig.b, static_cast<size_t>(keyLen_), idx_fp_);
+      writeOrDie(&offset, sizeof(offset), idx_fp_);
+      writeOrDie(&recidx, sizeof(recidx), idx_fp_);
       ++index_count_;
     }
     // Assemble the whole record in a stack buffer and emit ONCE. Field-at-a-time
@@ -283,6 +399,9 @@ class RunFileWriter {
   std::string tmp_path_;
   bool write_index_;
   bool compress_;
+  bool block_framed_ = false;     // compression 2: one zstd frame per block
+  uint64_t frame_offset_ = 0;     // file offset of the open frame's start
+  uint64_t frame_recidx_ = 0;     // record index of the open frame's first record
   long body_start_offset_;          // file offset of the first record (post-header)
   FILE* idx_fp_ = nullptr;        // streamed .idx sidecar (no in-RAM index buffer)
   uint64_t index_count_ = 0;      // entries streamed to idx_fp_
@@ -293,6 +412,20 @@ class RunFileWriter {
   ZSTD_CStream* cctx_ = nullptr;
   std::vector<char> obuf_;        // bounded compressed-output block buffer
 #endif
+
+  // FAIL-CLOSED writes: an unchecked short fwrite (ENOSPC, quota, I/O error)
+  // silently truncates the body; finalize() would then publish a plausible
+  // file whose records vanish with no signal — the same undercount shape the
+  // fail-closed open guard exists for. Runs near a disk-headroom gate (H21+)
+  // and /dev/shm-routed map outputs make this a real, reachable state, so any
+  // failed write aborts loudly instead.
+  void writeOrDie(const void* p, size_t n, FILE* f) {
+    if (n && std::fwrite(p, 1, n, f) != n) {
+      std::fprintf(stderr, "RunFileWriter: write failed (%s) for %s\n",
+                   std::strerror(errno), path_.c_str());
+      std::exit(1);
+    }
+  }
 
   // Emit body bytes: plain files buffer + fold the FNV CRC; compressed files feed
   // the zstd stream (no per-byte CRC — the frame checksum covers integrity).
@@ -310,7 +443,7 @@ class RunFileWriter {
                        ZSTD_getErrorName(r));
           return;
         }
-        if (out.pos) std::fwrite(obuf_.data(), 1, out.pos, fp_);
+        if (out.pos) writeOrDie(obuf_.data(), out.pos, fp_);
       }
       body_bytes_ += n;
       return;
@@ -320,7 +453,7 @@ class RunFileWriter {
     if (wpos_ + n > wbuf_.size()) flushWBuf();
     if (n >= wbuf_.size()) {
       // Oversized single emit (never happens for records, defensive): write direct.
-      std::fwrite(p, 1, n, fp_);
+      writeOrDie(p, n, fp_);
     } else {
       std::memcpy(wbuf_.data() + wpos_, p, n);
       wpos_ += n;
@@ -333,14 +466,17 @@ class RunFileWriter {
   // fp_ (finalize's count backpatch / CRC trailer) and before close.
   void flushWBuf() {
     if (wpos_) {
-      std::fwrite(wbuf_.data(), 1, wpos_, fp_);
+      writeOrDie(wbuf_.data(), wpos_, fp_);
       wpos_ = 0;
     }
   }
 
 #ifdef POLY_ZSTD
-  // Flush the zstd frame to completion (writes any buffered output + checksum).
-  void compressFinish() {
+  // End the open zstd frame (writes buffered output + the frame checksum) and
+  // leave cctx_ ready to start the next frame — the block-framing rollover.
+  // After ZSTD_e_end returns 0 the stream context begins a fresh frame on the
+  // next ZSTD_e_continue call; parameters (level, checksum) persist.
+  void compressEndFrame() {
     if (!cctx_) return;
     ZSTD_inBuffer in{nullptr, 0, 0};
     size_t rem;
@@ -352,9 +488,18 @@ class RunFileWriter {
                      ZSTD_getErrorName(rem));
         break;
       }
-      if (out.pos) std::fwrite(obuf_.data(), 1, out.pos, fp_);
+      if (out.pos) writeOrDie(obuf_.data(), out.pos, fp_);
     } while (rem != 0);
-    ZSTD_freeCStream(cctx_);
+    // No fflush here: ftell(fp_) — the next frame's .idx offset — is exact on
+    // a buffered write stream, and flushing per ~8KB frame would turn every
+    // frame into a write syscall.
+  }
+
+  // Flush the final zstd frame and retire the compression context (finalize).
+  void compressFinish() {
+    if (!cctx_) return;
+    compressEndFrame();
+    releaseCStream(cctx_);
     cctx_ = nullptr;
   }
 #endif
@@ -396,7 +541,7 @@ class RunFileWriter {
     std::fprintf(fp_, "records 000000000000000000\n");
     std::fprintf(fp_, "rev %s\n", rev.empty() ? "unknown" : rev.c_str());
     std::fprintf(fp_, "byteorder 1\n");
-    if (compress_) std::fprintf(fp_, "compression 1\n");
+    if (compress_) std::fprintf(fp_, "compression %d\n", block_framed_ ? 2 : 1);
     std::fprintf(fp_, "\n");
     std::fflush(fp_);
     body_start_offset_ = std::ftell(fp_);
@@ -436,7 +581,7 @@ class RunFileReader {
   ~RunFileReader() {
     if (fp_) std::fclose(fp_);
 #ifdef POLY_ZSTD
-    if (dctx_) ZSTD_freeDStream(dctx_);
+    if (dctx_) releaseDStream(dctx_);
 #endif
   }
 
@@ -533,9 +678,26 @@ class RunFileReader {
       std::fclose(f); return false;
     }
     std::fclose(f);
+#ifdef POLY_ZSTD
+    // Compressed bodies: only block-framed files are seekable (their .idx
+    // offsets are frame starts). Single-frame spill files never carry an .idx,
+    // so this guard is unreachable in practice — belt and braces.
+    if (compressed_ && !block_framed_) return false;
+#endif
     if (std::fseek(fp_, static_cast<long>(offset), SEEK_SET) != 0) return false;
     rpos_ = rlen_ = 0;  // drop the block buffer: its bytes predate the seek
     next_fill_ = kFirstFillBytes;  // post-seek reads are peek-sized until proven streaming
+#ifdef POLY_ZSTD
+    if (compressed_) {
+      // The seek target is a frame start: reset the stream session and drop
+      // buffered compressed/decompressed bytes — they predate the seek.
+      ZSTD_DCtx_reset(dctx_, ZSTD_reset_session_only);
+      in_.size = in_.pos = 0;
+      dpos_ = dlen_ = 0;
+      zhint_ = 1;
+      zin_fill_ = zout_fill_ = kFirstFillBytes;  // post-seek reads are peeks
+    }
+#endif
     records_read_ = recidx;
     seeked_ = true;
     return true;
@@ -560,16 +722,19 @@ class RunFileReader {
   std::string path_;
   bool seeked_;
   bool compressed_;
+  bool block_framed_ = false;       // compression 2: independent frames, seekable
   std::vector<uint8_t> rbuf_;       // plain-path block buffer (lazy, kSpillBlockBytes)
   size_t rpos_ = 0, rlen_ = 0;      // consumed / valid bytes in rbuf_
   size_t next_fill_ = kFirstFillBytes;  // adaptive fill size, doubles to kSpillBlockBytes
 #ifdef POLY_ZSTD
   ZSTD_DStream* dctx_ = nullptr;
-  std::vector<char> cbuf_;          // bounded compressed-input block buffer
+  std::vector<char> cbuf_;          // bounded compressed-input block buffer (adaptive)
   ZSTD_inBuffer in_{nullptr, 0, 0}; // persists leftover compressed bytes across reads
   size_t zhint_ = 1;                // last ZSTD_decompressStream return; 0 = frame done
-  std::vector<uint8_t> dbuf_;       // decompressed-output block buffer (lazy)
+  std::vector<uint8_t> dbuf_;       // decompressed-output block buffer (adaptive)
   size_t dpos_ = 0, dlen_ = 0;      // consumed / valid bytes in dbuf_
+  size_t zin_fill_ = kFirstFillBytes;   // adaptive compressed-input fill size
+  size_t zout_fill_ = kFirstFillBytes;  // adaptive decompressed-output size
 #endif
 
   // Read body bytes: plain files from a block buffer + fold the FNV CRC;
@@ -630,16 +795,29 @@ class RunFileReader {
   // Refill the decompressed-output block buffer from the zstd stream (refilling
   // the compressed-input block from the file as needed). Returns false if no
   // more decompressed bytes are available (EOF/truncated frame).
+  // BOTH buffers fill adaptively (kFirstFillBytes doubling to
+  // kSpillBlockBytes, reset on open/seek) for the same reason as rawRead's
+  // plain path: a merge heap-init peek is (ranges x inputs) reader opens per
+  // round, and a fixed 256KB read+decompress per open re-created the Fan-In
+  // Tax through the compressed path — measured 4.7x wall on the gympie
+  // H15/maxn30 bench before this fix.
   bool refillD() {
-    if (dbuf_.empty()) dbuf_.resize(kSpillBlockBytes);
+    const size_t dwant = std::min(zout_fill_, kSpillBlockBytes);
+    if (dbuf_.size() < dwant) dbuf_.resize(dwant);
+    zout_fill_ = std::min(zout_fill_ * 2, kSpillBlockBytes);
     dpos_ = dlen_ = 0;
     while (dlen_ == 0) {
       if (in_.pos == in_.size) {
-        size_t r = std::fread(cbuf_.data(), 1, cbuf_.size(), fp_);
+        // Safe to resize here: in_ is fully consumed, so no live pointers
+        // into cbuf_ survive the (possible) reallocation.
+        const size_t want = std::min(zin_fill_, kSpillBlockBytes);
+        if (cbuf_.size() < want) cbuf_.resize(want);
+        zin_fill_ = std::min(zin_fill_ * 2, kSpillBlockBytes);
+        size_t r = std::fread(cbuf_.data(), 1, want, fp_);
         in_.src = cbuf_.data(); in_.size = r; in_.pos = 0;
         if (r == 0) return false;  // needed more but hit EOF (truncated frame)
       }
-      ZSTD_outBuffer out{dbuf_.data(), dbuf_.size(), 0};
+      ZSTD_outBuffer out{dbuf_.data(), dwant, 0};
       zhint_ = ZSTD_decompressStream(dctx_, &out, &in_);
       if (ZSTD_isError(zhint_)) {
         std::fprintf(stderr, "RunFileReader: zstd decompress: %s\n",
@@ -647,7 +825,12 @@ class RunFileReader {
         return false;
       }
       dlen_ = out.pos;
-      if (zhint_ == 0 && dlen_ == 0) return false;  // frame done, nothing left
+      // Frame end with no output: a single-frame body is done (EOF for the
+      // caller), but a block-framed body may have the NEXT frame right behind
+      // it — loop on: leftover in_ bytes (or the next file read) feed the new
+      // frame, and ZSTD_decompressStream starts it in place. Termination is
+      // still the fread()==0 EOF above; next() never asks past records_.
+      if (zhint_ == 0 && dlen_ == 0 && !block_framed_) return false;
     }
     return true;
   }
@@ -664,6 +847,7 @@ class RunFileReader {
     char scratch[16];
     while (zhint_ != 0) {
       if (in_.pos == in_.size) {
+        if (cbuf_.empty()) cbuf_.resize(kFirstFillBytes);
         size_t r = std::fread(cbuf_.data(), 1, cbuf_.size(), fp_);
         in_.src = cbuf_.data(); in_.size = r; in_.pos = 0;
         if (r == 0) break;
@@ -694,9 +878,21 @@ class RunFileReader {
       if (std::strncmp(line, "POLYRUN ", 8) == 0) {
         saw_polyrun = true;
       }
-      else if (std::strncmp(line, "compression ", 12) == 0)
-        // Absent = 0 (plain, old files). 1 = zstd frame body.
-        compressed_ = (std::atoi(line + 12) == 1);
+      else if (std::strncmp(line, "compression ", 12) == 0) {
+        // Absent = 0 (plain, old files). 1 = single zstd frame (unindexed
+        // spill). 2 = block-framed zstd (indexed frontier; .idx offsets are
+        // frame starts). Anything else is from a newer format: REJECT rather
+        // than misread the body as plain bytes.
+        int cv = std::atoi(line + 12);
+        compressed_   = (cv >= 1);
+        block_framed_ = (cv == 2);
+        if (cv < 0 || cv > 2) {
+          std::fprintf(stderr,
+                       "RunFileReader: %s has unknown compression %d "
+                       "(newer format? rebuild required)\n", path_.c_str(), cv);
+          return false;
+        }
+      }
       else if (std::strncmp(line, "records ", 8) == 0)
         records_ = static_cast<size_t>(std::strtoull(line + 8, nullptr, 10));
       else if (std::strncmp(line, "byteorder ", 10) == 0)
@@ -711,10 +907,10 @@ class RunFileReader {
     }
     if (compressed_) {
 #ifdef POLY_ZSTD
-      dctx_ = ZSTD_createDStream();
-      ZSTD_initDStream(dctx_);
-      cbuf_.resize(kSpillBlockBytes);
-      in_ = ZSTD_inBuffer{cbuf_.data(), 0, 0};
+      dctx_ = acquireDStream();
+      // cbuf_ stays empty here: refillD sizes it adaptively from
+      // kFirstFillBytes so a one-record peek never pays a 256KB alloc+read.
+      in_ = ZSTD_inBuffer{nullptr, 0, 0};
 #else
       std::fprintf(stderr,
                    "RunFileReader: %s is zstd-compressed but this build lacks "
@@ -824,7 +1020,8 @@ std::pair<size_t, size_t> mergeRunFiles(
       heap.push(std::move(c));
   }
 
-  RunFileWriter<W> writer(out_path, H, 0, lo_hex, hi_hex, rev, keyLen);
+  RunFileWriter<W> writer(out_path, H, 0, lo_hex, hi_hex, rev, keyLen,
+                          /*write_index=*/true, /*compress=*/frontierZstd());
 
 #ifdef POLY_PROFILE
   // Split the merge into read+heap (memcmp), combine, and write (FNV+fwrite).

@@ -2,8 +2,10 @@ package verify
 
 import (
 	"encoding/binary"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -78,4 +80,22 @@ func TestVerifyCRCDetectsCorruptBody(t *testing.T) {
 		t.Fatal(err)
 	}
 	check(false) // corruption detected
+}
+
+// A compressed POLYRUN body (compression 1/2) has no FNV trailer and its
+// records are not raw bytes: both body readers must fail with a clear
+// compression error, never misread zstd bytes as records/CRC.
+func TestCompressedBodyFailsClosed(t *testing.T) {
+	dir := t.TempDir()
+	path := dir + "/comp.bin"
+	f, err := os.Create(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Fprintf(f, "POLYRUN 2\nheight 3\nmaxn 8\ncounter u64\nclassifier triangle\nkeylo \nkeyhi \nrecords %018d\nrev test\nbyteorder 1\ncompression 2\n\n", 64)
+	f.Write(make([]byte, 1024))
+	f.Close()
+	if _, _, err := SumCountsInFile(path); err == nil || !strings.Contains(err.Error(), "compress") {
+		t.Fatalf("SumCountsInFile on compressed body: want compression error, got %v", err)
+	}
 }

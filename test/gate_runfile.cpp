@@ -297,6 +297,125 @@ static void testMergeStopResumeMatchesUninterrupted() {
   std::remove(part2.c_str()); std::remove((part2 + ".idx").c_str());
 }
 
+// Frontier block-zstd ("compression 2"): an indexed+compressed file stores the
+// body as INDEPENDENT zstd frames, one per kZstdBlockRecords records, and its
+// .idx offsets point at frame starts — so seekToKey works on compressed
+// frontier files (the whole point; a single-frame body is unseekable).
+static void testBlockCompressedRoundTripAndSeek() {
+#ifdef POLY_ZSTD
+  const std::string path = "/tmp/gate_runfile_blockz.bin";
+  std::remove(path.c_str());
+  std::remove((path + ".idx").c_str());
+  const int N = 5000;  // several full frames + a partial tail frame
+  {
+    RunFileWriter<u64> w(path, 3, 8, "", "", "test", 0, /*write_index=*/true,
+                         /*compress=*/true);
+    assert(w.ok());
+    appendN(w, N);
+    w.finalize();
+  }
+  {
+    auto b = readAll(path);
+    std::string s(b.begin(), b.end());
+    assert(s.find("compression 2\n") != std::string::npos &&
+           "indexed+compressed file must declare block framing (compression 2)");
+  }
+  // Full sequential read across every frame boundary.
+  {
+    RunFileReader<u64> r(path, 3);
+    assert(r.ok() && r.records() == static_cast<size_t>(N));
+    RunRecord<u64> rec;
+    int i = 0;
+    while (r.next(rec)) {
+      assert(rec.sig.b[0] == static_cast<uint8_t>(i / 256) &&
+             rec.sig.b[1] == static_cast<uint8_t>(i % 256) &&
+             "block-compressed sequential read out of order");
+      assert(rec.counts.size() == 1 && rec.counts[0] == static_cast<u64>(i + 1));
+      ++i;
+    }
+    assert(i == N && "block-compressed sequential read lost records");
+  }
+  // Seek to keys landing in different frames, at and off stride boundaries.
+  for (int target : {0, 63, 64, 700, 1024, 1500, 3000, 4999}) {
+    RunFileReader<u64> r(path, 3);
+    assert(r.ok());
+    uint8_t klo[SIGMAX] = {};
+    klo[0] = static_cast<uint8_t>(target / 256);
+    klo[1] = static_cast<uint8_t>(target % 256);
+    assert(r.seekToKey(klo) && "seekToKey must succeed on a block-compressed file");
+    RunRecord<u64> rec;
+    bool found = false;
+    while (r.next(rec)) {
+      int got = rec.sig.b[0] * 256 + rec.sig.b[1];
+      if (got == target) {
+        found = true;
+        assert(rec.counts[0] == static_cast<u64>(target + 1) &&
+               "seeked read returned wrong record payload");
+        break;
+      }
+      assert(got < target && "seek overshot the target key");
+    }
+    assert(found && "seeked read never reached the target key");
+  }
+  std::remove(path.c_str());
+  std::remove((path + ".idx").c_str());
+#endif
+}
+
+// Compressed inputs must merge correctly (mergeRunFiles seeks + streams them),
+// and a mixed plain/compressed input set must behave identically to all-plain.
+static void testMergeWithBlockCompressedInputs() {
+#ifdef POLY_ZSTD
+  const std::string inz = "/tmp/gate_runfile_mz_in1.bin";
+  const std::string inp = "/tmp/gate_runfile_mz_in2.bin";
+  const std::string out = "/tmp/gate_runfile_mz_out.bin";
+  std::remove(inz.c_str()); std::remove((inz + ".idx").c_str());
+  std::remove(inp.c_str()); std::remove((inp + ".idx").c_str());
+  std::remove(out.c_str()); std::remove((out + ".idx").c_str());
+  {
+    RunFileWriter<u64> w(inz, 3, 8, "", "", "test", 0, true, /*compress=*/true);
+    appendN(w, 3000);
+    w.finalize();
+  }
+  writeRun(inp, 3, 3000);  // plain twin, same keys
+  auto [bytes, recs] = mergeRunFiles<u64>({inz, inp}, 3, "", "", out, "test");
+  (void)bytes;
+  assert(recs == 3000 && "merge of compressed+plain twins must combine keys");
+  RunFileReader<u64> r(out, 3);
+  RunRecord<u64> rec;
+  int i = 0;
+  while (r.next(rec)) {
+    assert(rec.counts.size() == 1 && rec.counts[0] == 2 * static_cast<u64>(i + 1) &&
+           "merged counts must sum the compressed and plain twins");
+    ++i;
+  }
+  assert(i == 3000);
+  std::remove(inz.c_str()); std::remove((inz + ".idx").c_str());
+  std::remove(inp.c_str()); std::remove((inp + ".idx").c_str());
+  std::remove(out.c_str()); std::remove((out + ".idx").c_str());
+#endif
+}
+
+// Fail-closed on formats from the future: a compression value this build does
+// not understand must reject the file, never misread it as plain.
+static void testHeaderRejectsUnknownCompression() {
+#ifdef POLY_ZSTD
+  const std::string path = "/tmp/gate_runfile_zver.bin";
+  std::remove(path.c_str());
+  std::remove((path + ".idx").c_str());
+  {
+    RunFileWriter<u64> w(path, 3, 8, "", "", "test", 0, true, /*compress=*/true);
+    appendN(w, 10);
+    w.finalize();
+  }
+  tamper(path, "compression 2", "compression 3");
+  RunFileReader<u64> r(path, 3);
+  assert(!r.ok() && "reader accepted an unknown compression value");
+  std::remove(path.c_str());
+  std::remove((path + ".idx").c_str());
+#endif
+}
+
 int main() {
   testAtomicPublish();
   testIndexHasMagic();
@@ -307,5 +426,8 @@ int main() {
   testWriterOpenFailureAborts();
   testMergeReaderOpenFailureAborts();
   testMergeStopResumeMatchesUninterrupted();
+  testBlockCompressedRoundTripAndSeek();
+  testMergeWithBlockCompressedInputs();
+  testHeaderRejectsUnknownCompression();
   std::puts("gate_runfile PASS");
 }

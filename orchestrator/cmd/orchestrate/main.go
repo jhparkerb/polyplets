@@ -59,6 +59,7 @@ func main() {
 	counter := flag.String("counter", "u64", "counter width: u64 or u128")
 	runDir := flag.String("run-dir", "", "directory for run files (default: auto in /tmp)")
 	spillDir := flag.String("spill-dir", "", "directory for map_worker internal spills")
+	fastMapDir := flag.String("fast-map-dir", "", "optional tmpfs dir (e.g. /dev/shm/<run>) for transient map outputs; falls back to run-dir per round when it lacks headroom")
 	ckptPath := flag.String("checkpoint", "", "checkpoint path (default: <run-dir>/POLYCKPT)")
 	ckptEvery := flag.Float64("checkpoint-every", 30, "checkpoint interval in seconds (0=every column)")
 	resume := flag.Bool("resume", false, "resume from checkpoint")
@@ -118,6 +119,22 @@ func main() {
 		fmt.Fprintf(os.Stderr, "orchestrate: mkdir %s: %v\n", *spillDir, err)
 		os.Exit(1)
 	}
+	if *fastMapDir != "" {
+		if err := os.MkdirAll(*fastMapDir, 0o777); err != nil {
+			fmt.Fprintf(os.Stderr, "orchestrate: mkdir %s: %v\n", *fastMapDir, err)
+			os.Exit(1)
+		}
+		// Stale transient outputs from a previous crashed run in the same
+		// tmpfs dir would leak RAM-backed pages for the whole run: sweep them.
+		// Map outputs are recomputed on resume, so this is always safe.
+		stale, _ := filepath.Glob(filepath.Join(*fastMapDir, "map_*.bin*"))
+		for _, p := range stale {
+			os.Remove(p)
+		}
+		if len(stale) > 0 {
+			fmt.Fprintf(os.Stderr, "orchestrate: cleared %d stale map outputs from %s\n", len(stale), *fastMapDir)
+		}
+	}
 
 	// Worker binaries.
 	bin := orchestrator.WorkerBin{}
@@ -144,6 +161,7 @@ func main() {
 		CounterWidth:    *counter,
 		RunDir:          *runDir,
 		SpillDir:        *spillDir,
+		FastMapDir:      *fastMapDir,
 		CheckpointPath:  *ckptPath,
 		CheckpointEvery: time.Duration(float64(time.Second) * *ckptEvery),
 		Rev:             rev,

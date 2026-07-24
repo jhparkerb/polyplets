@@ -20,13 +20,14 @@ type RunRef struct {
 
 // PolyrunHeader holds parsed POLYRUN file header fields.
 type PolyrunHeader struct {
-	Height  int
-	Maxn    int
-	Records uint64
-	Counter string // "u64" or "u128"
-	KeyLo   string
-	KeyHi   string
-	Rev     string
+	Height      int
+	Maxn        int
+	Records     uint64
+	Counter     string // "u64" or "u128"
+	KeyLo       string
+	KeyHi       string
+	Rev         string
+	Compression int // 0 plain, 1 single zstd frame, 2 block-framed zstd
 }
 
 // WordBytes returns the byte width of one count value (8 for u64, 16 for u128).
@@ -94,6 +95,8 @@ func ParseHeader(path string) (PolyrunHeader, int64, error) {
 			hdr.KeyHi = v
 		case "rev":
 			hdr.Rev = v
+		case "compression":
+			hdr.Compression, _ = strconv.Atoi(strings.TrimSpace(v))
 		}
 	}
 	return hdr, offset, nil
@@ -121,8 +124,23 @@ func SampleKeys(path string, H, keyLen, numCuts int) ([]string, error) {
 	if hdr.Records == 0 || hdr.Height != H {
 		return nil, nil
 	}
-	if cuts, err := sampleIndexKeys(path+".idx", keyLen, numCuts); err == nil && len(cuts) > 0 {
+	cuts, idxErr := sampleIndexKeys(path+".idx", keyLen, numCuts)
+	if idxErr == nil && len(cuts) > 0 {
 		return cuts, nil
+	}
+	// Compressed bodies cannot be body-scanned: zstd bytes read as records
+	// would silently mis-partition the round. Two distinct cases here:
+	//  - idx parsed fine but yielded nothing interior (any run under one
+	//    index stride — kink stage merges produce these constantly): that IS
+	//    the answer, return it without error;
+	//  - idx missing/corrupt: FAIL-CLOSED — compressed frontier files always
+	//    publish an .idx (RunFileWriter writes one for every indexed file
+	//    with records), so this means the sidecar is gone, not the run tiny.
+	if hdr.Compression != 0 {
+		if idxErr == nil {
+			return cuts, nil
+		}
+		return nil, fmt.Errorf("SampleKeys %s: compressed body (compression %d) with no usable .idx (%v) — cannot body-scan", path, hdr.Compression, idxErr)
 	}
 	return sampleBodyKeys(path, bodyOff, keyLen, int(hdr.Records), numCuts)
 }

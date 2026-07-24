@@ -518,7 +518,8 @@ std::pair<size_t, size_t> map_shard_file(
   if (spill_files.empty() && !std::getenv("POLY_NO_FASTPATH")) {
     sortRun(buf);
     deduplicateRun(buf);
-    RunFileWriter<W> ow(out_path, H, 0, "", "", rev, keyLen, /*write_index=*/true);
+    RunFileWriter<W> ow(out_path, H, 0, "", "", rev, keyLen, /*write_index=*/true,
+                        /*compress=*/frontierZstd());
     for (const auto& r : buf) ow.append(r);
     ow.finalize();
     out_recs = buf.size();
