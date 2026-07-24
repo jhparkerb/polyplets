@@ -52,9 +52,10 @@ int main(int argc, char** argv) {
     const std::string out = in + ".reframe.tmp";
     pid_t pid = fork();
     if (pid == 0) {
-      setenv("POLY_FRONTIER_ZSTD_BLOCK", std::to_string(fs).c_str(), 1);
+      // fs == 0: plain (uncompressed) rewrite — the absolute baseline.
+      setenv("POLY_FRONTIER_ZSTD_BLOCK", std::to_string(fs > 0 ? fs : 64).c_str(), 1);
       RunFileWriter<u128> w(out, H, 0, "", "", "reframe", keyLen,
-                            /*write_index=*/true, /*compress=*/true);
+                            /*write_index=*/true, /*compress=*/fs > 0);
       for (const auto& r : recs) w.append(r);
       w.finalize();
       _exit(0);
