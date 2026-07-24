@@ -59,24 +59,24 @@ inline constexpr size_t kSpillBlockBytes = 256 * 1024;
 // boundary and decompression starts cleanly there — a single-frame body
 // ("compression 1", the unindexed internal spill path) cannot seek at all.
 //
-// Frame size in RECORDS (env POLY_FRONTIER_ZSTD_BLOCK, default 64 =
-// kIndexStride). WRITER-SIDE ONLY: readers decompress whatever frames they
-// find and idx entries always point at the containing frame's start, so any
-// mix of frame sizes coexists (a default change never invalidates existing
-// files). The tradeoff, both ends measured:
-//  - 1024-record frames: whole-file-grade ratio (~1.8x) but every
-//    (merge-range x input) seeked open decompresses up to 1023 overshoot
-//    records — at fan-in scale a 1.8x merge-cpu regression (gympie bench).
-//  - 64-record (~8KB) frames: overshoot matches the plain path (<=63
-//    records) but the tiny window loses the redundancy — ~1.08x realized on
-//    live a(39) H20 data (130B/record vs ~141 plain).
-// The sweet spot is measured by experiments/reframe_measure.cpp on real
-// frontier files; adjust the default only with that curve in hand.
+// Frame size in RECORDS (env POLY_FRONTIER_ZSTD_BLOCK, default 256).
+// WRITER-SIDE ONLY: readers decompress whatever frames they find and idx
+// entries always point at the containing frame's start, so any mix of frame
+// sizes coexists (a default change never invalidates existing files).
+// The curve is U-shaped, both ends measured (results/fanin-tax.md):
+//  - ratio on identical live a(39) H20 records (plain 158.8 B/rec):
+//    64 -> 1.45x, 256 -> 1.72x, 512 -> 1.78x, 1024 -> 1.81x
+//    (experiments/reframe_measure.cpp);
+//  - gympie H15/maxn30 bench (plain 486s/6.0k cpu-s):
+//    64 -> 684s/7.1k, 256 -> 576s/6.9k, 512 -> 778s/8.5k.
+//    Below ~256, per-frame overhead (decompressBegin + checksum epilogue)
+//    dominates; above it, (merge-range x input) seek-overshoot decompression
+//    does. 256 dominates 64 on BOTH metrics — hence the default.
 inline size_t frontierZstdBlockRecords() {
   static const size_t v = [] {
     const char* e = std::getenv("POLY_FRONTIER_ZSTD_BLOCK");
     if (e && *e) { long n = std::atol(e); if (n > 0) return (size_t)n; }
-    return (size_t)64;
+    return (size_t)256;
   }();
   return v;
 }

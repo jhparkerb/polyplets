@@ -125,6 +125,32 @@ saturated mirror = opposite regime); run it between a(38) and a(39).
 Deploy plan: a(39) runs FRONTIER_LEVERS=1 (dalby_term.sh) as the at-scale
 validation against the banked a(1)-a(38) chain; flip the default after.
 
+**Frame-size sweet spot (2026-07-24, measured mid-a(39)):** the ratio-vs-
+frame-size curve on IDENTICAL live a(39) H20 records (5.72M records,
+plain = 158.8 B/rec; experiments/reframe_measure.cpp, frame size is the
+env knob POLY_FRONTIER_ZSTD_BLOCK, writer-side only):
+
+| frames (records) | B/rec | ratio | gympie bench wall/cpu |
+|---|---|---|---|
+| plain | 158.8 | 1.00x | 486s / 6.0k |
+| 64    | 109.8 | 1.45x | 684s / 7.1k |
+| **256** | **92.1** | **1.72x** | **576s / 6.9k** |
+| 512   | 89.0  | 1.78x | 778s / 8.5k |
+| 1024  | 87.5  | 1.81x | (1.8x merge-cpu, killed earlier) |
+
+U-shaped: below ~256 records per-frame overhead dominates; above,
+seek-overshoot x fan-in does. 256 dominates 64 on BOTH metrics →
+DEFAULT flipped to 256 (a(39) itself ran on 64 = 1.45x; scale its
+measured peak by 1.72/1.45 for the H21 projection). Earlier "~1.08x
+realized" note was a cross-stage comparison error — same-records
+measurement supersedes it.
+
+**Dalby A/B (2026-07-24, 64-frame config):** bench 105.6s/3.9k →
+119.3s/5.1k levers-on (+13% wall, the no-disk-benefit regime).
+**Production pole win: a(39) H20 columns ~3,500-3,600s vs a(38)'s
+~5,400-5,600s at the same 127-128M frontier = 1.5x** — the fastmap
+(tmpfs map outputs) + compressed merge traffic in combination.
+
 **a(38) H20 reality check (8h in):** the pole is far heavier than the
 ×2.15/height model predicted — frontier 127M records (2.8x H19's 45M
 peak), ~5.5ks/column at col 8/~39, eff_cores ~14, cpu/record ~1.6x H19's.
