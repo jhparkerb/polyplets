@@ -28,8 +28,17 @@
   fit point in hand. One box did all heights one term higher in ~the time
   a(36) needed two boxes in parallel.
   **a(38) live on dalby since 2026-07-23 ~16:2x EDT** (tmux 0:a38,
-  orchestrate PID 2012309, rev 8ce1bc5c, runs/ns_a38/, du monitor 0:a38du;
-  predicted 4-8h wall, disk peak ~160-170GB vs 281GB free).
+  orchestrate PID 2012309, rev 8ce1bc5c, runs/ns_a38/, du monitor 0:a38du).
+  **Revised ETA (measured at 8h in): ~30-40h total, NOT the predicted
+  4-8h** — H20 frontier is 127M records (2.8x H19's peak, above the
+  x2.15 model) at ~5.5ks/column, col 8/~39, eff_cores ~14 (disk-stall;
+  the mirror is measured-saturated). Disk peak so far 174GB, fits.
+  **Mirror Toll levers BUILT + GATED 2026-07-23 (commit a82f55c,
+  results/fanin-tax.md):** block-framed frontier zstd (compression 2,
+  POLY_FRONTIER_ZSTD=1) + --fast-map-dir tmpfs routing; full suite green
+  both modes; gympie worst-case +41% wall. NEXT between a(38) and a(39):
+  dalby bench A/B (bench_util.sh with/without POLY_FRONTIER_ZSTD=1), then
+  a(39) via FRONTIER_LEVERS=1 dalby_term.sh if favorable.
   Sequence: ~~a(37)~~ → a(38) [real H20 certifies P17 holdout
   T(37,20) + gives both P18 fit points] → wire P18 (derive_pk_fast.py 18,
   dry-run verified, red-first gate like P17) → a(39) → a(40)/a(41) iff
