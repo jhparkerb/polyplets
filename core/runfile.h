@@ -59,16 +59,27 @@ inline constexpr size_t kSpillBlockBytes = 256 * 1024;
 // boundary and decompression starts cleanly there — a single-frame body
 // ("compression 1", the unindexed internal spill path) cannot seek at all.
 //
-// Frame size = kIndexStride (64 records, ~8KB): every idx entry IS a frame
-// start, so a seeked reader's overshoot is <=63 records — identical to the
-// plain path. The first cut (1024-record frames for a better ratio) made every
-// (merge-range x input) open decompress up to 1023 overshoot records; at merge
-// fan-in scale that was GBs of pure skip work per round, measured as a 1.8x
-// merge-cpu regression on the gympie H15/maxn30 bench. The ratio cost of 8KB
-// frames is modest (sorted neighbors share key prefixes, so the redundancy
-// zstd exploits is local); the realized ratio is re-measured at scale on each
-// production run's rundir telemetry.
-inline constexpr size_t kZstdBlockRecords = 64;
+// Frame size in RECORDS (env POLY_FRONTIER_ZSTD_BLOCK, default 64 =
+// kIndexStride). WRITER-SIDE ONLY: readers decompress whatever frames they
+// find and idx entries always point at the containing frame's start, so any
+// mix of frame sizes coexists (a default change never invalidates existing
+// files). The tradeoff, both ends measured:
+//  - 1024-record frames: whole-file-grade ratio (~1.8x) but every
+//    (merge-range x input) seeked open decompresses up to 1023 overshoot
+//    records — at fan-in scale a 1.8x merge-cpu regression (gympie bench).
+//  - 64-record (~8KB) frames: overshoot matches the plain path (<=63
+//    records) but the tiny window loses the redundancy — ~1.08x realized on
+//    live a(39) H20 data (130B/record vs ~141 plain).
+// The sweet spot is measured by experiments/reframe_measure.cpp on real
+// frontier files; adjust the default only with that curve in hand.
+inline size_t frontierZstdBlockRecords() {
+  static const size_t v = [] {
+    const char* e = std::getenv("POLY_FRONTIER_ZSTD_BLOCK");
+    if (e && *e) { long n = std::atol(e); if (n > 0) return (size_t)n; }
+    return (size_t)64;
+  }();
+  return v;
+}
 
 // First body-read fill after open/seek; rawRead doubles from here up to
 // kSpillBlockBytes so streaming readers still amortize while one-record
@@ -241,6 +252,7 @@ class RunFileWriter {
     // kZstdBlockRecords. Unindexed+compressed stays the single-frame spill
     // format ("compression 1").
     block_framed_ = compress_ && write_index_;
+    zstd_block_records_ = frontierZstdBlockRecords();
     // Atomic publish (B4): stream to a temp file and rename onto the final path
     // in finalize().  A kill mid-write then leaves only a stale .tmp; the real
     // path never holds a placeholder record-count or a short CRC (which a seeked
@@ -291,7 +303,7 @@ class RunFileWriter {
     // Block framing: end the open frame and start a new one every
     // kZstdBlockRecords records. Must run BEFORE the index entry below so the
     // entry records the new frame's start, not a mid-frame position.
-    if (block_framed_ && (record_count_ % kZstdBlockRecords) == 0) {
+    if (block_framed_ && (record_count_ % zstd_block_records_) == 0) {
       if (record_count_ > 0) compressEndFrame();
       frame_offset_ = static_cast<uint64_t>(std::ftell(fp_));
       frame_recidx_ = record_count_;
@@ -400,6 +412,7 @@ class RunFileWriter {
   bool write_index_;
   bool compress_;
   bool block_framed_ = false;     // compression 2: one zstd frame per block
+  size_t zstd_block_records_ = 64;  // frame size in records (set in ctor)
   uint64_t frame_offset_ = 0;     // file offset of the open frame's start
   uint64_t frame_recidx_ = 0;     // record index of the open frame's first record
   long body_start_offset_;          // file offset of the first record (post-header)
