@@ -27,18 +27,23 @@
   T(37,36)=P_1(37)·3^33, growth 6.9212 smooth. Real T(37,19) = first P_18
   fit point in hand. One box did all heights one term higher in ~the time
   a(36) needed two boxes in parallel.
-  **a(38) live on dalby since 2026-07-23 ~16:2x EDT** (tmux 0:a38,
-  orchestrate PID 2012309, rev 8ce1bc5c, runs/ns_a38/, du monitor 0:a38du).
-  **Revised ETA (measured at 8h in): ~30-40h total, NOT the predicted
-  4-8h** — H20 frontier is 127M records (2.8x H19's peak, above the
-  x2.15 model) at ~5.5ks/column, col 8/~39, eff_cores ~14 (disk-stall;
-  the mirror is measured-saturated). Disk peak so far 174GB, fits.
-  **Mirror Toll levers BUILT + GATED 2026-07-23 (commit a82f55c,
-  results/fanin-tax.md):** block-framed frontier zstd (compression 2,
-  POLY_FRONTIER_ZSTD=1) + --fast-map-dir tmpfs routing; full suite green
-  both modes; gympie worst-case +41% wall. NEXT between a(38) and a(39):
-  dalby bench A/B (bench_util.sh with/without POLY_FRONTIER_ZSTD=1), then
-  a(39) via FRONTIER_LEVERS=1 dalby_term.sh if favorable.
+  **a(38) BANKED 2026-07-24** = 1180654489101178485738417779914
+  (results/ns_a38/ + PROVENANCE.md, commit 0057f2c): dalby solo, 15.8h
+  wall / 1.78M cpu-s / 221.5GB disk peak. A38_VALIDATE_PASS; growth
+  6.9261. **P_17 INDEPENDENT HOLDOUT PASS** (real T(37,20) == closed
+  form). **P_18 WIRED** (fit real T(37,19)+T(38,20), red-first
+  diag_p18_test.go). H20 pole reality: frontier 127M (2.8x H19, above
+  the x2.15 model), eff_cores ~14 (disk-stall). **H21 raw disk
+  projection ~490-620GB FAILS the 281GB gate — the Mirror Toll levers
+  are the candidate unlock, calibrated by a(39).**
+  **a(39) live on dalby since 2026-07-24 ~09:5x EDT with FRONTIER
+  LEVERS ON** (tmux 0:a39, PID 2042188, rev 0057f2c5, du monitor
+  0:a39du; confirmed: /dev/shm/ns_a39 map outputs + compression 2 merge
+  outputs). Dalby lever A/B: bench 105.6s->119.3s (+13% wall / +29% cpu,
+  the no-disk-benefit regime's cost ceiling; gympie worst case +41%).
+  Expected ~14-18h (a(38)-shaped, top real height H20 via P_18). Its
+  measured disk peak + fastmap/zstd telemetry decide the a(40)/a(41)
+  H21 gate (needs <=234GB effective for 20% headroom).
   Sequence: ~~a(37)~~ → a(38) [real H20 certifies P17 holdout
   T(37,20) + gives both P18 fit points] → wire P18 (derive_pk_fast.py 18,
   dry-run verified, red-first gate like P17) → a(39) → a(40)/a(41) iff
