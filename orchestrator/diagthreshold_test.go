@@ -90,10 +90,18 @@ func TestDiagonalStripValidTrueThreshold(t *testing.T) {
 	if diagonalStripValid(34, 17) {
 		t.Errorf("diagonalStripValid(34, 17) = true; want false (34 < 2*17+1=35)")
 	}
-	// k=18 is out of range until P_18 is derived and wired — diagonalStripValid
-	// must refuse it regardless of maxn, since diagonalCell has no case 18.
-	if diagonalStripValid(100, 18) {
-		t.Errorf("diagonalStripValid(100, 18) = true; want false (k=18/P_18 not wired into diagonalCell yet)")
+	// k=18 (P_18, now wired): a39 (maxn=39) must be able to use it (39 >= 2*18+1=37),
+	// keeping a39's top real height at H=maxn-19=H20 (H=maxn-18=H21 becomes closed-form).
+	if !diagonalStripValid(39, 18) {
+		t.Errorf("diagonalStripValid(39, 18) = false; want true (39 >= 2*18+1=37; a39 must be able to use P_18's shortcut)")
+	}
+	if diagonalStripValid(36, 18) {
+		t.Errorf("diagonalStripValid(36, 18) = true; want false (36 < 2*18+1=37)")
+	}
+	// k=19 is out of range until P_19 is derived and wired — diagonalStripValid
+	// must refuse it regardless of maxn, since diagonalCell has no case 19.
+	if diagonalStripValid(100, 19) {
+		t.Errorf("diagonalStripValid(100, 19) = true; want false (k=19/P_19 not wired into diagonalCell yet)")
 	}
 }
 
