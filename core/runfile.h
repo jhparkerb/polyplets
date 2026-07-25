@@ -126,6 +126,12 @@ inline int frontierZstdLevel() {
 // persistent, so a thread-local free list reaches steady state with zero
 // context allocation. A k-way merge holds many readers open concurrently —
 // hence a pool, not a single cached context.
+// Retention cap: a persistent worker that once ran an N-input merge must not
+// hold N idle contexts forever (80 workers x ~640 x ~200KB was a standing
+// 10-20GB term in the a(40) OOM). Peak concurrent use is unbounded (k-way
+// merges hold all readers open); only IDLE retention is capped.
+inline constexpr size_t kZstdCtxPoolCap = 64;
+
 struct ZstdCtxPool {
   std::vector<ZSTD_DStream*> d;
   std::vector<ZSTD_CStream*> c;
@@ -149,7 +155,10 @@ inline ZSTD_DStream* acquireDStream() {
   return ZSTD_createDStream();
 }
 inline void releaseDStream(ZSTD_DStream* x) {
-  if (x) zstdCtxPool().d.push_back(x);
+  if (!x) return;
+  auto& pool = zstdCtxPool().d;
+  if (pool.size() >= kZstdCtxPoolCap) { ZSTD_freeDStream(x); return; }
+  pool.push_back(x);
 }
 inline ZSTD_CStream* acquireCStream() {
   auto& pool = zstdCtxPool().c;
@@ -163,7 +172,10 @@ inline ZSTD_CStream* acquireCStream() {
   return ZSTD_createCStream();
 }
 inline void releaseCStream(ZSTD_CStream* x) {
-  if (x) zstdCtxPool().c.push_back(x);
+  if (!x) return;
+  auto& pool = zstdCtxPool().c;
+  if (pool.size() >= kZstdCtxPoolCap) { ZSTD_freeCStream(x); return; }
+  pool.push_back(x);
 }
 #endif
 

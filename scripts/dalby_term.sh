@@ -54,8 +54,13 @@ RESUME_FLAG=""
 FASTMAP_FLAG=""
 if [ "${FRONTIER_LEVERS:-0}" = "1" ]; then
   export POLY_FRONTIER_ZSTD=1
+  # RAM co-budget (the a(40) OOM lesson, 2x): worker spill budgets + tmpfs
+  # pages + zstd contexts all share the same 125GB. 40GB floor caps /dev/shm
+  # admission at ~22GB; with --ram 768MiB x 80 workers (60GB) + capped pools
+  # the sum stays ~90GB, leaving real page-cache headroom.
+  export POLY_FASTMAP_FLOOR_GB=${POLY_FASTMAP_FLOOR_GB:-40}
   FASTMAP_FLAG="--fast-map-dir /dev/shm/ns_a${N}"
-  echo "frontier levers ON: POLY_FRONTIER_ZSTD=1 $FASTMAP_FLAG"
+  echo "frontier levers ON: POLY_FRONTIER_ZSTD=1 $FASTMAP_FLAG floor=${POLY_FASTMAP_FLOOR_GB}GB"
 fi
 
 # cost_profile.tsv is append-only (orchestrator/telemetry.go), so a fresh
@@ -94,8 +99,11 @@ echo "rev: $(git rev-parse --short HEAD)"
 # here. --overlap-heights "$N" (all owned heights) stays: it is run-specific.
 # The commentary above records WHY those values were chosen.
 T0=$(date +%s)
+# --ram 768MiB (was 1GiB): jasonp's RAM-budget rule with the levers' tmpfs
+# and zstd terms subtracted — (125*0.8 - shm - pools)/80. Kink is RAM-light;
+# the budget is a spill trigger, not a working-set need.
 ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
-  --cores 80 --ram 1073741824 --overlap-heights "$N" \
+  --cores 80 --ram 805306368 --overlap-heights "$N" \
   --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" $FASTMAP_FLAG \
   --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 300 $RESUME_FLAG \
   --per-height-out runs/ns_a${N}/perheight \

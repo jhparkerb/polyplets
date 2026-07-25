@@ -416,6 +416,23 @@ static void testHeaderRejectsUnknownCompression() {
 #endif
 }
 
+// Pooled zstd contexts must have BOUNDED retention: a persistent worker that
+// once ran a 640-input merge must not hold 640 idle contexts forever (80
+// workers x 640 x ~200KB was a standing ~10-20GB term in the a(40) OOM).
+static void testZstdPoolRetentionBounded() {
+#ifdef POLY_ZSTD
+  std::vector<ZSTD_DStream*> d;
+  std::vector<ZSTD_CStream*> c;
+  for (int i = 0; i < 300; i++) { d.push_back(acquireDStream()); c.push_back(acquireCStream()); }
+  for (auto* p : d) releaseDStream(p);
+  for (auto* p : c) releaseCStream(p);
+  assert(zstdCtxPool().d.size() <= kZstdCtxPoolCap &&
+         "released DStreams beyond the cap must be freed, not pooled");
+  assert(zstdCtxPool().c.size() <= kZstdCtxPoolCap &&
+         "released CStreams beyond the cap must be freed, not pooled");
+#endif
+}
+
 int main() {
   testAtomicPublish();
   testIndexHasMagic();
@@ -429,5 +446,6 @@ int main() {
   testBlockCompressedRoundTripAndSeek();
   testMergeWithBlockCompressedInputs();
   testHeaderRejectsUnknownCompression();
+  testZstdPoolRetentionBounded();
   std::puts("gate_runfile PASS");
 }
