@@ -45,6 +45,10 @@ type SweepConfig struct {
 	MaxDiagK        int           // cap on wired diagonal closed-forms (0 = all wired). Set to k-1 to force the H=Maxn-k strip back to a REAL column sweep — e.g. 16 makes a maxn=37 run sweep H20 for real (the strict route: the swept T(37,20) is P_17's first independent holdout)
 	PerHeightOut    string        // dir to write per-height h<H>.out files (empty = none)
 	Bin             WorkerBin
+	// fastRes serializes tmpfs admission for --fast-map-dir (fastmap.go).
+	// Initialized by Run(); unexported so only the sweep entry sets it.
+	fastRes *fastMapReserver
+
 	// Pool, if non-nil, dispatches map/merge work to a WorkerPool of
 	// persistent processes (Bottleneck #5) instead of spawning a fresh
 	// map_worker/merge_worker per unit. Optional and nil-safe: callers that
@@ -181,6 +185,9 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	// here with one check rather than miscount or crash mid-run.
 	if cfg.Cores < 1 {
 		return nil, fmt.Errorf("Cores must be >= 1, got %d", cfg.Cores)
+	}
+	if cfg.FastMapDir != "" && cfg.fastRes == nil {
+		cfg.fastRes = newFastMapReserverFor(cfg.FastMapDir)
 	}
 
 	maxn := cfg.Maxn
@@ -1227,14 +1234,22 @@ func mapPhase(
 	// measured ~75% of all worker CPU on dalby's H15/maxn30 bench.
 	inBounds := loadKeyBounds(frontier, keyLen)
 
-	// Transient map outputs: tmpfs when it comfortably fits this round's
-	// projection, else the run dir — decided fresh each round (fastmap.go).
-	mapDir := pickMapDirForRound(cfg.FastMapDir, cfg.RunDir, frontier)
-	if cfg.FastMapDir != "" && mapDir == cfg.RunDir {
-		// The interesting event is the FALLBACK: tmpfs routing is the
-		// configured intent, so silently landing on the slow path would make
-		// an unexplained slowdown undiagnosable from the log.
-		fmt.Printf("event=fastmap_fallback H=%d col=%d stage=%s\n", H, col, stage)
+	// Transient map outputs: tmpfs only if this round's projection can be
+	// RESERVED against the shared budget (fastmap.go — the point-in-time
+	// statfs check was a TOCTOU race under overlap; it OOM-killed the a(40)
+	// launch). Released when this map phase returns.
+	mapDir := cfg.RunDir
+	if cfg.FastMapDir != "" && cfg.fastRes != nil {
+		need := mapRoundProjection(frontier)
+		if cfg.fastRes.reserve(need) {
+			mapDir = cfg.FastMapDir
+			defer cfg.fastRes.release(need)
+		} else {
+			// The interesting event is the FALLBACK: tmpfs routing is the
+			// configured intent, so silently landing on the slow path would
+			// make an unexplained slowdown undiagnosable from the log.
+			fmt.Printf("event=fastmap_fallback H=%d col=%d stage=%s\n", H, col, stage)
+		}
 	}
 
 	// Grain floor in records: don't steal a remnant smaller than StealGrain of a
