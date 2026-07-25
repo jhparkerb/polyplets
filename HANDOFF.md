@@ -43,13 +43,19 @@
   format-change cross-check (re-swept T(38,20) exact). Real T(39,20) =
   first P_19 fit point (second needs a(40)'s H21). 256-frame default
   deployed to dalby post-run (1.72x class ratio).
-  **LADDER STOPPED AT a(39) per authorization: the H21 disk gate FAILS
-  on measured numbers** — same-shape a(40) peak projects 324-412GB vs
-  the 234GB ceiling (281 free x 20% headroom); H21-solo reshaping lands
-  ~200-380GB (shm 62GB cap vs ~90GB+ H21 map rounds), not provably
-  under. Options are jasonp's: accept borderline solo-shape risk, free
-  disk (his ~/var+~/tmp 438GB — HIS data, never touched), or close the
-  ladder here. P_19 wiring and a(40)/a(41) wait on that call.
+  **GATE RESOLVED 2026-07-25: jasonp cleaned ~/var+~/tmp** (284GB freed;
+  survey + harvest by Claude, deletions authorized explicitly: rf_30008
+  fraction-sweep scratch 166GB, tmp/cadoeval 22GB, var/cado/12229_226
+  66GB after README-directed harvest to ~/var/cadoeval/groundtruth/,
+  30008_259 upload+dup1 36GB; avoid-re-sieve archives kept). dalby now
+  565GB free → ceiling 470GB vs a(40) projection 324-412GB — PASSES.
+  **a(40) live on dalby since 2026-07-25 ~10:0x EDT, levers on**
+  (tmux 0:a40, PID 2067950, rev c447f944, 256-frame default, du monitor
+  0:a40du). Top real height H21 (P_18 in production); its real T(40,21)
+  = P_19 fit point #2 + P_18's first independent holdout T(39,21).
+  Expected ~24-30h (a(39) 11.1h x ~2.2-2.8 height scaling). On landing:
+  validate → bank → wire P_19 → a(41) (same H21 shape, per standing
+  authorization).
   Sequence: ~~a(37)~~ → a(38) [real H20 certifies P17 holdout
   T(37,20) + gives both P18 fit points] → wire P18 (derive_pk_fast.py 18,
   dry-run verified, red-first gate like P17) → a(39) → a(40)/a(41) iff
