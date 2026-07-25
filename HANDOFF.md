@@ -36,14 +36,20 @@
   the x2.15 model), eff_cores ~14 (disk-stall). **H21 raw disk
   projection ~490-620GB FAILS the 281GB gate — the Mirror Toll levers
   are the candidate unlock, calibrated by a(39).**
-  **a(39) live on dalby since 2026-07-24 ~09:5x EDT with FRONTIER
-  LEVERS ON** (tmux 0:a39, PID 2042188, rev 0057f2c5, du monitor
-  0:a39du; confirmed: /dev/shm/ns_a39 map outputs + compression 2 merge
-  outputs). Dalby lever A/B: bench 105.6s->119.3s (+13% wall / +29% cpu,
-  the no-disk-benefit regime's cost ceiling; gympie worst case +41%).
-  Expected ~14-18h (a(38)-shaped, top real height H20 via P_18). Its
-  measured disk peak + fastmap/zstd telemetry decide the a(40)/a(41)
-  H21 gate (needs <=234GB effective for 20% headroom).
+  **a(39) BANKED 2026-07-25** = 8182864667276277865830132493466
+  (results/ns_a39/ + PROVENANCE.md, commit c447f94): FIRST levers-on
+  production run — 11.1h wall (vs a(38) 15.8h one term LOWER, 1.42x),
+  pole columns 1.5x, disk peak 174.5GB (vs 221.5). A39_VALIDATE_PASS +
+  format-change cross-check (re-swept T(38,20) exact). Real T(39,20) =
+  first P_19 fit point (second needs a(40)'s H21). 256-frame default
+  deployed to dalby post-run (1.72x class ratio).
+  **LADDER STOPPED AT a(39) per authorization: the H21 disk gate FAILS
+  on measured numbers** — same-shape a(40) peak projects 324-412GB vs
+  the 234GB ceiling (281 free x 20% headroom); H21-solo reshaping lands
+  ~200-380GB (shm 62GB cap vs ~90GB+ H21 map rounds), not provably
+  under. Options are jasonp's: accept borderline solo-shape risk, free
+  disk (his ~/var+~/tmp 438GB — HIS data, never touched), or close the
+  ladder here. P_19 wiring and a(40)/a(41) wait on that call.
   Sequence: ~~a(37)~~ → a(38) [real H20 certifies P17 holdout
   T(37,20) + gives both P18 fit points] → wire P18 (derive_pk_fast.py 18,
   dry-run verified, red-first gate like P17) → a(39) → a(40)/a(41) iff
