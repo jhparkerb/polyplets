@@ -49,13 +49,22 @@
   66GB after README-directed harvest to ~/var/cadoeval/groundtruth/,
   30008_259 upload+dup1 36GB; avoid-re-sieve archives kept). dalby now
   565GB free → ceiling 470GB vs a(40) projection 324-412GB — PASSES.
-  **a(40) live on dalby since 2026-07-25 ~10:0x EDT, levers on**
-  (tmux 0:a40, PID 2067950, rev c447f944, 256-frame default, du monitor
-  0:a40du). Top real height H21 (P_18 in production); its real T(40,21)
-  = P_19 fit point #2 + P_18's first independent holdout T(39,21).
-  Expected ~24-30h (a(39) 11.1h x ~2.2-2.8 height scaling). On landing:
-  validate → bank → wire P_19 → a(41) (same H21 shape, per standing
-  authorization).
+  **a(40) INCIDENT + RELAUNCH 2026-07-25:** the first launch (PID
+  2067950) died ~1h in — OOM killer took the ENTIRE tmux server (a(35)
+  failure class, 2nd occurrence): the per-round statfs check for
+  --fast-map-dir was a TOCTOU race under overlap; N concurrent rounds
+  overfilled /dev/shm (tmpfs = RAM). FIXED (commit f9d485f): rounds now
+  RESERVE projections under a lock vs a 24GB RAM floor
+  (POLY_FASTMAP_FLOOR_GB), red-first TestFastMapReservationRace.
+  Collateral: dalby's user ssh-agent died too — github pulls BLOCKED on
+  dalby until jasonp re-enters his key passphrase (branch shipped via
+  git bundle meanwhile; ref sw-incoming). **a(40) RESUMED (PID 2070278,
+  rev f9d485fb, tmux 0:a40 on a fresh tmux server, du monitor 0:a40du);
+  effectively a fresh start (~1h lost — overlap checkpoints are
+  height-boundary and none had completed).** Top real height H21; real
+  T(40,21) = P_19 fit point #2 + P_18's first holdout. Expected ~24-30h
+  from resume. On landing: validate → bank → certify P_18 → wire P_19 →
+  a(41) per standing authorization.
   Sequence: ~~a(37)~~ → a(38) [real H20 certifies P17 holdout
   T(37,20) + gives both P18 fit points] → wire P18 (derive_pk_fast.py 18,
   dry-run verified, red-first gate like P17) → a(39) → a(40)/a(41) iff
