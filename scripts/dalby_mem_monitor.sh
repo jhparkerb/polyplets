@@ -11,6 +11,7 @@ RUNDIR=$1; PID=$2; INTERVAL=${3:-60}
 LOG="${RUNDIR%/}.mem.log"
 echo $$ > "${RUNDIR%/}.memmon.pid"
 while kill -0 "$PID" 2>/dev/null; do
-  echo "$(date -Iseconds) $(free -m | awk 'NR==2{printf "used=%sM avail=%sM", $3, $7}') shm=$(du -sm /dev/shm 2>/dev/null | cut -f1)M" >> "$LOG"
+  TOP=$(ps -Ao rss,comm --sort=-rss 2>/dev/null | awk 'NR>1&&NR<=4{printf "%s:%dM ", $2, $1/1024}')
+  echo "$(date -Iseconds) $(free -m | awk 'NR==2{printf "used=%sM avail=%sM", $3, $7}') shm=$(du -sm /dev/shm 2>/dev/null | cut -f1)M top: $TOP" >> "$LOG"
   sleep "$INTERVAL"
 done

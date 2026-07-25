@@ -86,6 +86,14 @@ inline size_t frontierZstdBlockRecords() {
 // peeks (merge heap-init at fan-in scale) stay cheap.
 inline constexpr size_t kFirstFillBytes = 8 * 1024;
 
+// Compressed readers cap their adaptive buffers here, NOT kSpillBlockBytes:
+// a merge holds (inputs) readers open simultaneously per range, and 80
+// workers x ~640 inputs x (cbuf+dbuf at 256KB each + dctx) was a ~35GB
+// round-periodic RSS spike — the a(40) third OOM (mem.log: used 95->126.6GB
+// swings with shm at only 3-10GB). 64KB keeps streaming amortization (8
+// frames per fill at the 256-record default) at a quarter of the footprint.
+inline constexpr size_t kZReaderMaxFill = 64 * 1024;
+
 inline int spillZstdLevel() {
   const char* e = std::getenv("POLY_SPILL_ZSTD_LEVEL");
   if (e && *e) { int v = std::atoi(e); if (v != 0) return v; }
@@ -827,17 +835,17 @@ class RunFileReader {
   // Tax through the compressed path — measured 4.7x wall on the gympie
   // H15/maxn30 bench before this fix.
   bool refillD() {
-    const size_t dwant = std::min(zout_fill_, kSpillBlockBytes);
+    const size_t dwant = std::min(zout_fill_, kZReaderMaxFill);
     if (dbuf_.size() < dwant) dbuf_.resize(dwant);
-    zout_fill_ = std::min(zout_fill_ * 2, kSpillBlockBytes);
+    zout_fill_ = std::min(zout_fill_ * 2, kZReaderMaxFill);
     dpos_ = dlen_ = 0;
     while (dlen_ == 0) {
       if (in_.pos == in_.size) {
         // Safe to resize here: in_ is fully consumed, so no live pointers
         // into cbuf_ survive the (possible) reallocation.
-        const size_t want = std::min(zin_fill_, kSpillBlockBytes);
+        const size_t want = std::min(zin_fill_, kZReaderMaxFill);
         if (cbuf_.size() < want) cbuf_.resize(want);
-        zin_fill_ = std::min(zin_fill_ * 2, kSpillBlockBytes);
+        zin_fill_ = std::min(zin_fill_ * 2, kZReaderMaxFill);
         size_t r = std::fread(cbuf_.data(), 1, want, fp_);
         in_.src = cbuf_.data(); in_.size = r; in_.pos = 0;
         if (r == 0) return false;  // needed more but hit EOF (truncated frame)

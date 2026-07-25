@@ -98,12 +98,19 @@ echo "rev: $(git rev-parse --short HEAD)"
 # are now the ENGINE DEFAULTS (baked into orchestrate) -- no longer passed
 # here. --overlap-heights "$N" (all owned heights) stays: it is run-specific.
 # The commentary above records WHY those values were chosen.
+# maxn>=40: halve the merge fan-in (unit-mult 4 -> ~320 map outputs/round
+# instead of ~640) and trim to 72 cores — the reader-army RSS term scales
+# with (workers x inputs) and the third a(40) OOM was exactly that spike
+# (see dalby.mem.log + results/fanin-tax.md). ~19% wall cost at maxn=30
+# scales smaller at the IO-bound pole; a dead run costs a day.
+BIGN_FLAGS=""
+[ "$N" -ge 40 ] && BIGN_FLAGS="--unit-mult 4 --cores 72"
 T0=$(date +%s)
 # --ram 768MiB (was 1GiB): jasonp's RAM-budget rule with the levers' tmpfs
 # and zstd terms subtracted — (125*0.8 - shm - pools)/80. Kink is RAM-light;
 # the budget is a spill trigger, not a working-set need.
 ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
-  --cores 80 --ram 805306368 --overlap-heights "$N" \
+  --cores 80 --ram 805306368 --overlap-heights "$N" $BIGN_FLAGS \
   --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" $FASTMAP_FLAG \
   --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 300 $RESUME_FLAG \
   --per-height-out runs/ns_a${N}/perheight \
