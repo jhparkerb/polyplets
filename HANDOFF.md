@@ -1,4 +1,21 @@
-# HANDOFF — live state (updated 2026-07-25)
+# HANDOFF — live state (updated 2026-07-26)
+
+## LADDER PLAN (jasonp 2026-07-26): run through a(43), then close
+Sequence, each term validated+banked before the next:
+1. **a(40)** (RUNNING, phased, ~40% done): on landing — validate, bank,
+   certify P_18 holdout (real T(39,21) vs closed form), wire P_19 (fit
+   T(39,20)+T(40,21), both real).
+2. **Generalize the phased script BEFORE a(41)**: current A/B/C offsets
+   are N=40-specific; rule going forward = overlap heights <=19 only,
+   every real height >=20 runs SOLO with descending cores (48/40/32).
+   For N=41 the current formula would put H20 back into an 80-worker
+   overlap — the exact OOM regime.
+3. **a(41)** (~2.5-3d): top real H21 (P_19 wired). 4. **a(42)** (~1wk):
+   first H22 sweep — P_19's independent holdout (real T(41,22)) + both
+   P_20 fit points; disk gate first: measured a(40)/a(41) H21 peak x2.8
+   vs free (currently 500GB). 5. **a(43)** (~1wk): H22 again, final
+   term. **a(44)+ is out of reach on dalby** (~2wk/term, ~1TB peak >
+   874GB device) — the ladder CLOSES at a(43).
 
 ## FRONT OF QUEUE: a(40) — four OOM deaths, phased-run design ready
 **results/overcommit-hydra.md** is the postmortem + design. Short form:
