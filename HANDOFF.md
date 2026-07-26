@@ -1,4 +1,19 @@
-# HANDOFF — live state (updated 2026-07-23)
+# HANDOFF — live state (updated 2026-07-25)
+
+## FRONT OF QUEUE: a(40) — four OOM deaths, phased-run design ready
+**results/overcommit-hydra.md** is the postmortem + design. Short form:
+maxn=40 with full --overlap-heights does NOT fit dalby's 125GB (worker
+RSS 90-120GB alone at co-residency peaks; four measured heads, three
+fixed, the fourth is structural). NEXT SESSION: implement phased
+dalby_term.sh for N>=40 (--heights 3-19 overlap / 20 solo / 21 solo,
+restore 1GiB+unit-mult 8, ~48-64 cores on solo phases), plus two
+independent fixes: orchestrate RSS growth (hit 4.4GB, climbing —
+pprof it) and the ~0.5GB/worker non-budget overhead audit. a(40)
+checkpoint + run dir preserved on dalby; resume valid; per-phase resume
+works the same. jasonp's dalby ssh-agent needs re-adding (OOM casualty
+x2) before github pulls work there — git bundles meanwhile. All engine
+fixes from today (f9d485f, 6697c04, 7abd27d) are pushed and deployed on
+dalby at 7abd27df.
 
 ## Recently banked
 - **Fan-In Tax FIXED + branch deployed/validated on dalby (2026-07-23,
