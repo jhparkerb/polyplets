@@ -123,9 +123,14 @@ run_phase() {  # run_phase LABEL HEIGHTS CORES OVERLAP
 }
 if [ "$N" -ge 40 ]; then
   RC=0
+  # B/C core counts: 48/32 (were 64/48). The 5th OOM measured BOTH
+  # persistent fleets (map + merge = 2x cores processes) retaining ~1GB+
+  # each; malloc_trim now returns freed pages between requests, and the
+  # smaller fleets bound the sum even at retained peaks. The poles are
+  # disk-bound (eff_cores ~14), so the wall cost is small.
   run_phase A "1-$((N-21)),$((N-18))-$N" 80 "$N" && \
-  run_phase B "$((N-20))" 64 1 && \
-  run_phase C "$((N-19))" 48 1 || RC=$?
+  run_phase B "$((N-20))" 48 1 && \
+  run_phase C "$((N-19))" 32 1 || RC=$?
 else
   ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
     --cores 80 --ram 1073741824 --overlap-heights "$N" \

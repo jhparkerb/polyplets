@@ -10,6 +10,9 @@
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
+#ifdef __GLIBC__
+#include <malloc.h>
+#endif
 #include <cstring>
 #include <ctime>
 #include <functional>
@@ -204,6 +207,15 @@ inline int runWorkerMain(
     const int rc = runOneRequest(tokenizeLine(line));
     if (rc != 0) { std::free(line); return rc; }  // real failure exits, same as one-shot
     std::fflush(stdout);
+#ifdef __GLIBC__
+    // Return freed arena pages to the OS between requests. A persistent
+    // worker otherwise RETAINS its peak heap forever: after a big H20 round,
+    // 64 idle merge workers each held ~1GB while the 64 map workers ran
+    // their own ~1.3GB round — the two fleets' retained peaks summed past
+    // 125GB and the kernel OOM killer fired (5th a(40) death, 2026-07-26;
+    // results/overcommit-hydra.md). Cost: ~ms per request, paid off-round.
+    malloc_trim(0);
+#endif
   }
   std::free(line);
   return 0;
