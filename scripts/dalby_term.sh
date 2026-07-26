@@ -70,7 +70,7 @@ fi
 # wired made a genuinely-fixed height look like it was still real-swept --
 # docs/utilization-bottleneck-log.md). Resume must NOT touch it (or the
 # checkpoint/spill state); only clear it on a fresh start.
-[ -z "$RESUME_FLAG" ] && rm -f "$RUNDIR/cost_profile.tsv"
+[ -z "$RESUME_FLAG" ] && rm -f "$RUNDIR/cost_profile.tsv" "$RUNDIR/run.log"
 
 echo "=== a${N} KINK run starting: $(date -Iseconds) ==="
 echo "rev: $(git rev-parse --short HEAD)"
@@ -98,25 +98,44 @@ echo "rev: $(git rev-parse --short HEAD)"
 # are now the ENGINE DEFAULTS (baked into orchestrate) -- no longer passed
 # here. --overlap-heights "$N" (all owned heights) stays: it is run-specific.
 # The commentary above records WHY those values were chosen.
-# maxn>=40: halve the merge fan-in (unit-mult 4 -> ~320 map outputs/round
-# instead of ~640) and trim to 72 cores — the reader-army RSS term scales
-# with (workers x inputs) and the third a(40) OOM was exactly that spike
-# (see dalby.mem.log + results/fanin-tax.md). ~19% wall cost at maxn=30
-# scales smaller at the IO-bound pole; a dead run costs a day.
-BIGN_FLAGS=""
-[ "$N" -ge 40 ] && BIGN_FLAGS="--unit-mult 4 --cores 72"
 T0=$(date +%s)
-# --ram 768MiB (was 1GiB): jasonp's RAM-budget rule with the levers' tmpfs
-# and zstd terms subtracted — (125*0.8 - shm - pools)/80. Kink is RAM-light;
-# the budget is a spill trigger, not a working-set need.
-./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
-  --cores 80 --ram 805306368 --overlap-heights "$N" $BIGN_FLAGS \
-  --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" $FASTMAP_FLAG \
-  --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 300 $RESUME_FLAG \
-  --per-height-out runs/ns_a${N}/perheight \
-  --cost-profile-out "$RUNDIR/cost_profile.tsv" \
-  2>&1 | tee "$RUNDIR/run.log"
-RC=${PIPESTATUS[0]}
+# PHASED EXECUTION for N>=40 (Overcommit Hydra, results/overcommit-hydra.md):
+# maxn>=40 with full --overlap-heights does NOT fit dalby's 125GB — worker
+# RSS alone hits 90-120GB when H19+H20+H21 rounds co-reside (four measured
+# OOM kills 2026-07-25). Single-height phases bound RAM at ONE height's
+# working set by construction; the tall poles are disk-bound (eff_cores ~14)
+# so fewer cores there cost little wall. Same mechanism as the a(36)
+# ayr/dalby --heights split; perheight accumulates across phases; each phase
+# has its own checkpoint (resume reruns only the phase that died).
+# N<40: the classic single all-heights invocation, unchanged.
+run_phase() {  # run_phase LABEL HEIGHTS CORES OVERLAP
+  local LABEL=$1 HEIGHTS=$2 CORES=$3 OVERLAP=$4
+  echo "=== phase $LABEL: heights=$HEIGHTS cores=$CORES $(date -Iseconds) ==="
+  ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
+    --cores "$CORES" --ram 1073741824 --overlap-heights "$OVERLAP" \
+    --heights "$HEIGHTS" \
+    --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" $FASTMAP_FLAG \
+    --checkpoint "$RUNDIR/POLYCKPT.$LABEL" --checkpoint-every 300 $RESUME_FLAG \
+    --per-height-out runs/ns_a${N}/perheight \
+    --cost-profile-out "$RUNDIR/cost_profile.tsv" \
+    2>&1 | tee -a "$RUNDIR/run.log"
+  return "${PIPESTATUS[0]}"
+}
+if [ "$N" -ge 40 ]; then
+  RC=0
+  run_phase A "1-$((N-21)),$((N-18))-$N" 80 "$N" && \
+  run_phase B "$((N-20))" 64 1 && \
+  run_phase C "$((N-19))" 48 1 || RC=$?
+else
+  ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
+    --cores 80 --ram 1073741824 --overlap-heights "$N" \
+    --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" $FASTMAP_FLAG \
+    --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 300 $RESUME_FLAG \
+    --per-height-out runs/ns_a${N}/perheight \
+    --cost-profile-out "$RUNDIR/cost_profile.tsv" \
+    2>&1 | tee "$RUNDIR/run.log"
+  RC=${PIPESTATUS[0]}
+fi
 T1=$(date +%s)
 echo "=== a${N} run exited rc=$RC after $((T1-T0))s : $(date -Iseconds) ==="
 [ "$RC" = 0 ] || exit "$RC"
