@@ -110,12 +110,18 @@ T0=$(date +%s)
 # N<40: the classic single all-heights invocation, unchanged.
 run_phase() {  # run_phase LABEL HEIGHTS CORES OVERLAP
   local LABEL=$1 HEIGHTS=$2 CORES=$3 OVERLAP=$4
-  echo "=== phase $LABEL: heights=$HEIGHTS cores=$CORES $(date -Iseconds) ==="
+  # --resume is per-phase: orchestrate --resume exits 1 when the checkpoint
+  # file is missing, and a phase that has never started has none — a driver
+  # resumed after phase B completed killed phase C at launch (a(40),
+  # 2026-07-26). Resume only phases with a checkpoint; later ones run fresh.
+  local PHASE_RESUME=$RESUME_FLAG
+  [ -f "$RUNDIR/POLYCKPT.$LABEL" ] || PHASE_RESUME=""
+  echo "=== phase $LABEL: heights=$HEIGHTS cores=$CORES resume=${PHASE_RESUME:-no} $(date -Iseconds) ==="
   ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
     --cores "$CORES" --ram 1073741824 --overlap-heights "$OVERLAP" \
     --heights "$HEIGHTS" \
     --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" $FASTMAP_FLAG \
-    --checkpoint "$RUNDIR/POLYCKPT.$LABEL" --checkpoint-every 300 $RESUME_FLAG \
+    --checkpoint "$RUNDIR/POLYCKPT.$LABEL" --checkpoint-every 300 $PHASE_RESUME \
     --per-height-out runs/ns_a${N}/perheight \
     --cost-profile-out "$RUNDIR/cost_profile.tsv" \
     2>&1 | tee -a "$RUNDIR/run.log"
