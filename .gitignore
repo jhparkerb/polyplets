@@ -24,3 +24,7 @@ experiments/frontier_svd/frontier_*.txt
 # probe/validation run dumps (regenerable)
 experiments/**/*.out
 *.local
+
+# local-only study notes — never commit (guard also in .git/info/exclude)
+docs/viva-*.md
+docs/drill*.md

@@ -76,4 +76,8 @@ provenance — which binary, which host, which validations — is in
 An amateur project by Jason H Parker, built in collaboration with an AI
 assistant (Anthropic's Claude); the author owns all decisions and the
 correctness of every claim. See the report's AI note for the division of
-labor.
+labor. AI assistance spans essentially the entire commit history: most
+commits carry a `Co-Authored-By: Claude` trailer, but the trailer was
+not backfilled onto the minority that lack one, so treat the history as
+AI-assisted throughout rather than inferring per-commit provenance from
+trailers alone.
