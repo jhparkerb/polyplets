@@ -1,38 +1,47 @@
-# HANDOFF — live state (updated 2026-07-26)
+# HANDOFF — live state (updated 2026-07-28)
 
-## LADDER PLAN (jasonp 2026-07-26): run through a(43), then close
-Sequence, each term validated+banked before the next:
-1. **a(40)** (RUNNING, phased, ~40% done): on landing — validate, bank,
-   certify P_18 holdout (real T(39,21) vs closed form), wire P_19 (fit
-   T(39,20)+T(40,21), both real).
-2. **Generalize the phased script BEFORE a(41)**: current A/B/C offsets
-   are N=40-specific; rule going forward = overlap heights <=19 only,
-   every real height >=20 runs SOLO with descending cores (48/40/32).
-   For N=41 the current formula would put H20 back into an 80-worker
-   overlap — the exact OOM regime.
-3. **a(41)** (~2.5-3d): top real H21 (P_19 wired). 4. **a(42)** (~1wk):
-   first H22 sweep — P_19's independent holdout (real T(41,22)) + both
-   P_20 fit points; disk gate first: measured a(40)/a(41) H21 peak x2.8
-   vs free (currently 500GB). 5. **a(43)** (~1wk): H22 again, final
-   term. **a(44)+ is out of reach on dalby** (~2wk/term, ~1TB peak >
-   874GB device) — the ladder CLOSES at a(43).
+## PROJECT CLOSES AT a(40) — FINAL TERM LANDED
+**a(40) = 56749893611764175164545926946127 BANKED 2026-07-28**
+(`results/ns_a40/` + PROVENANCE.md). jasonp 2026-07-27: the project
+closes at a(40); the a(41)-a(43) ladder is CANCELLED (a(41) would add
+only the term + an orphan P_20 fit point; the next validation seam,
+a(42), is out of scope). Growth 6.9352 — series 6.9212, 6.9261,
+6.9308, 6.9352, smooth toward λ≈7.11.
 
-## FRONT OF QUEUE: a(40) — four OOM deaths, phased-run design ready
-**results/overcommit-hydra.md** is the postmortem + design. Short form:
-maxn=40 with full --overlap-heights does NOT fit dalby's 125GB (worker
-RSS 90-120GB alone at co-residency peaks; four measured heads, three
-fixed, the fourth is structural). NEXT SESSION: implement phased
-dalby_term.sh for N>=40 (--heights 3-19 overlap / 20 solo / 21 solo,
-restore 1GiB+unit-mult 8, ~48-64 cores on solo phases), plus two
-independent fixes: orchestrate RSS growth (hit 4.4GB, climbing —
-pprof it) and the ~0.5GB/worker non-budget overhead audit. a(40)
-checkpoint + run dir preserved on dalby; resume valid; per-phase resume
-works the same. jasonp's dalby ssh-agent needs re-adding (OOM casualty
-x2) before github pulls work there — git bundles meanwhile. All engine
-fixes from today (f9d485f, 6697c04, 7abd27d) are pushed and deployed on
-dalby at 7abd27df.
+Landed with the run:
+- A40_VALIDATE_PASS (b-file n≤20 + banked chain a(21)-a(39)).
+- **Mass P_k holdout certification: P_0..P_18 ALL confirmed** — the
+  real H21 sweep reproduces a(39)'s closed-form H21 shard exactly on
+  every row n=21..39, including P_18's first holdout T(39,21).
+- T(40,40)=3^39 and T(40,39)=955·3^36=P_1(40)·3^36 exact.
+
+Remaining close-out:
+1. **Wire P_19**: both fit points now real (T(39,20) =
+   305997488346556404027895440838, T(40,21) =
+   1613457978443478071138613405555); red-first gate like
+   diag_p18_test.go. P_19 stays fitted-no-holdout permanently (a
+   holdout would need a(42)'s real H22).
+2. **Fix the Zero Harvest engine bug** (red-first): resuming an
+   already-completed height harvests an EMPTY count table over the
+   good per-height output (clobbered h20.out; recovered from the
+   plain-text POLYCKPT.B `tri` table, cross-checked digit-for-digit vs
+   a(39)'s independent H20 sweep — full incident in
+   results/ns_a40/PROVENANCE.md). The phased-driver generalization
+   task for a(41)+ is MOOT.
+3. **jasonp: technical-report placeholders** — real a(40) above;
+   revision list delivered in-session 2026-07-27 (line-110 brace, P_k
+   k≤16→18/19, λ para, Split truncation, Reproducibility section).
+4. Publish prep continues (Leiden easy-fixes committed cca0c30;
+   repo/blog/OEIS sequencing is jasonp's).
 
 ## Recently banked
+- **a(40) run mechanics (2026-07-25..28, dalby)**: first production
+  phased run (Overcommit Hydra design) — phase A H1-19+H22-40
+  80c/6.3h, phase B H20-solo 48c/9.6h, phase C H21-solo 32c/36.4h
+  (H21 frontier peak 355.4M records, stable ~2.7x per-column over
+  H20). Disk peak 363.4GB. One driver incident (missing-checkpoint
+  resume at phase C, fixed dd748c4) whose relaunch triggered Zero
+  Harvest (above).
 - **Fan-In Tax FIXED + branch deployed/validated on dalby (2026-07-23,
   `results/fanin-tax.md`):** the dalby bench A/B exposed ~75% of worker CPU
   going to (units x input-files) open/seek overhead + 256KB-peek reads +
