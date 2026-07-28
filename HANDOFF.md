@@ -16,6 +16,10 @@ Landed with the run:
 - T(40,40)=3^39 and T(40,39)=955·3^36=P_1(40)·3^36 exact.
 
 Remaining close-out:
+0. **H20 recheck RUNNING on dalby** (`scripts/a40_h20_recheck.sh`,
+   tmux window a40h20chk, ~9.6h): clean H20-only re-sweep to reconfirm
+   the Zero-Harvest-recovered column, esp. T(40,20) — the one row with
+   no independent cross-check. Verdict line A40_H20_RECHECK_MATCH.
 1. **Wire P_19**: both fit points now real (T(39,20) =
    305997488346556404027895440838, T(40,21) =
    1613457978443478071138613405555); red-first gate like
