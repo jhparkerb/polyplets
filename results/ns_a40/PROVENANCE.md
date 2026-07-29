@@ -52,6 +52,13 @@ validation re-run manually (the driver's exact logic). The zeroed file
 is preserved as evidence at `runs/ns_a40/dalby/h20.out.zero-harvest-bug`
 on dalby.
 
+**Recheck (2026-07-28..29): a clean H20-only re-sweep
+(`scripts/a40_h20_recheck.sh`, fresh run dir + checkpoint, phase B's
+exact config, 48 cores, 43,747s sweep wall) reproduced the recovered
+`h20.out` byte-for-byte — A40_H20_RECHECK_MATCH. T(40,20) =
+2359769260803281210360136128699 is thereby independently re-derived,
+and the recovery carries no remaining caveat.**
+
 ## Validation
 
 - a(1)..a(20) match `fixtures/b006770.txt` exactly; a(21), a(26)..a(39)
