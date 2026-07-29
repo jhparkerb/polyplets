@@ -4,7 +4,7 @@ onset points.
 
 Reads diagCoeffTable from orchestrator/sweep.go (numerator coefficients,
 descending powers of n, divided by kfact, times 3^(n-1-3k)) and the banked
-triangle from results/triangle.txt, then for every k = 0..16:
+triangle from results/triangle.txt, then for every k = 0..18:
   - cross-checks the production polynomial against EVERY banked in-onset
     point on diagonal k (fail-closed on any mismatch),
   - reports the onset points n = 2k+1..3k+1 with availability,
@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SWEEP = ROOT / "orchestrator" / "sweep.go"
 TRIANGLE = ROOT / "results" / "triangle.txt"
 OUT = ROOT / "polyplets" / "pin-data.md"
-NMAX = 36
+NMAX = 40
 
 
 def parse_table(src: str) -> dict[int, tuple[list[int], int]]:
@@ -73,7 +73,7 @@ def main() -> None:
         "generation time; a mismatch aborts generation.",
         "",
     ]
-    for k in range(0, 17):
+    for k in range(0, 19):
         onset = 2 * k + 1
         pin_pts = list(range(onset, 3 * k + 2))
         banked = [n for n in range(onset, NMAX + 1) if (n, n - k) in tri]

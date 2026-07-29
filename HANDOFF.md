@@ -235,9 +235,12 @@ verify_claims 406/406 (adds: proof checker, ab-initio grand form, (2s+1)^2,
 spine digit-product on all in-band cells).
 
 ## Open threads
-- **Lean proof** (branch `lean-diagonal-proofs`, `polyplets/PROOF-STATUS.md`):
-  (a) finiteness, (b) row profile, (c-fwd), (d-local) done+green; remain (c-rev),
-  (d-global gap≤2), (e) offset-chain count.
+- **Lean proof** (now on master, `polyplets/PROOF-STATUS.md` is authoritative):
+  shape theorem + grand form standard-axioms-only; **Grand pin tier extended
+  to k ≤ 18 at the a(40) close (2026-07-29)** — triangle.txt reassembled
+  n ≤ 40, Pp17/Pp18 + real-swept guards, PinGrand `--kmax 18` (staircase
+  oracle 209/209), Audit guards extended; P_19 deliberately NOT formalized
+  (fitted-only, no possible holdout, unused in production).
 - **Unmerged engine branches — jasonp's call whether/when** (engine work deprioritized
   per the close target): `tm-hotpath-optim` (RunRecord shrink + pmr allocator, real
   4.47% dalby win, gates+ASan clean); `redesign` / kink-sharded (K-shard private-sweep

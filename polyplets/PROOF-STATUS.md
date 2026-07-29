@@ -1,4 +1,4 @@
-# Lean formalization status — production diagonal formulas P_0..P_16
+# Lean formalization status — production diagonal formulas P_0..P_18
 
 Goal (2026-07-20, /goal active): Lean-prove the diagonal closed forms used by
 the production engine (`diagonalCell`, k = 0..16); where full proof is out of
@@ -105,11 +105,12 @@ Headline results and their audited axioms (verbatim from
   deferred stretch goal, closed), `expPoly_natDegree_eq` (deg = k exactly),
   `shape_lead`, `bSeq_one`, `mu_one`: standard + the single `V_1_1`
   native_decide leaf.
-- `P<k>_grand_of_banked`, k = 1..16: the PRODUCTION polynomials
+- `P<k>_grand_of_banked`, k = 1..18: the PRODUCTION polynomials
   (`orchestrator/sweep.go`, via `Pin.lean`'s `Pp<k>`) pinned for all
   n ≥ 2k+1 with hypotheses = **2 real-swept cells per level**
-  (`T(2j+1, j+1)`, `T(2j+2, j+2)` for j = 4..16 — 26 anchors at k = 16,
-  every one with H ≤ 18; levels ≤ 3 discharged from
+  (`T(2j+1, j+1)`, `T(2j+2, j+2)` for j = 4..18 — 30 anchors at k = 18,
+  every one with H ≤ 20 and every one REAL-SWEPT (columns H ≤ 21 are real
+  sweeps of the a(40) run); levels ≤ 3 discharged from
   `P1_closed`/`P2_closed`/`P3_pinned`). Axioms: standard + `P3_pinned`'s
   heavy-k=3 native_decide set (V/Vt/d leaves + 16 CFGVchunk cards + light
   base enumerations).
@@ -119,8 +120,22 @@ cross-validation): the k = 12..16 PARTIAL tier's flagged-PREDICTED
 hypotheses are RETIRED — `P<k>_grand_of_banked` needs no beyond-banked
 points — and the k = 4..11 conditional tier's hypothesis lists, which
 included formula-generated cells (e.g. `T 31 20` at k = 11), are replaced
-by real-swept-only anchors. n ≤ 36 data now fully pins every wired
+by real-swept-only anchors. Banked data now fully pins every wired
 diagonal; the "extend to n = 49" upgrade path is obsolete.
+
+**a(40)-close extension (2026-07-29).** With the project closed at a(40)
+(banked triangle n ≤ 40, `results/triangle.txt` reassembled from
+`results/ns_a40/perheight/`), the Grand tier extends to the full wired
+range: `Pp17`/`Pp18` transcribed into `Pin.lean` (defs + degree lemmas +
+guards against REAL-SWEPT cells only — formula-generated cells on those
+diagonals are excluded as circular), `PinGrand.lean` regenerated with
+`--kmax 18` (fail-closed oracle now checks the staircase identity on 209
+real-cell instances, up from 170). `P17_grand_of_banked` anchors:
+T(35,18), T(36,19); `P18_grand_of_banked`: T(37,19), T(38,20) — the same
+cells the production fit used. **P_19 is deliberately NOT formalized**:
+it is fitted from the final two top cells T(39,20)/T(40,21), has no
+possible holdout (the sequence closes at a(40)), and is never used by
+any banked term; pinning it in Lean would certify nothing.
 
 ## Axiom audit
 
@@ -144,7 +159,7 @@ output, so any axiom-set drift FAILS the build (hostile-witness audit fix;
   (`lead_coeff_25`, `expPoly_natDegree_eq`); `shape_lead` transfers both
   to any shape witness. Axioms: standard + the single `V_1_1`
   native_decide leaf.
-- Explicit P_k: proved outright k ≤ 3; k = 4..16 proved modulo TWO
+- Explicit P_k: proved outright k ≤ 3; k = 4..18 proved modulo TWO
   real-swept banked cells per level (`P<k>_grand_of_banked`, Grand tier —
   supersedes the older Lagrange tiers, whose text is kept below for
   history). The former k = 12..16 PREDICTED residue is gone, and the

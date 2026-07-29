@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Assemble the canonical T(n,H) triangle from results/ns_a36/perheight/hH.out.
+"""Assemble the canonical T(n,H) triangle from results/ns_a40/perheight/hH.out.
 
 Output: results/triangle.txt, one line per cell "n H T(n,H)", row-major
-(n ascending, H ascending), 1 <= H <= n <= 36.
+(n ascending, H ascending), 1 <= H <= n <= 40.
 
-Fail-closed checks: row sums must equal a(n) from results/ns_a36/triangle.txt,
+Fail-closed checks: row sums must equal a(n) from results/ns_a40/triangle.txt,
 and T(n,n) must equal 3^(n-1).
 """
 
@@ -12,10 +12,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "results" / "ns_a36" / "perheight"
-ROWSUMS = ROOT / "results" / "ns_a36" / "triangle.txt"
+SRC = ROOT / "results" / "ns_a40" / "perheight"
+ROWSUMS = ROOT / "results" / "ns_a40" / "triangle.txt"
 OUT = ROOT / "results" / "triangle.txt"
-NMAX = 36
+NMAX = 40
 
 
 def read_column(path):
@@ -51,10 +51,10 @@ def main():
 
     header = [
         "# T(n,H): fixed polyplets (king-connected animals) of size n and",
-        "# bounding-box height exactly H, 1 <= H <= n <= 36.",
+        "# bounding-box height exactly H, 1 <= H <= n <= 40.",
         "# Columns: n H T(n,H).  Row sums give A006770.",
         "# Assembled by scripts/assemble_triangle.py from",
-        "# results/ns_a36/perheight/hH.out; provenance in results/ns_a36/PROVENANCE.md.",
+        "# results/ns_a40/perheight/hH.out; provenance in results/ns_a40/PROVENANCE.md.",
         "# Checks enforced at assembly: sum_H T(n,H) = a(n) for all n;",
         "# T(n,n) = 3^(n-1) for all n.",
     ]

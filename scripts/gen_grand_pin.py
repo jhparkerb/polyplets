@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Generate Polyplets/Grand/PinGrand.lean: the grand-form pinning of the
-production polynomials P_1..P_16 from TWO real banked cells per level.
+production polynomials P_1..P_18 from TWO real banked cells per level.
 
 Task GF-5 of the grand-form Lean formalization (polyplets/GRANDFORM-PLAN.md,
 polyplets/briefs/GF5-pingrand.md).  Fail-closed: recomputes the mu table
 level-by-level from results/triangle.txt exactly as experiments/staircase_check.py
-does, re-runs that oracle's checks (170-instance staircase, P-staircase identity,
-anchor parity, weight-side mu parity for k<=3), and enforces H <= 18 for every
-hypothesized anchor.  ANY failure aborts with no output.
+does, re-runs that oracle's checks (209-instance staircase, P-staircase identity,
+anchor parity, weight-side mu parity for k<=3), and enforces H <= 20 for every
+hypothesized anchor (every anchor real-swept: columns H <= 21 are real in
+the a(40) run).  ANY failure aborts with no output.
 
 Architecture (per level k):
   * Pstair{k}  -- the P-staircase ring identity with INTEGER coefficients
@@ -36,8 +37,8 @@ import sys
 from fractions import Fraction as F
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KMAX = 16
-HMAX_ANCHOR = 18
+KMAX = 18
+HMAX_ANCHOR = 20
 
 # Lean-verified aggregated interior weights (Weights.lean/Weights3(Heavy).lean).
 V = {(1, 1): 25, (1, 2): 49, (2, 2): 339, (1, 3): 81, (2, 3): 1860, (3, 3): 4778}
@@ -133,8 +134,8 @@ def check_all(T, P, mu):
     # 1. overdetermination: staircase at all 170 real in-range instances.
     total, bad = 0, []
     for k in range(0, KMAX + 1):
-        for H in range(k + 1, 19):
-            if H + 1 + k > 36:
+        for H in range(k + 1, 21):
+            if H + 1 + k > 40:
                 continue
             lhs = F(T(H + 1 + k, H + 1))
             rhs = sum(mu[i] * T(H + k - i, H) for i in range(k + 1))
@@ -143,8 +144,8 @@ def check_all(T, P, mu):
                 bad.append((k, H))
     if bad:
         die(f"staircase FAILS at {bad[:5]} ({len(bad)} total)")
-    if total != 170:
-        die(f"expected 170 staircase instances, got {total}")
+    if total != 209:
+        die(f"expected 209 staircase instances, got {total}")
 
     # 2. weight-side fixed point for mu_1..mu_3.
     nu = {0: F(1, 3)}
@@ -250,7 +251,8 @@ import Polyplets.Weights3Heavy
 The payoff of the grand-form staircase (`GRANDFORM-PLAN.md`, `briefs/GF5`):
 the production polynomials of `orchestrator/sweep.go` (`Pin.Pp1..Pp16`) are
 certified for **all** `n ≥ 2k+1` from only the two real-swept onset cells
-`A_k = T(2k+1, k+1)` and `B_k = T(2k+2, k+2)` per level (`H ≤ 18` throughout).
+`A_k = T(2k+1, k+1)` and `B_k = T(2k+2, k+2)` per level (`H ≤ 20` throughout,
+every anchor a real-swept cell).
 
 * `Pstair<k>` — the P-staircase ring identity
   `P_k(x+1) = Σ_i (μ_i·3^{{2i-1}})·P_{{k-i}}(x-i)` with **integer** coefficients.
@@ -312,9 +314,14 @@ lemma Pstair{k} (x : ℚ) :
 '''
 
 
+def hb_option(k):
+    """Levels k >= 17 exceed the default 200000-heartbeat budget (the mu-sum
+    simp and the closing ring expansion grow with k); scale the limit."""
+    return "set_option maxHeartbeats 1600000 in\n" if k >= 17 else ""
+
 def emit_mu_val(k, T, num, e):
     lines = []
-    lines.append(f'''
+    lines.append(hb_option(k) + f'''
 /-- **μ_{k} solved from the staircase** at `H={k}+1`: the second real cell
 `B_{k} = T({2 * k + 2},{k + 2})` pins `μ_{k}`. -/
 lemma mu{k}_val
@@ -347,11 +354,11 @@ lemma mu{k}_val
 
 def emit_grand_of_banked(k):
     lines = []
-    lines.append(f'''
+    lines.append(hb_option(k) + f'''
 /-- **k={k} grand form from two real cells per level** (levels 4..{k}).
 `3^(3·{k}+1)·T(H+{k},H) = P_{k}(H+{k})·3^(H+{k})` for all `H ≥ {k}+1`,
 by induction on `H` through `T_staircase`.  Hypotheses: the anchors
-`A_j = T(2j+1,j+1)`, `B_j = T(2j+2,j+2)` for `j = 4..{k}` (all `H ≤ 18`). -/
+`A_j = T(2j+1,j+1)`, `B_j = T(2j+2,j+2)` for `j = 4..{k}` (all `H ≤ 20`, real-swept). -/
 theorem P{k}_grand_of_banked
 {anchor_hyps(k)} :
     ∀ H : ℕ, {k} + 1 ≤ H →
@@ -389,7 +396,7 @@ theorem P{k}_grand_of_banked
 
 def emit_grand_prod(k):
     e = 3 * k + 1
-    return f'''
+    return hb_option(k) + f'''
 /-- **k={k} production `n`-form**: `T(n, n-{k}) = P_{k}(n)·3^(n-1-3·{k})` for all
 `n ≥ 2·{k}+1`, from `P{k}_grand_of_banked`. -/
 theorem P{k}_grand_prod
@@ -470,11 +477,11 @@ def main():
         pc[i] = val.numerator
 
     print("gen_grand_pin: ALL CHECKS PASS "
-          "(staircase 170/170, P-staircase, anchors, weight-side mu_1..3, "
-          f"pc integers, anchors H<=18); kmax={args.kmax}")
+          "(staircase 209/209, P-staircase, anchors, weight-side mu_1..3, "
+          f"pc integers, anchors H<=20); kmax={args.kmax}")
 
     inputs_line = ("results/triangle.txt, orchestrator/sweep.go, "
-                   "polyplets/pin-data.md (2026-07-21).")
+                   "polyplets/pin-data.md (2026-07-29, n <= 40 triangle).")
     out = [emit_header(inputs_line)]
 
     # Pstair for all levels.
