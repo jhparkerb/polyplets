@@ -19,7 +19,7 @@ sequences, nothing about novelty to defend.
 
 | entry | staged | b-file | new terms | anchor |
 |---|---|---|---|---|
-| A006770 (fixed polyplets) | `oeis/A006770.txt` | `results/b006770_upload.txt` | a(19)–a(35), +a(36) as %C conjecture | a(1)–a(22) two-algorithm |
+| A006770 (fixed polyplets) | `oeis/A006770.txt` | `results/b006770_upload.txt` | a(19)–a(40) | a(1)–a(22) two-algorithm |
 | A030233 (one-sided) | `oeis/A030233.txt` | `results/b030233_upload.txt` | a(18)–a(34) | Burnside from A006770 + r90/r180 |
 | A030222 (free) | `oeis/A030222.txt` | `results/b030222_upload.txt` | a(18)–a(32), +a(33) %C conjecture | Burnside (needs dmirror) |
 | A030234 (bilateral) | `oeis/A030234.txt` | `results/b030234_upload.txt` | a(18)–a(32), +a(33) %C | (E+G)/2 identity |
@@ -29,6 +29,17 @@ sequences, nothing about novelty to defend.
 All six b-files audited 2026-07-16: zero disagreement with live OEIS terms on
 every shared index, contiguous, format-clean, cross-entry Burnside identities
 verified numerically at every shared n (see §5).
+
+**2026-07-29 — A006770 promoted to a(40).** The a(37)–a(40) ladder (final
+term a(40), project close) retired the a(36) downgrade: P_16/P_17/P_18 each
+passed real-swept holdouts (T(35,19), T(37,20), T(39,21)), and the a(40)
+run's real H21 sweep re-confirmed P_0..P_18 on every row n = 21..39 at once
+(`results/ns_a40/PROVENANCE.md`; T(40,20) re-swept standalone,
+byte-identical). a(36)–a(40) added to the b-file, the a(36)-conjecture %C
+dropped, %E/header updated. These five terms postdate the 2026-07-16 audit:
+**re-run the §5 mechanical audit on A006770 before submission** (n ≤ 18
+byte-match vs live OEIS re-verified 2026-07-29 by
+`paper/verify_technical_report.py`; the other five entries are untouched).
 
 Checklist rule 1 (linked entries move together) is satisfied by submitting the
 six as one batch — the policy notes six related extensions is normal practice,
@@ -96,10 +107,12 @@ it requires trusting prose.
    a(1)–a(18) byte-match the live OEIS b-file.
 3. **Held-out closed-form predictions**: P_15, pinned before a(33) existed,
    predicted T(33,18) exactly; P_16, fitted on a(33)–a(34), predicted the
-   later real-swept holdout T(35,19) exactly. (T(36,20) also matches, but it
-   was itself P_16-generated in the a(36) run, so it is a consistency check,
-   not a holdout.) Terms whose newest cell lacks such a holdout are
-   *explicitly downgraded* (a(36) is a comment, not b-file data).
+   later real-swept holdout T(35,19); P_17 predicted the real-swept
+   T(37,20); P_18 predicted the real-swept T(39,21); and the a(40) run's
+   real H21 sweep reproduced the closed-form column-21 values on every row
+   n = 21..39 simultaneously (P_0..P_18 re-confirmed at a fresh point each).
+   No term in the b-file rests on a formula without a passed holdout (P_19
+   exists but is fitted-only and is used for NO banked term).
 4. **Honest grading is built into the entries themselves**: the %C text and
    b-file headers state exactly which terms are two-algorithm, which are
    single-algorithm-multiply-cross-checked, and which are conjectured. Nothing
