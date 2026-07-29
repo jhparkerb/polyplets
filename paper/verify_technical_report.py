@@ -163,6 +163,54 @@ for n in range(4, 41):
     check(f"T({n},{n}-1) = (25n-45)*3^(n-4)",
           col[n - 1][n], (25 * n - 45) * 3 ** (n - 4))
 
+# ---------------- H20/H21 pole columns vs the closed-form diagonals ----
+# The report's "P_k explicitly known for k<=19 ... verified against values
+# from later rows" claim, exercised on the two solo-phase pole columns of
+# the a(40) run: refit each P_k (k=1..18) from its two EARLIEST in-onset
+# cells via the exponential/cumulant law (exact rationals), then demand
+# every in-onset cell of columns H=20 and H=21 match the closed form.
+# H=21 is the mass certification (no fit cell lies in that column); in
+# H=20 the single fit cell T(38,20) (P_18's second point) is skipped.
+from fractions import Fraction as Fr
+
+def pcell(n, k):  # P_k(n) = T(n,n-k) * 3^(1+3k-n), exact
+    return Fr(col[n - k][n]) * Fr(3) ** (1 + 3 * k - n)
+
+ab = {}  # k -> (a_k, b_k) cumulant constants
+
+def qpart(n, k):  # [y^k] exp(sum_{j<k} (a_j+b_j n) y^j)
+    c = [Fr(0)] * (k + 1)
+    c[0] = Fr(1)
+    for j in range(1, k):
+        aj, bj = ab[j]
+        cy = [Fr(0)] * (k + 1)
+        cy[0] = Fr(1)
+        term = Fr(1)
+        for m in range(1, k // j + 1):
+            term *= (aj + bj * n)
+            term /= m
+            if m * j <= k:
+                cy[m * j] = term
+        c = [sum(c[i] * cy[m - i] for i in range(m + 1))
+             for m in range(k + 1)]
+    return c[k]
+
+for k in range(1, 19):
+    n1, n2 = 2 * k + 1, 2 * k + 2
+    v1, v2 = pcell(n1, k) - qpart(n1, k), pcell(n2, k) - qpart(n2, k)
+    bk = v2 - v1
+    ab[k] = (v1 - bk * n1, bk)
+
+for H in (20, 21):
+    for n in range(H + 1, 41):
+        k = n - H
+        if not (1 <= k <= 18) or n in (2 * k + 1, 2 * k + 2):
+            continue
+        ak, bk = ab[k]
+        want = qpart(n, k) + ak + bk * n
+        check(f"pole column: T({n},{H}) matches refit P_{k}",
+              pcell(n, k), want)
+
 print(f"{checks} checks, {len(failures)} failures")
 for f in failures:
     print(" ", f)
