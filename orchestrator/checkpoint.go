@@ -6,6 +6,8 @@
 //   col <c>
 //   frontier <path> [<path>...]
 //   acct cpu_s=<SUM> wall_s=<SUM> rss_max_mb=<MAX>
+//   tri <n> <value>    (accumulated triangle, sparse)
+//   htri <n> <value>   (current height's partial row alone, sparse)
 //
 // The bulk of the checkpoint IS the frontier run files already on disk; the
 // POLYCKPT just names them.  Resume reloads the frontier, re-dispatches any
@@ -37,7 +39,18 @@ type Checkpoint struct {
 	// before H, plus contributions from completed columns within H.
 	// Indexed by n; len = maxn+1.
 	Triangle []*big.Int
-	Acct     Acct
+	// HTri holds the CURRENT height H's partial contributions alone (the
+	// within-H share already merged into Triangle above). Resume seeds the
+	// height's sweep with it so the completion-time per-height write
+	// (h<H>.out) is whole — without it, a resumed height's per-height row
+	// carries only the post-resume columns (the Zero Harvest bug,
+	// results/ns_a40/PROVENANCE.md: resuming an already-COMPLETED height has
+	// no columns left and wrote all zeros over the good file). Absent from
+	// pre-fix checkpoints (nil): the triangle still resumes correctly, only
+	// the per-height row can't be reconstructed (writePerHeight's all-zero
+	// guard then refuses the worst case).
+	HTri []*big.Int
+	Acct Acct
 	Written  time.Time
 	// Run config stamped at write time so resume can hard-fail on a mismatched
 	// CLI (a different --maxn/--counter/--fold silently corrupts the triangle).
@@ -73,6 +86,13 @@ func (ck *Checkpoint) Write(path string) error {
 	for n, v := range ck.Triangle {
 		if v != nil && v.Sign() != 0 {
 			fmt.Fprintf(f, "tri %d %d\n", n, v)
+		}
+	}
+	// Sparse current-height partial row (see HTri). Additive line type:
+	// ReadCheckpoint ignores unknown keys, so old readers skip it.
+	for n, v := range ck.HTri {
+		if v != nil && v.Sign() != 0 {
+			fmt.Fprintf(f, "htri %d %d\n", n, v)
 		}
 	}
 
@@ -137,6 +157,20 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 				ck.Triangle = append(ck.Triangle, new(big.Int))
 			}
 			ck.Triangle[n] = val
+		case "htri":
+			parts := strings.Fields(v)
+			if len(parts) != 2 {
+				return nil, fmt.Errorf("%s: malformed htri line %q", path, line)
+			}
+			n, err1 := strconv.Atoi(parts[0])
+			val, ok := new(big.Int).SetString(parts[1], 10)
+			if err1 != nil || !ok || n < 0 {
+				return nil, fmt.Errorf("%s: malformed htri line %q", path, line)
+			}
+			for n >= len(ck.HTri) {
+				ck.HTri = append(ck.HTri, new(big.Int))
+			}
+			ck.HTri[n] = val
 		}
 	}
 	if !sawHeader {

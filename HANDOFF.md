@@ -21,18 +21,19 @@ Remaining close-out:
    reproduced the Zero-Harvest-recovered h20.out byte-for-byte;
    T(40,20) independently confirmed, recovery asterisk removed
    (PROVENANCE.md updated).
-1. **Wire P_19**: both fit points now real (T(39,20) =
-   305997488346556404027895440838, T(40,21) =
-   1613457978443478071138613405555); red-first gate like
-   diag_p18_test.go. P_19 stays fitted-no-holdout permanently (a
-   holdout would need a(42)'s real H22).
-2. **Fix the Zero Harvest engine bug** (red-first): resuming an
-   already-completed height harvests an EMPTY count table over the
-   good per-height output (clobbered h20.out; recovered from the
-   plain-text POLYCKPT.B `tri` table, cross-checked digit-for-digit vs
-   a(39)'s independent H20 sweep — full incident in
-   results/ns_a40/PROVENANCE.md). The phased-driver generalization
-   task for a(41)+ is MOOT.
+1. ~~Wire P_19~~ **DONE 2026-07-29** (commit 9671e94): derived via
+   scripts/derive_pk_fast.py from real T(39,20) + T(40,21), leading
+   coeff 25^19/19! + k!-integrality confirmed, red-first
+   diag_p19_test.go, k-range fence moved to k=20. Permanently
+   fitted-no-holdout (a holdout would need a(42)'s real H22).
+2. ~~Fix the Zero Harvest engine bug~~ **DONE 2026-07-29** (red-first
+   orchestrator/zero_harvest_test.go): checkpoint now carries the
+   current height's partial per-height row (`htri` lines), resume
+   seeds it, and writePerHeight refuses all-zero rows. The red test
+   also exposed the silent variant — after ANY mid-height resume the
+   old code's h<H>.out under-counted (phase B's own pre-clobber
+   h20.out was already wrong; the checkpoint was always the sole
+   correct copy — PROVENANCE.md corrected accordingly).
 3. **jasonp: technical-report placeholders** — real a(40) above;
    revision list delivered in-session 2026-07-27 (line-110 brace, P_k
    k≤16→18/19, λ para, Split truncation, Reproducibility section).

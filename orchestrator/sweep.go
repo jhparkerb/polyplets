@@ -227,6 +227,15 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		}
 	}
 
+	// hSeed is the resumed height's checkpointed partial per-height row —
+	// non-nil only while sweeping the height a mid-height resume landed in.
+	// Its contributions are already inside `triangle` (the checkpoint's
+	// Triangle merges them), so it must NOT be re-added there; it exists so
+	// the completion-time per-height write and the next checkpoint's HTri
+	// carry the height's WHOLE row, not just the post-resume columns (the
+	// Zero Harvest bug, results/ns_a40/PROVENANCE.md).
+	var hSeed []*big.Int
+
 	// writeCheckpoint writes a POLYCKPT with the outer triangle + the current
 	// height's partial contributions (hTri).  Both are needed: the outer triangle
 	// holds completed heights; hTri holds the current height's progress so far.
@@ -243,6 +252,7 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			Col:      col,
 			Frontier: frontier,
 			Triangle: combined,
+			HTri:     addRows(maxn, hTri, hSeed),
 			Acct:     acct,
 			Maxn:     cfg.Maxn,
 			Counter:  counterName(cfg.CounterWidth),
@@ -352,9 +362,11 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		startCol := 0
 		var frontier []string
 
+		hSeed = nil
 		if resume != nil && H == resume.H {
 			startCol = resume.Col + 1
 			frontier = resume.Frontier
+			hSeed = resume.HTri
 			resume = nil
 		} else {
 			seed := filepath.Join(cfg.RunDir, fmt.Sprintf("seed_h%d.bin", H))
@@ -380,15 +392,31 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		}
 
 		// Per-height row (multi-machine combine + direct cross-check vs the old
-		// engine's h<H>.out). Written only on a fully completed height.
+		// engine's h<H>.out). Written only on a fully completed height. hSeed
+		// restores the pre-resume columns' share after a mid-height resume —
+		// hTri alone holds only THIS process's columns (Zero Harvest).
 		if cfg.PerHeightOut != "" {
-			if werr := writePerHeight(cfg.PerHeightOut, H, maxn, hTri); werr != nil {
+			if werr := writePerHeight(cfg.PerHeightOut, H, maxn, addRows(maxn, hTri, hSeed)); werr != nil {
 				fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
 			}
 		}
 	}
 
 	return &SweepResult{Triangle: triangle, Acct: acct}, nil
+}
+
+// addRows returns a fresh maxn+1 row holding a+b (either may be nil/short);
+// inputs are not aliased or mutated.
+func addRows(maxn int, a, b []*big.Int) []*big.Int {
+	r := newBigRow(maxn + 1)
+	for _, src := range [][]*big.Int{a, b} {
+		for n, v := range src {
+			if n < len(r) && v != nil {
+				r[n].Add(r[n], v)
+			}
+		}
+	}
+	return r
 }
 
 // runOverlap sweeps heights CONCURRENTLY — cfg.OverlapHeights at a time, all
@@ -1741,6 +1769,21 @@ func mergePhase(
 // lines for n=1..maxn (matching the old engine's per-height output, so the two
 // can be byte-compared cell by cell).
 func writePerHeight(dir string, H, maxn int, hTri []*big.Int) error {
+	// Fail closed on an all-zero row: T(H,H)=3^(H-1)>0, so a completed height
+	// can NEVER produce one — an all-zero hTri means a harvest bug upstream
+	// (Zero Harvest overwrote a good h20.out with zeros in the a(40) run,
+	// results/ns_a40/PROVENANCE.md). Refuse rather than clobber whatever is
+	// on disk.
+	allZero := true
+	for _, v := range hTri {
+		if v != nil && v.Sign() != 0 {
+			allZero = false
+			break
+		}
+	}
+	if allZero {
+		return fmt.Errorf("refusing to write all-zero per-height row h%d.out (Zero Harvest guard: T(%d,%d)>0 always; harvest bug upstream)", H, H, H)
+	}
 	if err := os.MkdirAll(dir, 0o777); err != nil {
 		return err
 	}

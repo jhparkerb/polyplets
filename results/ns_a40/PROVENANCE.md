@@ -33,11 +33,25 @@ resume is per-phase). On the relaunch (07-26 21:16 EDT), the driver
 re-entered completed phases A and B in resume mode before starting C.
 Phase B resumed from its final checkpoint state (H=20 col=40), found no
 work, and on exit RE-HARVESTED `perheight/h20.out` from an empty
-in-memory count table — overwriting phase B's correct output with
-all-zero rows (engine bug, open: resuming an already-completed height
-harvests zeros instead of refusing or carrying the checkpointed
-counts). Phase A's resume path (fully-complete sentinel H=-1) skips
-harvest and was unaffected; phase C ran fresh and was unaffected.
+in-memory count table — overwriting phase B's output with all-zero rows.
+Phase A's resume path (fully-complete sentinel H=-1) skips harvest and
+was unaffected; phase C ran fresh and was unaffected.
+
+The engine bug (FIXED post-run, red-first
+`orchestrator/zero_harvest_test.go`): the completion-time per-height
+write used only the contributions swept by THIS process, while pre-
+resume columns' counts live only in the checkpoint's combined triangle.
+Resuming a COMPLETED height is the extreme case (no columns left →
+all zeros); the red test also proved the silent variant — after ANY
+mid-height resume the rewritten h<H>.out under-counts. Phase B itself
+had a mid-run interruption + resume, so the h20.out it wrote at
+completion was already under-counted BEFORE the zero overwrite; the
+checkpoint's count table was always the sole correct copy (its
+correctness is what the recovery below and the independent re-sweep
+both confirm). Fix: the checkpoint now carries the current height's
+partial per-height row (`htri` lines) and resume seeds it; plus
+writePerHeight refuses an all-zero row outright (T(H,H)=3^(H-1)>0
+makes one impossible for a completed height).
 
 36h later the driver's combine step refused the zeroed shard (fail-
 closed: "all counts zero (empty/corrupt shard)") and `set -e` ended the
