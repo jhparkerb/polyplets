@@ -5,15 +5,17 @@ cells on the square lattice where corner contact counts, OEIS
 [A006770](https://oeis.org/A006770). This repository extended the
 sequence from a(18) to
 
-    a(36) = 24629107617723857143962968288
+    a(40) = 56749893611764175164545926946127
 
 with a(1)–a(22) confirmed digit-for-digit by two independent algorithms
 sharing no counting logic (Redelmeier enumeration vs transfer matrix;
 three-architecture fleet run completed 2026-07-16), together with its
 symmetry companions (free A030222, one-sided A030233,
 bilateral A030234, asymmetric A030235, free-non-polyomino A194596), a
-hole-count stratification, fixed-height generating functions, and an
-empirical closed-form theory for the diagonals of two counting triangles.
+hole-count stratification, fixed-height generating functions, and a
+closed-form theory for the diagonals of two counting triangles (the laws'
+polynomial shapes proved, the higher-level constants fitted and
+holdout-validated).
 
 **The full account is the report: [`paper/polyplets-report.tex`](paper/polyplets-report.tex)**
 — results, methods ladder, and (critically) the confidence-tier system
@@ -60,14 +62,20 @@ provenance — which binary, which host, which validations — is in
 
 ## Confidence tiers (the short version)
 
-- **T1** a(1)–a(20): two algorithms sharing no counting logic agree
-  (independent whole-row Redelmeier confirmed a(20), 2026-07-11; a(22) running).
-- **T2** a(21)–a(34): one algorithm family, multiply decorrelated
-  (full-chain regression, cross-ISA recounts, held-out closed-form
-  diagonal checks, mod-p consistency). a(34)'s top-cell diagonal now has its
-  held-out check (a(35) supplies it).
-- **T2⁻** a(35)–a(36): T2 minus a full same-heights cross-ISA re-verify
-  (a(35) had only a partial cross-ISA; a(36)'s top cell awaits a(37)).
+- **T1** a(1)–a(22): two algorithms sharing no counting logic agree
+  (whole-row Redelmeier fleet vs transfer matrix, completed 2026-07-16).
+- **T2** a(23)–a(38): one algorithm family, multiply decorrelated
+  (full-chain regression on every run; cross-architecture recounts where
+  run — full at a(34), partial at a(35), split at a(36), none for
+  a(37)–a(38); and the held-out closed-form diagonal chain
+  P₁₅→T(33,18), P₁₆→T(35,19), P₁₇→T(37,20), P₁₈→T(39,21), each formula
+  predicting a cell of a term computed after it was pinned).
+- **T2⁻** a(39)–a(40): T2 minus the held-out top-cell check — their top
+  real cells sit on diagonal k=19, whose closed form has no independent
+  holdout and, the sequence closing at a(40), never will. Narrowed by the
+  a(40) run's real H21 sweep reproducing nineteen closed-form rows in the
+  same stroke that produced T(40,21), and by a standalone byte-identical
+  re-sweep of the H20 column.
 - **T3** n=33 companions: exact computation composed with empirically
   pinned but unproven quasi-polynomial formulas — labeled, never silently.
 

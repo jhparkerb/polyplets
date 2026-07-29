@@ -65,9 +65,11 @@ not "bulk."
 
 - **A: height triangle T(n,H)** (row sums A006770, diagonal 3^(n-1)) — strongest
   new-sequence candidate; the diagonal closed forms live in its comments.
-  Already staged as a skeleton: `oeis/draft-Tnh-triangle.txt` +
-  `oeis/b-draft-Tnh-triangle.txt` (20 rows / 210 cells, verified 2026-07-17:
-  row sums == A006770, T(n,n) == 3^(n-1), T(n,1) == 1).
+  Already staged: `oeis/draft-Tnh-triangle.txt` +
+  `oeis/b-draft-Tnh-triangle.txt` (40 rows / 820 cells — extended 2026-07-29
+  from the banked a(40) triangle, 210-cell prefix byte-identical; verified:
+  row sums == A006770 for n <= 40, T(n,n) == 3^(n-1), T(n,1) == 1; diagonal
+  closed-form %C/%F added).
 - **B: component triangle C(n,c)** (row sums A006770, both edge columns A001168).
 - **C (optional): HV-convex king animals** (38 terms, non-D-finite by area).
 

@@ -1,5 +1,7 @@
 DRAFT — OEIS submission: T(n,H), fixed king-polyplets by exact bounding-box height
-Status: data complete & validated for n<=20 (this file); n=21 row appends when a(21) lands.
+Status: FINAL — data complete & validated for n<=40 (820-cell b-file, the project's
+full banked triangle; extended from the 20-row staging 2026-07-29, prefix
+byte-identical). Superseeker pass still OWED before submission (SUBMISSION.md Wave 3).
 Novelty: the triangle, its row-flattening, the H=2/H=3 columns, and the T(n,n-1)
 sub-diagonal all returned no OEIS hits (per project notes); jasonp pushes submit.
 
@@ -10,8 +12,8 @@ sub-diagonal all returned no OEIS hits (per project notes); jasonp pushes submit
 1,27,55,27,
 1,68,248,240,81,
 1,167,996,1480,945,243,
-...  (full 210-term b-file: oeis/b-draft-Tnh-triangle.txt; full triangle:
-     results/ns_a20/Tnh_triangle.txt)
+...  (full 820-term b-file, rows n<=40: oeis/b-draft-Tnh-triangle.txt; per-height
+     columns: results/ns_a40/perheight/h1..h40.out)
 
 %N  Triangle read by rows: T(n,H) = number of fixed polyplets (king-move /
     8-connected polyominoes) of n cells whose bounding box has height exactly H,
@@ -21,10 +23,18 @@ sub-diagonal all returned no OEIS hits (per project notes); jasonp pushes submit
 %C  Left column is all 1s (height 1 = a horizontal strip of n cells, A000012).
 %C  Right diagonal T(n,n) = 3^(n-1) (A000244): height exactly n forces one cell per
     row, king-connected, with 3 horizontal offsets (-1,0,+1) at each of the n-1 steps.
-%C  Verified: every row sum byte-matches the known A006770(n) for n<=20 (combine -compare);
-    edges T(n,1)=1 and T(n,n)=3^(n-1) confirmed for all n<=20.
+%C  The top diagonals have closed forms: T(n,n-k) = P_k(n)*3^(n-1-3k) for n >= 2k+1,
+    with P_k an integer-valued polynomial of degree k and leading coefficient 25^k/k!
+    (shape proved by an exact walk-plus-clusters decomposition; constants derived
+    ab initio for k<=5, fitted and holdout-validated for 6<=k<=18). In particular
+    T(n,n-1) = (25n-45)*3^(n-4) for n >= 4.
+%C  Verified: every row sum matches the banked A006770(n) for n<=40 (a(1)-a(18)
+    byte-match the live OEIS b-file); edges T(n,1)=1 and T(n,n)=3^(n-1) confirmed
+    for all n<=40.
 
 %F  T(n,1) = 1.  T(n,n) = 3^(n-1).  Sum_{H=1..n} T(n,H) = A006770(n).
+%F  T(n,n-1) = (25n-45)*3^(n-4) for n >= 4; generally T(n,n-k) = P_k(n)*3^(n-1-3k)
+    for n >= 2k+1 with deg P_k = k, lead 25^k/k! (see the project report).
 
 %e  Triangle begins:
       n=1:  1
@@ -40,6 +50,10 @@ sub-diagonal all returned no OEIS hits (per project notes); jasonp pushes submit
 %K  nonn,tabl
 %O  1,3  (offset 1; first nontrivial term T(2,2)=3)
 
-Provenance: new-engine transfer-matrix run a(20) on ayr (rev aebdd82), per-height
-output runs/ns_a20/perheight/h1..h20.out, assembled by build/ns/combine; row sums
-validated against fixtures/b006770.txt (combine_compare PASS, n<=20).
+Provenance: rows n<=20 from the new-engine transfer-matrix run a(20) on ayr (rev
+aebdd82, combine_compare PASS vs fixtures/b006770.txt); rows extended to n<=40
+on 2026-07-29 from the banked a(40) triangle (results/ns_a40/perheight/,
+PROVENANCE.md — A40_VALIDATE_PASS, H20 recheck byte-identical, H21 mass
+closed-form cross-check), staged 210-cell prefix byte-identical. Validation at
+extension: row sums == banked A006770(n) for all n<=40, T(n,1)==1,
+T(n,n)==3^(n-1).
