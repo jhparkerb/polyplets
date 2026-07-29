@@ -263,7 +263,7 @@ if os.path.exists(SC):
 else:
     print("  (skipping symmetric n=18,19 checks: build/symcount_fast not found)")
 
-# === Claims of the full computational report (a(34) era, 2026-07) ===
+# === Claims of the full computational report (a(40) close, 2026-07) ===
 # These parse the report's tables straight out of the .tex, so transcription
 # errors in the paper are caught, then validate against the banked data.
 
@@ -293,21 +293,21 @@ def table_rows(label):
             rows.append(row)
     return rows
 
-TRI = load("results/ns_a36/triangle.txt")          # a(n) totals to 36
+TRI = load("results/ns_a40/triangle.txt")          # a(n) totals to 40
 chk("triangle totals extend b-file", all(TRI[n] == A[n] for n in A))
 
-# tab:terms -- all 36 values vs the banked totals
+# tab:terms -- all 40 values vs the banked totals
 terms = {}
 for row in table_rows("tab:terms"):
     for i in range(0, len(row) - 1, 2):
         terms[row[i]] = row[i + 1]
-chk("tab:terms has n=1..36", sorted(terms) == list(range(1, 37)))
+chk("tab:terms has n=1..40", sorted(terms) == list(range(1, 41)))
 for n, v in sorted(terms.items()):
     chk(f"tab:terms a({n}) vs banked", TRI.get(n) == v, f"paper {v} vs {TRI.get(n)}")
 
 # growth paragraph: quoted ratios and both lambda fits recomputed
-r34 = {n: TRI[n] / TRI[n - 1] for n in range(2, 37)}
-for n, q in ((20, 6.765), (27, 6.853), (34, 6.905), (36, 6.916)):
+r34 = {n: TRI[n] / TRI[n - 1] for n in range(2, 41)}
+for n, q in ((20, 6.765), (27, 6.853), (34, 6.905), (40, 6.935)):
     chk(f"quoted ratio r_{n}~{q}", round(r34[n], 3) == q, f"{r34[n]:.4f}")
 
 def lstsq(rows_, rhs):
@@ -325,17 +325,17 @@ def lstsq(rows_, rhs):
                 bq[i] -= f_ * bq[col]
     return [bq[i] / Aq[i][i] for i in range(m)]
 
-lam2q = [7.101, 7.104, 7.105, 7.106]
+lam2q = [7.102, 7.104, 7.106, 7.107]
 for s, q in zip((10, 15, 20, 25), lam2q):
-    ns = range(s, 37)
+    ns = range(s, 41)
     lam, lt = lstsq([[1.0, 1.0 / n] for n in ns], [r34[n] for n in ns])
-    chk(f"2-param lambda window {s}..36 == {q}", round(lam, 3) == q, f"{lam:.4f}")
-    chk(f"2-param theta window {s}..36 rounds into [-0.96,-0.94]",
-        -0.96 <= round(lt / lam, 2) <= -0.94)
+    chk(f"2-param lambda window {s}..40 == {q}", round(lam, 3) == q, f"{lam:.4f}")
+    chk(f"2-param theta window {s}..40 rounds into [-0.96,-0.95]",
+        -0.96 <= round(lt / lam, 2) <= -0.95)
 rss = {}
 for D1 in (0.5, 1.0):
     for s in (10, 15, 20, 25):
-        ns = range(s, 37)
+        ns = range(s, 41)
         sol = lstsq([[1.0, 1.0 / n, 1.0 / n ** (1 + D1)] for n in ns],
                     [r34[n] for n in ns])
         lam, th = sol[0], sol[1] / sol[0]
@@ -343,26 +343,95 @@ for D1 in (0.5, 1.0):
                   for n in ns)
         rss[(D1, s)] = res
         if D1 == 0.5:
-            chk(f"3-param lambda window {s}..36 in [7.1109,7.1111]",
-                7.1109 <= round(lam, 4) <= 7.1111, f"{lam:.5f}")
-            chk(f"3-param theta window {s}..36 in [-1.03,-1.02]",
+            chk(f"3-param lambda window {s}..40 in [7.1108,7.1111]",
+                7.1108 <= round(lam, 4) <= 7.1111, f"{lam:.5f}")
+            chk(f"3-param theta window {s}..40 in [-1.03,-1.02]",
                 -1.03 <= round(th, 2) <= -1.02, f"{th:.4f}")
-chk("Delta1=1/2 beats Delta1=1 on every window (~5x shortest, ~250x longest)",
-    all(rss[(0.5, s)] * 4.5 <= rss[(1.0, s)] for s in (10, 15, 20, 25))
-    and rss[(0.5, 10)] * 250 <= rss[(1.0, 10)])
+chk("Delta1=1/2 beats Delta1=1 on every window (~4x shortest, ~140x longest)",
+    all(rss[(0.5, s)] * 3.5 <= rss[(1.0, s)] for s in (10, 15, 20, 25))
+    and rss[(0.5, 10)] * 140 <= rss[(1.0, 10)])
 
-# tab:byheight36 -- swept heights vs run data; whole column sums to a(36)
-bh36 = {row[i]: row[i + 1] for row in table_rows("tab:byheight36")
+# tab:byheight40 -- swept heights vs run data; whole column sums to a(40)
+bh40 = {row[i]: row[i + 1] for row in table_rows("tab:byheight40")
         for i in range(0, len(row) - 1, 2)}
-chk("tab:byheight36 has H=1..36", sorted(bh36) == list(range(1, 37)))
-chk("tab:byheight36 sums to a(36)", sum(bh36.values()) == TRI[36])
-chk("T(36,36)==3^35", bh36[36] == 3 ** 35)
-inj = sum(v for h, v in bh36.items() if h >= 20)
-chk("injected share H>=20 rounds to 5.6%", round(100 * inj / TRI[36], 1) == 5.6)
-for h in range(3, 20):
-    ph = os.path.join(ROOT, "results", "ns_a36", "perheight", f"h{h}.out")
+chk("tab:byheight40 has H=1..40", sorted(bh40) == list(range(1, 41)))
+chk("tab:byheight40 sums to a(40)", sum(bh40.values()) == TRI[40])
+chk("T(40,40)==3^39", bh40[40] == 3 ** 39)
+chk("byheight40 peak at H=14", max(bh40, key=bh40.get) == 14)
+inj40 = sum(v for h, v in bh40.items() if h >= 22)
+chk("injected share H>=22 rounds to 4.1%", round(100 * inj40 / TRI[40], 1) == 4.1)
+chk("real-swept share H=3..21 rounds to 95.9%",
+    round(100 * sum(v for h, v in bh40.items() if 3 <= h <= 21) / TRI[40], 1) == 95.9)
+for h in range(1, 41):
+    ph = os.path.join(ROOT, "results", "ns_a40", "perheight", f"h{h}.out")
     if os.path.exists(ph):
-        chk(f"T(36,{h}) vs perheight run data", load(f"results/ns_a36/perheight/h{h}.out").get(36) == bh36[h])
+        chk(f"T(40,{h}) vs perheight run data",
+            load(f"results/ns_a40/perheight/h{h}.out").get(40) == bh40[h])
+
+# GF lower bound vs the now-exact a(40): captures 7.5%
+chk("GF bound captures 7.5% of exact a(40)",
+    round(100 * 4266005101622209395058618248135 / TRI[40], 1) == 7.5)
+
+# --- Held-out diagonal chain: refit every P_k from its two EARLIEST in-onset
+# cells (the production protocol) and demand every later banked cell on the
+# diagonal, through n=40, match exactly. Subsumes the quoted holdouts
+# P_15->T(33,18), P_16->T(35,19), P_17->T(37,20), P_18->T(39,21) and the
+# a(40) H=21 mass certification (rows n=21..39). Exact rational arithmetic.
+PH40 = {}
+for _f in glob.glob(os.path.join(ROOT, "results", "ns_a40", "perheight", "h*.out")):
+    _H = int(os.path.basename(_f)[1:-4])
+    PH40[_H] = load(os.path.relpath(_f, ROOT))
+def _Pcell(n, k):                       # P_k(n) = T(n,n-k) * 3^(1+3k-n), exact
+    t = PH40.get(n - k, {}).get(n)
+    if t is None:
+        return None
+    e = 1 + 3 * k - n
+    return F(t) * F(3) ** e
+_ab = {}                                # k -> (a_k, b_k) cumulant constants
+def _Q(n, k):                           # [y^k] exp(sum_{j<k} (a_j+b_j n) y^j)
+    c = [F(0)] * (k + 1)
+    c[0] = F(1)
+    for j in range(1, k):
+        aj, bj = _ab[j]
+        cy = [F(0)] * (k + 1)
+        cy[0] = F(1)
+        term = F(1)
+        for m in range(1, k // j + 1):
+            term *= (aj + bj * n)
+            term /= m
+            if m * j <= k:
+                cy[m * j] = term
+        c = [sum(c[i] * cy[m - i] for i in range(m + 1)) for m in range(k + 1)]
+    return c[k]
+holdout_ok, holdout_n = True, 0
+for k in range(1, 19):
+    n1, n2 = 2 * k + 1, 2 * k + 2       # earliest in-onset fit points
+    v1, v2 = _Pcell(n1, k) - _Q(n1, k), _Pcell(n2, k) - _Q(n2, k)
+    bk = v2 - v1
+    ak = v1 - bk * n1
+    _ab[k] = (ak, bk)
+    for n in range(2 * k + 1, 41):      # every banked in-onset cell
+        want = _Pcell(n, k)
+        if want is None or n in (n1, n2):
+            continue
+        holdout_n += 1
+        if _Q(n, k) + ak + bk * n != want:
+            holdout_ok = False
+            print(f"  FAIL: P_{k} holdout at n={n}")
+chk(f"P_k 2-point refit predicts every later banked diagonal cell "
+    f"(k=1..18, {holdout_n} holdout cells)", holdout_ok)
+chk("named holdouts present in the sweep",
+    all(_Pcell(n, k) is not None for n, k in
+        ((33, 15), (35, 16), (37, 17), (39, 18))))
+# leading coefficient 25^k/k!: P_k(n) - 25^k/k! n^k must have degree < k;
+# check via k-th finite difference == k! * lead == 25^k
+for k in (15, 16, 17, 18):
+    vals = [_Q(n, k) + _ab[k][0] + _ab[k][1] * n for n in range(2 * k + 1, 3 * k + 3)]
+    d = vals[:]
+    for _ in range(k):
+        d = [d[i + 1] - d[i] for i in range(len(d) - 1)]
+    chk(f"P_{k} k-th difference == 25^{k} (leading coeff 25^k/k!)",
+        all(x == F(25) ** k for x in d))
 
 # symmetry counts: tab:symcounts vs banked engine outputs; Burnside companions
 S34 = {t: load(f"runs/sym34/{t}.out") for t in ("r90", "r180", "hmirror")} \
@@ -524,7 +593,7 @@ chk("single-row cluster weight == (2s+1)^2 for s=2..6",
     all(count_stack([1, s, 1]) == (2 * s + 1) ** 2 for s in range(2, 7)))
 
 # (d) spine cubic: digit-product formula reproduces every in-band banked cell mod 3
-_ph = os.path.join(ROOT, "results", "ns_a36", "perheight")
+_ph = os.path.join(ROOT, "results", "ns_a40", "perheight")
 if os.path.isdir(_ph):
     T3 = {}
     for f in os.listdir(_ph):
@@ -570,7 +639,7 @@ if os.path.isdir(_ph):
     badc = 0
     for (n, Hc), t in T3.items():
         k = n - Hc
-        if not (1 <= Hc <= n <= 36 and n <= 2 * Hc - 1):
+        if not (1 <= Hc <= n <= 40 and n <= 2 * Hc - 1):
             continue
         e = n - 1 - 3 * k
         pk = digit_product(n, k)[k]
@@ -588,7 +657,7 @@ if os.path.isdir(_ph):
     chk(f"spine digit-product formula on all in-band banked cells ({okc} cells)",
         badc == 0, f"{badc} mismatches")
 else:
-    print("  (skipping spine check: results/ns_a36/perheight absent)")
+    print("  (skipping spine check: results/ns_a40/perheight absent)")
 
 print(f"\n{ok} checks passed, {bad} failed.")
 raise SystemExit(1 if bad else 0)

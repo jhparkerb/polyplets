@@ -192,7 +192,8 @@ history — not repeated here. Read this file, then `MEMORY.md`'s index.
 ## OEIS submission — gated on jasonp's viva
 **Master index + case file: `oeis/SUBMISSION.md`** (2026-07-16; wave structure,
 editor-facing argument facts, mechanical checklist, audit trail). Batch staged and
-audit-clean (b-files `results/b*_upload.txt` — A006770 to a(35), A030233 to a(34)
+audit-clean (b-files `results/b*_upload.txt` — A006770 to a(40) [promoted
+2026-07-29, re-audit owed, see SUBMISSION.md], A030233 to a(34)
 [both promoted post-a(22)-confirmation + P_16 holdouts], the four D-dependent to
 n=32; a(36)/a(33) staged as conjectured comments). Full pre-submission audit
 2026-07-16: every staged term verified against live OEIS + banked data; one
@@ -207,6 +208,17 @@ responsible; `docs/oeis-ai-policy.md`).
   only); signature dates → actual submission day; pink-box replies jasonp's alone.
 
 ## Paper (`paper/polyplets-report.tex`)
+**UPDATED to the a(40) close 2026-07-29**: title/abstract/tables through
+a(40) (twenty-two new terms), tier system reworked (T2 = a(23)-a(38);
+T2⁻ = a(39)+a(40), top cells on the never-holdable k=19 diagonal),
+by-height table now T(40,H) (peak H=14, injected share 4.1%), growth
+fits redone on 40 terms (confluent λ≈7.111 unchanged; series_da.py
+re-run on 40 terms: λ=7.1102, θ=-0.9997), validation section carries the
+full holdout chain P_15→T(33,18) ... P_18→T(39,21) + the a(40) H21
+mass certification + the H20 standalone recheck, cost appendix gains the
+a(37)-a(40) ladder table. verify_claims.py retargeted + extended (new
+exact 2-point P_k refit/holdout checker): **448/448 GREEN**, compiles
+clean. Earlier state below.
 Computational-report form, five external review rounds + self-check. Growth §3 confluent
 3-param fit (Δ₁=1/2, λ≈7.111). Now includes the rigorous **upper-bound** paragraph
 (above). `paper/verify_claims.py` — 397+ checks GREEN (parses tables from the .tex).

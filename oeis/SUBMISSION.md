@@ -122,7 +122,7 @@ it requires trusting prose.
    errors are caught; the checks fail on wrong programs).
 6. **Everything regenerates**: engines, gates, per-term provenance ledgers, and
    a self-contained checker live in the repo; the full computational report
-   (`paper/polyplets-report.tex`, "Fixed polyplets through a(36)") documents
+   (`paper/polyplets-report.tex`, "Fixed polyplets through a(40)") documents
    methods, validation architecture, and limits, including an explicit
    author's note on AI use (§"Author's note").
 

@@ -1,7 +1,7 @@
 \documentclass[11pt]{article}
 
 % ---------------------------------------------------------------------------
-%  Fixed polyplets through a(36): eighteen new terms of A006770, symmetry
+%  Fixed polyplets through a(40): twenty-two new terms of A006770, symmetry
 %  companions, and the diagonal structure of king-animal triangles.
 %  (Restructured 2026-07-05 per paper/restructure-plan.md: results first,
 %  explicit confidence tiers, methods as an escalation ladder.)
@@ -31,7 +31,7 @@
 \newtheorem{openproblem}[conjecture]{Open Problem}
 \newtheorem{theorem}{Theorem}
 
-\title{\textbf{Fixed polyplets through $a(36)$: eighteen new terms of OEIS
+\title{\textbf{Fixed polyplets through $a(40)$: twenty-two new terms of OEIS
 A006770, their symmetry companions, and the diagonal structure of king-animal
 triangles}\\[4pt]
 \large A computational report}
@@ -47,21 +47,22 @@ triangles}\\[4pt]
 A \emph{polyplet} (king-move animal) is a finite set of unit cells of the square
 lattice connected through shared edges or corners. OEIS sequence
 \href{https://oeis.org/A006770}{A006770} counts the \emph{fixed} polyplets of $n$
-cells, previously known through $n=18$. We report eighteen new terms, through
+cells, previously known through $n=18$. We report twenty-two new terms, through
 \[
-  a(36) = \num{24629107617723857143962968288},
+  a(40) = \num{56749893611764175164545926946127},
 \]
 each computed from scratch and reproducing every prior term. Because claims of
 this kind are only as good as their verification, every number in this paper
 carries an explicit confidence tier: $a(1)$--$a(22)$ are confirmed by two
 algorithms sharing no counting logic (direct enumeration and the transfer
-matrix); $a(23)$--$a(35)$ by a single algorithm family
-decorrelated across architectures and cross-checked per term against held-out
+matrix); $a(23)$--$a(40)$ by a single algorithm family
+cross-checked per term against held-out
 closed forms for the top diagonals of the height triangle (once certified by
 a live held-out prediction, those forms also supply the tallest, sparsest
-strata---$5.6\%$ of $a(36)$ arrives through them, a dependency quantified
-exactly in the text); $a(36)$'s own top real diagonal has no held-out closed
-form yet, which we state rather than paper over. The one-sided companion A030233 is extended to
+strata---$4.1\%$ of $a(40)$ arrives through them, a dependency quantified
+exactly in the text); the top real diagonal of the final two terms has no
+held-out closed form---the sequence ends here, so none will exist---which we
+state rather than paper over. The one-sided companion A030233 is extended to
 $n=34$; the free, bilateral, and asymmetric companions (A030222, A030234,
 A030235, A194596) to the reach of the diagonal-mirror symmetry count. Along the
 way the machinery yields structural results: closed forms for the diagonals
@@ -102,7 +103,7 @@ A006770 had been recorded through $n=18$.
 
 This document is a \emph{computational report}: its claims are numbers, the
 provenance and verification of those numbers, and the empirical structure
-found in them. It reports the terms $a(19)$ through $a(36)$ and the results
+found in them. It reports the terms $a(19)$ through $a(40)$ and the results
 that grew out of computing them, including the diagonal law of the height
 triangle---whose shape is proved here via an exact walk-plus-clusters
 decomposition---its mod-3 algebraic structure, and the diagonal-mirror
@@ -115,13 +116,13 @@ these computations.
 
 \paragraph{Contributions.}
 \begin{enumerate}
-  \item Eighteen new terms of A006770, $a(19)$--$a(36)$
+  \item Twenty-two new terms of A006770, $a(19)$--$a(40)$
         (Section~\ref{sec:result}).
   \item The one-sided companion A030233 to $n=34$; the free/bilateral/
         asymmetric companions A030222, A030234, A030235, and A194596 to
         $n=32$ (Section~\ref{sec:companions}).
   \item Closed forms for the height-triangle diagonals $T(n,n-k)$,
-        $k\le16$, via an exponential/cumulant law whose shape (polynomial
+        $k\le18$, via an exponential/cumulant law whose shape (polynomial
         of degree $k$ times $3^{\,n-1-3k}$, onset $n\ge2k+1$, integer
         values) is \emph{proved} by an exact walk-plus-clusters
         decomposition, with levels $k\le5$ derived ab initio from finite
@@ -164,17 +165,26 @@ later terms rest on decorrelation rather than algorithmic independence.
     Redelmeier enumeration against the transfer matrix); the symmetry counts
     to $n=24$; everything derived only from these. \\
     \tiertwo{} & One counting algorithm, decorrelated and cross-checked:
-    full chain-reproduction of all prior terms on every run; independent
-    recount on a second architecture/compiler; agreement of the top height
-    strata with \emph{held-out} diagonal closed forms $P_k$ (fitted on
-    earlier terms, predicting cells of later ones); modular/CRT internal
-    consistency. Covers $a(23)$--$a(35)$ and the symmetry counts
-    $25\le n\le32$. (Caveat: $a(35)$'s independent recount is only
-    \emph{partial}; Section~\ref{sec:confirm}.) \\
+    full chain-reproduction of all prior terms on every run; agreement of
+    the top height strata with \emph{held-out} diagonal closed forms $P_k$
+    (fitted on earlier terms, predicting cells of later ones); independent
+    recount on a second architecture/compiler where one was run (the
+    coverage varies by term and is itemized honestly in
+    Section~\ref{sec:confirm}: full at $a(34)$, partial at $a(35)$, split
+    at $a(36)$, absent for $a(37)$--$a(40)$, which are single-machine and
+    rest on the held-out closed-form checks); modular/CRT internal
+    consistency. Covers $a(23)$--$a(38)$ and the symmetry counts
+    $25\le n\le32$. \\
     \tiertwominus{} & \tiertwo{} \emph{minus} the held-out diagonal check.
-    Covers exactly one number, $a(36)$: its top real-swept stratum
-    $T(36,19)$ would be checked by $P_{17}$, which has no independent holdout
-    until $a(37)$ exists. It gets its own tag so the weaker standard is never
+    Covers the final two terms, $a(39)$ and $a(40)$: their top real-swept
+    strata $T(39,20)$ and $T(40,21)$ lie on diagonal $k=19$, whose closed
+    form $P_{19}$ has no independent holdout---and, the sequence closing at
+    $a(40)$, never will. The gap is narrowed by two checks described in
+    Section~\ref{sec:confirm} (the same $H=21$ sweep that produced
+    $T(40,21)$ reproduced nineteen independent closed-form predictions on
+    its other rows, and the $H=20$ column was re-swept standalone,
+    byte-identically), but the top cells themselves remain unchecked by
+    any closed form. The tag exists so the weaker standard is never
     silently absorbed into \tiertwo{}. \\
     \tierthree{} & Exact computation composed with the fitted diagonal-mirror
     $P_k$ of Section~\ref{sec:diagonals} (each pinned with holdout hits and
@@ -223,13 +233,13 @@ which enters the companion counts by Burnside's lemma
 \label{sec:result}
 
 \begin{equation}
-  \boxed{\,a(36) = \num{24629107617723857143962968288}\,}
+  \boxed{\,a(40) = \num{56749893611764175164545926946127}\,}
 \end{equation}
 
 Table~\ref{tab:terms} gives the full sequence. Terms $n\le18$ reproduce
-A006770 exactly; $a(19)$--$a(36)$ are new. $a(19)$--$a(22)$ are \tierone{};
-$a(23)$--$a(35)$ are \tiertwo{}; $a(36)$ is \tiertwominus{}
-(Table~\ref{tab:tiers}), the most exposed number in this paper.
+A006770 exactly; $a(19)$--$a(40)$ are new. $a(19)$--$a(22)$ are \tierone{};
+$a(23)$--$a(38)$ are \tiertwo{}; $a(39)$ and $a(40)$ are \tiertwominus{}
+(Table~\ref{tab:tiers}), the most exposed numbers in this paper.
 
 \begin{table}[H]
   \centering
@@ -238,46 +248,48 @@ $a(23)$--$a(35)$ are \tiertwo{}; $a(36)$ is \tiertwominus{}
     \toprule
     $n$ & $a(n)$ & $n$ & $a(n)$\\
     \midrule
-    1  & \num{1}              & \textbf{19} & $\mathbf{\num{151609203011580}}$\\
-    2  & \num{4}              & \textbf{20} & $\mathbf{\num{1025573519362016}}$\\
-    3  & \num{20}             & \textbf{21} & $\mathbf{\num{6954084405510437}}$\\
-    4  & \num{110}            & \textbf{22} & $\mathbf{\num{47255332844367680}}$\\
-    5  & \num{638}            & \textbf{23} & $\mathbf{\num{321749260511448732}}$\\
-    6  & \num{3832}           & \textbf{24} & $\mathbf{\num{2194666793369310473}}$\\
-    7  & \num{23592}          & \textbf{25} & $\mathbf{\num{14994811325186658577}}$\\
-    8  & \num{147941}         & \textbf{26} & $\mathbf{\num{102607513847014153892}}$\\
-    9  & \num{940982}         & \textbf{27} & $\mathbf{\num{703126792093436034256}}$\\
-    10 & \num{6053180}        & \textbf{28} & $\mathbf{\num{4824589228356722264087}}$\\
-    11 & \num{39299408}       & \textbf{29} & $\mathbf{\num{33145129805782422061325}}$\\
-    12 & \num{257105146}      & \textbf{30} & $\mathbf{\num{227969227118066423789154}}$\\
-    13 & \num{1692931066}     & \textbf{31} & $\mathbf{\num{1569631619081324581014300}}$\\
-    14 & \num{11208974860}    & \textbf{32} & $\mathbf{\num{10818203977457804418974036}}$\\
-    15 & \num{74570549714}    & \textbf{33} & $\mathbf{\num{74631481980411777590683952}}$\\
-    16 & \num{498174818986}   & \textbf{34} & $\mathbf{\num{515316838423862758858377704}}$\\
-    17 & \num{3340366308393}  & \textbf{35} & $\mathbf{\num{3561147281381782175236253062}}$\\
-    18 & \num{22471158811164} & \textbf{36} & $\mathbf{\num{24629107617723857143962968288}}$\\
+    1  & \num{1}              & \textbf{21} & $\mathbf{\num{6954084405510437}}$\\
+    2  & \num{4}              & \textbf{22} & $\mathbf{\num{47255332844367680}}$\\
+    3  & \num{20}             & \textbf{23} & $\mathbf{\num{321749260511448732}}$\\
+    4  & \num{110}            & \textbf{24} & $\mathbf{\num{2194666793369310473}}$\\
+    5  & \num{638}            & \textbf{25} & $\mathbf{\num{14994811325186658577}}$\\
+    6  & \num{3832}           & \textbf{26} & $\mathbf{\num{102607513847014153892}}$\\
+    7  & \num{23592}          & \textbf{27} & $\mathbf{\num{703126792093436034256}}$\\
+    8  & \num{147941}         & \textbf{28} & $\mathbf{\num{4824589228356722264087}}$\\
+    9  & \num{940982}         & \textbf{29} & $\mathbf{\num{33145129805782422061325}}$\\
+    10 & \num{6053180}        & \textbf{30} & $\mathbf{\num{227969227118066423789154}}$\\
+    11 & \num{39299408}       & \textbf{31} & $\mathbf{\num{1569631619081324581014300}}$\\
+    12 & \num{257105146}      & \textbf{32} & $\mathbf{\num{10818203977457804418974036}}$\\
+    13 & \num{1692931066}     & \textbf{33} & $\mathbf{\num{74631481980411777590683952}}$\\
+    14 & \num{11208974860}    & \textbf{34} & $\mathbf{\num{515316838423862758858377704}}$\\
+    15 & \num{74570549714}    & \textbf{35} & $\mathbf{\num{3561147281381782175236253062}}$\\
+    16 & \num{498174818986}   & \textbf{36} & $\mathbf{\num{24629107617723857143962968288}}$\\
+    17 & \num{3340366308393}  & \textbf{37} & $\mathbf{\num{170463735577007360431441250424}}$\\
+    18 & \num{22471158811164} & \textbf{38} & $\mathbf{\num{1180654489101178485738417779914}}$\\
+    \textbf{19} & $\mathbf{\num{151609203011580}}$ & \textbf{39} & $\mathbf{\num{8182864667276277865830132493466}}$\\
+    \textbf{20} & $\mathbf{\num{1025573519362016}}$ & \textbf{40} & $\mathbf{\num{56749893611764175164545926946127}}$\\
     \bottomrule
   \end{tabular}
-  \caption{Fixed polyplets $a(n)$, $n=1,\dots,36$. Terms $1$--$18$ match the
+  \caption{Fixed polyplets $a(n)$, $n=1,\dots,40$. Terms $1$--$18$ match the
   published A006770; boldface terms are new. Tiers: $a(19)$--$a(22)$ \tierone{};
-  $a(23)$--$a(35)$ \tiertwo{}; $a(36)$ \tiertwominus{}.}
+  $a(23)$--$a(38)$ \tiertwo{}; $a(39)$--$a(40)$ \tiertwominus{}.}
   \label{tab:terms}
 \end{table}
 
 \paragraph{Growth.}
 The successive ratios $r_n=a(n)/a(n{-}1)$ climb slowly:
 $r_{20}\approx6.765$, $r_{27}\approx6.853$, $r_{34}\approx6.905$,
-$r_{36}\approx6.916$. Fitting
+$r_{40}\approx6.935$. Fitting
 the two-parameter ansatz $r_n=\lambda(1+\theta/n)$ by least squares over
-trailing windows gives $\lambda=7.101$, $7.104$, $7.105$, $7.106$ (with
-$\theta$ between $-0.94$ and $-0.96$) for windows starting at $n=10$, $15$,
-$20$, $25$ and ending at $36$; the upward drift with window start is the
+trailing windows gives $\lambda=7.102$, $7.104$, $7.106$, $7.107$ (with
+$\theta$ between $-0.95$ and $-0.96$) for windows starting at $n=10$, $15$,
+$20$, $25$ and ending at $40$; the upward drift with window start is the
 signature of an unmodelled confluent correction. Refitting with a confluent
 term, $r_n=\lambda(1+\theta/n+c/n^{1+\Delta_1})$, with $\Delta_1$ scanned on
 a grid, the exponent $\Delta_1=\tfrac12$ gives the smallest residuals on
-every window (by factors from ${\sim}5$ on the shortest window to
-${\sim}250$ on the longest) and removes the drift:
-$\lambda=7.1109$--$7.1111$ across the same
+every window (by factors from ${\sim}4$ on the shortest window to
+${\sim}140$ on the longest) and removes the drift:
+$\lambda=7.1108$--$7.1111$ across the same
 four windows, with $\theta$ between $-1.02$ and $-1.03$---consistent with
 the universal two-dimensional lattice-animal value
 $\theta=-1$~\cite{jensen2001}, which the fit was free to miss. An
@@ -448,10 +460,10 @@ Method B confirmed $a(19)$ against Method A (byte-identical totals) and
 carried the sequence into the early twenties before its state space---which
 keeps a whole column of connectivity alive per step---outgrew memory.
 
-\subsection{Method C: the cell-at-a-time transfer matrix (to $n=34$)}
+\subsection{Method C: the cell-at-a-time transfer matrix (to $n=40$)}
 \label{sec:methodC}
 
-The production engine for $a(24)$--$a(36)$ replaces the column step with a
+The production engine for $a(24)$--$a(40)$ replaces the column step with a
 \emph{cell-at-a-time} step: the boundary advances one cell per transition,
 so the frontier is a staircase---$r$ cells of the new column above $H-r$
 cells of the old---plus one retained north-west \emph{carry} cell, kept
@@ -491,13 +503,14 @@ everything already known, including the \tierone{} range.
 
 \paragraph{Which cells are computed and which are injected.}
 This must be stated exactly, because the headline totals contain both. For
-$a(36)$, heights $3\le H\le19$ were swept for real ($94.4\%$ of the total);
-$H=1,2$ are elementary closed forms; and $H\ge20$---the diagonals
-$k\le16$---were \emph{injected} from the fitted closed forms of
-Section~\ref{sec:heightdiag}, contributing $5.6\%$ of $a(36)$. The
+$a(40)$, heights $3\le H\le21$ were swept for real ($95.9\%$ of the total);
+$H=1,2$ are elementary closed forms; and $H\ge22$---the diagonals
+$k\le18$---were \emph{injected} from the fitted closed forms of
+Section~\ref{sec:heightdiag}, contributing $4.1\%$ of $a(40)$. The
 analogous split holds for the preceding terms, the injection boundary
 advancing as each new $P_k$ is certified (at $a(30)$: real sweep
-$H\!=\!3$--$17$, closed forms elsewhere). The
+$H\!=\!3$--$17$, closed forms elsewhere; at $a(36)$: real sweep
+$H\!=\!3$--$19$, injection $5.6\%$). The
 discipline governing injection is strict and uniform: a $P_k$ is fitted on
 real-swept cells of earlier terms, must reproduce every other real-swept
 cell on its diagonal (holdout), must then predict the \emph{next} term's
@@ -507,17 +520,22 @@ surviving that live prediction is it injected for subsequent terms. An
 injected formula failing at larger $n$ would therefore have to pass a
 genuine forward prediction and then break one term later without warning;
 possible, unproven-formula risk being what it is, but the exposure is
-quantified ($5.6\%$ of the frontier term) and every injected formula
-carries at least one live held-out success---in particular $P_{16}$, whose
-$a(35)$ holdout $T(35,19)$ it now predicts exactly, so its use in $a(36)$
-is fully certified. (The one formula with no independent holdout, $P_{17}$,
-is \emph{not} injected; it is the absent check on $a(36)$'s top swept cell,
-the \tiertwominus{} grade of Section~\ref{sec:confirm}.) Readers who want totals free
-of any formula assistance may sum Table~\ref{tab:byheight36}'s rows
-$H\le19$ against the banked per-height data; the range $n\le19$ contains
-no injected cells at all.
+quantified ($4.1\%$ of the frontier term) and every injected formula
+carries at least one live held-out success: the chain runs
+$P_{15}\to T(33,18)$, $P_{16}\to T(35,19)$, $P_{17}\to T(37,20)$,
+$P_{18}\to T(39,21)$, each formula predicting a real-swept cell of a term
+computed after it was pinned, and the $a(40)$ run's real $H=21$ sweep
+reproduced the closed-form predictions on \emph{all} of its rows
+$n=21$--$39$ simultaneously---every injected level re-confirmed at a
+fresh point in a single stroke. (The one formula with no independent
+holdout, $P_{19}$, fitted from the final two top cells, is \emph{never}
+injected; it is the absent check on the top swept cells of $a(39)$ and
+$a(40)$, the \tiertwominus{} grade of Section~\ref{sec:confirm}.) Readers
+who want totals free of any formula assistance may sum
+Table~\ref{tab:byheight40}'s rows $H\le21$ against the banked per-height
+data; the range $n\le19$ contains no injected cells at all.
 
-Table~\ref{tab:byheight36} gives the height decomposition of the frontier
+Table~\ref{tab:byheight40} gives the height decomposition of the frontier
 term with the computed/injected boundary as stated above.
 
 \begin{table}[H]
@@ -525,34 +543,36 @@ term with the computed/injected boundary as stated above.
   \small
   \begin{tabular}{r r @{\quad}|@{\quad} r r}
     \toprule
-    $H$ & $T(36,H)$ & $H$ & $T(36,H)$\\
+    $H$ & $T(40,H)$ & $H$ & $T(40,H)$\\
     \midrule
-    1  & \num{1} & 19 & \num{954543410624801880699125196}\\
-    2  & \num{51422757785979} & 20 & \num{617106574276148286251699568}\\
-    3  & \num{17202429393149837639} & 21 & \num{370662558309766127292835233}\\
-    4  & \num{17468592122673825829363} & 22 & \num{206170745618188078237908398}\\
-    5  & \num{1218690359963499170272024} & 23 & \num{105767663082981556782445241}\\
-    6  & \num{19231039210859731542532750} & 24 & \num{49802601845517580926757996}\\
-    7  & \num{120483273959329312517694999} & 25 & \num{21400228080434589037073541}\\
-    8  & \num{411978131283172348004997626} & 26 & \num{8334217287643383057173976}\\
-    9  & \num{936542798408949825053453305} & 27 & \num{2917453961622875974502715}\\
-    10 & \num{1606231555541323527183121631} & 28 & \num{908809232916031590747384}\\
-    11 & \num{2256748681956746690925494475} & 29 & \num{248809784465074310240553}\\
-    12 & \num{2741152205324617233958469996} & 30 & \num{58929688327776835299597}\\
-    13 & \num{2979220402477908294524248155} & 31 & \num{11827696308664871166885}\\
-    14 & \num{2958431516488782774352129383} & 32 & \num{1955745481890214165518}\\
-    15 & \num{2716149032655917179237430475} & 33 & \num{255754883546589053052}\\
-    16 & \num{2319921447242520055171664952} & 34 & \num{24796498493819052315}\\
-    17 & \num{1848601374963391246942469386} & 35 & \num{1584332261468324055}\\
-    18 & \num{1375243914635422292588965219} & 36 & \num{50031545098999707}\\
+    1  & \num{1} & 21 & \num{1613457978443478071138613405555}\\
+    2  & \num{1746860020068407} & 22 & \num{1036374142845705722815141821285}\\
+    3  & \num{2419369854427749522365} & 23 & \num{624022655859072294428618062228}\\
+    4  & \num{5350439537095151311678183} & 24 & \num{351269152616432930163117009906}\\
+    5  & \num{610368200114680297664171180} & 25 & \num{184265041867569186198215286920}\\
+    6  & \num{13635239341813228735098460369} & 26 & \num{89738450015816790329906273587}\\
+    7  & \num{111035137324896523751239398006} & 27 & \num{40397094232064445666534976009}\\
+    8  & \num{465528145242248536226720728721} & 28 & \num{16724432197930235875086319641}\\
+    9  & \num{1243934910712656307542433402365} & 29 & \num{6330004954075835777839906782}\\
+    10 & \num{2431255947941571422066380818538} & 30 & \num{2175051912943059220286006775}\\
+    11 & \num{3805720842732391273809508781840} & 31 & \num{672859548584420700423098772}\\
+    12 & \num{5068880678792963509256398287546} & 32 & \num{185515129310093418751858116}\\
+    13 & \num{5981645254864746679671543482206} & 33 & \num{45020723858282897515374525}\\
+    14 & \num{6421250021867951738000921236255} & 34 & \num{9465785098942037026159422}\\
+    15 & \num{6374412577120147022430261962743} & 35 & \num{1688999770099402820172396}\\
+    16 & \num{5908452097354911220916654388822} & 36 & \num{248639909528376343574055}\\
+    17 & \num{5140790021321717364748374654418} & 37 & \num{28988633422018953978570}\\
+    18 & \num{4209726451267585301668763319533} & 38 & \num{2509287671955797860401}\\
+    19 & \num{3247572468599336484342102174163} & 39 & \num{143340376708634160555}\\
+    20 & \num{2359769260803281210360136128699} & 40 & \num{4052555153018976267}\\
     \midrule
-    \multicolumn{4}{r}{$\sum_H T(36,H) = \num{24629107617723857143962968288}$}\\
+    \multicolumn{4}{r}{$\sum_H T(40,H) = \num{56749893611764175164545926946127}$}\\
     \bottomrule
   \end{tabular}
-  \caption{The height decomposition of $a(36)$, peaking at $H=13$. The
+  \caption{The height decomposition of $a(40)$, peaking at $H=14$. The
   extreme diagonal is the closed form $T(H,H)=3^{H-1}$
-  ($T(36,36)=3^{35}$).}
-  \label{tab:byheight36}
+  ($T(40,40)=3^{39}$).}
+  \label{tab:byheight40}
 \end{table}
 
 \subsection{Method D: symmetric transfer matrices (the companions)}
@@ -599,7 +619,7 @@ The top diagonals of the height triangle---$T(n,n-k)$ for small $k$, the
 tallest, sparsest strips---are the most expensive cells of a sweep and the
 least populated. They have exact closed forms
 (Section~\ref{sec:diagonals}; the polynomial law is proved,
-Theorem~\ref{thm:diaglaw}): for each $k\le16$ a polynomial, fitted from
+Theorem~\ref{thm:diaglaw}): for each $k\le18$ a polynomial, fitted from
 two data points and then \emph{validated on held-out terms}, replaces the top
 real sweep height. Beyond the speedup, these closed forms are per-term
 independent checks of the production engine: a polynomial pinned on terms
@@ -628,36 +648,50 @@ designed around the weakest link at each stage.
   \item \textbf{Cross-architecture recounts.} $a(34)$'s full triangle was
         recomputed on a second architecture and compiler (x86/GCC against
         ARM/clang production) and is byte-identical, row by row; earlier
-        terms had per-term recounts of the heaviest strata. For $a(35)$ and
-        $a(36)$ this recount is weaker and we say so: $a(35)$'s second-machine
-        pass covered only part of the height range (a full same-heights
-        re-verify is pending), and $a(36)$ was computed with its heights
-        \emph{split} across two architectures (x86 for $H\le18$ and $H\ge20$,
-        ARM for the $H=19$ long pole) rather than recomputed whole---so their
-        decorrelation rests more on the held-out diagonal checks below than on
-        a full independent recount.
+        terms had per-term recounts of the heaviest strata. Beyond $a(34)$
+        the recount coverage weakens and we say so: $a(35)$'s second-machine
+        pass covered only part of the height range; $a(36)$ was computed
+        with its heights \emph{split} across two architectures (x86 for
+        $H\le18$ and $H\ge20$, ARM for the $H=19$ long pole) rather than
+        recomputed whole; and $a(37)$--$a(40)$ were computed on a single
+        machine (ARM) with no second-architecture pass at all---their
+        decorrelation rests on the full-chain reproduction and the held-out
+        diagonal checks below. Two mitigations at the final term: the
+        $H=20$ column of $a(40)$ was re-swept standalone from a fresh
+        checkpoint and is byte-identical, and the $H=21$ sweep carries the
+        nineteen-row closed-form cross-check described next.
   \item \textbf{Held-out diagonal closed forms.} For each $k$, $P_k$
         was fitted on the smallest admissible terms and then required to
-        reproduce every later term's cell $T(n,n-k)$ exactly. Two flagship
-        instances: $P_{15}$, pinned before $a(33)$ existed, predicted
-        $T(33,18)$ exactly; and $P_{16}$, fitted on $a(33)$ and $a(34)$, now
-        predicts \emph{both} later holdouts $T(35,19)$ and $T(36,20)$ exactly.
-        The certified $P_{16}$ removes exactly the check $a(34)$ previously
-        lacked, promoting $a(34)$ from \tiertwominus{} to \tiertwo{}, and makes
-        $a(35)$'s top real cell $T(35,19)$ an exact forward prediction. The
-        \tiertwominus{} grade now attaches to $a(36)$ alone: its top real cell
-        $T(36,19)$ lies on diagonal $k=17$, and $P_{17}$ can be fitted but has
-        no independent holdout until $a(37)$ exists---the same situation
-        $a(34)$ was in, migrated to the new frontier. As before, $a(36)$'s
-        top stratum runs the same code path the lower $P_k$ certified; what
-        lacks certification is its execution at the larger size, not the path.
+        reproduce every later term's cell $T(n,n-k)$ exactly. The holdout
+        chain runs the full ladder: $P_{15}$, pinned before $a(33)$
+        existed, predicted $T(33,18)$ exactly; $P_{16}$, fitted on $a(33)$
+        and $a(34)$, predicted $T(35,19)$; $P_{17}$, fitted on $a(35)$ and
+        $a(36)$, predicted $T(37,20)$; and $P_{18}$, fitted on $a(37)$ and
+        $a(38)$, predicted $T(39,21)$. Each passed holdout retroactively
+        certifies the top cells its formula was fitted on (a degree-$k$
+        polynomial through a wrong fit point does not predict the next
+        term's cell exactly), which is what holds $a(33)$--$a(38)$ at
+        \tiertwo{}. The strongest single check came free with the final
+        term: the $a(40)$ run's real $H=21$ sweep---the tallest real sweep
+        of the project---reproduced the closed-form values
+        $P_k(n)\,3^{n-1-3k}$ on every one of its rows $n=21$--$39$
+        simultaneously, re-confirming all nineteen wired levels at a fresh
+        point each, in the very sweep that produced $T(40,21)$. The
+        \tiertwominus{} grade attaches to $a(39)$ and $a(40)$: their top
+        real cells $T(39,20)$ and $T(40,21)$ lie on diagonal $k=19$, and
+        $P_{19}$---fitted from exactly these two cells---has no
+        independent holdout, nor ever will, the sequence closing at
+        $a(40)$. As before, those top strata run the same code path the
+        lower $P_k$ certified (and, for $H=21$, a path checked on its
+        nineteen other rows); what lacks certification is the top cells
+        themselves, not the path.
   \item \textbf{Modular consistency (design capability, not a production
         gate).} A residue-counter/CRT-reconstruction path exists and is
         regression-tested (independent residue systems must agree, which
         would catch overflow and transient corruption---not shared
         enumeration bugs, which the items above target), but it has only
         been exercised at small $n$, not against any production frontier
-        sweep $a(20)$--$a(34)$. Overflow protection for the reported terms
+        sweep $a(20)$--$a(40)$. Overflow protection for the reported terms
         instead comes from the items already listed above (cross-machine
         and cross-algorithm recount, u128-vs-u64 comparison at the sizes
         where both are feasible) plus the structural and fault-injection
@@ -707,9 +741,12 @@ background, $a_j$ the boundary correction---so each level costs exactly two
 new constants, fitted from two data points and validated on all others. The
 leading coefficient is $25^k/k!$ (twenty-five single-defect species per walk
 site, an integer the fit must and does reproduce at every level), and $P_k$
-times $k!$ must be integral. Levels $k\le16$ are fitted, validated, and wired
+times $k!$ must be integral. Levels $k\le18$ are fitted, validated, and wired
 into production (Section~\ref{sec:methodE}); each was pinned on the earliest
-admissible terms and holds on every later one.
+admissible terms and holds on every later one. (A nineteenth level, $P_{19}$,
+is determined by the final two top cells and passes the leading-coefficient
+and integrality checks, but with the sequence closing at $a(40)$ it has no
+holdout and is never used; we record it without certifying it.)
 
 The law's shape is not an empirical regularity but a theorem:
 
@@ -744,7 +781,7 @@ cluster types of surplus $\le5$
 (\texttt{experiments/cluster\_weight\_dp.py}), and the single-row cluster
 weight is exactly $(2s{+}1)^2$ for an $s$-cell row---$25=5^2$ is the $s=2$
 case, and the interior weight factors as $(2s{+}1)$ per contact side.
-What remains fitted rather than derived is $P_k$ for $6\le k\le16$; with
+What remains fitted rather than derived is $P_k$ for $6\le k\le18$; with
 the theorem in hand those fits are interpolation of a known-shape form,
 and their held-out hits remain load-bearing as checks of the
 \emph{engine} rather than of the law.
@@ -762,7 +799,7 @@ series as $H(t)$, one gets $H\equiv W \pmod 3$ where
 \[
   W^3 \;=\; W^2 + t \qquad\text{over } \mathbb F_3 .
 \]
-Consequences, each machine-verified on all $342$ in-band cells of the
+Consequences, each machine-verified on all $420$ in-band cells of the
 banked triangle: a base-3 digit-product formula
 $P_k(n)\bmod 3 = [y^k]\prod_i W(y^{3^i})^{n_i}$ (with $n=\sum n_i3^i$), so
 the triangle mod~3 is $3$-automatic with an explicit automaton; the spine
@@ -1337,15 +1374,17 @@ was computed, $a(25)$ was out of reach and the bound gave
 $a(25)\ge\num{6657105903966723073}$; the exact value
 $\num{14994811325186658577}$, computed later by Method~C, confirms it---a
 retrospective certification of the GF machinery. The bound remains
-available for any $n$ beyond the current frontier, though its capture
-fraction shrinks as taller strips dominate: $44\%$ of the exact value at
-$n=25$, $16\%$ at $n=34$. (When first computed the bound gave
-$a(35)\ge5.07\times10^{26}$, comfortably under the value
-$\num{3561147281381782175236253062}$ later computed by Method~C.) Beyond the
-current frontier it still gives, e.g.,
-$a(40)\ge\num{4266005101622209395058618248135}\approx4.27\times10^{30}$,
-an exact integer from rational arithmetic
-(\texttt{paper/gf\_bound.py}).
+available for any $n$, though its capture fraction shrinks as taller
+strips dominate: $44\%$ of the exact value at $n=25$, $16\%$ at $n=34$.
+(When first computed the bound gave $a(35)\ge5.07\times10^{26}$,
+comfortably under the value $\num{3561147281381782175236253062}$ later
+computed by Method~C; likewise its
+$a(40)\ge\num{4266005101622209395058618248135}$, an exact integer from
+rational arithmetic, stated here in an earlier draft while $a(40)$ was
+still out of reach, is confirmed by the now-exact value---the bound
+captures $7.5\%$ of it. Both are retrospective certifications of the
+machinery.) Beyond the final computed term it still gives exact bounds
+for any $n$ (\texttt{paper/gf\_bound.py}).
 
 \section{Reach and limits}
 \label{sec:reach}
@@ -1353,14 +1392,18 @@ an exact integer from rational arithmetic
 Method C's cost structure is set by its tallest surviving sweep height: at
 fixed $H$ the strip's state space is bounded and cost grows only about
 linearly in $n$, while adding a unit of height multiplies it by roughly the
-per-height frontier growth. With the diagonals $k\le16$ in closed form, the
-tallest real sweep stayed at $H=18$ through $a(34)$ and rose to $H=19$ for
-$a(35)$ and $a(36)$ (the latter with $H=19$ split off to a second machine),
-and the banked totals grew gently (see Appendix~\ref{sec:profile}). Each
-further term is within easy hardware reach; the binding constraint is
-verification, not compute---the frontier is always one term ahead of its own
-closed-form certification, which is what the \tiertwominus{} grade on $a(36)$
-records (Section~\ref{sec:confirm}). The symmetric counts scale as
+per-height frontier growth. As each new diagonal was certified the
+tallest real sweep advanced slowly---$H=18$ through $a(34)$, $H=19$ for
+$a(35)$--$a(37)$, $H=20$ for $a(38)$--$a(39)$, and $H=21$ for
+$a(40)$---while the cost per term grew steeply along the same ladder
+(Appendix~\ref{sec:profile}): the binding resource became disk rather
+than time (the $a(40)$ run's external shuffle peaked at $363$\,GB), and
+the final terms ran their tall poles as solo phases at reduced core
+counts to fit the disk budget. The deeper constraint is verification, not
+compute---the frontier is always one term ahead of its own closed-form
+certification, which is what the \tiertwominus{} grade on the final two
+terms records (Section~\ref{sec:confirm}); the sequence closes at
+$a(40)$ with that grade stated rather than outrun. The symmetric counts scale as
 $\sqrt{a}$-class problems and reached $n=34$ for three of the four types;
 the diagonal-mirror type, whose forced-square bounding box compresses least,
 is the binding constraint on the remaining companions---its per-strip RAM
@@ -1374,7 +1417,7 @@ beyond hardware at $n\ge33$ under the \tierthree{} label.
 \label{sec:availability}
 
 The source (all engines and gates), the per-height triangle rows for every
-term through $n=36$ with per-term provenance ledgers, the b-files for
+term through $n=40$ with per-term provenance ledgers, the b-files for
 A006770 and the companion sequences, the hole triangle and its columns, the
 recovered generating functions, and the sample statistics are in the
 accompanying repository; derived artifacts are regenerated on demand by the
@@ -1424,12 +1467,35 @@ All machines are commodity hardware owned and operated by the author:
     $a(34)$ & 3.7 & 58.5 & 6.3\\
     \bottomrule
   \end{tabular}
-  \caption{Banked per-term cost profiles for the uniform final-engine runs
-  (earlier terms were computed by intermediate engine generations and are
-  not directly comparable). The gentle growth reflects the closed-form
+  \caption{Banked per-term cost profiles for the uniform mid-project engine
+  runs (earlier terms were computed by intermediate engine generations and
+  are not directly comparable). The gentle growth reflects the closed-form
   diagonals holding the tallest real sweep at $H=18$ throughout this range;
   RAM stays small because the frontier spills to disk.}
   \label{tab:costs}
+\end{table}
+
+\begin{table}[H]
+  \centering\small
+  \begin{tabular}{l r r r r}
+    \toprule
+    term (full triangle, dalby) & wall (h) & core-hours & peak RSS (GB) & disk peak (GB)\\
+    \midrule
+    $a(37)$ & 3.6  & 161  & 0.4 & 76\\
+    $a(38)$ & 15.8 & 494  & 1.0 & 222\\
+    $a(39)$ & 11.1 & 575  & 1.5 & 175\\
+    $a(40)$ & 52.3 & 1477 & 4.0 & 363\\
+    \bottomrule
+  \end{tabular}
+  \caption{The closing ladder, run on successive engine generations (an
+  I/O-path rewrite before $a(37)$, spill-compression levers before
+  $a(39)$---which is why $a(39)$ ran faster than $a(38)$ one term
+  lower---and a phased schedule at $a(40)$: heights $1$--$19$ and
+  $22$--$40$ at $80$ cores, then the $H=20$ and $H=21$ poles solo at
+  reduced core counts to fit the disk budget; the $a(40)$ wall is the sum
+  of the three phases). Disk, not RAM or time, is the binding resource at
+  the close.}
+  \label{tab:costsladder}
 \end{table}
 
 \begin{itemize}

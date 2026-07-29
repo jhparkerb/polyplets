@@ -16,7 +16,7 @@ import os
 import numpy as np
 
 def load_sequence():
-    """a(1..33) from the verified b-file, a(34..36) the banked frontier values."""
+    """a(1..40) from the verified b-file (banked through the a(40) close)."""
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     banked = {}
     with open(os.path.join(root, "results", "b006770_upload.txt")) as fh:
@@ -24,10 +24,7 @@ def load_sequence():
             p = ln.split()
             if len(p) == 2 and p[0].isdigit():
                 banked[int(p[0])] = int(p[1])
-    banked[34] = 515316838423862758858377704
-    banked[35] = 3561147281381782175236253062
-    banked[36] = 24629107617723857143962968288
-    return [None] + [banked[n] for n in range(1, 37)]
+    return [None] + [banked[n] for n in range(1, 41)]
 
 A = load_sequence()
 
@@ -110,17 +107,17 @@ if __name__ == "__main__":
         e = spectrum(synth, 36, 7.0)
         print(f" true lambda={lam_t} theta={th_t}:")
         report(e, "  recovered")
-    print("\n=== POLYPLETS a(1..36) ===")
-    e = spectrum(A, 36, 7.11)
+    print("\n=== POLYPLETS a(1..40) ===")
+    e = spectrum(A, 40, 7.11)
     report(e, "first-order DA")
 
     print("\n  robustness -- lambda median vs rescaling lambda0 (anchoring test):")
     for lam0 in [6.8, 7.0, 7.11, 7.3]:
-        ee = spectrum(A, 36, lam0)
+        ee = spectrum(A, 40, lam0)
         lams = sorted(x[0] for x in ee)
         print(f"    lambda0={lam0}: lambda={lams[len(lams)//2]:.4f}")
     print("  robustness -- lambda median vs # terms N (lambda0=7.11):")
-    for N in [28, 32, 36]:
+    for N in [28, 32, 36, 40]:
         ee = spectrum(A, N, 7.11)
         lams = sorted(x[0] for x in ee); ths = sorted(x[1] for x in ee)
         print(f"    N={N}: lambda={lams[len(lams)//2]:.4f}  theta={ths[len(ths)//2]:+.4f}")
