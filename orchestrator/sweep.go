@@ -2067,6 +2067,23 @@ var diagCoeffTable = map[int]diagCoeffs{
 		"-181772288700805914476560807450032440000", "1799250000012213308990934660048459646800", "-11981768558659998471685945614032297834400", "43413108716808863459147673721575806860800",
 		"-62928082571267723622620177718733540032000", "-37079629775551619904419498589278737305600", "127787800900726736892183047952793411584000",
 	}, 6402373705728000},
+	// j=19: P_19, derived via scripts/derive_pk_fast.py, fit from T(39,20)
+	// (results/ns_a39, real H20 sweep) and T(40,21) (results/ns_a40, real H21
+	// sweep — the project's tallest) — the two smallest in-onset points (onset
+	// n>=2k+1=39), both real swept values. Leading coeff 25^19/19! and
+	// k!-integrality confirmed. P_18's first independent holdout landed with
+	// a(40): real T(39,21) == the P_18 closed form exactly (part of the mass
+	// P_0..P_18 holdout certification, results/ns_a40/PROVENANCE.md). P_19
+	// itself is PERMANENTLY fitted-no-holdout: its first holdout T(41,22)
+	// would need a real H22 sweep (a(42)-scale) and the project closes at
+	// a(40). Certification rests on the proven grand form.
+	19: {[]string{
+		"363797880709171295166015625", "-33244723454117774963378906250", "1424357847310602664947509765625", "-38591730438798666000366210937500",
+		"727030595527446770668029785156250", "-9771393162653867410812377929687500", "89995638539151550436367248535156250", "-453004710082909127087411116406250000",
+		"-944409269374670822401215767785546875", "39252594220672769117880845150149323750", "-358298151981147662874725170773291603075", "2148296543562596803834859234579821830300",
+		"-16078810194662771865976379108599174661000", "170839934990550635351731792986253521240000", "-1392420473012666818040989449181071438241200", "6711761282912093122885322126016995490667200",
+		"-15151852506142589813867733638627938392864000", "-2543898927875575925674449827661401617536000", "68213157850462358827070246509924492647014400", "-64521289465178862781240539863148792078336000",
+	}, 121645100408832000},
 }
 
 // hornerDiag evaluates a diagCoeffs' numerator at N via big.Int Horner,
@@ -2119,13 +2136,13 @@ func applyPow3(num *big.Int, e int) *big.Int {
 }
 
 // diagonalStripValid reports whether the k-th diagonal strip (H=maxn-k) can
-// be filled by diagonalCell instead of a real column sweep. k<=18 now that
-// P9..P18 are wired (case 9..18). The true structural threshold is n>=2k+1
+// be filled by diagonalCell instead of a real column sweep. k<=19 now that
+// P9..P19 are wired (case 9..19). The true structural threshold is n>=2k+1
 // (docs/proofs/T-n-nm2-and-general.md); both sweep.go dispatch sites
 // (sequential and overlap) must use this single helper so a future threshold
 // or k-range change can't apply to only one path.
 func diagonalStripValid(maxn, k int) bool {
-	return k >= 2 && k <= 18 && maxn >= 2*k+1
+	return k >= 2 && k <= 19 && maxn >= 2*k+1
 }
 
 // diagonalStripEnabled is the dispatch predicate both sweep paths
@@ -2138,11 +2155,12 @@ func diagonalStripEnabled(cfg SweepConfig, k int) bool {
 	return diagonalStripValid(cfg.Maxn, k) && (cfg.MaxDiagK == 0 || k <= cfg.MaxDiagK)
 }
 
-// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..18
+// diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..19
 // (docs/proofs/T-n-nm1.md, T-n-nm2-and-general.md). j=0,1,2 are proven from first
-// principles; j=3..18 are data-pinned from the triangle (leading 25^j/j!,
-// integer-exact), each holdout-validated (a diagonal deliberately swept unwired)
-// before wiring. j=3..10 were additionally VALIDATED at scale by the
+// principles; j=3..19 are data-pinned from the triangle (leading 25^j/j!,
+// integer-exact), each of j<=18 holdout-validated (a diagonal deliberately
+// swept unwired) before wiring; j=19 is permanently fitted-no-holdout (its
+// first holdout T(41,22) would need an a(42)-scale run — see its table entry). j=3..10 were additionally VALIDATED at scale by the
 // a(23)/a(24)/a25 sweeps (their swept H=16..18 == k=5..7 reproduce the formulas
 // exactly; j=8 is pinned from
 // a(24)'s T(24,16), matched the pre-a(24) falsifiable sum-of-roots prediction
