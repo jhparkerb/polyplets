@@ -84,8 +84,12 @@ last one).
     parallel + assembly 1343 s) — `P3_pinned` is UNCONDITIONAL, axioms =
     standard + the chunk/leaf native_decide values.
   - **k = 4..11 CONDITIONAL-ON-BANKED**: `Pk_pinned_of_banked`, hypotheses
-    = the k+1 banked onset T-values (results/triangle.txt, two-algorithm
-    provenance).
+    = the k+1 banked onset T-values (results/triangle.txt). These lists are
+    **not** uniformly two-algorithm, and some entries are not even real
+    sweeps: as the Supersession note below records, this tier's hypotheses
+    include formula-generated cells (`T 31 20` at k = 11). Provenance of
+    the hypothesis cells is graded by the Grand tier's anchor set, not
+    here — see the split immediately below.
   - **k = 12..16 PARTIAL**: `Pk_pinned_of_partial`, hypotheses = all
     banked points (12/10/8/6/4) + the 1/4/7/10/13 beyond-banked points at
     the production-PREDICTED values, explicitly flagged `-- PREDICTED` —
@@ -130,6 +134,27 @@ Headline results and their audited axioms (verbatim from
   `P1_closed`/`P2_closed`/`P3_pinned`). Axioms: standard + `P3_pinned`'s
   heavy-k=3 native_decide set (V/Vt/d leaves + 15 CFGVchunk cards + light
   base enumerations).
+
+  **Anchor provenance, measured (2026-07-30, AUDIT-2026-07-30 L7).** All 30
+  anchors are real-swept cells of the production kink engine. How many have
+  a *second* source is a different question, and the answer is not
+  "two-algorithm":
+
+  - **19 strip-second-sourced** — the anchors with H ≤ 14 and n ≤ 36, the
+    reach of the banked independent strip transfer-matrix run
+    (`results/strip-engine.md`, 413 cells, 0 mismatch).
+  - **11 kink-only** — beyond strip reach even at N = 40 (all have H ≥ 15):
+
+        T(28,15) T(29,15) T(30,16) T(31,16) T(32,17) T(33,17)
+        T(34,18) T(35,18) T(36,19) T(37,19) T(38,20)
+
+    Cross-ISA and cross-revision re-runs rule out machine, build and
+    transient faults for these, but cannot catch a logic bug shared by
+    every run of the same kernel. Same grade the project gives a(23)+:
+    single-algorithm, multiply cross-checked.
+
+  Two-algorithm (Redelmeier) confirmation covers row totals through n = 22
+  only, which reaches the k ≤ 10 anchors' rows and no further.
 
 **Supersession.** The `Pin.lean` tier map below is now historical (kept for
 cross-validation): the k = 12..16 PARTIAL tier's flagged-PREDICTED
