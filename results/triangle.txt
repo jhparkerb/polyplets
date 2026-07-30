@@ -3,8 +3,11 @@
 # Columns: n H T(n,H).  Row sums give A006770.
 # Assembled by scripts/assemble_triangle.py from
 # results/ns_a40/perheight/hH.out; provenance in results/ns_a40/PROVENANCE.md.
-# Checks enforced at assembly: sum_H T(n,H) = a(n) for all n;
-# T(n,n) = 3^(n-1) for all n.
+# Checks enforced at assembly: every column carries rows n=H..40 (no
+# defaulted zeros) and no duplicate n; sum_H T(n,H) = a(n) for all n
+# (agreement with the combine output, NOT independent corroboration);
+# T(n,n) = 3^(n-1) and T(n,n-1) = (25n-45)*3^(n-4) for all n >= 4
+# (proven closed forms, independent of this data).
 1 1 1
 2 1 1
 2 2 3
