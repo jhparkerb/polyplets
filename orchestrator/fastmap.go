@@ -22,6 +22,7 @@
 package orchestrator
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"sync"
@@ -71,14 +72,29 @@ func (r *fastMapReserver) release(need uint64) {
 // default 24GB (env POLY_FASTMAP_FLOOR_GB): on a 125GB box with 80 workers x
 // 1GiB spill budgets, tmpfs admission tops out well under the level that
 // starved the a(40) launch.
-func newFastMapReserverFor(fastDir string) *fastMapReserver {
-	floor := uint64(24) << 30
-	if e := os.Getenv("POLY_FASTMAP_FLOOR_GB"); e != "" {
-		if v, err := strconv.Atoi(e); err == nil && v > 0 {
-			floor = uint64(v) << 30
+//
+// An UNSET variable takes the default; a SET but unusable one ("40GB", "40g",
+// "", "0", "-8") is an error, not a fallback (O5 "Floor Guards the Wrong
+// Resource"). Silently reverting to 24GB on a typo hands the operator a floor
+// 16GB below the one they believe they configured, on the exact knob whose
+// misconfiguration is implicated in the four-OOM history.
+//
+// DEFERRED (AUDIT-2026-07-30 O5): the floor measures tmpfs headroom via
+// statfs on the fast dir, not system RAM. Those coincide on a dedicated
+// /dev/shm and diverge as soon as anything else is resident, so the guard can
+// pass while the box is already out of memory. Redesigning it to budget
+// against real RAM is the deferred half of this finding.
+func newFastMapReserverFor(fastDir string) (*fastMapReserver, error) {
+	floorGB := 24
+	if e, set := os.LookupEnv("POLY_FASTMAP_FLOOR_GB"); set {
+		v, err := strconv.Atoi(e)
+		if err != nil || v < 1 {
+			return nil, fmt.Errorf("POLY_FASTMAP_FLOOR_GB=%q: want a whole number of GB >= 1 (bare integer, no unit suffix)", e)
 		}
+		floorGB = v
 	}
-	return newFastMapReserver(func() (uint64, error) { return fsAvailBytes(fastDir) }, floor)
+	floor := uint64(floorGB) << 30
+	return newFastMapReserver(func() (uint64, error) { return fsAvailBytes(fastDir) }, floor), nil
 }
 
 // mapRoundProjection is the reserve size for a round reading the given

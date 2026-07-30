@@ -239,7 +239,11 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		return nil, fmt.Errorf("Cores must be >= 1, got %d", cfg.Cores)
 	}
 	if cfg.FastMapDir != "" && cfg.fastRes == nil {
-		cfg.fastRes = newFastMapReserverFor(cfg.FastMapDir)
+		res, err := newFastMapReserverFor(cfg.FastMapDir)
+		if err != nil {
+			return nil, err
+		}
+		cfg.fastRes = res
 	}
 
 	maxn := cfg.Maxn

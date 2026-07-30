@@ -55,9 +55,22 @@ FASTMAP_FLAG=""
 if [ "${FRONTIER_LEVERS:-0}" = "1" ]; then
   export POLY_FRONTIER_ZSTD=1
   # RAM co-budget (the a(40) OOM lesson, 2x): worker spill budgets + tmpfs
-  # pages + zstd contexts all share the same 125GB. 40GB floor caps /dev/shm
-  # admission at ~22GB; with --ram 768MiB x 80 workers (60GB) + capped pools
-  # the sum stays ~90GB, leaving real page-cache headroom.
+  # pages + zstd contexts all share the same 125GB. Derived from the flags
+  # THIS script actually passes (AUDIT-2026-07-30 E7: the old comment quoted
+  # "--ram 768MiB x 80 workers (60GB) ... ~90GB", but the invocations below
+  # pass --ram 1073741824 = 1 GiB):
+  #   phase A  --ram 1GiB x 80 workers  = 80GB
+  #   phase B  --ram 1GiB x 48 workers  = 48GB
+  #   phase C  --ram 1GiB x 32 workers  = 32GB
+  # plus tmpfs admission, which the 40GB floor caps at ~85GB free minus the
+  # floor, i.e. ~22GB in practice. Phase A is the binding case: 80 + ~22 =
+  # ~102GB of the 125GB, leaving ~23GB for page cache, zstd context pools and
+  # the orchestrator itself. Phases B/C are far under.
+  #
+  # CAVEAT (AUDIT-2026-07-30 O5, floor redesign DEFERRED): the floor is
+  # enforced against statfs on /dev/shm -- tmpfs headroom -- not against
+  # system RAM. The two coincide only while nothing else is resident, so this
+  # budget is an arithmetic argument, not something the guard enforces.
   export POLY_FASTMAP_FLOOR_GB=${POLY_FASTMAP_FLOOR_GB:-40}
   FASTMAP_FLAG="--fast-map-dir /dev/shm/ns_a${N}"
   echo "frontier levers ON: POLY_FRONTIER_ZSTD=1 $FASTMAP_FLAG floor=${POLY_FASTMAP_FLOOR_GB}GB"

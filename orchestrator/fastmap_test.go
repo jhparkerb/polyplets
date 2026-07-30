@@ -34,3 +34,34 @@ func TestFastMapReservationRace(t *testing.T) {
 		t.Fatalf("reserve must fail closed on statfs error")
 	}
 }
+
+// TestFastMapFloorEnvFailsLoudly — red-first regression for AUDIT-2026-07-30
+// O5 ("Floor Guards the Wrong Resource", env-parse half). An unparseable
+// POLY_FASTMAP_FLOOR_GB silently fell back to the 24GB default: an operator
+// who wrote "40GB" or "40g" got a floor 16GB lower than the one they thought
+// they had set, on the exact knob whose misconfiguration is implicated in the
+// four-OOM history. The floor must be refused at start, not guessed.
+//
+// RED before the fix:
+//
+//	--- FAIL: TestFastMapFloorEnvFailsLoudly (0.00s)
+//	    fastmap_test.go:55: POLY_FASTMAP_FLOOR_GB="40GB" accepted silently:
+//	        floor fell back to 24GB, not what the operator asked for
+//	    [... and for "40g", "", " ", "-8", "0", "24.5" ...]
+func TestFastMapFloorEnvFailsLoudly(t *testing.T) {
+	for _, bad := range []string{"40GB", "40g", "", " ", "-8", "0", "24.5"} {
+		t.Setenv("POLY_FASTMAP_FLOOR_GB", bad)
+		r, err := newFastMapReserverFor(t.TempDir())
+		if err == nil {
+			t.Errorf("POLY_FASTMAP_FLOOR_GB=%q accepted silently: floor fell back to %dGB, not what the operator asked for", bad, r.floor>>30)
+		}
+	}
+	t.Setenv("POLY_FASTMAP_FLOOR_GB", "40")
+	r, err := newFastMapReserverFor(t.TempDir())
+	if err != nil {
+		t.Fatalf("POLY_FASTMAP_FLOOR_GB=40: %v", err)
+	}
+	if got := r.floor >> 30; got != 40 {
+		t.Errorf("floor = %dGB, want 40GB", got)
+	}
+}
