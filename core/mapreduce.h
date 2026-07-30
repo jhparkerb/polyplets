@@ -245,6 +245,7 @@ std::pair<size_t, size_t> map_shard_file(
 
   // Key-bound parsing.
   const int keyLen = (cfg.keyLen != 0) ? cfg.keyLen : H + 2;
+  requireKeyLenFits(keyLen, "map_shard_file");
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};
   bool has_lo = parseKeyBound(lo_hex, lo_sig, keyLen, "map_shard_file", "lo");

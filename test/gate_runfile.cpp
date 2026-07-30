@@ -601,6 +601,55 @@ static void testMergeUnparseableBoundAborts() {
   std::remove("/tmp/gate_runfile_badbound_out.bin.idx");
 }
 
+// ─── V5: a keyLen wider than SIGMAX must be refused, not overflowed ─────────
+//
+// Every key in the engine lives in a fixed SIGMAX-byte Sig and is copied
+// through SIGMAX-sized STACK arrays (mergeRunFiles' lo_sig/hi_sig,
+// map_shard_file, map_shard_stage_file, map_worker's range filter, seekToKey's
+// probe buffer), and deserializeRecord zero-pads with
+// memset(sig.b + keyLen, 0, SIGMAX - keyLen) — which underflows to a huge
+// size_t once keyLen > SIGMAX. Nothing checked it anywhere. The reachable case
+// is the kink kernel's keyLen = H+4: at H >= 29 (SIGMAX=32) every one of those
+// buffers overflows, silently. Far beyond the a(40) close (H<=21), but a stack
+// smash with no diagnostic is not an acceptable way to find that out.
+static void writerWithOversizeKeyLen() {
+  RunFileWriter<u64> w("/tmp/gate_runfile_keylen.bin", SIGMAX - 4, 8, "", "",
+                       "test", SIGMAX + 1);
+  RunRecord<u64> r;
+  std::memset(r.sig.b, 0, SIGMAX);
+  r.H = SIGMAX - 4; r.keyLen = SIGMAX + 1; r.lo = 0; r.len = 1;
+  r.counts = {u64{1}};
+  w.append(r);        // pre-fix: memcpy reads SIGMAX+1 bytes out of a SIGMAX Sig
+  w.finalize();
+  std::fprintf(stderr, "child: wrote a keyLen=%d file with no complaint\n", SIGMAX + 1);
+}
+static void readerWithOversizeKeyLen() {
+  writeRun("/tmp/gate_runfile_keylen_in.bin", 3, 4);
+  RunFileReader<u64> r("/tmp/gate_runfile_keylen_in.bin", 3, SIGMAX + 1);
+  RunRecord<u64> rec;
+  while (r.next(rec)) {}
+  std::fprintf(stderr, "child: read with keyLen=%d with no complaint\n", SIGMAX + 1);
+}
+static void mergeWithOversizeKeyLen() {
+  writeRun("/tmp/gate_runfile_keylen_in.bin", 3, 4);
+  mergeRunFiles<u64>({"/tmp/gate_runfile_keylen_in.bin"}, 3, "", "",
+                     "/tmp/gate_runfile_keylen_out.bin", "test", SIGMAX + 1);
+}
+static void testOversizeKeyLenRefused() {
+  assert(runInChild(writerWithOversizeKeyLen) > 0 &&
+         "V5: RunFileWriter must refuse a keyLen wider than SIGMAX");
+  assert(runInChild(readerWithOversizeKeyLen) > 0 &&
+         "V5: RunFileReader must refuse a keyLen wider than SIGMAX");
+  assert(runInChild(mergeWithOversizeKeyLen) > 0 &&
+         "V5: mergeRunFiles must refuse a keyLen wider than SIGMAX");
+  std::remove("/tmp/gate_runfile_keylen.bin");
+  std::remove("/tmp/gate_runfile_keylen.bin.idx");
+  std::remove("/tmp/gate_runfile_keylen_in.bin");
+  std::remove("/tmp/gate_runfile_keylen_in.bin.idx");
+  std::remove("/tmp/gate_runfile_keylen_out.bin");
+  std::remove("/tmp/gate_runfile_keylen_out.bin.idx");
+}
+
 // Pooled zstd contexts must have BOUNDED retention: a persistent worker that
 // once ran a 640-input merge must not hold 640 idle contexts forever (80
 // workers x 640 x ~200KB was a standing ~10-20GB term in the a(40) OOM).
@@ -639,6 +688,7 @@ int main() {
   testReaderCorruptCompressedAborts();
   testFinalizeFailureDoesNotPublish();
   testMergeUnparseableBoundAborts();
+  testOversizeKeyLenRefused();
   testZstdPoolRetentionBounded();
   std::puts("gate_runfile PASS");
 }

@@ -288,6 +288,7 @@ class RunFileWriter {
         crc_(FNV_OFFSET), records_offset_(0),
         path_(path), tmp_path_(path + ".tmp"),
         write_index_(write_index), compress_(compress), body_start_offset_(0) {
+    requireKeyLenFits(keyLen_, "RunFileWriter");
 #ifndef POLY_ZSTD
     compress_ = false;  // no zstd in this build: only the plain path exists
 #endif
@@ -645,6 +646,7 @@ class RunFileReader {
         fp_(nullptr), records_(0), records_read_(0),
         crc_(FNV_OFFSET), path_(path), seeked_(false),
         compressed_(false) {
+    requireKeyLenFits(keyLen_, "RunFileReader");
     fp_ = std::fopen(path.c_str(), "rb");
     if (!fp_) {
       std::fprintf(stderr, "RunFileReader: cannot open %s\n", path.c_str());
@@ -759,7 +761,8 @@ class RunFileReader {
     }
     const long hdr = kRunIndexHeaderLen;
     const long entryLen = static_cast<long>(keyLen_) + 16; // key + u64 offset + u64 recidx
-    uint8_t key[64];
+    uint8_t key[SIGMAX];   // V5: sized by the key width, not a hardcoded 64
+                           // (requireKeyLenFits in the ctor guarantees the fit)
     auto keyAt = [&](long i) -> bool {
       return std::fseek(f, hdr + i * entryLen, SEEK_SET) == 0 &&
              std::fread(key, 1, static_cast<size_t>(keyLen_), f) == static_cast<size_t>(keyLen_);
@@ -1098,6 +1101,7 @@ std::pair<size_t, size_t> mergeRunFiles(
     volatile std::sig_atomic_t* terminate = nullptr,
     std::string* stop_key_out = nullptr) {
   if (keyLen == 0) keyLen = H + 2;
+  requireKeyLenFits(keyLen, "mergeRunFiles");
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};
   bool has_lo = parseKeyBound(lo_hex, lo_sig, keyLen, "mergeRunFiles", "lo");

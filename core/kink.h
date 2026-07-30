@@ -227,6 +227,7 @@ std::pair<size_t, size_t> map_shard_stage_file(
   const int maxn = cfg.maxn;
   const int r    = cfg.stage;
   const int keyLen = kinkKeyLen(H);
+  requireKeyLenFits(keyLen, "map_shard_stage_file");
 
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};

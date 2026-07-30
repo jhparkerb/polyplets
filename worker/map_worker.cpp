@@ -62,6 +62,7 @@ template <class W>
 static Run<W> readRangedRunFiles(const std::vector<std::string>& paths, int H,
                                  int keyLen, const std::string& lo_hex,
                                  const std::string& hi_hex) {
+  requireKeyLenFits(keyLen, "map_worker");
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};
   const bool has_lo = parseKeyBound(lo_hex, lo_sig, keyLen, "map_worker", "lo");
@@ -195,6 +196,14 @@ static int runOneRequest(const std::vector<std::string>& tokens) {
       }
     }
   }
+
+  // REFUSE AT START (V5): the key width this request implies must fit SIGMAX
+  // before any file is opened. The kink kernel's H+4 key is the reachable case
+  // (H >= 29 at SIGMAX=32); the column kernel's H+2 / holes H+3 are checked by
+  // the same call so no path is exempt. Every SIGMAX-sized stack buffer
+  // downstream (range filters, seekToKey's probe, deserializeRecord's zero-pad)
+  // depends on this.
+  requireKeyLenFits(kink ? kinkKeyLen(H) : (holes ? H + 3 : H + 2), "map_worker");
 
   const auto in_paths = splitComma(in_str);
 

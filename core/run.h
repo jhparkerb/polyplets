@@ -19,11 +19,33 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <memory_resource>
 #include <vector>
 
 #include "core/signature.h"
+
+// REFUSE AT START (V5): every key in this engine lives in a fixed SIGMAX-byte
+// Sig and is copied through SIGMAX-sized stack arrays (mergeRunFiles' lo_sig/
+// hi_sig, map_shard_file, map_shard_stage_file, map_worker's range filter,
+// seekToKey's probe buffer), and deserializeRecord zero-pads the tail with
+// memset(sig.b + keyLen, 0, SIGMAX - keyLen) -- which UNDERFLOWS to a huge
+// size_t the moment keyLen > SIGMAX. Nothing checked it. The reachable case is
+// the kink kernel, whose key is H+4 wide: at H >= 29 (SIGMAX=32) every one of
+// those buffers overflows. Far past the a(40) close (H<=21), but it is a
+// stack smash with no diagnostic, so it fails closed at the moment a keyLen is
+// first used instead.
+inline void requireKeyLenFits(int keyLen, const char* who) {
+  if (keyLen <= 0 || keyLen > SIGMAX) {
+    std::fprintf(stderr,
+                 "%s: keyLen %d does not fit SIGMAX=%d — refusing to run "
+                 "(rebuild with -DPOLY_SIGMAX=<bigger> for taller heights)\n",
+                 who, keyLen, SIGMAX);
+    std::exit(1);
+  }
+}
 
 // Supported counter widths.
 using u64  = std::uint64_t;
