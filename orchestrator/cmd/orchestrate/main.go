@@ -40,6 +40,13 @@ func main() {
 	if os.Getenv("GOGC") == "" {
 		debug.SetGCPercent(1000)
 	}
+	// ...but GOGC is a RATIO with no ceiling, which is how the orchestrator
+	// reached 4.4 GB RSS and climbing as an OOM contributor (O6; no leak was
+	// found). The soft memory limit bounds what that ratio can cost.
+	if _, err := orchestrator.ApplyGoMemoryLimit(); err != nil {
+		fmt.Fprintf(os.Stderr, "orchestrate: %v\n", err)
+		os.Exit(2)
+	}
 
 	maxn := flag.Int("maxn", 16, "max cell count")
 	fold := flag.Bool("fold", true, "R1 vertical-mirror fold")

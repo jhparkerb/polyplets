@@ -44,9 +44,19 @@ on the pole, which dominates). Combine/validation unchanged (perheight
 accumulates across phases; resume per phase).
 
 Open items for the implementation pass:
-- orchestrate's RSS growth (4.4GB and climbing when killed): profile
-  (pprof) — suspect per-round accumulation (bounds/telemetry/cuts).
-  Independent of phasing but wants fixing regardless.
+- ~~orchestrate's RSS growth (4.4GB and climbing when killed)~~ **CLOSED
+  2026-07-30 (AUDIT-2026-07-30 O6).** Verdict: **no leak.** The suspected
+  per-round accumulation is not there — telemetry is streamed to disk
+  rather than retained, and every pool (bounds, cuts, worker/zstd
+  contexts) is capped. The mechanism is GOGC without a ceiling:
+  cmd/orchestrate sets GOGC=1000 to stop the ~8000 pointless GC cycles
+  the default caused, but GOGC is a *ratio*, so the heap is allowed to
+  reach ~11x live before a collection — a tens-of-MB live heap becomes
+  GBs of RSS with nothing wrong. Fix: keep GOGC=1000, add
+  `debug.SetMemoryLimit` (default 4 GiB, `POLY_GO_MEMLIMIT_GB` override,
+  0 = off) so the ratio has a bound. Go's soft limit makes the collector
+  work harder near the limit rather than failing, so an under-sized limit
+  costs CPU, never correctness. Gated by `orchestrator/gomemlimit_test.go`.
 - Worker overhead audit: what is the ~0.5GB non-budget RSS per worker?
   (arena retention, zstd contexts, reader buffers, request scratch.)
 - Restore --ram 1GiB + unit-mult 8 for the phased config (the 768M +
