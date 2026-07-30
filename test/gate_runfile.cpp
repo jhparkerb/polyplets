@@ -660,14 +660,39 @@ static void testZstdPoolRetentionBounded() {
   for (int i = 0; i < 300; i++) { d.push_back(acquireDStream()); c.push_back(acquireCStream()); }
   for (auto* p : d) releaseDStream(p);
   for (auto* p : c) releaseCStream(p);
-  assert(zstdCtxPool().d.size() <= kZstdCtxPoolCap &&
+  assert(zstdCtxPool().d.size() <= zstdCtxPoolCap() &&
          "released DStreams beyond the cap must be freed, not pooled");
-  assert(zstdCtxPool().c.size() <= kZstdCtxPoolCap &&
+  assert(zstdCtxPool().c.size() <= zstdCtxPoolCap() &&
          "released CStreams beyond the cap must be freed, not pooled");
+  assert(zstdCtxPoolCap() == kZstdCtxPoolCapDefault &&
+         "the default idle-retention cap must stay 64 with the env unset");
+#endif
+}
+
+// E6 "Pool Underwater": the idle-retention cap is now an env knob
+// (POLY_ZSTD_CTX_POOL), parsed ONCE per process like the other POLY_* levers.
+// That "once" is why this runs first and in a forked child: the parsed value is
+// a function-local static, so a fork after any zstd use would inherit the
+// parent's already-initialized value and test nothing.
+static void poolCapFromEnv() {
+#ifdef POLY_ZSTD
+  setenv("POLY_ZSTD_CTX_POOL", "4", 1);
+  if (zstdCtxPoolCap() != 4) { std::fprintf(stderr, "cap not honored\n"); _exit(3); }
+  std::vector<ZSTD_DStream*> d;
+  for (int i = 0; i < 50; i++) d.push_back(acquireDStream());
+  for (auto* p : d) releaseDStream(p);
+  if (zstdCtxPool().d.size() > 4) { std::fprintf(stderr, "retained past the cap\n"); _exit(4); }
+#endif
+}
+static void testZstdPoolCapEnvOverride() {
+#ifdef POLY_ZSTD
+  const int rc = runInChild(poolCapFromEnv);
+  assert(rc == 0 && "POLY_ZSTD_CTX_POOL must set the idle-retention cap");
 #endif
 }
 
 int main() {
+  testZstdPoolCapEnvOverride();   // must precede any zstd use in this process
   testAtomicPublish();
   testIndexHasMagic();
   testHeaderRejectsBadByteorder();

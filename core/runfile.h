@@ -147,7 +147,24 @@ inline int frontierZstdLevel() {
 // hold N idle contexts forever (80 workers x ~640 x ~200KB was a standing
 // 10-20GB term in the a(40) OOM). Peak concurrent use is unbounded (k-way
 // merges hold all readers open); only IDLE retention is capped.
-inline constexpr size_t kZstdCtxPoolCap = 64;
+//
+// The cap is a RAM-vs-context-churn trade with a real cost on both sides: at a
+// production fan-in of ~640 inputs a 64-slot pool serves only ~10% of the
+// round's acquires and the rest pay ZSTD_createDStream's multi-MB workspace
+// allocation (the very cost the pool exists to avoid), while raising it
+// multiplies idle retention across every worker. Unlike every neighbouring
+// lever (POLY_FRONTIER_ZSTD*, POLY_SPILL_ZSTD_LEVEL, POLY_NO_SEEK) it had NO
+// knob, so the trade could not be moved without a rebuild. POLY_ZSTD_CTX_POOL
+// overrides it; default 64, unchanged. Parsed once per process, like the rest.
+inline constexpr size_t kZstdCtxPoolCapDefault = 64;
+inline size_t zstdCtxPoolCap() {
+  static const size_t v = [] {
+    const char* e = std::getenv("POLY_ZSTD_CTX_POOL");
+    if (e && *e) { long n = std::atol(e); if (n >= 0) return (size_t)n; }
+    return kZstdCtxPoolCapDefault;
+  }();
+  return v;
+}
 
 struct ZstdCtxPool {
   std::vector<ZSTD_DStream*> d;
@@ -174,7 +191,7 @@ inline ZSTD_DStream* acquireDStream() {
 inline void releaseDStream(ZSTD_DStream* x) {
   if (!x) return;
   auto& pool = zstdCtxPool().d;
-  if (pool.size() >= kZstdCtxPoolCap) { ZSTD_freeDStream(x); return; }
+  if (pool.size() >= zstdCtxPoolCap()) { ZSTD_freeDStream(x); return; }
   pool.push_back(x);
 }
 inline ZSTD_CStream* acquireCStream() {
@@ -191,7 +208,7 @@ inline ZSTD_CStream* acquireCStream() {
 inline void releaseCStream(ZSTD_CStream* x) {
   if (!x) return;
   auto& pool = zstdCtxPool().c;
-  if (pool.size() >= kZstdCtxPoolCap) { ZSTD_freeCStream(x); return; }
+  if (pool.size() >= zstdCtxPoolCap()) { ZSTD_freeCStream(x); return; }
   pool.push_back(x);
 }
 #endif
