@@ -35,3 +35,53 @@ func TestMaxDiagKForcesRealSweep(t *testing.T) {
 	// the P_3 closed form would have generated) byte-for-byte.
 	checkTriangle(t, "max-diag-k-capped", known, res.Triangle)
 }
+
+// TestMaxDiagKZeroDisablesInjection — red-first regression for
+// AUDIT-2026-07-30 D7 ("Cap Zero Inverts"). The dispatch predicate read
+// `MaxDiagK == 0 || k <= MaxDiagK`, so an operator asking for NO injection
+// with `--max-diag-k 0` got the MAXIMUM instead: every wired diagonal fired.
+// The accidental disable value was 1 (which still injects k=1, itself a
+// proven closed form, so nothing visibly broke). 0 now means what it says;
+// "no cap" is the omitted/negative sentinel.
+//
+// RED before the fix:
+//
+//	--- FAIL: TestMaxDiagKZeroDisablesInjection (0.10s)
+//	    maxdiagk_test.go:69: --max-diag-k 0 asked for NO diagonal injection but
+//	        H=6 (k=2) and H=5 (k=3) were still closed-formed: 0 columns swept
+//	        across both
+func TestMaxDiagKZeroDisablesInjection(t *testing.T) {
+	known := loadKnownTriangle(t)
+	dir := t.TempDir()
+	cfg := baseCfg(t, dir)
+	cfg.MaxDiagK = 0 // "no diagonal injection at all"
+	swept := 0
+	cfg.afterColumn = func(H, col int) {
+		if H == cfg.Maxn-2 || H == cfg.Maxn-3 {
+			swept++
+		}
+	}
+	res, err := Run(context.Background(), cfg, nil)
+	if err != nil {
+		t.Fatalf("full sweep maxn=%d max-diag-k=0: %v", cfg.Maxn, err)
+	}
+	if swept == 0 {
+		t.Fatalf("--max-diag-k 0 asked for NO diagonal injection but H=%d (k=2) and H=%d (k=3) were still closed-formed: 0 columns swept across both", cfg.Maxn-2, cfg.Maxn-3)
+	}
+	checkTriangle(t, "max-diag-k-zero", known, res.Triangle)
+}
+
+// TestValidateMaxDiagKRange pins the CLI range check: the flag used to accept
+// -1, 99 or any other value silently, each with its own surprising dispatch.
+func TestValidateMaxDiagKRange(t *testing.T) {
+	for _, v := range []int{-1, 0, 1, 19} {
+		if err := ValidateMaxDiagK(v); err != nil {
+			t.Errorf("ValidateMaxDiagK(%d) = %v, want accepted", v, err)
+		}
+	}
+	for _, v := range []int{-2, 20, 99} {
+		if err := ValidateMaxDiagK(v); err == nil {
+			t.Errorf("ValidateMaxDiagK(%d) = nil, want a range error", v)
+		}
+	}
+}

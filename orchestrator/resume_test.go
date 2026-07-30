@@ -82,6 +82,7 @@ func baseCfg(t *testing.T, dir string) SweepConfig {
 	return SweepConfig{
 		Maxn:            resumeMaxn,
 		Fold:            true,
+		MaxDiagK:        maxDiagKNoCap, // production dispatch (D7: the zero value means NO injection)
 		Cores:           resumeCores,
 		RAM:             resumeRAM,
 		RunDir:          dir,

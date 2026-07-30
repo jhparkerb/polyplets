@@ -70,11 +70,16 @@ func main() {
 	heightsArg := flag.String("heights", "", "subset of heights to sweep, e.g. 1-12 or 17,19,20 (default: all 1..maxn; for multi-machine split)")
 	perHeightOut := flag.String("per-height-out", "", "dir to write per-height h<H>.out rows (for combine + old-engine cross-check)")
 	kernel := flag.String("kernel", "column", "sweep kernel: kink (production per-cell boundary sweep) or column (the independent reference kernel, kept as the correctness oracle -- kink_validate.sh cross-checks kink against it)")
-	maxDiagK := flag.Int("max-diag-k", 0, "cap on wired diagonal closed-forms (0 = all wired). Set to k-1 to force the H=maxn-k strip back to a REAL column sweep, e.g. 16 at maxn=37 sweeps H20 for real (the strict route; the swept T(37,20) is P_17's first independent holdout). A resumed run must pass the same value")
+	maxDiagK := flag.Int("max-diag-k", -1, "cap on wired diagonal closed-forms: -1 (default) = no cap, all wired diagonals dispatch; 0 = NO diagonal injection at all (every strip is really swept); k = cap at that k. Set to k-1 to force the H=maxn-k strip back to a REAL column sweep, e.g. 16 at maxn=37 sweeps H20 for real (the strict route; the swept T(37,20) is P_17's first independent holdout). Stamped into the checkpoint: a resumed run must pass the same value")
 	flag.Parse()
 
 	if *kernel != "column" && *kernel != "kink" {
 		fmt.Fprintf(os.Stderr, "orchestrate: --kernel must be column or kink, got %q\n", *kernel)
+		os.Exit(2)
+	}
+
+	if err := orchestrator.ValidateMaxDiagK(*maxDiagK); err != nil {
+		fmt.Fprintf(os.Stderr, "orchestrate: %v\n", err)
 		os.Exit(2)
 	}
 

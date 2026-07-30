@@ -42,7 +42,7 @@ type SweepConfig struct {
 	CostProfileOut  string        // where to emit the cost profile (default: <RunDir>/cost_profile.tsv)
 	CostProfileRef  string        // optional reference profile to drive the live ETA
 	Heights         []int         // subset of heights to sweep (empty = 1..Maxn); for multi-machine split
-	MaxDiagK        int           // cap on wired diagonal closed-forms (0 = all wired). Set to k-1 to force the H=Maxn-k strip back to a REAL column sweep — e.g. 16 makes a maxn=37 run sweep H20 for real (the strict route: the swept T(37,20) is P_17's first independent holdout)
+	MaxDiagK        int           // cap on wired diagonal closed-forms: negative (maxDiagKNoCap) = no cap, 0 = NO diagonal injection at all, k = cap at that k. Set to k-1 to force the H=Maxn-k strip back to a REAL column sweep — e.g. 16 makes a maxn=37 run sweep H20 for real (the strict route: the swept T(37,20) is P_17's first independent holdout). NOTE the zero value of this struct means "no injection": callers that want production dispatch must set maxDiagKNoCap explicitly (D7), which fails toward more real sweeping, never toward a wrong cell
 	PerHeightOut    string        // dir to write per-height h<H>.out files (empty = none)
 	Bin             WorkerBin
 	// fastRes serializes tmpfs admission for --fast-map-dir (fastmap.go).
@@ -2223,6 +2223,27 @@ func diagonalStripValid(maxn, k int) bool {
 	return k >= 2 && k <= 19 && maxn >= 2*k+1
 }
 
+// maxDiagKNoCap is MaxDiagK's "no cap" sentinel: every structurally valid
+// diagonal may dispatch. It is NEGATIVE, not 0, because 0 has to mean the
+// thing an operator typing `--max-diag-k 0` is asking for — no injection at
+// all (D7 "Cap Zero Inverts"; the old predicate read 0 as "all wired", making
+// the accidental disable value 1).
+const maxDiagKNoCap = -1
+
+// maxDiagKMax is the largest wired diagonal (see diagonalStripValid); a cap
+// above it is meaningless and is rejected rather than silently accepted.
+const maxDiagKMax = 19
+
+// ValidateMaxDiagK checks a --max-diag-k value: maxDiagKNoCap (no cap), or a
+// cap in 0..maxDiagKMax. Anything else is an operator error, not a value to
+// interpret.
+func ValidateMaxDiagK(v int) error {
+	if v < maxDiagKNoCap || v > maxDiagKMax {
+		return fmt.Errorf("--max-diag-k %d out of range: %d = no cap (all wired diagonals dispatch), 0 = no diagonal injection at all, 1..%d = cap at that k", v, maxDiagKNoCap, maxDiagKMax)
+	}
+	return nil
+}
+
 // diagonalStripEnabled is the dispatch predicate both sweep paths
 // (sequential Run and runOverlap) must use: structural validity
 // (diagonalStripValid) AND the run's --max-diag-k cap. The cap exists so a
@@ -2230,7 +2251,7 @@ func diagonalStripValid(maxn, k int) bool {
 // route's certification mechanism (sweep H=maxn-k for real, then compare
 // against the P_k closed form it would have used).
 func diagonalStripEnabled(cfg SweepConfig, k int) bool {
-	return diagonalStripValid(cfg.Maxn, k) && (cfg.MaxDiagK == 0 || k <= cfg.MaxDiagK)
+	return diagonalStripValid(cfg.Maxn, k) && (cfg.MaxDiagK < 0 || k <= cfg.MaxDiagK)
 }
 
 // diagonalCell returns T(n, n-j), the j-th height-diagonal, for j=0..19
