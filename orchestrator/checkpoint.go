@@ -1,7 +1,7 @@
 // checkpoint.go — POLYCKPT write and read (DESIGN §9).
 //
-// POLYCKPT format:
-//   POLYCKPT 1
+// POLYCKPT format (docs/formats.md; version history there too):
+//   POLYCKPT 2
 //   H <h>
 //   col <c>
 //   frontier <path> [<path>...]
@@ -25,8 +25,22 @@ import (
 	"time"
 )
 
+// checkpointVersion is the POLYCKPT format version this build WRITES.
+//
+//	1 — pre-c789bfb: no `htri` lines, so a mid-height resume cannot
+//	    reconstruct the height's whole per-height row.
+//	2 — carries `htri` (the Zero Harvest fix).
+//
+// The version is stamped explicitly because absence of `htri` is NOT a usable
+// discriminator: the row is sparse-encoded, so a legitimately all-zero partial
+// row from a version-2 writer looks exactly like a version-1 ledger. Resume
+// refuses the one combination it cannot serve (O2 "Legacy Ledger", see
+// checkResumeConfig).
+const checkpointVersion = 2
+
 // Checkpoint is the resumable state after completing one column.
 type Checkpoint struct {
+	Version  int // POLYCKPT format version read from the header (1 when absent)
 	H        int
 	Col      int      // last COMPLETED column (-1 = none yet)
 	Frontier []string // paths to current frontier run files
@@ -68,7 +82,7 @@ func (ck *Checkpoint) Write(path string) error {
 	}
 	tmp := f.Name()
 
-	fmt.Fprintf(f, "POLYCKPT 1\n")
+	fmt.Fprintf(f, "POLYCKPT %d\n", checkpointVersion)
 	fmt.Fprintf(f, "H %d\n", ck.H)
 	fmt.Fprintf(f, "col %d\n", ck.Col)
 	fmt.Fprintf(f, "config maxn=%d counter=%s fold=%v kernel=%s\n", ck.Maxn, ck.Counter, ck.Fold, kernelName(ck.Kernel))
@@ -111,7 +125,7 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 	}
 	defer f.Close()
 
-	ck := &Checkpoint{Col: -1}
+	ck := &Checkpoint{Col: -1, Version: 1}
 	sc := bufio.NewScanner(f)
 	sawHeader := false
 	for sc.Scan() {
@@ -119,6 +133,13 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 		if !sawHeader {
 			if !strings.HasPrefix(line, "POLYCKPT") {
 				return nil, fmt.Errorf("not a POLYCKPT file: %s", path)
+			}
+			// Version defaults to 1: that is what an unversioned or
+			// unparseable header means for every checkpoint ever written.
+			if _, v, ok := strings.Cut(line, " "); ok {
+				if n, err := strconv.Atoi(strings.TrimSpace(v)); err == nil {
+					ck.Version = n
+				}
 			}
 			sawHeader = true
 			continue

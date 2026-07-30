@@ -169,6 +169,20 @@ func checkResumeConfig(cfg SweepConfig, resume *Checkpoint, heights []int) error
 	if len(resume.Done) > 0 {
 		return nil
 	}
+	// O2 "Legacy Ledger": a version-1 checkpoint predates the Zero Harvest fix
+	// and carries no htri, so a resume landing MID-height (columns already
+	// completed, frontier still live) can only rewrite h<H>.out from the
+	// post-resume columns — a short but NONZERO row. writePerHeight's all-zero
+	// refusal cannot see it (it fires only when zero columns were swept) and
+	// combine is blind to a nonzero under-count, so this must fail closed.
+	// Both other version-1 states stay resumable: col=-1 (no columns done, the
+	// row is whole either way) and a COMPLETED height (nil frontier — the
+	// preserved a(40) POLYCKPT.B shape, where no columns remain and the
+	// all-zero refusal already protects the good file on disk).
+	if cfg.PerHeightOut != "" && resume.Version < 2 && resume.Col >= 0 && len(resume.Frontier) > 0 {
+		return fmt.Errorf("resume: checkpoint %s is POLYCKPT v%d (predates the Zero Harvest fix, no htri) and is MID-height at H=%d col=%d — resuming would write a short h%d.out with only the post-resume columns; re-run height %d from scratch (delete the checkpoint) or resume without --per-height-out",
+			cfg.CheckpointPath, resume.Version, resume.H, resume.Col, resume.H, resume.H)
+	}
 	for _, H := range heights {
 		if H == resume.H {
 			return nil

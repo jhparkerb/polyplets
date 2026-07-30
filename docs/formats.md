@@ -116,12 +116,23 @@ Format: one directive per line, no blank-line terminator.
 
 | Line prefix | Format | Meaning |
 |-------------|--------|---------|
-| `POLYCKPT 1` | literal | Magic word + version; must be the first line |
-| `H` | `H <decimal>` | Strip height being computed |
+| `POLYCKPT 2` | literal | Magic word + version; must be the first line |
+| `H` | `H <decimal>` | Strip height being computed (`-1` in the overlap form) |
 | `col` | `col <decimal>` | Index of the last COMPLETED column; `-1` means none yet |
+| `config` | `config maxn=<d> counter=<u64\|u128> fold=<bool> kernel=<column\|kink>` | Run config stamped at write time; resume hard-fails on a mismatch |
 | `frontier` | `frontier <path> [<path>...]` | Space-separated paths to current frontier POLYRUN files |
+| `done` | `done <H> [<H>...]` | OVERLAP form only: the SET of fully-completed heights (heights finish out of order, so a single H/col cannot express progress). When present, `H`/`col`/`frontier` are unused |
 | `acct` | `acct cpu_s=<float> wall_s=<float> rss_max_mb=<float>` | Accumulated resource usage to date |
-| `tri` | `tri <n> <value>` | One triangle entry: size n, count value (u64 decimal). Only nonzero entries are written. Zero or more of these lines appear, in no specified order. |
+| `tri` | `tri <n> <value>` | One triangle entry: size n, count value (decimal, arbitrary width). Only nonzero entries are written. Zero or more of these lines appear, in no specified order. |
+| `htri` | `htri <n> <value>` | The CURRENT height's partial per-height row alone (same sparse encoding as `tri`). Version 2 only |
+
+**Version history.** Version 1 had no `htri`. Resume from a version-1 checkpoint
+therefore cannot reconstruct a whole per-height row, so a mid-height resume with
+`--per-height-out` is refused outright (AUDIT-2026-07-30 O2); a version-1
+checkpoint at `col=-1` or at a completed height (empty `frontier`) still resumes.
+The version is stamped rather than inferred from the presence of `htri` lines,
+because the row is sparse-encoded — a legitimately all-zero partial row from a
+version-2 writer is byte-identical to a version-1 ledger.
 
 `frontier` paths may contain spaces in principle, but in practice paths are chosen to be space-free.
 If the value after `frontier ` is empty the frontier is empty.
@@ -137,14 +148,17 @@ contributions from completed columns within the current height H.
 Example:
 
 ```
-POLYCKPT 1
+POLYCKPT 2
 H 5
 col 3
+config maxn=6 counter=u64 fold=true kernel=kink
 frontier /data/runs/run_col3_a.polyrun /data/runs/run_col3_b.polyrun
 acct cpu_s=142.831000 wall_s=38.201000 rss_max_mb=1024.000
 tri 4 4
 tri 5 12
 tri 6 23
+htri 5 7
+htri 6 11
 ```
 
 ---
