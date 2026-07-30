@@ -24,14 +24,35 @@ its per-height recurrence orders.
 
 ## Independence
 
-- **Different algorithm**: a classic connectivity-partition column sweep, not
-  the cell-at-a-time NW-carry kink kernel. No shared code, no shared frontier.
+Scoped honestly (AUDIT-2026-07-30 S1/S2/S3). What the strip engine is and
+is not independent OF:
+
+- **Disjoint from the kink kernel** — the load-bearing claim, and it holds:
+  a whole-column connectivity-partition sweep, not the cell-at-a-time
+  NW-carry kink kernel. No shared code, no shared frontier, no shared
+  state encoding with the engine that produced the banked triangle.
+- **NOT a different connectivity algorithm.** The core rule — union-find
+  over the new column's cells and the old column's component labels, with
+  stranded-component death — is the same rule as this repo's own reference
+  column oracle, `core/transition.h`. Written independently, but not a
+  different idea; a shared misconception about king-connectivity would not
+  be caught by it. The genuinely disjoint axes are the surrounding ones:
+  boundary granularity (whole-strip cumulative C_H vs per-column frontier),
+  accounting layer (second difference in H vs direct per-height tally),
+  count representation (`__int128` vs big.Int/CRT), and orchestration
+  (single process vs sharded map/merge).
 - **Anchored at small n** by a brute-force enumerator (translation classes of
   king-connected n-cell sets, binned by bbox height) — independent of BOTH the
-  strip TM and the kink kernel. Agreement n<=9: exact.
-- **Cross-implementation**: a Python reference (`experiments/strip_engine.py`)
-  and a C++ engine (`cpp/strip_tm.cpp`, `__int128` counts) agree byte-for-byte
-  on all C_H, H<=10.
+  strip TM and the kink kernel. Agreement n<=9: exact. **This anchor lives
+  only in the Python reference** (`brute_T`); it caps at n=9 and never runs
+  at H=11..14, so those columns rest on the C++ code alone plus its
+  agreement with the banked triangle.
+- **Cross-implementation, but not cross-mind**: a Python reference
+  (`experiments/strip_engine.py`) and a C++ *port of it*
+  (`cpp/strip_tm.cpp`, `__int128` counts) agree byte-for-byte on all C_H,
+  H<=10. They were written together and landed in the same commit
+  (`713540c`), so this is a transcription check — it catches typos and
+  overflow, not a wrong shared rule. Do not count it as a second source.
 
 ## Result
 
@@ -55,9 +76,13 @@ run — hostile-witness audit fix 7, `docs/lean-hostile-witness.md` — complete
 C_14 and the full compare: columns H≤14 independently confirmed at every
 banked n≤36. A first attempt on gympie was killed after thrashing: C_14's
 measured footprint is ~38 GB, past gympie's 24 GB; RAM-size accordingly. This
-flips the PinGrand anchors T(26,14) and T(27,14) to multi-source; remaining
-single-algorithm anchors are the 7 cells of levels 13B..16: T(28,15),
-T(29,15), T(30,16), T(31,16), T(32,17), T(33,17), T(34,18). C_15 would need
+flips the PinGrand anchors T(26,14) and T(27,14) to multi-source. At the
+a(40) close the Grand tier reaches k≤18 and has **30** anchors, of which 19
+are strip-second-sourced (H≤14, n≤36) and **11 are kink-only** — beyond
+strip reach even at N=40: T(28,15), T(29,15), T(30,16), T(31,16), T(32,17),
+T(33,17), T(34,18), T(35,18), T(36,19), T(37,19), T(38,20). (The "7 cells
+of levels 13B..16" this paragraph used to list was the k≤16 tier's count.)
+C_15 would need
 ~200+ GB by the same growth — off the table on current hardware.)
 
 Zero mismatches. What this adds over the EXISTING independent checks: the
@@ -67,7 +92,7 @@ provenance in `results/b030222_upload.txt`), but its cost is proportional to
 object count, so it stops at ~n=19-20. The strip TM's cost is ~2^H (independent
 of object count), so it EXTENDS independent per-column confirmation of the
 middle heights to n=20..36 — the region Redelmeier cannot reach. That is the
-strip engine's distinct contribution: columns H<=13 independently checked at
+strip engine's distinct contribution: columns H<=14 independently checked at
 large n, not a first check at small n. It raises second-source coverage of the
 630-entry triangle from 55.6% (columns H<=4 recurrences + P_k diagonals) toward
 ~85-90% (see the coverage map in `results/triangle-structure.md`).

@@ -68,6 +68,21 @@ Classification of the 26 cells:
   project already applies to a(23)+ ("single-algorithm, multiply cross-checked") —
   the P_k for k ≥ 12 inherit exactly that status, not two-algorithm independence.
 
+**Superseded 2026-07-30 (AUDIT-2026-07-30 L7/S5).** The classification above
+is the 2026-07-21 state (26 anchors, k ≤ 16). Two things moved: the completed
+C_14 strip run (dalby 2026-07-22, `results/strip_C14_run.log`) confirmed
+columns H ≤ 14 to n = 36, and the Grand tier extended to k ≤ 18 at the a(40)
+close (`c54ce70`), taking the anchor set to **30**. The current split is
+**19 strip-second-sourced / 11 kink-only**. The 11 are beyond strip reach
+even at N = 40 (H ≥ 15):
+
+    T(28,15) T(29,15) T(30,16) T(31,16) T(32,17) T(33,17)
+    T(34,18) T(35,18) T(36,19) T(37,19) T(38,20)
+
+`T(26,14)` and `T(27,14)`, single-algorithm above, are now strip-confirmed.
+The reasoning about what cross-ISA and cross-revision re-runs can and cannot
+catch is unchanged and still applies to the 11.
+
 Two documentation errors found:
 1. **Strip-engine coverage is H ≤ 13, not H ≤ 14** (`results/strip-engine.md:44-47`:
    C_14 was never completed; the H=14 log only computed the growth constant, no

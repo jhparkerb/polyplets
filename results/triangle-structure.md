@@ -132,9 +132,12 @@ middle heights where the kink kernel spends its time.
 ## 5. The lever
 
 Don't fit the middle atoms — **compute** them: an independent naive strip
-transfer matrix (connectivity-partition states, fresh code, zero shared
-enumeration with the kink kernel) computes C_H(n) directly; one validated
+transfer matrix (connectivity-partition states, zero shared enumeration with
+the kink kernel) computes C_H(n) directly; one validated
 strip column second-sources the whole T column via the differencing identity.
+(Scope, as built: disjoint from the kink kernel, but the connectivity rule
+itself is the same union-find as `core/transition.h` — see the Independence
+section of `results/strip-engine.md`.)
 Cheap for H up to ~12–14 (state-count measurement pending). This is the same
 conclusion as the a(23)-era note — the residual validation gap closes only by
 independent reimplementation — but now with the exact coverage arithmetic and
