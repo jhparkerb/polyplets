@@ -1,0 +1,29 @@
+=== polyplets Lean build receipt ===
+host       : gympie (Darwin arm64)
+date       : 2026-07-30T17:29:02Z
+rev        : 7a628830dcdf3a9834efbfb150687aee393c8d7e
+toolchain  : leanprover/lean4:v4.31.0
+mathlib    : rev="v4.31.0"
+command    : cd polyplets && lake build --no-build
+
+All targets up-to-date (8592 jobs).
+
+What this certifies:
+  Every target in the default closure (lakefile.toml defaultTargets =
+  ["Polyplets"]) is BUILT AND CURRENT at the rev above -- including the
+  k<=18 Grand pin tier (Grand/PinGrand.lean, 30 real-swept anchors) and
+  the heavy k=3 native_decide cone (Weights3Heavy.lean + its 15 chunk
+  modules), which is in that closure and cost ~37 min on a cold build.
+  It also certifies that every #guard_msgs axiom-footprint check in
+  Grand/Audit.lean PASSED, since a mismatch is a build error, not a
+  warning -- that now includes the Shape/Peel chain (AUDIT-2026-07-30
+  L3: shape_d, shape, shape_production, production_int_all, d_rec,
+  c_ident, P1_closed, P2_closed, P3_pinned).
+
+  It does NOT certify anything about the engine, the banked triangle,
+  or the anchor VALUES: those enter the Lean theorems as explicit
+  hypotheses (see polyplets/PROOF-STATUS.md, 19 strip-second-sourced /
+  11 kink-only).
+
+  Job count 8592 is unchanged from the 2026-07-29 k<=18 extension
+  (c54ce70); the L3 guards were added inside an existing module.

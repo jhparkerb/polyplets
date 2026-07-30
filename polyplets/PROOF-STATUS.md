@@ -178,6 +178,14 @@ it is fitted from the final two top cells T(39,20)/T(40,21), has no
 possible holdout (the sequence closes at a(40)), and is never used by
 any banked term; pinning it in Lean would certify nothing.
 
+**Build receipt (AUDIT-2026-07-30 L8).** The k ≤ 18 extension had no
+banked evidence that it builds — the claim lived in this file and nowhere
+else. `polyplets/build-receipt-2026-07-30.log` records `lake build
+--no-build` at rev `7a62883`: *All targets up-to-date (8592 jobs)*, Lean
+`v4.31.0`, Mathlib `v4.31.0`, on gympie. Because `#guard_msgs` mismatches
+are build errors, an up-to-date closure also certifies that every
+axiom-footprint guard passed.
+
 ## Axiom audit
 
 Conditional/partial tiers (k ≥ 4): pure [propext, Classical.choice,
