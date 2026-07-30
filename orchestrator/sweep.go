@@ -142,11 +142,23 @@ func kernelName(k string) string {
 	return k
 }
 
+// overlapModeName names a sweep mode for resume-mismatch messages.
+func overlapModeName(overlap bool) string {
+	if overlap {
+		return "OVERLAP (completed-height set)"
+	}
+	return "SEQUENTIAL (H/col)"
+}
+
 // checkResumeConfig hard-fails a resume whose checkpoint was written under a
 // different run config. A mismatched --maxn/--counter/--fold silently corrupts
 // the triangle (B1); a --heights list that no longer contains the checkpoint
 // height makes startIdx fall back to 0 and re-sweep completed heights, double-
-// counting (B7). Both must abort rather than produce a wrong answer.
+// counting (B7); a mismatched --max-diag-k changes which strips are injected
+// vs really swept (O3); a mismatched sweep MODE makes the checkpoint form
+// unreadable to the resuming driver (O4); and a pre-htri checkpoint cannot
+// serve a mid-height resume with per-height output (O2). Every one of them
+// must abort rather than produce a wrong answer.
 func checkResumeConfig(cfg SweepConfig, resume *Checkpoint, heights []int) error {
 	if resume == nil {
 		return nil
@@ -162,6 +174,32 @@ func checkResumeConfig(cfg SweepConfig, resume *Checkpoint, heights []int) error
 	}
 	if want, got := kernelName(cfg.Kernel), kernelName(resume.Kernel); got != want {
 		return fmt.Errorf("resume: checkpoint kernel=%s != --kernel %s", got, want)
+	}
+	// O3 "Strict Route Amnesia": --max-diag-k decides, per height, INJECTED vs
+	// REALLY SWEPT. A mismatch across a resume silently changes which cells the
+	// run computes — and can manufacture self-confirming holdout evidence (a
+	// strip swept for real before the crash, injected from the very formula it
+	// was meant to test after it).
+	if resume.MaxDiagKSet {
+		if resume.MaxDiagK != cfg.MaxDiagK {
+			return fmt.Errorf("resume: checkpoint maxdiagk=%d != --max-diag-k %d (changes which strips are injected vs really swept)", resume.MaxDiagK, cfg.MaxDiagK)
+		}
+	} else if cfg.MaxDiagK != maxDiagKNoCap {
+		return fmt.Errorf("resume: checkpoint predates the maxdiagk stamp, so the cap it ran under is unknown, but this run passes --max-diag-k %d (non-default) — re-run from scratch rather than mix two dispatch sets", cfg.MaxDiagK)
+	} else {
+		fmt.Fprintf(os.Stderr, "resume: checkpoint predates the maxdiagk stamp; assuming it ran at the default (no cap), which this run also uses\n")
+	}
+	// O4 "Mode Amnesia": the two checkpoint FORMS are not interchangeable. The
+	// stamp is authoritative when present; otherwise the form itself is exact
+	// (markDone is runOverlap's only writer, so an overlap checkpoint always
+	// names at least one completed height).
+	ckptOverlap := len(resume.Done) > 0
+	if resume.OverlapSet {
+		ckptOverlap = resume.Overlap > 1
+	}
+	if runIsOverlap := cfg.OverlapHeights > 1; ckptOverlap != runIsOverlap {
+		return fmt.Errorf("resume: checkpoint is the %s form but this run is %s (--overlap-heights %d): resuming across the two silently re-sweeps onto a populated triangle, or discards all progress",
+			overlapModeName(ckptOverlap), overlapModeName(runIsOverlap), cfg.OverlapHeights)
 	}
 	// Overlap-form checkpoint (Done set): resume skips completed heights by set
 	// membership, not by a single resume.H, so the H-in-heights check below does
@@ -278,6 +316,9 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 			Counter:  counterName(cfg.CounterWidth),
 			Fold:     cfg.Fold,
 			Kernel:   kernelName(cfg.Kernel),
+
+			MaxDiagK: cfg.MaxDiagK, MaxDiagKSet: true,
+			Overlap: cfg.OverlapHeights, OverlapSet: true,
 		}
 		if err := ck.Write(cfg.CheckpointPath); err != nil {
 			fmt.Fprintf(os.Stderr, "checkpoint write: %v\n", err)
@@ -491,6 +532,9 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 			Counter:  counterName(cfg.CounterWidth),
 			Fold:     cfg.Fold,
 			Kernel:   kernelName(cfg.Kernel),
+
+			MaxDiagK: cfg.MaxDiagK, MaxDiagKSet: true,
+			Overlap: cfg.OverlapHeights, OverlapSet: true,
 		}
 		if err := ck.Write(cfg.CheckpointPath); err != nil {
 			fmt.Fprintf(os.Stderr, "overlap checkpoint H=%d: %v\n", H, err)

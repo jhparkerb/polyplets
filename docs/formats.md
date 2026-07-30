@@ -119,7 +119,7 @@ Format: one directive per line, no blank-line terminator.
 | `POLYCKPT 2` | literal | Magic word + version; must be the first line |
 | `H` | `H <decimal>` | Strip height being computed (`-1` in the overlap form) |
 | `col` | `col <decimal>` | Index of the last COMPLETED column; `-1` means none yet |
-| `config` | `config maxn=<d> counter=<u64\|u128> fold=<bool> kernel=<column\|kink>` | Run config stamped at write time; resume hard-fails on a mismatch |
+| `config` | `config maxn=<d> counter=<u64\|u128> fold=<bool> kernel=<column\|kink> maxdiagk=<d> overlap=<d>` | Run config stamped at write time; resume hard-fails on a mismatch. `maxdiagk` and `overlap` were added by AUDIT-2026-07-30 O3/O4 — a config line without them is a pre-stamp checkpoint (resume then allows only the default cap, and infers the mode from whether a `done` line is present) |
 | `frontier` | `frontier <path> [<path>...]` | Space-separated paths to current frontier POLYRUN files |
 | `done` | `done <H> [<H>...]` | OVERLAP form only: the SET of fully-completed heights (heights finish out of order, so a single H/col cannot express progress). When present, `H`/`col`/`frontier` are unused |
 | `acct` | `acct cpu_s=<float> wall_s=<float> rss_max_mb=<float>` | Accumulated resource usage to date |
@@ -151,7 +151,7 @@ Example:
 POLYCKPT 2
 H 5
 col 3
-config maxn=6 counter=u64 fold=true kernel=kink
+config maxn=6 counter=u64 fold=true kernel=kink maxdiagk=-1 overlap=1
 frontier /data/runs/run_col3_a.polyrun /data/runs/run_col3_b.polyrun
 acct cpu_s=142.831000 wall_s=38.201000 rss_max_mb=1024.000
 tri 4 4

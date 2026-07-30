@@ -72,6 +72,24 @@ type Checkpoint struct {
 	Counter string // normalized "u64"/"u128"
 	Fold    bool
 	Kernel  string // normalized "column"/"kink"
+	// MaxDiagK is --max-diag-k as resolved at write time (O3 "Strict Route
+	// Amnesia"): it decides per height whether a strip is INJECTED from its
+	// closed form or REALLY SWEPT, so a resume under a different cap computes
+	// a different set of cells than the run it continues — and can manufacture
+	// self-confirming holdout evidence. Meaningful only when MaxDiagKSet;
+	// checkpoints written before this field existed leave it false.
+	MaxDiagK    int
+	MaxDiagKSet bool
+	// Overlap is --overlap-heights at write time (O4 "Mode Amnesia"). The two
+	// checkpoint FORMS are not interchangeable: an overlap (Done-set)
+	// checkpoint resumed sequentially short-circuits the B7 height check and
+	// re-sweeps everything onto a populated triangle; a sequential checkpoint
+	// resumed in overlap mode has no Done set and discards all progress. When
+	// OverlapSet is false the mode is inferred from the form (len(Done) > 0),
+	// which is exact: runOverlap's only checkpoint writer is markDone, so an
+	// overlap checkpoint always names at least one completed height.
+	Overlap    int
+	OverlapSet bool
 }
 
 // Write serializes the checkpoint to path atomically (write-then-rename).
@@ -85,7 +103,8 @@ func (ck *Checkpoint) Write(path string) error {
 	fmt.Fprintf(f, "POLYCKPT %d\n", checkpointVersion)
 	fmt.Fprintf(f, "H %d\n", ck.H)
 	fmt.Fprintf(f, "col %d\n", ck.Col)
-	fmt.Fprintf(f, "config maxn=%d counter=%s fold=%v kernel=%s\n", ck.Maxn, ck.Counter, ck.Fold, kernelName(ck.Kernel))
+	fmt.Fprintf(f, "config maxn=%d counter=%s fold=%v kernel=%s maxdiagk=%d overlap=%d\n",
+		ck.Maxn, ck.Counter, ck.Fold, kernelName(ck.Kernel), ck.MaxDiagK, ck.Overlap)
 	fmt.Fprintf(f, "frontier %s\n", strings.Join(ck.Frontier, " "))
 	if len(ck.Done) > 0 {
 		ds := make([]string, len(ck.Done))
@@ -215,6 +234,14 @@ func parseConfig(s string, ck *Checkpoint) {
 			ck.Fold = v == "true"
 		case "kernel":
 			ck.Kernel = v
+		case "maxdiagk":
+			if n, err := strconv.Atoi(v); err == nil {
+				ck.MaxDiagK, ck.MaxDiagKSet = n, true
+			}
+		case "overlap":
+			if n, err := strconv.Atoi(v); err == nil {
+				ck.Overlap, ck.OverlapSet = n, true
+			}
 		}
 	}
 }

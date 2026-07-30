@@ -14,9 +14,13 @@ import (
 // checkpoint height is no longer in the --heights list (B7: startIdx would fall
 // back to 0 and double-count completed heights). A matching resume must pass.
 func TestResumeConfigGuard(t *testing.T) {
-	cfg := SweepConfig{Maxn: 20, CounterWidth: "u64", Fold: true}
+	// MaxDiagK is spelled out because SweepConfig's zero value means "no
+	// diagonal injection" (D7) — a real CLI config always carries the resolved
+	// flag, and checkResumeConfig compares it against the checkpoint's stamp.
+	cfg := SweepConfig{Maxn: 20, CounterWidth: "u64", Fold: true, MaxDiagK: maxDiagKNoCap}
 	heights := []int{17, 18, 19, 20}
-	base := &Checkpoint{H: 18, Maxn: 20, Counter: "u64", Fold: true}
+	base := &Checkpoint{H: 18, Maxn: 20, Counter: "u64", Fold: true,
+		MaxDiagK: maxDiagKNoCap, MaxDiagKSet: true, Overlap: 1, OverlapSet: true}
 
 	if err := checkResumeConfig(cfg, base, heights); err != nil {
 		t.Errorf("matching resume rejected: %v", err)
@@ -32,6 +36,21 @@ func TestResumeConfigGuard(t *testing.T) {
 	mismatch("counter", func(c *Checkpoint) { c.Counter = "u128" })
 	mismatch("fold", func(c *Checkpoint) { c.Fold = false })
 	mismatch("height-not-in-list", func(c *Checkpoint) { c.H = 5 })
+	mismatch("maxdiagk", func(c *Checkpoint) { c.MaxDiagK = 16 })   // O3
+	mismatch("overlap-mode", func(c *Checkpoint) { c.Overlap = 8 }) // O4
+
+	// O3 back-compat: a checkpoint written before the maxdiagk stamp resumes
+	// under the default cap (with a warning) but not under a non-default one.
+	legacy := *base
+	legacy.MaxDiagKSet = false
+	if err := checkResumeConfig(cfg, &legacy, heights); err != nil {
+		t.Errorf("unstamped checkpoint + default cap rejected: %v", err)
+	}
+	capped := cfg
+	capped.MaxDiagK = 16
+	if checkResumeConfig(capped, &legacy, heights) == nil {
+		t.Errorf("unstamped checkpoint + non-default --max-diag-k 16 not caught")
+	}
 }
 
 // TestResumeKernelMismatch proves a resume hard-fails when the checkpoint was
@@ -42,11 +61,15 @@ func TestResumeConfigGuard(t *testing.T) {
 func TestResumeKernelMismatch(t *testing.T) {
 	heights := []int{17, 18, 19, 20}
 
-	columnCfg := SweepConfig{Maxn: 20, CounterWidth: "u64", Fold: true}
-	kinkCfg := SweepConfig{Maxn: 20, CounterWidth: "u64", Fold: true, Kernel: "kink"}
+	columnCfg := SweepConfig{Maxn: 20, CounterWidth: "u64", Fold: true, MaxDiagK: maxDiagKNoCap}
+	kinkCfg := SweepConfig{Maxn: 20, CounterWidth: "u64", Fold: true, Kernel: "kink", MaxDiagK: maxDiagKNoCap}
 
-	columnCkpt := &Checkpoint{H: 18, Maxn: 20, Counter: "u64", Fold: true}
-	kinkCkpt := &Checkpoint{H: 18, Maxn: 20, Counter: "u64", Fold: true, Kernel: "kink"}
+	stamp := Checkpoint{H: 18, Maxn: 20, Counter: "u64", Fold: true,
+		MaxDiagK: maxDiagKNoCap, MaxDiagKSet: true, Overlap: 1, OverlapSet: true}
+	columnCkpt := &stamp
+	kinkCk := stamp
+	kinkCk.Kernel = "kink"
+	kinkCkpt := &kinkCk
 
 	if err := checkResumeConfig(columnCfg, columnCkpt, heights); err != nil {
 		t.Errorf("matching column resume rejected: %v", err)
