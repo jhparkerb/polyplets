@@ -31,7 +31,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
         ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan \
-        ns-gate-frontier-zstd \
+        ns-gate-frontier-zstd ns-gate-diag-pins \
         ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
@@ -171,7 +171,16 @@ build/ns:
 # for T(n,H) and the polyplet totals) has an automatic correctness gate: its hot
 # kernel took a burst of perf work (L1..L4, dropped reachedUndo) with no routine
 # gate covering it — a miscount would otherwise rely on a dev running `make gates`.
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-frontier-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan gate-g2
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-frontier-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan ns-gate-diag-pins gate-g2
+
+# Diagonal-pin audit gate (AUDIT-2026-07-30 D4): re-derives nothing, but
+# fail-closed checks every wired P_k (k=1..19) against every REAL-swept
+# in-onset cell of results/triangle.txt (H <= 21), re-interpolates the levels
+# real data alone pins, and prints the per-term conditionality decomposition
+# for n=29..40 — the project's circularity map. Wired here so it cannot rot
+# again: it had been silently exiting on a parse error since P_17 was wired.
+ns-gate-diag-pins:
+	python3 scripts/verify_diagonal_pins.py
 
 # Fast gate subset for the pre-push hook (.githooks/pre-push). Targets well under
 # 30s: the full Go suite (guards / combine / runcat / closed-form / resume) plus
