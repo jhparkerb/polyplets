@@ -28,10 +28,11 @@ whole diagonal law.
   `P2_pinned`/`P2_closed` are the standalone diagonal laws.
 * **k = 3, conditional on three heavy leaves** (`P3_pinned_of_heavy`): the same
   recursion evaluator, but its three surplus-3 leaves `V 3 3`, `Vᵗ 3 3`,
-  `d 3 4` (enumerations of `C(45,6)·15`, `C(39,6)`, `C(28,7)` subsets — beyond
-  the `native_decide` compile budget in the default build) are taken as
-  hypotheses. `Weights3Heavy.lean` (outside the default build) discharges them
-  by `native_decide`, giving the unconditional `P3_pinned`.
+  `d 3 4` (enumerations of `C(45,6)·15`, `C(39,6)`, `C(28,7)` subsets — too
+  big for one `native_decide`, hence the chunking) are taken as
+  hypotheses. `Weights3Heavy.lean` discharges them by `native_decide`, giving
+  the unconditional `P3_pinned`. That module is reached by the default target
+  (via `Grand.PinGrand`); it costs ~37 min on a cold build and nothing after.
 * **Conditional** `k = 4..11` (`Pk_pinned_of_banked`): hypothesize the `k+1`
   banked onset `T`-values (all in `results/triangle.txt`).
 * **Partial** `k = 12..16` (`Pk_pinned_of_partial`): only `m(k) = 12,10,8,6,4`

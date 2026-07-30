@@ -35,10 +35,14 @@ cardinalities (one heavy column m=-7..0 per file, the light m=1..7 folded into
 assembly below is pure arithmetic. `Vᵗ 3 3` (`3.3·10⁶`) and `d 3 4` (`1.2·10⁶`)
 stay single `native_decide`s — both build below the overflow threshold.
 
-This module is **deliberately excluded from `Polyplets.lean`'s default target**
-so those hour-scale `native_decide` compilations do not gate ordinary builds.
-Build it explicitly (`lake build Polyplets.Weights3Heavy`) to obtain the
-unconditional `P3_pinned`.
+This module was originally excluded from `Polyplets.lean`'s default target so
+those long `native_decide` compilations would not gate ordinary builds. That
+is **no longer true**: since `Grand/PinGrand.lean` imports it (and the root
+`Polyplets.lean` imports `Grand.PinGrand`), it is in the default target's
+closure. A cold `lake build` therefore pays the chunk set once — ~37 min
+wall, chunks ≤ 856 s in parallel plus ~1343 s assembly — and is incremental
+afterwards. `lake build Polyplets.Weights3Heavy` still works to build just
+this cone.
 
 All three values are independently cross-checked out of Lean (2026-07-20);
 the fifteen chunk cardinalities are cross-checked by `scripts/gen_v33_chunks.py

@@ -10,8 +10,12 @@ historical tiers), and the **grand form** via the staircase route
 two real-swept cells per level). Status and axiom audits: `PROOF-STATUS.md`;
 the Grand modules' plan and task briefs: `GRANDFORM-PLAN.md`, `briefs/`.
 
-Build: `lake exe cache get` (once), then `lake build`. The heavy k=3 weight
-enumeration (`Weights3Heavy.lean`) is outside the default build; see
+Build: `lake exe cache get` (once, for Mathlib), then `lake build`. The heavy
+k=3 weight enumeration (`Weights3Heavy.lean` and its fifteen
+`native_decide` chunk modules) **is** in the default target's closure —
+`Polyplets.lean` → `Grand.PinGrand` → `Weights3Heavy` — so a cold `lake
+build` spends ~37 min on it once and is incremental thereafter. Mathlib's
+cache does not cover it (it is this project's own code). See
 `PROOF-STATUS.md`.
 
 ## GitHub configuration

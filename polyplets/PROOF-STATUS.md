@@ -70,8 +70,10 @@ Green = only the intended `sorry`s listed below.
   - **k = 0, 1, 2 UNCONDITIONAL**: `P0_pinned`, `P1_pinned`/`P1_closed`,
     `P2_pinned`/`P2_closed`.
   - **k = 3**: `P3_pinned_of_heavy` (hypotheses = V 3 3 = 4778,
-    Vᵗ 3 3 = 919, d 3 4 = 4687); `Weights3Heavy.lean` (OUT of default
-    build) discharges them ⇒ unconditional `P3_pinned`. The V 3 3 check
+    Vᵗ 3 3 = 919, d 3 4 = 4687); `Weights3Heavy.lean` (IN the default
+    target's closure since the Grand tier landed — `Polyplets.lean` →
+    `Grand.PinGrand` → `Weights3Heavy`; ~37 min on a cold build, cached
+    after) discharges them ⇒ unconditional `P3_pinned`. The V 3 3 check
     (~1.2·10⁸ candidates) stack-overflows as one native_decide, so it is
     chunked by leftmost cluster column into 15 per-file native_decides
     (`WeightsChunk*.lean`, partition lemma native_decide-free, histogram
