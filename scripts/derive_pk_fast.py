@@ -9,9 +9,12 @@ so  P_k(n) = known_k(n) + a_k + b_k n,  where known_k = (1/k) sum_{j<k} j c_j P_
 and c_j(n) = a_j + b_j n. Each P_k needs exactly its two unknowns a_k,b_k, fit
 from two diagonal data points T(n,n-k) (n >= 2k+1). Pure Fraction arithmetic.
 
-Diagonal data T(n,n-k) are read from banked per-height sweeps
-results/ns_a{n}/perheight/h{n-k}.out. Validation per k: leading coeff = 25^k/k!,
-P_k * k! integral, and agreement with every extra (held-out) data point.
+Diagonal data T(n,n-k) are read ONLY from heights a run actually swept (see
+REAL_H below); cells a run injected from a closed form are never used, so both
+the fit and the holdout rest on real enumeration. Validation per k: leading
+coeff = 25^k/k!, P_k * k! integral, and agreement with every extra (held-out)
+REAL data point -- reported as "NO HOLDOUT" when no such point exists rather
+than as a vacuous pass.
 """
 import glob, os, sys
 from fractions import Fraction as F
@@ -39,13 +42,55 @@ def peval(a, n):
     return r
 
 # ---- diagonal data loader ----
+#
+# PROVENANCE RULE.  Each banked run only *swept* heights up to some top real
+# height; everything above it was injected from the very P_k closed forms this
+# script derives.  The old loader globbed results/ns_a*/perheight/h{H}.out and
+# took the lexically-first run containing row n -- which for a diagonal point
+# at row n is ns_a{n}, precisely the run that injected that cell.  Every
+# "holdout" was therefore the formula checked against its own output.
+#
+# REAL_H[run] = top height that run swept for real.  Verified cell by cell
+# against each results/ns_a*/PROVENANCE.md on 2026-07-30 (AUDIT-2026-07-30 D2);
+# the quoted phrase from each file is given.  Runs with no perheight/ dir
+# (ns_a23..a25) are absent and simply never match.
+REAL_H = {
+    20: 20,  # "420 columns over 20 heights" (full real sweep, pre-diagonals)
+    21: 21,  # full real sweep; only the k=0 top strip H21 is closed form
+    26: 15,  # "real sweep H1-15 (top real H15)"
+    27: 16,  # "dalby: H16 (the monster) ... ayr: swept tail H3-15"
+    28: 15,  # "only H1,2 and the real sweep H3-15 run the engine"
+    29: 16,  # "only H1,2 and the real sweep H3-16 run the engine"
+    30: 17,  # "real sweep was H3-17 (top real height H17)"
+    31: 18,  # "real sweep was H3-18 (top real height H18)"
+    32: 18,  # "real sweep was H3-18.  P13 held the top real height at H18"
+    33: 18,  # "real sweep was H3-18.  P14 held the top real height at H18"
+    34: 18,  # "real sweep was H3-18.  P15 held the top real height at H18"
+    35: 19,  # "the real sweep ran H3-H19 (H19 swept as a real height)"
+    36: 19,  # "ayr: heights 1-18 real sweeps ... dalby: height 19 real sweep"
+    37: 19,  # "Real sweeps H3-H19; H20-H37 via wired P_k closed forms"
+    38: 20,  # "Real sweeps H3-H20 (first production H20 sweep)"
+    39: 20,  # "Real sweeps H3-H20; H21-H39 via wired P_k closed forms"
+    40: 21,  # "Real sweeps H3-H21 ... H21 is the tallest real sweep"
+}
+
 _cache = {}
 def load_T(n, H):
+    """T(n,H) from a run that actually SWEPT height H (never a P_k injection).
+
+    Returns None when no banked run swept that cell for real -- callers must
+    treat that as "no evidence", not as a missing file.
+    """
     key = (n, H)
     if key in _cache:
         return _cache[key]
     val = None
-    for f in sorted(glob.glob(os.path.join(ROOT, f"results/ns_a*/perheight/h{H}.out"))):
+    for run in sorted(REAL_H):
+        if H > REAL_H[run] or run < n:
+            continue                      # injected there, or row n absent
+        f = os.path.join(ROOT, f"results/ns_a{run}/perheight/h{H}.out")
+        if not os.path.exists(f):
+            continue
         with open(f) as fh:
             for line in fh:
                 p = line.split()
@@ -57,7 +102,7 @@ def load_T(n, H):
     return val
 
 def Pdata(n, k):
-    """P_k(n) from data = T(n,n-k) / 3^(n-1-3k)."""
+    """P_k(n) from real-swept data = T(n,n-k) / 3^(n-1-3k)."""
     T = load_T(n, n - k)
     if T is None:
         return None
@@ -95,8 +140,10 @@ def derive(kmax):
         lead_ok = P[k][k] == F(25**k, factorial(k))
         num = [ck*factorial(k) for ck in P[k]]
         int_ok = all(x.denominator == 1 for x in num)
-        # held-out points beyond the two fit points
-        hold_ok = True; nheld = 0
+        # held-out points beyond the two fit points -- REAL-SWEPT ONLY, so a
+        # pass is genuine independent evidence.  None means "no holdout data
+        # exists", which is a distinct state from "holdout passed".
+        hold_ok = None; nheld = 0
         for nn in range(2*k+1, 2*k+12):
             if nn in (n1, n2):
                 continue
@@ -104,11 +151,15 @@ def derive(kmax):
             if pd is None:
                 continue
             nheld += 1
+            if hold_ok is None:
+                hold_ok = True
             if peval(P[k], nn) != pd:
                 hold_ok = False
-        tag = "ok" if (lead_ok and int_ok and hold_ok) else "*** FAIL ***"
+        held = "NO HOLDOUT (0 points)" if nheld == 0 else \
+               f"holdout({nheld} real)={hold_ok}"
+        tag = "ok" if (lead_ok and int_ok and hold_ok is not False) else "*** FAIL ***"
         print(f"P_{k:2d}: fit n={n1},{n2}  lead25^k/k!={lead_ok}  int={int_ok}  "
-              f"holdout({nheld})={hold_ok}  a_k={a_k} b_k={b_k}  {tag}")
+              f"{held}  a_k={a_k} b_k={b_k}  {tag}")
     return P, c
 
 def emit_go(P, k):
