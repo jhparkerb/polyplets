@@ -48,7 +48,13 @@ Green = only the intended `sorry`s listed below.
   (∃ P deg ≤ k: T(n,n−k) = P(n)·3^(n−1−3k) for n ≥ 2k+1, zpow +
   subtraction-free companion), `production_int_onset` (+'), and stretch
   `production_int_all` (P integer-valued on ALL of ℤ, finite differences).
-  Same clean axiom footprint — no native_decide anywhere in the proof path.
+  Same clean axiom footprint — no native_decide anywhere in the proof path,
+  and since 2026-07-30 that is **enforced**, not asserted: `shape_d`,
+  `shape`, `shape_production`, `production_int_all`, `d_rec` and `c_ident`
+  each carry a `#guard_msgs`-wrapped `#print axioms` in
+  `Grand/Audit.lean`, so a native_decide leaking into this cone fails the
+  build (`P1_closed`/`P2_closed`/`P3_pinned` are pinned there too, with
+  their real leaf sets).
   Leading-coeff stretch: CLOSED by `Grand/Lead.lean` (`lead_coeff_25`,
   `expPoly_natDegree_eq`, `shape_lead` — see Grand section). Historical
   note: corrected target was P_k.coeff k = 25^k/k! (= production's
@@ -152,6 +158,16 @@ Shape/Peel/Separation themselves: no native_decide anywhere.
 `Grand/Audit.lean` is wrapped in `#guard_msgs` against the recorded expected
 output, so any axiom-set drift FAILS the build (hostile-witness audit fix;
 `docs/lean-hostile-witness.md`).
+
+**Extended to the Shape/Peel chain (2026-07-30, AUDIT-2026-07-30 L3):** the
+guards previously covered only the Grand results, so the sentence above
+("Shape/Peel/Separation themselves: no native_decide anywhere") was the one
+axiom claim nothing checked. `Grand/Audit.lean` now guards `shape_d`,
+`shape`, `shape_production`, `production_int_all`, `d_rec`, `c_ident`
+(standard axioms only) and `P1_closed`, `P2_closed`, `P3_pinned` (standard
++ their exact native leaf sets) as well. Unguarded advisory `#print axioms`
+remain in `Series`/`Mu`/`MuRec`/`Staircase`/`ExpForm`/`Lead`/`PinGrand` —
+those print but do not gate.
 
 ## What is proved vs out of reach (goal answer)
 
