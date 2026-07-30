@@ -112,19 +112,21 @@ the onset edge; the numbers above are this file's own recomputation and the
 ones to quote.)
 
 Cells are the flattering denominator, because the triangle's cells are wildly
-unequal in size. **By mass**, second-sourcing of the final terms as banked
-(the H<=14, n<=36 strip run) is:
+unequal in size. **By mass** the picture is starker. The banked strip run is
+H<=14 **and n<=36**, so it touches no cell of rows 37-40 at all:
 
-| term | strip-second-sourced mass |
-|---|---|
-| a(37) | 9.1% |
-| a(38) | 5.5% |
-| a(39) | 2.5% |
-| a(40) | ~0% |
+| term | strip mass, as banked (n<=36) | with the N=40 extension |
+|---|---|---|
+| a(37) | 0% | 53.8% |
+| a(38) | 0% | 50.8% |
+| a(39) | 0% | 47.9% |
+| a(40) | 0% | 45.0% |
 
-— because the strip run stopped at n=36 and the mass lives in the tall middle
-heights. A strip run extended to N=40 was launched 2026-07-30 (in progress;
-`results/strip_C14_n40_run.log`), which lifts these to roughly 45-54%. The
+(right-hand column = share of that row's mass in heights H<=14, recomputed
+from `results/ns_a40/perheight/h*.out`.) The strip run stopped four terms
+short of the close, and the mass lives in the tall middle heights. An N=40
+strip run was launched 2026-07-30 (in progress;
+`results/strip_C14_n40_run.log`) and delivers the right-hand column. The
 per-height mass breakdown of a(40) itself is in
 `results/ns_a40/PROVENANCE.md`.
 

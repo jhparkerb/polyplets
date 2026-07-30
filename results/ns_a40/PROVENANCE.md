@@ -134,10 +134,12 @@ means, quantified. Nothing here suggests a wrong value (see Validation
 above); it states the denominator honestly.
 
 Second-sourcing by the independent strip transfer-matrix engine
-(`results/strip-engine.md`) is bounded by its reach: as banked (the
-H<=14, n<=36 run) it covers 9.1% of a(37), 5.5% of a(38), 2.5% of
-a(39) and ~0% of a(40). A strip run extended to N=40 was launched
-2026-07-30 and, when it lands, lifts those to roughly 45-54%.
+(`results/strip-engine.md`) is bounded by its reach. As banked, that run
+is H<=14 and **n<=36**, so it touches no cell of rows 37-40: the strip
+second-sources **0%** of a(37), a(38), a(39) and a(40). The strip run
+extended to N=40 launched 2026-07-30 covers H<=14 at those rows, which
+is (recomputed from `perheight/h*.out`) **53.8%** of a(37), **50.8%** of
+a(38), **47.9%** of a(39) and **45.0%** of a(40).
 
 ## Notes
 

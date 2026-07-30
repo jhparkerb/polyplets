@@ -135,9 +135,10 @@ every cell in its onset — including the cells that diagonal itself produced.
 Over the closed n<=40 triangle (820 cells): doc-style union **90.7%**, honest
 cells **67.6%** (P_k credited only on really-swept cells), strip alone
 **50.4%**. And cells are the flattering denominator — by MASS the strip run
-as banked (H<=14, n<=36) second-sources 9.1% of a(37), 5.5% of a(38), 2.5% of
-a(39) and ~0% of a(40). An N=40 strip extension launched 2026-07-30 lifts
-those to roughly 45-54%. Full table: `results/strip-engine.md`.
+as banked (H<=14 **and n<=36**) touches no cell of rows 37-40, so it
+second-sources 0% of a(37)-a(40). The N=40 extension launched 2026-07-30
+covers H<=14 on those rows: 53.8% / 50.8% / 47.9% / 45.0% of a(37)-a(40).
+Full table: `results/strip-engine.md`.
 
 ## 5. The lever
 
