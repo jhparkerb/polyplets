@@ -109,8 +109,8 @@ with an empty boundary (the start of column 0).
 
 ## POLYCKPT checkpoint file
 
-A POLYCKPT file is a plain text file written atomically (write to temp, rename) after
-each completed column. It captures enough state to resume a height sweep.
+A POLYCKPT file is a plain text file written atomically (write to temp, fsync, rename)
+after each completed column. It captures enough state to resume a height sweep.
 
 Format: one directive per line, no blank-line terminator.
 
@@ -125,6 +125,7 @@ Format: one directive per line, no blank-line terminator.
 | `acct` | `acct cpu_s=<float> wall_s=<float> rss_max_mb=<float>` | Accumulated resource usage to date |
 | `tri` | `tri <n> <value>` | One triangle entry: size n, count value (decimal, arbitrary width). Only nonzero entries are written. Zero or more of these lines appear, in no specified order. |
 | `htri` | `htri <n> <value>` | The CURRENT height's partial per-height row alone (same sparse encoding as `tri`). Version 2 only |
+| `end` | `end <ntri> <nhtri>` | Terminator; must be the last line. Its presence proves the file is whole and its counts must equal the number of `tri`/`htri` lines actually read. Version 2 only — a version-2 file without it is rejected as a truncated prefix |
 
 **Version history.** Version 1 had no `htri`. Resume from a version-1 checkpoint
 therefore cannot reconstruct a whole per-height row, so a mid-height resume with
@@ -159,6 +160,7 @@ tri 5 12
 tri 6 23
 htri 5 7
 htri 6 11
+end 3 2
 ```
 
 ---

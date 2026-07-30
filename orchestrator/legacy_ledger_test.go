@@ -29,8 +29,9 @@ import (
 )
 
 // writeLegacyCheckpoint rewrites a checkpoint in the pre-Zero-Harvest format:
-// header forced to version 1 and every `htri` line dropped. Returns the new
-// path (the original is left intact).
+// header forced to version 1, every `htri` line dropped, and the `end`
+// terminator removed (version 1 had none — see O7). Returns the new path (the
+// original is left intact).
 func writeLegacyCheckpoint(t *testing.T, path string) string {
 	t.Helper()
 	f, err := os.Open(path)
@@ -45,7 +46,7 @@ func writeLegacyCheckpoint(t *testing.T, path string) string {
 		line := sc.Text()
 		if first {
 			line, first = "POLYCKPT 1", false
-		} else if strings.HasPrefix(line, "htri ") {
+		} else if strings.HasPrefix(line, "htri ") || strings.HasPrefix(line, "end ") {
 			continue
 		}
 		b.WriteString(line)

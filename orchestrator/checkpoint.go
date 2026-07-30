@@ -92,43 +92,67 @@ type Checkpoint struct {
 	OverlapSet bool
 }
 
-// Write serializes the checkpoint to path atomically (write-then-rename).
+// Write serializes the checkpoint to path atomically (write-then-rename),
+// terminated by an `end <ntri> <nhtri>` line and fsynced before the rename so
+// a crash can never leave a durable PREFIX under the real checkpoint name
+// (O7 "Truncated Ledger"). All writes go through a bufio.Writer whose Flush
+// reports the first error, so a full disk fails the write instead of
+// publishing a short file.
 func (ck *Checkpoint) Write(path string) error {
 	f, err := os.CreateTemp(filepath.Dir(path), ".polyckpt_tmp_*")
 	if err != nil {
 		return err
 	}
 	tmp := f.Name()
+	fail := func(err error) error {
+		f.Close()
+		os.Remove(tmp)
+		return err
+	}
+	w := bufio.NewWriter(f)
 
-	fmt.Fprintf(f, "POLYCKPT %d\n", checkpointVersion)
-	fmt.Fprintf(f, "H %d\n", ck.H)
-	fmt.Fprintf(f, "col %d\n", ck.Col)
-	fmt.Fprintf(f, "config maxn=%d counter=%s fold=%v kernel=%s maxdiagk=%d overlap=%d\n",
+	fmt.Fprintf(w, "POLYCKPT %d\n", checkpointVersion)
+	fmt.Fprintf(w, "H %d\n", ck.H)
+	fmt.Fprintf(w, "col %d\n", ck.Col)
+	fmt.Fprintf(w, "config maxn=%d counter=%s fold=%v kernel=%s maxdiagk=%d overlap=%d\n",
 		ck.Maxn, ck.Counter, ck.Fold, kernelName(ck.Kernel), ck.MaxDiagK, ck.Overlap)
-	fmt.Fprintf(f, "frontier %s\n", strings.Join(ck.Frontier, " "))
+	fmt.Fprintf(w, "frontier %s\n", strings.Join(ck.Frontier, " "))
 	if len(ck.Done) > 0 {
 		ds := make([]string, len(ck.Done))
 		for i, H := range ck.Done {
 			ds[i] = strconv.Itoa(H)
 		}
-		fmt.Fprintf(f, "done %s\n", strings.Join(ds, " "))
+		fmt.Fprintf(w, "done %s\n", strings.Join(ds, " "))
 	}
-	fmt.Fprintf(f, "acct cpu_s=%.6f wall_s=%.6f rss_max_mb=%.3f\n",
+	fmt.Fprintf(w, "acct cpu_s=%.6f wall_s=%.6f rss_max_mb=%.3f\n",
 		ck.Acct.CPUS, ck.Acct.WallS, ck.Acct.RSSMax)
 	// Sparse triangle: only non-zero entries.
+	nTri := 0
 	for n, v := range ck.Triangle {
 		if v != nil && v.Sign() != 0 {
-			fmt.Fprintf(f, "tri %d %d\n", n, v)
+			fmt.Fprintf(w, "tri %d %d\n", n, v)
+			nTri++
 		}
 	}
 	// Sparse current-height partial row (see HTri). Additive line type:
 	// ReadCheckpoint ignores unknown keys, so old readers skip it.
+	nHTri := 0
 	for n, v := range ck.HTri {
 		if v != nil && v.Sign() != 0 {
-			fmt.Fprintf(f, "htri %d %d\n", n, v)
+			fmt.Fprintf(w, "htri %d %d\n", n, v)
+			nHTri++
 		}
 	}
+	// Terminator: presence proves the file is whole, the counts prove no
+	// interior line was lost.
+	fmt.Fprintf(w, "end %d %d\n", nTri, nHTri)
 
+	if err := w.Flush(); err != nil {
+		return fail(err)
+	}
+	if err := f.Sync(); err != nil {
+		return fail(err)
+	}
 	if err := f.Close(); err != nil {
 		os.Remove(tmp)
 		return err
@@ -146,7 +170,8 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 
 	ck := &Checkpoint{Col: -1, Version: 1}
 	sc := bufio.NewScanner(f)
-	sawHeader := false
+	sawHeader, sawEnd := false, false
+	nTri, nHTri := 0, 0
 	for sc.Scan() {
 		line := sc.Text()
 		if !sawHeader {
@@ -197,6 +222,7 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 				ck.Triangle = append(ck.Triangle, new(big.Int))
 			}
 			ck.Triangle[n] = val
+			nTri++
 		case "htri":
 			parts := strings.Fields(v)
 			if len(parts) != 2 {
@@ -211,12 +237,37 @@ func ReadCheckpoint(path string) (*Checkpoint, error) {
 				ck.HTri = append(ck.HTri, new(big.Int))
 			}
 			ck.HTri[n] = val
+			nHTri++
+		case "end":
+			parts := strings.Fields(v)
+			if len(parts) != 2 {
+				return nil, fmt.Errorf("%s: malformed end line %q", path, line)
+			}
+			wantTri, e1 := strconv.Atoi(parts[0])
+			wantHTri, e2 := strconv.Atoi(parts[1])
+			if e1 != nil || e2 != nil {
+				return nil, fmt.Errorf("%s: malformed end line %q", path, line)
+			}
+			if wantTri != nTri || wantHTri != nHTri {
+				return nil, fmt.Errorf("%s: checkpoint is incomplete — read %d tri and %d htri lines, terminator says %d and %d (truncated or corrupt)", path, nTri, nHTri, wantTri, wantHTri)
+			}
+			sawEnd = true
 		}
 	}
 	if !sawHeader {
 		return nil, fmt.Errorf("empty POLYCKPT file: %s", path)
 	}
-	return ck, sc.Err()
+	if err := sc.Err(); err != nil {
+		return nil, err
+	}
+	// The terminator is a version-2 line, so version-1 files are read without
+	// it (they never had one, and O2/O3 already restrict what a version-1
+	// checkpoint may be resumed into). Every file this build writes must have
+	// it: no terminator = the file is a prefix, not a checkpoint.
+	if !sawEnd && ck.Version >= 2 {
+		return nil, fmt.Errorf("%s: POLYCKPT v%d has no `end` terminator — the file is truncated or was never finished", path, ck.Version)
+	}
+	return ck, nil
 }
 
 func parseConfig(s string, ck *Checkpoint) {
