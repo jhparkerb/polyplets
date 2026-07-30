@@ -107,10 +107,17 @@ degree bound comes from ℓ ≤ k. ∎
 
 P_k(n) = 3^(1+2k) q_k(n−k) = Σ_i 3^(1+2k) a_{k+1−i} C(n−k+i−1, i−1), and
 v₃(a_j) ≥ −(2k+1) with binomials integer, so **P_k(n) ∈ ℤ for every integer
-n**. (Integer *coefficients* in the monomial basis would be stronger, but
-are FALSE for every k ≥ 2 — the leading coefficient is 25^k/k! — and are
-not needed downstream: all mod-3^j arguments use values. An earlier
-"observed k ≤ 17" note here was wrong; retracted AUDIT-2026-07-30 P8.)
+n**. Equivalently, P_k's coefficients in the Newton (binomial) basis are
+integers — verified numerically at every wired level k = 1..19.
+
+(An earlier note here claimed integer *coefficients in the monomial basis*
+as a stronger fact "banked empirically for k ≤ 17". That is FALSE for every
+k ≥ 2 and always was: the leading coefficient is 25^k/k!, so P_2's is 625/2.
+Measured at all 19 wired levels, no monomial coefficient set is integral.
+Retracted AUDIT-2026-07-30 P8. The nearby fact that *is* true, and is what
+the engine's storage form relies on, is stated as an open item below:
+k!·P_k ∈ ℤ[n]. Nothing downstream needs either — all mod-3^j arguments use
+values.)
 
 ## Corollary — the grand form G·H^n
 
@@ -138,11 +145,16 @@ many enumerated weights that enter each modulus (5 integers mod 27).
   `experiments/spine_deeper.py`). Not proved for all k; note the natural
   route (rational GF for the top coefficient) fails because the all-pairs
   weight family is not C-finite (refuted at ℓ=16; unbounded gap walk).
-- ~~Monomial integer coefficients of P_k~~ — **retracted 2026-07-30
-  (AUDIT-2026-07-30 P8): measured false at every wired level k = 1..19,
-  so this was never an open item.** The monomial coefficients are
-  rationals with denominator dividing k! (P_2's leading term is 625/2),
-  which the proved leading coefficient 25^k/k! already forces. Integer
-  *values* are proved above.
+- **Denominator exactly k!: is k!·P_k ∈ ℤ[n] for all k?** Observed at every
+  wired level k = 1..19 — it is how `orchestrator/sweep.go`'s
+  `diagCoeffTable` stores each P_k (integer numerator coefficients over the
+  divisor k!), and the k!-divide guard checks the division is exact at every
+  evaluation. Not proved. The leading coefficient 25^k/k! shows k! cannot be
+  improved; what is open is that no *larger* denominator is ever needed.
+  (This replaces a garbled entry that claimed integer coefficients in the
+  MONOMIAL basis "observed k ≤ 17" — measured false at every k ≥ 2, since
+  25^k/k! is not an integer; retracted AUDIT-2026-07-30 P8. Integer *values*
+  are proved above, and the equivalent Newton-basis integrality is verified
+  numerically k = 1..19.)
 - Closed forms for multi-row cluster weights (open question raised, not a
   gap in this proof).

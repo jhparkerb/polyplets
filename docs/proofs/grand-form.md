@@ -201,13 +201,16 @@ tier. The item
 
 - Onset sharpness at n = 2k (failure below onset) — verified on banked data,
   proved ab initio only k ≤ 5.
-- ~~Monomial integer coefficients of P_k~~ — **retracted 2026-07-30
-  (AUDIT-2026-07-30 P8): measured false, not open.** P_k's monomial
-  coefficients are rationals with denominator dividing k! at every wired
-  level k = 1..19 (`orchestrator/sweep.go`'s `diagCoeffTable`: P_2 alone
-  has leading 625/2), as the proved leading coefficient 25^k/k! already
-  implies. Only the *values* are integral, and that is proved (Step 6 of
-  `diagonal-law.md`, and `production_int_all` in Lean).
+- **Denominator exactly k!**: `k!·P_k ∈ ℤ[n]`, observed at every wired level
+  k = 1..19 (`orchestrator/sweep.go`'s `diagCoeffTable` stores exactly this,
+  and the k!-divide guard checks exactness at each evaluation), not proved.
+  25^k/k! shows k! is necessary; that it is always sufficient is open.
+  (Corrected 2026-07-30, AUDIT-2026-07-30 P8: this entry previously read
+  "monomial integer coefficients of P_k, coefficient integrality observed
+  k ≤ 17". Monomial integrality is FALSE at every k ≥ 2 — P_2's leading
+  coefficient is 625/2 — measured across all 19 wired levels. Integer
+  *values* are proved: Step 6 of `diagonal-law.md`, `production_int_all` in
+  Lean; the equivalent Newton-basis integrality checks out k = 1..19.)
 
 (The Lean formalization of this theorem, formerly listed here, is CLOSED —
 see §Formalization above.)
