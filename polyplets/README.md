@@ -6,7 +6,7 @@ height): the peeling recursion (`Peel.lean`), the diagonal-law shape theorem
 (`Shape.lean`), explicit production-polynomial pinning (`Pin.lean`,
 historical tiers), and the **grand form** via the staircase route
 (`Polyplets/Grand/` — `d_mu_rec`, `T_staircase`, the unconditional
-`grand_form`, `lead_coeff_25`, and `P<k>_grand_of_banked` for k ≤ 16 from
+`grand_form`, `lead_coeff_25`, and `P<k>_grand_of_banked` for k ≤ 18 from
 two real-swept cells per level). Status and axiom audits: `PROOF-STATUS.md`;
 the Grand modules' plan and task briefs: `GRANDFORM-PLAN.md`, `briefs/`.
 
@@ -18,14 +18,6 @@ build` spends ~37 min on it once and is incremental thereafter. Mathlib's
 cache does not cover it (it is this project's own code). See
 `PROOF-STATUS.md`.
 
-## GitHub configuration
-
-To set up your new GitHub repository, follow these steps:
-
-* Under your repository name, click **Settings**.
-* In the **Actions** section of the sidebar, click "General".
-* Check the box **Allow GitHub Actions to create and approve pull requests**.
-* Click the **Pages** section of the settings sidebar.
-* In the **Source** dropdown menu, select "GitHub Actions".
-
-After following the steps above, you can remove this section from the README file.
+The tree is **sorry-free** (34 `.lean` files, ~10.8k lines) and every
+axiom-footprint claim is enforced by `#guard_msgs` in
+`Polyplets/Grand/Audit.lean`, so a drifting axiom set fails the build.

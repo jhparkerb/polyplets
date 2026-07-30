@@ -31,6 +31,7 @@ claims more than its tier.
 | `cpp/` | Redelmeier enumerators (`g2_redelmeier.cpp`, Method A), column transfer matrix (`tma*`), symmetric transfer matrices (`sym/symtm.cpp`) |
 | `core/`, `orchestrator/`, `worker/` | the production kink-carry transfer-matrix engine (Go orchestration, C++ kernels); design: `docs/engine-design.md` |
 | `scripts/` | the general toolchain: production runners (`dalby_term.sh`, `symtm_run.sh`, `dmirror_strips.sh`), derivers (`derive_pk_fast.py`, `dmirror_diagonals.py`, `derive_related.py`), assembly (`dmirror_sum.py`, `dmirror_hybrid_sum.py`), independent confirmation (`g2_campaign.sh`) |
+| `polyplets/` | the **Lean 4 formalization** (34 files, sorry-free): the peeling recursion, the diagonal-law shape theorem, and the grand form, with the production P_k pinned for k≤18 from two real-swept cells per level; axiom footprints are `#guard_msgs`-enforced. Status: `polyplets/PROOF-STATUS.md` |
 | `tests/` | the gate suite (red-first, fail-closed; `make gates`) |
 | `oeis/`, `submissions/` | staged OEIS extensions and new-sequence drafts (nothing auto-submitted) |
 | `docs/` | reference docs: engineering standards, observability contract, job checklist, formats, glossary, engine + dmirror design, proofs |
