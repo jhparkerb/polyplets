@@ -30,10 +30,18 @@
 //             prune, fold (--in keyed H+4, --out keyed H+2). In-RAM
 //             (kinkFinalizeColumn) -- no spill, no classify (harvest
 //             already happened at seed).
-// seed/finalize are in-RAM per Design 14 Phase 2's scope (a(20)-gate scale
-// never needs to spill an intermediate column table; file-backed variants
-// are a Phase 3 concern). Both still respect --lo/--hi so a sharded unit
-// only processes its own key range, matching the column kernel's contract.
+// seed/finalize are in-RAM: no spill path and no work-stealing (K1, the
+// standing deferral). The old note here scoped that to "a(20)-gate scale",
+// 20 terms stale by the close. The true envelope, measured: it survived the
+// whole a(21)..a(40) chain, because the PHASED production layout bounds how
+// much of a column is co-resident, not because a unit's slice is bounded --
+// a single seed/finalize unit still loads its entire assigned key range with
+// unbounded RSS, and BalancedCutsMulti's open-ended last range is documented
+// to skew ~9000x. So the exposure is unchanged and still deferred (phasing
+// masks it, it does not remove it); see AUDIT-2026-07-13 K1 and
+// AUDIT-2026-07-30's standing-deferrals section. Both still respect --lo/--hi
+// so a sharded unit only processes its own key range, matching the column
+// kernel's contract.
 // v1 = triangle only: rejects --holes with --kernel kink (the holes Euler
 // accumulator collides with the kink carry byte at the same sig offset,
 // see core/kink.h).
