@@ -5,11 +5,14 @@ package orchestrator
 // H=maxn-18 = H19 (H=maxn-17 = H20 becomes closed-form). The validated
 // P_9..P_16 fits pin the shared symbols, so only a17,b17 were fit — from
 // T(35,18) and T(36,19), the two smallest in-onset points (onset n>=2k+1=35).
-// Unlike k<=16 there is NO independent held-out diagonal-17 point yet: a(37)'s
-// real H20 sweep (strict route) would produce the first one, T(37,20). Until
-// then P_17's certification rests on the proven grand form (exp identity pins
-// the whole polynomial given a17,b17; leading coeff 25^17/17! and k!-
-// integrality both emerged, not assumed). The out-of-onset point T(34,17)
+// TWO independent held-out diagonal-17 points have since landed and are pinned
+// below: T(37,20) from the a(38) run's real H20 sweep, and T(38,21) from the
+// a(40) run's real H21 sweep — neither in the fit, both matching exactly.
+// (This comment previously said there was none, which was true at wiring time
+// and stale by a(38); AUDIT-2026-07-30 D5.) P_17's certification also rests on
+// the proven grand form (exp identity pins the whole polynomial given a17,b17;
+// leading coeff 25^17/17! and k!-integrality both emerged, not assumed).
+// The out-of-onset point T(34,17)
 // (n=2k=34) does NOT lie on the polynomial — checked during derivation,
 // consistent with the sharp onset observed at every lower k, so it is neither
 // a fit point nor a holdout (this corrects HANDOFF's earlier parenthetical).
@@ -25,8 +28,11 @@ func TestDiagonalP17Formula(t *testing.T) {
 		n    int
 		want string
 	}{
-		{35, "180152359823857046862682314"},  // T(35,18), fit point (results/ns_a35)
-		{36, "954543410624801880699125196"},  // T(36,19), fit point (results/ns_a36)
+		{35, "180152359823857046862682314"}, // T(35,18), fit point (results/ns_a35)
+		{36, "954543410624801880699125196"}, // T(36,19), fit point (results/ns_a36)
+		// HOLDOUTS: real swept cells that were NOT in the fit (D5).
+		{37, "4956437442714322066925263218"},  // T(37,20), real H20 sweep in the a(38) run
+		{38, "25262080143961999373255793104"}, // T(38,21), real H21 sweep in the a(40) run
 	}
 	for _, c := range cases {
 		want, ok := new(big.Int).SetString(c.want, 10)

@@ -8,17 +8,21 @@ import (
 // P_18 (diagonal k=18): fit from the two smallest in-onset points (onset
 // n >= 2k+1 = 37), BOTH real swept values — T(37,19) from the a(37) run
 // (results/ns_a37) and T(38,20) from the a(38) run (results/ns_a38).
-// Like P_17 at wiring time there is no independent held-out diagonal-18
-// point yet: the first, T(39,21), comes only from a real H21 sweep (a(40)).
-// Certification meanwhile rests on the proven grand form. Wiring makes
-// H = maxn-18 closed-form, keeping a(39)'s top real height at H20.
+// Its first independent holdout has since landed and is pinned below:
+// T(39,21), from the a(40) run's real H21 sweep, was not in the fit and
+// matches exactly. (This comment previously said there was none, which was
+// true at wiring time and stale by a(40); AUDIT-2026-07-30 D5.) Certification
+// also rests on the proven grand form. Wiring makes H = maxn-18 closed-form,
+// keeping a(39)'s top real height at H20.
 func TestDiagonalP18Formula(t *testing.T) {
 	cases := []struct {
 		n    int
 		want string
 	}{
-		{37, "7418664369542642927200487045"},   // T(37,19), fit point (results/ns_a37)
-		{38, "39207474138446972682720171554"},  // T(38,20), fit point (results/ns_a38)
+		{37, "7418664369542642927200487045"},  // T(37,19), fit point (results/ns_a37)
+		{38, "39207474138446972682720171554"}, // T(38,20), fit point (results/ns_a38)
+		// HOLDOUT: real swept cell that was NOT in the fit (D5).
+		{39, "203342057467470725522863434005"}, // T(39,21), real H21 sweep in the a(40) run
 	}
 	for _, c := range cases {
 		want, ok := new(big.Int).SetString(c.want, 10)
