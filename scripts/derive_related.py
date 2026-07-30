@@ -49,7 +49,13 @@ def main():
         raise SystemExit("usage: derive_related.py <symdir>  e.g. runs/sym24")
     symdir = os.path.join(ROOT, sys.argv[1])
 
-    fixed = load_nv(os.path.join(ROOT, 'results/ns_a34/triangle.txt'))
+    # A006770 a(n) from the FRONTIER run's row-sum file.  Was pinned at
+    # results/ns_a34/triangle.txt, six terms stale, and it capped the output
+    # silently.  Note this is deliberately NOT results/triangle.txt: that is
+    # the T(n,H) triangle (three columns, n H T) and load_nv would read the
+    # height column as the value.
+    fixed_path = os.path.join(ROOT, 'results/ns_a40/triangle.txt')
+    fixed = load_nv(fixed_path)
     a105  = load_nv(os.path.join(ROOT, 'fixtures/b000105.txt'))  # free polyominoes
     R90  = load_nv(os.path.join(symdir, 'r90.out'))
     R180 = load_nv(os.path.join(symdir, 'r180.out'))
@@ -63,8 +69,22 @@ def main():
     # PRESENT to cap its dependents, never defaulted.
 
     # per-sequence reach: OneSided needs r90+r180; the rest also need H and D
-    nmax_one = min(max(R180), max(fixed))
-    nmax = min(nmax_one, max(H), max(D)) if D else 0
+    reach_one = {'fixed': max(fixed), 'r180': max(R180)}
+    nmax_one = min(reach_one.values())
+    reach_all = dict(reach_one, hmirror=max(H), dmirror=max(D)) if D else {}
+    nmax = min(reach_all.values()) if D else 0
+    # Say what capped the reach.  A stale input source otherwise looks exactly
+    # like "no new terms are derivable yet" (AUDIT-2026-07-30 P11).
+    inputs = f"fixed<=n{max(fixed)} [{os.path.relpath(fixed_path, ROOT)}]" \
+             f", r90<=n{max(R90)}, r180<=n{max(R180)}"
+    inputs += f", hmirror<=n{max(H)}, dmirror<=n{max(D)}" if D else ", dmirror ABSENT"
+    print(f"inputs: {inputs}")
+    print(f"one-sided reach n={nmax_one}, capped by "
+          + ",".join(sorted(k for k, v in reach_one.items() if v == nmax_one)))
+    print(f"full reach n={nmax}, capped by "
+          + (",".join(sorted(k for k, v in reach_all.items() if v == nmax))
+             if D else "dmirror (absent)"))
+    print()
 
     known = {a: load_oeis_terms(a) for a in
              ('A030222', 'A030233', 'A030234', 'A030235', 'A194596')}
