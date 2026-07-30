@@ -6,7 +6,10 @@ Reads diagCoeffTable from orchestrator/sweep.go (numerator coefficients,
 descending powers of n, divided by kfact, times 3^(n-1-3k)) and the banked
 triangle from results/triangle.txt, then for every k = 0..18:
   - cross-checks the production polynomial against EVERY banked in-onset
-    point on diagonal k (fail-closed on any mismatch),
+    point on diagonal k (fail-closed on any mismatch), reporting the
+    REAL-SWEPT points separately from the formula-generated ones: a banked
+    cell with H > REAL_HMAX was itself injected by these very polynomials,
+    so agreement there is self-consistency, not confirmation,
   - reports the onset points n = 2k+1..3k+1 with availability,
   - emits a machine-readable block for Lean transcription.
 
@@ -23,6 +26,11 @@ SWEEP = ROOT / "orchestrator" / "sweep.go"
 TRIANGLE = ROOT / "results" / "triangle.txt"
 OUT = ROOT / "polyplets" / "pin-data.md"
 NMAX = 40
+# Tallest height any banked run actually SWEPT (results/ns_a40, H3-H21 real;
+# every H >= 22 cell in results/triangle.txt was injected from the closed
+# forms this script is checking).  See scripts/derive_pk_fast.py REAL_H for
+# the per-run provenance table this is the maximum of.
+REAL_HMAX = 21
 
 
 def parse_table(src: str) -> dict[int, tuple[list[int], int]]:
@@ -72,11 +80,24 @@ def main() -> None:
         "Every banked in-onset point re-verified against the polynomial at",
         "generation time; a mismatch aborts generation.",
         "",
+        f"PROVENANCE: cells with H <= {REAL_HMAX} were really swept by the",
+        "engine and are independent evidence for the polynomial; cells with",
+        f"H > {REAL_HMAX} were INJECTED into the triangle by these very",
+        "polynomials, so a match there is self-consistency only.  Both counts",
+        "are reported per level, and the pin-point lists below mark every",
+        "formula-generated entry.",
+        "",
     ]
+    tot_real = tot_formula = 0
+    tot_pin_real = tot_pin_formula = 0
     for k in range(0, 19):
         onset = 2 * k + 1
         pin_pts = list(range(onset, 3 * k + 2))
         banked = [n for n in range(onset, NMAX + 1) if (n, n - k) in tri]
+        n_real = sum(1 for n in banked if n - k <= REAL_HMAX)
+        n_formula = len(banked) - n_real
+        tot_real += n_real
+        tot_formula += n_formula
         checked = 0
         for n in banked:
             want = tri[(n, n - k)]
@@ -102,8 +123,22 @@ def main() -> None:
             f"(need {need} to pin) -> "
             + ("PINNABLE-FROM-BANKED" if have >= need else f"SHORTFALL {need - have}")
         )
-        lines.append(f"verified against banked: {checked} points, all match")
-        pin_rows = [f"T({n},{n - k}) = {tri[(n, n - k)]}" for n in pin_pts if (n, n - k) in tri]
+        assert checked == n_real + n_formula
+        lines.append(
+            f"verified against REAL-SWEPT (H<={REAL_HMAX}): {n_real} points / "
+            f"formula-generated (self-consistency only, H>{REAL_HMAX}): "
+            f"{n_formula} points; all match")
+        pin_rows = []
+        for n in pin_pts:
+            if (n, n - k) not in tri:
+                continue
+            row = f"T({n},{n - k}) = {tri[(n, n - k)]}"
+            if n - k > REAL_HMAX:
+                row += "   [formula-generated]"
+                tot_pin_formula += 1
+            else:
+                tot_pin_real += 1
+            pin_rows.append(row)
         lines.append("pin points (first k+1 in-onset, banked subset):")
         lines.extend(f"  {r}" for r in pin_rows)
         missing = [n for n in pin_pts if (n, n - k) not in tri]
@@ -121,9 +156,18 @@ def main() -> None:
                     sys.exit(f"non-integer prediction k={k} n={n}: {got}")
                 lines.append(f"  T({n},{n - k}) =pred= {got.numerator}")
         lines.append("")
+    lines.append(
+        f"TOTALS: in-onset cells checked = {tot_real} real-swept + "
+        f"{tot_formula} formula-generated; of the listed pin points, "
+        f"{tot_pin_real} real-swept + {tot_pin_formula} formula-generated.")
+    lines.append("")
     OUT.write_text("\n".join(lines))
     print(f"wrote {OUT}")
-    print("all banked in-onset points verified against production polynomials")
+    print(f"in-onset cells verified against production polynomials: "
+          f"{tot_real} REAL-SWEPT (H<={REAL_HMAX}, independent) + "
+          f"{tot_formula} formula-generated (self-consistency only)")
+    print(f"listed pin points: {tot_pin_real} real-swept + "
+          f"{tot_pin_formula} formula-generated")
 
 
 if __name__ == "__main__":

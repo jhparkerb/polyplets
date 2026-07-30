@@ -6,10 +6,17 @@ banked onset points from results/triangle.txt (n <= 40).
 Every banked in-onset point re-verified against the polynomial at
 generation time; a mismatch aborts generation.
 
+PROVENANCE: cells with H <= 21 were really swept by the
+engine and are independent evidence for the polynomial; cells with
+H > 21 were INJECTED into the triangle by these very
+polynomials, so a match there is self-consistency only.  Both counts
+are reported per level, and the pin-point lists below mark every
+formula-generated entry.
+
 ## k=0
 P_0: T(n,n) = 3^(n-1)
 onset n>=1; banked in-onset points: 40 (need 1 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 40 points, all match
+verified against REAL-SWEPT (H<=21): 21 points / formula-generated (self-consistency only, H>21): 19 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(1,1) = 1
 
@@ -17,7 +24,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [25, -45]
 kfact: 1
 onset n>=3; banked in-onset points: 38 (need 2 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 38 points, all match
+verified against REAL-SWEPT (H<=21): 20 points / formula-generated (self-consistency only, H>21): 18 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(3,2) = 10
   T(4,3) = 55
@@ -26,7 +33,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [625, -2459, 1134]
 kfact: 2
 onset n>=5; banked in-onset points: 36 (need 3 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 36 points, all match
+verified against REAL-SWEPT (H<=21): 19 points / formula-generated (self-consistency only, H>21): 17 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(5,3) = 248
   T(6,4) = 1480
@@ -36,7 +43,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [15625, -100050, 122213, -32940]
 kfact: 6
 onset n>=7; banked in-onset points: 34 (need 4 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 34 points, all match
+verified against REAL-SWEPT (H<=21): 18 points / formula-generated (self-consistency only, H>21): 16 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(7,4) = 7898
   T(8,5) = 47066
@@ -47,7 +54,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [390625, -3596250, 8099843, -6462882, 1752840]
 kfact: 24
 onset n>=9; banked in-onset points: 32 (need 5 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 32 points, all match
+verified against REAL-SWEPT (H<=21): 17 points / formula-generated (self-consistency only, H>21): 15 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(9,5) = 278240
   T(10,6) = 1631340
@@ -59,7 +66,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [9765625, -120546875, 425836625, -650171245, 422003550, 76975920]
 kfact: 120
 onset n>=11; banked in-onset points: 30 (need 6 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 30 points, all match
+verified against REAL-SWEPT (H<=21): 16 points / formula-generated (self-consistency only, H>21): 14 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(11,6) = 10311170
   T(12,7) = 59434367
@@ -72,7 +79,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [244140625, -3861328125, 19486496875, -47366857935, 55373728180, 946828380, -32099353920]
 kfact: 720
 onset n>=13; banked in-onset points: 28 (need 7 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 28 points, all match
+verified against REAL-SWEPT (H<=21): 15 points / formula-generated (self-consistency only, H>21): 13 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(13,7) = 393543824
   T(14,8) = 2234817674
@@ -86,7 +93,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [6103515625, -119765625000, 812310625000, -2839739579250, 5194366339015, -1878923357430, -6841564107480, 7756630081200]
 kfact: 5040
 onset n>=15; banked in-onset points: 26 (need 8 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 26 points, all match
+verified against REAL-SWEPT (H<=21): 14 points / formula-generated (self-consistency only, H>21): 12 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(15,8) = 15308484950
   T(16,9) = 85849256593
@@ -101,7 +108,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [152587890625, -3625976562500, 31658675781250, -149222374175000, 391357255277905, -350057694296660, -718224955399380, 2136536485853040, -923712586957440]
 kfact: 40320
 onset n>=17; banked in-onset points: 24 (need 9 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 24 points, all match
+verified against REAL-SWEPT (H<=21): 13 points / formula-generated (self-consistency only, H>21): 11 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(17,9) = 603392972436
   T(18,10) = 3348606811298
@@ -117,7 +124,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [3814697265625, -107720947265625, 1172546074218750, -7126125723281250, 25246485663128625, -39217219391133945, -44784313962337720, 312218815384892340, -359168984859479760, 17928204588927360]
 kfact: 362880
 onset n>=19; banked in-onset points: 22 (need 10 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 22 points, all match
+verified against REAL-SWEPT (H<=21): 12 points / formula-generated (self-consistency only, H>21): 10 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(19,10) = 24014057424024
   T(20,11) = 132107598093637
@@ -134,7 +141,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [95367431640625, -3151702880859375, 41724067382812500, -316409147402343750, 1450416433150453125, -3370526923710995055, -1108292379978242050, 31805482385795516100, -69735093253554241800, 32190356082435763680, 25618243319042572800]
 kfact: 3628800
 onset n>=21; banked in-onset points: 20 (need 11 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 20 points, all match
+verified against REAL-SWEPT (H<=21): 11 points / formula-generated (self-consistency only, H>21): 9 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(21,11) = 962797249464752
   T(22,12) = 5257610926802452
@@ -152,7 +159,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [2384185791015625, -91056823730468750, 1437517181396484375, -13264842209179687500, 76160367268876171875, -243501035699144280750, 120586120186765409825, 2497738719648063722600, -9207797682124933481700, 10269478266342644052000, 3325021854753536899200, 5868473845727607206400]
 kfact: 39916800
 onset n>=23; banked in-onset points: 18 (need 12 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 18 points, all match
+verified against REAL-SWEPT (H<=21): 10 points / formula-generated (self-consistency only, H>21): 8 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(23,12) = 38826609174639928
   T(24,13) = 210692983396251014
@@ -164,14 +171,14 @@ pin points (first k+1 in-onset, banked subset):
   T(30,19) = 2954110296739891764128
   T(31,20) = 13476628255738123866262
   T(32,21) = 60496763632561182774506
-  T(33,22) = 267567344516616416852062
-  T(34,23) = 1167265695441145358152351
+  T(33,22) = 267567344516616416852062   [formula-generated]
+  T(34,23) = 1167265695441145358152351   [formula-generated]
 
 ## k=12
 numerator (desc n): [59604644775390625, -2602958679199218750, 48223920440673828125, -530815263596191406250, 3721840065507802734375, -15512118396389744456250, 21149152791035920752695, 157168222110058996109130, -936571784113889621399900, 1860945781255305037306200, -561954556767083249661120, 2518353204096205882465920, -12192370946767873838592000]
 kfact: 479001600
 onset n>=25; banked in-onset points: 16 (need 13 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 16 points, all match
+verified against REAL-SWEPT (H<=21): 9 points / formula-generated (self-consistency only, H>21): 7 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(25,13) = 1573134737210737385
   T(26,14) = 8490578913536448064
@@ -182,16 +189,16 @@ pin points (first k+1 in-onset, banked subset):
   T(31,19) = 25980777373832690315657
   T(32,20) = 121507773432815574458792
   T(33,21) = 558865928667766384033421
-  T(34,22) = 2531214280334205695134436
-  T(35,23) = 11302231433302167372053753
-  T(36,24) = 49802601845517580926757996
-  T(37,25) = 216761708659294196806446100
+  T(34,22) = 2531214280334205695134436   [formula-generated]
+  T(35,23) = 11302231433302167372053753   [formula-generated]
+  T(36,24) = 49802601845517580926757996   [formula-generated]
+  T(37,25) = 216761708659294196806446100   [formula-generated]
 
 ## k=13
 numerator (desc n): [1490116119384765625, -73735713958740234375, 1581930904388427734375, -20438647987884521484375, 171498867051782080078125, -897242973195286876640625, 2053473678621559440657125, 7845602899216787491993635, -78302966517647904123999050, 242568775590879458927220300, -252892500470648129748781800, 630295671430278785315535840, -4709212944929227143077529600, 8516420444581467205615027200]
 kfact: 6227020800
 onset n>=27; banked in-onset points: 14 (need 14 to pin) -> PINNABLE-FROM-BANKED
-verified against banked: 14 points, all match
+verified against REAL-SWEPT (H<=21): 8 points / formula-generated (self-consistency only, H>21): 6 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(27,14) = 63986427407097237332
   T(28,15) = 343733831675681363476
@@ -201,18 +208,18 @@ pin points (first k+1 in-onset, banked subset):
   T(32,19) = 222037213145303005489339
   T(33,20) = 1063017698873182965322124
   T(34,21) = 5002581174202331698460002
-  T(35,22) = 23171984177741390734335158
-  T(36,23) = 105767663082981556782445241
-  T(37,24) = 476222071911467914867327506
-  T(38,25) = 2117045402320488291101904275
-  T(39,26) = 9299730798107170785360030808
-  T(40,27) = 40397094232064445666534976009
+  T(35,22) = 23171984177741390734335158   [formula-generated]
+  T(36,23) = 105767663082981556782445241   [formula-generated]
+  T(37,24) = 476222071911467914867327506   [formula-generated]
+  T(38,25) = 2117045402320488291101904275   [formula-generated]
+  T(39,26) = 9299730798107170785360030808   [formula-generated]
+  T(40,27) = 40397094232064445666534976009   [formula-generated]
 
 ## k=14
 numerator (desc n): [37252902984619140625, -2072393894195556640625, 50912246036529541015625, -761843525055694580078125, 7524678110464896240234375, -48052027303805350998046875, 157448856577961057749371875, 276655470142052990154351185, -5583936647603503419750059540, 25191124931485376140721243800, -47958023503387714879301084400, 118184880567640594471489711440, -979514007904340174674683668160, 3638916058760447487430557542400, -4028797193164605150126008371200]
 kfact: 87178291200
 onset n>=29; banked in-onset points: 12 (need 15 to pin) -> SHORTFALL 3
-verified against banked: 12 points, all match
+verified against REAL-SWEPT (H<=21): 7 points / formula-generated (self-consistency only, H>21): 5 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(29,15) = 2611110015255604740530
   T(30,16) = 13969442417594351366268
@@ -221,11 +228,11 @@ pin points (first k+1 in-onset, banked subset):
   T(33,19) = 1851392394172366952982798
   T(34,20) = 9061341124316405172057950
   T(35,21) = 43575275424260085198846849
-  T(36,22) = 206170745618188078237908398
-  T(37,23) = 960872649499611634617388174
-  T(38,24) = 4415798153086364928090741638
-  T(39,25) = 20029030415976318128336407820
-  T(40,26) = 89738450015816790329906273587
+  T(36,22) = 206170745618188078237908398   [formula-generated]
+  T(37,23) = 960872649499611634617388174   [formula-generated]
+  T(38,24) = 4415798153086364928090741638   [formula-generated]
+  T(39,25) = 20029030415976318128336407820   [formula-generated]
+  T(40,26) = 89738450015816790329906273587   [formula-generated]
   MISSING (beyond banked range): n=[41, 42, 43]
   PREDICTED values at missing points (production polynomial evaluations, NOT banked data — usable only as explicit residual hypotheses):
   T(41,27) =pred= 397456680396732807972242026742
@@ -236,7 +243,7 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [931322574615478515625, -57846307754516601562500, 1611761021614074707031250, -27620633003425598144531250, 316736418664104003906250000, -2416046782053819856347656250, 10461322884210958342060156250, 1967893236430787060707991250, -346618516939812097631010184825, 2203970151840239765899986819750, -6398534829863605593928976949100, 17955993014682160383586429971000, -146852693386847802168160405132800, 824216279306486381670291956424000, -1935618838774923672066722617670400, 1370506748049564268873803929856000]
 kfact: 1307674368000
 onset n>=31; banked in-onset points: 10 (need 16 to pin) -> SHORTFALL 6
-verified against banked: 10 points, all match
+verified against REAL-SWEPT (H<=21): 6 points / formula-generated (self-consistency only, H>21): 4 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(31,16) = 106848447386284024770292
   T(32,17) = 569579285523233406028051
@@ -244,10 +251,10 @@ pin points (first k+1 in-onset, banked subset):
   T(34,19) = 15111742807653801090985593
   T(35,20) = 75518035463847720292413552
   T(36,21) = 370662558309766127292835233
-  T(37,22) = 1789337957103928389914572136
-  T(38,23) = 8505713267602095540716166565
-  T(39,24) = 39855827398943917208656353418
-  T(40,25) = 184265041867569186198215286920
+  T(37,22) = 1789337957103928389914572136   [formula-generated]
+  T(38,23) = 8505713267602095540716166565   [formula-generated]
+  T(39,24) = 39855827398943917208656353418   [formula-generated]
+  T(40,25) = 184265041867569186198215286920   [formula-generated]
   MISSING (beyond banked range): n=[41, 42, 43, 44, 45, 46]
   PREDICTED values at missing points (production polynomial evaluations, NOT banked data — usable only as explicit residual hypotheses):
   T(41,26) =pred= 841257097247076130709957596760
@@ -261,16 +268,16 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [23283064365386962890625, -1604855060577392578125000, 50296202898025512695312500, -977645294998168945312500000, 12866158692583824157714843750, -115227786191848182480468750000, 627956075188775884851523437500, -744604346962912741214695500000, -18856370906133182542352742484975, 168083439133981919034904849231800, -683834540674642382762519712038200, 2295047561654327718980302632052800, -17913005887676406640071685928060400, 131791153675357698130550590831267200, -488805850691225808484910594988268800, 759766595538270156033339090440755200, -219118392304691271841806767714304000]
 kfact: 20922789888000
 onset n>=33; banked in-onset points: 8 (need 17 to pin) -> SHORTFALL 9
-verified against banked: 8 points, all match
+verified against REAL-SWEPT (H<=21): 5 points / formula-generated (self-consistency only, H>21): 3 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(33,17) = 4382793740312244017806517
   T(34,18) = 23288787870043631158670332
   T(35,19) = 121081244529132538941157409
   T(36,20) = 617106574276148286251699568
   T(37,21) = 3088116532240663753100466552
-  T(38,22) = 15194228798887114342965900210
-  T(39,23) = 73593578944746874408267467610
-  T(40,24) = 351269152616432930163117009906
+  T(38,22) = 15194228798887114342965900210   [formula-generated]
+  T(39,23) = 73593578944746874408267467610   [formula-generated]
+  T(40,24) = 351269152616432930163117009906   [formula-generated]
   MISSING (beyond banked range): n=[41, 42, 43, 44, 45, 46, 47, 48, 49]
   PREDICTED values at missing points (production polynomial evaluations, NOT banked data — usable only as explicit residual hypotheses):
   T(41,25) =pred= 1653826612613977820761919292031
@@ -287,14 +294,14 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [582076609134674072265625, -44283457100391387939453125, 1549785345792770385742187500, -33886054842615127563476562500, 506738958957323265075683593750, -5253930386581950765319824218750, 34866787110157325826676367187500, -86528320883080938837347917187500, -889937241002481289280616442864375, 11422356391454342173853403279879275, -62157637321860866791915723663376800, 253251875227507029291999691317061400, -1898632937628268836106376147065825200, 16730852931327365644218857489259687600, -86335313597104845199405280481932515200, 218410029105004429734891444381037497600, -171351859928354717515789878977767372800, -114129552065978933164859052982947840000]
 kfact: 355687428096000
 onset n>=35; banked in-onset points: 6 (need 18 to pin) -> SHORTFALL 12
-verified against banked: 6 points, all match
+verified against REAL-SWEPT (H<=21): 4 points / formula-generated (self-consistency only, H>21): 2 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(35,18) = 180152359823857046862682314
   T(36,19) = 954543410624801880699125196
   T(37,20) = 4956437442714322066925263218
   T(38,21) = 25262080143961999373255793104
-  T(39,22) = 126561805084439022828507524182
-  T(40,23) = 624022655859072294428618062228
+  T(39,22) = 126561805084439022828507524182   [formula-generated]
+  T(40,23) = 624022655859072294428618062228   [formula-generated]
   MISSING (beyond banked range): n=[41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52]
   PREDICTED values at missing points (production polynomial evaluations, NOT banked data — usable only as explicit residual hypotheses):
   T(41,24) =pred= 3031298605619334633021375113366
@@ -314,12 +321,12 @@ pin points (first k+1 in-onset, banked subset):
 numerator (desc n): [14551915228366851806640625, -1216004602611064910888671875, 47220123186707496643066406250, -1152996117314100265502929687500, 19425111820647906303405761718750, -230445407070280340071105957031250, 1818181407908782536004023437500000, -6826614118228039757132018320312500, -34818861040188463329071106306984375, 701508624630574629016108663795874925, -4974015500069905129885380187424318850, 24632585272713265594357624257091138200, -181772288700805914476560807450032440000, 1799250000012213308990934660048459646800, -11981768558659998471685945614032297834400, 43413108716808863459147673721575806860800, -62928082571267723622620177718733540032000, -37079629775551619904419498589278737305600, 127787800900726736892183047952793411584000]
 kfact: 6402373705728000
 onset n>=37; banked in-onset points: 4 (need 19 to pin) -> SHORTFALL 15
-verified against banked: 4 points, all match
+verified against REAL-SWEPT (H<=21): 3 points / formula-generated (self-consistency only, H>21): 1 points; all match
 pin points (first k+1 in-onset, banked subset):
   T(37,19) = 7418664369542642927200487045
   T(38,20) = 39207474138446972682720171554
   T(39,21) = 203342057467470725522863434005
-  T(40,22) = 1036374142845705722815141821285
+  T(40,22) = 1036374142845705722815141821285   [formula-generated]
   MISSING (beyond banked range): n=[41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]
   PREDICTED values at missing points (production polynomial evaluations, NOT banked data — usable only as explicit residual hypotheses):
   T(41,23) =pred= 5197231322798836565209514104711
@@ -337,3 +344,5 @@ pin points (first k+1 in-onset, banked subset):
   T(53,35) =pred= 502789204145944755696653389368517286093
   T(54,36) =pred= 2186486537076372144121599109000321560418
   T(55,37) =pred= 9436168192511014217927831999107812196792
+
+TOTALS: in-onset cells checked = 228 real-swept + 190 formula-generated; of the listed pin points, 118 real-swept + 27 formula-generated.
