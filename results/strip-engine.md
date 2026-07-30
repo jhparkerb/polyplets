@@ -103,13 +103,17 @@ the closed n<=40 triangle (820 cells), recomputed:
 
 | figure | value | what it counts |
 |---|---|---|
-| doc-style cell union | **90.7%** | H<=4 recurrences ∪ P_k diagonals ∪ strip (H<=14, n<=36), P_k credited everywhere in onset |
-| honest cells | **67.6%** | same, but a closed form is NOT a second source for a cell it generated (P_k credited only on really-swept cells, H<=21) |
-| strip alone | **50.4%** | the strip engine's own 413-cell-verified region |
+| doc-style cell union | **90.5%** (742) | H<=4 recurrences ∪ P_k diagonals ∪ strip (H<=14, n<=36), P_k credited everywhere in its onset |
+| honest cells | **67.3%** (552) | same, but a closed form is NOT a second source for a cell it generated — P_k credited only on really-swept cells (H<=21) |
+| strip alone | **50.4%** (413) | the strip engine's own verified region |
 
-(The audit reported 90.5% / 67.3% under a marginally different treatment of
-the onset edge; the numbers above are this file's own recomputation and the
-ones to quote.)
+Exact rule for reproducing these, so they are not folklore: cells are all
+(n,H) with 1<=H<=n<=40 (820 of them); `R` = H<=4; `S` = H<=14 and n<=36;
+`P` = diagonals k = n-H with **k <= 18** and n >= 2k+1. Diagonal k=19 is
+excluded from `P` deliberately — P_19 is fitted-no-holdout, so it certifies
+nothing; including it adds exactly its own two fit points, T(39,20) and
+T(40,21), and would read 90.7% / 67.6%. Then doc-style = |R ∪ P ∪ S|,
+honest = |R ∪ S ∪ (P ∩ {H<=21})|.
 
 Cells are the flattering denominator, because the triangle's cells are wildly
 unequal in size. **By mass** the picture is starker. The banked strip run is
