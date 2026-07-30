@@ -71,6 +71,46 @@ func TestMaxDiagKZeroDisablesInjection(t *testing.T) {
 	checkTriangle(t, "max-diag-k-zero", known, res.Triangle)
 }
 
+// TestPhasedRecipeDiagCap pins the height/cap algebra of the recorded a(N>=40)
+// reproduction recipe (scripts/dalby_term.sh, AUDIT-2026-07-30 D1 "Phase C
+// Phantom"). The diagonal index is k = N-H and the phase split uses fixed
+// offsets from N, so the same k ranges hold for every N >= 40:
+//
+//	phase A  H = 1..N-21  (k >= 21, past the fence) and H = N-18..N (k <= 18,
+//	         the injected closed-form tail)
+//	phase B  H = N-20     (k = 20, past the fence)
+//	phase C  H = N-19     (k = 19 — P_19 is wired, so WITHOUT the cap this
+//	         strip is injected from the formula it was fitted to, and the
+//	         a(40) mass holdout is destroyed by its own reproduction recipe)
+//
+// The script pins --max-diag-k 18 on all three phases. This test is the
+// executable form of that argument: the shell driver has no test harness.
+func TestPhasedRecipeDiagCap(t *testing.T) {
+	const phaseDiagCap = 18 // must match PHASE_DIAG_CAP in scripts/dalby_term.sh
+	for _, N := range []int{40, 41, 44} {
+		cfg := SweepConfig{Maxn: N, MaxDiagK: phaseDiagCap}
+		// The cap is load-bearing, not decorative: uncapped, phase C's
+		// strip IS injected. This is the defect D1 found.
+		if !diagonalStripEnabled(SweepConfig{Maxn: N, MaxDiagK: maxDiagKNoCap}, 19) {
+			t.Fatalf("N=%d: k=19 does not dispatch uncapped — the cap would be a no-op and this test is vacuous", N)
+		}
+		if k := N - (N - 19); diagonalStripEnabled(cfg, k) {
+			t.Errorf("N=%d phase C: H=%d (k=%d) still injects under --max-diag-k %d; the recipe would not really sweep it", N, N-19, k, phaseDiagCap)
+		}
+		if k := N - (N - 20); diagonalStripEnabled(cfg, k) {
+			t.Errorf("N=%d phase B: H=%d (k=%d) injects; it must be really swept", N, N-20, k)
+		}
+		// Phase A's tail must still be injected — that is the whole point of
+		// the phase split, and a cap that blocked it would turn a cheap
+		// closed-form tail into 19 real sweeps.
+		for H := N - 18; H <= N-2; H++ {
+			if k := N - H; !diagonalStripEnabled(cfg, k) {
+				t.Errorf("N=%d phase A: H=%d (k=%d) must stay closed-form under --max-diag-k %d", N, H, k, phaseDiagCap)
+			}
+		}
+	}
+}
+
 // TestValidateMaxDiagKRange pins the CLI range check: the flag used to accept
 // -1, 99 or any other value silently, each with its own surprising dispatch.
 func TestValidateMaxDiagKRange(t *testing.T) {

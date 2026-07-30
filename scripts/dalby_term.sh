@@ -121,6 +121,23 @@ T0=$(date +%s)
 # ayr/dalby --heights split; perheight accumulates across phases; each phase
 # has its own checkpoint (resume reruns only the phase that died).
 # N<40: the classic single all-heights invocation, unchanged.
+#
+# PHASE_DIAG_CAP (AUDIT-2026-07-30 D1 "Phase C Phantom"): the diagonal index
+# is k = N - H, and the phase split is defined by fixed offsets from N, so
+# each phase's k range is the same for every N >= 40:
+#   phase A  H = 1..N-21   -> k = 21..N-1  (past the k<=19 fence: real)
+#            H = N-18..N   -> k = 0..18    (the INJECTED closed-form tail)
+#   phase B  H = N-20      -> k = 20       (past the fence: real)
+#   phase C  H = N-19      -> k = 19       (P_19 is wired -- would INJECT)
+# With P_19 wired and the fence at k<=19, phase C stopped performing the real
+# H=N-19 sweep and injected it from the very formula that cell was fitted to:
+# a re-run silently destroys the P_0..P_18 mass holdout, the project's
+# strongest validation artifact, and falsifies the shipped "P_19 is used for
+# no banked term" claims. Capping at 18 forces phase C back to a real sweep
+# while leaving phase A's k<=18 tail untouched. Pinned on ALL THREE phases:
+# on A and B it is a no-op today (neither owns a k=19 height) and stays
+# correct if the fence or the split ever moves.
+PHASE_DIAG_CAP=18
 run_phase() {  # run_phase LABEL HEIGHTS CORES OVERLAP
   local LABEL=$1 HEIGHTS=$2 CORES=$3 OVERLAP=$4
   # --resume is per-phase: orchestrate --resume exits 1 when the checkpoint
@@ -132,7 +149,7 @@ run_phase() {  # run_phase LABEL HEIGHTS CORES OVERLAP
   echo "=== phase $LABEL: heights=$HEIGHTS cores=$CORES resume=${PHASE_RESUME:-no} $(date -Iseconds) ==="
   ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
     --cores "$CORES" --ram 1073741824 --overlap-heights "$OVERLAP" \
-    --heights "$HEIGHTS" \
+    --heights "$HEIGHTS" --max-diag-k "$PHASE_DIAG_CAP" \
     --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" $FASTMAP_FLAG \
     --checkpoint "$RUNDIR/POLYCKPT.$LABEL" --checkpoint-every 300 $PHASE_RESUME \
     --per-height-out runs/ns_a${N}/perheight \
