@@ -1,0 +1,89 @@
+=========================================================================
+POST-HOC REGENERATION -- THIS IS NOT THE ORIGINAL a(40) RUN LOG.
+The a(40) run's own stdout was never banked; A40_VALIDATE_PASS and
+A40_H20_RECHECK_MATCH existed only as prose in PROVENANCE.md, with no
+artifact behind them (AUDIT-2026-07-30 P5, "Assertion, Not Artifact").
+Regenerated 2026-07-30 on gympie (macOS/arm64) at rev fac2b85, as part of
+the AUDIT-2026-07-30 fix campaign.  NO SWEEP AND NO COMBINE WAS RUN:
+this is scripts/dalby_term.sh's VALIDATE_ONLY=1 path (added by the same
+campaign, finding P4) reading the ALREADY-BANKED artifacts:
+
+  a(40) run values : results/ns_a40/triangle.txt (copied to the throwaway
+                     run dir runs/ns_a40/validate-posthoc/a_n.txt, which
+                     is the file name the validate block reads)
+  comparison set   : fixtures/b006770.txt for n<=20, then the banked
+                     results/ns_a${n}/ artifacts for n=21..39
+  H20 recheck      : results/ns_a40/recheck/h20.out vs
+                     results/ns_a40/perheight/h20.out
+
+So this log re-establishes that the banked artifacts agree with each
+other TODAY.  It is not, and does not claim to be, evidence about what
+the original 2026-07-26..28 run printed.
+
+Command:
+  VALIDATE_ONLY=1 RUNDIR=runs/ns_a40/validate-posthoc \
+      bash scripts/dalby_term.sh 40
+=========================================================================
+
+=== a40 KINK run starting: 2026-07-30T12:40:35-04:00 ===
+rev: fac2b85
+=== validate a(1)-a(20) vs b-file ===
+a(1)=1 OK
+a(2)=4 OK
+a(3)=20 OK
+a(4)=110 OK
+a(5)=638 OK
+a(6)=3832 OK
+a(7)=23592 OK
+a(8)=147941 OK
+a(9)=940982 OK
+a(10)=6053180 OK
+a(11)=39299408 OK
+a(12)=257105146 OK
+a(13)=1692931066 OK
+a(14)=11208974860 OK
+a(15)=74570549714 OK
+a(16)=498174818986 OK
+a(17)=3340366308393 OK
+a(18)=22471158811164 OK
+a(19)=151609203011580 OK
+a(20)=1025573519362016 OK
+=== validate a(21)-a(39) vs banked ===
+a(21)=6954084405510437 OK [results/ns_a21/triangle.txt]
+a(22)=47255332844367680 OK [results/redelmeier_row22/combined.txt]
+a(23)=321749260511448732 OK [results/ns_a23/a_n.txt]
+a(24)=2194666793369310473 OK [results/ns_a24/a_n.txt]
+a(25)=14994811325186658577 OK [results/b006770_upload.txt]
+a(26)=102607513847014153892 OK [results/ns_a26/triangle.txt]
+a(27)=703126792093436034256 OK [results/ns_a27/triangle.txt]
+a(28)=4824589228356722264087 OK [results/ns_a28/triangle.txt]
+a(29)=33145129805782422061325 OK [results/ns_a29/triangle.txt]
+a(30)=227969227118066423789154 OK [results/ns_a30/triangle.txt]
+a(31)=1569631619081324581014300 OK [results/ns_a31/triangle.txt]
+a(32)=10818203977457804418974036 OK [results/ns_a32/triangle.txt]
+a(33)=74631481980411777590683952 OK [results/ns_a33/triangle.txt]
+a(34)=515316838423862758858377704 OK [results/ns_a34/triangle.txt]
+a(35)=3561147281381782175236253062 OK [results/ns_a35/triangle.txt]
+a(36)=24629107617723857143962968288 OK [results/ns_a36/triangle.txt]
+a(37)=170463735577007360431441250424 OK [results/ns_a37/triangle.txt]
+a(38)=1180654489101178485738417779914 OK [results/ns_a38/triangle.txt]
+a(39)=8182864667276277865830132493466 OK [results/ns_a39/triangle.txt]
+chain coverage: 19/19
+a(40) = 56749893611764175164545926946127
+growth a40/a39 = 6.935211068406165
+A40_VALIDATE_PASS
+A40_DONE
+
+=========================================================================
+H20 RECHECK BYTE-COMPARE (A40_H20_RECHECK_MATCH)
+The clean H20-only re-sweep of 2026-07-28..29 (scripts/a40_h20_recheck.sh,
+fresh run dir + checkpoint, phase B's exact config, 48 cores, 43,747s)
+against the checkpoint-recovered production shard:
+
+  $ cmp results/ns_a40/recheck/h20.out results/ns_a40/perheight/h20.out
+  (no output; cmp exit status 0)
+  sha256:
+    340360e26eddee745901f1a6dc9d7cd924d67899d47cf70e095456c70f5a5886  results/ns_a40/recheck/h20.out
+    340360e26eddee745901f1a6dc9d7cd924d67899d47cf70e095456c70f5a5886  results/ns_a40/perheight/h20.out
+A40_H20_RECHECK_MATCH
+=========================================================================
