@@ -59,6 +59,15 @@ inline constexpr size_t kSpillBlockBytes = 256 * 1024;
 // boundary and decompression starts cleanly there — a single-frame body
 // ("compression 1", the unindexed internal spill path) cannot seek at all.
 //
+// INTEGRITY of a compression-2 (or -1) file is the zstd frame checksum, in
+// band, not the FNV trailer plain files carry — and it is enforced fail-closed
+// HERE: RunFileReader aborts on any decode or checksum failure and on any body
+// that ends before the header's record count (E1). No independent out-of-band
+// check exists for these files: verify.go and runcat are Go and decode plain
+// bodies only, and there is no C++ dump tool (an audit reader is deferred, see
+// AUDIT-2026-07-30 E2). The manual recovery/inspection path is
+// `tail -c +<body offset+1> FILE | zstd -d`, which those two tools now print.
+//
 // Frame size in RECORDS (env POLY_FRONTIER_ZSTD_BLOCK, default 256).
 // WRITER-SIDE ONLY: readers decompress whatever frames they find and idx
 // entries always point at the containing frame's start, so any mix of frame

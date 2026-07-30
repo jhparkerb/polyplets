@@ -236,9 +236,11 @@ func SumCountsInFile(path string) (map[int]uint64, uint64, error) {
 	}
 	// FAIL-CLOSED: a compressed body's bytes are not records — decoding them
 	// as varints yields garbage sums with no signal. This independent verifier
-	// deliberately has no zstd path; say so instead of misreading.
+	// deliberately has no zstd path; say so instead of misreading, and say what
+	// DOES cover such a file (runcat is Go too, and there is no C++ dumper —
+	// the old "use the C++ readers (runcat)" referral was circular).
 	if hdr.Compression != 0 {
-		return nil, 0, fmt.Errorf("%s: compressed body (compression %d): this verifier cannot decode it — verify via the C++ readers (runcat) instead", path, hdr.Compression)
+		return nil, 0, fmt.Errorf("%s: compressed body (compression %d): this Go verifier decodes plain bodies only. Integrity of a compressed body rests on the in-band zstd frame checksum, which the C++ readers (core/runfile.h) enforce fail-closed — any decode or checksum failure aborts the reading worker rather than reading short. To check or dump one by hand: tail -c +%d %s | zstd -d", path, hdr.Compression, bodyOff+1, path)
 	}
 	f, err := os.Open(path)
 	if err != nil {
@@ -414,9 +416,12 @@ func Run(cfg Config) []CheckResult {
 
 		// CRC check. Compressed bodies carry zstd frame checksums instead of
 		// the FNV trailer — this verifier cannot check them; fail explicitly
-		// rather than compare FNV-of-zstd-bytes against frame-tail bytes.
+		// rather than compare FNV-of-zstd-bytes against frame-tail bytes. The
+		// zstd checksum is not weaker, just in-band: the C++ readers validate
+		// it on every frame and abort on failure (core/runfile.h). What is
+		// missing here is an INDEPENDENT check, so the failure stands.
 		if hdr.Compression != 0 {
-			results = append(results, fail("crc", fmt.Sprintf("%s: compressed body (compression %d): no FNV trailer to verify — use the C++ readers", fe.Path, hdr.Compression)))
+			results = append(results, fail("crc", fmt.Sprintf("%s: compressed body (compression %d): no FNV trailer for this Go verifier to check independently; its integrity check is the in-band zstd frame checksum, enforced fail-closed by the C++ readers. Hand check: tail -c +%d %s | zstd -d", fe.Path, hdr.Compression, bodyOff+1, fe.Path)))
 			continue
 		}
 		computed, err := ComputeBodyCRC(fe.Path, bodyOff)

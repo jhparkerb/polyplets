@@ -48,9 +48,11 @@ func catFile(path string) error {
 	}
 	// FAIL-CLOSED: runcat decodes raw record bytes; a compressed body would be
 	// misread as garbage records rather than erroring. No Go zstd path here —
-	// say so. (C++ readers handle compressed files; see core/runfile.h.)
+	// say so, and point at something that actually exists: verify.go is Go too
+	// and there is no C++ dump tool, so the honest answers are the readers'
+	// own fail-closed frame-checksum enforcement and a manual zstd -d.
 	if hdr.Compression != 0 {
-		return fmt.Errorf("%s: compressed body (compression %d): runcat cannot decode it", path, hdr.Compression)
+		return fmt.Errorf("%s: compressed body (compression %d): runcat decodes plain bodies only. Integrity of a compressed body is the in-band zstd frame checksum, enforced fail-closed by the C++ readers (core/runfile.h) — a decode or checksum failure aborts the reading worker. To dump it by hand: tail -c +%d %s | zstd -d", path, hdr.Compression, bodyOff+1, path)
 	}
 
 	fmt.Printf("# POLYRUN run: %s\n", path)
