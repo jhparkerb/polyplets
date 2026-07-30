@@ -621,14 +621,25 @@ class RunFileReader {
   RunFileReader(const RunFileReader&) = delete;
   RunFileReader& operator=(const RunFileReader&) = delete;
 
+  // The ONLY legitimate false from next() is "the header's record count has
+  // been reached" (checked first). Everything else — a body that ran out, a
+  // zstd decode or frame-checksum failure — is corruption, and E1 ("Short
+  // Shrift") is what happens if it merely returns false: every caller
+  // (mergeRunFiles' heap refill, map_shard_file, map_shard_stage_file) reads
+  // false as "input exhausted", so a truncated or bit-rotted shard silently
+  // contributes fewer records than its own header claims. Measured on the
+  // pre-fix code: a 500-byte truncation gave 2945 of 3000 records through a
+  // merge, and one flipped byte in a compression-2 file cut a seeked read off
+  // at 1024 of 3000 — both with exit status 0. Reachable via ENOSPC on the
+  // size-capped tmpfs the a(40) run used, so it fails closed instead.
   bool next(RunRecord<W>& out) {
     if (!fp_ || records_read_ >= records_) return false;
     out.sig = Sig{};
-    if (!bodyRead(out.sig.b, static_cast<size_t>(keyLen_))) return false;
+    if (!bodyRead(out.sig.b, static_cast<size_t>(keyLen_))) failShort("signature");
 
     uint8_t lo = 0, len = 0;
-    if (!bodyRead(&lo,  1)) return false;
-    if (!bodyRead(&len, 1)) return false;
+    if (!bodyRead(&lo,  1)) failShort("lo");
+    if (!bodyRead(&len, 1)) failShort("len");
 
     out.H      = H_;
     out.keyLen = keyLen_;
@@ -641,7 +652,7 @@ class RunFileReader {
       unsigned shift = 0;
       uint8_t byte;
       do {
-        if (!bodyRead(&byte, 1)) return false;
+        if (!bodyRead(&byte, 1)) failShort("count varint");
         v |= (static_cast<W>(byte & 0x7f) << shift);
         shift += 7;
       } while (byte & 0x80);
@@ -770,6 +781,21 @@ class RunFileReader {
   size_t zout_fill_ = kFirstFillBytes;  // adaptive decompressed-output size
 #endif
 
+  // FAIL-CLOSED short/corrupt body (E1): the body could not supply a record the
+  // header promised. There is nowhere legitimate to go from here — the caller
+  // cannot distinguish this from a clean end (that is the whole bug), and a
+  // partial input is exactly the silent-undercount shape the fail-closed
+  // writer/open guards exist for. `what` names the field that ran out, so the
+  // log says how far the body got.
+  [[noreturn]] void failShort(const char* what) {
+    std::fprintf(stderr,
+                 "RunFileReader: SHORT READ in %s: body ended or failed to "
+                 "decode at record %zu of %zu (%s) — truncated, corrupt, or "
+                 "lost to ENOSPC\n",
+                 path_.c_str(), records_read_, records_, what);
+    std::exit(1);
+  }
+
   // Read body bytes: plain files from a block buffer + fold the FNV CRC;
   // compressed files from a decompressed block buffer fed by the zstd stream.
   // Field-at-a-time fread (worst: one locked stdio call per varint BYTE) was
@@ -887,14 +913,21 @@ class RunFileReader {
       }
       ZSTD_outBuffer out{scratch, sizeof(scratch), 0};
       zhint_ = ZSTD_decompressStream(dctx_, &out, &in_);
+      // FAIL-CLOSED (E1): for compressed files the frame checksum IS the
+      // integrity check (they carry no FNV trailer), so a failure here must
+      // abort — warning and returning would leave the checksum decorative.
       if (ZSTD_isError(zhint_)) {
-        std::fprintf(stderr, "RunFileReader: zstd frame check: %s\n",
-                     ZSTD_getErrorName(zhint_));
-        return;
+        std::fprintf(stderr, "RunFileReader: %s: zstd frame check failed: %s\n",
+                     path_.c_str(), ZSTD_getErrorName(zhint_));
+        std::exit(1);
       }
     }
-    if (zhint_ != 0)
-      std::fprintf(stderr, "RunFileReader: zstd frame incomplete at EOF\n");
+    if (zhint_ != 0) {
+      std::fprintf(stderr,
+                   "RunFileReader: %s: zstd frame incomplete at EOF "
+                   "(truncated body)\n", path_.c_str());
+      std::exit(1);
+    }
   }
 #endif
 

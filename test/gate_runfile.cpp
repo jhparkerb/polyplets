@@ -37,6 +37,22 @@ static void writeAll(const std::string& p, const std::vector<uint8_t>& b) {
   std::fclose(f);
 }
 
+// Drop the last `bytes` bytes of a file (ENOSPC / lost-tail truncation).
+static void truncateBy(const std::string& p, size_t bytes) {
+  auto b = readAll(p);
+  assert(b.size() > bytes);
+  b.resize(b.size() - bytes);
+  writeAll(p, b);
+}
+
+// Flip one bit in the byte at `off` (bit rot / a torn write inside the body).
+static void flipByteAt(const std::string& p, size_t off) {
+  auto b = readAll(p);
+  assert(off < b.size());
+  b[off] ^= 0x40;
+  writeAll(p, b);
+}
+
 // Replace the first occurrence of `from` (a header token) with `to` of equal
 // length, so byte offsets are preserved.
 static void tamper(const std::string& path, const std::string& from,
@@ -416,6 +432,93 @@ static void testHeaderRejectsUnknownCompression() {
 #endif
 }
 
+// ─── E1 "Short Shrift": the reader must not report a short body as EOF ───────
+//
+// RunFileReader::next() used to return false identically for (i) the legitimate
+// end of records, (ii) a body that ran out early, and (iii) a zstd decode /
+// frame-checksum failure — and EVERY caller (mergeRunFiles' heap refill,
+// map_shard_file, map_shard_stage_file) reads false as "this input is
+// exhausted". A truncated or bit-rotted shard therefore contributed FEWER
+// records than its own header claims, silently, with no oracle downstream:
+// measured 2945 of 3000 records through a merge on a 500-byte truncation, and
+// 0 of 3000 on the production seeked path from one flipped byte in a
+// compression-2 file. Reachable via ENOSPC on the size-capped tmpfs the a(40)
+// run used. The reader now compares records read against the header count and
+// aborts.
+static const std::string kTruncPath = "/tmp/gate_runfile_short_trunc.bin";
+static const std::string kCorruptZPath = "/tmp/gate_runfile_short_corruptz.bin";
+
+static void readTruncatedToEnd() {
+  RunFileReader<u64> r(kTruncPath, 3);
+  assert(r.ok());
+  RunRecord<u64> rec;
+  size_t got = 0;
+  while (r.next(rec)) ++got;
+  // Pre-fix: falls out of the loop short of r.records() and returns cleanly.
+  std::fprintf(stderr, "child: yielded %zu of %zu records (no abort)\n", got, r.records());
+}
+static void testReaderTruncatedBodyAborts() {
+  writeRun(kTruncPath, 3, 3000);
+  truncateBy(kTruncPath, 500);
+  const int rc = runInChild(readTruncatedToEnd);
+  assert(rc > 0 &&
+         "fail-closed: a body shorter than the header's record count must abort");
+  std::remove(kTruncPath.c_str());
+  std::remove((kTruncPath + ".idx").c_str());
+}
+
+// Same hole through the merge, which is how it would actually reach a banked
+// value: a short input's records simply vanish from the merged output.
+static void mergeOverTruncatedInput() {
+  mergeRunFiles<u64>({kTruncPath}, 3, "", "",
+                     "/tmp/gate_runfile_short_merge_out.bin", "test");
+}
+static void testMergeOverTruncatedInputAborts() {
+  writeRun(kTruncPath, 3, 3000);
+  truncateBy(kTruncPath, 500);
+  const int rc = runInChild(mergeOverTruncatedInput);
+  assert(rc > 0 &&
+         "fail-closed: a merge over a short input must abort, not undercount");
+  std::remove(kTruncPath.c_str());
+  std::remove((kTruncPath + ".idx").c_str());
+  std::remove("/tmp/gate_runfile_short_merge_out.bin");
+  std::remove("/tmp/gate_runfile_short_merge_out.bin.idx");
+}
+
+// compression 2 + the production SEEKED read: zstd's in-band frame checksum is
+// what replaces the FNV trailer for these files, so a decode failure must be
+// fatal or the checksum buys nothing.
+static void readCorruptCompressedSeeked() {
+  RunFileReader<u64> r(kCorruptZPath, 3);
+  assert(r.ok());
+  uint8_t klo[SIGMAX] = {};
+  klo[0] = 1;  // key 256, well into the body
+  if (!r.seekToKey(klo)) { std::fprintf(stderr, "child: seek failed\n"); return; }
+  RunRecord<u64> rec;
+  size_t got = 0;
+  while (r.next(rec)) ++got;
+  std::fprintf(stderr, "child: seeked read yielded %zu records (no abort)\n", got);
+}
+static void testReaderCorruptCompressedAborts() {
+#ifdef POLY_ZSTD
+  std::remove(kCorruptZPath.c_str());
+  std::remove((kCorruptZPath + ".idx").c_str());
+  {
+    RunFileWriter<u64> w(kCorruptZPath, 3, 8, "", "", "test", 0,
+                         /*write_index=*/true, /*compress=*/true);
+    appendN(w, 3000);
+    w.finalize();
+  }
+  auto sz = readAll(kCorruptZPath).size();
+  flipByteAt(kCorruptZPath, sz / 2);
+  const int rc = runInChild(readCorruptCompressedSeeked);
+  assert(rc > 0 &&
+         "fail-closed: a zstd decode/checksum failure must abort, not read short");
+  std::remove(kCorruptZPath.c_str());
+  std::remove((kCorruptZPath + ".idx").c_str());
+#endif
+}
+
 // Pooled zstd contexts must have BOUNDED retention: a persistent worker that
 // once ran a 640-input merge must not hold 640 idle contexts forever (80
 // workers x 640 x ~200KB was a standing ~10-20GB term in the a(40) OOM).
@@ -446,6 +549,12 @@ int main() {
   testBlockCompressedRoundTripAndSeek();
   testMergeWithBlockCompressedInputs();
   testHeaderRejectsUnknownCompression();
+  // E1 "Short Shrift": short/corrupt bodies must abort, not read short. The
+  // forked children print their own diagnostics — that noise is the behavior
+  // under test.
+  testReaderTruncatedBodyAborts();
+  testMergeOverTruncatedInputAborts();
+  testReaderCorruptCompressedAborts();
   testZstdPoolRetentionBounded();
   std::puts("gate_runfile PASS");
 }
