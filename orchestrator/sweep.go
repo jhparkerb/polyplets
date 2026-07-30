@@ -239,7 +239,13 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 	// writeCheckpoint writes a POLYCKPT with the outer triangle + the current
 	// height's partial contributions (hTri).  Both are needed: the outer triangle
 	// holds completed heights; hTri holds the current height's progress so far.
-	writeCheckpoint := func(H, col int, frontier []string, hTri []*big.Int) {
+	//
+	// Returns whether the write actually PERSISTED (O1 "Ghost Checkpoint"). The
+	// callers feed that outcome — not the throttle decision — to frontierGuard:
+	// Checkpoint.Write is temp+rename, so a failed write leaves the STALE
+	// checkpoint on disk naming the OLD frontier, and GCing that frontier is
+	// exactly G1's stranding shape on the error path.
+	writeCheckpoint := func(H, col int, frontier []string, hTri []*big.Int) bool {
 		// Combine outer accumulated triangle with current height's contribution.
 		combined := copyBigRow(triangle)
 		for n, v := range hTri {
@@ -261,7 +267,9 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		}
 		if err := ck.Write(cfg.CheckpointPath); err != nil {
 			fmt.Fprintf(os.Stderr, "checkpoint write: %v\n", err)
+			return false
 		}
+		return true
 	}
 
 	tel, err := newTelemetry(cfg, time.Now())
@@ -440,7 +448,11 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 
 	var mu sync.Mutex
 	var firstErr error
-	noopCkpt := func(int, int, []string, []*big.Int) {} // overlap: no MID-height checkpoint
+	// Overlap mode takes no MID-height checkpoint, so nothing on disk ever
+	// references a mid-height frontier: the no-op "write" trivially succeeds and
+	// the guard is free to GC each consumed frontier eagerly (returning false
+	// here would retain every intermediate frontier for the whole height).
+	noopCkpt := func(int, int, []string, []*big.Int) bool { return true }
 	heightSem := make(chan struct{}, cfg.OverlapHeights)
 	var wg sync.WaitGroup
 
@@ -587,7 +599,7 @@ type sweepHeightFn func(
 	cfg SweepConfig,
 	H, startCol int,
 	frontier []string,
-	writeCheckpoint func(H, col int, frontier []string, hTri []*big.Int),
+	writeCheckpoint func(H, col int, frontier []string, hTri []*big.Int) bool,
 	tel *telemetry,
 	sem chan struct{},
 	activeHeights *atomic.Int32,
@@ -603,7 +615,7 @@ func sweepHeight(
 	cfg SweepConfig,
 	H, startCol int,
 	frontier []string,
-	writeCheckpoint func(H, col int, frontier []string, hTri []*big.Int),
+	writeCheckpoint func(H, col int, frontier []string, hTri []*big.Int) bool,
 	tel *telemetry,
 	sem chan struct{},
 	activeHeights *atomic.Int32,
@@ -618,12 +630,14 @@ func sweepHeight(
 	// goes through here, so the seam can never drift out of sync with a new
 	// call site; the cancel/error paths call writeCheckpoint directly and
 	// deliberately skip the notification (the test drives cancellation through
-	// afterColumn, so notifying there would recurse).
-	forwardCheckpoint := func(col int, frontier []string) {
-		writeCheckpoint(H, col, frontier, hTri)
+	// afterColumn, so notifying there would recurse). Returns whether the
+	// checkpoint actually persisted — see writeCheckpoint (O1).
+	forwardCheckpoint := func(col int, frontier []string) bool {
+		ok := writeCheckpoint(H, col, frontier, hTri)
 		if cfg.afterColumn != nil {
 			cfg.afterColumn(H, col)
 		}
+		return ok
 	}
 
 	// frontierIn is this column's map input size. It equals the previous
@@ -714,8 +728,7 @@ func sweepHeight(
 			// BEFORE GC so the stale per-column checkpoint (which named oldFrontier
 			// files) is superseded before those files are deleted. The guard also
 			// releases any frontier retained across an earlier throttled gap.
-			forwardCheckpoint(col, nil)
-			for _, del := range guard.afterColumn(true, oldFrontier, nil) {
+			for _, del := range guard.afterColumn(forwardCheckpoint(col, nil), oldFrontier, nil) {
 				removeRuns(del)
 			}
 			frontier = nil
@@ -727,11 +740,15 @@ func sweepHeight(
 		// The write is interval-throttled; the guard defers GC of the consumed
 		// frontier until a checkpoint that no longer references it is persisted, so
 		// a throttled column never strands the last checkpoint's frontier.
-		interval := cfg.CheckpointEvery
-		wrote := interval == 0 || time.Since(lastCkpt) >= interval
-		if wrote {
-			forwardCheckpoint(col, frontier)
-			lastCkpt = time.Now()
+		// `wrote` is the write OUTCOME, not the throttle decision: a checkpoint
+		// that failed to persist leaves the previous one — and the frontier it
+		// names — load-bearing (O1). lastCkpt only advances on success, so the
+		// next column retries immediately instead of waiting out the interval.
+		wrote := false
+		if interval := cfg.CheckpointEvery; interval == 0 || time.Since(lastCkpt) >= interval {
+			if wrote = forwardCheckpoint(col, frontier); wrote {
+				lastCkpt = time.Now()
+			}
 		}
 		for _, del := range guard.afterColumn(wrote, oldFrontier, frontier) {
 			removeRuns(del)
@@ -822,7 +839,7 @@ func sweepHeightKink(
 	cfg SweepConfig,
 	H, startCol int,
 	frontier []string,
-	writeCheckpoint func(H, col int, frontier []string, hTri []*big.Int),
+	writeCheckpoint func(H, col int, frontier []string, hTri []*big.Int) bool,
 	tel *telemetry,
 	sem chan struct{},
 	activeHeights *atomic.Int32,
@@ -832,11 +849,14 @@ func sweepHeightKink(
 	var acct Acct
 	lastCkpt := time.Now()
 
-	forwardCheckpoint := func(col int, frontier []string) {
-		writeCheckpoint(H, col, frontier, hTri)
+	// See sweepHeight's forwardCheckpoint: the bool is whether the checkpoint
+	// actually persisted, which is what frontierGuard must gate GC on (O1).
+	forwardCheckpoint := func(col int, frontier []string) bool {
+		ok := writeCheckpoint(H, col, frontier, hTri)
 		if cfg.afterColumn != nil {
 			cfg.afterColumn(H, col)
 		}
+		return ok
 	}
 
 	frontierIn := sumFrontierRecords(frontier)
@@ -981,19 +1001,20 @@ func sweepHeightKink(
 		frontier = nextFrontier
 
 		if totalRecs == 0 {
-			forwardCheckpoint(col, nil)
-			for _, del := range guard.afterColumn(true, oldFrontier, nil) {
+			for _, del := range guard.afterColumn(forwardCheckpoint(col, nil), oldFrontier, nil) {
 				removeRuns(del)
 			}
 			frontier = nil
 			break
 		}
 
-		interval := cfg.CheckpointEvery
-		wrote := interval == 0 || time.Since(lastCkpt) >= interval
-		if wrote {
-			forwardCheckpoint(col, frontier)
-			lastCkpt = time.Now()
+		// See sweepHeight: `wrote` is the write OUTCOME (O1), and lastCkpt
+		// advances only on a persisted checkpoint.
+		wrote := false
+		if interval := cfg.CheckpointEvery; interval == 0 || time.Since(lastCkpt) >= interval {
+			if wrote = forwardCheckpoint(col, frontier); wrote {
+				lastCkpt = time.Now()
+			}
 		}
 		for _, del := range guard.afterColumn(wrote, oldFrontier, frontier) {
 			removeRuns(del)

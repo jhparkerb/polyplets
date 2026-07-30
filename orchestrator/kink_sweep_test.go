@@ -76,7 +76,7 @@ func runOneHeight(t *testing.T, H, maxn int, sweepFn sweepHeightFn) []*big.Int {
 	sem := make(chan struct{}, cfg.Cores)
 	activeHeights := new(atomic.Int32)
 	activeHeights.Store(1)
-	noopCkpt := func(int, int, []string, []*big.Int) {}
+	noopCkpt := func(int, int, []string, []*big.Int) bool { return true }
 
 	hTri, _, err := sweepFn(context.Background(), cfg, H, 0, []string{seed}, noopCkpt, tel, sem, activeHeights)
 	if err != nil {
