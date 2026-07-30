@@ -2042,7 +2042,7 @@ type diagCoeffs struct {
 	kfact  int64
 }
 
-// diagCoeffTable holds j=1..10's coefficients (j=0 is the trivial pow3(n-1)
+// diagCoeffTable holds j=1..19's coefficients (j=0 is the trivial pow3(n-1)
 // case, handled separately). Source: docs/proofs/T-n-nm1.md,
 // T-n-nm2-and-general.md (j=1,2 proven; j=3..6 data-pinned, exact in int64
 // through the n these were originally used at); j=7,8 from
@@ -2054,7 +2054,8 @@ type diagCoeffs struct {
 // out n=23-25 matched exactly; P_10: 7 of 11 from theory+the b7 recovered
 // from P_9's own n^3 coefficient, 4 from 4 of 5 structurally-valid real
 // points n=21-24, 1 held out n=25 matched exactly — see
-// docs/a26-a30-diagonal-plan.md). All cases share one big.Int Horner
+// docs/a26-a30-diagonal-plan.md); j=11..19 from scripts/derive_pk_fast.py,
+// each documented at its own table entry below. All cases share one big.Int Horner
 // evaluator (hornerDiag) instead of j=1..6 doing native int64/uint64
 // arithmetic, since the guard-threshold fix (n>=2k+1, see applyPow3) invokes
 // j=1..6 at larger n than before where int64 would overflow, and P_10's
@@ -2184,9 +2185,10 @@ var diagCoeffTable = map[int]diagCoeffs{
 	// fits pin the shared symbols, so only a17,b17 needed new data, fit from
 	// T(35,18) and T(36,19) (results/ns_a35, results/ns_a36) — the two smallest
 	// in-onset points (onset n>=2k+1=35). Leading coeff 25^17/17! and
-	// k!-integrality both confirmed. UNLIKE k<=16 there is no independent
-	// held-out diagonal-17 point yet: the first, T(37,20), comes only from a
-	// real H20 sweep at a(37) (the strict route). Certification meanwhile rests
+	// k!-integrality both confirmed. Like every k<=16, P_17 now has independent
+	// held-out points: T(37,20) from the a(38) run's real H20 sweep and
+	// T(38,21) from the a(40) run's real H21 sweep, neither in the fit, both
+	// matching exactly (pinned in diag_p17_test.go). Certification also rests
 	// on the proven grand form (the exp identity pins the whole polynomial once
 	// a17,b17 are set). The out-of-onset T(34,17) (n=2k) was checked and does
 	// NOT lie on the polynomial — sharp onset, consistent with every lower k.
@@ -2352,7 +2354,7 @@ func diagonalCell(n, j int) *big.Int {
 }
 
 // contributeDiagonalStrip adds the closed-form strip H=maxn-k (the k-th
-// diagonal, k=0..16) to the triangle, doing no map/merge. The strip carries k+1
+// diagonal, k=0..19) to the triangle, doing no map/merge. The strip carries k+1
 // cells: T(n, maxn-k) for n=maxn-k..maxn, where the offset j=n-(maxn-k) makes
 // each cell the j-th diagonal at n, = diagonalCell(n, j). Callers guarantee
 // maxn >= 2k+1 so every cell is in its validity range.
