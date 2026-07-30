@@ -41,10 +41,15 @@ every entry in columns H computed, at every n up to 36:
 | Hmax | banked entries confirmed | wall (C++) |
 |------|--------------------------|------------|
 | 10   | 315                      | ~5 s       |
-| 13   | (see strip_engine_run.log; C_13 = 606s) | ~730 s |
+| 13   | (see strip_engine_run.log — C++ output despite the name; C_13 = 606s) | ~730 s |
 | 14   | **413, 0 mismatch, n≤36** (strip_C14_run.log, dalby 2026-07-22) | ~7.5 h dalby (C_14 = 22919s; dalby ≈ 5.4x slower/thread than gympie) |
 
-(The original `strip_engine_run.log` run stopped after C_13, so its end-of-run
+(`strip_engine_run.log` is `build/strip_tm` output — its first line says
+`strip_tm (C++)` — not the Python reference's, despite sharing the Python
+script's name. The Python reference's own output is banked separately at
+`results/strip_engine_python_run.log` (Hmax=10, Nmax=14, gympie 2026-07-30):
+that is where the brute-force anchor n≤9 actually runs, since `brute_T` exists
+only in the Python. The original C++ run stopped after C_13, so its end-of-run
 banked compare never executed and coverage stood at H≤13. The 2026-07-22 dalby
 run — hostile-witness audit fix 7, `docs/lean-hostile-witness.md` — completed
 C_14 and the full compare: columns H≤14 independently confirmed at every

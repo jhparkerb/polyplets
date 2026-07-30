@@ -1,0 +1,35 @@
+=== experiments/strip_engine.py Hmax=10 Nmax=14 host=gympie rev=3aa3ae2 2026-07-30T17:05:11Z ===
+=== command: python3 experiments/strip_engine.py 10 14 ===
+=== blob de7bb78262e04efb285f7473856310205a10559b ===
+=== purpose: bank the PYTHON reference's own output (AUDIT-2026-07-30 S6). The
+=== similarly-named results/strip_engine_run.log is C++ (build/strip_tm) output.
+=== This run carries the brute-force anchor (n<=9), which exists ONLY here.
+strip engine: Hmax=10 Nmax=14  (banked up to n=36)
+brute-force anchor to n=9 ...
+  C_1  computed in    0.0s
+  C_2  computed in    0.0s
+  C_3  computed in    0.0s
+  C_4  computed in    0.0s
+  C_5  computed in    0.0s
+  C_6  computed in    0.1s
+  C_7  computed in    0.3s
+  C_8  computed in    1.8s
+  C_9  computed in    9.9s
+  C_10 computed in   56.1s
+
+== validation: strip-engine T(n,H) vs brute (n<=9) and banked ==
+  vs brute (n<=9):  45 match, 0 MISMATCH
+  vs banked triangle: 95 match, 0 MISMATCH
+  ALL AGREE -> triangle columns H<=10 independently confirmed
+
+== C_H head values (independent), n = H..H+4 ==
+  C_1 : 1 1 1 1 1
+  C_2 : 5 12 29 70 169
+  C_3 : 32 112 387 1333 4590
+  C_4 : 222 944 3977 16670 69746
+  C_5 : 1582 7566 36023 170752 807173
+  C_6 : 11398 58886 303951 1564528 8032645
+  C_7 : 82478 449705 2455209 13389603 72891774
+  C_8 : 597646 3389630 19273655 109615868 622894980
+  C_9 : 4330612 25307152 148353217 870662365 5109696313
+  C_10: 31360332 187593576 1125917309 6769323014 40724680615
