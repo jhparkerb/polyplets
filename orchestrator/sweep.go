@@ -396,7 +396,9 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		// Top strip H==maxn is the closed-form diagonal T(maxn,maxn)=3^(maxn-1);
 		// contribute it directly — no map/merge (see contributeTopHeight).
 		if H == maxn {
-			contributeTopHeight(maxn, triangle, cfg)
+			if err := contributeTopHeight(maxn, triangle, cfg); err != nil {
+				return nil, err
+			}
 			continue
 		}
 
@@ -404,21 +406,27 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		// directly — it is ~24% of run wall. (maxn>=4 keeps H=maxn-1>=3 distinct
 		// from the H=1/H=2 low strips and 3^(maxn-4) non-negative.)
 		if H == maxn-1 && maxn >= 4 {
-			contributePoleHeight(maxn, triangle, cfg)
+			if err := contributePoleHeight(maxn, triangle, cfg); err != nil {
+				return nil, err
+			}
 			continue
 		}
 
 		// Strips H==maxn-k are closed-form (proven/data-pinned diagonals); see
 		// diagonalStripValid for the true n>=2k+1 validity threshold.
 		if k := maxn - H; diagonalStripEnabled(cfg, k) {
-			contributeDiagonalStrip(maxn, k, triangle, cfg)
+			if err := contributeDiagonalStrip(maxn, k, triangle, cfg); err != nil {
+				return nil, err
+			}
 			continue
 		}
 
 		// Trivial low strips H==1 and H==2 also have closed forms (C2);
 		// contribute them directly instead of spawning a worker per column.
 		if H == 1 || H == 2 {
-			contributeLowHeight(H, maxn, triangle, cfg)
+			if err := contributeLowHeight(H, maxn, triangle, cfg); err != nil {
+				return nil, err
+			}
 			continue
 		}
 
@@ -458,10 +466,8 @@ func Run(ctx context.Context, cfg SweepConfig, resume *Checkpoint) (*SweepResult
 		// engine's h<H>.out). Written only on a fully completed height. hSeed
 		// restores the pre-resume columns' share after a mid-height resume —
 		// hTri alone holds only THIS process's columns (Zero Harvest).
-		if cfg.PerHeightOut != "" {
-			if werr := writePerHeight(cfg.PerHeightOut, H, maxn, addRows(maxn, hTri, hSeed)); werr != nil {
-				fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
-			}
+		if err := emitPerHeight(cfg, H, maxn, addRows(maxn, hTri, hSeed)); err != nil {
+			return nil, err
 		}
 	}
 
@@ -564,36 +570,38 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 
 			// Closed-form strips: contribute directly, no map/merge (see Run).
 			// Each is a completed height -> markDone + checkpoint under mu.
-			if H == cfg.Maxn {
+			//
+			// contribute runs one of them under mu and marks the height done
+			// UNCONDITIONALLY, even when its per-height write failed (O9): the
+			// strip is already folded into triangle, and the checkpoint's
+			// invariant is "folded <=> in the Done set" — breaking it would let
+			// a sibling height's snapshot carry a contribution the Done set does
+			// not name, and resume would double-count it. The run still fails,
+			// via firstErr.
+			contribute := func(f func() error) {
 				mu.Lock()
-				contributeTopHeight(cfg.Maxn, triangle, cfg)
+				err := f()
 				markDone(H)
+				if err != nil && firstErr == nil {
+					firstErr = fmt.Errorf("H=%d: %w", H, err)
+				}
 				mu.Unlock()
 				fireAfterHeight(H)
+			}
+			if H == cfg.Maxn {
+				contribute(func() error { return contributeTopHeight(cfg.Maxn, triangle, cfg) })
 				return
 			}
 			if H == cfg.Maxn-1 && cfg.Maxn >= 4 {
-				mu.Lock()
-				contributePoleHeight(cfg.Maxn, triangle, cfg)
-				markDone(H)
-				mu.Unlock()
-				fireAfterHeight(H)
+				contribute(func() error { return contributePoleHeight(cfg.Maxn, triangle, cfg) })
 				return
 			}
 			if k := cfg.Maxn - H; diagonalStripEnabled(cfg, k) {
-				mu.Lock()
-				contributeDiagonalStrip(cfg.Maxn, k, triangle, cfg)
-				markDone(H)
-				mu.Unlock()
-				fireAfterHeight(H)
+				contribute(func() error { return contributeDiagonalStrip(cfg.Maxn, k, triangle, cfg) })
 				return
 			}
 			if H == 1 || H == 2 {
-				mu.Lock()
-				contributeLowHeight(H, cfg.Maxn, triangle, cfg)
-				markDone(H)
-				mu.Unlock()
-				fireAfterHeight(H)
+				contribute(func() error { return contributeLowHeight(H, cfg.Maxn, triangle, cfg) })
 				return
 			}
 
@@ -634,10 +642,14 @@ func runOverlap(ctx context.Context, cfg SweepConfig, heights []int,
 			markDone(H)
 			mu.Unlock()
 			fireAfterHeight(H)
-			if cfg.PerHeightOut != "" {
-				if werr := writePerHeight(cfg.PerHeightOut, H, cfg.Maxn, hTri); werr != nil {
-					fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
+			// Written AFTER markDone so the checkpoint invariant above holds;
+			// a failure still fails the run (O9).
+			if werr := emitPerHeight(cfg, H, cfg.Maxn, hTri); werr != nil {
+				mu.Lock()
+				if firstErr == nil {
+					firstErr = werr
 				}
+				mu.Unlock()
 			}
 		}(H)
 	}
@@ -1954,16 +1966,29 @@ func lowHeightRow(H, maxn int) []*big.Int {
 
 // contributeLowHeight adds the closed-form row for H==1 or H==2 to the triangle
 // (and writes its per-height row if requested), doing no map/merge.
-func contributeLowHeight(H, maxn int, triangle []*big.Int, cfg SweepConfig) {
+func contributeLowHeight(H, maxn int, triangle []*big.Int, cfg SweepConfig) error {
 	row := lowHeightRow(H, maxn)
 	for n := 1; n <= maxn && n < len(triangle); n++ {
 		triangle[n].Add(triangle[n], row[n])
 	}
-	if cfg.PerHeightOut != "" {
-		if werr := writePerHeight(cfg.PerHeightOut, H, maxn, row); werr != nil {
-			fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
-		}
+	return emitPerHeight(cfg, H, maxn, row)
+}
+
+// emitPerHeight writes a height's row when --per-height-out is set, turning a
+// failure into a RUN failure (O9 "Advisory Refusal"). Every per-height write
+// error used to be stderr-only, including writePerHeight's all-zero Zero
+// Harvest refusal: the run continued and exited 0, so the driver's $RC saw
+// success and went on to combine — exactly how the a(40) incident stayed
+// silent for 36h. The refusal still preserves whatever is on disk; it is just
+// no longer advisory.
+func emitPerHeight(cfg SweepConfig, H, maxn int, row []*big.Int) error {
+	if cfg.PerHeightOut == "" {
+		return nil
 	}
+	if err := writePerHeight(cfg.PerHeightOut, H, maxn, row); err != nil {
+		return fmt.Errorf("per-height write H=%d: %w", H, err)
+	}
+	return nil
 }
 
 // pow3 returns 3^k as a *big.Int, for k>=0 (0 for k<0). Negative-exponent
@@ -1988,7 +2013,7 @@ func pow3(k int) *big.Int {
 //
 // Caller guarantees maxn>=4. ns-gate-closedform pins both formulas against the
 // triangle so a derivation error can never reach a result.
-func contributePoleHeight(maxn int, triangle []*big.Int, cfg SweepConfig) {
+func contributePoleHeight(maxn int, triangle []*big.Int, cfg SweepConfig) error {
 	H := maxn - 1
 	row := newBigRow(maxn + 1)
 	row[H] = pow3(maxn - 2)
@@ -1999,11 +2024,7 @@ func contributePoleHeight(maxn int, triangle []*big.Int, cfg SweepConfig) {
 	if maxn < len(triangle) {
 		triangle[maxn].Add(triangle[maxn], row[maxn])
 	}
-	if cfg.PerHeightOut != "" {
-		if werr := writePerHeight(cfg.PerHeightOut, H, maxn, row); werr != nil {
-			fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
-		}
-	}
+	return emitPerHeight(cfg, H, maxn, row)
 }
 
 // diagCoeffs holds one Pk's integer-numerator Horner coefficients (leading
@@ -2331,7 +2352,7 @@ func diagonalCell(n, j int) *big.Int {
 // cells: T(n, maxn-k) for n=maxn-k..maxn, where the offset j=n-(maxn-k) makes
 // each cell the j-th diagonal at n, = diagonalCell(n, j). Callers guarantee
 // maxn >= 2k+1 so every cell is in its validity range.
-func contributeDiagonalStrip(maxn, k int, triangle []*big.Int, cfg SweepConfig) {
+func contributeDiagonalStrip(maxn, k int, triangle []*big.Int, cfg SweepConfig) error {
 	H := maxn - k
 	row := newBigRow(maxn + 1)
 	for j := 0; j <= k; j++ {
@@ -2341,27 +2362,19 @@ func contributeDiagonalStrip(maxn, k int, triangle []*big.Int, cfg SweepConfig) 
 			triangle[n].Add(triangle[n], row[n])
 		}
 	}
-	if cfg.PerHeightOut != "" {
-		if werr := writePerHeight(cfg.PerHeightOut, H, maxn, row); werr != nil {
-			fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", H, werr)
-		}
-	}
+	return emitPerHeight(cfg, H, maxn, row)
 }
 
 // contributeTopHeight adds the closed-form top strip T(maxn,maxn) to the
 // triangle (and writes its per-height row if requested), doing no map/merge.
-func contributeTopHeight(maxn int, triangle []*big.Int, cfg SweepConfig) {
+func contributeTopHeight(maxn int, triangle []*big.Int, cfg SweepConfig) error {
 	v := topHeightClosedForm(maxn)
 	if maxn < len(triangle) {
 		triangle[maxn].Add(triangle[maxn], v)
 	}
-	if cfg.PerHeightOut != "" {
-		hTri := newBigRow(maxn + 1)
-		hTri[maxn] = v
-		if werr := writePerHeight(cfg.PerHeightOut, maxn, maxn, hTri); werr != nil {
-			fmt.Fprintf(os.Stderr, "per-height write H=%d: %v\n", maxn, werr)
-		}
-	}
+	row := newBigRow(maxn + 1)
+	row[maxn] = v
+	return emitPerHeight(cfg, maxn, maxn, row)
 }
 
 // unitMult returns the configured MAP units-per-core, defaulting to 1.

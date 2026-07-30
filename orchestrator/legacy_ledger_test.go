@@ -117,11 +117,12 @@ func TestLegacyCheckpointMidHeightResumeRefused(t *testing.T) {
 	}
 }
 
-// TestLegacyCheckpointCompletedHeightResumeAllowed pins the state that must
-// KEEP its current safe behavior: a legacy checkpoint at a COMPLETED height
-// (nil frontier — the preserved a(40) POLYCKPT.B shape). Resume finds no
-// columns left, the all-zero refusal fires, and the good h<H>.out on disk
-// survives. Refusing this one would break the recorded recovery path.
+// TestLegacyCheckpointCompletedHeightResumeAllowed pins the state O2 must NOT
+// over-refuse: a legacy checkpoint at a COMPLETED height (nil frontier — the
+// preserved a(40) POLYCKPT.B shape). checkResumeConfig lets it through; the
+// sweep then finds no columns left, writePerHeight's all-zero refusal fires,
+// and the good h<H>.out on disk survives. Since O9 that refusal also fails the
+// run — the failure must be the write refusal, never O2's start-time refusal.
 func TestLegacyCheckpointCompletedHeightResumeAllowed(t *testing.T) {
 	want := refPerHeightRow(t, zeroHarvestH)
 
@@ -140,8 +141,12 @@ func TestLegacyCheckpointCompletedHeightResumeAllowed(t *testing.T) {
 	}
 	resumed := perHeightCfg(t, dir, zeroHarvestH)
 	resumed.CheckpointPath = legacy
-	if _, err := Run(context.Background(), resumed, ck); err != nil {
-		t.Fatalf("resume of a legacy COMPLETED-height checkpoint must still work: %v", err)
+	_, err = Run(context.Background(), resumed, ck)
+	if err != nil && strings.Contains(err.Error(), "predates the Zero Harvest fix") {
+		t.Fatalf("O2 refused a legacy COMPLETED-height checkpoint at start; only the MID-height case is unserveable: %v", err)
+	}
+	if err == nil || !strings.Contains(err.Error(), "refusing to write all-zero") {
+		t.Fatalf("resume of a legacy COMPLETED-height checkpoint: got %v, want the all-zero write refusal (fatal since O9)", err)
 	}
 	checkPerHeightRow(t, "legacy-completed-height-resume", want,
 		readPerHeightRow(t, resumed.PerHeightOut, zeroHarvestH))

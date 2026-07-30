@@ -118,6 +118,65 @@ func TestResumeCompletedHeightPreservesPerHeight(t *testing.T) {
 		readPerHeightRow(t, cfg.PerHeightOut, zeroHarvestH))
 }
 
+// TestAllZeroPerHeightRefusalIsFatal — red-first regression for
+// AUDIT-2026-07-30 O9 ("Advisory Refusal"). Every writePerHeight error,
+// INCLUDING the Zero Harvest all-zero refusal, was stderr-only: the run
+// continued and exited 0, so the driver's $RC saw success and marched on to
+// combine. That is precisely how the a(40) incident stayed silent for 36h.
+// The refusal must still preserve the good file on disk (the safe direction)
+// AND fail the run.
+//
+// The all-zero row is forced the way production produced it: resume a
+// COMPLETED height from a checkpoint carrying no htri, so there are no
+// columns left to sweep and nothing to reconstruct the row from.
+//
+// RED before the fix:
+//
+//	--- FAIL: TestAllZeroPerHeightRefusalIsFatal (0.44s)
+//	    zero_harvest_test.go:155: Run returned nil after refusing to write an
+//	        all-zero h4.out: the refusal is advisory, the process exits 0 and
+//	        the driver proceeds to combine
+func TestAllZeroPerHeightRefusalIsFatal(t *testing.T) {
+	want := refPerHeightRow(t, zeroHarvestH)
+
+	dir := t.TempDir()
+	cfg := perHeightCfg(t, dir, zeroHarvestH)
+	if _, err := Run(context.Background(), cfg, nil); err != nil {
+		t.Fatalf("initial run: %v", err)
+	}
+	ck, err := ReadCheckpoint(writeLegacyCheckpoint(t, cfg.CheckpointPath))
+	if err != nil {
+		t.Fatalf("read legacy checkpoint: %v", err)
+	}
+	if len(ck.HTri) != 0 || len(ck.Frontier) != 0 {
+		t.Fatalf("checkpoint htri=%d frontier=%v: not the all-zero-row shape, test is vacuous", len(ck.HTri), ck.Frontier)
+	}
+	if _, err := Run(context.Background(), perHeightCfg(t, dir, zeroHarvestH), ck); err == nil {
+		t.Fatalf("Run returned nil after refusing to write an all-zero h%d.out: the refusal is advisory, the process exits 0 and the driver proceeds to combine", zeroHarvestH)
+	}
+	// The refusal must still have preserved the good row.
+	checkPerHeightRow(t, "all-zero-refusal", want,
+		readPerHeightRow(t, cfg.PerHeightOut, zeroHarvestH))
+}
+
+// TestClosedFormPerHeightWriteFailureIsFatal covers the other five
+// writePerHeight call sites — the closed-form strips (low/pole/diagonal/top),
+// which also only logged to stderr. PerHeightOut points at an existing FILE so
+// the write fails at MkdirAll for every height.
+func TestClosedFormPerHeightWriteFailureIsFatal(t *testing.T) {
+	dir := t.TempDir()
+	blocked := filepath.Join(dir, "not-a-dir")
+	if err := os.WriteFile(blocked, []byte("x"), 0o666); err != nil {
+		t.Fatalf("write blocker file: %v", err)
+	}
+	cfg := kinkCfg(t, dir)
+	cfg.PerHeightOut = blocked
+	cfg.Heights = []int{1} // H=1 is the low-strip closed form: no sweep at all
+	if _, err := Run(context.Background(), cfg, nil); err == nil {
+		t.Fatalf("Run returned nil after the H=1 closed-form per-height write failed against %s", blocked)
+	}
+}
+
 // checkTriangleIsRow asserts a single-height run's triangle equals the
 // per-height row T(n,H) (zero everywhere else) — for --heights H they are
 // the same sum.
