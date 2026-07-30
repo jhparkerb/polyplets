@@ -5,9 +5,11 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
+#include <csignal>
 #include <cstring>
 #include <string>
 #include <vector>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -519,6 +521,60 @@ static void testReaderCorruptCompressedAborts() {
 #endif
 }
 
+// ─── E1b "Short Shrift" (writer half): finalize() must fail closed ───────────
+//
+// finalize() published unconditionally: the count backpatch's fseek only warned
+// on failure, and the CRC-trailer fwrite and the fclose were unchecked — so a
+// writer that ran out of disk in its LAST few bytes still renamed a plausible
+// file (placeholder or stale record count, missing CRC trailer) onto the final
+// path. The .tmp + rename design exists precisely so a half-written file is
+// never published; the error paths bypassed it.
+//
+// Forcing that state for real, no fault-injection seam: RLIMIT_FSIZE set to the
+// exact byte length of the finished body, so every record write succeeds and
+// only the 8-byte CRC trailer / its flush at fclose exceeds the limit (EFBIG;
+// SIGXFSZ ignored so we see the error rather than die).
+static const std::string kFsizePath = "/tmp/gate_runfile_finalize_fsize.bin";
+static const int kFsizeRecords = 40;   // < index stride*2, keeps the .idx tiny
+static long g_fsize_limit = 0;         // set by the parent before fork()
+
+static void writeRunUnderFsizeLimit() {
+  std::signal(SIGXFSZ, SIG_IGN);
+  struct rlimit rl;
+  rl.rlim_cur = static_cast<rlim_t>(g_fsize_limit);
+  rl.rlim_max = static_cast<rlim_t>(g_fsize_limit);
+  if (setrlimit(RLIMIT_FSIZE, &rl) != 0) { std::fprintf(stderr, "setrlimit failed\n"); _exit(2); }
+  RunFileWriter<u64> w(kFsizePath, 3, 8, "", "", "test");
+  for (int i = 0; i < kFsizeRecords; ++i) {
+    RunRecord<u64> r;
+    std::memset(r.sig.b, 0, SIGMAX);
+    r.sig.b[0] = 0; r.sig.b[1] = static_cast<uint8_t>(i);
+    r.H = 3; r.lo = 0; r.len = 1; r.counts = {static_cast<u64>(i + 1)};
+    w.append(r);
+  }
+  w.finalize();   // pre-fix: warns at most, then renames the short file into place
+  std::fprintf(stderr, "child: finalize returned normally (published=%d)\n",
+               (int)exists(kFsizePath));
+}
+static void testFinalizeFailureDoesNotPublish() {
+  // Reference write with no limit, to learn the exact finished size.
+  writeRun(kFsizePath, 3, kFsizeRecords);
+  const long full = static_cast<long>(readAll(kFsizePath).size());
+  std::remove(kFsizePath.c_str());
+  std::remove((kFsizePath + ".idx").c_str());
+  std::remove((kFsizePath + ".tmp").c_str());
+  g_fsize_limit = full - 8;   // everything but the CRC trailer fits
+
+  const int rc = runInChild(writeRunUnderFsizeLimit);
+  assert(rc > 0 &&
+         "fail-closed: a finalize that cannot complete must abort, not publish");
+  assert(!exists(kFsizePath) &&
+         "fail-closed: a file whose finalize failed must NEVER be renamed into place");
+  std::remove((kFsizePath + ".tmp").c_str());
+  std::remove((kFsizePath + ".idx").c_str());
+  std::remove((kFsizePath + ".idx.tmp").c_str());
+}
+
 // Pooled zstd contexts must have BOUNDED retention: a persistent worker that
 // once ran a 640-input merge must not hold 640 idle contexts forever (80
 // workers x 640 x ~200KB was a standing ~10-20GB term in the a(40) OOM).
@@ -555,6 +611,7 @@ int main() {
   testReaderTruncatedBodyAborts();
   testMergeOverTruncatedInputAborts();
   testReaderCorruptCompressedAborts();
+  testFinalizeFailureDoesNotPublish();
   testZstdPoolRetentionBounded();
   std::puts("gate_runfile PASS");
 }

@@ -378,24 +378,35 @@ class RunFileWriter {
     if (compress_) compressFinish();
 #endif
     flushWBuf();
+    // FAIL-CLOSED (E1): every leg of finalize is checked, because the ONLY
+    // reason the writer streams to a .tmp and renames is so a file that could
+    // not be finished is never published. Pre-fix the fseek legs merely warned
+    // and the CRC fwrite / fclose were unchecked, so a writer that ran out of
+    // disk in its last bytes still renamed a plausible file (stale or
+    // placeholder record count, missing CRC trailer) onto the final path — a
+    // silent undercount at the next reader, since the header count is what
+    // next() trusts.
     if (std::fseek(fp_, records_offset_, SEEK_SET) != 0)
-      std::fprintf(stderr, "RunFileWriter: fseek failed\n");
-    else
-      std::fprintf(fp_, "%018zu", record_count_);
+      failWriter("fseek to the record-count placeholder");
+    if (std::fprintf(fp_, "%018zu", record_count_) != 18)
+      failWriter("record-count backpatch");
     // Compressed files carry no FNV trailer — zstd's frame checksum replaces it.
     if (!compress_) {
       if (std::fseek(fp_, 0, SEEK_END) != 0)
-        std::fprintf(stderr, "RunFileWriter: fseek-end failed\n");
+        failWriter("fseek to the body end");
       uint64_t crc = crc_;
       uint8_t crc_bytes[8];
       for (int i = 0; i < 8; ++i) {
         crc_bytes[i] = static_cast<uint8_t>(crc & 0xff);
         crc >>= 8;
       }
-      std::fwrite(crc_bytes, 1, 8, fp_);
+      writeOrDie(crc_bytes, 8, fp_);
     }
-    std::fclose(fp_);
+    // fclose flushes: a buffered short write (ENOSPC, quota, EFBIG) surfaces
+    // HERE, not at the fwrite that filled the buffer.
+    const int close_rc = std::fclose(fp_);
     fp_ = nullptr;
+    if (close_rc != 0) failWriter("fclose");
     // Publish the index sidecar first (to its own temp, then rename), then the
     // data file last: the data file's appearance at the final path is the commit
     // point, and by then its .idx is already in place.  Clear any stale .idx if
@@ -452,6 +463,20 @@ class RunFileWriter {
   // fail-closed open guard exists for. Runs near a disk-headroom gate (H21+)
   // and /dev/shm-routed map outputs make this a real, reachable state, so any
   // failed write aborts loudly instead.
+  // FAIL-CLOSED (E1): drop the unfinished .tmp (so no later run can mistake it
+  // for salvage) and abort WITHOUT renaming. Never publish.
+  [[noreturn]] void failWriter(const char* what) {
+    std::fprintf(stderr,
+                 "RunFileWriter: %s failed (%s) for %s — not publishing "
+                 "(%zu records)\n",
+                 what, std::strerror(errno), path_.c_str(), record_count_);
+    if (fp_) { std::fclose(fp_); fp_ = nullptr; }
+    if (idx_fp_) { std::fclose(idx_fp_); idx_fp_ = nullptr; }
+    std::remove(tmp_path_.c_str());
+    std::remove((path_ + ".idx.tmp").c_str());
+    std::exit(1);
+  }
+
   void writeOrDie(const void* p, size_t n, FILE* f) {
     if (n && std::fwrite(p, 1, n, f) != n) {
       std::fprintf(stderr, "RunFileWriter: write failed (%s) for %s\n",
@@ -471,10 +496,12 @@ class RunFileWriter {
       while (in.pos < in.size) {
         ZSTD_outBuffer out{obuf_.data(), obuf_.size(), 0};
         size_t r = ZSTD_compressStream2(cctx_, &out, &in, ZSTD_e_continue);
+        // FAIL-CLOSED (E1): returning here dropped this record's bytes into a
+        // body that still gets published and counted — a silent undercount.
         if (ZSTD_isError(r)) {
           std::fprintf(stderr, "RunFileWriter: zstd compress: %s\n",
                        ZSTD_getErrorName(r));
-          return;
+          failWriter("zstd compress");
         }
         if (out.pos) writeOrDie(obuf_.data(), out.pos, fp_);
       }
@@ -516,10 +543,12 @@ class RunFileWriter {
     do {
       ZSTD_outBuffer out{obuf_.data(), obuf_.size(), 0};
       rem = ZSTD_compressStream2(cctx_, &out, &in, ZSTD_e_end);
+      // FAIL-CLOSED (E1): breaking left the frame unterminated (no checksum
+      // epilogue) in a file that would still be published.
       if (ZSTD_isError(rem)) {
         std::fprintf(stderr, "RunFileWriter: zstd flush: %s\n",
                      ZSTD_getErrorName(rem));
-        break;
+        failWriter("zstd frame flush");
       }
       if (out.pos) writeOrDie(obuf_.data(), out.pos, fp_);
     } while (rem != 0);
