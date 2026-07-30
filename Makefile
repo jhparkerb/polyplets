@@ -59,6 +59,15 @@ build:
 build/g2: cpp/g2_redelmeier.cpp | build
 	$(G2CXX) $(CXXFLAGS) $(G2_RESTRICT) -O3 $< -o $@
 
+# Independent strip transfer-matrix engine (the second source for T(n,H),
+# H<=14). -std=c++17 and no $(CXXFLAGS) deliberately: mirrors the build line
+# in scripts/run_strip_h14.sh exactly, so the gate binary and the production
+# run binary are the same program built the same way.
+# results/strip-engine.md's "Reproduce" section documented this target before
+# it existed (AUDIT-2026-07-30 S7).
+build/strip_tm: cpp/strip_tm.cpp | build
+	$(CXX) -O3 -std=c++17 $< -o $@
+
 # fixed-height transfer matrix over Z/pZ, for generating-function recovery
 build/gf_modp: cpp/gf_modp.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
