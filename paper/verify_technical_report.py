@@ -81,9 +81,36 @@ def table_body(label):
 def cells(row):
     out = []
     for c in row.split("&"):
-        c = re.sub(r"\\(num|textbf|g)\b|[{}\\]|\s", "", c)
+        # Strip any LaTeX control word.  The old pattern was
+        # r"\\(num|textbf|g)\b" -- but \g is used brace-less as \g1234, and
+        # \b never matches between "g" and "1", so every shaded cell survived
+        # as "g1234", parsed to None, and was silently skipped (42 of the 78
+        # tab:tnh cells).  A control word ends at the first non-letter, which
+        # is exactly what (?![A-Za-z]) / a greedy [a-zA-Z]+ expresses.
+        c = re.sub(r"\\[a-zA-Z]+|[{}\\]|\s", "", c)
         out.append(int(c) if c.isdigit() else None)
     return out
+
+
+# Per-table expected cell counts.  rows() yields nothing at all if a table
+# loses its \midrule or \bottomrule, and cells() yields None for anything it
+# cannot parse; without these guards either failure mode is silent and the
+# tool still prints a healthy-looking total.  Bump these deliberately when a
+# table gains rows.
+EXPECTED_CELLS = {
+    "tab:an": 40,        # a(1)..a(40), two column-pairs per row
+    "tab:tnh": 78,       # lower triangle T(n,H), n=1..12
+    "tab:onefree": 32,   # 17 one-sided + 15 free (n=33,34 free not yet known)
+    "tab:bisym": 60,     # 15 rows x (bilateral, asymmetric, nonpoly, sum)
+    "tab:holes": 93,     # both stacked tabulars, k=0..10
+}
+
+
+def coverage(label, seen):
+    want = EXPECTED_CELLS[label]
+    if seen != want:
+        failures.append(
+            f"FAIL {label} coverage: {seen} cells checked, expected {want}")
 
 
 def rows(env):
@@ -103,27 +130,34 @@ for r in rows(env):
         if r[i] is not None and r[i + 1] is not None:
             check(f"tab:an a({r[i]})", r[i + 1], banked_an[r[i]])
             seen += 1
-if seen != 40:
-    failures.append(f"FAIL tab:an: parsed {seen} of 40 terms")
+coverage("tab:an", seen)
 
 # Table 2: T(n,H) for n<=12
 env = table_body("tab:tnh")
+seen = 0
 for r in rows(env):
     n = r[0]
     for H, v in enumerate(r[1:], start=1):
         if v is not None:
             check(f"tab:tnh T({n},{H})", v, col[H][n])
+            seen += 1
+coverage("tab:tnh", seen)
 
 # Table 3: one-sided / free
 env = table_body("tab:onefree")
+seen = 0
 for r in rows(env):
     n = r[0]
     check(f"tab:onefree one-sided({n})", r[1], onesided[n])
+    seen += 1
     if len(r) > 2 and r[2] is not None:
         check(f"tab:onefree free({n})", r[2], free[n])
+        seen += 1
+coverage("tab:onefree", seen)
 
 # Table 4: bilateral / asymmetric / non-polyominoes
 env = table_body("tab:bisym")
+seen = 0
 for r in rows(env):
     n = r[0]
     check(f"tab:bisym bilateral({n})", r[1], bilateral[n])
@@ -131,10 +165,13 @@ for r in rows(env):
     check(f"tab:bisym nonpoly({n})", r[3], nonpoly[n])
     check(f"tab:bisym bilateral+asymmetric=free({n})",
           r[1] + r[2], free[n])
+    seen += 4
+coverage("tab:bisym", seen)
 
 # Table 5: holes, two stacked tabulars (k=0..3, then k=4..10)
 env = table_body("tab:holes")
 blocks = re.findall(r"\$n\$\s*&\s*\$k=(\d+)\$(.*?)\\bottomrule", env, re.S)
+seen = 0
 for k0, body in blocks:
     k0 = int(k0)
     for row in body.split(r"\\"):
@@ -148,6 +185,8 @@ for k0, body in blocks:
         for j, v in enumerate(r[1:]):
             if v is not None:
                 check(f"tab:holes ({n},k={k0 + j})", v, holes[(n, k0 + j)])
+                seen += 1
+coverage("tab:holes", seen)
 
 # Abstract: the inline a(40) display
 m = re.search(r"a\(40\) = \\num\{(\d+)\}", tex)
@@ -163,14 +202,20 @@ for n in range(4, 41):
     check(f"T({n},{n}-1) = (25n-45)*3^(n-4)",
           col[n - 1][n], (25 * n - 45) * 3 ** (n - 4))
 
-# ---------------- H20/H21 pole columns vs the closed-form diagonals ----
+# ---------------- every in-onset diagonal cell vs the closed forms ----
 # The report's "P_k explicitly known for k<=19 ... verified against values
-# from later rows" claim, exercised on the two solo-phase pole columns of
-# the a(40) run: refit each P_k (k=1..18) from its two EARLIEST in-onset
-# cells via the exponential/cumulant law (exact rationals), then demand
-# every in-onset cell of columns H=20 and H=21 match the closed form.
-# H=21 is the mass certification (no fit cell lies in that column); in
-# H=20 the single fit cell T(38,20) (P_18's second point) is skipped.
+# from later rows" claim, exercised on the WHOLE triangle: refit each P_k
+# (k=1..18) from its two EARLIEST in-onset cells via the exponential/cumulant
+# law (exact rationals), then demand that every other in-onset cell T(n,n-k)
+# of the banked triangle match the closed form.  The two fit cells per k are
+# skipped (they define the coefficients and cannot test them).
+#
+# This splits into two populations, both reported below:
+#   * H <= 21 -- real-swept cells; these genuinely test the closed forms.
+#   * H >= 22 -- cells the a(40) run *injected* from the wired P_k; matching
+#     here is a self-consistency check of the refit-vs-wired coefficients,
+#     not independent evidence.
+# Before this was widened it only covered H in (20,21), 35 cells.
 from fractions import Fraction as Fr
 
 def pcell(n, k):  # P_k(n) = T(n,n-k) * 3^(1+3k-n), exact
@@ -201,16 +246,27 @@ for k in range(1, 19):
     bk = v2 - v1
     ab[k] = (v1 - bk * n1, bk)
 
-for H in (20, 21):
+n_real, n_injected = 0, 0
+for H in range(2, 41):
     for n in range(H + 1, 41):
         k = n - H
-        if not (1 <= k <= 18) or n in (2 * k + 1, 2 * k + 2):
-            continue
+        if not (1 <= k <= 18) or n < 2 * k + 1:
+            continue          # outside the onset n >= 2k+1: no closed form
+        if n in (2 * k + 1, 2 * k + 2):
+            continue          # the two fit cells; they define P_k
         ak, bk = ab[k]
         want = qpart(n, k) + ak + bk * n
-        check(f"pole column: T({n},{H}) matches refit P_{k}",
-              pcell(n, k), want)
+        check(f"diagonal: T({n},{H}) matches refit P_{k}", pcell(n, k), want)
+        if H <= 21:
+            n_real += 1
+        else:
+            n_injected += 1
+if (n_real, n_injected) != (171, 171):
+    failures.append(f"FAIL diagonal coverage: {n_real} real-swept / "
+                    f"{n_injected} injected cells, expected 171 / 171")
 
+print(f"diagonal closed forms: {n_real} real-swept cells (independent) + "
+      f"{n_injected} injected cells (self-consistency)")
 print(f"{checks} checks, {len(failures)} failures")
 for f in failures:
     print(" ", f)
