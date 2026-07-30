@@ -28,9 +28,10 @@ sub-diagonal all returned no OEIS hits (per project notes); jasonp pushes submit
     (shape proved by an exact walk-plus-clusters decomposition; constants derived
     ab initio for k<=5, fitted and holdout-validated for 6<=k<=18). In particular
     T(n,n-1) = (25n-45)*3^(n-4) for n >= 4.
-%C  Verified: every row sum matches the banked A006770(n) for n<=40 (a(1)-a(18)
-    byte-match the live OEIS b-file); edges T(n,1)=1 and T(n,n)=3^(n-1) confirmed
-    for all n<=40.
+%C  Verified: every row sum matches the banked A006770(n) for n<=40, and the
+    row sums for n<=18 match the A006770 DATA field as OEIS serves it today
+    (that entry has no author-uploaded b-file; its b-file is auto-synthesized
+    from DATA); edges T(n,1)=1 and T(n,n)=3^(n-1) confirmed for all n<=40.
 
 %F  T(n,1) = 1.  T(n,n) = 3^(n-1).  Sum_{H=1..n} T(n,H) = A006770(n).
 %F  T(n,n-1) = (25n-45)*3^(n-4) for n >= 4; generally T(n,n-k) = P_k(n)*3^(n-1-3k)

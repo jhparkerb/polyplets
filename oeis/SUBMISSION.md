@@ -106,7 +106,11 @@ it requires trusting prose.
    The strongest kind of evidence a computational extension can offer.
 2. **Every run re-derives all previous terms** as a by-product (the triangle
    recomputation), so each submission's b-file is internally re-verified, and
-   a(1)–a(18) byte-match the live OEIS b-file.
+   a(1)–a(18) match the values OEIS serves today, line for line (checked
+   live 2026-07-30: A006770 has no author-uploaded b-file, so
+   oeis.org/A006770/b006770.txt is auto-synthesized from the entry's DATA
+   field — the comparison is against DATA, which is what our submission
+   would extend).
 3. **Held-out closed-form predictions**: P_15, pinned before a(33) existed,
    predicted T(33,18) exactly; P_16, fitted on a(33)–a(34), predicted the
    later real-swept holdout T(35,19); P_17 predicted the real-swept
