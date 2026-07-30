@@ -12,7 +12,9 @@ replacing the paper's GF route): `DESIGN.md`. Pin inputs (production
 coefficients + banked onset points, fail-closed generated): `pin-data.md`.
 
 Build: `cd polyplets && lake exe cache get` (once) then `lake build`.
-Green = only the intended `sorry`s listed below.
+Green = a sorry-free tree: there are no `sorry`s anywhere in `Polyplets/`
+(the historical "intended sorrys" list is gone; `Diagonal.lean` closed the
+last one).
 
 ## Landed (sorry-free, green, all committed)
 
@@ -87,7 +89,9 @@ Green = only the intended `sorry`s listed below.
   - **k = 12..16 PARTIAL**: `Pk_pinned_of_partial`, hypotheses = all
     banked points (12/10/8/6/4) + the 1/4/7/10/13 beyond-banked points at
     the production-PREDICTED values, explicitly flagged `-- PREDICTED` —
-    these are the precisely-stated residue of what n ≤ 36 data cannot pin.
+    these were the precisely-stated residue of what the then-banked n ≤ 36
+    data could not pin. Superseded: the triangle now runs to n ≤ 40 and the
+    Grand tier pins these levels outright (see Supersession below).
 - `Diagonal.lean` — `T_n_nm1`/`T_n_nm2` re-proved from `P1_closed`/
   `P2_closed`; **the tree is fully sorry-free**.
 
@@ -124,7 +128,7 @@ Headline results and their audited axioms (verbatim from
   every one with H ≤ 20 and every one REAL-SWEPT (columns H ≤ 21 are real
   sweeps of the a(40) run); levels ≤ 3 discharged from
   `P1_closed`/`P2_closed`/`P3_pinned`). Axioms: standard + `P3_pinned`'s
-  heavy-k=3 native_decide set (V/Vt/d leaves + 16 CFGVchunk cards + light
+  heavy-k=3 native_decide set (V/Vt/d leaves + 15 CFGVchunk cards + light
   base enumerations).
 
 **Supersession.** The `Pin.lean` tier map below is now historical (kept for
