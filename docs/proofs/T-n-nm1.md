@@ -115,10 +115,12 @@ V(1,1) = 25, Vᵗ(1,1) = 5 of `Weights.lean` (the same 25 = 16+9 split).
 - The Poisson leading coefficient is proved: deg P_k = k exactly and
   [n^k]P_k = 25^k/k! for all k (`Grand/Lead.lean`, standard axioms +
   the single V(1,1) leaf — the 25 of this file's §5).
-- Production P_1..P_16 are pinned for all n ≥ 2k+1 (`Grand/PinGrand.lean`):
-  k ≤ 3 outright, k = 4..16 as conditional theorems whose explicit
+- Production P_1..P_18 are pinned for all n ≥ 2k+1 (`Grand/PinGrand.lean`):
+  k ≤ 3 outright, k = 4..18 as conditional theorems whose explicit
   hypotheses are the two real-swept onset cells per level — engine values
   assumed, not proved in Lean (levels ≥ 12 single-algorithm; see
-  `docs/lean-hostile-witness.md`).
+  `docs/lean-hostile-witness.md`). k = 19, the engine's last wired
+  diagonal, is deliberately excluded: fitted-no-holdout, load-bearing for
+  no banked term.
 
 Status ledger: `polyplets/PROOF-STATUS.md`.

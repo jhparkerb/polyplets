@@ -131,7 +131,8 @@ def build(real, tbl):
 
 def check_all(T, P, mu):
     """Re-run the numeric oracle in full; abort on any mismatch."""
-    # 1. overdetermination: staircase at all 170 real in-range instances.
+    # 1. overdetermination: staircase at all 209 real in-range instances
+    #    (k <= 18, H <= 20; was 170 at the k <= 16 / n <= 36 tier).
     total, bad = 0, []
     for k in range(0, KMAX + 1):
         for H in range(k + 1, 21):

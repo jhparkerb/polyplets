@@ -107,9 +107,10 @@ degree bound comes from ℓ ≤ k. ∎
 
 P_k(n) = 3^(1+2k) q_k(n−k) = Σ_i 3^(1+2k) a_{k+1−i} C(n−k+i−1, i−1), and
 v₃(a_j) ≥ −(2k+1) with binomials integer, so **P_k(n) ∈ ℤ for every integer
-n**. (Integer *coefficients* in the monomial basis — stronger, and banked
-empirically for k ≤ 17 — are not needed downstream: all mod-3^j arguments
-use values.)
+n**. (Integer *coefficients* in the monomial basis would be stronger, but
+are FALSE for every k ≥ 2 — the leading coefficient is 25^k/k! — and are
+not needed downstream: all mod-3^j arguments use values. An earlier
+"observed k ≤ 17" note here was wrong; retracted AUDIT-2026-07-30 P8.)
 
 ## Corollary — the grand form G·H^n
 
@@ -137,7 +138,11 @@ many enumerated weights that enter each modulus (5 integers mod 27).
   `experiments/spine_deeper.py`). Not proved for all k; note the natural
   route (rational GF for the top coefficient) fails because the all-pairs
   weight family is not C-finite (refuted at ℓ=16; unbounded gap walk).
-- Monomial integer coefficients of P_k (observed k ≤ 17; integer values
-  proved above).
+- ~~Monomial integer coefficients of P_k~~ — **retracted 2026-07-30
+  (AUDIT-2026-07-30 P8): measured false at every wired level k = 1..19,
+  so this was never an open item.** The monomial coefficients are
+  rationals with denominator dividing k! (P_2's leading term is 625/2),
+  which the proved leading coefficient 25^k/k! already forces. Integer
+  *values* are proved above.
 - Closed forms for multi-row cluster weights (open question raised, not a
   gap in this proof).

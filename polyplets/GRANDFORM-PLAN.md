@@ -14,10 +14,14 @@ Formalize the grand form via the **staircase architecture** (below), yielding:
    cumulant sequences a, b with
    `3^(3k+1) · T(n, n−k) = expCoeff a b k n · 3^n` for all k, n ≥ 2k+1 —
    the Lean grand-form theorem proper.
-2. `P<k>_grand` for k = 1..16 (conditional-on-banked-REAL): the *production*
+2. `P<k>_grand` for k = 1..16 — **shipped at k = 1..18**, extended at the
+   a(40) close (`c54ce70`, 2026-07-29), the plan's original k ≤ 16 target
+   having been set when the triangle stopped at n = 36
+   (conditional-on-banked-REAL): the *production*
    polynomials of `orchestrator/sweep.go` pinned for all n ≥ 2k+1, with
-   hypotheses = **2 real-swept cells per level** (H ≤ 18 only; 26 values for
-   k = 16). This RETIRES the PREDICTED tier of `Pin.lean` (k = 12..16) and
+   hypotheses = **2 real-swept cells per level** (H ≤ 18 as planned, H ≤ 20
+   as shipped; 30 anchors at k = 18). This RETIRES the PREDICTED tier of
+   `Pin.lean` (k = 12..16) and
    also removes Pin's reliance on wired cells at k = 10, 11 (its current
    hypotheses include formula-generated cells like `T 31 20`).
 3. Corollaries: leading coefficient `25^k/k!` and `deg P_k = k` for all k
@@ -56,15 +60,20 @@ tail-kill, Lagrange lemma) collapses, in sequence form, to:
 From `experiments/staircase_check.py` (exact rational arithmetic):
 
 - The staircase holds at **all 170** real banked instances (k ≤ 16, H ≤ 18);
-  154 of these are beyond the 16 solving equations.
+  154 of these are beyond the 16 solving equations. (At the a(40) close the
+  fail-closed generator `scripts/gen_grand_pin.py` raised this to **209**
+  real instances at k ≤ 18, H ≤ 20 — 191 beyond the 18 solving equations —
+  and aborts if the count or any instance disagrees. `staircase_check.py`,
+  the exploratory twin quoted in this section, still runs at KMAX = 16.)
 - Onset is sharp: the staircase FAILS at H = k for all 16 levels.
 - μ₁..μ₃ from the weight-side fixed point (Lean-verified V values) equal
   μ₁..μ₃ solved from data. μ₁ = 25/3, μ₂ = 833/27, μ₃ = 32708/243.
-- The P-staircase polynomial identity holds for production P₁..P₁₆.
+- The P-staircase polynomial identity holds for production P₁..P₁₆ (and,
+  as shipped, P₁..P₁₈ — `gen_grand_pin.py --kmax 18`).
 - Anchors `T(2k+1, k+1)`, `T(2k+2, k+2)` match production values, all levels.
 - W/b/a reproduce `scripts/derive_pk_fast.py`'s constants exactly
   (b₁ = 25, a₁ = −45, b₂ = −209/2, a₁₆ = −48607562060310698638155/16) and
-  `leading coeff of P_k = b₁^k/k! = 25^k/k!` for k ≤ 16.
+  `leading coeff of P_k = b₁^k/k! = 25^k/k!` for k ≤ 16 (k ≤ 18 as shipped).
 
 Exact μ table (denominators are powers of 3; μ₁₅'s exponent 27 is correct,
 not a typo — the pattern is not strictly increasing):

@@ -6,7 +6,7 @@ standalone theorem, with the sharp onset. Content: the diagonal cumulants are
 (a_k, b_k) — so the `scripts/derive_pk_fast.py` model
 `P_k(n) = [y^k] exp(Σ_j (a_j + b_j n) y^j)` is proved structure, not an
 ansatz. Combined with the shape theorem this removes the "defect-gas
-structure" conditionality from the wired diagonals k = 10..16 (modulo the
+structure" conditionality from the wired diagonals k = 10..19 (modulo the
 Lean formalization of THIS proof, tracked separately).
 
 Machine check: `experiments/grand_form_check.py` — constructs z*, u, C, μ
@@ -170,8 +170,8 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
    **[n^k]P_k = 25^k/k! for all k** — the conjecture of
    `results/k8-pinning.md` (and the deferred stretch goal of `Shape.lean`) —
    and deg P_k = k exactly.
-3. **Conditionality ledger.** a(30)..a(36) (wired cells on diagonals
-   k = 10..16) now rest on: the real sweeps (H ≤ 19), the shape theorem
+3. **Conditionality ledger.** a(30)..a(40) (wired cells on diagonals
+   k = 10..19) now rest on: the real sweeps (H ≤ 21 as of a(40)), the shape theorem
    (Lean, deductive), THIS theorem (paper level, machine-checked), and the
    banked 2-point solve inputs. The former free-standing assumption "the
    defect gas is exactly linear" is discharged. The former Lean PREDICTED
@@ -190,16 +190,24 @@ fixed point of `ExpForm.lean` — same theorem, no power-series ring.
 Audits (`Polyplets/Grand/Audit.lean`): `grand_form` (the exp-form above)
 and `T_staircase` depend on **standard axioms only**; `lead_coeff_25`
 (Corollary 2) adds the single `V_1_1` native_decide leaf; the production
-polynomials are pinned for k ≤ 16 from two real-swept cells per level
-(`P<k>_grand_of_banked`), retiring the Lean PREDICTED tier. The item
+polynomials are pinned for k ≤ 18 from two real-swept cells per level
+(`P<k>_grand_of_banked`) — *conditional on those cells*: they are
+hypotheses of the Lean theorems, engine values assumed, not proved in
+Lean (`docs/lean-hostile-witness.md`). This retires the Lean PREDICTED
+tier. The item
 "Lean formalization" below is CLOSED.
 
 ## What remains open (unchanged from diagonal-law.md)
 
 - Onset sharpness at n = 2k (failure below onset) — verified on banked data,
   proved ab initio only k ≤ 5.
-- Monomial integer coefficients of P_k (values are integral; coefficient
-  integrality observed k ≤ 17).
+- ~~Monomial integer coefficients of P_k~~ — **retracted 2026-07-30
+  (AUDIT-2026-07-30 P8): measured false, not open.** P_k's monomial
+  coefficients are rationals with denominator dividing k! at every wired
+  level k = 1..19 (`orchestrator/sweep.go`'s `diagCoeffTable`: P_2 alone
+  has leading 625/2), as the proved leading coefficient 25^k/k! already
+  implies. Only the *values* are integral, and that is proved (Step 6 of
+  `diagonal-law.md`, and `production_int_all` in Lean).
 
 (The Lean formalization of this theorem, formerly listed here, is CLOSED —
 see §Formalization above.)

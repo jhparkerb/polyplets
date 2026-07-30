@@ -1,8 +1,12 @@
 # Lean formalization status — production diagonal formulas P_0..P_18
 
 Goal (2026-07-20, /goal active): Lean-prove the diagonal closed forms used by
-the production engine (`diagonalCell`, k = 0..16); where full proof is out of
+the production engine (`diagonalCell`); where full proof is out of
 reach, prove as much as possible and state exactly what remains input.
+The engine wires k = 0..19. Lean covers **k ≤ 18**, all grand-pinned from
+two real-swept cells per level. k = 19 is deliberately not pinned: it is
+fitted-no-holdout, no holdout is possible (the sequence closes at a(40)),
+and no banked term uses it — see the a(40)-close extension note below.
 Scope/route decisions: `PLAN.md`. Architecture (the peeling recursion,
 replacing the paper's GF route): `DESIGN.md`. Pin inputs (production
 coefficients + banked onset points, fail-closed generated): `pin-data.md`.
