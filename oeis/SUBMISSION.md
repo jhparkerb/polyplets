@@ -114,9 +114,9 @@ it requires trusting prose.
 3. **Held-out closed-form predictions**: P_15, pinned before a(33) existed,
    predicted T(33,18) exactly; P_16, fitted on a(33)–a(34), predicted the
    later real-swept holdout T(35,19); P_17 predicted the real-swept
-   T(37,20); P_18 predicted the real-swept T(39,21); and the a(40) run's
-   real H21 sweep reproduced the closed-form column-21 values on every row
-   n = 21..39 simultaneously (P_0..P_18 re-confirmed at a fresh point each).
+   T(37,20); and the a(40) run's first-ever real H21 sweep reproduced the
+   closed-form column-21 values on every row n = 21..39 at once — P_18's
+   first holdout, T(39,21), among them.
    No term in the b-file rests on a formula without a passed holdout (P_19
    exists but is fitted-only and is used for NO banked term).
 4. **Honest grading is built into the entries themselves**: the %C text and

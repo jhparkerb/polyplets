@@ -16,10 +16,10 @@
 # triangle), and every closed-form height-diagonal used is certified by
 # held-out real sweeps: P_15 predicted T(33,18); P_16, fitted on
 # a(33)-a(34), predicted the real-swept T(35,19); P_17 predicted the
-# real-swept T(37,20); P_18 predicted the real-swept T(39,21); and the
-# a(40) run's real H21 sweep reproduced the closed-form column-21 values
-# on every row n = 21..39 simultaneously (P_0..P_18 all re-confirmed at a
-# fresh point). T(40,20) was additionally re-swept in a clean standalone
+# real-swept T(37,20); and the a(40) run's first-ever real H21 sweep
+# reproduced the closed-form column-21 values on every row n = 21..39 at
+# once -- P_18's first holdout, T(39,21), among them.
+# T(40,20) was additionally re-swept in a clean standalone
 # run, byte-identical. NOT algorithm-independently confirmed -- Redelmeier
 # is O(a(n)) and infeasible much past n ~ 22.
 # - Jason H Parker, Jul 29 2026

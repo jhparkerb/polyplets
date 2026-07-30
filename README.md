@@ -68,8 +68,10 @@ provenance — which binary, which host, which validations — is in
   (full-chain regression on every run; cross-architecture recounts where
   run — full at a(34), partial at a(35), split at a(36), none for
   a(37)–a(38); and the held-out closed-form diagonal chain
-  P₁₅→T(33,18), P₁₆→T(35,19), P₁₇→T(37,20), P₁₈→T(39,21), each formula
-  predicting a cell of a term computed after it was pinned).
+  P₁₅→T(33,18), P₁₆→T(35,19), P₁₇→T(37,20), each formula predicting a
+  cell of a term computed after it was pinned — with P₁₈'s first holdout,
+  T(39,21), arriving as one row of the a(40) H21 sweep below rather than
+  as a separate event).
 - **T2⁻** a(39)–a(40): T2 minus the held-out top-cell check — their top
   real cells sit on diagonal k=19, whose closed form has no independent
   holdout and, the sequence closing at a(40), never will. Narrowed by the
