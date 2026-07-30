@@ -131,11 +131,56 @@ static void testCombineNoAlloc() {
   assert(a.counts[0] == 0 && a.counts[1] == 0 && a.counts[6] == 0);
 }
 
+// V3 (AUDIT-2026-07-30): decodeVarint's `shift += 7` had NO width bound, so a
+// corrupt stream of continuation bytes kept shifting past the counter width —
+// undefined behavior at shift >= 8*sizeof(W), and (on the hardware where the
+// shift is merely masked) a plausible wrong count rather than a rejected
+// record. A varint can never legitimately need more than ceil(8*sizeof(W)/7)
+// bytes, so anything longer is corruption and must be reported as a failed
+// decode, which is what every caller already handles (end-of-run for
+// deserializeRecord; a fail-closed abort in RunFileReader::next, E1).
+static void testVarintWidthBound() {
+  // 20 continuation bytes then a terminator: legal-looking, but 20 * 7 = 140
+  // bits, far past u64 and past u128.
+  uint8_t buf[21];
+  for (int i = 0; i < 20; ++i) buf[i] = 0x80;
+  buf[20] = 0x01;
+
+  size_t pos = 0;
+  u64 v64 = 0;
+  assert(!decodeVarint<u64>(buf, sizeof(buf), &pos, &v64) &&
+         "V3: an over-wide varint must fail to decode, not shift past u64");
+
+  pos = 0;
+  u128 v128 = 0;
+  assert(!decodeVarint<u128>(buf, sizeof(buf), &pos, &v128) &&
+         "V3: an over-wide varint must fail to decode, not shift past u128");
+
+  // The widest LEGITIMATE encodings still decode: 10 bytes for u64 (shifts
+  // 0..63), 19 for u128 (shifts 0..126).
+  uint8_t ok64[10];
+  for (int i = 0; i < 9; ++i) ok64[i] = 0x80;
+  ok64[9] = 0x01;                       // bit 63 set
+  pos = 0; v64 = 0;
+  assert(decodeVarint<u64>(ok64, sizeof(ok64), &pos, &v64) &&
+         "V3: the widest legal u64 varint must still decode");
+  assert(v64 == (u64{1} << 63));
+
+  uint8_t ok128[19];
+  for (int i = 0; i < 18; ++i) ok128[i] = 0x80;
+  ok128[18] = 0x01;                     // bit 126 set
+  pos = 0; v128 = 0;
+  assert(decodeVarint<u128>(ok128, sizeof(ok128), &pos, &v128) &&
+         "V3: the widest legal u128 varint must still decode");
+  assert(v128 == (u128{1} << 126));
+}
+
 int main() {
   testRoundTrip();
   testSortOrder();
   testCombine();
   testDeduplicate();
   testCombineNoAlloc();
+  testVarintWidthBound();
   std::puts("gate_run PASS");
 }

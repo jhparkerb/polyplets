@@ -706,6 +706,9 @@ class RunFileReader {
       uint8_t byte;
       do {
         if (!bodyRead(&byte, 1)) failShort("count varint");
+        // WIDTH-BOUNDED (V3), mirroring core/run.h's decodeVarint: a corrupt
+        // run of continuation bytes must not shift past the counter width.
+        if (shift >= 8 * sizeof(W)) failShort("over-wide count varint");
         v |= (static_cast<W>(byte & 0x7f) << shift);
         shift += 7;
       } while (byte & 0x80);

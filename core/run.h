@@ -160,6 +160,15 @@ inline bool decodeVarint(const uint8_t* data, size_t size, size_t* pos, W* out) 
   W result = 0; unsigned shift = 0; uint8_t byte;
   do {
     if (*pos >= size) return false;
+    // WIDTH-BOUNDED (V3): a valid varint for W needs at most
+    // ceil(8*sizeof(W)/7) bytes, so shift can never legitimately reach the
+    // counter width. Without this bound a corrupt run of continuation bytes
+    // shifts past it -- undefined behavior, and on hardware that merely masks
+    // the shift count, a plausible WRONG count instead of a rejected record.
+    // Treated as a failed decode, which every caller already handles
+    // (end-of-run for deserializeRecord; a fail-closed abort in
+    // RunFileReader::next, E1).
+    if (shift >= 8 * sizeof(W)) return false;
     byte = data[(*pos)++];
     result |= (static_cast<W>(byte & 0x7f) << shift);
     shift += 7;
