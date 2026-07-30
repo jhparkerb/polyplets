@@ -45,7 +45,10 @@ Flattened: 1, 1,3, 1,10,9, 1,27,55,27, 1,68,248,240,81, …
 
 **Regenerate / extend:** `results/ns_a36/perheight/h{H}.out` gives `T(n,H)` for
 H<=18, all n<=36 (main a36 engine). Or `build/g2 --per-box`. Independently
-cross-checked by the strip second source (results/strip-engine.md, H<=14).
+cross-checked by the strip second source (results/strip-engine.md) over
+H<=14 **and n<=36** — the banked strip run's reach. Cells with H>14, and all
+cells at n=37..40, are not strip-covered as banked (an N=40 extension run was
+launched 2026-07-30).
 
 Confirmed NOT in OEIS (sonnet-checked 2026-07-10: no height-refined triangle of
 A006770 exists).

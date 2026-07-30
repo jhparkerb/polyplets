@@ -129,6 +129,16 @@ Coverage: today 350/630 (55.6%); + independent naive strip engine to H=12 →
 84.8%; to H=14 → 89.7%. The residual single-source band is exactly the tall
 middle heights where the kink kernel spends its time.
 
+**Restated honestly at the close (AUDIT-2026-07-30 S4).** The percentages
+above are cell counts that credit each P_k diagonal as a second source for
+every cell in its onset — including the cells that diagonal itself produced.
+Over the closed n<=40 triangle (820 cells): doc-style union **90.7%**, honest
+cells **67.6%** (P_k credited only on really-swept cells), strip alone
+**50.4%**. And cells are the flattering denominator — by MASS the strip run
+as banked (H<=14, n<=36) second-sources 9.1% of a(37), 5.5% of a(38), 2.5% of
+a(39) and ~0% of a(40). An N=40 strip extension launched 2026-07-30 lifts
+those to roughly 45-54%. Full table: `results/strip-engine.md`.
+
 ## 5. The lever
 
 Don't fit the middle atoms — **compute** them: an independent naive strip

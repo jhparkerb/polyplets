@@ -93,9 +93,40 @@ object count, so it stops at ~n=19-20. The strip TM's cost is ~2^H (independent
 of object count), so it EXTENDS independent per-column confirmation of the
 middle heights to n=20..36 — the region Redelmeier cannot reach. That is the
 strip engine's distinct contribution: columns H<=14 independently checked at
-large n, not a first check at small n. It raises second-source coverage of the
-630-entry triangle from 55.6% (columns H<=4 recurrences + P_k diagonals) toward
-~85-90% (see the coverage map in `results/triangle-structure.md`).
+large n, not a first check at small n.
+
+### Coverage, stated three ways (AUDIT-2026-07-30 S4)
+
+"~85-90% coverage" was a *cell* count that credited the P_k closed forms as a
+second source — including for the cells those very formulas produced. Over
+the closed n<=40 triangle (820 cells), recomputed:
+
+| figure | value | what it counts |
+|---|---|---|
+| doc-style cell union | **90.7%** | H<=4 recurrences ∪ P_k diagonals ∪ strip (H<=14, n<=36), P_k credited everywhere in onset |
+| honest cells | **67.6%** | same, but a closed form is NOT a second source for a cell it generated (P_k credited only on really-swept cells, H<=21) |
+| strip alone | **50.4%** | the strip engine's own 413-cell-verified region |
+
+(The audit reported 90.5% / 67.3% under a marginally different treatment of
+the onset edge; the numbers above are this file's own recomputation and the
+ones to quote.)
+
+Cells are the flattering denominator, because the triangle's cells are wildly
+unequal in size. **By mass**, second-sourcing of the final terms as banked
+(the H<=14, n<=36 strip run) is:
+
+| term | strip-second-sourced mass |
+|---|---|
+| a(37) | 9.1% |
+| a(38) | 5.5% |
+| a(39) | 2.5% |
+| a(40) | ~0% |
+
+— because the strip run stopped at n=36 and the mass lives in the tall middle
+heights. A strip run extended to N=40 was launched 2026-07-30 (in progress;
+`results/strip_C14_n40_run.log`), which lifts these to roughly 45-54%. The
+per-height mass breakdown of a(40) itself is in
+`results/ns_a40/PROVENANCE.md`.
 
 Note: `build/g2` (cpp/g2_redelmeier.cpp) is the canonical, gated Redelmeier;
 prefer it over any ad hoc enumerator.
