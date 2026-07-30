@@ -5,6 +5,12 @@ Exact integer/rational arithmetic only (stdlib Fraction); no external packages.
 Regenerates the hole tables and the 3^(H-1) closed form from build/g2, reads the
 b-files for the published terms, and checks the transcribed paper tables against
 all of it. Run from the repo root after `make build/g2`:  python3 paper/verify_claims.py
+
+Exit 0 iff every check passed AND every optional group ran.  A group whose
+input is missing prints "COVERAGE DEGRADED", is counted in the final line, and
+makes the run exit nonzero; set ALLOW_PARTIAL=1 to accept a degraded run.
+SHOW_COVERAGE=1 prints each group's contributed check count (used to refresh
+the COVERAGE table below after adding checks).
 """
 import ast, os, re, subprocess, glob
 from fractions import Fraction as F
@@ -40,6 +46,67 @@ def chk(name, cond, detail=""):
     else:
         bad += 1; print(f"  FAIL: {name}  {detail}")
 
+# ---- coverage accounting (AUDIT-2026-07-30 P6) -------------------------------
+# Several blocks skip-and-continue when an input is missing.  They used to
+# print one quiet parenthetical and the tool still ended with
+# "N checks passed, 0 failed" and exit 0 -- in a tree without build/g2,
+# build/symcount_fast and runs/, 220 of 448 checks vanished with no signal in
+# the exit status.  Now every skip is loud, counted, and fatal unless
+# ALLOW_PARTIAL=1 is set in the environment.
+ALLOW_PARTIAL = os.environ.get("ALLOW_PARTIAL") == "1"
+SHOW_COVERAGE = os.environ.get("SHOW_COVERAGE") == "1"
+skipped = []
+
+def skip(group, ncheck, reason):
+    skipped.append((group, ncheck))
+    print(f"  COVERAGE DEGRADED: skipped {group} ({ncheck} checks) -- {reason}")
+
+def covered(group, expected, start):
+    """A present group must contribute the checks it is supposed to."""
+    global bad
+    got = ok + bad - start
+    if SHOW_COVERAGE:
+        print(f"  coverage {group}: {got} checks")
+    if got != expected:
+        bad += 1
+        print(f"  FAIL: coverage {group}: {got} checks contributed, "
+              f"expected {expected}")
+
+# ---- tracked fallback for the gitignored runs/sym3x columns ------------------
+# runs/ is in .gitignore, so the symmetric fixed-point columns (weeks of
+# compute) exist on one machine only.  results/sym_counts.txt is the tracked
+# extraction; see scripts/bank_sym_counts.py.
+def load_sym_bank():
+    path = os.path.join(ROOT, "results", "sym_counts.txt")
+    if not os.path.exists(path):
+        return None, None
+    cols, strips = {}, {}
+    for line in open(path):
+        p = line.split()
+        if len(p) == 3 and p[1].isdigit():
+            cols.setdefault(p[0], {})[int(p[1])] = int(p[2])
+        elif len(p) == 4 and p[0] == "dmirror_strip":
+            strips[(int(p[1]), int(p[2]))] = int(p[3])
+    return (cols or None), (strips or None)
+
+SYMCOLS, SYMSTRIPS = load_sym_bank()
+
+# Checks each optional group contributes in a complete tree.  Asserted when the
+# group runs and quoted when it is skipped, so the denominator is never a
+# mystery.  Re-harvest with SHOW_COVERAGE=1 after adding checks to a group.
+COVERAGE = {
+    "g2_holes": 37,
+    "g2_holetriangle": 7,
+    "free_onesided": 4,
+    "maxhole": 1,
+    "holes_n18": 5,
+    "symcount_1819": 4,
+    "sym_companions": 132,
+    "dmirror_strips": 40,
+    "spine_mod3": 1,
+    "byheight_h19": 32,
+}   # 263 of the 448 checks live in an optional group
+
 # --- Table tab:terms (paper transcription) vs b-file ---
 TERMS = {1:1,2:4,3:20,4:110,5:638,6:3832,7:23592,8:147941,9:940982,10:6053180,
  11:39299408,12:257105146,13:1692931066,14:11208974860,15:74570549714,
@@ -59,16 +126,38 @@ chk("byHeight sum == a(19)", sum(BH.values())==A[19])
 chk("byHeight peak at H=9", max(BH, key=BH.get)==9)
 chk("B_19(19)==3^18==387420489", BH[19]==3**18==387420489)
 chk("B_17(19) table/cross-check agree", BH[17]==47839787379)
+# B_H(19) and the B_H(H)=3^(H-1) closed form, per height.  Preferred source is
+# the a(19) TMA run dirs under runs/ -- a DIFFERENT engine, so those two checks
+# per height are cross-engine.  runs/ is gitignored, so fall back to the tracked
+# triangle (same engine as the bank, weaker but not nothing); either way the
+# check count is fixed and accounted for (AUDIT-2026-07-30 P6: this glob used
+# to contribute a silently variable 0..32 checks).
+_cov = ok + bad
+_h19 = {}   # H -> (T(19,H), T(H,H))
 for f in glob.glob(os.path.join(ROOT,"runs","**","h*.txt"), recursive=True):
     H = os.path.basename(f)[1:-4]
     if not H.isdigit(): continue
+    v19 = vHH = None
     for line in open(f):
         p = line.split()
-        if len(p)==2 and p[0]=="19":
-            chk(f"B_{H}(19) vs run data", BH[int(H)]==int(p[1]),
-                f"paper {BH[int(H)]} vs run {p[1]}")
-        if len(p)==2 and p[0]==H:                      # closed form B_H(H)=3^(H-1)
-            chk(f"B_{H}({H})==3^{int(H)-1}", int(p[1])==3**(int(H)-1))
+        if len(p)==2 and p[0]=="19": v19 = int(p[1])
+        if len(p)==2 and p[0]==H:    vHH = int(p[1])
+    if v19 is not None and vHH is not None:
+        _h19[int(H)] = (v19, vHH)
+_h19src = "runs/**/h*.txt (a(19) TMA run dirs, independent engine)"
+if not _h19:
+    _tri19 = {}
+    for line in open(os.path.join(ROOT, "results", "triangle.txt")):
+        p = line.split()
+        if len(p) == 3 and p[0].isdigit():
+            _tri19[(int(p[0]), int(p[1]))] = int(p[2])
+    _h19 = {H: (_tri19[(19, H)], _tri19[(H, H)]) for H in range(1, 17)}
+    _h19src = "results/triangle.txt (banked, same engine as the bank)"
+print(f"  byHeight cross-check source: {_h19src}")
+for H, (v19, vHH) in sorted(_h19.items()):
+    chk(f"B_{H}(19) vs run data", BH[H]==v19, f"paper {BH[H]} vs run {v19}")
+    chk(f"B_{H}({H})==3^{H-1}", vHH==3**(H-1))
+covered("byHeight per-height cross-check", COVERAGE["byheight_h19"], _cov)
 
 # --- growth ratios and lambda ---
 r = {n: F(A[n],A[n-1]) for n in range(2,20)}
@@ -95,6 +184,7 @@ chk("heights<=13 coverage ~ 97.6%",
     round(float(F(sum(BH[h] for h in range(1,14)),A[19]))*100,1)==97.6)
 
 # --- hole tables (regenerated from g2), both conventions ---
+_cov = ok + bad
 if os.path.exists(G2):
     h4, h8 = g2_holes("--holes"), g2_holes("--holes8")
     for n,v in {1:1,4:109,8:135609,10:5310754,12:215793158}.items():
@@ -109,13 +199,16 @@ if os.path.exists(G2):
     chk("first 4-conn hole at n=4",
         all(sum(c for hh,c in h4[n].items() if hh>0)==0 for n in range(1,4))
         and sum(c for hh,c in h4[4].items() if hh>0)==1)
+    covered("hole tables (build/g2)", COVERAGE["g2_holes"], _cov)
 else:
-    print("  (skipping hole checks: build/g2 not found; run `make build/g2`)")
+    skip("hole tables (build/g2)", COVERAGE["g2_holes"],
+         "build/g2 not found; run `make build/g2`")
 
 # === Claims added in the elevated paper (Sections 3, 7, 8) ===
 
 # Companions: extended free / one-sided (n=18,19) vs the symmetric-enumerator output
 fo_path = os.path.join(ROOT, "results", "free_onesided_polyplets.txt")
+_cov = ok + bad
 if os.path.exists(fo_path):
     FO = {}
     for line in open(fo_path):
@@ -126,6 +219,10 @@ if os.path.exists(fo_path):
     chk("Free(19)==18951156321090",      FO.get(19,(0,0))[0]==18951156321090)
     chk("OneSided(18)==5617792259411",   FO.get(18,(0,0))[1]==5617792259411)
     chk("OneSided(19)==37902303297525",  FO.get(19,(0,0))[1]==37902303297525)
+    covered("free/one-sided n=18,19", COVERAGE["free_onesided"], _cov)
+else:
+    skip("free/one-sided n=18,19", COVERAGE["free_onesided"],
+         "results/free_onesided_polyplets.txt absent")
 
 # Bilateral (A030234) and asymmetric (A030235) at n=19, from the subcounts
 bil19 = F(Hsym + D, 2)
@@ -141,11 +238,15 @@ chk("M(16)=25=2*4^2-2*4+1", M[15]==25==2*16-8+1)  # diamond tight at the n=16 4r
 chk("M(n)<=floor(n^2/8), n=1..16", all(M[n-1] <= n*n//8 for n in range(1,17)))
 # results/maxhole.txt (the maxhole_split output) must reproduce M(1..16)
 mh = os.path.join(ROOT, "results", "maxhole.txt")
+_cov = ok + bad
 if os.path.exists(mh):
     mv = {int(l.split()[0]): int(l.split()[1]) for l in open(mh)
           if l.split() and l.split()[0].isdigit()}
     chk("maxhole.txt reproduces M(1..16)",
         [mv.get(n) for n in range(1,17)]==M, str([mv.get(n) for n in range(1,17)]))
+    covered("maxhole M(1..16)", COVERAGE["maxhole"], _cov)
+else:
+    skip("maxhole M(1..16)", COVERAGE["maxhole"], "results/maxhole.txt absent")
 
 # GF transcriptions: paper coefficients must match the recovered data files
 def gf_block(path, header):
@@ -212,6 +313,7 @@ chk("H=7 hole-GF orders == 537,1074,1611 = 537*(k+1)",
 chk("H=8 k=0 hole-GF order==1499", order_of("results/hole_gfs.txt", "H=8 k=0 ")==1499)
 
 # Hole triangle rows in Table tab:holes and the A_0/A_1 caption sequences
+_cov = ok + bad
 if os.path.exists(G2):
     paper_rows = {4:{0:109,1:1}, 5:{0:622,1:16}, 6:{0:3664,1:166,2:2},
                   7:{0:22094,1:1456,2:42}, 8:{0:135609,1:11788,2:538,3:6}}
@@ -221,10 +323,15 @@ if os.path.exists(G2):
         [h4[n].get(0,0) for n in range(1,10)]==[1,4,20,109,622,3664,22094,135609,843941])
     chk("A_1 caption seq n=4..9",
         [h4[n].get(1,0) for n in range(4,10)]==[1,16,166,1456,11788,91300])
+    covered("hole triangle rows (build/g2)", COVERAGE["g2_holetriangle"], _cov)
+else:
+    skip("hole triangle rows (build/g2)", COVERAGE["g2_holetriangle"],
+         "build/g2 not found; run `make build/g2`")
 
 # Hole triangle extended to n=18 (transfer matrix; the flood oracle caps at n=14) and
 # its cross-ISA confirmation: dalby clang/ARM == ayr gcc/x86, byte-identical.
 hn18 = os.path.join(ROOT, "results", "holes_n18.txt")
+_cov = ok + bad
 if os.path.exists(hn18):
     T18 = {}
     for line in open(hn18):
@@ -242,10 +349,17 @@ if os.path.exists(hn18):
                           (l.split() for l in open(path)) if len(p) == 3 and p[0].isdigit())
         chk("holes n<=18 cross-ISA byte-identical (dalby clang/ARM == ayr gcc/x86)",
             _norm(hn18) == _norm(dn18))
+    covered("hole triangle n<=18", COVERAGE["holes_n18"], _cov)
+else:
+    skip("hole triangle n<=18", COVERAGE["holes_n18"],
+         "results/holes_n18.txt absent")
 
 # Companions table: bilaterally-symmetric (A030234) and asymmetric (A030235) at
-# n=18,19, regenerated from the mirror sub-counts via symcount_fast
+# n=18,19, regenerated from the mirror sub-counts via symcount_fast, or read
+# from the tracked results/sym_counts.txt bank when the binary is absent.
 SC = os.path.join(ROOT, "build", "symcount_fast")
+_cov = ok + bad
+Hm = Dm = _symsrc = None
 if os.path.exists(SC):
     def sc(t):
         out = subprocess.run([SC, t, "19"], capture_output=True, text=True).stdout
@@ -254,14 +368,21 @@ if os.path.exists(SC):
             p = line.split()
             if len(p) == 2 and p[0].lstrip("-").isdigit(): d[int(p[0])] = int(p[1])
         return d
-    Hm, Dm = sc("hmirror"), sc("dmirror")
+    Hm, Dm, _symsrc = sc("hmirror"), sc("dmirror"), "build/symcount_fast (live)"
+elif SYMCOLS and "hmirror" in SYMCOLS and "dmirror33" in SYMCOLS:
+    Hm, Dm = SYMCOLS["hmirror"], SYMCOLS["dmirror33"]
+    _symsrc = "results/sym_counts.txt (banked)"
+if Hm is not None:
+    print(f"  symmetric n=18,19 source: {_symsrc}")
     freeN = {18: 2808898025438, 19: 18951156321090}
     for n, bil, asym in [(18, 3791465, 2808894233973), (19, 9344655, 18951146976435)]:
         b = (Hm.get(n,0) + Dm.get(n,0)) // 2
         chk(f"bilateral({n})=(hmirror+dmirror)/2={bil}", b == bil, f"got {b}")
         chk(f"asymmetric({n})=Free-bilateral={asym}", freeN[n] - b == asym)
+    covered("symmetric n=18,19", COVERAGE["symcount_1819"], _cov)
 else:
-    print("  (skipping symmetric n=18,19 checks: build/symcount_fast not found)")
+    skip("symmetric n=18,19", COVERAGE["symcount_1819"],
+         "build/symcount_fast not found and results/sym_counts.txt absent")
 
 # === Claims of the full computational report (a(40) close, 2026-07) ===
 # These parse the report's tables straight out of the .tex, so transcription
@@ -434,17 +555,29 @@ for k in (15, 16, 17, 18):
         all(x == F(25) ** k for x in d))
 
 # symmetry counts: tab:symcounts vs banked engine outputs; Burnside companions
-S34 = {t: load(f"runs/sym34/{t}.out") for t in ("r90", "r180", "hmirror")} \
-    if os.path.exists(os.path.join(ROOT, "runs", "sym34", "r90.out")) else None
+_cov = ok + bad
+_symcolsrc = None
+if os.path.exists(os.path.join(ROOT, "runs", "sym34", "r90.out")):
+    S34 = {t: load(f"runs/sym34/{t}.out") for t in ("r90", "r180", "hmirror")}
+    _symcolsrc = "runs/sym34 + runs/sym3{2,3} (live run dirs)"
+elif SYMCOLS and all(t in SYMCOLS for t in ("r90", "r180", "hmirror")):
+    S34 = {t: SYMCOLS[t] for t in ("r90", "r180", "hmirror")}
+    _symcolsrc = "results/sym_counts.txt (banked)"
+else:
+    S34 = None
 DM = load("runs/sym32/dmirror.out") \
-    if os.path.exists(os.path.join(ROOT, "runs", "sym32", "dmirror.out")) else None
+    if os.path.exists(os.path.join(ROOT, "runs", "sym32", "dmirror.out")) \
+    else (SYMCOLS or {}).get("dmirror32")
 # D(33) in tab:symcounts is the T3 hybrid (direct strips + pinned closed
 # forms, scripts/dmirror_hybrid_sum.py); validate it against that assembly.
-if DM is not None and os.path.exists(os.path.join(ROOT, "runs", "sym33", "dmirror.out")):
-    DM33 = load("runs/sym33/dmirror.out")
+DM33 = load("runs/sym33/dmirror.out") \
+    if os.path.exists(os.path.join(ROOT, "runs", "sym33", "dmirror.out")) \
+    else (SYMCOLS or {}).get("dmirror33")
+if DM is not None and DM33 is not None:
     chk("hybrid dmirror.out prefix-matches n<=32", all(DM33[n] == DM[n] for n in DM))
     DM = DM33
 if S34 and DM:
+    print(f"  symmetry/companion source: {_symcolsrc}")
     for row in table_rows("tab:symcounts"):
         n, r9, r1, hm = row[0], row[1], row[2], row[3]
         d = row[4] if len(row) > 4 else None
@@ -478,11 +611,15 @@ if S34 and DM:
         chk(f"tab:companions freenonpoly({n})", fr - A105[n] == fnp)
         for s, v in (("030222", fr), ("030234", bi), ("030235", asy), ("194596", fnp)):
             chk(f"b{s}({n}) == table", B[s].get(n) == v)
+    covered("symmetry/companions n<=34", COVERAGE["sym_companions"], _cov)
 else:
-    print("  (skipping symmetry/companion checks: runs/sym34 or runs/sym32 absent)")
+    skip("symmetry/companions n<=34", COVERAGE["sym_companions"],
+         "runs/sym34 or runs/sym32 absent and results/sym_counts.txt absent")
 
 # dmirror diagonal quasi-polynomials (tab:dmpk) and GF numerators N_k
+_cov = ok + bad
 strips = glob.glob(os.path.join(ROOT, "runs", "sym32", "dmirror.S*.out"))
+dd = None
 if strips:
     dd = {}
     for f in strips:
@@ -491,6 +628,11 @@ if strips:
             p = line.split()
             if len(p) == 2 and p[0].isdigit():
                 dd[(S, int(p[0]))] = int(p[1])
+elif SYMSTRIPS:
+    dd = SYMSTRIPS
+if dd:
+    print("  dmirror strip source: "
+          + ("runs/sym32 (live)" if strips else "results/sym_counts.txt (banked)"))
     # P_k per parity: coefficient lists (constant first), Fractions
     PK = {  # (k, parity 0=even,1=odd): coeffs
         (0, 0): [2], (0, 1): [2],
@@ -544,8 +686,10 @@ if strips:
             chk(f"N_{k}(-1)==(-2)^{k}",
                 sum(c * (-1) ** i for i, c in enumerate(N)) == (-2) ** k)
         chk(f"deg N_{k}==2k", len(N) - 1 == 2 * k)
+    covered("dmirror P_k / N_k", COVERAGE["dmirror_strips"], _cov)
 else:
-    print("  (skipping dmirror P_k / N_k checks: runs/sym32 strips absent)")
+    skip("dmirror P_k / N_k", COVERAGE["dmirror_strips"],
+         "runs/sym32 strips absent and results/sym_counts.txt absent")
 
 # Theorem (single-hole) / Conjecture (multi-hole total): M(n) = round((n-2)^2/8)
 chk("M(n)==round((n-2)^2/8) for n=1..16",
@@ -594,6 +738,7 @@ chk("single-row cluster weight == (2s+1)^2 for s=2..6",
 
 # (d) spine cubic: digit-product formula reproduces every in-band banked cell mod 3
 _ph = os.path.join(ROOT, "results", "ns_a40", "perheight")
+_cov = ok + bad
 if os.path.isdir(_ph):
     T3 = {}
     for f in os.listdir(_ph):
@@ -656,8 +801,20 @@ if os.path.isdir(_ph):
         badc += not good
     chk(f"spine digit-product formula on all in-band banked cells ({okc} cells)",
         badc == 0, f"{badc} mismatches")
+    covered("spine mod 3", COVERAGE["spine_mod3"], _cov)
 else:
-    print("  (skipping spine check: results/ns_a40/perheight absent)")
+    skip("spine mod 3", COVERAGE["spine_mod3"],
+         "results/ns_a40/perheight absent")
 
-print(f"\n{ok} checks passed, {bad} failed.")
-raise SystemExit(1 if bad else 0)
+nskip = sum(n for _, n in skipped)
+print()
+print(f"{ok} checks passed, {bad} failed, {len(skipped)} skipped-groups "
+      f"({nskip} checks).")
+if skipped:
+    for g, n in skipped:
+        print(f"  SKIPPED: {g} ({n} checks)")
+    print(f"  This run covered {ok + bad} of {ok + bad + nskip} checks. "
+          + ("ALLOW_PARTIAL=1 set: exiting on failures only."
+             if ALLOW_PARTIAL else
+             "Set ALLOW_PARTIAL=1 to accept a degraded run."))
+raise SystemExit(1 if (bad or (skipped and not ALLOW_PARTIAL)) else 0)

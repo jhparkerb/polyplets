@@ -1,0 +1,596 @@
+# Symmetric fixed-point counts for the king-move (polyplet) lattice.
+# Columns: <key> <n> <value>, except dmirror_strip: dmirror_strip <S> <n> <value>.
+#
+# WHY THIS FILE EXISTS: runs/ is gitignored, so the source run
+# directories below live on one machine only and every check that
+# needs them silently skipped in any other checkout.  This is the
+# tracked fallback source (AUDIT-2026-07-30 P6).
+#
+# Source run directories (weeks of symcount_fast / symtm compute):
+#   r90            n=1..33 (17 rows) <- runs/sym34/r90.out
+#   r180           n=1..34 (34 rows) <- runs/sym34/r180.out
+#   hmirror        n=1..34 (34 rows) <- runs/sym34/hmirror.out
+#   dmirror32      n=1..32 (32 rows) <- runs/sym32/dmirror.out
+#   dmirror33      n=1..33 (33 rows) <- runs/sym33/dmirror.out
+#   dmirror_strip  32 strips, 423 rows <- runs/sym32/dmirror.S*.out
+#
+# Extracted 2026-07-30 by scripts/bank_sym_counts.py at rev fe78c36.
+# r90/r180/hmirror are the 90-degree, 180-degree and axis-parallel
+# mirror fixed-point counts; dmirror is the diagonal mirror.
+# dmirror32 is the direct n<=32 column; dmirror33 is the T3 hybrid
+# (direct strips + pinned closed forms) and prefix-matches it.
+# r90 legitimately has no rows for n = 2,3 (mod 4): no 90-degree-fixed
+# animals exist there, so an absent row means exactly 0.
+r90 1 1
+r90 4 2
+r90 5 2
+r90 8 9
+r90 9 8
+r90 12 48
+r90 13 38
+r90 16 274
+r90 17 203
+r90 20 1630
+r90 21 1147
+r90 24 9995
+r90 25 6731
+r90 28 62587
+r90 29 40607
+r90 32 398124
+r90 33 250098
+r180 1 1
+r180 2 4
+r180 3 4
+r180 4 22
+r180 5 22
+r180 6 132
+r180 7 132
+r180 8 825
+r180 9 826
+r180 10 5292
+r180 11 5300
+r180 12 34546
+r180 13 34562
+r180 14 228312
+r180 15 228046
+r180 16 1522666
+r180 17 1518201
+r180 18 10226480
+r180 19 10178520
+r180 20 69068156
+r180 21 68627597
+r180 22 468615712
+r180 23 464877860
+r180 24 3191633441
+r180 25 3161384353
+r180 26 21807864380
+r180 27 21570502908
+r180 28 149423372035
+r180 29 147600215717
+r180 30 1026290399226
+r180 31 1012501939560
+r180 32 7063812264280
+r180 33 6960731505456
+r180 34 48710062997772
+hmirror 1 1
+hmirror 2 2
+hmirror 3 4
+hmirror 4 10
+hmirror 5 22
+hmirror 6 58
+hmirror 7 132
+hmirror 8 353
+hmirror 9 822
+hmirror 10 2216
+hmirror 11 5238
+hmirror 12 14192
+hmirror 13 33912
+hmirror 14 92180
+hmirror 15 222110
+hmirror 16 605076
+hmirror 17 1467631
+hmirror 18 4004454
+hmirror 19 9765524
+hmirror 20 26676346
+hmirror 21 65348341
+hmirror 22 178667766
+hmirror 23 439354208
+hmirror 24 1202042621
+hmirror 25 2965640141
+hmirror 26 8118079636
+hmirror 27 20086237186
+hmirror 28 55006721709
+hmirror 29 136445497555
+hmirror 30 373785638266
+hmirror 31 929270191286
+hmirror 32 2546382907164
+hmirror 33 6343327587938
+hmirror 34 17385821908346
+dmirror32 1 1
+dmirror32 2 2
+dmirror32 3 4
+dmirror32 4 10
+dmirror32 5 22
+dmirror32 6 56
+dmirror32 7 130
+dmirror32 8 335
+dmirror32 9 798
+dmirror32 10 2072
+dmirror32 11 5016
+dmirror32 12 13098
+dmirror32 13 32056
+dmirror32 14 84086
+dmirror32 15 207426
+dmirror32 16 546080
+dmirror32 17 1355253
+dmirror32 18 3578476
+dmirror32 19 8923786
+dmirror32 20 23620398
+dmirror32 21 59135295
+dmirror32 22 156845838
+dmirror32 23 393969068
+dmirror32 24 1046749467
+dmirror32 25 2636626551
+dmirror32 26 7015813156
+dmirror32 27 17714707000
+dmirror32 28 47198412763
+dmirror32 29 119426348641
+dmirror32 30 318558058108
+dmirror32 31 807550483468
+dmirror32 32 2156235549286
+dmirror33 1 1
+dmirror33 2 2
+dmirror33 3 4
+dmirror33 4 10
+dmirror33 5 22
+dmirror33 6 56
+dmirror33 7 130
+dmirror33 8 335
+dmirror33 9 798
+dmirror33 10 2072
+dmirror33 11 5016
+dmirror33 12 13098
+dmirror33 13 32056
+dmirror33 14 84086
+dmirror33 15 207426
+dmirror33 16 546080
+dmirror33 17 1355253
+dmirror33 18 3578476
+dmirror33 19 8923786
+dmirror33 20 23620398
+dmirror33 21 59135295
+dmirror33 22 156845838
+dmirror33 23 393969068
+dmirror33 24 1046749467
+dmirror33 25 2636626551
+dmirror33 26 7015813156
+dmirror33 27 17714707000
+dmirror33 28 47198412763
+dmirror33 29 119426348641
+dmirror33 30 318558058108
+dmirror33 31 807550483468
+dmirror33 32 2156235549286
+dmirror33 33 5475149862148
+dmirror_strip 1 1 1
+dmirror_strip 2 2 2
+dmirror_strip 2 3 2
+dmirror_strip 2 4 1
+dmirror_strip 3 3 2
+dmirror_strip 3 4 7
+dmirror_strip 3 5 10
+dmirror_strip 3 6 8
+dmirror_strip 3 7 6
+dmirror_strip 3 8 3
+dmirror_strip 3 9 1
+dmirror_strip 4 4 2
+dmirror_strip 4 5 10
+dmirror_strip 4 6 34
+dmirror_strip 4 7 56
+dmirror_strip 4 8 78
+dmirror_strip 4 9 88
+dmirror_strip 4 10 86
+dmirror_strip 4 11 68
+dmirror_strip 4 12 48
+dmirror_strip 4 13 26
+dmirror_strip 4 14 12
+dmirror_strip 4 15 4
+dmirror_strip 4 16 1
+dmirror_strip 5 5 2
+dmirror_strip 5 6 12
+dmirror_strip 5 7 54
+dmirror_strip 5 8 166
+dmirror_strip 5 9 349
+dmirror_strip 5 10 628
+dmirror_strip 5 11 984
+dmirror_strip 5 12 1339
+dmirror_strip 5 13 1659
+dmirror_strip 5 14 1806
+dmirror_strip 5 15 1794
+dmirror_strip 5 16 1574
+dmirror_strip 5 17 1252
+dmirror_strip 5 18 874
+dmirror_strip 5 19 550
+dmirror_strip 5 20 298
+dmirror_strip 5 21 144
+dmirror_strip 5 22 58
+dmirror_strip 5 23 20
+dmirror_strip 5 24 5
+dmirror_strip 5 25 1
+dmirror_strip 6 6 2
+dmirror_strip 6 7 12
+dmirror_strip 6 8 72
+dmirror_strip 6 9 264
+dmirror_strip 6 10 870
+dmirror_strip 6 11 2048
+dmirror_strip 6 12 4554
+dmirror_strip 6 13 8608
+dmirror_strip 6 14 15192
+dmirror_strip 6 15 24214
+dmirror_strip 6 16 35817
+dmirror_strip 6 17 48788
+dmirror_strip 6 18 61672
+dmirror_strip 6 19 72020
+dmirror_strip 6 20 78180
+dmirror_strip 6 21 78258
+dmirror_strip 6 22 72826
+dmirror_strip 6 23 62374
+dmirror_strip 6 24 49568
+dmirror_strip 6 25 36200
+dmirror_strip 6 26 24464
+dmirror_strip 6 27 15140
+dmirror_strip 6 28 8640
+dmirror_strip 6 29 4474
+dmirror_strip 6 30 2118
+dmirror_strip 6 31 892
+dmirror_strip 6 32 337
+dmirror_strip 7 7 2
+dmirror_strip 7 8 14
+dmirror_strip 7 9 80
+dmirror_strip 7 10 370
+dmirror_strip 7 11 1356
+dmirror_strip 7 12 4461
+dmirror_strip 7 13 11727
+dmirror_strip 7 14 29338
+dmirror_strip 7 15 64256
+dmirror_strip 7 16 134052
+dmirror_strip 7 17 256580
+dmirror_strip 7 18 465072
+dmirror_strip 7 19 790068
+dmirror_strip 7 20 1266568
+dmirror_strip 7 21 1918831
+dmirror_strip 7 22 2740832
+dmirror_strip 7 23 3707300
+dmirror_strip 7 24 4728423
+dmirror_strip 7 25 5707976
+dmirror_strip 7 26 6497456
+dmirror_strip 7 27 6992554
+dmirror_strip 7 28 7094685
+dmirror_strip 7 29 6800186
+dmirror_strip 7 30 6143540
+dmirror_strip 7 31 5241598
+dmirror_strip 7 32 4214736
+dmirror_strip 8 8 2
+dmirror_strip 8 9 14
+dmirror_strip 8 10 100
+dmirror_strip 8 11 434
+dmirror_strip 8 12 1968
+dmirror_strip 8 13 6800
+dmirror_strip 8 14 23210
+dmirror_strip 8 15 64286
+dmirror_strip 8 16 176614
+dmirror_strip 8 17 423868
+dmirror_strip 8 18 1001310
+dmirror_strip 8 19 2160726
+dmirror_strip 8 20 4544966
+dmirror_strip 8 21 8951460
+dmirror_strip 8 22 17050928
+dmirror_strip 8 23 30804668
+dmirror_strip 8 24 53554036
+dmirror_strip 8 25 88841858
+dmirror_strip 8 26 141440068
+dmirror_strip 8 27 215381534
+dmirror_strip 8 28 314329264
+dmirror_strip 8 29 438979468
+dmirror_strip 8 30 587078374
+dmirror_strip 8 31 751041540
+dmirror_strip 8 32 919496918
+dmirror_strip 9 9 2
+dmirror_strip 9 10 16
+dmirror_strip 9 11 108
+dmirror_strip 9 12 576
+dmirror_strip 9 13 2426
+dmirror_strip 9 14 10134
+dmirror_strip 9 15 34866
+dmirror_strip 9 16 119560
+dmirror_strip 9 17 346823
+dmirror_strip 9 18 1007536
+dmirror_strip 9 19 2593096
+dmirror_strip 9 20 6654055
+dmirror_strip 9 21 15667421
+dmirror_strip 9 22 36505776
+dmirror_strip 9 23 79864760
+dmirror_strip 9 24 171609004
+dmirror_strip 9 25 351138538
+dmirror_strip 9 26 701326844
+dmirror_strip 9 27 1344737250
+dmirror_strip 9 28 2505717276
+dmirror_strip 9 29 4501536437
+dmirror_strip 9 30 7836685468
+dmirror_strip 9 31 13178999216
+dmirror_strip 9 32 21440576313
+dmirror_strip 10 10 2
+dmirror_strip 10 11 16
+dmirror_strip 10 12 132
+dmirror_strip 10 13 650
+dmirror_strip 10 14 3360
+dmirror_strip 10 15 12908
+dmirror_strip 10 16 53134
+dmirror_strip 10 17 177898
+dmirror_strip 10 18 620592
+dmirror_strip 10 19 1836888
+dmirror_strip 10 20 5587976
+dmirror_strip 10 21 15027768
+dmirror_strip 10 22 41098964
+dmirror_strip 10 23 102629272
+dmirror_strip 10 24 258136124
+dmirror_strip 10 25 606727444
+dmirror_strip 10 26 1424140928
+dmirror_strip 10 27 3173797864
+dmirror_strip 10 28 7011815074
+dmirror_strip 10 29 14862486046
+dmirror_strip 10 30 31045588430
+dmirror_strip 10 31 62627618152
+dmirror_strip 10 32 123944893336
+dmirror_strip 11 11 2
+dmirror_strip 11 12 18
+dmirror_strip 11 13 140
+dmirror_strip 11 14 844
+dmirror_strip 11 15 3970
+dmirror_strip 11 16 18536
+dmirror_strip 11 17 69692
+dmirror_strip 11 18 276544
+dmirror_strip 11 19 920588
+dmirror_strip 11 20 3215697
+dmirror_strip 11 21 9692357
+dmirror_strip 11 22 30329642
+dmirror_strip 11 23 84380322
+dmirror_strip 11 24 241290905
+dmirror_strip 11 25 629836097
+dmirror_strip 11 26 1674402720
+dmirror_strip 11 27 4149005896
+dmirror_strip 11 28 10384555497
+dmirror_strip 11 29 24610010476
+dmirror_strip 11 30 58482904914
+dmirror_strip 11 31 133106260872
+dmirror_strip 11 32 301886436136
+dmirror_strip 12 12 2
+dmirror_strip 12 13 18
+dmirror_strip 12 14 168
+dmirror_strip 12 15 930
+dmirror_strip 12 16 5376
+dmirror_strip 12 17 22658
+dmirror_strip 12 18 102968
+dmirror_strip 12 19 371144
+dmirror_strip 12 20 1456468
+dmirror_strip 12 21 4773258
+dmirror_strip 12 22 16784502
+dmirror_strip 12 23 50902900
+dmirror_strip 12 24 163080932
+dmirror_strip 12 25 463325158
+dmirror_strip 12 26 1372755550
+dmirror_strip 12 27 3694801422
+dmirror_strip 12 28 10260510040
+dmirror_strip 12 29 26402604140
+dmirror_strip 12 30 69463133588
+dmirror_strip 12 31 172031021482
+dmirror_strip 12 32 432197052824
+dmirror_strip 13 13 2
+dmirror_strip 13 14 20
+dmirror_strip 13 15 176
+dmirror_strip 13 16 1184
+dmirror_strip 13 17 6172
+dmirror_strip 13 18 31838
+dmirror_strip 13 19 129758
+dmirror_strip 13 20 562180
+dmirror_strip 13 21 1994530
+dmirror_strip 13 22 7675652
+dmirror_strip 13 23 25007580
+dmirror_strip 13 24 87861050
+dmirror_strip 13 25 268041791
+dmirror_strip 13 26 871168020
+dmirror_strip 13 27 2514978842
+dmirror_strip 13 28 7642851064
+dmirror_strip 13 29 21057842203
+dmirror_strip 13 30 60434670744
+dmirror_strip 13 31 160067696458
+dmirror_strip 13 32 437597065466
+dmirror_strip 14 14 2
+dmirror_strip 14 15 20
+dmirror_strip 14 16 208
+dmirror_strip 14 17 1282
+dmirror_strip 14 18 8188
+dmirror_strip 14 19 37754
+dmirror_strip 14 20 187640
+dmirror_strip 14 21 726240
+dmirror_strip 14 22 3084010
+dmirror_strip 14 23 10691266
+dmirror_strip 14 24 40799356
+dmirror_strip 14 25 131602388
+dmirror_strip 14 26 463231070
+dmirror_strip 14 27 1414016924
+dmirror_strip 14 28 4650860624
+dmirror_strip 14 29 13553191774
+dmirror_strip 14 30 42029471236
+dmirror_strip 14 31 117679848048
+dmirror_strip 14 32 346778428628
+dmirror_strip 15 15 2
+dmirror_strip 15 16 22
+dmirror_strip 15 17 216
+dmirror_strip 15 18 1604
+dmirror_strip 15 19 9194
+dmirror_strip 15 20 51958
+dmirror_strip 15 21 229124
+dmirror_strip 15 22 1077080
+dmirror_strip 15 23 4070978
+dmirror_strip 15 24 16834786
+dmirror_strip 15 25 57679408
+dmirror_strip 15 26 217562702
+dmirror_strip 15 27 698173444
+dmirror_strip 15 28 2453787785
+dmirror_strip 15 29 7497864321
+dmirror_strip 15 30 24840191816
+dmirror_strip 15 31 72895448540
+dmirror_strip 15 32 229366773306
+dmirror_strip 16 16 2
+dmirror_strip 16 17 22
+dmirror_strip 16 18 252
+dmirror_strip 16 19 1714
+dmirror_strip 16 20 11972
+dmirror_strip 16 21 60122
+dmirror_strip 16 22 324404
+dmirror_strip 16 23 1348012
+dmirror_strip 16 24 6163510
+dmirror_strip 16 25 22634242
+dmirror_strip 16 26 92230844
+dmirror_strip 16 27 311558226
+dmirror_strip 16 28 1167685708
+dmirror_strip 16 29 3722211556
+dmirror_strip 16 30 13082184392
+dmirror_strip 16 31 39927292696
+dmirror_strip 16 32 133080044518
+dmirror_strip 17 17 2
+dmirror_strip 17 18 24
+dmirror_strip 17 19 260
+dmirror_strip 17 20 2112
+dmirror_strip 17 21 13212
+dmirror_strip 17 22 81146
+dmirror_strip 17 23 385900
+dmirror_strip 17 24 1957050
+dmirror_strip 17 25 7882488
+dmirror_strip 17 26 34897132
+dmirror_strip 17 27 125997326
+dmirror_strip 17 28 504999086
+dmirror_strip 17 29 1691059606
+dmirror_strip 17 30 6290407196
+dmirror_strip 17 31 19969890980
+dmirror_strip 17 32 70087146202
+dmirror_strip 18 18 2
+dmirror_strip 18 19 24
+dmirror_strip 18 20 300
+dmirror_strip 18 21 2234
+dmirror_strip 18 22 16920
+dmirror_strip 18 23 92058
+dmirror_strip 18 24 535548
+dmirror_strip 18 25 2384194
+dmirror_strip 18 26 11680704
+dmirror_strip 18 27 45471494
+dmirror_strip 18 28 197249736
+dmirror_strip 18 29 699497494
+dmirror_strip 18 30 2772974166
+dmirror_strip 18 31 9199686548
+dmirror_strip 18 32 34054323140
+dmirror_strip 19 19 2
+dmirror_strip 19 20 26
+dmirror_strip 19 21 308
+dmirror_strip 19 22 2716
+dmirror_strip 19 23 18418
+dmirror_strip 19 24 122066
+dmirror_strip 19 25 623456
+dmirror_strip 19 26 3391450
+dmirror_strip 19 27 14534708
+dmirror_strip 19 28 68610978
+dmirror_strip 19 29 261259360
+dmirror_strip 19 30 1109899764
+dmirror_strip 19 31 3887641888
+dmirror_strip 19 32 15240176088
+dmirror_strip 20 20 2
+dmirror_strip 20 21 26
+dmirror_strip 20 22 352
+dmirror_strip 20 23 2850
+dmirror_strip 20 24 23240
+dmirror_strip 20 25 136274
+dmirror_strip 20 26 849472
+dmirror_strip 20 27 4038908
+dmirror_strip 20 28 21099126
+dmirror_strip 20 29 86976768
+dmirror_strip 20 30 400268096
+dmirror_strip 20 31 1491326342
+dmirror_strip 20 32 6239977158
+dmirror_strip 21 21 2
+dmirror_strip 21 22 28
+dmirror_strip 21 23 360
+dmirror_strip 21 24 3424
+dmirror_strip 21 25 25020
+dmirror_strip 21 26 177830
+dmirror_strip 21 27 971384
+dmirror_strip 21 28 5637826
+dmirror_strip 21 29 25646846
+dmirror_strip 21 30 128546664
+dmirror_strip 21 31 515835804
+dmirror_strip 21 32 2315827412
+dmirror_strip 22 22 2
+dmirror_strip 22 23 28
+dmirror_strip 22 24 408
+dmirror_strip 22 25 3570
+dmirror_strip 22 26 31156
+dmirror_strip 22 27 195930
+dmirror_strip 22 28 1301664
+dmirror_strip 22 29 6587106
+dmirror_strip 22 30 36525440
+dmirror_strip 22 31 159127396
+dmirror_strip 22 32 774120254
+dmirror_strip 23 23 2
+dmirror_strip 23 24 30
+dmirror_strip 23 25 416
+dmirror_strip 23 26 4244
+dmirror_strip 23 27 33242
+dmirror_strip 23 28 252030
+dmirror_strip 23 29 1466460
+dmirror_strip 23 30 9038026
+dmirror_strip 23 31 43521300
+dmirror_strip 23 32 230698912
+dmirror_strip 24 24 2
+dmirror_strip 24 25 30
+dmirror_strip 24 26 468
+dmirror_strip 24 27 4402
+dmirror_strip 24 28 40908
+dmirror_strip 24 29 274666
+dmirror_strip 24 30 1935724
+dmirror_strip 24 31 10390812
+dmirror_strip 24 32 60908914
+dmirror_strip 25 25 2
+dmirror_strip 25 26 32
+dmirror_strip 25 27 476
+dmirror_strip 25 28 5184
+dmirror_strip 25 29 43324
+dmirror_strip 25 30 348770
+dmirror_strip 25 31 2153668
+dmirror_strip 25 32 14036410
+dmirror_strip 26 26 2
+dmirror_strip 26 27 32
+dmirror_strip 26 28 532
+dmirror_strip 26 29 5354
+dmirror_strip 26 30 52752
+dmirror_strip 26 31 376634
+dmirror_strip 26 32 2804452
+dmirror_strip 27 27 2
+dmirror_strip 27 28 34
+dmirror_strip 27 29 540
+dmirror_strip 27 30 6252
+dmirror_strip 27 31 55522
+dmirror_strip 27 32 472698
+dmirror_strip 28 28 2
+dmirror_strip 28 29 34
+dmirror_strip 28 30 600
+dmirror_strip 28 31 6434
+dmirror_strip 28 32 66960
+dmirror_strip 29 29 2
+dmirror_strip 29 30 36
+dmirror_strip 29 31 608
+dmirror_strip 29 32 7456
+dmirror_strip 30 30 2
+dmirror_strip 30 31 36
+dmirror_strip 30 32 672
+dmirror_strip 31 31 2
+dmirror_strip 31 32 38
+dmirror_strip 32 32 2
