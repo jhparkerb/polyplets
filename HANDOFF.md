@@ -1,4 +1,4 @@
-# HANDOFF — live state (updated 2026-07-28)
+# HANDOFF — live state (updated 2026-07-30)
 
 ## PROJECT CLOSES AT a(40) — FINAL TERM LANDED
 **a(40) = 56749893611764175164545926946127 BANKED 2026-07-28**
@@ -39,6 +39,56 @@ Remaining close-out:
    k≤16→18/19, λ para, Split truncation, Reproducibility section).
 4. Publish prep continues (Leiden easy-fixes committed cca0c30;
    repo/blog/OEIS sequencing is jasonp's).
+
+## AUDIT-2026-07-30 close-out campaign — LANDED (2026-07-30)
+Third adversarial campaign (after 2026-06-28 and 2026-07-13), run at
+publish: five parallel read-only audits (Second Wind C++ data path,
+orchestrator resume/phasing/fastmap, diagonal injection, publish
+artifacts/checkers, Lean + strip second source), ~35 findings.
+Dispositions and the headline write-ups: **`AUDIT-2026-07-30.md`**.
+Fix batches A/B/C/D all landed on master (`git log --grep
+AUDIT-2026-07-30`). Bottom line unchanged by any of it: **no banked
+value is wrong.**
+
+What the campaign actually bought, in one line each:
+- fail-closed reader/finalize (the one HIGH engine fix, E1);
+- `verify_technical_report.py` no longer silently skips 42 of 78 Table 2
+  cells (P1), and its pole check now covers 342 in-onset cells;
+- the recorded a(40) recipe pins `--max-diag-k 18`, so a re-run still
+  performs the real H21 sweep instead of injecting it from P_19 (D1);
+- holdout reporting stopped grading formulas against their own output
+  (D2/D3);
+- **a(40) corroboration by mass is now stated** in
+  `results/ns_a40/PROVENANCE.md` — H11-19 is 81.3% of the term and has
+  no independent corroboration. That is what the T2⁻ grade means.
+- the strip second source is scoped honestly (same union-find rule as
+  `core/transition.h`; the Python "twin" is a port; coverage is 67.6%
+  of cells honestly counted, not 90.7%);
+- Lean: the Shape/Peel axiom claims are `#guard_msgs`-enforced, the
+  four "outside the default build" statements corrected, a build
+  receipt banked.
+
+One deviation worth knowing: the "monomial integer coefficients of P_k,
+observed k<=17" open item in `docs/proofs/diagonal-law.md` /
+`grand-form.md` was measured FALSE (P_k's monomial coefficients have
+denominator dividing k! at every wired level; 25^k/k! forces it) and is
+retracted, not bumped.
+
+**IN PROGRESS on dalby: strip N=40 second-source run.** Launched
+2026-07-30, tmux window `strip40`, ~8.3 h predicted, log
+`results/strip_C14_n40_run.log`. Purpose: the banked strip run stops at
+n=36, so it second-sources **0%** of a(37)-a(40) by mass. Extending it
+to N=40 covers heights H<=14 on those rows — **53.8% / 50.8% / 47.9% /
+45.0%** of a(37)/a(38)/a(39)/a(40) respectively. This is the single
+highest-value remaining validation action the campaign found, and it is
+one command with no new code. When it lands, update
+`results/strip-engine.md`'s mass table and
+`results/ns_a40/PROVENANCE.md`'s corroboration section.
+
+Still jasonp's, unchanged: the two `paper/technical-report.tex`
+placeholders (a(40) appears as 5.7e31 in the abstract and Table `tab:an`
+— `verify_technical_report.py` reports exactly those 2 failures out of
+781 checks, and nothing else).
 
 ## Recently banked
 - **a(40) run mechanics (2026-07-25..28, dalby)**: first production
