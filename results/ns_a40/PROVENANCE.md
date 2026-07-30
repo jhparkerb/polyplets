@@ -25,6 +25,23 @@ run as solo phases with bounded working sets.
 - Real sweeps H3-H21; H22-H40 via wired P_k closed forms (k = 40-H <=
   18). H21 is the tallest real sweep of the whole project.
 
+## Reproduction note (read before re-running)
+
+The original run predates P_19. Since P_19 was wired (`9671e94`, after
+a(40) was banked) the k-fence reaches 19, so an unrestricted re-run of
+phase C would **inject** H21 from P_19 instead of sweeping it — P_19
+being the formula fitted to that very cell. The value is provably
+unchanged (the closed-form H21 strip was checked against the real sweep
+and matches on all 20 rows), but the run's strongest validation
+artifact, the P_0..P_18 mass holdout below, would silently fail to
+regenerate.
+
+`scripts/dalby_term.sh` therefore pins `--max-diag-k 18` on all three
+phases for N >= 40 (`b2fde69`, AUDIT-2026-07-30 D1). Reproducing this
+run at HEAD keeps H21 a real 36.4-hour sweep. Anyone re-running by hand
+must pass the same cap; anyone deliberately re-running *without* it gets
+the same a(40) but must not describe the result as a holdout.
+
 ## Incident: Zero Harvest (and recovery)
 
 The first phase C launch died at t=0: `--resume` was passed for a phase
@@ -75,10 +92,17 @@ and the recovery carries no remaining caveat.**
 
 ## Validation
 
-- a(1)..a(20) match `fixtures/b006770.txt` exactly; a(21), a(26)..a(39)
-  match the banked plain-format triangles exactly (a(22)-a(25) banked in
-  triangle form only; their combine values match the recorded terms).
-  A40_VALIDATE_PASS.
+- a(1)..a(20) match `fixtures/b006770.txt` exactly; a(21)..a(39) match
+  the banked artifacts (`results/ns_a$n/a_n.txt` where one exists —
+  a(23), a(24) — otherwise the banked triangle for that run; n=22's
+  independent Redelmeier row lives at
+  `results/redelmeier_row22/combined.txt`, and a(25) is carried by
+  `results/ns_a25/RESULT.md` + `swept_rows.txt`). A40_VALIDATE_PASS. The
+  chain check is now counted rather than asserted: the validate block
+  reports its own coverage and fails on a gap (`dbb421a`,
+  AUDIT-2026-07-30 P4), and a labeled post-hoc re-run of it over the
+  banked artifacts is at `results/ns_a40/validate-2026-07-30.log`
+  (`7019ecb`, P5) — **chain coverage: 19/19**, no skips.
 - T(40,40) = 3^39 exactly; T(40,39) = 955 * 3^36 with 955 = P_1(40).
 - **Mass P_k holdout certification: the real H21 sweep reproduces
   a(39)'s closed-form-injected H21 shard exactly on every row n=21..39
@@ -88,6 +112,32 @@ and the recovery carries no remaining caveat.**
   (also the recovery certification above).
 - Growth a(40)/a(39) = 6.9352 (6.9212, 6.9261, 6.9308, 6.9352 — smooth
   approach to lambda ~= 7.11).
+
+## Corroboration by mass
+
+Confidence tiers are usually quoted per *term*; for a(40) the useful
+question is what fraction of the 5.67e31 polyplets is corroborated by
+something other than the one production sweep that produced it. Shares
+are of a(40) itself (recomputed from `perheight/h*.out`, row n=40):
+
+| height band | share of a(40) | independent corroboration |
+|---|---|---|
+| H1-10 | 7.52% | yes — matches the decorrelated fixed-height GFs expanded to n=40 (355 cells) |
+| H11-19 | **81.34%** | **none available** |
+| H20 | 4.16% | yes — byte-identical standalone re-sweep (`recheck/h20.out`) |
+| H21 | 2.84% | real sweep, but this is P_19's second fit point; no holdout is possible at any n |
+| H22-40 | 4.14% | closed forms P_0..P_18, every one with a passed real-swept holdout |
+
+So a(40)'s bulk — four fifths of it — rests on the single kink-carry
+production sweep of heights 11-19. That is what the README's T2- grade
+means, quantified. Nothing here suggests a wrong value (see Validation
+above); it states the denominator honestly.
+
+Second-sourcing by the independent strip transfer-matrix engine
+(`results/strip-engine.md`) is bounded by its reach: as banked (the
+H<=14, n<=36 run) it covers 9.1% of a(37), 5.5% of a(38), 2.5% of
+a(39) and ~0% of a(40). A strip run extended to N=40 was launched
+2026-07-30 and, when it lands, lifts those to roughly 45-54%.
 
 ## Notes
 
