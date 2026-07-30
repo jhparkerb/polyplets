@@ -34,12 +34,16 @@
 # consistent). This script runs overlap mode, whose height-set resume was
 # never affected anyway. Gated by TestKinkResumeMidColumn +
 # overlap_resume_test.go. Resume is safe again.
+#
+# VALIDATE_ONLY=1 [RUNDIR=...] dalby_term.sh N runs the post-run validation
+# block against an existing $RUNDIR/a_n.txt and exits -- no sweep, no combine.
+# It exists so the chain check can be exercised without an N-hour run
+# (AUDIT-2026-07-30 P4).
 set -e
 cd ~/src/polyominoes
 N="$1"
-[ -n "$N" ] || { echo "usage: dalby_term.sh N [--resume]"; exit 2; }
-RUNDIR=runs/ns_a${N}/dalby
-mkdir -p "$RUNDIR/spill" runs/ns_a${N}/perheight
+[ -n "$N" ] || { echo "usage: dalby_term.sh N [--resume]   (or VALIDATE_ONLY=1 dalby_term.sh N)"; exit 2; }
+RUNDIR=${RUNDIR:-runs/ns_a${N}/dalby}
 
 RESUME_FLAG=""
 [ "$2" = "--resume" ] && RESUME_FLAG="--resume"
@@ -111,6 +115,87 @@ echo "rev: $(git rev-parse --short HEAD)"
 # are now the ENGINE DEFAULTS (baked into orchestrate) -- no longer passed
 # here. --overlap-heights "$N" (all owned heights) stays: it is run-specific.
 # The commentary above records WHY those values were chosen.
+# banked_value N -- resolve n's previously banked a(n), setting BANK (the
+# value, "" if none found) and BANK_SRC (the file it came from).
+#
+# AUDIT-2026-07-30 P4 "Ungated Chain": the chain check used to consult ONLY
+# results/ns_a{n}/triangle.txt in 2-column form, print "a(n): no banked value"
+# and continue -- never counting coverage, never failing. At N=40 it silently
+# skipped n=22,23,24,25 (four of the nineteen chain links) even though every
+# one of them IS banked, just in a different file. Sources, in order:
+#   results/ns_a{n}/a_n.txt              (ns_a23, ns_a24)
+#   results/ns_a{n}/triangle.txt         (2-column form: a21, a26..a39)
+#   results/redelmeier_row{n}/combined.txt  (n=22, no ns_a22 dir exists)
+#   results/b006770_upload.txt           (the banked A006770 chain; the only
+#                                         source for n=25, whose run banked a
+#                                         provenance triangle, not a row file)
+# Only the plain "n a(n)" 2-column form is read: the detailed n/H/T(n,H)
+# triangles would need a bigint row-sum, and awk's $3+=... silently loses
+# precision past ~16 digits (confirmed: a23 comes out ...768 instead of the
+# correct ...732). A file in any other shape is skipped, not mis-summed.
+banked_value() {
+  local n=$1 f
+  BANK=""; BANK_SRC=""
+  for f in "results/ns_a${n}/a_n.txt" \
+           "results/ns_a${n}/triangle.txt" \
+           "results/redelmeier_row${n}/combined.txt" \
+           "results/b006770_upload.txt"; do
+    [ -f "$f" ] || continue
+    [ "$(awk '/^[[:space:]]*#/{next} NF{print NF; exit}' "$f")" = "2" ] || continue
+    BANK=$(awk -v n="$n" '$1==n{print $2; exit}' "$f")
+    if [ -n "$BANK" ]; then BANK_SRC=$f; return 0; fi
+  done
+  return 0
+}
+
+# validate_chain compares this run's a_n.txt against the b-file (n<=20) and
+# every banked term (21..N-1), then reports coverage. An uncovered link is a
+# FAILURE now, not a printed shrug: the whole point of recomputing the chain
+# is that a fresh a(N) run re-derives every earlier term, and a link nobody
+# compared is a link nobody checked.
+validate_chain() {
+  local MISMATCH=0 COVERED=0 LINKS=0 n got known aN aP
+  echo "=== validate a(1)-a(20) vs b-file ==="
+  for n in $(seq 1 20); do
+    got=$(awk -v n=$n '$1==n{print $2}' "$RUNDIR/a_n.txt")
+    known=$(awk -v n=$n '$1==n{print $2}' fixtures/b006770.txt)
+    if [ "$got" = "$known" ]; then echo "a($n)=$got OK"; else echo "a($n)=$got MISMATCH (b=$known)"; MISMATCH=1; fi
+  done
+  echo "=== validate a(21)-a($((N-1))) vs banked ==="
+  for n in $(seq 21 $((N-1))); do
+    LINKS=$((LINKS+1))
+    got=$(awk -v n=$n '$1==n{print $2}' "$RUNDIR/a_n.txt")
+    banked_value "$n"
+    if [ -z "$BANK" ]; then
+      echo "a($n): NO BANKED VALUE FOUND -- chain link UNCHECKED"
+      MISMATCH=1
+      continue
+    fi
+    COVERED=$((COVERED+1))
+    if [ "$got" = "$BANK" ]; then
+      echo "a($n)=$got OK [$BANK_SRC]"
+    else
+      echo "a($n)=$got MISMATCH (banked=$BANK from $BANK_SRC)"
+      MISMATCH=1
+    fi
+  done
+  echo "chain coverage: $COVERED/$LINKS"
+
+  aN=$(awk -v n=$N '$1==n{print $2}' "$RUNDIR/a_n.txt")
+  aP=$(awk -v n=$((N-1)) '$1==n{print $2}' "$RUNDIR/a_n.txt")
+  echo "a($N) = $aN"
+  python3 -c "print('growth a${N}/a$((N-1)) =', $aN/$aP)"
+  if [ "$MISMATCH" = 0 ]; then echo "A${N}_VALIDATE_PASS"; else echo "A${N}_VALIDATE_FAIL"; fi
+  echo "A${N}_DONE"
+  return "$MISMATCH"
+}
+
+if [ "${VALIDATE_ONLY:-0}" = "1" ]; then
+  validate_chain
+  exit
+fi
+
+mkdir -p "$RUNDIR/spill" runs/ns_a${N}/perheight
 T0=$(date +%s)
 # PHASED EXECUTION for N>=40 (Overcommit Hydra, results/overcommit-hydra.md):
 # maxn>=40 with full --overlap-heights does NOT fit dalby's 125GB — worker
@@ -184,35 +269,4 @@ echo "=== a${N} run exited rc=$RC after $((T1-T0))s : $(date -Iseconds) ==="
 echo "=== combine ==="
 ./build/ns/combine -in runs/ns_a${N}/perheight -maxn "$N" -out "$RUNDIR/a_n.txt" 2>&1 | tee "$RUNDIR/combine.log"
 
-MISMATCH=0
-echo "=== validate a(1)-a(20) vs b-file ==="
-for n in $(seq 1 20); do
-  got=$(awk -v n=$n '$1==n{print $2}' "$RUNDIR/a_n.txt")
-  known=$(awk -v n=$n '$1==n{print $2}' fixtures/b006770.txt)
-  if [ "$got" = "$known" ]; then echo "a($n)=$got OK"; else echo "a($n)=$got MISMATCH (b=$known)"; MISMATCH=1; fi
-done
-echo "=== validate a(21)-a($((N-1))) vs banked ==="
-for n in $(seq 21 $((N-1))); do
-  got=$(awk -v n=$n '$1==n{print $2}' "$RUNDIR/a_n.txt")
-  bank=""
-  # Not every n has its own results/ns_a{n}/ dir (e.g. a22 has none). And a
-  # few (ns_a23, ns_a24) store the detailed n/H/T(n,H) triangle instead of
-  # the plain "n a(n)" format -- summing that safely needs bigint (awk's
-  # $3+=... silently loses precision past ~16 digits, confirmed: a23 comes
-  # out ...768 instead of the correct ...732), so only trust the plain
-  # 2-column format here; anything else skips gracefully rather than risk a
-  # false MISMATCH from a precision-lossy sum, or `set -e` tripping on a
-  # missing file.
-  if [ -f "results/ns_a${n}/triangle.txt" ] && [ "$(awk 'NR==1{print NF; exit}' "results/ns_a${n}/triangle.txt")" = "2" ]; then
-    bank=$(awk -v n=$n '$1==n{print $2}' "results/ns_a${n}/triangle.txt")
-  fi
-  [ -z "$bank" ] && { echo "a($n): no banked value"; continue; }
-  if [ "$got" = "$bank" ]; then echo "a($n)=$got OK"; else echo "a($n)=$got MISMATCH (banked=$bank)"; MISMATCH=1; fi
-done
-
-aN=$(awk -v n=$N '$1==n{print $2}' "$RUNDIR/a_n.txt")
-aP=$(awk -v n=$((N-1)) '$1==n{print $2}' "$RUNDIR/a_n.txt")
-echo "a($N) = $aN"
-python3 -c "print('growth a${N}/a$((N-1)) =', $aN/$aP)"
-if [ "$MISMATCH" = 0 ]; then echo "A${N}_VALIDATE_PASS"; else echo "A${N}_VALIDATE_FAIL"; fi
-echo "A${N}_DONE"
+validate_chain
