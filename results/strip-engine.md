@@ -127,7 +127,11 @@ H<=14 **and n<=36**, so it touches no cell of rows 37-40 at all:
 | a(40) | 0% | 45.0% |
 
 (right-hand column = share of that row's mass in heights H<=14, recomputed
-from `results/ns_a40/perheight/h*.out`.) The strip run stopped four terms
+from `results/ns_a40/perheight/h*.out`.) Do not confuse this with the
+**holdout-confirmed** mass (9.1% / 5.5% / 2.5% / 0.0% for a(37)-a(40)),
+which is a different and unrelated quantity — closed-form cells later
+reached by a real sweep, tabulated in `results/ns_a40/PROVENANCE.md`. The
+strip run stopped four terms
 short of the close, and the mass lives in the tall middle heights. An N=40
 strip run was launched 2026-07-30 (in progress;
 `results/strip_C14_n40_run.log`) and delivers the right-hand column. The

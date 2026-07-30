@@ -133,7 +133,32 @@ production sweep of heights 11-19. That is what the README's T2- grade
 means, quantified. Nothing here suggests a wrong value (see Validation
 above); it states the denominator honestly.
 
-Second-sourcing by the independent strip transfer-matrix engine
+### Holdout-confirmed mass, a(35)..a(40)
+
+The same accounting applied to the closing terms answers a sharper
+question: how much of each term did a *closed form predict first and a
+later real sweep then confirm*? Those are the cells in closed-form
+territory (k = n-H <= 18, the shipped fence) that the a(40) run's real
+sweeps (H <= 21) actually reach:
+
+| term | holdout-confirmed mass |
+|---|---|
+| a(35) | 18.8% |
+| a(36) | 13.5% |
+| a(37) | 9.1% |
+| a(38) | 5.5% |
+| a(39) | 2.5% |
+| a(40) | **0.0%** |
+
+It decays to exactly zero at a(40) for a structural reason, not a
+sloppy one: a(40)'s closed-form cells start at H=22, above every real
+sweep that will ever exist, because the sequence closes here. No later
+run can confirm them. This is the T2- grade from the other side — the
+same fact as "H21 is P_19's fit point" in the table above.
+
+### Strip second source
+
+The independent strip transfer-matrix engine
 (`results/strip-engine.md`) is bounded by its reach. As banked, that run
 is H<=14 and **n<=36**, so it touches no cell of rows 37-40: the strip
 second-sources **0%** of a(37), a(38), a(39) and a(40). The strip run

@@ -71,8 +71,17 @@ What the campaign actually bought, in one line each:
 One deviation worth knowing: the "monomial integer coefficients of P_k,
 observed k<=17" open item in `docs/proofs/diagonal-law.md` /
 `grand-form.md` was measured FALSE (P_k's monomial coefficients have
-denominator dividing k! at every wired level; 25^k/k! forces it) and is
-retracted, not bumped.
+denominator dividing k! at every wired level; 25^k/k! forces it). It is
+replaced by the true statement behind it — **k!·P_k ∈ ℤ[n]**, observed at
+all 19 wired levels, load-bearing for `diagCoeffTable`'s representation
+and the k!-divide guard, and not proved.
+
+**Holdout-confirmed mass** (new, `results/ns_a40/PROVENANCE.md`): the
+share of each term that a closed form predicted first and a later real
+sweep then confirmed — a(35) 18.8%, a(36) 13.5%, a(37) 9.1%, a(38) 5.5%,
+a(39) 2.5%, **a(40) 0.0%**. Zero at a(40) structurally: its closed-form
+cells start at H=22, above every real sweep that will ever exist. Do not
+confuse this with strip coverage; they are different quantities.
 
 **IN PROGRESS on dalby: strip N=40 second-source run.** Launched
 2026-07-30, tmux window `strip40`, ~8.3 h predicted, log
