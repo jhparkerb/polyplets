@@ -31,6 +31,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
         ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan \
+        ns-gate-frontier-zstd \
         ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
@@ -170,7 +171,7 @@ build/ns:
 # for T(n,H) and the polyplet totals) has an automatic correctness gate: its hot
 # kernel took a burst of perf work (L1..L4, dropped reachedUndo) with no routine
 # gate covering it — a miscount would otherwise rely on a dev running `make gates`.
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan gate-g2
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-frontier-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan gate-g2
 
 # Fast gate subset for the pre-push hook (.githooks/pre-push). Targets well under
 # 30s: the full Go suite (guards / combine / runcat / closed-form / resume) plus
@@ -274,6 +275,23 @@ ns-gate-runfile: build/ns/gate_runfile
 
 build/ns/gate_runfile: test/gate_runfile.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
+
+# Frontier-compression gate (E3 "Unlit Levers"): the block-framed compression-2
+# format that produced the banked a(39)/a(40) frontier had ZERO gate coverage —
+# every gate ran with POLY_FRONTIER_ZSTD unset, i.e. plain map/merge outputs, so
+# the production configuration was exercised only by the production runs
+# themselves. Runs the format gate and the file-backed kink stage gate with
+# frontier compression ON at the default frame size AND at a deliberately tiny
+# non-power-of-two frame (7 records: many frames, frame boundaries landing
+# mid-index-stride, exercising the seek-into-frame path hard), then the
+# kink-vs-column sweep equivalence through the REAL worker binaries with
+# compression on.
+ns-gate-frontier-zstd: build/ns/gate_runfile build/ns/gate_kink_stage_file build/ns/map_worker build/ns/merge_worker
+	POLY_FRONTIER_ZSTD=1 ./build/ns/gate_runfile
+	POLY_FRONTIER_ZSTD=1 ./build/ns/gate_kink_stage_file
+	POLY_FRONTIER_ZSTD=1 POLY_FRONTIER_ZSTD_BLOCK=7 ./build/ns/gate_runfile
+	POLY_FRONTIER_ZSTD=1 POLY_FRONTIER_ZSTD_BLOCK=7 ./build/ns/gate_kink_stage_file
+	POLY_FRONTIER_ZSTD=1 go test ./orchestrator/ -run TestKinkSweepMatchesColumnSweep -count=1
 
 # Spill-compression gate: zstd round-trip + POLYRUN 2/compression 1 header +
 # on-disk shrink; then a NO-POLY_ZSTD build must REJECT the compressed file.
