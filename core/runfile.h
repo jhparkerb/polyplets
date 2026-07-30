@@ -225,6 +225,30 @@ inline bool hexToBytes(const std::string& hex, uint8_t* b, int n) {
   return true;
 }
 
+// FAIL-CLOSED key-bound parse (E4 "Load-Bearing Label"). Every range filter in
+// the engine was written as `has_lo = !lo_hex.empty() && hexToBytes(...)`, so a
+// bound that FAILED to parse (wrong length for this keyLen, a non-hex byte)
+// silently disabled the filter. Two distinct wrong answers follow:
+//   - mergeRunFiles stamps lo_hex/hi_hex into the OUTPUT header regardless, so
+//     the file advertises a range it did not honor; pruneByBounds then trusts
+//     the stamp and can skip that file for keys it actually holds;
+//   - a map unit with its filter disabled processes keys belonging to OTHER
+//     units, and the merge combines both copies — a double count.
+// Neither is detectable downstream, so an unparseable non-empty bound aborts.
+// Empty ("open end") is still the legitimate way to say "no bound".
+inline bool parseKeyBound(const std::string& hex, uint8_t* out, int keyLen,
+                          const char* who, const char* which) {
+  if (hex.empty()) return false;
+  if (!hexToBytes(hex, out, keyLen)) {
+    std::fprintf(stderr,
+                 "%s: unparseable %s key bound \"%s\" for keyLen %d — refusing "
+                 "to run with the range filter silently disabled\n",
+                 who, which, hex.c_str(), keyLen);
+    std::exit(1);
+  }
+  return true;
+}
+
 // ─── FNV-1a-64 ───────────────────────────────────────────────────────────────
 
 static constexpr uint64_t FNV_OFFSET = 14695981039346656037ULL;
@@ -1073,8 +1097,8 @@ std::pair<size_t, size_t> mergeRunFiles(
   if (keyLen == 0) keyLen = H + 2;
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};
-  bool has_lo = !lo_hex.empty() && hexToBytes(lo_hex, lo_sig, keyLen);
-  bool has_hi = !hi_hex.empty() && hexToBytes(hi_hex, hi_sig, keyLen);
+  bool has_lo = parseKeyBound(lo_hex, lo_sig, keyLen, "mergeRunFiles", "lo");
+  bool has_hi = parseKeyBound(hi_hex, hi_sig, keyLen, "mergeRunFiles", "hi");
 
   std::vector<std::unique_ptr<RunFileReader<W>>> readers;
   readers.reserve(in_paths.size());

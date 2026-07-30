@@ -230,8 +230,8 @@ std::pair<size_t, size_t> map_shard_stage_file(
 
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};
-  bool has_lo = !lo_hex.empty() && hexToBytes(lo_hex, lo_sig, keyLen);
-  bool has_hi = !hi_hex.empty() && hexToBytes(hi_hex, hi_sig, keyLen);
+  bool has_lo = parseKeyBound(lo_hex, lo_sig, keyLen, "map_shard_stage_file", "lo");
+  bool has_hi = parseKeyBound(hi_hex, hi_sig, keyLen, "map_shard_stage_file", "hi");
 
   std::vector<std::unique_ptr<RunFileReader<W>>> readers;
   readers.reserve(in_paths.size());

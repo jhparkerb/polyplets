@@ -64,8 +64,8 @@ static Run<W> readRangedRunFiles(const std::vector<std::string>& paths, int H,
                                  const std::string& hi_hex) {
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};
-  const bool has_lo = !lo_hex.empty() && hexToBytes(lo_hex, lo_sig, keyLen);
-  const bool has_hi = !hi_hex.empty() && hexToBytes(hi_hex, hi_sig, keyLen);
+  const bool has_lo = parseKeyBound(lo_hex, lo_sig, keyLen, "map_worker", "lo");
+  const bool has_hi = parseKeyBound(hi_hex, hi_sig, keyLen, "map_worker", "hi");
   Run<W> run;
   for (const auto& p : paths) {
     RunFileReader<W> r(p, H, keyLen);

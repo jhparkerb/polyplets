@@ -247,8 +247,8 @@ std::pair<size_t, size_t> map_shard_file(
   const int keyLen = (cfg.keyLen != 0) ? cfg.keyLen : H + 2;
   uint8_t lo_sig[SIGMAX] = {};
   uint8_t hi_sig[SIGMAX] = {};
-  bool has_lo = !lo_hex.empty() && hexToBytes(lo_hex, lo_sig, keyLen);
-  bool has_hi = !hi_hex.empty() && hexToBytes(hi_hex, hi_sig, keyLen);
+  bool has_lo = parseKeyBound(lo_hex, lo_sig, keyLen, "map_shard_file", "lo");
+  bool has_hi = parseKeyBound(hi_hex, hi_sig, keyLen, "map_shard_file", "hi");
 
   // Open all input files.  If this is a bounded unit, seek each reader to lo via
   // the sparse .idx sidecar (same as mergeRunFiles): a key-range unit then skips

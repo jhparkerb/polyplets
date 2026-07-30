@@ -575,6 +575,32 @@ static void testFinalizeFailureDoesNotPublish() {
   std::remove((kFsizePath + ".idx.tmp").c_str());
 }
 
+// ─── E4 "Load-Bearing Label": an unparseable key bound must not be ignored ───
+//
+// The range filters were written as `has_lo = !lo_hex.empty() &&
+// hexToBytes(...)`, so a bound that FAILED to parse (wrong length for this
+// keyLen, non-hex byte) silently disabled the filter — while mergeRunFiles went
+// on stamping that same bound into the output header's keylo/keyhi. The output
+// then claims a range it does not respect: downstream pruneByBounds trusts the
+// stamp and can skip the file for keys it actually contains. Fails closed now.
+static void mergeWithUnparseableBound() {
+  const std::string in = "/tmp/gate_runfile_badbound_in.bin";
+  writeRun(in, 3, 200);
+  // keyLen here is H+2 = 5 → 10 hex chars; give it 8.
+  mergeRunFiles<u64>({in}, 3, "abcdef01", "", "/tmp/gate_runfile_badbound_out.bin",
+                     "test");
+  std::fprintf(stderr, "child: merge ran with the bound silently disabled\n");
+}
+static void testMergeUnparseableBoundAborts() {
+  const int rc = runInChild(mergeWithUnparseableBound);
+  assert(rc > 0 &&
+         "fail-closed: an unparseable key bound must abort, not disable the filter");
+  std::remove("/tmp/gate_runfile_badbound_in.bin");
+  std::remove("/tmp/gate_runfile_badbound_in.bin.idx");
+  std::remove("/tmp/gate_runfile_badbound_out.bin");
+  std::remove("/tmp/gate_runfile_badbound_out.bin.idx");
+}
+
 // Pooled zstd contexts must have BOUNDED retention: a persistent worker that
 // once ran a 640-input merge must not hold 640 idle contexts forever (80
 // workers x 640 x ~200KB was a standing ~10-20GB term in the a(40) OOM).
@@ -612,6 +638,7 @@ int main() {
   testMergeOverTruncatedInputAborts();
   testReaderCorruptCompressedAborts();
   testFinalizeFailureDoesNotPublish();
+  testMergeUnparseableBoundAborts();
   testZstdPoolRetentionBounded();
   std::puts("gate_runfile PASS");
 }
