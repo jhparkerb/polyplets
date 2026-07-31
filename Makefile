@@ -26,7 +26,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 G2CXX := $(shell command -v clang++-19 2>/dev/null || command -v clang++ 2>/dev/null || echo $(CXX))
 G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),,-Wno-error=restrict)
 
-.PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert clean install \
+.PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
@@ -36,7 +36,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert
+gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert gate-strip-fast
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
@@ -81,6 +81,23 @@ build/strip_mu_kink: cpp/strip_mu_kink.cpp core/signature.h core/transition.h | 
 
 build/strip_mu_cert: cpp/strip_mu_cert.cpp cpp/obs.h core/signature.h core/transition.h | build
 	$(CXX) $(CXXFLAGS) -O3 -I. $< -o $@
+
+# strip_mu_fast is the INDEXED-ARRAY engine: the same cell-at-a-time kink sweep,
+# with the per-stage state graph enumerated once and frozen into int32 successor
+# arrays (cpp/strip_stage_ops.h), so a matvec is a flat scatter instead of a
+# hash-map rebuild. ~200x strip_mu_kink at H=11 (results/strip-mu-fast.md). The
+# map engine stays in the tree as the cross-check that gate-strip-fast runs.
+build/strip_mu_fast: cpp/strip_mu_fast.cpp cpp/strip_stage_ops.h cpp/obs.h \
+                     core/signature.h core/transition.h | build
+	$(CXX) $(CXXFLAGS) -O3 -I. $< -o $@
+
+# Gate strip-fast: the fast engine against BOTH the map engine (same mu_H, same
+# state counts, H<=8) and the published certificates (the exact kernel must PASS
+# the certified numerator and FAIL numerator+1). RED arms are in --selftest: a
+# corrupted transition table and a corrupted finalize map must both move mu_6,
+# and an over-claim or an all-zero vector must be refused. ~10 s.
+gate-strip-fast: build/strip_mu_fast build/strip_mu_kink
+	python3 tests/gate_strip_fast.py
 
 # Gate strip-cert: RED-first self-test for the certificate checker. mu_2 =
 # 1+sqrt(2), so 24142/10000 must PASS and 24143/10000 must FAIL; a deliberately

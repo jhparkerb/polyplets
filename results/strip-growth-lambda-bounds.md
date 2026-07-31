@@ -87,8 +87,25 @@ counts and gives:
   finalize), `O(H*states)`, no 2^H, no edge storage. Reproduces mu_H exactly
   through H=11 (5.99…, 6.11…). Also `cpp/strip_mu8.cpp` (whole-column via the
   tma viable-mask kernel) validates but hits the same 2^H edge wall as strip_mu.
-- **Speed gap:** the kink engine's first cut is `unordered_map`-bound (H=11 in
-  100s, ~3.4x/H) -> H=16 ~12h. Correctness is done; reaching H=16 (mu~6.5, beats
-  6.475) needs an indexed-array rewrite of the same logic (per-stage sparse
-  operators) — fast but another build increment. H=14 **done: mu_14 = 6.3800344**
-  (`results/strip_mu_H14.log`, 4851s); still below 6.475 (need higher H to win).
+- **Indexed-array rewrite DONE** (`cpp/strip_mu_fast.cpp` + `cpp/strip_stage_ops.h`,
+  `make build/strip_mu_fast`, gate `make gate-strip-fast`): the per-stage state
+  graph is enumerated once and frozen into two int32 successor arrays per stage,
+  so a matvec is a flat scatter instead of a hash-map rebuild. Measured **211x** at
+  H=11 (107.5s -> 0.51s) and **231x** on the certificate path at H=12 (393.5s ->
+  1.7s), with `mu_H` and state counts identical to the map engine for every H both
+  can run, and every published certificate H<=12 re-verifying (PASS at the
+  certified numerator, FAIL at numerator+1). Full note, cost model and RED-first
+  gate: [strip-mu-fast.md](strip-mu-fast.md).
+- **Reach, measured through H=16.** Table build and matvec throughput are measured
+  at every H up to 16 (`--ops`, `--bench`): `sum|S_r|` grows a steady 2.95x/H to
+  71.3M at H=16, the frozen tables are 564 MB, the build peaks at 4.9 GB, and the
+  per-stage-state cost barely moves (0.89 -> 0.95 ns) — no cache cliff. Projected
+  single-core wall: **H=14 16s / H=15 52s / H=16 ~3 min** for the float solve, and
+  **~18s / ~58s / ~3.4 min** for the full certificate. The paragraph this replaces
+  projected ~12h for the H=16 float solve. H>=13 solves are not run here; the
+  numbers are wall-clock arithmetic over measured throughputs, for the
+  orchestrator to schedule.
+- **Where that lands the bound:** the ladder's own increments put `mu_16` at ~6.5,
+  the first term to beat the multi-directed 6.475. H=14 is banked
+  (**mu_14 = 6.3800344**, `results/strip_mu_H14.log`, 4851s on the map engine) and
+  is still below it. What was "another build increment" is now an hours-free job.
