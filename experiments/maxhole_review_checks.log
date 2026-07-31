@@ -1,0 +1,21 @@
+== diagonal-frame family checks, 1 <= a, b <= 12 ==
+|hullBox \ boxHole| = a+b+2: all 144 pairs PASS
+4-neighbour ring short of a+b+2 at: [(1, 2, 4), (1, 4, 6), (1, 6, 8), (1, 8, 10), (1, 10, 12), (1, 12, 14), (2, 1, 4), (4, 1, 6), (6, 1, 8), (8, 1, 10), (10, 1, 12), (12, 1, 14)]
+boxHole rook-disconnected at: [(1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1), (9, 1), (10, 1), (11, 1), (12, 1)]
+  == {min=1, max>=3}: True
+== exhaustive single-hole checks, n = 2..9 ==
+n=2 animals=4 single-hole=0 maxarea=0
+n=3 animals=20 single-hole=0 maxarea=0
+n=4 animals=110 single-hole=1 maxarea=1
+n=5 animals=638 single-hole=16 maxarea=1
+n=6 animals=3832 single-hole=166 maxarea=2
+n=7 animals=23592 single-hole=1456 maxarea=3
+n=8 animals=147941 single-hole=11788 maxarea=5
+n=9 animals=940982 single-hole=91300 maxarea=6
+single-hole total (n<=9): 104727
+MoatBound (II') violations: 0
+(I') area violations: 0
+substitute 1 (>=1 cell per u-level) violations: 63112
+substitute 1 (>=2 cells per u-level) violations: 95252
+substitute 2 (gap charging >=2) violations: 0
+done

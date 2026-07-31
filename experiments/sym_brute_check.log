@@ -1,0 +1,7 @@
+n=1 fixed=1 r90=1 r180=1 hmirror=1 dmirror=1 free=1 onesided=1 bilateral=1
+n=2 fixed=4 r90=0 r180=4 hmirror=2 dmirror=2 free=2 onesided=2 bilateral=2
+n=3 fixed=20 r90=0 r180=4 hmirror=4 dmirror=4 free=5 onesided=6 bilateral=4
+n=4 fixed=110 r90=2 r180=22 hmirror=10 dmirror=10 free=22 onesided=34 bilateral=10
+n=5 fixed=638 r90=2 r180=22 hmirror=22 dmirror=22 free=94 onesided=166 bilateral=22
+n=6 fixed=3832 r90=0 r180=132 hmirror=58 dmirror=56 free=524 onesided=991 bilateral=57
+ALL MATCH
