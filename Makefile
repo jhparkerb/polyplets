@@ -26,7 +26,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 G2CXX := $(shell command -v clang++-19 2>/dev/null || command -v clang++ 2>/dev/null || echo $(CXX))
 G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),,-Wno-error=restrict)
 
-.PHONY: gates gate-g1 gate-g2 gate-euler clean install \
+.PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
@@ -36,7 +36,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver
+gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
@@ -67,6 +67,26 @@ build/g2: cpp/g2_redelmeier.cpp | build
 # it existed (AUDIT-2026-07-30 S7).
 build/strip_tm: cpp/strip_tm.cpp | build
 	$(CXX) -O3 -std=c++17 $< -o $@
+
+# Strip growth-constant engines (mu_H, the rigorous lambda lower-bound ladder).
+# strip_mu_cert is the CERTIFICATE tool: float power iteration to locate x*, then
+# an exact unsigned-__int128 Collatz-Wielandt check that promotes mu_H to a
+# machine-checkable rational. -I. for core/ (it reuses the production kink stage
+# transition verbatim) and cpp/obs.h rides the quoted include.
+build/strip_mu: cpp/strip_mu.cpp | build
+	$(CXX) $(CXXFLAGS) -O3 $< -o $@
+
+build/strip_mu_kink: cpp/strip_mu_kink.cpp core/signature.h core/transition.h | build
+	$(CXX) $(CXXFLAGS) -O3 -I. $< -o $@
+
+build/strip_mu_cert: cpp/strip_mu_cert.cpp cpp/obs.h core/signature.h core/transition.h | build
+	$(CXX) $(CXXFLAGS) -O3 -I. $< -o $@
+
+# Gate strip-cert: RED-first self-test for the certificate checker. mu_2 =
+# 1+sqrt(2), so 24142/10000 must PASS and 24143/10000 must FAIL; a deliberately
+# corrupted vector must be rejected with the offending state named. Sub-second.
+gate-strip-cert: build/strip_mu_cert
+	./build/strip_mu_cert --selftest
 
 # fixed-height transfer matrix over Z/pZ, for generating-function recovery
 build/gf_modp: cpp/gf_modp.cpp | build
@@ -130,6 +150,11 @@ gate-e0: build/subgraph_count
 
 build/subgraph_count: cpp/sym/subgraph_count.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
+
+# Cone anchor: directed king animals by enumerate+filter vs Bacher's closed form
+# (results/directed-cone-anchor.md). -Icpp for obs.h.
+build/directed_cone_anchor: cpp/directed_cone_anchor.cpp cpp/obs.h | build
+	$(CXX) $(CXXFLAGS) -O3 -pthread -Icpp $< -o $@
 
 # Gate S2: free/one-sided Burnside counts vs A000105/A030222 (oracle-grade)
 gate-s2:
@@ -196,7 +221,10 @@ ns-gate-diag-pins:
 # the sub-second C++ format+arith gates. The heavy C++ sweeps (spill, parallel,
 # holes, maxn=14 regression) stay in `make ns-gates`, run before a release or by
 # hand. Order: cheapest, most-targeted tripwires first so a regression fails fast.
-ns-gate-fast: ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile ns-gate-go ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker
+# gate-strip-cert rides here (sub-second) because it guards a PUBLISHED rigorous
+# bound: a regression that made the exact checker pass unconditionally would turn
+# a proof into a wrong number silently. Cheapest possible tripwire for it.
+ns-gate-fast: ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile ns-gate-go ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker gate-strip-cert
 
 # Closed-form invariant gate: assert the engine contributes every KNOWN closed
 # form (top strip H=N=3^(N-1); low strips T(n,1)=1, T(n,2) recurrence) DIRECTLY,

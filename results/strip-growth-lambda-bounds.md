@@ -34,6 +34,13 @@ multi-directed 6.475), our own, and improvable with H.
 
    Current ladder tops at mu_14 = 6.3800 (still below 6.475 — need higher H to win).
 
+> **Certificate grade, H<=11.** The `mu_H` below are floating-point power-iteration
+> values. `cpp/strip_mu_cert.cpp` upgrades them to exact rationals verified in
+> integer arithmetic (Collatz-Wielandt on the transfer operator at a rational x),
+> with a per-H receipt in `results/strip_mu_certificates.log`. Done for H<=11;
+> H=14 scheduled. Method, receipts and honest scope:
+> [strip-mu-certificates.md](strip-mu-certificates.md).
+
 **2. Independent lambda estimate (delivered, H<=13).** Sliding 3-point power-law
 fit `mu_H = lambda - c*H^{-p}` (`experiments/lambda_from_mu.py`) gives lambda
 estimates marching monotonically down as the center H rises:
