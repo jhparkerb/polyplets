@@ -176,11 +176,84 @@ Bad arguments are refused rather than clamped: an out-of-range `H`, or a
   (`results/strip_mu_H14.log`); peak RSS is 15 MB at H=11, so memory is a
   non-issue.
 
+## Addendum, 2026-07-31: the frozen stage-operator kernel
+
+`cpp/strip_mu_cert.cpp` now drives `cpp/strip_stage_ops.h` in **both** phases:
+the state graph is enumerated once per H and frozen into int32 successor arrays,
+and a matvec is H flat scatter passes plus a finalize pass (`strip::applyOps`)
+under a weight policy — `FloatWeight` for the power iteration, `ExactWeight` for
+the exact `unsigned __int128` check. Same operator, same state set, same
+term-for-term arithmetic; the hash-map sweep and its private copy of the kink
+transition are gone (net -81 lines). Details of the kernel:
+[strip-mu-fast.md](strip-mu-fast.md).
+
+**Nothing about what is certified changed.** Re-certifying H=2..12 with the new
+binary reproduces the receipts above field for field: same `num`/`den`, same
+`states`, same `mu_float`, same `vrange_bits`, same `acc_bits`, same `min_ratio`
+to all 9 printed digits, same PASS. `states` is still `StageOps::states()` — the
+in-edge-reachable boundary count — deliberately *not* the length of the dense
+vector, which is one longer: `S_0` also carries the empty seed, whose entry is
+identically zero (and which `checkCert` skips as `0 <= anything`). Reporting the
+vector length would have shifted every row of the table above by one.
+
+**Checksum caveat.** The checksum *definition* is unchanged — SHA-256 over the
+same state set, sorted by raw signature bytes, each followed by its 16-byte
+little-endian value — but the H>=3 **digests differ from the receipts above**.
+The reason is not a redefinition: the float phase now sums in index order rather
+than hash order, so the converged doubles differ in their last ulp and a handful
+of quantized entries differ in their low bits. Demonstrated rather than asserted:
+at H=3 the old and new binaries produce **byte-identical** checksums at
+`--vbits 20/30/40/50` and diverge only at `--vbits 96`, where quantization
+exposes the last ulp; and H=2 (a 3-state vector) matches at `--vbits 96` too. The
+receipt still identifies the vector that was actually checked, which is what the
+field is for — a re-verification must use the vector from the *same* run. The
+pre-adoption binary, rebuilt from the same source and re-run for the timings
+below, still reproduces the published digests byte for byte at H=11 and H=12, so
+the divergence is attributable to the new float phase and to nothing else.
+
+**Measured walls** (gympie, single core, `--digits 7`, old binary re-run
+alongside for a like-for-like comparison):
+
+| H | old (hash map) | new (frozen ops) | speedup |
+|---|---|---|---|
+| 11 | 127.3 s (receipt: 120.9 s) | 0.6 s | ~212x |
+| 12 | 438.7 s (receipt: 393.5 s) | 1.8 s | ~244x |
+| 13 | 1469.8 s (receipt) | 5.6 s | ~262x |
+
+H=13 is the sharper of the three: the old binary's H=13 certificate landed at
+24.5 minutes while this note was being written; the new binary reproduces it —
+`num=63060712`, `states=113633`, `vrange_bits=80.6`, `acc_bits=96.7` — in 5.6 s.
+
+**Consequence.** Certification is no longer a scheduling problem. A full H=14
+certificate ran here in **18.7 s** at 530 MB peak RSS (against the ~1.5 h the
+runner script budgets for the hash-map binary), matching the ~18-21 s projection
+in [strip-mu-fast.md](strip-mu-fast.md); on the same throughputs H=15 is ~1 min
+and H=16 ~3.5 min of single-core wall. Above H=15 the binding constraint is the
+enumerator's transient build RSS (measured 1.36 GB at H=15, 4.94 GB at H=16), not
+time.
+
+The thing to watch instead is the precision budget, and it has moved sharply:
+`vrange_bits` is **80.6** at H=13 and **87.4** at H=14 (+23.1, +6.8 on H=12's
+57.5), well ahead of the "H=14 near 76 bits" extrapolation in *Honest scope*
+above. At `vbits = 96` that is already tight enough to cost digits: the H=14 run
+above needed 18 sweeps and certified `6.3800149` rather than the `6.3800344` its
+float phase found. That is the failure mode behaving exactly as designed — a
+shortfall is absorbed as lost digits, never as a wrong claim — but at H>=15 a
+step-down is now the expected case, not a surprise, and `--digits 7` has stopped
+being the best setting. Fewer digits means a smaller `den`, hence a higher
+`vbits` cap and more surviving precision, and measured at H=14 that buys back
+more than it gives up: `--digits 6` certifies **6.380033** in 3 sweeps
+(`vbits = 100`) and `--digits 5` certifies **6.38003** on the first candidate
+(`vbits = 103`) — both strictly stronger bounds than `--digits 7`'s 6.3800149.
+Whichever `--digits` is used, run the ladder at one setting so the receipts stay
+comparable. (These H=14 numbers are from an adoption cross-check logged to
+scratch; the published H=14 receipt is the separately scheduled runner's.)
+
 ## Reproduce
 
     make build/strip_mu_cert
     ./build/strip_mu_cert --selftest                       # RED-first gate
-    ./build/strip_mu_cert 2 11                             # H<=11, ~3.5 min
+    ./build/strip_mu_cert 2 11                             # H<=11, ~1 s
 
 Receipts append to `results/strip_mu_certificates.log` (override with `--log`).
 The H=14 run is a separately scheduled single-threaded ~1.5h job with its own

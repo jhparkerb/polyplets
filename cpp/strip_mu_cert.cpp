@@ -20,9 +20,12 @@
 // does need irreducibility, but we only ever use the lower half.
 //
 // RESTRICTION IS SAFE.  We only ever hold the operator's action on the finite
-// support S of the converged eigenvector.  Mass flowing OUT of S is dropped,
-// i.e. we certify the principal submatrix M_S, and rho(M_S) <= rho(M).  A
-// PASS on M_S therefore implies a PASS on M.  Fail-closed by construction.
+// state set S_0 that cpp/strip_stage_ops.h enumerates -- the boundary states
+// reachable from the empty seed, which is exactly the support the converged
+// eigenvector lives on.  Mass flowing OUT of S is dropped (the frozen finalize
+// map sends it to -1), i.e. we certify the principal submatrix M_S, and
+// rho(M_S) <= rho(M).  A PASS on M_S therefore implies a PASS on M.
+// Fail-closed by construction.
 //
 // ROUNDING IS ONE-SIDED.  One matvec = one column sweep: seed -> H per-cell
 // kink stage transitions (weight x^placed) -> finalize.  With x = p/q the "no
@@ -34,9 +37,14 @@
 // and add: entries run to ~2^96 and p ~ 2^23, so int64 would overflow silently
 // -- the guard makes that a loud FAIL, never a wrong PASS.
 //
-// The three kink functions below are copied VERBATIM from core/kink.h (the
-// single source of truth), exactly as cpp/strip_mu_kink.cpp does, to avoid
-// pulling in the run/spill machinery kink.h includes.
+// THE KERNEL IS SHARED.  Both phases drive cpp/strip_stage_ops.h: the state
+// graph is enumerated ONCE per H and frozen into int32 successor arrays, and a
+// matvec is H flat scatter passes plus a finalize pass (strip::applyOps) under a
+// weight policy -- strip::FloatWeight for the power iteration, strip::ExactWeight
+// for the certificate check.  Same operator, same state set, same arithmetic as
+// cpp/strip_mu_fast.cpp's --verify, which re-verifies these receipts
+// independently.  Measured ~240x the previous hash-map sweep at H=11/12
+// (results/strip-mu-fast.md, results/strip-mu-certificates.md).
 //
 // Usage:
 //   strip_mu_cert <Hmin> <Hmax> [--digits D] [--vbits B] [--log FILE]
@@ -67,67 +75,13 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
-#include "core/signature.h"   // Sig, SIGMAX, canonicalizeSig
-#include "core/transition.h"  // namespace s8 (find/unite)
+#include "strip_stage_ops.h"  // StageOps, buildStageOps, applyOps, weight policies
 #include "obs.h"              // obs::Reporter, provenance
 
-// ---- copied verbatim from core/kink.h ----
-inline void canonMixed(Sig& s, int H) {
-  unsigned char map[256] = {0}; unsigned char next = 1;
-  for (int i = 0; i < H; ++i) { const unsigned char v = s.b[i];
-    if (v == 0) continue; if (map[v] == 0) map[v] = next++; s.b[i] = map[v]; }
-  const unsigned char c = s.b[H + 2];
-  if (c != 0) { if (map[c] == 0) map[c] = next++; s.b[H + 2] = map[c]; }
-}
-inline bool labelInMixedState(const Sig& s, int H, unsigned char L) {
-  for (int i = 0; i < H; ++i) if (s.b[i] == L) return true;
-  return s.b[H + 2] == L;
-}
-template <class F>
-inline void kinkStageTransition(const Sig& s, int H, int r, int ms, int maxn, F&& emit) {
-  int uf[2 * SIGMAX];
-  for (int occupy = 0; occupy < 2; ++occupy) {
-    if (occupy && ms + 1 > maxn) break;
-    Sig t = s; unsigned char newLabel = 0;
-    if (occupy) {
-      for (int i = 0; i < 2 * SIGMAX; ++i) uf[i] = i;
-      auto uadd = [&](unsigned char L) { if (L) { int a = s8::find(uf, 0), b = s8::find(uf, L); if (a != b) uf[a] = b; } };
-      if (r > 0) uadd(s.b[r - 1]);
-      uadd(s.b[r]); uadd(s.b[H + 2]); if (r + 1 < H) uadd(s.b[r + 1]);
-      const int root = s8::find(uf, 0); unsigned char fresh = 200;
-      for (int i = 0; i < H; ++i) if (t.b[i] && s8::find(uf, t.b[i]) == root) t.b[i] = fresh;
-      if (t.b[H + 2] && s8::find(uf, t.b[H + 2]) == root) t.b[H + 2] = fresh;
-      newLabel = fresh;
-    }
-    const unsigned char outgoing = t.b[H + 2];
-    t.b[H + 2] = t.b[r]; t.b[r] = occupy ? newLabel : 0;
-    if (occupy) { if (r == 0) t.b[H] = 1; if (r == H - 1) t.b[H + 1] = 1; t.b[H + 3] = 1; }
-    if (outgoing != 0 && !labelInMixedState(t, H, outgoing)) continue;
-    canonMixed(t, H); emit(t, occupy ? 1 : 0);
-  }
-}
-// ---- end copy ----
-
+using strip::StageOps;
 using u128 = unsigned __int128;
-
-struct SigHash {
-  size_t operator()(const Sig& s) const {
-    size_t h = 1469598103934665603ULL;
-    for (int i = 0; i < SIGMAX; ++i) { h ^= s.b[i]; h *= 1099511628211ULL; }
-    return h;
-  }
-};
-using Vec  = std::unordered_map<Sig, double, SigHash>;
-using IVec = std::unordered_map<Sig, u128, SigHash>;
-
-static const int BIG = 1 << 29;
-// Every accumulator is checked against this before a multiply or an add. 2^126
-// leaves a full bit of headroom below the unsigned __int128 range so the guard
-// itself cannot wrap.
-static const u128 LIMIT = (u128)1 << 126;
 
 static std::string u128str(u128 v) {
   if (v == 0) return "0";
@@ -216,21 +170,42 @@ inline std::string hex(Ctx c) {
 }
 }  // namespace sha
 
-// Deterministic serialization of the certificate vector: states sorted by their
-// raw SIGMAX bytes, each followed by its 16-byte little-endian value.
-static std::string vectorChecksum(const IVec& v) {
-  std::vector<const std::pair<const Sig, u128>*> ord;
+// The in-edge-reachable subset of S_0: the states some finalize edge targets.
+// This is the certificate's state set proper. S_0 additionally carries the empty
+// seed boundary (index 0), which nothing finalizes to -- an empty column is a
+// completion, not a transfer -- so it holds zero mass from the second matvec on.
+// Excluding it is what keeps `states` and the checksum's record set equal to what
+// the hash-map engine reported and to the published receipts.
+static std::vector<char> supportMask(const StageOps& O) {
+  std::vector<char> hit(O.size[0], 0);
+  for (std::int32_t j : O.fin) if (j >= 0) hit[j] = 1;
+  return hit;
+}
+
+// Deterministic serialization of the certificate vector: the support states
+// sorted by their raw SIGMAX bytes, each followed by its 16-byte little-endian
+// value. UNCHANGED from the hash-map era in rule and in record set (the empty
+// seed was never a key of the map vector either, and is excluded here). The
+// DIGESTS of the H=2..12 receipts nevertheless moved when the frozen-operator
+// kernel landed (2026-07-31): the float phase now sums in index order rather
+// than hash order, so the converged doubles differ in their last ulp and a few
+// quantized entries differ in their low bits. Same rule, different vector -- the
+// certified num/den, states and PASS are identical. See
+// results/strip-mu-certificates.md.
+static std::string vectorChecksum(const StageOps& O, const std::vector<u128>& v,
+                                  const std::vector<char>& inSupport) {
+  std::vector<std::size_t> ord;
   ord.reserve(v.size());
-  for (auto& kv : v) ord.push_back(&kv);
-  std::sort(ord.begin(), ord.end(), [](auto* a, auto* b) {
-    return std::memcmp(a->first.b, b->first.b, SIGMAX) < 0;
+  for (std::size_t i = 0; i < v.size(); ++i) if (inSupport[i]) ord.push_back(i);
+  std::sort(ord.begin(), ord.end(), [&](std::size_t a, std::size_t b) {
+    return std::memcmp(O.boundary[a].b, O.boundary[b].b, SIGMAX) < 0;
   });
   sha::Ctx c;
-  for (auto* kv : ord) {
-    sha::update(c, kv->first.b, SIGMAX);
+  for (std::size_t i : ord) {
+    sha::update(c, O.boundary[i].b, SIGMAX);
     uint8_t le[16];
-    u128 x = kv->second;
-    for (int i = 0; i < 16; ++i) { le[i] = uint8_t(x); x >>= 8; }
+    u128 x = v[i];
+    for (int k = 0; k < 16; ++k) { le[k] = uint8_t(x); x >>= 8; }
     sha::update(c, le, 16);
   }
   return sha::hex(c);
@@ -238,46 +213,24 @@ static std::string vectorChecksum(const IVec& v) {
 
 // ───────────────────────────── Phase 1: float ────────────────────────────────
 
-// M(x) * w : one column sweep. w keyed by boundary Sig (flags zeroed).
-// `keep` (optional) restricts the output to a fixed state set — the float
-// iteration then converges the eigenpair of the SAME principal submatrix M_S
-// the exact phase certifies, so the two phases agree on what is being bounded.
-static Vec matvecF(const Vec& w, int H, const double* xp, const Vec* keep) {
-  Vec D; D.reserve(w.size() * 2);
-  for (auto& kv : w) { Sig m = kv.first; m.b[H + 2] = 0; m.b[H + 3] = 0; D[m] += kv.second; }
-  for (int r = 0; r < H; ++r) {
-    Vec D2; D2.reserve(D.size() * 2);
-    for (auto& kv : D) { double wt = kv.second;
-      kinkStageTransition(kv.first, H, r, 0, BIG, [&](const Sig& t, int shift) { D2[t] += wt * xp[shift]; });
-    }
-    D.swap(D2);
-  }
-  Vec out; out.reserve(D.size());
-  for (auto& kv : D) { const Sig& m = kv.first;
-    if (!m.b[H + 3]) continue;                       // empty column = completion
-    unsigned char outgoing = m.b[H + 2];
-    Sig t = m; t.b[H + 2] = 0; t.b[H + 3] = 0;
-    if (outgoing != 0 && !labelInMixedState(t, H, outgoing)) continue;
-    canonicalizeSig(t.b, H); t.b[H] = 0; t.b[H + 1] = 0;   // <=H merge
-    if (keep && !keep->count(t)) continue;
-    out[t] += kv.second;
-  }
-  return out;
-}
+struct Work { std::vector<double> a, b, next; };   // scratch reused per matvec
 
-// Power-iterate M(x) in place; returns the dominant eigenvalue estimate.
-static double rhoF(double x, Vec& w, int H, const Vec* keep, int maxIt = 4000) {
-  double xp[2] = {1.0, x};
+// Power-iterate M(x) in place; returns the dominant eigenvalue estimate. The
+// iteration count and the 1e-13 stopping rule are those of the validated
+// cpp/strip_mu_kink.cpp, so the float mu_H reproduces the ladder.
+static double rhoF(const StageOps& O, double x, std::vector<double>& w, Work& s,
+                   int maxIt = 4000) {
+  const strip::FloatWeight fw(x);
   double r = 0;
   for (int it = 0; it < maxIt; ++it) {
-    Vec w2 = matvecF(w, H, xp, keep);
-    if (w2.empty()) return 0.0;
+    strip::applyOps(O, w, s.next, fw, s.a, s.b);   // float policy cannot fail
     double s2 = 0, s1 = 0;
-    for (auto& kv : w2) s2 += kv.second;
-    for (auto& kv : w) s1 += kv.second;
-    double rn = s2 / s1, inv = 1.0 / s2;
-    for (auto& kv : w2) kv.second *= inv;
-    w.swap(w2);
+    for (double v : s.next) s2 += v;
+    for (double v : w) s1 += v;
+    if (!(s2 > 0)) return 0.0;
+    const double rn = s2 / s1, inv = 1.0 / s2;
+    for (double& v : s.next) v *= inv;
+    w.swap(s.next);
     if (it > 3 && std::fabs(rn - r) < 1e-13 * rn) { r = rn; break; }
     r = rn;
   }
@@ -285,70 +238,21 @@ static double rhoF(double x, Vec& w, int H, const Vec* keep, int maxIt = 4000) {
 }
 
 // ───────────────────────────── Phase 2: exact ────────────────────────────────
-
-// floor-rounded M_S(p/q) * v, restricted to the keys of v. Returns false (and
-// leaves `out` unusable) if any accumulator would exceed LIMIT — fail-closed:
-// the caller must treat an overflow as a FAILED certificate, never a pass.
 //
-// Weights are applied PER TERM: the "no cell placed" branch carries weight 1 and
-// is copied exactly (no rounding at all), the "cell placed" branch carries
-// x = p/q and contributes floor(val*p/q). Two reasons over the obvious
-// "accumulate val*q / val*p, then divide the stage by q":
+// The exact matvec is strip::applyOps under strip::ExactWeight: weights are
+// applied PER TERM, the "no cell placed" branch carrying weight 1 (copied
+// exactly, no rounding at all) and the "cell placed" branch x = p/q contributing
+// floor(val*p/q). Two reasons over the obvious "accumulate val*q / val*p, then
+// divide the stage by q":
 //   * headroom — the accumulator never holds a factor of q (~2^27 at 7 digits),
 //     so the vector can carry ~27 more bits, which is exactly the precision the
 //     smallest eigenvector entries need at large H;
 //   * half the terms become exact, so the accumulated flooring loss is smaller.
 // floor(val*p/q) <= val*p/q and a sum of floors <= the floor of the sum, so the
-// result is still <= the exact M_S(p/q) v componentwise. `maxAcc` reports the
-// largest value ever held, so a run can show how much of the 2^126 it used.
-static bool matvecExact(const IVec& v, int H, u128 p, u128 q, IVec& out,
-                        u128& maxAcc) {
-  maxAcc = 0;
-  IVec D; D.reserve(v.size() * 2);
-  for (auto& kv : v) {
-    Sig m = kv.first; m.b[H + 2] = 0; m.b[H + 3] = 0;
-    u128& a = D[m];
-    if (a > LIMIT - kv.second) return false;
-    a += kv.second;
-    if (a > maxAcc) maxAcc = a;
-  }
-  for (int r = 0; r < H; ++r) {
-    IVec D2; D2.reserve(D.size() * 2);
-    bool ok = true;
-    for (auto& kv : D) {
-      const u128 val = kv.second;
-      kinkStageTransition(kv.first, H, r, 0, BIG, [&](const Sig& t, int shift) {
-        u128 term;
-        if (shift) {
-          if (val > LIMIT / p) { ok = false; return; }
-          term = (val * p) / q;                  // DOWNWARD: floor(val*x)
-        } else {
-          term = val;                            // weight 1: exact
-        }
-        u128& a = D2[t];
-        if (a > LIMIT - term) { ok = false; return; }
-        a += term;
-        if (a > maxAcc) maxAcc = a;
-      });
-      if (!ok) return false;
-    }
-    D.swap(D2);
-  }
-  out.clear(); out.reserve(v.size());
-  for (auto& kv : D) {
-    const Sig& m = kv.first;
-    if (!m.b[H + 3]) continue;
-    unsigned char outgoing = m.b[H + 2];
-    Sig t = m; t.b[H + 2] = 0; t.b[H + 3] = 0;
-    if (outgoing != 0 && !labelInMixedState(t, H, outgoing)) continue;
-    canonicalizeSig(t.b, H); t.b[H] = 0; t.b[H + 1] = 0;
-    if (!v.count(t)) continue;   // leaving S drops mass: rho(M_S) <= rho(M)
-    u128& a = out[t];
-    if (a > LIMIT - kv.second) return false;
-    a += kv.second;
-  }
-  return true;
-}
+// result is still <= the exact M_S(p/q) v componentwise. ExactWeight::maxAcc
+// reports the largest value ever held, so a run can show how much of the 2^126 it
+// used; a guard trip makes applyOps return false, which is a FAILED certificate,
+// never a pass.
 
 struct CheckResult {
   bool pass = false;
@@ -362,24 +266,25 @@ struct CheckResult {
 
 // The certificate check: (M_S(p/q) v)_i >= v_i for EVERY i in S, in exact
 // integer arithmetic. Any single failure fails the whole certificate.
-static CheckResult checkCert(const IVec& v, int H, u128 p, u128 q) {
+static CheckResult checkCert(const StageOps& O, const std::vector<u128>& v,
+                             u128 p, u128 q) {
   CheckResult R;
-  IVec out;
-  u128 maxAcc = 0;
-  if (!matvecExact(v, H, p, q, out, maxAcc)) { R.overflow = true; return R; }
-  R.accBits = maxAcc ? std::log2((double)maxAcc) : 0.0;
+  strip::ExactWeight ew(p, q);                    // x = p/q
+  std::vector<u128> out, sa, sb;
+  if (!strip::applyOps(O, v, out, ew, sa, sb)) { R.overflow = true; return R; }
+  R.accBits = ew.maxAcc ? std::log2((double)ew.maxAcc) : 0.0;
   double mr = 1e308;
   size_t nonzero = 0;
-  for (auto& kv : v) {
-    const u128 want = kv.second;
+  for (std::size_t i = 0; i < v.size(); ++i) {
+    const u128 want = v[i];
     if (want == 0) continue;   // 0 <= anything; harmless, contributes nothing
+                               // (the empty seed at index 0 is always such)
     ++nonzero;
-    auto it = out.find(kv.first);
-    const u128 got = (it == out.end()) ? (u128)0 : it->second;
+    const u128 got = out[i];
     mr = std::min(mr, (double)got / (double)want);
     if (got < want) {
       if (R.failures == 0) {
-        R.firstBad = sigHex(kv.first, H);
+        R.firstBad = sigHex(O.boundary[i], O.H);
         R.firstBadLhs = got; R.firstBadRhs = want;
       }
       ++R.failures;
@@ -396,15 +301,16 @@ static CheckResult checkCert(const IVec& v, int H, u128 p, u128 q) {
 // 2^vbits. Entries whose double falls below 1 quantize to 0; that is SAFE (the
 // Collatz-Wielandt test needs only v >= 0, v != 0) and is never silently
 // tolerated on the inequality side — every state is still checked.
-static IVec quantize(const Vec& w, int vbits, double& wmin, double& wmax) {
+static std::vector<u128> quantize(const std::vector<double>& w, int vbits,
+                                  double& wmin, double& wmax) {
   wmax = 0; wmin = 1e308;
-  for (auto& kv : w) {
-    if (kv.second > wmax) wmax = kv.second;
-    if (kv.second > 0 && kv.second < wmin) wmin = kv.second;
+  for (double d : w) {
+    if (d > wmax) wmax = d;
+    if (d > 0 && d < wmin) wmin = d;
   }
-  IVec v; v.reserve(w.size() * 2);
+  std::vector<u128> v(w.size());
   const double scale = std::ldexp(1.0, vbits) / wmax;
-  for (auto& kv : w) v[kv.first] = (u128)(kv.second * scale);
+  for (std::size_t i = 0; i < w.size(); ++i) v[i] = (u128)(w[i] * scale);
   return v;
 }
 
@@ -422,8 +328,9 @@ struct CertOut {
 
 static u128 ipow10(int d) { u128 r = 1; for (int i = 0; i < d; ++i) r *= 10; return r; }
 
-// One H: float power iteration -> rational candidate -> exact check, stepping
-// the numerator down until it passes (or the budget runs out).
+// One H: build the frozen operators -> float power iteration -> rational
+// candidate -> exact check, stepping the numerator down until it passes (or the
+// budget runs out).
 static CertOut certifyH(int H, int digits, int vbits, int maxAttempts) {
   CertOut C; C.H = H;
   auto t0 = std::chrono::steady_clock::now();
@@ -431,22 +338,27 @@ static CertOut certifyH(int H, int digits, int vbits, int maxAttempts) {
                     "H=" + std::to_string(H) + " digits=" + std::to_string(digits) +
                     " vbits=" + std::to_string(vbits));
 
-  Sig empty; std::memset(empty.b, 0, SIGMAX);
-  Vec w0; w0[empty] = 1.0;
+  const StageOps O = strip::buildStageOps(H);
+  const std::vector<char> inSupport = supportMask(O);
+  C.states = O.states();       // in-edge-reachable count, NOT the vector length
+  rep.beat(0, "phase=build");
+
+  Work s;
+  std::vector<double> w(O.size[0], 0.0);
+  w[0] = 1.0;                                   // index 0 is the empty boundary
 
   // bisect x for rho(M(x)) = 1, warm-starting the eigenvector (same schedule as
   // the validated cpp/strip_mu_kink.cpp, so the float mu_H reproduces the ladder)
-  Vec w = w0;
   for (int i = 0; i < 8; ++i) {
-    double xp[2] = {1.0, 0.25};
-    Vec t = matvecF(w, H, xp, nullptr);
-    if (!t.empty()) w.swap(t);
+    strip::applyOps(O, w, s.next, strip::FloatWeight(0.25), s.a, s.b);
+    double t = 0; for (double v : s.next) t += v;
+    if (t > 0) w.swap(s.next);
   }
   double lo = 0.10, hi = 0.5;
   for (int it = 0; it < 55; ++it) {
     double mid = 0.5 * (lo + hi);
-    Vec wm = w;
-    if (rhoF(mid, wm, H, nullptr) < 1.0) lo = mid; else hi = mid;
+    std::vector<double> wm = w;
+    if (rhoF(O, mid, wm, s) < 1.0) lo = mid; else hi = mid;
     if (hi - lo < 1e-13) break;
     rep.beat(it, "phase=bisect");
   }
@@ -460,11 +372,10 @@ static CertOut certifyH(int H, int digits, int vbits, int maxAttempts) {
   // far below anything the exact check can see, so re-polishing per candidate
   // would only burn sweeps — and a single fixed v makes the receipt's checksum
   // unambiguous (it is the vector that was actually checked).
-  Vec wf = w;
-  rhoF((double)(long double)den / (double)(long double)num0, wf, H, nullptr);
+  std::vector<double> wf = w;
+  rhoF(O, (double)(long double)den / (double)(long double)num0, wf, s);
   double wmin = 0, wmax = 0;
-  IVec v = quantize(wf, vbits, wmin, wmax);
-  C.states = v.size();
+  std::vector<u128> v = quantize(wf, vbits, wmin, wmax);
   C.rangeBits = std::log2(wmax / wmin);
 
   // The check is MONOTONE in num: smaller num means larger x = den/num, every
@@ -474,7 +385,7 @@ static CertOut certifyH(int H, int digits, int vbits, int maxAttempts) {
   int sweeps = 0;
   auto tryNum = [&](u128 n) -> bool {
     ++sweeps; C.attempts = sweeps;
-    CheckResult R = checkCert(v, H, den, n);   // x = den/n: stage weight 1 or x
+    CheckResult R = checkCert(O, v, den, n);   // x = den/n: stage weight 1 or x
     C.accBits = R.accBits;
     if (!R.pass) { C.firstBad = R.firstBad; }
     C.minRatio = R.minRatio;
@@ -482,7 +393,7 @@ static CertOut certifyH(int H, int digits, int vbits, int maxAttempts) {
                  "event=attempt job=stripmucert-H%d sweep=%d num=%s den=%s "
                  "states=%zu vrange_bits=%.1f acc_bits=%.1f fail=%zu "
                  "min_ratio=%.9f overflow=%d\n",
-                 H, sweeps, u128str(n).c_str(), u128str(den).c_str(), v.size(),
+                 H, sweeps, u128str(n).c_str(), u128str(den).c_str(), C.states,
                  C.rangeBits, R.accBits, R.failures, R.minRatio, R.overflow ? 1 : 0);
     std::fflush(stderr);
     rep.beat(sweeps, "phase=certify");   // throttled; the attempt line is per-sweep
@@ -494,20 +405,20 @@ static CertOut certifyH(int H, int digits, int vbits, int maxAttempts) {
     C.pass = true;
   } else {
     // bracket: hi always fails, lo (once found) always passes
-    u128 hi = num0, lo = 0; bool bracketed = false;
+    u128 hiN = num0, loN = 0; bool bracketed = false;
     for (u128 d = 1; d <= num0 && sweeps < maxAttempts; d *= 2) {
-      if (tryNum(num0 - d)) { lo = num0 - d; bracketed = true; break; }
-      hi = num0 - d;
+      if (tryNum(num0 - d)) { loN = num0 - d; bracketed = true; break; }
+      hiN = num0 - d;
     }
-    while (bracketed && lo + 1 < hi && sweeps < maxAttempts) {
-      const u128 mid = lo + (hi - lo) / 2;
-      if (tryNum(mid)) lo = mid; else hi = mid;
+    while (bracketed && loN + 1 < hiN && sweeps < maxAttempts) {
+      const u128 mid = loN + (hiN - loN) / 2;
+      if (tryNum(mid)) loN = mid; else hiN = mid;
     }
     // Re-verify the winning numerator last, so the receipt's min_ratio, acc_bits
     // and PASS all describe the rational actually certified — not some probe.
-    if (bracketed) { C.num = (long long)lo; C.pass = tryNum(lo); }
+    if (bracketed) { C.num = (long long)loN; C.pass = tryNum(loN); }
   }
-  if (C.pass) C.checksum = vectorChecksum(v);
+  if (C.pass) C.checksum = vectorChecksum(O, v, inSupport);
 
   C.wall = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
   rep.done("H=" + std::to_string(H) + " result=" + (C.pass ? "PASS" : "FAIL") +
@@ -519,6 +430,10 @@ static CertOut certifyH(int H, int digits, int vbits, int maxAttempts) {
 static void appendReceipt(const char* path, const CertOut& C, int digits, int vbits) {
   FILE* f = std::fopen(path, "a");
   if (!f) { std::fprintf(stderr, "event=error msg=\"cannot open receipt %s\"\n", path); return; }
+  // `states` is StageOps::states() — the in-edge-reachable boundary count, which
+  // is what every earlier receipt recorded. It is deliberately NOT the length of
+  // the dense vector: S_0 also carries the empty seed, whose entry is identically
+  // zero. Reporting the vector length here would shift the published table by one.
   std::fprintf(f,
       "event=certificate t=%s git=%s built=%s host=%s H=%d result=%s "
       "num=%lld den=%lld mu_lower=%.*f mu_float=%.9f states=%zu digits=%d "
@@ -534,30 +449,35 @@ static void appendReceipt(const char* path, const CertOut& C, int digits, int vb
 // ─────────────────────────────── self-test ───────────────────────────────────
 // RED-first: these must be able to FAIL. mu_2 = 1+sqrt(2) = 2.41421356..., so
 // 24142/10000 is a true lower bound (must PASS) and 24143/10000 is not (must
-// FAIL). Then a deliberately corrupted vector must be rejected with an index.
+// FAIL). Then a deliberately corrupted vector must be rejected with an index,
+// and the vacuous all-zero vector must be refused outright.
 static int selftest() {
   const int H = 2, vbits = 80;
   int bad = 0;
 
+  const StageOps O = strip::buildStageOps(H);
+  Work s;
+  std::vector<double> w(O.size[0], 0.0);
+  w[0] = 1.0;
+
   // Converge the eigenvector at x = 1/2.4142, just OUTSIDE the true radius
   // 1/(1+sqrt 2), so rho > 1 and the true claim has margin to spare.
-  Sig empty; std::memset(empty.b, 0, SIGMAX);
-  Vec w; w[empty] = 1.0;
-  rhoF(10000.0 / 24142.0, w, H, nullptr);
+  rhoF(O, 10000.0 / 24142.0, w, s);
 
   double wmin, wmax;
-  IVec v = quantize(w, vbits, wmin, wmax);
-  std::printf("selftest: H=2 states=%zu vrange_bits=%.1f\n", v.size(), std::log2(wmax / wmin));
+  std::vector<u128> v = quantize(w, vbits, wmin, wmax);
+  std::printf("selftest: H=2 states=%zu vlen=%zu vrange_bits=%.1f\n", O.states(),
+              v.size(), std::log2(wmax / wmin));
 
-  CheckResult a = checkCert(v, H, 10000, 24142);
+  CheckResult a = checkCert(O, v, 10000, 24142);
   std::printf("selftest A: mu_2 >= 24142/10000 -> %s (min_ratio=%.9f, expect PASS)\n",
               a.pass ? "PASS" : "FAIL", a.minRatio);
   if (!a.pass) { ++bad; std::printf("  UNEXPECTED: first bad state %s\n", a.firstBad.c_str()); }
 
   // 2.4143 > 1+sqrt(2): the checker must reject it at the SAME vector.
-  Vec w2 = w; rhoF(10000.0 / 24143.0, w2, H, nullptr);
-  IVec v2 = quantize(w2, vbits, wmin, wmax);
-  CheckResult b = checkCert(v2, H, 10000, 24143);
+  std::vector<double> w2 = w; rhoF(O, 10000.0 / 24143.0, w2, s);
+  std::vector<u128> v2 = quantize(w2, vbits, wmin, wmax);
+  CheckResult b = checkCert(O, v2, 10000, 24143);
   std::printf("selftest B: mu_2 >= 24143/10000 -> %s (min_ratio=%.9f, expect FAIL)\n",
               b.pass ? "PASS" : "FAIL", b.minRatio);
   if (b.pass) { ++bad; std::printf("  UNEXPECTED: an over-claim was certified\n"); }
@@ -565,13 +485,13 @@ static int selftest() {
                    u128str(b.firstBadLhs).c_str(), u128str(b.firstBadRhs).c_str());
 
   // Corrupt one entry of a PASSING vector: the checker must notice.
-  IVec vp = v;
+  std::vector<u128> vp = v;
   {
-    const Sig* worst = nullptr; u128 best = 0;
-    for (auto& kv : vp) if (kv.second > best) { best = kv.second; worst = &kv.first; }
-    if (worst) vp[*worst] = best << 30;
+    std::size_t worst = 0; u128 best = 0;
+    for (std::size_t i = 0; i < vp.size(); ++i) if (vp[i] > best) { best = vp[i]; worst = i; }
+    if (best) vp[worst] = best << 30;
   }
-  CheckResult c = checkCert(vp, H, 10000, 24142);
+  CheckResult c = checkCert(O, vp, 10000, 24142);
   std::printf("selftest C: perturbed vector -> %s (expect FAIL)\n", c.pass ? "PASS" : "FAIL");
   if (c.pass) { ++bad; std::printf("  UNEXPECTED: corruption not detected\n"); }
   else std::printf("  rejected at state %s: lhs=%s < rhs=%s (%zu failing states)\n",
@@ -580,9 +500,8 @@ static int selftest() {
 
   // The all-zero vector satisfies "A v >= v" vacuously for ANY claim; if the
   // checker accepted it, every rational would certify. It must refuse.
-  IVec vz = v;
-  for (auto& kv : vz) kv.second = 0;
-  CheckResult d = checkCert(vz, H, 10000, 24142);
+  std::vector<u128> vz(v.size(), 0);
+  CheckResult d = checkCert(O, vz, 10000, 24142);
   std::printf("selftest D: all-zero vector -> %s (expect FAIL)\n", d.pass ? "PASS" : "FAIL");
   if (d.pass) { ++bad; std::printf("  UNEXPECTED: a vacuous certificate was accepted\n"); }
 

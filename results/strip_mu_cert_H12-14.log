@@ -1,0 +1,112 @@
+c++ -std=c++20 -Wall -Wextra -Werror -DGIT_REV='"4ab40fa-dirty"' -DBUILD_TIME='"2026-07-31T13:43:19-0400"' -O3 -I. cpp/strip_mu_cert.cpp -o build/strip_mu_cert
+selftest: H=2 states=3 vrange_bits=1.3
+selftest A: mu_2 >= 24142/10000 -> PASS (min_ratio=1.000006582, expect PASS)
+selftest B: mu_2 >= 24143/10000 -> FAIL (min_ratio=0.999958055, expect FAIL)
+  rejected at state 000100000000: lhs=1208875111404083413233589 < rhs=1208925819614629174706176
+selftest C: perturbed vector -> FAIL (expect FAIL)
+  rejected at state 010000000000: lhs=537682965928004666609013035163071 < rhs=1298074214633706763017436006449152 (1 failing states)
+selftest D: all-zero vector -> FAIL (expect FAIL)
+selftest: ALL OK
+=== strip_mu_cert H=12..14 host=gympie rev=4ab40fa 2026-07-31T17:43:20Z ===
+=== cpp/strip_mu_cert.cpp blob 4c122d151ee682903e341df0275d8c1f10ca569e ===
+ H |   states |  mu_H (float) | certified mu_H >=      | ratio | sweeps | time
+event=start job=stripmucert-H12 t=2026-07-31T13:43:20-04:00 git=4ab40fa-dirty built=2026-07-31T13:43:19-0400 host=gympie H=12 digits=7 vbits=96
+event=heartbeat job=stripmucert-H12 t=2026-07-31T13:44:12-04:00 elapsed_s=51.6 rate=0.09693/s count=5 phase=bisect
+event=heartbeat job=stripmucert-H12 t=2026-07-31T13:44:58-04:00 elapsed_s=97.6 rate=0.1024/s count=10 phase=bisect
+event=heartbeat job=stripmucert-H12 t=2026-07-31T13:45:43-04:00 elapsed_s=142.9 rate=0.1049/s count=15 phase=bisect
+event=heartbeat job=stripmucert-H12 t=2026-07-31T13:46:29-04:00 elapsed_s=189.2 rate=0.1057/s count=20 phase=bisect
+event=heartbeat job=stripmucert-H12 t=2026-07-31T13:47:16-04:00 elapsed_s=236.1 rate=0.1059/s count=25 phase=bisect
+event=heartbeat job=stripmucert-H12 t=2026-07-31T13:48:02-04:00 elapsed_s=281.8 rate=0.1065/s count=30 phase=bisect
+event=heartbeat job=stripmucert-H12 t=2026-07-31T13:48:49-04:00 elapsed_s=329.0 rate=0.1064/s count=35 phase=bisect
+event=heartbeat job=stripmucert-H12 t=2026-07-31T13:49:35-04:00 elapsed_s=375.0 rate=0.1067/s count=40 phase=bisect
+event=attempt job=stripmucert-H12 sweep=1 num=62191246 den=10000000 states=41834 vrange_bits=57.5 acc_bits=96.7 fail=0 min_ratio=1.000000008 overflow=0
+event=done job=stripmucert-H12 t=2026-07-31T13:49:54-04:00 start=2026-07-31T13:43:20-04:00 wall_s=393.5 cpu_s=393.4 peak_rss_mb=46.1 H=12 result=PASS num=62191246 den=10000000 states=41834
+12 |    41834 |     6.2191246 |   62191246/10000000   | 1.0000 |        1 | 393.5s
+event=start job=stripmucert-H13 t=2026-07-31T13:49:54-04:00 git=4ab40fa-dirty built=2026-07-31T13:43:19-0400 host=gympie H=13 digits=7 vbits=96
+event=heartbeat job=stripmucert-H13 t=2026-07-31T13:50:49-04:00 elapsed_s=55.0 rate=0.01818/s count=1 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T13:51:54-04:00 elapsed_s=120.6 rate=0.02487/s count=3 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T13:53:02-04:00 elapsed_s=187.9 rate=0.02661/s count=5 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T13:54:09-04:00 elapsed_s=254.9 rate=0.02746/s count=7 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T13:55:17-04:00 elapsed_s=323.2 rate=0.02785/s count=9 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T13:56:26-04:00 elapsed_s=391.8 rate=0.02807/s count=11 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T13:57:40-04:00 elapsed_s=466.4 rate=0.02787/s count=13 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T13:58:53-04:00 elapsed_s=539.1 rate=0.02783/s count=15 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:00:02-04:00 elapsed_s=608.4 rate=0.02794/s count=17 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:01:11-04:00 elapsed_s=677.6 rate=0.02804/s count=19 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:02:24-04:00 elapsed_s=750.6 rate=0.02798/s count=21 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:03:33-04:00 elapsed_s=819.5 rate=0.02807/s count=23 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:04:41-04:00 elapsed_s=887.4 rate=0.02817/s count=25 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:05:50-04:00 elapsed_s=955.9 rate=0.02825/s count=27 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:06:58-04:00 elapsed_s=1024.2 rate=0.02832/s count=29 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:08:06-04:00 elapsed_s=1092.5 rate=0.02838/s count=31 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:09:16-04:00 elapsed_s=1161.9 rate=0.0284/s count=33 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:10:24-04:00 elapsed_s=1230.3 rate=0.02845/s count=35 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:11:33-04:00 elapsed_s=1298.8 rate=0.02849/s count=37 phase=bisect
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:12:41-04:00 elapsed_s=1366.9 rate=0.02853/s count=39 phase=bisect
+event=attempt job=stripmucert-H13 sweep=1 num=63060712 den=10000000 states=113633 vrange_bits=80.6 acc_bits=96.7 fail=0 min_ratio=1.000000000 overflow=0
+event=heartbeat job=stripmucert-H13 t=2026-07-31T14:14:23-04:00 elapsed_s=1469.7 rate=0.0006804/s count=1 phase=certify
+event=done job=stripmucert-H13 t=2026-07-31T14:14:24-04:00 start=2026-07-31T13:49:54-04:00 wall_s=1469.8 cpu_s=1863.1 peak_rss_mb=122.0 H=13 result=PASS num=63060712 den=10000000 states=113633
+13 |   113633 |     6.3060713 |   63060712/10000000   | 1.0000 |        1 | 1469.8s
+event=start job=stripmucert-H14 t=2026-07-31T14:14:24-04:00 git=4ab40fa-dirty built=2026-07-31T13:43:19-0400 host=gympie H=14 digits=7 vbits=96
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:16:23-04:00 elapsed_s=119.9 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:18:29-04:00 elapsed_s=245.5 rate=0.004073/s count=1 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:21:19-04:00 elapsed_s=415.7 rate=0.004811/s count=2 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:23:43-04:00 elapsed_s=559.7 rate=0.00536/s count=3 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:26:13-04:00 elapsed_s=709.7 rate=0.005636/s count=4 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:28:40-04:00 elapsed_s=856.5 rate=0.005837/s count=5 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:30:52-04:00 elapsed_s=988.3 rate=0.006071/s count=6 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:33:04-04:00 elapsed_s=1120.4 rate=0.006248/s count=7 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:35:19-04:00 elapsed_s=1255.3 rate=0.006373/s count=8 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:37:32-04:00 elapsed_s=1389.0 rate=0.00648/s count=9 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:39:45-04:00 elapsed_s=1522.0 rate=0.00657/s count=10 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:41:59-04:00 elapsed_s=1655.0 rate=0.006646/s count=11 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:44:12-04:00 elapsed_s=1788.0 rate=0.006711/s count=12 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:46:25-04:00 elapsed_s=1921.2 rate=0.006767/s count=13 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:48:36-04:00 elapsed_s=2052.0 rate=0.006823/s count=14 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:50:49-04:00 elapsed_s=2185.0 rate=0.006865/s count=15 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:53:02-04:00 elapsed_s=2318.2 rate=0.006902/s count=16 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:55:12-04:00 elapsed_s=2448.9 rate=0.006942/s count=17 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:57:26-04:00 elapsed_s=2582.1 rate=0.006971/s count=18 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T14:59:39-04:00 elapsed_s=2715.1 rate=0.006998/s count=19 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:01:52-04:00 elapsed_s=2848.2 rate=0.007022/s count=20 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:04:05-04:00 elapsed_s=2981.3 rate=0.007044/s count=21 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:06:19-04:00 elapsed_s=3115.0 rate=0.007063/s count=22 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:08:29-04:00 elapsed_s=3245.9 rate=0.007086/s count=23 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:10:43-04:00 elapsed_s=3379.2 rate=0.007102/s count=24 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:12:56-04:00 elapsed_s=3512.3 rate=0.007118/s count=25 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:15:09-04:00 elapsed_s=3645.5 rate=0.007132/s count=26 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:17:22-04:00 elapsed_s=3778.8 rate=0.007145/s count=27 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:19:35-04:00 elapsed_s=3911.9 rate=0.007158/s count=28 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:21:49-04:00 elapsed_s=4045.3 rate=0.007169/s count=29 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:24:02-04:00 elapsed_s=4178.4 rate=0.00718/s count=30 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:26:16-04:00 elapsed_s=4312.3 rate=0.007189/s count=31 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:28:30-04:00 elapsed_s=4446.1 rate=0.007197/s count=32 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:30:43-04:00 elapsed_s=4579.9 rate=0.007205/s count=33 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:32:57-04:00 elapsed_s=4713.7 rate=0.007213/s count=34 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:35:11-04:00 elapsed_s=4847.7 rate=0.00722/s count=35 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:37:28-04:00 elapsed_s=4984.7 rate=0.007222/s count=36 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:39:42-04:00 elapsed_s=5118.6 rate=0.007229/s count=37 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:41:56-04:00 elapsed_s=5252.4 rate=0.007235/s count=38 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:44:10-04:00 elapsed_s=5386.2 rate=0.007241/s count=39 phase=bisect
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:46:24-04:00 elapsed_s=5520.2 rate=0.007246/s count=40 phase=bisect
+event=attempt job=stripmucert-H14 sweep=1 num=63800344 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=4 min_ratio=0.997455471 overflow=0
+event=heartbeat job=stripmucert-H14 t=2026-07-31T15:50:56-04:00 elapsed_s=5792.5 rate=0.0001726/s count=1 phase=certify
+event=attempt job=stripmucert-H14 sweep=2 num=63800343 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=4 min_ratio=0.997455471 overflow=0
+event=attempt job=stripmucert-H14 sweep=3 num=63800342 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=4 min_ratio=0.997455471 overflow=0
+event=attempt job=stripmucert-H14 sweep=4 num=63800340 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=4 min_ratio=0.997455471 overflow=0
+event=attempt job=stripmucert-H14 sweep=5 num=63800336 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=3 min_ratio=0.997455471 overflow=0
+event=attempt job=stripmucert-H14 sweep=6 num=63800328 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=2 min_ratio=0.997455471 overflow=0
+event=attempt job=stripmucert-H14 sweep=7 num=63800312 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=2 min_ratio=0.997455471 overflow=0
+event=attempt job=stripmucert-H14 sweep=8 num=63800280 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=1 min_ratio=0.997455471 overflow=0
+event=attempt job=stripmucert-H14 sweep=9 num=63800216 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=1 min_ratio=0.997455471 overflow=0
+event=attempt job=stripmucert-H14 sweep=10 num=63800088 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=0 min_ratio=1.000000000 overflow=0
+event=attempt job=stripmucert-H14 sweep=11 num=63800152 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=1 min_ratio=0.997455471 overflow=0
+event=attempt job=stripmucert-H14 sweep=12 num=63800120 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=0 min_ratio=1.000000000 overflow=0
+event=attempt job=stripmucert-H14 sweep=13 num=63800136 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=0 min_ratio=1.000000000 overflow=0
+event=attempt job=stripmucert-H14 sweep=14 num=63800144 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=0 min_ratio=1.000000000 overflow=0
+event=attempt job=stripmucert-H14 sweep=15 num=63800148 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=0 min_ratio=1.000000000 overflow=0
+event=attempt job=stripmucert-H14 sweep=16 num=63800150 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=1 min_ratio=0.997455471 overflow=0
+event=attempt job=stripmucert-H14 sweep=17 num=63800149 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=0 min_ratio=1.000000000 overflow=0
+event=attempt job=stripmucert-H14 sweep=18 num=63800149 den=10000000 states=310571 vrange_bits=87.4 acc_bits=96.7 fail=0 min_ratio=1.000000000 overflow=0
+event=done job=stripmucert-H14 t=2026-07-31T15:51:36-04:00 start=2026-07-31T14:14:24-04:00 wall_s=5832.8 cpu_s=7695.3 peak_rss_mb=418.9 H=14 result=PASS num=63800149 den=10000000 states=310571
+14 |   310571 |     6.3800344 |   63800149/10000000   | 1.0000 |       18 | 5832.8s

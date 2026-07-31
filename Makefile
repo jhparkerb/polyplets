@@ -71,15 +71,18 @@ build/strip_tm: cpp/strip_tm.cpp | build
 # Strip growth-constant engines (mu_H, the rigorous lambda lower-bound ladder).
 # strip_mu_cert is the CERTIFICATE tool: float power iteration to locate x*, then
 # an exact unsigned-__int128 Collatz-Wielandt check that promotes mu_H to a
-# machine-checkable rational. -I. for core/ (it reuses the production kink stage
-# transition verbatim) and cpp/obs.h rides the quoted include.
+# machine-checkable rational. Since 2026-07-31 both phases drive the frozen
+# stage operators of cpp/strip_stage_ops.h (~240x at H=11/12), so that header is
+# a dependency here as well as under build/strip_mu_fast. -I. for core/ and
+# cpp/obs.h rides the quoted include.
 build/strip_mu: cpp/strip_mu.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
 build/strip_mu_kink: cpp/strip_mu_kink.cpp core/signature.h core/transition.h | build
 	$(CXX) $(CXXFLAGS) -O3 -I. $< -o $@
 
-build/strip_mu_cert: cpp/strip_mu_cert.cpp cpp/obs.h core/signature.h core/transition.h | build
+build/strip_mu_cert: cpp/strip_mu_cert.cpp cpp/strip_stage_ops.h cpp/obs.h \
+                     core/signature.h core/transition.h | build
 	$(CXX) $(CXXFLAGS) -O3 -I. $< -o $@
 
 # strip_mu_fast is the INDEXED-ARRAY engine: the same cell-at-a-time kink sweep,
