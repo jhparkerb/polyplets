@@ -31,8 +31,9 @@ by-height diagonals of fixed polyhexes are a polynomial times `2^n`.**
   (fixed polyhexes) `1, 3, 11, 44, 186` at `n = 1..5` — the same cross-family gate
   as `Universal/Square.lean` runs against A001168.
 
-The anchor cells and the row sums are `native_decide`; everything else is
-standard-axioms.
+The anchor cells and the row sums are `native_decide`; the `P₁` pins inherit
+exactly the two anchor-cell leaves (no further `native_decide`), and
+everything else is standard-axioms.
 -/
 
 namespace Polyplets.Universal
@@ -144,11 +145,12 @@ theorem hex_P1_closed (n : ℕ) (hn : 3 ≤ n) :
   rw [h]
   ring_nf
 
-/-- The out-of-sample corroboration, stated as an equation. -/
-example : (T hexLattice 5 4 : ℚ) = (9 * (5 : ℚ) - 15) * (2 : ℚ) ^ ((5 : ℤ) - 4) := by
-  have h := hex_P1_closed 5 (by norm_num)
-  norm_num at h ⊢
-  exact h
+/-- The out-of-sample corroboration, enforcing: the numeral from the anchor
+`T_hex_5_4` meets the pinned law in one statement, so the `example` fails if
+either side drifts. -/
+example : ((60 : ℕ) : ℚ) = (9 * (5 : ℚ) - 15) * (2 : ℚ) ^ ((5 : ℤ) - 4) := by
+  rw [← T_hex_5_4]
+  exact_mod_cast hex_P1_closed 5 (by norm_num)
 
 /-! ## Axiom audit -/
 

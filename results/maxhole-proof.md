@@ -96,6 +96,19 @@ king-connected, and encloses exactly the box. Choosing a+b = n−2 with the
 near-equal parity-optimal split achieves **round((n−2)²/8) for every n ≥ 4**
 (n=5 via the n=4 diamond plus one padding cell, M(5)=M(4)=1). Verified n ≤ 60,
 matching banked M(n) exactly for n ≤ 17: `experiments/maxhole_box_construction.py`.
+
+*Caveat (2026-07-31 adversarial review of the Lean formalization,
+docs/reviews/outworks-adversarial.md): the unqualified a+b+2 claim above
+holds only off the degenerate margin — the 4-neighbour ring has a+b+1 cells
+when min(a,b)=1 with max(a,b) even, and the box is not one 4-connected
+region (so the ring is a multi-hole animal, not a single-hole witness) when
+min(a,b)=1 with max(a,b) ≥ 3; measured for all a,b ≤ 12 by
+`experiments/maxhole_review_checks.py`. The optimizing split above never
+enters that margin, so every stated M(n) value is unaffected. The Lean
+construction (`Polyplets/Holes.lean`) uses the diagonal frame
+hullBox∖boxHole instead, which has a+b+2 cells for ALL a,b and subsumes the
+n=5 padding cell. The paper's §8 sentence quoting the unqualified ring claim
+should be qualified the same way.*
 The diamond is the a=b odd case; the previously-mysterious "slightly asymmetric"
 optima at n ≢ 0 (mod 4) are just the boxes with |a−b| ∈ {1,2}.
 

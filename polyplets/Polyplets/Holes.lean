@@ -34,10 +34,12 @@ Everything is easiest in the diagonal coordinates `u = x + y`, `v = x − y`
   every cell outside the hull escapes to infinity along a horizontal ray.
 * Taking `a + b = n − 2` as equal as possible gives the extremal areas.
 
-This is the family of `experiments/maxhole_box_construction.py`, transcribed;
+This is the family of `experiments/maxhole_box_construction.py`, adapted;
 see `results/maxhole-proof.md`. Note that `hullBox \ boxHole` has `a + b + 2`
-cells for *all* `a, b`, including the `(2,1)` case where it strictly contains
-the 4-neighbour ring of the box; so the `n = 5` "padding cell" of the python
+cells for *all* `a, b`, whereas the python 4-neighbour ring has only
+`a + b + 1` at every `min(a,b) = 1` with `max(a,b)` even (measured for all
+`a, b ≤ 12`, `experiments/maxhole_review_checks.py`); at `(2,1)` the frame
+strictly contains the ring, so the `n = 5` "padding cell" of the python
 docstring is here just the `(a,b) = (2,1)` member of the uniform family.
 -/
 
@@ -245,8 +247,9 @@ lemma ringAnimal_card (a b : ℕ) : (ringAnimal a b).card = a + b + 2 := by
 
 /-! ### The hole is rook-connected -/
 
-/-- One step of a rook walk inside a cell set. -/
-private abbrev rookStep (S : Finset (ℤ × ℤ)) (x y : ℤ × ℤ) : Prop :=
+/-- One step of a rook walk inside a cell set. Public because it appears in
+the statements of `boxHole_rook_connected` and `ringAnimal_singleHole`. -/
+abbrev rookStep (S : Finset (ℤ × ℤ)) (x y : ℤ × ℤ) : Prop :=
   x ∈ S ∧ y ∈ S ∧ rookAdj x y
 
 /-- One step of a king walk inside a cell set. -/
@@ -538,7 +541,14 @@ theorem enclosed_ringAnimal (a b : ℕ) : enclosed (ringAnimal a b) = ↑(boxHol
       tauto
     · exact Set.Finite.subset (boxHole a b).finite_toSet (component_subset_boxHole a b hp)
 
-/-- The ring animal has a single hole, given that its box is rook-connected. -/
+/-- The ring animal has a single hole, given that its box is rook-connected.
+
+Warning: the rook-connectivity hypothesis is *not* free — `boxHole a b` is
+rook-DISCONNECTED exactly when `min(a,b) = 1` and `max(a,b) ≥ 3` (the
+multi-hole rings; measured for all `a, b ≤ 12` by
+`experiments/maxhole_review_checks.py`), so `SingleHole (ringAnimal a b)` is
+false there. The optimizing split of `maxhole_lower` never lands in that
+set. -/
 theorem ringAnimal_singleHole (a b : ℕ) (ha : 1 ≤ a) (hb : 1 ≤ b)
     (hconn : ∀ p ∈ boxHole a b, ∀ q ∈ boxHole a b,
       Relation.ReflTransGen (rookStep (boxHole a b)) p q) :

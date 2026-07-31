@@ -32,7 +32,7 @@ number-theory shim.
 
 ## What this discharges
 
-Step 4 (Northcott/Kronecker finiteness) of the unconditional
+Step 4 (Northcott finiteness) of the unconditional
 non-D-finiteness theorem of `results/anisotropic-not-dfinite.md`, i.e. "the
 strip growth constants `μ_H`, pairwise distinct algebraic integers with house
 `< λ ≤ 9.3153`, have unbounded degree".
@@ -43,18 +43,22 @@ strict-monotonicity step (Mathlib has no Perron root theory), and any Lean
 notion of D-finiteness at all. So this file is a reusable ingredient, not the
 theorem.
 
-## Divergence found while formalizing (worth a paper edit)
+## Why two forms (finiteness and unboundedness)
 
-Step 5 of the paper argument contradicts step 4 by saying a `y`-ODE of order
-`r` with `x`-degrees `≤ D` "forces `deg_ℚ(μ_H) ≤ D` at all but at most `r`
-heights". Unboundedness alone (`unbounded_degree_of_house_le`: for each `d`
-*some* `H` has larger degree) does not contradict that — the offending `H`
-could be one of the `r` exceptions. What does contradict it, and what
-Northcott actually gives, is that `{H | deg(μ_H) ≤ D}` is *finite*
-(`finite_setOf_degree_le_of_house_le`), so no `r` exceptions suffice.
-The stronger statement is proved here and costs nothing; the prose of step 4
-("therefore `deg_ℚ(μ_H) → ∞`") is fine, it is the literal reading of the
-brief's deliverable that is too weak.
+`finite_setOf_degree_le_of_house_le` is the finiteness form of step 4; it is
+strictly stronger than the brief's pinned `unbounded_degree_of_house_le`
+(which is derived from it below), matches the paper's step (iv) more
+literally, and costs nothing extra — so both are proved and both are
+guarded.
+
+Correction (2026-07-31 adversarial review): an earlier revision of this note
+claimed the finiteness form was *needed* because "bare unboundedness does not
+contradict step 5 — the offending `H` could be one of the `r` exceptions".
+That was a quantifier slip: step 5's exceptional set is finite, degrees on a
+finite set are bounded, and unboundedness beyond that bound already yields
+the contradiction (machine-checked during the review). Neither form is
+mathematically deficient; the finiteness form is kept as the primary export
+because it is the closer match to the paper's (iv).
 
 ## Provenance note
 

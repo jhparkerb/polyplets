@@ -53,13 +53,17 @@ Two combinatorial substitutes were tried and both fail for that reason.
    one animal cell to each anti-diagonal level `u = ℓ` of the hole's range. The
    underlying claim — every such level carries an animal cell — is **false**,
    and false on the extremal family itself: the ring of the `3 × 3` box has
-   `n = 8 = ha + hm + 2` yet *no* cell at `u = 1`, because on the parity
-   sublattice the two `v`-walls sit in the same parity class. (Measured: the
-   claim fails on 1375 of 8375 random single-hole animals; `≥ 2` per level fails
-   on 4321.) A king step may change `u` by `2`, so the moat can skip levels.
+   `n = 8 = ha + hm + 2` yet no cell at `u = 0` or `u = 2`, because all four
+   walls sit at odd `u`, leaving the even levels of the hole's range empty.
+   (Measured exhaustively, `experiments/maxhole_review_checks.py`: the claim
+   fails on 63,112 of the 104,727 single-hole animals with `n ≤ 9`; `≥ 2` per
+   level fails on 95,252.) A king step may change `u` by `2`, so the moat can
+   skip levels.
 2. *Gap charging*: the repaired claim — every `u`-gap `{ℓ, ℓ+1}` for
    `u0 - 1 ≤ ℓ ≤ u1` carries `≥ 2` animal cells, and likewise for `v` — does
-   hold (0 violations on the same 8375 animals), but it cannot reach the target.
+   hold (0 violations on the same 104,727 animals), but it cannot reach the
+   target: it holds and is still too weak, so it is refuted by counting, not
+   by measurement.
    Each cell lies in exactly two `u`-gaps and two `v`-gaps, so the demand
    `2(ha+1) + 2(hm+1)` only gives `4·n ≥ 2(ha + hm + 2)`, i.e. half the bound.
    The ring is tight for `MoatBound`, so the factor of two is not slack in the
@@ -69,7 +73,12 @@ Two combinatorial substitutes were tried and both fail for that reason.
 
 Mathlib has neither Menger's theorem nor any digital-topology/Jordan-curve
 material to build the walk on (it does have Hall's theorem, which is not enough
-by itself), so (II′) stays a hypothesis here.
+by itself), so (II′) stays a hypothesis here. Beyond the paper proof and the
+3,927-animal machine check of `results/maxhole-proof.md`, (II′) as stated —
+with this file's exact `enclosed`/`SingleHole` definitions — was checked
+exhaustively against all 104,727 single-hole king animals with `n ≤ 9`
+(0 violations, tight on the box rings; `experiments/maxhole_review_checks.py`,
+2026-07-31 adversarial review).
 -/
 
 namespace Polyplets

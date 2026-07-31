@@ -598,10 +598,9 @@ theorem recRight_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonica
 animals of sizes `m` and `n` into the canonical animals of size `m + n`;
 `recLeft`/`recRight` are the left inverse that makes it an injection.
 
-The `1 ≤ m`, `1 ≤ n` hypotheses are kept for the downstream interface (and
-because the statement is false-flavoured without them — `a 0 = 0`) but are not
-needed: a canonical animal is nonempty whatever its declared size, so at `m = 0`
-there simply are none and both sides are `0`. -/
+The `1 ≤ m`, `1 ≤ n` hypotheses are kept for the downstream interface (the
+brief pins this signature) but are not needed by the proof: at `m = 0` the
+left side is `a 0 * a n = 0` and the inequality degenerates to `0 ≤ a n`. -/
 theorem a_supermul {m n : ℕ} (_hm : 1 ≤ m) (_hn : 1 ≤ n) : a m * a n ≤ a (m + n) := by
   classical
   have key : ∀ k : ℕ, a k = (canonicalAnimal_finite k).toFinset.card := fun k => by
@@ -646,7 +645,7 @@ noncomputable def negLogA (k : ℕ) : ℝ := -Real.log (a k)
 
 /-- **Supermultiplicativity, read through `log`.** The degenerate cases `m = 0`
 and `n = 0` are equalities: `a 0 = 0` and `Real.log 0 = 0`, so `negLogA 0 = 0`. -/
-theorem logSeq_subadditive : Subadditive negLogA := by
+theorem negLogA_subadditive : Subadditive negLogA := by
   intro p q
   rcases Nat.eq_zero_or_pos p with rfl | hp
   · simp [negLogA, a_zero]
@@ -663,7 +662,7 @@ theorem logSeq_subadditive : Subadditive negLogA := by
   linarith
 
 /-- The lower bound on `negLogA n / n` supplied by the exponential ceiling. -/
-theorem logSeq_div_ge {k : ℕ} (hk : 1 ≤ k) :
+theorem negLogA_div_ge {k : ℕ} (hk : 1 ≤ k) :
     -Real.log (3125 / 256 : ℝ) ≤ negLogA k / k := by
   have hkR : (0 : ℝ) < k := by exact_mod_cast hk
   have hpos : (0 : ℝ) < a k := by exact_mod_cast one_le_a hk
@@ -676,18 +675,18 @@ theorem logSeq_div_ge {k : ℕ} (hk : 1 ≤ k) :
   linarith
 
 /-- `negLogA n / n` is bounded below, the hypothesis Fekete's lemma needs. -/
-theorem logSeq_bddBelow : BddBelow (Set.range fun k : ℕ => negLogA k / k) := by
+theorem negLogA_bddBelow : BddBelow (Set.range fun k : ℕ => negLogA k / k) := by
   refine ⟨-Real.log (3125 / 256 : ℝ), ?_⟩
   rintro x ⟨k, rfl⟩
   rcases Nat.eq_zero_or_pos k with rfl | hk
   · simp only [negLogA, a_zero, Nat.cast_zero, Real.log_zero, neg_zero, zero_div]
     have := Real.log_nonneg (by norm_num : (1 : ℝ) ≤ 3125 / 256)
     linarith
-  · exact logSeq_div_ge hk
+  · exact negLogA_div_ge hk
 
 /-- **The growth constant of the polyplet sequence**, `λ = lim a(n)^{1/n}`,
 built as `exp` of the negated Fekete limit of `negLogA`. -/
-noncomputable def lambda : ℝ := Real.exp (-logSeq_subadditive.lim)
+noncomputable def lambda : ℝ := Real.exp (-negLogA_subadditive.lim)
 
 /-- `λ` is positive. -/
 lemma lambda_pos : 0 < lambda := Real.exp_pos _
@@ -696,8 +695,8 @@ lemma lambda_pos : 0 < lambda := Real.exp_pos _
 theorem lambda_tendsto :
     Filter.Tendsto (fun n => (a n : ℝ) ^ ((n : ℝ)⁻¹)) Filter.atTop (𝓝 lambda) := by
   have h0 : Filter.Tendsto (fun k : ℕ => negLogA k / k) Filter.atTop
-      (𝓝 logSeq_subadditive.lim) :=
-    logSeq_subadditive.tendsto_lim logSeq_bddBelow
+      (𝓝 negLogA_subadditive.lim) :=
+    negLogA_subadditive.tendsto_lim negLogA_bddBelow
   have h2 : Filter.Tendsto (fun k : ℕ => Real.exp (-(negLogA k / k))) Filter.atTop (𝓝 lambda) :=
     (Real.continuous_exp.tendsto _).comp h0.neg
   refine h2.congr' ?_
@@ -715,22 +714,22 @@ theorem a_le_lambda_pow {n : ℕ} (hn : 1 ≤ n) : (a n : ℝ) ≤ lambda ^ n :=
   have hpos : (0 : ℝ) < a n := by exact_mod_cast one_le_a hn
   have hn0 : n ≠ 0 := by omega
   have hnR : (0 : ℝ) < n := by exact_mod_cast hn
-  have hle : logSeq_subadditive.lim ≤ negLogA n / n :=
-    logSeq_subadditive.lim_le_div logSeq_bddBelow hn0
+  have hle : negLogA_subadditive.lim ≤ negLogA n / n :=
+    negLogA_subadditive.lim_le_div negLogA_bddBelow hn0
   rw [le_div_iff₀ hnR] at hle
   simp only [negLogA] at hle
   calc (a n : ℝ) = Real.exp (Real.log (a n)) := (Real.exp_log hpos).symm
-    _ ≤ Real.exp ((n : ℝ) * (-logSeq_subadditive.lim)) := Real.exp_le_exp.mpr (by linarith)
+    _ ≤ Real.exp ((n : ℝ) * (-negLogA_subadditive.lim)) := Real.exp_le_exp.mpr (by linarith)
     _ = lambda ^ n := by rw [lambda]; exact Real.exp_nat_mul _ n
 
 /-- **The upper bound `λ ≤ 5⁵/4⁴ = 3125/256`**, from the decision-tree ceiling
 of `UpperBound.lean`. -/
 theorem lambda_le : lambda ≤ 3125 / 256 := by
-  have hbd : -Real.log (3125 / 256 : ℝ) ≤ logSeq_subadditive.lim := by
-    refine ge_of_tendsto (logSeq_subadditive.tendsto_lim logSeq_bddBelow) ?_
-    filter_upwards [Filter.eventually_ge_atTop 1] with k hk using logSeq_div_ge hk
+  have hbd : -Real.log (3125 / 256 : ℝ) ≤ negLogA_subadditive.lim := by
+    refine ge_of_tendsto (negLogA_subadditive.tendsto_lim negLogA_bddBelow) ?_
+    filter_upwards [Filter.eventually_ge_atTop 1] with k hk using negLogA_div_ge hk
   rw [lambda]
-  calc Real.exp (-logSeq_subadditive.lim) ≤ Real.exp (Real.log (3125 / 256 : ℝ)) :=
+  calc Real.exp (-negLogA_subadditive.lim) ≤ Real.exp (Real.log (3125 / 256 : ℝ)) :=
         Real.exp_le_exp.mpr (by linarith)
     _ = 3125 / 256 := Real.exp_log (by norm_num)
 

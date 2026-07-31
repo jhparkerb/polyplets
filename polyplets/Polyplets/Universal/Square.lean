@@ -35,8 +35,9 @@ counts fixed polyominoes of `n` cells and bounding-box height exactly `H`.
   triangle reproduce A001168 (fixed polyominoes) `1, 2, 6, 19, 63` at
   `n = 1..5`.
 
-The anchor cells and the row sums are `native_decide`; everything else is
-standard-axioms.
+The anchor cells and the row sums are `native_decide`; the `P₁` pins inherit
+exactly the two anchor-cell leaves (no further `native_decide`), and
+everything else is standard-axioms.
 -/
 
 namespace Polyplets.Universal
@@ -159,12 +160,12 @@ theorem square_P1_closed (n : ℕ) (hn : 3 ≤ n) :
   rw [b_square] at h
   simpa [sqP1_eval] using h
 
-/-- The out-of-sample corroboration, stated as an equation: the pinned law and
-the independently enumerated `T(5,4)` agree at `12`. -/
-example : (T squareLattice 5 4 : ℚ) = 4 * (5 : ℚ) - 8 := by
-  have h := square_P1_closed 5 (by norm_num)
-  norm_num at h ⊢
-  exact h
+/-- The out-of-sample corroboration, enforcing: the numeral from the anchor
+`T_square_5_4` meets the pinned law in one statement, so the `example` fails
+if either side drifts. -/
+example : ((12 : ℕ) : ℚ) = 4 * (5 : ℚ) - 8 := by
+  rw [← T_square_5_4]
+  exact_mod_cast square_P1_closed 5 (by norm_num)
 
 /-! ## Axiom audit -/
 

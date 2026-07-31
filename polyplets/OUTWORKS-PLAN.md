@@ -90,6 +90,12 @@ OW-3 and OW-7 when OW-1 lands; OW-2 last of its chain.
   where the brief allows native_decide. Every headline theorem gets a
   `#guard_msgs`-wrapped `#print axioms` in the audit point (extend
   `Grand/Audit.lean` or a new `Audit` section per brief).
+  *(Toolchain correction, 2026-07-31 review: on lean4 v4.31.0
+  `native_decide` emits a per-declaration axiom
+  `<thm>._native.native_decide.ax_1_1`, not `Lean.ofReduceBool` — read
+  every "ofReduceBool" in this plan and the briefs as that per-declaration
+  leaf; the guards in `AuditOutworks.lean` record the real names, so the
+  trusted base grows by one named leaf per anchor.)*
 - **Style**: mirror `Shape.lean`/`Pin.lean` (docstrings everywhere, `omega`
   for index arithmetic, `exact_mod_cast` at casts, `norm_num` literal guards).
   Linters on, keep green.
@@ -134,6 +140,16 @@ OW-3 and OW-7 when OW-1 lands; OW-2 last of its chain.
   spot checks at n = 4 (22 / 34 / 10).
 - G-H (OW-8): all three finiteness deliverables standard axioms, no
   native_decide.
+
+## Post-campaign
+
+All eight briefs landed and merged 2026-07-30. Adversarially reviewed
+2026-07-31 — `docs/reviews/outworks-adversarial.md` (zero critical, zero
+statement-fidelity defects; the review's claim-hygiene fixes are recorded
+in `PROOF-STATUS.md`). Where a brief and the landed code differ (OW-2's
+concatenation design, OW-3's `card_common_neighbours` naming, OW-6's
+uniform family), the briefs are left as the historical contract and the
+deviations are documented in the module docs and the review.
 
 ## Briefs (all ready for execution)
 

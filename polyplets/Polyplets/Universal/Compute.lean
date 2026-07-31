@@ -18,8 +18,9 @@ lattice-generic but live outside the shape engine:
   `Universal/Finite.lean` is `p.1 ≤ M · (n − 1)`. Rather than compute `M`, `Tc`
   takes the box width `W` as a parameter and `Tc_eq_T` asks for
   `M · (n − 1) ≤ W − 1`; `Tc_eq_T_of_M_le_one` is the convenient corollary
-  `W = n` for every lattice of reach `1` (square, hex, king — all the named
-  instances except the degenerate `D = {-2, 0, 2}`).
+  `W = n` for every lattice of reach `1` (square, hex, king — the named
+  instances except the five-neighbour `D = Icc (-2) 2` and the degenerate
+  `D = {-2, 0, 2}`, both of reach `2`).
 * **the pin lemma** `pin` — `Pin.lean`'s Lagrange-uniqueness argument with
   `T ↦ T L` and `3 ↦ L.b`. A degree-`≤ k` polynomial matching the production
   witness at `k + 1` of the `k + 1` onset points *is* the witness, so it carries

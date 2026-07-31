@@ -115,8 +115,11 @@ theorem king_rowSum_4 : rowSum kingLattice 4 4 = 110 := by native_decide
 /-- A006770 at `n = 5`: `1 + 68 + 248 + 240 + 81 = 638` fixed polyplets. -/
 theorem king_rowSum_5 : rowSum kingLattice 5 5 = 638 := by native_decide
 
-/-- The generic enumerator agrees with the king tree's own `native_decide`
-value at `T(3,2)`: two independent enumerators, one number. -/
+/-- The generic and king `T` agree at `(3,2)` — by the definitional bridge
+`T_king`, not by computation. The genuine two-enumerator cross-check is
+`T_king_3_2` (generic `Tc`, its own native leaf) against the king tree's
+`Polyplets.T_3_2` (king `Tc`, a distinct native leaf): both are forced to
+the same `results/triangle.txt` constant `10` or the build fails. -/
 theorem gd3_Tc_agrees : T kingLattice 3 2 = Polyplets.T 3 2 := T_king 3 2
 
 /-! ## `P₁` through the generic pin -/
@@ -185,6 +188,13 @@ theorem king_P1_closed_via_universal (n : ℕ) (hn : 3 ≤ n) :
   simp only [b_king, kingP1_eval, Nat.cast_ofNat] at h
   rw [h]
   ring_nf
+
+/-- The out-of-sample corroboration, enforcing: the numeral from the anchor
+`T_king_5_4` meets the pinned law in one statement, so the `example` fails if
+either side drifts. -/
+example : ((240 : ℕ) : ℚ) = (25 * (5 : ℚ) - 45) * (3 : ℚ) ^ ((5 : ℤ) - 4) := by
+  rw [← T_king_5_4, T_king]
+  exact_mod_cast king_P1_closed_via_universal 5 (by norm_num)
 
 /-! ## Axiom audit -/
 

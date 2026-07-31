@@ -23,27 +23,37 @@ companion of `Grand/Audit.lean`. Every `#print axioms` below is wrapped in
 `#guard_msgs`, so the build FAILS if any axiom set drifts from the recorded
 expectation.
 
-Expected footprints, recorded in `PROOF-STATUS.md`:
+Expected footprints — every line below is ENFORCED by a guard in this file
+(2026-07-31 adversarial-review fix: the instance `P₁` pins, the row-sum
+gates, `universal_shape_d`, `lambda_lb`, the `n = 4` spot checks,
+`maxhole_lower_banked` and `strip_sum_le_a` were previously asserted here
+but unguarded):
 
-* OW-1 — `a_eq_sum` standard three; the anchors `a_1 .. a_6` each carry
-  exactly their own `native_decide` leaf (`a_6` guarded below as the
-  representative: it is the one consumed downstream by `lambda_lb`).
+* OW-1 — `a_eq_sum`, `strip_sum_le_a` standard three; the anchors
+  `a_1 .. a_6` each carry exactly their own `native_decide` leaf (`a_6`
+  guarded as the representative — it is the one consumed downstream by
+  `lambda_lb`; `a_1 .. a_5` are certified through the guarded `Free_4`/
+  `OneSided_4` consumers at `a_4` and otherwise advisory).
 * OW-3 — `a_le_choose`, `choose_le_pow` standard three (the exploration
   injection is a proof, not a computation; no `native_decide` in the file).
 * OW-2 — `a_supermul`, `lambda_tendsto`, `a_le_lambda_pow`, `lambda_le`
-  standard three; `lambda_gt`/`lambda_lb` add exactly the `a_6` leaf.
+  standard three; `lambda_gt` and `lambda_lb` add exactly the `a_6` leaf.
   Machine-checked bracket: `3.95 < λ ≤ 3125/256`.
 * OW-4 — `factorial_smul_int_coeff`, `production_factorial_int` standard.
 * OW-7 — the three Burnside equations and `r90_vanish` standard three;
-  the `n = 4` spot checks carry the anchor leaves they are derived from.
-* OW-6 — `maxhole_lower`, `card_le_of_diag_window`, `area_max`,
-  `maxhole_upper`, `maxhole` standard three (the last two conditional on
-  the named `MoatBound` hypothesis; anchors are kernel `decide`, hence
-  axiom-free beyond `propext`).
+  the `n = 4` spot checks carry exactly the anchor leaves they are derived
+  from (guarded below; the raw `R90_*`/`R180_*`/`Hm_*`/`Dm_*` anchors each
+  carry their own leaf, certified at `n = 4` through the spot checks).
+* OW-6 — `maxhole_lower`, `maxhole_lower_banked`, `card_le_of_diag_window`,
+  `area_max`, `maxhole_upper`, `maxhole` standard three (the last two
+  conditional on the named `MoatBound` hypothesis; the `decide` anchors are
+  kernel-checked, axiom-free beyond `propext`).
 * OW-8 — all four Northcott results standard three.
-* OW-5 — the universal diagonal law standard three at every row-local
-  lattice; the instance `P₁` pins carry exactly their two anchor-cell
-  leaves; `kingP1_eq_Pp1` standard (the generic king `P₁` IS `Pin.lean`'s).
+* OW-5 — the universal diagonal law (`universal_shape_d` included)
+  standard three at every row-local lattice; the instance `P₁` pins carry
+  exactly their two anchor-cell leaves; each row-sum gate carries exactly
+  its own leaf; `kingP1_eq_Pp1` standard (the generic king `P₁` IS
+  `Pin.lean`'s `Pp1`).
 -/
 
 namespace Polyplets
@@ -59,6 +69,10 @@ info: 'Polyplets.a_6' depends on axioms: [propext, Classical.choice, Quot.sound,
 -/
 #guard_msgs in
 #print axioms a_6
+
+/-- info: 'Polyplets.strip_sum_le_a' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms strip_sum_le_a
 
 /-! ## OW-3: the corset -/
 
@@ -94,6 +108,12 @@ info: 'Polyplets.lambda_gt' depends on axioms: [propext, Classical.choice, Quot.
 #guard_msgs in
 #print axioms lambda_gt
 
+/--
+info: 'Polyplets.lambda_lb' depends on axioms: [propext, Classical.choice, Quot.sound, a_6._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms lambda_lb
+
 /-! ## OW-4: the factorial residue -/
 
 /--
@@ -126,11 +146,51 @@ info: 'Polyplets.production_factorial_int' depends on axioms: [propext, Classica
 #guard_msgs in
 #print axioms r90_vanish
 
+/--
+info: 'Polyplets.Free_4' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Dm_4._native.native_decide.ax_1_1,
+ Hm_4._native.native_decide.ax_1_1,
+ R180_4._native.native_decide.ax_1_1,
+ R90_4._native.native_decide.ax_1_1,
+ a_4._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Free_4
+
+/--
+info: 'Polyplets.OneSided_4' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ R180_4._native.native_decide.ax_1_1,
+ R90_4._native.native_decide.ax_1_1,
+ a_4._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms OneSided_4
+
+/--
+info: 'Polyplets.Bilateral_4' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Dm_4._native.native_decide.ax_1_1,
+ Hm_4._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Bilateral_4
+
 /-! ## OW-6: the diamond theorem -/
 
 /-- info: 'Polyplets.maxhole_lower' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms maxhole_lower
+
+/--
+info: 'Polyplets.maxhole_lower_banked' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms maxhole_lower_banked
 
 /--
 info: 'Polyplets.card_le_of_diag_window' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -201,5 +261,166 @@ info: 'Polyplets.Universal.kingP1_eq_Pp1' depends on axioms: [propext, Classical
 -/
 #guard_msgs in
 #print axioms Universal.kingP1_eq_Pp1
+
+/--
+info: 'Polyplets.Universal.universal_shape_d' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms Universal.universal_shape_d
+
+/-! ### OW-5 instance pins — each carries exactly its two anchor-cell leaves -/
+
+/--
+info: 'Polyplets.Universal.square_P1_pinned' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.T_square_3_2._native.native_decide.ax_1_1,
+ Universal.T_square_4_3._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.square_P1_pinned
+
+/--
+info: 'Polyplets.Universal.square_P1_closed' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.T_square_3_2._native.native_decide.ax_1_1,
+ Universal.T_square_4_3._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.square_P1_closed
+
+/--
+info: 'Polyplets.Universal.hex_P1_pinned' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.T_hex_3_2._native.native_decide.ax_1_1,
+ Universal.T_hex_4_3._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.hex_P1_pinned
+
+/--
+info: 'Polyplets.Universal.hex_P1_closed' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.T_hex_3_2._native.native_decide.ax_1_1,
+ Universal.T_hex_4_3._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.hex_P1_closed
+
+/--
+info: 'Polyplets.Universal.king_P1_pinned_via_universal' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.T_king_3_2._native.native_decide.ax_1_1,
+ Universal.T_king_4_3._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.king_P1_pinned_via_universal
+
+/--
+info: 'Polyplets.Universal.king_P1_pinned_king_form' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.T_king_3_2._native.native_decide.ax_1_1,
+ Universal.T_king_4_3._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.king_P1_pinned_king_form
+
+/--
+info: 'Polyplets.Universal.king_P1_closed_via_universal' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.T_king_3_2._native.native_decide.ax_1_1,
+ Universal.T_king_4_3._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.king_P1_closed_via_universal
+
+/-! ### OW-5 cross-family gates — each carries exactly its own leaf -/
+
+/--
+info: 'Polyplets.Universal.square_rowSum_3' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.square_rowSum_3._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.square_rowSum_3
+
+/--
+info: 'Polyplets.Universal.square_rowSum_4' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.square_rowSum_4._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.square_rowSum_4
+
+/--
+info: 'Polyplets.Universal.square_rowSum_5' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.square_rowSum_5._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.square_rowSum_5
+
+/--
+info: 'Polyplets.Universal.hex_rowSum_3' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.hex_rowSum_3._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.hex_rowSum_3
+
+/--
+info: 'Polyplets.Universal.hex_rowSum_4' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.hex_rowSum_4._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.hex_rowSum_4
+
+/--
+info: 'Polyplets.Universal.hex_rowSum_5' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.hex_rowSum_5._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.hex_rowSum_5
+
+/--
+info: 'Polyplets.Universal.king_rowSum_3' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.king_rowSum_3._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.king_rowSum_3
+
+/--
+info: 'Polyplets.Universal.king_rowSum_4' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.king_rowSum_4._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.king_rowSum_4
+
+/--
+info: 'Polyplets.Universal.king_rowSum_5' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Universal.king_rowSum_5._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Universal.king_rowSum_5
 
 end Polyplets

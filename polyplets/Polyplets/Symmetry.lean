@@ -72,14 +72,19 @@ it. The anchors run to `n = 5` and match `results/sym_counts.txt`:
 `hmirror = dmirror = 1, 2, 4, 10, 22`. The `n = 6` row — where `hmirror = 58`
 first parts company with `dmirror = 56`, so that it is the first row telling
 the two mirror conventions apart — needs the `C(36,6) ≈ 1.9M`-subset
-enumeration that `Sequence.lean`'s `a 6` note prices at ~700 s per group
-element, so it is out of this module's budget; it was confirmed by an
-independent brute force over the same `n × n` box (2026-07-30, all four
-columns `n = 1 … 6` reproducing `results/sym_counts.txt` exactly, including the
-`58` / `56` split). Nothing here depends on which mirror is which: `free_eq`
-and `bilateral_eq` are symmetric in `Hm` and `Dm`, and the two definitions
-`D4.h` (negate `y`) and `D4.d` (swap) are explicit. Derived spot checks
-`Free 4 = 22`, `OneSided 4 = 34`, `Bilateral 4 = 10` close the loop against
+enumeration at roughly 490 s per group element (measured scaling from the
+`n = 5` anchors), so it is out of this module's budget. It is instead
+verified by the committed independent brute force
+`experiments/sym_brute_check.py` (run 2026-07-31, log alongside): all four
+columns `n = 1 … 6` reproduce `results/sym_counts.txt` exactly, including
+the `58` / `56` split, and the derived free/one-sided/bilateral values match
+A030222/A030233/A030234 through `n = 6`. In-file, the conventions are pinned
+by proof rather than anchor — `toFun_mul` forces the multiplication table to
+be composition of the eight explicit linear maps, and `D4.h` (negate `y`)
+vs `D4.d` (swap) are distinct conjugacy classes by `decide` — and nothing
+published depends on which mirror is which: `free_eq` and `bilateral_eq` are
+symmetric in `Hm` and `Dm`. Derived spot checks `Free 4 = 22`,
+`OneSided 4 = 34`, `Bilateral 4 = 10` close the loop against
 A030222/A030233/A030234.
 -/
 
