@@ -38,7 +38,9 @@ but unguarded):
   injection is a proof, not a computation; no `native_decide` in the file).
 * OW-2 — `a_supermul`, `lambda_tendsto`, `a_le_lambda_pow`, `lambda_le`
   standard three; `lambda_gt` and `lambda_lb` add exactly the `a_6` leaf.
-  Machine-checked bracket: `3.95 < λ ≤ 3125/256`.
+  Machine-checked bracket: `3.95 < λ ≤ 3125/256`. `lambda_gt_of_banked`
+  (the conditional `6.22 < λ` from banked `a 40`) is standard three — its
+  numeric input is a hypothesis, not a computation.
 * OW-4 — `factorial_smul_int_coeff`, `production_factorial_int` standard.
 * OW-7 — the three Burnside equations and `r90_vanish` standard three;
   the `n = 4` spot checks carry exactly the anchor leaves they are derived
@@ -113,6 +115,10 @@ info: 'Polyplets.lambda_lb' depends on axioms: [propext, Classical.choice, Quot.
 -/
 #guard_msgs in
 #print axioms lambda_lb
+
+/-- info: 'Polyplets.lambda_gt_of_banked' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms lambda_gt_of_banked
 
 /-! ## OW-4: the factorial residue -/
 

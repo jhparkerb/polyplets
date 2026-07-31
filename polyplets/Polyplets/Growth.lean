@@ -29,9 +29,13 @@ The payoff:
 * `lambda_tendsto` : `a n ^ (1/n) → lambda`;
 * `a_le_lambda_pow` : `a n ≤ lambda ^ n` (Fekete's limit-is-supremum half);
 * `lambda_le` : `lambda ≤ 3125 / 256 = 5⁵/4⁴`;
-* `lambda_lb` / `lambda_gt` : `3832 ≤ lambda ^ 6`, hence `3.95 < lambda`.
+* `lambda_lb` / `lambda_gt` : `3832 ≤ lambda ^ 6`, hence `3.95 < lambda`;
+* `lambda_gt_of_banked` : `311/50 = 6.22 < lambda`, **conditional** on the
+  banked hypothesis `a 40 = 56749893611764175164545926946127`.
 
-Together the last two are the machine-checked bracket `3.95 < λ ≤ 3125/256`.
+Together `lambda_gt` and `lambda_le` are the machine-checked bracket
+`3.95 < λ ≤ 3125/256`; `lambda_gt_of_banked` sharpens the lower side to
+`6.22 < λ` at the price of the banked hypothesis.
 
 ## The concatenation injection
 
@@ -750,13 +754,46 @@ theorem lambda_gt : (3.95 : ℝ) < lambda := by
   norm_num at h1
   linarith
 
+/-! ## The conditional lower bound from the banked final term
+
+The unconditional `3.95` above is what the `a 6 = 3832` anchor — the largest
+row Lean can enumerate for itself — can pay for. The project's banked table
+reaches `a 40`, and Fekete's `a n ≤ λⁿ` turns *any* banked term into a lower
+bound for `λ`. Taking the banked value as an explicit hypothesis, in the
+`P<k>_grand_of_banked` style, keeps the computation outside the kernel and
+visible in the statement. -/
+
+/-- **The conditional lower bound `6.22 < λ`, given the banked final term.**
+`a 40 = 56749893611764175164545926946127` is the last term of the banked
+triangle (`results/triangle.txt`, provenance `results/ns_a40/PROVENANCE.md`);
+it enters here as a hypothesis, not as a computation. From it,
+`(311/50)⁴⁰ = 6.22⁴⁰ < a 40 ≤ λ⁴⁰` — an exact integer comparison,
+`311⁴⁰ < 56749893611764175164545926946127 · 50⁴⁰` — and `x ↦ x⁴⁰` is strictly
+monotone on `[0, ∞)`, so `6.22 < λ`.
+
+The constant is close to sharp for this `n`: `a 40 ^ (1/40) = 6.22084…`, so
+`6.23` is already false. Note the conditionality is real — the hypothesis is a
+single-source value (the top of the table is kink-engine-only; see
+`PROOF-STATUS.md`'s anchor-provenance discussion), and the bound is still
+weaker than the unformalized strip ladder. -/
+theorem lambda_gt_of_banked (h : a 40 = 56749893611764175164545926946127) :
+    (311 / 50 : ℝ) < lambda := by
+  have hle : ((56749893611764175164545926946127 : ℕ) : ℝ) ≤ lambda ^ 40 := by
+    have := a_le_lambda_pow (n := 40) (by norm_num)
+    rwa [h] at this
+  have hpow : ((311 / 50 : ℝ)) ^ 40 < lambda ^ 40 := by
+    refine lt_of_lt_of_le ?_ hle
+    norm_num
+  exact lt_of_pow_lt_pow_left₀ 40 (le_of_lt lambda_pos) hpow
+
 /-! ## Axiom audit
 
 Plain `#print axioms`; the `#guard_msgs`-wrapped versions are integrated into
 the campaign audit point by the orchestrator. `a_supermul`, `lambda_tendsto`,
 `a_le_lambda_pow` and `lambda_le` must carry the standard three; `lambda_lb` and
 `lambda_gt` additionally carry the `native_decide` constant of the `a 6` anchor
-they inherit from `Sequence.lean`. -/
+they inherit from `Sequence.lean`. `lambda_gt_of_banked` takes its numeric input
+as a hypothesis rather than a computation, so it is back to the standard three. -/
 
 #print axioms a_supermul
 #print axioms lambda_tendsto
@@ -764,5 +801,6 @@ they inherit from `Sequence.lean`. -/
 #print axioms lambda_le
 #print axioms lambda_lb
 #print axioms lambda_gt
+#print axioms lambda_gt_of_banked
 
 end Polyplets

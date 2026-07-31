@@ -210,6 +210,29 @@ branch `lean-outworks`, orchestrator-reviewed per unit. Targets from the
   `lambda_tendsto`, `a_le_lambda_pow`, and the machine-checked bracket
   **`3.95 < λ ≤ 3125/256`** (`lambda_gt`/`lambda_le`; lower side inherits
   exactly the `a_6` leaf).
+
+  **Conditional lower bound `6.22 < λ` (added 2026-07-31, "Lean ratchet").**
+  `lambda_gt_of_banked (h : a 40 = 56749893611764175164545926946127) :
+  (311/50 : ℝ) < lambda`, from `a_le_lambda_pow` at `n = 40` plus the exact
+  integer comparison `311⁴⁰ < a(40)·50⁴⁰` and strict monotonicity of `x⁴⁰`
+  on `[0, ∞)`. Standard three axioms — the banked value is a *hypothesis*,
+  not a `native_decide` computation, in the `P<k>_grand_of_banked` style; the
+  guard is in `AuditOutworks.lean`. `3.95` stays the unconditional figure
+  (`a 6 = 3832` is the largest row Lean enumerates for itself).
+
+  Two honest caveats, both load-bearing:
+
+  - **Single-source hypothesis.** `a(40)` is a kink-engine-only value at the
+    top of the table — the same grade as a(23)+ and the 11 kink-only Grand
+    anchors above (see the anchor-provenance discussion): cross-ISA and
+    cross-revision re-runs, but no second algorithm. The strip second source
+    reaches H ≤ 14 only. So the theorem is conditional on a number, and the
+    number has one algorithm behind it.
+  - **Still weaker than the unformalized ladder.** The strip transfer-matrix
+    ladder gives μ₁₄ = 6.3800344 (`results/strip-growth-lambda-bounds.md`),
+    a better lower bound than 6.22 — but it is not formalized. `6.22` is
+    near-sharp for *this* route: `a(40)^(1/40) = 6.22084…`, so `6.23` is
+    false, and no single banked term can do better than 6.221.
 - `IntCoeff.lean` (OW-4) — `factorial_smul_int_coeff` (deg ≤ k integer-
   valued ⇒ k!·coeffs ∈ ℤ, binomial basis via forward differences) and
   `production_factorial_int` (§6.1's "k!·P_k integral"). Standard axioms.
@@ -266,14 +289,15 @@ branch `lean-outworks`, orchestrator-reviewed per unit. Targets from the
   the generic computable `Tc`): A001168 6/19/63, A001207 11/44/186,
   A006770 20/110/638.
 
-**Audit point**: `AuditOutworks.lean`, 51 guards (companion of
+**Audit point**: `AuditOutworks.lean`, 52 guards (companion of
 `Grand/Audit.lean`) — every headline theorem above, including the instance
 `P₁` pins, the nine cross-family row-sum gates, `universal_shape_d`,
-`lambda_lb`, the n = 4 Burnside spot checks, `maxhole_lower_banked` and
+`lambda_lb`, `lambda_gt_of_banked`, the n = 4 Burnside spot checks,
+`maxhole_lower_banked` and
 `strip_sum_le_a`, has a `#guard_msgs`-wrapped `#print axioms`, so axiom
 drift fails the build (the pin/rowSum/spot-check guards were added by the
 2026-07-31 adversarial-review fix; before that they were asserted but
-unenforced). Raw per-anchor theorems (`a_1..a_5`, the n ≤ 5 symmetry
+unenforced; `lambda_gt_of_banked`'s guard came with the Lean ratchet). Raw per-anchor theorems (`a_1..a_5`, the n ≤ 5 symmetry
 anchors, the instance anchor cells) each carry their own native leaf and
 are certified through the guarded consumers (`a_6` guarded as the
 representative). Full tree green 2026-07-31 after the review fixes:
