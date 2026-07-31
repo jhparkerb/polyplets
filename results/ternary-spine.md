@@ -124,9 +124,16 @@ $= \#\{H \le N : \lfloor 3H/2\rfloor > N\} = \lceil (N{-}1)/3\rceil$
 
 ## Falsifiable predictions (future terms)
 
+**All confirmed 2026-07-31 against the banked a(40) triangle**
+(`results/triangle.txt`, checked cell-by-cell):
+
 - $T(37,25) \equiv 1 \pmod 3$ (odd spine, $k=12$) and $T(n,H) \equiv 0 \pmod 3$
-  for all $37$-cell in-regime cells above the spine.
+  for all $37$-cell in-regime cells above the spine. **CONFIRMED** — spine cell
+  $\equiv 1$; all of $T(37,H)$ for $H = 26..37$ and $T(n,25)$ for $n < 37$
+  vanish mod 3.
 - $T(39,26) \equiv 1 \pmod 3$ and $P_{13}(39) \equiv 3 \pmod 9$ (even spine).
+  **CONFIRMED** — $T(39,26) \equiv 1 \pmod 3$, so $P_{13}(39) = 3\,T(39,26)
+  \equiv 3 \pmod 9$; row-39 above-spine cells ($H = 27..39$) all vanish mod 3.
 - Every future in-regime triangle cell mod 3 via T1's digit product.
 
 ## Row reading (jasonp's observation) and the sleeve zeros
@@ -157,6 +164,32 @@ Reading along rows instead of down columns:
   pair $n=30$; first three-in-total $n=35$; first three-in-a-row $n=36$. A
   closed law for these spikes (the deficit-$d$ unit formulas, $d \ge 2$) is
   the open remainder of the Witt tower.
+- **Census extended to the final data, $n \le 40$ (2026-07-31).**
+  `experiments/sleeve_zero_census.py` (`python3 experiments/sleeve_zero_census.py`)
+  sweeps the sleeve of row $n$ — $k$ from $\lfloor(n{-}1)/3\rfloor+1$ (first $k$
+  with $d\ge1$) to the law's reach $k_{\max}=\lfloor(n{-}1)/2\rfloor$ — and reads
+  the valuation off the banked triangle via $v_3(P_k(n)) = v_3(T(n,n{-}k)) + d$,
+  so it needs no fitted $P_k$ (which stop at $k=17$). It reproduces the census
+  above exactly at $n\le36$, including the two $n=19$ valuations. New rows:
+
+  | $n$ | sleeve zeros $(k: d \to v_3(P_k(n)))$ | count | longest run |
+  |---|---|---|---|
+  | 37 | $13\!: 3\to5$, $16\!: 12\to13$, $17\!: 15\to18$ | 3 | 2 |
+  | 38 | $16\!: 11\to13$ | 1 | 1 |
+  | 39 | — | 0 | 0 |
+  | 40 | $16\!: 9\to10$, $18\!: 15\to18$, $19\!: 18\to21$ | 3 | 2 |
+
+  **No new record events.** Rows 37 and 40 tie the three-in-total record (first
+  set at $n=35$) and each contain an adjacent pair, but nothing reaches
+  four-in-total or four-in-a-row, and $n=36$'s three-in-a-row still stands alone.
+  So the four "firsts" above are final for this project's data. Two observations
+  the extra rows add: the $k=16$ diagonal spikes in *three consecutive rows*
+  $n=36,37,38$ and again at $n=40$, skipping only $n=39$ — which is itself the
+  only wholly zero-free sleeve after $n=31$; and the excess $v_3-d$ in the new
+  rows tops out at $3$ ($k=17$ at $n=37$; $k=18$ and $k=19$ at $n=40$), well under
+  the all-$n$ ceiling of $5$ ($k=8$ at $n=17$), so no runaway. The $k=18,19$
+  cells sit past the fitted range but inside the proved regime ($n \ge 2k+1$), so
+  their valuations follow from the shape theorem plus the exact triangle.
 
 ### The frontier-parity law (jasonp, from the two staircases)
 

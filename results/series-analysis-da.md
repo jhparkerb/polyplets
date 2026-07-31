@@ -65,3 +65,25 @@ universality — worth a sentence if the growth § is revisited. Not edited here
 `experiments/series_da.py` (calibrated, self-contained). Data: `results/b006770_upload.txt`
 (n≤33) + banked a(34..36). Companion asymptotics: [[nu-exponent]] (ν),
 [[height-distribution-collapse]] (shape), [[hole-free-growth-constant]] (λ₀).
+
+## Refreshed at n=40 (2026-07-31)
+
+Rerun on the **final** 40-term sequence (a(1..40) from `results/b006770_upload.txt`,
+the a(40) close). Command: `python3 experiments/series_da.py`.
+
+**λ = 7.1102, θ = −0.9997**, from 42 approximants — the same 42 as at 36 terms
+(the degree spectrum is a fixed shape around N/3, so its size does not grow with N).
+
+- **Converged in N, now over 12 more terms:** λ = 7.1102 unchanged at N = 28, 32,
+  36, 40; θ = −0.9993 (N=28) → −0.9993 (32) → −0.9996 (36) → **−0.9997 (40)**,
+  creeping the last digit *toward* −1 rather than away. The N=36 rerun reproduces
+  the banked 7.1102 / −0.9996 exactly, so this is a clean extension, not a redo.
+- **Rescaling-independent:** λ_median = 7.1102 for λ₀ ∈ {6.8, 7.0, 7.11, 7.3};
+  still breaks only at λ₀=7.5 (spurious 7.6214), same as at 36 terms.
+- Calibration on synthetic series re-passes at N=36 (7.11/−1.0, 7.11/−0.5,
+  4.06/−1.0 all recovered exactly).
+
+**Reading unchanged, slightly firmer.** Four more exact terms move λ not at all
+(4 significant figures now stable across a 12-term window) and move θ by 1 unit in
+the 4th decimal. **λ = 7.110(1), θ = −1.000(1)** stands as the final-data statement;
+the 4th digit of λ is beyond what 40 terms resolve, exactly as it was at 36.

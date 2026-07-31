@@ -112,7 +112,7 @@ if __name__ == "__main__":
     report(e, "first-order DA")
 
     print("\n  robustness -- lambda median vs rescaling lambda0 (anchoring test):")
-    for lam0 in [6.8, 7.0, 7.11, 7.3]:
+    for lam0 in [6.8, 7.0, 7.11, 7.3, 7.5]:
         ee = spectrum(A, 40, lam0)
         lams = sorted(x[0] for x in ee)
         print(f"    lambda0={lam0}: lambda={lams[len(lams)//2]:.4f}")

@@ -24,9 +24,10 @@ cokernel is a finite 3-group.** Done, for all $N$.
 
 ### C2. A006770 is strictly log-convex
 $$a(n)^2 < a(n-1)\,a(n+1)\qquad(n\ge3),$$
-i.e. the ratios $a(n)/a(n-1)$ strictly increase to $\lambda$. Verified $n\le36$
-(zero violations). Consequence if proved: each ratio is a rigorous lower bound on
-$\lambda$ (so $a(36)/a(35)=6.916\le\lambda$). Companions: one-sided A030233, free
+i.e. the ratios $a(n)/a(n-1)$ strictly increase to $\lambda$. Verified on the full
+banked sequence $n\le40$ (zero violations; re-checked 2026-07-31 against
+`results/triangle.txt` row sums). Consequence if proved: each ratio is a rigorous
+lower bound on $\lambda$ (so $a(40)/a(39)=6.935\le\lambda$). Companions: one-sided A030233, free
 A030222, asymmetric A030235 are log-convex past small $n$; **the bilateral count
 A030234 is NOT** — log-convexity fails at every even $n$, a parity effect worth its
 own look.

@@ -4,7 +4,7 @@ reproduces the exact banked diagonal cells (see the appendix of
 results/height-distribution-collapse.md). Asserts ratio in [0.98, 1.06]
 for k = 3..14 at n = 36.
 """
-import types, os, io, contextlib, math
+import types, os, sys, io, contextlib, math
 from fractions import Fraction as F
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,7 +39,7 @@ def main():
         return sum(i * c * y ** i for i, c in enumerate(s)) / ev(s, y)
 
     T = {}
-    d = os.path.join(ROOT, "results", "ns_a36", "perheight")
+    d = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, "results", "ns_a40", "perheight")
     for f in os.listdir(d):
         if f.startswith('h') and f.endswith('.out'):
             Hcol = int(f[1:-4])
@@ -47,8 +47,10 @@ def main():
                 nn, c = ln.split()
                 T[(int(nn), Hcol)] = int(c)
 
-    n = 36
-    for k in range(3, 15):
+    n = int(sys.argv[1]) if len(sys.argv) > 1 else 40
+    print(f"saddle vs exact T(n, n-k), n={n}, data={d}")
+    worst = 0.0
+    for k in range(3, n // 2 + 2):
         lo, hi = 1e-9, 0.04
         for _ in range(200):
             mid = (lo + hi) / 2
@@ -57,15 +59,28 @@ def main():
             else:
                 lo = mid
         ys = (lo + hi) / 2
+        if ev(G, ys) <= 0 or ev(Hs, ys) <= 0:
+            # band edge alpha -> 1/2: the truncated G(y*) changes sign; the
+            # saddle evaluation ceases to be meaningful (expected breakdown).
+            print(f"  k={k:2d}  alpha={k/n:.4f}  G(y*) <= 0 -- band edge, stop")
+            break
         eps = ys * 1e-4
         var = (n * (evd(Hs, ys + eps) - evd(Hs, ys - eps)) +
                (evd(G, ys + eps) - evd(G, ys - eps))) / (2 * eps) * ys
         approx = math.exp((n - 1 - 3 * k) * math.log(3) + math.log(ev(G, ys))
                           + n * math.log(ev(Hs, ys)) - k * math.log(ys)
                           - 0.5 * math.log(2 * math.pi * var))
-        ratio = approx / T[(n, n - k)]
-        assert 0.98 < ratio < 1.06, (k, ratio)
-    print("flank saddle: ratios within [0.98, 1.06] for k=3..14 at n=36  OK")
+        exact = T[(n, n - k)]
+        if not exact:
+            print(f"  k={k:2d}  exact=0 (past band edge) -- stop")
+            break
+        ratio = approx / exact
+        print(f"  k={k:2d}  alpha={k/n:.4f}  saddle/exact={ratio:.4f}")
+        if k <= 14:
+            assert 0.98 < ratio < 1.06, (k, ratio)
+            worst = max(worst, abs(ratio - 1.0))
+    print(f"flank saddle: k=3..14 within [0.98, 1.06] at n={n}  OK "
+          f"(worst |ratio-1| = {worst*100:.1f}%)")
 
 
 if __name__ == "__main__":

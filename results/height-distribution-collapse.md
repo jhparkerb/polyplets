@@ -4,6 +4,9 @@
 on the FULL exact height triangle `results/ns_a36/perheight/hH.out` (all H=1..36,
 n≤36; row sums verified == a(n) against the b-file for n≤33, chain-consistent to 36).
 
+> **Refreshed on the final n≤40 data 2026-07-31 — see "Refreshed at n=40" at the
+> bottom.** The n≤36 numbers below all reproduce exactly; the addendum extends them.
+
 ## Question
 
 [[nu-exponent]] established the mean height grows as ⟨H⟩ ~ n^ν with ν→0.6407 (the
@@ -94,3 +97,54 @@ where the law's onset boundary sits and G(y*) changes sign -- the expected
 breakdown. Status: semi-analytic (truncated series); the rate function
 itself is exact modulo H's coefficients, all of which are theorems of the
 gas up to k=5 and pinned to k=17.
+
+## Refreshed at n=40 (2026-07-31)
+
+Both analyses rerun on the final banked triangle, `results/ns_a40/perheight`
+(all H, n≤40). Commands: `python3 experiments/height_collapse.py` and
+`python3 experiments/flank_saddle.py` (both now take the per-height directory —
+and the saddle script an `n` — as arguments, defaulting to the a(40) data).
+Rerunning them on `results/ns_a36/perheight` reproduces every banked number below
+to the digits quoted above, so these are extensions, not corrections.
+
+**Collapse keeps tightening, and faster than the n≤36 window suggested:**
+
+| n-window | collapse rel-variance |
+|---|---|
+| 8,12,16,20 | 0.1905 |
+| 16,20,24,28 | 0.1008 |
+| 24,28,32,36 | 0.0645 |
+| **28,32,36,40** | **0.0384** |
+
+The moments continue their monotone convergence:
+
+| n | std/mean | skew |
+|---|---|---|
+| 28 | 0.2274 | +0.337 |
+| 36 | 0.2261 | +0.351 |
+| **40** | **0.2255** | **+0.356** |
+
+So the limit shape's coefficient of variation is ≈0.225 (still drifting down in
+the 4th decimal) and the right skew is still creeping up — the shape universality
+statement is unchanged and better supported; ⟨H⟩ = 15.170 at n=40.
+
+**mean-based ν_eff continues its slow descent:** 0.7124 (n=12) → 0.6779 (n=36) →
+**0.6757 (n=40)**. Four more terms buy ~0.002 — still far above the asymptotic
+0.6407, confirming the "pre-asymptotic, large corrections" reading. See
+[[nu-exponent]] for the full refreshed slope sequence.
+
+**Tall flank at n=40 — the agreement window widens.** Saddle/exact ratios for
+T(40, 40−k):
+
+| k | 3 | 8 | 12 | 15 | 17 | 18 | 19 |
+|---|---|---|---|---|---|---|---|
+| saddle/exact | 1.0279 | 1.0103 | **1.0077** | 1.0101 | 1.0187 | 1.0307 | 1.0611 |
+
+At n=36 the ratio bottomed at 1.0091 (k=10–11) and had degraded past 1.02 by
+k=15; at n=40 it bottoms lower (**1.0077** at k=12) and stays inside 2% all the
+way to **k=17** and inside 3.1% to k=18, breaking down only at k=19 (6.1%) and
+failing outright at k=20 = n/2 — one past the law's reach k_max(40)=19 — where
+G(y\*) changes sign, the expected band-edge breakdown. So the refreshed statement is: the large-deviation
+rate reproduces the exact cells to **~1–3% across k=3..18 (α up to 0.45)** at n=40,
+tightening in the middle of the range as n grows, which is what a genuine saddle
+asymptotic should do.
