@@ -186,6 +186,80 @@ else. `polyplets/build-receipt-2026-07-30.log` records `lake build
 are build errors, an up-to-date closure also certifies that every
 axiom-footprint guard passed.
 
+## Outworks — second campaign (LANDED 2026-07-30, `OUTWORKS-PLAN.md`)
+
+Eight briefs (`briefs/OW1..OW8`), executed by Opus agents in three waves on
+branch `lean-outworks`, orchestrator-reviewed per unit. Targets from the
+2026-07-30 claims-vs-Lean audit. New modules, all sorry-free:
+
+- `Sequence.lean` (OW-1) — **`a n` exists in Lean** (A006770 as ncard of
+  height-blind canonical animals), `a_eq_sum : a n = Σ_{H=1..n} T n H`,
+  computable twin `ac`, native_decide anchors `a_1..a_6` =
+  1, 4, 20, 110, 638, 3832 vs banked row sums. `a_6` costs ~700 s / 5.9 GB
+  (forces `Tc 6 6`); `a 7` infeasible (C(49,7) ≈ 86M subsets).
+- `UpperBound.lean` (OW-3) — `a_le_choose : a n ≤ C(5n, n)` by the
+  decision-tree exploration (14-clause invariant, accept-position code,
+  re-anchored `expShape` injection — the brief's raw anchor is NOT
+  word-determined, caught and fixed in execution), and
+  `choose_le_pow : C(5n,n)·256^n ≤ 3125^n`. NO native_decide in the file.
+- `Growth.lean` (OW-2) — **λ exists**: `a_supermul` (Klarner concatenation
+  with explicit cut recovery), `lambda := exp(−lim)` via Mathlib Fekete,
+  `lambda_tendsto`, `a_le_lambda_pow`, and the machine-checked bracket
+  **`3.95 < λ ≤ 3125/256`** (`lambda_gt`/`lambda_le`; lower side inherits
+  exactly the `a_6` leaf).
+- `IntCoeff.lean` (OW-4) — `factorial_smul_int_coeff` (deg ≤ k integer-
+  valued ⇒ k!·coeffs ∈ ℤ, binomial basis via forward differences) and
+  `production_factorial_int` (§6.1's "k!·P_k integral"). Standard axioms.
+- `Symmetry.lean` (OW-7) — D₄/C₄ acting by apply-then-reanchor; the §7
+  Burnside identities `free_eq`, `oneSided_eq`, `bilateral_eq` and
+  `r90_vanish` (n ≢ 0,1 mod 4 ⇒ R90 = 0, affine quarter-turn argument),
+  all standard axioms; anchors vs `results/sym_counts.txt` n ≤ 5 in-file
+  (n = 6 verified out-of-file; ~490 s/element to add); derived n = 4
+  spot checks Free/OneSided/Bilateral = 22/34/10.
+- `Holes.lean` + `HolesUpper.lean` (OW-6) — hole machinery from scratch
+  (rook components, `enclosed`, `SingleHole`), **`maxhole_lower`
+  unconditional** (diagonal-frame family `hullBox ∖ boxHole`, card a+b+2
+  for ALL a,b — no degenerate (a,b), no n = 5 special case; anchors
+  n = 4..10 by kernel decide, zero native_decide), (I′) parity count +
+  maximization unconditional, and Theorem 2's upper bound **conditional on
+  the named `MoatBound`** hypothesis (`maxhole_upper`, `maxhole` =
+  IsGreatest) — the discrete-Jordan step needs digital topology Mathlib
+  lacks; both cheap substitutes measured-refuted (module doc has the
+  numbers). Finding: `boxHole a b` is rook-DISCONNECTED iff min(a,b) = 1
+  and max ≥ 3 (multi-hole rings, invisible to the total-area checks of
+  `results/maxhole-proof.md`).
+- `Northcott.lean` (OW-8) — house-arrest finiteness: bounded degree +
+  bounded house ⇒ finitely many algebraic integers (bridges Mathlib's
+  2025 `finite_mahlerMeasure_le`; the claims audit's "Mathlib lacks it"
+  is superseded). Finding: step 5 of the non-D-finiteness argument needs
+  the FINITENESS form `finite_setOf_degree_le_of_house_le`, not bare
+  unboundedness — both proved, divergence documented in the module doc.
+- `Universal/` (OW-5, the Verbatim Wager) — **the diagonal law
+  universalized**: `RowLocal` lattices (finite nonempty up-offset set D,
+  b = |D|), abstract `PeelSystem` engine, full generic geometric port
+  (Separation + the three peeling bijections), `universal_shape` /
+  `universal_shape_production` / `universal_production_int_all` for EVERY
+  row-local lattice, standard axioms. **Wager verdict: verbatim yes** —
+  the only parameterization is the width bound (`M·(n−1)`, since general
+  lattices skip columns; false-for-general-L lemma `exists_x_eq_of_cross`
+  replaced by a walk-length bound), and the paper's p-adic integrality
+  step is NOT needed (exact division, prime-agnostic). King re-derived
+  definitionally (`KingAgree.lean`, recursions re-proved generically);
+  instances pinned: square `P₁ = 4X − 8` (ordinary polyominoes!), hex
+  `P₁ = 9X − 15`, king `P₁ = Pin.lean's Pp1` proved outright. Cross-family
+  gates: A001168 6/19/63, A001207 11/44/186, A006770 20/110/638.
+
+**Audit point**: `AuditOutworks.lean` — every headline theorem above has a
+`#guard_msgs`-wrapped `#print axioms` (companion of `Grand/Audit.lean`),
+so axiom drift fails the build. Full tree green 2026-07-30: 8615 jobs.
+
+Integration renames (root-build name clashes, resolved in the new files;
+king tree untouched): UpperBound's `shape` → `expShape` (Shape.lean owns
+`shape`), Growth's `logSeq` → `negLogA` (ExpForm.lean owns `logSeq`),
+Holes' `kingAdj_shift` → `kingAdj_small_shift` (Growth owns the
+translation-invariance form), duplicate `kingAdj_symm`s dropped for
+`Graph.lean`'s.
+
 ## Axiom audit
 
 Conditional/partial tiers (k ≥ 4): pure [propext, Classical.choice,
