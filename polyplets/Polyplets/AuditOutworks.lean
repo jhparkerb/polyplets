@@ -88,6 +88,18 @@ info: 'Polyplets.a_6' depends on axioms: [propext, Classical.choice, Quot.sound,
 #guard_msgs in
 #print axioms strip_sum_le_a
 
+/--
+info: 'Polyplets.ratio_not_logConvex' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ a_1._native.native_decide.ax_1_1,
+ a_2._native.native_decide.ax_1_1,
+ a_3._native.native_decide.ax_1_1,
+ a_4._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms ratio_not_logConvex
+
 /-! ## OW-3: the corset -/
 
 /-- info: 'Polyplets.a_le_choose' depends on axioms: [propext, Classical.choice, Quot.sound] -/

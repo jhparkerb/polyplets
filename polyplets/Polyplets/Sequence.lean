@@ -266,6 +266,18 @@ header). `a 7` would need `Tc 7 7`, `C(49,7) ≈ 86M` subsets — roughly 44 tim
 this one, so the anchors stop at `n = 6`. -/
 theorem a_6 : a 6 = 3832 := by rw [← ac_eq_a 6 (by norm_num)]; native_decide
 
+/-- **The ratio sequence `a n / a (n-1)` is not log-convex** (jasonp's question,
+2026-07-31). Log-convexity of the ratios at `n = 3` would need
+`r 3 ^ 2 ≤ r 2 * r 4`, i.e. (cross-multiplied over ℕ, no division)
+`a 3 ^ 3 * a 1 ≤ a 2 ^ 3 * a 4`; the banked values give `8000 > 7040`, refuting
+it. One exact triple settles the universal claim — and in the data the ratios
+are strictly log-concave at every `n = 3 .. 39`
+(`results/open-conjectures.md`, C2 entry). Complements C2 (ratios increase,
+conjectural): increasing, at decreasing pace, as `θ = -1` predicts. Axioms:
+inherits the `a_1 .. a_4` native leaves only. -/
+theorem ratio_not_logConvex : a 2 ^ 3 * a 4 < a 3 ^ 3 * a 1 := by
+  rw [a_1, a_2, a_3, a_4]; decide
+
 /-! ## The §9 strip-capture lower bound -/
 
 /-- **The paper's §9 generating-function lower bound.** The heights `1 … 10`
