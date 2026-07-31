@@ -260,3 +260,45 @@ The H=14 run is a separately scheduled single-threaded ~1.5h job with its own
 runner (cost basis and kill/resume notes in the header):
 
     scripts/run_strip_mu_cert_h14.sh
+
+## Addendum 2026-07-31 (later): the ladder extended to H=17 — bracket floor now 6.543
+
+With the frozen-stage-operator kernel adopted, the full ladder was re-issued at
+rev `900b4ff` (receipts identical to the old-engine job's at H=12..14 — the two
+engines cross-validate on every shared rung) and extended:
+
+| H | states | mu_float | certified mu_H >= | digits/vbits | sweeps | wall |
+|---|---|---|---|---|---|---|
+| 15 | 853,466 | 6.4435408 | **6.443532** | 6 / 96 | 8 | 58 s |
+| 16 | 2,356,778 | 6.4985245 | **6.4984** | 4 / 106 | 3 | 225 s |
+| 17 | 6,536,381 | 6.5464870 | **6.543** | 3 / 110 | 6 | 773 s |
+
+**The certified bracket on lambda is now 6.543 <= lambda <= 9.3153** (upper:
+Bui convolution certificate, docs/proofs/polyplet-upper-bound.md). This
+supersedes both Bacher lower bounds (3+2sqrt(2) directed, closed form; 6.4752
+multi-directed, numerical-only) — the multi-directed value is beaten by a
+certificate for the first time.
+
+Two things learned pushing past H=14:
+
+- **The binding constraint at H=16 was neither float convergence nor +4 vbits.**
+  Identical certified numerators at vbits 96 and 100, and again after adding an
+  eigenvector polish phase (residual-driven extra sweeps after the eigenvalue
+  stopping rule fires — kept, it is the right stopping criterion and costs
+  little), pinned the cause: entries whose true scale sits BELOW the
+  quantization floor entirely are clamped to 1, and no few-bit budget increase
+  reaches them. The lever with teeth is `--digits`: a smaller numerator frees
+  accumulator headroom for `vbits` above the full `vrange` (104.3 bits at H=16,
+  ~110 at H=17), after which the certificate lands within an ulp of the float
+  value. Hence the per-H digits/vbits settings in the table — each chosen so
+  `vbits >= vrange`, trading quoted decimals for actually-certified magnitude.
+- **Cost/ceiling:** wall grows ~3.5x/rung and peak RSS hit 11.8 GB at H=17
+  (build-phase transient); H=18 projects ~45 min but ~35+ GB — off this box.
+  Each further rung buys ~+0.05 toward lambda ~ 7.11, against the finite-type
+  wall on the upper side; the ladder stops here for the project close.
+
+The `-dirty` suffix in these receipts' `git=` stamps is the untracked
+`paper/technical-report.tex` (+ editor swap) only — the tracked tree was clean
+at `900b4ff` for every post-adoption receipt. (`git status --porcelain` counts
+untracked files; `-uno` would not. Left as-is: the stamp semantics are a
+standards decision, not this run's.)

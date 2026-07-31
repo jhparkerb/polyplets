@@ -2,7 +2,9 @@
 
 > **OUTCOME (achieved below): λ ≤ 9.3153, PROVED** (exact rational Bui
 > convolution certificate; see the BREAKTHROUGH + Certificate-Squeeze sections).
-> The two-sided rigorous bracket is **5.828 ≤ λ ≤ 9.3153**. The intro/plan/crux/
+> The two-sided rigorous bracket is **6.543 ≤ λ ≤ 9.3153** (lower side upgraded
+> 2026-07-31 to the certified strip ladder μ₁₇, `results/strip-mu-certificates.md`;
+> at this doc's writing it was 5.828). The intro/plan/crux/
 > "Verdict" text below is the ORIGINAL pre-breakthrough scaffolding, kept as the
 > derivation record — it says "not yet done"; it was done later in this same doc.
 

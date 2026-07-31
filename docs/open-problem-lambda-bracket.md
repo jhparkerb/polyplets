@@ -8,15 +8,17 @@ settled; the question is a new idea.
 
 | | value | nature |
 |---|---|---|
-| lower (exact) | λ ≥ 3+2√2 ≈ **5.828** | directed king animals, closed form |
-| lower (num.) | λ ≥ **6.475** | multi-directed (Bacher), numerical |
-| lower ladder | μ_H ↗ λ, μ₁₃ = 6.306 | exact strip growth constants, → λ from below (compute-limited: μ_H≈6.6 needs H≈18–20) |
-| **estimate** | λ ≈ **7.110(1)** | ratio + confluent fit + **independent differential approximants** (this session) + μ_H extrapolation — four methods agree |
+| **lower (certified)** | λ ≥ μ₁₇ ≥ **6.543** | strip ladder, exact Collatz–Wielandt certificate (2026-07-31, `results/strip-mu-certificates.md`; frozen-stage-operator engine made H=17 a 13-min run) |
+| lower (closed form) | λ ≥ 3+2√2 ≈ 5.828 | directed king animals — best *closed-form* bound |
+| lower (num.) | λ ≥ 6.475 | multi-directed (Bacher), numerical, now superseded by the certified ladder |
+| **estimate** | λ ≈ **7.110(1)** | ratio + confluent fit + **independent differential approximants** + μ_H extrapolation — four methods agree |
 | upper | λ ≤ **9.3153** | Bui finite-type convolution certificate, exact rational (paper headline) |
 | upper (crude) | λ ≤ 12.2 | Eden/twig `C(5n,n)` |
 
-The estimate 7.110 is nailed. The **rigorous bracket [5.83, 9.32] is embarrassingly
-wide around it**, and the upper half is where it's stuck.
+The estimate 7.110 is nailed. The **rigorous bracket [6.54, 9.32] is still wide
+around it**, and the upper half is where it's stuck: the ladder can keep buying
+~+0.05/rung at ~3× cost per rung from below (memory-limited near H≈18 on current
+boxes), but no comparable mechanism exists on the upper side.
 
 ## Why the upper bound is stuck — a PROVEN barrier, not a tuning failure
 

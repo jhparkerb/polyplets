@@ -218,10 +218,21 @@ struct Work { std::vector<double> a, b, next; };   // scratch reused per matvec
 // Power-iterate M(x) in place; returns the dominant eigenvalue estimate. The
 // iteration count and the 1e-13 stopping rule are those of the validated
 // cpp/strip_mu_kink.cpp, so the float mu_H reproduces the ladder.
+//
+// The eigenvalue (a Rayleigh-type ratio) converges ~quadratically faster than
+// the VECTOR, and it is the vector the exact phase quantizes: at H=16 the
+// eigenvalue rule fired while a few states still carried enough residual to
+// bind the certificate 0.03 below the float eigenvalue (identical certified
+// numerator at --vbits 96 and 100 was the tell that flooring was NOT the
+// binding constraint). So after the eigenvalue rule fires, keep sweeping until
+// the componentwise residual max_i |(Mv)_i/rho - v_i| / v_i is below polishTol
+// (or maxIt runs out). This only improves the input to the exact checker; the
+// certificate remains sound regardless of how badly the vector is converged.
 static double rhoF(const StageOps& O, double x, std::vector<double>& w, Work& s,
-                   int maxIt = 4000) {
+                   int maxIt = 4000, double polishTol = 1e-11) {
   const strip::FloatWeight fw(x);
   double r = 0;
+  bool eigDone = false;
   for (int it = 0; it < maxIt; ++it) {
     strip::applyOps(O, w, s.next, fw, s.a, s.b);   // float policy cannot fail
     double s2 = 0, s1 = 0;
@@ -230,9 +241,25 @@ static double rhoF(const StageOps& O, double x, std::vector<double>& w, Work& s,
     if (!(s2 > 0)) return 0.0;
     const double rn = s2 / s1, inv = 1.0 / s2;
     for (double& v : s.next) v *= inv;
-    w.swap(s.next);
-    if (it > 3 && std::fabs(rn - r) < 1e-13 * rn) { r = rn; break; }
+    if (it > 3 && std::fabs(rn - r) < 1e-13 * rn) eigDone = true;
     r = rn;
+    if (eigDone) {
+      // Vector residual against the pre-normalization image: next was divided
+      // by s2, w by construction sums to 1, so (Mv)_i/rho - v_i is
+      // next_i*s2/(rn*s1) - w_i = next_i/rn' ... all constants cancel into the
+      // normalized pair below.
+      double worst = 0;
+      for (size_t i = 0; i < w.size(); ++i) {
+        if (w[i] > 0) {
+          const double rel = std::fabs(s.next[i] - w[i]) / w[i];
+          if (rel > worst) worst = rel;
+        }
+      }
+      w.swap(s.next);
+      if (worst < polishTol) break;
+    } else {
+      w.swap(s.next);
+    }
   }
   return r;
 }

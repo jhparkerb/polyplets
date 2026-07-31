@@ -238,8 +238,12 @@ history — not repeated here. Read this file, then `MEMORY.md`'s index.
   re-recovery. Run history in results/terminal-velocity.md + provenance.
 
 ## Rigorous λ bounds (NEW 2026-07-11)
-- **Two-sided rigorous bracket 5.828 ≤ λ ≤ 9.3153**, numerical λ≈7.111 inside.
-  Lower: directed/multi-directed king animals (3+2√2 exact, 6.475 Bacher). Upper
+- **Two-sided rigorous bracket 6.543 ≤ λ ≤ 9.3153**, numerical λ≈7.111 inside.
+  Lower (2026-07-31): certified strip ladder — exact Collatz–Wielandt certificates
+  μ₂..μ₁₇, μ₁₇ ≥ 6543/1000 (`results/strip-mu-certificates.md`, receipts in
+  `results/strip_mu_certificates.log`); supersedes directed/multi-directed
+  (3+2√2 exact, 6.475 numerical), which remain the best closed-form/lightweight
+  bounds. Upper
   (first ever, ours): Bui-style finite-type convolution certificate, `x=2147/20000`,
   machine-verified in exact rational arithmetic.
 - Derivation `docs/proofs/polyplet-upper-bound.md`; certificate `experiments/king_certificate.py`.

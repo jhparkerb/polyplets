@@ -33,7 +33,8 @@ additive pieces below. The primary source is convex-mirage.
 - Framing as a λ lower bound: μ≈3.129 is a valid but WEAK lower bound on
   λ_polyplet (~7.11), far below the banked directed/multi-directed 5.828/6.475
   (results/directed-king-animals.md) — which in turn sit inside the rigorous
-  two-sided bracket 5.828 ≤ λ ≤ 9.3153 (upper: ../docs/proofs/polyplet-upper-bound.md).
+  two-sided bracket, 6.543 ≤ λ ≤ 9.3153 as of 2026-07-31 (lower: certified strip
+  ladder, results/strip-mu-certificates.md; upper: ../docs/proofs/polyplet-upper-bound.md).
   So convex is NOT useful as a bound.
 
 ## Status

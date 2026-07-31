@@ -42,9 +42,12 @@ Directed ⊆ multi-directed ⊆ connected polyplets gives `μ_dir ≤ μ_multi �
 | polyplet λ | ~7.11 | unknown | heuristic only |
 | **Bui certificate (upper)** | **9.3153** | `20000/2147`, exact cert | fully rigorous |
 
-These are the first *rigorous* statements we have about `λ_polyplet`. Together with
-the **upper** bound they bracket it two-sided: **`5.8284 ≤ λ ≤ 9.3153`**, both sides
-rigorous (the upper side machine-verified in exact rational arithmetic). The upper
+These were the first *rigorous* statements we had about `λ_polyplet`. Together with
+the **upper** bound they bracketed it two-sided: **`5.8284 ≤ λ ≤ 9.3153`**, both sides
+rigorous (the upper side machine-verified in exact rational arithmetic). *(2026-07-31:
+the bracket's floor is now the certified strip ladder, `6.543 ≤ λ ≤ 9.3153` —
+`results/strip-mu-certificates.md`; `3+2√2` remains the best closed-form bound and
+the multi-directed 6.4752 remains numerical-only.)* The upper
 bound is derived by a Bui-style finite-type convolution certificate — see
 [../docs/proofs/polyplet-upper-bound.md](../docs/proofs/polyplet-upper-bound.md).
 

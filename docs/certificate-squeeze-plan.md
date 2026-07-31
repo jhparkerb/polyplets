@@ -28,7 +28,8 @@ do it even if the rest is abandoned.
 
 ## Banked context (do not re-derive)
 
-- Rigorous sandwich today: **5.828 ≤ λ ≤ 9.31** (numerical λ ≈ 7.11).
+- Rigorous sandwich today: **6.543 ≤ λ ≤ 9.31** (numerical λ ≈ 7.11; lower side
+  upgraded 2026-07-31 to the certified strip ladder μ₁₇, `results/strip-mu-certificates.md`).
 - λ ≤ 9.31 comes from the single-cell-split system in `experiments/king_bui.py`
   (RD=3, 5930 types). Proof narrative: `docs/proofs/polyplet-upper-bound.md`.
   Commit `d5addbb`.

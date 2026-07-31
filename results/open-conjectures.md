@@ -31,6 +31,16 @@ lower bound on $\lambda$ (so $a(40)/a(39)=6.935\le\lambda$). Companions: one-sid
 A030222, asymmetric A030235 are log-convex past small $n$; **the bilateral count
 A030234 is NOT** — log-convexity fails at every even $n$, a parity effect worth its
 own look.
+- **Margin structure (measured 2026-07-31):** the violation margin
+  $a(n{-}1)a(n{+}1)/a(n)^2 - 1$ tracks $-\theta/n^2$ exactly: $n^2\cdot$margin
+  climbs smoothly $0.89 \to 0.97$ over $n = 5..39$, consistent with
+  $\theta = -1.000(1)$ from the differential approximants. The margin is
+  structural, not marginal — so a *refutation* of C2 (a violating term) would
+  contradict the entire smooth-asymptotics picture and has no finite-certificate
+  route short of exhibiting a term past $a(40)$; both directions are gated on
+  proof-grade control of the correction structure, which nothing currently
+  provides. The affirmative injection route below remains the only path that
+  sidesteps asymptotics entirely.
 - **Attack:** log-convexity of animal counts is genuinely hard; the natural route is
   an injection $\mathcal A_{n-1}\times\mathcal A_{n+1}\hookrightarrow\mathcal A_n
   \times\mathcal A_n$ (or a total-positivity property of the transfer matrix). No
