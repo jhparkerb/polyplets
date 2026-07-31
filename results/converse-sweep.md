@@ -43,6 +43,20 @@ k = 12..18. The lone anomaly k = 11 (and the 10-vs-11 flip) says the closed
 law for v₅(D_k) — which coefficient binds the 5-adic content — is a new
 (small) open question.
 
+**Sharpened form (2026-07-31, measured coefficient profiles).** Write
+D_k = k!/5^{c_k}, c_k = min over k!-basis numerator coefficients of v₅.
+Measured c_k = 0 (k ≤ 4), 1 (k = 5..10, 12..14), 2 (k = 11, 15..18); the
+one-parameter law **c_k = ⌈v₅(k!)/2⌉ fits every k except k = 11** (predicts
+1, actual 2). Per-polynomial valuation profiles: a ramp descending from the
+proved v₅ = 2k at the leading coefficient by ~3–4 per degree, into a flat
+floor (of 1s or 2s) across all low-degree coefficients — the floor IS c_k.
+The low coefficients are the boundary/gas series (P_k(0) are the G
+coefficients), whose 5-adic structure has never been examined (all G/H
+arithmetic to date is 3-adic). **Open question, sharpened: prove
+c_k = ⌈v₅(k!)/2⌉ — or the corrected law — via the 5-adic structure of G,
+and explain k = 11.** Profile data: rerun the last block of
+`experiments/converse_sweep.py` or the inline probe in the session log.
+
 Action: the open-items phrasing "denominator exactly k!" (HANDOFF) is
 corrected to "k!·P_k ∈ ℤ[n] (proved integer-valued ⇒ divisibility; minimality
 false — see results/converse-sweep.md)".
