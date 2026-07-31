@@ -158,6 +158,15 @@ denominator of P_k is exactly the 5-part of (k/2)!.
 ## Status
 
 - Lower bound (ĉ_k ≥ v₅(k!) − H(k)): **proved**, from I1 + I2 + I3 only.
+- **Lean (2026-07-31, `polyplets/Polyplets/V5Denominator.lean`)**: the law
+  at every pinned level k = 1..18 (`v5_law_all`), the refutation of the
+  old ⌈v₅(k!)/2⌉ fit at k = 11 (`ceil_fit_refuted`), the k = 11 multiset
+  obstruction as a general theorem (`eleven_no_harvest`), and the taxed
+  seeds u₁ = 25, g₁ = −45 tied to the pinned P₁ (`u1_seed`, `g1_seed`) —
+  all kernel `decide`/proof, standard axioms, no native_decide; the
+  numerator lists are certified identical to `Pin.lean`'s production data
+  by `rfl` tie lemmas. The general-k lower bound remains paper-level
+  (open item in `polyplets/PROOF-STATUS.md`).
 - Equality: exact at k = 1..19 (k = 19 out-of-sample); open in general —
   needs non-vanishing of the extremal multinomial sum mod 5^{ĉ_k+1}
   (finite check per k, e.g. u₂ mod 5 drives the even-k floor).

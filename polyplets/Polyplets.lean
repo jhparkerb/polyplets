@@ -46,5 +46,6 @@ import Polyplets.Upper.BuiRD2
 import Polyplets.Upper.BuiRD3
 import Polyplets.Upper.Certificate
 import Polyplets.UpperBound
+import Polyplets.V5Denominator
 import Polyplets.Weights
 import Polyplets.Weights3

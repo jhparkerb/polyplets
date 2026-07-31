@@ -384,6 +384,32 @@ Holes' `kingAdj_shift` → `kingAdj_small_shift` (Growth owns the
 translation-invariance form), duplicate `kingAdj_symm`s dropped for
 `Graph.lean`'s.
 
+## v5 denominator law (LANDED 2026-07-31, `V5Denominator.lean`)
+
+The corrected 5-adic denominator law of `results/v5-denominator-law.md`
+(replacing the refuted `⌈v₅(k!)/2⌉` fit of `results/converse-sweep.md` §2),
+kernel-checked against the pinned production data:
+
+- `N1..N18` + `Pp<k>_data` — the numerator lists, certified identical to
+  `Pin.lean`'s `prodPoly` arguments by `rfl` (transcription typos fail the
+  build).
+- `v5_law_all` — `min v₅(numerators of k!·P_k) = v₅(k!) − H(k)` at every
+  level `k = 1..18`, `k = 11` included (plain kernel `decide`, NO
+  native_decide).
+- `ceil_fit_refuted` / `chat11` / `chat1` — the old fit's failure points
+  as kernel facts.
+- `eleven_no_harvest` — the k = 11 obstruction as a general multiset
+  theorem: parts ≥ 2 summing to 11 ⇒ all multiplicities ≤ 4.
+- `u1_seed` / `g1_seed` — `u₁ = P₁(1) − P₁(0) = 25`, `g₁ = P₁(0) = −45`
+  tied to `Pp1`, with their valuations.
+
+Axioms: `v5_law_all`, `ceil_fit_refuted`, `eleven_no_harvest` carry
+[propext, Quot.sound]; `u1_seed`/`g1_seed` add Classical.choice (norm_num).
+No native leaves. NOT formalized (open item): the general-`k` lower bound
+`ĉ_k ≥ v₅(k!) − H(k)` (Newton/multinomial over the boundary series G, Λ —
+paper-level proof in `results/v5-denominator-law.md`; would need formal
+finite differences + multinomial valuation bookkeeping over `ℤ[[y]]`).
+
 ## Axiom audit
 
 Conditional/partial tiers (k ≥ 4): pure [propext, Classical.choice,
