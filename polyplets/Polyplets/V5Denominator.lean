@@ -62,14 +62,15 @@ def v5q (q : ℚ) : ℤ := (v5F 64 q.num.natAbs : ℤ)
 def v5fact (k : ℕ) : ℤ := (v5F 64 (Nat.factorial k) : ℤ)
 
 /-- The harvest `H k`: how far the 5-adic content of the coefficients of
-`k!·P_k` can drop below `v₅(k!)` — closed form of the partition optimum
-(all-2s blocks; the odd leftover pays `g₁` tax `1`; `H 1 = -1` is the
-pure `g₁` tax). -/
+`k!·P_k` can drop below `v₅(k!)`. The partition optimum (all-2s blocks,
+odd leftover paying the `g₁` tax) collapses to a single expression:
+`v₅(⌊k/2⌋!)` docked by one exactly on the residue class `k ≡ 1 (mod 10)`
+(for odd `k` the leftover cell collides with a fresh multiple-of-5
+multiplicity iff `5 ∣ ⌊k/2⌋`; `H 1 = -1` is the same indicator at
+`v₅(0!) = 0`). Equivalently `v₅(k!) - H k` is `v₅` of the odd double
+factorial `≤ k`, plus the same indicator. -/
 def H (k : ℕ) : ℤ :=
-  if k == 0 then 0
-  else if k == 1 then -1
-  else if k % 2 == 0 then v5fact (k / 2)
-  else max (v5fact ((k - 3) / 2)) (v5fact ((k - 1) / 2) - 1)
+  v5fact (k / 2) - if k % 10 == 1 then 1 else 0
 
 /-! ## The pinned numerator data
 

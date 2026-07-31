@@ -152,15 +152,12 @@ def main():
     # ---- the law:  min_j v5([n^j] k! P_k) = v5(k!) - H(k) ----
     def Hval(k):
         """H(k) = max over {j_G + sum_t t*m_t = k, m_1 = 0 wlog} of
-        sum_t v5(m_t!) - [j_G == 1]; closed form via all-2s optimality."""
-        if k == 0:
-            return 0
-        if k == 1:
-            return -1          # only routes: j_G=1 (tax 1) or m_1=1 (tax 2)
-        if k % 2 == 0:
-            return v5(factorial(k // 2))
-        return max(v5(factorial((k - 3) // 2)),
-                   v5(factorial((k - 1) // 2)) - 1)
+        sum_t v5(m_t!) - [j_G == 1].  The all-2s/leftover case-split
+        collapses (jasonp's observation, 2026-07-31) to the one-liner
+        v5(floor(k/2)!) - [k = 1 mod 10]: for odd k the max form
+        max(v5((m-1)!), v5(m!)-1) = v5(m!) - min(v5(m), 1) and
+        5 | floor(k/2) iff k = 1 (mod 10); k = 0, 1 absorb too."""
+        return v5(factorial(k // 2)) - (1 if k % 10 == 1 else 0)
 
     def Hbrute(k):
         """Direct max over all partitions j_G + sum t*m_t = k (t >= 1),
@@ -179,6 +176,11 @@ def main():
         rec(k, 1, 0)
         return best[0]
 
+    def oddprod_v5(k):
+        """v5 of the odd double factorial <= k; c-hat_k = this + [k=1 mod 10]
+        (k! = 2^floor(k/2) * floor(k/2)! * oddprod)."""
+        return sum(v5(j) for j in range(1, k + 1, 2))
+
     print("\n== law check: c-hat_k = v5(k!) - H(k) ==")
     ok = True
     for k in range(1, kmax + 1):
@@ -186,6 +188,8 @@ def main():
         chat = min(p for p in (v5(kf * x) for x in P[k]) if p is not None)
         h, hb = Hval(k), Hbrute(k)
         assert h == hb, f"H closed form mismatch at k={k}: {h} vs {hb}"
+        assert v5(kf) - h == oddprod_v5(k) + (1 if k % 10 == 1 else 0), \
+            f"odd-double-factorial form mismatch at k={k}"
         law = v5(kf) - h
         tag = "ok" if chat == law else "*** MISMATCH ***"
         if chat != law:

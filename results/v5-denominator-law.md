@@ -18,10 +18,24 @@ relation to the minimal denominator D_k). Define the **harvest**
 > H(k) := max { Σ_t v₅(m_t!) − 2·m₁ − 𝟙[j_G = 1] :
 >               j_G + Σ_{t≥1} t·m_t = k,  j_G, m_t ≥ 0 },
 
-whose closed form (Lemma C) is H(0) = 0, H(1) = −1, and for k ≥ 2
+whose closed form (Lemma C) is, for ALL k ≥ 0 in one expression
+(2026-07-31, second pass — jasonp asked whether the original even/odd
+case-split was a simpler expression in disguise; it is):
 
-> H(k) = v₅((k/2)!)                                        (k even),
-> H(k) = max( v₅(((k−3)/2)!),  v₅(((k−1)/2)!) − 1 )        (k odd).
+> **H(k) = v₅(⌊k/2⌋!) − [k ≡ 1 (mod 10)]**.
+
+(The intermediate case-split form — H even = v₅((k/2)!), H odd =
+max(v₅(((k−3)/2)!), v₅(((k−1)/2)!) − 1), H(1) = −1 — collapses via
+max(v₅(m!) − v₅(m), v₅(m!) − 1) = v₅(m!) − min(v₅(m), 1) and, for odd k,
+5 | ⌊k/2⌋ ⟺ k ≡ 1 (mod 10); k = 0, 1 absorb into the same expression.
+Verified ≡ the case-split for k ≤ 5000 and ≡ the brute-force partition
+optimum for k ≤ 45.) Since k! = 2^⌊k/2⌋·⌊k/2⌋!·(odd numbers ≤ k), the law
+has the equivalent **odd-double-factorial form**
+
+> **ĉ_k = v₅( Π_{j ≤ k, j odd} j ) + [k ≡ 1 (mod 10)]** :
+
+the order-2 Newton slots eat exactly the even half of k!'s 5-content; the
+numerator floor is the odd half, plus the g₁ tax on one residue class.
 
 **THEOREM (lower bound, proved below).** ĉ_k ≥ v₅(k!) − H(k) for every
 k ≥ 1. Equivalently v₅(D_k) ≤ max(H(k), 0): the 5-part of the minimal
@@ -106,7 +120,11 @@ dominated by parts of size 2 with multiplicity Σ_t ⌊t·m_t/2⌋ ≥ Σ_t m_t.
 (iii) The leftover: even k takes j_G = 0, m₂ = k/2; odd k either pays the
 g₁ tax (j_G = 1, m₂ = (k−1)/2, payoff −1) or parks the parity in a free
 order-≥2 slot (one part 3, or j_G = 3: m₂ = (k−3)/2); larger j_G is
-dominated by monotonicity. ∎
+dominated by monotonicity. (iv) Collapse to the single expression: with
+m = ⌊k/2⌋, the odd-k optimum is max(v₅((m−1)!), v₅(m!) − 1) =
+v₅(m!) − min(v₅(m), 1) = v₅(m!) − [5 | m], and for odd k, 5 | m ⟺
+k ≡ 1 (mod 10); even k is never docked (no leftover), and k = 0, 1 read
+off directly. ∎
 
 ## Why k = 11 (and why "lone")
 
@@ -118,11 +136,13 @@ object is taxed at least as much as the harvest pays: g₁ = −45 costs 1
 costs 2. From k = 12 the leftover parks in a free order-2 slot. So
 ĉ₁₁ = v₅(11!) − 0 = 2, exceptionlessly.
 
-k = 11 looked "lone" only because the data window ended at 18: the same
-one-cell-too-many collision recurs at every k ≡ 1 (mod 10) that is not
-rescued by a 25-jump — the fit ⌈v₅(k!)/2⌉ diverges from the true law at
-k ∈ {1, 11, 21, 25, 26, 27, 28, 29, 31, 35, ...} (k ≤ 40; script prints
-the set to 120). First unmeasured divergence: **ĉ₂₁ = 4 − 1 = 3** where
+k = 11 looked "lone" only because the data window ended at 18: in the
+one-line form of H, the "exception" is exactly the Iverson bracket — the
+dock lands on the entire residue class k ≡ 1 (mod 10), of which 11 is
+just the first member past onset. The fit ⌈v₅(k!)/2⌉ diverges from the
+true law at k ∈ {1, 11, 21, 25, 26, 27, 28, 29, 31, 35, ...} (k ≤ 40;
+script prints the set to 120 — the 25, 26, ... entries are ⌊k/2⌋!-vs-half
+drift, not the bracket). First unmeasured divergence: **ĉ₂₁ = 4 − 1 = 3** where
 the old fit says 2 — a sharp falsifiable prediction, but it needs P₂₀/P₂₁,
 i.e. triangle rows n ≥ 41 (beyond project close) or an ab initio cluster
 weight sweep to surplus 21.
@@ -152,8 +172,8 @@ the k = 1 row (ĉ₁ = 1 > 0 = v₅(1!)) caps to D₁ = 1. The
 quantity; the uncapped numerator minimum at k = 1 is 1 (coefficients
 25, −45), and it is the uncapped ĉ that obeys the clean law — the k = 1
 "tax" H(1) = −1 is real, not an artifact. For k ≥ 2, v₅(D_k) = H(k) at
-every measured level; in particular, for even k the 5-part of the true
-denominator of P_k is exactly the 5-part of (k/2)!.
+every measured level: **the 5-part of the true denominator of P_k is that
+of ⌊k/2⌋!, docked one 5 exactly when k ≡ 1 (mod 10)**.
 
 ## Status
 
