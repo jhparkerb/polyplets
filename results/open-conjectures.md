@@ -30,7 +30,9 @@ banked sequence $n\le40$ (zero violations; re-checked 2026-07-31 against
 lower bound on $\lambda$ (so $a(40)/a(39)=6.935\le\lambda$). Companions: one-sided A030233, free
 A030222, asymmetric A030235 are log-convex past small $n$; **the bilateral count
 A030234 is NOT** — log-convexity fails at every even $n$, a parity effect worth its
-own look.
+own look. (Exact witness lists for every companion, plus the family-wide
+ratio-sequence sweep and two more converse kills — onset sharpness to $k\le13$,
+k!-minimality refuted — in `results/converse-sweep.md`, 2026-07-31.)
 - **Margin structure (measured 2026-07-31):** the violation margin
   $a(n{-}1)a(n{+}1)/a(n)^2 - 1$ tracks $-\theta/n^2$ exactly: $n^2\cdot$margin
   climbs smoothly $0.89 \to 0.97$ over $n = 5..39$, consistent with
@@ -41,6 +43,18 @@ own look.
   proof-grade control of the correction structure, which nothing currently
   provides. The affirmative injection route below remains the only path that
   sidesteps asymptotics entirely.
+- **Ratio sequence is NOT log-convex — THEOREM (jasonp's question, settled
+  2026-07-31):** $r(n) = a(n)/a(n{-}1)$ is strictly log-*concave* at every
+  testable index: $r(n)^2 > r(n{-}1)r(n{+}1)$, i.e.
+  $a(n)^3 a(n{-}2) > a(n{-}1)^3 a(n{+}1)$, holds for **all** $n = 3..39$ (exact
+  integer arithmetic on the banked terms). Witness at $n=3$ needs only
+  $20^3\cdot1 = 8000 > 7040 = 4^3\cdot110$ — terms that are two-algorithm
+  verified and Lean-kernel-proved (`a_1..a_6`), so the refutation is
+  certificate-grade. Together with C2 this is the coherent picture
+  $r(n) \approx \lambda(1 - 1/n)$: ratios increase (C2, conjectural), at
+  decreasing pace (log-concavity, witnessed everywhere measurable); the
+  all-$n$ log-concavity statement is C2's conjecture-grade mirror, gated on
+  the same correction-structure control.
 - **Attack:** log-convexity of animal counts is genuinely hard; the natural route is
   an injection $\mathcal A_{n-1}\times\mathcal A_{n+1}\hookrightarrow\mathcal A_n
   \times\mathcal A_n$ (or a total-positivity property of the transfer matrix). No

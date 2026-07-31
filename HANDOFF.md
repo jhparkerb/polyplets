@@ -74,7 +74,12 @@ observed k<=17" open item in `docs/proofs/diagonal-law.md` /
 denominator dividing k! at every wired level; 25^k/k! forces it). It is
 replaced by the true statement behind it — **k!·P_k ∈ ℤ[n]**, observed at
 all 19 wired levels, load-bearing for `diagCoeffTable`'s representation
-and the k!-divide guard, and not proved.
+and the k!-divide guard — and since proved (Lean `IntCoeff.lean`,
+`production_factorial_int`, via integer-valuedness). 2026-07-31 sharpening
+(`results/converse-sweep.md`): k! is NOT the minimal denominator — from
+k = 5 the true minimum is k!/5 (k!/25 at k = 11); only 5-adic content
+drops, the 25 = 5² defect constant being the likely mechanism. So quote
+the divisibility, never the minimality.
 
 **Holdout-confirmed mass** (new, `results/ns_a40/PROVENANCE.md`): the
 share of each term that a closed form predicted first and a later real
