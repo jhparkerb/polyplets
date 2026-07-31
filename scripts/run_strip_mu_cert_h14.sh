@@ -20,10 +20,13 @@
 # Output: one logfmt receipt line appended to results/strip_mu_certificates.log
 #   (H, num/den, states, SHA-256 of the certificate vector, PASS/FAIL, wall);
 #   full stdout+stderr teed to results/strip_mu_cert_H14.log.
+# Usage: run_strip_mu_cert_h14.sh [H_LO [H_HI]]   (default 14 14)
 set -e
+H_LO=${1:-14}
+H_HI=${2:-14}
 cd ~/src/polyominoes
 make build/strip_mu_cert
 ./build/strip_mu_cert --selftest          # RED-first gate before the long run
-echo "=== strip_mu_cert H=14 host=$(hostname -s) rev=$(git rev-parse --short HEAD) $(date -u +%FT%TZ) ==="
+echo "=== strip_mu_cert H=$H_LO..$H_HI host=$(hostname -s) rev=$(git rev-parse --short HEAD) $(date -u +%FT%TZ) ==="
 echo "=== cpp/strip_mu_cert.cpp blob $(git hash-object cpp/strip_mu_cert.cpp) ==="
-exec ./build/strip_mu_cert 14 14 --digits 7 --log results/strip_mu_certificates.log
+exec ./build/strip_mu_cert "$H_LO" "$H_HI" --digits 7 --log results/strip_mu_certificates.log
