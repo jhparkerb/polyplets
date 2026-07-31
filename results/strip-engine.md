@@ -57,13 +57,14 @@ is not independent OF:
 ## Result
 
 Engine-computed T(n,H) matches the banked (kink-derived) triangle EXACTLY for
-every entry in columns H computed, at every n up to 36:
+every entry in columns H computed, at every n up to 40:
 
 | Hmax | banked entries confirmed | wall (C++) |
 |------|--------------------------|------------|
 | 10   | 315                      | ~5 s       |
 | 13   | (see strip_engine_run.log — C++ output despite the name; C_13 = 606s) | ~730 s |
-| 14   | **413, 0 mismatch, n≤36** (strip_C14_run.log, dalby 2026-07-22) | ~7.5 h dalby (C_14 = 22919s; dalby ≈ 5.4x slower/thread than gympie) |
+| 14   | 413, 0 mismatch, n≤36 (strip_C14_run.log, dalby 2026-07-22) | ~7.5 h dalby (C_14 = 22919s; dalby ≈ 5.4x slower/thread than gympie) |
+| 14   | **469, 0 mismatch, n≤40** (strip_C14_n40_run.log, dalby 2026-07-30, rev 5239e73) | ~8.6 h dalby (C_14 = 25892s) |
 
 (`strip_engine_run.log` is `build/strip_tm` output — its first line says
 `strip_tm (C++)` — not the Python reference's, despite sharing the Python
@@ -101,15 +102,16 @@ large n, not a first check at small n.
 second source — including for the cells those very formulas produced. Over
 the closed n<=40 triangle (820 cells), recomputed:
 
-| figure | value | what it counts |
-|---|---|---|
-| doc-style cell union | **90.5%** (742) | H<=4 recurrences ∪ P_k diagonals ∪ strip (H<=14, n<=36), P_k credited everywhere in its onset |
-| honest cells | **67.3%** (552) | same, but a closed form is NOT a second source for a cell it generated — P_k credited only on really-swept cells (H<=21) |
-| strip alone | **50.4%** (413) | the strip engine's own verified region |
+| figure | value (n≤36 strip) | value (N=40 strip, 2026-07-30) | what it counts |
+|---|---|---|---|
+| doc-style cell union | 90.5% (742) | **95.4%** (782) | H<=4 recurrences ∪ P_k diagonals ∪ strip (H<=14), P_k credited everywhere in its onset |
+| honest cells | 67.3% (552) | **72.2%** (592) | same, but a closed form is NOT a second source for a cell it generated — P_k credited only on really-swept cells (H<=21) |
+| strip alone | 50.4% (413) | **57.2%** (469) | the strip engine's own verified region |
 
 Exact rule for reproducing these, so they are not folklore: cells are all
-(n,H) with 1<=H<=n<=40 (820 of them); `R` = H<=4; `S` = H<=14 and n<=36;
-`P` = diagonals k = n-H with **k <= 18** and n >= 2k+1. Diagonal k=19 is
+(n,H) with 1<=H<=n<=40 (820 of them); `R` = H<=4; `S` = H<=14 and n<=36
+(now n<=40 for the right-hand column); `P` = diagonals k = n-H with
+**k <= 18** and n >= 2k+1. Diagonal k=19 is
 excluded from `P` deliberately — P_19 is fitted-no-holdout, so it certifies
 nothing; including it adds exactly its own two fit points, T(39,20) and
 T(40,21), and would read 90.7% / 67.6%. Then doc-style = |R ∪ P ∪ S|,
@@ -119,7 +121,7 @@ Cells are the flattering denominator, because the triangle's cells are wildly
 unequal in size. **By mass** the picture is starker. The banked strip run is
 H<=14 **and n<=36**, so it touches no cell of rows 37-40 at all:
 
-| term | strip mass, as banked (n<=36) | with the N=40 extension |
+| term | strip mass, pre-extension (n<=36) | with the N=40 extension (DELIVERED 2026-07-30) |
 |---|---|---|
 | a(37) | 0% | 53.8% |
 | a(38) | 0% | 50.8% |
@@ -131,11 +133,12 @@ from `results/ns_a40/perheight/h*.out`.) Do not confuse this with the
 **holdout-confirmed** mass (9.1% / 5.5% / 2.5% / 0.0% for a(37)-a(40)),
 which is a different and unrelated quantity — closed-form cells later
 reached by a real sweep, tabulated in `results/ns_a40/PROVENANCE.md`. The
-strip run stopped four terms
-short of the close, and the mass lives in the tall middle heights. An N=40
-strip run was launched 2026-07-30 (in progress;
-`results/strip_C14_n40_run.log`) and delivers the right-hand column. The
-per-height mass breakdown of a(40) itself is in
+original strip run stopped four terms short of the close, and the mass
+lives in the tall middle heights. The N=40 strip run closing that gap
+COMPLETED 2026-07-30 (dalby, ~8.6 h, rev 5239e73;
+`results/strip_C14_n40_run.log`): 469 cells, 0 mismatch — every banked
+row now carries independent strip confirmation of its H<=14 mass
+(45.0% of a(40)). The per-height mass breakdown of a(40) itself is in
 `results/ns_a40/PROVENANCE.md`.
 
 Note: `build/g2` (cpp/g2_redelmeier.cpp) is the canonical, gated Redelmeier;
@@ -151,5 +154,5 @@ since C_H(n) <= H*a(n) < 1.7e38. State packed 4 bits/row -> H<=15 cap.
 ## Reproduce
 
     make -C . build/strip_tm      # or: clang++ -O3 -std=c++17 -o build/strip_tm cpp/strip_tm.cpp
-    ./build/strip_tm 14 36 results/ns_a36/perheight
+    ./build/strip_tm 14 40 results/ns_a40/perheight   # the 2026-07-30 full-reach run (~38 GB RAM, ~8.6 h dalby)
     python3 experiments/strip_engine.py 10 36     # brute-anchored reference
