@@ -24,10 +24,10 @@ is available (the limit itself is not built here).
 
 ## The exploration
 
-Every canonical animal is first re-anchored: `shape S` translates `S` so that
+Every canonical animal is first re-anchored: `expShape S` translates `S` so that
 its scan-least cell (row-major, `y` before `x`) sits at the origin. Canonicity
-pins the translation back, so `shape` is injective (`shape_injOn`), and the
-shape is what the exploration reconstructs.
+pins the translation back, so `expShape` is injective (`expShape_injOn`), and the
+the shape is what the exploration reconstructs.
 
 The exploration is a breadth-first flood from the origin, run as a pure
 transition function `expStep : ExpState → Bool → ExpState` on a queue of
@@ -45,7 +45,7 @@ accept-position set, which is what makes `S ↦ accept positions` injective.
 Two facts bound the number of steps:
 
 * the origin proposes only `4` candidates (the other four king neighbours are
-  scan-smaller, hence never cells of a shape), and
+  scan-smaller, hence never cells of a expShape), and
 * every later accepted cell `c` proposes at most `5`: its proposer `p` and all
   of `p`'s neighbours were already seen when `p` was accepted, and `p` shares
   at least two neighbours with `c` (`countP_new_le`).
@@ -65,7 +65,7 @@ Elementary and independent of the exploration, so it comes first. The engine is
 the one-step factorial identity `choose_step`, which turns the induction into a
 polynomial inequality with nonnegative coefficient differences. -/
 
-/-- Five factorial peels, with the successor shape supplied by definitional
+/-- Five factorial peels, with the successor expShape supplied by definitional
 unfolding of `Nat.add` (`m + 5` is `(m + 4) + 1`). -/
 private lemma factorial_add_five (m : ℕ) :
     factorial (m + 5)
@@ -435,7 +435,7 @@ lemma runA_eq_runO (D : Finset (ℤ × ℤ)) (K : ℕ) :
 Fourteen clauses carried together: piecemeal invariants do not survive the
 accepting step, where the queue, the considered set and the budget all move at
 once. `D` is an arbitrary cell set here — nothing in this section needs it to
-be a shape. -/
+be a expShape. -/
 
 /-- The exploration invariant relative to a cell set `D`. -/
 structure Good (D : Finset (ℤ × ℤ)) (st : ExpState) : Prop where
@@ -719,10 +719,10 @@ lemma runO_queue_nil {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) (hn 
       simp only [List.length_cons] at h
       omega
 
-/-- **The exploration reconstructs the shape.** Only cells of `D` are accepted,
+/-- **The exploration reconstructs the expShape.** Only cells of `D` are accepted,
 and every cell of `D` is: the origin is decided first, and each further cell is
 reached along a king path from it — when its predecessor was accepted the cell
-was proposed (it is scan-positive, being a non-origin cell of a shape), and a
+was proposed (it is scan-positive, being a non-origin cell of a expShape), and a
 halted run has decided everything it proposed. -/
 lemma runO_accepted {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) (hn : 1 ≤ n) :
     (runO D (5 * n)).accepted = D := by
@@ -763,7 +763,7 @@ lemma accPos_subset (D : Finset (ℤ × ℤ)) (k : ℕ) : (runO D k).accPos ⊆ 
 A canonical animal is anchored by its *bounding box*, which need not put any
 cell at the origin. The exploration wants the *scan-least cell* there instead,
 so the animal is translated; canonicity pins the translation back, which is why
-nothing is lost (`shape_injOn`). -/
+nothing is lost (`expShape_injOn`). -/
 
 /-- The x-coordinate of the scan-least cell of `S`: the least `k` with
 `(k, 0) ∈ S`. Totalised by `Nat.sInf`, whose junk value `0` on the empty set
@@ -775,7 +775,7 @@ row `0`, and `anchorX` picks the leftmost cell of that row. -/
 noncomputable def anchor (S : Finset (ℤ × ℤ)) : ℤ × ℤ := ((anchorX S : ℤ), 0)
 
 /-- `S` translated so that its scan-least cell sits at the origin. -/
-noncomputable def shape (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
+noncomputable def expShape (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
   S.image fun q => (q.1 - (anchor S).1, q.2 - (anchor S).2)
 
 /-- Row `0` of a canonical animal is inhabited, so `anchorX` is a genuine
@@ -824,29 +824,29 @@ private lemma kingAdj_sub (a : ℤ × ℤ) {x y : ℤ × ℤ} (h : kingAdj x y) 
   · change |x.2 - a.2 - (y.2 - a.2)| ≤ 1
     rw [show x.2 - a.2 - (y.2 - a.2) = x.2 - y.2 by ring]; exact h2
 
-/-- **A canonical animal re-anchors to a shape.** Size and connectivity survive
+/-- **A canonical animal re-anchors to a expShape.** Size and connectivity survive
 the translation; the origin is the image of the anchor; and every other cell is
 scan-greater because the anchor is scan-least. -/
-lemma isShape_shape {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
-    IsShape n (shape S) where
-  card := by rw [shape, Finset.card_image_of_injective _ (sub_injective _), hS.1]
+lemma isShape_expShape {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
+    IsShape n (expShape S) where
+  card := by rw [expShape, Finset.card_image_of_injective _ (sub_injective _), hS.1]
   conn := by
     intro d hd e he
-    rw [shape, Finset.mem_image] at hd he
+    rw [expShape, Finset.mem_image] at hd he
     obtain ⟨x, hx, rfl⟩ := hd
     obtain ⟨y, hy, rfl⟩ := he
     refine Relation.ReflTransGen.lift
       (fun q : ℤ × ℤ => (q.1 - (anchor S).1, q.2 - (anchor S).2)) (fun u v huv => ?_)
       (hS.2.1 x hx y hy)
-    exact ⟨by rw [shape]; exact Finset.mem_image_of_mem _ huv.1,
-      by rw [shape]; exact Finset.mem_image_of_mem _ huv.2.1, kingAdj_sub _ huv.2.2⟩
+    exact ⟨by rw [expShape]; exact Finset.mem_image_of_mem _ huv.1,
+      by rw [expShape]; exact Finset.mem_image_of_mem _ huv.2.1, kingAdj_sub _ huv.2.2⟩
   origin := by
     have := Finset.mem_image_of_mem (fun q : ℤ × ℤ => (q.1 - (anchor S).1, q.2 - (anchor S).2))
       (anchor_mem hS)
-    simpa [shape] using this
+    simpa [expShape] using this
   scan := by
     intro d hd hd0
-    rw [shape, Finset.mem_image] at hd
+    rw [expShape, Finset.mem_image] at hd
     obtain ⟨q, hq, rfl⟩ := hd
     have hy := hS.2.2.2.2.1 q hq
     have hane : (anchor S).2 = 0 := rfl
@@ -859,25 +859,25 @@ lemma isShape_shape {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal 
     · left; omega
 
 /-- Re-anchoring is undone by translating back. -/
-lemma shape_image (S : Finset (ℤ × ℤ)) :
-    (shape S).image (fun d => (d.1 + (anchor S).1, d.2 + (anchor S).2)) = S := by
-  rw [shape, Finset.image_image]
+lemma expShape_image (S : Finset (ℤ × ℤ)) :
+    (expShape S).image (fun d => (d.1 + (anchor S).1, d.2 + (anchor S).2)) = S := by
+  rw [expShape, Finset.image_image]
   ext q
   simp [Function.comp_def]
 
 /-- **Re-anchoring loses nothing.** Two canonical animals with the same shape
 have the same anchor: the animal's own `min x = 0` clause forces the anchor's
 x-coordinate to be the negative of the shape's minimum x-coordinate, so it is
-determined by the shape. Translating back then identifies the animals. -/
-lemma shape_injOn (n : ℕ) :
-    Set.InjOn shape {S : Finset (ℤ × ℤ) | IsCanonicalAnimal n S} := by
+determined by the expShape. Translating back then identifies the animals. -/
+lemma expShape_injOn (n : ℕ) :
+    Set.InjOn expShape {S : Finset (ℤ × ℤ) | IsCanonicalAnimal n S} := by
   have key : ∀ T₁ T₂ : Finset (ℤ × ℤ), IsCanonicalAnimal n T₁ → IsCanonicalAnimal n T₂ →
-      shape T₁ = shape T₂ → (anchor T₁).1 ≤ (anchor T₂).1 := by
+      expShape T₁ = expShape T₂ → (anchor T₁).1 ≤ (anchor T₂).1 := by
     intro T₁ T₂ hT₁ hT₂ h
     obtain ⟨q, hq, hq0⟩ := hT₁.2.2.2.1
-    have hd : (q.1 - (anchor T₁).1, q.2 - (anchor T₁).2) ∈ shape T₂ := by
-      rw [← h, shape]; exact Finset.mem_image_of_mem _ hq
-    rw [shape, Finset.mem_image] at hd
+    have hd : (q.1 - (anchor T₁).1, q.2 - (anchor T₁).2) ∈ expShape T₂ := by
+      rw [← h, expShape]; exact Finset.mem_image_of_mem _ hq
+    rw [expShape, Finset.mem_image] at hd
     obtain ⟨r, hr, hre⟩ := hd
     have hr0 : 0 ≤ r.1 := hT₂.2.2.1 r hr
     simp only [Prod.mk.injEq] at hre
@@ -889,38 +889,38 @@ lemma shape_injOn (n : ℕ) :
     simp only [anchor] at e1 e2 ⊢
     have : (anchorX S₁ : ℤ) = (anchorX S₂ : ℤ) := by omega
     rw [this]
-  calc S₁ = (shape S₁).image (fun d => (d.1 + (anchor S₁).1, d.2 + (anchor S₁).2)) :=
-        (shape_image S₁).symm
-    _ = (shape S₂).image (fun d => (d.1 + (anchor S₂).1, d.2 + (anchor S₂).2)) := by
+  calc S₁ = (expShape S₁).image (fun d => (d.1 + (anchor S₁).1, d.2 + (anchor S₁).2)) :=
+        (expShape_image S₁).symm
+    _ = (expShape S₂).image (fun d => (d.1 + (anchor S₂).1, d.2 + (anchor S₂).2)) := by
         rw [heq, ha]
-    _ = S₂ := shape_image S₂
+    _ = S₂ := expShape_image S₂
 
 /-! ## The bound -/
 
 /-- The exploration code of a canonical animal: the accept positions of the
-oracle-driven run on its shape. -/
+oracle-driven run on its expShape. -/
 noncomputable def expCode (n : ℕ) (S : Finset (ℤ × ℤ)) : Finset ℕ :=
-  (runO (shape S) (5 * n)).accPos
+  (runO (expShape S) (5 * n)).accPos
 
 /-- **`a n ≤ C(5n, n)`.** The exploration code embeds the canonical animals of
 `n` cells into the `n`-element subsets of `Finset.range (5 * n)`: it lands there
 because the run halts within `5 * n` steps and accepts exactly `n` times, and it
 is injective because replaying the exploration from the code alone recovers the
-shape (`runA_eq_runO`), which recovers the animal (`shape_injOn`). -/
+expShape (`runA_eq_runO`), which recovers the animal (`expShape_injOn`). -/
 theorem a_le_choose (n : ℕ) (hn : 1 ≤ n) : a n ≤ Nat.choose (5 * n) n := by
   have hmap : ∀ S ∈ {S : Finset (ℤ × ℤ) | IsCanonicalAnimal n S},
       expCode n S ∈ (↑(Finset.powersetCard n (Finset.range (5 * n))) : Set (Finset ℕ)) := by
     intro S hS
     rw [Finset.mem_coe, Finset.mem_powersetCard]
-    exact ⟨accPos_subset _ _, accPos_card (isShape_shape hS) hn⟩
+    exact ⟨accPos_subset _ _, accPos_card (isShape_expShape hS) hn⟩
   have hinj : Set.InjOn (expCode n) {S : Finset (ℤ × ℤ) | IsCanonicalAnimal n S} := by
     intro S₁ h₁ S₂ h₂ h
-    refine shape_injOn n h₁ h₂ ?_
-    have k1 : runA (expCode n S₁) (5 * n) = runO (shape S₁) (5 * n) :=
+    refine expShape_injOn n h₁ h₂ ?_
+    have k1 : runA (expCode n S₁) (5 * n) = runO (expShape S₁) (5 * n) :=
       runA_eq_runO _ _ _ le_rfl
-    have k2 : runA (expCode n S₂) (5 * n) = runO (shape S₂) (5 * n) :=
+    have k2 : runA (expCode n S₂) (5 * n) = runO (expShape S₂) (5 * n) :=
       runA_eq_runO _ _ _ le_rfl
-    rw [← runO_accepted (isShape_shape h₁) hn, ← runO_accepted (isShape_shape h₂) hn,
+    rw [← runO_accepted (isShape_expShape h₁) hn, ← runO_accepted (isShape_expShape h₂) hn,
       ← k1, ← k2, h]
   have hfin := (Finset.powersetCard n (Finset.range (5 * n))).finite_toSet
   have hle := Set.ncard_le_ncard_of_injOn (expCode n) hmap hinj hfin

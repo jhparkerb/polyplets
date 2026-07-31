@@ -5,6 +5,7 @@ Authors: Jason H Parker
 -/
 import Mathlib.Analysis.Subadditive
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Polyplets.Graph
 import Polyplets.UpperBound
 
 /-!
@@ -20,8 +21,8 @@ halves of Fekete's argument:
   side by side across one king edge, together with the recovery maps
   (`recLeft`, `recRight`) that undo it;
 * **Fekete's lemma**, from Mathlib's `Subadditive.tendsto_lim`, applied to
-  `logSeq n = -log (a n)`, which is subadditive by supermultiplicativity and
-  whose `logSeq n / n` is bounded below by the `UpperBound.lean` ceiling.
+  `negLogA n = -log (a n)`, which is subadditive by supermultiplicativity and
+  whose `negLogA n / n` is bounded below by the `UpperBound.lean` ceiling.
 
 The payoff:
 
@@ -117,10 +118,6 @@ cancellation as hypotheses so that it applies without any `-0`/`0` mismatch. -/
 lemma shiftBy_cancel {e d e' d' : ℤ} (he : e + e' = 0) (hd : d + d' = 0)
     (S : Finset (ℤ × ℤ)) : shiftBy (e', d') (shiftBy (e, d) S) = S := by
   rw [shiftBy_shiftBy, he, hd, shiftBy_zero]
-
-/-- King adjacency is symmetric. -/
-lemma kingAdj_symm {p q : ℤ × ℤ} (h : kingAdj p q) : kingAdj q p :=
-  ⟨h.1.symm, by rw [abs_sub_comm]; exact h.2.1, by rw [abs_sub_comm]; exact h.2.2⟩
 
 /-- King adjacency is translation-invariant. -/
 lemma kingAdj_shift (v : ℤ × ℤ) {x y : ℤ × ℤ} (h : kingAdj x y) :
@@ -628,8 +625,8 @@ theorem a_supermul {m n : ℕ} (_hm : 1 ≤ m) (_hn : 1 ≤ n) : a m * a n ≤ a
 
 /-! ## Fekete's ladder
 
-`logSeq n = -log (a n)` is subadditive (that is supermultiplicativity of `a`
-read through `log`) and `logSeq n / n` is bounded below (that is the
+`negLogA n = -log (a n)` is subadditive (that is supermultiplicativity of `a`
+read through `log`) and `negLogA n / n` is bounded below (that is the
 `UpperBound.lean` ceiling). Mathlib's `Subadditive.tendsto_lim` then supplies
 the limit, and `Subadditive.lim_le_div` the "limit is the infimum" half that
 turns into `a n ≤ lambda ^ n`. -/
@@ -645,16 +642,16 @@ theorem a_le_ratio_pow (k : ℕ) : (a k : ℝ) ≤ (3125 / 256 : ℝ) ^ k := by
   exact h2
 
 /-- The sequence Fekete is applied to: `-log (a n)`. -/
-noncomputable def logSeq (k : ℕ) : ℝ := -Real.log (a k)
+noncomputable def negLogA (k : ℕ) : ℝ := -Real.log (a k)
 
 /-- **Supermultiplicativity, read through `log`.** The degenerate cases `m = 0`
-and `n = 0` are equalities: `a 0 = 0` and `Real.log 0 = 0`, so `logSeq 0 = 0`. -/
-theorem logSeq_subadditive : Subadditive logSeq := by
+and `n = 0` are equalities: `a 0 = 0` and `Real.log 0 = 0`, so `negLogA 0 = 0`. -/
+theorem logSeq_subadditive : Subadditive negLogA := by
   intro p q
   rcases Nat.eq_zero_or_pos p with rfl | hp
-  · simp [logSeq, a_zero]
+  · simp [negLogA, a_zero]
   rcases Nat.eq_zero_or_pos q with rfl | hq
-  · simp [logSeq, a_zero]
+  · simp [negLogA, a_zero]
   have h1 : (0 : ℝ) < a p := by exact_mod_cast one_le_a hp
   have h2 : (0 : ℝ) < a q := by exact_mod_cast one_le_a hq
   have hsm : ((a p : ℝ) * (a q : ℝ)) ≤ (a (p + q) : ℝ) := by
@@ -662,12 +659,12 @@ theorem logSeq_subadditive : Subadditive logSeq := by
   have hlog : Real.log ((a p : ℝ) * (a q : ℝ)) ≤ Real.log (a (p + q) : ℝ) :=
     Real.log_le_log (by positivity) hsm
   rw [Real.log_mul (ne_of_gt h1) (ne_of_gt h2)] at hlog
-  simp only [logSeq]
+  simp only [negLogA]
   linarith
 
-/-- The lower bound on `logSeq n / n` supplied by the exponential ceiling. -/
+/-- The lower bound on `negLogA n / n` supplied by the exponential ceiling. -/
 theorem logSeq_div_ge {k : ℕ} (hk : 1 ≤ k) :
-    -Real.log (3125 / 256 : ℝ) ≤ logSeq k / k := by
+    -Real.log (3125 / 256 : ℝ) ≤ negLogA k / k := by
   have hkR : (0 : ℝ) < k := by exact_mod_cast hk
   have hpos : (0 : ℝ) < a k := by exact_mod_cast one_le_a hk
   have hlog : Real.log (a k) ≤ k * Real.log (3125 / 256 : ℝ) := by
@@ -675,21 +672,21 @@ theorem logSeq_div_ge {k : ℕ} (hk : 1 ≤ k) :
           Real.log_le_log hpos (a_le_ratio_pow k)
       _ = k * Real.log (3125 / 256 : ℝ) := by rw [Real.log_pow]
   rw [le_div_iff₀ hkR]
-  simp only [logSeq]
+  simp only [negLogA]
   linarith
 
-/-- `logSeq n / n` is bounded below, the hypothesis Fekete's lemma needs. -/
-theorem logSeq_bddBelow : BddBelow (Set.range fun k : ℕ => logSeq k / k) := by
+/-- `negLogA n / n` is bounded below, the hypothesis Fekete's lemma needs. -/
+theorem logSeq_bddBelow : BddBelow (Set.range fun k : ℕ => negLogA k / k) := by
   refine ⟨-Real.log (3125 / 256 : ℝ), ?_⟩
   rintro x ⟨k, rfl⟩
   rcases Nat.eq_zero_or_pos k with rfl | hk
-  · simp only [logSeq, a_zero, Nat.cast_zero, Real.log_zero, neg_zero, zero_div]
+  · simp only [negLogA, a_zero, Nat.cast_zero, Real.log_zero, neg_zero, zero_div]
     have := Real.log_nonneg (by norm_num : (1 : ℝ) ≤ 3125 / 256)
     linarith
   · exact logSeq_div_ge hk
 
 /-- **The growth constant of the polyplet sequence**, `λ = lim a(n)^{1/n}`,
-built as `exp` of the negated Fekete limit of `logSeq`. -/
+built as `exp` of the negated Fekete limit of `negLogA`. -/
 noncomputable def lambda : ℝ := Real.exp (-logSeq_subadditive.lim)
 
 /-- `λ` is positive. -/
@@ -698,17 +695,17 @@ lemma lambda_pos : 0 < lambda := Real.exp_pos _
 /-- **`λ` is the limit of `a(n)^{1/n}`.** -/
 theorem lambda_tendsto :
     Filter.Tendsto (fun n => (a n : ℝ) ^ ((n : ℝ)⁻¹)) Filter.atTop (𝓝 lambda) := by
-  have h0 : Filter.Tendsto (fun k : ℕ => logSeq k / k) Filter.atTop
+  have h0 : Filter.Tendsto (fun k : ℕ => negLogA k / k) Filter.atTop
       (𝓝 logSeq_subadditive.lim) :=
     logSeq_subadditive.tendsto_lim logSeq_bddBelow
-  have h2 : Filter.Tendsto (fun k : ℕ => Real.exp (-(logSeq k / k))) Filter.atTop (𝓝 lambda) :=
+  have h2 : Filter.Tendsto (fun k : ℕ => Real.exp (-(negLogA k / k))) Filter.atTop (𝓝 lambda) :=
     (Real.continuous_exp.tendsto _).comp h0.neg
   refine h2.congr' ?_
   filter_upwards [Filter.eventually_ge_atTop 1] with k hk
   have hpos : (0 : ℝ) < a k := by exact_mod_cast one_le_a hk
   rw [Real.rpow_def_of_pos hpos]
   congr 1
-  simp only [logSeq]
+  simp only [negLogA]
   ring
 
 /-- **Fekete's supremum half:** `a n ≤ λⁿ` for every `n ≥ 1`. The Fekete limit
@@ -718,10 +715,10 @@ theorem a_le_lambda_pow {n : ℕ} (hn : 1 ≤ n) : (a n : ℝ) ≤ lambda ^ n :=
   have hpos : (0 : ℝ) < a n := by exact_mod_cast one_le_a hn
   have hn0 : n ≠ 0 := by omega
   have hnR : (0 : ℝ) < n := by exact_mod_cast hn
-  have hle : logSeq_subadditive.lim ≤ logSeq n / n :=
+  have hle : logSeq_subadditive.lim ≤ negLogA n / n :=
     logSeq_subadditive.lim_le_div logSeq_bddBelow hn0
   rw [le_div_iff₀ hnR] at hle
-  simp only [logSeq] at hle
+  simp only [negLogA] at hle
   calc (a n : ℝ) = Real.exp (Real.log (a n)) := (Real.exp_log hpos).symm
     _ ≤ Real.exp ((n : ℝ) * (-logSeq_subadditive.lim)) := Real.exp_le_exp.mpr (by linarith)
     _ = lambda ^ n := by rw [lambda]; exact Real.exp_nat_mul _ n

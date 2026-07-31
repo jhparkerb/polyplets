@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Polyplets.Defs
+import Polyplets.Graph
 
 /-!
 # Holes: enclosed empty regions of king animals, and the box-ring lower bound
@@ -79,10 +80,6 @@ lemma rookAdj_symm {p q : ℤ × ℤ} (h : rookAdj p q) : rookAdj q p := by
   · exact Or.inl ⟨h1.symm, by rw [abs_sub_comm]; exact h2⟩
   · exact Or.inr ⟨h1.symm, by rw [abs_sub_comm]; exact h2⟩
 
-lemma kingAdj_symm {p q : ℤ × ℤ} (h : kingAdj p q) : kingAdj q p := by
-  obtain ⟨hne, h1, h2⟩ := h
-  exact ⟨hne.symm, by rwa [abs_sub_comm], by rwa [abs_sub_comm]⟩
-
 /-- The horizontal rook step. -/
 lemma rookAdj_horiz (p : ℤ × ℤ) {d : ℤ} (hd : d = 1 ∨ d = -1) :
     rookAdj p (p.1 + d, p.2) := by
@@ -104,7 +101,7 @@ lemma rookAdj_vert (p : ℤ × ℤ) {d : ℤ} (hd : d = 1 ∨ d = -1) :
     omega
 
 /-- Any nonzero displacement with both coordinates in `[-1, 1]` is a king step. -/
-lemma kingAdj_shift (p : ℤ × ℤ) {dx dy : ℤ} (hne : ¬(dx = 0 ∧ dy = 0))
+lemma kingAdj_small_shift (p : ℤ × ℤ) {dx dy : ℤ} (hne : ¬(dx = 0 ∧ dy = 0))
     (hx : -1 ≤ dx) (hx' : dx ≤ 1) (hy : -1 ≤ dy) (hy' : dy ≤ 1) :
     kingAdj p (p.1 + dx, p.2 + dy) := by
   refine ⟨?_, ?_, ?_⟩
@@ -347,7 +344,7 @@ private lemma ring_left_reach (a b : ℕ) :
         subst hx; subst hy; exact .refl
       · refine Relation.ReflTransGen.head (b := (x + -1, y + 1)) ⟨hp, ?_, ?_⟩ (ih _ ?_ ?_ ?_)
         · rw [mem_ringAnimal]; simp only; omega
-        · exact kingAdj_shift (x, y) (by omega) (by omega) (by omega) (by omega) (by omega)
+        · exact kingAdj_small_shift (x, y) (by omega) (by omega) (by omega) (by omega) (by omega)
         · rw [mem_ringAnimal]; simp only; omega
         · simp only; omega
         · simp only; omega
@@ -377,7 +374,7 @@ private lemma ring_bottom_reach (a b : ℕ) :
         subst hx; subst hy; exact .refl
       · refine Relation.ReflTransGen.head (b := (x + -1, y + -1)) ⟨hp, ?_, ?_⟩ (ih _ ?_ ?_ ?_)
         · rw [mem_ringAnimal]; simp only; omega
-        · exact kingAdj_shift (x, y) (by omega) (by omega) (by omega) (by omega) (by omega)
+        · exact kingAdj_small_shift (x, y) (by omega) (by omega) (by omega) (by omega) (by omega)
         · rw [mem_ringAnimal]; simp only; omega
         · simp only; omega
         · simp only; omega
@@ -410,7 +407,7 @@ private lemma ring_top_reach (a b : ℕ) :
             rw [mem_ringAnimal]; simp only; omega
         · refine Relation.ReflTransGen.head (b := (x + -1, y + -1)) ⟨hp, ?_, ?_⟩ (ih _ ?_ ?_ ?_)
           · rw [mem_ringAnimal]; simp only; omega
-          · exact kingAdj_shift (x, y) (by omega) (by omega) (by omega) (by omega) (by omega)
+          · exact kingAdj_small_shift (x, y) (by omega) (by omega) (by omega) (by omega) (by omega)
           · rw [mem_ringAnimal]; simp only; omega
           · simp only; omega
           · simp only; omega
@@ -444,7 +441,7 @@ private lemma ring_right_reach (a b : ℕ) :
             rw [mem_ringAnimal]; simp only; omega
         · refine Relation.ReflTransGen.head (b := (x + -1, y + 1)) ⟨hp, ?_, ?_⟩ (ih _ ?_ ?_ ?_)
           · rw [mem_ringAnimal]; simp only; omega
-          · exact kingAdj_shift (x, y) (by omega) (by omega) (by omega) (by omega) (by omega)
+          · exact kingAdj_small_shift (x, y) (by omega) (by omega) (by omega) (by omega) (by omega)
           · rw [mem_ringAnimal]; simp only; omega
           · simp only; omega
           · simp only; omega
