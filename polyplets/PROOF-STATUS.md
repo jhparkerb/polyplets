@@ -289,7 +289,74 @@ branch `lean-outworks`, orchestrator-reviewed per unit. Targets from the
   the generic computable `Tc`): A001168 6/19/63, A001207 11/44/186,
   A006770 20/110/638.
 
-**Audit point**: `AuditOutworks.lean`, 52 guards (companion of
+## Bui in Lean — the certificate upper bound (LANDED 2026-07-31, `Polyplets/Upper/`)
+
+Formalization of the certificate side of the project's headline polyplet
+upper bound `λ ≤ 9.3153` (`docs/proofs/polyplet-upper-bound.md`,
+BREAKTHROUGH + Certificate-Squeeze; `experiments/king_bui.py`,
+`experiments/king_certificate.py`). Three layers:
+
+- **Layer 1 (unconditional, `Upper/Certificate.lean`)** — the abstract
+  convolution-certificate machinery, standard axioms only:
+  - `BuiSystem`/`Sat`/`Super` — the abstract single-free-cell casing system
+    (`φ_T ≤ φ_{T'} + φ_{T'} * φ_D`, base types isolated) over any index
+    type, with a rank measure making the `T'`-chain well-founded;
+  - `BuiSystem.certSum_le` / `pow_mul_le` — the monotone-iteration bound:
+    a nonnegative rational super-solution `F_x(u) ≤ u` dominates
+    `x^n · φ_T n` (division-free, over ℚ; strong induction on the
+    truncation order, inner induction on rank);
+  - `lambda_le_of_pow_bound` — `a n ≤ C·y^n ⟹ λ ≤ y` via
+    `lambda_tendsto` (`C^{1/n} → 1`);
+  - `lambda_le_of_buiSystem`, `RatCert.lambda_le` — the assembled theorem
+    for exported certificates: all side conditions (index bounds, rank
+    descent, cleared-denominator super-solution inequalities
+    `nums[a]·CD + nums[a]·nums[b] ≤ nums[i]·CD`) packed into one `Bool`
+    the kernel evaluates.
+- **Layer 2 (RD=2 instance, conditional, `Upper/BuiData2.lean` +
+  `Upper/BuiRD2.lean`)** — the 185-type system and its exact certificate
+  `x = 106251/10⁶`, exported fail-closed by `scripts/gen_bui_cert.lean.py`
+  (asserts the banked x, re-runs the exact Fraction check, cross-checks
+  `experiments/king_certificate.py` as an independent oracle, and
+  pre-verifies the very integer rows Lean re-decides). `buiRD2_valid` is a
+  **kernel `decide`** (~5 s, axioms `[propext]` — no `native_decide`);
+  **`lambda_le_of_bui_rd2 (h : KingBuiSystemRD2Holds) :
+  lambda ≤ 10⁶/106251` (≈ 9.4117)**, standard three axioms.
+- **Layer 3 (RD=3 headline instance, conditional, `Upper/BuiData3.lean` +
+  `Upper/BuiRD3.lean`)** — the 5930-type system at the banked
+  `x = 2147/20000`: **`lambda_le_of_bui_rd3 (h : KingBuiSystemRD3Holds) :
+  lambda ≤ 20000/2147` (≈ 9.3153)** — the Lean rendering of the project's
+  headline `λ ≤ 9.3153`. The 5930-row check is past the kernel evaluator
+  (`decide +kernel` killed at >10 min / >6 GB; the `List.getD` walks are
+  quadratic in unary steps), so `buiRD3_valid` is a **`native_decide`**
+  (~7 s) and the theorem carries standard three + that one native leaf.
+  Evidence-grade note (in the hypothesis doc-comment): RD=3 recurrences
+  were *not* separately brute-forced — valid by construction from the
+  verified RD=2 system (a larger split window only adds known-empty cells).
+
+What is unconditional: the certificate arithmetic (that `u` really is a
+super-solution at `x`) and the entire analytic chain from super-solution to
+`λ ≤ 1/x`. What is hypothesis: `KingBuiSystemRD2Holds` /
+`KingBuiSystemRD3Holds` — that the actual king marked-corner counting
+functions satisfy the exported system inequalities and the anchor
+`a n ≤ φ_root n` (MoatBound-style named `Prop`s, `∃`-form, doc-comments
+state the intended witnesses). Evidence behind them: brute-force
+verification of every recurrence for all `n ≤ 9` at RD ≤ 2 (`king_bui.py`)
+plus the by-construction over-count argument in the doc.
+**The unconditional Lean bound remains `lambda_le : λ ≤ 3125/256`.**
+
+RED tests (2026-07-31, scratch, not committed): decrementing one
+certificate entry (`nums[0]` by `1/CD`) makes `decide` refute
+`buiRD2.valid = true` and `native_decide` refute `buiRD3.valid = true` —
+the checks are load-bearing. Regeneration is byte-identical for both data
+files (RD2 additionally cross-checked against the
+`experiments/king_certificate.py` oracle at generation time; RD3 oracle run
+at first generation).
+
+Build cost: `Upper/Certificate.lean` ~5 s, `Upper/BuiData2.lean` ~5 s
+(kernel decide), `Upper/BuiData3.lean` ~7 s (native_decide),
+hand modules ~3 s each — incremental full build +~20 s.
+
+**Audit point**: `AuditOutworks.lean`, 62 guards (companion of
 `Grand/Audit.lean`) — every headline theorem above, including the instance
 `P₁` pins, the nine cross-family row-sum gates, `universal_shape_d`,
 `lambda_lb`, `lambda_gt_of_banked`, the n = 4 Burnside spot checks,

@@ -14,6 +14,8 @@ import Polyplets.Northcott
 import Polyplets.Universal.King
 import Polyplets.Universal.Square
 import Polyplets.Universal.Hex
+import Polyplets.Upper.BuiRD2
+import Polyplets.Upper.BuiRD3
 
 /-!
 # Audit: the Outworks results in one place
@@ -56,6 +58,16 @@ but unguarded):
   exactly their two anchor-cell leaves; each row-sum gate carries exactly
   its own leaf; `kingP1_eq_Pp1` standard (the generic king `P₁` IS
   `Pin.lean`'s `Pp1`).
+* Bui in Lean (`Upper/`) — the abstract certificate machinery
+  (`BuiSystem.certSum_le`, `BuiSystem.pow_mul_le`, `lambda_le_of_pow_bound`,
+  `lambda_le_of_buiSystem`, `RatCert.lambda_le`) standard three;
+  `buiRD2_valid` is a kernel `decide` (`[propext]` only — no
+  `native_decide`); the conditional `lambda_le_of_bui_rd2`
+  (`λ ≤ 10⁶/106251` given `KingBuiSystemRD2Holds`) standard three.
+  The RD=3 headline instance carries exactly the one `buiRD3_valid`
+  native leaf (5930 rows are past what the kernel evaluator will do):
+  `lambda_le_of_bui_rd3` (`λ ≤ 20000/2147` given `KingBuiSystemRD3Holds`)
+  = standard three + that leaf.
 -/
 
 namespace Polyplets
@@ -428,5 +440,60 @@ info: 'Polyplets.Universal.king_rowSum_5' depends on axioms: [propext,
 -/
 #guard_msgs in
 #print axioms Universal.king_rowSum_5
+
+/-! ## Bui in Lean: the convolution-certificate upper bound -/
+
+/--
+info: 'Polyplets.BuiSystem.certSum_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms BuiSystem.certSum_le
+
+/--
+info: 'Polyplets.BuiSystem.pow_mul_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms BuiSystem.pow_mul_le
+
+/--
+info: 'Polyplets.lambda_le_of_pow_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms lambda_le_of_pow_bound
+
+/--
+info: 'Polyplets.lambda_le_of_buiSystem' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms lambda_le_of_buiSystem
+
+/-- info: 'Polyplets.RatCert.lambda_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms RatCert.lambda_le
+
+/-- info: 'Polyplets.buiRD2_valid' depends on axioms: [propext] -/
+#guard_msgs in
+#print axioms buiRD2_valid
+
+/--
+info: 'Polyplets.lambda_le_of_bui_rd2' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms lambda_le_of_bui_rd2
+
+/--
+info: 'Polyplets.buiRD3_valid' depends on axioms: [propext, buiRD3_valid._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms buiRD3_valid
+
+/--
+info: 'Polyplets.lambda_le_of_bui_rd3' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ buiRD3_valid._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms lambda_le_of_bui_rd3
 
 end Polyplets
