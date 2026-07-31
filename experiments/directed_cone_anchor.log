@@ -1,0 +1,56 @@
+== closed form, three independent routes ==
+  ok   closed form: legendre vs sqrt-series: agree for all n <= 25
+  ok   closed form: legendre vs delannoy sum: agree for all n <= 25
+  ok   closed form vs published A047781 (doc): agree for all n <= 8
+  D(t) coefficients n=1..12: [1, 4, 19, 96, 501, 2668, 14407, 78592, 432073, 2390004, 13286043, 74160672]
+
+== GREEN: enumerate all fixed king animals, filter to 5-step cone ==
+  $ /Users/jasonp/src/polyominoes/build/directed_cone_anchor dir5 15 8
+    event=start job=directed_cone_anchor t=2026-07-31T08:34:56-04:00 git=ce506bc-dirty built=2026-07-31T08:32:38-0400 host=gympie mode=dir5 n=15 threads=8 depth=7
+    event=done job=directed_cone_anchor t=2026-07-31T08:42:34-04:00 start=2026-07-31T08:34:56-04:00 wall_s=457.6 cpu_s=3484.1 peak_rss_mb=1.8 mode=dir5 n=15 a_n=13141557519
+  ok   unfiltered total vs A006770 (fixtures/b006770.txt): agree for all n <= 15
+  ok   dir5 filter vs closed form: agree for all n <= 15
+
+== GREEN: direct cone growth (second enumeration engine) ==
+  $ /Users/jasonp/src/polyominoes/build/directed_cone_anchor cone5 17 8
+    event=start job=directed_cone_anchor t=2026-07-31T08:42:34-04:00 git=ce506bc-dirty built=2026-07-31T08:32:38-0400 host=gympie mode=cone5 n=17 threads=8 depth=7
+    event=done job=directed_cone_anchor t=2026-07-31T08:45:49-04:00 start=2026-07-31T08:42:34-04:00 wall_s=194.8 cpu_s=1505.1 peak_rss_mb=1.8 mode=cone5 n=17 a_n=419472490257
+  ok   cone5 vs closed form: agree for all n <= 17
+  ok   cone5 vs dir5 filter (engine cross-check): agree for all n <= 15
+
+== RED control A: wrong cone (4-step {N,NE,E,SE}) ==
+  $ /Users/jasonp/src/polyominoes/build/directed_cone_anchor dir4 14 8
+    event=start job=directed_cone_anchor t=2026-07-31T08:45:49-04:00 git=ce506bc-dirty built=2026-07-31T08:32:38-0400 host=gympie mode=dir4 n=14 threads=8 depth=7
+    event=done job=directed_cone_anchor t=2026-07-31T08:47:10-04:00 start=2026-07-31T08:45:49-04:00 wall_s=81.0 cpu_s=633.4 peak_rss_mb=1.8 mode=dir4 n=14 a_n=978599560
+  ok   dir4 unfiltered total vs A006770: agree for all n <= 14
+  ok   dir4 vs published A055834 (doc): agree for all n <= 6
+  ok   dir4 vs A047781 -- MUST DIVERGE: diverges first at n=3 (18 vs 19) as required
+
+== RED control B: 5-step cone, bottom-row contiguity waived ==
+  $ /Users/jasonp/src/polyominoes/build/directed_cone_anchor dir5nb 14 8
+    event=start job=directed_cone_anchor t=2026-07-31T08:47:10-04:00 git=ce506bc-dirty built=2026-07-31T08:32:38-0400 host=gympie mode=dir5nb n=14 threads=8 depth=7
+    event=done job=directed_cone_anchor t=2026-07-31T08:48:34-04:00 start=2026-07-31T08:47:10-04:00 wall_s=84.6 cpu_s=629.4 peak_rss_mb=1.8 mode=dir5nb n=14 a_n=3463412836
+  ok   dir5nb unfiltered total vs A006770: agree for all n <= 14
+  ok   dir5nb vs A047781 -- MUST DIVERGE: diverges first at n=3 (20 vs 19) as required
+  ok   dir5nb vs A006770 -- MUST DIVERGE too (not just 'everything'): diverges first at n=4 (106 vs 110) as required
+
+== table: n | A006770 total | dir5 filter | closed form | dir4 | dir5nb ==
+  1                1               1               1             1               1
+  2                4               4               4             4               4
+  3               20              19              19            18              20
+  4              110              96              96            85             106
+  5              638             501             501           413             576
+  6             3832            2668            2668          2044            3179
+  7            23592           14407           14407         10248           17736
+  8           147941           78592           78592         51876           99748
+  9           940982          432073          432073        264550          564430
+ 10          6053180         2390004         2390004       1357070         3209194
+ 11         39299408        13286043        13286043       6994780        18316729
+ 12        257105146        74160672        74160672      36196706       104872413
+ 13       1692931066       415382397       415382397     187938842       602013085
+ 14      11208974860      2333445468      2333445468     978599560      3463412836
+ 15      74570549714     13141557519     13141557519             -               -
+ 16                -               -     74174404608             -               -
+ 17                -               -    419472490257             -               -
+
+ALL CHECKS PASSED

@@ -66,7 +66,7 @@ GF). Undirected animals have no such order; connectivity stays 2D-hard; GF not
 D-finite. Directedness *is* discarding the hard part. See
 [[algorithmic-levers-dead-connectivity-wall]].
 
-## Validation hook (feasible, not yet built)
+## Validation hook — BUILT 2026-07-31: [directed-cone-anchor.md](directed-cone-anchor.md)
 
 Directedness is a local O(cells) property: bottom-up forward-reachability from
 the leftmost-bottommost cell in cone `{W,NW,N,NE,E}`. Filtering the fixed-polyplet
@@ -74,5 +74,10 @@ enumerator by it must reproduce A047781 — an independent **closed-form** ancho
 (checkable to any n, unlike the strip-TM and g2 enumeration second-sources).
 Gotcha: the bottom row must be a single contiguous run; disjoint bottom runs that
 link only higher up are *multi*-directed (A-not-yet-in-OEIS), not directed.
-Cost: needs a reachability filter on the engine — marginal given project wind-down,
-but genuinely orthogonal to existing cross-checks.
+
+**Done.** Enumerate+filter = A047781 for n ≤ 15, direct cone growth for n ≤ 17,
+zero mismatches against the closed form; RED controls (4-step cone → A055834,
+diverging 18 vs 19 at n=3; bottom-row rule waived → 20 vs 19 at n=3) confirm the
+filter discriminates. The bottom-row gotcha turns out to be a *consequence* of
+the cone, not an extra rule. Tools `cpp/directed_cone_anchor.cpp` +
+`experiments/directed_cone_anchor.py`.
