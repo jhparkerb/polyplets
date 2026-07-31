@@ -452,6 +452,12 @@ spine digit-product on all in-band cells).
 3. **Lessons-learned document** (jasonp + Claude) — jasonp's explicit ask; after compute
    and paper, BEFORE submitting. The six postmortem failure classes as day-one practices
    are captured in MEMORY.md ([[next-project-practice]]).
+4. **Holes n≥20 campaign — measured not-cheap, jasonp's call.** n=19 is now assembled
+   from rescued telemetry (`results/holes_n19.txt`, TIER-DEGRADED: dirty binary stamp).
+   Cost scales ×4.2/term off a measured n=19 baseline of 61 h summed per-height wall
+   (201 CPU-h) with a 21.6 h critical-path height, so n=20 is ~11 days of summed wall
+   and n=22 ~190 days. Cost model + fit impact in
+   `results/hole-free-growth-constant.md`.
 
 ## Starting a fresh session from here
 Read this file, then `MEMORY.md`'s index (auto-loaded) for standing practices. No open

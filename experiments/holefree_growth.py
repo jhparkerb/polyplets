@@ -1,24 +1,34 @@
 #!/usr/bin/env python3
 """Hole-free growth constant lambda_0 vs lambda, from the exact hole distribution.
 
-Reads results/holes_n18.txt ("n holes count", g2 --holes, exact n<=18). Extracts
-A_k(n) (k holes) and a(n)=sum_k, estimates growth constants by Domb-Sykes,
-Richardson, and a 3-parameter log-linear fit (log f = logC + n logL + theta log n),
-and shows that the hole-free fraction A0/a decays as a clean geometric (lambda_0/lambda)^n.
+Usage: holefree_growth.py [TABLE]     (default results/holes_n18.txt)
+
+Reads a "n holes count" table (tma_holes square8 --holes; banked exact n<=18).
+Extracts A_k(n) (k holes) and a(n)=sum_k, estimates growth constants by
+Domb-Sykes, Richardson, and a 3-parameter log-linear fit
+(log f = logC + n logL + theta log n), and shows that the hole-free fraction
+A0/a decays as a clean geometric (lambda_0/lambda)^n.
 
 Result (n<=18): lambda~7.10, lambda_0~6.94, ratio 0.978 (pinned by the clean
 exponential fraction decay); hole-free = simple-connectivity is ~2.2%/cell costly.
 See results/hole-free-growth-constant.md.
+
+Pass results/holes_n19.txt to include the n=19 term -- note that table is
+TIER-DEGRADED (dirty binary stamp); see its header.
 """
 import math
+import sys
 from collections import defaultdict
 
-SRC = "results/holes_n18.txt"
+DEFAULT_SRC = "results/holes_n18.txt"
 
 
-def load():
+def load(src):
     tab = defaultdict(dict)
-    for ln in open(SRC):
+    for ln in open(src):
+        ln = ln.strip()
+        if not ln or ln.startswith("#"):
+            continue
         n, h, c = ln.split()
         tab[int(n)][int(h)] = int(c)
     return tab
@@ -46,7 +56,9 @@ def fit_logLinear(seq, ns, use=8):
 
 
 def main():
-    tab = load()
+    src = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_SRC
+    print(f"source: {src}")
+    tab = load(src)
     ns = sorted(tab)
     tot = {n: sum(tab[n].values()) for n in ns}
     A = {k: {n: tab[n].get(k, 0) for n in ns} for k in range(4)}
@@ -62,8 +74,10 @@ def main():
     print(f"\nlambda   = {la:.4f}  theta = {tha:+.2f}")
     print(f"lambda_0 = {l0:.4f}  theta = {th0:+.2f}   gap = {la-l0:.4f}   ratio = {l0/la:.5f}")
 
-    decay = (A[0][18] / tot[18]) / (A[0][17] / tot[17])
-    print(f"\nfraction A0/a per-cell decay (n=17->18): {decay:.5f}  vs lambda_0/lambda = {l0/la:.5f}")
+    top, prev = ns[-1], ns[-2]
+    decay = (A[0][top] / tot[top]) / (A[0][prev] / tot[prev])
+    print(f"\nfraction A0/a per-cell decay (n={prev}->{top}): {decay:.5f}"
+          f"  vs lambda_0/lambda = {l0/la:.5f}")
     print("log(A0/a) second differences (flat => pure exponential):")
     lg = [(n, math.log(A[0][n] / tot[n])) for n in ns]
     for i in range(2, len(lg)):
