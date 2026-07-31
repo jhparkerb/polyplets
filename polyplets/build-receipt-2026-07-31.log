@@ -1,0 +1,30 @@
+=== polyplets Lean build receipt ===
+host       : gympie (Darwin arm64)
+date       : 2026-07-31T06:12:27Z
+rev        : c72ecb66d4baeb59b7bbc2a8e2a9289e6211cf62
+toolchain  : leanprover/lean4:v4.31.0
+mathlib    : rev="v4.31.0"
+command    : cd polyplets && lake build --no-build
+
+All targets up-to-date (8615 jobs).
+
+What this certifies:
+  Every target in the default closure (lakefile.toml defaultTargets =
+  ["Polyplets"]) is BUILT AND CURRENT at the rev above -- the full
+  pre-Outworks closure of build-receipt-2026-07-30.log (Grand pin tier,
+  Weights3Heavy cone) PLUS the 23 Outworks modules and their audit point.
+  It also certifies that every #guard_msgs axiom-footprint check in BOTH
+  Grand/Audit.lean and AuditOutworks.lean PASSED, since a mismatch is a
+  build error, not a warning. AuditOutworks.lean carries 51 guards as of
+  the 2026-07-31 adversarial-review fix (docs/reviews/
+  outworks-adversarial.md): the OW headline theorems, the instance P1
+  pins, the nine cross-family row-sum gates, universal_shape_d,
+  lambda_lb, the n=4 Burnside spot checks, maxhole_lower_banked and
+  strip_sum_le_a.
+
+  It does NOT certify anything about the engine, the banked triangle,
+  or the anchor VALUES: those enter the Lean theorems as explicit
+  hypotheses or native_decide leaves (see polyplets/PROOF-STATUS.md).
+
+  Job count 8615 = the 8592 of the 2026-07-30 receipt + the 23 Outworks
+  modules; the review-fix guards were added inside existing modules.
