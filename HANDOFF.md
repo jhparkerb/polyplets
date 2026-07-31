@@ -78,8 +78,11 @@ and the k!-divide guard — and since proved (Lean `IntCoeff.lean`,
 `production_factorial_int`, via integer-valuedness). 2026-07-31 sharpening
 (`results/converse-sweep.md`): k! is NOT the minimal denominator — from
 k = 5 the true minimum is k!/5 (k!/25 at k = 11); only 5-adic content
-drops, the 25 = 5² defect constant being the likely mechanism. So quote
-the divisibility, never the minimality.
+drops. So quote the divisibility, never the minimality. The law behind
+the drop is now proved (`results/v5-denominator-law.md`): the 5-part of
+the denominator collapses from v₅(k!) to v₅(⌊k/2⌋!) because Λ − 1
+vanishes to order 2 mod 5 (u₁ = 25); k = 11 is no exception to the true
+law, and the old ⌈v₅(k!)/2⌉ fit is refuted (first divergence k = 21).
 
 **Holdout-confirmed mass** (new, `results/ns_a40/PROVENANCE.md`): the
 share of each term that a closed form predicted first and a later real

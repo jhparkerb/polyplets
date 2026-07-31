@@ -57,6 +57,17 @@ c_k = ⌈v₅(k!)/2⌉ — or the corrected law — via the 5-adic structure of 
 and explain k = 11.** Profile data: rerun the last block of
 `experiments/converse_sweep.py` or the inline probe in the session log.
 
+**RESOLVED (2026-07-31, same day): `results/v5-denominator-law.md`.** The
+⌈v₅(k!)/2⌉ fit was the wrong law; the true law is c_k = v₅(k!) − H(k)
+(H = the harvest, = v₅((k/2)!) for even k), proved as a lower bound from
+integer-valuedness + grand form + u₁ = 25, g₁ = −45, and exact at every
+measured level k = 1..19 (k = 19 out-of-sample) with NO exception at
+k = 11: H(11) = 0 because 11 cannot be partitioned into parts ≥ 2 with
+any multiplicity ≥ 5. First divergence of the old fit past the data
+window: predicted c_21 = 3, not 2. (Also: this section's c_k = 0 at
+k = 1 is the denominator-capped value; the uncapped numerator minimum is
+ĉ₁ = 1, and it is ĉ that obeys the clean law.)
+
 Action: the open-items phrasing "denominator exactly k!" (HANDOFF) is
 corrected to "k!·P_k ∈ ℤ[n] (proved integer-valued ⇒ divisibility; minimality
 false — see results/converse-sweep.md)".
