@@ -99,17 +99,12 @@ furthest~\cite{redelmeier,jensen2003,barequet}; the fixed-polyplet sequence
 A006770 had been recorded through $n=18$.
 
 This document is a \emph{computational report}: its claims are numbers, the
-provenance and verification of those numbers, and the empirical structure
-found in them. It reports the terms $a(19)$ through $a(40)$ and the results
-that grew out of computing them, including the diagonal law of the height
-triangle---whose shape is proved here via an exact walk-plus-clusters
-decomposition---its mod-3 algebraic structure, and the diagonal-mirror
-triangle's quasi-polynomial law, also proved in shape
-(Section~\ref{sec:diagonals}). It is an
-amateur contribution carried out with substantial AI assistance
-(Section~\ref{sec:ai}). The data appears in the document as well as the
-repository: a report's job is to be usable by the next person to attempt
-these computations.
+provenance and verification of those numbers, and the structure found in
+them. It reports $a(19)$ through $a(40)$ and the results that grew out of
+computing them. It is an amateur contribution carried out with substantial
+AI assistance (Section~\ref{sec:ai}). The data appears in the document as
+well as the repository: a report's job is to be usable by the next person
+to attempt these computations.
 
 \paragraph{Contributions.}
 \begin{enumerate}
@@ -461,16 +456,13 @@ refuses partial or duplicated inputs.
 
 \paragraph{I/O integrity.}
 A multi-hour external shuffle is itself a failure surface, so the disk
-layer is engineered to fail closed rather than lose states silently. Spill
-files carry a self-describing header including a \emph{record count}, so
-truncation---including the short writes produced by resource
-exhaustion---is detected on read rather than absorbed; readers and the
-merge refuse malformed or count-mismatched inputs; the per-height combiner
-refuses missing, empty, or duplicated shards and locks against concurrent
-runs; kept artifacts carry per-file checksums. These refusal paths are not
-assumed to work: the release's gate suite fault-injects each failure mode
-(truncated file, missing shard, duplicated rows, held lock) and requires
-the pipeline to abort loudly.
+layer fails closed rather than losing states silently: spill files carry a
+record count, so truncation---including the short writes produced by
+resource exhaustion---is detected on read rather than absorbed; readers and
+the merge refuse malformed or count-mismatched inputs; and the per-height
+combiner refuses missing, empty, or duplicated shards. These refusal paths
+are not assumed to work---the gate suite fault-injects each mode and
+requires the pipeline to abort loudly.
 
 Each production run reproduces the complete triangle---every $T(n,H)$ for all
 smaller $n$---so each new term arrives with a full-chain regression against
@@ -722,20 +714,15 @@ numerator degree at $2k+1$ over the pole $(1-3z)^{k+1}$; partial fractions
 then force the polynomial law with onset threshold $n\ge2k+1$ (the observed
 onset, now derived), and a $3$-adic bound on the change of basis gives the
 integrality. Cumulant linearity in $n$ is the residue resummation of the
-same identity. The full write-up and machine checks are in the repository
-(\texttt{docs/proofs/diagonal-law.md},
-\texttt{experiments/diagonal\_law\_proof\_check.py}). The constants
-themselves are finite local enumerations: the level-$\le5$ coefficients of
-both series in the grand form (in particular
-$h=25,208,1483,20688,130208$) are re-derived ab initio from the $31$
-cluster types of surplus $\le5$
-(\texttt{experiments/cluster\_weight\_dp.py}), and the single-row cluster
-weight is exactly $(2s{+}1)^2$ for an $s$-cell row---$25=5^2$ is the $s=2$
-case, and the interior weight factors as $(2s{+}1)$ per contact side.
-What remains fitted rather than derived is $P_k$ for $6\le k\le18$; with
-the theorem in hand those fits are interpolation of a known-shape form,
-and their held-out hits remain load-bearing as checks of the
-\emph{engine} rather than of the law.
+same identity. The constants themselves are finite local enumerations: the
+level-$\le5$ coefficients are re-derived ab initio from the $31$ cluster
+types of surplus $\le5$, and the single-row cluster weight is exactly
+$(2s{+}1)^2$ for an $s$-cell row, of which $25=5^2$ is the $s=2$ case. What
+remains fitted rather than derived is $P_k$ for $6\le k\le18$; with the
+theorem in hand those fits are interpolation of a known-shape form, and
+their held-out hits stay load-bearing as checks of the \emph{engine} rather
+than of the law. Write-up and machine checks:
+\texttt{docs/proofs/diagonal-law.md}.
 
 \subsection{The triangle mod 3, and lattice universality}
 \label{sec:spine}
@@ -867,9 +854,9 @@ over the square's symmetry group $D_4$:
 where $R_{90},R_{180},H,D$ count the animals fixed by a $90^\circ$ rotation,
 a $180^\circ$ rotation, an axis reflection, and a diagonal reflection
 (Method~D). At $n=34$: $R_{90}=0$ (invariance needs $n\equiv0,1\pmod4$;
-$34\equiv2$), $R_{180}=\num{48710062997772}$, $H=\num{17385821908346}$. The
-derivations assert the $/4$ and $/8$ integrality of the numerators at every
-$n$ and validate every published OEIS term of all five companion sequences.
+$34\equiv2$), $R_{180}=\num{48710062997772}$, $H=\num{17385821908346}$.
+Every derivation asserts the $/4$ and $/8$ integrality of its numerator and
+validates every published OEIS term of all five companions.
 
 The one-sided extension to $n=34$ is Table~\ref{tab:onesided}. The
 free/bilateral/asymmetric companions (A030222, A030234, A030235) and the
@@ -879,8 +866,7 @@ symmetry (Section~\ref{sec:methodD}): $D$ is exact through $n=32$
 ($D(32)=\num{2156235549286}$), which caps these four companions at
 $n=32$ within \tiertwo{}. Table~\ref{tab:companions} gives the new
 values; Table~\ref{tab:symcounts} records the symmetry fixed-point counts
-themselves, which are of independent interest (each is an OEIS-eligible
-sequence).
+themselves, each an OEIS-eligible sequence in its own right.
 
 One further term of each exists at the \tierthree{} grade, via the hybrid
 $D(33)$ of Table~\ref{tab:symcounts} (direct strips $S\le28$ plus pinned
@@ -914,9 +900,7 @@ never as b-file data.
   \end{tabular}}
   \caption{The four $D$-dependent companions, $n=25$--$32$ ($n=20$--$24$
   are in the repository ledger). \tiertwo{}, inheriting from the fixed
-  count and the symmetry counts; the derivation validates every published
-  OEIS term of all five companions and asserts the $/8$, $/4$, $/2$
-  integralities at every $n$.}
+  count and the symmetry counts.}
   \label{tab:companions}
 \end{table}
 
@@ -1266,14 +1250,14 @@ that grade stated rather than outrun.
 \section{Data and code availability}
 \label{sec:availability}
 
-The source (all engines and gates), the per-height triangle rows for every
-term through $n=40$ with per-term provenance ledgers, the b-files for
-A006770 and the companion sequences, the hole triangle and its columns, the
-recovered generating functions, and the sample statistics are in the
-accompanying repository; derived artifacts are regenerated on demand by the
-included tools. The cross-checks are encoded as runnable gates, and a
-self-contained checker re-verifies the paper's numerical claims against the
-committed and regenerated data.
+The accompanying repository holds the source (all engines and gates), the
+per-height triangle rows for every term through $n=40$ with per-term
+provenance ledgers, the b-files for A006770 and the companion sequences,
+the hole triangle and its columns, and the recovered generating functions;
+other derived artifacts are regenerated on demand by the included tools.
+The cross-checks are encoded as runnable gates, and a self-contained
+checker re-verifies this paper's numerical claims against the committed and
+regenerated data.
 
 \section{Author's note: use of AI}
 \label{sec:ai}
@@ -1286,13 +1270,10 @@ The author set the goals, made the design and verification decisions, owns
 and operated the machines, inspected the results, and is responsible for
 their correctness.
 
-The verification protocol of Section~\ref{sec:confirm}---independent
-algorithms where they exist, decorrelated recounts and held-out closed-form
-checks where they do not, and explicit confidence tiers throughout---ensures
-the central claims do not rest on the correctness of any single
-\emph{program}. They do rest, past $n=22$, on a single algorithm family;
-the tier system exists so that dependence is never hidden. All code and data
-are released for independent checking.
+The verification protocol of Section~\ref{sec:confirm} ensures the central
+claims do not rest on the correctness of any single \emph{program}. They do
+rest, past $n=22$, on a single algorithm family; the tier system exists so
+that dependence is never hidden.
 
 \appendix
 \section{Computational profile}
@@ -1316,14 +1297,10 @@ All machines are commodity hardware owned and operated by the author:
     $a(40)$ & 52.3 & 1477 & 4.0 & 363\\
     \bottomrule
   \end{tabular}
-  \caption{The closing ladder, run on successive engine generations (an
-  I/O-path rewrite before $a(37)$, spill-compression levers before
-  $a(39)$---which is why $a(39)$ ran faster than $a(38)$ one term
-  lower---and a phased schedule at $a(40)$: heights $1$--$19$ and
-  $22$--$40$ at $80$ cores, then the $H=20$ and $H=21$ poles solo at
-  reduced core counts to fit the disk budget; the $a(40)$ wall is the sum
-  of the three phases). Disk, not RAM or time, is the binding resource at
-  the close.}
+  \caption{The closing ladder, run on successive engine generations---which
+  is why $a(39)$ ran faster than $a(38)$ one term lower, and why $a(40)$
+  ran phased, its tall poles solo at reduced core counts to fit the disk
+  budget. Disk, not RAM or time, is the binding resource at the close.}
   \label{tab:costsladder}
 \end{table}
 
