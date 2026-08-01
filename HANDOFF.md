@@ -569,7 +569,9 @@ Untracked in the tree and NOT ours to touch: `paper/technical-report.tex`
 3. **Lessons-learned document** (jasonp + Claude) — jasonp's explicit ask; after compute
    and paper, BEFORE submitting. The six postmortem failure classes as day-one practices
    are captured in MEMORY.md ([[next-project-practice]]).
-4. **Holes n≥20 campaign — measured not-cheap, jasonp's call.** n=19 is now assembled
+4. ~~**Holes n≥20 campaign**~~ **NO-GO, jasonp 2026-08-01.** Closed, not deferred: the
+   series ends at n=19 and the hole-free fit uses what is banked. Cost that decided it:
+   n=19 is now assembled
    from rescued telemetry (`results/holes_n19.txt`, TIER-DEGRADED: dirty binary stamp).
    Cost scales ×4.2/term off a measured n=19 baseline of 61 h summed per-height wall
    (201 CPU-h) with a 21.6 h critical-path height, so n=20 is ~11 days of summed wall
@@ -584,10 +586,10 @@ unmerged engine branches, whether to revisit a(37)+ compute given the reach ceil
 **Pre-publication list as of 2026-08-01** — the two Claude-side items are done
 (Northcott/citation crawl, concatenation upper bound: both closed, no paper
 claim changed except a strengthening citation). What is left is the ledger
-above, and all four items are jasonp's: paper final read-through (including
-the two `technical-report.tex` placeholders, a(40) still 5.7e31 in the
-abstract and `tab:an` — `verify_technical_report.py` reports exactly those 2
-failures of 781), viva cold retakes → %C authorship pass → OEIS submit,
-[JP] lessons-learned sections, and the holes n≥20 go/no-go. Optional
+above, and the live items are jasonp's: paper final read-through (the two
+`technical-report.tex` placeholders are now filled — a(40) is literal in both
+the abstract and `tab:an`, and `verify_technical_report.py` reports 781
+checks, 0 failures), viva cold retakes → %C authorship pass → OEIS submit,
+and [JP] lessons-learned sections. Holes n≥20 is CLOSED no-go. Optional
 literature belt-and-braces, also his: MathSciNet or Scholar Cited-by on
 BM-R 2002.
