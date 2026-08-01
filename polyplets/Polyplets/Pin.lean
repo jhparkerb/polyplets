@@ -35,11 +35,13 @@ whole diagonal law.
   (via `Grand.PinGrand`); it costs ~37 min on a cold build and nothing after.
 * **Conditional** `k = 4..11` (`Pk_pinned_of_banked`): hypothesize the `k+1`
   banked onset `T`-values (all in `results/triangle.txt`).
-* **Partial** `k = 12..16` (`Pk_pinned_of_partial`): only `m(k) = 12,10,8,6,4`
-  onset points are banked; the theorem additionally hypothesizes the
-  `k+1-m(k)` beyond-banked points at the production polynomial's own PREDICTED
-  values (flagged in each docstring), stating exactly which unverified numbers
-  would close the gap.
+* `k = 12..16`: the former PARTIAL tier (`Pk_pinned_of_partial`) is DELETED
+  (2026-07-31). Its beyond-banked hypotheses were the production
+  polynomial's own PREDICTED values — zero cross-validation — and its
+  conclusions are byte-identical to `Grand/PinGrand.lean`'s
+  `P<k>_grand_prod`, which needs only two real-swept anchors per level.
+  Only the `Pp<k>` definitions, degree lemmas and guards remain here (the
+  Grand tier consumes them).
 
 The `k = 4..16` tier is machine-generated from `pin-data.md` by
 `scripts/gen_pin.py`; each transcription is guarded by a `norm_num` evaluation
@@ -896,7 +898,7 @@ theorem P11_pinned_of_banked
     (h28 : T 28 17 = 134417487965477643619)
     (h29 : T 29 18 = 636255557111930718092)
     (h30 : T 30 19 = 2954110296739891764128)
-    (h31 : T 31 20 = 13476628255738123866262)
+    (h31 : T 31 20 = 13476628255738123866262) -- since real-swept: a38/a39 h20.out agree
     (h32 : T 32 21 = 60496763632561182774506)
     (h33 : T 33 22 = 267567344516616416852062)
     (h34 : T 34 23 = 1167265695441145358152351)
@@ -974,72 +976,6 @@ lemma guard_12_36 : Pp12.eval (36 : ℚ) = ((49802601845517580926757996 * 3 ^ 1 
   rw [Pp12, prodPoly_eval]; norm_num
 lemma guard_12_37 : Pp12.eval (37 : ℚ) = ((216761708659294196806446100 * 3 ^ 0 : ℕ) : ℚ) := by
   rw [Pp12, prodPoly_eval]; norm_num
-/-- **k=12, PARTIAL tier.** 12 of the 13 required onset points are
-    banked (`n = 25..36`); the remaining 1 hypotheses
-    (`T(37,25)`) are the production polynomial's own PREDICTED
-    values beyond the banked range (`n = 37..37`), NOT independent data.
-    The theorem is therefore honest about exactly which unverified values
-    would close the gap. -/
-theorem P12_pinned_of_partial
-    (h25 : T 25 13 = 1573134737210737385)
-    (h26 : T 26 14 = 8490578913536448064)
-    (h27 : T 27 15 = 44416775012217775973)
-    (h28 : T 28 16 = 226062958310935838176)
-    (h29 : T 29 17 = 1122769428042637253575)
-    (h30 : T 30 18 = 5455070058849476986528)
-    (h31 : T 31 19 = 25980777373832690315657)
-    (h32 : T 32 20 = 121507773432815574458792)
-    (h33 : T 33 21 = 558865928667766384033421)
-    (h34 : T 34 22 = 2531214280334205695134436)
-    (h35 : T 35 23 = 11302231433302167372053753)
-    (h36 : T 36 24 = 49802601845517580926757996)
-    (h37 : T 37 25 = 216761708659294196806446100) -- PREDICTED (beyond banked)
-    : ∀ n : ℕ, 2 * 12 + 1 ≤ n →
-      (T n (n - 12) : ℚ) = Pp12.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 12) := by
-  refine pin 12 Pp12 Pp12_deg ({25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (25 - 12 : ℕ) = 13 from rfl,
-        show (3 * 12 + 1 - 25 : ℕ) = 12 from rfl, h25]
-      exact guard_12_25
-    · simp only [show (26 - 12 : ℕ) = 14 from rfl,
-        show (3 * 12 + 1 - 26 : ℕ) = 11 from rfl, h26]
-      exact guard_12_26
-    · simp only [show (27 - 12 : ℕ) = 15 from rfl,
-        show (3 * 12 + 1 - 27 : ℕ) = 10 from rfl, h27]
-      exact guard_12_27
-    · simp only [show (28 - 12 : ℕ) = 16 from rfl,
-        show (3 * 12 + 1 - 28 : ℕ) = 9 from rfl, h28]
-      exact guard_12_28
-    · simp only [show (29 - 12 : ℕ) = 17 from rfl,
-        show (3 * 12 + 1 - 29 : ℕ) = 8 from rfl, h29]
-      exact guard_12_29
-    · simp only [show (30 - 12 : ℕ) = 18 from rfl,
-        show (3 * 12 + 1 - 30 : ℕ) = 7 from rfl, h30]
-      exact guard_12_30
-    · simp only [show (31 - 12 : ℕ) = 19 from rfl,
-        show (3 * 12 + 1 - 31 : ℕ) = 6 from rfl, h31]
-      exact guard_12_31
-    · simp only [show (32 - 12 : ℕ) = 20 from rfl,
-        show (3 * 12 + 1 - 32 : ℕ) = 5 from rfl, h32]
-      exact guard_12_32
-    · simp only [show (33 - 12 : ℕ) = 21 from rfl,
-        show (3 * 12 + 1 - 33 : ℕ) = 4 from rfl, h33]
-      exact guard_12_33
-    · simp only [show (34 - 12 : ℕ) = 22 from rfl,
-        show (3 * 12 + 1 - 34 : ℕ) = 3 from rfl, h34]
-      exact guard_12_34
-    · simp only [show (35 - 12 : ℕ) = 23 from rfl,
-        show (3 * 12 + 1 - 35 : ℕ) = 2 from rfl, h35]
-      exact guard_12_35
-    · simp only [show (36 - 12 : ℕ) = 24 from rfl,
-        show (3 * 12 + 1 - 36 : ℕ) = 1 from rfl, h36]
-      exact guard_12_36
-    · simp only [show (37 - 12 : ℕ) = 25 from rfl,
-        show (3 * 12 + 1 - 37 : ℕ) = 0 from rfl, h37]
-      exact guard_12_37
-
 /-- k=13 production polynomial (numerator / 6227020800), transcribed from `pin-data.md`. -/
 noncomputable def Pp13 : Polynomial ℚ := prodPoly
   [1490116119384765625, -73735713958740234375, 1581930904388427734375, -20438647987884521484375, 171498867051782080078125, -897242973195286876640625, 2053473678621559440657125, 7845602899216787491993635, -78302966517647904123999050, 242568775590879458927220300, -252892500470648129748781800, 630295671430278785315535840, -4709212944929227143077529600, 8516420444581467205615027200] 6227020800
@@ -1073,76 +1009,6 @@ lemma guard_13_39 : Pp13.eval (39 : ℚ) = ((9299730798107170785360030808 * 3 ^ 
   rw [Pp13, prodPoly_eval]; norm_num
 lemma guard_13_40 : Pp13.eval (40 : ℚ) = ((40397094232064445666534976009 * 3 ^ 0 : ℕ) : ℚ) := by
   rw [Pp13, prodPoly_eval]; norm_num
-/-- **k=13, PARTIAL tier.** 10 of the 14 required onset points are
-    banked (`n = 27..36`); the remaining 4 hypotheses
-    (`T(37,24)`, `T(38,25)`, `T(39,26)`, `T(40,27)`) are the production polynomial's own PREDICTED
-    values beyond the banked range (`n = 37..40`), NOT independent data.
-    The theorem is therefore honest about exactly which unverified values
-    would close the gap. -/
-theorem P13_pinned_of_partial
-    (h27 : T 27 14 = 63986427407097237332)
-    (h28 : T 28 15 = 343733831675681363476)
-    (h29 : T 29 16 = 1795111626265027715356)
-    (h30 : T 30 17 = 9142099138689979555656)
-    (h31 : T 31 18 = 45518261981941858305944)
-    (h32 : T 32 19 = 222037213145303005489339)
-    (h33 : T 33 20 = 1063017698873182965322124)
-    (h34 : T 34 21 = 5002581174202331698460002)
-    (h35 : T 35 22 = 23171984177741390734335158)
-    (h36 : T 36 23 = 105767663082981556782445241)
-    (h37 : T 37 24 = 476222071911467914867327506) -- PREDICTED (beyond banked)
-    (h38 : T 38 25 = 2117045402320488291101904275) -- PREDICTED (beyond banked)
-    (h39 : T 39 26 = 9299730798107170785360030808) -- PREDICTED (beyond banked)
-    (h40 : T 40 27 = 40397094232064445666534976009) -- PREDICTED (beyond banked)
-    : ∀ n : ℕ, 2 * 13 + 1 ≤ n →
-      (T n (n - 13) : ℚ) = Pp13.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 13) := by
-  refine pin 13 Pp13 Pp13_deg ({27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (27 - 13 : ℕ) = 14 from rfl,
-        show (3 * 13 + 1 - 27 : ℕ) = 13 from rfl, h27]
-      exact guard_13_27
-    · simp only [show (28 - 13 : ℕ) = 15 from rfl,
-        show (3 * 13 + 1 - 28 : ℕ) = 12 from rfl, h28]
-      exact guard_13_28
-    · simp only [show (29 - 13 : ℕ) = 16 from rfl,
-        show (3 * 13 + 1 - 29 : ℕ) = 11 from rfl, h29]
-      exact guard_13_29
-    · simp only [show (30 - 13 : ℕ) = 17 from rfl,
-        show (3 * 13 + 1 - 30 : ℕ) = 10 from rfl, h30]
-      exact guard_13_30
-    · simp only [show (31 - 13 : ℕ) = 18 from rfl,
-        show (3 * 13 + 1 - 31 : ℕ) = 9 from rfl, h31]
-      exact guard_13_31
-    · simp only [show (32 - 13 : ℕ) = 19 from rfl,
-        show (3 * 13 + 1 - 32 : ℕ) = 8 from rfl, h32]
-      exact guard_13_32
-    · simp only [show (33 - 13 : ℕ) = 20 from rfl,
-        show (3 * 13 + 1 - 33 : ℕ) = 7 from rfl, h33]
-      exact guard_13_33
-    · simp only [show (34 - 13 : ℕ) = 21 from rfl,
-        show (3 * 13 + 1 - 34 : ℕ) = 6 from rfl, h34]
-      exact guard_13_34
-    · simp only [show (35 - 13 : ℕ) = 22 from rfl,
-        show (3 * 13 + 1 - 35 : ℕ) = 5 from rfl, h35]
-      exact guard_13_35
-    · simp only [show (36 - 13 : ℕ) = 23 from rfl,
-        show (3 * 13 + 1 - 36 : ℕ) = 4 from rfl, h36]
-      exact guard_13_36
-    · simp only [show (37 - 13 : ℕ) = 24 from rfl,
-        show (3 * 13 + 1 - 37 : ℕ) = 3 from rfl, h37]
-      exact guard_13_37
-    · simp only [show (38 - 13 : ℕ) = 25 from rfl,
-        show (3 * 13 + 1 - 38 : ℕ) = 2 from rfl, h38]
-      exact guard_13_38
-    · simp only [show (39 - 13 : ℕ) = 26 from rfl,
-        show (3 * 13 + 1 - 39 : ℕ) = 1 from rfl, h39]
-      exact guard_13_39
-    · simp only [show (40 - 13 : ℕ) = 27 from rfl,
-        show (3 * 13 + 1 - 40 : ℕ) = 0 from rfl, h40]
-      exact guard_13_40
-
 /-- k=14 production polynomial (numerator / 87178291200), transcribed from `pin-data.md`. -/
 noncomputable def Pp14 : Polynomial ℚ := prodPoly
   [37252902984619140625, -2072393894195556640625, 50912246036529541015625, -761843525055694580078125, 7524678110464896240234375, -48052027303805350998046875, 157448856577961057749371875, 276655470142052990154351185, -5583936647603503419750059540, 25191124931485376140721243800, -47958023503387714879301084400, 118184880567640594471489711440, -979514007904340174674683668160, 3638916058760447487430557542400, -4028797193164605150126008371200] 87178291200
@@ -1178,80 +1044,6 @@ lemma guard_14_42 : Pp14.eval (42 : ℚ) = ((1741355390468722299734072854984 * 3
   rw [Pp14, prodPoly_eval]; norm_num
 lemma guard_14_43 : Pp14.eval (43 : ℚ) = ((7551589891593991743211503128986 * 3 ^ 0 : ℕ) : ℚ) := by
   rw [Pp14, prodPoly_eval]; norm_num
-/-- **k=14, PARTIAL tier.** 8 of the 15 required onset points are
-    banked (`n = 29..36`); the remaining 7 hypotheses
-    (`T(37,23)`, `T(38,24)`, `T(39,25)`, `T(40,26)`, `T(41,27)`, `T(42,28)`, `T(43,29)`) are the production polynomial's own PREDICTED
-    values beyond the banked range (`n = 37..43`), NOT independent data.
-    The theorem is therefore honest about exactly which unverified values
-    would close the gap. -/
-theorem P14_pinned_of_partial
-    (h29 : T 29 15 = 2611110015255604740530)
-    (h30 : T 30 16 = 13969442417594351366268)
-    (h31 : T 31 17 = 72837427176953272756444)
-    (h32 : T 32 18 = 371092643133615870167145)
-    (h33 : T 33 19 = 1851392394172366952982798)
-    (h34 : T 34 20 = 9061341124316405172057950)
-    (h35 : T 35 21 = 43575275424260085198846849)
-    (h36 : T 36 22 = 206170745618188078237908398)
-    (h37 : T 37 23 = 960872649499611634617388174) -- PREDICTED (beyond banked)
-    (h38 : T 38 24 = 4415798153086364928090741638) -- PREDICTED (beyond banked)
-    (h39 : T 39 25 = 20029030415976318128336407820) -- PREDICTED (beyond banked)
-    (h40 : T 40 26 = 89738450015816790329906273587) -- PREDICTED (beyond banked)
-    (h41 : T 41 27 = 397456680396732807972242026742) -- PREDICTED (beyond banked)
-    (h42 : T 42 28 = 1741355390468722299734072854984) -- PREDICTED (beyond banked)
-    (h43 : T 43 29 = 7551589891593991743211503128986) -- PREDICTED (beyond banked)
-    : ∀ n : ℕ, 2 * 14 + 1 ≤ n →
-      (T n (n - 14) : ℚ) = Pp14.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 14) := by
-  refine pin 14 Pp14 Pp14_deg ({29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (29 - 14 : ℕ) = 15 from rfl,
-        show (3 * 14 + 1 - 29 : ℕ) = 14 from rfl, h29]
-      exact guard_14_29
-    · simp only [show (30 - 14 : ℕ) = 16 from rfl,
-        show (3 * 14 + 1 - 30 : ℕ) = 13 from rfl, h30]
-      exact guard_14_30
-    · simp only [show (31 - 14 : ℕ) = 17 from rfl,
-        show (3 * 14 + 1 - 31 : ℕ) = 12 from rfl, h31]
-      exact guard_14_31
-    · simp only [show (32 - 14 : ℕ) = 18 from rfl,
-        show (3 * 14 + 1 - 32 : ℕ) = 11 from rfl, h32]
-      exact guard_14_32
-    · simp only [show (33 - 14 : ℕ) = 19 from rfl,
-        show (3 * 14 + 1 - 33 : ℕ) = 10 from rfl, h33]
-      exact guard_14_33
-    · simp only [show (34 - 14 : ℕ) = 20 from rfl,
-        show (3 * 14 + 1 - 34 : ℕ) = 9 from rfl, h34]
-      exact guard_14_34
-    · simp only [show (35 - 14 : ℕ) = 21 from rfl,
-        show (3 * 14 + 1 - 35 : ℕ) = 8 from rfl, h35]
-      exact guard_14_35
-    · simp only [show (36 - 14 : ℕ) = 22 from rfl,
-        show (3 * 14 + 1 - 36 : ℕ) = 7 from rfl, h36]
-      exact guard_14_36
-    · simp only [show (37 - 14 : ℕ) = 23 from rfl,
-        show (3 * 14 + 1 - 37 : ℕ) = 6 from rfl, h37]
-      exact guard_14_37
-    · simp only [show (38 - 14 : ℕ) = 24 from rfl,
-        show (3 * 14 + 1 - 38 : ℕ) = 5 from rfl, h38]
-      exact guard_14_38
-    · simp only [show (39 - 14 : ℕ) = 25 from rfl,
-        show (3 * 14 + 1 - 39 : ℕ) = 4 from rfl, h39]
-      exact guard_14_39
-    · simp only [show (40 - 14 : ℕ) = 26 from rfl,
-        show (3 * 14 + 1 - 40 : ℕ) = 3 from rfl, h40]
-      exact guard_14_40
-    · simp only [show (41 - 14 : ℕ) = 27 from rfl,
-        show (3 * 14 + 1 - 41 : ℕ) = 2 from rfl, h41]
-      exact guard_14_41
-    · simp only [show (42 - 14 : ℕ) = 28 from rfl,
-        show (3 * 14 + 1 - 42 : ℕ) = 1 from rfl, h42]
-      exact guard_14_42
-    · simp only [show (43 - 14 : ℕ) = 29 from rfl,
-        show (3 * 14 + 1 - 43 : ℕ) = 0 from rfl, h43]
-      exact guard_14_43
-
 /-- k=15 production polynomial (numerator / 1307674368000), transcribed from `pin-data.md`. -/
 noncomputable def Pp15 : Polynomial ℚ := prodPoly
   [931322574615478515625, -57846307754516601562500, 1611761021614074707031250, -27620633003425598144531250, 316736418664104003906250000, -2416046782053819856347656250, 10461322884210958342060156250, 1967893236430787060707991250, -346618516939812097631010184825, 2203970151840239765899986819750, -6398534829863605593928976949100, 17955993014682160383586429971000, -146852693386847802168160405132800, 824216279306486381670291956424000, -1935618838774923672066722617670400, 1370506748049564268873803929856000] 1307674368000
@@ -1289,84 +1081,6 @@ lemma guard_15_45 : Pp15.eval (45 : ℚ) = ((326845683400612576938034232258422 *
   rw [Pp15, prodPoly_eval]; norm_num
 lemma guard_15_46 : Pp15.eval (46 : ℚ) = ((1415345781292850930051962247664808 * 3 ^ 0 : ℕ) : ℚ) := by
   rw [Pp15, prodPoly_eval]; norm_num
-/-- **k=15, PARTIAL tier.** 6 of the 16 required onset points are
-    banked (`n = 31..36`); the remaining 10 hypotheses
-    (`T(37,22)`, `T(38,23)`, `T(39,24)`, `T(40,25)`, `T(41,26)`, `T(42,27)`, `T(43,28)`, `T(44,29)`, `T(45,30)`, `T(46,31)`) are the production polynomial's own PREDICTED
-    values beyond the banked range (`n = 37..46`), NOT independent data.
-    The theorem is therefore honest about exactly which unverified values
-    would close the gap. -/
-theorem P15_pinned_of_partial
-    (h31 : T 31 16 = 106848447386284024770292)
-    (h32 : T 32 17 = 569579285523233406028051)
-    (h33 : T 33 18 = 2965403643769893816836542)
-    (h34 : T 34 19 = 15111742807653801090985593)
-    (h35 : T 35 20 = 75518035463847720292413552)
-    (h36 : T 36 21 = 370662558309766127292835233)
-    (h37 : T 37 22 = 1789337957103928389914572136) -- PREDICTED (beyond banked)
-    (h38 : T 38 23 = 8505713267602095540716166565) -- PREDICTED (beyond banked)
-    (h39 : T 39 24 = 39855827398943917208656353418) -- PREDICTED (beyond banked)
-    (h40 : T 40 25 = 184265041867569186198215286920) -- PREDICTED (beyond banked)
-    (h41 : T 41 26 = 841257097247076130709957596760) -- PREDICTED (beyond banked)
-    (h42 : T 42 27 = 3795574848533585489216721942077) -- PREDICTED (beyond banked)
-    (h43 : T 43 28 = 16935054908991996005303442375392) -- PREDICTED (beyond banked)
-    (h44 : T 44 29 = 74769781466143100221951023237056) -- PREDICTED (beyond banked)
-    (h45 : T 45 30 = 326845683400612576938034232258422) -- PREDICTED (beyond banked)
-    (h46 : T 46 31 = 1415345781292850930051962247664808) -- PREDICTED (beyond banked)
-    : ∀ n : ℕ, 2 * 15 + 1 ≤ n →
-      (T n (n - 15) : ℚ) = Pp15.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 15) := by
-  refine pin 15 Pp15 Pp15_deg ({31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (31 - 15 : ℕ) = 16 from rfl,
-        show (3 * 15 + 1 - 31 : ℕ) = 15 from rfl, h31]
-      exact guard_15_31
-    · simp only [show (32 - 15 : ℕ) = 17 from rfl,
-        show (3 * 15 + 1 - 32 : ℕ) = 14 from rfl, h32]
-      exact guard_15_32
-    · simp only [show (33 - 15 : ℕ) = 18 from rfl,
-        show (3 * 15 + 1 - 33 : ℕ) = 13 from rfl, h33]
-      exact guard_15_33
-    · simp only [show (34 - 15 : ℕ) = 19 from rfl,
-        show (3 * 15 + 1 - 34 : ℕ) = 12 from rfl, h34]
-      exact guard_15_34
-    · simp only [show (35 - 15 : ℕ) = 20 from rfl,
-        show (3 * 15 + 1 - 35 : ℕ) = 11 from rfl, h35]
-      exact guard_15_35
-    · simp only [show (36 - 15 : ℕ) = 21 from rfl,
-        show (3 * 15 + 1 - 36 : ℕ) = 10 from rfl, h36]
-      exact guard_15_36
-    · simp only [show (37 - 15 : ℕ) = 22 from rfl,
-        show (3 * 15 + 1 - 37 : ℕ) = 9 from rfl, h37]
-      exact guard_15_37
-    · simp only [show (38 - 15 : ℕ) = 23 from rfl,
-        show (3 * 15 + 1 - 38 : ℕ) = 8 from rfl, h38]
-      exact guard_15_38
-    · simp only [show (39 - 15 : ℕ) = 24 from rfl,
-        show (3 * 15 + 1 - 39 : ℕ) = 7 from rfl, h39]
-      exact guard_15_39
-    · simp only [show (40 - 15 : ℕ) = 25 from rfl,
-        show (3 * 15 + 1 - 40 : ℕ) = 6 from rfl, h40]
-      exact guard_15_40
-    · simp only [show (41 - 15 : ℕ) = 26 from rfl,
-        show (3 * 15 + 1 - 41 : ℕ) = 5 from rfl, h41]
-      exact guard_15_41
-    · simp only [show (42 - 15 : ℕ) = 27 from rfl,
-        show (3 * 15 + 1 - 42 : ℕ) = 4 from rfl, h42]
-      exact guard_15_42
-    · simp only [show (43 - 15 : ℕ) = 28 from rfl,
-        show (3 * 15 + 1 - 43 : ℕ) = 3 from rfl, h43]
-      exact guard_15_43
-    · simp only [show (44 - 15 : ℕ) = 29 from rfl,
-        show (3 * 15 + 1 - 44 : ℕ) = 2 from rfl, h44]
-      exact guard_15_44
-    · simp only [show (45 - 15 : ℕ) = 30 from rfl,
-        show (3 * 15 + 1 - 45 : ℕ) = 1 from rfl, h45]
-      exact guard_15_45
-    · simp only [show (46 - 15 : ℕ) = 31 from rfl,
-        show (3 * 15 + 1 - 46 : ℕ) = 0 from rfl, h46]
-      exact guard_15_46
-
 /-- k=16 production polynomial (numerator / 20922789888000), transcribed from `pin-data.md`. -/
 noncomputable def Pp16 : Polynomial ℚ := prodPoly
   [23283064365386962890625, -1604855060577392578125000, 50296202898025512695312500, -977645294998168945312500000, 12866158692583824157714843750, -115227786191848182480468750000, 627956075188775884851523437500, -744604346962912741214695500000, -18856370906133182542352742484975, 168083439133981919034904849231800, -683834540674642382762519712038200, 2295047561654327718980302632052800, -17913005887676406640071685928060400, 131791153675357698130550590831267200, -488805850691225808484910594988268800, 759766595538270156033339090440755200, -219118392304691271841806767714304000] 20922789888000
@@ -1406,89 +1120,6 @@ lemma guard_16_48 : Pp16.eval (48 : ℚ) = ((61476084902654001318172334339180692
   rw [Pp16, prodPoly_eval]; norm_num
 lemma guard_16_49 : Pp16.eval (49 : ℚ) = ((265872905714472345246195735620197402 * 3 ^ 0 : ℕ) : ℚ) := by
   rw [Pp16, prodPoly_eval]; norm_num
-/-- **k=16, PARTIAL tier.** 4 of the 17 required onset points are
-    banked (`n = 33..36`); the remaining 13 hypotheses
-    (`T(37,21)`, `T(38,22)`, `T(39,23)`, `T(40,24)`, `T(41,25)`, `T(42,26)`, `T(43,27)`, `T(44,28)`, `T(45,29)`, `T(46,30)`, `T(47,31)`, `T(48,32)`, `T(49,33)`) are the production polynomial's own PREDICTED
-    values beyond the banked range (`n = 37..49`), NOT independent data.
-    The theorem is therefore honest about exactly which unverified values
-    would close the gap. -/
-theorem P16_pinned_of_partial
-    (h33 : T 33 17 = 4382793740312244017806517)
-    (h34 : T 34 18 = 23288787870043631158670332)
-    (h35 : T 35 19 = 121081244529132538941157409)
-    (h36 : T 36 20 = 617106574276148286251699568)
-    (h37 : T 37 21 = 3088116532240663753100466552) -- PREDICTED (beyond banked)
-    (h38 : T 38 22 = 15194228798887114342965900210) -- PREDICTED (beyond banked)
-    (h39 : T 39 23 = 73593578944746874408267467610) -- PREDICTED (beyond banked)
-    (h40 : T 40 24 = 351269152616432930163117009906) -- PREDICTED (beyond banked)
-    (h41 : T 41 25 = 1653826612613977820761919292031) -- PREDICTED (beyond banked)
-    (h42 : T 42 26 = 7687014105490732269809813183582) -- PREDICTED (beyond banked)
-    (h43 : T 43 27 = 35299971363376894531180373585317) -- PREDICTED (beyond banked)
-    (h44 : T 44 28 = 160265426904862806342404790324662) -- PREDICTED (beyond banked)
-    (h45 : T 45 29 = 719824883297688221996444422232570) -- PREDICTED (beyond banked)
-    (h46 : T 46 30 = 3200253917372236958256602419568304) -- PREDICTED (beyond banked)
-    (h47 : T 47 31 = 14090970086504811644168254469037734) -- PREDICTED (beyond banked)
-    (h48 : T 48 32 = 61476084902654001318172334339180692) -- PREDICTED (beyond banked)
-    (h49 : T 49 33 = 265872905714472345246195735620197402) -- PREDICTED (beyond banked)
-    : ∀ n : ℕ, 2 * 16 + 1 ≤ n →
-      (T n (n - 16) : ℚ) = Pp16.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 16) := by
-  refine pin 16 Pp16 Pp16_deg ({33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (33 - 16 : ℕ) = 17 from rfl,
-        show (3 * 16 + 1 - 33 : ℕ) = 16 from rfl, h33]
-      exact guard_16_33
-    · simp only [show (34 - 16 : ℕ) = 18 from rfl,
-        show (3 * 16 + 1 - 34 : ℕ) = 15 from rfl, h34]
-      exact guard_16_34
-    · simp only [show (35 - 16 : ℕ) = 19 from rfl,
-        show (3 * 16 + 1 - 35 : ℕ) = 14 from rfl, h35]
-      exact guard_16_35
-    · simp only [show (36 - 16 : ℕ) = 20 from rfl,
-        show (3 * 16 + 1 - 36 : ℕ) = 13 from rfl, h36]
-      exact guard_16_36
-    · simp only [show (37 - 16 : ℕ) = 21 from rfl,
-        show (3 * 16 + 1 - 37 : ℕ) = 12 from rfl, h37]
-      exact guard_16_37
-    · simp only [show (38 - 16 : ℕ) = 22 from rfl,
-        show (3 * 16 + 1 - 38 : ℕ) = 11 from rfl, h38]
-      exact guard_16_38
-    · simp only [show (39 - 16 : ℕ) = 23 from rfl,
-        show (3 * 16 + 1 - 39 : ℕ) = 10 from rfl, h39]
-      exact guard_16_39
-    · simp only [show (40 - 16 : ℕ) = 24 from rfl,
-        show (3 * 16 + 1 - 40 : ℕ) = 9 from rfl, h40]
-      exact guard_16_40
-    · simp only [show (41 - 16 : ℕ) = 25 from rfl,
-        show (3 * 16 + 1 - 41 : ℕ) = 8 from rfl, h41]
-      exact guard_16_41
-    · simp only [show (42 - 16 : ℕ) = 26 from rfl,
-        show (3 * 16 + 1 - 42 : ℕ) = 7 from rfl, h42]
-      exact guard_16_42
-    · simp only [show (43 - 16 : ℕ) = 27 from rfl,
-        show (3 * 16 + 1 - 43 : ℕ) = 6 from rfl, h43]
-      exact guard_16_43
-    · simp only [show (44 - 16 : ℕ) = 28 from rfl,
-        show (3 * 16 + 1 - 44 : ℕ) = 5 from rfl, h44]
-      exact guard_16_44
-    · simp only [show (45 - 16 : ℕ) = 29 from rfl,
-        show (3 * 16 + 1 - 45 : ℕ) = 4 from rfl, h45]
-      exact guard_16_45
-    · simp only [show (46 - 16 : ℕ) = 30 from rfl,
-        show (3 * 16 + 1 - 46 : ℕ) = 3 from rfl, h46]
-      exact guard_16_46
-    · simp only [show (47 - 16 : ℕ) = 31 from rfl,
-        show (3 * 16 + 1 - 47 : ℕ) = 2 from rfl, h47]
-      exact guard_16_47
-    · simp only [show (48 - 16 : ℕ) = 32 from rfl,
-        show (3 * 16 + 1 - 48 : ℕ) = 1 from rfl, h48]
-      exact guard_16_48
-    · simp only [show (49 - 16 : ℕ) = 33 from rfl,
-        show (3 * 16 + 1 - 49 : ℕ) = 0 from rfl, h49]
-      exact guard_16_49
-
-
 /-! ### k = 17, 18: definitions + real-swept guards only (a(40)-close extension).
     The Lagrange tier is NOT extended here (it would need onset points to
     n = 52, far beyond banked data); these definitions feed the Grand

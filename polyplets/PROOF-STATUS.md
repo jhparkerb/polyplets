@@ -90,12 +90,13 @@ last one).
     include formula-generated cells (`T 31 20` at k = 11). Provenance of
     the hypothesis cells is graded by the Grand tier's anchor set, not
     here — see the split immediately below.
-  - **k = 12..16 PARTIAL**: `Pk_pinned_of_partial`, hypotheses = all
-    banked points (12/10/8/6/4) + the 1/4/7/10/13 beyond-banked points at
-    the production-PREDICTED values, explicitly flagged `-- PREDICTED` —
-    these were the precisely-stated residue of what the then-banked n ≤ 36
-    data could not pin. Superseded: the triangle now runs to n ≤ 40 and the
-    Grand tier pins these levels outright (see Supersession below).
+  - **k = 12..16 PARTIAL: DELETED 2026-07-31** (`Pk_pinned_of_partial`).
+    Their beyond-banked hypotheses were the production polynomial's own
+    PREDICTED values — a fabricated hypothesis provides zero
+    cross-validation — and their conclusions were byte-identical to the
+    Grand tier's `P<k>_grand_prod` (two real-swept anchors per level).
+    The `Pp<k>` defs, degree lemmas and guards remain (Grand consumes
+    them). Nothing referenced the deleted names.
 - `Diagonal.lean` — `T_n_nm1`/`T_n_nm2` re-proved from `P1_closed`/
   `P2_closed`; **the tree is fully sorry-free**.
 
@@ -156,12 +157,14 @@ Headline results and their audited axioms (verbatim from
   Two-algorithm (Redelmeier) confirmation covers row totals through n = 22
   only, which reaches the k ≤ 10 anchors' rows and no further.
 
-**Supersession.** The `Pin.lean` tier map below is now historical (kept for
-cross-validation): the k = 12..16 PARTIAL tier's flagged-PREDICTED
-hypotheses are RETIRED — `P<k>_grand_of_banked` needs no beyond-banked
-points — and the k = 4..11 conditional tier's hypothesis lists, which
-included formula-generated cells (e.g. `T 31 20` at k = 11), are replaced
-by real-swept-only anchors. Banked data now fully pins every wired
+**Supersession.** The `Pin.lean` tier map below is now historical: the
+k = 12..16 PARTIAL tier is DELETED outright (2026-07-31; "kept for
+cross-validation" was wrong — hypotheses fabricated from the polynomial
+cross-validate nothing), and the k = 4..11 conditional tier's hypothesis
+lists are replaced by the Grand tier's real-swept-only anchors. (The one
+cell there flagged formula-generated, `T 31 20` at k = 11, has since
+been really swept: a38 and a39 both swept H = 20 and agree with it
+digit-for-digit — noted inline in `Pin.lean`.) Banked data now fully pins every wired
 diagonal; the "extend to n = 49" upgrade path is obsolete.
 
 **a(40)-close extension (2026-07-29).** With the project closed at a(40)
