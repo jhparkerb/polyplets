@@ -113,3 +113,61 @@ counts and gives:
   the first term to beat the multi-directed 6.475. H=14 is banked
   (**mu_14 = 6.3800344**, `results/strip_mu_H14.log`, 4851s on the map engine) and
   is still below it. What was "another build increment" is now an hours-free job.
+
+## Chan–Rechnitzer 2018 read (2026-08-01): wrong direction, right machinery
+
+`papers/chan_rechnitzer_2018_upper_bounds_growth_rates_corner_transfer_matrices.pdf`
+(Linear Algebra Appl. 555 (2018) 139–156). Pulled as the most promising lead for
+improving the loose half of our bracket, `lambda <= 9.3153`. **It cannot do that,
+and the reason is worth recording because it is the connectivity wall again, from
+a new angle.**
+
+Their method: Calkin–Wilf's transfer-matrix eigenvalue upper bound
+(`kappa^{2p} <= Lambda_o(2p)`, `Lambda_o(m)` the dominant eigenvalue of the
+transfer matrix with *cylindrical* boundary conditions) combined with the
+Collatz–Wielandt formula, the approximate eigenvector supplied by Baxter's corner
+transfer matrix ansatz plus Nishino–Okunishi CTMRG. Applied to hard squares and
+four other models, extending the rigorously known digits by 4–6.
+
+**Why it does not transport.** They state four conditions for the method to apply.
+Two of them fail for polyplets, and both fail on connectivity:
+
+| condition | polyplets |
+|---|---|
+| transfer matrix from a **local face weight** `omega` (needed for the CTM formalism) | **fails** — connectivity is not a local face weight; our states carry component signatures precisely because it cannot be expressed locally |
+| `V` **symmetric** (needed for the Calkin–Wilf bound itself) | **fails** — the signature transfer is directional; union-find merges are not reversible |
+| non-negative | holds trivially |
+| irreducible | holds — and by *our* argument: any state reaches the single-cell state through a spanning column. They use the identical empty-column trick |
+
+Underneath the checklist is a normalization mismatch that no amount of
+engineering fixes. `kappa` is a **per-site** growth rate for a lattice-gas model on
+`N` sites; cylindrical boundary conditions over-count per site, which is exactly
+what makes `Lambda_o(m)` an upper bound. `lambda` is a **per-cell** growth rate for
+connected clusters, and confining animals to a cylinder of circumference `m`
+strictly *loses* animals — it is our `mu_m`, a lower bound converging up. The
+cylinder trick has no upper-bounding analogue for a connected family.
+
+**So: the 9.3153 upper bound is not improvable by this route.** That is now two
+independent method-classes floored above `lambda` for the same reason (this, and
+the Bui-style convolution certificate whose over-count is diffuse and non-local —
+`docs/certificate-squeeze-plan.md` P3). Treat the upper end as hard.
+
+**What IS transferable, in the other direction.** Their engineering is that the
+transfer matrix and the trial vector are both used *implicitly*: each component of
+`psi` and `V psi` is computed independently and discarded, so the memory cost is
+the tiny `F` matrices rather than the vector. That is what buys polynomial memory
+and lets them run far larger `m` than direct methods. **Our ladder stopped at
+H = 17 (6,536,381 states, 11.8 GB) for exactly the reason their method removes.**
+Since we already use the *lower* half of Collatz–Wielandt for the `mu_H`
+certificates, the architecture — never materialize the matrix or the vector,
+generate components on demand from a compact representation — applies to us
+unchanged.
+
+The catch: their *ansatz* for `psi` comes from CTM formalism, which needs the
+locality condition we fail. We would need our own compact representation of a
+trial vector over connectivity-signature states, and connectivity is the thing
+that makes those states non-local, so there is real reason to doubt a factored
+form exists. **Unexplored, not endorsed.** If it worked, the prize is concrete:
+the rungs gain ~0.05 each, so pushing H = 17 -> ~25 would move the certified floor
+from 6.543 toward ~6.9 against `lambda ~ 7.111` — the bracket's lower end is the
+half that is still moving.

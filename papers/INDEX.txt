@@ -110,6 +110,30 @@ Lattice-animal literature obtained 2026-08-01 (jasonp, ScienceDirect):
                                            Bousquet-Melou, q-Enumeration de polyominos convexes, JCTA 64
                                            (1993) 265-288. For the parked convex-polyplets side quest.
 
+Growth-rate bounding methods (obtained 2026-08-01, for the lambda <= 9.3153 push):
+  chan_rechnitzer_2018_upper_bounds_growth_rates_corner_transfer_matrices.pdf
+                                           Chan & Rechnitzer, Linear Algebra Appl. 555 (2018) 139-156.
+                                           Calkin-Wilf eigenvalue upper bound + Collatz-Wielandt, with the
+                                           trial eigenvector from Baxter CTM / Nishino-Okunishi CTMRG.
+                                           READ: cannot bound our lambda from above -- fails their
+                                           locality and symmetry conditions, and kappa is per-SITE for a
+                                           local-constraint gas while lambda is per-CELL for connected
+                                           clusters. Their implicit-matrix engineering DOES bear on
+                                           extending our mu_H ladder past H=17. See
+                                           results/strip-growth-lambda-bounds.md.
+  oh_2019_state_matrix_recursion_monomer_dimer.pdf
+  oh_2016_quantum_knot_mosaics_growth_constant.pdf
+  oh_2016_independent_vertex_sets_grid_graphs.pdf
+                                           Seungsang Oh's state-matrix-recursion cluster. All
+                                           local-constraint grid models; unread as of 2026-08-01.
+  bevan_brignall_pantone_2020_av1324_growth_rate_bounds.pdf
+  conway_guttmann_zinnjustin_2018_1324_revisited.pdf
+                                           Growth-rate bounds for permutation classes by structural
+                                           decomposition. Methodological only; unread.
+  bousquet-melou_1996_column_convex_polygons_enumeration.pdf
+                                           Bousquet-Melou, Discrete Math. 154 (1996) 1-25. BM-R 2002's
+                                           reference [2]; for the parked convex side quest.
+
 Distributed-computing background (engine design era):
   dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).
   afrati_dassarma_2013_mapreduce_cost_bounds.pdf  Afrati et al., MapReduce cost bounds.
