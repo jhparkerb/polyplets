@@ -851,86 +851,47 @@ that agree exactly.
         $\tfrac16S^3+\tfrac72S^2+\tfrac{83}{6}S+\tfrac{93}{2}$\\
     4 & $\tfrac1{24}S^4+\tfrac32S^3+\tfrac{28}{3}S^2+33S+180$ &
         $\tfrac1{24}S^4+\tfrac43S^3+\tfrac{97}{12}S^2+\tfrac{119}{3}S+\tfrac{1367}{8}$\\
-    5 & $\tfrac1{120}S^5+\tfrac5{12}S^4+4S^3+\tfrac{55}{3}S^2+\tfrac{2278}{15}S+570$ &
-        $\tfrac1{120}S^5+\tfrac{11}{24}S^4+\tfrac{19}{4}S^3+\tfrac{185}{12}S^2+\tfrac{18869}{120}S+\tfrac{4545}{8}$\,$^\dagger$\\
     \bottomrule
   \end{tabular}
   \caption{Diagonal-mirror diagonal polynomials $d(S,S+k)$, valid from the
-  stated onsets. Every polynomial except $k=5$ odd was pinned by exact
-  differencing on the highest-$S$ points, required to reproduce all earlier
-  in-regime points (holdout), and confirmed on strips computed after
-  pinning---$P_4$ even by two independent methods that agree exactly, $P_5$
-  even reproducing an earlier cumulant-form fit identically. The one entry
-  marked $^\dagger$ ($k=5$ odd) is instead fitted, with $7$ exact surplus
-  witnesses, and should be treated as one grade weaker than the pinned
-  rows.}
+  stated onsets. These are the levels the $n=33$ assembly uses. Each was
+  pinned by exact differencing on the highest-$S$ points, required to
+  reproduce all earlier in-regime points (holdout), and confirmed on strips
+  computed after pinning---$P_4$ even by two independent methods that agree
+  exactly. A weaker fitted $k=5$ level exists in the repository and is used
+  for nothing here.}
   \label{tab:dmpk}
 \end{table}
 
-In the generating-function basis the structure is crisper. Let $G_k$ be
-the generating function of the polynomial law itself,
-$G_k(x)=\sum_{S\ge0} P_k(S)\,x^S$ with $P_k$ evaluated per parity; its
-coefficients agree with the counts $d(S,S+k)$ at every in-regime $S$ (the
-finitely many pre-onset counts deviate from the polynomials, so the raw
-counting series differs from $G_k$ by an additive polynomial of degree
-below the onset, which does not affect the pole structure). Then
-\[
-  G_k(x)\;=\;\frac{N_k(x)}{(1-x)^{k+1}(1+x)^{k}},\qquad
-  N_k \in \mathbb{Z}[x],\ \deg N_k = 2k,\qquad
-  N_k(\pm1)=(\pm2)^k \ (k\ge1).
-\]
-The integer numerators, for the record:
-\begin{align*}
-  N_0 &= 2\\
-  N_1 &= 6+2x-6x^2\\
-  N_2 &= 12+8x-16x^2-8x^3+8x^4\\
-  N_3 &= 50+14x-124x^2-8x^3+110x^4+2x^5-36x^6\\
-  N_4 &= 180+40x-644x^2-54x^3+942x^4+12x^5-600x^6+2x^7+138x^8\\
-  N_5 &= 570+176x-2610x^2-520x^3+4996x^4+764x^5-4816x^6-496x^7\\
-      &\qquad +2282x^8+108x^9-422x^{10}
-\end{align*}
-($N_5$ rests in part on the fitted $P_5$-odd row of Table~\ref{tab:dmpk},
-so it remains one grade weaker; $N_4$ is fully pinned).
-The boundary condition $N_k(\pm1)=(\pm2)^k$ was never imposed on any
-fit---the fitter solves only for polynomial coefficients against exact
-diagonal counts---and it holds on the fully pinned rows $k\le4$, where
-every coefficient is fixed by exact differencing with surplus holdout
-points. Its status is an observed regularity across $k=1..5$, no stronger
-at $k=5$ than the fitted row itself.
-The boundary values say the dominant single-defect family has two species per
-odd footprint; the next layer of the peeled numerators follows linear-in-$k$
-laws, the signature of interacting defect pairs. Exact overdetermined
-elimination \emph{refutes} any low-order bivariate rational closure across
-$k$ (each level carries genuinely new defect species), and the parity
-structure of the $k=3$ level refutes the naive two-ground-state defect gas:
-additional length-free families (anti-diagonal excursions crossing the main
-spine) are present.
+In the generating-function basis the law is rational:
+$G_k(x)=\sum_{S\ge0}P_k(S)x^S = N_k(x)/(1-x)^{k+1}(1+x)^k$ with
+$N_k\in\mathbb Z[x]$ of degree $2k$, and the boundary values
+$N_k(\pm1)=(\pm2)^k$ hold across every level computed. They were never
+imposed on any fit---the fitter solves only for polynomial coefficients
+against exact diagonal counts---so they stand as an observed regularity.
+The numerators, and a defect-gas reading of their structure, are in the
+repository.
 
 The shape, however, is a theorem, by the same programme that
 Theorem~\ref{thm:diaglaw} carries out for the height triangle. Here the
-decomposition is a \emph{segment grammar}: reading rows, an animal at
-surplus $k$ splits into at most $2k{+}1$ perfect diagonal/anti-diagonal
-segments joined at defect clusters, with at most $2k$ direction reversals
-(each mirror-orbit of turns consumes cell surplus --- the reversal lemma,
-tight on the data); per combinatorial type the animals are the lattice
-points of a one-parameter polytope with coefficients in $\{1,2\}$, so
-each type contributes a period-two quasi-polynomial, and a telescoping
-rank argument caps the degree at $k$. Hence $d(S,S{+}k)$ is a period-two
-quasi-polynomial of degree $\le k$ for $S$ beyond an effective onset ---
-poles only at $x=\pm1$, of bounded order. The parity anomaly of the
-$k=3$ level is the grammar's anti-excursion classes, not an obstruction.
+decomposition is a \emph{segment grammar}: an animal at surplus $k$ splits
+into at most $2k{+}1$ perfect diagonal/anti-diagonal segments joined at
+defect clusters, with at most $2k$ direction reversals; per combinatorial
+type the animals are the lattice points of a one-parameter polytope with
+coefficients in $\{1,2\}$, so each type contributes a period-two
+quasi-polynomial, and a telescoping rank argument caps the degree at $k$.
 What the proof does \emph{not} deliver is the sharp onset
-($2k{+}2$/$2k{+}3$) and the exact multiplicity split $(k{+}1,k)$; those
-remain validated data. Full write-up with the honest lemma-by-lemma
-grading: \texttt{docs/proofs/dm-diagonal-law.md}.
+($2k{+}2$/$2k{+}3$) or the exact pole multiplicities $(k{+}1,k)$; those
+remain validated data. Write-up, graded lemma by lemma:
+\texttt{docs/proofs/dm-diagonal-law.md}.
 
 The polynomials themselves remain computed and validated rather than
-derived. Their practical role is sharp: the sparse strips ($S\ge29$ at
-$n\ge33$) are
-precisely the RAM-expensive ones---one strip burned $\sim$$62$ CPU-hours and
-$79$\,GB to produce the two numbers $d(31,31)=2$, $d(31,32)=38$ that $P_0$
-and $P_1$ now give for free---so the pinned polynomials replace exactly the
-strips that hardware cannot reach, at the price of the \tierthree{} label.
+derived, and their practical role is sharp: the sparse strips ($S\ge29$ at
+$n\ge33$) are precisely the RAM-expensive ones---one strip burned
+${\sim}62$ CPU-hours and $79$\,GB to produce the two numbers $d(31,31)=2$
+and $d(31,32)=38$ that $P_0$ and $P_1$ now give for free---so they replace
+exactly the strips hardware cannot reach, at the price of the \tierthree{}
+label.
 
 \section{Companion sequences}
 \label{sec:companions}
@@ -1314,26 +1275,25 @@ for directed bond animals, by Rechnitzer's haruspicy
 programme~\cite{rechnitzer}; the criterion that programme runs on is
 Lemma~9 of Bousquet-M\'elou and Rechnitzer~\cite{bmr2002}, whose proof
 begins with the same coefficient extraction used above. From that shared
-start the arguments diverge completely. Theirs concludes topologically ---
-the union of the coefficients' pole sets has finitely many limit points,
-via an asymptotic argument in the index --- and applying it demands an
-explicit combinatorial description of the denominators, in the polygon
-setting a product of cyclotomic polynomials. Ours concludes arithmetically
-and effectively: it follows a single distinguished pole per slice, and the
-only inputs are Perron--Frobenius monotonicity and a crude upper bound on
-$\lambda$. That lightness is the contribution. It is why the proof
-transports to any family with a column transfer matrix with no bespoke
-denominator analysis, and why it yields explicit excluded $(r,D)$ boxes
-rather than a bare dichotomy. Arithmetic constraints on D-finite series do
-exist: the \emph{D-finiteness, rationality and height} theorems of Bell,
-Nguyen and Zannier~\cite{bnz2020} and their multivariate
-P\'olya--Carlson successor, and the height-gap results of Bell, Hu and
-Satriano~\cite{bhs2020}. Both bound the Weil heights of the
-\emph{coefficients} of a series, or of a sequence read along the orbit of a
-rational map, and conclude rationality; neither speaks about the growth
-constants of a family of slices, and we found no application of either line
-to a lattice model. We have not located the use of Northcott
-finiteness on a family of slice growth constants elsewhere; a literature
+start the arguments diverge. Theirs concludes topologically---the union of
+the coefficients' pole sets has finitely many limit points, via an
+asymptotic argument in the index---and applying it demands an explicit
+combinatorial description of the denominators, in the polygon setting a
+product of cyclotomic polynomials. Ours concludes arithmetically and
+effectively, following a single distinguished pole per slice with no inputs
+beyond Perron--Frobenius monotonicity and a crude upper bound on $\lambda$.
+That lightness is the contribution: it is why the proof transports to any
+family with a column transfer matrix with no bespoke denominator analysis,
+and why it yields explicit excluded $(r,D)$ boxes rather than a bare
+dichotomy. Arithmetic constraints on D-finite series do exist---the
+\emph{D-finiteness, rationality and height} theorems of Bell, Nguyen and
+Zannier~\cite{bnz2020} with their multivariate P\'olya--Carlson successor,
+and the height-gap results of Bell, Hu and Satriano~\cite{bhs2020}---but
+both bound the Weil heights of the \emph{coefficients} of a series, or of a
+sequence read along the orbit of a rational map, and conclude rationality;
+neither speaks about the growth constants of a family of slices. We have
+located no application of either line to a lattice model, and no use of
+Northcott finiteness on a family of slice growth constants; a literature
 search cannot establish absence, so we claim the argument as ours with
 that qualification and nothing stronger.
 
@@ -1365,27 +1325,15 @@ remains available, exactly, for any $n$ beyond the final computed term
 \section{Reach and limits}
 \label{sec:reach}
 
-Method C's cost structure is set by its tallest surviving sweep height: at
-fixed $H$ the strip's state space is bounded and cost grows only about
-linearly in $n$, while adding a unit of height multiplies it by roughly the
-per-height frontier growth. As each new diagonal was certified the
-tallest real sweep advanced slowly---$H=18$ through $a(34)$, $H=19$ for
-$a(35)$--$a(37)$, $H=20$ for $a(38)$--$a(39)$, and $H=21$ for
-$a(40)$---while the cost per term grew steeply along the same ladder
-(Appendix~\ref{sec:profile}): the binding resource became disk rather
-than time (the $a(40)$ run's external shuffle peaked at $363$\,GB), and
-the final terms ran their tall poles as solo phases at reduced core
-counts to fit the disk budget. The deeper constraint is verification, not
-compute---the frontier is always one term ahead of its own closed-form
-certification, which is what the \tiertwominus{} grade on the final two
-terms records (Section~\ref{sec:confirm}); the sequence closes at
-$a(40)$ with that grade stated rather than outrun. The symmetric counts scale as
-$\sqrt{a}$-class problems and reached $n=34$ for three of the four types;
-the diagonal-mirror type, whose forced-square bounding box compresses least,
-is the binding constraint on the remaining companions (per-strip RAM
-peaked at $83$\,GB at $n=32$), and the pinned
-quasi-polynomials of Section~\ref{sec:dmdiag} substitute for the strips
-beyond hardware at $n\ge33$ under the \tierthree{} label.
+Method C's cost is set by its tallest surviving sweep height, which
+advanced only as each new diagonal was certified: $H=18$ through $a(34)$,
+$H=19$ for $a(35)$--$a(37)$, $H=20$ for $a(38)$--$a(39)$, $H=21$ for
+$a(40)$. Along that ladder the binding resource became disk rather than
+time (Appendix~\ref{sec:profile}). But the deeper constraint is
+verification, not compute: the frontier is always one term ahead of its
+own closed-form certification, which is exactly what the \tiertwominus{}
+grade on the final two terms records. The sequence closes at $a(40)$ with
+that grade stated rather than outrun.
 
 \section{Data and code availability}
 \label{sec:availability}
@@ -1430,28 +1378,6 @@ All machines are commodity hardware owned and operated by the author:
 
 \begin{table}[H]
   \centering\small
-  \begin{tabular}{l r r r}
-    \toprule
-    term (full triangle, Method C, dalby) & wall (h) & core-hours & peak RSS (GB)\\
-    \midrule
-    $a(30)$ & 1.0 & 22.1 & 1.7\\
-    $a(31)$ & 2.8 & 44.8 & 5.8\\
-    $a(32)$ & 3.0 & 49.0 & 5.6\\
-    $a(33)$ & 3.4 & 53.5 & 5.9\\
-    $a(34)$ & 3.7 & 58.5 & 6.3\\
-    \bottomrule
-  \end{tabular}
-  \caption{Banked per-term cost profiles for the uniform mid-project engine
-  runs (earlier terms were computed by intermediate engine generations and
-  are not directly comparable). The gentle growth reflects the closed-form
-  diagonals holding the tallest real sweep at $H=18$ throughout this range;
-  that tallest sweep dominates the wall (${\sim}70\%$ at $a(34)$), and RAM
-  stays small because the frontier spills to disk.}
-  \label{tab:costs}
-\end{table}
-
-\begin{table}[H]
-  \centering\small
   \begin{tabular}{l r r r r}
     \toprule
     term (full triangle, dalby) & wall (h) & core-hours & peak RSS (GB) & disk peak (GB)\\
@@ -1473,36 +1399,13 @@ All machines are commodity hardware owned and operated by the author:
   \label{tab:costsladder}
 \end{table}
 
-\begin{itemize}
-  \item \textbf{$a(36)$, full triangle (Method C, split across two
-        machines):} heights $H\le18$ and the injected range on ayr
-        ($1.94$\,h wall, $52$ core-hours, peak RSS $0.35$\,GB) in parallel
-        with the $H=19$ long pole on dalby ($3.28$\,h wall, $111$
-        core-hours, peak RSS $0.38$\,GB), under a run-file compression
-        (varint counts) that cut the long pole's wall $2.13\times$
-        relative to $a(35)$'s $H=19$ despite the larger term.
-  \item \textbf{Diagonal-mirror symmetry count, $n=32$ (Method D, farmed):}
-        the six deepest exact-bounding-box strips ($S=26$--$31$, dalby)
-        cost $3.0$\,M CPU-seconds $\approx835$ core-hours with per-strip
-        peak memory up to $82.7$\,GB; the remaining $25$ strips
-        ($S\le25$, ayr) another $1.7$\,M CPU-seconds $\approx476$
-        core-hours ($15.4$\,h wall sequential, per-strip peak
-        $38.8$\,GB). In total an order of magnitude more compute than
-        $a(34)$ itself, which is why the quasi-polynomials of
-        Section~\ref{sec:dmdiag} matter: they replace exactly the strips
-        whose memory grows fastest.
-  \item \textbf{Diagonal-mirror count, $n=33$ direct strips (for the
-        \tierthree{} assembly):} all $28$ strips $S\le28$ on dalby,
-        $24.0$\,h wall sequential, $6.71$\,M CPU-seconds $\approx1864$
-        core-hours, peak strip RSS $126.2$\,GB ($S=28$; the strips
-        $S\ge29$ that the closed forms replace would have exceeded the
-        machine outright).
-  \item \textbf{Symmetric counts at $n=34$ (Method D):} axis mirror
-        $\approx3.3$\,h wall / $53$\,k CPU-seconds / $8.2$\,GB;
-        $180^\circ$ rotation $\approx51$\,min wall / $18$\,k CPU-seconds /
-        $8.5$\,GB (both dalby); the $90^\circ$ count runs in seconds on
-        gympie.
-\end{itemize}
+The symmetry counts are cheaper except for the diagonal mirror, whose
+exact-bounding-box strip farm cost ${\approx}1300$ core-hours at $n=32$
+(per-strip peak $82.7$\,GB) and ${\approx}1864$ at $n=33$ (peak
+$126.2$\,GB)---an order of magnitude more compute than $a(34)$ itself, and
+the reason the closed forms of Section~\ref{sec:dmdiag} are worth their
+\tierthree{} label. Full per-run profiles, for every term and every
+symmetry type, are in the repository's provenance ledgers.
 
 \begin{thebibliography}{9}
 
