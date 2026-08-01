@@ -79,6 +79,37 @@ Non-D-finiteness of anisotropic generating functions (the lineage our theorem si
                                            elementary functions evaluated at integers. Swept 2026-08-01
                                            as part of closing the Northcott novelty item; no collision.
 
+Lattice-animal literature obtained 2026-08-01 (jasonp, ScienceDirect):
+  barequet_benshachar_osegueda_2021_concatenation_arguments.pdf
+                                           Barequet, Ben-Shachar & Osegueda, Concatenation arguments and
+                                           their applications to polyominoes and polycubes, Comput. Geom.
+                                           98 (2021) 101790. Fekete on quasi sub-/super-multiplicative
+                                           sequences => growth-constant bounds. NOT a log-convexity tool
+                                           (C2 unmoved); the sub-multiplicative UPPER-bound direction is
+                                           the part that could bear on our 9.3153. See MISSING.md.
+  aleksandrowicz_barequet_2009_polycubes_dimensionality_curse.pdf
+                                           Aleksandrowicz & Barequet, Counting polycubes without the
+                                           dimensionality curse, Discrete Math. 309 (2009) 4576-4583.
+                                           Face-adjacency hypercubic (2d neighbours); generalizes by
+                                           DIMENSION, not adjacency -- confirmed does not touch king.
+  mansour_rastegar_2021_animals_triangular_lattice.pdf
+                                           Mansour & Rastegar, Enumeration of various animals on the
+                                           triangular lattice, European J. Combin. 94 (2021) 103294
+                                           (arXiv 2011.05318). Baryiamonds, column-convex and convex
+                                           polyiamonds by perimeter. Bears on universality (polyiamonds).
+  liu_wang_2007_log_convexity_combinatorial_sequences.pdf
+                                           Liu & Wang, On the log-convexity of combinatorial sequences,
+                                           Adv. Appl. Math. 39 (2007) 453-476 (arXiv math/0602672).
+                                           Closure operations + three-term recurrences; a(n) has no known
+                                           recurrence, so probably cannot engage C2. Relevant to C2.
+  gouyou-beauchamps_viennot_1988_directed_animal_path_equivalence.pdf
+                                           Gouyou-Beauchamps & Viennot, Adv. Appl. Math. 9 (1988)
+                                           334-357. Directed animals <-> 1D paths; the lineage behind the
+                                           Bacher comparison bound and BM-R's heaps.
+  bousquet-melou_1993_q_enumeration_polyominos_convexes.pdf
+                                           Bousquet-Melou, q-Enumeration de polyominos convexes, JCTA 64
+                                           (1993) 265-288. For the parked convex-polyplets side quest.
+
 Distributed-computing background (engine design era):
   dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).
   afrati_dassarma_2013_mapreduce_cost_bounds.pdf  Afrati et al., MapReduce cost bounds.

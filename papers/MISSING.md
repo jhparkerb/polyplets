@@ -34,42 +34,54 @@ _(none outstanding — Barequet–Moffie 2007 and Mertens 1990 obtained 2026-06-
   (venue uncertain — INTEGERS / Electronic J.? ~2006). — the cleanest "width W alone bounds
   TM cost" realization; want exact venue + free version.
 
-## Newly identified, all free ("Open archive" on ScienceDirect), 2026-08-01
-From jasonp's lattice-animal search dumps. Not yet fetched; listed in
-descending order of what they would actually buy us.
+## Obtained 2026-08-01 from jasonp's lattice-animal searches — all in papers/
+Six papers, all now held. First-pass dispositions below; **one is worth
+following up and it is not the one first flagged.**
 
 - **G. Barequet, G. Ben-Shachar, M. C. Osegueda, "Concatenation arguments and
-  their applications to polyominoes and polycubes," Comput. Geom. (Oct 2021).**
-  Concatenation is exactly the injection technique that `results/open-conjectures.md`
-  C2 says is missing ("no clean injection is known for lattice animals" —
-  the stated route to log-convexity of A006770). If their arguments transfer to
-  king adjacency this is the closest thing to an attack on C2 we have seen.
-  **[high — the only lead here that touches a live open conjecture]**
+  their applications to polyominoes and polycubes," Comput. Geom. 98 (2021)
+  101790.** Flagged sight-unseen as an attack on C2 (log-convexity) on the
+  guess that concatenation supplies the missing injection. **Read: it does
+  not.** The method is Fekete on quasi sub-/super-multiplicative sequences
+  (Z(m+n) >= P(m+n)Z(m)Z(n)), which bounds *growth constants*, not
+  log-convexity — a different inequality from a(n)^2 < a(n-1)a(n+1). C2 is
+  unmoved and its "no clean injection is known" stands.
+  **What it does bear on is the lambda bracket.** The super-multiplicative
+  direction is already banked and superseded (Fekete gives
+  lambda >= a(40)^(1/40) ~ 6.22, commit 8ae1462; the certified ladder's 6.543
+  beats it). The open direction is **quasi-sub-multiplicativity, which yields
+  UPPER bounds** — and our upper end, 9.3153, is the loose half of the
+  bracket. Whether king animals admit a concatenation-based sub-multiplicative
+  bound below 9.3153 is a live question that would shorten a sentence in the
+  paper. Not attempted. **[the one worth a look]**
 - **G. Aleksandrowicz & G. Barequet, "Counting polycubes without the
-  dimensionality curse," Discrete Math. 309 (2009).** Already listed at [med]
-  above with the note "confirm they don't touch king" — it is free, so that
-  item can simply be closed by reading it. **[med]**
+  dimensionality curse," Discrete Math. 309 (2009).** The [med] want above is
+  **CLOSED**: its open question was "confirm they don't touch king," and they
+  do not — the algorithm is face-adjacency hypercubic throughout (each cell
+  has 2d neighbours). Generalization is by dimension, not by adjacency, as
+  suspected.
 - **T. Mansour & R. Rastegar, "Enumeration of various animals on the
-  triangular lattice," European J. Combin. (May 2021).** Bears on the
-  universality work (`docs/proofs/universal-diagonal-law.md`), which is
-  machine-checked on square/hex/king and wants further real instances rather
-  than more hypothetical interval lattices. **[med]**
+  triangular lattice," European J. Combin. 94 (2021) 103294** (also arXiv
+  2011.05318). Baryiamonds, column-convex and convex polyiamonds by perimeter.
+  Bears on the universality work's open item (polyiamonds, which need row
+  conventions) and on the parked convex side quest.
 - **L. L. Liu & Y. Wang, "On the log-convexity of combinatorial sequences,"
-  Adv. Appl. Math. 39 (2007) 453--476** (arXiv math/0602672). Checked at the
-  abstract level 2026-08-01: their machinery is closure operations plus
-  three-term recurrences, and a(n) satisfies no known recurrence, so it
-  probably cannot engage with C2 — worth one read to confirm the negative,
-  since it would sharpen *why* C2 is hard. **[low]**
-- Directed-animal lineage behind our Bacher comparison bound:
-  Gouyou-Beauchamps & Viennot, "Equivalence of the two-dimensional directed
-  animal problem to a one-dimensional path problem," Adv. Appl. Math. (1988);
-  Bousquet-Melou, "New enumerative results on two-dimensional directed
-  animals," Discrete Math. (1998). **[low — context, not load-bearing]**
-- Convex-family cluster, if the convex-polyplets side quest is ever revived
-  (`results/convex-polyplets.md`, K3 parked): Duchi-Rinaldi-Schaeffer
-  (Z-convex, 2008); Bousquet-Melou, q-enumeration de polyominos convexes
-  (JCTA 1993); Delest, column-convex GFs (JCTA 1988); Dubernard & Dutour
-  (1996); Feretic & Svrtan (1996). **[low]**
+  Adv. Appl. Math. 39 (2007) 453-476** (also arXiv math/0602672). Held; the
+  abstract-level read stands — closure operations plus three-term recurrences,
+  and a(n) satisfies no known recurrence. Reading it would confirm the
+  negative and sharpen *why* C2 is hard, which is worth a line in
+  open-conjectures.md if anyone does it.
+- **D. Gouyou-Beauchamps & G. Viennot, "Equivalence of the two-dimensional
+  directed animal problem to a one-dimensional path problem," Adv. Appl. Math.
+  9 (1988) 334-357.** Context for the directed-animal lineage behind the
+  Bacher comparison bound and behind BM-R's heaps.
+- **M. Bousquet-Melou, "q-Enumeration de polyominos convexes," JCTA 64 (1993)
+  265-288.** For the convex side quest if revived.
+
+Still un-obtained from that search, low value, not chased: Duchi-Rinaldi-
+Schaeffer (Z-convex, 2008), Delest column-convex GFs (JCTA 1988),
+Dubernard & Dutour (1996), Feretic & Svrtan (1996), Bousquet-Melou "New
+enumerative results on two-dimensional directed animals" (1998).
 
 ## Notes
 - arXiv-available (NOT missing): Jensen cond-mat/0007239 & 0007238, Conway 1610.09806,
