@@ -227,6 +227,59 @@ polyhexes, polyiamonds, and any family with a column transfer matrix, where
 theirs needs a bespoke combinatorial denominator analysis per family.
 Northcott appears in neither paper.
 
+### Klazar 2003, read (2026-08-01): analytic, not arithmetic
+
+Haruspicy 2's reference [13] — M. Klazar, "Non-P-recursiveness of numbers of
+matchings (linear chord diagrams) with many crossings," Adv. in Appl. Math.
+30 (2003) 126-136, same issue as Haruspicy 1 — was pulled on the guess that a
+one-variable non-P-recursiveness proof might be arithmetic and so a closer
+relative of ours than the Haruspicy line. **The guess was wrong: his
+obstruction is analytic.** Recording it because the negative is useful.
+
+His Theorem 1: let F satisfy F' = G(x,F) with G a Laurent series; if (i) F is
+*not analytic*, (ii) G is analytic, (iii) ord_y(G) < 0, then F is not
+D_A-finite, a fortiori not D-finite. Proof: iterate to get F^(k) = G_k(x,F)
+with ord_y(G_k) = k(p-1)+1 strictly negative; a D-finite relation collapses to
+H(x,F) = 0 with H analytic and nonzero (its y-order is R_0 G_m's, still
+negative), so Weierstrass preparation plus Puiseux force F analytic —
+contradicting (i). The whole lever is **divergence**: F must have zero radius
+of convergence.
+
+That criterion cannot engage with our object at all. Every G_H is rational
+with radius 1/mu_H, and mu_H < lambda, so F(x,y) is analytic in a bidisc.
+Condition (i) fails at the first hurdle.
+
+**Three distinct obstruction types now mapped in this neighbourhood:**
+
+| | obstruction | lever |
+|---|---|---|
+| BM-R 2002 | topological | accumulation of the pole set in C |
+| Klazar 2003 | analytic | zero radius of convergence vs. forced analyticity |
+| ours | arithmetic | degree and house of algebraic numbers (Northcott) |
+
+**The genuinely useful thing Klazar has, and we do not.** He enlarges the
+target class from D-finite (polynomial coefficients) to **D_A-finite**
+(analytic coefficients), on the explicit ground that "the key lies in the
+analytic x nonanalytic dichotomy" — so polynomiality was never doing the
+work, and he gets the stronger conclusion for free. Our theorem cannot follow
+him there, and it is worth being clear why: the step "a rational polynomial
+of degree <= D cannot vanish at an algebraic number of degree > D" is the
+entire dichotomy argument, and it dies the instant the coefficients are
+analytic rather than polynomial, since an analytic function may vanish at
+1/mu_{H0} without vanishing identically. **So our result is
+not-D-finite-over-Q(x) and does not extend to D_A-finite.** That is a real
+ceiling on the method, not a gap in the write-up, and it should be stated
+rather than left for a referee to notice.
+
+**One resonance worth following up separately.** Klazar's Theorem 4: (con_n)
+and (cro_n) are P-recursive modulo 2^k for every k — an object with no
+P-recursive description whose reductions mod a prime power are algebraic.
+That is structurally the same phenomenon as our ternary spine
+(`results/ternary-spine.md`): the height triangle admits no C-finite
+recurrence, yet mod 3 it is governed by the cubic W^3 = W^2 + t. Different
+combinatorics, same shape of answer. Whether the mechanisms are related is
+open and nobody has looked.
+
 **What remains unresolved, permanently by this method.** Whether the
 Northcott endgame appears somewhere else cannot be settled by search —
 absence is not a database result. The claim should therefore be scoped so it
