@@ -154,30 +154,20 @@ later terms rest on decorrelation rather than algorithmic independence.
     \midrule
     \tierone{} & Two algorithms sharing no counting logic agree, each
     reproducing the full published range. Covers $a(1)$--$a(22)$ (direct
-    Redelmeier enumeration against the transfer matrix); the symmetry counts
-    to $n=24$; everything derived only from these. \\
-    \tiertwo{} & One counting algorithm, decorrelated and cross-checked:
-    full chain-reproduction of all prior terms on every run; agreement of
-    the top height strata with \emph{held-out} diagonal closed forms $P_k$
-    (fitted on earlier terms, predicting cells of later ones); and, where
-    one was run, an independent recount on a second architecture and
-    compiler---coverage varies by term and is itemized in
-    Section~\ref{sec:confirm}. Covers $a(23)$--$a(38)$ and the symmetry
-    counts $25\le n\le32$. \\
+    Redelmeier enumeration against the transfer matrix), the symmetry counts
+    to $n=24$, and everything derived only from these. \\
+    \tiertwo{} & One counting algorithm, decorrelated: full
+    chain-reproduction of all prior terms on every run, \emph{held-out}
+    diagonal closed forms predicting the top height strata, and
+    second-architecture recounts where they were run
+    (Section~\ref{sec:confirm} itemizes the coverage). Covers
+    $a(23)$--$a(38)$ and the symmetry counts $25\le n\le32$. \\
     \tiertwominus{} & \tiertwo{} \emph{minus} the held-out diagonal check.
-    Covers the final two terms, $a(39)$ and $a(40)$: their top real-swept
-    strata lie on diagonal $k=19$, whose closed form $P_{19}$ has no
-    independent holdout---and, the sequence closing at $a(40)$, never
-    will. Two narrower checks partly compensate
-    (Section~\ref{sec:confirm}), but the top cells themselves remain
-    unchecked by any closed form. The tag exists so the weaker standard is
-    never silently absorbed into \tiertwo{}. \\
-    \tierthree{} & Exact computation composed with the fitted diagonal-mirror
-    $P_k$ of Section~\ref{sec:dmdiag}, each pinned with holdout hits and
-    confirmed forward on strips computed after pinning. The law's
-    quasi-polynomial shape and degree are \emph{proved}; what remains
-    empirical is the onset, so an onset shift beyond the pinned range is
-    the one surviving risk. Used for the $n=33$ companions; no
+    Covers $a(39)$ and $a(40)$, whose top real-swept strata lie on the one
+    diagonal that no holdout can ever certify. The tag exists so the weaker
+    standard is never silently absorbed into \tiertwo{}. \\
+    \tierthree{} & Exact computation composed with a closed form that is
+    fitted rather than derived. Used only for the $n=33$ companions; no
     \tierthree{} value appears in this paper without its label. \\
     \bottomrule
   \end{tabular}
@@ -439,10 +429,8 @@ holding the cell's connected-component label ($0$ for empty), with labels
 \emph{canonically renumbered in first-occurrence order} after every
 transition---the normalization that prevents equivalent partitions from
 proliferating as distinct states---plus the two touch flags; the value
-attached to a state is its vector of counts by size. States live in a flat
-open-addressing hash map keyed by that string (about $300$ bytes per state
-including counts at production sizes). The full layout is in the release's
-\texttt{core/signature.h}.
+attached to a state is its vector of counts by size (layout in
+\texttt{core/signature.h}).
 
 Method B confirmed $a(19)$ against Method A (byte-identical totals) and
 carried the sequence into the early twenties before its state space---which
@@ -579,12 +567,11 @@ The two engines agree---live, in the release's test gate---for every type at
 small $n$, and byte-identical at the $n=24$ oracle; beyond $n=24$ the
 transfer-matrix values are single-algorithm (\tiertwo{}), validated by prefix
 against the oracle range on every run. The diagonal-mirror sweep is the
-expensive one (its bounding box is forced square, so the frontier compresses
-least); its production form stores the frontier in flat sharded arrays with
-ranged count vectors, and farms disjoint exact-bounding-box strips across
-machines, the partial totals summing exactly by construction; the completed
-$n=32$ farm (32 strips across two machines) prefix-matches both the
-$n\le24$ oracle range and the earlier $n\le28$ run exactly.
+expensive one---its bounding box is forced square, so the frontier
+compresses least---and it is farmed across machines as disjoint
+exact-bounding-box strips whose partial totals sum exactly by construction;
+the completed $n=32$ farm prefix-matches both the $n\le24$ oracle range and
+the earlier $n\le28$ run exactly.
 
 \subsection{Method E: diagonal closed forms}
 \label{sec:methodE}
@@ -599,9 +586,7 @@ the production engine---a polynomial pinned on terms $\le n_0$ that
 predicts a frontier cell of term $n_0{+}1$ exactly is evidence no
 single-engine recount can provide, and that role survives the law being
 proved, since a theorem about the triangle does not validate a program that
-computes it. The same idea on the diagonal-mirror triangle yields the
-quasi-polynomials that assist the $n=33$ companions (\tierthree{} when
-used).
+computes it.
 
 \section{Validation architecture}
 \label{sec:confirm}
@@ -674,14 +659,12 @@ designed around the weakest link at each stage.
         diagonal at $n=2$, a doubled count at $n=1$, a prune off-by-one at
         $n=10$) while a provably count-preserving change survives---the
         checks fail on wrong programs and pass on right ones.
-  \item \textbf{Hygiene.} Every engine---the legacy oracles and the
-        production map/merge workers (both the column and cell-at-a-time
-        kernels)---is AddressSanitizer/UBSan clean at gate scale (small
-        $n$, against fixtures; the sanitizer build compiles the same
-        source the $-O3$ production binary does, unmodified); the
-        multithreaded paths are bit-identical to serial; every kept result
-        traces to a clean-tree commit stamp in a provenance ledger, and the
-        cross-checks are encoded as gates that run before release.
+  \item \textbf{Hygiene.} Every engine is AddressSanitizer/UBSan clean at
+        gate scale, the sanitizer build compiling the same source the
+        $-O3$ production binary does; the multithreaded paths are
+        bit-identical to serial; every kept result traces to a clean-tree
+        commit stamp in a provenance ledger; and the cross-checks are
+        encoded as gates that run before release.
 \end{itemize}
 
 \section{The diagonal structure of king-animal triangles}
@@ -1127,12 +1110,10 @@ was reproduced on a second architecture byte-identically. As an example,
   G_3(x)=\frac{9x^3-8x^4-2x^5+4x^6+x^7}{1-7x+15x^2-9x^3-3x^4+5x^5-x^6-x^7}.
 \]
 
-\paragraph{Hole-resolved.}
-Refining by hole count keeps each fixed-$(H,k)$ row C-finite: we recover
-$G_{H,k}$ for $H\le6$ (all reachable $k$), the rows $k\le2$ at $H=7$, and the
-row $k=0$ at $H=8$, each validated against a fresh prime. The rationality is genuinely a fixed-height
-phenomenon: the two-variable array is provably not D-finite, as we now
-show.
+Refining by hole count keeps each fixed-$(H,k)$ row C-finite, and those
+generating functions are recovered too, through $H\le6$. The rationality is
+genuinely a fixed-height phenomenon: the two-variable array is provably not
+D-finite, as we now show.
 
 \subsection{The by-height generating function is not D-finite}
 \label{sec:notdfinite}
@@ -1209,15 +1190,12 @@ vanishes as a polynomial in $N$, i.e.\ the top face is identically zero.
 The next face becomes the top and the same levels kill it in turn; all
 faces vanish, so all $p_i=0$ --- a contradiction. $\square$
 
-Corroboration beyond the abstract argument: the new-root contents of the
-ten exact denominators have degrees $1,2,4,9,29,68,181,462,1254,3289$, and
-the first eight are certified irreducible over $\mathbb Q$ (single- and
-multi-prime factorization certificates), so
-$\deg_{\mathbb Q}\mu_8=462$ already---the degree growth that (iv)
-guarantees abstractly is visible concretely at rate
-$\approx\sqrt\lambda$ per level. The argument uses only integer counts,
-per-height rationality, and strictly increasing bounded strip constants,
-so it applies verbatim to fixed polyominoes, polyhexes, and polyiamonds by
+The abstract degree growth is visible concretely: the new-root contents of
+the ten exact denominators have degrees $1,2,4,9,29,68,181,462,1254,3289$,
+the first eight certified irreducible over $\mathbb Q$, so
+$\deg_{\mathbb Q}\mu_8=462$ already. The argument uses only integer counts,
+per-height rationality, and strictly increasing bounded strip constants, so
+it applies verbatim to fixed polyominoes, polyhexes, and polyiamonds by
 height.
 
 \paragraph{Relation to existing work.}
@@ -1249,29 +1227,27 @@ Northcott finiteness on a family of slice growth constants; a literature
 search cannot establish absence, so we claim the argument as ours with
 that qualification and nothing stronger.
 
-One limitation deserves recording. Klazar~\cite{klazar} proves
-non-holonomicity for a class of divergent series after enlarging the target
-from D-finite to $D_A$-finite --- analytic rather than polynomial
-coefficients --- on the ground that polynomiality was never carrying the
+One limitation deserves recording. Klazar~\cite{klazar} enlarges the target
+from D-finite to $D_A$-finite---analytic rather than polynomial
+coefficients---on the ground that polynomiality was never carrying his
 argument. Ours admits no such enlargement: the step ``a polynomial over
 $\mathbb Q$ of degree $\le D$ cannot vanish at an algebraic number of degree
-exceeding $D$'' \emph{is} the dichotomy, and an analytic coefficient may
-vanish at $1/\mu_{H_0}$ without vanishing identically.
-Theorem~\ref{thm:notdfinite} is therefore a statement about D-finiteness
-over $\mathbb Q(x)$ and does not reach $D_A$-finiteness. The isotropic
-$a(x)$ remains open, exactly as in the polygon setting.
+exceeding $D$'' \emph{is} the dichotomy. Theorem~\ref{thm:notdfinite} is
+therefore about D-finiteness over $\mathbb Q(x)$ and does not reach
+$D_A$-finiteness; the isotropic $a(x)$ remains open, as in the polygon
+setting.
 
 \paragraph{Rigorous lower bounds.}
 Summing the fixed-height GFs gives $a(n)\ge\sum_{H\le 10}T(n,H)$ exactly for
-any $n$, by extracting coefficients from rational functions. Each of these
-bounds was computed while its term was still out of reach:
-$a(25)\ge\num{6657105903966723073}$, $a(35)\ge5.07\times10^{26}$, and
-$a(40)\ge\num{4266005101622209395058618248135}$ (an exact integer from
-rational arithmetic, stated in an earlier draft). All three are confirmed
-by the values Method~C produced later---a retrospective certification of
-the GF machinery. The capture fraction shrinks as taller strips dominate
-($44\%$ of the exact value at $n=25$, $7.5\%$ at $n=40$), but the bound
-remains available, exactly, for any $n$ beyond the final computed term
+any $n$, by extracting coefficients from rational functions. The bounds for
+$a(25)$, $a(35)$ and $a(40)$ were each computed while that term was still
+out of reach---the last of them
+$a(40)\ge\num{4266005101622209395058618248135}$, an exact integer from
+rational arithmetic---and all three are confirmed by the values Method~C
+produced later, a retrospective certification of the GF machinery. The
+capture fraction shrinks as taller strips dominate ($44\%$ of the exact
+value at $n=25$, $7.5\%$ at $n=40$), but the bound remains available,
+exactly, for any $n$ past the final computed term
 (\texttt{paper/gf\_bound.py}).
 
 \section{Reach and limits}
