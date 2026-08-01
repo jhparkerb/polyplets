@@ -863,14 +863,11 @@ that agree exactly.
   stated onsets. Every polynomial except $k=5$ odd was pinned by exact
   differencing on the highest-$S$ points, required to reproduce all earlier
   in-regime points (holdout), and confirmed on strips computed after
-  pinning ($P_4$ odd pinned by the $n=32$ farm's $S=23$ strip; $P_4$ even
-  also by two independent methods that agree exactly; $P_5$ even pinned by
-  the $n=33$ farm's $k=5$ points, identically reproducing the earlier
-  cumulant-form fit). The one entry marked $^\dagger$ ($k=5$ odd) is
-  fitted through the repository's exp-fitter with $7$ exact surplus
-  witnesses (a fit first made with $4$ witnesses and left unchanged by
-  the strips that landed afterwards) and should be treated as one grade
-  weaker than the pinned rows.}
+  pinning---$P_4$ even by two independent methods that agree exactly, $P_5$
+  even reproducing an earlier cumulant-form fit identically. The one entry
+  marked $^\dagger$ ($k=5$ odd) is instead fitted, with $7$ exact surplus
+  witnesses, and should be treated as one grade weaker than the pinned
+  rows.}
   \label{tab:dmpk}
 \end{table}
 
@@ -898,14 +895,12 @@ The integer numerators, for the record:
 \end{align*}
 ($N_5$ rests in part on the fitted $P_5$-odd row of Table~\ref{tab:dmpk},
 so it remains one grade weaker; $N_4$ is fully pinned).
-The boundary condition $N_k(\pm1)=(\pm2)^k$ was at
-no point imposed on any fit: the fitter solves only for polynomial
-coefficients against exact diagonal counts, and the boundary values
-\emph{emerged} from its output, exactly as they hold on the pinned rows
-$k\le4$---where every coefficient is fixed by exact differencing with
-surplus holdout points and no overfitting account is available. Its
-status is an observed regularity across levels $k=1..5$, with the caveat
-that at $k=5$ it is only as trustworthy as the fitted row itself.
+The boundary condition $N_k(\pm1)=(\pm2)^k$ was never imposed on any
+fit---the fitter solves only for polynomial coefficients against exact
+diagonal counts---and it holds on the fully pinned rows $k\le4$, where
+every coefficient is fixed by exact differencing with surplus holdout
+points. Its status is an observed regularity across $k=1..5$, no stronger
+at $k=5$ than the fitted row itself.
 The boundary values say the dominant single-defect family has two species per
 odd footprint; the next layer of the peeled numerators follows linear-in-$k$
 laws, the signature of interacting defect pairs. Exact overdetermined
@@ -913,21 +908,10 @@ elimination \emph{refutes} any low-order bivariate rational closure across
 $k$ (each level carries genuinely new defect species), and the parity
 structure of the $k=3$ level refutes the naive two-ground-state defect gas:
 additional length-free families (anti-diagonal excursions crossing the main
-spine) are present. A proof is not attempted, and we are explicit about
-what one would require. The natural strategy is a decomposition argument:
-show that every sufficiently large animal on this diagonal splits, in
-exactly one way, into a bounded set of local pieces (stretches of clean
-diagonal, the excursions above, and small clusters carrying the $k$ extra
-cells), so that counting animals reduces to counting arrangements of pieces
-along a line. Decompositions of that kind yield rational generating
-functions; but rationality alone does not give quasi-polynomiality---for
-that, every pole of $G_k$ must lie at a root of unity, and the specific law
-observed here demands the poles sit at $x=\pm1$ with multiplicities exactly
-$k{+}1$ and $k$. Nothing in the decomposition picture forces those
-multiplicities; they are measured facts a proof must reproduce from the
-count of independent free lengths available at weight $k$. This program
-has now been carried out for both triangles. For the \emph{height}
-triangle it is Theorem~\ref{thm:diaglaw}. For this triangle, the
+spine) are present.
+
+The shape, however, is a theorem, by the same programme that
+Theorem~\ref{thm:diaglaw} carries out for the height triangle. Here the
 decomposition is a \emph{segment grammar}: reading rows, an animal at
 surplus $k$ splits into at most $2k{+}1$ perfect diagonal/anti-diagonal
 segments joined at defect clusters, with at most $2k$ direction reversals
@@ -944,9 +928,9 @@ What the proof does \emph{not} deliver is the sharp onset
 remain validated data. Full write-up with the honest lemma-by-lemma
 grading: \texttt{docs/proofs/dm-diagonal-law.md}.
 
-The specific polynomials of Section~\ref{sec:dmdiag} are computed and
-validated (the law's shape is proved as described above). Its
-practical role is sharp: the sparse strips ($S\ge29$ at $n\ge33$) are
+The polynomials themselves remain computed and validated rather than
+derived. Their practical role is sharp: the sparse strips ($S\ge29$ at
+$n\ge33$) are
 precisely the RAM-expensive ones---one strip burned $\sim$$62$ CPU-hours and
 $79$\,GB to produce the two numbers $d(31,31)=2$, $d(31,32)=38$ that $P_0$
 and $P_1$ now give for free---so the pinned polynomials replace exactly the
