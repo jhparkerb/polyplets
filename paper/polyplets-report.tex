@@ -51,40 +51,37 @@ cells, previously known through $n=18$. We report twenty-two new terms, through
 \[
   a(40) = \num{56749893611764175164545926946127},
 \]
-each computed from scratch and reproducing every prior term. Because claims of
-this kind are only as good as their verification, every number in this paper
+each computed from scratch and reproducing every prior term. Every number
 carries an explicit confidence tier: $a(1)$--$a(22)$ are confirmed by two
 algorithms sharing no counting logic (direct enumeration and the transfer
-matrix); $a(23)$--$a(40)$ by a single algorithm family
-cross-checked per term against held-out
-closed forms for the top diagonals of the height triangle (once certified by
-a live held-out prediction, those forms also supply the tallest, sparsest
-strata---$4.1\%$ of $a(40)$ arrives through them, a dependency quantified
-exactly in the text); the top real diagonal of the final two terms has no
-held-out closed form---the sequence ends here, so none will exist---which we
-state rather than paper over. The one-sided companion A030233 is extended to
-$n=34$; the free, bilateral, and asymmetric companions (A030222, A030234,
-A030235, A194596) to the reach of the diagonal-mirror symmetry count. Along the
-way the machinery yields structural results: closed forms for the diagonals
-of the height triangle (an exponential/cumulant law with two new constants
-per level, whose polynomial-times-power-of-three shape, onset, and
-integrality are \emph{proved} here by an exact walk-plus-clusters
-decomposition, the first five levels' constants derived ab initio from
-finite cluster counts), the triangle's mod-3 structure (an algebraic
-``spine cubic'' $W^3=W^2+t$ over $\mathbb F_3$ --- and both law and curve
-are proved lattice-universal, governing polyominoes and polyhexes with the
-prime set by the lattice's drift count), a
-quasi-polynomial law for the diagonals of the
-symmetric-fixed-point triangle, likewise with proved shape
-(period two, degree $k$, with
-generating-function numerators satisfying $N_k(\pm1)=(\pm2)^k$, $k\ge1$), a
-hole-count
-stratification of A006770, exact fixed-height generating functions, the
-extremal maximum hole area (proved exactly
-$\lfloor(n-2)^2/8\rceil$ for a single hole), and rigorous lower bounds on
-$a(n)$. Results computed and
-validated but not proved are labeled as such; all code, data, and a
-claim-verifier are released.
+matrix); $a(23)$--$a(38)$ by a single algorithm family, cross-checked per
+term against \emph{held-out} closed forms for the top diagonals of the
+height triangle; $a(39)$ and $a(40)$ lack that held-out check on their top
+swept stratum---the sequence ends here, so it will never exist---which we
+grade rather than paper over. The one-sided companion A030233 is extended to
+$n=34$, and the free, bilateral, and asymmetric companions (A030222,
+A030234, A030235, A194596) to $n=32$.
+
+The machinery also yields structural results. The diagonals of the height
+triangle obey an exponential/cumulant law whose shape---a polynomial of
+degree $k$ times $3^{\,n-1-3k}$, with its onset and integrality---is
+\emph{proved} here by an exact walk-plus-clusters decomposition, and is
+lattice-universal: the same law, and the same mod-$p$ ``spine cubic''
+$W^3=W^2+t$, govern polyominoes and polyhexes, with the prime set by the
+lattice's drift count. The diagonals of the diagonal-mirror symmetry
+triangle obey a period-two quasi-polynomial law, likewise proved in shape.
+The by-height generating function $\sum T(n,H)x^ny^H$ is \emph{not
+D-finite}, by a Northcott-style argument on the strip growth constants that
+is lighter than the existing haruspicy route and transports to polyominoes,
+polyhexes, and polyiamonds. We bracket the growth constant rigorously,
+$6.543\le\lambda\le9.3153$, both ends by machine-checkable exact
+certificates, the upper bound apparently the first recorded for this
+lattice (the numerical estimate is $\lambda\approx7.111$). Finally, A006770
+is stratified by hole count through $n=18$, and the largest area a single
+hole can enclose is proved to be exactly
+$\lfloor(n-2)^2/8+\tfrac12\rfloor$. Results computed and validated but not
+proved are labeled as such; all code, data, and a claim-verifier are
+released.
 \end{abstract}
 
 \section{Introduction}
@@ -122,29 +119,24 @@ these computations.
         asymmetric companions A030222, A030234, A030235, and A194596 to
         $n=32$ (Section~\ref{sec:companions}).
   \item Closed forms for the height-triangle diagonals $T(n,n-k)$,
-        $k\le18$, via an exponential/cumulant law whose shape (polynomial
-        of degree $k$ times $3^{\,n-1-3k}$, onset $n\ge2k+1$, integer
-        values) is \emph{proved} by an exact walk-plus-clusters
-        decomposition, with levels $k\le5$ derived ab initio from finite
-        cluster counts and the fitted levels holdout-validated; used both
-        to accelerate the sweeps and---critically---as \emph{held-out
-        per-term checks} of the frontier terms
-        (Sections~\ref{sec:diagonals}, \ref{sec:confirm}). The triangle
-        mod~3 is governed by an algebraic spine cubic, with the Smith
-        normal form of the diagonal-polynomial matrix determined; law and
-        cubic are lattice-universal
-        (Sections~\ref{sec:spine}, \ref{sec:universal}).
-  \item A quasi-polynomial law for the diagonals of the diagonal-mirror
-        symmetry triangle---period two, degree $k$---whose shape is likewise
-        \emph{proved} (segment grammar + one-parameter lattice-point
-        counting; onset and pole multiplicities remain validated data),
-        with pinned polynomials, forward confirmations, and
-        generating-function structure (Section~\ref{sec:diagonals}).
-  \item A hole-count stratification of A006770 exact through $n=18$, the
-        extremal hole area (single-hole maximum proved exactly
-        $\lfloor(n-2)^2/8\rceil$, two-sided), exact fixed-height generating
-        functions for $H\le10$, and rigorous lower bounds
-        (Sections~\ref{sec:holes}--\ref{sec:gf}).
+        $k\le18$, via an exponential/cumulant law whose shape is
+        \emph{proved} by an exact walk-plus-clusters decomposition
+        (Theorem~\ref{thm:diaglaw}), and which is lattice-universal, as is
+        the algebraic ``spine cubic'' governing the triangle mod~3
+        (Sections~\ref{sec:heightdiag}--\ref{sec:universal}). The same
+        forms double as \emph{held-out per-term checks} of the frontier
+        terms (Section~\ref{sec:confirm}).
+  \item A period-two quasi-polynomial law for the diagonals of the
+        diagonal-mirror symmetry triangle, whose shape is likewise
+        \emph{proved}, with pinned polynomials and generating-function
+        structure (Section~\ref{sec:dmdiag}).
+  \item A proof that the by-height generating function is \emph{not}
+        D-finite (Theorem~\ref{thm:notdfinite}), and a rigorous two-sided
+        bracket $6.543\le\lambda\le9.3153$ from exact certificates at both
+        ends (Sections~\ref{sec:result}, \ref{sec:notdfinite}).
+  \item A hole-count stratification of A006770 exact through $n=18$, and
+        the single-hole maximum enclosed area, proved exactly
+        $\lfloor(n-2)^2/8+\tfrac12\rfloor$ (Section~\ref{sec:holes}).
 \end{enumerate}
 
 \paragraph{Confidence tiers.}
@@ -167,35 +159,26 @@ later terms rest on decorrelation rather than algorithmic independence.
     \tiertwo{} & One counting algorithm, decorrelated and cross-checked:
     full chain-reproduction of all prior terms on every run; agreement of
     the top height strata with \emph{held-out} diagonal closed forms $P_k$
-    (fitted on earlier terms, predicting cells of later ones); independent
-    recount on a second architecture/compiler where one was run (the
-    coverage varies by term and is itemized honestly in
-    Section~\ref{sec:confirm}: full at $a(34)$, partial at $a(35)$, split
-    at $a(36)$, absent for $a(37)$--$a(40)$, which are single-machine and
-    rest on the held-out closed-form checks); modular/CRT internal
-    consistency. Covers $a(23)$--$a(38)$ and the symmetry counts
-    $25\le n\le32$. \\
+    (fitted on earlier terms, predicting cells of later ones); and, where
+    one was run, an independent recount on a second architecture and
+    compiler---coverage varies by term and is itemized in
+    Section~\ref{sec:confirm}. Covers $a(23)$--$a(38)$ and the symmetry
+    counts $25\le n\le32$. \\
     \tiertwominus{} & \tiertwo{} \emph{minus} the held-out diagonal check.
     Covers the final two terms, $a(39)$ and $a(40)$: their top real-swept
-    strata $T(39,20)$ and $T(40,21)$ lie on diagonal $k=19$, whose closed
-    form $P_{19}$ has no independent holdout---and, the sequence closing at
-    $a(40)$, never will. The gap is narrowed by two checks described in
-    Section~\ref{sec:confirm} (the same $H=21$ sweep that produced
-    $T(40,21)$ reproduced nineteen independent closed-form predictions on
-    its other rows, and the $H=20$ column was re-swept standalone,
-    byte-identically), but the top cells themselves remain unchecked by
-    any closed form. The tag exists so the weaker standard is never
-    silently absorbed into \tiertwo{}. \\
+    strata lie on diagonal $k=19$, whose closed form $P_{19}$ has no
+    independent holdout---and, the sequence closing at $a(40)$, never
+    will. Two narrower checks partly compensate
+    (Section~\ref{sec:confirm}), but the top cells themselves remain
+    unchecked by any closed form. The tag exists so the weaker standard is
+    never silently absorbed into \tiertwo{}. \\
     \tierthree{} & Exact computation composed with the fitted diagonal-mirror
-    $P_k$ of Section~\ref{sec:diagonals} (each pinned with holdout hits and
-    confirmed forward on strips computed after pinning). The law's
-    quasi-polynomial shape and degree are now \emph{proved}, which
-    eliminates the degree-transition failure mode; what remains empirical
-    is the onset value, so an onset shift beyond the pinned range is the
-    one surviving (and bounded) risk. Used for the
-    $n=33$ companions ($D(33)$ and the four $D$-dependent values); no
-    \tierthree{} value is presented as established in this paper without
-    its label. \\
+    $P_k$ of Section~\ref{sec:dmdiag}, each pinned with holdout hits and
+    confirmed forward on strips computed after pinning. The law's
+    quasi-polynomial shape and degree are \emph{proved}; what remains
+    empirical is the onset, so an onset shift beyond the pinned range is
+    the one surviving risk. Used for the $n=33$ companions; no
+    \tierthree{} value appears in this paper without its label. \\
     \bottomrule
   \end{tabular}
   \caption{Confidence tiers used throughout. Conservative reading: \tierone{}
@@ -215,10 +198,10 @@ polyomino is a polyplet but not conversely: two cells touching only at a corner
 form a polyplet and not a polyomino. One subtlety: a
 polyplet connected \emph{purely} by diagonals lives on a single checkerboard
 colour class, itself a square lattice, so such a shape is a polyomino in
-disguise. The remark is purely illustrative: the companion arithmetic of
-Section~\ref{sec:companions} operates on the full king-move class under
-$D_4$ and never decomposes by colour class. A genuinely king shape mixes
-edge and corner contacts.
+disguise; a genuinely king shape mixes edge and corner contacts. (The
+remark is illustrative only---the companion arithmetic of
+Section~\ref{sec:companions} works on the full king-move class under $D_4$
+and never decomposes by colour class.)
 
 Animals are counted \textbf{fixed} (up to translation; rotations and
 reflections distinct), \textbf{one-sided} (up to translation and rotation), or
