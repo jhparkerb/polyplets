@@ -283,19 +283,13 @@ without rerunning the search that found it. Carrying the ladder to $H=17$
   \lambda \;\ge\; \mu_{17} \;\ge\; 6.543 ,
 \]
 with certificates at every rung from the independent anchor
-$\mu_2=1+\sqrt2$ upward ($\mu_{11}\ge5.9916957$, $\mu_{15}\ge6.443532$,
-$\mu_{16}\ge6.4984$). The ladder converges to $\lambda$ from below but
+$\mu_2=1+\sqrt2$ upward. The ladder converges to $\lambda$ from below but
 slowly---the rungs gain about $0.05$ each while cost grows ${\sim}3.5\times$
 per rung, reaching $11.8$\,GB at $H=17$---so it is stopped here rather than
-exhausted.
-
-For comparison, a closed-form bound needing no computation at all comes
-from a solvable subclass: the \emph{directed} king animals of
-Bacher~\cite{bacher} (OEIS A047781), counted by
-$\tfrac14\!\left((1+t)/\sqrt{1-6t+t^{2}}-1\right)$, have dominant
-singularity $t=3-2\sqrt2$, giving $\lambda\ge3+2\sqrt2\approx5.828$; his
-multi-directed subclass sharpens this to $\lambda\gtrsim6.475$ numerically
-(Corollary~12). Both are superseded by the certified ladder.
+exhausted. It supersedes the closed-form bound available from a solvable
+subclass, Bacher's directed king animals~\cite{bacher}, whose dominant
+singularity gives $\lambda\ge3+2\sqrt2\approx5.828$ with no computation at
+all ($\lambda\gtrsim6.475$ numerically for his multi-directed subclass).
 
 \paragraph{A rigorous upper bound on $\lambda$.}
 No upper bound on $\lambda$ appears in the literature. We obtain one by a
@@ -313,12 +307,10 @@ gives
 \]
 verified with no floating point in the deductive chain. Together with the
 certified strip ladder this brackets the growth constant two-sided,
-$6.543 \le \lambda \le 20000/2147$, i.e.\ $6.543 \le \lambda \le 9.3153$,
-consistent with the numerical estimate $\lambda\approx7.111$. Both ends are
-machine-checkable in exact arithmetic. The gap reflects a
-structural limit: the convolution over-count grows with animal size (distant
-overlaps between the two factors), so finite-type methods of this class floor
-strictly above $\lambda$.
+$6.543 \le \lambda \le 9.3153$, both ends machine-checkable in exact
+arithmetic and consistent with the estimate $\lambda\approx7.111$. The gap
+reflects a structural limit: the convolution over-count grows with animal
+size, so finite-type methods of this class floor strictly above $\lambda$.
 
 \paragraph{One-sided companion.}
 The one-sided count (A030233) needs, besides the fixed count, only the
