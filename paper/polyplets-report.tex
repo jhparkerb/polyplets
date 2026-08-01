@@ -262,28 +262,23 @@ $a(23)$--$a(38)$ are \tiertwo{}; $a(39)$ and $a(40)$ are \tiertwominus{}
 \paragraph{Growth.}
 The successive ratios $r_n=a(n)/a(n{-}1)$ climb slowly:
 $r_{20}\approx6.765$, $r_{27}\approx6.853$, $r_{34}\approx6.905$,
-$r_{40}\approx6.935$. Fitting
-the two-parameter ansatz $r_n=\lambda(1+\theta/n)$ by least squares over
-trailing windows gives $\lambda=7.102$, $7.104$, $7.106$, $7.107$ (with
-$\theta$ between $-0.95$ and $-0.96$) for windows starting at $n=10$, $15$,
-$20$, $25$ and ending at $40$; the upward drift with window start is the
-signature of an unmodelled confluent correction. Refitting with a confluent
-term, $r_n=\lambda(1+\theta/n+c/n^{1+\Delta_1})$, with $\Delta_1$ scanned on
-a grid, the exponent $\Delta_1=\tfrac12$ gives the smallest residuals on
-every window (by factors from ${\sim}4$ on the shortest window to
-${\sim}140$ on the longest) and removes the drift:
-$\lambda=7.1108$--$7.1111$ across the same
-four windows, with $\theta$ between $-1.02$ and $-1.03$---consistent with
-the universal two-dimensional lattice-animal value
-$\theta=-1$~\cite{jensen2001}, which the fit was free to miss. An
-independent first-order differential-approximant analysis of the series
-(calibrated to recover $\lambda$ and $\theta$ exactly from synthetic
-$n^\theta\lambda^n$ data, and stable across rescaling and the number of
-trailing terms used) locates the dominant singularity at
-$\lambda=7.110$ with exponent $\theta=-1.000$, corroborating both the
-estimate and the universal $\theta=-1$ by a route independent of the
-ratio fit. We accordingly estimate $\lambda\approx7.111$; this is an
-estimate, not a rigorous bound---the rigorous two-sided bracket follows.
+$r_{40}\approx6.935$. Least-squares fits of the two-parameter ansatz
+$r_n=\lambda(1+\theta/n)$ over trailing windows starting at $n=10$, $15$,
+$20$, $25$ give $\lambda=7.102$, $7.104$, $7.106$, $7.107$ ($\theta$
+between $-0.95$ and $-0.96$); the upward drift with window start is the
+signature of an unmodelled confluent correction. Adding a confluent term
+$c/n^{1+\Delta_1}$ and scanning $\Delta_1$, the exponent
+$\Delta_1=\tfrac12$ gives the smallest residuals on every window (by
+factors of ${\sim}4$ to ${\sim}140$) and removes the drift:
+$\lambda=7.1108$--$7.1111$ across the same four windows, with $\theta$
+between $-1.02$ and $-1.03$---consistent with the universal
+two-dimensional lattice-animal value $\theta=-1$~\cite{jensen2001}, which
+the fit was free to miss. A first-order differential-approximant analysis
+(calibrated on synthetic $n^\theta\lambda^n$ data and stable across
+rescalings and the number of trailing terms used) independently locates
+the dominant singularity at $\lambda=7.110$ with exponent
+$\theta=-1.000$. We accordingly estimate $\lambda\approx7.111$---an
+estimate, not a rigorous bound; the two-sided bracket follows.
 
 \paragraph{A rigorous lower bound on $\lambda$.}
 Polyplets of bounding-box height at most $H$ are a subfamily of all
@@ -309,13 +304,13 @@ slowly---the rungs gain about $0.05$ each while cost grows ${\sim}3.5\times$
 per rung, reaching $11.8$\,GB at $H=17$---so it is stopped here rather than
 exhausted.
 
-A weaker but closed-form bound comes from a solvable subclass: the
-\emph{directed} king animals of Bacher~\cite{bacher} (OEIS A047781), counted
-by $\tfrac14\!\left((1+t)/\sqrt{1-6t+t^{2}}-1\right)$, whose dominant
-singularity at $t=3-2\sqrt2$ gives $\lambda\ge3+2\sqrt2\approx5.828$ with no
-computation at all; Bacher's multi-directed subclass sharpens this to
-$\lambda\gtrsim6.475$ numerically (Corollary~12). Both are superseded by the
-certified ladder and are recorded here only as the closed-form comparison.
+For comparison, a closed-form bound needing no computation at all comes
+from a solvable subclass: the \emph{directed} king animals of
+Bacher~\cite{bacher} (OEIS A047781), counted by
+$\tfrac14\!\left((1+t)/\sqrt{1-6t+t^{2}}-1\right)$, have dominant
+singularity $t=3-2\sqrt2$, giving $\lambda\ge3+2\sqrt2\approx5.828$; his
+multi-directed subclass sharpens this to $\lambda\gtrsim6.475$ numerically
+(Corollary~12). Both are superseded by the certified ladder.
 
 \paragraph{A rigorous upper bound on $\lambda$.}
 No upper bound on $\lambda$ appears in the literature. We obtain one by a
@@ -338,8 +333,7 @@ consistent with the numerical estimate $\lambda\approx7.111$. Both ends are
 machine-checkable in exact arithmetic. The gap reflects a
 structural limit: the convolution over-count grows with animal size (distant
 overlaps between the two factors), so finite-type methods of this class floor
-strictly above $\lambda$; the crude decision-tree bound $\lambda\le5^5/4^4\approx
-12.2$ is superseded.
+strictly above $\lambda$.
 
 \paragraph{One-sided companion.}
 The one-sided count (A030233) needs, besides the fixed count, only the
@@ -1384,22 +1378,16 @@ $a(x)$ remains open, exactly as in the polygon setting.
 
 \paragraph{Rigorous lower bounds.}
 Summing the fixed-height GFs gives $a(n)\ge\sum_{H\le 10}T(n,H)$ exactly for
-any $n$, by extracting coefficients from rational functions. When this bound
-was computed, $a(25)$ was out of reach and the bound gave
-$a(25)\ge\num{6657105903966723073}$; the exact value
-$\num{14994811325186658577}$, computed later by Method~C, confirms it---a
-retrospective certification of the GF machinery. The bound remains
-available for any $n$, though its capture fraction shrinks as taller
-strips dominate: $44\%$ of the exact value at $n=25$, $16\%$ at $n=34$.
-(When first computed the bound gave $a(35)\ge5.07\times10^{26}$,
-comfortably under the value $\num{3561147281381782175236253062}$ later
-computed by Method~C; likewise its
-$a(40)\ge\num{4266005101622209395058618248135}$, an exact integer from
-rational arithmetic, stated here in an earlier draft while $a(40)$ was
-still out of reach, is confirmed by the now-exact value---the bound
-captures $7.5\%$ of it. Both are retrospective certifications of the
-machinery.) Beyond the final computed term it still gives exact bounds
-for any $n$ (\texttt{paper/gf\_bound.py}).
+any $n$, by extracting coefficients from rational functions. Each of these
+bounds was computed while its term was still out of reach:
+$a(25)\ge\num{6657105903966723073}$, $a(35)\ge5.07\times10^{26}$, and
+$a(40)\ge\num{4266005101622209395058618248135}$ (an exact integer from
+rational arithmetic, stated in an earlier draft). All three are confirmed
+by the values Method~C produced later---a retrospective certification of
+the GF machinery. The capture fraction shrinks as taller strips dominate
+($44\%$ of the exact value at $n=25$, $7.5\%$ at $n=40$), but the bound
+remains available, exactly, for any $n$ beyond the final computed term
+(\texttt{paper/gf\_bound.py}).
 
 \section{Reach and limits}
 \label{sec:reach}
