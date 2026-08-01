@@ -57,3 +57,31 @@ animals" (2006); "...3: SAPs" (JCTA 2006). Also check: J. Bell / S. Gerhold
 / M. Mezzarobba-adjacent non-D-finiteness criteria; Guttmann's solvability
 tests; Bousquet-Melou anisotropic surveys. If truly absent, this is a
 publishable stand-alone note.
+
+**PARTIALLY DISCHARGED 2026-08-01 — and the target paper changed.** The
+D-finiteness *test* the Haruspicy papers use is not in Haruspicy 1. Both
+Haruspicy 2 (Theorem 15) and Haruspicy 3 (Theorem 5) attribute it verbatim
+to **Bousquet-Melou & Rechnitzer, "Lattice animals and heaps of dimers,"
+Discrete Math. 258 (2002) 235-274, Lemma 9** — which is free from
+labri.fr/perso/bousquet and is now in `papers/` along with both Haruspicy
+papers (arXiv math/0406450, math/0408054). Side-by-side comparison against
+our dominant-pole dichotomy: `results/anisotropic-not-dfinite.md`. Summary:
+the opening move (extract y-coefficients from the ODE to get a linear
+recurrence with polynomial coefficients) is **shared and is theirs, 2002**;
+everything after diverges — their conclusion is topological (finitely many
+limit points of the whole pole set, via an asymptotic-in-n argument on the
+leading coefficient), ours is arithmetic and effective (a degree bound on
+one distinguished pole per slice, giving explicit (r,D) exclusion boxes).
+Northcott appears in neither.
+
+**Still open, and unresolvable by search:** whether the
+Northcott-on-growth-constants endgame appears elsewhere. Absence cannot be
+established from a database; the two remaining levers are (a) MathSciNet's
+citation graph on BM-R 2002 and the Haruspicy papers -- a weekday walk-in at
+Pitt Hillman or CMU Hunt, guest pass, read-only -- and (b) asking Rechnitzer
+(UBC) directly. jasonp's call; external contact is his alone.
+
+**Still wanted:** Haruspicy 1 itself (Adv. Appl. Math. 30 (2003) 228-257,
+Elsevier, no arXiv preprint found). It supplies the combinatorial
+section/density machinery behind Haruspicy 2's Theorem 1, not the test, so
+it is no longer blocking anything. **[low]**

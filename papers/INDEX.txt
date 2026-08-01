@@ -37,6 +37,26 @@ Polyomino/animal enumeration:
   efficient_enumeration_algorithms_2016.pdf  Efficient enumeration algorithms survey/paper (2016).
   tremblay_vernay.pdf                      Tremblay & Vernay, On the generation of discrete figures with connectivity constraints, RAIRO-TIA 58 (2024). (Source of A006770's a(18); cited in the OEIS entry.)
 
+Non-D-finiteness of anisotropic generating functions (the lineage our theorem sits in):
+  bousquet-melou_rechnitzer_2002_lattice_animals_heaps_of_dimers.pdf
+                                           Bousquet-Melou & Rechnitzer, Lattice animals and heaps of
+                                           dimers, Discrete Math. 258 (2002) 235-274. **Lemma 9 is the
+                                           source criterion**: if S(q,u) is D-finite in u with coefficients
+                                           rational in q, the union of the coefficients' pole sets has
+                                           finitely many limit points. Both Haruspicy papers cite this,
+                                           not Haruspicy 1, for the D-finiteness test. Free from
+                                           labri.fr/perso/bousquet (PostScript; converted here).
+  rechnitzer_2006_haruspicy2_sap_not_dfinite.pdf
+                                           Rechnitzer, Haruspicy 2: the anisotropic GF of self-avoiding
+                                           polygons is not D-finite, JCTA 113 (2006) 520-546
+                                           (arXiv math/0406450). Criterion restated as Theorem 15.
+  rechnitzer_2006_haruspicy3_bond_animals_not_dfinite.pdf
+                                           Rechnitzer, Haruspicy 3: the directed bond-animal GF is not
+                                           D-finite, JCTA (2006) (arXiv math/0408054). Same criterion as
+                                           Theorem 5. Haruspicy 1 (Adv. Appl. Math. 30 (2003) 228-257)
+                                           is still unobtained -- see MISSING.md -- but it supplies the
+                                           combinatorial section/density machinery, NOT the test.
+
 Distributed-computing background (engine design era):
   dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).
   afrati_dassarma_2013_mapreduce_cost_bounds.pdf  Afrati et al., MapReduce cost bounds.

@@ -175,3 +175,63 @@ before any external claim of novelty.
 **Status ledger for this document:** the quantified psi-boxes and the
 irreducibility certificates above remain as concrete effective content;
 the conditional statements are all retired.
+
+
+## Prior art, read and compared (2026-08-01)
+
+The novelty flag above sent us to the literature. Papers now held in
+`papers/`: Haruspicy 2 (arXiv math/0406450), Haruspicy 3 (math/0408054),
+and — the one that actually matters — **Bousquet-Melou & Rechnitzer,
+"Lattice animals and heaps of dimers," Discrete Math. 258 (2002) 235-274**,
+free from labri.fr/perso/bousquet.
+
+**First finding: we were chasing the wrong paper.** The D-finiteness test is
+not in Haruspicy 1. Haruspicy 2 states it as Theorem 15 "(from [4])" and
+Haruspicy 3 as Theorem 5 "(from [6])"; both references resolve to BM-R 2002,
+Lemma 9. Haruspicy 1 supplies the combinatorial section/density machinery
+(Haruspicy 2's Theorem 1), not the test.
+
+**Their criterion** (BM-R 2002, Lemma 9, verbatim modulo notation):
+
+> Let S(q,u) = sum_n S_n(q) u^n be a formal power series in u with
+> coefficients in C(q). Assume S(q,u) is D-finite in u. For n >= 0 let P_n
+> be the set of poles of S_n(q), and let P = union P_n. Then P has only a
+> finite number of limit points.
+
+Their proof: extract the coefficient of u^n from the ODE to get
+a_0(q,n)S_n = a_1(q,n)S_{n-1} + ... + a_k(q,n)S_{n-k} with a_i in C[q,n];
+so S_n has denominator I(q)·prod_m a_0(q,m). If l is a limit point there are
+(q_i, n_i) with q_i -> l, n_i -> infinity, a_0(q_i,n_i) = 0; dividing
+a_0 = sum_k b_k(q)n^k by n_i^d and letting i -> infinity gives b_d(l) = 0.
+So every limit point is a root of the fixed polynomial b_d. QED
+
+**Side by side with the dichotomy theorem above:**
+
+| | BM-R 2002, Lemma 9 | ours (dichotomy) |
+|---|---|---|
+| opening move | extract y-coefficients of the ODE => linear recurrence, polynomial coefficients | **identical** |
+| what is tracked | the *whole* pole set of every slice | *one* pole per slice, x = 1/mu_H |
+| finiteness input | topological: limit points of a subset of C | arithmetic: Northcott (bounded degree + bounded house) |
+| mechanism | asymptotic in n — divide by n^d, take the limit, hit the leading coefficient b_d | at a single level: lower faces regular at 1/mu_{H0} by strict monotonicity, so c_0 vanishes there; a degree-D polynomial over Q cannot kill an algebraic number of degree > D |
+| conclusion | qualitative: D-finite or not | **effective**: explicit (r, D) exclusion boxes |
+| input needed to apply | an explicit combinatorial description of the denominators (cyclotomic Psi_k from k-sections) | Perron-Frobenius monotonicity + any crude upper bound on lambda |
+
+**Honest reading.** Step 1 is theirs and dates to 2002 — extracting the
+coefficient relation is not ours to claim, and we should cite Lemma 9 for it
+rather than presenting the derivation as self-contained. Everything after
+step 1 diverges: they need all the poles and an accumulation argument in C,
+we need one distinguished pole and its degree over Q. The lightness of our
+hypotheses is the actual contribution — needing only monotonicity plus a
+crude bound is why the proof transports verbatim to polyominoes-by-height,
+polyhexes, polyiamonds, and any family with a column transfer matrix, where
+theirs needs a bespoke combinatorial denominator analysis per family.
+Northcott appears in neither paper.
+
+**What remains unresolved, permanently by this method.** Whether the
+Northcott endgame appears somewhere else cannot be settled by search —
+absence is not a database result. The claim should therefore be scoped so it
+does not rest on absence: assert the *lighter hypotheses* and the *effective
+boxes*, cite BM-R 2002 for the shared opening, and do not write "first."
+Two levers remain if a stronger statement is ever wanted: MathSciNet's
+citation graph on BM-R 2002 (read-only, weekday guest pass at Pitt Hillman or
+CMU Hunt), or asking Rechnitzer directly. Both jasonp's call.
