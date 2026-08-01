@@ -498,38 +498,25 @@ smaller $n$---so each new term arrives with a full-chain regression against
 everything already known, including the \tierone{} range.
 
 \paragraph{Which cells are computed and which are injected.}
-This must be stated exactly, because the headline totals contain both. For
+The headline totals contain both, so the split must be stated exactly. For
 $a(40)$, heights $3\le H\le21$ were swept for real ($95.9\%$ of the total);
 $H=1,2$ are elementary closed forms; and $H\ge22$---the diagonals
 $k\le18$---were \emph{injected} from the fitted closed forms of
 Section~\ref{sec:heightdiag}, contributing $4.1\%$ of $a(40)$. The
 analogous split holds for the preceding terms, the injection boundary
-advancing as each new $P_k$ is certified (at $a(30)$: real sweep
-$H\!=\!3$--$17$, closed forms elsewhere; at $a(36)$: real sweep
-$H\!=\!3$--$19$, injection $5.6\%$). The
-discipline governing injection is strict and uniform: a $P_k$ is fitted on
-real-swept cells of earlier terms, must reproduce every other real-swept
-cell on its diagonal (holdout), must then predict the \emph{next} term's
-real-swept cell on that diagonal exactly---the newest diagonal is always
-swept for real once more before its formula is trusted---and only after
-surviving that live prediction is it injected for subsequent terms. An
-injected formula failing at larger $n$ would therefore have to pass a
-genuine forward prediction and then break one term later without warning;
-possible, unproven-formula risk being what it is, but the exposure is
-quantified ($4.1\%$ of the frontier term) and every injected formula
-carries at least one live held-out success: the chain runs
-$P_{15}\to T(33,18)$, $P_{16}\to T(35,19)$, $P_{17}\to T(37,20)$,
-$P_{18}\to T(39,21)$, each formula predicting a real-swept cell of a term
-computed after it was pinned, and the $a(40)$ run's real $H=21$ sweep
-reproduced the closed-form predictions on \emph{all} of its rows
-$n=21$--$39$ simultaneously---every injected level re-confirmed at a
-fresh point in a single stroke. (The one formula with no independent
-holdout, $P_{19}$, fitted from the final two top cells, is \emph{never}
-injected; it is the absent check on the top swept cells of $a(39)$ and
-$a(40)$, the \tiertwominus{} grade of Section~\ref{sec:confirm}.) Readers
-who want totals free of any formula assistance may sum
+advancing as each new $P_k$ is certified (at $a(36)$: real sweep
+$H\!=\!3$--$19$, injection $5.6\%$); the range $n\le19$ contains no
+injected cells at all. The discipline governing injection is strict and
+uniform: a $P_k$ is fitted on real-swept cells of earlier terms, must
+reproduce every other real-swept cell on its diagonal (holdout), must then
+predict the \emph{next} term's real-swept cell on that diagonal
+exactly---the newest diagonal is always swept for real once more before its
+formula is trusted---and only after surviving that live prediction is it
+injected for subsequent terms. Section~\ref{sec:confirm} gives the
+resulting holdout chain, and the one formula that never earned injection.
+Readers who want totals free of any formula assistance may sum
 Table~\ref{tab:byheight40}'s rows $H\le21$ against the banked per-height
-data; the range $n\le19$ contains no injected cells at all.
+data.
 
 Table~\ref{tab:byheight40} gives the height decomposition of the frontier
 term with the computed/injected boundary as stated above.
@@ -611,20 +598,19 @@ $n\le24$ oracle range and the earlier $n\le28$ run exactly.
 \subsection{Method E: diagonal closed forms}
 \label{sec:methodE}
 
-The top diagonals of the height triangle---$T(n,n-k)$ for small $k$, the
-tallest, sparsest strips---are the most expensive cells of a sweep and the
-least populated. They have exact closed forms
-(Section~\ref{sec:diagonals}; the polynomial law is proved,
-Theorem~\ref{thm:diaglaw}): for each $k\le18$ a polynomial, fitted from
-two data points and then \emph{validated on held-out terms}, replaces the top
-real sweep height. Beyond the speedup, these closed forms are per-term
-independent checks of the production engine: a polynomial pinned on terms
-$\le n_0$ that predicts a frontier cell of term $n_0{+}1$ exactly is evidence
-no single-engine recount can provide---and that role survives the law being
+The top diagonals of the height triangle---$T(n,n-k)$ for small $k$---are a
+sweep's most expensive cells and its least populated. They have exact
+closed forms (Section~\ref{sec:heightdiag}; the polynomial law is proved,
+Theorem~\ref{thm:diaglaw}): for each $k\le18$ a polynomial, fitted from two
+data points and then validated on held-out terms, replaces the top real
+sweep height. Beyond the speedup they are per-term independent checks of
+the production engine---a polynomial pinned on terms $\le n_0$ that
+predicts a frontier cell of term $n_0{+}1$ exactly is evidence no
+single-engine recount can provide, and that role survives the law being
 proved, since a theorem about the triangle does not validate a program that
-computes it. The same idea applied to the
-diagonal-mirror triangle yields the quasi-polynomials that assist the
-$n=33$ companions (\tierthree{} when used).
+computes it. The same idea on the diagonal-mirror triangle yields the
+quasi-polynomials that assist the $n=33$ companions (\tierthree{} when
+used).
 
 \section{Validation architecture}
 \label{sec:confirm}
@@ -656,30 +642,26 @@ designed around the weakest link at each stage.
         $H=20$ column of $a(40)$ was re-swept standalone from a fresh
         checkpoint and is byte-identical, and the $H=21$ sweep carries the
         nineteen-row closed-form cross-check described next.
-  \item \textbf{Held-out diagonal closed forms.} For each $k$, $P_k$
-        was fitted on the smallest admissible terms and then required to
-        reproduce every later term's cell $T(n,n-k)$ exactly. The holdout
-        chain runs the full ladder: $P_{15}$, pinned before $a(33)$
-        existed, predicted $T(33,18)$ exactly; $P_{16}$, fitted on $a(33)$
-        and $a(34)$, predicted $T(35,19)$; $P_{17}$, fitted on $a(35)$ and
-        $a(36)$, predicted $T(37,20)$; and $P_{18}$, fitted on $a(37)$ and
-        $a(38)$, predicted $T(39,21)$. Each passed holdout retroactively
-        certifies the top cells its formula was fitted on (a degree-$k$
-        polynomial through a wrong fit point does not predict the next
-        term's cell exactly), which is what holds $a(33)$--$a(38)$ at
-        \tiertwo{}. The strongest single check came free with the final
-        term: the $a(40)$ run's real $H=21$ sweep---the tallest real sweep
-        of the project---reproduced the closed-form values
-        $P_k(n)\,3^{n-1-3k}$ on every one of its rows $n=21$--$39$
-        simultaneously, re-confirming all nineteen wired levels at a fresh
-        point each, in the very sweep that produced $T(40,21)$. The
-        \tiertwominus{} grade attaches to $a(39)$ and $a(40)$: their top
-        real cells $T(39,20)$ and $T(40,21)$ lie on diagonal $k=19$, and
-        $P_{19}$---fitted from exactly these two cells---has no
-        independent holdout, nor ever will, the sequence closing at
-        $a(40)$. As before, those top strata run the same code path the
-        lower $P_k$ certified (and, for $H=21$, a path checked on its
-        nineteen other rows); what lacks certification is the top cells
+  \item \textbf{Held-out diagonal closed forms.} Each $P_k$ was fitted on
+        the smallest admissible terms and then required to reproduce every
+        later term's cell $T(n,n-k)$ exactly. The chain runs the full
+        ladder---$P_{15}\to T(33,18)$, $P_{16}\to T(35,19)$,
+        $P_{17}\to T(37,20)$, $P_{18}\to T(39,21)$---each formula pinned
+        before the term it went on to predict existed. A passed holdout
+        retroactively certifies the top cells its formula was fitted on (a
+        degree-$k$ polynomial through a wrong fit point does not predict
+        the next term's cell exactly), which is what holds
+        $a(33)$--$a(38)$ at \tiertwo{}. The strongest single check came
+        free with the final term: the $a(40)$ run's real $H=21$ sweep
+        reproduced the closed-form values $P_k(n)\,3^{n-1-3k}$ on every one
+        of its rows $n=21$--$39$ simultaneously, re-confirming all nineteen
+        wired levels at a fresh point each, in the very sweep that produced
+        $T(40,21)$. The \tiertwominus{} grade attaches to $a(39)$ and
+        $a(40)$: their top real cells $T(39,20)$ and $T(40,21)$ lie on
+        diagonal $k=19$, and $P_{19}$---fitted from exactly these two
+        cells---has no independent holdout, nor ever will, the sequence
+        closing at $a(40)$. Those strata run the same code path the lower
+        $P_k$ certified; what lacks certification is the top cells
         themselves, not the path.
   \item \textbf{Modular consistency (design capability, not a production
         gate).} A residue-counter/CRT-reconstruction path exists and is
