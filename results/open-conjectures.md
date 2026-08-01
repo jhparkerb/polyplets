@@ -61,6 +61,24 @@ k!-minimality refuted — in `results/converse-sweep.md`, 2026-07-31.)
   an injection $\mathcal A_{n-1}\times\mathcal A_{n+1}\hookrightarrow\mathcal A_n
   \times\mathcal A_n$ (or a total-positivity property of the transfer matrix). No
   clean injection is known for lattice animals — finding one would be the theorem.
+- **Liu–Wang 2007 read (2026-08-01), and it sharpens *why* this is hard.**
+  `papers/liu_wang_2007_log_convexity_combinatorial_sequences.pdf` (Adv. Appl. Math.
+  39, 453–476) is the standard toolkit for log-convexity of combinatorial sequences.
+  It has exactly two kinds of tool, and **$a(n)$ is out of reach of both**:
+  (i) *closure operations* — log-convexity is preserved by componentwise sum,
+  binomial convolution, and the binomial and Stirling-of-the-second-kind transforms
+  (Davenport–Pólya and its corollaries), which requires building your sequence out
+  of already-log-convex ones; (ii) *three-term recurrences* — show $x_{n+1}/x_n$ is
+  increasing directly, which is how they do the central binomial coefficients,
+  Catalan, Motzkin, Fine, central Delannoy, and both Schröder families.
+  $a(n)$ has **no recurrence of any order** and **no construction from simpler
+  log-convex pieces** by those transforms. So the literature's entire apparatus
+  bottoms out in either a recurrence or a combinatorial decomposition, and C2 has
+  neither — which is the same wall as "no clean injection is known", seen from the
+  other side. The negative is now confirmed by reading rather than assumed.
+  Also checked and *not* applicable: Barequet–Ben-Shachar–Osegueda's concatenation
+  arguments, which give quasi sub-/super-multiplicativity (growth-constant bounds),
+  a different inequality from log-convexity.
 
 ## Theorems already set up (to prove together)
 

@@ -249,3 +249,40 @@ shorten the paper's sentence, it only edits a numeral in it, and the rung
 increments (~0.05) mean the ladder cannot approach `lambda` at any H we can
 build. The bracket is what it is. Recorded so the next person costs it in
 minutes instead of re-deriving the table.
+
+### Bevan–Brignall–Elvey Price–Pantone 2020, read (2026-08-01)
+
+`papers/bevan_brignall_pantone_2020_av1324_growth_rate_bounds.pdf`, EJC 88 (2020)
+103115. The last candidate that was not disqualified on sight — Av(1324)'s growth
+rate is per-object-size like `lambda`, not per-site, and permutation classes carry
+no locality constraint, so neither reason that killed Chan–Rechnitzer and the Oh
+cluster applies.
+
+**Their upper bound (Theorem 8, `gr(Av(1324)) <= 27/2`) is an injection into a
+labelled simpler class.** They map `Av_n(1324) -> {o,*}^n x D_n`: greedily grid the
+avoider in a descending `Av(213)`/`Av(132)` staircase, record one bit per point for
+which cell it landed in, and push the points into a two-cell "domino". The bit
+string lets you invert, so the map injects, and
+`gr <= 2 x gr(D) = 2 x 27/4 = 13.5`.
+
+**Verdict: the technique is generic, we are already inside it, and the part that
+made it win is an ingredient we do not have.** "Injectively encode each object as
+(bounded-alphabet label per element) x (member of a countable simpler class)" is
+exactly the family our own bounds live in — the crude king-Eden `5^5/4^4 = 12.2`
+and the Bui-style convolution `9.3153` are both over-counts of this shape. BBP's
+improvement came entirely from a bespoke structure theorem (Av(1324) sits inside an
+infinite staircase grid class) that let them take the simpler class to be something
+as small as dominoes. **There is no proposed structure theorem of that kind for
+polyplets, and nothing in this paper suggests one.** So this is a different sort of
+negative from the previous three: not "the method cannot apply", but "the method
+applies and we have no ingredient to feed it". If a structural characterisation of
+polyplets inside a smaller analyzable family ever turns up, this is the template to
+reach for.
+
+**Useful by-product — a calibration point for the paper.** Their rigorous bracket
+after decades of attention by many authors is `10.271 <= gr <= 13.5` around a
+numerical `mu ~ 11.60`: a ratio of **1.31**. Ours is `6.543 <= lambda <= 9.3153`
+around `7.111`: a ratio of **1.42**. A far more heavily studied problem, with a
+genuine structure theorem behind its bounds, lands in the same place. This is worth
+citing next to the paper's "the gap reflects a structural limit" sentence — it says
+the width of our bracket is normal for the genre, not a sign we stopped early.

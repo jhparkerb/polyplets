@@ -87,3 +87,33 @@ the a(40) close). Command: `python3 experiments/series_da.py`.
 (4 significant figures now stable across a 12-term window) and move θ by 1 unit in
 the 4th decimal. **λ = 7.110(1), θ = −1.000(1)** stands as the final-data statement;
 the 4th digit of λ is beyond what 40 terms resolve, exactly as it was at 36.
+
+## Caution from Conway–Guttmann–Zinn-Justin 2018 (read 2026-08-01)
+
+`papers/conway_guttmann_zinnjustin_2018_1324_revisited.pdf`, Adv. Appl. Math. 96
+(2018) 312–333. Pulled as a possible bounds paper; it is not one — it is a series
+analysis, and it is a cautionary one for us.
+
+With the generating function known to length 50, they conclude that 1324-avoiders
+do **not** have a simple power-law singularity. Their asymptotic form is
+
+    B * mu^n * mu_1^(sqrt n) * n^g,   mu = 11.600(3), mu_1 = 0.0400(5), g = -1.1(1)
+
+— a **stretched-exponential** correction. This is exactly the failure mode that a
+differential-approximant analysis is blind to: DAs fit a D-finite ansatz, and a
+`mu_1^sqrt(n)` factor is not in that ansatz, so the fitted exponent absorbs it and
+looks stable while being wrong.
+
+**Where that leaves our reading.** Our evidence against a stretched exponential is
+indirect but real: `theta = -1.000(1)` sits on a round value that universality
+predicts, the confluent 3-parameter fit is stable to 4 significant figures across a
+12-term window, and the C2 margin structure independently tracks `-theta/n^2`
+(`results/open-conjectures.md`) — three things that would have to conspire. Note
+also that 1324-avoiders are the known pathology among length-4 classes, not the
+norm. **Not a reason to doubt `lambda = 7.110(1)`, but it is a named alternative
+hypothesis we have never explicitly tested.**
+
+Concrete test if anyone wants it: refit the 40 terms with `mu_1^sqrt(n)` admitted
+as a fourth parameter and see whether `mu_1` is driven to 1 (no stretched
+exponential) or lands away from it. Cheap, and it converts an untested assumption
+into a measurement.

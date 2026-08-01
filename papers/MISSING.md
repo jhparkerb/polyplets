@@ -161,6 +161,27 @@ Optional, not needed for the claim as now scoped: MathSciNet's citation
 graph on BM-R 2002 (weekday guest pass, Pitt Hillman or CMU Hunt), or
 asking Rechnitzer (UBC) directly. Both jasonp's call.
 
+## STANDING NEXT ACTION: crawl the citation graph (jasonp, 2026-08-01)
+**Nothing obtained so far has been forward-searched.** Every paper in this
+session was found by keyword or by following references *backwards*; we have
+never asked "who cites this?" for any of them. That is the one search
+direction that could still surface a collision, because a 2026 paper reusing
+BM-R's Lemma 9 with an arithmetic endgame would be invisible to every probe
+run so far.
+
+Do this when idle. Priority order, forward citations of:
+1. **Bousquet-Melou & Rechnitzer 2002** (the criterion itself) — highest yield;
+   anyone building on the non-D-finiteness test lands here.
+2. **Haruspicy 2 and 3** — the programme's visible face.
+3. **Chan & Rechnitzer 2018** — anyone extending CTM growth-rate bounds; would
+   also catch a workaround for the locality/symmetry conditions we fail.
+4. **Bevan-Brignall-Elvey Price-Pantone 2020** — anyone porting the
+   inject-into-a-labelled-simpler-class template outside permutation classes.
+
+Tooling: MathSciNet is the right instrument and needs a weekday walk-in guest
+pass (Pitt Hillman or CMU Hunt, read-only — see the notes above). Google
+Scholar's "Cited by" is the free approximation and can be done from the desk.
+
 **Haruspicy 1 OBTAINED 2026-08-01** (jasonp, ScienceDirect) →
 `papers/rechnitzer_2003_haruspicy1_anisotropic_gf.pdf`. Confirms the reading
 above from the source: its content is the combinatorial section/density
