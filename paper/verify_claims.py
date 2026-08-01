@@ -263,7 +263,9 @@ P31, Q31 = gf_block("results/hole_gfs.txt", "H=3 k=1 ")
 chk("G_{3,1} numerator transcription",   P31==[0,0,0,0,1,2,0,-2,-1])
 chk("G_{3,1} denominator transcription", Q31==[1,-8,20,-14,-8,18,3,-16,6,6,-3,-2,1])
 
-# Fixed-height GF orders, and hole-GF order-law slopes c_H = ord(H,2)-ord(H,1)
+# Fixed-height GF orders and the lifetime-3 atom degrees they imply.
+# (The hole-GF "order grows like c_H(k+1)" fit was retired 2026-07-31 as a
+#  5-point interpolation with a free parameter per H, not a regularity.)
 def order_of(path, header):
     for line in open(os.path.join(ROOT, path)):
         if line.startswith(header) and "order=" in line:

@@ -303,24 +303,36 @@ ratio fit. We accordingly estimate $\lambda\approx7.111$; this is an
 estimate, not a rigorous bound---the rigorous two-sided bracket follows.
 
 \paragraph{A rigorous lower bound on $\lambda$.}
-The growth constant does admit a rigorous lower bound from a solvable
-subclass. Every \emph{directed} king animal---one with a bottom source from
-which every cell is reachable by steps in the upper half-plane cone
-$\{W,NW,N,NE,E\}$---is a polyplet, so its growth constant bounds $\lambda$ from
-below. Directed king animals are counted by Bacher~\cite{bacher} (OEIS
-A047781) through the algebraic generating function
-$\tfrac14\!\left((1+t)/\sqrt{1-6t+t^{2}}-1\right)$, whose dominant singularity
-at $t=3-2\sqrt2$ gives growth constant exactly $3+2\sqrt2\approx5.828$. Hence
+Polyplets of bounding-box height at most $H$ are a subfamily of all
+polyplets, so their growth constant $\mu_H$---the dominant eigenvalue of the
+height-$\le H$ strip transfer operator $M(x)$, whose entries are powers of
+$x$ counting cells placed---satisfies $\mu_H\le\lambda$ for every $H$, and
+$\mu_H$ increases with $H$. Each rung is certified rather than measured. Since
+$\rho(M(x))$ is increasing in $x$ and equals $1$ at $x=1/\mu_H$, exhibiting a
+nonnegative integer vector $v\ne0$ and a rational $x$ with $M(x)v\ge v$
+componentwise proves $\rho(M(x))\ge1$, hence $\mu_H\ge1/x$; the lower half of
+the Collatz--Wielandt formula needs neither positivity of $v$ nor
+irreducibility of $M$~\cite{hornjohnson}. The witness is a finite object and
+the check is exact integer arithmetic, so a reader re-verifies the bound
+without rerunning the search that found it. Carrying the ladder to $H=17$
+($6{,}536{,}381$ states) gives
 \[
-  \lambda \;\ge\; 3+2\sqrt2 \;\approx\; 5.828 .
+  \lambda \;\ge\; \mu_{17} \;\ge\; 6.543 ,
 \]
-The bound is rigorous but far from tight: the directed count
-$d(23)=\num{14146164790774359}$ is only about $4.4\%$ of $a(23)$, a thin and
-structurally simple slice of all polyplets. Bacher's larger \emph{multi-directed}
-subclass, still contained in the polyplets, sharpens this to
-$\lambda\gtrsim6.475$ (Corollary~12 of~\cite{bacher}); that value rests on a
-numerical determination of the dominant singularity rather than an algebraic
-one, so $3+2\sqrt2$ remains the exact rigorous bound.
+with certificates at every rung from the independent anchor
+$\mu_2=1+\sqrt2$ upward ($\mu_{11}\ge5.9916957$, $\mu_{15}\ge6.443532$,
+$\mu_{16}\ge6.4984$). The ladder converges to $\lambda$ from below but
+slowly---the rungs gain about $0.05$ each while cost grows ${\sim}3.5\times$
+per rung, reaching $11.8$\,GB at $H=17$---so it is stopped here rather than
+exhausted.
+
+A weaker but closed-form bound comes from a solvable subclass: the
+\emph{directed} king animals of Bacher~\cite{bacher} (OEIS A047781), counted
+by $\tfrac14\!\left((1+t)/\sqrt{1-6t+t^{2}}-1\right)$, whose dominant
+singularity at $t=3-2\sqrt2$ gives $\lambda\ge3+2\sqrt2\approx5.828$ with no
+computation at all; Bacher's multi-directed subclass sharpens this to
+$\lambda\gtrsim6.475$ numerically (Corollary~12). Both are superseded by the
+certified ladder and are recorded here only as the closed-form comparison.
 
 \paragraph{A rigorous upper bound on $\lambda$.}
 No upper bound on $\lambda$ appears in the literature. We obtain one by a
@@ -337,9 +349,10 @@ gives
   \lambda \;\le\; \tfrac{20000}{2147} \;\approx\; 9.3153 ,
 \]
 verified with no floating point in the deductive chain. Together with the
-directed bound this brackets the growth constant two-sided,
-$3+2\sqrt2 \le \lambda \le 20000/2147$, i.e.\ $5.828 \le \lambda \le 9.315$,
-consistent with the numerical estimate $\lambda\approx7.111$. The gap reflects a
+certified strip ladder this brackets the growth constant two-sided,
+$6.543 \le \lambda \le 20000/2147$, i.e.\ $6.543 \le \lambda \le 9.3153$,
+consistent with the numerical estimate $\lambda\approx7.111$. Both ends are
+machine-checkable in exact arithmetic. The gap reflects a
 structural limit: the convolution over-count grows with animal size (distant
 overlaps between the two factors), so finite-type methods of this class floor
 strictly above $\lambda$; the crude decision-tree bound $\lambda\le5^5/4^4\approx
@@ -1272,10 +1285,7 @@ was reproduced on a second architecture byte-identically. As an example,
 \paragraph{Hole-resolved.}
 Refining by hole count keeps each fixed-$(H,k)$ row C-finite: we recover
 $G_{H,k}$ for $H\le6$ (all reachable $k$), the rows $k\le2$ at $H=7$, and the
-row $k=0$ at $H=8$, each validated against a fresh prime. Across the
-recovered rows the order of $G_{H,k}$ grows about linearly in $k$ (for
-$H=3,\dots,7$ it fits $c_H(k+1)$ with $c_H=6,20,68,185,537$)---recorded as an
-empirical regularity. The rationality is genuinely a fixed-height
+row $k=0$ at $H=8$, each validated against a fresh prime. The rationality is genuinely a fixed-height
 phenomenon: the two-variable array is provably not D-finite, as we now
 show.
 

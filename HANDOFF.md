@@ -71,6 +71,40 @@ What the campaign actually bought, in one line each:
   four "outside the default build" statements corrected, a build
   receipt banked.
 
+## Claim-pruning pass 2026-07-31 (cold-eyed bottom-decile review)
+jasonp asked for the least novel/interesting/supported claims and an argument
+to drop them. Ten items ranked; **1-5 cut, 6-9 rescoped, 10 is jasonp's**.
+Each target doc now carries its own scope note; nothing correct was deleted,
+because re-deriving a closed door costs an evening and holding it costs a line.
+- **Cut:** the 37 digits of the all-pairs constant rho (keep the mechanism:
+  boundary-localized eigenvalue => clean constant but no C-finite recurrence);
+  the **v5 denominator law** (a fact about the monomial-basis representation of
+  an integer-valued polynomial, load-bearing for nothing — retain only
+  `k!·P_k ∈ ℤ[n]` + "minimality false"); **nu -> 0.6407** as evidence (0.6757 at
+  n=40, 5% off and drifting; theta = -1.000(1) carries universality alone);
+  the degree-sequence pattern commentary (`c_H(k+1)` fit, atom-degree "ratio
+  2.65"); the W_pair(b) cubic + "degenerate iff 4|b" as results (the numeral
+  *correction* 45/69/48 -> 58/114/57 stays, it was load-bearing).
+- **Rescoped:** lambda_0 qualitative only (drop "6.94"); component
+  stratification keeps the fragmentation statistic, drops "mean = (n+1)/2";
+  rook/bishop edge distribution RETIRED (its lever was measured dead);
+  **the paper's lambda bracket updated to the certified ladder** (below).
+- **Held deliberately, do not cut later:** validation artifacts (gf head-check,
+  cone anchor, strip second source) are evidence, not claims; negative results
+  are closed doors; well-hedged empirics are already doing their work.
+- Filter for future work: before chasing, name the sentence that gets *shorter*
+  in the paper if it works. If there isn't one, it is a curiosity.
+
+**paper/polyplets-report.tex lambda bracket UPDATED 2026-07-31**: the stated
+rigorous lower bound was 3+2sqrt2 ~ 5.828 (Bacher's directed animals), stale
+since the certified strip ladder landed the same day. Now
+**6.543 <= lambda <= 9.3153**, both ends machine-checkable in exact arithmetic;
+the directed/multi-directed bounds are demoted to a closed-form comparison
+remark. sec:gf's "Rigorous lower bounds" paragraph (the GF bound on a(n)) is a
+different claim and is unchanged. `paper/technical-report.tex` is jasonp's and
+was NOT touched — item 10 (the a(n)/4, a(n)/8 asymptotics reading as a result
+rather than as the Burnside triviality they are) is his to reword.
+
 One deviation worth knowing: the "monomial integer coefficients of P_k,
 observed k<=17" open item in `docs/proofs/diagonal-law.md` /
 `grand-form.md` was measured FALSE (P_k's monomial coefficients have
@@ -81,11 +115,15 @@ and the k!-divide guard — and since proved (Lean `IntCoeff.lean`,
 `production_factorial_int`, via integer-valuedness). 2026-07-31 sharpening
 (`results/converse-sweep.md`): k! is NOT the minimal denominator — from
 k = 5 the true minimum is k!/5 (k!/25 at k = 11 and k = 15..18); only
-5-adic content drops. So quote the divisibility, never the minimality. The law behind
-the drop is now proved (`results/v5-denominator-law.md`): the 5-part of
-the denominator collapses from v₅(k!) to v₅(⌊k/2⌋!) because Λ − 1
-vanishes to order 2 mod 5 (u₁ = 25); k = 11 is no exception to the true
-law, and the old ⌈v₅(k!)/2⌉ fit is refuted (first divergence k = 21).
+5-adic content drops. **So quote the divisibility, never the minimality — and
+stop there.** The law behind the drop was proved the same day
+(`results/v5-denominator-law.md`: the 5-part collapses from v₅(k!) to
+v₅(⌊k/2⌋!) because Λ − 1 vanishes to order 2 mod 5) and then **DEMOTED to a
+closed door** in the claim-pruning pass above: the minimal denominator is a
+property of the *monomial-basis representation* of an integer-valued
+polynomial — whose natural (binomial) basis has no denominators at all — and
+it is load-bearing nowhere. Proof and Lean statements kept, not extended, not
+paper material.
 
 **Holdout-confirmed mass** (new, `results/ns_a40/PROVENANCE.md`): the
 share of each term that a closed form predicted first and a later real
@@ -421,10 +459,15 @@ spine digit-product on all in-band cells).
   T(36,36-k) to ~1-3% for k=3..14, breaks at the alpha->1/2 band edge as
   expected; experiments/flank_saddle.py. K1 DONE
   (results/allpairs-kernel.md): gap-walk reformulation exact (l<=8); constant
-  rho = 14.40871398627036583814804007788... (37 digits), localized kappa-mode
-  (kappa=0.42109, kernel relation verified), P-plateau confirmed; algebraic
-  but no low-degree form (PSLQ excludes deg<=10, coeffs<=1e10; two spurious
-  fits exposed); exact elimination documented, not executed (low value).
+  **rho ~= 14.41** (37 digits CUT 2026-07-31, claim-pruning pass: the constant
+  is ours alone, appears nowhere else, and has no known minimal polynomial, so
+  the precision only sharpened an unanswerable question — the CLAIM is the
+  mechanism, that growth is a boundary-localized eigenvalue rather than bulk
+  spectrum, which is why the family has a clean constant and no C-finite
+  recurrence), localized kappa-mode (kappa ~= 0.421, kernel relation verified),
+  P-plateau confirmed; algebraic but no low-degree form (PSLQ excludes
+  deg<=10, coeffs<=1e10; two spurious fits exposed -- the cautionary half);
+  exact elimination documented, NOT to be executed.
   H2 DONE (results/convex-anisotropic.md): convex strip GFs recovered
   exactly H<=7 (orders 1,3,7,14,25,36,53); finding = root RECYCLING (psi
   degrees 1,2,3,5,7,6,8), opposite of the full family's separation -- weak
@@ -447,13 +490,19 @@ spine digit-product on all in-band cells).
   the curve is lattice-invariant; the lattice picks the prime and scaling).
   Instances machine-checked: square b=1 (poly diagonals, density 4,
   experiments/universal_law_check.py), hex b=2, king b=3 -- all with w=1.
-  The w question is CLOSED in closed form (2026-07-31, corrected pair
-  weights W_pair(b) = b^3 - b(b+1)/2 + 4 for interval D,
-  `experiments/universal_pair_weights.py` -- the 2026-07-15 numerals 45,
-  69, 48 were gap-capped undercounts, truly 58, 114, 57): odd p | b gives
-  w == 4 (mod p), always a unit; p = 2 gives w == floor(b/2) (mod 2),
-  degenerate exactly when 4 | b. Open: polyiamonds (needs row
-  conventions).
+  The w question is CLOSED. **Load-bearing half (keep):** the 2026-07-15
+  numerals 45, 69, 48 were gap-capped undercounts -- truly **58, 114, 57**
+  (`experiments/universal_pair_weights.py`, two independent methods); one of
+  them had reached the paper, and the correction also killed the "densities
+  are squares" reading (a b<=3 artifact). Theorem B is sharp on two witnesses
+  we hold outright: D={-2,0,2} gives w=0 (degenerate branch nonempty), interval
+  b=5 gives w=4!=1 (scaling nontrivial). **Demoted 2026-07-31 (claim-pruning
+  pass):** the closed form W_pair(b) = b^3 - b(b+1)/2 + 4 and the "degenerate
+  iff 4|b" classification are supporting detail, not results -- they describe
+  hypothetical interval lattices at b>=4 that nobody enumerates, while the
+  three real members (square b=1, hex b=2, king b=3) are all machine-checked.
+  Use the cubic to generate witnesses; do not extend the b-family. Open:
+  polyiamonds (needs row conventions).
   Paper's not-D-finite theorem landed (thm:notdfinite, verify_claims 407/407).
 
 - **Lessons-learned DRAFTED 2026-07-15** (docs/lessons-learned.md): six failure
