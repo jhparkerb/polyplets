@@ -145,12 +145,18 @@ many enumerated weights that enter each modulus (5 integers mod 27).
   `experiments/spine_deeper.py`). Not proved for all k; note the natural
   route (rational GF for the top coefficient) fails because the all-pairs
   weight family is not C-finite (refuted at ℓ=16; unbounded gap walk).
-- **Denominator exactly k!: is k!·P_k ∈ ℤ[n] for all k?** Observed at every
-  wired level k = 1..19 — it is how `orchestrator/sweep.go`'s
-  `diagCoeffTable` stores each P_k (integer numerator coefficients over the
-  divisor k!), and the k!-divide guard checks the division is exact at every
-  evaluation. Not proved. The leading coefficient 25^k/k! shows k! cannot be
-  improved; what is open is that no *larger* denominator is ever needed.
+- **Denominator k! — CLOSED both ways (2026-07-31).** k!·P_k ∈ ℤ[n] is a
+  THEOREM for all k (integer-valuedness + deg ≤ k; Lean
+  `production_factorial_int` in `IntCoeff.lean`) — it is how
+  `orchestrator/sweep.go`'s `diagCoeffTable` stores each P_k, and the
+  k!-divide guard checks exactness at each evaluation. But k! is NOT
+  minimal: the minimal denominator is D_k = k!/5^{ĉ_k} with
+  ĉ_k = v₅(k!) − H(k), H(k) = v₅(⌊k/2⌋!) − [k ≡ 1 (mod 10)]
+  (`results/v5-denominator-law.md`; lower bound proved, equality exact
+  k ≤ 19). Only the 5-part ever drops: v_p(D_k) = v_p(k!) for p ≠ 5 at
+  every measured level. (The old sentence here, "25^k/k! shows k! cannot
+  be improved", was wrong: 25^k/k! in lowest terms has no 5-part in its
+  denominator — that is exactly WHY the 5-part drops.)
   (This replaces a garbled entry that claimed integer coefficients in the
   MONOMIAL basis "observed k ≤ 17" — measured false at every k ≥ 2, since
   25^k/k! is not an integer; retracted AUDIT-2026-07-30 P8. Integer *values*

@@ -31,8 +31,8 @@ degree <= k with
     T(H+k, H) = q_k(H) * b^H    for ALL H >= k+1,
 
 equivalently T(n, n-k) = P_k(n) * b^(n-1-3k) for n >= 2k+1 with
-P_k(n) = b^(1+2k) q_k(n-k), and P_k takes values in Z[1/m] for every m
-coprime to b -- in fact P_k(n) is an integer for all integers n.
+P_k(n) = b^(1+2k) q_k(n-k), and P_k(n) is an integer for all integers
+n.
 
 *Proof* -- the five steps of the king proof, none of which used b = 3:
 
@@ -89,17 +89,42 @@ Only the pair-row survives mod p, with weight What = W_pair. QED
 | hex | 2 | n>=2k+1 | 9 = 3^2 | 9n-15 | H^3=H^2+u over F_2 (w=1) |
 | king | 3 | n>=2k+1 | 25 = 5^2 | 25n-45 | H^3=H^2+u over F_3 (w=1) |
 
-Densities are squares (below-contacts x above-contacts, plus bridge terms
-where the lattice allows them: king's 25 = 16 + 9). The unit question is
-now SETTLED by synthetic-lattice computation (2026-07-15): the solid-pair
-term (b+1)^2 is always == 1 mod p | b, but the bridge terms need not
-vanish. Measured pair weights: D = interval of size b: W = 4, 9, 25, 45,
-69 for b = 1..5 -- at b = 5, w = 69 == 4 (mod 5): a unit but NOT 1, so the
-cubic appears with genuine scaling H^3 = H^2 + 4u. And D = {-2, 0, 2}
-(b = 3) gives W = 48 == 0 (mod 3): the DEGENERATE branch is realized by an
-actual lattice whose mod-3 band is trivial. Theorem B's statement (curve
-up to scaling when w != 0; trivial band when w == 0) is exactly sharp;
-"w = 1 always" is false.
+CORRECTION 2026-07-31 (hygiene sweep; `experiments/universal_pair_weights.py`,
+two independent methods: direct gadget count with no gap cap, and
+end-to-end k = 1 diagonal enumeration with holdouts — [n]P_1 = W_pair
+confirmed on all six test lattices). The 2026-07-15 synthetic computation
+capped the pair's column gap at 2 — correct for max|dx| <= 1, silently
+lossy beyond — and its numerals for the wider lattices were undercounts:
+interval b = 4, 5 have **W_pair = 58, 114** (not 45, 69; the old numbers
+are exactly the gap <= 2 subtotals), and D = {-2, 0, 2} has **W_pair = 57**
+(not 48). Every qualitative conclusion survives, and the corrected
+sequence has a closed form for interval D:
+
+    W_pair(b) = b^3 - b(b+1)/2 + 4     (verified b = 1..8 gadget-side,
+                                        b <= 5 end-to-end),
+
+so densities are NOT squares beyond b = 3 — "squares" was a b <= 3
+artifact. The solid-pair term (b+1)^2 == 1 mod p | b stands. Mod-p
+corollary of the closed form: for **odd p | b** both b^3 and b(b+1)/2
+vanish, so **w == 4 (mod p) — always a unit**, and the universal spine for
+odd p is H^3 = H^2 + 4u with the 4 lattice-independent too (king's w = 1
+is 4 mod 3; b = 5's w is 4 mod 5 — a unit but not 1, so "w = 1 always"
+stays false with genuine scaling). For **p = 2**, w == floor(b/2) (mod 2):
+the DEGENERATE branch is realized exactly when 4 | b — by an ordinary
+interval lattice (b = 4: W = 58 == 0 mod 2), no contrived offset set
+needed; D = {-2, 0, 2} also lands there (57 == 0 mod 3, replacing the old
+48). Theorem B's statement (curve up to scaling when w != 0; trivial band
+when w == 0) is exactly sharp, with the branch condition now closed-form:
+degenerate iff p = 2 and 4 | b (for interval D).
+
+**Degree sharpening (2026-07-31).** deg q_k = k exactly, with leading
+coefficient [n^k]P_k = W_pair^k / k!: proved for king (grand-form
+Corollary 2, Lean `lead_coeff_25`; the argument is uniform in the weights
+with 25 -> W_pair, not written out for general b), and measured: k = 1 at
+all six test lattices above (slope = W_pair), hex k <= 2 (banked lead
+81/2 = 9^2/2!, `results/hex-diagonal-law.md`), square deg-k diagonals
+(`experiments/universal_law_check.py`). Since W_pair >= 4 > 0, the
+"degree <= k" of Theorem A is never slack at the top.
 
 ## Periodic extension: polyiamonds (data-grade, 2026-07-15)
 
@@ -109,8 +134,9 @@ extends: fixed polyiamonds (A001420 control, n <= 12) have minimal
 height-H animals with 2H-2 cells (up-down domino ground states) and
 
   T(2H-2, H) = 2^(H-2),   T(2H-1, H) = H 2^(H-1),
-  T(2H-2+k, H) = q_k(H) 2^H with q_k rational of degree k
-  (k = 2: constant second differences, verified).
+  T(2H-2+k, H) = q_k(H) 2^H with q_k rational of degree k, for
+  H >= k+1 by analogy (onset below that unexamined; k = 2: constant
+  second differences, verified).
 
 So periodic row-local lattices obey the same law with b = per-period
 drift and rational q_k; proving the periodic version = rerunning the five

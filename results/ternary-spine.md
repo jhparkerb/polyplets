@@ -36,7 +36,7 @@ $$\textstyle\sum_k P_k(n)\,y^k \;=\; G(y)\,H(y)^n .$$
   paper's "25 single-defect species"; $H = 1, 25, 208, 1483, 20688, 130208,\dots$
   is itself a candidate new integer sequence.
 
-## The conditionality ladder (finitely verified; conjectural beyond $y^{17}$)
+## The conditionality ladder (all three rungs now symbolic — see upgrades below)
 
 - $(\star a)$ $G \equiv 1 \pmod 9$ — verified: $v_3(G_j) \ge 2$, $j \le 17$.
   **UPGRADE 2026-07-12: DERIVED** — boundary-cluster residue formula for $G$

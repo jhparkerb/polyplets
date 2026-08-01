@@ -59,11 +59,14 @@ What the campaign actually bought, in one line each:
 - holdout reporting stopped grading formulas against their own output
   (D2/D3);
 - **a(40) corroboration by mass is now stated** in
-  `results/ns_a40/PROVENANCE.md` — H11-19 is 81.3% of the term and has
-  no independent corroboration. That is what the T2⁻ grade means.
+  `results/ns_a40/PROVENANCE.md` — post-N=40-strip-run, the band with no
+  second source is H15-19, 43.8% of the term (H11-14, 37.5%, is
+  strip-second-sourced; 2026-07-31 hygiene sweep). That is what the T2⁻
+  grade means.
 - the strip second source is scoped honestly (same union-find rule as
-  `core/transition.h`; the Python "twin" is a port; coverage is 67.6%
-  of cells honestly counted, not 90.7%);
+  `core/transition.h`; the Python "twin" is a port; coverage is 72.2%
+  of cells honestly counted post-N=40 (95.4% doc-style), the k=19
+  diagonal deliberately excluded);
 - Lean: the Shape/Peel axiom claims are `#guard_msgs`-enforced, the
   four "outside the default build" statements corrected, a build
   receipt banked.
@@ -77,8 +80,8 @@ all 19 wired levels, load-bearing for `diagCoeffTable`'s representation
 and the k!-divide guard — and since proved (Lean `IntCoeff.lean`,
 `production_factorial_int`, via integer-valuedness). 2026-07-31 sharpening
 (`results/converse-sweep.md`): k! is NOT the minimal denominator — from
-k = 5 the true minimum is k!/5 (k!/25 at k = 11); only 5-adic content
-drops. So quote the divisibility, never the minimality. The law behind
+k = 5 the true minimum is k!/5 (k!/25 at k = 11 and k = 15..18); only
+5-adic content drops. So quote the divisibility, never the minimality. The law behind
 the drop is now proved (`results/v5-denominator-law.md`): the 5-part of
 the denominator collapses from v₅(k!) to v₅(⌊k/2⌋!) because Λ − 1
 vanishes to order 2 mod 5 (u₁ = 25); k = 11 is no exception to the true
@@ -91,10 +94,10 @@ a(39) 2.5%, **a(40) 0.0%**. Zero at a(40) structurally: its closed-form
 cells start at H=22, above every real sweep that will ever exist. Do not
 confuse this with strip coverage; they are different quantities.
 
-**IN PROGRESS on dalby: strip N=40 second-source run.** Launched
-2026-07-30, tmux window `strip40`, ~8.3 h predicted, log
-`results/strip_C14_n40_run.log`. Purpose: the banked strip run stops at
-n=36, so it second-sources **0%** of a(37)-a(40) by mass. Extending it
+**COMPLETED on dalby: strip N=40 second-source run.** Launched
+2026-07-30, finished same day (~8.6 h, 469 cells, 0 mismatch), log
+`results/strip_C14_n40_run.log`. Purpose: the banked strip run stopped at
+n=36, so it second-sourced **0%** of a(37)-a(40) by mass. Extending it
 to N=40 covers heights H<=14 on those rows — **53.8% / 50.8% / 47.9% /
 45.0%** of a(37)/a(38)/a(39)/a(40) respectively. This is the single
 highest-value remaining validation action the campaign found, and it is
@@ -361,8 +364,9 @@ spine digit-product on all in-band cells).
   with deg P_k ≤ k and **P_k integer-valued** (new, was only observed). Onset
   matches observation exactly. Downstream: Ternary Spine / SNF / P_k machinery
   conditionality collapses to the finitely many enumerated cluster weights.
-  Open: onset sharpness for general k (non-cancellation); monomial integer
-  coefficients of P_k (values proved, coefficients observed).
+  Open: onset sharpness for general k (non-cancellation). (Monomial
+  integer coefficients: retracted, false at every k ≥ 2 —
+  AUDIT-2026-07-30 P8; the true statement is k!·P_k ∈ ℤ[n], proved.)
 - **Max-hole theorem M(n)=round((n−2)²/8) — STAGED for later examination**
   (`results/maxhole-proof.md`, figs `results/figs/maxhole_{ring,seal}.svg`, checker
   `experiments/maxhole_proof_check.py`). Near-complete proof: construction = diagonal
@@ -443,7 +447,13 @@ spine digit-product on all in-band cells).
   the curve is lattice-invariant; the lattice picks the prime and scaling).
   Instances machine-checked: square b=1 (poly diagonals, density 4,
   experiments/universal_law_check.py), hex b=2, king b=3 -- all with w=1.
-  Open: is w always a unit (or ever 0)? polyiamonds (needs row conventions).
+  The w question is CLOSED in closed form (2026-07-31, corrected pair
+  weights W_pair(b) = b^3 - b(b+1)/2 + 4 for interval D,
+  `experiments/universal_pair_weights.py` -- the 2026-07-15 numerals 45,
+  69, 48 were gap-capped undercounts, truly 58, 114, 57): odd p | b gives
+  w == 4 (mod p), always a unit; p = 2 gives w == floor(b/2) (mod 2),
+  degenerate exactly when 4 | b. Open: polyiamonds (needs row
+  conventions).
   Paper's not-D-finite theorem landed (thm:notdfinite, verify_claims 407/407).
 
 - **Lessons-learned DRAFTED 2026-07-15** (docs/lessons-learned.md): six failure

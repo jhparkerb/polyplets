@@ -177,7 +177,7 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
    defect gas is exactly linear" is discharged. The former Lean PREDICTED
    tier for k = 12..16 is retired: this proof is formalized (§Formalization
    below) and `P<k>_grand_of_banked` pins every level from two real-swept
-   cells with H ≤ 18 (`polyplets/PROOF-STATUS.md`).
+   cells with H ≤ 20 (`polyplets/PROOF-STATUS.md`).
 
 ## Formalization (2026-07-21)
 
@@ -201,10 +201,12 @@ tier. The item
 
 - Onset sharpness at n = 2k (failure below onset) — verified on banked data,
   proved ab initio only k ≤ 5.
-- **Denominator exactly k!**: `k!·P_k ∈ ℤ[n]`, observed at every wired level
-  k = 1..19 (`orchestrator/sweep.go`'s `diagCoeffTable` stores exactly this,
-  and the k!-divide guard checks exactness at each evaluation), not proved.
-  25^k/k! shows k! is necessary; that it is always sufficient is open.
+- **Denominator k! — CLOSED both ways (2026-07-31)**: `k!·P_k ∈ ℤ[n]` is
+  proved for all k (Lean `production_factorial_int`); minimality is FALSE —
+  the minimal denominator is k!/5^{ĉ_k}, ĉ_k = v₅(k!) − v₅(⌊k/2⌋!) +
+  [k ≡ 1 (mod 10)] (`results/v5-denominator-law.md`; lower bound proved,
+  exact k ≤ 19). The old "25^k/k! shows k! is necessary" pointed the wrong
+  way — it is why the 5-part drops.
   (Corrected 2026-07-30, AUDIT-2026-07-30 P8: this entry previously read
   "monomial integer coefficients of P_k, coefficient integrality observed
   k ≤ 17". Monomial integrality is FALSE at every k ≥ 2 — P_2's leading

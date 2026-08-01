@@ -228,9 +228,9 @@ branch `lean-outworks`, orchestrator-reviewed per unit. Targets from the
     cross-revision re-runs, but no second algorithm. The strip second source
     reaches H ≤ 14 only. So the theorem is conditional on a number, and the
     number has one algorithm behind it.
-  - **Still weaker than the unformalized ladder.** The strip transfer-matrix
-    ladder gives μ₁₄ = 6.3800344 (`results/strip-growth-lambda-bounds.md`),
-    a better lower bound than 6.22 — but it is not formalized. `6.22` is
+  - **Still weaker than the unformalized ladder.** The certified strip
+    ladder gives μ₁₇ ≥ 6.543 (`results/strip-mu-certificates.md`, addendum
+    2026-07-31; bracket 6.543 ≤ λ ≤ 9.3153) — but it is not formalized. `6.22` is
     near-sharp for *this* route: `a(40)^(1/40) = 6.22084…`, so `6.23` is
     false, and no single banked term can do better than 6.221.
 - `IntCoeff.lean` (OW-4) — `factorial_smul_int_coeff` (deg ≤ k integer-

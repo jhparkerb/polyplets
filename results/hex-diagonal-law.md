@@ -45,9 +45,12 @@ in-band cells H <= 14, k <= 2.
 For a lattice whose height-slices give b drift choices per row, the height
 triangle obeys T = P_k(n) b^(n-1-3k) with the mod-b structure governed by
 H^3 = H^2 + u over F_b's prime field -- the curve is lattice-independent
-because only the bare pair-row survives the valuation collapse and its
-weight is always == 1 (a square of contact counts, coprime to b?
-king: 25 == 1 mod 3; hex: 9 == 1 mod 2; the general unit-ness of
-(contacts)^2 mod b deserves its own argument). Open: polyiamonds
-(triangular lattice -- row structure alternates, drift count TBD);
-higher-coordination lattices; the b | contacts degenerate case.
+because only the bare pair-row survives the valuation collapse. The
+unit-ness question raised here is CLOSED (2026-07-31, superseding the
+"always == 1" guess): w = W_pair mod p obeys w == 4 (mod p) for odd
+p | b (so king 25 == 1 mod 3 and hex 9 == 1 mod 2 are both "4"), and
+w == floor(b/2) (mod 2) for p = 2, degenerate iff 4 | b -- canonical
+statement and corrected pair weights in
+`docs/proofs/universal-diagonal-law.md` (Instances/CORRECTION section).
+Open: polyiamonds (triangular lattice -- row structure alternates, drift
+count TBD); higher-coordination lattices.

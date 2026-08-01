@@ -15,12 +15,14 @@ $\prod d_i=|\det|$, so any prime $q\ne3$ dividing some $d_i$ would divide $d_N$ 
 $|\det|$ — impossible. **Therefore every invariant factor is a power of 3 and the
 cokernel is a finite 3-group.** Done, for all $N$.
 - **RESOLVED 2026-07-12:** the $\lceil(N-1)/3\rceil$ count is now a **theorem**
-  (modulo the diagonal law + a finitely-verified ladder) — the mod-3 diagonal
-  family is governed by the spine cubic $W^3 = W^2 + t$ over $\mathbb F_3$, the
-  activation entries evaluate in closed form by Lagrange inversion, and echelon
-  independence finishes. See `results/ternary-spine.md` (proof chain + 15/15
-  verifier). Remaining open there: prove the ladder itself; individual exponents
-  $e_i(N)$ still have no formula (the mod-9/27 lifts are the attack).
+  (modulo the diagonal law + the renewal/defect-gas chain formalism — the
+  ladder $(\star a,b,c)$ is derived, not assumed: `results/defect-gas.md`,
+  upgrade 2026-07-12/13) — the mod-3 diagonal family is governed by the spine
+  cubic $W^3 = W^2 + t$ over $\mathbb F_3$, the activation entries evaluate in
+  closed form by Lagrange inversion, and echelon independence finishes. See
+  `results/ternary-spine.md` (proof chain + 15/15 verifier). Remaining open
+  there: individual exponents $e_i(N)$ still have no formula (the mod-9/27
+  lifts are the attack).
 
 ### C2. A006770 is strictly log-convex
 $$a(n)^2 < a(n-1)\,a(n+1)\qquad(n\ge3),$$

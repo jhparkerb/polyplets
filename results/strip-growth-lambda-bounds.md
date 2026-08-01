@@ -32,7 +32,8 @@ multi-directed 6.475), our own, and improvable with H.
 > exact rational arithmetic), giving the two-sided bracket **5.828 <= lambda <=
 > 9.3153**. Derivation: [../docs/proofs/polyplet-upper-bound.md](../docs/proofs/polyplet-upper-bound.md).
 
-   Current ladder tops at mu_14 = 6.3800 (still below 6.475 — need higher H to win).
+   Current certified ladder tops at mu_17 >= 6.543 (`strip-mu-certificates.md`,
+   addendum 2026-07-31) — the 6.475 crossover is passed.
 
 > **Certificate grade, H<=11.** The `mu_H` below are floating-point power-iteration
 > values. `cpp/strip_mu_cert.cpp` upgrades them to exact rationals verified in

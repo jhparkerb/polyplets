@@ -123,7 +123,8 @@ are of a(40) itself (recomputed from `perheight/h*.out`, row n=40):
 | height band | share of a(40) | independent corroboration |
 |---|---|---|
 | H1-10 | 7.52% | yes — matches the decorrelated fixed-height GFs expanded to n=40 (355 cells) |
-| H11-19 | **81.34%** | **none available** |
+| H11-14 | 37.49% | yes — strip TM N=40 run (2026-07-30, 469 cells, 0 mismatch; `results/strip-engine.md`) — second source, not fully independent (shares `core/transition.h`'s union-find rule) |
+| H15-19 | **43.84%** | **none available** |
 | H20 | 4.16% | yes — byte-identical standalone re-sweep (`recheck/h20.out`) |
 | H21 | 2.84% | real sweep, but this is P_19's second fit point; no holdout is possible at any n |
 | H22-40 | 4.14% | closed forms P_0..P_18, every one with a passed real-swept holdout |
@@ -162,9 +163,10 @@ The independent strip transfer-matrix engine
 (`results/strip-engine.md`) is bounded by its reach. As banked, that run
 is H<=14 and **n<=36**, so it touches no cell of rows 37-40: the strip
 second-sources **0%** of a(37), a(38), a(39) and a(40). The strip run
-extended to N=40 launched 2026-07-30 covers H<=14 at those rows, which
-is (recomputed from `perheight/h*.out`) **53.8%** of a(37), **50.8%** of
-a(38), **47.9%** of a(39) and **45.0%** of a(40).
+extended to N=40 COMPLETED 2026-07-30 (dalby, ~8.6 h, 469 cells, 0
+mismatch; `results/strip_C14_n40_run.log`) and covers H<=14 at those
+rows, which is (recomputed from `perheight/h*.out`) **53.8%** of a(37),
+**50.8%** of a(38), **47.9%** of a(39) and **45.0%** of a(40).
 
 ## Notes
 
