@@ -86,4 +86,9 @@ coefficients, not numerator boundary values.
 - SNF individual exponents $e_i(N)$: no evident closed form (largest and count are
   clean; the middle ones are not). Superseded framing: C1 is the right handle.
 - Atom degrees $1,2,4,9,29,68,181,462,1254,3289$ (strip-GF denominator degrees):
-  no low-order constant-coefficient recurrence; ratios drift to $\sim2.65$.
+  no low-order constant-coefficient recurrence. **Closed door, not a pattern**
+  (2026-07-31): the "ratios drift to $\sim2.65$" reading was retired — a trend
+  on ten terms of a sequence that cannot be extended, with no consequence
+  attached. The degrees themselves stay: they are load-bearing for the
+  $\psi_1..\psi_8$ irreducibility certificates behind the non-D-finiteness
+  theorem (`results/anisotropic-not-dfinite.md`).

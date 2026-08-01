@@ -57,7 +57,14 @@ c_k = ⌈v₅(k!)/2⌉ — or the corrected law — via the 5-adic structure of 
 and explain k = 11.** Profile data: rerun the last block of
 `experiments/converse_sweep.py` or the inline probe in the session log.
 
-**RESOLVED (2026-07-31, same day): `results/v5-denominator-law.md`.** The
+**RESOLVED — and then DEMOTED — (2026-07-31, same day):
+`results/v5-denominator-law.md`.** Resolved as stated below; demoted on a
+cold-eyed pass the same evening, because the minimal denominator is a
+property of the monomial-basis *representation* of an integer-valued
+polynomial (whose natural basis has no denominators at all) and is
+load-bearing nowhere. The retained claim is only `k!·P_k ∈ ℤ[n]` +
+"minimality is false"; the sharpened open question posed above is
+**withdrawn, not open**. Detail: The
 ⌈v₅(k!)/2⌉ fit was the wrong law; the true law is c_k = v₅(k!) − H(k),
 H(k) = v₅(⌊k/2⌋!) − [k ≡ 1 (mod 10)], proved as a lower bound from
 integer-valuedness + grand form + u₁ = 25, g₁ = −45, and exact at every

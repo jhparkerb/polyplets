@@ -29,8 +29,11 @@ multi-directed 6.475), our own, and improvable with H.
 
 > These `mu_H` bounds squeeze lambda from BELOW. The complementary rigorous UPPER
 > bound is **lambda <= 9.3153** (Bui-style finite-type convolution certificate,
-> exact rational arithmetic), giving the two-sided bracket **5.828 <= lambda <=
-> 9.3153**. Derivation: [../docs/proofs/polyplet-upper-bound.md](../docs/proofs/polyplet-upper-bound.md).
+> exact rational arithmetic), giving the two-sided bracket
+> **6.543 <= lambda <= 9.3153** (updated 2026-07-31: the lower end is now the
+> certified ladder's mu_17, not Bacher's 5.828 — see the addendum below and
+> `strip-mu-certificates.md`; both ends are machine-checkable in exact
+> arithmetic). Derivation: [../docs/proofs/polyplet-upper-bound.md](../docs/proofs/polyplet-upper-bound.md).
 
    Current certified ladder tops at mu_17 >= 6.543 (`strip-mu-certificates.md`,
    addendum 2026-07-31) — the 6.475 crossover is passed.

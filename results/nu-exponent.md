@@ -1,5 +1,28 @@
 # Where a(n)'s mass sits + the extent exponent nu
 
+> **SCOPE NARROWED 2026-07-31 (cold-eyed pass). Two claims here, and only
+> one of them is worth making.**
+>
+> **KEEP — the qualitative statement, which answers the question that was
+> actually asked:** the bulk of `a(n)` lives at *growing but sublinear*
+> height. `mean_H/n` falls monotonically 0.745 (n=4) → 0.379 (n=40); it is
+> neither fixed-small-H nor n/2. That settles the original dispute and is
+> well supported by the full exact triangle.
+>
+> **DROP — nu as evidence for anything.** "ν_eff → 0.6407" is not a result.
+> 0.6407 is the standard 2D lattice-animal extent exponent, which
+> universality *already* assigns to polyplets; θ = −1.000(1) from the
+> differential approximants confirms class membership far more sharply
+> (`results/series-analysis-da.md`). Our number is 0.6757 at n = 40 — about
+> 5% off — still drifting 0.0022 per four terms, with no error bar, and no
+> more terms are coming. It is not evidence for the class (too far off) and
+> not evidence against it (drifting the right way). **Do not refresh it, do
+> not put it in the paper, and let θ carry the universality point alone.**
+> It is correctly already absent from `paper/polyplets-report.tex`.
+>
+> The measurements below are correct and stay banked; it is the reading
+> "universality confirmed" that is withdrawn.
+
 Date: 2026-07-10. `experiments/nu_exponent.py` on the banked height triangle.
 Settles "where does the typical polyplet's height sit" (raised vs Other Claude,
 who over-claimed "fixed small columns 2,3,4").

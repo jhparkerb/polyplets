@@ -55,18 +55,26 @@ not free).
 - No literature decomposes king animals by edge-component count → `C(n,c)` is
   unpublished.
 
-## Mean component count ≈ (n+1)/2 (task #8)
+## Fragmentation: a typical polyplet is ~n/2 pieces of ~2 cells (task #8)
 
-`mean_c(n) = Σ_c c·C(n,c) / a(n)`: **`1, 1.5, 2, 2.5, 3`** for n=1..5 (exactly
-`(n+1)/2`), then `3.501, 4.003, 4.506, 5.009` (n=6..9) — a tiny positive drift
-above `(n+1)/2`. So a typical polyplet has ~`n/2` edge-components averaging
-**~2 cells each**. This quantifies the fragmentation that makes
-`λ_polyplet ≈ 7.11 ≫ λ_polyomino ≈ 4.06`: `a(n)` is dominated by the huge
-multiplicity of corner-gluings of tiny pieces, not near-polyominoes.
+**This is the claim, and it is a statistic, not a law** (scope corrected
+2026-07-31 — see the note at the end of this section).
 
-The `≈(n+1)/2` mean reflects the triangle being **near-symmetric under
-`c ↔ n+1−c`** (exact at the edges: both = A001168; the interior asymmetry drives
-the small drift). Not an exact law — `Σ_c c·C(6,c) = 13416 ≠ 13412 = (7/2)a(6)`.
+`mean_c(n) = Σ_c c·C(n,c) / a(n)` runs `1, 1.5, 2, 2.5, 3, 3.501, 4.003,
+4.506, 5.009` for n=1..9. So a typical polyplet has **~n/2 edge-components
+averaging ~2 cells each**, reflecting a triangle that is near-symmetric under
+`c ↔ n+1−c` (exact at the edges, both = A001168). This quantifies the
+fragmentation that makes `λ_polyplet ≈ 7.11 ≫ λ_polyomino ≈ 4.06`: `a(n)` is
+dominated by the huge multiplicity of corner-gluings of tiny pieces, not by
+near-polyominoes.
+
+> **The "`mean_c = (n+1)/2`" framing is withdrawn (2026-07-31).** It is exact
+> for n = 1..5 and then drifts (3.501, 4.003, 4.506, 5.009), and this doc
+> already carried its own counterexample: `Σ_c c·C(6,c) = 13416 ≠ 13412 =
+> (7/2)a(6)`. Four exact cases and a drift over a triangle reaching only n = 9
+> is an observation, not a law — and stating it as one next to the `C(n,c)`
+> table, which *is* solid, only invites doubt about the table. Quote the
+> fragmentation statistic; drop the formula.
 
 ## The composition a(n) = f(A001168): hard, structural conclusion
 

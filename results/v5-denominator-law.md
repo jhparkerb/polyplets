@@ -1,5 +1,33 @@
 # The v5 denominator law: c_k = v5(k!) − H(k), proved via the 5-adic order of Λ − 1
 
+> **DEMOTED to a closed door, same day (2026-07-31), on a cold-eyed pass.**
+> The law is correct and the proof stands — nothing below is retracted. What
+> is withdrawn is its status as a *result*:
+>
+> 1. **It is a fact about our representation, not about polyplets.** `ĉ_k`
+>    is the minimum 5-adic valuation over the coefficients of `P_k` *in the
+>    monomial basis*. `P_k` is integer-valued (proved), so its natural basis
+>    is binomial coefficients — in which every coefficient is an integer by
+>    construction and there is no denominator to have a law about. The
+>    denominator exists only because we chose to write `P_k` in powers of n.
+> 2. **It is load-bearing for nothing.** The fact `diagCoeffTable` and the
+>    k!-divide guard actually need is `k!·P_k ∈ ℤ[n]`, which is proved
+>    separately from integer-valuedness. Minimality is used nowhere in the
+>    engine, the paper, or the Lean development's dependency graph.
+> 3. **Its origin was our own numerology.** The question it answers
+>    (`c_k = ⌈v₅(k!)/2⌉`, "explain k = 11") arose from a fit introduced
+>    hours earlier in `results/converse-sweep.md` §2. Repairing our own fit
+>    is hygiene, not a finding.
+>
+> **The retained claim, in full, is two sentences:** `k!·P_k ∈ ℤ[n]` (proved,
+> load-bearing). `k!` is *not* the minimal denominator — only 5-content ever
+> drops — so quote the divisibility and never the minimality.
+>
+> Everything below is kept because it is written, checked, and cheap to hold:
+> deleting it would only invite re-deriving it. It is not paper material, it
+> is not an open question, and it should not be extended. The Lean statements
+> (`k ≤ 18`) and `experiments/v5_denominator.py` stay for the same reason.
+
 2026-07-31. Resolves the open question of `results/converse-sweep.md` §2
 ("prove c_k = ⌈v₅(k!)/2⌉ — or the corrected law — via the 5-adic structure
 of G, and explain k = 11"). Outcome: **⌈v₅(k!)/2⌉ was the wrong law** — a

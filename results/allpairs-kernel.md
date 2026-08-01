@@ -13,32 +13,42 @@ J-class adds constant-weight (8) long jumps to (g', P) -- one new cell
 lands near the block, the far cell goes pending -- and weight-8 resets to
 (1, J). Ends: J pays g+3 (g<=2) / 6 (g>=3); P finishable only at g <= 2.
 
-## The constant (part 2)
+## The mechanism (part 2)
+
+> **Scope narrowed 2026-07-31.** This section used to lead with `rho` quoted
+> to 37 digits. Those digits certified nothing anyone can use: `rho` is the
+> dominant eigenvalue of an operator this project defined, it appears in no
+> other context, and it has no known minimal polynomial — so the precision
+> only sharpened a question we cannot answer. The **mechanism** below is the
+> result; the constant is its residue, and two significant figures is the
+> honest size for it. The full expansion remains reproducible from
+> `experiments/allpairs_kernel.py` at any `gmax` if a use for it ever appears.
 
 Dominant eigenvalue of the exact truncated operator (truncation error ~
-kappa^gmax, verified 1e-10 -> 1e-37 across gmax = 30..140):
+kappa^gmax, stable across gmax = 30..140):
 
-  rho = 14.4087139862703658381480400778825365989...   (37 digits)
+  rho ~= 14.41,  with decay rate kappa ~= 0.421
 
-**Spectral structure verified:** the eigenvector is a localized kappa-mode,
-f(g) ~ kappa^g with kappa = 0.4210895797931588..., satisfying the bulk
-kernel relation rho = kappa^2 + 2 kappa + 3 + 2/kappa + 1/kappa^2 (residual
-4e-17, at the kappa-extraction precision); the P-component has the predicted
-constant plateau 8 S_J/(rho - 9). Since rho = 14.41 > 9 = bulk mass, the
-growth is a boundary-localized eigenvalue, not essential spectrum -- WHY the
-family is not C-finite yet has a clean constant.
+**Spectral structure verified — this is the finding.** The eigenvector is a
+localized kappa-mode, f(g) ~ kappa^g, satisfying the bulk kernel relation
+rho = kappa^2 + 2 kappa + 3 + 2/kappa + 1/kappa^2; the P-component has the
+predicted constant plateau 8 S_J/(rho - 9). Since rho > 9 = bulk mass, the
+growth is a **boundary-localized eigenvalue, not essential spectrum** — which
+is WHY the all-pairs family has a clean growth constant and yet no C-finite
+recurrence. That statement is basis-independent and consequential; the
+decimal expansion is neither.
 
-**Algebraicity status:** the finite boundary system + the quartic tail
-relation imply rho IS algebraic, but PSLQ refutes every candidate of degree
-<= 10 with coefficients <= 1e10 (two seemingly-good fits at lower precision
-were exposed as noise by pushing truncation: a degree-4 candidate's residual
-jumped to 3e-12). The exact minimal polynomial would come from eliminating
-the ~15-unknown boundary system against the quartic -- documented route,
-not executed; expected degree ~20+, large coefficients.
+**Algebraicity status (closed door).** The finite boundary system + the
+quartic tail relation imply rho IS algebraic, but PSLQ refutes every
+candidate of degree <= 10 with coefficients <= 1e10 — and two seemingly-good
+low-precision fits were exposed as truncation noise, which is the cautionary
+half of this note. The exact minimal polynomial would come from eliminating
+the ~15-unknown boundary system against the quartic: documented route, not
+executed, expected degree ~20+ with large coefficients. **Not worth doing.**
 
 ## Verdict
 
-Single-row weights: (2s+1)^2 exactly (proved). Multi-row: no closed form,
-no C-finite recurrence; the correct invariant is the walk's localized
-eigenvalue rho = 14.4087139862703658... with kappa = 0.42109 decay. Open
-(low value): the exact elimination for rho's minimal polynomial.
+Single-row weights: (2s+1)^2 exactly (proved). Multi-row: no closed form and
+no C-finite recurrence, because the growth constant is a boundary-localized
+eigenvalue of the gap walk rather than bulk spectrum. That is the whole
+claim.

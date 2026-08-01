@@ -1,5 +1,23 @@
 # The hole-free growth constant λ₀: simple-connectivity is exponentially costly
 
+> **PRECISION NARROWED 2026-07-31 (cold-eyed pass).** State this
+> **qualitatively only**: hole-free polyplets grow strictly slower than
+> polyplets, and the hole-free fraction decays *exponentially*, not
+> polynomially — a hole is an entropic gain, not a rare accident. That
+> statement is what the data supports and it is the interesting half.
+>
+> **Stop quoting λ₀ ≈ 6.94 to three figures.** Reasons, in order:
+> (a) the estimate rests on n ≤ 18 from a **single-engine** hole table (see
+> the provenance correction below); (b) the same pipeline on the same data
+> returns λ ≈ 7.096 against the true 7.110, so the method carries ~0.014 of
+> error at this reach — the claimed gap λ − λ₀ ≈ 0.16 survives that by ~11×
+> (which is why the qualitative claim stands) but the third digit does not;
+> (c) novelty is modest by the doc's own account — this is the polyplet
+> analogue of *believed* (not proved) polyomino behaviour; (d) nobody will
+> ever refine it, because the holes n ≥ 20 campaign is measured at ~11 days
+> for n = 20 and was declined. A constant with no future should be stated at
+> the precision it will die at.
+
 2026-07-11 (research during the a(22) fleet run). `experiments/holefree_growth.py`
 on the banked hole distribution `results/holes_n18.txt` (n≤18, exact).
 
@@ -88,7 +106,9 @@ n=19: +8×10⁻⁶) — still flat to 5 decimals, no sign of curvature. And ρ m
 
 **Conclusion: n=19 changes nothing qualitatively.** It nudges λ₀ up by 0.002 —
 inside the stated ±0.02 — and tightens confidence that λ₀ < λ with a constant ratio.
-The quotable outputs are unchanged: λ₀ ≈ 6.94, ρ = λ₀/λ ≈ 0.978.
+The quotable outputs are unchanged: λ₀ < λ with ratio ρ = λ₀/λ ≈ 0.978, i.e.
+exponential decay of the hole-free fraction. (Per the 2026-07-31 scope note at
+the top: quote the ratio and the exponential, not the third digit of λ₀.)
 
 ## Reading
 

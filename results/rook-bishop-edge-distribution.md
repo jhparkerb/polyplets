@@ -1,4 +1,25 @@
-# Rook/diagonal edge-count distribution (sampled, not yet exact)
+# Rook/diagonal edge-count distribution (sampled — RETIRED, not "not yet exact")
+
+> **RETIRED 2026-07-31 (cold-eyed pass). Do not build the exact version.**
+> This is a sampled distribution (2000 random n=12 specimens, seed 42)
+> collected in support of the "cheap-core + sparse-correction" decomposition
+> family — and that entire lever family was **measured dead in the same
+> session** (see the connectivity-entanglement result in
+> `boundary-push-tensornetwork.md`). The doc below correctly flags the exact
+> `(size, rook-edge-count)` table as a small extension of the existing
+> `--contacts` flag in `cpp/g2_redelmeier.cpp` and correctly declines to
+> claim exactness. The right disposition is not "buildable follow-up" but
+> **closed**: building an exact table to characterise a decomposition nobody
+> will use buys nothing.
+>
+> Nothing is lost by retiring it. The one structural fact underneath — zero
+> rook edges ⟺ A001168, i.e. the `bishopConn` check — is independently banked
+> twice over: as a live structural gate in `cpp/g2_redelmeier.cpp`, and as
+> the proved edge identity `C(n,n) = A001168` with its bijection in
+> `results/component-stratification.md`.
+>
+> Kept as a closed door so the "is the all-diagonal case a dominant term we
+> could correct toward?" question is not re-asked. The answer is no.
 
 2026-07-07. Prompted by an evening of testing "cheap-core + sparse-correction"
 decompositions of king-adjacency (all measured negative — see

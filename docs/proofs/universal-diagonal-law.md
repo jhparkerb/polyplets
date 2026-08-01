@@ -103,6 +103,24 @@ sequence has a closed form for interval D:
     W_pair(b) = b^3 - b(b+1)/2 + 4     (verified b = 1..8 gadget-side,
                                         b <= 5 end-to-end),
 
+> **SCOPE NOTE 2026-07-31 (cold-eyed pass), on everything from the closed
+> form to the end of this paragraph.** The *correction* above is load-bearing
+> and stays in full: 45/69/48 were wrong, one of them reached the paper, and
+> killing the "densities are squares" reading was necessary. What is demoted
+> to supporting detail is the **generalization**: the cubic in b, and the
+> "degenerate iff 4 | b" classification, describe a family of hypothetical
+> interval lattices at b >= 4 that nobody enumerates. Exactly three members
+> of the class are objects anyone studies — square (b=1), hex (b=2), king
+> (b=3) — and all three are machine-checked here.
+>
+> Theorem B's sharpness needs only two witnesses, and we have both
+> independently of the cubic: `D = {-2,0,2}` realizes w = 0 (degenerate
+> branch nonempty), and interval b = 5 gives w = 4 != 1 (scaling genuinely
+> nontrivial). Those two examples carry the theorem. Keep the closed form as
+> the convenient way to *generate* such witnesses; do not present it, or the
+> 4 | b classification, as a result in its own right, and do not extend the
+> b-family further.
+
 so densities are NOT squares beyond b = 3 — "squares" was a b <= 3
 artifact. The solid-pair term (b+1)^2 == 1 mod p | b stands. Mod-p
 corollary of the closed form: for **odd p | b** both b^3 and b(b+1)/2
