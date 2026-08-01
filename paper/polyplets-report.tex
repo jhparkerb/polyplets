@@ -396,13 +396,11 @@ deeper levels. The recursion tallies by size; no animal is stored. Being
 embarrassingly parallel by sub-tree, the count was run as two decorrelated
 campaigns---on Apple silicon (Apple~clang, frontier split $7\times64$) and
 AMD/x86 (GCC, split $8\times96$). The per-size outputs are
-\textbf{byte-identical}. Because the two campaigns differ in hardware,
-compiler, and scheduling and the arithmetic is exact integer addition, a
-transient or platform-specific fault in one is overwhelmingly unlikely to be
-mirrored digit-for-digit in the other; the error mode they cannot jointly
-catch is a bug in the shared \emph{algorithm}, which is what the transfer
-matrix (Methods~B,~C) rules out by counting the same animals a completely
-different way. An optimized kernel (the terminal frontier level counted in
+\textbf{byte-identical}. Differing in hardware, compiler, and scheduling,
+the two campaigns make a transient or platform-specific fault implausible;
+what they cannot jointly catch is a bug in the shared \emph{algorithm},
+which is exactly what the transfer matrix (Methods~B,~C) rules out by
+counting the same animals a completely different way. An optimized kernel (the terminal frontier level counted in
 bulk, compile-time neighbour offsets; ${\approx}2\times$ faster) run as a
 three-architecture fleet (ARM, x86, Apple silicon) extended the whole-row
 enumeration to $n=22$---byte-identical across machines and matching the
@@ -475,17 +473,16 @@ refuses partial or duplicated inputs.
 
 \paragraph{I/O integrity.}
 A multi-hour external shuffle is itself a failure surface, so the disk
-layer is engineered to fail closed rather than lose states silently. Every
-spill file carries a self-describing header (magic, format version, byte
-order, key width, and the \emph{record count}, so truncation---including
-the short writes produced by resource exhaustion---is detected on read
-rather than absorbed); readers and the merge refuse malformed or
-count-mismatched inputs; the per-height combiner refuses missing, empty,
-or duplicated shards and takes a lock against concurrent runs on the same
-directory; and kept artifacts are listed in a manifest with per-file
-checksums. These refusal paths are not assumed to work: the release's gate
-suite fault-injects each failure mode (truncated file, missing shard,
-duplicated rows, held lock) and requires the pipeline to abort loudly.
+layer is engineered to fail closed rather than lose states silently. Spill
+files carry a self-describing header including a \emph{record count}, so
+truncation---including the short writes produced by resource
+exhaustion---is detected on read rather than absorbed; readers and the
+merge refuse malformed or count-mismatched inputs; the per-height combiner
+refuses missing, empty, or duplicated shards and locks against concurrent
+runs; kept artifacts carry per-file checksums. These refusal paths are not
+assumed to work: the release's gate suite fault-injects each failure mode
+(truncated file, missing shard, duplicated rows, held lock) and requires
+the pipeline to abort loudly.
 
 Each production run reproduces the complete triangle---every $T(n,H)$ for all
 smaller $n$---so each new term arrives with a full-chain regression against
@@ -657,17 +654,16 @@ designed around the weakest link at each stage.
         closing at $a(40)$. Those strata run the same code path the lower
         $P_k$ certified; what lacks certification is the top cells
         themselves, not the path.
-  \item \textbf{Modular consistency (design capability, not a production
+  \item \textbf{Modular consistency (a design capability, not a production
         gate).} A residue-counter/CRT-reconstruction path exists and is
-        regression-tested (independent residue systems must agree, which
-        would catch overflow and transient corruption---not shared
-        enumeration bugs, which the items above target), but it has only
-        been exercised at small $n$, not against any production frontier
+        regression-tested---independent residue systems must agree, which
+        would catch overflow and transient corruption, though not the
+        shared enumeration bugs the items above target---but it has only
+        been exercised at small $n$, never against a production frontier
         sweep $a(20)$--$a(40)$. Overflow protection for the reported terms
-        instead comes from the items already listed above (cross-machine
-        and cross-algorithm recount, u128-vs-u64 comparison at the sizes
-        where both are feasible) plus the structural and fault-injection
-        checks below.
+        comes instead from the recounts above, a u128-vs-u64 comparison at
+        the sizes where both are feasible, and the structural and
+        fault-injection checks below.
   \item \textbf{Structural cross-checks.} The transfer matrices'
         (height,\,size) and (size,\,perimeter) marginals match the explicit
         enumeration's; rook- and bishop-connected sub-counts reproduce
@@ -1033,18 +1029,16 @@ never as b-file data.
 \end{table}
 
 \paragraph{The bilateral identity.}
-The bilateral count equals $\tfrac12(H+D)$ exactly, by a double count. Write
-the symmetry group of a fixed polyplet as a subgroup $K\le D_4$. If $K$
-contains a reflection, its rotations form an index-$2$ subgroup, so exactly
-half of $K$'s elements are reflections; otherwise $K$ has none. Count the
+The bilateral count equals $\tfrac12(H+D)$ exactly, by a double count of the
 incidences $(A,m)$ of a fixed animal $A$ with a reflection
-$m\in\operatorname{Stab}(A)$ in two ways. Summed over the four reflections it
-is $2H+2D$, since conjugate reflections have equal fixed-counts. Summed over
-free classes, a class with stabilizer order $|K|$ contains $8/|K|$ fixed
-animals, each with $|K|/2$ reflections in its stabilizer when the class is
-bilateral (and none otherwise)---so exactly $4$ incidences per bilateral
-class. Hence $2H+2D=4\cdot(\text{bilateral classes})$. This was also checked
-numerically against every published term of A030234.
+$m\in\operatorname{Stab}(A)$. Summed over the four reflections this is
+$2H+2D$, since conjugate reflections have equal fixed-counts. Summed over
+free classes it is exactly $4$ per bilateral class: a stabilizer $K\le D_4$
+containing a reflection has its rotations as an index-$2$ subgroup, so half
+its elements are reflections, and a class with stabilizer order $|K|$
+contains $8/|K|$ fixed animals each contributing $|K|/2$. Hence
+$2H+2D=4\cdot(\text{bilateral classes})$, also checked numerically against
+every published term of A030234.
 
 \section{Hole stratification}
 \label{sec:holes}
@@ -1174,18 +1168,14 @@ maximization, the bound is exact at every $n$. Each step is machine-checked
 end-to-end on $3{,}927$ single-hole animals; write-up and checkers in
 \texttt{results/maxhole-proof.md}.
 
-$M(17)=28$ was the first genuinely untested prediction of the formula
-(fitted on $n\le16$, with no forward confirmation until this run): a
-78-way split of the exact ($n{=}17$) hole-area sweep, combined by
-elementwise maximum, confirms it exactly---a real forward test, not
-another point it was fit to.
-
 \begin{conjecture}
 \label{conj:diamond}
 The same formula gives the maximum \emph{total} enclosed area over any
 number of holes: splitting area across several holes is never better.
-Verified exhaustively for $n\le17$ and on $6{,}000$ random multi-hole
-animals with zero violations.
+Verified exhaustively for $n\le17$---and the $n=17$ sweep was a genuine
+forward test, the multi-hole values having been checked only to $n\le16$
+when it ran---and on $6{,}000$ random multi-hole animals, with zero
+violations.
 \end{conjecture}
 
 \begin{openproblem}
@@ -1208,17 +1198,16 @@ generating function $G_H(x)=P_H(x)/Q_H(x)$ is rational~\cite{stanley}. We
 recover these exactly for $H\le10$ by Berlekamp--Massey~\cite{massey} over
 $\mathbb{Z}/p\mathbb{Z}$ for several primes followed by CRT, each accepted
 only when the fitted recurrence reproduces held-out terms. The denominators
-$Q_H$ have orders\footnote{These orders are $3$-term running sums of
-\emph{atom} degrees $1,2,4,9,29,68,181,\dots$: each $Q_H$ factors as
-$N_{H-2}N_{H-1}N_H$, where $N_H$ is the denominator of the height-$H$ strip
-generating function. The divisibility direction is algebraic, not
-empirical: exact-height counts are second differences of strip counts, so
+$Q_H$ have orders\footnote{Each $Q_H$ factors as $N_{H-2}N_{H-1}N_H$, where
+$N_H$ is the denominator of the height-$H$ strip generating function, so
+these orders are $3$-term running sums of the \emph{atom} degrees
+$1,2,4,9,29,68,181,\dots$. The divisibility is algebraic, not empirical:
+exact-height counts are second differences of strip counts, so
 $Q_H \mid N_{H-2}N_{H-1}N_H$ by construction, for any finite-range animal
-class. What is observed rather than proved is the absence of cancellation
-(equality, so that every irreducible factor divides exactly three
-consecutive $Q_H$), verified here for $H\le7$; a failure at larger $H$
-could only \emph{shrink} $Q_H$, never introduce factors outside the three
-atoms. Neither degree sequence appears in OEIS (Superseeker-checked).} $1,3,7,15,42,106,278,711,1897,5005$ for
+class. Observed rather than proved is the absence of cancellation, verified
+here for $H\le7$; a failure at larger $H$ could only \emph{shrink} $Q_H$,
+never introduce factors outside the three atoms. Neither degree sequence
+appears in OEIS (Superseeker-checked).} $1,3,7,15,42,106,278,711,1897,5005$ for
 $H=1,\dots,10$; the $H=10$ recovery, needing $\sim\!10{,}000$ series terms,
 was reproduced on a second architecture byte-identically. As an example,
 \[
@@ -1393,10 +1382,8 @@ terms records (Section~\ref{sec:confirm}); the sequence closes at
 $a(40)$ with that grade stated rather than outrun. The symmetric counts scale as
 $\sqrt{a}$-class problems and reached $n=34$ for three of the four types;
 the diagonal-mirror type, whose forced-square bounding box compresses least,
-is the binding constraint on the remaining companions---its per-strip RAM
-peaked at $83$\,GB at $n=32$ after a compact-frontier rewrite (flat sharded
-arrays, ranged count vectors, $\approx1.6\times$ RAM and $\approx2\times$
-speed over the hash-map frontier it replaced), and the pinned
+is the binding constraint on the remaining companions (per-strip RAM
+peaked at $83$\,GB at $n=32$), and the pinned
 quasi-polynomials of Section~\ref{sec:dmdiag} substitute for the strips
 beyond hardware at $n\ge33$ under the \tierthree{} label.
 
@@ -1458,7 +1445,8 @@ All machines are commodity hardware owned and operated by the author:
   runs (earlier terms were computed by intermediate engine generations and
   are not directly comparable). The gentle growth reflects the closed-form
   diagonals holding the tallest real sweep at $H=18$ throughout this range;
-  RAM stays small because the frontier spills to disk.}
+  that tallest sweep dominates the wall (${\sim}70\%$ at $a(34)$), and RAM
+  stays small because the frontier spills to disk.}
   \label{tab:costs}
 \end{table}
 
@@ -1486,12 +1474,6 @@ All machines are commodity hardware owned and operated by the author:
 \end{table}
 
 \begin{itemize}
-  \item \textbf{$a(34)$, full triangle (Method C, dalby):} wall
-        $\approx3.7$\,h across all 34 heights; $\approx59$ core-hours; peak
-        resident memory $6.4$\,GB (the frontier spills to disk, so RAM
-        stays small; the tallest surviving real sweep height dominates,
-        $\sim70\%$ of the wall). The cross-ISA recount on ayr reproduced
-        the triangle byte-identically.
   \item \textbf{$a(36)$, full triangle (Method C, split across two
         machines):} heights $H\le18$ and the injected range on ayr
         ($1.94$\,h wall, $52$ core-hours, peak RSS $0.35$\,GB) in parallel
