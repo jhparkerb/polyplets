@@ -102,19 +102,25 @@ lemma prodPoly_eval (num : List ℚ) (kf x : ℚ) :
 /-! ## The generic pin lemma (Lagrange uniqueness) -/
 
 /-- **Pin lemma.** A polynomial `p` of degree `≤ k` that matches the shape
-witness (`shape_production`) at `k+1` distinct onset points `s ⊆ [2k+1, 3k+1]`
+witness (`shape_production`) at the `k+1` onset points `[2k+1, 3k+1]`
 *is* the shape witness, hence carries the full diagonal-law production form.
 
-The hypothesis `hpts` states, at each pin point `n`, that `p(n)` equals the
-integer `T(n,n-k)·3^(3k+1-n)` that `production_int_onset` also forces on the
-witness; Lagrange (`eq_of_degrees_lt_of_eval_finset_eq`) over `ℚ`, on `s` cast
-into `ℚ`, then identifies the two polynomials. -/
+The hypothesis `hpts` states, at each of the `k+1` onset points
+`n ∈ [2k+1, 3k+1]`, that `p(n)` equals the integer `T(n,n-k)·3^(3k+1-n)`
+that `production_int_onset` also forces on the witness; Lagrange
+(`eq_of_degrees_lt_of_eval_finset_eq`) over `ℚ`, on the interval cast into
+`ℚ`, then identifies the two polynomials. (2026-07-31: specialized to
+`s = Finset.Icc (2k+1) (3k+1)` — every caller passed exactly that set, so
+the former `s`/`hcard`/`hin` parameters were noise.) -/
 theorem pin (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k)
-    (s : Finset ℕ) (hcard : k + 1 ≤ s.card)
-    (hin : ∀ n ∈ s, 2 * k + 1 ≤ n ∧ n ≤ 3 * k + 1)
-    (hpts : ∀ n ∈ s, p.eval (n : ℚ) = ((T n (n - k) * 3 ^ (3 * k + 1 - n) : ℕ) : ℚ)) :
+    (hpts : ∀ n ∈ Finset.Icc (2 * k + 1) (3 * k + 1),
+      p.eval (n : ℚ) = ((T n (n - k) * 3 ^ (3 * k + 1 - n) : ℕ) : ℚ)) :
     ∀ n : ℕ, 2 * k + 1 ≤ n →
       (T n (n - k) : ℚ) = p.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) := by
+  set s : Finset ℕ := Finset.Icc (2 * k + 1) (3 * k + 1) with hs
+  have hcard : k + 1 ≤ s.card := by rw [hs, Nat.card_Icc]; omega
+  have hin : ∀ n ∈ s, 2 * k + 1 ≤ n ∧ n ≤ 3 * k + 1 := fun n hn =>
+    Finset.mem_Icc.mp (hs ▸ hn)
   obtain ⟨P, hPdeg, hPzpow, hPcomp⟩ := shape_production k
   have hpP : p = P := by
     have hinj : Set.InjOn (Nat.cast : ℕ → ℚ) s := fun a _ b _ h => by exact_mod_cast h
@@ -255,12 +261,11 @@ lemma guard_0_1 : Pp0.eval (1 : ℚ) = ((T 1 1 * 3 ^ 0 : ℕ) : ℚ) := by
 /-- **k=0 diagonal, unconditional**: `T(n,n) = 3^(n-1)` for `n ≥ 1`. -/
 theorem P0_pinned : ∀ n : ℕ, 2 * 0 + 1 ≤ n →
     (T n (n - 0) : ℚ) = Pp0.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 0) := by
-  refine pin 0 Pp0 Pp0_deg ({1} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn; norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (1 - 0 : ℕ) = 1 from rfl, show (3 * 0 + 1 - 1 : ℕ) = 0 from rfl]
-      exact guard_0_1
+  refine pin 0 Pp0 Pp0_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (1 - 0 : ℕ) = 1 from rfl, show (3 * 0 + 1 - 1 : ℕ) = 0 from rfl]
+    exact guard_0_1
 
 /-- k=1 production polynomial `P_1 = 25X - 45`. -/
 noncomputable def Pp1 : Polynomial ℚ := prodPoly [25, -45] 1
@@ -274,14 +279,13 @@ lemma guard_1_4 : Pp1.eval (4 : ℚ) = ((T 4 3 * 3 ^ 0 : ℕ) : ℚ) := by
 /-- **k=1 diagonal, unconditional** (production form). -/
 theorem P1_pinned : ∀ n : ℕ, 2 * 1 + 1 ≤ n →
     (T n (n - 1) : ℚ) = Pp1.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 1) := by
-  refine pin 1 Pp1 Pp1_deg ({3, 4} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (3 - 1 : ℕ) = 2 from rfl, show (3 * 1 + 1 - 3 : ℕ) = 1 from rfl]
-      exact guard_1_3
-    · simp only [show (4 - 1 : ℕ) = 3 from rfl, show (3 * 1 + 1 - 4 : ℕ) = 0 from rfl]
-      exact guard_1_4
+  refine pin 1 Pp1 Pp1_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (3 - 1 : ℕ) = 2 from rfl, show (3 * 1 + 1 - 3 : ℕ) = 1 from rfl]
+    exact guard_1_3
+  · simp only [show (4 - 1 : ℕ) = 3 from rfl, show (3 * 1 + 1 - 4 : ℕ) = 0 from rfl]
+    exact guard_1_4
 
 /-- **k=1 diagonal, human form**: `T(n, n-1) = (25n - 45)·3^(n-4)` for `n ≥ 3`
 (retires `Diagonal.T_n_nm1`). -/
@@ -306,16 +310,15 @@ lemma guard_2_7 : Pp2.eval (7 : ℚ) = ((T 7 5 * 3 ^ 0 : ℕ) : ℚ) := by
 /-- **k=2 diagonal, unconditional** (production form). -/
 theorem P2_pinned : ∀ n : ℕ, 2 * 2 + 1 ≤ n →
     (T n (n - 2) : ℚ) = Pp2.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 2) := by
-  refine pin 2 Pp2 Pp2_deg ({5, 6, 7} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (5 - 2 : ℕ) = 3 from rfl, show (3 * 2 + 1 - 5 : ℕ) = 2 from rfl]
-      exact guard_2_5
-    · simp only [show (6 - 2 : ℕ) = 4 from rfl, show (3 * 2 + 1 - 6 : ℕ) = 1 from rfl]
-      exact guard_2_6
-    · simp only [show (7 - 2 : ℕ) = 5 from rfl, show (3 * 2 + 1 - 7 : ℕ) = 0 from rfl]
-      exact guard_2_7
+  refine pin 2 Pp2 Pp2_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (5 - 2 : ℕ) = 3 from rfl, show (3 * 2 + 1 - 5 : ℕ) = 2 from rfl]
+    exact guard_2_5
+  · simp only [show (6 - 2 : ℕ) = 4 from rfl, show (3 * 2 + 1 - 6 : ℕ) = 1 from rfl]
+    exact guard_2_6
+  · simp only [show (7 - 2 : ℕ) = 5 from rfl, show (3 * 2 + 1 - 7 : ℕ) = 0 from rfl]
+    exact guard_2_7
 
 /-- **k=2 diagonal, human form**: `T(n, n-2) = ½(625n² - 2459n + 1134)·3^(n-7)`
 for `n ≥ 5` (retires `Diagonal.T_n_nm2`). -/
@@ -387,18 +390,17 @@ theorem P3_pinned_of_heavy (hV33 : V 3 3 = 4778) (hVt33 : Vt 3 3 = 919)
     norm_num [hd37, Vt_1_1, d_2_6, Vt_1_2, d_1_6, Vt_2_2, d_1_5, Vt_1_3, d_0_6, Vt_2_3, d_0_5,
       hVt33, d_0_4] at h
     omega
-  refine pin 3 Pp3 Pp3_deg ({7, 8, 9, 10} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (7 - 3 : ℕ) = 4 from rfl, show (3 * 3 + 1 - 7 : ℕ) = 3 from rfl, hT74]
-      exact guard_3_7
-    · simp only [show (8 - 3 : ℕ) = 5 from rfl, show (3 * 3 + 1 - 8 : ℕ) = 2 from rfl, hT85]
-      exact guard_3_8
-    · simp only [show (9 - 3 : ℕ) = 6 from rfl, show (3 * 3 + 1 - 9 : ℕ) = 1 from rfl, hT96]
-      exact guard_3_9
-    · simp only [show (10 - 3 : ℕ) = 7 from rfl, show (3 * 3 + 1 - 10 : ℕ) = 0 from rfl, hT10_7]
-      exact guard_3_10
+  refine pin 3 Pp3 Pp3_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (7 - 3 : ℕ) = 4 from rfl, show (3 * 3 + 1 - 7 : ℕ) = 3 from rfl, hT74]
+    exact guard_3_7
+  · simp only [show (8 - 3 : ℕ) = 5 from rfl, show (3 * 3 + 1 - 8 : ℕ) = 2 from rfl, hT85]
+    exact guard_3_8
+  · simp only [show (9 - 3 : ℕ) = 6 from rfl, show (3 * 3 + 1 - 9 : ℕ) = 1 from rfl, hT96]
+    exact guard_3_9
+  · simp only [show (10 - 3 : ℕ) = 7 from rfl, show (3 * 3 + 1 - 10 : ℕ) = 0 from rfl, hT10_7]
+    exact guard_3_10
 
 /-! ## Conditional (`k = 4..11`) and partial (`k = 12..16`) tiers
 
@@ -435,25 +437,24 @@ theorem P4_pinned_of_banked
     (h13 : T 13 9 = 189262009)
     : ∀ n : ℕ, 2 * 4 + 1 ≤ n →
       (T n (n - 4) : ℚ) = Pp4.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 4) := by
-  refine pin 4 Pp4 Pp4_deg ({9, 10, 11, 12, 13} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (9 - 4 : ℕ) = 5 from rfl,
-        show (3 * 4 + 1 - 9 : ℕ) = 4 from rfl, h9]
-      exact guard_4_9
-    · simp only [show (10 - 4 : ℕ) = 6 from rfl,
-        show (3 * 4 + 1 - 10 : ℕ) = 3 from rfl, h10]
-      exact guard_4_10
-    · simp only [show (11 - 4 : ℕ) = 7 from rfl,
-        show (3 * 4 + 1 - 11 : ℕ) = 2 from rfl, h11]
-      exact guard_4_11
-    · simp only [show (12 - 4 : ℕ) = 8 from rfl,
-        show (3 * 4 + 1 - 12 : ℕ) = 1 from rfl, h12]
-      exact guard_4_12
-    · simp only [show (13 - 4 : ℕ) = 9 from rfl,
-        show (3 * 4 + 1 - 13 : ℕ) = 0 from rfl, h13]
-      exact guard_4_13
+  refine pin 4 Pp4 Pp4_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (9 - 4 : ℕ) = 5 from rfl,
+      show (3 * 4 + 1 - 9 : ℕ) = 4 from rfl, h9]
+    exact guard_4_9
+  · simp only [show (10 - 4 : ℕ) = 6 from rfl,
+      show (3 * 4 + 1 - 10 : ℕ) = 3 from rfl, h10]
+    exact guard_4_10
+  · simp only [show (11 - 4 : ℕ) = 7 from rfl,
+      show (3 * 4 + 1 - 11 : ℕ) = 2 from rfl, h11]
+    exact guard_4_11
+  · simp only [show (12 - 4 : ℕ) = 8 from rfl,
+      show (3 * 4 + 1 - 12 : ℕ) = 1 from rfl, h12]
+    exact guard_4_12
+  · simp only [show (13 - 4 : ℕ) = 9 from rfl,
+      show (3 * 4 + 1 - 13 : ℕ) = 0 from rfl, h13]
+    exact guard_4_13
 
 /-- k=5 production polynomial (numerator / 120), transcribed from `pin-data.md`. -/
 noncomputable def Pp5 : Polynomial ℚ := prodPoly
@@ -484,28 +485,27 @@ theorem P5_pinned_of_banked
     (h16 : T 16 11 = 32703766750)
     : ∀ n : ℕ, 2 * 5 + 1 ≤ n →
       (T n (n - 5) : ℚ) = Pp5.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 5) := by
-  refine pin 5 Pp5 Pp5_deg ({11, 12, 13, 14, 15, 16} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (11 - 5 : ℕ) = 6 from rfl,
-        show (3 * 5 + 1 - 11 : ℕ) = 5 from rfl, h11]
-      exact guard_5_11
-    · simp only [show (12 - 5 : ℕ) = 7 from rfl,
-        show (3 * 5 + 1 - 12 : ℕ) = 4 from rfl, h12]
-      exact guard_5_12
-    · simp only [show (13 - 5 : ℕ) = 8 from rfl,
-        show (3 * 5 + 1 - 13 : ℕ) = 3 from rfl, h13]
-      exact guard_5_13
-    · simp only [show (14 - 5 : ℕ) = 9 from rfl,
-        show (3 * 5 + 1 - 14 : ℕ) = 2 from rfl, h14]
-      exact guard_5_14
-    · simp only [show (15 - 5 : ℕ) = 10 from rfl,
-        show (3 * 5 + 1 - 15 : ℕ) = 1 from rfl, h15]
-      exact guard_5_15
-    · simp only [show (16 - 5 : ℕ) = 11 from rfl,
-        show (3 * 5 + 1 - 16 : ℕ) = 0 from rfl, h16]
-      exact guard_5_16
+  refine pin 5 Pp5 Pp5_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (11 - 5 : ℕ) = 6 from rfl,
+      show (3 * 5 + 1 - 11 : ℕ) = 5 from rfl, h11]
+    exact guard_5_11
+  · simp only [show (12 - 5 : ℕ) = 7 from rfl,
+      show (3 * 5 + 1 - 12 : ℕ) = 4 from rfl, h12]
+    exact guard_5_12
+  · simp only [show (13 - 5 : ℕ) = 8 from rfl,
+      show (3 * 5 + 1 - 13 : ℕ) = 3 from rfl, h13]
+    exact guard_5_13
+  · simp only [show (14 - 5 : ℕ) = 9 from rfl,
+      show (3 * 5 + 1 - 14 : ℕ) = 2 from rfl, h14]
+    exact guard_5_14
+  · simp only [show (15 - 5 : ℕ) = 10 from rfl,
+      show (3 * 5 + 1 - 15 : ℕ) = 1 from rfl, h15]
+    exact guard_5_15
+  · simp only [show (16 - 5 : ℕ) = 11 from rfl,
+      show (3 * 5 + 1 - 16 : ℕ) = 0 from rfl, h16]
+    exact guard_5_16
 
 /-- k=6 production polynomial (numerator / 720), transcribed from `pin-data.md`. -/
 noncomputable def Pp6 : Polynomial ℚ := prodPoly
@@ -539,31 +539,30 @@ theorem P6_pinned_of_banked
     (h19 : T 19 13 = 5776897734667)
     : ∀ n : ℕ, 2 * 6 + 1 ≤ n →
       (T n (n - 6) : ℚ) = Pp6.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 6) := by
-  refine pin 6 Pp6 Pp6_deg ({13, 14, 15, 16, 17, 18, 19} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (13 - 6 : ℕ) = 7 from rfl,
-        show (3 * 6 + 1 - 13 : ℕ) = 6 from rfl, h13]
-      exact guard_6_13
-    · simp only [show (14 - 6 : ℕ) = 8 from rfl,
-        show (3 * 6 + 1 - 14 : ℕ) = 5 from rfl, h14]
-      exact guard_6_14
-    · simp only [show (15 - 6 : ℕ) = 9 from rfl,
-        show (3 * 6 + 1 - 15 : ℕ) = 4 from rfl, h15]
-      exact guard_6_15
-    · simp only [show (16 - 6 : ℕ) = 10 from rfl,
-        show (3 * 6 + 1 - 16 : ℕ) = 3 from rfl, h16]
-      exact guard_6_16
-    · simp only [show (17 - 6 : ℕ) = 11 from rfl,
-        show (3 * 6 + 1 - 17 : ℕ) = 2 from rfl, h17]
-      exact guard_6_17
-    · simp only [show (18 - 6 : ℕ) = 12 from rfl,
-        show (3 * 6 + 1 - 18 : ℕ) = 1 from rfl, h18]
-      exact guard_6_18
-    · simp only [show (19 - 6 : ℕ) = 13 from rfl,
-        show (3 * 6 + 1 - 19 : ℕ) = 0 from rfl, h19]
-      exact guard_6_19
+  refine pin 6 Pp6 Pp6_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (13 - 6 : ℕ) = 7 from rfl,
+      show (3 * 6 + 1 - 13 : ℕ) = 6 from rfl, h13]
+    exact guard_6_13
+  · simp only [show (14 - 6 : ℕ) = 8 from rfl,
+      show (3 * 6 + 1 - 14 : ℕ) = 5 from rfl, h14]
+    exact guard_6_14
+  · simp only [show (15 - 6 : ℕ) = 9 from rfl,
+      show (3 * 6 + 1 - 15 : ℕ) = 4 from rfl, h15]
+    exact guard_6_15
+  · simp only [show (16 - 6 : ℕ) = 10 from rfl,
+      show (3 * 6 + 1 - 16 : ℕ) = 3 from rfl, h16]
+    exact guard_6_16
+  · simp only [show (17 - 6 : ℕ) = 11 from rfl,
+      show (3 * 6 + 1 - 17 : ℕ) = 2 from rfl, h17]
+    exact guard_6_17
+  · simp only [show (18 - 6 : ℕ) = 12 from rfl,
+      show (3 * 6 + 1 - 18 : ℕ) = 1 from rfl, h18]
+    exact guard_6_18
+  · simp only [show (19 - 6 : ℕ) = 13 from rfl,
+      show (3 * 6 + 1 - 19 : ℕ) = 0 from rfl, h19]
+    exact guard_6_19
 
 /-- k=7 production polynomial (numerator / 5040), transcribed from `pin-data.md`. -/
 noncomputable def Pp7 : Polynomial ℚ := prodPoly
@@ -600,34 +599,33 @@ theorem P7_pinned_of_banked
     (h22 : T 22 15 = 1035856891052731)
     : ∀ n : ℕ, 2 * 7 + 1 ≤ n →
       (T n (n - 7) : ℚ) = Pp7.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 7) := by
-  refine pin 7 Pp7 Pp7_deg ({15, 16, 17, 18, 19, 20, 21, 22} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (15 - 7 : ℕ) = 8 from rfl,
-        show (3 * 7 + 1 - 15 : ℕ) = 7 from rfl, h15]
-      exact guard_7_15
-    · simp only [show (16 - 7 : ℕ) = 9 from rfl,
-        show (3 * 7 + 1 - 16 : ℕ) = 6 from rfl, h16]
-      exact guard_7_16
-    · simp only [show (17 - 7 : ℕ) = 10 from rfl,
-        show (3 * 7 + 1 - 17 : ℕ) = 5 from rfl, h17]
-      exact guard_7_17
-    · simp only [show (18 - 7 : ℕ) = 11 from rfl,
-        show (3 * 7 + 1 - 18 : ℕ) = 4 from rfl, h18]
-      exact guard_7_18
-    · simp only [show (19 - 7 : ℕ) = 12 from rfl,
-        show (3 * 7 + 1 - 19 : ℕ) = 3 from rfl, h19]
-      exact guard_7_19
-    · simp only [show (20 - 7 : ℕ) = 13 from rfl,
-        show (3 * 7 + 1 - 20 : ℕ) = 2 from rfl, h20]
-      exact guard_7_20
-    · simp only [show (21 - 7 : ℕ) = 14 from rfl,
-        show (3 * 7 + 1 - 21 : ℕ) = 1 from rfl, h21]
-      exact guard_7_21
-    · simp only [show (22 - 7 : ℕ) = 15 from rfl,
-        show (3 * 7 + 1 - 22 : ℕ) = 0 from rfl, h22]
-      exact guard_7_22
+  refine pin 7 Pp7 Pp7_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (15 - 7 : ℕ) = 8 from rfl,
+      show (3 * 7 + 1 - 15 : ℕ) = 7 from rfl, h15]
+    exact guard_7_15
+  · simp only [show (16 - 7 : ℕ) = 9 from rfl,
+      show (3 * 7 + 1 - 16 : ℕ) = 6 from rfl, h16]
+    exact guard_7_16
+  · simp only [show (17 - 7 : ℕ) = 10 from rfl,
+      show (3 * 7 + 1 - 17 : ℕ) = 5 from rfl, h17]
+    exact guard_7_17
+  · simp only [show (18 - 7 : ℕ) = 11 from rfl,
+      show (3 * 7 + 1 - 18 : ℕ) = 4 from rfl, h18]
+    exact guard_7_18
+  · simp only [show (19 - 7 : ℕ) = 12 from rfl,
+      show (3 * 7 + 1 - 19 : ℕ) = 3 from rfl, h19]
+    exact guard_7_19
+  · simp only [show (20 - 7 : ℕ) = 13 from rfl,
+      show (3 * 7 + 1 - 20 : ℕ) = 2 from rfl, h20]
+    exact guard_7_20
+  · simp only [show (21 - 7 : ℕ) = 14 from rfl,
+      show (3 * 7 + 1 - 21 : ℕ) = 1 from rfl, h21]
+    exact guard_7_21
+  · simp only [show (22 - 7 : ℕ) = 15 from rfl,
+      show (3 * 7 + 1 - 22 : ℕ) = 0 from rfl, h22]
+    exact guard_7_22
 
 /-- k=8 production polynomial (numerator / 40320), transcribed from `pin-data.md`. -/
 noncomputable def Pp8 : Polynomial ℚ := prodPoly
@@ -667,37 +665,36 @@ theorem P8_pinned_of_banked
     (h25 : T 25 17 = 187767529262410933)
     : ∀ n : ℕ, 2 * 8 + 1 ≤ n →
       (T n (n - 8) : ℚ) = Pp8.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 8) := by
-  refine pin 8 Pp8 Pp8_deg ({17, 18, 19, 20, 21, 22, 23, 24, 25} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (17 - 8 : ℕ) = 9 from rfl,
-        show (3 * 8 + 1 - 17 : ℕ) = 8 from rfl, h17]
-      exact guard_8_17
-    · simp only [show (18 - 8 : ℕ) = 10 from rfl,
-        show (3 * 8 + 1 - 18 : ℕ) = 7 from rfl, h18]
-      exact guard_8_18
-    · simp only [show (19 - 8 : ℕ) = 11 from rfl,
-        show (3 * 8 + 1 - 19 : ℕ) = 6 from rfl, h19]
-      exact guard_8_19
-    · simp only [show (20 - 8 : ℕ) = 12 from rfl,
-        show (3 * 8 + 1 - 20 : ℕ) = 5 from rfl, h20]
-      exact guard_8_20
-    · simp only [show (21 - 8 : ℕ) = 13 from rfl,
-        show (3 * 8 + 1 - 21 : ℕ) = 4 from rfl, h21]
-      exact guard_8_21
-    · simp only [show (22 - 8 : ℕ) = 14 from rfl,
-        show (3 * 8 + 1 - 22 : ℕ) = 3 from rfl, h22]
-      exact guard_8_22
-    · simp only [show (23 - 8 : ℕ) = 15 from rfl,
-        show (3 * 8 + 1 - 23 : ℕ) = 2 from rfl, h23]
-      exact guard_8_23
-    · simp only [show (24 - 8 : ℕ) = 16 from rfl,
-        show (3 * 8 + 1 - 24 : ℕ) = 1 from rfl, h24]
-      exact guard_8_24
-    · simp only [show (25 - 8 : ℕ) = 17 from rfl,
-        show (3 * 8 + 1 - 25 : ℕ) = 0 from rfl, h25]
-      exact guard_8_25
+  refine pin 8 Pp8 Pp8_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (17 - 8 : ℕ) = 9 from rfl,
+      show (3 * 8 + 1 - 17 : ℕ) = 8 from rfl, h17]
+    exact guard_8_17
+  · simp only [show (18 - 8 : ℕ) = 10 from rfl,
+      show (3 * 8 + 1 - 18 : ℕ) = 7 from rfl, h18]
+    exact guard_8_18
+  · simp only [show (19 - 8 : ℕ) = 11 from rfl,
+      show (3 * 8 + 1 - 19 : ℕ) = 6 from rfl, h19]
+    exact guard_8_19
+  · simp only [show (20 - 8 : ℕ) = 12 from rfl,
+      show (3 * 8 + 1 - 20 : ℕ) = 5 from rfl, h20]
+    exact guard_8_20
+  · simp only [show (21 - 8 : ℕ) = 13 from rfl,
+      show (3 * 8 + 1 - 21 : ℕ) = 4 from rfl, h21]
+    exact guard_8_21
+  · simp only [show (22 - 8 : ℕ) = 14 from rfl,
+      show (3 * 8 + 1 - 22 : ℕ) = 3 from rfl, h22]
+    exact guard_8_22
+  · simp only [show (23 - 8 : ℕ) = 15 from rfl,
+      show (3 * 8 + 1 - 23 : ℕ) = 2 from rfl, h23]
+    exact guard_8_23
+  · simp only [show (24 - 8 : ℕ) = 16 from rfl,
+      show (3 * 8 + 1 - 24 : ℕ) = 1 from rfl, h24]
+    exact guard_8_24
+  · simp only [show (25 - 8 : ℕ) = 17 from rfl,
+      show (3 * 8 + 1 - 25 : ℕ) = 0 from rfl, h25]
+    exact guard_8_25
 
 /-- k=9 production polynomial (numerator / 362880), transcribed from `pin-data.md`. -/
 noncomputable def Pp9 : Polynomial ℚ := prodPoly
@@ -740,40 +737,39 @@ theorem P9_pinned_of_banked
     (h28 : T 28 19 = 34317502124615571106)
     : ∀ n : ℕ, 2 * 9 + 1 ≤ n →
       (T n (n - 9) : ℚ) = Pp9.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 9) := by
-  refine pin 9 Pp9 Pp9_deg ({19, 20, 21, 22, 23, 24, 25, 26, 27, 28} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (19 - 9 : ℕ) = 10 from rfl,
-        show (3 * 9 + 1 - 19 : ℕ) = 9 from rfl, h19]
-      exact guard_9_19
-    · simp only [show (20 - 9 : ℕ) = 11 from rfl,
-        show (3 * 9 + 1 - 20 : ℕ) = 8 from rfl, h20]
-      exact guard_9_20
-    · simp only [show (21 - 9 : ℕ) = 12 from rfl,
-        show (3 * 9 + 1 - 21 : ℕ) = 7 from rfl, h21]
-      exact guard_9_21
-    · simp only [show (22 - 9 : ℕ) = 13 from rfl,
-        show (3 * 9 + 1 - 22 : ℕ) = 6 from rfl, h22]
-      exact guard_9_22
-    · simp only [show (23 - 9 : ℕ) = 14 from rfl,
-        show (3 * 9 + 1 - 23 : ℕ) = 5 from rfl, h23]
-      exact guard_9_23
-    · simp only [show (24 - 9 : ℕ) = 15 from rfl,
-        show (3 * 9 + 1 - 24 : ℕ) = 4 from rfl, h24]
-      exact guard_9_24
-    · simp only [show (25 - 9 : ℕ) = 16 from rfl,
-        show (3 * 9 + 1 - 25 : ℕ) = 3 from rfl, h25]
-      exact guard_9_25
-    · simp only [show (26 - 9 : ℕ) = 17 from rfl,
-        show (3 * 9 + 1 - 26 : ℕ) = 2 from rfl, h26]
-      exact guard_9_26
-    · simp only [show (27 - 9 : ℕ) = 18 from rfl,
-        show (3 * 9 + 1 - 27 : ℕ) = 1 from rfl, h27]
-      exact guard_9_27
-    · simp only [show (28 - 9 : ℕ) = 19 from rfl,
-        show (3 * 9 + 1 - 28 : ℕ) = 0 from rfl, h28]
-      exact guard_9_28
+  refine pin 9 Pp9 Pp9_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (19 - 9 : ℕ) = 10 from rfl,
+      show (3 * 9 + 1 - 19 : ℕ) = 9 from rfl, h19]
+    exact guard_9_19
+  · simp only [show (20 - 9 : ℕ) = 11 from rfl,
+      show (3 * 9 + 1 - 20 : ℕ) = 8 from rfl, h20]
+    exact guard_9_20
+  · simp only [show (21 - 9 : ℕ) = 12 from rfl,
+      show (3 * 9 + 1 - 21 : ℕ) = 7 from rfl, h21]
+    exact guard_9_21
+  · simp only [show (22 - 9 : ℕ) = 13 from rfl,
+      show (3 * 9 + 1 - 22 : ℕ) = 6 from rfl, h22]
+    exact guard_9_22
+  · simp only [show (23 - 9 : ℕ) = 14 from rfl,
+      show (3 * 9 + 1 - 23 : ℕ) = 5 from rfl, h23]
+    exact guard_9_23
+  · simp only [show (24 - 9 : ℕ) = 15 from rfl,
+      show (3 * 9 + 1 - 24 : ℕ) = 4 from rfl, h24]
+    exact guard_9_24
+  · simp only [show (25 - 9 : ℕ) = 16 from rfl,
+      show (3 * 9 + 1 - 25 : ℕ) = 3 from rfl, h25]
+    exact guard_9_25
+  · simp only [show (26 - 9 : ℕ) = 17 from rfl,
+      show (3 * 9 + 1 - 26 : ℕ) = 2 from rfl, h26]
+    exact guard_9_26
+  · simp only [show (27 - 9 : ℕ) = 18 from rfl,
+      show (3 * 9 + 1 - 27 : ℕ) = 1 from rfl, h27]
+    exact guard_9_27
+  · simp only [show (28 - 9 : ℕ) = 19 from rfl,
+      show (3 * 9 + 1 - 28 : ℕ) = 0 from rfl, h28]
+    exact guard_9_28
 
 /-- k=10 production polynomial (numerator / 3628800), transcribed from `pin-data.md`. -/
 noncomputable def Pp10 : Polynomial ℚ := prodPoly
@@ -819,43 +815,42 @@ theorem P10_pinned_of_banked
     (h31 : T 31 21 = 6312683044683280162504)
     : ∀ n : ℕ, 2 * 10 + 1 ≤ n →
       (T n (n - 10) : ℚ) = Pp10.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 10) := by
-  refine pin 10 Pp10 Pp10_deg ({21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (21 - 10 : ℕ) = 11 from rfl,
-        show (3 * 10 + 1 - 21 : ℕ) = 10 from rfl, h21]
-      exact guard_10_21
-    · simp only [show (22 - 10 : ℕ) = 12 from rfl,
-        show (3 * 10 + 1 - 22 : ℕ) = 9 from rfl, h22]
-      exact guard_10_22
-    · simp only [show (23 - 10 : ℕ) = 13 from rfl,
-        show (3 * 10 + 1 - 23 : ℕ) = 8 from rfl, h23]
-      exact guard_10_23
-    · simp only [show (24 - 10 : ℕ) = 14 from rfl,
-        show (3 * 10 + 1 - 24 : ℕ) = 7 from rfl, h24]
-      exact guard_10_24
-    · simp only [show (25 - 10 : ℕ) = 15 from rfl,
-        show (3 * 10 + 1 - 25 : ℕ) = 6 from rfl, h25]
-      exact guard_10_25
-    · simp only [show (26 - 10 : ℕ) = 16 from rfl,
-        show (3 * 10 + 1 - 26 : ℕ) = 5 from rfl, h26]
-      exact guard_10_26
-    · simp only [show (27 - 10 : ℕ) = 17 from rfl,
-        show (3 * 10 + 1 - 27 : ℕ) = 4 from rfl, h27]
-      exact guard_10_27
-    · simp only [show (28 - 10 : ℕ) = 18 from rfl,
-        show (3 * 10 + 1 - 28 : ℕ) = 3 from rfl, h28]
-      exact guard_10_28
-    · simp only [show (29 - 10 : ℕ) = 19 from rfl,
-        show (3 * 10 + 1 - 29 : ℕ) = 2 from rfl, h29]
-      exact guard_10_29
-    · simp only [show (30 - 10 : ℕ) = 20 from rfl,
-        show (3 * 10 + 1 - 30 : ℕ) = 1 from rfl, h30]
-      exact guard_10_30
-    · simp only [show (31 - 10 : ℕ) = 21 from rfl,
-        show (3 * 10 + 1 - 31 : ℕ) = 0 from rfl, h31]
-      exact guard_10_31
+  refine pin 10 Pp10 Pp10_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (21 - 10 : ℕ) = 11 from rfl,
+      show (3 * 10 + 1 - 21 : ℕ) = 10 from rfl, h21]
+    exact guard_10_21
+  · simp only [show (22 - 10 : ℕ) = 12 from rfl,
+      show (3 * 10 + 1 - 22 : ℕ) = 9 from rfl, h22]
+    exact guard_10_22
+  · simp only [show (23 - 10 : ℕ) = 13 from rfl,
+      show (3 * 10 + 1 - 23 : ℕ) = 8 from rfl, h23]
+    exact guard_10_23
+  · simp only [show (24 - 10 : ℕ) = 14 from rfl,
+      show (3 * 10 + 1 - 24 : ℕ) = 7 from rfl, h24]
+    exact guard_10_24
+  · simp only [show (25 - 10 : ℕ) = 15 from rfl,
+      show (3 * 10 + 1 - 25 : ℕ) = 6 from rfl, h25]
+    exact guard_10_25
+  · simp only [show (26 - 10 : ℕ) = 16 from rfl,
+      show (3 * 10 + 1 - 26 : ℕ) = 5 from rfl, h26]
+    exact guard_10_26
+  · simp only [show (27 - 10 : ℕ) = 17 from rfl,
+      show (3 * 10 + 1 - 27 : ℕ) = 4 from rfl, h27]
+    exact guard_10_27
+  · simp only [show (28 - 10 : ℕ) = 18 from rfl,
+      show (3 * 10 + 1 - 28 : ℕ) = 3 from rfl, h28]
+    exact guard_10_28
+  · simp only [show (29 - 10 : ℕ) = 19 from rfl,
+      show (3 * 10 + 1 - 29 : ℕ) = 2 from rfl, h29]
+    exact guard_10_29
+  · simp only [show (30 - 10 : ℕ) = 20 from rfl,
+      show (3 * 10 + 1 - 30 : ℕ) = 1 from rfl, h30]
+    exact guard_10_30
+  · simp only [show (31 - 10 : ℕ) = 21 from rfl,
+      show (3 * 10 + 1 - 31 : ℕ) = 0 from rfl, h31]
+    exact guard_10_31
 
 /-- k=11 production polynomial (numerator / 39916800), transcribed from `pin-data.md`. -/
 noncomputable def Pp11 : Polynomial ℚ := prodPoly
@@ -904,46 +899,45 @@ theorem P11_pinned_of_banked
     (h34 : T 34 23 = 1167265695441145358152351)
     : ∀ n : ℕ, 2 * 11 + 1 ≤ n →
       (T n (n - 11) : ℚ) = Pp11.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 11) := by
-  refine pin 11 Pp11 Pp11_deg ({23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (23 - 11 : ℕ) = 12 from rfl,
-        show (3 * 11 + 1 - 23 : ℕ) = 11 from rfl, h23]
-      exact guard_11_23
-    · simp only [show (24 - 11 : ℕ) = 13 from rfl,
-        show (3 * 11 + 1 - 24 : ℕ) = 10 from rfl, h24]
-      exact guard_11_24
-    · simp only [show (25 - 11 : ℕ) = 14 from rfl,
-        show (3 * 11 + 1 - 25 : ℕ) = 9 from rfl, h25]
-      exact guard_11_25
-    · simp only [show (26 - 11 : ℕ) = 15 from rfl,
-        show (3 * 11 + 1 - 26 : ℕ) = 8 from rfl, h26]
-      exact guard_11_26
-    · simp only [show (27 - 11 : ℕ) = 16 from rfl,
-        show (3 * 11 + 1 - 27 : ℕ) = 7 from rfl, h27]
-      exact guard_11_27
-    · simp only [show (28 - 11 : ℕ) = 17 from rfl,
-        show (3 * 11 + 1 - 28 : ℕ) = 6 from rfl, h28]
-      exact guard_11_28
-    · simp only [show (29 - 11 : ℕ) = 18 from rfl,
-        show (3 * 11 + 1 - 29 : ℕ) = 5 from rfl, h29]
-      exact guard_11_29
-    · simp only [show (30 - 11 : ℕ) = 19 from rfl,
-        show (3 * 11 + 1 - 30 : ℕ) = 4 from rfl, h30]
-      exact guard_11_30
-    · simp only [show (31 - 11 : ℕ) = 20 from rfl,
-        show (3 * 11 + 1 - 31 : ℕ) = 3 from rfl, h31]
-      exact guard_11_31
-    · simp only [show (32 - 11 : ℕ) = 21 from rfl,
-        show (3 * 11 + 1 - 32 : ℕ) = 2 from rfl, h32]
-      exact guard_11_32
-    · simp only [show (33 - 11 : ℕ) = 22 from rfl,
-        show (3 * 11 + 1 - 33 : ℕ) = 1 from rfl, h33]
-      exact guard_11_33
-    · simp only [show (34 - 11 : ℕ) = 23 from rfl,
-        show (3 * 11 + 1 - 34 : ℕ) = 0 from rfl, h34]
-      exact guard_11_34
+  refine pin 11 Pp11 Pp11_deg ?_
+  intro n hn
+  fin_cases hn
+  · simp only [show (23 - 11 : ℕ) = 12 from rfl,
+      show (3 * 11 + 1 - 23 : ℕ) = 11 from rfl, h23]
+    exact guard_11_23
+  · simp only [show (24 - 11 : ℕ) = 13 from rfl,
+      show (3 * 11 + 1 - 24 : ℕ) = 10 from rfl, h24]
+    exact guard_11_24
+  · simp only [show (25 - 11 : ℕ) = 14 from rfl,
+      show (3 * 11 + 1 - 25 : ℕ) = 9 from rfl, h25]
+    exact guard_11_25
+  · simp only [show (26 - 11 : ℕ) = 15 from rfl,
+      show (3 * 11 + 1 - 26 : ℕ) = 8 from rfl, h26]
+    exact guard_11_26
+  · simp only [show (27 - 11 : ℕ) = 16 from rfl,
+      show (3 * 11 + 1 - 27 : ℕ) = 7 from rfl, h27]
+    exact guard_11_27
+  · simp only [show (28 - 11 : ℕ) = 17 from rfl,
+      show (3 * 11 + 1 - 28 : ℕ) = 6 from rfl, h28]
+    exact guard_11_28
+  · simp only [show (29 - 11 : ℕ) = 18 from rfl,
+      show (3 * 11 + 1 - 29 : ℕ) = 5 from rfl, h29]
+    exact guard_11_29
+  · simp only [show (30 - 11 : ℕ) = 19 from rfl,
+      show (3 * 11 + 1 - 30 : ℕ) = 4 from rfl, h30]
+    exact guard_11_30
+  · simp only [show (31 - 11 : ℕ) = 20 from rfl,
+      show (3 * 11 + 1 - 31 : ℕ) = 3 from rfl, h31]
+    exact guard_11_31
+  · simp only [show (32 - 11 : ℕ) = 21 from rfl,
+      show (3 * 11 + 1 - 32 : ℕ) = 2 from rfl, h32]
+    exact guard_11_32
+  · simp only [show (33 - 11 : ℕ) = 22 from rfl,
+      show (3 * 11 + 1 - 33 : ℕ) = 1 from rfl, h33]
+    exact guard_11_33
+  · simp only [show (34 - 11 : ℕ) = 23 from rfl,
+      show (3 * 11 + 1 - 34 : ℕ) = 0 from rfl, h34]
+    exact guard_11_34
 
 /-- k=12 production polynomial (numerator / 479001600), transcribed from `pin-data.md`. -/
 noncomputable def Pp12 : Polynomial ℚ := prodPoly

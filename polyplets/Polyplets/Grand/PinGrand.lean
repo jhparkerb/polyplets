@@ -41,6 +41,24 @@ open Polynomial
 section GrandPin
 set_option linter.style.longLine false
 
+/-- **Generic H→n coordinate change** (2026-07-31 dedup): from the staircase
+banked form `3^(3k+1)·T(H+k,H) = P(H+k)·3^(H+k)` (`∀ H ≥ k+1`) to the
+production `n`-form. One lemma replaces the fifteen per-level copies of
+this proof that `P<k>_grand_prod` used to carry. -/
+lemma grand_to_prod {k : ℕ} {P : Polynomial ℚ}
+    (h : ∀ H : ℕ, k + 1 ≤ H →
+      (3 : ℚ) ^ (3 * k + 1) * (T (H + k) H : ℚ) = P.eval ((H : ℚ) + k) * 3 ^ (H + k)) :
+    ∀ n : ℕ, 2 * k + 1 ≤ n →
+      (T n (n - k) : ℚ) = P.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) := by
+  intro n hn
+  have hg := h (n - k) (by omega)
+  rw [show n - k + k = n from by omega,
+    show ((n - k : ℕ) : ℚ) + k = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
+  rw [show ((n : ℤ) - 1 - 3 * k) = (n : ℤ) - (3 * k + 1 : ℕ) from by push_cast; ring,
+    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast, zpow_natCast]
+  field_simp
+  linear_combination hg
+
 /-- **P-staircase at k=1**: `P_1(x+1) = Σ_{i=0}^{1} (μ_i·3^(2i-1))·P_{1-i}(x-i)`
 with integer coefficients `μ_i·3^(2i-1)`. A pure polynomial identity. -/
 lemma Pstair1 (x : ℚ) :
@@ -294,21 +312,13 @@ theorem P4_grand_of_banked
     ring
 
 /-- **k=4 production `n`-form**: `T(n, n-4) = P_4(n)·3^(n-1-3·4)` for all
-`n ≥ 2·4+1`, from `P4_grand_of_banked`. -/
+`n ≥ 2·4+1`, from `P4_grand_of_banked` via `grand_to_prod`. -/
 theorem P4_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340) :
     ∀ n : ℕ, 2 * 4 + 1 ≤ n →
-      (T n (n - 4) : ℚ) = Pp4.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 4) := by
-  intro n hn
-  have hg := P4_grand_of_banked hA4 hB4 (n - 4) (by omega)
-  rw [show n - 4 + 4 = n from by omega,
-    show ((n - 4 : ℕ) : ℚ) + 4 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 4) = (n : ℤ) - 13 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((13 : ℤ)) = ((13 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 4) : ℚ) = Pp4.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 4) :=
+  grand_to_prod (P4_grand_of_banked hA4 hB4)
 
 /-- **μ_5 solved from the staircase** at `H=5+1`: the second real cell
 `B_5 = T(12,7)` pins `μ_5`. -/
@@ -384,23 +394,15 @@ theorem P5_grand_of_banked
     ring
 
 /-- **k=5 production `n`-form**: `T(n, n-5) = P_5(n)·3^(n-1-3·5)` for all
-`n ≥ 2·5+1`, from `P5_grand_of_banked`. -/
+`n ≥ 2·5+1`, from `P5_grand_of_banked` via `grand_to_prod`. -/
 theorem P5_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
     (hA5 : T 11 6 = 10311170)
     (hB5 : T 12 7 = 59434367) :
     ∀ n : ℕ, 2 * 5 + 1 ≤ n →
-      (T n (n - 5) : ℚ) = Pp5.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 5) := by
-  intro n hn
-  have hg := P5_grand_of_banked hA4 hB4 hA5 hB5 (n - 5) (by omega)
-  rw [show n - 5 + 5 = n from by omega,
-    show ((n - 5 : ℕ) : ℚ) + 5 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 5) = (n : ℤ) - 16 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((16 : ℤ)) = ((16 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 5) : ℚ) = Pp5.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 5) :=
+  grand_to_prod (P5_grand_of_banked hA4 hB4 hA5 hB5)
 
 /-- **μ_6 solved from the staircase** at `H=6+1`: the second real cell
 `B_6 = T(14,8)` pins `μ_6`. -/
@@ -486,7 +488,7 @@ theorem P6_grand_of_banked
     ring
 
 /-- **k=6 production `n`-form**: `T(n, n-6) = P_6(n)·3^(n-1-3·6)` for all
-`n ≥ 2·6+1`, from `P6_grand_of_banked`. -/
+`n ≥ 2·6+1`, from `P6_grand_of_banked` via `grand_to_prod`. -/
 theorem P6_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -495,16 +497,8 @@ theorem P6_grand_prod
     (hA6 : T 13 7 = 393543824)
     (hB6 : T 14 8 = 2234817674) :
     ∀ n : ℕ, 2 * 6 + 1 ≤ n →
-      (T n (n - 6) : ℚ) = Pp6.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 6) := by
-  intro n hn
-  have hg := P6_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 (n - 6) (by omega)
-  rw [show n - 6 + 6 = n from by omega,
-    show ((n - 6 : ℕ) : ℚ) + 6 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 6) = (n : ℤ) - 19 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((19 : ℤ)) = ((19 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 6) : ℚ) = Pp6.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 6) :=
+  grand_to_prod (P6_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6)
 
 /-- **μ_7 solved from the staircase** at `H=7+1`: the second real cell
 `B_7 = T(16,9)` pins `μ_7`. -/
@@ -600,7 +594,7 @@ theorem P7_grand_of_banked
     ring
 
 /-- **k=7 production `n`-form**: `T(n, n-7) = P_7(n)·3^(n-1-3·7)` for all
-`n ≥ 2·7+1`, from `P7_grand_of_banked`. -/
+`n ≥ 2·7+1`, from `P7_grand_of_banked` via `grand_to_prod`. -/
 theorem P7_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -611,16 +605,8 @@ theorem P7_grand_prod
     (hA7 : T 15 8 = 15308484950)
     (hB7 : T 16 9 = 85849256593) :
     ∀ n : ℕ, 2 * 7 + 1 ≤ n →
-      (T n (n - 7) : ℚ) = Pp7.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 7) := by
-  intro n hn
-  have hg := P7_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 (n - 7) (by omega)
-  rw [show n - 7 + 7 = n from by omega,
-    show ((n - 7 : ℕ) : ℚ) + 7 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 7) = (n : ℤ) - 22 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((22 : ℤ)) = ((22 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 7) : ℚ) = Pp7.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 7) :=
+  grand_to_prod (P7_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7)
 
 /-- **μ_8 solved from the staircase** at `H=8+1`: the second real cell
 `B_8 = T(18,10)` pins `μ_8`. -/
@@ -726,7 +712,7 @@ theorem P8_grand_of_banked
     ring
 
 /-- **k=8 production `n`-form**: `T(n, n-8) = P_8(n)·3^(n-1-3·8)` for all
-`n ≥ 2·8+1`, from `P8_grand_of_banked`. -/
+`n ≥ 2·8+1`, from `P8_grand_of_banked` via `grand_to_prod`. -/
 theorem P8_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -739,16 +725,8 @@ theorem P8_grand_prod
     (hA8 : T 17 9 = 603392972436)
     (hB8 : T 18 10 = 3348606811298) :
     ∀ n : ℕ, 2 * 8 + 1 ≤ n →
-      (T n (n - 8) : ℚ) = Pp8.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 8) := by
-  intro n hn
-  have hg := P8_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 (n - 8) (by omega)
-  rw [show n - 8 + 8 = n from by omega,
-    show ((n - 8 : ℕ) : ℚ) + 8 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 8) = (n : ℤ) - 25 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((25 : ℤ)) = ((25 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 8) : ℚ) = Pp8.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 8) :=
+  grand_to_prod (P8_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8)
 
 /-- **μ_9 solved from the staircase** at `H=9+1`: the second real cell
 `B_9 = T(20,11)` pins `μ_9`. -/
@@ -864,7 +842,7 @@ theorem P9_grand_of_banked
     ring
 
 /-- **k=9 production `n`-form**: `T(n, n-9) = P_9(n)·3^(n-1-3·9)` for all
-`n ≥ 2·9+1`, from `P9_grand_of_banked`. -/
+`n ≥ 2·9+1`, from `P9_grand_of_banked` via `grand_to_prod`. -/
 theorem P9_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -879,16 +857,8 @@ theorem P9_grand_prod
     (hA9 : T 19 10 = 24014057424024)
     (hB9 : T 20 11 = 132107598093637) :
     ∀ n : ℕ, 2 * 9 + 1 ≤ n →
-      (T n (n - 9) : ℚ) = Pp9.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 9) := by
-  intro n hn
-  have hg := P9_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 (n - 9) (by omega)
-  rw [show n - 9 + 9 = n from by omega,
-    show ((n - 9 : ℕ) : ℚ) + 9 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 9) = (n : ℤ) - 28 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((28 : ℤ)) = ((28 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 9) : ℚ) = Pp9.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 9) :=
+  grand_to_prod (P9_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9)
 
 /-- **μ_10 solved from the staircase** at `H=10+1`: the second real cell
 `B_10 = T(22,12)` pins `μ_10`. -/
@@ -1014,7 +984,7 @@ theorem P10_grand_of_banked
     ring
 
 /-- **k=10 production `n`-form**: `T(n, n-10) = P_10(n)·3^(n-1-3·10)` for all
-`n ≥ 2·10+1`, from `P10_grand_of_banked`. -/
+`n ≥ 2·10+1`, from `P10_grand_of_banked` via `grand_to_prod`. -/
 theorem P10_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -1031,16 +1001,8 @@ theorem P10_grand_prod
     (hA10 : T 21 11 = 962797249464752)
     (hB10 : T 22 12 = 5257610926802452) :
     ∀ n : ℕ, 2 * 10 + 1 ≤ n →
-      (T n (n - 10) : ℚ) = Pp10.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 10) := by
-  intro n hn
-  have hg := P10_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 (n - 10) (by omega)
-  rw [show n - 10 + 10 = n from by omega,
-    show ((n - 10 : ℕ) : ℚ) + 10 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 10) = (n : ℤ) - 31 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((31 : ℤ)) = ((31 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 10) : ℚ) = Pp10.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 10) :=
+  grand_to_prod (P10_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10)
 
 /-- **μ_11 solved from the staircase** at `H=11+1`: the second real cell
 `B_11 = T(24,13)` pins `μ_11`. -/
@@ -1176,7 +1138,7 @@ theorem P11_grand_of_banked
     ring
 
 /-- **k=11 production `n`-form**: `T(n, n-11) = P_11(n)·3^(n-1-3·11)` for all
-`n ≥ 2·11+1`, from `P11_grand_of_banked`. -/
+`n ≥ 2·11+1`, from `P11_grand_of_banked` via `grand_to_prod`. -/
 theorem P11_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -1195,16 +1157,8 @@ theorem P11_grand_prod
     (hA11 : T 23 12 = 38826609174639928)
     (hB11 : T 24 13 = 210692983396251014) :
     ∀ n : ℕ, 2 * 11 + 1 ≤ n →
-      (T n (n - 11) : ℚ) = Pp11.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 11) := by
-  intro n hn
-  have hg := P11_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 (n - 11) (by omega)
-  rw [show n - 11 + 11 = n from by omega,
-    show ((n - 11 : ℕ) : ℚ) + 11 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 11) = (n : ℤ) - 34 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((34 : ℤ)) = ((34 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 11) : ℚ) = Pp11.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 11) :=
+  grand_to_prod (P11_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11)
 
 /-- **μ_12 solved from the staircase** at `H=12+1`: the second real cell
 `B_12 = T(26,14)` pins `μ_12`. -/
@@ -1350,7 +1304,7 @@ theorem P12_grand_of_banked
     ring
 
 /-- **k=12 production `n`-form**: `T(n, n-12) = P_12(n)·3^(n-1-3·12)` for all
-`n ≥ 2·12+1`, from `P12_grand_of_banked`. -/
+`n ≥ 2·12+1`, from `P12_grand_of_banked` via `grand_to_prod`. -/
 theorem P12_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -1371,16 +1325,8 @@ theorem P12_grand_prod
     (hA12 : T 25 13 = 1573134737210737385)
     (hB12 : T 26 14 = 8490578913536448064) :
     ∀ n : ℕ, 2 * 12 + 1 ≤ n →
-      (T n (n - 12) : ℚ) = Pp12.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 12) := by
-  intro n hn
-  have hg := P12_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 (n - 12) (by omega)
-  rw [show n - 12 + 12 = n from by omega,
-    show ((n - 12 : ℕ) : ℚ) + 12 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 12) = (n : ℤ) - 37 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((37 : ℤ)) = ((37 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 12) : ℚ) = Pp12.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 12) :=
+  grand_to_prod (P12_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12)
 
 /-- **μ_13 solved from the staircase** at `H=13+1`: the second real cell
 `B_13 = T(28,15)` pins `μ_13`. -/
@@ -1536,7 +1482,7 @@ theorem P13_grand_of_banked
     ring
 
 /-- **k=13 production `n`-form**: `T(n, n-13) = P_13(n)·3^(n-1-3·13)` for all
-`n ≥ 2·13+1`, from `P13_grand_of_banked`. -/
+`n ≥ 2·13+1`, from `P13_grand_of_banked` via `grand_to_prod`. -/
 theorem P13_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -1559,16 +1505,8 @@ theorem P13_grand_prod
     (hA13 : T 27 14 = 63986427407097237332)
     (hB13 : T 28 15 = 343733831675681363476) :
     ∀ n : ℕ, 2 * 13 + 1 ≤ n →
-      (T n (n - 13) : ℚ) = Pp13.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 13) := by
-  intro n hn
-  have hg := P13_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13 (n - 13) (by omega)
-  rw [show n - 13 + 13 = n from by omega,
-    show ((n - 13 : ℕ) : ℚ) + 13 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 13) = (n : ℤ) - 40 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((40 : ℤ)) = ((40 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 13) : ℚ) = Pp13.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 13) :=
+  grand_to_prod (P13_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13)
 
 /-- **μ_14 solved from the staircase** at `H=14+1`: the second real cell
 `B_14 = T(30,16)` pins `μ_14`. -/
@@ -1734,7 +1672,7 @@ theorem P14_grand_of_banked
     ring
 
 /-- **k=14 production `n`-form**: `T(n, n-14) = P_14(n)·3^(n-1-3·14)` for all
-`n ≥ 2·14+1`, from `P14_grand_of_banked`. -/
+`n ≥ 2·14+1`, from `P14_grand_of_banked` via `grand_to_prod`. -/
 theorem P14_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -1759,16 +1697,8 @@ theorem P14_grand_prod
     (hA14 : T 29 15 = 2611110015255604740530)
     (hB14 : T 30 16 = 13969442417594351366268) :
     ∀ n : ℕ, 2 * 14 + 1 ≤ n →
-      (T n (n - 14) : ℚ) = Pp14.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 14) := by
-  intro n hn
-  have hg := P14_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13 hA14 hB14 (n - 14) (by omega)
-  rw [show n - 14 + 14 = n from by omega,
-    show ((n - 14 : ℕ) : ℚ) + 14 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 14) = (n : ℤ) - 43 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((43 : ℤ)) = ((43 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 14) : ℚ) = Pp14.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 14) :=
+  grand_to_prod (P14_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13 hA14 hB14)
 
 /-- **μ_15 solved from the staircase** at `H=15+1`: the second real cell
 `B_15 = T(32,17)` pins `μ_15`. -/
@@ -1944,7 +1874,7 @@ theorem P15_grand_of_banked
     ring
 
 /-- **k=15 production `n`-form**: `T(n, n-15) = P_15(n)·3^(n-1-3·15)` for all
-`n ≥ 2·15+1`, from `P15_grand_of_banked`. -/
+`n ≥ 2·15+1`, from `P15_grand_of_banked` via `grand_to_prod`. -/
 theorem P15_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -1971,16 +1901,8 @@ theorem P15_grand_prod
     (hA15 : T 31 16 = 106848447386284024770292)
     (hB15 : T 32 17 = 569579285523233406028051) :
     ∀ n : ℕ, 2 * 15 + 1 ≤ n →
-      (T n (n - 15) : ℚ) = Pp15.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 15) := by
-  intro n hn
-  have hg := P15_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13 hA14 hB14 hA15 hB15 (n - 15) (by omega)
-  rw [show n - 15 + 15 = n from by omega,
-    show ((n - 15 : ℕ) : ℚ) + 15 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 15) = (n : ℤ) - 46 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((46 : ℤ)) = ((46 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 15) : ℚ) = Pp15.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 15) :=
+  grand_to_prod (P15_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13 hA14 hB14 hA15 hB15)
 
 /-- **μ_16 solved from the staircase** at `H=16+1`: the second real cell
 `B_16 = T(34,18)` pins `μ_16`. -/
@@ -2166,7 +2088,7 @@ theorem P16_grand_of_banked
     ring
 
 /-- **k=16 production `n`-form**: `T(n, n-16) = P_16(n)·3^(n-1-3·16)` for all
-`n ≥ 2·16+1`, from `P16_grand_of_banked`. -/
+`n ≥ 2·16+1`, from `P16_grand_of_banked` via `grand_to_prod`. -/
 theorem P16_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -2195,16 +2117,8 @@ theorem P16_grand_prod
     (hA16 : T 33 17 = 4382793740312244017806517)
     (hB16 : T 34 18 = 23288787870043631158670332) :
     ∀ n : ℕ, 2 * 16 + 1 ≤ n →
-      (T n (n - 16) : ℚ) = Pp16.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 16) := by
-  intro n hn
-  have hg := P16_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13 hA14 hB14 hA15 hB15 hA16 hB16 (n - 16) (by omega)
-  rw [show n - 16 + 16 = n from by omega,
-    show ((n - 16 : ℕ) : ℚ) + 16 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 16) = (n : ℤ) - 49 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((49 : ℤ)) = ((49 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 16) : ℚ) = Pp16.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 16) :=
+  grand_to_prod (P16_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13 hA14 hB14 hA15 hB15 hA16 hB16)
 set_option maxHeartbeats 1600000 in
 
 /-- **μ_17 solved from the staircase** at `H=17+1`: the second real cell
@@ -2403,7 +2317,7 @@ theorem P17_grand_of_banked
 set_option maxHeartbeats 1600000 in
 
 /-- **k=17 production `n`-form**: `T(n, n-17) = P_17(n)·3^(n-1-3·17)` for all
-`n ≥ 2·17+1`, from `P17_grand_of_banked`. -/
+`n ≥ 2·17+1`, from `P17_grand_of_banked` via `grand_to_prod`. -/
 theorem P17_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -2434,16 +2348,8 @@ theorem P17_grand_prod
     (hA17 : T 35 18 = 180152359823857046862682314)
     (hB17 : T 36 19 = 954543410624801880699125196) :
     ∀ n : ℕ, 2 * 17 + 1 ≤ n →
-      (T n (n - 17) : ℚ) = Pp17.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 17) := by
-  intro n hn
-  have hg := P17_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13 hA14 hB14 hA15 hB15 hA16 hB16 hA17 hB17 (n - 17) (by omega)
-  rw [show n - 17 + 17 = n from by omega,
-    show ((n - 17 : ℕ) : ℚ) + 17 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 17) = (n : ℤ) - 52 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((52 : ℤ)) = ((52 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 17) : ℚ) = Pp17.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 17) :=
+  grand_to_prod (P17_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13 hA14 hB14 hA15 hB15 hA16 hB16 hA17 hB17)
 set_option maxHeartbeats 1600000 in
 
 /-- **μ_18 solved from the staircase** at `H=18+1`: the second real cell
@@ -2652,7 +2558,7 @@ theorem P18_grand_of_banked
 set_option maxHeartbeats 1600000 in
 
 /-- **k=18 production `n`-form**: `T(n, n-18) = P_18(n)·3^(n-1-3·18)` for all
-`n ≥ 2·18+1`, from `P18_grand_of_banked`. -/
+`n ≥ 2·18+1`, from `P18_grand_of_banked` via `grand_to_prod`. -/
 theorem P18_grand_prod
     (hA4 : T 9 5 = 278240)
     (hB4 : T 10 6 = 1631340)
@@ -2685,16 +2591,8 @@ theorem P18_grand_prod
     (hA18 : T 37 19 = 7418664369542642927200487045)
     (hB18 : T 38 20 = 39207474138446972682720171554) :
     ∀ n : ℕ, 2 * 18 + 1 ≤ n →
-      (T n (n - 18) : ℚ) = Pp18.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 18) := by
-  intro n hn
-  have hg := P18_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13 hA14 hB14 hA15 hB15 hA16 hB16 hA17 hB17 hA18 hB18 (n - 18) (by omega)
-  rw [show n - 18 + 18 = n from by omega,
-    show ((n - 18 : ℕ) : ℚ) + 18 = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * 18) = (n : ℤ) - 55 from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show ((55 : ℤ)) = ((55 : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - 18) : ℚ) = Pp18.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 18) :=
+  grand_to_prod (P18_grand_of_banked hA4 hB4 hA5 hB5 hA6 hB6 hA7 hB7 hA8 hB8 hA9 hB9 hA10 hB10 hA11 hB11 hA12 hB12 hA13 hB13 hA14 hB14 hA15 hB15 hA16 hB16 hA17 hB17 hA18 hB18)
 
 end GrandPin
 

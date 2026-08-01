@@ -279,6 +279,24 @@ open Polynomial
 
 section GrandPin
 set_option linter.style.longLine false
+
+/-- **Generic H→n coordinate change** (2026-07-31 dedup): from the staircase
+banked form `3^(3k+1)·T(H+k,H) = P(H+k)·3^(H+k)` (`∀ H ≥ k+1`) to the
+production `n`-form. One lemma replaces the fifteen per-level copies of
+this proof that `P<k>_grand_prod` used to carry. -/
+lemma grand_to_prod {{k : ℕ}} {{P : Polynomial ℚ}}
+    (h : ∀ H : ℕ, k + 1 ≤ H →
+      (3 : ℚ) ^ (3 * k + 1) * (T (H + k) H : ℚ) = P.eval ((H : ℚ) + k) * 3 ^ (H + k)) :
+    ∀ n : ℕ, 2 * k + 1 ≤ n →
+      (T n (n - k) : ℚ) = P.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) := by
+  intro n hn
+  have hg := h (n - k) (by omega)
+  rw [show n - k + k = n from by omega,
+    show ((n - k : ℕ) : ℚ) + k = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
+  rw [show ((n : ℤ) - 1 - 3 * k) = (n : ℤ) - (3 * k + 1 : ℕ) from by push_cast; ring,
+    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast, zpow_natCast]
+  field_simp
+  linear_combination hg
 '''
 
 
@@ -396,23 +414,14 @@ theorem P{k}_grand_of_banked
 
 
 def emit_grand_prod(k):
-    e = 3 * k + 1
     return hb_option(k) + f'''
 /-- **k={k} production `n`-form**: `T(n, n-{k}) = P_{k}(n)·3^(n-1-3·{k})` for all
-`n ≥ 2·{k}+1`, from `P{k}_grand_of_banked`. -/
+`n ≥ 2·{k}+1`, from `P{k}_grand_of_banked` via `grand_to_prod`. -/
 theorem P{k}_grand_prod
 {anchor_hyps(k)} :
     ∀ n : ℕ, 2 * {k} + 1 ≤ n →
-      (T n (n - {k}) : ℚ) = Pp{k}.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * {k}) := by
-  intro n hn
-  have hg := P{k}_grand_of_banked {anchor_args(k)} (n - {k}) (by omega)
-  rw [show n - {k} + {k} = n from by omega,
-    show ((n - {k} : ℕ) : ℚ) + {k} = (n : ℚ) from by rw [Nat.cast_sub (by omega)]; ring] at hg
-  rw [show ((n : ℤ) - 1 - 3 * {k}) = (n : ℤ) - {e} from by ring,
-    zpow_sub₀ (by norm_num : (3 : ℚ) ≠ 0), zpow_natCast,
-    show (({e} : ℤ)) = (({e} : ℕ) : ℤ) from rfl, zpow_natCast]
-  field_simp
-  linear_combination hg
+      (T n (n - {k}) : ℚ) = Pp{k}.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * {k}) :=
+  grand_to_prod (P{k}_grand_of_banked {anchor_args(k)})
 '''
 
 
