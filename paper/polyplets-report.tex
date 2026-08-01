@@ -57,8 +57,8 @@ algorithms sharing no counting logic (direct enumeration and the transfer
 matrix); $a(23)$--$a(38)$ by a single algorithm family, cross-checked per
 term against \emph{held-out} closed forms for the top diagonals of the
 height triangle; $a(39)$ and $a(40)$ lack that held-out check on their top
-swept stratum, and since the sequence ends here it never will---which we
-grade rather than paper over. The one-sided companion A030233 is extended to
+swept stratum, and since the sequence ends here it never will. The tiers
+record that. The one-sided companion A030233 is extended to
 $n=34$, and the free, bilateral, and asymmetric companions (A030222,
 A030234, A030235, A194596) to $n=32$.
 
@@ -102,9 +102,9 @@ This document is a \emph{computational report}: its claims are numbers, the
 provenance and verification of those numbers, and the structure found in
 them. It reports $a(19)$ through $a(40)$ and the results that grew out of
 computing them. It is an amateur contribution carried out with substantial
-AI assistance (Section~\ref{sec:ai}). The data appears in the document as
-well as the repository: a report's job is to be usable by the next person
-to attempt these computations.
+AI assistance (Section~\ref{sec:ai}). The data appears in the document as well as
+the repository, so that the next person to attempt these computations can
+use it.
 
 \paragraph{Contributions.}
 \begin{enumerate}
@@ -135,11 +135,11 @@ to attempt these computations.
 \end{enumerate}
 
 \paragraph{Confidence tiers.}
-Since a single long count from one program is properly a conjecture, every
+A single long count from one program is a conjecture, so every
 numeric claim below is tagged with one of the tiers of
-Table~\ref{tab:tiers}, and the results tables repeat the tags. The tiers are honest about an asymmetry: past Redelmeier's
-reach no second counting \emph{algorithm} for the full sequence exists, so the
-later terms rest on decorrelation rather than algorithmic independence.
+Table~\ref{tab:tiers}, and the results tables repeat the tags. The tiers record an asymmetry: past Redelmeier's reach no second
+counting \emph{algorithm} for the full sequence exists, so the later terms
+rest on decorrelation rather than algorithmic independence.
 
 \begin{table}[H]
   \centering\small
@@ -207,7 +207,7 @@ which enters the companion counts by Burnside's lemma
 Table~\ref{tab:terms} gives the full sequence. Terms $n\le18$ reproduce
 A006770 exactly; $a(19)$--$a(40)$ are new. $a(19)$--$a(22)$ are \tierone{};
 $a(23)$--$a(38)$ are \tiertwo{}; $a(39)$ and $a(40)$ are \tiertwominus{}
-(Table~\ref{tab:tiers}), the most exposed numbers in this paper.
+(Table~\ref{tab:tiers}).
 
 \begin{table}[H]
   \centering
@@ -376,7 +376,7 @@ AMD/x86 (GCC, split $8\times96$). The per-size outputs are
 \textbf{byte-identical}. Differing in hardware, compiler, and scheduling,
 the two campaigns make a transient or platform-specific fault implausible;
 what they cannot jointly catch is a bug in the shared \emph{algorithm},
-which is exactly what the transfer matrix (Methods~B,~C) rules out by
+which the transfer matrix (Methods~B,~C) rules out by
 counting the same animals a completely different way. An optimized kernel (the terminal frontier level counted in
 bulk, compile-time neighbour offsets; ${\approx}2\times$ faster) run as a
 three-architecture fleet (ARM, x86, Apple silicon) extended the whole-row
@@ -447,7 +447,7 @@ results are banked with their provenance and re-summed by a combiner that
 refuses partial or duplicated inputs.
 
 \paragraph{I/O integrity.}
-A multi-hour external shuffle is itself a failure surface, so the disk
+A multi-hour external shuffle can fail in mid-flight, so the disk
 layer fails closed rather than losing states silently: spill files carry a
 record count, so truncation---including the short writes produced by
 resource exhaustion---is detected on read rather than absorbed; readers and
@@ -591,7 +591,7 @@ designed around the weakest link at each stage.
         recomputed on a second architecture and compiler (x86/GCC against
         ARM/clang production) and is byte-identical, row by row; earlier
         terms had per-term recounts of the heaviest strata. Beyond $a(34)$
-        the recount coverage weakens and we say so: $a(35)$'s second-machine
+        the recount coverage weakens: $a(35)$'s second-machine
         pass covered only part of the height range; $a(36)$ was computed
         with its heights \emph{split} across two architectures (x86 for
         $H\le18$ and $H\ge20$, ARM for the $H=19$ long pole) rather than
@@ -612,7 +612,7 @@ designed around the weakest link at each stage.
         degree-$k$ polynomial through a wrong fit point does not predict
         the next term's cell exactly), which is what holds
         $a(33)$--$a(38)$ at \tiertwo{}. The strongest single check came
-        free with the final term: the $a(40)$ run's real $H=21$ sweep
+        with the final term: the $a(40)$ run's real $H=21$ sweep
         reproduced the closed-form values $P_k(n)\,3^{n-1-3k}$ on every one
         of its rows $n=21$--$39$ simultaneously, re-confirming all nineteen
         wired levels at a fresh point each, in the very sweep that produced
@@ -621,8 +621,8 @@ designed around the weakest link at each stage.
         diagonal $k=19$, and $P_{19}$---fitted from exactly these two
         cells---has no independent holdout, nor ever will, the sequence
         closing at $a(40)$. Those strata run the same code path the lower
-        $P_k$ certified; what lacks certification is the top cells
-        themselves, not the path.
+        $P_k$ certified. It is the top cells that lack certification, not
+        the code path.
   \item \textbf{Modular consistency (a design capability, not a production
         gate).} A residue-counter/CRT-reconstruction path exists and is
         regression-tested---independent residue systems must agree, which
@@ -683,7 +683,7 @@ is determined by the final two top cells and passes the leading-coefficient
 and integrality checks, but with the sequence closing at $a(40)$ it has no
 holdout and is never used; we record it without certifying it.)
 
-The law's shape is not an empirical regularity but a theorem:
+The law's shape is a theorem:
 
 \begin{theorem}[diagonal law]
 \label{thm:diaglaw}
@@ -752,9 +752,8 @@ lattice ($b=2$: $P_1=9n-15$ holdout-exact, density $9=3^2$, a
 \emph{dyadic} spine $H^3=H^2+u$ over $\mathbb F_2$); and the king lattice
 ($b=3$, density $25=5^2$). The scaling $w$ is not always $1$---a contiguous
 five-neighbour lattice gives $w=4\pmod5$---and there is a degenerate branch
-($w=0$) whose banded triangle is trivial. The king lattice's spine is thus
-the $p=3$ member of a lattice-indexed family: the curve is invariant, and
-the lattice chooses the prime and the scaling. Proofs and checkers:
+($w=0$) whose banded triangle is trivial. The king lattice's spine is the $p=3$ member of a lattice-indexed family,
+with the lattice setting $p$ and $w$. Proofs and checkers:
 \texttt{docs/proofs/universal-diagonal-law.md}.
 
 \subsection{The diagonal-mirror triangle: quasi-polynomials, period two}
@@ -812,7 +811,7 @@ against exact diagonal counts---so they stand as an observed regularity.
 The numerators, and a defect-gas reading of their structure, are in the
 repository.
 
-The shape, however, is a theorem, by the same programme that
+The shape is a theorem, by the same programme that
 Theorem~\ref{thm:diaglaw} carries out for the height triangle. Here the
 decomposition is a \emph{segment grammar}: an animal at surplus $k$ splits
 into at most $2k{+}1$ perfect diagonal/anti-diagonal segments joined at
@@ -826,12 +825,11 @@ remain validated data. Write-up, graded lemma by lemma:
 \texttt{docs/proofs/dm-diagonal-law.md}.
 
 The polynomials themselves remain computed and validated rather than
-derived, and their practical role is sharp: the sparse strips ($S\ge29$ at
+derived. Their practical role: the sparse strips ($S\ge29$ at
 $n\ge33$) are precisely the RAM-expensive ones---one strip burned
 ${\sim}62$ CPU-hours and $79$\,GB to produce the two numbers $d(31,31)=2$
-and $d(31,32)=38$ that $P_0$ and $P_1$ now give for free---so they replace
-exactly the strips hardware cannot reach, at the price of the \tierthree{}
-label.
+and $d(31,32)=38$ that $P_0$ and $P_1$ now supply directly. They replace
+the strips hardware cannot reach, at the price of the \tierthree{} label.
 
 \section{Companion sequences}
 \label{sec:companions}
@@ -858,7 +856,7 @@ symmetry (Section~\ref{sec:methodD}): $D$ is exact through $n=32$
 ($D(32)=\num{2156235549286}$), which caps these four companions at
 $n=32$ within \tiertwo{}. Table~\ref{tab:companions} gives the new
 values; Table~\ref{tab:symcounts} records the symmetry fixed-point counts
-themselves, each an OEIS-eligible sequence in its own right.
+themselves, each an OEIS-eligible sequence.
 
 One further term of each exists at the \tierthree{} grade, via the hybrid
 $D(33)$ of Table~\ref{tab:symcounts} (direct strips $S\le28$ plus pinned
@@ -1007,7 +1005,7 @@ The walk-plus-clusters theorem refines by hole count: marking each cluster
 by the holes it makes gives stratified diagonal laws (the pair-row's weight
 splits $25=24+1$), and mod~3 only the maximal-hole stratum survives, so the
 triangle's entire mod-3 structure is carried by the hole-making
-configurations---the spine lives in the holes. Derivations and checkers:
+configurations. Derivations and checkers:
 \texttt{experiments/hole\_strata\_gas.py}.
 
 \paragraph{Maximum hole area.}
@@ -1187,10 +1185,9 @@ combinatorial description of the denominators, in the polygon setting a
 product of cyclotomic polynomials. Ours concludes arithmetically and
 effectively, following a single distinguished pole per slice with no inputs
 beyond Perron--Frobenius monotonicity and a crude upper bound on $\lambda$.
-That lightness is the contribution: it is why the proof transports to any
-family with a column transfer matrix with no bespoke denominator analysis,
-and why it yields explicit excluded $(r,D)$ boxes rather than a bare
-dichotomy. Arithmetic constraints on D-finite series do exist---the
+That lightness is why the proof transports to any family with a column
+transfer matrix, with no bespoke denominator analysis, and why it yields
+explicit excluded $(r,D)$ boxes rather than a bare dichotomy. Arithmetic constraints on D-finite series do exist---the
 \emph{D-finiteness, rationality and height} theorems of Bell, Nguyen and
 Zannier~\cite{bnz2020} with their multivariate P\'olya--Carlson successor,
 and the height-gap results of Bell, Hu and Satriano~\cite{bhs2020}---but
@@ -1200,9 +1197,9 @@ neither speaks about the growth constants of a family of slices. We have
 located no application of either line to a lattice model, and no use of
 Northcott finiteness on a family of slice growth constants; a literature
 search cannot establish absence, so we claim the argument as ours with
-that qualification and nothing stronger.
+that qualification.
 
-One limitation deserves recording. Klazar~\cite{klazar} enlarges the target
+One limitation. Klazar~\cite{klazar} enlarges the target
 from D-finite to $D_A$-finite---analytic rather than polynomial
 coefficients---on the ground that polynomiality was never carrying his
 argument. Ours admits no such enlargement: the step ``a polynomial over
@@ -1234,9 +1231,8 @@ $H=19$ for $a(35)$--$a(37)$, $H=20$ for $a(38)$--$a(39)$, $H=21$ for
 $a(40)$. Along that ladder the binding resource became disk rather than
 time (Appendix~\ref{sec:profile}). But the deeper constraint is
 verification, not compute: the frontier is always one term ahead of its
-own closed-form certification, which is exactly what the \tiertwominus{}
-grade on the final two terms records. The sequence closes at $a(40)$ with
-that grade stated rather than outrun.
+own closed-form certification, which the \tiertwominus{} grade on the final
+two terms records. The sequence closes at $a(40)$ with that grade stated.
 
 \section{Data and code availability}
 \label{sec:availability}
