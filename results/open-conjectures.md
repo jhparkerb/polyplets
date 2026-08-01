@@ -73,8 +73,14 @@ shapes.
 
 ### T4. $N_k(\pm1)=(\pm2)^k$ for the diagonal-mirror numerators
 The paper conjectures the dmirror diagonal GF $G_k=N_k/((1-x)^{k+1}(1+x)^k)$ has
-$N_k(\pm1)=(\pm2)^k$ for $k\ge1$ (observed, never imposed on the fit). Proving it is
-the "two ground states / two species per odd footprint" combinatorial identity.
+$N_k(\pm1)=(\pm2)^k$ for $k\ge1$ (observed, never imposed on the fit).
+**Reduced 2026-07-31** (`results/dmirror-diagonals.md`): via partial
+fractions, $N_k(1)=2^k$ ⟺ each parity class has leading coefficient
+$S^k/k!$ (banked), and $N_k(-1)=(-2)^k$ ⟺
+$\mathrm{lead}(P^{even}_k-P^{odd}_k)=(-1)^k/(k-1)!$ (verified exactly
+k=1..5). So T4 = "each of the two ground-state spines carries defect
+density 1" -- the combinatorial identity to prove is about leading
+coefficients, not numerator boundary values.
 
 ## Also-rans (probed, not clean)
 - SNF individual exponents $e_i(N)$: no evident closed form (largest and count are

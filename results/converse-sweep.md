@@ -96,6 +96,10 @@ observation, not a claim.
 MoatBound / peeling lemma / multi-hole master inequality (brute-force
 extension past n = 9 — compute-bounded, scripts exist); ψ₉/ψ₁₀ irreducibility
 (a single prime with irreducible reduction would PROVE it — bounded attempt,
-needs the atom polynomials extracted); N_k(±1) = (±2)^k, dm onset and
-multiplicity split, mod-27 bonus depth, θ = −1 (no new data available at
-project close).
+needs the atom polynomials extracted); mod-27 bonus depth, θ = −1 (no new
+data available at project close). N_k(±1) = (±2)^k and the dm
+onset/multiplicity split have since been REDUCED to leading-coefficient
+statements (2026-07-31, `results/dmirror-diagonals.md`,
+`docs/proofs/dm-diagonal-law.md`) — the ±1 boundary values are equivalent
+to banked-and-verified leading coefficients, the onset split is no split,
+and the pole multiplicities are a corollary, not an independent claim.

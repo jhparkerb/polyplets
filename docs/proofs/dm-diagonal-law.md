@@ -17,9 +17,14 @@ d(S, S+k) = p_k^{parity(S)}(S) for all S >= S_0(k). Consequently the
 generating function sum_S d(S,S+k) x^S is rational with poles only at
 x = 1 and x = -1, of total order <= k+1 at each.
 
-(The sharp onset S_0 = 2k+2 / 2k+3 and the exact pole multiplicities
-(k+1, k) observed in the data are NOT proved here; as with the king
-diagonal law, sharpness stays data-grade.)
+(The sharp onset -- the single condition S_0 = 2k+2, no parity split:
+2k+3 on the odd class is just the least odd integer past 2k+2 -- is NOT
+proved here; as with the king diagonal law, sharpness stays data-grade.
+The pole multiplicities (k+1, k) are NOT an independent data-grade item:
+writing d(S,S+k) = A(S) + (-1)^S B(S), they are equivalent to deg A = k
+and deg B = k-1, i.e. to the banked equal-leading-coefficients fact plus
+lead(P_even - P_odd) = (-1)^k/(k-1)! -- see
+`results/dmirror-diagonals.md`, 2026-07-31.)
 
 ## Setup and the skeleton
 

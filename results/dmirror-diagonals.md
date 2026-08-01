@@ -9,7 +9,9 @@ exactly SxS (the dmirror strip counts). On the diagonal k = n - S, d(S, S+k)
 is quasi-polynomial in S with **period 2** (off-diagonal cells pair under
 the mirror), **degree k per parity class** (leading coefficient S^k/k! --
 defect placement along the spine), and measured onset S0 ~= 2k+2 (even) /
-2k+3 (odd).
+2k+3 (odd) -- which is no parity split at all: 2k+3 is just the least odd
+integer >= 2k+2, so the onset is the single condition **S >= 2k+2**
+(2026-07-31; the STEP 1 section below already states it that way).
 
 Derivation: scripts/dmirror_diagonals.py over the per-strip farm outputs
 (runs/sym26 built for this purpose + the n=32 farm's high strips). Exact
@@ -99,8 +101,18 @@ derivation is a segment grammar (regular language over main-runs,
 anti-excursions, connectors, defects), not a one-line gas -- paper-scale,
 parked.
 
-**Usable weak law**: deg(P_even - P_odd) = k-1 held at k=1..3; check it
-on every future pin as a cheap structural alarm.
+**Usable weak law, upgraded to EXACT (2026-07-31)**: not just
+deg(P_even - P_odd) = k-1 but **lead(P_even - P_odd) = (-1)^k/(k-1)!** --
+verified on all five banked levels (-1, 1, -1/2, 1/6, -1/24 at k=1..5).
+Check the full coefficient, not the degree, on every future pin. Via
+partial fractions on the denominator law this is EQUIVALENT to
+N_k(-1) = (-2)^k, and likewise N_k(1) = 2^k is equivalent to the banked
+per-parity leading coefficient S^k/k! -- so conjecture T4
+(`results/open-conjectures.md`) is exactly the pair of leading-coefficient
+statements, one of which was already banked in this file's header. (The
+sub-leading ratio of P_even - P_odd fits (k-1)(4k-11)/2 on k=2..5 -- 3
+parameters on 4 points, level 6 refuses: NOT banked, recorded only so
+nobody mistakes it for a law.)
 
 ## Pattern hunt in the GF basis (2026-07-05, later)
 

@@ -8,7 +8,10 @@ proof, reduced to one clean open lemma. Machinery/verification:
 
 ## The formula and the extremal shape
 
-M(n) = round((n−2)²/8) (round half up; the half-integers occur at n≡0 mod 4).
+M(n) = round((n−2)²/8) (round half up; the half-integers occur at n≡0 mod 4)
+— equivalently, with no rounding convention at all, **M(n) = ⌊((n−2)²+4)/8⌋**
+(the form `Polyplets/Holes.lean` already uses, `floor_maxhole_formula`;
+identical for all n, checked to n=399).
 The king factor is **1/8**, double the rook/polyomino ~1/16, because a **diagonal**
 line of foreground cells seals the 4-connected background at one cell per step:
 adjacent hole cells straddling a diagonal wall are not 4-adjacent, so a 45° wall is

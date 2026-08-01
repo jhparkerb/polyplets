@@ -310,7 +310,12 @@ clusters carry multiple holes (T₂(7,5) = 13 ≠ 1).
 Verifier: `experiments/hole_strata_gas.py`.
 
 ## Open
-- Two-row closed form generalizing (2s+1)² (weight table is raw material).
+- Two-row closed form generalizing (2s+1)². First row pinned 2026-07-31:
+  **W(2,b) = 24b³ + 20b² + 35b − 3** (fit b=2..5 on the DP, holdout
+  W(2,6) = 6111 exact). Degree 3 per variable where one row is degree 2,
+  so the target is a symmetric bicubic Σ c_ij a^i b^j, c_ij = c_ji; the
+  a=2 row plus symmetry fixes 4 of its 10 coefficients. Next cells
+  W(3,5), W(4,4) exceed the Python DP's patience — needs the C++ path.
 - ~~The convergence + boundary analysis for a full proof of the law~~
   **DONE 2026-07-12**: `docs/proofs/diagonal-law.md` — separation lemma +
   chain identity + row bound (ℓ ≤ k) + partial fractions prove the law's
