@@ -273,6 +273,15 @@ neighbours go to the c-side, so they're empty in the `d`-piece.
   it and keeps improving with context. Target ~7.11 from above; realistic landing
   ~8 for feasible RD. First-ever polyplet upper bound below the crude bound.
 
+- **Concatenation route also closed (2026-08-01, `results/concatenation-upper-bound.md`).**
+  Barequet–Ben-Shachar–Osegueda's quasi sub-multiplicativity gives an upper bound
+  from a single term: with `a(40)` banked, a degree-2 `P` would yield λ ≤ 7.745
+  (degree 4 already yields nothing). But their lexicographic split shatters a king
+  comb into ~n/4 components (measured), so the reassembly code is `n^Θ(n)`; the
+  connected (centroid) split cannot prescribe halves to within `O(1)`. Same
+  connectivity wall as Phase 3. Transfer check: the missing lemma would also beat
+  the polyomino record 4.5252 → 4.3828 from published terms, so it is known-hard.
+
 **Verdict (updated):** the tight bound WAS derived — the king analog of Bui's
 system was hand-engineered and certificate-verified to **λ ≤ 9.3153** (see the
 BREAKTHROUGH + Certificate-Squeeze sections above). The verification harness is

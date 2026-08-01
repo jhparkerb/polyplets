@@ -54,6 +54,17 @@ following up and it is not the one first flagged.**
   bracket. Whether king animals admit a concatenation-based sub-multiplicative
   bound below 9.3153 is a live question that would shorten a sentence in the
   paper. Not attempted. **[the one worth a look]**
+  **LOOKED, 2026-08-01 — CLOSED, no gain** (`results/concatenation-upper-bound.md`,
+  `experiments/concatenation_bound_check.py`). Priced first: with `a(40)` banked,
+  a degree-2 `P` would give `lambda <= 7.745` (degree 3 gives 8.642; degree 4
+  gives 9.642 and helps nothing), and the measured `a(m+n)/(a(m)a(n))` grows
+  linearly in `m+n`, so 40 terms refute nothing. Then the proof: BBO's
+  lexicographic split shatters a king comb into `~n/4` components (measured), so
+  the reassembly code is `n^Theta(n)`, not polynomial; the centroid/spanning-tree
+  split that keeps both sides connected cannot prescribe the halves to within the
+  `O(1)` that Theorem 1(a)/(b) needs. Decisive: the same lemma for ordinary
+  polyominoes would give `lambda_poly <= 4.3828`, beating Barequet-Shalah's
+  4.5252 from published terms alone — it is a known-hard target, not an oversight.
 - **G. Aleksandrowicz & G. Barequet, "Counting polycubes without the
   dimensionality curse," Discrete Math. 309 (2009).** The [med] want above is
   **CLOSED**: its open question was "confirm they don't touch king," and they
