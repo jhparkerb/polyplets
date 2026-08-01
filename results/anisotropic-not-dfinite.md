@@ -338,3 +338,29 @@ instead of resting on absence alone.
 Coverage caveat kept honest: OpenAlex and Semantic Scholar disagree on counts
 (83 vs 74 on BM-R), so neither is complete; MathSciNet and Google Scholar's
 own "Cited by" remain unrun and remain jasonp's call.
+
+### Third database: Google Scholar (jasonp, 2026-08-01) — no collision
+
+The optional belt-and-braces from the crawl above, run. Scholar's *search
+within citing articles* is full-text, unlike OpenAlex and S2 which matched
+metadata only — a genuinely different instrument, and the one that could catch
+a paper using Northcott inside a proof without saying so in its abstract.
+
+Over BM-R 2002's 79 citing articles (a third count: OpenAlex 83, S2 74):
+**`Northcott` 0 hits, `Mahler` 0 hits.** `algebraic degree` and `height` return
+hits, all false — degree of the algebraic *equation* a generating function
+satisfies, and column/path height in bargraphs. Standalone searches
+`"growth constant" Northcott D-finite` and `"transfer matrix" "algebraic
+degree" "not D-finite"` return nothing at all. Haruspicy 2's 14 citing articles
+read in full: surveys, constructions, and the pole-accumulation route; the one
+new name, Assis-van Hoeij-Maillard's Fuchsian-ODE paper (J. Phys. A 2016),
+runs the opposite direction — exhibiting ODEs for solvable models, not
+supplying a non-D-finiteness criterion.
+
+Three independent databases, no collision, and the strongest of the three
+searches full text. Table and per-term notes in `papers/MISSING.md`. The
+paper's "Relation to existing work" scoping is unchanged and stays correct:
+absence cannot be established by search, and we claim the argument with that
+qualification. MathSciNet is now recorded as closed rather than pending —
+Scholar covers a superset of venues and searches full text, so a fourth
+negative would not change the sentence.

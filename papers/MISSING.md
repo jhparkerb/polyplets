@@ -252,3 +252,56 @@ degree, denominator a product of cyclotomic polynomials, plus a tight
 multiplicative upper bound), not a D-finiteness test. Also filed from the
 same issue: `klazar_2003_non_p_recursiveness_matchings.pdf` (Haruspicy 2's
 reference [13], adjacent prior art on non-P-recursiveness).
+
+## THIRD DATABASE: GOOGLE SCHOLAR, RUN BY jasonp 2026-08-01 — no collision
+The optional belt-and-braces above, half-discharged: Scholar done, MathSciNet
+still unrun (and now judged not worth the walk-in — see the verdict below).
+
+Scholar's **"search within citing articles"** is full-text over its index, not
+title/abstract, so it can hit a paper that uses a tool in a proof without ever
+advertising it. That makes it a strictly different instrument from OpenAlex and
+S2, which only matched metadata. Run over BM-R 2002's Cited-by (**79** — a
+third count, against OpenAlex 83 and S2 74; all three disagree, as expected):
+
+| term | hits | reading |
+|---|---|---|
+| `Northcott` | **0** | the discriminating search. Zero across 79 citing full texts. |
+| `Mahler` | **0** | second discriminating search. Zero. |
+| `algebraic degree` | ~9 | all false: degree of the *algebraic equation* a GF satisfies (Feretic's "degree-four algebraic equation", Le Borgne's approximants). Not degree of an algebraic number. |
+| `height` | ~10 | all false, and the term is hopeless here: column height, path height, bargraph height. Carries no information. |
+| `house` | 3 | all false (incidental prose). Expected — nobody indexes "the house of an algebraic number" usefully. |
+
+`"growth constant" Northcott D-finite` and
+`"transfer matrix" "algebraic degree" "not D-finite"` as plain Scholar
+searches: **0 results each.**
+
+Haruspicy 2's Cited-by (**14**; OpenAlex 13, S2 17) read in full. Contents:
+Mishna-Rechnitzer's non-holonomic quarter-plane walks (iterated kernel —
+analytic), BM's ICM survey, Mishna's book, BM-Brak "Exactly solved models"
+(x2), He 2025 weighted-SAW connective constant (already cleared in the API
+crawl), Clisby's AMS Notices survey, Richard's limit distributions (x2),
+Schwerdtfeger's prudent polygons + thesis, Rechnitzer's own chapter version,
+Beaton's thesis. Every one is construction, survey, or the
+pole/singularity-accumulation route. Nothing arithmetic.
+
+One item in that list was new to us and is the closest the whole sweep came:
+**Assis, van Hoeij & Maillard, "The perimeter generating functions of
+three-choice, imperfect, and one-punctured staircase polygons," J. Phys. A
+(2016)** — the differential-algebra crowd, 8th-order linear Fuchsian ODEs.
+Cleared at title/abstract level and the direction is opposite to ours: it
+*constructs* ODEs for solvable models (D-finiteness demonstrated by exhibition),
+it does not supply a criterion for proving a series non-D-finite. Not read in
+full; not a collision.
+
+**Verdict, three databases now: no collision.** Northcott-on-slice-growth-
+constants is not in this literature, and the negative is stronger than the API
+crawl's because Scholar searched full text rather than metadata. The paper's
+scoping in `paper/polyplets-report.tex` ("we have not located ... a literature
+search cannot establish absence") is unchanged and remains correct as written.
+
+**MathSciNet: NOT RUN, and recommended closed rather than pending.** Its edge
+over the APIs is curated indexing of journals they miss; but Scholar already
+covers a superset of venues *and* searches full text, which is the property
+that mattered for a proof-internal tool like Northcott. A weekday library
+walk-in for a fourth negative on a question three sources have answered is not
+a good trade. Reopen only if a referee asks.
