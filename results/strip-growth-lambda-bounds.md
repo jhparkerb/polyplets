@@ -193,3 +193,59 @@ counts identified above, so nothing here moves either end of the bracket.**
 No new engine idea either: the three-stage shape (convert to a mosaic system,
 state-matrix recursion, analyze the matrix) is what our own stage-operator strip
 kernel already does.
+
+### The implicit-trial-vector thread: measured, and RULED OUT (2026-08-01)
+
+Two measurements, one of which is a new structural fact worth keeping
+independently of the verdict.
+
+**1. Our frontier connectivity patterns are exactly NON-CROSSING** (new).
+`experiments/strip_state_count_model.py` models an `S_0` state as: choose an
+occupancy of the `H` rows (king adjacency forces each maximal vertical run into
+one component), then partition the runs. Against the banked `S_0` counts:
+
+| H | actual | runs x Catalan | runs x Bell |
+|---|---|---|---|
+| 9 | 2187 | 2188 | 2243 |
+| 12 | 41834 | 41835 | 46905 |
+| 16 | 2356778 | 2356779 | 3365627 |
+
+**`actual = NC - 1` exactly at every H = 9..16** (the one is the separately-held
+empty seed). The Bell column diverges immediately. So crossings never occur,
+despite king diagonals crossing geometrically — and the reason is a one-liner:
+a crossing needs edges `(r,c)-(r+1,c+1)` and `(r+1,c)-(r,c+1)`, which requires
+all four cells occupied, and then `(r,c)`,`(r+1,c)` are vertically adjacent, so
+the two "crossing" components were the same component all along. **The Temperley–
+Lieb / loop-model structure is therefore available to us**, which is the
+precondition a tensor-network trial vector would need. Banked as a fact; it is
+also the honest answer to "is the king frontier planar", which was open.
+
+**2. The precondition is met and the thread is still dead, because I had the
+bottleneck wrong.** Chan–Rechnitzer's implicit-vector trick saves the memory of
+`psi`. Our `psi` was never the constraint: at H = 17 it is ~18M entries, ~144 MB.
+What binds is the **frozen transition tables** (8 bytes per stage-state over
+`sum|S_r|`) and the **build transient** (~8.8x the table). Extrapolating the
+measured 2.95x/H:
+
+| H | `sum\|S_r\|` | table | build RSS | float matvec | exact sweep |
+|---|---|---|---|---|---|
+| 18 | 6.2e8 | 4.9 GB | ~43 GB | 0.6 s | 5 s |
+| 19 | 1.8e9 | 14.5 GB | ~127 GB | 1.7 s | 14 s |
+| 20 | 5.4e9 | 42.7 GB | ~374 GB | 5.1 s | 42 s |
+
+Making the *tables* implicit instead — recomputing transitions per column — is
+precisely what the old map engine did, and the frozen-table rewrite bought
+**211x** for exactly that (`strip-mu-fast.md`). Trading it back puts time into
+the wall immediately. So there is no version of the Chan–Rechnitzer trick that
+helps here: the memory it saves is not the memory we are short of.
+
+**What is actually reachable, with no new method at all:** H = 18 wants ~43 GB of
+build transient and a 5-second exact sweep — a big-RAM box today, existing engine,
+one command. That lands `mu_18 ~ 6.59`. H = 19 at ~127 GB is marginal; H = 20 at
+~374 GB is out.
+
+**Recommendation: don't.** 6.543 -> 6.59 against `lambda ~ 7.111` does not
+shorten the paper's sentence, it only edits a numeral in it, and the rung
+increments (~0.05) mean the ladder cannot approach `lambda` at any H we can
+build. The bracket is what it is. Recorded so the next person costs it in
+minutes instead of re-deriving the table.
