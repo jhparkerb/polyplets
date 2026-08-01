@@ -154,6 +154,23 @@ def validate():
 
 
 
+# Two-row interior weights W(a,b) past the k <= 5 table below, banked
+# 2026-08-01 (wall time in the comment; W(5,5) alone took 8.4 h). Reproduce a
+# single cell with `python3 experiments/cluster_weight_dp.py pair A B`.
+# Consequences in results/defect-gas.md: the a=2 cubic holds at b=7,8, the a=3
+# row is the quartic 24b^4+16b^3+110b^2-19b+16 (holdout W(3,7) exact), and the
+# symmetric-bicubic target is refuted -- deg_b W(a,.) = a+1.
+TWO_ROW_INTERIOR = {
+    (2, 7): 9454,     # 178 s
+    (2, 8): 13845,    # 1502 s
+    (3, 5): 19671,    # 89 s
+    (3, 6): 38422,    # 1144 s
+    (3, 7): 68385,    # 13388 s
+    (4, 4): 28559,    # 120 s
+    (4, 5): 74710,    # 1975 s
+    (5, 5): 226545,   # 30137 s
+}
+
 KNOWN_WEIGHTS = {  # (interior, boundary_bottom, boundary_top, pure), DP-computed, k <= 5
     (2,): (25, 5, 5, 1),
     (2, 2): (339, 66, 66, 13),
@@ -268,6 +285,17 @@ def check_grand_form(K=5):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 3 and sys.argv[1] == "pair":
+        a, b = int(sys.argv[2]), int(sys.argv[3])
+        t0 = time.time()
+        w = interior((a, b))
+        banked = TWO_ROW_INTERIOR.get((a, b)) or TWO_ROW_INTERIOR.get((b, a))
+        tag = ""
+        if banked is not None:
+            tag = "  (matches banked)" if banked == w else f"  MISMATCH vs {banked}"
+        print(f"W({a},{b}) = {w}   [{time.time() - t0:.0f}s]{tag}")
+        sys.exit(0)
+
     validate()
     for v, (wi, wb, wt, wp) in KNOWN_WEIGHTS.items():
         if sum(v) - len(v) <= 3:

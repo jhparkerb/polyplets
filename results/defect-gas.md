@@ -312,10 +312,48 @@ Verifier: `experiments/hole_strata_gas.py`.
 ## Open
 - Two-row closed form generalizing (2s+1)². First row pinned 2026-07-31:
   **W(2,b) = 24b³ + 20b² + 35b − 3** (fit b=2..5 on the DP, holdout
-  W(2,6) = 6111 exact). Degree 3 per variable where one row is degree 2,
-  so the target is a symmetric bicubic Σ c_ij a^i b^j, c_ij = c_ji; the
-  a=2 row plus symmetry fixes 4 of its 10 coefficients. Next cells
-  W(3,5), W(4,4) exceed the Python DP's patience — needs the C++ path.
+  W(2,6) = 6111 exact).
+
+  **Eight new cells banked 2026-08-01** (interior weights, `cluster_weight_dp.py
+  pair a b`; the run that produced them took 8.4 h on W(5,5) alone):
+
+  | (a,b) | W | wall |
+  |---|---|---|
+  | (2,7) | 9454 | 178 s |
+  | (2,8) | 13845 | 1502 s |
+  | (3,5) | 19671 | 89 s |
+  | (3,6) | 38422 | 1144 s |
+  | (3,7) | 68385 | 13388 s |
+  | (4,4) | 28559 | 120 s |
+  | (4,5) | 74710 | 1975 s |
+  | (5,5) | 226545 | 30137 s |
+
+  What they bought, in order of value:
+
+  1. **The a=2 cubic survives two more holdouts** — W(2,7) and W(2,8) are
+     exactly 24b³+20b²+35b−3. It was fitted on four points with one holdout;
+     it now has three.
+  2. **The a=3 row is a QUARTIC**, not a cubic:
+     **W(3,b) = 24b⁴ + 16b³ + 110b² − 19b + 16**, fitted on b=2..6 and
+     confirmed by the holdout **W(3,7) = 68385 exact**. Fourth differences are
+     constant (576 = 24·4!) at both available places.
+  3. **The symmetric-bicubic target is therefore REFUTED.** The stated goal was
+     `Σ_{i,j≤3} c_ij a^i b^j` with `c_ij = c_ji`; but deg_b W(a,·) = a+1
+     (measured: 3 at a=2, 4 at a=3), so no bivariate polynomial of fixed
+     degree can be right — with symmetry it would have to have degree a+1 in
+     b for every a at once. The right shape is binomial-flavoured, not
+     polynomial. Both known rows share leading coefficient **24**.
+
+  Left open: a=4 needs six points to close its degree (four in hand:
+  b=2,3,4,5) and W(4,6) is the next cell — extrapolating the measured DP
+  cost, on the order of a day in Python, so it wants the C++ path if anyone
+  revives this. Diagonal growth W(n,n) = 339, 3325, 28559, 226545 with ratios
+  9.81, 8.59, 7.93 — decreasing on four points, which is all that can honestly
+  be said; no shape fitted.
+
+  Standing filter applies (`MEMORY.md`, claim pruning): name the sentence
+  that gets shorter before spending compute here. Today it shortens none —
+  this entry is a closed door plus a corrected target, not a lead.
 - ~~The convergence + boundary analysis for a full proof of the law~~
   **DONE 2026-07-12**: `docs/proofs/diagonal-law.md` — separation lemma +
   chain identity + row bound (ℓ ≤ k) + partial fractions prove the law's
