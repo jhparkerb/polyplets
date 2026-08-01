@@ -515,7 +515,12 @@ spine digit-product on all in-band cells).
   2026-08-01** (papers/MISSING.md + results/anisotropic-not-dfinite.md:
   criterion traced to BM-R 2002 Lemma 9, not Haruspicy 1; shared opening
   step now cited in the paper; remaining leads swept, no collision;
-  D_A-finiteness ceiling recorded), paper scoping sign-off. Blocked on hard math (obstructions documented):
+  D_A-finiteness ceiling recorded; **forward citation crawl DONE 2026-08-01**
+  — OpenAlex + Semantic Scholar over BM-R 2002, Haruspicy 2/3,
+  Chan-Rechnitzer, BBEP, Bell-Hu-Satriano, BGKL: still no collision, and the
+  nearest arithmetic relative found (Bell-Nguyen-Zannier's height/D-finiteness
+  series) is now cited in the paper; MathSciNet + Scholar Cited-by remain
+  jasonp's optional belt-and-braces), paper scoping sign-off. Blocked on hard math (obstructions documented):
   onset sharpness (king+dm), dm Lemma-5 hardening + multiplicity split,
   max-hole peeling, SNF exponents, K3 exact convex mu, periodic-lattice
   formalization.

@@ -310,3 +310,31 @@ that is Haruspicy 2 (Haruspicy 3 is the directed bond-animal paper).
 
 Nothing further is owed here. The two optional levers above are for a
 stronger claim than the paper now makes.
+
+### Forward citation crawl (2026-08-01) — still no collision
+
+The one search direction never tried: everything above was found by keyword
+or by following references *backwards*. Crawled forward with OpenAlex and
+Semantic Scholar (`experiments/citation_crawl.py`) over BM-R 2002 (83/74
+citing), Haruspicy 2 (13/17), Haruspicy 3 (4/4), Chan-Rechnitzer 2018 (20/2),
+BBEP 2020 (3/20), plus the arithmetic relatives Bell-Hu-Satriano (5) and
+Bell-Gerhold-Klazar-Luca (25). Table and per-seed notes in
+`papers/MISSING.md`. Every descendant of BM-R that proves non-D-finiteness
+uses pole/singularity accumulation; no arithmetic endgame on a family of
+slice growth constants appears anywhere in those sets.
+
+The crawl did upgrade the nearest relative. **Bell, Nguyen & Zannier,
+"D-finiteness, rationality, and height"** (Trans. AMS 373 (2020) 4889-4906;
+II, Adv. Math. 414 (2023); III, multivariate Polya-Carlson, Math. Z. 306
+(2024), with S. Chen) is height theory applied directly to D-finite series —
+closer to us than Bell-Hu-Satriano's arithmetic dynamics. It is still a
+different configuration: they bound the Weil heights of the *coefficients*
+and conclude rationality; we bound degree and house of the *slice growth
+constants* and conclude a contradiction. Their forward citations (15/3/4)
+contain no combinatorial application. Now cited in the paper's "Relation to
+existing work" paragraph, so that paragraph names the arithmetic neighbours
+instead of resting on absence alone.
+
+Coverage caveat kept honest: OpenAlex and Semantic Scholar disagree on counts
+(83 vs 74 on BM-R), so neither is complete; MathSciNet and Google Scholar's
+own "Cited by" remain unrun and remain jasonp's call.

@@ -172,7 +172,58 @@ Optional, not needed for the claim as now scoped: MathSciNet's citation
 graph on BM-R 2002 (weekday guest pass, Pitt Hillman or CMU Hunt), or
 asking Rechnitzer (UBC) directly. Both jasonp's call.
 
-## STANDING NEXT ACTION: crawl the citation graph (jasonp, 2026-08-01)
+## CITATION GRAPH CRAWLED 2026-08-01 — no collision (was the standing action)
+Done from the desk with two independent citation databases instead of
+MathSciNet: **OpenAlex** and **Semantic Scholar**, both free APIs, driven by
+`experiments/citation_crawl.py` (re-runnable; dump kept out of the repo).
+Counts differ between sources, so neither is complete — but they disagree on
+*coverage*, not on the answer.
+
+Forward citations read, seed by seed:
+
+| seed | OpenAlex | S2 | what cites it |
+|---|---|---|---|
+| BM-R 2002 (the criterion) | 83 | 74 | heaps/directed-animal combinatorics, prudent and column-convex polygons, Haruspicy 2/3, Mishna-Rechnitzer's non-holonomic quarter-plane walks, Guttmann's survey volume |
+| Haruspicy 2 | 13 | 17 | same neighbourhood; newest is a 2025 J. Phys. A SAW paper |
+| Haruspicy 3 | 4 | 4 | four items, none about a criterion |
+| Chan-Rechnitzer 2018 | 20 | 2 | mostly a symbolic-dynamics book's chapters; one 2025 preprint |
+| BBEP 2020 (Av(1324)) | 3 | 20 | permutation patterns only, through 2026 |
+
+Extra seeds added on the way, because a colliding paper would have to cite
+one of them: **Bell-Hu-Satriano** (5 citing), **Bell-Gerhold-Klazar-Luca**
+(25 citing). Both citation sets are pure number theory / computer algebra —
+no lattice model anywhere in them.
+
+**Verdict: no collision.** Every descendant of BM-R that proves
+non-D-finiteness uses the pole/singularity-accumulation route. Nobody in
+these citation sets runs an arithmetic endgame on a family of slice growth
+constants.
+
+**One find worth the crawl** — the nearest arithmetic relative, better than
+Bell-Hu-Satriano: Bell, Nguyen & Zannier, *D-finiteness, rationality, and
+height*, Trans. AMS 373 (2020) 4889-4906, with part II (Adv. Math. 414, 2023)
+and part III, the multivariate Polya-Carlson dichotomy (Math. Z. 306, 2024,
+with S. Chen). Genuinely height-theoretic theorems about D-finite series —
+but they bound the Weil heights of the *coefficients* and conclude
+rationality, where ours bounds degree and house of the *slice growth
+constants* and concludes a contradiction. Different configuration; and
+their own forward citations (15 + 3 + 4) contain no combinatorial
+application. Now cited in the paper's "Relation to existing work" paragraph,
+which no longer rests on absence alone.
+
+Two 2025 items checked and cleared: He, *Upper bounds for the connective
+constant of weighted self-avoiding walks* (J. Phys. A, 2025) — Alm's
+algorithm extended, SAWs and self-avoiding trails only, not site animals;
+Liang, *Independent set enumeration ... of grid graphs and their variants*
+(arXiv 2507.04007) — tensor-network numerics for hard-core models including
+king graphs, estimates rather than rigorous bounds, and independent sets are
+not animals.
+
+**Still not done, still jasonp's if he wants belt-and-braces:** MathSciNet
+(weekday walk-in guest pass, Pitt Hillman or CMU Hunt) and Google Scholar's
+own "Cited by", which sees preprints and theses these two APIs miss.
+
+### The original entry, for the record
 **Nothing obtained so far has been forward-searched.** Every paper in this
 session was found by keyword or by following references *backwards*; we have
 never asked "who cites this?" for any of them. That is the one search
