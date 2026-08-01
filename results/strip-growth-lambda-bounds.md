@@ -171,3 +171,25 @@ form exists. **Unexplored, not endorsed.** If it worked, the prize is concrete:
 the rungs gain ~0.05 each, so pushing H = 17 -> ~25 would move the certified floor
 from 6.543 toward ~6.9 against `lambda ~ 7.111` — the bracket's lower end is the
 half that is still moving.
+
+### Oh cluster ruled out (2026-08-01)
+
+Three papers checked, `papers/oh_*.pdf`: state matrix recursion + monomer–dimer
+(Discrete Math. 342 (2019)), quantum knot mosaics (Topology Appl. 210 (2016)),
+independent vertex sets in grid graphs (LAA 510 (2016)). **All three fail on both
+counts identified above, so nothing here moves either end of the bracket.**
+
+- **Per-site normalization, again.** Oh's constants are per-area: the knot mosaic
+  constant is `delta = lim D_n^(1/n^2)`, the monomer–dimer and independent-set
+  rates are per-site on an `m x n` lattice. Same mismatch as `kappa` vs `lambda`.
+- **Local constraints, again.** The word "connected" in "suitably connected"
+  mosaics is misleading and worth naming so nobody re-reads this hoping: a mosaic
+  is suitably connected iff *any two tiles adjacent in a row or column have or
+  lack connection points simultaneously on their common edge*. That is pure local
+  edge-matching between neighbours — not global connectivity of a cluster. It is
+  exactly the kind of compatibility rule a transfer matrix handles trivially, and
+  it is why the method works there and not here.
+
+No new engine idea either: the three-stage shape (convert to a mosaic system,
+state-matrix recursion, analyze the matrix) is what our own stage-operator strip
+kernel already does.
