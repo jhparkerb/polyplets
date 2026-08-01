@@ -288,3 +288,25 @@ boxes*, cite BM-R 2002 for the shared opening, and do not write "first."
 Two levers remain if a stronger statement is ever wanted: MathSciNet's
 citation graph on BM-R 2002 (read-only, weekday guest pass at Pitt Hillman or
 CMU Hunt), or asking Rechnitzer directly. Both jasonp's call.
+
+### Item CLOSED (2026-08-01)
+
+The remaining leads named in the original todo -- Bell, Gerhold, Mezzarobba,
+Guttmann's solvability tests, the Bousquet-Melou anisotropic surveys -- were
+swept; detail and verdict in `papers/MISSING.md`. No collision. Every method
+located is topological (BM-R) or analytic (Klazar divergence; Bell-Gerhold-
+Klazar-Luca zero-counting); the one paper pairing heights with D-finiteness
+(Bell-Hu-Satriano, arXiv 2003.01255) is arithmetic dynamics along orbits of
+rational maps, a different configuration.
+
+The paper was updated the same day rather than left carrying the unattributed
+version: `paper/polyplets-report.tex` now cites BM-R Lemma 9 inside the proof
+at the extraction step, carries a "Relation to existing work" paragraph
+stating what is shared and what diverges, claims the Northcott endgame with
+the absence caveat explicit instead of implied, and records the
+D_A-finiteness ceiling. A stale citation was fixed in passing: the
+`rechnitzer` bibitem had labelled JCTA 113 (2006) 520-546 as "Haruspicy 3";
+that is Haruspicy 2 (Haruspicy 3 is the directed bond-animal paper).
+
+Nothing further is owed here. The two optional levers above are for a
+stronger claim than the paper now makes.

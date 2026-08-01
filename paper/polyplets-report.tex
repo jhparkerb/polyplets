@@ -1350,7 +1350,9 @@ Extracting $y$-coefficients gives, for every $N$, a relation
 $\sum_{\delta}c_\delta(x,N)\,G_{N-\delta}(x)=0$ over a finite window of
 $\delta$, where each $c_\delta(x,N)$ is polynomial in $N$ of degree $\le r$
 and in $x$ of degree $\le D$, and where the $c_\delta$ jointly determine
-the $p_i$ (falling factorials of $N$ are linearly independent). Anchor the
+the $p_i$ (falling factorials of $N$ are linearly independent). This
+extraction is the opening move of Lemma~9 of~\cite{bmr2002}; what follows
+is where we depart from it. Anchor the
 window so that its top face is a level $H_0$: every other face refers to a
 lower height, where $G$ is finite at $x=1/\mu_{H_0}$ by (iii), while
 $G_{H_0}$ has a pole there --- so the top coefficient vanishes at
@@ -1371,11 +1373,41 @@ guarantees abstractly is visible concretely at rate
 $\approx\sqrt\lambda$ per level. The argument uses only integer counts,
 per-height rationality, and strictly increasing bounded strip constants,
 so it applies verbatim to fixed polyominoes, polyhexes, and polyiamonds by
-height. We have not located this argument in the literature (the closest
-result we know, non-D-finiteness of the anisotropic self-avoiding-polygon
-generating function, is proved by Rechnitzer's haruspicy~\cite{rechnitzer}
-by quite different means), and state it as ours with that caveat. The
-isotropic $a(x)$ remains open, exactly as in the polygon setting.
+height.
+
+\paragraph{Relation to existing work.}
+Neither the conclusion nor the opening step is new. Non-D-finiteness of an
+anisotropic generating function was proved for self-avoiding polygons, and
+for directed bond animals, by Rechnitzer's haruspicy
+programme~\cite{rechnitzer}; the criterion that programme runs on is
+Lemma~9 of Bousquet-M\'elou and Rechnitzer~\cite{bmr2002}, whose proof
+begins with the same coefficient extraction used above. From that shared
+start the arguments diverge completely. Theirs concludes topologically ---
+the union of the coefficients' pole sets has finitely many limit points,
+via an asymptotic argument in the index --- and applying it demands an
+explicit combinatorial description of the denominators, in the polygon
+setting a product of cyclotomic polynomials. Ours concludes arithmetically
+and effectively: it follows a single distinguished pole per slice, and the
+only inputs are Perron--Frobenius monotonicity and a crude upper bound on
+$\lambda$. That lightness is the contribution. It is why the proof
+transports to any family with a column transfer matrix with no bespoke
+denominator analysis, and why it yields explicit excluded $(r,D)$ boxes
+rather than a bare dichotomy. We have not located the use of Northcott
+finiteness on a family of slice growth constants elsewhere; a literature
+search cannot establish absence, so we claim the argument as ours with
+that qualification and nothing stronger.
+
+One limitation deserves recording. Klazar~\cite{klazar} proves
+non-holonomicity for a class of divergent series after enlarging the target
+from D-finite to $D_A$-finite --- analytic rather than polynomial
+coefficients --- on the ground that polynomiality was never carrying the
+argument. Ours admits no such enlargement: the step ``a polynomial over
+$\mathbb Q$ of degree $\le D$ cannot vanish at an algebraic number of degree
+exceeding $D$'' \emph{is} the dichotomy, and an analytic coefficient may
+vanish at $1/\mu_{H_0}$ without vanishing identically.
+Theorem~\ref{thm:notdfinite} is therefore a statement about D-finiteness
+over $\mathbb Q(x)$ and does not reach $D_A$-finiteness. The isotropic
+$a(x)$ remains open, exactly as in the polygon setting.
 
 \paragraph{Rigorous lower bounds.}
 Summing the fixed-height GFs gives $a(n)\ge\sum_{H\le 10}T(n,H)$ exactly for
@@ -1599,6 +1631,12 @@ A.~Bacher,
 \emph{Directed and multi-directed animals in the king's lattice},
 arXiv:1301.1365 (2015).
 
+\bibitem{bmr2002}
+M.~Bousquet-M\'elou and A.~Rechnitzer,
+\emph{Lattice animals and heaps of dimers},
+Discrete Mathematics \textbf{258} (2002), 235--274 (Lemma~9: the
+pole-accumulation criterion for D-finiteness in a second variable).
+
 \bibitem{bui2025}
 V.~Bui,
 \emph{A convolutional approach to bounding the number of polyominoes},
@@ -1630,11 +1668,18 @@ Journal f\"ur die reine und angewandte Mathematik \textbf{53} (1857),
 173--175 (finiteness of algebraic integers with bounded degree and
 bounded conjugates).
 
+\bibitem{klazar}
+M.~Klazar,
+\emph{Non-P-recursiveness of numbers of matchings or linear chord diagrams
+with many crossings},
+Advances in Applied Mathematics \textbf{30} (2003), 126--136
+($D_A$-finiteness; the analytic--nonanalytic dichotomy).
+
 \bibitem{rechnitzer}
 A.~Rechnitzer,
 \emph{Haruspicy and anisotropic generating functions},
 Advances in Applied Mathematics \textbf{30} (2003), 228--257; and
-\emph{Haruspicy 3: the anisotropic generating function of self-avoiding
+\emph{Haruspicy 2: the anisotropic generating function of self-avoiding
 polygons is not D-finite},
 Journal of Combinatorial Theory Series A \textbf{113} (2006), 520--546.
 

@@ -34,6 +34,43 @@ _(none outstanding — Barequet–Moffie 2007 and Mertens 1990 obtained 2026-06-
   (venue uncertain — INTEGERS / Electronic J.? ~2006). — the cleanest "width W alone bounds
   TM cost" realization; want exact venue + free version.
 
+## Newly identified, all free ("Open archive" on ScienceDirect), 2026-08-01
+From jasonp's lattice-animal search dumps. Not yet fetched; listed in
+descending order of what they would actually buy us.
+
+- **G. Barequet, G. Ben-Shachar, M. C. Osegueda, "Concatenation arguments and
+  their applications to polyominoes and polycubes," Comput. Geom. (Oct 2021).**
+  Concatenation is exactly the injection technique that `results/open-conjectures.md`
+  C2 says is missing ("no clean injection is known for lattice animals" —
+  the stated route to log-convexity of A006770). If their arguments transfer to
+  king adjacency this is the closest thing to an attack on C2 we have seen.
+  **[high — the only lead here that touches a live open conjecture]**
+- **G. Aleksandrowicz & G. Barequet, "Counting polycubes without the
+  dimensionality curse," Discrete Math. 309 (2009).** Already listed at [med]
+  above with the note "confirm they don't touch king" — it is free, so that
+  item can simply be closed by reading it. **[med]**
+- **T. Mansour & R. Rastegar, "Enumeration of various animals on the
+  triangular lattice," European J. Combin. (May 2021).** Bears on the
+  universality work (`docs/proofs/universal-diagonal-law.md`), which is
+  machine-checked on square/hex/king and wants further real instances rather
+  than more hypothetical interval lattices. **[med]**
+- **L. L. Liu & Y. Wang, "On the log-convexity of combinatorial sequences,"
+  Adv. Appl. Math. 39 (2007) 453--476** (arXiv math/0602672). Checked at the
+  abstract level 2026-08-01: their machinery is closure operations plus
+  three-term recurrences, and a(n) satisfies no known recurrence, so it
+  probably cannot engage with C2 — worth one read to confirm the negative,
+  since it would sharpen *why* C2 is hard. **[low]**
+- Directed-animal lineage behind our Bacher comparison bound:
+  Gouyou-Beauchamps & Viennot, "Equivalence of the two-dimensional directed
+  animal problem to a one-dimensional path problem," Adv. Appl. Math. (1988);
+  Bousquet-Melou, "New enumerative results on two-dimensional directed
+  animals," Discrete Math. (1998). **[low — context, not load-bearing]**
+- Convex-family cluster, if the convex-polyplets side quest is ever revived
+  (`results/convex-polyplets.md`, K3 parked): Duchi-Rinaldi-Schaeffer
+  (Z-convex, 2008); Bousquet-Melou, q-enumeration de polyominos convexes
+  (JCTA 1993); Delest, column-convex GFs (JCTA 1988); Dubernard & Dutour
+  (1996); Feretic & Svrtan (1996). **[low]**
+
 ## Notes
 - arXiv-available (NOT missing): Jensen cond-mat/0007239 & 0007238, Conway 1610.09806,
   Jensen math/0506317, Guttmann-Jensen cond-mat/0603833, Clisby-Jensen 1111.5877,
@@ -74,12 +111,43 @@ leading coefficient), ours is arithmetic and effective (a degree bound on
 one distinguished pole per slice, giving explicit (r,D) exclusion boxes).
 Northcott appears in neither.
 
-**Still open, and unresolvable by search:** whether the
-Northcott-on-growth-constants endgame appears elsewhere. Absence cannot be
-established from a database; the two remaining levers are (a) MathSciNet's
-citation graph on BM-R 2002 and the Haruspicy papers -- a weekday walk-in at
-Pitt Hillman or CMU Hunt, guest pass, read-only -- and (b) asking Rechnitzer
-(UBC) directly. jasonp's call; external contact is his alone.
+**REMAINING LEADS SWEPT 2026-08-01 — item now CLOSED.** The other names in
+the original list were checked and none collides:
+
+- **Bell, Gerhold, Klazar & Luca**, "Non-holonomicity of sequences defined
+  via elementary functions," Ann. Comb. (2008), arXiv math/0605142 (saved to
+  `papers/`). Method is **analytic** -- counting zeros of elementary and
+  analytic functions -- and the class is sequences obtained by evaluating an
+  elementary function at positive integers. T(n,H) is not of that form.
+- **Gerhold**, "On some non-holonomic sequences," Electron. J. Combin. 11
+  (2004): same analytic family.
+- **Bell, Hu & Satriano**, "Height gap conjectures, D-finiteness, and weak
+  dynamical Mordell-Lang," arXiv 2003.01255. The one paper found that pairs
+  **heights with D-finiteness** -- but in arithmetic dynamics, bounding
+  h(f(Phi^n(x))) along orbits of rational maps, with D-finite coefficient
+  growth as an application. Different configuration entirely; not slice
+  growth constants. Closest arithmetic-flavoured relative located, and not a
+  collision.
+- **Guttmann**, "Indicators of solvability for lattice models," Discrete
+  Math. 217 (2000) 167-189: the programmatic source of the anisotropic-GF
+  solvability test that Rechnitzer's programme answers, not a theorem in our
+  configuration.
+- Also noted: the classical arithmetic constraint (D-finite + integer
+  coefficients + K rho^n n^alpha ==> alpha rational), used for quarter-plane
+  excursions. Arithmetic, but about one sequence's asymptotic exponent, not
+  a family of algebraic degrees.
+
+**Verdict.** Every non-D-finiteness method located in this literature is
+either topological (BM-R pole accumulation) or analytic (Klazar divergence;
+BGKL zero-counting). Northcott-on-slice-growth-constants was not found.
+Absence still cannot be established by search, so the paper now claims the
+argument with that qualification stated explicitly rather than resting on
+it -- see `paper/polyplets-report.tex`, "Relation to existing work", which
+also records the ceiling (our method cannot reach D_A-finiteness).
+
+Optional, not needed for the claim as now scoped: MathSciNet's citation
+graph on BM-R 2002 (weekday guest pass, Pitt Hillman or CMU Hunt), or
+asking Rechnitzer (UBC) directly. Both jasonp's call.
 
 **Haruspicy 1 OBTAINED 2026-08-01** (jasonp, ScienceDirect) →
 `papers/rechnitzer_2003_haruspicy1_anisotropic_gf.pdf`. Confirms the reading

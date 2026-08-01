@@ -511,8 +511,11 @@ spine digit-product on all in-band cells).
 - **EVERYTHING ELSE BLOCKED OR COMPLETE (2026-07-15).** Blocked on time/boxes:
   a(22) (~07-16; then gather+bank, frontier->22), H=11 GF re-recovery, a(37)
   decision. Blocked on jasonp: viva -> OEIS batch + 3 comment drafts,
-  [JP] lessons sections, Northcott literature check (papers/MISSING.md),
-  paper scoping sign-off. Blocked on hard math (obstructions documented):
+  [JP] lessons sections, ~~Northcott literature check~~ **CLOSED
+  2026-08-01** (papers/MISSING.md + results/anisotropic-not-dfinite.md:
+  criterion traced to BM-R 2002 Lemma 9, not Haruspicy 1; shared opening
+  step now cited in the paper; remaining leads swept, no collision;
+  D_A-finiteness ceiling recorded), paper scoping sign-off. Blocked on hard math (obstructions documented):
   onset sharpness (king+dm), dm Lemma-5 hardening + multiplicity split,
   max-hole peeling, SNF exponents, K3 exact convex mu, periodic-lattice
   formalization.

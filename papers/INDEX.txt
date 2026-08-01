@@ -71,6 +71,13 @@ Non-D-finiteness of anisotropic generating functions (the lineage our theorem si
                                            chord diagrams) with many crossings, Adv. in Appl. Math. 30
                                            (2003) 126-136. Same issue; cited by Haruspicy 2 as [13].
                                            Adjacent prior art on proving sequences non-P-recursive.
+                                           Obstruction is ANALYTIC (divergence); introduces D_A-finite.
+  bell_gerhold_klazar_luca_2008_nonholonomicity_elementary_functions.pdf
+                                           Bell, Gerhold, Klazar & Luca, Non-holonomicity of sequences
+                                           defined via elementary functions, Ann. Comb. (2008),
+                                           arXiv math/0605142. Analytic method (counting zeros); class is
+                                           elementary functions evaluated at integers. Swept 2026-08-01
+                                           as part of closing the Northcott novelty item; no collision.
 
 Distributed-computing background (engine design era):
   dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).
