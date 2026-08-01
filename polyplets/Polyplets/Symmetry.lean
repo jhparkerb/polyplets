@@ -491,7 +491,7 @@ lemma D4.sum_univ {M : Type*} [AddCommMonoid M] (f : D4 → M) :
   abel
 
 /-- **Burnside's lemma for `D4`.** -/
-theorem free_eq (n : ℕ) (_hn : 1 ≤ n) :
+theorem free_eq (n : ℕ) :
     8 * Free n = a n + 2 * R90 n + R180 n + 2 * Hm n + 2 * Dm n := by
   have hb := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group D4 (CA n)
   rw [D4.sum_univ (fun g => Fintype.card (MulAction.fixedBy (CA n) g))] at hb
@@ -570,7 +570,7 @@ lemma card_fixedByC4 (n : ℕ) (c : C4) :
   exact Fintype.card_congr' rfl
 
 /-- **Burnside's lemma for the rotation subgroup.** -/
-theorem oneSided_eq (n : ℕ) (_hn : 1 ≤ n) :
+theorem oneSided_eq (n : ℕ) :
     4 * OneSided n = a n + 2 * R90 n + R180 n := by
   have hb := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group C4 (CA n)
   rw [C4.sum_univ (fun c => Fintype.card (MulAction.fixedBy (CA n) c))] at hb
@@ -884,7 +884,7 @@ lemma card_stab_eq_two_mul (n : ℕ) (y : achiral n) :
   omega
 
 /-- **The bilateral half-sum.** -/
-theorem bilateral_eq (n : ℕ) (_hn : 1 ≤ n) : 2 * Bilateral n = Hm n + Dm n := by
+theorem bilateral_eq (n : ℕ) : 2 * Bilateral n = Hm n + Dm n := by
   have h1 := sum_stab_achiral n
   have h2 := sum_stab_refl_achiral n
   have h3 : ∑ y : achiral n, (Finset.univ.filter (fun g : D4 => g • y = y)).card
@@ -977,19 +977,19 @@ example : R90 3 = 0 := r90_vanish 3 (by norm_num)
 
 /-- `Free 4 = 22` (A030222), from `free_eq` and the anchors. -/
 theorem Free_4 : Free 4 = 22 := by
-  have h := free_eq 4 (by norm_num)
+  have h := free_eq 4
   rw [a_4, R90_4, R180_4, Hm_4, Dm_4] at h
   omega
 
 /-- `OneSided 4 = 34` (A030233), from `oneSided_eq` and the anchors. -/
 theorem OneSided_4 : OneSided 4 = 34 := by
-  have h := oneSided_eq 4 (by norm_num)
+  have h := oneSided_eq 4
   rw [a_4, R90_4, R180_4] at h
   omega
 
 /-- `Bilateral 4 = 10` (A030234), from `bilateral_eq` and the anchors. -/
 theorem Bilateral_4 : Bilateral 4 = 10 := by
-  have h := bilateral_eq 4 (by norm_num)
+  have h := bilateral_eq 4
   rw [Hm_4, Dm_4] at h
   omega
 

@@ -196,10 +196,9 @@ lemma canonicalAnimal_finite (n : ℕ) :
 canonical animals of `n` cells into height classes; each class is exactly the
 canonical set counted by `T n H` (`isCanonical_iff`), the classes are disjoint
 because `heightOf` is a function, and only heights `1 … n` occur
-(`one_le_heightOf`, `heightOf_le`). The `1 ≤ n` hypothesis is kept for the
-downstream interface but is not needed: at `n = 0` both sides are `0`
-(no canonical animal has `0` cells, and `Finset.Icc 1 0` is empty). -/
-theorem a_eq_sum (n : ℕ) (_hn : 1 ≤ n) :
+(`one_le_heightOf`, `heightOf_le`). Unconditional: at `n = 0` both sides are
+`0` (no canonical animal has `0` cells, and `Finset.Icc 1 0` is empty). -/
+theorem a_eq_sum (n : ℕ) :
     a n = ∑ H ∈ Finset.Icc 1 n, T n H := by
   have hbi : (canonicalAnimal_finite n).toFinset
       = (Finset.Icc 1 n).biUnion fun H => (canonical_finite n H).toFinset := by
@@ -232,8 +231,8 @@ def ac (n : ℕ) : ℕ := ∑ H ∈ Finset.Icc 1 n, Tc n H
 
 /-- The computable twin agrees with `a`, termwise by `Tc_eq_T` and in total by
 `a_eq_sum`. -/
-theorem ac_eq_a (n : ℕ) (hn : 1 ≤ n) : ac n = a n := by
-  rw [ac, a_eq_sum n hn]
+theorem ac_eq_a (n : ℕ) : ac n = a n := by
+  rw [ac, a_eq_sum n]
   exact Finset.sum_congr rfl fun H _ => Tc_eq_T n H
 
 /-! The right-hand sides are the row sums of `results/triangle.txt`
@@ -244,19 +243,19 @@ section (PLAN.md, scope interview 2026-07-20). -/
 set_option linter.style.nativeDecide false
 
 /-- `a 1 = 1`: the single cell. -/
-theorem a_1 : a 1 = 1 := by rw [← ac_eq_a 1 (by norm_num)]; native_decide
+theorem a_1 : a 1 = 1 := by rw [← ac_eq_a 1]; native_decide
 
 /-- `a 2 = 4`: the horizontal, vertical and two diagonal king dominoes. -/
-theorem a_2 : a 2 = 4 := by rw [← ac_eq_a 2 (by norm_num)]; native_decide
+theorem a_2 : a 2 = 4 := by rw [← ac_eq_a 2]; native_decide
 
 /-- `a 3 = 20` (banked row sum, `results/triangle.txt`). -/
-theorem a_3 : a 3 = 20 := by rw [← ac_eq_a 3 (by norm_num)]; native_decide
+theorem a_3 : a 3 = 20 := by rw [← ac_eq_a 3]; native_decide
 
 /-- `a 4 = 110` (banked row sum, `results/triangle.txt`). -/
-theorem a_4 : a 4 = 110 := by rw [← ac_eq_a 4 (by norm_num)]; native_decide
+theorem a_4 : a 4 = 110 := by rw [← ac_eq_a 4]; native_decide
 
 /-- `a 5 = 638` (banked row sum, `results/triangle.txt`). -/
-theorem a_5 : a 5 = 638 := by rw [← ac_eq_a 5 (by norm_num)]; native_decide
+theorem a_5 : a 5 = 638 := by rw [← ac_eq_a 5]; native_decide
 
 /-- `a 6 = 3832` (banked row sum, `results/triangle.txt`). This anchor is the
 expensive one: it needs the whole `n = 6` row of `Tc`, including `Tc 6 6` — a
@@ -264,7 +263,7 @@ expensive one: it needs the whole `n = 6` row of `Tc`, including `Tc 6 6` — a
 ruled out of that module's budget. Measured ~700 s on its own (see the module
 header). `a 7` would need `Tc 7 7`, `C(49,7) ≈ 86M` subsets — roughly 44 times
 this one, so the anchors stop at `n = 6`. -/
-theorem a_6 : a 6 = 3832 := by rw [← ac_eq_a 6 (by norm_num)]; native_decide
+theorem a_6 : a 6 = 3832 := by rw [← ac_eq_a 6]; native_decide
 
 /-- **The ratio sequence `a n / a (n-1)` is not log-convex** (jasonp's question,
 2026-07-31). Log-convexity of the ratios at `n = 3` would need
@@ -286,7 +285,7 @@ bound for `a n`: they are a sub-collection of the height classes, and every
 class is counted with a nonnegative multiplicity. -/
 theorem strip_sum_le_a (n : ℕ) (hn : 10 ≤ n) :
     ∑ H ∈ Finset.Icc 1 10, T n H ≤ a n := by
-  rw [a_eq_sum n (by omega)]
+  rw [a_eq_sum n]
   exact Finset.sum_le_sum_of_subset (Finset.Icc_subset_Icc_right hn)
 
 /-! ## Axiom audit

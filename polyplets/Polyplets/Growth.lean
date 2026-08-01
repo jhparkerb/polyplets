@@ -602,10 +602,10 @@ theorem recRight_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonica
 animals of sizes `m` and `n` into the canonical animals of size `m + n`;
 `recLeft`/`recRight` are the left inverse that makes it an injection.
 
-The `1 ≤ m`, `1 ≤ n` hypotheses are kept for the downstream interface (the
-brief pins this signature) but are not needed by the proof: at `m = 0` the
-left side is `a 0 * a n = 0` and the inequality degenerates to `0 ≤ a n`. -/
-theorem a_supermul {m n : ℕ} (_hm : 1 ≤ m) (_hn : 1 ≤ n) : a m * a n ≤ a (m + n) := by
+Unconditional: at `m = 0` the left side is `a 0 * a n = 0` and the
+inequality degenerates to `0 ≤ a n`. (The outworks brief pinned a `1 ≤ m`,
+`1 ≤ n` signature; the hypotheses were dead and dropped 2026-07-31.) -/
+theorem a_supermul {m n : ℕ} : a m * a n ≤ a (m + n) := by
   classical
   have key : ∀ k : ℕ, a k = (canonicalAnimal_finite k).toFinset.card := fun k => by
     rw [a, Set.ncard_eq_toFinset_card _ (canonicalAnimal_finite k)]
@@ -658,7 +658,7 @@ theorem negLogA_subadditive : Subadditive negLogA := by
   have h1 : (0 : ℝ) < a p := by exact_mod_cast one_le_a hp
   have h2 : (0 : ℝ) < a q := by exact_mod_cast one_le_a hq
   have hsm : ((a p : ℝ) * (a q : ℝ)) ≤ (a (p + q) : ℝ) := by
-    exact_mod_cast a_supermul hp hq
+    exact_mod_cast a_supermul
   have hlog : Real.log ((a p : ℝ) * (a q : ℝ)) ≤ Real.log (a (p + q) : ℝ) :=
     Real.log_le_log (by positivity) hsm
   rw [Real.log_mul (ne_of_gt h1) (ne_of_gt h2)] at hlog

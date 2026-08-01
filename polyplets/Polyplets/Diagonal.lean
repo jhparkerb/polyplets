@@ -45,12 +45,12 @@ Paper proofs:
 
 namespace Polyplets
 
-/-- **k = 1 diagonal.** `T(n, n-1) = (25n - 45) · 3^(n-4)` for `n ≥ 4`
-(the statement is true for `n ≥ 3` via the negative exponent; we take the
-clean `n ≥ 4` regime here). Paper proof: `docs/proofs/T-n-nm1.md`. -/
-theorem T_n_nm1 (n : ℕ) (hn : 4 ≤ n) :
+/-- **k = 1 diagonal.** `T(n, n-1) = (25n - 45) · 3^(n-4)` at the canonical
+onset `n ≥ 2·1+1 = 3` (negative exponent at `n = 3`). Paper proof:
+`docs/proofs/T-n-nm1.md`. -/
+theorem T_n_nm1 (n : ℕ) (hn : 3 ≤ n) :
     (T n (n - 1) : ℚ) = (25 * (n : ℚ) - 45) * (3 : ℚ) ^ ((n : ℤ) - 4) :=
-  P1_closed n (by omega)
+  P1_closed n hn
 
 /-- **k = 2 diagonal.** `T(n, n-2) = ½(625n² - 2459n + 1134) · 3^(n-7)` for
 `n ≥ 5`. Paper proof: `docs/proofs/T-n-nm2-and-general.md` §1 — a proof modulo

@@ -173,7 +173,7 @@ degree-`≤k` polynomial reproducing the `T`-diagonals for all `n ≥ 2k+1`, exa
 `shape_production`'s conclusion) has degree exactly `k` and leading coefficient
 `25^k/k!`. Proved by identifying `P` with `expPoly aSeq bSeq k` on the infinite
 onset set (`grand_form`), then reading off the top coefficient. -/
-theorem shape_lead (k : ℕ) (P : Polynomial ℚ) (_hdeg : P.natDegree ≤ k)
+theorem shape_lead (k : ℕ) (P : Polynomial ℚ)
     (hP : ∀ n : ℕ, 2 * k + 1 ≤ n →
       (3 : ℚ) ^ (3 * k + 1) * (T n (n - k) : ℚ) = P.eval (n : ℚ) * 3 ^ n) :
     P.natDegree = k ∧ P.coeff k = 25 ^ k / (k.factorial : ℚ) := by
