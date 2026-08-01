@@ -81,7 +81,11 @@ citation graph on BM-R 2002 and the Haruspicy papers -- a weekday walk-in at
 Pitt Hillman or CMU Hunt, guest pass, read-only -- and (b) asking Rechnitzer
 (UBC) directly. jasonp's call; external contact is his alone.
 
-**Still wanted:** Haruspicy 1 itself (Adv. Appl. Math. 30 (2003) 228-257,
-Elsevier, no arXiv preprint found). It supplies the combinatorial
-section/density machinery behind Haruspicy 2's Theorem 1, not the test, so
-it is no longer blocking anything. **[low]**
+**Haruspicy 1 OBTAINED 2026-08-01** (jasonp, ScienceDirect) →
+`papers/rechnitzer_2003_haruspicy1_anisotropic_gf.pdf`. Confirms the reading
+above from the source: its content is the combinatorial section/density
+machinery (coefficient of y^n rational, numerator degree <= denominator
+degree, denominator a product of cyclotomic polynomials, plus a tight
+multiplicative upper bound), not a D-finiteness test. Also filed from the
+same issue: `klazar_2003_non_p_recursiveness_matchings.pdf` (Haruspicy 2's
+reference [13], adjacent prior art on non-P-recursiveness).

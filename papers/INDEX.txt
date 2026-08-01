@@ -53,9 +53,24 @@ Non-D-finiteness of anisotropic generating functions (the lineage our theorem si
   rechnitzer_2006_haruspicy3_bond_animals_not_dfinite.pdf
                                            Rechnitzer, Haruspicy 3: the directed bond-animal GF is not
                                            D-finite, JCTA (2006) (arXiv math/0408054). Same criterion as
-                                           Theorem 5. Haruspicy 1 (Adv. Appl. Math. 30 (2003) 228-257)
-                                           is still unobtained -- see MISSING.md -- but it supplies the
-                                           combinatorial section/density machinery, NOT the test.
+                                           Theorem 5.
+  rechnitzer_2003_haruspicy1_anisotropic_gf.pdf
+                                           Rechnitzer, Haruspicy and anisotropic generating functions,
+                                           Adv. in Appl. Math. 30 (2003) 228-257. Obtained 2026-08-01
+                                           (jasonp, ScienceDirect). Supplies the combinatorial
+                                           section/density machinery -- for a wide range of bond-animal
+                                           families the coefficient of y^n is rational, numerator degree
+                                           <= denominator degree, denominator a product of cyclotomic
+                                           polynomials, with a tight multiplicative upper bound. NOT the
+                                           source of the D-finiteness test (that is BM-R 2002, above).
+                                           Section 2 explains the name: haruspicy is divination by
+                                           examining the organs of animals, and the technique examines
+                                           bond configurations inside lattice animals.
+  klazar_2003_non_p_recursiveness_matchings.pdf
+                                           Klazar, Non-P-recursiveness of numbers of matchings (linear
+                                           chord diagrams) with many crossings, Adv. in Appl. Math. 30
+                                           (2003) 126-136. Same issue; cited by Haruspicy 2 as [13].
+                                           Adjacent prior art on proving sequences non-P-recursive.
 
 Distributed-computing background (engine design era):
   dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).
