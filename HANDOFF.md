@@ -525,6 +525,44 @@ spine digit-product on all in-band cells).
   max-hole peeling, SNF exponents, K3 exact convex mu, periodic-lattice
   formalization.
 
+## Session 2026-08-01 (pre-publication sweep) — 3 commits, NOT pushed
+Master is 56 commits ahead of origin; pushing stays jasonp's call. Today's,
+newest first:
+
+- **`5b9e569` two-row weights filed.** The long DP run from the prior session
+  landed: eight interior weights W(a,b) — (2,7) (2,8) (3,5) (3,6) (3,7) (4,4)
+  (4,5) (5,5), W(5,5) alone 8.4 h — banked in `results/defect-gas.md` with
+  costs and in `cluster_weight_dp.py` as `TWO_ROW_INTERIOR`; new CLI
+  `cluster_weight_dp.py pair A B` reproduces a cell and self-checks.
+  Consequences: the a=2 cubic now has three holdouts; **the a=3 row is the
+  quartic 24b⁴+16b³+110b²−19b+16** (holdout W(3,7) exact); and the
+  **symmetric-bicubic target is REFUTED** — deg_b W(a,·) = a+1, so no
+  fixed-degree bivariate polynomial can be the closed form. Corrected target,
+  not a lead. Next cell if ever revived: W(4,6), wants the C++ path.
+- **`a5e778e` citation graph crawled** (the standing next action in
+  `papers/MISSING.md`, now spent). OpenAlex + Semantic Scholar over BM-R 2002,
+  Haruspicy 2/3, Chan-Rechnitzer, BBEP, Bell-Hu-Satriano, BGKL. **No
+  collision**; every BM-R descendant proving non-D-finiteness runs on pole
+  accumulation. Find: **Bell-Nguyen-Zannier, "D-finiteness, rationality, and
+  height"** (Trans. AMS 373 (2020) + parts II/III) — height theory applied to
+  D-finite series, nearest arithmetic relative, different configuration
+  (coefficient heights ⇒ rationality vs our slice growth constants ⇒
+  contradiction). Now cited in the paper's "Relation to existing work"
+  alongside Bell-Hu-Satriano, so that paragraph no longer rests on absence
+  alone. verify_claims **448/448**, pdflatex clean. Unrun and optional:
+  MathSciNet, Google Scholar's own Cited-by.
+- **`a621ee2` comb shatter** — the concatenation route to a better λ upper
+  bound, priced then closed (`results/concatenation-upper-bound.md`,
+  `experiments/concatenation_bound_check.py`). A degree-2 P would have given
+  λ ≤ 7.745 (deg 3 → 8.642, deg 4 → nothing), and 40 terms refute no such
+  relation; but the lexicographic split shatters a king comb into ~n/4
+  components, and the connected (centroid) split can't prescribe halves to
+  O(1). The same lemma would beat the polyomino record 4.5252 → 4.3828, so it
+  is known-hard. **Bracket unchanged: 6.543 ≤ λ ≤ 9.3153.**
+
+Untracked in the tree and NOT ours to touch: `paper/technical-report.tex`
+(+ live `.swp` — jasonp editing).
+
 ## Remaining work ledger
 1. **Paper final read-through.**
 2. **Viva cold retakes**, then %C authorship pass (jasonp's own words), then jasonp submits.
@@ -542,3 +580,14 @@ spine digit-product on all in-band cells).
 Read this file, then `MEMORY.md`'s index (auto-loaded) for standing practices. No open
 thread needs immediate action; pacing is jasonp's (viva retakes, whether to merge the
 unmerged engine branches, whether to revisit a(37)+ compute given the reach ceiling).
+
+**Pre-publication list as of 2026-08-01** — the two Claude-side items are done
+(Northcott/citation crawl, concatenation upper bound: both closed, no paper
+claim changed except a strengthening citation). What is left is the ledger
+above, and all four items are jasonp's: paper final read-through (including
+the two `technical-report.tex` placeholders, a(40) still 5.7e31 in the
+abstract and `tab:an` — `verify_technical_report.py` reports exactly those 2
+failures of 781), viva cold retakes → %C authorship pass → OEIS submit,
+[JP] lessons-learned sections, and the holes n≥20 go/no-go. Optional
+literature belt-and-braces, also his: MathSciNet or Scholar Cited-by on
+BM-R 2002.
