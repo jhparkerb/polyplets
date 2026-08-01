@@ -271,12 +271,29 @@ theorem u1_seed : Pp1.eval 1 - Pp1.eval 0 = 25 ∧ v5q 25 = 2 := by
   · simp only [Pp1_data, prodPoly_eval]; norm_num [N1]
   · decide
 
+
+set_option maxRecDepth 20000 in
+/-- **Upper-half profile law** (second pass, 2026-07-31): for every
+`i ≥ ⌈k/2⌉` the coefficient valuation is EXACTLY multinomial arithmetic,
+`v₅([nⁱ] k!·P_k) = 2(2i−k) + v₅(k!/((2i−k)!·(k−i)!))` — the unique
+minimal-slot configuration (`2i−k` order-1 slots at `u₁ = 25`, `k−i`
+order-2 slots, Stirling `s(i,i) = 1`) carries the whole 5-adic content.
+Lists are descending in `n`: ascending coefficient `i` is entry `k − i`. -/
+theorem upper_half_law :
+    ∀ p ∈ table, ∀ i ∈ List.range (p.1 + 1), p.1 ≤ 2 * i →
+      v5q (p.2.getD (p.1 - i) 0) =
+        2 * (2 * i - p.1 : ℕ) +
+        (v5F 64 (Nat.factorial p.1 /
+          (Nat.factorial (2 * i - p.1) * Nat.factorial (p.1 - i))) : ℤ) := by
+  decide
+
 /-! ## Axiom audit -/
 
 #print axioms v5_law_all
 #print axioms ceil_fit_refuted
 #print axioms eleven_no_harvest
 #print axioms u1_seed
+#print axioms upper_half_law
 
 end V5
 end Polyplets

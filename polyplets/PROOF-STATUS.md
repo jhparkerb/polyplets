@@ -402,6 +402,9 @@ kernel-checked against the pinned production data:
   theorem: parts ≥ 2 summing to 11 ⇒ all multiplicities ≤ 4.
 - `u1_seed` / `g1_seed` — `u₁ = P₁(1) − P₁(0) = 25`, `g₁ = P₁(0) = −45`
   tied to `Pp1`, with their valuations.
+- `upper_half_law` — the exact upper-half profile law
+  `v₅([nⁱ] k!·P_k) = 2(2i−k) + v₅(k!/((2i−k)!(k−i)!))` for `i ≥ ⌈k/2⌉`,
+  every level `k = 1..18` (kernel decide; second pass).
 
 Axioms: `v5_law_all`, `ceil_fit_refuted`, `eleven_no_harvest` carry
 [propext, Quot.sound]; `u1_seed`/`g1_seed` add Classical.choice (norm_num).

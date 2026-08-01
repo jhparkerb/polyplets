@@ -175,6 +175,45 @@ quantity; the uncapped numerator minimum at k = 1 is 1 (coefficients
 every measured level: **the 5-part of the true denominator of P_k is that
 of ⌊k/2⌋!, docked one 5 exactly when k ≡ 1 (mod 10)**.
 
+## Second pass: profile structure (2026-07-31, same day)
+
+Prompted by the H collapse, a sweep for further simplifications over the
+full valuation profiles (all coefficients, not just the floor; probe
+extended, k ≤ 19 with P₁₉ from the real-swept two-point pin):
+
+- **Upper-half law, EXACT.** For every i ≥ ⌈k/2⌉ and every k ≤ 19:
+
+  > v₅([nⁱ] k!·P_k) = 2(2i−k) + v₅( k! / ((2i−k)!·(k−i)!) ).
+
+  The "ramp descending ~3–4 per degree" of the first measurement is pure
+  multinomial arithmetic: the minimal-slot configuration (m = i slots:
+  2i−k order-1 slots at u₁ = 25, k−i order-2 slots, Stirling s(i,i) = 1)
+  is unique at minimal valuation and carries everything. Zero mismatches
+  at all 115 upper-half coefficients; Lean `upper_half_law` (kernel
+  decide, k ≤ 18). Large-k persistence needs the same care as the
+  bracket (25 | m₂(m₂−1) swaps first bite around m₂ ≈ 25).
+- **i = 0 column, exact and trivial once seen.** [n⁰] k!·P_k = k!·g_k is
+  a single term: v₅ = v₅(k!) + v₅(g_k). The primitive is the g-table.
+- **The exact u/g valuation tables (t ≤ 19).** v₅(u_t): 2 at t = 1,
+  **3 at t = 17**, else 0. v₅(g_t): 1 at t ∈ {1, 3, 4, 7, 12, 17}, else
+  0. No law found for these supports (the tempting "t ≡ 2 (mod 5)" for
+  {7, 12, 17} is support-only — g₂ ≡ 2 (mod 5) breaks it as a value
+  pattern).
+- **The residual: 23 genuine cancellation points.** After the i = 0 and
+  upper-half laws, 23 mid-band coefficients (k ≤ 19) sit strictly above
+  the config bound — and feeding the bound the EXACT u/g tables changes
+  nothing (the crude ≥0 bound and the exact-table bound coincide at all
+  of them): they are cross-config cancellations in the extremal sum, not
+  richer coefficient divisibility. All are +1 except (k,i) = (18,6) and
+  (19,6) at +2. The full profile is therefore NOT config-forced; the
+  floor law survives because cancellation only ever adds 5s.
+- **Mod-5 spine: NEGATIVE.** Unlike the mod-3 ternary spine (W³ = W²+t),
+  G and Λ mod 5 show no periodicity (no period ≤ 9 from any start ≤ 9,
+  also mod 25) and no quadratic algebraic relation A·S² + B·S + C ≡ 0
+  with deg ≤ 5 polynomial coefficients (full rank, nullity 0, at every
+  tested degree over the 20-term window). Data-capped at t ≤ 19; recorded
+  so nobody re-hunts it on this window.
+
 ## Status
 
 - Lower bound (ĉ_k ≥ v₅(k!) − H(k)): **proved**, from I1 + I2 + I3 only.

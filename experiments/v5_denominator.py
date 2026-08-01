@@ -200,6 +200,26 @@ def main():
               f"  {tag}{note}")
     print(f"law {'HOLDS' if ok else 'FAILS'} at every measured level")
 
+    print("\n== profile structure (second pass, 2026-07-31) ==")
+    # (a) upper half exact: v5([n^i] k! P_k) = 2(2i-k) + v5(k!/((2i-k)!(k-i)!))
+    #     for every i >= ceil(k/2) -- the "ramp" is pure multinomial arithmetic
+    # (b) i = 0 column exact: v5 = v5(k!) + v5(g_k)  (single term k!*g_k)
+    ramp_bad, col0_bad = [], []
+    for k in range(1, kmax + 1):
+        kf = factorial(k)
+        prof = [v5(kf * x) for x in P[k]]
+        for i in range((k + 1) // 2, k + 1):
+            m1, m2 = 2 * i - k, k - i
+            want = 2 * m1 + v5(kf // (factorial(m1) * factorial(m2)))
+            if prof[i] != want:
+                ramp_bad.append((k, i))
+        if prof[0] != v5(kf) + v5(ga[k]):
+            col0_bad.append(k)
+    assert not ramp_bad, f"upper-half law fails at {ramp_bad}"
+    assert not col0_bad, f"i=0 column law fails at {col0_bad}"
+    print("upper-half law (i >= ceil(k/2)) and i=0 column law: EXACT at "
+          f"every coefficient, k <= {kmax}")
+
     print("\n== predictions (assume attainment; H from proved bounds) ==")
     for k in range(19, 27):
         kf = factorial(k)
