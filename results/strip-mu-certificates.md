@@ -288,10 +288,19 @@ Two things learned pushing past H=14:
   little), pinned the cause: entries whose true scale sits BELOW the
   quantization floor entirely are clamped to 1, and no few-bit budget increase
   reaches them. The lever with teeth is `--digits`: a smaller numerator frees
-  accumulator headroom for `vbits` above the full `vrange` (104.3 bits at H=16,
-  ~110 at H=17), after which the certificate lands within an ulp of the float
-  value. Hence the per-H digits/vbits settings in the table — each chosen so
-  `vbits >= vrange`, trading quoted decimals for actually-certified magnitude.
+  accumulator headroom for more `vbits` (the cap is 126 − 6 reserved −
+  log2(10^digits) bits, so digits 6/4/3 buy vbits 100/106/110). At H=15
+  (vrange 97.8 < vbits 100) and H=16 (104.3 < 106) that lifts the whole
+  eigenvector range above the quantization floor and the certificate lands
+  within an ulp of the float value. **At H=17 it cannot**: the receipt's
+  measured vrange is 134.8 bits, above the cap at every digits setting (even
+  digits 1 reaches only ~116), so part of the eigenvector tail is clamped and
+  the certificate concedes ~0.0035 — 6.543 against the float 6.5464870. The
+  bound is unaffected (clamping only lowers the certified value, never
+  falsifies it); harvesting the concession would need ≥192-bit accumulators,
+  not pursued for the close. An earlier revision of this note claimed
+  `vbits >= vrange` at every rung — the H=17 receipt refutes that; the
+  criterion holds through H=16 only.
 - **Cost/ceiling:** wall grows ~3.5x/rung and peak RSS hit 11.8 GB at H=17
   (build-phase transient); H=18 projects ~45 min but ~35+ GB — off this box.
   Each further rung buys ~+0.05 toward lambda ~ 7.11, against the finite-type
