@@ -112,11 +112,6 @@ use it.
 
 \paragraph{Contributions.}
 \begin{enumerate}
-  \item Twenty-two new terms of A006770, $a(19)$--$a(40)$
-        (Section~\ref{sec:result}).
-  \item The one-sided companion A030233 to $n=34$; the free/bilateral/
-        asymmetric companions A030222, A030234, A030235, and A194596 to
-        $n=32$ (Section~\ref{sec:companions}).
   \item Closed forms for the height-triangle diagonals $T(n,n-k)$,
         $k\le18$, via an exponential/cumulant law whose shape is
         \emph{proved} by an exact walk-plus-clusters decomposition
@@ -128,12 +123,6 @@ use it.
   \item A period-two quasi-polynomial law for the diagonals of the
         diagonal-mirror symmetry triangle, with pinned polynomials
         (Section~\ref{sec:dmdiag}).
-  \item A proof that the by-height generating function is \emph{not}
-        D-finite (Theorem~\ref{thm:notdfinite}), and a rigorous two-sided
-        bracket $6.543\le\lambda\le9.3153$ from exact certificates at both
-        ends (Sections~\ref{sec:result}, \ref{sec:notdfinite}).
-  \item A hole-count stratification of A006770 exact through $n=18$
-        (Section~\ref{sec:holes}).
 \end{enumerate}
 
 \paragraph{Confidence tiers.}
@@ -168,19 +157,12 @@ rest on decorrelation rather than algorithmic independence.
     \tierthree{} value appears in this paper without its label. \\
     \bottomrule
   \end{tabular}
-  \caption{Confidence tiers used throughout. Conservative reading: \tierone{}
-  is confirmed; \tiertwo{} is a decorrelated single-method result;
-  \tierthree{} is conjecture-assisted and labeled as such.}
+  \caption{Confidence tiers used throughout.}
   \label{tab:tiers}
 \end{table}
 
 \section{Headline results}
 \label{sec:result}
-
-Table~\ref{tab:terms} gives the full sequence. Terms $n\le18$ reproduce
-A006770 exactly; $a(19)$--$a(40)$ are new. $a(19)$--$a(22)$ are \tierone{};
-$a(23)$--$a(38)$ are \tiertwo{}; $a(39)$ and $a(40)$ are \tiertwominus{}
-(Table~\ref{tab:tiers}).
 
 \begin{table}[H]
   \centering
@@ -212,7 +194,8 @@ $a(23)$--$a(38)$ are \tiertwo{}; $a(39)$ and $a(40)$ are \tiertwominus{}
     \bottomrule
   \end{tabular}
   \caption{Fixed polyplets $a(n)$, $n=1,\dots,40$. Terms $1$--$18$ match the
-  published A006770; boldface terms are new. Tiers: $a(19)$--$a(22)$ \tierone{};
+  published A006770; boldface terms are new. Tiers (Table~\ref{tab:tiers}):
+  $a(19)$--$a(22)$ \tierone{};
   $a(23)$--$a(38)$ \tiertwo{}; $a(39)$--$a(40)$ \tiertwominus{}.}
   \label{tab:terms}
 \end{table}
@@ -279,12 +262,9 @@ reflects a structural limit: the convolution over-count grows with animal
 size, so finite-type methods of this class floor strictly above $\lambda$.
 
 \paragraph{One-sided companion.}
-The one-sided count (A030233) needs, besides the fixed count, only the
-$90^\circ$- and $180^\circ$-rotation fixed-point counts
-(Section~\ref{sec:companions}), both of which reach $n=34$; hence fifteen new
-terms, listed in Table~\ref{tab:onesided}. The remaining companions also need the
-mirror counts and are bounded by the diagonal-mirror count's reach
-(Section~\ref{sec:companions}).
+The one-sided count (A030233) needs only the fixed count and the
+$90^\circ$/$180^\circ$ fixed-point counts, which reach $n=34$: fifteen new
+terms (Table~\ref{tab:onesided}).
 
 \begin{table}[H]
   \centering
@@ -409,18 +389,11 @@ results are banked with their provenance and re-summed by a combiner that
 refuses partial or duplicated inputs.
 
 \paragraph{I/O integrity.}
-A multi-hour external shuffle can fail in mid-flight, so the disk
-layer fails closed rather than losing states silently: spill files carry a
-record count, so truncation (including the short writes produced by
-resource exhaustion) is detected on read rather than absorbed; readers and
-the merge refuse malformed or count-mismatched inputs; and the per-height
-combiner refuses missing, empty, or duplicated shards. These refusal paths
-are not assumed to work: the gate suite fault-injects each mode and
-requires the pipeline to abort loudly.
-
-Each production run reproduces the complete triangle (every $T(n,H)$ for all
-smaller $n$), so each new term arrives with a full-chain regression against
-everything already known, including the \tierone{} range.
+The disk layer fails closed rather than losing states silently: spill files
+carry a record count, so truncation is detected on read rather than
+absorbed; readers, the merge, and the per-height combiner refuse malformed,
+count-mismatched, missing, empty, or duplicated inputs. The gate suite
+fault-injects each mode and requires the pipeline to abort loudly.
 
 \paragraph{Which cells are computed and which are injected.}
 The headline totals contain both, so the split must be stated exactly. For
@@ -525,9 +498,6 @@ the earlier $n\le28$ run exactly.
 \section{Validation architecture}
 \label{sec:confirm}
 
-The verification burden shifts across the sequence, and the checks are
-designed around the weakest link at each stage.
-
 \begin{itemize}
   \item \textbf{External truth.} Every method reproduces A006770 exactly for
         every $n\le18$, on every production run (the triangle re-derives all
@@ -570,7 +540,8 @@ designed around the weakest link at each stage.
         $a(40)$: their top real cells $T(39,20)$ and $T(40,21)$ lie on
         diagonal $k=19$, and $P_{19}$, fitted from exactly these two
         cells, has no independent holdout, nor ever will, the sequence
-        closing at $a(40)$. Those strata run the same code path the lower
+        closing at $a(40)$; it passes the leading-coefficient and
+        integrality checks and is recorded, unused. Those strata run the same code path the lower
         $P_k$ certified. It is the top cells that lack certification, not
         the code path.
   \item \textbf{Modular consistency (a design capability, not a production
@@ -596,11 +567,9 @@ designed around the weakest link at each stage.
         $n=10$) while a provably count-preserving change survives: the
         checks fail on wrong programs and pass on right ones.
   \item \textbf{Hygiene.} Every engine is AddressSanitizer/UBSan clean at
-        gate scale, the sanitizer build compiling the same source the
-        $-O3$ production binary does; the multithreaded paths are
-        bit-identical to serial; every kept result traces to a clean-tree
-        commit stamp in a provenance ledger; and the cross-checks are
-        encoded as gates that run before release.
+        gate scale, on the production source; the multithreaded paths are
+        bit-identical to serial; and every kept result traces to a
+        clean-tree commit stamp in a provenance ledger.
 \end{itemize}
 
 \paragraph{Availability.} The repository holds the source and the runnable
@@ -611,11 +580,6 @@ re-verifies this paper's numerical claims.
 
 \section{The diagonal structure of king-animal triangles}
 \label{sec:diagonals}
-
-Both triangles in this paper (the height triangle of the full count and the
-exact-bounding-box triangle of the diagonal-mirror count) turn out to have
-exactly solvable top diagonals. We record the laws, the fitting discipline,
-and what is proved versus pinned.
 
 \subsection{The height triangle: an exponential/cumulant law}
 \label{sec:heightdiag}
@@ -636,10 +600,7 @@ leading coefficient is $25^k/k!$ (twenty-five single-defect species per walk
 site, an integer the fit must and does reproduce at every level), and $P_k$
 times $k!$ must be integral. Levels $k\le18$ are fitted, validated, and wired
 into production (Section~\ref{sec:methodC}); each was pinned on the earliest
-admissible terms and holds on every later one. (A nineteenth level, $P_{19}$,
-is determined by the final two top cells and passes the leading-coefficient
-and integrality checks, but with the sequence closing at $a(40)$ it has no
-holdout and is never used; we record it without certifying it.)
+admissible terms and holds on every later one.
 
 The law's shape is a theorem:
 
@@ -692,7 +653,10 @@ triangle mod~3 is $3$-automatic, with an explicit automaton. The
 congruences this rests on are \emph{derived} from the same cluster
 decomposition rather than observed, and every consequence is
 machine-verified on all $420$ in-band cells of the banked triangle
-(\texttt{results/ternary-spine.md}). The law is not king-specific: for any
+(\texttt{results/ternary-spine.md}). The same decomposition refines by hole
+count (the pair-row's weight splits $25=24+1$), and mod~3 only the
+maximal-hole stratum survives
+(\texttt{experiments/hole\_strata\_gas.py}). The law is not king-specific: for any
 lattice whose adjacency reaches one row with $b$ up-neighbours the same
 proof gives $T(H{+}k,H)=q_k(H)b^H$, and mod any $p\mid b$ the diagonals are
 governed by the cubic $W^3=W^2+t$
@@ -905,14 +869,6 @@ b-files are prepared in the release.
   \label{tab:holes}
 \end{table}
 
-\paragraph{The diagonal law is hole-graded.}
-The walk-plus-clusters theorem refines by hole count: marking each cluster
-by the holes it makes gives stratified diagonal laws (the pair-row's weight
-splits $25=24+1$), and mod~3 only the maximal-hole stratum survives, so the
-triangle's entire mod-3 structure is carried by the hole-making
-configurations. Derivations and checkers:
-\texttt{experiments/hole\_strata\_gas.py}.
-
 \section{Generating functions by height, and rigorous bounds}
 \label{sec:gf}
 
@@ -1027,24 +983,20 @@ height.
 Neither the conclusion nor the opening step is new. Non-D-finiteness of an
 anisotropic generating function was proved for self-avoiding polygons, and
 for directed bond animals, by Rechnitzer's haruspicy
-programme~\cite{rechnitzer}; the criterion that programme runs on is
-Lemma~9 of Bousquet-M\'elou and Rechnitzer~\cite{bmr2002}, whose proof
-begins with the same coefficient extraction used above. From that shared
-start the arguments diverge. Theirs concludes topologically: the union of
-the coefficients' pole sets has finitely many limit points, via an
-asymptotic argument in the index. Applying it demands an explicit
-combinatorial description of the denominators, in the polygon setting a
-product of cyclotomic polynomials. Ours concludes arithmetically and
-effectively, following a single distinguished pole per slice with no inputs
-beyond Perron--Frobenius monotonicity and a crude upper bound on $\lambda$.
-That lightness is why the proof transports to any family with a column
-transfer matrix, with no bespoke denominator analysis, and why it yields
-explicit excluded $(r,D)$ boxes rather than a bare dichotomy. Arithmetic constraints on D-finite series do exist (the
-\emph{D-finiteness, rationality and height} theorems of Bell, Nguyen and
-Zannier~\cite{bnz2020} with their multivariate P\'olya--Carlson successor,
-and the height-gap results of Bell, Hu and Satriano~\cite{bhs2020}), but
-both bound the Weil heights of the \emph{coefficients} of a series, or of a
-sequence read along the orbit of a rational map, and conclude rationality;
+programme~\cite{rechnitzer}, whose criterion is Lemma~9 of
+Bousquet-M\'elou and Rechnitzer~\cite{bmr2002}, the same coefficient
+extraction used above. From that shared start the arguments diverge. Theirs
+concludes topologically, from the limit points of the coefficients' pole
+sets, and needs an explicit combinatorial description of the denominators
+(cyclotomic products, in the polygon setting); ours concludes
+arithmetically and effectively, following a single distinguished pole per
+slice with no inputs beyond Perron--Frobenius monotonicity and a crude
+upper bound on $\lambda$, and yields explicit excluded $(r,D)$ boxes rather
+than a bare dichotomy. Arithmetic constraints on D-finite series do exist
+(Bell, Nguyen and Zannier~\cite{bnz2020} with its multivariate
+P\'olya--Carlson successor, and the height gaps of Bell, Hu and
+Satriano~\cite{bhs2020}), but they bound the heights of a series'
+coefficients and conclude rationality;
 neither speaks about the growth constants of a family of slices. We have
 located no application of either line to a lattice model, and no use of
 Northcott finiteness on a family of slice growth constants; a literature

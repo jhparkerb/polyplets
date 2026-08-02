@@ -314,12 +314,115 @@ each records something that was *not* done); "Relation to existing work" and the
 Klazar limitation (novelty qualification and an explicit non-reach).
 
 ### Verifier checks with no claim in the paper
-Sixteen checks now test repository invariants the paper does not print: the six
+Eighteen checks now test repository invariants the paper does not print: the six
 residual N_k checks (phase 1), the seven hole-GF order-law checks, `H<=10
-captures 74.9% of a(19)`, and the a(25) bound pair. Not pruned — the argument
-for removing them is about what the released checker promises in its docstring,
-not about the document under review, and it should be settled once after phase 5
-when the final claim set is fixed.
+captures 74.9% of a(19)`, the a(25) bound pair, and — measured in phase 3 — the
+`holefree_gas.py` and `deficit2_proof.py` checkers, neither of which corresponds
+to any claim in the .tex ("deficit" appears nowhere in the paper). Not pruned —
+the argument for removing them is about what the released checker promises in
+its docstring, not about the document under review, and it should be settled
+once after phase 5 when the final claim set is fixed.
+
+## Commit 7 — phase 3, agreed paragraph-level batch (P1–P9, P12–P14)
+
+Phase 3 trims whole paragraphs, list items, bullets and captions. Line spans are
+positions in the post-phase-2 file (1193 lines, 64,207 bytes at 3282315). No
+check parses §5, the contributions list, any lead-in, or any caption text, so
+this stage is verifier-neutral by construction; the one exception was handled by
+condition (P9).
+
+### prop P1 — Contributions items 1, 2, 5, 6 (115–119, 131–136)
+Item-for-item restatement of the abstract the reader has just finished; items 1,
+2, 5 and 6 duplicate it clause for clause.
+**Ruling:** items 3 and 4 STAY — item 3 is the only front-matter statement of
+k≤18 and T(n,n−k), and item 4 is the diagonal-mirror law's only mention outside
+§6.3 (phase 1 struck that sentence from the abstract). My whole-list fallback
+was declined for exactly that reason.
+**Cost:** the scanner loses a one-screen inventory and reads the abstract for it.
+
+### prop P2 — the tab:terms lead-in (180–183)
+Both of its facts are in the caption 30 lines below, in the same words. Where
+prose and caption duplicate, the caption is the copy that must survive.
+**Condition, accepted:** the tier pointer moves into the caption — "Tiers
+(Table~\ref{tab:tiers}): …" — so the tags stay resolvable where they are used.
+
+### prop P3 — the §3 one-sided paragraph (281–287)
+Every clause is elsewhere: the reach explanation in tab:onesided's caption, the
+remaining-companions dependency in §7's second paragraph with the actual cap.
+Both of its pointers went to §7, which is the tell.
+**Salvage:** one sentence keeps the table introduced.
+
+### prop P4 — "Relation to existing work", compression (1026–1052)
+Cut: the three-lattice transport repetition ("That lightness is why the proof
+transports…"), which is already stated at the end of §9.1 and in the abstract;
+and the anatomy of what Bell–Nguyen–Zannier and Bell–Hu–Satriano bound.
+**Conditions, accepted, both from the defender:** (1) the haruspicy route's
+requirement survives in compressed form ("needs an explicit combinatorial
+description of the denominators (cyclotomic products, in the polygon setting)")
+— it is the only support for the abstract's "lighter than the existing
+haruspicy route"; (2) "explicit excluded (r,D) boxes rather than a bare
+dichotomy" survives — it is the only thing defining "effectively" in the
+retained divergence sentence. Retained as proposed: the priority concession with
+both citations, the reason BNZ/BHS do not apply, and the novelty hedge verbatim.
+**Honest note:** the conditions ate most of the saving — 27 lines to 19, not the
+~13 I projected.
+
+### prop P5 — Method C's chain-regression paragraph (421–423)
+The third statement of one discipline; §4's preamble states it as an engine-wide
+invariant and §5's bullets lean on it by name. Explicitly NOT treated as a
+duplicate of §5's "External truth" bullet, which claims agreement with published
+A006770 (external) rather than chain-reproduction (internal).
+
+### prop P6 — the P_19 parenthetical in §6.1 (639–642)
+The third of three statements of one fact, and the least precise; §5's held-out
+bullet names the two cells and the diagonal.
+**Salvage (mandatory — this is a closed door relocated, not deleted):** the
+unique content, that P_19 passes the leading-coefficient and integrality checks
+and is recorded unused, appends to §5's held-out bullet.
+
+### prop P7 — the I/O integrity paragraph, compression (411–419)
+Cut: the scene-setting ("A multi-hour external shuffle can fail in mid-flight"),
+the truncation gloss, and the rhetorical "These refusal paths are not assumed to
+work". The no-silent-loss claim the T2 grade leans on, the record counts, the
+refusing readers/merge/combiner, and the fault-injection gate all survive.
+
+### prop P8 — the §6 section lead-in (615–618)
+A roadmap for three subsections whose titles announce their contents.
+
+### prop P9 — the hole-graded diagonal law paragraph (908–914) — CONDITIONED
+Argued on a NEW ground, since phase 1 retained it inside a span defended as a
+whole and never on its own merits: phase 2's accepted R15 ruling cut a
+structurally identical item (a one-sentence result with no data, no consequence
+and no consumer, pointing at a repository script).
+**Condition, accepted:** the clause I offered is mandatory, extended with the
+datum — §6.2 now carries "The same decomposition refines by hole count (the
+pair-row's weight splits 25=24+1), and mod 3 only the maximal-hole stratum
+survives (\texttt{experiments/hole\_strata\_gas.py})". This keeps the
+`hole-marked strata` checker anchored, so it was NOT pruned and the verifier
+stays at 425.
+
+### prop P12 — the §5 lead-in (528–529)
+Signposting for a self-describing itemization.
+
+### prop P13 — the tab:tiers caption's second sentence (171–173)
+A gloss restating the first clause of three rows in the same words, which also
+silently omits T2-minus — the tier the paper's own frontier terms carry.
+
+### prop P14 — the §5 Hygiene bullet, compression (598–603) — CONDITIONED
+Cut: the trailing gates clause (duplicating the Availability paragraph four
+lines below) and the sanitizer parenthetical.
+**Condition, accepted:** "every kept result traces to a clean-tree commit stamp
+in a provenance ledger" survives explicitly, alongside the sanitizer and
+multithreaded-equals-serial keeps.
+
+### prop P10 — CONTESTED, RETAINED (no edit)
+The §5 bullet "Direct enumeration = transfer matrix through a(22)".
+**Defender's winning argument:** tab:tiers delegates its coverage itemization to
+§5 by name, so cutting this bullet would leave that itemization without an entry
+for the tier the table calls strongest; and it is the only statement of which
+algorithm pairs cover which part of the T1 range, so cutting it would
+misattribute the a(20)–a(22) anchor to the Method A/B pairing that only reaches
+a(19).
 
 ## Totals
 
@@ -332,10 +435,10 @@ when the final claim set is fixed.
 | commit 4 | 1233 | 66,745 | 429 |
 | commit 5 | 1194 | 64,229 | 427 |
 | commit 6 | 1193 | 64,207 | 425 |
+| commit 7 | 1145 | 61,233 | 425 |
 
 Phase 1 removed 204 lines and 10,499 bytes; phase 2 a further 40 lines and
-2,538 bytes. Running total: 244 lines and 13,037 bytes off the pre-trim
-document (17.0% of the lines, 16.9% of the bytes).
+2,538 bytes; phase 3 continues from there.
 pdflatex clean at every stage (zero errors, zero undefined references, the
 same seven pre-existing hyperref Unicode-bookmark warnings), and
 verify_claims green at every stage.
