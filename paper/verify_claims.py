@@ -98,14 +98,13 @@ COVERAGE = {
     "g2_holes": 37,
     "g2_holetriangle": 7,
     "free_onesided": 4,
-    "maxhole": 1,
     "holes_n18": 5,
     "symcount_1819": 4,
     "sym_companions": 132,
     "dmirror_strips": 40,
     "spine_mod3": 1,
     "byheight_h19": 32,
-}   # 263 of the 448 checks live in an optional group
+}   # 262 of the 441 checks live in an optional group
 
 # --- Table tab:terms (paper transcription) vs b-file ---
 TERMS = {1:1,2:4,3:20,4:110,5:638,6:3832,7:23592,8:147941,9:940982,10:6053180,
@@ -229,24 +228,9 @@ bil19 = F(Hsym + D, 2)
 chk("bilateral(19)=(H+D)/2=9344655", bil19.denominator==1 and int(bil19)==9344655)
 chk("asymmetric(19)=Free-bilateral=18951146976435", int(free)-int(bil19)==18951146976435)
 
-# Maximum hole area M(n): values to n=16 (results/maxhole.txt), diamond bound, isoperimetric
-M = [0,0,0,1,1,2,3,5,6,8,10,13,15,18,21,25]   # n=1..16 (maxhole_split, 4-conn-bg primary)
-chk("M(4)=1=2*1^2-2*1+1",   M[3]==1==2*1-2*1+1)
-chk("M(8)=5=2*2^2-2*2+1",   M[7]==5==2*4-2*2+1)
-chk("M(12)=13=2*3^2-2*3+1", M[11]==13==2*9-6+1)   # diamond tight at the n=12 4r-point
-chk("M(16)=25=2*4^2-2*4+1", M[15]==25==2*16-8+1)  # diamond tight at the n=16 4r-point too
-chk("M(n)<=floor(n^2/8), n=1..16", all(M[n-1] <= n*n//8 for n in range(1,17)))
-# results/maxhole.txt (the maxhole_split output) must reproduce M(1..16)
-mh = os.path.join(ROOT, "results", "maxhole.txt")
-_cov = ok + bad
-if os.path.exists(mh):
-    mv = {int(l.split()[0]): int(l.split()[1]) for l in open(mh)
-          if l.split() and l.split()[0].isdigit()}
-    chk("maxhole.txt reproduces M(1..16)",
-        [mv.get(n) for n in range(1,17)]==M, str([mv.get(n) for n in range(1,17)]))
-    covered("maxhole M(1..16)", COVERAGE["maxhole"], _cov)
-else:
-    skip("maxhole M(1..16)", COVERAGE["maxhole"], "results/maxhole.txt absent")
+# (maximum-hole-area block removed with the paper's Theorem 2 / Conjecture 1,
+#  trim phase 1 S6: the M(n) values, the diamond identities and the
+#  round((n-2)^2/8) form are no longer claimed in polyplets-report.tex.)
 
 # GF transcriptions: paper coefficients must match the recovered data files
 def gf_block(path, header):
@@ -692,10 +676,6 @@ if dd:
 else:
     skip("dmirror P_k / N_k", COVERAGE["dmirror_strips"],
          "runs/sym32 strips absent and results/sym_counts.txt absent")
-
-# Theorem (single-hole) / Conjecture (multi-hole total): M(n) = round((n-2)^2/8)
-chk("M(n)==round((n-2)^2/8) for n=1..16",
-    all(M[n - 1] == ((n - 2) ** 2 + 4) // 8 for n in range(1, 17)))
 
 # ---- second-wave checkers: universality, hole-graded laws, deficit-2 -------
 for script, tag in (("hex_gas.py", "hex law + dyadic spine"),

@@ -77,9 +77,7 @@ polyhexes, and polyiamonds. We bracket the growth constant rigorously,
 $6.543\le\lambda\le9.3153$, both ends by machine-checkable exact
 certificates, the upper bound apparently the first recorded for this
 lattice (the numerical estimate is $\lambda\approx7.111$). Finally, A006770
-is stratified by hole count through $n=18$, and the largest area a single
-hole can enclose is proved to be exactly
-$\lfloor(n-2)^2/8+\tfrac12\rfloor$. Results computed and validated but not
+is stratified by hole count through $n=18$. Results computed and validated but not
 proved are labeled as such; all code, data, and a claim-verifier are
 released.
 \end{abstract}
@@ -137,9 +135,8 @@ use it.
         D-finite (Theorem~\ref{thm:notdfinite}), and a rigorous two-sided
         bracket $6.543\le\lambda\le9.3153$ from exact certificates at both
         ends (Sections~\ref{sec:result}, \ref{sec:notdfinite}).
-  \item A hole-count stratification of A006770 exact through $n=18$, and
-        the single-hole maximum enclosed area, proved exactly
-        $\lfloor(n-2)^2/8+\tfrac12\rfloor$ (Section~\ref{sec:holes}).
+  \item A hole-count stratification of A006770 exact through $n=18$
+        (Section~\ref{sec:holes}).
 \end{enumerate}
 
 \paragraph{Confidence tiers.}
@@ -986,56 +983,6 @@ triangle's entire mod-3 structure is carried by the hole-making
 configurations. Derivations and checkers:
 \texttt{experiments/hole\_strata\_gas.py}.
 
-\paragraph{Maximum hole area.}
-How much empty area can $n$ cells enclose? Let $M(n)$ be the maximum number
-of enclosed empty cells over all $n$-cell polyplets. A diamond ($L^1$-ball)
-wall of $4r$ cells on $|x|+|y|=r$ is king-connected and seals the $2r^2-2r+1$
-cells inside it, and it is asymptotically optimal: measured in the king
-($L^\infty$, Chebyshev) metric, the area-maximizing shape is the $L^1$ ball
-dual to the $L^\infty$ square (Busemann's isoperimetrix~\cite{strang}).
-Hence $M(n)\sim n^2/8$, twice the polyomino rate, since only king animals
-can run the diagonal walls the $L^1$ ball requires. Brute force gives
-$M(1{:}17)=0,0,0,1,1,2,3,5,6,8,10,13,15,18,21,25,28$; all seventeen values
-are the nearest integer to $(n-2)^2/8$
-(\href{https://oeis.org/A001971}{A001971} shifted by two). For a single
-hole that form is proved, two-sided:
-
-\begin{theorem}[single-hole maximum]
-\label{thm:diamond}
-Over $n$-cell polyplets whose enclosed empty cells form one $4$-connected
-region, the maximum enclosed area is exactly
-$\left\lfloor (n-2)^2/8+\tfrac12\right\rfloor$ for every $n\ge4$.
-\end{theorem}
-
-\emph{Lower bound:} the $4$-neighbour ring of the diagonal box
-$u\in[0,a{-}1]$, $v\in[0,b{-}1]$ (diagonal coordinates $u=x{+}y$,
-$v=x{-}y$) has exactly $a{+}b{+}2$ cells, is king-connected, and encloses
-$\lceil ab/2\rceil$ cells; optimizing over $a{+}b=n{-}2$ attains the bound
-at every residue. \emph{Upper bound:} the hole's contour induces a closed
-king-walk of winding number one about it, whose loop-erasure is a simple
-cycle passing beyond the hole's diagonal extent on all four sides; since a
-king step moves $|\Delta u|+|\Delta v|\le2$, a cycle spanning diagonal
-ranges $h_a\times h_m$ needs at least $h_a{+}h_m{+}2$ cells, and with the
-parity count (area $\le\lceil h_a h_m/2\rceil$) the integer maximization is
-exact at every $n$. Machine-checked end to end on $3{,}927$ single-hole
-animals (\texttt{results/maxhole-proof.md}).
-
-\begin{conjecture}
-\label{conj:diamond}
-The same formula gives the maximum \emph{total} enclosed area over any
-number of holes: splitting area across several holes is never better.
-Verified exhaustively for $n\le17$ (the $n=17$ sweep a genuine forward
-test, run after the formula was fixed on $n\le16$) and on $6{,}000$ random
-multi-hole animals, with zero violations.
-\end{conjecture}
-
-\begin{openproblem}
-\label{op:mn}
-Prove Conjecture~\ref{conj:diamond}. Filling the holes reduces it to a
-``peeling'' inequality for hole-free animals ($|{\rm shell}_4(I)|\le|S|-4$,
-which telescopes to the bound), verified on $7{,}645$ animals but open.
-\end{openproblem}
-
 \section{Generating functions by height, and rigorous bounds}
 \label{sec:gf}
 
@@ -1320,17 +1267,11 @@ Advances in Applied Mathematics \textbf{30} (2003), 228--257; and
 polygons is not D-finite},
 Journal of Combinatorial Theory Series A \textbf{113} (2006), 520--546.
 
-\bibitem{strang}
-G.~Strang,
-\emph{Maximum area with Minkowski measures of perimeter},
-Proceedings of the Royal Society of Edinburgh Section A: Mathematics
-\textbf{138}(1) (2008), 189--199.
-
 \bibitem{oeis}
 OEIS Foundation Inc.,
 \emph{The On-Line Encyclopedia of Integer Sequences} (2026),
 sequences A006770, A030222, A030233, A030234, A030235, A194596, A001168,
-A389193, A001971, A047781.
+A389193, A047781.
 \url{https://oeis.org}.
 
 \end{thebibliography}

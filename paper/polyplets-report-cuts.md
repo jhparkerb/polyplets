@@ -94,3 +94,30 @@ structural cross-check bullet where it explains why bishop-connected sub-counts
 should reproduce A001168. The disowned parenthetical did not survive.
 **Refs resolved:** `sec:object` was never referenced; its two outbound refs to
 `sec:companions` died with it.
+
+## Commit 2 — S6, hole stratification (partial: max-hole area cut, triangle kept)
+
+### S6a — cut: "Maximum hole area" (1011–1059)
+Theorem 2 (single-hole maximum enclosed area
+$\lfloor(n-2)^2/8+\frac12\rfloor$), its two-sided proof, Conjecture 1
+(multi-hole total), Open Problem 1 (the peeling inequality), and
+`\bibitem{strang}`.
+**Argument that won:** a self-contained isoperimetric result about king animals,
+consuming none of the report's machinery and consumed by none of it — no term,
+no bound, no check depends on it, and it brings its own conjecture and open
+problem into a document whose thesis is twenty-two computed terms.
+**Salvage:** none; nothing surviving referred to it. `thm:diamond` and `op:mn`
+were never referenced, `conj:diamond` only from inside the cut span.
+**Also removed:** the abstract's max-hole clause, the max-hole half of
+contribution 6, and A001971 from the (uncited) OEIS bibitem list, which the
+deleted span was the only text to use.
+**Verifier:** the M(n) block (values, diamond identities, `maxhole.txt`
+reproduction) and the `round((n-2)^2/8)` check pruned, `COVERAGE["maxhole"]`
+dropped; 448 → 441 checks.
+
+### S6b — retained: hole convention, stratification, tab:holes (939–1009)
+**Defender's winning argument:** it is the same engine's output (hole count
+carried as a second additive index on the column transfer matrix), inside the
+report's stated scope ("the results that grew out of computing them"), and the
+row-sums-equal-A006770 / flood-fill oracle / cross-ISA recount sentences are
+validation evidence whose deletion would be silent.
