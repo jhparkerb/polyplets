@@ -101,10 +101,10 @@ COVERAGE = {
     "holes_n18": 5,
     "symcount_1819": 4,
     "sym_companions": 132,
-    "dmirror_strips": 40,
+    "dmirror_strips": 30,
     "spine_mod3": 1,
     "byheight_h19": 32,
-}   # 262 of the 439 checks live in an optional group
+}   # 252 of the 429 checks live in an optional group
 
 # --- Table tab:terms (paper transcription) vs b-file ---
 TERMS = {1:1,2:4,3:20,4:110,5:638,6:3832,7:23592,8:147941,9:940982,10:6053180,
@@ -667,10 +667,8 @@ if dd:
         chk(f"N_{k} series == d(S,S+k) in-regime, S<= {top}",
             all(b[S] == dd.get((S, S + k), 0)
                 for S in range(2 * k + 2, top + 1)))
-        if k >= 1:  # boundary law is k>=1 (N_0=2 is the two-spine factor)
-            chk(f"N_{k}(1)==2^{k}", sum(N) == 2 ** k)
-            chk(f"N_{k}(-1)==(-2)^{k}",
-                sum(c * (-1) ** i for i, c in enumerate(N)) == (-2) ** k)
+        # (the N_k(+-1)=(+-2)^k boundary checks went with the paper's
+        #  generating-function paragraph, trim phase 1 S8)
         chk(f"deg N_{k}==2k", len(N) - 1 == 2 * k)
     covered("dmirror P_k / N_k", COVERAGE["dmirror_strips"], _cov)
 else:

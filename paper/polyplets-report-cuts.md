@@ -146,3 +146,46 @@ pruned; 441 → 439 checks.
 **Defender's winning argument:** a derived corollary of the flagship theorem
 about *this paper's own* triangle, machine-verified on all 420 in-band banked
 cells — squarely within the report's stated claim types.
+
+## Commit 4 — S8, diagonal-mirror triangle (partial: apparatus cut, law kept)
+
+### S8a — cut: the forward hits, the GF basis, the proof sketch
+Three post-pinning forward hits (772–777), the $N_k$ generating-function
+paragraph with the $N_k(\pm1)=(\pm2)^k$ boundary observation (805–812), and the
+segment-grammar proof paragraph (814–825).
+**Argument that won:** the forward hits are asserted by tab:dmpk's own caption;
+the $N_k$ basis and the shape proof are apparatus for values the paper itself
+declines to publish as data (the $n=33$ companions are staged "as comments only,
+never as b-file data").
+**Correction forced on the remover:** the claim that tab:symcounts' ‡ footnote is
+self-describing was false — $d(S,n)$, "in-regime" and $P_0$–$P_4$ are defined
+only inside the proposed span, and $P_k$ there collides with the height-triangle
+$P_k$. Full deletion was rejected: it would have orphaned the four published
+T3 companion values, which are deliverables.
+**Retained:** the subsection heading, the $d(S,n)$ definition and the
+quasi-polynomial law with its onsets, tab:dmpk with its caption (which already
+records pinning, holdout and post-pinning confirmation), and the
+62-CPU-hour / 79 GB cost clause that justifies the T3 label. The sentence
+introducing the table was shortened to keep its `\ref` alive rather than orphan
+a retained float.
+**Abstract / contribution 4:** the "likewise proved in shape" sentence struck
+from the abstract; contribution 4 drops "whose shape is likewise proved" and
+"and generating-function structure", keeping the item and its `sec:dmdiag` ref.
+**Verifier:** the $N_k(\pm1)$ checks pruned, `COVERAGE["dmirror_strips"]`
+40 → 30; 439 → 429 checks. The remaining $N_k$ series and degree checks now
+validate repository data rather than a paper claim; left in place per the
+ruling.
+
+## Totals
+
+| stage | lines | bytes | verify_claims |
+|---|---|---|---|
+| pre-trim | 1437 | 77,244 | 448 |
+| commit 1 | 1338 | 72,702 | 448 |
+| commit 2 | 1279 | 69,690 | 441 |
+| commit 3 | 1262 | 68,506 | 439 |
+| commit 4 | 1233 | 66,745 | 429 |
+
+204 lines and 10,499 bytes removed (14.2% of the source), pdflatex clean at
+every stage (zero errors, zero undefined references, the same seven
+pre-existing hyperref Unicode-bookmark warnings).

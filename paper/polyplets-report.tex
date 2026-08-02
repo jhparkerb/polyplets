@@ -67,8 +67,7 @@ triangle obey an exponential/cumulant law whose shape---a polynomial of
 degree $k$ times $3^{\,n-1-3k}$, with its onset and integrality---is
 \emph{proved} here by an exact walk-plus-clusters decomposition, and is
 lattice-universal, the mod-$p$ ``spine cubic'' $W^3=W^2+t$ having its prime
-set by the lattice's drift count. The diagonals of the diagonal-mirror symmetry
-triangle obey a period-two quasi-polynomial law, likewise proved in shape.
+set by the lattice's drift count.
 The by-height generating function $\sum T(n,H)x^ny^H$ is \emph{not
 D-finite}, by a Northcott-style argument on the strip growth constants that
 is lighter than the existing haruspicy route and transports to polyominoes,
@@ -127,9 +126,8 @@ use it.
         forms double as \emph{held-out per-term checks} of the frontier
         terms (Section~\ref{sec:confirm}).
   \item A period-two quasi-polynomial law for the diagonals of the
-        diagonal-mirror symmetry triangle, whose shape is likewise
-        \emph{proved}, with pinned polynomials and generating-function
-        structure (Section~\ref{sec:dmdiag}).
+        diagonal-mirror symmetry triangle, with pinned polynomials
+        (Section~\ref{sec:dmdiag}).
   \item A proof that the by-height generating function is \emph{not}
         D-finite (Theorem~\ref{thm:notdfinite}), and a rigorous two-sided
         bracket $6.543\le\lambda\le9.3153$ from exact certificates at both
@@ -727,12 +725,7 @@ difference tables confirm over every available point:
   degree } k \text{ per parity class},
 \]
 with leading coefficient $S^k/k!$ and empirical onset $S\ge 2k+2$ (even) /
-$2k+3$ (odd). The pinned polynomials for $k\le3$
-(Table~\ref{tab:dmpk}), with $4$--$12$ holdout hits each, were subsequently
-confirmed \emph{forward} on strips computed hours later on different hardware
-($P_1$ hit $d(31,32)=38$; $P_2$ hit $d(30,32)=672$; $P_3$ hit
-$d(29,32)=7456$); $P_4$ (even class) is pinned by two independent methods
-that agree exactly.
+$2k+3$ (odd). The pinned polynomials are Table~\ref{tab:dmpk}.
 
 \begin{table}[H]
   \centering\small
@@ -759,28 +752,6 @@ that agree exactly.
   for nothing here.}
   \label{tab:dmpk}
 \end{table}
-
-In the generating-function basis the law is rational:
-$G_k(x)=\sum_{S\ge0}P_k(S)x^S = N_k(x)/(1-x)^{k+1}(1+x)^k$ with
-$N_k\in\mathbb Z[x]$ of degree $2k$, and the boundary values
-$N_k(\pm1)=(\pm2)^k$ hold across every level computed. They were never
-imposed on any fit (the fitter solves only for polynomial coefficients
-against exact diagonal counts), so they stand as an observed regularity.
-The numerators, and a defect-gas reading of their structure, are in the
-repository.
-
-The shape is a theorem, by the same programme that
-Theorem~\ref{thm:diaglaw} carries out for the height triangle. Here the
-decomposition is a \emph{segment grammar}: an animal at surplus $k$ splits
-into at most $2k{+}1$ perfect diagonal/anti-diagonal segments joined at
-defect clusters, with at most $2k$ direction reversals; per combinatorial
-type the animals are the lattice points of a one-parameter polytope with
-coefficients in $\{1,2\}$, so each type contributes a period-two
-quasi-polynomial, and a telescoping rank argument caps the degree at $k$.
-What the proof does \emph{not} deliver is the sharp onset
-($2k{+}2$/$2k{+}3$) or the exact pole multiplicities $(k{+}1,k)$; those
-remain validated data. Write-up, graded lemma by lemma:
-\texttt{docs/proofs/dm-diagonal-law.md}.
 
 The polynomials themselves remain computed and validated rather than
 derived. Their practical role: the sparse strips ($S\ge29$ at
