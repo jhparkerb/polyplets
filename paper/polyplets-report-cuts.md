@@ -439,6 +439,75 @@ Theorem 3's irreducibility argument leans on the boundary-signature definition
 in §4.2's first paragraph, which is untouched.
 **Net:** small (~2 lines), by design.
 
+## Commit 9 — phase 4, sentence-level tightening (T1–T13, T15–T18)
+
+Phase 4 removes and tightens individual sentences and clauses inside surviving
+paragraphs. Line spans are positions in the post-phase-3 file (1140 lines,
+60,978 bytes at d2db7cb). Verifier-neutral throughout: no check parses the
+abstract, §1, §5, any lead-in, or the λ-bound prose (measured, not assumed —
+`2147`, `20000`, `9.31`, `6.543`, `Collatz`, `certificate`, `Superseeker` all
+return nothing in verify_claims.py).
+
+Sixteen items applied. Six touch protected sentences and were filed with
+before/after text so the defender could check each scope survived; all six were
+verified and applied verbatim as filed.
+
+| id | target | what went |
+|---|---|---|
+| T1 | §9 transition, 891–893 | "as we now show", three lines above the heading that says it |
+| T2 | tab:byheight40 lead-in, 417–418 | caption carries it; the table keeps its other in-prose reference (the sum-rows-H≤21 instruction) |
+| T3 | §3, 225 | "Each rung is certified rather than measured." — topic sentence for the three that prove it |
+| T4 | §6.1, 600 | "The law's shape is a theorem:" bridge into a theorem environment |
+| T5 | §4.3, 394 | "The headline totals contain both, so the split must be stated exactly." — promise immediately before the disclosure |
+| T6 | §4 preamble, 300–301 | "each subsection states what ran out and what replaced it" — roadmap for four self-titled subsections |
+| T7 | §1, 109–111 | the data-appears-in-both sentence and its rationale clause |
+| T8 | abstract, 60–61 | "The tiers record that." |
+| T9 | §3 growth, 217–218 | PROTECTED: "This is an estimate, not a rigorous bound; the two-sided bracket follows." → "; this is not a rigorous bound." |
+| T10 | §3 upper bound, 257 | PROTECTED: "verified with no floating point in the deductive chain." — third exactness assertion in eight lines; the other two stand |
+| T11 | §4.1, 320–322 | PROTECTED: the shared-algorithm admission stays; its answer goes, because the paragraph's last sentence gives it more precisely |
+| T12 | tab:tiers T2⁻ row, 153–154 | PROTECTED: the tag's rationale sentence; the definition and coverage stand |
+| T13 | §5 held-out bullet, 539–541 | PROTECTED: two adjacent sentences merged, both halves of the distinction kept |
+| T15 | §9.1, 902–903 and 919–920 | "each stated here in the form used"; "In the standard terminology" (the term *house* survives, (iv) needs it) |
+| T16 | §8, 824–827 | PROTECTED: "exact" asserted twice in consecutive sentences; row-sums-equal-A006770 survives in tab:holes' caption, so the `hole rows sum to a(n)` check stays anchored |
+| T17 | §6.3, 702 | "Their practical role:" — a label before a colon-led explanation |
+| T18 | §7, 729–731 | "records … themselves" tightened; both table references survive |
+
+### STANDING CONSTRAINT from T4 — binding on phases 5 and 6
+With the "The law's shape is a theorem:" bridge gone, §6.1's sentence at what is
+now L616 —
+"What remains fitted rather than derived is $P_k$ for $6\le k\le18$; with the
+theorem in hand those fits are interpolation of a known-shape form" —
+is the subsection's SOLE in-place statement of the shape-proved / constants-fitted
+split. It is **not available for later cutting on the ground that it is stated
+elsewhere.** Recorded at the defender's insistence and upheld.
+
+### prop T14 — CONTESTED, RETAINED (no edit)
+§9.1's in-proof "This extraction is the opening move of Lemma~9 of~\cite{bmr2002};
+what follows is where we depart from it."
+**Defender's winning argument:** the sentence's load is not the attribution
+(which is indeed duplicated in "Relation to existing work") but the **departure
+marker** — it locates where the borrowed step ends and the paper's own argument
+begins. That boundary is the substance of the paper's hedged novelty claim, and
+nothing else in the proof marks it.
+
+### Compounding note — T8 + T12, binding
+Both statements that the weaker \tiertwominus{} standard is *deliberately* marked
+are now gone (the abstract's "The tiers record that." and the tier row's "The tag
+exists so the weaker standard is never silently absorbed into \tiertwo{}"). The
+fact itself survives four ways: the abstract's clause that a(39)/a(40) lack the
+held-out check and never will get it, the \tiertwominus{} row's definition and
+coverage, §5's held-out bullet, and the tier tags on the results tables. The
+defender will not concede a third cut in this family and the referee upholds
+that: **no further trimming of the T2⁻ marking.**
+
+### Declined addition — tab:terms reintroduction
+The remover raised the missing in-prose reference as a phase-3 deviation flag and
+then declined its own invitation to add one back: the section heading, the pinned
+[H] float and the self-describing caption leave no ambiguity, the verifier finds
+the table by label, and re-adding a sentence phase 3 removed would undo an
+accepted cut. Defender confirmed. P2's caption condition was verified landed —
+tab:terms' caption reads "Tiers (Table~\ref{tab:tiers}): …".
+
 ## Totals
 
 | stage | lines | bytes | verify_claims |
@@ -452,12 +521,14 @@ in §4.2's first paragraph, which is untouched.
 | commit 6 | 1193 | 64,207 | 425 |
 | commit 7 | 1145 | 61,233 | 425 |
 | commit 8 | 1140 | 60,978 | 425 |
+| commit 9 | 1123 | 59,891 | 425 |
 
 Phase 1 removed 204 lines and 10,499 bytes; phase 2 a further 40 lines and
-2,538 bytes; phase 3 a further 53 lines and 3,229 bytes. Running total: 297
-lines and 16,266 bytes off the pre-trim document (20.7% of the lines, 21.1%
-of the bytes), with the verifier down 23 checks, every one of them pruned in
-the same commit as the claim it tested.
+2,538 bytes; phase 3 a further 53 lines and 3,229 bytes; phase 4 a further 17
+lines and 1,087 bytes. Running total: 314 lines and 17,353 bytes off the
+pre-trim document (21.9% of the lines, 22.5% of the bytes), with the verifier
+down 23 checks, every one of them pruned in the same commit as the claim it
+tested.
 pdflatex clean at every stage (zero errors, zero undefined references, the
 same seven pre-existing hyperref Unicode-bookmark warnings), and
 verify_claims green at every stage.

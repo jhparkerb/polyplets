@@ -57,8 +57,8 @@ algorithms sharing no counting logic (direct enumeration and the transfer
 matrix); $a(23)$--$a(38)$ by a single algorithm family, cross-checked per
 term against \emph{held-out} closed forms for the top diagonals of the
 height triangle; $a(39)$ and $a(40)$ lack that held-out check on their top
-swept stratum, and since the sequence ends here it never will. The tiers
-record that. The one-sided companion A030233 is extended to
+swept stratum, and since the sequence ends here it never will.
+The one-sided companion A030233 is extended to
 $n=34$, and the free, bilateral, and asymmetric companions (A030222,
 A030234, A030235, A194596) to $n=32$.
 
@@ -106,9 +106,7 @@ them. It reports $a(19)$ through $a(40)$ and the results that grew out of
 computing them. It is an amateur contribution carried out in collaboration
 with an AI assistant (Anthropic's Claude Code); the author set the goals,
 made the design and verification decisions, ran the machines, and is
-responsible for correctness. The data appears in the document as well as
-the repository, so that the next person to attempt these computations can
-use it.
+responsible for correctness.
 
 \paragraph{Contributions.}
 \begin{enumerate}
@@ -150,8 +148,7 @@ rest on decorrelation rather than algorithmic independence.
     $a(23)$--$a(38)$ and the symmetry counts $25\le n\le32$. \\
     \tiertwominus{} & \tiertwo{} \emph{minus} the held-out diagonal check.
     Covers $a(39)$ and $a(40)$, whose top real-swept strata lie on the one
-    diagonal that no holdout can ever certify. The tag exists so the weaker
-    standard is never silently absorbed into \tiertwo{}. \\
+    diagonal that no holdout can ever certify. \\
     \tierthree{} & Exact computation composed with a closed form that is
     fitted rather than derived. Used only for the $n=33$ companions; no
     \tierthree{} value appears in this paper without its label. \\
@@ -214,15 +211,15 @@ factors of ${\sim}4$ to ${\sim}140$) and removes the drift:
 $\lambda=7.1108$--$7.1111$ across the same four windows, with $\theta$
 between $-1.02$ and $-1.03$, consistent with the universal
 two-dimensional lattice-animal value $\theta=-1$~\cite{jensen2001}, which
-the fit was free to miss. We accordingly estimate $\lambda\approx7.111$. This is an
-estimate, not a rigorous bound; the two-sided bracket follows.
+the fit was free to miss. We accordingly estimate $\lambda\approx7.111$;
+this is not a rigorous bound.
 
 \paragraph{A rigorous lower bound on $\lambda$.}
 Polyplets of bounding-box height at most $H$ are a subfamily of all
 polyplets, so their growth constant $\mu_H$ (the dominant eigenvalue of the
 height-$\le H$ strip transfer operator $M(x)$, whose entries are powers of
 $x$ counting cells placed) satisfies $\mu_H\le\lambda$ for every $H$, and
-$\mu_H$ increases with $H$. Each rung is certified rather than measured. Since
+$\mu_H$ increases with $H$. Since
 $\rho(M(x))$ is increasing in $x$ and equals $1$ at $x=1/\mu_H$, exhibiting a
 nonnegative integer vector $v\ne0$ and a rational $x$ with $M(x)v\ge v$
 componentwise proves $\rho(M(x))\ge1$, hence $\mu_H\ge1/x$; the lower half of
@@ -254,7 +251,7 @@ gives
 \[
   \lambda \;\le\; \tfrac{20000}{2147} \;\approx\; 9.3153 ,
 \]
-verified with no floating point in the deductive chain. Together with the
+Together with the
 certified strip ladder this brackets the growth constant two-sided,
 $6.543 \le \lambda \le 9.3153$, both ends machine-checkable in exact
 arithmetic and consistent with the estimate $\lambda\approx7.111$. The gap
@@ -297,8 +294,7 @@ terms (Table~\ref{tab:onesided}).
 
 Four counting methods (A--D) computed these numbers, with closed forms
 (Section~\ref{sec:heightdiag}) replacing the top diagonals, a sweep's most
-expensive and least populated cells; each subsection states what ran out and
-what replaced it. All engines share three disciplines: exact integer
+expensive and least populated cells. All engines share three disciplines: exact integer
 arithmetic; every production run re-derives \emph{all} smaller terms, so a
 regression anywhere in range is visible; and admissible pruning only (a prune
 may only ever \emph{lose} animals, so reproducing the published range
@@ -317,9 +313,8 @@ campaigns, on Apple silicon (Apple~clang, frontier split $7\times64$) and
 AMD/x86 (GCC, split $8\times96$). The per-size outputs are
 \textbf{byte-identical}. Differing in hardware, compiler, and scheduling,
 the two campaigns make a transient or platform-specific fault implausible;
-what they cannot jointly catch is a bug in the shared \emph{algorithm},
-which the transfer matrix (Methods~B,~C) rules out by
-counting the same animals a completely different way. An optimized kernel (the terminal frontier level counted in
+what they cannot jointly catch is a bug in the shared \emph{algorithm}.
+An optimized kernel (the terminal frontier level counted in
 bulk, compile-time neighbour offsets; ${\approx}2\times$ faster) run as a
 three-architecture fleet (ARM, x86, Apple silicon) extended the whole-row
 enumeration to $n=22$, byte-identical across machines and matching the
@@ -391,8 +386,7 @@ count-mismatched, missing, empty, or duplicated inputs. The gate suite
 fault-injects each mode and requires the pipeline to abort loudly.
 
 \paragraph{Which cells are computed and which are injected.}
-The headline totals contain both, so the split must be stated exactly. For
-$a(40)$, heights $3\le H\le21$ were swept for real ($95.9\%$ of the total);
+For $a(40)$, heights $3\le H\le21$ were swept for real ($95.9\%$ of the total);
 $H=1,2$ are elementary closed forms; and $H\ge22$, the diagonals
 $k\le18$, were \emph{injected} from the fitted closed forms of
 Section~\ref{sec:heightdiag}, contributing $4.1\%$ of $a(40)$. The
@@ -413,9 +407,6 @@ resulting holdout chain, and the one formula that never earned injection.
 Readers who want totals free of any formula assistance may sum
 Table~\ref{tab:byheight40}'s rows $H\le21$ against the banked per-height
 data.
-
-Table~\ref{tab:byheight40} gives the height decomposition of the frontier
-term with the computed/injected boundary as stated above.
 
 \begin{table}[H]
   \centering
@@ -536,9 +527,9 @@ the earlier $n\le28$ run exactly.
         diagonal $k=19$, and $P_{19}$, fitted from exactly these two
         cells, has no independent holdout, nor ever will, the sequence
         closing at $a(40)$; it passes the leading-coefficient and
-        integrality checks and is recorded, unused. Those strata run the same code path the lower
-        $P_k$ certified. It is the top cells that lack certification, not
-        the code path.
+        integrality checks and is recorded, unused. Those strata run the
+        same code path the lower $P_k$ certified: what lacks certification
+        is the cells, not the code.
   \item \textbf{Modular consistency (a design capability, not a production
         gate).} A residue-counter/CRT-reconstruction path exists and is
         regression-tested (independent residue systems must agree, which
@@ -596,8 +587,6 @@ site, an integer the fit must and does reproduce at every level), and $P_k$
 times $k!$ must be integral. Levels $k\le18$ are fitted, validated, and wired
 into production (Section~\ref{sec:methodC}); each was pinned on the earliest
 admissible terms and holds on every later one.
-
-The law's shape is a theorem:
 
 \begin{theorem}[diagonal law]
 \label{thm:diaglaw}
@@ -699,7 +688,7 @@ $2k+3$ (odd). The pinned polynomials are Table~\ref{tab:dmpk}.
 \end{table}
 
 The polynomials themselves remain computed and validated rather than
-derived. Their practical role: the sparse strips ($S\ge29$ at
+derived. The sparse strips ($S\ge29$ at
 $n\ge33$) are precisely the RAM-expensive ones: one strip burned
 ${\sim}62$ CPU-hours and $79$\,GB to produce the two numbers $d(31,31)=2$
 and $d(31,32)=38$ that $P_0$ and $P_1$ now supply directly. They replace
@@ -727,8 +716,8 @@ diagonal-mirror count, whose exact-bounding-box sweep is the costliest
 symmetry (Section~\ref{sec:methodD}): $D$ is exact through $n=32$,
 which caps these four companions at
 $n=32$ within \tiertwo{}. Table~\ref{tab:companions} gives the new
-values; Table~\ref{tab:symcounts} records the symmetry fixed-point counts
-themselves, each an OEIS-eligible sequence.
+values; the symmetry counts themselves (Table~\ref{tab:symcounts}) are each
+an OEIS-eligible sequence.
 
 One further term of each exists at the \tierthree{} grade, via the hybrid
 $D(33)$ of Table~\ref{tab:symcounts} (direct strips $S\le28$ plus pinned
@@ -821,10 +810,9 @@ sum of local contributions and is \emph{interpreted} only when an animal is
 complete, at which point every cavity is either enclosed by foreground (a
 hole) or open to the exterior (contributing nothing to $1-\chi$); an
 unfinished bay on the active frontier never enters a reported count, so no
-open/closed disambiguation is required mid-sweep. The resulting counts are
-exact,
-byte-identical to an independent per-animal flood fill for $n\le14$, and have
-row sums equal to A006770. The triangle is exact through $n=18$; rows
+open/closed disambiguation is required mid-sweep. The counts are
+byte-identical to an independent per-animal flood fill for $n\le14$.
+The triangle is exact through $n=18$; rows
 $15$--$18$, beyond the flood oracle, are confirmed by a second-architecture
 recount (clang/ARM against GCC/x86, byte-identical), so no row rests on a
 single engine. The
@@ -888,10 +876,6 @@ $a(40)\ge\num{4266005101622209395058618248135}$) were each computed while
 that term was still out of reach, and all three are confirmed by the values
 Method~C produced later (\texttt{paper/gf\_bound.py}).
 
-The rationality is
-genuinely a fixed-height phenomenon: the two-variable array is provably not
-D-finite, as we now show.
-
 \subsection{The by-height generating function is not D-finite}
 \label{sec:notdfinite}
 
@@ -900,8 +884,7 @@ $G_H(x)$ are its $y$-coefficients. $F$ fails to be D-finite (it satisfies
 no linear differential equation in $y$ with polynomial coefficients; since
 $F$ has rational coefficients, allowing complex coefficients changes
 nothing by descent to the field of definition). The proof combines four
-classical facts, each stated here in the form used; write
-$\mu_H$ for the growth constant of the height-$\le H$ strip counts,
+classical facts; write $\mu_H$ for the growth constant of the height-$\le H$ strip counts,
 so $1/\mu_H$ is the radius of convergence of $G_{\le H}$ and, by the
 second-difference identity above, of $G_H$.
 
@@ -916,9 +899,9 @@ polynomial.
 
 \emph{(ii) Every Galois conjugate of $\mu_H$ has modulus at most $\mu_H$.}
 The conjugates are among the reciprocal poles, and no pole has modulus
-below the radius of convergence, by the definition of the radius. In the
-standard terminology, the \emph{house} of the algebraic integer $\mu_H$
-equals $\mu_H$ itself, and $\mu_H<\lambda\le 20000/2147$ by the rigorous
+below the radius of convergence, by the definition of the radius. The
+\emph{house} of $\mu_H$ therefore equals
+$\mu_H$, and $\mu_H<\lambda\le 20000/2147$ by the rigorous
 upper bound of Section~\ref{sec:result}.
 
 \emph{(iii) The $\mu_H$ are strictly increasing, hence pairwise distinct.}
