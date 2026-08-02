@@ -52,7 +52,7 @@ cells, previously known through $n=18$. We report twenty-two new terms, through
   a(40) = \num{56749893611764175164545926946127},
 \]
 each computed from scratch and reproducing every prior term. Every number
-carries an explicit confidence tier: $a(1)$--$a(22)$ are confirmed by two
+carries a confidence tier: $a(1)$--$a(22)$ are confirmed by two
 algorithms sharing no counting logic (direct enumeration and the transfer
 matrix); $a(23)$--$a(38)$ by a single algorithm family, cross-checked per
 term against \emph{held-out} closed forms for the top diagonals of the
@@ -71,7 +71,7 @@ set by the lattice's drift count.
 The by-height generating function $\sum T(n,H)x^ny^H$ is \emph{not
 D-finite}, by a Northcott-style argument on the strip growth constants that
 is lighter than the existing haruspicy route and transports to polyominoes,
-polyhexes, and polyiamonds. We bracket the growth constant rigorously,
+polyhexes, and polyiamonds. We bracket the growth constant,
 $6.543\le\lambda\le9.3153$, both ends by machine-checkable exact
 certificates, the upper bound apparently the first recorded for this
 lattice (the numerical estimate is $\lambda\approx7.111$). Finally, A006770
@@ -126,7 +126,8 @@ responsible for correctness.
 \paragraph{Confidence tiers.}
 A single long count from one program is a conjecture, so every
 numeric claim below is tagged with one of the tiers of
-Table~\ref{tab:tiers}, and the results tables repeat the tags. The tiers record an asymmetry: past Redelmeier's reach no second
+Table~\ref{tab:tiers}, and the results tables repeat the tags. Past
+Redelmeier's reach no second
 counting \emph{algorithm} for the full sequence exists, so the later terms
 rest on decorrelation rather than algorithmic independence.
 
@@ -380,7 +381,7 @@ refuses partial or duplicated inputs.
 
 \paragraph{I/O integrity.}
 The disk layer fails closed rather than losing states silently: spill files
-carry a record count, so truncation is detected on read rather than
+carry a record count, so truncation is detected on read, not
 absorbed; readers, the merge, and the per-height combiner refuse malformed,
 count-mismatched, missing, empty, or duplicated inputs. The gate suite
 fault-injects each mode and requires the pipeline to abort loudly.
@@ -507,7 +508,7 @@ the earlier $n\le28$ run exactly.
         diagonal checks below. Two mitigations at the final term: the
         $H=20$ column of $a(40)$ was re-swept standalone from a fresh
         checkpoint and is byte-identical, and the $H=21$ sweep carries the
-        nineteen-row closed-form cross-check described next.
+        nineteen-row closed-form cross-check.
   \item \textbf{Held-out diagonal closed forms.} Each $P_k$ was fitted on
         the smallest admissible terms and then required to reproduce every
         later term's cell $T(n,n-k)$ exactly. The chain runs the full
@@ -517,8 +518,7 @@ the earlier $n\le28$ run exactly.
         retroactively certifies the top cells its formula was fitted on (a
         degree-$k$ polynomial through a wrong fit point does not predict
         the next term's cell exactly), which is what holds
-        $a(33)$--$a(38)$ at \tiertwo{}. The strongest single check came
-        with the final term: the $a(40)$ run's real $H=21$ sweep
+        $a(33)$--$a(38)$ at \tiertwo{}. The $a(40)$ run's real $H=21$ sweep
         reproduced the closed-form values $P_k(n)\,3^{n-1-3k}$ on every one
         of its rows $n=21$--$39$ simultaneously, re-confirming all nineteen
         wired levels at a fresh point each, in the sweep that produced
@@ -550,8 +550,7 @@ the earlier $n\le28$ run exactly.
         term.
   \item \textbf{Fault injection.} Planted errors are caught (a dropped
         diagonal at $n=2$, a doubled count at $n=1$, a prune off-by-one at
-        $n=10$) while a provably count-preserving change survives: the
-        checks fail on wrong programs and pass on right ones.
+        $n=10$) while a provably count-preserving change survives.
   \item \textbf{Hygiene.} Every engine is AddressSanitizer/UBSan clean at
         gate scale, on the production source; the multithreaded paths are
         bit-identical to serial; and every kept result traces to a
@@ -691,8 +690,8 @@ The polynomials themselves remain computed and validated rather than
 derived. The sparse strips ($S\ge29$ at
 $n\ge33$) are the RAM-expensive ones: one strip burned
 ${\sim}62$ CPU-hours and $79$\,GB to produce the two numbers $d(31,31)=2$
-and $d(31,32)=38$ that $P_0$ and $P_1$ now supply directly. They replace
-the strips hardware cannot reach, at the price of the \tierthree{} label.
+and $d(31,32)=38$ that $P_0$ and $P_1$ now supply directly, at the price of
+the \tierthree{} label.
 
 \section{Companion sequences}
 \label{sec:companions}
@@ -949,7 +948,7 @@ vanishes as a polynomial in $N$, i.e.\ the top face is identically zero.
 The next face becomes the top and the same levels kill it in turn; all
 faces vanish, so all $p_i=0$, a contradiction. $\square$
 
-The abstract degree growth is visible concretely: the new-root contents of
+The new-root contents of
 the ten exact denominators have degrees $1,2,4,9,29,68,181,462,1254,3289$,
 the first eight certified irreducible over $\mathbb Q$, so
 $\deg_{\mathbb Q}\mu_8=462$ already. The argument uses only integer counts,
@@ -963,7 +962,7 @@ anisotropic generating function was proved for self-avoiding polygons, and
 for directed bond animals, by Rechnitzer's haruspicy
 programme~\cite{rechnitzer}, whose criterion is Lemma~9 of
 Bousquet-M\'elou and Rechnitzer~\cite{bmr2002}, the same coefficient
-extraction used above. From that shared start the arguments diverge. Theirs
+extraction used above. Theirs
 concludes topologically, from the limit points of the coefficients' pole
 sets, and needs an explicit combinatorial description of the denominators
 (cyclotomic products, in the polygon setting); ours concludes
@@ -981,7 +980,7 @@ Northcott finiteness on a family of slice growth constants; a literature
 search cannot establish absence, so we claim the argument as ours with
 that qualification.
 
-One limitation. Klazar~\cite{klazar} enlarges the target
+Klazar~\cite{klazar} enlarges the target
 from D-finite to $D_A$-finite, analytic rather than polynomial
 coefficients, on the ground that polynomiality was never carrying his
 argument. Ours admits no such enlargement: the step ``a polynomial over

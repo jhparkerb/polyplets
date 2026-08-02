@@ -576,6 +576,164 @@ high-$S$ strip. Not a trim item and not fixed here — logged with the
 paper-unanchored checks below as something the author may want a real check for
 (a per-strip manifest against the expected $S$ range would do it).
 
+## Commit 11 — phase 6, claude-isms and LLM-speak sweep
+
+The final pass, on the author's direction to apply a very low bar to register
+noise — with the explicit condition that this is for readability, not for
+laundering: no de-watermarking intent, and the AI-assistance disclosure in §1
+is untouchable and untouched. Line spans are positions in the post-phase-5 file
+(1123 lines, 59,760 bytes at 58e7cb0).
+
+**Finding first: two families were already clean.** The pre-session commits
+(em-dash density 76→6, rhetorical closers stripped) did more than the top
+layer. Measured on the current file: zero discourse scaffolds ("Note that",
+"Observe that", "It is worth noting", "Importantly", "Crucially", "Indeed",
+"In other words", "That is,", "Specifically,", "In particular", "Moreover",
+"Furthermore", "Notably"); zero "serves as"/"acts as"/"plays the role of";
+zero sentence-initial And/But/Yet/So/Now as beat markers; zero of "careful",
+"comprehensive", "robust", "elegant", "powerful", "subtle", "crucial",
+"remarkable", "striking"; one body em-dash, a genuine apposition in a technical
+definition.
+
+**The "rather than" family was audited in full and none was cut as decorative.**
+All twelve instances are load-bearing scope statements or protected caveats:
+decorrelation/independence, fitted/derived, stopped/exhausted, disk/memory,
+fails-closed/silent-loss, detected/absorbed, split/recomputed-whole, L616,
+derived/observed, computed/derived, observed/proved, analytic/polynomial. One
+item (X4) touched the family only to break a doubled construction inside a
+single sentence, keeping both contrasts.
+
+**Applied:**
+- X1 the fault-injection epigram ("the checks fail on wrong programs and pass on
+  right ones") — a restatement of the sentence it hung on; all three planted
+  errors and the negative control survive verbatim.
+- X2 "From that shared start the arguments diverge." — a beat before the two
+  clauses that state the divergence.
+- X3 the abstract's "rigorously" — the machine-checkable exact certificates are
+  the rigour, and claim it more specifically.
+- X4 "detected on read rather than absorbed" → "detected on read, not absorbed"
+  — second of two "rather than" constructions in one sentence.
+- X5 "described next" — a pointer to the next bullet in a list.
+- X6 "The abstract degree growth is visible concretely:" — the degree list is
+  its own demonstration. ANCHOR CHECKED: the list `1,2,4,9,29,68,181,462,1254,
+  3289`, which the phase-2 R7 ruling deliberately made the anchor for
+  `lifetime-3 atom degrees`, is untouched.
+- BX1 "The strongest single check came with the final term:" — self-assessment.
+- BX2 "explicit" in "carries an explicit confidence tier".
+- BX4 "The tiers record an asymmetry:" — scaffold before the asymmetry itself.
+- BX5 "One limitation." — beat marker; the Klazar limitation is untouched.
+- BX6 reworded, not deleted: "…that $P_0$ and $P_1$ now supply directly, at the
+  price of the \tierthree{} label." The T3 attribution and the cost datum both
+  survive; the epigram's first clause, which restated the preceding sentence,
+  goes.
+
+### BX4 — family ruling recorded
+The T2⁻ standing constraint covers statements that the weaker standard is
+*deliberately marked*. "The tiers record an asymmetry" is a tier-asymmetry
+statement, not a deliberate-marking statement: out of family, cut on merits.
+
+### Borderlines retained (phase 6)
+- **BX3** "rigorous" at the fact-(ii) reference: it asserts the imported bound's
+  theorem status at the proof step that depends on it, and is the only
+  point-of-use statement of that status.
+- **BX7** "decisively": a causal attribution of the 200× to reshuffle-volume
+  reduction, distinct from the binding-resource claim, and the design rationale
+  a reimplementer needs.
+
+---
+
+# CLOSE-OUT
+
+## Per-phase totals
+
+| phase | what | lines | bytes | checks |
+|---|---|---|---|---|
+| — | pre-trim (d9901d0) | 1437 | 77,244 | 448 |
+| 1 | sections (commits 1–4) | 1233 | 66,745 | 429 |
+| 2 | results (commits 5–6) | 1193 | 64,207 | 425 |
+| 3 | paragraphs (commits 7–8) | 1140 | 60,978 | 425 |
+| 4 | sentences (commit 9) | 1123 | 59,891 | 425 |
+| 5 | words (commit 10) | 1123 | 59,760 | 425 |
+| 6 | register (commit 11) | 1122 | 59,400 | 425 |
+
+**315 lines (21.9%) and 17,844 bytes (23.1%) removed.** The verifier lost 23
+checks, every one pruned in the same commit as the claim it tested; it has been
+green at 425 for four consecutive phases.
+
+## Contested-retained across all six phases
+
+Items the remover proposed and the defender saved, with the argument that won:
+
+1. **Hole convention, stratification, tab:holes** (phase 1, S6b) — same engine's
+   output via a second additive index; the row-sums/flood-fill/cross-ISA
+   sentences are validation evidence whose deletion would be silent.
+2. **The mod-3 collapse and spine cubic** (phase 1, S7b) — a derived corollary of
+   Theorem 1 about this paper's own triangle, machine-verified on 420 cells.
+3. **The diagonal-mirror core** (phase 1, S8) — full deletion rejected: it would
+   orphan the four published T3 companion values, which are deliverables. The
+   remover's claim that tab:symcounts' ‡ footnote is self-describing was false.
+4. **§5's T1-anchor bullet** (phase 3, P10) — tab:tiers delegates coverage
+   itemization to §5 by name, and this is the only statement of which algorithm
+   pairs cover which part of the T1 range.
+5. **The in-proof Lemma 9 sentence** (phase 4, T14) — its load is the departure
+   marker, not the attribution: it locates where the borrowed step ends.
+6. **"completed"** in the n=32 farm sentence (phase 5, D3) — the only assertion
+   that every strip was summed; prefix-matching cannot detect a missing high-S
+   strip.
+7. **"entirely"** (phase 5, BL1) — after T11's trade, the definitional strength
+   claim the T1 tier rests on where Method B is introduced.
+8. **"and uniform"** (phase 5, BL3) — asserts identical application at every k,
+   what makes P_19's exclusion rule-driven.
+9. **"at all"** at the single-machine admission (phase 5, BL4) — intensifier on
+   self-criticism; removing it shifts register on the frankest admission.
+10. **"at the meeting point of"** (phase 5, BL7) — an intersection claim carrying
+    the paired-citation structure.
+11. **"rigorous"** at the fact-(ii) reference (phase 6, BX3).
+12. **"decisively"** (phase 6, BX7).
+
+Two contested items were cut in fallback form rather than retained: the G_3
+display (phase 2, R11, cut with two repairs) and Method B's state-encoding
+paragraph (phase 3, P11, folded into Method C).
+
+## Standing constraints and erosion floors
+
+Binding on any future trimming of this file:
+
+- **L616** — "What remains fitted rather than derived is $P_k$ for $6\le k\le18$;
+  with the theorem in hand those fits are interpolation of a known-shape form"
+  is §6.1's sole in-place statement of the shape-proved/constants-fitted split.
+  Not available for cutting on the ground that it is stated elsewhere.
+- **The T2⁻ marking family** — both statements that the weaker standard is
+  deliberately marked are gone; the fact survives four ways (abstract, T2⁻ row,
+  §5 held-out bullet, table tags). No third cut. Tier-*asymmetry* statements are
+  out of family (phase 6 BX4).
+- **"what follows departs from it"** — the T14 departure marker in full. No
+  further compression; "what follows" is untouchable.
+- **tab:terms' caption** must keep "Tiers (Table~\ref{tab:tiers}): …" — with the
+  lead-in gone, it is the only place the tier tags are made resolvable.
+- Closed doors, evidence, and scoping caveats keep their substance throughout:
+  the modular-consistency bullet, the H≤7 no-cancellation caveat, "stopped here
+  rather than exhausted", the single-machine admission, the Klazar limitation,
+  the novelty hedge, the T3 labels.
+
+## Release-integrity flags (deferred past phase 5, not fixed)
+
+Both are about `paper/verify_claims.py`, not the document, and both should be
+settled before release rather than by a trimming pass:
+
+1. **Eighteen checks with no claim in the paper.** The six residual N_k checks,
+   the seven hole-GF order-law checks (`c_3..c_7`, the H=7 order law,
+   `H=8 k=0 order==1499`), `H<=10 captures 74.9% of a(19)`, and the a(25) bound
+   pair. The checker's docstring promises to verify "every arithmetic/algebraic
+   claim in polyplets-report.tex"; it now also guards repository invariants the
+   paper never prints. Either prune them or amend the docstring to say so.
+2. **No farm-completeness check for the n=32 diagonal-mirror strip farm.**
+   `runs/sym32/dmirror.out` is consumed as given. A strip of exact bounding box
+   S contributes only to n≥S, so the prefix-matches at n≤24 and n≤28 cannot
+   detect a missing high-S strip, and the paper's "completed" rests on nothing
+   machine-checked. A per-strip manifest against the expected S range would
+   close it.
+
 ## Totals
 
 | stage | lines | bytes | verify_claims |
@@ -591,14 +749,14 @@ paper-unanchored checks below as something the author may want a real check for
 | commit 8 | 1140 | 60,978 | 425 |
 | commit 9 | 1123 | 59,891 | 425 |
 | commit 10 | 1123 | 59,760 | 425 |
+| commit 11 | 1122 | 59,400 | 425 |
 
-Phase 1 removed 204 lines and 10,499 bytes; phase 2 a further 40 lines and
-2,538 bytes; phase 3 a further 53 lines and 3,229 bytes; phase 4 a further 17
-lines and 1,087 bytes; phase 5 a further 131 bytes at unchanged line count
-(word cuts made in place, without rewrapping, so the diff stays readable).
-Running total: 314 lines and 17,484 bytes off the pre-trim document (21.9% of
-the lines, 22.6% of the bytes), with the verifier down 23 checks, every one of
-them pruned in the same commit as the claim it tested.
+Final: 315 lines and 17,844 bytes off the pre-trim document (21.9% of the
+lines, 23.1% of the bytes), with the verifier down 23 checks, every one of them
+pruned in the same commit as the claim it tested, and green at 425 for the last
+four phases. pdflatex clean at all eleven stages: zero errors, zero undefined
+references or citations, and the same seven pre-existing hyperref
+Unicode-bookmark warnings the document started with.
 pdflatex clean at every stage (zero errors, zero undefined references, the
 same seven pre-existing hyperref Unicode-bookmark warnings), and
 verify_claims green at every stage.
