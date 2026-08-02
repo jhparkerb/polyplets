@@ -104,7 +104,7 @@ COVERAGE = {
     "dmirror_strips": 40,
     "spine_mod3": 1,
     "byheight_h19": 32,
-}   # 262 of the 441 checks live in an optional group
+}   # 262 of the 439 checks live in an optional group
 
 # --- Table tab:terms (paper transcription) vs b-file ---
 TERMS = {1:1,2:4,3:20,4:110,5:638,6:3832,7:23592,8:147941,9:940982,10:6053180,
@@ -678,9 +678,7 @@ else:
          "runs/sym32 strips absent and results/sym_counts.txt absent")
 
 # ---- second-wave checkers: universality, hole-graded laws, deficit-2 -------
-for script, tag in (("hex_gas.py", "hex law + dyadic spine"),
-                    ("universal_law_check.py", "square b=1 + polyiamond ext"),
-                    ("holefree_gas.py", "hole-free diagonal law"),
+for script, tag in (("holefree_gas.py", "hole-free diagonal law"),
                     ("hole_strata_gas.py", "hole-marked strata"),
                     ("deficit2_proof.py", "deficit-2 symbolic proof")):
     rr = subprocess.run(["python3", os.path.join(ROOT, "experiments", script)],

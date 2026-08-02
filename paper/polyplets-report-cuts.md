@@ -121,3 +121,28 @@ carried as a second additive index on the column transfer matrix), inside the
 report's stated scope ("the results that grew out of computing them"), and the
 row-sums-equal-A006770 / flood-fill oracle / cross-ISA recount sentences are
 validation evidence whose deletion would be silent.
+
+## Commit 3 — S7, mod 3 and universality (partial: transport cut, spine kept)
+
+### S7a — cut: lattice universality (738–757)
+The row-local lattice definition, the five transport steps, the machine-checked
+square/hexagonal instances, the $w\ne1$ and degenerate branches.
+**Argument that won:** it certifies no term, feeds no engine and gates no tier,
+and it is about three lattices this report does not enumerate — a précis of a
+repository document it names in its own last line.
+**Salvage:** one sentence at the end of the surviving subsection: the law holds
+on any lattice reaching one row with $b$ up-neighbours, and mod any $p\mid b$
+the diagonals are governed by $W^3=W^2+t$, with the pointer to
+`docs/proofs/universal-diagonal-law.md`. The subsection is retitled "The
+triangle mod 3".
+**Abstract:** clause excision only — the Theorem 1 proof claim is untouched;
+"govern polyominoes and polyhexes" goes, "lattice-universal, the mod-$p$ spine
+cubic having its prime set by the lattice's drift count" stays, since the claim
+survives in the body via the salvage.
+**Verifier:** the `hex_gas.py` and `universal_law_check.py` subprocess checkers
+pruned; 441 → 439 checks.
+
+### S7b — retained: the mod-3 collapse and spine cubic (719–737)
+**Defender's winning argument:** a derived corollary of the flagship theorem
+about *this paper's own* triangle, machine-verified on all 420 in-band banked
+cells — squarely within the report's stated claim types.

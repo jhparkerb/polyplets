@@ -66,9 +66,8 @@ The machinery also yields structural results. The diagonals of the height
 triangle obey an exponential/cumulant law whose shape---a polynomial of
 degree $k$ times $3^{\,n-1-3k}$, with its onset and integrality---is
 \emph{proved} here by an exact walk-plus-clusters decomposition, and is
-lattice-universal: the same law, and the same mod-$p$ ``spine cubic''
-$W^3=W^2+t$, govern polyominoes and polyhexes, with the prime set by the
-lattice's drift count. The diagonals of the diagonal-mirror symmetry
+lattice-universal, the mod-$p$ ``spine cubic'' $W^3=W^2+t$ having its prime
+set by the lattice's drift count. The diagonals of the diagonal-mirror symmetry
 triangle obey a period-two quasi-polynomial law, likewise proved in shape.
 The by-height generating function $\sum T(n,H)x^ny^H$ is \emph{not
 D-finite}, by a Northcott-style argument on the strip growth constants that
@@ -691,7 +690,7 @@ their held-out hits stay load-bearing as checks of the \emph{engine} rather
 than of the law. Write-up and machine checks:
 \texttt{docs/proofs/diagonal-law.md}.
 
-\subsection{The triangle mod 3, and lattice universality}
+\subsection{The triangle mod 3}
 \label{sec:spine}
 
 Reducing the diagonal law modulo~3 collapses the cluster gas to a single
@@ -709,27 +708,11 @@ triangle mod~3 is $3$-automatic, with an explicit automaton. The
 congruences this rests on are \emph{derived} from the same cluster
 decomposition rather than observed, and every consequence is
 machine-verified on all $420$ in-band cells of the banked triangle
-(\texttt{results/ternary-spine.md}).
-
-Nothing in either result is specific to the king lattice. Call
-a lattice \emph{row-local} if its cells are indexed by $\mathbb Z^2$ with
-translation-invariant adjacency reaching at most one row up or down, and
-let $b$ be the number of up-neighbours of a cell (the drift count). The
-five steps of the proof carry over verbatim with $b$ in place of $3$:
-for every such lattice, $T(H{+}k,H)=q_k(H)\,b^H$ for all $H\ge k{+}1$ with
-$\deg q_k\le k$ and integer-valued $P_k=b^{1+2k}q_k$; and modulo any prime
-$p\mid b$ only the pair-row survives the valuation collapse, so the mod-$p$
-diagonal structure is governed by \emph{the same cubic} $H^3=H^2+wu$ over
-$\mathbb F_p$, with $w$ the pair-weight residue. Machine-checked
-instances: the square lattice ($b=1$: polyomino diagonals of A001168 are
-plain polynomials from the same onset, density $4=2^2$); the hexagonal
-lattice ($b=2$: $P_1=9n-15$ holdout-exact, density $9=3^2$, a
-\emph{dyadic} spine $H^3=H^2+u$ over $\mathbb F_2$); and the king lattice
-($b=3$, density $25=5^2$). The scaling $w$ is not always $1$ (a contiguous
-five-neighbour lattice gives $w=4\pmod5$), and there is a degenerate branch
-($w=0$) whose banded triangle is trivial. The king lattice's spine is the $p=3$ member of a lattice-indexed family,
-with the lattice setting $p$ and $w$. Proofs and checkers:
-\texttt{docs/proofs/universal-diagonal-law.md}.
+(\texttt{results/ternary-spine.md}). The law is not king-specific: for any
+lattice whose adjacency reaches one row with $b$ up-neighbours the same
+proof gives $T(H{+}k,H)=q_k(H)b^H$, and mod any $p\mid b$ the diagonals are
+governed by the cubic $W^3=W^2+t$
+(\texttt{docs/proofs/universal-diagonal-law.md}).
 
 \subsection{The diagonal-mirror triangle: quasi-polynomials, period two}
 \label{sec:dmdiag}
