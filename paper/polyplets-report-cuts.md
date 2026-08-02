@@ -288,6 +288,39 @@ hole-GF checks (`c_3..c_7`, the H=7 order law, `H=8 k=0 order==1499`) were
 already paper-unanchored before this trim — the checker's own comment records
 that claim's retirement in July — and are left alone.
 
+## Commit 6 — phase 2, the contested cut (R11)
+
+### R11 — the G_3(x) example (960–963) — CONTESTED, OVERRULED WITH REPAIRS
+One specimen of ten recovered generating functions, printed because it fits on
+a line. **Defender's contest:** (a) removing it leaves "orders" undefined —
+the display was the only place a reader could see what an order is; (b) the ten
+recovered GFs become unlocatable from the paper. **Overruled** as repairable,
+with the bias to remove: (a) the orders list gains "(the denominator degrees)",
+verified against `results/fixed_height_gfs.txt` — H=3 has order=7 and a
+degree-7 Q, so the gloss is exact; (b) the Availability paragraph in §5 gains
+"the recovered fixed-height generating functions".
+**Verifier:** the two `G_3` transcription checks were transcriptions *of this
+display*; both pruned, 427 → 425, and the `gf_block` helper they were the last
+callers of goes with them. This is the phase's largest verifier cost per line
+saved, and the released checker visibly shrinks. The stage is nearly
+byte-neutral (−22 bytes): the two repairs cost most of what the display saved,
+which is the price of the ruling and is recorded as such.
+
+### Considered and not proposed in phase 2
+tab:byheight40 (the only data form of the computed/injected split, and §4.3
+instructs readers to sum its H≤21 rows); the modular-consistency bullet, the
+P_19 parenthetical, and "stopped here rather than exhausted" (closed doors —
+each records something that was *not* done); "Relation to existing work" and the
+Klazar limitation (novelty qualification and an explicit non-reach).
+
+### Verifier checks with no claim in the paper
+Sixteen checks now test repository invariants the paper does not print: the six
+residual N_k checks (phase 1), the seven hole-GF order-law checks, `H<=10
+captures 74.9% of a(19)`, and the a(25) bound pair. Not pruned — the argument
+for removing them is about what the released checker promises in its docstring,
+not about the document under review, and it should be settled once after phase 5
+when the final claim set is fixed.
+
 ## Totals
 
 | stage | lines | bytes | verify_claims |
@@ -298,8 +331,11 @@ that claim's retirement in July — and are left alone.
 | commit 3 | 1262 | 68,506 | 439 |
 | commit 4 | 1233 | 66,745 | 429 |
 | commit 5 | 1194 | 64,229 | 427 |
+| commit 6 | 1193 | 64,207 | 425 |
 
-Phase 1 removed 204 lines and 10,499 bytes; phase 2 continues from there.
+Phase 1 removed 204 lines and 10,499 bytes; phase 2 a further 40 lines and
+2,538 bytes. Running total: 244 lines and 13,037 bytes off the pre-trim
+document (17.0% of the lines, 16.9% of the bytes).
 pdflatex clean at every stage (zero errors, zero undefined references, the
 same seven pre-existing hyperref Unicode-bookmark warnings), and
 verify_claims green at every stage.

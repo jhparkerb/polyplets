@@ -104,7 +104,7 @@ COVERAGE = {
     "dmirror_strips": 30,
     "spine_mod3": 1,
     "byheight_h19": 32,
-}   # 252 of the 427 checks live in an optional group
+}   # 252 of the 425 checks live in an optional group
 
 # --- Table tab:terms (paper transcription) vs b-file ---
 TERMS = {1:1,2:4,3:20,4:110,5:638,6:3832,7:23592,8:147941,9:940982,10:6053180,
@@ -233,18 +233,9 @@ chk("asymmetric(19)=Free-bilateral=18951146976435", int(free)-int(bil19)==189511
 #  round((n-2)^2/8) form are no longer claimed in polyplets-report.tex.)
 
 # GF transcriptions: paper coefficients must match the recovered data files
-def gf_block(path, header):
-    P = Q = None; want = False
-    for line in open(os.path.join(ROOT, path)):
-        if line.startswith(header): want = True; continue
-        if want and line.startswith("P: "): P = ast.literal_eval(line[3:])
-        if want and line.startswith("Q: "): Q = ast.literal_eval(line[3:]); break
-    return P, Q
-P3, Q3 = gf_block("results/fixed_height_gfs.txt", "H=3 ")
-chk("G_3 numerator transcription",   P3==[0,0,0,9,-8,-2,4,1])
-chk("G_3 denominator transcription", Q3==[1,-7,15,-9,-3,5,-1,-1])
-# (the G_{3,1} transcription checks went with the paper's hole-refined-GF
-#  sentence, trim phase 2 R15)
+# (the G_3 transcription checks went with the paper's worked GF example,
+#  trim phase 2 R11; the G_{3,1} pair went with the hole-refined-GF
+#  sentence, R15)
 
 # Fixed-height GF orders and the lifetime-3 atom degrees they imply.
 # (The hole-GF "order grows like c_H(k+1)" fit was retired 2026-07-31 as a

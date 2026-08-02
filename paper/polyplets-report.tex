@@ -605,8 +605,9 @@ designed around the weakest link at each stage.
 
 \paragraph{Availability.} The repository holds the source and the runnable
 gates, the per-height triangle rows for every term through $n=40$ with their
-provenance ledgers, the b-files for A006770 and its companions, and a
-self-contained checker that re-verifies this paper's numerical claims.
+provenance ledgers, the b-files for A006770 and its companions, the recovered
+fixed-height generating functions, and a self-contained checker that
+re-verifies this paper's numerical claims.
 
 \section{The diagonal structure of king-animal triangles}
 \label{sec:diagonals}
@@ -921,16 +922,14 @@ generating function $G_H(x)=P_H(x)/Q_H(x)$ is rational~\cite{stanley}. We
 recover these exactly for $H\le10$ by Berlekamp--Massey~\cite{massey} over
 $\mathbb{Z}/p\mathbb{Z}$ for several primes followed by CRT, each accepted
 only when the fitted recurrence reproduces held-out terms. The denominators
-$Q_H$ have orders $1,3,7,15,42,106,278,711,1897,5005$ for
+$Q_H$ have orders (the denominator degrees)
+$1,3,7,15,42,106,278,711,1897,5005$ for
 $H=1,\dots,10$; the $H=10$ recovery, needing $\sim\!10{,}000$ series terms,
 was reproduced on a second architecture byte-identically. Writing $N_H$ for
 the denominator of the height-$H$ strip generating function, exact-height
 counts are second differences of strip counts, so
 $Q_H \mid N_{H-2}N_{H-1}N_H$ by construction; that no cancellation occurs in
-that product is observed rather than proved, verified here for $H\le7$. As an example,
-\[
-  G_3(x)=\frac{9x^3-8x^4-2x^5+4x^6+x^7}{1-7x+15x^2-9x^3-3x^4+5x^5-x^6-x^7}.
-\]
+that product is observed rather than proved, verified here for $H\le7$.
 
 The recovered GFs also give exact lower bounds $a(n)\ge\sum_{H\le10}T(n,H)$
 for any $n$: those for $a(25)$, $a(35)$ and $a(40)$ (the last
