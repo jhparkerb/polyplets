@@ -177,10 +177,6 @@ rest on decorrelation rather than algorithmic independence.
 \section{Headline results}
 \label{sec:result}
 
-\begin{equation}
-  \boxed{\,a(40) = \num{56749893611764175164545926946127}\,}
-\end{equation}
-
 Table~\ref{tab:terms} gives the full sequence. Terms $n\le18$ reproduce
 A006770 exactly; $a(19)$--$a(40)$ are new. $a(19)$--$a(22)$ are \tierone{};
 $a(23)$--$a(38)$ are \tiertwo{}; $a(39)$ and $a(40)$ are \tiertwominus{}
@@ -235,11 +231,7 @@ factors of ${\sim}4$ to ${\sim}140$) and removes the drift:
 $\lambda=7.1108$--$7.1111$ across the same four windows, with $\theta$
 between $-1.02$ and $-1.03$, consistent with the universal
 two-dimensional lattice-animal value $\theta=-1$~\cite{jensen2001}, which
-the fit was free to miss. A first-order differential-approximant analysis
-(calibrated on synthetic $n^\theta\lambda^n$ data and stable across
-rescalings and the number of trailing terms used) independently locates
-the dominant singularity at $\lambda=7.110$ with exponent
-$\theta=-1.000$. We accordingly estimate $\lambda\approx7.111$. This is an
+the fit was free to miss. We accordingly estimate $\lambda\approx7.111$. This is an
 estimate, not a rigorous bound; the two-sided bracket follows.
 
 \paragraph{A rigorous lower bound on $\lambda$.}
@@ -261,12 +253,9 @@ without rerunning the search that found it. Carrying the ladder to $H=17$
 \]
 with certificates at every rung from the independent anchor
 $\mu_2=1+\sqrt2$ upward. The ladder converges to $\lambda$ from below, but
-slowly: the rungs gain about $0.05$ each while cost grows ${\sim}3.5\times$
-per rung, reaching $11.8$\,GB at $H=17$. It is stopped here rather than
-exhausted. It supersedes the closed-form bound available from a solvable
-subclass, Bacher's directed king animals~\cite{bacher}, whose dominant
-singularity gives $\lambda\ge3+2\sqrt2\approx5.828$ with no computation at
-all ($\lambda\gtrsim6.475$ numerically for his multi-directed subclass).
+slowly: the rungs gain about $0.05$ each. It is stopped here rather than
+exhausted. It improves on the $3+2\sqrt2$ available in closed form from
+Bacher's directed subclass~\cite{bacher}.
 
 \paragraph{A rigorous upper bound on $\lambda$.}
 No upper bound on $\lambda$ appears in the literature. We obtain one by a
@@ -293,11 +282,7 @@ size, so finite-type methods of this class floor strictly above $\lambda$.
 The one-sided count (A030233) needs, besides the fixed count, only the
 $90^\circ$- and $180^\circ$-rotation fixed-point counts
 (Section~\ref{sec:companions}), both of which reach $n=34$; hence fifteen new
-terms, through
-\[
-  \mathrm{OneSided}(34)=\num{128829209605977867230343869}.
-\]
-Table~\ref{tab:onesided} lists them. The remaining companions also need the
+terms, listed in Table~\ref{tab:onesided}. The remaining companions also need the
 mirror counts and are bounded by the diagonal-mirror count's reach
 (Section~\ref{sec:companions}).
 
@@ -415,8 +400,8 @@ carry, touch flags, counts), and each transition decides a single cell,
 resolving connectivity by union--find over its at-most-three placed
 neighbours. The finer step multiplies the number of transitions but shrinks
 the live state space and, decisively, the volume that must be reshuffled
-between passes (measured speedups over Method B grow from $\sim$29$\times$
-at $H=12$ to $\sim$200$\times$ at $H=16$). At frontier sizes beyond RAM the
+between passes (measured speedups over Method B grow with $H$, to
+$\sim$200$\times$ at $H=16$). At frontier sizes beyond RAM the
 state map spills to disk: the frontier is hash-sharded, expanded shard by
 shard, and merged by external passes, so the binding resource is disk
 bandwidth rather than memory. Heights remain independent jobs; per-height
@@ -772,17 +757,15 @@ over the square's symmetry group $D_4$:
 \]
 where $R_{90},R_{180},H,D$ count the animals fixed by a $90^\circ$ rotation,
 a $180^\circ$ rotation, an axis reflection, and a diagonal reflection
-(Method~D). At $n=34$: $R_{90}=0$ (invariance needs $n\equiv0,1\pmod4$;
-$34\equiv2$), $R_{180}=\num{48710062997772}$, $H=\num{17385821908346}$.
-Every derivation asserts the $/4$ and $/8$ integrality of its numerator and
+(Method~D). Every derivation asserts the $/4$ and $/8$ integrality of its numerator and
 validates every published OEIS term of all five companions.
 
 The one-sided extension to $n=34$ is Table~\ref{tab:onesided}. The
 free/bilateral/asymmetric companions (A030222, A030234, A030235) and the
 free-non-polyomino difference A194596 additionally need $D$, the
 diagonal-mirror count, whose exact-bounding-box sweep is the costliest
-symmetry (Section~\ref{sec:methodD}): $D$ is exact through $n=32$
-($D(32)=\num{2156235549286}$), which caps these four companions at
+symmetry (Section~\ref{sec:methodD}): $D$ is exact through $n=32$,
+which caps these four companions at
 $n=32$ within \tiertwo{}. Table~\ref{tab:companions} gives the new
 values; Table~\ref{tab:symcounts} records the symmetry fixed-point counts
 themselves, each an OEIS-eligible sequence.
@@ -854,15 +837,8 @@ never as b-file data.
 \end{table}
 
 \paragraph{The bilateral identity.}
-The bilateral count equals $\tfrac12(H+D)$ exactly, by a double count of the
-incidences $(A,m)$ of a fixed animal $A$ with a reflection
-$m\in\operatorname{Stab}(A)$. Summed over the four reflections this is
-$2H+2D$, since conjugate reflections have equal fixed-counts. Summed over
-free classes it is exactly $4$ per bilateral class: a stabilizer $K\le D_4$
-containing a reflection has its rotations as an index-$2$ subgroup, so half
-its elements are reflections, and a class with stabilizer order $|K|$
-contains $8/|K|$ fixed animals each contributing $|K|/2$. Hence
-$2H+2D=4\cdot(\text{bilateral classes})$, also checked numerically against
+The bilateral count equals $\tfrac12(H+D)$ exactly (a double count of
+animal--reflection incidences over $D_4$), checked numerically against
 every published term of A030234.
 
 \section{Hole stratification}
@@ -891,8 +867,7 @@ byte-identical to an independent per-animal flood fill for $n\le14$, and have
 row sums equal to A006770. The triangle is exact through $n=18$; rows
 $15$--$18$, beyond the flood oracle, are confirmed by a second-architecture
 recount (clang/ARM against GCC/x86, byte-identical), so no row rests on a
-single engine. At $n=18$ there are $\num{16503616943998}$ hole-free polyplets
-and $\num{4970078092354}$ with a single hole, the maximum being $10$. The
+single engine. The
 hole-free and one-hole columns are absent from OEIS (checked by Superseeker);
 b-files are prepared in the release.
 
@@ -946,24 +921,24 @@ generating function $G_H(x)=P_H(x)/Q_H(x)$ is rational~\cite{stanley}. We
 recover these exactly for $H\le10$ by Berlekamp--Massey~\cite{massey} over
 $\mathbb{Z}/p\mathbb{Z}$ for several primes followed by CRT, each accepted
 only when the fitted recurrence reproduces held-out terms. The denominators
-$Q_H$ have orders\footnote{Each $Q_H$ factors as $N_{H-2}N_{H-1}N_H$, where
-$N_H$ is the denominator of the height-$H$ strip generating function, so
-these orders are $3$-term running sums of the \emph{atom} degrees
-$1,2,4,9,29,68,181,\dots$. The divisibility is algebraic, not empirical:
-exact-height counts are second differences of strip counts, so
-$Q_H \mid N_{H-2}N_{H-1}N_H$ by construction, for any finite-range animal
-class. Observed rather than proved is the absence of cancellation, verified
-here for $H\le7$; a failure at larger $H$ could only \emph{shrink} $Q_H$,
-never introduce factors outside the three atoms. Neither degree sequence
-appears in OEIS (Superseeker-checked).} $1,3,7,15,42,106,278,711,1897,5005$ for
+$Q_H$ have orders $1,3,7,15,42,106,278,711,1897,5005$ for
 $H=1,\dots,10$; the $H=10$ recovery, needing $\sim\!10{,}000$ series terms,
-was reproduced on a second architecture byte-identically. As an example,
+was reproduced on a second architecture byte-identically. Writing $N_H$ for
+the denominator of the height-$H$ strip generating function, exact-height
+counts are second differences of strip counts, so
+$Q_H \mid N_{H-2}N_{H-1}N_H$ by construction; that no cancellation occurs in
+that product is observed rather than proved, verified here for $H\le7$. As an example,
 \[
   G_3(x)=\frac{9x^3-8x^4-2x^5+4x^6+x^7}{1-7x+15x^2-9x^3-3x^4+5x^5-x^6-x^7}.
 \]
 
-Refining by hole count keeps each fixed-$(H,k)$ row C-finite, and those
-generating functions are recovered too, through $H\le6$. The rationality is
+The recovered GFs also give exact lower bounds $a(n)\ge\sum_{H\le10}T(n,H)$
+for any $n$: those for $a(25)$, $a(35)$ and $a(40)$ (the last
+$a(40)\ge\num{4266005101622209395058618248135}$) were each computed while
+that term was still out of reach, and all three are confirmed by the values
+Method~C produced later (\texttt{paper/gf\_bound.py}).
+
+The rationality is
 genuinely a fixed-height phenomenon: the two-variable array is provably not
 D-finite, as we now show.
 
@@ -1008,8 +983,7 @@ rows and columns of an irreducible nonnegative matrix strictly decreases
 its Perron root~\cite{hornjohnson}, so the strip growth constants strictly
 increase. Strictness also rules out cancellation in the second
 differences, so $1/\mu_H$ is a genuine pole of $G_H$ and is not a pole of
-any $G_j$ with $j<H$. (Machine check: the ten exact denominators give
-$\mu_H = 1,\ 1{+}\sqrt2,\ 3.4437,\dots,5.9917$, strictly increasing.)
+any $G_j$ with $j<H$.
 
 \emph{(iv) Only finitely many algebraic integers have degree $\le D$ and
 house $\le B$} (Kronecker~\cite{kronecker}): the minimal polynomial has
@@ -1087,19 +1061,6 @@ exceeding $D$'' \emph{is} the dichotomy. Theorem~\ref{thm:notdfinite} is
 therefore about D-finiteness over $\mathbb Q(x)$ and does not reach
 $D_A$-finiteness; the isotropic $a(x)$ remains open, as in the polygon
 setting.
-
-\paragraph{Rigorous lower bounds.}
-Summing the fixed-height GFs gives $a(n)\ge\sum_{H\le 10}T(n,H)$ exactly for
-any $n$, by extracting coefficients from rational functions. The bounds for
-$a(25)$, $a(35)$ and $a(40)$ were each computed while that term was still
-out of reach (the last of them
-$a(40)\ge\num{4266005101622209395058618248135}$, an exact integer from
-rational arithmetic), and all three are confirmed by the values Method~C
-produced later, a retrospective certification of the GF machinery. The
-capture fraction shrinks as taller strips dominate ($44\%$ of the exact
-value at $n=25$, $7.5\%$ at $n=40$), but the bound remains available,
-exactly, for any $n$ past the final computed term
-(\texttt{paper/gf\_bound.py}).
 
 \begin{thebibliography}{9}
 

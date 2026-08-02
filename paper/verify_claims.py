@@ -104,7 +104,7 @@ COVERAGE = {
     "dmirror_strips": 30,
     "spine_mod3": 1,
     "byheight_h19": 32,
-}   # 252 of the 429 checks live in an optional group
+}   # 252 of the 427 checks live in an optional group
 
 # --- Table tab:terms (paper transcription) vs b-file ---
 TERMS = {1:1,2:4,3:20,4:110,5:638,6:3832,7:23592,8:147941,9:940982,10:6053180,
@@ -243,9 +243,8 @@ def gf_block(path, header):
 P3, Q3 = gf_block("results/fixed_height_gfs.txt", "H=3 ")
 chk("G_3 numerator transcription",   P3==[0,0,0,9,-8,-2,4,1])
 chk("G_3 denominator transcription", Q3==[1,-7,15,-9,-3,5,-1,-1])
-P31, Q31 = gf_block("results/hole_gfs.txt", "H=3 k=1 ")
-chk("G_{3,1} numerator transcription",   P31==[0,0,0,0,1,2,0,-2,-1])
-chk("G_{3,1} denominator transcription", Q31==[1,-8,20,-14,-8,18,3,-16,6,6,-3,-2,1])
+# (the G_{3,1} transcription checks went with the paper's hole-refined-GF
+#  sentence, trim phase 2 R15)
 
 # Fixed-height GF orders and the lifetime-3 atom degrees they imply.
 # (The hole-GF "order grows like c_H(k+1)" fit was retired 2026-07-31 as a

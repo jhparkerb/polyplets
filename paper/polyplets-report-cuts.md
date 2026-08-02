@@ -1,9 +1,11 @@
-# polyplets-report.tex — trim log, phase 1 (sections)
+# polyplets-report.tex — trim log
 
-Adversarial trim: a remover proposed section-level cuts, a defender contested
-them, a referee ruled with a slight bias toward removal. This log records what
-left, why, and where anything load-bearing landed. Line spans are positions in
-the pre-trim file (1437 lines, 77,244 bytes at commit d9901d0).
+Adversarial trim: a remover proposes cuts, a defender contests them, a referee
+rules with a slight bias toward removal. Phase 1 cut whole sections; phase 2 cut
+individual results. This log records what left, why, and where anything
+load-bearing landed. Phase-1 line spans are positions in the pre-trim file
+(1437 lines, 77,244 bytes at commit d9901d0); phase-2 spans are positions in the
+post-phase-1 file.
 
 Gate on every commit: `pdflatex -output-directory=paper paper/polyplets-report.tex`
 run twice, zero errors and zero undefined references/citations; `python3
@@ -176,6 +178,116 @@ from the abstract; contribution 4 drops "whose shape is likewise proved" and
 validate repository data rather than a paper claim; left in place per the
 ruling.
 
+## Commit 5 — phase 2, agreed result-level batch (R1–R10, R12–R15)
+
+Phase 2 trims individual results rather than sections: duplicated numbers,
+superseded bounds, unverifiable second opinions, telemetry. Line spans are
+positions in the post-phase-1 file (1233 lines, 66,745 bytes at 9cc8cc1).
+
+Measured coupling, since it decided several rulings: `verify_claims.py` parses
+the .tex only through five table labels (`tab:terms`, `tab:byheight40`,
+`tab:symcounts`, `tab:onesided`, `tab:companions`). Every other number it
+checks is hard-coded in the checker, transcribed from paper prose — so cutting
+prose breaks nothing mechanically, it orphans the check that existed to test
+the claim.
+
+### R1 — the boxed a(40) equation (180–183)
+The fourth printing of one 32-digit integer (abstract, box, tab:terms cell,
+tab:byheight40 column sum). No label, no ref, not parsed. Cut whole.
+
+### R2 — the n=34 symmetry counts in prose (775–776)
+R_90, R_180 and H at n=34, all three in tab:symcounts' n=34 row 65 lines below,
+and the R_90 vanishing rule already in that table's caption. Cut whole; zero
+verifier edits (the table is parsed, the prose was not).
+
+### R3 — the displayed OneSided(34) equation (296–300)
+A display whose value is the last cell of the table 20 lines below.
+**Salvage:** folded into the sentence it interrupted — "hence fifteen new
+terms, listed in Table~\ref{tab:onesided}", which also absorbs the following
+"Table~\ref{tab:onesided} lists them."
+
+### R4 — the D(32) parenthetical (785)
+Duplicate of tab:symcounts' n=32 D cell; the clause "D is exact through n=32"
+carries the point without the digits.
+
+### R5 — the n=18 hole counts in prose (894–895)
+Hole-free, one-hole and max-holes at n=18: the k=0 and k=1 cells of tab:holes'
+n=18 row plus its last populated column. **Salvage:** the OEIS-novelty sentence
+that followed (Superseeker check, b-files prepared) is kept — it is a claim,
+not a duplicate. Verifier untouched: `A_0(18)`, `A_1(18)` and `max holes at
+n=18` test `results/holes_n18.txt` against constants the retained table still
+claims.
+
+### R6 — the differential-approximant estimate of λ (238–242)
+The one numeric claim in the growth paragraph with no code path in the released
+checker, and it agrees with the fit it accompanies (7.110 against
+7.1108–7.1111; θ=−1.000 against −1.02..−1.03). The estimate λ≈7.111 stands on
+the fits, which are recomputed.
+
+### R7 — the denominator-structure footnote (949–958) — CONDITIONED
+Ten lines of subsidiary structure, whose atom-degree list `1,2,4,9,29,68,181`
+duplicates the first seven terms of the degree list at L1046 where they do real
+work.
+**Defender's correction, accepted:** my proposed salvage would have left
+"new-root contents" at L1046 without an antecedent and unanchored the verifier's
+`lifetime-3 atom degrees` check. The main-text replacement therefore (1) defines
+N_H as the denominator of the height-H strip generating function, (2) states the
+identity itself — exact-height counts are second differences of strip counts, so
+Q_H | N_{H-2}N_{H-1}N_H by construction — and (3) keeps the observed-not-proved
+caveat with its H≤7 scope. **R7 is verifier-neutral**; no check pruned.
+Dropped: the OEIS-novelty note on the two degree sequences.
+
+### R8 — the μ_H spot check (1011–1012)
+A ten-case numerical confirmation of the one fact among (i)–(iv) that is proved
+outright, by strict Perron–Frobenius submatrix monotonicity with a citation.
+
+### R9 — the "Rigorous lower bounds" paragraph (1091–1102) — CONDITIONED
+Lower bounds on three terms the paper now prints exactly; the paragraph itself
+concedes all three were later confirmed by Method C.
+**Condition, accepted:** the salvage retains the a(40) bound integer
+4266005101622209395058618248135, which keeps the `GF bound captures 7.5%` check
+anchored (not pruned) and keeps the computed-before-the-term-existed claim
+falsifiable. Four lines at the head of §9 replace twelve. Only the a(25) bound
+pair becomes paper-unanchored; not pruned.
+
+### R10 — the bilateral identity's proof (856–866) — CONDITIONED
+Eleven lines of stabilizer bookkeeping for one identity, in a report that
+states the Free and OneSided Burnside formulas without proof.
+**Condition, accepted:** the salvage carries both the mechanism ("a double count
+of animal–reflection incidences over D_4") and the empirical check ("checked
+numerically against every published term of A030234"). Verifier untouched — the
+identity survives as a statement and is still exercised at every n by
+`tab:companions bilat`.
+
+### R12 — the Method B→C speedup measurements (418–419) — CONDITIONED
+A benchmark against an engine that had already run out of memory; the same
+class of number phase 1 removed with the appendix.
+**Condition, accepted:** the H-dependence keeps one anchor — "growing with H, to
+~200× at H=16"; the 29×/H=12 endpoint goes.
+
+### R13 — the Bacher comparison (266–269) — CONDITIONED
+A superseded bound: 5.828 < 6.475 < 6.543.
+**Condition, accepted, and it corrects me:** my proposal targeted the sentence
+*and* `\bibitem{bacher}` while my own fallback kept the citation — the two are
+inconsistent and the bibitem must stay. Taken as the fallback: "It improves on
+the 3+2√2 available in closed form from Bacher's directed subclass~\cite{bacher}."
+The acknowledgment of prior art is not weakened further.
+
+### R14 — the ladder's cost-growth numbers (263–265) — CONDITIONED
+Resource telemetry of the kind phase 1 ruled out of the document.
+**Condition, accepted:** "the rungs gain about 0.05 each" survives — it is the
+convergence rate that explains the bracket's width, and it answers my own cost
+sentence. Only "cost grows ~3.5× per rung, reaching 11.8 GB at H=17" goes. The
+closed door ("stopped here rather than exhausted") survives, as proposed.
+
+### R15 — the hole-refined generating functions (965–966)
+A one-sentence result with no data, no consequence and no consumer.
+**Verifier:** the `G_{3,1}` numerator/denominator transcriptions were anchored
+only here (the paper displays no G_{3,1}); both pruned, 429 → 427. Seven further
+hole-GF checks (`c_3..c_7`, the H=7 order law, `H=8 k=0 order==1499`) were
+already paper-unanchored before this trim — the checker's own comment records
+that claim's retirement in July — and are left alone.
+
 ## Totals
 
 | stage | lines | bytes | verify_claims |
@@ -185,7 +297,9 @@ ruling.
 | commit 2 | 1279 | 69,690 | 441 |
 | commit 3 | 1262 | 68,506 | 439 |
 | commit 4 | 1233 | 66,745 | 429 |
+| commit 5 | 1194 | 64,229 | 427 |
 
-204 lines and 10,499 bytes removed (14.2% of the source), pdflatex clean at
-every stage (zero errors, zero undefined references, the same seven
-pre-existing hyperref Unicode-bookmark warnings).
+Phase 1 removed 204 lines and 10,499 bytes; phase 2 continues from there.
+pdflatex clean at every stage (zero errors, zero undefined references, the
+same seven pre-existing hyperref Unicode-bookmark warnings), and
+verify_claims green at every stage.
