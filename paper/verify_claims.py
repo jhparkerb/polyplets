@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Verify every arithmetic / algebraic claim in polyplets-report.tex.
 
+Beyond the paper's own claims, a small set of checks guards repository /
+release invariants the paper never prints (cuts-log flag 1, 2026-08-01):
+the six residual N_k checks, the seven hole-GF order-law checks (c_3..c_7,
+the H=7 order law, H=8 k=0 order==1499), "H<=10 captures 74.9% of a(19)",
+the a(25) bound pair, and the sym32 dmirror farm manifest.  These are
+deliberate: they pin banked data the paper's printed numbers are derived
+from, and they are labeled by their group names below.
+
 Exact integer/rational arithmetic only (stdlib Fraction); no external packages.
 Regenerates the hole tables and the 3^(H-1) closed form from build/g2, reads the
 b-files for the published terms, and checks the transcribed paper tables against
@@ -102,9 +110,10 @@ COVERAGE = {
     "symcount_1819": 4,
     "sym_companions": 132,
     "dmirror_strips": 30,
+    "sym32_farm": 3,
     "spine_mod3": 1,
     "byheight_h19": 32,
-}   # 252 of the 425 checks live in an optional group
+}   # 255 of the 428 checks live in an optional group
 
 # --- Table tab:terms (paper transcription) vs b-file ---
 TERMS = {1:1,2:4,3:20,4:110,5:638,6:3832,7:23592,8:147941,9:940982,10:6053180,
@@ -592,20 +601,50 @@ else:
     skip("symmetry/companions n<=34", COVERAGE["sym_companions"],
          "runs/sym34 or runs/sym32 absent and results/sym_counts.txt absent")
 
-# dmirror diagonal quasi-polynomials (tab:dmpk) and GF numerators N_k
-_cov = ok + bad
+# dmirror strip farm: parse, then manifest it (cuts-log flag 2, 2026-08-01).
+# A strip of exact span S first contributes at n=S, so the n<=24/28
+# prefix-matches upstream cannot see a missing high-S strip; only a direct
+# manifest of the farm can.
 strips = glob.glob(os.path.join(ROOT, "runs", "sym32", "dmirror.S*.out"))
 dd = None
+farm = {}
 if strips:
     dd = {}
     for f in strips:
         S = int(re.search(r"S(\d+)\.out", f).group(1))
+        rows = []
         for line in open(f):
             p = line.split()
             if len(p) == 2 and p[0].isdigit():
-                dd[(S, int(p[0]))] = int(p[1])
+                rows.append((int(p[0]), int(p[1])))
+        farm[S] = rows
+        for n, v in rows:
+            dd[(S, n)] = v
 elif SYMSTRIPS:
     dd = SYMSTRIPS
+
+_cov = ok + bad
+if strips:
+    chk("sym32 farm: strips S1..S32 all present",
+        sorted(farm) == list(range(1, 33)), f"have S={sorted(farm)}")
+    chk("sym32 farm: every strip starts at n=S with contiguous rows n<=32",
+        all(rows and rows[0][0] == S and rows[-1][0] <= 32
+            and [n for n, _ in rows] == list(range(S, S + len(rows)))
+            for S, rows in farm.items()))
+    D32 = load("runs/sym32/dmirror.out")
+    _sums = {}
+    for (S, n), v in dd.items():
+        _sums[n] = _sums.get(n, 0) + v
+    chk("sym32 farm: strip column sums == dmirror.out on every n=1..32",
+        all(_sums.get(n) == D32.get(n) for n in range(1, 33)),
+        f"mismatch at n={[n for n in range(1,33) if _sums.get(n)!=D32.get(n)]}")
+    covered("sym32 farm manifest", COVERAGE["sym32_farm"], _cov)
+else:
+    skip("sym32 farm manifest", COVERAGE["sym32_farm"],
+         "runs/sym32 strips absent (banked results/sym_counts.txt in use)")
+
+# dmirror diagonal quasi-polynomials (tab:dmpk) and GF numerators N_k
+_cov = ok + bad
 if dd:
     print("  dmirror strip source: "
           + ("runs/sym32 (live)" if strips else "results/sym_counts.txt (banked)"))
