@@ -4,8 +4,37 @@
 # brute-force, silent-wrong guards, combine/runfile integrity (see
 # AUDIT-2026-06-28.md). Install once with `make install-hooks`.
 #
+# Additionally run the FULL default `gates` chain (~10 min) when the push
+# touches anything beyond documentation. The fast subset is a curated
+# allowlist, and curated subsets have blind spots: the sym/symcount.py
+# deletion (754871a) broke bare `make` for 27 days while every push passed
+# ns-gate-fast. Fail closed: new refs and unrecognized paths get the full
+# chain.
+#
 # Genuine emergency bypass: `git push --no-verify` — then fix what you skipped.
 set -euo pipefail
 root="$(git rev-parse --show-toplevel)"
+zero=0000000000000000000000000000000000000000
+
+docs_only=1
+while read -r _lref lsha _rref rsha; do
+  [ "$lsha" = "$zero" ] && continue          # ref deletion: nothing to test
+  if [ "$rsha" = "$zero" ]; then
+    docs_only=0                              # new ref: no base to diff, fail closed
+    continue
+  fi
+  while read -r f; do
+    case "$f" in
+      *.md|*.tex|*.bib|*.txt|*.log|*.pdf|*.png|*.svg) ;;   # prose/assets only
+      *) docs_only=0 ;;                                    # scripts anywhere = code
+    esac
+  done < <(git -C "$root" diff --name-only "$rsha" "$lsha")
+done
+
 echo "pre-push: make ns-gate-fast"
-exec make -C "$root" ns-gate-fast
+make -C "$root" ns-gate-fast
+
+if [ "$docs_only" -eq 0 ]; then
+  echo "pre-push: push touches code — full 'make gates' (~10 min; emergency bypass: git push --no-verify)"
+  make -C "$root" gates
+fi
