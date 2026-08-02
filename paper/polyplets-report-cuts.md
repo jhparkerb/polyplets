@@ -508,6 +508,74 @@ the table by label, and re-adding a sentence phase 3 removed would undo an
 accepted cut. Defender confirmed. P2's caption condition was verified landed —
 tab:terms' caption reads "Tiers (Table~\ref{tab:tiers}): …".
 
+## Commit 10 — phase 5, word-level cuts (batch + BL2/BL5/BL6)
+
+The finest grain: individual words and short phrases inside surviving
+sentences. Adjudicated as one batch rather than per item. Line spans are
+positions in the post-phase-4 file (1123 lines, 59,891 bytes at feb1c81).
+Verifier-neutral; both proposals sitting inside sentences that carry a checked
+quantity were audited and neither touches the number or the qualifier the check
+tests (A1 near the injection shares, which are computed from tab:byheight40's
+body; A5 in the sentence carrying the a(40) GF-bound integer, where "while that
+term was out of reach" survives intact).
+
+**Applied — intensifiers:** A1 "at all" (injection paragraph), A2 "any"
+(formula-assistance sentence), A3 "very" (the sweep that produced T(40,21)),
+A4 "active" (the frontier is active by definition), A5 "still".
+
+**Applied — doubled qualifiers:** B1 "a single … at a time" → "one … at a
+time"; B2 "may only ever lose" → "may only lose" (claim-touching: the pruning
+admissibility claim is carried by "only").
+
+**Applied — wordy constructions:** C1 "are conjecture-assisted and are staged"
+→ "are conjecture-assisted, staged" (both halves of the T3 scope survive);
+C2 "what follows is where we depart from it" → "what follows departs from it".
+
+**Applied — filler:** D1 "in this paper"; D2 "thus".
+
+**Applied — repeated word:** E1 "the provenance and verification of those
+numbers" → "their provenance and verification".
+
+**Applied — borderlines the defender cleared:** BL2 "precisely" (the definite
+article carries the set-equality claim); BL5 "the data show, and" (one of two
+attributions of the same evidence; the stronger remains); BL6 "themselves" at
+the constants sentence.
+
+### prop D3 — PULLED, with refutation
+"completed" in "the completed $n=32$ farm prefix-matches both the $n\le24$
+oracle range and the earlier $n\le28$ run exactly."
+**Defender's refutation of my dependency reasoning, accepted:** I argued a farm
+that prefix-matches ran to completion. It does not follow. A strip of exact
+bounding box $S$ contributes only to $n\ge S$, so prefix-matching at $n\le24$
+and $n\le28$ cannot detect a missing high-$S$ strip; and the checker loads
+`runs/sym32/dmirror.out` as given. "completed" is therefore the document's only
+assertion that every strip of the farm was summed, and it stays.
+
+### Borderlines retained (one line each)
+- **BL1** "entirely" (L328): phase 4's T11 already traded away this sentence's
+  twin; "entirely different principle" is now the definitional strength claim
+  the \tierone{} tier rests on at the point Method B is introduced.
+- **BL3** "and uniform" (L399): "uniform" asserts identical application at every
+  $k$, which is what makes $P_{19}$'s exclusion rule-driven rather than ad hoc.
+- **BL4** "at all" (L505): an intensifier on self-criticism; removing it shifts
+  register on the paper's frankest admission of weak coverage.
+- **BL7** "at the meeting point of" (L86): an intersection claim, and it carries
+  the paired-citation structure that follows.
+
+### Erosion floors recorded
+- **C2:** "what follows departs from it" is the T14 departure marker in full.
+  No further compression; "what follows" is untouchable.
+- **D2** was approved on corrected grounds: the inference is carried by the
+  adjacent sentence, not by the phase-4 T11 claim I cited.
+
+### Coverage gap found (verify_claims.py)
+The D3 exchange surfaced an unverified gap: **nothing in the checker validates
+farm completeness for the $n=32$ diagonal-mirror strip farm.** `dmirror.out` is
+consumed as given, and the prefix-match checks that do run cannot see a missing
+high-$S$ strip. Not a trim item and not fixed here — logged with the
+paper-unanchored checks below as something the author may want a real check for
+(a per-strip manifest against the expected $S$ range would do it).
+
 ## Totals
 
 | stage | lines | bytes | verify_claims |
@@ -522,13 +590,15 @@ tab:terms' caption reads "Tiers (Table~\ref{tab:tiers}): …".
 | commit 7 | 1145 | 61,233 | 425 |
 | commit 8 | 1140 | 60,978 | 425 |
 | commit 9 | 1123 | 59,891 | 425 |
+| commit 10 | 1123 | 59,760 | 425 |
 
 Phase 1 removed 204 lines and 10,499 bytes; phase 2 a further 40 lines and
 2,538 bytes; phase 3 a further 53 lines and 3,229 bytes; phase 4 a further 17
-lines and 1,087 bytes. Running total: 314 lines and 17,353 bytes off the
-pre-trim document (21.9% of the lines, 22.5% of the bytes), with the verifier
-down 23 checks, every one of them pruned in the same commit as the claim it
-tested.
+lines and 1,087 bytes; phase 5 a further 131 bytes at unchanged line count
+(word cuts made in place, without rewrapping, so the diff stays readable).
+Running total: 314 lines and 17,484 bytes off the pre-trim document (21.9% of
+the lines, 22.6% of the bytes), with the verifier down 23 checks, every one of
+them pruned in the same commit as the claim it tested.
 pdflatex clean at every stage (zero errors, zero undefined references, the
 same seven pre-existing hyperref Unicode-bookmark warnings), and
 verify_claims green at every stage.

@@ -100,8 +100,8 @@ or \textbf{free} (up to all isometries); A006770 is the fixed count. The
 \emph{height triangle} $T(n,H)$ refines it, counting the $n$-cell animals of
 bounding-box height exactly $H$, so $a(n)=\sum_H T(n,H)$.
 
-This document is a \emph{computational report}: its claims are numbers, the
-provenance and verification of those numbers, and the structure found in
+This document is a \emph{computational report}: its claims are numbers,
+their provenance and verification, and the structure found in
 them. It reports $a(19)$ through $a(40)$ and the results that grew out of
 computing them. It is an amateur contribution carried out in collaboration
 with an AI assistant (Anthropic's Claude Code); the author set the goals,
@@ -151,7 +151,7 @@ rest on decorrelation rather than algorithmic independence.
     diagonal that no holdout can ever certify. \\
     \tierthree{} & Exact computation composed with a closed form that is
     fitted rather than derived. Used only for the $n=33$ companions; no
-    \tierthree{} value appears in this paper without its label. \\
+    \tierthree{} value appears without its label. \\
     \bottomrule
   \end{tabular}
   \caption{Confidence tiers used throughout.}
@@ -240,7 +240,7 @@ Bacher's directed subclass~\cite{bacher}.
 \paragraph{A rigorous upper bound on $\lambda$.}
 No upper bound on $\lambda$ appears in the literature. We obtain one by a
 Bui-style finite-type convolution certificate~\cite{bui2025}: mark a cell of the
-animal, case on the occupancy of a single neighbour at a time, and record the
+animal, case on the occupancy of one neighbour at a time, and record the
 resulting local patterns as a finite set of ``types'' whose generating functions
 satisfy a system of polynomial convolution inequalities
 $\varphi_T \le \varphi_{T'} + \varphi_{T'}\varphi_D$. A positive rational vector
@@ -297,7 +297,7 @@ Four counting methods (A--D) computed these numbers, with closed forms
 expensive and least populated cells. All engines share three disciplines: exact integer
 arithmetic; every production run re-derives \emph{all} smaller terms, so a
 regression anywhere in range is visible; and admissible pruning only (a prune
-may only ever \emph{lose} animals, so reproducing the published range
+may only \emph{lose} animals, so reproducing the published range
 certifies that it lost none).
 
 \subsection{Method A: direct enumeration (to $n=22$)}
@@ -319,7 +319,7 @@ bulk, compile-time neighbour offsets; ${\approx}2\times$ faster) run as a
 three-architecture fleet (ARM, x86, Apple silicon) extended the whole-row
 enumeration to $n=22$, byte-identical across machines and matching the
 transfer-matrix totals term for term. Direct enumeration and the transfer
-matrix are thus two independent algorithms agreeing through $a(22)$, which
+matrix are two independent algorithms agreeing through $a(22)$, which
 is the \tierone{} anchor.
 
 \subsection{Method B: the column transfer matrix (to $n\approx23$)}
@@ -393,7 +393,7 @@ Section~\ref{sec:heightdiag}, contributing $4.1\%$ of $a(40)$. The
 analogous split holds for the preceding terms, the injection boundary
 advancing as each new $P_k$ is certified (at $a(36)$: real sweep
 $H\!=\!3$--$19$, injection $5.6\%$); the range $n\le19$ contains no
-injected cells at all. Method C's cost is set by its tallest surviving
+injected cells. Method C's cost is set by its tallest surviving
 sweep height, which advanced only as each new diagonal was certified:
 $H=18$ through $a(34)$, $H=19$ for $a(35)$--$a(37)$, $H=20$ for
 $a(38)$--$a(39)$, $H=21$ for $a(40)$. The discipline governing injection is strict and
@@ -404,7 +404,7 @@ exactly (the newest diagonal is always swept for real once more before its
 formula is trusted), and only after surviving that live prediction is it
 injected for subsequent terms. Section~\ref{sec:confirm} gives the
 resulting holdout chain, and the one formula that never earned injection.
-Readers who want totals free of any formula assistance may sum
+Readers who want totals free of formula assistance may sum
 Table~\ref{tab:byheight40}'s rows $H\le21$ against the banked per-height
 data.
 
@@ -521,7 +521,7 @@ the earlier $n\le28$ run exactly.
         with the final term: the $a(40)$ run's real $H=21$ sweep
         reproduced the closed-form values $P_k(n)\,3^{n-1-3k}$ on every one
         of its rows $n=21$--$39$ simultaneously, re-confirming all nineteen
-        wired levels at a fresh point each, in the very sweep that produced
+        wired levels at a fresh point each, in the sweep that produced
         $T(40,21)$. The \tiertwominus{} grade attaches to $a(39)$ and
         $a(40)$: their top real cells $T(39,20)$ and $T(40,21)$ lie on
         diagonal $k=19$, and $P_{19}$, fitted from exactly these two
@@ -609,7 +609,7 @@ numerator degree at $2k+1$ over the pole $(1-3z)^{k+1}$; partial fractions
 then force the polynomial law with onset threshold $n\ge2k+1$ (the observed
 onset, now derived), and a $3$-adic bound on the change of basis gives the
 integrality. Cumulant linearity in $n$ is the residue resummation of the
-same identity. The constants themselves are finite local enumerations: the
+same identity. The constants are finite local enumerations: the
 level-$\le5$ coefficients are re-derived ab initio from the $31$ cluster
 types of surplus $\le5$, and the single-row cluster weight is exactly
 $(2s{+}1)^2$ for an $s$-cell row, of which $25=5^2$ is the $s=2$ case. What
@@ -652,7 +652,7 @@ governed by the cubic $W^3=W^2+t$
 Let $d(S,n)$ count the diagonal-mirror-fixed polyplets with $n$ cells and
 bounding box exactly $S\times S$ (the box is forced square). The minimal such
 animal is a bare diagonal, $n=S$, and there are exactly two ground states
-(main and anti-diagonal). On the diagonal $k=n-S$ the data show, and exact
+(main and anti-diagonal). On the diagonal $k=n-S$ exact
 difference tables confirm over every available point:
 \[
   d(S,\,S+k)\ \text{is quasi-polynomial in } S \text{ of period two and
@@ -689,7 +689,7 @@ $2k+3$ (odd). The pinned polynomials are Table~\ref{tab:dmpk}.
 
 The polynomials themselves remain computed and validated rather than
 derived. The sparse strips ($S\ge29$ at
-$n\ge33$) are precisely the RAM-expensive ones: one strip burned
+$n\ge33$) are the RAM-expensive ones: one strip burned
 ${\sim}62$ CPU-hours and $79$\,GB to produce the two numbers $d(31,31)=2$
 and $d(31,32)=38$ that $P_0$ and $P_1$ now supply directly. They replace
 the strips hardware cannot reach, at the price of the \tierthree{} label.
@@ -728,7 +728,7 @@ closed forms for the fifteen sparse cells):
   \text{A030235}(33)&=\num{9328935247549387670973679}\\
   \text{A194596}(33)&=\num{9328935102907028734392020}
 \end{align*}
-These are conjecture-assisted and are staged for OEIS as comments only,
+These are conjecture-assisted, staged for OEIS as comments only,
 never as b-file data.
 
 \begin{table}[H]
@@ -809,7 +809,7 @@ $2\times2$ bit-quad increments~\cite{gray}). The running $\chi$ tally is a
 sum of local contributions and is \emph{interpreted} only when an animal is
 complete, at which point every cavity is either enclosed by foreground (a
 hole) or open to the exterior (contributing nothing to $1-\chi$); an
-unfinished bay on the active frontier never enters a reported count, so no
+unfinished bay on the frontier never enters a reported count, so no
 open/closed disambiguation is required mid-sweep. The counts are
 byte-identical to an independent per-animal flood fill for $n\le14$.
 The triangle is exact through $n=18$; rows
@@ -873,7 +873,7 @@ that product is observed rather than proved, verified here for $H\le7$.
 The recovered GFs also give exact lower bounds $a(n)\ge\sum_{H\le10}T(n,H)$
 for any $n$: those for $a(25)$, $a(35)$ and $a(40)$ (the last
 $a(40)\ge\num{4266005101622209395058618248135}$) were each computed while
-that term was still out of reach, and all three are confirmed by the values
+that term was out of reach, and all three are confirmed by the values
 Method~C produced later (\texttt{paper/gf\_bound.py}).
 
 \subsection{The by-height generating function is not D-finite}
@@ -937,7 +937,7 @@ $\delta$, where each $c_\delta(x,N)$ is polynomial in $N$ of degree $\le r$
 and in $x$ of degree $\le D$, and where the $c_\delta$ jointly determine
 the $p_i$ (falling factorials of $N$ are linearly independent). This
 extraction is the opening move of Lemma~9 of~\cite{bmr2002}; what follows
-is where we depart from it. Anchor the
+departs from it. Anchor the
 window so that its top face is a level $H_0$: every other face refers to a
 lower height, where $G$ is finite at $x=1/\mu_{H_0}$ by (iii), while
 $G_{H_0}$ has a pole there, so the top coefficient vanishes at
