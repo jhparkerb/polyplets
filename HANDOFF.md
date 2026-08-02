@@ -563,6 +563,48 @@ newest first:
 Untracked in the tree and NOT ours to touch: `paper/technical-report.tex`
 (+ live `.swp` — jasonp editing).
 
+## Sessions 2026-08-01 (cont.) + 2026-08-02 — paper trim, release flags closed
+The section above was saved mid-day (79ac9c7); ~28 commits followed, all
+local, NOT pushed. Newest first:
+
+- **2026-08-02: both cuts-log release-integrity flags CLOSED (2cad8f2).**
+  (1) `paper/verify_claims.py`'s docstring now names the 18 repo-invariant
+  checks it guards beyond the paper and why they stay; (2) new fail-closed
+  "sym32 farm manifest" coverage group — S1..S32 all present, every strip
+  starts at n=S with contiguous rows, column sums reproduce `dmirror.out`
+  on every n. Red-tested on a farm copy with S31 deleted: trips exactly at
+  n=31,32, the band the n≤24/28 prefix-matches cannot see. verify_claims
+  now **428/428, 0 skipped**.
+- **2026-08-02: strip-mu note's false vbits rationale corrected (802277d).**
+  The H=17 receipt (vbits=110, vrange_bits=134.8) refutes the note's
+  "every rung ran with vbits ≥ vrange" — unattainable at any `--digits`
+  (cap = 126 − 6 − log2(10^d), max ~116); the clamped eigenvector tail
+  concedes ~0.0035 (6.543 certified vs 6.5464870 float). Bound valid;
+  harvest would need ≥192-bit accumulators, not pursued. This was the
+  first live finding from the (deleted-at-jasonp's-request) results
+  dependency map. The second — λ ≤ 9.3153 is Lean-conditional on the
+  named RD=3 hypotheses, unconditional Lean upper bound only 3125/256 —
+  needs no fix: PROOF-STATUS.md states it plainly and the paper claims
+  only exact-arithmetic checkability (true via the Python certificate).
+- **polyplets-report.tex trimmed, two campaigns (2026-08-01).** First wave
+  (3d4d6be..d9901d0, 14 commits): abstract rebalanced, one canonical
+  telling of the holdout discipline, benchmark appendix / reach section /
+  dm apparatus cut, λ bounds state the bound not the rungs, em-dash
+  density 76→6, rhetorical closers stripped. Then the remover/defender
+  adversarial trim (d1bd54c..218a1ed, 11 commits, six phases):
+  1437→1122 lines (−21.9%), verify_claims 448→425 with each check pruned
+  in the same commit as its claim, pdflatex + verifier green at every
+  stage. **Audit trail: `paper/polyplets-report-cuts.md`** — every cut
+  with the winning argument, twelve contested-retained items, standing
+  erosion floors (fitted-vs-derived sentence, T2⁻-marking family, T14
+  departure marker).
+- **Papers sweep closed (d161f3f..967138a, 040815c).** Northcott
+  criterion traced to BM-R 2002 Lemma 9; forward citation crawl plus the
+  two discriminating Scholar searches return zero collision; six
+  lattice-animal papers filed; oh-cluster and implicit-vector threads
+  ruled out; **strip frontier is non-crossing** banked as a new fact
+  (cdab5fb); holes n≥20 NO-GO recorded (1c30be9).
+
 ## Remaining work ledger
 1. **Paper final read-through.**
 2. **Viva cold retakes**, then %C authorship pass (jasonp's own words), then jasonp submits.
@@ -583,13 +625,16 @@ Read this file, then `MEMORY.md`'s index (auto-loaded) for standing practices. N
 thread needs immediate action; pacing is jasonp's (viva retakes, whether to merge the
 unmerged engine branches, whether to revisit a(37)+ compute given the reach ceiling).
 
-**Pre-publication list as of 2026-08-01** — the two Claude-side items are done
-(Northcott/citation crawl, concatenation upper bound: both closed, no paper
-claim changed except a strengthening citation). What is left is the ledger
-above, and the live items are jasonp's: paper final read-through (the two
-`technical-report.tex` placeholders are now filled — a(40) is literal in both
-the abstract and `tab:an`, and `verify_technical_report.py` reports 781
-checks, 0 failures), viva cold retakes → %C authorship pass → OEIS submit,
-and [JP] lessons-learned sections. Holes n≥20 is CLOSED no-go. Optional
-literature belt-and-braces, also his: MathSciNet or Scholar Cited-by on
-BM-R 2002.
+**Pre-publication list as of 2026-08-02** — Claude-side items ALL done:
+Northcott/citation crawl, concatenation upper bound, the polyplets-report
+trim (cuts log = audit trail), both cuts-log release-integrity flags
+(sym32 farm manifest + verify_claims docstring, 2cad8f2), and the
+strip-mu vbits rationale correction (802277d). verify_claims 428/428.
+What is left is the ledger above, and the live items are jasonp's: paper
+final read-through (the two `technical-report.tex` placeholders are now
+filled — a(40) is literal in both the abstract and `tab:an`, and
+`verify_technical_report.py` reports 781 checks, 0 failures), viva cold
+retakes → %C authorship pass → OEIS submit, and [JP] lessons-learned
+sections. Holes n≥20 is CLOSED no-go. Optional literature
+belt-and-braces, also his: MathSciNet Cited-by on BM-R 2002 (the two
+discriminating Scholar searches came back zero, 040815c).

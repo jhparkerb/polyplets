@@ -716,7 +716,7 @@ Binding on any future trimming of this file:
   rather than exhausted", the single-machine admission, the Klazar limitation,
   the novelty hedge, the T3 labels.
 
-## Release-integrity flags (deferred past phase 5, not fixed)
+## Release-integrity flags (deferred past phase 5 — BOTH CLOSED 2026-08-02, commit 2cad8f2)
 
 Both are about `paper/verify_claims.py`, not the document, and both should be
 settled before release rather than by a trimming pass:
