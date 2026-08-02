@@ -353,14 +353,6 @@ only when its boundary is a single component. Partial states that can never
 reconnect are pruned. A size-budget prune drops any state whose cells-so-far
 plus an \emph{admissible} lower bound on cells-still-needed exceeds $n$.
 
-Concretely, a state is a fixed-width byte string: one byte per strip row
-holding the cell's connected-component label ($0$ for empty), with labels
-\emph{canonically renumbered in first-occurrence order} after every
-transition (the normalization that prevents equivalent partitions from
-proliferating as distinct states), plus the two touch flags; the value
-attached to a state is its vector of counts by size (layout in
-\texttt{core/signature.h}).
-
 Method B confirmed $a(19)$ against Method A (byte-identical totals) and
 carried the sequence into the early twenties before its state space, which
 keeps a whole column of connectivity alive per step, outgrew memory.
@@ -374,9 +366,12 @@ so the frontier is a staircase---$r$ cells of the new column above $H-r$
 cells of the old---plus one retained north-west \emph{carry} cell, kept
 because king adjacency lets the next cell reach diagonally back across the
 kink in the staircase; without it the step would sever connectivity
-information the lattice still provides. The state encoding is as in
-Method~B (canonical component-label bytes over the staircase cells and the
-carry, touch flags, counts), and each transition decides a single cell,
+information the lattice still provides. A state is a fixed-width byte
+string: one component label per staircase cell and carry ($0$ for empty),
+renumbered in first-occurrence order after every transition so that
+equivalent partitions cannot proliferate as distinct states, plus the two
+touch flags and the vector of counts by size (layout in
+\texttt{core/signature.h}). Each transition decides a single cell,
 resolving connectivity by union--find over its at-most-three placed
 neighbours. The finer step multiplies the number of transitions but shrinks
 the live state space and, decisively, the volume that must be reshuffled

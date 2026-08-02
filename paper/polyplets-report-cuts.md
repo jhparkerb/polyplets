@@ -424,6 +424,21 @@ algorithm pairs cover which part of the T1 range, so cutting it would
 misattribute the a(20)–a(22) anchor to the Method A/B pairing that only reaches
 a(19).
 
+## Commit 8 — phase 3, the contested cut (P11)
+
+### prop P11 — Method B's state-encoding paragraph (376–382) — CONTESTED, CUT IN FALLBACK FORM
+Implementation detail for the engine that ran out of memory.
+**Defender's contest:** (a) Method C's "The state encoding is as in Method B"
+would dangle, pointing at a description that no longer exists; (b) my own
+proposal admitted the canonical-renumbering rationale is the single most useful
+implementation sentence in the paper. **Ruling:** cut in fallback form, bias to
+remove — Method C's parenthetical absorbs both the renumbering rationale and the
+\texttt{core/signature.h} pointer, and its sentence is made self-contained
+rather than cross-referential. "Canonical" remains true and explained.
+Theorem 3's irreducibility argument leans on the boundary-signature definition
+in §4.2's first paragraph, which is untouched.
+**Net:** small (~2 lines), by design.
+
 ## Totals
 
 | stage | lines | bytes | verify_claims |
@@ -436,9 +451,13 @@ a(19).
 | commit 5 | 1194 | 64,229 | 427 |
 | commit 6 | 1193 | 64,207 | 425 |
 | commit 7 | 1145 | 61,233 | 425 |
+| commit 8 | 1140 | 60,978 | 425 |
 
 Phase 1 removed 204 lines and 10,499 bytes; phase 2 a further 40 lines and
-2,538 bytes; phase 3 continues from there.
+2,538 bytes; phase 3 a further 53 lines and 3,229 bytes. Running total: 297
+lines and 16,266 bytes off the pre-trim document (20.7% of the lines, 21.1%
+of the bytes), with the verifier down 23 checks, every one of them pruned in
+the same commit as the claim it tested.
 pdflatex clean at every stage (zero errors, zero undefined references, the
 same seven pre-existing hyperref Unicode-bookmark warnings), and
 verify_claims green at every stage.
