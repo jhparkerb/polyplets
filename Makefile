@@ -26,7 +26,10 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 G2CXX := $(shell command -v clang++-19 2>/dev/null || command -v clang++ 2>/dev/null || echo $(CXX))
 G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),,-Wno-error=restrict)
 
-.PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast clean install \
+.PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
+        gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
+        gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
+        gate-compile-db clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
@@ -36,7 +39,18 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert gate-strip-fast
+gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+
+# Gate COMPILE-DB: clangd's compile_commands.json must be complete and honest.
+# A missing or wrong entry is invisible to every other gate (they use the
+# Makefile's own flags) but makes the editor report phantom errors in correct
+# code -- the failure this gate was written after was cpp/*.cpp missing from
+# the DB entirely, so clangd could not find <gmpxx.h> or "obs.h" and cascaded
+# fake "unknown type name 'mpz_class'" through every use. Regenerates first,
+# so it also catches a .cpp added without rerunning `make compile-commands`.
+# Syntax-only: ~11 s.
+gate-compile-db: compile-commands
+	./scripts/check_compile_commands.sh
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
@@ -172,9 +186,115 @@ build/subgraph_count: cpp/sym/subgraph_count.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
 # Cone anchor: directed king animals by enumerate+filter vs Bacher's closed form
-# (results/directed-cone-anchor.md). -Icpp for obs.h.
+# (results/directed-cone-anchor.md). Also the docs/middle-kingdom-plan.md Phase 0
+# 16-cell grid mode ("grid"/"gridbad") and Phase 1c's multi-directed filter
+# ("mdir"/"mdirbad", results/multi-directed.md). -Icpp for obs.h.
 build/directed_cone_anchor: cpp/directed_cone_anchor.cpp cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread -Icpp $< -o $@
+
+# Gate KING-GRID: docs/middle-kingdom-plan.md Phase 0 -- the 16-cell grid mode
+# vs the plan's reference table + RED controls (existing + gridbad staircase).
+gate-king-grid: build/directed_cone_anchor
+	python3 tests/gate_king_grid.py
+
+# Gate SITE-PERIM: docs/middle-kingdom-followups-plan.md Phase 4a -- the
+# grid-mode min-reduce of site perimeter (KING adjacency, minSPKing) vs the
+# 4k+4 perfect-square hand check and an independent oracle (build/g2's
+# square8 lattice, same population/convention, different code), plus the
+# rook-adjacency RED control (minSPRook) which must diverge.
+gate-site-perim: build/directed_cone_anchor build/g2
+	python3 tests/gate_site_perim.py
+
+# Gate MULTIDIRECTED: docs/middle-kingdom-plan.md Phase 1c -- Bacher's
+# Definition 2 brute force ("mdir") vs the Theorem 8 generating function, plus
+# the RED controls (keystone condition dropped; "control B") and the
+# 6.4752-not-6.118 growth-constant trap. results/multi-directed.md.
+gate-multidirected: build/directed_cone_anchor
+	python3 tests/gate_multidirected.py
+
+# GMP (mpz_class/gmpxx): headers live in /usr/include on Linux, /opt/local on
+# macOS/MacPorts. AUTO-DETECTED same as zstd above -- if the dev header is
+# absent, convex_area_tm is skipped rather than failing the whole `make`.
+ifeq ($(shell uname -s),Darwin)
+  GMP_HDR := /opt/local/include/gmpxx.h
+else
+  GMP_HDR := /usr/include/gmpxx.h
+endif
+ifneq ($(wildcard $(GMP_HDR)),)
+  GMP_CFLAGS := -DPOLY_GMP
+  GMP_LDFLAGS := -lgmpxx -lgmp
+  ifeq ($(shell uname -s),Darwin)
+    # -isystem, not -I: gmpxx.h itself trips -Wdeprecated-literal-operator
+    # under -Werror (old-style operator"" _mpz spacing) -- not our code to fix.
+    GMP_CFLAGS  += -isystem /opt/local/include
+    GMP_LDFLAGS := -L/opt/local/lib -lgmpxx -lgmp
+  endif
+else
+  GMP_CFLAGS :=
+  GMP_LDFLAGS :=
+  $(info NOTE: gmpxx dev header not found ($(GMP_HDR)); convex_area_tm skipped)
+endif
+
+# HV-convex-by-area transfer matrix, C++/GMP port of experiments/convex_tm.py
+# (docs/middle-kingdom-plan.md Phase 1a -- Python's N^4-DP-steps x N-digit-bigint
+# cost is too slow past n~200; this is a straight translation onto mpz_class).
+ifneq ($(GMP_LDFLAGS),)
+build/convex_area_tm: cpp/convex_area_tm.cpp cpp/obs.h | build
+	$(CXX) $(CXXFLAGS) -O3 -Icpp $(GMP_CFLAGS) $< -o $@ $(GMP_LDFLAGS)
+
+# HV-convex-by-semiperimeter exact-box transfer matrix, C++/GMP port of
+# experiments/convex_perimeter.py (docs/middle-kingdom-plan.md Phase 1b).
+build/convex_perim_tm: cpp/convex_perim_tm.cpp cpp/obs.h | build
+	$(CXX) $(CXXFLAGS) -O3 -Icpp $(GMP_CFLAGS) $< -o $@ $(GMP_LDFLAGS)
+
+# Column transfer matrix for the column-convex cells of the Phase 3 grid
+# (docs/middle-kingdom-plan.md, results/middle-kingdom-phase3.md): directedness
+# on a column-convex animal is a condition on the bottom profile alone.
+build/middle_kingdom_tm: cpp/middle_kingdom_tm.cpp cpp/obs.h | build
+	$(CXX) $(CXXFLAGS) -O3 -Icpp $(GMP_CFLAGS) $< -o $@ $(GMP_LDFLAGS)
+endif
+
+# Gate MIDDLE-KINGDOM: docs/middle-kingdom-plan.md Phase 3 -- the column
+# transfer matrix for every column-convex grid cell vs Phase 0's brute-force
+# 16-cell table, the A187077/A007052/convex-polyplet positive controls, and
+# the loosened-predicate RED controls. Needs GMP; skipped without it.
+gate-middle-kingdom: $(if $(GMP_LDFLAGS),build/middle_kingdom_tm)
+	python3 tests/gate_middle_kingdom.py
+
+# P-recurrence / algebraic-relation exclusion mod p (no GMP: the series terms
+# are reduced mod p on the way in). docs/middle-kingdom-plan.md Phase 2a.
+build/prec_guess: cpp/prec_guess.cpp cpp/obs.h | build
+	$(CXX) $(CXXFLAGS) -O3 -Icpp $< -o $@
+
+# Gate CONVEX-DFINITE: the sharpened order<=20/degree<=20 non-D-finite verdict
+# for HV-convex animals by area, king and edge-adjacent, plus the growth
+# constants. Deliberately does NOT depend on build/convex_area_tm (GMP is
+# optional here): the series files are in the tree, and the gate skips only
+# the transfer-matrix oracle when GMP is absent. ~4 s.
+gate-convex-dfinite: build/prec_guess
+	python3 tests/gate_convex_dfinite.py
+
+# Gate MK-DIR4-PERIM: docs/middle-kingdom-followups-plan.md Phase 2a -- the
+# dir4 mode of convex_perim_tm (HV-convex king animals by semiperimeter,
+# filtered to half-plane-4-cone-directed, Proposition 2 of
+# results/middle-kingdom-phase3.md translated onto the row-built transfer
+# matrix) vs directed_cone_anchor's "gridperim" brute force, the RED control
+# (dir4bad, the plan's own "non-strict decrease" example), and the termwise
+# dir4<=hv sanity check. Needs GMP for convex_perim_tm; skipped without it.
+gate-mk-dir4-perim: $(if $(GMP_LDFLAGS),build/convex_perim_tm) build/directed_cone_anchor
+	python3 tests/gate_mk_dir4_perim.py
+
+# Gate DIR4-PERIM-ALG: docs/middle-kingdom-followups-plan.md Phase 2b -- the
+# (dir4, HV-convex)-by-semiperimeter generating function is ALGEBRAIC of
+# degree 4 (results/convex-polyplets.md). Pins the quartic coefficient for
+# coefficient, its minimality in both directions, the nullity law a genuine
+# minimal relation obeys, and the negative/null controls that keep the
+# guesser honest about a positive verdict. Series files only, no GMP. ~8 s.
+# The null control is not a file in the tree: the gate re-cuts it into build/
+# from results/convex_area_terms_n700_king.txt on every run, and stops RED if
+# that source is missing or does not start with its banked prefix.
+gate-dir4-perim-alg: build/prec_guess
+	python3 tests/gate_dir4_perim_alg.py
 
 # Gate S2: free/one-sided Burnside counts vs A000105/A030222 (oracle-grade)
 gate-s2:
