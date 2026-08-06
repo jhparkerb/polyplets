@@ -97,8 +97,11 @@ are two instances of it.
 hypothesis `MoatBound`**. That conditionality is a formalization gap, not a
 mathematical one: (II') is proved on paper by the moat-cycle winding argument
 (`results/maxhole-proof.md`), and mathlib has no discrete-Jordan material to
-carry it. The genuinely open item is the *multi-hole* reduction, which the Lean
-file does not attempt.
+carry it. The *multi-hole* reduction the Lean file does not attempt is no
+longer open either (`results/maxhole-proof.md` §The union argument, 2026-08-06)
+— but formalizing it would mean assuming the grid isoperimetric inequality for
+arbitrary finite subsets, a bigger hypothesis than `MoatBound`, so the file
+stays as it is.
 
 ## What it does not certify
 

@@ -82,12 +82,15 @@ k!-minimality refuted — in `results/converse-sweep.md`, 2026-07-31.)
 
 ## Theorems already set up (to prove together)
 
-### T3. Max enclosed hole area $M(n)=\mathrm{round}((n-2)^2/8)$
-Reduced (`results/maxhole-proof.md`) to one lemma: a king-connected closed curve
-enclosing a single hole of diagonal extent $h_a\times h_m$ uses $\ge h_a+h_m+2$
-cells. Construction (diamond ring) done for $n\equiv0\bmod4$; the lemma is a
-winding-number / discrete-Jordan-curve count. Both sub-lemmas verified on ~2400
-shapes.
+### T3. Max enclosed hole area $M(n)=\mathrm{round}((n-2)^2/8)$ — **CLOSED, and not ours**
+**2026-08-06.** It is the grid isoperimetric inequality: Sieben 2008 Thm 4.1
+gives the single-hole half verbatim, and Altshuler et al. 2006 give the same
+minimum for an *arbitrary finite subset* of $\mathbb{Z}^2$, which applied to the
+union of all the holes gives the all-holes half in three lines
+(`results/maxhole-proof.md` §The union argument). The repo's own chain — the
+$(I')$ parity count, the $(II')$ moat-cycle winding argument, the diagonal-box
+construction — stands as an independent reproof of the single-hole half. Cite,
+do not claim.
 
 ### T4. $N_k(\pm1)=(\pm2)^k$ for the diagonal-mirror numerators
 The paper conjectures the dmirror diagonal GF $G_k=N_k/((1-x)^{k+1}(1+x)^k)$ has

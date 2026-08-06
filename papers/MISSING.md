@@ -8,7 +8,15 @@ Format: `Author(s), "Title," Venue Vol (Year) pages. DOI/ID. — why we want it.
 
 ## High priority
 
-_(none outstanding — Barequet–Moffie 2007 and Mertens 1990 obtained 2026-06-25)_
+_(none outstanding.)_
+
+_Cleared: Barequet–Moffie 2007 and Mertens 1990, obtained 2026-06-25. Sieben
+2008 and Altshuler et al. 2006, obtained 2026-08-06 — both read the same day
+and both now in `papers/`. They answered more than was asked: Sieben's Thm 4.1
+is M(n) verbatim rather than inverted, the two papers' statements do coincide
+(checked at every k ≤ 200,000 in `experiments/maxhole_sieben_check.py`), and
+Altshuler et al.'s no-connectivity hypothesis closed the multi-hole case
+outright — `results/maxhole-proof.md` §The union argument._
 
 ## Medium priority (the last unchecked ancestor of the phase-block decomposition)
 

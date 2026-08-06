@@ -405,7 +405,15 @@ spine digit-product on all in-band cells).
   Open: onset sharpness for general k (non-cancellation). (Monomial
   integer coefficients: retracted, false at every k ≥ 2 —
   AUDIT-2026-07-30 P8; the true statement is k!·P_k ∈ ℤ[n], proved.)
-- **Max-hole theorem M(n)=round((n−2)²/8) — STAGED for later examination**
+- **Max-hole theorem M(n)=round((n−2)²/8) — CLOSED 2026-08-06, AND NOT OURS.**
+  Both halves are the grid isoperimetric inequality: Sieben 2008 Thm 4.1 is the
+  single-hole statement verbatim, and Altshuler et al. 2006 prove the same
+  minimum for an *arbitrary finite subset* of ℤ², which applied to the union of
+  all the holes closes the multi-hole case in three lines
+  (`results/maxhole-proof.md` §The union argument; both PDFs now in `papers/`).
+  It ships as a cited corollary plus our n ≤ 17 enumeration; the repo's own
+  chain is an independent reproof, kept as a check.
+  *Superseded account of the same item, from 2026-07:*
   (`results/maxhole-proof.md`, figs `results/figs/maxhole_{ring,seal}.svg`, checker
   `experiments/maxhole_proof_check.py`). Near-complete proof: construction = diagonal
   diamond ring (done for n≡0 mod 4); upper bound reduced to **one open lemma (II')

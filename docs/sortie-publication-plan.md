@@ -103,9 +103,11 @@ Contents:
   c ≈ n/2 is the *mechanism* behind λ ≈ 7.11 ≫ 4.06 — the natural "what does
   this population look like" section straight after the count.
 - **Maximum enclosed hole area**, M(n) = ⌊((n−2)²+4)/8⌋, riding with the hole
-  table already in the report — **only if the one open lemma closes**
-  (`results/maxhole-proof.md`). The hole-fill bijection is three sentences and
-  rides along with it.
+  table already in the report. **Unconditional as of 2026-08-06**, and **not
+  ours**: both halves are the grid isoperimetric inequality (Sieben 2008,
+  Altshuler et al. 2006), so it goes in as a cited corollary plus our n ≤ 17
+  enumeration — `results/maxhole-proof.md`. The hole-fill bijection is three
+  sentences and rides along with it.
 - The differential-approximant growth estimate λ = 7.110(1), θ = −1.000(1)
   (`results/series-analysis-da.md`) as a paragraph, replacing the current stub.
 

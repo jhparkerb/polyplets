@@ -49,13 +49,15 @@ control, its gate and its second source.
 | 8 | λ ≥ a(40)^(1/40) = 6.2208413587750324 | 2 | Lean `a_supermul` → `lambda_gt_of_banked` (standard axioms only) | `lake build`; the guard is in `AuditOutworks.lean` |
 | 9 | component stratification, C(n,1) = C(n,n) = A001168 | 1 | `results/component-stratification.md`, the 45°-sublattice bijection | brute force n ≤ 14 in that note |
 | 10 | λ = 7.110(1), θ = −1.000(1) | 4 | `results/series-analysis-da.md` | differential approximants on the 40 terms; label as an estimate |
-| 11a | M_single(n) = ⌊((n−2)²+4)/8⌋, one hole | 1 | `results/maxhole-proof.md`: (I') parity count, (II') moat-cycle winding argument, uniform box construction | `experiments/maxhole_moat_check.py` (3,927 animals), `maxhole_box_construction.py` (n ≤ 60) |
-| 11b | M(n) = ⌊((n−2)²+4)/8⌋, all holes | **conditional** | same note; routes through the master inequality, open | state conditionally or omit. The merge route was refuted 2026-08-06 (`experiments/maxhole_merge_probe.py`) |
+| 11a | M_single(n) = ⌊((n−2)²+4)/8⌋, one hole | 1, **not ours** | **Sieben 2008 Thm 4.1** (σ(e) = ⌊e²/8 − e/2 + 1⌋) verbatim, not even inverted — `results/maxhole-proof.md` §The literature. Our (I')/(II')/moat-cycle chain is an independent reproof | `experiments/maxhole_sieben_check.py` (the identification, with a RED control); `maxhole_moat_check.py` (3,927 animals), `maxhole_box_construction.py` (n ≤ 60) |
+| 11b | M(n) = ⌊((n−2)²+4)/8⌋, all holes | 1, **not ours** | **PROVED 2026-08-06** — `results/maxhole-proof.md` §The union argument: **Altshuler et al. 2006** prove the same minimum for an arbitrary finite subset of ℤ², so applying it to the union of all the holes is three lines. The overlap count is dissolved, not answered | same script: the two papers' minima agree at every k ≤ 200,000, and no ≥2-component subset (k ≤ 10) beats it |
 | 12 | the hole-fill bijection | 1 | `results/hole-fill-interior-cell-identity.md` | exact, three sentences |
 
-Row 11b is the only one that must not ship as an unqualified result; 11a is a
-theorem and the Lean file's conditionality (`MoatBound`) is a formalization
-gap, not a mathematical one. Rows 1–4 are the
+Rows 11a and 11b are both theorems as of 2026-08-06, and both belong to the
+isoperimetry literature: they ship **with citations, not as new results**. What
+is ours there is the question and the enumeration. The Lean file's
+conditionality (`MoatBound`) is a formalization gap, not a mathematical one.
+Rows 1–4 are the
 tier-4 core and are covered in detail by `docs/paper1-reproducibility.md`,
 including the coverage figures (57.2% / 72.2% / 95.4%) and the mass split
 (95.9% of a(40) enumerated, 4.1% composed from held-out closed forms).

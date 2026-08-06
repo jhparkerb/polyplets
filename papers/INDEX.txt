@@ -170,6 +170,21 @@ Growth-rate bounding methods (obtained 2026-08-01, for the lambda <= 9.3153 push
                                            Burnside for the symmetry classes. Cite the 2004 paper for
                                            the phase blocks, this one for the building blocks.
 
+Grid isoperimetry (the source of the maxhole formula, results/maxhole-proof.md):
+  sieben_2008_minimum_site_perimeter.pdf   Sieben, Polyominoes with minimum site-perimeter and full set
+                                           achievement games, European J. Combin. 29(1) (2008) 108-117.
+                                           Obtained 2026-08-06. Thm 4.1: sigma(e) = floor(e^2/8 - e/2 + 1)
+                                           is M(n) verbatim; Thm 5.3: eps(s) = ceil(2 + sqrt(8s-4)).
+                                           Connected animals, holes allowed, up to congruence.
+  altshuler_etal_2006_minimal_perimeter_polyominoes.pdf
+                                           Altshuler, Yanovsky, Vainsencher, Wagner & Bruckstein, On
+                                           minimal perimeter polyminoes, DGCI 2006, LNCS 4245, 17-28.
+                                           Obtained 2026-08-06. Same numbers (Thm 1) for an ARBITRARY
+                                           finite subset of Z^2 -- no connectivity hypothesis, which is
+                                           what closes our multi-hole case (union of all the holes).
+                                           Thm 7 (sec 3.1) is a self-contained reproof; sec 3.2 does the
+                                           8-connectivity metric.
+
 Distributed-computing background (engine design era):
   dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).
   afrati_dassarma_2013_mapreduce_cost_bounds.pdf  Afrati et al., MapReduce cost bounds.

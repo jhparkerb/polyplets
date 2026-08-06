@@ -5,26 +5,126 @@ king-polyplets, 4-connected background. Confirmed exact by `g2 --maxhole` for
 n≤17 (`results/maxhole.txt`); M(17)=28 matched the prediction. Machinery/
 verification: `experiments/maxhole_proof_check.py`.
 
-**STATUS (corrected 2026-08-06).** This header used to read "a near-complete
-proof, reduced to one clean open lemma", and that sentence has been stale since
-2026-07-12. It is stale in both directions, so the state is worth stating once,
-here, at the top:
+**STATUS (2026-08-06, third correction the same day, both papers now read).**
+The theorem is **not ours, and it is no longer open**. Both halves are the
+grid isoperimetric inequality, cited:
 
-- **Single hole: a two-sided theorem.** (II'), the crux the header meant, was
-  PROVED by the moat-cycle argument below; with (I') and the uniform box
-  construction, `M_single(n) = ⌊((n−2)²+4)/8⌋` for every n ≥ 4. What is owed is
-  write-up rigor on step 1's contour construction, not mathematics.
-- **All holes: still open**, and this is the lemma a citation would rest on.
-  It routes through the master inequality and its peeling lemma, whose two
-  sub-lemmas are verified and unproved.
+- **Single hole: a cited theorem.** `M_single(n) = ⌊((n−2)²+4)/8⌋` for every
+  n ≥ 4. It is Sieben 2008 Theorem 4.1 *verbatim* — `σ(e) = ⌊e²/8 − e/2 + 1⌋`,
+  the maximum size of an animal of site-perimeter e — not even inverted.
+  (I'), (II') and the moat-cycle argument below reprove it from scratch, which
+  is worth keeping as an independent check and is not worth claiming.
+- **All holes: PROVED (2026-08-06), and also not ours.** Altshuler, Yanovsky,
+  Vainsencher, Wagner & Bruckstein (DGCI 2006) prove the same minimum for an
+  **arbitrary finite subset of ℤ²**, with no connectivity hypothesis. Apply it
+  to the union of *all* the holes at once and the multi-hole bound is three
+  lines (§The union argument). The overlap-counting question this note stopped
+  on yesterday does not need answering: it was an artefact of bounding each
+  hole separately.
 - **Lean** (`Polyplets/HolesUpper.lean`) takes (II') as the named hypothesis
   `MoatBound`, since mathlib has no discrete-Jordan material to build the
   winding argument on. So `maxhole` is conditional there even though the paper
-  proof is complete.
+  proof is complete. The union argument would need the isoperimetric
+  inequality itself as a hypothesis instead — not obviously an improvement in
+  Lean, and not attempted.
 
-A paper may state the single-hole theorem outright and must state the
-all-holes version as conditional. `docs/provenance-tables.md` Paper 1 row 11
-says the same thing.
+A paper may state both halves outright **with the citations, not as new
+results**. What remains ours is the *question* — nobody in the polyomino-hole
+literature seems to have asked for maximum hole area — plus the enumeration
+that confirms it to n = 17, and the reproofs.
+
+## The literature: M(n) is Sieben's σ, verbatim (2026-08-06, both papers read)
+
+The **site-perimeter** of a polyomino is the number of empty cells edge-adjacent
+to it. Sieben 2008 gives both directions, for polyominoes (edge-connected, holes
+allowed, the paper's own convention):
+
+> **Theorem 4.1 (Sieben 2008).** For e ∈ {4, 6, 7, 8, …}, the maximum size of an
+> animal of site-perimeter e is `σ(e) = ⌊e²/8 − e/2 + 1⌋`.
+>
+> **Theorem 5.3 (Sieben 2008).** The minimum site-perimeter of an s-cell animal
+> is `ε(s) = ⌈2 + √(8s−4)⌉`.
+
+**σ is M on the nose** — `⌊e²/8 − e/2 + 1⌋ = ⌊((e−2)²+4)/8⌋`, no inversion, no
+rounding convention. (e = 5 is outside Theorem 4.1's domain, since no animal has
+site-perimeter 5; M(5) = σ(4) = 1 anyway, so the closed form needs no case
+split. σ is strictly increasing, Sieben Lemma 4.2, which is what makes
+"site-perimeter ≤ n" and "site-perimeter = n" interchangeable for us.)
+
+**The single-hole upper bound is then three lines.** Let H be a sealed hole of
+area A in an n-cell king animal F. H is 4-connected, so it is a polyomino. Every
+cell edge-adjacent to H from outside is foreground: a background one would be in
+H's own 4-component. So H's site perimeter is a subset of F, giving
+`n ≥ |sp(H)| ≥ sp_min(A)`, i.e. `A ≤ M(n)`. The (I') parity count, the (II')
+span bound, the moat-cycle winding argument and the four-caps step all reprove
+this, independently and from scratch.
+
+Two things the identification also settles:
+
+- **Nothing in the single-hole bound is king-specific.** The hole is 4-connected
+  and its sealing set is its 4-site-perimeter whatever the foreground's
+  connectivity is. The "king factor 1/8, double the rook's 1/16" reading below
+  is really *site*-perimeter against *edge*-perimeter; the 8 is the 8 of
+  `√(8n−4)`, and the diagonal-wall argument explains why site perimeter is the
+  cheaper measure rather than why kings are special.
+- **The extremal shapes agree.** Sieben's minimisers are the diagonal
+  diamonds/boxes, which is the family the construction below arrives at
+  independently.
+
+## The union argument: the multi-hole case is closed (2026-08-06)
+
+Yesterday's version of this note stopped at an overlap count — how many
+foreground cells two sealed holes can share — because it bounded each hole
+separately and then had to reassemble. **Don't reassemble.** Bound the union.
+
+Altshuler et al. (DGCI 2006) prove the grid isoperimetric inequality for an
+**arbitrary finite subset** of ℤ², not just a connected one. Their `n(k)` is
+`min{|N(A)| : A ⊂ ℤ² finite, |A| ≥ k}` with `N(A)` the 4-neighbourhood, given
+exactly in their Theorem 1; their §3.1 Theorem 7 re-derives it by a
+self-contained slanted-bounding-rectangle projection, again for every finite A.
+Their minimisers come out connected ("optimal ⟹ simple", their Theorem 2), so
+`n(k) = ε(k)`: **allowing disconnection buys nothing.**
+
+> **Theorem (all holes).** For every n-cell king animal F, the total area of the
+> enclosed holes is at most `M(n) = ⌊((n−2)²+4)/8⌋`.
+>
+> *Proof.* Let `A = ⋃ᵢ Hᵢ` be the union of the bounded 4-components of ℤ² ∖ F,
+> of total area `|A|`. Take `c ∈ N(A)`. Then `c ∉ A`, and c is 4-adjacent to
+> some cell of some hole H_i; were c background it would lie in H_i's own
+> 4-component, i.e. in H_i ⊆ A. So `N(A) ⊆ F` and `n ≥ |N(A)| ≥ n(|A|) =
+> ε(|A|)`, whence `|A| ≤ σ(n) = M(n)`. ∎
+
+The union A is exactly where connectivity had to be dropped — it is disconnected
+whenever F has two holes — and dropping it is free. Tightness is the
+single-hole construction below. The overlap question, the master inequality and
+the peeling lemma are all superseded: none of them was ever the obstruction.
+
+**What is still ours.** The *question* — no paper found stating the maximum
+total hole area; the polyomino hole literature counts holes rather than
+measuring them (Kahle & Roldán, maximally many holes f(n) ≈ n/2; Baralić &
+Uppal, deep holes). The formula and both its bounds are the isoperimetric
+inequality, cited. Enumeration to n = 17 confirms the statement independently.
+
+Citations, both papers now held locally (`papers/INDEX.txt`):
+
+- N. Sieben, "Polyominoes with minimum site-perimeter and full set achievement
+  games," *European J. Combin.* **29**(1) (2008) 108–117.
+- Y. Altshuler, V. Yanovsky, D. Vainsencher, I. A. Wagner & A. M. Bruckstein,
+  "On minimal perimeter polyminoes," DGCI 2006, LNCS 4245, 17–28. (Five
+  authors; earlier drafts of this note dropped Vainsencher.)
+
+Checked rather than taken on trust, `experiments/maxhole_sieben_check.py`:
+the minimum site perimeter brute-forced over all fixed polyominoes to n = 9
+against ε (with an off-by-one RED control that must not match); `M(n) =
+max{A : ε(A) ≤ n}` for n ≤ 2000 and the equivalence at every A ≤ 200,000;
+σ(e) = M(e) directly; **Sieben's ε and Altshuler's n(k) agreeing at every
+k ≤ 200,000**, i.e. the two papers state one theorem; superadditivity; the 17
+banked rows of `results/maxhole.txt`; and the load-bearing hypothesis itself —
+every ≥2-component subset of size k ≤ 10 (pairs, 3.4M configurations) and
+k ≤ 8 (triples), over all relative placements within ±5, fails to beat ε(k).
+It ties at k = 2 (a diagonal pair shares two neighbours) and loses by 1–2
+everywhere else. The negative result is non-vacuous by construction: the run
+asserts it reached placements whose components share neighbours.
 
 ## The formula and the extremal shape
 
@@ -36,6 +136,8 @@ The king factor is **1/8**, double the rook/polyomino ~1/16, because a **diagona
 line of foreground cells seals the 4-connected background at one cell per step:
 adjacent hole cells straddling a diagonal wall are not 4-adjacent, so a 45° wall is
 half the cost of an axis wall. The extremal shape is a **diagonal diamond ring**.
+(§The literature: the 1/8 is site-perimeter against edge-perimeter, not a king
+fact — the same 8 as in Sieben's `√(8n−4)`.)
 
 ## Lower bound (construction) — done for n ≡ 0 mod 4
 
@@ -51,7 +153,9 @@ formula is confirmed but a clean closed construction for all residues isn't writ
 Work in diagonal coordinates u = x+y, v = x−y (all cells have u ≡ v mod 2). For a
 single 4-connected hole H, let **ha = range of u over H**, **hm = range of v over H**.
 
-- **(Reduction) A single hole is optimal.** Splitting area over k holes is less
+- **(Reduction) A single hole is optimal.** *No longer needed: §The union
+  argument bounds every hole at once. Kept because the empirical check is still
+  a check.* Splitting area over k holes is less
   efficient (⌈ha·hm/2⌉ is superadditive against a shared cell budget — two holes of
   half the linear size enclose ~½ the area). Verified: over 2680 random
   hole-polyplets, total area never exceeds M(n) even with multiple holes. So M(n) is
@@ -74,6 +178,10 @@ every residue — no off-by-one. ∎ modulo (I') and (II').
 ## What's proved vs open
 
 ## (II') PROVED — the moat-cycle argument (2026-07-12)
+
+*An independent reproof of Sieben's bound, as it turns out (§The literature).
+Kept as a check, and because it proves the sharper span form n ≥ ha+hm+2 rather
+than the area form; the Lean file's `MoatBound` hypothesis is this statement.*
 
 The winding-number route works. Five steps, each machine-checked end-to-end on
 3,927 random single-hole king animals (116 with pinched contours exercising the
@@ -137,7 +245,13 @@ optima at n ≢ 0 (mod 4) are just the boxes with |a−b| ∈ {1,2}.
 
 **⇒ M_single(n) = round((n−2)²/8) is now a two-sided theorem for all n.**
 
-## Multi-hole reduction (2026-07-12) — reformulated, verified, one clean target
+## Multi-hole reduction (2026-07-12) — SUPERSEDED by the Sieben route
+
+*Everything in this section is the isoperimetric content, and the isoperimetric
+content is now a citation (§The literature). The master inequality and the
+peeling lemma remain true as far as checked and remain unproved; they are no
+longer the shortest route, which is the sealing-set overlap count. Kept for the
+refutations, which stay useful.*
 
 Fill the holes: F′ = F ∪ (holes) is a hole-free animal of size N = n + A. The
 holes avoid F′'s 4-shell (cells with a 4-neighbour in the exterior — else leak),
@@ -247,11 +361,14 @@ hand.
 
 ## Questions for you
 
-1. Is there a slick winding/parity argument for **(II')** — why a closed king-curve
-   enclosing an ha×hm (diagonal) region must use ≥ ha+hm+2 cells? (This is the whole
-   theorem; the rest is bookkeeping.)
-2. The elongated-diamond construction for n ≢ 0 mod 4 — is there a clean uniform
-   family, or is a small per-residue case analysis the honest answer?
+*All of them are closed. The original two — (II'), and the n ≢ 0 mod 4
+construction — by the moat-cycle argument and the parity-aligned diagonal boxes
+below. The one that replaced them, "how many foreground cells can two sealed
+holes share?", was dissolved rather than answered: §The union argument never
+splits the holes up, so there is nothing to share. Anyone reopening that
+question should read that section first.*
 
-Verification: `python3 -m experiments.maxhole_proof_check`. Data:
-`results/maxhole.txt` (M(n), n≤17, exact from g2).
+Verification: `python3 -m experiments.maxhole_proof_check` (the original
+machinery), `python3 -m experiments.maxhole_sieben_check` (the identification
+with Sieben and Altshuler et al., and the disconnected-subset check the union
+argument rests on). Data: `results/maxhole.txt` (M(n), n≤17, exact from g2).
