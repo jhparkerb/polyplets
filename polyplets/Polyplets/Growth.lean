@@ -5,6 +5,7 @@ Authors: Jason H Parker
 -/
 import Mathlib.Analysis.Subadditive
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Polyplets.Fekete
 import Polyplets.Graph
 import Polyplets.UpperBound
 
@@ -21,8 +22,10 @@ halves of Fekete's argument:
   side by side across one king edge, together with the recovery maps
   (`recLeft`, `recRight`) that undo it;
 * **Fekete's lemma**, from Mathlib's `Subadditive.tendsto_lim`, applied to
-  `negLogA n = -log (a n)`, which is subadditive by supermultiplicativity and
-  whose `negLogA n / n` is bounded below by the `UpperBound.lean` ceiling.
+  `-log (a n)`, which is subadditive by supermultiplicativity and whose
+  `-log (a n) / n` is bounded below by the `UpperBound.lean` ceiling. Since
+  2026-08-06 that half is `Fekete.lean`'s, run against the instance
+  `polypletFekete`; `a` supplies the three hypotheses and nothing else.
 
 The payoff:
 
@@ -628,11 +631,18 @@ theorem a_supermul {m n : ℕ} : a m * a n ≤ a (m + n) := by
 
 /-! ## Fekete's ladder
 
-`negLogA n = -log (a n)` is subadditive (that is supermultiplicativity of `a`
-read through `log`) and `negLogA n / n` is bounded below (that is the
-`UpperBound.lean` ceiling). Mathlib's `Subadditive.tendsto_lim` then supplies
-the limit, and `Subadditive.lim_le_div` the "limit is the infimum" half that
-turns into `a n ≤ lambda ^ n`. -/
+`-log (a n)` is subadditive (that is supermultiplicativity of `a` read through
+`log`) and `-log (a n) / n` is bounded below (that is the `UpperBound.lean`
+ceiling). Mathlib's `Subadditive.tendsto_lim` then supplies the limit, and
+`Subadditive.lim_le_div` the "limit is the infimum" half that turns into
+`a n ≤ lambda ^ n`.
+
+The ladder itself lives in `Fekete.lean`. It asks a sequence for exactly the
+three facts used here: supermultiplicative, positive from `1` on, under an
+exponential ceiling. From those it runs `negLog → subadditive → bddBelow →
+growth → tendsto → le_growth_pow` once. `λ` is one instance of it; the
+staircase constant `µ` of `StairGrowth.lean` is the other. Everything below
+this point is the instance and five wrappers. -/
 
 /-- The exponential ceiling of `UpperBound.lean`, cast to `ℝ`. -/
 theorem a_le_ratio_pow (k : ℕ) : (a k : ℝ) ≤ (3125 / 256 : ℝ) ^ k := by
@@ -644,98 +654,37 @@ theorem a_le_ratio_pow (k : ℕ) : (a k : ℝ) ≤ (3125 / 256 : ℝ) ^ k := by
   rw [div_pow, le_div_iff₀ (by positivity)]
   exact h2
 
-/-- The sequence Fekete is applied to: `-log (a n)`. -/
-noncomputable def negLogA (k : ℕ) : ℝ := -Real.log (a k)
+/-- **The polyplet sequence as a Fekete instance.** Klarner's injection is
+`supermul`, `Sequence.lean`'s `one_le_a` is `one_le`, and the decision-tree
+ceiling is `ceiling`. Nothing else about `a` is used downstream of this point. -/
+noncomputable def polypletFekete : Fekete where
+  f := a
+  c := 3125 / 256
+  one_le_c := by norm_num
+  supermul := fun _ _ => a_supermul
+  one_le := one_le_a
+  ceiling := a_le_ratio_pow
 
-/-- **Supermultiplicativity, read through `log`.** The degenerate cases `m = 0`
-and `n = 0` are equalities: `a 0 = 0` and `Real.log 0 = 0`, so `negLogA 0 = 0`. -/
-theorem negLogA_subadditive : Subadditive negLogA := by
-  intro p q
-  rcases Nat.eq_zero_or_pos p with rfl | hp
-  · simp [negLogA, a_zero]
-  rcases Nat.eq_zero_or_pos q with rfl | hq
-  · simp [negLogA, a_zero]
-  have h1 : (0 : ℝ) < a p := by exact_mod_cast one_le_a hp
-  have h2 : (0 : ℝ) < a q := by exact_mod_cast one_le_a hq
-  have hsm : ((a p : ℝ) * (a q : ℝ)) ≤ (a (p + q) : ℝ) := by
-    exact_mod_cast a_supermul
-  have hlog : Real.log ((a p : ℝ) * (a q : ℝ)) ≤ Real.log (a (p + q) : ℝ) :=
-    Real.log_le_log (by positivity) hsm
-  rw [Real.log_mul (ne_of_gt h1) (ne_of_gt h2)] at hlog
-  simp only [negLogA]
-  linarith
-
-/-- The lower bound on `negLogA n / n` supplied by the exponential ceiling. -/
-theorem negLogA_div_ge {k : ℕ} (hk : 1 ≤ k) :
-    -Real.log (3125 / 256 : ℝ) ≤ negLogA k / k := by
-  have hkR : (0 : ℝ) < k := by exact_mod_cast hk
-  have hpos : (0 : ℝ) < a k := by exact_mod_cast one_le_a hk
-  have hlog : Real.log (a k) ≤ k * Real.log (3125 / 256 : ℝ) := by
-    calc Real.log (a k) ≤ Real.log ((3125 / 256 : ℝ) ^ k) :=
-          Real.log_le_log hpos (a_le_ratio_pow k)
-      _ = k * Real.log (3125 / 256 : ℝ) := by rw [Real.log_pow]
-  rw [le_div_iff₀ hkR]
-  simp only [negLogA]
-  linarith
-
-/-- `negLogA n / n` is bounded below, the hypothesis Fekete's lemma needs. -/
-theorem negLogA_bddBelow : BddBelow (Set.range fun k : ℕ => negLogA k / k) := by
-  refine ⟨-Real.log (3125 / 256 : ℝ), ?_⟩
-  rintro x ⟨k, rfl⟩
-  rcases Nat.eq_zero_or_pos k with rfl | hk
-  · simp only [negLogA, a_zero, Nat.cast_zero, Real.log_zero, neg_zero, zero_div]
-    have := Real.log_nonneg (by norm_num : (1 : ℝ) ≤ 3125 / 256)
-    linarith
-  · exact negLogA_div_ge hk
-
-/-- **The growth constant of the polyplet sequence**, `λ = lim a(n)^{1/n}`,
-built as `exp` of the negated Fekete limit of `negLogA`. -/
-noncomputable def lambda : ℝ := Real.exp (-negLogA_subadditive.lim)
+/-- **The growth constant of the polyplet sequence**, `λ = lim a(n)^{1/n}`. -/
+noncomputable def lambda : ℝ := polypletFekete.growth
 
 /-- `λ` is positive. -/
-lemma lambda_pos : 0 < lambda := Real.exp_pos _
+lemma lambda_pos : 0 < lambda := polypletFekete.growth_pos
 
 /-- **`λ` is the limit of `a(n)^{1/n}`.** -/
 theorem lambda_tendsto :
-    Filter.Tendsto (fun n => (a n : ℝ) ^ ((n : ℝ)⁻¹)) Filter.atTop (𝓝 lambda) := by
-  have h0 : Filter.Tendsto (fun k : ℕ => negLogA k / k) Filter.atTop
-      (𝓝 negLogA_subadditive.lim) :=
-    negLogA_subadditive.tendsto_lim negLogA_bddBelow
-  have h2 : Filter.Tendsto (fun k : ℕ => Real.exp (-(negLogA k / k))) Filter.atTop (𝓝 lambda) :=
-    (Real.continuous_exp.tendsto _).comp h0.neg
-  refine h2.congr' ?_
-  filter_upwards [Filter.eventually_ge_atTop 1] with k hk
-  have hpos : (0 : ℝ) < a k := by exact_mod_cast one_le_a hk
-  rw [Real.rpow_def_of_pos hpos]
-  congr 1
-  simp only [negLogA]
-  ring
+    Filter.Tendsto (fun n => (a n : ℝ) ^ ((n : ℝ)⁻¹)) Filter.atTop (𝓝 lambda) :=
+  polypletFekete.tendsto
 
 /-- **Fekete's supremum half:** `a n ≤ λⁿ` for every `n ≥ 1`. The Fekete limit
 of a subadditive sequence is the infimum of `u n / n`, so `-lim` dominates
 `log (a n) / n` at every `n`. -/
-theorem a_le_lambda_pow {n : ℕ} (hn : 1 ≤ n) : (a n : ℝ) ≤ lambda ^ n := by
-  have hpos : (0 : ℝ) < a n := by exact_mod_cast one_le_a hn
-  have hn0 : n ≠ 0 := by omega
-  have hnR : (0 : ℝ) < n := by exact_mod_cast hn
-  have hle : negLogA_subadditive.lim ≤ negLogA n / n :=
-    negLogA_subadditive.lim_le_div negLogA_bddBelow hn0
-  rw [le_div_iff₀ hnR] at hle
-  simp only [negLogA] at hle
-  calc (a n : ℝ) = Real.exp (Real.log (a n)) := (Real.exp_log hpos).symm
-    _ ≤ Real.exp ((n : ℝ) * (-negLogA_subadditive.lim)) := Real.exp_le_exp.mpr (by linarith)
-    _ = lambda ^ n := by rw [lambda]; exact Real.exp_nat_mul _ n
+theorem a_le_lambda_pow {n : ℕ} (hn : 1 ≤ n) : (a n : ℝ) ≤ lambda ^ n :=
+  polypletFekete.le_growth_pow hn
 
 /-- **The upper bound `λ ≤ 5⁵/4⁴ = 3125/256`**, from the decision-tree ceiling
 of `UpperBound.lean`. -/
-theorem lambda_le : lambda ≤ 3125 / 256 := by
-  have hbd : -Real.log (3125 / 256 : ℝ) ≤ negLogA_subadditive.lim := by
-    refine ge_of_tendsto (negLogA_subadditive.tendsto_lim negLogA_bddBelow) ?_
-    filter_upwards [Filter.eventually_ge_atTop 1] with k hk using negLogA_div_ge hk
-  rw [lambda]
-  calc Real.exp (-negLogA_subadditive.lim) ≤ Real.exp (Real.log (3125 / 256 : ℝ)) :=
-        Real.exp_le_exp.mpr (by linarith)
-    _ = 3125 / 256 := Real.exp_log (by norm_num)
+theorem lambda_le : lambda ≤ 3125 / 256 := polypletFekete.growth_le
 
 /-- **The lower bound `3832 ≤ λ⁶`**, from the banked anchor `a 6 = 3832`. -/
 theorem lambda_lb : (3832 : ℝ) ≤ lambda ^ 6 := by

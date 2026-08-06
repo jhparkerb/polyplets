@@ -3,6 +3,7 @@ import Polyplets.Compute
 import Polyplets.ComputeBridge
 import Polyplets.Defs
 import Polyplets.Diagonal
+import Polyplets.Fekete
 import Polyplets.Finite
 import Polyplets.Graph
 import Polyplets.Growth
@@ -26,6 +27,7 @@ import Polyplets.Sanity
 import Polyplets.Sequence
 import Polyplets.Shape
 import Polyplets.StairAnimals
+import Polyplets.StairGrowth
 import Polyplets.Symmetry
 import Polyplets.Universal.AbstractShape
 import Polyplets.Universal.Compute

@@ -17,6 +17,7 @@ import Polyplets.Universal.Hex
 import Polyplets.Upper.BuiRD2
 import Polyplets.Upper.BuiRD3
 import Polyplets.StairAnimals
+import Polyplets.StairGrowth
 
 /-!
 # Audit: the Outworks results in one place
@@ -69,6 +70,13 @@ but unguarded):
   native leaf (5930 rows are past what the kernel evaluator will do):
   `lambda_le_of_bui_rd3` (`λ ≤ 20000/2147` given `KingBuiSystemRD3Holds`)
   = standard three + that leaf.
+* Sortie B1 (`StairAnimals.lean`) — `Stair.join_valid`, `Stair.cut_join`,
+  `Stair.join_injOn` carry `[propext, Quot.sound]`, without
+  `Classical.choice`: the join and the cut are computable. The counting layer
+  over them (`StairGrowth.lean`: `Stair.M_supermul`, `Stair.M_tendsto`,
+  `Stair.M_le_mu_pow`, `Stair.mu_le`, `Stair.mu_gt_of_banked`) is standard
+  three — `Nat.card` and `Subadditive` bring `Classical.choice` — and carries
+  no native leaf, the banked `M 700` being a hypothesis.
 -/
 
 namespace Polyplets
@@ -528,5 +536,42 @@ the cut are computable and the proofs are constructive.
 /-- info: 'Polyplets.Stair.join_injOn' depends on axioms: [propext, Quot.sound] -/
 #guard_msgs in
 #print axioms Stair.join_injOn
+
+/-! ## The staircase growth constant `µ`
+
+`StairGrowth.lean`: the counting layer over B1, and Fekete. `M_supermul` is
+Lemma 3 as a cardinality — the statement `make gate-middle-kingdom` can only
+check on 700 terms, here for all `i` and `j`. `M_le_mu_pow` is the
+limit-is-supremum half that makes every banked term a floor, and
+`mu_gt_of_banked` cashes one in. Classical choice enters through `Nat.card` and
+Mathlib's `Subadditive`; no `native_decide` leaf anywhere — the banked `M 700`
+is a hypothesis, as in `lambda_gt_of_banked`.
+-/
+
+/--
+info: 'Polyplets.Stair.M_supermul' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms Stair.M_supermul
+
+/-- info: 'Polyplets.Stair.M_tendsto' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Stair.M_tendsto
+
+/--
+info: 'Polyplets.Stair.M_le_mu_pow' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms Stair.M_le_mu_pow
+
+/-- info: 'Polyplets.Stair.mu_le' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Stair.mu_le
+
+/--
+info: 'Polyplets.Stair.mu_gt_of_banked' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms Stair.mu_gt_of_banked
 
 end Polyplets

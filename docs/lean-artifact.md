@@ -6,9 +6,18 @@ someone who did not write it, and honest about where computation enters.
 
 ## What it is
 
-`polyplets/` — 63 modules, 21,192 lines, Lean 4 v4.31.0 against mathlib
-v4.31.0, **zero occurrences of `sorry`**, 8622 build targets current
+`polyplets/` — 65 modules, 21,659 lines, Lean 4 v4.31.0 against mathlib
+v4.31.0, **zero occurrences of `sorry`**, 8624 build targets current
 (`polyplets/build-receipt-2026-08-06.log`).
+
+One file is deliberately outside that: `polyplets/Draft/Prop6Skeleton.lean`,
+which carries five `sorry`s. It is not a library, `lake build` never compiles
+it, and nothing in `Polyplets/` imports it. It states the architecture of the
+rest of Proposition 6 — every statement typechecks, and each `sorry` is a named
+contract whose paper proof and numeric gate are cited beside it in the file's
+header. Its `#print axioms` prints `sorryAx`, which is the point: the file
+says what it has not proved. A reader auditing the artifact should read that
+header first, then `PROOF-STATUS.md`'s staircase section for what *is* proved.
 
 ## How a reader checks it
 
@@ -22,20 +31,21 @@ Part of the axiom discipline is enforced by the build rather than by a separate
 audit run, and the paper should describe it precisely, because the two halves
 are not equally strong:
 
-- **83 guarded.** `Grand/Audit.lean` (19) and `AuditOutworks.lean` (64 + the
-  three sortie-B1 additions) wrap `#print axioms` in `#guard_msgs`, so a
-  changed footprint is a **build error**. A reader who builds the project has
-  checked these without being asked to trust a log.
-- **143 unguarded.** The modules themselves print footprints on every build,
+- **88 guarded.** `Grand/Audit.lean` (18) and `AuditOutworks.lean` (70, of
+  which the last eight are sortie B1's three and the five staircase-growth
+  ones) wrap `#print axioms` in `#guard_msgs`, so a changed footprint is a
+  **build error**. A reader who builds the project has checked these without
+  being asked to trust a log.
+- **148 unguarded.** The modules themselves print footprints on every build,
   but nothing enforces them. They are informational.
 
 ## The footprint, stated plainly
 
-- Of the 83 guarded: 50 standard axioms only, 33 with named `native_decide`
+- Of the 88 guarded: 55 standard axioms only, 33 with named `native_decide`
   leaves.
-- Of the 143 unguarded: 95 standard only, 48 with named leaves.
+- Of the 148 unguarded: 100 standard only, 48 with named leaves.
 - A named leaf is one axiom per finite computation, e.g.
-  `a_6._native.native_decide.ax_1_1` for a(6) = 524.
+  `a_6._native.native_decide.ax_1_1` for a(6) = 3832.
 - No `sorryAx`. No anonymous `Lean.ofReduceBool`.
 
 Naming matters here: a named leaf says exactly which computation is being
@@ -54,16 +64,23 @@ lattice. `grand_form` and `grand_form_prod` are standard-axioms-only; the
 k ≤ 18 production pinning (`P18_grand_of_banked`, `P18_grand_prod`) carries
 the chunked weight cards as leaves.
 
-**Paper 3 — Proposition 6's Lemma 3.** `Stair.join_valid`, `Stair.cut_join`
-and `Stair.join_injOn` (`Polyplets/StairAnimals.lean`, sortie B1) formalise the
-column-join and its inverse: the join stays in the class, and the cut at
-cumulative area `i` inverts it, so the map is injective once both areas are
-fixed. Guarded, and their footprint is `[propext, Quot.sound]` — not even
-`Classical.choice`. What is **not** formalised is the counting layer (a
-cardinality per area) and the Fekete step, so Lean does not yet state
-`M i * M j ≤ M (i+j)` itself; the paper proof does, and Paper 3 should cite the
-paper proof, mentioning the formalised core rather than claiming a formalised
-lemma.
+**Paper 3 — Proposition 6's Lemma 3, and `µ`.** `Stair.join_valid`,
+`Stair.cut_join` and `Stair.join_injOn` (`Polyplets/StairAnimals.lean`, sortie
+B1) formalise the column-join and its inverse: the join stays in the class, and
+the cut at cumulative area `i` inverts it, so the map is injective once both
+areas are fixed. Guarded, and their footprint is `[propext, Quot.sound]` — not
+even `Classical.choice`. Since 2026-08-06 the counting layer and the Fekete
+step are there too (`StairGrowth.lean`), so **Lemma 3 itself is a Lean
+theorem**: `Stair.M_supermul : M i * M j ≤ M (i + j)` for all `i` and `j`,
+standard three axioms, guarded. With it, `Stair.M_tendsto` (`µ` exists) and
+`Stair.M_le_mu_pow` (`M n ≤ µⁿ` for every `n`, so banked terms are floors, not
+approximations), and the conditional `Stair.mu_gt_of_banked` giving
+`3.1234 < µ ≤ 4` from the banked `M 700`.
+
+What Paper 3 must *not* claim from this: Proposition 6. Lemmas 1 and 2, the
+geometric HV-convex layer and the squeeze are **not** formalised, so Lean
+states the growth constant of the *staircase* class, not the sandwich. Cite
+the paper proof for Proposition 6 and this development for Lemma 3.
 
 **Paper 3 — the λ bracket, upper end.** `BuiSystem.certSum_le`,
 `lambda_le_of_buiSystem` and `RatCert.lambda_le` are standard-axioms-only; the
@@ -71,8 +88,9 @@ concrete certificate `lambda_le_of_bui_rd3` depends on `buiRD3_valid`, a named
 leaf that is the certificate's arithmetic validity check. `lambda_lb` /
 `lambda_gt` depend on the evaluation of a(6). Fekete's ladder for λ —
 `a_supermul`, `lambda_tendsto`, `a_le_lambda_pow`, `lambda_le` — is
-standard-axioms-only, and is the same idiom the staircase squeeze would use if
-B4 lands.
+standard-axioms-only, and since 2026-08-06 it is literally shared with the
+staircase constant: `Fekete.lean` carries the ladder once and `lambda` and `mu`
+are two instances of it.
 
 **Paper 1 — the hole section, if it ships.** `maxhole_lower` and
 `maxhole_upper` are standard-axioms-only, and `maxhole` is **conditional on the

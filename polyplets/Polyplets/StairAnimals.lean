@@ -27,10 +27,10 @@ unique and no split index has to be carried alongside the join. This file proves
 exactly that — `join_valid`, `area_join`, `cut_join` — which is the combinatorial
 core of `M i * M j ≤ M (i + j)`.
 
-What is deliberately *not* here: the counting layer (a `Finset`/`ncard` of these
-lists per area) and the Fekete step. Both are transcriptions of `Growth.lean`'s
-`a_supermul` → `negLogA_subadditive` → `lambda_tendsto` chain once the counting
-function exists, and neither adds mathematical content to the lemma.
+The counting layer on top of this — `M n`, `M i * M j ≤ M (i + j)`, and the
+growth constant `µ` — is `StairGrowth.lean`, which reuses the Fekete ladder of
+`Fekete.lean` rather than transcribing `Growth.lean`'s. What is here is the
+combinatorial content: the join, the cut, and the injectivity.
 -/
 
 namespace Polyplets.Stair

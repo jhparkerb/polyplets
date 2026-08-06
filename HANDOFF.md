@@ -655,6 +655,23 @@ local, NOT pushed. Newest first:
   `lambda_gt_of_banked` shape), and Corollary 4 is a four-line elementary gap
   argument (`results/middle-kingdom-phase3.md:86`), not the `maxhole`-style
   theory gap first feared.
+- **Lean route EXECUTED — Lemma 3 and `µ` are theorems.**
+  `polyplets/Polyplets/Fekete.lean` (the ladder, once: supermultiplicative +
+  positive + exponential ceiling ⇒ growth, tendsto, `f n ≤ growth^n`) and
+  `polyplets/Polyplets/StairGrowth.lean` (`M n` as `Nat.card`, finiteness and
+  the `4^n` ceiling from one candidate `Finset`, `M_supermul`, `mu`). 471 new
+  lines against the brief's ~300 estimate, and `Growth.lean` gave back 53:
+  `lambda` is now `polypletFekete.growth` and its four public names are
+  wrappers, with `AuditOutworks.lean`'s pinned footprints unchanged, which is
+  what the brief nominated as the refactor's safety net. Guarded and
+  standard-three:
+  `Stair.M_supermul`, `M_tendsto`, `M_le_mu_pow`, `mu_le`, and the conditional
+  `mu_gt_of_banked` — bracket **`3.1234 < µ ≤ 4`**, the floor from the banked
+  `M 700`, no native leaf. Out-of-scope per the brief and NOT attempted:
+  Lemmas 1 and 2, the geometric layer, the squeeze. `lake build` green, full
+  `make` 16 gates green, `PROOF-STATUS.md` + `docs/lean-artifact.md` +
+  the build receipt updated (the receipt's old `a(6) = 524` and its
+  19/66 guarded split were both wrong; measured 18/70, total 88).
 - **Not committed, deliberately:** `paper/technical-report.tex` (jasonp's,
   read-only to Claude) and `paper/technical-report-gaps.md` remain untracked.
 

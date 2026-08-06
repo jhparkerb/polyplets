@@ -1,28 +1,42 @@
 === polyplets Lean build receipt ===
 host       : gympie (Darwin arm64)
-date       : 2026-08-06T15:39:03Z (axioms recount + StairAnimals: same session)
-rev        : 679800c + the sortie B1 module (see git log for the exact rev)
+date       : 2026-08-06T19:11:30Z (staircase growth constant: Fekete.lean +
+             StairGrowth.lean, superseding the 15:39:03Z receipt of the same
+             session)
+rev        : 50d4e7b + the staircase-growth modules (see git log for the exact
+             rev)
 toolchain  : leanprover/lean4:v4.31.0
 mathlib    : rev="v4.31.0"
 command    : cd polyplets && lake build && lake build --no-build
 
-All targets up-to-date (8622 jobs).
+All targets up-to-date (8624 jobs).
 
-Source: 63 modules, 21,192 lines. Occurrences of `sorry`: 0.
+Source: 65 modules, 21,659 lines. Occurrences of `sorry`: 0.
+
+That count is over the BUILT library, Polyplets/, which is what
+defaultTargets = ["Polyplets"] compiles. One file in the repo does contain
+`sorry`s and is deliberately outside the build: Draft/Prop6Skeleton.lean, five
+of them. It is a stated-architecture file -- every statement typechecks, each
+`sorry` is a named contract whose paper proof and numeric gate are cited in
+the file's header, and its `#print axioms` prints `sorryAx` rather than hiding
+it. Nothing in Polyplets/ imports it.
 
 === Axiom footprint ===
 
-226 `#print axioms` calls across the development, in two kinds:
+236 `#print axioms` calls across the development, in two kinds:
 
-  83   GUARDED by `#guard_msgs` in Grand/Audit.lean (19) and
-       AuditOutworks.lean (66). A changed footprint is a BUILD ERROR, not a
+  88   GUARDED by `#guard_msgs` in Grand/Audit.lean (18) and
+       AuditOutworks.lean (70). A changed footprint is a BUILD ERROR, not a
        warning, so a reader who builds the project has checked these.
-         50  standard axioms only
+       (The 19/66 split printed at 15:39:03Z was miscounted by one each way;
+       the total 83 was right. Counted here by walking back from each
+       `#print axioms` command line to its `#guard_msgs in`.)
+         55  standard axioms only
          33  standard axioms + one or more NAMED native_decide leaves
 
-  143  UNGUARDED, inside the modules themselves. These print their footprint
+  148  UNGUARDED, inside the modules themselves. These print their footprint
        on every build but nothing enforces it; they are informational.
-         95  standard axioms only
+         100  standard axioms only
          48  standard axioms + named native_decide leaves
 
   0    sorryAx
@@ -39,6 +53,9 @@ Standard-axioms-only, and load-bearing for the papers:
   a_supermul, lambda_tendsto, a_le_lambda_pow, lambda_le
   Stair.join_valid, Stair.cut_join, Stair.join_injOn   (sortie B1; these three
     need neither Classical.choice: [propext, Quot.sound] only)
+  Stair.M_supermul, M_tendsto, M_le_mu_pow, mu_le      (Lemma 3 and the
+    staircase growth constant; mu_gt_of_banked is standard three too, its
+    banked M 700 being a hypothesis rather than a computation)
   Universal.universal_shape_d, universal_shape, universal_shape_production,
     universal_production_int_all      (the universal diagonal law's engine)
   Universal.king_shape_*_via_universal, kingSystem, peelSystem
@@ -50,7 +67,7 @@ Standard-axioms-only, and load-bearing for the papers:
 
 Carrying named native leaves, with what the leaf is:
 
-  lambda_lb, lambda_gt                  a(6) = 524, evaluated
+  lambda_lb, lambda_gt                  a(6) = 3832, evaluated
   lambda_le_of_bui_rd3, buiRD3_valid    the RD3 Bui certificate's validity
   Universal.{king,square,hex}_P1_*      two triangle cells per lattice
   Universal.{king,square,hex}_rowSum_*  small row sums, the cross-family gates
@@ -63,7 +80,7 @@ Carrying named native leaves, with what the leaf is:
 
 Every target in the default closure (lakefile.toml defaultTargets =
 ["Polyplets"]) is BUILT AND CURRENT at the rev above, with zero sorries, and
-the 83 guarded footprints are exactly as printed above.
+the 88 guarded footprints are exactly as printed above.
 
 === What it does NOT certify ===
 
@@ -71,4 +88,4 @@ Nothing about the engine, the banked triangle, or the anchor VALUES: those
 enter the Lean theorems as explicit hypotheses or as native_decide leaves (see
 polyplets/PROOF-STATUS.md). `maxhole` is conditional on the hypothesis
 `MoatBound`, proved on paper in results/maxhole-proof.md but not in Lean.
-The 143 unguarded footprints are printed, not enforced.
+The 148 unguarded footprints are printed, not enforced.

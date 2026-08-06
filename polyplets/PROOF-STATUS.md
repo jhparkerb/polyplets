@@ -416,6 +416,77 @@ No native leaves. NOT formalized (open item): the general-`k` lower bound
 paper-level proof in `results/v5-denominator-law.md`; would need formal
 finite differences + multinomial valuation bookkeeping over `ℤ[[y]]`).
 
+## Staircase growth constant µ (LANDED 2026-08-06, `StairGrowth.lean`)
+
+`results/hv-growth-sandwich.md` Lemma 3 and the Fekete step on top of it —
+the authorized slice of Proposition 6 (`docs/lean-staircase-growth-brief.md`;
+everything else about Proposition 6 stays a paper proof, deliberately).
+Three files:
+
+- `StairAnimals.lean` (sortie B1, 2026-08-06) — the combinatorial core:
+  staircase king animals as a `List Col`, `join_valid`, `area_join`,
+  `cut_join`, `join_injOn`. Footprint `[propext, Quot.sound]`, without
+  `Classical.choice`: the join and the cut are computable.
+- `Fekete.lean` — Fekete's ladder, once, for any sequence that is
+  supermultiplicative, positive from `1` on, and under an exponential
+  ceiling `c^k`. `negLog → subadditive → bddBelow → growth → tendsto →
+  le_growth_pow → growth_le`. `Growth.lean`'s λ became the first instance
+  (`polypletFekete`) in the same commit: `lambda`, `lambda_tendsto`,
+  `a_le_lambda_pow`, `lambda_le` are now wrappers, with the identical
+  footprints their `AuditOutworks.lean` guards already pinned, and
+  `Growth.lean` is 53 lines shorter.
+- `StairGrowth.lean` — the counting layer and the second instance.
+
+**Unconditional, standard three axioms** [propext, Classical.choice,
+Quot.sound], no native leaves, all guarded in `AuditOutworks.lean`:
+
+- `Stair.M_supermul : M i * M j ≤ M (i + j)` — **Lemma 3** as a
+  cardinality, for all `i` and `j`. `join_valid` puts the join in the class,
+  `join_injOn` recovers the pair from the join alone once both areas are
+  fixed, and `Finset.card_le_card_of_injOn` reads that as the inequality.
+  This is what `make gate-middle-kingdom` cannot do: the gate checks
+  supermultiplicativity on 700 computed terms, this is every `i` and `j`.
+- `Stair.M_tendsto` — `µ = lim M(n)^{1/n}` exists.
+- `Stair.M_le_mu_pow : (M n : ℝ) ≤ µ^n` for **every** `n` — Fekete's
+  limit-is-supremum half, i.e. every banked term of the staircase sequence
+  is a rigorous floor under `µ` rather than an approach to it.
+- `Stair.mu_le : µ ≤ 4` — from the ceiling `M n ≤ 4^n`, which is proved by
+  counting an explicit candidate `Finset` (`cand p n`, over-counting: height
+  and offset ranges only) rather than by a bijection with compositions. The
+  same `Finset` supplies the finiteness `M n` needs to mean anything.
+
+**Conditional on a banked hypothesis** (the `lambda_gt_of_banked` shape —
+the value enters as a hypothesis, not a computation, so still standard three
+and no leaf):
+
+- `Stair.mu_gt_of_banked (h : M 700 = 1736852…636729) :
+  (15617/5000 : ℝ) < mu`, i.e. **`3.1234 < µ ≤ 4`** machine-checked.
+  `M 700` is from `cpp/middle_kingdom_tm.cpp` in `stair` mode
+  (`results/mk_stair_terms_n700.txt`); `M 700 ^ (1/700) = 3.1234045…`, so
+  the floor is near-sharp for this `n` and still well below the measured
+  `µ = 3.128943269730886…`. Same caveat as `lambda_gt_of_banked`: a
+  single-source value, one transfer-matrix run, not independently
+  reproduced.
+
+NOT formalized, and not attempted: Lemma 2 (the stack bound), Lemma 1 (the
+phase split), the geometric layer `IsHVCanonical`, Corollary 4, and the
+squeeze `A_tendsto` — so Lean states `µ` for the **staircase** class, not
+Proposition 6's "every class between staircase and HV-convex". Cost estimate
+for the rest: 1700–2700 lines, most of it the geometric layer.
+
+Those five are written down as typechecking contracts in
+`Draft/Prop6Skeleton.lean`, which is outside the build (`defaultTargets =
+["Polyplets"]`) and is the only file in the repo containing `sorry`. Its
+header names each contract, the paper proof that establishes it
+(`results/hv-growth-sandwich.md` Lemmas 1 and 2, Corollary 4 of
+`results/middle-kingdom-phase3.md`), and the numeric check that backs it.
+`make gate-middle-kingdom` reaches all five, but not equally: Lemma 2's bound
+is verified outright to `n ≤ 120` with a RED control, the stack class and the
+HV-convex predicate are brute-forced against the grid, while Lemma 1's
+inequality is pinned only through the phase split it rests on and the squeeze
+only through the measured `µ`. The header says which is which. `prop6` is
+proved from the contracts, so its footprint carries `sorryAx` and says so.
+
 ## Axiom audit
 
 Conditional/partial tiers (k ≥ 4): pure [propext, Classical.choice,
