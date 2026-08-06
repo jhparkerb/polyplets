@@ -605,6 +605,45 @@ local, NOT pushed. Newest first:
   ruled out; **strip frontier is non-crossing** banked as a new fact
   (cdab5fb); holes n≥20 NO-GO recorded (1c30be9).
 
+## Session 2026-08-06 — citations gate, and Proposition 6 made readable
+- **Gate CITATIONS added** (`tests/gate_citations.py`, wired first in
+  `make gates`). Every repo path cited in a tracked markdown file must exist;
+  templates, lines marked deleted/planned, and paths in git history are
+  allowed. Written because `results/beyond-polyplets.md` cited a
+  `results/cloud-investigation-2026-07-07.md` that has never existed — the name
+  belongs to a *memory* entry, not the repo. Six citation fixes landed with it
+  (beyond-polyplets, certificate-squeeze-plan Phase 3 deliverables never
+  written, sortie-publication-plan's PGO sources, ns_a25 launch script since
+  removed, related-seqs-n24's brace-glob path). Full `make`: 16 gates GREEN,
+  10m17s.
+- **Proposition 6 rewritten for a reader, not a checker.**
+  `results/hv-growth-sandwich.md` gains a 215-word notation-free orientation at
+  the head of §The proof (fatten / shear / thin; the ends are free, the middle
+  has the entropy), and Lemmas 2 and 3 are re-proved in the same register —
+  Lemma 2 split explicitly into its bijection half and its counting half with a
+  worked transpose (columns `[0,4],[1,3],[2,2]` → row widths `1,2,3,2,1`),
+  Lemma 3 gaining the "why that `d` and no other" step and a plainer statement
+  of why the seam is recoverable. No claim, bound or measurement changed;
+  `make gate-middle-kingdom` GREEN after.
+- **Status of the tier-1 gate: still open.** jasonp follows the *sketch* as of
+  this session; he has not vetted Lemmas 2 and 3, which is what
+  `docs/sortie-publication-plan.md` §3 actually asks for. So the Lean route (P1)
+  is not yet demoted to nice-to-have in practice.
+- **Lean cost, estimated against the tree (2026-08-06).** Lemma 3 alone ≈400
+  lines and no new mathematics — `Polyplets/StairAnimals.lean` already has
+  `join_valid`/`cut_join`/`join_injOn`; what is missing is the counting layer
+  (`M n` as a cardinality + finiteness, the pattern of `canonicalAnimal_finite`),
+  the ceiling `M n ≤ 4^n` for `BddBelow`, and a copy of `Growth.lean`'s
+  `a_supermul` → `negLogA_subadditive` → `lambda_tendsto` chain. Lemma 2 ≈600–900
+  lines and is real work: mathlib has **nothing** on unimodal compositions
+  (`Nat.Partition` and its `Fintype` exist, no cardinality bound), so the
+  row-width transpose is built from scratch. All of Proposition 6 ≈3000–4500
+  lines, ~60% of it the geometric layer that does not exist yet — HV-convexity
+  on `Finset (ℤ × ℤ)` in the `Defs.lean` idiom, Corollary 4, and Lemma 1's phase
+  split as a `Finset` injection. For scale: the whole development is 21k lines.
+- **Not committed, deliberately:** `paper/technical-report.tex` (jasonp's,
+  read-only to Claude) and `paper/technical-report-gaps.md` remain untracked.
+
 ## Remaining work ledger
 1. **Paper final read-through.**
 2. **Viva cold retakes**, then %C authorship pass (jasonp's own words), then jasonp submits.

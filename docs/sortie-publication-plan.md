@@ -86,8 +86,11 @@ Contents:
   because the workload is branch-mispredict-bound; disk-bound scaling at
   ~4.4×/term; the kink-carry NW-carry kernel. Sources: `results/perf-outcomes.md`,
   `results/utilization-fix-and-ceiling.md`, `results/scheduling.md`,
-  `results/crt-counter-shaping.md`, `results/kink-carry.md`,
-  `results/reach-scaling-and-resourcing.md`, `results/pgo-no-go`-related notes.
+  `results/crt-counter-shaping.md`, `results/kink-carry.md` (the base change
+  that takes ~4.4×/term down to ~2.5×), `results/second-wind.md`,
+  `results/terminal-velocity.md` (the PGO no-go and the branch-mispredict
+  profile behind it). Assembled with the numbers re-checked in
+  `docs/paper1-engine-chapter.md`.
 - **Validation architecture** — the current biggest hole (`§Reproducibility` is
   empty). Every production run re-derives all smaller terms; Redelmeier
   confirms to n = 22; an independent strip transfer-matrix engine sharing no
@@ -227,6 +230,16 @@ Proposition 6 and believing them, **Proposition 6 is tier 1** and Paper 3 is as
 unconstrained as Paper 1. The fallbacks (Lean warrant, or shipping Paper 3 on
 the bracket, the directed constant and the grid collapses alone) are not
 needed.
+
+**Status 2026-08-06: the reading gate is still open.** jasonp follows the
+argument's shape — the orientation section now at the head of
+`results/hv-growth-sandwich.md` §The proof was written for that, and Lemmas 2
+and 3 were re-proved in the same register — but has not vetted the two lemmas
+themselves. Until he does, tier 1 is *eligible*, not held, and P1's Lean warrant
+stays live rather than nice-to-have. Cost estimate for P1 in `HANDOFF.md`
+(session 2026-08-06): Lemma 3 alone ≈400 lines and no new mathematics; Lemma 2
+≈600–900 with no mathlib support for unimodal compositions; all of
+Proposition 6 ≈3000–4500, mostly the geometric layer B3.
 
 ---
 

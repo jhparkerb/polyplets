@@ -107,6 +107,25 @@ that cleared the unrestricted series.
 
 ## The proof
 
+**Orientation, without notation.** `A(n)` counts HV-convex king animals of `n`
+cells — blobs with no gap in any row or column. `M(n)` counts the staircase
+ones, where scanning left to right both edges only ever move up. Staircase is a
+thin slice of HV-convex, and the claim is that the two counts nevertheless grow
+at the same exponential rate, as does every family between them.
+
+Every intermediate family is trapped between `M` and `A` term by term, so the
+whole job is to show those two grow alike; nothing has to be proved about the
+individual families. One direction is free — staircase animals are HV-convex.
+For the other, read an HV-convex animal left to right: it **fattens**, then
+**shears**, then **thins**. The shearing middle is a staircase animal and the
+two ends are stacks, columns nesting one inside the next (Lemma 1). Stacks are
+rare enough that their number outgrows no exponential, so the ends cannot move
+a growth rate (Lemma 2); the middle has a rate at all because two staircase
+animals glue end to end without waste (Lemma 3). The squeeze follows.
+
+The gluing carries a bonus: the rate is the *supremum* of the computed values,
+not merely their limit, so every banked term is a rigorous floor under `µ`.
+
 Throughout, an HV-convex king animal is a sequence of column intervals
 `[b(j), t(j)]`, `j = 1..k`, with `b` valley-unimodal and `t` peak-unimodal
 (Corollary 4 of `results/middle-kingdom-phase3.md`), counted up to translation.
@@ -153,26 +172,44 @@ theirs: the king lattice (their middle kernel is `min(h,h')`, ours is
 `P(n) = A001523(n)`, the number of stacks / weakly unimodal compositions of `n`,
 and `P(n) ≤ E(n) := (n+1)^{4√n+6}`, so `P(n)^{1/n} → 1`.
 
-*Proof.* In a phase-`(1,1)` block the column intervals are **nested**,
-`[b(j+1), t(j+1)] ⊆ [b(j), t(j)]`, so the set of columns meeting a given row `y`
-is a prefix `1..r(y)`, and `{y : r(y) ≥ k} = [b(k), t(k)]` is a nested decreasing
-family of intervals, which makes `r` weakly unimodal with `Σ_y r(y) = n`. The
-map to the composition `(r(y))_y` is invertible, so `P(n)` is the number of
-weakly unimodal compositions of `n`. Splitting such a composition at its peak
-gives two partitions, so `P(n) ≤ (n+1)^2 p(n)^2`.
+The lemma is two independent claims bolted together: *what* the outer blocks
+are (a bijection), and *how few* of them there are (a counting bound). They are
+proved separately below and only the second is used downstream.
+
+*Proof, part 1: a stack is a weakly unimodal composition.* In a phase-`(1,1)`
+block the bottoms rise and the tops fall, so the column intervals are **nested**:
+`[b(j+1), t(j+1)] ⊆ [b(j), t(j)]`. Nesting means that if you ask *which columns
+meet row `y`*, the answer is never a broken set — it is a prefix `1..r(y)`.
+So transpose the picture: instead of the column heights, record the row widths
+`r(y)`, read bottom to top. Since `{y : r(y) ≥ k} = [b(k), t(k)]` is a decreasing
+nested family of intervals, `r` rises then falls — weakly unimodal — and
+`Σ_y r(y) = n`. The stack is rebuilt from `r` alone, so the map is a bijection
+and `P(n)` is the number of weakly unimodal compositions of `n`.
+
+Worked instance: columns `[0,4], [1,3], [2,2]` (heights `5, 3, 1`, area 9) have
+row widths `r = (1, 2, 3, 2, 1)` from row 0 up — unimodal, and also summing to 9.
+
+*Proof, part 2: there are few of them.* Cut a weakly unimodal composition at its
+peak and what falls out on either side is a partition, so
+`P(n) ≤ (n+1)^2 p(n)^2` — the `(n+1)^2` pays for the peak's position and value.
 
 For `p(n)` the classical asymptotic is not needed, and the squeeze in
-Proposition 6 uses only `P(n)^{1/n} → 1`. Put `s = ⌈√n⌉` and split a partition
-of `n` at `s`. The parts `≤ s` are determined by their `s` multiplicities, each
-an integer in `[0, n]`, so they contribute at most `(n+1)^s` choices. The parts
-`> s` have size `≥ s+1`, so there are at most `L = ⌊n/(s+1)⌋` of them, and
-listing them in nonincreasing order gives a sequence of length `≤ L` over `n`
-values, at most `(L+1)n^L ≤ (n+1)^{L+1}` choices. Hence
+Proposition 6 uses only `P(n)^{1/n} → 1`, so a deliberately crude bound will do.
+Put `s = ⌈√n⌉` and split a partition of `n` at `s`. The parts `≤ s` are
+determined by their `s` multiplicities, each an integer in `[0, n]`, so they
+contribute at most `(n+1)^s` choices. The parts `> s` have size `≥ s+1`, so
+there are at most `L = ⌊n/(s+1)⌋` of them, and listing them in nonincreasing
+order gives a sequence of length `≤ L` over `n` values, at most
+`(L+1)n^L ≤ (n+1)^{L+1}` choices. Hence
 
     p(n)  ≤  (n+1)^{s+L+1}  ≤  (n+1)^{2√n+2},
 
 since `s ≤ √n + 1` and `L ≤ n/(√n+1) ≤ √n`. So `P(n) ≤ (n+1)^{4√n+6} = E(n)`
 and `log P(n)/n ≤ (4√n+6) log(n+1)/n → 0`. ∎
+
+Only the exponent matters: `√n · log n` is `o(n)`, so however many stacks there
+are, they carry no exponential. That is the entire role of Lemma 2 in the
+squeeze — the outer blocks are counted only to be discarded.
 
 (Hardy–Ramanujan would give the sharper `P(n) = e^{O(√n)}`; nothing downstream
 distinguishes the two, and the elementary bound keeps Proposition 6 free of
@@ -189,21 +226,28 @@ agreeing, verified against the entry's own data by
 `lim M(n)^(1/n)` exists and equals `sup_n M(n)^(1/n)`.
 
 *Proof.* Given staircase animals `X` (area `i`, last column height `h`) and `Y`
-(area `j`, first column height `h'`), translate `Y` by `d = max(0, h − h')` and
-concatenate the two column sequences.
+(area `j`, first column height `h'`), slide `Y` up by `d = max(0, h − h')` and
+butt the two column sequences together.
+
+*Why that `d`, and no other.* Staircase means both boundaries nondecreasing.
+At the seam, `b` not dropping forces `d ≥ 0`; `t` not dropping forces
+`d ≥ h − h'`. So `max(0, h − h')` is the smallest legal slide — `d` is a
+function of `X` and `Y`, not a choice being made, which is what stops the join
+from smuggling in information.
 
 *The join is in the class.* `d ≥ 0`, so bottoms stay nondecreasing;
 `d − s = max(0, h − h') − (h − h') ≥ 0`, so tops stay nondecreasing; and
 `d ≤ h`, since `d = h − h' ≤ h − 1` when `h ≥ h'` and `d = 0` otherwise, so the
 junction columns are king-adjacent (`b(r+1) ≤ t(r) + 1`). Area is `i + j`.
 
-*The join is injective at fixed `(i, j)`.* Every column is nonempty, so the
-cumulative areas `h(1) + … + h(r)` are **strictly** increasing and at most one
-prefix of columns has total area exactly `i`. Since `(i, j)` is fixed, that
-prefix is `X`'s columns and the rest are `Y`'s, each read back up to
-translation, which is how both were counted. No index has to be supplied
-alongside the join, so distinct pairs have distinct images and
-`M(i) M(j) ≤ M(i+j)`.
+*The join is injective at fixed `(i, j)`.* The question is whether the seam can
+be found again from the glued animal alone, given `i` and `j`. It can: every
+column is nonempty, so the cumulative areas `h(1) + … + h(r)` are **strictly**
+increasing, and a strictly increasing sequence hits `i` at most once. Cut at
+that unique prefix — those are `X`'s columns, the rest are `Y`'s, each read back
+up to translation, which is how both were counted in the first place. No split
+index has to be supplied alongside the join, so distinct pairs have distinct
+images and `M(i) M(j) ≤ M(i+j)`.
 
 Fekete's lemma in its supermultiplicative form then gives
 `lim M(n)^(1/n) = sup_n M(n)^(1/n)`. That is mathlib's
