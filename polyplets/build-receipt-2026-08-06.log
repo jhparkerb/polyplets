@@ -1,0 +1,74 @@
+=== polyplets Lean build receipt ===
+host       : gympie (Darwin arm64)
+date       : 2026-08-06T15:39:03Z (axioms recount + StairAnimals: same session)
+rev        : 679800c + the sortie B1 module (see git log for the exact rev)
+toolchain  : leanprover/lean4:v4.31.0
+mathlib    : rev="v4.31.0"
+command    : cd polyplets && lake build && lake build --no-build
+
+All targets up-to-date (8622 jobs).
+
+Source: 63 modules, 21,192 lines. Occurrences of `sorry`: 0.
+
+=== Axiom footprint ===
+
+226 `#print axioms` calls across the development, in two kinds:
+
+  83   GUARDED by `#guard_msgs` in Grand/Audit.lean (19) and
+       AuditOutworks.lean (66). A changed footprint is a BUILD ERROR, not a
+       warning, so a reader who builds the project has checked these.
+         50  standard axioms only
+         33  standard axioms + one or more NAMED native_decide leaves
+
+  143  UNGUARDED, inside the modules themselves. These print their footprint
+       on every build but nothing enforces it; they are informational.
+         95  standard axioms only
+         48  standard axioms + named native_decide leaves
+
+  0    sorryAx
+  0    anonymous Lean.ofReduceBool
+
+Every native leaf is a named, per-computation axiom, so each one is traceable
+to the finite computation that produced it -- e.g.
+`a_6._native.native_decide.ax_1_1` is the evaluation of a(6), and
+`T_king_3_2._native...` is one cell of the king triangle. There is no blanket
+`ofReduceBool` dependency anywhere in the development.
+
+Standard-axioms-only, and load-bearing for the papers:
+
+  a_supermul, lambda_tendsto, a_le_lambda_pow, lambda_le
+  Stair.join_valid, Stair.cut_join, Stair.join_injOn   (sortie B1; these three
+    need neither Classical.choice: [propext, Quot.sound] only)
+  Universal.universal_shape_d, universal_shape, universal_shape_production,
+    universal_production_int_all      (the universal diagonal law's engine)
+  Universal.king_shape_*_via_universal, kingSystem, peelSystem
+  grand_form, grand_form_prod
+  maxhole_lower, maxhole_upper, maxhole  (the last CONDITIONAL on MoatBound)
+  BuiSystem.certSum_le, lambda_le_of_buiSystem, RatCert.lambda_le
+  V5.v5_law_all and the four V5 companions
+  free_eq, oneSided_eq, bilateral_eq, r90_vanish
+
+Carrying named native leaves, with what the leaf is:
+
+  lambda_lb, lambda_gt                  a(6) = 524, evaluated
+  lambda_le_of_bui_rd3, buiRD3_valid    the RD3 Bui certificate's validity
+  Universal.{king,square,hex}_P1_*      two triangle cells per lattice
+  Universal.{king,square,hex}_rowSum_*  small row sums, the cross-family gates
+  mu_one, mu_two, mu_three_of,
+    lead_coeff_25, shape_lead           small aggregated weights V_i_j
+  P18_grand_of_banked, P18_grand_prod   the chunked weight cards, k <= 18
+  Free_4, OneSided_4, Bilateral_4       the n = 4 Burnside spot checks
+
+=== What this certifies ===
+
+Every target in the default closure (lakefile.toml defaultTargets =
+["Polyplets"]) is BUILT AND CURRENT at the rev above, with zero sorries, and
+the 83 guarded footprints are exactly as printed above.
+
+=== What it does NOT certify ===
+
+Nothing about the engine, the banked triangle, or the anchor VALUES: those
+enter the Lean theorems as explicit hypotheses or as native_decide leaves (see
+polyplets/PROOF-STATUS.md). `maxhole` is conditional on the hypothesis
+`MoatBound`, proved on paper in results/maxhole-proof.md but not in Lean.
+The 143 unguarded footprints are printed, not enforced.
