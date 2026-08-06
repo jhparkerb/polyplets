@@ -1,0 +1,99 @@
+##### mk_dir4_perim_terms_s200.txt #####
+-- prec, degree 2, order ladder
+  J=40  D=2   CANDIDATE      rows=159 skip=0 rank=
+  J=42  D=2   CANDIDATE      rows=157 skip=0 rank=
+  J=44  D=2   CANDIDATE      rows=155 skip=0 rank=
+  J=46  D=2   CANDIDATE      rows=153 skip=0 rank=
+  J=47  D=2   CANDIDATE      rows=152 skip=0 rank=
+  J=48  D=2   CANDIDATE      rows=151 skip=0 rank=
+  J=49  D=2   UNDERDET       rows=150 skip=0
+  J=50  D=2   UNDERDET       rows=149 skip=0
+-- prec, degree 3, order ladder
+  J=34  D=3   CANDIDATE      rows=165 skip=0 rank=
+  J=35  D=3   CANDIDATE      rows=164 skip=0 rank=
+  J=36  D=3   CANDIDATE      rows=163 skip=0 rank=
+  J=37  D=3   CANDIDATE      rows=162 skip=0 rank=
+  J=38  D=3   CANDIDATE      rows=161 skip=0 rank=
+  J=39  D=3   UNDERDET       rows=160 skip=0
+  J=40  D=3   UNDERDET       rows=159 skip=0
+-- prec, degree 4, order ladder
+  J=26  D=4   CANDIDATE      rows=173 skip=0 rank=
+  J=27  D=4   CANDIDATE      rows=172 skip=0 rank=
+  J=28  D=4   CANDIDATE      rows=171 skip=0 rank=
+  J=29  D=4   CANDIDATE      rows=170 skip=0 rank=
+  J=30  D=4   CANDIDATE      rows=169 skip=0 rank=
+  J=31  D=4   CANDIDATE      rows=168 skip=0 rank=
+  J=32  D=4   CANDIDATE      rows=167 skip=0 rank=
+-- prec, degree 9, order ladder
+  J=11  D=9   EXCLUDED       rows=188 skip=0 rank=
+  J=12  D=9   EXCLUDED       rows=187 skip=0 rank=
+  J=13  D=9   CANDIDATE      rows=186 skip=0 rank=
+  J=14  D=9   CANDIDATE      rows=185 skip=0 rank=
+  J=15  D=9   CANDIDATE      rows=184 skip=0 rank=
+  J=16  D=9   CANDIDATE      rows=183 skip=0 rank=
+  J=17  D=9   CANDIDATE      rows=182 skip=0 rank=
+  J=18  D=9   UNDERDET       rows=181 skip=0
+-- prec, degree 12, order ladder
+  J=10  D=12  EXCLUDED       rows=189 skip=0 rank=
+  J=11  D=12  EXCLUDED       rows=188 skip=0 rank=
+  J=12  D=12  EXCLUDED       rows=187 skip=0 rank=
+  J=13  D=12  CANDIDATE      rows=186 skip=0 rank=
+  J=14  D=12  UNDERDET       rows=185 skip=0
+-- prec, degree ladder at fixed order 13
+  J=13  D=8   EXCLUDED       rows=186 skip=0 rank=
+  J=13  D=9   CANDIDATE      rows=186 skip=0 rank=
+  J=13  D=10  CANDIDATE      rows=186 skip=0 rank=
+  J=13  D=11  CANDIDATE      rows=186 skip=0 rank=
+  J=13  D=12  CANDIDATE      rows=186 skip=0 rank=
+  J=13  D=13  UNDERDET       rows=186 skip=0
+
+##### dir4_perim_null199.txt #####
+-- prec, degree 2, order ladder
+  J=40  D=2   EXCLUDED       rows=159 skip=0 rank=
+  J=42  D=2   EXCLUDED       rows=157 skip=0 rank=
+  J=44  D=2   EXCLUDED       rows=155 skip=0 rank=
+  J=46  D=2   EXCLUDED       rows=153 skip=0 rank=
+  J=47  D=2   EXCLUDED       rows=152 skip=0 rank=
+  J=48  D=2   EXCLUDED       rows=151 skip=0 rank=
+  J=49  D=2   UNDERDET       rows=150 skip=0
+  J=50  D=2   UNDERDET       rows=149 skip=0
+-- prec, degree 3, order ladder
+  J=34  D=3   EXCLUDED       rows=165 skip=0 rank=
+  J=35  D=3   EXCLUDED       rows=164 skip=0 rank=
+  J=36  D=3   EXCLUDED       rows=163 skip=0 rank=
+  J=37  D=3   EXCLUDED       rows=162 skip=0 rank=
+  J=38  D=3   EXCLUDED       rows=161 skip=0 rank=
+  J=39  D=3   UNDERDET       rows=160 skip=0
+  J=40  D=3   UNDERDET       rows=159 skip=0
+-- prec, degree 4, order ladder
+  J=26  D=4   EXCLUDED       rows=173 skip=0 rank=
+  J=27  D=4   EXCLUDED       rows=172 skip=0 rank=
+  J=28  D=4   EXCLUDED       rows=171 skip=0 rank=
+  J=29  D=4   EXCLUDED       rows=170 skip=0 rank=
+  J=30  D=4   EXCLUDED       rows=169 skip=0 rank=
+  J=31  D=4   EXCLUDED       rows=168 skip=0 rank=
+  J=32  D=4   EXCLUDED       rows=167 skip=0 rank=
+-- prec, degree 9, order ladder
+  J=11  D=9   EXCLUDED       rows=188 skip=0 rank=
+  J=12  D=9   EXCLUDED       rows=187 skip=0 rank=
+  J=13  D=9   EXCLUDED       rows=186 skip=0 rank=
+  J=14  D=9   EXCLUDED       rows=185 skip=0 rank=
+  J=15  D=9   EXCLUDED       rows=184 skip=0 rank=
+  J=16  D=9   EXCLUDED       rows=183 skip=0 rank=
+  J=17  D=9   EXCLUDED       rows=182 skip=0 rank=
+  J=18  D=9   UNDERDET       rows=181 skip=0
+-- prec, degree 12, order ladder
+  J=10  D=12  EXCLUDED       rows=189 skip=0 rank=
+  J=11  D=12  EXCLUDED       rows=188 skip=0 rank=
+  J=12  D=12  EXCLUDED       rows=187 skip=0 rank=
+  J=13  D=12  EXCLUDED       rows=186 skip=0 rank=
+  J=14  D=12  UNDERDET       rows=185 skip=0
+-- prec, degree ladder at fixed order 13
+  J=13  D=8   EXCLUDED       rows=186 skip=0 rank=
+  J=13  D=9   EXCLUDED       rows=186 skip=0 rank=
+  J=13  D=10  EXCLUDED       rows=186 skip=0 rank=
+  J=13  D=11  EXCLUDED       rows=186 skip=0 rank=
+  J=13  D=12  EXCLUDED       rows=186 skip=0 rank=
+  J=13  D=13  UNDERDET       rows=186 skip=0
+
+LADDER DONE

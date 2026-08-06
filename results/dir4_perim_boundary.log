@@ -1,0 +1,59 @@
+### boundary scan: smallest order J with a CANDIDATE at each degree D
+### (dir4 first, then the null control at the SAME box)
+-- degree 2
+   dir4  J=27  CANDIDATE unk=84   rows=172  nullity=1    holdout=84/84
+   null  J=27  EXCLUDED  unk=84   rows=172  nullity=0    holdout=0/84
+   hv    J=27  CANDIDATE unk=84   rows=172  nullity=45   holdout=84/84
+-- degree 3
+   dir4  J=19  CANDIDATE unk=80   rows=180  nullity=1    holdout=96/96
+   null  J=19  EXCLUDED  unk=80   rows=180  nullity=0    holdout=0/96
+   hv    J=19  CANDIDATE unk=80   rows=180  nullity=46   holdout=96/96
+-- degree 4
+   dir4  J=17  CANDIDATE unk=90   rows=182  nullity=3    holdout=88/88
+   null  J=17  EXCLUDED  unk=90   rows=182  nullity=0    holdout=0/88
+   hv    J=17  CANDIDATE unk=90   rows=182  nullity=55   holdout=88/88
+-- degree 5
+   dir4  J=15  CANDIDATE unk=96   rows=184  nullity=1    holdout=84/84
+   null  J=15  EXCLUDED  unk=96   rows=184  nullity=0    holdout=0/84
+   hv    J=15  CANDIDATE unk=96   rows=184  nullity=60   holdout=84/84
+-- degree 6
+   dir4  J=15  CANDIDATE unk=112  rows=184  nullity=5    holdout=68/68
+   null  J=15  EXCLUDED  unk=112  rows=184  nullity=0    holdout=0/68
+   hv    J=15  CANDIDATE unk=112  rows=184  nullity=73   holdout=68/68
+-- degree 7
+   dir4  J=14  CANDIDATE unk=120  rows=185  nullity=3    holdout=61/61
+   null  J=14  EXCLUDED  unk=120  rows=185  nullity=0    holdout=0/61
+   hv    J=14  CANDIDATE unk=120  rows=185  nullity=79   holdout=61/61
+-- degree 8
+   dir4  J=14  CANDIDATE unk=135  rows=185  nullity=6    holdout=46/46
+   null  J=14  EXCLUDED  unk=135  rows=185  nullity=0    holdout=0/46
+   hv    J=14  CANDIDATE unk=135  rows=185  nullity=91   holdout=46/46
+-- degree 9
+   dir4  J=13  CANDIDATE unk=140  rows=186  nullity=1    holdout=42/42
+   null  J=13  EXCLUDED  unk=140  rows=186  nullity=0    holdout=0/42
+   hv    J=13  CANDIDATE unk=140  rows=186  nullity=94   holdout=42/42
+-- degree 10
+   dir4  J=13  CANDIDATE unk=154  rows=186  nullity=3    holdout=28/28
+   null  J=13  EXCLUDED  unk=154  rows=186  nullity=0    holdout=0/28
+   hv    J=13  CANDIDATE unk=154  rows=186  nullity=105  holdout=28/28
+-- degree 11
+   dir4  J=13  CANDIDATE unk=168  rows=186  nullity=5    holdout=14/14
+   null  J=13  EXCLUDED  unk=168  rows=186  nullity=0    holdout=0/14
+   hv    J=13  CANDIDATE unk=168  rows=186  nullity=116  holdout=14/14
+-- degree 12
+   dir4  J=13  CANDIDATE unk=182  rows=186  nullity=7    holdout=0/0
+   null  J=13  EXCLUDED  unk=182  rows=186  nullity=0    holdout=0/0
+   hv    J=13  CANDIDATE unk=182  rows=186  nullity=127  holdout=0/0
+
+### the same, algebraic mode
+   L=4: no decidable box left (K=39)
+   L=6: no decidable box left (K=28)
+   L=8: no decidable box left (K=22)
+   L=10: no decidable box left (K=18)
+   L=12: no decidable box left (K=15)
+   L=14: no decidable box left (K=13)
+   L=16: no decidable box left (K=11)
+   L=20: no decidable box left (K=9)
+   dir4  K=4   L=24  CANDIDATE unk=125  rows=200  nullity=3    holdout=71/71
+   null  K=4   L=24  EXCLUDED  unk=125  rows=200  nullity=0    holdout=0/71
+BOUNDARY SCAN DONE

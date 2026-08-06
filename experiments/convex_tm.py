@@ -31,33 +31,40 @@ while dp:
         nmin = next((i for i, v in enumerate(vec) if v), None)
         if nmin is None:
             continue
+        # Prefix sums over n0 let each (npl, npr) sub-interval of dl be
+        # folded into one range-sum-and-add instead of a per-dl loop:
+        # every dl in a contiguous sub-interval shifts the same vec by the
+        # same wp, so the O(w) dl loop collapses to O(1) box counts times
+        # a single vector add scaled by the box width (a convolution with
+        # a box is just a prefix-sum difference of box width, folded here
+        # into a scalar multiply since the shift itself is dl-independent).
         for wp in range(1, N - nmin + 1):
-            # enumerate dl; dr = wp - w + dl
-            # king reach: dl <= w, dr >= -w; phases constrain signs
-            dl_hi = w if pl == 0 else w
-            dl_lo = -(N)  # will be cut by dr >= -w:  dl >= wp - w + dl >= ... dr = wp-w+dl >= -w => dl >= -wp
-            for dl in range(max(-wp, wp - 2 * w) if False else -wp, dl_hi + 1):
-                dr = wp - w + dl
-                if dr < -w:
+            # dl range before phase forcing: [-wp, w] (dr = wp - w + dl is
+            # already >= -w throughout since dl >= -wp).
+            lo = -wp if pl == 0 else 0        # pl==1 forces dl >= 0
+            hi = w if pr == 0 else w - wp     # pr==1 forces dl <= w - wp
+            if lo > hi:
+                continue
+            split_l = w - wp  # dr >= 0  <=>  dl >= split_l
+            for npl, lo_l, hi_l in (
+                ((0, lo, min(hi, 0)), (1, max(lo, 1), hi))
+                if pl == 0 else ((1, lo, hi),)
+            ):
+                if lo_l > hi_l:
                     continue
-                # phase transitions
-                if pl == 0:
-                    npl = 0 if dl <= 0 else 1
-                else:
-                    if dl < 0:
+                for npr, lo_r, hi_r in (
+                    ((0, split_l, hi), (1, lo, split_l - 1))
+                    if pr == 0 else ((1, lo, hi),)
+                ):
+                    a, b = max(lo_l, lo_r), min(hi_l, hi_r)
+                    if a > b:
                         continue
-                    npl = 1
-                if pr == 0:
-                    npr = 0 if dr >= 0 else 1
-                else:
-                    if dr > 0:
-                        continue
-                    npr = 1
-                tgt = ndp[(wp, npl, npr)]
-                for n0 in range(nmin, N - wp + 1):
-                    v = vec[n0]
-                    if v:
-                        tgt[n0 + wp] += v
+                    count = b - a + 1
+                    tgt = ndp[(wp, npl, npr)]
+                    for n0 in range(nmin, N - wp + 1):
+                        v = vec[n0]
+                        if v:
+                            tgt[n0 + wp] += count * v
     dp = ndp
     for vec in dp.values():
         for n0, v in enumerate(vec):

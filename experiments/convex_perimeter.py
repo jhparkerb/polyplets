@@ -25,6 +25,20 @@ SMAX = int(sys.argv[1]) if len(sys.argv) > 1 else 36
 
 
 def count_by_box(Smax, king=True):
+    """Row DP over the exact bounding box (W, H). Unlike convex_tm.py's area
+    DP, state keys store the ABSOLUTE column boundaries (l, r), needed by
+    future transitions -- so distinct rp values can't be merged into one
+    scaled count the way convex_tm.py's dl values were (docs/middle-kingdom-
+    plan.md Phase 1a). What DOES collapse: for a fixed lp, the same v is
+    added to EVERY rp in a contiguous range (the inner rp loop) -- a
+    textbook range update, done here as a 1D difference array per (lp, npl,
+    tLp, npr, tRp) bucket, marked in O(1) per lp and materialized with one
+    O(W) prefix-sum sweep per bucket after all source states are processed.
+    The lp loop itself stays explicit (unlike wp in convex_tm.py's collapse),
+    so this is ~S^6 -> ~S^5, not the ~S^5 -> ~S^4 area DP got. Verified
+    against the original nested (lp, rp) loop at Smax in {12, 20, 30},
+    exact match, both king and non-king, before this replaced it (Phase 1b).
+    """
     out = {}
     for W in range(1, Smax):
         Hmax = Smax - W
@@ -43,24 +57,57 @@ def count_by_box(Smax, king=True):
         res[1] = flush(dp)
         H = 1
         while H < Hmax:
-            ndp = defaultdict(int)
+            # delta[(lp, npl, tLp, npr, tRp)] = 1D difference array over rp,
+            # size W+1 (index W is the "one past end" sentinel).
+            delta = defaultdict(lambda: [0] * (W + 1))
+
+            def mark(key, a, b, v):
+                if a > b:
+                    return
+                arr = delta[key]
+                arr[a] += v
+                arr[b + 1] -= v
+
             for (l, r, pl, pr, tL, tR), v in dp.items():
-                for lp in range(W):
-                    if pl == 1 and lp < l:
+                lp_lo = l if pl == 1 else 0
+                lp_hi = min(W - 1, (r + 1 if king else r))
+                king_off = l - 1 if king else l
+                for lp in range(lp_lo, lp_hi + 1):
+                    rp_lo = max(lp, king_off)
+                    rp_hi = r if pr == 1 else W - 1
+                    if rp_lo > rp_hi:
                         continue
-                    for rp in range(lp, W):
-                        if pr == 1 and rp > r:
-                            continue
-                        if king:
-                            if lp > r + 1 or rp < l - 1:
-                                continue
+                    npl = 1 if (pl == 1 or lp > l) else 0
+                    tLp = tL or lp == 0
+
+                    if pr == 0:
+                        ranges = []
+                        a, b = rp_lo, min(rp_hi, r - 1)
+                        if a <= b:
+                            ranges.append((1, a, b))
+                        a, b = max(rp_lo, r), rp_hi
+                        if a <= b:
+                            ranges.append((0, a, b))
+                    else:
+                        ranges = [(1, rp_lo, rp_hi)]
+
+                    for npr, a, b in ranges:
+                        if tR:
+                            mark((lp, npl, tLp, npr, True), a, b, v)
+                        elif a <= W - 1 <= b:
+                            if a <= W - 2:
+                                mark((lp, npl, tLp, npr, False), a, W - 2, v)
+                            mark((lp, npl, tLp, npr, True), W - 1, W - 1, v)
                         else:
-                            if lp > r or rp < l:
-                                continue
-                        ndp[(lp, rp,
-                             1 if (pl == 1 or lp > l) else 0,
-                             1 if (pr == 1 or rp < r) else 0,
-                             tL or lp == 0, tR or rp == W - 1)] += v
+                            mark((lp, npl, tLp, npr, False), a, b, v)
+
+            ndp = defaultdict(int)
+            for (lp, npl, tLp, npr, tRp), arr in delta.items():
+                run = 0
+                for rp in range(W):
+                    run += arr[rp]
+                    if run:
+                        ndp[(lp, rp, npl, npr, tLp, tRp)] += run
             dp = ndp
             H += 1
             res[H] = flush(dp)

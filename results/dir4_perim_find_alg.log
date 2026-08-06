@@ -1,0 +1,27 @@
+series=mk_dir4_perim_terms_s200.txt terms=199 box=(4,22) unknowns=115 rows=200 train=119 holdout=81
+FOUND 1 relation(s) surviving the holdout  [3.1s]
+rows failing over Z: 0 of 200
+  q_0(t) = 9*t^4 + -120*t^5 + 676*t^6 + -2140*t^7 + 4283*t^8 + -5576*t^9 + 4198*t^10 + -906*t^11 + -1270*t^12 + 1350*t^13 + -96*t^14 + 364*t^15 + 888*t^16 + 526*t^17 + 349*t^18 + 246*t^19 + 98*t^20 + 16*t^21 + 1*t^22
+  q_1(t) = -30*t^3 + 482*t^4 + -3174*t^5 + 11056*t^6 + -21912*t^7 + 24026*t^8 + -9132*t^9 + -11860*t^10 + 13626*t^11 + 492*t^12 + -2894*t^13 + 6540*t^14 + 8332*t^15 + 7390*t^16 + 6696*t^17 + 4312*t^18 + 1616*t^19 + 314*t^20 + 24*t^21
+  q_2(t) = 37*t^2 + -700*t^3 + 5389*t^4 + -21320*t^5 + 44037*t^6 + -37722*t^7 + -13978*t^8 + 48384*t^9 + -20464*t^10 + -33324*t^11 + 20515*t^12 + 32808*t^13 + 26909*t^14 + 36302*t^15 + 40156*t^16 + 26936*t^17 + 10841*t^18 + 2516*t^19 + 286*t^20 + 8*t^21
+  q_3(t) = -20*t^1 + 438*t^2 + -3916*t^3 + 17882*t^4 + -40900*t^5 + 28522*t^6 + 51028*t^7 + -69112*t^8 + -44984*t^9 + 48224*t^10 + 20452*t^11 + -21166*t^12 + 31956*t^13 + 110234*t^14 + 124676*t^15 + 81772*t^16 + 34364*t^17 + 9190*t^18 + 1424*t^19 + 96*t^20
+  q_4(t) = 4*t^0 + -100*t^1 + 1029*t^2 + -5446*t^3 + 14407*t^4 + -10250*t^5 + -32039*t^6 + 43974*t^7 + 65620*t^8 + -55556*t^9 + -141788*t^10 + -55634*t^11 + 115295*t^12 + 212542*t^13 + 190333*t^14 + 112426*t^15 + 46834*t^16 + 13732*t^17 + 2689*t^18 + 312*t^19 + 16*t^20
+        3.09 real         3.07 user         0.01 sys
+            19955712  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                1967  page reclaims
+                  41  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   0  voluntary context switches
+                  48  involuntary context switches
+         48509039646  instructions retired
+         13790050230  cycles elapsed
+            11076016  peak memory footprint
+rc=0

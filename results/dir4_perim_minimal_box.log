@@ -1,0 +1,26 @@
+### prec: the low-degree and high-degree ends of the frontier
+  D=1: no decidable box left (J=66)
+  D=13: no decidable box left (J=13)
+  D=14: no decidable box left (J=12)
+  D=15: no decidable box left (J=11)
+
+### alg: minimal t-degree L at each algebraic degree K
+  K=2: no decidable box left (L=66)
+  K=3: no decidable box left (L=49)
+  dir4 K=4   L=22  CANDIDATE unk=115  rows=200  nullity=1    holdout=81/81
+  null K=4   L=22  EXCLUDED  unk=115  rows=200  nullity=0    holdout=0/81
+  dir4 K=5   L=22  CANDIDATE unk=138  rows=200  nullity=2    holdout=58/58
+  null K=5   L=22  EXCLUDED  unk=138  rows=200  nullity=0    holdout=0/58
+  dir4 K=6   L=22  CANDIDATE unk=161  rows=200  nullity=3    holdout=35/35
+  null K=6   L=22  EXCLUDED  unk=161  rows=200  nullity=0    holdout=0/35
+  dir4 K=7   L=22  CANDIDATE unk=184  rows=200  nullity=4    holdout=12/12
+  null K=7   L=22  EXCLUDED  unk=184  rows=200  nullity=0    holdout=0/12
+  K=8: no decidable box left (L=22)
+
+### headline boxes on the SECOND prime (1152921504606846883)
+  p0 prec  (27,2) CANDIDATE unk=84   rows=172  nullity=1    holdout=84/84  p1 prec  (27,2) CANDIDATE unk=84   rows=172  nullity=1    holdout=84/84  p0 prec  (19,3) CANDIDATE unk=80   rows=180  nullity=1    holdout=96/96  p1 prec  (19,3) CANDIDATE unk=80   rows=180  nullity=1    holdout=96/96  p0 prec  (17,4) CANDIDATE unk=90   rows=182  nullity=3    holdout=88/88  p1 prec  (17,4) CANDIDATE unk=90   rows=182  nullity=3    holdout=88/88  p0 prec  (15,5) CANDIDATE unk=96   rows=184  nullity=1    holdout=84/84  p1 prec  (15,5) CANDIDATE unk=96   rows=184  nullity=1    holdout=84/84  p0 prec  (13,9) CANDIDATE unk=140  rows=186  nullity=1    holdout=42/42  p1 prec  (13,9) CANDIDATE unk=140  rows=186  nullity=1    holdout=42/42  p0 alg   (4,24) CANDIDATE unk=125  rows=200  nullity=3    holdout=71/71  p1 alg   (4,24) CANDIDATE unk=125  rows=200  nullity=3    holdout=71/71
+### headline boxes with the first 20 rows dropped (holds EVENTUALLY?)
+  skip20 prec  (27,2) CANDIDATE nullity=1    holdout=64/64
+  skip20 prec  (19,3) CANDIDATE nullity=1    holdout=76/76
+  skip20 prec  (13,9) CANDIDATE nullity=1    holdout=22/22
+MINIMAL BOX DONE

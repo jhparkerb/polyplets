@@ -1,0 +1,361 @@
+##### CONTROL ARMS (tests/gate_convex_dfinite.py discipline) #####
+
+=== prec +  HV-convex by semiperimeter, banked (5,2) recurrence: must be CANDIDATE :: build/prec_guess prec results/convex_perim_terms_s200.txt 5 2
+mode=prec terms=199 box=(5,2) unknowns=18 rows=194 skip=0 prime=2305843009213693951
+train rows=22 rank=17 nullity=1
+holdout rows=172 best_consecutive_pass=172
+full rank=17 of 18 unknowns; nullity=1
+VERDICT: CANDIDATE
+rc=3
+
+=== prec -  same series, (2,1) too small: must be EXCLUDED :: build/prec_guess prec results/convex_perim_terms_s200.txt 2 1
+mode=prec terms=199 box=(2,1) unknowns=6 rows=197 skip=0 prime=2305843009213693951
+train rows=10 rank=6 nullity=0
+holdout rows=187 best_consecutive_pass=0
+full rank=6 of 6 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== alg +   A005436 algebraic (Delest-Viennot) at (2,8): must be CANDIDATE :: build/prec_guess alg results/a005436_perim_s100.txt 2 8
+mode=alg terms=99 box=(2,8) unknowns=27 rows=100 skip=0 prime=2305843009213693951
+train rows=31 rank=26 nullity=1
+holdout rows=69 best_consecutive_pass=69
+full rank=26 of 27 unknowns; nullity=1
+VERDICT: CANDIDATE
+rc=3
+
+=== alg -   A005436 at (2,4) too small: must be EXCLUDED :: build/prec_guess alg results/a005436_perim_s100.txt 2 4
+mode=alg terms=99 box=(2,4) unknowns=15 rows=100 skip=0 prime=2305843009213693951
+train rows=19 rank=15 nullity=0
+holdout rows=81 best_consecutive_pass=0
+full rank=15 of 15 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+##### POWER ARM: same series length, same maximal boxes as the dir4 sweep #####
+# If the guesser still finds the known HV recurrence inside the very boxes
+# that exclude dir4, an unpowered guesser is not the explanation.
+
+=== power prec HV-convex (known D-finite) box (12 12) :: build/prec_guess prec results/convex_perim_terms_s200.txt 12 12
+mode=prec terms=199 box=(12,12) unknowns=169 rows=187 skip=0 prime=2305843009213693951
+train rows=173 rank=54 nullity=115
+holdout rows=14 best_consecutive_pass=14
+full rank=54 of 169 unknowns; nullity=115
+VERDICT: CANDIDATE
+rc=3
+
+=== power prec HV-convex (known D-finite) box (13 12) :: build/prec_guess prec results/convex_perim_terms_s200.txt 13 12
+mode=prec terms=199 box=(13,12) unknowns=182 rows=186 skip=0 prime=2305843009213693951
+train rows=186 rank=55 nullity=127
+holdout rows=0 best_consecutive_pass=0
+full rank=55 of 182 unknowns; nullity=127
+VERDICT: CANDIDATE
+rc=3
+
+=== power prec HV-convex (known D-finite) box (9 17) :: build/prec_guess prec results/convex_perim_terms_s200.txt 9 17
+mode=prec terms=199 box=(9,17) unknowns=180 rows=190 skip=0 prime=2305843009213693951
+train rows=184 rank=66 nullity=114
+holdout rows=6 best_consecutive_pass=6
+full rank=66 of 180 unknowns; nullity=114
+VERDICT: CANDIDATE
+rc=3
+
+=== power prec HV-convex (known D-finite) box (17 9) :: build/prec_guess prec results/convex_perim_terms_s200.txt 17 9
+mode=prec terms=199 box=(17,9) unknowns=180 rows=182 skip=0 prime=2305843009213693951
+train rows=182 rank=50 nullity=130
+holdout rows=0 best_consecutive_pass=0
+full rank=50 of 180 unknowns; nullity=130
+VERDICT: CANDIDATE
+rc=3
+
+=== power prec HV-convex (known D-finite) box (6 26) :: build/prec_guess prec results/convex_perim_terms_s200.txt 6 26
+mode=prec terms=199 box=(6,26) unknowns=189 rows=193 skip=0 prime=2305843009213693951
+train rows=193 rank=90 nullity=99
+holdout rows=0 best_consecutive_pass=0
+full rank=90 of 189 unknowns; nullity=99
+VERDICT: CANDIDATE
+rc=3
+
+=== power prec HV-convex (known D-finite) box (4 37) :: build/prec_guess prec results/convex_perim_terms_s200.txt 4 37
+mode=prec terms=199 box=(4,37) unknowns=190 rows=195 skip=0 prime=2305843009213693951
+train rows=194 rank=121 nullity=69
+holdout rows=1 best_consecutive_pass=1
+full rank=121 of 190 unknowns; nullity=69
+VERDICT: CANDIDATE
+rc=3
+
+=== power prec HV-convex (known D-finite) box (2 62) :: build/prec_guess prec results/convex_perim_terms_s200.txt 2 62
+mode=prec terms=199 box=(2,62) unknowns=189 rows=197 skip=0 prime=2305843009213693951
+train rows=193 rank=189 nullity=0
+holdout rows=4 best_consecutive_pass=0
+full rank=189 of 189 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== power prec HV-convex (known D-finite) box (38 3) :: build/prec_guess prec results/convex_perim_terms_s200.txt 38 3
+mode=prec terms=199 box=(38,3) unknowns=156 rows=161 skip=0 prime=2305843009213693951
+train rows=160 rank=53 nullity=103
+holdout rows=1 best_consecutive_pass=1
+full rank=53 of 156 unknowns; nullity=103
+VERDICT: CANDIDATE
+rc=3
+
+=== power alg  HV-convex at (12,14) :: build/prec_guess alg results/convex_perim_terms_s200.txt 12 14
+mode=alg terms=199 box=(12,14) unknowns=195 rows=200 skip=0 prime=2305843009213693951
+train rows=199 rank=129 nullity=66
+holdout rows=1 best_consecutive_pass=1
+full rank=129 of 195 unknowns; nullity=66
+VERDICT: CANDIDATE
+rc=3
+
+##### THE QUESTION: dir4 x HV-convex by semiperimeter #####
+
+=== dir4 prec box (5 2) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 5 2
+mode=prec terms=199 box=(5,2) unknowns=18 rows=194 skip=0 prime=2305843009213693951
+train rows=22 rank=18 nullity=0
+holdout rows=172 best_consecutive_pass=0
+full rank=18 of 18 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec box (12 12) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 12 12
+mode=prec terms=199 box=(12,12) unknowns=169 rows=187 skip=0 prime=2305843009213693951
+train rows=173 rank=169 nullity=0
+holdout rows=14 best_consecutive_pass=0
+full rank=169 of 169 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec box (13 12) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 13 12
+mode=prec terms=199 box=(13,12) unknowns=182 rows=186 skip=0 prime=2305843009213693951
+train rows=186 rank=175 nullity=7
+holdout rows=0 best_consecutive_pass=0
+full rank=175 of 182 unknowns; nullity=7
+VERDICT: CANDIDATE
+rc=3
+
+=== dir4 prec box (11 14) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 11 14
+mode=prec terms=199 box=(11,14) unknowns=180 rows=188 skip=0 prime=2305843009213693951
+train rows=184 rank=180 nullity=0
+holdout rows=4 best_consecutive_pass=0
+full rank=180 of 180 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec box (9 17) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 9 17
+mode=prec terms=199 box=(9,17) unknowns=180 rows=190 skip=0 prime=2305843009213693951
+train rows=184 rank=180 nullity=0
+holdout rows=6 best_consecutive_pass=0
+full rank=180 of 180 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec box (17 9) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 17 9
+mode=prec terms=199 box=(17,9) unknowns=180 rows=182 skip=0 prime=2305843009213693951
+train rows=182 rank=147 nullity=33
+holdout rows=0 best_consecutive_pass=0
+full rank=147 of 180 unknowns; nullity=33
+VERDICT: CANDIDATE
+rc=3
+
+=== dir4 prec box (14 11) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 14 11
+mode=prec terms=199 box=(14,11) unknowns=180 rows=185 skip=0 prime=2305843009213693951
+train rows=184 rank=165 nullity=15
+holdout rows=1 best_consecutive_pass=1
+full rank=165 of 180 unknowns; nullity=15
+VERDICT: CANDIDATE
+rc=3
+
+=== dir4 prec box (6 26) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 6 26
+mode=prec terms=199 box=(6,26) unknowns=189 rows=193 skip=0 prime=2305843009213693951
+train rows=193 rank=189 nullity=0
+holdout rows=0 best_consecutive_pass=0
+full rank=189 of 189 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec box (4 37) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 4 37
+mode=prec terms=199 box=(4,37) unknowns=190 rows=195 skip=0 prime=2305843009213693951
+train rows=194 rank=190 nullity=0
+holdout rows=1 best_consecutive_pass=0
+full rank=190 of 190 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec box (3 46) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 3 46
+mode=prec terms=199 box=(3,46) unknowns=188 rows=196 skip=0 prime=2305843009213693951
+train rows=192 rank=188 nullity=0
+holdout rows=4 best_consecutive_pass=0
+full rank=188 of 188 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec box (2 62) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 2 62
+mode=prec terms=199 box=(2,62) unknowns=189 rows=197 skip=0 prime=2305843009213693951
+train rows=193 rank=189 nullity=0
+holdout rows=4 best_consecutive_pass=0
+full rank=189 of 189 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec box (1 97) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 1 97
+mode=prec terms=199 box=(1,97) unknowns=196 rows=198 skip=0 prime=2305843009213693951
+train rows=198 rank=196 nullity=0
+holdout rows=0 best_consecutive_pass=0
+full rank=196 of 196 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec box (30 4) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 30 4
+mode=prec terms=199 box=(30,4) unknowns=155 rows=169 skip=0 prime=2305843009213693951
+train rows=159 rank=113 nullity=42
+holdout rows=10 best_consecutive_pass=10
+full rank=113 of 155 unknowns; nullity=42
+VERDICT: CANDIDATE
+rc=3
+
+=== dir4 prec box (38 3) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 38 3
+mode=prec terms=199 box=(38,3) unknowns=156 rows=161 skip=0 prime=2305843009213693951
+train rows=160 rank=117 nullity=39
+holdout rows=1 best_consecutive_pass=1
+full rank=117 of 156 unknowns; nullity=39
+VERDICT: CANDIDATE
+rc=3
+
+=== dir4 prec box (48 2) :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 48 2
+mode=prec terms=199 box=(48,2) unknowns=147 rows=151 skip=0 prime=2305843009213693951
+train rows=151 rank=125 nullity=22
+holdout rows=0 best_consecutive_pass=0
+full rank=125 of 147 unknowns; nullity=22
+VERDICT: CANDIDATE
+rc=3
+
+=== dir4 alg box (12 14) :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 12 14
+mode=alg terms=199 box=(12,14) unknowns=195 rows=200 skip=0 prime=2305843009213693951
+train rows=199 rank=195 nullity=0
+holdout rows=1 best_consecutive_pass=0
+full rank=195 of 195 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 alg box (13 13) :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 13 13
+mode=alg terms=199 box=(13,13) unknowns=196 rows=200 skip=0 prime=2305843009213693951
+train rows=200 rank=196 nullity=0
+holdout rows=0 best_consecutive_pass=0
+full rank=196 of 196 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 alg box (14 12) :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 14 12
+mode=alg terms=199 box=(14,12) unknowns=195 rows=200 skip=0 prime=2305843009213693951
+train rows=199 rank=195 nullity=0
+holdout rows=1 best_consecutive_pass=0
+full rank=195 of 195 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 alg box (9 18) :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 9 18
+mode=alg terms=199 box=(9,18) unknowns=190 rows=200 skip=0 prime=2305843009213693951
+train rows=194 rank=190 nullity=0
+holdout rows=6 best_consecutive_pass=0
+full rank=190 of 190 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 alg box (18 9) :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 18 9
+mode=alg terms=199 box=(18,9) unknowns=190 rows=200 skip=0 prime=2305843009213693951
+train rows=194 rank=190 nullity=0
+holdout rows=6 best_consecutive_pass=0
+full rank=190 of 190 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 alg box (6 27) :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 6 27
+mode=alg terms=199 box=(6,27) unknowns=196 rows=200 skip=0 prime=2305843009213693951
+train rows=200 rank=178 nullity=18
+holdout rows=0 best_consecutive_pass=0
+full rank=178 of 196 unknowns; nullity=18
+VERDICT: CANDIDATE
+rc=3
+
+=== dir4 alg box (3 48) :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 3 48
+mode=alg terms=199 box=(3,48) unknowns=196 rows=200 skip=0 prime=2305843009213693951
+train rows=200 rank=196 nullity=0
+holdout rows=0 best_consecutive_pass=0
+full rank=196 of 196 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 alg box (2 65) :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 2 65
+mode=alg terms=199 box=(2,65) unknowns=198 rows=200 skip=0 prime=2305843009213693951
+train rows=200 rank=198 nullity=0
+holdout rows=0 best_consecutive_pass=0
+full rank=198 of 198 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 alg box (1 98) :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 1 98
+mode=alg terms=199 box=(1,98) unknowns=198 rows=200 skip=0 prime=2305843009213693951
+train rows=200 rank=198 nullity=0
+holdout rows=0 best_consecutive_pass=0
+full rank=198 of 198 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 alg box (30 5) :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 30 5
+mode=alg terms=199 box=(30,5) unknowns=186 rows=200 skip=0 prime=2305843009213693951
+train rows=190 rank=186 nullity=0
+holdout rows=10 best_consecutive_pass=0
+full rank=186 of 186 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 alg box (45 3) :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 45 3
+mode=alg terms=199 box=(45,3) unknowns=184 rows=200 skip=0 prime=2305843009213693951
+train rows=188 rank=184 nullity=0
+holdout rows=12 best_consecutive_pass=0
+full rank=184 of 184 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+##### ROBUSTNESS ON THE HEADLINE BOX #####
+
+=== dir4 prec (12,12), second prime :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 12 12 1
+mode=prec terms=199 box=(12,12) unknowns=169 rows=187 skip=0 prime=1152921504606846883
+train rows=173 rank=169 nullity=0
+holdout rows=14 best_consecutive_pass=0
+full rank=169 of 169 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec (12,12), skip 20 leading rows :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 12 12 0 4 20
+mode=prec terms=199 box=(12,12) unknowns=169 rows=167 skip=20 prime=2305843009213693951
+UNDERDETERMINED: rows 167 <= unknowns 169 -- more terms needed
+VERDICT: INCONCLUSIVE
+rc=2
+
+=== dir4 alg  (12,14), second prime :: build/prec_guess alg results/mk_dir4_perim_terms_s200.txt 12 14 1
+mode=alg terms=199 box=(12,14) unknowns=195 rows=200 skip=0 prime=1152921504606846883
+train rows=199 rank=195 nullity=0
+holdout rows=1 best_consecutive_pass=0
+full rank=195 of 195 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec (5,2), second prime :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 5 2 1
+mode=prec terms=199 box=(5,2) unknowns=18 rows=194 skip=0 prime=1152921504606846883
+train rows=22 rank=18 nullity=0
+holdout rows=172 best_consecutive_pass=0
+full rank=18 of 18 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+=== dir4 prec (5,2), skip 20 leading rows :: build/prec_guess prec results/mk_dir4_perim_terms_s200.txt 5 2 0 4 20
+mode=prec terms=199 box=(5,2) unknowns=18 rows=174 skip=20 prime=2305843009213693951
+train rows=22 rank=18 nullity=0
+holdout rows=152 best_consecutive_pass=0
+full rank=18 of 18 unknowns; nullity=0
+VERDICT: EXCLUDED
+rc=0
+
+SWEEP DONE
