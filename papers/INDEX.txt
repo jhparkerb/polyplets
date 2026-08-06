@@ -106,6 +106,15 @@ Lattice-animal literature obtained 2026-08-01 (jasonp, ScienceDirect):
                                            Gouyou-Beauchamps & Viennot, Adv. Appl. Math. 9 (1988)
                                            334-357. Directed animals <-> 1D paths; the lineage behind the
                                            Bacher comparison bound and BM-R's heaps.
+  bacher_2015_directed_multidirected_king_lattice.pdf
+                                           Bacher, Directed and multi-directed animals in the king's
+                                           lattice, arXiv:1301.1365v3 (2015). Obtained 2026-08-05. THE
+                                           source for both king-lattice bounds: Theorem 4 (directed GF =
+                                           A047781, growth 3+2sqrt2), Definition 2 (multi-directed),
+                                           Theorem 8 (Nordic decomposition, M = D/(1-B)), Lemma 11
+                                           (rho_B, root of 1-5x-7x^2+x^3 -- the 6.118 DECOY, not the
+                                           growth constant), Theorem 10 / Corollary 12 (B(rho_M)=1,
+                                           mu = 6.4752). Implemented in results/multi-directed.md.
   bousquet-melou_1993_q_enumeration_polyominos_convexes.pdf
                                            Bousquet-Melou, q-Enumeration de polyominos convexes, JCTA 64
                                            (1993) 265-288. For the parked convex-polyplets side quest.

@@ -10,7 +10,7 @@ settled; the question is a new idea.
 |---|---|---|
 | **lower (certified)** | λ ≥ μ₁₇ ≥ **6.543** | strip ladder, exact Collatz–Wielandt certificate (2026-07-31, `results/strip-mu-certificates.md`; frozen-stage-operator engine made H=17 a 13-min run) |
 | lower (closed form) | λ ≥ 3+2√2 ≈ 5.828 | directed king animals — best *closed-form* bound |
-| lower (num.) | λ ≥ 6.475 | multi-directed (Bacher), numerical, now superseded by the certified ladder |
+| lower (num.) | λ ≥ 6.475 | multi-directed (Bacher), numerical, extended to 6.475196280297 (`results/multi-directed.md`), now superseded by the certified ladder |
 | **estimate** | λ ≈ **7.110(1)** | ratio + confluent fit + **independent differential approximants** + μ_H extrapolation — four methods agree |
 | upper | λ ≤ **9.3153** | Bui finite-type convolution certificate, exact rational (paper headline) |
 | upper (crude) | λ ≤ 12.2 | Eden/twig `C(5n,n)` |

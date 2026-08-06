@@ -51,7 +51,8 @@ published value; Domb–Sykes/ratio fit on the 36 known terms plus an
 independent μ_H strip-extrapolation, both converging on ~7.11). Rigorously
 bracketed **6.543 ≤ λ ≤ 9.3153**: lower from the certified strip ladder (μ₁₇ ≥
 6.543, exact Collatz–Wielandt certificate 2026-07-31, superseding Bacher's
-3+2√2 ≈ 5.828 directed / 6.475 multi-directed); upper 9.3153 from a
+3+2√2 ≈ 5.828 directed / 6.475 multi-directed, extended to 6.475196280297,
+results/multi-directed.md); upper 9.3153 from a
 Bui-style finite-type convolution certificate, machine-verified in exact rational
 arithmetic (the first polyplet upper bound, ours — none published). Derivation:
 [proofs/polyplet-upper-bound.md](proofs/polyplet-upper-bound.md).
