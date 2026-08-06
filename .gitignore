@@ -17,7 +17,9 @@ experiments/*.bin.hash
 experiments/bench_column_results.txt
 
 # clangd compile DB — host-specific absolute paths; regenerate via `make compile-commands`
+# The .tmp sibling is the write-then-rename staging file; it only survives a crash.
 compile_commands.json
+compile_commands.json.tmp
 .cache/
 experiments/frontier_svd/frontier_*.txt
 
