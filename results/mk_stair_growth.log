@@ -1,0 +1,90 @@
+== stair: 700 terms
+        0.87 real         0.86 user         0.00 sys
+            50102272  maximum resident set size
+== hvmono: 700 terms
+        1.28 real         1.27 user         0.00 sys
+            57589760  maximum resident set size
+===== growth: stair
+# results/mk_stair_terms_n700.txt: 700 terms, working precision 500 digits
+
+## model discriminator: d_n = r_n - r_(n-1), and d_n / d_(n-1)
+   constant < 1 => geometric correction (theta = 0); -> 1 => power law (theta != 0)
+  n=  695  d=  2.0745645e-222  d_n/d_(n-1)=0.48100879371
+  n=  696  d=  9.9788377e-223  d_n/d_(n-1)=0.48100879371
+  n=  697  d=  4.7999087e-223  d_n/d_(n-1)=0.48100879371
+  n=  698  d=  2.3087983e-223  d_n/d_(n-1)=0.48100879371
+  n=  699  d=  1.1105523e-223  d_n/d_(n-1)=0.48100879371
+
+## theta probe: n*(r_n/mu - 1) with mu = raw tail ratio
+  n=  695  -4.04215617824e-220
+  n=  696  -1.82828640205e-220
+  n=  697  -7.6169081261e-221
+  n=  698  -2.47740346498e-221
+  n=  699  0.0
+
+## trusted digits (cross-checks, --drop 30)
+  raw tail ratio, N vs N-30:      ~213 digits
+  Aitken,         N vs N-30:      ~272 digits
+  Aitken vs Richardson, full N:      ~206 digits
+  => TRUSTED (min of the three, minus 2 guard): 204 digits
+
+## mu to 204 digits
+  3.12894326973088625227744799538775416053209122190439413496497464994924438583718257615823063288164783234634835221018937039608167576493048146233778414064847543298805623983850111109827008627878918922549000485
+  C = a(699)/mu^699 = 0.2893214639716513230848453480726559061033
+  C = a(700)/mu^700 = 0.2893214639716513230848453480726559061033
+
+## PSLQ: integer polynomial with mu as a root. degree <= 12, |coeff| <= 100000000, precision fed = 204 digits
+  degree  2: none
+  degree  3: none
+  degree  4: none
+  degree  5: none
+  degree  6: none
+  degree  7: none
+  degree  8: none
+  degree  9: none
+  degree 10: none
+  degree 11: none
+  degree 12: none
+  => NO integer relation survives in the searched box (degree <= 12, height <= 100000000): mu is not algebraic of that size.
+===== growth: hvmono
+# results/mk_hvmono_terms_n700.txt: 700 terms, working precision 500 digits
+
+## model discriminator: d_n = r_n - r_(n-1), and d_n / d_(n-1)
+   constant < 1 => geometric correction (theta = 0); -> 1 => power law (theta != 0)
+  n=  695  d= -2.9420353e-220  d_n/d_(n-1)=0.48100879371
+  n=  696  d= -1.4151448e-220  d_n/d_(n-1)=0.48100879371
+  n=  697  d= -6.8069711e-221  d_n/d_(n-1)=0.48100879371
+  n=  698  d=  -3.274213e-221  d_n/d_(n-1)=0.48100879371
+  n=  699  d= -1.5749252e-221  d_n/d_(n-1)=0.48100879371
+
+## theta probe: n*(r_n/mu - 1) with mu = raw tail ratio
+  n=  695  5.73236748622e-218
+  n=  696  2.59277698943e-218
+  n=  697  1.08018875477e-218
+  n=  698  3.51331973499e-219
+  n=  699  0.0
+
+## trusted digits (cross-checks, --drop 30)
+  raw tail ratio, N vs N-30:      ~211 digits
+  Aitken,         N vs N-30:      ~278 digits
+  Aitken vs Richardson, full N:      ~204 digits
+  => TRUSTED (min of the three, minus 2 guard): 202 digits
+
+## mu to 202 digits
+  3.128943269730886252277447995387754160532091221904394134964974649949244385837182576158230632881647832346348352210189370396081675764930481462337784140648475432988056239838501111098270086278789189225490005
+  C = a(699)/mu^699 = 0.3754530202799247317434892438190728207071
+  C = a(700)/mu^700 = 0.3754530202799247317434892438190728207071
+
+## PSLQ: integer polynomial with mu as a root. degree <= 12, |coeff| <= 100000000, precision fed = 202 digits
+  degree  2: none
+  degree  3: none
+  degree  4: none
+  degree  5: none
+  degree  6: none
+  degree  7: none
+  degree  8: none
+  degree  9: none
+  degree 10: none
+  degree 11: none
+  degree 12: none
+  => NO integer relation survives in the searched box (degree <= 12, height <= 100000000): mu is not algebraic of that size.

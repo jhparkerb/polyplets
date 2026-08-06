@@ -1,0 +1,92 @@
+ok   selftest ok: order 3 recovers all three exponents to 99 digits; order 2 gets lambda_1 to only 21
+
+## dir4  (results/mk_hvdir4_terms_n700.txt)
+  lambda_1 = 3.12894326973088625227744799539    trusted 279
+  lambda_2 = 2.51457964387872918851043719434    trusted 217
+  lambda_3 = 1.50504922775900393466569424779    trusted 69
+  lambda_4 = 1.43040460381247957829158487264    trusted 55
+  lambda_5 = 1.284337270981181428551058         trusted 25
+  lambda_6 = -1.25776216033063548324174210622   trusted 31
+
+## dir4asc  (results/mk_hvdir4asc_terms_n700.txt)
+  lambda_1 = 3.12894326973088625227744799539    trusted 284
+  lambda_2 = 1.50504922775900393466569424779    trusted 76
+  lambda_3 = 1.28433727098118142855105776084    trusted 32
+  lambda_4 = -1.25776216033063548324174210622   trusted 33
+  lambda_5 = 1.197644247588                     trusted 13
+  lambda_6 = 1.15142                            trusted 4
+
+## dir4desc  (results/mk_hvdir4desc_terms_n700.txt)
+  lambda_1 = 2.51457964387872918851043719434    trusted 226
+  lambda_2 = 1.43040460381247957829158487264    trusted 64
+  lambda_3 = 1.248465933710110190258859         trusted 26
+  lambda_4 = 1.174418053                        trusted 10
+  lambda_5 = (-0.544495 - 1.01792j)             trusted 0
+  lambda_6 = (-0.544495 + 1.01792j)             trusted 0
+
+## stair  (results/mk_stair_terms_n700.txt)
+  lambda_1 = 3.12894326973088625227744799539    trusted 301
+  lambda_2 = 1.50504922775900393466569424779    trusted 90
+  lambda_3 = 1.28433727098118142855105776084    trusted 43
+  lambda_4 = -1.25776216033063548324174210622   trusted 46
+  lambda_5 = 1.197644247588141290193            trusted 22
+  lambda_6 = 1.151415173                        trusted 10
+
+## hv  (results/convex_area_terms_n700_king.txt)
+  lambda_1 = 3.12894326973088625227744799539    trusted 285
+  lambda_2 = 1.50504922775900393466569424779    trusted 77
+  lambda_3 = 1.28433727098118142855105776084    trusted 32
+  lambda_4 = -1.25776216033063548324174210622   trusted 32
+  lambda_5 = 1.1976442475881                    trusted 14
+  lambda_6 = 1.15142                            trusted 4
+
+## hvmono  (results/mk_hvmono_terms_n700.txt)
+  lambda_1 = 3.12894326973088625227744799539    trusted 289
+  lambda_2 = 1.50504922775900393466569424779    trusted 80
+  lambda_3 = 1.28433727098118142855105776084    trusted 35
+  lambda_4 = -1.25776216033063548324174210622   trusted 35
+  lambda_5 = 1.197644247588141                  trusted 16
+  lambda_6 = 1.15142                            trusted 6
+
+## block  (results/mk_dir4_descblock_n700.txt)
+  lambda_1 = 2.51457964387872918851043719434    trusted 242
+  lambda_2 = 1.43040460381247957829158487264    trusted 78
+  lambda_3 = 1.24846593371011019025885895099    trusted 38
+  lambda_4 = 1.1744180531331764241              trusted 20
+  lambda_5 = 1.134324277                        trusted 10
+  lambda_6 = 1.1092                             trusted 4
+
+## claimed identifications
+   'agree' = digits the two measured numbers share;  'bearable' =
+   the smaller of the two trusted counts, which is all the
+   coincidence can be asserted to however many digits agree.
+
+claim                                             agree  bearable
+lambda_1(dir4desc) == lambda_1(block)               246       226
+lambda_2(dir4desc) == lambda_2(block)                72        64
+lambda_3(dir4desc) == lambda_3(block)                31        26
+lambda_1(dir4asc)  == lambda_1(stair)               310       284
+lambda_2(dir4asc)  == lambda_2(stair)                86        76
+lambda_3(dir4asc)  == lambda_3(stair)                37        32
+lambda_4(dir4asc)  == lambda_4(stair)                38        33
+lambda_1(dir4) == lambda_1(stair)                   303       279
+lambda_2(dir4) == lambda_1(block)                   236       217
+lambda_3(dir4) == lambda_2(stair)                    78        69
+lambda_4(dir4) == lambda_2(block)                    62        55
+lambda_5(dir4) == lambda_3(stair)                    29        25
+lambda_6(dir4) == lambda_4(stair)                    35        31
+lambda_2(stair) == lambda_2(hv)                      85        77
+lambda_2(stair) == lambda_2(hvmono)                  89        80
+
+## negative controls -- these must NOT match
+block lambda_1 vs every root of dir4asc          best   0 digits   ok (absent)
+block lambda_2 vs every root of dir4asc          best   1 digits   ok (absent)
+stair lambda_2 vs every root of dir4desc         best   1 digits   ok (absent)
+
+## Table B's ratios, recomputed from the spectrum
+  dir4    |lambda_2/lambda_1| = 0.803651401482585150553368   (trusted 217)
+  dir4asc |lambda_2/lambda_1| = 0.48100879370959321158558   (trusted 76)
+  stair   |lambda_2/lambda_1| = 0.48100879370959321158558   (trusted 90)
+  hv      |lambda_2/lambda_1| = 0.48100879370959321158558   (trusted 77)
+  hvmono  |lambda_2/lambda_1| = 0.48100879370959321158558   (trusted 80)
+  dir4    |lambda_3/lambda_1| = 0.48100879370959321158558   (trusted 69)

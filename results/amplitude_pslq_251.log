@@ -1,0 +1,38 @@
+# amplitude ratio, integer relations at 251 trusted digits
+#   r  = 0.4621090492099424400356623877003058328411634397299804247065...
+#   mu = 3.1289432697308862522774479953877541605320912219043941349649...
+# capacity budget: a box is in-capacity while (terms)*log10(height) < 126
+
+## positive control (1+sqrt2)/3, degree <= 4 at height <= 1e2: FOUND at degree 2 -- guesser is powered
+
+## over Q: integer polynomial with r as a root
+  degree <=   2 at height <= 1e+40: none   [in-capacity, capacity 120, 0 s]
+  degree <=   3 at height <= 1e+30: none   [in-capacity, capacity 120, 0 s]
+    ... degree 5/5, 0 s
+  degree <=   5 at height <= 1e+20: none   [in-capacity, capacity 120, 0 s]
+    ... degree 5/10, 0 s
+    ... degree 10/10, 1 s
+  degree <=  10 at height <= 1e+11: none   [in-capacity, capacity 121, 2 s]
+    ... degree 5/20, 0 s
+    ... degree 10/20, 1 s
+    ... degree 15/20, 6 s
+    ... degree 20/20, 29 s
+  degree <=  20 at height <= 100000: none   [in-capacity, capacity 105, 38 s]
+    ... degree 5/30, 0 s
+    ... degree 10/30, 1 s
+    ... degree 15/30, 5 s
+    ... degree 20/30, 25 s
+    ... degree 25/30, 88 s
+    ... degree 30/30, 251 s
+  degree <=  30 at height <= 10000: none   [in-capacity, capacity 124, 303 s]
+
+## over Q(mu): is r algebraic over Q(mu)?  (height <= 1e+06)
+  mu^i r^j, i <= 5, j <= 6, height <= 100 (42 terms): none   [in-capacity, capacity 84]
+  mu^i r^j, i <= 4, j <= 5, height <= 10000 (30 terms): none   [in-capacity, capacity 120]
+  mu^i r^j, i <= 3, j <= 4, height <= 1e+06 (20 terms): none   [in-capacity, capacity 120]
+  mu^i r^j, i <= 2, j <= 4, height <= 1e+08 (15 terms): none   [in-capacity, capacity 120]
+
+## 2r (the feed-vector ratio itself), degree <= 12 at height <= 1e2
+  none
+
+=> NO relation survives the capacity test in any box tried

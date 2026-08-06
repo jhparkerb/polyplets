@@ -117,3 +117,50 @@ Concrete test if anyone wants it: refit the 40 terms with `mu_1^sqrt(n)` admitte
 as a fourth parameter and see whether `mu_1` is driven to 1 (no stretched
 exponential) or lands away from it. Cheap, and it converts an untested assumption
 into a measurement.
+
+## Independent corroboration: the geometric-case pipeline fails correctly (2026-08-05)
+
+`docs/middle-kingdom-followups-plan.md` Phase 0. `experiments/convex_growth.py`
+was built for a *different* purpose (Middle Kingdom's D-finiteness boxes) and
+carries no theta ansatz: it discriminates geometric correction (theta = 0,
+its own use case, e.g. the HV-convex-by-area series) from power-law
+correction (theta != 0) by whether `d_n = r_n - r_(n-1)`'s successive ratio
+`d_n/d_(n-1)` sits flat below 1 or drifts toward 1, and it refuses to report
+trusted digits once the two accelerators it uses (Aitken, right for the
+geometric case; Richardson-in-1/n, right for the power-law case) disagree.
+
+Run on the plain 40-term A006770 series (`build/prec_guess`'s own input,
+`results/b006770_upload.txt`; command: `python3 experiments/convex_growth.py
+results/b006770_upload.txt`, defaults):
+
+```
+d_n/d_(n-1), n = 35..39: 0.94519 -> 0.94665 -> 0.94804 -> 0.94936 -> 0.95062
+trusted digits: 0
+mu (Aitken-on-ratios, untrusted): 7.1058
+```
+
+Two readings, both corroborating rather than duplicating this file's DA
+result:
+
+- **The discriminator itself drifts toward 1** (0.94519 -> 0.95062 over five
+  terms) instead of settling to a constant, which is precisely the power-law
+  signature — contrast the flat 0.481008794 this same tool reports for
+  unrestricted HV-convex-by-area (`results/middle-kingdom-phase3.md`), a
+  series with theta = 0. A006770's own growth pipeline is telling us,
+  without being told to look for theta, that theta != 0.
+- **The tool is wrong about mu at the 3rd digit (7.1058 vs 7.110), and
+  correctly so.** Aitken-on-ratios is the right accelerator only when the
+  correction is geometric; feeding it a power-law series (theta = -1) is an
+  ansatz mismatch, and the tool's own trusted-digit cross-check (Aitken vs
+  Richardson-in-1/n) catches the mismatch and reports 0 trusted digits rather
+  than a false-precision number. A tool that fails loudly on a mismatched
+  ansatz, on a series it was never tuned for, is corroboration of the
+  opposite kind from a matching-number: it shows the DA's theta = -1.000(1)
+  finding above is not an artifact of `series_da.py`'s own machinery, because
+  an unrelated tool with no ansatz for theta detects the same drift by a
+  different mechanism.
+
+This is not a new measurement of theta and does not sharpen `-1.000(1)`; it
+is a second, structurally independent tool agreeing that the series is *not*
+in the theta = 0 regime, which is the qualitative claim the ODE-based DA
+result depends on.

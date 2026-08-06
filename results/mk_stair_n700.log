@@ -1,0 +1,20 @@
+event=start job=middle_kingdom_tm t=2026-08-05T21:34:26-04:00 git=54440c2-dirty built=2026-08-05T21:33:45-0400 host=gympie mode=stair n=700
+event=done job=middle_kingdom_tm t=2026-08-05T21:34:27-04:00 start=2026-08-05T21:34:26-04:00 wall_s=0.9 cpu_s=0.9 peak_rss_mb=47.8 mode=stair n=700 a_n=17368528651849586692964028326758271833612371383870423413808116889318363599460025100827498779086610136761902989817504169488748816867918876735230734086164154151538989546114696139586414190817304691612024386097843528450235138333808483697230123839488604376917096321409200698726184492443222298900447735379737893097804045322780266978742339265500438636729
+        0.87 real         0.86 user         0.00 sys
+            50102272  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                3237  page reclaims
+                   2  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   0  voluntary context switches
+                  16  involuntary context switches
+         24309759230  instructions retired
+          3759978064  cycles elapsed
+            49316200  peak memory footprint
