@@ -1,0 +1,18 @@
+engine log: /Users/jasonp/src/polyominoes/results/mu_H_powiter_2_11.log
+ H   mu_H (GF root, dps=200)          dps=50 ok  strip_mu     agree   cert mu_float  agree
+ 2   2.414213562373095048801689            50    2.4142136      7     2.414213562      9
+ 3   3.443718375099081497475567            50    3.4437184      8     3.443718375     10
+ 4   4.182321412757309121434689            50    4.1823214      8     4.182321413     10
+ 5   4.717801290594596307177566            48    4.7178013      8     4.717801291     10
+ 6   5.115324460355388689040972            48    5.1153245      8     5.115324460     10
+ 7   5.417847609541867512673823            46    5.4178476      8     5.417847610     10
+ 8   5.653372762454405677809291            43    5.6533728      8     5.653372762     10
+ 9   5.840457941259661177477632            36    5.8404579      8     5.840457941     10
+10   5.991695792400592860781685            31    5.9916958      8     5.991695792     10
+11   6.115841628404631671174331             8    6.1158416      8     6.115841628     10
+
+GF side at the script's mp.dps=50: >= 8 matching digits vs the dps=200 recomputation
+cross-check vs build/strip_mu (H=2..11): 7 significant digits, worst case
+  (the engine prints %.7f, so more digits are not even visible; its own
+   convergence tolerances are rho 1e-11 / x* 1e-13.)
+cross-check vs strip_mu_cert receipts (H=2..11, mu_float at 10 digits): 9 significant digits, worst case

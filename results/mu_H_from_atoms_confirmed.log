@@ -1,0 +1,19 @@
+ H   mu_H (exact strip growth constant)   confirmed digits
+ 2   2.414213562373                      61
+ 3   3.443718375099                      60
+ 4   4.182321412757                      60
+ 5   4.717801290595                      60
+ 6   5.115324460355                      59
+ 7   5.417847609542                      56
+ 8   5.653372762454                      54
+ 9   5.840457941260                      46
+10   5.991695792401                      42
+11   6.115841628405                      78
+
+Extrapolations mu_H -> lambda:
+  full Richardson, 1/H^1:  lambda ~ 249.3566
+  full Richardson, 1/H^2:  lambda ~ 7.4595
+  two-point 1/H^2 on H=9,10:  lambda ~ 6.6364
+  two-point 1/H^2 on H=10,11:  lambda ~ 6.7070
+
+ a(n)-ratio fit (paper): lambda ~ 7.111

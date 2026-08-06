@@ -11,7 +11,12 @@
 // given x apply M(x) by power iteration to get spectral radius rho(x); bisect x
 // for rho(x)=1; report mu_H = 1/x*.
 //
-// Validation: reproduces the exact mu_H from the fixed-height GF roots
+// Validation: reproduces the mu_H from the fixed-height GF roots to all 7
+// decimals it prints (~8 significant digits), which is the resolution of
+// that comparison and not a claim about further digits (this engine is double
+// precision, converges rho to 1e-11 and x* to 1e-13). The same iteration
+// recorded at 10 digits by strip_mu_cert agrees to 9-10. Measured in
+// experiments/mu_H_precision_audit.py.
 // (H<=11: 2.4142, 3.4437, 4.1823, 4.7178, 5.1153, 5.4178, 5.6534, 5.8405,
 //  5.9917, 6.1158).
 //

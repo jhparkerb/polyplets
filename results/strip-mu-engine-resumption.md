@@ -31,7 +31,12 @@ Decision 2026-07-10 (jasonp): SKIP the fast engine for now, bank. May resume.
 
 H<=11 independently cross-checked against fixed-height GF roots
 (1/smallest positive root of Q_H, `results/fixed_height_gfs.txt`,
-`experiments/mu_H_from_atoms.py`). H=14 **done: mu_14 = 6.3800344**
+`experiments/mu_H_from_atoms.py`) — agreement to **every decimal in the row
+above** (7.8 to 8.9 significant digits); that is the full resolution of this
+comparison, since the engine converges rho to 1e-11 in double and prints `%.7f`.
+The certificate receipts record the same power iteration at 10 digits and agree
+to 9-10 significant digits (`results/strip_mu_certificates.log`). Both measured
+in `experiments/mu_H_precision_audit.py`. H=14 **done: mu_14 = 6.3800344**
 (`results/strip_mu_H14.log`, 4851s).
 
 Extrapolation: `experiments/lambda_from_mu.py` (update the `mu` dict with new

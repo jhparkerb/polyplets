@@ -3,8 +3,12 @@
 Date: 2026-07-10. Shaken loose while exploring T(n,H). `mu_H` = dominant
 eigenvalue of the height-H strip transfer matrix = top root of atom `q_H` =
 `1/(smallest positive root of Q_H)` from the banked fixed-height GFs
-(`results/fixed_height_gfs.txt`). Computed exactly (mpmath) in
-`experiments/mu_H_from_atoms.py`.
+(`results/fixed_height_gfs.txt`). An exact algebraic number, computed
+numerically (mpmath) in `experiments/mu_H_from_atoms.py` — Q_H's large
+alternating integer coefficients cancel badly at the root, costing ~42 digits
+at H=11, so that script now confirms every root against a doubled working
+precision and reports the digits it confirmed (>=42 for H<=11; measured,
+`experiments/mu_H_precision_audit.py`).
 
 ## The numbers (exact strip growth constants, H<=13)
 
@@ -14,8 +18,14 @@ eigenvalue of the height-H strip transfer matrix = top root of atom `q_H` =
 
 H<=11 from fixed-height GF roots; **H=12,13 newly computed by power iteration on
 the strip transfer matrix** (`cpp/strip_mu.cpp`, `build/strip_mu`; validated: it
-reproduces the GF-root mu_H exactly for H<=11). Increment ratios climb 0.72→0.84
-(power-law decay, not geometric).
+reproduces the GF-root mu_H for H<=11 to **all 7 decimals it prints** — 7.8 to
+8.9 significant digits, which is the resolution of that comparison and not a
+bound on either side, since the engine is double precision, converges rho to
+1e-11 and prints `%.7f`. The same power iteration recorded at 10 digits in the
+certificate receipts (`mu_float`, `results/strip_mu_certificates.log`) agrees to
+**9-10 significant digits**, so the sharper statement is available for free.
+Both measured in `experiments/mu_H_precision_audit.py`). Increment ratios
+climb 0.72→0.84 (power-law decay, not geometric).
 
 ## Why this matters
 
@@ -286,3 +296,134 @@ around `7.111`: a ratio of **1.42**. A far more heavily studied problem, with a
 genuine structure theorem behind its bounds, lands in the same place. This is worth
 citing next to the paper's "the gap reflects a structural limit" sentence — it says
 the width of our bracket is normal for the genre, not a sign we stopped early.
+
+## The ladder's approach to λ is not analytic in 1/H in the range measured
+
+2026-08-05, `docs/middle-kingdom-followups-plan.md` Phase 5 (supersedes the
+Phase 0 item 3 stub of the same name — same finding, full treatment).
+`experiments/strip_fss.py` reproduces every number below from one command,
+including the two-parameter fit and its conditioning, the surface-term
+increment-shrink diagnostic at two λ inputs, an optional third ansatz with a
+log term, and an H≥18 cost estimate. It folds in and replaces the earlier
+`experiments/strip_fss_probe.py` (deleted).
+
+**The fit.** `ln µ_H = ln λ − a/H − b/H²`, solved exactly (3 equations, 3
+unknowns) on consecutive triples of the banked ladder, H = 11..17, at the
+ladder's own **7-decimal precision** (`results/strip-mu-engine-resumption.md:30`
+for H≤14, `results/strip-mu-certificates.md`'s "the ladder extended to H=17"
+addendum table's `mu_float` column for H=15..17 — that is the input
+precision these fits use throughout, confirmed by the 9-decimal
+`results/strip_mu_certificates.log` `mu_float` moving all three triples away
+from the numbers below):
+
+| triple | λ | a | b |
+|---|---|---|---|
+| [11,12,13] | 7.29817 | 1.65351 | 3.19705 |
+| [13,14,15] | 7.25820 | 1.51121 | 4.11872 |
+| [15,16,17] | 7.22999 | 1.39472 | 4.99006 |
+
+This is the reference table (`docs/middle-kingdom-followups-plan.md` Table
+D) and it is not edited here. `experiments/strip_fss.py` reproduces λ for
+all three triples exactly, and a/b exactly for the [13,14,15] and [15,16,17]
+rows. For [11,12,13] it computes a = 1.65350, b = 3.19710 — a difference from
+the table in the 6th significant figure of each, cross-checked independently
+with `numpy.linalg.solve` and 50-digit `mpmath`, both of which agree with
+the script, not the table. That difference is 10–25× **below** the
+conditioning noise floor established next (a spread 2.2e-4 vs a 1e-5
+difference; b spread 1.3e-3 vs a 5e-5 difference) — display rounding from
+whatever tool produced the table originally, not a computational error, and
+far too small to move any reading below. Flagged and left as-is per the
+plan's "never edit the reference table" rule.
+
+**Precision the fit actually supports.** λ, a, and b are printed to 6
+significant figures above, but they are not all resolved to that precision by
+7-decimal input. Perturbing each of the three µ_H in a triple by ±1 unit in
+its last recorded digit (10⁻⁷), over all 8 sign combinations, gives the
+spread each parameter inherits from that input precision:
+
+| triple | λ spread | a spread | b spread |
+|---|---|---|---|
+| [11,12,13] | 6.8e-5 | 2.2e-4 | 1.3e-3 |
+| [13,14,15] | 8.9e-5 | 3.4e-4 | 2.4e-3 |
+| [15,16,17] | 1.1e-4 | 5.0e-4 | 4.0e-3 |
+
+λ (order 7) keeps **5–6 significant figures**; a (order 1–2) keeps about
+**3–4**; b (order 3–5) keeps about **3**. So a and b above are quoted one to
+three digits beyond what the banked µ_H support — recorded as measured, not
+re-rounded, with this precision statement standing next to them.
+
+**Does the substantive claim survive that noise floor? Yes, by two orders of
+magnitude.** b climbs 3.19705 → 4.11872 → 4.99006 across the three triples,
+changes of +0.92167 and +0.87134 — against a b-spread of 1.3e-3 to 4.0e-3,
+the climb is **≈220–700× the noise floor**, an order-1 change nothing like
+display rounding. λ drifts −0.01999, then −0.01410 per rung (center H = 12 →
+14 → 16) against a λ-spread of 6.8e-5 to 1.1e-4 — the drift is
+**≈120–290× the noise floor**. Both readings are real, not artifacts of the
+fit's own conditioning. λ overshoots the differential-approximant estimate
+7.1102 by +0.11979 (≈0.12) at the top triple; the ~0.013/rung figure in the
+plan's framing is a rounded characterization of a drift that is itself
+shrinking (−0.01999 then −0.01410 per rung, not constant) — same
+conclusion (still drifting, order 0.01–0.02 per rung, nowhere near settled),
+confirmed against the script rather than re-asserted.
+
+**The surface term.** `H(ln λ − ln µ_H)` with λ = 7.1102 is still falling at
+H = 17, by 0.035053 per rung, and its increments shrink only **~6.5% per
+rung** (H=17: ratio 0.9348 against H=16, a 6.52% shrink) where a clean 1/H²
+correction predicts (16/17)² ≈ **11.42%** shrink per rung. At λ = 7.111 the
+picture is the same to 3–4 significant figures (falling 0.034940 per rung,
+6.54% shrink) — the reading does not depend on which of the two banked λ
+estimates is fed in.
+
+**Reading.** Two independent symptoms of the same thing: the two-parameter
+1/H, 1/H² ansatz has not converged by H = 17 — λ is still drifting by two
+orders of magnitude more than the fit's own conditioning noise, and b is
+still climbing by an order-1 amount triple to triple — and the surface
+term's own increments decay slower than a 1/H² correction predicts, meaning
+there is a term between 1/H and 1/H² in the true expansion (most likely
+logarithmic) that this two-parameter ansatz cannot see. **The ladder's
+approach to λ is not analytic in 1/H in the range measured** (H ≤ 17).
+**Consequence: no 1/H² coefficient, hence no central charge, can be read off
+this ladder** — `results/unexplored-avenues.md` idea 6.1 (the
+Parisi–Sourlas / Yang–Lee / central-charge finite-size fit) is not an
+afternoon's fitting on this data, and its own stated prerequisite ("is λ
+known precisely enough to expose a 1/H² term") is now answered: no, not from
+the ladder side, at H ≤ 17.
+
+**Optional third ansatz.** `ln µ_H = ln λ − a/H − c·ln(H)/H²`, same
+three-point exact solve, cheap to add since the machinery is already here:
+
+| triple | λ | a | c |
+|---|---|---|---|
+| [11,12,13] | 7.21575 | 1.10866 | 3.25956 |
+| [13,14,15] | 7.19121 | 0.99219 | 3.62540 |
+| [15,16,17] | 7.17462 | 0.90289 | 3.92824 |
+
+λ does land nearer 7.110 with a log term (top-triple overshoot shrinks from
++0.120 to +0.064, roughly half), consistent with "a term between 1/H and
+1/H², most likely logarithmic" above. **This is a hint, not a result**: with
+three free parameters fit to three data points, the system is solved
+exactly rather than fit, so a plausible-looking answer proves nothing about
+the true functional form — a different guessed exponent for the log term, or
+no log term at all, would fit the same three points equally exactly. Nothing
+here is a claim about the correction's true shape, only that a log-shaped
+guess moves λ in the expected direction.
+
+**H≥18 cost, not run.** `results/strip-mu-fast.md`'s measured H=16
+throughputs (`sum|S_r|` growing a steady 2.95×/H, matvec count +~140/H,
+build RSS 4.94 GB) extrapolate to H=18: **build RSS ~43 GB, float solve
+~29 min, certificate ~32 min** (single core, this machine's arithmetic, one
+exact sweep). `results/strip-mu-certificates.md`'s own addendum, extrapolating
+the different, empirically-measured end-to-end wall growth (~3.5×/rung from
+H=16→17: 225s→773s), independently projects **~45 min, ~35+ GB** for H=18.
+The two extrapolations use different bases (table-throughput arithmetic vs.
+measured full-pipeline wall) and agree to within a factor of ~1.5 — both
+land in the same place: **tens of minutes, tens of GB, off a laptop**, each
+further rung buying only ~0.05 toward λ ≈ 7.11 against the ladder's own
+non-convergence documented above. Per the plan's hard rule this is **not
+run**; H ≥ 18 is a beg-and-agree compute decision, jasonp's to make, not a
+laptop job triggered by this write-up.
+
+Reproduce (instant, no compute job):
+```
+python3 experiments/strip_fss.py
+```

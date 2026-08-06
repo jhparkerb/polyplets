@@ -61,7 +61,9 @@ therefore also reads `lambda >= <certified value>`.
 `den = 10^7` throughout; the certified value is `mu_H` floored to 7 decimals, and
 every one of these passed on the **first** candidate numerator (no step-down).
 `mu_H (float)` is the power-iteration value the search phase produced, and it
-reproduces the banked ladder to all quoted digits.
+reproduces the banked ladder to all quoted digits — verified against the
+fixed-height GF roots recomputed at 200 digits: 9-10 significant digits, i.e.
+every digit printed here (`experiments/mu_H_precision_audit.py`).
 
 | H | certified `mu_H >=` | num / 10^7 | states | `mu_H` (float) | banked | wall |
 |---|---|---|---|---|---|---|
@@ -143,7 +145,12 @@ Bad arguments are refused rather than clamped: an out-of-range `H`, or a
   strip transfer operator. The operator itself is trusted, not certified here: it
   is the production kink kernel (`make ns-gate-kink`, `ns-gate-kink-column`), and
   the resulting `mu_H` are cross-checked against the fixed-height GF roots for
-  `H<=11` (`results/fixed_height_gfs.txt`, `experiments/mu_H_from_atoms.py`).
+  `H<=11` (`results/fixed_height_gfs.txt`, `experiments/mu_H_from_atoms.py`) —
+  the `mu_float` receipts agree with those roots to 9-10 significant digits,
+  every digit they record (measured, `experiments/mu_H_precision_audit.py`;
+  `build/strip_mu` prints only 7 decimals, so comparing against *that* engine
+  establishes ~8). The certificates themselves do not rest on those digits:
+  they are exact integer arithmetic on the operator.
 - The certified digits are a floor, so `2.4142135` for `H=2` is the certificate
   even though `mu_2 = 2.4142136` to 7 places. Certificates state what is *proved*.
 - Precision budget: the eigenvector's dynamic range grows steeply and unevenly
