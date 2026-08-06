@@ -99,8 +99,9 @@ All three run through the *same* enumeration and the *same* filter machinery,
 differing only in the step set and the source rule -- so a divergence is
 attributable to the perturbation and nothing else. The n=3 split is the sharpest
 case: the single 3-cell animal `{(0,0), (1,1), (2,0)}` has a *split* bottom row,
-so it is multi-directed but not directed; control A drops it plus one more,
-control B keeps it.
+so it is not directed; control A drops it plus one more, control B keeps it.
+(It is also multi-directed, but for an unrelated reason — see the correction
+below; a split bottom row is not what multi-directed means.)
 
 Control A reproduces **A055834** and, run to n=14, independently confirms the
 terms `36196706` (n=12), `187938842` (n=13), `978599560` (n=14) that
@@ -109,6 +110,12 @@ terms `36196706` (n=12), `187938842` (n=13), `978599560` (n=14) that
 enumerating all 11.2 billion fixed king animals and filtering. Control B is a
 genuine third sequence (1, 4, 20, 106, 576, 3179, 17736, 99748, ...), matching
 neither A047781 nor A006770.
+
+*(2026-08-05, Phase 1c: nor does it match Bacher's **multi-directed** class,
+which runs 1, 4, 20, 110, 636, 3790, … The two are **incomparable**: control B
+seeds only from the global bottom row, Bacher seeds from every local minimum of
+the column-bottom profile and adds a two-sided condition on the local maxima.
+Both directions have witnesses. [multi-directed.md](multi-directed.md).)*
 
 ## Cost and reach (honest)
 

@@ -6,6 +6,13 @@ are absent -- but two land on known sequences with genuinely NEW
 combinatorial interpretations, provable with one-line Temperley
 derivations. Classifier + checks: `experiments/king_subfamilies.py`.
 
+**Entry point, 2026-08-05:** this note is one input to the Middle Kingdom
+campaign, which crossed the convexity and directedness axes completely and
+superseded the "NONE are absent" answer above. `results/middle-kingdom.md`
+is the current overview of the family -- the 5x4 grid, the novel cells, the
+b-files and the staged OEIS comments. Read that first; this note for the
+derivations it cites.
+
 | subfamily (king lattice) | first terms | identity |
 |---|---|---|
 | column-convex | 1,4,18,83,385,... | A187077 (Bevan; our derivation results/convex-polyplets.md) |
@@ -29,6 +36,28 @@ AND tops nondecreasing) = skew Young diagrams with no empty rows/columns
 (A225114), by the identity map: monotone boundaries make the columns a skew
 shape; "no empty rows" forces bottom_{i+1} <= top_i + 1, which is exactly
 king contact, and conversely. 8 terms verified.
+
+**Draft comment (staged 2026-08-05, jasonp's call):**
+
+> a(n) is also the number of staircase polyplets with n cells: king-lattice
+> animals (sets of cells of Z^2 joined by edge or corner contact, counted up
+> to translation) in which every column is a contiguous interval and both the
+> column bottoms and the column tops are nondecreasing from left to right.
+> The identity is the identity map on diagrams. Monotone bottoms and tops
+> make the occupied columns a skew shape; a diagram with no empty row is one
+> in which bottom(j+1) <= top(j) + 1 for every pair of consecutive columns,
+> and that inequality is exactly corner contact between those columns, so the
+> no-empty-row condition and king-connectivity are the same condition.
+> Verified for n <= 8. Cf. A006770, A007052, A018902, A187077.
+
+Prior text for the same edit, written 2026-07-14 before the grid work, is in
+`oeis/draft-comments-subfamilies.txt`; the version above is the current one.
+The animal side is independently brute-forced to n = 14 -- 1, 3, 9, 28, 87,
+272, 850, 2659, 8318, 26025, 81427, 254777, 797175, 2494307
+(`results/mk_grid20_n14.txt`) -- but only the first 8 were matched against
+the entry's own data, which is what the comment claims. The same 14 terms are
+what the four collapsed staircase cells of the grid produce
+(`results/middle-kingdom-phase3.md`, Corollary 4).
 
 **The meta-finding:** every classical restriction (grounded, directed,
 staircase) collapses king animals into composition/partition-land or a
@@ -83,3 +112,24 @@ Bousquet-Melou–Conway non-planar L_n family Eq-by-Eq for the 4-step cone
 (GF is algebraic via A001002 per Kruchinin's formula on the entry, so a
 heaps-of-pieces/gas derivation likely exists and would upgrade the
 conjecture to a theorem).
+
+## Addendum 2026-08-05: the meta-finding, sharpened by Phase 3
+
+`results/middle-kingdom-phase3.md` crossed the directedness and convexity axes
+completely (a 5x4 grid). The reason every classical restriction collapses is
+now a proposition rather than an observation: **on a column-convex king animal
+each directedness predicate is a condition on the bottom profile alone**, and
+HV-convexity already forces that condition. HV-convex ⊂ 5-cone directed,
+staircase ⊂ both cones, column-convex ⊂ multi-directed. Eight of the grid's
+twelve open cells are equalities with the unfiltered row for that reason.
+
+A fourth comment-grade interpretation joins the three above:
+
+| subfamily (king lattice) | first terms | identity |
+|---|---|---|
+| **4-cone directed column-convex** | 1,4,17,73,314,1351,... | **A018902**, g.f. x(1-x)/(1-5x+3x^2) -- NEW interpretation, and it explains the entry's INVERT-of-A007052 formula: cut the profile at each one-row drop and the pieces are the A007052 class above |
+
+Three cells resist and are new sequences: (5-cone, column-convex), (control B,
+column-convex) and (4-cone, HV-convex). So "no new sequences to submit" is no
+longer the whole story for this family, though submission remains jasonp's
+call.

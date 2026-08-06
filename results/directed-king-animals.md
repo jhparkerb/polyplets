@@ -21,6 +21,13 @@ the paper + OEIS; the directed GF coefficients independently re-derived here.
 
 ## Multi-directed king animals
 
+**Definition pinned 2026-08-05 — see [multi-directed.md](multi-directed.md) for
+the statement, 200 terms, and the correction to what this note used to say.**
+Sources are the *local minima* of the column-bottom profile `b(x)` (at any
+height, not just the global bottom row), keystones its local maxima; every cell
+must be cone-reachable from some source, and every keystone from a source on
+each side. Counts 1, 4, 20, 110, 636, 3790, 23036, 141946, …
+
 - GF `M(t)` not D-finite. Two distinct singularities (don't conflate):
   - `ρ_B ≈ 0.16346` = pole of the *intermediate* series B, the root of
     `ρ³ − 7ρ² − 5ρ + 1 = 0` (Bacher Lemma 11). `1/ρ_B ≈ 6.118` — NOT the
@@ -29,6 +36,8 @@ the paper + OEIS; the directed GF coefficients independently re-derived here.
     (Theorem 10); no algebraic minimal polynomial (B is a non-D-finite sum).
 - Growth constant `μ = 1/ρ_M ≈ 6.4752` (Bacher Corollary 12). Determined
   **numerically**, not algebraically — carries that caveat as a rigorous bound.
+  Independently reproduced here to twelve digits, `μ = 6.475196280297`, from a
+  400-term series ([multi-directed.md](multi-directed.md)).
 
 ## The payoff: rigorous lower bounds on the polyplet growth constant
 
@@ -76,7 +85,13 @@ the leftmost-bottommost cell in cone `{W,NW,N,NE,E}`. Filtering the fixed-polypl
 enumerator by it must reproduce A047781 — an independent **closed-form** anchor
 (checkable to any n, unlike the strip-TM and g2 enumeration second-sources).
 Gotcha: the bottom row must be a single contiguous run; disjoint bottom runs that
-link only higher up are *multi*-directed (A-not-yet-in-OEIS), not directed.
+link only higher up are not directed.
+
+*(Correction 2026-08-05: this note used to call "disjoint bottom runs joined
+higher up" the definition of multi-directed. It is not — it is the `dir5nb`
+control-B predicate, and the two classes are **incomparable**, each containing
+animals the other rejects. [multi-directed.md](multi-directed.md) has Bacher's
+actual Definition 2, the witnesses both ways, and the corrected terms.)*
 
 **Done.** Enumerate+filter = A047781 for n ≤ 15, direct cone growth for n ≤ 17,
 zero mismatches against the closed form; RED controls (4-step cone → A055834,
