@@ -5,6 +5,21 @@ hole-fill bijection, the perimeter/interior-cell bracket, and the
 cut-vertex/block-cut-tree measurement from earlier (see this session's
 transcript; no prior file for the block-cut-tree numbers specifically).
 
+> **Prior art, located 2026-08-06.** The *asymptotic* content of this bijection
+> is known for square-lattice polyominoes: Guttmann, Jensen, Wong & Enting,
+> "Punctured polygons and polyominoes on the square lattice," J. Phys. A **33**
+> (2000) 1735–1764 (arXiv cond-mat/0003441; `papers/guttmann_jensen_wong_*.pdf`)
+> prove in their Appendix that k-punctured polyominoes have the same growth
+> constant as unpunctured ones and that the exponent shifts by exactly 1 per
+> puncture, φ_k = φ_0 − k — which is what "choose an interior cell" buys you, a
+> factor of n. Their method is van Rensburg & Whittington's (concatenation,
+> drilling, surgery), not a bijection.
+>
+> What is ours here is sharper and narrower: an *exact* bijection, for
+> **area-1** holes, on the **king** lattice, with the failure of injectivity
+> spelled out. Cite them as the asymptotic context; do not present the
+> phenomenon as new.
+
 ## The bijection (exact, provable — not measured)
 
 For an n-cell polyplet b with exactly one hole of area 1 at position x:

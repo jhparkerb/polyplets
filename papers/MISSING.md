@@ -6,6 +6,50 @@ can't be found; remove (and drop the PDF in `papers/`) once obtained.
 
 Format: `Author(s), "Title," Venue Vol (Year) pages. DOI/ID. — why we want it. [priority]`
 
+## Claude's web-search pass over this file, 2026-08-06
+
+Two obtained, six confirmed paywalled with their metadata pinned, one new lead.
+**Do not re-run the plain "title + pdf" search on the paywalled six; it has been run.**
+
+**Obtained:**
+
+- **Whittington & Soteros 1990** — free from Grimmett's own Hammersley-festschrift
+  page, `statslab.cam.ac.uk/~grg1000/books/hammfest/19-sgw.pdf`. Filed. Its title page
+  settles the author order *against* the note below: it reads Whittington & Soteros, so
+  Barequet–Rote had it right and Madras's bibliography reversed it.
+- **Guttmann, Jensen, Wong & Enting, "Punctured polygons and polyominoes on the square
+  lattice," J. Phys. A 33 (2000) 1735–1764, arXiv cond-mat/0003441** — free, and it was
+  on no list. Found while hunting the 1990 punctured-discs paper. It matters: its
+  Appendix proves k-punctured polyominoes share the unpunctured growth constant with the
+  exponent shifting by exactly 1 per puncture, which is the asymptotic content of our
+  hole-fill bijection. `results/hole-fill-interior-cell-identity.md` now cites it. It
+  also reproduces van Rensburg & Whittington's method, which largely discharges that want.
+
+**Metadata pinned, no free copy (all confirmed paywalled at Springer/IOP):**
+
+- Janse van Rensburg & Madras 1997 — IOP, `10.1088/0305-4470/30/23/007`. Nothing on the
+  author's York page.
+- Madras 1995 — Springer, `10.1007/BF02183684`. The abstract gives the result: **θ ≥
+  (d−1)/d**, so in 2D a rigorous θ ≥ ½ — consistent with, and much weaker than, the
+  universal 1 our approximants find. Worth a clause in the growth paragraph either way.
+- Bollobás & Leader, "Edge-isoperimetric inequalities in the grid" — **volume confirmed:
+  Combinatorica 11 (1991) 299–314**, `10.1007/BF01275667`. The entry below no longer
+  needs its "unconfirmed" caveat.
+- Conway, Brak & Guttmann 1993 — confirmed J. Phys. A 26 (1993) 3085–3091. ResearchGate
+  has a copy behind an account wall.
+- Janse van Rensburg & Whittington 1990 (punctured discs) — no free copy anywhere.
+- Ibn-Majdoub-Hassani 1996 — the thesis record exists, `theses.fr/1996PA112406`, with
+  abstract and jury; **no digitised full text**. Confirms the desk is exhausted.
+
+**Also noted:** Madras 1999, which we hold, is on arXiv as `math/9902161` — cite the
+arXiv id, and it explains the copy's poor OCR.
+
+**New lead, not chased:** Barber & Erde, "Isoperimetry in integer lattices,"
+arXiv 1707.04411 (2017/18). Solves the **edge**-isoperimetric problem asymptotically for
+Cayley graphs on ℤ^d, optimal shapes being zonotopes. The king lattice is such a Cayley
+graph, so this is the modern reference *if* the report ever prints the bond-perimeter
+twin. Asymptotic only, and free.
+
 ## High priority
 
 _(none outstanding — everything below was obtained 2026-08-06.)_
@@ -74,7 +118,8 @@ and Bezrukov cite cube isoperimetry only.
 - A. Asinowski, G. Barequet, R. Barequet & G. Rote, J. Integer Seq. **15**
   (2012) #12.8.4. → `papers/asinowski_etal_2012_*.pdf`. Open access.
 
-**New wants raised by Madras's own reference list** (neither searched yet):
+**New wants raised by Madras's own reference list** (Madras 1995 searched in the
+pass at the top of this file — paywalled, metadata pinned; MSW 1988 unsearched):
 
 - N. Madras, "A rigorous bound on the critical exponent for the number of
   lattice trees, animals, and polygons," J. Statist. Phys. **78** (1995)
@@ -111,11 +156,9 @@ repo depends on reading them.
 
 Not found in the second round (the citation scan above), same disposition:
 
-- C. E. Soteros & S. G. Whittington, "Lattice animals: rigorous results and wild guesses,"
-  in *Disorder in Physical Systems* (G. R. Grimmett & D. J. A. Welsh, eds.), Oxford
-  University Press 1990, 323–335. — a book chapter, which is why it is not online. Author
-  order is Soteros–Whittington per Madras's own bibliography; Barequet–Rote list it the
-  other way round. Wanted as a general novelty check on rigorous animal results. **[med]**
+- ~~C. E. Soteros & S. G. Whittington, "Lattice animals: rigorous results and wild
+  guesses"~~ — **OBTAINED 2026-08-06**, free from Grimmett's page; see the search pass at
+  the top. Correct order is Whittington & Soteros.
 - E. J. Janse van Rensburg & S. G. Whittington, "Punctured discs on the square lattice,"
   J. Phys. A **23** (1990) 1287–1294. — the nearest thing to prior art on *holes* the scan
   turned up; `results/maxhole-proof.md` claims no paper measures hole area, and this is the
@@ -128,13 +171,48 @@ Not found in the second round (the citation scan above), same disposition:
   of pairs of Hamming-adjacent lattice points," Studies in Appl. Math. **50** (1971) no. 2.
   — Wang–Wang's [9]; the edge-isoperimetric extremal problem on ℤⁿ, i.e. the bond-side
   companion to the vertex result we now cite. **[low]**
-- B. Bollobás & I. Leader, "Edge-isoperimetric inequalities in the grid," Combinatorica,
-  early 1990s (Bezrukov's [27] lists it as "to appear", so the volume is unconfirmed); and
+- B. Bollobás & I. Leader, "Edge-isoperimetric inequalities in the grid," Combinatorica
+  **11** (1991) 299–314, DOI 10.1007/BF01275667 (volume confirmed 2026-08-06); and
   "Exact edge-isoperimetric inequalities," European J. Combin. **11** (1990) 325–340.
   — only needed if the report prints the bond-perimeter twin. **[low]**
 - S. L. Bezrukov, "An isoperimetric problem for Manhattan lattices," proceedings, possibly
   in Russian (his own [19]). — the title is our exact setting, but Wang–Wang already
   answers it. Curiosity. **[low]**
+
+Not found in the third round either — the scan of Madras 1999's own bibliography, none
+of these previously listed:
+
+- E. J. Janse van Rensburg & N. Madras, "Metropolis Monte Carlo simulation of lattice
+  animals," J. Phys. A **30** (1997) 8035–8066. — **the one that checks our own claim.**
+  Madras 1999 points at its §2.4 and §2.8 for "further applications of the pattern theorem
+  for weighted animals". Those sections are where the corollaries were drawn, so if anyone
+  has already stated "simply-connected animals are exponentially rare", it is there — and
+  that is the one thing we still call ours in `results/hole-free-growth-constant.md`.
+  **[high]**
+- N. Madras & G. Slade, *The Self-Avoiding Walk*, Birkhäuser, Boston, 1993. — a book, so
+  library or purchase rather than download. Load-bearing if the report states the ratio
+  limit: Madras 1999 proves his Theorem 2.2 by reusing "the proof of Theorem 7.3.2 in
+  Madras and Slade (1993)". Also the standard monograph for the pattern-theorem lineage.
+  **[med]**
+- A. R. Conway, R. Brak & A. J. Guttmann, "Directed animals on two-dimensional lattices,"
+  J. Phys. A **26** (1993) 3085–3091. — Madras's [3], cited for numerical growth constants
+  of bond trees vs bond animals vs site animals across several directed 2D lattices. Wanted
+  only to see whether their lattice list includes the king/diagonal case, against
+  `results/directed-king-animals.md`. Distinct from the two A. R. Conway 1995 percolation
+  papers listed above. **[low-med]**
+- D. J. Klein, "Rigorous results for branched polymers with excluded volume," J. Chem.
+  Phys. **75** (1981) 5186–5189. — Madras's [11], cited beside Klarner 1967 as the other
+  route to *existence* of the growth constant by concatenation and subadditivity. Citation
+  courtesy; we hold Klarner and nothing depends on this. **[low]**
+
+Checked in Madras's bibliography and deliberately **not** wanted, so the list is not
+re-walked: Kesten 1963 (the SAW pattern theorem he generalises — name it in prose, no need
+to hold it); Bender–Gao–Richmond 1992 (submaps of maps, the same 0–1 phenomenon for planar
+maps); Madras–Soteros–Whittington et al. 1990 (collapsing branched polymer, the θ-point
+neighbourhood we already declined with Stratychuk–Soteros); Hara–Slade 1992 (high
+dimensions, lace expansion); Swierczak–Guttmann 1996 (non-Euclidean lattices);
+Vanderzande 1998 (polymer textbook); Grimmett 1989; Hammersley–Morton 1954; Cassels 1959
+(cited only for a lattice-periodicity technicality).
 
 ## Cleared 2026-08-06 — the polycube defect-diagonal line, both obtained
 

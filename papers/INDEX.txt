@@ -255,6 +255,27 @@ citation scan of the isoperimetry batch):
                                            access. Completes the polycube defect-diagonal set with the
                                            explicit k=3 case.
 
+Found by web search 2026-08-06, both free and both bearing on hole claims:
+  soteros_whittington_1990_rigorous_results_wild_guesses.pdf
+                                           Whittington & Soteros, Lattice animals: rigorous results and
+                                           wild guesses, in Disorder in Physical Systems (Grimmett &
+                                           Welsh, eds.), OUP 1990, 323-335. Free from Grimmett's own
+                                           Hammersley-festschrift page at statslab.cam.ac.uk. NOTE the
+                                           title page reads "S.G. Whittington and C.E. Soteros" -- the
+                                           Barequet-Rote order is right, Madras's bibliography reversed it.
+  guttmann_jensen_wong_enting_2000_punctured_polygons_polyominoes.pdf
+                                           Guttmann, Jensen, Wong & Enting, Punctured polygons and
+                                           polyominoes on the square lattice, J. Phys. A 33 (2000)
+                                           1735-1764; arXiv cond-mat/0003441. Turned up while hunting the
+                                           1990 "punctured discs" paper, and worth more: their Appendix
+                                           proves that k-punctured polyominoes share the unpunctured
+                                           growth constant and that the exponent shifts by exactly 1 per
+                                           puncture (phi_k = phi_0 - k). That is the asymptotic content of
+                                           our hole-fill bijection, for square-lattice polyominoes --
+                                           results/hole-fill-interior-cell-identity.md now cites it. Their
+                                           method is van Rensburg & Whittington's concatenation/drilling/
+                                           surgery, which also largely discharges the want for that paper.
+
 Distributed-computing background (engine design era):
   dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).
   afrati_dassarma_2013_mapreduce_cost_bounds.pdf  Afrati et al., MapReduce cost bounds.

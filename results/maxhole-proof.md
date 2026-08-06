@@ -110,8 +110,13 @@ the peeling lemma are all superseded: none of them was ever the obstruction.
 **What is still ours.** The *question* — no paper found stating the maximum
 total hole area; the polyomino hole literature counts holes rather than
 measuring them (Kahle & Roldán, maximally many holes f(n) ≈ n/2; Baralić &
-Uppal, deep holes). The formula and both its bounds are the isoperimetric
-inequality, cited. Enumeration to n = 17 confirms the statement independently.
+Uppal, deep holes; and, located 2026-08-06, Guttmann, Jensen, Wong & Enting,
+"Punctured polygons and polyominoes on the square lattice," J. Phys. A 33
+(2000) 1735–1764, who enumerate k-punctured polygons and polyominoes by
+perimeter and area and prove the growth constant is unchanged by finitely many
+punctures — counting again, not measuring). The formula and both its bounds are
+the isoperimetric inequality, cited. Enumeration to n = 17 confirms the
+statement independently.
 
 Citations, in the order a paper should give them; all held locally
 (`papers/INDEX.txt`):
