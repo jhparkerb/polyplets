@@ -10,6 +10,15 @@ Format: `Author(s), "Title," Venue Vol (Year) pages. DOI/ID. — why we want it.
 
 _(none outstanding — Barequet–Moffie 2007 and Mertens 1990 obtained 2026-06-25)_
 
+## Medium priority (the last unchecked ancestor of the phase-block decomposition)
+
+- F. Ibn-Majdoub-Hassani, "Combinatoire des polyominos et des tableaux décalés oscillants,"
+  PhD thesis, Université de Paris Sud, Orsay, November 1996. — reference [6] of
+  Gouyou-Beauchamps & Leroux 2004, the source of the C-convex hexagonal class, and the one
+  candidate origin of the growth-phase block decomposition that `results/novelty-sortie.md`
+  N3 could not obtain. His 1997 FPSAC paper uses strata instead, so this is a long shot,
+  but it is the only untested one. **[med]**
+
 ## Medium priority (the polycube defect-diagonal line — precedent for the diagonal law)
 
 Wanted by `results/novelty-sortie.md` N5: the same "fix the defect, get polynomial ×

@@ -151,6 +151,14 @@ Growth-rate bounding methods (obtained 2026-08-01, for the lambda <= 9.3153 push
                                            results/hv-growth-sandwich.md -- column states as a pair of
                                            one-way phases, blocks H_ij as maximal runs, H00/H22 stacks,
                                            H02 = Pa = H20 staircases. CITE IT (results/novelty-sortie.md N3).
+  denise_durr_ibnmajdoubhassani_1997_polyominos_convexes_hexagonal.pdf
+                                           Denise, Durr & Ibn-Majdoub-Hassani, FPSAC'97 (Vienna),
+                                           222-234. Reference [2] of Gouyou-Beauchamps & Leroux 2004,
+                                           and a candidate origin for the growth-phase decomposition.
+                                           It is not: it uses "decomposition par strates" (Temperley,
+                                           developed by Bousquet-Melou), column at a time. Recovered
+                                           2026-08-06 from the Wayback Machine as PostScript --
+                                           fpsac.org's own copy is a 404 -- and ps2pdf'd here.
   leroux_rassart_robitaille_1998_convex_polyominoes_symmetry_classes.pdf
                                            Leroux, Rassart & Robitaille, Adv. Appl. Math. 21 (1998)
                                            343-380 (arXiv math/9803130). The square-lattice

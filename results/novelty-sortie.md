@@ -70,6 +70,30 @@ alone**; the 1998 paper is the square-lattice ancestor for the building blocks
 (stacks, directed convex), not for the phase blocks. In the 2004 paper §2.3
 carries no citation for the decomposition itself.
 
+**Chasing the decomposition's own ancestry (2026-08-06).** §2.3 cites nobody
+for it, so the fifteen references of the 2004 paper were read and the three
+plausible earlier homes chased down:
+
+- **[3] Gouyou-Beauchamps & Leroux, FPSAC'04** is the French extended abstract
+  of this same paper ("this is the full version of a paper presented at the
+  FPSAC Conference in Vancouver"), not an earlier source.
+- **[8] Leroux, Rassart & Robitaille 1998** — read, see the correction above.
+  Temperley–Bousquet-Mélou strata, not phase blocks. The 2004 introduction
+  credits it only for the orbit/Burnside approach.
+- **[2] Denise, Dürr & Ibn-Majdoub-Hassani, FPSAC'97**, the obvious candidate
+  because random generation needs a constructive decomposition — recovered from
+  the Wayback Machine (the fpsac.org copy is gone) and now in `papers/`. It
+  says outright: "En utilisant la technique de « décomposition par strates »",
+  the Temperley technique "largement développée par Bousquet-Mélou". Column at
+  a time, not phase blocks.
+- **[6] Ibn-Majdoub-Hassani, PhD thesis, Orsay 1996** — the one item not
+  obtained (`papers/MISSING.md`). It is the source for the C-convex hexagonal
+  class itself, and its co-author's 1997 paper uses strata, so it is unlikely
+  to hold the phase blocks; unlikely is not checked.
+
+On that evidence Gouyou-Beauchamps & Leroux 2004 is the earliest source for the
+decomposition, and citing it is right.
+
 **What survives as ours.** Their decomposition drives exact generating series
 for a solvable family. Ours is applied to a family with no exact solution, and
 what is done with it is different:
