@@ -1,0 +1,335 @@
+python3 tests/gate_g1.py
+ok   square4  n= 1  got          1  expect          1  [b001168.txt]
+ok   square4  n= 2  got          2  expect          2  [b001168.txt]
+ok   square4  n= 3  got          6  expect          6  [b001168.txt]
+ok   square4  n= 4  got         19  expect         19  [b001168.txt]
+ok   square4  n= 5  got         63  expect         63  [b001168.txt]
+ok   square4  n= 6  got        216  expect        216  [b001168.txt]
+ok   square4  n= 7  got        760  expect        760  [b001168.txt]
+ok   square4  n= 8  got       2725  expect       2725  [b001168.txt]
+ok   square4  n= 9  got       9910  expect       9910  [b001168.txt]
+ok   square4  n=10  got      36446  expect      36446  [b001168.txt]
+ok   square8  n= 1  got          1  expect          1  [b006770.txt]
+ok   square8  n= 2  got          4  expect          4  [b006770.txt]
+ok   square8  n= 3  got         20  expect         20  [b006770.txt]
+ok   square8  n= 4  got        110  expect        110  [b006770.txt]
+ok   square8  n= 5  got        638  expect        638  [b006770.txt]
+ok   square8  n= 6  got       3832  expect       3832  [b006770.txt]
+ok   square8  n= 7  got      23592  expect      23592  [b006770.txt]
+ok   square8  n= 8  got     147941  expect     147941  [b006770.txt]
+ok   tri6     n= 1  got          1  expect          1  [b001207.txt]
+ok   tri6     n= 2  got          3  expect          3  [b001207.txt]
+ok   tri6     n= 3  got         11  expect         11  [b001207.txt]
+ok   tri6     n= 4  got         44  expect         44  [b001207.txt]
+ok   tri6     n= 5  got        186  expect        186  [b001207.txt]
+ok   tri6     n= 6  got        814  expect        814  [b001207.txt]
+ok   tri6     n= 7  got       3652  expect       3652  [b001207.txt]
+ok   tri6     n= 8  got      16689  expect      16689  [b001207.txt]
+GATE G1: GREEN
+python3 tests/gate_g2.py
+ok   A fixtures  square4  n<=14  vs b001168.txt
+ok   A fixtures  square8  n<=11  vs b006770.txt
+ok   A fixtures  tri6     n<=12  vs b001207.txt
+ok   B per-box   square4  n<=9  vs G1 oracle (88 box classes)
+ok   B per-box   square8  n<=7  vs G1 oracle (99 box classes)
+ok   B per-box   tri6     n<=7  vs G1 oracle (99 box classes)
+ok   C split     square8 n<=9 S=4 K=3: workers sum to full run
+ok   I terminal  square8  n<=13: aggregate(pure-count)==per-box rowsums
+ok   I terminal  square4  n<=14: aggregate(pure-count)==per-box rowsums
+ok   I terminal  tri6     n<=13: aggregate(pure-count)==per-box rowsums
+ok   I split@max square8 n<=9 S=9 K=3: boundary-at-maxn sums to full
+ok   D asan      square4  n<=11  clean + equal
+ok   D asan      square8  n<=8  clean + equal
+ok   D asan      tri6     n<=9  clean + equal
+ok   E rook/bish square8 n<=11: total=A006770, rook==bishop==A001168
+ok   E perimeter square8 n<=11: sum=A006770, perim=4n slice=A001168
+ok   F transpose square8 n<=11: byBox[n][w][h]==byBox[n][h][w] (379 (n,w,h) cells)
+ok   H holes-sum square8 n<=11: 4-bg and 8-bg both sum to A006770
+ok   H holes-conv square4 n<=11: hole-free=A006724, holey=A389193
+GATE G2: GREEN
+python3 tests/gate_tma.py
+ok   A totals      square4 n<=12 vs b001168.txt
+ok   B per-height  square4 n<=10 vs G2 per-box marginals (55 (h,n) classes)
+ok   C asan        square4 n<=9 clean + equal
+ok   D totals      square8 n<=11 vs b006770.txt
+ok   E per-height  square8 n<=9 vs G2 per-box marginals (45 (h,n) classes)
+ok   F asan        square8 n<=8 clean + equal
+ok   G perimeter   square8 n<=11 TMA==G2 (88 (n,perimeter) cells)
+ok   H holes       square8 n<=11 tma_holes==flood oracle (33 (n,#holes) classes)
+ok   I holes MT    square8 n<=11 --threads 4 == serial
+ok   J holes ckpt  square8 n<=11 write+resume == plain
+ok   K holes resv  square8 n<=11 --reserve == plain
+ok   L ihckpt T=1  square8 n<=14 kill@col5 resume == clean
+ok   L ihckpt T=4  square8 n<=14 kill@col5 resume == clean
+ok   L ihckpt holes square8 n<=14 kill@col5 resume == clean
+ok   M fold T=1    square8 n<=14 --fold == unfolded
+ok   M fold T=4    square8 n<=14 --fold == unfolded
+ok   M fold only-h  square8 n<=14 H11 --fold MT == unfolded
+ok   N smoke       square8 H12 N14 dense baseline == 177147/5511240/97548948
+GATE TMA: GREEN
+python3 tests/gate_s2.py
+ok   free square4  n<=10 vs A000105 free polyominoes
+ok   free square8  n<=9 vs A030222 free polyplets
+ok   burnside-free  square4: sum(Fix)/8 == direct dedup
+ok   burnside-1side square4: sum_rot(Fix)/4 == direct dedup
+ok   burnside-free  square8: sum(Fix)/8 == direct dedup
+ok   burnside-1side square8: sum_rot(Fix)/4 == direct dedup
+ok   conjugacy square4: r90==r270, h==v, d1==d2
+ok   conjugacy square8: r90==r270, h==v, d1==d2
+GATE S2: GREEN
+python3 tests/gate_e0.py
+ok   path-3           maxn=3  match
+ok   triangle         maxn=3  match
+ok   weighted-edge    maxn=3  match
+ok   star-4           maxn=4  match
+ok   weighted-path    maxn=8  match
+ok   square-4cycle    maxn=4  match
+ok   3x3-king         maxn=5  match
+ok   mixed-weights    maxn=7  match
+GATE E0: GREEN
+python3 tests/gate_sym.py
+ok   90-degree rotation   vs oracle, n<=8
+ok   180-degree rotation  vs oracle, n<=8
+ok   axis mirror          vs oracle, n<=8
+ok   diagonal mirror      vs oracle, n<=8
+ok   free polyplets via Burnside vs A030222, n<=11
+ok   C++ 90-degree rotation   == Python, n<=11
+ok   C++ 180-degree rotation  == Python, n<=11
+ok   C++ axis mirror          == Python, n<=11
+ok   C++ diagonal mirror      == Python, n<=11
+GATE symmetric/free: GREEN
+python3 tests/gate_symtm.py
+ok   symtm hmirror == symcount_fast, n<=18
+ok   symtm r180 == symcount_fast, n<=18
+ok   symtm dmirror == symcount_fast, n<=18
+GATE SYMTM: GREEN
+./build/euler_unit
+named shapes (with hand-checked hole counts):
+  single         comps8=1 holes4bg=0 | comps4=1 holes8bg=0 | E8=1 E4=1
+  domino         comps8=1 holes4bg=0 | comps4=1 holes8bg=0 | E8=1 E4=1
+  square2        comps8=1 holes4bg=0 | comps4=1 holes8bg=0 | E8=1 E4=1
+  diamond(n4)    comps8=1 holes4bg=1 | comps4=4 holes8bg=0 | E8=0 E4=4
+  ring3x3(n8)    comps8=1 holes4bg=1 | comps4=1 holes8bg=1 | E8=0 E4=0
+  ring4x4        comps8=1 holes4bg=1 | comps4=1 holes8bg=1 | E8=0 E4=0
+  pinch2holes    comps8=1 holes4bg=2 | comps4=1 holes8bg=1 | E8=-1 E4=0
+fuzz (all identities on random images):
+  fuzzed 191166 non-empty images
+
+ALL PASS
+python3 tests/gate_driver_robust.py
+  ok   valid run: a(4)=110 == fixture 110
+  ok   intact rows -> combine exit 0
+  ok   missing file -> combine abort
+  ok   empty file -> combine abort
+  ok   duplicate-n (race) -> combine abort
+  ok   lock held -> second run exit 3
+GATE DRIVER-ROBUST: GREEN
+./build/strip_mu_cert --selftest
+selftest: H=2 states=3 vlen=4 vrange_bits=1.3
+selftest A: mu_2 >= 24142/10000 -> PASS (min_ratio=1.000006582, expect PASS)
+selftest B: mu_2 >= 24143/10000 -> FAIL (min_ratio=0.999958055, expect FAIL)
+  rejected at state 000100000000: lhs=1208875111404083385437183 < rhs=1208925819614629174706176
+selftest C: perturbed vector -> FAIL (expect FAIL)
+  rejected at state 000100000000: lhs=537682965928004666609013035163071 < rhs=1298074214633706763017436006449152 (1 failing states)
+selftest D: all-zero vector -> FAIL (expect FAIL)
+selftest: ALL OK
+python3 tests/gate_strip_fast.py
+gate-strip-fast: indexed-array strip engine vs the map engine and the certificates
+  ok   --selftest (corrupted tables and over-claims are refused)
+  ok   both engines produced a ladder
+  ok   same heights covered (2..8)
+  ok   H=2: mu 2.4142136 == old 2.4142136
+  ok   H=2: states 3 == old 3
+  ok   H=3: mu 3.4437184 == old 3.4437184
+  ok   H=3: states 8 == old 8
+  ok   H=4: mu 4.1823214 == old 4.1823214
+  ok   H=4: states 20 == old 20
+  ok   H=5: mu 4.7178013 == old 4.7178013
+  ok   H=5: states 50 == old 50
+  ok   H=6: mu 5.1153245 == old 5.1153245
+  ok   H=6: states 126 == old 126
+  ok   H=7: mu 5.4178476 == old 5.4178476
+  ok   H=7: states 322 == old 322
+  ok   H=8: mu 5.6533728 == old 5.6533728
+  ok   H=8: states 834 == old 834
+  ok   H=2: exact check PASSes the certified 24142135/10000000
+  ok   H=2: exact check FAILs the over-claim 24142136/10000000
+  ok   H=3: exact check PASSes the certified 34437183/10000000
+  ok   H=3: exact check FAILs the over-claim 34437184/10000000
+  ok   H=4: exact check PASSes the certified 41823214/10000000
+  ok   H=4: exact check FAILs the over-claim 41823215/10000000
+  ok   H=5: exact check PASSes the certified 47178012/10000000
+  ok   H=5: exact check FAILs the over-claim 47178013/10000000
+  ok   H=6: exact check PASSes the certified 51153244/10000000
+  ok   H=6: exact check FAILs the over-claim 51153245/10000000
+  ok   H=7: exact check PASSes the certified 54178476/10000000
+  ok   H=7: exact check FAILs the over-claim 54178477/10000000
+  ok   H=8: exact check PASSes the certified 56533727/10000000
+  ok   H=8: exact check FAILs the over-claim 56533728/10000000
+  ok   refuses --verify 1 1 1
+  ok   refuses --bogus
+  ok   refuses --verify 8 1 0
+  ok   refuses --verify 8 56533727 10000000 --vbits 120
+gate-strip-fast: PASS
+python3 tests/gate_king_grid.py
+grid n=12: wall=13.8s (budget 600s)
+ok   grid n=12 runs under 10 minutes
+ok   (none,none) vs reference n<=10
+ok   (none,colconvex) vs reference n<=5
+ok   (none,hvconvex) vs reference n<=10
+ok   (none,staircase) vs reference n<=6
+ok   (dir5,none) vs reference n<=10
+ok   (dir4,none) vs reference n<=6
+ok   (ctrlB,none) vs reference n<=8
+ok   (mdir,none) vs reference n<=8
+ok   (none,none) vs fixtures/b006770.txt n<=12
+ok   (dir5,hvconvex) == (none,hvconvex)
+ok   (dir5,staircase) == (none,staircase)
+ok   (dir4,staircase) == (none,staircase)
+ok   (ctrlB,hvconvex) == (none,hvconvex)
+ok   (ctrlB,staircase) == (none,staircase)
+ok   (mdir,colconvex) == (none,colconvex)
+ok   (mdir,hvconvex) == (none,hvconvex)
+ok   (mdir,staircase) == (none,staircase)
+ok   (dir5,colconvex) != (none,colconvex) (a predicate that collapsed everything would pass above)
+ok   (dir4,colconvex) != (none,colconvex) (a predicate that collapsed everything would pass above)
+ok   (ctrlB,colconvex) != (none,colconvex) (a predicate that collapsed everything would pass above)
+ok   (dir4,hvconvex) != (none,hvconvex) (a predicate that collapsed everything would pass above)
+ok   RED control dir4: filtered(3)=18 (expect 18, MUST diverge from A047781=19)
+ok   RED control dir5nb: filtered(3)=20 (expect 20, MUST diverge from A047781=19)
+ok   RED control gridbad staircase MUST diverge from A225114: got [1, 3, 10, 34, 116, 396]
+ok   gridbad staircase reproduces A007052 (confirms the dropped predicate is exactly bottoms-only monotonicity): got [1, 3, 10, 34, 116, 396] want [1, 3, 10, 34, 116, 396]
+GATE KING-GRID: GREEN
+python3 tests/gate_site_perim.py
+ok   minSPKing(1) == 4*1+4 = 8: got 8
+ok   minSPKing(4) == 4*2+4 = 12: got 12
+ok   minSPKing(9) == 4*3+4 = 16: got 16
+ok   minSPKing vs g2 square8 --siteperim oracle n<=9
+ok   RED control minSPRook MUST diverge from minSPKing at every n<=9
+minSPKing n=1..9: [8, 10, 12, 12, 14, 14, 16, 16, 16]
+minSPRook n=1..9: [4, 6, 7, 8, 8, 9, 10, 10, 11]
+GATE SITE-PERIM: GREEN
+python3 tests/gate_multidirected.py
+series to n=200: 2.1s
+ok   series S = A001003 (little Schroeder half-animals)
+ok   series D from (1)-(3) = closed form (1/4)((1+t)/sqrt(1-6t+t^2)-1)
+ok   series D = A047781 (directed king animals)
+brute mdir n=12: wall=3.6s (budget 600s)
+ok   mdir n=12 runs under 10 minutes
+ok   brute-force Definition 2 == GF series, n<=12
+ok   RED control mdirbad (keystone condition dropped) MUST diverge from m(n): got [1, 4, 20, 110, 636, 3792, 23082, 142596]
+ok   mdirbad is a superset predicate (>= m(n) termwise): [1, 4, 20, 110, 636, 3792, 23082, 142596]
+ok   RED control dir5nb ('control B') MUST diverge from m(n)
+ok   control B diverges from multi-directed first at n=4: 106 vs 110
+ok   dir5nb still reproduces the recorded control B column
+ok   directed A047781 is a strict subset of multi-directed
+ok   m(200)/m(199) = 6.475196 -> mu = 6.4752
+ok   ratio is NOT drifting to 1/rho_B = 6.1175 (the Lemma 11 decoy)
+ok   1/rho_B from 1-5x-7x^2+x^3 = 6.1175
+ok   B(1/mu) = 0.999979 = 1 (Theorem 10, B(rho_M)=1)
+GATE MULTIDIRECTED: GREEN
+python3 tests/gate_convex_dfinite.py
+ok   convex_area_tm 14 1 reproduces king (convex polyplets)
+ok   convex_area_tm 14 0 reproduces king=0 (A067675 control)
+ok   banked king series starts with the reference 14 terms
+ok   banked control series starts with A067675's first 14 terms
+ok   prec positive control: banked (5,2) recurrence found (nullity 1)
+ok   prec positive control: fitted recurrence predicts all 172 held-out rows
+ok   prec negative control: (2,1) box correctly excluded
+ok   alg positive control: A005436 algebraic at (2,8) (nullity 1)
+ok   alg positive control: relation holds on all 69 held-out rows
+ok   alg negative control: A005436 at (2,4) correctly excluded
+ok   convex polyplets by area: prec box (20,20) EXCLUDED
+ok   convex polyplets by area: alg box (20,20) EXCLUDED
+ok   convex polyominoes by area (A067675): prec box (20,20) EXCLUDED
+ok   convex polyominoes by area (A067675): alg box (20,20) EXCLUDED
+ok   mu_king tail ratio starts 3.12894326973088 (got 3.12894326973088)
+ok   mu_control tail ratio starts 2.30913859333049 (got 2.30913859333049)
+GATE CONVEX-DFINITE: GREEN
+python3 tests/gate_middle_kingdom.py
+ok   cc vs Phase 0 brute-force grid n<=14
+ok   ccdir5 vs Phase 0 brute-force grid n<=14
+ok   ccdir4 vs Phase 0 brute-force grid n<=14
+ok   ccctrlb vs Phase 0 brute-force grid n<=14
+ok   hv vs Phase 0 brute-force grid n<=14
+ok   hvdir4 vs Phase 0 brute-force grid n<=14
+ok   stair vs Phase 0 brute-force grid n<=14
+ok   hvdir4asc vs Phase 0 brute-force grid n<=14
+ok   ccmono = A007052 (order-consecutive partitions): got [1, 3, 10, 34, 116, 396, 1352, 4616, 15760, 53808, 183712, 627232]
+ok   hv (column TM) vs convex_area_tm row TM, n<=120
+ok   RED ccdir4bad (drop<=2) MUST diverge from ccdir4: got [1, 4, 18, 82, 374, 1706, 7782, 35498, 161926, 738634, 3369318, 15369322, 70107974, 319801226]
+ok   RED ccdir4bad is a superset of ccdir4 (termwise >=)
+ok   RED ccctrlbbad MUST diverge from ccctrlb: got [1, 4, 18, 79, 341, 1448, 6077, 25286, 104555, 430314, 1764854, 7219184, 29471607, 120135089]
+ok   RED ccmono MUST diverge from ccdir5
+ok   RED ccmono (tops unconstrained) MUST diverge from stair
+ok   stair <= hvmono <= hvdir4 <= hv termwise: stair=[1, 3, 9, 28, 87, 272] hvmono=[1, 3, 10, 33, 107, 342]
+ok   the sandwich is strict somewhere (no rung is a duplicate)
+ok   stair <= hvdir4asc termwise (the staircase never enters phase (0,1)): got [1, 3, 10, 34, 115, 382]
+ok   hvdir4asc <= hvdir4 termwise (it is a subclass)
+ok   the phase split is not a no-op: hvdir4asc != hvdir4
+ok   RED hvdir4ascbad (phase (1,0) deleted) MUST diverge from hvdir4asc
+ok   dir5 <= ctrlB <= column-convex termwise (nesting)
+ok   dir4-HV <= HV termwise (nesting)
+ok   cc: derived g.f. denominator*F == numerator exactly, all 700 terms
+ok   ccdir5: derived g.f. denominator*F == numerator exactly, all 700 terms
+ok   ccdir4: derived g.f. denominator*F == numerator exactly, all 700 terms
+ok   ccctrlb: prec box (12,12) EXCLUDED (no P-recurrence / algebraic relation of that size)
+ok   ccctrlb: alg box (8,14) EXCLUDED (no P-recurrence / algebraic relation of that size)
+ok   hvdir4: prec box (20,20) EXCLUDED (no P-recurrence / algebraic relation of that size)
+ok   hvdir4: alg box (20,20) EXCLUDED (no P-recurrence / algebraic relation of that size)
+GATE MIDDLE-KINGDOM: GREEN
+python3 tests/gate_mk_dir4_perim.py
+ok   RED control dir4bad MUST diverge from brute-force dir4 somewhere in s<=  7: diverged at s=[5, 6, 7]
+ok   RED control dir4bad == hv mode exactly (same code path)
+ok   hv mode vs gridperim brute force, s<=7 (complete)
+ok   dir4 mode vs gridperim brute force, s<=7 (complete)
+ok   dir4 mode >= brute-force LOWER BOUND beyond s=7
+ok   dir4(s) <= hv(s) at every s
+ok   dir4(s) == hv(s) only at the small s where brute force confirms every animal is already directed: got [2, 3, 4] want [2,3,4]
+ok   king=0 control (A005436) unaffected: got [1, 2, 7, 28, 120, 528, 2344, 10416, 46160, 203680]
+hv   s=2..15: [1, 2, 9, 36, 154, 668, 2916, 12740, 55570, 241692, 1047604, 4524464, 19470660, 83500968]
+dir4 s=2..15: [1, 2, 9, 34, 137, 553, 2237, 9038, 36435, 146511, 587683, 2351915, 9393251, 37449143]
+brute (n<=12) hv:   [1, 2, 9, 36, 154, 668, 2819, 9862, 25747, 54032, 97332, 152146]
+brute (n<=12) dir4: [1, 2, 9, 34, 137, 553, 2147, 6737, 15800, 30810, 53352, 81742]
+GATE MK-DIR4-PERIM: GREEN
+python3 tests/gate_dir4_perim_alg.py
+ok   null control: 199 terms of the by-area king series, length-matched to the dir4 series (199)
+ok   dir4 alg (4,22) prime0: nullity exactly 1 (got 1)
+ok   dir4 alg (4,22) prime0: fit predicts all 81 held-out rows
+ok   dir4 alg (4,22) prime1: nullity exactly 1 (got 1)
+ok   dir4 alg (4,22) prime1: fit predicts all 81 held-out rows
+ok   dir4 prec (19,3): nullity exactly 1 (got 1)
+ok   dir4 prec (19,3): fit predicts all 96 held-out rows
+ok   dir4 alg (4,21) EXCLUDED -- t-degree one short
+ok   dir4 alg (3,48) EXCLUDED -- algebraic degree 3, t-degree 48
+ok   dir4 prec (19,2) EXCLUDED -- degree one short
+ok   dir4 prec (18,3) EXCLUDED -- order one short
+ok   dir4 prec (5,2) EXCLUDED -- the unrestricted series' own box
+ok   null control alg (4,22) EXCLUDED (same box, same length)
+ok   null control alg (4,24) EXCLUDED (same box, same length)
+ok   null control prec (19,3) EXCLUDED (same box, same length)
+ok   null control prec (27,2) EXCLUDED (same box, same length)
+ok   null control prec (13,9) EXCLUDED (same box, same length)
+ok   dir4 alg (5,22) nullity 2 = (K-3)(L-21) (got 2)
+ok   dir4 alg (6,22) nullity 3 = (K-3)(L-21) (got 3)
+ok   dir4 alg (4,23) nullity 2 = (K-3)(L-21) (got 2)
+ok   dir4 alg (4,24) nullity 3 = (K-3)(L-21) (got 3)
+ok   A005436 algebraic at (2,8) (nullity 1)
+ok   A005436: relation holds on all 69 held-out rows
+ok   A005436 at (2,4) EXCLUDED
+ok   unrestricted HV-convex alg (2,9): nullity 1 (got 1)
+ok   unrestricted HV-convex alg (2,8) EXCLUDED -- (2,9) is minimal
+ok   dir4_perim_find_alg.py rc=0
+ok   recovered quartic annihilates all 200 rows over Z
+ok   five coefficient polynomials (got 5)
+ok   q_0(t) matches the banked quartic
+ok   q_1(t) matches the banked quartic
+ok   q_2(t) matches the banked quartic
+ok   q_3(t) matches the banked quartic
+ok   q_4(t) matches the banked quartic
+GATE DIR4-PERIM-ALG: GREEN
+./scripts/gen_compile_commands.sh
+wrote compile_commands.json (34 entries)
+./scripts/check_compile_commands.sh
+checked 34 entries, 0 failed
+make exit code: 0
