@@ -29,6 +29,32 @@ on the banked hole distribution `results/holes_n18.txt` (n≤18, exact).
 > cross-checked against `g2 --holes` at small n by `tests/gate_holes.py` and
 > `tests/gate_g2.py`, but the n=18 table is single-engine.
 
+> **THE QUALITATIVE HALF IS A THEOREM, AND NOT OURS (2026-08-06).**
+> `λ₀ < λ`, with the hole-free fraction decaying exponentially, is a corollary
+> of **Madras's pattern theorem** (N. Madras, "A pattern theorem for lattice
+> clusters," *Ann. Comb.* **3** (1999) 357–384; `papers/madras_1999_*.pdf`).
+> His Theorem 2.1: for a *proper pattern* `P = (P₁, P₂)` — sites required
+> present and sites required **absent** — the clusters containing at most `εn`
+> translates of P are exponentially rare, `limsup(G_n[≤εn,P])^{1/n} < λ`. Take
+> P₁ = the eight neighbours of a cell, P₂ = that cell: any animal containing a
+> translate has an enclosed empty cell, so hole-free animals contain **zero**
+> translates and are exponentially rare. Hence λ₀ < λ strictly.
+>
+> This applies to us directly: his §3.1(f), the "spread-out lattice of range M"
+> with the sup norm, **is the king lattice at M = 1**, and his results cover
+> site animals on it. Two further consequences worth having:
+> - **claim (c) below is wrong and is retracted.** It said this is the polyplet
+>   analogue of *believed, not proved* polyomino behaviour. The same pattern
+>   argument proves it for polyominoes too (P₁ = four neighbours, P₂ = the
+>   cell), and has since 1999.
+> - **the ratio limit `a(n+1)/a(n) → λ` is also a theorem** for king animals
+>   (his Theorem 2.2 / Corollary 3.6), which is worth a sentence wherever the
+>   report fits ratios.
+>
+> Madras never mentions holes; the corollary is ours to draw, the theorem is
+> his to be cited. What survives as ours here is the *quantitative* picture —
+> ρ = λ₀/λ ≈ 0.978, measured — and that stays at n ≤ 18 precision.
+
 ## Question
 
 The height/diagonal structure of the triangle is well mapped, and polyplets are

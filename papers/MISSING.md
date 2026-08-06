@@ -49,6 +49,42 @@ k ≤ 200,000 in `experiments/maxhole_sieben_check.py`), and the no-connectivity
 hypothesis closed the multi-hole case outright — `results/maxhole-proof.md`
 §The union argument._
 
+## Citation scan of the isoperimetry batch, 2026-08-06 — three found, six not
+
+Scanned the reference lists of all seven papers filed that afternoon (Wang–Wang,
+Bollobás–Radcliffe, Chung, Bezrukov, Prellberg–Owczarek, Barequet–Barequet–Rote,
+Barequet–Shalah). Dead ends worth not re-scanning: Wang–Wang's own references are
+pure extremal set theory (Macaulay, Kruskal, Katona, Clements–Lindström) with no
+lattice-animal content; Chung is spectral/Cheeger throughout; Bollobás–Radcliffe
+and Bezrukov cite cube isoperimetry only.
+
+**Obtained and read:**
+
+- N. Madras, "A pattern theorem for lattice clusters," Ann. Comb. **3** (1999)
+  357–384. → `papers/madras_1999_*.pdf`. **The find.** Covers the king lattice
+  (his §3.1(f) at M=1, sup norm). λ₀ < λ for hole-free animals is a corollary
+  of his Theorem 2.1, and `a(n+1)/a(n) → λ` is his Theorem 2.2. See
+  `results/hole-free-growth-constant.md`, which retracted a claim on the
+  strength of it.
+- M. E. Fisher, A. J. Guttmann & S. G. Whittington, J. Phys. A **24** (1991)
+  3095–3106. → `papers/fisher_guttmann_whittington_1991_*.pdf`. States the
+  bond-perimeter maximum (m²/16, or (m²−4)/16) as "clearly", exactly as
+  Prellberg–Owczarek does. **Question closed with a negative: the 1/16 twin is
+  folklore and has no primary.** Don't keep hunting for one.
+- A. Asinowski, G. Barequet, R. Barequet & G. Rote, J. Integer Seq. **15**
+  (2012) #12.8.4. → `papers/asinowski_etal_2012_*.pdf`. Open access.
+
+**New wants raised by Madras's own reference list** (neither searched yet):
+
+- N. Madras, "A rigorous bound on the critical exponent for the number of
+  lattice trees, animals, and polygons," J. Statist. Phys. **78** (1995)
+  681–699. — bears directly on the θ = −1.000(1) paragraph: a *rigorous* bound
+  on the exponent we estimate numerically. **[med]**
+- N. Madras, C. E. Soteros & S. G. Whittington, "Statistics of lattice
+  animals," J. Phys. A **21** (1988) 4617–4635. — the classical rigorous-
+  statistics paper for animals; the natural place to check what else about
+  sub-classes is already proved. **[med]**
+
 ## Searched by jasonp 2026-08-06 and NOT FOUND — library or nothing
 
 Do not re-search these from the desk; the desk has been tried.
@@ -72,6 +108,33 @@ Do not re-search these from the desk; the desk has been tried.
 
 All four are wanted for lineage and citation courtesy, not for any claim: nothing in the
 repo depends on reading them.
+
+Not found in the second round (the citation scan above), same disposition:
+
+- C. E. Soteros & S. G. Whittington, "Lattice animals: rigorous results and wild guesses,"
+  in *Disorder in Physical Systems* (G. R. Grimmett & D. J. A. Welsh, eds.), Oxford
+  University Press 1990, 323–335. — a book chapter, which is why it is not online. Author
+  order is Soteros–Whittington per Madras's own bibliography; Barequet–Rote list it the
+  other way round. Wanted as a general novelty check on rigorous animal results. **[med]**
+- E. J. Janse van Rensburg & S. G. Whittington, "Punctured discs on the square lattice,"
+  J. Phys. A **23** (1990) 1287–1294. — the nearest thing to prior art on *holes* the scan
+  turned up; `results/maxhole-proof.md` claims no paper measures hole area, and this is the
+  one that could contradict it. **[med]**
+- I. G. Enting & A. J. Guttmann, "On the area of square lattice polygons," J. Stat. Phys.
+  **58** (1990) 475–484. — was wanted as the possible primary for the bond-perimeter
+  maximum. **Demoted: Fisher–Guttmann–Whittington 1991 shows that statement is folklore**,
+  so there is probably nothing to find here either. **[low]**
+- D. J. Kleitman, M. M. Krieger & B. L. Rothschild, "Configurations maximizing the number
+  of pairs of Hamming-adjacent lattice points," Studies in Appl. Math. **50** (1971) no. 2.
+  — Wang–Wang's [9]; the edge-isoperimetric extremal problem on ℤⁿ, i.e. the bond-side
+  companion to the vertex result we now cite. **[low]**
+- B. Bollobás & I. Leader, "Edge-isoperimetric inequalities in the grid," Combinatorica,
+  early 1990s (Bezrukov's [27] lists it as "to appear", so the volume is unconfirmed); and
+  "Exact edge-isoperimetric inequalities," European J. Combin. **11** (1990) 325–340.
+  — only needed if the report prints the bond-perimeter twin. **[low]**
+- S. L. Bezrukov, "An isoperimetric problem for Manhattan lattices," proceedings, possibly
+  in Russian (his own [19]). — the title is our exact setting, but Wang–Wang already
+  answers it. Curiosity. **[low]**
 
 ## Cleared 2026-08-06 — the polycube defect-diagonal line, both obtained
 

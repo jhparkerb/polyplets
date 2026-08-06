@@ -227,6 +227,34 @@ lists is what turned up the 1977 primary:
                                            Thm 7 (sec 3.1) is a self-contained reproof; sec 3.2 does the
                                            8-connectivity metric.
 
+Pattern theorems / rigorous animal statistics (obtained 2026-08-06 from the
+citation scan of the isoperimetry batch):
+  madras_1999_pattern_theorem_lattice_clusters.pdf
+                                           Madras, A pattern theorem for lattice clusters, Ann. Combin.
+                                           3 (1999) 357-384. LOAD-BEARING. Thm 2.1: clusters containing
+                                           at most eps*n translates of a proper pattern P = (present
+                                           sites, ABSENT sites) are exponentially rare. His Sec 3.1(f),
+                                           the spread-out lattice of range M under the sup norm, IS the
+                                           king lattice at M = 1, and site animals on it are covered.
+                                           Consequences for us: lambda_0 < lambda for hole-free animals
+                                           (pattern = 8 neighbours present, centre absent) is a corollary,
+                                           not a measurement -- results/hole-free-growth-constant.md; and
+                                           a(n+1)/a(n) -> lambda is a theorem (Thm 2.2 / Cor 3.6), which
+                                           licenses the report's ratio fits. Madras never mentions holes.
+  fisher_guttmann_whittington_1991_2d_vesicles_polygons.pdf
+                                           Fisher, Guttmann & Whittington, Two-dimensional lattice
+                                           vesicles and polygons, J. Phys. A 24 (1991) 3095-3106. The
+                                           bond-perimeter maximum, p. 3097: max area is m^2/16 for
+                                           perimeter m divisible by 4, else (m^2-4)/16 -- stated as
+                                           "clearly", same as Prellberg-Owczarek's (3.1). Two sources,
+                                           both calling it obvious: the 1/16 twin is folklore, with no
+                                           primary to cite. Prove it in a line or attribute loosely.
+  asinowski_etal_2012_polycubes_n_minus_3.pdf
+                                           Asinowski, Barequet, Barequet & Rote, Proper n-cell polycubes
+                                           in n-3 dimensions, J. Integer Seq. 15 (2012) #12.8.4. Open
+                                           access. Completes the polycube defect-diagonal set with the
+                                           explicit k=3 case.
+
 Distributed-computing background (engine design era):
   dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).
   afrati_dassarma_2013_mapreduce_cost_bounds.pdf  Afrati et al., MapReduce cost bounds.
