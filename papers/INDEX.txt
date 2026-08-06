@@ -153,9 +153,14 @@ Growth-rate bounding methods (obtained 2026-08-01, for the lambda <= 9.3153 push
                                            H02 = Pa = H20 staircases. CITE IT (results/novelty-sortie.md N3).
   leroux_rassart_robitaille_1998_convex_polyominoes_symmetry_classes.pdf
                                            Leroux, Rassart & Robitaille, Adv. Appl. Math. 21 (1998)
-                                           343-380. The square-lattice companion to the above. The
-                                           arXiv scan (math/9803130) has no text layer, so quote the
-                                           2004 paper instead.
+                                           343-380 (arXiv math/9803130). The square-lattice
+                                           predecessor of the above, READ 2026-08-06: it does NOT
+                                           carry the growth-phase decomposition. Its route is
+                                           Temperley-Bousquet-Melou -- partitions, stacks, the new
+                                           shifted stacks, and directed convex (Prop 4, quoted from
+                                           Bousquet-Melou 1996 Thm 3.4 as a q-Bessel ratio) -- plus
+                                           Burnside for the symmetry classes. Cite the 2004 paper for
+                                           the phase blocks, this one for the building blocks.
 
 Distributed-computing background (engine design era):
   dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).

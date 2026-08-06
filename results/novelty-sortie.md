@@ -51,11 +51,24 @@ Then, in the same section:
 So the shape of `results/hv-growth-sandwich.md`'s Lemma 1 — column states as a
 pair of monotone phase bits, blocks as maximal runs, transitions one-way, outer
 blocks stacks, middle block staircase — is **published prior art**, for convex
-polyominoes, on two lattices, twenty-two years ago. The companion paper is
-Leroux, Rassart & Robitaille, *Adv. Appl. Math.* 21 (1998) 343–380
-(`papers/leroux_rassart_robitaille_1998_convex_polyominoes_symmetry_classes.pdf`;
-that scan carries no extractable text layer, so the 2004 paper is the citable
-source here).
+polyominoes on the honeycomb lattice, twenty-two years ago. §2.3 cites nobody
+for the decomposition, and the square-lattice companion (Leroux, Rassart &
+Robitaille, *Adv. Appl. Math.* 21 (1998) 343–380,
+`papers/leroux_rassart_robitaille_1998_convex_polyominoes_symmetry_classes.pdf`)
+does not contain it, so 2004 is the earliest source this sweep can point at.
+
+**The 1998 companion, read (correction, same day).** This note first said the
+Leroux–Rassart–Robitaille scan had no text layer. Wrong: it extracts cleanly
+(63 KB, Type 1 fonts, dvips), and an empty grep for the 2004 paper's vocabulary
+was mistaken for a broken scan. Read properly, it does **not** carry the
+growth-phase decomposition. Its route is Temperley–Bousquet-Mélou: convex
+polyominoes are assembled from partitions, stacks, the new shifted stacks, and
+directed convex polyominoes, the last quoted from Bousquet-Mélou 1996 Theorem
+3.4 as a ratio of q-Bessel-type series (their Proposition 4), and Burnside then
+gives the symmetry classes. So the N3 collision rests on the **2004 paper
+alone**; the 1998 paper is the square-lattice ancestor for the building blocks
+(stacks, directed convex), not for the phase blocks. In the 2004 paper §2.3
+carries no citation for the decomposition itself.
 
 **What survives as ours.** Their decomposition drives exact generating series
 for a solvable family. Ours is applied to a family with no exact solution, and

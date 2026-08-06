@@ -141,8 +141,10 @@ profiles, with the column state an ordered pair, the transitions one-way, the
 extreme blocks `H00`/`H22` identified as **stack polyominoes** and the middle
 blocks as **staircase polyominoes** with `H02 = Pa = H20`. That is Lemma 1,
 Lemma 2's identification and Proposition 9 below, for convex polyominoes on the
-square and honeycomb lattices; the companion is Leroux, Rassart & Robitaille,
-*Adv. Appl. Math.* 21 (1998) 343–380. Both PDFs are in `papers/`. What is not
+honeycomb lattice. Their square-lattice companion (Leroux, Rassart & Robitaille,
+*Adv. Appl. Math.* 21 (1998) 343–380) uses a different route — partitions,
+stacks, shifted stacks and directed convex, Temperley–Bousquet-Mélou — so 2004
+is the source to cite. Both PDFs are in `papers/`. What is not
 theirs: the king lattice (their middle kernel is `min(h,h')`, ours is
 `min(h,h')+1`), a class with no exact solution, and everything Propositions 6,
 7, 10 and 11 do with the blocks.
