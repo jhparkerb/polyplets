@@ -53,10 +53,7 @@ regression test.
 ## 2. Utilization was the lever, not cores
 
 `results/a34-utilization-postmortem.md`, `results/utilization-fix-and-ceiling.md`,
-`docs/utilization-bottleneck-log.md`. (`results/beyond-polyplets.md` cites a
-`results/cloud-investigation-2026-07-07.md` for the cloud half; that file is in
-neither the tree nor the history, so the cloud conclusion has to be re-sourced
-or dropped before it is printed.)
+`docs/utilization-bottleneck-log.md`.
 
 The a(34) run was measured, from raw per-column telemetry rather than
 estimated, at
@@ -68,10 +65,18 @@ and reverses exactly where the wall-clock lives** — H18 is 70.2% of the run at
 17.2% utilization. So the waste was concentrated precisely where fixing it
 paid most, which is what ruled out "it is just an average over a fine run".
 
-This is also the answer to the cloud question — at 19.8% utilization, core
-count was not the binding constraint — but see the caveat above: the note that
-worked that out is missing from the repo, so if the chapter makes the cloud
-argument it needs a live source.
+**This is also the answer to the cloud question**, and both halves are
+citable. At 19.8% utilization, core count was not the binding constraint —
+that is the postmortem above. The cost half is `docs/cloud-burst-plan.md`,
+removed in the big tidy and readable at
+`git show 78602f8^:docs/cloud-burst-plan.md`: the wall is floored by the single
+most expensive height, which is an inherently sequential column sweep, so cloud
+can only help by giving *that one height* more physical cores than dalby's 80.
+The sizing lands on one `hpc7a.96xlarge` (192 physical cores, no SMT, ≈2.4×
+dalby) at roughly $7–8/hr on demand, and the decision, 2026-07-02, was not to
+buy it. A chapter paragraph on this should quote the structural reason rather
+than the price: extra *small* boxes do nothing for the floor, so the only
+purchasable speedup is a single bigger box for one height.
 
 **What worked** (`--overlap-heights`, real test at maxn=34, fixed binary):
 

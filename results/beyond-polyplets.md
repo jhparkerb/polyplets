@@ -169,9 +169,20 @@ bound), `results/crt-counter-shaping.md`.
 
 These answer a question no combinatorics paper asks: *how do you saturate a
 small heterogeneous non-cloud fleet on a disk-bound out-of-core enumeration?*
-`results/cloud-investigation-2026-07-07.md` adds the negative half — utilization
-at 19.8%, not core count, was the lever. Audience: anyone attempting a record
-enumeration on home hardware.
+The negative half — utilization at 19.8%, not core count, was the lever — is
+`results/a34-utilization-postmortem.md` (the measurement and its §4 ledger of
+what had already been tried) plus `docs/utilization-bottleneck-log.md`, which
+that finding seeded. The cost side is `docs/cloud-burst-plan.md`, removed in
+the big tidy (78602f8) and readable at `git show 78602f8^:docs/cloud-burst-plan.md`:
+one 192-physical-core box at ~$7–8/hr, decided against 2026-07-02, do not
+re-pitch. Audience: anyone attempting a record enumeration on home hardware.
+
+*(Citation fixed 2026-08-06: this line used to cite a
+`results/cloud-investigation-2026-07-07.md`. No such file has ever existed in
+the repo — `cloud-investigation-2026-07-07` is an entry in Claude's memory
+directory, and `docs/utilization-bottleneck-log.md` cites it correctly as
+`[[cloud-investigation-2026-07-07]] in memory`. A memory note is not a repo
+artifact and cannot be cited by a paper.)*
 
 ## C3. Verification methodology as the deliverable
 
