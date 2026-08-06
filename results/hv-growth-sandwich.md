@@ -132,6 +132,21 @@ bit naming `C2`'s phase. Each junction offset `d` lies in `[−h', h]` with
 
     A(n)  ≤  2 (n+1)^2  ·  sum_{i+j+l=n}  P(i) M(j) P(l),     P(0) = M(0) = 1.   (*)
 
+**Attribution (added 2026-08-06, `results/novelty-sortie.md` N3).** This
+decomposition is not new in kind. Gouyou-Beauchamps & Leroux, *Enumeration of
+symmetry classes of convex polyominoes on the honeycomb lattice*, FPSAC 2004
+(arXiv:math/0403168), §2.3 "Growth phases of convex polyominoes", decompose a
+convex polyomino into blocks `H_ij` by the growth phases of its upper and lower
+profiles, with the column state an ordered pair, the transitions one-way, the
+extreme blocks `H00`/`H22` identified as **stack polyominoes** and the middle
+blocks as **staircase polyominoes** with `H02 = Pa = H20`. That is Lemma 1,
+Lemma 2's identification and Proposition 9 below, for convex polyominoes on the
+square and honeycomb lattices; the companion is Leroux, Rassart & Robitaille,
+*Adv. Appl. Math.* 21 (1998) 343–380. Both PDFs are in `papers/`. What is not
+theirs: the king lattice (their middle kernel is `min(h,h')`, ours is
+`min(h,h')+1`), a class with no exact solution, and everything Propositions 6,
+7, 10 and 11 do with the blocks.
+
 **Lemma 2 (the outer blocks are stacks, hence sub-exponential).**
 `P(n) = A001523(n)`, the number of stacks / weakly unimodal compositions of `n`,
 and `P(n) ≤ E(n) := (n+1)^{4√n+6}`, so `P(n)^{1/n} → 1`.
@@ -235,6 +250,16 @@ and `E(n)^{1/n} → 1`, so `limsup A(n)^(1/n) ≤ µ + ε` for every `ε`, i.e.
 In the other direction, staircase ⊆ C ⊆ HV-convex gives `M(n) ≤ C(n) ≤ A(n)`
 termwise, so `liminf C(n)^(1/n) ≥ lim M(n)^(1/n) = µ` and
 `limsup C(n)^(1/n) ≤ limsup A(n)^(1/n) ≤ µ`. Both limits exist and equal `µ`. ∎
+
+**The square-lattice analogue is classical** (`results/novelty-sortie.md` N1).
+Convex polyominoes by area grow at 2.30914… (Bender 1974) and the parallelogram
+subclass, A006958, has the same constant: measured at 2.309138593330495, flat
+from n = 100 to n = 400 (`experiments/square_staircase_area.py`, which builds
+both series from the one kernel — `min(h,h')` square, `min(h,h')+1` king — and
+reproduces A006958 and A225114 as positive controls). So Proposition 6's
+conclusion could have been read off the solved models one lattice over. What
+the proposition adds is the king case, where neither class is solved, and the
+statement for *every* intermediate class rather than for two particular ones.
 
 Staircase ⊆ (dir4, HV-convex) is Proposition 2: bottoms nondecreasing means
 `d ≥ 0 ≥ −1`. The grid already records it as the collapse
@@ -573,6 +598,11 @@ three parts are a partition. Then **`A_(1,0)(n) = A_(0,1)(n)` for every `n`**,
 and the remainder, the paths `(0,0) → (1,1)`, is sub-exponential. Hence if
 `C_HV = lim A(n)/µ^n` exists, `C_HV = 2 C(A_(1,0))`.
 
+(The mirror equality of the two middle blocks is Gouyou-Beauchamps & Leroux's
+`H02 = Pa = H20` in the convex-polyomino setting — see the attribution note
+under Lemma 1. The factor 1/2 and the sub-exponential remainder are what this
+proposition adds here.)
+
 *Proof.* The vertical mirror `[b(j), t(j)] ↦ [−t(j), −b(j)]` is an
 area-preserving involution of the class that leaves every column height alone.
 It carries `d(j) = b(j+1) − b(j)` to `−(t(j+1) − t(j))`, so "`b` has risen"
@@ -809,8 +839,18 @@ the same shape as Kurkov's conjectured continued fraction for A225114.
 
 ## Novelty check
 
-Grepped `results/`, `docs/`, `papers/`, `paper/`, `oeis/` before claiming any of
-this new. `3.1289…` appears only against the HV-convex series and the
+**2026-08-06, the literature sweep** (`results/novelty-sortie.md`, plan items
+N1–N3). One collision, recorded above: the phase-block decomposition is
+Gouyou-Beauchamps & Leroux's, for convex polyominoes, and Lemma 1, Lemma 2's
+identification and Proposition 9 now carry the attribution. The rest holds:
+HV-convex king animals are not in OEIS and not in the literature searched under
+any name; no source states the squeeze for intermediate classes; and
+Propositions 6, 7, 10 and 11 have no counterpart found. The square-lattice
+version of Proposition 6's conclusion is classical, and is now marked as such
+in the text.
+
+The rest of this section predates that sweep. Grepped `results/`, `docs/`,
+`papers/`, `paper/`, `oeis/` before claiming any of this new. `3.1289…` appears only against the HV-convex series and the
 (dir4, HV-convex) cell; no file relates it to the staircase column, and
 `results/countable-subpopulations-criterion.md` records that no GF or constant
 for A225114 was banked. A225114 was re-fetched 2026-08-05

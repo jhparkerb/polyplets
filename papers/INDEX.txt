@@ -142,6 +142,20 @@ Growth-rate bounding methods (obtained 2026-08-01, for the lambda <= 9.3153 push
   bousquet-melou_1996_column_convex_polygons_enumeration.pdf
                                            Bousquet-Melou, Discrete Math. 154 (1996) 1-25. BM-R 2002's
                                            reference [2]; for the parked convex side quest.
+  gouyou-beauchamps_leroux_2004_convex_polyominoes_honeycomb.pdf
+                                           Gouyou-Beauchamps & Leroux, Enumeration of symmetry classes
+                                           of convex polyominoes on the honeycomb lattice, FPSAC 2004
+                                           (arXiv math/0403168). PULLED 2026-08-06 by the sortie
+                                           novelty sweep: section 2.3 "Growth phases of convex
+                                           polyominoes" is the prior art for Lemma 1 of
+                                           results/hv-growth-sandwich.md -- column states as a pair of
+                                           one-way phases, blocks H_ij as maximal runs, H00/H22 stacks,
+                                           H02 = Pa = H20 staircases. CITE IT (results/novelty-sortie.md N3).
+  leroux_rassart_robitaille_1998_convex_polyominoes_symmetry_classes.pdf
+                                           Leroux, Rassart & Robitaille, Adv. Appl. Math. 21 (1998)
+                                           343-380. The square-lattice companion to the above. The
+                                           arXiv scan (math/9803130) has no text layer, so quote the
+                                           2004 paper instead.
 
 Distributed-computing background (engine design era):
   dean_ghemawat_2004_mapreduce.pdf         Dean & Ghemawat, MapReduce (OSDI 2004).

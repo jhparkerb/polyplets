@@ -278,14 +278,17 @@ published paper is public. Standing caution: "no OEIS match on nine terms" is
 weak evidence when the class was defined here — the risk is that someone
 counted the same objects under another name.
 
-| # | question | blocks |
-|---|---|---|
-| N1 | Is the staircase-squeeze argument folklore in the polyomino literature? | Paper 3 |
-| N2 | Has anyone enumerated HV-convex *king* animals under another name? | Paper 3 |
-| N3 | Does the block factorisation of an HV-convex transfer operator appear in the column-convex literature? | Paper 3 |
-| N4 | Is there a published upper bound on λ_polyplet? Any strip ladder beating Bacher's 6.475? | Paper 3 |
-| N5 | Is a universal (lattice-class) diagonal law already in print? | Paper 2 |
-| N6 | Does the quantified ψ-degree argument collide with Rechnitzer's own Haruspicy program? | Paper 2 |
+**Swept 2026-08-06, all six. Verdicts in `results/novelty-sortie.md`; neither
+paper is blocked, and N3 is a real collision that changes what may be claimed.**
+
+| # | question | blocks | verdict |
+|---|---|---|---|
+| N1 | Is the staircase-squeeze argument folklore in the polyomino literature? | Paper 3 | not found as a theorem; its **conclusion is classical** for the square lattice by area (Bender 2.30914… = the measured parallelogram constant), and after N3 its ingredients are published too. Claim the king theorem, not the technique |
+| N2 | Has anyone enumerated HV-convex *king* animals under another name? | Paper 3 | **no.** Not in OEIS, and convexity never meets the king lattice in the literature searched |
+| N3 | Does the block factorisation of an HV-convex transfer operator appear in the column-convex literature? | Paper 3 | **YES.** Gouyou-Beauchamps & Leroux 2004 §2.3 decompose convex polyominoes by the growth phases of both profiles, with `H00`/`H22` stacks and `H02 = Pa = H20` staircases. Cite at Lemma 1, Lemma 2 and Prop 9; Props 6, 7, 10, 11 survive intact |
+| N4 | Is there a published upper bound on λ_polyplet? Any strip ladder beating Bacher's 6.475? | Paper 3 | **no** to both. The whole upper-bound line is square/hypercubic/polyiamond/polycube; the king lattice is absent, including from Kim–Pinna 2025 |
+| N5 | Is a universal (lattice-class) diagonal law already in print? | Paper 2 | **no** for height diagonals; the polycube **dimension**-defect line (Barequet–Barequet–Rote 2010, Barequet–Shalah 2015/2017) is the same statement shape one parameter over, and should be cited as precedent |
+| N6 | Does the quantified ψ-degree argument collide with Rechnitzer's own Haruspicy program? | Paper 2 | **no.** Haruspicy is bond animals and SAPs; directed *site* animals are solved, which is why it never turns our way. The one shared step was credited 2026-08-01 |
 
 Method: the citation neighbourhoods of the Bacher, Bousquet-Mélou, Rechnitzer
 and Barequet papers already in `papers/`, plus targeted searches. Un-findable

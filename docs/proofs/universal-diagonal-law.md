@@ -171,3 +171,24 @@ stated extension, not formalized.
 - Together with the anisotropic non-D-finiteness theorem (same repo),
   which is also lattice-universal, the two structural results about
   by-height triangles hold across the class.
+
+## Prior art (2026-08-06, `results/novelty-sortie.md` N5)
+
+No height-diagonal law for lattice-animal triangles was found in print, and
+`results/diagonal-closed-forms.md` had already recorded no published T(n,n−k)
+closed forms. The nearest published relative measures the defect in
+**dimension** rather than in height, on polycubes:
+
+- Barequet, Barequet & Rote, *Formulae and growth rates of high-dimensional
+  polycubes*, Combinatorica 30 (2010) 257–275 — for fixed n, the count is a
+  polynomial in the dimension d.
+- Barequet & Shalah, *Counting n-cell polycubes proper in n−k dimensions*,
+  European J. Combin. 63 (2017) 146–163 — for general k the formula has the
+  proved shape `2^(n−2k+1) n^(n−2k−1) (n−k) h_k(n)` with `h_k` polynomial.
+
+Same statement shape — fix the defect, get polynomial × exponential, degree
+governed by the defect — for one lattice family and one defect parameter.
+Theorem A quantifies over every row-local lattice instead, and is proved once
+for all of them. Cite that line as the precedent for the shape; do not present
+the phenomenon as unheard-of. Neither paper is held locally
+(`papers/MISSING.md`).

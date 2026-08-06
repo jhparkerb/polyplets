@@ -10,6 +10,20 @@ Format: `Author(s), "Title," Venue Vol (Year) pages. DOI/ID. — why we want it.
 
 _(none outstanding — Barequet–Moffie 2007 and Mertens 1990 obtained 2026-06-25)_
 
+## Medium priority (the polycube defect-diagonal line — precedent for the diagonal law)
+
+Wanted by `results/novelty-sortie.md` N5: the same "fix the defect, get polynomial ×
+exponential" statement shape as our universal diagonal law, with the defect measured in
+dimension instead of height. Paper 2 should cite both.
+
+- R. Barequet, G. Barequet & G. Rote, "Formulae and growth rates of high-dimensional
+  polycubes," Combinatorica 30 (2010) 257–275. DOI 10.1007/s00493-010-2448-8. — for fixed n,
+  the polycube count is a polynomial in the dimension. **[med]**
+- G. Barequet & M. Shalah, "Counting n-cell polycubes proper in n−k dimensions,"
+  European J. Combin. 63 (2017) 146–163 (SoCG 2015 version: "Automatic proofs for formulae
+  enumerating proper polycubes"). — the general-k form
+  2^(n−2k+1) n^(n−2k−1) (n−k) h_k(n), h_k polynomial. **[med]**
+
 ## Medium priority (the bounding-box / finite-lattice lineage we descend from)
 
 - A. R. Conway, "Enumerating 2D percolation series by the finite-lattice method: theory,"
