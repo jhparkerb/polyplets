@@ -68,6 +68,17 @@ convex families, **by area**, are empirically **non-D-finite** — a clean negat
 of the same character as B(y). (Empirical, not a proof: 38 terms rule out any
 recurrence up to order 6 / degree 5.)
 
+**Strengthened 2026-08-05** (`docs/middle-kingdom-plan.md` Phase 2a/2b, written
+up in `results/convex-polyplets.md`): both series now run to **n=700**, and both
+are excluded at **order ≤ 24, degree ≤ 24** — and, separately, satisfy no
+algebraic equation of degree ≤ 24 in either variable. The mod-p rank test that
+does it is a rigorous exclusion over Q, not a numerical one, and the four
+positive/negative controls that keep it powered are a gate
+(`make gate-convex-dfinite`). Same session: μ = 3.128943269730886252…
+(199 trusted digits), θ = 0 with a purely geometric correction, and no integer
+polynomial of degree ≤ 20 / height ≤ 1e8 has μ as a root. The paragraph above
+stands; it is now an order of magnitude stronger in every direction.
+
 ## Placement
 
 - A **finishable, self-contained** result (unlike B(y), which is parked): a new
