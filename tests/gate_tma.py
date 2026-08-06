@@ -19,7 +19,7 @@ import shutil
 import subprocess
 import sys
 
-from common import ROOT, Gate, parse_counts, read_bfile, run
+from common import ROOT, Gate, parse_counts, read_bfile, run, spawn
 
 TMA = os.path.join(ROOT, "build", "tma")
 TMA_ASAN = os.path.join(ROOT, "build", "tma_asan")
@@ -33,6 +33,22 @@ def main():
         if not os.path.exists(b):
             print(f"FAIL missing binary {b} (run: make)")
             return 1
+
+    # Checks M and N are the expensive end of this gate -- five square8 n<=14
+    # sweeps, 391 s of the gate's 429 s serial (2026-08-06, gympie) -- and none
+    # of them reads state another writes, so they run in the background while
+    # A..L do their (cheap) work in front. Same binaries, same arguments, same
+    # assertions, same printed order; only the waiting overlaps. Block measured
+    # at 140 s concurrent vs 406 s serial. Everything below stays straight-line:
+    # J and L resume from checkpoints their own previous step banked.
+    depth_m, H_m = 14, 11
+    f_plain_m = spawn(TMA, "square8", depth_m)
+    f_fold_m = {t: spawn(TMA, "square8", depth_m, "--fold", "--threads", t)
+                for t in (1, 4)}
+    f_base_oh = spawn(TMA, "square8", depth_m, "--only-height", H_m)
+    f_fold_oh = spawn(TMA, "square8", depth_m, "--only-height", H_m,
+                      "--fold", "--threads", 4)
+    f_smoke = spawn(TMA, "square8", 14, "--only-height", 12)
 
     # A. totals vs fixture
     depth_a = 12
@@ -174,16 +190,14 @@ def main():
     #    unfolded counts at every n. The a(21)/a(22) launch runs the per-height FOLDED
     #    exact path (an_fold_parallel.sh -> --only-height H --fold), so this guards the
     #    production engine directly -- full sweep serial+MT, and the only-height unit.
-    depth_m = 14
-    plain_m = parse_counts(run(TMA, "square8", depth_m))
+    plain_m = parse_counts(f_plain_m.result())
     for threads in (1, 4):
-        fold_m = parse_counts(run(TMA, "square8", depth_m, "--fold", "--threads", str(threads)))
+        fold_m = parse_counts(f_fold_m[threads].result())
         gate.check(fold_m == plain_m,
               f"M fold T={threads}    square8 n<={depth_m} --fold == unfolded")
-    H_m = 11  # a heavy mid-height, the exact unit the driver invokes
-    base_oh = parse_counts(run(TMA, "square8", depth_m, "--only-height", str(H_m)))
-    fold_oh = parse_counts(run(TMA, "square8", depth_m, "--only-height", str(H_m),
-                               "--fold", "--threads", "4"))
+    # H_m = 11 is a heavy mid-height, the exact unit the driver invokes
+    base_oh = parse_counts(f_base_oh.result())
+    fold_oh = parse_counts(f_fold_oh.result())
     gate.check(fold_oh == base_oh,
           f"M fold only-h  square8 n<={depth_m} H{H_m} --fold MT == unfolded")
 
@@ -194,7 +208,7 @@ def main():
     #    that changes one count is a defect. As the swappable backends land behind
     #    statedb.h (experiments/bench_column.cpp's Backend seam), add them to this
     #    loop -- each must reproduce `base` byte-for-byte (absent backends skipped).
-    smoke = parse_counts(run(TMA, "square8", 14, "--only-height", 12))
+    smoke = parse_counts(f_smoke.result())
     base = {(12,): 177147, (13,): 5511240, (14,): 97548948}  # dense H12/N14 marginal
     gate.check({k: v for k, v in smoke.items() if v} == base,
           "N smoke       square8 H12 N14 dense baseline == 177147/5511240/97548948")

@@ -4,7 +4,7 @@
 # brute-force, silent-wrong guards, combine/runfile integrity (see
 # AUDIT-2026-06-28.md). Install once with `make install-hooks`.
 #
-# Additionally run the FULL default `gates` chain (~10 min) when the push
+# Additionally run the FULL default `gates` chain (~3 min) when the push
 # touches anything beyond documentation. The fast subset is a curated
 # allowlist, and curated subsets have blind spots: the sym/symcount.py
 # deletion (754871a) broke bare `make` for 27 days while every push passed
@@ -35,6 +35,6 @@ echo "pre-push: make ns-gate-fast"
 make -C "$root" ns-gate-fast
 
 if [ "$docs_only" -eq 0 ]; then
-  echo "pre-push: push touches code — full 'make gates' (~10 min; emergency bypass: git push --no-verify)"
+  echo "pre-push: push touches code — full 'make gates' (~3 min; emergency bypass: git push --no-verify)"
   make -C "$root" gates
 fi

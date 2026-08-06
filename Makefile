@@ -39,7 +39,30 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
 # All currently existing gates
-gates: gate-citations gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+
+# The gate suite runs the gates CONCURRENTLY: they are independent processes
+# over read-only fixtures, and the only two that write scratch state write to
+# paths nobody else touches (gate_tma.py: runs/ckpt/gate_holes + runs/ckpt/gate_ih;
+# gate_dir4_perim_alg.py: build/dir4_perim_null199.txt). Measured 2026-08-06 on
+# gympie: 624 s serial -> 467 s at -j10, 16/16 GREEN. Parallelism is scoped to
+# THIS target via a sub-make rather than MAKEFLAGS, deliberately: the ns-gates
+# chain shares fixed scratch paths across targets (/tmp/ns_*, and gate_runfile
+# runs twice under different env in ns-gate-frontier-zstd), so it has not been
+# cleared for -j and must keep inheriting whatever the caller asked for.
+#
+# JOBS defaults to the PERFORMANCE core count on Darwin (10 on gympie, the hard
+# cap per the box's budget), nproc on Linux. Override with `make JOBS=1 gates`
+# to get the old serial run back -- worth doing when a gate goes RED, since 3.81
+# has no --output-sync and concurrent gate output can interleave.
+ifeq ($(shell uname -s),Darwin)
+  JOBS ?= $(shell sysctl -n hw.perflevel0.logicalcpu 2>/dev/null || sysctl -n hw.ncpu)
+else
+  JOBS ?= $(shell nproc 2>/dev/null || echo 4)
+endif
+
+gates:
+	@$(MAKE) --no-print-directory -j$(JOBS) $(GATE_TARGETS)
 
 # Gate COMPILE-DB: clangd's compile_commands.json must be complete and honest.
 # A missing or wrong entry is invisible to every other gate (they use the

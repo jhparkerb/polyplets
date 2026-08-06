@@ -169,7 +169,7 @@ What is pinned automatically, and therefore what a reader can re-run in
 minutes rather than CPU-months:
 
 ```
-make gates                 # every gate; 10m29s on gympie, all GREEN 2026-08-06
+make gates                 # every gate; 3m05s on gympie, all GREEN 2026-08-06
 make gate-g2               # the Redelmeier engine against the oracle and fixtures
 make gate-strip-cert       # RED-first self-test of the strip certificate checker
 make ns-gate-diag-pins     # every wired P_k against every real-swept in-onset cell

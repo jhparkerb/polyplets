@@ -1,5 +1,6 @@
 """Shared helpers for gate scripts: repo paths, fixtures, engine I/O, scoring."""
 
+import concurrent.futures
 import os
 import subprocess
 
@@ -44,6 +45,29 @@ def run(binary, *args):
     if r.returncode != 0:
         raise RuntimeError(f"{binary} {args}: rc={r.returncode}\n{r.stderr}")
     return r.stdout
+
+
+# Background engine runs. A gate is a chain of independent engine invocations
+# scored in printed order, and the long ones dominate: gate_tma's three full
+# square8 n<=14 sweeps are 365 s of its 429 s (measured 2026-08-06, gympie).
+# spawn() starts such a run immediately and returns a handle whose .result() is
+# the same stdout string run() would have returned -- so the CHECK order, the
+# arguments, and the assertions are untouched; only the waiting overlaps. The
+# threads do nothing but wait on subprocesses, so the GIL is irrelevant here.
+#
+# ONLY for runs with no ordering dependency on each other. A gate step that
+# reads state an earlier step wrote (gate_tma's J/L checkpoint write->resume
+# chains) must keep calling run() straight-line.
+_POOL = None
+_POOL_MAX = 8  # engine processes in flight; each of gate_tma's sweeps peaks ~170 MB
+
+
+def spawn(binary, *args):
+    """Start an engine run now; returns a future whose .result() is its stdout."""
+    global _POOL
+    if _POOL is None:
+        _POOL = concurrent.futures.ThreadPoolExecutor(max_workers=_POOL_MAX)
+    return _POOL.submit(run, binary, *args)
 
 
 def require_binary(path, make_target):
