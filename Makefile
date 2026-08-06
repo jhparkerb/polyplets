@@ -29,7 +29,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 .PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
-        gate-compile-db clean install \
+        gate-compile-db gate-citations clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
@@ -39,7 +39,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
 # All currently existing gates
-gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+gates: gate-citations gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # Gate COMPILE-DB: clangd's compile_commands.json must be complete and honest.
 # A missing or wrong entry is invisible to every other gate (they use the
@@ -51,6 +51,15 @@ gates: gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler g
 # Syntax-only: ~11 s.
 gate-compile-db: compile-commands
 	./scripts/check_compile_commands.sh
+
+# Gate CITATIONS: every repo path cited in a tracked markdown file must exist.
+# Written after results/beyond-polyplets.md was found citing a file that has
+# never existed -- the name belonged to a memory entry, not to the repo. Paths
+# that are templates, marked deleted/planned in the citing line, or present in
+# git history are allowed; a name that never existed is not. Sub-second, no
+# build deps, so it runs first.
+gate-citations:
+	python3 tests/gate_citations.py
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:

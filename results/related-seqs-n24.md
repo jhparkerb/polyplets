@@ -16,7 +16,8 @@ to the banked n=23 counts, hmirror 166s vs 15047s ≈ 90×). This made n=24 a
 ~2.2h job instead of ~half a day.
 
 **Validation:** all **95** overlapping terms match the known OEIS values
-(`oeis/A030222,A030233,A030234,A030235,A194596.txt`); Burnside numerators
+(`oeis/A030222.txt`, `oeis/A030233.txt`, `oeis/A030234.txt`,
+`oeis/A030235.txt`, `oeis/A194596.txt`); Burnside numerators
 divisible as required (Free/8, OneSided/4, (H+D)/2); asym = free − bilateral
 identity holds at every n. R90 fixed points are structurally zero for
 n ≢ 0,1 (mod 4) — R90(24)=9995 (24 ≡ 0) is the next nonzero after n=21;

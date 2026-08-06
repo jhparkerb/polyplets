@@ -4,7 +4,8 @@
 a(25) = 14,994,811,325,186,658,577
 ```
 
-Computed dalby-solo (`docs/a25-dalby-solo-launch.md`/`scripts/dalby_a25.sh`,
+Computed dalby-solo (launch plan and script both since removed; the plan doc
+never landed in the repo,
 rev `54d41fc`). Real-swept H1-16; H17-25 filled by closed-form diagonal
 injection (P₀-P₈, `orchestrator/sweep.go` `diagonalCell` cases 0-8). At launch
 time this left the run **single-source, computed tier**: one engine, one box,

@@ -136,9 +136,11 @@ Phase 2 table before touching levers 2–4.
   - sanity reproduction: the same pipeline pointed at the rook lattice must reproduce
     ≤ 4.63-ish (this catch caught the invalid tree-encoding bound before — keep it);
   - bound must beat 9.31, else keep 9.31 and record the negative result by name.
-- Deliverables: `experiments/king_multitype.py`, certificate file, proof-doc section,
+- Deliverables (Phase 3, NOT pursued — none of these were written):
+  `experiments/king_multitype.py`, certificate file, proof-doc section,
   memory update (supersede the "not pursued" note in the polyplet-upper-bound memory),
-  commit.
+  commit. Phase 1's certificate, which *was* written, is
+  `experiments/king_certificate.py`.
 
 ## Non-goals
 

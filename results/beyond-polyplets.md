@@ -164,7 +164,7 @@ series, dimer and tiling counts, spanning forests on wide strips.
 `results/a34-utilization-postmortem.md`, `results/utilization-fix-and-ceiling.md`,
 `results/scheduling.md` (LPT rejected, work-stealing adopted),
 `results/perf-outcomes.md`, `docs/utilization-bottleneck-log.md`, the tmpfs
-crossover (4.6x to a34, OOM at a35), `results/pgo-no-go` (branch-mispredict
+crossover (4.6x to a34, OOM at a35), `results/terminal-velocity.md` (the PGO no-go, branch-mispredict
 bound), `results/crt-counter-shaping.md`.
 
 These answer a question no combinatorics paper asks: *how do you saturate a
@@ -178,7 +178,7 @@ one 192-physical-core box at ~$7–8/hr, decided against 2026-07-02, do not
 re-pitch. Audience: anyone attempting a record enumeration on home hardware.
 
 *(Citation fixed 2026-08-06: this line used to cite a
-`results/cloud-investigation-2026-07-07.md`. No such file has ever existed in
+results/cloud-investigation-2026-07-07.md (no backticks: it is not a path). No such file has ever existed in
 the repo — `cloud-investigation-2026-07-07` is an entry in Claude's memory
 directory, and `docs/utilization-bottleneck-log.md` cites it correctly as
 `[[cloud-investigation-2026-07-07]] in memory`. A memory note is not a repo
