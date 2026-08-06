@@ -38,15 +38,7 @@ import sys
 
 from mpmath import mp, mpf, mpc, nstr, matrix, lu_solve, polyroots
 
-
-def read_terms(path):
-    vals = []
-    with open(path) as fh:
-        for line in fh:
-            line = line.strip()
-            if line and not line.startswith('#'):
-                vals.append(int(line.split()[-1]))
-    return vals
+from seriestools import read_terms, agree_digits
 
 
 def prony(a, k, end):
@@ -70,13 +62,6 @@ def prony(a, k, end):
     coeffs = [mpf(1)] + [-c[k - 1 - j] for j in range(k)]
     roots = polyroots(coeffs, maxsteps=500, extraprec=8 * mp.prec)
     return sorted(roots, key=lambda z: -abs(z))
-
-
-def agree_digits(x, y):
-    if x == y:
-        return mp.dps
-    d = abs(x - y) / abs(x) if x != 0 else abs(y)
-    return int(-mp.log10(d)) if d > 0 else mp.dps
 
 
 def nearest_agree(z, others):

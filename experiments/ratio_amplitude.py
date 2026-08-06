@@ -32,25 +32,7 @@ import sys
 
 from mpmath import mp, mpf, nstr, pslq
 
-
-def read_terms(path):
-    vals = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-            vals.append(int(line.split()[-1]))
-    return vals
-
-
-def aitken(seq):
-    out = []
-    for i in range(len(seq) - 2):
-        d1 = seq[i + 1] - seq[i]
-        d2 = seq[i + 2] - 2 * seq[i + 1] + seq[i]
-        out.append(seq[i] - d1 * d1 / d2 if d2 != 0 else seq[i])
-    return out
+from seriestools import read_terms, aitken, agree_digits
 
 
 def accelerate(vals, window, levels=8):
@@ -64,13 +46,6 @@ def accelerate(vals, window, levels=8):
         seq = aitken(seq)
         est = seq[-1]
     return tail[-1], est
-
-
-def agree_digits(x, y):
-    if x == y:
-        return mp.dps
-    d = abs(x - y) / abs(x)
-    return int(-mp.log10(d)) if d > 0 else mp.dps
 
 
 def ratio_series(a1, a2, n_to):

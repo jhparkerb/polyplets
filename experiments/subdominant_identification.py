@@ -27,8 +27,8 @@ import sys
 from mpmath import mp, mpf, nstr
 
 sys.path.insert(0, __file__.rsplit('/', 1)[0])
-from prony_spectrum import (prony, read_terms, agree_digits,  # noqa: E402
-                            nearest_agree, selftest)
+from prony_spectrum import prony, nearest_agree, selftest  # noqa: E402
+from seriestools import read_terms, agree_digits  # noqa: E402
 
 SERIES = {
     'dir4':  'results/mk_hvdir4_terms_n700.txt',

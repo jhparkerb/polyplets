@@ -6,7 +6,6 @@ Also prints the residue strings so patterns are eyeballable, and runs the
 same probe on the height-triangle row sums restricted to fixed H (control:
 those ARE C-finite, so BM must succeed there -- that validates the probe).
 """
-import sys
 
 def read_bfile(path):
     a = {}

@@ -1,0 +1,13 @@
+# Source globs covered by compile_commands.json, one pattern per line
+# (repo-relative, '#' comments and blank lines ignored).
+#
+# ONE list, read by both scripts/gen_compile_commands.sh (which writes an entry
+# per matching file) and scripts/check_compile_commands.sh (which checks none is
+# missing). They used to spell it out separately, which meant a new source
+# directory added to the generator alone left the checker's want-set unaware of
+# it -- the completeness check would pass vacuously, on exactly the failure it
+# exists to catch.
+worker/*.cpp
+test/*.cpp
+cpp/*.cpp
+cpp/*/*.cpp

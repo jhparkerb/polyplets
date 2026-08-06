@@ -31,10 +31,9 @@ Checks, in the plan's order:
      reproduces its banked reference prefix.
 """
 import os
-import subprocess
 import sys
 
-from common import ROOT, Gate
+from common import ROOT, Gate, run, require_binary
 
 TM = os.path.join(ROOT, "build", "convex_perim_tm")
 ANCHOR = os.path.join(ROOT, "build", "directed_cone_anchor")
@@ -45,14 +44,12 @@ A005436_REF = [1, 2, 7, 28, 120, 528, 2344, 10416, 46160, 203680]
 
 
 def run_tm(smax, king, mode):
-    out = subprocess.run([TM, str(smax), str(king), mode],
-                         capture_output=True, text=True, check=True).stdout
+    out = run(TM, smax, king, mode)
     return [int(x) for x in out.strip().split(",")]  # index 0 == s=2
 
 
 def run_brute(n, threads=4):
-    out = subprocess.run([ANCHOR, "gridperim", str(n), str(threads)],
-                         capture_output=True, text=True, check=True).stdout
+    out = run(ANCHOR, "gridperim", n, threads)
     hv, dir4 = {}, {}
     for line in out.strip().splitlines():
         s, h, d = (int(x) for x in line.split())
@@ -62,8 +59,7 @@ def run_brute(n, threads=4):
 
 def main():
     gate = Gate()
-    if not os.path.exists(ANCHOR):
-        print(f"FAIL missing {ANCHOR} (run: make build/directed_cone_anchor)")
+    if not require_binary(ANCHOR, "build/directed_cone_anchor"):
         return 1
     if not os.path.exists(TM):
         # convex_perim_tm needs GMP, which the Makefile treats as optional

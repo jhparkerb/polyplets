@@ -189,7 +189,7 @@ build/subgraph_count: cpp/sym/subgraph_count.cpp | build
 # (results/directed-cone-anchor.md). Also the docs/middle-kingdom-plan.md Phase 0
 # 16-cell grid mode ("grid"/"gridbad") and Phase 1c's multi-directed filter
 # ("mdir"/"mdirbad", results/multi-directed.md). -Icpp for obs.h.
-build/directed_cone_anchor: cpp/directed_cone_anchor.cpp cpp/obs.h | build
+build/directed_cone_anchor: cpp/directed_cone_anchor.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread -Icpp $< -o $@
 
 # Gate KING-GRID: docs/middle-kingdom-plan.md Phase 0 -- the 16-cell grid mode
@@ -239,18 +239,18 @@ endif
 # (docs/middle-kingdom-plan.md Phase 1a -- Python's N^4-DP-steps x N-digit-bigint
 # cost is too slow past n~200; this is a straight translation onto mpz_class).
 ifneq ($(GMP_LDFLAGS),)
-build/convex_area_tm: cpp/convex_area_tm.cpp cpp/obs.h | build
+build/convex_area_tm: cpp/convex_area_tm.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $(GMP_CFLAGS) $< -o $@ $(GMP_LDFLAGS)
 
 # HV-convex-by-semiperimeter exact-box transfer matrix, C++/GMP port of
 # experiments/convex_perimeter.py (docs/middle-kingdom-plan.md Phase 1b).
-build/convex_perim_tm: cpp/convex_perim_tm.cpp cpp/obs.h | build
+build/convex_perim_tm: cpp/convex_perim_tm.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $(GMP_CFLAGS) $< -o $@ $(GMP_LDFLAGS)
 
 # Column transfer matrix for the column-convex cells of the Phase 3 grid
 # (docs/middle-kingdom-plan.md, results/middle-kingdom-phase3.md): directedness
 # on a column-convex animal is a condition on the bottom profile alone.
-build/middle_kingdom_tm: cpp/middle_kingdom_tm.cpp cpp/obs.h | build
+build/middle_kingdom_tm: cpp/middle_kingdom_tm.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $(GMP_CFLAGS) $< -o $@ $(GMP_LDFLAGS)
 endif
 
@@ -263,7 +263,7 @@ gate-middle-kingdom: $(if $(GMP_LDFLAGS),build/middle_kingdom_tm)
 
 # P-recurrence / algebraic-relation exclusion mod p (no GMP: the series terms
 # are reduced mod p on the way in). docs/middle-kingdom-plan.md Phase 2a.
-build/prec_guess: cpp/prec_guess.cpp cpp/obs.h | build
+build/prec_guess: cpp/prec_guess.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $< -o $@
 
 # Gate CONVEX-DFINITE: the sharpened order<=20/degree<=20 non-D-finite verdict
@@ -281,8 +281,12 @@ gate-convex-dfinite: build/prec_guess
 # matrix) vs directed_cone_anchor's "gridperim" brute force, the RED control
 # (dir4bad, the plan's own "non-strict decrease" example), and the termwise
 # dir4<=hv sanity check. Needs GMP for convex_perim_tm; skipped without it.
+# Unlike its two siblings this gate has NO banked-series fallback -- every check
+# in it needs a fresh convex_perim_tm run. Without GMP it would print one skip
+# line and return 0, so `make gates` reported a green gate that verified
+# nothing. Say so loudly instead; the aggregate still passes, but not quietly.
 gate-mk-dir4-perim: $(if $(GMP_LDFLAGS),build/convex_perim_tm) build/directed_cone_anchor
-	python3 tests/gate_mk_dir4_perim.py
+	$(if $(GMP_LDFLAGS),python3 tests/gate_mk_dir4_perim.py,@echo "*** GATE MK-DIR4-PERIM NOT RUN: no GMP, and this gate has no banked-series fallback -- NOTHING was verified ***")
 
 # Gate DIR4-PERIM-ALG: docs/middle-kingdom-followups-plan.md Phase 2b -- the
 # (dir4, HV-convex)-by-semiperimeter generating function is ALGEBRAIC of

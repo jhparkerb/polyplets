@@ -27,11 +27,10 @@ must reject:
 Only then are the two exclusions themselves checked, in both modes.
 """
 import os
-import subprocess
 import sys
 from decimal import Decimal, getcontext
 
-from common import ROOT, Gate
+from common import ROOT, Gate, prec_guess, read_terms_file, run
 
 GUESS = os.path.join(ROOT, "build", "prec_guess")
 AREA = os.path.join(ROOT, "build", "convex_area_tm")
@@ -56,27 +55,7 @@ MU_POLY = "2.30913859333049"
 
 def guess(mode, terms, a, b, extra=()):
     """Run build/prec_guess; return (verdict, nullity, holdout, rows_held)."""
-    r = subprocess.run([GUESS, mode, terms, str(a), str(b)] + list(extra),
-                       capture_output=True, text=True)
-    if r.returncode not in (0, 3):
-        raise RuntimeError(f"prec_guess rc={r.returncode}\n{r.stderr}\n{r.stdout}")
-    verdict, nullity, hold, held = None, None, None, None
-    for line in r.stdout.splitlines():
-        if line.startswith("VERDICT:"):
-            verdict = line.split()[1]
-        elif line.startswith("full rank="):
-            nullity = int(line.rsplit("=", 1)[1])
-        elif line.startswith("holdout rows="):
-            parts = line.split()
-            held = int(parts[1].split("=")[1])
-            hold = int(parts[2].split("=")[1])
-    return verdict, nullity, hold, held
-
-
-def terms_of(path):
-    with open(path) as f:
-        return [int(l.split()[-1]) for l in f if l.strip()
-                and not l.startswith("#")]
+    return prec_guess(GUESS, mode, terms, a, b, *extra)
 
 
 def main():
@@ -89,15 +68,14 @@ def main():
     if os.path.exists(AREA):
         for king, ref, label in ((1, KING14, "king (convex polyplets)"),
                                  (0, POLY14, "king=0 (A067675 control)")):
-            out = subprocess.run([AREA, "14", str(king)], capture_output=True,
-                                 text=True, check=True).stdout
+            out = run(AREA, 14, king)
             got = [int(x) for x in out.strip().split(",")]
             g.check(got == ref, f"convex_area_tm 14 {king} reproduces {label}")
     else:
         print("skip  convex_area_tm adjacency oracle (no GMP build)")
-    g.check(terms_of(KING_TERMS)[:14] == KING14,
+    g.check(read_terms_file(KING_TERMS)[:14] == KING14,
             "banked king series starts with the reference 14 terms")
-    g.check(terms_of(POLY_TERMS)[:14] == POLY14,
+    g.check(read_terms_file(POLY_TERMS)[:14] == POLY14,
             "banked control series starts with A067675's first 14 terms")
 
     # --- positive control: the guesser must FIND a known recurrence ---------
@@ -134,7 +112,7 @@ def main():
     getcontext().prec = 40
     for path, mu, label in ((KING_TERMS, MU_KING, "mu_king"),
                             (POLY_TERMS, MU_POLY, "mu_control")):
-        a = terms_of(path)
+        a = read_terms_file(path)
         r = Decimal(a[-1]) / Decimal(a[-2])
         g.check(str(r).startswith(mu), f"{label} tail ratio starts {mu} (got {str(r)[:16]})")
 

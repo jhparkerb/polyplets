@@ -36,7 +36,7 @@ import os
 import subprocess
 import sys
 
-from common import ROOT, Gate
+from common import ROOT, Gate, prec_guess
 # KING14: the by-area king series' first 14 terms, the reference prefix
 # gate_convex_dfinite.py already guards. Imported, not copied, so the null
 # control here and the exclusion there are pinned to the same numbers.
@@ -70,21 +70,7 @@ QUARTIC = [
 
 def guess(mode, terms, a, b, prime=0):
     """(verdict, nullity, holdout_pass, holdout_rows) from build/prec_guess."""
-    r = subprocess.run([GUESS, mode, terms, str(a), str(b), str(prime)],
-                       capture_output=True, text=True)
-    if r.returncode not in (0, 2, 3):
-        raise RuntimeError(f"prec_guess rc={r.returncode}\n{r.stderr}{r.stdout}")
-    v, nul, hp, hr = None, None, None, None
-    for line in r.stdout.splitlines():
-        if line.startswith("VERDICT:"):
-            v = line.split()[1]
-        elif line.startswith("full rank="):
-            nul = int(line.rsplit("=", 1)[1])
-        elif line.startswith("holdout rows="):
-            p = line.split()
-            hr = int(p[1].split("=")[1])
-            hp = int(p[2].split("=")[1])
-    return v, nul, hp, hr
+    return prec_guess(GUESS, mode, terms, a, b, prime)
 
 
 def parse_poly(line, L):

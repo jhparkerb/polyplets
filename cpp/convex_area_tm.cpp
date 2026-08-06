@@ -37,6 +37,7 @@
 
 #include <gmpxx.h>
 
+#include "argparse.h"
 #include "obs.h"
 
 namespace {
@@ -56,8 +57,8 @@ int main(int argc, char** argv) {
     std::fprintf(stderr, "usage: %s N [king]\n", argv[0]);
     return 1;
   }
-  const int N = std::atoi(argv[1]);
-  const bool king = (argc < 3) || std::atoi(argv[2]) != 0;
+  const int N = (int)argparse::ArgInt(argv[1], "N", 1, 100000);
+  const bool king = (argc < 3) || argparse::ArgFlag(argv[2], "king");
   obs::Reporter rep("convex_area_tm", 0,
                     "N=" + std::to_string(N) + " king=" + std::to_string(king));
 

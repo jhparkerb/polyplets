@@ -35,6 +35,8 @@ import sys
 
 from mpmath import mp, mpf, nstr, polyroots
 
+from seriestools import read_terms
+
 STAIR = 'results/mk_stair_terms_n700.txt'
 # measured by experiments/prony_spectrum.py on the 700-term staircase series
 # (order 10, dps 1500); trusted digit counts are in
@@ -84,11 +86,6 @@ def series(num, den, terms):
             raise ValueError('non-integer coefficient: CF is not what we think')
         out.append(q)
     return out
-
-
-def read_terms(path):
-    return [int(l.split()[-1]) for l in open(path)
-            if l.strip() and not l.startswith('#')]
 
 
 def main():

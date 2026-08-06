@@ -68,6 +68,7 @@
 
 #include <gmpxx.h>
 
+#include "argparse.h"
 #include "obs.h"
 
 namespace {
@@ -88,8 +89,8 @@ int main(int argc, char** argv) {
                  argv[0]);
     return 1;
   }
-  const int Smax = std::atoi(argv[1]);
-  const bool king = argc < 3 || std::atoi(argv[2]) != 0;
+  const int Smax = (int)argparse::ArgInt(argv[1], "SMAX", 1, 100000);
+  const bool king = argc < 3 || argparse::ArgFlag(argv[2], "king");
   const std::string modeStr = argc < 4 ? "hv" : argv[3];
   bool strictLeft;  // dir4's one-line difference from unrestricted HV: see
                      // header. dir4bad is the RED control -- same as hv.

@@ -33,25 +33,7 @@ import sys
 
 from mpmath import mp, mpf, nstr, pslq, polyroots
 
-
-def read_terms(path):
-    vals = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-            vals.append(int(line.split()[-1]))
-    return vals
-
-
-def aitken(seq):
-    out = []
-    for i in range(len(seq) - 2):
-        d1 = seq[i + 1] - seq[i]
-        d2 = seq[i + 2] - 2 * seq[i + 1] + seq[i]
-        out.append(seq[i] - d1 * d1 / d2 if d2 != 0 else seq[i])
-    return out
+from seriestools import read_terms, aitken, agree_digits
 
 
 def richardson(seq, n0):
@@ -83,13 +65,6 @@ def accelerate(a, window, levels=6):
         est_r = seq[-1]
 
     return ratios, ratios[-1], est_a, est_r
-
-
-def agree_digits(x, y):
-    if x == y:
-        return mp.dps
-    d = abs(x - y) / abs(x)
-    return int(-mp.log10(d)) if d > 0 else mp.dps
 
 
 def main():

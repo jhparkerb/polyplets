@@ -73,6 +73,7 @@
 
 #include <gmpxx.h>
 
+#include "argparse.h"
 #include "obs.h"
 
 namespace {
@@ -143,7 +144,16 @@ std::vector<mpz_class> runProfile(Mode mode, int N, obs::Reporter& rep) {
           // Cut [lo, hi] into segments on which sign(d) and sign(d - s) are
           // both constant; there are at most five.
           int cut[6] = {lo, 0, 1, s, s + 1, hi + 1};
-          std::sort(cut, cut + 6);
+          // Six elements in three already-ordered runs ({lo, hi+1}, {0, 1},
+          // {s, s+1}), in the Theta(N^3) inner loop: insertion beats
+          // std::sort's general machinery by ~19% of total runtime, measured
+          // on `middle_kingdom_tm hv 700`.
+          for (int i = 1; i < 6; ++i) {
+            const int x = cut[i];
+            int j = i - 1;
+            while (j >= 0 && cut[j] > x) { cut[j + 1] = cut[j]; --j; }
+            cut[j + 1] = x;
+          }
           for (int c = 0; c < 5; ++c) {
             const int lseg = std::max(cut[c], lo);
             const int rseg = std::min(cut[c + 1], hi + 1);
@@ -263,8 +273,7 @@ int main(int argc, char** argv) {
   else if (ms == "hvdir4ascbad") mode = Mode::HVDir4AscBad;
   else { std::fprintf(stderr, "unknown mode %s\n", argv[1]); return 2; }
 
-  const int N = std::atoi(argv[2]);
-  if (N < 1 || N > 4000) { std::fprintf(stderr, "N out of range (1..4000)\n"); return 2; }
+  const int N = (int)argparse::ArgInt(argv[2], "N", 1, 4000);
 
   obs::Reporter rep("middle_kingdom_tm", 0,
                     "mode=" + ms + " n=" + std::to_string(N));

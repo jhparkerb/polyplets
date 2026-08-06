@@ -36,6 +36,8 @@ Target machine: gympie (laptop), single core.  MEASURED: --nmax 700 in ~20 s,
 import argparse
 import sys
 
+from seriestools import read_terms
+
 
 def brute(nmax, red=None):
     """DFS over explicit interval sequences.  The oracle."""
@@ -108,32 +110,29 @@ def dp(nmax, red=None):
     return out
 
 
-def brute_hvdir4(nmax):
-    """Brute force over (dir4, HV-convex) animals, split by phase path.
+def _walk_hv(nmax, dir4):
+    """HV-convex animals by area, tallied by which middle phases they visit.
 
-    Independent oracle for build/middle_kingdom_tm's hvdir4 / hvdir4asc /
-    hvdir4ascbad modes.  Enumerates explicit interval sequences [b, t] up to
-    translation and carries the two unimodality phase bits exactly as the
-    engine does: pb = 1 once b has risen (then d >= 0 forever), pt = 1 once t
-    has fallen (then d <= s forever).  Returns (all, asc, ascbad) where `asc`
-    drops every animal whose phase path ever visits (0,1) and `ascbad` -- the
-    RED control -- drops (1,0) instead.
+    Enumerates explicit column-interval sequences [b, t] up to translation and
+    carries the two unimodality phase bits exactly as build/middle_kingdom_tm
+    does: pb = 1 once b has risen (then d >= 0 forever), pt = 1 once t has
+    fallen (then d <= s forever).  dir4=True adds the 4-cone floor (the bottom
+    drops at most one row per step right); dir4=False leaves it unrestricted.
+
+    Returns by_seen[m][n], m the bitmask of visited middle phases: bit 0 is
+    (0,1), bit 1 is (1,0).  This is the load-bearing phase-path logic for both
+    oracles below, so it lives in one place -- a fix here cannot land in one
+    and miss the other.
     """
-    tot = [0] * (nmax + 1)
-    asc = [0] * (nmax + 1)
-    bad = [0] * (nmax + 1)
+    by_seen = [[0] * (nmax + 1) for _ in range(4)]
     sys.setrecursionlimit(10000)
 
     def walk(b, t, area, pb, pt, seen):
-        tot[area] += 1
-        if not (seen & 1):
-            asc[area] += 1
-        if not (seen & 2):
-            bad[area] += 1
+        by_seen[seen][area] += 1
         h = t - b + 1
         for hp in range(1, nmax - area + 1):
             s = h - hp
-            lo, hi = max(-hp, -1), h
+            lo, hi = (max(-hp, -1) if dir4 else -hp), h
             if pb == 1:
                 lo = max(lo, 0)
             if pt == 1:
@@ -147,6 +146,21 @@ def brute_hvdir4(nmax):
 
     for h in range(1, nmax + 1):
         walk(0, h - 1, h, 0, 0, 0)
+    return by_seen
+
+
+def brute_hvdir4(nmax):
+    """Brute force over (dir4, HV-convex) animals, split by phase path.
+
+    Independent oracle for build/middle_kingdom_tm's hvdir4 / hvdir4asc /
+    hvdir4ascbad modes.  Returns (all, asc, ascbad) where `asc` drops every
+    animal whose phase path ever visits (0,1) and `ascbad` -- the RED control
+    -- drops (1,0) instead.
+    """
+    m = _walk_hv(nmax, dir4=True)
+    tot = [sum(c) for c in zip(*m)]
+    asc = [x + y for x, y in zip(m[0], m[2])]   # never visited (0,1)
+    bad = [x + y for x, y in zip(m[0], m[1])]   # never visited (1,0)
     return tot, asc, bad
 
 
@@ -163,43 +177,10 @@ def brute_hv_mirror(nmax):
 
     Returns (all, via_10, via_01, neither).
     """
-    tot = [0] * (nmax + 1)
-    v10 = [0] * (nmax + 1)
-    v01 = [0] * (nmax + 1)
-    nei = [0] * (nmax + 1)
-    sys.setrecursionlimit(10000)
-
-    def walk(b, t, area, pb, pt, seen):
-        tot[area] += 1
-        (v10 if seen == 2 else v01 if seen == 1 else nei)[area] += 1
-        h = t - b + 1
-        for hp in range(1, nmax - area + 1):
-            s = h - hp
-            lo, hi = -hp, h                      # no dir4 floor: unrestricted
-            if pb == 1:
-                lo = max(lo, 0)
-            if pt == 1:
-                hi = min(hi, s)
-            for d in range(lo, hi + 1):
-                npb = 1 if d > 0 else pb
-                npt = 1 if d < s else pt
-                code = 1 if (npb, npt) == (0, 1) else (2 if (npb, npt) == (1, 0)
-                                                       else 0)
-                walk(b + d, b + d + hp - 1, area + hp, npb, npt, seen | code)
-
-    for h in range(1, nmax + 1):
-        walk(0, h - 1, h, 0, 0, 0)
-    return tot, v10, v01, nei
-
-
-def read_terms(path):
-    vals = []
-    with open(path) as fh:
-        for line in fh:
-            line = line.strip()
-            if line and not line.startswith('#'):
-                vals.append(int(line.split()[-1]))
-    return vals
+    m = _walk_hv(nmax, dir4=False)
+    tot = [sum(c) for c in zip(*m)]
+    nei = [x + y for x, y in zip(m[0], m[3])]   # visited both, or neither
+    return tot, m[2], m[1], nei
 
 
 def main():

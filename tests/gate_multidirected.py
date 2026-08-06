@@ -34,11 +34,10 @@ series B (Lemma 11). A series trending to 6.118 is a wrong definition or a
 bug, never a finding.
 """
 import os
-import subprocess
 import sys
 import time
 
-from common import ROOT, Gate
+from common import ROOT, Gate, run, require_binary
 
 sys.path.insert(0, os.path.join(ROOT, "experiments"))
 import multidirected_king as mdk  # noqa: E402
@@ -56,11 +55,10 @@ MU_B = 6.1175    # Lemma 11, 1/rho_B -- the decoy
 def run_filter(mode, n, threads=8):
     """Run a filter mode; return {n: filtered_count} and the wall time."""
     t0 = time.time()
-    proc = subprocess.run([BIN, mode, str(n), str(threads)],
-                          capture_output=True, text=True, check=True)
+    stdout = run(BIN, mode, n, threads)
     wall = time.time() - t0
     out = {}
-    for line in proc.stdout.strip().splitlines():
+    for line in stdout.strip().splitlines():
         p = [int(x) for x in line.split()]
         out[p[0]] = p[2]
     return out, wall
@@ -68,17 +66,17 @@ def run_filter(mode, n, threads=8):
 
 def main():
     gate = Gate()
-    if not os.path.exists(BIN):
-        print(f"FAIL missing {BIN} (run: make build/directed_cone_anchor)")
+    if not require_binary(BIN, "build/directed_cone_anchor"):
         return 1
 
     nseries = 200
     t0 = time.time()
-    _, _, _, d, b, m = mdk.multidirected(nseries)
+    # multidirected() already computes S on the way to D/B/M; recomputing it
+    # with a second half_animals() call cost 0.8 s of this gate's 7.5 s.
+    s, _, _, d, b, m = mdk.multidirected(nseries)
     print(f"series to n={nseries}: {time.time() - t0:.1f}s")
 
     # --- the series is anchored on its own before it anchors anything -------
-    s = mdk.half_animals(nseries)
     gate.check(s[1:12] == mdk.A001003[1:12],
                "series S = A001003 (little Schroeder half-animals)")
     gate.check(d == mdk.directed_closed_form(nseries),

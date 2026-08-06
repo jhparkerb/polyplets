@@ -22,18 +22,10 @@ import time
 from fractions import Fraction as F
 from math import gcd
 
+from seriestools import read_terms
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT = os.path.join(ROOT, "results", "mk_dir4_perim_terms_s200.txt")
-
-
-def read_terms(path):
-    out = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#"):
-                out.append(int(line.split()[-1]))
-    return out
 
 
 def powers(a, M, K):
@@ -55,7 +47,14 @@ def powers(a, M, K):
 
 def solve(rows, C, train):
     """Exact RREF over Q on the first `train` rows; return the nullspace
-    vectors that also annihilate every remaining row."""
+    vectors that also annihilate every remaining row.
+
+    TODO: this shares its RREF-plus-holdout body with convex_perimeter.find_prec
+    (~30 lines). The merge is not mechanical -- find_prec builds its own rows and
+    returns the FIRST passing vector, this one takes rows and returns ALL of
+    them -- so it wants a deliberate split into build_prec_rows() + a generic
+    solve_ansatz(), not a cleanup-pass edit to code the gates already pin.
+    """
     A = [[F(x) for x in r] for r in rows[:train]]
     piv = []
     ri = 0

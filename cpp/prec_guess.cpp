@@ -43,6 +43,7 @@
 #include <string>
 #include <vector>
 
+#include "argparse.h"
 #include "obs.h"
 
 namespace {
@@ -153,22 +154,25 @@ int main(int argc, char** argv) {
   if (argc < 5) {
     std::fprintf(stderr,
                  "usage: %s prec|alg <terms_file> <J|K> <D|L> [prime_idx] "
-                 "[train_extra]\n",
+                 "[train_extra] [skip]\n",
                  argv[0]);
     return 1;
   }
   const std::string mode = argv[1];
   const char* path = argv[2];
-  const int A = std::atoi(argv[3]);
-  const int B = std::atoi(argv[4]);
-  const int pidx = argc > 5 ? std::atoi(argv[5]) : 0;
-  const size_t train_extra = argc > 6 ? (size_t)std::atoi(argv[6]) : 4;
-  const size_t skip = argc > 7 ? (size_t)std::atoi(argv[7]) : 0;
-  P = kPrimes[pidx & 1];
+  const int A = (int)argparse::ArgInt(argv[3], "J|K", 0, 1 << 20);
+  const int B = (int)argparse::ArgInt(argv[4], "D|L", 0, 1 << 20);
+  const int pidx =
+      argc > 5 ? (int)argparse::ArgInt(argv[5], "prime_idx", 0, 1) : 0;
+  const size_t train_extra =
+      argc > 6 ? (size_t)argparse::ArgInt(argv[6], "train_extra", 0, 1 << 30) : 4;
+  const size_t skip =
+      argc > 7 ? (size_t)argparse::ArgInt(argv[7], "skip", 0, 1 << 30) : 0;
+  P = kPrimes[pidx];
 
   obs::Reporter rep("prec_guess", 0,
                     mode + " " + path + " " + std::to_string(A) + "," +
-                        std::to_string(B) + " p" + std::to_string(pidx & 1));
+                        std::to_string(B) + " p" + std::to_string(pidx));
 
   const std::vector<std::string> raw = ReadTerms(path);
   const size_t M = raw.size();
@@ -253,9 +257,14 @@ int main(int argc, char** argv) {
   std::printf("holdout rows=%zu best_consecutive_pass=%zu\n", R - Ttrain,
               best_hold);
 
-  // The exclusion itself: rank over ALL rows.
-  std::vector<size_t> piv2;
-  const size_t rk = Rref(rows, C, &piv2);
+  // The exclusion itself: rank over ALL rows. Rank is monotone in the row set
+  // and capped at C, so a full-rank training block already settles it -- skip
+  // the second reduction rather than recompute a foregone conclusion.
+  size_t rk = rk_tr;
+  if (rk_tr < C) {
+    std::vector<size_t> piv2;
+    rk = Rref(rows, C, &piv2);
+  }
   std::printf("full rank=%zu of %zu unknowns; nullity=%zu\n", rk, C, C - rk);
   const bool excluded = (rk == C);
   std::printf("VERDICT: %s\n", excluded ? "EXCLUDED" : "CANDIDATE");

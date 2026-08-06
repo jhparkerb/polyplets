@@ -19,13 +19,74 @@ def read_bfile(name):
     return terms
 
 
+def read_terms_file(path):
+    """Parse a banked series file into a list of a(n), in file order.
+
+    The format every results/*_terms_*.txt uses: one 'n a(n)' pair per line,
+    blank lines and '#' comments skipped, the value being the trailing field."""
+    vals = []
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#"):
+                vals.append(int(line.split()[-1]))
+    return vals
+
+
 def run(binary, *args):
-    """Run an engine binary, returning its stdout; raise on nonzero exit."""
+    """Run an engine binary, returning its stdout; raise on nonzero exit.
+
+    Prefer this to subprocess.run(..., check=True): CalledProcessError reports
+    the exit code but not stderr, so a gate whose engine refuses an argument or
+    dies prints a number and nothing about why."""
     r = subprocess.run([binary] + [str(a) for a in args],
                        capture_output=True, text=True)
     if r.returncode != 0:
         raise RuntimeError(f"{binary} {args}: rc={r.returncode}\n{r.stderr}")
     return r.stdout
+
+
+def require_binary(path, make_target):
+    """True if the engine is built; otherwise print how to build it."""
+    if os.path.exists(path):
+        return True
+    print(f"FAIL missing {path} (run: make {make_target})")
+    return False
+
+
+# build/prec_guess signals its verdict through the exit code as well as stdout:
+# 0 EXCLUDED, 2 INCONCLUSIVE (underdetermined), 3 CANDIDATE. Anything else is a
+# real failure -- a missing terms file, a refused argument -- and must not be
+# read as a verdict. Owning the contract here keeps three gates from each
+# deciding for themselves which codes are survivable; check=True in particular
+# turned a *falsified* claim (rc=3) into a traceback instead of a RED line.
+PREC_GUESS_RC = {0: "EXCLUDED", 2: "INCONCLUSIVE", 3: "CANDIDATE"}
+
+
+def prec_guess(binary, mode, terms, a, b, *extra):
+    """Run build/prec_guess; return (verdict, nullity, holdout_pass, holdout_rows).
+
+    nullity/holdout are None for an INCONCLUSIVE run, which prints neither."""
+    r = subprocess.run([binary, mode, terms, str(a), str(b)]
+                       + [str(x) for x in extra],
+                       capture_output=True, text=True)
+    if r.returncode not in PREC_GUESS_RC:
+        raise RuntimeError(f"prec_guess {mode} {a},{b}: rc={r.returncode}\n"
+                           f"{r.stderr}{r.stdout}")
+    verdict, nullity, hold_pass, hold_rows = None, None, None, None
+    for line in r.stdout.splitlines():
+        if line.startswith("VERDICT:"):
+            verdict = line.split()[1]
+        elif line.startswith("full rank="):
+            nullity = int(line.rsplit("=", 1)[1])
+        elif line.startswith("holdout rows="):
+            parts = line.split()
+            hold_rows = int(parts[1].split("=")[1])
+            hold_pass = int(parts[2].split("=")[1])
+    if verdict != PREC_GUESS_RC[r.returncode]:
+        raise RuntimeError(f"prec_guess {mode} {a},{b}: rc={r.returncode} says "
+                           f"{PREC_GUESS_RC[r.returncode]}, stdout says {verdict}")
+    return verdict, nullity, hold_pass, hold_rows
 
 
 def parse_counts(out):

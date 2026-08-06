@@ -64,8 +64,9 @@ def flags_for(f):
             extra += gmp_flags
     return args + extra
 
-sources = sorted(glob.glob("worker/*.cpp") + glob.glob("test/*.cpp")
-                 + glob.glob("cpp/*.cpp") + glob.glob("cpp/*/*.cpp"))
+sources = sorted(f for pat in open("scripts/compile_db_sources.txt")
+                 if pat.strip() and not pat.startswith("#")
+                 for f in glob.glob(pat.strip()))
 entries = [
     {"directory": root, "arguments": flags_for(f) + [f], "file": f"{root}/{f}"}
     for f in sources

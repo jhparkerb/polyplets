@@ -18,17 +18,12 @@
 set -u
 cd "$(dirname "$0")/.."
 
-G=build/prec_guess
-DIR4=results/mk_dir4_perim_terms_s200.txt
-NULL=build/dir4_perim_null199.txt
-SRC=results/convex_area_terms_n700_king.txt   # the null control's real source
-
-[ -f "$SRC" ] || { echo "missing $SRC (results/convex-polyplets.md)" >&2; exit 1; }
-head -199 "$SRC" > "$NULL"   # re-cut every run; never reuse a stale copy
+. "$(dirname "$0")/dir4_perim_lib.sh"
+cut_null_control
 
 row() {  # row <file> <mode> <J> <D>
   printf '  J=%-3s D=%-3s ' "$3" "$4"
-  "$G" "$2" "$1" "$3" "$4" 2>/dev/null | awk '
+  guess "$2" "$1" "$3" "$4" | awk '
     /^mode=/{split($4,b,"="); u=$5; r=$6}
     /^UNDERDETERMINED/{und=1}
     /^full rank/{split($3,x,"="); rk=x[2]}

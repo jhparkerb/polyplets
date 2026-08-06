@@ -39,7 +39,7 @@ import subprocess
 import sys
 import time
 
-from common import ROOT, Gate, read_bfile
+from common import ROOT, Gate, run, require_binary, read_bfile
 
 BIN = os.path.join(ROOT, "build", "directed_cone_anchor")
 
@@ -83,11 +83,10 @@ A225114 = [1, 3, 9, 28, 87, 272]
 
 def run_engine(mode, n, threads=8):
     t0 = time.time()
-    proc = subprocess.run([BIN, mode, str(n), str(threads)],
-                          capture_output=True, text=True, check=True)
+    out = run(BIN, mode, n, threads)
     wall = time.time() - t0
     table = {}
-    for line in proc.stdout.strip().splitlines():
+    for line in out.strip().splitlines():
         parts = [int(x) for x in line.split()]
         table[parts[0]] = parts[1:]
     return table, wall
@@ -101,8 +100,7 @@ def col(table, dirname, convname):
 
 def main():
     gate = Gate()
-    if not os.path.exists(BIN):
-        print(f"FAIL missing {BIN} (run: make build/directed_cone_anchor)")
+    if not require_binary(BIN, "build/directed_cone_anchor"):
         return 1
 
     accept_n = 12

@@ -13,7 +13,6 @@ Prediction: a(n) is EVEN whenever n = 2 or 3 (mod 4).
 
 This script brute-forces small n and checks the whole ladder.
 """
-import itertools
 from collections import defaultdict
 
 NB = [(dx, dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1) if (dx, dy) != (0, 0)]

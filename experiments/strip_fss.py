@@ -83,36 +83,37 @@ def fit3(rows, rhs):
     return sols
 
 
-def fit_triple(h1, h2, h3, mu=None):
-    """Exact solve of ln mu_H = L - a/H - b/H^2 for H in (h1,h2,h3)."""
-    mu = mu or MU
-    rows = [(1.0, -1.0 / h, -1.0 / (h * h)) for h in (h1, h2, h3)]
-    rhs = [math.log(mu[h]) for h in (h1, h2, h3)]
-    L, a, b = fit3(rows, rhs)
-    return math.exp(L), a, b
+def _inv_sq(h):
+    return -1.0 / (h * h)
 
 
-def fit_triple_log(h1, h2, h3, mu=None):
-    """Third ansatz: ln mu_H = L - a/H - c*ln(H)/H^2."""
+def _log_over_sq(h):
+    return -math.log(h) / (h * h)
+
+
+def fit_triple(h1, h2, h3, mu=None, third=_inv_sq):
+    """Exact solve of ln mu_H = L - a/H + c*third(H) for H in (h1,h2,h3).
+
+    third=_inv_sq is the two-parameter ansatz (c is b); third=_log_over_sq is
+    the optional ln(H)/H^2 variant of section_third_ansatz()."""
     mu = mu or MU
-    rows = [(1.0, -1.0 / h, -math.log(h) / (h * h)) for h in (h1, h2, h3)]
+    rows = [(1.0, -1.0 / h, third(h)) for h in (h1, h2, h3)]
     rhs = [math.log(mu[h]) for h in (h1, h2, h3)]
     L, a, c = fit3(rows, rhs)
     return math.exp(L), a, c
 
 
-def conditioning(h1, h2, h3, unit=LAST_DIGIT_UNIT, fit=fit_triple):
+def conditioning(h1, h2, h3):
     """Spread in the three fitted parameters over all 8 sign combinations
-    of a +/-unit perturbation applied independently to each of the 3 mu_H
-    inputs."""
-    p0 = fit(h1, h2, h3)
+    of a +/-LAST_DIGIT_UNIT perturbation applied independently to each of the
+    3 mu_H inputs."""
+    p0 = fit_triple(h1, h2, h3)
     cols = [[v] for v in p0]
     for signs in itertools.product((-1, 1), repeat=3):
         mu = dict(MU)
         for h, s in zip((h1, h2, h3), signs):
-            mu[h] = MU[h] + s * unit
-        p = fit(h1, h2, h3, mu)
-        for col, v in zip(cols, p):
+            mu[h] = MU[h] + s * LAST_DIGIT_UNIT
+        for col, v in zip(cols, fit_triple(h1, h2, h3, mu)):
             col.append(v)
     return tuple(max(c) - min(c) for c in cols)
 
@@ -193,7 +194,6 @@ def section_surface_term(lam):
         ratio = incs[H] / incs[prev] if incs[prev] else float('nan')
         print(f"  H={H:2d}  inc={incs[H]:+.6f}  inc/inc_prev={ratio:.4f}"
               f"  (pure 1/H^2 predicts {((H-1)/H)**2:.4f})")
-    return incs
 
 
 def section_third_ansatz():
@@ -202,7 +202,7 @@ def section_third_ansatz():
           "nothing)")
     print(f"{'triple':>12} | {'lambda':>10} | {'a':>10} | {'c':>10}")
     for h1 in TRIPLE_STARTS:
-        lam, a, c = fit_triple_log(h1, h1 + 1, h1 + 2)
+        lam, a, c = fit_triple(h1, h1 + 1, h1 + 2, third=_log_over_sq)
         print(f"[{h1},{h1+1},{h1+2}]".rjust(12)
               + f" | {lam:10.5f} | {a:10.5f} | {c:10.5f}")
 
@@ -242,7 +242,9 @@ def main():
     fits = section_two_param()
     spreads = section_conditioning(fits)
     section_noise_floor(fits, spreads)
-    for lam in (args.lam, 7.111):
+    # Both banked lambda candidates (docstring item 4); dict.fromkeys so
+    # --lambda_ 7.111 prints the section once, not twice.
+    for lam in dict.fromkeys((args.lam, 7.111)):
         section_surface_term(lam)
     section_third_ansatz()
     section_cost_estimate()

@@ -26,6 +26,8 @@ import argparse
 import sys
 from functools import lru_cache
 
+from seriestools import aitken
+
 
 def brute(nmax, climb_weight=1):
     """Direct enumeration over height sequences, the oracle for the DP."""
@@ -73,15 +75,6 @@ def dp(nmax, climb_weight=1):
         for h in range(nmax, 0, -1):
             s[h] = s[h + 1] + row[h]
         f[n], suf[n] = row, s
-    return out
-
-
-def aitken(seq):
-    out = []
-    for i in range(len(seq) - 2):
-        d1 = seq[i + 1] - seq[i]
-        d2 = seq[i + 2] - 2 * seq[i + 1] + seq[i]
-        out.append(seq[i] - d1 * d1 / d2 if d2 != 0 else seq[i])
     return out
 
 

@@ -80,16 +80,6 @@ def dp(nmax, bump=1):
     return out
 
 
-def read_terms(path):
-    vals = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith('#'):
-                vals.append(int(line.split()[-1]))
-    return vals
-
-
 HV14 = [1, 4, 16, 61, 221, 766, 2566, 8390, 26982, 85834, 271174, 853111,
         2677214, 8389720]
 STAIR14 = [1, 3, 9, 28, 87, 272, 850, 2659, 8318, 26025, 81427, 254777,

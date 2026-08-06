@@ -68,6 +68,8 @@ import sys
 
 from mpmath import mp, mpf, nstr, findroot
 
+from seriestools import agree_digits, read_terms
+
 # results/convex-polyplets.md's 199 banked digits of mu, reproduced by three
 # further series in results/hv-growth-sandwich.md.  Used only as a cross-check
 # on the shooting, never as an input to it.
@@ -172,13 +174,6 @@ def contract(w, phi, hmax):
     return acc
 
 
-def agree_digits(a, b):
-    if a == b:
-        return mp.dps
-    d = abs(a - b) / abs(a)
-    return int(-mp.log10(d)) if d > 0 else mp.dps
-
-
 def evaluate(dps, hmax):
     """(mu, r, r_nohalf, r_cap3, min phi) at working precision dps.
 
@@ -277,9 +272,11 @@ def main():
 
     # --- against the measured ratio -----------------------------------------
     f1, f2 = args.measured.split(',')
-    sys.path.insert(0, 'experiments')
+    # ratio_series/accelerate live in the probe that derived them; import them
+    # by this file's directory, not the cwd, so the script runs from anywhere.
+    sys.path.insert(0, __file__.rsplit('/', 1)[0])
     import ratio_amplitude as ra
-    a1, a2 = ra.read_terms(f1), ra.read_terms(f2)
+    a1, a2 = read_terms(f1), read_terms(f2)
     N = min(len(a1), len(a2))
     _, est_full = ra.accelerate(ra.ratio_series(a1, a2, N), 60)
     _, est_drop = ra.accelerate(ra.ratio_series(a1, a2, N - 100), 60)

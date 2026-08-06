@@ -17,23 +17,15 @@ verbatim (results/convex-polyplets.md).
 import os
 import sys
 import time
-from fractions import Fraction as F
+
+from seriestools import read_terms
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from convex_perimeter import find_prec  # noqa: E402
+from dir4_perim_find_alg import primitive  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT = os.path.join(ROOT, "results", "mk_dir4_perim_terms_s200.txt")
-
-
-def read_terms(path):
-    out = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#"):
-                out.append(int(line.split()[-1]))
-    return out
 
 
 def main():
@@ -54,14 +46,7 @@ def main():
         return 1
     # Clear denominators and the overall gcd, so the printed operator is the
     # primitive integer one.
-    den = 1
-    for x in sol:
-        den = den * x.denominator // __import__("math").gcd(den, x.denominator)
-    ints = [int(x * den) for x in sol]
-    g = 0
-    for x in ints:
-        g = __import__("math").gcd(g, abs(x))
-    ints = [x // g for x in ints]
+    ints = primitive(sol)
 
     # Independent re-verification over Q on EVERY row, not just the holdout.
     bad = 0

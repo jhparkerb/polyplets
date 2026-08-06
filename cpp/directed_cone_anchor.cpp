@@ -105,6 +105,7 @@
 #include <thread>
 #include <vector>
 
+#include "argparse.h"
 #include "obs.h"
 
 namespace {
@@ -476,6 +477,13 @@ void gridTally(Ctx& g, int size, bool checkTops) {
   };
   // multiDirected() and convexity() both scribble on colMin/colStamp, so the
   // convexity pass has to come after the directedness ones, not before.
+  // TODO: the shared scratch pool costs a redundant O(size) column-bottom scan
+  // per animal (measured ~5% of a `grid 11 1` run) and leaves this ordering
+  // constraint enforced by comment alone -- reordering these two calls compiles
+  // and returns wrong counts. The fix is one profile() pass filling colMin /
+  // colMax / colCount that both predicates read, plus private stamp arrays for
+  // reach()/sitePerim(). Deliberately NOT done in a cleanup pass: this is the
+  // hot loop behind the banked `grid 14 8` table.
   const ConvexResult cv = convexity(g, size, checkTops);
   const bool convFlags[4] = {true, cv.colConvex, cv.hvConvex, cv.staircase};
   for (int d = 0; d < 5; d++) {
@@ -612,14 +620,13 @@ int main(int argc, char** argv) {
   else if (ms == "gridperim") mode = Mode::GridPerim;
   else { std::fprintf(stderr, "unknown mode %s\n", argv[1]); return 2; }
 
-  N = std::atoi(argv[2]);
-  if (N < 1 || N > 26) { std::fprintf(stderr, "N out of range (1..26)\n"); return 2; }
+  N = (int)argparse::ArgInt(argv[2], "N", 1, 26);
   W = 2 * N + 1;
   GRID = W * (N + 2);
 
-  int threads = argc == 4 ? std::atoi(argv[3])
-                          : (int)std::min(8u, std::max(1u, std::thread::hardware_concurrency()));
-  if (threads < 1) threads = 1;
+  int threads = argc == 4
+      ? (int)argparse::ArgInt(argv[3], "THREADS", 1, 1024)
+      : (int)std::min(8u, std::max(1u, std::thread::hardware_concurrency()));
   // Shard on the subtree rooted at each animal of size `depth`; every thread
   // replays the (tiny) prefix above that depth, shard 0 alone counts it.
   int depth = 7;

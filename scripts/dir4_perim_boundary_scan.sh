@@ -17,18 +17,12 @@
 set -u
 cd "$(dirname "$0")/.."
 
-G=build/prec_guess
-DIR4=results/mk_dir4_perim_terms_s200.txt
-HV=results/convex_perim_terms_s200.txt
-NULL=build/dir4_perim_null199.txt
-SRC=results/convex_area_terms_n700_king.txt   # the null control's real source
-
-[ -f "$SRC" ] || { echo "missing $SRC (results/convex-polyplets.md)" >&2; exit 1; }
-head -199 "$SRC" > "$NULL"   # re-cut every run; never reuse a stale copy
+. "$(dirname "$0")/dir4_perim_lib.sh"
+cut_null_control
 
 # one <file> <mode> <J> <D> -> "VERDICT unknowns rows nullity holdpass/holdrows"
 one() {
-  "$G" "$2" "$1" "$3" "$4" 2>/dev/null | awk -v J="$3" -v D="$4" '
+  guess "$2" "$1" "$3" "$4" | awk -v J="$3" -v D="$4" '
     /^mode=/{for(i=1;i<=NF;i++){split($i,kv,"="); m[kv[1]]=kv[2]}}
     /^UNDERDETERMINED/{u=1}
     /^holdout rows=/{split($2,a,"="); hr=a[2]; split($3,b,"="); hp=b[2]}

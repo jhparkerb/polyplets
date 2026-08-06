@@ -22,16 +22,18 @@
 set -u
 cd "$(dirname "$0")/.."
 
-G=build/prec_guess
-DIR4=results/mk_dir4_perim_terms_s200.txt
-HV=results/convex_perim_terms_s200.txt
+. "$(dirname "$0")/dir4_perim_lib.sh"   # G, DIR4, HV
 A005436=results/a005436_perim_s100.txt
 
 run() {  # run <label> <mode> <file> <A> <B> [prime_idx] [train_extra] [skip]
-  local label=$1; shift
+  local label=$1 rc; shift
   echo "=== $label :: $G $*"
   "$G" "$@" 2>/dev/null
-  echo "rc=$?"
+  rc=$?
+  echo "rc=$rc"
+  # 0/2/3 are verdicts; anything else is a failure, and this sweep is read as
+  # a table of verdicts -- so say why, rather than leaving a bare rc=1.
+  case $rc in 0|2|3) ;; *) "$G" "$@" >/dev/null || true ;; esac
   echo
 }
 

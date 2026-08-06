@@ -35,10 +35,9 @@ Acceptance, all required:
     must fail to reproduce the real convention).
 """
 import os
-import subprocess
 import sys
 
-from common import ROOT, Gate
+from common import ROOT, Gate, run, require_binary
 
 BIN = os.path.join(ROOT, "build", "directed_cone_anchor")
 G2 = os.path.join(ROOT, "build", "g2")
@@ -48,10 +47,9 @@ SQUARES = [1, 4, 9]  # k=1,2,3 within ACCEPT_N
 
 
 def run_grid(n, threads=4):
-    proc = subprocess.run([BIN, "grid", str(n), str(threads)],
-                          capture_output=True, text=True, check=True)
+    out = run(BIN, "grid", n, threads)
     king, rook = {}, {}
-    for line in proc.stdout.strip().splitlines():
+    for line in out.strip().splitlines():
         parts = [int(x) for x in line.split()]
         n_ = parts[0]
         king[n_] = parts[-2]
@@ -60,10 +58,9 @@ def run_grid(n, threads=4):
 
 
 def run_g2_siteperim_min(n):
-    proc = subprocess.run([G2, "square8", str(n), "--siteperim"],
-                          capture_output=True, text=True, check=True)
+    out = run(G2, "square8", n, "--siteperim")
     mn = {}
-    for line in proc.stdout.strip().splitlines():
+    for line in out.strip().splitlines():
         n_, p, c = (int(x) for x in line.split())
         if c > 0:
             mn[n_] = min(mn.get(n_, 1 << 62), p)
@@ -72,11 +69,9 @@ def run_g2_siteperim_min(n):
 
 def main():
     gate = Gate()
-    if not os.path.exists(BIN):
-        print(f"FAIL missing {BIN} (run: make build/directed_cone_anchor)")
+    if not require_binary(BIN, "build/directed_cone_anchor"):
         return 1
-    if not os.path.exists(G2):
-        print(f"FAIL missing {G2} (run: make build/g2)")
+    if not require_binary(G2, "build/g2"):
         return 1
 
     king, rook = run_grid(ACCEPT_N)

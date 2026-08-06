@@ -37,10 +37,9 @@ would make every positive above meaningless):
   hvdir4ascbad  the phase split with phase (1,0) deleted instead of (0,1)
 """
 import os
-import subprocess
 import sys
 
-from common import ROOT, Gate
+from common import ROOT, Gate, prec_guess, read_terms_file, run
 
 BIN = os.path.join(ROOT, "build", "middle_kingdom_tm")
 KING_TERMS = os.path.join(ROOT, "results", "convex_area_terms_n700_king.txt")
@@ -116,23 +115,12 @@ EXCLUDE = [("ccctrlb", "prec", 12, 12), ("ccctrlb", "alg", 8, 14),
 def terms(mode, n):
     """First n terms of a mode: from the binary, or the banked file, or None."""
     if HAVE_BIN:
-        out = subprocess.run([BIN, mode, str(n)], capture_output=True,
-                             text=True, check=True).stdout
+        out = run(BIN, mode, n)
         return [int(line.split()[-1]) for line in out.strip().splitlines()]
     if mode in TERMS_FILE:
         vals = read_terms_file(TERMS_FILE[mode])
         return vals[:n] if len(vals) >= n else None
     return None
-
-
-def read_terms_file(path):
-    vals = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#"):
-                vals.append(int(line.split()[-1]))
-    return vals
 
 
 def main():
@@ -230,26 +218,31 @@ def main():
     gate.check(all(a <= b for a, b in zip(GRID["hvdir4"], GRID["hv"])),
                "dir4-HV <= HV termwise (nesting)")
 
-    # --- positive: the derived rational generating functions, on 700 terms --
+    # --- positive: the derived rational generating functions ----------------
+    # GF_N terms, not 700: the largest denominator here has 6 coefficients, so
+    # 150 terms over-determine the identity by ~145 equations and nothing is
+    # weakened -- while the engine is ~O(N^3), so 700 cost 5.6 s of this
+    # gate's 7.8 s and 150 costs 0.04 s. The engine itself is pinned against
+    # the independent row transfer matrix on 120 terms above.
+    GF_N = 150
     for mode, (den, num) in GF.items():
-        a = [0] + terms(mode, 700)
+        a = [0] + terms(mode, GF_N)
         prod = [sum(den[i] * a[m - i] for i in range(len(den)) if 0 <= m - i < len(a))
                 for m in range(len(a))]
         ok = prod[:len(num)] == num and not any(prod[len(num):])
         gate.check(ok, f"{mode}: derived g.f. denominator*F == numerator "
-                       f"exactly, all 700 terms"
+                       f"exactly, all {GF_N} terms"
                    + ("" if ok else f"  got {prod[:len(num) + 3]}"))
 
     # --- the exclusions the write-up quotes, re-run here -------------------
     guess = os.path.join(ROOT, "build", "prec_guess")
     if os.path.exists(guess):
         for name, mode, j, d in EXCLUDE:
-            f = TERMS_FILE[name]
-            out = subprocess.run([guess, mode, f, str(j), str(d)],
-                                 capture_output=True, text=True, check=True).stdout
-            gate.check("VERDICT: EXCLUDED" in out,
+            v, _, _, _ = prec_guess(guess, mode, TERMS_FILE[name], j, d)
+            gate.check(v == "EXCLUDED",
                        f"{name}: {mode} box ({j},{d}) EXCLUDED "
-                       f"(no P-recurrence / algebraic relation of that size)")
+                       f"(no P-recurrence / algebraic relation of that size): "
+                       f"got {v}")
     else:
         print("skip prec_guess exclusions (build/prec_guess absent)")
 
