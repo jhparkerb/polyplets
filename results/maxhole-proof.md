@@ -2,9 +2,29 @@
 
 2026-07-11 (with jasonp). M(n) = max total enclosed empty area over n-cell
 king-polyplets, 4-connected background. Confirmed exact by `g2 --maxhole` for
-n≤17 (`results/maxhole.txt`); M(17)=28 matched the prediction. Here: a near-complete
-proof, reduced to one clean open lemma. Machinery/verification:
-`experiments/maxhole_proof_check.py`.
+n≤17 (`results/maxhole.txt`); M(17)=28 matched the prediction. Machinery/
+verification: `experiments/maxhole_proof_check.py`.
+
+**STATUS (corrected 2026-08-06).** This header used to read "a near-complete
+proof, reduced to one clean open lemma", and that sentence has been stale since
+2026-07-12. It is stale in both directions, so the state is worth stating once,
+here, at the top:
+
+- **Single hole: a two-sided theorem.** (II'), the crux the header meant, was
+  PROVED by the moat-cycle argument below; with (I') and the uniform box
+  construction, `M_single(n) = ⌊((n−2)²+4)/8⌋` for every n ≥ 4. What is owed is
+  write-up rigor on step 1's contour construction, not mathematics.
+- **All holes: still open**, and this is the lemma a citation would rest on.
+  It routes through the master inequality and its peeling lemma, whose two
+  sub-lemmas are verified and unproved.
+- **Lean** (`Polyplets/HolesUpper.lean`) takes (II') as the named hypothesis
+  `MoatBound`, since mathlib has no discrete-Jordan material to build the
+  winding argument on. So `maxhole` is conditional there even though the paper
+  proof is complete.
+
+A paper may state the single-hole theorem outright and must state the
+all-holes version as conditional. `docs/provenance-tables.md` Paper 1 row 11
+says the same thing.
 
 ## The formula and the extremal shape
 
@@ -164,6 +184,43 @@ monotonicity this implies the multi-hole bound A ≤ round((n−2)²/8) outright
   - Also refuted en route (recorded to save future work): the union-range core
     (two-lone-cells), the per-component sum Σ(r_u,j+r_v,j+2) ≤ |S| (7-cell
     two-plus example), and claim (A) for general king-connected sets.
+
+## Refuted route: merging holes (2026-08-06)
+
+The peeling route is not the only conceivable induction, so the obvious
+alternative was tried and is dead. `experiments/maxhole_merge_probe.py`:
+
+> **MERGE LEMMA (candidate).** A king animal with k ≥ 2 holes and total
+> enclosed area A admits a nonempty W ⊆ F, |W| = t, such that F ∖ W is a king
+> animal with fewer holes and enclosed area ≥ A + t.
+
+Had it held, the multi-hole bound would follow from the single-hole theorem
+with no isoperimetry at all: peel until one hole remains, having spent s cells
+and gained ≥ s area, so `A + s ≤ M_single(n−s) ≤ M_single(n)`.
+
+**It fails at the very first multi-hole animal, n = 6:**
+
+    (0,2) (1,1) (1,3) (2,0) (2,2) (3,1)     holes {(1,2)}, {(2,1)}
+
+two unit holes sealed across a shared diagonal. No cell can be removed without
+opening a hole to the exterior, so no witness exists at any t. 6230 failures
+over all king animals with n ≤ 9.
+
+The failure is structural rather than incidental, and the measurement says why.
+Maximum total enclosed area over MULTI-hole animals, against the bound:
+
+| n | multi-hole animals | max A (multi) | M(n) | slack |
+|---|---|---|---|---|
+| 6 | 2 | 2 | 2 | **0** |
+| 7 | 42 | 2 | 3 | 1 |
+| 8 | 544 | 3 | 5 | 2 |
+| 9 | 5741 | 4 | 6 | 2 |
+
+At n = 6 the multi-hole configuration is **tight**, so any argument that must
+strictly gain area when it merges cannot survive the margin. The slack then
+grows, which is the useful half of the measurement: an eventual argument may
+assume n ≥ 7 and still have room, and the n = 6 case is two animals checked by
+hand.
 
 ## Superseded notes (pre-proof)
 
