@@ -1,0 +1,24 @@
+event=start job=convex_perim_tm t=2026-08-05T17:46:28-04:00 git=54440c2-dirty built=2026-08-05T17:41:41-0400 host=gympie total=199 Smax=200 king=1 mode=dir4
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:47:15-04:00 elapsed_s=47.0 rate=1.469/s done=0.3467 eta=2026-08-05T17:48:43-04:00 W=69
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:48:03-04:00 elapsed_s=95.3 rate=0.881/s done=0.4221 eta=2026-08-05T17:50:13-04:00 W=84
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:48:50-04:00 elapsed_s=142.0 rate=0.6619/s done=0.4724 eta=2026-08-05T17:51:28-04:00 W=94
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:49:38-04:00 elapsed_s=189.9 rate=0.5372/s done=0.5126 eta=2026-08-05T17:52:38-04:00 W=102
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:50:28-04:00 elapsed_s=240.1 rate=0.454/s done=0.5477 eta=2026-08-05T17:53:46-04:00 W=109
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:51:17-04:00 elapsed_s=289.0 rate=0.3979/s done=0.5779 eta=2026-08-05T17:54:48-04:00 W=115
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:52:02-04:00 elapsed_s=334.1 rate=0.3591/s done=0.6030 eta=2026-08-05T17:55:41-04:00 W=120
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:52:51-04:00 elapsed_s=383.1 rate=0.3263/s done=0.6281 eta=2026-08-05T17:56:37-04:00 W=125
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:53:43-04:00 elapsed_s=435.5 rate=0.2985/s done=0.6533 eta=2026-08-05T17:57:34-04:00 W=130
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:54:39-04:00 elapsed_s=491.2 rate=0.2748/s done=0.6784 eta=2026-08-05T17:58:31-04:00 W=135
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:55:25-04:00 elapsed_s=537.6 rate=0.2586/s done=0.6985 eta=2026-08-05T17:59:17-04:00 W=139
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:56:13-04:00 elapsed_s=585.0 rate=0.2444/s done=0.7186 eta=2026-08-05T18:00:02-04:00 W=143
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:57:01-04:00 elapsed_s=633.6 rate=0.232/s done=0.7387 eta=2026-08-05T18:00:45-04:00 W=147
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:57:50-04:00 elapsed_s=682.4 rate=0.2213/s done=0.7588 eta=2026-08-05T18:01:26-04:00 W=151
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:58:39-04:00 elapsed_s=731.3 rate=0.212/s done=0.7789 eta=2026-08-05T18:02:06-04:00 W=155
+event=heartbeat job=convex_perim_tm t=2026-08-05T17:59:28-04:00 elapsed_s=779.8 rate=0.2039/s done=0.7990 eta=2026-08-05T18:02:44-04:00 W=159
+event=heartbeat job=convex_perim_tm t=2026-08-05T18:00:15-04:00 elapsed_s=826.8 rate=0.1971/s done=0.8191 eta=2026-08-05T18:03:17-04:00 W=163
+event=heartbeat job=convex_perim_tm t=2026-08-05T18:01:00-04:00 elapsed_s=872.1 rate=0.1915/s done=0.8392 eta=2026-08-05T18:03:47-04:00 W=167
+event=heartbeat job=convex_perim_tm t=2026-08-05T18:01:53-04:00 elapsed_s=924.9 rate=0.186/s done=0.8643 eta=2026-08-05T18:04:18-04:00 W=172
+event=heartbeat job=convex_perim_tm t=2026-08-05T18:02:40-04:00 elapsed_s=972.1 rate=0.1821/s done=0.8894 eta=2026-08-05T18:04:40-04:00 W=177
+event=heartbeat job=convex_perim_tm t=2026-08-05T18:03:27-04:00 elapsed_s=1018.9 rate=0.1796/s done=0.9196 eta=2026-08-05T18:04:56-04:00 W=183
+event=heartbeat job=convex_perim_tm t=2026-08-05T18:04:14-04:00 elapsed_s=1066.4 rate=0.181/s done=0.9698 eta=2026-08-05T18:04:47-04:00 W=193
+event=done job=convex_perim_tm t=2026-08-05T18:04:20-04:00 start=2026-08-05T17:46:28-04:00 wall_s=1072.7 cpu_s=1072.6 peak_rss_mb=325.2 Smax=200

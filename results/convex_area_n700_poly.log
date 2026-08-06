@@ -1,0 +1,10 @@
+event=start job=convex_area_tm t=2026-08-05T13:40:19-04:00 git=54440c2-dirty built=2026-08-05T13:39:53-0400 host=gympie N=700 king=0
+event=heartbeat job=convex_area_tm t=2026-08-05T13:41:05-04:00 elapsed_s=46.1 rate=0.7162/s count=33 dp_states=2332
+event=heartbeat job=convex_area_tm t=2026-08-05T13:41:51-04:00 elapsed_s=92.0 rate=0.6308/s count=58 dp_states=2244
+event=heartbeat job=convex_area_tm t=2026-08-05T13:42:36-04:00 elapsed_s=137.2 rate=0.5978/s count=82 dp_states=2160
+event=heartbeat job=convex_area_tm t=2026-08-05T13:43:22-04:00 elapsed_s=183.4 rate=0.5888/s count=108 dp_states=2069
+event=heartbeat job=convex_area_tm t=2026-08-05T13:44:09-04:00 elapsed_s=230.0 rate=0.6043/s count=139 dp_states=1961
+event=heartbeat job=convex_area_tm t=2026-08-05T13:44:55-04:00 elapsed_s=275.7 rate=0.6348/s count=175 dp_states=1835
+event=heartbeat job=convex_area_tm t=2026-08-05T13:45:40-04:00 elapsed_s=321.1 rate=0.6913/s count=222 dp_states=1670
+event=heartbeat job=convex_area_tm t=2026-08-05T13:46:25-04:00 elapsed_s=366.2 rate=0.8029/s count=294 dp_states=1418
+event=done job=convex_area_tm t=2026-08-05T13:47:09-04:00 start=2026-08-05T13:40:19-04:00 wall_s=409.9 cpu_s=409.9 peak_rss_mb=225.6 n_max=700

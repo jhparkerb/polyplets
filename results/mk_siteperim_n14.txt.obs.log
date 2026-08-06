@@ -1,0 +1,17 @@
+event=start job=directed_cone_anchor t=2026-08-05T17:04:07-04:00 git=54440c2-dirty built=2026-08-05T16:59:02-0400 host=gympie mode=grid n=14 threads=8 depth=7
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:04:53-04:00 elapsed_s=45.4 rate=37.08/s count=1682 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:05:38-04:00 elapsed_s=90.7 rate=38.29/s count=3471 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:06:23-04:00 elapsed_s=136.0 rate=39.25/s count=5339 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:07:09-04:00 elapsed_s=181.4 rate=38.43/s count=6972 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:07:54-04:00 elapsed_s=226.8 rate=37.52/s count=8509 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:08:39-04:00 elapsed_s=272.2 rate=37.81/s count=10291 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:09:25-04:00 elapsed_s=317.6 rate=37.65/s count=11956 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:10:10-04:00 elapsed_s=363.0 rate=37.36/s count=13561 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:10:56-04:00 elapsed_s=408.3 rate=37.07/s count=15138 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:11:41-04:00 elapsed_s=453.7 rate=36.88/s count=16733 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:12:26-04:00 elapsed_s=499.1 rate=36.77/s count=18352 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:13:12-04:00 elapsed_s=544.5 rate=36.87/s count=20075 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:13:57-04:00 elapsed_s=589.9 rate=36.88/s count=21754 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:14:42-04:00 elapsed_s=635.3 rate=36.01/s count=22876 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T17:15:28-04:00 elapsed_s=680.6 rate=34.58/s count=23538 unit=subtrees
+event=done job=directed_cone_anchor t=2026-08-05T17:15:37-04:00 start=2026-08-05T17:04:07-04:00 wall_s=689.8 cpu_s=5117.6 peak_rss_mb=1.9 mode=grid n=14 a_n=11208974860

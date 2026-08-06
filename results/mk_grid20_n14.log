@@ -1,0 +1,13 @@
+event=start job=directed_cone_anchor t=2026-08-05T14:34:36-04:00 git=54440c2-dirty built=2026-08-05T14:33:13-0400 host=gympie mode=grid n=14 threads=8 depth=7
+event=heartbeat job=directed_cone_anchor t=2026-08-05T14:35:22-04:00 elapsed_s=45.3 rate=53.13/s count=2409 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T14:36:07-04:00 elapsed_s=90.6 rate=54.48/s count=4937 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T14:36:52-04:00 elapsed_s=135.9 rate=52.99/s count=7202 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T14:37:37-04:00 elapsed_s=181.2 rate=52.57/s count=9526 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T14:38:23-04:00 elapsed_s=226.5 rate=52.07/s count=11794 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T14:39:08-04:00 elapsed_s=271.9 rate=51.43/s count=13982 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T14:39:53-04:00 elapsed_s=317.2 rate=51.45/s count=16320 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T14:40:39-04:00 elapsed_s=362.5 rate=51.34/s count=18612 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T14:41:24-04:00 elapsed_s=407.8 rate=51.1/s count=20839 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T14:42:09-04:00 elapsed_s=453.1 rate=50.17/s count=22731 unit=subtrees
+event=heartbeat job=directed_cone_anchor t=2026-08-05T14:42:55-04:00 elapsed_s=498.3 rate=47.13/s count=23484 unit=subtrees
+event=done job=directed_cone_anchor t=2026-08-05T14:43:08-04:00 start=2026-08-05T14:34:36-04:00 wall_s=512.1 cpu_s=3672.6 peak_rss_mb=1.9 mode=grid n=14 a_n=11208974860
