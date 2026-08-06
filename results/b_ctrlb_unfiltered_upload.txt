@@ -1,0 +1,32 @@
+# King-lattice animals (polyplets) passing the "bottom-row-waived" 5-cone
+# cone-reachability predicate with no convexity restriction -- the RED
+# control from results/directed-cone-anchor.md ("control B" / grid column
+# ctrlB, none-convexity row), NOT Bacher's multi-directed class (the two are
+# incomparable; results/multi-directed.md). Counted by cell count n. NOT YET
+# SUBMITTED to OEIS -- staged pending jasonp's decision to submit.
+# a(1)-a(14) ONLY -- unlike the column-convex/HV-convex cells this class has
+# no known transfer matrix or closed form; every term comes from the
+# Redelmeier untried-set DFS (cpp/directed_cone_anchor.cpp mode dir5nb /
+# grid mode), which is O(a(n)) per term. n=14 measured at 84.6s single-run /
+# 629s cumulative (gympie, 2026-07-31/2026-08-05); n=15 was not attempted
+# (dir5's directly comparable filter took 457.6s at n=15, so dir5nb would be
+# in the same range). Fourteen terms is short for a b-file submission but is
+# everything this repo currently has, and OEIS entries do get created from
+# shorter starts. No OEIS match on the 9-term prefix or the full series
+# (experiments/oeis_lookup.py, 2026-08-05). Full context:
+# results/directed-cone-anchor.md, results/multi-directed.md.
+# - Jason H Parker, Aug 05 2026
+1 1
+2 4
+3 20
+4 106
+5 576
+6 3179
+7 17736
+8 99748
+9 564430
+10 3209194
+11 18316729
+12 104872413
+13 602013085
+14 3463412836
