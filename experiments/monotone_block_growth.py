@@ -13,7 +13,15 @@ The outer class, standalone, is: column intervals with heights
 h_1 >= h_2 >= ... >= h_k >= 1 summing to n, weighted by the number of vertical
 offsets, prod_j (h_j - h_{j+1} + 1). (The other outer run is this one read
 right to left, so one computation settles both.) Lemma 2 says its count P(n)
-is e^{O(sqrt n)}; this script measures P(n)^(1/n) -> 1.
+is sub-exponential; this script measures P(n)^(1/n) -> 1.
+
+Also checks Lemma 2's elementary bound (docs/sortie-publication-plan.md B2),
+which replaced Hardy-Ramanujan: P(n) <= (n+1)^2 p(n)^2 and, splitting a
+partition at s = ceil(sqrt n), p(n) <= (n+1)^(s + floor(n/(s+1)) + 1) <=
+(n+1)^(2 sqrt(n) + 2). That inequality is slack by miles, so what is pinned is
+the counting behind it: the small-part/large-part encoding must be injective
+and inside the two ranges the exponent multiplies, and the large-part cap must
+be ATTAINED (RED control -- one fewer and the bound would be false).
 
 Also checks the factorization inequality
     A(n) <= 2 (n+1)^2 sum_{i+j+l=n} P(i) M(j) P(l)
@@ -27,6 +35,7 @@ over height sequences for n <= 12 before anything is reported.
 Usage: python3 experiments/monotone_block_growth.py [--nmax 400]
 """
 import argparse
+import math
 import sys
 from functools import lru_cache
 
@@ -80,6 +89,44 @@ def dp(nmax, bump=1):
     return out
 
 
+def partitions(nmax):
+    """p(n), exact, by the usual O(n^2) part-by-part DP."""
+    p = [1] + [0] * nmax
+    for part in range(1, nmax + 1):
+        for n in range(part, nmax + 1):
+            p[n] += p[n - part]
+    return p
+
+
+def _partitions_of(n, largest=None):
+    """Every partition of n as a nonincreasing tuple."""
+    largest = n if largest is None else largest
+    if n == 0:
+        yield ()
+        return
+    for part in range(min(n, largest), 0, -1):
+        for rest in _partitions_of(n - part, part):
+            yield (part,) + rest
+
+
+def ceil_sqrt(n):
+    s = math.isqrt(n)
+    return s if s * s == n else s + 1
+
+
+def small_large_exponent(n):
+    """The exponent Lemma 2's elementary partition bound gives: p(n) <= (n+1)^e.
+
+    Split a partition of n at s = ceil(sqrt n). The parts <= s are fixed by
+    their s multiplicities, each in {0..n}: (n+1)^s. The parts > s number at
+    most floor(n/(s+1)) =: L, and a nonincreasing sequence of length <= L over
+    n values is one of at most (L+1) n^L <= (n+1)^(L+1). So e = s + L + 1,
+    which is at most 2 sqrt(n) + 2.
+    """
+    s = ceil_sqrt(n)
+    return s + n // (s + 1) + 1
+
+
 HV14 = [1, 4, 16, 61, 221, 766, 2566, 8390, 26982, 85834, 271174, 853111,
         2677214, 8389720]
 STAIR14 = [1, 3, 9, 28, 87, 272, 850, 2659, 8318, 26025, 81427, 254777,
@@ -107,7 +154,55 @@ def main():
         if n <= args.nmax:
             print(f"  n={n:5d}  P(n)={P[n]:.6g}  P(n)^(1/n)={P[n] ** (1.0 / n):.6f}"
                   f"  log P(n)/sqrt(n)="
-                  f"{__import__('math').log(P[n]) / n ** 0.5:.4f}")
+                  f"{math.log(P[n]) / n ** 0.5:.4f}")
+
+    # B2 of docs/sortie-publication-plan.md: Lemma 2 with no Hardy-Ramanujan.
+    # Everything here is exact integer arithmetic -- the exponents are the
+    # integers the proof produces, not a float sqrt.
+    print(f"\n## Lemma 2's elementary bounds, exact, n <= {args.nmax}")
+    p = partitions(args.nmax)
+    bad_p = [n for n in range(1, args.nmax + 1)
+             if p[n] > (n + 1) ** small_large_exponent(n)]
+    bad_P = [n for n in range(1, args.nmax + 1)
+             if P[n] > (n + 1) ** 2 * p[n] ** 2]
+    bad_e = [n for n in range(1, args.nmax + 1)
+             if small_large_exponent(n) > 2 * n ** 0.5 + 2]
+    assert not bad_p, f"p(n) <= (n+1)^(s+L+1) violated at {bad_p[:5]}"
+    assert not bad_P, f"P(n) <= (n+1)^2 p(n)^2 violated at {bad_P[:5]}"
+    assert not bad_e, f"s + L + 1 <= 2 sqrt(n) + 2 violated at {bad_e[:5]}"
+    print(f"ok   p(n) <= (n+1)^(s+L+1) with s+L+1 <= 2 sqrt(n)+2, every n "
+          f"(n={args.nmax}: p={p[args.nmax]:.6g} <= (n+1)^"
+          f"{small_large_exponent(args.nmax)})")
+    print(f"ok   P(n) <= (n+1)^2 p(n)^2, every n")
+    # The bound is enormously slack (p(n) = e^{Theta(sqrt n)} against
+    # e^{2 sqrt(n) log n}), so checking the inequality numerically proves
+    # nothing about the ARGUMENT. What is checked instead is the split the
+    # argument counts with: the small-part/large-part encoding must be
+    # injective and must land in the ranges the exponent is read off, and the
+    # large-part range must be attained -- one fewer and the count is wrong.
+    tight = []
+    for n in range(1, 41):
+        s = ceil_sqrt(n)
+        cap = n // (s + 1)
+        codes, most = set(), 0
+        for lam in _partitions_of(n):
+            small = tuple(sum(1 for x in lam if x == v) for v in range(1, s + 1))
+            large = tuple(x for x in lam if x > s)
+            assert max(small, default=0) <= n, f"n={n}: multiplicity out of range"
+            assert len(large) <= cap, f"n={n}: {len(large)} large parts > cap {cap}"
+            codes.add((small, large))
+            most = max(most, len(large))
+        assert len(codes) == p[n], f"n={n}: encoding not injective"
+        tight.append(most == cap)
+    assert all(tight), "the large-part cap n//(s+1) is not attained at every n<=40"
+    print("ok   the small/large encoding is injective and lands in the ranges "
+          "the exponent counts, n <= 40")
+    print("ok   RED the large-part cap n//(s+1) is ATTAINED at every n <= 40, "
+          "so one fewer would be a false bound")
+    n = args.nmax
+    print(f"     so log P({n})/{n} <= (4 sqrt(n)+6) log(n+1)/n = "
+          f"{(4 * n ** 0.5 + 6) * math.log(n + 1) / n:.4f}"
+          f"  (measured {math.log(P[n]) / n:.4f}) -> 0")
 
     print("\n## factorization inequality "
           "A(n) <= 2 (n+1)^2 sum P(i) M(j) P(l),  n <= 14")

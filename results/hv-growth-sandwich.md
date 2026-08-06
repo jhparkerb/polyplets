@@ -22,6 +22,17 @@ growth rates (Lemma 4, Proposition 7) and a conjecture at the level Table B
 measures (Conjecture 8), and Phase 1's two digit claims both reproduce and are
 floors.
 
+**2026-08-06, later still — Lemma 3 is stronger than it was written.** The
+column-join is injective at fixed `(i, j)` on the nose, so
+`M(i)M(j) ≤ M(i+j)` with no factor and no quasi-super-multiplicativity: see the
+rewritten Lemma 3. Fekete then makes the limit a supremum, so every banked term
+is a rigorous lower bound on `µ`, and Proposition 6's whole proof comes down to
+an injection, Fekete, and a stack bound. Lemma 2's stack bound is now
+elementary too (B2): the partition count is bounded by splitting at `√n`, so
+Hardy–Ramanujan is gone and the squeeze uses no analytic input at all. Nothing
+downstream changes; what changes is the warrant, which is the point of
+`docs/sortie-publication-plan.md` B1 and B2.
+
 **2026-08-06, later — the amplitude ratio has a formula.** See "The amplitude
 ratio is a ratio of two explicit feed vectors". Table B's 54 trusted digits
 become 251; the ratio is `(1/2)(w4·φ)/(w·φ)` with both feed vectors explicit
@@ -123,7 +134,7 @@ bit naming `C2`'s phase. Each junction offset `d` lies in `[−h', h]` with
 
 **Lemma 2 (the outer blocks are stacks, hence sub-exponential).**
 `P(n) = A001523(n)`, the number of stacks / weakly unimodal compositions of `n`,
-and `P(n) = e^{O(√n)}`.
+and `P(n) ≤ E(n) := (n+1)^{4√n+6}`, so `P(n)^{1/n} → 1`.
 
 *Proof.* In a phase-`(1,1)` block the column intervals are **nested**,
 `[b(j+1), t(j+1)] ⊆ [b(j), t(j)]`, so the set of columns meeting a given row `y`
@@ -131,8 +142,24 @@ is a prefix `1..r(y)`, and `{y : r(y) ≥ k} = [b(k), t(k)]` is a nested decreas
 family of intervals, which makes `r` weakly unimodal with `Σ_y r(y) = n`. The
 map to the composition `(r(y))_y` is invertible, so `P(n)` is the number of
 weakly unimodal compositions of `n`. Splitting such a composition at its peak
-gives two partitions, so `P(n) ≤ (n+1)^2 p(n)^2 = e^{O(√n)}` by Hardy–Ramanujan.
-∎
+gives two partitions, so `P(n) ≤ (n+1)^2 p(n)^2`.
+
+For `p(n)` the classical asymptotic is not needed, and the squeeze in
+Proposition 6 uses only `P(n)^{1/n} → 1`. Put `s = ⌈√n⌉` and split a partition
+of `n` at `s`. The parts `≤ s` are determined by their `s` multiplicities, each
+an integer in `[0, n]`, so they contribute at most `(n+1)^s` choices. The parts
+`> s` have size `≥ s+1`, so there are at most `L = ⌊n/(s+1)⌋` of them, and
+listing them in nonincreasing order gives a sequence of length `≤ L` over `n`
+values, at most `(L+1)n^L ≤ (n+1)^{L+1}` choices. Hence
+
+    p(n)  ≤  (n+1)^{s+L+1}  ≤  (n+1)^{2√n+2},
+
+since `s ≤ √n + 1` and `L ≤ n/(√n+1) ≤ √n`. So `P(n) ≤ (n+1)^{4√n+6} = E(n)`
+and `log P(n)/n ≤ (4√n+6) log(n+1)/n → 0`. ∎
+
+(Hardy–Ramanujan would give the sharper `P(n) = e^{O(√n)}`; nothing downstream
+distinguishes the two, and the elementary bound keeps Proposition 6 free of
+analytic input. `docs/sortie-publication-plan.md` B2.)
 
 Measured: `P(n) = 1, 2, 4, 8, 15, 27, 47, 79, 130, 209, 330, 512` matches
 A001523 termwise (`experiments/monotone_block_growth.py`, brute force and DP
@@ -140,41 +167,71 @@ agreeing, verified against the entry's own data by
 `experiments/oeis_lookup.py`), and `P(n)^(1/n)` falls 1.706 → 1.168 over
 `n = 10..400`.
 
-**Lemma 3 (the staircase count has a growth constant).**
-`M(i) M(j) ≤ (i+j) M(i+j)`, and therefore `lim M(n)^(1/n)` exists.
+**Lemma 3 (the staircase count is supermultiplicative).**
+`M(i) M(j) ≤ M(i+j)` for all `i, j ≥ 0` (with `M(0) = 1`), and therefore
+`lim M(n)^(1/n)` exists and equals `sup_n M(n)^(1/n)`.
 
 *Proof.* Given staircase animals `X` (area `i`, last column height `h`) and `Y`
-(area `j`, first column height `h'`), join them with
-`d = max(0, h − h')`. That `d` satisfies `d ≥ 0`, `d ≥ s`, `−h' ≤ d ≤ h`, so the
-join is a staircase animal of area `i + j`; and the pair is recovered from the
-join together with the index of the last column of `X`, which takes at most
-`i + j` values. For existence, put `L(n) = log M(n) ≥ 0`, so
-`L(i) + L(j) ≤ L(i+j) + log(i+j)`. Induction gives
-`L(2^m n) ≥ 2^m (L(n) − log n − 2 log 2)`, since
-`Σ_{i=1..m} 2^{m−i} log(2^i n) ≤ 2^m (log n + 2 log 2)`. For `N` large write
-`N = qn + r` with `r < n`, expand `q` in binary, and assemble `N` from the
-`≤ log₂ N + 1` blocks `2^i n` and the remainder, paying `log N` per join:
+(area `j`, first column height `h'`), translate `Y` by `d = max(0, h − h')` and
+concatenate the two column sequences.
 
-    L(N)  ≥  q (L(n) − log n − 2 log 2)  −  (log₂ N + 1) log N.
+*The join is in the class.* `d ≥ 0`, so bottoms stay nondecreasing;
+`d − s = max(0, h − h') − (h − h') ≥ 0`, so tops stay nondecreasing; and
+`d ≤ h`, since `d = h − h' ≤ h − 1` when `h ≥ h'` and `d = 0` otherwise, so the
+junction columns are king-adjacent (`b(r+1) ≤ t(r) + 1`). Area is `i + j`.
 
-Divide by `N` and let `N → ∞` with `n` fixed:
-`liminf L(N)/N ≥ (L(n) − log n − 2 log 2)/n`. Now let `n → ∞` along a
-subsequence realising `limsup L(n)/n`; the right-hand side tends to that limsup,
-so `liminf ≥ limsup`. ∎
+*The join is injective at fixed `(i, j)`.* Every column is nonempty, so the
+cumulative areas `h(1) + … + h(r)` are **strictly** increasing and at most one
+prefix of columns has total area exactly `i`. Since `(i, j)` is fixed, that
+prefix is `X`'s columns and the rest are `Y`'s, each read back up to
+translation, which is how both were counted. No index has to be supplied
+alongside the join, so distinct pairs have distinct images and
+`M(i) M(j) ≤ M(i+j)`.
 
-(This is quasi-super-multiplicativity in the sense of Barequet, Ben-Shachar &
-Osegueda, *Concatenation arguments and their applications to polyominoes and
-polycubes*, Comput. Geom. 98 (2021) 101790, §2.2, with `P(x) = 1/x`; the
-argument above is written out so nothing rests on the citation.
-`papers/barequet_benshachar_osegueda_2021_concatenation_arguments.pdf`.)
+Fekete's lemma in its supermultiplicative form then gives
+`lim M(n)^(1/n) = sup_n M(n)^(1/n)`. That is mathlib's
+`Subadditive.tendsto_lim` applied to `−log M`, exactly as
+`polyplets/Polyplets/Growth.lean`'s `a_supermul`, `negLogA_subadditive` and
+`lambda_tendsto` do for `λ`. ∎
 
-**Proof of Proposition 6.** Write `µ = lim M(n)^(1/n)`, which exists by
-Lemma 3 and is `≥ 1`. Fix `ε > 0` and take `C_ε` with `M(j) ≤ C_ε (µ+ε)^j`. In
-(*), bound `P(i), P(l) ≤ e^{c√n}` by Lemma 2:
+**By-product: every banked term is a rigorous lower bound on `µ`.** Because the
+limit is a supremum, `µ ≥ M(n)^(1/n)` for each `n` with no extrapolation
+involved. At `n = 700`,
 
-    A(n)  ≤  2 (n+1)^4 e^{2c√n} C_ε (µ+ε)^n,
+    µ  ≥  M(700)^(1/700)  =  3.12340450886853853211…
 
-so `limsup A(n)^(1/n) ≤ µ + ε` for every `ε`, i.e. `limsup A(n)^(1/n) ≤ µ`.
+against the extrapolated `3.128943269730886…`. The bound is exact arithmetic on
+a banked term; the digits past `3.12` remain extrapolation.
+
+*Provenance of the fix.* An earlier version of this lemma paid a factor `i + j`
+for the index of `X`'s last column and derived existence by hand from
+quasi-super-multiplicativity in the sense of Barequet, Ben-Shachar & Osegueda,
+*Concatenation arguments and their applications to polyominoes and polycubes*,
+Comput. Geom. 98 (2021) 101790, §2.2, with `P(x) = 1/x`
+(`papers/barequet_benshachar_osegueda_2021_concatenation_arguments.pdf`). The
+index is not free information, since strictly increasing cumulative areas
+already carry it, so the exact inequality holds and neither the `(i+j)` nor the
+citation is needed here. The citation remains the right tool for a
+concatenation that genuinely loses information.
+
+Measured (`experiments/staircase_supermul.py`, 0.6 s): brute force over `(h, d)`
+reproduces `M(1..12)`; over all `i + j ≤ 12` every one of 1182960 joins lands in
+the class, the map is injective at fixed `(i, j)`, and the area-`i` cut inverts
+it; and on the banked 700 terms `M(i)M(j) ≤ M(i+j)` has **zero violations** for
+every pair. Three RED controls, all required to fail: the stacks `P(n)` of
+Lemma 2 are *not* supermultiplicative (`P(2)P(20) = 22480 > 22277 = P(22)`), so
+the series check is not vacuous; the same join with `d = 0` leaves the class;
+and cutting at cumulative area `i + 1` fails to invert.
+
+**Proof of Proposition 6.** Write `µ = lim M(n)^(1/n) = sup_n M(n)^(1/n)`,
+which exists by Lemma 3 and is `≥ 1`. Fix `ε > 0` and take `C_ε` with
+`M(j) ≤ C_ε (µ+ε)^j`. In (*), bound `P(i), P(l) ≤ E(n)` by Lemma 2, which
+applies to every `i, l ≤ n` since `E` is nondecreasing:
+
+    A(n)  ≤  2 (n+1)^4 E(n)^2 C_ε (µ+ε)^n,
+
+and `E(n)^{1/n} → 1`, so `limsup A(n)^(1/n) ≤ µ + ε` for every `ε`, i.e.
+`limsup A(n)^(1/n) ≤ µ`.
 In the other direction, staircase ⊆ C ⊆ HV-convex gives `M(n) ≤ C(n) ≤ A(n)`
 termwise, so `liminf C(n)^(1/n) ≥ lim M(n)^(1/n) = µ` and
 `limsup C(n)^(1/n) ≤ limsup A(n)^(1/n) ≤ µ`. Both limits exist and equal `µ`. ∎
@@ -254,8 +311,8 @@ Of the four diagonal blocks, exactly two carry exponential weight standalone:
 The truncated `(0,0)` block stays sub-exponential for a different reason from
 Lemma 2's: with `h' ≥ h`, the entry count `min(2, h' − h + 1)` is 2 only at a
 strict rise, the strict rises take distinct heights, so there are at most
-`√(2n)` of them and the weight is `≤ 2^√(2n)`, against `e^{O(√n)}` height
-sequences.
+`√(2n)` of them and the weight is `≤ 2^√(2n)`, against the `≤ E(n)` height
+sequences of Lemma 2.
 
 The truncated `(0,1)` block is the exception, and it is the only one. It is not
 height-monotone — `h' ≤ h` at weight 2, `h' = h+1` at weight 1, `h' > h+1`
@@ -375,7 +432,7 @@ recovered from the join and the prefix area. Fekete gives
 every step, so it can never enter `(0,1)`, which needs `d ≤ 0` and `d < s`.
 With `D_asc ≤ D` and Proposition 6, `lim D_asc(n)^(1/n) = µ`.
 For `D_desc`, Lemma 1's factorisation with `T` in place of `M` gives
-`D_desc(n) ≤ 2(n+1)^2 Σ_(i+j+l=n) P0(i) T(j) P1(l) ≤ (n+1)^4 e^(2c√n) C_ε (ν+ε)^n`,
+`D_desc(n) ≤ 2(n+1)^2 Σ_(i+j+l=n) P0(i) T(j) P1(l) ≤ 2(n+1)^4 E(n)^2 C_ε (ν+ε)^n`,
 so `limsup D_desc(n)^(1/n) ≤ ν`. In the other direction, take a `T`-run of area
 `m` whose first column is `[0, h−1]` and prepend the column `[0, h]`: the
 joining step has `d = 0 ≤ 0` and `s = 1 > d`, so it enters `(0,1)`, the run's
@@ -513,7 +570,7 @@ through a slower-converging window.
 Partition the HV-convex animals by which middle phase their path visits; the
 two bits are monotone in `j`, so no path visits both `(1,0)` and `(0,1)` and the
 three parts are a partition. Then **`A_(1,0)(n) = A_(0,1)(n)` for every `n`**,
-and the remainder — paths `(0,0) → (1,1)` — is `e^{O(√n)}`. Hence if
+and the remainder, the paths `(0,0) → (1,1)`, is sub-exponential. Hence if
 `C_HV = lim A(n)/µ^n` exists, `C_HV = 2 C(A_(1,0))`.
 
 *Proof.* The vertical mirror `[b(j), t(j)] ↦ [−t(j), −b(j)]` is an
@@ -523,7 +580,7 @@ becomes "`t` has fallen": the phase bits swap, `(pb, pt) ↦ (pt, pb)`. Phases
 `(0,0)` and `(1,1)` are fixed and `(1,0) ↔ (0,1)`, so the involution is a
 bijection between the first two parts. The remainder factors as a phase-`(0,0)`
 block joined to a phase-`(1,1)` block at one step, both stacks by Lemma 2, so it
-is at most `(n+1) Σ_{i+l=n} P(i) P(l) = e^{O(√n)}`. ∎
+is at most `(n+1)^2 E(n)^2`, which is `µ^{o(n)}` by Lemma 2. ∎
 
 Brute-forced (`experiments/descent_block_oracle.py --mirror 14`, an independent
 DFS over explicit column intervals):
@@ -798,6 +855,7 @@ core.
 make build/middle_kingdom_tm build/prec_guess
 make gate-middle-kingdom                       # stair vs the grid, the sandwich,
                                                # the phase split, four RED controls
+python3 experiments/staircase_supermul.py      # Lemma 3, 0.6 s, three RED controls
 scripts/mk_stair_growth.sh                     # 700 terms each + mu, ~15 s total
 python3 experiments/monotone_block_growth.py --nmax 400
 python3 experiments/dir4_descent_block.py --nmax 700 \

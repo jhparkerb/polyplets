@@ -35,6 +35,10 @@ would make every positive above meaningless):
               above the global minimum wrongly accepted)
   ccmono      vs ccdir5: bottoms-nondecreasing is not valley-unimodality
   hvdir4ascbad  the phase split with phase (1,0) deleted instead of (0,1)
+  d=0 join      Lemma 3's column-join with d = 0 instead of max(0, h - h')
+                must leave the class
+  stacks P(n)   A001523 must VIOLATE supermultiplicativity, or the
+                M(i)M(j) <= M(i+j) check would pass for any sequence
 """
 import os
 import sys
@@ -265,6 +269,77 @@ def main():
     gate.check(v10[2:] != nei[2:],
                "RED the mirror halves MUST differ from the phase-(0,0)->(1,1) "
                "remainder (else the split is vacuous)")
+
+    # --- Lemma 3: the column-join is injective at FIXED (i, j) --------------
+    # results/hv-growth-sandwich.md Lemma 3, strengthened to M(i)M(j) <=
+    # M(i+j) (docs/sortie-publication-plan.md B1). What the proof turns on is
+    # that column areas are positive, so the area-i prefix is unique and no
+    # split index has to be carried; the checks below are the join landing in
+    # the class, the injectivity, and the inequality on all 700 banked terms.
+    import staircase_supermul as sms
+
+    M = sms.banked(sms.TERMS)
+    pool = {n: sms.animals(n) for n in range(1, 9)}
+    gate.check(all(len(pool[n]) == M[n] for n in pool),
+               f"staircase animals as (heights, offsets) reproduce M(1..8): "
+               f"got {[len(pool[n]) for n in sorted(pool)]}")
+    inclass = injective = True
+    for i in range(1, 8):
+        for j in range(1, 9 - i):
+            seen = {sms.join(x, y) for x in pool[i] for y in pool[j]}
+            inclass &= all(sms.is_animal(*z) and sum(z[0]) == i + j for z in seen)
+            injective &= (len(seen) == len(pool[i]) * len(pool[j])
+                          and all(sms.cut(z, i) for z in seen))
+    gate.check(inclass, "the column-join stays a staircase animal of area i+j")
+    gate.check(injective,
+               "the column-join is injective at fixed (i,j) and the area-i cut "
+               "inverts it, i+j <= 8")
+    gate.check(any(not sms.is_animal(*sms.join(x, y, rule="zero"))
+                   for i in range(1, 8) for j in range(1, 9 - i)
+                   for x in pool[i] for y in pool[j]),
+               "RED the d=0 join MUST leave the class (else the max(0,.) rule "
+               "is doing nothing)")
+    bad = sms.supermul_violations(M, len(M) - 1)
+    gate.check(not bad,
+               f"M(i)M(j) <= M(i+j) for every pair with i+j <= {len(M) - 1}: "
+               f"got {len(bad)} violations {bad[:3]}")
+    P = sms.stacks(24)
+    gate.check(sms.supermul_violations(P, 24),
+               "RED the stacks P(n) = A001523 MUST violate supermultiplicativity "
+               "(else the check above passes for any sequence)")
+
+    # --- Lemma 2 without Hardy-Ramanujan (sortie plan B2) -------------------
+    # p(n) <= (n+1)^(s+L+1) by splitting a partition at s = ceil(sqrt n). The
+    # inequality itself is slack by miles, so what is pinned is the counting:
+    # the small/large encoding must be injective and must land in the two
+    # ranges the exponent multiplies, and the large-part cap must be ATTAINED
+    # (one fewer and the bound would be false).
+    import monotone_block_growth as mbg
+
+    p = mbg.partitions(120)
+    Pn = mbg.dp(120)
+    gate.check(all(p[n] <= (n + 1) ** mbg.small_large_exponent(n)
+                   and mbg.small_large_exponent(n) <= 2 * n ** 0.5 + 2
+                   for n in range(1, 121)),
+               "p(n) <= (n+1)^(s+L+1) <= (n+1)^(2 sqrt(n)+2), n <= 120")
+    gate.check(all(Pn[n] <= (n + 1) ** 2 * p[n] ** 2 for n in range(1, 121)),
+               "P(n) <= (n+1)^2 p(n)^2 (split the stack at its peak), n <= 120")
+    enc_ok, cap_tight = True, True
+    for n in range(1, 21):
+        s = mbg.ceil_sqrt(n)
+        cap, codes, most = n // (s + 1), set(), 0
+        for lam in mbg._partitions_of(n):
+            codes.add((tuple(sum(1 for x in lam if x == v) for v in range(1, s + 1)),
+                       tuple(x for x in lam if x > s)))
+            most = max(most, sum(1 for x in lam if x > s))
+        enc_ok &= len(codes) == p[n] and most <= cap
+        cap_tight &= most == cap
+    gate.check(enc_ok,
+               "the small/large split encodes partitions injectively inside the "
+               "ranges the exponent counts, n <= 20")
+    gate.check(cap_tight,
+               "RED the large-part cap floor(n/(s+1)) is ATTAINED at every "
+               "n <= 20, so a smaller cap would be a false bound")
 
     try:
         import amplitude_feed_vectors as afv
