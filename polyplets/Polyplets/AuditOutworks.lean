@@ -16,6 +16,7 @@ import Polyplets.Universal.Square
 import Polyplets.Universal.Hex
 import Polyplets.Upper.BuiRD2
 import Polyplets.Upper.BuiRD3
+import Polyplets.StairAnimals
 
 /-!
 # Audit: the Outworks results in one place
@@ -507,5 +508,25 @@ info: 'Polyplets.lambda_le_of_bui_rd3' depends on axioms: [propext,
 -/
 #guard_msgs in
 #print axioms lambda_le_of_bui_rd3
+
+/-! ## Sortie B1: the staircase column-join
+
+`results/hv-growth-sandwich.md` Lemma 3. The join stays in the class and is
+injective once both areas are fixed, which is what makes the staircase count
+supermultiplicative on the nose. Not even `Classical.choice` -- the join and
+the cut are computable and the proofs are constructive.
+-/
+
+/-- info: 'Polyplets.Stair.join_valid' depends on axioms: [propext, Quot.sound] -/
+#guard_msgs in
+#print axioms Stair.join_valid
+
+/-- info: 'Polyplets.Stair.cut_join' depends on axioms: [propext, Quot.sound] -/
+#guard_msgs in
+#print axioms Stair.cut_join
+
+/-- info: 'Polyplets.Stair.join_injOn' depends on axioms: [propext, Quot.sound] -/
+#guard_msgs in
+#print axioms Stair.join_injOn
 
 end Polyplets

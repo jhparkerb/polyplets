@@ -25,6 +25,7 @@ import Polyplets.Separation
 import Polyplets.Sanity
 import Polyplets.Sequence
 import Polyplets.Shape
+import Polyplets.StairAnimals
 import Polyplets.Symmetry
 import Polyplets.Universal.AbstractShape
 import Polyplets.Universal.Compute
