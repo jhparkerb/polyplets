@@ -30,7 +30,20 @@ Polyomino/animal enumeration:
   counting_polyominoes_revisited.pdf       Barequet & Ben-Shachar, Counting polyominoes, revisited (TOPP problem 37 line of work).
   shirakawa_n59.pdf                        Enumeration of polyominoes up to size n=59 (per PDF title).
   barequet_moffie_2007_jensen_complexity.pdf  Barequet & Moffie, On the complexity of Jensen's algorithm for counting fixed polyominoes (2007).
-  barequet_rote_twisted_cylinders.pdf      Barequet & Rote, lambda bounds via twisted cylinders.
+  barequet_rote_twisted_cylinders.pdf      Barequet, Moffie, Ribo & Rote, Counting polyominoes on twisted
+                                           cylinders, INTEGERS: Electron. J. Combin. Number Theory 6
+                                           (2006) #A22. (Venue confirmed from the title page 2026-08-06;
+                                           this index previously credited only two of the four authors.)
+  barequet_barequet_rote_2010_high_dimensional_polycubes.pdf
+                                           R. Barequet, G. Barequet & Rote, Formulae and growth rates of
+                                           high-dimensional polycubes, Combinatorica 30 (2010) 257-275.
+                                           Obtained 2026-08-06. For fixed n the polycube count is a
+                                           polynomial in the dimension; growth rate 2ed - o(d).
+  barequet_shalah_2017_polycubes_proper_n_minus_k.pdf
+                                           Barequet & Shalah, Counting n-cell polycubes proper in n-k
+                                           dimensions, European J. Combin. 63 (2017) 146-163. Obtained
+                                           2026-08-06. The general-k framework; k=4 and k=5 proved for
+                                           the first time. Paper 2's defect-diagonal precedent.
   voge_guttmann_2003.pdf                   Voge & Guttmann (2003), polygon/animal series analysis.
   guttmann_series_appendix.pdf             Guttmann, series-analysis appendix (differential approximants background).
   jensen_benzenoid_parallel.pdf            Jensen, parallel enumeration of benzenoid hydrocarbons.
@@ -170,7 +183,36 @@ Growth-rate bounding methods (obtained 2026-08-01, for the lambda <= 9.3153 push
                                            Burnside for the symmetry classes. Cite the 2004 paper for
                                            the phase blocks, this one for the building blocks.
 
-Grid isoperimetry (the source of the maxhole formula, results/maxhole-proof.md):
+Grid isoperimetry (the source of the maxhole formula, results/maxhole-proof.md).
+All obtained 2026-08-06; the backward pass through the two 2006/2008 reference
+lists is what turned up the 1977 primary:
+  wang_wang_1977_discrete_isoperimetric_problems.pdf
+                                           Wang & Wang, Discrete Isoperimetric Problems, SIAM J. Appl.
+                                           Math. 32(4) (1977) 860-870. THE PRIMARY. A linear ordering of
+                                           Z^n whose every prefix minimizes the boundary (= points not in
+                                           the set at Euclidean distance 1, i.e. the 4-neighbourhood)
+                                           among sets of that size. Arbitrary sets, no connectivity. The
+                                           minimizers are "standard spheres" = |x|+|y| <= m plus part of
+                                           the next shell: our diagonal diamonds. Equivalent to
+                                           Macaulay's theorem, which they also show.
+  bollobas_radcliffe_1990_isoperimetric_cube_grid.pdf
+                                           Bollobas & Radcliffe, Isoperimetric Inequalities for Faces of
+                                           the Cube and the Grid, European J. Combin. 11 (1990) 323-333.
+                                           Altshuler's [4]; the combinatorics-side reference.
+  chung_2004_discrete_isoperimetric_inequalities.pdf
+                                           Chung, Discrete Isoperimetric Inequalities, Surveys in Diff.
+                                           Geom. IX (2004) 53-82. Survey; spectral/Cheeger flavour.
+  bezrukov_1994_isoperimetric_discrete_spaces.pdf
+                                           Bezrukov, Isoperimetric Problems in Discrete Spaces, Bolyai
+                                           Soc. Math. Stud. 3 (1994) 59-91. Survey, cube-centred.
+  prellberg_owczarek_1999_finite_perimeter_vesicles.pdf
+                                           Prellberg & Owczarek, On the asymptotics of the finite-
+                                           perimeter partition function of two-dimensional lattice
+                                           vesicles, Commun. Math. Phys. 201(3) (1999) 493-505. Sieben's
+                                           [10]. The BOND-perimeter twin of M(n) is their eq (3.1),
+                                           stated in passing: max area of a polygon of perimeter 2n is
+                                           n^2/4 (n even), (n^2-1)/4 (n odd) -- the 1/16 against our 1/8.
+
   sieben_2008_minimum_site_perimeter.pdf   Sieben, Polyominoes with minimum site-perimeter and full set
                                            achievement games, European J. Combin. 29(1) (2008) 108-117.
                                            Obtained 2026-08-06. Thm 4.1: sigma(e) = floor(e^2/8 - e/2 + 1)

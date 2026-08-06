@@ -14,9 +14,9 @@ grid isoperimetric inequality, cited:
   the maximum size of an animal of site-perimeter e — not even inverted.
   (I'), (II') and the moat-cycle argument below reprove it from scratch, which
   is worth keeping as an independent check and is not worth claiming.
-- **All holes: PROVED (2026-08-06), and also not ours.** Altshuler, Yanovsky,
-  Vainsencher, Wagner & Bruckstein (DGCI 2006) prove the same minimum for an
-  **arbitrary finite subset of ℤ²**, with no connectivity hypothesis. Apply it
+- **All holes: PROVED (2026-08-06), and also not ours.** The same minimum holds
+  for an **arbitrary finite subset of ℤ²**, with no connectivity hypothesis —
+  Wang & Wang 1977, with the ℤ² count made explicit by Altshuler et al. Apply it
   to the union of *all* the holes at once and the multi-hole bound is three
   lines (§The union argument). The overlap-counting question this note stopped
   on yesterday does not need answering: it was an artefact of bounding each
@@ -77,12 +77,20 @@ Yesterday's version of this note stopped at an overlap count — how many
 foreground cells two sealed holes can share — because it bounded each hole
 separately and then had to reassemble. **Don't reassemble.** Bound the union.
 
-Altshuler et al. (DGCI 2006) prove the grid isoperimetric inequality for an
-**arbitrary finite subset** of ℤ², not just a connected one. Their `n(k)` is
-`min{|N(A)| : A ⊂ ℤ² finite, |A| ≥ k}` with `N(A)` the 4-neighbourhood, given
-exactly in their Theorem 1; their §3.1 Theorem 7 re-derives it by a
-self-contained slanted-bounding-rectangle projection, again for every finite A.
-Their minimisers come out connected ("optimal ⟹ simple", their Theorem 2), so
+The grid isoperimetric inequality holds for an **arbitrary finite subset** of
+ℤ², not just a connected one. That is **Wang & Wang 1977** (read 2026-08-06):
+there is a linear ordering of ℤⁿ whose every prefix minimizes the boundary —
+the points *not* in the set at Euclidean distance 1, which in ℤ² is exactly
+`N(A)` — among all sets of that cardinality, with no connectivity hypothesis
+anywhere. Their minimisers are "standard spheres", `|x|+|y| ≤ m` plus part of
+the next shell: our diagonal diamonds. (They also show the result is equivalent
+to Macaulay's theorem.)
+
+Altshuler et al. (DGCI 2006) restate it for ℤ² with the count made explicit —
+`n(k) = min{|N(A)| : A ⊂ ℤ² finite, |A| ≥ k}` in closed form, their Theorem 1 —
+and reprove it independently, their §3.1 Theorem 7, by a self-contained
+slanted-bounding-rectangle projection, again for every finite A. Their
+minimisers come out connected ("optimal ⟹ simple", their Theorem 2), so
 `n(k) = ε(k)`: **allowing disconnection buys nothing.**
 
 > **Theorem (all holes).** For every n-cell king animal F, the total area of the
@@ -105,13 +113,30 @@ measuring them (Kahle & Roldán, maximally many holes f(n) ≈ n/2; Baralić &
 Uppal, deep holes). The formula and both its bounds are the isoperimetric
 inequality, cited. Enumeration to n = 17 confirms the statement independently.
 
-Citations, both papers now held locally (`papers/INDEX.txt`):
+Citations, in the order a paper should give them; all held locally
+(`papers/INDEX.txt`):
 
+- D.-L. Wang & P. Wang, "Discrete isoperimetric problems," *SIAM J. Appl.
+  Math.* **32**(4) (1977) 860–870. — **the primary.** The inequality for
+  arbitrary finite subsets, which is the one the union argument uses.
 - N. Sieben, "Polyominoes with minimum site-perimeter and full set achievement
-  games," *European J. Combin.* **29**(1) (2008) 108–117.
+  games," *European J. Combin.* **29**(1) (2008) 108–117. — σ and ε in closed
+  form, for connected animals.
 - Y. Altshuler, V. Yanovsky, D. Vainsencher, I. A. Wagner & A. M. Bruckstein,
-  "On minimal perimeter polyminoes," DGCI 2006, LNCS 4245, 17–28. (Five
-  authors; earlier drafts of this note dropped Vainsencher.)
+  "On minimal perimeter polyminoes," DGCI 2006, LNCS 4245, 17–28. — the ℤ²
+  closed form without connectivity, plus an independent proof. (Five authors;
+  earlier drafts of this note dropped Vainsencher.)
+
+Context, held but not load-bearing: Bollobás & Radcliffe (EJC 11, 1990),
+Chung (Surveys in Diff. Geom. IX, 2004), Bezrukov (Bolyai Soc. Math. Stud. 3,
+1994) — all cube-centred, the grid a section rather than the subject.
+
+**The bond-perimeter twin, for the rook side.** Prellberg & Owczarek (CMP 201,
+1999) eq. (3.1) states, in passing and without proof, that the maximum area of
+a square-lattice polygon of perimeter 2n is n²/4 for n even and (n²−1)/4 for n
+odd. That is the ~1/16 the note keeps contrasting our 1/8 against, in its own
+right: edge-perimeter against site-perimeter. Folklore there rather than a
+theorem of theirs, so quote it as such or prove it in a line.
 
 Checked rather than taken on trust, `experiments/maxhole_sieben_check.py`:
 the minimum site perimeter brute-forced over all fixed polyominoes to n = 9

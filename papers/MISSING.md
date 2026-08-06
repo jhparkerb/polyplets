@@ -8,59 +8,96 @@ Format: `Author(s), "Title," Venue Vol (Year) pages. DOI/ID. — why we want it.
 
 ## High priority
 
-_(none outstanding.)_
+_(none outstanding — everything below was obtained 2026-08-06.)_
 
-_Cleared: Barequet–Moffie 2007 and Mertens 1990, obtained 2026-06-25. Sieben
-2008 and Altshuler et al. 2006, obtained 2026-08-06 — both read the same day
-and both now in `papers/`. They answered more than was asked: Sieben's Thm 4.1
-is M(n) verbatim rather than inverted, the two papers' statements do coincide
-(checked at every k ≤ 200,000 in `experiments/maxhole_sieben_check.py`), and
-Altshuler et al.'s no-connectivity hypothesis closed the multi-hole case
-outright — `results/maxhole-proof.md` §The union argument._
+**The maxhole attribution chain, closed the same day it was opened.** A
+backward pass through the reference lists of Sieben 2008 and Altshuler et al.
+2006 raised an attribution question — not a gap in the proof — and jasonp
+pulled all five candidates within the hour. Answer: **the primary is Wang &
+Wang 1977.**
 
-## Medium priority (the last unchecked ancestor of the phase-block decomposition)
+- D. L. Wang & P. Wang, "Discrete Isoperimetric Problems," SIAM J. Appl. Math.
+  **32**(4) (1977) 860–870. — **READ. It is the source.** A linear ordering of
+  ℤⁿ whose every prefix minimizes the boundary (points not in the set at
+  Euclidean distance 1 — in ℤ², exactly our N(A)) among sets of that size.
+  Arbitrary sets, no connectivity, which is the hypothesis the union argument
+  needs. Minimizers are "standard spheres", |x|+|y| ≤ m plus part of the next
+  shell: our diagonal diamonds. They also show it is equivalent to Macaulay's
+  theorem. Cite this first; Sieben and Altshuler et al. supply closed forms.
+- B. Bollobás & A. J. Radcliffe (EJC 11, 1990); F. Chung (Surveys in Diff.
+  Geom. IX, 2004); S. L. Bezrukov (Bolyai Soc. Math. Stud. 3, 1994). — held,
+  all three. Cube-centred; the grid is a section, not the subject. Wang–Wang
+  is the cleaner citation for our statement, so these are context only.
+- T. Prellberg & A. L. Owczarek, Commun. Math. Phys. **201**(3) (1999)
+  493–505. — held. Sieben's [10]. The bond-perimeter twin is their eq (3.1),
+  stated in passing without proof: max area of a polygon of perimeter 2n is
+  n²/4 (n even), (n²−1)/4 (n odd). That is the rook-side 1/16 against our
+  site-side 1/8. Quotable, but it is folklore there, not a theorem of theirs.
+
+Deliberately not chased from those two reference lists: Bousquet-Mélou &
+Rechnitzer, "The site-perimeter of bargraphs" (Adv. Appl. Math. 31, 2003);
+Delest, Gouyou-Beauchamps & Vauquelin (Graphs Combin. 3, 1987); Stratychuk &
+Soteros (J. Phys. A 29, 1996). All three are site-perimeter *enumeration* or
+solvent contacts — a different question from the extremal one. Revisit only if
+the report grows a perimeter section.
+
+_Cleared earlier: Barequet–Moffie 2007 and Mertens 1990, obtained 2026-06-25.
+Sieben 2008 and Altshuler et al. 2006, obtained 2026-08-06 — both read the same
+day, and they answered more than was asked: Sieben's Thm 4.1 is M(n) verbatim
+rather than inverted, the two papers' statements do coincide (checked at every
+k ≤ 200,000 in `experiments/maxhole_sieben_check.py`), and the no-connectivity
+hypothesis closed the multi-hole case outright — `results/maxhole-proof.md`
+§The union argument._
+
+## Searched by jasonp 2026-08-06 and NOT FOUND — library or nothing
+
+Do not re-search these from the desk; the desk has been tried.
 
 - F. Ibn-Majdoub-Hassani, "Combinatoire des polyominos et des tableaux décalés oscillants,"
   PhD thesis, Université de Paris Sud, Orsay, November 1996. — reference [6] of
   Gouyou-Beauchamps & Leroux 2004, the source of the C-convex hexagonal class, and the one
   candidate origin of the growth-phase block decomposition that `results/novelty-sortie.md`
-  N3 could not obtain. His 1997 FPSAC paper uses strata instead, so this is a long shot,
-  but it is the only untested one. **[med]**
+  N3 could not obtain either. His 1997 FPSAC paper uses strata instead, so this is a long
+  shot, and it is now the only untested one. **Not found; very small result set.** A French
+  institutional repository (theses.fr, Orsay) is the remaining route. **[med]**
+- A. R. Conway, "Enumerating 2D percolation series by the finite-lattice method: theory,"
+  J. Phys. A 28 (1995) 335–349. DOI 10.1088/0305-4470/28/2/011. — FLM theory (bounding-box
+  Möbius decomposition = the architecture our 4-direction split sits inside).
+  **Not found.** **[med]**
+- A. R. Conway & A. J. Guttmann, "On two-dimensional percolation," J. Phys. A 28 (1995)
+  891–904. DOI 10.1088/0305-4470/28/4/015. **Not found.** **[med]**
+- I. G. Enting, "Generating functions for enumerating self-avoiding rings on the square
+  lattice," J. Phys. A 13 (1980) 3713. — origin of the finite-lattice method.
+  **Not found.** **[med]**
 
-## Medium priority (the polycube defect-diagonal line — precedent for the diagonal law)
+All four are wanted for lineage and citation courtesy, not for any claim: nothing in the
+repo depends on reading them.
+
+## Cleared 2026-08-06 — the polycube defect-diagonal line, both obtained
 
 Wanted by `results/novelty-sortie.md` N5: the same "fix the defect, get polynomial ×
 exponential" statement shape as our universal diagonal law, with the defect measured in
-dimension instead of height. Paper 2 should cite both.
+dimension instead of height. Paper 2 should cite both. **Both now in `papers/`; neither
+has been read past the abstract.**
 
 - R. Barequet, G. Barequet & G. Rote, "Formulae and growth rates of high-dimensional
-  polycubes," Combinatorica 30 (2010) 257–275. DOI 10.1007/s00493-010-2448-8. — for fixed n,
-  the polycube count is a polynomial in the dimension. **[med]**
+  polycubes," Combinatorica 30 (2010) 257–275. → `barequet_barequet_rote_2010_*.pdf`
 - G. Barequet & M. Shalah, "Counting n-cell polycubes proper in n−k dimensions,"
-  European J. Combin. 63 (2017) 146–163 (SoCG 2015 version: "Automatic proofs for formulae
-  enumerating proper polycubes"). — the general-k form
-  2^(n−2k+1) n^(n−2k−1) (n−k) h_k(n), h_k polynomial. **[med]**
+  European J. Combin. 63 (2017) 146–163. → `barequet_shalah_2017_*.pdf`
 
-## Medium priority (the bounding-box / finite-lattice lineage we descend from)
-
-- A. R. Conway, "Enumerating 2D percolation series by the finite-lattice method: theory,"
-  J. Phys. A 28 (1995) 335–349. DOI 10.1088/0305-4470/28/2/011. — FLM theory (bounding-box
-  Möbius decomposition = the architecture our 4-direction split sits inside). **[med]**
-- A. R. Conway & A. J. Guttmann, "On two-dimensional percolation," J. Phys. A 28 (1995)
-  891–904. DOI 10.1088/0305-4470/28/4/015. **[med]**
-- I. G. Enting, "Generating functions for enumerating self-avoiding rings on the square
-  lattice," J. Phys. A 13 (1980) 3713. — origin of the finite-lattice method. **[med]**
-- G. Aleksandrowicz & G. Barequet, "Counting d-dimensional polycubes and nonrectangular
-  planar polyominoes," IJCGA (2006); and "Counting polycubes without the dimensionality
-  curse," Discrete Math. 309 (2009). DOI 10.1016/j.disc.2009.01.022. — canonical generalized-
-  Redelmeier; generalizes by DIMENSION not adjacency (confirm they don't touch king). **[med]**
-
-## Check for a free version FIRST (may not actually be missing)
+## Cleared — were on the "check for a free version first" list, both already held
 
 - H. Tremblay & J. Vernay, "On the generation of discrete figures with connectivity
-  constraints," RAIRO-Theor. Inf. Appl. 58 (2024) Art. 16. DOI 10.1051/ita/2024013.
-  — **the source of the current world-record a(18) for A006770.** RAIRO-ITA is usually OPEN
-  ACCESS — try rairo-ita.org directly before the library. Code: github.com/J-Vernay/discrete-figures.
+  constraints," RAIRO-Theor. Inf. Appl. 58 (2024) Art. 16. — held since 2026-06-11 as
+  `papers/tremblay_vernay.pdf`. Source of the record a(18) for A006770; code at
+  github.com/J-Vernay/discrete-figures.
+- G. Barequet, M. Moffie, A. Ribó, G. Rote, "Counting polyominoes on twisted cylinders."
+  Held since 2026-06-28 as `papers/barequet_rote_twisted_cylinders.pdf`; **the uncertain
+  venue is settled from its own title page** — INTEGERS: Electronic Journal of
+  Combinatorial Number Theory **6** (2006), #A22, four authors. `INDEX.txt` corrected.
+- G. Aleksandrowicz & G. Barequet, "Counting d-dimensional polycubes and nonrectangular
+  planar polyominoes," IJCGA (2006). — dropped rather than obtained: its stated question
+  ("confirm they don't touch king") was answered by the 2009 companion we hold.
 - G. Barequet, M. Moffie, A. Ribó, G. Rote, "Counting polyominoes on twisted cylinders,"
   (venue uncertain — INTEGERS / Electronic J.? ~2006). — the cleanest "width W alone bounds
   TM cost" realization; want exact venue + free version.

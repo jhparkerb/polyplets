@@ -84,9 +84,10 @@ k!-minimality refuted — in `results/converse-sweep.md`, 2026-07-31.)
 
 ### T3. Max enclosed hole area $M(n)=\mathrm{round}((n-2)^2/8)$ — **CLOSED, and not ours**
 **2026-08-06.** It is the grid isoperimetric inequality: Sieben 2008 Thm 4.1
-gives the single-hole half verbatim, and Altshuler et al. 2006 give the same
-minimum for an *arbitrary finite subset* of $\mathbb{Z}^2$, which applied to the
-union of all the holes gives the all-holes half in three lines
+gives the single-hole half verbatim, and the same minimum for an *arbitrary
+finite subset* of $\mathbb{Z}^2$ (Wang & Wang 1977; $\mathbb{Z}^2$ count
+explicit in Altshuler et al. 2006) applied to the union of all the holes gives
+the all-holes half in three lines
 (`results/maxhole-proof.md` §The union argument). The repo's own chain — the
 $(I')$ parity count, the $(II')$ moat-cycle winding argument, the diagonal-box
 construction — stands as an independent reproof of the single-hole half. Cite,
