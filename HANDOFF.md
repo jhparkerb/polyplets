@@ -641,6 +641,20 @@ local, NOT pushed. Newest first:
   lines, ~60% of it the geometric layer that does not exist yet — HV-convexity
   on `Finset (ℤ × ℤ)` in the `Defs.lean` idiom, Corollary 4, and Lemma 1's phase
   split as a `Finset` injection. For scale: the whole development is 21k lines.
+- **Lean route decided: `docs/lean-staircase-growth-brief.md`.** After a
+  sceptical pass over four routes, the authorized slice is Lemma 3 + Fekete
+  only, ~300 lines — the counting layer on `StairAnimals.lean`, the `4^n`
+  ceiling, and Fekete *generalized* out of `Growth.lean:648-730` into a `Fekete`
+  structure so `lambda` and `mu` are two instances. Everything else about
+  Proposition 6 stays a paper proof: it is elementary, `make
+  gate-middle-kingdom` backs it with RED controls, and the full statement is
+  2000-3000 lines for a non-central result. Skeleton to start from:
+  `polyplets/Draft/Prop6Skeleton.lean` (typechecks, all contracts stubbed).
+  Two things the pass corrected: the numeric floor `µ ≥ 3.1234…` is
+  *conditional* on the banked `M 700` in any Lean version (the
+  `lambda_gt_of_banked` shape), and Corollary 4 is a four-line elementary gap
+  argument (`results/middle-kingdom-phase3.md:86`), not the `maxhole`-style
+  theory gap first feared.
 - **Not committed, deliberately:** `paper/technical-report.tex` (jasonp's,
   read-only to Claude) and `paper/technical-report-gaps.md` remain untracked.
 
