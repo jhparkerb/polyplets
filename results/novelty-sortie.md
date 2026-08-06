@@ -201,8 +201,43 @@ defect measured in **dimension** rather than in **height**, on one lattice
 family rather than on a class of lattices. Our Theorem A quantifies over every
 row-local lattice and is proved once for all of them, which theirs is not; but
 Paper 2 should cite this line as the precedent for the shape of the statement
-rather than presenting the phenomenon as unheard-of. Neither paper is held
-locally; both are worth having (added to `papers/MISSING.md`).
+rather than presenting the phenomenon as unheard-of.
+
+**Both papers obtained and read 2026-08-06** (`papers/barequet_barequet_rote_2010_*`,
+`barequet_shalah_2017_*`, plus `asinowski_etal_2012_*` for the explicit k=3 case).
+Read from the sources, the parallel is closer than the abstracts suggested:
+
+- **Barequet–Shalah Theorem 1** is `DX(n,n−k) = [2^{n−k}/(k−1)!]·n^{n−2k−1}·(n−k)
+  ·P_{3k−4}(n)` with `P` **monic of degree exactly 3k−4** — a degree previously
+  conjectured and proved there for the first time. Compare our `deg P_k ≤ k`.
+- Their stated payoff is the same as ours: *"DX(n,n−k) can be extrapolated from
+  3k−3 known values"* — prove the degree, then fit from finitely many rows. That
+  is exactly the P_k protocol, and it is the strongest argument that our
+  fit-with-a-proved-degree-bound practice is standard rather than suspect.
+- What they do not have is our **sharp onset** (n ≥ 2k+1, failure at n=2k verified
+  on all banked data), and they work in one lattice family where Theorem A is
+  proved for every row-local lattice at once.
+- BBR 2010 Theorem 8 is the dimension-polynomial statement; their Theorem 12
+  derives the ratio limit **from Madras 1999**, the same citation we now use for
+  `a(n+1)/a(n) → λ`. The polycube line already leans on it.
+
+Three things from Asinowski et al. that Paper 2 should take on board:
+
+- **"Diagonal formulae" is their term too.** They write "so-called *diagonal
+  formulae*, that is, formulae for DX(n, n−k)". Our naming for T(n, n−k) is not
+  idiosyncratic; use the established phrase and cite the line.
+- **The shape was predicted before it was proved, in statistical physics.**
+  Peard & Gaunt (J. Phys. A 28 (1995) 6109–6124, p. 6113 eq. (2.15)) predicted
+  `DX(n,n−k) = 2^{n−2k+1} n^{n−2k−1} g_k(n)` with `g_k` polynomial; Luther &
+  Mertens supplied explicit `h_k` for k ≤ 7; Barequet–Shalah proved it in 2017.
+  A conjecture-then-proof arc for exactly our statement shape, and the earliest
+  occurrence is 1995, not 2010.
+- **They have a leading-coefficient law too, and ours rhymes with it.** Their
+  refined conjecture, from inspecting the fitted polynomials, is that `h_k`'s
+  leading coefficient is `2^{k−1}/(k−1)!`. Ours (`docs/proofs/diagonal-law.md`)
+  is `25^k/k!`. Same phenomenon — an explicit exponential-over-factorial leading
+  coefficient for the defect polynomial — on the dimension defect rather than
+  the height defect, and in both cases first *seen* in fitted data.
 
 ## N6 — collision with Haruspicy?
 

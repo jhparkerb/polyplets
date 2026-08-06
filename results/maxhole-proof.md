@@ -132,9 +132,34 @@ Citations, in the order a paper should give them; all held locally
   closed form without connectivity, plus an independent proof. (Five authors;
   earlier drafts of this note dropped Vainsencher.)
 
-Context, held but not load-bearing: Bollobás & Radcliffe (EJC 11, 1990),
-Chung (Surveys in Diff. Geom. IX, 2004), Bezrukov (Bolyai Soc. Math. Stud. 3,
-1994) — all cube-centred, the grid a section rather than the subject.
+Context, held and read 2026-08-06, none load-bearing: Bollobás & Radcliffe
+(EJC 11, 1990) is a Kruskal–Katona result for down-sets in the finite grid
+[p]^N, not our problem; Chung (Surveys in Diff. Geom. IX, 2004) is spectral
+throughout, with no ℤ² content at all; Bezrukov (Bolyai Soc. Math. Stud. 3,
+1994) is cube-centred, but his §7b is worth one line — the ℤⁿ case appears
+there as the "all circles infinite" limit of the **torus** problem, solved in
+his [40] with an initial-segment order that is Wang–Wang's diamond order
+(by Σ|xᵢ|, then orthant, then magnitudes). A second source for our statement,
+and it also records that odd finite cycle lengths destroy the linear order.
+
+**Three further things Wang–Wang gives, read in full 2026-08-06:**
+
+- **The extremal shapes, explicitly, in 2D.** §6 lists the ordering's first
+  thirteen points of ℤ²: the diagonal diamond, grown shell by shell. The
+  boundary there is defined exactly as ours — integer points outside the set at
+  unit distance — so §6 is the statement the union argument cites, not §5's
+  ℤ₊ⁿ version.
+- **Corollary 2 does not reach the king neighbourhood.** It generalises the
+  boundary operator to `Bdry_V(X)` for `V = {v : Σ|vᵢ| ≤ k}`, i.e. Manhattan
+  balls, and standard spheres stay optimal. The 8-neighbour (sup-norm) ball is
+  *not* of that form, so the 4-connected-background convention is Wang–Wang's
+  and the **8-connected-background convention is not** — for that, Altshuler et
+  al. §3.2 (`n₈ ≥ 4(√k+1)`, minimisers square) is the one to cite. Worth
+  knowing if the report ever prints the other hole convention.
+- **Corollary 1 and Corollary 5** are adjacent freebies: standard spheres also
+  maximise the number of *interior* points for their size (relevant to the
+  interior-cell bracket in `hole-fill-interior-cell-identity.md`), and Cor 5 is
+  the abstract form of the superadditivity our check verifies numerically.
 
 **The bond-perimeter twin, for the rook side.** Prellberg & Owczarek (CMP 201,
 1999) eq. (3.1) states, in passing and without proof, that the maximum area of

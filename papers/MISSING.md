@@ -44,6 +44,16 @@ Two obtained, six confirmed paywalled with their metadata pinned, one new lead.
 **Also noted:** Madras 1999, which we hold, is on arXiv as `math/9902161` — cite the
 arXiv id, and it explains the copy's poor OCR.
 
+**New want, raised by reading Asinowski et al. (2026-08-06, unsearched):**
+P. J. Peard & D. S. Gaunt, "1/d-expansions for the free energy of lattice animal models
+of a self-interacting branched polymer," J. Phys. A **28** (1995) 6109–6124 — p. 6113,
+eq. (2.15) is where the *diagonal formula* shape `DX(n,n−k) = 2^{n−2k+1} n^{n−2k−1}
+g_k(n)` was first predicted, twenty-two years before Barequet–Shalah proved it. If Paper 2
+cites the polycube line as precedent for the statement shape, this is the earliest
+occurrence and the honest first citation. Also of interest, same authors: Gaunt & Peard,
+"1/d-expansions for the free energy of weakly embedded site animal models," J. Phys. A
+**33** (2000) 7515–7539. **[med]**
+
 **New lead, not chased:** Barber & Erde, "Isoperimetry in integer lattices,"
 arXiv 1707.04411 (2017/18). Solves the **edge**-isoperimetric problem asymptotically for
 Cayley graphs on ℤ^d, optimal shapes being zonotopes. The king lattice is such a Cayley

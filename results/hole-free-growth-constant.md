@@ -51,9 +51,30 @@ on the banked hole distribution `results/holes_n18.txt` (n≤18, exact).
 >   (his Theorem 2.2 / Corollary 3.6), which is worth a sentence wherever the
 >   report fits ratios.
 >
+> The technique is standard, not clever: Whittington & Soteros's 1990 survey
+> (`papers/soteros_whittington_1990_*.pdf`, §4) states the animal pattern
+> theorem — attributing it to **Madras 1988**, so it predates the 1999 general
+> version — and then does exactly this, deriving Λ₀ < Λ, λ₀ < λ and Λ < λ₀ from
+> patterns a subclass cannot contain. They also record that such gaps can be
+> made **quantitative**: λ − λ₀ ≥ 0.00003758·λ₀ from Madras et al. (1988). If a
+> rigorous numeric gap for hole-free king animals is ever wanted, that is the
+> route.
+>
 > Madras never mentions holes; the corollary is ours to draw, the theorem is
 > his to be cited. What survives as ours here is the *quantitative* picture —
 > ρ = λ₀/λ ≈ 0.978, measured — and that stays at n ≤ 18 precision.
+>
+> **And the quantitative half is more interesting than this note credited it.**
+> Madras's own §5 poses, as an open problem, exactly the shape of the
+> measurement below. Writing bond animals of ℤ² as animals of the triangular
+> lattice avoiding the diagonal-bond pattern, he conjectures the avoiding
+> fraction decays *purely exponentially with no multiplicative power-law term*,
+> ratio = the ratio of growth constants, and says a proof "would be very strong
+> support for the universality of θ, even in the absence of a rigorous proof
+> that θ exists." Facts (1) and (2) below are that statement, measured, for a
+> different pattern-avoiding pair: hole-free polyplets inside polyplets, clean
+> geometric ρⁿ to five decimals with ρ = λ₀/λ to four. So the constant is not
+> "a constant with no future" — it is a data point on a stated open problem.
 
 ## Question
 
@@ -195,9 +216,22 @@ budget, so real wall would land between the two columns.)
 So "n≈22, cheap" is off by orders of magnitude: **n=20 alone is a multi-day dalby
 campaign and n=22 is a multi-month one.** Decision deferred to jasonp — this is a
 substantial resource commitment, not a spare-cycles run.
-- This is the polyplet analogue of the (believed) polyomino behaviour that
-  simply-connected polyominoes grow strictly slower than λ≈4.06; not claiming the
-  polyomino literature here, only measuring it directly for king animals.
+- ~~This is the polyplet analogue of the (believed) polyomino behaviour that
+  simply-connected polyominoes grow strictly slower than λ≈4.06~~ **— corrected
+  2026-08-06, twice over. The polyomino statement is neither merely believed nor
+  merely qualitative:**
+  - **it is provable** (Madras 1999's pattern theorem, see the head of this
+    note); and
+  - **the numbers are published.** Guttmann, Jensen, Wong & Enting (J. Phys. A
+    33 (2000) 1735–1764) give κ = 3.9709 for 0-punctured square polyominoes —
+    which are SAP counted by area — against τ = 4.062591(9) for all
+    polyominoes, their own refinement of 4.06265(5). Their finitely-punctured
+    classes all share κ with the exponent rising by one per puncture,
+    a_n^(k) ~ κⁿ n^{k−1}; the full count reaches τ only by summing over k
+    growing with n. That is the same picture this note measures for polyplets.
+  - Their ratio **κ/τ = 0.97743** against our measured **λ₀/λ = 0.97800** for
+    king animals. Recorded as an observation, not a claim: two lattices, two
+    single-engine estimates, no reason yet to expect them equal.
 
 ## Novelty / provenance
 
