@@ -105,6 +105,42 @@ else
   echo "  fired as expected (refused, with a reason)"
 fi
 
+# Check D: sharding ONE frame's removal DFS must change nothing.  --only has a
+# single frame, so the frame-level thread pool cannot help it; --threads there
+# instead splits by the first two removals.  That is a second code path through
+# the same dfs(), and the only thing standing between it and a silently wrong
+# count is this comparison.  Same frame, same RMAX, sharded against unsharded,
+# byte for byte -- the tally, the free-removal series and the header all.
+echo "== check D: --only sharded == --only unsharded"
+for spec in "square4 9 9 0 5" "square4 11 11 0 4" "square8 7 7 -1 4"; do
+  set -- $spec
+  lat=$1 w=$2 h=$3 par=$4 rm=$5
+  ./build/perimeter_min "$lat" 999 "$rm" --only "$w" "$h" "$par" \
+      >"$TMP/uns.txt" 2>/dev/null
+  ./build/perimeter_min "$lat" 999 "$rm" --only "$w" "$h" "$par" --threads 6 \
+      >"$TMP/shd.txt" 2>/dev/null
+  if cmp -s "$TMP/uns.txt" "$TMP/shd.txt"; then
+    echo "  ok  $lat W=$w H=$h parity=$par rmax=$rm"
+  else
+    echo "  SHARD MISMATCH $lat W=$w H=$h parity=$par rmax=$rm"
+    diff "$TMP/uns.txt" "$TMP/shd.txt" | head -5
+    fail=1
+  fi
+done
+
+# RED control for check D: it must be able to SEE a difference.  Comparing two
+# different RMAX values through the same comparison has to fail, else the check
+# is vacuous (both files empty, cmp trivially happy).
+echo "== RED control: check D must notice a real difference"
+./build/perimeter_min square4 999 5 --only 9 9 0 >"$TMP/r5.txt" 2>/dev/null
+./build/perimeter_min square4 999 4 --only 9 9 0 --threads 6 >"$TMP/r4.txt" 2>/dev/null
+if cmp -s "$TMP/r5.txt" "$TMP/r4.txt"; then
+  echo "  RED CONTROL DID NOT FIRE -- rmax=5 and rmax=4 compared equal"
+  fail=1
+else
+  echo "  fired as expected (rmax=5 != rmax=4)"
+fi
+
 # The runtime (H1) assert must not have tripped in either real run.
 if grep -q "hypothesis=H1" "$TMP"/square8.log "$TMP"/square4.log "$TMP"/tri6.log; then
   echo "  (H1) VIOLATION reported at runtime"

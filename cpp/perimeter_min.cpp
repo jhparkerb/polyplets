@@ -362,6 +362,47 @@ struct BoxRun {
   }
 
   void run() { dfs(0, 0); }
+
+  // ONE frame across many cores.  The frame loop in main() is the usual source
+  // of parallelism, but --only has a single frame, and at RMAX=7 on 145 cells
+  // that frame alone is ~2.4e11 nodes.
+  //
+  // The decomposition is by the first two removals, which partitions the search
+  // exactly: every removal set of size >= 2 has a unique lexicographically
+  // first pair (i,j), every set of size 1 a unique i, and the empty set is the
+  // root.  So the tasks are
+  //
+  //     (-1,-1)  the empty removal, records r=0
+  //     (i, -1)  records r=1 for that single removal
+  //     (i,  j)  i<j: records r=2 and the whole subtree beneath it
+  //
+  // Depth 2 rather than depth 1 on purpose: the depth-1 shards are wildly
+  // uneven (shard 0 alone is ~6% of the tree, capping speedup near 17x),
+  // while ~C(M,2) depth-2 shards bring the largest under a percent.
+  void runTask(int i, int j) {
+    if (i < 0) { record(0); return; }
+    remove(i);
+    if (j < 0) {
+      record(1);
+    } else {
+      remove(j);
+      dfs(j + 1, 2);
+      restore(j);
+    }
+    restore(i);
+  }
+
+  // The task list for runTask(), in the order above.
+  static std::vector<std::pair<int,int>> tasksFor(int M, int rmax) {
+    std::vector<std::pair<int,int>> t;
+    t.push_back({-1, -1});
+    if (rmax >= 1)
+      for (int i = 0; i < M; ++i) t.push_back({i, -1});
+    if (rmax >= 2)
+      for (int i = 0; i < M; ++i)
+        for (int j = i + 1; j < M; ++j) t.push_back({i, j});
+    return t;
+  }
 };
 
 int main(int argc, char** argv) {
@@ -474,6 +515,70 @@ int main(int argc, char** argv) {
   // into connected() with an empty nbrIdx.
   std::atomic<int> overMask{0};
 
+  std::vector<long long> freeTotal;          // sharded path's free-removal sums
+
+  // --only with --threads: shard the removal DFS itself.  The frame loop cannot
+  // help when there is one frame, and that is exactly the case (a single huge
+  // hull) where the deep RMAX values live.
+  const bool shardOneFrame = (jobs.size() == 1 && threads > 1);
+  if (shardOneFrame) {
+    const Job& job = jobs[0];
+    BoxRun probe(job.W, job.H, job.parity, job.mult,
+                 RMAX < 0 ? kMaxCells : RMAX, off, noff, hex3, job.slo, job.shi);
+    if (!probe.build()) {
+      std::fprintf(stderr, "FATAL: --only frame W=%d H=%d parity=%d is not a "
+                   "legal frame bounding box\n", job.W, job.H, job.parity);
+      return 3;
+    }
+    if (probe.tooBig) {
+      std::fprintf(stderr, "FATAL: frame W=%d H=%d parity=%d has %d cells, over "
+                   "the connectivity mask (%d). Raise kMaskWords.\n",
+                   job.W, job.H, job.parity, probe.M, kMaxCells);
+      return 3;
+    }
+    const int rmaxEff = (RMAX < 0) ? probe.M : RMAX;
+    const auto tasks = BoxRun::tasksFor(probe.M, rmaxEff);
+    std::fprintf(stderr, "event=plan job=perimeter_min shards=%zu cells=%d\n",
+                 tasks.size(), probe.M);
+
+    std::atomic<size_t> nextT{0};
+    auto shardWorker = [&](bool beats) {
+      BoxRun r(job.W, job.H, job.parity, job.mult, rmaxEff, off, noff,
+               hex3, job.slo, job.shi);
+      if (!r.build()) return;
+      r.rmax = rmaxEff;
+      for (;;) {
+        size_t t = nextT.fetch_add(1);
+        if (t >= tasks.size()) break;
+        r.runTask(tasks[t].first, tasks[t].second);
+        if (beats && (t & 0xff) == 0)
+          rep.beat((double)t, "shards=" + std::to_string(tasks.size()) +
+                              " nodes=" + std::to_string(nodes.load()));
+      }
+      std::lock_guard<std::mutex> g(mu);
+      for (auto& kv : r.res.tally) total[kv.first] += kv.second;
+      nodes += r.res.nodes; emitted += r.res.emitted;
+      violations += r.res.violations;
+      if (freeTotal.size() < r.freeByR.size())
+        freeTotal.resize(r.freeByR.size(), 0);
+      for (size_t k = 0; k < r.freeByR.size(); ++k) freeTotal[k] += r.freeByR[k];
+    };
+
+    std::vector<std::thread> shardPool;
+    for (int t = 1; t < threads; ++t) shardPool.emplace_back(shardWorker, false);
+    shardWorker(true);
+    for (auto& t : shardPool) t.join();
+
+    if (boxes_out) {
+      std::string s;
+      for (long long v : freeTotal) s += " " + std::to_string(v);
+      std::printf("# box W=%d H=%d parity=%d slo=%d shi=%d pbox=%d cells=%d "
+                  "mult=%d free:%s\n",
+                  probe.W, probe.H, probe.parity, probe.slo, probe.shi,
+                  probe.pbox, probe.M, probe.mult, s.c_str());
+    }
+  }
+
   auto worker = [&]() {
     for (;;) {
       size_t j = next.fetch_add(1);
@@ -511,10 +616,12 @@ int main(int argc, char** argv) {
     }
   };
 
-  std::vector<std::thread> pool;
-  for (int t = 1; t < threads; ++t) pool.emplace_back(worker);
-  worker();
-  for (auto& t : pool) t.join();
+  if (!shardOneFrame) {
+    std::vector<std::thread> pool;
+    for (int t = 1; t < threads; ++t) pool.emplace_back(worker);
+    worker();
+    for (auto& t : pool) t.join();
+  }
 
   if (overMask.load()) return 3;   // fail closed: output would be incomplete
 
