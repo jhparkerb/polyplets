@@ -42,9 +42,11 @@ toolchain:
 	  echo "paper/Makefile: '$(BIBTEX)' not found (needed by the L papers)."; exit 1; }
 
 # Three passes with a conditional bibtex between the first and second.  The
-# bibtex run is conditional on the .aux actually naming a bibliography, because
-# polyplets-report.tex and technical-report.tex still carry inline
-# thebibliography environments and bibtex would exit 1 on them.
+# bibtex run needs BOTH conditions in the .aux: a \bibdata line (the manuscript
+# uses refs.bib at all -- polyplets-report.tex and technical-report.tex still
+# carry inline thebibliography environments and bibtex exits 1 on them) and at
+# least one \citation (bibtex also exits 1 on "I found no \citation commands",
+# which a manuscript that has not started citing yet would trip).
 #
 # Pass 3 is not superstition: pass 2 is where \cite keys and the \label targets
 # inside the bibliography first resolve, and pass 3 is what settles page
@@ -53,7 +55,7 @@ toolchain:
 %.pdf: %.tex $(SHARED)
 	@echo "  LATEX   $<"
 	@$(LATEX) $(LATEXOPT) $* >/dev/null || { $(LATEX) $(LATEXOPT) $*; exit 1; }
-	@if grep -q '^\\bibdata' $*.aux 2>/dev/null; then \
+	@if grep -q '^\\bibdata' $*.aux 2>/dev/null && grep -q '^\\citation' $*.aux 2>/dev/null; then \
 	   echo "  BIBTEX  $*"; $(BIBTEX) $* >/dev/null || { $(BIBTEX) $*; exit 1; }; \
 	   $(LATEX) $(LATEXOPT) $* >/dev/null; \
 	 fi
