@@ -44,19 +44,41 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 |---|---|---|
 | `technical-report.tex` | **P1** — Fixed polyplets through *a*(40) | in progress, jasonp's prose, roughly 40% built |
 | `polyplets-report.tex` | — | superseded. A complete machine-written draft of P1's material, trimmed 2026-08-01. Under the split it cannot be lifted into `technical-report.tex` sentence by sentence; it is **source material and notes** |
-| `L1-diagonal-law.tex` | **L1** — A diagonal law for row-local lattices | draft |
-| `L3-lambda-bounds.tex` | **L3** — Bounds for the polyplet growth constant | draft |
-| `L4-not-dfinite.tex` | **L4** — The by-height generating function is not D-finite | draft |
+| `L1-diagonal-law.tex` | **L1** — A diagonal law for row-local lattices | draft, 15pp |
+| `L2-ternary-spine.tex` | **L2** — The mod-3 arithmetic of the height triangle | draft, 10pp — **novelty unchecked** |
+| `L3-lambda-bounds.tex` | **L3** — A certified two-sided bound for λ | draft, 14pp |
+| `L4-not-dfinite.tex` | **L4** — An arithmetic obstruction to D-finiteness | draft, 11pp |
+| `L5-convex-king-animals.tex` | **L5** — Convex king animals | draft, 18pp |
+| `L6-perimeter-gradings.tex` | **L6** — Perimeter gradings of lattice animals | draft, 11pp — **compute-gated, do not submit** |
 
-Planned and not yet drafted: **P2** (two stratifications of A006770), **P3**
-(king animals by convexity and directedness), **L2** (the mod-3 arithmetic of the
-height triangle), **L5** (convex king animals), **L6** (perimeter gradings).
-L2 and L6 each owe a novelty sweep before they are written, and L6 is
-additionally gated on compute; `docs/publication-split.md` §5 has the details.
+Every L paper carries a loud draft banner, because every one of their
+verification ledgers currently reads "human verification: none". Two carry a
+second banner as well, and those two are the ones to be careful with:
 
-The numbering is `docs/publication-split.md`'s and is not dense — L1, L3 and L4
-were drafted first because their novelty verdicts came back clean and because P2
-and P3 cite them.
+- **L2's novelty is unchecked.** The six N1–N6 sweeps never touched the spine
+  cubic, the digit product or the Smith normal form count.
+  `docs/publication-split.md` §5 wants a sweep *before* the paper is written. It
+  was drafted anyway, deliberately — the ideas are recorded and the prerequisite
+  is now named rather than vague — but nothing in it is claimed to be new.
+- **L6 is compute-gated.** Its central claim is that the perimeter grading
+  behaves identically on both lattices through defect *k* = 5, and the run
+  producing *k* = 6 was still going when it was drafted. Four live predictions
+  ride on it, one of which currently rests on a single data point.
+  `docs/publication-split.md` §5 is explicit that publishing first risks
+  publishing something *k* = 6 contradicts.
+
+Planned and not yet drafted: **P2** (two stratifications of A006770) and **P3**
+(king animals by convexity and directedness). Both are jasonp's prose and are
+not the machine's to write.
+
+The numbering is `docs/publication-split.md`'s. L1, L3 and L4 were drafted first
+because their novelty verdicts came back clean and because P2 and P3 cite them.
+
+**L5 has a standing attribution requirement.** Gouyou-Beauchamps and Leroux
+(FPSAC 2004, §2.3) have its block decomposition and its mirror equality, for
+convex polyominoes on the honeycomb lattice. `docs/publication-split.md` requires
+that citation in three places — at Lemma 1, at Proposition 9, and in the
+related-work section. A revision that drops one of them is a regression.
 
 ## Who may edit what
 
@@ -96,7 +118,7 @@ parses it and checks its printed numbers against banked results in `results/`:
 | verifier | manuscript | needs |
 |---|---|---|
 | `verify_technical_report.py` | `technical-report.tex` | `results/ns_a40/`, b-files, `results/holes_n18.txt` |
-| `verify_l_papers.py` | `L1`, `L3`, `L4` | `results/strip_mu_certificates.log`, `results/triangle.txt` |
+| `verify_l_papers.py` | `L1`, `L3`, `L4`, `L6` | `results/strip_mu_certificates.log`, `results/triangle.txt`, `results/perimmin_square8_p48_r6.txt` |
 | `verify_claims.py` | `polyplets-report.tex` | `build/g2` — so it is not in `make papers-verify`; run it explicitly |
 
 Each is red-first: it fails on a manuscript whose tables have drifted, and each
