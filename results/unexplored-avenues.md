@@ -140,12 +140,22 @@ inhomogeneous term that is a Euler-characteristic count — i.e. the same
 topological data as the hole stratification (`results/hole_gfs.txt`, A0/A1,
 the maxhole work).
 
-**The convention detail that decides whether this works at all:** in the
+~~**The convention detail that decides whether this works at all:** in the
 matching identity each cluster's boundary is measured in the *other* lattice —
 a polyomino's perimeter w.r.t. the king neighbourhood, a polyplet's w.r.t. the
-rook neighbourhood. Get this wrong and nothing will check out. Testable today
-against the n<=19 `byBox`/site-perimeter data plus published polyomino
-perimeter polynomials, before any new compute.
+rook neighbourhood. Get this wrong and nothing will check out.~~ **WRONG,
+corrected 2026-08-07 — `results/matching-pair-convention.md`.** The perimeter
+is SAME-lattice; what crosses is the CONNECTIVITY (occupied-king clusters pair
+with vacant-rook clusters). Measured over all 65535 subsets of a 4x4 box: the
+matched Euler identities hold universally, the cross-pairings fail on 12.8%.
+The repo's `--siteperim` was already in the right convention.
+
+Still testable against the n<=19 `byBox`/site-perimeter data plus published
+polyomino perimeter polynomials — but **not "before any new compute"**, which
+was the other thing this bullet got wrong. The two sides of the relation are
+graded by different quantities: the king side by size, the rook side by
+site-PERIMETER at unbounded size. That is a perimeter-graded enumeration on the
+polyomino side, and nothing here is enumerated that way.
 
 **Claimed payoffs (speculative):**
 
