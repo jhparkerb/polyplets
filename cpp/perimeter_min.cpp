@@ -51,7 +51,7 @@
 //
 // COST is sum over boxes of sum_{r<=RMAX} C(M,r) nodes, each O(1) amortised
 // (perimeter and bounding-box occupancy are maintained incrementally across the
-// removal DFS) plus a u128 flood fill for connectivity.  square8 PMAX=40
+// removal DFS) plus a bitmask flood fill for connectivity.  square8 PMAX=40
 // RMAX=6 is ~1e9 nodes; the box loop is threaded.
 
 #include <atomic>
@@ -68,7 +68,54 @@
 #include "obs.h"
 
 using u64 = std::uint64_t;
-using u128 = unsigned __int128;
+
+// Connectivity mask.  This was an unsigned __int128, which capped a frame at
+// 128 cells and so capped the square4 diamond at W=15 -- one term short of the
+// j=7 free-removal test.  Four words buys W=17 (145 cells) with room over.
+//
+// Every operation is bounded by `nw`, the number of words a given frame
+// actually uses, so a 113-cell box still touches two words and pays what it
+// used to.  The flood fill in connected() is the hot loop and the only reason
+// this is hand-rolled rather than a std::bitset.
+static constexpr int kMaskWords = 4;
+static constexpr int kMaxCells = 64 * kMaskWords;
+
+struct Mask {
+  u64 w[kMaskWords] = {0, 0, 0, 0};
+
+  void set(int i)        { w[i >> 6] |= u64(1) << (i & 63); }
+  void clear(int i)      { w[i >> 6] &= ~(u64(1) << (i & 63)); }
+  bool test(int i) const { return (w[i >> 6] >> (i & 63)) & 1; }
+
+  bool any(int nw) const {
+    for (int k = 0; k < nw; ++k) if (w[k]) return true;
+    return false;
+  }
+  bool equals(const Mask& o, int nw) const {
+    for (int k = 0; k < nw; ++k) if (w[k] != o.w[k]) return false;
+    return true;
+  }
+  void orWith(const Mask& o, int nw)  { for (int k = 0; k < nw; ++k) w[k] |= o.w[k]; }
+  void andNot(const Mask& o, int nw)  { for (int k = 0; k < nw; ++k) w[k] &= ~o.w[k]; }
+  void andWith(const Mask& o, int nw) { for (int k = 0; k < nw; ++k) w[k] &= o.w[k]; }
+
+  // index of the lowest set bit; -1 if empty
+  int lowest(int nw) const {
+    for (int k = 0; k < nw; ++k)
+      if (w[k]) return (k << 6) + __builtin_ctzll(w[k]);
+    return -1;
+  }
+  // all M low bits set
+  static Mask full(int M) {
+    Mask m;
+    for (int k = 0; k < kMaskWords; ++k) {
+      int bits = M - (k << 6);
+      if (bits <= 0) break;
+      m.w[k] = (bits >= 64) ? ~u64(0) : ((u64(1) << bits) - 1);
+    }
+    return m;
+  }
+};
 
 struct Offset { int du, dv; };
 
@@ -97,8 +144,6 @@ struct Func { int a, b; };
 static constexpr Func kFuncsRect[] = {{1,0},{0,1}};
 static constexpr Func kFuncsHex[]  = {{1,0},{0,1},{1,1}};
 
-static constexpr int kMaxCells = 128;          // u128 connectivity mask
-
 struct BoxResult {
   // (n, p) -> count, already multiplied by the transpose factor
   std::map<std::pair<int,int>, long long> tally;
@@ -125,16 +170,23 @@ struct BoxRun {
   int EW = 0, EH = 0;
   std::vector<int> cellPos;                    // cell index -> expanded pos
   std::vector<std::vector<int>> nbrPos;        // cell index -> neighbour posns
-  std::vector<u128> nbrIdx;                    // cell index -> in-box nbr mask
+  std::vector<Mask> nbrIdx;                    // cell index -> in-box nbr mask
   std::vector<int> cellU, cellV;
   int M = 0;
+  int nw = 0;                                  // mask words this frame uses
+  // A frame that spans and is within PMAX but has more than kMaxCells cells.
+  // build() still fills in pbox for it, so the caller can tell an over-mask
+  // frame that MATTERS from one that was out of perimeter range anyway.  The
+  // old code returned a bare false here, which a sweep could not distinguish
+  // from "not a legal frame" -- a silently missing animal.
+  bool tooBig = false;
 
   std::vector<int> cnt;                        // expanded pos -> animal nbrs
   std::vector<char> inAnimal;
   std::vector<int> occU, occV, occS;           // occupied cells per functional value
   int perim = 0;
   int pbox = 0;
-  u128 remaining = 0;
+  Mask remaining;
 
   BoxResult res;
   // Perimeter-PRESERVING removals, by removal count. These are the free moves
@@ -160,7 +212,7 @@ struct BoxRun {
         cellPos.push_back(pos(u, v));
         ++M;
       }
-    if (M == 0 || M > kMaxCells) return false;
+    if (M == 0) return false;
     // the filled box must actually span W x H, else this (W,H,parity) is not a
     // legal frame bounding box and every animal in it is counted elsewhere
     bool u0 = false, u1 = false, v0 = false, v1 = false, s0 = false, s1 = false;
@@ -178,16 +230,13 @@ struct BoxRun {
     std::vector<int> posToIdx(EW * EH, -1);
     for (int i = 0; i < M; ++i) posToIdx[cellPos[i]] = i;
 
-    nbrPos.resize(M); nbrIdx.assign(M, 0);
+    nbrPos.resize(M);
     for (int i = 0; i < M; ++i) {
       int u = cellU[i], v = cellV[i];
       for (int d = 0; d < noff; ++d) {
         int nu = u + off[d].du, nv = v + off[d].dv;
         if (nu < -1 || nu > W || nv < -1 || nv > H) continue;
-        int q = pos(nu, nv);
-        nbrPos[i].push_back(q);
-        int j = posToIdx[q];
-        if (j >= 0) nbrIdx[i] |= (u128)1 << j;
+        nbrPos[i].push_back(pos(nu, nv));
       }
     }
 
@@ -203,7 +252,20 @@ struct BoxRun {
     for (int q = 0; q < EW * EH; ++q)
       if (cnt[q] > 0 && !inAnimal[q]) ++perim;
     pbox = perim;
-    remaining = (M == 128) ? ~(u128)0 : (((u128)1 << M) - 1);
+
+    // Size verdict last, so pbox is filled in before it is passed judgement on.
+    // The caller compares pbox against PMAX and only then decides whether an
+    // over-mask frame is a problem or merely out of range.
+    if (M > kMaxCells) { tooBig = true; return true; }
+
+    nw = (M + 63) / 64;
+    nbrIdx.assign(M, Mask());
+    for (int i = 0; i < M; ++i)
+      for (int q : nbrPos[i]) {
+        int j = posToIdx[q];
+        if (j >= 0) nbrIdx[i].set(j);
+      }
+    remaining = Mask::full(M);
     return true;
   }
 
@@ -214,31 +276,33 @@ struct BoxRun {
   }
 
   bool connected() const {
-    if (remaining == 0) return false;
-    int first = 0;
-    while (!((remaining >> first) & 1)) ++first;
-    u128 seen = (u128)1 << first, frontier = seen;
-    while (frontier) {
-      u128 next = 0;
-      u128 f = frontier;
-      while (f) {
-        int i = 0;
-        u128 low = f & (~f + 1);
-        while (!((low >> i) & 1)) ++i;
-        next |= nbrIdx[i];
-        f ^= low;
+    int first = remaining.lowest(nw);
+    if (first < 0) return false;
+    Mask seen, frontier;
+    seen.set(first);
+    frontier.set(first);
+    while (frontier.any(nw)) {
+      Mask next;
+      for (int k = 0; k < nw; ++k) {
+        u64 f = frontier.w[k];
+        while (f) {
+          int i = (k << 6) + __builtin_ctzll(f);
+          next.orWith(nbrIdx[i], nw);
+          f &= f - 1;
+        }
       }
-      next &= remaining & ~seen;
-      seen |= next;
+      next.andWith(remaining, nw);
+      next.andNot(seen, nw);
+      seen.orWith(next, nw);
       frontier = next;
     }
-    return seen == remaining;
+    return seen.equals(remaining, nw);
   }
 
   void remove(int i) {
     int p0 = cellPos[i];
     inAnimal[p0] = 0;
-    remaining &= ~((u128)1 << i);
+    remaining.clear(i);
     --occU[cellU[i]]; --occV[cellV[i]]; --occS[cellU[i] + cellV[i]];
     if (cnt[p0] > 0) ++perim;                 // i itself becomes perimeter
     for (int q : nbrPos[i]) {
@@ -253,7 +317,7 @@ struct BoxRun {
     }
     if (cnt[p0] > 0) --perim;
     inAnimal[p0] = 1;
-    remaining |= (u128)1 << i;
+    remaining.set(i);
     ++occU[cellU[i]]; ++occV[cellV[i]]; ++occS[cellU[i] + cellV[i]];
   }
 
@@ -273,7 +337,7 @@ struct BoxRun {
         std::fprintf(stderr, "event=h1 W=%d H=%d parity=%d n=%d p=%d pbox=%d "
                      "cells=", W, H, parity, n, perim, pbox);
         for (int i = 0; i < M; ++i)
-          if ((remaining >> i) & 1)
+          if (remaining.test(i))
             std::fprintf(stderr, "(%d,%d)", cellU[i], cellV[i]);
         std::fprintf(stderr, "\n");
       }
@@ -303,8 +367,11 @@ struct BoxRun {
 int main(int argc, char** argv) {
   if (argc < 4) {
     std::fprintf(stderr,
-                 "usage: perimeter_min {square4|square8} PMAX RMAX [--threads T]\n"
-                 "  RMAX < 0 means unbounded (complete brute force per box)\n");
+                 "usage: perimeter_min {square4|square8|tri6} PMAX RMAX\n"
+                 "         [--threads T] [--boxes] [--only W H PARITY [SLO SHI]]\n"
+                 "  RMAX < 0 means unbounded (complete brute force per box)\n"
+                 "  --boxes  per-frame free-removal breakdown\n"
+                 "  --only   run ONE frame; SLO SHI give the tri6 u+v window\n");
     return 2;
   }
   std::string lat = argv[1];
@@ -375,6 +442,17 @@ int main(int argc, char** argv) {
             BoxRun probe(W, H, par, 1, 0, off, noff, hex3, slo, shi);
             if (!probe.build()) continue;
             if (probe.pbox > PMAX) continue;
+            // In range AND unrepresentable: every animal in this frame would be
+            // missing from the output with nothing to say so.  Refuse the run.
+            if (probe.tooBig) {
+              std::fprintf(stderr,
+                           "FATAL: frame W=%d H=%d parity=%d has %d cells, over "
+                           "the connectivity mask (%d). Its pbox=%d is within "
+                           "PMAX=%d, so skipping it would silently drop animals. "
+                           "Raise kMaskWords.\n",
+                           W, H, par, probe.M, kMaxCells, probe.pbox, PMAX);
+              return 3;
+            }
             anyH = anyW = true;
             jobs.push_back({W, H, par, W == H ? 1 : 2, slo, shi});
             if (!hex3) break;
@@ -391,6 +469,10 @@ int main(int argc, char** argv) {
   std::atomic<size_t> next{0};
   std::atomic<long long> nodes{0}, emitted{0};
   std::atomic<int> violations{0};
+  // --only pushes its frame without going through the plan loop's probe, so the
+  // over-mask refusal has to exist here too.  Without it a too-big frame walks
+  // into connected() with an empty nbrIdx.
+  std::atomic<int> overMask{0};
 
   auto worker = [&]() {
     for (;;) {
@@ -401,6 +483,14 @@ int main(int argc, char** argv) {
                RMAX < 0 ? kMaxCells : RMAX, off, noff,
                hex3, job.slo, job.shi);
       if (!r.build()) continue;
+      if (r.tooBig) {
+        if (overMask.fetch_add(1) == 0)
+          std::fprintf(stderr,
+                       "FATAL: frame W=%d H=%d parity=%d has %d cells, over the "
+                       "connectivity mask (%d). Raise kMaskWords.\n",
+                       r.W, r.H, r.parity, r.M, kMaxCells);
+        continue;
+      }
       if (RMAX < 0) r.rmax = r.M;
       r.run();
       std::lock_guard<std::mutex> g(mu);
@@ -425,6 +515,8 @@ int main(int argc, char** argv) {
   for (int t = 1; t < threads; ++t) pool.emplace_back(worker);
   worker();
   for (auto& t : pool) t.join();
+
+  if (overMask.load()) return 3;   // fail closed: output would be incomplete
 
   std::printf("# perimeter_min lattice=%s pmax=%d rmax=%d git=%s\n",
               lat.c_str(), PMAX, RMAX, GIT_REV);

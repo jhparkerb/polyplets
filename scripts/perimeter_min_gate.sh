@@ -74,6 +74,37 @@ else
   echo "  fired as expected (square4 != square8)"
 fi
 
+# Wide boxes.  The connectivity mask used to be a u128, so any frame with more
+# than 128 cells was dropped by build() -- and dropped SILENTLY, indistinguishably
+# from "not a legal frame bounding box", which in a full sweep is a missing
+# animal rather than an error.  W=17 is the diamond that carries the j=7
+# free-removal term (145 cells), so it is the case that mattered.
+#
+# The free-removal prefix is checked, not just the cell count: 1, 4, 18 is
+# phi_2^4, which is what a working wide mask must reproduce.  RMAX=2 keeps it
+# to C(145,2) subsets, so this costs nothing.
+echo "== wide box: square4 W=17 (145 cells) must enumerate, not be skipped"
+wide=$(./build/perimeter_min square4 999 2 --only 17 17 0 2>/dev/null | grep '^# box' || true)
+echo "  $wide"
+case "$wide" in
+  *"cells=145"*"free: 1 4 18"*) echo "  ok  145-cell frame enumerated, free prefix is phi_2^4" ;;
+  *) echo "  WIDE BOX FAILED -- got: ${wide:-<no box line at all>}"; fail=1 ;;
+esac
+
+# RED control, and the fail-closed half of the same bug: a frame that exceeds
+# the mask must be REFUSED LOUDLY.  Silently returning nothing is what the u128
+# limit used to do, and it is the failure mode this gate exists to prevent.
+echo "== RED control: a frame over the mask limit must fail closed, not silently"
+if ./build/perimeter_min square4 999 1 --only 33 33 0 >/dev/null 2>"$TMP/toobig.log"; then
+  echo "  RED CONTROL DID NOT FIRE -- an over-limit frame exited 0"
+  fail=1
+elif ! grep -q "over the connectivity mask" "$TMP/toobig.log"; then
+  echo "  RED CONTROL DID NOT FIRE -- nonzero exit but no explanatory message"
+  fail=1
+else
+  echo "  fired as expected (refused, with a reason)"
+fi
+
 # The runtime (H1) assert must not have tripped in either real run.
 if grep -q "hypothesis=H1" "$TMP"/square8.log "$TMP"/square4.log "$TMP"/tri6.log; then
   echo "  (H1) VIOLATION reported at runtime"
