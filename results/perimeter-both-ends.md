@@ -154,10 +154,55 @@ checked directly rather than inferred:
 side must exceed `i` — and both are **linear** in the deficit, against the max
 end's triangular `T_k + 3`.
 
-**Odd `p` is a different regime.** `pmin` is even on king, so odd `p` is not a
-box perimeter, and those rows do not stabilise at all: they grow, quadratically
-in `p` (`i=1, p = 1 mod 4`: `5, 12, 21, 32, 45, 60`, i.e. `m(m+4)`). The stable
-part of the min ladder is exactly the part sitting on attainable box perimeters.
+### What decides whether a column stabilises: attainability, not parity
+
+King's odd-`p` rows do not stabilise at all — they grow. It is tempting to call
+that a parity effect, and wrong: square4's odd-`p` rows stabilise perfectly well.
+The actual rule, tested on both lattices by
+`experiments/perimeter_min_attainability.py`, is
+
+    C(p, .) stabilises  <=>  p is ATTAINED as pmin(n) for some n.
+
+King's `pmin = 2*ceil(2*sqrt(n)) + 4` is always even, so **no** odd `p` is ever
+an isoperimetric perimeter, and every odd column counts animals that are one
+unit worse than any optimum — a different population, with a positional freedom
+along the boundary that grows with it. square4's `pmin = 2 + ceil(sqrt(8n-4))`
+attains every integer in range **except 5**, and correspondingly every one of
+its four columns stabilises. The hypothesis is checked class by class against
+the measured stabilisation and holds on both lattices with no exceptions.
+
+The non-attained columns are not structureless — they are quadratic in `p`:
+
+    p = 1 mod 4, i=1:  (p^2 - 10p - 39)/16
+    p = 3 mod 4, i=1:  (p^2 - 10p - 43)/8
+    p = 1 mod 4, i=2:  (3p^2 - 30p - 197)/8
+
+fitted exactly with holdouts. Higher `i` needs `p` past 40 to overdetermine.
+
+### A third lattice: tri6, and the period follows the ball
+
+The stabilisation law is not a two-lattice coincidence. `tri6` (the 6-neighbour
+triangular/hex lattice, g2's own offsets) was added to the enumerator and gated
+against `build/g2 tri6 --siteperim` the same way — 35 `(n,p)` cells, exact.
+
+It needed a genuine generalisation. The complement trick works only when the
+lattice's isoperimetric shape is a **full hull**, and a hex ball is a HEXAGON,
+which is not a parallelogram in any linear frame. So the hull family became a
+range on each of a list of linear functionals: `u, v` for the square lattices
+(a rectangle — the old behaviour exactly), and `u, v, u+v` for tri6 (a hexagon).
+
+With that, tri6's ladder stabilises too — but with **period 6, not 4**:
+
+    C(p, 0) = 1, 6, 3, 2, 3, 6   for p = 0, 1, 2, 3, 4, 5 mod 6
+
+all six classes STABLE, the `1` falling on `p = 0 mod 6` where the hull is the
+perfect hexagon and is unique. `i=1` is stable at 14 in the `0 mod 6` class and
+consistent at `27, 24, 27, 42` in the others on two points each; firming those
+needs `p = 30`, which is ~5 h single-core and was not run.
+
+So across three lattices the shape of the law is the same — eventually constant
+in `p`, onset growing with `i` — and the **period is set by the isoperimetric
+shape**: 4 for the square and diamond hulls, 6 for the hexagonal one.
 
 ### square4: stabilises, but not to the same numbers
 

@@ -77,6 +77,25 @@ static constexpr Offset kKing[] = {{-1,-1},{0,-1},{1,-1},{-1,0},
                                    {1,0},{-1,1},{0,1},{1,1}};
 // square4 in the rotated frame: the 4 rook neighbours become the 4 diagonals.
 static constexpr Offset kDiag[] = {{-1,-1},{1,-1},{-1,1},{1,1}};
+// tri6, the 6-neighbour triangular/hex lattice, in axial coordinates -- the
+// same offsets g2 uses, so its --siteperim census gates this one too.
+static constexpr Offset kTri6[] = {{0,-1},{1,-1},{-1,0},{1,0},{-1,1},{0,1}};
+
+// A HULL is a range on each of a few linear functionals of (u,v). The
+// complement trick works only when the lattice's isoperimetric shape is a FULL
+// hull, so the functionals are chosen per lattice to make that true:
+//
+//   square8  balls are L-infinity squares  -> u, v          (a rectangle)
+//   square4  balls are L-1 diamonds, which are rectangles in the rotated
+//            frame                          -> u, v          (a rectangle)
+//   tri6     balls are HEXAGONS, which are no parallelogram in any frame, so a
+//            third constraint is needed     -> u, v, u+v     (a hexagon)
+//
+// Two functionals is the old behaviour exactly; the third is inert unless the
+// lattice asks for it.
+struct Func { int a, b; };
+static constexpr Func kFuncsRect[] = {{1,0},{0,1}};
+static constexpr Func kFuncsHex[]  = {{1,0},{0,1},{1,1}};
 
 static constexpr int kMaxCells = 128;          // u128 connectivity mask
 
@@ -91,11 +110,16 @@ struct BoxRun {
   int W, H, parity, mult, rmax;
   const Offset* off;
   int noff;
+  // Range of the third functional u+v. hex3 == false leaves it inert, which is
+  // exactly the old two-functional rectangle.
+  bool hex3 = false;
+  int slo = 0, shi = 0;
 
   BoxRun(int W_, int H_, int parity_, int mult_, int rmax_,
-         const Offset* off_, int noff_)
+         const Offset* off_, int noff_,
+         bool hex3_ = false, int slo_ = 0, int shi_ = 0)
       : W(W_), H(H_), parity(parity_), mult(mult_), rmax(rmax_),
-        off(off_), noff(noff_) {}
+        off(off_), noff(noff_), hex3(hex3_), slo(slo_), shi(shi_) {}
 
   // frame geometry, expanded by one ring so neighbours are always in range
   int EW = 0, EH = 0;
@@ -107,7 +131,7 @@ struct BoxRun {
 
   std::vector<int> cnt;                        // expanded pos -> animal nbrs
   std::vector<char> inAnimal;
-  std::vector<int> occU, occV;                 // occupied cells per row/column
+  std::vector<int> occU, occV, occS;           // occupied cells per functional value
   int perim = 0;
   int pbox = 0;
   u128 remaining = 0;
@@ -131,6 +155,7 @@ struct BoxRun {
         // 0/1 select a class of the rotated square4 frame, where every cell
         // carries u+v of one fixed parity.
         if (parity >= 0 && ((u + v) & 1) != parity) continue;
+        if (hex3 && (u + v < slo || u + v > shi)) continue;
         cellU.push_back(u); cellV.push_back(v);
         cellPos.push_back(pos(u, v));
         ++M;
@@ -138,14 +163,17 @@ struct BoxRun {
     if (M == 0 || M > kMaxCells) return false;
     // the filled box must actually span W x H, else this (W,H,parity) is not a
     // legal frame bounding box and every animal in it is counted elsewhere
-    bool u0 = false, u1 = false, v0 = false, v1 = false;
+    bool u0 = false, u1 = false, v0 = false, v1 = false, s0 = false, s1 = false;
     for (int i = 0; i < M; ++i) {
       if (cellU[i] == 0) u0 = true;
       if (cellU[i] == W - 1) u1 = true;
       if (cellV[i] == 0) v0 = true;
       if (cellV[i] == H - 1) v1 = true;
+      if (cellU[i] + cellV[i] == slo) s0 = true;
+      if (cellU[i] + cellV[i] == shi) s1 = true;
     }
     if (!(u0 && u1 && v0 && v1)) return false;
+    if (hex3 && !(s0 && s1)) return false;
 
     std::vector<int> posToIdx(EW * EH, -1);
     for (int i = 0; i < M; ++i) posToIdx[cellPos[i]] = i;
@@ -165,10 +193,10 @@ struct BoxRun {
 
     cnt.assign(EW * EH, 0);
     inAnimal.assign(EW * EH, 0);
-    occU.assign(W, 0); occV.assign(H, 0);
+    occU.assign(W, 0); occV.assign(H, 0); occS.assign(W + H, 0);
     for (int i = 0; i < M; ++i) {
       inAnimal[cellPos[i]] = 1;
-      ++occU[cellU[i]]; ++occV[cellV[i]];
+      ++occU[cellU[i]]; ++occV[cellV[i]]; ++occS[cellU[i] + cellV[i]];
       for (int q : nbrPos[i]) ++cnt[q];
     }
     perim = 0;
@@ -180,7 +208,9 @@ struct BoxRun {
   }
 
   bool spans() const {
-    return occU[0] && occU[W - 1] && occV[0] && occV[H - 1];
+    if (!(occU[0] && occU[W - 1] && occV[0] && occV[H - 1])) return false;
+    if (hex3 && !(occS[slo] && occS[shi])) return false;
+    return true;
   }
 
   bool connected() const {
@@ -209,7 +239,7 @@ struct BoxRun {
     int p0 = cellPos[i];
     inAnimal[p0] = 0;
     remaining &= ~((u128)1 << i);
-    --occU[cellU[i]]; --occV[cellV[i]];
+    --occU[cellU[i]]; --occV[cellV[i]]; --occS[cellU[i] + cellV[i]];
     if (cnt[p0] > 0) ++perim;                 // i itself becomes perimeter
     for (int q : nbrPos[i]) {
       if (--cnt[q] == 0 && !inAnimal[q]) --perim;
@@ -224,7 +254,7 @@ struct BoxRun {
     if (cnt[p0] > 0) --perim;
     inAnimal[p0] = 1;
     remaining |= (u128)1 << i;
-    ++occU[cellU[i]]; ++occV[cellV[i]];
+    ++occU[cellU[i]]; ++occV[cellV[i]]; ++occS[cellU[i] + cellV[i]];
   }
 
   void record(int r) {
@@ -298,10 +328,13 @@ int main(int argc, char** argv) {
     }
   }
 
-  const Offset* off; int noff; std::vector<int> parities;
+  const Offset* off; int noff; std::vector<int> parities; bool hex3 = false;
   if (lat == "square8")      { off = kKing; noff = 8; parities = {-1}; }
   else if (lat == "square4") { off = kDiag; noff = 4; parities = {0, 1}; }
+  else if (lat == "tri6")    { off = kTri6; noff = 6; parities = {-1};
+                               hex3 = true; }
   else { std::fprintf(stderr, "unknown lattice %s\n", lat.c_str()); return 2; }
+  (void)kFuncsRect; (void)kFuncsHex;
 
   obs::Reporter rep("perimeter_min", 0,
                     "lattice=" + lat + " pmax=" + std::to_string(PMAX) +
@@ -311,22 +344,31 @@ int main(int argc, char** argv) {
   // stop at the first H that overshoots.  pbox is MEASURED off the filled box
   // (BoxRun::build), never a formula, so the box loop makes no lattice-specific
   // assumption about what the isoperimetric shape is.
-  struct Job { int W, H, parity, mult; };
+  struct Job { int W, H, parity, mult, slo, shi; };
   std::vector<Job> jobs;
   if (onlyW) {
-    jobs.push_back({onlyW, onlyH, onlyP, 1});
+    jobs.push_back({onlyW, onlyH, onlyP, 1, 0, onlyW + onlyH - 2});
     boxes_out = true;
   }
+  // Transposing (u,v) is a lattice symmetry on all three lattices and fixes the
+  // u+v window, so only W <= H is walked and W < H counted twice.
   for (int W = 1; !onlyW; ++W) {
     bool anyW = false;
     for (int H = W;; ++H) {
       bool anyH = false;
+      const int smax = W + H - 2;
       for (int par : parities) {
-        BoxRun probe(W, H, par, 1, 0, off, noff);
-        if (!probe.build()) continue;
-        if (probe.pbox > PMAX) continue;
-        anyH = anyW = true;
-        jobs.push_back({W, H, par, W == H ? 1 : 2});
+        // hex3: walk every window [slo,shi] of u+v. Without it the single
+        // full window is the plain rectangle, i.e. the old behaviour.
+        for (int slo = 0; slo <= (hex3 ? smax : 0); ++slo)
+          for (int shi = (hex3 ? slo : smax); shi <= smax; ++shi) {
+            BoxRun probe(W, H, par, 1, 0, off, noff, hex3, slo, shi);
+            if (!probe.build()) continue;
+            if (probe.pbox > PMAX) continue;
+            anyH = anyW = true;
+            jobs.push_back({W, H, par, W == H ? 1 : 2, slo, shi});
+            if (!hex3) break;
+          }
       }
       if (!anyH) break;
     }
@@ -346,7 +388,8 @@ int main(int argc, char** argv) {
       if (j >= jobs.size()) break;
       const Job& job = jobs[j];
       BoxRun r(job.W, job.H, job.parity, job.mult,
-               RMAX < 0 ? kMaxCells : RMAX, off, noff);
+               RMAX < 0 ? kMaxCells : RMAX, off, noff,
+               hex3, job.slo, job.shi);
       if (!r.build()) continue;
       if (RMAX < 0) r.rmax = r.M;
       r.run();
@@ -355,8 +398,10 @@ int main(int argc, char** argv) {
         std::string s;
         for (size_t j2 = 0; j2 < r.freeByR.size(); ++j2)
           s += " " + std::to_string(r.freeByR[j2]);
-        std::printf("# box W=%d H=%d parity=%d pbox=%d cells=%d mult=%d free:%s\n",
-                    r.W, r.H, r.parity, r.pbox, r.M, r.mult, s.c_str());
+        std::printf("# box W=%d H=%d parity=%d slo=%d shi=%d pbox=%d cells=%d "
+                    "mult=%d free:%s\n",
+                    r.W, r.H, r.parity, r.slo, r.shi, r.pbox, r.M, r.mult,
+                    s.c_str());
       }
       for (auto& kv : r.res.tally) total[kv.first] += kv.second;
       nodes += r.res.nodes; emitted += r.res.emitted;

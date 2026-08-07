@@ -55,6 +55,11 @@ def isqrt_ceil(v: int) -> int:
 PMIN = {
     "square4": lambda n: 2 + isqrt_ceil(8 * n - 4),      # A261491
     "square8": lambda n: 2 * isqrt_ceil(4 * n) + 4,      # A235382
+    # tri6 has no banked closed form, so nmax(p) is DERIVED from the census
+    # instead: the maximum-area animal at perimeter p sits at deficit i = 0,
+    # which is inside the enumerator's complete domain for every p <= PMAX, so
+    # the largest n present at that p IS nmax(p) and not merely a lower bound.
+    "derive": None,
 }
 
 
@@ -81,6 +86,10 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("census")
     ap.add_argument("--lattice", required=True, choices=sorted(PMIN))
+    ap.add_argument("--period", type=int, default=4,
+                    help="residue period of p to group by. The period is set by "
+                         "the lattice's isoperimetric shape -- 4 for the square "
+                         "and diamond hulls, 6 for the hexagonal one.")
     args = ap.parse_args()
 
     pmax_hdr = rmax_hdr = None
@@ -105,18 +114,25 @@ def main() -> int:
           % (args.census, pmax_hdr, imax))
 
     pmin = PMIN[args.lattice]
-    # nmax(p) = max{n : pmin(n) <= p}
-    nmax_of = {}
-    n = 1
-    while pmin(n) <= pmax_hdr:
-        nmax_of[pmin(n)] = n
-        n += 1
-    best, running = 0, {}
-    for p in range(min(nmax_of), pmax_hdr + 1):
-        if p in nmax_of:
-            best = nmax_of[p]
-        if best:
-            running[p] = best
+    if pmin is None:
+        running = {}
+        for (n, p) in tab:
+            if p <= pmax_hdr and tab[(n, p)] > 0:
+                running[p] = max(running.get(p, 0), n)
+        running = {p: v for p, v in sorted(running.items())}
+    else:
+        # nmax(p) = max{n : pmin(n) <= p}
+        nmax_of = {}
+        n = 1
+        while pmin(n) <= pmax_hdr:
+            nmax_of[pmin(n)] = n
+            n += 1
+        best, running = 0, {}
+        for p in range(min(nmax_of), pmax_hdr + 1):
+            if p in nmax_of:
+                best = nmax_of[p]
+            if best:
+                running[p] = best
 
     q4 = partitions_4colour(imax + 2)
     print("4-coloured partition numbers q4(0..%d) = %s"
@@ -136,12 +152,13 @@ def main() -> int:
         print(row)
     print()
 
-    print("Stability: the last few p in each residue class mod 4")
-    for cls in range(4):
-        ps = [p for p in sorted(running) if p % 4 == cls]
+    per = args.period
+    print("Stability: the last few p in each residue class mod %d" % per)
+    for cls in range(per):
+        ps = [p for p in sorted(running) if p % per == cls]
         if not ps:
             continue
-        print("  p = %d mod 4:" % cls)
+        print("  p = %d mod %d:" % (cls, per))
         for i in range(imax + 1):
             live = [p for p in ps if running[p] - i >= 1]
             seq = [tab.get((running[p] - i, p), 0) for p in live]

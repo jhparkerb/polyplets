@@ -59,6 +59,9 @@ check square8 18 results/siteperim_square8_n14.txt || fail=1
 echo "== square4 (rook, rotated frame) vs results/siteperim_square4_n20.txt"
 check square4 14 results/siteperim_square4_n20.txt || fail=1
 
+echo "== tri6 (hex, 3-functional hexagonal hull) vs results/siteperim_tri6_n12.txt"
+check tri6 16 results/siteperim_tri6_n12.txt || fail=1
+
 # RED control: the rotated square4 frame is a genuinely different lattice from
 # square8, not a relabelling.  Comparing square4's enumeration against the KING
 # census must FAIL -- if it passes, the two modes are computing the same thing
@@ -72,7 +75,7 @@ else
 fi
 
 # The runtime (H1) assert must not have tripped in either real run.
-if grep -q "hypothesis=H1" "$TMP"/square8.log "$TMP"/square4.log; then
+if grep -q "hypothesis=H1" "$TMP"/square8.log "$TMP"/square4.log "$TMP"/tri6.log; then
   echo "  (H1) VIOLATION reported at runtime"
   fail=1
 fi
