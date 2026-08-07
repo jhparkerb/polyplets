@@ -37,6 +37,7 @@ ORACLE_MAXN = 8   # brute force generates every animal, so this is the cheap wal
 MAXN = 11         # Python reference depth and the C++ cross-check depth
 
 FAST_BIN = os.path.join(ROOT, "build", "symcount_fast")
+TM_BIN = os.path.join(ROOT, "build", "symtm")
 
 
 def cpp_counts(name, maxn):
@@ -180,6 +181,59 @@ def main():
         gate.check(bool(broken),
                    "control: D2diag graded by height breaks the parity"
                    + (f" (e.g. n,H={sorted(broken)[0]})" if broken
+                      else " -- IT DID NOT"))
+
+    # 6. The per-cell mod-4 refinement, if symtm is built.  The three order-2
+    #    subgroups of D2ax are <h>, <v> and C2 = <r180>, so
+    #        T(n,H) = I_H(<h>) + I_H(<v>) + I_H(C2) - 2 I_H(D2ax)  (mod 4)
+    #    I_H(<v>) comes from the SAME hmirror table grouped by W instead of H:
+    #    transposing an h-symmetric W x H animal gives a v-symmetric H x W one.
+    if os.path.exists(FAST_BIN) and os.path.exists(TM_BIN):
+        hm = {}
+        out = subprocess.run([TM_BIN, "hmirror", str(MAXN), "2", "--byheight"],
+                             capture_output=True, text=True, check=True).stdout
+        for line in out.strip().splitlines():
+            n, h, w, v = (int(x) for x in line.split())
+            hm[(n, h, w)] = v
+        c2 = {}
+        out = subprocess.run([TM_BIN, "r180", str(MAXN), "2", "--byheight"],
+                             capture_output=True, text=True, check=True).stdout
+        for line in out.strip().splitlines():
+            n, h, v = (int(x) for x in line.split())
+            c2[(n, h)] = v
+        ih, iv = {}, {}
+        for (n, h, w), v in hm.items():
+            ih[(n, h)] = ih.get((n, h), 0) + v
+            iv[(n, w)] = iv.get((n, w), 0) + v
+
+        # Both --byheight tables must reproduce the per-element counts the
+        # existing (unrefined) types already compute.
+        for label, tab, ref in (("hmirror", ih, "axis mirror"),
+                                ("r180", c2, "180-degree rotation")):
+            flat = {}
+            for (n, _h), v in tab.items():
+                flat[n] = flat.get(n, 0) + v
+            gate.check(flat == {n: v for n, v in elem[ref].items() if v},
+                       f"symtm {label:7s} --byheight sums to Fix(g), n<={MAXN}")
+
+        def rhs4(n, h, k):
+            return (ih.get((n, h), 0) + iv.get((n, h), 0) + c2.get((n, h), 0)
+                    - k * byh.get((n, h), 0))
+        cells = [(n, h) for (n, h) in tri if n <= ORACLE_MAXN]
+        bad = [c for c in cells if (tri[c] - rhs4(c[0], c[1], 2)) % 4]
+        gate.check(not bad,
+                   f"T(n,H) = I_H(<h>)+I_H(<v>)+I_H(C2)-2I_H(D2ax) (mod 4)"
+                   f" vs brute oracle, n<={ORACLE_MAXN}"
+                   + (f"  MISMATCH at {sorted(bad)}" if bad else ""))
+        # Control: I_H(<v>) is not I_H(<h>). Reusing the height grouping for
+        # both — the mistake the transpose exists to avoid — must break it.
+        swapped = [c for c in cells
+                   if (tri[c] - (2 * ih.get(c, 0) + c2.get(c, 0)
+                                 - 2 * byh.get(c, 0))) % 4]
+        gate.check(bool(swapped),
+                   "control: using I_H(<h>) twice instead of the transpose"
+                   " breaks it"
+                   + (f" (e.g. n,H={sorted(swapped)[0]})" if swapped
                       else " -- IT DID NOT"))
 
     return gate.verdict("subgroup/mod-4")

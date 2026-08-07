@@ -241,7 +241,7 @@ gate-sym: build/symcount_fast
 	python3 tests/gate_sym.py
 
 # Gate subgroup: per-SUBGROUP invariant counts + the a(n) mod 4 congruence
-gate-subgroup: build/symcount_fast
+gate-subgroup: build/symcount_fast build/symtm
 	python3 tests/gate_subgroup.py
 
 # Gate E0: weighted connected-subgraph counter vs brute force

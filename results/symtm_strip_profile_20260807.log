@@ -1,0 +1,31 @@
+hmirror 5 0
+hmirror 10 0
+hmirror 15 3
+hmirror 19 51
+hmirror 20 33
+scripts/symtm_strip_profile.sh: line 36: 51292 Killed: 9                  timeout "$CAP" "$BIN" "$mode" "$N" "$THREADS" --strips "$H" "$H" > /dev/null 2>&1
+hmirror 25 >120
+scripts/symtm_strip_profile.sh: line 36: 51306 Killed: 9                  timeout "$CAP" "$BIN" "$mode" "$N" "$THREADS" --strips "$H" "$H" > /dev/null 2>&1
+hmirror 30 >120
+scripts/symtm_strip_profile.sh: line 36: 51316 Killed: 9                  timeout "$CAP" "$BIN" "$mode" "$N" "$THREADS" --strips "$H" "$H" > /dev/null 2>&1
+hmirror 34 >120
+scripts/symtm_strip_profile.sh: line 36: 51331 Killed: 9                  timeout "$CAP" "$BIN" "$mode" "$N" "$THREADS" --strips "$H" "$H" > /dev/null 2>&1
+hmirror 38 >120
+scripts/symtm_strip_profile.sh: line 36: 51348 Killed: 9                  timeout "$CAP" "$BIN" "$mode" "$N" "$THREADS" --strips "$H" "$H" > /dev/null 2>&1
+hmirror 40 >120
+r180 5 0
+r180 10 15
+scripts/symtm_strip_profile.sh: line 36: 51381 Killed: 9                  timeout "$CAP" "$BIN" "$mode" "$N" "$THREADS" --strips "$H" "$H" > /dev/null 2>&1
+r180 15 >120
+scripts/symtm_strip_profile.sh: line 36: 51405 Killed: 9                  timeout "$CAP" "$BIN" "$mode" "$N" "$THREADS" --strips "$H" "$H" > /dev/null 2>&1
+r180 19 >120
+scripts/symtm_strip_profile.sh: line 36: 51430 Killed: 9                  timeout "$CAP" "$BIN" "$mode" "$N" "$THREADS" --strips "$H" "$H" > /dev/null 2>&1
+r180 20 >120
+scripts/symtm_strip_profile.sh: line 36: 51446 Killed: 9                  timeout "$CAP" "$BIN" "$mode" "$N" "$THREADS" --strips "$H" "$H" > /dev/null 2>&1
+r180 25 >120
+scripts/symtm_strip_profile.sh: line 36: 51462 Killed: 9                  timeout "$CAP" "$BIN" "$mode" "$N" "$THREADS" --strips "$H" "$H" > /dev/null 2>&1
+r180 30 >120
+r180 34 7
+r180 38 0
+r180 40 0
+wrote results/symtm_strip_profile_n40.txt

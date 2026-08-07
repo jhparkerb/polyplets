@@ -1,0 +1,23 @@
+# symtm per-strip wall seconds at N=40, 8 threads, cap 120s
+# git=cd96795 host=gympie date=2026-08-07T15:16:02-04:00
+# mode H seconds
+hmirror 5 0
+hmirror 10 0
+hmirror 15 3
+hmirror 19 51
+hmirror 20 33
+hmirror 25 >120
+hmirror 30 >120
+hmirror 34 >120
+hmirror 38 >120
+hmirror 40 >120
+r180 5 0
+r180 10 15
+r180 15 >120
+r180 19 >120
+r180 20 >120
+r180 25 >120
+r180 30 >120
+r180 34 7
+r180 38 0
+r180 40 0

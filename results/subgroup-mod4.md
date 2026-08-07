@@ -138,14 +138,69 @@ That bullet is struck in the source file with this reason.
 - `scripts/subgroup_mod4.sh`, `experiments/subgroup_mod4.py`,
   `tests/gate_subgroup.py` (13 checks, 5 of them controls)
 
-## Next
+## What one bit means, stated properly
 
-Per-cell **mod 4** instead of per-cell parity:
-`T(n,H) = I_H(<h>) + I_H(<v>) + I_H(C2) - 2 I_H(D2ax) (mod 4)`. Those three
-inputs are lambda^(n/2) families, out of reach for explicit enumeration, but
-`symtm` is a transfer matrix whose cost is states x columns. Its hmirror mode
-already sweeps one exact-height strip at a time, and recording the width at
-harvest yields `I_H(<v>)` from the same run by transposition. Its r180 mode
-needs more care: the transpose restriction harvests strip H only for W >= H
-with weight 2 when W > H, so the strip label is NOT the height. Covering
-H <= 19 at n=40 needs only strips H <= 19, the cheap end of that engine.
+Per cell it is literally one bit: an engine error of size `delta` in `T(n,H)`
+is caught iff `delta` is odd. For a single corrupted cell that is 50%.
+
+But single-cell errors are not this project's failure mode. The Zero Harvest
+incident in `ns_a40/PROVENANCE.md` zeroed an entire `h20.out` row -- 20 cells
+at once. A dropped shard, an off-by-one in a column loop, a resume seeded from
+the wrong table, an overflow: every one of them corrupts many cells together,
+and 820 independent bits catch a k-cell corruption with probability
+`1 - 2^-k`. For that h20 row, `1 - 2^-20`.
+
+So: **worst case one bit, against an adversary corrupting exactly one cell and
+choosing a delta that preserves its parity; against every failure mode that
+has actually occurred here, effectively certain.**
+
+## Per-cell mod 4: why it is NOT being bought at n=40
+
+The refinement `T(n,H) = I_H(<h>) + I_H(<v>) + I_H(C2) - 2 I_H(D2ax) (mod 4)`
+is real -- verified cell by cell against the production triangle -- and the
+`--byheight` modes for `symtm` hmirror and r180 are built and regression-clean
+(`results/percell-mod4.md`). It is not being pushed to n=40, for three
+measured reasons.
+
+**1. `I_H(<v>)` has no bounded-height route.** Transposing sends a v-symmetric
+animal of height H to an h-symmetric one of WIDTH H whose own height is
+unbounded, so it needs every strip up to n. A `--maxwidth` brake was added and
+is not enough: width 8 across all 40 strips still ran past 2 minutes. The
+bounded-height route is a NEW vmirror sweep mode -- sweep the left half of a
+height-H strip and glue at the middle, the right half being the left
+column-reversed -- which is a `sweepR180`-sized piece of glue logic, not a
+patch.
+
+**2. r180's cost peaks exactly on the band that needs it.**
+`results/symtm_strip_profile_n40.txt`, N=40, 8 threads, 120s cap per strip:
+
+```
+hmirror   H=5:0   H=10:0    H=15:3     H=19:51    H=20:33   H=25..40: >120
+r180      H=5:0   H=10:15   H=15:>120  H=19:>120  H=20..30: >120
+          H=34:7  H=38:0    H=40:0
+```
+
+r180's expensive strips are the MIDDLE ones. The transpose restriction forces
+W >= H, so as H approaches n every column is pinned to a single cell and the
+strip collapses -- which is why H=34..40 are seconds while H=15..19 are past
+the cap. "Cover H<=19 using only the cheap short strips" does not survive
+contact with this curve: H=15..19 IS the peak.
+
+**3. The bit it buys is the one least worth having.** Two bits per cell moves
+the single-cell adversarial case from 1/2 to 3/4 and adds essentially nothing
+against systematic corruption, which 820 bits already catch with probability
+indistinguishable from 1. And it would be bought with a fresh transfer-matrix
+mode whose own correctness then becomes the thing being trusted --
+`symcount_fast` has been gated against the brute oracle since June and
+reproduces the sym34 farm's r90 identically on all 33 rows; a new vmirror
+sweep would have none of that history. A checker with a bug that happens to
+agree is worse than no checker.
+
+## Why this band will never get better than bits
+
+The strip engine is the only thing that could second-source H15-19 with real
+VALUES rather than bits, and it cannot reach them. Its wall grows ~6x per
+height: H=14 took 8.6h on dalby (`results/strip-engine.md`), putting H=15 at
+~52h and H=19 at ~7.6 years, and its state packing caps out anyway ("State
+packed 4 bits/row -> H<=15 cap"). The parity bit in this file is, realistically,
+the only independent evidence 43.84% of a(40) will ever carry.

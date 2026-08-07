@@ -217,14 +217,26 @@ static void forEachPalinMask(const Sig& old, int H, int budget, F&& fn) {
 struct StripStats {
   u64 stateSum = 0, steps = 0, dead = 0, kept = 0;
 };
-static StripStats sweepHmirror(int H, int maxn, std::vector<u64>& total) {
+// byWH (optional, --byheight): [n*(maxn+1) + W] for THIS strip's height H.
+// palinRec rejects the all-zero mask (`if (i == cx.half) { if (!mask) return;
+// }`), so no column is ever empty and the loop index col IS the width of an
+// animal harvested at that boundary.
+//
+// wcap: stop the column loop there. Harvesting only widths <= wcap is what
+// makes I_H(<v>) reachable: a v-symmetric animal of height H transposes to an
+// h-symmetric one of WIDTH H, whose own height is unbounded -- so that input
+// needs EVERY strip, and the only usable brake is the width.
+static StripStats sweepHmirror(int H, int maxn, std::vector<u64>& total,
+                               std::vector<u64>* byWH = nullptr,
+                               int wcap = -1) {
   StripStats st;
   DB db, next;
   Sig seed;
   std::memset(seed.b, 0, SIGMAX);
   db[seed] = std::vector<u64>(maxn + 1, 0);
   db[seed][0] = 1;
-  for (int col = 0; col <= maxn && !db.empty(); ++col) {
+  const int colMax = wcap > 0 && wcap < maxn ? wcap : maxn;
+  for (int col = 0; col <= colMax && !db.empty(); ++col) {
     st.stateSum += db.size();
     next.clear();
     for (auto& [sig, counts] : db) {
@@ -233,7 +245,10 @@ static StripStats sweepHmirror(int H, int maxn, std::vector<u64>& total) {
         if (counts[n]) { ms = n; break; }
       if (ms < 0) continue;
       if (closable(sig, H))
-        for (int n = 1; n <= maxn; ++n) total[n] += counts[n];
+        for (int n = 1; n <= maxn; ++n) {
+          total[n] += counts[n];
+          if (byWH && counts[n]) (*byWH)[n * (maxn + 1) + col] += counts[n];
+        }
       auto emit = [&](u64 mask, int cells) {
         ++st.steps;
         Sig out;
@@ -500,7 +515,16 @@ static void forEachR180Mask(const Sig& s, int H, int budget, int ms2, int maxn,
   r180Rec(cx, 0, 0ull, 0, covBase, 0u, fn);
 }
 
-static StripStats sweepR180(int H, int maxn, std::vector<u64>& total) {
+// byH (optional, --byheight): [n*(maxn+1) + height], graded by the animal's
+// TRUE height. That is not the strip label: the transpose restriction below
+// harvests strip H only for widths W >= H and gives weight 2 when W > H, the
+// pair being the W x H animal and its distinct H x W transpose. So a weight-2
+// close contributes one animal of height H and one of height W, and a
+// weight-1 close (W == H) contributes one of height H. Splitting the weight
+// that way recovers the true height at no extra sweep cost -- whereas reading
+// the strip label as the height would be simply wrong.
+static StripStats sweepR180(int H, int maxn, std::vector<u64>& total,
+                            std::vector<u64>* byH = nullptr) {
   StripStats st;
   const int hb = maxn / 2;  // left-cell budget
   const int half = (H + 1) / 2;
@@ -519,19 +543,34 @@ static StripStats sweepR180(int H, int maxn, std::vector<u64>& total) {
       for (int n = 0; n <= hb; ++n)
         if (counts[n]) { ms = n; break; }
       if (ms < 0) continue;
+      // Credit one animal at height H, and (when the close is the weight-2
+      // kind) one more at height W for the transpose. See the byH note above.
+      auto credit = [&](int n, int W, u64 c) {
+        if (!byH) return;
+        (*byH)[n * (maxn + 1) + H] += c;
+        if (W > H && W <= maxn) (*byH)[n * (maxn + 1) + W] += c;
+      };
       if (2 * col >= H && glueEven(sig, H)) {
-        const u64 w = 2 * col > H ? 2 : 1;
+        const int W = 2 * col;
+        const u64 w = W > H ? 2 : 1;
         for (int nl = ms; nl <= hb; ++nl)
-          if (counts[nl]) total[2 * nl] += w * counts[nl];
+          if (counts[nl]) {
+            total[2 * nl] += w * counts[nl];
+            credit(2 * nl, W, counts[nl]);
+          }
       }
       if (2 * col + 1 >= H) {
-        const u64 w = 2 * col + 1 > H ? 2 : 1;
+        const int W = 2 * col + 1;
+        const u64 w = W > H ? 2 : 1;
         forEachMiddleMask(sig, H, maxn - 2 * ms, pairsAll & ~val.cov,
                           [&](u64 m, int mc) {
                             if (!glueOdd(sig, H, m)) return;
                             for (int nl = ms; nl <= hb && 2 * nl + mc <= maxn;
                                  ++nl)
-                              if (counts[nl]) total[2 * nl + mc] += w * counts[nl];
+                              if (counts[nl]) {
+                                total[2 * nl + mc] += w * counts[nl];
+                                credit(2 * nl + mc, W, counts[nl]);
+                              }
                           });
       }
       auto emit = [&](u64 mask, int cells) {
@@ -1031,29 +1070,60 @@ static StripStats sweepDmirror(int S, int maxn, int T, std::vector<u64>& total,
 }
 
 int main(int argc, char** argv) {
-  const std::string type = argc >= 2 ? argv[1] : "";
+  // Optional flags may appear anywhere; strip them, then read positionals so
+  // the existing dmirror "MAXN THREADS SMIN SMAX" interface is untouched.
+  std::vector<std::string> pos;
+  bool byHeight = false;
+  int hmin = -1, hmax = -1, wcap = -1;
+  for (int i = 1; i < argc; ++i) {
+    const std::string a = argv[i];
+    if (a == "--byheight") {
+      byHeight = true;
+    } else if (a == "--strips" && i + 2 < argc) {
+      hmin = std::atoi(argv[i + 1]);
+      hmax = std::atoi(argv[i + 2]);
+      i += 2;
+    } else if (a == "--maxwidth" && i + 1 < argc) {
+      wcap = std::atoi(argv[i + 1]);
+      ++i;
+    } else {
+      pos.push_back(a);
+    }
+  }
+  const int pc = static_cast<int>(pos.size());
+  const std::string type = pc >= 1 ? pos[0] : "";
   const bool isDm = type == "dmirror";
-  if (argc < 3 || argc > (isDm ? 6 : 4) ||
+  if (pc < 2 || pc > (isDm ? 5 : 3) ||
       (type != "hmirror" && type != "r180" && !isDm)) {
     std::fprintf(stderr,
-                 "usage: %s {hmirror|r180} MAXN [THREADS]\n"
+                 "usage: %s {hmirror|r180} MAXN [THREADS] "
+                 "[--strips HMIN HMAX] [--byheight]\n"
                  "       %s dmirror MAXN [THREADS [SMIN SMAX]]\n",
                  argv[0], argv[0]);
     return 2;
   }
-  const int maxn = std::atoi(argv[2]);
-  if (maxn < 1 || maxn > 34) {  // dmirror layout caps the bbox at 34
-    std::fprintf(stderr, "MAXN out of range (1..34)\n");
+  const int maxn = std::atoi(pos[1].c_str());
+  // dmirror's unfolded-hook layout caps the bbox at 34 (POLY_SIGMAX=70 fits
+  // 34 + 33 label bytes + flag); hmirror/r180 signatures are H + 2 bytes, so
+  // they are limited only by the u64 masks and run to 40 for the subgroup
+  // congruences (results/subgroup-mod4.md).
+  if (maxn < 1 || maxn > (isDm ? 34 : 40)) {
+    std::fprintf(stderr, "MAXN out of range (1..%d for %s)\n",
+                 isDm ? 34 : 40, type.c_str());
     return 2;
   }
-  int nthreads = argc >= 4 ? std::atoi(argv[3]) : 1;
+  if (byHeight && isDm) {
+    std::fprintf(stderr, "--byheight is hmirror/r180 only\n");
+    return 2;
+  }
+  int nthreads = pc >= 3 ? std::atoi(pos[2].c_str()) : 1;
   if (nthreads < 1) nthreads = 1;
   // dmirror strip range: farm exact-bbox strips across machines; the
   // partial totals of disjoint ranges sum to the full count.
   int smin = 1, smax = maxn;
-  if (isDm && argc == 6) {
-    smin = std::atoi(argv[4]);
-    smax = std::atoi(argv[5]);
+  if (isDm && pc == 5) {
+    smin = std::atoi(pos[3].c_str());
+    smax = std::atoi(pos[4].c_str());
     if (smin < 1 || smax > maxn || smin > smax) {
       std::fprintf(stderr, "bad strip range %d..%d (need 1<=SMIN<=SMAX<=MAXN)\n",
                    smin, smax);
@@ -1063,11 +1133,15 @@ int main(int argc, char** argv) {
 
   obs::Reporter rep(
       "symtm-" + type + "-N" + std::to_string(maxn),
-      static_cast<double>(isDm ? smax - smin + 1 : maxn),
+      static_cast<double>(isDm ? smax - smin + 1
+                               : (hmax > 0 ? hmax : maxn) -
+                                     (hmin > 0 ? hmin : 1) + 1),
       "type=" + type + " threads=" + std::to_string(nthreads) +
           (isDm ? " strips=" + std::to_string(smin) + ".." +
                       std::to_string(smax)
-                : ""));
+                : " strips=" + std::to_string(hmin > 0 ? hmin : 1) + ".." +
+                      std::to_string(hmax > 0 ? hmax : maxn)) +
+          (byHeight ? " byheight=1" : ""));
 
   if (isDm) {
     // Strips run SEQUENTIALLY, tallest (most expensive) first, each using
@@ -1096,37 +1170,73 @@ int main(int argc, char** argv) {
   // over roots: threads pull strip indices off an atomic counter, tallest
   // (most expensive) strips first so the stragglers start earliest, and
   // reduce thread-local totals under a mutex.
-  auto* sweep = type == "hmirror" ? sweepHmirror : sweepR180;
+  const bool isHm = type == "hmirror";
+  const int lo = hmin > 0 ? hmin : 1, hi = hmax > 0 ? hmax : maxn;
+  const int nstrips = hi - lo + 1;
   std::vector<u64> total(maxn + 1, 0);
+  // --byheight tables. hmirror's per-strip result is indexed by WIDTH, so it
+  // lands at this strip's H in a 3-D (n,H,W) table; r180's is already graded
+  // by true height and merges additively.
+  const size_t D = static_cast<size_t>(maxn) + 1;
+  std::vector<u64> hw(byHeight && isHm ? D * D * D : 0, 0);
+  std::vector<u64> rh(byHeight && !isHm ? D * D : 0, 0);
   std::atomic<int> nextIdx{0};
   std::atomic<int> beats{0};
   std::mutex mu;
   auto body = [&]() {
     std::vector<u64> local(maxn + 1, 0);
+    std::vector<u64> lhw(byHeight && isHm ? D * D : 0, 0);
+    std::vector<u64> lrh(byHeight && !isHm ? D * D : 0, 0);
     int idx;
-    while ((idx = nextIdx.fetch_add(1)) < maxn) {
-      const int H = maxn - idx;  // descending: big strips first
-      const StripStats st = sweep(H, maxn, local);
+    while ((idx = nextIdx.fetch_add(1)) < nstrips) {
+      const int H = hi - idx;  // descending: big strips first
+      if (byHeight && isHm) std::fill(lhw.begin(), lhw.end(), 0);
+      const StripStats st =
+          isHm ? sweepHmirror(H, maxn, local, byHeight ? &lhw : nullptr, wcap)
+               : sweepR180(H, maxn, local, byHeight ? &lrh : nullptr);
       std::lock_guard<std::mutex> lk(mu);
+      if (byHeight && isHm)
+        for (size_t n = 0; n < D; ++n)
+          for (size_t w = 0; w < D; ++w)
+            hw[(n * D + static_cast<size_t>(H)) * D + w] += lhw[n * D + w];
       rep.beat(beats.fetch_add(1) + 1,
                "H=" + std::to_string(H) +
                    " states=" + std::to_string(st.stateSum) +
                    " steps=" + std::to_string(st.steps) +
                    " dead=" + std::to_string(st.dead) +
                    " kept=" + std::to_string(st.kept),
-               /*force=*/true);  // <=34 lines; per-strip stats are the point
+               /*force=*/true);  // <=40 lines; per-strip stats are the point
     }
     std::lock_guard<std::mutex> lk(mu);
     for (int n = 0; n <= maxn; ++n) total[n] += local[n];
+    for (size_t i = 0; i < rh.size(); ++i) rh[i] += lrh[i];
   };
   std::vector<std::thread> pool;
   pool.reserve(nthreads);
   for (int t = 0; t < nthreads; ++t) pool.emplace_back(body);
   for (auto& th : pool) th.join();
 
-  for (int n = 1; n <= maxn; ++n)
-    if (total[n])
-      std::printf("%d %llu\n", n, static_cast<unsigned long long>(total[n]));
+  if (byHeight && isHm) {
+    // "n H W count": summing over W gives I_H(<h>); grouping by W instead
+    // gives I_W(<v>), since transposing an h-symmetric W x H animal yields a
+    // v-symmetric H x W one.
+    for (size_t n = 1; n < D; ++n)
+      for (size_t h = 1; h < D; ++h)
+        for (size_t w = 1; w < D; ++w)
+          if (hw[(n * D + h) * D + w])
+            std::printf("%zu %zu %zu %llu\n", n, h, w,
+                        static_cast<unsigned long long>(hw[(n * D + h) * D + w]));
+  } else if (byHeight) {
+    for (size_t n = 1; n < D; ++n)
+      for (size_t h = 1; h < D; ++h)
+        if (rh[n * D + h])
+          std::printf("%zu %zu %llu\n", n, h,
+                      static_cast<unsigned long long>(rh[n * D + h]));
+  } else {
+    for (int n = 1; n <= maxn; ++n)
+      if (total[n])
+        std::printf("%d %llu\n", n, static_cast<unsigned long long>(total[n]));
+  }
   rep.done("result=ok");
   return 0;
 }
