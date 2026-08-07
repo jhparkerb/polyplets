@@ -3,8 +3,8 @@
 
     python3 paper/verify_l_papers.py          # run from anywhere
 
-Covers paper/L1-diagonal-law.tex, paper/L3-lambda-bounds.tex and
-paper/L4-not-dfinite.tex.  Read-only with respect to the .tex files: it parses
+Covers paper/L1-diagonal-law.tex, paper/L3-lambda-bounds.tex,
+paper/L4-not-dfinite.tex and paper/L6-perimeter-gradings.tex.  Read-only with respect to the .tex files: it parses
 their tables and displayed constants and checks them against results/, against
 an independent brute-force enumeration, and against each other.
 
@@ -20,6 +20,7 @@ rejected:
   R3  the A308359 quadratic evaluated at n = 2k, where the onset is sharp
   R4  a linear fit to the A308359 diagonal, which must miss the third point
   R5  the king diagonal formula evaluated one row below its proved onset
+  R6  a min-end column claimed stable one rung before its onset
 
 R3 and R5 are not bookkeeping: they are what puts the *onset* of the diagonal
 law under test rather than merely its shape.
@@ -35,6 +36,7 @@ PAPER = ROOT / "paper"
 
 failures = []
 checks = 0
+reds = 0
 
 
 def ok(cond, what):
@@ -46,8 +48,9 @@ def ok(cond, what):
 
 def red(cond_should_be_false, what):
     """A control: cond must be False, i.e. the bad thing must be rejected."""
-    global checks
+    global checks, reds
     checks += 1
+    reds += 1
     if cond_should_be_false:
         failures.append("RED CONTROL DID NOT FIRE: " + what)
 
@@ -410,6 +413,64 @@ def check_l1_a308359():
        f"the paper's spot values 282 and 638, got {P3(7)} and {P3(8)}")
 
 
+def check_l6_min_end():
+    """L6's king minimum-end ladder, against the p<=48 census.
+
+    Reads the census cold and rebuilds the C(p,i) table, then checks the paper's
+    two claims: the stabilised constants, and the onset p* = 4i + 8.  The odd-p
+    columns must be empty (king's pmin is always even, so no odd p is ever an
+    isoperimetric perimeter) -- that one doubles as a control, since a census
+    that leaked partial rows would fill them."""
+    import math
+    src = tex("L6-perimeter-gradings.tex")
+    census = ROOT / "results" / "perimmin_square8_p48_r6.txt"
+    if not src:
+        return
+    if not census.exists():
+        failures.append(f"missing {census}")
+        return
+
+    A = {}
+    for line in census.read_text().splitlines():
+        if line.startswith("#") or not line.strip():
+            continue
+        n, p, c = (int(x) for x in line.split())
+        A[(n, p)] = c
+
+    # pmin on the king lattice is A235382 = 2*ceil(2*sqrt(n)) + 4.
+    nmax = {}
+    for n in range(1, 4000):
+        q = 2 * math.ceil(2 * math.sqrt(n)) + 4
+        if q <= 48:
+            nmax[q] = max(nmax.get(q, 0), n)
+
+    stable = [1, 6, 22, 68, 187, 470, 1106]
+    ok(all(str(v) in src for v in stable),
+       "L6 must print the king p=0 mod 4 constants")
+
+    # The constants, at every p where the paper says all seven have stabilised.
+    for p in (32, 36, 40, 44, 48):
+        got = [A.get((nmax[p] - i, p), 0) for i in range(7)]
+        ok(got == stable, f"L6 tab:mincoeffs at p={p}: {got} != {stable}")
+
+    # The onset law: column i takes its stable value first at p = 4i + 8.
+    for i, want in enumerate(stable):
+        onset = 4 * i + 8
+        ok(A.get((nmax[onset] - i, onset), 0) == want,
+           f"L6 onset: column i={i} should reach {want} at p={onset}")
+        if onset - 4 in nmax:
+            red(A.get((nmax[onset - 4] - i, onset - 4), 0) == want,
+                f"column i={i} already stable one rung early, at p={onset-4}")
+
+    # Odd p is never attained on the king lattice, so those columns are empty.
+    odd = [p for (_, p) in A if p % 2 == 1 and p <= 48]
+    ok(all(A[(n, p)] > 0 for (n, p) in A if p % 2 == 1) or not odd,
+       "odd-p rows present in the census are genuine counts, not zeros")
+    ok(all(2 * math.ceil(2 * math.sqrt(n)) + 4 != p
+           for n in range(1, 200) for p in set(odd)),
+       "no odd p is attained as king pmin -- the attainability claim")
+
+
 def check_l1_pair_weights():
     """W_pair is the slope of P_1 on every lattice, and 4, 9, 25 are NOT
     (b+1)^2 in general -- the paper says so and the numbers must agree."""
@@ -450,6 +511,7 @@ def main():
     check_l1_king_diagonals()
     check_l1_a308359()
     check_l1_pair_weights()
+    check_l6_min_end()
 
     if failures:
         print(f"verify_l_papers: {len(failures)} FAILURE(S) of {checks} checks\n")
@@ -457,7 +519,7 @@ def main():
             print("  FAIL " + f)
         return 1
     print(f"verify_l_papers: all {checks} checks passed "
-          f"(including 5 RED controls that fired)")
+          f"({reds} of them RED controls, every one of which fired)")
     return 0
 
 
