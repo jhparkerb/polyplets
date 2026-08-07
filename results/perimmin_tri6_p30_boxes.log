@@ -1,0 +1,7 @@
+event=start job=perimeter_min t=2026-08-07T12:51:14-04:00 git=9253525-dirty built=2026-08-07T12:34:37-0400 host=gympie lattice=tri6 pmax=30 rmax=6
+event=plan job=perimeter_min boxes=1142
+event=heartbeat job=perimeter_min t=2026-08-07T12:51:59-04:00 elapsed_s=45.1 rate=13.95/s count=629 boxes=1142 nodes=1712110945
+event=heartbeat job=perimeter_min t=2026-08-07T12:52:45-04:00 elapsed_s=90.6 rate=8.937/s count=810 boxes=1142 nodes=3424618210
+event=heartbeat job=perimeter_min t=2026-08-07T12:53:30-04:00 elapsed_s=135.9 rate=6.816/s count=926 boxes=1142 nodes=5150728132
+event=heartbeat job=perimeter_min t=2026-08-07T12:54:15-04:00 elapsed_s=181.0 rate=5.73/s count=1037 boxes=1142 nodes=6878456254
+event=done job=perimeter_min t=2026-08-07T12:54:45-04:00 start=2026-08-07T12:51:14-04:00 wall_s=211.2 cpu_s=1265.1 peak_rss_mb=3.5 result=ok boxes=1142 nodes=8115905828 emitted=7505846743 cells=647

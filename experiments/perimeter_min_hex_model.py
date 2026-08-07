@@ -52,8 +52,16 @@ def main() -> int:
     # hull inventory: pbox -> list of (cells, multiplicity)
     byp = defaultdict(list)
     for line in open(args.hulls):
+        # Only the '# box' lines.  --boxes writes the hull inventory and the
+        # census into the SAME stream, and the census header carries pmax=/rmax=
+        # pairs that this regex happily matches -- so parsing every line finds a
+        # hull with no pbox and dies.  Filter first.
+        if not line.startswith("# box"):
+            continue
         d = dict(re.findall(r"(\w+)=(-?\d+)", line))
         byp[int(d["pbox"])].append((int(d["cells"]), int(d["mult"])))
+    if not byp:
+        sys.exit(f"no '# box' lines in {args.hulls} -- was it run with --boxes?")
 
     tab = defaultdict(int)
     rmax = None
