@@ -171,7 +171,7 @@ def main() -> int:
             while live and live[0][1] == 0:
                 live = live[1:]
             got = None
-            for degree in range(0, 4):
+            for degree in range(0, 7):   # odd-p columns run past cubic
                 co = fit_poly(live, degree)
                 if co is not None:
                     got = (degree, co)
@@ -181,8 +181,10 @@ def main() -> int:
                 print("   p=%d mod 4, i=%d  (from p=%d, %d pts)  degree %d:  %s"
                       % (cls, i, live[0][0], len(live), got[0], show(got[1])))
             else:
-                print("   p=%d mod 4, i=%d  (%d pts)  no fit up to degree 3"
-                      % (cls, i, len(live)))
+                print("   p=%d mod 4, i=%d  (%d pts)  no fit to degree 6 -- "
+                      "with %d holdouts that needs %d points, so this is "
+                      "UNDERDETERMINED, not evidence against a polynomial"
+                      % (cls, i, len(live), HOLDOUTS, 7 + HOLDOUTS))
     if not found_any:
         print("   (every column on this lattice stabilises -- nothing to fit)")
     return 0
