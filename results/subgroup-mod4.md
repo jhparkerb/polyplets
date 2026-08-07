@@ -134,7 +134,12 @@ That bullet is struck in the source file with this reason.
 - `results/subgroup_counts.txt` — I(H) for the four subgroups, n ≤ 40
 - `results/subgroup_d2ax_byheight.txt` — I_H(D2ax) as "n H count", 630 rows
 - `results/subgroup_mod4_verdict.txt` — the assembler's full output
-- `results/subgroup_mod4_20260807.log` — the run log
+- `results/subgroup_mod4_20260807.log` — the run log, and note it is the
+  **pre-fix** run: its last line still reads
+  `mod 8: 33 rows predicted, MISMATCH [...]`, 21 of 33 rows. That is the
+  dropped-factor-of-2 error above being caught, not a live failure. The
+  corrected result is `subgroup_mod4_verdict.txt`, written two minutes later,
+  and the log is kept as the receipt rather than overwritten
 - `scripts/subgroup_mod4.sh`, `experiments/subgroup_mod4.py`,
   `tests/gate_subgroup.py` (13 checks, 5 of them controls)
 
