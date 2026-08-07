@@ -7,6 +7,9 @@
 #   A  pruned counts == g2 --siteperim, for every (n, k) with k <= KMAX
 #   B  pruned == unpruned on the same range (isolates the prune from the rewrite)
 #   C  the (k, c, H) marginals sum back to the (n, k) totals
+#   D  --split shards sum elementwise to the unsplit run (mirrors g2's gate C).
+#      A sharded production run is only as trustworthy as this check: a shard
+#      that double-counts or drops a subtree is invisible in its own output.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -76,5 +79,45 @@ print(f"  C ok  (k,c,H) marginals sum to the (n,k) totals")
 PY
 done
 
+# D: split-sum invariance. Shard at animal size 6 into 7 parts -- 7 does not
+# divide the subtree count, so the round-robin is genuinely uneven and an
+# off-by-one in ownership shows up rather than cancelling.
+for spec in "square4 $NSQ" "square8 $NKI"; do
+  set -- $spec
+  lat=$1 n=$2
+  echo "== $lat split-sum invariance =="
+  ./build/perimeter_defect "$lat" "$n" "$KMAX" > "$WORK/whole.$lat" 2>/dev/null
+  : > "$WORK/parts.$lat"
+  for idx in 0 1 2 3 4 5 6; do
+    ./build/perimeter_defect "$lat" "$n" "$KMAX" --split 6 7 "$idx" \
+        >> "$WORK/parts.$lat" 2>/dev/null
+  done
+  python3 - "$lat" "$WORK/whole.$lat" "$WORK/parts.$lat" <<'SPLITPY' || fail=1
+import sys
+from collections import defaultdict
+lat, wf, pf = sys.argv[1], sys.argv[2], sys.argv[3]
+
+def load(path):
+    t = defaultdict(int)
+    for line in open(path):
+        f = line.split()
+        if not f or not f[0].isdigit():
+            continue
+        t[tuple(f[:-1])] += int(f[-1])
+    return t
+
+whole, parts = load(wf), load(pf)
+bad = [k for k in set(whole) | set(parts) if whole.get(k, 0) != parts.get(k, 0)]
+if bad:
+    print("  D FAIL %s: %d cells differ, e.g. %s"
+          % (lat, len(bad), [(k, whole.get(k,0), parts.get(k,0)) for k in sorted(bad)[:5]]))
+    sys.exit(1)
+if sum(whole.values()) == 0:
+    print("  D FAIL %s: empty census, the check is vacuous" % lat)
+    sys.exit(1)
+print("  D ok  7 shards sum to the unsplit run over %d cells (%d animals)"
+      % (len(whole), sum(whole.values())))
+SPLITPY
+done
 if [ "$fail" -ne 0 ]; then echo "GATE FAILED"; exit 1; fi
 echo "GATE PASSED"

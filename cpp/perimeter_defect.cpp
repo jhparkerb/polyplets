@@ -62,6 +62,16 @@ struct Search {
   const Offset* offs = nullptr;
   bool prune = true;               // false => unpruned control run (--verify)
 
+  // Deterministic subtree partition, ported from g2's --split (cpp/g2_redelmeier.cpp).
+  // Every shard walks the tree identically down to animal size splitS and
+  // increments the same counter at that level, so the shards agree on the
+  // numbering without communicating; a shard owns -- counts AND descends into --
+  // exactly the subtrees whose number is its own mod splitK. Nodes above splitS
+  // are counted by shard 0 alone. The elementwise sum over shards must equal the
+  // unsplit run, which is what scripts/perimeter_defect_gate.sh checks.
+  int splitS = 0;                  // 0 = no splitting
+  u64 splitK = 1, splitIdx = 0, splitCtr = 0;
+
   int gridW = 0, xOrigin = 0, yOrigin = 0;
   std::vector<char> status;        // 1 = never place here (tried/blocked/border)
   std::vector<char> inAnimal;
@@ -192,7 +202,19 @@ struct Search {
       if (k < minDefectSeen) minDefectSeen = k;
 
       const bool live = !prune || k <= kmax;
-      if (k <= kmax) {
+
+      bool countIt = true, descend = true;
+      if (splitS > 0) {
+        if (size < splitS) {
+          countIt = (splitIdx == 0);
+        } else if (size == splitS) {
+          const bool mine = (splitCtr++ % splitK) == splitIdx;
+          countIt = mine;
+          descend = mine;
+        }
+      }
+
+      if (countIt && k <= kmax) {
         const int c = bonds - size + 1;
         if (c < 0 || c > cmax) {
           std::fprintf(stderr, "FATAL: cycle rank %d outside [0, %d] at k=%d -- "
@@ -202,7 +224,7 @@ struct Search {
         counts[slot(size, k, c, maxy + 1)] += 1;
       }
 
-      if (live && size < maxn) {
+      if (live && descend && size < maxn) {
         std::vector<int>& child = untriedByDepth[depth + 1];
         child.clear();
         const int budget = kmax - k;
@@ -242,6 +264,9 @@ int main(int argc, char** argv) {
   if (argc < 4) {
     std::fprintf(stderr,
                  "usage: %s {square4|square8} NMAX KMAX [--no-prune]\n"
+                 "                [--split S K IDX]\n"
+                 "  --split: shard the search at animal size S into K parts,\n"
+                 "           emit part IDX. Elementwise sum over IDX = unsplit.\n"
                  "  emits \"n k count\" for the site-perimeter defect "
                  "k = (deg/2)(n+1) - p\n",
                  argv[0]);
@@ -254,8 +279,19 @@ int main(int argc, char** argv) {
   else { std::fprintf(stderr, "unknown lattice: %s\n", lattice.c_str()); return 2; }
   s.maxn = std::atoi(argv[2]);
   s.kmax = std::atoi(argv[3]);
-  for (int i = 4; i < argc; ++i)
+  for (int i = 4; i < argc; ++i) {
     if (std::strcmp(argv[i], "--no-prune") == 0) s.prune = false;
+    else if (std::strcmp(argv[i], "--split") == 0 && i + 3 < argc) {
+      s.splitS = std::atoi(argv[i + 1]);
+      s.splitK = std::strtoull(argv[i + 2], nullptr, 10);
+      s.splitIdx = std::strtoull(argv[i + 3], nullptr, 10);
+      i += 3;
+      if (s.splitK == 0 || s.splitIdx >= s.splitK || s.splitS < 1) {
+        std::fprintf(stderr, "bad --split S K IDX (need S>=1, 0<=IDX<K)\n");
+        return 2;
+      }
+    }
+  }
   if (s.maxn < 1 || s.maxn > 400) { std::fprintf(stderr, "NMAX out of range (1..400)\n"); return 2; }
   if (s.kmax < 0 || s.kmax > 40)  { std::fprintf(stderr, "KMAX out of range (0..40)\n"); return 2; }
 

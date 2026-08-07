@@ -29,7 +29,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 .PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
-        gate-compile-db gate-citations gate-perimeter-min clean install \
+        gate-compile-db gate-citations gate-perimeter-min gate-perimeter-defect clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
@@ -39,7 +39,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-perimeter-min gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-perimeter-min gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -63,6 +63,14 @@ endif
 
 gates:
 	@$(MAKE) --no-print-directory -j$(JOBS) $(GATE_TARGETS)
+
+# Gate PERIMETER-DEFECT: the pruned max-end search vs g2 --siteperim (A), vs
+# its own unpruned control (B), marginal consistency (C), and --split shards
+# summing elementwise to the unsplit run (D). D is what makes a sharded
+# production run trustworthy -- a shard that drops or double-counts a subtree
+# looks perfectly healthy in its own output. ~40 s.
+gate-perimeter-defect: build/perimeter_defect build/g2
+	./scripts/perimeter_defect_gate.sh
 
 # Gate PERIMETER-MIN: build/perimeter_min enumerates the isoperimetric end of
 # the perimeter table by COMPLEMENTATION, which is complete only under a
