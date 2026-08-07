@@ -76,10 +76,23 @@ tangent cone** `{a >= |b|}`; `experiments/cone_order_ideals.py` computes it
 (`1, 1, 3, 5, 9, 14, 24, 35, 55, 81, ...`) and its 4th power reproduces every
 measured diamond term. `P(x)` is the lattice-aligned special case, so king,
 tri6 and square4 collapse to one statement. Full write-up in
-`results/perimeter-both-ends.md`. Open follow-ups from it: an OEIS lookup of the
-seven-plus-term tip series (six terms will hit A120452 again), the `j=7,8`
-predictions `3452, 8229` (blocked on `kMaxCells = 128`), and the unresolved
-6-corner/8-corner hull factorisation.
+`results/perimeter-both-ends.md`.
+
+The tip series is **A053993 = Andrews' `phi_2`** (generalized Frobenius
+partitions, up to two repetitions per row), so it is an **eta quotient** with an
+explicit infinite product, Andrews eq. (5.9), verified to `n=40`. Not a closed
+form, and don't call it one; it is exactly as explicit as `P(x)` itself, no
+more. `phi_1` is the partition function, so both corner types in this campaign
+are the same family: unimodular corner gives `phi_1 = P(x)`, the index-2 diamond
+tip gives `phi_2`. The `phi_m` guess for
+index `m` is FALSE at `m=3` and recorded as a closed door.
+
+**OEIS lookups now run from here** — jasonp authorised direct `curl` against
+oeis.org 2026-08-07 (`?fmt=json`, `null` body means no match). Be polite. This
+supersedes the earlier "his call, deliberately unrun" rule.
+
+Open follow-ups: the `j=7,8` predictions `3452, 8229` (blocked on
+`kMaxCells = 128`), and the unresolved 6-corner/8-corner hull factorisation.
 
 The original framing of the test, kept for the record:
 

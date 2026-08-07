@@ -62,6 +62,62 @@ def ideal_series(nmax, offset=1):
     return list(rest(nmax, nmax, nmax))
 
 
+def index_m_cone_series(m, nmax):
+    """Downsets by size of the general index-m cone, by brute-force enumeration.
+
+    The cone spanned by the primitive rays (1,0) and (1,m) has index m; in the
+    basis of those rays, scaled by m, the ambient lattice inside it becomes
+
+        Q_m = {(U, V) in Z_{>=0}^2 : U + V = 0 (mod m)}
+
+    under the componentwise order.  m=1 is the quadrant and must return the
+    partition numbers; m=2 must agree with ideal_series() above.  This is the
+    slow, obviously-correct enumerator, kept as the control on that one.
+    """
+    bound = m * nmax + m
+    elts = [
+        (u, v)
+        for u in range(bound + 1)
+        for v in range(bound + 1)
+        if (u + v) % m == 0
+    ]
+
+    def below(p):
+        u, v = p
+        return [
+            (u - du, v - dv)
+            for du in range(m + 1)
+            for dv in range(m + 1)
+            if (du or dv) and u - du >= 0 and v - dv >= 0 and (u - du + v - dv) % m == 0
+        ]
+
+    cur = {frozenset()}
+    counts = [1]
+    for _ in range(nmax):
+        nxt = set()
+        for s in cur:
+            for p in elts:
+                if p not in s and all(q in s for q in below(p)):
+                    nxt.add(s | {p})
+        counts.append(len(nxt))
+        cur = nxt
+    return counts
+
+
+def andrews_phi2(nmax):
+    """Andrews' phi_2 via Memoirs AMS 301 eq. (5.9), an eta quotient.
+
+    prod_{k>0} [(1-x^k)(1-x^{12k-10})(1-x^{12k-9})(1-x^{12k-3})(1-x^{12k-2})]^{-1}
+    """
+    out = [1] + [0] * nmax
+    for k in range(1, nmax + 2):
+        for e in (k, 12 * k - 10, 12 * k - 9, 12 * k - 3, 12 * k - 2):
+            if 1 <= e <= nmax:
+                for i in range(e, nmax + 1):
+                    out[i] += out[i - e]
+    return out
+
+
 def poly_pow(series, k, nmax):
     out = [1] + [0] * nmax
     for _ in range(k):
@@ -82,10 +138,22 @@ def main():
     print("  ", " ".join(str(x) for x in tip))
     print("quadrant control (offset 0, must be the partition numbers):")
     print("  ", " ".join(str(x) for x in ideal_series(nmax, offset=0)))
-    print("A120452, the six-term match:")
+    print("A120452, the six-term match that is wrong at the seventh:")
     print("   1 1 3 5 9 14 23 34 52 75 109 155 219")
     print("4th power = square4 diamond free-removals:")
     print("  ", " ".join(str(x) for x in poly_pow(tip, 4, nmax)))
+
+    andrews = andrews_phi2(nmax)
+    print("Andrews phi_2 = A053993, product form (5.9):")
+    print("  ", " ".join(str(x) for x in andrews))
+    assert andrews == tip, "cone ideals are not phi_2"
+
+    # controls: the brute-force enumerator must reproduce both known cases
+    small = min(nmax, 9)
+    assert index_m_cone_series(1, small) == ideal_series(small, offset=0)[: small + 1]
+    assert index_m_cone_series(2, small) == tip[: small + 1]
+    print("index-3 cone (phi_m generalisation FAILS here; phi_3 is A053992):")
+    print("  ", " ".join(str(x) for x in index_m_cone_series(3, small)))
 
 
 if __name__ == "__main__":

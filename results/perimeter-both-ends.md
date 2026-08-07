@@ -298,11 +298,54 @@ lattice-aligned (unimodular) cone, which is why king boxes and tri6 hexagons
 give `P(x)^4` and `P(x)^6`. square4's diamond tips are unimodular-failing and
 give `C^4`. Three lattices, one statement.
 
-The tip series has no known OEIS identity yet. `1, 1, 3, 5, 9, 14, 24, 35, 55,
-81, 120, 171, 248` is worth a lookup; its Euler transform exponents are
-`1, 2, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 2, ...`, not an evidently clean
-product. Note that A120452 also matches its first six terms, so a six-term
-lookup will hit the wrong sequence again.
+### The tip series is A053993: Andrews' generalized Frobenius partitions
+
+Looked up from here (jasonp authorised direct `curl` against oeis.org,
+2026-08-07). `1, 1, 3, 5, 9, 14, 24, 35, 55, 81, 120, 171, 248, ...` is
+**A053993 = phi_2(n)**, Andrews' generalized Frobenius partitions allowing up to
+two repetitions of an integer in a row (Memoirs AMS 301, 1984). All 31 computed
+terms agree with the OEIS data. That gives the tip factor an explicit infinite
+product, Andrews eq. (5.9):
+
+    G_tip(x) = prod_{k>0} [ (1-x^k)(1-x^{12k-10})(1-x^{12k-9})
+                            (1-x^{12k-3})(1-x^{12k-2}) ]^{-1}
+
+verified against the cone count to `n = 40` (`andrews_phi2()` in
+`experiments/cone_order_ideals.py`, asserted at runtime). Equivalently the eta
+quotient `q^{1/12} eta(q^4) eta(q^6)^2 / (eta(q) eta(q^2) eta(q^3) eta(q^12))`.
+The Euler exponents measured here (`1, 2, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1`
+repeating) are exactly A053993's known period-12 Euler transform.
+
+**Do not call this a closed form.** It is an infinite product, and calling it
+closed would be the goat-grazing kind of answer. What it actually is is an eta
+quotient, which is precisely the status of `P(x) = prod 1/(1-x^n)` that it
+generalises: the tip factor is no more and no less explicit than the partition
+function at a lattice-aligned corner. That is the honest claim, and it is
+already the useful one, since a modular eta quotient carries its own asymptotic
+(`phi_2(n) ~ exp(2*pi*sqrt(2n)/3) / (6*sqrt(2)*n)`, Kotesovec) and its own
+transformation theory. square4's whole diamond min-end generating function is
+`G_tip(x)^4`.
+
+This makes the min-end law sharper still. Andrews' `phi_1` **is** the partition
+function, so both cases we actually meet are the same family:
+
+| corner | cone | tip factor |
+|---|---|---|
+| king box, tri6 hexagon | unimodular (index 1) | `phi_1 = p(n) = P(x)` |
+| square4 diamond tip | index 2 | `phi_2 = A053993` |
+
+**The obvious generalisation is false, and it is worth recording as closed.**
+`phi_m` for an index-`m` cone fails at `m = 3`: the cone spanned by `(1,0)` and
+`(1,3)` has order-ideal series `1, 1, 4, 8, 14, 24, 39, 64, 105, 161, 244, 370`,
+whereas `phi_3` is **A053992** = `1, 1, 3, 6, 11, 18, 31, 49, 78, ...`. The
+index-3 series is not in OEIS at all. This is not surprising in hindsight:
+Andrews' `phi_k` are all *two*-rowed objects, and index-`m` cones stop being
+unique up to `GL_2(Z)` at `m = 3` (Hirzebruch-Jung), so there is no single
+"index-3 cone" for a formula to name. The identity is real for `m <= 2` and
+that is all we need, since no lattice in this campaign produces a sharper tip.
+
+Beware re-looking-up the tip series with six terms: A120452 matches
+`1, 1, 3, 5, 9, 14` and will come back instead.
 
 **Prediction, still untested:** `j = 7, 8` are `3452` and `8229`. Reaching them
 needs `W = 17` (145 cells), over the `kMaxCells = 128` u128 limit, so it needs a
@@ -406,21 +449,23 @@ in the header), plus their `.log` provenance.
 
 ## OEIS status of the seven series
 
-Looked up by jasonp, 2026-08-07 (external services are his call, so none of this
-was run from here). Two hits, five apparent novelties:
+First looked up by jasonp 2026-08-07; S1, S2 and S3 **re-run from here the same
+day with the extra terms** the cone model supplied, after jasonp authorised
+direct `curl` against oeis.org. Two hits, five apparent novelties:
 
 | | series | result |
 |---|---|---|
-| S1 | square4 diamond free-removals `1, 4, 18, 60, 187, 524` | **no match** |
-| S2 | square4 even-W hull free-removals `1, 6, 25, 88, 272, 766` | **no match** |
-| S3 | per-tip `1, 1, 3, 5, 9, 14` | **A120452 — REFUTED at the seventh term**, `24` not `23`; needs re-lookup as `1, 1, 3, 5, 9, 14, 24, 35, 55, 81, 120, 171, 248` |
+| S1 | square4 diamond free-removals, now `1, 4, 18, 60, 187, 524, 1388, 3452, 8229, 18800` | **no match** (10 terms) |
+| S2 | square4 even-W hull free-removals, now `1, 6, 25, 88, 272, 766, 2012` | **no match** (7 terms) |
+| S3 | per-tip `1, 1, 3, 5, 9, 14, 24, 35, 55, 81, 120, 171, 248` | **A053993**, Andrews' `phi_2`; an eta quotient, same status as `P(x)`. A120452 matched only the first six terms and is refuted at the seventh |
 | S4 | hexagon free-removals `1, 6, 27, 98, 315, 918` | `P(x)^6`; A071734 matched the first five terms and is refuted at the sixth |
 | S5 | tri6 `C(p,0)` `1, 3, 2, 3, 6, 1, 6, ...` | **no match** |
 | S6 | king min-perimeter stable columns | **no match** (though the model explains them) |
 | S7 | square4 min-perimeter stable columns | **no match** |
 
-"No match" is OEIS's answer to the terms I had, not a novelty proof: S1 and S2
-carry six terms and S7 four or five, which is thin. S6 is the interesting one --
+"No match" is OEIS's answer to the terms submitted, not a novelty proof: S7
+carries four or five, which is thin. S1 is now at ten terms and S3's fate is the
+warning attached to all of them, six terms hit the wrong sequence. S6 is the interesting one --
 it has a complete model here (`q4` convolved with the box-skew deficits) and yet
 is not in OEIS, so it is a derived-but-unrecorded sequence rather than a mystery.
 
