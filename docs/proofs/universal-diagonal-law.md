@@ -141,12 +141,54 @@ Every row also survives 5–11 holdout values past the ones used to fit it.
 Coefficients are rational, not integral, which is the expected shape:
 `k!·P_k ∈ ℤ[n]` with P_k integer-*valued* (32/3 × 3! = 64).
 
-What this does **not** do is explain the coefficients. `experiments/defect_gas.py`
-factors the same counts into cluster weights — that is where 25 = 16 + 9 comes
-from — but it is written for `(dx, dr) ∈ (−1,0,1)²` and is not lattice-
-parametric. Making the gas parametric is the open engineering step; the machine
-above is values-plus-theorem, which is enough to *state* the formulas but not to
-say why they look as they do.
+## The gas, made lattice-parametric (2026-08-06)
+
+`experiments/gas_cumulants.py`. The machine above says *what* P_k is; the gas
+says *why*, and its content turns out to be one line about cumulants. Write
+
+    F(n, u) = Σ_k P_k(n) u^k,  P_0 = 1,   and   c_k = [u^k] log F.
+
+**Every c_k is linear in n**, on every lattice tested, at every k reached:
+
+| lattice | c_1 | c_2 | c_3 | c_4 |
+|---|---|---|---|---|
+| square | 4n − 8 | −19n + 54 | 472/3 n − 1718/3 | −3099/2 n + 6558 |
+| hex | 9n − 15 | −37/2 n − 83/2 | 32n − 32 | |
+| king | 25n − 45 | −209/2 n − 891/2 | | |
+
+That is extensivity — an independent 1-D gas of defects whose interactions live
+entirely in the constants — and **the shape of the law follows from it**:
+deg P_k ≤ k because the top term of P_k is c_1^k/k!, and the leading
+coefficient is therefore `W^k/k!` with W the slope of c_1. Checked: square
+4^k/k!, hex 9^k/k!, king 25^k/k!, against the machine's polynomials.
+
+The king row is the calibration — `c_2 = −209/2 n − 891/2` is exactly the
+`(a2, b2) = (−891/2, −209/2)` hardcoded in `experiments/defect_gas.py`'s
+reconstruction, arrived at here from a drift-parametric DP instead.
+
+W is also the **pair-cluster weight**, counted independently as a gadget by
+`experiments/universal_pair_weights.py` — two routes with no shared code path,
+agreeing at 4, 9, 25. And `cluster_weight(D, sizes)` is now parametric, with
+king reproducing every weight in `defect_gas.py`'s table:
+
+| cluster | square | hex | king (must match `defect_gas.py`) |
+|---|---|---|---|
+| (2,) | 4 | 9 | 25 |
+| (3,) | 9 | 16 | 49 |
+| (4,) | 16 | 25 | 81 |
+| (2,2) | 12 | 60 | 339 |
+| (2,3) | 30 | 138 | 930 |
+| (2,2,2) | 36 | 409 | 4778 |
+
+Run at window 6 rather than 9, the port reproduces the *documented bug* —
+(2,2,2) clips to 4776 — which is a check on the port and a trap to keep away
+from.
+
+**What is still king-only:** assembling c_k for k ≥ 2 *from* the cluster
+weights, i.e. `defect_gas.py`'s ledger and the master equation. The parametric
+statement above is what makes that step worth taking: we know the target is
+linear in n on every lattice, so what is missing is the combination of weights
+that produces its two coefficients.
 
 ## Instances (machine-checked)
 

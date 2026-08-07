@@ -4,6 +4,16 @@
 Verifier: `experiments/defect_gas.py` — row model validated against the banked
 triangle (exact, H ≤ 10, k ≤ 2), ledger reconstructs P₂ symbolically.
 
+> **2026-08-06: the gas is no longer a king-lattice story.**
+> `experiments/gas_cumulants.py` shows the cumulants are linear in n on square
+> and hex too, with leading coefficients W^k/k! for the lattice's own pair
+> weight (4, 9, 25) — so the mechanism below explains the diagonal formulae of
+> every row-local lattice, not just this one. `cluster_weight` is parametric
+> there and reproduces every king weight in this note. What remains king-only
+> is the **ledger** — assembling c_k from the weights — and the master
+> equation. See `docs/proofs/universal-diagonal-law.md` §The gas, made
+> lattice-parametric.
+
 ## The row model (an independent third enumeration algorithm)
 
 Read a height-H king animal row by row. The k = 0 stratum is a drift walk
