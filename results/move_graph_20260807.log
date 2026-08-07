@@ -1,0 +1,16 @@
+Idea 8: connectivity of the single-cell-move graph on fixed king animals
+
+n =  1  animals =         1  components =      1  largest =         1  CONNECTED  (0.0s)
+      animals with NO legal move (every cell a cut vertex): 1
+        #
+
+n =  2  animals =         4  components =      1  largest =         4  CONNECTED  (0.0s)
+n =  3  animals =        20  components =      1  largest =        20  CONNECTED  (0.0s)
+n =  4  animals =       110  components =      1  largest =       110  CONNECTED  (0.0s)
+n =  5  animals =       638  components =      1  largest =       638  CONNECTED  (0.0s)
+n =  6  animals =      3832  components =      1  largest =      3832  CONNECTED  (0.1s)
+n =  7  animals =     23592  components =      1  largest =     23592  CONNECTED  (0.5s)
+n =  8  animals =    147941  components =      1  largest =    147941  CONNECTED  (4.4s)
+n =  9  animals =    940982  components =      1  largest =    940982  CONNECTED  (35.6s)
+n = 10  animals =   6053180  components =      1  largest =   6053180  CONNECTED  (289.7s)
+EXIT=0

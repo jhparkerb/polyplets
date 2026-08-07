@@ -366,11 +366,24 @@ existing extremal result rather than starting a new topic.
 
 ## 8. Dynamics of the SPACE, not of the objects
 
+**EXECUTED 2026-08-07 — `results/move-graph-connectivity.md`.** Answer: yes,
+connected at every n <= 10, one component throughout, and no animal with n >= 2
+is ever stuck (every connected graph on >= 2 vertices has two non-cut
+vertices). Twenty minutes, not an evening. Read the honest-limits section of
+that file before quoting the second bullet below — it is struck.
+
 - Is the graph on n-polyplets under **single-cell moves that preserve
   connectivity** connected? Exhaustively decidable at n <= 10 with the existing
   oracle — the cheapest item in this whole file.
-- If yes: mixing time, hence a uniform sampler, hence measurement of nu and of
-  everything in idea 5 at n = 100+, far past the enumeration frontier.
+- ~~If yes: mixing time, hence a uniform sampler, hence measurement of nu and of
+  everything in idea 5 at n = 100+, far past the enumeration frontier.~~
+  **STRUCK as written 2026-08-07** — not because it is wrong but because it
+  collapses three steps into one. Irreducibility is necessary and nowhere near
+  sufficient; the sampler needs the chain to MIX, which this probe measures
+  nothing about, and it needs irreducibility at the n being sampled, which a
+  census at n <= 10 does not give. The gate that was cleared is the first and
+  cheapest of three. Prior art unchecked and likely to exist: see the
+  Janse van Rensburg-Madras entry in `papers/MISSING.md`.
 
 "Markov" appears in the repo only in `defect-gas.md`, in an unrelated sense.
 

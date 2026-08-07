@@ -253,7 +253,18 @@ of these previously listed:
   for weighted animals". Those sections are where the corollaries were drawn, so if anyone
   has already stated "simply-connected animals are exponentially rare", it is there — and
   that is the one thing we still call ours in `results/hole-free-growth-constant.md`.
-  **[high]**
+
+  **Second reason to want it, added 2026-08-07 — it now settles two questions.**
+  A Metropolis chain on lattice animals cannot be published without establishing
+  its own irreducibility, and the move it uses is the connectivity-preserving
+  single-cell move. So the square-lattice case of idea 8 of
+  `results/unexplored-avenues.md` — is the move graph connected — is almost
+  certainly a lemma in this paper, along with whatever they know about its
+  mixing. We have now measured the king case directly
+  (`results/move-graph-connectivity.md`); what this paper would supply is the
+  proof technique for all `n`, and the honest prior art. Check §2 for the chain's
+  definition and ergodicity argument before anything in that results file is
+  described as new. **[high]**
 - N. Madras & G. Slade, *The Self-Avoiding Walk*, Birkhäuser, Boston, 1993. — a book, so
   library or purchase rather than download. Load-bearing if the report states the ratio
   limit: Madras 1999 proves his Theorem 2.2 by reusing "the proof of Theorem 7.3.2 in
