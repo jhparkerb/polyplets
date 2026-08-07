@@ -29,7 +29,8 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 .PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
-        gate-compile-db gate-citations gate-perimeter-min gate-perimeter-defect clean install \
+        gate-compile-db gate-citations gate-perimeter-min gate-perimeter-defect \
+        gate-perimeter-min-shard clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
         ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
@@ -39,7 +40,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-perimeter-min gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -81,6 +82,17 @@ gate-perimeter-defect: build/perimeter_defect build/g2
 # missing animal. Includes a RED control. ~2 s.
 gate-perimeter-min: build/perimeter_min build/g2
 	./scripts/perimeter_min_gate.sh
+
+# Gate PERIMETER-MIN-SHARD: the sharded driver that makes a min-end census
+# resumable must be a drop-in for the monolithic run, or a resumed census is a
+# different number wearing the same filename. Checks the merged per-frame result
+# byte-for-byte against the monolithic one on both lattices, then damages frame
+# files the way a kill does (no trailer, empty, missing, wrong geometry) and
+# requires each to be redone or refused. The RED control removes the transpose
+# multiplicity -- `--only` forces mult=1, so without reapplying it every W<H
+# frame is halved and the equivalence check must go red. ~25 s.
+gate-perimeter-min-shard: build/perimeter_min
+	./scripts/perimeter_min_shard_gate.sh
 
 # Gate COMPILE-DB: clangd's compile_commands.json must be complete and honest.
 # A missing or wrong entry is invisible to every other gate (they use the
