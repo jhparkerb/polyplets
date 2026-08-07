@@ -1,0 +1,22 @@
+event=start job=perimeter_min t=2026-08-07T10:16:50-04:00 git=167dd4e-dirty built=2026-08-07T08:46:47-0400 host=gympie lattice=square8 pmax=44 rmax=6
+event=plan job=perimeter_min boxes=100
+event=heartbeat job=perimeter_min t=2026-08-07T10:17:38-04:00 elapsed_s=47.5 rate=1.327/s count=63 boxes=100 nodes=305566661
+event=heartbeat job=perimeter_min t=2026-08-07T10:18:31-04:00 elapsed_s=100.8 rate=0.724/s count=73 boxes=100 nodes=621856628
+event=heartbeat job=perimeter_min t=2026-08-07T10:19:20-04:00 elapsed_s=150.4 rate=0.5385/s count=81 boxes=100 nodes=775228101
+event=heartbeat job=perimeter_min t=2026-08-07T10:20:14-04:00 elapsed_s=204.4 rate=0.4256/s count=87 boxes=100 nodes=995032982
+event=heartbeat job=perimeter_min t=2026-08-07T10:21:19-04:00 elapsed_s=268.8 rate=0.305/s count=82 boxes=100 nodes=1166354493
+event=heartbeat job=perimeter_min t=2026-08-07T10:22:11-04:00 elapsed_s=320.9 rate=0.2742/s count=88 boxes=100 nodes=1310547613
+event=heartbeat job=perimeter_min t=2026-08-07T10:23:34-04:00 elapsed_s=404.1 rate=0.2276/s count=92 boxes=100 nodes=1613730380
+event=heartbeat job=perimeter_min t=2026-08-07T10:25:00-04:00 elapsed_s=490.0 rate=0.1694/s count=83 boxes=100 nodes=1893198648
+event=heartbeat job=perimeter_min t=2026-08-07T10:25:51-04:00 elapsed_s=540.5 rate=0.1721/s count=93 boxes=100 nodes=2064520159
+event=heartbeat job=perimeter_min t=2026-08-07T10:31:01-04:00 elapsed_s=851.2 rate=0.09868/s count=84 boxes=100 nodes=2762183099
+event=heartbeat job=perimeter_min t=2026-08-07T10:32:12-04:00 elapsed_s=921.6 rate=0.102/s count=94 boxes=100 nodes=3088390296
+event=heartbeat job=perimeter_min t=2026-08-07T10:33:00-04:00 elapsed_s=970.2 rate=0.09277/s count=90 boxes=100 nodes=3527772212
+event=heartbeat job=perimeter_min t=2026-08-07T10:35:14-04:00 elapsed_s=1104.3 rate=0.08784/s count=97 boxes=100 nodes=3879686406
+event=heartbeat job=perimeter_min t=2026-08-07T10:43:07-04:00 elapsed_s=1577.1 rate=0.06024/s count=95 boxes=100 nodes=4463238937
+event=heartbeat job=perimeter_min t=2026-08-07T10:45:00-04:00 elapsed_s=1689.9 rate=0.05385/s count=91 boxes=100 nodes=5179105635
+event=heartbeat job=perimeter_min t=2026-08-07T10:51:43-04:00 elapsed_s=2092.8 rate=0.04683/s count=98 boxes=100 nodes=5848346299
+event=heartbeat job=perimeter_min t=2026-08-07T11:01:57-04:00 elapsed_s=2707.4 rate=0.03546/s count=96 boxes=100 nodes=6839988164
+event=heartbeat job=perimeter_min t=2026-08-07T11:17:32-04:00 elapsed_s=3642.3 rate=0.02718/s count=99 boxes=100 nodes=8035966740
+event=heartbeat job=perimeter_min t=2026-08-07T11:21:35-04:00 elapsed_s=3885.1 rate=0.02574/s count=100 boxes=100 nodes=9307394636
+event=done job=perimeter_min t=2026-08-07T11:21:35-04:00 start=2026-08-07T10:16:50-04:00 wall_s=3885.1 cpu_s=16694.4 peak_rss_mb=2.7 result=ok boxes=100 nodes=9307394636 emitted=9293974768 cells=1186
