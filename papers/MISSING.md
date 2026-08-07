@@ -93,7 +93,29 @@ twin. Asymptotic only, and free.
   {a >= |b|}" is a KNOWN reading of `phi_2`. Andrews' `phi_k` are two-rowed
   arrays and our object is a pair of nested partitions, which smells like the
   same bijection; if it is already in there, the min-end result cites it rather
-  than claiming it. A physical AMS Memoir — any research maths library. **[high]**
+  than claiming it.
+
+  **LOCATED 2026-08-07, PARKED — jasonp is not searching further from work.**
+  ISBN 0821823027 / 9780821823026, LCCN 84003059, AMS 1984, 26 cm. Pitt's
+  discovery layer lists it under **"Ebook Central Perpetual and DDA"**, so an
+  electronic copy may exist. Caveat: DDA is demand-driven, so the title is
+  discoverable without necessarily being owned, and a walk-in guest account may
+  not be able to trigger the purchase. Try the Ebook Central link first; fall
+  back to print (Memoirs vol. 49, no. 301). Do NOT chase the online *serial*
+  record (ISSN 1947-6221) — that is the whole Memoirs run and carries no
+  per-item holdings; search the monograph by title/author instead.
+
+  Pitt access notes: visitors get a temporary guest computer account at any ULS
+  library with photo ID, on-site only, no remote access. Hillman Mon-Thu
+  8:30-22:00, Fri 8:30-18:00, Sat/Sun 10:00-18:00; Bevier (science/engineering,
+  the likelier home of print J. Phys. A runs) Mon-Fri 9:00-17:00 only. **All ULS
+  libraries closed Monday 2026-08-10.**
+
+  When it is in hand, two things to read: **eq. (5.9)**, the product form we
+  quote from OEIS and have never read, and whether Andrews gives `phi_2` a
+  combinatorial description matching our pair of nested partitions
+  `(lambda, mu)` — that is the difference between a new interpretation and a
+  known one. **[high]**
 
 _(everything below was obtained 2026-08-06.)_
 
@@ -557,3 +579,22 @@ covers a superset of venues *and* searches full text, which is the property
 that mattered for a proof-internal tool like Northcott. A weekday library
 walk-in for a fourth negative on a question three sources have answered is not
 a good trade. Reopen only if a referee asks.
+
+## How to actually get these (researched 2026-08-07)
+
+Full notes in the `library-access-pittsburgh` memory. The short of it:
+
+- **Remote e-access is not purchasable** by an unaffiliated person; licences tie
+  it to affiliation. Everything below is on-site or print.
+- **Penn State is free to all Pennsylvania residents** — borrowing privileges at
+  every PSU library on a PA licence/state ID. Open question worth one email to
+  `ul-common-services@psu.edu`: does the resident card allow requesting from
+  University Park, which is where 1980s J. Phys. A would live.
+- **Pitt** guest account (on-site) or Special Borrower ($50 alumni / $100 other,
+  books not journals). **Bevier** sci/eng library is Mon-Fri 9-5 only and is the
+  real constraint. **CMU** guest pass gives two-hour sessions, on-site only.
+- **Pre-1995 is the hard part**: IOP sells old content as a separate archive
+  product, so a current IOPscience licence does not imply 1980-1993 access.
+- **Email the authors.** For Barequet & Magal — one of the two load-bearing
+  items — this is likely faster than any library, and we already hold five
+  Barequet papers.
