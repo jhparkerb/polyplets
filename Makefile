@@ -39,7 +39,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-perimeter-min gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-perimeter-min gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -239,6 +239,10 @@ gate-symtm: build/symtm build/symcount_fast
 # Gate sym: symmetric-polyplet counters (4 types) + free count vs A030222
 gate-sym: build/symcount_fast
 	python3 tests/gate_sym.py
+
+# Gate subgroup: per-SUBGROUP invariant counts + the a(n) mod 4 congruence
+gate-subgroup: build/symcount_fast
+	python3 tests/gate_subgroup.py
 
 # Gate E0: weighted connected-subgraph counter vs brute force
 gate-e0: build/subgraph_count

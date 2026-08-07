@@ -8,7 +8,13 @@
 // residual translation a mirror axis leaves free. See sym/symcount.py and
 // docs-s2-symmetric-enumerator.md.
 //
-// CLI:  symcount_fast {r90|r180|hmirror|dmirror} MAXN   -> "n count" lines.
+// CLI:  symcount_fast {r90|r180|hmirror|dmirror|c4|d2ax|d2diag|d4} MAXN
+//                                                        -> "n count" lines.
+//
+// The first four are per-ELEMENT fixed-point counts Fix(g) (what Burnside
+// needs). The last four are per-SUBGROUP invariant counts I(H) (what the
+// orbit-SIZE distribution, hence a(n) mod 4, needs) -- a different object:
+// I(D2ax) is fixed by BOTH axis mirrors, whereas hmirror is Fix(h).
 
 #include <cstdint>
 #include <cstdio>
@@ -63,6 +69,42 @@ static SymType makeType(const std::string& name) {
   if (name == "dmirror")
     return {{{{ID, {0,1,0, 1,0,0}}}},
             Anchor::Diag};
+  // --- SUBGROUP-invariant types (see sym/symcount.py). Each subgroup below
+  // has a centre, so every placement pins translation and no anchor applies.
+  // c4 is r90's group: invariance under r90 is invariance under all of C4.
+  if (name == "c4") return makeType("r90");
+  if (name == "d2ax") {   // {e, h, v, r180}: mirrors x = E/2, y = F/2
+    SymType t{{}, Anchor::None};
+    for (int E = 0; E <= 1; ++E)
+      for (int F = 0; F <= 1; ++F)
+        t.placements.push_back({{ID,
+                                 {1,0,0, 0,-1,F},
+                                 {-1,0,E, 0,1,0},
+                                 {-1,0,E, 0,-1,F}}});
+    return t;
+  }
+  if (name == "d2diag") { // {e, d, ad, r180}: mirrors y = x and x + y = D
+    SymType t{{}, Anchor::None};
+    for (int D = 0; D <= 1; ++D)
+      t.placements.push_back({{ID,
+                               {0,1,0, 1,0,0},
+                               {0,-1,D, -1,0,D},
+                               {-1,0,D, 0,-1,D}}});
+    return t;
+  }
+  if (name == "d4") {     // the full group, centred on a cell (V=0) or vertex
+    SymType t{{}, Anchor::None};
+    for (int V = 0; V <= 1; ++V)
+      t.placements.push_back({{ID,
+                               {0,-1,V, 1,0,0},
+                               {-1,0,V, 0,-1,V},
+                               {0,1,0, -1,0,V},
+                               {1,0,0, 0,-1,V},
+                               {-1,0,V, 0,1,0},
+                               {0,1,0, 1,0,0},
+                               {0,-1,V, -1,0,V}}});
+    return t;
+  }
   std::fprintf(stderr, "unknown symmetry type: %s\n", name.c_str());
   std::exit(2);
 }
@@ -88,6 +130,11 @@ struct Counter {
                                  // append new neighbours past end, so each
                                  // child's untried range stays contiguous.
   std::vector<u64> counts;
+  // Optional (n, height) refinement. The height-preserving subgroup of D4 is
+  // exactly D2ax = {e,h,v,r180}, so a height-graded orbit count is meaningful
+  // for that type: it gives T(n,H) mod 2 (see experiments/subgroup_mod4.py).
+  bool byHeight = false;
+  std::vector<u64> hcounts;      // (maxn+1) x (maxn+1), indexed n*(maxn+1)+ht
 
   int cellIdx(int x, int y) const { return (y - lo) * gridW + (x - lo); }
   int cellX(int idx) const { return idx % gridW + lo; }
@@ -197,7 +244,18 @@ struct Counter {
   // On backtrack the appended tail is unmarked and truncated. Forward vs the
   // old LIFO order changes traversal, not the multiset of animals counted.
   void search(int root, int start, int w) {
-    if (connectedAndAnchored()) counts[w] += 1;
+    if (connectedAndAnchored()) {
+      counts[w] += 1;
+      if (byHeight) {
+        int ymin = 1 << 30, ymax = -(1 << 30);
+        for (int c : curCells) {
+          const int y = cellY(c);
+          ymin = std::min(ymin, y);
+          ymax = std::max(ymax, y);
+        }
+        hcounts[w * (maxn + 1) + (ymax - ymin + 1)] += 1;
+      }
+    }
     const int end = static_cast<int>(list.size());
     for (int i = start; i < end; ++i) {
       const int v = list[i];
@@ -253,11 +311,13 @@ struct Counter {
     auto body = [&]() {
       Counter w = *this;                 // independent buffers + graph copy
       w.counts.assign(maxn + 1, 0);
+      if (byHeight) w.hcounts.assign((maxn + 1) * (maxn + 1), 0);
       w.list.reserve(V);
       int r;
       while ((r = nextR.fetch_add(1)) < V) w.runRoot(r);
       std::lock_guard<std::mutex> lk(reduceMu);
       for (int n = 0; n <= maxn; ++n) counts[n] += w.counts[n];
+      for (size_t i = 0; i < hcounts.size(); ++i) hcounts[i] += w.hcounts[i];
     };
     std::vector<std::thread> pool;
     pool.reserve(nthreads);
@@ -270,17 +330,26 @@ const int Counter::KDX[8] = {1, 1, 1, 0, 0, -1, -1, -1};
 const int Counter::KDY[8] = {1, 0, -1, 1, -1, 1, 0, -1};
 
 int main(int argc, char** argv) {
-  if (argc < 3 || argc > 4) {
+  // --byheight may appear anywhere; strip it, then read positionals.
+  std::vector<std::string> pos;
+  bool byHeight = false;
+  for (int i = 1; i < argc; ++i) {
+    const std::string a = argv[i];
+    if (a == "--byheight") byHeight = true;
+    else pos.push_back(a);
+  }
+  if (pos.size() < 2 || pos.size() > 3) {
     std::fprintf(stderr,
-                 "usage: %s {r90|r180|hmirror|dmirror} MAXN [THREADS]\n",
+                 "usage: %s {r90|r180|hmirror|dmirror|c4|d2ax|d2diag|d4} "
+                 "MAXN [THREADS] [--byheight]\n",
                  argv[0]);
     return 2;
   }
-  SymType type = makeType(argv[1]);
-  const int maxn = std::atoi(argv[2]);
+  SymType type = makeType(pos[0]);
+  const int maxn = std::atoi(pos[1].c_str());
   if (maxn < 1 || maxn > 40) { std::fprintf(stderr, "MAXN out of range\n"); return 2; }
 
-  int nthreads = argc == 4 ? std::atoi(argv[3]) : 0;
+  int nthreads = pos.size() == 3 ? std::atoi(pos[2].c_str()) : 0;
   if (nthreads <= 0) {
     nthreads = static_cast<int>(std::thread::hardware_concurrency());
     if (nthreads < 1) nthreads = 1;
@@ -295,12 +364,13 @@ int main(int argc, char** argv) {
   c.gridW = c.hi - c.lo + 1;
   c.gridCells = c.gridW * c.gridW;
   c.counts.assign(maxn + 1, 0);
+  c.byHeight = byHeight;
+  if (byHeight) c.hcounts.assign((maxn + 1) * (maxn + 1), 0);
 
-  obs::Reporter rep("symcount-" + std::string(argv[1]) + "-N" +
-                        std::to_string(maxn),
+  obs::Reporter rep("symcount-" + pos[0] + "-N" + std::to_string(maxn),
                     static_cast<double>(type.placements.size()),
-                    "type=" + std::string(argv[1]) +
-                        " threads=" + std::to_string(nthreads));
+                    "type=" + pos[0] + " threads=" + std::to_string(nthreads) +
+                        (byHeight ? " byheight=1" : ""));
   int pi = 0;
   for (const Placement& p : type.placements) {
     c.runPlacementParallel(p.group, nthreads);
@@ -308,9 +378,21 @@ int main(int argc, char** argv) {
     rep.beat(pi, "placement=" + std::to_string(pi));
   }
 
-  for (int n = 1; n <= maxn; ++n)
-    if (c.counts[n])
-      std::printf("%d %llu\n", n, static_cast<unsigned long long>(c.counts[n]));
+  // Flat "n count"; with --byheight, "n H count" rows instead (height = the
+  // bounding-box height of the whole animal, not of the quotient).
+  if (byHeight) {
+    for (int n = 1; n <= maxn; ++n)
+      for (int h = 1; h <= maxn; ++h)
+        if (c.hcounts[n * (maxn + 1) + h])
+          std::printf("%d %d %llu\n", n, h,
+                      static_cast<unsigned long long>(
+                          c.hcounts[n * (maxn + 1) + h]));
+  } else {
+    for (int n = 1; n <= maxn; ++n)
+      if (c.counts[n])
+        std::printf("%d %llu\n", n,
+                    static_cast<unsigned long long>(c.counts[n]));
+  }
   rep.done("result=ok");
   return 0;
 }

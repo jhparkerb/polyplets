@@ -82,7 +82,20 @@ twin. Asymptotic only, and free.
 
 ## High priority
 
-_(none outstanding — everything below was obtained 2026-08-06.)_
+- **G. E. Andrews, "Generalized Frobenius partitions," Memoirs of the American
+  Mathematical Society, Number 301, May 1984.** — RAISED 2026-08-07, and the
+  most wanted thing in this file. The square4 diamond tip's free-removal factor
+  is `phi_2` = A053993, and we cite Andrews eq. (5.9) for its product form
+  **entirely second-hand from the OEIS entry**. We verified the product against
+  our own cone count to n=40, so nothing is at risk numerically, but the
+  citation is unread. More important: the memoir is where `phi_k` is defined and
+  developed, so it is the place to find out whether "order ideals of the cone
+  {a >= |b|}" is a KNOWN reading of `phi_2`. Andrews' `phi_k` are two-rowed
+  arrays and our object is a pair of nested partitions, which smells like the
+  same bijection; if it is already in there, the min-end result cites it rather
+  than claiming it. A physical AMS Memoir — any research maths library. **[high]**
+
+_(everything below was obtained 2026-08-06.)_
 
 **The maxhole attribution chain, closed the same day it was opened.** A
 backward pass through the reference lists of Sieben 2008 and Altshuler et al.

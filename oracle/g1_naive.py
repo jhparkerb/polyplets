@@ -106,11 +106,24 @@ def canon_under(cells, t):
     return tuple(sorted((x - mx, y - my) for x, y in pts))
 
 
+# Subgroups of D4 as index sets into D4 above: e(0) r90(1) r180(2) r270(3)
+# h(4) v(5) d(6) ad(7). An animal is H-invariant iff every element of H fixes
+# it -- which is NOT the same as being fixed by any one element of H, so these
+# are separate objects from classfix.
+SUBGROUPS = {
+    "c4":     (0, 1, 2, 3),
+    "d2ax":   (0, 2, 4, 5),
+    "d2diag": (0, 2, 6, 7),
+    "d4":     (0, 1, 2, 3, 4, 5, 6, 7),
+}
+
+
 def count_symmetry(lattice, maxn):
     """Brute-force free/one-sided/fixed counts and per-element fixed counts.
 
     Square lattices only (D4 symmetry); polyhexes have a different group.
-    Returns {fixed, free, onesided, classfix[8]} as {n: count} dicts.
+    Returns {fixed, free, onesided, classfix[8], subfix} as {n: count} dicts,
+    subfix keyed by the SUBGROUPS names above.
     Deliberately re-grows from scratch -- oracle clarity over reuse.
     Validates Burnside internally: sum(classfix)/8 == free.
     """
@@ -118,22 +131,29 @@ def count_symmetry(lattice, maxn):
     nbrs = NEIGHBORS[lattice]
     fixed, free, onesided = {}, {}, {}
     classfix = {i: {} for i in range(8)}
+    subfix = {name: {} for name in SUBGROUPS}
 
     def analyze(animals, n):
         free_orbits, onesided_orbits = set(), set()
         cfix = [0] * 8
+        sfix = {name: 0 for name in SUBGROUPS}
         for a in animals:
             self_form = canon_under(a, D4[0])
             imgs = [canon_under(a, t) for t in D4]
             for i, im in enumerate(imgs):
                 if im == self_form:
                     cfix[i] += 1
+            for name, idxs in SUBGROUPS.items():
+                if all(imgs[i] == self_form for i in idxs):
+                    sfix[name] += 1
             free_orbits.add(min(imgs))
             onesided_orbits.add(min(imgs[:4]))
         free[n] = len(free_orbits)
         onesided[n] = len(onesided_orbits)
         for i in range(8):
             classfix[i][n] = cfix[i]
+        for name in SUBGROUPS:
+            subfix[name][n] = sfix[name]
 
     current = {frozenset([(0, 0)])}
     fixed[1] = 1
@@ -149,8 +169,8 @@ def count_symmetry(lattice, maxn):
         fixed[n] = len(grown)
         analyze(grown, n)
         current = grown
-    return {"fixed": fixed, "free": free,
-            "onesided": onesided, "classfix": classfix}
+    return {"fixed": fixed, "free": free, "onesided": onesided,
+            "classfix": classfix, "subfix": subfix}
 
 
 def main():

@@ -154,6 +154,53 @@ DMIRROR_PLACEMENTS = {
     "through_cells": [ID, lambda x, y: (y, x)],
 }
 
+# --- Order-4 and order-8 SUBGROUPS of D4 -------------------------------------
+#
+# The four types above are the per-ELEMENT fixed-point counts Burnside needs.
+# The orbit-SIZE distribution needs per-SUBGROUP invariant counts instead, and
+# those are different objects: I(D2ax) is the set of animals fixed by BOTH axis
+# mirrors, not Fix(h).  Each subgroup below has a fixed point (its centre), so
+# every placement pins translation completely and no anchor is needed.
+#
+# C4 = <r90> is already R90_PLACEMENTS: invariance under r90 IS invariance
+# under the whole cyclic group, so no new placements are needed for it.
+
+# D2ax = {e, h, v, r180}: two perpendicular axis-parallel mirrors, x = E/2 and
+# y = F/2, each through a line of cells (0) or between two lines (1).
+D2AX_PLACEMENTS = {
+    f"x{E}y{F}": [ID,
+                  (lambda E, F: lambda x, y: (x, F - y))(E, F),
+                  (lambda E, F: lambda x, y: (E - x, y))(E, F),
+                  (lambda E, F: lambda x, y: (E - x, F - y))(E, F)]
+    for E in (0, 1) for F in (0, 1)
+}
+
+# D2diag = {e, d, ad, r180}: the two diagonal mirrors.  A diagonal lattice
+# reflection must run through cell centres, so the axes are y = x and
+# x + y = D; translation moves the pair by (-a+b, a+b), so only D mod 2
+# survives -- two placements, centred on a cell (D=0) or a vertex (D=1).
+D2DIAG_PLACEMENTS = {
+    f"d{D}": [ID,
+              lambda x, y: (y, x),
+              (lambda D: lambda x, y: (D - y, D - x))(D),
+              (lambda D: lambda x, y: (D - x, D - y))(D)]
+    for D in (0, 1)
+}
+
+# D4, the full group: centre on a cell (V=0) or a vertex (V=1), as for r90.
+D4_PLACEMENTS = {
+    f"c{V}": [ID,
+              (lambda V: lambda x, y: (V - y, x))(V),
+              (lambda V: lambda x, y: (V - x, V - y))(V),
+              (lambda V: lambda x, y: (y, V - x))(V),
+              (lambda V: lambda x, y: (x, V - y))(V),
+              (lambda V: lambda x, y: (V - x, y))(V),
+              lambda x, y: (y, x),
+              (lambda V: lambda x, y: (V - y, V - x))(V)]
+    for V in (0, 1)
+}
+
+
 # Residual-translation anchors: a rotation centre pins position fully (None);
 # a horizontal mirror axis leaves x free -> pin leftmost cell at x=0; a
 # diagonal axis leaves the (1,1) direction free -> pin min(x+y) to {0,1}
@@ -175,6 +222,16 @@ SYMMETRY_TYPES = {
     "180-degree rotation": (R180_PLACEMENTS, NO_ANCHOR),
     "axis mirror":         (HMIRROR_PLACEMENTS, _anchor_xmin0),
     "diagonal mirror":     (DMIRROR_PLACEMENTS, _anchor_diag),
+}
+
+
+# Each SUBGROUP: (placements, anchor). Summing placements -> I(H), the number
+# of fixed animals invariant under H. Keys match symcount_fast's CLI names.
+SUBGROUP_TYPES = {
+    "c4":     (R90_PLACEMENTS,    NO_ANCHOR),
+    "d2ax":   (D2AX_PLACEMENTS,   NO_ANCHOR),
+    "d2diag": (D2DIAG_PLACEMENTS, NO_ANCHOR),
+    "d4":     (D4_PLACEMENTS,     NO_ANCHOR),
 }
 
 
