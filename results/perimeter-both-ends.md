@@ -241,14 +241,84 @@ which is not `P(x)^4` — it is larger from `j=2` on (18 against 14). Taking a
 `P(x)^c` needs the hull's corners to be LATTICE-ALIGNED, i.e. to span the
 lattice's own quadrant. King's box corners and the hexagon's corners are;
 square4's diamond tips are 90 degrees off the rook lattice, so the removable
-shapes there are not plain Young diagrams.
+shapes there are not plain Young diagrams. The next section closes this: the
+tip counts order ideals of its tangent cone, `P(x)` is the lattice-aligned
+special case, and square4 stops being an exception at all.
 
-**The per-tip series is A120452** (jasonp's lookup, 2026-08-07):
-`1, 1, 3, 5, 9, 14, 23, 34, 52, 75, 109, ...`, which OEIS also characterises as
-the integer partitions of `2n` with exactly two odd parts, one of which is the
-greatest, and as those with reverse-alternating sum 2. So the diamond tip's
-removable shapes are a known object, not a new one, and the series continues
-`23, 34, 52` — which predicts square4's `j = 6, 7, 8` free-removal terms.
+### A120452 is refuted at its seventh term, and the exception dissolves
+
+**A120452 was a six-term coincidence.** jasonp's 2026-08-07 lookup matched the
+per-tip series `1, 1, 3, 5, 9, 14` to A120452 (partitions of `2n` with exactly
+two odd parts, the greatest among them), which continues `23, 34, 52`. That
+predicts square4's `j=6` free-removal term as `1384`. The `W=13` diamond
+measured `1388`, and the `W=15` probe (2026-08-07, `results/perimmin_free_15_15_0.txt`,
+r=7 diamond, 113 cells) measures `1388` as well. Two hull radii agree, so `j=6`
+is converged and the convergence rule `W = 2j+1` holds. The per-tip series is
+`1, 1, 3, 5, 9, 14, 24`, and A120452's `23` is wrong. The discrepancy `1388 - 1384 = 4`
+is exactly `4 x (24 - 23)`, i.e. the four tips are still independent; only the
+tip series was misidentified.
+
+**What the tip actually counts: order ideals of its tangent cone.** A king box
+corner spans the lattice's own quadrant `{a >= 0, b >= 0}`, whose finite order
+ideals are Young diagrams, hence `P(x)`. Undo the diamond's 45-degree rotation
+and a square4 tip is instead the cone
+
+    C = {(a, b) in Z^2 : a >= |b|}
+
+Put `u = a - b`, `v = a + b`. That carries `C` to the index-2 sublattice
+
+    Q = {(u, v) in Z_{>=0}^2 : u = v (mod 2)}
+
+under the componentwise order. Writing a finite downset by its column sizes
+`a_i = c_{2i}`, `b_i = c_{2i+1}` gives exactly
+
+    a non-increasing, b non-increasing, a_i >= b_i, b_i >= a_{i+1} - 1
+
+equivalently pairs of partitions `(lambda, mu)` with `mu` contained in `lambda`
+and `lambda` minus its first row and column contained in `mu`, weighted by
+`|lambda| + |mu|`. Setting the `-1` offset to `0` collapses `lambda = mu` and
+recovers `P(x)`, which is the king control. Counting them
+(`experiments/cone_order_ideals.py`) gives
+
+    tip:      1, 1, 3, 5, 9, 14, 24, 35, 55, 81, 120, 171, 248, ...
+    control:  1, 1, 2, 3, 5,  7, 11, 15, 22, 30,  42,  56,  77, ...   = P(x)
+
+and the 4th power is
+
+    1, 4, 18, 60, 187, 524, 1388, 3452, 8229, 18800, 41536, ...
+
+matching every measured square4 diamond term including the `1388` that killed
+A120452. The model has no free parameters; it is derived from the cone, not
+fitted.
+
+**So the min-end law is lattice-general with no exception.** Each corner of the
+isoperimetric hull contributes the order-ideal generating function of its
+tangent cone intersected with the lattice; `P(x)` is the special case of a
+lattice-aligned (unimodular) cone, which is why king boxes and tri6 hexagons
+give `P(x)^4` and `P(x)^6`. square4's diamond tips are unimodular-failing and
+give `C^4`. Three lattices, one statement.
+
+The tip series has no known OEIS identity yet. `1, 1, 3, 5, 9, 14, 24, 35, 55,
+81, 120, 171, 248` is worth a lookup; its Euler transform exponents are
+`1, 2, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2, 2, ...`, not an evidently clean
+product. Note that A120452 also matches its first six terms, so a six-term
+lookup will hit the wrong sequence again.
+
+**Prediction, still untested:** `j = 7, 8` are `3452` and `8229`. Reaching them
+needs `W = 17` (145 cells), over the `kMaxCells = 128` u128 limit, so it needs a
+wider connectivity mask first.
+
+**Unresolved side observation.** The `W=14 parity=0` hull (6 corners, measured
+`1, 6, 25, 88, 272, 766, 2012`) and the `W=15 parity=1` hull (8 corners,
+`1, 8, 36, 128, 398, 1120, 2924`) fit no product `P^a C^b`. Dividing both by
+`C^4` leaves the *same* factor `1, 1, -1, -1, 0, 1, 1` in each, which is
+suggestive but has negative coefficients, so it is not itself a counting series.
+The natural geometric guess, that truncating a diamond tip replaces one sharp
+corner by two blunt ones of a common type `D`, fails: the 8th root of the
+8-corner series is not integral. Either those hulls' corner regions are not yet
+independent at `j <= 6`, or their `j=6` terms are not converged (`W=13` gave
+`2896` against `W=15`'s `2924` for the 8-corner family, so the `W = 2j+1` rule
+does not transfer to it). Both are cheap to settle with one more hull size each.
 
 ### A near miss that had to be measured, not argued
 
@@ -343,7 +413,7 @@ was run from here). Two hits, five apparent novelties:
 |---|---|---|
 | S1 | square4 diamond free-removals `1, 4, 18, 60, 187, 524` | **no match** |
 | S2 | square4 even-W hull free-removals `1, 6, 25, 88, 272, 766` | **no match** |
-| S3 | per-tip `1, 1, 3, 5, 9, 14` | **A120452** |
+| S3 | per-tip `1, 1, 3, 5, 9, 14` | **A120452 — REFUTED at the seventh term**, `24` not `23`; needs re-lookup as `1, 1, 3, 5, 9, 14, 24, 35, 55, 81, 120, 171, 248` |
 | S4 | hexagon free-removals `1, 6, 27, 98, 315, 918` | `P(x)^6`; A071734 matched the first five terms and is refuted at the sixth |
 | S5 | tri6 `C(p,0)` `1, 3, 2, 3, 6, 1, 6, ...` | **no match** |
 | S6 | king min-perimeter stable columns | **no match** (though the model explains them) |

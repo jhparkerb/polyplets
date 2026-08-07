@@ -66,7 +66,24 @@ interpolation. It was validated against the known k=4 and k=5 answers.
 n=78 was chosen because a period-6 degree-6 fit with two holdouts per class needs
 54 points above onset 24, i.e. n to 77.
 
-## THE live test: does A120452 predict square4's j=6?
+## RESOLVED 2026-08-07: A120452 refuted, the min-end law has no exception
+
+The `W=15` probes landed. `results/perimmin_free_15_15_0.txt` gives `j=6 = 1388`,
+same as `W=13`, so the term is converged and the `W = 2j+1` rule holds for the
+diamond family. A120452 predicted `1384` and is wrong at its seventh term
+(`23`, should be `24`). The per-tip series counts **order ideals of the tip's
+tangent cone** `{a >= |b|}`; `experiments/cone_order_ideals.py` computes it
+(`1, 1, 3, 5, 9, 14, 24, 35, 55, 81, ...`) and its 4th power reproduces every
+measured diamond term. `P(x)` is the lattice-aligned special case, so king,
+tri6 and square4 collapse to one statement. Full write-up in
+`results/perimeter-both-ends.md`. Open follow-ups from it: an OEIS lookup of the
+seven-plus-term tip series (six terms will hit A120452 again), the `j=7,8`
+predictions `3452, 8229` (blocked on `kMaxCells = 128`), and the unresolved
+6-corner/8-corner hull factorisation.
+
+The original framing of the test, kept for the record:
+
+### does A120452 predict square4's j=6?
 
 jasonp's OEIS lookups (2026-08-07) identified the per-tip series
 `1, 1, 3, 5, 9, 14` as **A120452**, which continues `23, 34, 52, 75, ...`. If the
