@@ -312,7 +312,8 @@ int main(int argc, char** argv) {
   int RMAX = std::atoi(argv[3]);
   int threads = 1;
   bool boxes_out = false;
-  int onlyW = 0, onlyH = 0, onlyP = 0;
+  int onlyW = 0, onlyH = 0, onlyP = 0, onlySlo = 0, onlyShi = 0;
+  bool onlyHex = false;
   for (int a = 4; a < argc; ++a) {
     if (!std::strcmp(argv[a], "--threads") && a + 1 < argc)
       threads = std::atoi(argv[++a]);
@@ -325,6 +326,12 @@ int main(int argc, char** argv) {
       onlyW = std::atoi(argv[++a]);
       onlyH = std::atoi(argv[++a]);
       onlyP = std::atoi(argv[++a]);
+      // optional hex window: --only W H parity SLO SHI
+      if (a + 2 < argc && argv[a + 1][0] != '-') {
+        onlySlo = std::atoi(argv[++a]);
+        onlyShi = std::atoi(argv[++a]);
+        onlyHex = true;
+      }
     }
   }
 
@@ -347,7 +354,10 @@ int main(int argc, char** argv) {
   struct Job { int W, H, parity, mult, slo, shi; };
   std::vector<Job> jobs;
   if (onlyW) {
-    jobs.push_back({onlyW, onlyH, onlyP, 1, 0, onlyW + onlyH - 2});
+    jobs.push_back({onlyW, onlyH, onlyP, 1,
+                    onlyHex ? onlySlo : 0,
+                    onlyHex ? onlyShi : onlyW + onlyH - 2});
+    if (onlyHex) hex3 = true;
     boxes_out = true;
   }
   // Transposing (u,v) is a lattice symmetry on all three lattices and fixes the

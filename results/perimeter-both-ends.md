@@ -204,6 +204,30 @@ So across three lattices the shape of the law is the same — eventually constan
 in `p`, onset growing with `i` — and the **period is set by the isoperimetric
 shape**: 4 for the square and diamond hulls, 6 for the hexagonal one.
 
+### The free-removal factor is P(x)^(corners)
+
+The mechanism generalises with it, and sharply. Measured directly on a single
+large hull (`--only`), the perimeter-preserving removal counts are
+
+    king, square box (4 corners), W=7:   1, 4, 14, 40, 105, 252, 574   = [x^j] P(x)^4
+    tri6, hexagon    (6 corners), r=4:   1, 6, 27, 98, 315             = [x^j] P(x)^6
+
+with `P(x) = prod 1/(1-x^n)`, each converging term by term as the hull outgrows
+`j`. So the per-hull factor is `P(x)^c` with `c` the number of corners of the
+isoperimetric hull: a Young diagram at each corner, independently, exactly as
+the king argument said — and the hexagon confirms it was a general argument
+rather than a fact about boxes.
+
+**square4 is the exception, and its exception is informative.** Its diamond
+gives `1, 4, 18, 60, 187, 524` (converged to `j=5`; `W=11` and `W=13` agree),
+which is not `P(x)^4` — it is larger from `j=2` on (18 against 14). Taking a
+4th root gives a per-tip series `1, 1, 3, 5, 9, 14`, not the partition numbers
+`1, 1, 2, 3, 5, 7`. The reading — interpretation, not measurement — is that
+`P(x)^c` needs the hull's corners to be LATTICE-ALIGNED, i.e. to span the
+lattice's own quadrant. King's box corners and the hexagon's corners are;
+square4's diamond tips are 90 degrees off the rook lattice, so the removable
+shapes there are not plain Young diagrams. What does count them is open.
+
 ### square4: stabilises, but not to the same numbers
 
 All **four** residue classes stabilise here, not just the even ones. Values are
