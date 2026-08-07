@@ -226,7 +226,31 @@ which is not `P(x)^4` — it is larger from `j=2` on (18 against 14). Taking a
 `P(x)^c` needs the hull's corners to be LATTICE-ALIGNED, i.e. to span the
 lattice's own quadrant. King's box corners and the hexagon's corners are;
 square4's diamond tips are 90 degrees off the rook lattice, so the removable
-shapes there are not plain Young diagrams. What does count them is open.
+shapes there are not plain Young diagrams.
+
+**The per-tip series is A120452** (jasonp's lookup, 2026-08-07):
+`1, 1, 3, 5, 9, 14, 23, 34, 52, 75, 109, ...`, which OEIS also characterises as
+the integer partitions of `2n` with exactly two odd parts, one of which is the
+greatest, and as those with reverse-alternating sum 2. So the diamond tip's
+removable shapes are a known object, not a new one, and the series continues
+`23, 34, 52` — which predicts square4's `j = 6, 7, 8` free-removal terms.
+
+### A near miss that had to be measured, not argued
+
+`P(x)^6` was claimed for the hexagon on data converged only to `j=4`
+(`1, 6, 27, 98, 315`). Those five terms are also the opening of **A071734**,
+`p(5n+4)/5` — Ramanujan's congruence — because
+`sum p(5n+4) x^n = 5 * prod (1-x^{5n})^5 / (1-x^n)^6`, i.e. A071734 is exactly
+`P(x)^6` corrected by `prod (1-x^{5n})^5 = 1 - 5x^5 + ...`. The two agree to
+`j=4` and part at `j=5`: **918** against **913**.
+
+Measured on an `r=5` hull (`--only 11 11 -1 5 15`): **918**. So it is `P(x)^6`
+and the Ramanujan sequence is a coincidence of the first five terms. Each hull
+radius has bought exactly one more correct term (`r=3` right to `j=3`, `r=4` to
+`j=4`), so `r=5` is the first hull that can see `j=5` at all.
+
+The lesson is the one worth keeping: five converged terms and a clean structural
+argument were still not enough to exclude a different classical sequence.
 
 ### square4: stabilises, but not to the same numbers
 
@@ -294,6 +318,26 @@ coefficient, and disagree at the min end on the very first nontrivial constant.
 Census data kept: `results/perimmin_square8_p40_r6.txt` and
 `results/perimmin_square4_p24_r6.txt` (`n p count`, with the completeness domain
 in the header), plus their `.log` provenance.
+
+## OEIS status of the seven series
+
+Looked up by jasonp, 2026-08-07 (external services are his call, so none of this
+was run from here). Two hits, five apparent novelties:
+
+| | series | result |
+|---|---|---|
+| S1 | square4 diamond free-removals `1, 4, 18, 60, 187, 524` | **no match** |
+| S2 | square4 even-W hull free-removals `1, 6, 25, 88, 272, 766` | **no match** |
+| S3 | per-tip `1, 1, 3, 5, 9, 14` | **A120452** |
+| S4 | hexagon free-removals `1, 6, 27, 98, 315, 918` | `P(x)^6`; A071734 matched the first five terms and is refuted at the sixth |
+| S5 | tri6 `C(p,0)` `1, 3, 2, 3, 6, 1, 6, ...` | **no match** |
+| S6 | king min-perimeter stable columns | **no match** (though the model explains them) |
+| S7 | square4 min-perimeter stable columns | **no match** |
+
+"No match" is OEIS's answer to the terms I had, not a novelty proof: S1 and S2
+carry six terms and S7 four or five, which is thin. S6 is the interesting one --
+it has a complete model here (`q4` convolved with the box-skew deficits) and yet
+is not in OEIS, so it is a derived-but-unrecorded sequence rather than a mystery.
 
 ## Status of these claims
 
