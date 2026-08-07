@@ -1,0 +1,19 @@
+event=start job=perimeter_min t=2026-08-07T11:24:58-04:00 git=113002f-dirty built=2026-08-07T10:32:28-0400 host=gympie lattice=tri6 pmax=30 rmax=6
+event=plan job=perimeter_min boxes=1142
+event=heartbeat job=perimeter_min t=2026-08-07T11:25:43-04:00 elapsed_s=45.3 rate=11.51/s count=521 boxes=1142 nodes=753222411
+event=heartbeat job=perimeter_min t=2026-08-07T11:26:29-04:00 elapsed_s=90.9 rate=6.557/s count=596 boxes=1142 nodes=1270790997
+event=heartbeat job=perimeter_min t=2026-08-07T11:27:15-04:00 elapsed_s=137.0 rate=4.614/s count=632 boxes=1142 nodes=1824478179
+event=heartbeat job=perimeter_min t=2026-08-07T11:28:00-04:00 elapsed_s=182.2 rate=4.023/s count=733 boxes=1142 nodes=2383764516
+event=heartbeat job=perimeter_min t=2026-08-07T11:28:47-04:00 elapsed_s=229.0 rate=3.38/s count=774 boxes=1142 nodes=2857878340
+event=heartbeat job=perimeter_min t=2026-08-07T11:29:33-04:00 elapsed_s=274.6 rate=2.906/s count=798 boxes=1142 nodes=3250618819
+event=heartbeat job=perimeter_min t=2026-08-07T11:30:19-04:00 elapsed_s=320.6 rate=2.592/s count=831 boxes=1142 nodes=3763605083
+event=heartbeat job=perimeter_min t=2026-08-07T11:31:04-04:00 elapsed_s=366.1 rate=2.338/s count=856 boxes=1142 nodes=4164368866
+event=heartbeat job=perimeter_min t=2026-08-07T11:31:50-04:00 elapsed_s=411.6 rate=2.179/s count=897 boxes=1142 nodes=4583026767
+event=heartbeat job=perimeter_min t=2026-08-07T11:32:38-04:00 elapsed_s=459.4 rate=2.007/s count=922 boxes=1142 nodes=5072910960
+event=heartbeat job=perimeter_min t=2026-08-07T11:33:24-04:00 elapsed_s=506.1 rate=1.842/s count=932 boxes=1142 nodes=5499482172
+event=heartbeat job=perimeter_min t=2026-08-07T11:34:10-04:00 elapsed_s=552.2 rate=1.773/s count=979 boxes=1142 nodes=6009630564
+event=heartbeat job=perimeter_min t=2026-08-07T11:34:56-04:00 elapsed_s=598.0 rate=1.672/s count=1000 boxes=1142 nodes=6330089560
+event=heartbeat job=perimeter_min t=2026-08-07T11:35:43-04:00 elapsed_s=645.3 rate=1.598/s count=1031 boxes=1142 nodes=6792903287
+event=heartbeat job=perimeter_min t=2026-08-07T11:36:29-04:00 elapsed_s=691.2 rate=1.509/s count=1043 boxes=1142 nodes=7248206907
+event=heartbeat job=perimeter_min t=2026-08-07T11:37:15-04:00 elapsed_s=737.3 rate=1.48/s count=1091 boxes=1142 nodes=7702506348
+event=done job=perimeter_min t=2026-08-07T11:37:42-04:00 start=2026-08-07T11:24:58-04:00 wall_s=764.0 cpu_s=4571.4 peak_rss_mb=3.1 result=ok boxes=1142 nodes=8115905828 emitted=7505846743 cells=647

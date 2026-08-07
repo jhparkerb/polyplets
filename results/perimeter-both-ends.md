@@ -191,14 +191,29 @@ which is not a parallelogram in any linear frame. So the hull family became a
 range on each of a list of linear functionals: `u, v` for the square lattices
 (a rectangle — the old behaviour exactly), and `u, v, u+v` for tri6 (a hexagon).
 
-With that, tri6's ladder stabilises too — but with **period 6, not 4**:
+With that, tri6's ladder stabilises too — but with **period 6, not 4**. At
+`p <= 30`, `i = 0` and `i = 1` are stable in all six classes:
 
-    C(p, 0) = 1, 6, 3, 2, 3, 6   for p = 0, 1, 2, 3, 4, 5 mod 6
+    C(p, 0) =  1,  6,  3,  2,  3,  6    for p = 0..5 mod 6
+    C(p, 1) = 14, 42, 27, 24, 27, 42
 
-all six classes STABLE, the `1` falling on `p = 0 mod 6` where the hull is the
-perfect hexagon and is unique. `i=1` is stable at 14 in the `0 mod 6` class and
-consistent at `27, 24, 27, 42` in the others on two points each; firming those
-needs `p = 30`, which is ~5 h single-core and was not run.
+the `1` falling on `p = 0 mod 6`, where the hull is the perfect hexagon and is
+unique.
+
+**And the whole king model transfers, with `q6` for `q4`.** The king form was
+
+    C(p, i) = sum over hulls H with pbox(H) = p of q_c(i - deficit(H))
+
+with `deficit(H) = nmax(p) - |H|` and `c` the hull's corner count. Feeding tri6's
+hull inventory (areas and multiplicities straight out of `--boxes`) and `q6` into
+that formula, with **nothing fitted**, reproduces every settled column:
+
+    18 of 18 settled columns agree, 0 mismatches
+    (p=30: i=0..3 -> 1, 14, 87, 392; p=25..29: i=0..2 across the other classes)
+
+So the min-end law is lattice-general rather than a fact about boxes: the hull
+family supplies the deficits, the corner count supplies the exponent, and the
+partition function does the rest. `experiments/perimeter_min_hex_model.py`.
 
 So across three lattices the shape of the law is the same — eventually constant
 in `p`, onset growing with `i` — and the **period is set by the isoperimetric
