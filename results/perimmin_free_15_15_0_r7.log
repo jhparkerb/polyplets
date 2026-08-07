@@ -1,0 +1,2 @@
+event=start job=perimeter_min t=2026-08-07T12:51:14-04:00 git=9253525-dirty built=2026-08-07T12:34:37-0400 host=gympie lattice=square4 pmax=999 rmax=7
+event=plan job=perimeter_min boxes=1

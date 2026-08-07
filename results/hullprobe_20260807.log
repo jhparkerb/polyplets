@@ -1,0 +1,3 @@
+=== W=16 H=16 parity=0 rmax=6 -> results/perimmin_free_16_16_0.txt
+# box W=16 H=16 parity=0 slo=0 shi=30 pbox=34 cells=128 mult=1 free: 1 6 25 88 272 766 2012
+=== W=17 H=17 parity=1 rmax=6 -> results/perimmin_free_17_17_1.txt
