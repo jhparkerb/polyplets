@@ -110,13 +110,22 @@ predicts, the confluent 3-parameter fit is stable to 4 significant figures acros
 12-term window, and the C2 margin structure independently tracks `-theta/n^2`
 (`results/open-conjectures.md`) — three things that would have to conspire. Note
 also that 1324-avoiders are the known pathology among length-4 classes, not the
-norm. **Not a reason to doubt `lambda = 7.110(1)`, but it is a named alternative
-hypothesis we have never explicitly tested.**
+norm. **Not a reason to doubt `lambda = 7.110(1)`.**
 
-Concrete test if anyone wants it: refit the 40 terms with `mu_1^sqrt(n)` admitted
-as a fourth parameter and see whether `mu_1` is driven to 1 (no stretched
-exponential) or lands away from it. Cheap, and it converts an untested assumption
-into a measurement.
+**TESTED 2026-08-07 — `results/stretched-exponential-test.md`.** The 40 terms
+were refitted with `mu_1^sqrt(n)` admitted as a fourth parameter (the ansatz is
+linear in logs, so 4-point windows solve exactly). `mu_1 -> 1.0068` after
+Richardson extrapolation, against a calibrated resolving power of 1%: with a
+confluent correction planted underneath, planted `mu_1` of 1.00 / 0.99 / 0.95
+recover as 0.969 / 0.960 / 0.921, so a 1% stretched exponential separates
+cleanly and the measurement sits above even the zero-correction calibration
+point. No stretched exponential. The same fit returns `theta -> -0.981` while
+free to blame one instead, which corroborates `theta = -1.000(1)` from a
+strictly larger ansatz than produced it.
+
+The caution above still stands as a caution — DAs *are* blind to this factor,
+which is why the test was worth running — but it is no longer an untested
+hypothesis.
 
 ## Independent corroboration: the geometric-case pipeline fails correctly (2026-08-05)
 

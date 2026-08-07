@@ -450,12 +450,18 @@ project is closing out at a(40).
 
 ---
 
-## Cheapest genuinely open item, already named elsewhere
+## Cheapest genuinely open item, already named elsewhere — DONE 2026-08-07
 
-Not from this sweep — `results/series-analysis-da.md` names it itself and it
+~~Not from this sweep — `results/series-analysis-da.md` names it itself and it
 is still undone: refit the 40 terms admitting a `mu_1^sqrt(n)` stretched
 exponential as a fourth parameter and see whether `mu_1` is driven to 1. That
-converts a named untested alternative hypothesis into a measurement.
+converts a named untested alternative hypothesis into a measurement.~~
+
+**Done: `results/stretched-exponential-test.md`.** `mu_1 -> 1.0068` against a
+calibrated 1% resolving power — no stretched exponential — and `theta -> -0.981`
+as a by-product, corroborating `theta = -1.000(1)` from a strictly larger
+ansatz. This is the one item in this file that named a sentence which would get
+shorter, and that sentence has been shortened.
 
 ---
 
