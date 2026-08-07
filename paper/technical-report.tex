@@ -1,0 +1,331 @@
+\documentclass[11pt]{article}
+
+% * a(n) confirmed two ways up through a(22)                                          
+% * a(n) computed using following techniques to cut search space up to a(35) or a(40),
+%   depending on how strict we want to be                                             
+% * split partial sums of a(n) into T(n,H)                                            
+%    - exposes T(H, H) and T(k, H) for small k; this leads naturally to formulae for  
+%      other regions of the triangle                                                  
+% * computation of related sequences for symmetrical polyplets, those having holes    
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{numprint}
+\usepackage{microtype}
+\usepackage[table]{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{flafter}   % a float never appears before the text that introduces it
+\usepackage{float}     % [H] pins tables/figures exactly where written
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\setlength{\intextsep}{16pt plus 3pt minus 3pt}
+
+\npthousandsep{,}
+\npfourdigitsep
+\newcommand{\num}[1]{\numprint{#1}}
+\newcommand{\g}{\cellcolor{gray!15}}
+
+\title{Polyplets}
+\author{Jason Parker-Burlingham \texttt{<jasonp@panix.com>}}
+\date{July 18, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The king-lattice polyplet sequence \href{https://oeis.org/A006770}{A006770} has been expanded
+through
+\[
+  a(40) = \num{56749893611764175164545926946127};
+\]
+terms through $a(22)$ were computed via the transfer matrix method and Redelmeier enumeration.
+Terms for $23 \le{} n \le{} 35$ were computed twice on different machines; $a(36)$--$a(40)$ were
+computed once.  All terms pass a battery of consistency checks.
+
+A new triangular sequence $T(n,H), H\le{}n$ is proposed that counts the king polyplets of size $n$
+and height exactly $H$.  Formulas for small $H$ and the region where $H>n/2$ are derived that
+allowed computation of larger $a(n)$.
+
+This work is completed with heavy assistance from Claude Code, especially the Fable model.
+\end{abstract}
+
+\section{Definitions}
+\label{sec:definitions}
+
+An \textbf{animal} is a finite, connected set of cells on a lattice; the \textbf{size} of an animal
+is the number of cells that comprise it; the \textbf{height} of an animal is the height of its
+bounding box.  In particular the \textbf{king polyplets} (or polyplets) that exist on the king
+lattice where cells are connected by the 8 compass directions are considered here; the
+rook-connected animals known as \textbf{polyominoes} are also relevant.
+
+The polyplets can be counted with respect to the symmetries of the king lattice:
+\begin{description}
+\item[Fixed] polyplets are distinct up to translation (\href{https://oeis.org/A006770}{A006770});
+\item[One-sided] polyplets are distinct up to translation and rotation
+	(\href{https://oeis.org/A030233}{A030233});
+\item[Free] polyplets are distinct up to translation, rotation and reflection
+	(\href{https://oeis.org/A030222}{A030222});
+\end{description}
+
+Within the free polyplets, those that are \textbf{bilateral} have at least one reflection symmetry
+(\href{https://oeis.org/A030234}{A030234}); those that are \textbf{asymmetric} have no reflective
+symmetry (\href{https://oeis.org/A030235}{A030235}).
+
+A polyplet may have one or more \textbf{holes}, polyominoes of unfilled cells enclosed by
+king-connected occupied cells.  Thus a hole of size $1$ may be enclosed by a polyplet of size $4$,
+and a domino of $2$ cells or two size-$1$ holes may be enclosed by a polyplet of size $6$.
+
+$\mathbf{T(n,H)}$, $1\le{H}\le{n}$ is the number of fixed polyplets of size $n$ whose bounding box is of
+height exactly $H$; the row sums produce $a(n)$, the number of fixed polyplets of size $n$ (A006770).
+
+\section{Results}
+\label{sec:results}
+
+% In narrative order, give:
+% 1 a(n)
+% 2 T(n,H), closed-form regions, diagonal law
+% 3 One-sided, free, bilateral, asymmetric; A194596
+% 4 Hole-classified counts
+% 5 lambda bounds
+
+\paragraph{Enumeration of the fixed polyplets} Table~\ref{tab:an} gives all known $a(n)$:
+
+\begin{table}
+\begin{tabular}{r r @{\quad}|@{\quad} r r}
+\toprule
+$n$ & $a(n)$ & $n$ & $a(n)$\\
+\midrule
+1           & \num{1}                & \textbf{21} & \num{6954084405510437}\\
+2           & \num{4}                & \textbf{22} & \num{47255332844367680}\\
+3           & \num{20}               & \textbf{23} & \num{321749260511448732}\\
+4           & \num{110}              & \textbf{24} & \num{2194666793369310473}\\
+5           & \num{638}              & \textbf{25} & \num{14994811325186658577}\\
+6           & \num{3832}             & \textbf{26} & \num{102607513847014153892}\\
+7           & \num{23592}            & \textbf{27} & \num{703126792093436034256}\\
+8           & \num{147941}           & \textbf{28} & \num{4824589228356722264087}\\
+9           & \num{940982}           & \textbf{29} & \num{33145129805782422061325}\\
+10          & \num{6053180}          & \textbf{30} & \num{227969227118066423789154}\\
+11          & \num{39299408}         & \textbf{31} & \num{1569631619081324581014300}\\
+12          & \num{257105146}        & \textbf{32} & \num{10818203977457804418974036}\\
+13          & \num{1692931066}       & \textbf{33} & \num{74631481980411777590683952}\\
+14          & \num{11208974860}      & \textbf{34} & \num{515316838423862758858377704}\\
+15          & \num{74570549714}      & \textbf{35} & \num{3561147281381782175236253062}\\
+16          & \num{498174818986}     & \textbf{36} & \num{24629107617723857143962968288}\\
+17          & \num{3340366308393}    & \textbf{37} & \num{170463735577007360431441250424}\\
+18          & \num{22471158811164}   & \textbf{38} & \num{1180654489101178485738417779914}\\
+\textbf{19} & \num{151609203011580}  & \textbf{39} & \num{8182864667276277865830132493466}\\
+\textbf{20} & \num{1025573519362016} & \textbf{40} & \num{56749893611764175164545926946127}\\
+\bottomrule
+\end{tabular}
+\caption{Fixed polyplets $a(n)$, $n=1,\dots,40$.  Terms $1$--$18$ match A006770; new terms have bold $n$.}
+\label{tab:an}
+\end{table}
+
+\paragraph{Fixed polyplets by height} Table~\ref{tab:tnh} shows $T(n,H)$ for small $n$.  Regions of
+this table have formulas: $T(n,n)$ is the number of polyplets with one cell per row; this
+requirement forces $3^{n-1}$.  When $H>n/2$, cell placement choices are sufficiently constrained to
+require $T(n,H) = P_{n-H}(n)\,3^{3H-2n-1}$ where the integer-valued $P_k$ has degree $k=n-H$ and the
+leading coefficient is exactly $25^k/k!$.  $P_k$ is explicitly known for $k\le19$ after being fitted
+against computed values of $T(n,H)$ and verified against values from later rows.  $P_k$ can be fixed
+after computing the $3k$-th row of $T(n,H)$.
+
+\begin{table}
+\centering\footnotesize 
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{r | r r r r r r r r r r r r}
+\toprule
+$n$ & $H=1$ & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12\\
+\midrule
+ 1 & \g1\\
+ 2 & 1 & \g3\\
+ 3 & 1 & \g10 & \g9\\
+ 4 & 1 & 27 & \g55 & \g27\\
+ 5 & 1 & 68 & \g248 & \g240 & \g81\\
+ 6 & 1 & 167 & 996 & \g1480 & \g945 & \g243\\
+ 7 & 1 & 406 & 3775 & \g7898 & \g7273 & \g3510 & \g729\\
+ 8 & 1 & 983 & 13837 & 39119 & \g47066 & \g32193 & \g12555 & \g2187\\
+ 9 & 1 & 2376 & 49676 & 185198 & \g278240 & \g241864 & \g133326 & \g43740 & \g6561\\
+10 & 1 & 5739 & 175964 & 850650 & 1558399 & \g1631340 & \g1134865 & \g527094 & \g149445 & \g19683\\
+11 & 1 & 13858 & 617789 & 3824200 & 8422286 & \g10311170 & \g8533676 & \g5001114 & \g2013255 & \g503010 & \g59049\\
+12 & 1 & 33459 & 2156027 & 16922729 & 44372452 & 62471842 & \g59434367 & \g41336884 & \g21039624 & \g7487559 & \g1673055 & \g177147\\
+\bottomrule
+\end{tabular}
+\caption{Fixed polyplets by height $T(n, H)$.  Shaded cells can be computed using formulas.}
+\label{tab:tnh}
+\end{table}
+
+\paragraph{Non-fixed polyplets} Table~\ref{tab:onefree} and Table~\ref{tab:bisym} give new counts
+for one-sided, free, bilateral and asymmetric polyplets of size $n$ as well as free polyplets that
+are not polyominoes (\href{https://oeis.org/A194596}{A194596}).  Note that few polyplets are
+polyominoes thanks to the higher polyplet growth rate, and that the one-sided count approaches
+$a(n)/4$ and the free count approaches $a(n)/8$ as $n$ grows.
+
+\begin{table}
+\begin{tabular}{r | r r}
+\toprule
+$n$         &                         one-sided &                            free\\
+\midrule
+\textbf{18} &               \num{5617792259411} &             \num{2808898025438}\\
+\textbf{19} &              \num{37902303297525} &            \num{18951156321090}\\
+\textbf{20} &             \num{256393397108358} &           \num{128196711128365}\\
+\textbf{21} &            \num{1738521118535082} &           \num{869260590388450}\\
+\textbf{22} &           \num{11813833328245848} &          \num{5906916748001325}\\
+\textbf{23} &           \num{80437315244081648} &         \num{40218657830371643}\\
+\textbf{24} &          \num{548666699140240976} &        \num{274333350132318510}\\
+\textbf{25} &         \num{3748702832087014098} &       \num{1874351417444073722}\\
+\textbf{26} &        \num{25651878467205504568} &      \num{12825939237386225482}\\
+\textbf{27} &       \num{175781698028751634291} &      \num{87890849023826053192}\\
+\textbf{28} &      \num{1206147307126536440324} &     \num{603073653588819503780}\\
+\textbf{29} &      \num{8286282451482505589564} &    \num{4143141225805220756331}\\
+\textbf{30} &     \num{56992306779773178547095} &   \num{28496153390059675197641}\\
+\textbf{31} &    \num{392407904770584270738465} &  \num{196203952385726340537921}\\
+\textbf{32} &   \num{2704550994366217058008641} & \num{1352275497184284183618433}\\
+\textbf{33} &  \num{18657870495104684580672401}\\
+\textbf{34} & \num{128829209605977867230343869}\\
+\bottomrule
+\end{tabular}
+\caption{One-sided and free polyplet counts.}
+\label{tab:onefree}
+\end{table}
+
+\begin{table}
+\begin{tabular}{r | r r r}
+\toprule
+$n$         &           bilateral &                      asymmetric &                 non-polyominoes\\
+\midrule
+\textbf{18} &       \num{3791465} &             \num{2808894233973} &             \num{2808705403386}\\
+\textbf{19} &       \num{9344655} &            \num{18951146976435} &            \num{18950413696858}\\
+\textbf{20} &      \num{25148372} &           \num{128196685979993} &           \num{128193840456415}\\
+\textbf{21} &      \num{62241818} &           \num{869260528146632} &           \num{869249467327772}\\
+\textbf{22} &     \num{167756802} &          \num{5906916580244523} &          \num{5906873556143637}\\
+\textbf{23} &     \num{416661638} &         \num{40218657413710005} &         \num{40218489783363915}\\
+\textbf{24} &    \num{1124396044} &        \num{274333349007922466} &        \num{274332695132618107}\\
+\textbf{25} &    \num{2801133346} &       \num{1874351414642940376} &       \num{1874348860217028958}\\
+\textbf{26} &    \num{7566946396} &      \num{12825939229819279086} &      \num{12825929238297403407}\\
+\textbf{27} &   \num{18900472093} &      \num{87890849004925581099} &      \num{87890809870815114705}\\
+\textbf{28} &   \num{51102567236} &     \num{603073653537716936544} &     \num{603073500077718909177}\\
+\textbf{29} &  \num{127935923098} &    \num{4143141225677284833233} &    \num{4143140623183267694353}\\
+\textbf{30} &  \num{346171848187} &   \num{28496153389713503349454} &   \num{28496151021712637626389}\\
+\textbf{31} &  \num{868410337377} &  \num{196203952384857930200544} &  \num{196203943068019810549971}\\
+\textbf{32} & \num{2351309228225} & \num{1352275497181932874390208} & \num{1352275460489267191905554}\\
+\bottomrule
+\end{tabular}
+\caption{Counts of bilateral and asymmetric free polyplets, and the number of
+non-polyomino free polyplets.  Note that
+$\#\text{bilateral} + \#\text{asymmetric} = \#\text{free}$.}
+\label{tab:bisym}
+\end{table}
+
+\paragraph{Holes} Polyplets with holes were tracked and counted during transfer
+matrix enumeration by tracking the Euler characteristic through $n=18$.
+Redelmeier enumeration checked these counts using flood-fill to verify counts
+for $n\le14$.  Coounts are given in Table~\ref{tab:holes}
+
+\begin{table}
+\begin{tabular}{r | r r r r}
+\toprule
+$n$ & $k=0$ & 1 & 2 & 3\\
+\midrule
+ 1 & 1\\
+ 2 & 4\\
+ 3 & 20\\
+ 4 & 109 & 1\\
+ 5 & 622 & 16\\
+ 6 & \num{3664} & 166 & 2\\
+ 7 & \num{22094} & \num{1456} & 42\\
+ 8 & \num{135609} & \num{11788} & 538 & 6\\
+ 9 & \num{843941} & \num{91300} & \num{5596} & 144\\
+10 & \num{5310754} & \num{688034} & \num{52268} & \num{2082}\\
+11 & \num{33724862} & \num{5091820} & \num{457754} & \num{24144}\\
+12 & \num{215793158} & \num{37209939} & \num{3841776} & \num{248526}\\
+13 & \num{1389673091} & \num{269452496} & \num{31290820} & \num{2374520}\\
+14 & \num{8998648488} & \num{1937956658} & \num{249306876} & \num{21556520}\\
+15 & \num{58548155506} & \num{13865448048} & \num{1953275736} & \num{188568632}\\
+16 & \num{382526638033} & \num{98796744112} & \num{15103433472} & \num{1603972074}\\
+17 & \num{2508473632910} & \num{701664375696} & \num{115556223626} & \num{13348948048}\\
+18 & \num{16503616943998} & \num{4970078092354} & \num{876484089730} & \num{109173877126}\\
+\bottomrule
+\end{tabular}\\[2ex]
+\begin{tabular}{r | r r r r r r r}
+\toprule
+$n$ & $k=4$ & 5 & 6 & 7 & 8 & 9 & 10\\
+\midrule
+ 9 & 1\\
+10 & 42\\
+11 & 820 & 8\\
+12 & \num{11482} & 263 & 2\\
+13 & \num{135235} & \num{4808} & 96\\
+14 & \num{1437090} & \num{67020} & \num{2186} & 22\\
+15 & \num{14261808} & \num{804084} & \num{35086} & 808 & 6\\
+16 & \num{134769521} & \num{8779911} & \num{465138} & \num{16410} & 314 & 1\\
+17 & \num{1227552608} & \num{89826208} & \num{5490242} & \num{251104} & \num{7847} & 104\\
+18 & \num{10866411352} & \num{876032532} & \num{59950610} & \num{3272674} & \num{137298} & \num{3460} & 30\\
+\bottomrule
+\end{tabular}
+\caption{Count of fixed polyplets of size $n$ with exactly $k$ holes.}
+\label{tab:holes}
+\end{table}
+
+\paragraph{Growth rate} $a(n)^{1/n} \to \lambda$ where $\lambda\approx7.11$, checkable from Table~\ref{tab:an}
+
+\section{Methods}
+\label{sec:methods}
+
+\paragraph{Redelmeier enumeration} An implementation of Redelmeier enumeration was used to extend
+$a(n)$ and to confirm the correctness of the counts for larger $n$.  As runtime and storage
+increases with $a(n)$ only terms through $n=22$ could be confirmed with this software.
+
+\paragraph{Transfer matrix method} When the space and time requirements for Redelmeier were reached,
+polyplet classes were counted by height of the bounding box by freezing the left-hand-side of each animal
+class in progress and considering how the polyplets could grow given constraints on the previous column,
+whether the top and/or bottom of the bounding box had been reached, cell connectivity rules and the number
+of cells still able to be placed.
+
+\paragraph{Formulas} Formulas exist for $T(n,H)$ where $n=H$ and $H>n/2$.  $T(n,n)=3^{n-1}$
+by simply choosing 1 of 3 positions to occupy in each row besides the first.
+
+For $T(n, n-1)$, there are $n-1$ rows and $n-2$ junctions between rows where a choice is made for
+the shape and placement of the next cell(s).  Single cells have exactly three options: left, right
+and center of the previous cell.
+
+To occupy $n$ cells in $n-1$ rows, one row must have two cells that both must be connected to the
+rest of the polyplet:  a `joiner' that can be either a left-right domino or a `split' where two
+cells are separated by exactly one empty cell (a larger gap could not be spanned by only one
+occupied cell in the next row).  The joiner can be present at any of the $n-3$ interior rows.
+
+For a domino joiner, one junction has 4 possibilities (rather than 3), and the other also has
+4:  the domino may connect diagonally or orthogonally to the left or right of the previous cell,
+and the subsequent cell may be similarly placed.  This means we have $16(n-3)\cdot{}3^{n-4}$ junction
+possibilities.
+
+%   ...X...  ...X...  ...X...  ...X...
+%   .11....  ..22...  ...33..  ....44.
+%   abcd...  .abcd..  ..abcd.  ...abcd
+
+For a split joiner, when the joiner is exactly to the left and right of the previous cell, there are
+five possibilities for the next row, otherwise there are four placements for the split that force a
+single choice of the next row's cell.  That is 4 choices with one constrained subsequent choice, and
+one choice with 5 choices, giving $(4\cdot{}1 + 1\cdot{}5)(n-3)\cdot{}3^{n-4}$ in total.
+
+%   ...X...  ...X...  ...X...  ...X...  ...X...
+%   1.1....  .2.2...  ..3.3..  ...4.4.  ....5.5
+%   .a.....  ..a....  .abcde.  ....a..  .....a.
+
+These combine to give us $25(n-3)\cdot{}3^{n-4}$ options for an interior joiner.
+
+Next, account for the possibility that the polyplet starts or ends with a domino or a split; there
+are five ways to start or end the polyplet, giving $2\cdot{}5\cdot{}3^{n-3} = 30\cdot{}3^{n-4}$
+options to add to the interior joiner options:
+
+%   ..11...  ..1.1..
+%   .abcd..  ...e...
+
+\[
+    T(n, n-1) = 25(n-3)\cdot{}3^{n-4} + 30\cdot{}3^{n-4} = (25n - 45)\cdot{}3^{n-4}
+\]
+
+\section{Reproducibility}
+\label{sec:reproduce}
+
+\end{document}
