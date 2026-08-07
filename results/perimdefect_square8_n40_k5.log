@@ -1,0 +1,2 @@
+event=start job=perimdefect-square8-N40-K5 t=2026-08-07T00:49:56-04:00 git=69c4ccd-dirty built=2026-08-07T00:39:30-0400 host=gympie lattice=square8 kmax=5 prune=on
+event=done job=perimdefect-square8-N40-K5 t=2026-08-07T00:50:47-04:00 start=2026-08-07T00:49:56-04:00 wall_s=51.4 cpu_s=51.4 peak_rss_mb=1.9 result=ok nodes=1479216161 min_defect=0

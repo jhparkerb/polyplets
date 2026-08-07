@@ -105,6 +105,12 @@ build:
 build/g2: cpp/g2_redelmeier.cpp | build
 	$(G2CXX) $(CXXFLAGS) $(G2_RESTRICT) -O3 $< -o $@
 
+# Defect-pruned Redelmeier for the site-perimeter grading. Separate binary
+# because the prune changes the search, not the bookkeeping, and it needs
+# NMAX far past g2's 40 (docs/perimeter-defect-plan.md, Task B).
+build/perimeter_defect: cpp/perimeter_defect.cpp cpp/obs.h | build
+	$(G2CXX) $(CXXFLAGS) $(G2_RESTRICT) -O3 $< -o $@
+
 # Independent strip transfer-matrix engine (the second source for T(n,H),
 # H<=14). -std=c++17 and no $(CXXFLAGS) deliberately: mirrors the build line
 # in scripts/run_strip_h14.sh exactly, so the gate binary and the production

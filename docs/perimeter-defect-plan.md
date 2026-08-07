@@ -91,14 +91,22 @@ Expect a straggler tail rather than linear speedup — see
 `engine-utilization-and-scheduling`. Plan n=16 as the target and n=17 as a
 stretch only if the dalby benchmark beats the gympie ratio substantially.
 
+**SUPERSEDED 2026-08-07 — Task A was not run and should not be.** Task B
+succeeded far past its brief: `build/perimeter_defect` reaches n=70 on king in 2017 s
+on one core, against the n=16 this run was scoped for, and is cross-validated
+against `build/g2 --siteperim` over g2's whole range. See
+`results/perimeter-defect-diagonals.md`. The checklist below is kept as the
+record of what a launch would have required; `scripts/dalby_siteperim.sh` was
+planned here and never written.
+
 **Checklist items that are NOT yet discharged** (`docs/job-checklist.md`):
 
 1. Cost predicted above from measurement — but on **gympie**. Re-benchmark
    n=12 and n=13 on dalby before committing to n=16; do not assume the ratio.
 2. Budget: RAM trivial, so the only constraint is cores. Check what else is
    running on dalby first.
-3. Run from a named in-repo script, not a heredoc. One does not exist yet —
-   write `scripts/dalby_siteperim.sh` on the model of
+3. Run from a named in-repo script, not a heredoc. The planned (never written,
+   and now never needed) `scripts/dalby_siteperim.sh` was to follow
    `scripts/dalby_holes_perheight.sh`.
 4. **The deployed local binary is stamped `fddbfae-dirty` and HEAD is now past
    that.** Rebuild and redeploy on dalby, then re-read the stamp, before any run

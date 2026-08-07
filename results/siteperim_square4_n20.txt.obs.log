@@ -1,0 +1,20 @@
+event=start job=g2-square4-N20 t=2026-08-06T23:36:52-04:00 git=69c4ccd-dirty built=2026-08-06T23:36:27-0400 host=gympie lattice=square4
+event=done job=g2-square4-N20 t=2026-08-07T00:23:07-04:00 start=2026-08-06T23:36:52-04:00 wall_s=2775.1 cpu_s=2774.9 peak_rss_mb=1.8 result=ok
+     2775.15 real      2769.11 user         5.77 sys
+             1867776  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                 280  page reclaims
+                   1  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   0  voluntary context switches
+               31191  involuntary context switches
+      34482816724750  instructions retired
+      11574293312360  cycles elapsed
+             1409360  peak memory footprint

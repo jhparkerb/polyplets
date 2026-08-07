@@ -1,0 +1,2 @@
+event=start job=g2-square4-N21 t=2026-08-07T00:13:42-04:00 git=69c4ccd-dirty built=2026-08-06T23:36:27-0400 host=gympie lattice=square4
+event=done job=g2-square4-N21 t=2026-08-07T00:17:06-04:00 start=2026-08-07T00:13:42-04:00 wall_s=204.3 cpu_s=204.2 peak_rss_mb=1.7 result=ok
