@@ -227,8 +227,62 @@ def run(name, kmax, hmax, window):
     return ok, forms
 
 
+def identify():
+    """Which lattice is each drift set, really? Brute force small n and name it.
+
+    Guards against a mislabelling that would be easy to make and hard to spot:
+    D = (-1, 0) is SIX-regular, i.e. polyhexes -- cells are HEXAGONS, and it is
+    their centres that form the triangular point lattice. Animals of equilateral
+    TRIANGLES (polyiamonds) are a different object: three neighbours per cell,
+    alternating orientation, A001420 rather than A001207, and outside this class
+    entirely because the adjacency is parity-dependent.
+    """
+    from experiments.universal_pair_weights import neighbors
+
+    KNOWN_TOTALS = {
+        "square": ("A001168 fixed polyominoes",
+                   [1, 2, 6, 19, 63, 216, 760, 2725]),
+        "hex": ("A001207 fixed hexagonal polyominoes (= triangular-lattice "
+                "site animals)", [1, 3, 11, 44, 186, 814, 3652, 16689]),
+        "king": ("A006770 fixed polyplets", [1, 4, 20, 110, 638, 3832, 23592,
+                                             147941]),
+    }
+    print("Lattice identification (brute force, n <= 8):")
+    ok = True
+    for name, D in LATTICES.items():
+        seen = {frozenset({(0, 0)})}
+        frontier = list(seen)
+        got = [1]
+        for _ in range(2, 9):
+            nxt = set()
+            for a in frontier:
+                for c in a:
+                    for nb in neighbors(c, D):
+                        if nb in a:
+                            continue
+                        q = a | {nb}
+                        mx = min(x for x, _ in q)
+                        my = min(y for _, y in q)
+                        q = frozenset((x - mx, y - my) for x, y in q)
+                        if q not in seen:
+                            seen.add(q)
+                            nxt.add(q)
+            got.append(len(nxt))
+            frontier = list(nxt)
+        deg = len(set(neighbors((0, 0), D)))
+        label, want = KNOWN_TOTALS[name]
+        match = got == want
+        ok &= match
+        print(f"  {name:7s} D={str(D):11s} degree {deg}  {label}"
+              f"{'' if match else '  MISMATCH: ' + str(got)}")
+    return ok
+
+
 def main():
-    print("Reproducing the three published instances, then extending:")
+    if not identify():
+        print("lattice identification failed; the labels are wrong")
+        return 1
+    print("\nReproducing the three published instances, then extending:")
     ok = True
     o1, _ = run("square", 4, 14, 6)
     o2, _ = run("hex", 3, 12, 6)

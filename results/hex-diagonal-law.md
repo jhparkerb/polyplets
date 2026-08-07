@@ -1,5 +1,17 @@
 # The diagonal law is universal: polyhexes (2026-07-15)
 
+> **Which cells these are (clarified 2026-08-06).** **Hexagons**, six
+> neighbours each. Their centres form the triangular *point* lattice, which is
+> why the literature also calls this the triangular lattice — but the cells are
+> not triangles. **Polyiamonds — animals of equilateral triangles — are a
+> different object**: three neighbours per cell, alternating orientation,
+> counts A001420 (2, 3, 6, 14, 36, …) against A001207's (1, 3, 11, 44, 186, …)
+> here. They fall outside the row-local class because the adjacency is
+> parity-dependent; the law does look to survive there in periodic form, probed
+> in `experiments/universal_law_check.py`. See
+> `docs/proofs/universal-diagonal-law.md` §The lattice class. The A001207
+> validation below is what pins which of the two this note is about.
+
 Question #1 of the fresh menu: does the walk-plus-clusters diagonal law
 transfer to other lattices? Answer for the hexagonal lattice: YES, with
 the identical structure. Tool: `experiments/hex_gas.py` (brute enumerator

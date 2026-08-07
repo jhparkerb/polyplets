@@ -18,10 +18,39 @@ symmetric adjacency A contained in {(dx, dy) : |dy| <= 1}, with:
 - (U) the up-offset set D = {dx : (dx, 1) in A} is finite and nonempty;
   write **b = |D|** (the drift count).
 
-Instances: square lattice D = {0}, b = 1; hexagonal (brick) D = {-1, 0},
-b = 2; king D = {-1, 0, 1}, b = 3. Animals = finite connected nonempty
+Instances: square lattice D = {0}, b = 1; **polyhexes** D = {-1, 0}, b = 2;
+king D = {-1, 0, 1}, b = 3. Animals = finite connected nonempty
 cell sets up to translation; T(n, H) = those with n cells and exactly H
 nonempty rows spanning a height-H window.
+
+**What the b = 2 instance is, settled 2026-08-06 by measurement**
+(`experiments/diagonal_machine.py` `identify()`, brute force to n = 8, run on
+every invocation so the labels cannot drift). D = {−1, 0} is **six**-regular,
+totals 1, 3, 11, 44, 186, 814, 3652, 16689 = **A001207: fixed hexagonal
+polyominoes**. Cells are hexagons; each has six neighbours; their centres form
+the triangular *point* lattice, which is why the literature also calls this the
+triangular lattice (Madras's §3.1(b) "Tri"). This repo's "hex" label is the
+cell-side name and is correct.
+
+**Polyiamonds are a different object and are NOT in the class.** Cells are
+equilateral triangles, each with **three** edge-neighbours, and the up/down
+orientation alternates — so the adjacency is parity-dependent, not
+translation-invariant, and (U) fails: there is no single drift set D. Counts
+are A001420 (2, 3, 6, 14, 36, 94, 250, 675, 1838 …), nothing like A001207.
+Two names collide here and it is worth stating once: *triangular lattice* as a
+point lattice means six neighbours and gives polyhexes; *tiling by triangles*
+means three neighbours and gives polyiamonds. OEIS itself files polyiamonds
+under "the 2-dimensional hexagonal lattice".
+
+Theorem A does not cover polyiamonds — but the law appears to survive in
+**periodic** form, which is the natural extension to want.
+`experiments/universal_law_check.py` `polyiamond_probe()` checks to n = 12
+that the top two diagonals are `T(2H−2, H) = 2^(H−2)` and
+`T(2H−1, H) = H·2^(H−1)`, and that the k = 2 diagonal is quadratic in
+`T/2^H`. Note the indexing differs: the maximal n at height H is 2H−1, not H,
+because a height-H strip holds two triangle orientations per column. Making
+that a theorem would mean allowing a period-2 drift and asking for q_k
+quasi-polynomial with period 2. Not proved, not attempted.
 
 ## Theorem A (universal diagonal law)
 
