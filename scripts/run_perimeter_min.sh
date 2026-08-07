@@ -44,6 +44,13 @@ run () {                        # lattice pmax
   echo "--- wrote $out ($(grep -vc '^#' "$out") rows)"
 }
 
-run square8 "$KING_P"
-run square4 "$ROOK_P"
+# LATTICES selects which runs to do, so a follow-up pass that only needs one
+# lattice does not redo the other at production size.
+for lat in ${LATTICES:-square8 square4}; do
+  case $lat in
+    square8) run square8 "$KING_P" ;;
+    square4) run square4 "$ROOK_P" ;;
+    *) echo "unknown lattice $lat"; exit 2 ;;
+  esac
+done
 echo "ALL RUNS DONE"

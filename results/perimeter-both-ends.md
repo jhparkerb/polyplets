@@ -161,21 +161,22 @@ part of the min ladder is exactly the part sitting on attainable box perimeters.
 
 ### square4: stabilises, but not to the same numbers
 
-All **four** residue classes stabilise here, not just the even ones. Values held
-to the bar of three equal entries at the top of the range are given plain; those
-with only two are marked `?` and are provisional, the run at `p <= 24` having
-stopped one class short:
+All **four** residue classes stabilise here, not just the even ones. Values are
+held to a bar of three equal entries at the top of the range; `?` marks the one
+with only two. Extending the run to `p <= 28` promoted every value that the
+`p <= 24` pass could only call provisional:
 
-| | i=0 | i=1 | i=2 | i=3 | stabilises from |
-|---|---|---|---|---|---|
-| `p = 0 mod 4` | 1 | 9  | 52  | 206  | `p* = 4i + 4` |
-| `p = 2 mod 4` | 4 | 22 | 106 | 392? | `p* = 4i + 6` (i>=1) |
-| `p = 1 mod 4` | 4 | 28 | 124? | 456? | `p* = 4i + 9` |
-| `p = 3 mod 4` | 4 | 28 | 124 | 456? | `p* = 4i + 7` |
+| | i=0 | i=1 | i=2 | i=3 | i=4 | stabilises from |
+|---|---|---|---|---|---|---|
+| `p = 0 mod 4` | 1 | 9  | 52  | 206 | 719 | `p* = 4i + 4` |
+| `p = 2 mod 4` | 4 | 22 | 106 | 392 | -   | `p* = 4i + 6` (i>=1) |
+| `p = 1 mod 4` | 4 | 28 | 124 | 456? | -  | `p* = 4i + 9` |
+| `p = 3 mod 4` | 4 | 28 | 124 | 456 | -   | `p* = 4i + 7` |
 
-So the linear stabilisation onset holds on this lattice too, with a different
-constant per class. The two odd classes agree with each other on every value
-that converged. `C(p,0) = 1` when
+So the linear stabilisation onset holds on this lattice too, exactly, with a
+different constant per class — four or five points per class, no exceptions
+above `i = 0`. The two odd classes agree with each other on every value that
+converged. `C(p,0) = 1` when
 `p = 0 mod 4` (the perfect diamond, unique) and `4` otherwise (a partial layer
 in four rotationally equivalent positions), with `p=6` the small-`n` exception.
 
