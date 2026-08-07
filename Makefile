@@ -37,7 +37,8 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan \
         ns-gate-frontier-zstd ns-gate-diag-pins \
         ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
-        build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify
+        build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify \
+        papers papers-verify papers-clean papers-list
 
 # All currently existing gates
 GATE_TARGETS = gate-citations gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
@@ -720,6 +721,32 @@ build/ns/gate_holes: test/gate_holes.cpp $(NS_HEADERS) | build/ns
 #   ./build/ns/driver1 --maxn 18 --ram 67108864 --spill /some/nvme/dir --compare
 ns-gate-resume:
 	@echo "AC-1 gate (long): ./build/ns/driver1 --maxn 18 --ram 67108864 --spill /tmp/ns_ac1 --compare"
+
+# ─── manuscripts ─────────────────────────────────────────────────────────────
+# paper/ holds the manuscripts; papers/ holds the literature this project reads.
+# The two are told apart in paper/README.md, which is also where the P/L
+# authorship split is spelled out.
+#
+#   make papers              every manuscript to PDF
+#   make paper-L3-lambda-bounds   one, by file stem
+#   make papers-verify       the numeric verifiers over the manuscripts
+#
+# Deliberately NOT in GATE_TARGETS: `make gates` must stay runnable on a box
+# with no TeX installed (dalby and ayr are compute boxes and have none).
+papers:
+	@$(MAKE) --no-print-directory -C paper
+
+paper-%:
+	@$(MAKE) --no-print-directory -C paper $*.pdf
+
+papers-verify:
+	@$(MAKE) --no-print-directory -C paper verify
+
+papers-list:
+	@$(MAKE) --no-print-directory -C paper list
+
+papers-clean:
+	@$(MAKE) --no-print-directory -C paper clean
 
 clean:
 	rm -rf build

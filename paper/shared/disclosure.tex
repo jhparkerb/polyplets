@@ -1,0 +1,71 @@
+% ---------------------------------------------------------------------------
+%  paper/shared/disclosure.tex — the two authorship disclosure blocks.
+%
+%  docs/publication-split.md §1 fixes the rule these implement:
+%
+%    "Under no circumstances will there be any ambiguity about whether a paper
+%     is wholly my work (none), merely my prose (some) or entirely LLM-authored
+%     (some)."   — jasonp, 2026-08-07
+%
+%  There are exactly two blocks and they live in exactly one file, so that a
+%  paper cannot quietly soften its own disclosure.  The fixed sentences take no
+%  arguments.  The ONE thing a paper supplies is the per-result verification
+%  ledger, because that is the part that differs honestly between papers — and
+%  §1 requires it to be per result, not in aggregate.
+%
+%  Do not add a \Pdisclosure or \Ldisclosure variant with an optional softening
+%  argument.  If a paper does not fit one of these two blocks, the paper is
+%  wrong, not the block.
+% ---------------------------------------------------------------------------
+
+\newsavebox{\disclosurebox}
+
+\newenvironment{disclosureframe}
+  {\begin{center}\begin{lrbox}{\disclosurebox}\begin{minipage}{0.93\textwidth}\small}
+  {\end{minipage}\end{lrbox}\fbox{\usebox{\disclosurebox}}\end{center}}
+
+% --- P: jasonp's prose -------------------------------------------------------
+% Byline: Jason Parker, alone.  Argument: the per-result ledger of what the
+% machine did.
+\newcommand{\Pdisclosure}[1]{%
+\begin{disclosureframe}
+\textbf{Authorship.}\enspace Every sentence of this paper was written by its
+named author. He has read every proof it states and believes each one, and he
+is responsible for the correctness of what it claims.
+
+\smallskip
+\textbf{Machine contribution.}\enspace #1
+\end{disclosureframe}}
+
+% --- L: entirely machine-written --------------------------------------------
+% Argument: the per-result verification ledger — for each result, what warrants
+% it (Lean kernel, exact certificate, or labelled measurement) and how much of
+% it a human has checked.
+\newcommand{\Ldisclosure}[1]{%
+\begin{disclosureframe}
+\textbf{Authorship.}\enspace This document was written end to end by a large
+language model. That includes its mathematics, its prose, its tables and its
+\LaTeX{}. No sentence of it was written by a human. The mathematics it reports
+was likewise derived by machine.
+
+\smallskip
+\textbf{Human role.}\enspace The person who directed this work chose what to
+compute, chose what to publish, and is responsible for the decision to release
+this document. Except where the ledger below says otherwise, that person has
+not personally checked the arguments here, and this disclosure is not to be
+read as an endorsement of them.
+
+\smallskip
+\textbf{What warrants each result.}\enspace #1
+\end{disclosureframe}}
+
+% --- Draft banner ------------------------------------------------------------
+% For an L-paper whose verification ledger is not yet settled.  Loud on purpose:
+% an L-paper without a truthful ledger must not be mistaken for a finished one.
+\newcommand{\draftbanner}[1]{%
+\begin{center}
+\fcolorbox{red!60!black}{yellow!15}{%
+  \begin{minipage}{0.93\textwidth}\small
+  \textbf{DRAFT — NOT FOR CIRCULATION.}\enspace #1
+  \end{minipage}}
+\end{center}}

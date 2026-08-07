@@ -1,0 +1,58 @@
+% ---------------------------------------------------------------------------
+%  paper/shared/preamble.tex — packages and macros common to every manuscript
+%  in this directory.  Factored out of paper/polyplets-report.tex and
+%  paper/technical-report.tex, which between them had two copies of the same
+%  twenty lines.
+%
+%  technical-report.tex does NOT \input this file and is not to be edited to do
+%  so: it is jasonp's prose and is read-only to the machine (paper/README.md,
+%  "Who may edit what").  The duplication there is deliberate.
+%
+%  Assumes \documentclass[11pt]{article} has already been issued.
+% ---------------------------------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{numprint}
+\usepackage{microtype}
+\usepackage[table]{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{flafter}   % a float never appears before the text that introduces it
+\usepackage{float}     % [H] pins tables/figures exactly where written
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\setlength{\intextsep}{16pt plus 3pt minus 3pt}
+
+\npthousandsep{,}
+\npfourdigitsep
+\newcommand{\num}[1]{\numprint{#1}}
+\newcommand{\g}{\cellcolor{gray!15}}
+
+% Theorem environments.  One counter shared across kinds, so that a reference
+% like "Theorem 4" is unambiguous in a paper that also has lemmas and
+% propositions.
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{openproblem}[theorem]{Open Problem}
+
+% Repo-path citations.  Every one of these must resolve in the tree that ships
+% with the paper; `make gate-citations` checks the markdown, and
+% paper/verify_claims.py checks the manuscripts.
+\newcommand{\repo}[1]{\texttt{#1}}
+
+% OEIS links.
+\newcommand{\oeis}[1]{\href{https://oeis.org/#1}{#1}}
+
+% Growth constants, so a rename is one edit.
+\newcommand{\lam}{\lambda}
+\newcommand{\muH}{\mu_H}
