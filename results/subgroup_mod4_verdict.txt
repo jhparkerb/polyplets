@@ -1,0 +1,60 @@
+c4 vs banked r90 (n<=33): identical on all rows
+
+  n a(n) mod 4  predicted a(n) mod 8  predicted
+  1          1          1          1          1
+  2          0          0          4          4
+  3          0          0          4          4
+  4          2          2          6          6
+  5          2          2          6          6
+  6          0          0          0          0
+  7          0          0          0          0
+  8          1          1          5          5
+  9          2          2          6          6
+ 10          0          0          4          4
+ 11          0          0          0          0
+ 12          2          2          2          2
+ 13          2          2          2          2
+ 14          0          0          4          4
+ 15          2          2          2          2
+ 16          2          2          2          2
+ 17          1          1          1          1
+ 18          0          0          4          4
+ 19          0          0          4          4
+ 20          0          0          0          0
+ 21          1          1          5          5
+ 22          0          0          0          0
+ 23          0          0          4          4
+ 24          1          1          1          1
+ 25          1          1          1          1
+ 26          0          0          4          4
+ 27          0          0          0          0
+ 28          3          3          7          7
+ 29          1          1          5          5
+ 30          2          2          2          2
+ 31          0          0          4          4
+ 32          0          0          4          4
+ 33          0          0          0          0
+ 34          0          0          -          -
+ 35          2          2          -          -
+ 36          0          0          -          -
+ 37          0          0          -          -
+ 38          2          2          -          -
+ 39          2          2          -          -
+ 40          3          3          -          -
+
+mod 4: 40 rows predicted, 40 comparable, 0 mismatches
+mod 8: 33 rows predicted, 0 mismatches
+
+T(n,H) = I_H(D2ax) (mod 2), a(40) triangle vs subgroup counts
+    band   cells  mass share of a(40)  mismatches
+   H1-10     355                7.52%           0
+  H11-14     114               37.49%           0
+  H15-19     120               43.84%           0
+     H20      21                4.16%           0
+     H21      20                2.84%           0
+  H22-40     190                4.14%           0
+   TOTAL     820              100.00%           0
+
+a(40) = 56749893611764175164545926946127
+  banked   mod 4 = 3
+  subgroup mod 4 = 3

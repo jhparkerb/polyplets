@@ -16,7 +16,11 @@ EXACTLY H (so I(H) = sum over K >= H of F(K)):
 giving
 
   a(n) = I(C4) + I(D2ax) + I(D2diag) - 2 I(D4)                        (mod 4)
-  a(n) = Fix(r180) + 2 Fix(h) + 2 Fix(d) - I(D2ax) - I(D2diag)        (mod 8)
+  a(n) = Fix(r180) + 2 Fix(h) + 2 Fix(d) - 2 I(D2ax) - 2 I(D2diag)    (mod 8)
+
+(the mod-8 line: every I(C4) and I(D4) term cancels, and the two order-2
+mirror CLASSES each contribute twice -- {e,h} with {e,v}, and {e,d} with
+{e,ad} -- which is where both factors of 2 come from.)
 
 The mod-4 line needs only the three order-4 subgroups, each a quotient-domain
 family of size ~lambda^(n/4) -- reachable to n=40 on a laptop.  The mod-8 line
@@ -156,7 +160,8 @@ def main():
         if have8:
             fixd = banked["dmirror33"].get(n, banked["dmirror32"].get(n, 0))
             p8 = (g(banked["r180"], n) + 2 * g(banked["hmirror"], n)
-                  + 2 * fixd - g(sub["d2ax"], n) - g(sub["d2diag"], n)) % 8
+                  + 2 * fixd - 2 * g(sub["d2ax"], n)
+                  - 2 * g(sub["d2diag"], n)) % 8
             mod8_rows += 1
             if n in a and a[n] % 8 != p8:
                 mod8_bad.append(n)

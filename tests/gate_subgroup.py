@@ -30,7 +30,7 @@ sys.path.insert(0, os.path.join(ROOT, "sym"))
 sys.path.insert(0, os.path.join(ROOT, "oracle"))
 
 from symcount import (HMIRROR_PLACEMENTS, SUBGROUP_TYPES,  # noqa: E402
-                      _anchor_xmin0, count_symmetry_type)
+                      SYMMETRY_TYPES, _anchor_xmin0, count_symmetry_type)
 from g1_naive import count_by_box, count_symmetry  # noqa: E402
 
 ORACLE_MAXN = 8   # brute force generates every animal, so this is the cheap wall
@@ -81,6 +81,28 @@ def main():
     gate.check(not bad,
                f"a(n) = I(C4)+I(D2ax)+I(D2diag)-2I(D4) (mod 4), n<={MAXN}"
                + (f"  MISMATCH at {bad}" if bad else ""))
+
+    # 3b. The mod-8 companion.  Every I(C4) and I(D4) term cancels; the two
+    #     order-2 mirror CLASSES each contribute twice ({e,h} with {e,v}, and
+    #     {e,d} with {e,ad}), which is where both factors of 2 come from.
+    #     Gated because the first version of it shipped with those factors
+    #     dropped and was wrong on 21 of 33 rows.
+    elem = {name: count_symmetry_type(pl, MAXN, anchor)
+            for name, (pl, anchor) in SYMMETRY_TYPES.items()}
+
+    def rhs8(n, k):
+        return (elem["180-degree rotation"].get(n, 0)
+                + 2 * elem["axis mirror"].get(n, 0)
+                + 2 * elem["diagonal mirror"].get(n, 0)
+                - k * sym["d2ax"].get(n, 0) - k * sym["d2diag"].get(n, 0))
+    bad8 = [n for n in range(1, MAXN + 1) if (fixed[n] - rhs8(n, 2)) % 8]
+    gate.check(not bad8,
+               f"a(n) = Fix(r180)+2Fix(h)+2Fix(d)-2I(D2ax)-2I(D2diag) (mod 8),"
+               f" n<={MAXN}" + (f"  MISMATCH at {bad8}" if bad8 else ""))
+    slipped = [n for n in range(1, MAXN + 1) if (fixed[n] - rhs8(n, 1)) % 8]
+    gate.check(bool(slipped),
+               "control: coefficient 1 instead of 2 breaks it"
+               + (f" (first at n={slipped[0]})" if slipped else " -- IT DID NOT"))
 
     # 4. Controls. Each must FAIL the corresponding true statement somewhere,
     #    or the check above would be passing on a degenerate identity.

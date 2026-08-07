@@ -1,0 +1,135 @@
+# Subgroup-invariant fixed-animal counts I(H) for the king (polyplet) lattice.
+# Columns: <subgroup> <n> <value>.  Absent row means exactly 0.
+#
+# I(H) = number of fixed (translation-class) animals invariant under EVERY
+# element of H.  This is NOT results/sym_counts.txt's per-element Fix(g):
+# I(d2ax) is fixed by both axis mirrors, Fix(h) by one.  Needed for the
+# D4 orbit-SIZE distribution, hence a(n) mod 4 (experiments/subgroup_mod4.py).
+#
+#   c4     = <r90>            order 4    I(C4) = Fix(r90)
+#   d2ax   = {e,h,v,r180}     order 4
+#   d2diag = {e,d,ad,r180}    order 4
+#   d4     = the full group   order 8
+#
+# Produced by scripts/subgroup_mod4.sh 40 8
+# Source: results/subgroup_raw/{c4,d2ax,d2diag,d4}.n40.out
+c4 1 1
+c4 4 2
+c4 5 2
+c4 8 9
+c4 9 8
+c4 12 48
+c4 13 38
+c4 16 274
+c4 17 203
+c4 20 1630
+c4 21 1147
+c4 24 9995
+c4 25 6731
+c4 28 62587
+c4 29 40607
+c4 32 398124
+c4 33 250098
+c4 36 2563730
+c4 37 1565452
+c4 40 16671983
+d2ax 1 1
+d2ax 2 2
+d2ax 3 2
+d2ax 4 4
+d2ax 5 4
+d2ax 6 10
+d2ax 7 10
+d2ax 8 25
+d2ax 9 24
+d2ax 10 64
+d2ax 11 60
+d2ax 12 166
+d2ax 13 150
+d2ax 14 430
+d2ax 15 378
+d2ax 16 1124
+d2ax 17 953
+d2ax 18 2934
+d2ax 19 2426
+d2ax 20 7704
+d2ax 21 6159
+d2ax 22 20176
+d2ax 23 15758
+d2ax 24 53137
+d2ax 25 40245
+d2ax 26 139450
+d2ax 27 103368
+d2ax 28 367901
+d2ax 29 265117
+d2ax 30 966962
+d2ax 31 683128
+d2ax 32 2554030
+d2ax 33 1757936
+d2ax 34 6720280
+d2ax 35 4541410
+d2ax 36 17765096
+d2ax 37 11718606
+d2ax 38 46784640
+d2ax 39 30338576
+d2ax 40 123753061
+d2diag 1 1
+d2diag 2 2
+d2diag 3 2
+d2diag 4 4
+d2diag 5 4
+d2diag 6 10
+d2diag 7 10
+d2diag 8 25
+d2diag 9 22
+d2diag 10 64
+d2diag 11 56
+d2diag 12 164
+d2diag 13 130
+d2diag 14 422
+d2diag 15 332
+d2diag 16 1092
+d2diag 17 795
+d2diag 18 2830
+d2diag 19 2030
+d2diag 20 7354
+d2diag 21 4953
+d2diag 22 19116
+d2diag 23 12674
+d2diag 24 49831
+d2diag 25 31303
+d2diag 26 129830
+d2diag 27 80292
+d2diag 28 339133
+d2diag 29 200063
+d2diag 30 885184
+d2diag 31 514320
+d2diag 32 2315874
+d2diag 33 1290102
+d2diag 34 6053660
+d2diag 35 3323600
+d2diag 36 15857830
+d2diag 37 8380522
+d2diag 38 41502646
+d2diag 39 21631710
+d2diag 40 108831725
+d4 1 1
+d4 4 2
+d4 5 2
+d4 8 5
+d4 9 4
+d4 12 12
+d4 13 8
+d4 16 32
+d4 17 19
+d4 20 84
+d4 21 45
+d4 24 219
+d4 25 105
+d4 28 573
+d4 29 253
+d4 32 1508
+d4 33 614
+d4 36 3950
+d4 37 1502
+d4 40 10379

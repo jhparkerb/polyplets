@@ -34,7 +34,11 @@ I have; where I cannot I have said so.
 
 ---
 
-## 1. Burnside run backwards: congruences for a(n)
+## 1. Burnside run backwards: congruences for a(n) -- EXECUTED 2026-08-07
+
+**Status: no longer an idea.** Built, gated and run; see
+`results/subgroup-mod4.md` for what it found, and read the struck bullet
+below before quoting this section's payoffs.
 
 **The observation.** D4 acts on fixed polyplets; orbit sizes divide 8. With
 `n_k` = number of orbits of size `k`,
@@ -80,9 +84,29 @@ counts `I(D4)`, `I(D2ax)`, `I(D2diag)` are separate objects and are not banked.
   source. Two independent bits mod 4, from a structurally unrelated algorithm
   on a quotient domain, would cover 100% of the row. **This is the sentence
   that gets shorter.**
-- The same inputs are what A030222/A030233/A030234/A030235/A194596 need; they
-  have been stranded at n=32-34 while fixed reached 40.
+- ~~The same inputs are what A030222/A030233/A030234/A030235/A194596 need;
+  they have been stranded at n=32-34 while fixed reached 40.~~
+  **WRONG, struck 2026-08-07.** Burnside needs per-ELEMENT `Fix(g)` --
+  `free_num = fixed + 2 Fix(r90) + Fix(r180) + 2 Fix(h) + 2 Fix(d)`
+  (`tests/common.py:132`, `free_and_one_sided`) -- and the binding input there
+  is `Fix(d)`, the diagonal-mirror count, which is exactly the 24h/126GB
+  lambda^(n/2) blocker of `results/related-seqs-n33.md`. The order-4 subgroup
+  counts `I(C4)`, `I(D2ax)`, `I(D2diag)` are a *different object* (invariant
+  under every element of a subgroup, not fixed by one element) and do not feed
+  Burnside at all. The five related sequences stay stranded; nothing in this
+  idea moves them.
 - Statements about terms that will never be computed (`a(60) mod 4`).
+
+**Sharper than the mod-4 row total, found while implementing it (2026-08-07).**
+D2ax = {e, h, v, r180} is *exactly* the height-preserving subgroup of D4 --
+r90, r270 and both diagonal mirrors swap height with width -- so it acts on
+the animals of each fixed height separately, orbit sizes there divide 4, and
+
+    T(n,H) = I_H(D2ax)   (mod 2)
+
+is one independent bit per triangle CELL rather than two bits on a row total.
+That is what actually addresses the payoff bullet above: it localises the
+check to the H15-19 band instead of only constraining the sum a(40).
 
 **Rider, separate and weaker.** This is the natural place to test the
 resonance `results/anisotropic-not-dfinite.md` flags as *"open and nobody has

@@ -71,6 +71,29 @@ What the campaign actually bought, in one line each:
   four "outside the default build" statements corrected, a build
   receipt banked.
 
+## Subgroup census — H15-19 now HAS a second source (2026-08-07)
+`results/subgroup-mod4.md`. The orbit-SIZE distribution needs per-SUBGROUP
+invariant counts `I(H)` — a different object from the banked per-element
+`Fix(g)`, and none were banked. They are lambda^(n/4) families, so 31 min on
+gympie buys `a(n) mod 4` at every n <= 40 (a(40) = 3 both ways) by an
+algorithm sharing no code path with the column engine.
+
+**The load-bearing result is the height-graded form.** D2ax = {e,h,v,r180} is
+exactly the height-preserving subgroup of D4, so `T(n,H) = I_H(D2ax) (mod 2)`
+— one bit per triangle CELL, not two per row. **820 cells, 0 mismatches,
+100% of a(40)'s mass**, including the 120 cells of H15-19 (43.84%, previously
+"none available" above) and the 190 cells of H22-40 that no later sweep can
+hold out. Two bits per row / one per cell, not a proof — a wrong a(40)
+survives iff its error is 0 mod 4.
+
+A free mod-8 by-product over the banked `Fix(g)` corpus (n <= 32, 0
+mismatches) caught its own first version's algebra error, 21 of 33 rows;
+both congruences are now in `gate-subgroup` (13 checks, 5 controls).
+
+Idea 1 of `results/unexplored-avenues.md` is marked EXECUTED there, with its
+A030222-unstranding payoff STRUCK: Burnside needs per-element `Fix(d)`, the
+24h/126GB blocker, which subgroup counts do not supply.
+
 ## Claim-pruning pass 2026-07-31 (cold-eyed bottom-decile review)
 jasonp asked for the least novel/interesting/supported claims and an argument
 to drop them. Ten items ranked; **1-5 cut, 6-9 rescoped, 10 is jasonp's**.
