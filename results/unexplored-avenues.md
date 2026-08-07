@@ -166,6 +166,16 @@ current paper gets shorter.**
 
 ## 3. lambda upper bound: a bridge-credit sketch (MOST LIKELY WRONG)
 
+**CLOSED 2026-08-07 — it was wrong, and unsound rather than merely unproved.**
+`results/bridge-credit-closed.md`, `experiments/band_charge_probe.py`. The
+short version: step 1's encoding is not injective (all three 2-cell animals
+share one code; 96% of the n=8 census collides at H=1), because it records no
+band-to-band horizontal alignment — which is exactly the `c(H)` the scheme
+existed to bound. Assuming `c(H)=1` gives `lambda <= mu_H`, contradicting the
+certified `mu_17 = 6.543 < lambda`. **Step 2, the claim flagged below as
+load-bearing, holds in everything measured; the kill is one step earlier.**
+Read the rest for the record, not as a live lead.
+
 `docs/open-problem-lambda-bracket.md` asks whether the vertical join between
 height-H strips is boundable and reads candidate (1) as "most promising, may
 itself be non-local". A possible mechanism, offered as a sketch to be killed:
