@@ -270,6 +270,9 @@ Not a count — a limit object.
 
 ## 6. Universality: Parisi-Sourlas, Yang-Lee, and the central charge
 
+**6.1 is CLOSED, 2026-08-07** — see the strike at the end of this section.
+6.2 is untouched.
+
 **The highest-value gap the sweep found, and it needs no new compute.**
 
 Lattice animals are conjecturally in the Yang-Lee edge universality class in
@@ -280,27 +283,39 @@ The words Parisi, Yang-Lee, and central charge appear **nowhere** in the repo.
 
 Two concrete, separable questions:
 
-1. **Finite-size scaling of the strip data.** Conformal invariance predicts the
+1. ~~**Finite-size scaling of the strip data.** Conformal invariance predicts the
    strip free energy `ln mu_H` approaches `ln lambda` with a universal `1/H^2`
    correction whose coefficient carries a central charge. The repo owns
    `mu_13 ... mu_17` with exact Collatz-Wielandt certificates
    (`results/strip-mu-certificates.md`). This is a **fit to data already on
    disk**. If the coefficient lands near the Yang-Lee value the project has an
    independent confirmation of its own universality class; if it does not, that
-   is a more interesting note.
+   is a more interesting note.~~
+   **STRUCK 2026-08-07** — `results/strip-growth-lambda-bounds.md` answered
+   this item's own stated prerequisite, and the answer is no. The ladder's
+   approach to `lambda` is not analytic in `1/H` at `H <= 17`: the surface
+   term `H(ln lambda - ln mu_H)` is still falling at H=17 and its increments
+   shrink only ~6.5% per rung where a clean `1/H^2` correction demands ~11.4%,
+   so there is a term between `1/H` and `1/H^2` (most likely logarithmic) that
+   the two-parameter ansatz cannot see. No `1/H^2` coefficient, hence no
+   central charge, can be read off this data. Not an afternoon's fitting; it
+   would need `mu_H` far past H=17, which the strip engine cannot reach.
 2. **Is the king lattice in the same class as the square lattice?** It must be
    if universality holds. That is a *prediction*, testable against the two
-   theta fits, rather than a count.
+   theta fits, rather than a count. **Still open** — it does not go through the
+   strip ladder, so 6.1's closure does not touch it.
 
 **Honest limits.** Five certified `mu_H` values is a short series for a
 two-parameter finite-size fit, and the certificates bracket rather than pin
 each `mu_H`; the fit must propagate those brackets or it is worthless.
 Whether `lambda` itself is known precisely enough to expose a `1/H^2` term is
-the first thing to check, before any fitting.
+the first thing to check, before any fitting. **That check has now been run
+and it failed — see the strike on 6.1 above.**
 
 **Sentence that gets shorter:** the `theta = -1` paragraph in the series
 analysis, which currently reports a fitted exponent with no explanation of why
-that number.
+that number. Only 6.2 could still shorten it, and 6.2 is a comparison of two
+theta fits, not a derivation.
 
 ---
 
@@ -388,12 +403,14 @@ itself is probably folklore for polyominoes.
 ## Ranked, cheapest first (2026-08-04 sweep only)
 
 1. **Idea 8**, connectivity under single-cell moves — existing oracle, n <= 10,
-   one script.
-2. **Idea 6.1**, the finite-size / central-charge fit — data already on disk,
+   one script. **The only one of the three still open.**
+2. ~~**Idea 6.1**, the finite-size / central-charge fit — data already on disk,
    an afternoon, and it is the only item here that shortens an existing
-   sentence.
-3. **Idea 7**, king isoperimetry — small-n search, then guess-and-prove exactly
-   as maxhole went.
+   sentence.~~ **CLOSED 2026-08-07**, negatively: the data on disk cannot
+   support the fit (`results/strip-growth-lambda-bounds.md`).
+3. ~~**Idea 7**, king isoperimetry — small-n search, then guess-and-prove exactly
+   as maxhole went.~~ **CLOSED**: search done, closed form already published as
+   A235382 (`results/min-site-perimeter.md`).
 
 Ideas 5, 9 and 10 are new-paper-sized and should not be started while the
 project is closing out at a(40).
