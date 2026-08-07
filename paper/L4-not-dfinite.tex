@@ -1,0 +1,635 @@
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+%  L4 — The by-height generating function is not D-finite.
+%  Category L (entirely machine-written); see paper/README.md and
+%  docs/publication-split.md.
+%
+%  Source material, all in this repository:
+%    results/anisotropic-not-dfinite.md   the theorem, the boxes, the prior art
+%    results/triangle-structure.md        the Atom Ledger and root separation
+%    results/strip-mu-certificates.md     the crude lambda bound the proof uses
+%    results/fixed_height_gfs.txt         the banked G_H
+%    papers/MISSING.md                    the literature searches, per database
+% ---------------------------------------------------------------------------
+
+\input{shared/preamble}
+\input{shared/disclosure}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+
+\title{\textbf{An arithmetic obstruction to D-finiteness for
+lattice-animal height generating functions}\\[4pt]
+\large Bounded degree and bounded house, against a strictly
+increasing family of slice growth constants}
+\author{[byline: jasonp's call --- \repo{docs/publication-split.md} \S1]}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\draftbanner{This is a first draft. The verification ledger below records what
+warrants each result \emph{mechanically}; the column that records what a human
+has read is empty, deliberately, because nobody has read it yet. Do not
+circulate until that column says something true.}
+
+\Ldisclosure{%
+\emph{Theorem~\ref{thm:main} (not D-finite)} --- proved below from four
+classical ingredients (Fatou, Pringsheim, Perron--Frobenius, Northcott) plus
+Lemma~\ref{lem:mono}. Not formalized. Its opening move --- extracting a
+coefficient relation from the ODE --- is not ours and is cited to
+Bousquet-M\'elou and Rechnitzer~\cite[Lemma~9]{bmr2002}.
+\emph{Lemma~\ref{lem:mono} (strict monotonicity)} --- proved below by
+Perron--Frobenius; the numerical values in Table~\ref{tab:mu} are labelled
+measurement, and the strictness the proof needs does not depend on them.
+\emph{The exclusion boxes of \S\ref{sec:effective}} --- rest on
+certificates computed modulo a $61$-bit prime, where a gcd equal to $1$ with
+preserved degrees is a rigorous certificate over $\Q$; the irreducibility
+certificates for $H \le 8$ are single-prime for $H \le 4$ and multi-prime
+subset-sum-intersection for $H = 5..8$.
+\emph{The literature comparison of \S\ref{sec:related}} --- three databases,
+one of them full-text, recorded per search in \repo{papers/MISSING.md}. It
+establishes no collision found; it does not and cannot establish absence, and
+no claim here rests on absence.
+\emph{Human verification:} none, as of this draft.}
+
+\begin{abstract}
+\noindent
+Let $T(n,H)$ count the fixed king-lattice animals of $n$ cells whose bounding
+box has height exactly $H$, and let
+$F(x,y) = \sum_{n,H} T(n,H)x^ny^H$. We prove that $F$ is not D-finite.
+
+The obstruction is arithmetic rather than topological or analytic, which as far
+as we can tell is new in this neighbourhood, and it is what makes the proof
+cheap to transport. Write $\mu_H$ for the growth constant of the height-$\le H$
+strip. Two facts about the family $(\mu_H)$ do all the work: it is
+\emph{strictly increasing} (Perron--Frobenius, since each strip system sits
+inside the next as a proper principal submatrix of an irreducible nonnegative
+matrix), and it is \emph{bounded} (by $\lambda \le 9.3154$, or by any crude
+bound). Each $\mu_H$ is an algebraic integer all of whose conjugates are at most
+$\mu_H$ in modulus, so Northcott finiteness forces the algebraic degrees
+$[\Q(\mu_H):\Q]$ to be unbounded. Against that, a D-finite $F$ would force those
+degrees to be bounded by the $x$-degree of its annihilating operator at all but
+finitely many heights. Contradiction.
+
+The proof uses only integer counts, rationality of each height slice, and a
+strictly increasing bounded family of slice growth constants. It therefore
+applies verbatim to fixed polyominoes by height, to polyhexes, and to any
+lattice-animal family with a column transfer matrix.
+
+The argument is also \emph{effective}, which the qualitative statement is not.
+From certified data we exclude explicit boxes: no annihilating $y$-ODE exists of
+order $r \le 5$ with $x$-degrees $\le 28$, of order $r \le 3$ with $x$-degrees
+$\le 180$, of order $r \le 1$ with $x$-degrees $\le 1253$, and so on.
+
+We are explicit about the method's ceiling. The step ``a rational polynomial of
+degree $\le D$ cannot vanish at an algebraic number of degree $> D$'' is the
+whole argument, and it fails the instant the coefficients are allowed to be
+analytic rather than polynomial. So the result is not-D-finite over $\Q(x)$ and
+does \emph{not} extend to Klazar's larger $D_A$-finite class. That is a real
+limit of the method, not a gap in the exposition.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+Counting lattice animals by size alone gives a sequence, $a(n)$, about which
+almost nothing exact is known. Counting them by size \emph{and height} gives a
+two-variable object, and the extra variable turns out to be where a proof can get
+a grip. This is Rechnitzer's observation in the haruspicy
+programme~\cite{rechnitzer2003,rechnitzer2006}: the anisotropic generating
+function can be shown not to be D-finite even when the isotropic one is out of
+reach, and the mechanism is that the height slices are individually rational and
+their poles proliferate.
+
+We prove the corresponding statement for the king lattice, by a different
+mechanism.
+
+\begin{definition}
+$T(n,H)$ is the number of fixed king animals (polyplets) of $n$ cells whose
+bounding box has height exactly $H$; $G_H(x) := \sum_n T(n,H)x^n$; and
+\[
+  F(x,y) \;:=\; \sum_{n,H} T(n,H)\,x^n y^H \;=\; \sum_H G_H(x)\,y^H .
+\]
+\end{definition}
+
+\begin{theorem}
+\label{thm:main}
+$F(x,y)$ is not D-finite.
+\end{theorem}
+
+\subsection{The shape of the argument}
+
+Every proof of non-D-finiteness in this area starts the same way, and we should
+say so before saying what is different. If $F$ satisfies
+$\sum_{i \le r}p_i(x,y)\,\partial_y^i F = 0$ with $p_i \in \Q[x,y]$ not all zero,
+extracting the coefficient of $y^H$ turns the ODE into a linear recurrence in $H$
+whose coefficients are polynomials in $x$ and $H$. That step is due to
+Bousquet-M\'elou and Rechnitzer~\cite[Lemma~9]{bmr2002} and we cite it rather
+than re-deriving it as though it were ours.
+
+What is done with the recurrence is where the routes diverge, and there are three
+of them:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l l}
+\toprule
+ & obstruction & lever \\
+\midrule
+Bousquet-M\'elou--Rechnitzer 2002~\cite{bmr2002} & topological & accumulation of the pole set in $\C$ \\
+Klazar 2003~\cite{klazar2003} & analytic & zero radius of convergence vs.\ forced analyticity \\
+this paper & \textbf{arithmetic} & degree and house of algebraic numbers \\
+\bottomrule
+\end{tabular}
+\caption{Three obstruction types in the same neighbourhood.}
+\label{tab:three}
+\end{table}
+
+Ours tracks \emph{one} distinguished pole per slice --- the singularity
+$x = 1/\mu_H$ at the radius of convergence --- and asks about its degree over
+$\Q$. If the lower slices are all regular there, the recurrence forces the
+leading coefficient to vanish at $1/\mu_H$; but a nonzero rational polynomial of
+degree $\le D$ cannot vanish at an algebraic number of degree $> D$. So a
+D-finite $F$ caps $[\Q(\mu_H):\Q]$ at all but finitely many heights. Northcott
+says that cap is impossible, because the $\mu_H$ are infinitely many distinct
+algebraic integers of bounded house.
+
+\subsection{What is gained, and what is given up}
+
+\paragraph{Gained: lightness.} The hypotheses are integer counts, per-height
+rationality, and a strictly increasing bounded family of slice growth constants.
+There is no bespoke combinatorial analysis of denominators, which is what
+\cite{bmr2002} needs per family. That is why \S\ref{sec:transport} can transport
+the theorem to polyominoes, polyhexes and beyond in a paragraph rather than a
+paper.
+
+\paragraph{Gained: effectivity.} \cite{bmr2002}'s criterion is asymptotic in $n$
+and gives a qualitative verdict. Ours applies at a single level, so certified
+data at finitely many heights excludes explicit $(r,D)$ boxes
+(\S\ref{sec:effective}) --- which is the form in which a claim like ``the
+by-height columns are not expected to satisfy a small ODE'' can actually be
+checked by someone who does not believe it.
+
+\paragraph{Given up: the larger class.} Klazar enlarges the target from D-finite
+to $D_A$-finite --- analytic rather than polynomial coefficients --- on the
+ground that polynomiality was never doing the work in his argument, and gets the
+stronger conclusion for free. We cannot follow him, and the reason is exactly the
+step that makes our proof work: an \emph{analytic} function may vanish at
+$1/\mu_{H_0}$ without vanishing identically, so the degree comparison dies. Our
+theorem is not-D-finite over $\Q(x)$ and stops there. We state this rather than
+leave it for a referee.
+
+\section{Ingredients}
+
+\subsection{Rationality, and \texorpdfstring{$\mu_H$}{mu\_H} as an algebraic integer}
+
+\begin{lemma}
+\label{lem:alg}
+Each $G_H$ is rational with integer coefficients; $\mu_H$, the reciprocal of its
+radius of convergence, is an algebraic integer; and every Galois conjugate of
+$\mu_H$ has modulus at most $\mu_H$, so $\mathrm{house}(\mu_H) = \mu_H$.
+\end{lemma}
+
+\begin{proof}
+$G_H$ is the generating function of a finite transfer matrix, hence rational, and
+its coefficients are counts. By Fatou's lemma~\cite{fatou1906}, a rational power
+series with integer coefficients has a lowest-terms denominator $Q_H$ with
+$Q_H(0) = 1$ and integer coefficients. The reversal of $Q_H$ is then monic and
+integral, and its roots are exactly the reciprocals of the poles of $G_H$.
+
+Since $T \ge 0$, Pringsheim's theorem~\cite[Thm.~IV.6]{flajoletSedgewick2009}
+puts a singularity of $G_H$ at the positive-real point of its circle of
+convergence; for a rational function that singularity is a pole. So $\mu_H$ is
+the reciprocal of a pole, hence a root of the monic integral reversal, hence an
+algebraic integer.
+
+Every pole of $G_H$ has modulus at least the radius $1/\mu_H$, by definition of
+the radius of convergence. So every root of the reversal --- and in particular
+every conjugate of $\mu_H$ --- has modulus at most $\mu_H$.
+\end{proof}
+
+The house bound is then $\mathrm{house}(\mu_H) = \mu_H < \lambda \le 9.3154$,
+using the certified upper bound on the king growth constant.\footnote{Companion
+paper: \emph{A certified two-sided bound for the polyplet growth constant}. Any
+crude bound would do --- $\lambda \le 5^5/4^4 \approx 12.2$ is elementary --- so
+this ingredient is not delicate.}
+
+\subsection{Strict monotonicity}
+
+\begin{lemma}[strict monotonicity]
+\label{lem:mono}
+$\mu_{H+1} > \mu_H$ for every $H$. Consequently the $\mu_H$ are pairwise
+distinct, and $1/\mu_H$ is a pole of $G_H$ that is not a pole of any $G_j$ with
+$j < H$.
+\end{lemma}
+
+\begin{proof}
+Let $\nu_H$ be the growth constant of the height-$\le H$ strip counts, computed
+by the column-signature transfer matrix $M_H(x)$: states are boundary signatures
+under the nonempty-column invariant. The signature digraph is strongly connected
+--- any state reaches the single-cell state by closing off its components with a
+spanning column, and any state is reachable from the single-cell state --- so
+$M_H(x)$ is irreducible and nonnegative for $x > 0$.
+
+$M_H$ sits inside $M_{H+1}$ as a proper principal submatrix, namely the
+signatures that do not use row $H+1$, and the extra states connect back through
+the explicit cycle: single cell $\to$ full $(H+1)$-column $\to$ single cell.
+Deleting rows and columns of an irreducible nonnegative matrix strictly decreases
+the Perron root~\cite[Ch.~8]{hornJohnson2013}, so $\rho_{H+1}(x) > \rho_H(x)$ at
+every $x > 0$. At $x^*_H$, where $\rho_H = 1$, this gives
+$\rho_{H+1}(x^*_H) > 1$, hence $x^*_{H+1} < x^*_H$ and $\nu_{H+1} > \nu_H$
+strictly.
+
+Exact-height counts are second differences of strip counts. Strictness is what
+rules out cancellation there, so $\mu_H = \nu_H$ and the pole $1/\mu_H$ of $G_H$
+is genuine.
+\end{proof}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{r r r r r r r r r r}
+\toprule
+$H$ & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\
+\midrule
+$\mu_H$ & 1.0 & 2.41421 & 3.44372 & 4.18232 & 4.71780 & 5.11532 & 5.41785 & 5.65337 & 5.84046 \\
+\bottomrule
+\end{tabular}
+\caption{Strip growth constants, by exact-coefficient evaluation
+($\mu_{10} = 5.99170$). Labelled measurement; Lemma~\ref{lem:mono} does not
+depend on these values, and the proof of Theorem~\ref{thm:main} does not use
+them. $\mu_2 = 1+\sqrt2$ exactly. An earlier floating-point artifact at $H = 9$
+was corrected.}
+\label{tab:mu}
+\end{table}
+
+\subsection{Northcott finiteness}
+
+\begin{lemma}
+\label{lem:northcott}
+$[\Q(\mu_H):\Q] \to \infty$.
+\end{lemma}
+
+\begin{proof}
+Fix $D$. An algebraic integer of degree $\le D$ whose conjugates all have modulus
+at most $B$ has minimal polynomial with integer coefficients bounded by
+$\binom{D}{k}B^k$ in absolute value --- they are elementary symmetric functions
+of the conjugates. There are therefore finitely many such integer polynomials,
+hence finitely many such algebraic numbers~\cite{northcott1949,kronecker1857}.
+
+By Lemma~\ref{lem:alg} every $\mu_H$ is an algebraic integer of house at most
+$B = 9.3154$, and by Lemma~\ref{lem:mono} they are pairwise distinct, hence
+infinitely many. So for every $D$ only finitely many have degree $\le D$.
+\end{proof}
+
+\section{The dichotomy, and the theorem}
+
+\begin{theorem}[dichotomy]
+\label{thm:dichotomy}
+Suppose $F$ is annihilated by a $y$-ODE of order $r$ with $x$-degrees at most
+$D$. Then $[\Q(\mu_H):\Q] \le D$ for all but at most $r$ values of $H$.
+\end{theorem}
+
+\begin{proof}
+Write the annihilating relation as $\sum_{i \le r}p_i(x,y)\partial_y^iF = 0$ with
+$p_i \in \Q[x,y]$ not all zero and $D = \max_i \deg_x p_i$. Extracting
+$y$-coefficients~\cite[Lemma~9]{bmr2002} gives, for every $H$,
+\begin{equation}
+  \sum_{\delta \le \sigma} c_\delta(x,H)\,G_{H-\delta}(x) \;=\; 0 ,
+  \label{eq:rec}
+\end{equation}
+with $\deg_x c_\delta \le D$, $\deg_H c_\delta \le r$, and with
+$\{c_\delta\} \equiv 0$ forcing $\{p_i\} \equiv 0$, since the falling factorials
+of $H$ are linearly independent.
+
+Fix $H_0$ and instance \eqref{eq:rec} at $H = H_0$, evaluating near
+$x = 1/\mu_{H_0}$. Every term with $\delta \ge 1$ refers to a height below $H_0$,
+where by Lemma~\ref{lem:mono} the radius of convergence is strictly larger, so
+those slices are finite at $1/\mu_{H_0}$. The $\delta = 0$ term has $G_{H_0}$,
+which has a genuine pole there. Hence $c_0(1/\mu_{H_0},H_0) = 0$.
+
+Now $c_0(\cdot,H_0)$ is a polynomial over $\Q$ of degree at most $D$. If
+$[\Q(\mu_{H_0}):\Q] > D$, then $1/\mu_{H_0}$ also has degree $> D$ over $\Q$ and
+no nonzero rational polynomial of degree $\le D$ vanishes at it; so
+$c_0(\cdot,H_0) \equiv 0$.
+
+Suppose that happens at $r+1$ distinct heights. Then the polynomial
+$c_0(x,\cdot)$, of degree at most $r$ in $H$, vanishes at $r+1$ points for each
+fixed $x$, so $c_0 \equiv 0$ identically. Now recurse: with the $\delta = 0$ face
+gone, \eqref{eq:rec} anchored at $H_0 + 1$ makes $c_1$ the leading face, and the
+same argument at the same set of levels kills it; and so on through
+$\delta = 2, 3, \dots$. All faces vanish, so all $p_i$ vanish, contradiction.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+Suppose $F$ were D-finite. Without loss of generality the annihilating operator
+is over $\Q(x,y)$: $F$ has rational coefficients, and D-finiteness over $\C$
+descends to the field of definition. Clearing denominators gives an operator of
+some order $r$ with $x$-degrees at most some $D$. By
+Theorem~\ref{thm:dichotomy}, $[\Q(\mu_H):\Q] \le D$ at all but at most $r$
+heights --- contradicting Lemma~\ref{lem:northcott}, which says only finitely
+many heights have degree $\le D$ while infinitely many heights exist.
+\end{proof}
+
+\section{The effective content}
+\label{sec:effective}
+
+Theorem~\ref{thm:main} is qualitative. Theorem~\ref{thm:dichotomy} is not: it
+applies at a single height, so certified data at finitely many heights excludes
+explicit boxes. This section gives two families of them, resting on different
+ingredients, so that a reader who distrusts one can use the other.
+
+\subsection{New-root content}
+
+For the banked fixed-height generating functions $G_H = P_H/Q_H$ in lowest terms,
+define the \emph{new-root content}
+\[
+  \psi_H \;:=\; \frac{Q_H}{\gcd\bigl(Q_H,\; Q_1Q_2\cdots Q_{H-1}\bigr)} ,
+\]
+the denominator factors appearing first at height $H$. Certified: $\deg\psi_H$
+is $1, 2, 4, 9, 29, 68, 181, 462, 1254, 3289$ for $H = 1,\dots,10$; every
+$\psi_H$ is squarefree; every $P_H/Q_H$ is in lowest terms, so every root is
+active. The certificates are computed modulo the prime $p = 2^{61}-1$, where a
+gcd equal to $1$ with preserved degrees is a rigorous certificate over
+$\Q$.\footnote{The banked $H = 11$ entry is marked unvalidated and is excluded
+here: its $Q_{11}$ shares no roots with $Q_9Q_{10}$ modulo $p$, which is
+inconsistent with the structure at every validated level. It is a data-hygiene
+flag, not a mathematical anomaly, and nothing above or below uses it.}
+
+Running the argument of Theorem~\ref{thm:dichotomy} with \emph{all} roots of
+$\psi_{H_0}$ instead of the single dominant one --- each is a pole of $G_{H_0}$
+and, by construction, not a pole of any earlier slice --- gives
+$c_0(\alpha,H_0) = 0$ for $\deg\psi_{H_0}$ distinct values $\alpha$. So
+$\deg\psi_{H_0} > D$ forces $c_0(\cdot,H_0) \equiv 0$, and the recursion is as
+before. The rule is: exclude $(r,D)$ whenever at least $r+1$ certified levels
+have $\deg\psi_H > D$.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l l}
+\toprule
+order & excluded $x$-degrees \\
+\midrule
+$r \le 5$ & $D \le 28$ \\
+$r \le 4$ & $D \le 67$ \\
+$r \le 3$ & $D \le 180$ \\
+$r \le 2$ & $D \le 461$ \\
+$r \le 1$ & $D \le 1253$ \\
+$r = 0$   & $D \le 3288$ \\
+\bottomrule
+\end{tabular}
+\caption{No annihilating $y$-ODE for $F$ exists with these $(r,D)$, from the
+$\psi$-degree certificates at $H \le 10$.}
+\label{tab:psiboxes}
+\end{table}
+
+\subsection{Boxes from monotonicity and irreducibility alone}
+
+The $\psi$-construction needs the banked $G_H$. A second family of boxes rests
+only on Lemma~\ref{lem:mono} plus irreducibility certificates, and so is
+self-contained relative to this paper's own ingredients.
+
+$\psi_H$ is irreducible over $\Q$ for $H = 1,\dots,8$ --- degrees
+$1, 2, 4, 9, 29, 68, 181, 462$ --- by single-prime certificates for $H \le 4$ and
+multi-prime subset-sum-intersection certificates for $H = 5,\dots,8$. (At degrees
+$1254$ and $3289$ the factoring cost was not paid.) Hence
+$[\Q(\mu_H):\Q] = \deg\psi_H$ at every certified level.
+
+A side effect is worth recording: irreducibility together with positivity of the
+dominant root means, by Galois conjugation, that \emph{every} root of the atom is
+active in $T(n,H)$. So the minimality ingredient that an earlier root-separation
+argument needed is not needed at these levels.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l l}
+\toprule
+order & excluded $x$-degrees \\
+\midrule
+$r \le 4$ & $D \le 8$ \\
+$r \le 3$ & $D \le 28$ \\
+$r \le 2$ & $D \le 67$ \\
+$r \le 1$ & $D \le 180$ \\
+$r = 0$   & $D \le 461$ \\
+\bottomrule
+\end{tabular}
+\caption{Weaker than Table~\ref{tab:psiboxes}, but resting only on strict
+monotonicity and the irreducibility certificates.}
+\label{tab:irrboxes}
+\end{table}
+
+\subsection{The growth rate, for calibration}
+
+$\deg\psi_H$ grows by a factor of about $2.7$ per level, which is close to
+$\sqrt\lambda \approx 2.67$ --- the atom degree tracks the frontier size, as one
+would expect from the transfer-matrix picture. This is an observation about rate,
+not an input: Theorem~\ref{thm:main} needs unboundedness, and gets it from
+Northcott rather than from any measured growth.
+
+\section{Transport to other families}
+\label{sec:transport}
+
+The proof of Theorem~\ref{thm:main} used exactly three things:
+
+\begin{enumerate}
+\item the counts $T(n,H)$ are nonnegative integers;
+\item each height slice $G_H$ is rational, which follows from a finite column
+  transfer matrix;
+\item the slice growth constants $\mu_H$ are strictly increasing and bounded
+  above.
+\end{enumerate}
+
+Nothing about king adjacency appears anywhere. So:
+
+\begin{corollary}
+\label{cor:transport}
+The height-anisotropic generating function is not D-finite for fixed polyominoes
+(the \oeis{A001168} triangle), for polyhexes, for polyiamonds, and generally for
+any lattice-animal family admitting a column transfer matrix with a strongly
+connected signature digraph and a finite growth constant.
+\end{corollary}
+
+The only per-family work is item~3, and both halves of it are cheap. Strictness
+is the Perron--Frobenius argument of Lemma~\ref{lem:mono}, which needs the
+signature digraph to be strongly connected --- true whenever a full column is a
+legal state and every state can be closed off by one. Boundedness needs any crude
+upper bound on the family's growth constant, and a counting argument of the kind
+in Proposition-of-the-companion-paper style always supplies one.
+
+By contrast, \cite{bmr2002}'s route needs an explicit combinatorial description
+of the denominators --- cyclotomic factors from $k$-sections, in their case --- to
+be redone for each new family. That difference is the actual content of the
+lightness claim in the introduction, and it is why we think the transport
+statement is the more useful half of this paper.
+
+\section{Relation to existing work}
+\label{sec:related}
+
+\subsection{Bousquet-M\'elou and Rechnitzer 2002}
+
+Their Lemma~9 is the criterion the haruspicy papers use, cited there
+as ``(from~[4])'' and ``(from~[6])'' respectively; it is not in Haruspicy~1,
+which supplies the combinatorial section and density machinery instead. Stated in
+their notation: if $S(q,u) = \sum_n S_n(q)u^n$ is D-finite in $u$, and $P$ is the
+union of the pole sets of the $S_n$, then $P$ has only finitely many limit points.
+Their proof extracts the coefficient of $u^n$ from the ODE to get
+$a_0(q,n)S_n = a_1(q,n)S_{n-1} + \dots$, so $S_n$ has denominator dividing
+$I(q)\prod_m a_0(q,m)$; a limit point $\ell$ produces $(q_i,n_i)$ with
+$q_i \to \ell$, $n_i \to \infty$ and $a_0(q_i,n_i) = 0$, and dividing
+$a_0 = \sum_k b_k(q)n^k$ by $n_i^d$ in the limit gives $b_d(\ell) = 0$. Every
+limit point is a root of one fixed polynomial.
+
+Side by side:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{p{0.20\textwidth} p{0.35\textwidth} p{0.35\textwidth}}
+\toprule
+ & \cite[Lemma~9]{bmr2002} & this paper (Thm.~\ref{thm:dichotomy}) \\
+\midrule
+opening move & extract $y$-coefficients of the ODE, giving a recurrence with polynomial coefficients & \textbf{identical}, and cited to them \\
+what is tracked & the \emph{whole} pole set of every slice & \emph{one} pole per slice, $x = 1/\mu_H$ \\
+finiteness input & topological: limit points of a subset of $\C$ & arithmetic: Northcott (bounded degree and bounded house) \\
+mechanism & asymptotic in $n$: divide by $n^d$, take the limit, hit the leading coefficient & at a single level: lower faces regular at $1/\mu_{H_0}$, so $c_0$ vanishes there; degree comparison over $\Q$ \\
+conclusion & qualitative & \textbf{effective}: explicit $(r,D)$ boxes \\
+input needed & an explicit combinatorial description of the denominators, per family & Perron--Frobenius monotonicity plus any crude growth bound \\
+\bottomrule
+\end{tabular}
+\caption{The shared opening, and where the two arguments part company.}
+\label{tab:sidebyside}
+\end{table}
+
+Step~1 is theirs and dates to 2002. We cite it inside the proof rather than
+presenting the derivation as self-contained. The lightness of the remaining
+hypotheses is what we claim.
+
+\subsection{Klazar 2003, and the ceiling on our method}
+
+Klazar's Theorem~1: if $F' = G(x,F)$ with $G$ a Laurent series, $F$ \emph{not}
+analytic, $G$ analytic and $\mathrm{ord}_y(G) < 0$, then $F$ is not $D_A$-finite
+and a fortiori not D-finite. The lever is divergence --- $F$ must have zero
+radius of convergence --- and it cannot engage with our object at all: every
+$G_H$ is rational with radius $1/\mu_H$, and $\mu_H < \lambda$, so $F$ is
+analytic in a bidisc and his first hypothesis fails outright.
+
+We record this because the negative is useful --- a one-variable
+non-$P$-recursiveness proof looked like it might be arithmetic, and it is not ---
+and because Klazar has one thing we do not. He enlarges the target class from
+D-finite to $D_A$-finite, with analytic rather than polynomial coefficients, on
+the explicit ground that ``the key lies in the analytic $\times$ nonanalytic
+dichotomy'', and so gets the stronger conclusion for free. Our theorem cannot
+follow, and it is worth being exact about why: the step ``a rational polynomial
+of degree $\le D$ cannot vanish at an algebraic number of degree $> D$'' is the
+whole dichotomy argument, and it dies the instant the coefficients are analytic,
+since an analytic function may vanish at $1/\mu_{H_0}$ without vanishing
+identically. \textbf{Theorem~\ref{thm:main} is not-D-finite over $\Q(x)$ and does
+not extend to $D_A$-finite.} That is a ceiling on the method.
+
+\subsection{Arithmetic neighbours}
+
+Height theory has been applied to D-finiteness directly. Bell, Nguyen and
+Zannier, \emph{D-finiteness, rationality, and height}~\cite{bnz2020}, with its
+two sequels, is the nearest relative we found; Bell, Hu and
+Satriano~\cite{bhs2020} is arithmetic dynamics along orbits of rational maps and
+is further away. The configuration differs from ours in what is measured: they
+bound the Weil heights of the \emph{coefficients} and conclude rationality; we
+bound degree and house of the \emph{slice growth constants} and conclude a
+contradiction. Bell, Gerhold, Klazar and Luca~\cite{bgkl2008} is a
+zero-counting argument, again analytic.
+
+We name these so that this section rests on the arithmetic neighbourhood being
+mapped, rather than on absence.
+
+\subsection{What the searches established, and what they cannot}
+
+Three independent databases were searched, and the record is per-search in
+\repo{papers/MISSING.md}. A forward citation crawl over
+\cite{bmr2002} (83 and 74 citing works by two indexes), the haruspicy
+papers, \cite{chanRechnitzer2018}, \cite{bbo2021}, \cite{bhs2020} and
+\cite{bgkl2008} found that every descendant proving non-D-finiteness uses pole or
+singularity accumulation; no arithmetic endgame on a family of slice growth
+constants appears in any of those sets. A third pass used full-text search within
+citing articles --- a genuinely different instrument, and the one that could catch
+a paper using Northcott inside a proof without saying so in an abstract: over
+\cite{bmr2002}'s citing articles, ``Northcott'' returns zero hits and ``Mahler''
+zero hits, while ``algebraic degree'' and ``height'' return hits that are all
+false positives (the degree of an algebraic equation; column height in
+bargraphs).
+
+\emph{This establishes no collision found. It does not establish absence, and it
+cannot.} Accordingly nothing in this paper is claimed on the strength of a search:
+we assert the lighter hypotheses and the effective boxes, we cite
+\cite[Lemma~9]{bmr2002} for the shared opening, and we do not write ``first''.
+
+\subsection{One resonance, unexplored}
+
+Klazar's Theorem~4 shows that two of his sequences are $P$-recursive modulo
+$2^k$ for every $k$: objects with no $P$-recursive description whose reductions
+modulo a prime power are algebraic. That is structurally the same phenomenon as
+the mod-$3$ behaviour of the king height triangle, which admits no C-finite
+recurrence and yet is governed modulo $3$ by a single cubic. Different
+combinatorics, same shape of answer. Whether the mechanisms are related is open,
+and as far as we know nobody has looked.
+
+\section{Open problems}
+
+\begin{openproblem}[the isotropic sequence]
+Theorem~\ref{thm:main} says nothing about $a(x) = \sum_n a(n)x^n$, the row sums.
+The same is true of Rechnitzer's SAP theorem, and for the same structural reason:
+summing over $H$ destroys the slice structure the proof depends on. Nothing here
+should be read as evidence about $a(x)$ either way.
+\end{openproblem}
+
+\begin{openproblem}[extend past $\Q(x)$]
+Is $F$ non-$D_A$-finite? Our method cannot say, for the reason in
+\S\ref{sec:related}. An argument that survives analytic coefficients would need
+a different endgame than a degree comparison.
+\end{openproblem}
+
+\begin{openproblem}[certify the top two levels]
+$\psi_9$ and $\psi_{10}$, at degrees $1254$ and $3289$, are squarefree and
+new-root-certified but not certified irreducible. Doing so would upgrade
+Table~\ref{tab:irrboxes} toward Table~\ref{tab:psiboxes}.
+\end{openproblem}
+
+\begin{openproblem}[quantitative Northcott]
+Lemma~\ref{lem:northcott} is qualitative: for each $D$, finitely many heights
+have degree $\le D$. An effective version --- \emph{how many} $\mu_H$ can have
+degree $\le D$, given house $\le 9.3154$ --- would turn the exclusion boxes from
+data-dependent into proved, since the counting bound in the proof is explicit.
+This looks like the most reachable of these four.
+\end{openproblem}
+
+\section{Reproduction}
+\label{sec:repro}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l}
+\toprule
+claim & check \\
+\midrule
+$\psi$-degrees, squarefreeness, lowest terms & \repo{experiments/anisotropic\_dfinite.py} \\
+Table~\ref{tab:psiboxes} and Table~\ref{tab:irrboxes} & \repo{experiments/anisotropic\_dfinite.py} \\
+irreducibility certificates, $H \le 8$ & \repo{experiments/anisotropic\_dfinite.py} \\
+Table~\ref{tab:mu} & \repo{experiments/mu\_H\_from\_atoms.py} \\
+the banked $G_H$ & \repo{results/fixed\_height\_gfs.txt} \\
+the house bound $\lambda \le 9.3154$ & companion paper; \repo{docs/proofs/polyplet-upper-bound.md} \\
+the literature record & \repo{papers/MISSING.md}, \repo{experiments/citation\_crawl.py} \\
+this paper's printed numbers & \repo{paper/verify\_l\_papers.py} \\
+\bottomrule
+\end{tabular}
+\caption{Where each claim is checked. All certificates are computed modulo
+$p = 2^{61}-1$; a gcd of $1$ with preserved degrees over $\F_p$ is a rigorous
+certificate over $\Q$, since a factor over $\Q$ would reduce to a factor mod $p$.}
+\label{tab:repro}
+\end{table}
+
+\bibliographystyle{plain}
+\bibliography{shared/refs}
+
+\end{document}

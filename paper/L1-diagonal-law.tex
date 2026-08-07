@@ -1,0 +1,987 @@
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+%  L1 — A diagonal law for row-local lattices.
+%  Category L (entirely machine-written); see paper/README.md and
+%  docs/publication-split.md.
+%
+%  Source material, all in this repository:
+%    docs/proofs/universal-diagonal-law.md   Theorems A and B, the instances
+%    docs/proofs/diagonal-law.md             the king case, written out first
+%    docs/proofs/grand-form.md               Theorem C and its corollaries
+%    docs/proofs/T-n-nm1.md                  P_1(n) = 25n - 45 from scratch
+%    docs/proofs/T-n-nm2-and-general.md      the king k = 2 hand derivation
+%    results/hex-diagonal-law.md             the b = 2 instance
+%    results/polyiamond-diagonal-law.md      the periodic extension
+%    results/diagonal-closed-forms.md        the literature check on T(n,n-k)
+%    results/defect-gas.md                   the king cluster weights
+% ---------------------------------------------------------------------------
+
+\input{shared/preamble}
+\input{shared/disclosure}
+
+\newcommand{\Wp}{W_{\mathrm{pair}}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\F}{\mathbb{F}}
+
+\title{\textbf{A diagonal law for row-local lattices}\\[4pt]
+\large Polynomial closed forms for lattice-animal counts at fixed
+height defect}
+\author{[byline: jasonp's call --- \repo{docs/publication-split.md} \S1]}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\draftbanner{This is a first draft. The verification ledger below records what
+warrants each result \emph{mechanically}; the column that records what a human
+has read is empty, deliberately, because nobody has read it yet. Do not
+circulate until that column says something true.}
+
+\Ldisclosure{%
+\emph{Theorem~\ref{thm:A} (shape, onset, integrality)} --- proved below. The
+king instance ($b=3$) is formalized in Lean~4 against mathlib
+(\repo{polyplets/Polyplets/Universal/}: \texttt{universal\_shape\_d},
+\texttt{universal\_shape}, \texttt{universal\_shape\_production},
+\texttt{universal\_production\_int\_all}) and depends on standard axioms only,
+with no \texttt{sorry} anywhere in the development. Machine checks of the
+general statement: \repo{experiments/universal\_law\_check.py} (square),
+\repo{experiments/diagonal\_law\_proof\_check.py} (king),
+\repo{experiments/hex\_gas.py} (hex).
+\emph{Theorem~\ref{thm:B} (the spine)} --- paper proof only, not formalized;
+both sharpness witnesses are machine computations
+(\repo{experiments/universal\_pair\_weights.py}).
+\emph{Theorem~\ref{thm:C} (the grand form)} --- paper proof below; the king
+instance is Lean, standard axioms only (\texttt{grand\_form},
+\texttt{grand\_form\_prod}), and the per-level production pinning for
+$k \le 18$ carries one named \texttt{native\_decide} leaf per weight card.
+\emph{The closed forms of Table~\ref{tab:machine}} --- each is a consequence of
+Theorem~\ref{thm:A} applied to $k+1$ enumerated values, and each survives 5--11
+held-out values that were not used to fit it.
+\emph{Corollary~\ref{cor:a308359}} --- deduced from Theorem~\ref{thm:A}; the
+enumeration behind it independently reproduces the case Mathar records as
+proved.
+\emph{Human verification:} none, as of this draft.}
+
+\begin{abstract}
+\noindent
+Let $T(n,H)$ count the fixed lattice animals of $n$ cells whose bounding box has
+height exactly $H$. We prove that for a broad class of lattices --- those whose
+adjacency moves the row index by at most one, which we call \emph{row-local} ---
+the diagonals of this triangle have closed forms: for every $k \ge 0$ there is a
+polynomial $q_k$ of degree exactly $k$ with
+\[
+  T(H+k,\,H) \;=\; q_k(H)\cdot b^{H}
+  \qquad\text{for all } H \ge k+1,
+\]
+where $b$ is the number of ways the lattice steps from one row to the next. The
+onset $H \ge k+1$ is proved, not observed. The leading coefficient of $q_k$ is
+$\Wp^{\,k}/k!$, where $\Wp$ is a single enumerable constant of the lattice.
+Square animals ($b=1$), polyhexes ($b=2$) and king animals ($b=3$) are three
+instances of one theorem.
+
+Three consequences. First, $k+1$ enumerated values of a diagonal now
+\emph{determine} it, which turns a fitted formula into a proved one; we tabulate
+the resulting closed forms, several of which appear to be new. Second, the
+conjecture recorded at OEIS \oeis{A308359} --- that the width-defect-$2$
+diagonal of the fixed polyomino triangle is $8n^2-51n+86$ for $n \ge 5$ ---
+follows, degree, onset and all. Third, modulo a prime $p$ dividing $b$ the
+generating function of the law satisfies one cubic, $W^3 = W^2 + t$, that does
+not depend on the lattice: the lattice chooses only the prime and a scaling.
+
+We also record where the theorem stops. Polyiamonds fail the hypothesis --- their
+adjacency is orientation-dependent, so there is no single step set --- and yet
+the conclusion survives in periodic form, which we report as measurement rather
+than theorem.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+The number of fixed lattice animals with $n$ cells has no known closed form on
+any lattice of interest, and there is good reason to think none exists: the
+anisotropic generating function of the king-animal height triangle is provably
+not D-finite, and the same argument applies to polyominoes and polyhexes.\footnote{%
+Companion paper: \emph{The by-height generating function is not D-finite}.}
+Stratifying by height does not repair that. What it does is expose structure the
+row sums hide.
+
+Write $T(n,H)$ for the number of fixed animals with $n$ cells whose bounding box
+has height exactly $H$. The rows of this triangle are the objects one normally
+wants; the \emph{diagonals} --- fix the \emph{defect} $k = n - H$ and let $H$
+grow --- are the objects that turn out to be tractable. Empirically, on every
+lattice anyone has tabulated, they are polynomial times exponential. This paper
+proves that, in the following form.
+
+\begin{quote}
+For every row-local lattice and every $k \ge 0$ there is a polynomial $q_k$ of
+degree $k$ with $T(H+k,H) = q_k(H)\,b^H$ for all $H \ge k+1$, where $b$ counts
+the ways of stepping from a row to the next.
+\end{quote}
+
+Three things about that statement are worth flagging before the proof.
+
+\paragraph{The onset is proved, not fitted.} $H \ge k+1$ --- equivalently
+$n \ge 2k+1$ in the other coordinate --- comes out of the argument, as exactly
+the reach of a correction polynomial whose degree is bounded by a triviality
+about cluster rows. It is not read off data and then hoped for. This is what
+makes the law useful as a \emph{tool}: because the degree is $\le k$ and the
+onset is $\ge k+1$, any $k+1$ enumerated in-onset values determine $q_k$
+outright, and every further value is a theorem rather than a test.
+
+\paragraph{The class, not the lattice, is the object.} The proof never uses
+$b=3$, or symmetry of the step set, or any arithmetic particular to a lattice.
+The square lattice is the degenerate case $b=1$; polyhexes are $b=2$; king
+animals are $b=3$. Getting all three from one argument is not economy for its own
+sake --- it is what makes the mod-$p$ result of Section~\ref{sec:spine} possible,
+since there the lattice's only contributions are a prime and a scalar.
+
+\paragraph{Where it stops is informative.} Polyiamonds are not in the class, and
+for a reason that is easy to state: a triangular cell's three neighbours depend
+on whether the triangle points up or down, so the adjacency is not
+translation-invariant and there is no single step set to count. The law
+nevertheless appears to hold with a period-2 correction. We report that as data
+(Section~\ref{sec:polyiamond}) and do not dress it as a theorem.
+
+\subsection{Relation to existing work}
+\label{sec:priorart}
+
+We did not find a height-diagonal law for lattice-animal triangles in print, and
+a separate search for published closed forms for $T(n,n-k)$ came back empty as
+well.\footnote{\repo{results/diagonal-closed-forms.md} and
+\repo{results/novelty-sortie.md} record the searches and their negative
+results.} We do not claim to be first, because absence is not a database result;
+we claim the theorem and cite the nearest published relative, which is close
+enough to be worth stating plainly.
+
+That relative measures the defect in \emph{dimension} rather than in height, on
+polycubes. Barequet, Barequet and Rote~\cite{barequetBarequetRote2010} show that
+for fixed $n$ the number of polycubes is a polynomial in the dimension $d$;
+Barequet and Shalah~\cite{barequetShalah2017} give, for general $k$, the shape
+\[
+  2^{\,n-2k+1}\, n^{\,n-2k-1}\,(n-k)\, h_k(n)
+\]
+for the count of $n$-cell polycubes proper in $n-k$ dimensions, with $h_k$
+polynomial. That is the same statement shape as ours --- fix a defect parameter,
+get polynomial times exponential, with the degree governed by the defect --- for
+one lattice family and one defect. Theorem~\ref{thm:A} quantifies over every
+row-local lattice instead, and is proved once for all of them. The phenomenon is
+not unheard of and we do not present it as such.
+
+The one place where our theorem settles something on the record is
+Corollary~\ref{cor:a308359}, which proves a conjecture standing in OEIS
+\oeis{A308359}~\cite{a308359} since 2019.
+
+\subsection{How to read the rest}
+
+Section~\ref{sec:class} defines the class and pins its three instances.
+Section~\ref{sec:A} proves the law. Section~\ref{sec:sharp} sharpens it: the
+degree is exactly $k$, the leading coefficient is $\Wp^k/k!$, and the onset is
+sharp on all data. Section~\ref{sec:grand} upgrades the law to an exact
+one-mode resummation --- the \emph{grand form} --- which is what makes each
+successive diagonal cost two new rational constants and no more.
+Section~\ref{sec:spine} is the mod-$p$ theorem. Section~\ref{sec:machine} is the
+tool: closed forms, and how they are certified. Section~\ref{sec:a308359} is the
+A308359 corollary. Section~\ref{sec:polyiamond} is the failure case.
+Section~\ref{sec:formal} records the Lean development, and
+Section~\ref{sec:repro} says how to re-run everything.
+
+\section{Row-local lattices}
+\label{sec:class}
+
+\begin{definition}[row-local lattice]
+\label{def:rowlocal}
+A \emph{row-local lattice} has cells indexed by $\Z^2$ and a
+translation-invariant symmetric adjacency relation $A \subseteq \Z^2$ (a set of
+offsets, with $u \sim v$ iff $v - u \in A$) satisfying
+\begin{description}
+\item[(L)] $A \subseteq \{(dx,dy) : |dy| \le 1\}$ --- adjacency changes the row
+  index by at most one;
+\item[(R)] the within-row offsets $\{dx : (dx,0) \in A\}$ are finite and
+  contain $dx = \pm 1$ --- a run of consecutive cells in one row is connected;
+\item[(U)] the \emph{up-offset set} $D := \{dx : (dx,1) \in A\}$ is finite and
+  nonempty. Write $b := |D|$, the \emph{drift count}.
+\end{description}
+An \emph{animal} is a finite nonempty connected set of cells, taken up to
+translation; $T(n,H)$ counts the animals with $n$ cells occupying exactly $H$
+consecutive rows.
+\end{definition}
+
+Condition (L) is the whole of the geometric content --- it is what makes a row
+with a single cell a cut, which is Lemma~\ref{lem:sep} and the engine of
+everything after it. Conditions (R) and (U) are finiteness bookkeeping.
+
+\begin{example}[the three instances]
+\label{ex:instances}
+\leavevmode
+\begin{itemize}
+\item \textbf{Square lattice.} $A = \{(\pm1,0),(0,\pm1)\}$, so $D = \{0\}$ and
+  $b=1$. Animals are fixed polyominoes, \oeis{A001168}.
+\item \textbf{Polyhexes.} $D = \{-1,0\}$, $b=2$. Cells are hexagons, each with
+  six neighbours; $T$'s row sums are $1, 3, 11, 44, 186, 814, 3652, 16689,
+  \dots$ = \oeis{A001207}, fixed hexagonal polyominoes.
+\item \textbf{King animals (polyplets).} $A$ is all eight compass offsets, so
+  $D = \{-1,0,1\}$ and $b=3$. Row sums are \oeis{A006770}.
+\end{itemize}
+\end{example}
+
+\begin{remark}[a name collision worth stating once]
+\label{rem:names}
+The centres of the $b=2$ cells form the triangular \emph{point} lattice, so the
+literature sometimes calls this the triangular lattice --- Madras's
+``Tri''~\cite{madras1999}, for instance. That is the six-neighbour object and it
+gives polyhexes. \emph{Tiling by triangles} is a different object: each
+equilateral cell has three edge-neighbours, the counts are
+$2, 3, 6, 14, 36, 94, 250, 675, 1838, \dots$ = \oeis{A001420}, and OEIS files
+these polyiamonds under ``the 2-dimensional hexagonal lattice''. Two names,
+crossed. Definition~\ref{def:rowlocal} covers the first and not the second; see
+Section~\ref{sec:polyiamond}.
+\end{remark}
+
+\subsection{The decomposition}
+
+Fix a row-local lattice and read an animal of height $H$ row by row; every one of
+its $H$ rows is nonempty. Call a row with exactly one cell a \emph{walk row}, and
+call a maximal run of rows with two or more cells a \emph{cluster}. A cluster's
+\emph{type} is its stack of row sizes $(s_1,\dots,s_\ell)$ with every
+$s_i \ge 2$; its \emph{surplus} is $k_c = \sum_i (s_i - 1)$ and its \emph{length}
+is $\ell_c$. Since every cluster row contributes at least one to the surplus,
+\begin{equation}
+  \ell_c \;\le\; k_c .
+  \label{eq:elllek}
+\end{equation}
+Inequality~\eqref{eq:elllek} is the load-bearing triviality of this paper: it is
+what bounds the degree in Step~4 below, what makes the onset $H \ge k+1$ rather
+than something worse, and what collapses the mod-$p$ series in
+Section~\ref{sec:spine}.
+
+Four families of weights count the configurations of a cluster relative to its
+contacts:
+\begin{itemize}
+\item the \emph{interior} weight $W_c$: configurations of a cluster of type $c$
+  together with the single walk cell below it (held fixed) and the single walk
+  cell above it (free), the whole being connected;
+\item the \emph{edge} weights $W^b_c$ and $W^t_c$: the same with the cell below
+  (respectively above) absent, for clusters that touch the bottom (respectively
+  top) of the animal. $W^t$ of a type is $W^b$ of its reversal;
+\item the \emph{pure} weights $W^p_c$: animals consisting of a single cluster and
+  nothing else.
+\end{itemize}
+
+\begin{lemma}[finiteness]
+\label{lem:finite}
+Every weight above is finite, and for each $k$ there are finitely many cluster
+types of surplus $k$ --- exactly the $2^{k-1}$ compositions of $k$ into parts
+$\ge 1$, one part per row.
+\end{lemma}
+
+\begin{proof}
+A connected set of $c$ cells has $x$-spread at most $(c-1)\max|dx|$, which is
+finite by (R) and (U); so a cluster of bounded surplus, together with its two
+contact cells, ranges over a finite set of configurations once we quotient by
+$x$-translation. The type count is the composition count, and $\ell_c \le k_c$ by
+\eqref{eq:elllek}.
+\end{proof}
+
+\section{The diagonal law}
+\label{sec:A}
+
+\begin{theorem}[diagonal law]
+\label{thm:A}
+Let $L$ be a row-local lattice with drift count $b$. For every $k \ge 0$ there is
+a polynomial $q_k \in \Q[H]$ of degree at most $k$ such that
+\[
+  T(H+k,\,H) \;=\; q_k(H)\cdot b^{H}
+  \qquad\text{for every } H \ge k+1 .
+\]
+Equivalently, setting $P_k(n) := b^{\,1+2k}\, q_k(n-k)$,
+\[
+  T(n,\,n-k) \;=\; P_k(n)\cdot b^{\,n-1-3k}
+  \qquad\text{for every } n \ge 2k+1 ,
+\]
+and $P_k$ takes an integer value at every integer.
+\end{theorem}
+
+The proof is five steps. None of them uses the value of $b$.
+
+\subsection*{Step 1: a walk row is a cut}
+
+\begin{lemma}[separation]
+\label{lem:sep}
+A set of cells occupying rows $r_1 < \dots < r_H$, every row nonempty, is
+connected if and only if each segment between consecutive walk rows (endpoints
+included) is connected.
+\end{lemma}
+
+\begin{proof}
+By (L), adjacency changes the row index by at most one, so any path from a cell
+strictly below row $r$ to a cell strictly above row $r$ must contain a cell of
+row $r$. If $r$ is a walk row, that cell is unique.
+
+($\Leftarrow$) Consecutive segments overlap exactly in a walk cell, so
+connectedness glues.
+
+($\Rightarrow$) Take two cells inside one segment $[r,r']$ and a path between
+them in the animal. Any excursion of the path below $r$ leaves and re-enters
+through the unique walk cell of row $r$, and likewise above $r'$; excising each
+excursion leaves a path inside the segment.
+\end{proof}
+
+\subsection*{Step 2: the chain identity}
+
+Let $y$ mark surplus and $z$ mark rows, and set
+$F(y,z) = \sum_{n,H} T(n,H)\, y^{\,n-H} z^{H}$.
+
+\begin{proposition}[chain identity]
+\label{prop:chain}
+\[
+  F \;=\; E_b\,(1-S)^{-1} E_t \;+\; P,
+\]
+exactly, where
+\[
+  S = b\,z + \sum_c W_c\, y^{k_c} z^{\ell_c+1},\quad
+  E_b = z\Bigl(1 + \sum_c W^b_c\, y^{k_c} z^{\ell_c}\Bigr),\quad
+  E_t = 1 + \sum_c W^t_c\, y^{k_c} z^{\ell_c},
+\]
+and $P = \sum_c W^p_c\, y^{k_c} z^{\ell_c}$, all sums over cluster types $c$.
+\end{proposition}
+
+\begin{proof}
+By Lemma~\ref{lem:sep} every animal decomposes \emph{uniquely} as either a single
+pure cluster --- the $P$ term --- or as an optional bottom-edge cluster, then an
+alternating chain of walk steps and clusters cut at its walk rows, then an
+optional top-edge cluster. Configurations of each piece are counted relative to
+the walk cell it shares with its neighbour, so the choices multiply; rows and
+surplus add, so the monomials multiply. A plain walk step contributes $b z$,
+since by (U) there are exactly $b$ ways to place the next single cell above the
+current one; a cluster together with the walk row above it contributes
+$W_c y^{k_c} z^{\ell_c+1}$. Summing the geometric series in $S$ gives the
+identity. Uniqueness of the decomposition and invariance under $x$-translation
+are what make it exact rather than an inequality.
+\end{proof}
+
+For the king lattice this identity was checked against an independently
+enumerated triangle: exact agreement at all 40 cells with $k \le 3$, $H \le 10$,
+and per-order agreement to $H = 33$
+(\repo{experiments/diagonal\_law\_proof\_check.py}).
+
+\subsection*{Step 3: rational structure}
+
+Write $\sigma := S - bz$, so that every term of $\sigma$ has $y$-order at least
+one. Then $(1-S)^{-1} = \sum_{m \ge 0} \sigma^m (1-bz)^{-(m+1)}$, and extracting
+$[y^k]$ kills every $m > k$. Hence
+
+\begin{proposition}
+\label{prop:rational}
+$\displaystyle [y^k]\,F \;=\; \frac{R_k(z)}{(1-bz)^{\,k+1}}$
+with $R_k \in \Z[z]$ and $\deg R_k \le 2k+1$.
+\end{proposition}
+
+\begin{proof}
+Only the degree count needs saying, and it is \eqref{eq:elllek} four times. An
+$E_b$ factor at surplus $k_b$ has $z$-degree at most $k_b + 1$; an $E_t$ factor at
+surplus $k_t$ has $z$-degree at most $k_t$; a term of $\sigma^m$ at total surplus
+$k_m$ has $z$-degree $\sum_i (\ell_i + 1) \le k_m + m$, and carries a factor
+$(1-bz)^{\,k-m}$ to reach the common denominator. With
+$k_b + k_m + k_t = k$ the total is at most
+$(k_b+1) + (k_m+m) + k_t + (k-m) = 2k+1$. The pure part contributes $z$-degree at
+most $k$ against a denominator $(1-bz)^{k+1}$, which is within the bound.
+\end{proof}
+
+For the king lattice the bound is attained: $\deg R_k$ is exactly $1,3,5,7$ for
+$k = 0,1,2,3$.
+
+\subsection*{Step 4: partial fractions, and where the onset comes from}
+
+Change basis in the numerator: write
+$R_k(z) = \sum_{j \ge 0} a_j (1-bz)^{j}$, which is legitimate over $\Q$ and has
+$a_j$ equal to the coefficients of $R_k\bigl((1-w)/b\bigr)$, hence
+$a_j \in b^{-(2k+1)}\Z$. Splitting the sum at $j = k+1$,
+\[
+  [y^k]F \;=\; \underbrace{\sum_{j \le k} a_j (1-bz)^{\,j-k-1}}_{\text{poles}}
+             \;+\; \underbrace{\sum_{j \ge k+1} a_j (1-bz)^{\,j-k-1}}_{=:\,D(z)} ,
+\]
+and $D$ is a \emph{polynomial} of degree at most $(2k+1)-(k+1) = k$, by
+Proposition~\ref{prop:rational}. Taking $[z^H]$ with $H > \deg D$, that is with
+$H \ge k+1$, the polynomial part contributes nothing and
+\begin{equation}
+  T(H+k,\,H) \;=\; \Bigl(\sum_{i=1}^{k+1} a_{k+1-i}\binom{H+i-1}{\,i-1\,}\Bigr) b^{H}
+  \;=:\; q_k(H)\, b^{H},
+  \label{eq:qk}
+\end{equation}
+a polynomial in $H$ of degree at most $k$ times $b^H$, exactly.
+
+The onset is therefore not an artifact of the method: $H \ge k+1$ is precisely
+the reach of $D$, and $\deg D \le k$ traces back through
+Proposition~\ref{prop:rational} to $\ell_c \le k_c$.
+
+\subsection*{Step 5: integrality}
+
+From \eqref{eq:qk},
+\[
+  P_k(n) \;=\; b^{\,1+2k} q_k(n-k)
+  \;=\; \sum_{i=1}^{k+1} b^{\,1+2k} a_{k+1-i}\binom{n-k+i-1}{\,i-1\,}.
+\]
+Each binomial is an integer at every integer $n$, and
+$v_p(a_j) \ge -(2k+1)v_p(b)$ for every prime $p \mid b$ with no other primes
+appearing in a denominator; so every coefficient $b^{1+2k}a_{k+1-i}$ is an
+integer and $P_k(n) \in \Z$. This proves Theorem~\ref{thm:A}. \qed
+
+\begin{remark}[integer values, not integer coefficients]
+\label{rem:newton}
+$P_k$ is integer-\emph{valued}; its coefficients in the monomial basis are not
+integers for any $k \ge 2$, since by Theorem~\ref{thm:D} the leading one is
+$\Wp^k/k!$ --- for the king lattice, $P_2$ leads with $625/2$. What is true, and
+what an implementation should store, is the Newton-basis form implicit in
+\eqref{eq:qk}, equivalently the statement that $k!\,P_k \in \Z[n]$. That
+statement is a theorem (integer-valuedness plus $\deg \le k$) and is formalized;
+$k!$ is not the \emph{minimal} denominator, and for the king lattice the minimal
+one is known exactly, but that is an arithmetic question about one lattice and
+belongs elsewhere.
+\end{remark}
+
+\section{Sharpness}
+\label{sec:sharp}
+
+Theorem~\ref{thm:A} bounds the degree. The bound is attained, and the leading
+coefficient is a single enumerable constant of the lattice.
+
+\begin{definition}[the pair weight]
+\label{def:pair}
+$\Wp$ is the interior weight $W_c$ of the unique cluster type of surplus $1$: a
+single row of two cells, counted together with the walk cell fixed below it and
+the walk cell free above it.
+\end{definition}
+
+\begin{theorem}[degree and leading coefficient]
+\label{thm:D}
+$\deg q_k = k$ exactly, and the coefficient of $n^k$ in $P_k$ is $\Wp^{\,k}/k!$.
+In particular $[n^1]P_1 = \Wp$.
+\end{theorem}
+
+The proof is a corollary of the grand form and is given in
+Section~\ref{sec:grand} (Corollary~\ref{cor:lead}); it is written out for the
+king lattice in full, and the argument is uniform in the weights, with $25$
+replaced by $\Wp$ throughout. We state the measured position honestly: the
+identity $[n]P_1 = \Wp$ has been verified end to end on six test lattices by two
+routes that share no code --- a direct gadget count and an independent $k=1$
+diagonal enumeration with held-out values --- and the general-$k$ statement is
+proved and Lean-checked for $b = 3$ and measured for $b = 1, 2$.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l r r l l}
+\toprule
+lattice & $b$ & $\Wp$ & $P_1(n)$ & onset \\
+\midrule
+square    & 1 & 4  & $4n-8$   & $n \ge 2k+1$ \\
+polyhex   & 2 & 9  & $9n-15$  & $n \ge 2k+1$ \\
+king      & 3 & 25 & $25n-45$ & $n \ge 2k+1$ \\
+\bottomrule
+\end{tabular}
+\caption{The three instances at $k=1$. Since $\Wp \ge 4 > 0$ on every lattice in
+the class, the degree bound of Theorem~\ref{thm:A} is never slack at the top.}
+\label{tab:instances}
+\end{table}
+
+\begin{remark}[$4, 9, 25$ are not squares, and that matters]
+\label{rem:notsquares}
+The first three values are $2^2$, $3^2$ and $5^2$, which invites the reading that
+$\Wp$ is always a perfect square. It is false, and an
+earlier version of this work published one of the wrong numbers. A recount with
+the column gap left uncapped --- the earlier computation capped it at $2$, which
+is correct only when $\max|dx| \le 1$ --- gives $\Wp = 58$ and $114$ for the
+interval step sets with $b = 4, 5$, and $\Wp = 57$ for $D = \{-2,0,2\}$. The
+squares are a $b \le 3$ artifact. What survives is the weaker congruence used in
+Section~\ref{sec:spine}: the solid-pair contribution is $(b+1)^2 \equiv 1$
+modulo any $p \mid b$.
+
+Interval step sets happen to satisfy $\Wp(b) = b^3 - b(b+1)/2 + 4$, verified for
+$b \le 8$ by gadget count and $b \le 5$ end to end. We use that only as a
+convenient way to \emph{generate} witnesses for Theorem~\ref{thm:B}'s sharpness,
+and we do not present it as a result: exactly three members of the class are
+objects anyone studies, and all three are in Table~\ref{tab:instances}.
+\end{remark}
+
+\paragraph{Onset sharpness.} Theorem~\ref{thm:A} proves validity from
+$n = 2k+1$. That the formula \emph{fails} at $n = 2k$ is a non-cancellation
+statement --- it needs $\deg D = k$ exactly --- and we have it on all banked data
+for the king lattice through $k \le 17$, and ab initio from the weight table for
+$k \le 5$, where $\deg R_k = 2k+1$ exactly with leading coefficients
+$1, 4, -80, 1753, -40928, 987355$. It is not proved for all $k$. The natural
+route --- a rational generating function for the top coefficient --- is
+obstructed: the relevant all-pairs weight family is not C-finite, refuted at
+$\ell = 16$, because the walk between the pair cells has unbounded gap. We record
+onset sharpness as an open problem (Section~\ref{sec:open}) and note that
+Corollary~\ref{cor:a308359} uses it only as a control, never as an input.
+
+\section{The grand form}
+\label{sec:grand}
+
+Theorem~\ref{thm:A} says each diagonal is a polynomial. It says nothing about how
+the diagonals relate to each other, and that relation is where the practical
+content is: each new $k$ turns out to cost exactly two new rational constants.
+
+\begin{theorem}[grand form]
+\label{thm:C}
+There are $C, \mu \in \Q[[y]]$ with $C(0) = 1/b$ and $\mu(0) = b$ such that
+\[
+  T(H+k,\,H) \;=\; [y^k]\bigl(C(y)\,\mu(y)^{H}\bigr)
+  \qquad\text{for every } k \ge 0 \text{ and } H \ge k+1 .
+\]
+Equivalently there are rational constants $a_j, b_j$ $(j \ge 1)$, with
+$(a_j,b_j)$ determined by the cluster weights of surplus at most $j$, such that
+\[
+  P_k(n) \;=\; [y^k]\exp\Bigl(\sum_{j \ge 1} (a_j + b_j n)\, y^{j}\Bigr)
+  \qquad\text{for every } k \ge 0,\ n \ge 2k+1 .
+\]
+\end{theorem}
+
+Everything happens in $\Q[[y]]$, $y$-adically: no analysis, no convergence
+question, and --- the load-bearing feature --- no weight enumeration, so the
+proof covers all $k$ at once. We sketch the four moves; each is elementary and
+each is exact per order.
+
+\paragraph{Step 1: Weierstrass preparation by hand.} There is a unique pair
+$(z^*, u)$ with $z^* \in 1/b + y\Q[[y]]$, $u = \sum_j u_j(z) y^j$ with
+$\deg u_j \le j$ and $u_0 = b$, such that $1 - S = (z^* - z)\,u$. Construct both
+at once by induction on $y$-order. Order $0$ is $u_0(1/b - z) = 1 - bz$. At order
+$j$, collecting $[y^j]$ of $(z^*-z)u = 1-S$ gives
+$(1/b - z)\,u_j = N_j - b\,\zeta_j$ with
+$N_j = -\sigma_j - \sum_{m<j}\zeta_m u_{j-m}$ known and of degree at most $j+1$;
+choosing $\zeta_j := N_j(1/b)/b$ makes the right-hand side vanish at $z = 1/b$,
+so the division is exact in $\Q[z]$ and $\deg u_j \le j$. Since $u(0,0) = b \ne 0$,
+$u$ is a unit, and substituting $z = z^*$ shows $z^*$ is the unique root of
+$1-S$ in $1/b + y\Q[[y]]$.
+
+\paragraph{Step 2: the inverse unit stays polynomial per order.} Expanding
+$u^{-1}$ as a geometric series in $\sum_j (u_j/b)y^j$, the $y^k$-coefficient
+takes only $m \le k$ factors and compositions of $k$, so
+$\deg [y^k]u^{-1} \le k$. Hence for $G := E_b E_t u^{-1}$, splitting
+$k = k_b + k_t + k_u$ gives $\deg [y^k]G \le k+1$; equivalently, writing
+$G = \sum_i g_i(y) z^i$, we have $\mathrm{ord}_y(g_i) \ge i-1$. This is the fact
+that makes the resummation exact rather than asymptotic.
+
+\paragraph{Step 3: exactly one geometric mode.} Set $\mu := 1/z^*$. In
+$\Q[[y]][[z]]$, $(z^*-z)^{-1} = \mu\sum_m (\mu z)^m$, so
+\[
+  [z^H](F - P) \;=\; \sum_{i \le H} g_i\, \mu^{\,H+1-i}
+  \;=\; \mu^{\,H+1}\bigl(\hat C - \rho_H\bigr),
+\]
+with $\hat C := \sum_{i \ge 0} g_i (z^*)^i$ convergent $y$-adically and tail
+$\rho_H$ of $y$-order at least $H$. For $H \ge k+1$ the tail contributes nothing
+at order $y^k$, and $[z^H][y^k]P = 0$ as well since $\deg_z [y^k]P \le k < H$.
+Setting $C := \hat C \mu$ gives the first display of Theorem~\ref{thm:C}. (Check:
+$[y^0]G = z/b$, so $C(0) = 1/b$, and $k=0$ reads $T(H,H) = b^{\,H-1}$, the pure
+walk.)
+
+\paragraph{Step 4: production coordinates.} The second display reads the triangle
+along fixed $n$ rather than fixed $H$, and the change of coordinates is the
+diagonal form of Lagrange inversion. In the form needed here: for
+$f, \varphi \in \Q[[w]]$ with $\varphi(0) \ne 0$ and $\hat w \in y\Q[[y]]$ the
+unique solution of $\hat w = y\varphi(\hat w)$,
+\[
+  \sum_{k \ge 0} y^k\,[w^k]\bigl(f\varphi^k\bigr)
+  \;=\; \frac{f(\hat w)}{1 - y\varphi'(\hat w)} ,
+\]
+proved by writing $[w^k](f\varphi^k) = \mathrm{res}_w(f\varphi^k w^{-k-1})$,
+summing the geometric series to $\mathrm{res}_w\bigl(f/(w - y\varphi(w))\bigr)$,
+and factoring $w - y\varphi(w) = (w-\hat w)v(w,y)$ by Step 1's induction with
+$v(\hat w) = 1 - y\varphi'(\hat w)$. Applying it with $f = C\mu^n$ and
+$\varphi = \mu^{-1}$ gives $\sum_k y^k [w^k](C\mu^{n-k}) = K(y)M(y)^n$ --- so $n$
+enters only through $M^n$ --- and renormalising to the law's units turns that
+into the exponential display, with
+$a_j := [y^j]\log\bigl(b\,K(b^3 y)\bigr)$ and
+$b_j := [y^j]\log\bigl(M(b^3 y)/b\bigr)$. Every object at order $j$ is built from
+weights of surplus at most $j$, which is the locality claim. \qed
+
+\begin{remark}[scope]
+The proof above is written for a general row-local lattice, replacing the
+constant $3$ of the king case by $b$ throughout. The king case is the one that
+was written out first in full detail and the one formalized in Lean; the
+generalization is the same induction with $b$ symbolic, and the two places where
+one might worry --- the choice of $\zeta_j$ and the $y$-adic convergence of
+$\hat C$ --- use only $b \ne 0$ and $\mathrm{ord}_y(g_i) \ge i-1$ respectively.
+\end{remark}
+
+\subsection{Two corollaries}
+
+\begin{corollary}[two constants per level]
+\label{cor:two}
+$P_k(n) = \mathrm{known}_k(n) + a_k + b_k\,n$, where $\mathrm{known}_k$ is
+determined by the levels below $k$. Consequently, given
+Theorem~\ref{thm:A}'s degree bound, \emph{any two} in-onset values of a diagonal
+pin $(a_k,b_k)$ by a nonsingular $2\times2$ rational solve, and every further
+in-onset value is then a theorem rather than a test.
+\end{corollary}
+
+\begin{proof}
+$[y^k]\exp(\sum_j c_j y^j)$ is a polynomial in $c_1,\dots,c_{k-1}$ plus $c_k$
+itself; the new level enters linearly and $c_k = a_k + b_k n$.
+\end{proof}
+
+\begin{corollary}[leading coefficient; Theorem~\ref{thm:D}]
+\label{cor:lead}
+The only contribution to $n^k$ at order $y^k$ is $(b_1 n y)^k/k!$, so
+$[n^k]P_k = b_1^{\,k}/k!$. Since $P_1(n) = b_1 n + a_1$ and $[n]P_1 = \Wp$
+(Definition~\ref{def:pair}), $[n^k]P_k = \Wp^{\,k}/k!$ and $\deg P_k = k$.
+\end{corollary}
+
+For the king lattice $P_1(n) = 25n - 45$ is derived from scratch by a
+row-junction count, so $b_1 = 25$, $a_1 = -45$, and $[n^k]P_k = 25^k/k!$ for all
+$k$.
+
+\subsection{The gas picture, and why the shape is what it is}
+
+Corollary~\ref{cor:two} has a physical reading that is worth one paragraph
+because it explains the shape rather than merely deriving it. Write
+$F(n,u) = \sum_k P_k(n)u^k$ with $P_0 = 1$, and let $c_k = [u^k]\log F$. Then
+Theorem~\ref{thm:C} says exactly that \emph{every $c_k$ is linear in $n$}: the
+defects form a one-dimensional gas that is extensive, with all of the interaction
+living in the constant terms. Degree $\deg P_k \le k$ follows because the top term
+of $P_k$ is $c_1^k/k!$, and the leading coefficient is $\Wp^k/k!$ because $\Wp$
+is the slope of $c_1$.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l l l l l}
+\toprule
+lattice & $c_1$ & $c_2$ & $c_3$ & $c_4$ \\
+\midrule
+square & $4n-8$  & $-19n+54$              & $\tfrac{472}{3}n-\tfrac{1718}{3}$ & $-\tfrac{3099}{2}n+6558$ \\
+hex    & $9n-15$ & $-\tfrac{37}{2}n-\tfrac{83}{2}$ & $32n-32$ & \\
+king   & $25n-45$ & $-\tfrac{209}{2}n-\tfrac{891}{2}$ & & \\
+\bottomrule
+\end{tabular}
+\caption{Cumulants of the diagonal series, computed by a drift-parametric
+transfer computation (\repo{experiments/gas\_cumulants.py}). Linear in $n$ on
+every lattice, at every level reached. The king $c_2$ is the calibration: it
+reproduces, from a parametric computation, the pair
+$(a_2,b_2) = (-891/2,\,-209/2)$ that an earlier king-only reconstruction had
+hard-coded.}
+\label{tab:cumulants}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l r r r}
+\toprule
+cluster type & square & hex & king \\
+\midrule
+$(2)$       & 4  & 9   & 25 \\
+$(3)$       & 9  & 16  & 49 \\
+$(4)$       & 16 & 25  & 81 \\
+$(2,2)$     & 12 & 60  & 339 \\
+$(2,3)$     & 30 & 138 & 930 \\
+$(2,2,2)$   & 36 & 409 & 4778 \\
+\bottomrule
+\end{tabular}
+\caption{Interior cluster weights $W_c$, computed parametrically in the step set
+$D$. The king column reproduces every entry of an independent king-only weight
+table. Run at too small a search window the parametric version reproduces that
+table's \emph{documented} clipping bug --- $(2,2,2)$ comes out $4776$ --- which
+is a check on the port and a trap to stay clear of.}
+\label{tab:weights}
+\end{table}
+
+\section{The universal spine}
+\label{sec:spine}
+
+The mod-$p$ behaviour of the law is where quantifying over lattices pays off. The
+answer is one curve; the lattice contributes only a prime and a scalar.
+
+\begin{theorem}[universal spine]
+\label{thm:B}
+Let $p$ be a prime dividing $b$, and let $w := \Wp \bmod p$. Then modulo $p$ the
+grand series $\mathcal H(u)$ of the law satisfies
+\[
+  \mathcal H \;=\; 1 + w\,u\,\mathcal H^{-2},
+  \qquad\text{that is}\qquad
+  \mathcal H^3 = \mathcal H^2 + w\,u \quad\text{over } \F_p .
+\]
+If $w \ne 0$ this is the cubic $W^3 = W^2 + t$ after the rescaling $t = wu$: the
+curve does not depend on the lattice. If $w = 0$ the mod-$p$ triangle is trivial
+in the band.
+\end{theorem}
+
+\begin{proof}
+The chain identity gives a master equation
+$\mathcal H = 1 + \sum_c \widehat W_c\, u^{k_c}\mathcal H^{-(k_c+\ell_c)}$ with
+$\widehat W_c = W_c\, b^{\,2k_c - \ell_c - 1}$, after the substitution
+$\mu = b\mathcal H$, $u = y\mu/b^3$. Now count valuations. For every cluster,
+using $\ell_c \le k_c$ from \eqref{eq:elllek},
+\[
+  v_p(\widehat W_c) \;=\; (2k_c - \ell_c - 1)\,v_p(b) + v_p(W_c)
+  \;\ge\; (k_c - 1)\,v_p(b) ,
+\]
+which is at least $1$ for every cluster except the one with
+$k_c = \ell_c = 1$ --- the pair row. So modulo $p$ only the pair row survives,
+with weight $\widehat W = \Wp$.
+\end{proof}
+
+\begin{remark}[the statement is exactly sharp]
+Both branches are realised by ordinary lattices, so neither half of
+Theorem~\ref{thm:B} is vacuous. $D = \{-2,0,2\}$ has $\Wp = 57 \equiv 0 \pmod 3$,
+realising the degenerate branch; the interval set with $b = 5$ has
+$\Wp = 114 \equiv 4 \pmod 5$, a unit but not $1$, so the scaling is genuinely
+present and ``$w = 1$ always'' is false. Two further consequences of
+Remark~\ref{rem:notsquares}'s closed form, for interval $D$: at odd $p \mid b$
+both $b^3$ and $b(b+1)/2$ vanish, so $w \equiv 4$ --- always a unit, and the
+spine for odd $p$ is $\mathcal H^3 = \mathcal H^2 + 4u$ with the $4$
+lattice-independent too; at $p = 2$, $w \equiv \lfloor b/2 \rfloor \pmod 2$, so
+the degenerate branch occurs exactly when $4 \mid b$.
+\end{remark}
+
+For the king lattice, $p = 3$ and $w = 25 \bmod 3 = 1$, so the spine is
+$\mathcal H^3 = \mathcal H^2 + u$ over $\F_3$; for polyhexes, $p = 2$ and
+$w = 9 \bmod 2 = 1$, giving the same cubic over $\F_2$. The square lattice has
+$b = 1$ and no prime, so the theorem is vacuous there, correctly.
+
+\section{The law as a tool}
+\label{sec:machine}
+
+Theorem~\ref{thm:A} plus Corollary~\ref{cor:two} converts enumeration into proof.
+Because the degree is at most $k$ and the onset is at $H \ge k+1$, it suffices to
+enumerate $k+1$ in-onset values of a diagonal --- or, using
+Corollary~\ref{cor:two}, just two --- to determine $q_k$ outright.
+
+Supplying those values is a small computation, not a large one, and it does not
+require enumerating animals. A surplus-budgeted row transfer, parametric in the
+step set $D$, carries as state the current row's occupied cells (normalised in
+$x$), which component of the animal-so-far each belongs to, and the surplus spent
+so far; components that lose their foothold in the current row are pruned as
+unreconnectable. The cost therefore depends on $k$ and $H$, not on the number of
+animals. Rows may have gaps, so positions are searched in a window, and every run
+reports a stability check at window size and window size $+2$.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l r r l l}
+\toprule
+lattice & $b$ & $k$ & $P_k(n)$ & status \\
+\midrule
+square & 1 & 1 & $4n-8$ & matches \oeis{A308359} (proved there) \\
+square & 1 & 2 & $8n^2-51n+86$ & \textbf{A308359's conjecture} (Cor.~\ref{cor:a308359}) \\
+square & 1 & 3 & $\tfrac{32}{3}n^3-140n^2+\tfrac{1960}{3}n-1090$ & no published form found \\
+square & 1 & 4 & $\tfrac{32}{3}n^4-\tfrac{712}{3}n^3+\tfrac{12635}{6}n^2-\tfrac{52813}{6}n+14496$ & no published form found \\
+hex & 2 & 1 & $9n-15$ & reproduces the banked $b=2$ form \\
+hex & 2 & 2 & $\tfrac{81}{2}n^2-\tfrac{307}{2}n+71$ & no published form found \\
+hex & 2 & 3 & $\tfrac{243}{2}n^3-774n^2+\tfrac{1897}{2}n+28$ & no published form found \\
+king & 3 & 1 & $25n-45$ & reproduces the from-scratch derivation \\
+king & 3 & 2 & $\tfrac{625}{2}n^2-\tfrac{2459}{2}n+567$ & reproduces the hand derivation \\
+\bottomrule
+\end{tabular}
+\caption{Diagonal closed forms. Each is a theorem: Theorem~\ref{thm:A} supplies
+the degree and the onset, and the tabulated values supply the coefficients.
+Every row additionally survives 5--11 held-out values past the ones used to
+determine it.}
+\label{tab:machine}
+\end{table}
+
+Two rows of Table~\ref{tab:machine} are checks rather than results, and they are
+the reason to believe the rest. The king $k=2$ form was derived by hand, by a
+different argument, before this machinery existed; the parametric computation
+returns it coefficient for coefficient. And the square $k=3$ row can be checked
+against A308359's own printed triangle with no computation at all: it gives
+$282$ at $n=7$ and $638$ at $n=8$, which are that entry's values.
+
+Coefficients are rational rather than integral, which is the shape
+Remark~\ref{rem:newton} predicts: $k!\,P_k \in \Z[n]$, and
+$\tfrac{32}{3}\cdot 3! = 64$.
+
+\section{A conjecture of A308359}
+\label{sec:a308359}
+
+OEIS \oeis{A308359}~\cite{a308359}, entered by R.~J.~Mathar in May 2019, is the
+triangle of fixed polyominoes with $n$ cells by bounding-box \emph{width}, height
+free --- which is the transpose of the square-lattice instance of $T(n,H)$. The
+entry records $T(n,n-1) = 4n-8$ for $n \ge 3$ as known, and states:
+
+\begin{quote}
+\textbf{Conjecture:} $T(n,n-2) = 8n^2 - 51n + 86$ for $n \ge 5$.
+\end{quote}
+
+\begin{corollary}
+\label{cor:a308359}
+The conjecture holds.
+\end{corollary}
+
+\begin{proof}
+This is Theorem~\ref{thm:A} at $b = 1$, $k = 2$. The theorem gives
+$\deg P_2 \le 2$ and validity from $n \ge 2k+1 = 5$ --- exactly the range the
+conjecture states --- so three enumerated in-onset values determine the
+polynomial and the conjecture is whatever those three values say. Enumerating
+$n = 5, 6, 7$ gives $8n^2 - 51n + 86$.
+\end{proof}
+
+We ran that from our own enumeration rather than from the entry's numbers, in
+three stages so that a disagreement would say where it lived: first the row sums
+against \oeis{A001168}, then the $k=1$ diagonal, which must reproduce the
+$4n-8$ that Mathar records as \emph{proved} --- that step is what certifies our
+triangle is the same object as theirs, and it is an independent third party's
+check on our machinery --- and only then the quadratic. It reproduces every value
+of the entry's printed triangle through $n = 11$.
+
+Two controls, both of which must fail, and do
+(\repo{experiments/oeis\_a308359\_check.py}):
+\begin{itemize}
+\item a \emph{linear} fit through $n = 5, 6$ must miss at $n = 7$ --- it gives
+  $105$ against the true $121$ --- or the degree is not under test;
+\item the formula must \emph{fail} at $n = 2k = 4$, since the onset is sharp ---
+  $T(4,2) = 9$ where the quadratic says $10$ --- or the onset is not under test.
+\end{itemize}
+
+Two things are worth noting beyond the corollary itself. The onset in the
+conjecture, ``$n \ge 5$'', was presumably read off data; Theorem~\ref{thm:A}
+gives $2k+1$ for every $k$, proved, which is where the next diagonals of that
+entry come from --- rows 3 and 4 of Table~\ref{tab:machine}.
+
+\section{Where the theorem stops: polyiamonds}
+\label{sec:polyiamond}
+
+Polyiamonds are the natural next lattice to try and they are \emph{not} in the
+class. Cells are equilateral triangles; each has three edge-neighbours; and the
+up/down orientation alternates along a row, so the adjacency is parity-dependent
+rather than translation-invariant and hypothesis (U) fails --- there is no single
+step set $D$ to count. This is not a technicality that a little more care would
+remove. The counts are \oeis{A001420}: $2, 3, 6, 14, 36, 94, 250, 675, 1838,
+\dots$, nothing like the $b=2$ instance's \oeis{A001207}
+(Remark~\ref{rem:names}).
+
+The conclusion nevertheless appears to survive, in the periodic form one would
+guess. The indexing shifts, because a height-$H$ strip holds two triangle
+orientations per column, so the \emph{maximal} $n$ at height $H$ is $2H-1$ rather
+than $H$. Checked to $n = 12$ against a brute-force control
+(\repo{experiments/universal\_law\_check.py}, \texttt{polyiamond\_probe}):
+\[
+  T(2H-2,\,H) = 2^{\,H-2},
+  \qquad
+  T(2H-1,\,H) = H\cdot 2^{\,H-1},
+\]
+and the next diagonal, $T(2H-2+k, H)/2^H$, is quadratic in $H$ at $k = 2$
+(constant second differences, verified). The ground states at height $H$ are the
+$2H-2$-cell up-down domino chains.
+
+Making that a theorem means allowing a \emph{period-2} step set and asking for
+$q_k$ quasi-polynomial with period $2$: rerun the five steps of
+Section~\ref{sec:A} with a transfer over one period, so that the drift step
+becomes a matrix. We have not done it, and we state the periodic law as an
+extension rather than a result. What the polyiamond case does establish is that
+hypothesis (U) is doing real work in Theorem~\ref{thm:A} and is not merely
+convenient.
+
+\section{Formalization}
+\label{sec:formal}
+
+The king instance is formalized in Lean~4 (toolchain v4.31.0) against
+mathlib~\cite{mathlib}, in a development of 65 modules and about 21{,}700 lines
+with \textbf{zero occurrences of \texttt{sorry}}. What is relevant here:
+
+\begin{itemize}
+\item The engine --- \texttt{Universal.universal\_shape\_d},
+  \texttt{universal\_shape}, \texttt{universal\_shape\_production},
+  \texttt{universal\_production\_int\_all} --- and the \texttt{kingSystem} and
+  \texttt{peelSystem} instances depend on \textbf{standard axioms only}
+  (\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}).
+\item The grand form --- \texttt{grand\_form} and \texttt{grand\_form\_prod},
+  Theorem~\ref{thm:C} --- likewise depends on standard axioms only. It was
+  restructured for Lean as a \emph{staircase} route: in sequence form, Steps 1--3
+  collapse to a convolution fixed point plus one strong induction, and Step 4's
+  Lagrange lemma becomes a fixed point, with no power-series ring involved. Same
+  theorem, different scaffolding.
+\item \texttt{lead\_coeff\_25} (Corollary~\ref{cor:lead} for the king) adds a
+  single named \texttt{native\_decide} leaf, which is the evaluation of one
+  cluster weight.
+\item The per-lattice instance pins --- \texttt{king\_P1\_*},
+  \texttt{square\_P1\_*}, \texttt{hex\_P1\_*} --- and the cross-family row-sum
+  gates carry named leaves that amount to two triangle cells per lattice.
+\item The $k \le 18$ production pinning
+  (\texttt{P\textit{k}\_grand\_of\_banked}) is \emph{conditional on enumerated
+  cells}: those cells are hypotheses of the Lean theorems, not proved in Lean.
+\end{itemize}
+
+A reader who wants to check this rather than take it on trust should note that 88
+of the axiom footprints are \emph{guarded}: the modules wrap
+\texttt{\#print axioms} in \texttt{\#guard\_msgs}, so a changed footprint is a
+build error and building the project checks them. The remaining 148 print their
+footprints but are informational. There is no \texttt{sorryAx} and no anonymous
+\texttt{Lean.ofReduceBool}; every compiled-evaluation leaf is named, so the
+trusted surface is enumerable rather than diffuse.
+
+What the development does \emph{not} certify: the enumeration engine, the banked
+triangle, or any anchor value. Those enter as explicit hypotheses or as named
+leaves.
+
+\section{Open problems}
+\label{sec:open}
+
+\begin{openproblem}[onset sharpness in general]
+Theorem~\ref{thm:A} proves validity from $n = 2k+1$. Prove that the formula fails
+at $n = 2k$ for every $k$ --- equivalently, that $\deg D = k$ exactly, with no
+cancellation. Verified on all banked king data through $k \le 17$ and proved ab
+initio from the weight table for $k \le 5$. The obvious route, a rational
+generating function for the top coefficient of $R_k$, is blocked: the all-pairs
+weight family is not C-finite.
+\end{openproblem}
+
+\begin{openproblem}[closed forms for multi-row cluster weights]
+Table~\ref{tab:weights} is enumerated. Is there a closed form for $W_c$ as a
+function of the step set $D$ and the type $c$, generalising
+Remark~\ref{rem:notsquares}'s $\Wp(b)$ for interval $D$?
+\end{openproblem}
+
+\begin{openproblem}[the cumulants from the weights, for general $b$]
+Table~\ref{tab:cumulants} says every $c_k$ is linear in $n$ on every lattice, and
+Theorem~\ref{thm:C} proves it. Assembling the two coefficients of $c_k$ for
+$k \ge 2$ \emph{from the cluster weights} has been done only for the king
+lattice. Since the target's shape is now known, what is missing is exactly the
+combination of weights that produces the pair $(a_k, b_k)$.
+\end{openproblem}
+
+\begin{openproblem}[the periodic law]
+Prove Section~\ref{sec:polyiamond}'s periodic extension: for a lattice that is
+row-local only after passing to a period-$q$ $x$-translation, $T$ obeys the same
+law with $b$ the per-period drift and $q_k$ quasi-polynomial of period $q$.
+\end{openproblem}
+
+\section{Reproduction}
+\label{sec:repro}
+
+Every computation quoted above is in this repository and is re-runnable from a
+clean checkout.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l}
+\toprule
+claim & check \\
+\midrule
+chain identity, king & \repo{experiments/diagonal\_law\_proof\_check.py} \\
+Theorem~\ref{thm:A}, square instance & \repo{experiments/universal\_law\_check.py} \\
+Theorem~\ref{thm:A}, hex instance & \repo{experiments/hex\_gas.py} \\
+Table~\ref{tab:machine} (all rows) & \repo{experiments/diagonal\_machine.py} \\
+Table~\ref{tab:cumulants} & \repo{experiments/gas\_cumulants.py} \\
+$\Wp$, two independent routes & \repo{experiments/universal\_pair\_weights.py} \\
+Corollary~\ref{cor:a308359} and its two controls & \repo{experiments/oeis\_a308359\_check.py} \\
+onset sharpness, $k \le 5$ ab initio & \repo{experiments/spine\_deeper.py} \\
+Section~\ref{sec:polyiamond} & \repo{experiments/universal\_law\_check.py} \\
+Section~\ref{sec:formal} & \texttt{cd polyplets \&\& lake build} \\
+this paper's printed numbers & \repo{paper/verify\_l\_papers.py} \\
+\bottomrule
+\end{tabular}
+\caption{Where each claim is checked.}
+\label{tab:repro}
+\end{table}
+
+The label identifying which lattice a step set denotes is not taken on faith:
+\repo{experiments/diagonal\_machine.py} brute-forces the animal counts to $n=8$
+on every invocation and matches them against the OEIS sequences named in
+Example~\ref{ex:instances}, so a mislabelled instance is a failure rather than a
+silently wrong table.
+
+\bibliographystyle{plain}
+\bibliography{shared/refs}
+
+\end{document}
