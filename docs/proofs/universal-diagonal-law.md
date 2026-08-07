@@ -81,6 +81,31 @@ Valuation: v_p(What_c) = (2k_c - l_c - 1) v_p(b) + v_p(W_c) >=
 (k_c - 1) v_p(b) >= 1 for every cluster except k = l = 1, using k >= l.
 Only the pair-row survives mod p, with weight What = W_pair. QED
 
+## Corollary: OEIS A308359's open conjecture (2026-08-06)
+
+**A308359** (R. J. Mathar, May 2019) is the triangle of *fixed polyominoes with
+n cells by bounding-box width*, height free — our own T(n, H) transposed. It
+records `T(n,n-1) = 4n-8` for n ≥ 3 as known, and
+
+> **Conjecture: T(n,n−2) = 8n² − 51n + 86 for n ≥ 5.**
+
+That is Theorem A at b = 1, k = 2. The theorem gives deg ≤ 2 and onset
+n ≥ 2k+1 = 5 — exactly the range the conjecture states — so **three enumerated
+values determine the polynomial and the conjecture follows**.
+`experiments/oeis_a308359_check.py` does it from our own enumeration rather
+than from their numbers: totals against A001168 first, then k=1 reproducing
+their proved 4n−8 (which is what certifies our triangle is theirs), then the
+quadratic through n = 5,6,7 — which comes out `8n² − 51n + 86` verbatim and
+reproduces every value to n = 11. Two RED controls: a linear fit through
+n = 5,6 must miss at n = 7 (it gives 105 against 121), and the formula must
+**fail** at n = 2k = 4, since the onset is sharp (T(4,2) = 9, quadratic says
+10) — otherwise neither the degree nor the onset would be under test.
+
+Two things worth noting. The k=1 agreement is an independent third party's
+check on our machinery. And the onset in their conjecture, "n ≥ 5", was
+presumably read off data; ours is 2k+1 for every k, proved, which is where the
+next diagonals would come from.
+
 ## Instances (machine-checked)
 
 | lattice | b | onset | density (pair wt) | P_1(n) | spine |

@@ -53,9 +53,10 @@ on the banked hole distribution `results/holes_n18.txt` (n≤18, exact).
 >
 > The technique is standard, not clever: Whittington & Soteros's 1990 survey
 > (`papers/soteros_whittington_1990_*.pdf`, §4) states the animal pattern
-> theorem — attributing it to **Madras 1988**, so it predates the 1999 general
-> version — and then does exactly this, deriving Λ₀ < Λ, λ₀ < λ and Λ < λ₀ from
-> patterns a subclass cannot contain. They also record that such gaps can be
+> theorem and then does exactly this, deriving Λ₀ < Λ, λ₀ < λ and Λ < λ₀ from
+> patterns a subclass cannot contain. (They attribute it to "Madras (1988)",
+> which their bibliography lists as a **personal communication** — so the result
+> existed in 1988, but Madras 1999 remains the citable publication.) They also record that such gaps can be
 > made **quantitative**: λ − λ₀ ≥ 0.00003758·λ₀ from Madras et al. (1988). If a
 > rigorous numeric gap for hole-free king animals is ever wanted, that is the
 > route.

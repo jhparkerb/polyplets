@@ -237,7 +237,60 @@ Three things from Asinowski et al. that Paper 2 should take on board:
   leading coefficient is `2^{k−1}/(k−1)!`. Ours (`docs/proofs/diagonal-law.md`)
   is `25^k/k!`. Same phenomenon — an explicit exponential-over-factorial leading
   coefficient for the defect polynomial — on the dimension defect rather than
-  the height defect, and in both cases first *seen* in fitted data.
+  the height defect. Theirs was found by inspection and then proved; ours comes
+  with a mechanism (`results/defect-gas.md`: 25 = 16 + 9 is the two-cell cluster
+  weight, the k! is unordered defects). Caveat on the parallel: monic-versus-not
+  is a normalisation choice, so the shared content is *that* there is an explicit
+  exponential-over-factorial leading coefficient, not that the constants match.
+
+### N5 RE-RUN 2026-08-06 with the field's own search key — two more families
+
+The earlier sweep was run without knowing that this literature calls these
+objects **"diagonal formulae"**. Re-running on that phrase plus bounding
+box/perimeter found two families the first pass missed. Neither collides with
+our theorem, but both are prior art for the *shape*, and one of them is the
+same triangle we compute.
+
+- **Barequet & Magal, "Automatic generation of formulae for polyominoes with a
+  fixed perimeter defect," Comput. Geom. 108 (2022/23) 101919.** A third defect
+  parameter — perimeter — with an algorithm that enumerates reduced polyominoes
+  of a given defect and emits closed formulae and generating functions, k ≤ 5
+  (previously k ≤ 3). Not held; ScienceDirect, and no free copy on the author's
+  own publication page. Added to `papers/MISSING.md`.
+- **OEIS A308359** (R. J. Mathar, 2019): fixed polyominoes by bounding-box
+  width, height free — **our T(n,H) transposed**, for the square lattice. It has
+  `T(n,n−1) = 4n−8` (n ≥ 3) as known and `T(n,n−2) = 8n²−51n+86` (n ≥ 5) as an
+  open conjecture. So the height/width defect diagonal for polyominoes is not
+  unheard-of; it is a seven-year-old OEIS entry.
+  **And our Theorem A settles the conjecture** — see the corollary in
+  `docs/proofs/universal-diagonal-law.md` and
+  `experiments/oeis_a308359_check.py`.
+
+### What Paper 2 may claim, after all of this
+
+The *phenomenon* — fix a defect, get a polynomial times an exponential, degree
+governed by the defect — is established, named, and has at least four instances
+in print or in OEIS: dimension (Peard–Gaunt 1995 → Barequet–Shalah 2017),
+perimeter (Barequet–Magal 2022), bounding box for square polyominoes (A308359,
+partly conjectural), and ours. **Paper 2 must not present the phenomenon as
+new.** What survives, in decreasing order of confidence:
+
+1. **The universal theorem.** One proof covering every row-local lattice at
+   once, with b = |D| the drift count entering as b^H. Every published instance
+   is one lattice family. This is the contribution.
+2. **The sharp onset.** n ≥ 2k+1, with failure at n = 2k as a non-cancellation.
+   No onset statement was found on any of the other three; A308359's "n ≥ 5"
+   is 2k+1 at k=2, read off data rather than derived.
+3. **The first closed forms for king animals by height**, and the machinery
+   (`results/defect-gas.md`, `docs/proofs/grand-form.md`) that produces the
+   coefficients from a finite cluster table rather than by fitting.
+4. **A settled conjecture in someone else's triangle** as evidence that 1 and 2
+   are worth having.
+
+Not ours, and to be cited rather than claimed: the statement shape, the term
+"diagonal formulae", and the prove-the-degree-then-interpolate protocol, whose
+payoff Barequet–Shalah state explicitly ("can be extrapolated from 3k−3 known
+values").
 
 ## N6 — collision with Haruspicy?
 

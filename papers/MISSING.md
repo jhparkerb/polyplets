@@ -54,6 +54,26 @@ occurrence and the honest first citation. Also of interest, same authors: Gaunt 
 "1/d-expansions for the free energy of weakly embedded site animal models," J. Phys. A
 **33** (2000) 7515–7539. **[med]**
 
+**New wants from the N5 re-run on "diagonal formulae" (2026-08-06, unsearched
+beyond confirming no free copy exists):**
+
+- G. Barequet & B. Magal, "Automatic generation of formulae for polyominoes with
+  a fixed perimeter defect," Comput. Geom. **108** (2022/23) 101919, DOI
+  10.1016/j.comgeo.2022.101919. — the **perimeter**-defect member of the same
+  family as our height-defect diagonals: an algorithm that emits closed formulae
+  and generating functions per defect, k ≤ 5 (previously k ≤ 3). Paper 2 should
+  cite it as prior art for the statement shape; worth reading to see whether
+  their automatic generation subsumes or complements our defect-gas machinery.
+  ScienceDirect returns 403 and the author's own publications page carries no
+  PDF for it. **[high]**
+- G. Barequet & M. Shalah, "Improved upper bounds on the growth constants of
+  polyominoes and polycubes," Algorithmica (2022). — spotted on the same page.
+  Bears on `docs/proofs/polyplet-upper-bound.md`, where our 9.3153 is the loose
+  half of the bracket and the polyomino comparison figures are quoted
+  second-hand. Note for that doc: Barequet–Shalah 2017 states the best known
+  polyomino bounds as ~4.0025 (lower) and **4.649551** (Klarner–Rivest, upper),
+  where our doc says "4.63". **[med]**
+
 **New lead, not chased:** Barber & Erde, "Isoperimetry in integer lattices,"
 arXiv 1707.04411 (2017/18). Solves the **edge**-isoperimetric problem asymptotically for
 Cayley graphs on ℤ^d, optimal shapes being zonotopes. The king lattice is such a Cayley
