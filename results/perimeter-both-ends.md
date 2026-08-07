@@ -449,23 +449,32 @@ in the header), plus their `.log` provenance.
 
 ## OEIS status of the seven series
 
-First looked up by jasonp 2026-08-07; S1, S2 and S3 **re-run from here the same
-day with the extra terms** the cone model supplied, after jasonp authorised
-direct `curl` against oeis.org. Two hits, five apparent novelties:
+First looked up by jasonp 2026-08-07; S3 **re-run from here the same day with
+the extra terms** the cone model supplied, after jasonp authorised direct `curl`
+against oeis.org. That re-run is the whole point of the table: it turned a wrong
+hit into the right one. Two hits, five apparent novelties:
 
 | | series | result |
 |---|---|---|
-| S1 | square4 diamond free-removals, now `1, 4, 18, 60, 187, 524, 1388, 3452, 8229, 18800` | **no match** (10 terms) |
-| S2 | square4 even-W hull free-removals, now `1, 6, 25, 88, 272, 766, 2012` | **no match** (7 terms) |
+| S1 | square4 diamond free-removals `1, 4, 18, 60, 187, 524, 1388, 3452, 8229, 18800` | **no match** |
+| S2 | square4 even-W hull free-removals `1, 6, 25, 88, 272, 766, 2012` | **no match** |
 | S3 | per-tip `1, 1, 3, 5, 9, 14, 24, 35, 55, 81, 120, 171, 248` | **A053993**, Andrews' `phi_2`; an eta quotient, same status as `P(x)`. A120452 matched only the first six terms and is refuted at the seventh |
 | S4 | hexagon free-removals `1, 6, 27, 98, 315, 918` | `P(x)^6`; A071734 matched the first five terms and is refuted at the sixth |
 | S5 | tri6 `C(p,0)` `1, 3, 2, 3, 6, 1, 6, ...` | **no match** |
 | S6 | king min-perimeter stable columns | **no match** (though the model explains them) |
 | S7 | square4 min-perimeter stable columns | **no match** |
 
-"No match" is OEIS's answer to the terms submitted, not a novelty proof: S7
-carries four or five, which is thin. S1 is now at ten terms and S3's fate is the
-warning attached to all of them, six terms hit the wrong sequence. S6 is the interesting one --
+**Query short to find, extend to verify, and don't confuse the two.** More terms
+can only shrink the match set, so re-running a *miss* with extra terms buys
+nothing (I did it for S1 and S2 anyway, and it bought nothing); for discovery it
+is actively worse, since a candidate whose OEIS entry lists eight terms can
+never match a ten-term query. Extra terms earn their keep only against a *hit*,
+which is exactly how S3 and S4 were caught.
+
+"No match" is OEIS's answer to the terms submitted, not a novelty proof, and no
+term count changes that — the transform battery is what would, and that is
+jasonp's to send. S7 carries only four or five terms, which is thin on both
+counts. S6 is the interesting one --
 it has a complete model here (`q4` convolved with the box-skew deficits) and yet
 is not in OEIS, so it is a derived-but-unrecorded sequence rather than a mystery.
 
