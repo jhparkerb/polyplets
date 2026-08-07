@@ -94,6 +94,32 @@ Idea 1 of `results/unexplored-avenues.md` is marked EXECUTED there, with its
 A030222-unstranding payoff STRUCK: Burnside needs per-element `Fix(d)`, the
 24h/126GB blocker, which subgroup counts do not supply.
 
+### Per-cell mod 4: BUILT, GATED, DELIBERATELY NOT PUSHED TO n=40
+`symtm` grew `--byheight` (hmirror emits "n H W"; r180 emits true height, its
+transpose weight split one-at-H one-at-W because the strip label is NOT the
+height), plus `--strips` and `--maxwidth`. The refinement
+`T(n,H) = I_H(<h>) + I_H(<v>) + I_H(C2) - 2 I_H(D2ax) (mod 4)` is gated at
+n<=8 with a control that fails if the height grouping is reused for both
+mirrors instead of transposed. **Do not resume the n=40 push** without reading
+`results/subgroup-mod4.md` §"why it is NOT being bought": r180's cost peaks on
+exactly the H=15..19 band (H=15,19,20,25,30 all past a 120s cap at N=40, while
+H=34,38,40 collapse to seconds), `I_H(<v>)` has no bounded-height route short
+of a new vmirror sweep mode, and the bit it buys hardens single-cell errors —
+the one failure mode this project has never had.
+
+**IN FLIGHT at handoff:** `scripts/percell_mod4.sh 32 8`, tmux window
+`percell32` on gympie, driver PID 51511, log
+`results/percell_mod4_20260807.log`. Purpose is to check the ALGEBRA at scale
+(~500 cells instead of 78), not to reach n=40 — the mod-8 companion shipped
+with a wrong coefficient and only banked data caught it. Heartbeat ETA was
+drifting 17:27 -> 16:25 as the tall strips cleared; budget ~1h from its 15:39
+start. On completion: `results/percell-mod4.md` **does not exist yet and is
+already referenced from `results/subgroup-mod4.md`** — write it.
+
+**`make` NOT re-run since the symtm edit.** `gate-subgroup` is GREEN on its
+own (17 checks, 7 controls); the full suite was last green at `16236db`. Run a
+bare `make` once `percell32` frees the cores.
+
 ## Claim-pruning pass 2026-07-31 (cold-eyed bottom-decile review)
 jasonp asked for the least novel/interesting/supported claims and an argument
 to drop them. Ten items ranked; **1-5 cut, 6-9 rescoped, 10 is jasonp's**.
