@@ -5,9 +5,13 @@
 #   The monolithic `perimeter_min LAT PMAX RMAX` accumulates every frame's tally
 #   in memory and prints it only at exit, so it is strictly all-or-nothing: the
 #   square8 p=48 run on ayr on 2026-08-07 died at 3.9 h with a 0-byte output
-#   file, having completed 105 of its 121 frames. Nothing was corrupted; all of
+#   file, having dispatched 118 of its 121 frames. Nothing was corrupted; all of
 #   it was lost. docs/job-checklist.md item 5 calls that a defect to fix before
 #   running the job long, which is what this script is.
+#
+#   (Dispatched, not completed: the heartbeat's `count` is whichever worker beat
+#   last, so it is non-monotonic across 32 threads and is an index into the frame
+#   list, never a completion count. 118 is the largest index seen.)
 #
 #   Frame granularity also fixes the straggler: the frame pool cannot help the
 #   single largest frame, but `--only` with --threads shards the removal DFS
@@ -23,10 +27,10 @@
 #
 # PREDICTED COST (square8 p=48 r=6, from measured runs):
 #   p=44 r=6 took 3885 s wall / 16694 cpu-s over 100 frames, 9.3e9 nodes.
-#   The dead ayr p=48 run reached 16.6e9 nodes and frame 105 of 121 in 14092 s
-#   at 32 threads. Node count is super-exponential in PMAX and the last frames
-#   are the largest, so budget 5-8 h at 32 threads and treat any figure tighter
-#   than that as unmeasured.
+#   The dead ayr p=48 run reached 16.6e9 nodes in 14092 s at 32 threads, with
+#   frame 118 of 121 dispatched. Node count is super-exponential in PMAX and the
+#   last frames are the largest, so budget 5-8 h at 32 threads and treat any
+#   figure tighter than that as unmeasured.
 #
 # RESUME: just re-run the same command. A frame is complete iff its file carries
 #   BOTH a '# box' line and the '# perimeter_min lattice=' trailer; complete

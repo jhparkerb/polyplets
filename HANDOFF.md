@@ -71,6 +71,38 @@ What the campaign actually bought, in one line each:
   four "outside the default build" statements corrected, a build
   receipt banked.
 
+## LIVE JOB — ayr, king min-end census at p=48 (2026-08-07 18:01 EDT)
+`scripts/ayr_pmin48.sh`, tmux `0:pmin48`, driver PID 2261, log
+`results/ayr_pmin48.runlog`. Feeds the minimum end of
+`results/perimeter-both-ends.md` — the king partner to the square4 deep boxes
+on dalby — and through it the perimeter-grading paper (L6 in
+`docs/publication-split.md`). Tier: reproducible measurement. Budget 5-8 h at
+32 threads; p=48 has never finished, so anything tighter is unmeasured.
+
+The first attempt died at 3.9 h in the afternoon's power cut with a **0-byte**
+output file: `perimeter_min` accumulated all 121 frames in memory and printed
+only at exit, so it was strictly all-or-nothing. Nothing was corrupted; all of
+it was lost. Receipt kept in `results/dead-2026-08-07-powercut/`.
+
+Fixed rather than retried. `scripts/perimeter_min_sharded.sh` runs one `--only`
+frame per invocation, skips frames that are provably whole (a `# box` line AND
+the trailer), and publishes each by atomic rename, so resuming is re-running
+the same command and an interrupted frame can never pass for a finished one.
+The trap it had to clear: `--only` forces `mult=1` while the plan carries
+`mult=2` for every W<H frame, so `experiments/perimeter_min_merge.py` reapplies
+the multiplicity from the plan the binary itself emitted.
+`make gate-perimeter-min-shard` checks the merge byte-for-byte against the
+monolithic run on both lattices, damages frame files the four ways a kill can,
+and RED-controls the multiplicity by dropping it.
+
+Before starting p=48 the job re-ran both gates on ayr's own build and made the
+sharded driver **re-derive the banked p=40 census**, with git as the diff: the
+tracked file moved in its `git=` stamp line and nowhere else. All three green.
+
+**Two commits sit unpushed on ayr** (78ec1cd the dead-run receipt, 6fb3f39 the
+restart script); pushing runs the full gate suite and would steal cores from
+the census, so it waits for the run to finish.
+
 ## Subgroup census — H15-19 now HAS a second source (2026-08-07)
 `results/subgroup-mod4.md`. The orbit-SIZE distribution needs per-SUBGROUP
 invariant counts `I(H)` — a different object from the banked per-element
