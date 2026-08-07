@@ -1,0 +1,79 @@
+=== hmirror to n=32 on 8 threads --byheight ===
+event=start job=symtm-hmirror-N32 t=2026-08-07T15:39:03-04:00 git=cd96795-dirty built=2026-08-07T15:13:18-0400 host=gympie total=32 type=hmirror threads=8 strips=1..32 byheight=1
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:42:27-04:00 elapsed_s=203.8 rate=0.004907/s done=0.0312 eta=2026-08-07T17:27:43-04:00 H=26 states=972979 steps=589684931 dead=0 kept=123308194
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:43:57-04:00 elapsed_s=293.9 rate=0.006806/s done=0.0625 eta=2026-08-07T16:57:24-04:00 H=24 states=552258 steps=260708917 dead=0 kept=100282391
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:44:17-04:00 elapsed_s=314.1 rate=0.009551/s done=0.0938 eta=2026-08-07T16:34:53-04:00 H=25 states=1444445 steps=934279320 dead=0 kept=210784037
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:44:52-04:00 elapsed_s=349.1 rate=0.01146/s done=0.1250 eta=2026-08-07T16:25:35-04:00 H=22 states=286835 steps=101140962 dead=0 kept=57983083
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:33-04:00 elapsed_s=389.4 rate=0.01284/s done=0.1562 eta=2026-08-07T16:20:35-04:00 H=28 states=1530057 steps=1161889876 dead=0 kept=99395817
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:45-04:00 elapsed_s=401.3 rate=0.01495/s done=0.1875 eta=2026-08-07T16:14:44-04:00 H=20 states=137213 steps=34806927 dead=0 kept=25576130
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:47-04:00 elapsed_s=403.8 rate=0.01734/s done=0.2188 eta=2026-08-07T16:09:48-04:00 H=21 states=434227 steps=161842135 dead=0 kept=96295733
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:51-04:00 elapsed_s=407.3 rate=0.01964/s done=0.2500 eta=2026-08-07T16:06:12-04:00 H=18 states=60934 steps=10754502 dead=0 kept=9123760
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:56-04:00 elapsed_s=412.9 rate=0.0218/s done=0.2812 eta=2026-08-07T16:03:31-04:00 H=17 states=95278 steps=17376274 dead=0 kept=14934643
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:57-04:00 elapsed_s=413.8 rate=0.02416/s done=0.3125 eta=2026-08-07T16:01:07-04:00 H=16 states=25407 steps=2979681 dead=0 kept=2725115
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.3 rate=0.02649/s done=0.3438 eta=2026-08-07T15:59:11-04:00 H=15 states=40939 steps=4814530 dead=0 kept=4433282
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.5 rate=0.02888/s done=0.3750 eta=2026-08-07T15:57:31-04:00 H=14 states=10237 steps=732503 dead=0 kept=695419
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.8 rate=0.03127/s done=0.4062 eta=2026-08-07T15:56:06-04:00 H=13 states=16952 steps=1192903 dead=0 kept=1137351
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.8 rate=0.03367/s done=0.4375 eta=2026-08-07T15:54:53-04:00 H=12 states=4048 steps=162691 dead=0 kept=157560
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.9 rate=0.03607/s done=0.4688 eta=2026-08-07T15:53:50-04:00 H=11 states=6834 steps=271155 dead=0 kept=263644
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.9 rate=0.03847/s done=0.5000 eta=2026-08-07T15:52:54-04:00 H=10 states=1581 steps=34307 dead=0 kept=33652
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.9 rate=0.04087/s done=0.5312 eta=2026-08-07T15:52:05-04:00 H=9 states=2698 steps=58238 dead=0 kept=57342
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.9 rate=0.04328/s done=0.5625 eta=2026-08-07T15:51:22-04:00 H=8 states=609 steps=6966 dead=0 kept=6897
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.9 rate=0.04568/s done=0.5938 eta=2026-08-07T15:50:43-04:00 H=7 states=1046 steps=11973 dead=0 kept=11889
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.9 rate=0.04809/s done=0.6250 eta=2026-08-07T15:50:08-04:00 H=6 states=227 steps=1333 dead=0 kept=1328
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.9 rate=0.05049/s done=0.6562 eta=2026-08-07T15:49:36-04:00 H=5 states=392 steps=2316 dead=0 kept=2311
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.9 rate=0.0529/s done=0.6875 eta=2026-08-07T15:49:08-04:00 H=4 states=76 steps=212 dead=0 kept=212
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.9 rate=0.0553/s done=0.7188 eta=2026-08-07T15:48:41-04:00 H=3 states=136 steps=386 dead=0 kept=386
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.9 rate=0.0577/s done=0.7500 eta=2026-08-07T15:48:17-04:00 H=2 states=17 steps=16 dead=0 kept=16
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:45:59-04:00 elapsed_s=415.9 rate=0.06011/s done=0.7812 eta=2026-08-07T15:47:55-04:00 H=1 states=33 steps=32 dead=0 kept=32
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:46:03-04:00 elapsed_s=420.1 rate=0.0619/s done=0.8125 eta=2026-08-07T15:47:39-04:00 H=19 states=210544 steps=56044029 dead=0 kept=42157136
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:46:18-04:00 elapsed_s=434.3 rate=0.06217/s done=0.8438 eta=2026-08-07T15:47:38-04:00 H=23 states=827303 steps=414881719 dead=0 kept=168525628
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:49:02-04:00 elapsed_s=598.7 rate=0.04677/s done=0.8750 eta=2026-08-07T15:50:27-04:00 H=27 states=2253804 steps=1831749684 dead=0 kept=173405818
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:49:49-04:00 elapsed_s=645.8 rate=0.04491/s done=0.9062 eta=2026-08-07T15:50:55-04:00 H=30 states=2110420 steps=1955549113 dead=0 kept=46482228
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:53:03-04:00 elapsed_s=839.3 rate=0.03574/s done=0.9375 eta=2026-08-07T15:53:58-04:00 H=32 states=2644132 steps=2528271845 dead=0 kept=9434817
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:55:07-04:00 elapsed_s=964.0 rate=0.03216/s done=0.9688 eta=2026-08-07T15:55:38-04:00 H=29 states=3017056 steps=3051176158 dead=0 kept=82870625
+event=heartbeat job=symtm-hmirror-N32 t=2026-08-07T15:58:44-04:00 elapsed_s=1180.6 rate=0.02711/s done=1.0000 H=31 states=3378068 steps=3841981716 dead=0 kept=17217085
+event=done job=symtm-hmirror-N32 t=2026-08-07T15:58:44-04:00 start=2026-08-07T15:39:03-04:00 wall_s=1180.6 cpu_s=5498.4 peak_rss_mb=3890.1 result=ok
+=== r180 to n=32 on 8 threads --byheight ===
+event=start job=symtm-r180-N32 t=2026-08-07T15:58:44-04:00 git=cd96795-dirty built=2026-08-07T15:13:18-0400 host=gympie total=32 type=r180 threads=8 strips=1..32 byheight=1
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T15:58:44-04:00 elapsed_s=0.0 rate=732.1/s done=0.0312 eta=2026-08-07T15:58:44-04:00 H=32 states=303 steps=694 dead=0 kept=616
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T15:58:44-04:00 elapsed_s=0.0 rate=108.5/s done=0.0625 eta=2026-08-07T15:58:44-04:00 H=31 states=9227 steps=33071 dead=0 kept=30529
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T15:58:44-04:00 elapsed_s=0.0 rate=153.6/s done=0.0938 eta=2026-08-07T15:58:44-04:00 H=30 states=10105 steps=37541 dead=0 kept=35131
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T15:58:44-04:00 elapsed_s=0.2 rate=17.08/s done=0.1250 eta=2026-08-07T15:58:45-04:00 H=28 states=98566 steps=587094 dead=0 kept=554686
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T15:58:44-04:00 elapsed_s=0.3 rate=18.51/s done=0.1562 eta=2026-08-07T15:58:45-04:00 H=29 states=107127 steps=627070 dead=0 kept=591132
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T15:58:46-04:00 elapsed_s=1.8 rate=3.274/s done=0.1875 eta=2026-08-07T15:58:53-04:00 H=26 states=545511 steps=5031085 dead=0 kept=4766221
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T15:58:46-04:00 elapsed_s=2.1 rate=3.343/s done=0.2188 eta=2026-08-07T15:58:53-04:00 H=27 states=620586 steps=5611673 dead=0 kept=5303842
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T15:58:54-04:00 elapsed_s=9.9 rate=0.8067/s done=0.2500 eta=2026-08-07T15:59:23-04:00 H=24 states=1934229 steps=29079568 dead=0 kept=27642564
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T15:58:56-04:00 elapsed_s=12.5 rate=0.7206/s done=0.2812 eta=2026-08-07T15:59:27-04:00 H=25 states=2317620 steps=33961918 dead=0 kept=32199658
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T15:59:25-04:00 elapsed_s=41.0 rate=0.244/s done=0.3125 eta=2026-08-07T16:00:55-04:00 H=22 states=4528225 steps=117766995 dead=0 kept=112442779
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T15:59:37-04:00 elapsed_s=52.9 rate=0.2079/s done=0.3438 eta=2026-08-07T16:01:18-04:00 H=23 states=5767442 steps=145027837 dead=0 kept=138062999
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:00:45-04:00 elapsed_s=120.7 rate=0.09944/s done=0.3750 eta=2026-08-07T16:04:06-04:00 H=20 states=7017744 steps=335599829 dead=0 kept=322420719
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:03:40-04:00 elapsed_s=296.3 rate=0.04387/s done=0.4062 eta=2026-08-07T16:10:53-04:00 H=21 states=9616652 steps=440775487 dead=0 kept=421953418
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:06-04:00 elapsed_s=382.3 rate=0.03662/s done=0.4375 eta=2026-08-07T16:13:17-04:00 H=12 states=521853 steps=226607152 dead=0 kept=225677490
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:18-04:00 elapsed_s=394.4 rate=0.03803/s done=0.4688 eta=2026-08-07T16:12:45-04:00 H=18 states=7124130 steps=654914735 dead=0 kept=635285714
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:26-04:00 elapsed_s=402.3 rate=0.03977/s done=0.5000 eta=2026-08-07T16:12:08-04:00 H=10 states=102219 steps=34144549 dead=0 kept=34097911
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:27-04:00 elapsed_s=402.9 rate=0.0422/s done=0.5312 eta=2026-08-07T16:11:22-04:00 H=14 states=1963013 steps=617292160 dead=0 kept=610731784
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:27-04:00 elapsed_s=403.4 rate=0.04462/s done=0.5625 eta=2026-08-07T16:10:40-04:00 H=8 states=18161 steps=2459482 dead=0 kept=2457826
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:27-04:00 elapsed_s=403.5 rate=0.04709/s done=0.5938 eta=2026-08-07T16:10:03-04:00 H=7 states=7609 steps=582364 dead=0 kept=582055
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:28-04:00 elapsed_s=403.5 rate=0.04956/s done=0.6250 eta=2026-08-07T16:09:30-04:00 H=6 states=3197 steps=133177 dead=0 kept=133125
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:28-04:00 elapsed_s=403.5 rate=0.05204/s done=0.6562 eta=2026-08-07T16:08:59-04:00 H=5 states=1344 steps=29766 dead=0 kept=29758
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:28-04:00 elapsed_s=403.5 rate=0.05452/s done=0.6875 eta=2026-08-07T16:08:31-04:00 H=4 states=560 steps=6454 dead=0 kept=6454
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:28-04:00 elapsed_s=403.5 rate=0.057/s done=0.7188 eta=2026-08-07T16:08:05-04:00 H=3 states=224 steps=1308 dead=0 kept=1308
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:28-04:00 elapsed_s=403.5 rate=0.05948/s done=0.7500 eta=2026-08-07T16:07:42-04:00 H=2 states=78 steps=214 dead=0 kept=214
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:28-04:00 elapsed_s=403.5 rate=0.06195/s done=0.7812 eta=2026-08-07T16:07:20-04:00 H=1 states=17 steps=16 dead=0 kept=16
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:28-04:00 elapsed_s=404.5 rate=0.06428/s done=0.8125 eta=2026-08-07T16:07:01-04:00 H=9 states=43299 steps=9813264 dead=0 kept=9804434
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:32-04:00 elapsed_s=408.1 rate=0.06615/s done=0.8438 eta=2026-08-07T16:06:47-04:00 H=11 states=237191 steps=107919309 dead=0 kept=107685220
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:05:58-04:00 elapsed_s=433.7 rate=0.06456/s done=0.8750 eta=2026-08-07T16:06:59-04:00 H=13 states=1118166 steps=527682576 dead=0 kept=524325990
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:06:17-04:00 elapsed_s=453.3 rate=0.06397/s done=0.9062 eta=2026-08-07T16:07:03-04:00 H=16 states=4678442 steps=829817917 dead=0 kept=813421348
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:06:53-04:00 elapsed_s=489.4 rate=0.0613/s done=0.9375 eta=2026-08-07T16:07:25-04:00 H=19 states=10656036 steps=933741412 dead=0 kept=901783060
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:08:07-04:00 elapsed_s=562.8 rate=0.05508/s done=0.9688 eta=2026-08-07T16:08:25-04:00 H=15 states=3670520 steps=1142184098 dead=0 kept=1125985282
+event=heartbeat job=symtm-r180-N32 t=2026-08-07T16:08:49-04:00 elapsed_s=605.2 rate=0.05288/s done=1.0000 H=17 states=7754409 steps=1317461489 dead=0 kept=1285883130
+event=done job=symtm-r180-N32 t=2026-08-07T16:08:49-04:00 start=2026-08-07T15:58:44-04:00 wall_s=605.2 cpu_s=2758.0 peak_rss_mb=3233.1 result=ok
+hmirror byheight sums vs banked flat, n<=32: identical
+r180 byheight sums vs banked flat, n<=32: identical
+
+    band   cells    mod 2    mod 4
+   H1-10     275        0        0
+  H11-14      82        0        0
+  H15-19      80        0        0
+    H20+      91        0        0
+   TOTAL     528        0        0   (mismatch counts)
