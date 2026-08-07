@@ -329,10 +329,14 @@ transformation theory. square4's whole diamond min-end generating function is
 This makes the min-end law sharper still. Andrews' `phi_1` **is** the partition
 function, so both cases we actually meet are the same family:
 
-| corner | cone | tip factor |
-|---|---|---|
-| king box, tri6 hexagon | unimodular (index 1) | `phi_1 = p(n) = P(x)` |
-| square4 diamond tip | index 2 | `phi_2 = A053993` |
+| corner | cone and coset | factor | OEIS |
+|---|---|---|---|
+| king box, tri6 hexagon | unimodular (index 1) | `phi_1 = p(n) = P(x)` | A000041 |
+| square4 sharp tip | index 2, apex ON the lattice | `phi_2` | A053993 |
+| square4 bevel | index 2, apex OFF it | `D` | A201077 |
+
+The coset is not a detail: the same cone gives two different factors depending
+on whether its apex is a lattice point. See the bevel section below.
 
 **The obvious generalisation is false, and it is worth recording as closed.**
 `phi_m` for an index-`m` cone fails at `m = 3`: the cone spanned by `(1,0)` and
@@ -351,17 +355,60 @@ Beware re-looking-up the tip series with six terms: A120452 matches
 needs `W = 17` (145 cells), over the `kMaxCells = 128` u128 limit, so it needs a
 wider connectivity mask first.
 
-**Unresolved side observation.** The `W=14 parity=0` hull (6 corners, measured
-`1, 6, 25, 88, 272, 766, 2012`) and the `W=15 parity=1` hull (8 corners,
-`1, 8, 36, 128, 398, 1120, 2924`) fit no product `P^a C^b`. Dividing both by
-`C^4` leaves the *same* factor `1, 1, -1, -1, 0, 1, 1` in each, which is
-suggestive but has negative coefficients, so it is not itself a counting series.
-The natural geometric guess, that truncating a diamond tip replaces one sharp
-corner by two blunt ones of a common type `D`, fails: the 8th root of the
-8-corner series is not integral. Either those hulls' corner regions are not yet
-independent at `j <= 6`, or their `j=6` terms are not converged (`W=13` gave
-`2896` against `W=15`'s `2924` for the 8-corner family, so the `W = 2j+1` rule
-does not transfer to it). Both are cheap to settle with one more hull size each.
+### RESOLVED: the corner inventory was wrong, and the missing type is the BEVEL
+
+The `W=14 parity=0` hull (6 corners, `1, 6, 25, 88, 272, 766, 2012`) and the
+`W=15 parity=1` hull (8 corners, `1, 8, 36, 128, 398, 1120, 2924`) fit no
+product `P^a C^b`, and my first two explanations were both wrong. It was not
+unconvergence: `W=16` measures `1, 6, 25, 88, 272, 766, 2012`, identical to
+`W=14`, so the 6-corner family's `j=6` is converged at `2012`. And it was not a
+failure of independence. **The corner inventory was wrong.**
+
+Look at the parity constraint in the rotated frame. A square4 frame is the box
+`{0 <= u < W, 0 <= v < H}` restricted to one class of `u+v`, and whether the
+box's own corner cell survives that restriction depends on the parity:
+
+| frame | box corners kept | corners | decomposition |
+|---|---|---|---|
+| odd `W`, parity 0 | all 4 (`u+v` even at each) | 4 sharp | `C^4` |
+| even `W`, parity 0 | 2; the other 2 are cut | 2 sharp + 2 bevels | `C^2 D^2` |
+| odd `W`, parity 1 | 0; all 4 are cut | 4 bevels | `D^4` |
+
+A cut corner does not vanish, it becomes a two-cell **bevel** — which is why the
+`j=1` counts are 4, 6 and 8 rather than 4, 4 and 4. The bevel is the same cone
+`{a >= |b|}` with its apex landing on the OTHER coset of the index-2
+sublattice, so the apex cell is absent and the corner presents two minimal cells
+instead of one. Its order-ideal series is
+
+    D = 1, 2, 3, 6, 10, 16, 26, 40, 60, 90, 131, 188, 269, ...
+
+**This is a real prediction, not a fit.** `D` was extracted from the even-`W`
+family (`m6 / C^2`, square root, all coefficients integral and non-negative) and
+then predicts the odd-`W` parity-1 family with nothing left free:
+
+    D^4       = 1, 8, 36, 128, 398, 1120, 2924
+    measured  = 1, 8, 36, 128, 398, 1120, 2924
+
+all seven terms. And `D` falls out of its own cone poset directly — the odd
+coset of `{(u,v) >= 0}` — with no reference to any measurement.
+
+**`D` is A201077**, and it is an eta quotient like `phi_2`:
+
+    D(x) = 1 / prod_{i>0} (1-q^{2i-1})^2 (1-q^{12i-8})(1-q^{12i-6})
+                          (1-q^{12i-4})(1-q^{12i})
+
+verified against the cone count to `n = 24` and asserted at runtime.
+
+**The six-term trap fired a third time and was caught.** A201077 and **A262984**
+agree on `1, 2, 3, 6, 10, 16, 26, 40, 60, 90, 131, 188` — twelve terms — and
+part at the thirteenth, `269` against `268`. The brute-force enumerator only
+reached eleven. Extending the fast column DP to the bevel gave `269`, so it is
+A201077. Three near-misses now in one campaign (A071734, A120452, A262984), each
+killed only by computing one term past where the lookup was comfortable.
+
+So the earlier "same factor `1, 1, -1, -1, 0, 1, 1` in both" was an artifact of
+forcing `C^4` onto hulls that do not have four sharp tips. Nothing was wrong
+with the product law; the geometry was misread.
 
 ### A near miss that had to be measured, not argued
 

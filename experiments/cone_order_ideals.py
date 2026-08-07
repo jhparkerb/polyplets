@@ -40,19 +40,35 @@ import sys
 from functools import lru_cache
 
 
-def ideal_series(nmax, offset=1):
-    """[x^n] for n <= nmax of the order-ideal series of the cone.
+def ideal_series(nmax, offset=1, slack=0):
+    """[x^n] for n <= nmax of the order-ideal series of a cone.
 
-    offset=1 is the diamond tip; offset=0 degenerates to the quadrant (P(x)).
+    Two half-integer offsets control which coset of the index-2 sublattice the
+    cone's apex lands on, and they are what distinguishes a SHARP corner from a
+    BEVELLED one:
+
+        offset=1, slack=0   apex ON the lattice -- the sharp diamond tip, phi_2
+        offset=0, slack=1   apex OFF it -- the bevel, two minimal cells
+        offset=0, slack=0   degenerate: a = b throughout, i.e. P(x) = phi_1
+
+    In column terms: b_i <= a_i + slack and a_i <= b_{i-1} + offset, with both
+    sequences non-increasing.
     """
 
     @lru_cache(maxsize=None)
     def rest(a_prev, b_prev, budget):
         """Counts by size for columns i, i+1, ... given column i-1 = (a_prev, b_prev)."""
         out = [0] * (budget + 1)
-        out[0] = 1  # stop here: every remaining column empty
-        for a in range(1, min(a_prev, b_prev + offset, budget) + 1):
-            for b in range(0, min(a, b_prev, budget - a) + 1):
+        out[0] = 1  # stop here: this column and every later one empty
+        # `a` starts at 0, not 1.  With slack the even column may be EMPTY while
+        # the odd one is not -- the bevel's ideal {(1,0)} has nothing below it,
+        # so forcing a >= 1 silently drops those.  Both sequences are
+        # non-increasing, so a = b = 0 really is the terminal case and is
+        # counted once, above.
+        for a in range(0, min(a_prev, b_prev + offset, budget) + 1):
+            for b in range(0, min(a + slack, b_prev, budget - a) + 1):
+                if a == 0 and b == 0:
+                    continue
                 used = a + b
                 for n, cnt in enumerate(rest(a, b, budget - used)):
                     out[used + n] += cnt
@@ -131,13 +147,41 @@ def poly_pow(series, k, nmax):
     return out
 
 
+def andrews_a201077(nmax):
+    """A201077, the bevel: 1 / prod (1-q^(2i-1))^2 (1-q^(12i-8))(1-q^(12i-6))
+    (1-q^(12i-4))(1-q^(12i)).  An eta quotient, like phi_2."""
+    out = [1] + [0] * nmax
+    for i in range(1, nmax + 2):
+        for e in (2 * i - 1, 2 * i - 1, 12 * i - 8, 12 * i - 6,
+                  12 * i - 4, 12 * i):
+            if 1 <= e <= nmax:
+                for k in range(e, nmax + 1):
+                    out[k] += out[k - e]
+    return out
+
+
 def main():
     nmax = int(sys.argv[1]) if len(sys.argv) > 1 else 12
     tip = ideal_series(nmax)
+    bevel = ideal_series(nmax, offset=0, slack=1)
     print("cone {a >= |b|} order ideals by size:")
     print("  ", " ".join(str(x) for x in tip))
     print("quadrant control (offset 0, must be the partition numbers):")
     print("  ", " ".join(str(x) for x in ideal_series(nmax, offset=0)))
+    print("bevel (same cone, apex OFF the lattice) = A201077:")
+    print("  ", " ".join(str(x) for x in bevel))
+    assert bevel == andrews_a201077(nmax), "bevel is not A201077"
+
+    # The three square4 hull families, all with nothing fitted.
+    c2 = poly_pow(tip, 2, nmax)
+    d2 = poly_pow(bevel, 2, nmax)
+    mixed = [sum(c2[k] * d2[n - k] for k in range(n + 1)) for n in range(nmax + 1)]
+    print("odd W parity 0, 4 sharp tips        C^4    :",
+          " ".join(str(x) for x in poly_pow(tip, 4, nmax)))
+    print("even W parity 0, 2 sharp + 2 bevels C^2 D^2:",
+          " ".join(str(x) for x in mixed))
+    print("odd W parity 1, 4 bevels            D^4    :",
+          " ".join(str(x) for x in poly_pow(bevel, 4, nmax)))
     print("A120452, the six-term match that is wrong at the seventh:")
     print("   1 1 3 5 9 14 23 34 52 75 109 155 219")
     print("4th power = square4 diamond free-removals:")
