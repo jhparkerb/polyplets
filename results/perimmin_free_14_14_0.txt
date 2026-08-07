@@ -1,0 +1,33 @@
+# box W=14 H=14 parity=0 pbox=30 cells=98 mult=1 free: 1 6 25 88 272 766 2012
+# perimeter_min lattice=square4 pmax=999 rmax=6 git=167dd4e-dirty
+# COMPLETE only for animals with perimeter <= 999 AND area
+# deficit i = nmax(p) - n at most 6. Rows outside that domain
+# are present but partial -- do not read them as counts.
+92 30 2012
+92 31 66748
+92 32 1042246
+92 33 9902594
+92 34 61585604
+92 35 250639764
+92 36 545972861
+93 30 766
+93 31 24036
+93 32 345262
+93 33 2894860
+93 34 14988810
+93 35 40293172
+94 30 272
+94 31 7870
+94 32 100007
+94 33 702290
+94 34 2426347
+95 30 88
+95 31 2258
+95 32 24180
+95 33 114498
+96 30 25
+96 31 544
+96 32 3971
+97 30 6
+97 31 90
+98 30 1
