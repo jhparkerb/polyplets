@@ -106,6 +106,48 @@ check on our machinery. And the onset in their conjecture, "n ≥ 5", was
 presumably read off data; ours is 2k+1 for every k, proved, which is where the
 next diagonals would come from.
 
+## The diagonal machine (2026-08-06)
+
+`experiments/diagonal_machine.py`. Theorem A's degree bound and onset turn
+k+1 enumerated values into a proved closed form, for **any** row-local lattice.
+The script supplies the values with a surplus-budgeted row transfer DP that is
+parametric in the drift set D — state is (this row's cells normalized, which
+component of the animal-so-far each belongs to, surplus spent), components that
+lose their foothold in the current row are pruned as unreconnectable — so its
+cost depends on k and H rather than on the number of animals. Rows may have
+gaps, so positions are searched in a window and every run reports a stability
+check at window and window+2.
+
+It reproduces every independently known form and then keeps going:
+
+| lattice | b | k | P_k(n) | status |
+|---|---|---|---|---|
+| square | 1 | 1 | 4n − 8 | matches A308359 (proved there) |
+| square | 1 | 2 | 8n² − 51n + 86 | matches A308359's **conjecture** |
+| square | 1 | 3 | 32/3 n³ − 140n² + 1960/3 n − 1090 | new |
+| square | 1 | 4 | 32/3 n⁴ − 712/3 n³ + 12635/6 n² − 52813/6 n + 14496 | new |
+| hex | 2 | 1 | 9n − 15 | matches `results/hex-diagonal-law.md` |
+| hex | 2 | 2 | 81/2 n² − 307/2 n + 71 | new |
+| hex | 2 | 3 | 243/2 n³ − 774n² + 1897/2 n + 28 | new |
+| king | 3 | 1 | 25n − 45 | matches `docs/proofs/diagonal-law.md` |
+| king | 3 | 2 | 625/2 n² − 2459/2 n + 567 | matches `T-n-nm2-and-general.md` |
+
+The king k=2 row is the strongest check: `½(625n² − 2459n + 1134)` was derived
+by hand in a separate proof, and the parametric DP returns it. The square k=3
+row can be checked against A308359's own printed triangle without running
+anything — it gives 282 at n=7 and 638 at n=8, which are that entry's values.
+Every row also survives 5–11 holdout values past the ones used to fit it.
+
+Coefficients are rational, not integral, which is the expected shape:
+`k!·P_k ∈ ℤ[n]` with P_k integer-*valued* (32/3 × 3! = 64).
+
+What this does **not** do is explain the coefficients. `experiments/defect_gas.py`
+factors the same counts into cluster weights — that is where 25 = 16 + 9 comes
+from — but it is written for `(dx, dr) ∈ (−1,0,1)²` and is not lattice-
+parametric. Making the gas parametric is the open engineering step; the machine
+above is values-plus-theorem, which is enough to *state* the formulas but not to
+say why they look as they do.
+
 ## Instances (machine-checked)
 
 | lattice | b | onset | density (pair wt) | P_1(n) | spine |
