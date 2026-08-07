@@ -71,6 +71,26 @@ What the campaign actually bought, in one line each:
   four "outside the default build" statements corrected, a build
   receipt banked.
 
+## FLEET STATE at 2026-08-07 18:09 EDT (written for a fresh session)
+
+Three jobs live, all feeding the perimeter-grading paper (L6 in
+`docs/publication-split.md`) and nothing else. **Re-arm the watchers first
+thing** — they are `tail --pid` over ssh and do not survive a session change.
+
+| box | job | PID to watch | state at 18:09 |
+|---|---|---|---|
+| ayr | `scripts/ayr_pmin48.sh` → square8 min-end p=48, tmux `0:pmin48`, log `results/ayr_pmin48.runlog` | 2261 | 117 of 121 frames complete in 7 min; the 4 that remain (W=10 H=10/11/12, W=11 H=11) are the giants and are where the hours are |
+| dalby | `scripts/dalby_square4_deep.sh` → square4 min-end deep boxes, tmux `0:j7w17` | 2423184 | W=15 r8 done (`1 4 18 60 187 524 1388 3452 8193`); on W=17 r8 since 14:29 EDT |
+| dalby | `dalby_perimeter_defect_pool.sh square8 78 6`, tmux `0:pdk6big` | 2420612 (stage 1) | all 456 shards dispatched, a couple still running. **Stage 2 (`square4 78 6`) starts automatically after**, then `STAGE2_ALLDONE` and a `sleep 86400` — so watch 2420612, not the outer 2420610, and re-arm on stage 2 |
+
+gympie is idle; its three finished windows (percell mod-4, symtm strip profile,
+subgroup mod-4) were inspected, confirmed banked and closed 2026-08-07.
+
+**Git is divergent across three boxes and needs reconciling.** `origin/master`
+is at 3b7359d. gympie has f333ec1 and 840885c on top of it; ayr has 78ec1cd and
+6fb3f39 on top of it. Neither is pushed, deliberately — a push runs the full
+gate suite and would steal cores from the census. Reconcile after the runs land.
+
 ## LIVE JOB — ayr, king min-end census at p=48 (2026-08-07 18:01 EDT)
 `scripts/ayr_pmin48.sh`, tmux `0:pmin48`, driver PID 2261, log
 `results/ayr_pmin48.runlog`. Feeds the minimum end of
