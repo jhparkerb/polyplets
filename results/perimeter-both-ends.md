@@ -1,0 +1,237 @@
+# Both ends of the perimeter table: a triangular onset at one, a linear one at the other
+
+2026-08-07. Extends `results/perimeter-defect-diagonals.md`, which graded
+`A(n,p)` by `k = pmax(n) - p` only. The table has two boundary curves; this
+pass grades from both and asks what each end's ladder looks like.
+
+## The answer in one paragraph
+
+The two ends are structurally different objects and the difference is sharp.
+At the **maximum** end the extremal animals are sticks, the classes are
+quasi-polynomials of degree exactly `k` in `n`, and their onsets follow
+`onset(k) = k(k+1)/2 + 3` — **triangular**, the law
+`perimeter-defect-diagonals.md` looked for and did not find. At the **minimum**
+end the extremal animals are balls of the adjacency metric, the natural row
+index is `p` rather than `n`, and the classes are **eventually constant** in `p`
+with onset `4i + const` — **linear**. On the king lattice those constants are
+exactly a convolution of the **4-coloured partition function** with the
+box-skew deficits, verified at `i = 0..6` and confirmed at the mechanism level.
+On square4 the ladder stabilises too but its constants are a *different*
+combinatorial object — `1, 4, 18, 60, 187` where king has `1, 4, 14, 40, 105`.
+So the lattices agree on leading structure at the max end and disagree at the
+min end from the first nontrivial term.
+
+## The maximum end: the onset law is triangular
+
+`experiments/perimeter_max_structure.py` re-derives each defect class's onset
+from the census (largest `n` where the fitted closed form fails, plus one)
+rather than reading it off the write-up. On **both** lattices:
+
+| k | period | degree | onset | `T_k + 3` |
+|---|---|---|---|---|
+| 2 | 1 | 2 | 6  | 6  |
+| 3 | 2 | 3 | 9  | 9  |
+| 4 | 2 | 4 | 13 | 13 |
+| 5 | 6 | 5 | 18 | 18 |
+
+    onset(k) = k(k+1)/2 + 3        for k >= 2
+
+Four consecutive hits on each lattice. `k = 0, 1` are the degenerate exceptions
+that hid the law (onsets 2 and 3, against 3 and 4), which is why a scan of
+`2, 3, 6, 9, 13, 18` as a whole found nothing. **Predicts `onset(6) = 24` and
+`onset(7) = 31`** — untested, see "What this run did not buy" below.
+
+### The recentred basis is non-negative integers
+
+The partial-fraction basis `1/Phi_1^j -> C(n+j-1, j-1)` is centred at `n = 0`,
+which is why its coefficients are the ugly rationals of
+`perimeter-defect-diagonals.md`. Re-expand each residue class in `C(m, j)` with
+`m = (n - n0)/period` stepping along the class from its first in-regime point,
+and **every coefficient is a non-negative integer**, on both lattices, for
+`k = 2..5`, in every residue class. Examples (king, then square4):
+
+    k=2        92, 48, 12                    60, 40, 12
+    k=3 r=1  1528, 1868, 1164, 312          856, 1324, 1004, 312
+    k=4 r=1 45753, 48873, 32438, 12484, 2176    22993, 30293, 24222, 10956, 2176
+
+The leading coefficient is lattice-independent (`312`, `2176`, `3842640` for
+`k = 3, 4, 5`) — it is `c_k * k! * period^k`, so this is the known
+leading-diagonal universality in integer form, not a new one. Everything
+beneath it is lattice-specific, exactly as in the partial-fraction triangle.
+
+Defining the recentring at all needs the onset law, so this is downstream of it.
+
+### Two doors closed
+
+- **The onset is not the positivity threshold.** The `C(m,j)` coefficients are
+  forward differences, so non-negativity says the class counts are built by
+  choosing `j` things out of `m`. Tempting, but the least `n0` with all forward
+  differences non-negative is strictly *below* the onset in every class on both
+  lattices (`k=5`: threshold 12 against onset 18). Positivity is real and the
+  onset is real; neither explains the other.
+- **The numerators are not non-negative.** `G_k` carries a polynomial part
+  holding the pre-onset holdouts, so testing the numerator of the full `G_k` is
+  meaningless (that was the first answer, and it was noise). Done properly on
+  the tail series, `Ntilde_k = (sum_{n>=onset} A(n,k) x^n) * D_k / x^onset` is a
+  polynomial of degree exactly `deg D_k - 1` — a fresh confirmation of the
+  predicted cyclotomic denominators — but its coefficients change sign from
+  `k = 2` on. There is no positive numerator over `D_k`.
+
+`deg Ntilde_k = 0, 1, 3, 5, 7, 11` for `k = 0..5`, consistent with the linear
+growth a rational `F(x,y) = sum_k G_k(x) y^k` would need, but six terms across
+two denominator regimes do not settle it.
+
+## The minimum end: a different kind of ladder
+
+`pmax(n)` is linear in `n`, so at the max end `n` and `p` are interchangeable.
+`pmin(n)` grows like `sqrt(n)` and is a **step function**, so an `n`-indexed
+ladder there has columns polynomial in `sqrt(n)` at best. The right row index is
+`p`, with `nmax(p) = max{n : pmin(n) <= p}` and
+
+    C(p, i) = A(nmax(p) - i, p).
+
+`pmin` itself is not ours and is not refitted: square4 is A261491
+(`ceil(2 + sqrt(8n-4))`), king is A235382 (`2*ceil(2*sqrt(n)) + 4`), both
+already banked in `results/min-site-perimeter.md` and both re-verified against
+the census here before anything else runs.
+
+### Getting the data: complementation, not growth
+
+The max-end prune works because `k = pmax(n) - p` is monotone under cell
+addition. `p - pmin(n)` is **not** — adding a cell can lower it — so there is no
+growth prune at this end at all. What replaces it is that near-minimal animals
+are *fat*: they fill their own bounding box up to a few cells. `cpp/perimeter_min.cpp`
+enumerates boxes and removes small subsets, at `sum_r C(M,r)` rather than
+anything exponential in `n`. square4 is worked in the rotated frame `u = x+y`,
+`v = x-y`, where the four rook neighbours become the four diagonals and a
+diamond — which fills no `(x,y)` box — is exactly a parity-restricted box.
+
+Completeness rests on **(H1)**: every animal's perimeter is at least its own
+filled frame bounding box's. Given (H1), an animal at area deficit `i` has at
+most `i` removals. (H1) is asserted at runtime and tested from outside by
+`make gate-perimeter-min`, which runs with removals unbounded on small boxes —
+where the program degenerates to a complete brute force — and compares cell for
+cell against `build/g2 --siteperim`, a different search entirely. A violation
+would surface as a missing animal. 33 and 52 `(n,p)` cells agree; a RED control
+confirms the two lattice modes are not computing the same thing.
+
+Reached `p <= 40` on king (`n` to 81) and `p <= 24` on square4 (`n` to 61),
+against the `n <= 14` and `n <= 20` the brute-force censuses stop at.
+
+### King: the ladder is the 4-coloured partition function
+
+`C(p, i)` is eventually **constant** in `p` along each residue class mod 4, and
+the constants are exactly
+
+    p = 0 mod 4:  C(i) = q4(i) + 2 * sum_{s>=1} q4(i - s^2)
+    p = 2 mod 4:  C(i) = 2 * sum_{s>=0} q4(i - s(s+1))
+    p odd:        0
+
+with `q4(j) = [x^j] prod_n (1-x^n)^-4 = 1, 4, 14, 40, 105, 252, 574` the
+4-coloured partition numbers. Measured against predicted, `i = 0..6`:
+
+| i | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|---|
+| `p = 0 mod 4` | 1 | 6 | 22 | 68 | 187 | 470 | 1106 |
+| `p = 2 mod 4` | 2 | 8 | 30 | 88 | 238 | 584 | 1360 |
+
+**All fourteen match exactly.** Two mechanisms are doing the work and both are
+checked directly rather than inferred:
+
+- *Where `q4` comes from.* Removing a corner cell of a filled king box drops one
+  ring cell and adds the removed cell: net zero. So the perimeter-preserving
+  removals are a Young diagram at each of the 4 corners, giving `P(x)^4`. The
+  per-box free-removal counts (`--boxes`) converge to `1, 4, 14, 40, 105, 252,
+  574` term by term, and converge *exactly* when the box side exceeds the
+  removal count: `W=5` is right to `j=4`, `W=6` to `j=5`, `W=7` to `j=6`.
+- *Where the period 4 comes from.* At semi-perimeter `S = w+h` the balanced box
+  is optimal and a skew of `s` costs `s^2` cells when `S` is even and `s(s+1)`
+  when odd. Different deficit sets, hence different columns, hence period 4
+  in `p`.
+
+**Stabilisation onset:** `p* = 4i + 8` for `p = 0 mod 4` and `4i + 10` for
+`p = 2 mod 4`, exact for `i = 0..6`. Both say the same thing — the balanced box
+side must exceed `i` — and both are **linear** in the deficit, against the max
+end's triangular `T_k + 3`.
+
+**Odd `p` is a different regime.** `pmin` is even on king, so odd `p` is not a
+box perimeter, and those rows do not stabilise at all: they grow, quadratically
+in `p` (`i=1, p = 1 mod 4`: `5, 12, 21, 32, 45, 60`, i.e. `m(m+4)`). The stable
+part of the min ladder is exactly the part sitting on attainable box perimeters.
+
+### square4: stabilises, but not to the same numbers
+
+All **four** residue classes stabilise here, not just the even ones. Values held
+to the bar of three equal entries at the top of the range are given plain; those
+with only two are marked `?` and are provisional, the run at `p <= 24` having
+stopped one class short:
+
+| | i=0 | i=1 | i=2 | i=3 | stabilises from |
+|---|---|---|---|---|---|
+| `p = 0 mod 4` | 1 | 9  | 52  | 206  | `p* = 4i + 4` |
+| `p = 2 mod 4` | 4 | 22 | 106 | 392? | `p* = 4i + 6` (i>=1) |
+| `p = 1 mod 4` | 4 | 28 | 124? | 456? | `p* = 4i + 9` |
+| `p = 3 mod 4` | 4 | 28 | 124 | 456? | `p* = 4i + 7` |
+
+So the linear stabilisation onset holds on this lattice too, with a different
+constant per class. The two odd classes agree with each other on every value
+that converged. `C(p,0) = 1` when
+`p = 0 mod 4` (the perfect diamond, unique) and `4` otherwise (a partial layer
+in four rotationally equivalent positions), with `p=6` the small-`n` exception.
+
+The free-removal factor is **not** `q4`. Measured on single large boxes
+(`--only`), the diamond's perimeter-preserving removal counts converge to
+
+    1, 4, 18, 60, 187        (agreeing at W=9 and W=11; j=5,6 not yet converged)
+
+against king's `1, 4, 14, 40, 105`. They first differ at `j=2`: 18 against 14.
+Taking a 4th root gives a per-tip series `1, 1, 3, 5, 9` — not the partition
+numbers `1, 1, 2, 3, 5`. A diamond tip is a sharper corner than a box corner and
+admits more perimeter-preserving removals; what counts them is open.
+
+So the two lattices agree at the max end on period, degree, onset and leading
+coefficient, and disagree at the min end on the very first nontrivial constant.
+
+## What this run did not buy
+
+- **`k = 6` at the max end was not run.** It tests four live predictions at
+  once: `onset(6) = 24`, the `Phi_2` leading diagonal's `15/4`, whether the
+  `Phi_3` exponent is `k-4` (that slope rests on a single data point at `k=5`),
+  and whether `Phi_4` stays absent. Measured cost: `k=6` is ~12x `k=5` per `n`
+  (king `n=26`: 3.0 s -> 29.6 s; `n=30`: 8.0 s -> 94.1 s), and `k=5` to `n=70`
+  took 2017 s king / 913 s square4, so `k=6` to `n=70` is **3-7 hours
+  single-core** and `perimeter_defect` has no sharding. A period-6 degree-6 fit
+  with holdouts needs `n` near 78. Over the ask-first bar; not launched.
+- **square4's free-removal counts at `j = 5, 6`** need `W = 13` (85 cells,
+  `C(85,6) = 4.5e8`), and `--only` runs one box on one thread, so it did not
+  finish inside the 10-minute budget given it. The `j <= 4` values are converged
+  and are what is reported.
+- **No OEIS lookups were run** on any sequence here — `1, 4, 18, 60, 187`, the
+  per-tip `1, 1, 3, 5, 9`, and the stable square4 columns are all unchecked
+  against the literature and against OEIS.
+
+## Reproduce
+
+    make gate-perimeter-min                       # must print GATE PASSED
+    scripts/run_perimeter_min.sh                  # 571 s + 77 s wall, 10 threads
+    python3 experiments/perimeter_min_model.py results/perimmin_square8_p40_r6.txt --lattice square8
+    python3 experiments/perimeter_min_model.py results/perimmin_square4_p24_r6.txt --lattice square4
+    python3 experiments/perimeter_min_ladder.py results/siteperim_square4_n20.txt --lattice square4
+    python3 experiments/perimeter_max_structure.py results/perimdefect_square8_n70_k5.txt --lattice square8
+    python3 experiments/perimeter_max_structure.py results/perimdefect_square4_n70_k5.txt --lattice square4
+    ./build/perimeter_min square4 99 6 --only 11 11 0     # a single large box
+
+Census data kept: `results/perimmin_square8_p40_r6.txt` and
+`results/perimmin_square4_p24_r6.txt` (`n p count`, with the completeness domain
+in the header), plus their `.log` provenance.
+
+## Status of these claims
+
+The `pmin` closed forms are published (A261491, A235382) and only verified here.
+The king min-end model is **measured and mechanism-checked, not proved**: `q4`
+is confirmed as the per-box free-removal limit by direct count rather than by a
+bijection, and the "box side exceeds `i`" convergence rule is read off the data.
+The onset law `T_k + 3` is an exact fit at four points per lattice with the
+degenerate `k < 2` excluded — a conjecture with good support, not a theorem. The
+enumerator's completeness rests on (H1), which is checked exhaustively only on
+the small boxes `gate-perimeter-min` reaches. Novelty is unchecked throughout.

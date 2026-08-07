@@ -113,6 +113,12 @@ struct BoxRun {
   u128 remaining = 0;
 
   BoxResult res;
+  // Perimeter-PRESERVING removals, by removal count. These are the free moves
+  // -- the corner staircases -- and their generating function is the per-box
+  // factor the whole stable ladder convolves. Kept separately because the
+  // aggregate (n,p) table cannot be deconvolved without knowing which box each
+  // animal came from.
+  std::vector<long long> freeByR;
 
   int pos(int u, int v) const { return (v + 1) * EW + (u + 1); }
 
@@ -245,6 +251,10 @@ struct BoxRun {
     }
     res.tally[{n, perim}] += mult;
     ++res.emitted;
+    if (perim == pbox) {
+      if ((int)freeByR.size() <= r) freeByR.resize(r + 1, 0);
+      ++freeByR[r];                      // per box, NOT multiplied by mult
+    }
   }
 
   void dfs(int start, int r) {
@@ -271,9 +281,22 @@ int main(int argc, char** argv) {
   int PMAX = std::atoi(argv[2]);
   int RMAX = std::atoi(argv[3]);
   int threads = 1;
-  for (int a = 4; a < argc; ++a)
+  bool boxes_out = false;
+  int onlyW = 0, onlyH = 0, onlyP = 0;
+  for (int a = 4; a < argc; ++a) {
     if (!std::strcmp(argv[a], "--threads") && a + 1 < argc)
       threads = std::atoi(argv[++a]);
+    else if (!std::strcmp(argv[a], "--boxes"))
+      boxes_out = true;                  // per-box free-removal breakdown
+    else if (!std::strcmp(argv[a], "--only") && a + 3 < argc) {
+      // Run ONE box. The per-box free-removal sequence converges to its limit
+      // only once the box side exceeds the removal count, so pinning the limit
+      // means reaching a box far bigger than any full PMAX sweep can afford.
+      onlyW = std::atoi(argv[++a]);
+      onlyH = std::atoi(argv[++a]);
+      onlyP = std::atoi(argv[++a]);
+    }
+  }
 
   const Offset* off; int noff; std::vector<int> parities;
   if (lat == "square8")      { off = kKing; noff = 8; parities = {-1}; }
@@ -290,7 +313,11 @@ int main(int argc, char** argv) {
   // assumption about what the isoperimetric shape is.
   struct Job { int W, H, parity, mult; };
   std::vector<Job> jobs;
-  for (int W = 1;; ++W) {
+  if (onlyW) {
+    jobs.push_back({onlyW, onlyH, onlyP, 1});
+    boxes_out = true;
+  }
+  for (int W = 1; !onlyW; ++W) {
     bool anyW = false;
     for (int H = W;; ++H) {
       bool anyH = false;
@@ -324,6 +351,13 @@ int main(int argc, char** argv) {
       if (RMAX < 0) r.rmax = r.M;
       r.run();
       std::lock_guard<std::mutex> g(mu);
+      if (boxes_out) {
+        std::string s;
+        for (size_t j2 = 0; j2 < r.freeByR.size(); ++j2)
+          s += " " + std::to_string(r.freeByR[j2]);
+        std::printf("# box W=%d H=%d parity=%d pbox=%d cells=%d mult=%d free:%s\n",
+                    r.W, r.H, r.parity, r.pbox, r.M, r.mult, s.c_str());
+      }
       for (auto& kv : r.res.tally) total[kv.first] += kv.second;
       nodes += r.res.nodes; emitted += r.res.emitted;
       violations += r.res.violations;

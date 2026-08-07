@@ -5,26 +5,38 @@ Reads `build/perimeter_defect` census rows (`n k c H count`) and asks:
 
   1. ONSET LAW.  results/perimeter-defect-diagonals.md records onsets
      2, 3, 6, 9, 13, 18 for k = 0..5 and says "no law found".  Test
-     onset(k) = k(k+1)/2 + 3 for k >= 2 (the two small k being degenerate),
-     which reproduces 6, 9, 13, 18 exactly and predicts 24 at k=6.  The onset
-     is RE-DERIVED here from the census -- the largest n at which the fitted
-     closed form fails -- not copied from the write-up, so this is a check of
-     the law against data, not against a table someone typed.
+     onset(k) = k(k+1)/2 + 3 for k >= 2 (the two smallest k being degenerate),
+     which reproduces 6, 9, 13, 18 and predicts 24 at k=6.  The onset is
+     RE-DERIVED here from the census -- the largest n at which the fitted closed
+     form fails, plus one -- not copied from the write-up, so this checks the
+     law against data rather than against a table someone typed.
 
   2. RECENTRED BASIS.  The partial-fraction basis 1/Phi_1^j expands the plain
-     part in C(n+j-1, j-1), i.e. centred at n = 0, which is why the
-     coefficients are ugly rationals.  Re-expand Q_k(n) in C(n - onset_k, j).
+     part in C(n+j-1, j-1), i.e. centred at n = 0, which is why its coefficients
+     are ugly rationals.  Re-expand each residue class in C(m, j) where
+     m = (n - n0)/period steps ALONG the class from its first in-regime point.
      Non-negative integers there would be evidence of a direct combinatorial
      decomposition (j free gaps along a backbone) rather than an interpolation.
 
-  3. NUMERATOR POSITIVITY.  G_k = N_k(x)/D_k(x) with D_k the predicted
-     cyclotomic product.  Are the N_k coefficients non-negative?  Do square and
-     king numerators differ by a simple factor?
+  3. NUMERATOR POSITIVITY, done on the right object.  G_k carries a polynomial
+     part R_k holding the pre-onset holdouts, and R_k has no reason to be
+     positive -- so the numerator of the FULL G_k is the wrong thing to test
+     (its degree is onset + deg D, which is what gave the first, meaningless,
+     negative answer).  Test instead the tail series from the onset:
+     Ntilde_k = (sum_{n>=onset} A(n,k) x^n) * D_k / x^onset, which is a
+     polynomial of degree < deg D_k.  That it IS one, with the predicted
+     cyclotomic D_k, is itself a check.
 
   4. BIVARIATE RATIONALITY.  The denominator exponents are linear in k
-     (k+1, k-1, k-4), which is the signature of F(x,y) = sum_k G_k(x) y^k being
-     rational in y over Q(x).  Test whether the sequence (N_k) satisfies a
-     short linear recurrence in k with polynomial-in-x coefficients.
+     (k+1, k-1, k-4), the signature of F(x,y) = sum_k G_k(x) y^k being rational
+     in y over Q(x).  Report deg Ntilde_k and look for a short linear recurrence
+     in k over Q(x).
+
+Exact arithmetic throughout: Fraction, never float.  A degree-5 interpolation on
+n up to 70 has entries around 70^5, and a float solve there silently returns a
+fit that misses the holdouts by a rounding error rather than by a real
+disagreement -- which is indistinguishable, from the outside, from "no closed
+form exists".
 
     python3 experiments/perimeter_max_structure.py results/perimdefect_square8_n70_k5.txt --lattice square8
 
@@ -37,13 +49,14 @@ import argparse
 import sys
 from collections import defaultdict
 from fractions import Fraction
-
-import sympy as sp
-
-x = sp.Symbol("x")
-PHI = {1: 1 - x, 2: 1 + x, 3: 1 + x + x**2, 4: 1 + x**2, 6: 1 - x + x**2}
+from math import comb
 
 PMAX = {"square4": lambda n: 2 * n + 2, "square8": lambda n: 4 * n + 4}
+
+# Cyclotomic polynomials as coefficient lists, low order first.
+PHI = {1: [1, -1], 2: [1, 1], 3: [1, 1, 1], 4: [1, 0, 1], 6: [1, -1, 1]}
+
+HOLDOUTS = 2            # spare points required per residue class
 
 
 def read_defect_census(path):
@@ -59,56 +72,92 @@ def read_defect_census(path):
     return by_k
 
 
-def quasi_fit(pts, period, degree):
-    """Fit a period-`period` quasi-polynomial of degree `degree` to {n: v}.
+def solve_exact(rows):
+    """Gauss-Jordan over Fraction. rows = augmented matrix. Returns the column."""
+    m = len(rows)
+    A = [list(r) for r in rows]
+    for c in range(m):
+        piv = next((r for r in range(c, m) if A[r][c] != 0), None)
+        if piv is None:
+            return None
+        A[c], A[piv] = A[piv], A[c]
+        pv = A[c][c]
+        A[c] = [v / pv for v in A[c]]
+        for r in range(m):
+            if r != c and A[r][c] != 0:
+                f = A[r][c]
+                A[r] = [a - f * b for a, b in zip(A[r], A[c])]
+    return [A[r][m] for r in range(m)]
 
-    Returns {residue: [coeffs]} or None if any residue class is underdetermined.
-    Uses exact rational linear solve, no floats.
+
+def poly_at(coeffs, n):
+    return sum(c * Fraction(n) ** j for j, c in enumerate(coeffs))
+
+
+def quasi_fit(pts, period, degree):
+    """Fit a period-`period`, degree-`degree` quasi-polynomial to {n: v}.
+
+    Returns {residue: coeffs} or None if any class is underdetermined or any
+    holdout disagrees.
     """
     out = {}
     for r in range(period):
         sub = sorted((n, v) for n, v in pts.items() if n % period == r)
-        if len(sub) < degree + 1:
+        if len(sub) < degree + 1 + HOLDOUTS:
             return None
-        A = sp.Matrix([[sp.Integer(n) ** j for j in range(degree + 1)]
-                       for n, _ in sub[:degree + 1]])
-        b = sp.Matrix([[sp.Integer(v)] for _, v in sub[:degree + 1]])
-        try:
-            sol = A.solve(b)
-        except Exception:
+        rows = [[Fraction(n) ** j for j in range(degree + 1)] + [Fraction(v)]
+                for n, v in sub[:degree + 1]]
+        co = solve_exact(rows)
+        if co is None:
             return None
-        coeffs = [sp.nsimplify(c) for c in sol]
-        for n, v in sub[degree + 1:]:                    # holdouts
-            got = sum(c * sp.Integer(n) ** j for j, c in enumerate(coeffs))
-            if sp.simplify(got - v) != 0:
+        for n, v in sub[degree + 1:]:
+            if poly_at(co, n) != v:
                 return None
-        out[r] = coeffs
+        out[r] = co
     return out
 
 
-def onset_of(pts, period, degree):
-    """Largest n where the (period, degree) form FAILS; onset = that + 1.
+def fit_class(pts, kdeg):
+    """Find the cheapest (period, degree) closed form, then its onset.
 
-    Fit on the top of the range (guaranteed inside the regime), then walk down.
+    The fit window is the TOP of the range (certainly inside the regime); the
+    onset is then the largest n anywhere in the census where the form fails,
+    plus one.
     """
     ns = sorted(pts)
-    # the fit window must sit entirely inside the regime AND leave every
-    # residue class spare points: (degree+1) to interpolate + 2 holdouts.
-    need = period * (degree + 3)
-    if len(ns) < need + 2:
-        return None, None
-    tail = {n: pts[n] for n in ns[-need:]}
-    fit = quasi_fit(tail, period, degree)
-    if fit is None:
-        return None, None
-    def val(n):
-        c = fit[n % period]
-        return sum(ci * sp.Integer(n) ** j for j, ci in enumerate(c))
-    worst = 0
-    for n in ns:
-        if val(n) != pts[n]:
-            worst = max(worst, n)
-    return worst + 1, fit
+    for period in (1, 2, 3, 6):
+        for degree in range(0, kdeg + 1):
+            need = period * (degree + 1 + HOLDOUTS)
+            if len(ns) < need:
+                continue
+            tail = {n: pts[n] for n in ns[-need:]}
+            fit = quasi_fit(tail, period, degree)
+            if fit is None:
+                continue
+            worst = 0
+            for n in ns:
+                if poly_at(fit[n % period], n) != pts[n]:
+                    worst = max(worst, n)
+            return period, degree, worst + 1, fit
+    return None
+
+
+def polymul(a, b):
+    out = [0] * (len(a) + len(b) - 1)
+    for i, x in enumerate(a):
+        if x:
+            for j, y in enumerate(b):
+                out[i + j] += x * y
+    return out
+
+
+def denominator(k):
+    """The predicted cyclotomic denominator Phi_1^(k+1) Phi_2^(k-1) Phi_3^(k-4)."""
+    d = [1]
+    for base, e in ((1, k + 1), (2, k - 1), (3, k - 4)):
+        for _ in range(max(0, e)):
+            d = polymul(d, PHI[base])
+    return d
 
 
 def main() -> int:
@@ -120,103 +169,101 @@ def main() -> int:
 
     by_k = read_defect_census(args.census)
     nmax = max(max(d) for d in by_k.values())
-    print("census %s  lattice %s  n<=%d  k<=%d"
-          % (args.census, args.lattice, nmax, max(by_k)))
+    print("census %s  lattice %s  n<=%d" % (args.census, args.lattice, nmax))
     print()
 
-    # ---- 1. onset law -------------------------------------------------------
+    fits = {}
     print("== 1. ONSET LAW:  onset(k) =?= k(k+1)/2 + 3 for k >= 2")
-    print("  k | period degree | onset (from census) | T_k+3 | match")
-    onsets, fits = {}, {}
+    print("   k | period degree | onset (from census) | T_k+3 | match")
     for k in range(0, args.kmax + 1):
-        pts = by_k.get(k)
-        if not pts:
+        if k not in by_k:
             continue
-        got = None
-        for period in (1, 2, 3, 6):
-            for degree in range(0, k + 1):
-                o, f = onset_of(pts, period, degree)
-                if o is not None and degree == k:
-                    got = (period, degree, o, f)
-                    break
-            if got:
-                break
-        if not got:
-            print("  %d | NO FIT" % k)
+        got = fit_class(by_k[k], k)
+        if got is None:
+            print("   %d | NO FIT" % k)
             continue
-        period, degree, o, f = got
-        onsets[k], fits[k] = o, f
+        period, degree, onset, fit = got
+        fits[k] = (period, degree, onset, fit)
         pred = k * (k + 1) // 2 + 3
-        print("  %d | %6d %6d | %19d | %5d | %s"
-              % (k, period, degree, o, pred,
-                 "yes" if o == pred else ("(k<2 exempt)" if k < 2 else "NO")))
-    if onsets:
-        print("  observed onsets: %s" % [onsets[k] for k in sorted(onsets)])
-        print("  T_k+3 predicts:  %s" % [k * (k + 1) // 2 + 3
-                                         for k in sorted(onsets)])
-        print("  predictions: onset(6)=%d  onset(7)=%d"
-              % (6 * 7 // 2 + 3, 7 * 8 // 2 + 3))
+        tag = "(k<2 exempt)" if k < 2 else ("yes" if onset == pred else "NO")
+        print("   %d | %6d %6d | %19d | %5d | %s"
+              % (k, period, degree, onset, pred, tag))
+    if fits:
+        ks = sorted(fits)
+        print("   observed onsets: %s" % [fits[k][2] for k in ks])
+        print("   T_k+3 predicts:  %s" % [k * (k + 1) // 2 + 3 for k in ks])
+        print("   PREDICTS onset(6)=%d  onset(7)=%d" % (24, 31))
     print()
 
-    # ---- 2. recentred binomial basis ---------------------------------------
-    print("== 2. RECENTRED BASIS:  Q_k(n) in C(n - onset_k, j)")
-    print("   (per residue class; integrality/non-negativity is the signal)")
-    n_ = sp.Symbol("n")
+    print("== 2. RECENTRED BASIS: class r in C(m, j), m = (n - n0)/period")
     for k in sorted(fits):
-        o = onsets[k]
-        for r in sorted(fits[k]):
-            poly = sum(c * n_ ** j for j, c in enumerate(fits[k][r]))
-            # Expand in the basis C(n-o, j), j = 0..k.  Evaluating at
-            # n = o, o+1, ... makes the system unit-triangular, so this is an
-            # exact rational solve with no cancellation worries.
-            js = list(range(k + 1))
-            M = sp.Matrix([[sp.binomial(sp.Integer(o + m) - o, j) for j in js]
-                           for m in range(k + 1)])
-            v = sp.Matrix([[poly.subs(n_, o + m)] for m in range(k + 1)])
-            try:
-                sol = M.solve(v)
-            except Exception:
-                print("  k=%d r=%d  singular" % (k, r))
+        period, degree, onset, fit = fits[k]
+        for r in sorted(fit):
+            n0 = onset + ((r - onset) % period)          # first in-regime n
+            rows = []
+            for i in range(degree + 1):
+                n = n0 + i * period
+                rows.append([Fraction(comb(i, j)) for j in range(degree + 1)]
+                            + [poly_at(fit[r], n)])
+            co = solve_exact(rows)
+            if co is None:
                 continue
-            vals = [sp.nsimplify(s) for s in sol]
-            allint = all(val.is_integer for val in vals)
-            allpos = all(val >= 0 for val in vals)
-            print("  k=%d r=%d  %s   int=%s pos=%s"
-                  % (k, r, [str(v_) for v_ in vals], allint, allpos))
+            ints = all(c.denominator == 1 for c in co)
+            pos = all(c >= 0 for c in co)
+            print("   k=%d r=%d n0=%-3d %-46s int=%s pos=%s"
+                  % (k, r, n0, [str(c) for c in co], ints, pos))
     print()
 
-    # ---- 3/4. numerators ----------------------------------------------------
-    print("== 3. NUMERATORS over the predicted cyclotomic denominator")
-    nums = {}
-    for k in sorted(by_k):
-        if k > args.kmax:
-            continue
-        pts = by_k[k]
-        ser = sum(sp.Integer(pts.get(n, 0)) * x ** n for n in range(nmax + 1))
-        den = sp.Integer(1)
-        for d, e in ((1, k + 1), (2, k - 1), (3, k - 4)):
-            if e > 0:
-                den *= PHI[d] ** e
-        prod = sp.Poly(sp.expand(ser * den), x)
-        cs = prod.all_coeffs()[::-1]
-        # the series is truncated at nmax, so only coefficients up to
-        # nmax - deg(den) are trustworthy
-        cut = nmax - sp.Poly(den, x).degree()
-        head = cs[:cut + 1]
-        tail_zero = all(c == 0 for c in cs[cut + 1:len(cs)])
-        # strip trailing zeros of the head to find the true numerator degree
-        deg = max([i for i, c in enumerate(head) if c != 0] or [0])
-        nums[k] = head[:deg + 1]
-        print("  k=%d  deg N=%2d  nonneg=%s  N = %s"
-              % (k, deg, all(c >= 0 for c in nums[k]), nums[k]))
-        if deg > cut - 4:
-            print("      WARNING: numerator degree close to the trustworthy cut"
-                  " (%d); series may be too short." % cut)
+    # Is the onset the POSITIVITY THRESHOLD?  The C(m,j) coefficients are the
+    # forward differences of Q_k along its residue class, so "all non-negative"
+    # says the class counts are built by choosing j things out of m from the
+    # onset on.  If the least n0 with that property IS the onset, the onset law
+    # stops being a fitted number and becomes a statement about the polynomial.
+    print("== 2b. Least n0 (per class) with all forward differences >= 0")
+    print("   k | r | least n0 | onset+offset | equal?")
+    for k in sorted(fits):
+        period, degree, onset, fit = fits[k]
+        for r in sorted(fit):
+            here = onset + ((r - onset) % period)
+            least = None
+            for cand in range(here + 4 * period, -1, -period):
+                rows = []
+                for i in range(degree + 1):
+                    rows.append([Fraction(comb(i, j)) for j in range(degree + 1)]
+                                + [poly_at(fit[r], cand + i * period)])
+                co = solve_exact(rows)
+                if co is None or not all(c >= 0 for c in co):
+                    break
+                least = cand
+            print("   %d | %d | %8s | %12d | %s"
+                  % (k, r, least, here,
+                     "yes" if least == here else "no (%s)" % least))
     print()
-    print("== 4. BIVARIATE: does N_k satisfy a short recurrence in k?")
-    print("   (reported as the numerator degree sequence; a rational F(x,y)")
-    print("    needs deg N_k to grow linearly and the N_k to satisfy one.)")
-    print("   deg N_k = %s" % [len(nums[k]) - 1 for k in sorted(nums)])
+
+    print("== 3. NUMERATOR of the TAIL series over the predicted denominator")
+    print("   Ntilde_k = (sum_{n>=onset} A(n,k) x^n) * D_k / x^onset")
+    nums = {}
+    for k in sorted(fits):
+        period, degree, onset, fit = fits[k]
+        den = denominator(k)
+        ser = [0] * (nmax + 1)
+        for n in range(onset, nmax + 1):
+            ser[n] = by_k[k].get(n, 0)
+        prod = polymul(ser, den)
+        cut = nmax                       # coefficients above this are truncation
+        want = len(den) - 1              # deg Ntilde must be < deg D_k
+        head = prod[onset:onset + want]
+        junk = [i for i in range(onset + want, cut + 1) if prod[i] != 0]
+        nums[k] = head
+        print("   k=%d  deg D=%2d  Ntilde=%s" % (k, len(den) - 1, head))
+        print("        vanishes above deg D: %s%s"
+              % ("yes" if not junk else "NO at n=%s" % junk[:5],
+                 "   nonneg=%s" % all(c >= 0 for c in head)))
+    print()
+    print("== 4. BIVARIATE: deg Ntilde_k = %s"
+          % [len(nums[k]) - 1 for k in sorted(nums)])
+    print("   (linear growth is necessary for F(x,y) = sum_k G_k(x) y^k to be")
+    print("    rational; the Ntilde_k must also satisfy a recurrence in k.)")
     return 0
 
 
