@@ -86,10 +86,13 @@ thing** — they are `tail --pid` over ssh and do not survive a session change.
 gympie is idle; its three finished windows (percell mod-4, symtm strip profile,
 subgroup mod-4) were inspected, confirmed banked and closed 2026-08-07.
 
-**Git is divergent across three boxes and needs reconciling.** `origin/master`
-is at 3b7359d. gympie has f333ec1 and 840885c on top of it; ayr has 78ec1cd and
-6fb3f39 on top of it. Neither is pushed, deliberately — a push runs the full
-gate suite and would steal cores from the census. Reconcile after the runs land.
+**Git divergence, reconciled content-wise 2026-08-08.** `origin/master` is at
+3b7359d. gympie's f333ec1/840885c are in local master; ayr's 78ec1cd/6fb3f39
+(power-cut receipt, pmin48 script) are now in local master as byte-identical
+content, sha256-verified against ayr's commits. Local master is canonical.
+Remaining, after jasonp pushes: ayr resets to the pushed master (its two local
+commits are content-redundant); dalby reconciles only after its runs land —
+do not touch dalby's clone while the drivers hold it.
 
 ## LANDED — ayr, king min-end census at p=48 (started 2026-08-07 18:01 EDT, done 22:12 UTC)
 `scripts/ayr_pmin48.sh`, tmux `0:pmin48`, driver PID 2261, log
