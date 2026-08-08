@@ -9,7 +9,7 @@ The super-multiplicative (lower-bound) half of that paper is banked and
 superseded — Fekete gives `lambda >= a(40)^(1/40) = 6.2208`, the certified strip
 ladder gives 6.543 (`results/strip-mu-certificates.md`). The open half is
 **quasi sub-multiplicativity, which yields UPPER bounds**, and our upper end
-(9.3153, `docs/proofs/polyplet-upper-bound.md`) is the loose side of the bracket.
+(9.3154, `docs/proofs/polyplet-upper-bound.md`) is the loose side of the bracket.
 
 **Verdict: the route cannot be pushed for the full king class.** The prize is
 real and was worth pricing — but the missing lemma is a known-hard target whose
@@ -26,7 +26,7 @@ With `a(40)` banked, write `F = c1 (2n)^c2` for the slack factor at `n = 40`:
 |---|---|
 | `F < 7.54` | relation is **refuted** — the bound would fall below our certified `lambda >= 6.543` |
 | `F < 210.5` | refuted modulo `lambda ~ 7.111` (numeric only) |
-| `F < 1.03e7` | **beats** the 9.3153 certificate |
+| `F < 1.03e7` | **beats** the 9.3154 certificate |
 
 So the live window is `7.5 <= F <= 1.03e7`, i.e. **the lemma helps iff `deg P <= 3`**:
 
@@ -39,7 +39,7 @@ So the live window is `7.5 <= F <= 1.03e7`, i.e. **the lemma helps iff `deg P <=
 | 4 | 4.10e7 | 9.6423 | no gain |
 
 BBO's convex-polyomino P is degree 2 (`mn + 2(m+n) + 1`, their Theorem 8), so the
-honest target value is **7.745** — a genuine improvement on 9.3153, still far
+honest target value is **7.745** — a genuine improvement on 9.3154, still far
 above `lambda ~ 7.111`, and it decays slowly with more terms (estimated 7.49 at
 n=80, 7.29 at n=200 — the `(2n)^2` factor only dies like `exp(2 ln(2n)/n)`).
 
@@ -111,8 +111,8 @@ polyominoes — the class where the split is bounded.
 
 ## What is left of the thread
 
-- The upper bound stays at **9.3153** (exact-rational Bui-style convolution
-  certificate). Bracket unchanged: `6.543 <= lambda <= 9.3153`.
+- The upper bound stays at **9.3154** (exact-rational Bui-style convolution
+  certificate). Bracket unchanged: `6.543 <= lambda <= 9.3154`.
 - The only live remnant: BBO's split *does* port to **convex polyplets** (the
   parked side quest, `results/convex-polyplets.md`), which would bracket
   `lambda_convex-king`. That bounds a subclass constant, shortens no sentence in

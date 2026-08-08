@@ -27,7 +27,7 @@ One question: *is it already known that finite-type convolution bounds cannot
 reach λ?*
 
 `docs/open-problem-lambda-bracket.md` records the P2 slack audit
-(`experiments/king_slack.py`): the 9.3153 over-count is diffuse (median slack
+(`experiments/king_slack.py`): the 9.3154 over-count is diffuse (median slack
 1.14, worst type 1.22) and **compounds at +0.022 per cell**. Slack growing with
 n is the signature of a non-local over-count, which no finite context R can
 see — so the whole method class floors strictly above λ. The doc itself calls

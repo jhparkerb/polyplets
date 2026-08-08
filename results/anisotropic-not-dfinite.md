@@ -128,7 +128,7 @@ finiteness. Nothing empirical remains.
 2. **(House bound.)** Every pole of G_H has modulus >= the radius 1/mu_H,
    by the definition of radius of convergence. So every Galois conjugate of
    mu_H (a root of the reversal) has modulus <= mu_H: house(mu_H) = mu_H,
-   and mu_H < lambda <= 9.3153 (the banked rigorous bound; any crude bound
+   and mu_H < lambda <= 9.3154 (the banked rigorous bound; any crude bound
    works).
 
 3. **(Strict monotonicity — Perron-Frobenius.)** Let nu_H be the growth of
@@ -152,7 +152,7 @@ finiteness. Nothing empirical remains.
 4. **(Northcott/Kronecker finiteness.)** For fixed D, an algebraic integer
    of degree <= D with house <= B has minimal-polynomial coefficients
    bounded by binom(D,k) B^k — finitely many integer polynomials, so
-   finitely many such numbers. With B = 9.3153: for every D, only finitely
+   finitely many such numbers. With B = 9.3154: for every D, only finitely
    many of the (infinitely many, distinct) mu_H can have degree <= D.
    Therefore **deg_Q(mu_H) -> infinity**.
 

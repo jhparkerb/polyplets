@@ -73,7 +73,7 @@ cites it.
 
 | | paper | contents | pages | Claude sessions | his hours | reach | novelty |
 |---|---|---|---|---|---|---|---|
-| **L3** | Bounds for λ: 6.543 ≤ λ ≤ 9.3153 | both certificates in full; the strip ladder µ_H; the Collatz–Wielandt rationals; the Lean upper bound | 14–18 | 3–4 | ~2 | **highest of L** | N4 clean — no published upper bound existed |
+| **L3** | Bounds for λ: 6.543 ≤ λ ≤ 9.3154 | both certificates in full; the strip ladder µ_H; the Collatz–Wielandt rationals; the Lean upper bound | 14–18 | 3–4 | ~2 | **highest of L** | N4 clean — no published upper bound existed |
 | **L1** | A diagonal law for row-local lattices | T(H+k,H) = q_k(H)·b^H; the abstract shape engine; square, hex and king instances; the grand form; the polyiamond case where the hypothesis fails and the conclusion survives | 12–16 | 2–3 | ~2 | high | N5 clean; cite the polycube dimension-defect line as precedent |
 | **L4** | The by-height GF is not D-finite | the quantified ψ-degree argument; mod-p certificates with preserved degrees; transport to polyominoes, polyhexes, polyiamonds | 12–16 | 3 | ~1 | high | N6 clean |
 | **L2** | The mod-3 arithmetic of the height triangle | the spine cubic W³ = W² + t; the base-3 digit-product formula; SNF all 3-powers with ⌈(N−1)/3⌉ nontrivial factors; the 3-adic lift | 10–12 | 2 | ~1 | medium | **UNCHECKED** — N1–N6 never covered it |

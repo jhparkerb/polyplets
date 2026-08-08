@@ -35,7 +35,7 @@ number-theory shim.
 Step 4 (Northcott finiteness) of the unconditional
 non-D-finiteness theorem of `results/anisotropic-not-dfinite.md`, i.e. "the
 strip growth constants `μ_H`, pairwise distinct algebraic integers with house
-`< λ ≤ 9.3153`, have unbounded degree".
+`< λ ≤ 9.3154`, have unbounded degree".
 
 Steps 1–3 and 5 remain unformalized and are out of scope here: Fatou's lemma
 for integer rational series, Pringsheim positivity, the Perron–Frobenius

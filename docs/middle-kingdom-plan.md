@@ -267,7 +267,7 @@ A closed form for μ is the best available outcome in this whole row.
 **2c. Independently estimate the multi-directed growth constant.** Bacher's
 6.4752 is numerical-only in the literature — no minimal polynomial. Our series
 estimate would independently confirm a published number that currently sits just
-under the certified λ bracket (`6.543 ≤ λ ≤ 9.3153`). Note the tension worth
+under the certified λ bracket (`6.543 ≤ λ ≤ 9.3154`). Note the tension worth
 checking: 6.4752 < 6.543, consistent with multi-directed ⊂ all, as required.
 
 **2c: DONE, subsumed by Phase 1c (2026-08-05).** Phase 1c's 400-term GF series

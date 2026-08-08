@@ -199,7 +199,7 @@ because re-deriving a closed door costs an evening and holding it costs a line.
 **paper/polyplets-report.tex lambda bracket UPDATED 2026-07-31**: the stated
 rigorous lower bound was 3+2sqrt2 ~ 5.828 (Bacher's directed animals), stale
 since the certified strip ladder landed the same day. Now
-**6.543 <= lambda <= 9.3153**, both ends machine-checkable in exact arithmetic;
+**6.543 <= lambda <= 9.3154**, both ends machine-checkable in exact arithmetic;
 the directed/multi-directed bounds are demoted to a closed-form comparison
 remark. sec:gf's "Rigorous lower bounds" paragraph (the GF bound on a(n)) is a
 different claim and is unchanged. `paper/technical-report.tex` is jasonp's and
@@ -388,7 +388,7 @@ history — not repeated here. Read this file, then `MEMORY.md`'s index.
   re-recovery. Run history in results/terminal-velocity.md + provenance.
 
 ## Rigorous λ bounds (NEW 2026-07-11)
-- **Two-sided rigorous bracket 6.543 ≤ λ ≤ 9.3153**, numerical λ≈7.111 inside.
+- **Two-sided rigorous bracket 6.543 ≤ λ ≤ 9.3154**, numerical λ≈7.111 inside.
   Lower (2026-07-31): certified strip ladder — exact Collatz–Wielandt certificates
   μ₂..μ₁₇, μ₁₇ ≥ 6543/1000 (`results/strip-mu-certificates.md`, receipts in
   `results/strip_mu_certificates.log`); supersedes directed/multi-directed
@@ -668,7 +668,7 @@ newest first:
   relation; but the lexicographic split shatters a king comb into ~n/4
   components, and the connected (centroid) split can't prescribe halves to
   O(1). The same lemma would beat the polyomino record 4.5252 → 4.3828, so it
-  is known-hard. **Bracket unchanged: 6.543 ≤ λ ≤ 9.3153.**
+  is known-hard. **Bracket unchanged: 6.543 ≤ λ ≤ 9.3154.**
 
 Untracked in the tree and NOT ours to touch: `paper/technical-report.tex`
 (+ live `.swp` — jasonp editing).
@@ -692,7 +692,7 @@ local, NOT pushed. Newest first:
   concedes ~0.0035 (6.543 certified vs 6.5464870 float). Bound valid;
   harvest would need ≥192-bit accumulators, not pursued. This was the
   first live finding from the (deleted-at-jasonp's-request) results
-  dependency map. The second — λ ≤ 9.3153 is Lean-conditional on the
+  dependency map. The second — λ ≤ 9.3154 is Lean-conditional on the
   named RD=3 hypotheses, unconditional Lean upper bound only 3125/256 —
   needs no fix: PROOF-STATUS.md states it plainly and the paper claims
   only exact-arithmetic checkability (true via the Python certificate).

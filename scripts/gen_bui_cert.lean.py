@@ -10,7 +10,7 @@ ceil-to-CD repair sweeps).  Fail-closed:
 
   * the closure size must match the banked type count (RD=2: 185, RD=3: 5930);
   * the rational rate x must equal the banked value
-    (RD=2: 106251/10^6 => lambda <= 9.4117...; RD=3: 2147/20000 => 9.3153...);
+    (RD=2: 106251/10^6 => lambda <= 9.4117...; RD=3: 2147/20000 => 9.31532...);
   * the super-solution inequalities are verified in exact Fraction arithmetic
     (the same check king_certificate.py performs), AND in the cleared-
     denominator integer form that the emitted Lean `decide` re-checks;

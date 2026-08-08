@@ -120,7 +120,7 @@ step 1 is not even well-formed there.
 
 ## What this leaves
 
-- The bracket is unchanged: `6.543 <= lambda <= 9.3153`.
+- The bracket is unchanged: `6.543 <= lambda <= 9.3154`.
 - Candidate (1) of `docs/open-problem-lambda-bracket.md` is **not** refuted —
   the vertical-join question is still open and still the most promising of the
   four. What is refuted is this particular way of trying to avoid it. The

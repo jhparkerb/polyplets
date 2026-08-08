@@ -113,7 +113,7 @@ contain zero translates, hence are exponentially rare), so print it as a cited
 consequence, not a measurement. The measured ratio λ₀/λ ≈ 0.978 is the part
 that is ours, and it is n ≤ 18 data.
 
-## 12. A rigorous two-sided bracket: 6.543 ≤ λ ≤ 9.3153
+## 12. A rigorous two-sided bracket: 6.543 ≤ λ ≤ 9.3154
 
 `results/strip-mu-certificates.md`, `docs/proofs/polyplet-upper-bound.md`,
 `paper/polyplets-report.tex:218`. Lower: certified strip ladder to H=17

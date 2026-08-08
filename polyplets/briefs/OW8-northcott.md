@@ -98,7 +98,7 @@ theorem unbounded_degree_of_house_le {B : ℝ} {μ : ℕ → ℂ}
 Discharges: step 4 (Northcott/Kronecker finiteness) of the unconditional
 non-D-finiteness theorem (`results/anisotropic-not-dfinite.md`), i.e. "the
 strip growth constants μ_H, pairwise distinct algebraic integers with
-house < λ ≤ 9.3153, have unbounded degree" — modulo steps 1–3, 5 which
+house < λ ≤ 9.3154, have unbounded degree" — modulo steps 1–3, 5 which
 remain unformalized and out of scope: Fatou's lemma for integer rational
 series, Pringsheim positivity, the Perron–Frobenius strict-monotonicity
 step (Mathlib has no Perron root theory), and any Lean notion of

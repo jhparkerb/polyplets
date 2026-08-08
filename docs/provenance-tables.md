@@ -85,7 +85,7 @@ must be cited as theirs (that credit is already in the source note).
 
 | # | result | tier | origin | how a reader checks it |
 |---|---|---|---|---|
-| 1 | λ ≤ 9.3153 | **2** | `docs/proofs/polyplet-upper-bound.md`; Lean `BuiSystem.certSum_le`, `lambda_le_of_buiSystem`, `RatCert.lambda_le` (standard axioms) + `lambda_le_of_bui_rd3` | `lake build`; the concrete certificate depends on the named leaf `buiRD3_valid` |
+| 1 | λ ≤ 9.3154 | **2** | `docs/proofs/polyplet-upper-bound.md`; Lean `BuiSystem.certSum_le`, `lambda_le_of_buiSystem`, `RatCert.lambda_le` (standard axioms) + `lambda_le_of_bui_rd3` | `lake build`; the concrete certificate depends on the named leaf `buiRD3_valid` |
 | 2 | λ ≥ 6.543 | **3** | certified strip ladder µ₁₇, exact rational Collatz–Wielandt with a per-H receipt (`results/strip-mu-certificates.md`) | `make gate-strip-fast` runs the engine against the published certificates — the exact kernel must PASS the certified numerator and FAIL numerator+1; `make gate-strip-cert` is the checker's own RED-first self-test |
 | 3 | µ = 3.128943269730886… for every class between staircase and HV-convex (Proposition 6) | **1** | `results/hv-growth-sandwich.md`, Lemmas 1–3 + the squeeze | elementary: an injection, Fekete, a stack bound. `make gate-middle-kingdom` pins the ingredients |
 | 4 | M(i)M(j) ≤ M(i+j), and µ ≥ M(700)^(1/700) = 3.1234045… | 1 | Lemma 3, sortie B1; **machine-checked** — Lean `Stair.M_supermul`, `Stair.M_tendsto`, `Stair.M_le_mu_pow`, `Stair.mu_gt_of_banked` (`polyplets/Polyplets/StairGrowth.lean`, standard axioms, guarded) | `lake build` proves the inequality for all i, j; `experiments/staircase_supermul.py` checks 700 terms with three RED controls. The floor is conditional on the banked `M 700` as a hypothesis |

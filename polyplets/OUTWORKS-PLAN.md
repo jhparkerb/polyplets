@@ -54,7 +54,7 @@ Explicitly OUT of scope (audit verdict: blocked on machinery Mathlib lacks,
 not worth building here): the mod-3 spine (char-3 Lagrange inversion), the
 dm-mirror quasi-polynomial law (Ehrhart), Theorem 3 non-D-finiteness in full
 (Perron–Frobenius + Pringsheim + D-finiteness, all absent from Mathlib), the
-λ ≤ 9.3153 certificate (type-system soundness exists only in Python), the
+λ ≤ 9.3154 certificate (type-system soundness exists only in Python), the
 hole-graded diagonal laws (need OW-6's machinery plus mod-3), and every
 computed value including a(40).
 

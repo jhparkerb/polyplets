@@ -8,7 +8,7 @@ import Polyplets.Growth
 /-!
 # The convolution-certificate upper bound (Bui's method, abstract layer)
 
-`docs/proofs/polyplet-upper-bound.md` proves `λ ≤ 9.3153` by the Bui
+`docs/proofs/polyplet-upper-bound.md` proves `λ ≤ 9.3154` by the Bui
 convolution-certificate method (`experiments/king_bui.py`,
 `experiments/king_certificate.py`): a finite family of marked-animal counting
 functions `φ_T` closes, by single-free-cell casing, into recurrences

@@ -158,7 +158,7 @@ def main():
         # the arithmetic-flavoured relatives: a colliding paper would cite these
         ("Bell-Hu-Satriano (height gap + D-finiteness)", "arXiv:2003.01255"),
         ("Bell-Gerhold-Klazar-Luca 2008 (non-holonomicity)", "arXiv:math/0605142"),
-        # the upper-bound lineage our 9.3153 sits in
+        # the upper-bound lineage our 9.3154 sits in
         ("Barequet-Shalah 2016 (improved polyomino upper bounds)",
          "10.1016/j.tcs.2021.02.020"),
     ]

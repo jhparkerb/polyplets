@@ -38,9 +38,9 @@ lower bound on lambda we have**, beating both Bacher bounds (directed 5.828,
 multi-directed 6.475), our own, and improvable with H.
 
 > These `mu_H` bounds squeeze lambda from BELOW. The complementary rigorous UPPER
-> bound is **lambda <= 9.3153** (Bui-style finite-type convolution certificate,
+> bound is **lambda <= 9.3154** (Bui-style finite-type convolution certificate,
 > exact rational arithmetic), giving the two-sided bracket
-> **6.543 <= lambda <= 9.3153** (updated 2026-07-31: the lower end is now the
+> **6.543 <= lambda <= 9.3154** (updated 2026-07-31: the lower end is now the
 > certified ladder's mu_17, not Bacher's 5.828 — see the addendum below and
 > `strip-mu-certificates.md`; both ends are machine-checkable in exact
 > arithmetic). Derivation: [../docs/proofs/polyplet-upper-bound.md](../docs/proofs/polyplet-upper-bound.md).
@@ -128,7 +128,7 @@ counts and gives:
 
 `papers/chan_rechnitzer_2018_upper_bounds_growth_rates_corner_transfer_matrices.pdf`
 (Linear Algebra Appl. 555 (2018) 139–156). Pulled as the most promising lead for
-improving the loose half of our bracket, `lambda <= 9.3153`. **It cannot do that,
+improving the loose half of our bracket, `lambda <= 9.3154`. **It cannot do that,
 and the reason is worth recording because it is the connectivity wall again, from
 a new angle.**
 
@@ -157,7 +157,7 @@ connected clusters, and confining animals to a cylinder of circumference `m`
 strictly *loses* animals — it is our `mu_m`, a lower bound converging up. The
 cylinder trick has no upper-bounding analogue for a connected family.
 
-**So: the 9.3153 upper bound is not improvable by this route.** That is now two
+**So: the 9.3154 upper bound is not improvable by this route.** That is now two
 independent method-classes floored above `lambda` for the same reason (this, and
 the Bui-style convolution certificate whose over-count is diffuse and non-local —
 `docs/certificate-squeeze-plan.md` P3). Treat the upper end as hard.
@@ -279,7 +279,7 @@ string lets you invert, so the map injects, and
 made it win is an ingredient we do not have.** "Injectively encode each object as
 (bounded-alphabet label per element) x (member of a countable simpler class)" is
 exactly the family our own bounds live in — the crude king-Eden `5^5/4^4 = 12.2`
-and the Bui-style convolution `9.3153` are both over-counts of this shape. BBP's
+and the Bui-style convolution `9.3154` are both over-counts of this shape. BBP's
 improvement came entirely from a bespoke structure theorem (Av(1324) sits inside an
 infinite staircase grid class) that let them take the simpler class to be something
 as small as dominoes. **There is no proposed structure theorem of that kind for
@@ -291,7 +291,7 @@ reach for.
 
 **Useful by-product — a calibration point for the paper.** Their rigorous bracket
 after decades of attention by many authors is `10.271 <= gr <= 13.5` around a
-numerical `mu ~ 11.60`: a ratio of **1.31**. Ours is `6.543 <= lambda <= 9.3153`
+numerical `mu ~ 11.60`: a ratio of **1.31**. Ours is `6.543 <= lambda <= 9.3154`
 around `7.111`: a ratio of **1.42**. A far more heavily studied problem, with a
 genuine structure theorem behind its bounds, lands in the same place. This is worth
 citing next to the paper's "the gap reflects a structural limit" sentence — it says

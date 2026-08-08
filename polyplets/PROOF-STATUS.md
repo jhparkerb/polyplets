@@ -233,7 +233,7 @@ branch `lean-outworks`, orchestrator-reviewed per unit. Targets from the
     number has one algorithm behind it.
   - **Still weaker than the unformalized ladder.** The certified strip
     ladder gives μ₁₇ ≥ 6.543 (`results/strip-mu-certificates.md`, addendum
-    2026-07-31; bracket 6.543 ≤ λ ≤ 9.3153) — but it is not formalized. `6.22` is
+    2026-07-31; bracket 6.543 ≤ λ ≤ 9.3154) — but it is not formalized. `6.22` is
     near-sharp for *this* route: `a(40)^(1/40) = 6.22084…`, so `6.23` is
     false, and no single banked term can do better than 6.221.
 - `IntCoeff.lean` (OW-4) — `factorial_smul_int_coeff` (deg ≤ k integer-
@@ -295,7 +295,7 @@ branch `lean-outworks`, orchestrator-reviewed per unit. Targets from the
 ## Bui in Lean — the certificate upper bound (LANDED 2026-07-31, `Polyplets/Upper/`)
 
 Formalization of the certificate side of the project's headline polyplet
-upper bound `λ ≤ 9.3153` (`docs/proofs/polyplet-upper-bound.md`,
+upper bound `λ ≤ 9.3154` (`docs/proofs/polyplet-upper-bound.md`,
 BREAKTHROUGH + Certificate-Squeeze; `experiments/king_bui.py`,
 `experiments/king_certificate.py`). Three layers:
 
@@ -327,8 +327,8 @@ BREAKTHROUGH + Certificate-Squeeze; `experiments/king_bui.py`,
 - **Layer 3 (RD=3 headline instance, conditional, `Upper/BuiData3.lean` +
   `Upper/BuiRD3.lean`)** — the 5930-type system at the banked
   `x = 2147/20000`: **`lambda_le_of_bui_rd3 (h : KingBuiSystemRD3Holds) :
-  lambda ≤ 20000/2147` (≈ 9.3153)** — the Lean rendering of the project's
-  headline `λ ≤ 9.3153`. The 5930-row check is past the kernel evaluator
+  lambda ≤ 20000/2147` (≈ 9.31532)** — the Lean rendering of the project's
+  headline `λ ≤ 9.3154`. The 5930-row check is past the kernel evaluator
   (`decide +kernel` killed at >10 min / >6 GB; the `List.getD` walks are
   quadratic in unary steps), so `buiRD3_valid` is a **`native_decide`**
   (~7 s) and the theorem carries standard three + that one native leaf.

@@ -68,7 +68,7 @@ beyond confirming no free copy exists):**
   PDF for it. **[high]**
 - G. Barequet & M. Shalah, "Improved upper bounds on the growth constants of
   polyominoes and polycubes," Algorithmica (2022). — spotted on the same page.
-  Bears on `docs/proofs/polyplet-upper-bound.md`, where our 9.3153 is the loose
+  Bears on `docs/proofs/polyplet-upper-bound.md`, where our 9.3154 is the loose
   half of the bracket and the polyomino comparison figures are quoted
   second-hand. Note for that doc: Barequet–Shalah 2017 states the best known
   polyomino bounds as ~4.0025 (lower) and **4.649551** (Klarner–Rivest, upper),
@@ -335,9 +335,9 @@ following up and it is not the one first flagged.**
   direction is already banked and superseded (Fekete gives
   lambda >= a(40)^(1/40) ~ 6.22, commit 8ae1462; the certified ladder's 6.543
   beats it). The open direction is **quasi-sub-multiplicativity, which yields
-  UPPER bounds** — and our upper end, 9.3153, is the loose half of the
+  UPPER bounds** — and our upper end, 9.3154, is the loose half of the
   bracket. Whether king animals admit a concatenation-based sub-multiplicative
-  bound below 9.3153 is a live question that would shorten a sentence in the
+  bound below 9.3154 is a live question that would shorten a sentence in the
   paper. Not attempted. **[the one worth a look]**
   **LOOKED, 2026-08-01 — CLOSED, no gain** (`results/concatenation-upper-bound.md`,
   `experiments/concatenation_bound_check.py`). Priced first: with `a(40)` banked,

@@ -235,7 +235,7 @@ Grouped by theme; file:line detail preserved where actionable.
 - Very generic top-level names in namespace `Polyplets` (`bar`, `concat`,
   `cutAt`, `maxX`, …) — no clash today; landmine.
 - Context note: the machine-checked bracket 3.95 < λ ≤ 3125/256 is strictly
-  weaker on both sides than the paper's §3 bracket (5.828 ≤ λ ≤ 9.3153,
+  weaker on both sides than the paper's §3 bracket (5.828 ≤ λ ≤ 9.3154,
   deliberately out of Lean scope); paper text must not cite `lambda_gt`/
   `lambda_le` as the §3 bounds.
 

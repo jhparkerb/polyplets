@@ -1,12 +1,33 @@
 # Upper bound on the polyplet growth constant λ
 
-> **OUTCOME (achieved below): λ ≤ 9.3153, PROVED** (exact rational Bui
+> **OUTCOME (achieved below): λ ≤ 9.3154, PROVED** (exact rational Bui
 > convolution certificate; see the BREAKTHROUGH + Certificate-Squeeze sections).
-> The two-sided rigorous bracket is **6.543 ≤ λ ≤ 9.3153** (lower side upgraded
+> The two-sided rigorous bracket is **6.543 ≤ λ ≤ 9.3154** (lower side upgraded
 > 2026-07-31 to the certified strip ladder μ₁₇, `results/strip-mu-certificates.md`;
 > at this doc's writing it was 5.828). The intro/plan/crux/
 > "Verdict" text below is the ORIGINAL pre-breakthrough scaffolding, kept as the
 > derivation record — it says "not yet done"; it was done later in this same doc.
+
+> **CORRECTION 2026-08-07, repo-wide: the headline decimal was 9.3153 and is now
+> 9.3154.** Nothing about the certificate changed and nothing downstream depended
+> on the difference; the digit was simply rounded the wrong way. What the
+> certificate proves is `λ ≤ 20000/2147 = 9.3153237…`. Rounding that to four
+> places *to nearest* gives 9.3153 — which is BELOW the true value, so
+> "λ ≤ 9.3153" asserts 3.2e-5 more than was ever proved. An upper bound has to
+> round away from the truth, so the four-decimal form is **9.3154**.
+>
+> Swept across 32 files (docs, results, experiments, `polyplets/` comments,
+> `paper/polyplets-report.tex`). Where the number appears as an *approximation*
+> rather than a bound it now reads 9.31532, so that no bare "9.3153" is left in
+> the tree to be quoted as the bound. The Lean statements were already exact
+> (`lambda ≤ 20000/2147`) and only their comments moved. Receipts and logs were
+> not touched — they record what a run printed.
+>
+> Prefer the rational `20000/2147` to any decimal in code; a live threshold in
+> `experiments/concatenation_bound_check.py` now uses it, since rounding UP there
+> would make a rival bound look useful when it is not. Caught by
+> `paper/verify_l_papers.py`, which keeps a RED control that rejects the
+> truncated form.
 
 2026-07-11. (Original intro:) There was no published or project upper bound on
 λ_polyplet (only lower: 6.475 multi-directed, 5.828 directed; estimate ~7.11).
@@ -234,7 +255,7 @@ neighbours go to the c-side, so they're empty in the `d`-piece.
   dominates every iterate, so the iteration is bounded at x and **λ ≤ 1/x** rigorously.
   RD=3: x = 2147/20000, a 5930-component certificate (max denominator 10⁶), all
   inequalities verified in exact `fractions.Fraction` arithmetic →
-  **λ ≤ 9.3153, PROVED (no floats in the chain).** (The tiny gap 9.3153 vs the
+  **λ ≤ 9.3154, PROVED (no floats in the chain).** (The tiny gap 9.3154 vs the
   numerical 9.306 is a deliberate 0.1% safety margin `eps` so the super-solution has
   room; shrink `eps` to tighten toward 9.306 at the cost of larger fixpoint values.)
   RD=2 cross-check: x = 106251/10⁶ → λ ≤ 9.4117, PASS.
@@ -265,7 +286,7 @@ neighbours go to the c-side, so they're empty in the `d`-piece.
   method's saturating slack) says 8-connectivity is genuinely worse — 8.1 is optimistic,
   not guaranteed. Reaching ~8 would need the full hand-engineered required-cell apparatus
   (needs Bui's papers, multi-session, real invalid-bound risk) for at most ~1 term and
-  never λ. **Recommendation: bank the exact λ ≤ 9.3153; do not sink multi-session effort
+  never λ. **Recommendation: bank the exact λ ≤ 9.3154; do not sink multi-session effort
   into Phase 3.** The connectivity wall is a hard floor for this method class.
 
 - So the earlier "can't beat 12.2 generically" was right about the *generic*
@@ -283,7 +304,7 @@ neighbours go to the c-side, so they're empty in the `d`-piece.
   the polyomino record 4.5252 → 4.3828 from published terms, so it is known-hard.
 
 **Verdict (updated):** the tight bound WAS derived — the king analog of Bui's
-system was hand-engineered and certificate-verified to **λ ≤ 9.3153** (see the
+system was hand-engineered and certificate-verified to **λ ≤ 9.3154** (see the
 BREAKTHROUGH + Certificate-Squeeze sections above). The verification harness is
 banked and reusable. (Original pre-breakthrough verdict: "crude 12.2 stands; a
 tight bound is not yet done" — superseded.)

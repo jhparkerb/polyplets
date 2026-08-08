@@ -152,7 +152,7 @@ no longer needs a formal warrant to ship, so P1 is now a nice-to-have.)
 
 One subject, four answers:
 
-- **6.543 ≤ λ ≤ 9.3153**, both ends machine-checkable in exact arithmetic. The
+- **6.543 ≤ λ ≤ 9.3154**, both ends machine-checkable in exact arithmetic. The
   upper end is the notable half — per `docs/proofs/polyplet-upper-bound.md`
   there was **no published upper bound on λ_polyplet at all** before it — and
   it is in Lean (`Upper/Certificate.lean` + `BuiData`), tier 2. The lower end

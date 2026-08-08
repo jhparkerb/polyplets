@@ -280,7 +280,7 @@ engines cross-validate on every shared rung) and extended:
 | 16 | 2,356,778 | 6.4985245 | **6.4984** | 4 / 106 | 3 | 225 s |
 | 17 | 6,536,381 | 6.5464870 | **6.543** | 3 / 110 | 6 | 773 s |
 
-**The certified bracket on lambda is now 6.543 <= lambda <= 9.3153** (upper:
+**The certified bracket on lambda is now 6.543 <= lambda <= 9.3154** (upper:
 Bui convolution certificate, docs/proofs/polyplet-upper-bound.md). This
 supersedes both Bacher lower bounds (3+2sqrt(2) directed, closed form; 6.4752
 multi-directed, numerical-only) — the multi-directed value is beaten by a

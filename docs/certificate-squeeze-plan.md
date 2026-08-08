@@ -7,7 +7,7 @@ certificates). Target λ ≤ 8.5; stretch λ ≤ 8.1 (the rook-gap analogy: Bui'
 
 **Status: EXECUTED 2026-07-11 through Phase 2. Phases 1–2 done; Phase 3 NOT pursued
 (measured negative — see verdict).**
-- **Phase 1 DONE:** exact rational certificate, λ ≤ 9.3153 proved in Fraction arithmetic
+- **Phase 1 DONE:** exact rational certificate, λ ≤ 9.3154 proved in Fraction arithmetic
   (`experiments/king_certificate.py`, RD=3, x=2147/20000, 5930 rationals). The banked
   bound is now machine-checkable, no floats in the chain.
 - **Phase 2 DONE:** slack audit (`experiments/king_slack.py`). Verdict: the over-count is
@@ -19,7 +19,7 @@ certificates). Target λ ≤ 8.5; stretch λ ≤ 8.1 (the rook-gap analogy: Bui'
 - **Phase 3 NOT pursued:** required-cell types (lever 2) hit the same wall; best case ~8.1
   (polyomino method's gap), and king slack grows where rook's saturates, so 8-connectivity
   is worse — 8.1 is optimistic. Multi-session + papers + invalid-bound risk for ≤1 term,
-  never λ. **Banked λ ≤ 9.3153 (exact) is the result.** Detail: docs/proofs/polyplet-upper-bound.md.
+  never λ. **Banked λ ≤ 9.3154 (exact) is the result.** Detail: docs/proofs/polyplet-upper-bound.md.
 
 --- ORIGINAL PLAN BELOW (kept for the record) ---
 

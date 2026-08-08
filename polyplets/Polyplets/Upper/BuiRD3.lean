@@ -6,10 +6,10 @@ Authors: Jason H Parker
 import Polyplets.Upper.BuiData3
 
 /-!
-# The conditional Bui upper bound at RD = 3: `lambda ≤ 20000/2147 ≈ 9.3153`
+# The conditional Bui upper bound at RD = 3: `lambda ≤ 20000/2147 ≈ 9.31532`
 
 The headline instance — the project's banked polyplet upper bound
-(`docs/proofs/polyplet-upper-bound.md`: `λ ≤ 9.3153, PROVED`), here with its
+(`docs/proofs/polyplet-upper-bound.md`: `λ ≤ 9.3154, PROVED`), here with its
 certificate side machine-checked and its combinatorial side an explicit named
 hypothesis. Same split as `Upper/BuiRD2.lean`, at the 5930-type RD = 3 system
 with rate `x = 107350/10⁶ = 2147/20000`.
@@ -44,7 +44,7 @@ def KingBuiSystemRD3Holds : Prop := buiRD3.SystemHolds
 
 /-- **Conditional headline upper bound on the polyplet growth constant**:
 `lambda ≤ 20000/2147 = 9.31532…`, given the RD=3 system hypothesis — the
-Lean rendering of the project's banked `λ ≤ 9.3153`. The certificate
+Lean rendering of the project's banked `λ ≤ 9.3154`. The certificate
 arithmetic over all 5930 rows is kernel-checked (`buiRD3_valid`). -/
 theorem lambda_le_of_bui_rd3 (h : KingBuiSystemRD3Holds) :
     lambda ≤ (20000 : ℝ) / 2147 := by

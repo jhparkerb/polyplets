@@ -174,7 +174,7 @@ Kim–Pinna 2025 — is square lattice, hypercubic, polyiamond and polycube; the
 king lattice is absent from all of it, including the 2025 concatenation paper
 that would have been the natural place. This reconfirms
 `docs/proofs/polyplet-upper-bound.md`'s standing claim rather than adding to
-it: the 9.3153 certificate has no competitor because there is no incumbent.
+it: the 9.3154 certificate has no competitor because there is no incumbent.
 
 Also checked: percolation-side sources for the king lattice (the
 next-nearest-neighbour square lattice) give perimeter polynomials and cluster
