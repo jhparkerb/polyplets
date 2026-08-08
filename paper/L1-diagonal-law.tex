@@ -105,8 +105,8 @@ any lattice of interest, and there is good reason to think none exists: the
 anisotropic generating function of the king-animal height triangle is provably
 not D-finite, and the same argument applies to polyominoes and polyhexes.\footnote{%
 Companion paper: \emph{The by-height generating function is not D-finite}.}
-Stratifying by height does not repair that. What it does is expose structure the
-row sums hide.
+Stratifying by height does not repair that; it exposes structure the row sums
+hide.
 
 Write $T(n,H)$ for the number of fixed animals with $n$ cells whose bounding box
 has height exactly $H$. The rows of this triangle are the objects one normally
@@ -169,8 +169,8 @@ translation; $T(n,H)$ counts the animals with $n$ cells occupying exactly $H$
 consecutive rows.
 \end{definition}
 
-Condition (L) is the whole of the geometric content --- it is what makes a row
-with a single cell a cut, which is Lemma~\ref{lem:sep}. Conditions (R) and (U) are finiteness bookkeeping.
+Condition (L) is the whole of the geometric content --- it makes a row with a
+single cell a cut, which is Lemma~\ref{lem:sep}. Conditions (R) and (U) are finiteness bookkeeping.
 
 \begin{example}[the three instances]
 \label{ex:instances}
@@ -194,8 +194,8 @@ literature sometimes calls this the triangular lattice --- Madras's
 gives polyhexes. \emph{Tiling by triangles} is a different object: each
 equilateral cell has three edge-neighbours, the counts are
 $2, 3, 6, 14, 36, 94, 250, 675, 1838, \dots$ = \oeis{A001420}, and OEIS files
-these polyiamonds under ``the 2-dimensional hexagonal lattice''. Two names,
-crossed. Definition~\ref{def:rowlocal} covers the first and not the second; see
+these polyiamonds under ``the 2-dimensional hexagonal lattice''.
+Definition~\ref{def:rowlocal} covers the first and not the second; see
 Section~\ref{sec:polyiamond}.
 \end{remark}
 
@@ -309,7 +309,7 @@ since by (U) there are exactly $b$ ways to place the next single cell above the
 current one; a cluster together with the walk row above it contributes
 $W_c y^{k_c} z^{\ell_c+1}$. Summing the geometric series in $S$ gives the
 identity. Uniqueness of the decomposition and invariance under $x$-translation
-are what make it exact rather than an inequality.
+make it exact rather than an inequality.
 \end{proof}
 
 For the king lattice this identity was checked against an independently
@@ -486,7 +486,7 @@ $(a_j,b_j)$ determined by the cluster weights of surplus at most $j$, such that
 
 Everything happens in $\Q[[y]]$, $y$-adically: no analysis, no convergence
 question, and --- the load-bearing feature --- no weight enumeration, so the
-proof covers all $k$ at once. We sketch the four moves; each is elementary and exact per order.
+proof covers all $k$ at once. We sketch the four steps; each is elementary and exact per order.
 
 \paragraph{Step 1: Weierstrass preparation by hand.} There is a unique pair
 $(z^*, u)$ with $z^* \in 1/b + y\Q[[y]]$, $u = \sum_j u_j(z) y^j$ with
@@ -505,8 +505,8 @@ $u^{-1}$ as a geometric series in $\sum_j (u_j/b)y^j$, the $y^k$-coefficient
 takes only $m \le k$ factors and compositions of $k$, so
 $\deg [y^k]u^{-1} \le k$. Hence for $G := E_b E_t u^{-1}$, splitting
 $k = k_b + k_t + k_u$ gives $\deg [y^k]G \le k+1$; equivalently, writing
-$G = \sum_i g_i(y) z^i$, we have $\mathrm{ord}_y(g_i) \ge i-1$. This is the fact
-that makes the resummation exact rather than asymptotic.
+$G = \sum_i g_i(y) z^i$, we have $\mathrm{ord}_y(g_i) \ge i-1$. This fact makes the
+resummation exact rather than asymptotic.
 
 \paragraph{Step 3: exactly one geometric mode.} Set $\mu := 1/z^*$. In
 $\Q[[y]][[z]]$, $(z^*-z)^{-1} = \mu\sum_m (\mu z)^m$, so

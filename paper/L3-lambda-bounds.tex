@@ -82,8 +82,8 @@ $H \le 17$ by exhibiting a nonnegative integer vector $v$ and a rational $x$
 with $M(x)v \ge v$ componentwise, checked in exact $128$-bit arithmetic with
 every rounding taken downward. This is Collatz--Wielandt in its lower half only,
 which needs neither irreducibility nor positivity. The top rung,
-$\mu_{17} \ge 6.543$, beats the best previously published lower bound --- and
-beats it with a certificate, where that value was numerical.
+$\mu_{17} \ge 6.543$, beats the best previously published lower bound, with a
+certificate where that value was numerical.
 
 The upper end has no published predecessor that we could find. Elementary
 counting gives $\lambda \le 5^5/4^4 \approx 12.2$ and, we show, cannot be pushed
@@ -351,7 +351,7 @@ $H=17$, against a vector ceiling of $96$ bits at seven decimal digits.
 Entries whose true scale sits \emph{below} the quantisation floor are clamped to
 $1$, and no few-bit increase reaches them --- verified by leaving the width at
 $96$ and at $100$ and getting identical certified numerators, and again after
-adding an eigenvector polish phase. The lever with teeth is the number of
+adding an eigenvector polish phase. The lever that works is the number of
 decimal digits: a smaller denominator frees accumulator headroom for more vector
 bits, since the cap is $126 - 6 - \log_2(10^{\mathit{digits}})$. Digits $6$, $4$
 and $3$ buy widths $100$, $106$ and $110$, and at $H = 15$ and $H = 16$ that
@@ -365,7 +365,7 @@ need at least $192$-bit accumulators. We did not pursue it, because each further
 rung buys about $+0.05$ toward $\lambda \approx 7.11$, and $H = 18$ needs roughly
 $35$~GB of transient build memory.
 
-The behaviour under deliberate crippling is the reassuring measurement here.
+Deliberate crippling measures the flooring loss directly.
 Forcing the width down to $55$ bits at $H = 10$ --- so the smallest entry becomes
 about $2^{10}$ instead of $2^{51}$ --- makes the first candidate fail at four
 states with a minimum ratio of $0.99994$: the binding state is short by
@@ -522,7 +522,7 @@ $d$. The $d$-empty branch is an \emph{exact} partition --- animals of type $T$
 with $d$ empty are exactly the animals of type $T'$ --- and the $d$-occupied
 branch is a valid split over-count.
 
-Two details are what make \eqref{eq:split} beat the generic version, and both
+Two details make \eqref{eq:split} beat the generic version, and both
 were the difference between $12.5$ and $9.3$:
 \begin{enumerate}
 \item multi-neighbour cases stay \emph{convolutions}, preserving both pieces,
@@ -621,8 +621,8 @@ term between $n = 7$ and $n = 8$. A purely \emph{local} over-count would be
 constant in $n$; growth means the over-count \emph{accumulates with animal
 size}. That is the distant-overlap signature: in $\varphi_{T'}\varphi_D$ the
 $d$-piece and the other side may wrap around and collide arbitrarily far from
-the cut, and no finite window can forbid it. The same wall is what saturated the
-window lever in Table~\ref{tab:rd}.
+the cut, and no finite window can forbid it. The same wall saturated the window
+lever in Table~\ref{tab:rd}.
 
 \paragraph{The anchor is clean.} $G_8(n)/a(n) = 1.0, 1.0, 1.1, 1.23, 1.36, 1.50,
 1.63$ for $n = 1,\dots,7$: growing, but only as fast as the polynomial prefactor
@@ -677,7 +677,7 @@ For scale, the corresponding polyomino problem has been worked on for fifty
 years: Klarner and Rivest's method~\cite{klarnerRivest1973} gives $4.65$, pushed
 by Barequet and Shalah to $4.5252$, against a true value near $4.0626$ and a
 proved lower bound above $4$~\cite{barequetRoteShalah2016}. Our $31\%$ upper gap
-against their $11\%$ is the eight-neighbour penalty made quantitative.
+against their $11\%$ quantifies the eight-neighbour penalty.
 
 \begin{openproblem}[the real target]
 Bring the upper bound below $8$, or below $7.5$. \S\ref{sec:gap} says the levers
