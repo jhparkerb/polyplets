@@ -1,0 +1,140 @@
+> **NOTE: authored by Claude at jasonp's direction, 2026-08-07.** This is the
+> working agreement for a review campaign, not a result.
+
+# The L-paper trim campaign
+
+Two agents argue about every line of the six L papers. One argues for removal,
+one argues for retention, and neither of them touches a `.tex` file. This
+directory is where the argument happens.
+
+jasonp's rule, stated at the outset:
+
+> One agent will make an argument to remove sections, results, paragraphs,
+> sentences, words (in that order) and the other agent will accept that as a
+> principled argument and react accordingly depending on whether it can
+> successfully argue to retain the content. In no case shall the document get
+> larger except temporarily.
+
+## The two roles
+
+**CUTTER.** Proposes removals, and must argue for each one. "This is verbose"
+is not an argument; the argument names what the reader loses and why that is
+worth less than the space. The cutter has no quota — it is not trying to hit a
+percentage, and a phase in which it proposes nothing for a given paper is a
+legitimate outcome.
+
+**DEFENDER.** Reads every proposal as a principled argument made in good faith,
+and concedes the ones it cannot beat. Conceding is the expected case, not a
+failure; the defender is not the papers' lawyer, it is the reader's. Its
+rebuttals name the specific reader who is harmed and the specific thing that
+reader can no longer do.
+
+Neither agent edits a manuscript. They read the papers and they write the
+ledger files below. Application is a separate, single-writer step, so that two
+agents can never hold the same file open.
+
+## The ladder, and what a phase is
+
+Five phases, in this order, each one covering all six papers before the next
+begins. **One pass per level — the cutter proposes once, the defender answers
+once, the adjudicator rules, the edits land, the phase commits.** No iteration
+inside a phase.
+
+| phase | granularity |
+|---|---|
+| 1 | sections |
+| 2 | results — theorems, propositions, lemmas, corollaries, remarks |
+| 3 | paragraphs |
+| 4 | sentences |
+| 5 | words and phrases within a sentence |
+
+Each phase is one commit covering all six papers, so that a mistake can be
+located in time and reverted whole. That is the entire reason for the phase
+structure and it is why no phase may be split or merged.
+
+## Adjudication
+
+Claude adjudicates, **with a slight bias toward removal**: where the defence is
+arguable but not decisive, the content goes. A decisive defence is one that
+names a concrete loss — a step of a proof that stops following, a number a
+reader cannot reproduce, a hypothesis that stops being checkable. A defence
+that appeals to tone, symmetry, completeness-for-its-own-sake, or "a reader
+might wonder" is not decisive.
+
+Contested rulings are logged in `phase-N-verdict.md` with the reasoning, so
+that jasonp can overturn any one of them by reading a single file.
+
+## What is off limits
+
+These are not open to argument. The cutter may not propose them and a proposal
+that reaches them is a bug in the campaign, not a close call.
+
+1. **The disclosure blocks.** `\Ldisclosure` and its per-result verification
+   ledger, in every paper. The ledger is required to be per result and not in
+   aggregate (`docs/publication-split.md` §1); shortening it *is* aggregating
+   it. Compressing a ledger entry is removing a disclosure.
+2. **The draft banners**, including L2's novelty-unchecked banner and L6's
+   compute-gated banner. Those two banners are the reason those two papers are
+   safe to have written at all.
+3. **Attribution.** L5's Gouyou-Beauchamps and Leroux citations, in all three
+   places (`docs/publication-split.md` §5, N3 collision). Attribution is never
+   redundant, no matter how many times the same name appears.
+4. **Results that another paper cites.** L1's universal law (cited by P2) and
+   L3's λ bracket, 6.543 ≤ λ ≤ 9.3154 (cited by P3). Their statements stay and
+   their constants stay exact.
+5. **Every file outside the six.** `technical-report.tex` is jasonp's prose and
+   is read-only to the machine. `polyplets-report.tex`, `shared/`, and
+   `verify_l_papers.py` are out of scope. `scripts/l_trim_gate.sh` enforces
+   this with checksums.
+
+## Standing defences the defender should raise, and the cutter should expect
+
+Not immunities — arguments that usually win, drawn from what this project has
+already learned about pruning its own prose.
+
+- **Evidence and closed doors survive.** A measurement that warrants a claim,
+  and a record of an approach that was tried and failed, are the two things
+  that cannot be recovered by re-deriving them later. Prune the claim, not its
+  warrant.
+- **Exact constants survive verbatim.** λ ≤ 9.3154 is not 9.3153 and is not
+  "about 9.32". `verify_l_papers.py` checks 318 of these and will block the
+  commit, but the argument should never get that far.
+- **A hedge that scopes a claim is load-bearing.** "at order and degree ≤ 24 on
+  700 terms" is not padding around "not D-finite"; it is the difference between
+  a measurement and a false theorem.
+
+And the standing cuts the cutter should look for first:
+
+- **Aphoristic closers.** A section that ends by restating its own point in a
+  more memorable way ends one sentence too late. Same for the paired-dash aside
+  that exists for rhythm.
+- **Restatement across the seam.** A result stated in the introduction, again
+  before its proof, and again in the conclusion, is stated twice too often.
+- **Scaffolding prose.** "In this section we will", "It is worth noting that",
+  "Before proceeding, observe that". The paper is not a lecture.
+
+## Files in this directory
+
+| file | written by | contents |
+|---|---|---|
+| `PROTOCOL.md` | — | this file, the working agreement |
+| `baseline.tsv` | `l_trim_gate.sh baseline` | pre-campaign word counts and frozen-file checksums |
+| `phase-N-cuts.md` | CUTTER | numbered proposals, each with file, anchor, verbatim excerpt, argument |
+| `phase-N-defense.md` | DEFENDER | one verdict per proposal: CONCEDE or RETAIN, with the argument |
+| `phase-N-verdict.md` | Claude | the ruling on each proposal, and what was applied |
+
+A proposal is identified as `PN.paper.k` — `P3.L5.7` is the seventh paragraph
+proposal against L5. The identifier is stable across all three files so that a
+line in the verdict can be traced back to the argument that produced it.
+
+## The commit gate
+
+`scripts/l_trim_gate.sh check N` runs before every phase commit and blocks it
+on any of five failures: a paper that does not compile, an undefined `\ref` or
+`\cite` anywhere in a log, a `verify_l_papers.py` failure, a paper that grew in
+words since baseline, or a frozen file that changed. All three of the checks
+that can catch a silent error — growth, frozen-file modification, and dangling
+references — were RED-tested against deliberate breakage before the campaign
+started.
+
+Nothing in this campaign is pushed. Publishing is jasonp's call.
