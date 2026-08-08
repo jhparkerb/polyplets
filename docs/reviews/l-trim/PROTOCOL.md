@@ -113,6 +113,50 @@ And the standing cuts the cutter should look for first:
 - **Scaffolding prose.** "In this section we will", "It is worth noting that",
   "Before proceeding, observe that". The paper is not a lecture.
 
+## Amendments — 2026-08-07, after phase 2's adjudication, before its application
+
+Adopted at jasonp's direction after the first running of this campaign produced
+a history that misstated itself: a five-concern commit titled for one of them,
+a STATE file describing gate checks that did not yet exist, a verdict deferring
+a repair inside the commit that performed it. The branch was rebuilt to remove
+those mistakes; these rules exist so it stays removed.
+
+1. **Confidence in a checker is a demonstrated kill, never a count.** "All N
+   checks passed" is the fallacy the substring bug lived behind — 318 also
+   "passed" while six of twelve corruptions sailed through. A check is trusted
+   only if a specific corruption has been watched turning it red: a RED control
+   corrupting the computed value for a recomputation check, a manuscript
+   mutation for a text check. The kill matrix in `tests/gate_l_paper_verifier.py`
+   pairs every check site in `verify_l_papers.py` with its kill; a site nothing
+   can turn red is vacuous, and is a finding that triggers the documented
+   unfreeze procedure, not a quiet patch. Gates and ledgers quote kill rates;
+   a bare pass-count is never cited as confidence.
+
+2. **Commit discipline.** One concern per commit. A phase's ledgers, applier,
+   edits and STATE update land in one commit. An out-of-band repair gets its
+   own commit, placed before the phase that depends on it. No committed file
+   may state something false about the tree it sits in — STATE.md describes
+   the commit that contains it, never a hoped-for future.
+
+3. **Anchors are content-addressed.** The verbatim excerpt is the authority;
+   line numbers are advisory. An applier asserts on every expected text before
+   writing anything, and a single failed assertion writes nothing at all
+   (the `apply-phase-1.py` model). The verdict, not the cuts file, is the
+   authority on what text ships.
+
+4. **Context hygiene.** The cutter, defender and adjudicator run as fresh
+   subagents that read PROTOCOL, the papers and the prior ledgers from disk,
+   write only their own ledger file, and return a summary of at most 20 lines.
+   The driving session never loads paper contents or the cuts/defense files
+   into its own context: it reads verdicts, runs the applier and the gate, and
+   commits. STATE.md is the resume state; no agent is kept alive to be
+   "resumed by message". Model policy, jasonp's direction of 2026-08-07:
+   every campaign agent runs on Fable.
+
+5. **No load-bearing counts in this file.** Numbers that drift as the campaign
+   runs — check counts, word totals — live in the ledgers and in STATE.md,
+   stamped with the phase at which they were measured.
+
 ## Files in this directory
 
 | file | written by | contents |
