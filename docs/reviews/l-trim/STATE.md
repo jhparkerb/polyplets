@@ -20,7 +20,8 @@ in PROTOCOL's Amendments section.
 | `3bf970c` | PROTOCOL amendments 1–5; STATE rewritten |
 | `302f862` | kill matrix — 45/45 killable ok-sites killed, 28 corruption runs; **found `l6.odd-attain` vacuous** |
 | `6b9ffef` | second documented unfreeze — `l6.odd-attain` repaired to quantify over the census, 46/46 |
-| *(this commit)* | phase 2 — twelve results rulings applied, all six papers; 33,411 → 32,935 words (−1.4% this phase, −5.2% from baseline) |
+| `20bb8a2` | phase 2 — twelve results rulings applied; 33,411 → 32,935 words |
+| *(this commit)* | phase 3 — sixteen paragraph rulings applied, all six papers; 32,935 → 31,988 words (−2.9% this phase, −8.0% from baseline) |
 
 The five `pw.*`/`a308.linear-ctrl` sites the matrix marks VACUOUS are closed
 integer arithmetic over literals inside the frozen file — no reachable input,
@@ -28,14 +29,17 @@ the freeze checksum is their guard, by design; recorded, not repaired.
 
 ## Next, in order
 
-1. **Phases 3, 4, 5** — paragraphs, sentences, words. Per phase: fresh Fable
-   cutter, defender, adjudicator writing the three ledgers and the applier;
-   the driving session runs applier + gate and makes the phase's one commit.
+1. **Phases 4, 5** — sentences, then words. Per phase: fresh Fable cutter,
+   defender, adjudicator writing the three ledgers and the applier; the
+   driving session runs applier + gate and makes the phase's one commit.
+   Phase-4 leads deferred by the phase-3 cutter are listed in that cuts
+   file's "not brought" section; `rem:newton` is a defined, unreferenced
+   label carried to phase 5 (phase-3 verdict, Carried forward).
 
 ## Standing cautions
 
-- Three pinned constants occur exactly once, at **L1:468**, **L4:329**,
-  **L5:340** (line numbers valid post-phase-2). A phase going near them must
+- Three pinned constants occur exactly once, at **L1:444**, **L4:320**,
+  **L5:340** (line numbers valid post-phase-3). A phase going near them must
   relocate the literal first or gate check 6 blocks the commit.
 - `verify_l_papers.py` is frozen (checksum in `baseline.tsv`). Its stale
   comment at `:273` ("the paper says ~2.7 per level") and L5's outdated header

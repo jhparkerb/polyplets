@@ -121,30 +121,6 @@ degree $k$ with $T(H+k,H) = q_k(H)\,b^H$ for all $H \ge k+1$, where $b$ counts
 the ways of stepping from a row to the next.
 \end{quote}
 
-Three things about that statement are worth flagging before the proof.
-
-\paragraph{The onset is proved, not fitted.} $H \ge k+1$ --- equivalently
-$n \ge 2k+1$ in the other coordinate --- comes out of the argument, as exactly
-the reach of a correction polynomial whose degree is bounded by a triviality
-about cluster rows. It is not read off data and then hoped for. This is what
-makes the law useful as a \emph{tool}: because the degree is $\le k$ and the
-onset is $\ge k+1$, any $k+1$ enumerated in-onset values determine $q_k$
-outright, and every further value is a theorem rather than a test.
-
-\paragraph{The class, not the lattice, is the object.} The proof never uses
-$b=3$, or symmetry of the step set, or any arithmetic particular to a lattice.
-The square lattice is the degenerate case $b=1$; polyhexes are $b=2$; king
-animals are $b=3$. Getting all three from one argument is not economy for its own
-sake --- it is what makes the mod-$p$ result of Section~\ref{sec:spine} possible,
-since there the lattice's only contributions are a prime and a scalar.
-
-\paragraph{Where it stops is informative.} Polyiamonds are not in the class, and
-for a reason that is easy to state: a triangular cell's three neighbours depend
-on whether the triangle points up or down, so the adjacency is not
-translation-invariant and there is no single step set to count. The law
-nevertheless appears to hold with a period-2 correction. We report that as data
-(Section~\ref{sec:polyiamond}) and do not dress it as a theorem.
-
 \subsection{Relation to existing work}
 \label{sec:priorart}
 
@@ -760,10 +736,6 @@ returns it coefficient for coefficient. And the square $k=3$ row can be checked
 against A308359's own printed triangle with no computation at all: it gives
 $282$ at $n=7$ and $638$ at $n=8$, which are that entry's values.
 
-Coefficients are rational rather than integral, which is the shape
-Remark~\ref{rem:newton} predicts: $k!\,P_k \in \Z[n]$, and
-$\tfrac{32}{3}\cdot 3! = 64$.
-
 \section{A conjecture of A308359}
 \label{sec:a308359}
 
@@ -805,11 +777,6 @@ Two controls, both of which must fail, and do
 \item the formula must \emph{fail} at $n = 2k = 4$, since the onset is sharp ---
   $T(4,2) = 9$ where the quadratic says $10$ --- or the onset is not under test.
 \end{itemize}
-
-Two things are worth noting beyond the corollary itself. The onset in the
-conjecture, ``$n \ge 5$'', was presumably read off data; Theorem~\ref{thm:A}
-gives $2k+1$ for every $k$, proved, which is where the next diagonals of that
-entry come from --- rows 3 and 4 of Table~\ref{tab:machine}.
 
 \section{Where the theorem stops: polyiamonds}
 \label{sec:polyiamond}

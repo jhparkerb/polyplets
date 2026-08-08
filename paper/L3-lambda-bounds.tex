@@ -229,12 +229,6 @@ $M(\mathit{den}/\mathit{num})\,v \ge v$ holds componentwise in exact integer
 arithmetic.
 \end{definition}
 
-The point of insisting on this is that a power iteration is not a proof. Re-run a
-bisection over a power iteration on another machine and one gets a different set
-of last digits, with no artifact anyone can audit. A certificate replaces the
-whole chain with a finite object and a finite integer computation, and anyone can
-re-run the second part.
-
 \subsection{The certified ladder}
 
 \begin{theorem}
@@ -491,9 +485,6 @@ functional-equation trick~\cite{klarnerRivest1973} exists to handle.
 
 \subsection{The generic decomposition is worse than the crude bound}
 
-Before the method that worked, the method that did not, since the reason is
-instructive.
-
 A generic twig decomposition was built and verified against brute force: the
 enumerator reproduces \oeis{A006770}; the base fact
 $a(n) \le G_8(n) \le n\,a(n)$ holds, where $G_8$ counts animals with a marked
@@ -690,11 +681,6 @@ elementary counting & $\lambda \le 12.2$ & closed form & this paper, Prop.~\ref{
 finite objects a reader can re-check.}
 \label{tab:compare}
 \end{table}
-
-The certified $6.543$ supersedes both of Bacher's lower bounds, and it is worth
-being precise about the sense in which it does: the multi-directed $6.4752$ is a
-numerical value, and $6.543$ is the first value we know of to beat it with a
-certificate.
 
 For scale, the corresponding polyomino problem has been worked on for fifty
 years: Klarner and Rivest's method~\cite{klarnerRivest1973} gives $4.65$, pushed
