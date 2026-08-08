@@ -79,7 +79,7 @@ thing** — they are `tail --pid` over ssh and do not survive a session change.
 
 | box | job | PID to watch | state at 18:09 |
 |---|---|---|---|
-| ayr | `scripts/ayr_pmin48.sh` → square8 min-end p=48, tmux `0:pmin48`, log `results/ayr_pmin48.runlog` | 2261 | 117 of 121 frames complete in 7 min; the 4 that remain (W=10 H=10/11/12, W=11 H=11) are the giants and are where the hours are |
+| ayr | `scripts/ayr_pmin48.sh` → square8 min-end p=48, tmux `0:pmin48`, log `results/ayr_pmin48.runlog` | 2261 | **DONE 2026-08-07 22:12 UTC** — `AYR_PMIN48_DONE`, 121/121 frames, census `results/perimmin_square8_p48_r6.txt` (1526 rows) identical on ayr and here by sha256; script and runlog committed 2026-08-08 |
 | dalby | `scripts/dalby_square4_deep.sh` → square4 min-end deep boxes, tmux `0:j7w17` | 2423184 | W=15 r8 done (`1 4 18 60 187 524 1388 3452 8193`); on W=17 r8 since 14:29 EDT |
 | dalby | `dalby_perimeter_defect_pool.sh square8 78 6`, tmux `0:pdk6big` | 2420612 (stage 1) | all 456 shards dispatched, a couple still running. **Stage 2 (`square4 78 6`) starts automatically after**, then `STAGE2_ALLDONE` and a `sleep 86400` — so watch 2420612, not the outer 2420610, and re-arm on stage 2 |
 
@@ -91,7 +91,7 @@ is at 3b7359d. gympie has f333ec1 and 840885c on top of it; ayr has 78ec1cd and
 6fb3f39 on top of it. Neither is pushed, deliberately — a push runs the full
 gate suite and would steal cores from the census. Reconcile after the runs land.
 
-## LIVE JOB — ayr, king min-end census at p=48 (2026-08-07 18:01 EDT)
+## LANDED — ayr, king min-end census at p=48 (started 2026-08-07 18:01 EDT, done 22:12 UTC)
 `scripts/ayr_pmin48.sh`, tmux `0:pmin48`, driver PID 2261, log
 `results/ayr_pmin48.runlog`. Feeds the minimum end of
 `results/perimeter-both-ends.md` — the king partner to the square4 deep boxes

@@ -50,8 +50,9 @@ verdict. Nothing is pushed; publishing is jasonp's call.
 
 ## Open, and not this campaign's to fix
 
-- `make gates` red on `gate-citations`: five citations to ayr_pmin48 paths
-  from `fb5a0d4`/`f333ec1`, earlier on 2026-08-07, files untouched here.
+- ~~`make gates` red on `gate-citations`~~ FIXED post-campaign, 2026-08-08:
+  the cited `scripts/ayr_pmin48.sh` and `results/ayr_pmin48.runlog` existed
+  only on ayr; committed after the run landed (`AYR_PMIN48_DONE`, 121/121).
 - **L5 `tab:perim` row 3** states a dir4-by-area exclusion verdict nothing in
   L5 warrants (`sec:exclusions` tests the HV-convex king series and the
   polyomino control, never dir4). Carried from phase 1's verdict.

@@ -1,0 +1,462 @@
+=== ayr p48 restart, threads=32, 2026-08-07T18:01:26-04:00
+=== [1/3] gates
+./scripts/perimeter_min_gate.sh
+== square8 (king) vs results/siteperim_square8_n14.txt
+  33 (n,p) cells agree, p<=18 n<=14
+== square4 (rook, rotated frame) vs results/siteperim_square4_n20.txt
+  52 (n,p) cells agree, p<=14 n<=20
+== tri6 (hex, 3-functional hexagonal hull) vs results/siteperim_tri6_n12.txt
+  35 (n,p) cells agree, p<=16 n<=12
+== RED control: square4 enumeration vs the KING census (must mismatch)
+  fired as expected (square4 != square8)
+== wide box: square4 W=17 (145 cells) must enumerate, not be skipped
+  # box W=17 H=17 parity=0 slo=0 shi=32 pbox=36 cells=145 mult=1 free: 1 4 18
+  ok  145-cell frame enumerated, free prefix is phi_2^4
+== RED control: a frame over the mask limit must fail closed, not silently
+  fired as expected (refused, with a reason)
+== check D: --only sharded == --only unsharded
+  ok  square4 W=9 H=9 parity=0 rmax=5
+  ok  square4 W=11 H=11 parity=0 rmax=4
+  ok  square8 W=7 H=7 parity=-1 rmax=4
+== RED control: check D must notice a real difference
+  fired as expected (rmax=5 != rmax=4)
+GATE PASSED
+./scripts/perimeter_min_shard_gate.sh
+== square8 pmax=20 rmax=6: sharded+merged == monolithic
+  identical (92 rows)
+== square4 pmax=14 rmax=6: sharded+merged == monolithic
+  identical (83 rows)
+== resume: a finished census re-runs zero frames and is unchanged
+  0 frames re-run
+  output unchanged
+== RED: a frame with no trailer is redone, not trusted
+  redone as required
+  census restored identically
+== RED: an empty frame file is redone, not trusted
+  redone as required
+  census restored identically
+== RED: the merge refuses a missing frame instead of undercounting
+  refused: perimeter_min_merge: frame f_3_5_-1.txt missing -- the run is not finished, refusing to merge a partial census
+== RED: the merge refuses a frame that disagrees with the plan
+  refused: perimeter_min_merge: frame f_3_5_-1.txt disagrees with the plan on cells (999 vs 15)
+== RED control: dropping the transpose multiplicity must break equivalence
+  fired as expected (mult matters)
+GATE PASSED
+=== [2/3] reproduction check: sharded p=40 vs the banked census
+=== square8 pmax=40 rmax=6 threads=32 -> results/pmin_square8_p40_r6.frames  (2026-08-07T22:01:28Z)
+--- plan: 81 frames
+--- [1/81] W=1 H=1 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=1 parity=-1 slo=0 shi=0 pbox=8 cells=1 mult=1 free: 1
+--- [2/81] W=1 H=2 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=2 parity=-1 slo=0 shi=1 pbox=10 cells=2 mult=1 free: 1
+--- [3/81] W=1 H=3 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=3 parity=-1 slo=0 shi=2 pbox=12 cells=3 mult=1 free: 1
+--- [4/81] W=1 H=4 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=4 parity=-1 slo=0 shi=3 pbox=14 cells=4 mult=1 free: 1
+--- [5/81] W=1 H=5 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=5 parity=-1 slo=0 shi=4 pbox=16 cells=5 mult=1 free: 1
+--- [6/81] W=1 H=6 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=6 parity=-1 slo=0 shi=5 pbox=18 cells=6 mult=1 free: 1
+--- [7/81] W=1 H=7 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=7 parity=-1 slo=0 shi=6 pbox=20 cells=7 mult=1 free: 1
+--- [8/81] W=1 H=8 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=8 parity=-1 slo=0 shi=7 pbox=22 cells=8 mult=1 free: 1
+--- [9/81] W=1 H=9 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=9 parity=-1 slo=0 shi=8 pbox=24 cells=9 mult=1 free: 1
+--- [10/81] W=1 H=10 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=10 parity=-1 slo=0 shi=9 pbox=26 cells=10 mult=1 free: 1
+--- [11/81] W=1 H=11 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=11 parity=-1 slo=0 shi=10 pbox=28 cells=11 mult=1 free: 1
+--- [12/81] W=1 H=12 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=12 parity=-1 slo=0 shi=11 pbox=30 cells=12 mult=1 free: 1
+--- [13/81] W=1 H=13 parity=-1  (2026-08-07T22:01:28Z)
+# box W=1 H=13 parity=-1 slo=0 shi=12 pbox=32 cells=13 mult=1 free: 1
+--- [14/81] W=1 H=14 parity=-1  (2026-08-07T22:01:29Z)
+# box W=1 H=14 parity=-1 slo=0 shi=13 pbox=34 cells=14 mult=1 free: 1
+--- [15/81] W=1 H=15 parity=-1  (2026-08-07T22:01:29Z)
+# box W=1 H=15 parity=-1 slo=0 shi=14 pbox=36 cells=15 mult=1 free: 1
+--- [16/81] W=1 H=16 parity=-1  (2026-08-07T22:01:29Z)
+# box W=1 H=16 parity=-1 slo=0 shi=15 pbox=38 cells=16 mult=1 free: 1
+--- [17/81] W=1 H=17 parity=-1  (2026-08-07T22:01:29Z)
+# box W=1 H=17 parity=-1 slo=0 shi=16 pbox=40 cells=17 mult=1 free: 1
+--- [18/81] W=2 H=2 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=2 parity=-1 slo=0 shi=2 pbox=12 cells=4 mult=1 free: 1 4 2
+--- [19/81] W=2 H=3 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=3 parity=-1 slo=0 shi=3 pbox=14 cells=6 mult=1 free: 1 4 8 4
+--- [20/81] W=2 H=4 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=4 parity=-1 slo=0 shi=4 pbox=16 cells=8 mult=1 free: 1 4 8 12 6
+--- [21/81] W=2 H=5 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=5 parity=-1 slo=0 shi=5 pbox=18 cells=10 mult=1 free: 1 4 8 12 16 8
+--- [22/81] W=2 H=6 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=6 parity=-1 slo=0 shi=6 pbox=20 cells=12 mult=1 free: 1 4 8 12 16 20 10
+--- [23/81] W=2 H=7 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=7 parity=-1 slo=0 shi=7 pbox=22 cells=14 mult=1 free: 1 4 8 12 16 20 24
+--- [24/81] W=2 H=8 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=8 parity=-1 slo=0 shi=8 pbox=24 cells=16 mult=1 free: 1 4 8 12 16 20 24
+--- [25/81] W=2 H=9 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=9 parity=-1 slo=0 shi=9 pbox=26 cells=18 mult=1 free: 1 4 8 12 16 20 24
+--- [26/81] W=2 H=10 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=10 parity=-1 slo=0 shi=10 pbox=28 cells=20 mult=1 free: 1 4 8 12 16 20 24
+--- [27/81] W=2 H=11 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=11 parity=-1 slo=0 shi=11 pbox=30 cells=22 mult=1 free: 1 4 8 12 16 20 24
+--- [28/81] W=2 H=12 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=12 parity=-1 slo=0 shi=12 pbox=32 cells=24 mult=1 free: 1 4 8 12 16 20 24
+--- [29/81] W=2 H=13 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=13 parity=-1 slo=0 shi=13 pbox=34 cells=26 mult=1 free: 1 4 8 12 16 20 24
+--- [30/81] W=2 H=14 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=14 parity=-1 slo=0 shi=14 pbox=36 cells=28 mult=1 free: 1 4 8 12 16 20 24
+--- [31/81] W=2 H=15 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=15 parity=-1 slo=0 shi=15 pbox=38 cells=30 mult=1 free: 1 4 8 12 16 20 24
+--- [32/81] W=2 H=16 parity=-1  (2026-08-07T22:01:29Z)
+# box W=2 H=16 parity=-1 slo=0 shi=16 pbox=40 cells=32 mult=1 free: 1 4 8 12 16 20 24
+--- [33/81] W=3 H=3 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=3 parity=-1 slo=0 shi=4 pbox=16 cells=9 mult=1 free: 1 4 14 24 29 16 2
+--- [34/81] W=3 H=4 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=4 parity=-1 slo=0 shi=5 pbox=18 cells=12 mult=1 free: 1 4 14 32 57 68 66
+--- [35/81] W=3 H=5 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=5 parity=-1 slo=0 shi=6 pbox=20 cells=15 mult=1 free: 1 4 14 32 67 104 134
+--- [36/81] W=3 H=6 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=6 parity=-1 slo=0 shi=7 pbox=22 cells=18 mult=1 free: 1 4 14 32 67 116 178
+--- [37/81] W=3 H=7 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=7 parity=-1 slo=0 shi=8 pbox=24 cells=21 mult=1 free: 1 4 14 32 67 116 192
+--- [38/81] W=3 H=8 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=8 parity=-1 slo=0 shi=9 pbox=26 cells=24 mult=1 free: 1 4 14 32 67 116 192
+--- [39/81] W=3 H=9 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=9 parity=-1 slo=0 shi=10 pbox=28 cells=27 mult=1 free: 1 4 14 32 67 116 192
+--- [40/81] W=3 H=10 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=10 parity=-1 slo=0 shi=11 pbox=30 cells=30 mult=1 free: 1 4 14 32 67 116 192
+--- [41/81] W=3 H=11 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=11 parity=-1 slo=0 shi=12 pbox=32 cells=33 mult=1 free: 1 4 14 32 67 116 192
+--- [42/81] W=3 H=12 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=12 parity=-1 slo=0 shi=13 pbox=34 cells=36 mult=1 free: 1 4 14 32 67 116 192
+--- [43/81] W=3 H=13 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=13 parity=-1 slo=0 shi=14 pbox=36 cells=39 mult=1 free: 1 4 14 32 67 116 192
+--- [44/81] W=3 H=14 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=14 parity=-1 slo=0 shi=15 pbox=38 cells=42 mult=1 free: 1 4 14 32 67 116 192
+--- [45/81] W=3 H=15 parity=-1  (2026-08-07T22:01:29Z)
+# box W=3 H=15 parity=-1 slo=0 shi=16 pbox=40 cells=45 mult=1 free: 1 4 14 32 67 116 192
+--- [46/81] W=4 H=4 parity=-1  (2026-08-07T22:01:29Z)
+# box W=4 H=4 parity=-1 slo=0 shi=6 pbox=20 cells=16 mult=1 free: 1 4 14 40 85 156 226
+--- [47/81] W=4 H=5 parity=-1  (2026-08-07T22:01:29Z)
+# box W=4 H=5 parity=-1 slo=0 shi=7 pbox=22 cells=20 mult=1 free: 1 4 14 40 95 192 342
+--- [48/81] W=4 H=6 parity=-1  (2026-08-07T22:01:29Z)
+# box W=4 H=6 parity=-1 slo=0 shi=8 pbox=24 cells=24 mult=1 free: 1 4 14 40 95 204 386
+--- [49/81] W=4 H=7 parity=-1  (2026-08-07T22:01:29Z)
+# box W=4 H=7 parity=-1 slo=0 shi=9 pbox=26 cells=28 mult=1 free: 1 4 14 40 95 204 400
+--- [50/81] W=4 H=8 parity=-1  (2026-08-07T22:01:29Z)
+# box W=4 H=8 parity=-1 slo=0 shi=10 pbox=28 cells=32 mult=1 free: 1 4 14 40 95 204 400
+--- [51/81] W=4 H=9 parity=-1  (2026-08-07T22:01:29Z)
+# box W=4 H=9 parity=-1 slo=0 shi=11 pbox=30 cells=36 mult=1 free: 1 4 14 40 95 204 400
+--- [52/81] W=4 H=10 parity=-1  (2026-08-07T22:01:29Z)
+# box W=4 H=10 parity=-1 slo=0 shi=12 pbox=32 cells=40 mult=1 free: 1 4 14 40 95 204 400
+--- [53/81] W=4 H=11 parity=-1  (2026-08-07T22:01:29Z)
+# box W=4 H=11 parity=-1 slo=0 shi=13 pbox=34 cells=44 mult=1 free: 1 4 14 40 95 204 400
+--- [54/81] W=4 H=12 parity=-1  (2026-08-07T22:01:29Z)
+# box W=4 H=12 parity=-1 slo=0 shi=14 pbox=36 cells=48 mult=1 free: 1 4 14 40 95 204 400
+--- [55/81] W=4 H=13 parity=-1  (2026-08-07T22:01:30Z)
+# box W=4 H=13 parity=-1 slo=0 shi=15 pbox=38 cells=52 mult=1 free: 1 4 14 40 95 204 400
+--- [56/81] W=4 H=14 parity=-1  (2026-08-07T22:01:30Z)
+# box W=4 H=14 parity=-1 slo=0 shi=16 pbox=40 cells=56 mult=1 free: 1 4 14 40 95 204 400
+--- [57/81] W=5 H=5 parity=-1  (2026-08-07T22:01:30Z)
+# box W=5 H=5 parity=-1 slo=0 shi=8 pbox=24 cells=25 mult=1 free: 1 4 14 40 105 228 458
+--- [58/81] W=5 H=6 parity=-1  (2026-08-07T22:01:30Z)
+# box W=5 H=6 parity=-1 slo=0 shi=9 pbox=26 cells=30 mult=1 free: 1 4 14 40 105 240 502
+--- [59/81] W=5 H=7 parity=-1  (2026-08-07T22:01:30Z)
+# box W=5 H=7 parity=-1 slo=0 shi=10 pbox=28 cells=35 mult=1 free: 1 4 14 40 105 240 516
+--- [60/81] W=5 H=8 parity=-1  (2026-08-07T22:01:30Z)
+# box W=5 H=8 parity=-1 slo=0 shi=11 pbox=30 cells=40 mult=1 free: 1 4 14 40 105 240 516
+--- [61/81] W=5 H=9 parity=-1  (2026-08-07T22:01:30Z)
+# box W=5 H=9 parity=-1 slo=0 shi=12 pbox=32 cells=45 mult=1 free: 1 4 14 40 105 240 516
+--- [62/81] W=5 H=10 parity=-1  (2026-08-07T22:01:31Z)
+# box W=5 H=10 parity=-1 slo=0 shi=13 pbox=34 cells=50 mult=1 free: 1 4 14 40 105 240 516
+--- [63/81] W=5 H=11 parity=-1  (2026-08-07T22:01:31Z)
+# box W=5 H=11 parity=-1 slo=0 shi=14 pbox=36 cells=55 mult=1 free: 1 4 14 40 105 240 516
+--- [64/81] W=5 H=12 parity=-1  (2026-08-07T22:01:31Z)
+# box W=5 H=12 parity=-1 slo=0 shi=15 pbox=38 cells=60 mult=1 free: 1 4 14 40 105 240 516
+--- [65/81] W=5 H=13 parity=-1  (2026-08-07T22:01:32Z)
+# box W=5 H=13 parity=-1 slo=0 shi=16 pbox=40 cells=65 mult=1 free: 1 4 14 40 105 240 516
+--- [66/81] W=6 H=6 parity=-1  (2026-08-07T22:01:33Z)
+# box W=6 H=6 parity=-1 slo=0 shi=10 pbox=28 cells=36 mult=1 free: 1 4 14 40 105 252 546
+--- [67/81] W=6 H=7 parity=-1  (2026-08-07T22:01:33Z)
+# box W=6 H=7 parity=-1 slo=0 shi=11 pbox=30 cells=42 mult=1 free: 1 4 14 40 105 252 560
+--- [68/81] W=6 H=8 parity=-1  (2026-08-07T22:01:33Z)
+# box W=6 H=8 parity=-1 slo=0 shi=12 pbox=32 cells=48 mult=1 free: 1 4 14 40 105 252 560
+--- [69/81] W=6 H=9 parity=-1  (2026-08-07T22:01:33Z)
+# box W=6 H=9 parity=-1 slo=0 shi=13 pbox=34 cells=54 mult=1 free: 1 4 14 40 105 252 560
+--- [70/81] W=6 H=10 parity=-1  (2026-08-07T22:01:33Z)
+# box W=6 H=10 parity=-1 slo=0 shi=14 pbox=36 cells=60 mult=1 free: 1 4 14 40 105 252 560
+--- [71/81] W=6 H=11 parity=-1  (2026-08-07T22:01:34Z)
+# box W=6 H=11 parity=-1 slo=0 shi=15 pbox=38 cells=66 mult=1 free: 1 4 14 40 105 252 560
+--- [72/81] W=6 H=12 parity=-1  (2026-08-07T22:01:35Z)
+# box W=6 H=12 parity=-1 slo=0 shi=16 pbox=40 cells=72 mult=1 free: 1 4 14 40 105 252 560
+--- [73/81] W=7 H=7 parity=-1  (2026-08-07T22:01:37Z)
+# box W=7 H=7 parity=-1 slo=0 shi=12 pbox=32 cells=49 mult=1 free: 1 4 14 40 105 252 574
+--- [74/81] W=7 H=8 parity=-1  (2026-08-07T22:01:37Z)
+# box W=7 H=8 parity=-1 slo=0 shi=13 pbox=34 cells=56 mult=1 free: 1 4 14 40 105 252 574
+--- [75/81] W=7 H=9 parity=-1  (2026-08-07T22:01:38Z)
+# box W=7 H=9 parity=-1 slo=0 shi=14 pbox=36 cells=63 mult=1 free: 1 4 14 40 105 252 574
+--- [76/81] W=7 H=10 parity=-1  (2026-08-07T22:01:38Z)
+# box W=7 H=10 parity=-1 slo=0 shi=15 pbox=38 cells=70 mult=1 free: 1 4 14 40 105 252 574
+--- [77/81] W=7 H=11 parity=-1  (2026-08-07T22:01:40Z)
+# box W=7 H=11 parity=-1 slo=0 shi=16 pbox=40 cells=77 mult=1 free: 1 4 14 40 105 252 574
+--- [78/81] W=8 H=8 parity=-1  (2026-08-07T22:01:43Z)
+# box W=8 H=8 parity=-1 slo=0 shi=14 pbox=36 cells=64 mult=1 free: 1 4 14 40 105 252 574
+--- [79/81] W=8 H=9 parity=-1  (2026-08-07T22:01:44Z)
+# box W=8 H=9 parity=-1 slo=0 shi=15 pbox=38 cells=72 mult=1 free: 1 4 14 40 105 252 574
+--- [80/81] W=8 H=10 parity=-1  (2026-08-07T22:01:46Z)
+# box W=8 H=10 parity=-1 slo=0 shi=16 pbox=40 cells=80 mult=1 free: 1 4 14 40 105 252 574
+--- [81/81] W=9 H=9 parity=-1  (2026-08-07T22:01:49Z)
+# box W=9 H=9 parity=-1 slo=0 shi=16 pbox=40 cells=81 mult=1 free: 1 4 14 40 105 252 574
+--- frames: 81 run, 0 already complete, 81 total
+--- wrote results/perimmin_square8_p40_r6.txt (899 rows)
+SHARDED_DONE square8 pmax=40 rmax=6 2026-08-07T22:01:53Z
+--- p=40 reproduced exactly (only the git= stamp differs)
+=== [3/3] p=48 census
+=== square8 pmax=48 rmax=6 threads=32 -> results/pmin_square8_p48_r6.frames  (2026-08-07T22:01:53Z)
+--- plan: 121 frames
+--- [1/121] W=1 H=1 parity=-1  (2026-08-07T22:01:53Z)
+# box W=1 H=1 parity=-1 slo=0 shi=0 pbox=8 cells=1 mult=1 free: 1
+--- [2/121] W=1 H=2 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=2 parity=-1 slo=0 shi=1 pbox=10 cells=2 mult=1 free: 1
+--- [3/121] W=1 H=3 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=3 parity=-1 slo=0 shi=2 pbox=12 cells=3 mult=1 free: 1
+--- [4/121] W=1 H=4 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=4 parity=-1 slo=0 shi=3 pbox=14 cells=4 mult=1 free: 1
+--- [5/121] W=1 H=5 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=5 parity=-1 slo=0 shi=4 pbox=16 cells=5 mult=1 free: 1
+--- [6/121] W=1 H=6 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=6 parity=-1 slo=0 shi=5 pbox=18 cells=6 mult=1 free: 1
+--- [7/121] W=1 H=7 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=7 parity=-1 slo=0 shi=6 pbox=20 cells=7 mult=1 free: 1
+--- [8/121] W=1 H=8 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=8 parity=-1 slo=0 shi=7 pbox=22 cells=8 mult=1 free: 1
+--- [9/121] W=1 H=9 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=9 parity=-1 slo=0 shi=8 pbox=24 cells=9 mult=1 free: 1
+--- [10/121] W=1 H=10 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=10 parity=-1 slo=0 shi=9 pbox=26 cells=10 mult=1 free: 1
+--- [11/121] W=1 H=11 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=11 parity=-1 slo=0 shi=10 pbox=28 cells=11 mult=1 free: 1
+--- [12/121] W=1 H=12 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=12 parity=-1 slo=0 shi=11 pbox=30 cells=12 mult=1 free: 1
+--- [13/121] W=1 H=13 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=13 parity=-1 slo=0 shi=12 pbox=32 cells=13 mult=1 free: 1
+--- [14/121] W=1 H=14 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=14 parity=-1 slo=0 shi=13 pbox=34 cells=14 mult=1 free: 1
+--- [15/121] W=1 H=15 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=15 parity=-1 slo=0 shi=14 pbox=36 cells=15 mult=1 free: 1
+--- [16/121] W=1 H=16 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=16 parity=-1 slo=0 shi=15 pbox=38 cells=16 mult=1 free: 1
+--- [17/121] W=1 H=17 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=17 parity=-1 slo=0 shi=16 pbox=40 cells=17 mult=1 free: 1
+--- [18/121] W=1 H=18 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=18 parity=-1 slo=0 shi=17 pbox=42 cells=18 mult=1 free: 1
+--- [19/121] W=1 H=19 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=19 parity=-1 slo=0 shi=18 pbox=44 cells=19 mult=1 free: 1
+--- [20/121] W=1 H=20 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=20 parity=-1 slo=0 shi=19 pbox=46 cells=20 mult=1 free: 1
+--- [21/121] W=1 H=21 parity=-1  (2026-08-07T22:01:54Z)
+# box W=1 H=21 parity=-1 slo=0 shi=20 pbox=48 cells=21 mult=1 free: 1
+--- [22/121] W=2 H=2 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=2 parity=-1 slo=0 shi=2 pbox=12 cells=4 mult=1 free: 1 4 2
+--- [23/121] W=2 H=3 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=3 parity=-1 slo=0 shi=3 pbox=14 cells=6 mult=1 free: 1 4 8 4
+--- [24/121] W=2 H=4 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=4 parity=-1 slo=0 shi=4 pbox=16 cells=8 mult=1 free: 1 4 8 12 6
+--- [25/121] W=2 H=5 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=5 parity=-1 slo=0 shi=5 pbox=18 cells=10 mult=1 free: 1 4 8 12 16 8
+--- [26/121] W=2 H=6 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=6 parity=-1 slo=0 shi=6 pbox=20 cells=12 mult=1 free: 1 4 8 12 16 20 10
+--- [27/121] W=2 H=7 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=7 parity=-1 slo=0 shi=7 pbox=22 cells=14 mult=1 free: 1 4 8 12 16 20 24
+--- [28/121] W=2 H=8 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=8 parity=-1 slo=0 shi=8 pbox=24 cells=16 mult=1 free: 1 4 8 12 16 20 24
+--- [29/121] W=2 H=9 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=9 parity=-1 slo=0 shi=9 pbox=26 cells=18 mult=1 free: 1 4 8 12 16 20 24
+--- [30/121] W=2 H=10 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=10 parity=-1 slo=0 shi=10 pbox=28 cells=20 mult=1 free: 1 4 8 12 16 20 24
+--- [31/121] W=2 H=11 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=11 parity=-1 slo=0 shi=11 pbox=30 cells=22 mult=1 free: 1 4 8 12 16 20 24
+--- [32/121] W=2 H=12 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=12 parity=-1 slo=0 shi=12 pbox=32 cells=24 mult=1 free: 1 4 8 12 16 20 24
+--- [33/121] W=2 H=13 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=13 parity=-1 slo=0 shi=13 pbox=34 cells=26 mult=1 free: 1 4 8 12 16 20 24
+--- [34/121] W=2 H=14 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=14 parity=-1 slo=0 shi=14 pbox=36 cells=28 mult=1 free: 1 4 8 12 16 20 24
+--- [35/121] W=2 H=15 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=15 parity=-1 slo=0 shi=15 pbox=38 cells=30 mult=1 free: 1 4 8 12 16 20 24
+--- [36/121] W=2 H=16 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=16 parity=-1 slo=0 shi=16 pbox=40 cells=32 mult=1 free: 1 4 8 12 16 20 24
+--- [37/121] W=2 H=17 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=17 parity=-1 slo=0 shi=17 pbox=42 cells=34 mult=1 free: 1 4 8 12 16 20 24
+--- [38/121] W=2 H=18 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=18 parity=-1 slo=0 shi=18 pbox=44 cells=36 mult=1 free: 1 4 8 12 16 20 24
+--- [39/121] W=2 H=19 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=19 parity=-1 slo=0 shi=19 pbox=46 cells=38 mult=1 free: 1 4 8 12 16 20 24
+--- [40/121] W=2 H=20 parity=-1  (2026-08-07T22:01:54Z)
+# box W=2 H=20 parity=-1 slo=0 shi=20 pbox=48 cells=40 mult=1 free: 1 4 8 12 16 20 24
+--- [41/121] W=3 H=3 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=3 parity=-1 slo=0 shi=4 pbox=16 cells=9 mult=1 free: 1 4 14 24 29 16 2
+--- [42/121] W=3 H=4 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=4 parity=-1 slo=0 shi=5 pbox=18 cells=12 mult=1 free: 1 4 14 32 57 68 66
+--- [43/121] W=3 H=5 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=5 parity=-1 slo=0 shi=6 pbox=20 cells=15 mult=1 free: 1 4 14 32 67 104 134
+--- [44/121] W=3 H=6 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=6 parity=-1 slo=0 shi=7 pbox=22 cells=18 mult=1 free: 1 4 14 32 67 116 178
+--- [45/121] W=3 H=7 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=7 parity=-1 slo=0 shi=8 pbox=24 cells=21 mult=1 free: 1 4 14 32 67 116 192
+--- [46/121] W=3 H=8 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=8 parity=-1 slo=0 shi=9 pbox=26 cells=24 mult=1 free: 1 4 14 32 67 116 192
+--- [47/121] W=3 H=9 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=9 parity=-1 slo=0 shi=10 pbox=28 cells=27 mult=1 free: 1 4 14 32 67 116 192
+--- [48/121] W=3 H=10 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=10 parity=-1 slo=0 shi=11 pbox=30 cells=30 mult=1 free: 1 4 14 32 67 116 192
+--- [49/121] W=3 H=11 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=11 parity=-1 slo=0 shi=12 pbox=32 cells=33 mult=1 free: 1 4 14 32 67 116 192
+--- [50/121] W=3 H=12 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=12 parity=-1 slo=0 shi=13 pbox=34 cells=36 mult=1 free: 1 4 14 32 67 116 192
+--- [51/121] W=3 H=13 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=13 parity=-1 slo=0 shi=14 pbox=36 cells=39 mult=1 free: 1 4 14 32 67 116 192
+--- [52/121] W=3 H=14 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=14 parity=-1 slo=0 shi=15 pbox=38 cells=42 mult=1 free: 1 4 14 32 67 116 192
+--- [53/121] W=3 H=15 parity=-1  (2026-08-07T22:01:54Z)
+# box W=3 H=15 parity=-1 slo=0 shi=16 pbox=40 cells=45 mult=1 free: 1 4 14 32 67 116 192
+--- [54/121] W=3 H=16 parity=-1  (2026-08-07T22:01:55Z)
+# box W=3 H=16 parity=-1 slo=0 shi=17 pbox=42 cells=48 mult=1 free: 1 4 14 32 67 116 192
+--- [55/121] W=3 H=17 parity=-1  (2026-08-07T22:01:55Z)
+# box W=3 H=17 parity=-1 slo=0 shi=18 pbox=44 cells=51 mult=1 free: 1 4 14 32 67 116 192
+--- [56/121] W=3 H=18 parity=-1  (2026-08-07T22:01:55Z)
+# box W=3 H=18 parity=-1 slo=0 shi=19 pbox=46 cells=54 mult=1 free: 1 4 14 32 67 116 192
+--- [57/121] W=3 H=19 parity=-1  (2026-08-07T22:01:55Z)
+# box W=3 H=19 parity=-1 slo=0 shi=20 pbox=48 cells=57 mult=1 free: 1 4 14 32 67 116 192
+--- [58/121] W=4 H=4 parity=-1  (2026-08-07T22:01:56Z)
+# box W=4 H=4 parity=-1 slo=0 shi=6 pbox=20 cells=16 mult=1 free: 1 4 14 40 85 156 226
+--- [59/121] W=4 H=5 parity=-1  (2026-08-07T22:01:56Z)
+# box W=4 H=5 parity=-1 slo=0 shi=7 pbox=22 cells=20 mult=1 free: 1 4 14 40 95 192 342
+--- [60/121] W=4 H=6 parity=-1  (2026-08-07T22:01:56Z)
+# box W=4 H=6 parity=-1 slo=0 shi=8 pbox=24 cells=24 mult=1 free: 1 4 14 40 95 204 386
+--- [61/121] W=4 H=7 parity=-1  (2026-08-07T22:01:56Z)
+# box W=4 H=7 parity=-1 slo=0 shi=9 pbox=26 cells=28 mult=1 free: 1 4 14 40 95 204 400
+--- [62/121] W=4 H=8 parity=-1  (2026-08-07T22:01:56Z)
+# box W=4 H=8 parity=-1 slo=0 shi=10 pbox=28 cells=32 mult=1 free: 1 4 14 40 95 204 400
+--- [63/121] W=4 H=9 parity=-1  (2026-08-07T22:01:56Z)
+# box W=4 H=9 parity=-1 slo=0 shi=11 pbox=30 cells=36 mult=1 free: 1 4 14 40 95 204 400
+--- [64/121] W=4 H=10 parity=-1  (2026-08-07T22:01:56Z)
+# box W=4 H=10 parity=-1 slo=0 shi=12 pbox=32 cells=40 mult=1 free: 1 4 14 40 95 204 400
+--- [65/121] W=4 H=11 parity=-1  (2026-08-07T22:01:56Z)
+# box W=4 H=11 parity=-1 slo=0 shi=13 pbox=34 cells=44 mult=1 free: 1 4 14 40 95 204 400
+--- [66/121] W=4 H=12 parity=-1  (2026-08-07T22:01:56Z)
+# box W=4 H=12 parity=-1 slo=0 shi=14 pbox=36 cells=48 mult=1 free: 1 4 14 40 95 204 400
+--- [67/121] W=4 H=13 parity=-1  (2026-08-07T22:01:56Z)
+# box W=4 H=13 parity=-1 slo=0 shi=15 pbox=38 cells=52 mult=1 free: 1 4 14 40 95 204 400
+--- [68/121] W=4 H=14 parity=-1  (2026-08-07T22:01:57Z)
+# box W=4 H=14 parity=-1 slo=0 shi=16 pbox=40 cells=56 mult=1 free: 1 4 14 40 95 204 400
+--- [69/121] W=4 H=15 parity=-1  (2026-08-07T22:01:57Z)
+# box W=4 H=15 parity=-1 slo=0 shi=17 pbox=42 cells=60 mult=1 free: 1 4 14 40 95 204 400
+--- [70/121] W=4 H=16 parity=-1  (2026-08-07T22:01:58Z)
+# box W=4 H=16 parity=-1 slo=0 shi=18 pbox=44 cells=64 mult=1 free: 1 4 14 40 95 204 400
+--- [71/121] W=4 H=17 parity=-1  (2026-08-07T22:01:59Z)
+# box W=4 H=17 parity=-1 slo=0 shi=19 pbox=46 cells=68 mult=1 free: 1 4 14 40 95 204 400
+--- [72/121] W=4 H=18 parity=-1  (2026-08-07T22:02:01Z)
+# box W=4 H=18 parity=-1 slo=0 shi=20 pbox=48 cells=72 mult=1 free: 1 4 14 40 95 204 400
+--- [73/121] W=5 H=5 parity=-1  (2026-08-07T22:02:03Z)
+# box W=5 H=5 parity=-1 slo=0 shi=8 pbox=24 cells=25 mult=1 free: 1 4 14 40 105 228 458
+--- [74/121] W=5 H=6 parity=-1  (2026-08-07T22:02:03Z)
+# box W=5 H=6 parity=-1 slo=0 shi=9 pbox=26 cells=30 mult=1 free: 1 4 14 40 105 240 502
+--- [75/121] W=5 H=7 parity=-1  (2026-08-07T22:02:03Z)
+# box W=5 H=7 parity=-1 slo=0 shi=10 pbox=28 cells=35 mult=1 free: 1 4 14 40 105 240 516
+--- [76/121] W=5 H=8 parity=-1  (2026-08-07T22:02:03Z)
+# box W=5 H=8 parity=-1 slo=0 shi=11 pbox=30 cells=40 mult=1 free: 1 4 14 40 105 240 516
+--- [77/121] W=5 H=9 parity=-1  (2026-08-07T22:02:04Z)
+# box W=5 H=9 parity=-1 slo=0 shi=12 pbox=32 cells=45 mult=1 free: 1 4 14 40 105 240 516
+--- [78/121] W=5 H=10 parity=-1  (2026-08-07T22:02:04Z)
+# box W=5 H=10 parity=-1 slo=0 shi=13 pbox=34 cells=50 mult=1 free: 1 4 14 40 105 240 516
+--- [79/121] W=5 H=11 parity=-1  (2026-08-07T22:02:04Z)
+# box W=5 H=11 parity=-1 slo=0 shi=14 pbox=36 cells=55 mult=1 free: 1 4 14 40 105 240 516
+--- [80/121] W=5 H=12 parity=-1  (2026-08-07T22:02:04Z)
+# box W=5 H=12 parity=-1 slo=0 shi=15 pbox=38 cells=60 mult=1 free: 1 4 14 40 105 240 516
+--- [81/121] W=5 H=13 parity=-1  (2026-08-07T22:02:05Z)
+# box W=5 H=13 parity=-1 slo=0 shi=16 pbox=40 cells=65 mult=1 free: 1 4 14 40 105 240 516
+--- [82/121] W=5 H=14 parity=-1  (2026-08-07T22:02:06Z)
+# box W=5 H=14 parity=-1 slo=0 shi=17 pbox=42 cells=70 mult=1 free: 1 4 14 40 105 240 516
+--- [83/121] W=5 H=15 parity=-1  (2026-08-07T22:02:08Z)
+# box W=5 H=15 parity=-1 slo=0 shi=18 pbox=44 cells=75 mult=1 free: 1 4 14 40 105 240 516
+--- [84/121] W=5 H=16 parity=-1  (2026-08-07T22:02:12Z)
+# box W=5 H=16 parity=-1 slo=0 shi=19 pbox=46 cells=80 mult=1 free: 1 4 14 40 105 240 516
+--- [85/121] W=5 H=17 parity=-1  (2026-08-07T22:02:17Z)
+# box W=5 H=17 parity=-1 slo=0 shi=20 pbox=48 cells=85 mult=1 free: 1 4 14 40 105 240 516
+--- [86/121] W=6 H=6 parity=-1  (2026-08-07T22:02:25Z)
+# box W=6 H=6 parity=-1 slo=0 shi=10 pbox=28 cells=36 mult=1 free: 1 4 14 40 105 252 546
+--- [87/121] W=6 H=7 parity=-1  (2026-08-07T22:02:25Z)
+# box W=6 H=7 parity=-1 slo=0 shi=11 pbox=30 cells=42 mult=1 free: 1 4 14 40 105 252 560
+--- [88/121] W=6 H=8 parity=-1  (2026-08-07T22:02:25Z)
+# box W=6 H=8 parity=-1 slo=0 shi=12 pbox=32 cells=48 mult=1 free: 1 4 14 40 105 252 560
+--- [89/121] W=6 H=9 parity=-1  (2026-08-07T22:02:26Z)
+# box W=6 H=9 parity=-1 slo=0 shi=13 pbox=34 cells=54 mult=1 free: 1 4 14 40 105 252 560
+--- [90/121] W=6 H=10 parity=-1  (2026-08-07T22:02:26Z)
+# box W=6 H=10 parity=-1 slo=0 shi=14 pbox=36 cells=60 mult=1 free: 1 4 14 40 105 252 560
+--- [91/121] W=6 H=11 parity=-1  (2026-08-07T22:02:26Z)
+# box W=6 H=11 parity=-1 slo=0 shi=15 pbox=38 cells=66 mult=1 free: 1 4 14 40 105 252 560
+--- [92/121] W=6 H=12 parity=-1  (2026-08-07T22:02:28Z)
+# box W=6 H=12 parity=-1 slo=0 shi=16 pbox=40 cells=72 mult=1 free: 1 4 14 40 105 252 560
+--- [93/121] W=6 H=13 parity=-1  (2026-08-07T22:02:30Z)
+# box W=6 H=13 parity=-1 slo=0 shi=17 pbox=42 cells=78 mult=1 free: 1 4 14 40 105 252 560
+--- [94/121] W=6 H=14 parity=-1  (2026-08-07T22:02:34Z)
+# box W=6 H=14 parity=-1 slo=0 shi=18 pbox=44 cells=84 mult=1 free: 1 4 14 40 105 252 560
+--- [95/121] W=6 H=15 parity=-1  (2026-08-07T22:02:42Z)
+# box W=6 H=15 parity=-1 slo=0 shi=19 pbox=46 cells=90 mult=1 free: 1 4 14 40 105 252 560
+--- [96/121] W=6 H=16 parity=-1  (2026-08-07T22:02:53Z)
+# box W=6 H=16 parity=-1 slo=0 shi=20 pbox=48 cells=96 mult=1 free: 1 4 14 40 105 252 560
+--- [97/121] W=7 H=7 parity=-1  (2026-08-07T22:03:12Z)
+# box W=7 H=7 parity=-1 slo=0 shi=12 pbox=32 cells=49 mult=1 free: 1 4 14 40 105 252 574
+--- [98/121] W=7 H=8 parity=-1  (2026-08-07T22:03:12Z)
+# box W=7 H=8 parity=-1 slo=0 shi=13 pbox=34 cells=56 mult=1 free: 1 4 14 40 105 252 574
+--- [99/121] W=7 H=9 parity=-1  (2026-08-07T22:03:13Z)
+# box W=7 H=9 parity=-1 slo=0 shi=14 pbox=36 cells=63 mult=1 free: 1 4 14 40 105 252 574
+--- [100/121] W=7 H=10 parity=-1  (2026-08-07T22:03:13Z)
+# box W=7 H=10 parity=-1 slo=0 shi=15 pbox=38 cells=70 mult=1 free: 1 4 14 40 105 252 574
+--- [101/121] W=7 H=11 parity=-1  (2026-08-07T22:03:15Z)
+# box W=7 H=11 parity=-1 slo=0 shi=16 pbox=40 cells=77 mult=1 free: 1 4 14 40 105 252 574
+--- [102/121] W=7 H=12 parity=-1  (2026-08-07T22:03:19Z)
+# box W=7 H=12 parity=-1 slo=0 shi=17 pbox=42 cells=84 mult=1 free: 1 4 14 40 105 252 574
+--- [103/121] W=7 H=13 parity=-1  (2026-08-07T22:03:26Z)
+# box W=7 H=13 parity=-1 slo=0 shi=18 pbox=44 cells=91 mult=1 free: 1 4 14 40 105 252 574
+--- [104/121] W=7 H=14 parity=-1  (2026-08-07T22:03:38Z)
+# box W=7 H=14 parity=-1 slo=0 shi=19 pbox=46 cells=98 mult=1 free: 1 4 14 40 105 252 574
+--- [105/121] W=7 H=15 parity=-1  (2026-08-07T22:03:58Z)
+# box W=7 H=15 parity=-1 slo=0 shi=20 pbox=48 cells=105 mult=1 free: 1 4 14 40 105 252 574
+--- [106/121] W=8 H=8 parity=-1  (2026-08-07T22:04:31Z)
+# box W=8 H=8 parity=-1 slo=0 shi=14 pbox=36 cells=64 mult=1 free: 1 4 14 40 105 252 574
+--- [107/121] W=8 H=9 parity=-1  (2026-08-07T22:04:32Z)
+# box W=8 H=9 parity=-1 slo=0 shi=15 pbox=38 cells=72 mult=1 free: 1 4 14 40 105 252 574
+--- [108/121] W=8 H=10 parity=-1  (2026-08-07T22:04:34Z)
+# box W=8 H=10 parity=-1 slo=0 shi=16 pbox=40 cells=80 mult=1 free: 1 4 14 40 105 252 574
+--- [109/121] W=8 H=11 parity=-1  (2026-08-07T22:04:39Z)
+# box W=8 H=11 parity=-1 slo=0 shi=17 pbox=42 cells=88 mult=1 free: 1 4 14 40 105 252 574
+--- [110/121] W=8 H=12 parity=-1  (2026-08-07T22:04:48Z)
+# box W=8 H=12 parity=-1 slo=0 shi=18 pbox=44 cells=96 mult=1 free: 1 4 14 40 105 252 574
+--- [111/121] W=8 H=13 parity=-1  (2026-08-07T22:05:05Z)
+# box W=8 H=13 parity=-1 slo=0 shi=19 pbox=46 cells=104 mult=1 free: 1 4 14 40 105 252 574
+--- [112/121] W=8 H=14 parity=-1  (2026-08-07T22:05:35Z)
+# box W=8 H=14 parity=-1 slo=0 shi=20 pbox=48 cells=112 mult=1 free: 1 4 14 40 105 252 574
+--- [113/121] W=9 H=9 parity=-1  (2026-08-07T22:06:25Z)
+# box W=9 H=9 parity=-1 slo=0 shi=16 pbox=40 cells=81 mult=1 free: 1 4 14 40 105 252 574
+--- [114/121] W=9 H=10 parity=-1  (2026-08-07T22:06:30Z)
+# box W=9 H=10 parity=-1 slo=0 shi=17 pbox=42 cells=90 mult=1 free: 1 4 14 40 105 252 574
+--- [115/121] W=9 H=11 parity=-1  (2026-08-07T22:06:41Z)
+# box W=9 H=11 parity=-1 slo=0 shi=18 pbox=44 cells=99 mult=1 free: 1 4 14 40 105 252 574
+--- [116/121] W=9 H=12 parity=-1  (2026-08-07T22:07:01Z)
+# box W=9 H=12 parity=-1 slo=0 shi=19 pbox=46 cells=108 mult=1 free: 1 4 14 40 105 252 574
+--- [117/121] W=9 H=13 parity=-1  (2026-08-07T22:07:39Z)
+# box W=9 H=13 parity=-1 slo=0 shi=20 pbox=48 cells=117 mult=1 free: 1 4 14 40 105 252 574
+--- [118/121] W=10 H=10 parity=-1  (2026-08-07T22:08:45Z)
+# box W=10 H=10 parity=-1 slo=0 shi=18 pbox=44 cells=100 mult=1 free: 1 4 14 40 105 252 574
+--- [119/121] W=10 H=11 parity=-1  (2026-08-07T22:09:07Z)
+# box W=10 H=11 parity=-1 slo=0 shi=19 pbox=46 cells=110 mult=1 free: 1 4 14 40 105 252 574
+--- [120/121] W=10 H=12 parity=-1  (2026-08-07T22:09:51Z)
+# box W=10 H=12 parity=-1 slo=0 shi=20 pbox=48 cells=120 mult=1 free: 1 4 14 40 105 252 574
+--- [121/121] W=11 H=11 parity=-1  (2026-08-07T22:11:13Z)
+# box W=11 H=11 parity=-1 slo=0 shi=20 pbox=48 cells=121 mult=1 free: 1 4 14 40 105 252 574
+--- frames: 121 run, 0 already complete, 121 total
+--- wrote results/perimmin_square8_p48_r6.txt (1526 rows)
+SHARDED_DONE square8 pmax=48 rmax=6 2026-08-07T22:12:35Z
+AYR_PMIN48_DONE 2026-08-07T18:12:35-04:00
