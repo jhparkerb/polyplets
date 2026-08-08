@@ -133,9 +133,8 @@ lattice~\cite{gblRoux2004}. It is natural to expect the lever to work on the
 king lattice too.
 
 It does, but only for perimeter. That split --- \emph{area wild, perimeter tame}
---- is the organising fact of this paper, and it turns out to hold for both
-lattices, which means the classical solvability results were always
-perimeter results and the area side was never tractable in the first place.
+--- is the organising fact of this paper, and it holds for both lattices, which means the classical solvability results were always
+perimeter results and the area side was never tractable.
 
 \begin{definition}
 A \emph{convex king animal}, equivalently an \emph{HV-convex king animal} or
@@ -207,8 +206,7 @@ $\lim_n A(n)^{1/n} = \mu = 3.128943269730886\dots$
 Read informally: $A(n)$ counts blobs with no gap in any row or column; $M(n)$
 counts the staircase ones, a thin slice. The claim is that they grow at the same
 exponential rate, as does everything between. Every intermediate class is
-trapped between $M$ and $A$ term by term, so nothing has to be proved about the
-individual classes --- the whole job is those two.
+trapped between $M$ and $A$ term by term, so nothing has to be proved about the individual classes.
 
 \begin{lemma}[three-block factorisation]
 \label{lem:blocks}
@@ -398,8 +396,7 @@ $\deg q_j \le 24$. The same holds for HV-convex polyominoes by area
 (\oeis{A067675}), regenerated to the same length.
 \end{theorem}
 
-Two things make this one test rather than a $25\times25$ sweep, and both are
-worth stating because they are what makes the negative rigorous.
+Two things make this one test rather than a $25\times25$ sweep, and they are what makes the negative rigorous.
 
 \paragraph{The boxes nest.} A solution with $J' \le J$ and $D' \le D$ is a
 solution of the $(J,D)$ ansatz with the unused $p_i$ set to zero. Excluding the
@@ -749,8 +746,7 @@ $m + h + 1$. Restricting to $h = 1$ gives $D_{\mathrm{desc}}(n) \ge T_1(n{-}2)$,
 so $\liminf D_{\mathrm{desc}}(n)^{1/n} \ge \nu$ by Lemma~\ref{lem:T}.
 \end{proof}
 
-So $\nu$ is not an artefact of an extrapolation: it is the growth constant of an
-explicitly counted half of the series. Measured,
+Measured,
 \begin{quote}\small
 $\nu = 2.5145796438787291885104371943430998201410308559007832719354957107238\\
 4099229632690389299337761749953732175539964789209170137762869374741150849461805388232$
@@ -824,8 +820,7 @@ coefficient-level argument cannot reach.
 \subsection{A correction to an earlier reading}
 
 An earlier version of this work read the two series as having \emph{different}
-subdominant behaviour, with the four-cone one lacking the $0.4810$. That reading
-is wrong, and the correction is instructive:
+subdominant behaviour, with the four-cone one lacking the $0.4810$. That reading is wrong:
 
 \begin{table}[H]
 \centering\small
@@ -846,7 +841,7 @@ present.}
 \end{table}
 
 The second row is measured on four-cone-directed animals directly, with no
-peeling and no annihilator. A free by-product of the split: deleting the
+peeling and no annihilator. A by-product of the split: deleting the
 descending half stops the $2.5146$ from polluting the extrapolation, and the
 same run's $\mu$ jumps from $51$ trusted digits to $200$.
 

@@ -129,8 +129,7 @@ a separate search for published closed forms for $T(n,n-k)$ came back empty as
 well.\footnote{\repo{results/diagonal-closed-forms.md} and
 \repo{results/novelty-sortie.md} record the searches and their negative
 results.} We do not claim to be first, because absence is not a database result;
-we claim the theorem and cite the nearest published relative, which is close
-enough to be worth stating plainly.
+we claim the theorem and cite the nearest published relative.
 
 That relative measures the defect in \emph{dimension} rather than in height, on
 polycubes. Barequet, Barequet and Rote~\cite{barequetBarequetRote2010} show that
@@ -171,8 +170,7 @@ consecutive rows.
 \end{definition}
 
 Condition (L) is the whole of the geometric content --- it is what makes a row
-with a single cell a cut, which is Lemma~\ref{lem:sep} and the engine of
-everything after it. Conditions (R) and (U) are finiteness bookkeeping.
+with a single cell a cut, which is Lemma~\ref{lem:sep}. Conditions (R) and (U) are finiteness bookkeeping.
 
 \begin{example}[the three instances]
 \label{ex:instances}
@@ -188,7 +186,7 @@ everything after it. Conditions (R) and (U) are finiteness bookkeeping.
 \end{itemize}
 \end{example}
 
-\begin{remark}[a name collision worth stating once]
+\begin{remark}[a name collision]
 \label{rem:names}
 The centres of the $b=2$ cells form the triangular \emph{point} lattice, so the
 literature sometimes calls this the triangular lattice --- Madras's
@@ -382,7 +380,6 @@ appearing in a denominator; so every coefficient $b^{1+2k}a_{k+1-i}$ is an
 integer and $P_k(n) \in \Z$. This proves Theorem~\ref{thm:A}. \qed
 
 \begin{remark}[integer values, not integer coefficients]
-\label{rem:newton}
 $P_k$ is integer-\emph{valued}; its coefficients in the monomial basis are not
 integers for any $k \ge 2$, since by Corollary~\ref{cor:lead} the leading one is
 $\Wp^k/k!$ --- for the king lattice, $P_2$ leads with $625/2$. What is true, and
@@ -412,7 +409,7 @@ $\Wp^{\,k}/k!$, and in particular $[n^1]P_1 = \Wp$. That is
 Corollary~\ref{cor:lead}, proved in Section~\ref{sec:grand} once the grand
 form is available; it is written out for the
 king lattice in full, and the argument is uniform in the weights, with $25$
-replaced by $\Wp$ throughout. We state the measured position honestly: the
+replaced by $\Wp$ throughout. The measured position: the
 identity $[n]P_1 = \Wp$ has been verified end to end on six test lattices by two
 routes that share no code --- a direct gadget count and an independent $k=1$
 diagonal enumeration with held-out values --- and the general-$k$ statement is
@@ -434,7 +431,7 @@ the class, the degree bound of Theorem~\ref{thm:A} is never slack at the top.}
 \label{tab:instances}
 \end{table}
 
-\begin{remark}[$4, 9, 25$ are not squares, and that matters]
+\begin{remark}[$4, 9, 25$ are not squares]
 \label{rem:notsquares}
 The first three values are $2^2$, $3^2$ and $5^2$, which invites the reading that
 $\Wp$ is always a perfect square. It is false, and an
@@ -470,7 +467,7 @@ Corollary~\ref{cor:a308359} uses it only as a control, never as an input.
 
 Theorem~\ref{thm:A} says each diagonal is a polynomial. It says nothing about how
 the diagonals relate to each other, and that relation is where the practical
-content is: each new $k$ turns out to cost exactly two new rational constants.
+content is: each new $k$ costs exactly two new rational constants.
 
 \begin{theorem}[grand form]
 \label{thm:C}
@@ -489,8 +486,7 @@ $(a_j,b_j)$ determined by the cluster weights of surplus at most $j$, such that
 
 Everything happens in $\Q[[y]]$, $y$-adically: no analysis, no convergence
 question, and --- the load-bearing feature --- no weight enumeration, so the
-proof covers all $k$ at once. We sketch the four moves; each is elementary and
-each is exact per order.
+proof covers all $k$ at once. We sketch the four moves; each is elementary and exact per order.
 
 \paragraph{Step 1: Weierstrass preparation by hand.} There is a unique pair
 $(z^*, u)$ with $z^* \in 1/b + y\Q[[y]]$, $u = \sum_j u_j(z) y^j$ with
@@ -692,7 +688,7 @@ $b = 1$ and no prime, so the theorem is vacuous there, correctly.
 Theorem~\ref{thm:A} plus Corollary~\ref{cor:two} converts enumeration into proof.
 Because the degree is at most $k$ and the onset is at $H \ge k+1$, it suffices to
 enumerate $k+1$ in-onset values of a diagonal --- or, using
-Corollary~\ref{cor:two}, just two --- to determine $q_k$ outright.
+Corollary~\ref{cor:two}, just two --- to determine $q_k$.
 
 A surplus-budgeted row transfer, parametric in the
 step set $D$, carries as state the current row's occupied cells (normalised in
@@ -837,7 +833,7 @@ with \textbf{zero occurrences of \texttt{sorry}}. What is relevant here:
   cells}: those cells are hypotheses of the Lean theorems, not proved in Lean.
 \end{itemize}
 
-A reader who wants to check this rather than take it on trust should note that 88
+A reader who wants to check this should note that 88
 of the axiom footprints are \emph{guarded}: the modules wrap
 \texttt{\#print axioms} in \texttt{\#guard\_msgs}, so a changed footprint is a
 build error and building the project checks them. The remaining 148 print their

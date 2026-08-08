@@ -22,24 +22,27 @@ in PROTOCOL's Amendments section.
 | `6b9ffef` | second documented unfreeze — `l6.odd-attain` repaired to quantify over the census, 46/46 |
 | `20bb8a2` | phase 2 — twelve results rulings applied; 33,411 → 32,935 words |
 | `9d05633` | phase 3 — sixteen paragraph rulings applied; 32,935 → 31,988 words |
-| *(this commit)* | phase 4 — twenty-two sentence rulings applied, all six papers; 31,988 → 31,569 words (−1.3% this phase, −9.2% from baseline) |
+| `26bbae2` | phase 4 — twenty-two sentence rulings applied; 31,988 → 31,569 words |
+| *(this commit)* | phase 5 — forty-two word/phrase rulings applied, one RETAIN; 31,569 → 31,339 words. **Campaign complete: 34,758 → 31,339, −9.8%** |
 
 The five `pw.*`/`a308.linear-ctrl` sites the matrix marks VACUOUS are closed
 integer arithmetic over literals inside the frozen file — no reachable input,
 the freeze checksum is their guard, by design; recorded, not repaired.
 
-## Next, in order
+## The campaign is complete
 
-1. **Phase 5** — words and phrases within a sentence, the ladder's last rung.
-   Fresh Fable cutter, defender, adjudicator writing the three ledgers and
-   the applier; the driving session runs applier + gate and makes the one
-   commit. Carried in: `rem:newton` is a defined, unreferenced label
-   (phase-3 verdict, Carried forward).
+All five rungs of the ladder have run: sections, results, paragraphs,
+sentences, words. One pass each, one commit each, every commit carrying its
+own argument. The campaign's residual list — everything any verdict deferred
+post-campaign — is gathered in one place, the phase-5 verdict's "Carried
+forward" section (9 items). The only proposal retained in five phases is
+P5.L1.6, on causal-attribution grounds; the reasoning is in the phase-5
+verdict. Nothing is pushed; publishing is jasonp's call.
 
 ## Standing cautions
 
-- Three pinned constants occur exactly once, at **L1:443**, **L4:320**,
-  **L5:335** (line numbers valid post-phase-4). A phase going near them must
+- Three pinned constants occur exactly once, at **L1:440**, **L4:318**,
+  **L5:333** (line numbers valid post-phase-5). A phase going near them must
   relocate the literal first or gate check 6 blocks the commit.
 - `verify_l_papers.py` is frozen (checksum in `baseline.tsv`). Its stale
   comment at `:273` ("the paper says ~2.7 per level") and L5's outdated header

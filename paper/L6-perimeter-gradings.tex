@@ -106,8 +106,7 @@ exactly when its $p$ is realised as $\pminn(n)$ for some $n$.
 The mechanism behind the min-end constants is a Young diagram at each corner of
 the isoperimetric hull, giving a factor $P(x)^c$ with $c$ the corner count ---
 confirmed on a hexagonal hull as well as a square one. The square lattice's
-diamond is an apparent exception, and resolving it is the sharpest thing here:
-each tip counts order ideals of its tangent cone, $P(x)$ is the lattice-aligned
+diamond is an apparent exception: each tip counts order ideals of its tangent cone, $P(x)$ is the lattice-aligned
 special case, and the tip series is Andrews' $\phi_2$ --- so the two corner types
 in this problem are the first two members of one family.
 
@@ -122,7 +121,7 @@ the laws above at once, is not in yet.
 The site perimeter of a lattice animal is the number of empty cells adjacent to
 it. Write $A(n,p)$ for the number of fixed animals of $n$ cells with site
 perimeter $p$. For each $n$ the possible $p$ occupy an interval, and the two
-boundary curves of that interval are quite different creatures:
+boundary curves of that interval are different creatures:
 \[
   \pmaxx(n) = \begin{cases} 2n+2 & \text{square lattice} \\ 4n+4 & \text{king lattice}\end{cases}
   \qquad\text{is linear,}
@@ -206,8 +205,7 @@ coefficients do not.}
 
 Four consecutive hits on each lattice ($6, 9, 13, 18$). The degenerate cases
 $k = 0, 1$ have onsets $2$ and $3$ against the law's $3$ and $4$, which is
-exactly why scanning the whole sequence $2,3,6,9,13,18$ found nothing --- the law
-is there and the first two terms hide it. It predicts $\mathrm{onset}(6) = 24$
+exactly why scanning the whole sequence $2,3,6,9,13,18$ found nothing. The law predicts $\mathrm{onset}(6) = 24$
 and $\mathrm{onset}(7) = 31$.
 
 $k = 3$ carries a genuine period-$2$ term on \emph{both}
@@ -447,8 +445,7 @@ $\binom{k+1}{2}+3$. That contrast is the paper's title.
 \subsection{What decides stabilisation: attainability, not parity}
 
 King's odd-$p$ rows do not stabilise; they grow. It is tempting to call that a
-parity effect, and it is wrong, because the square lattice's odd-$p$ rows
-stabilise perfectly well. The actual rule, tested on both lattices:
+parity effect, and it is wrong, because the square lattice's odd-$p$ rows stabilise. The actual rule, tested on both lattices:
 
 \begin{quote}
 $C(p,\cdot)$ stabilises $\iff$ $p$ is \textbf{attained} as $\pminn(n)$ for some
@@ -501,7 +498,7 @@ $1, 1, 3, 5, 9, 14, 24, 35, 55, 81, \dots$, whose fourth power reproduces every
 measured diamond term. $P(x)$ is the lattice-aligned special case, so king, tri6
 and square4 collapse to one statement and the diamond stops being an exception.
 
-\paragraph{A refutation worth recording.} The six-term prefix
+\paragraph{A refutation.} The six-term prefix
 $1,1,3,5,9,14$ matches \oeis{A120452}, which continues $23, 34, 52, 75,\dots$
 If the diamond's four tips were independent then $g^4$ with $g = $ A120452 would
 give the square lattice's $j = 6$ free-removal term as $1384$. The measurement is
@@ -513,8 +510,7 @@ $24$.
 \paragraph{The tip series has a name.} It is \oeis{A053993}, Andrews'
 $\phi_2$~\cite{andrews1984}: generalized Frobenius partitions with up to two
 repetitions per row. So it is an \textbf{eta quotient} with an explicit infinite
-product (Andrews eq.~5.9), verified here to $n = 40$. That is exactly as explicit
-as $P(x)$ itself and no more, and this paper does not call it a closed form.
+product (Andrews eq.~5.9), verified here to $n = 40$. That is exactly as explicit as $P(x)$ itself, and this paper does not call it a closed form.
 
 The reading is that the two corner types in this problem are the first two
 members of one family: a unimodular corner gives $\phi_1 = P(x)$, and the
@@ -557,7 +553,7 @@ bounding-box height $H$ is exactly
   \qquad (H \ge 2),
 \]
 with zero violations and equality \emph{attained} in all $672$ cells $(n,H)$
-present at $k \le 5$, $n \le 40$ --- so it is sharp and no better bound exists.
+present at $k \le 5$, $n \le 40$ --- so it is sharp.
 Equivalently $H \ge (n+k)/(k+1)$, that is $p \le 4n + 4 - \lceil(n-H)/(H-1)\rceil$,
 and by transposition the same with the width. Hence $k = 0$ forces $H = W = n$
 (the diagonal sticks) and $k = 1$ forces both dimensions at least $(n+1)/2$.

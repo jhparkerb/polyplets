@@ -96,7 +96,7 @@ $\lambda \le 9.3154$ in exact arithmetic.
 
 We also report, as measurement rather than theorem, why the upper bound stops
 where it does. An audit of every recurrence in the system shows the over-count
-is diffuse (median slack $1.144$, maximum $1.222$) and, decisively, that it
+is diffuse (median slack $1.144$, maximum $1.222$) and that it
 \emph{grows with $n$} --- so it is not a local defect that a larger window or
 per-type tuning could remove, but the same eight-neighbour connectivity
 obstruction that closed the other routes we tried.
@@ -136,16 +136,14 @@ $6.543 \le \lambda \le 9.3154$.
 \end{theorem}
 
 Both decimals round in the safe direction, and the rationals are what is
-actually certified.\footnote{Worth one sentence because it is easy to get
-backwards. The lower certificate proves $\lambda \ge 6543/1000$, so its decimal
+actually certified.\footnote{Easy to get backwards. The lower certificate proves $\lambda \ge 6543/1000$, so its decimal
 is exact. The upper certificate proves $\lambda \le 20000/2147 = 9.31532\dots$,
 so the four-decimal form of that bound is $9.3154$ and not $9.3153$: truncating
 an upper bound claims something the certificate does not give. The difference is
 $3.2\times10^{-5}$ and nothing here depends on it, but a bound should round
 away from the truth, not toward it.}
 
-Both halves are \emph{certificates} in a strict sense that is worth stating,
-because it is the organising idea of the paper. Neither half asks the reader to
+Both halves are \emph{certificates} in a strict sense. Neither half asks the reader to
 trust a search, an eigenvalue solver, a floating-point convergence criterion, or
 a run that cannot be repeated. Each half is a finite object --- an integer vector
 on one side, a rational vector on the other --- plus a finite integer or
@@ -187,8 +185,7 @@ and bounded by $\lambda$.
 
 \subsection{The three inequalities}
 
-Everything in this section is the composition of three facts, and it is worth
-separating them, because only the first two are about the tool and only the third
+Everything in this section is the composition of three facts: only the first two are about the tool and only the third
 is about polyplets.
 
 \paragraph{(1) Collatz--Wielandt, lower half.} Let $A$ be a nonnegative square
@@ -290,7 +287,7 @@ with the largest entry at $2^{\mathit{vbits}}$, sets
 $\mathit{num} = \lfloor \mu_{\text{float}} \cdot \mathit{den}\rfloor$, and checks
 $M(\mathit{den}/\mathit{num})\,v \ge v$ in \texttt{unsigned \_\_int128}.
 
-Three things make that sound rather than merely careful.
+Three things make that sound.
 
 \paragraph{Every rounding is downward.} Each of the $H$ stages of a column sweep
 is a nonnegative linear map, hence monotone, and the ``cell placed'' branch
@@ -406,14 +403,14 @@ $H = 5,\dots,12$, with the exponent $p$ tending to about $1$ --- a $1/H$
 finite-size correction. The sequence converges toward the value $\approx 7.11$
 that term ratios give.
 
-The value of this is that it is \emph{structurally} independent: strip spectra
+It is \emph{structurally} independent: strip spectra
 and row-sum ratios share no data and no algorithm. It is not yet sharper than the
 ratio estimate --- at $H = 12$ it is still $7.29$ --- but it corroborates it.
 
 Two caveats we record rather than bury. Reaching $\mu_H$ through count ratios
 $T(n,H)/T(n-1,H)$ instead of eigenvalues is badly under-converged for
 $H \gtrsim 6$; at $n = 36$, $H = 18$ that ratio is $7.63$, above $\lambda$. And
-extrapolation quality is genuinely uncertain: full Richardson in $1/H^2$ gives
+extrapolation quality is uncertain: full Richardson in $1/H^2$ gives
 $7.41$ while a local two-point fit gives $6.64$--$6.71$, so higher-order
 corrections matter and the ladder is too short for a controlled estimate. The
 rigorous \emph{lower bound} use needs no extrapolation and is unaffected by any
@@ -476,7 +473,7 @@ number to be checked against; the rook analogue does.
 The would-be repair --- a transfer matrix on the Redelmeier generation queue ---
 fails because that state is unbounded, its length growing with the perimeter.
 There is therefore no simple finite-state valid bound between $12.2$ and the real
-method, and the unbounded dimension is precisely what the Klarner--Rivest
+method, and the unbounded dimension is what the Klarner--Rivest
 functional-equation trick~\cite{klarnerRivest1973} exists to handle.
 
 \subsection{The generic decomposition is worse than the crude bound}
@@ -556,7 +553,7 @@ $0.096$.}
 \end{table}
 
 The other lever available in a decomposition of this kind --- which free cell to
-case on --- has \emph{no effect at all} here. Lower-left, upper-right, diagonal
+case on --- has \emph{no effect} here. Lower-left, upper-right, diagonal
 and orthogonal orderings all produce the identical $185$-type closure and the
 identical $9.4022$ at window~$2$. The closure saturates to the same set
 regardless of casing order, and the bound is a spectral property of the closed
