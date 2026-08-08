@@ -208,11 +208,7 @@ Read informally: $A(n)$ counts blobs with no gap in any row or column; $M(n)$
 counts the staircase ones, a thin slice. The claim is that they grow at the same
 exponential rate, as does everything between. Every intermediate class is
 trapped between $M$ and $A$ term by term, so nothing has to be proved about the
-individual classes --- the whole job is those two. One direction is free. For
-the other, read an HV-convex animal left to right: it fattens, then shears, then
-thins. The shearing middle is a staircase animal and the two ends are stacks;
-stacks are too few to carry an exponential, and the middle has a rate at all
-because two staircase animals glue end to end without waste.
+individual classes --- the whole job is those two.
 
 \begin{lemma}[three-block factorisation]
 \label{lem:blocks}
@@ -295,8 +291,7 @@ $\log P(n)/n \le (4\sqrt n + 6)\log(n{+}1)/n \to 0$.
 \end{proof}
 
 Only the exponent matters: $\sqrt n \log n$ is $o(n)$, so however many stacks
-there are, they carry no exponential. That is Lemma~\ref{lem:stacks}'s entire
-role --- the outer blocks are counted only to be discarded. Hardy and
+there are, they carry no exponential. Hardy and
 Ramanujan~\cite{hardyRamanujan1918} would give the sharper $p(n) = e^{O(\sqrt
 n)}$; nothing downstream distinguishes the two, and the elementary bound keeps
 the squeeze free of analytic input, which is worth more here than sharpness.
@@ -581,7 +576,7 @@ search returned nothing at degree $3$.
 \section{Perimeter is tame}
 \label{sec:perimeter}
 
-The mirage refines cleanly when the statistic changes. By \emph{semiperimeter}
+By \emph{semiperimeter}
 --- for a convex animal the box's $W + H$, with edge-perimeter $2(W{+}H)$ ---
 the same class is not merely D-finite but algebraic.
 

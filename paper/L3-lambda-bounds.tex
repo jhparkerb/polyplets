@@ -272,7 +272,6 @@ $\mu_2 = 1 + \sqrt2 = 2.41421356\dots$}
 \label{tab:ladder}
 \end{table}
 
-Two features of the table are the honest parts and deserve to be read as such.
 The certified value is the floor: at $H = 2$ the certificate says $2.4142135$
 even though $\mu_2 = 2.4142136$ to seven places, because a certificate states
 what is \emph{proved}. And from $H = 14$ upward the certified value falls
@@ -325,7 +324,7 @@ tolerance.
 \subsection{The checker has to be able to say no}
 \label{sec:selftest}
 
-A checker that cannot fail is not a checker. Four self-tests run as a gate:
+Four self-tests run as a gate:
 
 \begin{enumerate}
 \item[\textbf{A}] $\mu_2 = 1+\sqrt2$, so $24142/10000$ must PASS. It does.
@@ -375,8 +374,7 @@ about $2^{10}$ instead of $2^{51}$ --- makes the first candidate fail at four
 states with a minimum ratio of $0.99994$: the binding state is short by
 \emph{one unit in the last place}, so the flooring loss is $O(1)$, not $O(H)$.
 The bracket-and-bisect then lands on a slightly weaker rational in twenty sweeps,
-at a wall time indistinguishable from the full-precision run. The cost of the
-crippling shows up honestly as lost digits and never as a wrong claim.
+at a wall time indistinguishable from the full-precision run.
 
 \subsection{Honest scope}
 \label{sec:honest}
@@ -394,9 +392,7 @@ strip operator is doubting something this paper does not prove.
 Two engines were run against each other on every shared rung: an older hash-map
 sweep and a frozen-successor-array kernel roughly $250\times$ faster reproduce
 the receipts field for field at $H = 12, 13, 14$ --- same numerator, same state
-count, same minimum ratio to all nine printed digits. That is a cross-validation
-of the operator by two implementations, which is the strongest statement
-available short of certifying the operator itself.
+count, same minimum ratio to all nine printed digits.
 
 \subsection{An independent estimate of \texorpdfstring{$\lambda$}{lambda}}
 \label{sec:estimate}
@@ -613,9 +609,7 @@ rather than diffuse. There is no \texttt{sorry} and no anonymous
 
 The bracket is $6.543 \le \lambda \le 9.3154$ around a value near $7.11$, so the
 upper side is loose by about $31\%$. This section measures where that looseness
-sits. The finding is that it does not sit anywhere: it is diffuse, it compounds
-with $n$, and it is therefore not reachable by the levers one would try next.
-Everything here is measurement against brute-force counts.
+sits. Everything here is measurement against brute-force counts.
 
 \paragraph{Diffuse, not concentrated.} Define
 $\mathrm{slack}(T,n) = \mathrm{rhs}(T,n)/\mathrm{true}(T,n)$ for each recurrence
@@ -623,7 +617,7 @@ of the window-$2$ system, against brute-force counts. Over $152$ recurrences the
 maximum slack is $1.222$, the median $1.144$ and the minimum $1.000$; nothing
 exceeds $1.5$ and only four exceed $1.2$. The loosest are the far-reach split
 types. There is no small set of bad types to hand-engineer: fixing the worst four
-barely moves the bound. \emph{Per-type tuning is dead.}
+barely moves the bound.
 
 \paragraph{It grows with $n$.} The median slack increases by about $+0.022$ per
 term between $n = 7$ and $n = 8$. A purely \emph{local} over-count would be
