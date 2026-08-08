@@ -127,6 +127,13 @@ A proposal is identified as `PN.paper.k` — `P3.L5.7` is the seventh paragraph
 proposal against L5. The identifier is stable across all three files so that a
 line in the verdict can be traced back to the argument that produced it.
 
+**The ledger is kept, not swept.** Every `phase-N-*.md` is committed with the
+phase whose edits it justifies, and none of them is deleted when the campaign
+ends. jasonp's call, and the reason is the campaign's whole purpose: a commit
+that removes a paragraph is only auditable if the argument that removed it sits
+in the same commit. The trim runs on a branch, so the ledger costs nothing on
+`master` until he decides otherwise.
+
 ## The commit gate
 
 `scripts/l_trim_gate.sh check N` runs before every phase commit and blocks it

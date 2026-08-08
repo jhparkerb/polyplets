@@ -159,31 +159,6 @@ D-finite $F$ caps $[\Q(\mu_H):\Q]$ at all but finitely many heights. Northcott
 says that cap is impossible, because the $\mu_H$ are infinitely many distinct
 algebraic integers of bounded house.
 
-\subsection{What is gained, and what is given up}
-
-\paragraph{Gained: lightness.} The hypotheses are integer counts, per-height
-rationality, and a strictly increasing bounded family of slice growth constants.
-There is no bespoke combinatorial analysis of denominators, which is what
-\cite{bmr2002} needs per family. That is why \S\ref{sec:transport} can transport
-the theorem to polyominoes, polyhexes and beyond in a paragraph rather than a
-paper.
-
-\paragraph{Gained: effectivity.} \cite{bmr2002}'s criterion is asymptotic in $n$
-and gives a qualitative verdict. Ours applies at a single level, so certified
-data at finitely many heights excludes explicit $(r,D)$ boxes
-(\S\ref{sec:effective}) --- which is the form in which a claim like ``the
-by-height columns are not expected to satisfy a small ODE'' can actually be
-checked by someone who does not believe it.
-
-\paragraph{Given up: the larger class.} Klazar enlarges the target from D-finite
-to $D_A$-finite --- analytic rather than polynomial coefficients --- on the
-ground that polynomiality was never doing the work in his argument, and gets the
-stronger conclusion for free. We cannot follow him, and the reason is exactly the
-step that makes our proof work: an \emph{analytic} function may vanish at
-$1/\mu_{H_0}$ without vanishing identically, so the degree comparison dies. Our
-theorem is not-D-finite over $\Q(x)$ and stops there. We state this rather than
-leave it for a referee.
-
 \section{Ingredients}
 
 \subsection{Rationality, and \texorpdfstring{$\mu_H$}{mu\_H} as an algebraic integer}
@@ -422,14 +397,6 @@ monotonicity and the irreducibility certificates.}
 \label{tab:irrboxes}
 \end{table}
 
-\subsection{The growth rate, for calibration}
-
-$\deg\psi_H$ grows by a factor of about $2.7$ per level, which is close to
-$\sqrt\lambda \approx 2.67$ --- the atom degree tracks the frontier size, as one
-would expect from the transfer-matrix picture. This is an observation about rate,
-not an input: Theorem~\ref{thm:main} needs unboundedness, and gets it from
-Northcott rather than from any measured growth.
-
 \section{Transport to other families}
 \label{sec:transport}
 
@@ -463,7 +430,7 @@ in Proposition-of-the-companion-paper style always supplies one.
 By contrast, \cite{bmr2002}'s route needs an explicit combinatorial description
 of the denominators --- cyclotomic factors from $k$-sections, in their case --- to
 be redone for each new family. That difference is the actual content of the
-lightness claim in the introduction, and it is why we think the transport
+lightness claim in the abstract, and it is why we think the transport
 statement is the more useful half of this paper.
 
 \section{Relation to existing work}
@@ -564,16 +531,6 @@ bargraphs).
 cannot.} Accordingly nothing in this paper is claimed on the strength of a search:
 we assert the lighter hypotheses and the effective boxes, we cite
 \cite[Lemma~9]{bmr2002} for the shared opening, and we do not write ``first''.
-
-\subsection{One resonance, unexplored}
-
-Klazar's Theorem~4 shows that two of his sequences are $P$-recursive modulo
-$2^k$ for every $k$: objects with no $P$-recursive description whose reductions
-modulo a prime power are algebraic. That is structurally the same phenomenon as
-the mod-$3$ behaviour of the king height triangle, which admits no C-finite
-recurrence and yet is governed modulo $3$ by a single cubic. Different
-combinatorics, same shape of answer. Whether the mechanisms are related is open,
-and as far as we know nobody has looked.
 
 \section{Open problems}
 

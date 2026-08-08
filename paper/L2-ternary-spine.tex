@@ -139,43 +139,6 @@ $N/3$.}
 A pattern like that is either a coincidence of small numbers or a shadow of
 something. It is the second, and the something is a cubic.
 
-\subsection{What is proved}
-
-\begin{theorem}[the spine cubic]
-\label{thm:spine-informal}
-Let $H(y) \in \Z[[y]]$ be the per-row transfer series of the height triangle's
-diagonal family, so that $\sum_k P_k(n)y^k = G(y)H(y)^n$. Then modulo $3$,
-$H$ is the unique root $W \in \F_3[[t]]$ with $W(0)=1$ of $W^3 = W^2 + t$.
-\end{theorem}
-
-This is the king-lattice instance of a lattice-independent statement: for any
-row-local lattice with drift count $b$ and any prime $p \mid b$, the same cubic
-appears with the pair weight as its only scaling. The general statement and its
-proof are in the companion paper on the diagonal law; here we take the instance
-$p = 3$, $w = 25 \bmod 3 = 1$ and push on the arithmetic that follows, which is
-where the king lattice stops being interchangeable with any other.
-
-From the cubic:
-
-\begin{itemize}
-\item a base-$3$ digit product for the whole triangle mod $3$
-  (Theorem~\ref{thm:digit}), which is exactly the statement that the triangle is
-  $3$-automatic, with the automaton written down;
-\item closed forms for the first nonzero entry of every column
-  (Theorems~\ref{thm:oddspine} and~\ref{thm:evenspine}), computed by
-  Lagrange--B\"urmann, using an accident of characteristic $3$;
-\item the activation law: column $H$ is $\equiv 0$ for all
-  $n < \lfloor 3H/2\rfloor$ and $\not\equiv 0$ at $n = \lfloor 3H/2\rfloor$
-  (Theorem~\ref{thm:activation});
-\item the Smith normal form count $\lceil (N-1)/3\rceil$
-  (Theorem~\ref{thm:snf}), which follows from the activation law by an echelon
-  argument;
-\item reading along rows, the last nonzero residue of row $n$ cycles $1,1,2$
-  with $n \bmod 3$ (Theorem~\ref{thm:deficit2} supplies the third case);
-\item and a $3$-adic lift, $H^3 - H^2 \equiv 25t \pmod{27}$, whose level-$3$
-  correction is again $W$ (\S\ref{sec:lift}).
-\end{itemize}
-
 \subsection{Novelty status}
 \label{sec:novelty}
 
@@ -209,6 +172,10 @@ $G(0) = H(0) = 1$ and
 Both are proved in the companion paper. Equation~\eqref{eq:grand} is what makes
 this paper possible: it turns statements about infinitely many polynomials into
 statements about two power series.
+The spine cubic below is theirs too: the companion paper's universal spine
+theorem gives the same curve for every prime $p$ dividing the base, provided
+the pair weight is nonzero modulo $p$, after rescaling $t$ by that weight.
+Here $p = 3$ and $25 \equiv 1 \pmod 3$, so no rescaling is visible.
 
 \begin{proposition}[P\'olya integrality]
 \label{prop:polya}

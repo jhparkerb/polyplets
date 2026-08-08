@@ -151,36 +151,6 @@ both the bottom and the top of the column interval are nondecreasing. Write
 $M(n)$ for their number: $1, 3, 9, 28, 87, 272, \dots$ (OEIS \oeis{A225114}).
 \end{definition}
 
-\subsection{What is proved, and what is measured}
-
-We are careful throughout about which is which, because this paper contains a
-lot of both and the two are easy to blur.
-
-\paragraph{Proved.} The squeeze (Proposition~\ref{prop:squeeze}) and its three
-lemmas; the fact that every enumerated staircase term is a rigorous floor under
-$\mu$; the exponential split of the directed subclass into two halves with
-proved rates (Lemma~\ref{lem:T}, Proposition~\ref{prop:split}); the mirror
-equality and the factor $\tfrac12$ (Proposition~\ref{prop:mirror}); the
-three-term recurrence characterising the staircase eigenvector
-(Proposition~\ref{prop:phi}); and the amplitude-ratio identity
-(Proposition~\ref{prop:ratio}), conditional on the amplitudes existing.
-
-\paragraph{Rigorous in one direction.} The exclusions of
-\S\ref{sec:exclusions}. Full column rank modulo a prime proves full column rank
-over $\Q$, so \emph{excluding} a box is rigorous; a rank defect would only be a
-candidate, which is why the candidate branch gets holdouts, a second prime and a
-row skip.
-
-\paragraph{Measured.} $\mu$ and its digit count; $\theta = 0$; the amplitudes;
-the Prony spectra; the PSLQ box exclusions. None of these is a theorem and the
-paper never uses one as an input to a proof.
-
-\paragraph{Conjectured.} Exactly one thing (Conjecture~\ref{conj:sharp}), and we
-say plainly that the repository has no proof of a sharp asymptotic $A(n) \sim
-C\mu^n$ for \emph{any} series in this family --- so asking for the second
-exponential as a theorem is asking for strictly more than is known about the
-first.
-
 \section{The class and its transfer structure}
 \label{sec:structure}
 
@@ -686,19 +656,6 @@ minimal $(K_0,L_0)$ relation forces nullity $(K-K_0+1)(L-L_0+1)$ as the box
 opens, since $F^it^jP$ all lie in the larger box. Measured against predicted for
 $(K_0,L_0) = (4,22)$, the two grids agree cell for cell over the whole decidable
 region; on the null control the same grid is all zeros.
-
-\subsection{The reading}
-
-So the two classes sit one step apart in the same hierarchy: HV-convex
-quadratic, (dir4, HV-convex) quartic. The four-cone restriction raises the
-algebraic degree from $2$ to $4$ and the $t$-degree from $9$ to $22$, and does
-not leave the algebraic class --- while by \emph{area} it changes nothing about
-tractability at all, both being excluded in the same boxes.
-
-The wild/tame split is therefore a property of the statistic crossed with
-HV-convexity, and it is robust to a constraint that moves the second singularity
-and the amplitude. That is the same shape of answer the classical theory gives
-for why perimeter is the tractable statistic~\cite{delestViennot1984}.
 
 \subsection{Column-convex: solved, and already known}
 
