@@ -17,14 +17,20 @@ in PROTOCOL's Amendments section.
 | `72ec45a` | phase 0 — PROTOCOL, `scripts/l_trim_gate.sh`, baseline, RED-tested |
 | `895d85f` | phase 1 — nine sections removed across all six papers, 34,758 → 33,411 words (−3.9%) |
 | `859969e` | checkers hardened — verifier substring repair (mutation gate 12/12), gate checks 6–7 |
-| *(this commit)* | PROTOCOL amendments 1–5; this rewrite of STATE |
+| `3bf970c` | PROTOCOL amendments 1–5; STATE rewritten |
+| *(this commit)* | kill matrix — 45/45 killable ok-sites killed, 28 corruption runs; **found `l6.odd-attain` vacuous** |
 
 ## Next, in order
 
-1. **Kill matrix** (PROTOCOL amendment 1): pair every check site in
-   `paper/verify_l_papers.py` with the RED control or mutation that kills it,
-   extending `tests/gate_l_paper_verifier.py`. Own commit. A vacuous site is a
-   finding, not a patch.
+1. **Second documented unfreeze**: repair `l6.odd-attain` in
+   `verify_l_papers.py` — the "no odd $p$ attained as king pmin" check
+   compares an always-even formula against odd $p$, a parity tautology that
+   stays green when the census claims odd $p=13$ attained (kill-matrix demo
+   `census-oddp-claimed`). Same treatment as the substring repair: RED-first,
+   re-verify every blessed tree, re-baseline, PROTOCOL records it. The five
+   `pw.*`/`a308.linear-ctrl` sites the matrix marks VACUOUS are closed integer
+   arithmetic over literals inside the frozen file — no reachable input, the
+   freeze checksum is their guard, by design; recorded, not repaired.
 2. **Apply phase 2.** Argued and adjudicated; ledgers land with the
    application, in one commit, per amendment 2. The applier is written fresh
    from the ledgers by a Fable agent: content-addressed anchors only (two
