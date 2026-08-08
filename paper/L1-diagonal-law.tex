@@ -256,20 +256,11 @@ contacts:
   nothing else.
 \end{itemize}
 
-\begin{lemma}[finiteness]
-\label{lem:finite}
-Every weight above is finite, and for each $k$ there are finitely many cluster
-types of surplus $k$ --- exactly the $2^{k-1}$ compositions of $k$ into parts
-$\ge 1$, one part per row.
-\end{lemma}
-
-\begin{proof}
-A connected set of $c$ cells has $x$-spread at most $(c-1)\max|dx|$, which is
-finite by (R) and (U); so a cluster of bounded surplus, together with its two
-contact cells, ranges over a finite set of configurations once we quotient by
-$x$-translation. The type count is the composition count, and $\ell_c \le k_c$ by
-\eqref{eq:elllek}.
-\end{proof}
+All four weight families are finite, and each surplus admits only finitely
+many cluster types: by (R) and (U) a connected set of cells has bounded
+$x$-spread, so clusters of bounded surplus range over finitely many
+configurations once $x$-translation is quotiented out. The sums in
+Proposition~\ref{prop:chain} are therefore formal power series.
 
 \section{The diagonal law}
 \label{sec:A}
@@ -418,7 +409,7 @@ integer and $P_k(n) \in \Z$. This proves Theorem~\ref{thm:A}. \qed
 \begin{remark}[integer values, not integer coefficients]
 \label{rem:newton}
 $P_k$ is integer-\emph{valued}; its coefficients in the monomial basis are not
-integers for any $k \ge 2$, since by Theorem~\ref{thm:D} the leading one is
+integers for any $k \ge 2$, since by Corollary~\ref{cor:lead} the leading one is
 $\Wp^k/k!$ --- for the king lattice, $P_2$ leads with $625/2$. What is true, and
 what an implementation should store, is the Newton-basis form implicit in
 \eqref{eq:qk}, equivalently the statement that $k!\,P_k \in \Z[n]$. That
@@ -441,14 +432,10 @@ single row of two cells, counted together with the walk cell fixed below it and
 the walk cell free above it.
 \end{definition}
 
-\begin{theorem}[degree and leading coefficient]
-\label{thm:D}
-$\deg q_k = k$ exactly, and the coefficient of $n^k$ in $P_k$ is $\Wp^{\,k}/k!$.
-In particular $[n^1]P_1 = \Wp$.
-\end{theorem}
-
-The proof is a corollary of the grand form and is given in
-Section~\ref{sec:grand} (Corollary~\ref{cor:lead}); it is written out for the
+Precisely: $\deg q_k = k$ exactly, the coefficient of $n^k$ in $P_k$ is
+$\Wp^{\,k}/k!$, and in particular $[n^1]P_1 = \Wp$. That is
+Corollary~\ref{cor:lead}, proved in Section~\ref{sec:grand} once the grand
+form is available; it is written out for the
 king lattice in full, and the argument is uniform in the weights, with $25$
 replaced by $\Wp$ throughout. We state the measured position honestly: the
 identity $[n]P_1 = \Wp$ has been verified end to end on six test lattices by two
@@ -500,7 +487,7 @@ $1, 4, -80, 1753, -40928, 987355$. It is not proved for all $k$. The natural
 route --- a rational generating function for the top coefficient --- is
 obstructed: the relevant all-pairs weight family is not C-finite, refuted at
 $\ell = 16$, because the walk between the pair cells has unbounded gap. We record
-onset sharpness as an open problem (Section~\ref{sec:open}) and note that
+it as open and note that
 Corollary~\ref{cor:a308359} uses it only as a control, never as an input.
 
 \section{The grand form}
@@ -608,7 +595,7 @@ $[y^k]\exp(\sum_j c_j y^j)$ is a polynomial in $c_1,\dots,c_{k-1}$ plus $c_k$
 itself; the new level enters linearly and $c_k = a_k + b_k n$.
 \end{proof}
 
-\begin{corollary}[leading coefficient; Theorem~\ref{thm:D}]
+\begin{corollary}[leading coefficient]
 \label{cor:lead}
 The only contribution to $n^k$ at order $y^k$ is $(b_1 n y)^k/k!$, so
 $[n^k]P_k = b_1^{\,k}/k!$. Since $P_1(n) = b_1 n + a_1$ and $[n]P_1 = \Wp$
@@ -902,15 +889,6 @@ leaves.
 
 \section{Open problems}
 \label{sec:open}
-
-\begin{openproblem}[onset sharpness in general]
-Theorem~\ref{thm:A} proves validity from $n = 2k+1$. Prove that the formula fails
-at $n = 2k$ for every $k$ --- equivalently, that $\deg D = k$ exactly, with no
-cancellation. Verified on all banked king data through $k \le 17$ and proved ab
-initio from the weight table for $k \le 5$. The obvious route, a rational
-generating function for the top coefficient of $R_k$, is blocked: the all-pairs
-weight family is not C-finite.
-\end{openproblem}
 
 \begin{openproblem}[closed forms for multi-row cluster weights]
 Table~\ref{tab:weights} is enumerated. Is there a closed form for $W_c$ as a

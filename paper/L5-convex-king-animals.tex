@@ -394,16 +394,6 @@ continues past them. Three independent series, three different classes.}
 \label{tab:fourrungs}
 \end{table}
 
-\begin{remark}[the square-lattice analogue is classical]
-Convex polyominoes by area grow at $2.30914\dots$~\cite{bender1974} and the
-parallelogram subclass \oeis{A006958} has the same constant --- measured here at
-$2.309138593330495$, flat from $n = 100$ to $n = 400$. So
-Proposition~\ref{prop:squeeze}'s conclusion could have been read off the solved
-models one lattice over. What the proposition adds is the king case, where
-neither class is solved, and the statement for \emph{every} intermediate class
-rather than for two particular ones.
-\end{remark}
-
 \section{Area is wild}
 \label{sec:exclusions}
 
@@ -955,14 +945,11 @@ and the spectral radius of $T(x)$ increases continuously in $x$, so it reaches
 $1$ at $x = 1/\mu$.
 \end{proof}
 
-\begin{corollary}[$\mu$ by shooting]
-\label{cor:shoot}
 Shooting on that recurrence computes $\mu$ to arbitrary precision in
-$O(h_{\max})$ operations, with no series and no extrapolation. It reproduces all
-$199$ banked digits and continues past them, and reaches \textbf{$987$ digits in
-$1.6$ seconds} on one core --- against a $700$-term enumeration plus
-extrapolation for $200$.
-\end{corollary}
+$O(h_{\max})$ operations, with no series and no extrapolation: it reproduces
+all $199$ banked digits, continues past them, and reaches $987$ digits in
+$1.6$ seconds on one core, against a $700$-term enumeration plus extrapolation
+for $200$.
 
 \begin{proposition}[the ratio]
 \label{prop:ratio}
@@ -1094,7 +1081,8 @@ identity (Proposition~\ref{prop:ratio}).
 
 \paragraph{The square-lattice analogue.} Bender's $2.30914$~\cite{bender1974} for
 convex polyominoes by area, and the parallelogram subclass \oeis{A006958}
-sharing it, mean that Proposition~\ref{prop:squeeze}'s \emph{conclusion} could
+sharing it (measured here at $2.309138593330495$, flat from $n = 100$ to
+$n = 400$), mean that Proposition~\ref{prop:squeeze}'s \emph{conclusion} could
 have been read off the solved models one lattice over. It is the generality ---
 every intermediate class, on a lattice where nothing is solved --- that is the
 contribution.
@@ -1115,11 +1103,6 @@ Prove $A(n) \sim C\mu^n$, or the same for $M(n)$. Nothing in this paper reaches
 it, and Conjecture~\ref{conj:sharp} depends on it. The most concrete route is a
 proof of Kurkov's conjectured continued fraction for \oeis{A225114}, which would
 supply the meromorphic continuation and the spectral gap.
-\end{openproblem}
-
-\begin{openproblem}[the arithmetic of $\mu$]
-Is $\mu$ irrational? Transcendental? \S\ref{sec:exclusions} excludes boxes and
-nothing more.
 \end{openproblem}
 
 \begin{openproblem}[non-D-finiteness as a theorem]

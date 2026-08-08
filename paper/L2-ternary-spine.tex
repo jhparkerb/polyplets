@@ -211,8 +211,8 @@ invertible in $\Z[[y]]$ by the geometric series.
 $H$ begins $1, 25, 208, 1483, 20688, 130208, \dots$ and is the per-row transfer
 series of the underlying defect gas; its first coefficient $25$ is the number of
 single-defect species, which is the pair weight of the companion paper. Whether
-$H$ itself is a known sequence is one of the things the missing novelty sweep
-would settle.
+$H$ itself is a known sequence, unchecked against the OEIS~\cite{oeis} or
+anywhere else, is one of the things the missing novelty sweep would settle.
 
 \section{The ladder, and what it now rests on}
 \label{sec:ladder}
@@ -281,15 +281,10 @@ $W(y)^{3^i} = W(y^{3^i})$, so $W^n = \prod_i \bigl(W^{3^i}\bigr)^{n_i} =
 \prod_i W(y^{3^i})^{n_i}$.
 \end{proof}
 
-\begin{remark}[the automaton]
 $W$ is algebraic over $\F_3(t)$, so by Christol's
-theorem~\cite{christol1980} --- a power series over $\F_p$ is algebraic exactly
-when its coefficient sequence is $p$-automatic --- the array is
-$3$-automatic~\cite{allouche2003}. Theorem~\ref{thm:digit} is that automaton made
-explicit for the two-dimensional array: to read $T(n,H) \bmod 3$, expand $n$ in
-base $3$ and multiply one factor per digit. Nothing about the animals is
-consulted.
-\end{remark}
+theorem~\cite{christol1980} the array is $3$-automatic~\cite{allouche2003},
+and Theorem~\ref{thm:digit} is its automaton written out for the
+two-dimensional case.
 
 \section{The spine}
 
@@ -437,15 +432,6 @@ the last step elementary.
 Verified directly on the enumerated matrix for every $N \le 36$, reproducing
 Table~\ref{tab:snfcount} and the full exponent lists.
 
-\begin{remark}[why one per three]
-The $\lceil\cdot/3\rceil$ is the activation slope $3/2$ against the diagonal, and
-it is the same $/3$ that appears elsewhere in this triangle's structure --- the
-columns factor as products of three consecutive atoms, and the $3$-adic content
-of the law itself runs $3^{n-1}$ on the diagonal and $3^{3k+1}$ across it. The
-SNF count, the atom factorisation and the $3$-adic exponents are not three
-phenomena. They are one, and it is the cubic.
-\end{remark}
-
 \section{Reading along rows}
 
 Everything above reads down columns. Reading along rows gives a picture that is
@@ -578,12 +564,6 @@ Theorem~\ref{thm:snf} counts the nontrivial invariant factors and the
 determinant fixes their sum at $N(N-1)/2$. The individual exponents $e_i(N)$ are
 not known. The mod-$3$ rank gives the count but says nothing about the higher
 $3$-adic structure; the lifts of \S\ref{sec:lift} are the natural attack.
-\end{openproblem}
-
-\begin{openproblem}[is $H$ known?]
-$H = 1, 25, 208, 1483, 20688, 130208, \dots$ is the per-row transfer series of
-the defect gas. It is a candidate new integer sequence and we have not checked
-it against the OEIS~\cite{oeis} or anywhere else (\S\ref{sec:novelty}).
 \end{openproblem}
 
 \begin{openproblem}[other primes]

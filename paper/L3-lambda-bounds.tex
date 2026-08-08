@@ -163,13 +163,7 @@ king adjacency (the eight offsets $(\pm1,0),(0,\pm1),(\pm1,\pm1)$), taken up to
 translation. $a(n)$ is their number; $\lambda := \lim_n a(n)^{1/n}$.
 \end{definition}
 
-\begin{proposition}[existence, and terms are floors]
-\label{prop:fekete}
-$a(m)a(n) \le a(m+n)$; hence $\lambda$ exists, and $a(n) \le \lambda^n$ for all
-$n$.
-\end{proposition}
-
-This is Fekete's lemma on $\log a$. The ladder --- supermultiplicativity, the
+The ladder --- supermultiplicativity, the
 existence of the limit, the per-term inequality, and the resulting lower bound
 --- is formalized in Lean~4 against mathlib~\cite{mathlib} and depends on
 standard axioms only. The formalization carries the ladder \emph{once}, generic
@@ -720,13 +714,6 @@ $\mu_{18}$ and beyond need $\ge 192$-bit accumulators and roughly $35$~GB of
 transient memory. Each rung buys about $+0.05$. The ladder converges to
 $\lambda$, so in principle the lower side can be pushed arbitrarily close; in
 practice the cost per rung grows about $3.5\times$.
-\end{openproblem}
-
-\begin{openproblem}[the missing concatenation lemma]
-Find a connected split of a lattice animal into two pieces with sizes prescribed
-to within $O(1)$ and with $\mathrm{poly}(n)$ reassembly information. This would
-give $\lambda \le 7.745$ here and improve the polyomino record; the second
-consequence is why it should be expected to be hard.
 \end{openproblem}
 
 \section{Reproduction}
