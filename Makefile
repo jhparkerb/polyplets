@@ -29,7 +29,8 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 .PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
-        gate-compile-db gate-citations gate-perimeter-min gate-perimeter-defect \
+        gate-compile-db gate-citations gate-l-paper-verifier \
+        gate-perimeter-min gate-perimeter-defect \
         gate-perimeter-min-shard clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
@@ -41,7 +42,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         papers papers-verify papers-clean papers-list
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -114,6 +115,22 @@ gate-compile-db: compile-commands
 # build deps, so it runs first.
 gate-citations:
 	python3 tests/gate_citations.py
+
+# Gate L-PAPER-VERIFIER: mutation-tests paper/verify_l_papers.py, which is the
+# only thing standing between the L manuscripts and a wrong printed number.
+#
+# It exists because that verifier asserted "the paper prints X" with
+# `str(X) in src` -- substring containment -- at three sites, and on 2026-08-07
+# six of twelve deliberate manuscript corruptions went undetected, wrong-digit
+# typos among them. It carried thirteen RED controls and not one of them was on
+# a text assertion, so nothing ever established that those checks could fail.
+#
+# A verifier is trusted silently by everything downstream of it, so it is held
+# to a higher standard than the papers it protects, not a lower one. This gate
+# corrupts each manuscript twelve ways on a temp copy and requires the verifier
+# to go red every time. Sub-second, no build deps.
+gate-l-paper-verifier:
+	python3 tests/gate_l_paper_verifier.py
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:

@@ -10,7 +10,7 @@
 #      scripts/l_trim_gate.sh baseline     # record the pre-campaign metrics
 #      scripts/l_trim_gate.sh check N      # gate phase N against baseline
 #
-#  The five checks, in the order a breakage is cheapest to diagnose:
+#  The six checks, in the order a breakage is cheapest to diagnose:
 #
 #    1. compile      every L paper builds, three passes, -halt-on-error
 #    2. references   no "undefined" reference or citation appears in any log,
@@ -19,12 +19,36 @@
 #    4. monotone     no paper is longer in words than it was at baseline
 #    5. untouched    technical-report.tex, polyplets-report.tex and shared/
 #                    are byte-identical to baseline
+#    6. constants    the load-bearing exact constants are still printed
+#    7. citations    no paper has lost a \cite key since baseline
 #
 #  Check 5 exists because the campaign's blast radius is six files and the
 #  ledger.  technical-report.tex is jasonp's prose and is read-only to the
 #  machine; shared/disclosure.tex carries the verification ledgers that the
 #  whole authorship split rests on.  A trim agent reaching either of those is
 #  a bug, and this is where it stops.
+#
+#  Check 6 exists because check 3 cannot be trusted to do this particular job.
+#  verify_l_papers.py asserts that a paper still prints a number by testing
+#  `str(d) in src` — substring containment against the whole file — and that is
+#  weaker than it looks.  Measured 2026-08-07: delete the line of L4 that prints
+#  all ten psi-degrees and the check at verify_l_papers.py:204 stays green,
+#  because "1", "2", "4" and "9" match anywhere in a LaTeX file and 29, 68, 181,
+#  462, 1254 and 3289 each occur elsewhere in L4.  The same shape is at :448
+#  (L6's min-end constants, where "1" and "6" are vacuous) and at :495, where
+#  "58" is satisfied by the "6558" sitting in a table entry.  verify_l_papers.py
+#  is frozen for the duration of the campaign, so the repair goes here instead:
+#  pin each constant by exact literal in the paper that owns it.  Four of the
+#  eight occur exactly once, which is precisely what makes them losable.
+#
+#  Check 7 closes the one silent failure neither of the others can see.  Check 2
+#  catches an undefined citation, but dropping the LAST \cite of a key is not an
+#  undefined citation: the key still exists in refs.bib, BibTeX simply omits the
+#  entry, the paper compiles clean, and an attribution disappears with no warning
+#  anywhere.  PROTOCOL is explicit that attribution is never redundant, so a key
+#  leaving a paper is always a failure, never a legitimate trim.  Three keys in
+#  L2 — christol1980, allouche2003, oeis — occur exactly once each, and phase 2
+#  proposes cutting all three ranges.
 # ---------------------------------------------------------------------------
 set -uo pipefail
 
@@ -56,12 +80,22 @@ fail=0
 say()  { printf '  %-12s %s\n' "$1" "$2"; }
 bad()  { printf '  %-12s %s\n' "FAIL" "$*"; fail=1; }
 
+# Sorted unique \cite keys of a manuscript, space separated.  Handles the
+# multi-key form \cite{a,b} as well as \citet/\citep.
+cite_keys() {
+  grep -o '\\cite[tp]\?{[^}]*}' "$1" 2>/dev/null \
+    | sed 's/.*{//; s/}//' | tr ',' '\n' | tr -d ' ' | sort -u | tr '\n' ' '
+}
+
 # --- baseline ---------------------------------------------------------------
 if [[ "${1:-}" == "baseline" ]]; then
   mkdir -p "$LEDGER"
   : > "$BASELINE"
   for p in "${L_PAPERS[@]}"; do
     printf 'words\t%s\t%s\n' "$p" "$(wc -w < "$PAPER/$p.tex" | tr -d ' ')" >> "$BASELINE"
+  done
+  for p in "${L_PAPERS[@]}"; do
+    printf 'cites\t%s\t%s\n' "$p" "$(cite_keys "$PAPER/$p.tex")" >> "$BASELINE"
   done
   for f in "${FROZEN[@]}"; do
     [[ -e "$ROOT/$f" ]] || { echo "l_trim_gate: frozen file missing: $f" >&2; exit 1; }
@@ -144,6 +178,43 @@ while IFS=$'\t' read -r kind key val; do
     bad "untouched $key — MODIFIED, and it is out of scope"
   else
     say "untouched" "$key"
+  fi
+done < "$BASELINE"
+
+# --- 6. constants -----------------------------------------------------------
+# Exact literals, not substrings.  A count of zero is the failure; a count that
+# merely drops is a legitimate cut of a duplicate occurrence.
+while IFS='|' read -r paper literal; do
+  [[ -n "${paper:-}" ]] || continue
+  n=$(grep -Fc -- "$literal" "$PAPER/$paper" 2>/dev/null || true)
+  if [[ "${n:-0}" -eq 0 ]]; then
+    bad "constants $paper no longer prints: $literal"
+  else
+    say "constants" "$(printf '%-24s %sx  %s' "${paper%.tex}" "$n" "$literal")"
+  fi
+done <<'CONSTANTS'
+L1-diagonal-law.tex|\Wp = 58
+L1-diagonal-law.tex|\Wp = 57
+L2-ternary-spine.tex|1, 25, 208, 1483, 20688, 130208
+L3-lambda-bounds.tex|6.543
+L3-lambda-bounds.tex|9.3154
+L4-not-dfinite.tex|1, 2, 4, 9, 29, 68, 181, 462, 1254, 3289
+L5-convex-king-animals.tex|3.12340450886853853211
+L6-perimeter-gradings.tex|1, 6, 22, 68, 187, 470, 1106
+CONSTANTS
+
+# --- 7. citations -----------------------------------------------------------
+while IFS=$'\t' read -r kind key val; do
+  [[ "$kind" == "cites" ]] || continue
+  now=" $(cite_keys "$PAPER/$key.tex") "
+  lost=""
+  for k in $val; do
+    [[ "$now" == *" $k "* ]] || lost+="$k "
+  done
+  if [[ -n "$lost" ]]; then
+    bad "citations $key dropped its last \\cite of: ${lost% }"
+  else
+    say "citations" "$(printf '%-24s %s keys intact' "$key" "$(echo "$val" | wc -w | tr -d ' ')")"
   fi
 done < "$BASELINE"
 

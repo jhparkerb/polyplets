@@ -55,6 +55,54 @@ def red(cond_should_be_false, what):
         failures.append("RED CONTROL DID NOT FIRE: " + what)
 
 
+def prints_number(src, value):
+    """True iff `src` prints `value` as a number, not as a digit substring.
+
+    `str(value) in src` is not this test and must never be used for it.  It was,
+    until 2026-08-07, at three sites here, and tests/gate_l_paper_verifier.py
+    exists because of what that let through: "58" is satisfied by the "6558" in
+    a table entry, and "1", "2", "4", "9" are satisfied by any LaTeX document at
+    all, so `all(str(d) in src for d in PSI_DEGREES)` could not fail.  Deleting
+    the line of L4 that printed every psi-degree left the check green, and so
+    did mistyping the last one.
+
+    The guard is a digit boundary on both sides: a match may not be preceded or
+    followed by another digit, and may not be preceded by a decimal point (so
+    "114" does not match inside "3.114").
+    """
+    return re.search(r"(?<![\d.])" + re.escape(str(value)) + r"(?!\d)", src) is not None
+
+
+def prints_together(src, values, window=240):
+    """True iff `src` prints all of `values` as numbers within one `window`.
+
+    Presence-anywhere is the wrong claim when a number occurs in the paper for
+    more than one reason.  L1 prints 114 twice: once as the b=5 interval pair
+    weight and once as a residue mod 5, four hundred lines apart.  So
+    `prints_number(src, 114)` stays true even when the sentence that states the
+    pair weights is mistyped -- measured, and the last mutation
+    tests/gate_l_paper_verifier.py caught.  What the paper actually claims is
+    that 58 and 114 are the b = 4, 5 weights *together*, and co-occurrence is
+    the testable form of that.  The window is characters, so it survives
+    rewording and rewrapping but not a typo at the statement site.
+    """
+    for m in re.finditer(r"(?<![\d.])" + re.escape(str(values[0])) + r"(?!\d)", src):
+        near = src[m.start(): m.start() + window]
+        if all(prints_number(near, v) for v in values[1:]):
+            return True
+    return False
+
+
+def prints_sequence(src, values, sep=", "):
+    """True iff `src` prints the whole sequence, in order, as one list.
+
+    Checking the members one at a time cannot see a dropped line: every member
+    of L6's [1, 6, 22, 68, 187, 470, 1106] occurs somewhere in L6 for unrelated
+    reasons.  The list as a unit occurs once, where the paper states it.
+    """
+    return sep.join(str(v) for v in values) in src
+
+
 def tex(name):
     p = PAPER / name
     if not p.exists():
@@ -201,8 +249,12 @@ def check_l4_boxes():
     if not src:
         return
 
-    ok(all(str(d) in src for d in PSI_DEGREES),
-       "L4 must print every psi-degree it uses")
+    # The list as a unit, not member by member: "1", "2", "4" and "9" are
+    # satisfied by any LaTeX file, so the member-wise form could not fail.
+    ok(prints_sequence(src, PSI_DEGREES),
+       "L4 must print the psi-degree list " + ", ".join(map(str, PSI_DEGREES)))
+    red(prints_sequence(src, PSI_DEGREES[:-1] + [PSI_DEGREES[-1] + 9]),
+        "a psi-degree list with the last degree mistyped")
 
     full = boxes_from(PSI_DEGREES)
     for r, D in ((5, 28), (4, 67), (3, 180), (2, 461), (1, 1253), (0, 3288)):
@@ -445,8 +497,13 @@ def check_l6_min_end():
             nmax[q] = max(nmax.get(q, 0), n)
 
     stable = [1, 6, 22, 68, 187, 470, 1106]
-    ok(all(str(v) in src for v in stable),
-       "L6 must print the king p=0 mod 4 constants")
+    # As a list: every member occurs somewhere in L6 for unrelated reasons, and
+    # "1" and "6" occur in any document, so member-wise this could not fail.
+    ok(prints_sequence(src, stable),
+       "L6 must print the king p=0 mod 4 constants "
+       + ", ".join(map(str, stable)))
+    red(prints_sequence(src, stable[:-1] + [stable[-1] - 100]),
+        "a min-end constant list with the last entry mistyped")
 
     # The constants, at every p where the paper says all seven have stabilised.
     for p in (32, 36, 40, 44, 48):
@@ -492,8 +549,25 @@ def check_l1_pair_weights():
         W = int(Wpair_interval(b))
         r = math.isqrt(W)
         ok(r * r != W, f"W_pair({b}) = {W} is not a square")
-    ok("58" in src and "114" in src and "57" in src,
-       "L1 must print the corrected pair weights")
+    # Digit-bounded, and co-occurring: "58" as a bare substring is satisfied by
+    # the "6558" in the six-lattice table, and 114 appears twice in L1 for two
+    # different reasons, so neither containment nor presence-anywhere can see a
+    # typo at the site that states them.
+    ok(prints_together(src, [58, 114]),
+       "L1 must print 58 and 114 together as the b = 4, 5 interval pair weights")
+    ok(prints_number(src, 57),
+       "L1 must print the corrected pair weight 57 for D = {-2,0,2}")
+
+    # Unit controls on the matchers themselves, on synthetic input: these are
+    # what was missing when the substring form shipped.
+    red(prints_number("the entry 6558 and nothing else", 58),
+        "a digit substring inside a larger number satisfying a number check")
+    red(prints_number("a coefficient 3.114 appears", 114),
+        "a digit substring after a decimal point satisfying a number check")
+    red(prints_together("W = 58 here." + "x" * 400 + "and 114 far away", [58, 114]),
+        "two numbers far apart satisfying a co-occurrence check")
+    red(prints_sequence("1, 6, 22, 68, 187, 470, 1006", [1, 6, 22, 68, 187, 470, 1106]),
+        "a mistyped list satisfying a sequence check")
 
     # Theorem B's two sharpness witnesses.
     ok(57 % 3 == 0, "D = {-2,0,2} realises the degenerate branch mod 3")

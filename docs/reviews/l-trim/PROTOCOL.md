@@ -97,8 +97,8 @@ already learned about pruning its own prose.
   that cannot be recovered by re-deriving them later. Prune the claim, not its
   warrant.
 - **Exact constants survive verbatim.** λ ≤ 9.3154 is not 9.3153 and is not
-  "about 9.32". `verify_l_papers.py` checks 318 of these and will block the
-  commit, but the argument should never get that far.
+  "about 9.32". `verify_l_papers.py` checks these and will block the commit,
+  but the argument should never get that far.
 - **A hedge that scopes a claim is load-bearing.** "at order and degree ≤ 24 on
   700 terms" is not padding around "not D-finite"; it is the difference between
   a measurement and a false theorem.
@@ -137,11 +137,43 @@ in the same commit. The trim runs on a branch, so the ledger costs nothing on
 ## The commit gate
 
 `scripts/l_trim_gate.sh check N` runs before every phase commit and blocks it
-on any of five failures: a paper that does not compile, an undefined `\ref` or
+on any of seven failures: a paper that does not compile, an undefined `\ref` or
 `\cite` anywhere in a log, a `verify_l_papers.py` failure, a paper that grew in
-words since baseline, or a frozen file that changed. All three of the checks
-that can catch a silent error — growth, frozen-file modification, and dangling
-references — were RED-tested against deliberate breakage before the campaign
-started.
+words since baseline, a frozen file that changed, a pinned load-bearing constant
+whose occurrence count drops to zero, or a `\cite` key leaving any paper's set.
+Of the first five, the three that can catch a silent error — growth,
+frozen-file modification, and dangling references — were RED-tested against
+deliberate breakage before the campaign started. Checks 6 and 7 were added
+during phase 2's argument, because that argument showed what the first five
+could not catch, and were RED-tested the same way before being trusted.
+
+### `verify_l_papers.py` was deliberately unfrozen once, between phase 2's adjudication and its application
+
+The freeze exists so a trim agent cannot quiet a check that is inconvenient.
+It was lifted exactly once, by jasonp's instruction, and the reason is recorded
+here because an undocumented change to a frozen file is indistinguishable from
+the thing the freeze prevents.
+
+Phase 2's argument turned up that the verifier asserted "the manuscript prints
+X" with `str(X) in src` — substring containment — at three sites.
+`tests/gate_l_paper_verifier.py` measured what that let through: six of twelve
+deliberate manuscript corruptions undetected, wrong-digit typos among them. The
+file carried thirteen RED controls and none of them was on a text assertion, so
+nothing had ever established that those checks could fail.
+
+jasonp's ruling: fix it, and fix it **retroactively**. The takeaway he asked to
+have on the record is that **verifiers, tests and linters are engineered to a
+higher standard than the content they protect** — a paper with an error is
+caught by its checker, and a checker with an error is caught by nobody.
+
+What was done, in order: the mutation gate was written first and failed first;
+the three sites were repaired to match a number as a number, a list as a list
+and a joint claim as a co-occurrence; the gate went to twelve of twelve; the
+repaired verifier was re-run against every tree the broken one had blessed —
+pre-campaign `9cebd90`, phase 0, phase 1, and the working tree — and all four
+pass; and the frozen checksum was re-baselined to the repaired file. The gate
+now runs in `make gates` as `gate-l-paper-verifier`.
+
+The freeze is back on. Any further change to that file needs the same treatment.
 
 Nothing in this campaign is pushed. Publishing is jasonp's call.
