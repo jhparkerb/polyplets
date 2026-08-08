@@ -1,0 +1,23 @@
+/Users/jasonp/src/polyominoes/docs/reviews/llm-tics/density.py:13: SyntaxWarning: "\[" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\["? A raw string is also an option.
+  math ($...$, \[...\], equation-like environments), and LaTeX commands are
+paper                         words  contrast-neg         cleft     serves-as    dash-aside      scaffold         punch mean-len
+--------------------------------------------------------------------------------------------------------------------------------
+L1-diagonal-law.tex            4930     1.01/1k     0.61/1k     0.00/1k     2.84/1k     0.00/1k     2.03/1k     23.7
+L2-ternary-spine.tex           2289     0.87/1k     0.87/1k     0.00/1k     1.31/1k     0.00/1k     3.93/1k     18.3
+L3-lambda-bounds.tex           4274     0.94/1k     0.70/1k     0.00/1k     2.34/1k     0.00/1k     0.94/1k     24.1
+L4-not-dfinite.tex             2435     0.00/1k     0.82/1k     0.00/1k     2.46/1k     0.00/1k     0.41/1k     23.2
+L5-convex-king-animals.tex     4798     0.63/1k     1.67/1k     0.00/1k     1.25/1k     0.00/1k     0.63/1k     27.3
+L6-perimeter-gradings.tex      3049     2.30/1k     0.66/1k     0.00/1k     2.95/1k     0.00/1k     0.98/1k     23.5
+== L overall                  21775     0.96/1k     0.92/1k     0.00/1k     2.20/1k     0.00/1k     1.38/1k
+
+technical-report.tex           1045     0.00/1k     0.00/1k     0.00/1k     0.00/1k     0.00/1k     0.00/1k     47.5
+polyplets-report.tex           6539     0.46/1k     0.15/1k     0.00/1k     0.46/1k     0.00/1k     0.46/1k     28.5
+== P-control overall           7584     0.40/1k     0.13/1k     0.00/1k     0.40/1k     0.00/1k     0.40/1k
+
+ratio L : P-control per construction (1.0 = human-like density)
+  contrast-neg    0.96 vs   0.40  ratio  2.44
+  cleft           0.92 vs   0.13  ratio  6.97
+  serves-as       0.00 vs   0.00  ratio inf
+  dash-aside      2.20 vs   0.40  ratio  5.57
+  scaffold        0.00 vs   0.00  ratio inf
+  punch           1.38 vs   0.40  ratio  3.48
