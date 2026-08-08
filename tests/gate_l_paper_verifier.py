@@ -11,10 +11,10 @@ Why it exists: until 2026-08-07 three manuscript checks were written as
 `str(value) in src`, plain substring containment, so "58" was satisfied by the
 "6558" in a table entry and the psi-degree list check could not fail at all.
 Twelve manuscript mutations measured that; six sailed through.  The verifier
-was repaired (the one documented unfreeze) and this gate keeps the standard:
+was repaired (the first documented unfreeze) and this gate keeps the standard:
 a check is trusted only if a specific corruption has turned it red.
 
-The verifier has 51 ok() sites and 14 red() control sites (19 red instances,
+The verifier has 51 ok() sites and 15 red() control sites (20 red instances,
 some in loops).  Kill mechanisms, in preference order:
 
   mut:<id>    a manuscript mutation applied to a temp copy of the papers --
@@ -39,11 +39,6 @@ the baseline run (which must be clean) is the proof each of them fired.
 VACUOUS findings, reported prominently (they trigger the documented unfreeze
 procedure; this gate only tolerates and warns):
 
-  l6.odd-attain -- ok(all(2*ceil(2*sqrt(n))+4 != p ...), "... the
-      attainability claim") compares an always-even formula against odd p, so
-      it is a parity tautology: it cannot fail for ANY census content.  The
-      demo run `census-oddp-claimed` appends a census row claiming odd
-      perimeter 13 IS attained (count 7) and the verifier stays green.
   a308.linear-ctrl, pw.squares, pw.mod3, pw.mod5, pw.units -- closed integer
       arithmetic over literals inside the frozen verifier (e.g. ok(57%3==0)).
       No injectable input exists: int arithmetic cannot be monkeypatched and
@@ -51,6 +46,14 @@ procedure; this gate only tolerates and warns):
       arithmetic against verifier-source typos only; the freeze is their
       guard.  Corruptions tried: the bad-Fraction patch (does not reach int
       ops), manuscript mutation (they read no manuscript).
+
+Formerly VACUOUS, repaired: l6.odd-attain compared the always-even pmin
+formula against odd p -- a parity tautology, green for ANY census content;
+the demo run `census-oddp-claimed` (a census row claiming odd perimeter 13
+IS attained, count 7) left the verifier green.  The second documented
+unfreeze (2026-08-07) rewrote the site as a universally-quantified check
+over census entries -- every positive odd-p row strictly above the pmin
+formula -- and census-oddp-claimed is now a REQUIRED kill below.
 
 Everything runs on temp copies: the manuscripts on disk, results/ files and
 the verifier itself are never modified.
@@ -60,7 +63,7 @@ the verifier itself are never modified.
 
 Exit 0 iff the baseline is clean, every listed kill is detected (its
 site-attributing fragment appears among the failures of its run), every
-mutation target still exists, and the vacuity demo stays green.
+mutation target still exists, and any vacuity demo stays green.
 """
 
 import importlib.util
@@ -230,8 +233,9 @@ def corrupt_census(results_dir):
 
 
 def census_oddp_claimed(results_dir):
-    """VACUITY DEMO: a census row claiming the odd perimeter 13 IS attained.
-    The 'attainability claim' check must stay green -- that is the finding."""
+    """A census row claiming the odd perimeter 13 IS attained at n=5, below
+    pmin(5) = 14.  Formerly the vacuity demo for l6.odd-attain; since the
+    second unfreeze repaired that site, this is a required kill."""
     p = results_dir / "perimmin_square8_p48_r6.txt"
     p.write_text(p.read_text() + "5 13 7\n")
 
@@ -239,11 +243,12 @@ def census_oddp_claimed(results_dir):
 RESULTS_RUNS = {
     "triangle-corrupt": corrupt_triangle,
     "census-corrupt": corrupt_census,
+    "census-oddp-claimed": census_oddp_claimed,
 }
 
-VACUITY_DEMOS = {
-    "census-oddp-claimed": (census_oddp_claimed, "l6.odd-attain"),
-}
+# No current vacuity demos: l6.odd-attain, the only one, was repaired in the
+# second documented unfreeze.  The machinery stays for the next finding.
+VACUITY_DEMOS = {}
 
 # ---------------------------------------------------------------------------
 # Monkeypatched internal inputs, for recomputation sites no file reaches.
@@ -496,13 +501,14 @@ SITES = [
      "odd-p census rows, where present, are genuine counts not zeros",
      [("res", "census-corrupt", "genuine counts")]),
     ("l6.odd-attain", "check_l6_min_end",
-     "no odd p is attained as king pmin ('the attainability claim')",
-     [("VACUOUS", "parity-tautology", None)]),
+     "every positive odd-p census row sits strictly above the pmin formula",
+     [("res", "census-oddp-claimed", "the attainability claim"),
+      ("red", "Roddp-below-pmin", None)]),
 ]
 
 # The verifier's own negative controls: each corrupts its input on every run
 # and main() fails unless every one fired.  The clean baseline run is
-# therefore the proof of all 14 sites (19 instances; two are in loops).
+# therefore the proof of all 15 sites (20 instances; two are in loops).
 RED_SITES = [
     ("R1-ladder-nudge", "check_l3_ladder",
      "a ladder value one ulp above its receipt is rejected"),
@@ -532,6 +538,8 @@ RED_SITES = [
      "a min-end list with the last entry mistyped is not found in L6"),
     ("Ronset-one-rung-early", "check_l6_min_end",
      "no column is stable one rung before its onset (6 instances)"),
+    ("Roddp-below-pmin", "check_l6_min_end",
+     "a synthetic census row claiming odd p=13 attained at n=5 is rejected"),
 ]
 
 
@@ -719,9 +727,7 @@ def main():
           f"{len(RESULTS_RUNS)} results, {len(PATCH_RUNS)} patch); "
           f"{len(RED_SITES)}/{len(RED_SITES)} RED-control sites fired in baseline")
     for site, reason in sorted(set(vacuous)):
-        detail = ("cannot fail for ANY census: always-even formula vs odd p; "
-                  "demo run left it green" if reason == "parity-tautology" else
-                  "closed integer arithmetic over literals in the frozen "
+        detail = ("closed integer arithmetic over literals in the frozen "
                   "verifier; no reachable input")
         print(f"  WARNING: VACUOUS site {site} [{reason}] -- {detail}")
     print(f"  ({len(vac_sites)} of {ok_sites} ok-sites VACUOUS -- tolerated, "

@@ -191,7 +191,9 @@ deliberate breakage before the campaign started. Checks 6 and 7 were added
 during phase 2's argument, because that argument showed what the first five
 could not catch, and were RED-tested the same way before being trusted.
 
-### `verify_l_papers.py` was deliberately unfrozen once, between phase 2's adjudication and its application
+### `verify_l_papers.py` has been deliberately unfrozen twice, both on the record
+
+**First unfreeze, between phase 2's adjudication and its application:**
 
 The freeze exists so a trim agent cannot quiet a check that is inconvenient.
 It was lifted exactly once, by jasonp's instruction, and the reason is recorded
@@ -218,6 +220,17 @@ pre-campaign `9cebd90`, phase 0, phase 1, and the working tree — and all four
 pass; and the frozen checksum was re-baselined to the repaired file. The gate
 now runs in `make gates` as `gate-l-paper-verifier`.
 
-The freeze is back on. Any further change to that file needs the same treatment.
+**Second unfreeze, immediately after the kill matrix landed:** the matrix
+(amendment 1) found `l6.odd-attain` vacuous — "no odd $p$ is attained as king
+pmin" compared an always-even formula against odd $p$, a parity tautology true
+of any census whatsoever. Same treatment, same order: the kill was demonstrated
+first (`census-oddp-claimed`), the site repaired to quantify over the actual
+census entries, the repaired verifier re-run retroactively, the checksum
+re-baselined. One repair, one commit.
+
+The freeze is back on. Any further change to that file needs the same
+treatment: a demonstrated kill first, the repair, retroactive re-verification
+of every tree the old verifier blessed, a re-baselined checksum, and a
+paragraph here.
 
 Nothing in this campaign is pushed. Publishing is jasonp's call.

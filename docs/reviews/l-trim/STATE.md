@@ -18,27 +18,24 @@ in PROTOCOL's Amendments section.
 | `895d85f` | phase 1 — nine sections removed across all six papers, 34,758 → 33,411 words (−3.9%) |
 | `859969e` | checkers hardened — verifier substring repair (mutation gate 12/12), gate checks 6–7 |
 | `3bf970c` | PROTOCOL amendments 1–5; STATE rewritten |
-| *(this commit)* | kill matrix — 45/45 killable ok-sites killed, 28 corruption runs; **found `l6.odd-attain` vacuous** |
+| `302f862` | kill matrix — 45/45 killable ok-sites killed, 28 corruption runs; **found `l6.odd-attain` vacuous** |
+| *(this commit)* | second documented unfreeze — `l6.odd-attain` repaired to quantify over the census, 46/46 |
+
+The five `pw.*`/`a308.linear-ctrl` sites the matrix marks VACUOUS are closed
+integer arithmetic over literals inside the frozen file — no reachable input,
+the freeze checksum is their guard, by design; recorded, not repaired.
 
 ## Next, in order
 
-1. **Second documented unfreeze**: repair `l6.odd-attain` in
-   `verify_l_papers.py` — the "no odd $p$ attained as king pmin" check
-   compares an always-even formula against odd $p$, a parity tautology that
-   stays green when the census claims odd $p=13$ attained (kill-matrix demo
-   `census-oddp-claimed`). Same treatment as the substring repair: RED-first,
-   re-verify every blessed tree, re-baseline, PROTOCOL records it. The five
-   `pw.*`/`a308.linear-ctrl` sites the matrix marks VACUOUS are closed integer
-   arithmetic over literals inside the frozen file — no reachable input, the
-   freeze checksum is their guard, by design; recorded, not repaired.
-2. **Apply phase 2.** Argued and adjudicated; ledgers land with the
-   application, in one commit, per amendment 2. The applier is written fresh
-   from the ledgers by a Fable agent: content-addressed anchors only (two
+1. **Apply phase 2.** Argued and adjudicated; ledgers land with the
+   application, in one commit, per amendment 2. The applier has been written
+   fresh from the ledgers by a Fable agent and is untracked until it lands
+   with the phase: content-addressed anchors only (two
    residue line numbers in the cuts file are off by one — the verdict's
    "Corrections applied to the ledger" section is the authority), and result
    environments sit between two blank lines, so each removal takes one
    adjacent blank to keep the one-separator invariant.
-3. **Phases 3, 4, 5** — paragraphs, sentences, words. Per phase: fresh Fable
+2. **Phases 3, 4, 5** — paragraphs, sentences, words. Per phase: fresh Fable
    cutter, defender, adjudicator writing the three ledgers and the applier;
    the driving session runs applier + gate and makes the phase's one commit.
 

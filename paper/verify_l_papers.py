@@ -469,10 +469,11 @@ def check_l6_min_end():
     """L6's king minimum-end ladder, against the p<=48 census.
 
     Reads the census cold and rebuilds the C(p,i) table, then checks the paper's
-    two claims: the stabilised constants, and the onset p* = 4i + 8.  The odd-p
-    columns must be empty (king's pmin is always even, so no odd p is ever an
-    isoperimetric perimeter) -- that one doubles as a control, since a census
-    that leaked partial rows would fill them."""
+    two claims: the stabilised constants, and the onset p* = 4i + 8.  King pmin
+    is always even, so no odd p is ever an isoperimetric perimeter: every
+    positive odd-p census row must sit strictly above the pmin formula, and
+    odd-p rows that are present must be genuine counts (a census that leaked
+    partial rows would fill them with zeros)."""
     import math
     src = tex("L6-perimeter-gradings.tex")
     census = ROOT / "results" / "perimmin_square8_p48_r6.txt"
@@ -523,9 +524,22 @@ def check_l6_min_end():
     odd = [p for (_, p) in A if p % 2 == 1 and p <= 48]
     ok(all(A[(n, p)] > 0 for (n, p) in A if p % 2 == 1) or not odd,
        "odd-p rows present in the census are genuine counts, not zeros")
-    ok(all(2 * math.ceil(2 * math.sqrt(n)) + 4 != p
-           for n in range(1, 200) for p in set(odd)),
+    # Until 2026-08-07 (the second documented unfreeze) this site compared the
+    # always-even pmin formula against odd p over a range of n -- a parity
+    # tautology, green for ANY census content.  The claim is universally
+    # quantified over the census itself: an animal with odd perimeter exists
+    # only strictly above its area's pmin, so every positive odd-p row must sit
+    # strictly above 2*ceil(2*sqrt(n)) + 4.  A row below that (like a claimed
+    # odd pmin) is rejected.
+    def odd_above_pmin(table):
+        return all(p > 2 * math.ceil(2 * math.sqrt(n)) + 4
+                   for (n, p), c in table.items() if p % 2 == 1 and c > 0)
+
+    ok(odd_above_pmin(A),
        "no odd p is attained as king pmin -- the attainability claim")
+    red(odd_above_pmin({**A, (5, 13): 7}),
+        "a census row claiming the odd perimeter 13 attained at n=5, "
+        "below pmin(5) = 14")
 
 
 def check_l1_pair_weights():
