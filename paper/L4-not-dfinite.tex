@@ -31,10 +31,7 @@ increasing family of slice growth constants}
 \begin{document}
 \maketitle
 
-\draftbanner{This is a first draft. The verification ledger below records what
-warrants each result \emph{mechanically}; the column that records what a human
-has read is empty, deliberately, because nobody has read it yet. Do not
-circulate until that column says something true.}
+\firstdraftbanner
 
 \Ldisclosure{%
 \emph{Theorem~\ref{thm:main} (not D-finite)} --- proved below from four
@@ -51,9 +48,8 @@ preserved degrees is a rigorous certificate over $\Q$; the irreducibility
 certificates for $H \le 8$ are single-prime for $H \le 4$ and multi-prime
 subset-sum-intersection for $H = 5..8$.
 \emph{The literature comparison of \S\ref{sec:related}} --- three databases,
-one of them full-text, recorded per search in \repo{papers/MISSING.md}. It
-establishes no collision found; it does not and cannot establish absence, and
-no claim here rests on absence.
+one of them full-text, recorded per search in \repo{papers/MISSING.md}. No
+collision found, and no claim here rests on that.
 \emph{Human verification:} none, as of this draft.}
 
 \begin{abstract}
@@ -62,11 +58,10 @@ Let $T(n,H)$ count the fixed king-lattice animals of $n$ cells whose bounding
 box has height exactly $H$, and let
 $F(x,y) = \sum_{n,H} T(n,H)x^ny^H$. We prove that $F$ is not D-finite.
 
-The obstruction is arithmetic rather than topological or analytic, which as far
-as we can tell is new in this neighbourhood, and it makes the proof cheap to
-transport. Write $\mu_H$ for the growth constant of the height-$\le H$
-strip. Two facts about the family $(\mu_H)$ do all the work: it is
-\emph{strictly increasing} (Perron--Frobenius, since each strip system sits
+The obstruction is arithmetic rather than topological or analytic, which is
+what makes the proof cheap to transport. Write $\mu_H$ for the growth constant
+of the height-$\le H$ strip. The proof needs two facts about the family
+$(\mu_H)$: it is \emph{strictly increasing} (Perron--Frobenius, since each strip system sits
 inside the next as a proper principal submatrix of an irreducible nonnegative
 matrix), and it is \emph{bounded} (by $\lambda \le 9.3154$, or by any crude
 bound). Each $\mu_H$ is an algebraic integer all of whose conjugates are at most
@@ -80,17 +75,16 @@ strictly increasing bounded family of slice growth constants. It therefore
 applies verbatim to fixed polyominoes by height, to polyhexes, and to any
 lattice-animal family with a column transfer matrix.
 
-The argument is also \emph{effective}, which the qualitative statement is not.
-From certified data we exclude explicit boxes: no annihilating $y$-ODE exists of
+The argument is also effective. From certified data we exclude explicit boxes:
+no annihilating $y$-ODE exists of
 order $r \le 5$ with $x$-degrees $\le 28$, of order $r \le 3$ with $x$-degrees
 $\le 180$, of order $r \le 1$ with $x$-degrees $\le 1253$, and so on.
 
-We are explicit about the method's ceiling. The step ``a rational polynomial of
-degree $\le D$ cannot vanish at an algebraic number of degree $> D$'' is the
-whole argument, and it fails the instant the coefficients are allowed to be
-analytic rather than polynomial. So the result is not-D-finite over $\Q(x)$ and
-does \emph{not} extend to Klazar's larger $D_A$-finite class. That is a real
-limit of the method, not a gap in the exposition.
+The method has a ceiling. The step ``a rational polynomial of degree $\le D$
+cannot vanish at an algebraic number of degree $> D$'' is the whole argument, and
+it fails the instant the coefficients are allowed to be analytic rather than
+polynomial. So the result is not-D-finite over $\Q(x)$ and does \emph{not}
+extend to Klazar's larger $D_A$-finite class.
 \end{abstract}
 
 \tableofcontents
@@ -110,7 +104,8 @@ We prove the corresponding statement for the king lattice, by a different
 mechanism.
 
 \begin{definition}
-$T(n,H)$ is the number of fixed king animals (polyplets) of $n$ cells whose
+$T(n,H)$ is the number of fixed polyplets --- animals on the king lattice ---
+of $n$ cells whose
 bounding box has height exactly $H$; $G_H(x) := \sum_n T(n,H)x^n$; and
 \[
   F(x,y) \;:=\; \sum_{n,H} T(n,H)\,x^n y^H \;=\; \sum_H G_H(x)\,y^H .
@@ -178,10 +173,9 @@ every conjugate of $\mu_H$ --- has modulus at most $\mu_H$.
 \end{proof}
 
 The house bound is then $\mathrm{house}(\mu_H) = \mu_H < \lambda \le 9.3154$,
-using the certified upper bound on the king growth constant.\footnote{Companion
-paper: \emph{A certified two-sided bound for the polyplet growth constant}. Any
-crude bound would do --- $\lambda \le 5^5/4^4 \approx 12.2$ is elementary --- so
-this ingredient is not delicate.}
+the certified upper bound of companion paper L3, \emph{A certified two-sided
+bound for the polyplet growth constant}. Any crude bound would do: the
+elementary $\lambda \le 5^5/4^4 \approx 12.2$ suffices.
 
 \subsection{Strict monotonicity}
 
@@ -226,8 +220,7 @@ $\mu_H$ & 1.0 & 2.41421 & 3.44372 & 4.18232 & 4.71780 & 5.11532 & 5.41785 & 5.65
 \caption{Strip growth constants, by exact-coefficient evaluation
 ($\mu_{10} = 5.99170$). Labelled measurement; Lemma~\ref{lem:mono} does not
 depend on these values, and the proof of Theorem~\ref{thm:main} does not use
-them. $\mu_2 = 1+\sqrt2$ exactly. An earlier floating-point artifact at $H = 9$
-was corrected.}
+them. $\mu_2 = 1+\sqrt2$ exactly.}
 \label{tab:mu}
 \end{table}
 
@@ -250,7 +243,7 @@ $B = 9.3154$, and by Lemma~\ref{lem:mono} they are pairwise distinct, hence
 infinitely many. So for every $D$ only finitely many have degree $\le D$.
 \end{proof}
 
-\section{The dichotomy, and the theorem}
+\section{The dichotomy}
 
 \begin{theorem}[dichotomy]
 \label{thm:dichotomy}
@@ -304,8 +297,8 @@ many heights have degree $\le D$ while infinitely many heights exist.
 
 Theorem~\ref{thm:main} is qualitative. Theorem~\ref{thm:dichotomy} is not: it
 applies at a single height, so certified data at finitely many heights excludes
-explicit boxes. This section gives two families of them, resting on different
-ingredients, so that a reader who distrusts one can use the other.
+explicit boxes. This section gives two families of them, resting on different ingredients and
+therefore independently usable.
 
 \subsection{New-root content}
 
@@ -407,9 +400,8 @@ connected signature digraph and a finite growth constant.
 The only per-family work is item~3, and both halves of it are cheap. Strictness
 is the Perron--Frobenius argument of Lemma~\ref{lem:mono}, which needs the
 signature digraph to be strongly connected --- true whenever a full column is a
-legal state and every state can be closed off by one. Boundedness needs any crude
-upper bound on the family's growth constant, and a counting argument of the kind
-in Proposition-of-the-companion-paper style always supplies one.
+legal state and every state can be closed off by one. Boundedness needs any crude upper bound on the family's growth constant, and a
+Redelmeier-scan count of the kind in companion paper L3 always supplies one.
 
 \section{Relation to existing work}
 \label{sec:related}
@@ -446,7 +438,7 @@ Step~1 is theirs and dates to 2002. We cite it inside the proof rather than
 presenting the derivation as self-contained. The lightness of the remaining
 hypotheses is what we claim.
 
-\subsection{Klazar 2003, and the ceiling on our method}
+\subsection{Klazar 2003}
 
 Klazar's Theorem~1: if $F' = G(x,F)$ with $G$ a Laurent series, $F$ \emph{not}
 analytic, $G$ analytic and $\mathrm{ord}_y(G) < 0$, then $F$ is not $D_A$-finite
@@ -460,11 +452,9 @@ non-$P$-recursiveness proof looked like it might be arithmetic, and it is not --
 and because Klazar has one thing we do not. He enlarges the target class from
 D-finite to $D_A$-finite, with analytic rather than polynomial coefficients, on
 the explicit ground that ``the key lies in the analytic $\times$ nonanalytic
-dichotomy'', and so gets the stronger conclusion for free. Our theorem cannot follow: the step ``a rational polynomial
-of degree $\le D$ cannot vanish at an algebraic number of degree $> D$'' is the
-whole dichotomy argument, and it fails the instant the coefficients are analytic,
-since an analytic function may vanish at $1/\mu_{H_0}$ without vanishing
-identically. \textbf{Theorem~\ref{thm:main} is not-D-finite over $\Q(x)$ and does
+dichotomy'', and so gets the stronger conclusion for free. Our theorem cannot follow: the degree comparison fails the instant the
+coefficients are analytic, since an analytic function may vanish at
+$1/\mu_{H_0}$ without vanishing identically. \textbf{Theorem~\ref{thm:main} is not-D-finite over $\Q(x)$ and does
 not extend to $D_A$-finite.}
 
 \subsection{Arithmetic neighbours}
@@ -482,7 +472,7 @@ zero-counting argument, again analytic.
 We name these so that this section rests on the arithmetic neighbourhood being
 mapped, rather than on absence.
 
-\subsection{What the searches established, and what they cannot}
+\subsection{What the searches establish}
 
 Three independent databases were searched, and the record is per-search in
 \repo{papers/MISSING.md}. A forward citation crawl over
@@ -498,10 +488,9 @@ zero hits, while ``algebraic degree'' and ``height'' return hits that are all
 false positives (the degree of an algebraic equation; column height in
 bargraphs).
 
-\emph{This establishes no collision found. It does not establish absence, and it
-cannot.} Accordingly nothing in this paper is claimed on the strength of a search:
-we assert the lighter hypotheses and the effective boxes, we cite
-\cite[Lemma~9]{bmr2002} for the shared opening, and we do not write ``first''.
+No collision found. Nothing in this paper is claimed on the strength of that:
+we assert the lighter hypotheses and the effective boxes, and we cite
+\cite[Lemma~9]{bmr2002} for the shared opening.
 
 \section{Open problems}
 

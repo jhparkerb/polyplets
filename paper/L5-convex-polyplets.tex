@@ -1,0 +1,736 @@
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+%  L5 — Convex polyplets.
+%  Category L (entirely machine-written); see paper/README.md and
+%  docs/publication-split.md.
+%
+%  N3 COLLISION.  Gouyou-Beauchamps & Leroux, FPSAC 2004, §2.3, have the block
+%  decomposition of \label{lem:blocks} and the mirror equality that now lives in
+%  L7, for convex polyominoes on the honeycomb lattice.
+%  docs/publication-split.md requires that citation in THREE places, marked
+%  "attribution --- k of n".  Since the L5/L7 split separated the two results,
+%  the placements are: HERE rem:attr1 (at lem:blocks) and the paragraph opening
+%  \label{sec:related}; in L7 rem:attr2 (at prop:mirror) and its own
+%  \label{sec:related} paragraph.  Four placements, none droppable, and the
+%  total must not fall below three.  docs/publication-split.md still describes
+%  the pre-split arrangement and needs jasonp's sign-off to match.
+%  (Labels, not compiled numbers, on purpose: numbering drifts under revision,
+%  labels do not.)
+%
+%  Source material, all in this repository:
+%    results/hv-growth-sandwich.md      Props 6-11, Lemmas 1-4, Conjecture 8
+%    results/convex-polyplets.md        the exclusions, mu, the PSLQ boxes
+%    docs/proofs/convex-mirage.md       the original mirage finding
+%    results/middle-kingdom-phase3.md   the grid, Corollary 4, Proposition 5
+%    results/middle-kingdom.md          the campaign index
+%    results/mk-dir4-perimeter.md       the dir4 perimeter series
+% ---------------------------------------------------------------------------
+
+\input{shared/preamble}
+\input{shared/disclosure}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\HV}{\mathrm{HV}}
+
+\title{\textbf{Convex polyplets}\\[4pt]
+\large Intractable by area, algebraic by perimeter, and one growth
+constant for every class in between}
+\author{[byline: jasonp's call --- \repo{docs/publication-split.md} \S1]}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\firstdraftbanner[ One further gate is specific to this paper: the attribution
+to Gouyou-Beauchamps and Leroux (\S\ref{sec:related}) must survive every
+revision, in both of the places it appears here and in both of the places it
+appears in companion paper L7.]
+
+\Ldisclosure{%
+\emph{Proposition~\ref{prop:squeeze} (the squeeze) and Lemmas~\ref{lem:blocks},
+\ref{lem:stacks}, \ref{lem:supermul}} --- proved below, with no analytic input:
+an injection, Fekete's lemma, and an elementary partition bound.
+Lemma~\ref{lem:supermul}'s column join and its inverse are formalized in Lean~4
+against mathlib (\texttt{Stair.join\_valid}, \texttt{Stair.cut\_join},
+\texttt{Stair.join\_injOn}), with axiom footprint \texttt{[propext,
+Quot.sound]} --- not even \texttt{Classical.choice} --- and the counting layer
+and Fekete step are there too (\texttt{Stair.M\_supermul},
+\texttt{Stair.M\_tendsto}, \texttt{Stair.M\_le\_mu\_pow}), all guarded. So
+Lemma~\ref{lem:supermul} is a Lean theorem.
+\emph{Proposition~\ref{prop:squeeze} itself is NOT formalized}: the geometric
+HV-convex layer (Lemma~\ref{lem:blocks}) and the squeeze are paper proofs.
+\emph{The exclusions of \S\ref{sec:exclusions}} --- rigorous in the direction
+claimed: full column rank modulo a prime is a proof of full rank over $\Q$.
+Four positive and negative control arms, and a fifth on an unrelated series,
+are pinned by a gate.
+\emph{$\mu$ to 199 digits, $\theta = 0$, the amplitudes} --- labelled
+measurement, with the trusted digit count itself measured rather than asserted.
+\emph{The PSLQ verdicts} --- labelled measurement, stated as falsifiable box
+exclusions and never as ``$\mu$ is transcendental''.
+\emph{The subdominant exponential and the amplitude ratio} --- moved to
+companion paper L7, with their own ledger.
+\emph{Novelty} --- N1 and N2 clean; \textbf{N3 is a real collision}, cited here
+and in L7.
+\emph{Human verification:} none, as of this draft.}
+
+\begin{abstract}
+\noindent
+A \emph{convex polyplet} is a king-connected set of cells of $\Z^2$ in which
+every row and every column is a single contiguous run. We report what is now
+known about counting them, in the order the paper proves it.
+
+The structural result is a squeeze. Let $\mathcal C$ be \emph{any} class with
+$\text{staircase} \subseteq \mathcal C \subseteq \text{HV-convex}$. Then
+$\lim \mathcal C(n)^{1/n}$ exists and equals the growth constant
+$\mu = 3.128943269730886\dots$ of the full class. Reading an HV-convex animal
+left to right, it fattens, shears, then thins; the shearing middle is a
+staircase polyplet and the two ends are stacks, which are too few to move an
+exponential. The proof uses no analytic input, and because the staircase join is
+exactly injective the limit is a supremum, so every enumerated term is a rigorous
+floor under $\mu$.
+
+By \textbf{area} the class is intractable, and we make that quantitative. On
+$700$ terms the generating function satisfies no P-recurrence of order $\le 24$
+with polynomial coefficients of degree $\le 24$, and no algebraic equation of
+degree $\le 20$ in $F$ with coefficients of degree $\le 20$ in $t$; the same
+holds for the classical convex-polyomino control regenerated to the same length.
+We pin $\mu$ to $199$ digits and measure the correction to pure exponential
+growth to be geometric: $\theta = 0$, no power-law factor and nothing resembling
+a stretched exponential. Integer-relation searches find no polynomial with $\mu$
+as a root of degree $\le 20$ and height $\le 10^8$, $\le 30$ and $\le 10^6$, or
+$\le 12$ and $\le 10^{15}$.
+
+By \textbf{semiperimeter} the same class is algebraic, of degree $2$; imposing a
+directedness condition strong enough to cut the population to about $1\%$ raises
+the degree to $4$ and does not leave the algebraic class. Convexity is a
+perimeter lever rather than an area lever, for polyplets as for polyominoes.
+
+What sits underneath the leading term is the subject of companion paper L7,
+\emph{The subdominant exponential and the amplitude ratio of convex
+polyplets}: the four-cone-directed subclass splits into an ascending half growing
+at $\mu$ and a descending half growing at a second constant
+$\nu = 2.5145796\dots$, and the amplitude ratio of the two classes has a closed
+expression.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+Convexity is the classical tractability lever for polyominoes. Convex polygons
+by perimeter have an algebraic generating
+function~\cite{delestViennot1984}; convex polyominoes by area grow at
+$2.30914\dots$~\cite{bender1974}; symmetry classes of convex polyominoes have
+been enumerated on the square lattice~\cite{lrr1998} and on the honeycomb
+lattice~\cite{gblRoux2004}. It is natural to expect the lever to work on the
+king lattice too.
+
+It does, but only for perimeter. The same split appears on the square lattice,
+where the classical solvability results are perimeter results and the area side
+is not known to be tractable either.
+
+\begin{definition}
+A \emph{convex polyplet}, equivalently an \emph{HV-convex polyplet} or convex
+animal on the king lattice, is a finite king-connected set of cells of $\Z^2$ in
+which every row and every column is a single contiguous run, counted up to
+translation. Write $A(n)$ for the number with $n$ cells:
+\[
+  1,\; 4,\; 16,\; 61,\; 221,\; 766,\; 2566,\; 8390,\; 26982,\; 85834,\;
+  271174,\; 853111,\; \dots
+\]
+A \emph{staircase} polyplet --- the king-lattice analogue of the parallelogram
+polyominoes --- is one in which, scanning columns left to right,
+both the bottom and the top of the column interval are nondecreasing. Write
+$M(n)$ for their number: $1, 3, 9, 28, 87, 272, \dots$ (OEIS \oeis{A225114}, the skew shapes with no empty row or column).
+\end{definition}
+
+\section{The class and its transfer structure}
+\label{sec:structure}
+
+An HV-convex polyplet is a sequence of column intervals $[b(j), t(j)]$,
+$j = 1,\dots,k$, with $b$ valley-unimodal and $t$ peak-unimodal, counted up to
+translation. Write
+\[
+  d(j) = b(j{+}1) - b(j), \qquad h(j) = t(j) - b(j) + 1, \qquad
+  s(j) = h(j) - h(j{+}1).
+\]
+
+Give column $j$ the \emph{phase} $(p_b, p_t)$, where $p_b = 1$ if some earlier
+step had $d > 0$ and $p_t = 1$ if some earlier step had $t$ decreasing.
+Unimodality makes both bits monotone in $j$: each flips at most once and never
+flips back. So the transfer operator is block-triangular in the four phases, and
+the diagonal blocks are:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{c l l l}
+\toprule
+phase & meaning & step constraint & kernel $K(h,h')$ \\
+\midrule
+$(0,0)$ & $b$ falls, $t$ rises & $s \le d \le 0$ & $h'-h+1$, \; $h' \ge h$ \\
+$(1,0)$ & both rise & $d \ge \max(0,s)$ & $\min(h,h')+1$ \\
+$(0,1)$ & both fall & $d \le \min(0,s)$ & $\min(h,h')+1$ \\
+$(1,1)$ & $b$ rises, $t$ falls & $0 \le d \le s$ & $h-h'+1$, \; $h' \le h$ \\
+\bottomrule
+\end{tabular}
+\caption{The four diagonal blocks. Blocks $(1,0)$ and $(0,1)$ are the staircase
+kernel and its mirror; blocks $(0,0)$ and $(1,1)$ are stacks.}
+\label{tab:blocks}
+\end{table}
+
+The unbounded state variable is the column height, and the coupling in it is
+the single kernel $\min(h,h')+1$, appearing once in each middle block. That
+kernel is the whole of the king lattice's difference from the square one, where
+it is $\min(h,h')$, and the sections that follow are arguments about it.
+
+\section{The squeeze}
+\label{sec:squeeze}
+
+\begin{proposition}[the squeeze]
+\label{prop:squeeze}
+Let $\mathcal C$ be any class of polyplets with
+\[
+  \text{staircase} \;\subseteq\; \mathcal C \;\subseteq\; \text{HV-convex}.
+\]
+Then $\lim_n \mathcal C(n)^{1/n}$ exists and equals
+$\lim_n A(n)^{1/n} = \mu = 3.128943269730886\dots$
+\end{proposition}
+
+The staircase polyplets are a thin subclass of the HV-convex ones and grow at the
+same exponential rate, so every class between them is trapped term by term and
+nothing has to be proved about the intermediate classes individually.
+
+\begin{lemma}[three-block factorisation]
+\label{lem:blocks}
+Write $P(n)$ for the number of monotone-height blocks of area $n$ (phase
+$(0,0)$, or equivalently by reversal phase $(1,1)$) and $M(n)$ for the staircase
+count, with $P(0) = M(0) = 1$. Then
+\begin{equation}
+  A(n) \;\le\; 2\,(n{+}1)^2 \sum_{i+j+l=n} P(i)\,M(j)\,P(l) .
+  \label{eq:factor}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+By the monotonicity of the phase bits, the columns split into three consecutive
+(possibly empty) runs $C_1C_2C_3$ carrying phases $(0,0)$; one of $(1,0)$ or
+$(0,1)$; and $(1,1)$. Every step internal to a run obeys that run's constraint
+in Table~\ref{tab:blocks}, so taken standalone $C_1$ and $C_3$ are
+monotone-height blocks and $C_2$ is a staircase polyplet or the vertical mirror of
+one. The animal is recovered from $(C_1,C_2,C_3)$, the two junction offsets and
+one bit naming $C_2$'s phase; each junction offset lies in $[-h', h]$ with
+$h + h' \le n$, hence takes at most $n+1$ values.
+\end{proof}
+
+\begin{remark}[attribution --- 1 of 3]
+\label{rem:attr1}
+This decomposition is not new in kind. Gouyou-Beauchamps and
+Leroux~\cite{gblRoux2004}, \S2.3 ``Growth phases of convex polyominoes'',
+decompose a convex polyomino into blocks $H_{ij}$ by the growth phases of its
+upper and lower profiles, with the column state an ordered pair, the transitions
+one-way, the extreme blocks $H_{00}$ and $H_{22}$ identified as \emph{stack}
+polyominoes and the middle blocks as \emph{staircase} polyominoes with
+$H_{02} = Pa = H_{20}$. That is Lemma~\ref{lem:blocks} here, together with
+Lemma~\ref{lem:stacks}'s identification, and the mirror equality that companion
+paper L7 attributes to them, for convex polyominoes on the honeycomb lattice.
+Their square-lattice companion~\cite{lrr1998} reaches the same objects by a
+different route, so 2004 is the source to cite. What is not theirs: the king
+lattice, where their middle kernel $\min(h,h')$ becomes $\min(h,h')+1$; a class
+with no exact solution; and what Proposition~\ref{prop:squeeze} and L7 do with
+the blocks.
+\end{remark}
+
+\begin{lemma}[the outer blocks are stacks, hence sub-exponential]
+\label{lem:stacks}
+$P(n)$ is the number of weakly unimodal compositions of $n$ (OEIS
+\oeis{A001523}), and $P(n) \le E(n) := (n{+}1)^{4\sqrt n + 6}$, so
+$P(n)^{1/n} \to 1$.
+\end{lemma}
+
+Only the counting bound is used downstream; the bijection identifies what is
+being counted.
+
+\begin{proof}[Part 1: a stack is a weakly unimodal composition]
+In a phase-$(1,1)$ block the bottoms rise and the tops fall, so the column
+intervals are \emph{nested}: $[b(j{+}1),t(j{+}1)] \subseteq [b(j),t(j)]$.
+Nesting means that the set of columns meeting row $y$ is never broken --- it is
+a prefix $1..r(y)$. Transpose the picture and record the row widths $r(y)$ from
+the bottom up. Since $\{y : r(y) \ge k\} = [b(k),t(k)]$ is a decreasing nested
+family of intervals, $r$ rises then falls, and $\sum_y r(y) = n$. The stack is
+rebuilt from $r$ alone, so the map is a bijection.
+
+Worked instance: columns $[0,4],[1,3],[2,2]$ (heights $5,3,1$, area $9$) have
+row widths $r = (1,2,3,2,1)$, unimodal and summing to $9$.
+\end{proof}
+
+\begin{proof}[Part 2: there are few of them]
+Cut a weakly unimodal composition at its peak; what falls out on either side is
+a partition, so $P(n) \le (n{+}1)^2 p(n)^2$, the $(n{+}1)^2$ paying for the
+peak's position and value.
+
+For $p(n)$ a deliberately crude bound suffices, since the squeeze uses only
+$P(n)^{1/n}\to1$. Put $s = \lceil\sqrt n\rceil$ and split a partition of $n$ at
+$s$. The parts $\le s$ are determined by their $s$ multiplicities, each an
+integer in $[0,n]$, contributing at most $(n{+}1)^s$ choices. The parts $> s$
+number at most $L = \lfloor n/(s{+}1)\rfloor$, and listing them in nonincreasing
+order gives at most $(L{+}1)n^L \le (n{+}1)^{L+1}$ choices. Hence
+$p(n) \le (n{+}1)^{s+L+1} \le (n{+}1)^{2\sqrt n + 2}$, since $s \le \sqrt n + 1$
+and $L \le \sqrt n$. So $P(n) \le E(n)$ and
+$\log P(n)/n \le (4\sqrt n + 6)\log(n{+}1)/n \to 0$.
+\end{proof}
+
+Only the exponent matters: $\sqrt n \log n$ is $o(n)$, so the stacks carry no
+exponential. Hardy and Ramanujan~\cite{hardyRamanujan1918} give the sharper
+$p(n) = e^{O(\sqrt n)}$, which nothing downstream needs, and the elementary
+bound keeps the squeeze free of analytic input.
+
+\begin{lemma}[the staircase count is supermultiplicative]
+\label{lem:supermul}
+$M(i)M(j) \le M(i+j)$ for all $i,j \ge 0$. Hence $\lim_n M(n)^{1/n}$ exists and
+equals $\sup_n M(n)^{1/n}$.
+\end{lemma}
+
+\begin{proof}
+Given staircase polyplets $X$ of area $i$ with last column height $h$, and $Y$ of
+area $j$ with first column height $h'$, slide $Y$ up by $d = \max(0, h-h')$ and
+butt the two column sequences together.
+
+\emph{Why that $d$ and no other.} Staircase means both boundaries
+nondecreasing. At the seam, $b$ not dropping forces $d \ge 0$; $t$ not dropping
+forces $d \ge h - h'$. So $\max(0, h-h')$ is the smallest legal slide --- it is a
+\emph{function} of $X$ and $Y$, not a choice, which is what stops the join from
+smuggling in information.
+
+\emph{The join is in the class.} $d \ge 0$ keeps bottoms nondecreasing;
+$d - s = \max(0,h-h') - (h-h') \ge 0$ keeps tops nondecreasing; and $d \le h$,
+since $d = h-h' \le h-1$ when $h \ge h'$ and $d = 0$ otherwise, so the junction
+columns are king-adjacent. Area is $i+j$.
+
+\emph{The join is injective at fixed $(i,j)$.} Every column is nonempty, so the
+cumulative areas $h(1)+\dots+h(r)$ are \emph{strictly} increasing, and a
+strictly increasing sequence hits $i$ at most once. Cut at that unique prefix:
+those are $X$'s columns and the rest are $Y$'s, each read back up to
+translation, which is how both were counted. No split index has to be supplied
+alongside the join, so distinct pairs have distinct images.
+
+Fekete's lemma in supermultiplicative form finishes.
+\end{proof}
+
+\begin{corollary}[every banked term is a floor]
+\label{cor:floor}
+$\mu \ge M(n)^{1/n}$ for every $n$, with no extrapolation. At $n = 700$,
+\[
+  \mu \;\ge\; M(700)^{1/700} \;=\; 3.12340450886853853211\dots
+\]
+\end{corollary}
+
+The digits past $3.12$ in the extrapolated value remain extrapolation; the
+inequality above is exact arithmetic on an enumerated term.
+
+\begin{proof}[Proof of Proposition~\ref{prop:squeeze}]
+Write $\mu = \lim M(n)^{1/n} = \sup_n M(n)^{1/n} \ge 1$, which exists by
+Lemma~\ref{lem:supermul}. Fix $\varepsilon > 0$ and take $C_\varepsilon$ with
+$M(j) \le C_\varepsilon(\mu+\varepsilon)^j$. In \eqref{eq:factor}, bound
+$P(i), P(l) \le E(n)$ by Lemma~\ref{lem:stacks}, valid for every $i, l \le n$
+since $E$ is nondecreasing:
+\[
+  A(n) \;\le\; 2(n{+}1)^4 E(n)^2 C_\varepsilon (\mu+\varepsilon)^n ,
+\]
+and $E(n)^{1/n} \to 1$, so $\limsup A(n)^{1/n} \le \mu + \varepsilon$ for every
+$\varepsilon$. In the other direction, staircase $\subseteq \mathcal C
+\subseteq$ HV-convex gives $M(n) \le \mathcal C(n) \le A(n)$ termwise, so
+$\liminf \mathcal C(n)^{1/n} \ge \mu$ and
+$\limsup \mathcal C(n)^{1/n} \le \limsup A(n)^{1/n} \le \mu$.
+\end{proof}
+
+\subsection{Consequences of the squeeze}
+
+The four-cone-directed subclass shares $\mu$ with the unrestricted one to $49$
+digits, which had looked like a bijection waiting to be found. It is not: it is
+Proposition~\ref{prop:squeeze}, and the four-cone condition is not special.
+\emph{Every} condition that leaves the staircase polyplets alone leaves $\mu$
+alone, because the staircase polyplets already carry all of the exponential
+entropy. Table~\ref{tab:blocks} says the same thing at the operator level: the
+four-cone floor rewrites the kernels of blocks $(0,0)$ and $(0,1)$ and leaves
+blocks $(1,0)$ and $(1,1)$ untouched entry for entry --- and block $(1,0)$ is the
+staircase kernel.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l r l}
+\toprule
+class & first terms & trusted digits of $\mu$ & amplitude $C$ \\
+\midrule
+staircase (\oeis{A225114}) & $1,3,9,28,87,272$ & 204 & $0.28932146397165132308$ \\
+HV-convex, $b$ nondecreasing & $1,3,10,33,107,342$ & 202 & $0.37545302027992473174$ \\
+(dir4, HV-convex) & $1,4,15,53,177,567$ & --- & $0.45030318571234118235$ \\
+HV-convex & $1,4,16,61,221,766$ & 199 & $0.97445221313500464915$ \\
+\bottomrule
+\end{tabular}
+\caption{Four classes, one constant. The staircase value reproduces all $199$
+digits the HV-convex series pins, and continues to $204$.}
+\label{tab:fourrungs}
+\end{table}
+
+\section{Counting by area}
+\label{sec:exclusions}
+
+\begin{theorem}
+\label{thm:excl}
+On $700$ terms, the by-area generating function of HV-convex polyplets
+satisfies no P-recurrence
+$\sum_{i \le J} p_i(n)a(n{+}i) = 0$ with $J \le 24$ and $\deg p_i \le 24$, and no
+algebraic equation $\sum_{j \le K} q_j(t)F(t)^j = 0$ with $K \le 24$ and
+$\deg q_j \le 24$. The same holds for HV-convex polyominoes by area
+(\oeis{A067675}), regenerated to the same length.
+\end{theorem}
+
+Two facts make this one test rather than a $25\times25$ sweep.
+
+\paragraph{The boxes nest.} A solution with $J' \le J$ and $D' \le D$ is a
+solution of the $(J,D)$ ansatz with the unused $p_i$ set to zero. Excluding the
+maximal box excludes every box inside it.
+
+\paragraph{Full column rank mod $p$ is a proof over $\Q$.} The matrix entries
+are integers. Full column rank modulo $p$ means some maximal minor is nonzero
+mod $p$, hence nonzero over $\Q$, hence the only rational solution is trivial.
+Rank can drop mod $p$, never rise, so \emph{this} direction is rigorous. A rank
+\emph{defect} would only be a candidate --- which is the branch that gets the
+holdout and the second prime.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l l r r r l}
+\toprule
+series & mode & box & unknowns & rows & rank & verdict \\
+\midrule
+king    & prec & $(20,20)$ & 441 & 680 & 441 & EXCLUDED \\
+king    & prec & $(24,24)$ & 625 & 676 & 625 & EXCLUDED \\
+king    & prec & $(20,20)$, skip 50 rows & 441 & 630 & 441 & EXCLUDED \\
+king    & prec & $(20,20)$, second prime & 441 & 680 & 441 & EXCLUDED \\
+king    & alg  & $(20,20)$ & 441 & 701 & 441 & EXCLUDED \\
+king    & alg  & $(24,24)$ & 625 & 701 & 625 & EXCLUDED \\
+control & prec & $(20,20)$ & 441 & 680 & 441 & EXCLUDED \\
+control & prec & $(24,24)$ & 625 & 676 & 625 & EXCLUDED \\
+control & prec & $(20,20)$, skip 50 rows & 441 & 630 & 441 & EXCLUDED \\
+control & prec & $(20,20)$, second prime & 441 & 680 & 441 & EXCLUDED \\
+control & alg  & $(20,20)$ & 441 & 701 & 441 & EXCLUDED \\
+control & alg  & $(24,24)$ & 625 & 701 & 625 & EXCLUDED \\
+\bottomrule
+\end{tabular}
+\caption{$p = 2^{61}-1$ unless noted. The row skip tests ``holds eventually''
+rather than ``holds from $n=1$''; same verdict.}
+\label{tab:excl}
+\end{table}
+
+$(25,25)$ is the first box that $700$ terms cannot decide, at $676$ unknowns
+against $675$ rows, so the boxes above are where the term count runs out rather
+than where the method does.
+
+Algebraicity was tested separately even though algebraic implies D-finite, since
+the implication only rules out algebraic functions whose induced ODE fits inside
+the box already excluded, and a degree-$24$ algebraic function can induce a much
+larger one.
+
+\subsection{Positive and negative controls}
+
+A negative from a guesser means nothing without a positive control: a series
+whose answer is already known, run through the identical pipeline, where the
+tool has to return that answer. Four arms run as a gate, each required to come
+out as stated:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l l l l}
+\toprule
+arm & series & box & must be & is \\
+\midrule
+prec $+$ & HV-convex by semiperimeter & $(5,2)$ & CANDIDATE & nullity 1; predicts all 172 held-out rows \\
+prec $-$ & same series & $(2,1)$ & EXCLUDED & rank 6 of 6 \\
+alg $+$ & \oeis{A005436}, algebraic~\cite{delestViennot1984} & $(2,8)$ & CANDIDATE & nullity 1; holds on all 69 held-out rows \\
+alg $-$ & same series & $(2,4)$ & EXCLUDED & rank 15 of 15 \\
+\bottomrule
+\end{tabular}
+\caption{The tool finds a P-recurrence when one exists, finds an algebraic
+equation when one exists, and refuses both when the box is too small.}
+\label{tab:controls}
+\end{table}
+
+A fifth arm is what makes any positive verdict in this paper trustworthy: a
+series with no algebraic equation to find. $199$ terms of the by-area king
+series, the same length and comparable term size to the perimeter series, come
+back EXCLUDED with nullity $0$ at every box where the perimeter series is a
+candidate. A $199$-term matrix of that shape does not manufacture rank
+defects.
+
+\subsection{$\mu$, $\theta$, and the amplitude}
+
+The discriminator for the shape of the correction is the ratio of successive
+differences of $r_n = a(n{+}1)/a(n)$: a constant below $1$ means the correction
+is geometric --- an isolated subdominant singularity, no power-law factor ---
+while drift toward $1$ would mean a branch point and $\theta \ne 0$.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l l}
+\toprule
+series & $d_n/d_{n-1}$ & reading \\
+\midrule
+king (HV-convex) & $0.48100879371$, constant to all 12 printed digits & geometric \\
+control (\oeis{A067675}) & $0.625135968591$, constant to all 12 printed digits & geometric \\
+\bottomrule
+\end{tabular}
+\caption{Measured over the last five $n$ of each $700$-term series.}
+\label{tab:theta}
+\end{table}
+
+The direct probe agrees: $n(r_n/\mu - 1)$, which tends to $\theta$ under a power
+law, sits at the $10^{-216}$ level for the king series and $10^{-137}$ for the
+control --- that is, at zero. So $\theta = 0$ for both, there is no power-law
+correction, and nothing resembling a stretched exponential:
+\[
+  a(n) = C\mu^n\bigl(1 + O(\rho^n)\bigr), \qquad
+  \rho = 0.481008794 \text{ (king)}, \quad 0.625135969 \text{ (control)}.
+\]
+
+Trusted digits are \emph{measured}, not asserted: the whole pipeline is re-run
+on the series truncated by $30$ terms, and the reported figure is the minimum
+over three independent comparisons, minus a two-digit guard.
+
+\begin{quote}\small
+$\mu$, convex polyplets by area, $199$ trusted digits:\\[2pt]
+\texttt{3.1289432697308862522774479953877541605320912219043941349649746499492}\\
+\texttt{4438583718257615823063288164783234634835221018937039608167576493048146}\\
+\texttt{233778414064847543298805623983850111109827008627878918922549}
+\end{quote}
+
+\begin{quote}\small
+$\mu$, convex polyominoes by area (\oeis{A067675}), $121$ trusted digits:\\[2pt]
+\texttt{2.3091385933304947310987203050172125319118144725816284016944029002844}\\
+\texttt{56440748316842717281615774412174374610237798122137142}
+\end{quote}
+
+The control's value is an external check on the whole apparatus: Bender's
+published constant is $2.30914$~\cite{bender1974}, and the non-king transfer
+matrix plus this extrapolation reproduce it and extend it by $116$ digits.
+
+\subsection{Integer-relation searches for $\mu$}
+
+An integer-relation search on $(1,\mu,\dots,\mu^d)$, run at the trusted
+precision only. The discipline that matters: a hit is reported as
+REJECTED-ARTIFACT unless $(d{+}1)\log_{10}(\text{height})$ is well below half
+the trusted digit count, because PSLQ always returns \emph{something} once the
+unknowns can absorb the input precision.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l r r l l}
+\toprule
+$\mu$ & digits fed & degree $\le$ & height $\le$ & result \\
+\midrule
+king & 199 & 20 & $10^{8}$ & none at any degree \\
+king & 199 & 30 & $10^{6}$ & none at any degree \\
+king & 199 & 12 & $10^{15}$ & none at any degree \\
+king & 137 & 20 & $10^{5}$ & none at any degree \\
+control & 121 & 12 & $10^{8}$ & none at any degree \\
+control & 121 & 20 & $10^{4}$ & none at any degree \\
+control & 121 & 20 & $10^{8}$ & hits at degree 15--20, \textbf{all REJECTED-ARTIFACT} \\
+\bottomrule
+\end{tabular}
+\caption{The last row is the box outgrowing the precision: capacity
+$125$--$142$ against $121$ trusted digits, which is what the capacity test
+rejects.}
+\label{tab:pslq}
+\end{table}
+
+So the falsifiable statement is: \emph{no integer polynomial has $\mu_{\text{king}}$
+as a root with degree $\le 20$ and coefficients below $10^8$, nor degree $\le 30$
+below $10^6$, nor degree $\le 12$ below $10^{15}$}. A closed form, if one exists,
+lies outside those boxes.
+
+\subsubsection*{A worked rejection}
+
+The cubic $3219x^3 - 7630x^2 - 18493x + 33955$ was offered mid-investigation,
+produced by feeding a then-published $16$-digit $\mu$ to a computer algebra
+service. Its nearest root is
+\[
+  \begin{aligned}
+    &3.12894326973088625330312785623831607097 \\
+    \mu = {}&3.12894326973088625227744799538775416053
+  \end{aligned}
+\]
+--- agreement to $18$ digits, disagreement at the $19$th. It is also inside the
+PSLQ box already searched (degree $3$, height $3.4\times10^4$), which is why that
+search returned nothing at degree $3$.
+
+\section{Counting by semiperimeter}
+\label{sec:perimeter}
+
+By \emph{semiperimeter}
+--- for a convex animal the box's $W + H$, with edge-perimeter $2(W{+}H)$ ---
+the same class is not merely D-finite but algebraic.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l l l}
+\toprule
+class & statistic & verdict & minimal box \\
+\midrule
+HV-convex polyplets & area & non-D-finite, non-algebraic & --- \\
+HV-convex polyplets & semiperimeter & \textbf{algebraic, degree 2} & $(2,9)$ \\
+dir4 HV-convex polyplets & area & non-D-finite, non-algebraic & --- \\
+dir4 HV-convex polyplets & semiperimeter & \textbf{algebraic, degree 4} & $(4,22)$ \\
+\bottomrule
+\end{tabular}
+\caption{The split between the two statistics survives a directedness
+constraint strong enough to cut the population to about $1\%$ by $s = 200$.}
+\label{tab:perim}
+\end{table}
+
+The unrestricted quadratic, fitted on $34$ rows and holding on all $166$ later
+ones with zero failures over $\Z$:
+\[
+\begin{aligned}
+q_0 &= 2t^2 - 21t^3 + 88t^4 - 196t^5 + 242t^6 - 119t^7 + 72t^8 + 16t^9, \\
+q_1 &= -4t + 52t^2 - 252t^3 + 554t^4 - 520t^5 + 96t^6 + 128t^7, \\
+q_2 &= 2 - 31t + 176t^2 - 416t^3 + 256t^4 + 256t^5 .
+\end{aligned}
+\]
+$(2,8)$ is EXCLUDED and rational is excluded to $t$-degree $98$, so the box is
+minimal in both directions.
+
+The directed quartic has $\deg q_j \le 22$; it was fitted on the first $119$
+rows, annihilates all $81$ later ones, and re-substituted into the integer
+series annihilates all $200$ rows over $\Z$ with zero failures. $(4,21)$ is
+EXCLUDED, as is every algebraic degree below $4$ as far as $199$ terms reach
+(degree $3$ to $t$-degree $48$, degree $2$ to $65$, rational to $98$).
+
+\begin{remark}[the coefficients are themselves evidence]
+The quartic's coefficients have five digits. A rank defect absorbed from $199$
+large terms would produce sixty-digit integers --- and does: the $(19,3)$
+P-recurrence for the same object, which is a \emph{non-minimal} description, has
+coefficients of about sixty digits.
+\end{remark}
+
+\subsection{The nullity check}
+
+The internal consistency check for a positive algebraicity verdict. A genuine
+minimal $(K_0,L_0)$ relation forces nullity $(K-K_0+1)(L-L_0+1)$ as the box
+opens, since $F^it^jP$ all lie in the larger box. Measured against predicted for
+$(K_0,L_0) = (4,22)$, the two grids agree cell for cell over the whole decidable
+region; on the by-area series of the fifth arm the same grid is all zeros.
+
+\subsection{Column-convex polyplets}
+
+For contrast, the neighbouring class is exactly solvable.
+Temperley's method~\cite{temperley1956} with the last column's height as
+catalytic variable --- king contact gives $h + h' + 1$ placements --- closes to a
+$2\times2$ linear system and yields
+\[
+  F(x) \;=\; \frac{x(1-x)^3}{1 - 7x + 13x^2 - 10x^3 + 2x^4},
+\]
+with growth $4.64468\dots$, a quartic root. Brute-validated to $n \le 8$.
+
+This is a rediscovery: the generating function is that of OEIS \oeis{A187077}
+verbatim. Two things about that entry are recorded here, since it carries no
+derivation. First, its comment ``Equivalent to a sequence of row-convex
+polyhexes (\oeis{A059716})'' is not correct in its plain reading: row-convex
+polyhexes are $1,3,11,42,162,\dots$ while this sequence is $1,4,18,83,385,\dots$,
+so the two agree only at the first term. Checked by direct enumeration on both
+lattices with all fixed polyhexes reproducing \oeis{A001207} as a control. One
+placement is the whole difference --- a row of length $h$ admits $h + h' + 1$
+positions for a length-$h'$ row beside it on the king lattice against $h + h'$
+on the hexagonal one. Second, what the sequence counts is row-convex
+\emph{polyplets}; column-convex polyplets are the transpose and give the same
+counts.
+
+\section{Relation to existing work}
+\label{sec:related}
+
+\paragraph{Attribution --- 2 of 2.} The block decomposition of
+Lemma~\ref{lem:blocks}, and the identification of the extreme blocks as stacks
+and the middle blocks as staircases, are present in Gouyou-Beauchamps and
+Leroux~\cite{gblRoux2004}, \S2.3, for convex polyominoes on the honeycomb
+lattice. Their square-lattice companion~\cite{lrr1998} reaches the same objects
+by a different route, through partitions, stacks, shifted stacks and directed
+convex via Temperley and Bousquet-M\'elou, so~\cite{gblRoux2004} is the source
+to cite for the decomposition itself. The third placement that
+\repo{docs/publication-split.md} requires sits with the mirror equality, in
+companion paper L7.
+
+What is not theirs, and is what this paper claims: the king lattice, where the
+middle kernel is $\min(h,h')+1$ rather than $\min(h,h')$ and neither class is
+exactly solved; and the squeeze over \emph{every} intermediate class
+(Proposition~\ref{prop:squeeze}).
+
+\paragraph{The square-lattice analogue.} Bender's $2.30914$~\cite{bender1974} for
+convex polyominoes by area, and the parallelogram subclass \oeis{A006958}
+sharing it (measured here at $2.309138593330495$, flat from $n = 100$ to
+$n = 400$), mean that Proposition~\ref{prop:squeeze}'s \emph{conclusion} could
+have been read off the solved models one lattice over. It is the generality ---
+every intermediate class, on a lattice where nothing is solved --- that is the
+contribution.
+
+\paragraph{Perimeter.} Delest and Viennot~\cite{delestViennot1984} is the
+classical algebraicity result and is used here as the positive control for the
+algebraicity guesser. \S\ref{sec:perimeter}'s finding is the king analogue with
+an explicit minimal box.
+
+\paragraph{Column-convex.} \S\ref{sec:perimeter} records a rediscovery of
+\oeis{A187077} by Temperley's method~\cite{temperley1956}, together with a
+correction to that entry's comment.
+
+\section{Open problems}
+
+\begin{openproblem}[a sharp asymptotic, for anything in this family]
+Prove $A(n) \sim C\mu^n$, or the same for $M(n)$. Proposition~\ref{prop:squeeze}
+and Lemma~\ref{lem:supermul} give exponential rates and never an amplitude, and
+the amplitudes of Table~\ref{tab:fourrungs} are measured, not derived. The most
+concrete route is a proof of Kurkov's conjectured continued fraction for
+\oeis{A225114}; companion paper L7 states what would follow from it.
+\end{openproblem}
+
+\begin{openproblem}[non-D-finiteness as a theorem]
+Theorem~\ref{thm:excl} is an exclusion on $700$ terms, not a proof. The
+arithmetic obstruction that works for the height-anisotropic king generating
+function does not obviously apply here, since the natural slicing of a convex
+class is not by height.
+\end{openproblem}
+
+\section{Reproduction}
+\label{sec:repro}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l}
+\toprule
+claim & check \\
+\midrule
+$A(n)$ to $n = 700$ & \texttt{make build/convex\_area\_tm \&\& build/convex\_area\_tm 700 1} \\
+the control to $n = 700$ & \texttt{build/convex\_area\_tm 700 0} \\
+Theorem~\ref{thm:excl} & \texttt{make build/prec\_guess}; \texttt{build/prec\_guess prec ... 24 24} \\
+Table~\ref{tab:controls} & \texttt{make gate-convex-dfinite} \\
+$\mu$, $\theta$, the amplitudes & \repo{experiments/convex\_growth.py} \\
+Table~\ref{tab:pslq} & \repo{experiments/convex\_growth.py} \texttt{--algdeg} \\
+Lemma~\ref{lem:supermul}, measured & \repo{experiments/staircase\_supermul.py} \\
+Lemma~\ref{lem:supermul}, in Lean & \texttt{cd polyplets \&\& lake build} \\
+Lemma~\ref{lem:blocks}, brute force & \repo{experiments/monotone\_block\_growth.py} \\
+the block series $T$ & \repo{experiments/dir4\_descent\_block.py}, \repo{experiments/descent\_block\_oracle.py} \\
+\S\ref{sec:perimeter} & \repo{experiments/dir4\_perim\_find\_alg.py}, \texttt{make gate-dir4-perim-alg} \\
+column-convex & \repo{experiments/colconvex\_king.py} \\
+the squeeze, pinned & \texttt{make gate-middle-kingdom} \\
+\bottomrule
+\end{tabular}
+\caption{Where each claim is checked. Every proof-relevant item is either a
+paper proof above or a Lean theorem; everything in this table is a measurement
+or a reproduction of one.}
+\label{tab:repro}
+\end{table}
+
+\bibliographystyle{plain}
+\bibliography{shared/refs}
+
+\end{document}

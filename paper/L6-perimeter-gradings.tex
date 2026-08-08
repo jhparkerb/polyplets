@@ -7,11 +7,14 @@
 %
 %  ***COMPUTE-GATED.  DO NOT SUBMIT.***
 %  docs/publication-split.md §5: L6 cannot be finished until the k=6 pool lands
-%  on BOTH lattices and BOTH minimum-end runs finish.  Writing a k<=5
+%  on BOTH lattices and BOTH minimum-end runs finish.  The two minimum-end runs
+%  are now DONE; the k=6 pool is the only outstanding gate.  Writing a k<=5
 %  universality claim before k=6 lands risks publishing something k=6
 %  contradicts.  As of this draft:
 %    dalby, window pdk6big : square8 78 6 RUNNING (stage 2, square4, QUEUED)
-%    dalby, window j7w17   : square4 deep min-end RUNNING
+%    dalby, window j7w17   : square4 deep min-end DONE 2026-08-08T08:51Z
+%                            (W=15,17; extends the diamond series to j=8, and
+%                             confirms the tangent-cone prediction at j=7,8)
 %    ayr,   window pmin48  : square8 p=48 min-end DONE 2026-08-07T22:12Z
 %  §\ref{sec:k6} is the placeholder that must be replaced when they land.
 %
@@ -37,7 +40,7 @@
 \newcommand{\pminn}{p_{\min}}
 
 \title{\textbf{Perimeter gradings of lattice animals}\\[4pt]
-\large Two ends of one table, and two different onset laws}
+\large Two ends of one table, and two different onsets}
 \author{[byline: jasonp's call --- \repo{docs/publication-split.md} \S1]}
 \date{August 2026}
 
@@ -71,7 +74,7 @@ of the 4-coloured partition function at $i = 0..6$: fourteen of fourteen exact,
 with both contributing mechanisms checked directly rather than inferred.
 \emph{The tip series identification} --- $\phi_2$ of \cite{andrews1984}, an eta
 quotient with an explicit infinite product, verified to $n = 40$. It is
-\emph{not} a closed form and this paper does not call it one.
+\emph{not} a closed form.
 \emph{$k = 6$} --- \textbf{not yet computed}. See \S\ref{sec:k6}.
 \emph{Novelty} --- \textbf{unchecked}, and the square column reproduces
 \cite{abmz2022}, which we do not hold.
@@ -85,7 +88,7 @@ of object.
 
 At the \textbf{maximum} end the extremal animals are sticks, the natural index
 is the defect $k = \pmaxx(n) - p$, and the classes are quasi-polynomials in $n$
-of degree exactly $k$. Their onsets follow a triangular law,
+of degree exactly $k$. Their onsets follow
 $\mathrm{onset}(k) = \binom{k+1}{2} + 3$, verified at four consecutive values on
 each of the square and king lattices. Through $k = 5$ the period, the degree,
 the onset \emph{and the leading coefficient} are identical on the two lattices;
@@ -106,12 +109,13 @@ exactly when its $p$ is realised as $\pminn(n)$ for some $n$.
 The mechanism behind the min-end constants is a Young diagram at each corner of
 the isoperimetric hull, giving a factor $P(x)^c$ with $c$ the corner count ---
 confirmed on a hexagonal hull as well as a square one. The square lattice's
-diamond is an apparent exception: each tip counts order ideals of its tangent cone, $P(x)$ is the lattice-aligned
-special case, and the tip series is Andrews' $\phi_2$ --- so the two corner types
-in this problem are the first two members of one family.
+diamond is an apparent exception: its tips are not lattice-aligned, and each
+counts the order ideals of its own tangent cone, of which $P(x)$ is the aligned
+special case. The diamond's tip series is Andrews' $\phi_2$, so the two corner
+types here are the first two members of one family.
 
 \emph{This is a compute-gated draft.} The $k = 6$ verdict, which tests four of
-the laws above at once, is not in yet.
+the statements above at once, is not in yet.
 \end{abstract}
 
 \tableofcontents
@@ -137,13 +141,14 @@ used only to test whether a mechanism generalises.
 \section{The maximum end}
 \label{sec:max}
 
-\subsection{Why the search is cheap: the defect is monotone}
+\subsection{The defect is monotone}
 
 Grading by $k := \pmaxx(n) - p$ looks as though it should want a
-surplus-budgeted row transfer, on the model of a companion paper's height grading. It cannot: the
-perimeter defect does not bound the transverse extent of a linear sweep --- a U
-whose arms are far apart has $k = 3$ and unbounded spread --- which is presumably
-why the published method classifies patterns instead of sweeping.
+surplus-budgeted row transfer, on the model of the height grading in companion
+paper L1. It cannot: the perimeter defect does not bound the transverse extent
+of a linear sweep, since a U whose arms are far apart has $k = 3$ and unbounded
+spread. That is presumably why the published method classifies patterns instead
+of sweeping.
 
 Something simpler works. Let $c = e - n + 1$ be the cycle rank of the animal's
 adjacency graph, and let $t$ be the sum, over empty cells adjacent to the
@@ -176,7 +181,7 @@ gated: pruned counts match an independent brute-force census cell for cell on
 both lattices, the prune is confirmed to change nothing against an unpruned
 control run, and the $(c,H)$ marginals sum back.
 
-\subsection{The classes, and the triangular onset law}
+\subsection{The classes and their onsets}
 
 \begin{table}[H]
 \centering\small
@@ -200,12 +205,13 @@ coefficients do not.}
 \end{table}
 
 \begin{quote}
-\textbf{Onset law.} $\mathrm{onset}(k) = \tbinom{k+1}{2} + 3$ for $k \ge 2$.
+\textbf{Onset.} $\mathrm{onset}(k) = \tbinom{k+1}{2} + 3$ for $k \ge 2$.
 \end{quote}
 
 Four consecutive hits on each lattice ($6, 9, 13, 18$). The degenerate cases
-$k = 0, 1$ have onsets $2$ and $3$ against the law's $3$ and $4$, which is
-exactly why scanning the whole sequence $2,3,6,9,13,18$ found nothing. The law predicts $\mathrm{onset}(6) = 24$
+$k = 0, 1$ have onsets $2$ and $3$ against the formula's $3$ and $4$, which is
+exactly why scanning the whole sequence $2,3,6,9,13,18$ found nothing. The
+formula predicts $\mathrm{onset}(6) = 24$
 and $\mathrm{onset}(7) = 31$.
 
 $k = 3$ carries a genuine period-$2$ term on \emph{both}
@@ -224,7 +230,7 @@ different sub-leading coefficients:
   \end{cases}
 \]
 
-\subsection{The cyclotomic content is finer than the period}
+\subsection{The cyclotomic content}
 
 At $k = 5$ the fitted period is $6$, but the $\Phid_6$ component of the constant
 term is \emph{exactly zero}: what looks like period $6$ is $\Phid_2$ and
@@ -236,7 +242,7 @@ coefficient, $\Phid_3$ only the constant --- gives, across $k \le 5$,
   \qquad\text{with}\qquad
   \boxed{\;\Phid_d \text{ first appears at } k = 2d-1\;}
 \]
-($d=2$ at $k=3$, $d=3$ at $k=5$). If that law holds, ``quasi-polynomial'' is a
+($d=2$ at $k=3$, $d=3$ at $k=5$). If that holds, ``quasi-polynomial'' is a
 coarse label and each successive prime-power periodicity costs a fixed two
 units of defect.
 
@@ -248,7 +254,7 @@ lattices, with $\gcd(N,D) = 1$ so no factor is spurious. At $k = 5$ that is
 far harder test than the two-spare-points-per-class bar at which the formulae
 were fitted.
 
-\subsection{A triangle of coefficients, universal exactly one diagonal deep}
+\subsection{The coefficient triangle}
 
 Writing the partial fractions with $R_k$ the polynomial part carrying the
 pre-onset holdouts, the king generating functions are
@@ -293,11 +299,13 @@ $k=5$ & $15/8^\ast$ & $-293/8^\ast$ & $10503/32$ & $-28141/16$ \\
 \bottomrule
 \end{tabular}
 \caption{Every $d = 0$ entry agrees across the lattices; $d = 1$ already fails
-from $k = 2$ in the $\Phid_1$ block. This is a diagonal statement about a
-triangle of \emph{coefficients} rather than about counts, and it is the closest
-structural analogue to the height-diagonal law that this grading offers.}
+from $k = 2$ in the $\Phid_1$ block.}
 \label{tab:coefftri}
 \end{table}
+
+The statement is a diagonal one about a triangle of \emph{coefficients} rather
+than about counts, which is the closest structural analogue to the
+height-diagonal law that this grading offers.
 
 Of the two leading diagonals, one closes and one does not:
 
@@ -329,12 +337,12 @@ every residue class:
 The leading coefficient is lattice-independent ($312$, $2176$, $3842640$ for
 $k = 3,4,5$) --- it is $c_k\,k!\,\text{period}^k$, so this is the known leading
 diagonal in integer form, not a new fact. Defining the recentring at all needs
-the onset law, so this is downstream of it.
+the onset formula, so this is downstream of it.
 
 \subsection{Doors closed}
 \label{sec:closed}
 
-Recorded because each was an attractive story and each is dead.
+Each of these was an attractive reading, and each is dead.
 
 \begin{itemize}
 \item \textbf{The parity is not carried by the cyclic animals.} Splitting each
@@ -344,7 +352,7 @@ Recorded because each was an attractive story and each is dead.
   animals, so the appealing ``a ring has an even cell count'' story is wrong.
 \item \textbf{It is not carried by any single height slice.} Every slice
   $H = n - j$ at fixed $j$ is a plain polynomial on both lattices.
-\item \textbf{It is not the height floor.} The floor law of \S\ref{sec:identity}
+\item \textbf{It is not the height floor.} The floor identity of \S\ref{sec:identity}
   has period $k+1$, and the near-floor king slices do oscillate with period $4$
   at $k=3$ --- but it predicts period $5$ at $k=4$ where the answer is $2$, and
   the square lattice has no meaningful floor at all yet shows the identical
@@ -382,7 +390,7 @@ Data at this end comes from \emph{complementation} rather than growth: enumerate
 the isoperimetric hulls and remove cells, since the defect is not monotone under
 addition here.
 
-\subsection{King: the ladder is the 4-coloured partition function}
+\subsection{King: the constants are the 4-coloured partition function}
 
 $C(p,i)$ is eventually constant in $p$ along each residue class mod $4$, and the
 constants are
@@ -438,14 +446,15 @@ $4$ in $p$.
 for $p \equiv 2 \pmod 4$, exact for $i = 0,\dots,6$.
 \end{quote}
 
-Both say the same thing --- the balanced box side must exceed $i$ --- and both are
-\emph{linear} in the defect, against the maximum end's triangular
-$\binom{k+1}{2}+3$. That contrast is the paper's title.
+Both say the same thing, that the balanced box side must exceed $i$, and both
+are \emph{linear} in the defect, against the maximum end's triangular
+$\binom{k+1}{2}+3$.
 
-\subsection{What decides stabilisation: attainability, not parity}
+\subsection{What decides stabilisation}
 
-King's odd-$p$ rows do not stabilise; they grow. It is tempting to call that a
-parity effect, and it is wrong, because the square lattice's odd-$p$ rows stabilise. The actual rule, tested on both lattices:
+King's odd-$p$ rows do not stabilise; they grow. The square lattice's odd-$p$
+rows do stabilise, so parity is not the rule. The rule, tested on both lattices,
+is attainability:
 
 \begin{quote}
 $C(p,\cdot)$ stabilises $\iff$ $p$ is \textbf{attained} as $\pminn(n)$ for some
@@ -484,31 +493,39 @@ outgrows $j$. So the per-hull factor is $P(x)^c$ with $c$ the number of corners
 of the isoperimetric hull --- a Young diagram at each corner, independently. The
 hexagon confirms that this was a general argument and not a fact about boxes.
 
-\paragraph{The square lattice's diamond looks like an exception.} It gives
-$1, 4, 18, 60, 187, 524$, not $P(x)^4$ --- larger from $j = 2$ on, $18$ against
-$14$. A fourth root gives a per-tip series $1, 1, 3, 5, 9, 14$, not the partition
-numbers $1, 1, 2, 3, 5, 7$.
+\paragraph{The square lattice's diamond is an apparent exception.} It gives
+$1, 4, 18, 60, 187, 524, 1388, 3452, 8229$, not $P(x)^4$, and is larger from
+$j = 2$ on: $18$ against $14$. A fourth root gives a per-tip series
+$1, 1, 3, 5, 9, 14, \dots$, not the partition numbers $1, 1, 2, 3, 5, 7$.
 
-\paragraph{And then it is not.} A diamond tip is $90^\circ$ off the rook lattice,
+\paragraph{The tip is not lattice-aligned.} A diamond tip is $90^\circ$ off the square lattice's axes,
 so the removable shapes there are not plain Young diagrams. What the tip counts
 is the \textbf{order ideals of its tangent cone} $\{a \ge |b|\}$:
 $1, 1, 3, 5, 9, 14, 24, 35, 55, 81, \dots$, whose fourth power reproduces every
 measured diamond term. $P(x)$ is the lattice-aligned special case, so king, tri6
 and square4 collapse to one statement and the diamond stops being an exception.
 
+The last two diamond terms are a prediction that was tested after the fact. The
+$W = 15$ and $W = 17$ hulls were enumerated once the identification was already
+written down, and returned $3452$ at $j = 7$ and $8229$ at $j = 8$, which are
+$[x^7]g^4$ and $[x^8]g^4$ exactly. The convergence rule shows its teeth here:
+$W = 15$ gives $8193$ at $j = 8$, where $j = 8$ needs $W \ge 17$, and only the
+wider hull reports the converged $8229$.
+
 \paragraph{A refutation.} The six-term prefix
 $1,1,3,5,9,14$ matches \oeis{A120452}, which continues $23, 34, 52, 75,\dots$
 If the diamond's four tips were independent then $g^4$ with $g = $ A120452 would
 give the square lattice's $j = 6$ free-removal term as $1384$. The measurement is
-$1388$, and the convergence rule --- term $j$ is correct once $W = 2j+1$, verified
-at $j=4$ and $j=5$ --- says the run was already converged. A wider run confirmed
-it. So A120452 is wrong at its seventh term: $23$, where the correct value is
-$24$.
+$1388$, and the convergence rule, that term $j$ is correct once $W = 2j+1$,
+verified at $j = 4$ and $j = 5$, says the run was already converged; wider runs
+at $W = 15$ and $W = 17$ confirm it. So A120452 is wrong at its seventh term:
+$23$, where the correct value is $24$.
 
 \paragraph{The tip series has a name.} It is \oeis{A053993}, Andrews'
 $\phi_2$~\cite{andrews1984}: generalized Frobenius partitions with up to two
-repetitions per row. So it is an \textbf{eta quotient} with an explicit infinite
-product (Andrews eq.~5.9), verified here to $n = 40$. That is exactly as explicit as $P(x)$ itself, and this paper does not call it a closed form.
+repetitions per row. So it is an \textbf{eta quotient} with an explicit infinite product (Andrews
+eq.~5.9), verified here to $n = 40$: as explicit as $P(x)$ itself, and not a
+closed form.
 
 The reading is that the two corner types in this problem are the first two
 members of one family: a unimodular corner gives $\phi_1 = P(x)$, and the
@@ -561,20 +578,20 @@ $k_{\min}(n,H) = 0$ for $H \in \{1, n\}$ and $1$ for every $H$ between. The
 reason is structural: the two square defect-$0$ animals are the horizontal
 \emph{and} vertical sticks, at opposite ends of the height range, so no height is
 ever more than one defect unit from optimal. Both king defect-$0$ animals are
-diagonal sticks with $H = n$, which is why the king law bites.
+diagonal sticks with $H = n$, which is why the king bound bites.
 
-\section{The \texorpdfstring{$k = 6$}{k = 6} verdict is not in}
+\section{The \texorpdfstring{$k = 6$}{k = 6} verdict}
 \label{sec:k6}
 
 \textbf{This section is a placeholder.} The computation that decides it was
 running when this draft was written, and the paper cannot be finished without
-it, because $k = 6$ tests four of the laws above at once.
+it, because $k = 6$ tests four of the statements above at once.
 
 \begin{enumerate}
-\item $\mathrm{onset}(6) = 24$, from the triangular law.
+\item $\mathrm{onset}(6) = 24$, from the onset formula.
 \item The $\Phid_2$ leading diagonal's $15/4$, from $5(k-2)!/2^{k-1}$.
 \item The $\Phid_3$ exponent $k-4$. \textbf{Today that slope rests on a single
-  data point}, at $k = 5$. $k = 6$ is what makes it a law or kills it.
+  data point}, at $k = 5$. $k = 6$ is what confirms the exponent or kills it.
 \item $\Phid_4$ absent until $k = 7$, from ``$\Phid_d$ first appears at
   $k = 2d-1$''.
 \end{enumerate}
@@ -589,9 +606,8 @@ against the known $k = 4$ and $k = 5$ answers before being pointed at $k = 6$.
 The merge refuses to run unless every shard reports success, so a partial run
 cannot be mistaken for a complete one.
 
-\emph{If item 3 fails, \S\ref{sec:max}'s denominator law is wrong and the
-sentence about periodicities costing two units of defect apiece comes out.} That
-is the honest reason this paper is not finished.
+\emph{If item 3 fails, \S\ref{sec:max}'s denominator formula is wrong and the
+sentence about periodicities costing two units of defect apiece comes out.}
 
 \section{Novelty}
 \label{sec:novelty}
@@ -604,9 +620,8 @@ reproduces that work rather than extending it}, and the $k=3$ square formula
 above was written down partly to confirm we had not misread the slides --- the
 $(-1)^n$ is there, so we had not.
 
-The king column, the triangular onset law, the coefficient triangle, the whole
-minimum end, and the $n$/$H$/$p$ identity have not been searched for in the
-literature. Nothing here is claimed to be new.
+The king column, the onset formula, the coefficient triangle, the whole
+minimum end and the $n$/$H$/$p$ identity have not been searched for at all.
 
 \section{Open problems}
 
@@ -642,7 +657,7 @@ claim & check \\
 \midrule
 the enumerator and its gate & \texttt{make build/perimeter\_defect}; \repo{scripts/perimeter\_defect\_gate.sh} \\
 Table~\ref{tab:maxend} & \repo{experiments/perimeter\_defect\_fit.py} \\
-the onset law & \repo{experiments/perimeter\_max\_structure.py} \\
+the onset formula & \repo{experiments/perimeter\_max\_structure.py} \\
 the denominators, predicted then divided & \repo{experiments/perimeter\_defect\_gf.py} \\
 the coefficient triangle & \repo{experiments/perimeter\_defect\_gf.py} \texttt{--compare} \\
 the min-end census & \texttt{make build/perimeter\_min}; \repo{scripts/perimeter\_min\_gate.sh} \\

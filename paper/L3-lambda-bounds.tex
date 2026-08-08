@@ -32,10 +32,7 @@ integer arithmetic}
 \begin{document}
 \maketitle
 
-\draftbanner{This is a first draft. The verification ledger below records what
-warrants each result \emph{mechanically}; the column that records what a human
-has read is empty, deliberately, because nobody has read it yet. Do not
-circulate until that column says something true.}
+\firstdraftbanner
 
 \Ldisclosure{%
 \emph{Existence of $\lambda$} --- Fekete's lemma applied to a
@@ -85,7 +82,7 @@ which needs neither irreducibility nor positivity. The top rung,
 $\mu_{17} \ge 6.543$, beats the best previously published lower bound, with a
 certificate where that value was numerical.
 
-The upper end has no published predecessor that we could find. Elementary
+We found no published upper bound to compare against. Elementary
 counting gives $\lambda \le 5^5/4^4 \approx 12.2$ and, we show, cannot be pushed
 below that: the two obvious improvements are both non-injective, and both are
 caught by the same control, namely that the identical argument would prove
@@ -119,13 +116,11 @@ so every enumerated term is a floor on $\lambda$ and never an approximation to
 it. Ratios of enumerated terms put $\lambda$ near $7.11$.
 
 The state of rigorous knowledge before this work was one-sided. Bacher's directed
-king animals give $\lambda \ge 3 + 2\sqrt2 \approx 5.828$ in closed
+animals on the king lattice give $\lambda \ge 3 + 2\sqrt2 \approx 5.828$ in closed
 form~\cite{bacher2015}, and his multi-directed animals give $\approx 6.4752$,
-that one numerically rather than in closed form. On the other side we found
-nothing: no upper bound on $\lambda$ for the king lattice appears in the
-literature we searched, and the searches are recorded in
-\repo{papers/MISSING.md} rather than asserted here. We claim the bound; we do not
-claim to be first, because absence is not a database result.
+that one numerically rather than in closed form. No upper bound on $\lambda$ for
+the king lattice appears in the literature we searched; the searches are
+recorded in \repo{papers/MISSING.md}. We claim the bound, not priority.
 
 \subsection{What is proved}
 
@@ -136,22 +131,18 @@ $6.543 \le \lambda \le 9.3154$.
 \end{theorem}
 
 Both decimals round in the safe direction, and the rationals are what is
-actually certified.\footnote{Easy to get backwards. The lower certificate proves $\lambda \ge 6543/1000$, so its decimal
-is exact. The upper certificate proves $\lambda \le 20000/2147 = 9.31532\dots$,
-so the four-decimal form of that bound is $9.3154$ and not $9.3153$: truncating
-an upper bound claims something the certificate does not give. The difference is
-$3.2\times10^{-5}$ and nothing here depends on it, but a bound should round
-away from the truth, not toward it.}
+actually certified.\footnote{The lower certificate proves
+$\lambda \ge 6543/1000$, so its decimal is exact. The upper certificate proves
+$\lambda \le 20000/2147 = 9.31532\dots$, so the four-decimal form of that bound
+is $9.3154$ and not $9.3153$; truncating an upper bound would claim
+$3.2\times10^{-5}$ more than the certificate gives.}
 
-Both halves are \emph{certificates} in a strict sense. Neither half asks the reader to
-trust a search, an eigenvalue solver, a floating-point convergence criterion, or
-a run that cannot be repeated. Each half is a finite object --- an integer vector
-on one side, a rational vector on the other --- plus a finite integer or
-rational computation that checks a system of inequalities against it. The
-searches that \emph{found} those objects were floating-point and are not part of
-the proof. If the search had returned a worse object, the check would still have
-been valid; if it had returned a wrong one, the check would have failed loudly
-and named the failing component.
+Each half is a \emph{certificate}: a finite object, an integer vector on one
+side and a rational vector on the other, together with a finite integer or
+rational computation checking a system of inequalities against it. The searches
+that found those objects were floating-point and are not part of the proof. A
+worse object would still check; a wrong one fails the check and names the
+failing component.
 
 \section{Preliminaries}
 
@@ -161,12 +152,11 @@ king adjacency (the eight offsets $(\pm1,0),(0,\pm1),(\pm1,\pm1)$), taken up to
 translation. $a(n)$ is their number; $\lambda := \lim_n a(n)^{1/n}$.
 \end{definition}
 
-The ladder --- supermultiplicativity, the
-existence of the limit, the per-term inequality, and the resulting lower bound
---- is formalized in Lean~4 against mathlib~\cite{mathlib} and depends on
-standard axioms only. The formalization carries the ladder \emph{once}, generic
-in the sequence, so that $\lambda$ and the growth constant of a staircase
-subfamily are two instances of the same development.
+Supermultiplicativity, the existence of the limit, the per-term inequality and
+the resulting lower bound are formalized in Lean~4 against
+mathlib~\cite{mathlib} and depend on standard axioms only. The formalization
+carries them once, generic in the sequence, so that $\lambda$ and the growth
+constant of a staircase subfamily are two instances of the same development.
 
 \begin{definition}[strip counts and strip growth constants]
 \label{def:strip}
@@ -185,8 +175,8 @@ and bounded by $\lambda$.
 
 \subsection{The three inequalities}
 
-Everything in this section is the composition of three facts: only the first two are about the tool and only the third
-is about polyplets.
+The lower bound is the composition of three facts. The first two are about
+nonnegative matrices; only the third is about polyplets.
 
 \paragraph{(1) Collatz--Wielandt, lower half.} Let $A$ be a nonnegative square
 matrix and let $v \ge 0$, $v \ne 0$, satisfy $Av \ge v$ componentwise. Then
@@ -269,17 +259,16 @@ $\mu_2 = 1 + \sqrt2 = 2.41421356\dots$}
 \label{tab:ladder}
 \end{table}
 
-The certified value is the floor: at $H = 2$ the certificate says $2.4142135$
-even though $\mu_2 = 2.4142136$ to seven places, because a certificate states
-what is \emph{proved}. And from $H = 14$ upward the certified value falls
-measurably short of the float value --- at $H = 17$, $6.543$ against $6.5465$ ---
-for the reason given in \S\ref{sec:precision}. Clamping can only lower the
-certified value; it can never falsify it.
+The certified value is a floor. At $H = 2$ the certificate says $2.4142135$
+where $\mu_2 = 2.4142136$ to seven places, and from $H = 14$ upward it falls
+measurably short of the float value, reaching $6.543$ against $6.5465$ at
+$H = 17$ for the reason given in \S\ref{sec:precision}. Clamping can only lower
+the certified value; it can never falsify it.
 
-\subsection{Why the exact phase is sound}
+\subsection{Soundness of the exact phase}
 \label{sec:exact}
 
-The tool has two phases and only the second is load-bearing. Phase~1 is a
+The tool has two phases and only the second enters the proof. Phase~1 is a
 warm-started bisection on $x$ for $\rhoo(M(x)) = 1$, in double precision, using
 the production column-sweep kernel; it proposes a candidate $x$ and a candidate
 vector, and nothing in it enters the proof. Phase~2 scales the vector to integers
@@ -318,7 +307,7 @@ hundreds. The winning numerator is re-verified last, so the receipt describes th
 rational that was actually certified. A failure is never absorbed into a
 tolerance.
 
-\subsection{The checker has to be able to say no}
+\subsection{The self-tests}
 \label{sec:selftest}
 
 Four self-tests run as a gate:
@@ -339,7 +328,7 @@ cannot see from a receipt. Bad arguments are likewise refused rather than
 clamped: an out-of-range $H$, or a vector width above the arithmetic's headroom,
 exits with the valid range printed.
 
-\subsection{The precision budget, and where the ladder stops}
+\subsection{The precision budget}
 \label{sec:precision}
 
 The binding constraint at large $H$ is not time and not convergence. It is that
@@ -365,15 +354,15 @@ need at least $192$-bit accumulators. We did not pursue it, because each further
 rung buys about $+0.05$ toward $\lambda \approx 7.11$, and $H = 18$ needs roughly
 $35$~GB of transient build memory.
 
-Deliberate crippling measures the flooring loss directly.
-Forcing the width down to $55$ bits at $H = 10$ --- so the smallest entry becomes
-about $2^{10}$ instead of $2^{51}$ --- makes the first candidate fail at four
-states with a minimum ratio of $0.99994$: the binding state is short by
-\emph{one unit in the last place}, so the flooring loss is $O(1)$, not $O(H)$.
+Forcing the width down measures the flooring loss directly. At $55$ bits at
+$H = 10$, where the smallest entry becomes about $2^{10}$ instead of $2^{51}$,
+the first candidate fails at four states with a minimum ratio of $0.99994$: the
+binding state is short by one unit in the last place, so the flooring loss is
+$O(1)$, not $O(H)$.
 The bracket-and-bisect then lands on a slightly weaker rational in twenty sweeps,
 at a wall time indistinguishable from the full-precision run.
 
-\subsection{Honest scope}
+\subsection{Scope}
 \label{sec:honest}
 
 What is certified is the inequality $\mu_H \ge \mathit{num}/\mathit{den}$,
@@ -383,8 +372,8 @@ exercised by its own gates, and the resulting $\mu_H$ are cross-checked for
 $H \le 11$ against roots of independently banked fixed-height generating
 functions, agreeing to $9$--$10$ significant digits --- every digit those receipts
 record. The certificates do not rest on that agreement; they are exact integer
-arithmetic on the operator. But a reader who doubts that the operator is the
-strip operator is doubting something this paper does not prove.
+arithmetic on the operator. That the operator is the strip operator is the one
+thing here taken on trust.
 
 Two engines were run against each other on every shared rung: an older hash-map
 sweep and a frozen-successor-array kernel roughly $250\times$ faster reproduce
@@ -407,7 +396,7 @@ It is \emph{structurally} independent: strip spectra
 and row-sum ratios share no data and no algorithm. It is not yet sharper than the
 ratio estimate --- at $H = 12$ it is still $7.29$ --- but it corroborates it.
 
-Two caveats we record rather than bury. Reaching $\mu_H$ through count ratios
+Two caveats. Reaching $\mu_H$ through count ratios
 $T(n,H)/T(n-1,H)$ instead of eigenvalues is badly under-converged for
 $H \gtrsim 6$; at $n = 36$, $H = 18$ that ratio is $7.63$, above $\lambda$. And
 extrapolation quality is uncertain: full Richardson in $1/H^2$ gives
@@ -443,12 +432,10 @@ $K$ newly-exposed neighbours, so $A(x) = (1+x)^K$ and the bound is
 $K^K/(K-1)^{K-1}$. The rook case $K = 3$ gives $6.75$ and the king case $K = 5$
 gives $12.2$, which is a useful cross-check on the derivation.
 
-\subsection{Two shortcuts that do not work, and the control that catches them}
+\subsection{Two shortcuts that do not work}
 \label{sec:falsestarts}
 
-We record these because both are tempting, one of them is a bound we have seen
-people assume, and the control that kills them is the one every candidate bound
-in this area should be run through.
+Both are tempting, and one control kills both.
 
 \paragraph{``$\lambda \le 8$ because each cell has eight neighbours.''} False.
 The idea is to encode an animal by its spanning-tree parent directions, at most
@@ -463,12 +450,11 @@ the exclude decisions on already-adjacent cells, which is exactly where the
 cycles live. Only the full decision \emph{sequence} is injective, and counting
 that is Proposition~\ref{prop:crude}.
 
-\paragraph{The control.} Both are caught immediately by running the identical
-argument on the rook lattice, where it proves
-$\lambda_{\text{polyomino}} \le 4$ --- and $\lambda_{\text{polyomino}} \approx
-4.06 > 4$~\cite{barequetRoteShalah2016}. \emph{Sanity-check every candidate king
-bound against its rook analogue before quoting it.} A king bound has no published
-number to be checked against; the rook analogue does.
+\paragraph{The control.} Both are caught by running the identical argument on
+the square lattice, where it proves $\lambda_{\text{polyomino}} \le 4$ while
+$\lambda_{\text{polyomino}} \approx 4.06$~\cite{barequetRoteShalah2016}. A king
+bound has no published number to check against; its rook analogue does, so every
+candidate bound here is run through that analogue first.
 
 The would-be repair --- a transfer matrix on the Redelmeier generation queue ---
 fails because that state is unbounded, its length growing with the perimeter.
@@ -476,7 +462,7 @@ There is therefore no simple finite-state valid bound between $12.2$ and the rea
 method, and the unbounded dimension is what the Klarner--Rivest
 functional-equation trick~\cite{klarnerRivest1973} exists to handle.
 
-\subsection{The generic decomposition is worse than the crude bound}
+\subsection{The generic twig decomposition}
 
 A generic twig decomposition was built and verified against brute force: the
 enumerator reproduces \oeis{A006770}; the base fact
@@ -652,7 +638,7 @@ wall. A transfer check confirms the difficulty is not ours: the missing lemma
 would also improve the published polyomino record from $4.5252$ to $4.3828$, so
 it is known-hard rather than merely unattempted.
 
-\section{Comparison, and what is open}
+\section{Comparison}
 
 \begin{table}[H]
 \centering\small
@@ -660,8 +646,8 @@ it is known-hard rather than merely unattempted.
 \toprule
 bound & value & kind & source \\
 \midrule
-directed king animals & $\lambda \ge 3+2\sqrt2 \approx 5.828$ & closed form & \cite{bacher2015} \\
-multi-directed king animals & $\lambda \ge 6.4752$ & numerical & \cite{bacher2015} \\
+directed animals, king lattice & $\lambda \ge 3+2\sqrt2 \approx 5.828$ & closed form & \cite{bacher2015} \\
+multi-directed animals, king lattice & $\lambda \ge 6.4752$ & numerical & \cite{bacher2015} \\
 strip ladder, certified & $\lambda \ge \mathbf{6.543}$ & exact rational certificate & this paper \\
 $\lambda$ (estimate) & $\approx 7.11$ & extrapolation & --- \\
 convolution certificate & $\lambda \le \mathbf{9.3154}$ & exact rational certificate & this paper \\
@@ -678,6 +664,8 @@ years: Klarner and Rivest's method~\cite{klarnerRivest1973} gives $4.65$, pushed
 by Barequet and Shalah to $4.5252$, against a true value near $4.0626$ and a
 proved lower bound above $4$~\cite{barequetRoteShalah2016}. Our $31\%$ upper gap
 against their $11\%$ quantifies the eight-neighbour penalty.
+
+\section{Open problems}
 
 \begin{openproblem}[the real target]
 Bring the upper bound below $8$, or below $7.5$. \S\ref{sec:gap} says the levers

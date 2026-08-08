@@ -62,6 +62,19 @@ read as an endorsement of them.
 % --- Draft banner ------------------------------------------------------------
 % For an L-paper whose verification ledger is not yet settled.  Loud on purpose:
 % an L-paper without a truthful ledger must not be mistaken for a finished one.
+%
+% \firstdraftbanner is the standard wording, which five papers previously
+% carried character-for-character in their own preambles.  It lives here for the
+% same reason the disclosure blocks do: identical text in seven places drifts,
+% and a paper must not be able to soften it by editing its own copy.  The
+% optional argument is for a gate specific to one paper, appended verbatim; a
+% paper needing different wording (L6, compute-gated) calls \draftbanner direct.
+\newcommand{\firstdraftbanner}[1][]{%
+\draftbanner{This is a first draft. The verification ledger below records what
+warrants each result \emph{mechanically}; the column that records what a human
+has read is empty, deliberately, because nobody has read it yet. Do not
+circulate until that column says something true.#1}}
+
 \newcommand{\draftbanner}[1]{%
 \begin{center}
 \fcolorbox{red!60!black}{yellow!15}{%

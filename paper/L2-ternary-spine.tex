@@ -1,12 +1,12 @@
 \documentclass[11pt]{article}
 
 % ---------------------------------------------------------------------------
-%  L2 — The mod-3 arithmetic of the king-animal height triangle.
+%  L2 — The mod-3 arithmetic of the polyplet height triangle.
 %  Category L (entirely machine-written); see paper/README.md and
 %  docs/publication-split.md.
 %
 %  NOVELTY STATUS: UNCHECKED.  The N1-N6 sweeps covered the diagonal law,
-%  haruspicy, the staircase squeeze, HV-convex king animals and the lambda
+%  haruspicy, the staircase squeeze, HV-convex polyplets and the lambda
 %  upper bound.  They never touched the ternary spine, the digit product or
 %  the SNF count.  docs/publication-split.md §5 requires a sweep in the
 %  N1-N6 style BEFORE this is written -- it has not happened, and the paper
@@ -28,7 +28,7 @@
 \newcommand{\F}{\mathbb{F}}
 \newcommand{\vthree}{v_3}
 
-\title{\textbf{The mod-3 arithmetic of the king-animal height triangle}\\[4pt]
+\title{\textbf{The mod-3 arithmetic of the polyplet height triangle}\\[4pt]
 \large One cubic, a base-3 digit product, and a Smith normal form}
 \author{[byline: jasonp's call --- \repo{docs/publication-split.md} \S1]}
 \date{August 2026}
@@ -36,12 +36,9 @@
 \begin{document}
 \maketitle
 
-\draftbanner{This is a first draft, and it is the \emph{least} ready of the
-machine-written papers. Its novelty status is \textbf{unchecked}: no literature
-sweep has been run against the spine cubic, the digit product or the Smith
-normal form count, and \repo{docs/publication-split.md} \S5 requires one
-\emph{before} the paper is written, not after. Everything below should be read
-as ``this is what we can prove'', never as ``this is new''. Do not circulate.}
+\firstdraftbanner[ A second gate applies here: no literature sweep has been run
+against the spine cubic, the digit product or the Smith normal form count, and
+\repo{docs/publication-split.md} \S5 requires one before the paper is written.]
 
 \Ldisclosure{%
 \emph{Theorem~\ref{thm:snf-3power} (all invariant factors are $3$-powers)} ---
@@ -50,9 +47,8 @@ unconditional, two lines, proved below.
 the diagonal law.
 \emph{Theorems~\ref{thm:digit}, \ref{thm:oddspine}, \ref{thm:evenspine},
 \ref{thm:activation}, \ref{thm:snf}} --- conditional on the diagonal law
-(itself a theorem, companion paper L1) together with the coefficient ladder
-of \S\ref{sec:ladder}. Every rung of that ladder has been derived symbolically
-from the cluster master equation; none of it is empirical input any more. All
+(itself a theorem, companion paper L1) together with the three congruences of
+\S\ref{sec:ladder}, each derived symbolically from the cluster master equation. All
 five are additionally verified against an independently enumerated triangle:
 $342$ in-regime cells for the digit product, all $k \le 17$ for the spine
 theorems, and every $N \le 36$ for the Smith normal form.
@@ -60,49 +56,51 @@ theorems, and every $N \le 36$ for the Smith normal form.
 Lagrange--B\"urmann over $\Z/27$ followed by an exact polynomial division on
 the mod-$27$ master curve; the division is a finite exact computation.
 \emph{\S\ref{sec:sleeve} (sleeve zeros)} --- labelled measurement, complete for
-$n \le 40$, with no closed law claimed.
+$n \le 40$, with no closed form claimed.
 \emph{Novelty} --- \textbf{unchecked}. See the draft banner and
 \S\ref{sec:novelty}.
 \emph{Human verification:} none, as of this draft.}
 
 \begin{abstract}
 \noindent
-Let $T(n,H)$ be the number of fixed king-lattice animals of $n$ cells whose
-bounding box has height exactly $H$. Read as an integer matrix, \emph{the
-triangle's entire integer content sits at the single prime $3$}: every
-invariant factor of every leading $N \times N$ block is a
-power of $3$, and the number of nontrivial ones is exactly
-$\lceil (N-1)/3\rceil$.
+Let $T(n,H)$ be the number of fixed king-lattice animals with $n$ cells whose
+bounding box has height exactly $H$, and let $T_N = [T(i,j)]_{i,j \le N}$.
+Because $T_N$ is lower triangular with determinant $3^{N(N-1)/2}$, its Smith
+normal form over $\Z$ is $\mathrm{diag}(3^{e_1},\dots,3^{e_N})$; the number of
+nontrivial invariant factors is $\lceil (N-1)/3\rceil$. We derive it from the
+arithmetic of the triangle modulo $3$, assuming the diagonal law and the product
+form of companion paper L1 together with three congruences derived from the
+cluster master equation.
 
-Both facts come from one object. Modulo $3$ the triangle's diagonal
-generating series is the unique root $W \in \F_3[[t]]$ with $W(0)=1$ of
+Modulo $3$ the diagonal generating series of the triangle is the unique
+$W \in \F_3[[t]]$ with $W(0)=1$ satisfying
 \[
-  W^3 \;=\; W^2 + t ,
+  W^3 \;=\; W^2 + t .
 \]
-an Artin--Schreier-like cubic, from which everything below follows. Writing $n$
-in base $3$ as $\sum_i n_i3^i$, the diagonal polynomials satisfy the digit
-product
+Writing $n = \sum_i n_i 3^i$ in base $3$, the diagonal polynomials satisfy
 \[
-  P_k(n) \bmod 3 \;=\; [y^k]\prod_i W\!\left(y^{3^i}\right)^{n_i},
+  P_k(n) \;\equiv\; [y^k]\prod_i W\!\left(y^{3^i}\right)^{n_i} \pmod 3 ,
 \]
-so the triangle mod $3$ is $3$-automatic and the automaton is explicit. Column
-$H$ vanishes identically modulo $3$ until row $\lfloor 3H/2\rfloor$, where it is
-nonzero; we call this the \emph{activation law} and evaluate its two boundary
-cases in closed form by Lagrange--B\"urmann, using the accident that in
-characteristic $3$ the relevant correction term vanishes identically. Because
-the activation rows are strictly increasing, the activated columns sit in
-echelon position, and that gives the Smith normal form count.
+so the triangle modulo $3$ is $3$-automatic with an explicit automaton.
 
-Reading along rows rather than columns, the last nonzero residue of row $n$
-cycles $1, 1, 2$ with $n \bmod 3$; the third case is a separate theorem, proved
-by a Lagrange--B\"urmann computation on the mod-$27$ master curve. We also
-report the exceptions, the \emph{sleeve zeros} where the $3$-adic valuation
-spikes above its generic value, as a complete census for $n \le 40$ with no
-law claimed.
+The cubic admits the parametrisation
+\[
+  t \;=\; \frac{x}{(1-x)^3}, \qquad W \;=\; \frac{1}{1-x} ,
+\]
+in which the Lagrange--B\"urmann correction term vanishes identically in
+characteristic $3$, so the two boundary cases can be evaluated in closed form:
+column $H$ vanishes modulo $3$ in every row below $\lfloor 3H/2\rfloor$ and is a
+unit in that row. Since $H \mapsto \lfloor 3H/2\rfloor$ is strictly increasing,
+the surviving columns of $T_N$ modulo $3$ stand in echelon position, and
+counting the vanishing ones gives the invariant-factor count.
 
-Finally the cubic lifts: $H^3 - H^2 \equiv 25t \pmod{27}$, where the constant
-$25$ is the pair-row weight of the underlying cluster gas, and the level-$3$
-correction is again $W$.
+Read along rows, the last nonzero residue of row $n$ is $1$, $1$, $2$ according
+to $n \bmod 3$, the third case being the deficit-$2$ cell, which we treat
+separately by Lagrange--B\"urmann over $\Z/27$. We give a complete census for
+$n \le 40$ of the cells whose $3$-adic valuation exceeds the deficit the
+diagonal law forces on them; a closed formula for those exceptions is open. The
+cubic lifts: $H^3 - H^2 \equiv 25t \pmod{27}$ with $25$ the single-defect weight
+of L1's cluster decomposition; $W$ returns as the level-$3$ correction.
 \end{abstract}
 
 \tableofcontents
@@ -111,15 +109,14 @@ correction is again $W$.
 
 \subsection{The observation}
 
-Take the height triangle of the king lattice, whose entry $T(n,H)$ counts the
-fixed king animals with $n$ cells and bounding box of height exactly $H$, read
-its leading $N \times N$ block as an integer matrix, and compute the Smith
-normal form: every invariant factor is a power of $3$.
+The height triangle of the king lattice has entry $T(n,H)$, the number of fixed
+polyplets with $n$ cells whose bounding box has height exactly $H$. Its
+leading $N \times N$ block $T_N$ is lower triangular, since $T(n,H) = 0$ for
+$H > n$, and every invariant factor of its Smith normal form over $\Z$ is a
+power of $3$.
 
-That is not hard to explain, and \S\ref{sec:snf3} does it in two lines. The
-harder fact, and the subject of this paper, is the second observation, that the
-number of \emph{nontrivial} invariant factors, those with exponent $> 0$, is
-exactly $\lceil (N-1)/3\rceil$:
+The number of \emph{nontrivial} invariant factors, those with exponent $> 0$,
+does not follow from the determinant, and is $\lceil (N-1)/3\rceil$:
 
 \begin{table}[H]
 \centering\small
@@ -130,25 +127,21 @@ $N$ & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 \\
 nontrivial factors & 1 & 2 & 2 & 2 & 3 & 3 & 3 & 4 & 4 & 4 & 5 \\
 \bottomrule
 \end{tabular}
-\caption{One new nontrivial invariant factor per three columns. The matrix is
-integrally simple except for a slowly growing $3$-adic core of rank about
-$N/3$.}
+\caption{One new nontrivial invariant factor per three columns.}
 \label{tab:snfcount}
 \end{table}
 
 \subsection{Novelty status}
 \label{sec:novelty}
 
-\textbf{Unchecked.} This project has run six literature sweeps, covering the
-diagonal law, haruspicy and non-D-finiteness, the staircase squeeze, HV-convex
-king animals, and the growth-constant upper bound; \emph{none of them touched
-the material in this paper.} The nearest neighbours we can name without a sweep
-are Christol's theorem, which makes ``algebraic over $\F_3$'' and
-``$3$-automatic'' the same statement, and the general theory of Artin--Schreier
-curves, which is where a cubic of this shape lives. Neither of those amounts to
-a claim of priority: nothing in this paper is asserted to be new, and the paper
-should not be circulated until a sweep in the style of the earlier six has been
-run.
+\textbf{Unchecked.} The project's six literature sweeps covered the diagonal
+law, haruspicy and non-D-finiteness, the staircase squeeze, HV-convex
+polyplets and the growth-constant upper bound. None of them touched the spine
+cubic, the digit product or the Smith normal form count, and a seventh in the
+same style is the condition for circulating this paper. The nearest neighbours
+we can name without one are Christol's theorem, which makes ``algebraic over
+$\F_3$'' and ``$3$-automatic'' the same statement, and the theory of
+Artin--Schreier curves, to which the cubic below belongs.
 
 \section{Setup}
 \label{sec:setup}
@@ -160,20 +153,21 @@ there is a polynomial $P_k$ of degree exactly $k$ with
   \qquad\text{for every } n \ge 2k+1,
   \label{eq:law}
 \end{equation}
-and the \emph{grand form}, also a theorem: there are $G, H \in \Q[[y]]$ with
+and the \emph{product form}, also a theorem: there are $G, H \in \Q[[y]]$ with
 $G(0) = H(0) = 1$ and
 \begin{equation}
   \sum_{k \ge 0} P_k(n)\,y^k \;=\; G(y)\,H(y)^n
   \qquad\text{for every } n \ge 2k+1 \text{ at order } y^k .
   \label{eq:grand}
 \end{equation}
-Both are proved in the companion paper, and the present one rests on them
-throughout: \eqref{eq:grand} turns statements about infinitely many polynomials
-into statements about two power series, while the same paper's universal spine
-theorem supplies the cubic below, giving one and the same curve for every prime
-$p$ dividing the base, provided the pair weight is nonzero modulo $p$ and $t$ is
-rescaled by that weight. Here $p = 3$ and $25 \equiv 1 \pmod 3$, so no rescaling
-is visible.
+Both are proved in companion paper L1, \emph{A diagonal law for row-local
+lattices}. Equation \eqref{eq:grand} is what makes this paper possible, since it
+replaces infinitely many polynomials by two power series. The cubic of
+\S\ref{sec:cubic} comes from the same source: L1's \emph{universal spine
+theorem} gives that one curve for every prime $p$ dividing the base, provided
+the lattice's single-defect weight is nonzero modulo $p$ and $t$ is rescaled by
+it. Here $p = 3$ and the weight is $25 \equiv 1 \pmod 3$, so no rescaling is
+visible.
 
 \begin{proposition}[P\'olya integrality]
 \label{prop:polya}
@@ -189,9 +183,9 @@ integral at $k+1$ consecutive integers is integer-valued
 everywhere~\cite{polya1915}.
 \end{proof}
 
-The leading coefficient of $P_k$ is $25^k/k!$, which is not an integer;
-integer-valuedness without integer coefficients is the binomial situation, and
-the window used in the proof is exactly $k+1$ wide.
+The leading coefficient of $P_k$ is $25^k/k!$, so $P_k$ takes integer values
+without having integer coefficients, as $\binom{n}{k}$ does; the window in the
+proof is the $k+1$ consecutive integers such a polynomial needs.
 
 \begin{proposition}
 \label{prop:GH}
@@ -205,50 +199,51 @@ by Proposition~\ref{prop:polya}; $G$ has constant term $P_0(0) = 1$, so it is
 invertible in $\Z[[y]]$ by the geometric series.
 \end{proof}
 
-$H$ begins $1, 25, 208, 1483, 20688, 130208, \dots$ and is the per-row transfer
-series of the underlying defect gas; its first coefficient $25$ is the number of
-single-defect species, which is the pair weight of the companion paper. We have
-not checked $H$ against the OEIS~\cite{oeis} or anywhere else, so whether it is
-a known sequence is one of the things the missing novelty sweep would settle.
+Proposition~\ref{prop:GH} computes $H$ from the diagonal polynomials, and with
+$P_k$ known through $k = 17$ it begins $1, 25, 208, 1483, 20688, 130208, \dots$
+It is the per-row transfer series of L1's cluster decomposition, and its first
+coefficient $25$ counts the single-defect species of one row, which is L1's pair
+weight. Whether $H$ is a known sequence is for the missing novelty sweep
+to settle; it has not been looked up in the OEIS~\cite{oeis}.
 
-\section{The ladder, and what it now rests on}
+\section{Three coefficient identities}
 \label{sec:ladder}
 
-Three coefficient identities carry everything below. When this line of work
-started they were empirical, verified through $y^{17}$, and all three are now
-derived from the cluster master equation.
+Everything below uses three congruences, each derived from L1's cluster master
+equation
+\[
+  H \;=\; 1 + \sum_c \widehat W_c\, u^{k_c} H^{-(k_c+\ell_c)} ,
+\]
+the sum running over cluster types $c$ of surplus $k_c$ and length $\ell_c$.
 
 \begin{description}
-\item[$(\star a)$] $G \equiv 1 \pmod 9$. \emph{Derived} from a residue formula
-  for the boundary clusters together with a valuation lemma on boundary weights,
-  plus one identity of the mod-$9$ cubic. (Originally: $\vthree(G_j) \ge 2$
-  verified for $j \le 17$.)
-\item[$(\star b)$] $H \equiv W \pmod 3$. \emph{Derived} from the master equation
-  $H = 1 + \sum_c \widehat W_c u^{k_c}H^{-(k_c+\ell_c)}$ together with the
-  valuation lemma, since every cluster has surplus at least its length, so that
-  only the bare pair row survives modulo $3$. Being an all-orders statement, it
-  identifies the cubic as \emph{the gas of bare pair rows} rather than a
-  numerical coincidence. (Originally: verified on all 18 known coefficients,
-  with the resulting digit formula reproducing 342 independently enumerated
-  triangle cells.)
-\item[$(\star c)$] $S := (H^3 - H(t^3))/3$ satisfies $S \equiv t^2 + tW \pmod 3$.
-  \emph{Derived} from the mod-$9$ cubic alone: uniqueness of the cubic's fixed
-  point gives $H(t^3) \equiv H^2 + 25t - 3t^2 - 3tW \pmod 9$, and a three-line
-  cancellation over $\F_3$ finishes. Additionally verified to order $t^{300}$ on
-  the explicit mod-$27$ fixed point.
+\item[$(\star a)$] $G \equiv 1 \pmod 9$, from a residue formula for the boundary
+  clusters, a valuation lemma on boundary weights, and one identity of the
+  mod-$9$ cubic.
+\item[$(\star b)$] $H \equiv W \pmod 3$. Every cluster has surplus at least its
+  length, so the valuation lemma leaves only the two-cell row surviving modulo
+  $3$: the cubic counts chains of those rows and nothing else. The derivation
+  holds at all orders.
+\item[$(\star c)$] $(H^3 - H(t^3))/3 \equiv t^2 + tW \pmod 3$, from the mod-$9$
+  cubic alone. Uniqueness of its solution gives
+  $H(t^3) \equiv H^2 + 25t - 3t^2 - 3tW \pmod 9$, and a three-line cancellation
+  over $\F_3$ finishes.
 \end{description}
 
+$(\star b)$ reproduces $342$ independently enumerated triangle cells through the
+digit product of \S\ref{sec:cubic}, and $(\star c)$ holds to order $t^{300}$
+against the mod-$27$ solution of \S\ref{sec:lift}.
+
 \section{The spine cubic and the digit product}
+\label{sec:cubic}
 
 \begin{definition}
 $W \in \F_3[[t]]$ is the unique root with $W(0) = 1$ of $W^3 = W^2 + t$.
 \end{definition}
-
-Existence and uniqueness are immediate by Hensel-style coefficient extraction,
-since in the form $W^2(W-1) = t$ the cubic determines each successive
-coefficient of $W = 1 + \dots$ in turn. It is Artin--Schreier-like, and $W$ is
-algebraic over $\F_3(t)$ of degree $3$. It also has a rational parametrisation
-that does all the computational work below:
+Written $W^2(W-1) = t$, the cubic determines the coefficients of
+$W = 1 + \dots$ one after another, which gives existence and uniqueness; $W$ is
+algebraic of degree $3$ over $\F_3(t)$. Every computation below goes through its
+rational parametrisation
 \begin{equation}
   t \;=\; \frac{x}{(1-x)^3},
   \qquad
@@ -266,23 +261,24 @@ Write $n = \sum_i n_i 3^i$ in base $3$. Then
 \end{theorem}
 
 \begin{proof}
-By $(\star a)$ and $(\star b)$, the grand form \eqref{eq:grand} reduces modulo
+By $(\star a)$ and $(\star b)$, the product form \eqref{eq:grand} reduces modulo
 $3$ to $\sum_k P_k(n)y^k \equiv W^n$. Frobenius over $\F_3$ gives
 $W(y)^{3^i} = W(y^{3^i})$, so $W^n = \prod_i \bigl(W^{3^i}\bigr)^{n_i} =
 \prod_i W(y^{3^i})^{n_i}$.
 \end{proof}
 
-$W$ is algebraic over $\F_3(t)$, so by Christol's
-theorem~\cite{christol1980} the array is $3$-automatic~\cite{allouche2003},
-and Theorem~\ref{thm:digit} is its automaton written out for the
-two-dimensional case.
+Since $W$ is algebraic over $\F_3(t)$, Christol's
+theorem~\cite{christol1980} makes the array $P_k(n) \bmod 3$
+$3$-automatic~\cite{allouche2003}, and Theorem~\ref{thm:digit} writes that
+automaton out in two dimensions.
 
 \section{The spine}
 
 Call the cell $T\bigl(n, \lfloor 2n/3 \rfloor\bigr)$ at
 $n = \lfloor 3H/2\rfloor$ the \emph{spine} of column $H$; it is the first entry
-of that column not divisible by $3$, and the two parities need separate
-treatment because the exponent $n-1-3k$ in \eqref{eq:law} lands differently.
+of that column not divisible by $3$. Odd and even $H$ need separate treatment,
+because the exponent $n-1-3k$ of \eqref{eq:law} is $0$ at the spine in the first
+case and $-1$ in the second.
 
 Both proofs use Lagrange--B\"urmann in the following form~\cite[Ch.~5]{stanley2012}:
 if $x = t\varphi(x)$ then
@@ -354,7 +350,7 @@ and induction on $\vthree(k)$ reduces to the previous case.
 We have verified the self-similarity for $m \le 5$, and the congruence
 $P_k(3k)\equiv3\pmod 9$ for all $k \le 17$, against the enumerated triangle.
 
-\begin{theorem}[activation law]
+\begin{theorem}[the activation boundary]
 \label{thm:activation}
 Column $H$ of the triangle satisfies $T(n,H) \equiv 0 \pmod 3$ for every
 $n < \lfloor 3H/2\rfloor$, and $T\bigl(\lfloor 3H/2\rfloor, H\bigr)
@@ -367,7 +363,7 @@ $\vthree(T(n,H)) = (3H-2n-1) + \vthree(P_{n-H}(n))$.
 
 \emph{Below the boundary.} $n < \lfloor 3H/2\rfloor$ makes the explicit exponent
 $3H-2n-1 \ge 1$, and $\vthree(P_k(n)) \ge 0$ by Proposition~\ref{prop:polya}. So
-$\vthree(T(n,H)) \ge 1$. This half needs only the law, not the ladder.
+$\vthree(T(n,H)) \ge 1$. This half needs only the law, not \S\ref{sec:ladder}.
 
 \emph{At the boundary.} $H$ odd puts $n = 3k+1$, where the explicit exponent is
 $0$ and $\vthree(P_k(3k+1)) = 0$ by Theorem~\ref{thm:oddspine}. $H$ even puts
@@ -393,8 +389,9 @@ with $\prod d_i = |\det|$, so any prime $q \ne 3$ dividing some $d_i$ would
 divide $d_N$, hence the determinant --- impossible.
 \end{proof}
 
-That much is unconditional; counting the nontrivial factors, which is the next
-theorem, needs the activation law and with it the ladder of \S\ref{sec:ladder}.
+The argument uses only the determinant, so Theorem~\ref{thm:snf-3power} is
+unconditional. Counting the nontrivial factors needs Theorem~\ref{thm:activation}, and
+with it the congruences of \S\ref{sec:ladder}.
 
 \begin{theorem}
 \label{thm:snf}
@@ -426,8 +423,10 @@ reproducing Table~\ref{tab:snfcount} and the full exponent lists.
 
 \section{Reading along rows}
 
-Everything above reads down columns; reading along rows gives a picture that is
-equivalent where the two overlap and different where they do not.
+The results above are statements about columns. Read along rows, the same
+triangle has a last nonzero entry in each row, which
+Theorem~\ref{thm:activation} already locates for two residue classes of $n$
+and not for the third.
 
 \paragraph{The spine is also the last nonzero of its row.} Being to the right of
 the spine in row $n$ means $n < \lfloor 3H/2\rfloor$, the same region
@@ -436,7 +435,7 @@ of one fact.
 
 \paragraph{Rows $n \equiv 2 \pmod 3$ have no spine cell at all.} For those rows
 $\lfloor 3H/2\rfloor$ never equals $n$, so the last nonzero entry is one step
-earlier, at the deficit-$2$ cell, whose residue is not $1$.
+earlier, at the deficit-$2$ cell, whose residue is $2$.
 
 \begin{theorem}[deficit-$2$ residue]
 \label{thm:deficit2}
@@ -459,17 +458,15 @@ third.
 \section{Sleeve zeros}
 \label{sec:sleeve}
 
-This section is measurement, and no law is claimed. A cell to the left of the
-spine in row $n$ carries a forced deficit $d := 3k+1-n$, and generically
-$\vthree(P_k(n)) = d$ exactly, so that the cell is a unit at that valuation; a
-\emph{sleeve zero} is a cell where $\vthree(P_k(n)) > d$, an excess divisibility
-with no evident cause.
+A cell to the left of the spine in row $n$ carries a forced deficit
+$d := 3k+1-n$, and $\vthree(P_k(n)) = d$ generically. A \emph{sleeve zero} is a
+cell with $\vthree(P_k(n)) > d$. No formula for them is known, and what follows
+is a census.
 
-The census is complete for the project's data, $n \le 40$, and reads valuations
-off the enumerated triangle through
-$\vthree(P_k(n)) = \vthree(T(n,n-k)) + d$, so that no fitted $P_k$ is needed.
-That matters, because the fitted ones stop at $k = 17$ while the proved regime
-$n \ge 2k+1$ reaches further.
+It is complete for the project's data, $n \le 40$. Valuations are read off the
+enumerated triangle through $\vthree(P_k(n)) = \vthree(T(n,n-k)) + d$, so no
+fitted $P_k$ is needed; fitting would have stopped the census at $k = 17$, while
+the proved regime $n \ge 2k+1$ reaches further.
 
 \begin{table}[H]
 \centering\small
@@ -492,16 +489,15 @@ reaches four.}
 \label{tab:sleeve}
 \end{table}
 
-The final rows add two observations. The $k = 16$ diagonal spikes in three
-consecutive rows, $n = 36, 37, 38$, and again at $n = 40$, skipping only
-$n = 39$, which is itself the only wholly zero-free sleeve after $n = 31$; and
-the excess $\vthree - d$ in the new rows tops out at $3$, well under the
-all-$n$ ceiling of $5$ (at $k=8$, $n=17$).
+In the final rows the $k = 16$ diagonal spikes at $n = 36, 37$ and $38$, and
+again at $n = 40$, skipping only $n = 39$, which is the one sleeve free of zeros
+after $n = 31$. The excess $\vthree - d$ there reaches $3$, against a ceiling of
+$5$ over all $n$ (at $k=8$, $n=17$).
 
 \begin{openproblem}[the deficit-$d$ unit formulas]
 Theorems~\ref{thm:oddspine} and~\ref{thm:evenspine} are the cases $d = 0$ and
 $d = 1$ of a family: give the unit part of $P_k(n)$ at forced deficit $d$, for
-$d \ge 2$. A closed law there would predict the sleeve zeros rather than
+$d \ge 2$. A closed form there would predict the sleeve zeros rather than
 tabulate them, and it is the open remainder of the Witt-vector tower begun in
 \S\ref{sec:lift}.
 \end{openproblem}
@@ -509,7 +505,7 @@ tabulate them, and it is the open remainder of the Witt-vector tower begun in
 \section{The 3-adic lift}
 \label{sec:lift}
 
-The cubic does not stop at $\F_3$, and the two levels above it repeat it:
+Two further $3$-adic levels of the cubic have been computed.
 
 \begin{itemize}
 \item $H^3 - H^2 \equiv 25t \pmod{27}$. The spine cubic lifts two further
@@ -517,19 +513,18 @@ The cubic does not stop at $\F_3$, and the two levels above it repeat it:
   ($25 \equiv 7 \bmod 9$ and $\equiv 1 \bmod 3$, which is why the mod-$3$
   statement reads $W^3 = W^2 + t$ with no visible constant).
 \item $\bigl(H^3 - H^2 - 25t\bigr)/27 \equiv t\bigl(W(t^3)-1\bigr) \pmod 3$. The
-  level-$3$ correction is again $W$, so the tower telescopes through the same
-  series rather than producing a new object at each level.
+  level-$3$ correction is again $W$, so the same series reappears one level up.
 \item Also found: $\bigl(H(t^3) - H^2 - t\bigr)/3 \equiv -(t + t^2 + tW)
   \pmod 3$.
 \end{itemize}
 
 These three are measured, not proved.
 
-\section{Predictions, and how they came out}
+\section{The $n = 40$ predictions}
 
-The theorems above were stated before the enumeration reached $n = 40$, which
-makes the last rows a genuine test rather than a fit. All three predictions were
-confirmed cell by cell against the final triangle:
+The theorems above were stated before the enumeration reached $n = 40$, so the
+last rows test them rather than fit them. All three predictions held, cell by
+cell, against the final triangle:
 
 \begin{itemize}
 \item $T(37,25) \equiv 1 \pmod 3$ (odd spine, $k=12$), and every in-regime cell
@@ -547,16 +542,17 @@ confirmed cell by cell against the final triangle:
 \begin{openproblem}[the individual exponents]
 Theorem~\ref{thm:snf} counts the nontrivial invariant factors and the
 determinant fixes their sum at $N(N-1)/2$, but the individual exponents
-$e_i(N)$ are not known, the mod-$3$ rank giving the count and saying nothing
-about the higher $3$-adic structure; the lifts of \S\ref{sec:lift} are the
-natural attack.
+$e_i(N)$ are unknown. The mod-$3$ rank gives the count and says nothing about
+the higher $3$-adic structure; the lifts of \S\ref{sec:lift} are the natural
+attack.
 \end{openproblem}
 
 \begin{openproblem}[other primes]
 The general spine theorem gives one cubic per prime dividing the drift count,
 which for polyhexes is $p = 2$, with the same curve. Does the polyhex triangle
 have a mod-$2$ arithmetic as rich as this one, with a digit product, an
-activation law and a Smith normal form count? Nothing here forbids it and nobody
+activation boundary and a Smith normal form count? Nothing here forbids it and
+nobody
 has looked.
 \end{openproblem}
 
@@ -569,12 +565,12 @@ has looked.
 \toprule
 claim & check \\
 \midrule
-T1--T5 and the ladder & \repo{experiments/ternary\_spine.py} (15 checks) \\
+T1--T5 and the congruences & \repo{experiments/ternary\_spine.py} (15 checks) \\
 the 342-cell digit-product mass check & \repo{experiments/ternary\_spine.py} \\
 Theorem~\ref{thm:deficit2} & \repo{experiments/deficit2\_proof.py} \\
 Table~\ref{tab:sleeve} & \repo{experiments/sleeve\_zero\_census.py} \\
 the enumerated triangle & \repo{results/triangle.txt} \\
-the underlying law and grand form & companion paper; \repo{docs/proofs/diagonal-law.md}, \repo{docs/proofs/grand-form.md} \\
+the underlying law and product form & companion paper L1; \repo{docs/proofs/diagonal-law.md}, \repo{docs/proofs/grand-form.md} \\
 the master equation and weights & \repo{results/defect-gas.md} \\
 \bottomrule
 \end{tabular}

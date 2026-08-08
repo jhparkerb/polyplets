@@ -110,7 +110,7 @@ def cut_null_control():
     """
     if not os.path.isfile(AREA700):
         stop(f"null control source missing: {AREA700}\n"
-             "  It is the 700-term HV-convex-king-animals-by-area series"
+             "  It is the 700-term HV-convex-polyplets-by-area series"
              " (results/convex-polyplets.md).\n"
              "  Regenerate (needs GMP, ~8 min; the engine prints the terms"
              " comma-separated,\n  this file is one 'n a(n)' pair per line):\n"

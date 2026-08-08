@@ -81,7 +81,7 @@ L_PAPERS = [
     "L2-ternary-spine.tex",
     "L3-lambda-bounds.tex",
     "L4-not-dfinite.tex",
-    "L5-convex-king-animals.tex",
+    "L5-convex-polyplets.tex",
     "L6-perimeter-gradings.tex",
 ]
 

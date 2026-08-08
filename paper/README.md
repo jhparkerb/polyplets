@@ -50,7 +50,7 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 | `L2-ternary-spine.tex` | **L2** — The mod-3 arithmetic of the height triangle | draft, 10pp — **novelty unchecked** |
 | `L3-lambda-bounds.tex` | **L3** — A certified two-sided bound for λ | draft, 14pp |
 | `L4-not-dfinite.tex` | **L4** — An arithmetic obstruction to D-finiteness | draft, 11pp |
-| `L5-convex-king-animals.tex` | **L5** — Convex king animals | draft, 18pp |
+| `L5-convex-polyplets.tex` | **L5** — Convex polyplets | draft, 18pp |
 | `L6-perimeter-gradings.tex` | **L6** — Perimeter gradings of lattice animals | draft, 11pp — **compute-gated, do not submit** |
 
 Every L paper carries a loud draft banner, because every one of their
