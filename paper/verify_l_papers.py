@@ -270,7 +270,9 @@ def check_l4_boxes():
     # R2: a box one degree wider is not supported by the same data.
     red(full[3] >= 181, "a psi-box widened past the 4th largest degree")
 
-    # psi-degree growth rate: the paper says ~2.7 per level, near sqrt(lambda).
+    # psi-degree growth rate: ~2.7 per level, near sqrt(lambda).  Data-only
+    # sanity check: the subsection that printed this ratio was removed in
+    # l-trim phase 1, so nothing in the manuscript states it anymore.
     ratios = [PSI_DEGREES[i + 1] / PSI_DEGREES[i] for i in range(4, 9)]
     mean = sum(ratios) / len(ratios)
     ok(2.4 < mean < 2.9, f"psi-degree growth ~2.7, measured {mean:.2f}")

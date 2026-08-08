@@ -44,9 +44,12 @@ verdict. Nothing is pushed; publishing is jasonp's call.
 - Three pinned constants occur exactly once, at **L1:440**, **L4:318**,
   **L5:333** (line numbers valid post-phase-5). A phase going near them must
   relocate the literal first or gate check 6 blocks the commit.
-- `verify_l_papers.py` is frozen (checksum in `baseline.tsv`). Its stale
-  comment at `:273` ("the paper says ~2.7 per level") and L5's outdated header
-  comment block are post-campaign hygiene, on record here so they are not lost.
+- ~~`verify_l_papers.py` `:273` stale comment; L5's outdated header comment
+  block~~ BOTH FIXED post-campaign, 2026-08-08: the comment now says the
+  subsection is gone, and L5's header names results by label (`lem:blocks`,
+  `prop:mirror`, `rem:attr1/2`, `sec:related`) instead of compiled numbers,
+  which drift. Verifier checksum re-baselined (comment-only edit, mutation
+  gate green before and after).
 
 ## Open, and not this campaign's to fix
 

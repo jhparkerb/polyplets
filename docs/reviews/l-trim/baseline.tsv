@@ -9,7 +9,7 @@ sha	paper/polyplets-report.tex	1323342746fe53e5b6421a07a363c3121300c970dfc43cffd
 sha	paper/shared/disclosure.tex	efadb814ad936b79f8ac43f69e48bc8e35b4e3349caf8b1fcdb38080c1656e98
 sha	paper/shared/preamble.tex	c2e19168a835ce87f56790d5a24b5afb6ce4ac76ea5d376ab56f5e5cf3804c8d
 sha	paper/shared/refs.bib	21b8966b6aee5cc9ab3c6877fa47cbbccbcbe923ba0f19df8ce541617314e6ea
-sha	paper/verify_l_papers.py	296c74791f68d192c63d7974cfcc290d8ca748987214e029f4b523f07d01604f
+sha	paper/verify_l_papers.py	72a7763e4f9d8ac8841d2b57e7738b798154f34cbe0796bd5c7d8117f451a690
 cites	L1-diagonal-law	a308359 barequetBarequetRote2010 barequetShalah2017 madras1999 mathlib 
 cites	L2-ternary-spine	allouche2003 christol1980 oeis polya1915 
 cites	L3-lambda-bounds	bacher2015 barequetRoteShalah2016 bbo2021 bui2025 klarnerRivest1973 mathlib 

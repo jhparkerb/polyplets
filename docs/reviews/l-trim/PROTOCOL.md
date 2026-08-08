@@ -233,4 +233,10 @@ treatment: a demonstrated kill first, the repair, retroactive re-verification
 of every tree the old verifier blessed, a re-baselined checksum, and a
 paragraph here.
 
+**Post-campaign, 2026-08-08** (the campaign complete, the freeze formally
+expired with it): one comment-only edit — the stale "the paper says ~2.7 per
+level" note, on the residual list since phase 2 — under the same mechanics:
+no check semantics changed, mutation gate green before and after, checksum
+re-baselined so `l_trim_gate` stays green as a whole-tree invariant.
+
 Nothing in this campaign is pushed. Publishing is jasonp's call.
