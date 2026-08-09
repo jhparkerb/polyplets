@@ -116,7 +116,22 @@ direction bounds `|x|` by `connected_sub_x_le` in both directions against the
 anchor `(0, 1)`. Mirror the proof of `mem_CFGVt`. -/
 theorem mem_CFGVp {ℓ j : ℕ} (h : 1 ≤ ℓ + j) {S : Finset (ℤ × ℤ)} :
     S ∈ CFGVp ℓ j ↔ IsVpConfig ℓ j S := by
-  sorry
+  rw [CFGVp, Finset.mem_filter]
+  constructor
+  · exact fun hmem => hmem.2
+  · intro hS
+    refine ⟨?_, hS⟩
+    obtain ⟨hcard, h01, hy, -, -, hconn⟩ := hS
+    rw [Finset.mem_powersetCard]
+    refine ⟨?_, hcard⟩
+    intro p hp
+    have hx1 : p.1 - (0 : ℤ) ≤ (S.card : ℤ) - 1 := connected_sub_x_le hconn h01 hp
+    have hx2 : (0 : ℤ) - p.1 ≤ (S.card : ℤ) - 1 := connected_sub_x_le hconn hp h01
+    obtain ⟨hy1, hy2⟩ := hy p hp
+    have hcardZ : (S.card : ℤ) = (ℓ : ℤ) + (j : ℤ) := by exact_mod_cast hcard
+    rw [hcardZ] at hx1 hx2
+    rw [mem_window]
+    refine ⟨?_, ?_, ?_, ?_⟩ <;> omega
 
 /-- `Wp(2¹) = 1`: two cells in one row, king-connected forces adjacency. -/
 theorem Vp_1_1 : Vp 1 1 = 1 := by native_decide
@@ -147,8 +162,180 @@ theorem depth1_k0' :
       DepthAssembly.ppTable 0 = -1 / 3 :=
   DepthAssembly.depth1_k0 _ _ _ rfl rfl rfl
 
--- TODO(agent): the remaining 35 corollaries, same pattern.
-theorem depth_corollaries_todo : True := by sorry
+theorem depth1_k1' :
+    DepthAssembly.Dval 1 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 1 = 4 / 9 :=
+  DepthAssembly.depth1_k1 _ _ _ rfl rfl rfl
+
+theorem depth1_k2' :
+    DepthAssembly.Dval 1 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 2 = 80 / 27 :=
+  DepthAssembly.depth1_k2 _ _ _ rfl rfl rfl
+
+theorem depth1_k3' :
+    DepthAssembly.Dval 1 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 3 = 1753 / 81 :=
+  DepthAssembly.depth1_k3 _ _ _ rfl rfl rfl
+
+theorem depth1_k4' :
+    DepthAssembly.Dval 1 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 4 = 40928 / 243 :=
+  DepthAssembly.depth1_k4 _ _ _ rfl rfl rfl
+
+theorem depth1_k5' :
+    DepthAssembly.Dval 1 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 5 = 987355 / 729 :=
+  DepthAssembly.depth1_k5 _ _ _ rfl rfl rfl
+
+theorem depth1_k6' :
+    DepthAssembly.Dval 1 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 6 = 24323825 / 2187 :=
+  DepthAssembly.depth1_k6 _ _ _ rfl rfl rfl
+
+theorem depth1_k7' :
+    DepthAssembly.Dval 1 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 7 = 607833256 / 6561 :=
+  DepthAssembly.depth1_k7 _ _ _ rfl rfl rfl
+
+theorem depth1_k8' :
+    DepthAssembly.Dval 1 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 8 = 15348306104 / 19683 :=
+  DepthAssembly.depth1_k8 _ _ _ rfl rfl rfl
+
+theorem depth2_k0' :
+    DepthAssembly.Dval 2 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 0 = 0 :=
+  DepthAssembly.depth2_k0 _ _ _ rfl rfl rfl
+
+theorem depth2_k1' :
+    DepthAssembly.Dval 2 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 1 = 20 / 27 :=
+  DepthAssembly.depth2_k1 _ _ _ rfl rfl rfl
+
+theorem depth2_k2' :
+    DepthAssembly.Dval 2 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 2 = 130 / 27 :=
+  DepthAssembly.depth2_k2 _ _ _ rfl rfl rfl
+
+theorem depth2_k3' :
+    DepthAssembly.Dval 2 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 3 = 11524 / 243 :=
+  DepthAssembly.depth2_k3 _ _ _ rfl rfl rfl
+
+theorem depth2_k4' :
+    DepthAssembly.Dval 2 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 4 = 344398 / 729 :=
+  DepthAssembly.depth2_k4 _ _ _ rfl rfl rfl
+
+theorem depth2_k5' :
+    DepthAssembly.Dval 2 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 5 = 1124984 / 243 :=
+  DepthAssembly.depth2_k5 _ _ _ rfl rfl rfl
+
+theorem depth2_k6' :
+    DepthAssembly.Dval 2 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 6 = 294307877 / 6561 :=
+  DepthAssembly.depth2_k6 _ _ _ rfl rfl rfl
+
+theorem depth2_k7' :
+    DepthAssembly.Dval 2 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 7 = 8480809952 / 19683 :=
+  DepthAssembly.depth2_k7 _ _ _ rfl rfl rfl
+
+theorem depth2_k8' :
+    DepthAssembly.Dval 2 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 8 = 80887423214 / 19683 :=
+  DepthAssembly.depth2_k8 _ _ _ rfl rfl rfl
+
+theorem depth3_k0' :
+    DepthAssembly.Dval 3 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 0 = 0 :=
+  DepthAssembly.depth3_k0 _ _ _ rfl rfl rfl
+
+theorem depth3_k1' :
+    DepthAssembly.Dval 3 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 1 = 0 :=
+  DepthAssembly.depth3_k1 _ _ _ rfl rfl rfl
+
+theorem depth3_k2' :
+    DepthAssembly.Dval 3 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 2 = 214 / 81 :=
+  DepthAssembly.depth3_k2 _ _ _ rfl rfl rfl
+
+theorem depth3_k3' :
+    DepthAssembly.Dval 3 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 3 = 24877 / 729 :=
+  DepthAssembly.depth3_k3 _ _ _ rfl rfl rfl
+
+theorem depth3_k4' :
+    DepthAssembly.Dval 3 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 4 = 343550 / 729 :=
+  DepthAssembly.depth3_k4 _ _ _ rfl rfl rfl
+
+theorem depth3_k5' :
+    DepthAssembly.Dval 3 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 5 = 13288195 / 2187 :=
+  DepthAssembly.depth3_k5 _ _ _ rfl rfl rfl
+
+theorem depth3_k6' :
+    DepthAssembly.Dval 3 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 6 = 1436864696 / 19683 :=
+  DepthAssembly.depth3_k6 _ _ _ rfl rfl rfl
+
+theorem depth3_k7' :
+    DepthAssembly.Dval 3 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 7 = 16454701829 / 19683 :=
+  DepthAssembly.depth3_k7 _ _ _ rfl rfl rfl
+
+theorem depth3_k8' :
+    DepthAssembly.Dval 3 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 8 = 182195974328 / 19683 :=
+  DepthAssembly.depth3_k8 _ _ _ rfl rfl rfl
+
+theorem depth4_k0' :
+    DepthAssembly.Dval 4 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 0 = 0 :=
+  DepthAssembly.depth4_k0 _ _ _ rfl rfl rfl
+
+theorem depth4_k1' :
+    DepthAssembly.Dval 4 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 1 = 0 :=
+  DepthAssembly.depth4_k1 _ _ _ rfl rfl rfl
+
+theorem depth4_k2' :
+    DepthAssembly.Dval 4 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 2 = 0 :=
+  DepthAssembly.depth4_k2 _ _ _ rfl rfl rfl
+
+theorem depth4_k3' :
+    DepthAssembly.Dval 4 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 3 = 24146 / 2187 :=
+  DepthAssembly.depth4_k3 _ _ _ rfl rfl rfl
+
+theorem depth4_k4' :
+    DepthAssembly.Dval 4 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 4 = 1400566 / 6561 :=
+  DepthAssembly.depth4_k4 _ _ _ rfl rfl rfl
+
+theorem depth4_k5' :
+    DepthAssembly.Dval 4 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 5 = 75221426 / 19683 :=
+  DepthAssembly.depth4_k5 _ _ _ rfl rfl rfl
+
+theorem depth4_k6' :
+    DepthAssembly.Dval 4 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 6 = 1199562484 / 19683 :=
+  DepthAssembly.depth4_k6 _ _ _ rfl rfl rfl
+
+theorem depth4_k7' :
+    DepthAssembly.Dval 4 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 7 = 51621741496 / 59049 :=
+  DepthAssembly.depth4_k7 _ _ _ rfl rfl rfl
+
+theorem depth4_k8' :
+    DepthAssembly.Dval 4 8 DepthAssembly.sigTable DepthAssembly.bbTable
+      DepthAssembly.ppTable 8 = 2058403227110 / 177147 :=
+  DepthAssembly.depth4_k8 _ _ _ rfl rfl rfl
 
 /-! ## 4. Identity (II) on truncated series, closed inside Lean at `k ≤ 8` -/
 
@@ -226,6 +413,36 @@ theorem ppTable_row0_is_walk :
     (DepthAssembly.ppTable.getD 0 []).tail =
       (GapWalk.walkFamilies 8).map fun t => (t.2.2 : ℤ) := by
   native_decide
+
+/-! ## 6. Axiom audit: the head theorems of this module -/
+
+/-- info: 'Polyplets.GapWalkBridge.mem_CFGVp' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms mem_CFGVp
+
+/--
+info: 'Polyplets.GapWalkBridge.Vp_3_3' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Vp_3_3._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms Vp_3_3
+
+/--
+info: 'Polyplets.GapWalkBridge.f1_matches_depth1' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ f1_matches_depth1._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms f1_matches_depth1
+
+/--
+info: 'Polyplets.GapWalkBridge.walk_table_19' depends on axioms: [propext, walk_table_19._native.native_decide.ax_1_1]
+-/
+#guard_msgs in
+#print axioms walk_table_19
 
 end GapWalkBridge
 end Polyplets
