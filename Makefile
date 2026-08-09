@@ -381,11 +381,13 @@ build/severance_w3_families: cpp/severance_w3_families.cpp cpp/obs.h | build
 # (AuditOutworks pattern), so axiom drift also fails the build. RED until the
 # wave-1 agents land their proofs.
 NOTARY_MODULES := polyplets/Polyplets/GapWalkBridge.lean \
-                  polyplets/Polyplets/DepthOneConstants.lean
+                  polyplets/Polyplets/DepthOneConstants.lean \
+                  polyplets/Polyplets/DepthOneSeries.lean
 gate-notary:
 	@if grep -wn 'sorry\|axiom\|admit' $(NOTARY_MODULES); then \
 	  echo 'gate-notary: RED — sorry/axiom/admit present'; exit 1; fi
-	cd polyplets && lake build Polyplets.GapWalkBridge Polyplets.DepthOneConstants
+	cd polyplets && lake build Polyplets.GapWalkBridge \
+	  Polyplets.DepthOneConstants Polyplets.DepthOneSeries
 
 # Gate CONVEX-DFINITE: the sharpened order<=20/degree<=20 non-D-finite verdict
 # for HV-convex animals by area, king and edge-adjacent, plus the growth
