@@ -78,7 +78,9 @@ itself (tensor-network / MPS), which is orthogonal to holonomy.
 ## Caveats / honest limits
 
 - Orders past ~11 are lower bounds (need more n per H than we have).
-- Only *linear* slicings n−H=const were tested against long data runs; exotic
+- Only *linear* slicings n−H=const were tested against long data runs
+  (**slopes s>=2, n=sH+k, tested 2026-08-09 — nothing there:
+  `results/slope-slicings.md`**); exotic
   statistics (perimeter, column count, spectral coordinates) aren't in the
   triangle and would need fresh enumeration to probe — an open door, not tested.
 - C-finite only; a P-finite (polynomial-coefficient) recurrence could be lower
