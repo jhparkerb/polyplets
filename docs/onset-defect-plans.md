@@ -203,7 +203,7 @@ record, why the depth resummation is a boundary layer.
 Boundary Layer (§2), and corroborated by Spectral Edge (§3). Desk work, but real
 research rather than post-processing.
 
-**Output.** `docs/proofs/onset-defect.md` if it closes; otherwise a recorded
+**Output.** `docs/proofs/onset-defect.md` (planned) if it closes; otherwise a recorded
 account of where the construction resists, which is itself worth having.
 
 **RESULT (first pass), `results/discarded-term.md`.** The discarded object is
@@ -275,7 +275,7 @@ it is a separate measurement.
 **Feeds.** `results/onset-defect-law.md` §4, whose thin-rate reading currently
 rests on one non-degenerate lattice.
 
-**Output.** `results/third-lattice-defect.md`.
+**Output.** `results/third-lattice-defect.md` (planned).
 
 ---
 
