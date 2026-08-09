@@ -382,12 +382,16 @@ build/severance_w3_families: cpp/severance_w3_families.cpp cpp/obs.h | build
 # wave-1 agents land their proofs.
 NOTARY_MODULES := polyplets/Polyplets/GapWalkBridge.lean \
                   polyplets/Polyplets/DepthOneConstants.lean \
-                  polyplets/Polyplets/DepthOneSeries.lean
+                  polyplets/Polyplets/DepthOneSeries.lean \
+                  polyplets/Polyplets/GapWalkRows.lean \
+                  polyplets/Polyplets/GapWalkCanon.lean \
+                  polyplets/Polyplets/GapWalkTrunc.lean
 gate-notary:
 	@if grep -wn 'sorry\|axiom\|admit' $(NOTARY_MODULES); then \
 	  echo 'gate-notary: RED — sorry/axiom/admit present'; exit 1; fi
 	cd polyplets && lake build Polyplets.GapWalkBridge \
-	  Polyplets.DepthOneConstants Polyplets.DepthOneSeries
+	  Polyplets.DepthOneConstants Polyplets.DepthOneSeries \
+	  Polyplets.GapWalkRows Polyplets.GapWalkCanon Polyplets.GapWalkTrunc
 
 # Gate CONVEX-DFINITE: the sharpened order<=20/degree<=20 non-D-finite verdict
 # for HV-convex animals by area, king and edge-adjacent, plus the growth
