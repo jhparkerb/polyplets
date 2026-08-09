@@ -2,9 +2,11 @@ import Polyplets.AuditOutworks
 import Polyplets.Compute
 import Polyplets.ComputeBridge
 import Polyplets.Defs
+import Polyplets.DepthAssembly
 import Polyplets.Diagonal
 import Polyplets.Fekete
 import Polyplets.Finite
+import Polyplets.GapWalk
 import Polyplets.Graph
 import Polyplets.Growth
 import Polyplets.Holes

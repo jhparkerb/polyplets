@@ -368,6 +368,13 @@ build/prec_guess: cpp/prec_guess.cpp cpp/argparse.h cpp/obs.h | build
 build/severance_w1: cpp/severance_w1.cpp cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp -pthread $< -o $@
 
+# Bounded-excess cluster-weight families, C++ port of the row-transfer DP in
+# experiments/severance_w3_depths.py (Severance W3): the aggregated interior /
+# bottom-edge / pure series by (excess e, surplus k). Feeds the cached table
+# results/severance_w3_families_K19_e3.txt that unblocks depth j = 4.
+build/severance_w3_families: cpp/severance_w3_families.cpp cpp/obs.h | build
+	$(CXX) $(CXXFLAGS) -O3 -Icpp -pthread $< -o $@
+
 # Gate CONVEX-DFINITE: the sharpened order<=20/degree<=20 non-D-finite verdict
 # for HV-convex animals by area, king and edge-adjacent, plus the growth
 # constants. Deliberately does NOT depend on build/convex_area_tm (GMP is
