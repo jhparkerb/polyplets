@@ -80,7 +80,7 @@ thing** — they are `tail --pid` over ssh and do not survive a session change.
 | box | job | PID to watch | state at 18:09 |
 |---|---|---|---|
 | ayr | `scripts/ayr_pmin48.sh` → square8 min-end p=48, tmux `0:pmin48`, log `results/ayr_pmin48.runlog` | 2261 | **DONE 2026-08-07 22:12 UTC** — `AYR_PMIN48_DONE`, 121/121 frames, census `results/perimmin_square8_p48_r6.txt` (1526 rows) identical on ayr and here by sha256; script and runlog committed 2026-08-08 |
-| dalby | `scripts/dalby_square4_deep.sh` → square4 min-end deep boxes, tmux `0:j7w17` | 2423184 | W=15 r8 done (`1 4 18 60 187 524 1388 3452 8193`); on W=17 r8 since 14:29 EDT |
+| dalby | `scripts/dalby_square4_deep.sh` → square4 min-end deep boxes, tmux `0:j7w17` | 2423184 | **DONE 2026-08-08 08:51 EDT** — `DEEP_DONE`, both boxes `result=ok`. `W=15` `1 4 18 60 187 524 1388 3452 8193`, `W=17` `... 3452 8229`. Censuses and logs committed here 2026-08-09; the `j=7,8` predictions are confirmed and the `8193`/`8229` split is explained and measured (`results/perimeter-both-ends.md`) |
 | dalby | `dalby_perimeter_defect_pool.sh square8 78 6`, tmux `0:pdk6big` | 2420612 (stage 1) | all 456 shards dispatched, a couple still running. **Stage 2 (`square4 78 6`) starts automatically after**, then `STAGE2_ALLDONE` and a `sleep 86400` — so watch 2420612, not the outer 2420610, and re-arm on stage 2 |
 
 gympie is idle; its three finished windows (percell mod-4, symtm strip profile,

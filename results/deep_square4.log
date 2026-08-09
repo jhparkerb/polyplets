@@ -1,0 +1,6 @@
+=== deep square4, threads=56, started 2026-08-07T13:05:49-04:00
+--- W=15 parity=0 rmax=8 -> results/perimmin_free_15_15_0_r8.txt  (2026-08-07T13:05:49-04:00)
+# box W=15 H=15 parity=0 slo=0 shi=28 pbox=32 cells=113 mult=1 free: 1 4 18 60 187 524 1388 3452 8193
+--- W=17 parity=0 rmax=8 -> results/perimmin_free_17_17_0_r8.txt  (2026-08-07T14:29:39-04:00)
+# box W=17 H=17 parity=0 slo=0 shi=32 pbox=36 cells=145 mult=1 free: 1 4 18 60 187 524 1388 3452 8229
+DEEP_DONE 2026-08-08T08:51:21-04:00

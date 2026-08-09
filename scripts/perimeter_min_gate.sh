@@ -141,6 +141,47 @@ else
   echo "  fired as expected (rmax=5 != rmax=4)"
 fi
 
+# Check E: the free-removal row against a SECOND IMPLEMENTATION.
+# experiments/diamond_free_removals.py counts the same diamonds by growing the
+# removal set one cell at a time and keeping what stays perimeter-neutral --
+# different language, different algorithm, no shared code.  It is what confirmed
+# that W=15's 8193 at j=8 was the box running out and not the model failing
+# (results/perimeter-both-ends.md), so it needs to stay honest.  r=5 and r=6 are
+# small enough to cost a second each.
+echo "== check E: free-removal row == experiments/diamond_free_removals.py"
+for spec in "11 5 6" "13 6 6"; do
+  set -- $spec
+  w=$1 r=$2 jm=$3
+  cpp=$(./build/perimeter_min square4 999 "$jm" --only "$w" "$w" 0 2>/dev/null \
+        | sed -n 's/.*free: //p')
+  py=$(python3 experiments/diamond_free_removals.py "$jm" "$r" \
+       | sed -n 's/^r=.*pbox=[0-9]*: //p')
+  if [ -n "$cpp" ] && [ "$cpp" = "$py" ]; then
+    echo "  ok  W=$w  $cpp"
+  else
+    echo "  SECOND-SOURCE MISMATCH W=$w"
+    echo "    cpp: $cpp"
+    echo "    py : $py"
+    fail=1
+  fi
+done
+
+# RED control for check E: the comparison must be able to fail.  The two
+# implementations agree on the diamond of radius r, so pointing the Python at
+# radius r-1 has to disagree -- if it does not, the sed above is producing empty
+# strings and the check is comparing nothing to nothing.
+echo "== RED control: check E against the wrong radius (must mismatch)"
+cpp=$(./build/perimeter_min square4 999 6 --only 13 13 0 2>/dev/null \
+      | sed -n 's/.*free: //p')
+py=$(python3 experiments/diamond_free_removals.py 6 5 \
+     | sed -n 's/^r=.*pbox=[0-9]*: //p')
+if [ -n "$cpp" ] && [ "$cpp" = "$py" ]; then
+  echo "  RED CONTROL DID NOT FIRE -- r=6 and r=5 compared equal"
+  fail=1
+else
+  echo "  fired as expected (r=6 != r=5)"
+fi
+
 # The runtime (H1) assert must not have tripped in either real run.
 if grep -q "hypothesis=H1" "$TMP"/square8.log "$TMP"/square4.log "$TMP"/tri6.log; then
   echo "  (H1) VIOLATION reported at runtime"

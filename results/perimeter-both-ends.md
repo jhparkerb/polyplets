@@ -351,9 +351,69 @@ that is all we need, since no lattice in this campaign produces a sharper tip.
 Beware re-looking-up the tip series with six terms: A120452 matches
 `1, 1, 3, 5, 9, 14` and will come back instead.
 
-**Prediction, still untested:** `j = 7, 8` are `3452` and `8229`. Reaching them
-needs `W = 17` (145 cells), over the `kMaxCells = 128` u128 limit, so it needs a
-wider connectivity mask first.
+### CONFIRMED: `j = 7` and `j = 8` are `3452` and `8229`
+
+The prediction was `3452` and `8229`, and reaching `j = 8` needed `W = 17`
+(145 cells), over the old `kMaxCells = 128` u128 limit. The four-word mask
+bought it, and `scripts/dalby_square4_deep.sh` ran both radii on dalby:
+
+| box | cells | wall | nodes | free removals `j = 0..8` |
+|---|---|---|---|---|
+| `W=15` `r8` | 113 | 1h 24m | 5.5e11 | `1 4 18 60 187 524 1388 3452` **`8193`** |
+| `W=17` `r8` | 145 | 18h 22m | 4.2e12 | `1 4 18 60 187 524 1388 3452` **`8229`** |
+
+`j = 7 = 3452` at both radii, which is the campaign's convergence standard, and
+it is the model's value. `j = 8` is `8229` at `W = 17`, also the model's value,
+but the two radii **disagree** there — so on the standard as stated, `j = 8` had
+one radius and not two.
+
+**The `8193` is the box running out, not the model being wrong.** A free removal
+is an order ideal in a tip cone, and a single column driven straight down the
+axis of one tip needs that tip to be `j` cells deep. A radius-`r` diamond has
+depth `r`, so it can hold every ideal up to size `r` and starts losing them at
+`r + 1`. `W = 15` is `r = 7`: correct through `j = 7`, short at `j = 8`, by the
+36 ideals that do not fit.
+
+That is a claim about geometry, so it was measured rather than argued.
+`experiments/diamond_free_removals.py` counts free removals directly — grow the
+removal set one cell at a time, keep the ones that stay perimeter-neutral and
+connected — which is a different algorithm from `cpp/perimeter_min.cpp`'s
+enumerate-all-subsets-and-filter, on a different implementation in a different
+language. It reproduces **both** measured rows exactly, all 18 terms, and being
+incremental it reaches radii the C++ cannot afford:
+
+    r=5   W=11   1 4 18 60 187 524 1360
+    r=7   W=15   1 4 18 60 187 524 1388 3452 8193
+    r=8   W=17   1 4 18 60 187 524 1388 3452 8229 18760 41268
+    r=9   W=19   1 4 18 60 187 524 1388 3452 8229 18800 41492  88628 184027
+    r=10  W=21   1 4 18 60 187 524 1388 3452 8229 18800 41536  88876 185031
+    r=11  W=23   1 4 18 60 187 524 1388 3452 8229 18800 41536  88924 185303
+    r=12  W=25   1 4 18 60 187 524 1388 3452 8229 18800 41536  88924 185355
+    model        1 4 18 60 187 524 1388 3452 8229 18800 41536  88924 185355
+
+(`r=5` and `r=6` are in `scripts/perimeter_min_gate.sh` as check E, where the
+C++ and this script are compared row against row on every run.)
+
+So `W = 19` gives `j = 8 = 8229` as well, and so do `W = 21`, `W = 23` and
+`W = 25`: **`j = 8` has five agreeing radii**, and the prediction is confirmed
+on the campaign's own standard several times over. The ladder carries three more
+predicted terms to that standard — `j = 9 = 18800` at four radii,
+`j = 10 = 41536` at three, `j = 11 = 88924` at two — and offers
+`j = 12 = 185355` at one.
+
+The truncation rule the table shows is exact and worth keeping, because it says
+how far to trust any future box: **radius `r` reproduces the model through
+`j = r` and undercounts from `j = r + 1` on.** Every radius here breaks exactly
+where that says it should — `5` at `6`, `7` at `8`, `8` at `9`, `9` at `10`,
+`10` at `11`, `11` at `12` — and every term below its break is the model's;
+`r = 12` runs out of `j` before it runs out of hull. Read backwards it is a cost
+model: a term `j` needs `W = 2j+1`, and what the enumerator costs in that box is
+what the 18-hour `W = 17` run showed.
+
+**The model is now measured, not extrapolated, through `j = 11`.** It was fitted
+to nothing in the first place — it is derived from the tangent cone — so the
+four fresh terms are four predictions kept, on top of the `1388` that killed
+A120452.
 
 ### RESOLVED: the corner inventory was wrong, and the missing type is the BEVEL
 
@@ -503,7 +563,7 @@ hit into the right one. Two hits, five apparent novelties:
 
 | | series | result |
 |---|---|---|
-| S1 | square4 diamond free-removals `1, 4, 18, 60, 187, 524, 1388, 3452, 8229, 18800` | **no match** |
+| S1 | square4 diamond free-removals `1, 4, 18, 60, 187, 524, 1388, 3452, 8229, 18800` | **no match** (looked up when the last two were model values; all ten are measured as of 2026-08-09) |
 | S2 | square4 even-W hull free-removals `1, 6, 25, 88, 272, 766, 2012` | **no match** |
 | S3 | per-tip `1, 1, 3, 5, 9, 14, 24, 35, 55, 81, 120, 171, 248` | **A053993**, Andrews' `phi_2`; an eta quotient, same status as `P(x)`. A120452 matched only the first six terms and is refuted at the seventh |
 | S4 | hexagon free-removals `1, 6, 27, 98, 315, 918` | `P(x)^6`; A071734 matched the first five terms and is refuted at the sixth |

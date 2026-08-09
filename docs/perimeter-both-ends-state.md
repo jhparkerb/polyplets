@@ -91,8 +91,20 @@ index `m` is FALSE at `m=3` and recorded as a closed door.
 oeis.org 2026-08-07 (`?fmt=json`, `null` body means no match). Be polite. This
 supersedes the earlier "his call, deliberately unrun" rule.
 
-Open follow-ups: the `j=7,8` predictions `3452, 8229` (blocked on
-`kMaxCells = 128`), and the unresolved 6-corner/8-corner hull factorisation.
+**The `j=7,8` predictions `3452, 8229` are CONFIRMED** (2026-08-09). The
+four-word mask lifted `kMaxCells = 128`; `scripts/dalby_square4_deep.sh` measured
+`W=15` and `W=17` on dalby (18h for `W=17`). `j=7 = 3452` at both radii. `j=8`
+split — `8193` at `W=15`, `8229` at `W=17` — because a radius-`r` diamond holds
+free removals only through `j = r`; `W=15` is one deep short at `j=8` and drops
+36 of them. Measured, not argued: `experiments/diamond_free_removals.py` counts
+free removals by a different algorithm, reproduces both C++ rows exactly, and
+reaches `W=19`, `21`, `23` — where `j=8 = 8229` every time. So `j=8` has four
+agreeing radii, `j=9 = 18800` three and `j=10 = 41536` two: **the model is
+measured, not extrapolated, through `j=10`.** Every radius breaks exactly at
+`j = r+1`, which is now check E of `scripts/perimeter_min_gate.sh` at the two
+small radii. Write-up in `results/perimeter-both-ends.md`.
+
+Open follow-up: the unresolved 6-corner/8-corner hull factorisation.
 
 The original framing of the test, kept for the record:
 

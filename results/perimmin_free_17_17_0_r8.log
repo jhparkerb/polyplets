@@ -1,0 +1,4 @@
+event=start job=perimeter_min t=2026-08-07T14:29:39-04:00 git=4aa9017f-dirty built=2026-08-07T13:04:24-0400 host=dalby lattice=square4 pmax=999 rmax=8
+event=plan job=perimeter_min boxes=1
+event=plan job=perimeter_min shards=10586 cells=145
+event=done job=perimeter_min t=2026-08-08T08:51:21-04:00 start=2026-08-07T14:29:39-04:00 wall_s=66102.0 cpu_s=3701660.0 peak_rss_mb=2.6 result=ok boxes=1 nodes=4224730391600 emitted=3217872931289 cells=45

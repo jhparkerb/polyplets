@@ -13,8 +13,9 @@
 %  contradicts.  As of this draft:
 %    dalby, window pdk6big : square8 78 6 RUNNING (stage 2, square4, QUEUED)
 %    dalby, window j7w17   : square4 deep min-end DONE 2026-08-08T08:51Z
-%                            (W=15,17; extends the diamond series to j=8, and
-%                             confirms the tangent-cone prediction at j=7,8)
+%                            (W=15,17; extended the diamond series to j=8; the
+%                             tangent-cone predictions at j=7,8 are CONFIRMED,
+%                             and a second source carries them to j=11)
 %    ayr,   window pmin48  : square8 p=48 min-end DONE 2026-08-07T22:12Z
 %  §\ref{sec:k6} is the placeholder that must be replaced when they land.
 %
@@ -494,7 +495,7 @@ of the isoperimetric hull --- a Young diagram at each corner, independently. The
 hexagon confirms that this was a general argument and not a fact about boxes.
 
 \paragraph{The square lattice's diamond is an apparent exception.} It gives
-$1, 4, 18, 60, 187, 524, 1388, 3452, 8229$, not $P(x)^4$, and is larger from
+$1, 4, 18, 60, 187, 524, 1388, 3452, 8229, 18800, 41536$, not $P(x)^4$, and is larger from
 $j = 2$ on: $18$ against $14$. A fourth root gives a per-tip series
 $1, 1, 3, 5, 9, 14, \dots$, not the partition numbers $1, 1, 2, 3, 5, 7$.
 
@@ -511,6 +512,15 @@ written down, and returned $3452$ at $j = 7$ and $8229$ at $j = 8$, which are
 $[x^7]g^4$ and $[x^8]g^4$ exactly. The convergence rule shows its teeth here:
 $W = 15$ gives $8193$ at $j = 8$, where $j = 8$ needs $W \ge 17$, and only the
 wider hull reports the converged $8229$.
+
+That last step rested on one hull, so it was checked against a second
+implementation. Counting free removals by growing the set one cell at a time,
+rather than by filtering every subset, is cheap enough to reach hulls the
+enumerator cannot afford; it reproduces both enumerated rows exactly, and
+returns $8229$ again at $W = 19$, $21$, $23$ and $25$. The same runs carry the
+series to $18800$, $41536$ and $88924$, each at two hulls or more, and break at
+$j = r+1$ at every radius --- the convergence rule holding at six more places
+than it was checked at.
 
 \paragraph{A refutation.} The six-term prefix
 $1,1,3,5,9,14$ matches \oeis{A120452}, which continues $23, 34, 52, 75,\dots$
@@ -664,6 +674,7 @@ the min-end census & \texttt{make build/perimeter\_min}; \repo{scripts/perimeter
 the sharded resumable driver & \repo{scripts/perimeter\_min\_shard\_gate.sh} \\
 attainability & \repo{experiments/perimeter\_min\_attainability.py} \\
 the tip series & \repo{experiments/cone\_order\_ideals.py} \\
+the diamond series, second source & \repo{experiments/diamond\_free\_removals.py} \\
 the $n$/$H$/$p$ identity & \repo{results/king\_joint\_nhp\_n9.txt}, \repo{results/king\_triple\_classes\_n9.txt} \\
 census data, max end & \repo{results/perimdefect\_square4\_n70\_k5.txt} and siblings \\
 census data, min end & \repo{results/perimmin\_square8\_p48\_r6.txt} and siblings \\
