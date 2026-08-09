@@ -362,6 +362,12 @@ gate-middle-kingdom: $(if $(GMP_LDFLAGS),build/middle_kingdom_tm)
 build/prec_guess: cpp/prec_guess.cpp cpp/argparse.h cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $< -o $@
 
+# Cluster-weight row-transfer DP, C++ port of experiments/cluster_weight_dp.py
+# (Severance W1, docs/onset-defect-severance-plan.md section 3): the ab-initio
+# interior/boundary/pure weights per composition, levels k = 1..K.
+build/severance_w1: cpp/severance_w1.cpp cpp/obs.h | build
+	$(CXX) $(CXXFLAGS) -O3 -Icpp -pthread $< -o $@
+
 # Gate CONVEX-DFINITE: the sharpened order<=20/degree<=20 non-D-finite verdict
 # for HV-convex animals by area, king and edge-adjacent, plus the growth
 # constants. Deliberately does NOT depend on build/convex_area_tm (GMP is
