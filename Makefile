@@ -385,13 +385,19 @@ NOTARY_MODULES := polyplets/Polyplets/GapWalkBridge.lean \
                   polyplets/Polyplets/DepthOneSeries.lean \
                   polyplets/Polyplets/GapWalkRows.lean \
                   polyplets/Polyplets/GapWalkCanon.lean \
-                  polyplets/Polyplets/GapWalkTrunc.lean
+                  polyplets/Polyplets/GapWalkTrunc.lean \
+                  polyplets/Polyplets/GapWalkStacks.lean \
+                  polyplets/Polyplets/GapWalkPeel.lean \
+                  polyplets/Polyplets/GapWalkEnds.lean \
+                  polyplets/Polyplets/GapWalkBij.lean
 gate-notary:
 	@if grep -wn 'sorry\|axiom\|admit' $(NOTARY_MODULES); then \
 	  echo 'gate-notary: RED — sorry/axiom/admit present'; exit 1; fi
 	cd polyplets && lake build Polyplets.GapWalkBridge \
 	  Polyplets.DepthOneConstants Polyplets.DepthOneSeries \
-	  Polyplets.GapWalkRows Polyplets.GapWalkCanon Polyplets.GapWalkTrunc
+	  Polyplets.GapWalkRows Polyplets.GapWalkCanon Polyplets.GapWalkTrunc \
+	  Polyplets.GapWalkStacks Polyplets.GapWalkPeel Polyplets.GapWalkEnds \
+	  Polyplets.GapWalkBij
 
 # Gate CONVEX-DFINITE: the sharpened order<=20/degree<=20 non-D-finite verdict
 # for HV-convex animals by area, king and edge-adjacent, plus the growth

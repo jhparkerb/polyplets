@@ -9,9 +9,13 @@ import Polyplets.Diagonal
 import Polyplets.Fekete
 import Polyplets.Finite
 import Polyplets.GapWalk
+import Polyplets.GapWalkBij
 import Polyplets.GapWalkBridge
 import Polyplets.GapWalkCanon
+import Polyplets.GapWalkEnds
+import Polyplets.GapWalkPeel
 import Polyplets.GapWalkRows
+import Polyplets.GapWalkStacks
 import Polyplets.GapWalkTrunc
 import Polyplets.Graph
 import Polyplets.Growth
