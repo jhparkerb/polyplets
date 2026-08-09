@@ -83,12 +83,39 @@ def walkFamiliesCap (M L : Nat) : List (Nat × Nat × Nat) :=
 theorem walkFamiliesCap_self (L : Nat) :
     walkFamiliesCap (2 * L + 3) L = walkFamilies L := rfl
 
+/-- The sum of a list of zeros is zero (local copy: the Canon module's
+version is `private` to that file). -/
+private lemma sum_eq_zero_of_forall' {l : List Nat} (h : ∀ x ∈ l, x = 0) :
+    l.sum = 0 := by
+  induction l with
+  | nil => simp
+  | cons x xs ih =>
+    have hx : x = 0 := h x List.mem_cons_self
+    have hxs : xs.sum = 0 := ih (fun y hy => h y (List.mem_cons_of_mem x hy))
+    simp [hx, hxs]
+
 /-- All `J`-mass sits at gaps `≤ 2 + 2l` after `l` steps, at any cap, from
 any start whose `J`-support lies below gap 3. -/
 theorem iter_J_support (cap : Nat) (F : St → Nat)
     (hF : ∀ g, 3 ≤ g → F (g, true) = 0) :
     ∀ l g, 2 + 2 * l < g → iter cap F l (g, true) = 0 := by
-  sorry
+  intro l
+  induction l with
+  | zero => intro g hg; exact hF g (by omega)
+  | succ l ih =>
+    intro g hg
+    change funStep cap (iter cap F l) (g, true) = 0
+    unfold funStep
+    apply sum_eq_zero_of_forall'
+    intro x hx
+    obtain ⟨s, hs, rfl⟩ := List.mem_map.mp hx
+    obtain ⟨gs, cs⟩ := s
+    obtain ⟨h1, h2⟩ := (mem_states cap gs cs).mp hs
+    cases cs
+    · simp [stepMul_P_to_J gs g (by omega)]
+    · by_cases hfar : gs + 2 < g
+      · simp [stepMul_J_to_J_far gs g (by omega) hfar]
+      · simp [ih gs (by omega)]
 
 /-- The cone invariant: walks at caps `M ≤ M'` from a common low-`J` start
 agree on every `J`-value, and on `P`-values in the cone `g + 2l ≤ M`. -/
@@ -97,7 +124,48 @@ theorem iter_agree (F : St → Nat) (hF : ∀ g, 3 ≤ g → F (g, true) = 0)
     ∀ l, 2 * l + 5 ≤ M →
       (∀ g, iter M F l (g, true) = iter M' F l (g, true)) ∧
       (∀ g, g + 2 * l ≤ M → iter M F l (g, false) = iter M' F l (g, false)) := by
-  sorry
+  intro l
+  induction l with
+  | zero =>
+    intro _
+    exact ⟨fun g => rfl, fun g _ => rfl⟩
+  | succ l ih =>
+    intro hcone
+    obtain ⟨ihJ, ihP⟩ := ih (by omega)
+    obtain ⟨k, rfl⟩ : ∃ k, M' = M + k := ⟨M' - M, by omega⟩
+    refine ⟨fun g => ?_, fun g hgle => ?_⟩
+    · change funStep M (iter M F l) (g, true) = funStep (M + k) (iter (M + k) F l) (g, true)
+      have hz : funStep (M + k) (iter (M + k) F l) (g, true)
+          = funStep M (iter (M + k) F l) (g, true) := by
+        apply funStep_split_zero
+        intro i _
+        refine ⟨?_, ?_⟩
+        · simp [iter_J_support (M + k) F hF l (M + i + 1) (by omega)]
+        · simp [stepMul_P_far_to_J (M + i + 1) g (by omega)]
+      rw [hz]
+      apply funStep_congr
+      intro gs cs h1 h2
+      cases cs
+      · by_cases hgs : gs + 2 * l ≤ M
+        · exact Or.inl (ihP gs hgs)
+        · exact Or.inr (stepMul_P_far_to_J gs g (by omega))
+      · exact Or.inl (ihJ gs)
+    · change funStep M (iter M F l) (g, false) = funStep (M + k) (iter (M + k) F l) (g, false)
+      have hz : funStep (M + k) (iter (M + k) F l) (g, false)
+          = funStep M (iter (M + k) F l) (g, false) := by
+        apply funStep_split_zero
+        intro i _
+        refine ⟨?_, ?_⟩
+        · simp [iter_J_support (M + k) F hF l (M + i + 1) (by omega)]
+        · simp [stepMul_P_local (M + i + 1) g false (by omega) (Or.inl (by omega))]
+      rw [hz]
+      apply funStep_congr
+      intro gs cs h1 h2
+      cases cs
+      · by_cases hgs : gs + 2 * l ≤ M
+        · exact Or.inl (ihP gs hgs)
+        · exact Or.inr (stepMul_P_local gs g false (by omega) (Or.inl (by omega)))
+      · exact Or.inl (ihJ gs)
 
 /-- **Truncation exactness.** Every cap `M ≥ 2L + 3` emits the family
 triples of `walkFamilies L`: the truncation of the gap walk is invisible
@@ -105,7 +173,61 @@ to the emitted weights, so the untruncated walk is what `walkFamilies`
 computes. -/
 theorem walkFamiliesCap_exact (L M : Nat) (h : 2 * L + 3 ≤ M) :
     walkFamiliesCap M L = walkFamilies L := by
-  sorry
+  obtain ⟨k, rfl⟩ : ∃ k, M = (2 * L + 3) + k := ⟨M - (2 * L + 3), by omega⟩
+  rw [← walkFamiliesCap_self L]
+  change walkAux L (2 * L + 3 + k) (startInterior (2 * L + 3 + k)) (startBare (2 * L + 3 + k))
+      = walkAux L (2 * L + 3) (startInterior (2 * L + 3)) (startBare (2 * L + 3))
+  have hI1 : startInterior (2 * L + 3 + k) = canon (2 * L + 3 + k) startCount :=
+    startInterior_eq _
+  have hI2 : startInterior (2 * L + 3) = canon (2 * L + 3) startCount := startInterior_eq _
+  have hB1 : startBare (2 * L + 3 + k) = canon (2 * L + 3 + k) bareCount := startBare_eq _
+  have hB2 : startBare (2 * L + 3) = canon (2 * L + 3) bareCount := startBare_eq _
+  rw [hI1, hI2, hB1, hB2]
+  simp only [walkAux_canon]
+  apply List.map_congr_left
+  intro l hl
+  have hlL : l < L := List.mem_range.mp hl
+  have hJstart : ∀ g, 3 ≤ g → startCount (g, true) = 0 := startCount_J_high
+  have hJbare : ∀ g, 3 ≤ g → bareCount (g, true) = 0 := fun g hg => bareCount_J_high g (by omega)
+  have hcone : 2 * l + 5 ≤ 2 * L + 3 := by omega
+  have hle : (2 * L + 3) ≤ (2 * L + 3) + k := by omega
+  obtain ⟨ihJ1, ihP1⟩ := iter_agree startCount hJstart (2 * L + 3) (2 * L + 3 + k) hle l hcone
+  obtain ⟨ihJ2, ihP2⟩ := iter_agree bareCount hJbare (2 * L + 3) (2 * L + 3 + k) hle l hcone
+  have e1 : qEndF (2 * L + 3 + k) (iter (2 * L + 3 + k) startCount l)
+      = qEndF (2 * L + 3) (iter (2 * L + 3) startCount l) := by
+    have hsplit : qEndF (2 * L + 3 + k) (iter (2 * L + 3 + k) startCount l)
+        = qEndF (2 * L + 3) (iter (2 * L + 3 + k) startCount l) := by
+      apply qEndF_split_zero
+      · omega
+      · intro i _
+        exact iter_J_support (2 * L + 3 + k) startCount hJstart l (2 * L + 3 + i + 1) (by omega)
+    rw [hsplit]
+    apply qEndF_congr
+    · exact fun g _ _ => (ihJ1 g).symm
+    · exact fun g h1 h2 => (ihP1 g (by omega)).symm
+  have e2 : qEndF (2 * L + 3 + k) (iter (2 * L + 3 + k) bareCount l)
+      = qEndF (2 * L + 3) (iter (2 * L + 3) bareCount l) := by
+    have hsplit : qEndF (2 * L + 3 + k) (iter (2 * L + 3 + k) bareCount l)
+        = qEndF (2 * L + 3) (iter (2 * L + 3 + k) bareCount l) := by
+      apply qEndF_split_zero
+      · omega
+      · intro i _
+        exact iter_J_support (2 * L + 3 + k) bareCount hJbare l (2 * L + 3 + i + 1) (by omega)
+    rw [hsplit]
+    apply qEndF_congr
+    · exact fun g _ _ => (ihJ2 g).symm
+    · exact fun g h1 h2 => (ihP2 g (by omega)).symm
+  have e3 : bareEndF (2 * L + 3 + k) (iter (2 * L + 3 + k) bareCount l)
+      = bareEndF (2 * L + 3) (iter (2 * L + 3) bareCount l) := by
+    have hsplit : bareEndF (2 * L + 3 + k) (iter (2 * L + 3 + k) bareCount l)
+        = bareEndF (2 * L + 3) (iter (2 * L + 3 + k) bareCount l) := by
+      apply bareEndF_split_zero
+      intro i _
+      exact iter_J_support (2 * L + 3 + k) bareCount hJbare l (2 * L + 3 + i + 1) (by omega)
+    rw [hsplit]
+    apply bareEndF_congr
+    exact fun g _ _ => (ihJ2 g).symm
+  rw [e1, e2, e3]
 
 /-! ## Axiom audits (AuditOutworks pattern)
 
@@ -114,9 +236,7 @@ axioms, tighten the `info` string to the actual list; `native_decide`
 (`Lean.ofReduceBool`) is out of bounds, as is declaring new axioms. -/
 
 /--
-info: 'Polyplets.GapWalk.walkFamiliesCap_exact' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
+info: 'Polyplets.GapWalk.walkFamiliesCap_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
 -/
 #guard_msgs in
 #print axioms walkFamiliesCap_exact

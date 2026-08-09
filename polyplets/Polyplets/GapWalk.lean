@@ -63,9 +63,12 @@ here: `walk_table` certifies the walk's own arithmetic. The agreement with
 `V ℓ ℓ` / `Vᵗ ℓ ℓ` (and the pure `Vp ℓ ℓ`) at `ℓ ≤ 3` is now *proved* as
 literal equalities in `GapWalkBridge.lean` (campaign Notary), which also pins
 the walk to the two-source table at `l ≤ 19` and closes the depth-1 assembly
-at `k ≤ 8` inside Lean. Supplying the bijection itself — and with it the
-`g ≤ gmax` truncation argument — remains open; both are priced in
-`docs/notary-kernel-scoping.md` (pieces B and T).
+at `k ≤ 8` inside Lean. The `g ≤ gmax` truncation argument is now **closed**
+(campaign Notary, piece T): `GapWalkTrunc.lean` proves every cap `M ≥ 2L + 3`
+emits the same family triples (`walkFamiliesCap_exact`), via the vanishing
+rows of `GapWalkRows.lean` and the iterated-function form of
+`GapWalkCanon.lean`. Supplying the bijection itself remains open; it is
+priced in `docs/notary-kernel-scoping.md` (piece B).
 -/
 
 namespace Polyplets

@@ -10,7 +10,17 @@ none, none is quoted.
 
 ## The four pieces
 
-**T — truncation exactness.** `GapWalk.walkFamilies L` (gap cap
+**T — truncation exactness.** **DONE 2026-08-09** (same-day wave 3):
+`GapWalkTrunc.walkFamiliesCap_exact` — every cap `M ≥ 2L+3` emits the same
+family triples, standard axioms only, gate green. The architecture that
+landed is *cheaper* than the one priced below: cap stability needs only
+zero-multiplicity facts (`GapWalkRows.lean`: P-locality ±2, no P→J at gap
+≥ 3 or from gap ≥ 4, J→J reach ≤ +2, start supports) plus a cone induction
+over an iterated-function form of the DP (`GapWalkCanon.lean`,
+`GapWalkTrunc.lean`); the closed-form transition rows priced as T's cost
+center below were never needed — they remain with K, which actually
+consumes them. Original pricing kept for the record:
+`GapWalk.walkFamilies L` (gap cap
 `gmax = 2L+3`) equals the untruncated walk, for every `L`. Architecture: an
 exact-walk representation `(jHead : List ℕ, pHead : List ℕ, pTail : ℕ)` — the
 J-class row has finite support (spreads by ≤ 2 per step from support ≤ 2 at
@@ -97,7 +107,7 @@ Full theorem = K + B + D  (T absorbed into K)
 - Ordered by value per unit risk: **T first** (self-contained, finishes
   GapWalk.lean's open item, prerequisite for K), then **B**, then **K**,
   with **D** last and priced separately once `Diagonal.lean`'s general-`k`
-  lemma is attempted at all.
+  lemma is attempted at all. *(T landed 2026-08-09; B is next.)*
 - None of the four is a single-session Sonnet task under the wave-1 pattern
   (one file, one agent, gate-checked); each is a multi-module campaign with
   Fable-authored decompositions per module. Per the frontier rules, none

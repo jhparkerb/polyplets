@@ -51,6 +51,27 @@ characteristic-zero field with `s2² = 2`, `s3² = 3`, plus `ℝ`-instantiations
 - The `Φ` used here and the `Φ` of `DepthOneConstants` are the same
   polynomial (`phiCList*_eval`).
 
+**`GapWalkRows.lean` / `GapWalkCanon.lean` / `GapWalkTrunc.lean`** (wave 3,
+piece T of the scoping note, same day) — truncation exactness:
+
+- **`walkFamiliesCap_exact`: every gap cap `M ≥ 2L + 3` emits the same
+  family triples as `walkFamilies L`** — the hard-wired truncation is
+  invisible to the emitted weights, so the untruncated walk (the common
+  value of all sufficiently large caps) is what `walkFamilies` computes.
+  With the bridge, the `k ≤ 19` pins and the `k ≤ 8` assembly now bind the
+  *exact* walk, not a truncation — the "in spirit" prerequisite piece K
+  named is discharged.
+- Proved by cap-stability cone induction: four zero-multiplicity rows
+  (`P`-locality ±2; no `P → J` at gap ≥ 3 or from gap ≥ 4; `J → J` reach
+  ≤ +2) plus start supports (`GapWalkRows`), the DP as an iterated state
+  function with split/congruence toolkit (`GapWalkCanon`), then J-support
+  `≤ 2 + 2l` and cap-agreement on all `J` plus `P` inside the cone
+  `g + 2l ≤ M` (`GapWalkTrunc`). The `2L + 3` bound is the exact edge of
+  the cone condition at the last emission. No closed-form rows needed —
+  those stay priced under K. Standard axioms only (no `native_decide`
+  anywhere in the three modules); statements pre-verified numerically
+  (rows to `g ≤ 40, gp ≤ 80`; cap stability to `L ≤ 5`, caps `2L + 10`).
+
 Axioms throughout: `propext, Classical.choice, Quot.sound` plus
 `Lean.ofReduceBool` on the `native_decide` theorems (project standard;
 audited per-theorem in-file).
@@ -60,13 +81,14 @@ audited per-theorem in-file).
 - Identity (II) at all `k`, identity (I), and the diagonal-law Step 4–5
   frame (piece D of the scoping note; blocked behind `Diagonal.lean`'s
   general-`k` factorization lemma).
-- The walk-path ↔ configuration bijection (B) and the `gmax` truncation
-  argument (T).
+- The walk-path ↔ configuration bijection (B). (The `gmax` truncation
+  argument (T) is closed as of wave 3, above.)
 - `Φ(x, N(x)) = 0` at all orders (K) — feasible entirely inside `ℚ⟦s⟧`
   with no analysis; cost centers measured and listed in the scoping note.
 - Coefficient asymptotics (`C₁ = √6/(27√π)`, exponent `k^{−1/2}` as an
   asymptotic statement): real-analytic transfer, no Mathlib support —
   deliberately out of scope; the constants live in Lean as branch data.
 
-None of T/B/K/D launches without explicit agreement (each is a multi-module
-campaign, not a wave-1-shaped task).
+None of B/K/D launches without explicit agreement (each is a multi-module
+campaign, not a wave-1-shaped task). T launched on exactly that agreement
+and landed 2026-08-09.

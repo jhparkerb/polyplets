@@ -160,4 +160,11 @@ scoping formula, which is the only measured rate we have.
   bijection (B), and identities (D).
 - **N4 scoping folded into the same note.** Verdict: T → B → K → D by
   value per risk; none launches without explicit agreement.
+- **Wave 3 (piece T) COMPLETE** — agreement given, executed 2026-08-09:
+  truncation exactness proved as cap stability
+  (`GapWalkTrunc.walkFamiliesCap_exact`, caps `M ≥ 2L+3` all agree),
+  three new modules (`GapWalkRows`, `GapWalkCanon`, `GapWalkTrunc`) in the
+  gate, three Sonnet agents against pre-verified skeletons, zero statement
+  changes, standard axioms only. The scoping note's exact-walk
+  architecture was not needed; see its updated T entry. Next: B.
 - Outcome summary: `results/notary-depth1-lean.md`.
