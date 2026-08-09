@@ -1,0 +1,72 @@
+# Notary: what the depth-1 closure now means in Lean
+
+2026-08-09. Campaign Notary, waves 1–2 complete same day. Plan:
+`docs/notary-lean-plan.md`; the priced remainder:
+`docs/notary-kernel-scoping.md`. Gate: `make gate-notary` (sorry/axiom grep +
+`lake build` of the three modules; axiom audits are `#guard_msgs` blocks
+inside the modules). Wave 1 was executed by two Sonnet agents against
+Fable-authored skeletons whose every statement was pre-verified in exact
+arithmetic (`build/notary_n3_lean_gen.py`, `build/notary_series_check.py`);
+both landed with zero statement changes.
+
+## What is now proved in Lean (was: nothing beyond finite value pins)
+
+**`GapWalkBridge.lean`** — the finite anchor, closed end to end:
+
+- Walk = enumeration at every reachable level: `W(2^ℓ) = V ℓ ℓ`,
+  `W^b(2^ℓ) = Vᵗ ℓ ℓ`, and the previously-unformalized pure weight
+  `W^p(2^ℓ) = Vp ℓ ℓ` (`IsVpConfig`/`CFGVp` new, in the `Weights.lean`
+  idiom with its window-independence lemma `mem_CFGVp`), `ℓ ≤ 3`.
+- All 36 depth identities of `DepthAssembly.lean` made unconditional — the
+  weight-table hypotheses discharged against the banked tables.
+- Identity (II) evaluated on truncated series built from the walk itself
+  equals the depth-1 identity values at every `k ≤ 8`
+  (`f1_matches_depth1`): enumeration → tables → (C)/(D) → (II) → walk is a
+  closed loop inside Lean at those cells.
+- The walk pinned against the C++ two-source table to `k ≤ 19`
+  (`walk_table_19`), and the `e = 0` rows of the assembly tables identified
+  as the walk's own output.
+
+**`DepthOneConstants.lean`** — the constants as branch data of `Φ`, over any
+characteristic-zero field with `s2² = 2`, `s3² = 3`, plus `ℝ`-instantiations:
+
+- `phiC4 = (27x−1)² · g`, `g(1/27) = 7929856/19683 ≠ 0` — order-2 vanishing
+  (the rate `9` per `k`).
+- `Ψ(v, wv) = Φ((1−v²)/27, w)` — the Puiseux frame is polynomial (the
+  exponent `−1/2`).
+- `Ψ(0, V) = (7929856/14348907)(27V²−2)²` and `27V₀² = 2` — the sheet
+  crossing; `(V₀/3)² = 2/243`, the θ-free amplitude square.
+- `Ψ(v, V₀+V₁v+V₂v²) = v⁴·Q₄(v)` with all of `V₁, V₂, Q₄` explicit, and the
+  pinning pivot nonzero — the truncated physical branch, exactly.
+- `a = −1/8 − V₂/(2V₀) = 3293/92928 − 3251·√3/185856` — the `1/k`
+  coefficient, in `ℚ(√3)`.
+
+**`DepthOneSeries.lean`** — the algebraic claim, finitely:
+
+- `N(x) = 3F₁(3x) + 1` from the walk matches the banked numerators to
+  `k ≤ 19`.
+- **`Φ(x, N(x)) ≡ 0 mod x^61`** in exact rationals (`phi_annihilates`) —
+  4 orders of holdout past the `(8,4)` fit window on the fitted route,
+  fully independent on the kernel-derived route.
+- The `Φ` used here and the `Φ` of `DepthOneConstants` are the same
+  polynomial (`phiCList*_eval`).
+
+Axioms throughout: `propext, Classical.choice, Quot.sound` plus
+`Lean.ofReduceBool` on the `native_decide` theorems (project standard;
+audited per-theorem in-file).
+
+## What remains paper-only, precisely
+
+- Identity (II) at all `k`, identity (I), and the diagonal-law Step 4–5
+  frame (piece D of the scoping note; blocked behind `Diagonal.lean`'s
+  general-`k` factorization lemma).
+- The walk-path ↔ configuration bijection (B) and the `gmax` truncation
+  argument (T).
+- `Φ(x, N(x)) = 0` at all orders (K) — feasible entirely inside `ℚ⟦s⟧`
+  with no analysis; cost centers measured and listed in the scoping note.
+- Coefficient asymptotics (`C₁ = √6/(27√π)`, exponent `k^{−1/2}` as an
+  asymptotic statement): real-analytic transfer, no Mathlib support —
+  deliberately out of scope; the constants live in Lean as branch data.
+
+None of T/B/K/D launches without explicit agreement (each is a multi-module
+campaign, not a wave-1-shaped task).

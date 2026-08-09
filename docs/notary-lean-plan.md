@@ -144,3 +144,20 @@ Every wave ends: `make gate-notary`, then full `make` once per code-touching
 session. No ETAs are quoted anywhere in this plan because none have a
 measured basis; N0's enumeration sizes are computed before launch from the
 scoping formula, which is the only measured rate we have.
+
+## Execution status (2026-08-09, same day)
+
+- **Wave 1 COMPLETE, gate green.** N0 (`GapWalkBridge.lean`) and N3
+  (`DepthOneConstants.lean`) both landed by Sonnet agents with zero
+  statement changes against the pre-verified skeletons.
+- **Wave 2 re-scoped and COMPLETE.** The original N1/N2 (kernel equations →
+  algebraicity, all orders) turned out research-grade on design — the
+  summability bookkeeping in `ℚ⟦s⟧` is a small library, not a wave —
+  so wave 2 delivered the strongest finite statement instead:
+  `DepthOneSeries.lean`, `Φ(x, N(x)) ≡ 0 mod x^61` plus the `k ≤ 19` pin.
+  The full-kernel architecture and pricing moved to
+  `docs/notary-kernel-scoping.md` (piece K), alongside truncation (T),
+  bijection (B), and identities (D).
+- **N4 scoping folded into the same note.** Verdict: T → B → K → D by
+  value per risk; none launches without explicit agreement.
+- Outcome summary: `results/notary-depth1-lean.md`.

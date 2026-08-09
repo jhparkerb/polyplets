@@ -59,10 +59,13 @@ DP holdout at `l = 6` (`2703074`, `517701`); `l ≤ 3` agree with the
 
 The bijection between cluster configurations (the `CFGV` world of
 `Weights.lean` / `WeightsChunk.lean`) and walk paths is **not** formalized
-here: `walk_table` certifies the walk's own arithmetic, and the agreement with
-`V ℓ ℓ` / `Vᵗ ℓ ℓ` at `ℓ ≤ 3` is checked numerically against those modules'
-values rather than proved. Supplying that bijection — and with it the
-`g ≤ gmax` truncation argument — remains open.
+here: `walk_table` certifies the walk's own arithmetic. The agreement with
+`V ℓ ℓ` / `Vᵗ ℓ ℓ` (and the pure `Vp ℓ ℓ`) at `ℓ ≤ 3` is now *proved* as
+literal equalities in `GapWalkBridge.lean` (campaign Notary), which also pins
+the walk to the two-source table at `l ≤ 19` and closes the depth-1 assembly
+at `k ≤ 8` inside Lean. Supplying the bijection itself — and with it the
+`g ≤ gmax` truncation argument — remains open; both are priced in
+`docs/notary-kernel-scoping.md` (pieces B and T).
 -/
 
 namespace Polyplets
