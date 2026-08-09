@@ -375,6 +375,18 @@ build/severance_w1: cpp/severance_w1.cpp cpp/obs.h | build
 build/severance_w3_families: cpp/severance_w3_families.cpp cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp -pthread $< -o $@
 
+# Gate NOTARY: the Lean-ification of the depth-1 closure (campaign Notary,
+# docs/notary-lean-plan.md). Fails on any sorry in the Notary modules, then
+# builds them; the axiom audits are #guard_msgs blocks inside the modules
+# (AuditOutworks pattern), so axiom drift also fails the build. RED until the
+# wave-1 agents land their proofs.
+NOTARY_MODULES := polyplets/Polyplets/GapWalkBridge.lean \
+                  polyplets/Polyplets/DepthOneConstants.lean
+gate-notary:
+	@if grep -wn 'sorry\|axiom\|admit' $(NOTARY_MODULES); then \
+	  echo 'gate-notary: RED — sorry/axiom/admit present'; exit 1; fi
+	cd polyplets && lake build Polyplets.GapWalkBridge Polyplets.DepthOneConstants
+
 # Gate CONVEX-DFINITE: the sharpened order<=20/degree<=20 non-D-finite verdict
 # for HV-convex animals by area, king and edge-adjacent, plus the growth
 # constants. Deliberately does NOT depend on build/convex_area_tm (GMP is

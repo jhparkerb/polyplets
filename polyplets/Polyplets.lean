@@ -3,10 +3,12 @@ import Polyplets.Compute
 import Polyplets.ComputeBridge
 import Polyplets.Defs
 import Polyplets.DepthAssembly
+import Polyplets.DepthOneConstants
 import Polyplets.Diagonal
 import Polyplets.Fekete
 import Polyplets.Finite
 import Polyplets.GapWalk
+import Polyplets.GapWalkBridge
 import Polyplets.Graph
 import Polyplets.Growth
 import Polyplets.Holes
