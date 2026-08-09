@@ -111,7 +111,7 @@ theorem walkFamiliesCap_exact (L M : Nat) (h : 2 * L + 3 ≤ M) :
 
 Expected: standard axioms only. If a finished proof uses strictly fewer
 axioms, tighten the `info` string to the actual list; `native_decide`
-(`Lean.ofReduceBool`) and new `axiom` declarations are out of bounds. -/
+(`Lean.ofReduceBool`) is out of bounds, as is declaring new axioms. -/
 
 /--
 info: 'Polyplets.GapWalk.walkFamiliesCap_exact' depends on axioms: [propext,

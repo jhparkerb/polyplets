@@ -60,14 +60,29 @@ the new gap `≤ 2` (and `gp = 1` is below 3 anyway). Holds for every source
 gap `g`, boundary rows included. -/
 theorem stepMul_P_to_J (g gp : Nat) (h : 3 ≤ gp) :
     stepMul g false gp true = 0 := by
-  sorry
+  rw [stepMul, List.length_eq_zero_iff, List.filter_eq_nil_iff]
+  intro i _
+  simp only [near, joined, Bool.and_eq_true, Bool.or_eq_true, beq_iff_eq,
+    decide_eq_true_eq, if_neg (by omega : ¬ gp = 1),
+    if_neg (show (false = true) → False by decide)]
+  omega
 
 /-- From a pending-components source at gap `≥ 4`, no placement joins: the
 generic `P` row's only `J` entry is the bulk move to gap `g − 2 = 1`. Holds
 for every target gap `gp`. -/
 theorem stepMul_P_far_to_J (g gp : Nat) (h : 4 ≤ g) :
     stepMul g false gp true = 0 := by
-  sorry
+  rw [stepMul, List.length_eq_zero_iff, List.filter_eq_nil_iff]
+  intro i _
+  by_cases hgp1 : gp = 1
+  · simp only [near, joined, Bool.and_eq_true, Bool.or_eq_true, beq_iff_eq,
+      decide_eq_true_eq, if_pos hgp1,
+      if_neg (show (false = true) → False by decide)]
+    omega
+  · simp only [near, joined, Bool.and_eq_true, Bool.or_eq_true, beq_iff_eq,
+      decide_eq_true_eq, if_neg hgp1,
+      if_neg (show (false = true) → False by decide)]
+    omega
 
 /-- Locality of the generic `P` row: a source at gap `g ≥ 3` reaches only
 gaps in `[g − 2, g + 2]`, either class — the new row must touch both
@@ -75,14 +90,24 @@ pending components, whose contact windows sit `g` apart. -/
 theorem stepMul_P_local (g gp : Nat) (c : Bool) (hg : 3 ≤ g)
     (h : gp + 2 < g ∨ g + 2 < gp) :
     stepMul g false gp c = 0 := by
-  sorry
+  rw [stepMul, List.length_eq_zero_iff, List.filter_eq_nil_iff]
+  intro i _
+  simp only [near, joined, Bool.and_eq_true, Bool.or_eq_true, beq_iff_eq,
+    decide_eq_true_eq,
+    if_neg (show (false = true) → False by decide)]
+  split_ifs <;> omega
 
 /-- A joined target at gap `gp ≥ 3` needs its source within two below:
 both new cells must sit in contact windows, and those windows span
 `[−1, g + 1]`, so `gp ≤ g + 2`. -/
 theorem stepMul_J_to_J_far (g gp : Nat) (hgp : 3 ≤ gp) (h : g + 2 < gp) :
     stepMul g true gp true = 0 := by
-  sorry
+  rw [stepMul, List.length_eq_zero_iff, List.filter_eq_nil_iff]
+  intro i _
+  simp only [near, joined, Bool.and_eq_true, Bool.or_eq_true, beq_iff_eq,
+    decide_eq_true_eq, if_neg (by omega : ¬ gp = 1),
+    if_true]
+  omega
 
 /-! ## The start vectors as cap-independent state functions
 
@@ -113,31 +138,31 @@ theorem startBare_eq (gmax : Nat) :
 it can only be joined if both cells touch that cell, forcing gap `≤ 2`. -/
 theorem startCount_J_high (g : Nat) (h : 3 ≤ g) :
     startCount (g, true) = 0 := by
-  sorry
+  rw [startCount, List.length_eq_zero_iff, List.filter_eq_nil_iff]
+  intro i _
+  simp only [near, Bool.and_eq_true, Bool.or_eq_true, beq_iff_eq,
+    decide_eq_true_eq, if_neg (by omega : ¬ g = 1)]
+  omega
 
 /-- The bare start is joined only at gap 1, by definition. -/
 theorem bareCount_J_high (g : Nat) (h : 2 ≤ g) :
     bareCount (g, true) = 0 := by
-  sorry
+  rw [bareCount, if_neg (by simp; omega)]
 
 /-! ## Axiom audits (AuditOutworks pattern)
 
 Expected: standard axioms only. If a finished proof uses strictly fewer
 axioms, tighten the `info` string to the actual list; `native_decide`
-(`Lean.ofReduceBool`) and new `axiom` declarations are out of bounds. -/
+(`Lean.ofReduceBool`) is out of bounds, as is declaring new axioms. -/
 
 /--
-info: 'Polyplets.GapWalk.stepMul_P_local' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
+info: 'Polyplets.GapWalk.stepMul_P_local' depends on axioms: [propext, Classical.choice, Quot.sound]
 -/
 #guard_msgs in
 #print axioms stepMul_P_local
 
 /--
-info: 'Polyplets.GapWalk.stepMul_J_to_J_far' depends on axioms: [propext,
- Classical.choice,
- Quot.sound]
+info: 'Polyplets.GapWalk.stepMul_J_to_J_far' depends on axioms: [propext, Classical.choice, Quot.sound]
 -/
 #guard_msgs in
 #print axioms stepMul_J_to_J_far
