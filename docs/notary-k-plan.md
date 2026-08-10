@@ -153,6 +153,26 @@ One agent per module, statements pre-verified, gate RED first, as in T/B.
 
 **Wave K-δ (3 agents, sequential dependencies inside the wave):**
 
+*Architecture refinement (worked out 2026-08-10, before the generator):*
+the closed-form entries have per-component `s`-poles (m6), so they are
+not definable componentwise as series. Instead the generator emits, per
+start and per entry `k`: a shift `e_k ≤ 4`, a common unit denominator
+`d_k(s)`, and numerator polynomials `N_{k,i}(s)`, defining the *regular*
+series `ŷ_k := (Σ_i N_{k,i}·basisᵢ)·(d_k)⁻¹` (basis `1, A, B, AB`); the
+transcription theorem is `X^{e_k}·d_k·x_k = ŷ_k` — poles never appear.
+The six γ equations are cleared to polynomial rows by the *defining
+relations* instead of substitution: multiply row (1) by `(2X)⁴` and
+rewrite every `(2X·u₁)^j` by `u1_def` (`2X·u₁ = 1−X−A`); rows (5),(6)
+additionally clear the geometric `w`-factors by `(1−uᵢ)` via
+`one_sub_u1_mul_w1`; the generator computes each clearing monomial and
+the `linear_combination` cofactors (from `u1_def`/`u2_def`, the two
+square relations, and the `w` identities). Uniqueness stays as planned
+(truncL det certificate at coeff 12 = −16, `Matrix.adjugate_mul` in the
+domain, on the *cleared* system so entries are polynomial in
+`X, A, B`); the Ψ/quartic step runs on the closed forms with `s`-powers
+cleared by the generator (multiply through by the max shift), sizes
+staying m7-scale.
+
 - `DepthOneKernelSol.lean` — the transcribed closed forms (12 entries ×
   4 components, ≤ 235 chars each, per-entry `s`-pole cleared by an explicit
   shift), and `M·X̂ = R` for both starts: each row multiplied through by the
