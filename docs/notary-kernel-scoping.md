@@ -38,8 +38,25 @@ never reaches the cap. Cost center: proving the closed-form transition rows
 functionals). Everything else is induction bookkeeping. No new mathematics;
 moderate, self-contained, the natural next Sonnet wave if any.
 
-**B — the bijection.** Walk paths ↔ `CFGV`/`CFGVt`/`CFGVp` configurations
-for all `ℓ` (currently: numeric agreement at `ℓ ≤ 3`, `GapWalkBridge`).
+**B — the bijection.** **DONE 2026-08-09** (wave 4, four modules):
+`GapWalkBij.walkFamilies_configs` — every emitted family triple is
+`(V ℓ ℓ, Vᵗ ℓ ℓ, Vp ℓ ℓ)`, unconditionally; standard axioms only, gate
+green. The architecture: partial stacks (bottom parts of all-pairs
+clusters, invariant: every king-component meets the top row) with the
+class flag as a *binary* state (`GapWalkStacks.lean`), the row peel
+reduced to four near-Booleans + one adjacency so the fiber over a stack
+is exactly `stepMul`'s own filter window (`GapWalkPeel.lean`,
+`STK*_card_step`), end assemblies by fiber count and a y-flip reflection
+(`GapWalkEnds.lean`), and a Trunc-style cone induction assembling the
+head (`GapWalkBij.lean`). With `walk_table` the identity turns
+enumeration into computation: `V`/`Vᵗ`/`Vp` at `ℓ = 4, 5, 6` are now
+literal-value theorems (68314/981085/14115141, 13103/187965/2703074,
+2515/36021/517701) — past `native_decide` enumeration reach, using none.
+Every statement was numerically pre-verified before any proof agent ran
+(`verify_bij_statements.py`, union-find); all four modules landed with
+zero statement changes. Original pricing kept for the
+record: walk paths ↔ `CFGV`/`CFGVt`/`CFGVp` configurations
+for all `ℓ` (previously: numeric agreement at `ℓ ≤ 3`, `GapWalkBridge`).
 This is transfer-matrix correctness: peel an all-pairs cluster row by row,
 show the state `(gap, joined?)` is exactly what the next row's placement
 count depends on, with `stepMul` counting normalized placements. Depends on
@@ -107,7 +124,8 @@ Full theorem = K + B + D  (T absorbed into K)
 - Ordered by value per unit risk: **T first** (self-contained, finishes
   GapWalk.lean's open item, prerequisite for K), then **B**, then **K**,
   with **D** last and priced separately once `Diagonal.lean`'s general-`k`
-  lemma is attempted at all. *(T landed 2026-08-09; B is next.)*
+  lemma is attempted at all. *(T landed 2026-08-09; B landed 2026-08-09;
+  K is next.)*
 - None of the four is a single-session Sonnet task under the wave-1 pattern
   (one file, one agent, gate-checked); each is a multi-module campaign with
   Fable-authored decompositions per module. Per the frontier rules, none

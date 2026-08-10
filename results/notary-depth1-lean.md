@@ -1,6 +1,6 @@
 # Notary: what the depth-1 closure now means in Lean
 
-2026-08-09. Campaign Notary, waves 1–2 complete same day. Plan:
+2026-08-09. Campaign Notary, waves 1–4 complete same day. Plan:
 `docs/notary-lean-plan.md`; the priced remainder:
 `docs/notary-kernel-scoping.md`. Gate: `make gate-notary` (sorry/axiom grep +
 `lake build` of the three modules; axiom audits are `#guard_msgs` blocks
@@ -72,6 +72,36 @@ piece T of the scoping note, same day) — truncation exactness:
   anywhere in the three modules); statements pre-verified numerically
   (rows to `g ≤ 40, gp ≤ 80`; cap stability to `L ≤ 5`, caps `2L + 10`).
 
+**`GapWalkStacks.lean` / `GapWalkPeel.lean` / `GapWalkEnds.lean` /
+`GapWalkBij.lean`** (wave 4, piece B of the scoping note, same day) — the
+walk ↔ configuration bijection:
+
+- **`walkFamilies_configs`: every emitted family triple of
+  `walkFamilies L` is `(V ℓ ℓ, Vᵗ ℓ ℓ, Vp ℓ ℓ)`, for every `L`,
+  unconditionally** — the walk's numbers *mean* all-pairs clusters at
+  every level, closing `GapWalk.lean`'s stated open item. The `ℓ ≤ 3`
+  literal equalities of the bridge are subsumed.
+- New literal-value theorems, past enumeration reach and using no
+  `native_decide`: `V 4 4 = 68314`, `V 5 5 = 981085`,
+  `V 6 6 = 14115141`; `Vᵗ 4 4 = 13103`, `Vᵗ 5 5 = 187965`,
+  `Vᵗ 6 6 = 2703074`; `Vp 4 4 = 2515`, `Vp 5 5 = 36021`,
+  `Vp 6 6 = 517701`. (The `ℓ ≤ 3` values took `native_decide` over
+  ~10⁵-pair windows; these are pure `walk_table` arithmetic through the
+  bijection.)
+- Proved by row-peeling partial stacks: bottom parts of clusters whose
+  every king-component meets the top row, making the class flag a binary
+  state (`GapWalkStacks`); the new-row interface reduced to four
+  near-Booleans plus one adjacency, so the fiber over a stack is exactly
+  `stepMul`'s own counting window and the stack counts step by `funStep`
+  (`GapWalkPeel`); the three end assemblies by fiber counting and a
+  y-flip reflection for the top edge (`GapWalkEnds`); then a cone
+  induction in the Trunc idiom (invariant at cap `M ≥ 2l + 4`: `J` agrees
+  at `g ≤ 2l + 2`, `P` inside `g + 2l ≤ M`) assembling the head
+  (`GapWalkBij`). Standard axioms only in all four modules; statements
+  pre-verified numerically (union-find enumeration: master fiber lemma
+  exhaustively at `i ≤ 2`, ends at `ℓ ≤ 3`, cone at the edge cap, heads
+  to `L = 5`).
+
 Axioms throughout: `propext, Classical.choice, Quot.sound` plus
 `Lean.ofReduceBool` on the `native_decide` theorems (project standard;
 audited per-theorem in-file).
@@ -81,14 +111,14 @@ audited per-theorem in-file).
 - Identity (II) at all `k`, identity (I), and the diagonal-law Step 4–5
   frame (piece D of the scoping note; blocked behind `Diagonal.lean`'s
   general-`k` factorization lemma).
-- The walk-path ↔ configuration bijection (B). (The `gmax` truncation
-  argument (T) is closed as of wave 3, above.)
 - `Φ(x, N(x)) = 0` at all orders (K) — feasible entirely inside `ℚ⟦s⟧`
   with no analysis; cost centers measured and listed in the scoping note.
+  (The `gmax` truncation argument (T) closed in wave 3; the walk-path ↔
+  configuration bijection (B) closed in wave 4, above.)
 - Coefficient asymptotics (`C₁ = √6/(27√π)`, exponent `k^{−1/2}` as an
   asymptotic statement): real-analytic transfer, no Mathlib support —
   deliberately out of scope; the constants live in Lean as branch data.
 
-None of B/K/D launches without explicit agreement (each is a multi-module
-campaign, not a wave-1-shaped task). T launched on exactly that agreement
-and landed 2026-08-09.
+Neither K nor D launches without explicit agreement (each is a
+multi-module campaign, not a wave-1-shaped task). T and B launched on
+exactly that agreement and both landed 2026-08-09.

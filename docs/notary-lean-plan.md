@@ -167,4 +167,14 @@ scoping formula, which is the only measured rate we have.
   gate, three Sonnet agents against pre-verified skeletons, zero statement
   changes, standard axioms only. The scoping note's exact-walk
   architecture was not needed; see its updated T entry. Next: B.
+- **Wave 4 (piece B) COMPLETE** — agreement given ("Run B"), executed
+  2026-08-09: the walk↔configuration bijection proved as
+  `GapWalkBij.walkFamilies_configs` — every emitted family triple is
+  `(V ℓ ℓ, Vᵗ ℓ ℓ, Vp ℓ ℓ)`, unconditionally. Four new modules in the
+  gate (`GapWalkStacks`, `GapWalkPeel`, `GapWalkEnds`, `GapWalkBij`),
+  four Sonnet agents against numerically pre-verified skeletons, zero
+  statement changes, standard axioms only, no `native_decide`. New
+  literal-value theorems past enumeration reach: `V`/`Vᵗ`/`Vp` at
+  `ℓ = 4, 5, 6`. GapWalk.lean's Open section now closes entirely.
+  Remaining pieces: K, D — neither launches without explicit agreement.
 - Outcome summary: `results/notary-depth1-lean.md`.

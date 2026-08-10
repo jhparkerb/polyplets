@@ -57,18 +57,18 @@ DP holdout at `l = 6` (`2703074`, `517701`); `l ≤ 3` agree with the
 
 ## Open
 
-The bijection between cluster configurations (the `CFGV` world of
-`Weights.lean` / `WeightsChunk.lean`) and walk paths is **not** formalized
-here: `walk_table` certifies the walk's own arithmetic. The agreement with
-`V ℓ ℓ` / `Vᵗ ℓ ℓ` (and the pure `Vp ℓ ℓ`) at `ℓ ≤ 3` is now *proved* as
-literal equalities in `GapWalkBridge.lean` (campaign Notary), which also pins
-the walk to the two-source table at `l ≤ 19` and closes the depth-1 assembly
-at `k ≤ 8` inside Lean. The `g ≤ gmax` truncation argument is now **closed**
-(campaign Notary, piece T): `GapWalkTrunc.lean` proves every cap `M ≥ 2L + 3`
-emits the same family triples (`walkFamiliesCap_exact`), via the vanishing
-rows of `GapWalkRows.lean` and the iterated-function form of
-`GapWalkCanon.lean`. Supplying the bijection itself remains open; it is
-priced in `docs/notary-kernel-scoping.md` (piece B).
+Nothing: the bijection between cluster configurations (the `CFGV` world of
+`Weights.lean` / `WeightsChunk.lean`) and walk paths is now **closed**
+(campaign Notary, piece B). `GapWalkStacks.lean` / `GapWalkPeel.lean` /
+`GapWalkEnds.lean` / `GapWalkBij.lean` prove `walkFamilies_configs`: every
+emitted family triple is `(V ℓ ℓ, Vᵗ ℓ ℓ, Vp ℓ ℓ)`, unconditionally — the
+walk's numbers *mean* clusters at every level, and with `walk_table` the
+values at `ℓ = 4, 5, 6` become literal-value theorems past enumeration
+reach. This subsumes the earlier partial closures: the `ℓ ≤ 3` literal
+equalities of `GapWalkBridge.lean`, and the `g ≤ gmax` truncation argument
+of piece T (`GapWalkTrunc.lean`, `walkFamiliesCap_exact`, cap `M ≥ 2L + 3`)
+via the vanishing rows of `GapWalkRows.lean` and the iterated-function form
+of `GapWalkCanon.lean`.
 -/
 
 namespace Polyplets
