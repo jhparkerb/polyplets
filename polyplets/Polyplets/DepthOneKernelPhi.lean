@@ -753,14 +753,18 @@ theorem phi_annihilates_exact : PhiOp Nexact = 0 := by
   unfold PhiOp
   rw [hN, ← lift_identity_series (scale3 F1y), hQS, mul_zero]
 
-/-- The truncation of the exact `N` is the banked integer list `nSeries 60`,
-tying `Nexact` to the series `DepthOneSeries.phi_annihilates` checks. -/
-theorem truncL_Nexact :
-    KernelSeries.truncL 61 Nexact = DepthOneSeries.nSeries 60 := by
-  sorry
+/-! ### Step (C): the walk-enumeration corollary.
 
-/-! ### Step (C): re-derive `DepthOneSeries.phi_annihilates` from the exact
-identity, via `truncL_Nexact` -/
+`phi_annihilates_of_exact` re-derives `DepthOneSeries.phi_annihilates`
+*given* the walk↔closed-form bridge `truncL 61 Nexact = nSeries 60` as an
+explicit hypothesis. That bridge — the kernel closed form equals the walk's
+own `walkFamilies` enumeration at all orders — is identity (II), scoped as
+notary piece D; the existing `GapWalkBridge.f1_matches_depth1` /
+`walk_table_19` links are `native_decide` at finite order only, and no
+all-orders symbolic version exists in the development. It is deliberately
+NOT proved here: piece K's deliverable is the unconditional
+`phi_annihilates_exact` above, and this corollary shows exactly what the
+finite `phi_annihilates` check would follow from. -/
 
 /-- `tmul` only reads its left list through `getD` below `n`: agreement
 there is enough to swap the list. -/
@@ -823,10 +827,13 @@ private theorem truncL_add (n : ℕ) (F G : PowerSeries ℚ) :
   rw [map_add, KernelSeries.truncL_getD n k F hk, KernelSeries.truncL_getD n k G hk]
 
 /-- **`DepthOneSeries.phi_annihilates`, re-derived without `native_decide`**
-from the exact identity. -/
-theorem phi_annihilates_of_exact :
+from the exact identity `phi_annihilates_exact`, given the piece-D
+walk↔closed-form bridge `hbridge` as an explicit hypothesis (see the section
+note above). -/
+theorem phi_annihilates_of_exact
+    (hbridge : KernelSeries.truncL 61 Nexact = DepthOneSeries.nSeries 60) :
     (DepthOneSeries.phiApply (DepthOneSeries.nSeries 60) 61).all (· == 0) = true := by
-  rw [← truncL_Nexact]
+  rw [← hbridge]
   have hone : (1 : ℚ) :: List.replicate 60 0 = KernelSeries.truncL 61 (1 : PowerSeries ℚ) :=
     (truncL_one 61 (by norm_num)).symm
   have key : DepthOneSeries.phiApply (KernelSeries.truncL 61 Nexact) 61

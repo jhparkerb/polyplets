@@ -325,3 +325,20 @@ avoid it, that is a statement-design failure to bring back, not a license.
   18 bare, coeff −64 after row-1/2 doubling), non-vanishing established,
   and the six walk unknowns solved by adjugate uniqueness and transcribed
   to `X^e · den · unknown = num`, both starts. Only `Phi` remains.
+- 2026-08-10: wave K-δ `DepthOneKernelPhi` COMPLETE, **piece K done
+  (option A)**. `phi_annihilates_exact : PhiOp Nexact = 0` — the exact
+  `Φ(x, N(x)) = 0` in `ℚ⟦x⟧` at all orders, standard axioms, no
+  `native_decide` — is proved. Two generated certificates carry it:
+  `quartic_tuple` (the scalar quartic, 26k `linear_combination`) and
+  `quartic_cleared` (the cleared annihilation, 41k, `gen7`; the degree-40
+  factor `g` is not needed in Lean by the domain argument). `phiF1_even`
+  went in via a from-scratch `X ↦ −X` involution swapping `A`, `B`; the
+  lift is coefficient-level (no `rescale`) through a `×3` ring hom.
+  **Scope boundary:** the walk↔closed-form bridge `truncL 61 Nexact =
+  nSeries 60` is identity (II) = **piece D**, not provable in K (the
+  existing `walkFamilies`↔value links are `native_decide` at finite order
+  only). So `phi_annihilates_of_exact` re-derives
+  `DepthOneSeries.phi_annihilates` taking that bridge as an *explicit
+  hypothesis* `hbridge`; no bare `sorry`. Remaining to fully close: wire
+  the module into `gate-notary`/`Polyplets.lean`, add the axiom audits,
+  `make gate-notary` + full `make`, results doc.
