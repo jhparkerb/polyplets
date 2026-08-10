@@ -729,6 +729,107 @@ theorem master_J {F : St → Nat} {j01 j02 p02 pt : Nat}
     exact hrhs.symm
   rw [hcore]
 
+/-! ### Reusable pieces of the `J`-master, exposed for the derivative and
+`P`-master proofs (duplicated bookkeeping from `master_J`'s proof, kept in
+lockstep with it — do not edit `master_J` itself). -/
+
+/-- The finite right-side family of the `J`-master (same as `master_J`'s
+local `rhsF`, exposed at top level). -/
+private noncomputable def rhsFJ (F : St → Nat) (j01 j02 : Nat) : ℕ → PowerSeries ℚ :=
+  fun n =>
+    if n = 3 then C (j01 : ℚ) - jS F 1 + X ^ 2 * c1S F
+    else if n = 4 then C (j02 : ℚ) - jS F 2 + X ^ 2 * c2S F
+    else if n = 5 then X ^ 2 * c3S F
+    else if n = 6 then X ^ 2 * c4S F
+    else 0
+
+private lemma rhsFJ_support (F : St → Nat) (j01 j02 : Nat) :
+    ∀ g, 7 ≤ g → rhsFJ F j01 j02 g = 0 := by
+  intro g hg
+  simp only [rhsFJ]
+  rw [if_neg (by omega), if_neg (by omega), if_neg (by omega), if_neg (by omega)]
+
+/-- The pointwise bracket identity behind `master_J` (same as its local
+`hcase`, exposed at top level, `n` fully generic). -/
+private lemma colJ3_case {F : St → Nat} {j01 j02 p02 pt : Nat}
+    (h : StartData F j01 j02 p02 pt) (n : ℕ) :
+    (if n < 2 then (0 : PowerSeries ℚ) else colJ3 F (n - 2)) - X ^ 2 * colJ3 F n -
+      (2 * X ^ 2) * (if n < 1 then 0 else colJ3 F (n - 1)) -
+      (3 * X ^ 2) * (if n < 2 then 0 else colJ3 F (n - 2)) -
+      (2 * X ^ 2) * (if n < 3 then 0 else colJ3 F (n - 3)) -
+      X ^ 2 * (if n < 4 then 0 else colJ3 F (n - 4)) = rhsFJ F j01 j02 n := by
+  simp only [rhsFJ, colJ3, c1S, c2S, c3S, c4S]
+  rcases Nat.lt_or_ge n 7 with hn7 | hn7
+  · interval_cases n
+    · norm_num
+    · norm_num
+    · norm_num
+    · norm_num
+      have j1 := jS_col_one h
+      simp only [map_natCast] at j1
+      linear_combination j1
+    · norm_num
+      have j2 := jS_col_two h
+      simp only [map_natCast] at j2
+      linear_combination j2
+    · norm_num
+      linear_combination jS_col_three h
+    · norm_num
+      linear_combination jS_col_four h
+  · obtain ⟨k, rfl⟩ : ∃ k, n = k + 7 := ⟨n - 7, by omega⟩
+    have hk3 : k + 7 - 2 = k + 5 := by omega
+    have hk1 : k + 7 - 1 = k + 6 := by omega
+    have hk2 : k + 7 - 3 = k + 4 := by omega
+    have hk4 : k + 7 - 4 = k + 3 := by omega
+    rw [if_neg (show ¬ k + 7 < 2 by omega), if_neg (show ¬ k + 7 < 1 by omega),
+      if_neg (show ¬ k + 7 < 3 by omega), if_neg (show ¬ k + 7 < 4 by omega)]
+    rw [hk3, hk1, hk2, hk4]
+    rw [if_neg (show ¬ k + 5 < 3 by omega), if_neg (show ¬ k + 6 < 3 by omega),
+      if_neg (show ¬ k + 7 < 3 by omega), if_neg (show ¬ k + 4 < 3 by omega),
+      if_neg (show ¬ k + 3 < 3 by omega)]
+    rw [if_neg (show k + 7 ≠ 3 by omega), if_neg (show k + 7 ≠ 4 by omega),
+      if_neg (show k + 7 ≠ 5 by omega), if_neg (show k + 7 ≠ 6 by omega)]
+    linear_combination jS_col_generic h k
+
+/-- Pure weight bookkeeping: multiplying the shifted-window bracket by the
+weight `C n` distributes correctly against the derivative bracket built
+from `C (n − i)`-weighted shifts (`i = 0, 1, 2, 3, 4`), for *any* family
+`a`. No column identity is needed here — it is index arithmetic in the
+weight only, so it is proved for a fully generic `a`. -/
+private lemma weight_shift_bracket (a : ℕ → PowerSeries ℚ) (n : ℕ) :
+    (if n < 2 then (0 : PowerSeries ℚ) else C (((n - 2 : ℕ) : ℚ)) * a (n - 2)) -
+        X ^ 2 * (C (n : ℚ) * a n) -
+      2 * X ^ 2 * (if n < 1 then 0 else C (((n - 1 : ℕ) : ℚ)) * a (n - 1)) -
+      3 * X ^ 2 * (if n < 2 then 0 else C (((n - 2 : ℕ) : ℚ)) * a (n - 2)) -
+      2 * X ^ 2 * (if n < 3 then 0 else C (((n - 3 : ℕ) : ℚ)) * a (n - 3)) -
+      X ^ 2 * (if n < 4 then 0 else C (((n - 4 : ℕ) : ℚ)) * a (n - 4)) +
+      (2 * (if n < 2 then (0 : PowerSeries ℚ) else a (n - 2)) -
+        2 * X ^ 2 * (if n < 1 then 0 else a (n - 1)) -
+        6 * X ^ 2 * (if n < 2 then 0 else a (n - 2)) -
+        6 * X ^ 2 * (if n < 3 then 0 else a (n - 3)) -
+        4 * X ^ 2 * (if n < 4 then 0 else a (n - 4))) =
+      C (n : ℚ) *
+        ((if n < 2 then (0 : PowerSeries ℚ) else a (n - 2)) - X ^ 2 * a n -
+          2 * X ^ 2 * (if n < 1 then 0 else a (n - 1)) -
+          3 * X ^ 2 * (if n < 2 then 0 else a (n - 2)) -
+          2 * X ^ 2 * (if n < 3 then 0 else a (n - 3)) -
+          X ^ 2 * (if n < 4 then 0 else a (n - 4))) := by
+  rcases Nat.lt_or_ge n 4 with hn4 | hn4
+  · interval_cases n <;> norm_num [map_natCast, map_ofNat] <;> ring
+  · have h1 : (((n - 1 : ℕ) : ℚ)) = (n : ℚ) - 1 := by
+      rw [Nat.cast_sub (by omega)]; norm_num
+    have h2 : (((n - 2 : ℕ) : ℚ)) = (n : ℚ) - 2 := by
+      rw [Nat.cast_sub (by omega)]; norm_num
+    have h3 : (((n - 3 : ℕ) : ℚ)) = (n : ℚ) - 3 := by
+      rw [Nat.cast_sub (by omega)]; norm_num
+    have h4 : (((n - 4 : ℕ) : ℚ)) = (n : ℚ) - 4 := by
+      rw [Nat.cast_sub (by omega)]; norm_num
+    simp only [if_neg (show ¬ n < 1 by omega), if_neg (show ¬ n < 2 by omega),
+      if_neg (show ¬ n < 3 by omega), if_neg (show ¬ n < 4 by omega)]
+    rw [h1, h2, h3, h4]
+    simp only [map_sub, map_ofNat, map_one]
+    ring
+
 /-- The `P`-master evaluated at any `u` of positive order. -/
 theorem master_P {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) (u w : PowerSeries ℚ)
@@ -748,7 +849,100 @@ theorem master_J_deriv {F : St → Nat} {j01 j02 p02 pt : Nat}
         (u ^ 2 - X ^ 2 * (1 + u + u ^ 2) ^ 2) * J3serW F u) =
       u ^ 2 * (2 * (u ^ 2 * Qser F j01 j02 u) +
         u ^ 3 * Qpser F j01 j02 u) := by
-  sorry
+  have hcore : u * Kernel.dP u * J3ser F u +
+      (u ^ 2 - X ^ 2 * (1 + u + u ^ 2) ^ 2) * J3serW F u =
+      2 * (u ^ 2 * Qser F j01 j02 u) + u ^ 3 * Qpser F j01 j02 u := by
+    set a : ℕ → PowerSeries ℚ := colJ3 F with hadef
+    set aw : ℕ → PowerSeries ℚ := fun g => C (g : ℚ) * a g with hawdef
+    have haw_col : ∀ g, colJ3W F g = aw g := by
+      intro g
+      simp only [hawdef, hadef, colJ3W, colJ3]
+      split_ifs <;> simp
+    have hJ3 : J3ser F u = lfsum (fun g => a g * u ^ g) := rfl
+    have hJ3w : J3serW F u = lfsum (fun g => aw g * u ^ g) := by
+      unfold J3serW
+      congr 1
+      funext g
+      rw [haw_col g]
+    set F1 : ℕ → PowerSeries ℚ := fun n => if n < 1 then 0 else a (n - 1) with hF1def
+    set F2 : ℕ → PowerSeries ℚ := fun n => if n < 2 then 0 else a (n - 2) with hF2def
+    set F3 : ℕ → PowerSeries ℚ := fun n => if n < 3 then 0 else a (n - 3) with hF3def
+    set F4 : ℕ → PowerSeries ℚ := fun n => if n < 4 then 0 else a (n - 4) with hF4def
+    set F1w : ℕ → PowerSeries ℚ := fun n => if n < 1 then 0 else aw (n - 1) with hF1wdef
+    set F2w : ℕ → PowerSeries ℚ := fun n => if n < 2 then 0 else aw (n - 2) with hF2wdef
+    set F3w : ℕ → PowerSeries ℚ := fun n => if n < 3 then 0 else aw (n - 3) with hF3wdef
+    set F4w : ℕ → PowerSeries ℚ := fun n => if n < 4 then 0 else aw (n - 4) with hF4wdef
+    have e1 : u ^ 1 * J3ser F u = lfsum (fun n => F1 n * u ^ n) := by
+      rw [hJ3]; exact lfsum_shift_mul a u hu 1
+    have e2 : u ^ 2 * J3ser F u = lfsum (fun n => F2 n * u ^ n) := by
+      rw [hJ3]; exact lfsum_shift_mul a u hu 2
+    have e3 : u ^ 3 * J3ser F u = lfsum (fun n => F3 n * u ^ n) := by
+      rw [hJ3]; exact lfsum_shift_mul a u hu 3
+    have e4 : u ^ 4 * J3ser F u = lfsum (fun n => F4 n * u ^ n) := by
+      rw [hJ3]; exact lfsum_shift_mul a u hu 4
+    have e1w : u ^ 1 * J3serW F u = lfsum (fun n => F1w n * u ^ n) := by
+      rw [hJ3w]; exact lfsum_shift_mul aw u hu 1
+    have e2w : u ^ 2 * J3serW F u = lfsum (fun n => F2w n * u ^ n) := by
+      rw [hJ3w]; exact lfsum_shift_mul aw u hu 2
+    have e3w : u ^ 3 * J3serW F u = lfsum (fun n => F3w n * u ^ n) := by
+      rw [hJ3w]; exact lfsum_shift_mul aw u hu 3
+    have e4w : u ^ 4 * J3serW F u = lfsum (fun n => F4w n * u ^ n) := by
+      rw [hJ3w]; exact lfsum_shift_mul aw u hu 4
+    have hexpand1 : u * Kernel.dP u * J3ser F u =
+        2 * (u ^ 2 * J3ser F u) - 2 * X ^ 2 * (u ^ 1 * J3ser F u) -
+          6 * X ^ 2 * (u ^ 2 * J3ser F u) - 6 * X ^ 2 * (u ^ 3 * J3ser F u) -
+          4 * X ^ 2 * (u ^ 4 * J3ser F u) := by
+      unfold Kernel.dP; ring
+    have hexpand2 : (u ^ 2 - X ^ 2 * (1 + u + u ^ 2) ^ 2) * J3serW F u =
+        u ^ 2 * J3serW F u - X ^ 2 * J3serW F u - 2 * X ^ 2 * (u ^ 1 * J3serW F u) -
+          3 * X ^ 2 * (u ^ 2 * J3serW F u) - 2 * X ^ 2 * (u ^ 3 * J3serW F u) -
+          X ^ 2 * (u ^ 4 * J3serW F u) := by ring
+    rw [e1, e2, e3, e4] at hexpand1
+    rw [e1w, e2w, e3w, e4w, hJ3w] at hexpand2
+    set rhsFw : ℕ → PowerSeries ℚ := fun n => C (n : ℚ) * rhsFJ F j01 j02 n with hrhsFwdef
+    have hrhsw : 2 * (u ^ 2 * Qser F j01 j02 u) + u ^ 3 * Qpser F j01 j02 u =
+        lfsum (fun n => rhsFw n * u ^ n) := by
+      have hfin : ∀ g, 7 ≤ g → rhsFw g = 0 := by
+        intro g hg
+        simp only [hrhsFwdef]
+        rw [rhsFJ_support F j01 j02 g hg, mul_zero]
+      rw [lfsum_eq_of_finite rhsFw u hu 7 hfin]
+      simp only [Finset.sum_range_succ, Finset.sum_range_zero, hrhsFwdef, rhsFJ]
+      norm_num [Qser, Qpser, map_natCast, map_ofNat]
+      ring
+    have hfinal :
+        (2 * lfsum (fun n => F2 n * u ^ n) - 2 * X ^ 2 * lfsum (fun n => F1 n * u ^ n) -
+            6 * X ^ 2 * lfsum (fun n => F2 n * u ^ n) - 6 * X ^ 2 * lfsum (fun n => F3 n * u ^ n) -
+            4 * X ^ 2 * lfsum (fun n => F4 n * u ^ n)) +
+          (lfsum (fun n => F2w n * u ^ n) - X ^ 2 * lfsum (fun n => aw n * u ^ n) -
+            2 * X ^ 2 * lfsum (fun n => F1w n * u ^ n) -
+            3 * X ^ 2 * lfsum (fun n => F2w n * u ^ n) -
+            2 * X ^ 2 * lfsum (fun n => F3w n * u ^ n) -
+            X ^ 2 * lfsum (fun n => F4w n * u ^ n)) =
+        lfsum (fun n => rhsFw n * u ^ n) := by
+      rw [lfsum_mul_left (2 : PowerSeries ℚ) (fun n => F2 n * u ^ n) (locFin_geom F2 u hu),
+        lfsum_mul_left (2 * X ^ 2 : PowerSeries ℚ) (fun n => F1 n * u ^ n) (locFin_geom F1 u hu),
+        lfsum_mul_left (6 * X ^ 2 : PowerSeries ℚ) (fun n => F2 n * u ^ n) (locFin_geom F2 u hu),
+        lfsum_mul_left (6 * X ^ 2 : PowerSeries ℚ) (fun n => F3 n * u ^ n) (locFin_geom F3 u hu),
+        lfsum_mul_left (4 * X ^ 2 : PowerSeries ℚ) (fun n => F4 n * u ^ n) (locFin_geom F4 u hu),
+        lfsum_mul_left (X ^ 2 : PowerSeries ℚ) (fun n => aw n * u ^ n) (locFin_geom aw u hu),
+        lfsum_mul_left (2 * X ^ 2 : PowerSeries ℚ) (fun n => F1w n * u ^ n) (locFin_geom F1w u hu),
+        lfsum_mul_left (3 * X ^ 2 : PowerSeries ℚ) (fun n => F2w n * u ^ n) (locFin_geom F2w u hu),
+        lfsum_mul_left (2 * X ^ 2 : PowerSeries ℚ) (fun n => F3w n * u ^ n) (locFin_geom F3w u hu),
+        lfsum_mul_left (X ^ 2 : PowerSeries ℚ) (fun n => F4w n * u ^ n) (locFin_geom F4w u hu)]
+      rw [← lfsum_sub, ← lfsum_sub, ← lfsum_sub, ← lfsum_sub,
+        ← lfsum_sub, ← lfsum_sub, ← lfsum_sub, ← lfsum_sub, ← lfsum_sub, ← lfsum_add]
+      congr 1
+      funext n
+      have hb := weight_shift_bracket a n
+      have hc := colJ3_case h n
+      simp only [← hadef] at hc
+      simp only [hF1def, hF2def, hF3def, hF4def, hF1wdef, hF2wdef, hF3wdef, hF4wdef, hawdef,
+        hrhsFwdef]
+      linear_combination u ^ n * hb + u ^ n * C (n : ℚ) * hc
+    rw [hJ3w, hexpand1, hexpand2, hfinal]
+    exact hrhsw.symm
+  rw [hcore]
 
 /-! ## Root facts -/
 
@@ -845,14 +1039,38 @@ theorem dJ3_u1 {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
     Kernel.dP Kernel.u1 * J3ser F Kernel.u1 =
       Kernel.u1 ^ 2 * Qpser F j01 j02 Kernel.u1 := by
-  sorry
+  have hm := master_J_deriv h Kernel.u1 Kernel.constantCoeff_u1
+  rw [show Kernel.u1 ^ 2 - X ^ 2 * (1 + Kernel.u1 + Kernel.u1 ^ 2) ^ 2 = 0 from by
+    linear_combination Kernel.u1_kernel, zero_mul, add_zero] at hm
+  rw [closing_Q_u1 h, mul_zero, mul_zero, zero_add] at hm
+  have h4 : Kernel.u1 ^ 3 * (Kernel.dP Kernel.u1 * J3ser F Kernel.u1) =
+      Kernel.u1 ^ 3 * (Kernel.u1 ^ 2 * Qpser F j01 j02 Kernel.u1) := by
+    have heq : Kernel.u1 ^ 2 * (Kernel.u1 * Kernel.dP Kernel.u1 * J3ser F Kernel.u1) =
+        Kernel.u1 ^ 3 * (Kernel.dP Kernel.u1 * J3ser F Kernel.u1) := by ring
+    have heq2 : Kernel.u1 ^ 2 * (Kernel.u1 ^ 3 * Qpser F j01 j02 Kernel.u1) =
+        Kernel.u1 ^ 3 * (Kernel.u1 ^ 2 * Qpser F j01 j02 Kernel.u1) := by ring
+    rw [heq, heq2] at hm
+    exact hm
+  exact mul_left_cancel₀ (pow_ne_zero 3 u1_ne_zero) h4
 
 /-- The differentiated `J`-master at `u₂`. -/
 theorem dJ3_u2 {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
     Kernel.dP Kernel.u2 * J3ser F Kernel.u2 =
       Kernel.u2 ^ 2 * Qpser F j01 j02 Kernel.u2 := by
-  sorry
+  have hm := master_J_deriv h Kernel.u2 Kernel.constantCoeff_u2
+  rw [show Kernel.u2 ^ 2 - X ^ 2 * (1 + Kernel.u2 + Kernel.u2 ^ 2) ^ 2 = 0 from by
+    linear_combination Kernel.u2_kernel, zero_mul, add_zero] at hm
+  rw [closing_Q_u2 h, mul_zero, mul_zero, zero_add] at hm
+  have h4 : Kernel.u2 ^ 3 * (Kernel.dP Kernel.u2 * J3ser F Kernel.u2) =
+      Kernel.u2 ^ 3 * (Kernel.u2 ^ 2 * Qpser F j01 j02 Kernel.u2) := by
+    have heq : Kernel.u2 ^ 2 * (Kernel.u2 * Kernel.dP Kernel.u2 * J3ser F Kernel.u2) =
+        Kernel.u2 ^ 3 * (Kernel.dP Kernel.u2 * J3ser F Kernel.u2) := by ring
+    have heq2 : Kernel.u2 ^ 2 * (Kernel.u2 ^ 3 * Qpser F j01 j02 Kernel.u2) =
+        Kernel.u2 ^ 3 * (Kernel.u2 ^ 2 * Qpser F j01 j02 Kernel.u2) := by ring
+    rw [heq, heq2] at hm
+    exact hm
+  exact mul_left_cancel₀ (pow_ne_zero 3 u2_ne_zero) h4
 
 /-- Equation (5): the cleared `P`-side equation at `u₁`. -/
 theorem closing_P_u1 {F : St → Nat} {j01 j02 p02 pt : Nat}
