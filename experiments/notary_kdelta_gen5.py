@@ -185,7 +185,7 @@ for kind, rowno, uname, relvar, j01, j02, p02, pt in CASES:
                     - qu * RELu - qa * RELrel - scale * row)
     if chk != 0:
         fail(f"certificate re-verification failed row {rowno} ({kind})")
-    coefE = sp.expand((2 * s) ** m)
+    coefE = sp.expand((2 * s) ** m * (1 - u) ** 2)
     coefW = sp.expand(-(2 * s) ** m * qw)
     coefU = sp.expand(-qu)
     coefREL = sp.expand(-qa)

@@ -263,10 +263,14 @@ for kind in ('int', 'bare'):
             kM = max(kM, kc)
             Mps.append((kc, Mp))
         k = max(kR, kM)
-        R_pol[r] = tuple(sp.expand(e * s ** (k - kR)) for e in Rp)
+        # rows 1,2 keep half-integer entries from the (2s)-clearing: double
+        # them so every emitted coefficient is an integer (Lean numerals).
+        dbl = 2 if r in (0, 1) else 1
+        R_pol[r] = tuple(sp.expand(dbl * e * s ** (k - kR)) for e in Rp)
         for c in range(6):
             kc, Mp = Mps[c]
-            M_pol[r][c] = tuple(sp.expand(e * s ** (k - kc)) for e in Mp)
+            M_pol[r][c] = tuple(sp.expand(dbl * e * s ** (k - kc))
+                                for e in Mp)
         ks.append(k)
         mx = max(len(str(e)) for t in ([R_pol[r]] + M_pol[r]) for e in t)
         print(f"    row {r + 1}: s^{k}"
