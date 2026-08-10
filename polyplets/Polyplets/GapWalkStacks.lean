@@ -556,7 +556,7 @@ and the other `|x| ≤ 2i + g`), and every cell is within `2i` of one top. -/
 theorem isStackI_x_le {i g : ℕ} {c : Bool} {S : Finset (ℤ × ℤ)}
     (hi : 1 ≤ i) (h : IsStackI i g c S) :
     ∀ p ∈ S, |p.1| ≤ 4 * (i : ℤ) + 2 * (g : ℤ) := by
-  obtain ⟨hL, hR, hmaxeq, hOK, -, -⟩ := isStackI_top hi h
+  obtain ⟨hL, hR, _, hOK, -, -⟩ := isStackI_top hi h
   have hcardZ : (S.card : ℤ) = 2 * (i : ℤ) + 1 := by exact_mod_cast h.2.1
   have h0 : ((0 : ℤ), (0 : ℤ)) ∈ S := h.2.2.1
   have hspread : ∀ {a b : ℤ × ℤ}, reach S a b → a ∈ S → b ∈ S →
@@ -592,7 +592,7 @@ theorem isStackI_x_le {i g : ℕ} {c : Bool} {S : Finset (ℤ × ℤ)}
 theorem isStackB_x_le {i g : ℕ} {c : Bool} {S : Finset (ℤ × ℤ)}
     (hi : 1 ≤ i) (h : IsStackB i g c S) :
     ∀ p ∈ S, |p.1| ≤ 4 * (i : ℤ) + 2 * (g : ℤ) := by
-  obtain ⟨hL, hR, hmaxeq, hOK, -, -⟩ := isStackB_top hi h
+  obtain ⟨hL, hR, _, hOK, -, -⟩ := isStackB_top hi h
   have hcardZ : (S.card : ℤ) = 2 * (i : ℤ) := by exact_mod_cast h.2.1
   have h0 : ((0 : ℤ), (1 : ℤ)) ∈ S := h.2.2.1
   have hspread : ∀ {a b : ℤ × ℤ}, reach S a b → a ∈ S → b ∈ S →

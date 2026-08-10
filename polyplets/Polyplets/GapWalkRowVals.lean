@@ -171,9 +171,7 @@ theorem stepMul_P_bulk (g gp : ℕ) (hg : 3 ≤ g) (hgp : 2 ≤ gp) :
       decide_eq_true_eq, Bool.eq_false_iff, ne_eq]
     omega]
   rw [length_filter_range_interval, bulkW]
-  split_ifs with hb
-  · omega
-  · omega
+  split_ifs <;> omega
 
 /-- The unique generic join: gap 3 folding onto gap 1. -/
 theorem stepMul_P3_join : stepMul 3 false 1 true = 1 := by decide
@@ -353,9 +351,7 @@ theorem stepMul_J_bulk (g gp : ℕ) (hg : 3 ≤ g) (hgp : 3 ≤ gp) :
     simp only [Bool.and_eq_true, Bool.or_eq_true, beq_iff_eq, decide_eq_true_eq]
     omega]
   rw [length_filter_range_interval, bulkW]
-  split_ifs with hb
-  · omega
-  · omega
+  split_ifs <;> omega
 
 /-- The rank-one spray: a joined source reaches every `(gp, P)`, `gp ≥ 3`,
 with weight 12, corrected by `−2·bulkW` inside the bulk window. -/

@@ -193,11 +193,7 @@ theorem mk_aaC : (PowerSeries.mk aaC : PowerSeries ℚ) =
   rw [PowerSeries.coeff_mk, show (2 : PowerSeries ℚ) = C 2 from (map_ofNat C 2).symm,
     show (3 : PowerSeries ℚ) = C 3 from (map_ofNat C 3).symm]
   simp only [map_sub, coeff_one, coeff_C_mul, coeff_X, coeff_X_pow]
-  rcases n with _ | _ | _ | n
-  · simp [aaC]
-  · simp [aaC]
-  · simp [aaC]
-  · simp [aaC]
+  rcases n with _ | _ | _ | n <;> simp [aaC]
 
 theorem mk_bbC : (PowerSeries.mk bbC : PowerSeries ℚ) =
     1 + 2 * X - 3 * X ^ 2 := by
@@ -205,11 +201,7 @@ theorem mk_bbC : (PowerSeries.mk bbC : PowerSeries ℚ) =
   rw [PowerSeries.coeff_mk, show (2 : PowerSeries ℚ) = C 2 from (map_ofNat C 2).symm,
     show (3 : PowerSeries ℚ) = C 3 from (map_ofNat C 3).symm]
   simp only [map_sub, map_add, coeff_one, coeff_C_mul, coeff_X, coeff_X_pow]
-  rcases n with _ | _ | _ | n
-  · simp [bbC]
-  · simp [bbC]
-  · simp [bbC]
-  · simp [bbC]
+  rcases n with _ | _ | _ | n <;> simp [bbC]
 
 theorem A_sq : A * A = 1 - 2 * X - 3 * X ^ 2 := by
   rw [A, sqrt_sq aaC rfl, mk_aaC]

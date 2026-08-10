@@ -978,7 +978,6 @@ theorem isStackI_trunc {i g' : ℕ} {c' : Bool} {S : Finset (ℤ × ℤ)}
     rcases htrow q hq hqy with rfl | rfl
     · exact Or.inl htLfix
     · exact Or.inr htRfix
-  have ha : u.1 - tL.1 = u.1 - tL.1 := rfl
   set a := u.1 - tL.1 with hadef
   have huv_eq : u = (tL.1 + a, (i : ℤ) + 1) := by
     apply Prod.ext

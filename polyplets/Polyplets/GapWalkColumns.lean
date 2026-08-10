@@ -112,7 +112,7 @@ theorem pY_one (F : St → Nat) (h1 : F (1, false) = 0) : pY F 1 = 0 := by
 /-! ## Finset surgery helpers -/
 
 /-- Two finsets agreeing that `f` vanishes off each other have equal sums. -/
-private lemma sum_eq_of_zero_outside {M : Type*} [AddCommMonoid M] (f : Nat → M)
+lemma sum_eq_of_zero_outside {M : Type*} [AddCommMonoid M] (f : Nat → M)
     (S W : Finset Nat) (hSW : ∀ g ∈ S, g ∉ W → f g = 0)
     (hWS : ∀ g ∈ W, g ∉ S → f g = 0) :
     ∑ g ∈ S, f g = ∑ g ∈ W, f g := by
@@ -127,14 +127,14 @@ private lemma sum_eq_of_zero_outside {M : Type*} [AddCommMonoid M] (f : Nat → 
   rw [h1, h2]
 
 /-- A length-5 `Icc` sum, peeled from the top. -/
-private lemma sum_Icc_five {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
+lemma sum_Icc_five {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
     ∑ g ∈ Finset.Icc a (a + 4), f g = f a + f (a + 1) + f (a + 2) + f (a + 3) + f (a + 4) := by
   rw [Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega),
     Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega), Finset.Icc_self,
     Finset.sum_singleton]
 
 /-- A length-3 `Icc` sum, peeled from the top. -/
-private lemma sum_Icc_three {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
+lemma sum_Icc_three {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
     ∑ g ∈ Finset.Icc a (a + 2), f g = f a + f (a + 1) + f (a + 2) := by
   rw [Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega), Finset.Icc_self,
     Finset.sum_singleton]
@@ -145,13 +145,13 @@ private lemma sum_Icc_two {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat
   rw [Finset.sum_Icc_succ_top (by omega), Finset.Icc_self, Finset.sum_singleton]
 
 /-- A length-4 `Icc` sum, peeled from the top. -/
-private lemma sum_Icc_four {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
+lemma sum_Icc_four {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
     ∑ g ∈ Finset.Icc a (a + 3), f g = f a + f (a + 1) + f (a + 2) + f (a + 3) := by
   rw [Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega),
     Finset.sum_Icc_succ_top (by omega), Finset.Icc_self, Finset.sum_singleton]
 
 /-- Splitting off the first two gaps of an `Icc 1 n` sum. -/
-private lemma sum_Icc_one_two_split {M : Type*} [AddCommMonoid M] (f : Nat → M) (n : Nat)
+lemma sum_Icc_one_two_split {M : Type*} [AddCommMonoid M] (f : Nat → M) (n : Nat)
     (hn : 2 ≤ n) :
     ∑ g ∈ Finset.Icc 1 n, f g = f 1 + f 2 + ∑ g ∈ Finset.Icc 3 n, f g := by
   have hset : Finset.Icc 1 n = insert 1 (insert 2 (Finset.Icc 3 n)) := by

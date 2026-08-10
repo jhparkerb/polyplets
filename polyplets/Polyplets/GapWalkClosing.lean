@@ -234,53 +234,6 @@ theorem pS_col_generic {F : St → Nat} {j01 j02 p02 pt : Nat}
 
 /-! ## The `Jm` column-sum recurrence (the equation-(4) primitive) -/
 
-/-! ### Local Finset-window helpers (replicated from `GapWalkColumns`) -/
-
-/-- Two finsets agreeing that `f` vanishes off each other have equal sums. -/
-private lemma sum_eq_of_zero_outside {M : Type*} [AddCommMonoid M] (f : Nat → M)
-    (S W : Finset Nat) (hSW : ∀ g ∈ S, g ∉ W → f g = 0)
-    (hWS : ∀ g ∈ W, g ∉ S → f g = 0) :
-    ∑ g ∈ S, f g = ∑ g ∈ W, f g := by
-  have h1 : ∑ g ∈ S, f g = ∑ g ∈ S ∪ W, f g := by
-    apply Finset.sum_subset Finset.subset_union_left
-    intro x hx hxS
-    exact hWS x ((Finset.mem_union.mp hx).resolve_left hxS) hxS
-  have h2 : ∑ g ∈ W, f g = ∑ g ∈ S ∪ W, f g := by
-    apply Finset.sum_subset Finset.subset_union_right
-    intro x hx hxW
-    exact hSW x ((Finset.mem_union.mp hx).resolve_right hxW) hxW
-  rw [h1, h2]
-
-/-- A length-5 `Icc` sum, peeled from the top. -/
-private lemma sum_Icc_five {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
-    ∑ g ∈ Finset.Icc a (a + 4), f g = f a + f (a + 1) + f (a + 2) + f (a + 3) + f (a + 4) := by
-  rw [Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega),
-    Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega), Finset.Icc_self,
-    Finset.sum_singleton]
-
-/-- A length-3 `Icc` sum, peeled from the top. -/
-private lemma sum_Icc_three {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
-    ∑ g ∈ Finset.Icc a (a + 2), f g = f a + f (a + 1) + f (a + 2) := by
-  rw [Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega), Finset.Icc_self,
-    Finset.sum_singleton]
-
-/-- A length-4 `Icc` sum, peeled from the top. -/
-private lemma sum_Icc_four {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
-    ∑ g ∈ Finset.Icc a (a + 3), f g = f a + f (a + 1) + f (a + 2) + f (a + 3) := by
-  rw [Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega),
-    Finset.sum_Icc_succ_top (by omega), Finset.Icc_self, Finset.sum_singleton]
-
-/-- Splitting off the first two gaps of an `Icc 1 n` sum. -/
-private lemma sum_Icc_one_two_split {M : Type*} [AddCommMonoid M] (f : Nat → M) (n : Nat)
-    (hn : 2 ≤ n) :
-    ∑ g ∈ Finset.Icc 1 n, f g = f 1 + f 2 + ∑ g ∈ Finset.Icc 3 n, f g := by
-  have hset : Finset.Icc 1 n = insert 1 (insert 2 (Finset.Icc 3 n)) := by
-    ext x
-    simp only [Finset.mem_Icc, Finset.mem_insert]
-    omega
-  rw [hset, Finset.sum_insert (by simp only [Finset.mem_insert, Finset.mem_Icc]; omega),
-    Finset.sum_insert (by simp only [Finset.mem_Icc]; omega), add_assoc]
-
 /-- The `ℕ`-level column-sum recurrence: the deep `J` mass at order `m+1`,
 plus the two edge corrections, is nine times the deep mass at order `m`
 plus the two head feeds. -/

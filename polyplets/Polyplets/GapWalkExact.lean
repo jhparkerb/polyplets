@@ -237,7 +237,7 @@ theorem pE_one (F : St → Nat) (h1 : F (1, false) = 0) (m : Nat) :
   | zero => rw [pE_zero]; exact h1
   | succ m =>
     unfold pE
-    set M := 1 + 2 * (m + 1) + 5 with hMdef
+    set M := 1 + 2 * (m + 1) + 5
     change funStep M (iter M F m) (1, false) = 0
     unfold funStep
     apply sum_eq_zero_of_forall
@@ -254,7 +254,7 @@ theorem jE_step (F : St → Nat) (hF : ∀ g, 3 ≤ g → F (g, true) = 0)
     jE F (m + 1) gp =
       (∑ g ∈ Finset.Icc 1 (2 * m + 2), jE F m g * stepMul g true gp true) +
       (∑ g ∈ Finset.Icc 1 3, pE F m g * stepMul g false gp true) := by
-  set M := 2 * m + gp + 7 with hMdef
+  set M := 2 * m + gp + 7
   have hM1 : 2 * (m + 1) + 5 ≤ M := by omega
   have hM0 : 2 * m + 5 ≤ M := by omega
   rw [jE_eq F hF hM1 gp]
@@ -290,7 +290,7 @@ theorem pE_step (F : St → Nat) (hF : ∀ g, 3 ≤ g → F (g, true) = 0)
     pE F (m + 1) gp =
       (∑ g ∈ Finset.Icc 1 (2 * m + 2), jE F m g * stepMul g true gp false) +
       (∑ g ∈ Finset.Icc 1 (gp + 2), pE F m g * stepMul g false gp false) := by
-  set M := 2 * m + gp + 7 with hMdef
+  set M := 2 * m + gp + 7
   have hM1 : 2 * (m + 1) + 5 ≤ M := by omega
   have hM0 : 2 * m + 5 ≤ M := by omega
   have hgM : gp + 2 * (m + 1) ≤ M := by omega
