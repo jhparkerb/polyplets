@@ -123,6 +123,34 @@ One agent per module, statements pre-verified, gate RED first, as in T/B.
   the column sum; the emitted-family series `S`, `B`, `P̂` in terms of the
   six unknowns (end-functional bridge).
 
+  *Telescoping design (worked out 2026-08-10, before the skeleton):*
+  transport the K-β column identities through `expand 2` (`X ↦ X²`, an
+  algebra map: identities map to identities, `ĵ_g := expand 2 (jY F g)`).
+  For a root `u` define the evaluated series by `lfsum` over cutoff
+  columns (`if g < 3 then 0 else ĵ_g` etc.; `LocFin` from
+  `constantCoeff u = 0` via `coeff_pow_eq_zero`). The master identity
+  evaluated at `u` — `D(u)·J₃(u) = u²·Q(u)` — is proved columnwise: write
+  `D(u)·J₃(u) − u²·Q(u)` as one `lfsum` over target powers `n` (shift
+  algebra: `lfsum_mul_left` for the five kernel multiples, `lfsum_shift`
+  to reindex), whose `n`-th family member is exactly the transported
+  column identity at `n` (generic for `n ≥ 7`, the four exceptional
+  columns for `n = 3..6`, zero below) — so the family is zero pointwise
+  and the lfsum vanishes. Then `D(u) = 0` (kernel identity) and `u² ≠ 0`
+  (domain; `coeff 1 u = 1`) give `Q(u) = 0`: equations (1), (2). The
+  P-side runs the same route on `f_g = p̂_g − 2ĵ_g` with two extras: the
+  constant tails `C pt` collapse by a geometric lemma
+  (`(lfsum fun g => u^g) · (1−u) = 1`, provable by `lfsum_shift`
+  telescoping; `(1−u)⁻¹` units from `KernelRoots`), and instead of
+  dividing by the valuation-1 series `D′(u)` the equations stay in the
+  cleared form (5), (6). Equation (3) is the transported `u³` column
+  verbatim; equation (4) is the columnwise sum of the generic identities
+  over `3 ≤ g ≤ 2m+2` per coefficient (window sum `= 9` inside, boundary
+  corrections at the window edges die by `J`-support). The six equations'
+  target forms are `equations_cleared` of
+  `experiments/notary_k_measure.py` (m5: walk satisfies them, s-order 28,
+  both starts); `P0(u) = C p02·u² + C pt·u³·(1−u)⁻¹` uniformly covers
+  both starts.
+
 **Wave K-δ (3 agents, sequential dependencies inside the wave):**
 
 - `DepthOneKernelSol.lean` — the transcribed closed forms (12 entries ×
