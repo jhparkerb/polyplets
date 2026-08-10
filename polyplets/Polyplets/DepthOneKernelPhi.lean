@@ -864,5 +864,25 @@ theorem phi_annihilates_of_exact
   rw [key, phi_annihilates_exact, truncL_zero]
   simp
 
+/-! ## Axiom audits (AuditOutworks pattern)
+
+Expected: standard axioms only. No `native_decide` (`Lean.ofReduceBool`)
+reaches the exact Φ annihilation — the two `linear_combination` certificates
+are kernel-checked. `phi_annihilates_of_exact` additionally consumes the
+piece-D bridge as an explicit hypothesis, so its own trust base stays
+standard. -/
+
+/--
+info: 'Polyplets.DepthOneKernelPhi.phi_annihilates_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms phi_annihilates_exact
+
+/--
+info: 'Polyplets.DepthOneKernelPhi.phi_annihilates_of_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms phi_annihilates_of_exact
+
 end DepthOneKernelPhi
 end Polyplets

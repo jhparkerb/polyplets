@@ -65,8 +65,16 @@ open item). Larger than T: the row-peeling needs a canonical decomposition
 of configurations (the `mem_CFGV` machinery helps) and a
 multiplicity-preserving bijection, not just an invariant.
 
-**K — the kernel method, all orders.** `Φ(x, N(x)) = 0` exactly (currently:
-mod `x^61`, `DepthOneSeries.phi_annihilates`). The right architecture — and
+**K — the kernel method, all orders. DONE 2026-08-10** (up to the piece-D
+bridge). `DepthOneKernelPhi.phi_annihilates_exact : Φ(x, N(x)) = 0` now holds
+*exactly* in `ℚ⟦x⟧` at all orders — kernel-verified, no `native_decide`,
+replacing the earlier mod-`x^61` `DepthOneSeries.phi_annihilates`. The whole
+y-form quartic collapses to two machine-generated `linear_combination`
+certificates over the two √-square relations. The one thing K cannot supply
+is the walk↔closed-form bridge `truncL 61 Nexact = nSeries 60` (that the
+kernel closed form *is* the walk's own enumeration at all orders) — that is
+identity (II) = **piece D**, so `phi_annihilates_of_exact` carries it as an
+explicit hypothesis rather than proving it. The right architecture — and
 the reason this is feasible at all without analysis — is that the entire
 derivation of `severance_w2_kernel.py` lives in `ℚ⟦s⟦` (`y = s²`):
 
@@ -125,8 +133,9 @@ Full theorem = K + B + D  (T absorbed into K)
   GapWalk.lean's open item, prerequisite for K), then **B**, then **K**,
   with **D** last and priced separately once `Diagonal.lean`'s general-`k`
   lemma is attempted at all. *(T landed 2026-08-09; B landed 2026-08-09;
-  K opened 2026-08-09 — decomposition, measurements, and wave K-α in
-  `docs/notary-k-plan.md`.)*
+  K landed 2026-08-10 up to the piece-D bridge — `Φ(x,N(x))=0` exact at all
+  orders, `DepthOneKernelPhi.phi_annihilates_exact`, waves α–δ in
+  `docs/notary-k-plan.md`. Only D remains.)*
 - None of the four is a single-session Sonnet task under the wave-1 pattern
   (one file, one agent, gate-checked); each is a multi-module campaign with
   Fable-authored decompositions per module. Per the frontier rules, none

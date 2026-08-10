@@ -102,23 +102,48 @@ walk ↔ configuration bijection:
   exhaustively at `i ≤ 2`, ends at `ℓ ≤ 3`, cone at the edge cap, heads
   to `L = 5`).
 
+**`DepthOneKernelPhi.lean`** (wave K, piece K of the scoping note,
+2026-08-10) — the kernel method at all orders:
+
+- **`phi_annihilates_exact : Φ(x, N(x)) = 0`, exactly in `ℚ⟦x⟧` at every
+  order** — the exact upgrade of the earlier mod-`x^61`
+  `DepthOneSeries.phi_annihilates` (which used `native_decide`). The
+  depth-1 defect kernel's closed form annihilates `Φ` identically. Proved
+  entirely inside `ℚ[X, a, b]/(a²−AA, b²−BB)` (the two √-square relations),
+  with no complex analysis and no `native_decide`: the whole y-form quartic
+  collapses to a single scalar identity and then to a cleared `bracket = 0`,
+  each discharged by one machine-generated `linear_combination` cofactor
+  certificate (kernel-checked). The `x ↦ 3x` lift is coefficient-level (no
+  `PowerSeries.rescale` in this Mathlib) and `Φ`'s F₁-factor is proved even
+  in `s` via a from-scratch `X ↦ −X` automorphism swapping `A ↔ B`.
+- **`phi_annihilates_of_exact`** re-derives `DepthOneSeries.phi_annihilates`
+  (the mod-`x^61` value pin) from the exact theorem *without*
+  `native_decide` — conditional on the one thing piece K cannot supply: the
+  walk↔closed-form bridge `truncL 61 Nexact = nSeries 60` (that the kernel
+  closed form is the walk's own `walkFamilies` enumeration at all orders),
+  which is identity (II) = **piece D**. It is carried as an explicit
+  hypothesis `hbridge`, not a `sorry`.
+
 Axioms throughout: `propext, Classical.choice, Quot.sound` plus
 `Lean.ofReduceBool` on the `native_decide` theorems (project standard;
-audited per-theorem in-file).
+audited per-theorem in-file). `phi_annihilates_exact` and
+`phi_annihilates_of_exact` are on the standard three only.
 
 ## What remains paper-only, precisely
 
 - Identity (II) at all `k`, identity (I), and the diagonal-law Step 4–5
   frame (piece D of the scoping note; blocked behind `Diagonal.lean`'s
-  general-`k` factorization lemma).
-- `Φ(x, N(x)) = 0` at all orders (K) — feasible entirely inside `ℚ⟦s⟧`
-  with no analysis; cost centers measured and listed in the scoping note.
-  (The `gmax` truncation argument (T) closed in wave 3; the walk-path ↔
-  configuration bijection (B) closed in wave 4, above.)
+  general-`k` factorization lemma). This is now the *only* remaining piece:
+  it is exactly the `hbridge` hypothesis of `phi_annihilates_of_exact`, and
+  closing it would discharge that hypothesis and connect the exact
+  `Φ`-annihilation back to the triangle. (The `gmax` truncation argument (T)
+  closed in wave 3; the walk-path ↔ configuration bijection (B) closed in
+  wave 4; `Φ(x, N(x)) = 0` at all orders (K) closed exactly in wave K,
+  above.)
 - Coefficient asymptotics (`C₁ = √6/(27√π)`, exponent `k^{−1/2}` as an
   asymptotic statement): real-analytic transfer, no Mathlib support —
   deliberately out of scope; the constants live in Lean as branch data.
 
-Neither K nor D launches without explicit agreement (each is a
-multi-module campaign, not a wave-1-shaped task). T and B launched on
-exactly that agreement and both landed 2026-08-09.
+D does not launch without explicit agreement (a multi-module campaign, not
+a wave-1-shaped task). T, B, and K launched on exactly that agreement — T
+and B landed 2026-08-09, K landed 2026-08-10.
