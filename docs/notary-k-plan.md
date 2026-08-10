@@ -279,6 +279,15 @@ avoid it, that is a statement-design failure to bring back, not a license.
   `GapWalkColumns` (11 sorries) both proved, zero statement changes
   (verified by diff: imports, private helpers, proof bodies only), audit
   guards green, standard axioms only. `make gate-notary` green.
+- 2026-08-10: wave K-δ generator complete (stages 1+2,
+  `experiments/notary_kdelta_gen.py` / `notary_kdelta_gen2.py`, data in
+  `build/notary_kdelta_data*.json`, both ALL PASS): pole-free closed forms
+  verified against the walk; Ψ and the quartic re-verified, lift ratio
+  exactly 1/3; the cleared polynomial system emitted (row entries ≤ 53
+  chars — far below the m6 worst case), the walk satisfying it
+  numerically and the closed forms satisfying it *exactly* in the tuple
+  algebra; cleared-det certificates: valuation 22 / lead −16 (interior),
+  valuation 18 / lead −16 (bare); divX low-coefficient guards pass.
 - 2026-08-10: wave K-γ complete — `GapWalkClosing` (24 sorries) proved
   across three agent rounds (the third unblocked by the coordinator's
   diagnosis: the `−2·J₃` right-side term of the P-master is a shifted
