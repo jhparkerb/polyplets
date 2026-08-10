@@ -173,6 +173,38 @@ domain, on the *cleared* system so entries are polynomial in
 cleared by the generator (multiply through by the max shift), sizes
 staying m7-scale.
 
+*Full δ chain (settled 2026-08-10, stage-1 generator data in
+`build/notary_kdelta_data.json`, verified — entries ≤ 235 chars, shifts
+≤ 4, unit denominators, lift ratio exactly 1/3):*
+1. **Cleared rows for the walk** — from the γ equations by
+   `(2X)^deg`-clearing (rewrite `((2X)·u₁)^j` via `u1_def`, powers `j ≤ 8`
+   as squared/cubed congruences of it) and one `(1−uᵢ)` factor for the
+   `w`-rows via `one_sub_uᵢ_mul_wᵢ`. Generator emits the row polynomials
+   `M_{rc}, R_r ∈ ℚ[X,A,B]`, numerically verified; the agent proves each
+   row from the γ equation by `rw`/`linear_combination` — no generator
+   cofactor certificates needed.
+2. **The closed forms as series** — `x̂_c := (divX)^[e_c] (num_c) · d_c⁻¹`
+   where `num_c = Σᵢ N_{c,i}·basisᵢ` (regular; `divX` iterated `e_c ≤ 4`
+   times). Transcription lemma `X^{e_c}·d_c·x̂_c = num_c` needs only the
+   finite certificate `coeff n (num_c) = 0` for `n < e_c` (A/B coefficient
+   literals). `M·x̂ = R` rows: multiply row `r` by `X^E·D`
+   (`E = max e_c`, `D = lcm d_c`) so it becomes a generator-verified
+   `ring` identity in `ℚ[X,A,B]` mod the two square relations; divide the
+   unit/`X`-powers back out (domain).
+3. **Uniqueness, abstract** — `M·(x_walk − x̂) = 0`, so
+   `det M · (x_walk − x̂) = adj M ⬝ (M ⬝ (x_walk − x̂)) = 0`
+   (`Matrix.adjugate_mul` — never expanded); `coeff 12 (det M) = −16 ≠ 0`
+   via the `truncL` list certificate (entries truncated through the A/B
+   literals; Leibniz over 720 permutations in list arithmetic,
+   `norm_num`-evaluated, never `native_decide`); domain ⇒
+   `x_walk = x̂` componentwise.
+4. **Φ** — walk `F₁` (γ's `qSeries`/`bSeries` bridge) equals the
+   closed-form `F₁`; the `Ψ`→`cY` quartic annihilates it (`ring`
+   identity on the stage-1 `n0..n3`/`den` data, `s`-powers cleared);
+   lift `x ↦ s²/3` by `expand 2 ∘ rescale (1/3)` against the banked
+   `PHI_COEFFS` with the verified scale `1/3`; head theorem
+   `Φ(x, N(x)) = 0`.
+
 - `DepthOneKernelSol.lean` — the transcribed closed forms (12 entries ×
   4 components, ≤ 235 chars each, per-entry `s`-pole cleared by an explicit
   shift), and `M·X̂ = R` for both starts: each row multiplied through by the
