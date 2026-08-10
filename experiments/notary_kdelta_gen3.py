@@ -63,7 +63,10 @@ def lean_q(r):
 
 
 def lean_poly(expr):
-    """A polynomial in s as a Lean `PowerSeries ℚ` expression in X."""
+    """A polynomial in s as a Lean `PowerSeries ℚ` expression in X.
+
+    Integer coefficients only, emitted as bare numerals so `ring` can
+    normalize them (a `C`-literal is an opaque atom to `ring`)."""
     expr = sp.expand(expr)
     if expr == 0:
         return "0"
@@ -72,16 +75,15 @@ def lean_poly(expr):
     for (k,), co in sorted(p.as_dict().items()):
         pq, qq = sp.fraction(sp.nsimplify(co))
         if qq != 1:
-            base = f"C ({pq}/{qq} : ℚ)"
-        else:
-            base = f"C ({pq} : ℚ)"
+            fail(f"non-integer coefficient {co} in {str(expr)[:60]}")
+        base = str(pq) if pq >= 0 else f"(-{-pq})"
         if k == 0:
             terms.append(base)
         elif k == 1:
             terms.append(f"{base} * X")
         else:
             terms.append(f"{base} * X ^ {k}")
-    return " + ".join(terms).replace("+ C (-", "+ C (-")
+    return " + ".join(terms)
 
 
 def lean_tup(tup_strs, aname="Kernel.A", bname="Kernel.B"):
@@ -192,9 +194,14 @@ for kind in ('int', 'bare'):
                          f"num{nm}{K}")
         lhs = " +\n      ".join(terms)
         rhs = f"({lean_poly(sp.expand(s ** E * D))}) * ({lean_tup(R[r])})"
+        unf = " ".join(f"num{LNAME[n]}{K}" for n in NAMES)
+        out.append(f"set_option maxHeartbeats 1600000 in")
+        out.append("-- the generated identity multiplies degree-40 numerators:")
+        out.append("-- `ring` needs headroom beyond the default budget")
         out.append(f"theorem row{r + 1}{K} :")
         out.append(f"    {lhs}")
         out.append(f"      = {rhs} := by")
+        out.append(f"  unfold {unf}")
         # certificate in Lean form: polynomials in X, A, B
         def free_to_lean(e):
             e = sp.expand(e)

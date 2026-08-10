@@ -4,6 +4,7 @@ import Polyplets.ComputeBridge
 import Polyplets.Defs
 import Polyplets.DepthAssembly
 import Polyplets.DepthOneConstants
+import Polyplets.DepthOneKernelSol
 import Polyplets.DepthOneSeries
 import Polyplets.Diagonal
 import Polyplets.Fekete
