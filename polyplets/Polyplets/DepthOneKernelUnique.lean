@@ -607,9 +607,30 @@ private theorem coeffAB12 : coeff 12 ((Kernel.A : PowerSeries ℚ) * Kernel.B) =
   simp only [Finset.sum_range_succ, Finset.sum_range_zero]
   norm_num [coeffA0, coeffA1, coeffA2, coeffA3, coeffA4, coeffA5, coeffA6, coeffA7, coeffA8, coeffA9, coeffA10, coeffA11, coeffA12, coeffB0, coeffB1, coeffB2, coeffB3, coeffB4, coeffB5, coeffB6, coeffB7, coeffB8, coeffB9, coeffB10, coeffB11, coeffB12]
 
+set_option maxHeartbeats 4000000 in
+-- the 720-term expansion is symbol-only (opaque `M`) but still sizable
+set_option maxRecDepth 4000 in
+/-- Combinatorial expansion of a `6×6` determinant with opaque entries (the
+Leibniz formula, all `720` signed permutation products); separating this
+from the entry algebra keeps each `simp`/`ring` call small. -/
+private theorem det_fin_six {R : Type*} [CommRing R] (M : Matrix (Fin 6) (Fin 6) R) :
+    M.det =
+      M 0 0 * M 1 1 * M 2 2 * M 3 3 * M 4 4 * M 5 5 - M 0 0 * M 1 1 * M 2 2 * M 3 3 * M 4 5 * M 5 4 - M 0 0 * M 1 1 * M 2 2 * M 3 4 * M 4 3 * M 5 5 + M 0 0 * M 1 1 * M 2 2 * M 3 4 * M 4 5 * M 5 3 + M 0 0 * M 1 1 * M 2 2 * M 3 5 * M 4 3 * M 5 4 - M 0 0 * M 1 1 * M 2 2 * M 3 5 * M 4 4 * M 5 3 - M 0 0 * M 1 1 * M 2 3 * M 3 2 * M 4 4 * M 5 5 + M 0 0 * M 1 1 * M 2 3 * M 3 2 * M 4 5 * M 5 4 + M 0 0 * M 1 1 * M 2 3 * M 3 4 * M 4 2 * M 5 5 - M 0 0 * M 1 1 * M 2 3 * M 3 4 * M 4 5 * M 5 2 - M 0 0 * M 1 1 * M 2 3 * M 3 5 * M 4 2 * M 5 4 + M 0 0 * M 1 1 * M 2 3 * M 3 5 * M 4 4 * M 5 2 + M 0 0 * M 1 1 * M 2 4 * M 3 2 * M 4 3 * M 5 5 - M 0 0 * M 1 1 * M 2 4 * M 3 2 * M 4 5 * M 5 3 - M 0 0 * M 1 1 * M 2 4 * M 3 3 * M 4 2 * M 5 5 + M 0 0 * M 1 1 * M 2 4 * M 3 3 * M 4 5 * M 5 2 + M 0 0 * M 1 1 * M 2 4 * M 3 5 * M 4 2 * M 5 3 - M 0 0 * M 1 1 * M 2 4 * M 3 5 * M 4 3 * M 5 2 - M 0 0 * M 1 1 * M 2 5 * M 3 2 * M 4 3 * M 5 4 + M 0 0 * M 1 1 * M 2 5 * M 3 2 * M 4 4 * M 5 3 + M 0 0 * M 1 1 * M 2 5 * M 3 3 * M 4 2 * M 5 4 - M 0 0 * M 1 1 * M 2 5 * M 3 3 * M 4 4 * M 5 2 - M 0 0 * M 1 1 * M 2 5 * M 3 4 * M 4 2 * M 5 3 + M 0 0 * M 1 1 * M 2 5 * M 3 4 * M 4 3 * M 5 2 - M 0 0 * M 1 2 * M 2 1 * M 3 3 * M 4 4 * M 5 5 + M 0 0 * M 1 2 * M 2 1 * M 3 3 * M 4 5 * M 5 4 + M 0 0 * M 1 2 * M 2 1 * M 3 4 * M 4 3 * M 5 5 - M 0 0 * M 1 2 * M 2 1 * M 3 4 * M 4 5 * M 5 3 - M 0 0 * M 1 2 * M 2 1 * M 3 5 * M 4 3 * M 5 4 + M 0 0 * M 1 2 * M 2 1 * M 3 5 * M 4 4 * M 5 3 + M 0 0 * M 1 2 * M 2 3 * M 3 1 * M 4 4 * M 5 5 - M 0 0 * M 1 2 * M 2 3 * M 3 1 * M 4 5 * M 5 4 - M 0 0 * M 1 2 * M 2 3 * M 3 4 * M 4 1 * M 5 5 + M 0 0 * M 1 2 * M 2 3 * M 3 4 * M 4 5 * M 5 1 + M 0 0 * M 1 2 * M 2 3 * M 3 5 * M 4 1 * M 5 4 - M 0 0 * M 1 2 * M 2 3 * M 3 5 * M 4 4 * M 5 1 - M 0 0 * M 1 2 * M 2 4 * M 3 1 * M 4 3 * M 5 5 + M 0 0 * M 1 2 * M 2 4 * M 3 1 * M 4 5 * M 5 3 + M 0 0 * M 1 2 * M 2 4 * M 3 3 * M 4 1 * M 5 5 - M 0 0 * M 1 2 * M 2 4 * M 3 3 * M 4 5 * M 5 1 - M 0 0 * M 1 2 * M 2 4 * M 3 5 * M 4 1 * M 5 3 + M 0 0 * M 1 2 * M 2 4 * M 3 5 * M 4 3 * M 5 1 + M 0 0 * M 1 2 * M 2 5 * M 3 1 * M 4 3 * M 5 4 - M 0 0 * M 1 2 * M 2 5 * M 3 1 * M 4 4 * M 5 3 - M 0 0 * M 1 2 * M 2 5 * M 3 3 * M 4 1 * M 5 4 + M 0 0 * M 1 2 * M 2 5 * M 3 3 * M 4 4 * M 5 1 + M 0 0 * M 1 2 * M 2 5 * M 3 4 * M 4 1 * M 5 3 - M 0 0 * M 1 2 * M 2 5 * M 3 4 * M 4 3 * M 5 1 + M 0 0 * M 1 3 * M 2 1 * M 3 2 * M 4 4 * M 5 5 - M 0 0 * M 1 3 * M 2 1 * M 3 2 * M 4 5 * M 5 4 - M 0 0 * M 1 3 * M 2 1 * M 3 4 * M 4 2 * M 5 5 + M 0 0 * M 1 3 * M 2 1 * M 3 4 * M 4 5 * M 5 2 + M 0 0 * M 1 3 * M 2 1 * M 3 5 * M 4 2 * M 5 4 - M 0 0 * M 1 3 * M 2 1 * M 3 5 * M 4 4 * M 5 2 - M 0 0 * M 1 3 * M 2 2 * M 3 1 * M 4 4 * M 5 5 + M 0 0 * M 1 3 * M 2 2 * M 3 1 * M 4 5 * M 5 4 + M 0 0 * M 1 3 * M 2 2 * M 3 4 * M 4 1 * M 5 5 - M 0 0 * M 1 3 * M 2 2 * M 3 4 * M 4 5 * M 5 1 - M 0 0 * M 1 3 * M 2 2 * M 3 5 * M 4 1 * M 5 4 + M 0 0 * M 1 3 * M 2 2 * M 3 5 * M 4 4 * M 5 1 + M 0 0 * M 1 3 * M 2 4 * M 3 1 * M 4 2 * M 5 5 - M 0 0 * M 1 3 * M 2 4 * M 3 1 * M 4 5 * M 5 2 - M 0 0 * M 1 3 * M 2 4 * M 3 2 * M 4 1 * M 5 5 + M 0 0 * M 1 3 * M 2 4 * M 3 2 * M 4 5 * M 5 1 + M 0 0 * M 1 3 * M 2 4 * M 3 5 * M 4 1 * M 5 2 - M 0 0 * M 1 3 * M 2 4 * M 3 5 * M 4 2 * M 5 1 - M 0 0 * M 1 3 * M 2 5 * M 3 1 * M 4 2 * M 5 4 + M 0 0 * M 1 3 * M 2 5 * M 3 1 * M 4 4 * M 5 2 + M 0 0 * M 1 3 * M 2 5 * M 3 2 * M 4 1 * M 5 4 - M 0 0 * M 1 3 * M 2 5 * M 3 2 * M 4 4 * M 5 1 - M 0 0 * M 1 3 * M 2 5 * M 3 4 * M 4 1 * M 5 2 + M 0 0 * M 1 3 * M 2 5 * M 3 4 * M 4 2 * M 5 1 - M 0 0 * M 1 4 * M 2 1 * M 3 2 * M 4 3 * M 5 5 + M 0 0 * M 1 4 * M 2 1 * M 3 2 * M 4 5 * M 5 3 + M 0 0 * M 1 4 * M 2 1 * M 3 3 * M 4 2 * M 5 5 - M 0 0 * M 1 4 * M 2 1 * M 3 3 * M 4 5 * M 5 2 - M 0 0 * M 1 4 * M 2 1 * M 3 5 * M 4 2 * M 5 3 + M 0 0 * M 1 4 * M 2 1 * M 3 5 * M 4 3 * M 5 2 + M 0 0 * M 1 4 * M 2 2 * M 3 1 * M 4 3 * M 5 5 - M 0 0 * M 1 4 * M 2 2 * M 3 1 * M 4 5 * M 5 3 - M 0 0 * M 1 4 * M 2 2 * M 3 3 * M 4 1 * M 5 5 + M 0 0 * M 1 4 * M 2 2 * M 3 3 * M 4 5 * M 5 1 + M 0 0 * M 1 4 * M 2 2 * M 3 5 * M 4 1 * M 5 3 - M 0 0 * M 1 4 * M 2 2 * M 3 5 * M 4 3 * M 5 1 - M 0 0 * M 1 4 * M 2 3 * M 3 1 * M 4 2 * M 5 5 + M 0 0 * M 1 4 * M 2 3 * M 3 1 * M 4 5 * M 5 2 + M 0 0 * M 1 4 * M 2 3 * M 3 2 * M 4 1 * M 5 5 - M 0 0 * M 1 4 * M 2 3 * M 3 2 * M 4 5 * M 5 1 - M 0 0 * M 1 4 * M 2 3 * M 3 5 * M 4 1 * M 5 2 + M 0 0 * M 1 4 * M 2 3 * M 3 5 * M 4 2 * M 5 1 + M 0 0 * M 1 4 * M 2 5 * M 3 1 * M 4 2 * M 5 3 - M 0 0 * M 1 4 * M 2 5 * M 3 1 * M 4 3 * M 5 2 - M 0 0 * M 1 4 * M 2 5 * M 3 2 * M 4 1 * M 5 3 + M 0 0 * M 1 4 * M 2 5 * M 3 2 * M 4 3 * M 5 1 + M 0 0 * M 1 4 * M 2 5 * M 3 3 * M 4 1 * M 5 2 - M 0 0 * M 1 4 * M 2 5 * M 3 3 * M 4 2 * M 5 1 + M 0 0 * M 1 5 * M 2 1 * M 3 2 * M 4 3 * M 5 4 - M 0 0 * M 1 5 * M 2 1 * M 3 2 * M 4 4 * M 5 3 - M 0 0 * M 1 5 * M 2 1 * M 3 3 * M 4 2 * M 5 4 + M 0 0 * M 1 5 * M 2 1 * M 3 3 * M 4 4 * M 5 2 + M 0 0 * M 1 5 * M 2 1 * M 3 4 * M 4 2 * M 5 3 - M 0 0 * M 1 5 * M 2 1 * M 3 4 * M 4 3 * M 5 2 - M 0 0 * M 1 5 * M 2 2 * M 3 1 * M 4 3 * M 5 4 + M 0 0 * M 1 5 * M 2 2 * M 3 1 * M 4 4 * M 5 3 + M 0 0 * M 1 5 * M 2 2 * M 3 3 * M 4 1 * M 5 4 - M 0 0 * M 1 5 * M 2 2 * M 3 3 * M 4 4 * M 5 1 - M 0 0 * M 1 5 * M 2 2 * M 3 4 * M 4 1 * M 5 3 + M 0 0 * M 1 5 * M 2 2 * M 3 4 * M 4 3 * M 5 1 + M 0 0 * M 1 5 * M 2 3 * M 3 1 * M 4 2 * M 5 4 - M 0 0 * M 1 5 * M 2 3 * M 3 1 * M 4 4 * M 5 2 - M 0 0 * M 1 5 * M 2 3 * M 3 2 * M 4 1 * M 5 4 + M 0 0 * M 1 5 * M 2 3 * M 3 2 * M 4 4 * M 5 1 + M 0 0 * M 1 5 * M 2 3 * M 3 4 * M 4 1 * M 5 2 - M 0 0 * M 1 5 * M 2 3 * M 3 4 * M 4 2 * M 5 1 - M 0 0 * M 1 5 * M 2 4 * M 3 1 * M 4 2 * M 5 3 + M 0 0 * M 1 5 * M 2 4 * M 3 1 * M 4 3 * M 5 2 + M 0 0 * M 1 5 * M 2 4 * M 3 2 * M 4 1 * M 5 3 - M 0 0 * M 1 5 * M 2 4 * M 3 2 * M 4 3 * M 5 1 - M 0 0 * M 1 5 * M 2 4 * M 3 3 * M 4 1 * M 5 2 + M 0 0 * M 1 5 * M 2 4 * M 3 3 * M 4 2 * M 5 1 - M 0 1 * M 1 0 * M 2 2 * M 3 3 * M 4 4 * M 5 5 + M 0 1 * M 1 0 * M 2 2 * M 3 3 * M 4 5 * M 5 4 + M 0 1 * M 1 0 * M 2 2 * M 3 4 * M 4 3 * M 5 5 - M 0 1 * M 1 0 * M 2 2 * M 3 4 * M 4 5 * M 5 3 - M 0 1 * M 1 0 * M 2 2 * M 3 5 * M 4 3 * M 5 4 + M 0 1 * M 1 0 * M 2 2 * M 3 5 * M 4 4 * M 5 3 + M 0 1 * M 1 0 * M 2 3 * M 3 2 * M 4 4 * M 5 5 - M 0 1 * M 1 0 * M 2 3 * M 3 2 * M 4 5 * M 5 4 - M 0 1 * M 1 0 * M 2 3 * M 3 4 * M 4 2 * M 5 5 + M 0 1 * M 1 0 * M 2 3 * M 3 4 * M 4 5 * M 5 2 + M 0 1 * M 1 0 * M 2 3 * M 3 5 * M 4 2 * M 5 4 - M 0 1 * M 1 0 * M 2 3 * M 3 5 * M 4 4 * M 5 2 - M 0 1 * M 1 0 * M 2 4 * M 3 2 * M 4 3 * M 5 5 + M 0 1 * M 1 0 * M 2 4 * M 3 2 * M 4 5 * M 5 3 + M 0 1 * M 1 0 * M 2 4 * M 3 3 * M 4 2 * M 5 5 - M 0 1 * M 1 0 * M 2 4 * M 3 3 * M 4 5 * M 5 2 - M 0 1 * M 1 0 * M 2 4 * M 3 5 * M 4 2 * M 5 3 + M 0 1 * M 1 0 * M 2 4 * M 3 5 * M 4 3 * M 5 2 + M 0 1 * M 1 0 * M 2 5 * M 3 2 * M 4 3 * M 5 4 - M 0 1 * M 1 0 * M 2 5 * M 3 2 * M 4 4 * M 5 3 - M 0 1 * M 1 0 * M 2 5 * M 3 3 * M 4 2 * M 5 4 + M 0 1 * M 1 0 * M 2 5 * M 3 3 * M 4 4 * M 5 2 + M 0 1 * M 1 0 * M 2 5 * M 3 4 * M 4 2 * M 5 3 - M 0 1 * M 1 0 * M 2 5 * M 3 4 * M 4 3 * M 5 2 + M 0 1 * M 1 2 * M 2 0 * M 3 3 * M 4 4 * M 5 5 - M 0 1 * M 1 2 * M 2 0 * M 3 3 * M 4 5 * M 5 4 - M 0 1 * M 1 2 * M 2 0 * M 3 4 * M 4 3 * M 5 5 + M 0 1 * M 1 2 * M 2 0 * M 3 4 * M 4 5 * M 5 3 + M 0 1 * M 1 2 * M 2 0 * M 3 5 * M 4 3 * M 5 4 - M 0 1 * M 1 2 * M 2 0 * M 3 5 * M 4 4 * M 5 3 - M 0 1 * M 1 2 * M 2 3 * M 3 0 * M 4 4 * M 5 5 + M 0 1 * M 1 2 * M 2 3 * M 3 0 * M 4 5 * M 5 4 + M 0 1 * M 1 2 * M 2 3 * M 3 4 * M 4 0 * M 5 5 - M 0 1 * M 1 2 * M 2 3 * M 3 4 * M 4 5 * M 5 0 - M 0 1 * M 1 2 * M 2 3 * M 3 5 * M 4 0 * M 5 4 + M 0 1 * M 1 2 * M 2 3 * M 3 5 * M 4 4 * M 5 0 + M 0 1 * M 1 2 * M 2 4 * M 3 0 * M 4 3 * M 5 5 - M 0 1 * M 1 2 * M 2 4 * M 3 0 * M 4 5 * M 5 3 - M 0 1 * M 1 2 * M 2 4 * M 3 3 * M 4 0 * M 5 5 + M 0 1 * M 1 2 * M 2 4 * M 3 3 * M 4 5 * M 5 0 + M 0 1 * M 1 2 * M 2 4 * M 3 5 * M 4 0 * M 5 3 - M 0 1 * M 1 2 * M 2 4 * M 3 5 * M 4 3 * M 5 0 - M 0 1 * M 1 2 * M 2 5 * M 3 0 * M 4 3 * M 5 4 + M 0 1 * M 1 2 * M 2 5 * M 3 0 * M 4 4 * M 5 3 + M 0 1 * M 1 2 * M 2 5 * M 3 3 * M 4 0 * M 5 4 - M 0 1 * M 1 2 * M 2 5 * M 3 3 * M 4 4 * M 5 0 - M 0 1 * M 1 2 * M 2 5 * M 3 4 * M 4 0 * M 5 3 + M 0 1 * M 1 2 * M 2 5 * M 3 4 * M 4 3 * M 5 0 - M 0 1 * M 1 3 * M 2 0 * M 3 2 * M 4 4 * M 5 5 + M 0 1 * M 1 3 * M 2 0 * M 3 2 * M 4 5 * M 5 4 + M 0 1 * M 1 3 * M 2 0 * M 3 4 * M 4 2 * M 5 5 - M 0 1 * M 1 3 * M 2 0 * M 3 4 * M 4 5 * M 5 2 - M 0 1 * M 1 3 * M 2 0 * M 3 5 * M 4 2 * M 5 4 + M 0 1 * M 1 3 * M 2 0 * M 3 5 * M 4 4 * M 5 2 + M 0 1 * M 1 3 * M 2 2 * M 3 0 * M 4 4 * M 5 5 - M 0 1 * M 1 3 * M 2 2 * M 3 0 * M 4 5 * M 5 4 - M 0 1 * M 1 3 * M 2 2 * M 3 4 * M 4 0 * M 5 5 + M 0 1 * M 1 3 * M 2 2 * M 3 4 * M 4 5 * M 5 0 + M 0 1 * M 1 3 * M 2 2 * M 3 5 * M 4 0 * M 5 4 - M 0 1 * M 1 3 * M 2 2 * M 3 5 * M 4 4 * M 5 0 - M 0 1 * M 1 3 * M 2 4 * M 3 0 * M 4 2 * M 5 5 + M 0 1 * M 1 3 * M 2 4 * M 3 0 * M 4 5 * M 5 2 + M 0 1 * M 1 3 * M 2 4 * M 3 2 * M 4 0 * M 5 5 - M 0 1 * M 1 3 * M 2 4 * M 3 2 * M 4 5 * M 5 0 - M 0 1 * M 1 3 * M 2 4 * M 3 5 * M 4 0 * M 5 2 + M 0 1 * M 1 3 * M 2 4 * M 3 5 * M 4 2 * M 5 0 + M 0 1 * M 1 3 * M 2 5 * M 3 0 * M 4 2 * M 5 4 - M 0 1 * M 1 3 * M 2 5 * M 3 0 * M 4 4 * M 5 2 - M 0 1 * M 1 3 * M 2 5 * M 3 2 * M 4 0 * M 5 4 + M 0 1 * M 1 3 * M 2 5 * M 3 2 * M 4 4 * M 5 0 + M 0 1 * M 1 3 * M 2 5 * M 3 4 * M 4 0 * M 5 2 - M 0 1 * M 1 3 * M 2 5 * M 3 4 * M 4 2 * M 5 0 + M 0 1 * M 1 4 * M 2 0 * M 3 2 * M 4 3 * M 5 5 - M 0 1 * M 1 4 * M 2 0 * M 3 2 * M 4 5 * M 5 3 - M 0 1 * M 1 4 * M 2 0 * M 3 3 * M 4 2 * M 5 5 + M 0 1 * M 1 4 * M 2 0 * M 3 3 * M 4 5 * M 5 2 + M 0 1 * M 1 4 * M 2 0 * M 3 5 * M 4 2 * M 5 3 - M 0 1 * M 1 4 * M 2 0 * M 3 5 * M 4 3 * M 5 2 - M 0 1 * M 1 4 * M 2 2 * M 3 0 * M 4 3 * M 5 5 + M 0 1 * M 1 4 * M 2 2 * M 3 0 * M 4 5 * M 5 3 + M 0 1 * M 1 4 * M 2 2 * M 3 3 * M 4 0 * M 5 5 - M 0 1 * M 1 4 * M 2 2 * M 3 3 * M 4 5 * M 5 0 - M 0 1 * M 1 4 * M 2 2 * M 3 5 * M 4 0 * M 5 3 + M 0 1 * M 1 4 * M 2 2 * M 3 5 * M 4 3 * M 5 0 + M 0 1 * M 1 4 * M 2 3 * M 3 0 * M 4 2 * M 5 5 - M 0 1 * M 1 4 * M 2 3 * M 3 0 * M 4 5 * M 5 2 - M 0 1 * M 1 4 * M 2 3 * M 3 2 * M 4 0 * M 5 5 + M 0 1 * M 1 4 * M 2 3 * M 3 2 * M 4 5 * M 5 0 + M 0 1 * M 1 4 * M 2 3 * M 3 5 * M 4 0 * M 5 2 - M 0 1 * M 1 4 * M 2 3 * M 3 5 * M 4 2 * M 5 0 - M 0 1 * M 1 4 * M 2 5 * M 3 0 * M 4 2 * M 5 3 + M 0 1 * M 1 4 * M 2 5 * M 3 0 * M 4 3 * M 5 2 + M 0 1 * M 1 4 * M 2 5 * M 3 2 * M 4 0 * M 5 3 - M 0 1 * M 1 4 * M 2 5 * M 3 2 * M 4 3 * M 5 0 - M 0 1 * M 1 4 * M 2 5 * M 3 3 * M 4 0 * M 5 2 + M 0 1 * M 1 4 * M 2 5 * M 3 3 * M 4 2 * M 5 0 - M 0 1 * M 1 5 * M 2 0 * M 3 2 * M 4 3 * M 5 4 + M 0 1 * M 1 5 * M 2 0 * M 3 2 * M 4 4 * M 5 3 + M 0 1 * M 1 5 * M 2 0 * M 3 3 * M 4 2 * M 5 4 - M 0 1 * M 1 5 * M 2 0 * M 3 3 * M 4 4 * M 5 2 - M 0 1 * M 1 5 * M 2 0 * M 3 4 * M 4 2 * M 5 3 + M 0 1 * M 1 5 * M 2 0 * M 3 4 * M 4 3 * M 5 2 + M 0 1 * M 1 5 * M 2 2 * M 3 0 * M 4 3 * M 5 4 - M 0 1 * M 1 5 * M 2 2 * M 3 0 * M 4 4 * M 5 3 - M 0 1 * M 1 5 * M 2 2 * M 3 3 * M 4 0 * M 5 4 + M 0 1 * M 1 5 * M 2 2 * M 3 3 * M 4 4 * M 5 0 + M 0 1 * M 1 5 * M 2 2 * M 3 4 * M 4 0 * M 5 3 - M 0 1 * M 1 5 * M 2 2 * M 3 4 * M 4 3 * M 5 0 - M 0 1 * M 1 5 * M 2 3 * M 3 0 * M 4 2 * M 5 4 + M 0 1 * M 1 5 * M 2 3 * M 3 0 * M 4 4 * M 5 2 + M 0 1 * M 1 5 * M 2 3 * M 3 2 * M 4 0 * M 5 4 - M 0 1 * M 1 5 * M 2 3 * M 3 2 * M 4 4 * M 5 0 - M 0 1 * M 1 5 * M 2 3 * M 3 4 * M 4 0 * M 5 2 + M 0 1 * M 1 5 * M 2 3 * M 3 4 * M 4 2 * M 5 0 + M 0 1 * M 1 5 * M 2 4 * M 3 0 * M 4 2 * M 5 3 - M 0 1 * M 1 5 * M 2 4 * M 3 0 * M 4 3 * M 5 2 - M 0 1 * M 1 5 * M 2 4 * M 3 2 * M 4 0 * M 5 3 + M 0 1 * M 1 5 * M 2 4 * M 3 2 * M 4 3 * M 5 0 + M 0 1 * M 1 5 * M 2 4 * M 3 3 * M 4 0 * M 5 2 - M 0 1 * M 1 5 * M 2 4 * M 3 3 * M 4 2 * M 5 0 + M 0 2 * M 1 0 * M 2 1 * M 3 3 * M 4 4 * M 5 5 - M 0 2 * M 1 0 * M 2 1 * M 3 3 * M 4 5 * M 5 4 - M 0 2 * M 1 0 * M 2 1 * M 3 4 * M 4 3 * M 5 5 + M 0 2 * M 1 0 * M 2 1 * M 3 4 * M 4 5 * M 5 3 + M 0 2 * M 1 0 * M 2 1 * M 3 5 * M 4 3 * M 5 4 - M 0 2 * M 1 0 * M 2 1 * M 3 5 * M 4 4 * M 5 3 - M 0 2 * M 1 0 * M 2 3 * M 3 1 * M 4 4 * M 5 5 + M 0 2 * M 1 0 * M 2 3 * M 3 1 * M 4 5 * M 5 4 + M 0 2 * M 1 0 * M 2 3 * M 3 4 * M 4 1 * M 5 5 - M 0 2 * M 1 0 * M 2 3 * M 3 4 * M 4 5 * M 5 1 - M 0 2 * M 1 0 * M 2 3 * M 3 5 * M 4 1 * M 5 4 + M 0 2 * M 1 0 * M 2 3 * M 3 5 * M 4 4 * M 5 1 + M 0 2 * M 1 0 * M 2 4 * M 3 1 * M 4 3 * M 5 5 - M 0 2 * M 1 0 * M 2 4 * M 3 1 * M 4 5 * M 5 3 - M 0 2 * M 1 0 * M 2 4 * M 3 3 * M 4 1 * M 5 5 + M 0 2 * M 1 0 * M 2 4 * M 3 3 * M 4 5 * M 5 1 + M 0 2 * M 1 0 * M 2 4 * M 3 5 * M 4 1 * M 5 3 - M 0 2 * M 1 0 * M 2 4 * M 3 5 * M 4 3 * M 5 1 - M 0 2 * M 1 0 * M 2 5 * M 3 1 * M 4 3 * M 5 4 + M 0 2 * M 1 0 * M 2 5 * M 3 1 * M 4 4 * M 5 3 + M 0 2 * M 1 0 * M 2 5 * M 3 3 * M 4 1 * M 5 4 - M 0 2 * M 1 0 * M 2 5 * M 3 3 * M 4 4 * M 5 1 - M 0 2 * M 1 0 * M 2 5 * M 3 4 * M 4 1 * M 5 3 + M 0 2 * M 1 0 * M 2 5 * M 3 4 * M 4 3 * M 5 1 - M 0 2 * M 1 1 * M 2 0 * M 3 3 * M 4 4 * M 5 5 + M 0 2 * M 1 1 * M 2 0 * M 3 3 * M 4 5 * M 5 4 + M 0 2 * M 1 1 * M 2 0 * M 3 4 * M 4 3 * M 5 5 - M 0 2 * M 1 1 * M 2 0 * M 3 4 * M 4 5 * M 5 3 - M 0 2 * M 1 1 * M 2 0 * M 3 5 * M 4 3 * M 5 4 + M 0 2 * M 1 1 * M 2 0 * M 3 5 * M 4 4 * M 5 3 + M 0 2 * M 1 1 * M 2 3 * M 3 0 * M 4 4 * M 5 5 - M 0 2 * M 1 1 * M 2 3 * M 3 0 * M 4 5 * M 5 4 - M 0 2 * M 1 1 * M 2 3 * M 3 4 * M 4 0 * M 5 5 + M 0 2 * M 1 1 * M 2 3 * M 3 4 * M 4 5 * M 5 0 + M 0 2 * M 1 1 * M 2 3 * M 3 5 * M 4 0 * M 5 4 - M 0 2 * M 1 1 * M 2 3 * M 3 5 * M 4 4 * M 5 0 - M 0 2 * M 1 1 * M 2 4 * M 3 0 * M 4 3 * M 5 5 + M 0 2 * M 1 1 * M 2 4 * M 3 0 * M 4 5 * M 5 3 + M 0 2 * M 1 1 * M 2 4 * M 3 3 * M 4 0 * M 5 5 - M 0 2 * M 1 1 * M 2 4 * M 3 3 * M 4 5 * M 5 0 - M 0 2 * M 1 1 * M 2 4 * M 3 5 * M 4 0 * M 5 3 + M 0 2 * M 1 1 * M 2 4 * M 3 5 * M 4 3 * M 5 0 + M 0 2 * M 1 1 * M 2 5 * M 3 0 * M 4 3 * M 5 4 - M 0 2 * M 1 1 * M 2 5 * M 3 0 * M 4 4 * M 5 3 - M 0 2 * M 1 1 * M 2 5 * M 3 3 * M 4 0 * M 5 4 + M 0 2 * M 1 1 * M 2 5 * M 3 3 * M 4 4 * M 5 0 + M 0 2 * M 1 1 * M 2 5 * M 3 4 * M 4 0 * M 5 3 - M 0 2 * M 1 1 * M 2 5 * M 3 4 * M 4 3 * M 5 0 + M 0 2 * M 1 3 * M 2 0 * M 3 1 * M 4 4 * M 5 5 - M 0 2 * M 1 3 * M 2 0 * M 3 1 * M 4 5 * M 5 4 - M 0 2 * M 1 3 * M 2 0 * M 3 4 * M 4 1 * M 5 5 + M 0 2 * M 1 3 * M 2 0 * M 3 4 * M 4 5 * M 5 1 + M 0 2 * M 1 3 * M 2 0 * M 3 5 * M 4 1 * M 5 4 - M 0 2 * M 1 3 * M 2 0 * M 3 5 * M 4 4 * M 5 1 - M 0 2 * M 1 3 * M 2 1 * M 3 0 * M 4 4 * M 5 5 + M 0 2 * M 1 3 * M 2 1 * M 3 0 * M 4 5 * M 5 4 + M 0 2 * M 1 3 * M 2 1 * M 3 4 * M 4 0 * M 5 5 - M 0 2 * M 1 3 * M 2 1 * M 3 4 * M 4 5 * M 5 0 - M 0 2 * M 1 3 * M 2 1 * M 3 5 * M 4 0 * M 5 4 + M 0 2 * M 1 3 * M 2 1 * M 3 5 * M 4 4 * M 5 0 + M 0 2 * M 1 3 * M 2 4 * M 3 0 * M 4 1 * M 5 5 - M 0 2 * M 1 3 * M 2 4 * M 3 0 * M 4 5 * M 5 1 - M 0 2 * M 1 3 * M 2 4 * M 3 1 * M 4 0 * M 5 5 + M 0 2 * M 1 3 * M 2 4 * M 3 1 * M 4 5 * M 5 0 + M 0 2 * M 1 3 * M 2 4 * M 3 5 * M 4 0 * M 5 1 - M 0 2 * M 1 3 * M 2 4 * M 3 5 * M 4 1 * M 5 0 - M 0 2 * M 1 3 * M 2 5 * M 3 0 * M 4 1 * M 5 4 + M 0 2 * M 1 3 * M 2 5 * M 3 0 * M 4 4 * M 5 1 + M 0 2 * M 1 3 * M 2 5 * M 3 1 * M 4 0 * M 5 4 - M 0 2 * M 1 3 * M 2 5 * M 3 1 * M 4 4 * M 5 0 - M 0 2 * M 1 3 * M 2 5 * M 3 4 * M 4 0 * M 5 1 + M 0 2 * M 1 3 * M 2 5 * M 3 4 * M 4 1 * M 5 0 - M 0 2 * M 1 4 * M 2 0 * M 3 1 * M 4 3 * M 5 5 + M 0 2 * M 1 4 * M 2 0 * M 3 1 * M 4 5 * M 5 3 + M 0 2 * M 1 4 * M 2 0 * M 3 3 * M 4 1 * M 5 5 - M 0 2 * M 1 4 * M 2 0 * M 3 3 * M 4 5 * M 5 1 - M 0 2 * M 1 4 * M 2 0 * M 3 5 * M 4 1 * M 5 3 + M 0 2 * M 1 4 * M 2 0 * M 3 5 * M 4 3 * M 5 1 + M 0 2 * M 1 4 * M 2 1 * M 3 0 * M 4 3 * M 5 5 - M 0 2 * M 1 4 * M 2 1 * M 3 0 * M 4 5 * M 5 3 - M 0 2 * M 1 4 * M 2 1 * M 3 3 * M 4 0 * M 5 5 + M 0 2 * M 1 4 * M 2 1 * M 3 3 * M 4 5 * M 5 0 + M 0 2 * M 1 4 * M 2 1 * M 3 5 * M 4 0 * M 5 3 - M 0 2 * M 1 4 * M 2 1 * M 3 5 * M 4 3 * M 5 0 - M 0 2 * M 1 4 * M 2 3 * M 3 0 * M 4 1 * M 5 5 + M 0 2 * M 1 4 * M 2 3 * M 3 0 * M 4 5 * M 5 1 + M 0 2 * M 1 4 * M 2 3 * M 3 1 * M 4 0 * M 5 5 - M 0 2 * M 1 4 * M 2 3 * M 3 1 * M 4 5 * M 5 0 - M 0 2 * M 1 4 * M 2 3 * M 3 5 * M 4 0 * M 5 1 + M 0 2 * M 1 4 * M 2 3 * M 3 5 * M 4 1 * M 5 0 + M 0 2 * M 1 4 * M 2 5 * M 3 0 * M 4 1 * M 5 3 - M 0 2 * M 1 4 * M 2 5 * M 3 0 * M 4 3 * M 5 1 - M 0 2 * M 1 4 * M 2 5 * M 3 1 * M 4 0 * M 5 3 + M 0 2 * M 1 4 * M 2 5 * M 3 1 * M 4 3 * M 5 0 + M 0 2 * M 1 4 * M 2 5 * M 3 3 * M 4 0 * M 5 1 - M 0 2 * M 1 4 * M 2 5 * M 3 3 * M 4 1 * M 5 0 + M 0 2 * M 1 5 * M 2 0 * M 3 1 * M 4 3 * M 5 4 - M 0 2 * M 1 5 * M 2 0 * M 3 1 * M 4 4 * M 5 3 - M 0 2 * M 1 5 * M 2 0 * M 3 3 * M 4 1 * M 5 4 + M 0 2 * M 1 5 * M 2 0 * M 3 3 * M 4 4 * M 5 1 + M 0 2 * M 1 5 * M 2 0 * M 3 4 * M 4 1 * M 5 3 - M 0 2 * M 1 5 * M 2 0 * M 3 4 * M 4 3 * M 5 1 - M 0 2 * M 1 5 * M 2 1 * M 3 0 * M 4 3 * M 5 4 + M 0 2 * M 1 5 * M 2 1 * M 3 0 * M 4 4 * M 5 3 + M 0 2 * M 1 5 * M 2 1 * M 3 3 * M 4 0 * M 5 4 - M 0 2 * M 1 5 * M 2 1 * M 3 3 * M 4 4 * M 5 0 - M 0 2 * M 1 5 * M 2 1 * M 3 4 * M 4 0 * M 5 3 + M 0 2 * M 1 5 * M 2 1 * M 3 4 * M 4 3 * M 5 0 + M 0 2 * M 1 5 * M 2 3 * M 3 0 * M 4 1 * M 5 4 - M 0 2 * M 1 5 * M 2 3 * M 3 0 * M 4 4 * M 5 1 - M 0 2 * M 1 5 * M 2 3 * M 3 1 * M 4 0 * M 5 4 + M 0 2 * M 1 5 * M 2 3 * M 3 1 * M 4 4 * M 5 0 + M 0 2 * M 1 5 * M 2 3 * M 3 4 * M 4 0 * M 5 1 - M 0 2 * M 1 5 * M 2 3 * M 3 4 * M 4 1 * M 5 0 - M 0 2 * M 1 5 * M 2 4 * M 3 0 * M 4 1 * M 5 3 + M 0 2 * M 1 5 * M 2 4 * M 3 0 * M 4 3 * M 5 1 + M 0 2 * M 1 5 * M 2 4 * M 3 1 * M 4 0 * M 5 3 - M 0 2 * M 1 5 * M 2 4 * M 3 1 * M 4 3 * M 5 0 - M 0 2 * M 1 5 * M 2 4 * M 3 3 * M 4 0 * M 5 1 + M 0 2 * M 1 5 * M 2 4 * M 3 3 * M 4 1 * M 5 0 - M 0 3 * M 1 0 * M 2 1 * M 3 2 * M 4 4 * M 5 5 + M 0 3 * M 1 0 * M 2 1 * M 3 2 * M 4 5 * M 5 4 + M 0 3 * M 1 0 * M 2 1 * M 3 4 * M 4 2 * M 5 5 - M 0 3 * M 1 0 * M 2 1 * M 3 4 * M 4 5 * M 5 2 - M 0 3 * M 1 0 * M 2 1 * M 3 5 * M 4 2 * M 5 4 + M 0 3 * M 1 0 * M 2 1 * M 3 5 * M 4 4 * M 5 2 + M 0 3 * M 1 0 * M 2 2 * M 3 1 * M 4 4 * M 5 5 - M 0 3 * M 1 0 * M 2 2 * M 3 1 * M 4 5 * M 5 4 - M 0 3 * M 1 0 * M 2 2 * M 3 4 * M 4 1 * M 5 5 + M 0 3 * M 1 0 * M 2 2 * M 3 4 * M 4 5 * M 5 1 + M 0 3 * M 1 0 * M 2 2 * M 3 5 * M 4 1 * M 5 4 - M 0 3 * M 1 0 * M 2 2 * M 3 5 * M 4 4 * M 5 1 - M 0 3 * M 1 0 * M 2 4 * M 3 1 * M 4 2 * M 5 5 + M 0 3 * M 1 0 * M 2 4 * M 3 1 * M 4 5 * M 5 2 + M 0 3 * M 1 0 * M 2 4 * M 3 2 * M 4 1 * M 5 5 - M 0 3 * M 1 0 * M 2 4 * M 3 2 * M 4 5 * M 5 1 - M 0 3 * M 1 0 * M 2 4 * M 3 5 * M 4 1 * M 5 2 + M 0 3 * M 1 0 * M 2 4 * M 3 5 * M 4 2 * M 5 1 + M 0 3 * M 1 0 * M 2 5 * M 3 1 * M 4 2 * M 5 4 - M 0 3 * M 1 0 * M 2 5 * M 3 1 * M 4 4 * M 5 2 - M 0 3 * M 1 0 * M 2 5 * M 3 2 * M 4 1 * M 5 4 + M 0 3 * M 1 0 * M 2 5 * M 3 2 * M 4 4 * M 5 1 + M 0 3 * M 1 0 * M 2 5 * M 3 4 * M 4 1 * M 5 2 - M 0 3 * M 1 0 * M 2 5 * M 3 4 * M 4 2 * M 5 1 + M 0 3 * M 1 1 * M 2 0 * M 3 2 * M 4 4 * M 5 5 - M 0 3 * M 1 1 * M 2 0 * M 3 2 * M 4 5 * M 5 4 - M 0 3 * M 1 1 * M 2 0 * M 3 4 * M 4 2 * M 5 5 + M 0 3 * M 1 1 * M 2 0 * M 3 4 * M 4 5 * M 5 2 + M 0 3 * M 1 1 * M 2 0 * M 3 5 * M 4 2 * M 5 4 - M 0 3 * M 1 1 * M 2 0 * M 3 5 * M 4 4 * M 5 2 - M 0 3 * M 1 1 * M 2 2 * M 3 0 * M 4 4 * M 5 5 + M 0 3 * M 1 1 * M 2 2 * M 3 0 * M 4 5 * M 5 4 + M 0 3 * M 1 1 * M 2 2 * M 3 4 * M 4 0 * M 5 5 - M 0 3 * M 1 1 * M 2 2 * M 3 4 * M 4 5 * M 5 0 - M 0 3 * M 1 1 * M 2 2 * M 3 5 * M 4 0 * M 5 4 + M 0 3 * M 1 1 * M 2 2 * M 3 5 * M 4 4 * M 5 0 + M 0 3 * M 1 1 * M 2 4 * M 3 0 * M 4 2 * M 5 5 - M 0 3 * M 1 1 * M 2 4 * M 3 0 * M 4 5 * M 5 2 - M 0 3 * M 1 1 * M 2 4 * M 3 2 * M 4 0 * M 5 5 + M 0 3 * M 1 1 * M 2 4 * M 3 2 * M 4 5 * M 5 0 + M 0 3 * M 1 1 * M 2 4 * M 3 5 * M 4 0 * M 5 2 - M 0 3 * M 1 1 * M 2 4 * M 3 5 * M 4 2 * M 5 0 - M 0 3 * M 1 1 * M 2 5 * M 3 0 * M 4 2 * M 5 4 + M 0 3 * M 1 1 * M 2 5 * M 3 0 * M 4 4 * M 5 2 + M 0 3 * M 1 1 * M 2 5 * M 3 2 * M 4 0 * M 5 4 - M 0 3 * M 1 1 * M 2 5 * M 3 2 * M 4 4 * M 5 0 - M 0 3 * M 1 1 * M 2 5 * M 3 4 * M 4 0 * M 5 2 + M 0 3 * M 1 1 * M 2 5 * M 3 4 * M 4 2 * M 5 0 - M 0 3 * M 1 2 * M 2 0 * M 3 1 * M 4 4 * M 5 5 + M 0 3 * M 1 2 * M 2 0 * M 3 1 * M 4 5 * M 5 4 + M 0 3 * M 1 2 * M 2 0 * M 3 4 * M 4 1 * M 5 5 - M 0 3 * M 1 2 * M 2 0 * M 3 4 * M 4 5 * M 5 1 - M 0 3 * M 1 2 * M 2 0 * M 3 5 * M 4 1 * M 5 4 + M 0 3 * M 1 2 * M 2 0 * M 3 5 * M 4 4 * M 5 1 + M 0 3 * M 1 2 * M 2 1 * M 3 0 * M 4 4 * M 5 5 - M 0 3 * M 1 2 * M 2 1 * M 3 0 * M 4 5 * M 5 4 - M 0 3 * M 1 2 * M 2 1 * M 3 4 * M 4 0 * M 5 5 + M 0 3 * M 1 2 * M 2 1 * M 3 4 * M 4 5 * M 5 0 + M 0 3 * M 1 2 * M 2 1 * M 3 5 * M 4 0 * M 5 4 - M 0 3 * M 1 2 * M 2 1 * M 3 5 * M 4 4 * M 5 0 - M 0 3 * M 1 2 * M 2 4 * M 3 0 * M 4 1 * M 5 5 + M 0 3 * M 1 2 * M 2 4 * M 3 0 * M 4 5 * M 5 1 + M 0 3 * M 1 2 * M 2 4 * M 3 1 * M 4 0 * M 5 5 - M 0 3 * M 1 2 * M 2 4 * M 3 1 * M 4 5 * M 5 0 - M 0 3 * M 1 2 * M 2 4 * M 3 5 * M 4 0 * M 5 1 + M 0 3 * M 1 2 * M 2 4 * M 3 5 * M 4 1 * M 5 0 + M 0 3 * M 1 2 * M 2 5 * M 3 0 * M 4 1 * M 5 4 - M 0 3 * M 1 2 * M 2 5 * M 3 0 * M 4 4 * M 5 1 - M 0 3 * M 1 2 * M 2 5 * M 3 1 * M 4 0 * M 5 4 + M 0 3 * M 1 2 * M 2 5 * M 3 1 * M 4 4 * M 5 0 + M 0 3 * M 1 2 * M 2 5 * M 3 4 * M 4 0 * M 5 1 - M 0 3 * M 1 2 * M 2 5 * M 3 4 * M 4 1 * M 5 0 + M 0 3 * M 1 4 * M 2 0 * M 3 1 * M 4 2 * M 5 5 - M 0 3 * M 1 4 * M 2 0 * M 3 1 * M 4 5 * M 5 2 - M 0 3 * M 1 4 * M 2 0 * M 3 2 * M 4 1 * M 5 5 + M 0 3 * M 1 4 * M 2 0 * M 3 2 * M 4 5 * M 5 1 + M 0 3 * M 1 4 * M 2 0 * M 3 5 * M 4 1 * M 5 2 - M 0 3 * M 1 4 * M 2 0 * M 3 5 * M 4 2 * M 5 1 - M 0 3 * M 1 4 * M 2 1 * M 3 0 * M 4 2 * M 5 5 + M 0 3 * M 1 4 * M 2 1 * M 3 0 * M 4 5 * M 5 2 + M 0 3 * M 1 4 * M 2 1 * M 3 2 * M 4 0 * M 5 5 - M 0 3 * M 1 4 * M 2 1 * M 3 2 * M 4 5 * M 5 0 - M 0 3 * M 1 4 * M 2 1 * M 3 5 * M 4 0 * M 5 2 + M 0 3 * M 1 4 * M 2 1 * M 3 5 * M 4 2 * M 5 0 + M 0 3 * M 1 4 * M 2 2 * M 3 0 * M 4 1 * M 5 5 - M 0 3 * M 1 4 * M 2 2 * M 3 0 * M 4 5 * M 5 1 - M 0 3 * M 1 4 * M 2 2 * M 3 1 * M 4 0 * M 5 5 + M 0 3 * M 1 4 * M 2 2 * M 3 1 * M 4 5 * M 5 0 + M 0 3 * M 1 4 * M 2 2 * M 3 5 * M 4 0 * M 5 1 - M 0 3 * M 1 4 * M 2 2 * M 3 5 * M 4 1 * M 5 0 - M 0 3 * M 1 4 * M 2 5 * M 3 0 * M 4 1 * M 5 2 + M 0 3 * M 1 4 * M 2 5 * M 3 0 * M 4 2 * M 5 1 + M 0 3 * M 1 4 * M 2 5 * M 3 1 * M 4 0 * M 5 2 - M 0 3 * M 1 4 * M 2 5 * M 3 1 * M 4 2 * M 5 0 - M 0 3 * M 1 4 * M 2 5 * M 3 2 * M 4 0 * M 5 1 + M 0 3 * M 1 4 * M 2 5 * M 3 2 * M 4 1 * M 5 0 - M 0 3 * M 1 5 * M 2 0 * M 3 1 * M 4 2 * M 5 4 + M 0 3 * M 1 5 * M 2 0 * M 3 1 * M 4 4 * M 5 2 + M 0 3 * M 1 5 * M 2 0 * M 3 2 * M 4 1 * M 5 4 - M 0 3 * M 1 5 * M 2 0 * M 3 2 * M 4 4 * M 5 1 - M 0 3 * M 1 5 * M 2 0 * M 3 4 * M 4 1 * M 5 2 + M 0 3 * M 1 5 * M 2 0 * M 3 4 * M 4 2 * M 5 1 + M 0 3 * M 1 5 * M 2 1 * M 3 0 * M 4 2 * M 5 4 - M 0 3 * M 1 5 * M 2 1 * M 3 0 * M 4 4 * M 5 2 - M 0 3 * M 1 5 * M 2 1 * M 3 2 * M 4 0 * M 5 4 + M 0 3 * M 1 5 * M 2 1 * M 3 2 * M 4 4 * M 5 0 + M 0 3 * M 1 5 * M 2 1 * M 3 4 * M 4 0 * M 5 2 - M 0 3 * M 1 5 * M 2 1 * M 3 4 * M 4 2 * M 5 0 - M 0 3 * M 1 5 * M 2 2 * M 3 0 * M 4 1 * M 5 4 + M 0 3 * M 1 5 * M 2 2 * M 3 0 * M 4 4 * M 5 1 + M 0 3 * M 1 5 * M 2 2 * M 3 1 * M 4 0 * M 5 4 - M 0 3 * M 1 5 * M 2 2 * M 3 1 * M 4 4 * M 5 0 - M 0 3 * M 1 5 * M 2 2 * M 3 4 * M 4 0 * M 5 1 + M 0 3 * M 1 5 * M 2 2 * M 3 4 * M 4 1 * M 5 0 + M 0 3 * M 1 5 * M 2 4 * M 3 0 * M 4 1 * M 5 2 - M 0 3 * M 1 5 * M 2 4 * M 3 0 * M 4 2 * M 5 1 - M 0 3 * M 1 5 * M 2 4 * M 3 1 * M 4 0 * M 5 2 + M 0 3 * M 1 5 * M 2 4 * M 3 1 * M 4 2 * M 5 0 + M 0 3 * M 1 5 * M 2 4 * M 3 2 * M 4 0 * M 5 1 - M 0 3 * M 1 5 * M 2 4 * M 3 2 * M 4 1 * M 5 0 + M 0 4 * M 1 0 * M 2 1 * M 3 2 * M 4 3 * M 5 5 - M 0 4 * M 1 0 * M 2 1 * M 3 2 * M 4 5 * M 5 3 - M 0 4 * M 1 0 * M 2 1 * M 3 3 * M 4 2 * M 5 5 + M 0 4 * M 1 0 * M 2 1 * M 3 3 * M 4 5 * M 5 2 + M 0 4 * M 1 0 * M 2 1 * M 3 5 * M 4 2 * M 5 3 - M 0 4 * M 1 0 * M 2 1 * M 3 5 * M 4 3 * M 5 2 - M 0 4 * M 1 0 * M 2 2 * M 3 1 * M 4 3 * M 5 5 + M 0 4 * M 1 0 * M 2 2 * M 3 1 * M 4 5 * M 5 3 + M 0 4 * M 1 0 * M 2 2 * M 3 3 * M 4 1 * M 5 5 - M 0 4 * M 1 0 * M 2 2 * M 3 3 * M 4 5 * M 5 1 - M 0 4 * M 1 0 * M 2 2 * M 3 5 * M 4 1 * M 5 3 + M 0 4 * M 1 0 * M 2 2 * M 3 5 * M 4 3 * M 5 1 + M 0 4 * M 1 0 * M 2 3 * M 3 1 * M 4 2 * M 5 5 - M 0 4 * M 1 0 * M 2 3 * M 3 1 * M 4 5 * M 5 2 - M 0 4 * M 1 0 * M 2 3 * M 3 2 * M 4 1 * M 5 5 + M 0 4 * M 1 0 * M 2 3 * M 3 2 * M 4 5 * M 5 1 + M 0 4 * M 1 0 * M 2 3 * M 3 5 * M 4 1 * M 5 2 - M 0 4 * M 1 0 * M 2 3 * M 3 5 * M 4 2 * M 5 1 - M 0 4 * M 1 0 * M 2 5 * M 3 1 * M 4 2 * M 5 3 + M 0 4 * M 1 0 * M 2 5 * M 3 1 * M 4 3 * M 5 2 + M 0 4 * M 1 0 * M 2 5 * M 3 2 * M 4 1 * M 5 3 - M 0 4 * M 1 0 * M 2 5 * M 3 2 * M 4 3 * M 5 1 - M 0 4 * M 1 0 * M 2 5 * M 3 3 * M 4 1 * M 5 2 + M 0 4 * M 1 0 * M 2 5 * M 3 3 * M 4 2 * M 5 1 - M 0 4 * M 1 1 * M 2 0 * M 3 2 * M 4 3 * M 5 5 + M 0 4 * M 1 1 * M 2 0 * M 3 2 * M 4 5 * M 5 3 + M 0 4 * M 1 1 * M 2 0 * M 3 3 * M 4 2 * M 5 5 - M 0 4 * M 1 1 * M 2 0 * M 3 3 * M 4 5 * M 5 2 - M 0 4 * M 1 1 * M 2 0 * M 3 5 * M 4 2 * M 5 3 + M 0 4 * M 1 1 * M 2 0 * M 3 5 * M 4 3 * M 5 2 + M 0 4 * M 1 1 * M 2 2 * M 3 0 * M 4 3 * M 5 5 - M 0 4 * M 1 1 * M 2 2 * M 3 0 * M 4 5 * M 5 3 - M 0 4 * M 1 1 * M 2 2 * M 3 3 * M 4 0 * M 5 5 + M 0 4 * M 1 1 * M 2 2 * M 3 3 * M 4 5 * M 5 0 + M 0 4 * M 1 1 * M 2 2 * M 3 5 * M 4 0 * M 5 3 - M 0 4 * M 1 1 * M 2 2 * M 3 5 * M 4 3 * M 5 0 - M 0 4 * M 1 1 * M 2 3 * M 3 0 * M 4 2 * M 5 5 + M 0 4 * M 1 1 * M 2 3 * M 3 0 * M 4 5 * M 5 2 + M 0 4 * M 1 1 * M 2 3 * M 3 2 * M 4 0 * M 5 5 - M 0 4 * M 1 1 * M 2 3 * M 3 2 * M 4 5 * M 5 0 - M 0 4 * M 1 1 * M 2 3 * M 3 5 * M 4 0 * M 5 2 + M 0 4 * M 1 1 * M 2 3 * M 3 5 * M 4 2 * M 5 0 + M 0 4 * M 1 1 * M 2 5 * M 3 0 * M 4 2 * M 5 3 - M 0 4 * M 1 1 * M 2 5 * M 3 0 * M 4 3 * M 5 2 - M 0 4 * M 1 1 * M 2 5 * M 3 2 * M 4 0 * M 5 3 + M 0 4 * M 1 1 * M 2 5 * M 3 2 * M 4 3 * M 5 0 + M 0 4 * M 1 1 * M 2 5 * M 3 3 * M 4 0 * M 5 2 - M 0 4 * M 1 1 * M 2 5 * M 3 3 * M 4 2 * M 5 0 + M 0 4 * M 1 2 * M 2 0 * M 3 1 * M 4 3 * M 5 5 - M 0 4 * M 1 2 * M 2 0 * M 3 1 * M 4 5 * M 5 3 - M 0 4 * M 1 2 * M 2 0 * M 3 3 * M 4 1 * M 5 5 + M 0 4 * M 1 2 * M 2 0 * M 3 3 * M 4 5 * M 5 1 + M 0 4 * M 1 2 * M 2 0 * M 3 5 * M 4 1 * M 5 3 - M 0 4 * M 1 2 * M 2 0 * M 3 5 * M 4 3 * M 5 1 - M 0 4 * M 1 2 * M 2 1 * M 3 0 * M 4 3 * M 5 5 + M 0 4 * M 1 2 * M 2 1 * M 3 0 * M 4 5 * M 5 3 + M 0 4 * M 1 2 * M 2 1 * M 3 3 * M 4 0 * M 5 5 - M 0 4 * M 1 2 * M 2 1 * M 3 3 * M 4 5 * M 5 0 - M 0 4 * M 1 2 * M 2 1 * M 3 5 * M 4 0 * M 5 3 + M 0 4 * M 1 2 * M 2 1 * M 3 5 * M 4 3 * M 5 0 + M 0 4 * M 1 2 * M 2 3 * M 3 0 * M 4 1 * M 5 5 - M 0 4 * M 1 2 * M 2 3 * M 3 0 * M 4 5 * M 5 1 - M 0 4 * M 1 2 * M 2 3 * M 3 1 * M 4 0 * M 5 5 + M 0 4 * M 1 2 * M 2 3 * M 3 1 * M 4 5 * M 5 0 + M 0 4 * M 1 2 * M 2 3 * M 3 5 * M 4 0 * M 5 1 - M 0 4 * M 1 2 * M 2 3 * M 3 5 * M 4 1 * M 5 0 - M 0 4 * M 1 2 * M 2 5 * M 3 0 * M 4 1 * M 5 3 + M 0 4 * M 1 2 * M 2 5 * M 3 0 * M 4 3 * M 5 1 + M 0 4 * M 1 2 * M 2 5 * M 3 1 * M 4 0 * M 5 3 - M 0 4 * M 1 2 * M 2 5 * M 3 1 * M 4 3 * M 5 0 - M 0 4 * M 1 2 * M 2 5 * M 3 3 * M 4 0 * M 5 1 + M 0 4 * M 1 2 * M 2 5 * M 3 3 * M 4 1 * M 5 0 - M 0 4 * M 1 3 * M 2 0 * M 3 1 * M 4 2 * M 5 5 + M 0 4 * M 1 3 * M 2 0 * M 3 1 * M 4 5 * M 5 2 + M 0 4 * M 1 3 * M 2 0 * M 3 2 * M 4 1 * M 5 5 - M 0 4 * M 1 3 * M 2 0 * M 3 2 * M 4 5 * M 5 1 - M 0 4 * M 1 3 * M 2 0 * M 3 5 * M 4 1 * M 5 2 + M 0 4 * M 1 3 * M 2 0 * M 3 5 * M 4 2 * M 5 1 + M 0 4 * M 1 3 * M 2 1 * M 3 0 * M 4 2 * M 5 5 - M 0 4 * M 1 3 * M 2 1 * M 3 0 * M 4 5 * M 5 2 - M 0 4 * M 1 3 * M 2 1 * M 3 2 * M 4 0 * M 5 5 + M 0 4 * M 1 3 * M 2 1 * M 3 2 * M 4 5 * M 5 0 + M 0 4 * M 1 3 * M 2 1 * M 3 5 * M 4 0 * M 5 2 - M 0 4 * M 1 3 * M 2 1 * M 3 5 * M 4 2 * M 5 0 - M 0 4 * M 1 3 * M 2 2 * M 3 0 * M 4 1 * M 5 5 + M 0 4 * M 1 3 * M 2 2 * M 3 0 * M 4 5 * M 5 1 + M 0 4 * M 1 3 * M 2 2 * M 3 1 * M 4 0 * M 5 5 - M 0 4 * M 1 3 * M 2 2 * M 3 1 * M 4 5 * M 5 0 - M 0 4 * M 1 3 * M 2 2 * M 3 5 * M 4 0 * M 5 1 + M 0 4 * M 1 3 * M 2 2 * M 3 5 * M 4 1 * M 5 0 + M 0 4 * M 1 3 * M 2 5 * M 3 0 * M 4 1 * M 5 2 - M 0 4 * M 1 3 * M 2 5 * M 3 0 * M 4 2 * M 5 1 - M 0 4 * M 1 3 * M 2 5 * M 3 1 * M 4 0 * M 5 2 + M 0 4 * M 1 3 * M 2 5 * M 3 1 * M 4 2 * M 5 0 + M 0 4 * M 1 3 * M 2 5 * M 3 2 * M 4 0 * M 5 1 - M 0 4 * M 1 3 * M 2 5 * M 3 2 * M 4 1 * M 5 0 + M 0 4 * M 1 5 * M 2 0 * M 3 1 * M 4 2 * M 5 3 - M 0 4 * M 1 5 * M 2 0 * M 3 1 * M 4 3 * M 5 2 - M 0 4 * M 1 5 * M 2 0 * M 3 2 * M 4 1 * M 5 3 + M 0 4 * M 1 5 * M 2 0 * M 3 2 * M 4 3 * M 5 1 + M 0 4 * M 1 5 * M 2 0 * M 3 3 * M 4 1 * M 5 2 - M 0 4 * M 1 5 * M 2 0 * M 3 3 * M 4 2 * M 5 1 - M 0 4 * M 1 5 * M 2 1 * M 3 0 * M 4 2 * M 5 3 + M 0 4 * M 1 5 * M 2 1 * M 3 0 * M 4 3 * M 5 2 + M 0 4 * M 1 5 * M 2 1 * M 3 2 * M 4 0 * M 5 3 - M 0 4 * M 1 5 * M 2 1 * M 3 2 * M 4 3 * M 5 0 - M 0 4 * M 1 5 * M 2 1 * M 3 3 * M 4 0 * M 5 2 + M 0 4 * M 1 5 * M 2 1 * M 3 3 * M 4 2 * M 5 0 + M 0 4 * M 1 5 * M 2 2 * M 3 0 * M 4 1 * M 5 3 - M 0 4 * M 1 5 * M 2 2 * M 3 0 * M 4 3 * M 5 1 - M 0 4 * M 1 5 * M 2 2 * M 3 1 * M 4 0 * M 5 3 + M 0 4 * M 1 5 * M 2 2 * M 3 1 * M 4 3 * M 5 0 + M 0 4 * M 1 5 * M 2 2 * M 3 3 * M 4 0 * M 5 1 - M 0 4 * M 1 5 * M 2 2 * M 3 3 * M 4 1 * M 5 0 - M 0 4 * M 1 5 * M 2 3 * M 3 0 * M 4 1 * M 5 2 + M 0 4 * M 1 5 * M 2 3 * M 3 0 * M 4 2 * M 5 1 + M 0 4 * M 1 5 * M 2 3 * M 3 1 * M 4 0 * M 5 2 - M 0 4 * M 1 5 * M 2 3 * M 3 1 * M 4 2 * M 5 0 - M 0 4 * M 1 5 * M 2 3 * M 3 2 * M 4 0 * M 5 1 + M 0 4 * M 1 5 * M 2 3 * M 3 2 * M 4 1 * M 5 0 - M 0 5 * M 1 0 * M 2 1 * M 3 2 * M 4 3 * M 5 4 + M 0 5 * M 1 0 * M 2 1 * M 3 2 * M 4 4 * M 5 3 + M 0 5 * M 1 0 * M 2 1 * M 3 3 * M 4 2 * M 5 4 - M 0 5 * M 1 0 * M 2 1 * M 3 3 * M 4 4 * M 5 2 - M 0 5 * M 1 0 * M 2 1 * M 3 4 * M 4 2 * M 5 3 + M 0 5 * M 1 0 * M 2 1 * M 3 4 * M 4 3 * M 5 2 + M 0 5 * M 1 0 * M 2 2 * M 3 1 * M 4 3 * M 5 4 - M 0 5 * M 1 0 * M 2 2 * M 3 1 * M 4 4 * M 5 3 - M 0 5 * M 1 0 * M 2 2 * M 3 3 * M 4 1 * M 5 4 + M 0 5 * M 1 0 * M 2 2 * M 3 3 * M 4 4 * M 5 1 + M 0 5 * M 1 0 * M 2 2 * M 3 4 * M 4 1 * M 5 3 - M 0 5 * M 1 0 * M 2 2 * M 3 4 * M 4 3 * M 5 1 - M 0 5 * M 1 0 * M 2 3 * M 3 1 * M 4 2 * M 5 4 + M 0 5 * M 1 0 * M 2 3 * M 3 1 * M 4 4 * M 5 2 + M 0 5 * M 1 0 * M 2 3 * M 3 2 * M 4 1 * M 5 4 - M 0 5 * M 1 0 * M 2 3 * M 3 2 * M 4 4 * M 5 1 - M 0 5 * M 1 0 * M 2 3 * M 3 4 * M 4 1 * M 5 2 + M 0 5 * M 1 0 * M 2 3 * M 3 4 * M 4 2 * M 5 1 + M 0 5 * M 1 0 * M 2 4 * M 3 1 * M 4 2 * M 5 3 - M 0 5 * M 1 0 * M 2 4 * M 3 1 * M 4 3 * M 5 2 - M 0 5 * M 1 0 * M 2 4 * M 3 2 * M 4 1 * M 5 3 + M 0 5 * M 1 0 * M 2 4 * M 3 2 * M 4 3 * M 5 1 + M 0 5 * M 1 0 * M 2 4 * M 3 3 * M 4 1 * M 5 2 - M 0 5 * M 1 0 * M 2 4 * M 3 3 * M 4 2 * M 5 1 + M 0 5 * M 1 1 * M 2 0 * M 3 2 * M 4 3 * M 5 4 - M 0 5 * M 1 1 * M 2 0 * M 3 2 * M 4 4 * M 5 3 - M 0 5 * M 1 1 * M 2 0 * M 3 3 * M 4 2 * M 5 4 + M 0 5 * M 1 1 * M 2 0 * M 3 3 * M 4 4 * M 5 2 + M 0 5 * M 1 1 * M 2 0 * M 3 4 * M 4 2 * M 5 3 - M 0 5 * M 1 1 * M 2 0 * M 3 4 * M 4 3 * M 5 2 - M 0 5 * M 1 1 * M 2 2 * M 3 0 * M 4 3 * M 5 4 + M 0 5 * M 1 1 * M 2 2 * M 3 0 * M 4 4 * M 5 3 + M 0 5 * M 1 1 * M 2 2 * M 3 3 * M 4 0 * M 5 4 - M 0 5 * M 1 1 * M 2 2 * M 3 3 * M 4 4 * M 5 0 - M 0 5 * M 1 1 * M 2 2 * M 3 4 * M 4 0 * M 5 3 + M 0 5 * M 1 1 * M 2 2 * M 3 4 * M 4 3 * M 5 0 + M 0 5 * M 1 1 * M 2 3 * M 3 0 * M 4 2 * M 5 4 - M 0 5 * M 1 1 * M 2 3 * M 3 0 * M 4 4 * M 5 2 - M 0 5 * M 1 1 * M 2 3 * M 3 2 * M 4 0 * M 5 4 + M 0 5 * M 1 1 * M 2 3 * M 3 2 * M 4 4 * M 5 0 + M 0 5 * M 1 1 * M 2 3 * M 3 4 * M 4 0 * M 5 2 - M 0 5 * M 1 1 * M 2 3 * M 3 4 * M 4 2 * M 5 0 - M 0 5 * M 1 1 * M 2 4 * M 3 0 * M 4 2 * M 5 3 + M 0 5 * M 1 1 * M 2 4 * M 3 0 * M 4 3 * M 5 2 + M 0 5 * M 1 1 * M 2 4 * M 3 2 * M 4 0 * M 5 3 - M 0 5 * M 1 1 * M 2 4 * M 3 2 * M 4 3 * M 5 0 - M 0 5 * M 1 1 * M 2 4 * M 3 3 * M 4 0 * M 5 2 + M 0 5 * M 1 1 * M 2 4 * M 3 3 * M 4 2 * M 5 0 - M 0 5 * M 1 2 * M 2 0 * M 3 1 * M 4 3 * M 5 4 + M 0 5 * M 1 2 * M 2 0 * M 3 1 * M 4 4 * M 5 3 + M 0 5 * M 1 2 * M 2 0 * M 3 3 * M 4 1 * M 5 4 - M 0 5 * M 1 2 * M 2 0 * M 3 3 * M 4 4 * M 5 1 - M 0 5 * M 1 2 * M 2 0 * M 3 4 * M 4 1 * M 5 3 + M 0 5 * M 1 2 * M 2 0 * M 3 4 * M 4 3 * M 5 1 + M 0 5 * M 1 2 * M 2 1 * M 3 0 * M 4 3 * M 5 4 - M 0 5 * M 1 2 * M 2 1 * M 3 0 * M 4 4 * M 5 3 - M 0 5 * M 1 2 * M 2 1 * M 3 3 * M 4 0 * M 5 4 + M 0 5 * M 1 2 * M 2 1 * M 3 3 * M 4 4 * M 5 0 + M 0 5 * M 1 2 * M 2 1 * M 3 4 * M 4 0 * M 5 3 - M 0 5 * M 1 2 * M 2 1 * M 3 4 * M 4 3 * M 5 0 - M 0 5 * M 1 2 * M 2 3 * M 3 0 * M 4 1 * M 5 4 + M 0 5 * M 1 2 * M 2 3 * M 3 0 * M 4 4 * M 5 1 + M 0 5 * M 1 2 * M 2 3 * M 3 1 * M 4 0 * M 5 4 - M 0 5 * M 1 2 * M 2 3 * M 3 1 * M 4 4 * M 5 0 - M 0 5 * M 1 2 * M 2 3 * M 3 4 * M 4 0 * M 5 1 + M 0 5 * M 1 2 * M 2 3 * M 3 4 * M 4 1 * M 5 0 + M 0 5 * M 1 2 * M 2 4 * M 3 0 * M 4 1 * M 5 3 - M 0 5 * M 1 2 * M 2 4 * M 3 0 * M 4 3 * M 5 1 - M 0 5 * M 1 2 * M 2 4 * M 3 1 * M 4 0 * M 5 3 + M 0 5 * M 1 2 * M 2 4 * M 3 1 * M 4 3 * M 5 0 + M 0 5 * M 1 2 * M 2 4 * M 3 3 * M 4 0 * M 5 1 - M 0 5 * M 1 2 * M 2 4 * M 3 3 * M 4 1 * M 5 0 + M 0 5 * M 1 3 * M 2 0 * M 3 1 * M 4 2 * M 5 4 - M 0 5 * M 1 3 * M 2 0 * M 3 1 * M 4 4 * M 5 2 - M 0 5 * M 1 3 * M 2 0 * M 3 2 * M 4 1 * M 5 4 + M 0 5 * M 1 3 * M 2 0 * M 3 2 * M 4 4 * M 5 1 + M 0 5 * M 1 3 * M 2 0 * M 3 4 * M 4 1 * M 5 2 - M 0 5 * M 1 3 * M 2 0 * M 3 4 * M 4 2 * M 5 1 - M 0 5 * M 1 3 * M 2 1 * M 3 0 * M 4 2 * M 5 4 + M 0 5 * M 1 3 * M 2 1 * M 3 0 * M 4 4 * M 5 2 + M 0 5 * M 1 3 * M 2 1 * M 3 2 * M 4 0 * M 5 4 - M 0 5 * M 1 3 * M 2 1 * M 3 2 * M 4 4 * M 5 0 - M 0 5 * M 1 3 * M 2 1 * M 3 4 * M 4 0 * M 5 2 + M 0 5 * M 1 3 * M 2 1 * M 3 4 * M 4 2 * M 5 0 + M 0 5 * M 1 3 * M 2 2 * M 3 0 * M 4 1 * M 5 4 - M 0 5 * M 1 3 * M 2 2 * M 3 0 * M 4 4 * M 5 1 - M 0 5 * M 1 3 * M 2 2 * M 3 1 * M 4 0 * M 5 4 + M 0 5 * M 1 3 * M 2 2 * M 3 1 * M 4 4 * M 5 0 + M 0 5 * M 1 3 * M 2 2 * M 3 4 * M 4 0 * M 5 1 - M 0 5 * M 1 3 * M 2 2 * M 3 4 * M 4 1 * M 5 0 - M 0 5 * M 1 3 * M 2 4 * M 3 0 * M 4 1 * M 5 2 + M 0 5 * M 1 3 * M 2 4 * M 3 0 * M 4 2 * M 5 1 + M 0 5 * M 1 3 * M 2 4 * M 3 1 * M 4 0 * M 5 2 - M 0 5 * M 1 3 * M 2 4 * M 3 1 * M 4 2 * M 5 0 - M 0 5 * M 1 3 * M 2 4 * M 3 2 * M 4 0 * M 5 1 + M 0 5 * M 1 3 * M 2 4 * M 3 2 * M 4 1 * M 5 0 - M 0 5 * M 1 4 * M 2 0 * M 3 1 * M 4 2 * M 5 3 + M 0 5 * M 1 4 * M 2 0 * M 3 1 * M 4 3 * M 5 2 + M 0 5 * M 1 4 * M 2 0 * M 3 2 * M 4 1 * M 5 3 - M 0 5 * M 1 4 * M 2 0 * M 3 2 * M 4 3 * M 5 1 - M 0 5 * M 1 4 * M 2 0 * M 3 3 * M 4 1 * M 5 2 + M 0 5 * M 1 4 * M 2 0 * M 3 3 * M 4 2 * M 5 1 + M 0 5 * M 1 4 * M 2 1 * M 3 0 * M 4 2 * M 5 3 - M 0 5 * M 1 4 * M 2 1 * M 3 0 * M 4 3 * M 5 2 - M 0 5 * M 1 4 * M 2 1 * M 3 2 * M 4 0 * M 5 3 + M 0 5 * M 1 4 * M 2 1 * M 3 2 * M 4 3 * M 5 0 + M 0 5 * M 1 4 * M 2 1 * M 3 3 * M 4 0 * M 5 2 - M 0 5 * M 1 4 * M 2 1 * M 3 3 * M 4 2 * M 5 0 - M 0 5 * M 1 4 * M 2 2 * M 3 0 * M 4 1 * M 5 3 + M 0 5 * M 1 4 * M 2 2 * M 3 0 * M 4 3 * M 5 1 + M 0 5 * M 1 4 * M 2 2 * M 3 1 * M 4 0 * M 5 3 - M 0 5 * M 1 4 * M 2 2 * M 3 1 * M 4 3 * M 5 0 - M 0 5 * M 1 4 * M 2 2 * M 3 3 * M 4 0 * M 5 1 + M 0 5 * M 1 4 * M 2 2 * M 3 3 * M 4 1 * M 5 0 + M 0 5 * M 1 4 * M 2 3 * M 3 0 * M 4 1 * M 5 2 - M 0 5 * M 1 4 * M 2 3 * M 3 0 * M 4 2 * M 5 1 - M 0 5 * M 1 4 * M 2 3 * M 3 1 * M 4 0 * M 5 2 + M 0 5 * M 1 4 * M 2 3 * M 3 1 * M 4 2 * M 5 0 + M 0 5 * M 1 4 * M 2 3 * M 3 2 * M 4 0 * M 5 1 - M 0 5 * M 1 4 * M 2 3 * M 3 2 * M 4 1 * M 5 0 := by
+  simp [Matrix.det_succ_row_zero, Fin.sum_univ_succ, Fin.succAbove]
+  ring
+
+set_option maxHeartbeats 4000000 in
+-- the 720-term expansion against the certificate needs headroom
+set_option maxRecDepth 16000 in
 /-- The determinant of the cleared system, in closed basis form. -/
 theorem det_matInt : (matInt).det = detTupInt := by
-  sorry
+  rw [det_fin_six]
+  simp [matInt]
+  unfold m11Int m12Int m13Int m14Int m15Int m16Int m21Int m22Int m23Int m24Int m25Int m26Int
+    m31Int m32Int m33Int m34Int m35Int m36Int m41Int m42Int m43Int m44Int m45Int m46Int
+    m51Int m52Int m53Int m54Int m55Int m56Int m61Int m62Int m63Int m64Int m65Int m66Int
+    detTupInt
+  linear_combination (-1296*Kernel.B^2*X^18 + 3528*Kernel.B^2*X^16 - 1168*Kernel.B^2*X^14 + 232*Kernel.B^2*X^12 - 16*Kernel.B^2*X^10 + 4140*Kernel.B*X^20 + 576*Kernel.B*X^19 - 9532*Kernel.B*X^18 + 1160*Kernel.B*X^17 - 1116*Kernel.B*X^16 - 2152*Kernel.B*X^15 + 2108*Kernel.B*X^14 + 152*Kernel.B*X^13 - 496*Kernel.B*X^12 + 8*Kernel.B*X^11 + 32*Kernel.B*X^10 + 1404*X^22 - 1692*X^21 - 15024*X^20 + 4652*X^19 + 23936*X^18 - 12124*X^17 - 1360*X^16 + 3452*X^15 - 1276*X^14 - 168*X^13 + 272*X^12 - 8*X^11 - 16*X^10) * Kernel.A_sq + (4140*Kernel.A*X^20 - 576*Kernel.A*X^19 - 9532*Kernel.A*X^18 - 1160*Kernel.A*X^17 - 1116*Kernel.A*X^16 + 2152*Kernel.A*X^15 + 2108*Kernel.A*X^14 - 152*Kernel.A*X^13 - 496*Kernel.A*X^12 - 8*Kernel.A*X^11 + 32*Kernel.A*X^10 + 1404*X^22 + 1692*X^21 - 11136*X^20 - 2060*X^19 + 12056*X^18 + 5068*X^17 + 5672*X^16 - 1116*X^15 - 3140*X^14 - 296*X^13 + 552*X^12 + 40*X^11 - 32*X^10) * Kernel.B_sq
 
 /-- The determinant certificate: the order-22 coefficient is `−64`. -/
 -- sanity (python): coeff 22 detTupInt = -64
@@ -619,7 +640,11 @@ theorem coeff_detInt : coeff 22 (detTupInt) = -64 := by
   norm_num [coeffA0, coeffA1, coeffA2, coeffA3, coeffA4, coeffA5, coeffA6, coeffA7, coeffA8, coeffA9, coeffA10, coeffA11, coeffA12, coeffB0, coeffB1, coeffB2, coeffB3, coeffB4, coeffB5, coeffB6, coeffB7, coeffB8, coeffB9, coeffB10, coeffB11, coeffB12, coeffAB0, coeffAB2, coeffAB4, coeffAB6, coeffAB8, coeffAB10, coeffAB12]
 
 theorem det_ne_zeroInt : (matInt).det ≠ 0 := by
-  sorry
+  intro h
+  rw [det_matInt] at h
+  have h22 := coeff_detInt
+  rw [h, map_zero] at h22
+  norm_num at h22
 
 /-- The walk satisfies the system (the six `walkRow` theorems, vectorized). -/
 theorem mulVec_walkInt {F : St → Nat} (h : StartData F 4 1 4 6) :
@@ -662,31 +687,87 @@ theorem mulVec_scaledNumInt :
 common `X^E·D` scaling (adjugate against the determinant, in the domain). -/
 theorem unk_eqInt {F : St → Nat} (h : StartData F 4 1 4 6) (c : Fin 6) :
     (X ^ 4 * denAllInt) * unkVec F c = scaledNumInt c := by
-  sorry
+  have hmv : (matInt).mulVec (fun c => (X ^ 4 * denAllInt) * unkVec F c - scaledNumInt c) = 0 := by
+    have h1 : (matInt).mulVec ((X ^ 4 * denAllInt) • unkVec F) = (X ^ 4 * denAllInt) • rvecInt := by
+      rw [Matrix.mulVec_smul, mulVec_walkInt h]
+    have h2 : (matInt).mulVec scaledNumInt = (X ^ 4 * denAllInt) • rvecInt := mulVec_scaledNumInt
+    have hveq : (fun c => (X ^ 4 * denAllInt) * unkVec F c - scaledNumInt c)
+        = (X ^ 4 * denAllInt) • unkVec F - scaledNumInt := by
+      funext c
+      simp [smul_eq_mul]
+    rw [hveq, Matrix.mulVec_sub, h1, h2, sub_self]
+  have hadj : (matInt).det • (fun c => (X ^ 4 * denAllInt) * unkVec F c - scaledNumInt c) = 0 := by
+    have hcg := congrArg (matInt).adjugate.mulVec hmv
+    rwa [Matrix.mulVec_mulVec, Matrix.adjugate_mul, Matrix.smul_mulVec, Matrix.one_mulVec,
+      Matrix.mulVec_zero] at hcg
+  have hc : (matInt).det * ((X ^ 4 * denAllInt) * unkVec F c - scaledNumInt c) = 0 := by
+    simpa [Pi.smul_apply, smul_eq_mul] using congrFun hadj c
+  rcases mul_eq_zero.mp hc with hd | hvc
+  · exact absurd hd det_ne_zeroInt
+  · exact sub_eq_zero.mp hvc
+
+private theorem two_ps_ne_zero : (2 : PowerSeries ℚ) ≠ 0 := by
+  rw [show (2 : PowerSeries ℚ) = C 2 from (map_ofNat C 2).symm, ← map_zero (C (R := ℚ))]
+  intro h
+  have h2 := C_injective h
+  norm_num at h2
 
 theorem transJ1Int {F : St → Nat} (h : StartData F 4 1 4 6) :
     X ^ 2 * denJ1Int * (jS F 1) = numJ1Int := by
-  sorry
+  have key := unk_eqInt h 0
+  simp [unkVec, scaledNumInt] at key
+  have hden : denAllInt = 2 * denJ1Int := by unfold denAllInt denJ1Int; ring
+  rw [hden] at key
+  have hne : (X : PowerSeries ℚ) ^ 2 * 2 ≠ 0 :=
+    mul_ne_zero (pow_ne_zero 2 PowerSeries.X_ne_zero) two_ps_ne_zero
+  apply mul_left_cancel₀ hne
+  linear_combination key
 
 theorem transJ2Int {F : St → Nat} (h : StartData F 4 1 4 6) :
     X ^ 3 * denJ2Int * (jS F 2) = numJ2Int := by
-  sorry
+  have key := unk_eqInt h 1
+  simp [unkVec, scaledNumInt] at key
+  have hden : denAllInt = denJ2Int := by unfold denAllInt denJ2Int; ring
+  rw [hden] at key
+  apply mul_left_cancel₀ (PowerSeries.X_ne_zero (R := ℚ))
+  linear_combination key
 
 theorem transJ3Int {F : St → Nat} (h : StartData F 4 1 4 6) :
     X ^ 4 * denJ3Int * (jS F 3) = numJ3Int := by
-  sorry
+  have key := unk_eqInt h 2
+  simp [unkVec, scaledNumInt] at key
+  have hden : denAllInt = 2 * denJ3Int := by unfold denAllInt denJ3Int; ring
+  rw [hden] at key
+  apply mul_left_cancel₀ two_ps_ne_zero
+  linear_combination key
 
 theorem transJmInt {F : St → Nat} (h : StartData F 4 1 4 6) :
     X ^ 3 * denJmInt * (JmS F) = numJmInt := by
-  sorry
+  have key := unk_eqInt h 3
+  simp [unkVec, scaledNumInt] at key
+  have hden : denAllInt = denJmInt := by unfold denAllInt denJmInt; ring
+  rw [hden] at key
+  apply mul_left_cancel₀ (PowerSeries.X_ne_zero (R := ℚ))
+  linear_combination key
 
 theorem transP2Int {F : St → Nat} (h : StartData F 4 1 4 6) :
     X ^ 3 * denP2Int * (pS F 2) = numP2Int := by
-  sorry
+  have key := unk_eqInt h 4
+  simp [unkVec, scaledNumInt] at key
+  have hden : denAllInt = 2 * denP2Int := by unfold denAllInt denP2Int; ring
+  rw [hden] at key
+  have hne : (X : PowerSeries ℚ) * 2 ≠ 0 := mul_ne_zero PowerSeries.X_ne_zero two_ps_ne_zero
+  apply mul_left_cancel₀ hne
+  linear_combination key
 
 theorem transP3Int {F : St → Nat} (h : StartData F 4 1 4 6) :
     X ^ 4 * denP3Int * (pS F 3) = numP3Int := by
-  sorry
+  have key := unk_eqInt h 5
+  simp [unkVec, scaledNumInt] at key
+  have hden : denAllInt = 2 * denP3Int := by unfold denAllInt denP3Int; ring
+  rw [hden] at key
+  apply mul_left_cancel₀ two_ps_ne_zero
+  linear_combination key
 
 -- ==================== start: bare ====================
 noncomputable def m11Bare : PowerSeries ℚ :=
@@ -927,9 +1008,18 @@ noncomputable def rvecBare : Fin 6 → PowerSeries ℚ :=
 noncomputable def scaledNumBare : Fin 6 → PowerSeries ℚ :=
   ![X ^ 2 * numJ1Bare, X ^ 1 * 2 * numJ2Bare, numJ3Bare, X ^ 1 * numJmBare, X ^ 1 * numP2Bare, numP3Bare]
 
+set_option maxHeartbeats 4000000 in
+-- the 720-term expansion against the certificate needs headroom
+set_option maxRecDepth 16000 in
 /-- The determinant of the cleared system, in closed basis form. -/
 theorem det_matBare : (matBare).det = detTupBare := by
-  sorry
+  rw [det_fin_six]
+  simp [matBare]
+  unfold m11Bare m12Bare m13Bare m14Bare m15Bare m16Bare m21Bare m22Bare m23Bare m24Bare m25Bare m26Bare
+    m31Bare m32Bare m33Bare m34Bare m35Bare m36Bare m41Bare m42Bare m43Bare m44Bare m45Bare m46Bare
+    m51Bare m52Bare m53Bare m54Bare m55Bare m56Bare m61Bare m62Bare m63Bare m64Bare m65Bare m66Bare
+    detTupBare
+  linear_combination (-1296*Kernel.B^2*X^14 + 3528*Kernel.B^2*X^12 - 1168*Kernel.B^2*X^10 + 232*Kernel.B^2*X^8 - 16*Kernel.B^2*X^6 + 4140*Kernel.B*X^16 + 576*Kernel.B*X^15 - 9532*Kernel.B*X^14 + 1160*Kernel.B*X^13 - 1116*Kernel.B*X^12 - 2152*Kernel.B*X^11 + 2108*Kernel.B*X^10 + 152*Kernel.B*X^9 - 496*Kernel.B*X^8 + 8*Kernel.B*X^7 + 32*Kernel.B*X^6 + 1404*X^18 - 1692*X^17 - 15024*X^16 + 4652*X^15 + 23936*X^14 - 12124*X^13 - 1360*X^12 + 3452*X^11 - 1276*X^10 - 168*X^9 + 272*X^8 - 8*X^7 - 16*X^6) * Kernel.A_sq + (4140*Kernel.A*X^16 - 576*Kernel.A*X^15 - 9532*Kernel.A*X^14 - 1160*Kernel.A*X^13 - 1116*Kernel.A*X^12 + 2152*Kernel.A*X^11 + 2108*Kernel.A*X^10 - 152*Kernel.A*X^9 - 496*Kernel.A*X^8 - 8*Kernel.A*X^7 + 32*Kernel.A*X^6 + 1404*X^18 + 1692*X^17 - 11136*X^16 - 2060*X^15 + 12056*X^14 + 5068*X^13 + 5672*X^12 - 1116*X^11 - 3140*X^10 - 296*X^9 + 552*X^8 + 40*X^7 - 32*X^6) * Kernel.B_sq
 
 /-- The determinant certificate: the order-18 coefficient is `−64`. -/
 -- sanity (python): coeff 18 detTupBare = -64
@@ -939,7 +1029,11 @@ theorem coeff_detBare : coeff 18 (detTupBare) = -64 := by
   norm_num [coeffA0, coeffA1, coeffA2, coeffA3, coeffA4, coeffA5, coeffA6, coeffA7, coeffA8, coeffA9, coeffA10, coeffA11, coeffA12, coeffB0, coeffB1, coeffB2, coeffB3, coeffB4, coeffB5, coeffB6, coeffB7, coeffB8, coeffB9, coeffB10, coeffB11, coeffB12, coeffAB0, coeffAB2, coeffAB4, coeffAB6, coeffAB8, coeffAB10, coeffAB12]
 
 theorem det_ne_zeroBare : (matBare).det ≠ 0 := by
-  sorry
+  intro h
+  rw [det_matBare] at h
+  have h18 := coeff_detBare
+  rw [h, map_zero] at h18
+  norm_num at h18
 
 /-- The walk satisfies the system (the six `walkRow` theorems, vectorized). -/
 theorem mulVec_walkBare {F : St → Nat} (h : StartData F 1 0 1 1) :
@@ -982,31 +1076,77 @@ theorem mulVec_scaledNumBare :
 common `X^E·D` scaling (adjugate against the determinant, in the domain). -/
 theorem unk_eqBare {F : St → Nat} (h : StartData F 1 0 1 1) (c : Fin 6) :
     (X ^ 3 * denAllBare) * unkVec F c = scaledNumBare c := by
-  sorry
+  have hmv : (matBare).mulVec (fun c => (X ^ 3 * denAllBare) * unkVec F c - scaledNumBare c) = 0 := by
+    have h1 : (matBare).mulVec ((X ^ 3 * denAllBare) • unkVec F) = (X ^ 3 * denAllBare) • rvecBare := by
+      rw [Matrix.mulVec_smul, mulVec_walkBare h]
+    have h2 : (matBare).mulVec scaledNumBare = (X ^ 3 * denAllBare) • rvecBare := mulVec_scaledNumBare
+    have hveq : (fun c => (X ^ 3 * denAllBare) * unkVec F c - scaledNumBare c)
+        = (X ^ 3 * denAllBare) • unkVec F - scaledNumBare := by
+      funext c
+      simp [smul_eq_mul]
+    rw [hveq, Matrix.mulVec_sub, h1, h2, sub_self]
+  have hadj : (matBare).det • (fun c => (X ^ 3 * denAllBare) * unkVec F c - scaledNumBare c) = 0 := by
+    have hcg := congrArg (matBare).adjugate.mulVec hmv
+    rwa [Matrix.mulVec_mulVec, Matrix.adjugate_mul, Matrix.smul_mulVec, Matrix.one_mulVec,
+      Matrix.mulVec_zero] at hcg
+  have hc : (matBare).det * ((X ^ 3 * denAllBare) * unkVec F c - scaledNumBare c) = 0 := by
+    simpa [Pi.smul_apply, smul_eq_mul] using congrFun hadj c
+  rcases mul_eq_zero.mp hc with hd | hvc
+  · exact absurd hd det_ne_zeroBare
+  · exact sub_eq_zero.mp hvc
 
 theorem transJ1Bare {F : St → Nat} (h : StartData F 1 0 1 1) :
     X ^ 1 * denJ1Bare * (jS F 1) = numJ1Bare := by
-  sorry
+  have key := unk_eqBare h 0
+  simp [unkVec, scaledNumBare] at key
+  have hden : denAllBare = denJ1Bare := by unfold denAllBare denJ1Bare; ring
+  rw [hden] at key
+  apply mul_left_cancel₀ (pow_ne_zero 2 (PowerSeries.X_ne_zero (R := ℚ)))
+  linear_combination key
 
 theorem transJ2Bare {F : St → Nat} (h : StartData F 1 0 1 1) :
     X ^ 2 * denJ2Bare * (jS F 2) = numJ2Bare := by
-  sorry
+  have key := unk_eqBare h 1
+  simp [unkVec, scaledNumBare] at key
+  have hden : denAllBare = 2 * denJ2Bare := by unfold denAllBare denJ2Bare; ring
+  rw [hden] at key
+  have hne : (X : PowerSeries ℚ) * 2 ≠ 0 := mul_ne_zero PowerSeries.X_ne_zero two_ps_ne_zero
+  apply mul_left_cancel₀ hne
+  linear_combination key
 
 theorem transJ3Bare {F : St → Nat} (h : StartData F 1 0 1 1) :
     X ^ 3 * denJ3Bare * (jS F 3) = numJ3Bare := by
-  sorry
+  have key := unk_eqBare h 2
+  simp [unkVec, scaledNumBare] at key
+  have hden : denAllBare = denJ3Bare := by unfold denAllBare denJ3Bare; ring
+  rw [hden] at key
+  linear_combination key
 
 theorem transJmBare {F : St → Nat} (h : StartData F 1 0 1 1) :
     X ^ 2 * denJmBare * (JmS F) = numJmBare := by
-  sorry
+  have key := unk_eqBare h 3
+  simp [unkVec, scaledNumBare] at key
+  have hden : denAllBare = denJmBare := by unfold denAllBare denJmBare; ring
+  rw [hden] at key
+  apply mul_left_cancel₀ (PowerSeries.X_ne_zero (R := ℚ))
+  linear_combination key
 
 theorem transP2Bare {F : St → Nat} (h : StartData F 1 0 1 1) :
     X ^ 2 * denP2Bare * (pS F 2) = numP2Bare := by
-  sorry
+  have key := unk_eqBare h 4
+  simp [unkVec, scaledNumBare] at key
+  have hden : denAllBare = denP2Bare := by unfold denAllBare denP2Bare; ring
+  rw [hden] at key
+  apply mul_left_cancel₀ (PowerSeries.X_ne_zero (R := ℚ))
+  linear_combination key
 
 theorem transP3Bare {F : St → Nat} (h : StartData F 1 0 1 1) :
     X ^ 3 * denP3Bare * (pS F 3) = numP3Bare := by
-  sorry
+  have key := unk_eqBare h 5
+  simp [unkVec, scaledNumBare] at key
+  have hden : denAllBare = denP3Bare := by unfold denAllBare denP3Bare; ring
+  rw [hden] at key
+  linear_combination key
 
 
 /-! ## Axiom audits (AuditOutworks pattern)
