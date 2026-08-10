@@ -198,19 +198,95 @@ noncomputable def r6Int : PowerSeries ℚ :=
   ((-2) + (-8) * X + 2 * X ^ 2 + 24 * X ^ 3) + (2 + 6 * X + (-4) * X ^ 2 + (-12) * X ^ 3) * Kernel.B
 theorem walkRow1Int {F : St → Nat} (h : StartData F 4 1 4 6) :
     m11Int * (jS F 1) + m12Int * (jS F 2) + m13Int * (jS F 3) + m14Int * (JmS F) + m15Int * (pS F 2) + m16Int * (pS F 3) = r1Int := by
-  sorry
+  have hu1 := Kernel.u1_def
+  have e1 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 = 8 * X ^ 3 * (1 - X - Kernel.A) := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 = 8 * X ^ 3 * (2 * X * Kernel.u1) := by ring
+    rw [h', hu1]
+  have e2 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 2 = 4 * X ^ 2 * (1 - X - Kernel.A) ^ 2 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 2 = 4 * X ^ 2 * (2 * X * Kernel.u1) ^ 2 := by ring
+    rw [h', hu1]
+  have e3 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 3 = 2 * X * (1 - X - Kernel.A) ^ 3 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 3 = 2 * X * (2 * X * Kernel.u1) ^ 3 := by ring
+    rw [h', hu1]
+  have e4 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 4 = (1 - X - Kernel.A) ^ 4 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 4 = (2 * X * Kernel.u1) ^ 4 := by ring
+    rw [h', hu1]
+  have hQ := closing_Q_u1 h
+  unfold Qser at hQ
+  simp only [map_natCast] at hQ
+  push_cast at hQ
+  have hcombo : ((4 : PowerSeries ℚ) - jS F 1 + X ^ 2 * c1S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1) +
+      ((1 : PowerSeries ℚ) - jS F 2 + X ^ 2 * c2S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 2) +
+      (X ^ 2 * c3S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 3) +
+      (X ^ 2 * c4S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 4) = 0 := by
+    linear_combination (16 * X ^ 4) * hQ
+  rw [e1, e2, e3, e4] at hcombo
+  unfold c1S c2S c3S c4S at hcombo
+  unfold m11Int m12Int m13Int m14Int m15Int m16Int r1Int
+  have hXpow : (X : PowerSeries ℚ) ^ 2 ≠ 0 := pow_ne_zero 2 X_ne_zero
+  have h8 : (8 : PowerSeries ℚ) ≠ 0 := by
+    intro hh
+    have hz := congrArg constantCoeff hh
+    rw [show constantCoeff (8 : PowerSeries ℚ) = 8 from map_ofNat constantCoeff 8, map_zero] at hz
+    norm_num at hz
+  have hcancel : (8 : PowerSeries ℚ) * X ^ 2 ≠ 0 := mul_ne_zero h8 hXpow
+  apply mul_left_cancel₀ hcancel
+  linear_combination hcombo - (Kernel.A^2*(jS F 2)*X^2 - 2*Kernel.A*(jS F 1)*X^3 - 4*Kernel.A*(jS F 2)*X^2 + 2*(jS F 1)*X^4 + 6*(jS F 1)*X^3 + 3*(jS F 2)*X^4 - 2*(jS F 2)*X^3 + 3*(jS F 2)*X^2 + 8*(JmS F)*X^4 + 8*(pS F 2)*X^4 + 4*X^2) * Kernel.A_sq
 
 theorem walkRow2Int {F : St → Nat} (h : StartData F 4 1 4 6) :
     m21Int * (jS F 1) + m22Int * (jS F 2) + m23Int * (jS F 3) + m24Int * (JmS F) + m25Int * (pS F 2) + m26Int * (pS F 3) = r2Int := by
-  sorry
+  have hu2 := Kernel.u2_def
+  have e1 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 = 8 * X ^ 3 * (Kernel.B - 1 - X) := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 = 8 * X ^ 3 * (2 * X * Kernel.u2) := by ring
+    rw [h', hu2]
+  have e2 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 2 = 4 * X ^ 2 * (Kernel.B - 1 - X) ^ 2 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 2 = 4 * X ^ 2 * (2 * X * Kernel.u2) ^ 2 := by ring
+    rw [h', hu2]
+  have e3 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 3 = 2 * X * (Kernel.B - 1 - X) ^ 3 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 3 = 2 * X * (2 * X * Kernel.u2) ^ 3 := by ring
+    rw [h', hu2]
+  have e4 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 4 = (Kernel.B - 1 - X) ^ 4 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 4 = (2 * X * Kernel.u2) ^ 4 := by ring
+    rw [h', hu2]
+  have hQ := closing_Q_u2 h
+  unfold Qser at hQ
+  simp only [map_natCast] at hQ
+  push_cast at hQ
+  have hcombo : ((4 : PowerSeries ℚ) - jS F 1 + X ^ 2 * c1S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2) +
+      ((1 : PowerSeries ℚ) - jS F 2 + X ^ 2 * c2S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 2) +
+      (X ^ 2 * c3S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 3) +
+      (X ^ 2 * c4S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 4) = 0 := by
+    linear_combination (16 * X ^ 4) * hQ
+  rw [e1, e2, e3, e4] at hcombo
+  unfold c1S c2S c3S c4S at hcombo
+  unfold m21Int m22Int m23Int m24Int m25Int m26Int r2Int
+  have hXpow : (X : PowerSeries ℚ) ^ 2 ≠ 0 := pow_ne_zero 2 X_ne_zero
+  have h8 : (8 : PowerSeries ℚ) ≠ 0 := by
+    intro hh
+    have hz := congrArg constantCoeff hh
+    rw [show constantCoeff (8 : PowerSeries ℚ) = 8 from map_ofNat constantCoeff 8, map_zero] at hz
+    norm_num at hz
+  have hcancel : (8 : PowerSeries ℚ) * X ^ 2 ≠ 0 := mul_ne_zero h8 hXpow
+  apply mul_left_cancel₀ hcancel
+  linear_combination hcombo - (Kernel.B^2*(jS F 2)*X^2 + 2*Kernel.B*(jS F 1)*X^3 - 4*Kernel.B*(jS F 2)*X^2 + 2*(jS F 1)*X^4 - 6*(jS F 1)*X^3 + 3*(jS F 2)*X^4 + 2*(jS F 2)*X^3 + 3*(jS F 2)*X^2 + 8*(JmS F)*X^4 + 8*(pS F 2)*X^4 + 4*X^2) * Kernel.B_sq
 
 theorem walkRow3Int {F : St → Nat} (h : StartData F 4 1 4 6) :
     m31Int * (jS F 1) + m32Int * (jS F 2) + m33Int * (jS F 3) + m34Int * (JmS F) + m35Int * (pS F 2) + m36Int * (pS F 3) = r3Int := by
-  sorry
+  have hc := closing_eq3 h
+  unfold c1S at hc
+  simp only [map_natCast] at hc
+  push_cast at hc
+  unfold m31Int m32Int m33Int m34Int m35Int m36Int r3Int
+  linear_combination hc
 
 theorem walkRow4Int {F : St → Nat} (h : StartData F 4 1 4 6) :
     m41Int * (jS F 1) + m42Int * (jS F 2) + m43Int * (jS F 3) + m44Int * (JmS F) + m45Int * (pS F 2) + m46Int * (pS F 3) = r4Int := by
-  sorry
+  have hc := closing_eq4 h
+  unfold c1S c2S c3S c4S at hc
+  simp only [map_natCast] at hc
+  push_cast at hc
+  unfold m41Int m42Int m43Int m44Int m45Int m46Int r4Int
+  linear_combination hc
 
 theorem walkRow5Int {F : St → Nat} (h : StartData F 4 1 4 6) :
     m51Int * (jS F 1) + m52Int * (jS F 2) + m53Int * (jS F 3) + m54Int * (JmS F) + m55Int * (pS F 2) + m56Int * (pS F 3) = r5Int := by
@@ -262,7 +338,23 @@ theorem mulVec_walkInt {F : St → Nat} (h : StartData F 4 1 4 6) :
 vectorized and rescaled). -/
 theorem mulVec_scaledNumInt :
     (matInt).mulVec (scaledNumInt) = (X ^ 4 * denAllInt) • rvecInt := by
-  sorry
+  funext c
+  fin_cases c <;>
+    simp [matInt, scaledNumInt, rvecInt, Matrix.mulVec, dotProduct,
+      Fin.sum_univ_six, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+      Pi.smul_apply, smul_eq_mul, Matrix.of_apply]
+  · unfold m11Int m12Int m13Int m14Int m15Int m16Int r1Int denAllInt
+    linear_combination row1Int
+  · unfold m21Int m22Int m23Int m24Int m25Int m26Int r2Int denAllInt
+    linear_combination row2Int
+  · unfold m31Int m32Int m33Int m34Int m35Int m36Int r3Int denAllInt
+    linear_combination row3Int
+  · unfold m41Int m42Int m43Int m44Int m45Int m46Int r4Int denAllInt
+    linear_combination row4Int
+  · unfold m51Int m52Int m53Int m54Int m55Int m56Int r5Int denAllInt
+    linear_combination row5Int
+  · unfold m61Int m62Int m63Int m64Int m65Int m66Int r6Int denAllInt
+    linear_combination row6Int
 
 /-- Uniqueness: the two solutions of the cleared system agree after the
 common `X^E·D` scaling (adjugate against the determinant, in the domain). -/
@@ -381,19 +473,95 @@ noncomputable def r6Bare : PowerSeries ℚ :=
   (1 + 5 * X + 5 * X ^ 2 + (-3) * X ^ 3) + ((-1) + (-4) * X + (-3) * X ^ 2) * Kernel.B
 theorem walkRow1Bare {F : St → Nat} (h : StartData F 1 0 1 1) :
     m11Bare * (jS F 1) + m12Bare * (jS F 2) + m13Bare * (jS F 3) + m14Bare * (JmS F) + m15Bare * (pS F 2) + m16Bare * (pS F 3) = r1Bare := by
-  sorry
+  have hu1 := Kernel.u1_def
+  have e1 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 = 8 * X ^ 3 * (1 - X - Kernel.A) := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 = 8 * X ^ 3 * (2 * X * Kernel.u1) := by ring
+    rw [h', hu1]
+  have e2 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 2 = 4 * X ^ 2 * (1 - X - Kernel.A) ^ 2 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 2 = 4 * X ^ 2 * (2 * X * Kernel.u1) ^ 2 := by ring
+    rw [h', hu1]
+  have e3 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 3 = 2 * X * (1 - X - Kernel.A) ^ 3 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 3 = 2 * X * (2 * X * Kernel.u1) ^ 3 := by ring
+    rw [h', hu1]
+  have e4 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 4 = (1 - X - Kernel.A) ^ 4 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 4 = (2 * X * Kernel.u1) ^ 4 := by ring
+    rw [h', hu1]
+  have hQ := closing_Q_u1 h
+  unfold Qser at hQ
+  simp only [map_natCast] at hQ
+  push_cast at hQ
+  have hcombo : ((1 : PowerSeries ℚ) - jS F 1 + X ^ 2 * c1S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1) +
+      ((0 : PowerSeries ℚ) - jS F 2 + X ^ 2 * c2S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 2) +
+      (X ^ 2 * c3S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 3) +
+      (X ^ 2 * c4S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u1 ^ 4) = 0 := by
+    linear_combination (16 * X ^ 4) * hQ
+  rw [e1, e2, e3, e4] at hcombo
+  unfold c1S c2S c3S c4S at hcombo
+  unfold m11Bare m12Bare m13Bare m14Bare m15Bare m16Bare r1Bare
+  have hXpow : (X : PowerSeries ℚ) ^ 3 ≠ 0 := pow_ne_zero 3 X_ne_zero
+  have h8 : (8 : PowerSeries ℚ) ≠ 0 := by
+    intro hh
+    have hz := congrArg constantCoeff hh
+    rw [show constantCoeff (8 : PowerSeries ℚ) = 8 from map_ofNat constantCoeff 8, map_zero] at hz
+    norm_num at hz
+  have hcancel : (8 : PowerSeries ℚ) * X ^ 3 ≠ 0 := mul_ne_zero h8 hXpow
+  apply mul_left_cancel₀ hcancel
+  linear_combination hcombo - (Kernel.A^2*(jS F 2)*X^2 - 2*Kernel.A*(jS F 1)*X^3 - 4*Kernel.A*(jS F 2)*X^2 + 2*(jS F 1)*X^4 + 6*(jS F 1)*X^3 + 3*(jS F 2)*X^4 - 2*(jS F 2)*X^3 + 3*(jS F 2)*X^2 + 8*(JmS F)*X^4 + 8*(pS F 2)*X^4) * Kernel.A_sq
 
 theorem walkRow2Bare {F : St → Nat} (h : StartData F 1 0 1 1) :
     m21Bare * (jS F 1) + m22Bare * (jS F 2) + m23Bare * (jS F 3) + m24Bare * (JmS F) + m25Bare * (pS F 2) + m26Bare * (pS F 3) = r2Bare := by
-  sorry
+  have hu2 := Kernel.u2_def
+  have e1 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 = 8 * X ^ 3 * (Kernel.B - 1 - X) := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 = 8 * X ^ 3 * (2 * X * Kernel.u2) := by ring
+    rw [h', hu2]
+  have e2 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 2 = 4 * X ^ 2 * (Kernel.B - 1 - X) ^ 2 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 2 = 4 * X ^ 2 * (2 * X * Kernel.u2) ^ 2 := by ring
+    rw [h', hu2]
+  have e3 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 3 = 2 * X * (Kernel.B - 1 - X) ^ 3 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 3 = 2 * X * (2 * X * Kernel.u2) ^ 3 := by ring
+    rw [h', hu2]
+  have e4 : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 4 = (Kernel.B - 1 - X) ^ 4 := by
+    have h' : (16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 4 = (2 * X * Kernel.u2) ^ 4 := by ring
+    rw [h', hu2]
+  have hQ := closing_Q_u2 h
+  unfold Qser at hQ
+  simp only [map_natCast] at hQ
+  push_cast at hQ
+  have hcombo : ((1 : PowerSeries ℚ) - jS F 1 + X ^ 2 * c1S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2) +
+      ((0 : PowerSeries ℚ) - jS F 2 + X ^ 2 * c2S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 2) +
+      (X ^ 2 * c3S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 3) +
+      (X ^ 2 * c4S F) * ((16 : PowerSeries ℚ) * X ^ 4 * Kernel.u2 ^ 4) = 0 := by
+    linear_combination (16 * X ^ 4) * hQ
+  rw [e1, e2, e3, e4] at hcombo
+  unfold c1S c2S c3S c4S at hcombo
+  unfold m21Bare m22Bare m23Bare m24Bare m25Bare m26Bare r2Bare
+  have hXpow : (X : PowerSeries ℚ) ^ 3 ≠ 0 := pow_ne_zero 3 X_ne_zero
+  have h8 : (8 : PowerSeries ℚ) ≠ 0 := by
+    intro hh
+    have hz := congrArg constantCoeff hh
+    rw [show constantCoeff (8 : PowerSeries ℚ) = 8 from map_ofNat constantCoeff 8, map_zero] at hz
+    norm_num at hz
+  have hcancel : (8 : PowerSeries ℚ) * X ^ 3 ≠ 0 := mul_ne_zero h8 hXpow
+  apply mul_left_cancel₀ hcancel
+  linear_combination hcombo - (Kernel.B^2*(jS F 2)*X^2 + 2*Kernel.B*(jS F 1)*X^3 - 4*Kernel.B*(jS F 2)*X^2 + 2*(jS F 1)*X^4 - 6*(jS F 1)*X^3 + 3*(jS F 2)*X^4 + 2*(jS F 2)*X^3 + 3*(jS F 2)*X^2 + 8*(JmS F)*X^4 + 8*(pS F 2)*X^4) * Kernel.B_sq
 
 theorem walkRow3Bare {F : St → Nat} (h : StartData F 1 0 1 1) :
     m31Bare * (jS F 1) + m32Bare * (jS F 2) + m33Bare * (jS F 3) + m34Bare * (JmS F) + m35Bare * (pS F 2) + m36Bare * (pS F 3) = r3Bare := by
-  sorry
+  have hc := closing_eq3 h
+  unfold c1S at hc
+  simp only [map_natCast] at hc
+  push_cast at hc
+  unfold m31Bare m32Bare m33Bare m34Bare m35Bare m36Bare r3Bare
+  linear_combination hc
 
 theorem walkRow4Bare {F : St → Nat} (h : StartData F 1 0 1 1) :
     m41Bare * (jS F 1) + m42Bare * (jS F 2) + m43Bare * (jS F 3) + m44Bare * (JmS F) + m45Bare * (pS F 2) + m46Bare * (pS F 3) = r4Bare := by
-  sorry
+  have hc := closing_eq4 h
+  unfold c1S c2S c3S c4S at hc
+  simp only [map_natCast] at hc
+  push_cast at hc
+  unfold m41Bare m42Bare m43Bare m44Bare m45Bare m46Bare r4Bare
+  linear_combination hc
 
 theorem walkRow5Bare {F : St → Nat} (h : StartData F 1 0 1 1) :
     m51Bare * (jS F 1) + m52Bare * (jS F 2) + m53Bare * (jS F 3) + m54Bare * (JmS F) + m55Bare * (pS F 2) + m56Bare * (pS F 3) = r5Bare := by
@@ -445,7 +613,23 @@ theorem mulVec_walkBare {F : St → Nat} (h : StartData F 1 0 1 1) :
 vectorized and rescaled). -/
 theorem mulVec_scaledNumBare :
     (matBare).mulVec (scaledNumBare) = (X ^ 3 * denAllBare) • rvecBare := by
-  sorry
+  funext c
+  fin_cases c <;>
+    simp [matBare, scaledNumBare, rvecBare, Matrix.mulVec, dotProduct,
+      Fin.sum_univ_six, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+      Pi.smul_apply, smul_eq_mul, Matrix.of_apply]
+  · unfold m11Bare m12Bare m13Bare m14Bare m15Bare m16Bare r1Bare denAllBare
+    linear_combination row1Bare
+  · unfold m21Bare m22Bare m23Bare m24Bare m25Bare m26Bare r2Bare denAllBare
+    linear_combination row2Bare
+  · unfold m31Bare m32Bare m33Bare m34Bare m35Bare m36Bare r3Bare denAllBare
+    linear_combination row3Bare
+  · unfold m41Bare m42Bare m43Bare m44Bare m45Bare m46Bare r4Bare denAllBare
+    linear_combination row4Bare
+  · unfold m51Bare m52Bare m53Bare m54Bare m55Bare m56Bare r5Bare denAllBare
+    linear_combination row5Bare
+  · unfold m61Bare m62Bare m63Bare m64Bare m65Bare m66Bare r6Bare denAllBare
+    linear_combination row6Bare
 
 /-- Uniqueness: the two solutions of the cleared system agree after the
 common `X^E·D` scaling (adjugate against the determinant, in the domain). -/
