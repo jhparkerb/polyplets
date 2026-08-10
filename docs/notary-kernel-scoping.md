@@ -108,14 +108,25 @@ curve" to "derived from the walk, end to end" — but the walk itself still
 hangs on B for its combinatorial meaning, and on D for the connection to
 the triangle.
 
-**D — identities (I)/(II).** `D_1(k) = lead(R_k)/(−3)^(k+1)` and
-`D_1(k) = [y^k](P̂ − B²/(3+S))` for all `k`. Blocked behind the general-`k`
-factorization lemma that `Diagonal.lean` names as its missing theorem
-(its header: "general `k` is a *sketch*, and the factorization lemma it
-needs is the real theorem"), then diagonal-law Steps 4–5 and the tightness
-degree count. This is the largest piece and the only one whose paper proof
-is itself a multi-step sketch at general `k`. Nothing below D changes what
-is *proved about the triangle*; T/B/K live entirely on the walk side.
+**D — identities (I)/(II). CONFIRMED OPEN 2026-08-10 — not closable as a
+formula.** `D_1(k) = lead(R_k)/(−3)^(k+1)` and `D_1(k) = [y^k](P̂ − B²/(3+S))`
+for all `k`. Blocked behind the general-`k` factorization lemma that
+`Diagonal.lean` names as its missing theorem (its header: "general `k` is a
+*sketch*, and the factorization lemma it needs is the real theorem"), then
+diagonal-law Steps 4–5 and the tightness degree count. That lemma reduces to a
+closed form for the single-cluster generating function `B(y)` — and the a(40)
+extraction settles it in the **negative**: 18 converged terms (was 9 at a(21),
+inside the 15–20-term window once thought decisive), and every falsifiable
+algebraic/D-finite form is trivial (`experiments/braw_from_data.py`,
+`build/braw_a40.log`; `docs/proofs/T-n-nm2-and-general.md` §5). `B(y)` is not
+algebraic or D-finite at any reachable complexity, so the uniform general-`k`
+lemma has no closed form to transcribe. D is therefore **finite-pinned** (walk
+= triangle exactly at `k ≤ 8` assembled, `k ≤ 19` two-source, order-60
+holdout) and stays there; the all-orders `hbridge` of
+`phi_annihilates_of_exact` is not dischargeable as a uniform theorem. Nothing
+below D changes what is *proved about the triangle*; T/B/K live entirely on the
+walk side, and Notary's deliverable (the defect law + exact constants) does not
+consume D.
 
 ## Dependency picture
 
@@ -131,15 +142,21 @@ Full theorem = K + B + D  (T absorbed into K)
 
 - Ordered by value per unit risk: **T first** (self-contained, finishes
   GapWalk.lean's open item, prerequisite for K), then **B**, then **K**,
-  with **D** last and priced separately once `Diagonal.lean`'s general-`k`
-  lemma is attempted at all. *(T landed 2026-08-09; B landed 2026-08-09;
+  with **D** last. *(T landed 2026-08-09; B landed 2026-08-09;
   K landed 2026-08-10 up to the piece-D bridge — `Φ(x,N(x))=0` exact at all
   orders, `DepthOneKernelPhi.phi_annihilates_exact`, waves α–δ in
-  `docs/notary-k-plan.md`. Only D remains.)*
-- None of the four is a single-session Sonnet task under the wave-1 pattern
-  (one file, one agent, gate-checked); each is a multi-module campaign with
-  Fable-authored decompositions per module. Per the frontier rules, none
-  launches without explicit agreement.
+  `docs/notary-k-plan.md`.)* **Terminus 2026-08-10: T, B, K done; D
+  confirmed open (no closed-form `B(y)`) and finite-pinned. Notary is at its
+  achievable maximum — the walk side is closed, the triangle tie is exact to
+  finite order, and the two remaining boundaries (D, the analytic transfer)
+  are a genuine open problem and a scoped-out real-analysis step, not pending
+  work. Close-out disclosure: `results/notary-depth1-lean.md` "Terminus".**
+- T, B, K were each a multi-module campaign with Fable-authored decompositions
+  per module, launched on explicit agreement (not a wave-1-shaped task). D is
+  no longer a launchable formalization target: its uniform lemma has no closed
+  form. The only remaining *optional* work is finite polish — fixed-`k`
+  `k = 3, 4` in `Diagonal.lean`, or discharging `hbridge` to a chosen finite
+  order — which strengthens the finite pin but changes nothing structural.
 - The disclosure as of wave 2 stands on its own (`docs/notary-lean-plan.md`
   §1 fallback): algebraicity checked in Lean to order 60 with 4-order
   holdout past the fit, branch constants exact, assembly closed inside Lean

@@ -129,21 +129,54 @@ Axioms throughout: `propext, Classical.choice, Quot.sound` plus
 audited per-theorem in-file). `phi_annihilates_exact` and
 `phi_annihilates_of_exact` are on the standard three only.
 
-## What remains paper-only, precisely
+## Terminus (2026-08-10): where Notary stops, and why each boundary is principled
 
-- Identity (II) at all `k`, identity (I), and the diagonal-law Step 4–5
-  frame (piece D of the scoping note; blocked behind `Diagonal.lean`'s
-  general-`k` factorization lemma). This is now the *only* remaining piece:
-  it is exactly the `hbridge` hypothesis of `phi_annihilates_of_exact`, and
-  closing it would discharge that hypothesis and connect the exact
-  `Φ`-annihilation back to the triangle. (The `gmax` truncation argument (T)
-  closed in wave 3; the walk-path ↔ configuration bijection (B) closed in
-  wave 4; `Φ(x, N(x)) = 0` at all orders (K) closed exactly in wave K,
-  above.)
-- Coefficient asymptotics (`C₁ = √6/(27√π)`, exponent `k^{−1/2}` as an
-  asymptotic statement): real-analytic transfer, no Mathlib support —
-  deliberately out of scope; the constants live in Lean as branch data.
+The walk side is closed end to end — T (truncation exactness), B (walk ↔
+cluster configurations), K (`Φ(x, N(x)) = 0` exact at all orders), and the
+branch constants (DepthOneConstants) — all on standard axioms. Two boundaries
+remain, and **neither is unfinished work**: one is a genuine open pure-math
+question, the other a deliberately scoped-out real-analysis step. Notary is at
+its achievable maximum.
 
-D does not launch without explicit agreement (a multi-module campaign, not
-a wave-1-shaped task). T, B, and K launched on exactly that agreement — T
-and B landed 2026-08-09, K landed 2026-08-10.
+**Boundary 1 — the all-orders walk ↔ triangle tie (piece D) is provably not
+closable as a formula.** Piece D is identity (I), `D₁(k) = lead(R_k)/(−3)^(k+1)`,
+tying the walk's defect to the triangle's diagonal polynomial `R_k`; its
+all-orders form is exactly the `hbridge` hypothesis of
+`phi_annihilates_of_exact` and exactly `Diagonal.lean`'s general-`k`
+factorization lemma. That lemma reduces to a closed form for the single-cluster
+generating function `B(y)`. **We now know there is none:** extending the
+extraction to the banked a(40) triangle gives 18 converged terms of `B(y)`
+(vs 9 at a(21) — squarely inside the 15–20-term window once thought decisive),
+and every falsifiable algebraic (`P(f,y)=0`) and D-finite (linear-ODE) form
+returns the trivial solution only (`experiments/braw_from_data.py`, log
+`build/braw_a40.log`; recorded in `docs/proofs/T-n-nm2-and-general.md` §5). So
+`B(y)` is not algebraic or D-finite at any reachable complexity — consistent
+with the non-D-finiteness of polyomino growth series. Piece D therefore stays
+**exactly identified with the literal triangle at finite order** — assembled
+inside Lean at `k ≤ 8`, two-source-verified at `k ≤ 19`, algebraicity
+holdout-checked to order 60 — and that finite pin is the mathematical maximum,
+not a placeholder. `hbridge` remains an explicit hypothesis, discharged only up
+to whatever finite order one is willing to compute (a `native_decide`-scale
+check, deliberately not taken since the exact `phi_annihilates_exact` already
+subsumes the finite value pin).
+
+**Boundary 2 — the analytic transfer** (branch data → the literal `k^{−1/2}`
+asymptotic and `C₁ = √6/(27√π)` with its `√π`): real-analytic, no Mathlib
+support, **deliberately out of scope since wave 2**. The constants live in Lean
+as exact branch data (`(27x−1)²`, `27V₀² = 2`, `a`); the passage from
+"square-root branch" to coefficient asymptotics is stated in the paper and
+consumes those Lean-verified constants.
+
+**Net.** Notary's deliverable — the depth-1 defect law, its quartic `Φ`, and
+its exact algebraic constants — is proved on the walk side, at all orders, on
+standard axioms. Its identification with the literal polyplet triangle is exact
+to finite order and known to have no uniform closed form beyond that. There is
+no remaining proof effort that would change this: piece D is an open pure-math
+question (not a to-do), and the analytic transfer is a scoped-out real-analysis
+step. The optional finite increments that remain — fixed-`k` `k = 3, 4` in
+`Diagonal.lean` (mechanical, no `B(y)`), or discharging `hbridge` to a chosen
+finite order — strengthen the finite pin but change nothing structural.
+
+(History: T and B launched and landed 2026-08-09; K launched and landed
+2026-08-10; the `B(y)` non-closability check completed 2026-08-10, converting
+D from "pending multi-module campaign" to "confirmed open, finite-pinned.")

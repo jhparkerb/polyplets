@@ -198,9 +198,23 @@ polyomino GF is conjectured so). Going further needs ~15–20 terms, which requi
 driving the engine into the expensive tall-strip / high-excess region (H≈14–18)
 for a poor-prior, high-degree fit.
 
+**Update 2026-08-10 — extended to the a(40) triangle, negative confirmed.**
+The a(40) per-height data (`results/ns_a40/`, banked) reaches into exactly the
+tall-strip region §above wanted, so the `λ_raw` slice now yields **18 converged
+terms** (was 9 at a(21); the first 9 reproduce the values above exactly,
+denominators still pure powers of 3). Re-running the falsifiable equation search
+at that ceiling — algebraic `P(f,y)=0` up to (deg_f 8 × deg_y 1) and linear ODEs
+up to order 4, on both `λ_raw` and `log λ_raw` — **every falsifiable form returns
+the trivial solution only**. So the 2026-06-29 negative is not a data-starvation
+artefact: at doubled precision, inside the 15–20-term window, B(y) still shows no
+algebraic or D-finite closed form. This is strong evidence it is genuinely
+non-D-finite, consistent with the polyomino-growth lore. (Restored + extended
+extractor: `experiments/braw_from_data.py [NMAX]`, log `build/braw_a40.log`.)
+
 **Status: parked, not blocking.** The *practical* value of B(y) is already banked
 — the proven diagonals free the expensive **top** heights (k≤4 wired into the
 engine; k≤7 data-pinned as cross-checks). Full B(y) closure would only
 formula-free the *cheap* low heights. So closing B(y) is a pure-math open question,
 not on the a(n) record path. Reproduce the extraction with
-`experiments/braw_from_data.py` against the per-height files in `results/ns_a21/`.
+`experiments/braw_from_data.py` against the per-height files in `results/ns_a40/`
+(or pass an `NMAX` with a matching `results/ns_a{NMAX}/` tree).
