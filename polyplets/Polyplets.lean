@@ -14,6 +14,7 @@ import Polyplets.GapWalkBridge
 import Polyplets.GapWalkCanon
 import Polyplets.GapWalkEnds
 import Polyplets.GapWalkPeel
+import Polyplets.GapWalkRowVals
 import Polyplets.GapWalkRows
 import Polyplets.GapWalkStacks
 import Polyplets.GapWalkTrunc
@@ -22,6 +23,8 @@ import Polyplets.Growth
 import Polyplets.Holes
 import Polyplets.HolesUpper
 import Polyplets.IntCoeff
+import Polyplets.KernelRoots
+import Polyplets.KernelSeries
 import Polyplets.Northcott
 import Polyplets.Grand.Audit
 import Polyplets.Grand.ExpForm

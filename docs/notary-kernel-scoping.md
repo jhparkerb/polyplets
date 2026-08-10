@@ -125,7 +125,8 @@ Full theorem = K + B + D  (T absorbed into K)
   GapWalk.lean's open item, prerequisite for K), then **B**, then **K**,
   with **D** last and priced separately once `Diagonal.lean`'s general-`k`
   lemma is attempted at all. *(T landed 2026-08-09; B landed 2026-08-09;
-  K is next.)*
+  K opened 2026-08-09 — decomposition, measurements, and wave K-α in
+  `docs/notary-k-plan.md`.)*
 - None of the four is a single-session Sonnet task under the wave-1 pattern
   (one file, one agent, gate-checked); each is a multi-module campaign with
   Fable-authored decompositions per module. Per the frontier rules, none

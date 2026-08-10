@@ -1,0 +1,176 @@
+# Notary piece K: the kernel method at all orders, in Lean
+
+2026-08-09. Companion to `docs/notary-kernel-scoping.md` (piece K's pricing)
+and `docs/notary-lean-plan.md` (campaign conventions). Target head theorem:
+
+    Φ(x, N(x)) = 0   exactly, in ℚ⟦x⟧,
+
+for the walk series `N` whose truncations `DepthOneSeries.nSeries` already
+pins to the banked defect at `k ≤ 19` and annihilates mod `x^61`. With T and
+B closed, this upgrades every campaign constant from "branch data of a pinned
+curve" to "derived from the walk, end to end".
+
+## 0. Measurement basis
+
+`experiments/notary_k_measure.py` (log `build/notary_k_measure.log`,
+2026-08-09, 79 s) verified numerically every statement class below, before
+any skeleton was written:
+
+- **m1** the closed-form transition rows (generic `g ≥ 3` both classes, four
+  boundary rows with uniform tails, start vectors) against
+  `depth1_gap_walk.transitions`, `g ≤ 29`, `gp ≤ 60`;
+- **m2** J-support `≤ 2m + 2` and P-tail constancy from `g ≥ 2m + 3`
+  (interior start is tight at `2m + 3`, bare start reaches `2m + 2`);
+- **m3** the two master double-series identities (§2) coefficient-wise,
+  `u`-orders `≤ 44`, `y`-orders `< 14`, both starts;
+- **m4** the square-root recursions for `A`, `B`, the shifted-series roots
+  `u₁`, `u₂`, their kernel identities to `s`-order 51, and agreement with
+  the sympy roots;
+- **m5** the cleared 6×6 system (§3): the walk's own series satisfy it
+  (both starts, `s`-order 28), the sympy closed forms satisfy it exactly,
+  and both determinants have **valuation 12 with leading coefficient −16**
+  — the uniqueness certificate is one rational number;
+- **m6** transcription sizes: every closed-form component is ≤ 235 chars
+  with per-component `s`-poles of order ≤ 4 that cancel in the basis
+  combination; all polynomial denominators are units in ℚ⟦s⟧;
+- **m7** the elimination identity `Ψ(T) = 0` in the algebra
+  `ℚ(s)[A,B]/(A²−AA, B²−BB)` (the future `ring` lemma), the `y`-form
+  quartic `cY₀..cY₄` (≤ 115 chars each), its numeric annihilation of `F₁`
+  to `s`-order 41, and the exact lift `Σ cYₖ(3x)((W−1)/3)^k = (1/3)·Φ(x,W)`
+  against the banked `PHI_COEFFS`.
+
+## 1. Architecture in one paragraph
+
+Everything lives in `ℚ⟦s⟧` (`y = s²`); no topology, no complex analysis.
+The walk's exact (uncapped) values exist by piece T's cone lemma
+(`GapWalkTrunc.iter_agree`); its per-gap generating series `ĵ_g`, `p̂_g` are
+even series, and locally finite sums (`val ≥ g` per term) are defined
+coefficient-wise by a small bespoke library — not Mathlib topology. The two
+master identities (§2) hold per column by the closed-form rows; evaluating
+the `u`-columns against the kernel roots `u₁, u₂ ∈ s·ℚ⟦s⟧` telescopes them
+into six closing equations per start vector — with the P-side equations
+*cleared* of `D′(uᵢ)` denominators, so every equation is polynomial in the
+generators. The transcribed sympy solution satisfies the same affine system
+(pure `ring` over `A² = (1−3s)(1+s)`, `B² = (1+3s)(1−s)`); the difference is
+killed by Cramer (`Matrix.adjugate_mul`) in the domain ℚ⟦s⟧, using
+`coeff 12 (det M) = −16 ≠ 0`. The assembly `F₁ = P̂ − B²/(3+S)` and the
+degree-4 norm identity `Ψ(T) = 0` then annihilate `F₁` by the `y`-form
+quartic; the substitution `x ↦ s²/3` (`rescale` + `expand`, injective)
+carries this to `Φ(x, N(x)) = 0`.
+
+## 2. The two master identities
+
+With `D(u) = u² − y(1+u+u²)²`, `J₃ = J − j₁u − j₂u²`, `P₃ = P − p₂u²`:
+
+    D·J₃ = u²·Q,            Q = J0 − j₁u − j₂u² + y·R_J          (J-master)
+    D·(P₃ − 2J₃) = u²·(P0 − p₂u² − 2J₃ + y·R_P)                  (P-master)
+
+as identities per `u`-column with ℚ⟦s⟧-coefficients (`R_J`, `R_P` as in
+`experiments/severance_w2_kernel.py`; the `1/(1−u)` tails of `R_P` and `P0`
+are geometric columns). Verified coefficient-wise (m3). At `u = uᵢ`,
+`D(uᵢ) = 0` kills the left sides; the derivative of the J-master gives
+`D′(uᵢ)·J₃(uᵢ) = uᵢ²·Q′(uᵢ)`, which clears `J₃(uᵢ)` from the P-side. The
+six closing equations per start are then
+
+    (1),(2)  Q(uᵢ) = 0
+    (3)      j₁ = [u¹]J0 + y(j₃ + c₁)
+    (4)      Jm·(1 − 9y) = Q(1)        [proved as a column *sum*, not u = 1]
+    (5),(6)  D′(uᵢ)·(P0(uᵢ) − p₂uᵢ² + y·R_P(uᵢ)) − 2uᵢ²·Q′(uᵢ) = 0
+
+— (4) never substitutes `u = 1` (not a legal series substitution): it is the
+`g ≥ 3` column-sum of the step recurrence, finite per order by J-support.
+
+## 3. Modules and waves
+
+One agent per module, statements pre-verified, gate RED first, as in T/B.
+
+**Wave K-α (independent, 3 agents in parallel):**
+
+- `GapWalkRowVals.lean` — the closed-form rows: generic `g ≥ 3` values for
+  both classes (bulk `(1,2,3,2,1)`, J-background `8/2/8/12`, fold-downs at
+  `gp ≤ 2`), the four boundary rows (heads + uniform tails, symbolic `gp`),
+  start-vector values, and `stepMul g c 1 false = 0`. Counting analogue of
+  `GapWalkRows` (values, not vanishing): filter-length = explicit count via
+  `omega`-driven interval case analysis. ~25 lemmas.
+- `KernelSeriesLib.lean` — the locally-finite-sum library over
+  `PowerSeries ℚ`: `lfsum F := mk (fun n => Σ_{g ≤ n} coeff n (F g))` with
+  hypothesis `∀ g n, n < g → coeff n (F g) = 0`; linearity, fixed-factor
+  pull-through, shift/reindex, finite-support collapse; plus the
+  truncation homomorphism (`trunc`-lists vs `tmul`/`tinvAux` of
+  `GapWalkBridge`) that the det certificate consumes.
+- `KernelRoots.lean` — `A`, `B` by coefficient recursion (`A² = 1−2s−3s²`,
+  `B² = 1+2s−3s²`, constant term 1), `u₁ = ((1−s)−A)/2s`,
+  `u₂ = (−(1+s)+B)/2s` as shifted series with defining relations
+  `2s·u₁ = (1−s) − A` etc., kernel identities `uᵢ² = y(1+uᵢ+uᵢ²)²`,
+  positivity of valuation, `(1−uᵢ)` units, `D′(uᵢ)` and its valuation-1
+  normal form.
+
+**Wave K-β (2 agents):**
+
+- `GapWalkExact.lean` — exact walk values `jE`/`pE` per start (stable caps
+  via `iter_agree`), the exact step recurrence as a finite sum over the
+  closed-form rows, J-support `≤ 2m+2`, P-tail constancy from `2m+3`,
+  `pE m 1 = 0`, and the end-functional bridge: `qEndF`/`bareEndF` of the
+  iterates as linear reads of `jE`/`pE` — the walk-emitted numbers.
+- `GapWalkColumns.lean` — the column series `ĵ_g`, `p̂_g`, tail series, and
+  `Jm` as elements of ℚ⟦s⟧ (even, `y = s²`); the two master identities of
+  §2 per `u`-column, from the exact recurrence.
+
+**Wave K-γ (1 agent, after α+β):**
+
+- `GapWalkClosing.lean` — `J₃(uᵢ)`, `P₃(uᵢ)` via `lfsum`; the telescoping;
+  the six closing equations per start as ℚ⟦s⟧ identities; equation (4) as
+  the column sum; the emitted-family series `S`, `B`, `P̂` in terms of the
+  six unknowns (end-functional bridge).
+
+**Wave K-δ (3 agents, sequential dependencies inside the wave):**
+
+- `DepthOneKernelSol.lean` — the transcribed closed forms (12 entries ×
+  4 components, ≤ 235 chars each, per-entry `s`-pole cleared by an explicit
+  shift), and `M·X̂ = R` for both starts: each row multiplied through by the
+  exact `s`-power and units that make it a polynomial identity in
+  `ℚ[s, A, B]` mod the two square relations — `linear_combination`/`ring`.
+  Statements generated and numerically verified by a committed generator
+  script before the skeleton lands. May split into `...SolInt.lean` /
+  `...SolBare.lean` if build times demand.
+- `DepthOneKernelUnique.lean` — `coeff 12 (det M) = −16` (finite rational
+  arithmetic through the truncation homomorphism; `A`-coefficients to order
+  12 as lemma literals), `det M ≠ 0`, Cramer via `Matrix.adjugate_mul` in
+  the domain ℚ⟦s⟧: **the walk's six series are the closed forms** — twice.
+- `DepthOneKernelPhi.lean` — `F₁ = P̂ − B²/(3+S)` (unit `3+S`), the norm
+  identity `Ψ(T) = 0` by `ring`, the `y`-form quartic `cY₀..cY₄`
+  annihilating `F₁`, the lift `x ↦ s²/3` (`PowerSeries.rescale` +
+  `expand`, injective on coefficients, scale `1/3` against the banked Φ),
+  and the head theorem `Φ(x, N(x)) = 0` for `N := mk (nSeries ·)` —
+  literally the series whose truncation `DepthOneSeries.phi_annihilates`
+  checks; corollary: that finite theorem re-derived from this one.
+
+## 4. Gate and axioms
+
+`gate-notary` extends by each landed module (sorry/axiom grep + build).
+Target axiom footprint: standard axioms only for every walk-side module
+(K-α through K-γ); `native_decide` is permitted only where the existing
+modules already use it (none planned; the det certificate is designed to
+land with `decide`/`norm_num` on order-12 literals) — if an agent cannot
+avoid it, that is a statement-design failure to bring back, not a license.
+
+## 5. Order of battle
+
+1. Fable: this plan, wave K-α skeletons (numerically pre-verified
+   statements), RED gate, agent briefs. Commit.
+2. Wave K-α: 3 agents in parallel, then `make gate-notary`.
+3. Fable: K-β skeletons against K-α's landed API; 2 agents.
+4. Fable: K-γ skeleton (the telescoping statements are the one place the
+   summability library and the roots meet — drafted in full, not sketched);
+   1 agent.
+5. Fable: generator script for K-δ (X̂ literals, cleared-row identities,
+   det tuple, `cY` literals; each emitted statement re-verified
+   numerically), then the three K-δ skeletons; agents in dependency order.
+6. Every wave ends `make gate-notary`; full `make` once per code-touching
+   session. Waves respect the 3-hour usage window; no ETAs are quoted
+   because none have a measured basis.
+
+## Execution status
+
+- 2026-08-09: plan written; measurement m1–m7 all pass
+  (`build/notary_k_measure.log`).
