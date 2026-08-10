@@ -174,3 +174,11 @@ avoid it, that is a statement-design failure to bring back, not a license.
 
 - 2026-08-09: plan written; measurement m1–m7 all pass
   (`build/notary_k_measure.log`).
+- 2026-08-09: wave K-α complete — `GapWalkRowVals`, `KernelSeries`,
+  `KernelRoots` all proved, zero sorries, standard axioms only, both
+  `#guard_msgs` audits green per module. One statement fix during the wave,
+  made by the author not the agents: `lfsum_of_support_lt` gained its missing
+  `LocFin F` hypothesis after the KernelSeries agent produced a counterexample
+  to the stated form and correctly left it sorried. No other statement
+  changed. `make gate-notary` green; full `make` green
+  (`build/make-full-notary-K-alpha.log`).
