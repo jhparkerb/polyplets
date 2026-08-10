@@ -132,23 +132,28 @@ noncomputable def JmS (F : St → Nat) : PowerSeries ℚ := e2 (JmY F)
 
 @[simp] theorem coeff_jS_even (F : St → Nat) (g m : Nat) :
     coeff (2 * m) (jS F g) = (jE F m g : ℚ) := by
-  sorry
+  change coeff (2 * m) (e2 (jY F g)) = (jE F m g : ℚ)
+  rw [e2, PowerSeries.coeff_expand_mul, coeff_jY]
 
 theorem coeff_jS_odd (F : St → Nat) (g n : Nat) (h : ¬ 2 ∣ n) :
     coeff n (jS F g) = 0 := by
-  sorry
+  change coeff n (e2 (jY F g)) = 0
+  rw [e2, PowerSeries.coeff_expand_of_not_dvd 2 (by norm_num) _ h]
 
 @[simp] theorem coeff_pS_even (F : St → Nat) (g m : Nat) :
     coeff (2 * m) (pS F g) = (pE F m g : ℚ) := by
-  sorry
+  change coeff (2 * m) (e2 (pY F g)) = (pE F m g : ℚ)
+  rw [e2, PowerSeries.coeff_expand_mul, coeff_pY]
 
 theorem coeff_pS_odd (F : St → Nat) (g n : Nat) (h : ¬ 2 ∣ n) :
     coeff n (pS F g) = 0 := by
-  sorry
+  change coeff n (e2 (pY F g)) = 0
+  rw [e2, PowerSeries.coeff_expand_of_not_dvd 2 (by norm_num) _ h]
 
 /-- Nothing is ever pending at gap 1, in `s`. -/
 theorem pS_one (F : St → Nat) (h1 : F (1, false) = 0) : pS F 1 = 0 := by
-  sorry
+  change e2 (pY F 1) = 0
+  rw [pY_one F h1, map_zero]
 
 /-! ## The transported column identities -/
 
@@ -157,39 +162,45 @@ theorem jS_col_one {F : St → Nat} {j01 j02 p02 pt : Nat}
     jS F 1 = C (j01 : ℚ) +
       X ^ 2 * (5 * jS F 1 + 6 * jS F 2 + 8 * JmS F - jS F 3 +
         2 * pS F 2 + pS F 3) := by
-  sorry
+  simpa [jS, pS, JmS, e2, map_add, map_sub, map_mul, map_ofNat, PowerSeries.expand_C,
+    PowerSeries.expand_X] using congrArg e2 (jY_col_one h)
 
 theorem jS_col_two {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
     jS F 2 = C (j02 : ℚ) +
       X ^ 2 * (2 * jS F 1 + 3 * jS F 2 + 2 * JmS F + 2 * jS F 3 +
         jS F 4 + 2 * pS F 2) := by
-  sorry
+  simpa [jS, pS, JmS, e2, map_add, map_sub, map_mul, map_ofNat, PowerSeries.expand_C,
+    PowerSeries.expand_X] using congrArg e2 (jY_col_two h)
 
 theorem jS_col_three {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
     jS F 3 = X ^ 2 * (jS F 1 + 2 * jS F 2 + 3 * jS F 3 + 2 * jS F 4 +
       jS F 5) := by
-  sorry
+  simpa [jS, pS, JmS, e2, map_add, map_sub, map_mul, map_ofNat, PowerSeries.expand_C,
+    PowerSeries.expand_X] using congrArg e2 (jY_col_three h)
 
 theorem jS_col_four {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
     jS F 4 = X ^ 2 * (jS F 2 + 2 * jS F 3 + 3 * jS F 4 + 2 * jS F 5 +
       jS F 6) := by
-  sorry
+  simpa [jS, pS, JmS, e2, map_add, map_sub, map_mul, map_ofNat, PowerSeries.expand_C,
+    PowerSeries.expand_X] using congrArg e2 (jY_col_four h)
 
 theorem jS_col_generic {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) (k : Nat) :
     jS F (k + 5) = X ^ 2 * (jS F (k + 7) + 2 * jS F (k + 6) +
       3 * jS F (k + 5) + 2 * jS F (k + 4) + jS F (k + 3)) := by
-  sorry
+  simpa [jS, pS, JmS, e2, map_add, map_sub, map_mul, map_ofNat, PowerSeries.expand_C,
+    PowerSeries.expand_X] using congrArg e2 (jY_col_generic h k)
 
 theorem pS_col_two {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
     pS F 2 = C (p02 : ℚ) +
       X ^ 2 * ((pS F 4 - 2 * jS F 4) + 2 * (pS F 3 - 2 * jS F 3) +
         8 * JmS F + 4 * jS F 1 + 4 * jS F 2 + pS F 2) := by
-  sorry
+  simpa [jS, pS, JmS, e2, map_add, map_sub, map_mul, map_ofNat, PowerSeries.expand_C,
+    PowerSeries.expand_X] using congrArg e2 (pY_col_two h)
 
 theorem pS_col_three {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
@@ -197,7 +208,8 @@ theorem pS_col_three {F : St → Nat} {j01 j02 p02 pt : Nat}
       X ^ 2 * ((pS F 5 - 2 * jS F 5) + 2 * (pS F 4 - 2 * jS F 4) +
         3 * (pS F 3 - 2 * jS F 3) + 12 * JmS F + 6 * jS F 1 +
         6 * jS F 2 + 4 * pS F 2) := by
-  sorry
+  simpa [jS, pS, JmS, e2, map_add, map_sub, map_mul, map_ofNat, PowerSeries.expand_C,
+    PowerSeries.expand_X] using congrArg e2 (pY_col_three h)
 
 theorem pS_col_four {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
@@ -205,7 +217,8 @@ theorem pS_col_four {F : St → Nat} {j01 j02 p02 pt : Nat}
       X ^ 2 * ((pS F 6 - 2 * jS F 6) + 2 * (pS F 5 - 2 * jS F 5) +
         3 * (pS F 4 - 2 * jS F 4) + 2 * (pS F 3 - 2 * jS F 3) +
         12 * JmS F + 8 * jS F 1 + 8 * jS F 2 + 3 * pS F 2) := by
-  sorry
+  simpa [jS, pS, JmS, e2, map_add, map_sub, map_mul, map_ofNat, PowerSeries.expand_C,
+    PowerSeries.expand_X] using congrArg e2 (pY_col_four h)
 
 theorem pS_col_generic {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) (k : Nat) :
@@ -216,9 +229,224 @@ theorem pS_col_generic {F : St → Nat} {j01 j02 p02 pt : Nat}
         2 * (pS F (k + 4) - 2 * jS F (k + 4)) +
         (pS F (k + 3) - 2 * jS F (k + 3)) +
         12 * JmS F + 8 * jS F 1 + 10 * jS F 2 + 2 * pS F 2) := by
-  sorry
+  simpa [jS, pS, JmS, e2, map_add, map_sub, map_mul, map_ofNat, PowerSeries.expand_C,
+    PowerSeries.expand_X] using congrArg e2 (pY_col_generic h k)
 
 /-! ## The `Jm` column-sum recurrence (the equation-(4) primitive) -/
+
+/-! ### Local Finset-window helpers (replicated from `GapWalkColumns`) -/
+
+/-- Two finsets agreeing that `f` vanishes off each other have equal sums. -/
+private lemma sum_eq_of_zero_outside {M : Type*} [AddCommMonoid M] (f : Nat → M)
+    (S W : Finset Nat) (hSW : ∀ g ∈ S, g ∉ W → f g = 0)
+    (hWS : ∀ g ∈ W, g ∉ S → f g = 0) :
+    ∑ g ∈ S, f g = ∑ g ∈ W, f g := by
+  have h1 : ∑ g ∈ S, f g = ∑ g ∈ S ∪ W, f g := by
+    apply Finset.sum_subset Finset.subset_union_left
+    intro x hx hxS
+    exact hWS x ((Finset.mem_union.mp hx).resolve_left hxS) hxS
+  have h2 : ∑ g ∈ W, f g = ∑ g ∈ S ∪ W, f g := by
+    apply Finset.sum_subset Finset.subset_union_right
+    intro x hx hxW
+    exact hSW x ((Finset.mem_union.mp hx).resolve_right hxW) hxW
+  rw [h1, h2]
+
+/-- A length-5 `Icc` sum, peeled from the top. -/
+private lemma sum_Icc_five {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
+    ∑ g ∈ Finset.Icc a (a + 4), f g = f a + f (a + 1) + f (a + 2) + f (a + 3) + f (a + 4) := by
+  rw [Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega),
+    Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega), Finset.Icc_self,
+    Finset.sum_singleton]
+
+/-- A length-3 `Icc` sum, peeled from the top. -/
+private lemma sum_Icc_three {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
+    ∑ g ∈ Finset.Icc a (a + 2), f g = f a + f (a + 1) + f (a + 2) := by
+  rw [Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega), Finset.Icc_self,
+    Finset.sum_singleton]
+
+/-- A length-4 `Icc` sum, peeled from the top. -/
+private lemma sum_Icc_four {M : Type*} [AddCommMonoid M] (f : Nat → M) (a : Nat) :
+    ∑ g ∈ Finset.Icc a (a + 3), f g = f a + f (a + 1) + f (a + 2) + f (a + 3) := by
+  rw [Finset.sum_Icc_succ_top (by omega), Finset.sum_Icc_succ_top (by omega),
+    Finset.sum_Icc_succ_top (by omega), Finset.Icc_self, Finset.sum_singleton]
+
+/-- Splitting off the first two gaps of an `Icc 1 n` sum. -/
+private lemma sum_Icc_one_two_split {M : Type*} [AddCommMonoid M] (f : Nat → M) (n : Nat)
+    (hn : 2 ≤ n) :
+    ∑ g ∈ Finset.Icc 1 n, f g = f 1 + f 2 + ∑ g ∈ Finset.Icc 3 n, f g := by
+  have hset : Finset.Icc 1 n = insert 1 (insert 2 (Finset.Icc 3 n)) := by
+    ext x
+    simp only [Finset.mem_Icc, Finset.mem_insert]
+    omega
+  rw [hset, Finset.sum_insert (by simp only [Finset.mem_insert, Finset.mem_Icc]; omega),
+    Finset.sum_insert (by simp only [Finset.mem_Icc]; omega), add_assoc]
+
+/-- The `ℕ`-level column-sum recurrence: the deep `J` mass at order `m+1`,
+plus the two edge corrections, is nine times the deep mass at order `m`
+plus the two head feeds. -/
+private lemma jE_Jm_step_nat (F : St → Nat) (hF : ∀ g, 3 ≤ g → F (g, true) = 0) (m : Nat) :
+    (∑ g ∈ Finset.Icc 3 (2 * m + 4), jE F (m + 1) g) + 3 * jE F m 3 + jE F m 4 =
+      jE F m 1 + 3 * jE F m 2 + 9 * (∑ g ∈ Finset.Icc 3 (2 * m + 2), jE F m g) := by
+  have hstep : ∀ g ∈ Finset.Icc 3 (2 * m + 4), jE F (m + 1) g =
+      ∑ g' ∈ Finset.Icc 1 (2 * m + 2), jE F m g' * stepMul g' true g true := by
+    intro g hg
+    simp only [Finset.mem_Icc] at hg
+    rw [jE_step F hF m g (by omega)]
+    have hP : (∑ g' ∈ Finset.Icc 1 3, pE F m g' * stepMul g' false g true) = 0 := by
+      apply Finset.sum_eq_zero
+      intro g' _hg'
+      rw [stepMul_P_to_J g' g (by omega)]; ring
+    rw [hP, Nat.add_zero]
+  have hsum : (∑ g ∈ Finset.Icc 3 (2 * m + 4), jE F (m + 1) g) =
+      ∑ g ∈ Finset.Icc 3 (2 * m + 4), ∑ g' ∈ Finset.Icc 1 (2 * m + 2),
+        jE F m g' * stepMul g' true g true :=
+    Finset.sum_congr rfl hstep
+  rw [hsum, Finset.sum_comm]
+  have hsplit : (∑ g' ∈ Finset.Icc 1 (2 * m + 2), ∑ g ∈ Finset.Icc 3 (2 * m + 4),
+      jE F m g' * stepMul g' true g true) =
+      ∑ g' ∈ Finset.Icc 1 (2 * m + 2), jE F m g' *
+        (∑ g ∈ Finset.Icc 3 (2 * m + 4), stepMul g' true g true) := by
+    apply Finset.sum_congr rfl
+    intro g' _hg'
+    rw [Finset.mul_sum]
+  rw [hsplit, sum_Icc_one_two_split _ (2 * m + 2) (by omega)]
+  have hA1 : (∑ g ∈ Finset.Icc 3 (2 * m + 4), stepMul 1 true g true) = 1 := by
+    have heq : (∑ g ∈ Finset.Icc 3 (2 * m + 4), stepMul 1 true g true) =
+        ∑ g ∈ ({3} : Finset Nat), stepMul 1 true g true := by
+      apply sum_eq_of_zero_outside
+      · intro g hgS hgW
+        simp only [Finset.mem_singleton] at hgW
+        simp only [Finset.mem_Icc] at hgS
+        rw [stepMul_J_to_J_far 1 g (by omega) (by omega)]
+      · intro g hgW hgS
+        simp only [Finset.mem_singleton] at hgW
+        subst hgW
+        exact absurd (Finset.mem_Icc.mpr ⟨le_refl 3, by omega⟩) hgS
+    rw [heq, Finset.sum_singleton, stepMul_1J_3J]
+  have hA2 : (∑ g ∈ Finset.Icc 3 (2 * m + 4), stepMul 2 true g true) = 3 := by
+    have heq : (∑ g ∈ Finset.Icc 3 (2 * m + 4), stepMul 2 true g true) =
+        ∑ g ∈ ({3, 4} : Finset Nat), stepMul 2 true g true := by
+      apply sum_eq_of_zero_outside
+      · intro g hgS hgW
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hgW
+        simp only [Finset.mem_Icc] at hgS
+        rw [stepMul_J_to_J_far 2 g (by omega) (by omega)]
+      · intro g hgW hgS
+        simp only [Finset.mem_insert, Finset.mem_singleton] at hgW
+        rcases hgW with rfl | rfl <;>
+          exact absurd (Finset.mem_Icc.mpr (by omega)) hgS
+    rw [heq, show ({3, 4} : Finset ℕ) = insert 3 {4} from rfl,
+      Finset.sum_insert (by decide), Finset.sum_singleton, stepMul_2J_3J, stepMul_2J_4J]
+  have hAgen : ∀ g' ∈ Finset.Icc 3 (2 * m + 2),
+      (∑ g ∈ Finset.Icc 3 (2 * m + 4), stepMul g' true g true) +
+        (if g' = 3 then 3 else if g' = 4 then 1 else 0) = 9 := by
+    intro g' hg'
+    simp only [Finset.mem_Icc] at hg'
+    obtain ⟨hg'1, hg'2⟩ := hg'
+    have hrw : (∑ g ∈ Finset.Icc 3 (2 * m + 4), stepMul g' true g true) =
+        ∑ g ∈ Finset.Icc 3 (2 * m + 4), bulkW g' g := by
+      apply Finset.sum_congr rfl
+      intro g hg
+      simp only [Finset.mem_Icc] at hg
+      exact stepMul_J_bulk g' g (by omega) (by omega)
+    rw [hrw]
+    rcases Nat.lt_or_ge g' 5 with hg5 | hg5
+    · interval_cases g'
+      · have hwin : (∑ g ∈ Finset.Icc 3 (2 * m + 4), bulkW 3 g) =
+            ∑ g ∈ Finset.Icc 3 5, bulkW 3 g := by
+          apply sum_eq_of_zero_outside
+          · intro g hgS hgW
+            simp only [Finset.mem_Icc] at hgS hgW
+            simp only [bulkW]; split_ifs with hb <;> omega
+          · intro g hgW hgS
+            simp only [Finset.mem_Icc] at hgW hgS
+            exact absurd (⟨by omega, by omega⟩ : 3 ≤ g ∧ g ≤ 2 * m + 4) hgS
+        rw [hwin, sum_Icc_three]
+        have e1 : bulkW 3 3 = 3 := by simp only [bulkW]; split_ifs <;> omega
+        have e2 : bulkW 3 4 = 2 := by simp only [bulkW]; split_ifs <;> omega
+        have e3 : bulkW 3 5 = 1 := by simp only [bulkW]; split_ifs <;> omega
+        rw [e1, e2, e3]; norm_num
+      · have hwin : (∑ g ∈ Finset.Icc 3 (2 * m + 4), bulkW 4 g) =
+            ∑ g ∈ Finset.Icc 3 6, bulkW 4 g := by
+          apply sum_eq_of_zero_outside
+          · intro g hgS hgW
+            simp only [Finset.mem_Icc] at hgS hgW
+            simp only [bulkW]; split_ifs with hb <;> omega
+          · intro g hgW hgS
+            simp only [Finset.mem_Icc] at hgW hgS
+            exact absurd (⟨by omega, by omega⟩ : 3 ≤ g ∧ g ≤ 2 * m + 4) hgS
+        rw [hwin, show (6 : ℕ) = 3 + 3 from rfl, sum_Icc_four]
+        have e1 : bulkW 4 3 = 2 := by simp only [bulkW]; split_ifs <;> omega
+        have e2 : bulkW 4 4 = 3 := by simp only [bulkW]; split_ifs <;> omega
+        have e3 : bulkW 4 5 = 2 := by simp only [bulkW]; split_ifs <;> omega
+        have e4 : bulkW 4 6 = 1 := by simp only [bulkW]; split_ifs <;> omega
+        rw [e1, e2, e3, e4]; norm_num
+    · have hif : (if g' = 3 then (3 : ℕ) else if g' = 4 then 1 else 0) = 0 := by
+        rw [if_neg (by omega), if_neg (by omega)]
+      rw [hif, Nat.add_zero]
+      obtain ⟨k, rfl⟩ : ∃ k, g' = k + 5 := ⟨g' - 5, by omega⟩
+      have hwin : (∑ g ∈ Finset.Icc 3 (2 * m + 4), bulkW (k + 5) g) =
+          ∑ g ∈ Finset.Icc (k + 3) (k + 7), bulkW (k + 5) g := by
+        apply sum_eq_of_zero_outside
+        · intro g hgS hgW
+          simp only [Finset.mem_Icc] at hgS hgW
+          simp only [bulkW]; split_ifs with hb <;> omega
+        · intro g hgW hgS
+          simp only [Finset.mem_Icc] at hgW hgS
+          exact absurd (⟨by omega, by omega⟩ : 3 ≤ g ∧ g ≤ 2 * m + 4) hgS
+      rw [hwin, sum_Icc_five]
+      have e1 : bulkW (k + 5) (k + 3) = 1 := by simp only [bulkW]; split_ifs <;> omega
+      have e2 : bulkW (k + 5) (k + 4) = 2 := by simp only [bulkW]; split_ifs <;> omega
+      have e3 : bulkW (k + 5) (k + 5) = 3 := by simp only [bulkW]; split_ifs <;> omega
+      have e4 : bulkW (k + 5) (k + 6) = 2 := by simp only [bulkW]; split_ifs <;> omega
+      have e5 : bulkW (k + 5) (k + 7) = 1 := by simp only [bulkW]; split_ifs <;> omega
+      rw [e1, e2, e3, e4, e5]
+  have hgen : (∑ g' ∈ Finset.Icc 3 (2 * m + 2), jE F m g' *
+      (∑ g ∈ Finset.Icc 3 (2 * m + 4), stepMul g' true g true)) + 3 * jE F m 3 + jE F m 4 =
+      9 * (∑ g' ∈ Finset.Icc 3 (2 * m + 2), jE F m g') := by
+    have hpt : (∑ g' ∈ Finset.Icc 3 (2 * m + 2), jE F m g' *
+        (∑ g ∈ Finset.Icc 3 (2 * m + 4), stepMul g' true g true)) +
+        (∑ g' ∈ Finset.Icc 3 (2 * m + 2), jE F m g' *
+          (if g' = 3 then 3 else if g' = 4 then 1 else 0)) =
+        9 * (∑ g' ∈ Finset.Icc 3 (2 * m + 2), jE F m g') := by
+      rw [← Finset.sum_add_distrib, Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro g' hg'
+      rw [← Nat.mul_add, hAgen g' hg']; ring
+    have hcorr : (∑ g' ∈ Finset.Icc 3 (2 * m + 2), jE F m g' *
+        (if g' = 3 then 3 else if g' = 4 then 1 else 0)) = 3 * jE F m 3 + jE F m 4 := by
+      have hwin : (∑ g' ∈ Finset.Icc 3 (2 * m + 2), jE F m g' *
+          (if g' = 3 then (3 : ℕ) else if g' = 4 then 1 else 0)) =
+          ∑ g' ∈ ({3, 4} : Finset Nat), jE F m g' *
+            (if g' = 3 then (3 : ℕ) else if g' = 4 then 1 else 0) := by
+        apply sum_eq_of_zero_outside
+        · intro g' hg'S hg'W
+          simp only [Finset.mem_insert, Finset.mem_singleton] at hg'W
+          rw [if_neg (by omega), if_neg (by omega)]; ring
+        · intro g' hg'W hg'S
+          simp only [Finset.mem_insert, Finset.mem_singleton] at hg'W
+          simp only [Finset.mem_Icc] at hg'S
+          rcases hg'W with rfl | rfl
+          · rw [jE_support F hF m 3 (by omega)]; ring
+          · rw [jE_support F hF m 4 (by omega)]; ring
+      rw [hwin, show ({3, 4} : Finset ℕ) = insert 3 {4} from rfl,
+        Finset.sum_insert (by decide), Finset.sum_singleton]
+      have e1 : (if (3 : ℕ) = 3 then (3 : ℕ) else if 3 = 4 then 1 else 0) = 3 := by norm_num
+      have e2 : (if (4 : ℕ) = 3 then (3 : ℕ) else if 4 = 4 then 1 else 0) = 1 := by norm_num
+      rw [e1, e2]; ring
+    omega
+  rw [hA1, hA2, Nat.mul_one]
+  omega
+
+/-! ### Coefficient bookkeeping for small numerals -/
+
+private lemma coeff_3mulS (S : PowerSeries ℚ) (m : Nat) :
+    coeff m (3 * S) = 3 * coeff m S := by
+  rw [show (3 : PowerSeries ℚ) = C 3 from (map_ofNat C 3).symm, coeff_C_mul]
+
+private lemma coeff_9mulS (S : PowerSeries ℚ) (m : Nat) :
+    coeff m (9 * S) = 9 * coeff m S := by
+  rw [show (9 : PowerSeries ℚ) = C 9 from (map_ofNat C 9).symm, coeff_C_mul]
 
 /-- Summing the generic `J`-columns: the deep mass steps by `9×` itself
 with window-edge corrections and the two head feeds. -/
@@ -226,14 +454,29 @@ theorem JmY_step {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
     JmY F = X * (jY F 1 + 3 * jY F 2 + 9 * JmY F - 3 * jY F 3 -
       jY F 4) := by
-  sorry
+  apply PowerSeries.ext
+  intro n
+  cases n with
+  | zero =>
+    rw [coeff_JmY, show Finset.Icc 3 (2 * 0 + 2) = (∅ : Finset ℕ) from
+        Finset.Icc_eq_empty (by omega), Finset.sum_empty,
+      PowerSeries.coeff_zero_X_mul]
+  | succ m =>
+    rw [coeff_JmY, show 2 * (m + 1) + 2 = 2 * m + 4 from by ring,
+      PowerSeries.coeff_succ_X_mul]
+    simp only [map_add, map_sub, coeff_3mulS, coeff_9mulS, coeff_jY, coeff_JmY]
+    have hn := jE_Jm_step_nat F h.deep_j m
+    have hq := congrArg (fun z : ℕ => (z : ℚ)) hn
+    push_cast at hq
+    linarith [hq]
 
 /-- `JmY_step`, transported. -/
 theorem JmS_step {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
     JmS F = X ^ 2 * (jS F 1 + 3 * jS F 2 + 9 * JmS F - 3 * jS F 3 -
       jS F 4) := by
-  sorry
+  simpa [jS, pS, JmS, e2, map_add, map_sub, map_mul, map_ofNat, PowerSeries.expand_C,
+    PowerSeries.expand_X] using congrArg e2 (JmY_step h)
 
 /-! ## Evaluated series -/
 
@@ -266,7 +509,56 @@ noncomputable def J3serW (F : St → Nat) (u : PowerSeries ℚ) : PowerSeries �
 theorem lfsum_geom (u w : PowerSeries ℚ) (hu : constantCoeff u = 0)
     (hw : (1 - u) * w = 1) (K : Nat) :
     lfsum (fun g => (if g < K then 0 else 1) * u ^ g) = u ^ K * w := by
-  sorry
+  have hS_locfin : LocFin (fun g => u ^ g) := by
+    have h := locFin_geom (fun _ => (1 : PowerSeries ℚ)) u hu
+    simpa only [one_mul] using h
+  have hshiftA : ∀ K : Nat, lfsum (fun g => (if g < K then (0 : PowerSeries ℚ) else 1) * u ^ g) =
+      u ^ K * lfsum (fun g => u ^ g) := by
+    intro K
+    have hGK : LocFin (fun g => (if g < K then (0 : PowerSeries ℚ) else 1) * u ^ g) :=
+      locFin_geom _ u hu
+    rw [lfsum_shift _ hGK K (fun g hg => by simp [if_pos hg])]
+    have heq : (fun g => (if g + K < K then (0 : PowerSeries ℚ) else 1) * u ^ (g + K)) =
+        fun g => u ^ K * u ^ g := by
+      funext g
+      rw [if_neg (by omega), one_mul, pow_add, mul_comm]
+    rw [heq]
+    exact (lfsum_mul_left (u ^ K) (fun g => u ^ g) hS_locfin).symm
+  set S := lfsum (fun g => u ^ g) with hSdef
+  have hD0 : lfsum (fun g => (if g < 0 then (0 : PowerSeries ℚ) else 1) * u ^ g) -
+      lfsum (fun g => (if g < 1 then (0 : PowerSeries ℚ) else 1) * u ^ g) = 1 := by
+    rw [← lfsum_sub]
+    have heq : (fun g => (if g < 0 then (0 : PowerSeries ℚ) else 1) * u ^ g -
+        (if g < 1 then (0 : PowerSeries ℚ) else 1) * u ^ g) =
+        (fun g => if g = 0 then (1 : PowerSeries ℚ) else 0) := by
+      funext g
+      rcases g with _ | g <;> simp
+    rw [heq]
+    have hDlocfin : LocFin (fun g => if g = 0 then (1 : PowerSeries ℚ) else 0) := by
+      intro g n hn
+      rcases g with _ | g
+      · omega
+      · simp
+    rw [lfsum_of_support_lt _ hDlocfin 1 (fun g hg => by simp [show g ≠ 0 from by omega])]
+    simp
+  have hS0 : lfsum (fun g => (if g < 0 then (0 : PowerSeries ℚ) else 1) * u ^ g) = S := by
+    have h0 := hshiftA 0
+    simpa using h0
+  have hS1 : lfsum (fun g => (if g < 1 then (0 : PowerSeries ℚ) else 1) * u ^ g) = u * S := by
+    have h1 := hshiftA 1
+    simpa using h1
+  rw [hS0, hS1] at hD0
+  have hSw : (1 - u) * S = 1 := by linear_combination hD0
+  have h1u_ne : (1 - u : PowerSeries ℚ) ≠ 0 := by
+    intro h
+    rw [h, zero_mul] at hw
+    exact zero_ne_one hw
+  have heqmul : (1 - u) * (S - w) = 0 := by rw [mul_sub, hSw, hw]; ring
+  have hSeqw : S = w := by
+    rcases mul_eq_zero.mp heqmul with h | h
+    · exact absurd h h1u_ne
+    · exact sub_eq_zero.mp h
+  rw [hshiftA K, hSeqw]
 
 /-! ## The right-side polynomials -/
 
@@ -311,6 +603,33 @@ noncomputable def P0ser (p02 pt : Nat) (u w : PowerSeries ℚ) :
     PowerSeries ℚ :=
   C (p02 : ℚ) * u ^ 2 + C (pt : ℚ) * u ^ 3 * w
 
+/-! ### The shifted-window `lfsum` toolkit -/
+
+/-- `u^c` times an `lfsum` reindexes the family by `c` (zero below `c`). -/
+private lemma lfsum_shift_mul (a : ℕ → PowerSeries ℚ) (u : PowerSeries ℚ)
+    (hu : constantCoeff u = 0) (c : ℕ) :
+    u ^ c * lfsum (fun g => a g * u ^ g) =
+      lfsum (fun n => (if n < c then 0 else a (n - c)) * u ^ n) := by
+  have ha : LocFin (fun g => a g * u ^ g) := locFin_geom a u hu
+  have hshift : LocFin (fun n => (if n < c then (0 : PowerSeries ℚ) else a (n - c)) * u ^ n) :=
+    locFin_geom (fun n => if n < c then 0 else a (n - c)) u hu
+  rw [lfsum_shift _ hshift c (fun g hg => by simp [if_pos hg])]
+  have heq : (fun g => (if g + c < c then (0 : PowerSeries ℚ) else a (g + c - c)) * u ^ (g + c)) =
+      fun g => u ^ c * (a g * u ^ g) := by
+    funext g
+    rw [if_neg (by omega), show g + c - c = g from by omega, pow_add]
+    ring
+  rw [heq]
+  exact lfsum_mul_left (u ^ c) (fun g => a g * u ^ g) ha
+
+/-- A finitely-supported family (zero from `K` on) collapses `lfsum` to its
+explicit finite sum, backwards: build an `lfsum` from a finite polynomial. -/
+private lemma lfsum_eq_of_finite (F : ℕ → PowerSeries ℚ) (u : PowerSeries ℚ)
+    (hu : constantCoeff u = 0) (K : Nat) (h : ∀ g, K ≤ g → F g = 0) :
+    lfsum (fun n => F n * u ^ n) = ∑ g ∈ Finset.range K, F g * u ^ g :=
+  lfsum_of_support_lt (fun n => F n * u ^ n) (locFin_geom F u hu) K
+    (fun g hg => by rw [h g hg, zero_mul])
+
 /-! ## The three evaluated master identities (generic `u`, premultiplied) -/
 
 /-- The `J`-master evaluated at any `u` of positive order:
@@ -320,7 +639,95 @@ theorem master_J {F : St → Nat} {j01 j02 p02 pt : Nat}
     (hu : constantCoeff u = 0) :
     u ^ 2 * ((u ^ 2 - X ^ 2 * (1 + u + u ^ 2) ^ 2) * J3ser F u) =
       u ^ 2 * (u ^ 2 * Qser F j01 j02 u) := by
-  sorry
+  have hcore : (u ^ 2 - X ^ 2 * (1 + u + u ^ 2) ^ 2) * J3ser F u =
+      u ^ 2 * Qser F j01 j02 u := by
+    set a : ℕ → PowerSeries ℚ := colJ3 F with hadef
+    set F1 : ℕ → PowerSeries ℚ := fun n => if n < 1 then 0 else a (n - 1) with hF1def
+    set F2 : ℕ → PowerSeries ℚ := fun n => if n < 2 then 0 else a (n - 2) with hF2def
+    set F3 : ℕ → PowerSeries ℚ := fun n => if n < 3 then 0 else a (n - 3) with hF3def
+    set F4 : ℕ → PowerSeries ℚ := fun n => if n < 4 then 0 else a (n - 4) with hF4def
+    have hJ3 : J3ser F u = lfsum (fun g => a g * u ^ g) := rfl
+    have e1 : u ^ 1 * J3ser F u = lfsum (fun n => F1 n * u ^ n) := by
+      rw [hJ3]; exact lfsum_shift_mul a u hu 1
+    have e2 : u ^ 2 * J3ser F u = lfsum (fun n => F2 n * u ^ n) := by
+      rw [hJ3]; exact lfsum_shift_mul a u hu 2
+    have e3 : u ^ 3 * J3ser F u = lfsum (fun n => F3 n * u ^ n) := by
+      rw [hJ3]; exact lfsum_shift_mul a u hu 3
+    have e4 : u ^ 4 * J3ser F u = lfsum (fun n => F4 n * u ^ n) := by
+      rw [hJ3]; exact lfsum_shift_mul a u hu 4
+    have hexpand : (u ^ 2 - X ^ 2 * (1 + u + u ^ 2) ^ 2) * J3ser F u =
+        u ^ 2 * J3ser F u - X ^ 2 * J3ser F u - (2 * X ^ 2) * (u ^ 1 * J3ser F u) -
+          (3 * X ^ 2) * (u ^ 2 * J3ser F u) - (2 * X ^ 2) * (u ^ 3 * J3ser F u) -
+          X ^ 2 * (u ^ 4 * J3ser F u) := by ring
+    rw [e1, e2, e3, e4, hJ3] at hexpand
+    -- The finite right-side family.
+    set rhsF : ℕ → PowerSeries ℚ := fun n =>
+      if n = 3 then C (j01 : ℚ) - jS F 1 + X ^ 2 * c1S F
+      else if n = 4 then C (j02 : ℚ) - jS F 2 + X ^ 2 * c2S F
+      else if n = 5 then X ^ 2 * c3S F
+      else if n = 6 then X ^ 2 * c4S F
+      else 0 with hrhsFdef
+    have hrhs : u ^ 2 * Qser F j01 j02 u = lfsum (fun n => rhsF n * u ^ n) := by
+      have hfin : ∀ g, 7 ≤ g → rhsF g = 0 := by
+        intro g hg
+        simp only [hrhsFdef]
+        rw [if_neg (by omega), if_neg (by omega), if_neg (by omega), if_neg (by omega)]
+      rw [lfsum_eq_of_finite rhsF u hu 7 hfin]
+      simp only [Finset.sum_range_succ, Finset.sum_range_zero, hrhsFdef]
+      norm_num [Qser]
+      ring
+    have hfinal : lfsum (fun n => F2 n * u ^ n) - X ^ 2 * lfsum (fun n => a n * u ^ n) -
+        (2 * X ^ 2) * lfsum (fun n => F1 n * u ^ n) -
+        (3 * X ^ 2) * lfsum (fun n => F2 n * u ^ n) -
+        (2 * X ^ 2) * lfsum (fun n => F3 n * u ^ n) -
+        X ^ 2 * lfsum (fun n => F4 n * u ^ n) = lfsum (fun n => rhsF n * u ^ n) := by
+      rw [lfsum_mul_left (X ^ 2) (fun n => a n * u ^ n) (locFin_geom a u hu),
+        lfsum_mul_left (2 * X ^ 2) (fun n => F1 n * u ^ n) (locFin_geom F1 u hu),
+        lfsum_mul_left (3 * X ^ 2) (fun n => F2 n * u ^ n) (locFin_geom F2 u hu),
+        lfsum_mul_left (2 * X ^ 2) (fun n => F3 n * u ^ n) (locFin_geom F3 u hu),
+        lfsum_mul_left (X ^ 2) (fun n => F4 n * u ^ n) (locFin_geom F4 u hu)]
+      rw [← lfsum_sub, ← lfsum_sub, ← lfsum_sub, ← lfsum_sub, ← lfsum_sub]
+      congr 1
+      funext n
+      have hcase : F2 n - X ^ 2 * a n - (2 * X ^ 2) * F1 n - (3 * X ^ 2) * F2 n -
+          (2 * X ^ 2) * F3 n - X ^ 2 * F4 n = rhsF n := by
+        simp only [hF1def, hF2def, hF3def, hF4def, hadef, hrhsFdef, colJ3, c1S, c2S, c3S, c4S]
+        rcases Nat.lt_or_ge n 7 with hn7 | hn7
+        · interval_cases n
+          · norm_num
+          · norm_num
+          · norm_num
+          · norm_num
+            have j1 := jS_col_one h
+            simp only [map_natCast] at j1
+            linear_combination j1
+          · norm_num
+            have j2 := jS_col_two h
+            simp only [map_natCast] at j2
+            linear_combination j2
+          · norm_num
+            linear_combination jS_col_three h
+          · norm_num
+            linear_combination jS_col_four h
+
+        · obtain ⟨k, rfl⟩ : ∃ k, n = k + 7 := ⟨n - 7, by omega⟩
+          have hk3 : k + 7 - 2 = k + 5 := by omega
+          have hk1 : k + 7 - 1 = k + 6 := by omega
+          have hk2 : k + 7 - 3 = k + 4 := by omega
+          have hk4 : k + 7 - 4 = k + 3 := by omega
+          rw [if_neg (show ¬ k + 7 < 2 by omega), if_neg (show ¬ k + 7 < 1 by omega),
+            if_neg (show ¬ k + 7 < 3 by omega), if_neg (show ¬ k + 7 < 4 by omega)]
+          rw [hk3, hk1, hk2, hk4]
+          rw [if_neg (show ¬ k + 5 < 3 by omega), if_neg (show ¬ k + 6 < 3 by omega),
+            if_neg (show ¬ k + 7 < 3 by omega), if_neg (show ¬ k + 4 < 3 by omega),
+            if_neg (show ¬ k + 3 < 3 by omega)]
+          rw [if_neg (show k + 7 ≠ 3 by omega), if_neg (show k + 7 ≠ 4 by omega),
+            if_neg (show k + 7 ≠ 5 by omega), if_neg (show k + 7 ≠ 6 by omega)]
+          linear_combination jS_col_generic h k
+      linear_combination hcase * u ^ n
+    rw [hJ3, hexpand, hfinal]
+    exact hrhs.symm
+  rw [hcore]
 
 /-- The `P`-master evaluated at any `u` of positive order. -/
 theorem master_P {F : St → Nat} {j01 j02 p02 pt : Nat}
@@ -346,16 +753,46 @@ theorem master_J_deriv {F : St → Nat} {j01 j02 p02 pt : Nat}
 /-! ## Root facts -/
 
 theorem coeff_one_u1 : coeff 1 (Kernel.u1 : PowerSeries ℚ) = 1 := by
-  sorry
+  rw [Kernel.u1, PowerSeries.coeff_mk]
+  have hA2 : coeff (2 : ℕ) (Kernel.A : PowerSeries ℚ) = -2 := by
+    rw [Kernel.A, PowerSeries.coeff_mk]
+    show (Kernel.sqrtList Kernel.aaC 2).getD 2 0 = -2
+    rw [Kernel.sqrtList]
+    rw [show Finset.Ioo 0 (1 + 1) = ({1} : Finset ℕ) from by decide, Finset.sum_singleton]
+    rw [Kernel.sqrtList]
+    rw [show Finset.Ioo 0 (0 + 1) = (∅ : Finset ℕ) from by decide, Finset.sum_empty]
+    norm_num [Kernel.aaC, Kernel.sqrtList]
+  have h1 : coeff (2 : ℕ) (1 - X - Kernel.A : PowerSeries ℚ) = 2 := by
+    simp only [map_sub, PowerSeries.coeff_one, PowerSeries.coeff_X, hA2]
+    norm_num
+  rw [h1]; norm_num
 
 theorem coeff_one_u2 : coeff 1 (Kernel.u2 : PowerSeries ℚ) = -1 := by
-  sorry
+  rw [Kernel.u2, PowerSeries.coeff_mk]
+  have hB2 : coeff (2 : ℕ) (Kernel.B : PowerSeries ℚ) = -2 := by
+    rw [Kernel.B, PowerSeries.coeff_mk]
+    show (Kernel.sqrtList Kernel.bbC 2).getD 2 0 = -2
+    rw [Kernel.sqrtList]
+    rw [show Finset.Ioo 0 (1 + 1) = ({1} : Finset ℕ) from by decide, Finset.sum_singleton]
+    rw [Kernel.sqrtList]
+    rw [show Finset.Ioo 0 (0 + 1) = (∅ : Finset ℕ) from by decide, Finset.sum_empty]
+    norm_num [Kernel.bbC, Kernel.sqrtList]
+  have h1 : coeff (2 : ℕ) (Kernel.B - 1 - X : PowerSeries ℚ) = -2 := by
+    simp only [map_sub, PowerSeries.coeff_one, PowerSeries.coeff_X, hB2]
+    norm_num
+  rw [h1]; norm_num
 
 theorem u1_ne_zero : (Kernel.u1 : PowerSeries ℚ) ≠ 0 := by
-  sorry
+  intro h
+  have := coeff_one_u1
+  rw [h, map_zero] at this
+  norm_num at this
 
 theorem u2_ne_zero : (Kernel.u2 : PowerSeries ℚ) ≠ 0 := by
-  sorry
+  intro h
+  have := coeff_one_u2
+  rw [h, map_zero] at this
+  norm_num at this
 
 /-! ## The six closing equations -/
 
@@ -363,19 +800,36 @@ theorem u2_ne_zero : (Kernel.u2 : PowerSeries ℚ) ≠ 0 := by
 theorem closing_Q_u1 {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
     Qser F j01 j02 Kernel.u1 = 0 := by
-  sorry
+  have hm := master_J h Kernel.u1 Kernel.constantCoeff_u1
+  rw [show Kernel.u1 ^ 2 - X ^ 2 * (1 + Kernel.u1 + Kernel.u1 ^ 2) ^ 2 = 0 from by
+    linear_combination Kernel.u1_kernel, zero_mul, mul_zero] at hm
+  have h4 : Kernel.u1 ^ 2 * (Kernel.u1 ^ 2 * Qser F j01 j02 Kernel.u1) =
+      Kernel.u1 ^ 4 * Qser F j01 j02 Kernel.u1 := by ring
+  rw [h4] at hm
+  rcases mul_eq_zero.mp hm.symm with h0 | h0
+  · exact absurd h0 (pow_ne_zero 4 u1_ne_zero)
+  · exact h0
 
 /-- Equation (2): `Q(u₂) = 0`. -/
 theorem closing_Q_u2 {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
     Qser F j01 j02 Kernel.u2 = 0 := by
-  sorry
+  have hm := master_J h Kernel.u2 Kernel.constantCoeff_u2
+  rw [show Kernel.u2 ^ 2 - X ^ 2 * (1 + Kernel.u2 + Kernel.u2 ^ 2) ^ 2 = 0 from by
+    linear_combination Kernel.u2_kernel, zero_mul, mul_zero] at hm
+  have h4 : Kernel.u2 ^ 2 * (Kernel.u2 ^ 2 * Qser F j01 j02 Kernel.u2) =
+      Kernel.u2 ^ 4 * Qser F j01 j02 Kernel.u2 := by ring
+  rw [h4] at hm
+  rcases mul_eq_zero.mp hm.symm with h0 | h0
+  · exact absurd h0 (pow_ne_zero 4 u2_ne_zero)
+  · exact h0
 
 /-- Equation (3): the `j₁` fixed point. -/
 theorem closing_eq3 {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) :
     jS F 1 = C (j01 : ℚ) + X ^ 2 * (jS F 3 + c1S F) := by
-  sorry
+  rw [c1S]
+  linear_combination jS_col_one h
 
 /-- Equation (4): the column sum `Jm·(1 − 9y) = Q(1)`. -/
 theorem closing_eq4 {F : St → Nat} {j01 j02 p02 pt : Nat}
@@ -383,7 +837,8 @@ theorem closing_eq4 {F : St → Nat} {j01 j02 p02 pt : Nat}
     JmS F * (1 - 9 * X ^ 2) =
       C (j01 : ℚ) + C (j02 : ℚ) - jS F 1 - jS F 2 +
         X ^ 2 * (c1S F + c2S F + c3S F + c4S F) := by
-  sorry
+  rw [c1S, c2S, c3S, c4S]
+  linear_combination JmS_step h + jS_col_one h + jS_col_two h
 
 /-- The differentiated `J`-master at `u₁`: `D′(u₁)·J₃(u₁) = u₁²·Q′(u₁)`. -/
 theorem dJ3_u1 {F : St → Nat} {j01 j02 p02 pt : Nat}
@@ -427,18 +882,40 @@ noncomputable def qSeries (F : St → Nat) : PowerSeries ℚ :=
 noncomputable def bSeries (F : St → Nat) : PowerSeries ℚ :=
   jY F 1 + jY F 2 + JmY F
 
+private lemma coeff_4mulS (S : PowerSeries ℚ) (m : Nat) :
+    coeff m (4 * S) = 4 * coeff m S := by
+  rw [show (4 : PowerSeries ℚ) = C 4 from (map_ofNat C 4).symm, coeff_C_mul]
+
+private lemma coeff_5mulS (S : PowerSeries ℚ) (m : Nat) :
+    coeff m (5 * S) = 5 * coeff m S := by
+  rw [show (5 : PowerSeries ℚ) = C 5 from (map_ofNat C 5).symm, coeff_C_mul]
+
+private lemma coeff_6mulS (S : PowerSeries ℚ) (m : Nat) :
+    coeff m (6 * S) = 6 * coeff m S := by
+  rw [show (6 : PowerSeries ℚ) = C 6 from (map_ofNat C 6).symm, coeff_C_mul]
+
 /-- The `q`-end stream is the walk's emitted `qEnd` numbers. -/
 theorem coeff_qSeries {F : St → Nat} {j01 j02 p02 pt : Nat}
     (h : StartData F j01 j02 p02 pt) {m M : Nat} (hM : 2 * m + 5 ≤ M) :
     coeff m (qSeries F) = (qEndF M (iter M F m) : ℚ) := by
-  sorry
+  rw [qSeries]
+  simp only [map_add, coeff_4mulS, coeff_5mulS, coeff_6mulS, coeff_jY, coeff_pY, coeff_JmY]
+  have hq := qEndF_eval F h.deep_j hM
+  rw [hq, pE_one F h.head_p1 m]
+  push_cast
+  ring
 
 /-- The bare-end stream is the walk's emitted `bareEnd` numbers. -/
 theorem coeff_bSeries (F : St → Nat)
     (hF : ∀ g, 3 ≤ g → F (g, true) = 0) {m M : Nat}
     (hM : 2 * m + 5 ≤ M) :
     coeff m (bSeries F) = (bareEndF M (iter M F m) : ℚ) := by
-  sorry
+  rw [bSeries]
+  simp only [map_add, coeff_jY, coeff_JmY]
+  have hb := bareEndF_eval F hF hM
+  rw [hb]
+  push_cast
+  ring
 
 /-! ## Axiom audits (AuditOutworks pattern)
 
