@@ -20,10 +20,11 @@ DATA = f"results/ns_a{NMAX}/perheight"   # h{N}.out: lines "n T(n,N)"
 
 def Trow(N):
     d = {}
-    for line in open(f"{DATA}/h{N}.out"):
-        p = line.split()
-        if len(p) == 2:
-            d[int(p[0])] = int(p[1])
+    with open(f"{DATA}/h{N}.out") as fh:
+        for line in fh:
+            p = line.split()
+            if len(p) == 2:
+                d[int(p[0])] = int(p[1])
     return d
 
 
@@ -90,7 +91,6 @@ def powers(f, maxdeg, K):
 def nullspace(M):
     """Exact rational null space of matrix M (list of rows). Returns list of
     basis vectors (as Fraction lists)."""
-    import copy
     A = [row[:] for row in M]
     rows, cols = len(A), len(A[0]) if A else 0
     pivots, r = [], 0
@@ -132,9 +132,10 @@ def guess_algebraic(f, df, dy, K):
                 col[n] = fp[i][n - j]
             terms.append((i, j)); cols.append(col)
     nun = len(terms)
-    # rows = series coefficients 0..K ; want more equations than unknowns
-    rows = min(K + 1, nun)  # use all available; falsifiable iff K+1 > nun
-    M = [[cols[t][n] for t in range(nun)] for n in range(rows)]
+    # every order 0..K is one equation — an over-determined system when
+    # falsifiable (K+1 > nun), so the extra orders can reject a low-order fit
+    # (matches guess_odf; a bare nun×nun square would ignore the holdout orders)
+    M = [[cols[t][n] for t in range(nun)] for n in range(K + 1)]
     ns = nullspace(M)
     return terms, ns, (K + 1 > nun)
 

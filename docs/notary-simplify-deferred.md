@@ -73,6 +73,40 @@ re-running `make gate-notary` per change — not as a blind batch.
   `GapWalkCanon`/`KernelRoots`/`KernelSeries` (dozens): speeds elaboration but
   each needs its exact lemma list pinned against a build.
 
+## Pass 2 (non-Lean) — observations deferred
+
+From the pass-2 review over the durable non-Lean code (tests, `scripts/*.sh`,
+`cpp/`, tooling). The contained fixes were applied (dead `import copy`,
+`guess_algebraic` over-determined guard + `with open` in
+`experiments/braw_from_data.py`; `tracked_markdown()` called once in
+`tests/gate_citations.py`; dead `Func`/`kFuncsRect`/`kFuncsHex` deleted from
+`cpp/perimeter_min.cpp`). Deferred:
+
+- **`tests/gate_subgroup.py:44,150,173,193,199`** — five
+  `subprocess.run(..., check=True)` reimplement `common.run`, but swapping
+  changes the failure-path exception (`CalledProcessError`→`RuntimeError`), so
+  not behavior-preserving; leave unless the gate's fail contract is revisited.
+- **`cpp/severance_w1.cpp` + `cpp/severance_w3_families.cpp`** share ~80 lines
+  (`die`/`add_checked`/`to_dec`/FNV-1a `KeyHash`/union-find/combination
+  iterator) → a `cpp/severance_common.h`. Real refactor: scale-validated
+  engines that differ load-bearingly (`int16_t c[20]` vs `int8_t c[8]`; w3 also
+  has `mul_checked`).
+- **FNV-1a byte hash written 4×** (`severance_w1`/`w3` `KeyHash`, `symtm`
+  `SigHash` + `DmShard::rawHash`, the last two in one file) → one
+  `fnv1a(const u8*, n)`. Hot-path hashers of validated engines — don't
+  auto-apply.
+- **`scripts/dalby_perimeter_defect_{k6,pool}.sh`** — byte-identical `MERGEPY`
+  shard-merge heredoc → `experiments/merge_defect.py`. Deliberately separate
+  job records (one-shard-per-core vs worker-pool).
+- **Probe scripts** (`gympie_j7_probe`, `gympie_square4_hullprobe`,
+  `dalby_square4_deep`) open-code what `scripts/perimeter_min_only.sh` already
+  parametrizes — **leave as-is** (each is a self-documenting job record with its
+  own cost/rationale header); noted so no one adds a fourth copy.
+- **`cpp/perimeter_min.cpp:572,602`** — the `# box … free:` line built twice →
+  `emitBoxLine`; output contract the gate greps, so not mechanical.
+- **`cpp/sym/symcount_fast.cpp:311`** — per-thread full `Counter` copy is
+  intentional (independent read-only graph per worker); **do not touch**.
+
 ## Not touched (justified, do not "fix")
 
 - Every `maxHeartbeats`/`maxRecDepth` bump in `DepthOneKernel{Sol,Phi,Unique}`

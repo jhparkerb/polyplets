@@ -124,12 +124,13 @@ def main():
 
     hist = history_paths()
     totals = {k: [] for k in ("exists", "template", "exempt", "history", "MISSING")}
-    for f in tracked_markdown():
+    files = tracked_markdown()
+    for f in files:
         with open(os.path.join(ROOT, f), errors="replace") as fh:
             merge(totals, classify(fh.read(), hist, f))
 
     n = sum(len(v) for v in totals.values())
-    print(f"{n} path citations across {len(tracked_markdown())} tracked markdown files")
+    print(f"{n} path citations across {len(files)} tracked markdown files")
     for k in ("exists", "template", "exempt", "history", "MISSING"):
         print(f"  {k:9s} {len(totals[k])}")
 

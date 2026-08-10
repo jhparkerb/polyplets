@@ -139,10 +139,7 @@ static constexpr Offset kTri6[] = {{0,-1},{1,-1},{-1,0},{1,0},{-1,1},{0,1}};
 //            third constraint is needed     -> u, v, u+v     (a hexagon)
 //
 // Two functionals is the old behaviour exactly; the third is inert unless the
-// lattice asks for it.
-struct Func { int a, b; };
-static constexpr Func kFuncsRect[] = {{1,0},{0,1}};
-static constexpr Func kFuncsHex[]  = {{1,0},{0,1},{1,1}};
+// lattice asks for it (see the `hex3` flag below).
 
 struct BoxResult {
   // (n, p) -> count, already multiplied by the transpose factor
@@ -449,7 +446,6 @@ int main(int argc, char** argv) {
   else if (lat == "tri6")    { off = kTri6; noff = 6; parities = {-1};
                                hex3 = true; }
   else { std::fprintf(stderr, "unknown lattice %s\n", lat.c_str()); return 2; }
-  (void)kFuncsRect; (void)kFuncsHex;
 
   obs::Reporter rep("perimeter_min", 0,
                     "lattice=" + lat + " pmax=" + std::to_string(PMAX) +
