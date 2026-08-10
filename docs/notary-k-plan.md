@@ -182,3 +182,16 @@ avoid it, that is a statement-design failure to bring back, not a license.
   to the stated form and correctly left it sorried. No other statement
   changed. `make gate-notary` green; full `make` green
   (`build/make-full-notary-K-alpha.log`).
+- 2026-08-10: wave K-β opened — skeletons `GapWalkExact.lean`,
+  `GapWalkColumns.lean` committed RED, every statement numerically
+  pre-verified (`experiments/notary_kbeta_statements.py` b1–b6,
+  `build/notary_kbeta_statements.log`). Two design deviations from the
+  wave-β paragraph above: (1) the m2 P-tail-constancy lemma is dropped — no
+  downstream statement consumes it (the geometric tail columns of the
+  master identities carry the start-data constant `pt`, not walk values;
+  the closing equations read the tails through `(1−uᵢ)⁻¹`, provided by
+  `KernelRoots`); (2) the column series and master identities live in the
+  `y`-variable `ℚ⟦X⟧` — the `s`-variable versions are one `expand 2`
+  transport, deferred to wave K-γ where the roots live. Because Columns
+  imports Exact and the RED audit guards block dependent elaboration, the
+  two agents run sequentially: Exact first, Columns once Exact is green.
