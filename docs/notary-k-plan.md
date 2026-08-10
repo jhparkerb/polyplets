@@ -227,3 +227,11 @@ avoid it, that is a statement-design failure to bring back, not a license.
   `GapWalkColumns` (11 sorries) both proved, zero statement changes
   (verified by diff: imports, private helpers, proof bodies only), audit
   guards green, standard axioms only. `make gate-notary` green.
+- 2026-08-10: wave K-γ complete — `GapWalkClosing` (24 sorries) proved
+  across three agent rounds (the third unblocked by the coordinator's
+  diagnosis: the `−2·J₃` right-side term of the P-master is a shifted
+  lfsum family, not a finite polynomial). All six closing equations of
+  the cleared system are now theorems of the walk at the kernel roots,
+  both starts, generic in the start package; statements untouched
+  throughout; audit guards green, standard axioms only. `make
+  gate-notary` green.
