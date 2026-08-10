@@ -296,3 +296,16 @@ avoid it, that is a statement-design failure to bring back, not a license.
   both starts, generic in the start package; statements untouched
   throughout; audit guards green, standard axioms only. `make
   gate-notary` green.
+- 2026-08-10: wave K-δ `DepthOneKernelSol` complete — the twelve cleared
+  num-form row identities proved by emitted `linear_combination`
+  certificates over `Kernel.A_sq`/`B_sq` (generator
+  `experiments/notary_kdelta_gen3.py`, all re-verified as free-polynomial
+  identities before emission); zero agent rounds, statements untouched.
+- 2026-08-10: wave K-δ `DepthOneKernelUnique` complete (0 sorries,
+  standard axioms, `make gate-notary` green). The 6×6 cleared system is
+  expanded by a new private `det_fin_six` (Mathlib `det_fin_three`
+  pattern, no det lemmas on the large entries), matched to the
+  pre-verified `detTup` combination, its coeff pinned (valuation 22 int /
+  18 bare, coeff −64 after row-1/2 doubling), non-vanishing established,
+  and the six walk unknowns solved by adjugate uniqueness and transcribed
+  to `X^e · den · unknown = num`, both starts. Only `Phi` remains.
