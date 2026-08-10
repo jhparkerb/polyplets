@@ -34,6 +34,13 @@ Polyomino/animal enumeration:
                                            cylinders, INTEGERS: Electron. J. Combin. Number Theory 6
                                            (2006) #A22. (Venue confirmed from the title page 2026-08-06;
                                            this index previously credited only two of the four authors.)
+  barequet_shalah_2013_twisted_cylinders_socg.pdf
+                                           Barequet & Shalah, Polyominoes on twisted cylinders, Proc.
+                                           29th Ann. Symp. on Computational Geometry (SoCG '13), Rio de
+                                           Janeiro, June 2013. 2-page multimedia/video contribution
+                                           (ACM 978-1-4503-2031-3/13/06); an animated exposition of the
+                                           Integers-2006 twisted-cylinder transfer matrix above, not a new
+                                           result. Obtained 2026-08-10 during the code-provenance check.
   barequet_barequet_rote_2010_high_dimensional_polycubes.pdf
                                            R. Barequet, G. Barequet & Rote, Formulae and growth rates of
                                            high-dimensional polycubes, Combinatorica 30 (2010) 257-275.
