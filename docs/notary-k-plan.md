@@ -218,12 +218,28 @@ staying m7-scale.
   12 as lemma literals), `det M ≠ 0`, Cramer via `Matrix.adjugate_mul` in
   the domain ℚ⟦s⟧: **the walk's six series are the closed forms** — twice.
 - `DepthOneKernelPhi.lean` — `F₁ = P̂ − B²/(3+S)` (unit `3+S`), the norm
-  identity `Ψ(T) = 0` by `ring`, the `y`-form quartic `cY₀..cY₄`
-  annihilating `F₁`, the lift `x ↦ s²/3` (`PowerSeries.rescale` +
-  `expand`, injective on coefficients, scale `1/3` against the banked Φ),
-  and the head theorem `Φ(x, N(x)) = 0` for `N := mk (nSeries ·)` —
-  literally the series whose truncation `DepthOneSeries.phi_annihilates`
-  checks; corollary: that finite theorem re-derived from this one.
+  identity `Ψ(T) = 0`, the `y`-form quartic `cY₀..cY₄` annihilating `F₁`,
+  the lift to `Φ(x, N(x)) = 0`, and the corollary re-deriving
+  `DepthOneSeries.phi_annihilates`.
+  **Quartic (measured, `experiments/notary_kdelta_gen6.py`):** the whole
+  `y`-form quartic collapses to a *single scalar* elimination identity
+  `Ψ(numTuple) = 0` in `ℚ⟦s⟧` mod `A²=AA, B²=BB` (`numTuple = n0 + n1 A +
+  n2 B + n3 A B`, `d = numTuple − n0`): `(d² + Pq)² = 4 AA (d n1 + n2 n3
+  BB)²`, one `linear_combination` over `Kernel.A_sq/B_sq`, cofactors cA
+  17872 / cB 8122 chars — the same one-shot regime as `Sol`/`Unique`
+  (heartbeats 16M, `maxRecDepth 8000`; cert in `build/notary_kdelta_phi_cert.txt`).
+  **Lift — design pivot (`PowerSeries.rescale` does NOT exist in this
+  Mathlib):** do the `x ↦ 3x` scaling coefficient-wise exactly as
+  `DepthOneSeries.nSeries` already does (`N` coeff `k = 3^(k+1)·[y^k]F₁ +
+  [k=0]`), *not* via `rescale`. `phiF1` (the `s`-tuple, `den/n0..n3`) is
+  **even in `s`** (`n0, den, n3` even; `n1,n2` mirror-paired through
+  `A↔B` under `s ↦ −s`), so `phiF1 = e2 (F1y)` for the exact `y`-series
+  `F1y := mk (fun k => coeff (2k) phiF1)` — an evenness sub-lemma is owed.
+  Head `N := mk (fun k => 3^(k+1)·coeff k F1y + if k=0 then 1 else 0)`;
+  `Φ(x,N) = Σ_k phiC_k·N^k = 0` transported from the `y`-quartic by the
+  lift `ring` identity `3·Σ cY_k(3x)((W−1)/3)^k = Σ phiC_k W^k` (verified
+  in gen6); corollary re-derives `phi_annihilates` via `truncL` to the
+  list model.  `e2 = expand 2` and `truncL_mul/_mk/_getD` are the bridge.
 
 ## 4. Gate and axioms
 
