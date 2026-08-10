@@ -223,3 +223,7 @@ avoid it, that is a statement-design failure to bring back, not a license.
   transport, deferred to wave K-γ where the roots live. Because Columns
   imports Exact and the RED audit guards block dependent elaboration, the
   two agents run sequentially: Exact first, Columns once Exact is green.
+- 2026-08-10: wave K-β complete — `GapWalkExact` (12 sorries) and
+  `GapWalkColumns` (11 sorries) both proved, zero statement changes
+  (verified by diff: imports, private helpers, proof bodies only), audit
+  guards green, standard axioms only. `make gate-notary` green.
