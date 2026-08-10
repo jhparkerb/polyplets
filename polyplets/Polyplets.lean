@@ -5,6 +5,7 @@ import Polyplets.Defs
 import Polyplets.DepthAssembly
 import Polyplets.DepthOneConstants
 import Polyplets.DepthOneKernelSol
+import Polyplets.DepthOneKernelUnique
 import Polyplets.DepthOneSeries
 import Polyplets.Diagonal
 import Polyplets.Fekete
