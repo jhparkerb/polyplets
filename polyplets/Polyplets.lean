@@ -12,6 +12,7 @@ import Polyplets.GapWalk
 import Polyplets.GapWalkBij
 import Polyplets.GapWalkBridge
 import Polyplets.GapWalkCanon
+import Polyplets.GapWalkClosing
 import Polyplets.GapWalkColumns
 import Polyplets.GapWalkEnds
 import Polyplets.GapWalkExact
