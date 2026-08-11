@@ -178,7 +178,8 @@ int main(int argc, char** argv) {
   for (long s = 0; s < K; ++s) {
     const u64 r = pick(rng);
     int H = static_cast<int>(std::upper_bound(cum.begin(), cum.end(), r) - cum.begin());
-    if (H < 1) H = 1; if (H > n) H = n;
+    if (H < 1) H = 1;
+    if (H > n) H = n;
     ++alloc[H];
   }
 
