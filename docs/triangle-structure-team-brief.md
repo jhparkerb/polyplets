@@ -1,5 +1,14 @@
 # Team brief — adversarial structure hunt on the T(n,H) triangle
 
+> **EXECUTED 2026-08-11, commit `aa2b1eb`. Superseded for all further work by
+> `docs/triangle-structure-round2-brief.md`.** Outcome: no relation checks
+> a(40) by a route independent of the engines, and the round established why —
+> the fittable region and the checkable region are disjoint. Read
+> `results/triangle-hunt-synthesis.md` first. This file is kept as the record
+> of what was asked and as the source of the settled negatives; its prior-work
+> list has been corrected in place (three cited files live on branch
+> `second-source`, and two banked files were missing from it).
+
 ## The object
 
 T(n,H) = number of fixed king-animals (polyplets) with n cells and bounding-box
