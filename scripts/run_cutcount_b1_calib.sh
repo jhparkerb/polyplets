@@ -22,9 +22,13 @@
 #   script and completed heights are skipped. A kill costs one height at most.
 # Kill:     kill the cutcount_b1 PID shown in the tmux window; rows already
 #   written are kept.
-# Provenance: dalby tree is clean-at-3b7359de but stamps -dirty (22 untracked
-#   result files). cpp/cutcount_b1.cpp itself is UNCOMMITTED (probe lineage);
-#   its sha256 is echoed into the log below.
+# Provenance: the run in flight 2026-08-11 was launched from a dalby tree
+#   clean-at-3b7359de that stamps -dirty (22 untracked result files), with
+#   cpp/cutcount_b1.cpp still uncommitted. It is committed now, on branch
+#   second-source, together with gate-cutcount-b1; the source sha256 echoed
+#   into the log below is what identifies which revision produced a row.
+#   NOTE: the committed engine exits nonzero on a mismatch AND on a
+#   zero-cell comparison; the running binary predates that and exits 0.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 OUT=results/cutcount_b1
