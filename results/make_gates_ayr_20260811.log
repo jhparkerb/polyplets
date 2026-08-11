@@ -1,0 +1,7 @@
+# Build receipt: full `make` (the 26-target gate suite) on ayr, 32 cores,
+# branch second-source at 80b5ef2, 2026-08-11 15:09 UTC, EXIT=0.
+# 21 GATE lines GREEN/PASSED, no red. Kept because this branch's collateral
+# commits exist to make this run possible at all: three strip-mu engines and
+# tma_sample did not build under ayr's gcc, the compile DB did not mirror
+# strip_mu.cpp's inert OpenMP pragmas, and gate-citations counted Lake's build
+# tree as missing paths. Run on ayr, not gympie, at jasonp's instruction.
