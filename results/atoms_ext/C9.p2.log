@@ -1,0 +1,22 @@
+event=start job=cutcount_b1 t=2026-08-11T09:34:08-04:00 git=5be68a7-dirty built=2026-08-11T13:29:29Z host=gympie
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:34:53-04:00 elapsed_s=45.1 rate=5.205/s count=235 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:35:38-04:00 elapsed_s=90.2 rate=4.301/s count=388 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:36:23-04:00 elapsed_s=135.2 rate=3.935/s count=532 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:37:08-04:00 elapsed_s=180.5 rate=3.751/s count=677 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:37:54-04:00 elapsed_s=225.7 rate=3.642/s count=822 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:38:39-04:00 elapsed_s=271.0 rate=3.569/s count=967 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:39:24-04:00 elapsed_s=316.2 rate=3.517/s count=1112 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:40:09-04:00 elapsed_s=361.5 rate=3.477/s count=1257 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:40:54-04:00 elapsed_s=406.5 rate=3.447/s count=1401 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:41:40-04:00 elapsed_s=451.7 rate=3.422/s count=1546 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:42:25-04:00 elapsed_s=497.0 rate=3.403/s count=1691 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:43:10-04:00 elapsed_s=542.2 rate=3.386/s count=1836 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:43:55-04:00 elapsed_s=587.5 rate=3.372/s count=1981 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:44:41-04:00 elapsed_s=632.7 rate=3.36/s count=2126 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:45:26-04:00 elapsed_s=678.0 rate=3.35/s count=2271 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:46:11-04:00 elapsed_s=723.2 rate=3.341/s count=2416 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:46:56-04:00 elapsed_s=768.5 rate=3.332/s count=2561 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:47:42-04:00 elapsed_s=813.8 rate=3.325/s count=2706 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:48:27-04:00 elapsed_s=858.8 rate=3.318/s count=2850 modp H=9 states=5041
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:49:12-04:00 elapsed_s=904.1 rate=3.313/s count=2995 modp H=9 states=5041
+event=done job=cutcount_b1 t=2026-08-11T09:49:14-04:00 start=2026-08-11T09:34:08-04:00 wall_s=906.0 cpu_s=905.8 peak_rss_mb=256.4 mode=modp H=9

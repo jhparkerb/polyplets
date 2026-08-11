@@ -1,0 +1,1 @@
+H=8 N=1000 states=834 banked-prefix-check(n<=40): OK  BM-degree=462 (needs N >= 2*deg+slack to be trusted; series time 121.6s)

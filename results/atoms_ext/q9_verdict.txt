@@ -1,0 +1,6 @@
+H=9 p=2147483629: n<=40 vs banked: OK
+H=9 p=2147483629: BM order on 2250 terms = 1125; holdout on remaining 750 terms: FAILS at n=2251
+  (order not yet converged — need more terms)
+H=9 p=2147483587: n<=40 vs banked: OK
+H=9 p=2147483587: BM order on 2250 terms = 1125; holdout on remaining 750 terms: FAILS at n=2251
+  (order not yet converged — need more terms)
