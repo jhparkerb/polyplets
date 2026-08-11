@@ -212,6 +212,10 @@ Do not re-search these from the desk; the desk has been tried.
   **Not found.** **[med]**
 - A. R. Conway & A. J. Guttmann, "On two-dimensional percolation," J. Phys. A 28 (1995)
   891–904. DOI 10.1088/0305-4470/28/4/015. **Not found.** **[med]**
+  *Added 2026-08-11 (second-source merge): its high-density site series order is
+  the number that prices the Sykes–Essam matching-identity candidate's
+  published-data reach (`results/second-source-candidates.md`); no longer
+  citation-courtesy only.*
 - I. G. Enting, "Generating functions for enumerating self-avoiding rings on the square
   lattice," J. Phys. A 13 (1980) 3713. — origin of the finite-lattice method.
   **Not found.** **[med]**
@@ -590,6 +594,50 @@ covers a superset of venues *and* searches full text, which is the property
 that mattered for a proof-internal tool like Northcott. A weekday library
 walk-in for a fourth negative on a question three sources have answered is not
 a good trade. Reopen only if a referee asks.
+
+## Wanted-but-likely-nonexistent (searched 2026-08-11)
+
+## Second-source team wants, applied in the merge pass 2026-08-11
+
+Staged in `results/second-source-candidates-A.md` (lane A) and applied here by
+the merge; both price the Sykes–Essam matching-identity candidate. Sykes &
+Wilkinson 1986 (J. Phys. A 19, 3407 and 3415) were also proposed and are
+deliberately NOT listed: both were pinned and abstract-read 2026-08-11 (DOIs
+10.1088/0305-4470/19/16/035 and /036) and are simple-cubic/BCC only — no
+nnSquare content, nothing to obtain.
+
+- J. A. M. S. Duarte, Portgal. Phys. 12 (1981) 99. — known only through
+  Mertens 1990 ref 14 and his Appendix A statement that Duarte computed **all
+  square-lattice g_{s,t} for t ≤ 16** ("his values are confirmed"). That table
+  is what would lift the matching-identity check's no-new-compute reach from
+  M = 15 to M = 16. Searched (lane A, one web pass 2026-08-11): no digitized
+  Portugaliae Physica copy found. **[med]**
+- H. P. Peters, D. Stauffer, H. P. Hölters & K. Loewenich, "Radius, perimeter,
+  and density profile for percolation clusters and lattice animals," Z. Phys. B
+  34 (1979) 399. DOI 10.1007/BF01325205 (Springer record verified 2026-08-11;
+  paywalled). — per Mertens 1990, the source of the nnSquare (king) g_{s,t}
+  for s ≤ 10; wanted to complete the perimeter-resolved external cross-check
+  of `results/mertens-1990-perimeter-crosscheck.md` below s = 11. **[med]**
+
+- M. Fliess, "Matrices de Hankel," J. Math. Pures Appl. **53** (1974)
+  197–222. — the primary for the minimal-realization theorem (minimal linear
+  representation dimension = Hankel rank) behind the scaling campaign's class
+  floor (`results/scaling-exploration.md` §2). Staged by lane A, applied in
+  the merge 2026-08-11. Searched once by title+journal; paywalled, no free
+  copy. Cited universally by the weighted-automata literature; Berstel &
+  Reutenauer 2011 is the held-able modern treatment if a substitute is
+  wanted. **[med]**
+
+- **Exact pathwidth/treewidth of the king graph P_m ⊠ P_n** — wanted as a
+  citation for `results/second-source-candidates-B.md` (the kink frontier
+  achieves width m+1). Searched: "pathwidth king graph", "treewidth strong
+  product of paths", "bandwidth strong product two paths", Kozawa–Otachi–
+  Yamazaki DAM 162 (2014) (gives only tw ≥ 3 here), Eppstein arXiv:2005.00179
+  (discusses strong-product lower bounds, no king value), the 2024 tree-/path-
+  width-under-operations survey (arXiv:2406.08985). No source states the exact
+  value; we hold the bracket m ≤ pw ≤ m+1 from citations plus an exhaustive-DP
+  probe giving pw = m+1 at m = 2..5. If a referee wants a literature pin, it
+  apparently doesn't exist — the probe + two-line layout argument is the record.
 
 ## How to actually get these (researched 2026-08-07)
 
