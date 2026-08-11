@@ -1,0 +1,42 @@
+== d=8 tower level, built and measured ==
+  missing weights: 57 interior, 15 boundary orientations (x2 runs where asymmetric)
+    interior(3, 3, 3) = 253155  v3=1  [5.1 s]
+    interior(2, 3, 4) = 184328  v3=0  [32.3 s]
+    interior(2, 4, 3) = 230231  v3=0  [58.8 s]
+    interior(3, 4, 2) = 230231  v3=0  [22.6 s]
+    interior(4, 3, 2) = 184328  v3=0  [18.1 s]
+    interior(2, 2, 5) = 55466  v3=0  [7.7 s]
+    interior(2, 5, 2) = 113856  v3=1  [42.5 s]
+    interior(5, 2, 2) = 55466  v3=0  [7.3 s]
+    interior(2, 2, 3, 3) = 1000708  v3=0  [5.5 s]
+    interior(2, 2, 4, 2) = 756373  v3=0  [7.3 s]
+    interior(2, 4, 2, 2) = 756373  v3=0  [5.2 s]
+    interior(2, 2, 2, 3, 3) = 14561179  v3=0  [13.2 s]
+    interior(2, 2, 3, 3, 2) = 20690821  v3=0  [10.6 s]
+    interior(2, 3, 3, 2, 2) = 20690821  v3=0  [7.5 s]
+    interior(2, 2, 2, 4, 2) = 11040885  v3=2  [17.3 s]
+    interior(2, 2, 4, 2, 2) = 11377368  v3=3  [13.1 s]
+    interior(2, 4, 2, 2, 2) = 11040885  v3=2  [9.6 s]
+  full m=9 weight set computed in 362 s of DP (57 interior + 24 boundary runs)
+  tower: 72 interior survivors, curve deg 19 monic; H+G match banked k<=17  [1.9 s]
+  d=8 family residues r_k, k=8..55: 011011011011011011011011011011011011011011011011
+  periodicity: full-range period 3; from k=17 period 3
+  family-8 cells vs banked triangle (T*3^8 == P_k(n) mod 3^9, i.e. T mod 3 == r_k):
+    k= 8 (n,H)=(17, 9) [real-sweep]: banked 0, predicted 0  MATCH
+    k= 9 (n,H)=(20,11) [real-sweep]: banked 1, predicted 1  MATCH
+    k=10 (n,H)=(23,13) [real-sweep]: banked 1, predicted 1  MATCH
+    k=11 (n,H)=(26,15) [real-sweep]: banked 0, predicted 0  MATCH
+    k=12 (n,H)=(29,17) [real-sweep]: banked 1, predicted 1  MATCH
+    k=13 (n,H)=(32,19) [real-sweep]: banked 1, predicted 1  MATCH
+    k=14 (n,H)=(35,21) [real-sweep]: banked 0, predicted 0  MATCH <-- the d=8 LAW-FREE ENUMERATED cell
+    k=15 (n,H)=(38,23) [closed-form-Pk]: banked 1, predicted 1  MATCH
+  8/8 cells match
+  banked-grid periodicity scan (in-onset restriction k >= d):
+    d= 8: all-grid 112201101101 period3=False | k>=d 01101101 period3=True (8 pts)
+    d= 9: all-grid 100101112220 period3=False | k>=d 01112220 period3=False (8 pts)
+    d=10: all-grid 121012220001 period3=False | k>=d 2220001 period3=False (7 pts)
+    d=11: all-grid 21112111000 period3=False | k>=d 111000 period3=False (6 pts)
+    d=12: all-grid 121122211001 period3=False | k>=d 211001 period3=False (6 pts)
+    d=13: all-grid 02000020101 period3=False | k>=d 20101 period3=False (5 pts)
+    d=14: all-grid 12121222122 period3=False | k>=d 2122 period3=True (4 pts)
+    d=15: all-grid 01110001100 period3=False | k>=d 1100 period3=False (4 pts)
