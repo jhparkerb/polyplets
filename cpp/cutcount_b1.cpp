@@ -437,6 +437,13 @@ int main(int argc, char** argv) {
     }
     printf("\nvs banked triangle: %d match, %d MISMATCH\n", allok, allbad);
     rep.done("mode=assemble match=" + std::to_string(allok) + " mismatch=" + std::to_string(allbad));
+    // Fail closed: an unreadable/empty banked dir compares NOTHING and would
+    // otherwise print "0 match, 0 MISMATCH" and exit 0 -- a comparison that
+    // cannot fail is not a check.
+    if (!allbad && !allok) {
+      fprintf(stderr, "FATAL no_banked_cells_compared dir=%s\n", argv[5]);
+      return 3;
+    }
     return allbad ? 2 : 0;
   }
   if (argc >= 2 && !std::strcmp(argv[1], "--states")) {
@@ -491,6 +498,16 @@ int main(int argc, char** argv) {
         }
       }
     printf("\nvs banked triangle: %d match, %d MISMATCH\n", ok, bad);
+    rep.done("mode=full Hmax=" + std::to_string(Hmax) + " Nmax=" + std::to_string(Nmax)
+             + " match=" + std::to_string(ok) + " mismatch=" + std::to_string(bad));
+    // Same fail-closed rule as --assemble: mismatches are fatal, and a run
+    // that compared zero cells (wrong/empty banked dir) is fatal too.
+    if (bad) return 2;
+    if (!ok) {
+      fprintf(stderr, "FATAL no_banked_cells_compared dir=%s\n", argv[3]);
+      return 3;
+    }
+    return 0;
   } else {
     for (int H = 1; H <= Hmax; H++) {
       printf("T(n,%d):", H);

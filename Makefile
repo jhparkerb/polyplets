@@ -30,7 +30,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
         gate-compile-db gate-citations gate-l-paper-verifier \
-        gate-perimeter-min gate-perimeter-defect \
+        gate-perimeter-min gate-perimeter-defect gate-cutcount-b1 \
         gate-perimeter-min-shard clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
         ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-holes \
@@ -42,7 +42,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         papers papers-verify papers-clean papers-list
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-cutcount-b1 gate-citations gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -280,6 +280,19 @@ gate-e0: build/subgraph_count
 
 build/subgraph_count: cpp/sym/subgraph_count.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
+
+# B1: the rule-independent second count of T(n,H) -- colour-symmetrized spin TM
+# over Z[q]/(q^2), connectivity never decided (results/second-source-candidates.md
+# §5.1). -Icpp for obs.h.
+build/cutcount_b1: cpp/cutcount_b1.cpp cpp/obs.h | build
+	$(CXX) $(CXXFLAGS) -O3 -Icpp $< -o $@
+
+# Gate CUTCOUNT-B1: B1 vs the banked triangle (84 cells, then 400), the
+# in-engine self-checks, the --assemble path the production run uses, and four
+# RED controls -- including the one that matters most for a second source, that
+# a banked directory it cannot read must FAIL rather than compare nothing. ~7 s.
+gate-cutcount-b1: build/cutcount_b1
+	python3 tests/gate_cutcount_b1.py
 
 # Cone anchor: directed king animals by enumerate+filter vs Bacher's closed form
 # (results/directed-cone-anchor.md). Also the docs/middle-kingdom-plan.md Phase 0
