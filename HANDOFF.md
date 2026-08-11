@@ -80,7 +80,7 @@ is the ranked summary and the entry point.
 - **Deliverable 1, running:** B1, a rule-independent second count of T(n,H)
   (`cpp/cutcount_b1.cpp`) — colour-symmetrized spin TM over Z[q]/(q^2),
   connectivity never decided. Lifts per-cell rule-independent coverage above
-  n=22 from 0% to 45.0% of a(40) at H<=14, 66.6% at H<=16. Live on dalby, see
+  n=22 from 0% to 45.0% of a(40) at H<=14, 66.7% at H<=16. Live on dalby, see
   the fleet table below.
 - **Deliverable 2:** an unconditional lower bound (Hankel rank + Nisan) fencing
   every sweep engine carrying a linear summary, and the theorem that the

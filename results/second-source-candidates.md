@@ -70,7 +70,7 @@ table in `results/second-source-candidates-C.md` §census.
   | tier | needs | share of a(40) rule-independent, cumulative | kink-only Grand anchors flipped |
   |---|---|---|---|
   | H ≤ 14 (base) | production run | 45.0% | 0 of 11 |
-  | H ≤ 16 | running binary | 66.6% | 4: T(28,15) 7.1%, T(29,15) 7.9%, T(30,16) 6.1%, T(31,16) 6.8% of their rows |
+  | H ≤ 16 | running binary | 66.7% | 4: T(28,15) 7.1%, T(29,15) 7.9%, T(30,16) 6.1%, T(31,16) 6.8% of their rows |
   | H ≤ 17 | half-day payload change (u128 + prime check) + ~a day of dalby — the wall figure is an extrapolation from the measured 34.2 s/column at H = 14, held UNFIRMED until tonight's measured H = 15/16 walls | 75.7% | 6, adding T(32,17) 5.3%, T(33,17) 5.9% |
   | H ≥ 18 | ~210 GB — **closed permanently** | 24.3% of a(40) stays kink-only | T(34,18)..T(38,20), 5 anchors, never |
 

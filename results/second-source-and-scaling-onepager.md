@@ -3,8 +3,8 @@
 2026-08-11. Written at the close of the two-campaign session, after the local
 machine OOMed and took the previous session's tmux and ssh-agent with it.
 
-**Branch:** `second-source`, 7 commits, not pushed, `make` not run against
-`cpp/cutcount_b1.cpp`.
+**Branch:** `second-source`, not pushed. Gated (`make gate-cutcount-b1`) and
+the suite re-run on ayr; gympie is deliberately untouched.
 
 ## The setup that produced it
 
@@ -49,7 +49,7 @@ banked all along (see correction 8).
    running.** Colour-symmetrized spin TM over ℤ[q]/(q²); connectivity is never
    decided, only read off the linear coefficient. Moves per-cell
    rule-independent coverage from **0% above n = 22 today** to 45.0% of a(40)
-   at H ≤ 14, 66.6% at H ≤ 16 (the running binary), 75.7% at H ≤ 17 after a
+   at H ≤ 14, 66.7% at H ≤ 16 (the running binary), 75.7% at H ≤ 17 after a
    half-day payload change — and flips 4 (then 6) of the 11 kink-only Grand
    anchors to two-source. Carries a self-check the incumbent's blind spot
    cannot survive: A_n(1) = C(HW, n) by Pascal in the same wrapping ring,

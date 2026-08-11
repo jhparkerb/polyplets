@@ -423,7 +423,7 @@ H = 15–17 stretch would recover a further 30.7% of a(40) (cumulative
 proposed rule-independent route. **[Update 2026-08-11, final: the window census turned out to be the right
 object for B1's RAM after all (cell-at-a-time engine; the equal-cut
 correction changed only the cross-engine comparison). Resolved tiers:
-running binary reaches H ≤ 16 (66.6% of a(40) cumulative, 4 of 11 anchors
+running binary reaches H ≤ 16 (66.7% of a(40) cumulative, 4 of 11 anchors
 flip); a half-day payload re-size (96 → 40 B/area) brings H = 17 at ~72 GB
 (75.7%, 6 of 11); H ≥ 18 is closed permanently — 24.3% of a(40) and the 5
 anchors T(34,18)..T(38,20) stay kink-only. Tier table in the canonical
