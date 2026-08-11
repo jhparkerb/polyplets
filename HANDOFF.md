@@ -97,6 +97,49 @@ is the ranked summary and the entry point.
   change (buys 2 Grand anchors, 9.1% of a(40)); whether to buy the H=11 floor
   point (7.2 h per x-value) that would firm the "floor base ~2.79" lean.
 
+### State saved 2026-08-11 11:10 EDT (branch parked; jasonp switching teams)
+
+The branch is **gated and green** and needs nothing to be coherent. Full
+`make` on ayr at 80b5ef2: 26 targets, 21 GATE lines, EXIT=0, receipt banked
+as `results/make_gates_ayr_20260811.log`. Local tree clean; jasonp's
+triangle-structure brief for the NEXT agent team is `git stash@{0}` on this
+branch, untouched.
+
+**Live job, dalby, nobody watching it.** `scripts/run_cutcount_b1_calib.sh`,
+tmux `0:cutcount_b1`. Driver PID **2475024**; the current per-height child is
+**2475239** (H=15, 33/41 columns at 11:10, ~129 s/column, so the H=15 row is
+~20 min out). Re-arm with `ssh dalby.jhpb.org 'tail --pid=2475024 -f /dev/null'`
+— the session that armed it is gone, and watchers do not survive that.
+H=16 follows automatically (~2.7x the states, expect ~46 GB RSS and a few
+hours); H=17 is NOT in this binary's reach and is jasonp's payload call.
+
+**When a height lands, the work it unlocks** (nothing else is pending):
+1. the script's own `--assemble` compares the new row against banked
+   `results/ns_a40/perheight/h<H>.out` and logs `match/MISMATCH` — read
+   `results/cutcount_b1/calib_run.log` for the verdict;
+2. gather the row files from dalby into `results/cutcount_b1/rows/` here
+   (they exist only on dalby today, deliberately — see the fleet row);
+3. H<=15 and H<=16 flip four kink-only Grand anchors (T(28,15), T(29,15),
+   T(30,16), T(31,16)) to two-source and take rule-independent per-cell
+   coverage of a(40) from 45.0% to 66.7% — update
+   `results/ns_a40/PROVENANCE.md`'s corroboration section,
+   `results/strip-engine.md`'s mass table, and the tier table in
+   `results/second-source-candidates.md` §2.
+
+**Unstarted work, priced** (none of it blocks anything): paper paragraphs for
+the Motzkin state-count theorem and the class floor (`paper/polyplets-report.tex`,
+neither written); extending the A286139 definition check to Howroyd's n=16 in
+C++ (minutes); the two free-rein matching-identity probes (15 min each,
+§9.4); a `/simplify` or code-review pass over `cpp/cutcount_b1.cpp`, which no
+one but its author has read.
+
+**Not pushed.** Local master is 93 commits ahead of origin and this branch
+adds 18 on top. ayr currently sits ON this branch (it has the branch plus
+`explore/theorem-multihole` fetched by bundle, and a copy of the gitignored
+`papers/*.pdf` so gate-citations is meaningful there); its own two old
+commits are content-redundant with local master. dalby is untouched and must
+stay so while the driver holds its clone.
+
 ## FLEET STATE at 2026-08-07 18:09 EDT (written for a fresh session)
 
 Three jobs live, all feeding the perimeter-grading paper (L6 in
