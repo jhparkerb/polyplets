@@ -71,6 +71,32 @@ What the campaign actually bought, in one line each:
   four "outside the default build" statements corrected, a build
   receipt banked.
 
+## BRANCH `second-source` (2026-08-11) — two campaigns, 11 commits, NOT pushed
+
+Branched off local master (93 commits ahead of origin). Everything from the
+two three-lane campaigns lives here; `results/second-source-and-scaling-onepager.md`
+is the ranked summary and the entry point.
+
+- **Deliverable 1, running:** B1, a rule-independent second count of T(n,H)
+  (`cpp/cutcount_b1.cpp`) — colour-symmetrized spin TM over Z[q]/(q^2),
+  connectivity never decided. Lifts per-cell rule-independent coverage above
+  n=22 from 0% to 45.0% of a(40) at H<=14, 66.6% at H<=16. Live on dalby, see
+  the fleet table below.
+- **Deliverable 2:** an unconditional lower bound (Hankel rank + Nisan) fencing
+  every sweep engine carrying a linear summary, and the theorem that the
+  incumbent column TM has exactly Motzkin(H+1)-1 states — so its asymptotic
+  base is 3, and the long-quoted "~2.65x/height" is a local ratio near H=10
+  (corrected in `results/strip-engine.md`).
+- **Verification added here:** `make gate-cutcount-b1` (in GATE_TARGETS), and
+  B1's banked comparison made fail-CLOSED — it used to compare zero cells and
+  exit 0 when it could not read the banked directory.
+- **Known red on ayr, pre-existing:** none as of the last run; the strip-mu
+  gcc build failures and the compile-DB pragma gap were fixed here as
+  collateral so the suite runs somewhere other than gympie.
+- **jasonp's calls, carried:** whether H=17 is worth the half-day payload
+  change (buys 2 Grand anchors, 9.1% of a(40)); whether to buy the H=11 floor
+  point (7.2 h per x-value) that would firm the "floor base ~2.79" lean.
+
 ## FLEET STATE at 2026-08-07 18:09 EDT (written for a fresh session)
 
 Three jobs live, all feeding the perimeter-grading paper (L6 in
@@ -82,7 +108,7 @@ thing** — they are `tail --pid` over ssh and do not survive a session change.
 | ayr | `scripts/ayr_pmin48.sh` → square8 min-end p=48, tmux `0:pmin48`, log `results/ayr_pmin48.runlog` | 2261 | **DONE 2026-08-07 22:12 UTC** — `AYR_PMIN48_DONE`, 121/121 frames, census `results/perimmin_square8_p48_r6.txt` (1526 rows) identical on ayr and here by sha256; script and runlog committed 2026-08-08 |
 | dalby | `scripts/dalby_square4_deep.sh` → square4 min-end deep boxes, tmux `0:j7w17` | 2423184 | **DONE 2026-08-08 08:51 EDT** — `DEEP_DONE`, both boxes `result=ok`. `W=15` `1 4 18 60 187 524 1388 3452 8193`, `W=17` `... 3452 8229`. Censuses and logs committed here 2026-08-09; the `j=7,8` predictions are confirmed and the `8193`/`8229` split is explained and measured (`results/perimeter-both-ends.md`) |
 | dalby | `dalby_perimeter_defect_pool.sh square8 78 6`, tmux `0:pdk6big` | 2420612 (stage 1) | all 456 shards dispatched, a couple still running. **Stage 2 (`square4 78 6`) starts automatically after**, then `STAGE2_ALLDONE` and a `sleep 86400` — so watch 2420612, not the outer 2420610, and re-arm on stage 2 |
-| dalby | `./build/cutcount_b1 --height H 40` per height → B1 rule-independent second count of T(n,H) (second-source campaign winner, `results/second-source-candidates.md` §5.1; tier table §2), tmux `0:cutcount_b1`, per-height row files land on dalby only (gathered here when the run finishes), obs heartbeats on-pane | 2475121 (H=14 phase) | RUNNING at 2026-08-11 09:54 EDT: 13/13 completed heights `q0_zero=OK q1eval_binomial=OK (n=1..40)`, mid-H=14, heartbeat `states=891074` matching the measured census exactly; target H≤16 on this binary, H=17 pending jasonp's payload-change call |
+| dalby | `./build/cutcount_b1 --height H 40` per height → B1 rule-independent second count of T(n,H) (second-source campaign winner, `results/second-source-candidates.md` §5.1; tier table §2), tmux `0:cutcount_b1`, per-height row files land on dalby only (gathered here when the run finishes), obs heartbeats on-pane | driver 2475024 (H=15 phase 2475239) | RUNNING at 2026-08-11 10:45 EDT: 14/14 completed heights `q0_zero=OK q1eval_binomial=OK (n=1..40)`, H=14 landed 10:02 (1618 s, peak RSS 6.9 GB); H=15 in flight, 2,624,197 window states, 17.3 GB RSS, ~130 s/column of 41; target H≤16 on this binary, H=17 pending jasonp's payload-change call |
 
 gympie is idle; its three finished windows (percell mod-4, symtm strip profile,
 subgroup mod-4) were inspected, confirmed banked and closed 2026-08-07.
