@@ -60,8 +60,15 @@ def flags_for(f):
         return args + zstd_flags
     extra = ["-Icpp"]
     with open(f) as fh:
-        if "gmpxx.h" in fh.read():
-            extra += gmp_flags
+        src = fh.read()
+    if "gmpxx.h" in src:
+        extra += gmp_flags
+    # cpp/strip_mu.cpp carries `#pragma omp` but its Makefile rule passes no
+    # -fopenmp, so the real build ignores those pragmas -- and mirroring the
+    # real build is this DB's whole contract. clang says nothing; gcc raises
+    # -Werror=unknown-pragmas and fails the check on a file that builds fine.
+    if "#pragma omp" in src:
+        extra += ["-Wno-unknown-pragmas"]
     return args + extra
 
 sources = sorted(f for pat in open("scripts/compile_db_sources.txt")
