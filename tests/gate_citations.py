@@ -50,7 +50,12 @@ PLACEHOLDER = set("{}<>*?$:")
 EXEMPT_WORDS = ("deleted", "removed", "planned", "todo", "deliverable",
                 "never existed", "no such file", "in memory", "not a path",
                 "since removed", "to be written")
-EPHEMERAL_RE = re.compile(r"^(runs|build)/|^results/(ns_a\d+|redelmeier_)")
+# polyplets/.lake/ is Lake's vendored-dependency and build tree -- the Lean
+# equivalent of build/, present only on a box that has run `lake build`, so
+# docs/lean-environment.md's pointers into it are false reds anywhere else
+# (they are all red on ayr, which has no Lean toolchain).
+EPHEMERAL_RE = re.compile(r"^(runs|build)/|^results/(ns_a\d+|redelmeier_)"
+                          r"|^polyplets/\.lake/")
 
 
 def tracked_markdown():
