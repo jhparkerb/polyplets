@@ -61,9 +61,23 @@ independent implementations, written blind to each other, agreeing exactly
 at all four overlapping heights — and both lanes' first *sampled* attempts
 under-measured the same way before being superseded by exact closure, which
 is recorded in both files. The scalar companion floor (B): q_H = deg of
-C_H's minimal recurrence = 1, 2, 4, 9, 29, 68, **181, 462** (H ≤ 8, new
-points holdout-validated at two primes; q_9 in flight), tied to the engine
+C_H's minimal recurrence = 1, 2, 4, 9, 29, 68, 181, 462, tied to the engine
 floor by q_H ≤ d_H·H, which holds at every measured point.
+
+**Correction 2026-08-11 (post-merge grep): 181 and 462 are NOT new, and the
+sequence was already banked two terms further.** deg ψ_H = 1, 2, 4, 9, 29,
+68, 181, 462, **1254, 3289** for H = 1..10 is in
+`results/anisotropic-not-dfinite.md` (and repeated in
+`results/triangle-combinations.md`, `results/open-conjectures.md`,
+`docs/onset-defect-plans.md`, and the L4 paper) — lane A's own coordination
+note cites it; lane B measured H = 7, 8 independently and the merge adopted
+B's "(new)" without checking A's citation. What the measurement actually
+bought is a **cross-method confirmation** — Berlekamp–Massey on C_H(n) mod
+two primes agreeing with the ψ_H denominator degrees obtained by factoring —
+which is worth having and is not a new point. Consequence for §7: the q_9
+probe is **redundant, and its target value is known to be 1254**; the
+verdict file's non-convergence (BM order 1125 on 2250 terms) is consistent
+with that, since resolving order 1254 needs upward of 2600 terms.
 
 **What the fence encloses**: weighted automata over any field, temporal
 MPS/MPO, rank-compressed or basis-changed DPs, the incumbent kernels, B1,
@@ -205,7 +219,9 @@ Findings for jasonp; the affected files are deliberately NOT edited.
   banked standalone (`results/king-column-motzkin.md`). The H = 11 floor
   point that would firm §4's lean (7.2 h per x-value) is a jasonp decision,
   not a running job.
-- B: q_9 verdict (`results/atoms_ext/q9_verdict.txt`); mod-p shadow ranks;
+- B: ~~q_9 verdict~~ **cancelled 2026-08-11** — q_9 = 1254 is banked (§2
+  correction); `results/atoms_ext/q9_verdict.txt` records only that 2250
+  terms are too few to resolve it. Live: mod-p shadow ranks;
   the H = 12–13 closure sizing that decides §4. (B1's memory ceiling
   RESOLVED 2026-08-11 — the window census is the true working set; tier
   table in `results/second-source-candidates.md` §2.)

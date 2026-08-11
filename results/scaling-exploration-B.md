@@ -31,9 +31,9 @@ atoms exactly under the same protocol before producing new ones):
 | 4 | 9 | 2.25 | 50 | 2.50 | 0.18 |
 | 5 | 29 | 3.22 | 126 | 2.52 | 0.23 |
 | 6 | 68 | 2.34 | 322 | 2.56 | 0.21 |
-| 7 | **181** (new) | 2.66 | 834 | 2.59 | 0.22 |
-| 8 | **462** (new) | 2.55 | 2187 | 2.62 | 0.21 |
-| 9 | (run in flight, `results/atoms_ext/q9_verdict.txt`) | | 5797 | 2.65 | |
+| 7 | **181** (banked; re-measured here) | 2.66 | 834 | 2.59 | 0.22 |
+| 8 | **462** (banked; re-measured here) | 2.55 | 2187 | 2.62 | 0.21 |
+| 9 | **1254** (banked, `results/anisotropic-not-dfinite.md`; the BM run is redundant) | 2.71 | 5797 | 2.65 | 0.22 |
 
 (s_H from `results/strip-engine.md`'s measured state counts, shifted to align
 heights; the alignment constant does not affect ratios. Per A-S6 these have
@@ -213,7 +213,7 @@ bridge to the brief's automatic-sequences item and the repo's ternary spine.
 | item | verdict | number |
 |---|---|---|
 | Exact MPS / bond-dimension compression | base equals incumbent's; constant ~4–5× dimension only | q_H table above |
-| Any weighted-automaton engine below b^H, b < ~2.6 | impossible (Fliess floor) | q_7 = 181, q_8 = 462, ratios ≈ 2.6 |
+| Any weighted-automaton engine below b^H, b < ~2.6 | impossible (Fliess floor) | q_7 = 181, q_8 = 462, ratios ≈ 2.6 (values banked, re-measured here) |
 | B1 as a scaling candidate | same base as incumbent on equal cuts (+2.5% states at H=9); climbing-ratio claim was a window-cut artifact | A-S4; my window counts stand only as B1's own resource curve |
 | Subset-lattice transforms / subset convolution | 2^{HW} states | HW = 840 at frontier |
 | GF(2) rank-based (base 2.0) for exact counts | unsound for counting | [BCKN15] |

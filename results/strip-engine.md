@@ -147,7 +147,13 @@ prefer it over any ad hoc enumerator.
 ## Complexity (measured, C++)
 
 State count per height (distinct connectivity partitions cached):
-1, 3, 8, 20, 50, 126, 322, 834, 2187, 5797, ... — grows ~2.65x/height.
+1, 3, 8, 20, 50, 126, 322, 834, 2187, 5797, ... — **exactly Motzkin(H+1) − 1**
+(theorem + proof + three-implementation check: `results/king-column-motzkin.md`,
+2026-08-11), so the asymptotic base is **3**, not 2.65. The "~2.65x/height"
+this line carried is the LOCAL ratio near H ≈ 10; the local ratio is ×2.75 at
+H = 14 and ×2.81 at H = 21, climbing to 3. Quote the closed form, and compare
+engines at like-for-like heights or by closed form — never by extrapolating
+2.65.
 Wall grows ~6x/height (H=10: 3.5s). __int128 suffices through n<=40, H<=15
 since C_H(n) <= H*a(n) < 1.7e38. State packed 4 bits/row -> H<=15 cap.
 
