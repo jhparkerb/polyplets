@@ -609,3 +609,29 @@ Full notes in the `library-access-pittsburgh` memory. The short of it:
 - **Email the authors.** For Barequet & Magal — one of the two load-bearing
   items — this is likely faster than any library, and we already hold five
   Barequet papers.
+
+## From the 2026-08-13 reading pass (citation chase over the 11 fetched PDFs)
+
+Wanted, no arXiv version found (arXiv API title/author queries run 2026-08-13;
+plain web "title + pdf" search NOT yet run on these):
+
+- Rands & Welsh, "Animals, trees and renewal sequences," IMA J. Appl. Math. 27
+  (1981) 1–18. — The renewal identity P(n) = sum Q(i)P(n-i) over inconstructible
+  animals; if stated lattice-generically it hands polyplets the same identity,
+  and with it Bui's conditional upper-bound machinery (arXiv:2211.14909 §4).
+  Also the general-lattice framework G-P cite for the old honeycomb bound. [med]
+- Delyon, "Taille, forme et nombre des amas dans les problèmes de percolation,"
+  Thèse de 3ème cycle, Univ. Pierre et Marie Curie, 1980. — The original
+  cluster-size non-decay result the Hammond/G-P equality-at-p_c chain builds
+  on. French 3rd-cycle thesis, no DOI; likely unobtainable. [low]
+- Barequet & Ben-Shachar, "Algorithms for counting minimal-perimeter lattice
+  animals" (cited as under submission, 2020; check for the published version).
+  — The tool for extending our king |M_n| sequence (1,2,6,1,8,2,22,6,1,30,...,
+  no OEIS match) without brute force. [med]
+- Gaunt & Peard, "1/d-expansions for the free energy of weakly embedded site
+  animal models of branched polymers," J. Phys. A 33 (2000) 7515–7539. — The
+  degree/dimension-expansion literature; Barequet–Shalah's arXiv v2 cites it as
+  a broken "[?]" at their p.7523/Eq. 4.9 use. IOP, pre-arXiv-era physics. [low]
+- Harary & Harborth, "Extremal animals," J. Comb. Inf. Syst. Sci. 1 (1976)
+  1–8. — Earliest extremal min/max perimeter across lattices; the most likely
+  place a king-lattice perimeter statement already exists. [low]

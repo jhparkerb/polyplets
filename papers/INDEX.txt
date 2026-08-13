@@ -307,3 +307,10 @@ Part V, for provenance; downloaded as the "fetch relevant papers" pass):
   barequet_benshachar_2022_minimal_perimeter_constant_isomer.pdf  Barequet & Ben-Shachar, Minimal-perimeter lattice animals and the constant-isomer conjecture, arXiv:2205.07025. Lattice-generic; perimeter-campaign adjacent.
   xun_hao_ziff_2021_extended_neighborhoods.pdf   Xun, Hao & Ziff, Site percolation on square and simple cubic lattices with extended neighborhoods and their continuum limit, PRE 103, 022126 (2021); arXiv:2010.02895. The square (1,2)-neighborhood is king connectivity.
   dobbelaere_etal_2026_building_with_blocks.pdf  Dobbelaere, Kagey, Thomas & Vindas-Melendez, Building with blocks: enumerating polyforms on tilings, arXiv:2602.23301 (Bridges 2026). General polyform-on-tilings machinery.
+
+Citation chase from the 2026-08-13 reading pass (the four readers' reports;
+provenance in the session notes and polyplets-2024-2026.bib):
+  hammond_2005_lattice_animal_approach_percolation.pdf  Hammond, A lattice animal approach to percolation, arXiv:math/0402026. With its companion below, the animal-form (not interface-form) equality-at-p_c behind the Georgakopoulos-Panagiotis conversion -- the citable route to lambda_king >= 5.256 without their "we expect" caveat. (Route is a closed door anyway: capped below our 6.543.)
+  hammond_2005_exponent_relations.pdf            Hammond, Percolation and lattice animals: exponent relations, and conditions for theta(p_c)=0, arXiv:math/0402048. Companion to the above; one of the two is the ECP 10:45-59 (2005) paper cited by G-P as [17].
+  jacobsen_2015_temperley_lieb_thresholds.pdf    Jacobsen, Critical points of Potts and O(N) models from eigenvalue identities in periodic Temperley-Lieb algebras, J. Phys. A 48:454003 (2015); arXiv:1507.03027. Source of p_c(square site) = 0.59274605..., hence the authoritative king threshold 0.40725395... via Sykes-Essam matching.
+  koch_kurz_2006_generalized_polyominoes.pdf     Koch & Kurz, Enumeration of generalized polyominoes, arXiv:math/0605144. The only prior general-adjacency enumeration framework cited by Dobbelaere et al.; check whether king adjacency was covered.
