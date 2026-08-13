@@ -1,0 +1,2 @@
+A006770 check n<=8: OK [1, 4, 20, 110, 638, 3832, 23592, 147941]
+I_H(<v>) brute vs banked-transpose, n<=8: 36 cells, 0 mismatches

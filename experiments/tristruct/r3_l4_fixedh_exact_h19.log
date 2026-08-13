@@ -1,0 +1,2 @@
+hmirror H=19: 23347 reachable states, 18639635 edges, 1023 seeds, BFS 156.9s
+hmirror H=19: exact dp vs banked symtm, n=1..32: 0 mismatches
