@@ -1,0 +1,221 @@
+=== run_cutcount_b1_calib 2026-08-11T13:23:00Z host=dalby
+=== source sha256: 59e90660b42a0d94  tree: 3b7359de
+event=start job=cutcount_b1 t=2026-08-11T09:23:00-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:23:00-04:00 start=2026-08-11T09:23:00-04:00 wall_s=0.0 cpu_s=0.0 peak_rss_mb=2.6 mode=height H=1 wall_s=0.000880
+selfcheck H=1: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_1 done in 0.0 s -> results/cutcount_b1/rows/C1.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:23:00-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:23:00-04:00 start=2026-08-11T09:23:00-04:00 wall_s=0.0 cpu_s=0.0 peak_rss_mb=2.6 mode=height H=2 wall_s=0.002028
+selfcheck H=2: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_2 done in 0.0 s -> results/cutcount_b1/rows/C2.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:23:00-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:23:00-04:00 start=2026-08-11T09:23:00-04:00 wall_s=0.0 cpu_s=0.0 peak_rss_mb=2.6 mode=height H=3 wall_s=0.006556
+selfcheck H=3: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_3 done in 0.0 s -> results/cutcount_b1/rows/C3.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:23:00-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:23:00-04:00 start=2026-08-11T09:23:00-04:00 wall_s=0.0 cpu_s=0.0 peak_rss_mb=2.6 mode=height H=4 wall_s=0.018067
+selfcheck H=4: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_4 done in 0.0 s -> results/cutcount_b1/rows/C4.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:23:00-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:23:00-04:00 start=2026-08-11T09:23:00-04:00 wall_s=0.1 cpu_s=0.1 peak_rss_mb=3.2 mode=height H=5 wall_s=0.077621
+selfcheck H=5: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_5 done in 0.1 s -> results/cutcount_b1/rows/C5.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:23:00-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:23:00-04:00 start=2026-08-11T09:23:00-04:00 wall_s=0.2 cpu_s=0.2 peak_rss_mb=4.5 mode=height H=6 wall_s=0.156579
+selfcheck H=6: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_6 done in 0.2 s -> results/cutcount_b1/rows/C6.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:23:00-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:23:00-04:00 start=2026-08-11T09:23:00-04:00 wall_s=0.5 cpu_s=0.5 peak_rss_mb=8.2 mode=height H=7 wall_s=0.458891
+selfcheck H=7: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_7 done in 0.5 s -> results/cutcount_b1/rows/C7.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:23:00-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:23:02-04:00 start=2026-08-11T09:23:00-04:00 wall_s=1.4 cpu_s=1.4 peak_rss_mb=17.4 mode=height H=8 wall_s=1.377100
+selfcheck H=8: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_8 done in 1.4 s -> results/cutcount_b1/rows/C8.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:23:02-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:23:06-04:00 start=2026-08-11T09:23:02-04:00 wall_s=4.5 cpu_s=4.5 peak_rss_mb=41.9 mode=height H=9 wall_s=4.543062
+selfcheck H=9: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_9 done in 4.5 s -> results/cutcount_b1/rows/C9.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:23:06-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:23:22-04:00 start=2026-08-11T09:23:06-04:00 wall_s=15.6 cpu_s=15.6 peak_rss_mb=109.4 mode=height H=10 wall_s=15.645590
+selfcheck H=10: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_10 done in 15.6 s -> results/cutcount_b1/rows/C10.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:23:22-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:24:08-04:00 elapsed_s=46.0 rate=0.8269/s count=38 H=11 states=38065
+event=done job=cutcount_b1 t=2026-08-11T09:24:12-04:00 start=2026-08-11T09:23:22-04:00 wall_s=49.7 cpu_s=49.7 peak_rss_mb=299.0 mode=height H=11 wall_s=49.724861
+selfcheck H=11: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_11 done in 49.7 s -> results/cutcount_b1/rows/C11.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:24:12-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:24:58-04:00 elapsed_s=46.2 rate=0.2814/s count=13 H=12 states=107241
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:25:46-04:00 elapsed_s=94.5 rate=0.2647/s count=25 H=12 states=107241
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:26:34-04:00 elapsed_s=142.5 rate=0.2597/s count=37 H=12 states=107241
+event=done job=cutcount_b1 t=2026-08-11T09:26:50-04:00 start=2026-08-11T09:24:12-04:00 wall_s=158.5 cpu_s=158.4 peak_rss_mb=835.5 mode=height H=12 wall_s=158.458247
+selfcheck H=12: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_12 done in 158.5 s -> results/cutcount_b1/rows/C12.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:26:50-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:27:48-04:00 elapsed_s=57.5 rate=0.1044/s count=6 H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:28:39-04:00 elapsed_s=108.8 rate=0.09195/s count=10 H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:29:30-04:00 elapsed_s=160.1 rate=0.08747/s count=14 H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:30:21-04:00 elapsed_s=211.1 rate=0.08526/s count=18 H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:31:12-04:00 elapsed_s=262.2 rate=0.08391/s count=22 H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:32:03-04:00 elapsed_s=313.1 rate=0.08304/s count=26 H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:32:54-04:00 elapsed_s=363.9 rate=0.08244/s count=30 H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:33:45-04:00 elapsed_s=414.6 rate=0.082/s count=34 H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:34:36-04:00 elapsed_s=465.3 rate=0.08167/s count=38 H=13 states=306858
+event=done job=cutcount_b1 t=2026-08-11T09:35:14-04:00 start=2026-08-11T09:26:50-04:00 wall_s=503.4 cpu_s=503.0 peak_rss_mb=2393.4 mode=height H=13 wall_s=503.286514
+selfcheck H=13: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_13 done in 503.3 s -> results/cutcount_b1/rows/C13.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:35:14-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:36:19-04:00 elapsed_s=64.8 rate=0.04627/s count=3 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:37:39-04:00 elapsed_s=145.0 rate=0.03448/s count=5 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:39:00-04:00 elapsed_s=226.5 rate=0.03091/s count=7 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:40:22-04:00 elapsed_s=308.0 rate=0.02923/s count=9 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:41:44-04:00 elapsed_s=390.4 rate=0.02817/s count=11 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:43:08-04:00 elapsed_s=473.7 rate=0.02744/s count=13 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:44:30-04:00 elapsed_s=556.7 rate=0.02694/s count=15 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:45:54-04:00 elapsed_s=639.8 rate=0.02657/s count=17 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:47:17-04:00 elapsed_s=722.9 rate=0.02628/s count=19 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:48:39-04:00 elapsed_s=805.2 rate=0.02608/s count=21 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:50:01-04:00 elapsed_s=886.8 rate=0.02594/s count=23 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:51:22-04:00 elapsed_s=968.3 rate=0.02582/s count=25 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:52:44-04:00 elapsed_s=1049.7 rate=0.02572/s count=27 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:54:05-04:00 elapsed_s=1131.0 rate=0.02564/s count=29 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:55:26-04:00 elapsed_s=1212.4 rate=0.02557/s count=31 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:56:47-04:00 elapsed_s=1293.6 rate=0.02551/s count=33 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:58:09-04:00 elapsed_s=1374.9 rate=0.02546/s count=35 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:59:30-04:00 elapsed_s=1456.2 rate=0.02541/s count=37 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:00:51-04:00 elapsed_s=1537.2 rate=0.02537/s count=39 H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:02:12-04:00 elapsed_s=1618.2 rate=0.02534/s count=41 H=14 states=891074
+event=done job=cutcount_b1 t=2026-08-11T10:02:12-04:00 start=2026-08-11T09:35:14-04:00 wall_s=1618.6 cpu_s=1617.5 peak_rss_mb=6924.6 mode=height H=14 wall_s=1618.153173
+selfcheck H=14: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_14 done in 1618.2 s -> results/cutcount_b1/rows/C14.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T10:02:13-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:03:53-04:00 elapsed_s=100.4 rate=0.01992/s count=2 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:05:45-04:00 elapsed_s=211.8 rate=0.01416/s count=3 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:07:54-04:00 elapsed_s=341.5 rate=0.01171/s count=4 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:10:07-04:00 elapsed_s=474.0 rate=0.01055/s count=5 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:12:17-04:00 elapsed_s=604.5 rate=0.009926/s count=6 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:14:28-04:00 elapsed_s=735.2 rate=0.009521/s count=7 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:16:39-04:00 elapsed_s=866.0 rate=0.009238/s count=8 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:18:48-04:00 elapsed_s=995.3 rate=0.009042/s count=9 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:21:00-04:00 elapsed_s=1127.0 rate=0.008873/s count=10 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:23:11-04:00 elapsed_s=1258.1 rate=0.008743/s count=11 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:25:22-04:00 elapsed_s=1389.6 rate=0.008635/s count=12 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:27:31-04:00 elapsed_s=1518.5 rate=0.008561/s count=13 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:29:41-04:00 elapsed_s=1647.9 rate=0.008496/s count=14 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:31:50-04:00 elapsed_s=1776.9 rate=0.008442/s count=15 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:34:00-04:00 elapsed_s=1906.9 rate=0.008391/s count=16 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:36:09-04:00 elapsed_s=2036.2 rate=0.008349/s count=17 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:38:18-04:00 elapsed_s=2165.7 rate=0.008311/s count=18 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:40:27-04:00 elapsed_s=2294.7 rate=0.00828/s count=19 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:42:36-04:00 elapsed_s=2423.7 rate=0.008252/s count=20 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:44:45-04:00 elapsed_s=2552.8 rate=0.008226/s count=21 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:46:55-04:00 elapsed_s=2681.9 rate=0.008203/s count=22 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:49:03-04:00 elapsed_s=2810.6 rate=0.008183/s count=23 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:51:12-04:00 elapsed_s=2939.0 rate=0.008166/s count=24 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:53:20-04:00 elapsed_s=3067.7 rate=0.008149/s count=25 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:55:29-04:00 elapsed_s=3196.3 rate=0.008134/s count=26 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:57:37-04:00 elapsed_s=3324.7 rate=0.008121/s count=27 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T10:59:46-04:00 elapsed_s=3453.2 rate=0.008108/s count=28 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:01:55-04:00 elapsed_s=3581.9 rate=0.008096/s count=29 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:04:03-04:00 elapsed_s=3710.5 rate=0.008085/s count=30 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:06:11-04:00 elapsed_s=3838.3 rate=0.008076/s count=31 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:08:19-04:00 elapsed_s=3966.6 rate=0.008067/s count=32 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:10:27-04:00 elapsed_s=4094.4 rate=0.00806/s count=33 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:12:36-04:00 elapsed_s=4223.1 rate=0.008051/s count=34 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:14:44-04:00 elapsed_s=4351.2 rate=0.008044/s count=35 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:16:53-04:00 elapsed_s=4480.0 rate=0.008036/s count=36 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:19:04-04:00 elapsed_s=4611.4 rate=0.008024/s count=37 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:21:16-04:00 elapsed_s=4743.2 rate=0.008011/s count=38 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:23:27-04:00 elapsed_s=4874.4 rate=0.008001/s count=39 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:25:37-04:00 elapsed_s=5004.3 rate=0.007993/s count=40 H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:27:46-04:00 elapsed_s=5133.2 rate=0.007987/s count=41 H=15 states=2624197
+event=done job=cutcount_b1 t=2026-08-11T11:27:47-04:00 start=2026-08-11T10:02:13-04:00 wall_s=5134.5 cpu_s=5131.2 peak_rss_mb=20382.8 mode=height H=15 wall_s=5133.192589
+selfcheck H=15: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_15 done in 5133.2 s -> results/cutcount_b1/rows/C15.out.tmp
+=== H<=15 assemble/compare:
+event=start job=cutcount_b1 t=2026-08-11T11:27:48-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T11:27:48-04:00 start=2026-08-11T11:27:48-04:00 wall_s=0.0 cpu_s=0.0 peak_rss_mb=2.6 mode=assemble match=600 mismatch=0
+H=1: 40 match, 0 mismatch
+H=2: 40 match, 0 mismatch
+H=3: 40 match, 0 mismatch
+H=4: 40 match, 0 mismatch
+H=5: 40 match, 0 mismatch
+H=6: 40 match, 0 mismatch
+H=7: 40 match, 0 mismatch
+H=8: 40 match, 0 mismatch
+H=9: 40 match, 0 mismatch
+H=10: 40 match, 0 mismatch
+H=11: 40 match, 0 mismatch
+H=12: 40 match, 0 mismatch
+H=13: 40 match, 0 mismatch
+H=14: 40 match, 0 mismatch
+H=15: 40 match, 0 mismatch
+
+vs banked triangle: 600 match, 0 MISMATCH
+event=start job=cutcount_b1 t=2026-08-11T11:27:48-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:33:13-04:00 elapsed_s=324.9 rate=0.006157/s count=2 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:39:11-04:00 elapsed_s=683.0 rate=0.004392/s count=3 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:46:04-04:00 elapsed_s=1095.9 rate=0.00365/s count=4 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:53:00-04:00 elapsed_s=1512.2 rate=0.003306/s count=5 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T11:59:55-04:00 elapsed_s=1926.9 rate=0.003114/s count=6 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T12:06:52-04:00 elapsed_s=2343.9 rate=0.002986/s count=7 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T12:13:47-04:00 elapsed_s=2758.9 rate=0.0029/s count=8 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T12:20:48-04:00 elapsed_s=3180.2 rate=0.00283/s count=9 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T12:27:48-04:00 elapsed_s=3600.4 rate=0.002777/s count=10 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T12:34:45-04:00 elapsed_s=4017.2 rate=0.002738/s count=11 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T12:41:39-04:00 elapsed_s=4431.2 rate=0.002708/s count=12 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T12:48:35-04:00 elapsed_s=4847.2 rate=0.002682/s count=13 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T12:55:28-04:00 elapsed_s=5260.3 rate=0.002661/s count=14 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T13:02:23-04:00 elapsed_s=5674.9 rate=0.002643/s count=15 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T13:09:15-04:00 elapsed_s=6087.3 rate=0.002628/s count=16 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T13:16:10-04:00 elapsed_s=6501.5 rate=0.002615/s count=17 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T13:23:03-04:00 elapsed_s=6914.5 rate=0.002603/s count=18 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T13:29:57-04:00 elapsed_s=7328.7 rate=0.002593/s count=19 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T13:36:50-04:00 elapsed_s=7742.0 rate=0.002583/s count=20 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T13:43:50-04:00 elapsed_s=8162.3 rate=0.002573/s count=21 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T13:50:45-04:00 elapsed_s=8577.3 rate=0.002565/s count=22 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T13:57:40-04:00 elapsed_s=8991.6 rate=0.002558/s count=23 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T14:04:32-04:00 elapsed_s=9404.2 rate=0.002552/s count=24 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T14:11:29-04:00 elapsed_s=9821.3 rate=0.002545/s count=25 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T14:18:28-04:00 elapsed_s=10240.4 rate=0.002539/s count=26 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T14:25:25-04:00 elapsed_s=10656.9 rate=0.002534/s count=27 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T14:32:20-04:00 elapsed_s=11071.5 rate=0.002529/s count=28 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T14:39:17-04:00 elapsed_s=11488.7 rate=0.002524/s count=29 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T14:46:11-04:00 elapsed_s=11903.0 rate=0.00252/s count=30 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T14:53:05-04:00 elapsed_s=12317.2 rate=0.002517/s count=31 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T15:00:00-04:00 elapsed_s=12732.4 rate=0.002513/s count=32 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T15:06:55-04:00 elapsed_s=13147.2 rate=0.00251/s count=33 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T15:13:51-04:00 elapsed_s=13562.5 rate=0.002507/s count=34 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T15:20:43-04:00 elapsed_s=13974.7 rate=0.002505/s count=35 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T15:27:39-04:00 elapsed_s=14390.6 rate=0.002502/s count=36 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T15:34:38-04:00 elapsed_s=14809.5 rate=0.002498/s count=37 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T15:41:33-04:00 elapsed_s=15225.4 rate=0.002496/s count=38 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T15:48:30-04:00 elapsed_s=15641.5 rate=0.002493/s count=39 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T15:55:26-04:00 elapsed_s=16058.0 rate=0.002491/s count=40 H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-11T16:02:19-04:00 elapsed_s=16470.9 rate=0.002489/s count=41 H=16 states=7832667
+event=done job=cutcount_b1 t=2026-08-11T16:02:23-04:00 start=2026-08-11T11:27:48-04:00 wall_s=16475.2 cpu_s=16465.1 peak_rss_mb=60827.4 mode=height H=16 wall_s=16470.894700
+selfcheck H=16: q0_zero=OK q1eval_binomial=OK (n=1..40)
+C_16 done in 16470.9 s -> results/cutcount_b1/rows/C16.out.tmp
+=== H<=16 assemble/compare:
+event=start job=cutcount_b1 t=2026-08-11T16:02:26-04:00 git=3b7359de-dirty built=2026-08-11T13:22:57Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T16:02:26-04:00 start=2026-08-11T16:02:26-04:00 wall_s=0.0 cpu_s=0.0 peak_rss_mb=2.6 mode=assemble match=640 mismatch=0
+H=1: 40 match, 0 mismatch
+H=2: 40 match, 0 mismatch
+H=3: 40 match, 0 mismatch
+H=4: 40 match, 0 mismatch
+H=5: 40 match, 0 mismatch
+H=6: 40 match, 0 mismatch
+H=7: 40 match, 0 mismatch
+H=8: 40 match, 0 mismatch
+H=9: 40 match, 0 mismatch
+H=10: 40 match, 0 mismatch
+H=11: 40 match, 0 mismatch
+H=12: 40 match, 0 mismatch
+H=13: 40 match, 0 mismatch
+H=14: 40 match, 0 mismatch
+H=15: 40 match, 0 mismatch
+H=16: 40 match, 0 mismatch
+
+vs banked triangle: 640 match, 0 MISMATCH
+=== done 2026-08-11T20:02:26Z
