@@ -228,11 +228,19 @@ Standing project rules unchanged: exact integer arithmetic, named scripts under
 `paper/technical-report.tex` read-only, `docs/viva-*.md` never committed, no
 jobs on gympie, anything over five minutes in a tmux window.
 
-**The measurement boundary**, since every lane owes a cost model anchored on a
-measurement it took itself: throwaway scripts under `experiments/`, laptop
-minutes, small n. No new modes in existing engines, nothing new under `build/`,
-no fleet jobs. A lane needing more than that has produced a phase-2 proposal,
-which is jasonp's call and not the lane's.
+**The measurement boundary. REPLACED 2026-08-12, mid-round, by
+`docs/r3-job-dispatch.md` — read it, it governs.** The original wording said
+"throwaway scripts, laptop minutes, small n". That was wrong: it put every probe
+in this round on gympie, jasonp's working laptop, against the project's standing
+rule. The lead wrote it; the lanes followed it correctly.
+
+In short, and the dispatch file has the detail: **no agent runs compute on any
+machine.** An agent that needs a number files a job request — with wall, RAM,
+disk and core estimates, each labelled MEASURED, EXTRAPOLATED or ASSERTED, plus
+what decision the number changes and what RED control it carries — and the lead
+dispatches it to ayr or dalby, or asks jasonp for gympie per job. Agents write
+results to disk as they get them, never holding them in context; measurements
+already taken stand and nothing is re-run.
 
 **The disclosure block, mapped to phase 1.** These are route proposals, not
 checks, so: *bits* are projected-at-phase-2 with the modulus stated; *checker*
@@ -266,19 +274,81 @@ holds on more cells" is round 1's output, banked at zero.
 
 Model: Fable throughout.
 
+## Generativity — the round runs in waves, not one pass
+
+Added mid-round, 2026-08-12, on jasonp's instruction, after L4 closed: a fan-out
+in which every agent gives exactly one idea a thorough look and then reports
+that there is nothing is not a search. **Ruling something out is half a lane's
+job. The other half is what the obstruction tells you to try next.**
+
+`results/triangle-r3-queue.md` is the shared append-only idea queue, with its
+protocol at the top. Every agent that closes a candidate files at least two
+successor rows, different in kind rather than parameter tweaks: what would have
+to be different about the problem for it to work, whether an adjacent object has
+that property, and what the obstruction proves about the family rather than the
+instance. "None — the obstruction is terminal for this whole family" is an
+answer only when it is argued. Rows are cheap and half-formed rows are wanted;
+cross-lane rows are wanted; an unfiled idea costs the round more than a bad row
+does. L6's pruned near-misses go in the queue rather than into a silent cap.
+
+Between waves the lead runs a **triage pass**: rank the OPEN rows by the queue's
+standing order, dispatch the top ones as the next wave, and record what was
+dropped and why. **The round ends when two consecutive triage passes produce no
+row worth dispatching** — not when the first wave of lanes reports back. That
+dry condition, met twice, is what licenses the closing statement; a single quiet
+wave does not.
+
 ## Stop conditions
 
-- A lane that clears neither ticket level stops there and files the reason. That
-  is a finding about the problem, not a failure of the lane.
-- No lane builds anything. A scout that starts writing a sweep mode has left its
-  brief.
-- If every lane fails both levels, the deliverable is the proved statement that
-  the connectivity rule cannot be varied within reach — each obstruction named —
-  and the triangle closes on that.
+**REVISED 2026-08-12, and the revision is the point.** The original text ended
+the round on two consecutive dry triage passes. **That rule is withdrawn on
+jasonp's instruction: never stop making ideas.** The queue outlives the round
+that opened it, and no brief here again carries a condition whose satisfaction
+is a reason to stop generating.
 
-## Deliverable
+The evidence is this round's own record. Every closure threw off something
+better than what it killed: the involution lane died on a two-horn dilemma
+whose escape *was* the cancellation family; the contour lane died by
+state-space isomorphism, and that isomorphism produced the definition-level
+proof — the round's best idea, from its worst-performing lane; the quotient
+lane's cost floor is what made anyone ask what an implicit count would look
+like. None of it was in any brief, and the lead's withheld seed list did not
+contain the one route that survived.
 
-One `results/triangle-r3-*.md` per lane and per adversary, each with its mapped
-disclosure block and its entry-ticket paragraph; one ranked synthesis carrying
-the phase-2 proposal if there is one; one line in `HANDOFF.md` recording what
-the final round bought.
+What remains:
+
+- A lane that clears neither ticket level files the reason **and its
+  successors**. A closure without successors is an incomplete deliverable, not
+  a negative result.
+- No lane builds anything, and no lane runs compute — see
+  `docs/r3-job-dispatch.md`. A scout that starts writing a sweep mode, or
+  launches a background job, has left its brief.
+- If every lane fails both levels, the proved statement that the rule cannot be
+  varied within reach is a **deliverable, not a terminus**. File it, then file
+  what it makes newly askable.
+
+## Deliverable — exact paths, assigned here
+
+Nobody invents a filename. Write to your assigned path and no other; if you need
+a second file, name it with your lane's prefix and say so in the main file.
+
+| agent | blind list, filed first | main deliverable |
+|---|---|---|
+| harness | — | `results/triangle-r3-harness.md` |
+| L1 (+L2's question) | `results/triangle-r3-blind-l1.md` | `results/triangle-r3-l1-corner-gluing.md` |
+| L3 | `results/triangle-r3-blind-l3.md` | `results/triangle-r3-l3-contour.md` |
+| L4 | `results/triangle-r3-blind-l4.md` | `results/triangle-r3-l4-quotient.md` |
+| L5 | `results/triangle-r3-blind-l5.md` | `results/triangle-r3-l5-constraint.md` |
+| L6 | `results/triangle-r3-blind-l6.md` | `results/triangle-r3-l6-wildcard.md` |
+| adversary, independence | — | `results/triangle-r3-adv-independence.md` |
+| adversary, cost + completeness | — | `results/triangle-r3-adv-cost.md` |
+| lead | — | `results/triangle-r3-synthesis.md` |
+
+Scripts go under `experiments/tristruct/` named `r3_<lane>_<purpose>.py` (or
+`.cpp`); logs alongside as `r3_<lane>_<purpose>.log`. Nothing under `build/`,
+nothing in `/tmp`, no edits to any existing script or engine.
+
+Each main file carries its mapped disclosure block and its entry-ticket
+paragraph. The lead's synthesis carries the ranked ledger and the phase-2
+proposal if one is earned; one line lands in `HANDOFF.md` recording what the
+final round bought.

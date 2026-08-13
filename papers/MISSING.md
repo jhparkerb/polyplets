@@ -609,3 +609,16 @@ Full notes in the `library-access-pittsburgh` memory. The short of it:
 - **Email the authors.** For Barequet & Magal — one of the two load-bearing
   items — this is likely faster than any library, and we already hold five
   Barequet papers.
+
+## King-anchor pass (triangle round 3), 2026-08-12
+
+- **Tremblay, H. & Vernay, J., "On the generation of discrete figures with
+  connectivity constraints," RAIRO-Theor. Inf. Appl. 58 (2024) Art. 16.
+  doi:10.1051/ita/2024013.** — source of A006770(18) (their p. 13); the only
+  modern external king-lattice generation paper. Publisher and DOI both 403'd
+  2026-08-12; no arXiv/HAL preprint found. Their code is public
+  (github.com/J-Vernay/discrete-figures). [medium]
+- **Peters, H. P., Stauffer, D., Hölters, K. & Loewenich, K., Z. Phys. B 34
+  (1979) 399. doi:10.1007/BF01325205.** — original external source for
+  A006770 n ≤ 10 (nnsquare perimeter polynomials), per Mertens 1990 ref. 11.
+  Springer paywall. [low — Mertens 1990 (held) supersedes its terms]

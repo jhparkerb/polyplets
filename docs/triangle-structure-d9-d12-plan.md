@@ -76,6 +76,9 @@ m = 9 was built in `experiments/tristruct/r2_scout_d8.py`. Per level:
 - **Two bit-counts, first line**, per the round-2 brief's rule 3: bits against
   enumeration error, and bits against formula-chain error with what they are
   conditional on.
+- **Scoring is `docs/skeptical-reader-standard.md`.** Every result opens with
+  its disclosure block; results without one are not scored, and the
+  automatic-zero list applies in full.
 - **Sensitivity, not just agreement.** A level's checks passing means nothing
   unless a corrupted weight would have broken them. Agent 3's corruption
   battery is the model; run the equivalent at each new level.
@@ -100,7 +103,8 @@ Stop and report, rather than pushing on, if any of these fire:
 
 ## Deliverable
 
-One file, `results/triangle-tower-d9-d12.md`: the per-level table (modulus,
+One file, `results/triangle-tower-d9-d12.md` (planned, does not exist yet): the
+per-level table (modulus,
 interior terms, curve degree, new weights, measured wall), the target cycle or
 aperiodicity finding at each d, the enumerated-cell check table with
 provenance, the two bit-counts, the DP-only exposure list, and the measured
