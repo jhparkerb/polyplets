@@ -1,0 +1,25 @@
+== 1. Z vs brute subset enumeration ==
+  box 2x3: OK
+  box 3x3: OK
+  box 4x3: OK
+  box 3x4: OK
+  box 4x4: OK
+  box 2x5: OK
+== 2/3. pipeline T mod 2 vs self-grown animals ==
+  cells compared: 28; mismatches: 0 []
+  grower totals: [1, 4, 20, 110, 638, 3832, 23592]
+== 4. exact N_H(n) spot checks vs brute translation classes ==
+  N_2(4) pipeline=158 brute=158 OK
+  N_3(5) pipeline=10928 brute=10928 OK
+  N_2(5) pipeline=664 brute=664 OK
+  N_3(6) pipeline=88764 brute=88764 OK
+  N_4(6) pipeline=821380 brute=821380 OK
+== 5. RED battery: asymmetric + symmetric stencil mutants ==
+  drop-NW: 12 cells wrong vs ground truth; first: [(2, 2), (3, 3), (4, 2), (4, 4), (5, 3), (5, 5)]
+  drop-SW: 12 cells wrong vs ground truth; first: [(2, 2), (3, 3), (4, 2), (4, 4), (5, 3), (5, 5)]
+  rook: 4 cells wrong vs ground truth; first: [(4, 3), (5, 3), (6, 3), (6, 5)]
+== 6. banked comparison (post-hoc) ==
+  pipeline vs banked, 28 cells n<=8: 0 mismatches []
+  grower row totals vs banked a(n), n<=8: OK
+  banked T(40,20) mod 2 = 1 (provenance real-sweep)
+  banked T(40,21) mod 2 = 1 (provenance real-sweep)
