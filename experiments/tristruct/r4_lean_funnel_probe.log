@@ -1,0 +1,47 @@
+host=gympie date=2026-08-13T03:47:08Z
+lake=/Users/jasonp/.elan/bin/lake toolchain=leanprover/lean4:v4.31.0
+=== GATE A: /Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean_funnel_probe.lean ===
+--- elaborator output (must be empty) ---
+--- wall / peak RSS (MEASURED, this run) ---
+        9.61 real         1.86 user         2.37 sys
+          5515296768  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              409577  page reclaims
+               64116  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+               21658  voluntary context switches
+               53199  involuntary context switches
+            25012675  instructions retired
+             9601091  cycles elapsed
+             1278264  peak memory footprint
+gateA_exit=0
+gateA_elaborator_output_lines=0
+GATE A: PASS
+=== GATE B (RED control 1) ===
+mutation: sed 's/have h := hadj.2.1/have h := hadj.2.2/'
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean_funnel_probe.red.lean:157:2: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  -1 ≤ g - i ≤ 1
+  d - e ≥ 1
+  d - f ≤ -1
+where
+ d := c
+ e := a.1
+ f := b.1
+ g := a.2
+ i := b.2
+'Polyplets.R4Funnel.redReach_of_reach' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean_funnel_probe.red.lean:281:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+- info: 'Polyplets.R4Funnel.redReach_of_reach' depends on axioms: [propext, Classical.choice, Quot.sound]
++ info: 'Polyplets.R4Funnel.redReach_of_reach' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+gateB_exit=1
+GATE B: PASS (mutant rejected, exit=1)
+ALL GATES PASS

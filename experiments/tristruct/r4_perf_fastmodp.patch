@@ -1,0 +1,200 @@
+--- a/cpp/cutcount_b1.cpp
++++ b/cpp/cutcount_b1.cpp
+@@ -93,7 +93,13 @@
+ 
+ // ---------- frontier key: H+1 slots, 5 bits per slot, packed into u128 ----------
+ // slot k = color-block id of the cell processed k+1 cells ago (0 = empty).
+-// Max distinct blocks in a window of H+2 cells is <= 9 for H<=16; 5 bits is roomy.
++// Max distinct blocks b in the H+1 slot window is floor((H+1)/2) -- 8 at H=16,
++// 10 at H=19 and H=20, 11 at H=21 (r4-perf section 3: distinct ids are pairwise
++// non-king-adjacent, the window is two column segments meeting at row r-1, and
++// the seam costs exactly one when both segments are at their independent-set
++// maximum). 5 bits per slot is roomy; the successor buffer is not, so
++// SUCC_MAX below is checked rather than assumed.
++static const int SUCC_MAX = 16;   // >= floor((H+1)/2) + 2 for all H <= 24
+ struct KeyHash {
+   size_t operator()(u128 k) const {
+     u64 lo = (u64)k, hi = (u64)(k >> 64);
+@@ -148,7 +154,7 @@
+ }
+ 
+ // enumerate successors of `key` at cell (r,c); returns count, fills out[]
+-static inline int successors(u128 key, int H, int r, int c, Succ out[12]) {
++static inline int successors(u128 key, int H, int r, int c, Succ out[SUCC_MAX]) {
+   int n = 0;
+   // empty cell
+   out[n++] = { shifted(key, H, 0), 1, 0, 0 };
+@@ -166,6 +172,12 @@
+     int x = slot(key, k);
+     if (x && !present[x]) { present[x] = 1; b++; }
+     if (x > mx) mx = x;
++  }
++  // fail closed: b+2 entries are about to be written into out[SUCC_MAX].
++  if (b + 2 > SUCC_MAX) {
++    fprintf(stderr, "FATAL succ_overflow H=%d r=%d c=%d b=%d cap=%d\n",
++            H, r, c, b, SUCC_MAX);
++    std::exit(2);
+   }
+   for (int x = 1; x <= mx; x++)
+     if (present[x]) out[n++] = { shifted(key, H, x), 1, 0, 1 };
+@@ -186,7 +198,7 @@
+       for (int r = 0; r < H; r++) {
+         nxt.clear();
+         nxt.reserve(cur.size() * 2);
+-        Succ s[12];
++        Succ s[SUCC_MAX];
+         for (auto& kv : cur) {
+           int ns = successors(kv.first, H, r, c, s);
+           trans += ns;
+@@ -227,7 +239,7 @@
+       nidx.clear();
+       npay.clear();
+       nidx.reserve(idx.size() * 2);
+-      Succ s[12];
++      Succ s[SUCC_MAX];
+       for (auto& kv : idx) {
+         const Payload& P = pay[kv.second];
+         int ns = successors(kv.first, H, r, c, s);
+@@ -301,10 +313,37 @@
+ }
+ 
+ // mod-p series: same DP, payload (c0,c1) mod p per (state, area). p < 2^31.
++//
++// PERF (r4-perf, 2026-08-12). Three changes to the arithmetic, none of them to
++// the stencil, the transitions, canon/shifted, or the weight algebra. Each is
++// exact rather than approximate because of one invariant, asserted here and
++// maintained by every write below: EVERY STORED COEFFICIENT IS IN [0,p).
++//
++//  (i)  Layout is structure-of-arrays: slots [0,NA) hold c0, slots [NA,2NA)
++//       hold c1. Pure reindexing of the same values; it makes the common edge
++//       one contiguous vector add, which the compiler can vectorize.
++//  (ii) `successors` emits (m0,m1) = (1,0) on every edge except the single
++//       fresh-colour one (lines 160/165/183 vs 184). That edge is specialized
++//       to  d = d + c; if (d >= p) d -= p  -- no multiply, no `%`. It is exact
++//       because d,c < p < 2^31, so d+c < 2^32 cannot overflow a uint32_t and
++//       one conditional subtract reduces it. This removes the 64-bit divide
++//       from ~90% of all edges.
++//  (iii) The fresh-colour edge (m0 = -b mod p, m1 = 1) uses Shoup's
++//       precomputed-multiplier reduction -- w = floor(m0*2^64/p) computed once
++//       per edge and amortized over the area slots -- instead of `%`. Standard
++//       and exact for m0,c < p < 2^63: r = m0*c - floor(w*c/2^64)*p lies in
++//       [0,2p), and one conditional subtract finishes it.
++//
++// The column-boundary sum also drops its per-slot `%`: fcur accumulates raw in
++// uint64_t and is reduced once per column. Exact while states*(p-1) < 2^64,
++// i.e. states < 2^33; checked below, fail-closed.
++//
++// Output is bit-identical to the pre-optimization version for every (H,p).
+ static void run_height_modp(int H, int Nmax, uint64_t p, const char* outfile) {
+   int W = Nmax + 1, NA = Nmax + 1;
++  const uint32_t pu = (uint32_t)p;
+   std::unordered_map<u128, uint32_t, KeyHash> idx, nidx;
+-  std::vector<std::vector<uint32_t>> pay, npay;   // 2*NA per state
++  std::vector<std::vector<uint32_t>> pay, npay;   // 2*NA per state: [0,NA)=c0, [NA,2NA)=c1
+   idx[0] = 0;
+   pay.push_back(std::vector<uint32_t>(2 * NA, 0));
+   pay[0][0] = 1;
+@@ -312,7 +351,7 @@
+   for (int c = 0; c < W; c++) {
+     for (int r = 0; r < H; r++) {
+       nidx.clear(); npay.clear(); nidx.reserve(idx.size() * 2);
+-      Succ s[12];
++      Succ s[SUCC_MAX];
+       for (auto& kv : idx) {
+         const auto& P = pay[kv.second];
+         int ns = successors(kv.first, H, r, c, s);
+@@ -325,16 +364,49 @@
+             npay.push_back(std::vector<uint32_t>(2 * NA, 0));
+           } else j = it->second;
+           auto& Q = npay[j];
+-          uint64_t m0 = (uint64_t)((s[i].m0 % (int64_t)p + (int64_t)p) % (int64_t)p);
+-          uint64_t m1 = (uint64_t)s[i].m1 % p;
+           int dn = s[i].dn;
+-          for (int n = 0; n + dn <= Nmax; n++) {
+-            uint64_t c0 = P[2 * n], c1 = P[2 * n + 1];
++          if (s[i].m0 == 1 && s[i].m1 == 0) {
++            // (ii) the common edge: two contiguous modular vector adds.
++            const uint32_t* __restrict sc = P.data();
++            uint32_t* __restrict dc = Q.data() + dn;
++            int lim = Nmax - dn;
++            for (int n = 0; n <= lim; n++) {
++              uint32_t t = dc[n] + sc[n];
++              dc[n] = t >= pu ? t - pu : t;
++            }
++            sc = P.data() + NA;
++            dc = Q.data() + NA + dn;
++            for (int n = 0; n <= lim; n++) {
++              uint32_t t = dc[n] + sc[n];
++              dc[n] = t >= pu ? t - pu : t;
++            }
++            continue;
++          }
++          // (iii) the fresh-colour edge. m1 is 0 or 1 on every edge this
++          // generator emits; anything else would need a multiply here, so
++          // fail closed rather than compute the wrong thing.
++          if (s[i].m1 != 0 && s[i].m1 != 1) {
++            fprintf(stderr, "FATAL m1_not_bit H=%d r=%d c=%d m1=%lld\n",
++                    H, r, c, (long long)s[i].m1); std::exit(2);
++          }
++          uint64_t m0 = (uint64_t)((s[i].m0 % (int64_t)p + (int64_t)p) % (int64_t)p);
++          uint64_t m1 = (uint64_t)s[i].m1;
++          uint64_t w = (uint64_t)((((u128)m0) << 64) / p);   // Shoup multiplier
++          for (int n = 0; n + dn <= Nmax; n++) {
++            uint32_t c0 = P[n], c1 = P[NA + n];
+             if (!(c0 | c1)) continue;
+-            uint32_t& d0 = Q[2 * (n + dn)];
+-            uint32_t& d1 = Q[2 * (n + dn) + 1];
+-            d0 = (uint32_t)((d0 + c0 * m0) % p);
+-            d1 = (uint32_t)((d1 + c1 * m0 + c0 * m1) % p);
++            uint64_t q0 = (uint64_t)(((u128)w * c0) >> 64);
++            uint64_t r0 = m0 * (uint64_t)c0 - q0 * p;      // in [0,2p)
++            if (r0 >= p) r0 -= p;
++            uint64_t q1 = (uint64_t)(((u128)w * c1) >> 64);
++            uint64_t r1 = m0 * (uint64_t)c1 - q1 * p;
++            if (r1 >= p) r1 -= p;
++            uint32_t& d0 = Q[n + dn];
++            uint32_t& d1 = Q[NA + n + dn];
++            uint32_t t0 = d0 + (uint32_t)r0;  d0 = t0 >= pu ? t0 - pu : t0;
++            uint32_t t1 = d1 + (uint32_t)r1;  t1 = t1 >= pu ? t1 - pu : t1;
++            if (m1) { t1 += c0; if (t1 >= pu) t1 -= pu; }
++            d1 = t1;
+           }
+         }
+       }
+@@ -343,16 +415,21 @@
+     }
+     fprev = fcur;
+     std::fill(fcur.begin(), fcur.end(), 0);
++    if (pay.size() >= (1ull << 33)) {
++      fprintf(stderr, "FATAL colsum_accum_overflow H=%d states=%zu\n", H, pay.size());
++      std::exit(2);
++    }
+     for (auto& P : pay)
+-      for (int t = 0; t < 2 * NA; t++) fcur[t] = (fcur[t] + P[t]) % p;
++      for (int t = 0; t < 2 * NA; t++) fcur[t] += P[t];
++    for (int t = 0; t < 2 * NA; t++) fcur[t] %= p;
+     if (g_rep) g_rep->beat(c + 1, "modp H=" + std::to_string(H)
+                    + " states=" + std::to_string(idx.size()));
+   }
+   FILE* f = fopen(outfile, "w");
+   if (!f) { perror(outfile); std::exit(1); }
+   for (int n = 1; n <= Nmax; n++) {
+-    uint64_t c0 = (fcur[2 * n] + p - fprev[2 * n]) % p;
+-    uint64_t c1 = (fcur[2 * n + 1] + p - fprev[2 * n + 1]) % p;
++    uint64_t c0 = (fcur[n] + p - fprev[n]) % p;
++    uint64_t c1 = (fcur[NA + n] + p - fprev[NA + n]) % p;
+     if (c0) { fprintf(stderr, "FATAL q0_nonzero_modp H=%d n=%d\n", H, n); std::exit(2); }
+     fprintf(f, "%d %llu\n", n, (unsigned long long)c1);
+   }
+@@ -374,7 +451,10 @@
+   if (argc == 6 && !std::strcmp(argv[1], "--modp")) {
+     int H = atoi(argv[2]), Nmax = atoi(argv[3]);
+     uint64_t p = strtoull(argv[4], nullptr, 10);
+-    if (H > 16 || p >= (1ull << 31)) { fprintf(stderr, "limits: H<=16, p<2^31\n"); return 1; }
++    // H <= 24: the key packs BITS*(H+1) <= 128 bits (shifted/canon), block ids
++    // after canon are <= b+1 <= floor((H+1)/2)+1 <= 13 and fit 5 bits, the u32
++    // state index holds the H=24 census, and SUCC_MAX = 16 >= b+2 = 14.
++    if (H > 24 || p >= (1ull << 31)) { fprintf(stderr, "limits: H<=24, p<2^31\n"); return 1; }
+     run_height_modp(H, Nmax, p, argv[5]);
+     printf("C_%d mod %llu, n<=%d -> %s\n", H, (unsigned long long)p, Nmax, argv[5]);
+     rep.done("mode=modp H=" + std::to_string(H));
