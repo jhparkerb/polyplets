@@ -1,0 +1,14 @@
+OK  H=2 W=4: DP [q^1] == brute-force connected counts, n<= 8
+OK  H=3 W=3: DP [q^1] == brute-force connected counts, n<= 9
+OK  H=3 W=4: DP [q^1] == brute-force connected counts, n<= 7
+OK  H=4 W=3: DP [q^1] == brute-force connected counts, n<= 7
+RED corrupted weight: caught by structural self-check ([q^0] != 0 at n=1: 2305843009213693942)
+H  W  max_window_states  sec/col(last)  growth
+4  8  1233  0.006  -
+5  8  3774  0.022  3.061
+6  8  11307  0.084  2.996
+7  8  33752  0.306  2.985
+8  8  100655  1.115  2.982
+9  8  301482  3.959  2.995
+10  8  908359  14.002  3.013
+11  8  2757851  51.607  3.036

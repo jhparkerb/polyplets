@@ -1,0 +1,7 @@
+H=7  own TM states: 322   p3 build_states: 322
+H=1 control: own=1 p3=1
+H=2 control: own=3 p3=3
+H=3 control: own=8 p3=8
+H=4 control: own=20 p3=20
+H=5 control: own=50 p3=50
+H=6 control: own=126 p3=126

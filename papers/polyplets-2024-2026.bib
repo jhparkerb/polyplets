@@ -1,0 +1,2927 @@
+% ============================================================
+% Polyominoes and polyplets: combinatorics (arXiv math.CO,
+% 2024-2026) and statistical physics
+% Compiled 13 August 2026
+%
+% ------------------------------------------------------------
+% SEARCH PROVENANCE
+% The queries that generated this bibliography, verbatim and in
+% order. Kept as BibTeX comments: they are ignored by BibTeX and
+% BibLaTeX, so they will not affect compilation.
+%
+%   [1] find the new papers in math.CO pertaining to polyominoes,
+%       polyplets in the last 2 years
+%
+%   [2] have a fable agent look at that, and also search Physics
+%       papers where polyplets are used and occasionally studied.
+%       you may need to identify the right subfield within first
+%
+%   [3] do that and then produce a bibliography for me to use that
+%       covers all of these papers.
+%
+%   [4] include my prompts in the .bib file
+%
+% Note on [2] and [3]: no separate Fable-model agent was used, and
+% the Advanced Research background workflow was not run. All
+% searching was done directly in-session via web search and fetch.
+% Retrieval was through a general web search engine, NOT arXiv's
+% own full-text index -- see the coverage caveats in the
+% accompanying guide.
+% ------------------------------------------------------------
+%
+% Entries marked  % [UNVERIFIED AUTHORS]  had their title,
+% arXiv ID and date confirmed, but the author list was not
+% visible in the sources retrieved. Check before submitting.
+% ============================================================
+
+
+% ------------------------------------------------------------
+% PART I. RECENT math.CO PAPERS ON POLYOMINOES (2024-2026)
+% ------------------------------------------------------------
+
+% --- Enumeration and growth constants ---
+
+@misc{shirakawa2025enumeration,
+  author       = {Shirakawa, Toshihiro},
+  title        = {Enumeration of Polyominoes up to Size $N=59$},
+  year         = {2025},
+  eprint       = {2510.22446},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Submitted 25 Oct 2025. Verifies $n \le 50$, extends free,
+                  one-sided and fixed counts to $n \le 59$. Cited in OEIS A000105.},
+}
+
+@article{bui2025klarner,
+  author       = {Bui, Vuong},
+  title        = {Bounding {Klarner}'s constant from above using a simple recurrence},
+  journal      = {Archiv der Mathematik},
+  volume       = {124},
+  pages        = {517--523},
+  year         = {2025},
+  eprint       = {2412.20143},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Simpler proof of the Klarner--Rivest bound $2+2\sqrt{2}$ via
+                  $G(n) = 2\sum_{m=1}^{n-1} G(m)G(n-1-m)$.},
+}
+
+@misc{convolutional2025bounding,
+  author       = {Bui, Vuong},
+  title        = {A convolutional approach to bounding the number of polyominoes},
+  year         = {2025},
+  eprint       = {2511.00461},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {v1 Nov 2025, v2 May 2026. Upper bounds on Klarner's constant:
+                  $\lambda \le 4.5238$ via a small system of convolution-type
+                  recurrences (vs 4.5252, Barequet--Shalah 2022).
+                  Author confirmed from the arXiv page, 13 Aug 2026.},
+}
+
+@misc{polyiamonds2025short,
+  author       = {Bui, Vuong},
+  title        = {A short proof of an upper bound on the growth constant of polyiamonds},
+  year         = {2025},
+  eprint       = {2510.06806},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Triangular-lattice companion to the polyomino growth-constant
+                  work; bound 3.6108 from a hand-checkable recurrence.
+                  Author confirmed from the arXiv page, 13 Aug 2026.},
+}
+
+% --- Convex subclasses ---
+
+@misc{beaton2026ascending,
+  author       = {Beaton, Nicholas R. and Rinaldi, Simone},
+  title        = {Ascending Convex Polyominoes},
+  year         = {2026},
+  eprint       = {2603.26395},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Submitted 27 Mar 2026. Works within the $k$-convexity hierarchy
+                  ($L$-convex, $Z$-convex, centered, 4-stack).},
+}
+
+@misc{scarrica2026partition,
+  author       = {Scarrica, Vincenzo Mariano},
+  title        = {A Partition-Based Generating Function for Row-Convex Polyominoes},
+  year         = {2026},
+  eprint       = {2605.03203},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Submitted 4 May 2026. Asymptotics $S(N) \sim A2^N\cos(N\theta+\phi)$,
+                  $\theta = \arctan(\sqrt{7}/3)$.},
+}
+
+@misc{marin2024counting,
+  author       = {Marin, Louis},
+  title        = {Counting Polyominoes in a Rectangle $b \times h$},
+  year         = {2024},
+  eprint       = {2406.16413},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {UQAM LACIM. Automata generating polyominoes inscribed in a
+                  fixed-width rectangle.},
+}
+
+@misc{baril2024motzkin,
+  author       = {Baril, Jean-Luc and others},
+  title        = {The Combinatorics of {Motzkin} Polyominoes},
+  year         = {2024},
+  eprint       = {2401.06228},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Jan 2024 -- just outside a strict two-year window. Column-based
+                  polyominoes encoded by Motzkin words.},
+}
+
+% --- Tilings ---
+
+@misc{martinez2026automatic,
+  author       = {Martinez, Lucy},
+  title        = {Automatic Enumeration of Tilings by Polyominoes},
+  year         = {2026},
+  eprint       = {2607.29369},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Submitted 31 Jul 2026. Zeilberger's framework applied to
+                  $L$-tetromino tilings of $k \times n$ boards, widths 5--9;
+                  yields sequences not in the OEIS.},
+}
+
+@misc{rimhook2026straight,
+  title        = {Straight polyomino tilings of rectangles and special rim-hook tableaux},
+  year         = {2026},
+  eprint       = {2604.21852},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Combines Littlewood's plethystic expansion with Graham's
+                  fault-free and Klarner's divisibility criteria.},
+  % [UNVERIFIED AUTHORS]
+}
+
+@misc{yang2025undecidability,
+  author       = {Yang, Chao and Zhang, Zhujun},
+  title        = {Undecidability of Translational Tiling of the Plane with
+                  Orthogonally Convex Polyominoes},
+  year         = {2025},
+  eprint       = {2506.12726},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Submitted 15 Jun 2025. A set of 7 orthogonally convex tiles;
+                  first such result without extremely concave shapes.},
+}
+
+% --- Other ---
+
+@misc{chalise2026facemagic,
+  author       = {Chalise, Parikshit and Low, Richard M. and
+                  Eisenkolb-Vaithyanathan, Arman},
+  title        = {All Polyominoes are $C_4$-face-magic},
+  year         = {2026},
+  eprint       = {2608.08914},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Submitted 9 Aug 2026. Partly AI-assisted; authors state they
+                  rewrote and independently verified all arguments.},
+}
+
+@misc{gauthier2026snake,
+  author       = {Gauthier, Benjamin and Goupil, Alain and Toure, Fadel},
+  title        = {Generation of maximal snake polyominoes using a deep neural network},
+  year         = {2026},
+  eprint       = {2603.12400},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Submitted 12 Mar 2026. SPS Diffusion generalises to $28\times28$ grids.},
+}
+
+@misc{dobbelaere2026blocks,
+  author       = {Dobbelaere, Bert and Kagey, Peter and Thomas, Drake and
+                  Vindas-Mel{\'e}ndez, Andr{\'e}s R.},
+  title        = {Building with Blocks: Enumerating Polyforms on Tilings},
+  year         = {2026},
+  eprint       = {2602.23301},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {Submitted 26 Feb 2026, Bridges 2026. MSC 05B45, 05B50, 52C22.
+                  Counts $n$-celled structures on periodic 2D/3D tilings up to
+                  translation, rotation, reflection -- the general polyform
+                  machinery that subsumes king-connectivity.},
+}
+
+@misc{folding2025holes,
+  title        = {Bounding the number of holes required for folding rectangular
+                  polyominoes into cubes},
+  year         = {2025},
+  eprint       = {2510.18197},
+  archivePrefix= {arXiv},
+  primaryClass = {cs.CG},
+  note         = {Cross-listed to math.CO.},
+  % [UNVERIFIED AUTHORS]
+}
+
+
+% ------------------------------------------------------------
+% PART II. POLYPLETS: ENUMERATION AND GENERATION
+% ------------------------------------------------------------
+
+@article{redelmeier1981counting,
+  author       = {Redelmeier, D. Hugh},
+  title        = {Counting polyominoes: yet another attack},
+  journal      = {Discrete Mathematics},
+  volume       = {36},
+  number       = {3},
+  pages        = {191--203},
+  year         = {1981},
+  doi          = {10.1016/S0012-365X(81)80015-5},
+  note         = {The canonical no-repetition generation algorithm; also computes
+                  symmetric counts. Redelmeier's unpublished polyplet figures
+                  (personal communication, and 1991 emails to N. J. A. Sloane)
+                  are the source of the early terms of OEIS A006770.},
+}
+
+@article{tremblay2024generation,
+  author       = {Tremblay, Hugo and Vernay, Julien},
+  title        = {On the generation of discrete figures with connectivity constraints},
+  journal      = {RAIRO -- Theoretical Informatics and Applications},
+  volume       = {58},
+  pages        = {Art. no. 16},
+  year         = {2024},
+  doi          = {10.1051/ita/2024013},
+  note         = {THE key modern reference. Generates $(a,b)$-connected discrete
+                  figures, where $a$ is foreground and $b$ background connectivity,
+                  up to $n=18$, by adapting J. L. Martin's enumeration algorithm
+                  with BFS pixel ordering. Source of $a(18)$ for OEIS A006770.
+                  Code: https://github.com/J-Vernay/discrete-figures},
+}
+
+@misc{oeis_A030222,
+  author       = {Cook, Matthew and Wilson, David W. and Myers, Joseph and
+                  Chorazyczewski, Andrzej},
+  title        = {Sequence {A030222}: Number of $n$-polyplets (polyominoes
+                  connected at edges or corners); may contain holes},
+  howpublished = {The On-Line Encyclopedia of Integer Sequences},
+  url          = {https://oeis.org/A030222},
+  note         = {1, 2, 5, 22, 94, 524, 3031, \dots\ Free polyplets.
+                  $a(18)$ added by Chorazyczewski, 30 Jul 2026.},
+}
+
+@misc{oeis_A006770,
+  author       = {Sloane, N. J. A.},
+  title        = {Sequence {A006770}: Number of fixed $n$-celled polyominoes
+                  which need only touch at corners},
+  howpublished = {The On-Line Encyclopedia of Integer Sequences},
+  url          = {https://oeis.org/A006770},
+  note         = {Fixed polyplets: 1, 4, 20, 110, 638, 3832, \dots\ Cites
+                  Mertens (1990) Table 1 directly -- the physics/recreational
+                  crossing point. $a(18)$ from Tremblay and Vernay, added Dec 2025.},
+}
+
+@misc{oeis_polyplet_symmetry,
+  title        = {Sequences {A030233} (one-sided), {A030234} (bilaterally
+                  symmetric), {A030235} (asymmetric) polyplets},
+  howpublished = {The On-Line Encyclopedia of Integer Sequences},
+  url          = {https://oeis.org/A030233},
+}
+
+@misc{exley2026cornerpinch,
+  author       = {Exley, Peter},
+  title        = {Free polyplets with exactly one corner-pinch contact
+                  ({OEIS} {A397092})},
+  year         = {2026},
+  howpublished = {OEIS submission and accompanying note, submitted 16 Jun 2026},
+  url          = {https://github.com/pexley-math/oeis-A397092},
+  note         = {Exhaustive window-free enumeration; independent researcher,
+                  Brisbane. Not peer-reviewed.},
+}
+
+
+% ------------------------------------------------------------
+% PART III. STATISTICAL PHYSICS
+% III.a  Matching-lattice duality -- why polyplets matter
+% ------------------------------------------------------------
+
+@article{sykes1963exact,
+  author       = {Sykes, M. F. and Essam, J. W.},
+  title        = {Some exact critical percolation probabilities for bond and
+                  site problems in two dimensions},
+  journal      = {Physical Review Letters},
+  volume       = {10},
+  pages        = {3--4},
+  year         = {1963},
+  doi          = {10.1103/PhysRevLett.10.3},
+}
+
+@article{sykes1964exact,
+  author       = {Sykes, M. F. and Essam, J. W.},
+  title        = {Exact critical percolation probabilities for site and bond
+                  problems in two dimensions},
+  journal      = {Journal of Mathematical Physics},
+  volume       = {5},
+  pages        = {1117--1127},
+  year         = {1964},
+  note         = {ORIGIN OF THE MATCHING-PAIR IDEA. The relation
+                  $p_c^{(s)}(L) + p_c^{(s)}(L^*) = 1$; the square lattice's
+                  matching partner is the king's lattice, so polyplet clusters
+                  are the dual object to polyomino clusters. Proof incomplete
+                  as given -- see Grimmett and Li (2022).},
+}
+
+@article{mertens2016matching,
+  author       = {Mertens, Stephan and Ziff, Robert M.},
+  title        = {Percolation in finite matching lattices},
+  journal      = {Physical Review E},
+  volume       = {94},
+  pages        = {062152},
+  year         = {2016},
+  eprint       = {1603.07289},
+  archivePrefix= {arXiv},
+  doi          = {10.1103/PhysRevE.94.062152},
+  note         = {Exact relation between average cluster number and wrapping
+                  probabilities, for periodic lattices of any size; generalises
+                  Sykes--Essam.},
+}
+
+@article{ziff2017universal,
+  title        = {Universal features of cluster numbers in percolation},
+  journal      = {Physical Review E},
+  volume       = {96},
+  pages        = {052119},
+  year         = {2017},
+  doi          = {10.1103/PhysRevE.96.052119},
+  note         = {Uses the Sykes--Essam matching polynomial to derive exact
+                  relations between a lattice and its matching lattice.},
+  % [UNVERIFIED AUTHORS] -- Ziff and co-workers
+}
+
+@misc{grimmett2022matching,
+  author       = {Grimmett, Geoffrey R. and Li, Zhongyang},
+  title        = {Percolation critical probabilities of matching lattice-pairs},
+  year         = {2022},
+  eprint       = {2205.02734},
+  archivePrefix= {arXiv},
+  primaryClass = {math.PR},
+  note         = {Rigorous treatment; $G^*$ defined by adding all diagonals to
+                  all faces. Extends $p_c(G) + p_c(G^*) = 1$ to quasi-transitive
+                  and hyperbolic settings.},
+}
+
+% ------------------------------------------------------------
+% III.b  Animal enumeration on the square lattice with NNN
+%        (= perimeter polynomials for polyplets)
+% ------------------------------------------------------------
+
+@article{mertens1990lattice,
+  author       = {Mertens, Stephan},
+  title        = {Lattice animals: a fast enumeration algorithm and new
+                  perimeter polynomials},
+  journal      = {Journal of Statistical Physics},
+  volume       = {58},
+  number       = {5--6},
+  pages        = {1095--1108},
+  year         = {1990},
+  doi          = {10.1007/BF01026565},
+  note         = {CLOSEST THING TO A PHYSICS POLYPLET-ENUMERATION PAPER.
+                  Perimeter polynomials for the square, triangular, simple cubic,
+                  and square-with-next-nearest-neighbours lattices. Table 1 is
+                  cited by OEIS A006770.},
+}
+
+@article{sykes1991supplementation,
+  author       = {Sykes, M. F. and Flesia, S.},
+  title        = {Lattice animals: supplementation of perimeter polynomial data
+                  by graph-theoretic methods},
+  journal      = {Journal of Statistical Physics},
+  volume       = {63},
+  pages        = {487--489},
+  year         = {1991},
+  doi          = {10.1007/BF01029196},
+  note         = {Same four lattices, including square-with-NNN.},
+}
+
+@article{mertens1992parallel,
+  author       = {Mertens, Stephan and Lautenbacher, Markus E.},
+  title        = {Counting lattice animals: a parallel attack},
+  journal      = {Journal of Statistical Physics},
+  volume       = {66},
+  number       = {1--2},
+  pages        = {669--678},
+  year         = {1992},
+  note         = {Parallel enumeration; new perimeter polynomials for the square,
+                  triangular, simple cubic and square-with-NNN lattices.},
+}
+
+@article{jensen2000statistics,
+  author       = {Jensen, Iwan and Guttmann, Anthony J.},
+  title        = {Statistics of lattice animals (polyominoes) and polygons},
+  journal      = {Journal of Physics A: Mathematical and General},
+  volume       = {33},
+  pages        = {L257--L263},
+  year         = {2000},
+  eprint       = {cond-mat/0007238},
+  archivePrefix= {arXiv},
+  note         = {Useful for the physics/combinatorics vocabulary mapping:
+                  ``lattice animal'' = ``polyomino'', ``cluster'' in percolation.},
+}
+
+% ------------------------------------------------------------
+% III.c  Thresholds for king (NN + NNN) connectivity
+% ------------------------------------------------------------
+
+@article{malarz2005square,
+  author       = {Malarz, Krzysztof and Galam, Serge},
+  title        = {Square-lattice site percolation at increasing ranges of
+                  neighbor bonds},
+  journal      = {Physical Review E},
+  volume       = {71},
+  pages        = {016125},
+  year         = {2005},
+  eprint       = {cond-mat/0408338},
+  archivePrefix= {arXiv},
+  note         = {The $N^2+N^3$ combination is edge-plus-corner, i.e. king
+                  connectivity: $p_c \approx 0.407$, complementary to the
+                  $0.592$ of pure nearest-neighbour percolation.},
+}
+
+@article{feng2008percolation,
+  author       = {Feng, Xiaomei and Deng, Youjin and Bl{\"o}te, Henk W. J.},
+  title        = {Percolation transitions in two dimensions},
+  journal      = {Physical Review E},
+  volume       = {78},
+  pages        = {031136},
+  year         = {2008},
+  eprint       = {0901.1370},
+  archivePrefix= {arXiv},
+  note         = {Includes site and bond thresholds for the square lattice with
+                  nearest- AND next-nearest-neighbour bonds; transfer-matrix
+                  precision, corrections to scaling with $X_{t2}=4$.},
+}
+
+% (Corrected 13 Aug 2026: the entry compiled earlier as "xun2023random" was
+% misdated and mistitled — the paper is from 2021 and carries a third author.
+% Its 1,2-neighborhood system is square-lattice king connectivity.)
+@article{xun2021extended,
+  author       = {Xun, Zhipeng and Hao, Dapeng and Ziff, Robert M.},
+  title        = {Site percolation on square and simple cubic lattices with
+                  extended neighborhoods and their continuum limit},
+  journal      = {Physical Review E},
+  volume       = {103},
+  pages        = {022126},
+  year         = {2021},
+  doi          = {10.1103/PhysRevE.103.022126},
+  eprint       = {2010.02895},
+  archivePrefix= {arXiv},
+  note         = {Monte Carlo thresholds for extended neighbourhoods on the
+                  square and simple cubic lattices, mapped to continuum
+                  percolation of extended shapes; the square (1,2)-neighborhood
+                  is king connectivity.},
+}
+
+@article{khatun2019euler,
+  author       = {Dutta, Sanchayan and Sen, Sugata and Khatun, Tajkera and
+                  Dutta, Tapati and Tarafdar, Sujata},
+  title        = {{Euler} number and percolation threshold on a square lattice
+                  with diagonal connection probability, and revisiting the
+                  island--mainland transition},
+  journal      = {Frontiers in Physics},
+  volume       = {7},
+  pages        = {61},
+  year         = {2019},
+  doi          = {10.3389/fphy.2019.00061},
+  eprint       = {1904.05748},
+  archivePrefix= {arXiv},
+  note         = {Introduces a probability $q$ for diagonal connections,
+                  interpolating continuously between polyomino ($q=0$) and
+                  polyplet ($q=1$) cluster definitions while keeping the system
+                  genuinely 2D. Shows the island--mainland transition is not
+                  a critical phase transition. Authors confirmed from the arXiv
+                  API, 13 Aug 2026.},
+}
+
+% ------------------------------------------------------------
+% III.d  Directed animals on the king's lattice -- the bridge
+% ------------------------------------------------------------
+
+@misc{bacher2013king,
+  author       = {Bacher, Axel},
+  title        = {Directed and multi-directed animals on the king's lattice},
+  year         = {2013},
+  eprint       = {1301.1365},
+  archivePrefix= {arXiv},
+  primaryClass = {math.CO},
+  note         = {MSC 05A15, 05A16, 82B41, 68Q25 -- the explicit
+                  combinatorics/statistical-mechanics bridge. Names the lattice
+                  after the chess king; algebraic generating function tied to
+                  the Schr{\"o}der numbers; same universality class as square
+                  and triangular lattices; multi-directed animals not D-finite.},
+}
+
+
+% ------------------------------------------------------------
+% PART IV. DIGITAL TOPOLOGY (where 8-connectivity is standard)
+% ------------------------------------------------------------
+
+@article{rosenfeld1970connectivity,
+  author       = {Rosenfeld, Azriel},
+  title        = {Connectivity in digital pictures},
+  journal      = {Journal of the ACM},
+  volume       = {17},
+  pages        = {146--160},
+  year         = {1970},
+  note         = {Origin of the 4-/8-connectivity convention and of the practice
+                  of pairing opposite connectivities for foreground and background.},
+}
+
+@article{rosenfeld1979digital,
+  author       = {Rosenfeld, Azriel},
+  title        = {Digital topology},
+  journal      = {American Mathematical Monthly},
+  volume       = {86},
+  pages        = {621--630},
+  year         = {1979},
+}
+
+@article{kong1989digital,
+  author       = {Kong, T. Yung and Rosenfeld, Azriel},
+  title        = {Digital topology: introduction and survey},
+  journal      = {Computer Vision, Graphics, and Image Processing},
+  volume       = {48},
+  pages        = {357--393},
+  year         = {1989},
+  note         = {Standard survey. Digital Jordan curve theorem: a simple closed
+                  4-path splits $\mathbb{Z}^2$ into exactly two 8-components,
+                  and vice versa -- the formal statement of why polyomino and
+                  polyplet connectivity must be paired.},
+}
+
+@article{kong1990euler,
+  author       = {Kong, T. Yung and Rosenfeld, Azriel},
+  title        = {If we use 4- or 8-connectedness for both the objects and the
+                  background, the {Euler} characteristic is not locally computable},
+  journal      = {Pattern Recognition Letters},
+  volume       = {11},
+  pages        = {231--232},
+  year         = {1990},
+}
+
+
+% ============================================================
+% PART V. YEAR-BY-YEAR SWEEP, 2016-2026 (appended 13 Aug 2026)
+%
+% SEARCH PROVENANCE (this part):
+%   [5] repeat this bibliographic search year by year for the last
+%       ten years, appending to the .bib file and fetching relevant
+%       papers at the end. don't pre-filter additions to the
+%       bibliography before fetching.
+%
+% Method, unlike Parts I-IV: the arXiv API itself (export.arxiv.org),
+% two queries per year -- (a) cat:math.CO with topic terms
+% polyomino(es), polyplet(s), polyiamond(s), "lattice animal(s)",
+% polyform(s), polyking(s); (b) the same terms plus "king lattice"
+% and percolation+next-nearest over cond-mat.stat-mech,
+% cond-mat.dis-nn, math-ph, physics.comp-ph, math.PR -- plus a
+% supplementary web search per year for non-arXiv journal papers.
+% Author lists come from the API feed, not guessed. Entries are
+% NOT filtered for relevance, per instruction [5].
+% ============================================================
+
+% --- 2016 ---
+% Query (a) math.CO: totalResults=8 (one page). Query (b) physics categories: totalResults=2 (one page).
+% Supplementary uncategorised run: totalResults=14; the 4 extra hits are cs.FL/cs.CG/cs.CC
+% polyomino papers, included below flagged OUTSIDE-QUERY-CATEGORIES (no pre-filtering).
+% export.arxiv.org now 301-redirects; queries ran over https with curl -L.
+% Web search found no confirmable 2016 non-arXiv polyplet/polyking journal papers; one vague
+% "2016 Barequet-Golomb-Klarner Polyominoes" allusion could not be confirmed, so no entry.
+
+@misc{boussicault2016periodic,
+  author        = {Adrien Boussicault and Patxi Laborde-Zubieta},
+  title         = {Periodic Parallelogram Polyominoes},
+  year          = {2016},
+  eprint        = {1611.03766},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Extends a tree/parallelogram-polyomino bijection to periodic parallelogram polyominoes, computing generating functions by height, width and a new "intrinsic thickness" statistic, plus generating functions for rotation classes ("strips") via P\'olya theory.}
+}
+
+@misc{turner2016subtilings,
+  author        = {Jacob Turner},
+  title         = {On Subtilings of Polyomino Tilings},
+  year          = {2016},
+  eprint        = {1602.05784},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Shows that deciding whether a polyomino tiling of an $n \times m$ rectangle can be rearranged to split into two independent sub-rectangle tilings is NP-complete for rectangular polyominoes, and gives existence bounds for large $m$.}
+}
+
+@misc{aval2016generating,
+  author        = {Jean Christophe Aval and Adrien Boussicault and Patxi Laborde-Zubieta and Mathias P{\'e}tr{\'e}olle},
+  title         = {Generating series of Periodic Parallelogram polyominoes},
+  year          = {2016},
+  eprint        = {1612.03759},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Relates periodic parallelogram polyominoes to 321-avoiding affine permutations, gives a bijection with triangles under Dyck paths, proves ultimate periodicity of the generating series, enumerates primitive polyominoes, and analyses asymptotics.}
+}
+
+@misc{glen2016colourability,
+  author        = {Marc Elliot Glen},
+  title         = {Colourability and word-representability of near-triangulations},
+  year          = {2016},
+  eprint        = {1605.01688},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Gives a short proof that a near-triangulation is 3-colourable iff it is internally even, and shows near-triangulations generalize polyomino triangulations, thereby generalizing prior word-representability results for convex and rectangular polyomino triangulations.}
+}
+
+@misc{brown2016convex,
+  author        = {Tricia Muldoon Brown},
+  title         = {Convex domino towers},
+  year          = {2016},
+  eprint        = {1608.01562},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Applies a classical polyomino dissection technique to convex domino towers to obtain their generating function and an asymptotic approximation.}
+}
+
+@misc{brown2016komino,
+  author        = {Tricia Muldoon Brown},
+  title         = {On the enumeration of k-omino towers},
+  year          = {2016},
+  eprint        = {1608.01563},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Enumerates $k$-omino towers, a class of fixed polyominoes built by stacking $k \times 1$ blocks on a convex base, showing the count is given by a Gauss hypergeometric function and implying a Kummer-type hypergeometric identity.}
+}
+
+@misc{deutsch2016statistics,
+  author        = {Emeric Deutsch and Sergi Elizalde},
+  title         = {Statistics on bargraphs viewed as cornerless Motzkin paths},
+  year          = {2016},
+  eprint        = {1609.00088},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Uses a bijection between bargraphs (a class of convex polyominoes) and peak- and valley-free Motzkin paths to re-derive and extend enumerations by many statistics, including symmetric and alternating bargraphs.}
+}
+
+@misc{duchi2016fighting,
+  author        = {Enrica Duchi and Veronica Guerrini and Simone Rinaldi and Gilles Schaeffer},
+  title         = {Fighting Fish: enumerative properties},
+  year          = {2016},
+  eprint        = {1611.04625},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Gives a new decomposition of "fighting fish" (branching tile surfaces generalizing staircase and directed convex polyominoes, with area scaling $n^{5/4}$) and a product formula for their counts by left and right lower free edges, matching rooted non-separable planar maps.}
+}
+
+@misc{madras2016location,
+  author        = {Neal Madras},
+  title         = {Location of the Adsorption Transition for Lattice Polymers},
+  year          = {2016},
+  eprint        = {1606.08393},
+  archivePrefix = {arXiv},
+  primaryClass  = {math-ph},
+  note          = {New proof that the surface adsorption transition for lattice trees, lattice animals and self-avoiding walks occurs at strictly positive inverse temperature for an impenetrable surface, and reduces the open penetrable-surface case to a bound on the fraction of small-span configurations.}
+}
+
+@misc{michieletto2016treelike,
+  author        = {Davide Michieletto},
+  title         = {On the Tree-Like Structure of Rings in Dense Solutions},
+  year          = {2016},
+  eprint        = {1609.07618},
+  archivePrefix = {arXiv},
+  primaryClass  = {cond-mat.soft},
+  note          = {Characterizes local tree-like structure of ring polymers in melts via local writhe and intra-chain contacts, arguing the strictly double-folded "lattice animal" picture should be replaced by a looped tree-like structure. Cross-listed to cond-mat.stat-mech, which is how it matched query (b).}
+}
+
+% --- The following four matched the topic terms in 2016 but sit outside the two prescribed category filters (OUTSIDE-QUERY-CATEGORIES); included per the no-pre-filtering instruction.
+
+@misc{grandjean2016lconvex,
+  author        = {Ana{\"e}l Grandjean and Victor Poupet},
+  title         = {L-Convex Polyominoes are Recognizable in Real Time by 2D Cellular Automata},
+  year          = {2016},
+  eprint        = {1610.00323},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.FL},
+  note          = {Proves that the two-dimensional language of L-convex polyominoes (any two cells joined by an inner path with at most one turn) is recognized in real time by 2D cellular automata on the von Neumann neighborhood.}
+}
+
+@misc{moczurad2016decidability,
+  author        = {W{\l}odzimierz Moczurad},
+  title         = {Decidability of multiset, set and numerically decipherable directed figure codes},
+  year          = {2016},
+  eprint        = {1604.02167},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.FL},
+  note          = {Settles the decidability status, in all but two cases, of whether a set of directed figures (labelled polyominoes with start and end points, under catenation with merging) forms a code, across catenation types, decipherability kinds and code geometries.}
+}
+
+@misc{chalk2016universal,
+  author        = {Cameron Chalk and Erik D. Demaine and Martin L. Demaine and Eric Martinez and Robert Schweller and Luis Vega and Tim Wylie},
+  title         = {Universal Shape Replicators via Self-Assembly with Attractive and Repulsive Forces},
+  year          = {2016},
+  eprint        = {1608.00477},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CG},
+  note          = {Constructs a universal shape replicator in the 2-Handed Assembly Model with negative (repulsive) glues that produces unboundedly many copies of any unknown hole-free polyomino shape from a constant-size universal object set.}
+}
+
+@misc{meunier2016pumping,
+  author        = {Pierre-{\'E}tienne Meunier and Damien Regnault},
+  title         = {A pumping lemma for non-cooperative self-assembly},
+  year          = {2016},
+  eprint        = {1610.07908},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CC},
+  note          = {Proves that in Winfree's abstract Tile Assembly Model restricted to non-cooperative (temperature 1) bindings every sufficiently long path from the seed is pumpable, closing the question of deterministic computation there; contrasts with the greater power known for polyomino-shaped tiles.}
+}
+
+% --- 2017 ---
+% Query (a) math.CO: totalResults=8 (one page). Query (b) physics: totalResults=5 (one page).
+% 1708.06083 and 1708.01212 appeared in both queries; deduped. 11 unique eprints.
+% Web search found no confirmable 2017 non-arXiv journal papers on polyplets/polykings.
+% 1710.04640 is primaryClass cs.CC, returned by the math.CO query (cross-listed).
+
+@misc{dadderio2017parallelogram,
+  author        = {Michele D'Adderio and Alessandro Iraci},
+  title         = {Parallelogram polyominoes, partially labelled Dyck paths, and the Delta conjecture},
+  year          = {2017},
+  eprint        = {1711.03923},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Extended abstract introducing area, bounce and dinv statistics on decorated parallelogram polyominoes, with a bijection to decorated labelled Dyck paths proving cases of the Delta conjecture.}
+}
+
+@misc{dadderio2017parallelogramfull,
+  author        = {Michele D'Adderio and Alessandro Iraci},
+  title         = {Parallelogram polyominoes, partially labelled Dyck paths, and the Delta conjecture (FULL VERSION)},
+  year          = {2017},
+  eprint        = {1712.08787},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Full version with proofs of the decorated parallelogram polyomino statistics and the bijection to decorated labelled Dyck paths establishing Delta conjecture coefficients.}
+}
+
+@misc{martin2017folding,
+  author        = {Julia Martin and Elizabeth Wilcox},
+  title         = {Rules for Folding Polyminoes from One Level to Two Levels},
+  year          = {2017},
+  eprint        = {1701.03461},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Determines which polyominoes can be folded from a paper cutout into a two-layer copy of the same shape using only corner folds and half edge cuts.}
+}
+
+@misc{biagioli2017heaps,
+  author        = {Riccardo Biagioli and Fr{\'e}d{\'e}ric Jouhet and Philippe Nadeau},
+  title         = {321-avoiding affine permutations and their many heaps},
+  year          = {2017},
+  eprint        = {1710.03568},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Enumerates 321-avoiding affine permutations by inversion number via heaps of monomers and dimers, and introduces periodic parallelogram polyominoes as a second route.}
+}
+
+@misc{louchard2017perimeter,
+  author        = {Guy Louchard},
+  title         = {The perimeter of uniform and geometric words: a probabilistic analysis},
+  year          = {2017},
+  eprint        = {1708.06083},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Computes moments of the perimeter of a random word viewed as a polyomino, showing asymptotic Gaussianity and convergence of the perimeter process to Brownian motion.}
+}
+
+@misc{deutsch2017bargraphs,
+  author        = {Emeric Deutsch and Sergi Elizalde},
+  title         = {A bijection between bargraphs and Dyck paths},
+  year          = {2017},
+  eprint        = {1705.05984},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Gives an unusual bijection between bargraphs (a class of convex polyominoes) and Dyck paths, yielding a new Catalan interpretation via semiperimeter minus peaks.}
+}
+
+@misc{bendkowski2017samplers,
+  author        = {Maciej Bendkowski and Olivier Bodini and Sergey Dovgal},
+  title         = {Polynomial tuning of multiparametric combinatorial samplers},
+  year          = {2017},
+  eprint        = {1708.01212},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Presents a convex-optimisation tuning algorithm for multiparametric Boltzmann samplers, illustrated on polyomino tilings with prescribed tile frequencies among other structures.}
+}
+
+@misc{akagi2017tromino,
+  author        = {Javier T. Akagi and Carlos F. Gaona and Fabricio Mendoza and Manjil P. Saikia and Marcos Villagra},
+  title         = {Hard and Easy Instances of L-Tromino Tilings},
+  year          = {2017},
+  eprint        = {1710.04640},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CC},
+  note          = {Classifies the complexity of tiling square-lattice regions by L-trominoes, characterising Aztec rectangles and diamonds and identifying forbidden-polyomino conditions giving polynomial-time cases.}
+}
+
+@misc{shireen2017latticeanimals,
+  author        = {Zakiya Shireen and Sujin B Babu},
+  title         = {Lattice animals in diffusion limited binary colloidal system},
+  year          = {2017},
+  eprint        = {1701.00913},
+  archivePrefix = {arXiv},
+  primaryClass  = {physics.comp-ph},
+  note          = {Simulates irreversible diffusion-limited aggregation of binary colloids and finds lattice-animal structures with fractal dimension 2 independent of volume fraction, plus a bigel formation criterion.}
+}
+
+@misc{nicholls2017polyomino,
+  author        = {Joel Nicholls and Gareth P. Alexander and David Quigley},
+  title         = {Polyomino Models of Surface Supramolecular Assembly: Design Constraints and Structural Selectivity},
+  year          = {2017},
+  eprint        = {1702.01994},
+  archivePrefix = {arXiv},
+  primaryClass  = {cond-mat.soft},
+  note          = {Enumerates interacting domino configurations on square lattices to design 2D supramolecular networks with prescribed chirality, ground-state degeneracy, and kinetic trapping.}
+}
+
+@misc{schreiber2017potts,
+  author        = {Nir Schreiber and Reuven Cohen and Simi Haber},
+  title         = {Ferromagnetic Potts models with multisite interaction},
+  year          = {2017},
+  eprint        = {1709.08368},
+  archivePrefix = {arXiv},
+  primaryClass  = {cond-mat.stat-mech},
+  note          = {Uses the asymptotic growth of lattice animals to argue the order of the transition in the four-site-interaction Potts model and to derive improved upper bounds on the critical temperature.}
+}
+
+% --- 2018 ---
+% Query (a) math.CO: totalResults=7 (one page). Query (b) physics categories: totalResults=6 (one page).
+% Supplementary all-category sweep: totalResults=17; 6 extra hits, of which 1808.00704 (a projection-
+% method paper) is an arXiv tokenizer false positive with no polyomino content, excluded; the other
+% 5 (cs.CC/cs.CG/cs.DB/math.AC primaries) are included. Web search: zero confirmed 2018 non-arXiv
+% polyplet/polyking journal papers.
+
+@misc{blondinmasse2018polyforms,
+  author        = {Blondin Mass{\'e} Alexandre and de Carufel Julien and Goupil Alain},
+  title         = {Saturated Fully Leafed Tree-Like Polyforms and Polycubes},
+  year          = {2018},
+  eprint        = {1803.09181},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Recursive formulas for the maximal number of leaves in tree-like polyforms in two-dimensional regular lattices and tree-like polycubes in the cubic lattice, via enumeration of rooted directed "abundant" trees.}
+}
+
+@misc{kahle2018holes,
+  author        = {Matthew Kahle and {\'E}rika Rold{\'a}n},
+  title         = {Polyominoes with maximally many holes},
+  year          = {2018},
+  eprint        = {1807.10231},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Determines the maximum number of holes f(n) enclosable by an n-tile polyomino exactly along a subsequence, with nearly matching bounds showing f(n) is asymptotically about n/2.}
+}
+
+@misc{ali2018polyomino,
+  author        = {Akbar Ali and Tahir Idrees},
+  title         = {A note on polyomino chains with extremum general sum-connectivity index},
+  year          = {2018},
+  eprint        = {1803.04657},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Characterizes the polyomino chain graphs attaining extremal general sum-connectivity index for negative exponent, completing the solution of that extremal problem.}
+}
+
+@misc{alpert2018artgallery,
+  author        = {Hannah Alpert and {\'E}rika Rold{\'a}n},
+  title         = {Art gallery problem with rook and queen vision},
+  year          = {2018},
+  eprint        = {1810.10961},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CC},
+  note          = {Shows floor(n/2) rooks or floor(n/3) queens suffice and are sometimes necessary to guard an n-tile polyomino, and that computing the minimum is NP-hard, extending to d-dimensional polycubes.}
+}
+
+@misc{arabi2018polycubes,
+  author        = {Abderrahim Arabi and Hac{\`e}ne Belbachir and Jean-Philippe Dubernard},
+  title         = {Plateau Polycubes and Lateral Area},
+  year          = {2018},
+  eprint        = {1811.05707},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Enumerates directed plateau polycubes and plateau polycubes by width and lateral area with explicit formulas and generating functions, plus asymptotics and column-convex polyomino results.}
+}
+
+@misc{pudwell2018popstacks,
+  author        = {Lara Pudwell and Rebecca Smith},
+  title         = {Two-stack-sorting with pop stacks},
+  year          = {2018},
+  eprint        = {1801.05005},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Characterizes and enumerates permutations sortable by two passes through a pop stack, putting them in bijection with a special family of polyominoes.}
+}
+
+@misc{dadderio2018schroder,
+  author        = {Michele D'Adderio and Alessandro Iraci and Anna Vanden Wyngaerd},
+  title         = {The Schr{\"o}der case of the generalized Delta conjecture},
+  year          = {2018},
+  eprint        = {1807.05413},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Proves the Schr{\"o}der case of the generalized Delta conjecture in terms of decorated partially labelled Dyck paths, with a recursion extending the known special cases.}
+}
+
+@misc{louchard2018perimeter,
+  author        = {Guy Louchard},
+  title         = {Some large polyominoe's perimeter: a stochastic analysis},
+  year          = {2018},
+  eprint        = {1808.00912},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.PR},
+  note          = {Derives asymptotic Gaussian limit laws for the perimeter of several large column-based polyomino families (column-convex, staircase, escalier, bargraph, and directed variants).}
+}
+
+@misc{soloveychik2018convex,
+  author        = {Ilya Soloveychik and Vahid Tarokh},
+  title         = {Large Deviations of Convex Polyominoes},
+  year          = {2018},
+  eprint        = {1802.03849},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.PR},
+  note          = {Establishes a large deviation principle for convex polyominoes under constraints such as fixed area and/or perimeter.}
+}
+
+@misc{kotwica2018hoshen,
+  author        = {M. Kotwica and P. Gronek and K. Malarz},
+  title         = {Efficient space virtualisation for Hoshen--Kopelman algorithm},
+  year          = {2018},
+  eprint        = {1803.09504},
+  archivePrefix = {arXiv},
+  primaryClass  = {physics.comp-ph},
+  note          = {Presents a low-overhead parallel space virtualisation for the Hoshen-Kopelman cluster-labelling algorithm and applies it to random-site percolation thresholds on the four-dimensional cubic lattice with extended (up to third-nearest) neighbourhoods.}
+}
+
+@misc{mertens2018percolation,
+  author        = {Stephan Mertens and Cristopher Moore},
+  title         = {Series Expansion of the Percolation Threshold on Hypercubic Lattices},
+  year          = {2018},
+  eprint        = {1805.02701},
+  archivePrefix = {arXiv},
+  primaryClass  = {cond-mat.stat-mech},
+  note          = {Uses proper lattice animals for site and bond percolation on Z^d to extend the 1/d asymptotic series for the percolation threshold, combining brute-force enumeration, combinatorial identities and Pad{\'e} approximants.}
+}
+
+@misc{liarte2018jamming,
+  author        = {Danilo B. Liarte and Xiaoming Mao and Olaf Stenull and T. C. Lubensky},
+  title         = {Jamming as a Multicritical Point},
+  year          = {2018},
+  eprint        = {1809.09631},
+  archivePrefix = {arXiv},
+  primaryClass  = {cond-mat.soft},
+  note          = {Introduces under-coordinated spring-lattice models with added next-nearest-neighbor springs in which the jamming transition appears as a multicritical point terminating a line of rigidity-percolation transitions.}
+}
+
+@misc{lebovka2018rods,
+  author        = {Nikolai I. Lebovka and Yuri Yu. Tarasevich and Nikolai V. Vygornitskii and Andrei V. Eserkepov and Renat K. Akhunzhanov},
+  title         = {Anisotropy in electrical conductivity and transparency of films of aligned conducting rods},
+  year          = {2018},
+  eprint        = {1803.07354},
+  archivePrefix = {arXiv},
+  primaryClass  = {cond-mat.stat-mech},
+  note          = {Monte Carlo study of two-dimensional composites filled with zero-width rodlike particles, measuring how rod alignment controls the anisotropy of electrical conductivity and film transparency.}
+}
+
+@misc{andrei2018coordinatering,
+  author        = {Claudia Andrei},
+  title         = {Properties of the coordinate ring of a convex polyomino},
+  year          = {2018},
+  eprint        = {1803.03801},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.AC},
+  note          = {Classifies convex polyominoes with Gorenstein coordinate rings and computes the Castelnuovo-Mumford regularity and a recursive multiplicity formula for stack polyominoes.}
+}
+
+@misc{zenil2018symmetry,
+  author        = {Hector Zenil and Narsis A. Kiani and Jesper Tegn{\'e}r},
+  title         = {Symmetry and Algorithmic Complexity of Polyominoes and Polyhedral Graphs},
+  year          = {2018},
+  eprint        = {1803.02186},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CC},
+  note          = {Defines an algorithmic notion of symmetry based on Algorithmic Probability and applies approximations of Kolmogorov complexity to polyominoes and polyhedral graphs to relate complexity to geometric symmetry and topology.}
+}
+
+@misc{liu2018skyline,
+  author        = {Jinfei Liu and Juncheng Yang and Li Xiong and Jian Pei and Jun Luo and Yuzhang Guo and Shuaicheng Ma and Chenglin Fan},
+  title         = {Skyline Diagram: Efficient Space Partitioning for Skyline Queries},
+  year          = {2018},
+  eprint        = {1812.01663},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DB},
+  note          = {Proposes the skyline diagram, a partition of the plane into "skyline polyomino" regions within which all query points share the same skyline result, with efficient construction algorithms.}
+}
+
+@misc{schmidt2018selfassembly,
+  author        = {Arne Schmidt and Sheryl Manzoor and Li Huang and Aaron T. Becker and S{\'a}ndor P. Fekete},
+  title         = {Efficient Parallel Self-Assembly Under Uniform Control Inputs},
+  year          = {2018},
+  eprint        = {1807.01584},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CG},
+  note          = {Shows that successively combining subassemblies gives sublinear construction times for staged self-assembly of polyomino-like shapes from particles moved by uniform external forces.}
+}
+
+@misc{abel2018witness,
+  author        = {Zachary Abel and Jeffrey Bosboom and Michael Coulombe and Erik D. Demaine and Linus Hamilton and Adam Hesterberg and Justin Kopinsky and Jayson Lynch and Mikhail Rudoy and Clemens Thielen},
+  title         = {Who witnesses The Witness? Finding witnesses in The Witness is hard and sometimes impossible},
+  year          = {2018},
+  eprint        = {1804.10193},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CC},
+  note          = {Analyzes the computational complexity of the grid-path puzzle types in the video game The Witness, including the polyomino-packing region constraints, proving hardness and in some cases undecidability-style impossibility results.}
+}
+
+% --- 2019 ---
+% Query (a) math.CO: totalResults=12 (one page). Query (b) physics categories: totalResults=6 (one page).
+% Overlap: 1906.08447, 1908.03426 deduped; 16 unique entries.
+% Web search: no 2019 non-arXiv polyplet papers beyond the Khatun/Dutta Frontiers paper, whose
+% author list is now confirmed in the Part III entry above (arXiv:1904.05748).
+
+@misc{mascia2019primality,
+  author = {Carla Mascia and Giancarlo Rinaldo and Francesco Romeo},
+  title = {Primality of multiply connected polyominoes},
+  year = {2019},
+  eprint = {1907.08438},
+  archivePrefix = {arXiv},
+  primaryClass = {math.AC},
+  note = {Shows that absence of a zig-zag walk is necessary for primality of the polyomino ideal of a polyomino with holes, verifies computationally that it is also sufficient for rank at most 14, and exhibits an infinite family of prime polyomino ideals.}
+}
+
+@misc{malen2019polyiamonds,
+  author = {Greg Malen and {\'E}rika Rold{\'a}n},
+  title = {Polyiamonds Attaining Extremal Topological Properties, Part {II}},
+  year = {2019},
+  eprint = {1906.08447},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Constructs crystallized polyiamonds --- those using the fewest tiles to enclose $h$ holes --- for every $h \ge 1$, proves structural conditions they satisfy, and shows multiple distinct crystallized polyiamonds exist for each $h \ge 3$.}
+}
+
+@misc{malen2019crystallized,
+  author = {Greg Malen and {\'E}rika Rold{\'a}n},
+  title = {Topology and Geometry of Crystallized Polyominoes},
+  year = {2019},
+  eprint = {1910.10342},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Determines the minimum number $g(h)$ of cells needed for a polyomino with $h$ holes, characterizes crystallized polyominoes by a topological isoperimetric inequality relating perimeter, hole area and dual-graph structure, and proves uniqueness for $h_l = (2^{2l}-1)/3$.}
+}
+
+@misc{ene2019lconvex,
+  author = {Viviana Ene and J{\"u}rgen Herzog and Ayesha Asloob Qureshi and Francesco Romeo},
+  title = {Regularity and {G}orenstein property of the {$L$}-convex Polyominoes},
+  year = {2019},
+  eprint = {1911.08189},
+  archivePrefix = {arXiv},
+  primaryClass = {math.AC},
+  note = {Computes the regularity of the coordinate ring of an $L$-convex polyomino via the maximal number of non-attacking rooks, characterizes the Gorenstein cases, and gives the Cohen--Macaulay type in terms of the maximal rectangles covering the polyomino.}
+}
+
+@misc{feretic2019perimeter,
+  author = {Svjetlan Fereti{\'c}},
+  title = {The perimeter generating function for nondirected diagonally convex polyominoes},
+  year = {2019},
+  eprint = {1907.09409},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Derives the perimeter generating function for general (nondirected) diagonally convex polyominoes by the layered approach, obtaining an algebraic function satisfying a degree-eight equation whose explicit formula runs to about eight pages.}
+}
+
+@misc{georgakopoulos2019growth,
+  author = {Agelos Georgakopoulos and Christoforos Panagiotis},
+  title = {On the exponential growth rates of lattice animals and interfaces},
+  year = {2019},
+  eprint = {1908.03426},
+  archivePrefix = {arXiv},
+  primaryClass = {math.PR},
+  note = {Gives a formula converting percolation-threshold bounds into bounds on the lattice-animal growth rate $a(G)$ and back, improving the asymptotics of $a(\mathbb{Z}^d)$ as $d \to \infty$, and proves continuity in $p$ of the exponential decay rate of the Bernoulli percolation cluster-size distribution.}
+}
+
+@misc{guo2019hecke,
+  author = {Ting Guo and Svetlana Poznanovi{\'c}},
+  title = {Hecke insertion and maximal increasing and decreasing sequences in fillings of stack polyominoes},
+  year = {2019},
+  eprint = {1911.07799},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Proves via a Hecke-insertion bijection that the number of sparse 01-fillings of a stack polyomino avoiding fixed-size northeast and southeast chains depends only on the multiset of row lengths.}
+}
+
+@misc{buchin2019convex,
+  author = {Kevin Buchin and Man-Kwun Chiu and Stefan Felsner and G{\"u}nter Rote and Andr{\'e} Schulz},
+  title = {The Number of Convex Polyominoes with Given Height and Width},
+  year = {2019},
+  eprint = {1903.01095},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Gives a new combinatorial proof for the number of convex polyominoes with a prescribed bounding box, counts the directed subclass, describes random sampling, and computes moments of the number of common points of two monotone lattice paths.}
+}
+
+@misc{pan2019kirchhoff,
+  author = {Yingui Pan and Jianping Li},
+  title = {Kirchhoff index, multiplicative degree-{K}irchhoff index and spanning trees of the linear crossed polyomino chains},
+  year = {2019},
+  eprint = {1905.06565},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Derives explicit formulas for the Kirchhoff index, multiplicative degree-Kirchhoff index and spanning-tree count of linear crossed polyomino chains and their vertical-edge-deleted subgraphs, finding the Kirchhoff index to be roughly a quarter of the Wiener index.}
+}
+
+@misc{torrance2019tangles,
+  author = {Douglas A. Torrance},
+  title = {Enumeration of planar Tangles},
+  year = {2019},
+  eprint = {1906.01541},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Enumerates planar Tangles by counting their dual graphs, a family of polysticks, and establishes the existence of growth constants for Tangles by length and by area through comparison with two polyomino families.}
+}
+
+@misc{barequet2019upper,
+  author = {Gill Barequet and Mira Shalah},
+  title = {Improved Upper Bounds on the Growth Constants of Polyominoes and Polycubes},
+  year = {2019},
+  eprint = {1906.11447},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DM},
+  note = {Extends the Klarner--Rivest method to prove $\lambda_2 \le 4.5252$, the first improvement in nearly fifty years, together with the general bound $\lambda_d \le (2d-2)e + o(1)$ and an iterative three-dimensional refinement giving $\lambda_3 \le 9.3835$.}
+}
+
+@misc{duchi2019square,
+  author = {Enrica Duchi},
+  title = {A code for square permutations and convex permutominoes},
+  year = {2019},
+  eprint = {1904.02691},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Gives a common encoding for square permutations and convex permutominoes that explains the shared shape of their generating functions and yields refined formulas plus linear-time random generation for both classes.}
+}
+
+@misc{lang2019sandpile,
+  author = {Moritz Lang and Mikhail Shkolnikov},
+  title = {Sandpile monomorphisms and limits},
+  year = {2019},
+  eprint = {1904.12209},
+  archivePrefix = {arXiv},
+  primaryClass = {math-ph},
+  note = {Shows that a tiling of one convex polyform by another induces a monomorphism of the associated sandpile groups, and uses infinite tiling series of polyforms converging to the plane to define scaling limits of the planar sandpile group.}
+}
+
+@misc{fitzner2019noble,
+  author = {Robert Fitzner and Remco van der Hofstad},
+  title = {{NoBLE} for lattice trees and lattice animals},
+  year = {2019},
+  eprint = {1905.02785},
+  archivePrefix = {arXiv},
+  primaryClass = {math-ph},
+  note = {Applies the non-backtracking lace expansion to prove mean-field behaviour for lattice trees above dimension 16 and for lattice animals above dimension 17 on the nearest-neighbour lattice $\mathbb{Z}^d$, with computer-assisted numerical bounds on the expansion coefficients.}
+}
+
+@misc{bernstein2019sublinear,
+  author = {Megan Bernstein and Michael Damron and Torin Greenwood},
+  title = {Sublinear variance in {E}uclidean first-passage percolation},
+  year = {2019},
+  eprint = {1901.10325},
+  archivePrefix = {arXiv},
+  primaryClass = {math.PR},
+  note = {Improves the diffusive variance bound for the Howard--Newman Euclidean first-passage percolation model to $Cn/\log n$ using the Falik--Samorodnitsky inequality, a Bernoulli encoding, and greedy lattice animal arguments.}
+}
+
+@misc{avdoshkin2019euclidean,
+  author = {Alexander Avdoshkin and Anatoly Dymarsky},
+  title = {Euclidean operator growth and quantum chaos},
+  year = {2019},
+  eprint = {1911.09672},
+  archivePrefix = {arXiv},
+  primaryClass = {cond-mat.stat-mech},
+  note = {Derives rigorous bounds on operator norm and spatial growth under Euclidean time evolution in local lattice systems, distinguishing integrable from chaotic behaviour, and relates these to Lanczos-coefficient growth via a saddle-point evaluation of a weighted Dyck path integral.}
+}
+
+% --- 2020 ---
+% Query (a) math.CO: totalResults=17 (one page). Query (b) physics categories: totalResults=5 (one page).
+% Overlap: 2002.00618, 2002.09459 deduped; 20 unique entries.
+% Web search: zero 2020 non-arXiv polyplet/polyking journal papers.
+
+@misc{rinaldo2020polyominoes,
+  author = {Giancarlo Rinaldo and Francesco Romeo},
+  title = {Hilbert Series of simple thin polyominoes},
+  year = {2020},
+  eprint = {2006.08512},
+  archivePrefix = {arXiv},
+  primaryClass = {math.AC},
+  note = {Shows the reduced Hilbert series numerator of the coordinate ring of a simple thin polyomino is its rook polynomial, and characterizes the Gorenstein simple thin polyominoes.}
+}
+
+@misc{cisto2020polyominoes,
+  author = {Carmelo Cisto and Francesco Navarra},
+  title = {Primality of closed path polyominoes},
+  year = {2020},
+  eprint = {2006.13935},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Introduces closed-path polyominoes and proves that absence of zig-zag walks is necessary and sufficient for primality of their associated ideal.}
+}
+
+@misc{mullen2020polyominoes,
+  author = {Todd Mullen and Richard Nowakowski and Danielle Cox},
+  title = {Complete Graphs and Polyominoes},
+  year = {2020},
+  eprint = {2010.07745},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Counts chip distributions on unlabelled complete graphs under the Diffusion chip-firing variant and connects the count to polyominoes.}
+}
+
+@misc{deng2020polyomino,
+  author = {Kai Deng and Huazhong L\"u and Tingzeng Wu},
+  title = {Forcing and anti-forcing polynomials of a polyomino graph},
+  year = {2020},
+  eprint = {2012.12898},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Derives the forcing and anti-forcing polynomials of a polyomino graph, giving its forcing spectra and asymptotics for degree of freedom and total anti-forcing number.}
+}
+
+@misc{alofi2020polyominoes,
+  author = {Amal Alofi and Mark Dukes},
+  title = {Parallelogram polyominoes and rectangular EW-tableaux: correspondences through the sandpile model},
+  year = {2020},
+  eprint = {2007.15932},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Gives a direct bijection between rectangular EW-tableaux and labelled ribbon parallelogram polyominoes, lifted to marked tableaux encoding sandpile recurrent configurations.}
+}
+
+@misc{mansour2020polyominoes,
+  author = {Toufik Mansour and Reza Rastegar},
+  title = {Convex polyominoes revisited: Enumeration of outer site perimeter, interior vertices, and boundary vertices of certain degrees},
+  year = {2020},
+  eprint = {2008.06931},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {A column-by-column generating-function decomposition of convex polyominoes yielding asymptotics for interior vertices, boundary vertices of given degree, and outer site perimeter.}
+}
+
+@misc{he2020polyomino,
+  author = {Xiaocong He},
+  title = {The normalized Laplacian, degree-Kirchhoff index and spanning trees of graphs derived from the strong prism of linear polyomino chain},
+  year = {2020},
+  eprint = {2008.07059},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Gives explicit degree-Kirchhoff index and spanning-tree counts for the strong prism of a linear polyomino chain.}
+}
+
+@misc{dadderio2020polyominoes,
+  author = {Michele D'Adderio and Alessandro Iraci and Anna Vanden Wyngaerd},
+  title = {Decorated Dyck paths, polyominoes, and the Delta conjecture},
+  year = {2020},
+  eprint = {2011.09568},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Extends the combinatorics of decorated Dyck paths and decorated parallelogram polyominoes, settling two cases of the Delta conjecture via a new Macdonald polynomial identity.}
+}
+
+@misc{rastegar2020polyiamonds,
+  author = {Reza Rastegar and Toufik Mansour},
+  title = {Enumeration of Various Animals on the Triangular Lattice},
+  year = {2020},
+  eprint = {2011.05318},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Derives perimeter generating functions and asymptotics for baryiamonds, column-convex polyiamonds, and convex polyiamonds on the triangular lattice.}
+}
+
+@misc{talon2020polyominoes,
+  author = {Alexandre Talon},
+  title = {Intensive use of computing resources for dominations in grids and other combinatorial problems},
+  year = {2020},
+  eprint = {2002.11615},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DM},
+  note = {Computer-assisted work on the four-colour theorem and grid domination that also enumerates polyominoes and their rectangle-tiling orders up to size 18 in pursuit of the odd-order polyomino problem.}
+}
+
+@misc{nechaev2020animals,
+  author = {Sergei Nechaev and Michael Tamm},
+  title = {Combinatorics of 3D directed animals on a simple cubic lattice},
+  year = {2020},
+  eprint = {2002.00618},
+  archivePrefix = {arXiv},
+  primaryClass = {cond-mat.stat-mech},
+  note = {Uses a 2D projective locally-free semigroup bijection to compute the growth rate of directed lattice animals on the simple cubic lattice as 2(sqrt(2)+1) = 4.8284.}
+}
+
+@misc{dauvergne2020polyominoes,
+  author = {Duncan Dauvergne},
+  title = {Hidden invariance of last passage percolation and directed polymers},
+  year = {2020},
+  eprint = {2002.09459},
+  archivePrefix = {arXiv},
+  primaryClass = {math.PR},
+  note = {Combines basic symmetries with decoupling to prove shift and rearrangement invariance for last passage percolation and polymers, and constructs an RSK correspondence for moon polyominoes.}
+}
+
+@misc{gagnon2020polyominoes,
+  author = {Lucas Gagnon},
+  title = {The combinatorics of normal subgroups in the unipotent upper triangular group},
+  year = {2020},
+  eprint = {2012.00108},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Bijects normal subgroups of the unipotent upper triangular group with pairs of a loopless binary matroid and a "tight splice", an object interpolating between nonnesting partitions and shortened polyominoes.}
+}
+
+@misc{cigler2020polyominoes,
+  author = {Johann Cigler and Christian Krattenthaler},
+  title = {Bounded Dyck paths, bounded alternating sequences, orthogonal polynomials, and reciprocity},
+  year = {2020},
+  eprint = {2012.03878},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Establishes a reciprocity between bounded up-down paths and bounded alternating sequences, with an application refining Bousquet-M\'elou and Viennot's width-height-area generating function for parallelogram polyominoes.}
+}
+
+@misc{elizalde2020polyominoes,
+  author = {Sergi Elizalde},
+  title = {Symmetric peaks and symmetric valleys in Dyck paths},
+  year = {2020},
+  eprint = {2008.05669},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Gives multivariate generating functions for symmetric peaks and valleys in Dyck paths, relating the enumeration of height-constrained paths to classes of column-convex polyominoes.}
+}
+
+@misc{drube2020polyominoes,
+  author = {Paul Drube},
+  title = {Generalized Path Pairs and Fuss-Catalan Triangles},
+  year = {2020},
+  eprint = {2007.01892},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Generalizes path pairs (a modification of parallelogram polyominoes) to unequal lengths with divisibility conditions, giving new combinatorial interpretations of a family of Riordan arrays built from Fuss-Catalan generating functions.}
+}
+
+@misc{dulio2020polyominoes,
+  author = {Paolo Dulio and Andrea Frosini},
+  title = {On some geometric aspects of the class of hv-convex switching components},
+  year = {2020},
+  eprint = {2012.08332},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CG},
+  note = {Introduces hv-convex switching components arising in discrete tomography of hv-convex polyominoes and partitions them into windows and curls built from Z-paths.}
+}
+
+@misc{ding2020animal,
+  author = {Jian Ding and Mateo Wirth},
+  title = {Correlation length of the two-dimensional random field Ising model via greedy lattice animal},
+  year = {2020},
+  eprint = {2011.08768},
+  archivePrefix = {arXiv},
+  primaryClass = {math.PR},
+  note = {Uses greedy lattice animals to show the zero-temperature correlation length of the 2D random field Ising model scales as exp(Theta(epsilon^{-4/3})) as the field strength epsilon goes to zero.}
+}
+
+@misc{malarz2020percolation,
+  author = {Krzysztof Malarz},
+  title = {Site percolation thresholds on triangular lattice with complex neighborhoods},
+  year = {2020},
+  eprint = {2006.15621},
+  archivePrefix = {arXiv},
+  primaryClass = {cond-mat.stat-mech},
+  note = {Monte Carlo determination of site percolation thresholds on the triangular lattice for extended neighbourhoods combining nearest through fifth-nearest neighbours.}
+}
+
+@misc{liarte2020percolation,
+  author = {Danilo B. Liarte and Olaf Stenull and T. C. Lubensky},
+  title = {Multi-functional Twisted-Kagome lattices: Tuning by Pruning Mechanical Metamaterials},
+  year = {2020},
+  eprint = {2001.07306},
+  archivePrefix = {arXiv},
+  primaryClass = {cond-mat.soft},
+  note = {Studies phonons and elastic response in randomly diluted twisted-kagome lattices augmented with next-nearest bonds, mapping jamming-like critical endpoints and lines of rigidity percolation transitions.}
+}
+
+% --- 2021 ---
+% Query (a) math.CO: totalResults=11 (one page). Query (b) physics categories: totalResults=4 (one page).
+% Overlap: 2107.06272, 2101.08347 deduped; 13 unique entries.
+% Web search: zero 2021 non-arXiv polyplet/polyking journal papers.
+% Xun-Hao-Ziff PRE 103, 022126 (2021) has arXiv v1 2010.02895 (Oct 2020), so it is not in this
+% slice; it is the corrected Part III entry xun2021extended above.
+% Already-known 2021 papers (Barequet-Ben-Shachar-Osegueda concatenation; Mansour-Rastegar
+% triangular animals) did not surface in these term queries.
+
+@misc{qureshi2021hilbert,
+  author        = {Ayesha Asloob Qureshi and Giancarlo Rinaldo and Francesco Romeo},
+  title         = {Hilbert series of Parallelogram Polyominoes},
+  year          = {2021},
+  eprint        = {2111.01907},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Conjectures the reduced Hilbert series of a simple polyomino's coordinate ring in terms of non-attacking rook arrangements, verifies it computationally up to rank 11, and proves it for parallelogram polyominoes.}
+}
+
+@misc{kummini2021rook,
+  author        = {Manoj Kummini and Dharm Veer},
+  title         = {The $h$-polynomial and the rook polynomial of some polyominoes},
+  year          = {2021},
+  eprint        = {2110.14905},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.AC},
+  note          = {Shows $h_2 < r_2$ for convex polyominoes that are not thin, partially confirming a conjectured characterization of thin polyominoes by Rinaldo and Romeo.}
+}
+
+@misc{mansour2021carlitz,
+  author        = {Mansour Toufik and Reza Rastegar and Armend Shabani},
+  title         = {On column-convex and convex Carlitz polyominoes},
+  year          = {2021},
+  eprint        = {2102.00445},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Introduces Carlitz polyominoes and derives the asymptotic counts of column-convex and convex Carlitz polyominoes by perimeter.}
+}
+
+@misc{cisto2021primality,
+  author        = {Carmelo Cisto and Francesco Navarra and Rosanna Utano},
+  title         = {Primality of weakly connected collections of cells and weakly closed path polyominoes},
+  year          = {2021},
+  eprint        = {2106.02155},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.AC},
+  note          = {Identifies the inner-2-minor ideal of a weakly connected simple collection of cells with the toric ideal of a weakly chordal bipartite graph, and characterizes primality for a new class of non-simple polyominoes.}
+}
+
+@misc{lidjan2021homology,
+  author        = {Edin Lidjan and Djordje Baralic},
+  title         = {Homology of polyomino tilings on flat surfaces},
+  year          = {2021},
+  eprint        = {2103.04404},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Extends Reid's tiling homology group to square-tiled topological surfaces and uses it to prove non-existence results for polyomino tilings there.}
+}
+
+@misc{georgakopoulos2021growth,
+  author        = {Agelos Georgakopoulos and Christoforos Panagiotis},
+  title         = {On the exponential growth rates of lattice animals and interfaces II: new asymptotic bounds},
+  year          = {2021},
+  eprint        = {2107.06272},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.PR},
+  note          = {Translates percolation-threshold bounds into lattice-animal growth-rate bounds and back, improving the asymptotics of $a(\mathbb{Z}^d)$ as $d \to \infty$ and giving $p_c(\mathbb{Z}^3) > 0.2522$ for site percolation.}
+}
+
+@misc{guttmann2021lconvex,
+  author        = {Anthony Guttmann and Vaclav Kotesovec},
+  title         = {A numerical study of L-convex polyominoes and 201-avoiding ascent sequences},
+  year          = {2021},
+  eprint        = {2109.09928},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Obtains the coefficient asymptotics for L-convex polyominoes by series analysis and conjectures an algebraic generating function for 201-avoiding ascent sequences, illustrating the numerical methods used.}
+}
+
+@misc{malen2021holeyominoes,
+  author        = {Greg Malen and Fedor Manin and Erika Roldan},
+  title         = {High-dimensional holeyominoes},
+  year          = {2021},
+  eprint        = {2104.04558},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Proves that the maximum number of holes per tile in a $d$-dimensional polyomino of $n$ tiles tends to $(d-1)/d$, and constructs maximal-hole polyominoes in $d$-dimensional tori.}
+}
+
+@misc{kim2021lommel,
+  author        = {Jang Soo Kim and Dennis Stanton},
+  title         = {Three families of $q$-Lommel polynomials},
+  year          = {2021},
+  eprint        = {2105.10096},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Studies three $q$-analogues of Lommel polynomials with combinatorial models built from weighted Motzkin paths, Schroeder paths, and parallelogram polyominoes.}
+}
+
+@misc{arabi2021polycubes,
+  author        = {Abderrahim Arabi and Hac{\`e}ne Belbachir and Jean-Philippe Dubernard},
+  title         = {Enumeration of parallelogram polycubes},
+  year          = {2021},
+  eprint        = {2105.00971},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DM},
+  note          = {Enumerates parallelogram polycubes by width, length, and depth via a Dirichlet generating function linked to multiple zeta values, generalizing the parallelogram-polyomino case and extending to polyhypercubes.}
+}
+
+@misc{bodini2021tilings,
+  author        = {Olivier Bodini and Matthieu Latapy},
+  title         = {Generalized Tilings with Height Functions},
+  year          = {2021},
+  eprint        = {2101.08347},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Generalizes the class of tilings admitting a height function (including domino tilings of polyominoes), giving polynomial-time tilability decision and a distributive lattice structure on flip-accessibility.}
+}
+
+@misc{apollonio2021metastability,
+  author        = {Valentina Apollonio and Vanessa Jacquier and Francesca Romana Nardi and Alessio Troiani},
+  title         = {Metastability for the Ising model on the hexagonal lattice},
+  year          = {2021},
+  eprint        = {2101.11894},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.PR},
+  note          = {Analyzes low-temperature Metropolis metastability for the hexagonal-lattice Ising model, describing critical configurations geometrically and including results on polyiamonds of maximal area and minimal perimeter.}
+}
+
+@misc{hu2021percolation,
+  author        = {Yi Hu and Patrick Charbonneau},
+  title         = {Percolation thresholds on high dimensional $D_n$ and dense packing lattices},
+  year          = {2021},
+  eprint        = {2102.09682},
+  archivePrefix = {arXiv},
+  primaryClass  = {cond-mat.stat-mech},
+  note          = {Computes site and bond percolation thresholds on $D_n$ root lattices ($n=3$--$13$) and $E_8$ relatives, comparing invasion-percolation estimates against dimensional series expansions based on lattice-animal enumeration.}
+}
+
+% --- 2022 ---
+% Query (a) math.CO: totalResults=20 (one page). Query (b) physics categories: totalResults=5 (one page).
+% Supplementary all-category run: totalResults=31; the 8 hits beyond (a)/(b) are included below.
+% Web search: zero 2022 non-arXiv polyplet/polyking papers beyond Barequet-Shalah (journal entry below).
+% Excluded per instruction: 2205.02734 (Grimmett-Li, already in Part III).
+% 33 arXiv entries + 1 journal entry.
+
+@misc{stehr2022polyiamonds,
+  author = {Eva Stehr and Linda Kleist},
+  title = {Folding Polyiamonds into Octahedra},
+  year = {2022},
+  eprint = {2207.13989},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CG},
+  note = {Characterizes which polyiamonds fold into an octahedron, proving every polyiamond of size at least 15 folds and that foldability is decidable in polynomial time.}
+}
+
+@misc{bui2022lowerbound,
+  author = {Vuong Bui},
+  title = {An asymptotic lower bound on the number of polyominoes},
+  year = {2022},
+  eprint = {2211.14909},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Proves P(n) >= A n^{-T log n} lambda^n for Klarner's constant lambda, and conjectures a monotonicity of inconstructible polyominoes that would give lambda < 4.1141.}
+}
+
+@misc{dinu2022konig,
+  author = {Rodica Dinu and Francesco Navarra},
+  title = {Non-simple polyominoes of K{\H o}nig type and their canonical module},
+  year = {2022},
+  eprint = {2210.12665},
+  archivePrefix = {arXiv},
+  primaryClass = {math.AC},
+  note = {Shows closed-path polyomino ideals are of Koenig type and describes the canonical module and Cohen-Macaulay type for circle closed paths.}
+}
+
+@misc{herzog2022lattices,
+  author = {J{\"u}rgen Herzog and Takayuki Hibi},
+  title = {Finite distributive lattices, polyominoes and ideals of K{\H o}nig type},
+  year = {2022},
+  eprint = {2202.09643},
+  archivePrefix = {arXiv},
+  primaryClass = {math.AC},
+  note = {Classifies finite distributive lattices whose join-meet ideals are of Koenig type and studies a class of polyominoes with the same property.}
+}
+
+@misc{romeo2022rook,
+  author = {Francesco Romeo},
+  title = {The Stanley-Reisner ideal of the rook complex of polyominoes},
+  year = {2022},
+  eprint = {2211.04820},
+  archivePrefix = {arXiv},
+  primaryClass = {math.AC},
+  note = {Characterizes polyominoes with a pure rook complex and relates the Castelnuovo-Mumford regularity of its Stanley-Reisner ideal to an induced matching number.}
+}
+
+@misc{kirgizov2022fibonacci,
+  author = {Sergey Kirgizov and Jos{\'e} Luis Ram{\'i}rez},
+  title = {Polyominoes and graphs built from Fibonacci words},
+  year = {2022},
+  eprint = {2211.05460},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Introduces k-bonacci polyominoes associated with binary words avoiding k consecutive ones and enumerates them by area, semiperimeter, and word length.}
+}
+
+@misc{cisto2022hilbert,
+  author = {Carmelo Cisto and Francesco Navarra and Rosanna Utano},
+  title = {Hilbert-Poincar{\'e} series and Gorenstein property for some non-simple polyominoes},
+  year = {2022},
+  eprint = {2205.08375},
+  archivePrefix = {arXiv},
+  primaryClass = {math.AC},
+  note = {Shows the h-polynomial of a closed path without zig-zag walks is its rook polynomial, and characterizes the Gorenstein prime closed paths.}
+}
+
+@misc{cisto2022grobner,
+  author = {Carmelo Cisto and Francesco Navarra and Rosanna Utano},
+  title = {On Gr{\"o}bner bases and Cohen-Macaulay property of closed path polyominoes},
+  year = {2022},
+  eprint = {2205.08251},
+  archivePrefix = {arXiv},
+  primaryClass = {math.AC},
+  note = {Gives monomial orders under which the generators of a closed-path polyomino ideal form a reduced Groebner basis, yielding a normal Cohen-Macaulay coordinate ring.}
+}
+
+@misc{richter2022covering,
+  author = {Christian Richter},
+  title = {Covering rectangles by few monotonous polyominoes},
+  year = {2022},
+  eprint = {2203.09323},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Determines the least number of monotonous polyominoes needed to cover an m-by-n lattice rectangle, in closed form.}
+}
+
+@misc{barequet2022isomer,
+  author = {Gill Barequet and Gil Ben-Shachar},
+  title = {Minimal-Perimeter Lattice Animals and the Constant-Isomer Conjecture},
+  year = {2022},
+  eprint = {2205.07025},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CG},
+  note = {Gives sufficient conditions on a lattice for inflating all minimal-perimeter animals of one size to yield exactly the minimal-perimeter animals of a larger size, verified on the square and hexagonal lattices.}
+}
+
+@misc{miller2022clumsy,
+  author = {Emma Miller and Mitchel O'Connor and Nathan Shank},
+  title = {Clumsy Packing of Polyominoes in Finite Space},
+  year = {2022},
+  eprint = {2203.06675},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Finds the minimum number of polyominoes (rectangle, L, T, plus) that can be packed into a finite space so that no further piece fits.}
+}
+
+@misc{johnson2022promotion,
+  author = {Joseph Johnson and Ricky Ini Liu},
+  title = {Piecewise-linear promotion and RSK in rectangles and moon polyominoes},
+  year = {2022},
+  eprint = {2210.04326},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Constructs piecewise-linear and birational versions of Rubey's chain-statistic-preserving bijections between fillings of equivalent moon polyominoes.}
+}
+
+@misc{langloisremillard2022domination,
+  author = {Alexis Langlois-R{\'e}millard and Mia M{\"u}{\ss}ig and {\'E}rika R{\'o}ldan},
+  title = {Complexity of chess domination problems},
+  year = {2022},
+  eprint = {2211.05651},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Proves maximum independent domination by non-attacking queens or rooks is NP-complete on polycubes of dimension three and higher, and computes new queen-domination values on square polyominoes.}
+}
+
+@misc{aggarwal2022tilings,
+  author = {Mudit Aggarwal and Samrith Ram},
+  title = {Generating functions for straight polyomino tilings of narrow rectangles},
+  year = {2022},
+  eprint = {2206.04437},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Gives an explicit generating function for tilings of an m-by-n rectangle by k-by-1 rectangles when m < 2k, and extends it to boxes tiled by k-by-k-by-1 bricks.}
+}
+
+@misc{ma2022octagonal,
+  author = {Qi Ma},
+  title = {Extremal octagonal chains with respect to the Kirchhoff index},
+  year = {2022},
+  eprint = {2209.10264},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Characterizes the octagonal chains maximizing and minimizing the Kirchhoff index, alongside known results for linear polyomino and hexagonal chains.}
+}
+
+@misc{propp2022aztec,
+  author = {James Propp},
+  title = {Some 2-adic conjectures concerning polyomino tilings of Aztec diamonds},
+  year = {2022},
+  eprint = {2204.00158},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Counts tilings of order-n Aztec diamonds by various tile sets and conjectures 2-adic regularity in the resulting counting functions.}
+}
+
+@misc{bloom2022moon,
+  author = {Jonathan S. Bloom and Dan Saracino},
+  title = {Strictly increasing and decreasing sequences in subintervals of words and a conjecture of Guo and Poznanovi{\'c}},
+  year = {2022},
+  eprint = {2204.05259},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Proves a conjecture of Guo and Poznanovic on chains in 01-fillings of moon polyominoes using a new K-infusion correspondence and RSK variants.}
+}
+
+@misc{duchi2022fightingfish,
+  author = {Enrica Duchi and Corentin Henriet},
+  title = {A bijection between rooted planar maps and generalized fighting fish},
+  year = {2022},
+  eprint = {2210.16635},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Extends fighting fish, a generalization of parallelogram polyominoes, and bijects them with Mullin codes of rooted planar maps.}
+}
+
+@misc{albert2022exploration,
+  author = {Michael H. Albert and Christian Bean and Anders Claesson and {\'E}mile Nadeau and Jay Pantone and Henning Ulfarsson},
+  title = {Combinatorial Exploration: An algorithmic framework for enumeration},
+  year = {2022},
+  eprint = {2202.07715},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Presents a domain-agnostic algorithmic framework that automatically derives counting sequences and generating functions, with proofs-of-concept including polyominoes.}
+}
+
+@misc{trinca2022toric,
+  author = {Cibele Cristina Trinca and J. Carmelo Interlando and Reginaldo Palazzo and Antonio Aparecido de Andrade and Ricardo Augusto Watanabe},
+  title = {On the Construction of New Toric Quantum Codes and Quantum Burst-Error Correcting Codes},
+  year = {2022},
+  eprint = {2205.13582},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.IT},
+  note = {Constructs an infinite family of toric quantum codes on square lattices and identifies the polyomino shapes that tessellate the corresponding lattices.}
+}
+
+@misc{bhoja2022polyforms1,
+  author = {Niren Bhoja and Kirill Krasnov},
+  title = {Notes on Spinors and Polyforms I: General Case},
+  year = {2022},
+  eprint = {2205.04866},
+  archivePrefix = {arXiv},
+  primaryClass = {math-ph},
+  note = {Describes creation/annihilation operator models of general Clifford algebras in terms of polyforms (inhomogeneous differential forms) and an associated mixed complex/paracomplex structure. [Different sense of "polyform" than the lattice-animal one.]}
+}
+
+@misc{kawamoto2022spreadout,
+  author = {Noe Kawamoto and Akira Sakai},
+  title = {Spread-out limit of the critical points for lattice trees and lattice animals in dimensions d>8},
+  year = {2022},
+  eprint = {2205.09451},
+  archivePrefix = {arXiv},
+  primaryClass = {math.PR},
+  note = {Sharpens the spread-out critical point for lattice trees and lattice animals to p_c = 1/e + C L^{-d} + O(L^{-d-1}) for d > 8 via the lace expansion.}
+}
+
+@misc{rigas2022potts,
+  author = {Pete Rigas},
+  title = {Correlation length lower bound for the random-field Potts model with the greedy lattice animal},
+  year = {2022},
+  eprint = {2211.06795},
+  archivePrefix = {arXiv},
+  primaryClass = {math.PR},
+  note = {Uses an upper bound on the greedy lattice animal to obtain a 4/3 correlation-length scaling lower bound for the random-field Potts model, matching the Ising case.}
+}
+
+@misc{bhoja2022polyforms2,
+  author = {Niren Bhoja and Kirill Krasnov},
+  title = {Notes on Spinors and Polyforms II: Quaternions and Octonions},
+  year = {2022},
+  eprint = {2205.05447},
+  archivePrefix = {arXiv},
+  primaryClass = {math-ph},
+  note = {Relates quaternionic and octonionic generalizations of Pauli matrices to the creation/annihilation operator (polyform) models of Cl(5) and Cl(9). [Different sense of "polyform" than the lattice-animal one.]}
+}
+
+@misc{madras2022adsorption,
+  author = {Neal Madras},
+  title = {Adsorption of Lattice Polymers with Quenched Topologies},
+  year = {2022},
+  eprint = {2203.13338},
+  archivePrefix = {arXiv},
+  primaryClass = {math-ph},
+  note = {Introduces adsorption models in which the polymer topology (lattice animal, tree, comb, or ring) is quenched before adsorption, and proves properties of the limiting free energy and critical point.}
+}
+
+@misc{kummini2022charneydavis,
+  author = {Manoj Kummini and Dharm Veer},
+  title = {The Charney-Davis conjecture for simple thin polyominoes},
+  year = {2022},
+  eprint = {2203.03487},
+  archivePrefix = {arXiv},
+  primaryClass = {math.AC},
+  note = {Shows the Gorenstein toric rings associated to simple thin polyominoes satisfy the Charney-Davis conjecture.}
+}
+
+@misc{thomas2022nanopores,
+  author = {Sneha Thomas and Kevin S. Silmore and Ananth Govind Rajan},
+  title = {Enumerating Stable Nanopores in Graphene and their Geometrical Properties Using the Combinatorics of Hexagonal Lattices},
+  year = {2022},
+  eprint = {2210.04445},
+  archivePrefix = {arXiv},
+  primaryClass = {cond-mat.mtrl-sci},
+  note = {Adapts Redelmeier's polyform enumeration algorithm to triangular lattice animals (polyiamonds and polyhexes) to enumerate stable graphene nanopore shapes, cutting 11.7 million N=20 isomers to 0.184 million stable ones.}
+}
+
+@misc{rieck2022artgallery,
+  author = {Christian Rieck and Christian Scheffer},
+  title = {The Dispersive Art Gallery Problem},
+  year = {2022},
+  eprint = {2209.10291},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CG},
+  note = {Studies vertex guarding of polyominoes maximizing the minimum pairwise guard distance, proving an upper bound of 3 for simple polyominoes and NP-completeness for distance 5.}
+}
+
+@misc{patil2022tangram,
+  author = {Ashlesha Patil and Yosef P. Jacobson and Don Towsley and Saikat Guha},
+  title = {Measurement-based Quantum Computation as a Tangram Puzzle},
+  year = {2022},
+  eprint = {2210.11465},
+  archivePrefix = {arXiv},
+  primaryClass = {quant-ph},
+  note = {Shows that mapping a quantum circuit into measurement-based quantum computing is equivalent to arranging polyominoes on a square-grid board, and builds a puzzle game around it.}
+}
+
+@misc{gerard2022xrays,
+  author = {Yan Gerard},
+  title = {Reconstruction of Convex Sets from One or Two X-rays},
+  year = {2022},
+  eprint = {2211.08091},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CG},
+  note = {Disproves a conjecture on convex aggregation in HV-convex polyomino reconstruction and gives polynomial-time reconstruction for one X-ray and for fat digital convex sets.}
+}
+
+@misc{seaton2022hitomezashi,
+  author = {Katherine A. Seaton and Carol Hayes},
+  title = {Mathematical specification of hitomezashi designs},
+  year = {2022},
+  eprint = {2208.12580},
+  archivePrefix = {arXiv},
+  primaryClass = {math.HO},
+  note = {Analyses hitomezashi stitching designs via binary words and duality, proposing self-dual "Pell persimmon polyomino patterns" related to Fibonacci snowflakes.}
+}
+
+@misc{garcia2022reconfiguration,
+  author = {Javier Garcia and Michael Yannuzzi and Peter Kramer and Christian Rieck and Aaron T. Becker},
+  title = {Connected Reconfiguration of Polyominoes Amid Obstacles using RRT*},
+  year = {2022},
+  eprint = {2207.01282},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.RO},
+  note = {Applies RRT* sampling to reconfiguring a connected 2D tile set (polyomino) in obstacle-filled environments, comparing against global and local planners.}
+}
+
+@misc{demange2022firebreak,
+  author = {Marc Demange and Alessia Di Fonso and Gabriele Di Stefano and Pierpaolo Vittorini},
+  title = {About the Infinite Windy Firebreak Location problem},
+  year = {2022},
+  eprint = {2204.05475},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DM},
+  note = {Models wildfire containment as edge removal on infinite graphs, proving coNP-completeness in restricted cases and a polynomial reduction to Min Cut for infinite grid and polyomino-grid graphs.}
+}
+
+@article{barequet2022upperbound,
+  author = {Gill Barequet and Mira Shalah},
+  title = {Improved Upper Bounds on the Growth Constants of Polyominoes and Polycubes},
+  journal = {Algorithmica},
+  volume = {84},
+  number = {12},
+  pages = {3559--3586},
+  year = {2022},
+  doi = {10.1007/s00453-022-00948-6},
+  note = {Journal version of arXiv:1906.11447; extends Klarner and Rivest's method to prove lambda <= 4.5252 for polyominoes, the first improvement in almost half a century, and lambda_d <= (2d-2)e + o(1) in dimension d.}
+}
+
+% --- 2023 ---
+% Query (a) math.CO: totalResults=8 (one page). Query (b) physics categories: totalResults=3 (one page).
+% Overlap: 2304.00841 (Hypergraph Animals) deduped; 10 unique term-query hits.
+% Zero 2023 arXiv hits for "polyplet(s)", "polyking(s)", "king lattice" as such.
+% The last three entries below came from supplementary search, not the prescribed term
+% queries: extended-neighborhood site-percolation papers whose neighborhood families
+% include the (1,1)-diagonal/king contacts — kept, no pre-filtering.
+
+@misc{bui2023polyiamonds,
+  author = {Vuong Bui},
+  title = {The number of polyiamonds is supermultiplicative},
+  year = {2023},
+  eprint = {2304.10077},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Proves $T(\ell+m) \ge T(\ell)T(m)$ for polyiamonds by a combined concatenate-merge-add-cells argument, raising the best known growth-constant lower bound from 2.8423 to 2.8578; published in Electron. J. Combin. (2023) P4-38, doi 10.37236/12028.}
+}
+
+@misc{cisto2023polyocollection,
+  author = {Carmelo Cisto and Francesco Navarra and Dharm Veer},
+  title = {Polyocollection ideals and primary decomposition of polyomino ideals},
+  year = {2023},
+  eprint = {2302.08337},
+  archivePrefix = {arXiv},
+  primaryClass = {math.AC},
+  note = {Introduces polyocollections, generalizing collections of cells and polyominoes, to compute primary decompositions of non-prime polyomino ideals and to describe the minimal decomposition of non-prime closed path polyominoes; doi 10.1016/j.jalgebra.2023.11.024. Cross-listed to math.CO.}
+}
+
+@misc{dinu2023rook,
+  author = {Rodica Dinu and Francesco Navarra},
+  title = {On the rook polynomial of grid polyominoes},
+  year = {2023},
+  eprint = {2309.01818},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Shows the rook polynomial of a grid polyomino (a thin polyomino with holes in a grid pattern) equals the $h$-polynomial of its coordinate ring, extending earlier results for frame polyominoes.}
+}
+
+@misc{jahangir2023frame,
+  author = {Rizwan Jahangir and Francesco Navarra},
+  title = {Shellable simplicial complex and switching rook polynomial of frame polyominoes},
+  year = {2023},
+  eprint = {2306.11467},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Gives a shelling order for the simplicial complex attached to a frame polyomino and a bijection between canonical rook configurations and its facets, identifying the $h$-polynomial with the switching rook polynomial; doi 10.1016/j.jpaa.2023.107576.}
+}
+
+@misc{florez2023dyck,
+  author = {Rigoberto Fl\'orez and Jos\'e L. Ram\'irez and Fabio A. Velandia and Diego Villamizar},
+  title = {Some Connections Between Restricted Dyck Paths, Polyominoes, and Non-Crossing Partitions},
+  year = {2023},
+  eprint = {2308.02059},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Connects restricted $d$-Dyck paths to non-crossing partitions and to subfamilies of polyominoes, with generating functions counting several statistics of each.}
+}
+
+@misc{ascolese2023doublesquare,
+  author = {Michela Ascolese and Andrea Frosini},
+  title = {On a conjecture on prime double square tiles},
+  year = {2023},
+  eprint = {2305.04626},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Proves, via combinatorics on words, that the boundary words of prime double square polyominoes (translation tiles) contain no run of two or more equal letters, opening the way to fast generation and enumeration by perimeter and area.}
+}
+
+@misc{tuckerfoltz2023locked,
+  author = {Jamie Tucker-Foltz},
+  title = {Locked Polyomino Tilings},
+  year = {2023},
+  eprint = {2307.15996},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO},
+  note = {Constructs locked $t$-omino tilings (tilings no two-tile swap can alter) for $t \ge 3$, including 3- and 4-omino tilings on arbitrarily large square grids, giving counterexamples to the irreducibility of the ReCom redistricting Markov chain on grid graphs.}
+}
+
+@misc{stumpf2023hypergraph,
+  author = {Michael P. H. Stumpf},
+  title = {Hypergraph Animals},
+  year = {2023},
+  eprint = {2304.00841},
+  archivePrefix = {arXiv},
+  primaryClass = {q-bio.MN},
+  note = {Defines hypergraph animals describing local node neighbourhoods in hypergraphs, relates them to lattice animals and network motifs, and studies their combinatorics and abundances in random hypergraphs. Cross-listed to both the math.CO and the physics query.}
+}
+
+@misc{can2023lipschitz,
+  author = {Van Hao Can and Shuta Nakajima and Van Quyet Nguyen},
+  title = {Lipschitz-continuity of time constant in generalized First-passage percolation},
+  year = {2023},
+  eprint = {2312.03550},
+  archivePrefix = {arXiv},
+  primaryClass = {math.PR},
+  note = {Uses lattice animal theory plus a one-step renormalization and Russo's formula to prove Lipschitz continuity of the time constant in generalized first-passage percolation, simplifying the multi-scale argument of Cerf and Dembin.}
+}
+
+@misc{liu2023deconvolution,
+  author = {Yucheng Liu and Gordon Slade},
+  title = {Gaussian deconvolution and the lace expansion},
+  year = {2023},
+  eprint = {2310.07635},
+  archivePrefix = {arXiv},
+  primaryClass = {math.PR},
+  note = {Gives simple conditions for the solution of a convolution equation to have Gaussian $|x|^{-(d-2)}$ decay, simplifying high-dimensional critical two-point function proofs for self-avoiding walk, Ising, $\varphi^4$, percolation, and lattice trees and lattice animals; doi 10.1007/s00440-024-01350-9.}
+}
+
+@misc{malarz2023square,
+  author = {Krzysztof Malarz},
+  title = {Random site percolation thresholds on square lattice for complex neighborhoods containing sites up to the sixth coordination zone},
+  year = {2023},
+  eprint = {2303.10423},
+  archivePrefix = {arXiv},
+  primaryClass = {cond-mat.stat-mech},
+  note = {Computes Newman--Ziff Monte Carlo site-percolation thresholds on the square lattice for complex (non-compact, multi-zone) neighborhoods up to the sixth coordination zone, finding the power law $p_c \propto \zeta^{-0.5454(60)}$ in the distance-weighted coordination number.}
+}
+
+@misc{malarz2023universality,
+  author = {Krzysztof Malarz},
+  title = {Universality of random-site percolation thresholds for two-dimensional complex non-compact neighborhoods},
+  year = {2023},
+  eprint = {2310.20668},
+  archivePrefix = {arXiv},
+  primaryClass = {cond-mat.stat-mech},
+  note = {Extends the threshold survey to triangular and honeycomb lattices through the sixth coordination zone and reports a lattice-independent power law $p_c \propto \zeta^{-0.5546(67)}$ in the distance-weighted coordination number.}
+}
+
+@misc{xun2023extended,
+  author = {Zhipeng Xun and Dapeng Hao and Robert M. Ziff},
+  title = {Extended-range percolation in five dimensions},
+  year = {2023},
+  eprint = {2308.15719},
+  archivePrefix = {arXiv},
+  primaryClass = {cond-mat.stat-mech},
+  note = {Determines site and bond percolation thresholds for five-dimensional hypercubic lattices with extended neighborhoods and compares them to the continuum limit; published J. Stat. Mech. 2025, 123301, doi 10.1088/1742-5468/ae1df5.}
+}
+
+% ==================================================================
+% 2024-2026 GAP-FILL SLICE
+% arXiv API totalResults per query (no query exceeded 200; no paging needed):
+%   cat:math.CO + topic terms      -> 2024: 18, 2025: 24, 2026: 19
+%   physics cats + topic terms     -> 2024: 5,  2025: 2,  2026: 6
+%   NO category filter + terms     -> 2024: 33, 2025: 32, 2026: 28
+% The uncategorized sweep was added because the two prescribed category
+% queries missed 29 papers in cs.DM / cs.CG / cs.CC / math.AC / math.MG /
+% math.GM, e.g. Castelli-Massazza (Z-convex) and both GASCom proceedings
+% volumes. All three sweeps are merged and deduped here, and deduped
+% against the 15-eprint exclusion list.
+% Nine entries are incidental term matches (supergravity "polyform",
+% hypergraph "polyform", a video-tracking system named "Tetris", etc.);
+% per the no-pre-filtering instruction they are kept and flagged in note.
+% ==================================================================
+
+% --- 2024 (gap-fill) --- (30 arXiv entries + 2 journal entries)
+@misc{cisto2024cohenmacaulay,
+  author        = {Carmelo Cisto and Rizwan Jahangir and Francesco Navarra},
+  title         = {On Cohen-Macaulay non-prime collections of cells},
+  year          = {2024},
+  eprint        = {2401.09152},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.AC},
+  note          = {Shows all closed path polyominoes are Cohen-Macaulay and characterizes the Gorenstein ones, with Hilbert-Poincare series for non-prime collections of cells.}
+}
+
+@misc{stefan2024cohenmacaulay,
+  author        = {Alin Ştefan},
+  title         = {Cohen-Macaulay types of certain edge subrings of bipartite graphs and (generalized) Fuss-Catalan numbers},
+  year          = {2024},
+  eprint        = {2401.15446},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.AC},
+  note          = {Exhibits convex-polyomino coordinate rings whose Cohen-Macaulay types are generalized Fuss-Catalan numbers.}
+}
+
+@misc{shigechi2024networks,
+  author        = {Keiichi Shigechi},
+  title         = {Networks bijective to permutations},
+  year          = {2024},
+  eprint        = {2402.05600},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Constructs networks bijective to permutations from polyomino and Rothe diagrams via Dyck tilings, and shows the poset of networks is a graded lattice.}
+}
+
+@misc{aichholzer2024folding,
+  author        = {Oswin Aichholzer and Florian Lehner and Christian Lindorfer},
+  title         = {Folding polyominoes into cubes},
+  year          = {2024},
+  eprint        = {2402.14965},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CG},
+  note          = {Gives an algorithm deciding whether a given polyomino folds into a cube along lattice creases, allowing multiply covered faces.}
+}
+
+@misc{derycke2024sandpile,
+  author        = {Henri Derycke and Mark Dukes and Yvan Le Borgne},
+  title         = {The sandpile model on the complete split graph: $q,t$-Schröder polynomials, sawtooth polyominoes, and a cycle lemma},
+  year          = {2024},
+  eprint        = {2402.15372},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Relates sorted recurrent sandpile configurations on the complete split graph to q,t-Schroeder polynomials and sawtooth polyominoes.}
+}
+
+@misc{cisto2024collections,
+  author        = {Carmelo Cisto and Rizwan Jahangir and Francesco Navarra},
+  title         = {Collections of cells, binomial ideals and combinatorics},
+  year          = {2024},
+  eprint        = {2403.06743},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.AC},
+  note          = {Describes the Macaulay2 package PolyominoIdeals for computing with collections of cells, polyominoes, and their binomial ideals.}
+}
+
+@misc{yang2024ollinger,
+  author        = {Chao Yang and Zhujun Zhang},
+  title         = {A proof of Ollinger's conjecture: undecidability of tiling the plane with a set of $8$ polyominoes},
+  year          = {2024},
+  eprint        = {2403.13472},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Proves Ollinger conjecture that translational tiling of the plane with a set of 8 polyominoes is undecidable.}
+}
+
+@misc{sigarreta2024zagreb,
+  author        = {Sayle Sigarreta and Hugo Cruz-Suarez},
+  title         = {Zagreb Connection indices on polyomino chains and random polyomino chains},
+  year          = {2024},
+  eprint        = {2405.12389},
+  archivePrefix = {arXiv},
+  primaryClass  = {cond-mat.dis-nn},
+  note          = {Derives exact formulas and extremal values for the first and second Zagreb connection indices of polyomino chains and random polyomino chains via Markov chains.}
+}
+
+@misc{condon2024debruijn,
+  author        = {D. Condon and Yuxin Wang and E. Yang},
+  title         = {De Bruijn Polyominoes},
+  year          = {2024},
+  eprint        = {2405.18543},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Introduces de Bruijn and prismatic polyominoes generalizing de Bruijn sequences and arrays, with constructions and enumeration.}
+}
+
+@misc{brlek2024gascom,
+  author        = {Srečko Brlek and Luca Ferrari},
+  title         = {Proceedings of the 13th edition of the conference on Random Generation of Combinatorial Structures. Polyominoes and Tilings},
+  year          = {2024},
+  eprint        = {2406.14588},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DM},
+  note          = {Proceedings of GASCom 2024 on random and exhaustive generation of combinatorial structures, polyominoes and tilings.}
+}
+
+@misc{schager2024bijection,
+  author        = {Florian Schager and Michael Wallner},
+  title         = {A Bijection between Stacked Directed Polyominoes and Motzkin Paths with Alternative Catastrophes},
+  year          = {2024},
+  eprint        = {2406.16417},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Gives a bijection between stacked directed polyominoes and Motzkin paths with catastrophes, improving bounds on the asymptotic width of stacked directed animals.}
+}
+
+@misc{sportiello2024measures,
+  author        = {Andrea Sportiello},
+  title         = {Natural Measures on Polyominoes Induced by the Abelian Sandpile Model},
+  year          = {2024},
+  eprint        = {2406.16418},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DM},
+  note          = {Introduces a Boltzmann measure on polyominoes induced by boundary avalanches in the Abelian sandpile model, arguing for a 3/2 power-law size decay.}
+}
+
+@misc{vandongen2024ax,
+  author        = {Vincent Van Dongen and Pierre Gradit},
+  title         = {Ax, 3 polyominoes for tiling the plane non-periodically},
+  year          = {2024},
+  eprint        = {2407.06202},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.GM},
+  note          = {Presents Ax, a new set of three polyominoes that tile the plane only non-periodically, related to Ammann A4.}
+}
+
+@misc{xia2024skyrmion,
+  author        = {Jing Xia and Xichao Zhang and Yan Zhou and Xiaoxi Liu and Guoping Zhao and Masahito Mochizuki},
+  title         = {Transformation of a cellular skyrmion to polyomino-like structures},
+  year          = {2024},
+  eprint        = {2407.07298},
+  archivePrefix = {arXiv},
+  primaryClass  = {cond-mat.mes-hall},
+  note          = {Shows a square cellular skyrmion on a grid pinning pattern can be driven by current pulses into polyomino-like shapes.}
+}
+
+@misc{bagchi2024tiered,
+  author        = {Biswadeep Bagchi and Srinibas Swain},
+  title         = {Tiered tree, Parking function and Postnikov-Shapiro algebra},
+  year          = {2024},
+  eprint        = {2408.03087},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Gives a bijection between parallelogram polyominoes and graphical parking functions, and describes tiered graphs via Whitney operations.}
+}
+
+@misc{mitcompgeom2024deltahedral,
+  author        = {MIT CompGeom Group and Hugo A. Akitaya and Erik D. Demaine and Adam Hesterberg and Anna Lubiw and Jayson Lynch and Joseph O'Rourke and Frederick Stock and Josef Tkadlec},
+  title         = {Deltahedral Domes over Equiangular Polygons},
+  year          = {2024},
+  eprint        = {2408.04687},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.MG},
+  note          = {Characterizes which equiangular polygons can be capped by a convex polyhedron whose remaining faces are convex polyiamonds.}
+}
+
+@misc{navarra2024shellable,
+  author        = {Francesco Navarra},
+  title         = {Shellable flag simplicial complexes of non-simple polyominoes},
+  year          = {2024},
+  eprint        = {2408.12367},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.AC},
+  note          = {Proves shellability of flag simplicial complexes attached to non-simple thin polyominoes, giving Cohen-Macaulayness and an h-polynomial interpretation.}
+}
+
+@misc{guo2024hecke,
+  author        = {Ting Guo and Gaofan Li},
+  title         = {Hecke growth diagrams, and maximal increasing and decreasing sequences in fillings of stack polyominoes},
+  year          = {2024},
+  eprint        = {2408.16211},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Bijects 01-fillings of stack polyominoes with corner labellings, reproving symmetry of longest increasing and decreasing chain distributions.}
+}
+
+@misc{fekete2024coordinated,
+  author        = {Sándor P. Fekete and Ramin Kosfeld and Peter Kramer and Jonas Neutzner and Christian Rieck and Christian Scheffer},
+  title         = {Coordinated Motion Planning: Multi-Agent Path Finding in a Densely Packed, Bounded Domain},
+  year          = {2024},
+  eprint        = {2409.06486},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CG},
+  note          = {Studies makespan-optimal multi-agent path finding for labeled agents densely packed in a simply connected axis-parallel (polyomino) domain.}
+}
+
+@misc{verges2024greedy,
+  author        = {Julien Verges},
+  title         = {Law of large numbers for greedy animals and paths in a Poissonian environment},
+  year          = {2024},
+  eprint        = {2410.15771},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.PR},
+  note          = {Proves a law of large numbers for continuous Poissonian analogues of greedy lattice animals and paths.}
+}
+
+@misc{arnbjergnielsen2024wings,
+  author        = {Sif F. Arnbjerg-Nielsen and Matthew D. Biviano and Annette Cazaubiel and Alexander Schødt and Andreas Carlson and Kaare H. Jensen},
+  title         = {A trade-off between hydrodynamic performance and morphological bias limits the evolution of symmetric lattice animal wings},
+  year          = {2024},
+  eprint        = {2411.09456},
+  archivePrefix = {arXiv},
+  primaryClass  = {physics.bio-ph},
+  note          = {Uses laser-cut two-dimensional polyomino "lattice animal" wings in a settling-tank experiment to study a hydrodynamic performance versus morphological bias trade-off.}
+}
+
+@misc{langloisremillard2024gamification,
+  author        = {Alexis Langlois-Rémillard and Élise Raphael and Erika Roldan},
+  title         = {Insights from a workshop on gamification of research in mathematics and computer science},
+  year          = {2024},
+  eprint        = {2411.10207},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.HO},
+  note          = {Reports on gamification of research including DominatriX, an art gallery problem on polyominoes with rooks and queens.}
+}
+
+@misc{koley2024knutson,
+  author        = {Mitra Koley and Nirmal Kotal and Dharm Veer},
+  title         = {Polyominoes and Knutson ideals},
+  year          = {2024},
+  eprint        = {2411.16364},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.AC},
+  note          = {Studies radicality and primality of polyomino ideals by initiating the study of Knutson ideals among polyominoes.}
+}
+
+@misc{pulido2024fibonacci,
+  author        = {Juan F. Pulido and José L. Ramírez and Andrés R. Vindas-Meléndez},
+  title         = {Generating Trees and Fibonacci Polyominoes},
+  year          = {2024},
+  eprint        = {2411.17812},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Introduces p-Fibonacci polyominoes defined from p-Fibonacci words and enumerates them by area, semi-perimeter, and inner points.}
+}
+
+@misc{liu2024nearcritical,
+  author        = {Yucheng Liu and Gordon Slade},
+  title         = {Near-critical and finite-size scaling for high-dimensional lattice trees and animals},
+  year          = {2024},
+  eprint        = {2412.05491},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.PR},
+  note          = {Proves correlation-length divergence and near-critical two-point bounds for spread-out lattice trees and lattice animals above the upper critical dimension, with torus finite-size scaling.}
+}
+
+@misc{liu2024critical,
+  author        = {Yucheng Liu and Gordon Slade},
+  title         = {Critical scaling profile for trees and connected subgraphs on the complete graph},
+  year          = {2024},
+  eprint        = {2412.05503},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.PR},
+  note          = {Identifies a single critical scaling profile for trees and connected subgraphs on the complete graph, conjectured to govern high-dimensional lattice trees and animals.}
+}
+
+@misc{wu2024nofreelunch,
+  author        = {Jing-Chuan Wu and Qi Ye and Dong-Ling Deng and Li-Wei Yu},
+  title         = {No-Free-Lunch Theories for Tensor-Network Machine Learning Models},
+  year          = {2024},
+  eprint        = {2412.05674},
+  archivePrefix = {arXiv},
+  primaryClass  = {quant-ph},
+  note          = {No-free-lunch theorems for tensor-network machine learning models. [incidental term match; no polyomino content]}
+}
+
+@misc{beluhov2024double,
+  author        = {Nikolai Beluhov},
+  title         = {Double Tiles},
+  year          = {2024},
+  eprint        = {2412.08989},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Describes explicitly all polyominoes, and then all polygons, admitting two distinct lattice tilings in the square class.}
+}
+
+@misc{jacquier2024isoperimetric,
+  author        = {V. Jacquier and W. M. Ruszel and C. Spitoni},
+  title         = {Isoperimetric inequality for nonlocal bi-axial discrete perimeter},
+  year          = {2024},
+  eprint        = {2412.13005},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.PR},
+  note          = {Solves a nonlocal discrete isoperimetric problem for a bi-axial polyomino perimeter and characterizes the minimizers at fixed area.}
+}
+
+@misc{yang2024translational,
+  author        = {Chao Yang and Zhujun Zhang},
+  title         = {Translational Aperiodic Sets of 7 Polyominoes},
+  year          = {2024},
+  eprint        = {2412.17382},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Constructs a translational aperiodic set of 7 polyominoes, reducing the previous record.}
+}
+
+% Non-arXiv journal finds for 2024 (from supplementary web search):
+@article{barequet2024counting,
+  author  = {Gill Barequet and Gil Ben-Shachar},
+  title   = {Counting Polyominoes, Revisited},
+  journal = {Proceedings of the Symposium on Algorithm Engineering and Experiments (ALENEX)},
+  year    = {2024},
+  pages   = {133--143},
+  doi     = {10.1137/1.9781611977929.10},
+  note    = {Improves Jensen's transfer-matrix algorithm by using bounding boxes on the lattice rotated by 45 degrees, extending the polyomino count from 56 to 70 terms.}
+}
+
+@article{bui2024asymptotic,
+  author  = {Vuong Bui},
+  title   = {An Asymptotic Lower Bound on the Number of Polyominoes},
+  journal = {Annals of Combinatorics},
+  volume  = {28},
+  number  = {2},
+  pages   = {459--484},
+  year    = {2024},
+  doi     = {10.1007/s00026-023-00675-x},
+  note    = {Journal version (2024) of arXiv:2211.14909, whose v1 predates this slice; gives an asymptotic lower bound on the number of polyominoes.}
+}
+
+% --- 2025 (gap-fill) --- (27 entries; no non-arXiv journal finds)
+@misc{ramirez2025enumeration,
+  author        = {José L. Ramírez and Diego Villamizar},
+  title         = {Enumeration of Colored Tilings on Graphs via Generating Functions},
+  year          = {2025},
+  eprint        = {2501.06008},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Uses bivariate generating functions to count colored connected blocks in graphs, generalizing colored polyomino tilings of grids.}
+}
+
+@misc{cazals2025hard,
+  author        = {Pierre Cazals and Aymeric François and Loïc Henriet and Lucas Leclerc and Malory Marin and Yassine Naghmouchi and Wesley da Silva Coelho and Florian Sikora and Vittorio Vitale and Rémi Watrigant and Monique Witt Garzillo and Constantin Dalyac},
+  title         = {Identifying hard native instances for the maximum independent set problem on neutral atoms quantum processors},
+  year          = {2025},
+  eprint        = {2502.04291},
+  archivePrefix = {arXiv},
+  primaryClass  = {quant-ph},
+  note          = {Identifies hard native maximum-independent-set instances on King Lattice graphs for neutral-atom quantum processors.}
+}
+
+@misc{nikolaev2025evolomino,
+  author        = {Andrei V. Nikolaev},
+  title         = {Evolomino is NP-complete},
+  year          = {2025},
+  eprint        = {2503.07611},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CC},
+  note          = {Proves the Nikoli puzzle Evolomino NP-complete by a parsimonious reduction from 3-SAT, hence its counting version is #P-complete.}
+}
+
+@misc{cioni2025sorting,
+  author        = {Lapo Cioni and Luca Ferrari and Rebecca Smith},
+  title         = {Sorting permutations using a pop stack with a bypass},
+  year          = {2025},
+  eprint        = {2503.08285},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DM},
+  note          = {Characterizes permutations sortable by a pop stack with bypass; the enumeration passes through restricted Motzkin paths and polyomino-related classes.}
+}
+
+@misc{liang2025tiling,
+  author        = {Kai Liang},
+  title         = {Solving tiling enumeration problems by tensor network contractions},
+  year          = {2025},
+  eprint        = {2503.17698},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Computes exact tiling enumerations, including polyomino tilings recast as Wang tilings, by two-dimensional tensor network contraction, extending dozens of OEIS sequences.}
+}
+
+@misc{ahmia2025enumeration,
+  author        = {M. Ahmia and J. -L. Baril and B. Rezig},
+  title         = {Enumeration on polyominoes determined by Catalan words avoiding $(\geq,\geq)$},
+  year          = {2025},
+  eprint        = {2504.04828},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Derives generating functions for Motzkin polyominoes coming from Catalan words avoiding the pattern (>=,>=), by length, area, and semiperimeter.}
+}
+
+@misc{beluhov2025minimumturn,
+  author        = {Nikolai Beluhov},
+  title         = {Minimum-Turn Tours of Even Polyominoes},
+  year          = {2025},
+  eprint        = {2504.11282},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Proves the Peng-Rascoussier conjecture on the structure of minimum-turn Hamiltonian cycles of even polyominoes that are topological disks.}
+}
+
+@misc{fekete2025drainability,
+  author        = {Sándor P. Fekete and Peter Kramer and Jan-Marc Reinhardt and Christian Rieck and Christian Scheffer},
+  title         = {Drainability and Fillability of Polyominoes in Diverse Models of Global Control},
+  year          = {2025},
+  eprint        = {2504.16762},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CG},
+  note          = {Studies filling and draining polyomino environments under globally controlled tilt models.}
+}
+
+@misc{pete2025nonamenable,
+  author        = {Gábor Pete and Sándor Rokob},
+  title         = {Nonamenable Poisson zoo},
+  year          = {2025},
+  eprint        = {2505.07145},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.PR},
+  note          = {Studies the Poisson zoo of i.i.d. lattice animals on nonamenable Cayley graphs and the emergence of infinite clusters.}
+}
+
+@misc{blondinmasse2025maximal,
+  author        = {Alexandre Blondin Massé and Alain Goupil and Ralphael L'Heureux and Louis Marin},
+  title         = {Maximal 2-dimensional binary words of bounded degree},
+  year          = {2025},
+  eprint        = {2505.13640},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Gives an exact formula for the maximum number of 1s in a bounded-degree binary 2D word, yielding an upper bound on maximal snake polyominoes in a rectangle.}
+}
+
+@misc{qian2025unfolding,
+  author        = {Long Qian and Eric Wang and Bernardo Subercaseaux and Marijn J. H. Heule},
+  title         = {Unfolding Boxes with Local Constraints},
+  year          = {2025},
+  eprint        = {2506.01079},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CG},
+  note          = {Enumerates polyominoes foldable into multiple non-isomorphic boxes using SAT encodings that avoid global connectivity constraints.}
+}
+
+@misc{gil2025oddindexed,
+  author        = {Juan B. Gil and Felix H. Xu and William Y. Zhu},
+  title         = {Odd-indexed Fibonacci numbers via pattern-avoiding permutations},
+  year          = {2025},
+  eprint        = {2506.15800},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Bijects directed column-convex polyominoes, block fountains, and other odd-indexed-Fibonacci families with pattern-avoiding permutations.}
+}
+
+@misc{yang2025fourtiles,
+  author        = {Chao Yang and Zhujun Zhang},
+  title         = {Undecidability of Translational Tiling of the Plane with Four Tiles},
+  year          = {2025},
+  eprint        = {2506.19295},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Shows translational tiling of the plane with a set of 4 polyominoes is undecidable.}
+}
+
+@misc{fekete2025guarding,
+  author        = {Sándor P. Fekete and Kai Kobbe and Dominik Krupke and Joseph S. B. Mitchell and Christian Rieck and Christian Scheffer},
+  title         = {Guarding Offices with Maximum Dispersion},
+  year          = {2025},
+  eprint        = {2506.21307},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CG},
+  note          = {Solves the dispersive art gallery problem with r-visibility for office-like orthogonal polygons built from rectangular rooms and corridors.}
+}
+
+@misc{kim2025undecidability,
+  author        = {Yoonhu Kim},
+  title         = {Undecidability of Tiling the Plane with a Set of 5 Polyominoes},
+  year          = {2025},
+  eprint        = {2508.10067},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Proves undecidability of translational tiling of the plane with a set of 5 polyominoes using a new edge-labeling method.}
+}
+
+@misc{kim2025growth,
+  author        = {Sun Woo P. Kim and Gabriele Pinna},
+  title         = {Existence and bounds of growth constants for restricted walks, surfaces, and generalisations},
+  year          = {2025},
+  eprint        = {2509.04568},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Establishes existence and bounds for growth constants of self-osculating walks, restricted surfaces, and generalisations, via an automata method.}
+}
+
+@misc{mitulbcompgeom2025tromino,
+  author        = {MIT-ULB CompGeom Group and Zachary Abel and Hugo Akitaya and Lily Chung and Erik D. Demaine and Jenny Diomidova and Della Hendrickson and Stefan Langerman and Jayson Lynch},
+  title         = {Undecidability of Tiling with a Tromino},
+  year          = {2025},
+  eprint        = {2509.07906},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CG},
+  note          = {Proves co-RE-completeness of completing a periodic placement of L or I trominoes to a plane tiling.}
+}
+
+@misc{montesymorales2025augmented,
+  author        = {Manuel Montes-y-Morales and Saylé Sigarreta and Hugo Cruz-Suárez},
+  title         = {Maximum augmented Zagreb index on polyomino chains},
+  year          = {2025},
+  eprint        = {2509.10669},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Uses dynamic programming to characterize the polyomino chains maximizing the augmented Zagreb index, resolving a 2016 problem.}
+}
+
+@misc{eu2025ternary,
+  author        = {Sen-Peng Eu and Tung-Shan Fu and Yu-Ren Pan},
+  title         = {On Ternary Trees and Fighting Fish},
+  year          = {2025},
+  eprint        = {2509.16667},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Builds a tree construction for fighting fish, a generalization of directed convex polyominoes, and bijects them with ternary trees.}
+}
+
+@misc{abdullah2025folk,
+  author        = {Duaa Abdullah and Jasem Hamoud},
+  title         = {The Role of Mathematical Folk Puzzles in Developing mathematical Thinking and Problem-Solving Skills},
+  year          = {2025},
+  eprint        = {2510.24266},
+  archivePrefix = {arXiv},
+  primaryClass  = {econ.TH},
+  note          = {Survey of mathematical folk puzzles including a minimal dissection path problem for polyominoes. [borderline: math outreach]}
+}
+
+@misc{ma2025connected,
+  author        = {Hongxia Ma and Xian'an Jin and Meiqiao Zhang},
+  title         = {On the enumeration of connected sets in finite cylindrical lattice graphs},
+  year          = {2025},
+  eprint        = {2511.01319},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Enumerates connected sets (finite lattice animals) in grid and cylinder graphs P_m x P_n and C_m x P_n.}
+}
+
+@misc{navarra2025switching,
+  author        = {Francesco Navarra and Ayesha Asloob Qureshi and Giancarlo Rinaldo},
+  title         = {Switching Rook Polynomials of Collections of Cells: Palindromicity and Domino-Stability},
+  year          = {2025},
+  eprint        = {2511.13982},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Introduces domino-stability and studies palindromicity of switching rook polynomials of collections of cells.}
+}
+
+@misc{jensen2025canonical,
+  author        = {Noah Jensen and Stephanie Treneer},
+  title         = {Toward a Canonical Representation of Blocked Rectangular Grids with an Application to Finite Tiling Problems},
+  year          = {2025},
+  eprint        = {2511.20915},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Constructs near-canonical representatives for blocked rectangular grids up to symmetry, applied to finite polyomino tiling problems.}
+}
+
+@misc{navarra2025rook,
+  author        = {Francesco Navarra and Ayesha Asloob Qureshi and Giancarlo Rinaldo},
+  title         = {Switching rook polynomial of collections of cells},
+  year          = {2025},
+  eprint        = {2511.22346},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.AC},
+  note          = {Gives an algorithm for the switching rook polynomial of a collection of cells and verifies it equals the h-polynomial for polyominoes up to rank 12.}
+}
+
+@misc{navarra2025advances,
+  author        = {Francesco Navarra and Ayesha Asloob Qureshi},
+  title         = {Recent Advances in the Theory of Polyomino Ideals},
+  year          = {2025},
+  eprint        = {2511.22778},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.AC},
+  note          = {Survey of recent advances on polyomino ideals: primality, Hilbert-Poincare series, Gorensteinness, and rook theory.}
+}
+
+@misc{avilajimenez2025slidable,
+  author        = {Alberto Avila-Jimenez and David Barreda and Sarah-Laurie Evans and Austin Luchsinger and Aiden Massie and Robert Schweller and Evan Tomai and Tim Wylie},
+  title         = {General Computation using Slidable Tiles with Deterministic Global Forces},
+  year          = {2025},
+  eprint        = {2512.06574},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CG},
+  note          = {Simulates space-bounded Turing machines with slidable polyominoes under deterministic clockwise full-tilt global forces.}
+}
+
+@misc{cronin2025assembly,
+  author        = {Leroy Cronin and Juan Carlos Morales Parra and Keith Y. Patarroyo},
+  title         = {Assembly Addition Chains},
+  year          = {2025},
+  eprint        = {2512.18030},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Generalizes addition chains to assembly multi-magmas over a set with building blocks, with Schoenhage-type length bounds.}
+}
+
+% --- 2026 (gap-fill) --- (27 entries; no non-arXiv journal finds)
+@misc{baldassarri2026metastable,
+  author        = {Simone Baldassarri and Vanessa Jacquier and Alessandro Zocca},
+  title         = {Metastable opinion dynamics with hidden preferences: an Ising model with neutral agents},
+  year          = {2026},
+  eprint        = {2601.05714},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.PR},
+  note          = {Analyzes metastability of an Ising-type opinion model with hidden preferences and neutral agents on grid networks.}
+}
+
+@misc{baralic2026deep,
+  author        = {Djordje Baralic and Shiven Uppal},
+  title         = {Polyominoes with maximal number of deep holes},
+  year          = {2026},
+  eprint        = {2601.06840},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Determines the maximum number of pairwise disjoint deep holes an n-omino can enclose, showing h_n = n/3 + o(n).}
+}
+
+@misc{baril2026black,
+  author        = {Jean-Luc Baril and Sela Fried and Nathanaël Hassler and José Luis Ramírez},
+  title         = {Black Cell Capacity in Catalan polyominoes},
+  year          = {2026},
+  eprint        = {2601.17410},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Studies the distribution of black cells in a chessboard colouring of Catalan (bargraph) polyominoes, with generating functions.}
+}
+
+@misc{nguyen2026superconcentration,
+  author        = {Van Quyet Nguyen},
+  title         = {Superconcentration and chaos in Bernoulli percolation},
+  year          = {2026},
+  eprint        = {2602.01036},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.PR},
+  note          = {Establishes an equivalence between sublinear variance of the chemical distance in supercritical Bernoulli percolation and chaos of geodesics.}
+}
+
+@misc{he2026crystallization,
+  author        = {Qidong He},
+  title         = {Unified criteria for crystallization in hard-core lattice systems with applications to polyomino fluids and multi-component mixtures},
+  year          = {2026},
+  eprint        = {2602.05294},
+  archivePrefix = {arXiv},
+  primaryClass  = {math-ph},
+  note          = {Gives unified criteria for high-fugacity crystallization in hard-core lattice systems, applying to polyomino fluids and chiral mixtures.}
+}
+
+@misc{oka2026covering,
+  author        = {Keigo Oka and Naoki Inaba and Akira Iino},
+  title         = {Covering a Polyomino-Shaped Stain with Non-Overlapping Identical Stickers},
+  year          = {2026},
+  eprint        = {2602.19525},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DS},
+  note          = {Classifies the polyomino "stain" shapes that can always be covered by non-overlapping congruent polyomino stickers.}
+}
+
+@misc{fekete2026tilt,
+  author        = {Sándor P. Fekete and Jonas Friemel and Peter Kramer and Jan-Marc Reinhardt and Christian Rieck and Christian Scheffer},
+  title         = {Tilt Automata: Gathering Particles With Uniform External Control},
+  year          = {2026},
+  eprint        = {2603.02796},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CG},
+  note          = {Studies gathering particles on a polyomino board under uniform external tilt forces.}
+}
+
+@misc{mithardness2026orientation,
+  author        = {MIT Hardness Group and Zachary Abel and Erik D. Demaine and Jenny Diomidova and Jeffery Li and Zixiang Zhou},
+  title         = {Planar Graph Orientation Frameworks, Applied to KPlumber and Polyomino Tiling},
+  year          = {2026},
+  eprint        = {2603.03488},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CC},
+  note          = {Analyzes complexity of planar graph orientation problems with local vertex constraints, applied to KPlumber and polyomino tiling.}
+}
+
+@misc{montesymorales2026extremal,
+  author        = {Manuel Montes-y-Morales and Sayle Sigarreta and Hugo Cruz-Suarez},
+  title         = {Extremal degree-based indices of general polyomino chains via dynamic programming},
+  year          = {2026},
+  eprint        = {2603.05684},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Dynamic-programming framework for extremal general polyomino chains, resolving a 2015 problem on the generalized Randic index with alpha = -1.}
+}
+
+@misc{nikolaev2026ilp,
+  author        = {Andrei V. Nikolaev and Yuri A. Myasnikov},
+  title         = {An Integer Linear Programming Model for the Evolomino Puzzle},
+  year          = {2026},
+  eprint        = {2603.09483},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.OC},
+  note          = {Formulates the Evolomino puzzle as an integer linear program encoding block evolution and connectivity, with a puzzle-generation algorithm.}
+}
+
+@misc{mithardness2026tetris,
+  author        = {MIT Hardness Group and Josh Brunner and Erik D. Demaine and Della Hendrickson and Jeffery Li},
+  title         = {Tetris is Hard with Just One Piece Type},
+  year          = {2026},
+  eprint        = {2603.09958},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CC},
+  note          = {Proves NP-hardness of Tetris clearing and survival restricted to a single tetromino piece type (except O).}
+}
+
+@misc{eldridge2026holey,
+  author        = {Summer Eldridge and Adithya Prabha and Aiden Roger and Cooper Roger and Érika Roldán and Rosemberg Toalá-Enríquez},
+  title         = {Holey Hyperbolic Polyforms},
+  year          = {2026},
+  eprint        = {2603.18638},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Bounds the minimum number of tiles a hyperbolic \{p,q\} polyform needs to realize exactly h holes.}
+}
+
+@misc{baril2026stanley,
+  author        = {Jean-Luc Baril and Aubrey Blecher and José Luis Ramírez},
+  title         = {Enumerations and Bijections for Stanley Polyominoes},
+  year          = {2026},
+  eprint        = {2604.12392},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Derives generating functions and bijections for Stanley polyominoes, a subclass of parallelogram polyominoes. [arXiv metadata lists the third author as "José Luis ramírez"; capitalization normalized here]}
+}
+
+@misc{valentini2026polyformer,
+  author        = {Alessio Valentini and David Pekker and Chungwen Liang and Todd Martinez and Swagatam Mukhopadhyay},
+  title         = {Polyformer: a generative framework for thermodynamic modeling of polymeric molecules},
+  year          = {2026},
+  eprint        = {2604.14241},
+  archivePrefix = {arXiv},
+  primaryClass  = {q-bio.BM},
+  note          = {Generative framework for thermodynamic modeling of polymeric molecules. [term collision: "polyform" in the model name]}
+}
+
+@misc{ahlberg2026polynomials,
+  author        = {John Ahlberg and Per Alexandersson},
+  title         = {Polynomials from tilings of rectangles},
+  year          = {2026},
+  eprint        = {2605.03473},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Studies tilings of rectangles by unit squares and one Ferrers-shaped tile, proving real-rootedness and interlacing for the tiling polynomials, including L-shaped polyominoes.}
+}
+
+@misc{liu2026spectral,
+  author        = {Xizhi Liu and Junchi Luo},
+  title         = {The spectral radius of $k$-chromatic $r$-graphs},
+  year          = {2026},
+  eprint        = {2605.14755},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Bounds the p-spectral radius of k-chromatic r-graphs. [term collision: "polyform" means the hypergraph polynomial form]}
+}
+
+@misc{galli2026superform,
+  author        = {Michele Galli and Christian Kennedy and Parth Raina and Gabriele Tartaglino-Mazzucchelli},
+  title         = {Superform Approach to Equivariant Localization in Supergravity},
+  year          = {2026},
+  eprint        = {2605.17919},
+  archivePrefix = {arXiv},
+  primaryClass  = {hep-th},
+  note          = {Superspace mechanism producing equivariantly closed polyforms for localization in supergravity. [term collision: "polyform" in the differential-form sense]}
+}
+
+@misc{kittivorawong2026tetris,
+  author        = {Chanwut Kittivorawong and Alena Chao and Charlie Si and Alvin Cheung},
+  title         = {Tetris: Tile-level Sampling for Efficient and High-Fidelity Video Object Tracking},
+  year          = {2026},
+  eprint        = {2605.25538},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CV},
+  note          = {Tile-level sampling for video object tracking. [term collision: no polyomino content]}
+}
+
+@misc{roy2026wordrepresentable,
+  author        = {Suchanda Roy and Ramesh Hariharasubramanian},
+  title         = {Characterization of Word-Representable Near-Triangulations},
+  year          = {2026},
+  eprint        = {2605.25733},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Characterizes word-representable near-triangulations, a class including polyomino triangulations.}
+}
+
+@misc{brlek2026gascom,
+  author        = {Srečko Brlek and Luca Ferrari},
+  title         = {Proceedings of the 14th edition of the conference on Random Generation of Combinatorial Structures},
+  year          = {2026},
+  eprint        = {2606.09910},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DM},
+  note          = {Proceedings of GASCom 2026 on random and exhaustive generation of combinatorial structures.}
+}
+
+@misc{baril2026fibonacci,
+  author        = {Jean-Luc Baril and José Luis Ramírez and Samuel Ramírez and Diego Villamizar},
+  title         = {Fibonacci and Catalan Numbers Meet in Staircase Polyominoes},
+  year          = {2026},
+  eprint        = {2606.13152},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DM},
+  note          = {Refines Turbans Fibonacci enumeration of staircase (column-convex) polyominoes with multivariate generating functions for perimeter and area.}
+}
+
+@misc{blondinmasse2026snake,
+  author        = {Alexandre Blondin Massé and Alain Goupil},
+  title         = {Snake Polyominoes of Maximal Area in a Rectangle},
+  year          = {2026},
+  eprint        = {2606.13155},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DM},
+  note          = {Gives an algorithm generating all snake polyominoes in an h x w rectangle and exact maximal-area formulas for h <= 5.}
+}
+
+@misc{castelli2026zconvex,
+  author        = {Luca Castelli and Paolo Massazza},
+  title         = {On the Counting Sequence of Z-convex Polyominoes},
+  year          = {2026},
+  eprint        = {2606.13158},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DM},
+  note          = {Presents formulas and a C++ program computing the longest known counting sequence by area of Z-convex (degree-of-convexity 2) polyominoes.}
+}
+
+@misc{conway2026kconvexgascom,
+  author        = {Andrew R. Conway and Anthony J. Guttmann},
+  title         = {k-Convex Polyominoes by Semi-perimeter},
+  year          = {2026},
+  eprint        = {2606.13845},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DM},
+  note          = {GASCom version: conjectured generating function for k-convex polyominoes by semi-perimeter, obtained from generated enumeration data.}
+}
+
+@misc{conway2026kconvex,
+  author        = {Andrew R. Conway and Anthony J. Guttmann},
+  title         = {$k$-Convex Polyominoes by Semi-perimeter},
+  year          = {2026},
+  eprint        = {2607.12448},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.CO},
+  note          = {Conjectured generating function for k-convex polyominoes by semi-perimeter, from analysis of generated enumeration data. [same work as 2606.13845]}
+}
+
+@misc{langloisremillard2026fences,
+  author        = {Alexis Langlois-Rémillard and Mia N. Müßig and Érika Roldán},
+  title         = {Extremal fences with polyforms},
+  year          = {2026},
+  eprint        = {2607.22379},
+  archivePrefix = {arXiv},
+  primaryClass  = {math.HO},
+  note          = {Isoperimetric "fence" problem for polyforms in the three regular plane tessellations, including Shimauchis pentomino proof and an ILP formulation.}
+}
+
+@misc{langloisremillard2026indqueens,
+  author        = {Alexis Langlois-Rémillard and Mia Müßig},
+  title         = {Maximum independent queen set on polyominoes is NP-complete},
+  year          = {2026},
+  eprint        = {2607.24668},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CC},
+  note          = {Proves maximum independent queen set on polyominoes is NP-complete and #P-complete, confirming a conjecture of Langlois-Remillard, Muessig and Roldan.}
+}
+
+% No polyplet-, polyking-, or king-connectivity-specific paper from 2024-2026
+% appeared on arXiv or in the supplementary web searches beyond what is above;
+% the only web lead was an unpublished GitHub note on OEIS A397092 (corner-pinch
+% polyplets), which is not a journal paper and is therefore not entered here.
+% No non-arXiv journal finds for 2025 or 2026.

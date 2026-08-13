@@ -1,0 +1,121 @@
+host=gympie date=2026-08-13T11:56:57Z
+lake=/Users/jasonp/.elan/bin/lake toolchain=leanprover/lean4:v4.31.0
+=== GATE D: SHARED DEFS byte-identity ===
+gateD_shared_def_lines=38
+GATE D: PASS
+=== GATE A (GREEN): /Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_encode.lean ===
+--- elaborator output (must be empty) ---
+--- wall / peak RSS (MEASURED, this run) ---
+        3.32 real         1.80 user         1.73 sys
+          5517393920  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              473610  page reclaims
+                 166  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                  38  voluntary context switches
+                5403  involuntary context switches
+            24938338  instructions retired
+             8872666  cycles elapsed
+             1278264  peak memory footprint
+gateA_exit=0
+gateA_output_lines=0 gateA_error_lines=0 gateA_pin_errors=0
+GATE A: PASS
+=== GATE B (RED 1: rowCls over-merges) ===
+mutation: ((reachSet P (c, y)).filter -> ((P).filter
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_mutant.lean:145:35: warning: Variable name `y` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_mutant.lean:193:47: error: Application type mismatch: The argument
+  hqR
+has type
+  (c, y') ∈ P
+but is expected to have type
+  (c, y') ∈ (stepExpand P)^[P.card] {(c, y)}
+in the application
+  iterate_stepExpand_subset hy P.card hqR
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_mutant.lean:194:33: error: Application type mismatch: The argument
+  hqR
+has type
+  (c, y') ∈ P
+but is expected to have type
+  (c, y') ∈ (stepExpand P)^[P.card] {(c, y)}
+in the application
+  reachSet_sound hy P.card (c, y') hqR
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_mutant.lean:196:21: error: Application type mismatch: The argument
+  reachSet_complete hy hr
+has type
+  (c, y') ∈ reachSet P (c, y)
+but is expected to have type
+  (c, y') ∈ P
+in the application
+  And.intro (reachSet_complete hy hr)
+'Polyplets.R4Encode.encode_faithful_colAt' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_mutant.lean:386:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+- info: 'Polyplets.R4Encode.encode_faithful_colAt' depends on axioms: [propext, Classical.choice, Quot.sound]
++ info: 'Polyplets.R4Encode.encode_faithful_colAt' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+gateB_exit=1
+GATE B: PASS (mutant rejected, exit=1)
+=== GATE C (RED 2: lbl loses its occupancy guard) ===
+mutation: ' else ⊤' -> ' else (rowCls P c y).min' in lbl
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_mutant.lean:233:21: error: unsolved goals
+P : Finset (ℤ × ℤ)
+c y : ℤ
+hy : (c, y) ∉ P
+⊢ (rowCls P c y).min = ⊤
+'Polyplets.R4Encode.encode_faithful_colAt' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_mutant.lean:386:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+- info: 'Polyplets.R4Encode.encode_faithful_colAt' depends on axioms: [propext, Classical.choice, Quot.sound]
++ info: 'Polyplets.R4Encode.encode_faithful_colAt' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+gateC_exit=1
+GATE C: PASS (mutant rejected, exit=1)
+=== GATE E (SKELETON): /Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_state.lean ===
+--- elaborator output (expected: exactly 3 sorry warnings) ---
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_state.lean:209:8: warning: declaration uses `sorry`
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_state.lean:223:8: warning: declaration uses `sorry`
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_state.lean:242:8: warning: declaration uses `sorry`
+--- wall / peak RSS (MEASURED, this run) ---
+        3.25 real         1.70 user         1.67 sys
+          5508055040  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              472884  page reclaims
+                 170  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                  39  voluntary context switches
+                3817  involuntary context switches
+            26297386  instructions retired
+            10649582  cycles elapsed
+             1278264  peak memory footprint
+gateE_exit=0 gateE_output_lines=3 gateE_errors=0 gateE_sorries=3
+GATE E: PASS (3 named holes, nothing else)
+=== GATE F (RED 3: rowFin's Fin bound cannot be discharged) ===
+mutation: 'if h : 0 ≤ y ∧ y < (H : ℤ)' -> '... y ≤ (H : ℤ)'
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_mutant.lean:169:52: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  a ≥ 0
+  a ≤ 0
+where
+ a := ↑H
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_mutant.lean:209:8: warning: declaration uses `sorry`
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_mutant.lean:223:8: warning: declaration uses `sorry`
+/Users/jasonp/src/polyominoes/experiments/tristruct/r4_lean2_mutant.lean:242:8: warning: declaration uses `sorry`
+gateF_exit=1 gateF_errors=1
+GATE F: PASS (mutant rejected, exit=1, errors=1)
+ALL GATES PASS

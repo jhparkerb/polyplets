@@ -1,0 +1,45 @@
+== Step 1: hypothesis test, mask enumeration vs measured, H=4..14 ==
+  H=4: max over r = 45 (argmax r=0)  MATCH
+  H=5: max over r = 111 (argmax r=0)  MATCH
+  H=6: max over r = 279 (argmax r=0)  MATCH
+  H=7: max over r = 718 (argmax r=0)  MATCH
+  H=8: max over r = 1884 (argmax r=0)  MATCH
+  H=9: max over r = 5041 (argmax r=0)  MATCH
+  H=10: max over r = 13733 (argmax r=0)  MATCH
+  H=11: max over r = 38065 (argmax r=0)  MATCH
+  H=12: max over r = 107241 (argmax r=0)  MATCH
+  H=13: max over r = 306858 (argmax r=0)  MATCH
+  H=14: max over r = 891074 (argmax r=0)  MATCH
+== Step 2: path-DP vs mask enumeration, H=4..14, every r ==
+  path-DP == enumeration at every (H, r), H=4..14: OK
+== Step 3: exact censuses H=15..21 (path-DP, now trusted) ==
+  H=15: windows = 2624197  ratio vs H-1 = 2.9450
+  H=16: windows = 7832667  ratio vs H-1 = 2.9848
+  H=17: windows = 23681423  ratio vs H-1 = 3.0234
+  H=18: windows = 72487711  ratio vs H-1 = 3.0610
+  H=19: windows = 224529648  ratio vs H-1 = 3.0975
+  H=20: windows = 703470478  ratio vs H-1 = 3.1331
+  H=21: windows = 2228466695  ratio vs H-1 = 3.1678
+  (H=13->14 measured ratio was 2.9038; the closed form is exact arithmetic, no fit)
+== Step 4: exact column-cut censuses (for completeness) ==
+  H=15: cut states = 1132106
+  H=16: cut states = 3365626
+  H=17: cut states = 10137558
+  H=18: cut states = 30920942
+  H=19: cut states = 95457177
+  H=20: cut states = 298128277
+  H=21: cut states = 941574416
+  (reachability = all (fill, partition) pairs verified only at H<=9, r3_adv_state_iso.py Part 4; cut counts are not the RAM driver)
+== Step 5: RAM and wall, exact windows, stated payload model ==
+  model per window (L6/branch): key+hash ~22 B; payload = 41 area slots x bytes(m) x 2 buffers
+  8-bit prime: 104 B/window; 63-bit prime: 678 B/window
+  wall/height ~ windows x 41 slots x 0.94 us x (41-H) columns (branch-measured throughput at H=14)
+  H | windows | RAM 8-bit | RAM 63-bit | wall (1 thread)
+  15 | 2624197 | 0.3 GiB | 1.7 GiB | 0.7 h
+  16 | 7832667 | 0.8 GiB | 4.9 GiB | 2.1 h
+  17 | 23681423 | 2.3 GiB | 15.0 GiB | 6.1 h
+  18 | 72487711 | 7.0 GiB | 45.8 GiB | 17.8 h
+  19 | 224529648 | 21.7 GiB | 141.8 GiB | 52.9 h
+  20 | 703470478 | 68.1 GiB | 444.2 GiB | 158.2 h
+  21 | 2228466695 | 215.8 GiB | 1407.1 GiB | 477.1 h
+total 1.6s
