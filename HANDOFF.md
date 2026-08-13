@@ -1,4 +1,38 @@
-# HANDOFF — live state (updated 2026-07-30)
+# HANDOFF — live state (updated 2026-08-13)
+
+## 2026-08-13 — triangle salvage merged; reading pass; king twigs opened
+
+- **Triangle-structure agent campaign closed as a FAILURE** (four rounds;
+  `docs/triangle-postmortem.md`). Salvage merged to master (`bb897b1`);
+  the index of what survived, with verification labels and remaining work
+  per item, is `results/triangle-salvage.md`. Per-agent round records stay
+  on the `triangle-structure` branch. New banked numbers from the salvage:
+  **T(40,20) ≡ 1 and T(40,21) ≡ 1 (mod 2)** — spin/involution route, twin
+  runs byte-identical across ayr/dalby, oracle-checked vs the B1 recount
+  (caveat pre-registered: not independent of B1).
+- **Decade bibliography built**: `papers/polyplets-2024-2026.bib`,
+  2016–2026 year-by-year arXiv sweep, search provenance in comments;
+  15 PDFs fetched and indexed, 5 unobtainable filed in MISSING.md.
+  Across all eleven years: zero papers use "polyplet"/"polyking"; the
+  published enumeration frontier is still n=18 (Tremblay–Vernay 2024).
+- **Reading-pass verdicts** (four readers over the 11 PDFs, load-bearing
+  claims cross-checked): the percolation→growth route (Georgakopoulos–
+  Panagiotis) is a **closed door** — capped at λ ≥ 5.256 by the true king
+  p_c, permanently under our 6.543; the two-term inequality's form appears
+  nowhere in the Bui corpus (last novelty check standing: Jensen-style
+  transfer-matrix literature); authoritative king threshold is
+  0.40725395… = 1 − p_c(square site), Jacobsen 2015 via Sykes–Essam.
+- **King twigs thread OPEN** (`docs/king-twigs-plan.md`): the KR/BS twig
+  ladder is untried on king adjacency and level-1 arithmetic suggests it
+  could undercut the standing λ ≤ 20000/2147 ≈ 9.3154. Next action = the
+  Phase-2 afternoon in the plan. Do not cite KR's 4.6496 (unreproduced).
+- **Measured side-result**: the king lattice is an in-scope 2D
+  counterexample to the necessity of Barequet–Ben-Shachar's constant-isomer
+  conditions — Premise 2 fails at every inflation-chain root, conclusion
+  holds 9/9 (`cpp/kingperim.cpp`, `cpp/kinginflate.cpp`, wired into make);
+  the |M_n| census 1,2,6,1,8,2,22,6,1,30,… has no OEIS match.
+- Full `make` gate battery GREEN on this state (gate-citations fixed:
+  three planned-file citations marked per the gate's remedy).
 
 ## PROJECT CLOSES AT a(40) — FINAL TERM LANDED
 **a(40) = 56749893611764175164545926946127 BANKED 2026-07-28**
