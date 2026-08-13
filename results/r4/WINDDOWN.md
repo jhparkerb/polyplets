@@ -22,10 +22,21 @@ not, and the write-ahead rule is what caught it:
 | r4-adv-ind, r4-adv-cost | adversaries (2) | yes |
 | r4-tallband | scout — H=22..40 provenance | yes |
 | r4-floors | adversary — the three floors | yes |
-| **r4-lean2** | builder — the Lean encoding layer | **NO deliverable.** Progress file ends on an unmatched `ABOUT TO`; it authored `experiments/tristruct/r4_lean2_encode.lean` and stopped |
+| r4-lean2 | builder — the Lean encoding layer | yes, `results/r4/r4-lean2.md` (28 KB) + `experiments/tristruct/r4_lean2_encode.lean` + rows R4-LEAN2-1..4 |
 
-**r4-lean2's unfiled work is the round's most valuable single artifact and was
-recovered by compiling what it left.** See below.
+**CORRECTION, entered 07:05.** An earlier version of this file recorded
+r4-lean2 as having died without filing. That was wrong: it was still working
+when I checked at 06:52 — its progress file showed an unmatched `ABOUT TO`
+because the step was in flight, which is the write-ahead rule working exactly
+as designed — and it filed at 06:59. **All thirteen agents filed.** The lead
+read a live progress marker as a death certificate; the correct action on an
+unmatched `ABOUT TO` is to check whether the agent is still running before
+concluding anything.
+
+What does stand, because I verified it independently: `encode_faithful` and
+`encode_faithful_colAt` in that source elaborate with zero output and axioms
+`[propext, Classical.choice, Quot.sound]`, no `sorryAx`. The proof is real; the
+story about how it was recovered was not.
 
 ## Jobs — left running deliberately
 
