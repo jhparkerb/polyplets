@@ -293,3 +293,17 @@ Other:
   refs-transfer-matrix.md                  reading notes on the transfer-matrix literature.
 
 MISSING.md — wanted papers we could not obtain (for library lookup).
+
+Found by the year-by-year arXiv sweep 2026-08-13 (see polyplets-2024-2026.bib,
+Part V, for provenance; downloaded as the "fetch relevant papers" pass):
+  bui_2023_polyiamonds_supermultiplicative.pdf   Bui, The number of polyiamonds is supermultiplicative, EJC (2023); arXiv:2304.10077. T(l+m) >= T(l)T(m) -- nearest published relative of our two-term column inequality.
+  bui_2022_asymptotic_lower_bound.pdf            Bui, An asymptotic lower bound on the number of polyominoes, arXiv:2211.14909.
+  bui_2025_klarner_simple_recurrence.pdf         Bui, Bounding Klarner's constant from above using a simple recurrence, Arch. Math. 124 (2025); arXiv:2412.20143.
+  bui_2025_convolutional_upper_bound.pdf         Bui, A convolutional approach to bounding the number of polyominoes, arXiv:2511.00461. lambda <= 4.5238; method advertised as general -- candidate to run on the king lattice.
+  bui_2025_polyiamond_upper_bound.pdf            Bui, A short proof of an upper bound on the growth constant of polyiamonds, arXiv:2510.06806.
+  barequet_shalah_2019_improved_upper_bounds.pdf Barequet & Shalah, Improved upper bounds on the growth constants of polyominoes and polycubes, arXiv:1906.11447 (= Algorithmica 84 (2022) 3559-3586). lambda <= 4.5252.
+  georgakopoulos_panagiotis_2019_growth_rates_interfaces.pdf  Georgakopoulos & Panagiotis, On the exponential growth rates of lattice animals and interfaces, arXiv:1908.03426. Percolation-threshold <-> growth-rate conversions; possible route to king-lattice lambda bounds from known thresholds.
+  georgakopoulos_panagiotis_2021_growth_rates_ii.pdf          Same authors, part II: new asymptotic bounds, arXiv:2107.06272.
+  barequet_benshachar_2022_minimal_perimeter_constant_isomer.pdf  Barequet & Ben-Shachar, Minimal-perimeter lattice animals and the constant-isomer conjecture, arXiv:2205.07025. Lattice-generic; perimeter-campaign adjacent.
+  xun_hao_ziff_2021_extended_neighborhoods.pdf   Xun, Hao & Ziff, Site percolation on square and simple cubic lattices with extended neighborhoods and their continuum limit, PRE 103, 022126 (2021); arXiv:2010.02895. The square (1,2)-neighborhood is king connectivity.
+  dobbelaere_etal_2026_building_with_blocks.pdf  Dobbelaere, Kagey, Thomas & Vindas-Melendez, Building with blocks: enumerating polyforms on tilings, arXiv:2602.23301 (Bridges 2026). General polyform-on-tilings machinery.

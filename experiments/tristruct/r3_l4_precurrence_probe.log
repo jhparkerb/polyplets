@@ -1,0 +1,5 @@
+hmirror: NO P-recurrence in the box r<=6, d<=4 with >=5 surplus equations, over 34 banked terms
+r180: NO P-recurrence in the box r<=6, d<=4 with >=5 surplus equations, over 34 banked terms
+# RED control (run separately, same probe function): factorial and Catalan
+# both caught at order 1 degree 1 (and all supersets). Prober fails red as
+# required; the hmirror/r180 negatives above are trustworthy.

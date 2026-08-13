@@ -1,0 +1,24 @@
+hmirror H=3: 5 reachable states, 15 edges, 3 seeds, BFS 0.0s
+hmirror H=3: exact dp vs banked symtm, n=1..32: 0 mismatches
+hmirror H=3: N=512 -> BM orders p1:5 p2:5 (0s)
+hmirror H=3: MINIMAL ORDER 5 (two primes agree, N=512 >= 2r+64; 5 states)
+hmirror H=4: 5 reachable states, 15 edges, 3 seeds, BFS 0.0s
+hmirror H=4: exact dp vs banked symtm, n=1..32: 0 mismatches
+hmirror H=4: N=512 -> BM orders p1:6 p2:6 (0s)
+hmirror H=4: MINIMAL ORDER 6 (two primes agree, N=512 >= 2r+64; 5 states)
+hmirror H=5: 16 reachable states, 104 edges, 7 seeds, BFS 0.0s
+hmirror H=5: exact dp vs banked symtm, n=1..32: 0 mismatches
+hmirror H=5: N=512 -> BM orders p1:18 p2:18 (0s)
+hmirror H=5: MINIMAL ORDER 18 (two primes agree, N=512 >= 2r+64; 16 states)
+hmirror H=6: 16 reachable states, 104 edges, 7 seeds, BFS 0.0s
+hmirror H=6: exact dp vs banked symtm, n=1..32: 0 mismatches
+hmirror H=6: N=512 -> BM orders p1:14 p2:14 (0s)
+hmirror H=6: MINIMAL ORDER 14 (two primes agree, N=512 >= 2r+64; 16 states)
+hmirror H=7: 46 reachable states, 606 edges, 15 seeds, BFS 0.0s
+hmirror H=7: exact dp vs banked symtm, n=1..32: 0 mismatches
+hmirror H=7: N=512 -> BM orders p1:47 p2:47 (0s)
+hmirror H=7: MINIMAL ORDER 47 (two primes agree, N=512 >= 2r+64; 46 states)
+hmirror H=8: 46 reachable states, 606 edges, 15 seeds, BFS 0.0s
+hmirror H=8: exact dp vs banked symtm, n=1..32: 0 mismatches
+hmirror H=8: N=512 -> BM orders p1:30 p2:30 (0s)
+hmirror H=8: MINIMAL ORDER 30 (two primes agree, N=512 >= 2r+64; 46 states)

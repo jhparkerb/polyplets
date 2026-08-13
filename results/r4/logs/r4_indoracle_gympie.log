@@ -1,0 +1,17 @@
+=== JOB-IND-1 local re-run, gympie 2026-08-13T10:44:58Z ===
+--- GREEN n<=8
+stencil=king nmax=8 rowdir=results/cutcount_b1/rows perturb=None
+brute animals total (n<=8): 176138
+
+OK 36 cells agree: literal flood-fill definition vs B1 rows
+green_exit=0
+--- RED perturb 6,3
+brute animals total (n<=7): 28198
+
+FAIL 1 mismatch(es) over 28 compared cells
+perturb_exit=2
+--- RED rook
+brute animals total (n<=7): 1067
+
+FAIL 21 mismatch(es) over 28 compared cells
+rook_exit=2

@@ -1,0 +1,71 @@
+== 1. valid whole-column states: brute vs recurrence ==
+  m= 1  brute=       3  rec=       3  OK
+  m= 2  brute=       7  rec=       7  OK
+  m= 3  brute=      17  rec=      17  OK
+  m= 4  brute=      41  rec=      41  OK
+  m= 5  brute=      99  rec=      99  OK
+  m= 6  brute=     239  rec=     239  OK
+  m= 7  brute=     577  rec=     577  OK
+  m= 8  brute=    1393  rec=    1393  OK
+  m= 9  brute=    3363  rec=    3363  OK
+  m=10  brute=    8119  rec=    8119  OK
+  m=11  brute=   19601  rec=   19601  OK
+  m=12  brute=   47321  rec=   47321  OK
+  exact by recurrence:
+  t_19 = 22,619,537
+  t_20 = 54,608,393
+  t_21 = 131,836,323
+  t_22 = 318,281,039
+  t_23 = 768,398,401
+== 2. reachability (from empty column) ==
+  m=1  reachable=3  valid=3  OK
+  m=2  reachable=7  valid=7  OK
+  m=3  reachable=17  valid=17  OK
+  m=4  reachable=41  valid=41  OK
+  m=5  reachable=99  valid=99  OK
+  m=6  reachable=239  valid=239  OK
+  m=7  reachable=577  valid=577  OK
+== 3. cell-at-a-time window census W(m) vs t_(m+1) ==
+  m=2  W=     15  t_3=     17  W/t = 0.8824
+  m=3  W=     37  t_4=     41  W/t = 0.9024
+  m=4  W=     89  t_5=     99  W/t = 0.8990
+  m=5  W=    215  t_6=    239  W/t = 0.8996
+  m=6  W=    519  t_7=    577  W/t = 0.8995
+  m=7  W=   1253  t_8=   1393  W/t = 0.8995
+  m=8  W=   3025  t_9=   3363  W/t = 0.8995
+  m=9  W=   7303  t_10=   8119  W/t = 0.8995
+== 4. whole-column compatible pairs P_m ==
+  m= 2  P=31
+  m= 3  P=145  x4.677
+  m= 4  P=673  x4.641
+  m= 5  P=3,127  x4.646
+  m= 6  P=14,527  x4.646
+  m= 7  P=67,489  x4.646
+  m= 8  P=313,537  x4.646
+  m= 9  P=1,456,615  x4.646
+  m=10  P=6,767,071  x4.646
+  m=11  P=31,438,129  x4.646
+  m=19  P=6,821,884,412,881
+  m=20  P=31,692,778,455,073
+  m=21  P=147,236,767,058,935
+== 5. window census follows the same Pell recurrence ==
+  m=2  enumerated=15  recurrence=15  OK
+  m=3  enumerated=37  recurrence=37  OK
+  m=4  enumerated=89  recurrence=89  OK
+  m=5  enumerated=215  recurrence=215  OK
+  m=6  enumerated=519  recurrence=519  OK
+  m=7  enumerated=1253  recurrence=1253  OK
+  m=8  enumerated=3025  recurrence=3025  OK
+  m=9  enumerated=7303  recurrence=7303  OK
+  W(18) = 20,346,159   (unconditional bound t_19 = 22,619,537)
+  W(19) = 49,119,973   (unconditional bound t_20 = 54,608,393)
+  W(20) = 118,586,105   (unconditional bound t_21 = 131,836,323)
+  W(21) = 286,292,183   (unconditional bound t_22 = 318,281,039)
+== 6. cost model (slot-ops), untransposed design ==
+  run m=18: window   20,346,159  slot-ops = 1.847e+12
+  run m=19: window   49,119,973  slot-ops = 4.707e+12
+  run m=20: window  118,586,105  slot-ops = 1.196e+13
+  run m=21: window  286,292,183  slot-ops = 3.032e+13
+  TOTAL slot-ops = 4.883e+13
+  wall at measured 40 ns/slot-op (dalby B1 anchor): 22.6 thread-days
+  RAM peak (m=21): 10.1 GiB at 38 B/state (x1.5 margin: 15.2 GiB)

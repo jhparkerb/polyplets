@@ -1,0 +1,13 @@
+== P2 parity theorem analogue: T(n,H) even for n odd, H even ==
+  square enum (all H, n<=14): 21 cells in region, 0 odd-valued (all even)
+  tri    enum (all H, n<=16): 16 cells in region, 0 odd-valued (all even)
+  square TM   (H=2,4, n<=140): 137 cells in region, 0 odd-valued (all even)
+  tri    TM   (H=2,4, n<=140): 136 cells in region, 0 odd-valued (all even)
+
+== P3 atom-ladder analogue: ord C_H additivity ==
+  square: ord C_H for H=1..5: [1, 3, 10, 26, None]
+    H=3: ord T = 14 vs d_3+d_2+d_1 = 10+3+1 = 14  -> MATCHES
+    H=4: ord T = 39 vs d_4+d_3+d_2 = 26+10+3 = 39  -> MATCHES
+  tri: ord C_H for H=1..5: [1, 7, 17, None, None]
+    H=3: ord T = 23 vs d_3+d_2+d_1 = 17+7+1 = 25  -> FAILS
+    H=4: undetermined (some order > 45)

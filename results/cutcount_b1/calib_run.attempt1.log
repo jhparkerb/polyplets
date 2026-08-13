@@ -1,0 +1,42 @@
+=== run_cutcount_b1_calib 2026-08-11T13:18:12Z host=dalby
+=== source sha256: ea05cdb3ee829a0c  tree: 3b7359de
+event=start job=cutcount_b1 t=2026-08-11T09:18:12-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:18:12-04:00 start=2026-08-11T09:18:12-04:00 wall_s=0.0 cpu_s=0.0 peak_rss_mb=2.6 mode=height H=1 wall_s=0.000298
+C_1 done in 0.0 s -> results/cutcount_b1/rows/C1.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:18:12-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:18:12-04:00 start=2026-08-11T09:18:12-04:00 wall_s=0.0 cpu_s=0.0 peak_rss_mb=2.6 mode=height H=2 wall_s=0.001324
+C_2 done in 0.0 s -> results/cutcount_b1/rows/C2.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:18:13-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:18:13-04:00 start=2026-08-11T09:18:13-04:00 wall_s=0.0 cpu_s=0.0 peak_rss_mb=2.6 mode=height H=3 wall_s=0.005133
+C_3 done in 0.0 s -> results/cutcount_b1/rows/C3.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:18:13-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:18:13-04:00 start=2026-08-11T09:18:13-04:00 wall_s=0.0 cpu_s=0.0 peak_rss_mb=2.6 mode=height H=4 wall_s=0.015005
+C_4 done in 0.0 s -> results/cutcount_b1/rows/C4.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:18:13-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:18:13-04:00 start=2026-08-11T09:18:13-04:00 wall_s=0.0 cpu_s=0.0 peak_rss_mb=3.2 mode=height H=5 wall_s=0.041357
+C_5 done in 0.0 s -> results/cutcount_b1/rows/C5.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:18:13-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:18:13-04:00 start=2026-08-11T09:18:13-04:00 wall_s=0.1 cpu_s=0.1 peak_rss_mb=3.8 mode=height H=6 wall_s=0.112057
+C_6 done in 0.1 s -> results/cutcount_b1/rows/C6.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:18:13-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:18:13-04:00 start=2026-08-11T09:18:13-04:00 wall_s=0.3 cpu_s=0.3 peak_rss_mb=6.3 mode=height H=7 wall_s=0.328100
+C_7 done in 0.3 s -> results/cutcount_b1/rows/C7.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:18:13-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:18:14-04:00 start=2026-08-11T09:18:13-04:00 wall_s=1.0 cpu_s=1.0 peak_rss_mb=12.7 mode=height H=8 wall_s=0.989497
+C_8 done in 1.0 s -> results/cutcount_b1/rows/C8.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:18:14-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:18:17-04:00 start=2026-08-11T09:18:14-04:00 wall_s=3.2 cpu_s=3.2 peak_rss_mb=29.3 mode=height H=9 wall_s=3.149164
+C_9 done in 3.1 s -> results/cutcount_b1/rows/C9.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:18:17-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:18:28-04:00 start=2026-08-11T09:18:17-04:00 wall_s=11.0 cpu_s=11.0 peak_rss_mb=75.0 mode=height H=10 wall_s=10.973917
+C_10 done in 11.0 s -> results/cutcount_b1/rows/C10.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:18:28-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=done job=cutcount_b1 t=2026-08-11T09:19:05-04:00 start=2026-08-11T09:18:28-04:00 wall_s=36.8 cpu_s=36.8 peak_rss_mb=203.7 mode=height H=11 wall_s=36.765178
+C_11 done in 36.8 s -> results/cutcount_b1/rows/C11.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:19:05-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:19:51-04:00 elapsed_s=46.4 rate=0.3665/s count=17 H=12 states=107241
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:20:39-04:00 elapsed_s=93.9 rate=0.3515/s count=33 H=12 states=107241
+event=done job=cutcount_b1 t=2026-08-11T09:21:03-04:00 start=2026-08-11T09:19:05-04:00 wall_s=117.6 cpu_s=117.5 peak_rss_mb=567.4 mode=height H=12 wall_s=117.531610
+C_12 done in 117.5 s -> results/cutcount_b1/rows/C12.out.tmp
+event=start job=cutcount_b1 t=2026-08-11T09:21:03-04:00 git=3b7359de-dirty built=2026-08-11T13:17:47Z host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-11T09:21:56-04:00 elapsed_s=53.4 rate=0.1311/s count=7 H=13 states=306858

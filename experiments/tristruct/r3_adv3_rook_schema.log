@@ -1,0 +1,12 @@
+H= 1: n<=9 swept, peak states=1, 0.00 s
+H= 2: n<=9 swept, peak states=5, 0.00 s
+H= 3: n<=9 swept, peak states=15, 0.00 s
+H= 4: n<=9 swept, peak states=39, 0.01 s
+H= 5: n<=9 swept, peak states=97, 0.04 s
+H= 6: n<=9 swept, peak states=236, 0.16 s
+H= 7: n<=9 swept, peak states=514, 0.69 s
+H= 8: n<=9 swept, peak states=1011, 2.74 s
+H= 9: n<=9 swept, peak states=1928, 10.86 s
+H=2 deep run to n=33 vs OEIS column: 0.00 s
+H=3 deep run to n=33 vs OEIS column: 0.01 s
+ALL EXTERNAL CHECKS PASS: 117 comparisons (box table n<=9, H=2 to n=33, H=3 to n=33, row sums) (14.5 s total)

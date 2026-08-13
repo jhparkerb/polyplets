@@ -1,0 +1,381 @@
+=== LG-JOB-1R start 2026-08-13T02:03:31Z
+binary sha256: 4e3817b693d122eee7adf4c903b0f469ddbdd6c9349127e4a45a4b59480f8711  /home/jasonp/src/pm-b1/build/cutcount_b1
+oracle: /home/jasonp/src/polyominoes/results/cutcount_b1/rows
+--- H=12 p=2147483647 start 2026-08-13T02:03:31Z
+event=start job=cutcount_b1 t=2026-08-12T22:03:31-04:00 git=48ac1089-dirty built=2026-08-12T22:01:56-0400 host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:04:16-04:00 elapsed_s=45.2 rate=0.775/s count=35 modp H=12 states=107241
+event=done job=cutcount_b1 t=2026-08-12T22:04:24-04:00 start=2026-08-12T22:03:31-04:00 wall_s=53.2 cpu_s=53.2 peak_rss_mb=114.9 mode=modp H=12
+C_12 mod 2147483647, n<=40 -> /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C12.p2147483647.out
+	Command being timed: "/home/jasonp/src/pm-b1/build/cutcount_b1 --modp 12 40 2147483647 /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C12.p2147483647.out"
+	User time (seconds): 53.04
+	System time (seconds): 0.12
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:53.22
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 117624
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 64304
+	Voluntary context switches: 24
+	Involuntary context switches: 1018
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 16
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+--- H=12 p=2147483647 rc=0 end 2026-08-13T02:04:24Z
+--- H=13 p=2147483647 start 2026-08-13T02:04:24Z
+event=start job=cutcount_b1 t=2026-08-12T22:04:24-04:00 git=48ac1089-dirty built=2026-08-12T22:01:56-0400 host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:05:11-04:00 elapsed_s=47.3 rate=0.2327/s count=11 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:05:59-04:00 elapsed_s=94.6 rate=0.222/s count=21 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:06:45-04:00 elapsed_s=141.5 rate=0.2192/s count=31 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:07:32-04:00 elapsed_s=188.0 rate=0.218/s count=41 modp H=13 states=306858
+event=done job=cutcount_b1 t=2026-08-12T22:07:32-04:00 start=2026-08-12T22:04:24-04:00 wall_s=188.2 cpu_s=188.0 peak_rss_mb=350.2 mode=modp H=13
+C_13 mod 2147483647, n<=40 -> /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C13.p2147483647.out
+	Command being timed: "/home/jasonp/src/pm-b1/build/cutcount_b1 --modp 13 40 2147483647 /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C13.p2147483647.out"
+	User time (seconds): 187.72
+	System time (seconds): 0.24
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 3:08.17
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 358556
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 134802
+	Voluntary context switches: 88
+	Involuntary context switches: 2700
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 40
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+--- H=13 p=2147483647 rc=0 end 2026-08-13T02:07:32Z
+--- H=14 p=2147483647 start 2026-08-13T02:07:32Z
+event=start job=cutcount_b1 t=2026-08-12T22:07:32-04:00 git=48ac1089-dirty built=2026-08-12T22:01:56-0400 host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:08:32-04:00 elapsed_s=60.1 rate=0.08321/s count=5 modp H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:09:19-04:00 elapsed_s=106.6 rate=0.07504/s count=8 modp H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:10:05-04:00 elapsed_s=152.8 rate=0.072/s count=11 modp H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:10:51-04:00 elapsed_s=199.1 rate=0.07032/s count=14 modp H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:11:37-04:00 elapsed_s=245.1 rate=0.06937/s count=17 modp H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:12:23-04:00 elapsed_s=291.2 rate=0.06868/s count=20 modp H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:13:23-04:00 elapsed_s=350.9 rate=0.0684/s count=24 modp H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:14:22-04:00 elapsed_s=409.9 rate=0.06831/s count=28 modp H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:15:20-04:00 elapsed_s=468.3 rate=0.06834/s count=32 modp H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:16:18-04:00 elapsed_s=526.3 rate=0.06841/s count=36 modp H=14 states=891074
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:17:16-04:00 elapsed_s=584.1 rate=0.06848/s count=40 modp H=14 states=891074
+event=done job=cutcount_b1 t=2026-08-12T22:17:32-04:00 start=2026-08-12T22:07:32-04:00 wall_s=599.5 cpu_s=599.0 peak_rss_mb=956.6 mode=modp H=14
+C_14 mod 2147483647, n<=40 -> /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C14.p2147483647.out
+	Command being timed: "/home/jasonp/src/pm-b1/build/cutcount_b1 --modp 14 40 2147483647 /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C14.p2147483647.out"
+	User time (seconds): 598.51
+	System time (seconds): 0.46
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 9:59.53
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 979596
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 299782
+	Voluntary context switches: 188
+	Involuntary context switches: 7738
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 104
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+--- H=14 p=2147483647 rc=0 end 2026-08-13T02:17:32Z
+--- H=15 p=2147483647 start 2026-08-13T02:17:32Z
+event=start job=cutcount_b1 t=2026-08-12T22:17:32-04:00 git=48ac1089-dirty built=2026-08-12T22:01:56-0400 host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:18:20-04:00 elapsed_s=48.0 rate=0.04167/s count=2 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:19:10-04:00 elapsed_s=98.4 rate=0.03048/s count=3 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:20:00-04:00 elapsed_s=148.8 rate=0.02689/s count=4 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:20:52-04:00 elapsed_s=200.6 rate=0.02493/s count=5 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:21:44-04:00 elapsed_s=251.8 rate=0.02382/s count=6 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:22:36-04:00 elapsed_s=304.0 rate=0.02303/s count=7 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:23:28-04:00 elapsed_s=356.5 rate=0.02244/s count=8 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:24:19-04:00 elapsed_s=407.0 rate=0.02211/s count=9 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:25:10-04:00 elapsed_s=458.6 rate=0.02181/s count=10 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:26:01-04:00 elapsed_s=509.1 rate=0.02161/s count=11 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:26:52-04:00 elapsed_s=560.4 rate=0.02141/s count=12 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:27:42-04:00 elapsed_s=610.3 rate=0.0213/s count=13 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:28:33-04:00 elapsed_s=661.1 rate=0.02118/s count=14 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:29:24-04:00 elapsed_s=712.3 rate=0.02106/s count=15 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:30:15-04:00 elapsed_s=763.6 rate=0.02095/s count=16 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:31:07-04:00 elapsed_s=815.1 rate=0.02086/s count=17 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:31:59-04:00 elapsed_s=867.3 rate=0.02076/s count=18 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:32:52-04:00 elapsed_s=920.5 rate=0.02064/s count=19 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:33:42-04:00 elapsed_s=970.7 rate=0.0206/s count=20 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:34:34-04:00 elapsed_s=1022.2 rate=0.02054/s count=21 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:35:26-04:00 elapsed_s=1073.9 rate=0.02049/s count=22 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:36:19-04:00 elapsed_s=1127.2 rate=0.0204/s count=23 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:37:12-04:00 elapsed_s=1180.5 rate=0.02033/s count=24 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:38:02-04:00 elapsed_s=1230.8 rate=0.02031/s count=25 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:38:54-04:00 elapsed_s=1281.8 rate=0.02028/s count=26 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:39:44-04:00 elapsed_s=1331.9 rate=0.02027/s count=27 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:40:36-04:00 elapsed_s=1383.8 rate=0.02023/s count=28 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:41:27-04:00 elapsed_s=1435.7 rate=0.0202/s count=29 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:42:20-04:00 elapsed_s=1488.1 rate=0.02016/s count=30 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:43:12-04:00 elapsed_s=1540.2 rate=0.02013/s count=31 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:44:04-04:00 elapsed_s=1591.9 rate=0.0201/s count=32 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:44:55-04:00 elapsed_s=1643.8 rate=0.02008/s count=33 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:45:47-04:00 elapsed_s=1695.7 rate=0.02005/s count=34 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:46:39-04:00 elapsed_s=1747.4 rate=0.02003/s count=35 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:47:33-04:00 elapsed_s=1801.3 rate=0.01999/s count=36 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:48:25-04:00 elapsed_s=1853.1 rate=0.01997/s count=37 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:49:17-04:00 elapsed_s=1905.6 rate=0.01994/s count=38 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:50:09-04:00 elapsed_s=1957.0 rate=0.01993/s count=39 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:51:01-04:00 elapsed_s=2008.8 rate=0.01991/s count=40 modp H=15 states=2624197
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:51:55-04:00 elapsed_s=2063.7 rate=0.01987/s count=41 modp H=15 states=2624197
+event=done job=cutcount_b1 t=2026-08-12T22:51:57-04:00 start=2026-08-12T22:17:32-04:00 wall_s=2065.1 cpu_s=2063.5 peak_rss_mb=2363.6 mode=modp H=15
+C_15 mod 2147483647, n<=40 -> /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C15.p2147483647.out
+	Command being timed: "/home/jasonp/src/pm-b1/build/cutcount_b1 --modp 15 40 2147483647 /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C15.p2147483647.out"
+	User time (seconds): 2058.42
+	System time (seconds): 5.06
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 34:25.08
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 2420292
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 2903998
+	Voluntary context switches: 419
+	Involuntary context switches: 25906
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 336
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+--- H=15 p=2147483647 rc=0 end 2026-08-13T02:51:57Z
+--- H=16 p=2147483647 start 2026-08-13T02:51:57Z
+event=start job=cutcount_b1 t=2026-08-12T22:51:57-04:00 git=48ac1089-dirty built=2026-08-12T22:01:56-0400 host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:54:35-04:00 elapsed_s=158.5 rate=0.01262/s count=2 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T22:57:25-04:00 elapsed_s=328.4 rate=0.009136/s count=3 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:00:20-04:00 elapsed_s=503.3 rate=0.007948/s count=4 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:03:17-04:00 elapsed_s=679.9 rate=0.007354/s count=5 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:06:06-04:00 elapsed_s=849.6 rate=0.007062/s count=6 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:08:56-04:00 elapsed_s=1019.6 rate=0.006866/s count=7 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:11:54-04:00 elapsed_s=1196.7 rate=0.006685/s count=8 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:14:49-04:00 elapsed_s=1371.8 rate=0.006561/s count=9 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:17:47-04:00 elapsed_s=1550.1 rate=0.006451/s count=10 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:20:41-04:00 elapsed_s=1724.5 rate=0.006379/s count=11 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:23:36-04:00 elapsed_s=1899.4 rate=0.006318/s count=12 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:26:32-04:00 elapsed_s=2074.9 rate=0.006265/s count=13 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:29:37-04:00 elapsed_s=2260.2 rate=0.006194/s count=14 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:32:28-04:00 elapsed_s=2431.4 rate=0.006169/s count=15 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:35:24-04:00 elapsed_s=2606.8 rate=0.006138/s count=16 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:38:15-04:00 elapsed_s=2777.9 rate=0.00612/s count=17 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:41:09-04:00 elapsed_s=2952.1 rate=0.006097/s count=18 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:44:02-04:00 elapsed_s=3125.7 rate=0.006079/s count=19 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:46:54-04:00 elapsed_s=3297.7 rate=0.006065/s count=20 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:49:51-04:00 elapsed_s=3474.0 rate=0.006045/s count=21 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:52:45-04:00 elapsed_s=3648.3 rate=0.00603/s count=22 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:55:35-04:00 elapsed_s=3817.8 rate=0.006024/s count=23 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-12T23:58:28-04:00 elapsed_s=3990.8 rate=0.006014/s count=24 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:01:27-04:00 elapsed_s=4170.0 rate=0.005995/s count=25 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:04:17-04:00 elapsed_s=4339.9 rate=0.005991/s count=26 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:07:04-04:00 elapsed_s=4507.0 rate=0.005991/s count=27 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:09:49-04:00 elapsed_s=4672.7 rate=0.005992/s count=28 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:12:35-04:00 elapsed_s=4838.4 rate=0.005994/s count=29 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:15:20-04:00 elapsed_s=5003.4 rate=0.005996/s count=30 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:18:08-04:00 elapsed_s=5171.1 rate=0.005995/s count=31 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:20:53-04:00 elapsed_s=5336.0 rate=0.005997/s count=32 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:23:39-04:00 elapsed_s=5502.3 rate=0.005997/s count=33 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:26:32-04:00 elapsed_s=5675.4 rate=0.005991/s count=34 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:29:23-04:00 elapsed_s=5846.5 rate=0.005986/s count=35 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:32:17-04:00 elapsed_s=6020.4 rate=0.00598/s count=36 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:35:08-04:00 elapsed_s=6191.5 rate=0.005976/s count=37 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:37:56-04:00 elapsed_s=6359.0 rate=0.005976/s count=38 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:40:43-04:00 elapsed_s=6525.7 rate=0.005976/s count=39 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:43:30-04:00 elapsed_s=6693.4 rate=0.005976/s count=40 modp H=16 states=7832667
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:46:17-04:00 elapsed_s=6860.0 rate=0.005977/s count=41 modp H=16 states=7832667
+event=done job=cutcount_b1 t=2026-08-13T00:46:21-04:00 start=2026-08-12T22:51:57-04:00 wall_s=6864.1 cpu_s=6859.2 peak_rss_mb=7040.8 mode=modp H=16
+C_16 mod 2147483647, n<=40 -> /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C16.p2147483647.out
+	Command being timed: "/home/jasonp/src/pm-b1/build/cutcount_b1 --modp 16 40 2147483647 /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C16.p2147483647.out"
+	User time (seconds): 6847.07
+	System time (seconds): 12.12
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:54:24
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 7209816
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 6898181
+	Voluntary context switches: 1015
+	Involuntary context switches: 84211
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 336
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+--- H=16 p=2147483647 rc=0 end 2026-08-13T04:46:21Z
+--- H=13 p=2147483629 start 2026-08-13T04:46:21Z
+event=start job=cutcount_b1 t=2026-08-13T00:46:21-04:00 git=48ac1089-dirty built=2026-08-12T22:01:56-0400 host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:47:07-04:00 elapsed_s=45.9 rate=0.2395/s count=11 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:47:53-04:00 elapsed_s=91.8 rate=0.2288/s count=21 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:48:38-04:00 elapsed_s=137.2 rate=0.2259/s count=31 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:49:24-04:00 elapsed_s=182.7 rate=0.2245/s count=41 modp H=13 states=306858
+event=done job=cutcount_b1 t=2026-08-13T00:49:24-04:00 start=2026-08-13T00:46:21-04:00 wall_s=182.8 cpu_s=182.6 peak_rss_mb=353.9 mode=modp H=13
+C_13 mod 2147483629, n<=40 -> /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C13.p2147483629.out
+	Command being timed: "/home/jasonp/src/pm-b1/build/cutcount_b1 --modp 13 40 2147483629 /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C13.p2147483629.out"
+	User time (seconds): 182.44
+	System time (seconds): 0.16
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 3:02.79
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 362432
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 136669
+	Voluntary context switches: 75
+	Involuntary context switches: 2744
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 40
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+--- H=13 p=2147483629 rc=0 end 2026-08-13T04:49:24Z
+--- H=13 p=2147483587 start 2026-08-13T04:49:24Z
+event=start job=cutcount_b1 t=2026-08-13T00:49:24-04:00 git=48ac1089-dirty built=2026-08-12T22:01:56-0400 host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:50:10-04:00 elapsed_s=46.1 rate=0.2385/s count=11 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:50:56-04:00 elapsed_s=92.3 rate=0.2275/s count=21 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:51:42-04:00 elapsed_s=138.7 rate=0.2234/s count=31 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:52:29-04:00 elapsed_s=185.5 rate=0.221/s count=41 modp H=13 states=306858
+event=done job=cutcount_b1 t=2026-08-13T00:52:29-04:00 start=2026-08-13T00:49:24-04:00 wall_s=185.6 cpu_s=185.5 peak_rss_mb=350.6 mode=modp H=13
+C_13 mod 2147483587, n<=40 -> /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C13.p2147483587.out
+	Command being timed: "/home/jasonp/src/pm-b1/build/cutcount_b1 --modp 13 40 2147483587 /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C13.p2147483587.out"
+	User time (seconds): 185.27
+	System time (seconds): 0.19
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 3:05.64
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 359032
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 137880
+	Voluntary context switches: 47
+	Involuntary context switches: 2663
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 40
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+--- H=13 p=2147483587 rc=0 end 2026-08-13T04:52:29Z
+--- H=13 p=2147483579 start 2026-08-13T04:52:29Z
+event=start job=cutcount_b1 t=2026-08-13T00:52:29-04:00 git=48ac1089-dirty built=2026-08-12T22:01:56-0400 host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:53:16-04:00 elapsed_s=46.5 rate=0.2368/s count=11 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:54:02-04:00 elapsed_s=92.8 rate=0.2263/s count=21 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:54:48-04:00 elapsed_s=138.5 rate=0.2238/s count=31 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:55:33-04:00 elapsed_s=184.0 rate=0.2228/s count=41 modp H=13 states=306858
+event=done job=cutcount_b1 t=2026-08-13T00:55:33-04:00 start=2026-08-13T00:52:29-04:00 wall_s=184.1 cpu_s=183.9 peak_rss_mb=350.0 mode=modp H=13
+C_13 mod 2147483579, n<=40 -> /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C13.p2147483579.out
+	Command being timed: "/home/jasonp/src/pm-b1/build/cutcount_b1 --modp 13 40 2147483579 /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C13.p2147483579.out"
+	User time (seconds): 183.69
+	System time (seconds): 0.23
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 3:04.14
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 358404
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 138339
+	Voluntary context switches: 82
+	Involuntary context switches: 2781
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 40
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+--- H=13 p=2147483579 rc=0 end 2026-08-13T04:55:34Z
+--- H=13 p=2147483563 start 2026-08-13T04:55:34Z
+event=start job=cutcount_b1 t=2026-08-13T00:55:34-04:00 git=48ac1089-dirty built=2026-08-12T22:01:56-0400 host=dalby
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:56:20-04:00 elapsed_s=46.4 rate=0.2371/s count=11 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:57:06-04:00 elapsed_s=92.4 rate=0.2273/s count=21 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:57:51-04:00 elapsed_s=137.9 rate=0.2247/s count=31 modp H=13 states=306858
+event=heartbeat job=cutcount_b1 t=2026-08-13T00:58:37-04:00 elapsed_s=183.4 rate=0.2235/s count=41 modp H=13 states=306858
+event=done job=cutcount_b1 t=2026-08-13T00:58:37-04:00 start=2026-08-13T00:55:34-04:00 wall_s=183.5 cpu_s=183.4 peak_rss_mb=350.4 mode=modp H=13
+C_13 mod 2147483563, n<=40 -> /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C13.p2147483563.out
+	Command being timed: "/home/jasonp/src/pm-b1/build/cutcount_b1 --modp 13 40 2147483563 /home/jasonp/src/pm-b1/results/cutcount_b1/modp/C13.p2147483563.out"
+	User time (seconds): 183.14
+	System time (seconds): 0.20
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 3:03.54
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 358836
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 136945
+	Voluntary context switches: 75
+	Involuntary context switches: 2865
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 48
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+--- H=13 p=2147483563 rc=0 end 2026-08-13T04:58:37Z
+=== rowcheck 2026-08-13T04:58:37Z
+H=12 p=2147483647: 40 values, 0 mismatch
+H=13 p=2147483563: 40 values, 0 mismatch
+H=13 p=2147483579: 40 values, 0 mismatch
+H=13 p=2147483587: 40 values, 0 mismatch
+H=13 p=2147483629: 40 values, 0 mismatch
+H=13 p=2147483647: 40 values, 0 mismatch
+H=14 p=2147483647: 40 values, 0 mismatch
+H=15 p=2147483647: 40 values, 0 mismatch
+H=16 p=2147483647: 40 values, 0 mismatch
+
+OK 360 residues match the exact oracle, heights [12, 13, 14, 15, 16], max H=16
+rowcheck rc=0
+=== LG-JOB-1R done 2026-08-13T04:58:37Z
