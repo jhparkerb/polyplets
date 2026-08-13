@@ -88,7 +88,7 @@ From the pass-2 review over the durable non-Lean code (tests, `scripts/*.sh`,
   not behavior-preserving; leave unless the gate's fail contract is revisited.
 - **`cpp/severance_w1.cpp` + `cpp/severance_w3_families.cpp`** share ~80 lines
   (`die`/`add_checked`/`to_dec`/FNV-1a `KeyHash`/union-find/combination
-  iterator) → a `cpp/severance_common.h`. Real refactor: scale-validated
+  iterator) → a planned `cpp/severance_common.h` (never created). Real refactor: scale-validated
   engines that differ load-bearingly (`int16_t c[20]` vs `int8_t c[8]`; w3 also
   has `mul_checked`).
 - **FNV-1a byte hash written 4×** (`severance_w1`/`w3` `KeyHash`, `symtm`
@@ -96,7 +96,7 @@ From the pass-2 review over the durable non-Lean code (tests, `scripts/*.sh`,
   `fnv1a(const u8*, n)`. Hot-path hashers of validated engines — don't
   auto-apply.
 - **`scripts/dalby_perimeter_defect_{k6,pool}.sh`** — byte-identical `MERGEPY`
-  shard-merge heredoc → `experiments/merge_defect.py`. Deliberately separate
+  shard-merge heredoc → a planned `experiments/merge_defect.py` (never created). Deliberately separate
   job records (one-shard-per-core vs worker-pool).
 - **Probe scripts** (`gympie_j7_probe`, `gympie_square4_hullprobe`,
   `dalby_square4_deep`) open-code what `scripts/perimeter_min_only.sh` already

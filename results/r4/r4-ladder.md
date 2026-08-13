@@ -551,7 +551,8 @@ to buy **if and only if a residue disagrees**.
 Each stage produces one checkable artifact and gates the next.
 
 **Stage 0 — the predictions, before any compute.** Write
-`experiments/tristruct/r4_ladder_predict.py`: read `results/triangle.txt` and
+`experiments/tristruct/r4_ladder_predict.py` (planned, does not exist yet):
+read `results/triangle.txt` and
 `results/cutcount_b1/rows/C15.out`, `C16.out`, emit `predicted C_17(n) mod p` for
 n=1..40 and each prime, into `results/r4/predicted/C17.p<P>.pred`. RED half: flip
 one digit of one banked `T` and confirm the comparator reports a mismatch.
