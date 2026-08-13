@@ -166,7 +166,9 @@ echo "--- wall / peak RSS (MEASURED, this run) ---" >> "$LOG"
 cat "$TM" >> "$LOG"
 E_LINES=$(grep -c '[^[:space:]]' "$OUT")
 E_ERR=$(grep -c 'error:' "$OUT")
-E_SORRY=$(grep -c "declaration uses 'sorry'" "$OUT")
+# Lean 4.31 quotes with backticks ("uses `sorry`"); older docs show ASCII
+# quotes. Match either, so the count can't silently read 0 on a quote style.
+E_SORRY=$(grep -c 'declaration uses .sorry.' "$OUT")
 echo "gateE_exit=$E_RC gateE_output_lines=$E_LINES gateE_errors=$E_ERR gateE_sorries=$E_SORRY" >> "$LOG"
 if [ "$E_RC" -ne 0 ]; then
   fail "GATE E: FAIL — the skeleton did not elaborate (exit=$E_RC)"

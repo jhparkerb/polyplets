@@ -323,3 +323,22 @@ Mitigative (this failure class), then preventative (the pattern):
     candidate lists with a withheld seed scored afterwards, two-bit-count
     pricing, adversaries by standing question, generativity with lead
     triage — all standing, none re-derived per round.
+
+## Addendum, 2026-08-13 (salvage pass)
+
+The unrun receipts were run after the fact, during salvage:
+
+- **The lean2 gate battery is now green** — all six gates including the
+  three RED mutants (`experiments/tristruct/r4_lean2_gate.log`, gympie,
+  toolchain v4.31.0). Its first-ever run failed on its own bug: gate E
+  counted sorry warnings with an ASCII-quote pattern where Lean 4.31 emits
+  backticks, reading a correct output as zero. One-line fix, rerun, green.
+  So the wind-down's "encoding layer PROVED" turned out true — and was
+  still unreceipted when claimed, over a gate that had never once run and
+  did not work as written.
+- **The spin m=1..21 runs** were found still in flight on dalby and ayr at
+  salvage time (m=20, ~93%); waiters attached, outcome recorded in
+  `results/triangle-salvage.md` §6.
+
+The salvage index itself — what merges to master and what stays as campaign
+history — is `results/triangle-salvage.md`.
