@@ -161,6 +161,19 @@ build/perimeter_defect: cpp/perimeter_defect.cpp cpp/obs.h | build
 
 # Minimum-perimeter (isoperimetric-end) enumerator. Complementation, not
 # growth: the min-side defect is not monotone under cell addition, so
+# Exhaustive minimal-site-perimeter census for king animals: eps(n), |M_n|,
+# and the (|B|, c=|P|-|B|) split, n<=25. Written 2026-08-13 for the
+# Barequet--Ben-Shachar constant-isomer premise check; the measured failure
+# of their Premise 2 (c=9 at inflation-chain roots, 8 elsewhere) and the
+# 9/9 |M_n|=|M_{n+eps}| match live in the reading-pass record.
+build/kingperim: cpp/kingperim.cpp | build
+	$(CXX) $(CXXFLAGS) -O3 $< -o $@
+
+# Companion: does inflation Q -> Q + 3x3 ball preserve perimeter-minimality
+# and injectivity on M_n (n<=16)? Cross-checks eps(n) against A235382.
+build/kinginflate: cpp/kinginflate.cpp | build
+	$(CXX) $(CXXFLAGS) -O3 $< -o $@
+
 # perimeter_defect's prune has no analogue here (cpp/perimeter_min.cpp).
 build/perimeter_min: cpp/perimeter_min.cpp cpp/obs.h | build
 	$(G2CXX) $(CXXFLAGS) $(G2_RESTRICT) -O3 $< -o $@
