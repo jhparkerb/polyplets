@@ -1,6 +1,61 @@
 # HANDOFF — live state (updated 2026-08-14)
 
-## 2026-08-14 — Clean Room: the second source for `D_j`, IN FLIGHT
+## 2026-08-14 — Clean Room: the second source for `D_j`, CLOSED (depths 2–4)
+
+Full record: `results/clean-room-depthj.md`. The re-derivation stands and
+`D_j` is no longer single-sourced at j = 2, 3, 4.
+
+**17 holdout cells agree exactly past the range the shipped gate covers** —
+j = 2 at k = 20..25, j = 3 at k = 20 and 22..25, j = 4 at k = 20..25.
+`D_3(21)` is excluded because I quoted the incumbent's value for it while
+diagnosing a mismatch. The two sides agree on all 69 shared cells, 18 of them
+at `k >= 20`; 17 is 18 less that one contaminated cell. Comparator is
+fail-closed both ways (any mismatch fails; a run
+comparing nothing at `k >= 20` fails as VACUOUS) with a RED selftest that
+fired on every invocation.
+
+**One real defect, found and conceded by the challenger, not by fiat.** The
+first comparison FAILED at j = 3 from k = 21. The incumbent proved cap-stable
+(K = 27 reproduces K = 25 exactly there); the challenger's "bridging" prune
+proved unsafe for the one-4 family, changing that series first at `l = 19`,
+i.e. k = 21 — exactly the onset. No-prune is the correct side. **The prune's
+stated per-row claim is NOT what the probe falsifies** — `prune_probe.py`
+finds max reductions 2, 4, 6 against caps 4, 6, 8, so the mechanism is still
+open. It does not matter downstream: the prune is disabled.
+
+**Depth 4 needed the incumbent's ceiling lifted.** `D_series(4,K)` is free
+once the excess-3 table is on disk (0.04 s); only `K19_e3` was cached, so the
+first j = 4 comparison came back VACUOUS. Built
+`results/severance_w3_families_K25_e3.txt` (44:17, 2.89 GB, 16 threads,
+contended ayr); it agrees with `K19_e3` on all 76 overlapping cells.
+
+**Provenance gap, open and deliberate.** Only one-4 was re-run under explicit
+flags (`--noprune` and `--noprune --spanx=16` both reproduce the reference
+md5, so the series is span-converged). one-5, 4+3 and 3+3+3 still rest on the
+deriver's `*_loose.json` caches with unrecorded flags; re-running was started
+and abandoned on cost (one-5 8391 s / 17 GB, 4+3 6792 s / 31.4 GB — six runs
+would have been ~15 h and risked ayr's RAM). Their correctness is carried by
+the k = 20..25 agreement, not by flag provenance.
+
+### `J = 5` / `K = 21`: priced, NOT launched
+
+Measured on quiet dalby, `families K 4 <T>`: at K=16, 47:09/4.49 GB (4
+threads), 40:33/4.73 GB (8), 38:09/5.13 GB (16); then K=17 60:33/7.35 GB and
+K=18 92:28/9.30 GB at 16 threads. Wall ratio 1.59 then 1.53 per K step →
+**K = 21 is ~5–6 h and ~14–19 GB**. Beg-and-agree before launch. Command:
+`build/severance_w3_families families 21 4 16` from `~/tmp/depth-swap2`.
+
+Two findings that change how to think about it: **excess, not K, is the
+expensive axis** (K=19/e=3 is 146 s; K=16/e=4 is 38 min), and **there is no
+thread win** — 4→16 threads buys 19% of wall, and peak RSS is flat in thread
+count (4.49→5.13 GB), so the footprint is the tables, not per-thread state.
+Tables byte-identical across all three thread counts. Note this contradicts the older "18 min / 2.2 GB on 8 cores"
+reference for K=16/e=4 recorded below; that figure was not reproduced on
+dalby and its machine is unrecorded. The clean room's per-family Python
+builder is *not* a cheaper alternative — its mixed excess-3 families already
+cost hours and tens of GB apiece.
+
+## superseded — Clean Room in flight (kept for the scrub list)
 
 The open item below ("`D_j` is still single-sourced") is being closed. jasonp's
 order of work: the re-derivation first, the `J = 5` table second; the report's
