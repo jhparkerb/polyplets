@@ -26,6 +26,24 @@ instrument `experiments/depth_swap_anchors.py`.
 - **Motley's banked H <= 16 rows already close n <= 34, not 31** — `--source
   motley` reads its own `C_1..C_16`, assembles `C_H - 2C_{H-1} + C_{H-2}`, and
   reproduces rows 17..34, 171 cells, 0 mismatches. Three terms at zero compute.
+- **The depth ladder is validated to J = 5.** Reach is `n <= 2 H_max + J - 1`;
+  each closed defect substitutes for one swept height. J = 4 checked at guard 14
+  (rows 15..31, 153 cells) and J = 5 at guard 13 (rows 14..30, 153 cells), both
+  0 mismatches. **J = 5 at H = 18 closes n <= 40, which would retire Ticker
+  Tape** and the check-split and flat arena that exist only for it. It needs one
+  table — excess-4 families at K = 21, a run of the existing C++ builder, **an
+  ayr job** (K = 16 took 18 min / 2.2 GB peak on 8 cores). J = 7 and J = 9 are
+  out: ~35x per depth.
+- **Docs rebudgeted**: `docs/motley-plan.md` and `motley-goal.md` (every rung
+  worth three more terms; Ticker Tape is the only rung whose terms nothing else
+  reaches), and `results/report-claims-after-anchor-cut.md` lists what the cut
+  falsifies in `paper/polyplets-report.tex` — **manuscript untouched**. The
+  headline there: line 528's "no independent holdout, nor ever will" is wrong,
+  and the `\tiertwominus{}` tier is defined around exactly that absence, so on
+  the report's own criterion a(39) and a(40) move to `\tiertwo{}`. The
+  `\tierone{}` boundary needs jasonp's ruling, not an edit.
+- **gympie is off limits for this project's compute** (2026-08-14, hard). All
+  runs go to ayr or dalby.
 - **Two things this does NOT do.** It does not remove the dependence on the
   sweep — anchors move down, they do not vanish; W1 remains the only ab-initio
   route and still stops at k = 9. And `D_j` is still single-sourced: per
