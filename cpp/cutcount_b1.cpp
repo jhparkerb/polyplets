@@ -51,34 +51,25 @@ using u64 = uint64_t;
 using u128 = unsigned __int128;
 using i128 = __int128;
 
-// ---------- 256-bit wrapping signed integer (4 little-endian u64 limbs) ----------
-struct I256 {
-  u64 v[4];
-};
-static inline void iadd(I256& a, const I256& b) {
-  u128 c = 0;
-  for (int i = 0; i < 4; i++) { c += (u128)a.v[i] + b.v[i]; a.v[i] = (u64)c; c >>= 64; }
+// ---------- payload: wrapping 128-bit ring (Half Measure) ----------
+// The DP is a ring homomorphism into Z/2^128, so every coefficient it carries
+// is the true value reduced mod 2^128.  C_16(40) = 2^106.8 and the per-height
+// ratio is falling (1.44, 1.36 at H = 15, 16), so C_19(40) projects to ~2^108
+// -- inside the half-open [0, 2^127) window that fits_pay() enforces on every
+// value before a row is written.  The A(1) self-check compares two values
+// computed in the SAME wrapping ring, so it stays exact at any width even
+// though its true value C(861,40) is ~2^229.
+using Pay = u128;
+static inline void iadd(Pay& a, const Pay& b) { a += b; }
+// a += x * m for small signed m (|m| < 2^31); two's complement makes the
+// sign-extended multiply the right answer mod 2^128.
+static inline void iaddmul(Pay& a, const Pay& x, int64_t m) {
+  a += x * (Pay)(i128)m;
 }
-// a += x * m for small signed m (|m| < 2^31)
-static inline void iaddmul(I256& a, const I256& x, int64_t m) {
-  if (m == 0) return;
-  u64 um = (u64)(m < 0 ? -m : m);
-  I256 p;
-  u128 c = 0;
-  for (int i = 0; i < 4; i++) { c += (u128)x.v[i] * um; p.v[i] = (u64)c; c >>= 64; }
-  if (m < 0) { // negate p (two's complement)
-    u128 cc = 1;
-    for (int i = 0; i < 4; i++) { cc += (u128)(~p.v[i]); p.v[i] = (u64)cc; cc >>= 64; }
-  }
-  iadd(a, p);
-}
-static inline bool iszero(const I256& a) { return !(a.v[0] | a.v[1] | a.v[2] | a.v[3]); }
-// value assuming it fits in signed 128 (top limbs are sign extension)
-static inline bool fits_i128(const I256& a) {
-  u64 se = (a.v[1] >> 63) ? ~0ull : 0ull;
-  return a.v[2] == se && a.v[3] == se;
-}
-static inline i128 to_i128(const I256& a) { return (i128)(((u128)a.v[1] << 64) | a.v[0]); }
+static inline bool iszero(const Pay& a) { return a == 0; }
+// exact as a nonnegative integer, and so convertible to signed 128
+static inline bool fits_pay(const Pay& a) { return (a >> 127) == 0; }
+static inline i128 to_i128(const Pay& a) { return (i128)a; }
 
 static std::string i128str(i128 v) {
   if (v == 0) return "0";
@@ -206,7 +197,7 @@ static void census(int Hmin, int Hmax, int ncols) {
 }
 
 // ---------- full engine ----------
-struct Payload { std::vector<I256> a; }; // 3*(Nmax+1): [3n]=c0, [3n+1]=c1, [3n+2]=A(1)
+struct Payload { std::vector<Pay> a; }; // 3*(Nmax+1): [3n]=c0, [3n+1]=c1, [3n+2]=A(1)
 
 // run one height H, return per-n [q^1] of C_H (i128) — plus check [q^0]==0
 static std::vector<i128> run_height(int H, int Nmax, double& wall) {
@@ -218,10 +209,10 @@ static std::vector<i128> run_height(int H, int Nmax, double& wall) {
   std::vector<Payload> pay, npay;
   idx[0] = 0;
   pay.push_back({});
-  pay[0].a.assign(ST * NA, I256{});
-  pay[0].a[0].v[0] = 1; // n=0: c0=1
-  pay[0].a[2].v[0] = 1; // n=0: A(1)=1
-  std::vector<I256> fprev(ST * NA, I256{}), fcur(ST * NA, I256{});
+  pay[0].a.assign(ST * NA, Pay{});
+  pay[0].a[0] = 1; // n=0: c0=1
+  pay[0].a[2] = 1; // n=0: A(1)=1
+  std::vector<Pay> fprev(ST * NA, Pay{}), fcur(ST * NA, Pay{});
   for (int c = 0; c < W; c++) {
     for (int r = 0; r < H; r++) {
       nidx.clear();
@@ -238,18 +229,18 @@ static std::vector<i128> run_height(int H, int Nmax, double& wall) {
             j = (uint32_t)npay.size();
             nidx.emplace(s[i].key, j);
             npay.push_back({});
-            npay[j].a.assign(ST * NA, I256{});
+            npay[j].a.assign(ST * NA, Pay{});
           } else j = it->second;
           Payload& Q = npay[j];
           int dn = s[i].dn;
           for (int n = 0; n + dn <= Nmax; n++) {
-            const I256& c0 = P.a[ST * n];
-            const I256& c1 = P.a[ST * n + 1];
-            const I256& ev = P.a[ST * n + 2];
+            const Pay& c0 = P.a[ST * n];
+            const Pay& c1 = P.a[ST * n + 1];
+            const Pay& ev = P.a[ST * n + 2];
             if (iszero(c0) && iszero(c1) && iszero(ev)) continue;
-            I256& d0 = Q.a[ST * (n + dn)];
-            I256& d1 = Q.a[ST * (n + dn) + 1];
-            I256& de = Q.a[ST * (n + dn) + 2];
+            Pay& d0 = Q.a[ST * (n + dn)];
+            Pay& d1 = Q.a[ST * (n + dn) + 1];
+            Pay& de = Q.a[ST * (n + dn) + 2];
             iaddmul(d0, c0, s[i].m0);
             iaddmul(d1, c1, s[i].m0);
             iaddmul(d1, c0, s[i].m1);
@@ -262,7 +253,7 @@ static std::vector<i128> run_height(int H, int Nmax, double& wall) {
     }
     // column boundary: f_c = column-sum of payloads
     fprev = fcur;
-    std::fill(fcur.begin(), fcur.end(), I256{});
+    std::fill(fcur.begin(), fcur.end(), Pay{});
     for (auto& P : pay)
       for (int t = 0; t < ST * NA; t++) iadd(fcur[t], P.a[t]);
     if (g_rep) g_rep->beat(c + 1, "H=" + std::to_string(H)
@@ -273,8 +264,8 @@ static std::vector<i128> run_height(int H, int Nmax, double& wall) {
   //   (b) A(1)-part of C_H(n) = C(H*W, n) - C(H*(W-1), n)  (all-subsets binomial;
   //       exercises every transition weight at q=1, no connectivity involved)
   auto binom_rows = [&](int m) {           // Pascal in the same wrapping ring
-    std::vector<I256> row(NA, I256{});
-    row[0].v[0] = 1;
+    std::vector<Pay> row(NA, Pay{});
+    row[0] = 1;
     for (int i = 1; i <= m; i++)
       for (int k = std::min(i, Nmax); k >= 1; k--) iadd(row[k], row[k - 1]);
     return row;
@@ -282,15 +273,15 @@ static std::vector<i128> run_height(int H, int Nmax, double& wall) {
   auto bW = binom_rows(H * W), bW1 = binom_rows(H * (W - 1));
   std::vector<i128> out(NA, 0);
   for (int n = 1; n < NA; n++) {
-    I256 c0 = fcur[ST * n], c1 = fcur[ST * n + 1], ce = fcur[ST * n + 2];
+    Pay c0 = fcur[ST * n], c1 = fcur[ST * n + 1], ce = fcur[ST * n + 2];
     iaddmul(c0, fprev[ST * n], -1);
     iaddmul(c1, fprev[ST * n + 1], -1);
     iaddmul(ce, fprev[ST * n + 2], -1);
     if (!iszero(c0)) { fprintf(stderr, "FATAL q0_nonzero H=%d n=%d\n", H, n); std::exit(2); }
-    if (!fits_i128(c1)) { fprintf(stderr, "FATAL q1_overflow_i128 H=%d n=%d\n", H, n); std::exit(2); }
-    I256 want = bW[n];
+    if (!fits_pay(c1)) { fprintf(stderr, "FATAL q1_overflow_pay H=%d n=%d\n", H, n); std::exit(2); }
+    Pay want = bW[n];
     iaddmul(want, bW1[n], -1);
-    if (std::memcmp(ce.v, want.v, sizeof ce.v)) {
+    if (ce != want) {
       fprintf(stderr, "FATAL q1eval_binomial H=%d n=%d\n", H, n); std::exit(2);
     }
     out[n] = to_i128(c1);
