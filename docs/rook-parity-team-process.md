@@ -358,7 +358,7 @@ dependency structure a wave design would break: question 1 (base anatomy)
 *sets the measured clause of the bar itself* (`rook-parity.md:51-56`), and
 the kill threshold for question 2 must be registered before question 2's fit
 is run. Structure: sequential-ish scouts plus one adversary, all Fable,
-charter = a single file (`docs/rook-parity-bar.md` or similar) containing
+charter = a single file (`docs/rook-parity-bar.md`, planned) containing
 the numeric bar, the g fit with basis labels, the Hankel verdict, and the
 registered kill thresholds for round 2. INSTRUMENTS.md, the roster ledger,
 and the receipt gate exist from this day — `rook-parity.md:138-141` already

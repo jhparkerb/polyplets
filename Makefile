@@ -29,7 +29,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 .PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
-        gate-compile-db gate-citations gate-l-paper-verifier \
+        gate-compile-db gate-citations gate-l-paper-verifier gate-receipts \
         gate-perimeter-min gate-perimeter-defect \
         gate-perimeter-min-shard clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
@@ -42,7 +42,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         papers papers-verify papers-clean papers-list
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-receipts gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -115,6 +115,26 @@ gate-compile-db: compile-commands
 # build deps, so it runs first.
 gate-citations:
 	python3 tests/gate_citations.py
+
+# Gate RECEIPTS: in the rook-parity campaign's deliverables and briefs, a status
+# token that says something executed (PROVED/VERIFIED/GREEN/RUN/CONFIRMED/
+# PASSED/MATCHED, in a table cell or on a `status:` line) must carry an in-tree,
+# non-empty path on the same line.
+#
+# Written because the round-4 status drift had a sign: every discrepancy
+# upgraded a written-but-unrun instrument to a completed one, none went the
+# other way (results/r4/INSTRUMENTS.md:4-8). The rule that ended it was
+# disciplinary; every disciplinary control in that campaign was waived at least
+# once, usually by the lead, so this is the mechanical form. In-tree is
+# load-bearing: the campaign's largest result sat only on dalby for two days.
+#
+# It proves a receipt EXISTS, not that the receipt says what the claim says --
+# that is the numbers adversary's job, and the gate exists so the adversary
+# spends its pass reading logs instead of hunting for their absence. Red-first:
+# --self-test runs before every scan and requires three planted claims (no
+# receipt, absent file, remote path) to be rejected. Sub-second, no build deps.
+gate-receipts:
+	./scripts/check_receipts.sh
 
 # Gate L-PAPER-VERIFIER: mutation-tests paper/verify_l_papers.py, which is the
 # only thing standing between the L manuscripts and a wrong printed number.
