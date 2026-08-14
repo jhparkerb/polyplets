@@ -32,7 +32,12 @@ lock at the top, so it removes two cells per rung from the top row's residue
 The residual band is Coin Lift's target (`docs/coin-lift-plan.md`); nothing in
 this plan attempts it.
 
-## Step 0 — the provenance re-run (before any new code)
+## Step 0 — the provenance re-run (before any new code) — DONE, GREEN
+
+Run 2026-08-14: 16 of 16 rows byte-identical, 640 of 640 triangle cells,
+binary stamped `48ac1089` clean with `gate-cutcount-b1` GREEN, 4.7 h of wall
+across three streams. **a(n) is now citable for n <= 31.**
+`results/motley-step0.md`.
 
 The banked H <= 16 rows came from source sha `59e90660`, a dirty working copy
 matching no committed rev, with a gate battery predating the fail-closed exit
@@ -48,6 +53,31 @@ This also establishes the reference engine as the **frozen specification**:
 434 lines, the 80-line connectivity core (`slot`, `canon`, `gather`,
 `shifted`, `successors`) unchanged by every rung below. Each rung must
 reproduce the reference byte for byte at every height both can reach.
+
+## What the in-engine self-checks do not check
+
+Measured 2026-08-14 by planting a defect and running the battery: a
+**bottom-anchored stencil defect** — `gather` skips the (r+1) diagonal when
+r = 0, so components merge wrongly only along the bottom row — passes
+`q0_zero` and `q1eval_binomial` **at every height**, and is caught only by the
+banked-row comparison (59 of 84 cells mismatch, first at T(2,2)).
+
+That is the expected behaviour on reflection and it should be said out loud:
+the q^0 check tests that the count has no constant term, and the A(1) check
+evaluates every transition weight at q = 1, where the colour bookkeeping
+collapses and connectivity is not consulted at all. **Neither is a
+connectivity check.** They catch arithmetic and wiring, not the rule.
+
+The consequence for this plan: at every height with a banked row, the byte
+comparison is the real gate and it is decisive. At H = 17 and above there is
+no banked C row, so the only rule-level check is the assembled T(n,H) against
+`results/triangle.txt` — which is why the H = 17 runner does that comparison
+itself and exits nonzero on any mismatch, and why Confetti's held-out prime
+matters more than its gate list makes it sound.
+
+(The battery is fail-closed on this defect but inelegant about it: the engine
+exits 2, and the gate script raises rather than printing a FAIL line. Nonzero
+either way.)
 
 ## Rung 1 — Half Measure
 

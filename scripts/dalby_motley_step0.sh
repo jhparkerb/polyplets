@@ -31,7 +31,12 @@ set -euo pipefail
 
 BIN="$HOME/src/pm-b1-step0/build/cutcount_b1"
 OUT="$HOME/var/motley-step0"
+# rows/ compares against the banked C rows; the T assembly compares against
+# the banked TRIANGLE, which is a different directory in a different format
+# (hN.out).  Pointing --assemble at the row directory makes it compare nothing,
+# which the engine correctly treats as a failure (exit 3).
 BANKED="$OUT/banked"
+TRIANGLE="$HOME/src/pm-b1-step0/results/ns_a40/perheight"
 NMAX=40
 HMAX=16
 
@@ -41,7 +46,11 @@ if [ "${1:-}" = "--assemble" ]; then
   for H in $(seq 1 $HMAX); do
     [ -s "$OUT/rows/C$H.out" ] || { echo "MISSING $OUT/rows/C$H.out" >&2; exit 1; }
   done
-  exec "$BIN" --assemble $HMAX $NMAX "$OUT/rows" "$BANKED" 2>&1 \
+  for H in $(seq 1 $HMAX); do
+    cmp "$OUT/rows/C$H.out" "$BANKED/C$H.out" || exit 2
+  done
+  echo "all $HMAX rows byte-identical to the banked C rows"
+  exec "$BIN" --assemble $HMAX $NMAX "$OUT/rows" "$TRIANGLE" 2>&1 \
        | tee "$OUT/logs/assemble.log"
 fi
 

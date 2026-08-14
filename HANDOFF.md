@@ -34,13 +34,17 @@ statement that did not survive contact.
   deterministic bit is the unique optimum of the class.
   Round 1 found rook has no char-2 crack; the collapse is specific to the
   characteristic *and* the stencil.
-- **Motley Step 0 is running on dalby** in three concurrent streams from a
-  clean worktree (`~/src/pm-b1-step0`, stamp `48ac1089`, no `-dirty`),
-  `gate-cutcount-b1` GREEN on that build. C14 already reproduces the banked row
-  byte for byte. 4.6 h wall instead of 6.7 core-hours serial.
+- **Motley Step 0 is DONE and GREEN** — `results/motley-step0.md`. 16 of 16
+  rows byte-identical to the banked rows, 640 of 640 cells against the banked
+  triangle, from a clean worktree (`~/src/pm-b1-step0`, stamp `48ac1089`, no
+  `-dirty`) with `gate-cutcount-b1` GREEN on that build and the binary's
+  sha256 recorded. 4.7 h of wall across three streams against 6.7 core-hours
+  serial; H = 16's wall landed 3.5% above the 2026-08-11 calibration despite
+  co-residency. **a(n) is citable for n <= 31**, by a rule that never decides
+  connectivity.
 - **Half Measure is written, gated and measured** (`b9d725b`): rows
   byte-identical to both the reference binary and the banked rows at H = 12,
-  13, 14; payload factor **0.514 measured** — the x1.9 the ladder budgets — and
+  13, 14, 15, with H = 16 running; payload factor **0.514 measured** — the x1.9 the ladder budgets — and
   a **x1.46-1.57 wall bonus** nobody had counted on. That moves H = 17 from
   100 GB / ~15 h to **91 GB / ~7-10 h**, and the +-20% census band's bad end
   (109 GB) now fits dalby with 13 GB to spare. The check-split does not need to
