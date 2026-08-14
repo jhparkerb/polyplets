@@ -51,6 +51,13 @@ W1 ceiling as built.
 
 ## What this changes in the certification map
 
+> **Reach superseded 2026-08-14 — `results/anchor-cut-map.md`.** The paragraph
+> below is right about what W1 does (P_k with no swept cell at all, k <= 9) and
+> that remains the only ab-initio route. Its *reach* arithmetic is not: the
+> "2 anchor cells per level for k = 10..18" no longer sit at the staircase's
+> onset, so rows 25–33 are not the ceiling. With the depth swap a sweep to
+> `H_max` closes `n <= 2 H_max + J - 1`.
+
 Middle-band rows are fully code-independent when every cell has H ≤ 14
 (strip engine) or k = n−H ≤ 9 (this result): rows n ≤ 24 once the
 below-onset depths j ≤ n−29 are closed — for n ≤ 24 no depth formulas are
