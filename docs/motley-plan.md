@@ -208,6 +208,21 @@ Measure's run is where it first gets measured).
 
 **Product.** a(n) closed for n <= 35.
 
+**Status (2026-08-14): instrumented, gated, unlaunched.** The gate battery
+exists (`tests/gate_confetti.py` on `half-measure`, commit `3002104`): brute
+fixed-polyplet oracle (A030232-anchored) x 5 primes x H = 2..6, the exact
+battery wholesale, and four planted REDs (NW-drop, rook, bottom-anchored,
+weight-corrupt) — all caught; GREEN on dalby in 28 s against the H = 17
+production binary `4df3fec9`. **The receipt enforcement now exists**: the
+gate writes `<binary>.confetti-receipt` only on full GREEN, and
+`scripts/dalby_confetti_h18.sh` refuses to start on a missing receipt, a
+non-GREEN verdict, or a sha256 that no longer matches the binary — all three
+refusal paths red-tested, plus synthetic-fixture tests of the assembly
+(held-out corruption and triangle corruption both exit 2 naming the cell).
+Measured re-pricing: --modp runs at ~0.47x the u128 wall (H = 12, 13 timed),
+so H = 18 projects to **~16 h/pass, ~82 h for five passes, ~83 GB peak**
+(RSS scaled from measured modp H = 13 at the measured x2.96/height).
+
 ## Rung 3 — Ticker Tape
 
 **Change.** The same driver at u16: **8 x 16-bit primes** (8 x 15.99 = 128
