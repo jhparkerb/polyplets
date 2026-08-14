@@ -1,0 +1,22 @@
+ABOUT: ground-truth tie, build/g2 square8 8 --rook-bishop
+  g2 rook column == A001168 for n=1..8: OK
+  brute semantics H=2 W=3: OK
+  brute semantics H=3 W=3: OK
+  brute semantics H=3 W=4: OK
+  RED A OK: planted king stencil miscounts vs rook brute force
+  automaton-assembled a(n) n=1..8 == A001168 == g2: OK
+  RED B OK: one killed transition breaks the word-count regression at H=3 W=3
+  observation: same defect vs A001168 tie -> CANCELS (tie survives)
+  mod-p spot check H=4..6: p=32749 == p=2^31-1 == A-S1: OK
+
+lat H  states  rank_GF2  rank_modp  rank_GF(2^16) t1 t2
+king 4  20  6  6  [6, 6]   (0.1s)
+king 5  50  15  17  [15, 15]   (0.0s)
+king 6  126  27  35  [27, 27]   (0.1s)
+rook 4  20  20  20  [20, 20]   (0.0s)
+rook 5  50  49  50  [49, 49]   (0.1s)
+rook 6  126  119  126  [119, 119]   (0.6s)
+
+ratios rank_GF2 / 2^H and modp growth:
+  king: H4: 6/16=0.375; H5: 15/32=0.469 modp x2.83; H6: 27/64=0.422 modp x2.06
+  rook: H4: 20/16=1.250; H5: 49/32=1.531 modp x2.50; H6: 119/64=1.859 modp x2.52
