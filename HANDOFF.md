@@ -58,6 +58,23 @@ statement that did not survive contact.
   constants; **the pre-registered kill condition does not fire**, so
   Confetti's and Ticker Tape's projections stand on a measured point.
   Measured Half Measure factors at H = 16: RSS x0.5147, wall x1.394.
+- **Confetti (H = 18) is RUNNING** — launched 2026-08-14 17:56 EDT, tmux
+  `motley-h18` on dalby, driver PID in `~/var/motley-h18/driver.pid`. Five
+  sequential 31-bit-prime passes, CRT from four + held-out fifth (RED-D),
+  T(n,18) vs the incumbent triangle at the end; **~16 h/pass, ~82 h total,
+  ~83 GB peak** (measured: modp wall ~0.47x u128 at H = 12, 13). Gate
+  battery GREEN on dalby (`tests/gate_confetti.py`, half-measure `3002104`;
+  brute A030232-anchored oracle, 4 planted REDs all caught) and **receipt
+  enforcement now exists and is red-tested** — the runner
+  (`scripts/dalby_confetti_h18.sh`, master `443ed36`) refuses to run a
+  binary whose sha256 lacks a green receipt. Product on GREEN: a(n)
+  rule-independent for n <= 35.
+- **Exact Change** (char-2 basis hunt, `results/exactchange-probes.md`,
+  `afec943`): rank = A034299 exactly (nine points, r(21) = 932,071
+  predicted); quotient is cross-mask linear algebra; cell-level rank
+  ~Theta(H 2^H) shrinks the compression to ~6x vs the spin engine; sparse
+  transitions exist in the closure basis, no a-priori construction. Parked
+  OPEN — jasonp flags the OEIS hit as very interesting, come back to it.
 - **The engine had an uncosted `H <= 16` ceiling** and refused to start. Three
   argument checks, not a property of the algorithm; no plan or review caught
   it. Raised to the structural limit (key packing, H <= 24) with the other two
