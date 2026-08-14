@@ -18,7 +18,7 @@ filed (via SendMessage, onto a queue row) is free and preferred.
 | 1 | R1-K | adversary | Fable | 2026-08-13 | 2026-08-13 | 2026-08-13 | brief-kill pass, wave 1, spawned alone; PASS conditional, condition applied to the brief before wave 2 |
 | 2 | R1-A | scout | Fable | 2026-08-13 | 2026-08-14 | 2026-08-14 | base anatomy audit; b = 1.7266, K3 fired, one job request (A1-JOB-1) held for jasonp |
 | 3 | R1-B | scout | Fable | 2026-08-13 | 2026-08-14 | 2026-08-14 | P_k tower feasibility; **is** gate 0. Fired the kill row |
-| 4 | R1-C | scout | Fable | 2026-08-13 | — | — | rook Hankel ranks at small H; marginal lane, verdict must name the king decision |
-| 5 | R1-D | adversary | Fable | 2026-08-13 | — | — | transport obstruction; owns queue row K2 (the asserted β ≥ 2) |
+| 4 | R1-C | scout | Fable | 2026-08-13 | 2026-08-14 | 2026-08-14 | rook Hankel ranks at small H; marginal lane, verdict must name the king decision |
+| 5 | R1-D | adversary | Fable | 2026-08-13 | 2026-08-14 | 2026-08-14 | transport obstruction; owns queue row K2 (the asserted β ≥ 2) |
 | 6 | R1-E | scout | Fable | 2026-08-14 | — | — | wave-3 dispatch off queue row B1: was gate 0's kill aimed at the right object |
 
