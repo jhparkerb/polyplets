@@ -1,5 +1,127 @@
 # HANDOFF — live state (updated 2026-08-14)
 
+## 2026-08-14 — both plans reviewed, reconciled, and executed as far as they go
+
+Two Fable reviews (one per plan) against the tree, reconciled, then executed.
+Commits `76f71c5` (Coin Lift), `1e430fb` (Motley), `b9d725b` on branch
+`half-measure`. Neither review found a plan blocked; both found a load-bearing
+statement that did not survive contact.
+
+- **Coin Lift is CLOSED at G2. It is dead.** The char-2 collapse does not
+  survive one lift: at H = 9, mu_1 = 229, mu_2 = 459, mu_3 = 500, mu_4 = 501 =
+  the generic rank exactly, and mu_2/mu_1 grows every height (1.00 → 2.00 over
+  H = 4..9). **Coin Flip, Coin Roll and Biased Coin Flip are untouched** — one
+  deterministic bit, or a probabilistic fingerprint. G3 and G4 never run.
+  `results/coin-lift-g2.md`, probe `experiments/tristruct/r3_lift_snf_probe.py`.
+- **G2 as written could never have fired**, and the shape of the error is worth
+  carrying: "the Z/4 free rank" counts the invariant factors that are units mod
+  4, which is identically the GF(2) rank. The well-posed object is
+  `mu_k = #{invariant factors with v_2 < k}`, the minimal generator count of
+  the Hankel column module over Z/2^k.
+- **Other characteristics are also dead, and now it is a theorem plus an
+  exhaustive sweep** — `results/coin-flip-characteristic-landscape.md`,
+  commit `8861523`. Every weighted automaton over every commutative ring has
+  dimension >= min_p rank_{F_p} (reduce mod a maximal ideal), field extensions
+  of char 2 are rank-identical, and multiplicative grading is exactly
+  rank-preserving — so **Coin Roll's freeness is upgraded from measurement to
+  theorem**, and there is nothing to search for in weightings. A
+  determinantal-divisor budget `sum_p d_p ln p <= (N/2) ln N` then makes the
+  remaining sweep finite; certified at H = 6..9 with rank_Q pinned rather than
+  assumed. **At H = 6, p = 2 is the only prime in the universe that drops the
+  rank at all**; from H = 7 on only p = 3 moves it, by 1.1-2.6% against
+  characteristic 2's 34-54%. Characteristic 2's share grows with height and
+  the competitor cutoff falls (44,633 -> 849 across H = 6..9). One
+  deterministic bit is the unique optimum of the class.
+  Round 1 found rook has no char-2 crack; the collapse is specific to the
+  characteristic *and* the stencil.
+- **Motley Step 0 is running on dalby** in three concurrent streams from a
+  clean worktree (`~/src/pm-b1-step0`, stamp `48ac1089`, no `-dirty`),
+  `gate-cutcount-b1` GREEN on that build. C14 already reproduces the banked row
+  byte for byte. 4.6 h wall instead of 6.7 core-hours serial.
+- **Half Measure is written, gated and measured** (`b9d725b`): rows
+  byte-identical to both the reference binary and the banked rows at H = 12,
+  13, 14; payload factor **0.514 measured** — the x1.9 the ladder budgets — and
+  a **x1.46-1.57 wall bonus** nobody had counted on. That moves H = 17 from
+  100 GB / ~15 h to **91 GB / ~7-10 h**, and the +-20% census band's bad end
+  (109 GB) now fits dalby with 13 GB to spare. The check-split does not need to
+  be pulled forward.
+- **H = 17 has an external oracle**: `results/triangle.txt` carries the
+  incumbent's T(n,17) for every n <= 40, so the product and its check land
+  together. `scripts/dalby_motley_h17.sh`, fail-closed.
+- Plan corrections from the reviews: the banked ladder already closes
+  **n <= 31**, not 30; Motley's `--modp` mode is **already committed** on
+  `second-source` and carries two streams, not three, so Confetti's A(1) check
+  rests on the held-out prime and the banked rows alone; and the receipt
+  enforcement Confetti's gate battery names **does not exist yet**.
+- **Open for jasonp**: `docs/b1-closure-plan.md` §7 argues the Tier-1
+  cancellation-identity write-up should come *before* the engineering ladder;
+  neither Motley doc mentions it. Nothing was decided here.
+
+## 2026-08-14 — Motley and Coin Lift: two plans, and one exclusion
+
+Plans: `docs/motley-plan.md`, `docs/coin-lift-plan.md`. Goal docs:
+`docs/motley-goal.md`, `docs/coin-lift-goal.md`.
+
+- **B1 is now Motley** — the colour-symmetrized spin TM that paints every
+  subset and never decides connectivity. Its three planned rungs: **Half
+  Measure** (`I256` -> `u128`, x1.9), **Confetti** (4 x 31-bit residues + CRT,
+  x4), **Ticker Tape** (8 x 16-bit residues, x2, and it carries the check-split
+  and the flat arena because H = 19 does not fit without them).
+- Motley's reach: Half Measure -> H = 17, closes a(n) for n <= 33; Confetti ->
+  H = 18, n <= 35; Ticker Tape -> H = 19, n <= 37. Row 40's residual band goes
+  9 -> 7 -> 5 -> 3 cells. **Step 0 is a 6.7 core-hour clean re-run of H <= 16**,
+  which makes the already-closed a(30) citable.
+- **Coin Lift is capped, and the argument is from the repo's own numbers.** A
+  Z/2^k realization of bounded dimension for all k gives a Z_2- hence
+  Q-realization, and rank_Q >= rank_{F_p}; the measured mod-p Hankel rank
+  extrapolates to ~2.3e7 at H = 21 against the char-2 dimension of 9.2e5. So
+  **exact values at char-2 dimension are excluded** — the floor is 25x. What
+  survives is 2-3 deterministic bits per cell (Z/4, Z/8), untouched by the
+  limit argument.
+- **Second Coin Lift hazard, easy to miss**: the collapse was measured on the
+  *incumbent-rule* automaton, so a compressed realization obtained by
+  projecting it inherits the incumbent's rule and certifies nothing. Rule
+  independence requires a basis described from the definition of
+  king-connectivity, not from the projection. That is gate G3 and it has veto
+  power.
+- Gates G1 (rank ladder past H = 9, hours) and G2 (Z/4 module structure,
+  minutes) together price the whole Coin Lift program. Nothing downstream
+  starts before both land.
+- **No ensemble recommended for either plan right now.** Motley is a specified
+  engineering sequence with mechanical oracles; Coin Lift's first two gates are
+  a day of solo work. An ensemble earns its keep only at Coin Lift G3, and only
+  if G1 and G2 pass.
+
+## 2026-08-13 — Closure: the P_k lock, and B1's RAM ceiling
+
+Full record and arithmetic: `docs/b1-closure-plan.md`.
+
+- **Every P_k needed for row 40 is anchored at H <= 20**, so a B1 sweep to
+  H = 20 pins the whole H >= 22 band ab initio at **zero additional compute**
+  (level k = 40-H; band H >= 22 is k <= 18; P_18's anchors are T(37,19) and
+  T(38,20)). H <= 20 in RAM plus that lock = **97.157% of a(40)
+  rule-independent**, and the entire remaining gap is one cell, **T(40,21) =
+  2.8431%** — P_19's second anchor is T(40,21) itself, so it cannot be reached
+  by formula. The tower does not cut the sweep: break-even lands exactly on
+  H = 21.
+- **RAM ladder against dalby's 121 GB available**, off the measured
+  8,142 B/window and the census-anchored window projection. Each height demands
+  a factor off baseline — H17 1.6x, H18 4.9x, H19 15.2x, H20 47.7x, H21 151x —
+  and the rungs are ordered biggest-and-simplest-first in the plan's §3:
+  `I256 -> u128` (x1.9) buys **H = 17** on its own (100 GB); the residue ladder
+  with CRT (x4/x8/x16 at u32/u16/u8) buys **H = 18** (52 GB) and **H = 19**
+  (87 GB); **H = 20** (92 GB) needs the last width plus a flat arena and
+  chunked release of the consumed buffer, and sits at the wall with ~24% margin.
+- **H = 21 cannot fit at any payload width** — 2.25B windows means 135 GB of
+  keys before a single coefficient is stored. Out-of-core (504 GB working set
+  vs 563 GB free NVMe) or nothing.
+- Dead levers, recorded so they are not re-derived: area-variable
+  evaluation/interpolation (true degree is H*W = 861), and the ranged-area
+  payload that gave the incumbent 1.89x (the payload is dense here).
+- Next measurement, and it carries the rest: **H = 17 exact-u128**, one core,
+  ~15 h — it puts a real wall, RSS, and census ratio under every projection
+  above.
+
 ## 2026-08-14 — rook parity round 1 run and closed; the goal did not survive it
 
 One desk-only round, six Fable agents, no compute dispatched. Brief

@@ -6,8 +6,18 @@
 > not run. Coin Flip, Coin Roll and Biased Coin Flip are untouched — one
 > deterministic bit, or a probabilistic fingerprint. Measurement, the restated
 > gate, and the other characteristics: `results/coin-lift-g2.md`. G1 stands on
-> its own for those three: the collapse itself holds to H = 10 measured
-> (rank 453 = 0.442 x 2^10 against a generic 1217).
+> its own for those three: the collapse itself holds to H = 11 measured
+> (rank 912 = 0.445 x 2^11).
+>
+> **And the survivors cannot be extended either, by theorem.**
+> `results/coin-flip-characteristic-landscape.md`: every weighted automaton
+> over every commutative ring has dimension at least min_p rank_{F_p}; field
+> extensions of char 2 are rank-identical; multiplicative grading is exactly
+> rank-preserving (so Coin Roll is free by theorem); and a determinantal-
+> divisor budget makes the surviving sweep finite and certifies it at
+> H = 6..9. At H = 6, p = 2 is the only prime in the universe that drops the
+> rank at all. One deterministic bit is the unique optimum of the class, not
+> the best thing found in it.
 
 **Coin Flip** is the hypothetical algorithm that computes T(n,H) mod 2 through
 the characteristic-2 rank collapse of the strip-counting functional. **Coin
