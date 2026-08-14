@@ -151,11 +151,20 @@ comparison, fail-closed.
 first *measured* wall, RSS and census ratio above H = 16, which every
 projection below currently rests on.
 
-**Status**: launched 2026-08-14 06:32 EDT, binary `4df3fec9` clean, gate
-GREEN. Byte-for-byte oracle passed at **H = 12, 13, 14, 15 and 16** — every
-height the reference can also reach. Measured at H = 16: peak RSS 32.06 GB
-against the reference's 62.29 (**x0.5147**), wall 12,231 s against 17,047
+**Status: DONE, GREEN** (2026-08-14, receipt `results/motley-h17.md`).
+Byte-for-byte oracle passed at **H = 12, 13, 14, 15 and 16** — every height
+the reference can also reach. Measured at H = 16: peak RSS 32.06 GB against
+the reference's 62.29 (**x0.5147**), wall 12,231 s against 17,047
 (**x1.394**, both under partial co-residency).
+
+Production run (dalby, binary `4df3fec9` clean, gate GREEN): wall 39,117 s
+(10.9 h), peak RSS 95.0 GB against the 91 predicted, census 23,681,423
+windows. T(n,17) matches the incumbent's triangle at all 24 cells, 0
+mismatch: **a(n) closed rule-independently for n <= 33**. The measured
+per-height ratios above H = 16 — census x3.023, RSS x2.963, wall x3.198
+(same-payload) — sit within a few percent of the ladder constants
+(x2.984 / x3.209), so the kill condition does not fire and the H = 18/19
+projections below stand as priced.
 
 ## Rung 2 — Confetti
 

@@ -49,9 +49,15 @@ statement that did not survive contact.
   100 GB / ~15 h to **91 GB / ~7-10 h**, and the +-20% census band's bad end
   (109 GB) now fits dalby with 13 GB to spare. The check-split does not need to
   be pulled forward.
-- **H = 17 is RUNNING** — launched 06:32 EDT, binary `4df3fec9` clean, gate
-  GREEN, ~96 GB predicted peak (87.6 GB at 3 min) and ~11 h. Measured Half
-  Measure factors at H = 16: RSS x0.5147, wall x1.394.
+- **H = 17 is DONE, GREEN** (receipt `results/motley-h17.md`; row banked as
+  `results/cutcount_b1/rows/C17.out`): T(n,17) matches the incumbent triangle
+  at all 24 cells, 0 mismatch — **a(n) closed rule-independently for
+  n <= 33**. Measured: wall 39,117 s (10.9 h), peak RSS 95.0 GB (91
+  predicted), census 23,681,423 windows. Per-height ratios above H = 16 —
+  census x3.023, RSS x2.963, wall x3.198 same-payload — match the ladder
+  constants; **the pre-registered kill condition does not fire**, so
+  Confetti's and Ticker Tape's projections stand on a measured point.
+  Measured Half Measure factors at H = 16: RSS x0.5147, wall x1.394.
 - **The engine had an uncosted `H <= 16` ceiling** and refused to start. Three
   argument checks, not a property of the algorithm; no plan or review caught
   it. Raised to the structural limit (key packing, H <= 24) with the other two
