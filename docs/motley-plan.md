@@ -1,0 +1,179 @@
+# Motley — the plan for rungs Half Measure, Confetti, Ticker Tape
+
+**Motley** is the engine formerly called B1: the colour-symmetrized spin
+transfer matrix with clash-zeroing (`results/cutcount_b1/`). It counts by
+painting every subset in motley colours and never once deciding whether
+anything is connected; the answer is read off a coefficient at the end. The
+three rungs this plan builds, in order:
+
+| rung | what | factor |
+|---|---|---|
+| **Half Measure** | `I256` -> wrapping `u128` — half the coefficient width | x1.9 |
+| **Confetti** | payload shredded into 4 x 31-bit residues + CRT | x4 over Half Measure |
+| **Ticker Tape** | finer shreds: 8 x 16-bit residues | x2 over Confetti |
+
+Background and the full seven-rung ladder: `docs/b1-closure-plan.md`. This
+plan implements only the three rungs that carry heights, plus the two small
+changes Ticker Tape cannot do without.
+
+## What it delivers
+
+Each height Motley reaches closes rows at the bottom *and* extends the P_k
+lock at the top, so it removes two cells per rung from the top row's residue
+(`docs/b1-closure-plan.md` §1, §6):
+
+| after | Motley reaches | closes outright | row 40's residual band |
+|---|---|---|---|
+| today (banked) | H <= 16 | a(n), n <= 31 | T(40,17)..T(40,25), 9 cells |
+| Half Measure | H <= 17 | n <= 33 | 7 cells |
+| Confetti | H <= 18 | n <= 35 | 5 cells |
+| Ticker Tape | H <= 19 | n <= 37 | T(40,20)..T(40,22), 3 cells |
+
+The residual band is Coin Lift's target (`docs/coin-lift-plan.md`); nothing in
+this plan attempts it.
+
+## Step 0 — the provenance re-run (before any new code)
+
+The banked H <= 16 rows came from source sha `59e90660`, a dirty working copy
+matching no committed rev, with a gate battery predating the fail-closed exit
+codes (`results/cutcount_b1/PROVENANCE.md`). Until that is redone, **a(30) is
+closed but not citable.**
+
+- Build the committed fail-closed engine from `second-source` (rev `48ac108`).
+- Re-run H = 1..16 at Nmax = 40, compare to the banked rows byte for byte.
+- Cost: 6.7 core-hours, one core, no new code. It is a chore, not a decision.
+- Product: a(n) rule-independent for all n <= 31, citable.
+
+This also establishes the reference engine as the **frozen specification**:
+434 lines, the 80-line connectivity core (`slot`, `canon`, `gather`,
+`shifted`, `successors`) unchanged by every rung below. Each rung must
+reproduce the reference byte for byte at every height both can reach.
+
+## Rung 1 — Half Measure
+
+**Change.** `I256` becomes a wrapping `u128`. One type, one bound check.
+
+**Why it is exact.** C_H(40) is 1.42e32 at H = 16 (log2 = 106.8) and its
+per-height ratio is falling (1.44, 1.36 at H = 15, 16), so C_19(40) projects
+to ~2^109 — inside a wrapping u128, by the same ring-hom argument the I256
+already relies on. The A(1) self-check compares two values computed in the
+*same* wrapping ring, so it stays valid at any width even though its true
+value C(861,40) is ~2^229.
+
+**Measured 2026-08-14** (commit `b9d725b`, gympie, against the reference
+binary built from `8748d78` on the same box with the same flags): rows
+byte-identical to the reference *and* to the banked rows at H = 12 and H = 13;
+peak RSS 875 -> 451 MB and 2,478 -> 1,274 MB, a payload factor of **0.514** —
+the x1.9 the ladder budgets, now measured rather than counted off the struct
+width; wall 42.3 -> 26.9 s and 150.2 -> 102.8 s, **x1.57 and x1.46**, which is
+a bonus the RAM ladder never spent. The diff is 21 lines of payload type and
+helpers; the 80-line connectivity core and the DP body are untouched.
+
+**Guard.** Fail-closed per height: assert the reconstructed C_H(n) < 2^127
+before writing a row. If a future height violates it, the run stops rather
+than wrapping silently.
+
+**Run.** H = 17, Nmax = 40, one core. Against the measured ladder (RSS
+x2.984/height, wall x3.209/height) and the measured payload factor: **91 GB
+peak**, not the 100 GB budgeted before the factor was measured, and ~7-10 h
+rather than ~15 h. The +-20% band the census-ratio extrapolation carries puts
+the peak at **73-109 GB against dalby's 122 GB available** — the bad end of
+the band now fits with 13 GB to spare, which is what makes it right to launch
+this without first pulling the check-split (rung B) forward.
+
+The row has an external oracle: `results/triangle.txt` carries the
+incumbent's T(n,17) for every n <= 40, so the product and its check arrive
+together. Runner `scripts/dalby_motley_h17.sh` does the T assembly and the
+comparison, fail-closed.
+
+**Product.** a(n) closed for n <= 33; T(n,17) for all n <= 40 banked; and the
+first *measured* wall, RSS and census ratio above H = 16, which every
+projection below currently rests on.
+
+## Rung 2 — Confetti
+
+**Change.** Payload width becomes a template parameter; a CRT driver runs the
+passes and reconstructs. Confetti is the u32 instantiation: **4 x 31-bit
+primes**, since final values < 2^112 and 4 x 31 = 124 bits, **plus one extra
+prime run as a held-out RED** — reconstruct from four, predict the fifth,
+compare.
+
+**Reuse.** This is a port, not a design. `cpp/tma/sweep8_modp.h` already does
+CRT over 2-3 primes for the incumbent, `cpp/gf_modp.cpp` (217 lines) and
+`cpp/tma_modp_test.cpp` exist, and `results/crt-counter-shaping.md` settled the
+prime shape (u32 with the 31-bit interleave) as a banked decision. **Motley's
+own `--modp` mode is already in committed source** (`run_height_modp`, on
+`second-source` since `7b13137`) — the round-3 premise that "nobody has
+authored a residue-payload variant" was already stale. It carries two streams,
+not three: it has the q0_zero check but **not** the A(1)/binomial check, which
+the gate list below must say out loud, because the held-out prime and the
+banked-row reproduction are then carrying that weight alone.
+
+**Gate battery, per width, before any production column** (from
+`results/triangle-r3-ladder-gate.md` §4, unchanged):
+
+- GREEN: [q^1] against brute-force enumeration at (H,W) in {(2,4), (3,3),
+  (3,4), (4,3), (5,3), (6,2)}, every n, every prime.
+- GREEN: reproduce banked rows C_1..C_16 byte for byte at Nmax = 40.
+- GREEN: the held-out prime predicts correctly.
+- RED: a planted NW-stencil drop must fail the battery; the script exits
+  nonzero unless every GREEN passes *and* every RED fails.
+- Receipt naming the binary's sha256. **This does not exist yet**:
+  `scripts/check_receipts.sh` is the docs-claims scanner, and nothing today
+  makes a production runner refuse to start without a receipt. Small glue
+  script, and it is Confetti's to write — Step 0 and Half Measure carry their
+  provenance in the obs stamp (clean `GIT_REV`, no `-dirty`) and in the gate
+  run recorded beside the launch.
+
+**Run.** H = 18, Nmax = 40. **91 GB peak**; 5 passes, sequential (they cannot
+be co-resident), ~60-120 h total depending on how much the narrow inner loop
+buys back (a 4-limb `iaddmul` becomes one multiply-add; unmeasured, and Half
+Measure's run is where it first gets measured).
+
+**Product.** a(n) closed for n <= 35.
+
+## Rung 3 — Ticker Tape
+
+**Change.** The same driver at u16: **8 x 16-bit primes** (8 x 15.99 = 128
+bits) plus one held out as RED. The width is a parameter; this rung is a
+prime table and a gate re-run.
+
+**Two changes it cannot do without**, because H = 19 does not fit otherwise:
+
+- **Split the A(1) check into its own pass** (ST 3 -> 2). Peak drops a third,
+  the check is preserved exactly, total wall rises by half. Without it:
+  135 GB. Hours of work.
+- **Flat arena with an open-addressed index.** The measured container overhead
+  is ~270 B/window — 3% of today's footprint but 45% of a u16 payload. Replace
+  `unordered_map<u128,u32>` plus a heap-allocated `vector` per state with an
+  open-addressed key table and one contiguous slab, taking it to ~57 B.
+  Without it: 135 GB. A day, and it wants its own differential test against
+  `std::unordered_map` at small H, exhaustively.
+
+**Run.** H = 19, Nmax = 40. **87 GB peak**; 9 passes, sequential.
+
+**Wall is the binding constraint here, not RAM.** At today's arithmetic a
+single H = 19 pass is ~150 h on one core; nine of them is 2-8 weeks depending
+on the residue speedup. Motley is single-threaded, so this occupies one core
+of dalby's 80 for the duration. Sharding the state space by key hash across
+threads is the obvious fix and is **out of scope** — it is the change that
+costs auditability, and it is not needed for any height in this plan.
+
+**Product.** a(n) closed for n <= 37; row 40 down to three cells.
+
+## Risks, and what retires each
+
+| risk | retired by |
+|---|---|
+| census-ratio extrapolation carries H = 18, 19 | Half Measure's measured H = 17 windows, then Confetti's H = 18 |
+| ~57 B arena constant is a design target, not a measurement | measure at H = 18 before Ticker Tape commits |
+| residue speedup unmeasured; Ticker Tape's wall could be 8 weeks | measured on Confetti's first pass |
+| CRT reconstruction wrong | held-out prime, per height, fail-closed |
+| the arena is hand-rolled — the one place on this plan where a bug can hide | exhaustive differential test vs `unordered_map` at H <= 10 |
+
+## What this plan deliberately does not do
+
+- No H = 20 or 21. Those need the remaining rungs (u8 residues, chunked
+  release) and H = 21 does not fit at any width — the keys alone are 135 GB.
+- No parallel frontier, no spill, no dense ranking.
+- No change to the 80-line connectivity core, at any rung.
