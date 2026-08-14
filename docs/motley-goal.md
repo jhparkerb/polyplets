@@ -22,6 +22,11 @@ Close a(n) rule-independently for **n <= 37**, and reduce row 40's residual
 band to three cells, by building three rungs on a frozen 80-line connectivity
 core.
 
+> **Revised 2026-08-14 — `results/anchor-cut-map.md`.** The same three rungs now
+> close **n <= 40** and empty the residual band, because a level's constant pins
+> from columns `k+1-j`, `k+2-j` rather than at the staircase's onset: reach is
+> `n <= 2 H_max + J - 1`. "Done" below should read n <= 40, not n <= 37.
+
 Done means: `a(n)` for n <= 37 reproduced by Motley from an in-tree
 fail-closed binary with a gate receipt, matching the banked triangle byte for
 byte, with the P_k levels those runs pin recorded and their holdout cells

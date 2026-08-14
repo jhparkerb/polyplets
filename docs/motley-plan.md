@@ -20,17 +20,33 @@ changes Ticker Tape cannot do without.
 
 Each height Motley reaches closes rows at the bottom *and* extends the P_k
 lock at the top, so it removes two cells per rung from the top row's residue
-(`docs/b1-closure-plan.md` §1, §6):
+(`docs/b1-closure-plan.md` §1, §6).
 
-| after | Motley reaches | closes outright | row 40's residual band |
-|---|---|---|---|
-| today (banked) | H <= 16 | a(n), n <= 31 | T(40,17)..T(40,25), 9 cells |
-| Half Measure | H <= 17 | n <= 33 | 7 cells |
-| Confetti | H <= 18 | n <= 35 | 5 cells |
-| Ticker Tape | H <= 19 | n <= 37 | T(40,20)..T(40,22), 3 cells |
+**Revised 2026-08-14 for the anchor cut** (`results/anchor-cut-map.md`). A
+level's constant no longer has to be pinned at the staircase's onset: at depth
+`j` it pins from columns `k+1-j`, `k+2-j`, so a sweep to `H_max` closes
+`n <= 2 H_max + J - 1` where `J` is the deepest closed defect. With the shipped
+`J = 3`, every rung is worth **three more terms** than this plan budgeted, and
+the residual band empties one rung earlier than it was ever going to:
 
-The residual band is Coin Lift's target (`docs/coin-lift-plan.md`); nothing in
-this plan attempts it.
+| after | Motley reaches | closes outright | was | row 40's residual band |
+|---|---|---|---|---|
+| today (banked) | H <= 16 | a(n), **n <= 34** | n <= 31 | T(40,20)..T(40,22), 3 cells |
+| Half Measure | H <= 17 | **n <= 36** | n <= 33 | 3 cells |
+| Confetti | H <= 18 | **n <= 38** | n <= 35 | 3 cells |
+| Ticker Tape | H <= 19 | **n <= 40** | n <= 37 | **empty** |
+
+Two consequences for this plan as written. The residual band was Coin Lift's
+target; Coin Lift is dead at G2 (`results/coin-lift-g2.md`) and the band closes
+here instead, at the last rung. And **the whole point of the ladder is now
+Ticker Tape**: rows 35..40 are what the remaining rungs buy, and the first two
+rungs buy terms that were already going to be reached.
+
+If `J = 5` is bought (the excess-4 family table at K = 21 — a run, not new
+code, `results/anchor-cut-map.md` §"Raising J"), Confetti's H = 18 closes
+n <= 40 and **Ticker Tape becomes unnecessary** — which retires the check-split
+and the flat arena with it, since those exist only because H = 19 does not fit
+without them.
 
 ## Step 0 — the provenance re-run (before any new code) — DONE, GREEN
 
@@ -38,6 +54,11 @@ Run 2026-08-14: 16 of 16 rows byte-identical, 640 of 640 triangle cells,
 binary stamped `48ac1089` clean with `gate-cutcount-b1` GREEN, 4.7 h of wall
 across three streams. **a(n) is now citable for n <= 31.**
 `results/motley-step0.md`.
+
+> **Updated 2026-08-14:** those same rows now carry **n <= 34**, verified rather
+> than argued — `experiments/depth_swap_anchors.py --rebuild --source motley`
+> reads Motley's own `C_1..C_16`, rebuilds rows 17..34, and matches the banked
+> triangle on 171 cells with 0 mismatches. Three terms at zero compute.
 
 The banked H <= 16 rows came from source sha `59e90660`, a dirty working copy
 matching no committed rev, with a gate battery predating the fail-closed exit
@@ -147,9 +168,9 @@ incumbent's T(n,17) for every n <= 40, so the product and its check arrive
 together. Runner `scripts/dalby_motley_h17.sh` does the T assembly and the
 comparison, fail-closed.
 
-**Product.** a(n) closed for n <= 33; T(n,17) for all n <= 40 banked; and the
-first *measured* wall, RSS and census ratio above H = 16, which every
-projection below currently rests on.
+**Product.** a(n) closed for n <= 36 (was n <= 33 before the anchor cut);
+T(n,17) for all n <= 40 banked; and the first *measured* wall, RSS and census
+ratio above H = 16, which every projection below currently rests on.
 
 **Status**: launched 2026-08-14 06:32 EDT, binary `4df3fec9` clean, gate
 GREEN. Byte-for-byte oracle passed at **H = 12, 13, 14, 15 and 16** — every
@@ -197,7 +218,8 @@ be co-resident), ~60-120 h total depending on how much the narrow inner loop
 buys back (a 4-limb `iaddmul` becomes one multiply-add; unmeasured, and Half
 Measure's run is where it first gets measured).
 
-**Product.** a(n) closed for n <= 35.
+**Product.** a(n) closed for n <= 38 (was n <= 35). With `J = 5` bought, this
+rung closes n <= 40 and the plan ends here.
 
 ## Rung 3 — Ticker Tape
 
@@ -226,7 +248,9 @@ of dalby's 80 for the duration. Sharding the state space by key hash across
 threads is the obvious fix and is **out of scope** — it is the change that
 costs auditability, and it is not needed for any height in this plan.
 
-**Product.** a(n) closed for n <= 37; row 40 down to three cells.
+**Product.** a(n) closed for n <= 40 (was n <= 37 with three cells left in row
+40); row 40's residual band **empty**. This is the rung the ladder exists for,
+and the only one whose terms nothing else reaches.
 
 ## Risks, and what retires each
 
@@ -242,5 +266,8 @@ costs auditability, and it is not needed for any height in this plan.
 
 - No H = 20 or 21. Those need the remaining rungs (u8 residues, chunked
   release) and H = 21 does not fit at any width — the keys alone are 135 GB.
+  **Since the anchor cut, nothing asks for them**: H = 19 closes row 40, and
+  `T(40,21)` — the cell the closure plan built the whole H = 20/21 argument
+  around — rebuilds from columns 18 and 19.
 - No parallel frontier, no spill, no dense ranking.
 - No change to the 80-line connectivity core, at any rung.
