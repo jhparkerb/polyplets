@@ -29,7 +29,7 @@ covered below. That class contains Coin Flip, Coin Roll, Biased Coin Flip,
 Coin Lift, every cut-and-count variant with any auxiliary group, and the
 incumbent and Motley themselves.
 
-## Four theorems
+## Five theorems
 
 **T1 — extension fields buy nothing.** For any field F, rank_F(M) depends only
 on char F. M has entries in the prime field; rank is the vanishing pattern of
@@ -45,12 +45,16 @@ area grading that gives every n in one run costs exactly zero dimensions, not
 "zero as far as H = 9 measured" — and **no weighting of that shape can ever
 help**, so there is nothing to search for there.
 
-**T3 — the whole landscape is indexed by the characteristic.** Let R be any
-commutative ring with 1 != 0 and let f have an R-linear realization of
-dimension D (any weighted automaton: initial vector, one matrix per symbol,
-final vector). Take a maximal ideal m of R. Reducing every entry gives a
-realization of dimension D over the field R/m, and Hankel rank over a field is
-a floor on realization dimension. So
+**T3 — the whole landscape is indexed by the characteristic.** First the floor
+itself, which needs no theory: a realization of dimension D (initial vector,
+one matrix per symbol, final vector) factors the Hankel matrix as
+`H = P Q`, where row u of P is `alpha A_u` and column v of Q is `A_v beta`.
+The inner dimension is D, so rank H <= D over whatever ring it lives in. That
+is the entire argument, and it holds over any ring at all.
+
+Now let R be any commutative ring with 1 != 0 carrying an R-linear
+realization of f of dimension D. Take a maximal ideal m of R. Reducing every
+entry gives a realization of dimension D over the field R/m, so
 
     D  >=  rank over the prime field of R/m  >=  min over primes p of rank_{F_p}(M)
 
@@ -77,6 +81,20 @@ d_p >= d_2, hence **ln p <= B / d_2** — an explicit bound below which every
 prime can simply be tested; and (*) also **pins rank_Q** rather than assuming
 some large prime is generic, since a true rank exceeding the observed maximum
 by 1 would have to drop at every prime tested, costing sum(ln p) > B.
+
+**T5 — non-commutative rings buy nothing either, once cost is counted in
+scalars.** Let R be any ring with 1 != 0 and m a maximal two-sided ideal
+(Zorn). Suppose R/m is artinian; Artin-Wedderburn makes it `M_k(D)` for a
+division ring D. Reading each `M_k(D)` entry as a k x k block turns a
+realization of dimension D_0 into a D-realization of dimension k*D_0, so
+`k * D_0 >= rank_D(M)`. And `rank_D(M) = rank_{F_p}(M)` for p = char D,
+because M's entries are 0/1, hence lie in the prime field, which is central in
+D, so elimination never leaves it. A matrix ring can therefore cut the
+*dimension* by a factor k -- but each dimension now stores k^2 scalars, and
+`D_0 * k^2 >= k * rank_{F_p} >= rank_{F_p}`. Counted in scalars, which is the
+honest metric for a transfer matrix, the floor is untouched. (Non-artinian
+simple quotients are not covered; nothing on the table needs them.)
+
 
 ## The sweep, certified
 
@@ -129,9 +147,9 @@ is widening in the direction that closes the question, not opening it.
 - **A different functional is untouched.** This is about f = "exactly one
   king-connected component" on the strip automaton. A decomposition that
   counts something else and assembles a(n) differently is not bounded here.
-- **Non-commutative R is not claimed.** T3's reduction wants a maximal ideal
-  with a field quotient. Matrix-ring quotients are not covered; I did not
-  chase it because no proposal on the table needs it.
+- **Non-commutative R is covered only for artinian simple quotients** (T5),
+  where matrix rings lose on scalars even when they win on dimension. A ring
+  whose simple quotient is not artinian is outside the argument.
 - **The certificates are per height, H <= 9.** T1–T3 are height-independent;
   T4's bound and the sweep are computed per height, and the higher the height
   the *tighter* the bound gets (44,633 → 2,853 → 1,318 → 849 across
