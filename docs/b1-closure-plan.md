@@ -270,6 +270,16 @@ finessed. Row 39 falls on the other side of the same parity — its top consumed
 level is k = 18, anchored at T(37,19) and T(38,20), both inside an H <= 20
 sweep.
 
+> **CORRECTED 2026-08-14 — `results/anchor-cut-map.md`.** "Cannot be finessed"
+> is true of the staircase's *onset* instance and false of the cell. Level 19
+> pins from columns 18 and 19 at depth 2, level 20 from the same two columns at
+> depth 3, with the below-onset residual carried by the closed defects
+> (`docs/proofs/depth-swap-residual.md`). The whole table above shifts by
+> `J - 1 = 2`: **a(38), a(39) and a(40) all close from H <= 19**, and the
+> H = 20 rung this section builds toward is not needed for them. Rung G and the
+> out-of-core question are unaffected only in the sense that nothing now asks
+> for them.
+
 Two consequences worth carrying:
 
 - **The whole out-of-core question disappears** if the deliverable is a(39).

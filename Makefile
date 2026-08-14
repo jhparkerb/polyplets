@@ -42,7 +42,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         papers papers-verify papers-clean papers-list
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-receipts gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-receipts gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db gate-depth-swap
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -538,6 +538,27 @@ ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spil
 # again: it had been silently exiting on a parse error since P_17 was wired.
 ns-gate-diag-pins:
 	python3 scripts/verify_diagonal_pins.py
+
+# Gate DEPTH-SWAP: the anchor cut (results/anchor-cut-map.md). Three checks in
+# one run, ~106 s. (1) the P-staircase is a POLYNOMIAL identity -- 1026
+# instances, 779 of them below onset, which is the step the proof in
+# docs/proofs/depth-swap-residual.md rests on; (2) the below-onset residual
+# equals the defect combination at every reachable instance, with two RED
+# controls that must fire (residual never zero, mu-weighted sum never
+# droppable); (3) end-to-end, every cell above H = 19 in rows 20..40 rebuilt
+# from cells at H <= 19 and compared to the banked triangle, under an accessor
+# guard that ABORTS on any read above the guard height. Without that guard the
+# rebuild could quietly read the very cells it claims to derive, which is the
+# one way this whole result could be wrong and still look right.
+gate-depth-swap:
+	python3 experiments/depth_swap_anchors.py
+	@if python3 experiments/depth_swap_anchors.py --rebuild --red >/dev/null 2>&1; then \
+		echo "GATE DEPTH-SWAP: RED -- corrupting a defect did NOT break the rebuild"; \
+		exit 1; \
+	else \
+		echo "GATE DEPTH-SWAP: RED control fires (corrupt defect -> rebuild fails)"; \
+	fi
+	@echo "GATE DEPTH-SWAP: GREEN"
 
 # Fast gate subset for the pre-push hook (.githooks/pre-push). Targets well under
 # 30s: the full Go suite (guards / combine / runcat / closed-form / resume) plus

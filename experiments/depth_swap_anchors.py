@@ -59,10 +59,14 @@ def read_triangle():
     return d
 
 
-def load_defects(jmax, K):
+def load_defects(jmax, K, red=False):
     D = {0: [F(0)] * (K + 1)}
     for j in range(1, jmax + 1):
         D[j] = D_series(j, K)
+    if red:
+        # RED control: nudge one defect by 1. Everything downstream reads it,
+        # so a run that still reports MATCH is not checking what it claims to.
+        D[min(2, jmax)][K] += 1
     return D
 
 
@@ -139,39 +143,89 @@ def run_identity(args):
     return 0
 
 
+def read_motley():
+    """Motley's own rows -> {(n,H): T}.  T(n,H) = C_H - 2 C_{H-1} + C_{H-2}
+    (results/motley-step0.md), the assembly its H=17 script also uses."""
+    base = os.path.join(ROOT, "results", "cutcount_b1", "rows")
+    C = {}
+    for name in os.listdir(base):
+        m = re.fullmatch(r'C(\d+)\.out', name)
+        if not m:
+            continue
+        H = int(m.group(1))
+        col = {}
+        with open(os.path.join(base, name)) as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                n, v = line.split()
+                col[int(n)] = int(v)
+        C[H] = col
+    if not C:
+        sys.exit(f"no Motley rows under {base}")
+
+    def c(H, n):
+        return 0 if H < 1 else C.get(H, {}).get(n, 0)
+
+    out = {}
+    for H in sorted(C):
+        if H - 2 >= 1 or H <= 2:                 # need C_{H-1}, C_{H-2}
+            if H >= 3 and (H - 1 not in C or H - 2 not in C):
+                continue
+        for n in C[H]:
+            out[(n, H)] = c(H, n) - 2 * c(H - 1, n) + c(H - 2, n)
+    return out
+
+
 # ---------------------------------------------------------------- rebuild mode
 def run_rebuild(args):
     banked = read_triangle()
+    source = read_motley() if args.source == "motley" else banked
+    if args.source == "motley":
+        top = max(H for _, H in source)
+        print(f"input source: Motley rows, complete to H = {top}")
+        if args.hguard > top:
+            args.hguard = top
+            print(f"  guard lowered to H = {top} (Motley's reach)")
     reads = []
 
     def swept(n, H):
-        """Banked cell, guarded to the heights a sweep actually reaches."""
+        """Input cell, guarded to the heights the sweep actually reaches."""
         if H > args.hguard:
             sys.exit(f"GUARD VIOLATION: read of T({n},{H}) above H={args.hguard}")
         if n == H:
             return 3 ** (n - 1)
-        v = banked.get((n, H))
+        v = source.get((n, H))
         if v is None:
             sys.exit(f"missing swept cell T({n},{H})")
         reads.append((n, H))
         return v
 
-    D = load_defects(args.jmax, args.ktop)
+    kmax = args.hguard + args.jmax - 2               # deepest level pinnable
+    nmax = min(args.nmax, 2 * args.hguard + args.jmax - 1)
+    D = load_defects(args.jmax, min(args.ktop, kmax), red=args.red)
     mu = {0: F(3)}
 
     # levels whose onset instance is inside the swept band: ordinary pinning
     for k in range(1, args.hguard - 1):
+        if 2 * k + 2 > args.nmax:
+            break
         mu[k] = (F(swept(2 * k + 2, k + 2))
                  - sum(mu[i] * swept(2 * k + 1 - i, k + 1)
                        for i in range(k))) / F(swept(k + 1, k + 1))
 
     # the rest: pinned below onset, corrected by the ab-initio defects
-    for k, j in PIN_PLAN:
+    for k in range(max(mu) + 1, kmax + 1):
+        j = max(1, k + 2 - args.hguard)              # shallowest that fits
         H = k + 1 - j
+        if j > args.jmax:
+            break
         mu[k] = (F(swept(H + 1 + k, H + 1))
                  - sum(mu[i] * swept(H + k - i, H) for i in range(k))
                  - corr(D, mu, k, H, args.jmax)) / F(swept(H, H))
         print(f"mu_{k} pinned at depth {j} from columns {H}, {H + 1}")
+    print(f"levels pinned to k = {max(mu)}; rows closable to n = {nmax}")
 
     print(f"highest banked height read: H = {max(H for _, H in reads)} "
           f"(guard {args.hguard})")
@@ -196,10 +250,10 @@ def run_rebuild(args):
             return F(swept(n, H)) if n >= H else None
         return col.get((n, H))
 
-    for H in range(args.hguard, args.hguard + 3):
-        for k in range(0, args.ktop + 1):
+    for H in range(args.hguard, nmax):
+        for k in range(0, max(mu) + 1):
             n = H + 1 + k
-            if n > args.nmax:
+            if n > nmax:
                 continue
             acc, ok = F(0), True
             for i in range(k + 1):
@@ -213,20 +267,104 @@ def run_rebuild(args):
 
     print()
     allok = True
-    for (n, H) in RESIDUAL_CELLS:
-        got, want = col.get((n, H)), banked.get((n, H))
-        if got is None or want is None or got != F(want):
-            allok = False
-            print(f"  T({n},{H}): {'NOT PRODUCED' if got is None else 'MISMATCH'}")
+    if nmax >= 40 and args.nmax >= 40:
+        for (n, H) in RESIDUAL_CELLS:
+            got, want = col.get((n, H)), banked.get((n, H))
+            if got is None or want is None or got != F(want):
+                allok = False
+                print(f"  T({n},{H}): {'NOT PRODUCED' if got is None else 'MISMATCH'}")
+            else:
+                print(f"  T({n},{H}): MATCH")
+        print()
+
+    # row-by-row closure: every cell either swept or rebuilt, and correct
+    closed = []
+    for n in range(args.hguard + 1, nmax + 1):
+        heights = [H for (nn, H) in banked if nn == n]
+        missing, wrong = [], []
+        for H in heights:
+            if H <= args.hguard:
+                if source.get((n, H)) != banked[(n, H)]:
+                    wrong.append(H)
+                continue
+            got = col.get((n, H))
+            if got is None:
+                missing.append(H)
+            elif got != F(banked[(n, H)]):
+                wrong.append(H)
+        if not missing and not wrong:
+            closed.append(n)
         else:
-            print(f"  T({n},{H}): MATCH")
-    extra = [(n, H) for (n, H) in col
-             if (n, H) not in RESIDUAL_CELLS and (n, H) in banked]
+            allok = False
+            print(f"  row {n}: {len(missing)} cells not produced, "
+                  f"{len(wrong)} mismatched")
+    if closed:
+        print(f"rows fully reproduced above the guard: "
+              f"{min(closed)}..{max(closed)} ({len(closed)} rows)")
+
+    extra = [(n, H) for (n, H) in col if (n, H) in banked]
     bad = [(n, H) for (n, H) in extra if col[(n, H)] != F(banked[(n, H)])]
-    print(f"\nother rebuilt cells checked: {len(extra)}, mismatches: {len(bad)}")
+    print(f"rebuilt cells checked against banked: {len(extra)}, "
+          f"mismatches: {len(bad)}")
     if bad:
         print(f"  first: {sorted(bad)[:5]}")
     return 0 if allok and not bad and not bad_mu else 1
+
+
+# ----------------------------------------------------------------- pstair mode
+def run_pstair(args):
+    """The step the proof rests on: the P-staircase is a POLYNOMIAL identity.
+
+        P_k(n+1) = sum_{i=0..k} mu_i 3^(2i-1) P_{k-i}(n-i)
+
+    holds for every n, not merely at and above onset. Both sides have degree
+    <= k, so agreement at k+1 points is already decisive; this checks a wide
+    range on both sides of onset, including negative n, and reports the onset
+    region separately from the region where the diagonal LAW is invalid.
+    """
+    src = open(os.path.join(ROOT, "orchestrator", "sweep.go")).read()
+    tbl = {0: ([1], 1)}
+    for mm in re.finditer(r'\n\t(\d+): \{\[\]string\{([^}]*)\}, (\d+)\}', src):
+        tbl[int(mm.group(1))] = (
+            [int(x) for x in re.findall(r'"(-?\d+)"', mm.group(2))],
+            int(mm.group(3)))
+
+    def P(k, n):
+        c, kf = tbl[k]
+        num = 0
+        for co in c:
+            num = num * n + co
+        return F(num, kf)
+
+    real = read_triangle()
+    mu = {0: F(3)}
+    for k in range(1, max(tbl) + 1):
+        a = real.get((2 * k + 2, k + 2))
+        if a is None:
+            break
+        mu[k] = (F(a) - sum(mu[i] * real[(2 * k + 1 - i, k + 1)]
+                            for i in range(k))) / F(3 ** k)
+
+    below = above = 0
+    bad = []
+    for k in range(1, max(mu) + 1):
+        if k not in tbl:
+            continue
+        for n in range(-2 * k, 3 * k + 4):
+            lhs = P(k, n + 1)
+            rhs = sum(mu[i] * F(3) ** (2 * i - 1) * P(k - i, n - i)
+                      for i in range(k + 1))
+            if lhs != rhs:
+                bad.append((k, n))
+            elif n < 2 * k + 1:
+                below += 1
+            else:
+                above += 1
+    print(f"P-staircase instances: {below} below onset, {above} at/above, "
+          f"mismatches {len(bad)}")
+    if bad:
+        print(f"  first: {bad[:5]}")
+    return 1 if bad or below == 0 else 0
 
 
 def main():
@@ -234,15 +372,23 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--identity", action="store_true")
     ap.add_argument("--rebuild", action="store_true")
+    ap.add_argument("--pstair", action="store_true")
     ap.add_argument("--hguard", type=int, default=19,
                     help="highest banked height the rebuild may read")
     ap.add_argument("--jmax", type=int, default=3, help="deepest defect loaded")
     ap.add_argument("--ktop", type=int, default=20)
+    ap.add_argument("--source", choices=("banked", "motley"), default="banked",
+                    help="where the cells at or below the guard come from")
+    ap.add_argument("--red", action="store_true",
+                    help="RED control: corrupt one defect; --rebuild must fail")
     ap.add_argument("--nmax", type=int, default=40)
     args = ap.parse_args()
-    if not (args.identity or args.rebuild):
-        args.identity = args.rebuild = True
+    if not (args.identity or args.rebuild or args.pstair):
+        args.identity = args.rebuild = args.pstair = True
     rc = 0
+    if args.pstair:
+        rc |= run_pstair(args)
+        print()
     if args.identity:
         rc |= run_identity(args)
         print()

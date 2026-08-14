@@ -53,6 +53,14 @@ First depth-4 values: `D_4(4..7) = 1400566/6561, 75221426/19683,
 
 ## What this changes in the certification map
 
+> **SUPERSEDED 2026-08-14 — `results/anchor-cut-map.md`.** The section below
+> treats the two anchor cells per level as a fixed cost at the staircase's
+> onset, so it stops the map at row 33 and calls rows 34–40 out of reach. The
+> depths closed *here* are what removes that: level `k` pins from columns
+> `k+1-j`, `k+2-j` at depth `j <= 4`, so a sweep to `H_max` reaches
+> `n <= 2 H_max + J - 1`. Read the text below for the depth machinery, not for
+> the reach.
+
 With depths j ≤ 4 closed, every below-onset cell of rows n ≤ 33 with
 k = n−H ≤ 18 is now formula-covered (deepest depth needed at the H = 15
 seam of row 33 is j = 4). Combined with the strip engine (H ≤ 14) and W1's

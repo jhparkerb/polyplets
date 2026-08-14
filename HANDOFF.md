@@ -1,5 +1,39 @@
 # HANDOFF — live state (updated 2026-08-14)
 
+## 2026-08-14 — the anchor cut: the residual band closes from H <= 19
+
+Branch `worktree-depth-swap2`. Mechanism `results/depth-swap-anchors.md`,
+proof `docs/proofs/depth-swap-residual.md`, map `results/anchor-cut-map.md`,
+instrument `experiments/depth_swap_anchors.py`.
+
+- **`T(40,21)` was never un-finessable; the staircase's onset instance was.**
+  Level `k`'s constant `mu_k` can be pinned from the depth-`j` instance, whose
+  cells lie in columns `k+1-j` and `k+2-j`, so level 19 pins from columns 18
+  and 19 at depth 2 and level 20 from the same pair at depth 3. The
+  below-onset residual is **proved** to be
+  `R(k,H) = D_{j-1}(k) - sum_i mu_i D_{j-i}(k-i)`: the P-staircase is a
+  polynomial identity (no onset condition, 1026 instances checked, 779 below
+  onset), so substituting `T = law + defect` leaves exactly that.
+- **All six residual cells rebuild from H <= 19** — and so does every other
+  cell above the guard in rows 20..40, 231 cells, 0 mismatches, under an
+  accessor guard that aborts on any read above the guard height.
+- **The reach rule is now `n <= 2 H_max + J - 1`**, against the closure plan's
+  `2 H_max - 1`, with `J = 3` the deepest shipped defect. Verified at guards
+  14, 16, 17, 18, 19 → rows 30, 34, 36, 38, 40, zero mismatches at every guard.
+- **The H = 20 rung is not needed for a(40).** Ticker Tape's H = 19, already in
+  the Motley plan, closes rows to 40. `docs/b1-closure-plan.md` §
+  "a(40) is the odd one out" carries the correction in place.
+- **Motley's banked H <= 16 rows already close n <= 34, not 31** — `--source
+  motley` reads its own `C_1..C_16`, assembles `C_H - 2C_{H-1} + C_{H-2}`, and
+  reproduces rows 17..34, 171 cells, 0 mismatches. Three terms at zero compute.
+- **Two things this does NOT do.** It does not remove the dependence on the
+  sweep — anchors move down, they do not vanish; W1 remains the only ab-initio
+  route and still stops at k = 9. And `D_j` is still single-sourced: per
+  jasonp's condition, cells pinned this way count as shored up only once the
+  depth-`j` identity is re-derived independently of
+  `experiments/severance_w3_depths.py`. **That re-derivation is the open item**,
+  and it cannot be done by anyone who has read that script.
+
 ## 2026-08-14 — both plans reviewed, reconciled, and executed as far as they go
 
 Two Fable reviews (one per plan) against the tree, reconciled, then executed.

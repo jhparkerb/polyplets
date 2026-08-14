@@ -1,7 +1,9 @@
 # Depth-swapped anchors: the residual band closes from H <= 19
 
-2026-08-14. Instrument: `experiments/depth_swap_anchors.py` (`--identity`,
-`--rebuild`). Every number below is printed by that script.
+2026-08-14. Instrument: `experiments/depth_swap_anchors.py` (`--pstair`,
+`--identity`, `--rebuild`). Every number below is printed by that script.
+Proof of the identity: `docs/proofs/depth-swap-residual.md`. Certification map
+as it now stands: `results/anchor-cut-map.md`.
 
 `docs/b1-closure-plan.md` §7 states that `T(40,21)` "cannot be finessed",
 because level 19's own two anchors are `T(39,20)` and `T(40,21)` — both in the
@@ -12,10 +14,14 @@ It is not true of the identity.
 
 **All six residual cells rebuild exactly from cells at H <= 19, with no cell
 above H = 19 read at any point.** `T(38,20)`, `T(39,20)`, `T(40,20)`,
-`T(39,21)`, `T(40,21)`, `T(40,22)` — six of six against the banked triangle,
-plus 54 further rebuilt cells with zero mismatches. The read guard is enforced
-in the accessor, so a slip aborts rather than passing quietly; the run reports
-`highest banked height read: H = 19`.
+`T(39,21)`, `T(40,21)`, `T(40,22)` — six of six against the banked triangle.
+The read guard is enforced in the accessor, so a slip aborts rather than
+passing quietly; the run reports `highest banked height read: H = 19`.
+
+It is not only those six. From the same H <= 19 inputs, **every cell above the
+guard in rows 20..40 is reproduced — 231 cells, 0 mismatches** — so the entire
+band the sweep cannot reach comes back, not just the cells the closure plan
+called residual.
 
 ## The mechanism
 
@@ -52,6 +58,11 @@ triangle cannot pin at all, its anchor being `T(42,22)` — reproduces
 
 ## Evidence
 
+`--pstair`: the step the proof rests on — the P-staircase is a polynomial
+identity, not an onset-conditional one — checked at **1026 instances** spanning
+both sides of onset and into negative `n`, 779 of them below onset,
+mismatches 0.
+
 `--identity`: 54 instances at depths j = 1, 2, 3 and k <= 20, exact `Fraction`
 arithmetic, **54 of 54 holding**. Two RED controls, both firing at 54/54: the
 residual is never zero (so the defects are load-bearing), and dropping the
@@ -79,11 +90,12 @@ separate compute question and is not costed here.
   inputs here are the incumbent's own banked cells. The claim that the residual
   band is closed *rule-independently* needs Motley's rows substituted for them;
   that is a straight input swap, not new machinery, but it has not been done.
-- **The residual identity is verified, not proved.** 54 exact instances with
-  controls is strong, and the depth-1 case is already a theorem by another
-  route, but the general form should fall out of the chain identity's degree
-  bookkeeping (`docs/proofs/diagonal-law.md` Steps 2 and 4) and that derivation
-  is not written.
+- ~~**The residual identity is verified, not proved.**~~ **Proved
+  2026-08-14**, `docs/proofs/depth-swap-residual.md`: the law values satisfy the
+  staircase identically (the P-staircase is a polynomial identity, so it
+  carries no onset condition), and substituting `T = law + defect` leaves
+  exactly the defect combination. The 54 instances are now a check on the
+  arithmetic rather than the evidence for the shape.
 - **The depth-j identity itself is single-sourced.** `D_j` comes from one
   script. jasonp's standing condition (2026-08-14) is that these cells count as
   shored up only once that identity is re-derived independently of
