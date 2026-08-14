@@ -384,7 +384,17 @@ AS1_MODP = {4: 6, 5: 17, 6: 35, 7: 88, 8: 204, 9: 501, 10: 1217}
 
 
 def main():
+    # argv: [maxh [ntvals]].  ntvals is how many random t values the graded
+    # GF(2^16) rank is taken at; 2 (the default) is what the banked log used.
+    # 1 is the G1 ladder amendment above H=11: the graded rank has matched the
+    # ungraded GF(2) rank at every measured height, so the second t buys a
+    # 2^-16 false-pass margin on an already six-for-six check, at the price of
+    # ~40% of the height's wall.
     maxh = int(sys.argv[1]) if len(sys.argv) > 1 else 9
+    ntvals = int(sys.argv[2]) if len(sys.argv) > 2 else 2
+    if ntvals not in (1, 2):
+        print("ntvals must be 1 or 2")
+        return 1
     print("exact 'before' numbers at H=21:")
     print("  incumbent column states Motzkin(22)-1 =", motzkin(22) - 1)
     print("  B1 column-cut sum C(22,2k)Bell(k)     =", b1_colcut(21))
@@ -417,7 +427,7 @@ def main():
         rng = np.random.default_rng(20260812 + H)
         t1, t2 = [int(x) for x in rng.integers(2, 65535, 2)]
         rg1 = obs_rank_gf216(delta, accept, msizes, t1)
-        rg2 = obs_rank_gf216(delta, accept, msizes, t2)
+        rg2 = obs_rank_gf216(delta, accept, msizes, t2) if ntvals == 2 else '-'
         print(f"{H}  {len(order)}  {motzkin(H+1)-1}  {r2}  {rg1}  {rg2}  "
               f"{AS1_MODP.get(H,'-')}   ({time.time()-t0:.1f}s)")
     return 0

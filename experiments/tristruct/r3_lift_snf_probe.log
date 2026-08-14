@@ -1,0 +1,16 @@
+Coin Lift G2 -- mu_k(H) = #invariant factors with v_2 < k, p=2, K=8
+mu_1 = rank over F_2 (the collapse, if any); mu_K ~ rank_Q (the generic curve)
+
+H  states  gens  mu_1  mu_2  mu_3  mu_4  mu_5  mu_6  mu_7  mu_8   GF2  modp   mu_2/mu_1  mu_1/2^H   wall
+4  20  6  6  6  6  6  6  6  6  6   6  6   1.000  0.375  (0.0s)
+5  50  17  15  17  17  17  17  17  17  17   15  17   1.133  0.469  (0.0s)
+6  126  35  27  35  35  35  35  35  35  35   27  35   1.296  0.422  (0.1s)
+7  322  88  58  86  88  88  88  88  88  88   58  88   1.483  0.453  (0.6s)
+8  834  204  112  194  204  204  204  204  204  204   112  204   1.732  0.438  (5.3s)
+9  2187  505  229  459  500  501  501  501  501  501   229  501   2.004  0.447  (54.6s)
+
+RED control: dropping the (r-1) diagonal from the merge stencil must move the mu profile
+  H=4  true [6, 6, 6, 6, 6, 6, 6, 6]   red [11, 11, 11, 11, 11, 11, 11, 11]
+  H=5  true [15, 17, 17, 17, 17, 17, 17, 17]   red [24, 25, 25, 25, 25, 25, 25, 25]
+
+RESULT: GREEN
