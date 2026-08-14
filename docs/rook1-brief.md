@@ -48,6 +48,27 @@ before wave 2 spawned and before any `g` existed.
 | `g`, ab-initio `P_k` cost growth | `g ≤ 3` | parity: composite base ≈ max(√3, √g) holds the goal |
 | `g` | `3 < g < b²` | route survives but beats the incumbent only, not parity |
 | `g` | `g ≥ b²` | **the tower route is killed.** Round 2 does not launch on it |
+
+**Re-registration, 2026-08-14, and it happens after a measurement exists — read
+this before citing the table.** R1-A measured `b = 1.7266`, so `b² = 2.9813 < 3`
+and the table above is not a partition after all: the middle band `3 < g < b²`
+is empty, and the parity and kill bands overlap on [2.9813, 3]. That is my
+defect, inherited from writing `b²` as a function without noticing that `b` near
+√3 collapses it. The repaired partition:
+
+| quantity | threshold | consequence |
+|---|---|---|
+| `g` | `g < b² = 2.9813` | route survives; and since `b² < 3` it is at parity by the same token |
+| `g` | `g ≥ b² = 2.9813` | **the tower route is killed** |
+
+Pre-registration means a threshold is not written after the number is known, and
+this rewrite breaks that rule on its face. What saves the record is that the
+verdict is **invariant under both versions**: R1-B's measured lower bound
+`g ≥ 8.15` exceeds every boundary either table can produce, so nothing about the
+kill turns on the repair. The overlap band [2.9813, 3] never had a measurement
+in it and now never will. Recorded rather than quietly fixed, because a silently
+edited threshold is the exact failure the pre-registration rule exists to stop —
+queue row A3, and jasonp's to overrule.
 | measured clause of the bar | set by R1-A on this day, before any challenger exists | a challenger must come in strictly below it on the same n = 24..30 window |
 
 `b` is the incumbent's per-n cost base and `b²` is the boundary because the

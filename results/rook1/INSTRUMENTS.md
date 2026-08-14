@@ -22,3 +22,5 @@ Logs live in `results/rook1/logs/`.
 Round 1 is desk-only: no engine, no fleet compute, no gate-1 work. Any lane that
 wants a job files a request and the lead dispatches it; the row lands here with
 an in-tree artifact path or it is not DONE.
+| R1-A base fit | incumbent per-n cost: kink-ladder ln-cpu slope 1.4595 (n=30..40, 9 pts, structured residuals); frontier per-height cpu ratio 2.9813 => b = 1.7266; window n=24..30 has one kink point (shipped-engine window curve NOT ESTABLISHED) | **DESK, from banked tsv/PROVENANCE cpu records — no new compute** | `experiments/rook1/rook1_R1-A_basefit.log` |
+| R1-C rank probe | rook vs king strip-automaton Hankel ranks (GF(2), GF(2^16) graded, mod-p) H<=9; king ranks regressed against banked tables; A001168 tie vs build/g2 --rook-bishop; RED A (wrong stencil) + RED B (killed transition) both go red | **RUN** `experiments/rook1/rook1_R1-C_rank_probe.log` | `experiments/rook1/rook1_R1-C_rank_probe.log` |

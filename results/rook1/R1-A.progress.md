@@ -11,3 +11,9 @@ DONE: pulled a24..a39 records — kink ladder starts a30; a30-34 dalby-solo same
 ABOUT TO: sum a31-34 tsv cpu, grep a39 cpu + a24 H16 stats + a25 cpu, per-height cpu sums a30-34
 DONE: full cpu series in hand — kink dalby ladder a30..a40 (a35/36 split, excluded), column window points a26/a28/a29, per-height sums
 ABOUT TO: write+run experiments/rook1/rook1_R1-A_basefit.py (ln-cpu vs n least squares, residuals, per-height ratios)
+DONE: fit run -> experiments/rook1/rook1_R1-A_basefit.log (ladder slope 1.4595; frontier per-height 2.9813; sqrt=1.72663; window curve for shipped engine NOT ESTABLISHED)
+ABOUT TO: write deliverable results/rook1/R1-A.md + queue rows + INSTRUMENTS row
+DONE: deliverable results/rook1/R1-A.md written; queue rows A0-A4 appended; INSTRUMENTS row added
+ABOUT TO: run scripts/check_receipts.sh
+DONE: check_receipts.sh green (19 files)
+DONE: R1-A question closed — filed, stopping. b=1.7266, threshold proposed 1.7266, K3 FIRED. Successors A1-A4.

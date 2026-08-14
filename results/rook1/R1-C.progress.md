@@ -9,3 +9,7 @@ DONE: g2 square8 8 --rook-bishop -> rook col = A001168 exactly (log captured in 
 ABOUT TO: write experiments/rook1/rook1_R1-C_rank_probe.py (rook+king strip automata, GF(2)/GF(2^16)/mod-p observability ranks, A001168 tie, two RED controls) and run at MAXH=8 foreground
 DONE: probe written + smoke-run MAXH=6. All gates green incl. both REDs. Smoke result: rook GF(2) rank ~= states (20/20, 49/50, 119/126), mod-p FULL -- no crack. Finding logged: bottom-anchored delta defect CANCELS in the exact-height telescope; A001168 tie alone is a weak gate, word-count regression is the red one.
 ABOUT TO: full run MAXH=8 foreground (est ~1-2 min from smoke timings), log = experiments/rook1/rook1_R1-C_rank_probe.log
+DONE: full run MAXH=8 (log experiments/rook1/rook1_R1-C_rank_probe.log). VERDICT SHAPE: rook has NO char-2 crack -- GF(2) rank 20,49,119,288,696 vs states 20,50,126,322,834 (83-100%), mod-p FULL at H<=7; king regression reproduces banked tables exactly.
+ABOUT TO: final run MAXH=9 (GF2-only at H=9 by caps, est ~1.5 min extrapolated from 1.9s H=8) -> same log stem
+DONE: MAXH=9 run (log experiments/rook1/rook1_R1-C_rank_probe.log); deliverable results/rook1/R1-C.md filed; queue rows C1-C4 appended; INSTRUMENTS.md row appended; scripts/check_receipts.sh GREEN (20 files).
+FILED. Lane closed; reporting to lead and stopping.

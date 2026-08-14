@@ -1,0 +1,47 @@
+# re-derive cpu sums: for f in results/ns_a{26,30,31,32,33,34}/cost_profile*.tsv; do awk -F'\t' '!/^#/{c+=$6}END{print FILENAME, c}' $f; done
+== Series 1: kink dalby ladder, ln(cpu_s) vs n, least squares ==
+n window: 30..40 (9 points; 35,36 excluded, cross-machine)
+slope = 0.37811  =>  per-n cost ratio e^slope = 1.4595
+residuals (ln cpu - fit), and implied cpu/fit factor:
+  n=30  resid=+0.079  x1.08   topH=17  [results/ns_a30/cost_profile_dalby.tsv (awk sum cpu_s)]
+  n=31  resid=+0.408  x1.50   topH=18  [results/ns_a31/cost_profile_dalby.tsv (awk sum cpu_s)]
+  n=32  resid=+0.119  x1.13   topH=18  [results/ns_a32/cost_profile_dalby.tsv (awk sum cpu_s)]
+  n=33  resid=-0.170  x0.84   topH=18  [results/ns_a33/cost_profile_dalby.tsv (awk sum cpu_s)]
+  n=34  resid=-0.459  x0.63   topH=18  [results/ns_a34/cost_profile_dalby.tsv (awk sum cpu_s)]
+  n=37  resid=-0.580  x0.56   topH=19  [results/ns_a37/PROVENANCE.md (cpu 580223s)]
+  n=38  resid=+0.165  x1.18   topH=20  [results/ns_a38/PROVENANCE.md (cpu 1,783,598s)]
+  n=39  resid=-0.064  x0.94   topH=20  [results/ns_a39/PROVENANCE.md (cpu 2,070,672s)]
+  n=40  resid=+0.501  x1.65   topH=21  [results/ns_a40/PROVENANCE.md (871963+1116858+3329644)]
+adjacent measured per-n ratios (MEASURED, same machine):
+  a31/a30 = 2.029 over dn=1 => 2.029/n  (topH 17->18)
+  a32/a31 = 1.094 over dn=1 => 1.094/n  (topH 18->18)
+  a33/a32 = 1.093 over dn=1 => 1.093/n  (topH 18->18)
+  a34/a33 = 1.093 over dn=1 => 1.093/n  (topH 18->18)
+  a37/a34 = 2.754 over dn=3 => 1.402/n  (topH 18->19)
+  a38/a37 = 3.074 over dn=1 => 3.074/n  (topH 19->20)
+  a39/a38 = 1.161 over dn=1 => 1.161/n  (topH 20->20)
+  a40/a39 = 2.568 over dn=1 => 2.568/n  (topH 20->21)
+
+== Series 2: chartered window n=24..30, what exists ==
+  n=24  cpu=None  topH=16  engine=column  machine=dalby  [results/ns_a24/RESULT.md: wall 4870.3s x 80c, H16 only; H1-15 reused; TOTAL CPU NOT RECORDED]
+  n=25  cpu=None  topH=16  engine=column  machine=ayr30  [results/ns_a25/RESULT.md: wall 45841.5s x 30c; cpu not recorded]
+  n=26  cpu=259913  topH=15  engine=column  machine=dalby  [results/ns_a26/cost_profile.tsv (awk sum cpu_s)]
+  n=27  cpu=848671  topH=16  engine=column  machine=dalby(H16 only)+ayr(H3-15, cpu not recorded)  [results/ns_a27/cost_profile_dalby.tsv]
+  n=28  cpu=353202  topH=15  engine=column  machine=ayr32  [results/ns_a28/PROVENANCE.md cpu 353201.8s]
+  n=29  cpu=1960647  topH=16  engine=column  machine=dalby  [results/ns_a29/PROVENANCE.md cpu 1960646.8s]
+  n=30  cpu=79445  topH=17  engine=kink  machine=dalby  [results/ns_a30/cost_profile_dalby.tsv]
+column-engine dalby pair a26->a29: ratio 7.543 over 3n => 1.961/n (2 points, no residuals possible)
+
+== Per-height cpu ratios, kink dalby (cost per unit height) ==
+  a30: H16/H15=1.955, H17/H16=2.262
+  a31: H16/H15=2.094, H17/H16=2.359, H18/H17=2.599
+  a32: H16/H15=2.118, H17/H16=2.385, H18/H17=2.649
+  a33: H16/H15=2.125, H17/H16=2.409, H18/H17=2.680
+  a34: H16/H15=2.134, H17/H16=2.425, H18/H17=2.729
+  a40 phases: C/B = H21/H20 = 2.9813  (ns_a40/PROVENANCE.md)
+  sqrt of frontier per-height ratio: sqrt(2.9813) = 1.72663
+
+== Fixed-H per-n growth (polynomial factor), kink dalby ==
+  H=16: per-n factors ['1.028', '1.072', '1.077', '1.076']
+  H=17: per-n factors ['1.072', '1.084', '1.088', '1.082']
+  H=18: per-n factors ['1.105', '1.101', '1.102']
