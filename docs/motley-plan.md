@@ -79,6 +79,37 @@ matters more than its gate list makes it sound.
 exits 2, and the gate script raises rather than printing a FAIL line. Nonzero
 either way.)
 
+## The height ceiling nobody costed
+
+The engine refused H = 17 outright: three argument checks read `H <= 16`.
+Neither this plan, `docs/b1-closure-plan.md`, nor either review caught it —
+the launch did, by refusing. It was the height the banked ladder stopped at,
+not a property of the algorithm.
+
+The real ceiling is the key packing: H+1 slots of 5 bits in a u128, so
+**H <= 24**. Two further limits are far away and are now asserted rather than
+assumed, by a `check_height()` the three entry points call:
+
+- **Block ids must fit a 5-bit slot.** The maximum id is the number of
+  distinct blocks in the frontier window, bounded by the maximal filled runs
+  in H+1 slots plus one for the column-boundary split — vertically adjacent
+  filled cells in a column are king-adjacent and share an id, while the two
+  slots either side of the boundary are not board neighbours. That is 10 at
+  H = 17 and passes 31 only beyond H = 60.
+- **`successors()` writes blocks + 2 entries.** The same bound gives <= 12 at
+  H = 17 — inside the original buffer — but **13 at H = 18**, so the three
+  caller-side buffers went to 32. Measured max fan-out is milder still,
+  ceil(H/2) + 1: 3,4,4,5,5,6,6,7,7,8,8 at H = 4..14 by census, and 9 at H = 15
+  confirming the formula.
+
+The connectivity core is untouched — `slot`, `canon`, `gather`, `shifted`,
+`successors` are byte-identical and only the callers' buffers grew. Commit
+`4df3fec`, gate GREEN, C_13 still byte-identical after the change.
+
+**Carry this into Confetti and Ticker Tape**: H = 18 would have overflowed the
+original 12-entry buffer by one, silently, on the stack. The rung that first
+needed it was two rungs away from the one that found it.
+
 ## Rung 1 — Half Measure
 
 **Change.** `I256` becomes a wrapping `u128`. One type, one bound check.
@@ -119,6 +150,12 @@ comparison, fail-closed.
 **Product.** a(n) closed for n <= 33; T(n,17) for all n <= 40 banked; and the
 first *measured* wall, RSS and census ratio above H = 16, which every
 projection below currently rests on.
+
+**Status**: launched 2026-08-14 06:32 EDT, binary `4df3fec9` clean, gate
+GREEN. Byte-for-byte oracle passed at **H = 12, 13, 14, 15 and 16** — every
+height the reference can also reach. Measured at H = 16: peak RSS 32.06 GB
+against the reference's 62.29 (**x0.5147**), wall 12,231 s against 17,047
+(**x1.394**, both under partial co-residency).
 
 ## Rung 2 — Confetti
 

@@ -44,11 +44,20 @@ statement that did not survive contact.
   connectivity.
 - **Half Measure is written, gated and measured** (`b9d725b`): rows
   byte-identical to both the reference binary and the banked rows at H = 12,
-  13, 14, 15, with H = 16 running; payload factor **0.514 measured** — the x1.9 the ladder budgets — and
+  13, 14, 15 **and 16** — every height the reference can also reach; payload factor **0.514 measured** — the x1.9 the ladder budgets — and
   a **x1.46-1.57 wall bonus** nobody had counted on. That moves H = 17 from
   100 GB / ~15 h to **91 GB / ~7-10 h**, and the +-20% census band's bad end
   (109 GB) now fits dalby with 13 GB to spare. The check-split does not need to
   be pulled forward.
+- **H = 17 is RUNNING** — launched 06:32 EDT, binary `4df3fec9` clean, gate
+  GREEN, ~96 GB predicted peak (87.6 GB at 3 min) and ~11 h. Measured Half
+  Measure factors at H = 16: RSS x0.5147, wall x1.394.
+- **The engine had an uncosted `H <= 16` ceiling** and refused to start. Three
+  argument checks, not a property of the algorithm; no plan or review caught
+  it. Raised to the structural limit (key packing, H <= 24) with the other two
+  bounds now asserted rather than assumed. **H = 18 would have overflowed a
+  12-entry stack buffer by one, silently** — found two rungs before the one
+  that needed it. Core untouched; commit `4df3fec`.
 - **H = 17 has an external oracle**: `results/triangle.txt` carries the
   incumbent's T(n,17) for every n <= 40, so the product and its check land
   together. `scripts/dalby_motley_h17.sh`, fail-closed.
