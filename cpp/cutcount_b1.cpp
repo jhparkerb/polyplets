@@ -92,8 +92,35 @@ struct KeyHash {
     return (size_t)(h ^ (h >> 29));
   }
 };
-static const int BITS = 5;
 static const u128 SLOTMASK = 0x1F;
+
+// Height ceiling, and where each part of it comes from.  The frontier key
+// packs H+1 slots of BITS bits into a u128, so (H+1)*BITS <= 128 gives
+// H <= 24 -- that is the structural limit and the one HMAX_KEY enforces.
+// The other two are far away and are asserted rather than relied on:
+//   * block ids must fit a slot.  The maximum id is the number of distinct
+//     blocks in the frontier, measured (census, H = 4..17) as ceil(H/2), so
+//     it exceeds 31 only past H = 62.
+//   * successors() writes at most (number of blocks) + 2 entries, measured as
+//     ceil(H/2) + 1 -- 3,4,4,5,5,6,6,7,7,8,8 at H = 4..14 and confirmed
+//     directly at 15, 16, 17.  SUCC_CAP = 32 covers every height the key
+//     packing can reach, with a factor of three in hand.
+// The engine shipped with a flat H <= 16 argument check, which was the height
+// the banked ladder stopped at, not a property of the algorithm.
+static const int BITS = 5;
+static const int SUCC_CAP = 32;
+static const int HMAX_KEY = 24;
+static inline void check_height(int H) {
+  if ((H + 1) * BITS > 128) {
+    fprintf(stderr, "FATAL key_width H=%d\n", H); std::exit(2);
+  }
+  if (H / 2 + 1 > (int)SLOTMASK) {
+    fprintf(stderr, "FATAL slot_width H=%d\n", H); std::exit(2);
+  }
+  if (H / 2 + 2 > SUCC_CAP) {
+    fprintf(stderr, "FATAL succ_cap H=%d\n", H); std::exit(2);
+  }
+}
 
 static inline int slot(u128 key, int k) { return (int)((key >> (BITS * k)) & SLOTMASK); }
 
@@ -177,7 +204,7 @@ static void census(int Hmin, int Hmax, int ncols) {
       for (int r = 0; r < H; r++) {
         nxt.clear();
         nxt.reserve(cur.size() * 2);
-        Succ s[12];
+        Succ s[SUCC_CAP];
         for (auto& kv : cur) {
           int ns = successors(kv.first, H, r, c, s);
           trans += ns;
@@ -218,7 +245,7 @@ static std::vector<i128> run_height(int H, int Nmax, double& wall) {
       nidx.clear();
       npay.clear();
       nidx.reserve(idx.size() * 2);
-      Succ s[12];
+      Succ s[SUCC_CAP];
       for (auto& kv : idx) {
         const Payload& P = pay[kv.second];
         int ns = successors(kv.first, H, r, c, s);
@@ -303,7 +330,7 @@ static void run_height_modp(int H, int Nmax, uint64_t p, const char* outfile) {
   for (int c = 0; c < W; c++) {
     for (int r = 0; r < H; r++) {
       nidx.clear(); npay.clear(); nidx.reserve(idx.size() * 2);
-      Succ s[12];
+      Succ s[SUCC_CAP];
       for (auto& kv : idx) {
         const auto& P = pay[kv.second];
         int ns = successors(kv.first, H, r, c, s);
@@ -365,7 +392,8 @@ int main(int argc, char** argv) {
   if (argc == 6 && !std::strcmp(argv[1], "--modp")) {
     int H = atoi(argv[2]), Nmax = atoi(argv[3]);
     uint64_t p = strtoull(argv[4], nullptr, 10);
-    if (H > 16 || p >= (1ull << 31)) { fprintf(stderr, "limits: H<=16, p<2^31\n"); return 1; }
+    if (H > HMAX_KEY || p >= (1ull << 31)) { fprintf(stderr, "limits: H<=%d, p<2^31\n", HMAX_KEY); return 1; }
+    check_height(H);
     run_height_modp(H, Nmax, p, argv[5]);
     printf("C_%d mod %llu, n<=%d -> %s\n", H, (unsigned long long)p, Nmax, argv[5]);
     rep.done("mode=modp H=" + std::to_string(H));
@@ -373,7 +401,8 @@ int main(int argc, char** argv) {
   }
   if (argc == 5 && !std::strcmp(argv[1], "--height")) {
     int H = atoi(argv[2]), Nmax = atoi(argv[3]);
-    if (H > 16 || Nmax > 60) { fprintf(stderr, "limits: H<=16 Nmax<=60\n"); return 1; }
+    if (H > HMAX_KEY || Nmax > 60) { fprintf(stderr, "limits: H<=%d Nmax<=60\n", HMAX_KEY); return 1; }
+    check_height(H);
     double wall = 0;
     auto row = run_height(H, Nmax, wall);
     FILE* f = fopen(argv[4], "w");
@@ -445,7 +474,8 @@ int main(int argc, char** argv) {
   }
   if (argc < 3) { fprintf(stderr, "usage: %s Hmax Nmax [banked_dir] | --states Hmin Hmax Ncols\n", argv[0]); return 1; }
   int Hmax = atoi(argv[1]), Nmax = atoi(argv[2]);
-  if (Hmax > 16 || Nmax > 60) { fprintf(stderr, "limits: Hmax<=16 Nmax<=60\n"); return 1; }
+  if (Hmax > HMAX_KEY || Nmax > 60) { fprintf(stderr, "limits: Hmax<=%d Nmax<=60\n", HMAX_KEY); return 1; }
+  for (int h = 1; h <= Hmax; h++) check_height(h);
   std::vector<std::vector<i128>> C(Hmax + 1);
   for (int H = 1; H <= Hmax; H++) {
     double wall = 0;
