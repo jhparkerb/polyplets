@@ -1,4 +1,73 @@
-# HANDOFF — live state (updated 2026-08-13)
+# HANDOFF — live state (updated 2026-08-14)
+
+## 2026-08-14 — rook parity round 1 run and closed; the goal did not survive it
+
+One desk-only round, six Fable agents, no compute dispatched. Brief
+`docs/rook1-brief.md`, product `docs/rook-parity-bar.md`, lane files and the
+ledger/queue/INSTRUMENTS under `results/rook1/`. Commits `e72e5ac`..`4a90412`.
+
+**The goal in `docs/rook-parity.md` is not well-formed, and the round is what
+established that.** jasonp's verdict, and the evidence agrees: the pin sits
+0.31% above what the incumbent already measures, the test is passable by the
+incumbent, and the bar contradicts the pin. Do not restart it as written; do not
+re-run the round. The goal file itself is UNCHANGED by instruction — every
+correction below lives in the brief, the bar file, or the lane files.
+
+- **The incumbent's base is b = 1.7266 = √2.9813** (R1-A), from the measured
+  frontier per-height cpu ratio, phase C / phase B = 3,329,644 / 1,116,858, on
+  the dH/dn = ½ treadmill. Below the √3 = 1.7321 pin. **`kink-carry.md:46`'s
+  2.42–2.5 is WRONG as a kink cost claim** — a pre-kink state-growth number from
+  another engine on another trajectory. `kink-carry.md:69`'s 1.61 is the
+  states/RAM base, a lower bound on cost. The goal file's whole quantitative
+  spine inherited the wrong number.
+- **Conditional, and this is the live question**: 1.7266 holds on a *fitted*-P_k
+  treadmill; frozen fence gives 2.98. And the per-height ratio is still rising
+  (2.60 → 2.73 → 2.98 across H18..H21) — if it crosses 3, b crosses the pin from
+  below. That is queue row A2, the only open question that can still move the
+  base.
+- **Gate 0 fired its kill: the ab-initio P_k tower is DEAD** (R1-B). g ≈ 20 per
+  level (ratio 21.0 at k=4→5, MEASURED lower bound 8.15 at k=5→6,
+  `results/defect-gas.md:242`). At even g = 3, k=9 → k=19 is 7.4 years of
+  16-thread dalby.
+- **But gate 0 measured the wrong object** (R1-E): the a(40) assembly consumes
+  two rational constants per level, not the weight DP, and depth ≤ 4 below-onset
+  cells are closed ab initio — so every level is pinnable from the route's own
+  H ≤ 19 sweep, and depth ≥ 5 is consumed nowhere. Not a rescue: both routes
+  sweep to half height, so the re-anchored route's base **is** b, and deleting
+  phases B+C (84% of a(40) cpu) is a constant factor, out of scope by the goal's
+  own terms. Corrected gate-0 measurement (e ≤ 3 family DP growth over
+  K = 19..25, minutes-scale) is queue row E2, UNRUN.
+- **King→rook transport is DEAD unconditionally**, not merely out of scope
+  (R1-D). Counting floor on all injective reductions β ≥ ln λ_k / ln λ_r = 1.244
+  rigorous, 1.400 at best estimates; budget at b = 1.7266 is β < 0.994. The
+  goal's asserted β ≥ 2 for the diagonal-splice family is now derived and tight
+  (lattice parity ⇒ ≥ 2 expensive axes ⇒ ≥ 2n−1 cells; identity+bridges attains
+  it).
+- **Rook shows NO char-2 crack** (R1-C): GF(2) Hankel rank 20/49/119/288/696/1681
+  at H = 4..9 on a state space identical to king's, growth ~2.42×/height, mod-p
+  exactly full. King's 0.44·2^H collapse is stencil-specific, so **the INV-4
+  explicit-basis hunt loses its CKN precedent** — reset its prior.
+- **Collateral, and it belongs to any future gate**: a bottom-anchored transition
+  kill cancels exactly in the exact-height second-difference telescope — the
+  corrupted engine still reproduces A001168 for all n ≤ 8. End-to-end value ties
+  pass that whole defect class; plant an anchored defect, not just the NW-stencil
+  drop (queue row C4).
+- **Held for jasonp, undecided**: A1-JOB-1 (incumbent's on-window n=24..30 curve,
+  ~2 h dalby) — my recommendation is to run it as the incumbent arm of gate 1
+  alongside a challenger, never alone, for commensurability. A4 (gate 1's strict
+  clause is now stronger than the √3 pin). E3 (the a(40) test may separate
+  nothing, since the treadmill self-anchors).
+- **New mechanical control, kept**: `scripts/check_receipts.sh` +
+  `make gate-receipts`, red-first with three planted-claim fixtures. A status
+  token in a table cell or `status:` line under `results/rook*/`,
+  `docs/rook*-brief.md` or `docs/rook-parity-bar.md` needs an in-tree non-empty
+  path on the same line.
+- **Process lesson, jasonp's**: the round's mechanical controls were aimed at
+  transmission failures while the actual failure was target selection again. The
+  brief-adversary audited the round's premises but not the *goal's*, and passed
+  all four lanes. The base anatomy audit was the goal file's own first question
+  and it ran in parallel with three lanes that depended on its answer; it should
+  have run before the brief existed.
 
 ## 2026-08-13 — triangle salvage merged; reading pass; king twigs opened
 
