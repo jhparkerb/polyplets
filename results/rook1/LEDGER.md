@@ -20,5 +20,14 @@ filed (via SendMessage, onto a queue row) is free and preferred.
 | 3 | R1-B | scout | Fable | 2026-08-13 | 2026-08-14 | 2026-08-14 | P_k tower feasibility; **is** gate 0. Fired the kill row |
 | 4 | R1-C | scout | Fable | 2026-08-13 | 2026-08-14 | 2026-08-14 | rook Hankel ranks at small H; marginal lane, verdict must name the king decision |
 | 5 | R1-D | adversary | Fable | 2026-08-13 | 2026-08-14 | 2026-08-14 | transport obstruction; owns queue row K2 (the asserted β ≥ 2) |
-| 6 | R1-E | scout | Fable | 2026-08-14 | — | — | wave-3 dispatch off queue row B1: was gate 0's kill aimed at the right object |
+| 6 | R1-E | scout | Fable | 2026-08-14 | 2026-08-14 | 2026-08-14 | wave-3 dispatch off queue row B1: was gate 0's kill aimed at the right object |
 
+
+## Census at close, 2026-08-14
+
+Six spawned of a hard cap of 8; `ListAgents` reports no reachable agents, and
+every row above carries a stop date. **6 dispatched = 6 listed = 6 real.** The
+round closes.
+
+Agent-time accounting, the half of postmortem item 9 this ledger retires: all
+six were Fable, all desk-only, none dispatched a job. Two slots were never used.

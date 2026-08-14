@@ -49,7 +49,7 @@ FIXTURES="$ROOT/tests/fixtures/receipts"
 default_scope() {
 	local f
 	for f in "$ROOT"/results/rook*/*.md "$ROOT"/results/rook*/**/*.md \
-	         "$ROOT"/docs/rook*-brief.md; do
+	         "$ROOT"/docs/rook*-brief.md "$ROOT"/docs/rook-parity-bar.md; do
 		[ -f "$f" ] && printf '%s\n' "$f"
 	done
 }

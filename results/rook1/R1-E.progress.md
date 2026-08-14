@@ -8,3 +8,6 @@ DONE: step 4 (read early, severance + depth records) -> depths j=2,3,4 closed ab
 ABOUT TO: step 3 — PROVENANCE.md band structure at n=40, and depth1-closed identity direction (T below onset = P_k extension - defect)
 DONE: step 3 -> PROVENANCE: real sweeps H3-21, wired k<=18 for H>=22; Phase A (H1-19 + wired) 6.3h vs B+C (H20,H21 solo) = 84% cpu. depth1-closed: D_1(k) = T(2k,k) - law; below-onset column k IS k+1 integers (coeffs of D(z)), depth j = [z^{k+1-j}]D(z); D_1 exact to k=200 in 42s, needs NO P_k. Pinning argument complete: every (a_k,b_k) for k<=20 is pinnable from H<=19 sweep cells (in-onset for k<=17, depth<=4 below-onset + closed D_j for k=18,19,20). Full weight DP consumed NOWHERE. Counter-sting also found: remaining exponential = the sweep itself = incumbent's base.
 ABOUT TO: step 5 — read queue.md head for format, then file R1-E.md verdict + successor rows, close B1
+DONE: step 5 -> results/rook1/R1-E.md filed (verdict: bounded-depth slices suffice, full weight DP consumed nowhere; no parity rescue — remaining exponential is the sweep's b); queue rows E0 (closes B1), E1, E2, E3 appended
+ABOUT TO: run ./scripts/check_receipts.sh
+DONE: check_receipts.sh -> exit 0 (self-test OK, 22 files, gate green). R1-E filed complete; B1 closed; reporting to lead and stopping.

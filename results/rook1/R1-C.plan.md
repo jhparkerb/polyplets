@@ -18,7 +18,8 @@ change (or "changes nothing").
    the Hankel object may need per-cut or per-height data). Produces: a
    data-availability verdict — computable seconds-scale on gympie, or a job
    request, or structurally unavailable without the (out-of-scope) rook TM.
-3. If seconds-scale: write `experiments/rook1/rook1_R1-C_hankel.py` (or reuse
+3. If seconds-scale: write `experiments/rook1/rook1_R1-C_hankel.py` (planned
+   name; see the revision at the end of this file) (or reuse
    the king script with a rook data source), compute char-2 and mod-p ranks for
    rook at the same small H range, log beside the script. RED control: plant a
    corrupted input (bit-flipped matrix entry / truncated sequence) and show the
@@ -39,3 +40,11 @@ change (or "changes nothing").
 - Any computation that I would background, wrap in timeout, or tee: becomes a
   job request per `docs/r3-job-dispatch.md`; I do not run a small version
   locally while waiting.
+
+## Revision, appended by the lead 2026-08-14
+
+Step 3's script was filed as `experiments/rook1/rook1_R1-C_rank_probe.py`, not
+the `..._hankel.py` planned above. The plan is not rewritten, per the
+write-ahead rule; the planned name is labelled in place and the actual name
+recorded here. `make gate-citations` is what surfaced the discrepancy — a plan
+citing a path that was never created.
