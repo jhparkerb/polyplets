@@ -15,3 +15,4 @@ filed (via SendMessage, onto a queue row) is free and preferred.
 
 | # | id | type | model | spawned | filed | stopped | notes |
 |---|---|---|---|---|---|---|---|
+| 1 | R1-K | adversary | Fable | 2026-08-13 | — | — | brief-kill pass, wave 1, spawned alone; wave 2 gated on its PASS file |

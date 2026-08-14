@@ -38,18 +38,36 @@ go.** That takes jasonp, in so many words. (`rook-parity.md:106-113`, and the
 postmortem's item 2: every stop failure in the triangle campaign was a waiver,
 not a detection failure.)
 
+A complete numeric partition of `g`, with no unassigned band: every value that
+can come out of the measurement fires exactly one row. Revised 2026-08-13 on
+R1-K's pre-registration audit (`results/rook1/R1-K.md` §Pre-registration audit),
+before wave 2 spawned and before any `g` existed.
+
 | quantity | threshold | consequence |
 |---|---|---|
-| `g`, ab-initio `P_k` cost growth | `g ≲ 3` | parity: composite base ≈ max(√3, √g) holds the goal |
-| `g` | `3 < g < 5.9` | route survives but beats the incumbent only, not parity |
-| `g` | `g > 6` | **the tower route is killed.** Round 2 does not launch on it |
+| `g`, ab-initio `P_k` cost growth | `g ≤ 3` | parity: composite base ≈ max(√3, √g) holds the goal |
+| `g` | `3 < g < b²` | route survives but beats the incumbent only, not parity |
+| `g` | `g ≥ b²` | **the tower route is killed.** Round 2 does not launch on it |
 | measured clause of the bar | set by R1-A on this day, before any challenger exists | a challenger must come in strictly below it on the same n = 24..30 window |
 
-R1-A proposes the measured-clause number; it is registered in
-`docs/rook-parity-bar.md` (planned) on this day and not renegotiated
-afterwards. Chartering
-"beat X" after measuring the challenger is round 2 of the triangle campaign
-again.
+`b` is the incumbent's per-n cost base and `b²` is the boundary because the
+composite base goes as `√g`: the tower beats the incumbent iff `√g < b`. **The
+registered threshold is the function `b²`, not a negotiable number** — that is
+what makes it pre-registered while R1-A and R1-B run in parallel. Under the
+current best reading `b = 2.42`, the boundary is `2.42² = 5.856`; R1-A's
+reconciliation of the 2.42 / 1.61 / 1.73 contradiction fixes `b`, and the
+resulting number is registered in `docs/rook-parity-bar.md` (planned) *before*
+`g` is compared against it. Not 5.9: a `g` in [5.856, 5.9) would satisfy a
+threshold written as 5.9 while actually exceeding the incumbent.
+
+`g ≤ 3` exactly, not "≲ 3": parity is `√g ≤ √3`, and a measured 3.05 is a kill
+of the parity claim, not a conversation. The goal file's "g ≫ 6"
+(`rook-parity.md:111`) is the loose form; this table is the binding one, and the
+bar file restates it so round 2 cites one number.
+
+R1-A proposes the measured-clause number; it is registered on this day and not
+renegotiated afterwards. Chartering "beat X" after measuring the challenger is
+round 2 of the triangle campaign again.
 
 ## What is CLOSED — do not re-derive, do not re-propose
 
@@ -151,6 +169,9 @@ or a job request to the lead for anything larger; **nothing in between.**
 Verdict: does rook show the char-2 crack that `results/triangle-r3-involution.md`
 §2 measured on king (~0.44·2^H against mod-p 2.5–2.8×/height vs ~3× states), or
 not — and does the answer change any king decision. "No" is a full result here.
+Your verdict must **name the specific king decision that changes, or say
+"changes nothing" in those words** (R1-K's condition on this lane): a verdict
+that leaves that open is not filed.
 
 ### R1-D — adversary, the transport obstruction
 
