@@ -51,6 +51,36 @@ The `H <= 16` row is not a projection: `--source motley` reads Motley's own
 script does, and reproduces rows 17..34 against the banked triangle, 171 cells,
 0 mismatches.
 
+## Raising J: each depth substitutes for one swept height
+
+`n <= 2 H_max + J - 1` is symmetric in the two levers, so a deeper defect buys
+exactly what an extra height buys. What each `J` would make unnecessary:
+
+| J | H = 16 (banked) | H = 17 (Half Measure) | H = 18 (Confetti) | H = 19 (Ticker Tape) |
+|---|---|---|---|---|
+| 3 (shipped) | 34 | 36 | 38 | **40** |
+| 4 (validated) | 35 | 37 | 39 | 41 |
+| 5 | 36 | 38 | **40** | 42 |
+| 7 | 38 | **40** | 42 | 44 |
+| 9 | **40** | 42 | 44 | 46 |
+
+**J = 4 is validated**, not projected: at guard 14 with `--jmax 4`, `mu_16` pins
+at depth 4 and rows 15..31 reproduce, 153 cells, 0 mismatches.
+
+The cost is the cluster families of excess `<= j-1`. Timed on the Python path
+at K = 21: j = 1, 2, 3 take 0.1 s, 3.4 s, 131 s — about **35x per depth**, so
+j = 4 is ~1.3 h and j = 6 is ~80 days there. The C++ builder
+(`cpp/severance_w3_families.cpp`) is the real path: it takes `emax` as an
+argument, `MAXN = 8` admits excess <= 6 (hence J <= 7), and
+`experiments/severance_w3_depths.py` has no depth ceiling of its own
+(`emax = j - 1` throughout). So **J = 5 is a table to build, not code to
+write** — but J = 7 and J = 9 are out at this scaling, needing 35^2 and 35^4
+more than J = 5.
+
+The trade is not free in evidence terms. Dropping a swept rung moves weight off
+an enumerating engine and onto the depth identity, which is the single-sourced
+link. Deeper J makes the independent re-derivation more load-bearing, not less.
+
 ## What this removes
 
 - **The H = 20 rung.** `docs/b1-closure-plan.md`'s ladder builds toward H = 20
