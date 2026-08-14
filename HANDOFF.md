@@ -1,5 +1,58 @@
 # HANDOFF — live state (updated 2026-08-14)
 
+## 2026-08-14 — Clean Room: the second source for `D_j`, IN FLIGHT
+
+The open item below ("`D_j` is still single-sourced") is being closed. jasonp's
+order of work: the re-derivation first, the `J = 5` table second; the report's
+tier ruling is explicitly NOT in scope ("I'll handle document editing questions
+when it is document editing time").
+
+**The isolation.** A scrubbed copy of `74bf988` was built by deleting, not
+merely forbidding, everything that records the incumbent derivation:
+`experiments/severance_w3_{depths,gate,modp}.py`, `severance_w4_field.py`,
+`depth_swap_anchors.py`, `cpp/severance_w3_families.cpp`, both cached family
+tables, `results/onset-defect-depths234.md`, the anchor-cut notes,
+`docs/onset-defect-severance-plan.md`, `docs/motley-plan.md`,
+`polyplets/Polyplets/DepthAssembly.lean`, `results/rook1/` (R1-E leaked the
+whole family class), and `HANDOFF.md` — plus § 6 of
+`results/onset-defect-depth1-closed.md` redacted in place, that being the
+paragraph that prices the depth-`j` family class. Cluster *excess* itself was
+deliberately left in: it is project vocabulary from
+`docs/proofs/T-n-nm2-and-general.md`, not the incumbent's secret. Scrubbed tree
+`ayr:~/tmp/cleanroom-depthj`; unscrubbed comparison tree
+`ayr:~/tmp/incumbent-depthj`; the deriving agent is barred from both that and
+`ayr:~/src/polyominoes`.
+
+**Provenance.** `git bundle` of the branch → fetched into ayr's real repo →
+checked out as the worktree `ayr:~/tmp/depth-swap2` (clean, binaries stamp
+`GIT_REV=74bf988b`). ayr's main checkout was left on `second-source` rather
+than switched.
+
+**What the deriver has, unprompted by any incumbent file.** Substituting
+`z = 1/u`, `Y = y/u` in Step 4's chain identity gives
+`sum_t r_{2k+1-t} u^t = [Y^k] (u-3)^(k+1) { P~ + B~^2/(u-3-S~) }` with each
+cluster type weighted `Y^surplus u^excess`; **mod `u^j` only excess `<= j-1`
+clusters survive** — the incumbent's family class, reached independently from
+the degree-slack argument. Collapses to the public depth-1 identity at `u = 0`.
+`D_2`, `D_3` in hand to `k = 25`; **54/54 banked cells exact**, weights
+validated against its own brute force and the `k <= 9` banked per-type table.
+`j = 4` families still computing (tmux `fam-one5` pid 159587, `fam-p34`).
+
+**The test that actually decides it is not the banked cells** — the shipped
+gate already covers those. It is `k = 20..25`, past the triangle, where there
+is nothing to fit to. `ayr:~/tmp/incdvals` (tmux `incdvals`, pid 160777) runs
+the incumbent to `k = 25` from the stamped worktree for exactly that
+comparison. Small-`k` overlap already agrees exactly (`D_2(2) = 130/27`,
+`D_2(3) = 11524/243`, `D_2(4) = 344398/729`, `D_3(3) = 24877/729`).
+
+**`J = 5` / `K = 21` is NOT launched and is unpriced.** The two known points
+(`K=19,e=3` 146 s; `K=16,e=4` 18 min / 2.2 GB on 8 cores) do not pin the per-K
+growth at `e = 4`. tmux `famcalib` (pid 154530, `ayr:~/tmp/famcalib`) is
+measuring `K = 16, 17, 18` at `e = 4` on 16 threads to fit it. If the
+extrapolation to `K = 21` clears an hour it is a beg-and-agree before launch.
+The run itself is `build/severance_w3_families families 21 4 <threads>` from
+`ayr:~/tmp/depth-swap2`.
+
 ## 2026-08-14 — the anchor cut: the residual band closes from H <= 19
 
 Branch `worktree-depth-swap2`. Mechanism `results/depth-swap-anchors.md`,
