@@ -57,6 +57,12 @@ own unattended loop, and its headline output is prediction calibration.
   ayr) in a directory retained until grading completes; "no ssh" means no
   ssh *off* that host. Sessions may not spawn subagents (closes the
   token-accounting hole R2-V11).
+- **Network: read-only oeis.org lookups allowed, every query logged.**
+  Rungs 2–3 of the answer key are OEIS identifications; the court arm had
+  the instrument, so parity requires the loop have it too. Known
+  imperfection, accepted: sessions see live-2026-08 OEIS, the court saw
+  2026-07-12 state; any graded claim that rests on post-cut OEIS content
+  is bucketed READ-OFF. All other network stays closed.
 - **Session procedure**: write the report stub (`DIRECTION:`, `SHAPE:`)
   as the first action; one-paragraph execution plan; work (desk + sandbox
   scripts; the inherited tools are stdlib Python, seconds-scale); finish
@@ -110,6 +116,15 @@ territory; the graded ladder makes that a fine outcome, not a spoiled run.
 - **Launch is conditional on the operator declaring the ~5 days available**
   (the git record shows two ~3-day absences in six weeks; an absent
   operator turns Q2 into NOT TESTED, which is reportable but wasteful).
+- **Declared 2026-08-15 09:00**: Sat until 16:00; Sun all day; Mon–Wed
+  working — perhaps half an hour in the morning, several hours in the
+  evenings, sporadic through the workday. Commit-hour histogram since
+  2026-07-01 confirms the 02–06 trough (6–13 commits/hr vs 29–75 outside
+  it), so the 04:00 slot's dead window is real. **Calendar**: s01 Sat
+  20:00, s02–s04 Sun, s05–s13 Mon–Wed, s14 Thu 04:00 (no bulletin window
+  follows the final session, so its dead slot costs nothing). Every
+  non-dead window has declared coverage: mornings gate the 12:00 session,
+  evenings gate the 20:00 session.
 
 ## 5. Metrics (all fixed here; the verdict rule is §7's, sealed)
 
@@ -145,15 +160,31 @@ Ratios are computed **run-total only**; per-session ratios are not metrics.
 1. jasonp's prediction (registered skeptic) — per-session rates and rung
    prediction, plus expected failure modes, bulletin use, and what the
    court would have done better. Written knowing §8 C5.
+   **sha256: PENDING (his hand).**
 2. Fable's prediction, same categories, sealed by a different instance
-   than the one that grades.
+   than the one that grades. `sealed/FABLE-PREDICTION.md`,
+   sha256 `0640a8128b93498ffad0eccfd05e75663bc4de013e7f0055045962a1d2dcaa67`
+   (operator: seal item 1 before reading it).
 3. The answer key and in-scope/out-of-scope list (§3).
+   `sealed/ANSWER-KEY.md`, sha256
+   `9f73384d472d8bc74400c5277dbaf44770dc1463561b248bf7685284543322dc`.
 4. The banked-claim list for the slice (re-derivation denominator).
+   `sealed/BANKED-CLAIMS.md`, sha256
+   `8f87cbd62f9d8c3d851d115667fa70579c1bf15c7be5104190c4c14fb465a7b4`.
 5. The claim-granularity calibration counts (§5).
-6. Worked examples for the subjective metrics (§5).
+   `sealed/CALIBRATION.md`, sha256
+   `e891cf91a79bfd659c903e86d9ef4bf6e68a3ad30d3caeb61a793ac6d36f9b06`.
+6. Worked examples for the subjective metrics (§5). **PENDING** — being
+   mined from the corpus; sealed by edit here when filed.
 7. **The verdict rule**: which combination of outcomes counts as the loop
    doing well/poorly, with numbers — crude and sealed beats careful and
-   post-hoc.
+   post-hoc. `sealed/VERDICT-RULE.md`, sha256
+   `9f9e48f49bd6193cbcee2a07d2c84b990937f0b99ca4c03137ce9f5df062e202`.
+
+Sandbox definition published: `results/ghostship/SANDBOX.md`, sha256
+`10a5dfbcd8a52371a21a7bd0a2c6eda55fb9208c08cf665471afa797707812ee`
+(includes the C4 sweep: the perimeter hint and the Temperley name are IN
+the slice — the court's identical starting position, ruled not a leak).
 
 Grading order, enforced: the claim-by-claim grading table is filed and
 hashed **before** either prediction file is opened. Claim verification runs
