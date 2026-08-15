@@ -35,20 +35,39 @@ This note: a clean crude bound, and the design + crux for a tight one.
 
 ## Crude rigorous bound: λ ≤ 5⁵/4⁴ = 3125/256 ≈ 12.2
 
-Redelmeier-canonical-scan decision-tree count. Scan cells row-major (top→bottom,
-left→right); grow the animal by an include/exclude decision on each cell that
-enters the "untried" frontier.
+**Proof REPAIRED 2026-08-14** (king-twigs round, `results/king-twigs-l1.md`,
+harness `experiments/kingtwigs/l1_schemes.py`). The original argument below
+is broken; the constant survives by a sound BFS-frame derivation.
 
-- When a cell is **included**, only its king-neighbours *ahead* in scan order —
-  `E, SW, S, SE` (**≤ 4**) — newly enter the frontier; the other four
-  (`W, NW, N, NE`) are already behind. So building an n-cell animal considers
-  (included + rejected) `≤ 5n` cells total.
-- The animal is exactly *which* n of those ≤5n considered cells were included:
-  `a(n) ≤ C(5n, n)`. Hence `λ ≤ lim C(5n,n)^{1/n} = 5⁵/4⁴ ≈ 12.2`. ∎
+*The broken version (kept as a warning):* "scan row-major; when a cell is
+included, only its king-neighbours ahead in scan order (E, SW, S, SE, ≤ 4)
+newly enter the frontier — the other four are already behind — so
+a(n) ≤ C(5n, n)." The parenthetical is false: *behind* does not mean
+*already considered*. A re-entrant animal whose cell attaches only from
+below-behind — witness the hook
+`{(0,3),(0,2),(0,1),(0,0),(1,0),(2,0),(3,0),(3,1)}`, where `(3,1)` is an
+ahead-neighbour of no included cell — never enters the frontier, so the map
+animal → decision string is undefined on it. Measured: the scheme misses 2
+of 20 animals at n = 3 and 96,065 of 147,941 at n = 8.
 
-Rigorous, no machinery. With overlap accounting (many "ahead" neighbours are
-already on the frontier ⇒ effective forward branching < 4) this improves toward
-~9–10, but that is where the easy argument tops out — far from the true ~7.11.
+*The sound derivation of the same constant:* process opened cells FIFO from
+the scan-min root (BFS). A processed cell u with parent d encodes, as one
+letter, which cells of its **frame** — N(u) minus {d} minus the shared set
+N(u) ∩ N(d) — it newly opens. Shared sets have 4 cells for orthogonal d and
+2 for diagonal d, so frames have 3 or 5 slots; coverage holds because
+N(u) = {parent} ∪ shared ∪ frame and shared ⊆ N(parent(u)) recurses to the
+root (whose frame is all 8). Each n-cell animal maps injectively (replay
+decoder) to n letters of total weight xⁿ⁻¹yⁿ; the letter alphabet is the
+5-bit mask family with Σ x^(opens) = (1+x)⁵, so
+`a(n) ≤ [xⁿ⁻¹] (1+x)^{5n}·O(1)` and `λ ≤ min_b (1+b)⁵/b = 5⁵/4⁴` at
+b = 1/4. ∎  Machine-verified (round-trip, distinctness, weight identity,
+alphabet census) over all animals n ≤ 8, with a RED slot-dropping control.
+
+The "overlap accounting improves toward ~9–10" remark previously here is
+withdrawn: the improvement it gestured at is the Klarner–Rivest deferral
+mechanism, and that is structurally blocked on king adjacency (a deferred
+cell always lands in the child's shared set) — see
+`results/king-twigs-l1.md`, which closes the twig route at exactly 5⁵/4⁴.
 
 **NB — the tempting "≤ 8" is FALSE.** Encoding by spanning-tree parent-direction
 (≤8/cell ⇒ λ≤8) is not an injection: for ordinary polyominoes the same argument

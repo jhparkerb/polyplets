@@ -1,5 +1,11 @@
 # King twigs — checking the twig-ladder upper bound
 
+> **CLOSED 2026-08-14, closed door.** Level-1 king number = 5⁵/4⁴ = 12.207
+> exactly (≥ the ~10.5 kill line below); the KR deferral mechanism is
+> structurally blocked on king adjacency, and Phase 0's re-derivation found
+> the crude-bound baseline proof broken (repaired). Verdict, receipts and
+> the block argument: `results/king-twigs-l1.md`. Phases 2b/3 never run.
+
 *Thread name: **king twigs**. Written 2026-08-13, out of the reading pass over
 Klarner–Rivest 1973 and Barequet–Shalah 2019/2022
 (`papers/klarner_rivest_1973_upper_bound.pdf`,
