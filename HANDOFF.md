@@ -1,4 +1,110 @@
-# HANDOFF — live state (updated 2026-08-14)
+# HANDOFF — live state (updated 2026-08-15)
+
+## 2026-08-15 — GHOST SHIP LAUNCHED; s01 fires 20:00 EDT tonight
+
+The unattended-loop experiment is live. Protocol:
+`docs/ghostship-preregistration.md` (v2 + §4 calendar + OEIS parity ruling);
+sandbox spec `results/ghostship/SANDBOX.md`; all seven §7 artifacts sealed
+with sha256s recorded in the pre-registration (both predictions, answer
+key, banked-claim list, calibration, worked examples, verdict rule).
+Predictions split: **jasonp rung 3 at s10, 7 re-derivations, 33% bad
+claims, >3× cost; Fable rung 2 at ~s9, rung 3 never, 2 re-derivations,
+≥15× cost.**
+
+Mechanics: dalby `~/var/ghostship/` — 21-file sandbox at `74b2c20` +
+HISTORY.txt, launcher `run_session.sh` (repo copy
+`scripts/ghostship/`), cron `0 4,12,20 * * *` (dalby clock = EDT),
+NOT_BEFORE gates until 19:00 08-15. s01 tonight 20:00, s02–s04 Sun,
+s05–s13 Mon–Wed, s14 Thu 04:00. Auth: long-lived token in
+`~/var/ghostship/token` + isolated `claude-config/` (no CLAUDE.md, no
+memory — C6). Smoke tests green (haiku + fable). Stop rule arms at s6;
+missing report retried once; timeout 2 h/session.
+
+**Standing rules while it runs**: nobody reads `sandbox/reports/`
+content until grading (MANIFEST, session count, machine health are
+fine); jasonp steers only via `~/var/ghostship/BULLETIN.md`; any
+deviation → `results/ghostship/CONTAMINATION.md`. Between slots dalby
+shows NO claude process — that is correct, not a failure. Token-limit
+risk acknowledged: usage JSONs land per session in `usage/`; check s01's
+burn before Sunday; stretching to 2/day is a loggable schedule change,
+not a C3 break.
+
+**After the run (or a HALT)**: grading order per §7 — claim table filed
+and hashed BEFORE either prediction file is opened; claim verification
+provenance-stripped; prediction scoring authorship-stripped by a fresh
+instance. Court baseline = the real 2026-07-12 ladder
+`60b6ac5`→`3afca73`→`37ce404`, tokens/wall from that session record.
+
+Also this morning: state system banked (`docs/state-minimal.md`, his
+adopt/bank call open); `CLAUDE_CODE_DISABLE_MOUSE=1` added to his global
+settings (mouse capture was hijacking Terminal.app selection; ctrl-c
+had collaterally stopped three idle agents — no loss).
+
+## 2026-08-14 (evening) — backlog set 5/6/2/4/3 executed; one lane still out
+
+jasonp queued five open threads (his numbering: 5 anisotropic novelty check,
+6 onset-defect depth ≥ 2, 2 king twigs, 4 cancellation identity, 3 Middle
+Kingdom) with Exact Change (1) deferred on a running job. State:
+
+- **5 and 3 were already done** — the anisotropic novelty check closed
+  2026-08-01 (three databases, no collision; paper already scoped) and
+  Middle Kingdom is complete through Phase 4 and committed. Both memory
+  entries were stale and are fixed; nothing was re-run.
+- **2 — King twigs CLOSED, closed door** (`results/king-twigs-l1.md`,
+  harness `experiments/kingtwigs/l1_schemes.py`, GREEN on dalby). Level-1
+  king twig bound = 5⁵/4⁴ = 12.207 **exactly**; the KR/BS deferral gain is
+  structurally blocked on king adjacency (a deferred cell always lands in
+  the child's shared set — machine witness `{(0,0),(0,−1),(−1,−1)}`);
+  12.207 ≥ the plan's pre-registered 10.5 kill line; C_i ladder dead by
+  budget (~24% needed vs BS's 6.3% precedent). λ ≤ 9.3154 untouched.
+  Collateral: **the crude-bound proof in
+  `docs/proofs/polyplet-upper-bound.md` was broken** (its frontier misses
+  re-entrant animals — 65% of n=8; witnessed, measured) and is repaired in
+  place with a sound BFS-frame derivation of the same constant.
+- **4 — the cancellation identity is written and proved**
+  (`docs/proofs/cutcount-identity.md`, Birthright agent off
+  `docs/birthright-brief.md`): Σ_configs Π_births (q − b) = q^{c(S)},
+  **exactly in ℤ[q]**, unconditional; five lemmas; check
+  `experiments/birthright_identity_check.py` (223k subsets, 0 mismatches,
+  5 RED controls fire) independently re-run, sha-matched. Its §6 lists four
+  corrections to `docs/b1-closure-plan.md` §7's paraphrase (updated) and
+  records that the engine header's cited `probe_cutcount_dp.py` was deleted
+  from the tree. Tier 2 delimited, not done; Lean formalization open.
+  **Gate wiring undecided**: the check is a natural `gate-cutcount-identity`
+  but the gympie ban means `make` must run on ayr/dalby — jasonp's call.
+- **1 unblocked**: the running job was `exactchange_minauto.py` fast-closure
+  on dalby; it landed clean — N-family automaton ranks H=10/11/12 =
+  453/912/1818, all A034299, brute anchors OK. Banked in
+  `results/exactchange-probes.md`; H=13 test now priced ~5–6 h single-core
+  off the measured H=12 wall (1696 s); still needs sign-off + second source.
+
+**Ridgeline (item 6) LANDED and VERIFIED** —
+`results/ridgeline-depth-amplitudes.md`, scripts `experiments/ridgeline_*.py`
+(hash-matched repo↔dalby, master + vertex independently re-run GREEN, RED
+controls fire). **The depth-amplitude family is derived: j = 5 is 35/8**,
+and the whole family is one constant — the onset branch-point velocity
+α = 50/81 = 450/729, computed by finite enumeration over the vetted row
+transfer; the central binomials are Γ(j−1/2) in disguise, and 118/27 was an
+artefact of the Γ-weighted normalisation. The scaling function is a square
+root, not Airy (dispersion nondegenerate). Depth-1 constants reproduced
+(C₁ to 2.5e−12). **Read §5 (limits ledger) before citing** — the
+singularity-form assumptions are named, argued and measured but not proved;
+proving assumption 4 (the (J,P) perturbation with correct critical vectors)
+is the recorded self-contained follow-up. Memories updated
+(severance-w4-depth-tower). The whole 5/6/2/4/3 set is now CLOSED.
+
+Machines: **ayr unreachable** since ~23:00 UTC (no route to host — power
+cut until proven otherwise; nothing from this set is owed it). Confetti
+H=18 still running on dalby per the entry below; today's desk-scale runs
+went to dalby scratch (`~/tmp/kingtwigs`, `~/tmp/birthright`,
+`~/tmp/ridgeline` — disposable). **Everything from this set is
+uncommitted** for review: modified `docs/king-twigs-plan.md` (closed
+header), `docs/proofs/polyplet-upper-bound.md`, `docs/b1-closure-plan.md`,
+`results/exactchange-probes.md`; new `results/king-twigs-l1.md`,
+`docs/proofs/cutcount-identity.md`, `experiments/kingtwigs/`,
+`experiments/birthright_identity_check.py`, the two brief files. jasonp's
+own pending edits (`docs/rook-parity.md` deletion, `results/coin-lift-g2.md`)
+untouched.
 
 ## 2026-08-14 — both plans reviewed, reconciled, and executed as far as they go
 
