@@ -192,8 +192,13 @@ of the opposite sign. So `D_1(k)` is **not** a constant times
 `binom(2k,k)(9/4)^k`, confirming from the asymptotic side what the P-finite search
 (Appendix) found algebraically.
 
-**What would move this.** Nothing available. The bar is set by the correction
-tail at k ≤ 19, and `P_k` stops at 19.
+**What would move this.** ~~Nothing available. The bar is set by the correction
+tail at k ≤ 19, and `P_k` stops at 19.~~ **MOVED, by derivation rather than
+data (Ridgeline, 2026-08-14, `results/ridgeline-depth-amplitudes.md`):**
+the amplitude family is one derived constant, α = 50/81, and **j = 5 is
+35/8**; the rival rationals this section reports were artefacts of scanning
+the Γ-weighted normalisation. This section's measurements stand; its
+extrapolation scoping is superseded.
 
 ## 3. The resummation is a boundary layer, not a global scaling form
 

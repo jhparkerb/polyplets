@@ -101,8 +101,13 @@ follows by echelon since the activation rows `⌊3H/2⌋` are strictly increasin
 
 ## Still open
 
-- Prove the ladder itself (G ≡ 1 mod 9; H ≡ W mod 3; S ≡ t²+tW mod 3) — needs
-  the cluster combinatorics of the cumulants.
+- ~~Prove the ladder itself (G ≡ 1 mod 9; H ≡ W mod 3; S ≡ t²+tW mod 3) — needs
+  the cluster combinatorics of the cumulants.~~ **CLOSED by
+  `results/defect-gas.md`** ((⋆a) derived at :185, (⋆b) at :162, (⋆c) symbolic
+  proof at :193): "all three ladder items now stand on the defect gas
+  symbolically — the ladder is retired as an empirical input in full."
+  *(This bullet sat open for a month after the answer was banked; found by the
+  Offside one-way-citation sweep, 2026-08-14.)*
 - A formula for the individual exponents `e_i(N)` (the full 3-adic invariant
   factors, not just count/sum) — the mod-3 rank gives the count but not the higher
   3-adic structure; the mod-9/27 lifts in ternary-spine.md are the natural attack.

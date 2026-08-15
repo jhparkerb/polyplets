@@ -1,12 +1,13 @@
 # Middle Kingdom — the poly-time belt of king-animal subclasses
 
-**Status:** planned 2026-08-05. Authored in-session with jasonp; execute
-post-`/clear` from this file alone. Phases 0, 1 (1a/1b/1c), 2 and 3 all DONE
-2026-08-05, uncommitted -- see `results/middle-kingdom-grid.md`,
-`results/convex-polyplets.md`, `results/multi-directed.md`,
-`results/middle-kingdom-phase3.md`. `make gate-king-grid gate-multidirected
-gate-convex-dfinite gate-middle-kingdom` GREEN; full `make` GREEN. **Phase 4
-is what remains.** Nothing below has been run except where marked MEASURED.
+**Status: CAMPAIGN COMPLETE AND COMMITTED** (correction 2026-08-14: this
+header previously said "Phase 4 is what remains", stale since Phase 4 landed
+2026-08-05-06 -- b-files staged in `b90f3ef`, index `results/middle-kingdom.md`,
+simplify pass `444ced0`). All five phases done; don't relaunch any phase.
+Deliverables: `results/middle-kingdom-grid.md`, `results/convex-polyplets.md`,
+`results/multi-directed.md`, `results/middle-kingdom-phase3.md`,
+`results/middle-kingdom.md`. Gates `make gate-king-grid gate-multidirected
+gate-convex-dfinite gate-middle-kingdom` GREEN; full `make` GREEN.
 
 Phase 3's outcome in one line: of the twelve open cells (the nine below plus
 the three the multi-directed row adds), **eight collapse onto the unfiltered

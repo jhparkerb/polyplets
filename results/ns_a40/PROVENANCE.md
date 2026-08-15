@@ -124,7 +124,7 @@ are of a(40) itself (recomputed from `perheight/h*.out`, row n=40):
 |---|---|---|
 | H1-10 | 7.52% | yes — matches the decorrelated fixed-height GFs expanded to n=40 (355 cells) |
 | H11-14 | 37.49% | yes — strip TM N=40 run (2026-07-30, 469 cells, 0 mismatch; `results/strip-engine.md`) — second source, not fully independent (shares `core/transition.h`'s union-find rule) |
-| H15-19 | **43.84%** | **none available** |
+| H15-19 | **43.84%** | congruence-level only — T(n,H) ≡ I_H(D2ax) mod 2 checked at all 120 cells of the band, 0 mismatches, by the subgroup census (`results/subgroup-mod4.md`, 2026-08-07, `gate-subgroup`); an algorithm sharing no code path with the column engine. Not an exact recount: a wrong value survives iff its error is 0 mod 4. No exact second source available. *(Row previously said "none available", stale 2026-08-07..14.)* |
 | H20 | 4.16% | yes — byte-identical standalone re-sweep (`recheck/h20.out`) |
 | H21 | 2.84% | real sweep, but this is P_19's second fit point; no holdout is possible at any n |
 | H22-40 | 4.14% | closed forms P_0..P_18, every one with a passed real-swept holdout |
