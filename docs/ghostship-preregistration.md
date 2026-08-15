@@ -160,7 +160,8 @@ Ratios are computed **run-total only**; per-session ratios are not metrics.
 1. jasonp's prediction (registered skeptic) — per-session rates and rung
    prediction, plus expected failure modes, bulletin use, and what the
    court would have done better. Written knowing §8 C5.
-   **sha256: PENDING (his hand).**
+   Interview transcript sealed as `sealed/JASONP-PREDICTION.md`, sha256
+   `739098c43ca38cd039cfdd06ab63d6ac026ce4eb43e40a3b8949cd5acec1f759`.
 2. Fable's prediction, same categories, sealed by a different instance
    than the one that grades. `sealed/FABLE-PREDICTION.md`,
    sha256 `0640a8128b93498ffad0eccfd05e75663bc4de013e7f0055045962a1d2dcaa67`
