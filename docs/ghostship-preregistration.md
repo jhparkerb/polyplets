@@ -174,8 +174,11 @@ Ratios are computed **run-total only**; per-session ratios are not metrics.
 5. The claim-granularity calibration counts (§5).
    `sealed/CALIBRATION.md`, sha256
    `e891cf91a79bfd659c903e86d9ef4bf6e68a3ad30d3caeb61a793ac6d36f9b06`.
-6. Worked examples for the subjective metrics (§5). **PENDING** — being
-   mined from the corpus; sealed by edit here when filed.
+6. Worked examples for the subjective metrics (§5).
+   `sealed/WORKED-EXAMPLES.md`, sha256
+   `c7a7535503e63ea1dbac05afcf5218f7d157eef9ab687889ecb43f901d9a68e0`
+   (2 positive / 2 negative, receipts spot-verified against
+   `docs/utilization-bottleneck-log.md` and `results/overcommit-hydra.md`).
 7. **The verdict rule**: which combination of outcomes counts as the loop
    doing well/poorly, with numbers — crude and sealed beats careful and
    post-hoc. `sealed/VERDICT-RULE.md`, sha256
