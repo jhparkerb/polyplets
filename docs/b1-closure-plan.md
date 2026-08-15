@@ -316,10 +316,21 @@ code. Three tiers:
    disconnected sets — (q-b1)(q-b2) = -q(b1+b2) + b1*b2 mod q^2 — so the
    connected count emerges from a cancellation summed over all configurations.
    Proving that is pure combinatorics with no program in it, and it is the piece
-   worth having. **Today its entire justification is the C++ comment asserting
+   worth having. ~~Today its entire justification is the C++ comment asserting
    the rule plus `experiments/probe_cutcount_dp.py` checking it against brute
-   force at five board sizes.** The identity has never been written down in
-   closed form in this repo.
+   force at five board sizes. The identity has never been written down in
+   closed form in this repo.~~ **DONE 2026-08-14 (Birthright):
+   `docs/proofs/cutcount-identity.md`** — stated in closed form and proved
+   unconditionally, exactly in ℤ[q] (not merely mod q²), with a
+   RED-controlled brute-force check
+   (`experiments/birthright_identity_check.py`, 10 boards, 223k subsets, 0
+   mismatches). Caveat for readers of THIS paragraph: the proof's §6 records
+   four places where the description here mis-states the rule (b counts live
+   labels not components; a subset carries a sum over configurations, not one
+   product; the identity is exact, not a mod-q² phenomenon; the H+1
+   window-reach lemma is Tier 1, load-bearing). Note also
+   `probe_cutcount_dp.py` was deleted from the tree (added `7b13137`); the
+   new check supersedes it.
 2. **The DP realises that sum** — window locality (king adjacency reaches at
    most H+1 cells back in scan order, so the H+1-slot window is a sufficient
    statistic) plus invariant preservation by `successors`. Mechanical and very
