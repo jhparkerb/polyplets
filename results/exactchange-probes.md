@@ -224,8 +224,20 @@ structure is the prize here, not the wall clock.
 
 ## Still running / next when resumed
 
-- minauto H = 12 fast-closure confirmation (dalby, in flight).
+- ~~minauto H = 12 fast-closure confirmation (dalby, in flight)~~ **DONE
+  2026-08-14** (dalby run landed, exit 0; brute anchors H=2,3 OK 27/286/1906):
+
+      H   minstates   rank   A034299         (build, rank wall)
+      10      1,399    453   453  OK         (4.6 s,   13.2 s)
+      11      3,441    912   912  OK         (24.6 s,  152.3 s)
+      12      8,539  1,818  1,818 OK         (130.4 s, 1696.3 s)
+
+  The N-family automaton route independently reproduces the G1 ladder's
+  three top points, so the A034299 match no longer rests on the retired
+  gympie run alone. Rank wall grew ~11.1x from H = 11 to 12; naive
+  extrapolation puts the H = 13 rank step at ~5-6 h single-core, matching
+  the projection below.
 - H = 13 decisive test of A034299's 3643: ~5-6 h single-core projected
-  (price to be confirmed off the H = 12 wall), PLUS a second source per
+  (now calibrated off the measured H = 12 wall), PLUS a second source per
   §9 item 3.  Needs sign-off.
 - The three settling checks above; the L1-L3 proof program.
