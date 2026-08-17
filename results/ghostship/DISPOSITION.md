@@ -65,7 +65,19 @@ rather than research value.
 It is a larger defect than the untested bulletin, and it was not on either
 predictor's list.
 
-## 4. Salvage — recommended, not yet done
+## 4. Salvage — DONE 2026-08-17
+
+Items 1–2 and 4–5 landed as one dated section at the end of
+`results/convex-polyplets.md`; item 3 remains staged, not submitted.
+
+The import turned up one correction, folded into VALUE-TRIAGE §D: half of
+Layer 1 was already banked in the repo (the s≤200 series and degree-2
+algebraicity, 2026-08-05), so the loop re-derived repo work as well as
+literature. Both were outside the sealed denominator, which is scoped to the
+21 slice files. The re-derivation metric covers the innermost of three rings
+and reports 0.
+
+Original plan, retained for the record:
 
 1. **Import Layer 1 into `results/convex-polyplets.md`** (an OPEN
    side-quest) with explicit Ghost Ship provenance, carrying the kernel

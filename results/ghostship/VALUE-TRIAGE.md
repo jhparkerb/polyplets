@@ -102,11 +102,25 @@ Carlitz, honeycomb and symmetry-class variants) surface nothing using
 **king adjacency**. The family's absence from OEIS corroborates — coverage
 of convex-polyomino variants there is dense.
 
-**Disposition: highest-confidence new result of the run**, and it lands
-directly on `results/convex-polyplets.md`, an OPEN side-quest. The explicit
-closed form `F = −(M + 2x²y²(1+x+y)²√Δ)/(2KΔ²)`, `Δ = (1−x−y)²−4xy`,
-`K = x+y+xy`, derived by kernel method with no fitting in the final chain,
-is the piece to import.
+**Amended 2026-08-17 during the salvage import.** Half of Layer 1 was
+already banked *in this repo*, post-cut and therefore legitimately withheld
+from the sandbox: `results/convex-polyplets.md` has carried the s=2..200
+semiperimeter series and its degree-2 algebraicity since 2026-08-05, and the
+loop's 200 terms match `results/convex_perim_terms_s200.txt` exactly on all
+199 shared entries. So the loop re-derived banked repo work here, invisibly
+to the metric — the sealed denominator (`sealed/BANKED-CLAIMS.md`) is scoped
+to "claims already banked **at the cut, inside the slice**", 21 files, by
+design.
+
+**Disposition: still the run's best new result, but narrower than the
+capstone reads.** What is new to the repo is the *derivation* and the
+bivariate refinement: `F(x,y) = −(M + 2x²y²(1+x+y)²√Δ)/(2KΔ²)`,
+`Δ = (1−x−y)²−4xy`, `K = x+y+xy`, from an explicit 4-phase catalytic
+functional equation by kernel method with no fitting in the final chain,
+where the banked result was a box-fitted quadratic. Plus the univariate
+closed form that solves it, the fixed-height structure, and Layer 2's
+certified constants against the repo's 199 trusted-but-uncertified digits.
+Imported 2026-08-17 into `results/convex-polyplets.md`.
 
 ## E. Layer 2 — q-series closed form, certified asymptotics,
 ## non-D-finiteness: NO COLLISION FOUND
@@ -183,11 +197,20 @@ limit law.
 
 ## Consequence for the experiment design
 
-The rubric's headline "0 unwitting re-derivations" is scoped to the repo.
-Against the **literature** the loop re-derived a published result at
-something like a third of its budget, and neither the loop nor the grading
-could have seen it: the sandbox ships 21 files and no library, and the
-grading rubric never asks the question.
+The rubric's headline "0 unwitting re-derivations" is scoped to **the 21
+files inside the slice** — narrower even than the repo. There are three
+rings, and the metric covers only the innermost:
+
+| ring | did the loop re-derive it? | did the metric see it? |
+|---|---|---|
+| the slice (21 files at the cut) | no | yes — this is the reported 0 |
+| the repo (post-cut work, 2026-08-05) | **yes** — the s≤200 series and degree-2 algebraicity (§D) | no, by design |
+| the literature | **yes** — the area limit law (§C) | no, never asked |
+
+Neither outer ring was visible to the loop, which is fair — both were
+legitimately withheld or absent. Neither was visible to the grader either,
+which is the defect. The sandbox ships 21 files and no library, and the
+rubric asks about none of it.
 
 A sealed sandbox cannot avoid this failure mode. Any second run needs
 either literature access inside the sandbox (which weakens the blind) or a

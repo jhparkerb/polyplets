@@ -617,3 +617,133 @@ number of digits fed to an integer-relation search is the whole ballgame, and
 this is exactly why the growth script refuses to report a hit unless
 `(d+1) log10(height)` sits well below the trusted digit count. Anyone with a
 16-digit mu and a cubic solver will find this polynomial; it means nothing.
+
+## Ghost Ship import: the box statistic derived, and the area q-series (2026-08-17)
+
+Salvage from the Ghost Ship experiment (`results/ghostship/`), which ran 14
+unattended sessions against a sandbox cut at `74b2c20` — i.e. blind to
+everything on this page dated 2026-08-05 or later. Value triage in
+`results/ghostship/VALUE-TRIAGE.md`; what follows is the part that survived
+it. Receipts are in-tree at
+`results/ghostship/grading/run-record/sandbox/` (abbreviated `GS/` below);
+that tree is committed, so every path here resolves.
+
+**Read the "already banked" list first.** The loop, working from the cut,
+independently produced the s=2..200 semiperimeter series and its degree-2
+algebraicity — both of which this page has carried since 2026-08-05 (§"Extended
+to s=200", §"The unrestricted series is algebraic too"). Its 200 terms match
+`results/convex_perim_terms_s200.txt` exactly, all 199 shared entries. That is
+a re-derivation of banked work; it fell outside Ghost Ship's re-derivation
+metric only because the sealed denominator was scoped to the 21 files inside
+the slice, not to the repo. Nothing below claims those two results.
+
+### New here: the bivariate box GF, derived rather than fitted
+
+The banked result is a quadratic satisfied by the univariate GF, obtained by
+box-fitting in `(2,9)`. The loop derived the **bivariate** object from an
+explicit 4-phase catalytic functional equation by the kernel method, with no
+fitting anywhere in the final chain:
+
+    F(x,y) = Sum_{w,h} f(w,h) x^w y^h
+           = -(M + 2x^2 y^2 (1+x+y)^2 sqrt(D)) / (2 K D^2)
+      D = (1-x-y)^2 - 4xy,  K = x + y + xy
+
+`f(w,h)` = translation classes with bounding box exactly w x h. The king
+modification is absorbed entirely by the kernel `K = x+y+xy` and the weight
+`(1+x+y)^2` — that is the structural content, and it is what the box-fit could
+not see. Derivation: `GS/docs/proofs/convex-box-kernel.md`. Note:
+`GS/results/convex-box.md`.
+
+Specialising, the univariate closed form solves the banked quadratic:
+
+    F(t) = [t^2(2 - 10t + 14t^2 - 5t^3 - 4t^4) - t^3 (1+2t)^2 sqrt(1-4t)]
+           / ((2+t)(1-4t)^2)
+
+**Verified independently 2026-08-17**: re-implemented from this expression
+alone in exact `Fraction` arithmetic (radical series built from Catalan
+numbers, none of the loop's code), it reproduces all 200 terms of
+`GS/king_semiperim_200.txt` and hence all 199 of
+`results/convex_perim_terms_s200.txt`. The discriminant factors as
+`4t^6 (1-4t)^5 (1+2t)^4`, so `sqrt(1-4t)` is the only radical — the same
+radicand as classical convex polyominoes.
+
+Asymptotics: `a(s) ~ (s/128) 4^s`, next order `-(1/64)(2s+1)C(2s,s)`. This is
+**term-for-term the shape of A005436's exact formula**
+`(2n+3)4^(n-4) - 4(n-3)C(2n-7,n-4)`, i.e. king-adjacency convex animals and
+classical convex polyominoes agree in leading amplitude and in the form of the
+correction. Measured ratio king/A005436: 1.2440 (s=8), 1.0990 (20), 1.0450
+(40), 1.0207 (80), 1.0076 (201) — tending to 1 roughly as 1 + 1.5/s. The
+ratio's limit is measured, not proved.
+
+### New here: fixed-height structure
+
+- `f(w,h)` is polynomial in `w` of degree `2h-2` for all `w >= 1`:
+  `f(w,2) = 2w^2 - 1`, `f(w,3) = w^4 + (2/3)w^3 - (1/2)w^2 - (13/6)w + 2`;
+  h = 4, 5 banked. Receipt `GS/out_row_polynomials.txt`.
+- Fixed-height **area** GFs are rational with cyclotomic denominators:
+  `A_2 = q^2(3-q)/(1-q)^3`, `A_3 = q^3(7+2q+3q^2-4q^3+2q^4)/((1-q)^4(1-q^3))`,
+  `A_4` denominator `(1-q)^4(1-q^3)^2(1-q^4)`. Slices sum to the banked area
+  sequence for n <= 12. Receipts `GS/out_area_fixed_height.txt`,
+  `GS/out_area_slices_check.txt`. Mechanism proved in
+  `GS/docs/proofs/convex-area-q-temperley.md`.
+- Row-GF numerators satisfy `N_h(1) = A153337`, proved at GF level, plus
+  halving identities at `x = -1`. `GS/docs/proofs/row-gf-specializations.md`.
+
+### New here: the area GF as an explicit q-series, and certified constants
+
+This page banks `mu = 3.128943269730886...` to 199 **trusted** digits from
+series ratios. The loop replaced trust with a certificate:
+
+    a(n) ~ A mu^n,  mu = 1/q_c,  q_c the smallest positive zero of
+    K(q) = Sum_m (-1)^m (2 - q^m) q^{m(m+1)/2} / (q;q)_m^2
+
+    mu = 3.128943269730886252277447995387754160532...
+    A  = 0.974452213135004649151329420860243327425...
+
+both to 44+ digits by exact-rational interval arithmetic, with a simple-pole
+certificate. Control values reproduce the published Kotesovec/Klarner-Rivest
+digits at certified precision. Receipts `GS/out_s10_certify_amplitude.txt`,
+`GS/results/convex-area-asymptotics.md`. The area GF itself is a finite
+combination of four q-adically convergent q-series from the q-deformed
+functional equation, with 50-term predictions checked against an independent
+transfer matrix and control mode hitting A067675/A067676 b-files 50/50; 60
+exact terms in `GS/out_s05_terms60.txt`.
+
+### New here: two OEIS identifications on the directed-convex subfamily
+
+`a_dir(s) = A014300(s-1)` (nodes of odd outdegree in ordered rooted trees) and
+`d(n,n) = A112029(n-1) = Sum_k C(n-1+k,k)^2`. Both verified against b-files by
+the loop and re-checked 2026-08-17: neither entry carries any polyomino,
+convex, king or polyplet interpretation, so both are comment-grade. Note
+`GS/results/directed-convex-king.md`.
+
+Sequences absent from OEIS as of 2026-08-17 (searched here, control query
+`1,2,7,28,120,528,2344,10416,46160` hits A005436 exactly, so the search finds
+real hits): the semiperimeter series above; the twist `2,5,20,81,344`; the
+60-term area series; directed-convex king by area `1,3,10,33,107,342`.
+
+### Lead, not result: non-D-finiteness of the area GF
+
+`K(q)` has >= 40 located real zeros in (0,1) accumulating at q = 1 under
+`K(e^-eps) ~ 2 . 3^(1/4) sqrt(eps/2pi) cos(V/eps - pi/12)` with
+`V = 2 Cl_2(pi/3)`, the Gieseking constant; `F(1,1,q)` has poles at these
+zeros (residues nonzero at the first four), and a D-finite GF has finitely
+many singularities. Firm numerically. Two named gaps before this is more than
+a lead: a rigorous steepest-descent/Stokes treatment of the oscillation law
+near q = 1, and nonvanishing of the residue at infinitely many zeros.
+`GS/results/K-oscillation-gieseking.md`.
+
+### Do not re-derive: the area-moment limit law
+
+The loop spent its three costliest sessions deriving
+`c_r = (r!)^2 / 2^(r+7)`, hence `E[area^r]/s^(2r) -> (r!)^2/((2r+1)! 2^r)`,
+i.e. `area/s^2 -> U(1-U)/2`. **This is published.** Richard,
+*Limit distributions and scaling functions*, arXiv:0704.0716, Table 1 and the
+accompanying remark: convex polygons carry the rectangles area limit law
+`beta_{1,1/2}`. What survives the collision is narrow but real — area-moment
+GF algebraicity for **every** r via the same kernel
+(`GS/docs/proofs/area-moment-kernel.md`), and the explicit statement that king
+and polyomino give the identical law. Enting & Guttmann, "Area-weighted
+moments of convex polygons on the square lattice", J. Phys. A 22 (1989), is
+linked from A005436 and covers this ground for the control family; read it
+before any further work on moments here.
