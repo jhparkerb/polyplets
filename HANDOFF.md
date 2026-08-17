@@ -33,6 +33,15 @@ session-boundary handoff family, and invisible to grading — the claim
 table grades CARRY claims, DEAD lines are not claims. A false DEAD line
 removes a capability from every successor.
 
+Post-action review CLOSED (b468ee2, `results/ghostship/POST-ACTION.md`):
+DEAD-line audit — 4 of 10 substantive DEAD lines defective (2 false, 1
+mislabelled lead, 1 unmeasured cost) against 0 FALSE in 64 graded claims;
+s01's closed form independently re-implemented, 200/200 terms. Panel
+scored — ~30 of 34 recommendations adopted, R3 #1 became the design, R3 #3
+caught the memory leak that would have voided the run; all three lanes
+shared one blind spot (they audited what the loop asserts, never what it
+forecloses).
+
 Open, his: (a) salvage — import Layer 1 + Layer 2 into
 `results/convex-polyplets.md` (OPEN side-quest) with Ghost Ship provenance,
 stage the sequences/comments behind the viva; (b) run 2 only if all four
