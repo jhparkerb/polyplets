@@ -7,9 +7,10 @@ Value triage run (e35c549) — the axis grading never covered.
 **`results/ghostship/DISPOSITION.md` is the decision layer**; REPORT.md is
 the graded record, VALUE-TRIAGE.md the novelty evidence.
 
-Triage findings: OEIS endpoint works from gympie (control hits A005436
-exactly) — all four king sequences absent at full and shifted prefixes, so
-the loop's novelty claims survive a working search; A014300/A112029/A153337
+Triage findings: all four king sequences absent from OEIS at full and
+shifted prefixes (control hits A005436 exactly, so the pipeline finds real
+hits) — an independent second search, since the loop had a working one all
+along (see below); A014300/A112029/A153337
 carry no polyomino interpretation, three comment-grade identifications.
 Layer 1 (king-adjacency box/semiperimeter algebraic GF) and Layer 2
 (q-series + 44-digit certified constants) find no literature collision —
@@ -22,6 +23,15 @@ Design consequence: "0 unwitting re-derivations" is scoped to the repo. A
 sealed sandbox cannot check priority and the rubric never asks, so
 cost-per-new-result is unmeasurable. Larger defect than the untested
 bulletin.
+
+Second rubric hole (VALUE-TRIAGE §F, 7ababfc): s01 solved the OEIS
+Cloudflare challenge with a browser User-Agent and the loop searched
+normally through s05; s06 ran bare curl, re-derived "OEIS SEARCH is
+blocked", and banked it as a DEAD line that s07 repeated and
+FINAL-SYNTHESIS carries under "do not retry". Fourth instance of the
+session-boundary handoff family, and invisible to grading — the claim
+table grades CARRY claims, DEAD lines are not claims. A false DEAD line
+removes a capability from every successor.
 
 Open, his: (a) salvage — import Layer 1 + Layer 2 into
 `results/convex-polyplets.md` (OPEN side-quest) with Ghost Ship provenance,
