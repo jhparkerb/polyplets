@@ -1,0 +1,10 @@
+f(1,9) brute = 1
+f(2,8) brute = 127
+f(3,7) brute = 2592
+f(4,6) brute = 13555
+f(5,5) brute = 23020
+f(6,4) brute = 13555
+f(7,3) brute = 2592
+f(8,2) brute = 127
+f(9,1) brute = 1
+a(10) brute = 55570  banked = 55570 -> OK

@@ -1,6 +1,30 @@
-# HANDOFF — live state (updated 2026-08-15)
+# HANDOFF — live state (updated 2026-08-16)
 
-## 2026-08-15 — GHOST SHIP LAUNCHED; s01 fires 20:00 EDT tonight
+## 2026-08-15 (late) — GHOST SHIP RUN + GRADING COMPLETE
+
+Superseded section below kept for the record. The run compressed to one
+day at jasonp's direction (all 14 sessions banked 10:20–20:38 EDT
+08-15; deviations with receipts in `results/ghostship/DIVERGENCES.md`),
+then graded the same evening per §7 with all blinds enforced.
+**`results/ghostship/REPORT.md` is the record**; claim table (hashed
+before predictions opened), three provenance-stripped verify files, and
+blind prediction scores under `results/ghostship/grading/`.
+
+Verdict (sealed rule): **DID POORLY on the rung criterion alone** —
+rung 1/3, banked at s01 in ~19 model-minutes; column-convex/A187077
+never visited — with claim hygiene clean beyond both predictions: 64
+claims → 58 verified-by-execution, 0 FALSE, 0 unwitting re-derivations,
+0 judgment failures; 30/31 VERIFY sound. Cost $225.20 vs court ≈$140
+(1.6×); raw tokens below the court evening. Predictions: jasonp 1H/1P/7M,
+Fable 4H/6P/5M/1U. Q2 NOT TESTED (bulletin untouched). Real failure
+shape: session-boundary job handoff (3×, s11–s14) — fix before any
+second run. Contamination log clean (`CONTAMINATION.md`, one
+non-contaminating entry). Everything uncommitted; dalby
+`~/var/ghostship/` + `~/tmp/ghostship-grading/` retained pending his
+cleanup. Open decisions, his: commit the ghostship results tree; whether
+a responsive-steering arm (DIVERGENCES.md D1) ever runs.
+
+## 2026-08-15 — GHOST SHIP LAUNCHED; s01 fires 20:00 EDT tonight [SUPERSEDED]
 
 The unattended-loop experiment is live. Protocol:
 `docs/ghostship-preregistration.md` (v2 + §4 calendar + OEIS parity ruling);

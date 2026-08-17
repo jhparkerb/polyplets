@@ -1,0 +1,9 @@
+s13 REGISTERED PREDICTION for the r=7 delta-chassis extraction
+(written to disk BEFORE any r=7 chassis run existed; adjudicate by
+comparing out_s13_tau_profiles_r7.json inner profiles against these).
+Profiles as maps m -> coeff of z^-m, z = tau-2, inner chart s=2+delta^2 tau.
+Predicted inner orders: M10 r=7: delta^-32; M11 r=7: delta^-34.
+Also predicted: c_7 = 99225/64; M00 profile psi00_7 = -(14)!/(4 z^15).
+
+chi_7 (M10 inner profile): [(8, '1587600'), (9, '-12700800'), (10, '57153600'), (11, '-190512000'), (12, '523908000'), (13, '-1257379200'), (14, '2724321600'), (15, '-5448643200')]
+phi_7 (M11 inner profile): [(1, '-99225/32'), (2, '99225/8'), (3, '-382725/8'), (4, '354375/2'), (5, '-2508975/4'), (6, '2112075'), (7, '-6733125'), (8, '20241900'), (9, '-55665225'), (10, '136930500'), (11, '-298865700'), (12, '576298800'), (13, '-969229800'), (14, '1362160800'), (15, '-1362160800')]

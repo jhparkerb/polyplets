@@ -1,0 +1,4 @@
+== control: (1-4t)^2 F = A + B sqrt(1-4t): D = (1-4t)^2
+  FIT OK (all 32 coeffs incl. 6 holdout)
+  [1] (1)t^2 + (-6)t^3 + (11)t^4 + (-4)t^5
+  [sqrt(1-4t)] (-4)t^4

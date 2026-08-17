@@ -1,0 +1,4 @@
+Part A (exact over Z): A2==Delta^4*K: True; A1==Delta^2*M (exact div): True; 4*K*A0==M^2-Delta*S^2: True; disc==Delta^5*S^2: True; M diagonal check: True
+prime p=2305843009213693951: 84 specializations c=2..85, identity checked to u-deg min(validity,242); min F validity u-deg = 245; failures: 0
+prime p=1000000000000000009: 84 specializations c=2..85, identity checked to u-deg min(validity,242); min F validity u-deg = 245; failures: 0
+CLOSED: identity 2*K*Delta^2*F + M + S*sqrt(Delta) = 0 holds as a polynomial identity modulo both primes on the full sufficient box (deg_x<=79 via 84 values, deg_u<=242 directly).

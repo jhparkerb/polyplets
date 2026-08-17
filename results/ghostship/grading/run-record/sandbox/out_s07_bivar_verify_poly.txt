@@ -1,0 +1,23 @@
+Session 07: exact over-Z verification of the CRT-lifted bivariate
+first-moment closed form
+
+    M1(x,y) = (A + B*sqrt(D)) / (K^2 D^4),  D=(1-x-y)^2-4xy, K=x+y+xy.
+
+Checks (all exact rational arithmetic, no mod-p anywhere):
+  C1. series expansion of the closed form == DP table M1(w,h) on the
+      full 26x26 box (676 cells; the fit used only 729 grid equations at
+      two primes — this is the exact-lift confirmation).
+  C2. symmetry A(x,y)=A(y,x), B(x,y)=B(y,x).
+  C3. specialization x=y=t reproduces the univariate fit
+      A_1(t) = (P + Q sqrt(1-4t))/((2+t)^2 (1-4t)^4) exactly
+      (t^2 K(t,t)^2-cancellation check), as SERIES to t^52 against the
+      DP52 semiperimeter data (independent path: bivariate closed form
+      -> diagonal sum, vs banked a1 sequence).
+Output: out_s07_bivar_verify.txt; prints A, B.
+
+A(x,y) (symmetrized, 39 monomials):
+  (1)x^1y^1 + (-6)x^1y^2 + (15)x^1y^3 + (-20)x^1y^4 + (15)x^1y^5 + (-6)x^1y^6 + (1)x^1y^7 + (-6)x^2y^1 + (20)x^2y^2 + (-18)x^2y^3 + (-8)x^2y^4 + (22)x^2y^5 + (-12)x^2y^6 + (2)x^2y^7 + (15)x^3y^1 + (-18)x^3y^2 + (28)x^3y^3 + (-40)x^3y^4 + (-5)x^3y^5 + (18)x^3y^6 + (2)x^3y^7 + (-20)x^4y^1 + (-8)x^4y^2 + (-40)x^4y^3 + (64)x^4y^4 + (-20)x^4y^5 + (-8)x^4y^6 + (15)x^5y^1 + (22)x^5y^2 + (-5)x^5y^3 + (-20)x^5y^4 + (12)x^5y^5 + (-6)x^6y^1 + (-12)x^6y^2 + (18)x^6y^3 + (-8)x^6y^4 + (1)x^7y^1 + (2)x^7y^2 + (2)x^7y^3
+B(x,y) (symmetrized, 12 monomials):
+  (4)x^2y^2 + (-8)x^2y^3 + (8)x^2y^5 + (-4)x^2y^6 + (-8)x^3y^2 + (-8)x^3y^4 + (16)x^3y^5 + (-8)x^4y^3 + (-24)x^4y^4 + (8)x^5y^2 + (16)x^5y^3 + (-4)x^6y^2
+C1: exact over-Z check M1*D^4 == A+B*sqrt(D) on the full [0..26]^2 grid (729 coefficients): OK
+C3: diagonal x=y=t: A(t,t)==t^0*P_univ and B(t,t)==t^0*Q_univ EXACTLY (all coefficients) => bivariate form specializes to the holdout-verified univariate A_1

@@ -1,0 +1,28 @@
+s09 slice-moment run: MAXR=8 NU=260 x0=1/4 primes=[2305843009213693951, 1000000000000000009]
+[king]
+  prime 2305843009213693951
+    level 1: 1.6s  degs num M00/M10/M11 = 5/9/9  den e = (0, 3, 0)/(0, 3, 3)/(0, 3, 3)  tot.vu=259
+    level 2: 3.3s  degs num M00/M10/M11 = 9/15/15  den e = (0, 5, 0)/(0, 5, 5)/(0, 5, 5)  tot.vu=258
+    level 3: 5.9s  degs num M00/M10/M11 = 13/21/21  den e = (0, 7, 0)/(0, 7, 7)/(0, 7, 7)  tot.vu=257
+    level 4: 9.5s  degs num M00/M10/M11 = 17/27/27  den e = (0, 9, 0)/(0, 9, 9)/(0, 9, 9)  tot.vu=256
+    level 5: 14.3s  degs num M00/M10/M11 = 21/33/33  den e = (0, 11, 0)/(0, 11, 11)/(0, 11, 11)  tot.vu=255
+    level 6: 20.3s  degs num M00/M10/M11 = 25/39/39  den e = (0, 13, 0)/(0, 13, 13)/(0, 13, 13)  tot.vu=254
+    level 7: 27.8s  degs num M00/M10/M11 = 29/45/45  den e = (0, 15, 0)/(0, 15, 15)/(0, 15, 15)  tot.vu=253
+    level 8: 36.9s  degs num M00/M10/M11 = 33/51/51  den e = (0, 17, 0)/(0, 17, 17)/(0, 17, 17)  tot.vu=252
+  solve_all_levels wall 120.2s
+    S0 slice vs banked closed form: OK all 131 terms
+    r=0: degP=5 degQ=4 surplus=119  cP==(0!)^2/2^7: MATCH
+      phase M00: NO FIT (needs other atoms)
+      phase M10: NO FIT (needs other atoms)
+      phase M11: NO FIT (needs other atoms)
+    S1 slice vs banked closed form: OK all 130 terms
+    r=1: degP=9 degQ=8 surplus=110  cP==(1!)^2/2^8: MATCH
+      phase M00: NO FIT (needs other atoms)
+      phase M10: NO FIT (needs other atoms)
+      phase M11: NO FIT (needs other atoms)
+    r=2: degP=14 degQ=13 surplus=100  cP==(2!)^2/2^9: MATCH
+      phase M00: NO FIT (needs other atoms)
+      phase M10: NO FIT (needs other atoms)
+      phase M11: NO FIT (needs other atoms)
+    r=3: degP=19 degQ=18 surplus=89  cP==(3!)^2/2^10: MATCH
+      phase M00: NO FIT (needs other atoms)

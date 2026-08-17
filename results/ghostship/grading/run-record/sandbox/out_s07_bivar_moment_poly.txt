@@ -1,0 +1,25 @@
+Session 07: bivariate FIRST AREA MOMENT closed form for convex king
+animals: M1(x,y) = sum_{w,h} M1(w,h) x^w y^h, M1(w,h) = total area over
+animals with bounding box exactly w x h.
+
+Structure hypothesis (from the proven F = -(M + 2x^2y^2(1+x+y)^2 sqrt(D))
+/(2K D^2), D=(1-x-y)^2-4xy, K=x+y+xy, and the s07 univariate moment fits
+whose denominators specialize as K(t,t)=t(2+t), D(t,t)=1-4t):
+
+    M1(x,y) = (A(x,y) + B(x,y) * sqrt(D)) / (K^2 * D^4)
+
+with A, B symmetric integer polynomials.  Fit by modular linear algebra
+(two 62-bit primes) on the DP table over a full WBOX x WBOX box, holdout
+= all table cells not used as equations, then exact rational
+reconstruction is SKIPPED (mod-p certificate only, like s02's first pass)
+unless coefficients are directly integers mod both primes consistent
+with small ints (CRT lift + verify over Z on the table).
+
+Output: out_s07_bivar_moment.txt (+ .json with the lifted polynomials)
+
+M1 table built over 26x26 box (king=False), e.g. M1(3,3)=408, M1(10,10)=1358542530840
+prime 2305843009213693951: UNIQUE solution, 306 unknowns, 729 equations (overdetermined, consistent)
+prime 9223372036854775783: UNIQUE solution, 306 unknowns, 729 equations (overdetermined, consistent)
+lift: max|coeff| A: 64, B: 24
+A has 22 terms, B has 7 terms
+verdict: CRT-lifted small integers

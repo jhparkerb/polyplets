@@ -1,0 +1,46 @@
+Session 07: first and second AREA MOMENTS of convex king animals
+(+ polyomino control) by exact bounding box, then by semiperimeter.
+
+M_r(w,h) = sum over convex animals with bounding box exactly w x h of
+area^r  (r=0,1,2).  M_0 is the banked f(w,h).
+
+Method: the s01-validated row-interval DP (convex_box.g_table model),
+extended to carry (count, sum area, sum area^2) per state.  Adding a row
+of length k maps (c, m1, m2) -> contributes (c, m1 + k c, m2 + 2 k m1 +
+k^2 c) to the successor state.  Exact-width extraction by the same second
+difference in w as f_from_g (valid: moment weights are translation
+invariant, the operator is linear).
+
+Validations (all hard asserts):
+  V1. definitional subset brute force (independent: raw subsets, area =
+      popcount) for all boxes wh <= 16, r=0,1,2, king AND polyomino.
+  V2. r=0 table == convex_box.g_table/f_from_g output (w,h <= 12).
+  V3. against the s04 joint truth table out_s04_area_truth.json:
+      M_r(w,h) == sum_n n^r f(w,h;n) for all w,h <= 10, both modes.
+  V4. transpose symmetry M_r(w,h) == M_r(h,w).
+
+Output: semiperimeter moment sequences a_r(s) = sum_{w+h=s} M_r(w,h),
+s = 2..SMAX, both modes -> out_s07_area_moments.json (+ .txt receipt).
+
+Usage: python3 experiments/s07_area_moments.py [SMAX]
+
+[king] V1 brute force wh<=16, r=0,1,2: OK
+[king] V2 r=0 == convex_box f(w,h), w,h<=12 (144 cells): OK
+[king] V3 == s04 joint truth table (100 boxes): OK
+[king] V4 transpose symmetry: OK
+[king] a0(s), s=2..37: 1, 2, 9, 36, 154, 668, 2916, 12740, 55570, 241692, 1047604, 4524464 ...
+[king]   a0(37) = 3930930693154691068192
+[king] a1(s), s=2..37: 1, 4, 26, 148, 844, 4704, 25644, 136856, 716162, 3681280, 18619948, 92820864 ...
+[king]   a1(37) = 569765416666174759488608
+[king] a2(s), s=2..37: 1, 8, 78, 632, 4824, 34616, 236016, 1540112, 9675818, 58812752, 347275736, 1998867408 ...
+[king]   a2(37) = 87213512087500458599858480
+[poly] V1 brute force wh<=16, r=0,1,2: OK
+[poly] V2 r=0 == convex_box f(w,h), w,h<=12 (144 cells): OK
+[poly] V3 == s04 joint truth table (100 boxes): OK
+[poly] V4 transpose symmetry: OK
+[poly] a0(s), s=2..37: 1, 2, 7, 28, 120, 528, 2344, 10416, 46160, 203680, 894312, 3907056 ...
+[poly]   a0(37) = 3746790354386182679408
+[poly] a1(s), s=2..37: 1, 4, 22, 124, 706, 3968, 21880, 118192, 625776, 3251744, 16610072, 83537520 ...
+[poly]   a1(37) = 553409332372775372003568
+[poly] a2(s), s=2..37: 1, 8, 70, 560, 4258, 30680, 210668, 1385928, 8778792, 53778352, 319849916, 1853161480 ...
+[poly]   a2(37) = 85653392889750413766166920

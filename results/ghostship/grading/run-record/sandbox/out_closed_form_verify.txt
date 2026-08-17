@@ -1,0 +1,6 @@
+closed form vs 200 terms: MATCH
+closed form vs 38 pure-DP terms: MATCH
+A(1/4) = 0
+A/(1-4t) = [Fraction(2, 1), Fraction(-18, 1), Fraction(54, 1), Fraction(-61, 1), Fraction(16, 1), Fraction(16, 1)] rem []
+numerator at t=-2 with sqrt=3: 34992  (0 => removable)
+numerator at t=-2 with sqrt=-3: 0

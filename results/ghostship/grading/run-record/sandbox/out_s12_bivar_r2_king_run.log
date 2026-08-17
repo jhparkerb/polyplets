@@ -1,0 +1,12 @@
+s12 king r=2 degree-ladder retry: WBOX=30
+[king] r=2 DP table built (329s)
+  TA=21 TB=18 p1: unique fit, 232 unknowns, 496 eqs, 264 surplus
+  TA=21 TB=18 p2: unique fit, 264 surplus
+  CRT lift max|coeff| = 8898 (small)
+  deg A_2 = 20, deg B_2 = 18, terms 150/105
+  EXACT over-Z residual on full 31x31 grid: ZERO everywhere
+  Delta | B_2: CONFIRMED
+  x^2y^2 | (B/Delta): yes
+  (1+x+y) | (B/(Delta x^2y^2)): no
+  content gcd of B/(Delta x^2y^2) = 1
+receipts: out_s12_bivar_r2_king.txt, out_s12_bivar_r2_king.json

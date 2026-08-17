@@ -1,0 +1,10 @@
+KING:
+  final F: a<=(74, 109) b<=(72, 107) den atoms size (74, 106)
+  identity numerator components: P<=(79, 119)  Q<=(78, 117)
+  identity denominator size: (74, 106)
+  => sufficient verification box: x-deg <= 160, u-deg <= 242
+CONTROL:
+  final F: a<=(69, 105) b<=(67, 103) den atoms size (69, 102)
+  identity numerator components: P<=(74, 115)  Q<=(73, 113)
+  identity denominator size: (69, 102)
+  => sufficient verification box: x-deg <= 150, u-deg <= 234

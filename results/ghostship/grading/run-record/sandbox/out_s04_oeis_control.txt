@@ -1,0 +1,4 @@
+control FULL (convex polyominoes by area) vs A067675 b-file,
+  50 terms from the q-Temperley formula: OK
+control DIRECTED (F00+F10) vs A067676 b-file,
+  50 terms: OK

@@ -1,0 +1,182 @@
+s12 delta-Laurent local engine: MAXR=6 NUCAP=150 modes=both primes=[2305843009213693951, 1000000000000000009]
+== prime 2305843009213693951 ==
+[king] building levels 0..6, NUCAP=150, p=2305843009213693951
+    level 1: 1.7s  tot.pr=124  tot.val=-8
+    level 2: 3.2s  tot.pr=108  tot.val=-12
+    level 3: 5.1s  tot.pr=87  tot.val=-16
+    level 4: 7.4s  tot.pr=60  tot.val=-20
+    level 5: 10.2s  tot.pr=27  tot.val=-24
+    level 6: 13.5s  tot.pr=-12  tot.val=-28
+[king] solve wall 41s
+[king] V1 level-0 == s03 closed form at collision: OK
+[king] V2 vs out_s09_slice_PQ_run1.json: r0:OK r1:OK r2:OK r3:OK r4:OK r5:OK r6:OK
+[king] V3/V4 Laurent profiles (val: coeffs, mod p):
+  r=0: tot val=-4 (want -4: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[807045053224792883, 0]
+        M10(1): val=-1 lead=[960767920505705813, 1626900345389661843]
+        M11(1): val=-4 lead=[18014398509481984, 2269814212194729983]
+  r=1: tot val=-8 (want -8: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[682529530727253410, 0]
+        M10(1): val=-4 lead=[72057594037927936, 128102389400760775]
+        M11(1): val=-8 lead=[9007199254740992, 0]
+        V4b dom-only tot differs from delta-order None (gap None): leading order PRESERVED
+  r=2: tot val=-12 (want -12: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[1323000484966449046, 0]
+        M10(1): val=-7 lead=[1714370258152368810, 312249574164354389]
+        M11(1): val=-12 lead=[18014398509481984, 0]
+        V4b dom-only tot differs from delta-order -10 (gap 2): leading order PRESERVED
+  r=3: tot val=-16 (want -16: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[1738568735458977924, 0]
+        M10(1): val=-10 lead=[1047086913363640320, 363290369941220009]
+        M11(1): val=-16 lead=[81064793292668928, 0]
+        V4b dom-only tot differs from delta-order -14 (gap 2): leading order PRESERVED
+  r=4: tot val=-20 (want -20: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[1970301161731499249, 0]
+        M10(1): val=-13 lead=[2060256092033646596, 292733975779082220]
+        M11(1): val=-20 lead=[648518346341351424, 0]
+        V4b dom-only tot differs from delta-order -18 (gap 2): leading order PRESERVED
+  r=5: tot val=-24 (want -24: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[1522133234816389756, 0]
+        M10(1): val=-16 lead=[1640013951804637267, 305118874754350702]
+        M11(1): val=-24 lead=[1188950301625810947, 0]
+        V4b dom-only tot differs from delta-order -22 (gap 2): leading order PRESERVED
+  r=6: tot val=-28 (want -28: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[1125856465342823525, 0]
+        M10(1): val=-19 lead=[472378782594893863, 153263124818940621]
+        M11(1): val=-28 lead=[648518346341351487, 0]
+        V4b dom-only tot differs from delta-order -26 (gap 2): leading order PRESERVED
+[poly] building levels 0..6, NUCAP=150, p=2305843009213693951
+    level 1: 1.6s  tot.pr=124  tot.val=-8
+    level 2: 3.0s  tot.pr=108  tot.val=-12
+    level 3: 4.9s  tot.pr=87  tot.val=-16
+    level 4: 7.3s  tot.pr=60  tot.val=-20
+    level 5: 10.1s  tot.pr=27  tot.val=-24
+    level 6: 13.4s  tot.pr=-12  tot.val=-28
+[poly] solve wall 41s
+[poly] V2 vs out_s09_slice_PQ_run1.json: r0:OK r1:OK r2:OK r3:OK r4:OK r5:OK r6:OK
+[poly] V3/V4 Laurent profiles (val: coeffs, mod p):
+  r=0: tot val=-4 (want -4: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[807045053224792883, 0]
+        M10(1): val=-1 lead=[144115188075855872, 1498797955988901068]
+        M11(1): val=-4 lead=[18014398509481984, 2269814212194729983]
+  r=1: tot val=-8 (want -8: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[682529530727253410, 0]
+        M10(1): val=-4 lead=[54043195528445952, 2233785415175766015]
+        M11(1): val=-8 lead=[9007199254740992, 0]
+        V4b dom-only tot differs from delta-order None (gap None): leading order PRESERVED
+  r=2: tot val=-12 (want -12: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[1323000484966449046, 0]
+        M10(1): val=-7 lead=[132856189007429632, 2035627031571464191]
+        M11(1): val=-12 lead=[18014398509481984, 0]
+        V4b dom-only tot differs from delta-order -10 (gap 2): leading order PRESERVED
+  r=3: tot val=-16 (want -16: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[1738568735458977924, 0]
+        M10(1): val=-10 lead=[785315185022730240, 161003686678495231]
+        M11(1): val=-16 lead=[81064793292668928, 0]
+        V4b dom-only tot differs from delta-order -14 (gap 2): leading order PRESERVED
+  r=4: tot val=-20 (want -20: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[1970301161731499249, 0]
+        M10(1): val=-13 lead=[1545192069025234947, 843299030225125363]
+        M11(1): val=-20 lead=[648518346341351424, 0]
+        V4b dom-only tot differs from delta-order -18 (gap 2): leading order PRESERVED
+  r=5: tot val=-24 (want -24: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[1522133234816389756, 0]
+        M10(1): val=-16 lead=[1806471216156901438, 827518839343283962]
+        M11(1): val=-24 lead=[1188950301625810947, 0]
+        V4b dom-only tot differs from delta-order -22 (gap 2): leading order PRESERVED
+  r=6: tot val=-28 (want -28: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[1125856465342823525, 0]
+        M10(1): val=-19 lead=[930744839249593885, 771909939256877574]
+        M11(1): val=-28 lead=[648518346341351487, 0]
+        V4b dom-only tot differs from delta-order -26 (gap 2): leading order PRESERVED
+== prime 1000000000000000009 ==
+[king] building levels 0..6, NUCAP=150, p=1000000000000000009
+    level 1: 1.5s  tot.pr=124  tot.val=-8
+    level 2: 2.8s  tot.pr=108  tot.val=-12
+    level 3: 4.5s  tot.pr=87  tot.val=-16
+    level 4: 6.6s  tot.pr=60  tot.val=-20
+    level 5: 9.1s  tot.pr=27  tot.val=-24
+    level 6: 12.0s  tot.pr=-12  tot.val=-28
+[king] solve wall 37s
+[king] V1 level-0 == s03 closed form at collision: OK
+[king] V2 vs out_s09_slice_PQ_run1.json: r0:OK r1:OK r2:OK r3:OK r4:OK r5:OK r6:OK
+[king] V3/V4 Laurent profiles (val: coeffs, mod p):
+  r=0: tot val=-4 (want -4: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[650000000000000006, 0]
+        M10(1): val=-1 lead=[916666666666666675, 405555555555555559]
+        M11(1): val=-4 lead=[554687500000000005, 890625000000000008]
+  r=1: tot val=-8 (want -8: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[944000000000000009, 0]
+        M10(1): val=-4 lead=[218750000000000002, 55555555555555556]
+        M11(1): val=-8 lead=[777343750000000007, 0]
+        V4b dom-only tot differs from delta-order None (gap None): leading order PRESERVED
+  r=2: tot val=-12 (want -12: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[480640000000000009, 0]
+        M10(1): val=-7 lead=[954427083333333342, 947916666666666675]
+        M11(1): val=-12 lead=[554687500000000005, 0]
+        V4b dom-only tot differs from delta-order -10 (gap 2): leading order PRESERVED
+  r=3: tot val=-16 (want -16: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[438976000000000108, 0]
+        M10(1): val=-10 lead=[616210937500000006, 352864583333333335]
+        M11(1): val=-16 lead=[996093750000000009, 0]
+        V4b dom-only tot differs from delta-order -14 (gap 2): leading order PRESERVED
+  r=4: tot val=-20 (want -20: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[504762880000004356, 0]
+        M10(1): val=-13 lead=[789611816406250012, 763671874999999987]
+        M11(1): val=-20 lead=[968750000000000009, 0]
+        V4b dom-only tot differs from delta-order -18 (gap 2): leading order PRESERVED
+  r=5: tot val=-24 (want -24: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[178948096000293517, 0]
+        M10(1): val=-16 lead=[365417480468750087, 207519531249999600]
+        M11(1): val=-24 lead=[609375000000000009, 0]
+        V4b dom-only tot differs from delta-order -22 (gap 2): leading order PRESERVED
+  r=6: tot val=-28 (want -28: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[80996495389090790, 0]
+        M10(1): val=-19 lead=[5015373229982556, 992614746093738438]
+        M11(1): val=-28 lead=[968750000000000072, 0]
+        V4b dom-only tot differs from delta-order -26 (gap 2): leading order PRESERVED
+[poly] building levels 0..6, NUCAP=150, p=1000000000000000009
+    level 1: 1.4s  tot.pr=124  tot.val=-8
+    level 2: 2.6s  tot.pr=108  tot.val=-12
+    level 3: 4.3s  tot.pr=87  tot.val=-16
+    level 4: 6.4s  tot.pr=60  tot.val=-20
+    level 5: 8.9s  tot.pr=27  tot.val=-24
+    level 6: 11.8s  tot.pr=-12  tot.val=-28
+[poly] solve wall 36s
+[poly] V2 vs out_s09_slice_PQ_run1.json: r0:OK r1:OK r2:OK r3:OK r4:OK r5:OK r6:OK
+[poly] V3/V4 Laurent profiles (val: coeffs, mod p):
+  r=0: tot val=-4 (want -4: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[650000000000000006, 0]
+        M10(1): val=-1 lead=[437500000000000004, 350000000000000003]
+        M11(1): val=-4 lead=[554687500000000005, 890625000000000008]
+  r=1: tot val=-8 (want -8: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[944000000000000009, 0]
+        M10(1): val=-4 lead=[664062500000000006, 781250000000000007]
+        M11(1): val=-8 lead=[777343750000000007, 0]
+        V4b dom-only tot differs from delta-order None (gap None): leading order PRESERVED
+  r=2: tot val=-12 (want -12: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[480640000000000009, 0]
+        M10(1): val=-7 lead=[215820312500000002, 679687500000000006]
+        M11(1): val=-12 lead=[554687500000000005, 0]
+        V4b dom-only tot differs from delta-order -10 (gap 2): leading order PRESERVED
+  r=3: tot val=-16 (want -16: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[438976000000000108, 0]
+        M10(1): val=-10 lead=[962158203125000009, 770019531250000006]
+        M11(1): val=-16 lead=[996093750000000009, 0]
+        V4b dom-only tot differs from delta-order -14 (gap 2): leading order PRESERVED
+  r=4: tot val=-20 (want -20: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[504762880000004356, 0]
+        M10(1): val=-13 lead=[592208862304687509, 403808593749999991]
+        M11(1): val=-20 lead=[968750000000000009, 0]
+        V4b dom-only tot differs from delta-order -18 (gap 2): leading order PRESERVED
+  r=5: tot val=-24 (want -24: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[178948096000293517, 0]
+        M10(1): val=-16 lead=[24063110351562563, 71235656738280989]
+        M11(1): val=-24 lead=[609375000000000009, 0]
+        V4b dom-only tot differs from delta-order -22 (gap 2): leading order PRESERVED
+  r=6: tot val=-28 (want -28: OK) lead=OK(c_r=(r!)^2/2^(r+7)) next=OK(=0)
+        M00(1): val=0 lead=[80996495389090790, 0]
+        M10(1): val=-19 lead=[3761529922486917, 629470825195304832]
+        M11(1): val=-28 lead=[968750000000000072, 0]
+        V4b dom-only tot differs from delta-order -26 (gap 2): leading order PRESERVED
+receipts: out_s12_delta_local.txt, out_s12_delta_profiles.json

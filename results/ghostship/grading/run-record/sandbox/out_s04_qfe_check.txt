@@ -1,0 +1,2 @@
+KING: q-FE transitions vs ground truth, 100 boxes w,h<=10, per-area: OK
+POLY: q-FE transitions vs ground truth, 100 boxes w,h<=10, per-area: OK

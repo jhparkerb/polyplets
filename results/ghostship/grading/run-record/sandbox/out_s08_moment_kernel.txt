@@ -1,0 +1,56 @@
+Session 08: KERNEL-METHOD DERIVATION of the area-moment generating
+functions of convex king animals (and the polyomino control) — the
+"Temperley moment method" sketched in docs/proofs/area-moments-method.md,
+executed here for moment levels r = 1, 2.
+
+Derivation (machine-executed below; see docs/proofs/area-moment-kernel.md):
+Let Theta = q d/dq. Apply Theta^r to the PROVEN q-functional-equation
+system (docs/proofs/convex-area-q-temperley.md §1) and set q = 1. Writing
+M_ph^{(r)}(s) = Theta^r F_ph(s;q)|_{q=1} and D = s d/ds, every equation
+becomes the SAME q=1 operator equation applied to the level-r unknowns
+plus an explicitly known inhomogeneity:
+
+    level 1:  I_ph = D F_ph(s)
+    level 2:  I_ph = 2 D M_ph^{(1)}(s) - D^2 F_ph(s)
+
+(proof of the rule: expand q = e^eps; c(q s) X(q) with slot X in
+{G(qs;q), G(1;q), G'(1;q)} has eps^2-coefficient*2 equal to
+c*X^{(2)} + 2 D[c X^{(1)}] + D^2[c X^{(0)}]; summing over the terms of an
+equation F_ph = Op[..] and using the level-(r-1) equations telescopes the
+D-terms into the stated inhomogeneity.)
+
+Hence the level-r system is solved by the SAME kernel method as level 0
+(s03): phase (0,0) is non-catalytic; the staircase kernel
+P_K(s) = (s-1)(1-xs) - ys is killed at its power-series root s0; the
+closing kernel (s-1)^2 - ys^2 at sigma_pm = 1/(1 -+ u), giving
+M^{(r)}(1) etc. by linear algebra. All ingredients stay in Q(x,y,sqrt(D)):
+THE MOMENT GFs ARE ALGEBRAIC, constructively, at every level r.
+
+This script executes levels 0,1,2 in exact truncated series arithmetic mod
+two ~2^60 primes and checks:
+  C0  level-0 grid == validated DP table f(w,h) (re-derivation of s03)
+  C1  [x^w u^2h] M^{(r)} == sum_n n^r f(w,h;n) from the doubly-validated
+      joint truth table out_s04_area_truth.json, r=1,2, both modes
+  C2  diagonal sum_w [x^w u^2(s-w)] M^{(r)} == a_r(s) from the independent
+      moment DP out_s07_area_moments_r4_30.json, r<=4
+  C3  M^{(1)} satisfies s07's fitted closed form:
+      A + B*sqrt(Delta) - M1 * K^2 * Delta^4 == 0   [king]
+      A' + B'*sqrt(Delta) - M1 * Delta^4 == 0        [poly]
+      (checked by multiplication: no division by K needed)
+
+Usage: python3 experiments/s08_moment_kernel.py [NX] [H] [maxlevel] [big]
+Output: out_s08_moment_kernel.txt
+
+s08 moment-kernel run: NX=6 H=6 NU=16 maxlevel=2
+prime p = 6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151
+  [king] C0 level-0 kernel solution vs DP table: OK
+  [king] C1 moment grids r=1..2 vs joint truth table: 84 cells OK, 0 bad OK
+  [king] C2 diagonal vs independent univariate DP (s<=7): 12 OK, 0 bad OK
+  [king] C3 derived M1 satisfies s07 fitted closed form (A+B*sqrtD == M1*K^2*D^4): OK
+  [king] wall 0.3s
+  [poly] C0 level-0 kernel solution vs DP table: OK
+  [poly] C1 moment grids r=1..2 vs joint truth table: 84 cells OK, 0 bad OK
+  [poly] C2 diagonal vs independent univariate DP (s<=7): 12 OK, 0 bad OK
+  [poly] C3 derived M1 satisfies s07 fitted closed form (A+B*sqrtD == M1*K^2*D^4): OK
+  [poly] wall 0.3s
+VERDICT: ALL CHECKS PASS

@@ -1,0 +1,15 @@
+king x=1 y=1: q-Temperley solution vs truth (n<=10): OK
+king x=2 y=1: q-Temperley solution vs truth (n<=10): OK
+king x=1 y=3: q-Temperley solution vs truth (n<=10): OK
+king x=3 y=2: q-Temperley solution vs truth (n<=10): OK
+poly x=1 y=1: q-Temperley solution vs truth (n<=10): OK
+poly x=2 y=1: q-Temperley solution vs truth (n<=10): OK
+poly x=1 y=3: q-Temperley solution vs truth (n<=10): OK
+poly x=3 y=2: q-Temperley solution vs truth (n<=10): OK
+
+KING x=y=1, N=30 (0.5s): area sequence from q-Temperley formula vs banked 30-term convex-mirage sequence: OK
+  1, 4, 16, 61, 221, 766, 2566, 8390, 26982, 85834, 271174, 853111, 2677214, 8389720, 26271014, 82230035, ...
+CONTROL x=y=1, N=30 (0.5s): convex polyominoes by area, first 14 vs known: OK
+  1, 2, 6, 19, 59, 176, 502, 1374, 3630, 9312, 23320, 57279, 138536, 331032, 783630, 1841867, 4306172, 10028276, 23288394, 53974959, 124925967, 288878550, 667602492, 1542254655, 3562000916, 8225719574, 18994263354, 43858728367, 101270779744, 233836327750
+
+all checks passed

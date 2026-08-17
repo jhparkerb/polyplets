@@ -1,0 +1,24 @@
+Session 07 REGISTERED PREDICTION (written BEFORE any r>=3 moment data
+exists in this repository; the DP so far computed only r=0,1,2).
+
+Observation (out_s07_moment_asymptotics.txt): for BOTH convex king
+animals and convex polyominoes, by semiperimeter s,
+    E[area]/s^2   -> 1/12,   E[area^2]/s^4 -> 1/120,  Var/s^4 -> 1/720,
+which are exactly the first two moments of  X = U(1-U)/2,  U ~ Uniform(0,1).
+
+LIMIT-LAW HYPOTHESIS: area/s^2 -> U(1-U)/2 in distribution (same law for
+king and polyomino).  Geometric form: width/s -> Uniform(0,1), and the
+animal fills exactly half its bounding box (fill ratio concentrates at 1/2;
+forced by the exact variance match).
+
+Consequences to be TESTED with fresh r=3,4 DP data (not yet computed):
+  E[area^r]/s^(2r) -> (r!)^2 / ((2r+1)! * 2^r)
+  equivalently  p_0(A_r) = c_0 * (r!)^2 / 2^r  with  c_0 = 1/128:
+
+  r=3:  E[area^3]/s^6 -> 1/1120,   p_0(A_3) = 9/256    [both modes]
+  r=4:  E[area^4]/s^8 -> 1/10080,  p_0(A_4) = 9/32     [both modes]
+
+Also predicted: A_3 has denominator (2+t)^4 (1-4t)^8 [king] / (1-4t)^8
+[poly], continuing the pattern (2+t)^(r+1) (1-4t)^(2r+2).
+
+Falsified if any fitted/extracted constant differs.

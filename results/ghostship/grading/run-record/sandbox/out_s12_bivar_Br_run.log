@@ -1,0 +1,57 @@
+s11 bivariate B_r extraction: WBOX=30 rmax=3 primes 2305843009213693951,9223372036854775783
+REGISTERED PREDICTION (see reports/session-11.md): Delta | B_r and B_r = Delta*x^2y^2*(1+x+y)*C_r [king] / Delta*4x^2y^2*E_r [control]
+sqrt(Delta) over Z to grid 30: 903 terms (0s)
+[king] DP tables r<=(3) built, transpose OK (323s)
+[king] r=1 p=2305843009213693951: unique fit, 106 unknowns, 496 equations, 390 consistent surplus rows (0s)
+[king] r=1 p=9223372036854775783: unique fit, 106 unknowns, 496 equations, 390 consistent surplus rows (0s)
+[king] r=1: CRT lift max|coeff| = 86 (small)
+[king] r=1: EXACT over-Z residual on full 31x31 grid: ZERO everywhere
+[king] r=1 CONTROL vs banked s07 json: A == banked, B == banked
+[king] r=1: Delta | B_1 exact division: CONFIRMED
+[king] r=1: x^2y^2 | (B/Delta): yes
+[king] r=1: (1+x+y) | (B/(Delta x^2y^2)): CONFIRMED
+[king] r=1: quotient [C] 10 monomials, max total deg 4:
+    (4)x^0y^1 + (-4)x^0y^2 + (4)x^1y^0 + (-5)x^1y^1 + (2)x^1y^2 + (-1)x^1y^3 + (-4)x^2y^0 + (2)x^2y^1 + (6)x^2y^2 + (-1)x^3y^1
+[king] r=2 p=2305843009213693951: FIT FAILED rank=-1
+[king] r=3 p=2305843009213693951: unique fit, 352 unknowns, 496 equations, 144 consistent surplus rows (2s)
+[king] r=3 p=9223372036854775783: unique fit, 352 unknowns, 496 equations, 144 consistent surplus rows (4s)
+[king] r=3: CRT lift max|coeff| = 1822460 (small)
+[king] r=3: EXACT over-Z residual on full 31x31 grid: ZERO everywhere
+[king] r=3: Delta | B_3 exact division: CONFIRMED
+[king] r=3: x^2y^2 | (B/Delta): yes
+[king] r=3: (1+x+y) | (B/(Delta x^2y^2)): no
+[king] r=3: quotient [B_over_Dxy] 151 monomials, max total deg 17:
+    (400)x^0y^3 + (-1856)x^0y^4 + (2448)x^0y^5 + (1344)x^0y^6 + (-6048)x^0y^7 + (4032)x^0y^8 + (2016)x^0y^9 + (-3648)x^0y^10 + (1296)x^0y^11 + (128)x^0y^12 + (-112)x^0y^13 + (1200)x^1y^2 + (-6333)x^1y^3 + (10455)x^1y^4 + (-1785)x^1y^5 + (-8229)x^1y^6 + (-3938)x^1y^7 + (20102)x^1y^8 + (-11874)x^1y^9 + (-3050)x^1y^10 + (3839)x^1y^11 + (3)x^1y^12 + (-389)x^1y^13 + (-1)x^1y^14 + (1200)x^2y^1 + (-8954)x^2y^2 + (20137)x^2y^3 + (-13876)x^2y^4 + (-13567)x^2y^5 + (15210)x^2y^6 + (14514)x^2y^7 + (-5712)x^2y^8 + (-20550)x^2y^9 + (8562)x^2y^10 + (4133)x^2y^11 + (-604)x^2y^12 + (-491)x^2y^13 + (-2)x^2y^14 + (400)x^3y^0 + (-6333)x^3y^1 + (20137)x^3y^2 + (-21179)x^3y^3 + (-33331)x^3y^4 + (74951)x^3y^5 + (-10675)x^3y^6 + (-7274)x^3y^7 + (-40178)x^3y^8 + (6129)x^3y^9 + (14619)x^3y^10 + (3573)x^3y^11 + (-571)x^3y^12 + (-267)x^3y^13 + (-1)x^3y^14 + (-1856)x^4y^0 + (10455)x^4y^1 + (-13876)x^4y^2 + (-33331)x^4y^3 + (106868)x^4y^4 + (-34203)x^4y^5 + (-59624)x^4y^6 + (3814)x^4y^7 + (-16048)x^4y^8 + (24489)x^4y^9 + (10252)x^4y^10 + (3837)x^4y^11 + (44)x^4y^12 + (-53)x^4y^13 + (2448)x^5y^0 + (-1785)x^5y^1 + (-13567)x^5y^2 + (74951)x^5y^3 + (-34203)x^5y^4 + (-111020)x^5y^5 + (47176)x^5y^6 + (28000)x^5y^7 + (1684)x^5y^8 + (7893)x^5y^9 + (2615)x^5y^10 + (2009)x^5y^11 + (135)x^5y^12 + (1344)x^6y^0 + (-8229)x^6y^1 + (15210)x^6y^2 + (-10675)x^6y^3 + (-59624)x^6y^4 + (47176)x^6y^5 + (62284)x^6y^6 + (-16576)x^6y^7 + (-7312)x^6y^8 + (-9851)x^6y^9 + (-1678)x^6y^10 + (155)x^6y^11 + (-6048)x^7y^0 + (-3938)x^7y^1 + (14514)x^7y^2 + (-7274)x^7y^3 + (3814)x^7y^4 + (28000)x^7y^5 + (-16576)x^7y^6 + (-19530)x^7y^7 + (4462)x^7y^8 + (-5326)x^7y^9 + (-730)x^7y^10 + (4032)x^8y^0 + (20102)x^8y^1 + (-5712)x^8y^2 + (-40178)x^8y^3 + (-16048)x^8y^4 + (1684)x^8y^5 + (-7312)x^8y^6 + (4462)x^8y^7 + (10440)x^8y^8 + (494)x^8y^9 + (2016)x^9y^0 + (-11874)x^9y^1 + (-20550)x^9y^2 + (6129)x^9y^3 + (24489)x^9y^4 + (7893)x^9y^5 + (-9851)x^9y^6 + (-5326)x^9y^7 + (494)x^9y^8 + (-3648)x^10y^0 + (-3050)x^10y^1 + (8562)x^10y^2 + (14619)x^10y^3 + (10252)x^10y^4 + (2615)x^10y^5 + (-1678)x^10y^6 + (-730)x^10y^7 + (1296)x^11y^0 + (3839)x^11y^1 + (4133)x^11y^2 + (3573)x^11y^3 + (3837)x^11y^4 + (2009)x^11y^5 + (155)x^11y^6 + (128)x^12y^0 + (3)x^12y^1 + (-604)x^12y^2 + (-571)x^12y^3 + (44)x^12y^4 + (135)x^12y^5 + (-112)x^13y^0 + (-389)x^13y^1 + (-491)x^13y^2 + (-267)x^13y^3 + (-53)x^13y^4 + (-1)x^14y^1 + (-2)x^14y^2 + (-1)x^14y^3
+[king] total wall 328s
+[poly] DP tables r<=(3) built, transpose OK (304s)
+[poly] r=1 p=2305843009213693951: unique fit, 106 unknowns, 496 equations, 390 consistent surplus rows (0s)
+[poly] r=1 p=9223372036854775783: unique fit, 106 unknowns, 496 equations, 390 consistent surplus rows (0s)
+[poly] r=1: CRT lift max|coeff| = 64 (small)
+[poly] r=1: EXACT over-Z residual on full 31x31 grid: ZERO everywhere
+[poly] r=1 CONTROL vs banked s07 json: A == banked, B == banked
+[poly] r=1: Delta | B_1 exact division: CONFIRMED
+[poly] r=1: x^2y^2 | (B/Delta): yes
+[poly] r=1: content gcd of B/(Delta x^2y^2) = 4
+[poly] r=1: quotient [E_times (content 4)] 4 monomials, max total deg 2:
+    (1)x^0y^0 + (-1)x^0y^2 + (2)x^1y^1 + (-1)x^2y^0
+[poly] r=2 p=2305843009213693951: unique fit, 211 unknowns, 496 equations, 285 consistent surplus rows (1s)
+[poly] r=2 p=9223372036854775783: unique fit, 211 unknowns, 496 equations, 285 consistent surplus rows (1s)
+[poly] r=2: CRT lift max|coeff| = 7094 (small)
+[poly] r=2: EXACT over-Z residual on full 31x31 grid: ZERO everywhere
+[poly] r=2: Delta | B_2 exact division: CONFIRMED
+[poly] r=2: x^2y^2 | (B/Delta): yes
+[poly] r=2: content gcd of B/(Delta x^2y^2) = 2
+[poly] r=2: quotient [E_times (content 2)] 28 monomials, max total deg 6:
+    (-27)x^0y^0 + (78)x^0y^1 + (-45)x^0y^2 + (-60)x^0y^3 + (75)x^0y^4 + (-18)x^0y^5 + (-3)x^0y^6 + (78)x^1y^0 + (-234)x^1y^1 + (216)x^1y^2 + (-32)x^1y^3 + (-38)x^1y^4 + (10)x^1y^5 + (-45)x^2y^0 + (216)x^2y^1 + (-206)x^2y^2 + (56)x^2y^3 + (-13)x^2y^4 + (-60)x^3y^0 + (-32)x^3y^1 + (56)x^3y^2 + (12)x^3y^3 + (75)x^4y^0 + (-38)x^4y^1 + (-13)x^4y^2 + (-18)x^5y^0 + (10)x^5y^1 + (-3)x^6y^0
+[poly] r=3 p=2305843009213693951: unique fit, 352 unknowns, 496 equations, 144 consistent surplus rows (2s)
+[poly] r=3 p=9223372036854775783: unique fit, 352 unknowns, 496 equations, 144 consistent surplus rows (4s)
+[poly] r=3: CRT lift max|coeff| = 1499572 (small)
+[poly] r=3: EXACT over-Z residual on full 31x31 grid: ZERO everywhere
+[poly] r=3: Delta | B_3 exact division: CONFIRMED
+[poly] r=3: x^2y^2 | (B/Delta): yes
+[poly] r=3: content gcd of B/(Delta x^2y^2) = 2
+[poly] r=3: quotient [E_times (content 2)] 66 monomials, max total deg 10:
+    (293)x^0y^0 + (-1456)x^0y^1 + (2151)x^0y^2 + (1104)x^0y^3 + (-7182)x^0y^4 + (9072)x^0y^5 + (-4914)x^0y^6 + (624)x^0y^7 + (441)x^0y^8 + (-128)x^0y^9 + (-5)x^0y^10 + (-1456)x^1y^0 + (7662)x^1y^1 + (-15388)x^1y^2 + (12748)x^1y^3 + (804)x^1y^4 + (-9544)x^1y^5 + (6988)x^1y^6 + (-1932)x^1y^7 + (92)x^1y^8 + (26)x^1y^9 + (2151)x^2y^0 + (-15388)x^2y^1 + (31116)x^2y^2 + (-27492)x^2y^3 + (16034)x^2y^4 + (-8628)x^2y^5 + (780)x^2y^6 + (1460)x^2y^7 + (-33)x^2y^8 + (1104)x^3y^0 + (12748)x^3y^1 + (-27492)x^3y^2 + (9136)x^3y^3 + (1016)x^3y^4 + (7212)x^3y^5 + (-3652)x^3y^6 + (-72)x^3y^7 + (-7182)x^4y^0 + (804)x^4y^1 + (16034)x^4y^2 + (1016)x^4y^3 + (-13002)x^4y^4 + (2228)x^4y^5 + (294)x^4y^6 + (9072)x^5y^0 + (-9544)x^5y^1 + (-8628)x^5y^2 + (7212)x^5y^3 + (2228)x^5y^4 + (-420)x^5y^5 + (-4914)x^6y^0 + (6988)x^6y^1 + (780)x^6y^2 + (-3652)x^6y^3 + (294)x^6y^4 + (624)x^7y^0 + (-1932)x^7y^1 + (1460)x^7y^2 + (-72)x^7y^3 + (441)x^8y^0 + (92)x^8y^1 + (-33)x^8y^2 + (-128)x^9y^0 + (26)x^9y^1 + (-5)x^10y^0
+[poly] total wall 310s
+VERDICT: FAILURES PRESENT
+receipts: out_s12_bivar_Br.txt, out_s12_bivar_Br.json

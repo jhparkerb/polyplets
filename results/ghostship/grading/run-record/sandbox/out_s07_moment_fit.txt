@@ -1,0 +1,34 @@
+Session 07: fit exact radical closed forms for the area-moment
+generating functions
+
+  A_r(t) = sum_s a_r(s) t^s,   a_r(s) = sum area^r over convex king
+                               animals of semiperimeter s  (r=1,2),
+
+with the s01/s02-established ansatz field Q(t, sqrt(1-4t)):
+
+  A_r(t) = [P(t) + Q(t) * S] / ((2+t)^a * (1-4t)^b),  S = sqrt(1-4t)
+
+(a,b integers >= 0; half-integer singularity exponents are covered by the
+Q*S numerator).  Exact Fraction linear algebra; the fit uses the minimal
+prefix of terms and EVERY remaining term is holdout.  Control mode
+(convex polyominoes) fitted with denominator (1-4t)^b (no (2+t): s02
+showed K=1 there).
+
+Input: out_s07_area_moments.json.  Output: out_s07_moment_fit.txt.
+
+[king] A_1(t) = [P + Q*sqrt(1-4t)] / (2+t)^2 * (1-4t)^4
+  P = (4)*t^2 + (-52)*t^3 + (230)*t^4 + (-348)*t^5 + (120)*t^6 + (-84)*t^7 + (-54)*t^8 + (80)*t^9 + (32)*t^10
+  Q = (8)*t^3 + (-29)*t^4 + (-34)*t^5 + (100)*t^6 + (-40)*t^7 + (-32)*t^8
+  unknowns = 22, equations = 47, surplus(holdout-equivalent) = 25
+[king] A_2(t) = [P + Q*sqrt(1-4t)] / (2+t)^3 * (1-4t)^6
+  P = (8)*t^2 + (12)*t^3 + (-444)*t^4 + (474)*t^5 + (7140)*t^6 + (-23614)*t^7 + (25140)*t^8 + (766)*t^9 + (-17936)*t^10 + (5936)*t^11 + (4928)*t^12 + (-2304)*t^13 + (-1024)*t^14
+  Q = (-128)*t^3 + (1010)*t^4 + (-2093)*t^5 + (-470)*t^6 + (3534)*t^7 + (1428)*t^8 + (-6548)*t^9 + (16)*t^10 + (3344)*t^11 + (960)*t^12
+  unknowns = 30, equations = 47, surplus(holdout-equivalent) = 17
+[poly] A_1(t) = [P + Q*sqrt(1-4t)] / (1-4t)^4
+  P = (1)*t^2 + (-12)*t^3 + (50)*t^4 + (-76)*t^5 + (42)*t^6 + (-48)*t^7 + (32)*t^8
+  Q = (4)*t^4 + (-16)*t^5
+  unknowns = 18, equations = 47, surplus(holdout-equivalent) = 29
+[poly] A_2(t) = [P + Q*sqrt(1-4t)] / (1-4t)^6
+  P = (1)*t^2 + (-16)*t^3 + (172)*t^4 + (-1116)*t^5 + (4062)*t^6 + (-8304)*t^7 + (10160)*t^8 + (-7872)*t^9 + (3840)*t^10 + (-1024)*t^11
+  Q = (-54)*t^4 + (528)*t^5 + (-1896)*t^6 + (3216)*t^7 + (-2736)*t^8 + (960)*t^9
+  unknowns = 24, equations = 47, surplus(holdout-equivalent) = 23

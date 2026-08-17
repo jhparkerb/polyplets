@@ -1,0 +1,33 @@
+Session 13: v-GENERAL local profile recursion (general point of the
+singular curve Delta = 0, parametrized x = v^2, y_c = (1-v)^2, s* = 1/v)
+and the scaling proof of the s09 curve-amplitude law.
+
+Chart: s = s* + delta^2*tau, lambda := 8v^3(1-v)*tau, mu := lambda - 1
+(so the D00 root u_- is mu = 0 and the closing-kernel point sigma+ is
+mu = -2). Profiles (leading Laurent coefficients, inner chart):
+  M00 = delta^-(4r+2) psi_r,  M10 = delta^-(4r+4) chi_r,
+  M11 = delta^-(4r+6) phi_r.
+Derived recursion (hand chart-expansion of the s08 operators; see
+results/convex-area-local-transfer.md section 6):
+  psi_r = -(r*kappa/mu) psi_{r-1}'        psi_0 = -4v^2(1-v)^3/mu
+  chi_r = 4v^2(1-v)^2 psi_r + kappa r chi_{r-1}'
+  a_r   = 2v chi_r + 8v^2(1-v) r phi_{r-1}'
+  phi_r = 4v(1-v)^2 (a_r - a_r(-2))/(mu+2)
+  c_r   = a_r(-2)/2,   d_r = c_r/(1-v)    [' = d/dmu = d/dlambda]
+with kappa = 32 v^3 (1-v)^3.
+
+CHECKS:
+  K1  at v = 1/2 the system == the banked z-form system of
+      s13_local_recursion.py (mu == z/2: coefficientwise match of chi,
+      phi and c_r for r <= RMAX)
+  K2  scaling law: for v in {1/3, 1/5, 3/7, 2/5}, r <= RMAX:
+      c_r(v) == (r!)^2 2^(5r+3) (v(1-v))^(3r+5)   [s09 curve law]
+  K3  normalized profiles are v-free: chi_r(v)/(Cchi g^r) and
+      phi_r(v)/(Cphi g^r) identical across all v (pure functions of mu)
+
+Output: out_s13_curve_recursion.txt
+
+== v-general local recursion, r <= 12 ==
+K1 (v=1/2 == banked z-form, r<=12): PASS
+K2 (curve law c_r(v) = (r!)^2 2^(5r+3) (v(1-v))^(3r+5), 5 values of v, r<=12): PASS
+K3 (normalized profiles v-free): PASS

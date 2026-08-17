@@ -1,0 +1,6 @@
+CONTROL A2: Delta-valuation 4, quotient deg 0
+   quotient = +1x^0y^0
+CONTROL A1: Delta-valuation 2, quotient deg 6
+CONTROL A0: Delta-valuation 0, quotient deg 12
+CONTROL disc: Delta-valuation 5 , remaining deg 8
+   remaining = +64x^4y^4

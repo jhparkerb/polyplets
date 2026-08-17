@@ -1,0 +1,39 @@
+Session 13: check the derived value law  lead M11^(r)'(1) = 2 c_r.
+
+Predicted by K11-root removability at z = -4 in the local transfer
+(results/convex-area-local-transfer.md section 2): M11'(1) has leading
+Laurent coefficient 2c_r at valuation -(4r+4), i.e. EXACTLY twice the
+M11(1) leading coefficient, in both modes.
+
+Usage: python3 experiments/s13_dr_check.py [MAXR] [NUCAP]
+Output: out_s13_dr_check.txt
+
+[king p=2305843009213693951] r=0: val M11'(1)=-4 (want -4), lead==2c_r: OK
+[king p=2305843009213693951] r=1: val M11'(1)=-8 (want -8), lead==2c_r: OK
+[king p=2305843009213693951] r=2: val M11'(1)=-12 (want -12), lead==2c_r: OK
+[king p=2305843009213693951] r=3: val M11'(1)=-16 (want -16), lead==2c_r: OK
+[king p=2305843009213693951] r=4: val M11'(1)=-20 (want -20), lead==2c_r: OK
+[king p=2305843009213693951] r=5: val M11'(1)=-24 (want -24), lead==2c_r: OK
+[king p=2305843009213693951] r=6: val M11'(1)=-28 (want -28), lead==2c_r: OK
+[poly p=2305843009213693951] r=0: val M11'(1)=-4 (want -4), lead==2c_r: OK
+[poly p=2305843009213693951] r=1: val M11'(1)=-8 (want -8), lead==2c_r: OK
+[poly p=2305843009213693951] r=2: val M11'(1)=-12 (want -12), lead==2c_r: OK
+[poly p=2305843009213693951] r=3: val M11'(1)=-16 (want -16), lead==2c_r: OK
+[poly p=2305843009213693951] r=4: val M11'(1)=-20 (want -20), lead==2c_r: OK
+[poly p=2305843009213693951] r=5: val M11'(1)=-24 (want -24), lead==2c_r: OK
+[poly p=2305843009213693951] r=6: val M11'(1)=-28 (want -28), lead==2c_r: OK
+[king p=1000000000000000009] r=0: val M11'(1)=-4 (want -4), lead==2c_r: OK
+[king p=1000000000000000009] r=1: val M11'(1)=-8 (want -8), lead==2c_r: OK
+[king p=1000000000000000009] r=2: val M11'(1)=-12 (want -12), lead==2c_r: OK
+[king p=1000000000000000009] r=3: val M11'(1)=-16 (want -16), lead==2c_r: OK
+[king p=1000000000000000009] r=4: val M11'(1)=-20 (want -20), lead==2c_r: OK
+[king p=1000000000000000009] r=5: val M11'(1)=-24 (want -24), lead==2c_r: OK
+[king p=1000000000000000009] r=6: val M11'(1)=-28 (want -28), lead==2c_r: OK
+[poly p=1000000000000000009] r=0: val M11'(1)=-4 (want -4), lead==2c_r: OK
+[poly p=1000000000000000009] r=1: val M11'(1)=-8 (want -8), lead==2c_r: OK
+[poly p=1000000000000000009] r=2: val M11'(1)=-12 (want -12), lead==2c_r: OK
+[poly p=1000000000000000009] r=3: val M11'(1)=-16 (want -16), lead==2c_r: OK
+[poly p=1000000000000000009] r=4: val M11'(1)=-20 (want -20), lead==2c_r: OK
+[poly p=1000000000000000009] r=5: val M11'(1)=-24 (want -24), lead==2c_r: OK
+[poly p=1000000000000000009] r=6: val M11'(1)=-28 (want -28), lead==2c_r: OK
+d_r = 2 c_r law, r<=6, both modes, both primes: PASS

@@ -1,0 +1,15 @@
+Session 07: exact Delest-Viennot-style formula for the TOTAL AREA of
+convex polyominoes with semiperimeter s (perimeter 2s), derived from the
+fitted+holdout-verified closed form A_1^poly = P/(1-4t)^4 + 4t^4/(1-4t)^(5/2),
+P = t^2-12t^3+50t^4-76t^5+42t^6-48t^7+32t^8:
+
+  a1(s) = sum_{k=2..8} P_k * C(s-k+3,3) * 4^(s-k)
+          + (4/3)(2m+1)(2m+3) C(2m,m),   m = s-4
+
+  (P_k = 1,-12,50,-76,42,-48,32 for k=2..8)
+
+Verified EXACTLY against the DP data for ALL s=2..52 (inline check, see
+session-07 LOG; the closed form itself passed two registered-prediction
+holdout rounds). Companion to Delest-Viennot's count formula
+p(s)=(2s+3)4^(s-4) - 4(2s-7)C(2s-8,s-4)-ish structure: the area version
+has a cubic polynomial times 4^s plus a (2m+1)(2m+3)C(2m,m)/3 term.

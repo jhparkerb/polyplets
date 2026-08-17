@@ -1,0 +1,465 @@
+commit 74b2c2036531080ca6828df6e99df1bee10c6553
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-12 17:59:51 -0400
+
+    tool(convex): restore lost 38-term transfer matrix (convex-mirage TODO)
+    
+    Row-interval transfer with unimodal-envelope phase automaton (unique parse:
+    phases flip on first strict violation), king reach between rows. Regenerates
+    all 38 terms; first 20 match convex-mirage's reference; mu=3.12894.
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 47cd9482a03362fc0e283f49128bb12736c3ba5f
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-12 17:53:29 -0400
+
+    research(holefree-gas): hole-free diagonal law ab initio; spine carried by hole-makers
+    
+    Hole-free cluster weights (24/47/304; boundary 5/7/62); master equation +
+    residue derive P0_1 = 24n-42 and P0_2 = 288n^2-1113n+507, exact on all
+    banked hole-free GF data (H<=8). 24 == 0 mod 3: the full triangle's mod-3
+    structure (spine cubic) is carried entirely by hole-making configurations;
+    the hole-free triangle is mod-3 trivial in-band.
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit c95ebc0abe9619ee5b45957a165d5979402cbefc
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-12 17:45:25 -0400
+
+    research(spine-deeper): mod-81 equation, G mod 27, deficit-2 law to m=94; sharpness k<=5
+    
+    Cross-pollination round: (1) onset sharpness verified ab initio k<=5
+    (deg R_k = 2k+1, leads 1,4,-80,1753,-40928,987355); (2) all-pairs weight
+    family proven NOT C-finite (order-7 fit refuted at l=16; unbounded gap
+    walk; growth ~14.41, kernel-method open) -- blocks the rational-GF route
+    to all-k sharpness; (3) finite mod-81 master equation (six terms, four-pair
+    stack at 27) matches banked; (4) G mod 27 derived (pair-row boundary only);
+    (5) T(3m+2,2m+1) == 2 mod 3 now holds on fully-derived series m=1..94,
+    previously an unproved observation checkable only to m~11.
+    experiments/spine_deeper.py green.
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 5e5f33087e2c77bcdf73d753d8aa595cc166f97d
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-12 17:00:34 -0400
+
+    measure(defect-gas): weight DP; grand form ab initio to u^5; P17-from-gas dead
+    
+    Row-transfer DP counts cluster weights without enumeration (validated 21/21).
+    Full k<=5 table (31 types): master equation reproduces h4=20688, h5=130208
+    and boundary residue reproduces g1..g5 -- G*H^n derived from finite local
+    counts through order 5. Reach measured: ~20x/k (3.1s/65s/>530s at k=4/5/6),
+    k=17 extrapolates ~10^17s => strict H20 sweep remains the only P17
+    certification. check_grand_form() embedded (ms, weights as literals).
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 644a24925289a483378798b92adefbc8b9374d31
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-12 16:27:58 -0400
+
+    proof(defect-gas): (*c) closed symbolically -- the ladder is fully proved
+    
+    H(u^3) == H^2 + 25u - 3u^2 - 3uW (mod 9), from the mod-9 cubic alone:
+    uniqueness of the cubic fixed point + termwise expansion of X^9 mod 9 +
+    a three-line F3 cancellation via W^3 = W^2 + u. All three Ternary Spine
+    ladder items now symbolic; closed-form identity added to check_ladder()
+    (green to u^300 + banked cross-check).
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 96505aa0bce89ca837dcbc3c661197a278077a23
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-12 15:33:15 -0400
+
+    proof(diagonal-law): the law's shape is a theorem
+    
+    Separation lemma (walk rows are cuts) + exact chain identity + row bound
+    (l <= k) + partial fractions in (1-3z) prove T(n,n-k) = P_k(n) 3^(n-1-3k)
+    for n >= 2k+1 with deg P_k <= k, and (new) P_k integer-VALUED via the
+    3-adic bound v3 >= -(2k+1) on the (1-3z)-basis coefficients. Onset derived,
+    matches observation. Checker green: deg bounds tight, chain==banked to H=33,
+    law exact from H=k+1, sharp at H=k, k<=3. Downstream conditionality
+    (Ternary Spine, SNF, P_k machinery) collapses to enumerated cluster weights.
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 332ab316e167939801b46b54aa9c7fb8f2693322
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-12 13:07:34 -0400
+
+    proof(defect-gas): boundary weights derive G; full Ternary Spine ladder retired
+    
+    Boundary cluster weights (single-row = 2s+1: entry x exit factorization of
+    (2s+1)^2); exact chain identity with boundaries 40/40 vs banked triangle;
+    residue formula for G verified to u^3. (*a) G==1 mod 9 DERIVED: boundary
+    valuation lemma + the mod-9 cubic identity H^2H'+3uH'+2H==0. (*c) verified to
+    u^300 on the unique pure-algebra mod-27 fixed point. check_ladder() +
+    boundary_weight() added; ternary-spine.md + HANDOFF.md updated.
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 34845ab9964414c1baac55c483d2acde01e01a5e
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-12 12:58:25 -0400
+
+    proof(defect-gas): master equation derives the spine cubic
+    
+    Cluster renewal chain => H = 1 + sum What_c u^k H^-(k+l), What = W*3^(2k-l-1).
+    Exact through u^3 (h3=1483 from enumerated weights incl. W(2,2,2)=4778).
+    Valuation lemma (k>=l per cluster) kills everything but the bare pair-row
+    mod 3 => H^3 = H^2 + u DERIVED; mod-9 lift derived; finite mod-27 equation
+    matches all 18 known coefficients. Ladder item (*b) upgraded to theorem-of-
+    the-gas. check_master() added to experiments/defect_gas.py.
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit ecbf1157ab3807da5687c80a90b3519fbdba49ae
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-12 11:40:41 -0400
+
+    docs(defect-gas): complete the writeup -- (2s+1)^2 theorem, 625 demystified, K=3
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit ff61f3cb6156350d0af29042a4ab4a3b25dbcf4a
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-12 11:39:14 -0400
+
+    research(defect-gas): (2s+1)^2 single-row cluster theorem PROVED; K=3 validated
+    
+    Natural normalization reveals the single-row cluster weights are the odd squares:
+    25=5^2, 49=7^2, 81=9^2, 121=11^2 (the ledger's 441 was 49*9, a units artifact).
+    PROVED by the gap-bridging case analysis: j wide gaps contribute (s+2)^2 /
+    2(s+3)-1 / 2 / 0 for j=0/1/2/>=3, and the sum telescopes to (2s+1)^2 exactly.
+    625=25^2 demystified: separation->=1 clusters compose as a Markov chain, so
+    factorization is exact and interaction is strictly a contact phenomenon.
+    K=3 row model validated against banked T(H+3,H) (H<=8) after fixing two window
+    bugs (bridges may come from below; pending blocks are the only reach constraint)
+    -- h3=1483's content confirmed by the independent algorithm.
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit f3e55e7f0ab66e8db7b5328ee1be5deeda9ba897
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-12 11:20:31 -0400
+
+    research(defect-gas): mechanism of the cumulant law -- 25 = 16+9 proved, k=2 ledger exact
+    
+    Nibble #3 landed. Built the ROW MODEL (transfer DP over row contents +
+    connectivity partitions, surplus-budgeted) -- an independent third enumeration
+    algorithm, validated exactly against the banked triangle (H<=10, k<=2). With it:
+    
+    - h1 = 25 PROVED by hand: 25 = 16 (adjacent pairs, 4x4 contacts) + 9 (gap
+      pairs, connectivity-constrained) -- the paper's "25 species" is 4^2 + 3^2.
+    - k=2 cluster ledger extracted by exact holdout-checked fits: triple row
+      441 = 21^2; adjacent pair-pair 1017 = 9*113 (the true interaction); pairs at
+      separation 1 weigh EXACTLY 625 = 25^2 (surprise factorization); separated
+      pairs = ideal gas 625/2 H^2. Ledger sums to P_2(H+2) EXACTLY (symbolic).
+    - Mechanism identified: the diagonal cumulant law is a 1D defect-gas law
+      (linear-in-n cumulants = extensivity; exp form = cluster independence;
+      G = chain ends). Road to proving the law + the Ternary Spine ladder: cluster
+      weights are finite computations; needs convergence + boundary analysis.
+    - 3-adic hook noted: 25 == 1, 441 == 1 mod 3, 1017 == 0 mod 9 -- the ladder
+      congruences should be arithmetic facts about cluster weights.
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 1f2e64894f3e7afb9499c49cfad39a3dc7fefc10
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 22:09:23 -0400
+
+    docs: repo-wide stale-statement audit — fix outdated claims across docs/results/code
+    
+    Exhaustive pass (6 parallel scan agents + central verification). Fixed outdated
+    present-tense claims; dated historical records got concise supersession notes.
+    
+    Frontier/values now current:
+    - k8-pinning.md, diagonal-closed-forms.md: P8 pinned (T(24,16)=42594477635772598
+      banked, verified in ns_a36/perheight/h16.out) — was "pins when a(24) lands".
+    - strip-{growth-lambda-bounds,mu-engine-resumption}.md: ladder extended to
+      mu_14=6.3800344 (strip_mu_H14.log) — was "running now / append when done".
+    - strip-engine.md: H=14 never completed (log stops at C_13) — was "(running)".
+    - engine-design.md: engine computed a(21)-a(36) (was a(34)).
+    - README.md: frontier a(36) (was a(34)); two-algorithm tier a(1)-a(20) (was a(19));
+      T2/T2- re-tiered for the a(36) frontier (a(35) had only partial cross-ISA).
+    - polyplet-zoo.md: M(17)=28 confirmed + hole-free exponential decay + 36 terms.
+    - map-profile.md, merge-ledger.md: Track B COMPLETE (self-contradicted headers).
+    - polyplet-upper-bound.md: reconciled intro/verdict with its own λ<=9.3153 breakthrough.
+    - triangle_relations{,2,3}.py: read ns_a36 / 36-row (was ns_a35); row-sum check green.
+    - g2_redelmeier.cpp: a(22)~4.7e16, full analysis-flag list; statedb.h TODO gate moot.
+    
+    Supersession notes added to dated records: terminal-velocity-plan (a21->a22),
+    redelmeier-tall-plan (n=22 in reach), dmirror-design/-diagonals (built; n33 landed,
+    n34 declined), a35-two-media-plan + dalby_a35_two_media.sh (OOM'd; varint engine),
+    a34-utilization-postmortem + steal-tail + overlap-kink (fix built, ~0 effect),
+    related-seqs-n24/n32/n33 (b-files staged, dmirror(33) landed), triangle-structure
+    (36-row exists), completion-oracle/boundary-push-tensornetwork (resolved live status).
+    
+    Left untouched (verified clean or off-limits): HANDOFF.md, paper/ (deliberately
+    a(34)-scoped; theta=-1 strengthening is jasonp's call), AUDIT-2026-06-28.md, viva
+    drills (jasonp-owned). Also fixed the dead ROADMAP.md memory pointer -> HANDOFF.md.
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit ce8f56d27c321a560989eda787a26b46447eaee2
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 11:10:09 -0400
+
+    docs: propagate the rigorous upper bound (lambda <= 9.3153) repo-wide
+    
+    Wherever the lambda lower bound is discussed, add the complementary upper bound
+    and a link to the derivation (docs/proofs/polyplet-upper-bound.md). Now a
+    two-sided rigorous bracket 5.828 <= lambda <= 9.3153 everywhere:
+    - glossary: corrected the stale 'no upper bound' claim
+    - directed-king-animals: sandwich table + upper row
+    - strip growth/mu docs: bracket note beside the mu_H lower-bound ladder
+    - convex-polyplets: bracket in the weak-lower-bound framing
+    - paper: new 'rigorous upper bound' paragraph (Bui-style convolution certificate,
+      x=2147/20000, exact-arithmetic verified) + bui2025 bib entry (titles verified
+      against arXiv). Compiles clean, no undefined citations.
+    
+    Interior-cell 'lower bound' mentions left untouched (different quantity).
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit e3bfa4fa0a4b8d39825c5c76dd38c9ce79a292bd
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 10:44:51 -0400
+
+    proof(cert-squeeze P2): slack audit -> connectivity-wall floor; P3 not pursued
+    
+    Phase 2 of Certificate Squeeze. king_slack.py measures per-recurrence slack
+    vs brute-force A006770. The over-count is diffuse (max 1.22, median 1.14,
+    none >1.5), COMPOUNDING (+0.022/term - grows with n, hence non-local), and
+    the anchor G8 is asymptotically clean (growth=lambda; the growing G8/A ratio
+    is only the n*A polynomial prefactor). Growth-with-n is the distant-overlap
+    signature: phi_T'*phi_D lets the two pieces collide arbitrarily far from the
+    cut, unforbiddable by any finite window - the connectivity wall that saturated
+    RD. Lever 4 (per-type) dead (no target); lever 1 (multi-cell) only relocates
+    the over-count (=king_derive ~12.5); lever 2 (required-cell) hits the same
+    wall, best case ~8.1 and king slack grows where rook saturates. Verdict: bank
+    the exact lambda <= 9.3153, do not sink multi-session effort into Phase 3.
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit e08b57b27def8c6cb1099f41d33f2d16f2e98e4b
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 10:38:51 -0400
+
+    proof(cert-squeeze P1): exact rational certificate for lambda <= 9.3153
+    
+    Phase 1 of Certificate Squeeze. king_certificate.py finds a rational
+    super-solution u >= F_x(u) (monotone system map at x), verified in exact
+    Fraction arithmetic -> lambda <= 1/x rigorously, no floats in the chain.
+    RD=3: x=2147/20000, 5930-component certificate, max denom 1e6, PASS ->
+    lambda <= 9.3153 (0.1% eps margin above numerical 9.306). RD=2 cross-check
+    x=106251/1e6 -> 9.4117 PASS. Repair uses ceil-to-fixed-denominator to keep
+    denominators from exploding. Also adds king_slack.py (Phase 2 audit, WIP).
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit d5addbb6f112f6bd04ea9ce759b8b93dd7975a42
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 10:14:43 -0400
+
+    proof(upper-bound): RD=3 -> lambda <= 9.31; cell-choice lever measured null
+    
+    Split-window RD sweep saturates: RD=1/2/3 -> 10.35/9.40/9.31. Cell-choice
+    (ll/hr/diag/orth casing order) has zero effect - identical 185-type closure
+    and 9.4022 at RD=2 - so the bound is a spectral property of the closed system,
+    invariant to casing order. Both levers exhausted; 9.31 is this decomposition's
+    floor. Indexed-array certificate iteration + NOVERIFY/DORDER guards.
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit dcbf911896fa544dbb664955d029663da7d804c7
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 09:47:50 -0400
+
+    feat(upper-bound): Bui mechanism ported to king -> lambda <= 9.40 (verified), beats crude 12.2
+    
+    experiments/king_bui.py: case one cell d at a time, phi_T = phi_T' + phi_T'*phi_D (T'=T+{d forbidden}, D=d split-off type). d-empty is an EXACT partition; d-occupied a valid split. Fixes over generic version: multi-neighbour cases stay convolutions (not lossy re-marks) and the split type D knows all c's other neighbours go to the c-side. Tightens with split window: RD=1->10.35 (21 types), RD=2->9.40 (185 types), both verified valid over-counts vs brute force. First polyplet upper bound below the crude 12.2.
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit bdb7bfa5babac1ad249e404899293089e8894537
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 09:24:08 -0400
+
+    measure(upper-bound): R=2 twig bound = 12.54, window size is not the lever
+    
+    Fast indexed iteration (king_bound_fast.py): R=2 closes to 8740 types in 1s and gives lambda<=12.5382 -- essentially R=1's 12.50, slightly worse. So the generic-decomposition looseness is structural (how convolutions compound), not a context-window deficiency; R=3 is pointless. Beating 12.2 needs Bui's engineered types. Corrects an earlier reasoned-not-measured claim.
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit a640f0b77bc247069fe2725af307ef907617e4a7
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 09:06:31 -0400
+
+    feat(upper-bound): verified king twig-derivation harness; generic decomposition too loose
+    
+    Brute-force enumerator + auto type-closure + numerical verification of every leaf reduction and cut convolution (all valid over-counts). Base fact A(n)<=G8(n)<=n*A(n) confirmed; 15-class decomposition (12 leaf + 3 NW-stranding cuts) verified. But the generic decomposition gives lambda<=12.5-13, WORSE than crude 12.2 -- tightness needs Bui's specifically-engineered types, not generic over-counting. Harness is reusable for checking any proposed king system.
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit d0a7414f8c7379ef481662b72c1f8c6e41fa91da
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 07:52:36 -0400
+
+    feat(upper-bound): validated Bui certificate machinery (rook 4.63); king system is the only gap
+    
+    certificate_bound.py implements Bui's monotone-iteration finder + exact rational certificate checker; reproduces the published rook 6-type lambda_2<=4.63 (finder 4.6287, cert x=100/463 verified exactly). Full pipeline now validated on polyiamond (3.6108) and rook (4.63). Remaining: derive the king twig/closure system (the load-bearing geometric lemma) and feed it in, sanity-gated.
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 0fb98ecfee87452e97417d5a0d9f162e63699ec0
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 01:19:39 -0400
+
+    docs(proofs): correct upper-bound method (twig-encoding); add validated Bui kernel tool
+    
+    Research pinned the real method: BFS twig-encoding + GF-diagonal (Klarner-Rivest/Barequet-Shalah), NOT column cross-sections. Our crude 12.2 = the king Eden bound (K=5 new neighbours, 5^5/4^4). Bui's convolution-certificate method (arXiv:2510.06806) is the clean port; kernel_bound.py extracts lambda=Q'(z*) and validates on polyiamonds (3.6108). Remaining: derive the king twig/neighbourhood geometric lemma -> Q_king, then read off the bound (sanity-gated).
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit aa0f3a32634a18d1afd1b3e0d622c64949780b05
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 01:11:07 -0400
+
+    docs(proofs): Stage 1 has no valid improvement (tree bound is a mirage, fails rook check)
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 22ff4f0d80bc94784f231596b093d9748e21b86f
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 01:00:45 -0400
+
+    docs(proofs): staged plan to bound lambda from above (crude -> optimized -> cross-section)
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 4a22f55e717215b89ac0e90cfe3c6b369c4a060f
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-11 00:48:45 -0400
+
+    docs(proofs): crude polyplet upper bound lambda<=12.2 + design/crux for tight bound
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 308800f6a954819ec9d2b9d89c7d8d61c97cf71d
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-10 22:42:16 -0400
+
+    fix(docs): integrate diagonal + convex work with prior banked/proven results
+    
+    Integration audit: two session results were blind re-derivations of deeper prior work. Diagonals: correct onset k+2 -> 2k+1 and normalization 3^n -> 3^(n-1-3k); credit the PROOF (docs/proofs/T-n-nm2-and-general.md) and k8-pinning.md; the degree-2k in boundary-push was the lone stale claim. Convex: subordinate to docs/proofs/convex-mirage.md (38 terms, non-D-finite by area); mark the brute convex_polyplets.py as an inferior low-n cross-check. Genuinely-new session results (directed-king bounds, C(n,c) triangle, SNF, production matrix, mu_H engines, nu) verified NOT pre-existing.
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 08dd39ecbbd6ddbfc896667ebc42e7b1b601acdc
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-10 22:30:12 -0400
+
+    docs(polyplets): components, convex, nu, directed bounds, finite-lattice; OEIS candidates
+    
+    New: C(n,c) component triangle (A001168 both edges, mean ~(n+1)/2), convex-polyplet sequence (1,4,16,61,...), nu~0.6407 universality, directed/multi-directed king animals (Bacher, A047781), finite-lattice negative, countability criterion. OEIS candidates staged (2 triangles + convex), deferred to viva/jasonp.
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 76967605ae43b654bffa6f622792eb19312f21b7
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-10 22:30:12 -0400
+
+    feat(strip): mu_H strip growth-constant engines + independent lambda estimate
+    
+    Three power-iteration engines for the height-H strip growth constant mu_H (all-column strip_mu/strip_mu8, and the cell-at-a-time kink engine strip_mu_kink reusing the production kinkStageTransition). Exact ladder to H=13; sliding extrapolation mu_H -> lambda corroborates the a(n)-ratio 7.11 independently. Full resumption dossier for the indexed-array fast engine (would beat 6.475).
+    
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013Q9JPxofy6JBHCBToaJnsA
+
+commit 78602f8e77bf02d9a72af0df83933c4bac32cb96
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-07-06 08:19:00 -0400
+
+    the big tidy: remove the supports, keep the arch
+    
+    Removed (all recoverable in history): docs process corpus (per-term
+    plans/forecasts, research logs, frontier/, next-system/ planning + perf/
+    trees), 48 one-shot scripts, experiments/, superseded oeis drafts,
+    submission-a19.md, ROADMAP.md, untracked autonomy/ + polyplets/.
+    
+    Kept: reference docs (engineering-standards, observability,
+    job-checklist, formats, layout, glossary, dmirror-design, oeis-ai-policy,
+    proofs/), docs/engine-design.md (moved from next-system/DESIGN.md — the
+    arch's own record), the generic script toolchain, results/ untouched as
+    the evidence archive, papers/ library, curated oeis staging.
+    
+    Added: README.md — the fork-and-reproduce face of the repo (layout,
+    quickstart, tier system, authorship). oeis/README refreshed to
+    close-state. HANDOFF: tidy done, lessons-learned todo added.
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_01Hqu6P9hDqvF42pnopTtsdb
+
+commit d66c23ac43a7be9f1be882a1431633eb6a854f3e
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-06-29 23:24:05 -0400
+
+    proofs: Convex Mirage — convex polyplets by area are non-D-finite
+    
+    The 'tractable subfamily' hunt's one real candidate. Convex (HV-convex) polyplets
+    are classically solved by PERIMETER, but by AREA the row transfer matrix
+    (experiments/convex_polyplets.py, validated vs brute force) gives 38 terms whose
+    holdout-validated P-recurrence search finds nothing -- and neither does the known
+    convex-polyomino control (the discriminator). So convex-by-area is empirically
+    non-D-finite, a clean negative like B(y). New sequence 1,4,16,61,221,766,2566,...
+    (growth mu~3.13), Superseeker-able. Off the a(25)-reach path; for the paper.
+    
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013on8ZvUvc4L2oJbQLJ9ZHT
+
+commit 77418bdb20ce5dfa7663024fa959f515f24e184f
+Author: Jason Parker <jasonp@panix.com>
+Date:   2026-06-29 15:42:27 -0400
+
+    experiments: convex polyplet/polyomino enumeration by area (transfer matrix)
+    
+    Row transfer matrix (state = left-phase, right-phase, width; transitions counted
+    by multiplicity, weighted by area). Validated vs brute force (n<=8); edge case
+    reproduces the known convex-polyomino area sequence. Includes a holdout-validated
+    P-recurrence search: finds none for convex polyplets OR the known convex-polyomino
+    control -> convex enumeration by area is q-series / non-D-finite (the classical
+    algebraicity is by perimeter, not area). Growth mu ~ 3.13.
+    
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013on8ZvUvc4L2oJbQLJ9ZHT

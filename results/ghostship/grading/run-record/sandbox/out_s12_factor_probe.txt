@@ -1,0 +1,44 @@
+Session 12: factor-structure probe of the extracted B_r quotients
+(out_s12_bivar_Br.json).  s10's conjectured king shape B_r =
+Delta*x^2y^2*(1+x+y)*C_r was REFUTED at r=3 by the main run; here we ask
+what DOES divide the quotients Q_r := B_r/(Delta*x^2y^2), king and poly,
+r = 2,3 (r=1 anchors: king Q_1 = (1+x+y)*C_1, poly Q_1 = 4(1-x+y)(1+x-y)).
+
+Candidate atoms (all seen in the s02/s10 factor zoo): 1+x+y, 1-x+y, 1+x-y,
+1-x-y, K = x+y+xy, Delta itself (multiplicity 2?), x+y, 1-x, 1-y, C_1.
+Also: symmetry check Q(x,y)==Q(y,x), content, evaluation on the curve
+Delta=0 at (a^2,(1-a)^2) for rational a (does Q vanish on the curve?).
+
+Usage: python3 experiments/s12_factor_probe.py
+Output: out_s12_factor_probe.txt
+
+king_r1: quotient_tag = C
+-- king_r1: 10 monomials, deg 4, symmetric: True
+   content = 1
+   atom factorization: C1 * CORE[1 monomials, deg 0]
+   core vanishes on curve: [False, False, False]
+   vanishes on curve Delta=0: [('a=1/2', False), ('a=1/3', False), ('a=2/5', False), ('a=1/4', False), ('a=3/7', False), ('a=2/7', False)]
+king_r3: quotient_tag = B_over_Dxy
+-- king_r3: 151 monomials, deg 17, symmetric: True
+   content = 1
+   atom factorization: Delta * CORE[116 monomials, deg 15]
+   core vanishes on curve: [False, False, False]
+   vanishes on curve Delta=0: [('a=1/2', True), ('a=1/3', True), ('a=2/5', True), ('a=1/4', True), ('a=3/7', True), ('a=2/7', True)]
+poly_r1: quotient_tag = E_times (content 4)
+-- poly_r1: 4 monomials, deg 2, symmetric: True
+   content = 1
+   atom factorization: 1-x+y * 1+x-y * CORE[1 monomials, deg 0]
+   core vanishes on curve: [False, False, False]
+   vanishes on curve Delta=0: [('a=1/2', False), ('a=1/3', False), ('a=2/5', False), ('a=1/4', False), ('a=3/7', False), ('a=2/7', False)]
+poly_r2: quotient_tag = E_times (content 2)
+-- poly_r2: 28 monomials, deg 6, symmetric: True
+   content = 1
+   atom factorization: (none) * CORE[28 monomials, deg 6]
+   core vanishes on curve: [False, False, False]
+   vanishes on curve Delta=0: [('a=1/2', False), ('a=1/3', False), ('a=2/5', False), ('a=1/4', False), ('a=3/7', False), ('a=2/7', False)]
+poly_r3: quotient_tag = E_times (content 2)
+-- poly_r3: 66 monomials, deg 10, symmetric: True
+   content = 1
+   atom factorization: Delta * CORE[45 monomials, deg 8]
+   core vanishes on curve: [False, False, False]
+   vanishes on curve Delta=0: [('a=1/2', True), ('a=1/3', True), ('a=2/5', True), ('a=1/4', True), ('a=3/7', True), ('a=2/7', True)]

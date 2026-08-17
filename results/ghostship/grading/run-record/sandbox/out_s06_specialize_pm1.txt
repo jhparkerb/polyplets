@@ -1,0 +1,16 @@
+sanity: M(t,t) matches banked {3:-4,4:20,5:-28,6:10,7:8}
+A. M(-1,y) coeffs y^1..y^5: [-16, 16, -20, 0, -2]
+A. Phi coeffs h=1..10 (should be N_h(-1)): [-1, 4, -12, -16, 80, 96, -448, -544, 2304, 2880]
+A. Phi[h] == banked N_h(-1) for h in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] : True
+A. closed form Phi == series Phi to y^44: True
+B. M(1-e,Ye^2) nonzero e-orders <=5: {5: {1: -2}}
+B. PROVEN: M(1-e,Ye^2) == -2Y e^5 (mod e^6)  -- exactly the m5(Y)=-2Y the limit needs
+B. lim_{e->0} F(1-e,Ye^2)/e == Y/(1-4Y)^2 - 4Y^2(1-4Y)^(-3/2) to Y^43: True
+B. G[h] == banked N_h(1) for h<=18: True
+B. G[h] == A153337 closed form h*4^(h-1)-2(h-1)C(2h-2,h-1), h<44: True
+C. odd-part numerator identity  -y-20y^3-32y^5 == y(1-4y^2)-2y(1+4y^2)^2: True
+C. N_{2k}(-1) = (-1)^(k+1) 4 N_k(1)  for k=1..21: True
+C. N_{2k+1}(-1) = (-1)^k (2k+1) 4^k  for k=1..20: True
+C. boundary: N_1(-1) = -1 (claim formula would give +1; k=0 is the sole exception)
+
+ALL CHECKS PASS

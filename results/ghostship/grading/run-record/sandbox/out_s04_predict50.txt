@@ -1,0 +1,4 @@
+q-Temperley formula N=50 (2.0s), king x=y=1
+all 50 terms vs independent transfer matrix (convex_tm.py 50): OK
+  terms 31-50 are beyond every previously banked file (fresh predictions confirmed): True
+  a(50) = 5736473632219682585431462

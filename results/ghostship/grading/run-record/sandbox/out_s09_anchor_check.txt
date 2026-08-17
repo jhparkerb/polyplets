@@ -1,0 +1,18 @@
+s09: exact-Fraction re-expansion of the banked A_r closed forms
+(r=0..4, king+poly; numerators as hardcoded in s09_slice_moments.BANKED,
+sourced from s01/s03, results/convex-area-moments.md, out_s07_r4_fit.txt)
+against the independent moment-DP sequences out_s07_area_moments_r4_57.json.
+Doubles as (a) typo-proof of the s09 anchor table and (b) an independent
+VERIFY of the s07/s08 fitted closed forms. Output: out_s09_anchor_check.txt
+
+king r=0: banked closed form vs DP57 sequence: OK (48 terms)  anchor cP=1/128 cQ=-1/64
+king r=1: banked closed form vs DP57 sequence: OK (48 terms)  anchor cP=1/256 cQ=0
+king r=2: banked closed form vs DP57 sequence: OK (48 terms)  anchor cP=1/128 cQ=0
+king r=3: banked closed form vs DP57 sequence: OK (48 terms)  anchor cP=9/256 cQ=0
+king r=4: banked closed form vs DP57 sequence: OK (48 terms)  anchor cP=9/32 cQ=0
+poly r=0: banked closed form vs DP57 sequence: OK (48 terms)  anchor cP=1/128 cQ=-1/64
+poly r=1: banked closed form vs DP57 sequence: OK (48 terms)  anchor cP=1/256 cQ=0
+poly r=2: banked closed form vs DP57 sequence: OK (48 terms)  anchor cP=1/128 cQ=0
+poly r=3: banked closed form vs DP57 sequence: OK (48 terms)  anchor cP=9/256 cQ=0
+poly r=4: banked closed form vs DP57 sequence: OK (48 terms)  anchor cP=9/32 cQ=0
+VERDICT: ALL OK

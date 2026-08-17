@@ -1,0 +1,218 @@
+Session 09: leading singular coefficients of the area-moment GFs A_r(t)
+of convex king animals at t=1/4, for r far beyond the banked r<=4 — via the
+SLICE x=1/4 of the s08 Temperley moment-kernel recursion.
+
+Idea. The s08-derived bivariate moment GFs M_r(x,y) live in Q(x,y,sqrt(D)),
+D = (1-x-y)^2-4xy, with conjectured denominator K^(r+1) D^(2r+2),
+K = x+y+xy.  Writing M_r ~ C_r(x,y)/D^(2r+2) near D=0, the univariate
+diagonal A_r(t)=M_r(t,t) has D(t,t)=1-4t, so
+
+    A_r(t) ~ c_r/(1-4t)^(2r+2),   c_r = C_r(1/4,1/4).
+
+The slice x=1/4 crosses D=0 transversally at y=1/4
+(D(1/4,y) = (y-1/4)(y-9/4)), so C_r(1/4,1/4) is computable from the slice:
+with S_r(y) := M_r(1/4,y),
+
+    S_r(y) * Kx^(r+1) * Dx^(2r+2) = P_r(y) + Q_r(y)*sqrt(Dx),
+    Kx=(1+5y)/4, Dx=(y-1/4)(y-9/4),
+    c_r = P_r(1/4)/(9/16)^(r+1),  and the sqrt-correction
+    cQ_r = Q_r(1/4)/(9/16)^(r+1)  (coefficient of (1-4t)^-(2r+3/2)).
+
+Limit-law equivalence (s01 firm: a_0(s) ~ (s/128) 4^s, i.e. c_0=1/128):
+E[area^r]/s^(2r) -> 128 c_r/(2r+1)!, and area/s^2 ->d U(1-U)/2 at moment
+level iff  c_r = (r!)^2 / 2^(r+7)  for all r.  Banked anchors r<=4 agree.
+
+Computation. With x NUMERIC (=1/4 mod p) the s08 recursion collapses to
+ONE series variable u (y=u^2): scalars = truncated u-series mod p (K3.Ser
+with NX=0).  To reach r=8 the s08 SRat denominators (which grow like 3^r)
+are replaced by FRat: rational functions in s with denominator kept as a
+FACTORED multiset over the fixed atom registry
+
+    a0 = 1-xs,  a1 = D00 = (1-xs)^2-y,  a2 = PK1 = ((s-1)(1-xs)-ys)/(s-s0)
+
+(all unit leading s-coefficient since x is numeric), with lcm-based
+addition, ladder reuse of D=s d/ds derivatives across levels, and exact
+factor cancellation (trial division) after every operation that grows
+degrees.  Everything mod two 61-bit primes independently; rationals
+recovered by CRT + Wang reconstruction.
+
+Checks:
+  S0  slice series of level 0 == s03 PROVEN closed form
+      -(M + 2x^2y^2(1+x+y)^2 sqrt(D))/(2K D^2) at x=1/4      (all terms)
+  S1  slice series of level 1 == s07/s08 bivariate M1 closed form
+      (A + B sqrt(D))/(K^2 D^4) at x=1/4                     (all terms)
+  S2  fits P_r,Q_r pass with >= SURPLUS_MIN surplus equations at the
+      conjectured denominator (denominator law on the slice, every r)
+  S3  (cP_r, cQ_r) for r<=4 == the same constants from the BANKED diagonal
+      closed forms A_r(t) (s01/s03 r=0, s07 r=1,2, s07/s08 r=3,4)
+  S4  HEADLINE: cP_r == (r!)^2/2^(r+7) for r=0..MAXR, king AND control
+
+Usage: python3 experiments/s09_slice_moments.py [MAXR] [NU]
+Output: out_s11_slice_r12.txt, out_s11_slice_PQ_r12.json
+
+s09 slice-moment run: MAXR=12 NU=380 x0=1/4 primes=[2305843009213693951, 1000000000000000009]
+[king]
+  prime 2305843009213693951
+    level 1: 3.5s  degs num M00/M10/M11 = 5/9/9  den e = (0, 3, 0)/(0, 3, 3)/(0, 3, 3)  tot.vu=379
+    level 2: 7.3s  degs num M00/M10/M11 = 9/15/15  den e = (0, 5, 0)/(0, 5, 5)/(0, 5, 5)  tot.vu=378
+    level 3: 12.9s  degs num M00/M10/M11 = 13/21/21  den e = (0, 7, 0)/(0, 7, 7)/(0, 7, 7)  tot.vu=377
+    level 4: 20.6s  degs num M00/M10/M11 = 17/27/27  den e = (0, 9, 0)/(0, 9, 9)/(0, 9, 9)  tot.vu=376
+    level 5: 30.8s  degs num M00/M10/M11 = 21/33/33  den e = (0, 11, 0)/(0, 11, 11)/(0, 11, 11)  tot.vu=375
+    level 6: 43.8s  degs num M00/M10/M11 = 25/39/39  den e = (0, 13, 0)/(0, 13, 13)/(0, 13, 13)  tot.vu=374
+    level 7: 59.9s  degs num M00/M10/M11 = 29/45/45  den e = (0, 15, 0)/(0, 15, 15)/(0, 15, 15)  tot.vu=373
+    level 8: 79.5s  degs num M00/M10/M11 = 33/51/51  den e = (0, 17, 0)/(0, 17, 17)/(0, 17, 17)  tot.vu=372
+    level 9: 102.6s  degs num M00/M10/M11 = 37/57/57  den e = (0, 19, 0)/(0, 19, 19)/(0, 19, 19)  tot.vu=371
+    level 10: 130.7s  degs num M00/M10/M11 = 41/63/63  den e = (0, 21, 0)/(0, 21, 21)/(0, 21, 21)  tot.vu=370
+    level 11: 163.1s  degs num M00/M10/M11 = 45/69/69  den e = (0, 23, 0)/(0, 23, 23)/(0, 23, 23)  tot.vu=369
+    level 12: 199.8s  degs num M00/M10/M11 = 49/75/75  den e = (0, 25, 0)/(0, 25, 25)/(0, 25, 25)  tot.vu=368
+  solve_all_levels wall 856.0s
+    S0 slice vs banked closed form: OK all 191 terms
+    r=0: degP=5 degQ=4 surplus=179  cP==(0!)^2/2^7: MATCH
+    S1 slice vs banked closed form: OK all 190 terms
+    r=1: degP=9 degQ=8 surplus=170  cP==(1!)^2/2^8: MATCH
+    r=2: degP=14 degQ=13 surplus=160  cP==(2!)^2/2^9: MATCH
+    r=3: degP=19 degQ=18 surplus=149  cP==(3!)^2/2^10: MATCH
+    r=4: degP=24 degQ=23 surplus=139  cP==(4!)^2/2^11: MATCH
+    r=5: degP=29 degQ=28 surplus=128  cP==(5!)^2/2^12: MATCH
+    r=6: degP=34 degQ=33 surplus=118  cP==(6!)^2/2^13: MATCH
+    r=7: degP=39 degQ=38 surplus=107  cP==(7!)^2/2^14: MATCH
+    r=8: degP=44 degQ=43 surplus=97  cP==(8!)^2/2^15: MATCH
+    r=9: degP=49 degQ=48 surplus=86  cP==(9!)^2/2^16: MATCH
+    r=10: degP=54 degQ=53 surplus=76  cP==(10!)^2/2^17: MATCH
+    r=11: degP=59 degQ=58 surplus=65  cP==(11!)^2/2^18: MATCH
+    r=12: degP=64 degQ=63 surplus=55  cP==(12!)^2/2^19: MATCH
+    S3 r=0 anchor: cP OK, cQ OK
+    S3 r=1 anchor: cP OK, cQ OK
+    S3 r=2 anchor: cP OK, cQ OK
+    S3 r=3 anchor: cP OK, cQ OK
+    S3 r=4 anchor: cP OK, cQ OK
+  prime 1000000000000000009
+    level 1: 3.3s  degs num M00/M10/M11 = 5/9/9  den e = (0, 3, 0)/(0, 3, 3)/(0, 3, 3)  tot.vu=379
+    level 2: 6.9s  degs num M00/M10/M11 = 9/15/15  den e = (0, 5, 0)/(0, 5, 5)/(0, 5, 5)  tot.vu=378
+    level 3: 12.2s  degs num M00/M10/M11 = 13/21/21  den e = (0, 7, 0)/(0, 7, 7)/(0, 7, 7)  tot.vu=377
+    level 4: 19.6s  degs num M00/M10/M11 = 17/27/27  den e = (0, 9, 0)/(0, 9, 9)/(0, 9, 9)  tot.vu=376
+    level 5: 29.3s  degs num M00/M10/M11 = 21/33/33  den e = (0, 11, 0)/(0, 11, 11)/(0, 11, 11)  tot.vu=375
+    level 6: 41.5s  degs num M00/M10/M11 = 25/39/39  den e = (0, 13, 0)/(0, 13, 13)/(0, 13, 13)  tot.vu=374
+    level 7: 56.7s  degs num M00/M10/M11 = 29/45/45  den e = (0, 15, 0)/(0, 15, 15)/(0, 15, 15)  tot.vu=373
+    level 8: 74.8s  degs num M00/M10/M11 = 33/51/51  den e = (0, 17, 0)/(0, 17, 17)/(0, 17, 17)  tot.vu=372
+    level 9: 96.4s  degs num M00/M10/M11 = 37/57/57  den e = (0, 19, 0)/(0, 19, 19)/(0, 19, 19)  tot.vu=371
+    level 10: 122.4s  degs num M00/M10/M11 = 41/63/63  den e = (0, 21, 0)/(0, 21, 21)/(0, 21, 21)  tot.vu=370
+    level 11: 152.1s  degs num M00/M10/M11 = 45/69/69  den e = (0, 23, 0)/(0, 23, 23)/(0, 23, 23)  tot.vu=369
+    level 12: 186.2s  degs num M00/M10/M11 = 49/75/75  den e = (0, 25, 0)/(0, 25, 25)/(0, 25, 25)  tot.vu=368
+  solve_all_levels wall 802.6s
+    S0 slice vs banked closed form: OK all 191 terms
+    r=0: degP=5 degQ=4 surplus=179  cP==(0!)^2/2^7: MATCH
+    S1 slice vs banked closed form: OK all 190 terms
+    r=1: degP=9 degQ=8 surplus=170  cP==(1!)^2/2^8: MATCH
+    r=2: degP=14 degQ=13 surplus=160  cP==(2!)^2/2^9: MATCH
+    r=3: degP=19 degQ=18 surplus=149  cP==(3!)^2/2^10: MATCH
+    r=4: degP=24 degQ=23 surplus=139  cP==(4!)^2/2^11: MATCH
+    r=5: degP=29 degQ=28 surplus=128  cP==(5!)^2/2^12: MATCH
+    r=6: degP=34 degQ=33 surplus=118  cP==(6!)^2/2^13: MATCH
+    r=7: degP=39 degQ=38 surplus=107  cP==(7!)^2/2^14: MATCH
+    r=8: degP=44 degQ=43 surplus=97  cP==(8!)^2/2^15: MATCH
+    r=9: degP=49 degQ=48 surplus=86  cP==(9!)^2/2^16: MATCH
+    r=10: degP=54 degQ=53 surplus=76  cP==(10!)^2/2^17: MATCH
+    r=11: degP=59 degQ=58 surplus=65  cP==(11!)^2/2^18: MATCH
+    r=12: degP=64 degQ=63 surplus=55  cP==(12!)^2/2^19: MATCH
+    S3 r=0 anchor: cP OK, cQ OK
+    S3 r=1 anchor: cP OK, cQ OK
+    S3 r=2 anchor: cP OK, cQ OK
+    S3 r=3 anchor: cP OK, cQ OK
+    S3 r=4 anchor: cP OK, cQ OK
+[poly]
+  prime 2305843009213693951
+    level 1: 3.3s  degs num M00/M10/M11 = 5/8/9  den e = (0, 3, 0)/(0, 3, 3)/(0, 3, 3)  tot.vu=379
+    level 2: 7.1s  degs num M00/M10/M11 = 9/14/15  den e = (0, 5, 0)/(0, 5, 5)/(0, 5, 5)  tot.vu=378
+    level 3: 12.7s  degs num M00/M10/M11 = 13/20/21  den e = (0, 7, 0)/(0, 7, 7)/(0, 7, 7)  tot.vu=377
+    level 4: 20.5s  degs num M00/M10/M11 = 17/26/27  den e = (0, 9, 0)/(0, 9, 9)/(0, 9, 9)  tot.vu=376
+    level 5: 30.5s  degs num M00/M10/M11 = 21/32/33  den e = (0, 11, 0)/(0, 11, 11)/(0, 11, 11)  tot.vu=375
+    level 6: 43.3s  degs num M00/M10/M11 = 25/38/39  den e = (0, 13, 0)/(0, 13, 13)/(0, 13, 13)  tot.vu=374
+    level 7: 59.2s  degs num M00/M10/M11 = 29/44/45  den e = (0, 15, 0)/(0, 15, 15)/(0, 15, 15)  tot.vu=373
+    level 8: 78.7s  degs num M00/M10/M11 = 33/50/51  den e = (0, 17, 0)/(0, 17, 17)/(0, 17, 17)  tot.vu=372
+    level 9: 102.0s  degs num M00/M10/M11 = 37/56/57  den e = (0, 19, 0)/(0, 19, 19)/(0, 19, 19)  tot.vu=371
+    level 10: 129.5s  degs num M00/M10/M11 = 41/62/63  den e = (0, 21, 0)/(0, 21, 21)/(0, 21, 21)  tot.vu=370
+    level 11: 161.1s  degs num M00/M10/M11 = 45/68/69  den e = (0, 23, 0)/(0, 23, 23)/(0, 23, 23)  tot.vu=369
+    level 12: 198.1s  degs num M00/M10/M11 = 49/74/75  den e = (0, 25, 0)/(0, 25, 25)/(0, 25, 25)  tot.vu=368
+  solve_all_levels wall 847.4s
+    r=0: degP=5 degQ=3 surplus=179  cP==(0!)^2/2^7: MATCH
+    S1 slice vs banked closed form: OK all 190 terms
+    r=1: degP=9 degQ=8 surplus=170  cP==(1!)^2/2^8: MATCH
+    r=2: degP=14 degQ=13 surplus=160  cP==(2!)^2/2^9: MATCH
+    r=3: degP=19 degQ=18 surplus=149  cP==(3!)^2/2^10: MATCH
+    r=4: degP=24 degQ=23 surplus=139  cP==(4!)^2/2^11: MATCH
+    r=5: degP=29 degQ=28 surplus=128  cP==(5!)^2/2^12: MATCH
+    r=6: degP=34 degQ=33 surplus=118  cP==(6!)^2/2^13: MATCH
+    r=7: degP=39 degQ=38 surplus=107  cP==(7!)^2/2^14: MATCH
+    r=8: degP=44 degQ=43 surplus=97  cP==(8!)^2/2^15: MATCH
+    r=9: degP=49 degQ=48 surplus=86  cP==(9!)^2/2^16: MATCH
+    r=10: degP=54 degQ=53 surplus=76  cP==(10!)^2/2^17: MATCH
+    r=11: degP=59 degQ=58 surplus=65  cP==(11!)^2/2^18: MATCH
+    r=12: degP=64 degQ=63 surplus=55  cP==(12!)^2/2^19: MATCH
+    S3 r=0 anchor: cP OK, cQ OK
+    S3 r=1 anchor: cP OK, cQ OK
+    S3 r=2 anchor: cP OK, cQ OK
+    S3 r=3 anchor: cP OK, cQ OK
+    S3 r=4 anchor: cP OK, cQ OK
+  prime 1000000000000000009
+    level 1: 3.1s  degs num M00/M10/M11 = 5/8/9  den e = (0, 3, 0)/(0, 3, 3)/(0, 3, 3)  tot.vu=379
+    level 2: 6.7s  degs num M00/M10/M11 = 9/14/15  den e = (0, 5, 0)/(0, 5, 5)/(0, 5, 5)  tot.vu=378
+    level 3: 11.9s  degs num M00/M10/M11 = 13/20/21  den e = (0, 7, 0)/(0, 7, 7)/(0, 7, 7)  tot.vu=377
+    level 4: 19.3s  degs num M00/M10/M11 = 17/26/27  den e = (0, 9, 0)/(0, 9, 9)/(0, 9, 9)  tot.vu=376
+    level 5: 28.9s  degs num M00/M10/M11 = 21/32/33  den e = (0, 11, 0)/(0, 11, 11)/(0, 11, 11)  tot.vu=375
+    level 6: 41.2s  degs num M00/M10/M11 = 25/38/39  den e = (0, 13, 0)/(0, 13, 13)/(0, 13, 13)  tot.vu=374
+    level 7: 56.4s  degs num M00/M10/M11 = 29/44/45  den e = (0, 15, 0)/(0, 15, 15)/(0, 15, 15)  tot.vu=373
+    level 8: 74.4s  degs num M00/M10/M11 = 33/50/51  den e = (0, 17, 0)/(0, 17, 17)/(0, 17, 17)  tot.vu=372
+    level 9: 96.4s  degs num M00/M10/M11 = 37/56/57  den e = (0, 19, 0)/(0, 19, 19)/(0, 19, 19)  tot.vu=371
+    level 10: 122.0s  degs num M00/M10/M11 = 41/62/63  den e = (0, 21, 0)/(0, 21, 21)/(0, 21, 21)  tot.vu=370
+    level 11: 152.0s  degs num M00/M10/M11 = 45/68/69  den e = (0, 23, 0)/(0, 23, 23)/(0, 23, 23)  tot.vu=369
+    level 12: 186.8s  degs num M00/M10/M11 = 49/74/75  den e = (0, 25, 0)/(0, 25, 25)/(0, 25, 25)  tot.vu=368
+  solve_all_levels wall 800.3s
+    r=0: degP=5 degQ=3 surplus=179  cP==(0!)^2/2^7: MATCH
+    S1 slice vs banked closed form: OK all 190 terms
+    r=1: degP=9 degQ=8 surplus=170  cP==(1!)^2/2^8: MATCH
+    r=2: degP=14 degQ=13 surplus=160  cP==(2!)^2/2^9: MATCH
+    r=3: degP=19 degQ=18 surplus=149  cP==(3!)^2/2^10: MATCH
+    r=4: degP=24 degQ=23 surplus=139  cP==(4!)^2/2^11: MATCH
+    r=5: degP=29 degQ=28 surplus=128  cP==(5!)^2/2^12: MATCH
+    r=6: degP=34 degQ=33 surplus=118  cP==(6!)^2/2^13: MATCH
+    r=7: degP=39 degQ=38 surplus=107  cP==(7!)^2/2^14: MATCH
+    r=8: degP=44 degQ=43 surplus=97  cP==(8!)^2/2^15: MATCH
+    r=9: degP=49 degQ=48 surplus=86  cP==(9!)^2/2^16: MATCH
+    r=10: degP=54 degQ=53 surplus=76  cP==(10!)^2/2^17: MATCH
+    r=11: degP=59 degQ=58 surplus=65  cP==(11!)^2/2^18: MATCH
+    r=12: degP=64 degQ=63 surplus=55  cP==(12!)^2/2^19: MATCH
+    S3 r=0 anchor: cP OK, cQ OK
+    S3 r=1 anchor: cP OK, cQ OK
+    S3 r=2 anchor: cP OK, cQ OK
+    S3 r=3 anchor: cP OK, cQ OK
+    S3 r=4 anchor: cP OK, cQ OK
+
+reconstructed singular coefficients (CRT over both primes):
+mode    r  cP (= (r!)^2/2^(r+7)?)   cQ
+king    0                 1/128 MATCH     -1/64
+king    1                 1/256 MATCH     0
+king    2                 1/128 MATCH     0
+king    3                 9/256 MATCH     0
+king    4                  9/32 MATCH     0
+king    5                225/64 MATCH     0
+king    6               2025/32 MATCH     0
+king    7              99225/64 MATCH     0
+king    8               99225/2 MATCH     0
+king    9             8037225/4 MATCH     0
+king   10           200930625/2 MATCH     0
+king   11         24312605625/4 MATCH     0
+king   12          437626901250 MATCH     0
+poly    0                 1/128 MATCH     -1/64
+poly    1                 1/256 MATCH     0
+poly    2                 1/128 MATCH     0
+poly    3                 9/256 MATCH     0
+poly    4                  9/32 MATCH     0
+poly    5                225/64 MATCH     0
+poly    6               2025/32 MATCH     0
+poly    7              99225/64 MATCH     0
+poly    8               99225/2 MATCH     0
+poly    9             8037225/4 MATCH     0
+poly   10           200930625/2 MATCH     0
+poly   11         24312605625/4 MATCH     0
+poly   12          437626901250 MATCH     0

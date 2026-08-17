@@ -1,0 +1,2 @@
+REDUCED closed form vs 38 pure-DP terms: MATCH
+F coeffs 2..8: ['1', '2', '9', '36', '154', '668', '2916']

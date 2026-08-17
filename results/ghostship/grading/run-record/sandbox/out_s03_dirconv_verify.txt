@@ -1,0 +1,5 @@
+(1) a_dir(s) == A014300(s-1) for s=2..18: True
+    twist 2A(n)+A(n-1)==(3n-1)Cat(n-1) for n=2..39: True
+(2) d(n,n) == Sum C(n-1+k,k)^2 (A112029) for n=1..17: True
+(control) poly a_dir(s)==C(2s-4,s-2): True; d(n,n)==C(2n-2,n-1)^2: True
+all identifications verified exactly
