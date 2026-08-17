@@ -101,10 +101,17 @@ A second run is worth its cost only with all four of:
    ruled out on the operator's own reasoning. Otherwise drop Q2 from the
    design rather than carry an untestable question a second time.
 3. **Per-curve token instrumentation** at the launcher, or drop Q3.
-4. **Session-boundary handoff fix.** Three instances (s11–s14): a successor
-   reads a missing receipt as a dead run and relaunches work already in
-   flight. Structural cost of the fresh-session design, unpredicted by
-   both predictors.
+4. **Session-boundary handoff fix.** Four instances now. Three (s11–s14):
+   a successor reads a missing receipt as a dead run and relaunches work
+   already in flight. The fourth (VALUE-TRIAGE §F): s06 loses s01's OEIS
+   User-Agent workaround, re-derives "search is blocked" from a bare curl,
+   and banks it as a DEAD line that reaches the capstone. Structural cost
+   of the fresh-session design, unpredicted by both predictors.
+
+   With it: **DEAD lines must enter the graded grammar**, and successors
+   must re-test an inherited infrastructure negative before honouring it.
+   A false DEAD line is the expensive kind — it removes a capability from
+   every session after it, and the current rubric cannot see one.
 
 **And the rung ladder should not survive.** The loop "failed" by not
 pursuing a target it was never told about, while building eleven verified

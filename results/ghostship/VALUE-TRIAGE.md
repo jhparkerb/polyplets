@@ -9,12 +9,16 @@ on the four headline layers of
 Not a regrade. Different axis, run after the fact, with tools the sandbox
 did not have: a working OEIS search and the literature.
 
-## A. OEIS novelty claims — CONFIRMED (the known hole is closed)
+## A. OEIS novelty claims — CONFIRMED (independently, not repaired)
 
-The loop's OEIS `/search` was Cloudflare-blocked during the run; it routed
-via b-files, so every "not in OEIS" claim rested on a crippled search. The
-endpoint works from gympie. Pipeline validated on the control family
-first: `1,2,7,28,120,528,2344,10416,46160` → **A005436** (convex polygons
+**Corrected 2026-08-17 after reading `reports/session-01.md`.** This section
+first said the loop's `/search` was Cloudflare-blocked and its novelty
+claims therefore rested on a crippled search. That is false, and the source
+of the error is itself a finding — see §F. The loop had a working search
+from session 01 and used it through session 05. What follows is an
+independent second search, not a repair.
+
+Pipeline validated on the control family first: `1,2,7,28,120,528,2344,10416,46160` → **A005436** (convex polygons
 by perimeter), exact hit. So a real hit would have been found.
 
 All four king sequences return zero results, both at full length and at
@@ -27,8 +31,8 @@ shifted 4–6 term prefixes (to catch offset-shifted entries):
 | king convex area (60 exact terms) | 1,4,16,61,221,766,2566,8390,26982 | absent |
 | directed-convex king by area | 1,3,10,33,107,342 | absent |
 
-**Disposition: the loop was right, and more conservative than it needed to
-be.** Four new sequences plus the certified constants (q_c, mu, A, A_dir,
+**Disposition: the loop was right, on its own working search.** Four new
+sequences plus the certified constants (q_c, mu, A, A_dir,
 and a control amplitude for A067676) are submission-grade material.
 
 ## B. Three cross-family identifications — REAL, and new to the target entries
@@ -124,6 +128,43 @@ well-studied even if this instance is not.
 gap correctly (rigorous steepest descent for the oscillation law; residue
 nonvanishing at infinitely many zeros). Keep as a lead, not a result.
 
+## F. A false banked fact, lost at a session boundary
+
+Found while reading `reports/session-01.md`; not part of the novelty pass,
+but the most legible defect in the run.
+
+Session 01 hit the Cloudflare challenge on a bare `curl` to `/search`,
+**solved it in the same session** with a browser User-Agent, and logged both
+queries verbatim (lines 94–97). The workaround was then used continuously:
+s02 (A153337), s03 (A014300, A112029 and `id:` lookups), s04 (seven
+searches plus two b-files), s05 (five, including constant lookups).
+
+Session 06 ran `curl` **without the `-A` flag**, hit the challenge, and
+banked:
+
+> `DEAD: ... note OEIS SEARCH is Cloudflare-blocked for curl — use b-file
+> URLs (oeis.org/Axxxxxx/bxxxxxx.txt), which work.`
+
+s07 repeated it as fact. It reached the capstone unchallenged, where
+`FINAL-SYNTHESIS.md` lists "OEIS /search endpoint via curl
+(Cloudflare-blocked — b-file URLs work)" under **Dead ends (do not retry)**.
+
+So the run's own capstone carries a false infrastructure claim, refuted by a
+log five sessions earlier in the same document series, and it was persuasive
+enough to mislead this triage on first pass.
+
+Why grading missed it: the claim table grades CARRY claims. DEAD lines are
+not claims under the rubric, so a false one is invisible — and a false DEAD
+line is the expensive kind, because it removes a capability from every
+successor.
+
+This is the **fourth** instance of the failure family `REPORT.md` names as
+session-boundary handoff (three job-relaunch instances, s11–s14), and the
+cheapest to describe: a working technique lost at a boundary, re-recorded as
+a property of the world. Any second run needs DEAD lines inside the graded
+grammar, and a successor rule that re-tests an inherited infrastructure
+negative before honouring it.
+
 ## Net
 
 | item | disposition |
@@ -154,7 +195,9 @@ literature-priority pass added to grading (cheap — this triage was under an
 hour). Absent one of the two, an unattended loop's cost-per-new-result is
 unmeasurable, and the rung ladder measures the wrong thing regardless.
 
-This defect is larger than the untested bulletin.
+This defect is larger than the untested bulletin. The §F regression is a
+second, independent argument for widening the rubric: it grades what the
+loop asserts, not what the loop concludes it cannot do.
 
 ## Method
 
