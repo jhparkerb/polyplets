@@ -42,10 +42,20 @@ caught the memory leak that would have voided the run; all three lanes
 shared one blind spot (they audited what the loop asserts, never what it
 forecloses).
 
-Open, his: (a) salvage — import Layer 1 + Layer 2 into
-`results/convex-polyplets.md` (OPEN side-quest) with Ghost Ship provenance,
-stage the sequences/comments behind the viva; (b) run 2 only if all four
-DISPOSITION §5 conditions are met, ladder retired. dalby
+SALVAGE DONE (a4c8085): Layer 1 + Layer 2 imported as a dated section at
+the end of `results/convex-polyplets.md`. The import found that half of
+Layer 1 was already banked here — the s≤200 series and degree-2
+algebraicity, 2026-08-05, matching the loop's 200 terms exactly — so the
+loop re-derived repo work as well as literature, and the sealed denominator
+saw neither (it is scoped to the 21 slice files). Three rings, metric
+covers the innermost, reports 0.
+
+Decided 2026-08-17: **no run 2, and no further unattended-loop
+machinery.** The panel pattern (adversarial desk lanes before spending) and
+the court are what earned their cost; the loop did not. Literature-priority
+pass adopted as standing practice on any result called new.
+
+Open, his: OEIS sequences + 3 comments staged behind the viva; dalby
 `~/var/ghostship/` + `~/tmp/ghostship-grading/` still retained.
 
 ## 2026-08-15 (late) — GHOST SHIP RUN + GRADING COMPLETE [SUPERSEDED]
