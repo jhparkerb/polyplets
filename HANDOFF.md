@@ -1,6 +1,35 @@
-# HANDOFF — live state (updated 2026-08-16)
+# HANDOFF — live state (updated 2026-08-17)
 
-## 2026-08-15 (late) — GHOST SHIP RUN + GRADING COMPLETE
+## 2026-08-17 — GHOST SHIP FILED + TRIAGED; salvage pending, run 2 undecided
+
+Record committed (8336e02, 355 files incl. the loop's own sandbox tree).
+Value triage run (e35c549) — the axis grading never covered.
+**`results/ghostship/DISPOSITION.md` is the decision layer**; REPORT.md is
+the graded record, VALUE-TRIAGE.md the novelty evidence.
+
+Triage findings: OEIS endpoint works from gympie (control hits A005436
+exactly) — all four king sequences absent at full and shifted prefixes, so
+the loop's novelty claims survive a working search; A014300/A112029/A153337
+carry no polyomino interpretation, three comment-grade identifications.
+Layer 1 (king-adjacency box/semiperimeter algebraic GF) and Layer 2
+(q-series + 44-digit certified constants) find no literature collision —
+the two real results. **Layer 3 SUPERSEDED**: Richard arXiv:0704.0716 gives
+convex polygons the rectangles area law beta_{1,1/2}; the loop's
+c_r = (r!)^2/2^(r+7) is exactly the moment sequence of U(1−U)/2. Sessions
+09–14, the run's three most expensive among them, largely re-derive it.
+
+Design consequence: "0 unwitting re-derivations" is scoped to the repo. A
+sealed sandbox cannot check priority and the rubric never asks, so
+cost-per-new-result is unmeasurable. Larger defect than the untested
+bulletin.
+
+Open, his: (a) salvage — import Layer 1 + Layer 2 into
+`results/convex-polyplets.md` (OPEN side-quest) with Ghost Ship provenance,
+stage the sequences/comments behind the viva; (b) run 2 only if all four
+DISPOSITION §5 conditions are met, ladder retired. dalby
+`~/var/ghostship/` + `~/tmp/ghostship-grading/` still retained.
+
+## 2026-08-15 (late) — GHOST SHIP RUN + GRADING COMPLETE [SUPERSEDED]
 
 Superseded section below kept for the record. The run compressed to one
 day at jasonp's direction (all 14 sessions banked 10:20–20:38 EDT
