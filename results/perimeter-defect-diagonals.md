@@ -251,3 +251,71 @@ H, count), `results/siteperim_square4_n20.txt` and
 `results/siteperim_square8_n14.txt` (the g2 brute-force cross-checks),
 `results/king_joint_nhp_n9.txt` and `results/king_triple_classes_n9.txt` (the
 (n,H,p) joint census behind the identity above), `results/bbox_square4_n21.txt`.
+
+---
+
+## The k = 6 verdict (2026-08-18): universality extends, the Phi_2 closed form dies
+
+The two `n = 78, k <= 6` censuses were run on dalby 2026-08-07/08-10 under
+`scripts/dalby_perimeter_defect_pool.sh` (456 shards, 76-way, splitS=14,
+binary `git=6473890c`, clean stamp), and **were not brought back into the repo
+until 2026-08-18**. Both merged with 456/456 shards `result=ok`:
+
+| lattice | file | wall | animals |
+|---|---|---|---|
+| king (square8) | `results/perimdefect_square8_n78_k6.txt` | 151,915 s (42 h) | 3,948,974,545,893 |
+| square (square4) | `results/perimdefect_square4_n78_k6.txt` | 83,667 s (23 h) | 3,168,296,567,027 |
+
+Analysis: `python3 experiments/perimeter_defect_gf.py <file> --kmax 6`
+(the default `--kmax` is 5, which is why a first pass shows nothing at k = 6).
+
+### The denominator, both lattices
+
+    Phi_1^7 Phi_2^5 Phi_3^2      deg(N) = 39, gcd(N,D) = 1,
+                                 22 consecutive zero coefficients in deg 40..61
+
+Exactly as predicted by `Phi_1^(k+1) Phi_2^(k-1) Phi_3^(k-4)`. The 22 zeros are
+a check the prediction never saw.
+
+### Grading the four k = 6 tests
+
+1. **Onset 24 — CONFIRMED.** `deg(N) - deg(D) = 39 - 16 = 23`, so the
+   quasi-polynomial holds from n = 24, and the triangular onset law
+   `k(k+1)/2 + 3` gives 24. (The same computation reproduces onset 18 at
+   k = 5: `29 - 12 = 17`.)
+2. **The Phi_2 leading diagonal — REFUTED.** `5(k-2)!/2^(k-1)` predicts
+   **15/4**; the measured value is **5/2**, on *both* lattices. So the closed
+   form 5/4, 5/4, 15/8 that held for k = 3, 4, 5 is a coincidence of three
+   terms, not a law. What survives is that the value is still lattice-
+   independent — the universality statement, not the formula.
+3. **The Phi_3 exponent k-4 — CONFIRMED.** `Phi_3^2` at k = 6, and it was the
+   prediction that the division test then validated. The slope no longer rests
+   on one data point.
+4. **Phi_4 absent until k = 7 — CONFIRMED at k = 6.** The predicted denominator
+   divides the series exactly, so no fourth cyclotomic factor is needed.
+
+### What the universality claim becomes
+
+Through **k = 6**, both lattices share the denominator, the period, the degree,
+the onset, and the leading coefficient of every cyclotomic block:
+
+    Phi_1 top, k=6:  66625/36     identical
+    Phi_2 top, k=6:  5/2          identical
+    Phi_3 top, k=6:  -5920/243    identical (coefficient of x^3)
+
+**But one k = 5 statement does not extend.** At k = 5 the *entire* Phi_3 block
+was identical on both lattices (`(40x/27 + 8/3)/Phi_3`). At k = 6 only its
+leading coefficient is: king carries
+`(-5920x^3 - 19128x^2 - 18528x - 12656)/243` against square's
+`(-5920x^3 - 18768x^2 - 18168x - 12296)/243`. So "the entire period-3 content
+of the perimeter grading is lattice-independent" was also a k = 5 accident.
+The rule that survives both corrections is the original one: **the leading
+diagonal of each cyclotomic block is universal, everything beneath it is
+lattice-specific.**
+
+### Cost, measured against the estimate
+
+`scripts/dalby_perimeter_defect_pool.sh`'s header predicted ~136 core-hours and
+~1.8 h wall for king n = 78, extrapolating `time ~ n^7.9` from n <= 38. The
+real king run took **42 h wall at 76-way**, ~23x the estimate. The header's
+prediction should be treated as refuted, not as calibration for anything else.

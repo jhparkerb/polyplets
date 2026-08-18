@@ -1,0 +1,5 @@
+NOTE: gmpxx dev header not found (/usr/include/gmpxx.h); convex_area_tm skipped
+=== square8 n<=78 k<=6 shards=456 parallel=76 splitS=14 git=6473890c
+pool drained in 151915 s
+merged 456 shards -> results/perimdefect_square8_n78_k6.txt (20788 cells, 3948974545893 animals)
+DONE results/perimdefect_square8_n78_k6.txt
