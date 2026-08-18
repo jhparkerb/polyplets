@@ -25,11 +25,19 @@
 
 // ---- copied verbatim from core/kink.h ----
 inline void canonMixed(Sig& s, int H) {
-  unsigned char map[256] = {0}; unsigned char next = 1;
-  for (int i = 0; i < H; ++i) { const unsigned char v = s.b[i];
-    if (v == 0) continue; if (map[v] == 0) map[v] = next++; s.b[i] = map[v]; }
+  unsigned char map[256] = {0};
+  unsigned char next = 1;
+  for (int i = 0; i < H; ++i) {
+    const unsigned char v = s.b[i];
+    if (v == 0) continue;
+    if (map[v] == 0) map[v] = next++;
+    s.b[i] = map[v];
+  }
   const unsigned char c = s.b[H + 2];
-  if (c != 0) { if (map[c] == 0) map[c] = next++; s.b[H + 2] = map[c]; }
+  if (c != 0) {
+    if (map[c] == 0) map[c] = next++;
+    s.b[H + 2] = map[c];
+  }
 }
 inline bool labelInMixedState(const Sig& s, int H, unsigned char L) {
   for (int i = 0; i < H; ++i) if (s.b[i] == L) return true;
