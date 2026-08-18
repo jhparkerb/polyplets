@@ -297,8 +297,8 @@ Kingdom) with Exact Change (1) deferred on a running job. State:
   re-entrant animals — 65% of n=8; witnessed, measured) and is repaired in
   place with a sound BFS-frame derivation of the same constant.
 - **4 — the cancellation identity is written and proved**
-  (`docs/proofs/cutcount-identity.md`, Birthright agent off
-  `docs/birthright-brief.md`): Σ_configs Π_births (q − b) = q^{c(S)},
+  (`docs/proofs/cutcount-identity.md`, Birthright agent; its brief
+  `docs/birthright-brief.md` was deleted at project close): Σ_configs Π_births (q − b) = q^{c(S)},
   **exactly in ℤ[q]**, unconditional; five lemmas; check
   `experiments/birthright_identity_check.py` (223k subsets, 0 mismatches,
   5 RED controls fire) independently re-run, sha-matched. Its §6 lists four

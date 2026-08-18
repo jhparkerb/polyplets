@@ -1,6 +1,8 @@
 # Coinage candidates (mechanical cut)
 
-From the 11,475 tuples in `L-novel-ngrams.md`, four mechanical filters, no judgement:
+From the 11,475 tuples in the full n-gram dump `paper/L-novel-ngrams.md` --- an
+intermediate artifact, deleted at project close and recoverable from git
+history --- four mechanical filters, no judgement:
 
 1. drop any tuple containing a function word (the, of, in, we, that, ...);
 2. drop any tuple containing a finite verb or discourse word (gives, shows, rather, ...);

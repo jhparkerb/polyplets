@@ -34,7 +34,7 @@ claims more than its tier.
 | `polyplets/` | the **Lean 4 formalization** (34 files, sorry-free): the peeling recursion, the diagonal-law shape theorem, and the grand form, with the production P_k pinned for k≤18 from two real-swept cells per level; axiom footprints are `#guard_msgs`-enforced. Status: `polyplets/PROOF-STATUS.md` |
 | `tests/` | the gate suite (red-first, fail-closed; `make gates`) |
 | `oeis/`, `submissions/` | staged OEIS extensions and new-sequence drafts (nothing auto-submitted) |
-| `docs/` | reference docs: engineering standards, observability contract, job checklist, formats, glossary, engine + dmirror design, proofs |
+| `docs/` | reference docs (engineering standards, observability contract, job checklist, formats, glossary, engine + dmirror design), the proofs in `docs/proofs/`, and the campaign record — map: [`docs/README.md`](docs/README.md) |
 | `papers/` | the cited literature (PDFs) |
 
 One-shot launch scripts, per-term plans, and the research-log corpus that
@@ -59,7 +59,10 @@ scripts/g2_campaign.sh 16 8    # same, split across 8 workers
 against the transfer-matrix engine (see `docs/engine-design.md` and
 `scripts/dalby_term.sh` for the production configuration). Per-term
 provenance — which binary, which host, which validations — is in
-`results/ns_a*/PROVENANCE.md`.
+`results/ns_a*/PROVENANCE.md`, and the one per-cell table of what is
+confirmed by which independent source is
+[`results/provenance-table.md`](results/provenance-table.md), generated and
+gated (`make gate-provenance`) so it cannot drift from the banked rows.
 
 ## Confidence tiers (the short version)
 

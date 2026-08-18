@@ -1,7 +1,9 @@
 # GRANDFORM-PLAN — Lean formalization of the grand-form theorem
 
 2026-07-21. Master plan for formalizing `docs/proofs/grand-form.md` in Lean 4,
-executed by **Opus agents** (one per task brief, `polyplets/briefs/GF*.md`),
+executed by **Opus agents** (one per task brief, `polyplets/briefs/GF*.md` ---
+the briefs were deleted at project close and are in git history; the Lean
+files they produced are the authoritative statement),
 orchestrated from a supervising session. Every mathematical claim below is
 **pre-validated numerically** by `experiments/staircase_check.py` (ALL CHECKS
 PASS, 2026-07-21) — agents formalize, they do not need to re-derive.

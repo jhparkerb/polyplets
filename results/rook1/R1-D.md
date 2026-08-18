@@ -3,7 +3,7 @@
 Filed 2026-08-13. Charter: `docs/rook1-brief.md` §R1-D, running
 `docs/rook-parity.md:88-90` as its negative, plus queue row K2
 (diagonal-splice β ≥ 2). Everything below is desk work; the only compute was
-foreground arithmetic (logged in `results/rook1/R1-D.progress.md`). Every
+foreground arithmetic, stated inline where it is used. Every
 argument here is a hand argument and is labelled as such; nothing in this file
 is formalized or machine-checked.
 
@@ -121,7 +121,8 @@ Image classes must be at least as numerous as sources:
 | rigorous: λ_k ≥ 6.543 (certificate sandwich, `docs/rook-parity.md:38`), λ_r ≤ 4.5252 (Klarner–Rivest, `papers/klarner_rivest_1973_upper_bound.pdf`, `docs/glossary.md:48-49`) | **β ≥ 1.244** |
 | best estimates: λ_k ≈ 7.12 (grand-form saddle, in-repo), λ_r ≈ 4.0625696 (`docs/glossary.md:48`) | **β ≥ 1.400** |
 
-Arithmetic in `results/rook1/R1-D.progress.md`. Two consequences:
+Both floors are `log λ_k / log λ_r`: log 6.543 / log 4.5252 = 1.2443, and
+log 7.12 / log 4.0625696 = 1.4003. Two consequences:
 
 - **Under b = 1.73 (R0 demands β < 1), transport is dead outright**, by the
   rigorous floor alone: 1.244 > 1. No cleverness escapes an injective

@@ -1,7 +1,8 @@
 # OUTWORKS-PLAN — extending Lean coverage beyond the height triangle
 
 2026-07-30. Master plan for the second Lean formalization campaign, executed by
-**Opus agents** (one per task brief, `polyplets/briefs/OW*.md`), orchestrated
+**Opus agents** (one per task brief, `polyplets/briefs/OW*.md` --- the briefs
+were deleted at project close and are in git history), orchestrated
 from a supervising session — same machinery as `GRANDFORM-PLAN.md`.
 
 ## Why "Outworks"
@@ -151,7 +152,7 @@ concatenation design, OW-3's `card_common_neighbours` naming, OW-6's
 uniform family), the briefs are left as the historical contract and the
 deviations are documented in the module docs and the review.
 
-## Briefs (all ready for execution)
+## Briefs (deleted at project close; in git history)
 
 `briefs/OW1-sequence.md` · `briefs/OW2-fekete.md` · `briefs/OW3-corset.md` ·
 `briefs/OW4-factorial.md` · `briefs/OW5-universal.md` (3 phases) ·

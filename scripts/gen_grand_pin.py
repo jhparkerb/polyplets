@@ -3,7 +3,8 @@
 production polynomials P_1..P_18 from TWO real banked cells per level.
 
 Task GF-5 of the grand-form Lean formalization (polyplets/GRANDFORM-PLAN.md,
-polyplets/briefs/GF5-pingrand.md).  Fail-closed: recomputes the mu table
+polyplets/briefs/GF5-pingrand.md, deleted at close; in git history).
+Fail-closed: recomputes the mu table
 level-by-level from results/triangle.txt exactly as experiments/staircase_check.py
 does, re-runs that oracle's checks (209-instance staircase, P-staircase identity,
 anchor parity, weight-side mu parity for k<=3), and enforces H <= 20 for every

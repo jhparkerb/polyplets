@@ -29,7 +29,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 .PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
-        gate-compile-db gate-citations gate-l-paper-verifier gate-receipts \
+        gate-compile-db gate-citations gate-docs-index gate-l-paper-verifier gate-receipts \
         gate-perimeter-min gate-perimeter-defect \
         gate-perimeter-min-shard clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
@@ -42,7 +42,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         papers papers-verify papers-clean papers-list
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-receipts gate-provenance gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-docs-index gate-receipts gate-provenance gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -139,6 +139,12 @@ gate-compile-db: compile-commands
 # build deps, so it runs first.
 gate-citations:
 	python3 tests/gate_citations.py
+
+# Gate DOCS-INDEX: docs/README.md names every file under docs/, by path or by
+# directory.  The citations gate closes the other direction (an index entry
+# pointing at a file that is gone), so between them the map cannot rot.
+gate-docs-index:
+	python3 tests/gate_docs_index.py
 
 # Gate RECEIPTS: in the rook-parity campaign's deliverables and briefs, a status
 # token that says something executed (PROVED/VERIFIED/GREEN/RUN/CONFIRMED/

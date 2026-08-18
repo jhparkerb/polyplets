@@ -4,6 +4,11 @@
 a real production sweep** (Even Keel, branch `even-keel`, D1-D5 landed
 2026-07-09; see the "D5 confirmation" note below).
 
+The three D-step planning documents this file cites --- `docs/even-keel-plan.md`
+(D1-D5), `docs/even-keel-fusion-plan.md` (D6) and `docs/even-keel-predictions.md`
+(the pre-registered numbers) --- were deleted at project close and are in git
+history. What they planned is recorded here as built and confirmed.
+
 ## D5 confirmation (2026-07-09, real production sweep, dalby)
 
 `docs/even-keel-plan.md` D1-D4 implemented `BalancedCutsMulti` (true
