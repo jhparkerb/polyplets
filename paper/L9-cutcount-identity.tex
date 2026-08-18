@@ -1,0 +1,392 @@
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+%  L9 — The cut-count cancellation identity.
+%  Category L (entirely machine-written); see paper/README.md and
+%  docs/publication-split.md.
+%
+%  NOVELTY STATUS: UNCHECKED.  No literature-priority pass has been run.  The
+%  identity is of a well-populated type (transfer-matrix connectivity counting
+%  by colourings), so a collision is more likely here than in most of this
+%  series, and nothing is claimed to be new.
+%
+%  Source material, all in this repository:
+%    docs/proofs/cutcount-identity.md      the proof, the verification, the ledger
+%    results/cutcount_b1/                  the banked engine source and provenance
+%    results/motley-h17.md                 what the second source has closed
+%    results/motley-step0.md               why the self-checks are not enough
+%    polyplets/Polyplets/Defs.lean         the connectivity vocabulary
+% ---------------------------------------------------------------------------
+
+\input{shared/preamble}
+\input{shared/disclosure}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Win}{\mathrm{Win}}
+\newcommand{\Cfg}{\mathrm{Cfg}}
+
+\title{\textbf{A cancellation identity for scan-order colourings}\\[4pt]
+\large The rule behind a second source for lattice-animal counts}
+\author{[byline: jasonp's call --- \repo{docs/publication-split.md} \S1]}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\firstdraftbanner[ Two gates are specific to this paper. \textbf{No
+literature-priority pass has been run} (\S\ref{sec:novelty}), and the identity
+is of a type with a large literature, so nothing here is claimed to be new. And
+the bridge from the identity to the program that motivated it is \emph{not}
+crossed here (\S\ref{sec:tier2}); that is stated as a limit, not left implicit.]
+
+\Ldisclosure{%
+\emph{Theorem~\ref{thm:main} (the identity)} --- \textbf{proved} below, for
+every board and every subset, in $\Z[q]$, unconditionally. No hypothesis is
+needed and none is carried; the one place a condition looked likely --- a
+window-size proviso --- is discharged by Lemma~\ref{lem:reach}, which is a
+theorem about the scan order rather than an assumption. Lemmas
+\ref{lem:reach}--\ref{lem:choice} are elementary and self-contained. Not
+formalized.
+\emph{The verification of \S\ref{sec:verify}} --- exhaustive brute force over
+every subset of ten boards: $223{,}296$ subsets, $331{,}935$ configurations,
+zero mismatches, with five RED controls each of which fires. It reaches $16$
+cells and $H \le 5$; the proof is uniform in the board, so the battery is there
+to catch a mis-statement rather than to extend a range.
+\emph{That the colouring model is the rule a particular program implements} ---
+\textbf{checked, not proved}, and it is the single largest weak point in the
+document this paper is drawn from: it is a reading of C++, argued but not
+derived. A wrong reading would make the paper prove the wrong theorem, and no
+internal rigour would reveal that.
+\emph{That any program computes the sum} --- \textbf{not addressed}
+(\S\ref{sec:tier2}).
+\emph{Novelty} --- \textbf{unchecked}. See \S\ref{sec:novelty}.
+\emph{Human verification:} none, as of this draft.}
+
+\begin{abstract}
+\noindent
+Fix a rectangular board and scan its cells in column-major order. Colour the
+cells of a subset $S$ one at a time under three local rules --- a configuration
+dies if a cell sees two colours among its earlier neighbours, inherits the
+colour if it sees exactly one, and otherwise may either adopt any colour
+currently live in a bounded window or start a fresh one --- and weight each
+surviving configuration by $\prod (q - b)$ over its fresh starts, $b$ being the
+number of live colours at that moment. Then, for every board and every subset,
+\[
+  \sum_{\varphi} \; \prod_{v \,\in\, \mathrm{births}(\varphi)} \bigl(q - b_\varphi(v)\bigr)
+  \;=\; q^{\,c(S)}
+  \qquad\text{in } \Z[q],
+\]
+where $c(S)$ is the number of connected components of $S$. Every configuration
+that fails to give each component exactly one birth cancels, exactly, with no
+truncation.
+
+The identity is proved here in five elementary lemmas. Its interest is not the
+statement but what it licenses: reducing modulo $q^2$ leaves the number of
+connected subsets, so a dynamic program over the window --- which never tests
+connectivity --- counts connected animals. That is the mathematical content of a
+second enumeration source, independent of the usual connectivity-tracking
+method, and independence of method is what a count with no closed form can
+otherwise never have.
+
+What is not proved here is that any particular program computes this sum. That
+bridge is stated as an open piece of work with its three parts named, rather
+than assumed.
+\end{abstract}
+
+\tableofcontents
+
+\section{Why a cancellation identity}
+\label{sec:intro}
+
+Counts of lattice animals are produced by programs, and a program's output is
+believed for two reasons: it agrees with independently computed values where
+they exist, and it agrees with a second program that shares no method with the
+first. The second reason is the stronger one and the harder to arrange, because
+the natural methods all track connectivity the same way --- by maintaining
+components of a frontier and merging them --- and two programs that both do
+that share their bugs.
+
+This paper is about a rule that does not track connectivity at all. Cells are
+coloured under local constraints; the weight of a colouring is a product over
+the cells that started a new colour; and the sum over colourings collapses to
+$q^{c(S)}$, so the coefficient of $q^1$ counts connected sets. Connectivity is
+never tested. It is recovered from cancellation.
+
+The identity below is the whole mathematical content of that rule. It is stated
+for finite sets of cells and proved as combinatorics; no program appears in the
+statement or in the proof.
+
+\section{The model}
+\label{sec:model}
+
+Fix integers $H, W \ge 1$ and let $\Gamma = \{(r,c) : 0 \le r < H,\ 0 \le c < W\}$,
+cells written (row, column). The \emph{scan order} is column-major:
+$\mathrm{ord}(r,c) = cH + r$. Adjacency is king adjacency --- Chebyshev distance
+one --- and $c(S)$ counts king-connected components of $S$, with $c(\emptyset) = 0$.
+
+For a cell $v$ write $N^-(v)$ for its king neighbours earlier in scan order, and
+let the \emph{window} $\Win(v)$ be the $H+1$ cells immediately preceding $v$.
+
+A \emph{configuration} of $S \subseteq \Gamma$ is a map $\varphi$ from $S$ to
+positive integers, built by visiting the cells of $S$ in scan order under three
+rules:
+
+\begin{description}
+\item[clash.] If $\varphi(N^-(v))$ has two or more elements, the configuration is
+  \emph{void} and discarded.
+\item[forced.] If $\varphi(N^-(v))$ is a single label $\ell$, then
+  $\varphi(v) = \ell$.
+\item[free.] If $N^-(v) = \emptyset$, let
+  $L_\varphi(v) = \varphi(S \cap \Win(v))$ be the \emph{live} labels and
+  $b_\varphi(v) = |L_\varphi(v)|$ their number. Then either
+  $\varphi(v) \in L_\varphi(v)$ (\emph{adopt}) or $\varphi(v)$ is the next unused
+  label (\emph{birth}).
+\end{description}
+
+Write $\Cfg(S)$ for the non-void configurations, $B(\varphi)$ for the set of
+cells at which $\varphi$ gave birth, and
+\[
+  w(\varphi) \;=\; \prod_{v \in B(\varphi)} \bigl(q - b_\varphi(v)\bigr) \;\in\; \Z[q],
+\]
+an empty product being $1$.
+
+Three features of the free rule are load-bearing and are easy to soften by
+accident.
+
+\begin{itemize}
+\item \textbf{Adopt offers every live label}, including the labels of components
+  the cell does not touch. There is no adjacency test in the adopt branch.
+\item \textbf{$b$ counts distinct live \emph{labels}, not components.} Two
+  components sharing a colour are counted once. Because adopt lets one component
+  take another's colour, the distinction is real.
+\item \textbf{``Live'' means in the window.} A label whose last cell has left the
+  window is gone and is not counted, which is what allows colours to be reused.
+\end{itemize}
+
+\section{The identity}
+\label{sec:identity}
+
+\begin{theorem}
+\label{thm:main}
+For every $H, W \ge 1$ and every $S \subseteq \Gamma$,
+\[
+  \sum_{\varphi \in \Cfg(S)} \ \prod_{v \in B(\varphi)} \bigl(q - b_\varphi(v)\bigr)
+  \;=\; q^{\,c(S)} \qquad\text{in } \Z[q].
+\]
+\end{theorem}
+
+The equality is in $\Z[q]$ itself, with no truncation --- a stronger statement
+than the modulo-$q^2$ version that the application needs.
+
+\begin{corollary}
+\label{cor:count}
+Summing over all $S \subseteq \Gamma$ with $|S| = n$ and reducing modulo $q^2$,
+\[
+  A_n(q) \;=\; \sum_{|S| = n} q^{\,c(S)}
+  \;\equiv\; \#\{S : |S| = n,\ S \text{ connected}\}\cdot q \pmod{q^2},
+\]
+so $[q^1]A_n$ counts the connected $n$-cell subsets of the board and
+$[q^0]A_n = 0$ for $n \ge 1$. Setting $q = 1$ gives $\sum_\varphi w(\varphi) = 1$
+for every $S$, so the $q = 1$ evaluation counts all subsets, $\binom{HW}{n}$.
+\end{corollary}
+
+The two consequences in Corollary~\ref{cor:count} are the natural self-checks
+for an implementation, and it is worth saying plainly that \emph{neither of them
+consults connectivity}. A rule that has gone wrong in a way that preserves the
+$q^0$ and $q=1$ evaluations passes both. Only comparison against independently
+computed values catches that.
+
+\section{Proof}
+\label{sec:proof}
+
+The proof is five lemmas. Throughout, fix $S$ and write $C_1, \dots, C_m$ for
+its components, $m = c(S)$, indexed by the scan order of their minima.
+
+\begin{lemma}[reach]
+\label{lem:reach}
+Every earlier king neighbour of $v$ lies in $\Win(v)$.
+\end{lemma}
+
+Under column-major order the earlier king neighbours of $(r,c)$ are at scan
+distance at most $H+1$, so the window of that size sees all of them. This is a
+statement about the scan order, and it is why no window-size hypothesis appears
+in Theorem~\ref{thm:main}.
+
+\begin{lemma}[survivors are constant on components]
+\label{lem:const}
+$\varphi \in \Cfg(S)$ if and only if $\varphi$ is constant on each component of
+$S$.
+\end{lemma}
+
+\begin{lemma}[component minima are free, and nothing else is born]
+\label{lem:minima}
+For each $i$, the scan-minimal cell of $C_i$ is free, and every cell that gives
+birth is a component minimum.
+\end{lemma}
+
+\begin{lemma}[the adopt branch a component needs is always on offer]
+\label{lem:adopt}
+If $v$ is free and its component already carries a label, that label is live at
+$v$.
+\end{lemma}
+
+Lemma~\ref{lem:adopt} is where the window size earns its place: a component that
+leaves the window and returns would have lost its label, and
+Lemma~\ref{lem:reach} is exactly what rules that out.
+
+\begin{lemma}[configurations are choice sequences]
+\label{lem:choice}
+The map sending $\varphi$ to its sequence of choices at the component minima is a
+bijection onto the sequences in which the $i$-th minimum either adopts one of the
+$b_i$ live labels or is born.
+\end{lemma}
+
+Given the lemmas, the sum factorises over the component minima: the $i$-th
+contributes $b_i$ adopt terms of weight $1$ and one birth term of weight
+$q - b_i$, so
+\[
+  \sum_{\varphi} w(\varphi)
+  \;=\; \prod_{i=1}^{m} \bigl(b_i + (q - b_i)\bigr)
+  \;=\; q^{\,m} \;=\; q^{\,c(S)} .
+\]
+The cancellation is that exact: at each component the $b_i$ ways to reuse an
+existing colour are cancelled by the $-b_i$ carried in the birth weight,
+leaving $q$. \qed
+
+\section{Verification}
+\label{sec:verify}
+
+The identity is checked as stated --- by enumerating the model of
+\S\ref{sec:model} directly, not by running any production code. Every subset of
+each of ten boards is enumerated, weights are summed exactly in $\Z[q]$, and the
+result compared with $q^{c(S)}$ using flood fill for $c(S)$.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l r r r r}
+\toprule
+boards & subsets & configurations & mismatches & wall \\
+\midrule
+$1{\times}6$, $1{\times}10$, $2{\times}5$, $2{\times}7$, $2{\times}8$,
+ & $223{,}296$ & $331{,}935$ & $0$ & $5.4$\,s \\
+$3{\times}4$, $3{\times}5$, $4{\times}3$, $4{\times}4$, $5{\times}3$ & & & & \\
+\bottomrule
+\end{tabular}
+\caption{Exhaustive over subsets, not sampled. Lemma~\ref{lem:adopt} is
+additionally audited at $53{,}552$ instances, with zero failures.}
+\label{tab:verify}
+\end{table}
+
+Five RED controls run alongside, and all five fire:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l}
+\toprule
+control & what it corrupts \\
+\midrule
+RED-1 & clash-voiding dropped \\
+RED-2 & $b$ counts all labels, not live ones \\
+RED-3 & a free cell may not adopt a live label \\
+RED-4 & window of $H$ cells, so some earlier neighbours are unseen \\
+RED-5 & liveness window shortened to $H-2$ \\
+\bottomrule
+\end{tabular}
+\caption{Each control breaks one ingredient the proof uses, and each is required
+to produce a mismatch. RED-4 and RED-5 are the ones that put
+Lemma~\ref{lem:reach} under test.}
+\label{tab:red}
+\end{table}
+
+Two limits of this battery, stated rather than left to be discovered. It reaches
+$16$ cells and $H \le 5$, so a phenomenon first appearing at $H \ge 6$ would not
+be seen; the proof is uniform in $H$ and $W$, which is why a bounded check is the
+right shape of test, but it is not an unbounded one. And the controls test the
+ingredients identified as load-bearing --- an ingredient nobody thought of has no
+control.
+
+\section{What is not proved here}
+\label{sec:tier2}
+
+The identity is about finite sets of cells. That some \emph{program} computes the
+sum is a separate claim, and this paper does not make it. The argument has three
+parts, all mechanical and none carried out here:
+
+\begin{itemize}
+\item \textbf{Locality} --- the window sees all earlier neighbours. This half is
+  proved: it is Lemma~\ref{lem:reach}.
+\item \textbf{Sufficient statistic} --- the rules consult the past only through
+  equality of labels within the window and the number of distinct live labels, so
+  the colour-coincidence partition of the window determines the remaining weight,
+  and a canonical form of that partition is a sufficient state.
+\item \textbf{Colour reuse} --- an implementation's fresh label is fresh only
+  within the window, whereas \S\ref{sec:model}'s births are globally fresh. The
+  two agree because an expired label is never consulted again.
+\end{itemize}
+
+Beyond that sits the bridge from a formal model to a compiled binary, which is
+not addressed at all. And one further layer is disjoint from everything here: the
+accounting that turns per-board counts into counts by bounding-box height. The
+identity is per-board and says nothing about it.
+
+\section{Novelty}
+\label{sec:novelty}
+
+\textbf{Unchecked.} No literature search has been run on this statement, and
+unlike most of this series the base rate is unfavourable: counting connected
+subgraphs by a colouring with signed weights, so that disconnected configurations
+cancel, is a well-populated idea, and the transfer-matrix literature on lattice
+animals is large. The honest expectation is that something close to
+Theorem~\ref{thm:main} exists. Nothing here is claimed to be new; what is claimed
+is that this particular rule, with this window and this liveness convention, is
+proved to compute $q^{c(S)}$.
+
+\section{Open problems}
+
+\begin{openproblem}[formalize the identity]
+Lemmas~\ref{lem:reach}--\ref{lem:choice} are elementary, finite in statement and
+uniform in the board. The repository's Lean development already carries the
+connectivity vocabulary and a comparable chain, so this is a scoped target rather
+than a research problem.
+\end{openproblem}
+
+\begin{openproblem}[cross the bridge of \S\ref{sec:tier2}]
+The three parts are stated. Doing them turns ``a program was checked against
+known values'' into ``a program provably computes a proved identity'', which is
+the difference the second source exists to make.
+\end{openproblem}
+
+\begin{openproblem}[other adjacencies and other scan orders]
+Nothing in the proof is specific to king adjacency beyond
+Lemma~\ref{lem:reach}, which bounds the scan distance to earlier neighbours. For
+which adjacency and scan-order pairs does a window of bounded size suffice, and
+what is the minimal window?
+\end{openproblem}
+
+\section{Reproduction}
+\label{sec:repro}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l}
+\toprule
+claim & check \\
+\midrule
+the identity, on every subset of ten boards & \repo{experiments/birthright\_identity\_check.py} \\
+the five RED controls & same script \\
+Lemma~\ref{lem:adopt}, audited & same script \\
+the proof, in full & \repo{docs/proofs/cutcount-identity.md} \\
+the banked rule the model reads & \repo{results/cutcount\_b1/} \\
+what the second source has closed & \repo{results/motley-h17.md} \\
+why the self-checks are not sufficient & \repo{results/motley-step0.md} \\
+\bottomrule
+\end{tabular}
+\caption{The verification script is pure Python and takes seconds; it enumerates
+the model of \S\ref{sec:model} and touches no production engine.}
+\label{tab:repro}
+\end{table}
+
+\bibliographystyle{plain}
+\bibliography{shared/refs}
+
+\end{document}

@@ -55,6 +55,12 @@ chain; formalized in Lean (\texttt{RatCert.lambda\_le},
 certificate \texttt{lambda\_le\_of\_bui\_rd3} adds one named
 \texttt{native\_decide} leaf, which is the certificate's arithmetic validity
 check).
+\emph{The elementary bound $\lambda \le 5^5/4^4$
+(Proposition~\ref{prop:crude})} --- proved, by a BFS-frame encoding that is
+machine-verified over every animal with $n \le 8$ with a RED control. Its
+\emph{earlier} proof, by the Redelmeier decision string, was found to be false
+on re-entrant animals and is retained in \S\ref{sec:crudebound} as a warning
+rather than deleted; the constant never moved.
 \emph{The slack audit of \S\ref{sec:gap}} --- labelled measurement against
 brute-force counts, not a theorem.
 \emph{The estimate $\lambda \approx 7.11$} --- labelled measurement
@@ -409,28 +415,52 @@ of this.
 \label{sec:upper}
 
 \subsection{Elementary counting: \texorpdfstring{$\lambda \le 12.2$}{lambda <= 12.2}}
+\label{sec:crudebound}
 
 \begin{proposition}
 \label{prop:crude}
-$a(n) \le \binom{5n}{n}$, and hence $\lambda \le 5^5/4^4 = 3125/256 \approx 12.2$.
+$\lambda \le 5^5/4^4 = 3125/256 \approx 12.2$.
 \end{proposition}
 
 \begin{proof}
-Run the canonical Redelmeier scan: visit cells in row-major order and grow the
-animal by an include/exclude decision on each cell that enters the untried
-frontier. When a cell is \emph{included}, only its king-neighbours \emph{ahead}
-in scan order --- E, SW, S, SE, at most four --- newly enter the frontier; the
-other four are already behind. So building an $n$-cell animal considers at most
-$5n$ cells in total, and the animal is determined by which $n$ of those
-considered cells were included. The asymptotics of $\binom{5n}{n}^{1/n}$ give the
-constant.
+Process opened cells FIFO from the scan-minimal root, so the animal is explored
+by breadth-first search. A processed cell $u$ with parent $d$ is encoded by one
+letter recording which cells of its \emph{frame} it newly opens, the frame being
+$N(u)$ less $\{d\}$ less the shared set $N(u) \cap N(d)$. Shared sets have four
+cells for an orthogonal $d$ and two for a diagonal one, so every frame has three
+or five slots, and coverage holds because $N(u)$ is the parent together with the
+shared set and the frame, with the shared set contained in $N(\mathrm{parent}(u))$
+and the recursion terminating at the root, whose frame is all eight neighbours.
+A replay decoder recovers the animal from the letter sequence, so each $n$-cell
+animal maps injectively to $n$ letters of total weight $x^{n-1}y^n$. The letter
+alphabet is the $5$-bit mask family with $\sum x^{\mathrm{opens}} = (1+x)^5$,
+whence $a(n) \le [x^{n-1}](1+x)^{5n}\cdot O(1)$ and
+$\lambda \le \min_b (1+b)^5/b = 5^5/4^4$ at $b = 1/4$.
 \end{proof}
 
-This is rigorous and needs no machinery. In the language of the twig encodings
-below it is the ``Eden level'': the alphabet is every occupancy pattern of the
-$K$ newly-exposed neighbours, so $A(x) = (1+x)^K$ and the bound is
-$K^K/(K-1)^{K-1}$. The rook case $K = 3$ gives $6.75$ and the king case $K = 5$
-gives $12.2$, which is a useful cross-check on the derivation.
+\begin{remark}[a repair, and what it cost]
+An earlier version of this proposition ran the Redelmeier scan directly: include
+or exclude each cell entering the untried frontier, note that an included cell
+newly exposes only its four neighbours ahead in scan order, and conclude
+$a(n) \le \binom{5n}{n}$. That argument is \textbf{false}, and the constant it
+reaches is nevertheless right. ``Behind in scan order'' does not mean ``already
+considered'': a re-entrant animal can contain a cell that is the ahead-neighbour
+of no included cell, so it never enters the frontier at all and the map from
+animals to decision strings is undefined on it. The witness is the hook
+$\{(0,3),(0,2),(0,1),(0,0),(1,0),(2,0),(3,0),(3,1)\}$, in which $(3,1)$ is
+reached only from below-behind. This is not a rare corner: the scheme misses
+$2$ of $20$ animals at $n = 3$ and $96{,}065$ of $147{,}941$ at $n = 8$.
+
+The BFS-frame derivation above proves the same constant soundly, and is
+machine-verified --- round trip, distinctness, weight identity and alphabet
+census over every animal with $n \le 8$, with a RED slot-dropping control.
+\end{remark}
+
+The bound is rigorous and needs no machinery. In the language of the twig
+encodings below it is the ``Eden level'': the alphabet is every occupancy pattern
+of the $K$ frame slots, so $A(x) = (1+x)^K$ and the bound is $K^K/(K-1)^{K-1}$.
+The rook case $K = 3$ gives $6.75$ and the king case $K = 5$ gives $12.2$, which
+is a useful cross-check on the derivation.
 
 \subsection{Two shortcuts that do not work}
 \label{sec:falsestarts}
@@ -447,8 +477,9 @@ Also false, and for the same reason. Each cell has at most four forward
 king-neighbours, so the Redelmeier growth \emph{tree} is a $4$-ary tree on $n$
 nodes; but animal $\mapsto$ tree is not injective, again because the tree drops
 the exclude decisions on already-adjacent cells, which is exactly where the
-cycles live. Only the full decision \emph{sequence} is injective, and counting
-that is Proposition~\ref{prop:crude}.
+cycles live. What is injective is the BFS-frame letter sequence of
+Proposition~\ref{prop:crude}, and the difference between that and the naive
+decision string is exactly the repair recorded above.
 
 \paragraph{The control.} Both are caught by running the identical argument on
 the square lattice, where it proves $\lambda_{\text{polyomino}} \le 4$ while
@@ -495,7 +526,19 @@ not a resolution problem. It is the \emph{case routing}: multi-neighbour cases
 were routed as lossy linear re-marks instead of as convolutions, and that throws
 away one of the two pieces every time.
 
+\paragraph{The twig route is closed, at exactly the crude constant.} A later
+round asked what the Klarner--Rivest twig mechanism gives on this lattice at
+level $1$, with the pre-registered reading that a level-$1$ number above about
+$10.5$ closes the route. It gives $5^5/4^4$ --- identical to
+Proposition~\ref{prop:crude}, to the digit. The mechanism that lets twigs beat
+the Eden level on the square lattice is deferral, and deferral is structurally
+blocked under king adjacency: a deferred cell always lands in its child's shared
+set. So the twig family cannot improve on the elementary bound here, and
+\S\ref{sec:convolution}'s method is not merely the better route but the only one
+of the two that moves.
+
 \subsection{The convolution system}
+\label{sec:convolution}
 
 The method that works is Bui's~\cite{bui2025}, ported to king adjacency. The
 move is to case on \emph{one} free cell $d$ at a time:

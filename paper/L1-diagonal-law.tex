@@ -380,10 +380,12 @@ integers for any $k \ge 2$, since by Corollary~\ref{cor:lead} the leading one is
 $\Wp^k/k!$ --- for the king lattice, $P_2$ leads with $625/2$. What is true, and
 what an implementation should store, is the Newton-basis form implicit in
 \eqref{eq:qk}, equivalently the statement that $k!\,P_k \in \Z[n]$. That
-statement is a theorem (integer-valuedness plus $\deg \le k$) and is formalized;
-$k!$ is not the \emph{minimal} denominator, and for the king lattice the minimal
-one is known exactly, but that is an arithmetic question about one lattice and
-belongs elsewhere.
+statement is a theorem (integer-valuedness plus $\deg \le k$) and is formalized.
+$k!$ is not the \emph{minimal} denominator; the minimal one has been worked out
+for the king lattice, but it is a fact about a \emph{basis choice} rather than
+about the lattice --- in the Newton basis every coefficient is an integer by
+construction and there is no denominator to have a law about --- so it is quoted
+nowhere here and nothing below depends on it.
 \end{remark}
 
 \section{Sharpness}
@@ -445,12 +447,25 @@ $n = 2k+1$. That the formula \emph{fails} at $n = 2k$ is a non-cancellation
 statement --- it needs $\deg D = k$ exactly --- and we have it on all banked data
 for the king lattice through $k \le 17$, and ab initio from the weight table for
 $k \le 5$, where $\deg R_k = 2k+1$ exactly with leading coefficients
-$1, 4, -80, 1753, -40928, 987355$. It is not proved for all $k$. The natural
-route --- a rational generating function for the top coefficient --- is
-obstructed: the relevant all-pairs weight family is not C-finite, refuted at
-$\ell = 16$, because the walk between the pair cells has unbounded gap. We record
-it as open and note that
+$1, 4, -80, 1753, -40928, 987355$. It is not proved for all $k$, and
 Corollary~\ref{cor:a308359} uses it only as a control, never as an input.
+
+The natural route --- a \emph{rational} generating function for the top
+coefficient --- is obstructed: the relevant all-pairs weight family is not
+C-finite, refuted at $\ell = 16$, because the walk between the pair cells has
+unbounded gap. The route that is not obstructed is the next one up. Companion
+paper L8 identifies that top coefficient with the depth-one below-onset defect,
+computes it exactly to $k = 200$ from the cluster families alone, and exhibits an
+irreducible quartic satisfied by its generating function; singularity analysis of
+that quartic gives
+\[
+  D_1(k) \;\sim\; \frac{\sqrt6}{27\sqrt\pi}\,9^k\,k^{-1/2},
+\]
+whose amplitude is positive, so $D_1(k) \ne 0$ for all sufficiently large $k$ ---
+which is exactly $\deg R_k = 2k+1$, which is onset sharpness. Two things stop
+that from closing the problem here. The quartic is fitted and held on holdout
+orders, not proved; and ``sufficiently large'' is not made effective, so it would
+not by itself cover any particular $k$. Both are stated in L8's ledger.
 
 \section{The product form}
 \label{sec:grand}

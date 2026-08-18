@@ -1,0 +1,496 @@
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+%  L8 — Below the onset: the diagonal law's error term.
+%  Category L (entirely machine-written); see paper/README.md and
+%  docs/publication-split.md.
+%
+%  NOVELTY STATUS: UNCHECKED.  No literature-priority pass has been run on any
+%  statement here.  The standing rule adopted 2026-08-17 (Ghost Ship Layer 3)
+%  requires one before any claim of novelty; this paper therefore claims none.
+%
+%  Source material, all in this repository:
+%    docs/proofs/diagonal-law.md              the law, its onset, its proof
+%    results/diagonal-law-below-onset.md      how the law fails below onset
+%    results/onset-defect-law.md              rate 9, exponent j-3/2, amplitude
+%    results/onset-defect-depth1-closed.md    the quartic, and every j=1 constant
+%    results/onset-defect-depths234.md        depths 2,3,4 closed the same way
+%    results/ridgeline-depth-amplitudes.md    alpha = 50/81, and the limits ledger
+%    results/onset-defect-crossover.md        the near-onset layer, downgraded
+%    results/allpairs-kernel.md               the gap walk
+% ---------------------------------------------------------------------------
+
+\input{shared/preamble}
+\input{shared/disclosure}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+
+\title{\textbf{Below the onset}\\[4pt]
+\large The error term of a diagonal law, depth by depth}
+\author{[byline: jasonp's call --- \repo{docs/publication-split.md} \S1]}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\firstdraftbanner[ One gate is specific to this paper: \textbf{no
+literature-priority pass has been run on any statement in it}
+(\S\ref{sec:novelty}), so nothing here is claimed to be new.]
+
+\Ldisclosure{%
+\emph{The diagonal law itself, its degree, its onset and its sharpness} ---
+proved elsewhere (companion paper L1), used here as stated.
+\emph{The exact frame of \S\ref{sec:frame}} --- proved: the entire below-onset
+content of column $k$ is the $k+1$ coefficients of one correction polynomial,
+which is a rearrangement of the chain identity and nothing more.
+\emph{The depth-$1$ closure of \S\ref{sec:depth1}} --- the defect is computed
+exactly to $k = 200$ from independently enumerated cluster families, and the
+quartic $\Phi$ was fitted on $57$ series orders and holds on $144$ orders of
+pure holdout, with a mod-$p$ scan showing nothing smaller works. The constants
+$9$, $-1/2$, $\sqrt6/(27\sqrt\pi)$ and $a \in \Q(\sqrt3)$ are then
+\emph{derived} from $\Phi$ by singularity analysis, not fitted.
+\emph{Depths $2,3,4$ (\S\ref{sec:depths})} --- exact identities over
+independently enumerated families, agreeing with the banked triangle at
+$19+18+17+16$ cells, with a RED control that fires.
+\emph{$\theta_j = j - 3/2$ and rate $9$ at $j \le 7$ (\S\ref{sec:allj})} ---
+labelled measurement, bias-calibrated against controls whose correction series
+do \emph{not} terminate, and the calibration is self-consistent rather than
+independent: it removes an artefact, it does not prove the law.
+\emph{$\alpha = 50/81$ (\S\ref{sec:ridge})} --- derived, by a finite local
+enumeration ($\Sigma = 450$ out of $450$ excursions), \textbf{conditional on
+four named analytic assumptions} which are listed in full in
+\S\ref{sec:assumptions} and are not proved anywhere.
+\emph{The amplitude family at $j \ge 5$} --- a \textbf{prediction}. No exact
+$D_5$ beyond $k \le 19$ exists.
+\emph{The near-onset scaling of \S\ref{sec:crossover}} --- measurement,
+downgraded on adversarial review and reported at the strength that survived it.
+\emph{Novelty} --- \textbf{unchecked}, entirely. See \S\ref{sec:novelty}.
+\emph{Human verification:} none, as of this draft.}
+
+\begin{abstract}
+\noindent
+On the king lattice, the number $T(n,H)$ of fixed animals of $n$ cells with
+bounding-box height exactly $H$ satisfies a diagonal law: for $k$ fixed and
+$n \ge 2k+1$,
+\[
+  T(n, n-k) \;=\; P_k(n)\cdot 3^{\,n-1-3k},
+\]
+with $P_k$ a polynomial of degree $k$. The onset $n \ge 2k+1$ is sharp. This
+paper is about what happens below it, where the law is false.
+
+It is false by a vanishing relative amount, and the error has structure that no
+algebraic search finds because the structure is analytic. Writing the defect at
+depth $j = 2k+1-n$ as $D_j(k)$, we report: an exact frame in which the entire
+below-onset content of a column is $k+1$ integers; a closed form at depth $1$,
+where the generating function is algebraic --- an irreducible quartic --- from
+which the rate $9$, the exponent $-1/2$, the amplitude $\sqrt6/(27\sqrt\pi)$ and
+the next coefficient $a = 3293/92928 - 3251\sqrt3/185856 \in \Q(\sqrt3)$ all
+follow by singularity analysis; the same closure at depths $2$, $3$ and $4$; and
+the measurement $\theta_j = j - 3/2$ with rate $9$ at every depth $j \le 7$.
+
+The depth direction then collapses. The seven measured amplitude ratios are not
+seven numbers but one: the velocity $\alpha = 50/81$ at which the defect's
+branch point moves when a cluster is allowed one unit of excess, computed exactly
+by a finite local count. That resolves an ambiguity the measurements alone could
+not --- at $j = 5$ the value is $35/8$, and the competing $118/27$, which fits
+the numbers better, is an artefact of the normalisation in which they were read.
+
+The derivation of $\alpha$ rests on four analytic assumptions which we state
+rather than prove.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+\label{sec:intro}
+
+A diagonal law is an exact statement with an onset. Companion paper L1 proves
+that for a row-local lattice with drift $b$, the diagonal $T(H+k, H)$ equals
+$q_k(H)b^H$ with $\deg q_k \le k$, for $H$ past an explicit threshold, and that
+the threshold is sharp: at one row below it the formula is wrong.
+
+Sharpness is usually where a result stops. Here it is where this paper starts.
+The king-lattice instance, in the indexing used throughout,
+\begin{equation}
+  T(n, n-k) \;=\; P_k(n)\cdot 3^{\,n-1-3k}, \qquad n \ge 2k+1,
+  \label{eq:law}
+\end{equation}
+is exact above the onset line and false below it, and the region below the onset
+line is not a boundary case --- it is the middle of the triangle, $H \le n/2$.
+Define the \emph{depth}
+\[
+  j \;=\; 2k+1-n \;\ge\; 1
+\]
+and the \emph{defect}
+\[
+  D_j(k) \;=\; T(n,n-k) - P_k(n)\cdot 3^{\,n-1-3k}, \qquad n = 2k+1-j .
+\]
+Depth $1$ is the first row the law misses, depth $2$ the next, and so on.
+
+Two facts frame everything below. First, the law is asymptotically exact where
+it is false: the number of correct leading digits of $T$ grows with $k$ at every
+fixed depth. Second, the defect has no algebraic structure that a search finds
+directly --- C-finite to order $8$ and P-finite to $(r,d) = (4,4)$ both come back
+null. The reason, established here, is that those searches were looking in the
+wrong category and at the wrong scale: $D_1$ \emph{is} P-finite, at
+$(r,d) = (35,4)$, and the structure that explains the whole family is a moving
+branch point rather than a recurrence.
+
+\paragraph{What this paper is not.} It is not a proof of the defect law. Rate
+$9$ and exponent $j - 3/2$ are proved at $j = 1$ and measured at $j \le 7$;
+the amplitude family is derived from an identity plus four analytic assumptions
+that are stated in \S\ref{sec:assumptions} and proved nowhere. The ledger on
+page 1 says which is which, claim by claim, and \S\ref{sec:novelty} says that no
+literature search has been run at all.
+
+\section{The exact frame: a column is $k+1$ integers}
+\label{sec:frame}
+
+The chain identity behind \eqref{eq:law} gives, per column $k = n - H$,
+\begin{equation}
+  [y^k]F \;=\; \frac{R_k(z)}{(1-3z)^{\,k+1}}, \qquad R_k \in \Z[z], \quad
+  \deg R_k \le 2k+1,
+  \label{eq:column}
+\end{equation}
+and the step that produces the law splits off a correction polynomial $D(z)$ of
+degree at most $k$. Everything below the onset is that polynomial:
+\begin{equation}
+  D_j(k) \;=\; [z^{\,k+1-j}]\,D(z).
+  \label{eq:defectcoeff}
+\end{equation}
+So the below-onset part of a column is not an infinite tail to be estimated. It
+is $k+1$ integers, and the depth-$j$ defect is literally one of them. In
+particular the top one is a single coefficient of $R_k$:
+\begin{equation}
+  D_1(k) \;=\; \frac{\operatorname{lead}(R_k)}{(-3)^{\,k+1}}.
+  \label{eq:d1lead}
+\end{equation}
+
+This is what makes the rest computable. A defect defined as a difference of two
+large numbers would inherit their size; \eqref{eq:defectcoeff} says the defect is
+an object in its own right, with its own generating function.
+
+\section{Depth one closes}
+\label{sec:depth1}
+
+\subsection{The defect without the triangle}
+
+The obstacle to computing $D_1(k)$ far was that $P_k$ was known only to
+$k \le 19$. Equation~\eqref{eq:d1lead} removes the obstacle: the leading
+coefficient of $R_k$ assembles from the all-pairs cluster families alone --- the
+gap walk --- with no triangle data and no wired $P_k$ anywhere. Depth one is
+therefore exact to $k = 200$ in about $40$ seconds, against a previous ceiling
+of $19$.
+
+\subsection{The generating function is algebraic}
+
+With $200$ exact terms in hand, the generating function
+$W(x) = \sum_k D_1(k)x^k$ satisfies an irreducible quartic $\Phi(x, W) = 0$.
+The fit used $57$ series orders; the quartic then holds on $144$ further orders
+that the fit never saw, and a modular scan shows no smaller box works --- no
+cubic, no quadratic, nothing rational, within the degrees the series supports.
+
+That the object is algebraic is what the earlier null results were missing.
+$D_1$ is also P-finite, at $(r,d) = (35,4)$; the verdicts of ``not P-finite'' at
+envelopes $(4,4)$ and $(6,8)$ were correct as scoped and are explained by the
+size of the true one.
+
+\subsection{Every depth-one constant, derived}
+
+From $\Phi$, singularity analysis gives the constants that the campaign had been
+measuring:
+\[
+  D_1(k) \;=\; C_1\,9^k\,k^{-1/2}\Bigl(1 + \frac{a}{k} + O(k^{-2})\Bigr),
+  \qquad
+  C_1 = \frac{\sqrt6}{27\sqrt\pi},
+\]
+\[
+  a \;=\; \frac{3293}{92928} - \frac{3251\sqrt3}{185856}
+    \;=\; 0.005138939956706\dots
+\]
+The rate $9$ and the exponent $-1/2$ are branch data of $\Phi$. The amplitude
+matches the measured $0.05118432$ within a control-backed bar of $3\times10^{-7}$
+relative, and the recognition is unique: over all $\sqrt m/(n\sqrt\pi)$ with
+$m \le 200$, $n \le 400$, exactly one value lies within $10^{-6}$ of the
+measurement.
+
+The coefficient $a$ is the useful one, because it explains a failure. It lies in
+$\Q(\sqrt3)$, which is why every attempt to recognise it at $k \le 19$ ---
+rationals, products of $\sqrt6$ and $\pi$ --- had to fail. Nothing was wrong with
+those searches except the field they searched in.
+
+\section{Depths two, three and four}
+\label{sec:depths}
+
+The same closure runs at $j = 2, 3, 4$: an exact identity over independently
+enumerated weight families, with no triangle data and no wired $P_k$ in the
+derivation. Grade every cluster family by its excess
+$e = \sum_i (s_i - 2)$. Then the coefficient $[z^{k+1-j}]$ of the correction
+polynomial draws only on families of total excess $\le j-1$, assembled through
+the chain identity with binomial $(1-3z)$ corrections.
+
+The excess grading is the content. It is not ``up to $j-1$ rows of size $3$'',
+which is what a first reading of the depth-$1$ case suggests and which is wrong:
+depth $3$ needs the one-$4$-row family, and depth $4$ needs one-$5$-row, $4+3$,
+and $3+3+3$.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l l}
+\toprule
+depth & banked cells matched exactly & range \\
+\midrule
+$j = 1$ & $19$ & $k = 1..19$ \\
+$j = 2$ & $18$ & $k = 2..19$ \\
+$j = 3$ & $17$ & $k = 3..19$ \\
+$j = 4$ & $16$ & $k = 4..19$ \\
+\bottomrule
+\end{tabular}
+\caption{The gate assembles its banked side from the triangle and the wired
+$P_k$, which the candidate identities never touch, so the two sides share no
+machinery. A RED self-test fires.}
+\label{tab:depths}
+\end{table}
+
+\section{All depths, measured}
+\label{sec:allj}
+
+Beyond $j = 4$ there is no closed form and there is measurement. Write
+$D_j(k) \sim C_j\,9^k\,k^{\theta_j}$.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{r l l l}
+\toprule
+$j$ & $\theta_j$ & $j - 3/2$ & rate \\
+\midrule
+1 & $-0.5000 \pm 0.0010$ & $-0.5$ & $8.999998 \pm 2.2\times10^{-5}$ \\
+2 & $+0.5000 \pm 0.0025$ & $+0.5$ & $9.000000 \pm 2.1\times10^{-3}$ \\
+3 & $+1.5002 \pm 0.0065$ & $+1.5$ & $8.9988 \pm 5.6\times10^{-3}$ \\
+4 & $+2.5006 \pm 0.0110$ & $+2.5$ & $8.9945 \pm 8.9\times10^{-3}$ \\
+5 & $+3.4974 \pm 0.0130$ & $+3.5$ & $9.0395 \pm 5.1\times10^{-2}$ \\
+6 & $+4.4999 \pm 0.0090$ & $+4.5$ & $9.0025 \pm 7.2\times10^{-2}$ \\
+7 & $+5.4983 \pm 0.0385$ & $+5.5$ & --- \\
+\bottomrule
+\end{tabular}
+\caption{$\theta_j = j - 3/2$ at every depth measured, and rate $9$ inside the
+bar at every depth. Bias-calibrated; see below.}
+\label{tab:thetas}
+\end{table}
+
+\paragraph{The estimator is biased and the bias is the story.} The naive
+estimator $L_k = k(D_k/D_{k-1}/9 - 1) \to \theta$ carries a systematic of up to
+$0.02$ in $\theta$ and $0.03$ in the rate when run against a control whose
+correction series does not terminate. An earlier reading of this data reported
+$\theta$ drifting low with $j$ and the rate falling away from $9$ --- $8.98$,
+$8.91$, $8.77$ at $j = 3,4,5$. Both drifts are reproduced exactly by a control
+whose $\theta$ and rate are right by construction. They were the estimator.
+
+The correction is not free of assumption, and the ledger says so: the matched
+control is built assuming $\theta_j = j - 3/2$, so Table~\ref{tab:thetas} is a
+self-consistency test. It removes ``$\theta$ drifts low'' as evidence against the
+law; it is not independent evidence for it.
+
+\section{The depth direction is one constant}
+\label{sec:ridge}
+
+\subsection{Depth is a coupling, not a new object}
+
+Under $Y = yz$ and $t = 1/z$, the proved chain identity collapses to
+\begin{equation}
+  G(Y,t) \;=\; \widehat P(Y,t) + \frac{\widehat B(Y,t)^2}{\,t - 3 - \widehat S(Y,t)\,},
+  \qquad
+  D_j(k) = [Y^k t^{\,j-1}]\,G ,
+  \label{eq:master}
+\end{equation}
+valid for $j - 1 \le k$, where $\widehat S, \widehat B, \widehat P$ are the
+excess-graded aggregates of the cluster families and $t$ marks excess. The
+grading is legitimate because a family of excess $e$ carries $k \ge e+1$, so
+$t^e$ always arrives with at least $Y^{e+1}$.
+
+Equation~\eqref{eq:master} reproduces the depth-$1$ through depth-$4$ series at
+all $74$ exact cells with $k \le 19$, and perturbing one excess-$1$ weight by
+$+1$ breaks it.
+
+What it buys is not brevity. It says what the depth variable \emph{is}: a marker
+for cluster excess, hence a perturbation of the row transfer of the gap walk.
+Depth is a coupling constant.
+
+\subsection{A moving branch point}
+
+In the normalisation $D_j(k) \sim C_j 9^k k^{j-3/2}$ the tower has one scaling
+variable $\tau = t/(1-9Y)$, and the family of amplitude ratios becomes
+\[
+  \frac{C_{M+1}}{C_1} \;=\; \frac{\alpha^M}{M!},
+\]
+a pure exponential rather than a family of binomials. An exponential enhancement
+per unit chain length is exactly a square-root branch point whose \emph{location}
+moves linearly with the excess marker,
+\[
+  1 - 9Y_c(t) \;=\; \alpha t + O(t^2),
+\]
+with the exponent pinned at $-1/2$. So $\alpha$ is a local quantity: the
+first-order shift of the zero-momentum eigenvalue of the gap walk's row transfer
+under one $3$-cell row. That is a finite count, and it is
+\[
+  \alpha \;=\; \frac{\Sigma}{729} \;=\; \frac{450}{729} \;=\; \frac{50}{81}.
+\]
+
+\subsection{What the measurements could not decide}
+
+In the earlier normalisation the amplitude ratios read
+$1, 1, 3/2, 5/2, 4.370843, 7.866341, 14.441622$ against the candidate
+$\binom{2j-2}{j-1}/2^{j-1} = 1, 1, 3/2, 5/2, 35/8, 63/8, 231/16$. At $j = 3$ and
+$j = 4$ the candidate is the only rational with denominator $\le 32$ inside the
+measurement bar. At $j = 5$ it is not: eight simple rationals fit, and one of
+them, $118/27 = 4.370370$, is \emph{closer} to the measurement than
+$35/8 = 4.375$.
+
+The derivation settles it. With $C_{M+1}/C_1 = \alpha^M/M!$ exactly and
+$\alpha = 50/81$, the value at $j = 5$ is $35/8$; $118/27$ is what the
+measurement returns when it is read in a normalisation that hides the
+exponential, and it is an artefact of that reading rather than a competing
+constant.
+
+This is the paper's one instance of a derivation overturning a better numerical
+fit, and it is worth being explicit about the direction of the evidence: the
+$j = 5$ number alone favours the wrong answer, and only the mechanism behind
+$\alpha$ makes the right one right.
+
+\subsection{The four assumptions}
+\label{sec:assumptions}
+
+The derivation of $\alpha$ is conditional. The conditions, stated as they stand
+and not softened:
+
+\begin{enumerate}
+\item \emph{The exponent stays exactly $-1/2$ for small $t > 0$.} The dispersion
+  has a nondegenerate stationary point at $u = 1$, with $(\log K)''(1) = 4/3$
+  symbolically, and analytic perturbations of a nondegenerate minimum stay
+  nondegenerate. What is missing is control of the step from the dispersion to
+  the assembled $G$.
+\item \emph{$Y_c(t)$ is analytic at $t = 0$.} Each order in $t$ adds finitely
+  many excess families, so the vertex expansion is order-by-order finite.
+  Convergence is not proved.
+\item \emph{The cancellation that keeps $1/9$ dominant persists at every order in
+  $t$.} Rate $9$ is measured at every depth $j \le 6$ and derived at $j = 1$
+  only.
+\item \emph{The perturbative bookkeeping behind $\alpha = \Sigma/729$} --- a flat
+  zero-momentum projection inside the delocalised sector. This was the weakest
+  link and is now much less weak: the excursion lands in the well-behaved sector
+  $450$ times out of $450$ and in the badly-behaved one never, so the vertex acts
+  where the transfer is a translation-invariant walk of mass $9$ and the flat
+  mode is the honest critical mode. What remains unproved is the passage from
+  ``the zero-momentum mass shifts by $Y^2t\,\Sigma/9$'' to ``the branch point of
+  $G$ moves by $\alpha t$ with its exponent intact'', which is assumption 1 in
+  other clothes.
+\end{enumerate}
+
+Two further items are verified rather than derived. $\alpha_M$ is constant over
+$M = 1,2,3$ within calibrated bias --- sharp at $M=1$ ($1.1\times10^{-9}$),
+useful at $M=2$, and at $M=3$ constraining almost nothing on its own. And the
+law at $j = 5,6,7$ is a prediction: no exact $D_5$ beyond $k \le 19$ exists here
+or anywhere.
+
+\section{The near-onset layer}
+\label{sec:crossover}
+
+Close to the onset line a resummation of the family,
+\[
+  D_j(k) \;\approx\; \frac{\sqrt6}{27}\cdot\frac{\binom{2N}{N}}{4^N}
+  \binom{N}{k}9^k\Bigl(\frac{50}{81}\Bigr)^{j-1}, \qquad N = k+j-1,
+\]
+is accurate and degrades smoothly with depth, which implies a scaling variable.
+Fitting the residual surface over $168$ banked below-onset cells finds a boundary
+layer of width $j \sim k^{0.4}$.
+
+That exponent, and the crossover curve read off it, were downgraded on
+adversarial review and are reported here as measurement with the weaker status
+they came back with; the family exclusions from the same analysis stand. The
+honest summary is that the resummation is a near-onset statement and is not a
+uniform description of the below-onset region.
+
+\section{Novelty}
+\label{sec:novelty}
+
+\textbf{Unchecked, entirely.} No literature-priority pass has been run on the
+defect law, on the depth-$1$ quartic, on $\alpha$, or on the near-onset scaling.
+The standing rule in this repository, adopted after a result was derived at
+length and found afterwards to be published, is that a pass runs before anything
+is called new. Nothing here is called new.
+
+The one bibliographic fact available is negative in a useful direction: the
+diagonal law itself, its onset and its sharpness are covered by companion paper
+L1's searches, and those searches did not extend to the error term.
+
+\section{Open problems}
+
+\begin{openproblem}[prove the defect law]
+Rate $9$ and exponent $j - 3/2$ are derived at $j = 1$ from the quartic and
+measured at $j \le 7$. A proof at general $j$ needs the four assumptions of
+\S\ref{sec:assumptions}, of which item 4 is self-contained: redo the first-order
+perturbation with the correct left and right critical vectors of the transfer and
+confirm that $\Sigma/729$ falls out.
+\end{openproblem}
+
+\begin{openproblem}[make the sharpness argument unconditional and effective]
+The amplitude $C_1 = \sqrt6/(27\sqrt\pi)$ is positive, so $D_1(k) \ne 0$ for all
+sufficiently large $k$ --- and $D_1(k) \ne 0$ is precisely the non-cancellation
+statement that makes the diagonal law's onset sharp, which companion paper L1
+records as open. Two gaps stand between that remark and a theorem: the quartic
+$\Phi$ is fitted and held on $144$ holdout orders rather than proved, and
+``sufficiently large'' is not effective. Closing either is worth more than
+another depth.
+\end{openproblem}
+
+\begin{openproblem}[an exact $D_5$]
+Every statement about $j \ge 5$ in this paper is a prediction, because the exact
+data stops at $k \le 19$ there. Extending the excess-graded family enumeration by
+one unit of excess would test the $35/8$ against something other than its own
+derivation.
+\end{openproblem}
+
+\begin{openproblem}[the algebraic tower]
+$D_1$ is algebraic. Is $D_2$? The master identity gives each depth as a
+coefficient of one bivariate object, so the natural question is whether $G$ is
+algebraic in $Y$ at every fixed order in $t$, which the depth-$1$ quartic
+establishes only at $t^0$.
+\end{openproblem}
+
+\section{Reproduction}
+\label{sec:repro}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l}
+\toprule
+claim & check \\
+\midrule
+the law, its onset and sharpness & companion paper L1; \repo{docs/proofs/diagonal-law.md} \\
+the law is asymptotically exact below onset & \repo{experiments/law\_below\_onset.py} \\
+the exact frame, and $D_j$ as a coefficient & \repo{experiments/defect\_below\_onset.py} \\
+depth 1 to $k = 200$ & \repo{experiments/depth1\_gap\_walk.py} \\
+the quartic $\Phi$ and its holdouts & \repo{experiments/depth1\_minpoly.py} \\
+the derived constants $C_1$, $a$ & \repo{experiments/depth1\_asymptotics.py} \\
+$D_1$ P-finite at $(35,4)$ & \repo{experiments/depth1\_recurrence.py} \\
+depths 2--4, and the gate & \repo{experiments/severance\_w3\_depths.py}, \repo{experiments/severance\_w3\_gate.py} \\
+$\theta_j$, the rate, and the controls & \repo{experiments/defect\_nine\_exponent.py}, \repo{experiments/defect\_controls.py} \\
+the amplitude and its family & \repo{experiments/defect\_amplitude.py}, \repo{experiments/defect\_amplitude\_family.py} \\
+the master identity and $\alpha$ & \repo{experiments/ridgeline\_master.py}, \repo{experiments/ridgeline\_vertex.py} \\
+the near-onset layer & \repo{experiments/boundary\_layer.py} \\
+\bottomrule
+\end{tabular}
+\caption{Where each claim is checked. The banked notes carrying the full
+records are \repo{results/onset-defect-law.md},
+\repo{results/onset-defect-depth1-closed.md},
+\repo{results/onset-defect-depths234.md} and
+\repo{results/ridgeline-depth-amplitudes.md}.}
+\label{tab:repro}
+\end{table}
+
+\bibliographystyle{plain}
+\bibliography{shared/refs}
+
+\end{document}
