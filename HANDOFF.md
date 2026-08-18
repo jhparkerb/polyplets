@@ -1,5 +1,32 @@
 # HANDOFF — live state (updated 2026-08-18)
 
+## 2026-08-18 (latest) — THE ABZ PAPER WAS FREE; L6 EDITS PENDING
+
+The paywalled Asinowski--Barequet--Zheng paper the L6 pass wanted is obtained:
+the ANALCO 2018 polycube companion, "Polycubes with small perimeter defect,"
+93--100, free from Simon Plouffe's OEIS citation mirror. Filed in `papers/`,
+read; full verdict in `docs/priority-passes-2026-08-18.md` §ABZ full text.
+
+- **The king column is a separate derivation, not a corollary of their
+  framework.** Their proof is cut-shrinking to unique reduced representatives,
+  and every mechanical step is stated in face-adjacency terms -- the
+  `6n - e - 2|E|` accounting, the L-cell definition, the non-adjacency
+  condition defining a cut, the handshake bound at max degree 6. The shape of
+  the argument transports to king; the theorem does not.
+- **They conjecture what we measured.** Their §4 conjectures highest-degree
+  factor `(x-1)^(k+1)` and asymptotics `gamma n^k`. Our table has `Phi_1^(k+1)`
+  and degree `k` for every `k <= 6` on both lattices.
+- **Pending, his call: the L6 edits.** Cite the ANALCO paper rather than the
+  slides, and restate the degree row as confirming a published conjecture
+  rather than as our own observation.
+
+Re-confirmed unobtainable in the same pass: **Barequet--Magal 2023** (no
+preprint, no conference version; the author's page now offers only a
+reprint-request mailto -- this is the remaining high-priority want),
+**Andrews Memoirs 301**, **Rands & Welsh 1981**. Ben-Shachar's minimal-perimeter
+paper is pinned as Algorithmica 85(1) (2023) 75--99, no arXiv. The Plouffe
+mirror is recorded as exhausted for us in `papers/MISSING.md`.
+
 ## 2026-08-18 (later) — PRIORITY PASSES AND PROOF AUDIT OVER ALL NINE L PAPERS
 
 **Three literature collisions, two of them load-bearing.** Record:
