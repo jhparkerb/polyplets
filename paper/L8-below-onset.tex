@@ -111,7 +111,7 @@ that for a row-local lattice with drift $b$, the diagonal $T(H+k, H)$ equals
 $q_k(H)b^H$ with $\deg q_k \le k$, for $H$ past an explicit threshold, and that
 the threshold is sharp: at one row below it the formula is wrong.
 
-Sharpness is usually where a result stops. Here it is where this paper starts.
+Sharpness is usually where a result stops. This paper starts there.
 The king-lattice instance, in the indexing used throughout,
 \begin{equation}
   T(n, n-k) \;=\; P_k(n)\cdot 3^{\,n-1-3k}, \qquad n \ge 2k+1,
@@ -168,9 +168,9 @@ particular the top one is a single coefficient of $R_k$:
   \label{eq:d1lead}
 \end{equation}
 
-This is what makes the rest computable. A defect defined as a difference of two
-large numbers would inherit their size; \eqref{eq:defectcoeff} says the defect is
-an object in its own right, with its own generating function.
+The rest is computable because of this. A defect defined as a difference of two
+large numbers would inherit their size; \eqref{eq:defectcoeff} makes it an object
+in its own right, with its own generating function.
 
 \section{Depth one closes}
 \label{sec:depth1}
@@ -192,7 +192,7 @@ The fit used $57$ series orders; the quartic then holds on $144$ further orders
 that the fit never saw, and a modular scan shows no smaller box works --- no
 cubic, no quadratic, nothing rational, within the degrees the series supports.
 
-That the object is algebraic is what the earlier null results were missing.
+The earlier null results missed that the object is algebraic.
 $D_1$ is also P-finite, at $(r,d) = (35,4)$; the verdicts of ``not P-finite'' at
 envelopes $(4,4)$ and $(6,8)$ were correct as scoped and are explained by the
 size of the true one.
@@ -231,8 +231,9 @@ $e = \sum_i (s_i - 2)$. Then the coefficient $[z^{k+1-j}]$ of the correction
 polynomial draws only on families of total excess $\le j-1$, assembled through
 the chain identity with binomial $(1-3z)$ corrections.
 
-The excess grading is the content. It is not ``up to $j-1$ rows of size $3$'',
-which is what a first reading of the depth-$1$ case suggests and which is wrong:
+The grading by excess is the substantive step. It is not ``up to $j-1$ rows of
+size $3$'' --- a first reading of the depth-$1$ case suggests that, and it is
+wrong:
 depth $3$ needs the one-$4$-row family, and depth $4$ needs one-$5$-row, $4+3$,
 and $3+3+3$.
 
@@ -314,9 +315,9 @@ Equation~\eqref{eq:master} reproduces the depth-$1$ through depth-$4$ series at
 all $74$ exact cells with $k \le 19$, and perturbing one excess-$1$ weight by
 $+1$ breaks it.
 
-What it buys is not brevity. It says what the depth variable \emph{is}: a marker
-for cluster excess, hence a perturbation of the row transfer of the gap walk.
-Depth is a coupling constant.
+The identity's use is not brevity. It identifies the depth variable as a marker
+for cluster excess, so depth is a perturbation of the row transfer of the gap
+walk --- a coupling constant rather than a new object to be summed.
 
 \subsection{A moving branch point}
 
@@ -349,15 +350,14 @@ them, $118/27 = 4.370370$, is \emph{closer} to the measurement than
 $35/8 = 4.375$.
 
 The derivation settles it. With $C_{M+1}/C_1 = \alpha^M/M!$ exactly and
-$\alpha = 50/81$, the value at $j = 5$ is $35/8$; $118/27$ is what the
-measurement returns when it is read in a normalisation that hides the
-exponential, and it is an artefact of that reading rather than a competing
-constant.
+$\alpha = 50/81$, the value at $j = 5$ is $35/8$. The measurement returns
+$118/27$ when it is read in a normalisation that hides the exponential, so that
+number is an artefact of the reading rather than a competing constant.
 
 This is the paper's one instance of a derivation overturning a better numerical
-fit, and it is worth being explicit about the direction of the evidence: the
-$j = 5$ number alone favours the wrong answer, and only the mechanism behind
-$\alpha$ makes the right one right.
+fit. The direction of the evidence is the part to keep in view: the $j = 5$
+number alone favours the wrong answer, and only the mechanism behind $\alpha$
+selects the right one.
 
 \subsection{The four assumptions}
 \label{sec:assumptions}
@@ -382,7 +382,7 @@ and not softened:
   link and is now much less weak: the excursion lands in the well-behaved sector
   $450$ times out of $450$ and in the badly-behaved one never, so the vertex acts
   where the transfer is a translation-invariant walk of mass $9$ and the flat
-  mode is the honest critical mode. What remains unproved is the passage from
+  mode is the critical mode. What remains unproved is the passage from
   ``the zero-momentum mass shifts by $Y^2t\,\Sigma/9$'' to ``the branch point of
   $G$ moves by $\alpha t$ with its exponent intact'', which is assumption 1 in
   other clothes.
@@ -409,8 +409,8 @@ layer of width $j \sim k^{0.4}$.
 That exponent, and the crossover curve read off it, were downgraded on
 adversarial review and are reported here as measurement with the weaker status
 they came back with; the family exclusions from the same analysis stand. The
-honest summary is that the resummation is a near-onset statement and is not a
-uniform description of the below-onset region.
+resummation is a near-onset statement and not a uniform description of the
+below-onset region.
 
 \section{Novelty}
 \label{sec:novelty}
@@ -421,10 +421,10 @@ terms to fixed-height and bounding-box animal formulas, asymptotics of defects
 below a formula's threshold, and algebraic generating functions for the leading
 coefficients of such families.
 
-That is a \emph{weak} negative and is worth saying why. The object here is
+That negative is \emph{weak}, for a stateable reason. The object here is
 defined relative to a diagonal law of our own, so a collision would have to be
-with work that had the law first --- which is what companion paper L1's searches
-cover, and they came back clean. A pass over an object nobody else has defined
+with work that had the law first, which companion paper L1's searches cover, and
+they came back clean. A pass over an object nobody else has defined
 tests very little. Nothing here is called new.
 
 \section{Open problems}
@@ -439,7 +439,7 @@ confirm that $\Sigma/729$ falls out.
 
 \begin{openproblem}[make the sharpness argument unconditional and effective]
 The amplitude $C_1 = \sqrt6/(27\sqrt\pi)$ is positive, so $D_1(k) \ne 0$ for all
-sufficiently large $k$ --- and $D_1(k) \ne 0$ is precisely the non-cancellation
+sufficiently large $k$ --- and $D_1(k) \ne 0$ is the non-cancellation
 statement that makes the diagonal law's onset sharp, which companion paper L1
 records as open. Two gaps stand between that remark and a theorem: the quartic
 $\Phi$ is fitted and held on $144$ holdout orders rather than proved, and

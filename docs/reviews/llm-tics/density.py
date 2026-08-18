@@ -23,7 +23,8 @@ PAPER = Path(__file__).resolve().parents[3] / "paper"
 L_PAPERS = [
     "L1-diagonal-law.tex", "L2-ternary-spine.tex", "L3-lambda-bounds.tex",
     "L4-not-dfinite.tex", "L5-convex-polyplets.tex",
-    "L6-perimeter-gradings.tex",
+    "L6-perimeter-gradings.tex", "L7-subdominant-amplitude.tex",
+    "L8-below-onset.tex", "L9-cutcount-identity.tex",
 ]
 CONTROLS = ["technical-report.tex", "polyplets-report.tex"]
 
