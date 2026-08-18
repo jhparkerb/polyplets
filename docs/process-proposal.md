@@ -260,7 +260,7 @@ is invisible from inside one thread, hence the standing cross-thread row
 in A3 and the grouped Lock listing in A6. Without a mechanism the field
 is write-only, and the guardrails below say to delete such a field.
 
-## `docs/research-heuristics.md`
+## `docs/research-heuristics.md` (planned, not yet written)
 
 Trigger → action. Admission rule: **every entry names a repo incident
 where following it would have changed the action taken.** Literature

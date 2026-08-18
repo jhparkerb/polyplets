@@ -56,7 +56,7 @@ A001168, min-perimeter = A027709. Total fixed polyplet count = A006770.
 
 ### 4. Max distinct holes (`4-max-holes/draft.txt`, `b-max-holes.txt`)
 - Terms 0,0,0,1,1,2,2,3,4,4,5,6,6,7,8,9,9,10,11,12,... (n=1..30 in the b-file).
-- Source: `oeis/draft-maxholecount.txt` on branch `explore/theorem-multihole`;
+- Source: `oeis/draft-maxholecount.txt` (deleted 2026-07-06) on branch `explore/theorem-multihole`;
   b-file regenerated here from the proven formula.
 - Definition: max number of bounded 4-connected complement components over n-cell
   polyplets. **Proven closed form** a(n) = n + 1 - A027709(n)/2 (Pick's theorem on

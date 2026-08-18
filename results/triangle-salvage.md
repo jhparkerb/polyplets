@@ -41,7 +41,7 @@ with both RED controls biting — perturbed cell named exactly, rook stencil
 breaking 21 of 28 (`results/r4/logs/r4_indoracle_gympie.log`,
 `r4_indoracle_n10_ayr.log`).
 
-**Independence, honestly stated** (from `results/triangle-r3-adv-independence.md`
+**Independence, honestly stated** (from `results/triangle-r3-adv-independence.md`  <!-- never existed: lane deliverable not filed -->
 and `results/r4/r4-adv-ind.md`): the DP's state space strictly contains the
 incumbent's Motzkin object; independence rests on dynamics and failure modes,
 not disjoint states. What the two routes still share is exactly one thing —
@@ -67,10 +67,10 @@ m=1..21, launched 06:00 EDT 2026-08-13, both exited clean the same day;
 acceptance (byte-identity of the two outputs) PASSED. Full receipts in §6.
 
 **Independence caveat, pre-registered** (`results/triangle-r3-synthesis.md`
-§CORRECTION, `results/r4/r4-inv.md`): forced parity clears the bar against
+§CORRECTION, `results/r4/r4-inv.md`): forced parity clears the bar against  <!-- never existed: lane deliverable not filed -->
 the kink engines but NOT against B1 — B1's [q¹] and spin's q=2 evaluation in
 ℤ/4 are two extractions from one identity. This is row 40's H=21 first
-independent evidence of any kind (`results/r4/r4-tallband.md`: T(40,21) is
+independent evidence of any kind (`results/r4/r4-tallband.md`: T(40,21) is  <!-- never existed: lane deliverable not filed -->
 the thinnest cell in the row — Lean's P_k covers H=22..40, the sweep covers
 it once, nothing else reaches it).
 
@@ -128,7 +128,7 @@ T(n,H) ≡ 0 (mod 2) for n odd, H even, by the midline-reflection involution;
 the translation-classes subtlety closed by an explicit lemma. 190 cells'
 parity now rests on proof rather than engine agreement; zero row-40 cells by
 the theorem's own scope. `results/triangle-hunt-klein-parity.md`, audit in
-`results/triangle-hunt-refutation-symmetry.md`, check
+`results/triangle-hunt-refutation-symmetry.md`, check  <!-- never existed: lane deliverable not filed -->
 `experiments/tristruct/refB_parity_check.py`.
 
 ### 2.3 Two-term cell inequality — PROVED
@@ -137,7 +137,7 @@ T(n,H) ≥ 3T(n−1,H−1) + T(n−1,H) for 2 ≤ H ≤ n−1, equality exactly 
 H = n. Two injections with disjoint images; audited; 0 violations on the
 banked triangle; within 2.2 bits of truth everywhere (worst slack 4.59×).
 `results/triangle-hunt-proof-first.md`,
-`results/triangle-hunt-refutation-proof-first.md`,
+`results/triangle-hunt-proof-first.md`,
 `experiments/tristruct/p1_ineq_check.py`, `refA_prooffirst_check.py`.
 
 **Novelty check, 2026-08-13** (OEIS A006770 + literature search): no
@@ -259,17 +259,17 @@ Kept so nobody re-derives or re-pitches. Each entry names its file.
    inside the triangle reaches the exposed band.
 2. **Column recurrences are dead above H=4, permanently** — minimal orders
    first apply at n=43 (H=5) and n=107 (H=6), both > 40
-   (`results/triangle-hunt-refutation-columns.md`).
+   (`results/triangle-hunt-refutation-columns.md`).  <!-- never existed: lane deliverable not filed -->
 3. **Only three slice directions are testable at all** — (0,1), (−1,1),
    (−1,2); the other twelve span no fit+holdout pair
-   (`results/triangle-hunt-slices.md`).
+   (`results/triangle-hunt-slices.md`).  <!-- never existed: lane deliverable not filed -->
 4. **No third route class in the literature** — 35 candidates, pre-registered
    filters, one survivor, and the survivor was already project-held (B1)
    (`results/triangle-r3-l6-wildcard.md`).
 5. **Piece/contour/quotient vocabularies do not help** — piece states
    exceed cell states and diverge; contour encodings are state-space
    isomorphic to the incumbent; the symmetry quotient is priced out by its
-   own answer size (`results/triangle-r3-l1-corner-gluing.md`,
+   own answer size (`results/triangle-r3-l1-corner-gluing.md`,  <!-- never existed: lane deliverable not filed -->
    `-l3-contour.md`, `-l4-quotient.md`).
 6. **The two-horn involution obstruction** — validity-aware site keys drift
    under their own move; validity-blind ones leave the class. Any correct
@@ -294,7 +294,7 @@ Kept so nobody re-derives or re-pitches. Each entry names its file.
    with the information floor. Round 3 dismissed it as "a rank is an
    existence statement" — which is work not done, not an obstruction; CKN
    have explicit bases for the matchings analogue. Needs no compute.
-   (`results/r4/r4-floors.md`, `results/triangle-r3-adv-independence.md`
+   (`results/r4/r4-floors.md`, `results/triangle-r3-adv-independence.md`  <!-- never existed: lane deliverable not filed -->
    rank data.)
 2. **Residue ladder H=17..19** — 22.20% of a(40), confirmation-mode design,
    ~5.7 days on existing code (`results/r4/r4-ladder.md`,

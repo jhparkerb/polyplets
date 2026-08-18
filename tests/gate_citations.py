@@ -53,10 +53,19 @@ EXEMPT_WORDS = ("deleted", "removed", "planned", "todo", "deliverable",
 EPHEMERAL_RE = re.compile(r"^(runs|build)/|^results/(ns_a\d+|redelmeier_)")
 
 
+# results/ghostship/ is a frozen record of a DIFFERENT filesystem: the sandbox
+# the unattended run worked in, plus the grading files that quote its paths.
+# Its citations are correct about that tree and wrong about this one, and the
+# record must not be edited to make a gate happy -- that is what makes it a
+# record.  Excluded by scope, not by exemption markers.
+EXCLUDED_TREES = ("results/ghostship/",)
+
+
 def tracked_markdown():
     out = subprocess.run(["git", "-C", ROOT, "ls-files", "*.md"],
                          capture_output=True, text=True, check=True).stdout
-    return out.split()
+    return [f for f in out.split()
+            if not f.startswith(EXCLUDED_TREES)]
 
 
 def history_paths():
@@ -125,12 +134,28 @@ def main():
     hist = history_paths()
     totals = {k: [] for k in ("exists", "template", "exempt", "history", "MISSING")}
     files = tracked_markdown()
+    # A tracked file missing from the working tree is a deletion that has not
+    # been committed.  That is a legitimate state to be in and an illegitimate
+    # state to crash on: the gate reports it and fails, rather than dying with a
+    # traceback that hides every finding after it.  (Before this, one uncommitted
+    # deletion masked nine real dangling citations for as long as it sat there.)
+    absent = []
     for f in files:
-        with open(os.path.join(ROOT, f), errors="replace") as fh:
+        path = os.path.join(ROOT, f)
+        if not os.path.exists(path):
+            absent.append(f)
+            continue
+        with open(path, errors="replace") as fh:
             merge(totals, classify(fh.read(), hist, f))
 
     n = sum(len(v) for v in totals.values())
-    print(f"{n} path citations across {len(files)} tracked markdown files")
+    print(f"{n} path citations across {len(files) - len(absent)} tracked "
+          f"markdown files")
+    if absent:
+        print(f"  {len(absent)} tracked file(s) missing from the working tree "
+              f"(uncommitted deletion?):")
+        for f in absent:
+            print(f"    {f}")
     for k in ("exists", "template", "exempt", "history", "MISSING"):
         print(f"  {k:9s} {len(totals[k])}")
 
@@ -168,6 +193,10 @@ def main():
             print(f"  {src}:{line}  ->  {p}")
         print("\nFix the path, or mark the line (deleted / planned / in memory) "
               "if the reader is meant to know it is not there.")
+    if absent:
+        print("\nGATE CITATIONS: RED -- a tracked file is not in the working "
+              "tree; commit the deletion or restore the file.")
+    if totals["MISSING"] or absent:
         return 1
 
     print("\nGATE CITATIONS: GREEN")

@@ -220,9 +220,9 @@ in `results/`, where it already is.
 
 ## 6. The gate — one target, five checks, red-first
 
-`make gate-state`, one script, `scripts/check_state.sh`, with a `--self-test`
+`make gate-state`, one script, `scripts/check_state.sh` (planned), with a `--self-test`
 that runs first on every invocation, in the shape `check_receipts.sh` already
-uses. Fixtures under `tests/fixtures/state/`, one planted violation per check.
+uses. Fixtures under `tests/fixtures/state/` (planned), one planted violation per check.
 A check that has never rejected a planted violation is not a check.
 
 1. **Receipts.** Every `receipt:`, `harness:`, `checked:` path exists, is
