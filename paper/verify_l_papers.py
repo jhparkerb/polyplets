@@ -21,6 +21,7 @@ rejected:
   R4  a linear fit to the A308359 diagonal, which must miss the third point
   R5  the king diagonal formula evaluated one row below its proved onset
   R6  a min-end column claimed stable one rung before its onset
+  R7  the k=6 defect class claimed quasi-polynomial one step below its onset
 
 R3 and R5 are not bookkeeping: they are what puts the *onset* of the diagonal
 law under test rather than merely its shape.
@@ -593,6 +594,80 @@ def check_l1_pair_weights():
 
 # ---------------------------------------------------------------------------
 
+def check_l6_max_end_k6():
+    """L6's k = 6 verdict, rebuilt from the two n = 78 censuses.
+
+    Integer arithmetic only: multiply each defect-6 tail series from the claimed
+    onset by the claimed denominator Phi_1^7 Phi_2^5 Phi_3^2 and demand that
+    every coefficient above deg D - 1 vanish, inside the window the truncated
+    census makes exact.  That is what licenses the paper's k = 6 row; a wrong
+    onset or a wrong denominator both show up here as a surviving coefficient.
+
+    Then the two coefficients the section turns on: the Phi_2 leading diagonal
+    is 5/2 on both lattices (not the withdrawn 15/4), and the paper says so."""
+    src = tex("L6-perimeter-gradings.tex")
+    if not src:
+        return
+
+    def phi_pow(base, e):
+        out = [1]
+        for _ in range(e):
+            nxt = [0] * (len(out) + len(base) - 1)
+            for i, x in enumerate(out):
+                for j, y in enumerate(base):
+                    nxt[i + j] += x * y
+            out = nxt
+        return out
+
+    def mul(a, b):
+        out = [0] * (len(a) + len(b) - 1)
+        for i, x in enumerate(a):
+            if x:
+                for j, y in enumerate(b):
+                    out[i + j] += x * y
+        return out
+
+    D = [1]
+    for base, e in (([1, -1], 7), ([1, 1], 5), ([1, 1, 1], 2)):
+        D = mul(D, phi_pow(base, e))
+    degD = len(D) - 1
+    ok(degD == 16, f"deg(Phi_1^7 Phi_2^5 Phi_3^2) = {degD}, expected 16")
+
+    for lat in ("square8", "square4"):
+        census = ROOT / "results" / f"perimdefect_{lat}_n78_k6.txt"
+        if not census.exists():
+            failures.append(f"missing {census}")
+            continue
+        rows = defaultdict(int)
+        for line in census.read_text().splitlines():
+            f = line.split()
+            if len(f) >= 3 and f[0].isdigit() and int(f[1]) == 6:
+                rows[int(f[0])] += int(f[-1])
+        nmax = max(rows)
+        ok(nmax == 78, f"{lat} k=6 census reaches n={nmax}, expected 78")
+
+        def zeros_above(onset):
+            tail = [rows.get(n, 0) for n in range(onset, nmax + 1)]
+            prod = mul(tail, D)
+            exact = (nmax - onset) - degD
+            return [i for i in range(degD, exact + 1) if prod[i]]
+
+        # The claimed onset works ...
+        ok(zeros_above(24) == [],
+           f"{lat}: Phi_1^7 Phi_2^5 Phi_3^2 divides the k=6 tail from onset 24")
+        # ... and it is the smallest one that does, which is what makes 24 the
+        # onset rather than merely an onset.
+        red(zeros_above(23) == [],
+            f"{lat}: the k=6 class already quasi-polynomial from n = 23")
+
+    ok(prints_number(src, 24) and "onset" in src,
+       "L6 must print onset 24 for k = 6")
+    ok(prints_together(src, [5, 2]) and "15/4" in src,
+       "L6 must state the refuted 15/4 alongside the measured 5/2")
+    red("15/4$ at $k = 6$. The measured" in src and "5/2" not in src,
+        "a draft that keeps 15/4 as the k=6 value")
+
+
 def main():
     check_l3_ladder()
     check_l3_constants()
@@ -602,6 +677,7 @@ def main():
     check_l1_a308359()
     check_l1_pair_weights()
     check_l6_min_end()
+    check_l6_max_end_k6()
 
     if failures:
         print(f"verify_l_papers: {len(failures)} FAILURE(S) of {checks} checks\n")
