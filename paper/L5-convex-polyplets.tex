@@ -61,7 +61,12 @@ and Fekete step are there too (\texttt{Stair.M\_supermul},
 \texttt{Stair.M\_tendsto}, \texttt{Stair.M\_le\_mu\_pow}), all guarded. So
 Lemma~\ref{lem:supermul} is a Lean theorem.
 \emph{Proposition~\ref{prop:squeeze} itself is NOT formalized}: the geometric
-HV-convex layer (Lemma~\ref{lem:blocks}) and the squeeze are paper proofs.
+HV-convex layer (Lemma~\ref{lem:blocks}) and the squeeze are paper proofs. They
+were audited against enumeration to $n = 13$ on 2026-08-18: no animal visits
+both middle phases (so the three-way split is exact), the mirror equality holds
+termwise, and the remainder is $0.39\%$ of the class at $n = 13$ with its growth
+ratio falling --- consistent with Lemma~\ref{lem:stacks} and not a substitute
+for it (\repo{results/l-paper-proof-audit.md}).
 \emph{The exclusions of \S\ref{sec:exclusions}} --- rigorous in the direction
 claimed: full column rank modulo a prime is a proof of full rank over $\Q$.
 Four positive and negative control arms, and a fifth on an unrelated series,

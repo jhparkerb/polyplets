@@ -50,7 +50,12 @@ appears here.]
 \Ldisclosure{%
 \emph{Lemma~\ref{lem:T} and Proposition~\ref{prop:split} (the exact split, and
 both rates)} --- proved below, from Fekete's lemma and the companion paper's
-three-block factorisation.
+three-block factorisation. Every step of Lemma~\ref{lem:T} was additionally
+checked against the enumerated block through $n = 16$, against two independent
+oracles, with the slack in each step measured and reported: steps (i) and (iv)
+run about a factor of $2$ from failing and step (vi) a factor of $34$, so the
+check confirms the shape of each step and not its constants
+(\repo{results/l-paper-proof-audit.md}).
 \emph{Propositions~\ref{prop:mirror} and \ref{prop:phi}} --- proved below.
 \emph{Proposition~\ref{prop:ratio} (the amplitude ratio)} --- proved,
 conditional on the two amplitudes existing, which is strictly weaker than

@@ -264,17 +264,30 @@ bijection onto the sequences in which the $i$-th minimum either adopts one of th
 $b_i$ live labels or is born.
 \end{lemma}
 
-Given the lemmas, the sum factorises over the component minima: the $i$-th
-contributes $b_i$ adopt terms of weight $1$ and one birth term of weight
-$q - b_i$, so
+The sum does \emph{not} factorise into a product over the minima, and it is
+worth being careful about why: the number of live labels $b_\varphi(v_i)$ depends
+on the choices made at $v_1, \dots, v_{i-1}$, so there is no fixed $b_i$ to
+multiply. What is true is that the dependence does not matter, which the
+induction makes precise.
+
+For $1 \le i \le m+1$ and a history $h$ of choices at $v_1, \dots, v_{i-1}$, let
+$F_i(h)$ be the sum of weights over all completions --- choices at
+$v_i, \dots, v_m$ consistent with $h$. We claim $F_i(h) = q^{\,m-i+1}$ for every
+$i$ and every $h$, by downward induction on $i$. For $i = m+1$ the sum is over
+the empty completion, so $F_{m+1}(h) = 1$. For $i \le m$, write
+$b = b_\varphi(v_i)$, which by Lemma~\ref{lem:choice} is determined by $h$
+alone. The available choices at $v_i$ are $b$ adopt branches, each of weight $1$,
+and one birth branch of weight $q - b$; applying the induction hypothesis to each
+resulting history gives
 \[
-  \sum_{\varphi} w(\varphi)
-  \;=\; \prod_{i=1}^{m} \bigl(b_i + (q - b_i)\bigr)
-  \;=\; q^{\,m} \;=\; q^{\,c(S)} .
+  F_i(h) \;=\; b \cdot q^{\,m-i} + (q-b)\cdot q^{\,m-i} \;=\; q^{\,m-i+1},
 \]
-The cancellation is that exact: at each component the $b_i$ ways to reuse an
-existing colour are cancelled by the $-b_i$ carried in the birth weight,
-leaving $q$. \qed
+and $b$ cancels whatever it was. Taking $i = 1$ gives
+$\sum_\varphi w(\varphi) = q^{\,m} = q^{\,c(S)}$. \qed
+
+The cancellation is that exact, and it is local in the right way: at each
+component the $b$ ways to reuse an existing colour are cancelled by the $-b$
+carried in the birth weight, leaving $q$ whatever the history was.
 
 \section{Verification}
 \label{sec:verify}
