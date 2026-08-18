@@ -1,6 +1,55 @@
 # HANDOFF — live state (updated 2026-08-18)
 
+## 2026-08-18 (later) — PRIORITY PASSES AND PROOF AUDIT OVER ALL NINE L PAPERS
+
+**Three literature collisions, two of them load-bearing.** Record:
+`docs/priority-passes-2026-08-18.md`.
+
+- **L9 collides at the level of its whole statement.** The cut-count identity
+  is the Fortuin-Kasteleyn/Potts correspondence -- evaluating `q^c` by colouring
+  components instead of tracking them -- specialised to site clusters in scan
+  order. Hoshen-Kopelman (1976) is the unsigned ancestor of the labelling;
+  Jensen's signature algorithm is the method it is an alternative to. Abstract,
+  introduction and novelty section rewritten; no theorem claimed. What survives
+  is the specific rule and the proof that its window suffices.
+- **L6 collides twice.** The Asinowski slides turned out to be **free** (the
+  repo had them recorded as unobtainable): they carry the defect identity
+  `k = e + 2f`, which is our `k = 2c + t` and licenses the enumeration prune,
+  and the theorem that each fixed-defect GF is rational with cyclotomic
+  denominator, for polyominoes and d-polycubes. Both attributed in place. The
+  king column, the onset formula, the two-lattice universality, the coefficient
+  triangle and the whole minimum end survive.
+- **L5** gains Bousquet-Melou-Fedou as the square antecedent of the kernel.
+  **L2** gains a related-work section on Rowland-Yassawi and the mod-3^k
+  machinery with why neither applies (L4's non-D-finiteness kills the
+  hypothesis). **L8**'s pass found nothing and the paper says why that is weak.
+
+**Lesson recorded in `papers/MISSING.md`: two of the three collisions came from
+pulling full text of sources already listed there, not from new searches.
+Re-try that file before searching.**
+
+**Proof audit** (`results/l-paper-proof-audit.md`) found **one real defect**:
+L9 printed its final step as a product over component minima, but `b` depends
+on the history of earlier choices -- the source proof uses downward induction
+for exactly that reason. Fixed. Same family as L3's broken proof: a step that
+reads as bookkeeping and is not. Both defects were invisible to prose review
+and to numerical agreement, because the numbers were right.
+
+Also audited: L7's Lemma T, all six steps, against two independent oracles
+through n=16, **with the slack measured** -- steps (i) and (iv) run a factor ~2
+from failing, (vi) a factor of 34, so the check confirms shapes and not
+constants; two of five RED controls do not fire and the script says so. L5/L7's
+phase decomposition to n=13: no animal visits both middle phases (implicit
+until now), the mirror equality holds termwise, the remainder is 0.39% of the
+class with falling growth ratio. L3's repaired proof re-derived from scratch:
+shared sets are 4 cells orthogonal, 2 diagonal, frames 3 or 5 slots as claimed.
+
+Still open, his: every L ledger reads "human verification: none"; whether
+`docs/` and the Ghost Ship tree go public; the paywalled ABZ paper is still
+wanted (the slides state theorems without proofs).
+
 ## 2026-08-18 — L PAPERS BROUGHT CURRENT; TWO NEW ONES; k=6 HARVESTED
+
 
 **The k=6 censuses were already done.** Both n=78 runs finished on dalby
 2026-08-09 and 08-10 (456/456 shards ok, `git=6473890c`) and the output was
