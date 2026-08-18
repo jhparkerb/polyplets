@@ -173,3 +173,52 @@ Two of the three collisions were found by pulling **full text of a source we
 already knew about** rather than by a new search. The slides had been sitting in
 `papers/MISSING.md` as unobtainable; they were free. Before the next round of
 keyword searching, re-try every entry in that file.
+
+## ABZ full text — obtained the same day, and it answers the question the slides left open
+
+The paywalled Asinowski–Barequet–Zheng paper the L6 pass wanted is free: the
+ANALCO 2018 polycube companion, "Polycubes with small perimeter defect,"
+Proc. ANALCO 2018, 93–100. Filed in `papers/`. It carries the proofs the slides
+only stated.
+
+**What the proof actually is.** For a polycube `P` in `Z^d` under face
+connectivity: `p = 6n − e − 2|E|` counting the two ways perimeter is lost,
+giving `p <= 4n+2` and `k = e + 2r` with `r` the circuit rank (their
+Proposition 2.1 — our `k = 2c + t`). Rationality (their Theorem 3.1) is proved
+by *cut shrinking*: a `j`-orthogonal cut is a maximal run of grid slices whose
+projection is a set of pairwise non-adjacent cells with no common neighbours;
+deleting a cut's slices and regluing preserves the defect, cuts are pairwise
+independent, so every polycube shrinks to a unique reduced one. A pattern class
+is a fibre of that map, its generating function is `x^b` times a product of
+`1/(1−x^s)` (s = number of ports of a cut), hence cyclotomic. Finiteness of the
+class count comes from bounding three kinds of special cell — excess cells,
+L-cells, and degree-1 cells — each against `k = e + 2r`, with the degree-1
+bound `|V_1| <= 4|V_{>=3}| + 2` coming from the handshake inequality at maximum
+degree 6.
+
+**Verdict for L6: the king column is a separate derivation, not a corollary.**
+Every mechanical step above is stated in face-adjacency terms — the perimeter
+accounting `6n − e − 2|E|`, the L-cell definition ("occupied neighbours that
+are not opposite"), the non-adjacency condition defining a cut, and the
+handshake bound at max degree 6. None of it is stated lattice-generically, and
+king adjacency breaks the cut condition in particular. The *shape* of the
+argument plainly transports; the theorem does not. So L6's king results are not
+inside their framework, while our square-lattice statements remain their
+theorem re-derived.
+
+**They conjecture what we measured.** Their §4 conjectures that for any `d` and
+fixed `k` the highest-degree factor of the characteristic polynomial is
+`(x−1)^{k+1}`, so that the count is asymptotically `γ n^k`. Our table in
+`results/perimeter-defect-diagonals.md` has exactly `Φ₁^{k+1}` and degree `k`
+for every `k <= 6` on **both** lattices. That reframes the degree row: for the
+square lattice it is evidence for a published conjecture rather than an
+observation of ours, and for king it is evidence for the same conjecture on a
+lattice their framework does not reach. L6 should say so.
+
+**Also settled by the same paper:** their `B(n,d,0) = d` and
+`B(n,d,1) = d(d−1)(n−2)/2`, and the observation that a pattern of defect `k`
+spans at most `k+1` dimensions.
+
+**Not done here, and open for his call:** the L6 edits implied by the two
+paragraphs above — citing the ANALCO paper rather than the slides, and
+restating the degree row as a conjecture-confirmation.

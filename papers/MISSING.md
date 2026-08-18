@@ -655,3 +655,39 @@ separate derivation.
 **Lesson recorded, not just the entry.** Two of the three collisions found in
 the 2026-08-18 priority passes came from pulling full text of sources already
 listed here, not from new keyword searches. Re-try this file before searching.
+
+## Claude's second re-try pass, 2026-08-18 (later) — the ABZ paper is OBTAINED
+
+**The underlying paywalled ABZ paper is no longer wanted.** The full text with
+proofs is free from Simon Plouffe's OEIS citation mirror,
+`plouffe.fr/OEIS/citations/3174304.3175272.pdf` — it is the ANALCO 2018 paper
+A. Asinowski, G. Barequet & Y. Zheng, "Polycubes with small perimeter defect,"
+Proc. ANALCO 2018, 93–100 (SIAM), the 3-dimensional companion to the ENDM 2017
+polyomino note the slides were drawn from. Filed as
+`papers/asinowski_barequet_zheng_2018_polycubes_small_perimeter_defect.pdf`.
+Read; verdict in `docs/priority-passes-2026-08-18.md` §ABZ full text.
+
+**Method note for whoever chases the remaining wants:** that mirror is a flat
+directory of ~800 PDFs at `plouffe.fr/OEIS/citations/`, filenames mostly
+opaque ACM/DOI ids, no search. Grepping its index for our author names yields
+nothing else — `conway.pdf`, `harborth.pdf` and `harborth_diss.pdf` are all
+false friends (Grassmannian packings; a Magdeburg scheduling dissertation by a
+different Harborth). **Do not re-grep that index.** It was found by a title
+search that happened to surface the mirror, so title searches are still the
+route; the mirror itself is exhausted for us.
+
+**Still wanted, and re-confirmed unobtainable this pass:**
+
+- **Barequet & Magal 2023 (Comput. Geom. 108, 101919)** — no preprint, no
+  conference version, no author PDF. Barequet's publications page carries no
+  hrefs at all now and instead offers a reprint-request mailto. **The remaining
+  high-priority perimeter-defect want.** [high]
+- **Andrews, Memoirs AMS 301** — `ams.org/memo/0301/memo0301.pdf` exists and
+  returns an access page, not the PDF, to an unaffiliated fetch. Unchanged:
+  library job. [high]
+- **Rands & Welsh 1981** — OUP `academic.oup.com/imamat/article-abstract/27/1/1`,
+  abstract only, no free copy anywhere. [med]
+- **Barequet & Ben-Shachar, minimal-perimeter counting** — the published version
+  is *Algorithmica* **85**(1) (2023) 75–99, "Algorithms for Counting
+  Minimum-Perimeter Lattice Animals," doi 10.1007/s00453-022-01008-9. No arXiv.
+  Metadata pinned; the citation can now be given correctly even unread. [med]
