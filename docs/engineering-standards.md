@@ -45,6 +45,23 @@ form*. Anything we can state as an invariant is a free, fast tripwire.
   Ship the tripwire *with* the fix; a fix without a regression test is how the
   same bug comes back. (The audit campaign retrofitted this 20×; do it up front.)
 
+## 3b. Never weigh a cell by its size
+
+**A term is wrong if any one of its cells is wrong.** So "T(40,19) is 5.7% of
+a(40)", "43.84% of a(40) has no second source", "97% rule-independent" and every
+other share-of-a(n) figure is banned: it is a number with no decision attached
+to it, and it invites the reading it cannot support — that a term is partly
+trustworthy in proportion to the cells that were checked.
+
+State cells. "Eleven cells of the triangle have one source, and here they are"
+is the same fact without the false arithmetic. `results/provenance-table.md` is
+the form to copy, and `make gate-provenance` pins the count.
+
+Standing ruling, restated 2026-08-18 after this framing reappeared in a day's
+worth of new notes. It applies to papers, notes, commit messages, memory, and
+conversation. Removing it from a historical record is not required where the
+edit would mangle the record; not writing it again is.
+
 ## 4. Don't run a record job from a stale or uncommitted build
 
 The A1 incident's root was a fix that existed but was never committed, so it

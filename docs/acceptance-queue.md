@@ -45,7 +45,7 @@ size) from nothing but the clone.
 "What is confirmed, by which independent source, covering what share" is spread
 across `results/ns_a40/PROVENANCE.md`, `results/strip-engine.md`,
 `results/subgroup-mod4.md`, `results/motley-h17.md` and HANDOFF.md. That spread
-is not auditable by a referee or by us — the strip-coverage vs holdout-mass
+is not auditable by a referee or by us — the strip-coverage vs holdout
 confusion already bit once. Generate one table; gate it against the banked rows
 so it cannot drift.
 

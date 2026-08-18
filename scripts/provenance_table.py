@@ -66,9 +66,10 @@ EXPECTED = {
     "gf_cells": (355, "ns_a40/PROVENANCE.md"),
     "honest_pct": (72.2, "strip-engine.md"),
     "strip_alone_pct": (57.2, "strip-engine.md"),
-    "band_15_19_pct_of_a40": (43.84, "ns_a40/PROVENANCE.md"),
-    "h20_pct_of_a40": (4.16, "ns_a40/PROVENANCE.md"),
-    "h21_pct_of_a40": (2.84, "ns_a40/PROVENANCE.md"),
+    # No share-of-a(n) figures are computed or pinned here.  A cell is
+    # corroborated or it is not; a wrong cell ruins a(n) whatever its size, so a
+    # percentage of a(n) carries no decision and is not tracked.  Standing
+    # ruling, restated 2026-08-18.
     # The cells that carry ONLY the mod-4 congruence -- no exact recount and no
     # closed form.  This is the project's real gap, so it is pinned: if it grows
     # something regressed, and when Confetti lands (Motley H=18) it must shrink,
@@ -134,14 +135,9 @@ def analyse(T, motley_h=MOTLEY_H):
         100 * sum(1 for c in cells if exact[c]) / len(cells), 1)
     stats["congruence_only_mass"] = {}
     stats["strip_alone_pct"] = round(100 * stats["strip_cells"] / len(cells), 1)
-    a40 = a[NMAX]
-    band = sum(T[(NMAX, h)] for h in range(15, 20))
-    stats["band_15_19_pct_of_a40"] = round(100 * band / a40, 2)
-    stats["h20_pct_of_a40"] = round(100 * T[(NMAX, 20)] / a40, 2)
-    stats["h21_pct_of_a40"] = round(100 * T[(NMAX, 21)] / a40, 2)
-    # mass with no exact second source, per row
-    stats["unsourced_mass"] = {
-        n: sum(T[(n, h)] for h in range(1, n + 1) if not exact[(n, h)]) / a[n]
+    # Cells, not shares: per row, which cells have no exact recount.
+    stats["unsourced_cells"] = {
+        n: [h for h in range(1, n + 1) if not exact[(n, h)]]
         for n in range(1, NMAX + 1)
     }
     return a, src, exact, stats
@@ -198,20 +194,21 @@ def write_table(T, a, src, exact, stats):
              "recount, no closed form: **%d**" % len(co))
     if co:
         L.append("")
-        L.append("  | cell | share of its row |")
-        L.append("  |---|---|")
-        for (n, h) in sorted(co):
-            L.append("  | T(%d,%d) | %.2f%% |" % (n, h, 100 * T[(n, h)] / a[n]))
+        L.append("  " + ", ".join("T(%d,%d)" % c for c in sorted(co)))
+        L.append("")
+        L.append("  Each is a cell whose value has one source. That is the "
+                 "statement; a(n) is no better than its worst cell, so how "
+                 "large these cells are is not a fact about how much of a(n) "
+                 "is trustworthy and is deliberately not reported.")
     L.append("\n## Row 40, cell by cell\n")
-    L.append("| H | T(40,H) share | sources |\n|---|---|---|")
-    a40 = a[NMAX]
+    L.append("| H | sources |\n|---|---|")
     for h in range(1, NMAX + 1):
-        s = "".join(sorted(src[(NMAX, h)]))
-        L.append("| %d | %.4f%% | %s |" % (h, 100 * T[(NMAX, h)] / a40, s))
-    L.append("\n## Mass with no exact second source, by row\n")
-    L.append("| n | share of a(n) |\n|---|---|")
+        L.append("| %d | %s |" % (h, "".join(sorted(src[(NMAX, h)]))))
+    L.append("\n## Cells with no exact second source, by row\n")
+    L.append("| n | heights |\n|---|---|")
     for n in range(30, NMAX + 1):
-        L.append("| %d | %.2f%% |" % (n, 100 * stats["unsourced_mass"][n]))
+        hs = stats["unsourced_cells"][n]
+        L.append("| %d | %s |" % (n, ", ".join(map(str, hs)) if hs else "none"))
     L.append("")
     OUT.write_text("\n".join(L))
 
@@ -223,13 +220,17 @@ def selftest(T):
     if bad:
         print("SELFTEST FAILED: clean run should pass:", bad)
         return 1
-    T2 = dict(T)
-    T2[(NMAX, 19)] = T2[(NMAX, 19)] * 2          # corrupt one cell's mass
-    _, _, _, stats2 = analyse(T2, motley_h=MOTLEY_H)
+    # RED: widening Motley's reach by one height must change the pinned count
+    # of congruence-only cells.  (The old control doubled a cell's value and
+    # watched a share move; shares are gone, and a cell count is the right
+    # thing to guard anyway -- it is what the table asserts.)
+    _, _, _, stats2 = analyse(T, motley_h=MOTLEY_H + 1)
     if not check(stats2, verbose=False):
-        print("SELFTEST FAILED: doubling T(40,19) did not move any share")
+        print("SELFTEST FAILED: Motley at H=%d left the pinned cell count "
+              "unchanged" % (MOTLEY_H + 1))
         return 1
-    print("selftest ok: doubling T(40,19) is caught by the band share")
+    print("selftest ok: a one-height change in Motley's reach moves the "
+          "pinned count")
     return 0
 
 

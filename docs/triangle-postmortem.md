@@ -4,8 +4,8 @@
 `aa2b1eb..1e1a2ff`, ~44 hours wall) set out to buy a breakthrough on the
 polyplet count: a(40) checkable by a route that does not re-run the
 enumeration engines, or a proof closing the shared-rule objection. Neither
-was delivered. At wind-down the mission band — H = 15..21 of row 40, 50.84%
-of a(40), single production sweep — remains single-sourced except for two
+was delivered. At wind-down the mission band — H = 15..21 of row 40, single
+production sweep — remains single-sourced except for two
 cells recovered from a pre-campaign run; the Lean route has one proved layer
 out of a dependency graph with eight rows not stated in any form and its
 central definition (`step`) not started; the residue ladder is `WRITTEN,
@@ -63,7 +63,7 @@ can run in an afternoon. Scored that way:
   and "43.84% largest unconfirmed block" written hours after a scout found
   H = 15..16 had been two-sourced two days earlier
   (`results/triangle-r3-ladder-gate.md`).
-- **Round 4**: T(40,15)+T(40,16) two-sourced — 21.64% of a(40), and real —
+- **Round 4**: T(40,15)+T(40,16) two-sourced — two real cells —
   but *recovered from a pre-campaign dalby run*, not produced by the round.
   The executed-round deliverables at stop: ladder H = 17..19 unrun, spin
   parity still in flight, Lean encoding layer proved but the definition it
@@ -260,7 +260,7 @@ Salvage inside a failed campaign — real, and none of it the mission:
   B1 rows and the dirty-tree source that produced them (matching no
   committed blob) sat untracked on dalby until `bd31a58` recovered them.
   A disk failure or cleanup on dalby would have erased the only
-  independent recount of 21.64% of a(40).
+  independent recount of T(40,15) and T(40,16).
 - **A mechanical assertion caught the false width premise** before it
   shaped a compute run — the spin pipeline's stability check failed at
   (n,H) = (4,3), catching by machine what three artifacts and the

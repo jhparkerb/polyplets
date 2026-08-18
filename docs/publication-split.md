@@ -143,7 +143,7 @@ all complete and validated.
 
 - **P1** — the mod-2 / mod-4 subgroup census landed *today*
   (`results/subgroup-mod4.md`, `results/percell-mod4.md`): a parity bit on all
-  820 cells of the a(40) triangle with 0 mismatches, covering 100% of a(40)'s
+  820 cells of the a(40) triangle with 0 mismatches, covering every cell of
   mass including the 43.84% band that previously had no second source at all,
   plus a(n) mod 4 confirmed at every n ≤ 40 and a mod-8 cross-check to n ≤ 32.
   That is a material change to the validation chapter, which until today topped

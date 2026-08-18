@@ -33,37 +33,39 @@ saying it can.
 
 ## What it would buy
 
-Each rung closes one cell at the bottom of row 40 and one at the top.
+Each rung closes one cell at the bottom of row 40 and one at the top, and closes
+two more terms outright.
 
-| | closes outright | row 40 residual | share of a(40) with no exact second source |
-|---|---|---|---|
-| after Half Measure (H≤17) | n ≤ 33 | 7 cells | 25.0% |
-| after Confetti (H≤18, tomorrow) | n ≤ 35 | 5 cells | **15.65%** |
-| after Ticker Tape (H≤19) | n ≤ 37 | 3 cells | **8.83%** |
+| | closes outright | row 40's residual cells |
+|---|---|---|
+| after Half Measure (H<=17) | n <= 33 | 7 |
+| after Confetti (H<=18, tomorrow) | n <= 35 | 5 |
+| after Ticker Tape (H<=19) | n <= 37 | 3 |
 
-Ticker Tape's two cells are T(40,19) = 5.72% and T(40,23) = 1.10% of a(40):
-**6.82% of the term**, plus rule-independent closure of a(36) and a(37).
+Ticker Tape's two cells are T(40,19) and T(40,23), and its two terms are a(36)
+and a(37).
 
-## The rate, and the judgement
+## The judgement
 
-- Confetti: **16.5%** of a(40) second-sourced, plus two terms, for **4.6 days**
-  — 3.6 points per day.
-- Ticker Tape: **6.8%**, plus two terms, for **26–40 days** plus an arena
-  redesign — 0.2 points per day.
+Confetti buys two cells and two terms for 4.6 days. Ticker Tape buys two cells
+and two terms for 26-40 days plus an arena redesign that has to find a factor
+of 1.6 before the job fits in RAM at all. Same purchase, six to nine times the
+wall clock, and a prerequisite nobody has measured.
 
-That is an **18x worse return**, and the qualitative position is unchanged
-either way: after Confetti the honest sentence is "8.8–15.7% of a(40) rests on
-a single engine"; Ticker Tape moves the number and does not remove the
-sentence. a(38), a(39) and a(40) stay outside rule-independent closure at every
-rung of this ladder, and they are the terms the paper is actually judged on.
+The position afterwards is also unchanged in kind. Row 40 still has cells with
+one source, so the sentence "part of row 40 rests on a single engine" survives
+Ticker Tape exactly as it survives Confetti -- three cells instead of five is
+not a different claim, it is the same claim with a smaller list. And a(38),
+a(39) and a(40) stay outside rule-independent closure at every rung of this
+ladder, which is what the paper is actually judged on.
 
-**Recommendation: stop the ladder at Confetti.** Bank H=18, quote n ≤ 35
-rule-independent and 15.65% single-sourced, and spend the month on the
+**Recommendation: stop the ladder at Confetti.** Bank H=18, quote n <= 35
+rule-independent, name the residual cells, and spend the month on the
 release-critical items instead. Revisit only if the arena redesign lands for
 some other reason and H = 19 becomes a weekend rather than a month.
 
 **What does not substitute for it:** Coin Lift's exact-value route is excluded
 by the mod-p floor (`results/coin-lift-g2.md`), so the residual band has no
-cheap alternative closer. The mod-2/mod-4 subgroup census already covers 100%
-of row 40's cells at congruence level (`results/subgroup-mod4.md`); that is a
+cheap alternative closer. The mod-2/mod-4 subgroup census already covers every
+cell of row 40 at congruence level (`results/subgroup-mod4.md`); that is a
 different kind of evidence and it is already banked.

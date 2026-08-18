@@ -4,9 +4,8 @@
 is now marked EXECUTED there (and has one of its two claimed payoffs struck —
 see the correction at the end of this file).
 
-**Headline: 820 cells of the a(40) triangle, 0 parity mismatches, covering
-100% of a(40)'s mass — including the 43.84% band that had no second source at
-all.** Plus `a(n) mod 4` confirmed independently at every n ≤ 40, and a free
+**Headline: 820 cells of the a(40) triangle, 0 parity mismatches — every cell,
+including the H15-19 band that had no second source at all.** Plus `a(n) mod 4` confirmed independently at every n ≤ 40, and a free
 mod-8 cross-check of the banked symmetry corpus at n ≤ 32.
 
 ## What was missing, and why it is a different object
@@ -66,19 +65,19 @@ n ≤ 33.
 
 **mod 4: 40 rows, 40 comparable, 0 mismatches.** a(40) = 3 mod 4 both ways.
 
-**The triangle, per height band** (bands and mass shares are
-`ns_a40/PROVENANCE.md`'s own "Corroboration by mass" partition, so this table
+**The triangle, per height band** (bands follow
+`ns_a40/PROVENANCE.md`'s partition, so this table
 answers that one directly):
 
-| band | cells | share of a(40) | parity mismatches | what it had before |
-|---|---|---|---|---|
-| H1-10 | 355 | 7.52% | 0 | decorrelated fixed-height GFs |
-| H11-14 | 114 | 37.49% | 0 | strip TM (shares `core/transition.h`) |
-| **H15-19** | **120** | **43.84%** | **0** | **none available** |
-| H20 | 21 | 4.16% | 0 | byte-identical re-sweep |
-| H21 | 20 | 2.84% | 0 | real sweep, P_19's fit point |
-| H22-40 | 190 | 4.14% | 0 | closed forms, no holdout possible |
-| **TOTAL** | **820** | **100.00%** | **0** | |
+| band | cells | parity mismatches | what it had before |
+|---|---|---|---|
+| H1-10 | 355 | 0 | decorrelated fixed-height GFs |
+| H11-14 | 114 | 0 | strip TM (shares `core/transition.h`) |
+| **H15-19** | **120** | **0** | **none available** |
+| H20 | 21 | 0 | byte-identical re-sweep |
+| H21 | 20 | 0 | real sweep, P_19's fit point |
+| H22-40 | 190 | 0 | closed forms, no holdout possible |
+| **TOTAL** | **820** | **0** | |
 
 The two rows that matter are H15-19, which the ledger records as having no
 corroboration of any kind, and H22-40, whose closed-form cells no later sweep
@@ -208,4 +207,4 @@ VALUES rather than bits, and it cannot reach them. Its wall grows ~6x per
 height: H=14 took 8.6h on dalby (`results/strip-engine.md`), putting H=15 at
 ~52h and H=19 at ~7.6 years, and its state packing caps out anyway ("State
 packed 4 bits/row -> H<=15 cap"). The parity bit in this file is, realistically,
-the only independent evidence 43.84% of a(40) will ever carry.
+the only independent evidence the H15-19 cells will ever carry.

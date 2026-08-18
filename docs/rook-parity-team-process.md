@@ -333,7 +333,7 @@ not, and all three are adopted:
 
 **Repatriation of remote results.** The campaign's largest result sat
 untracked on dalby for two days, matching no committed blob; a disk failure
-would have erased the only independent recount of 21.64% of a(40)
+would have erased the only independent recount of T(40,15) and T(40,16)
 (`triangle-postmortem.md:259-264`). Neither list touches it, and
 `docs/r3-job-dispatch.md` §"What the lead owes back" returns numbers and a
 log path but not the artifact. Rule: job completion includes rsync of

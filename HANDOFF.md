@@ -433,9 +433,8 @@ Full record and arithmetic: `docs/b1-closure-plan.md`.
 - **Every P_k needed for row 40 is anchored at H <= 20**, so a B1 sweep to
   H = 20 pins the whole H >= 22 band ab initio at **zero additional compute**
   (level k = 40-H; band H >= 22 is k <= 18; P_18's anchors are T(37,19) and
-  T(38,20)). H <= 20 in RAM plus that lock = **97.157% of a(40)
-  rule-independent**, and the entire remaining gap is one cell, **T(40,21) =
-  2.8431%** — P_19's second anchor is T(40,21) itself, so it cannot be reached
+  T(38,20)). H <= 20 in RAM plus that lock leaves **one cell** of row 40 not
+  rule-independent, **T(40,21)** — P_19's second anchor is T(40,21) itself, so it cannot be reached
   by formula. The tower does not cut the sweep: break-even lands exactly on
   H = 21.
 - **RAM ladder against dalby's 121 GB available**, off the measured
@@ -490,7 +489,7 @@ correction below lives in the brief, the bar file, or the lane files.
   cells are closed ab initio — so every level is pinnable from the route's own
   H ≤ 19 sweep, and depth ≥ 5 is consumed nowhere. Not a rescue: both routes
   sweep to half height, so the re-anchored route's base **is** b, and deleting
-  phases B+C (84% of a(40) cpu) is a constant factor, out of scope by the goal's
+  phases B+C cpu) is a constant factor, out of scope by the goal's
   own terms. Corrected gate-0 measurement (e ≤ 3 family DP growth over
   K = 19..25, minutes-scale) is queue row E2, UNRUN.
 - **King→rook transport is DEAD unconditionally**, not merely out of scope
@@ -694,10 +693,9 @@ algorithm sharing no code path with the column engine.
 
 **The load-bearing result is the height-graded form.** D2ax = {e,h,v,r180} is
 exactly the height-preserving subgroup of D4, so `T(n,H) = I_H(D2ax) (mod 2)`
-— one bit per triangle CELL, not two per row. **820 cells, 0 mismatches,
-100% of a(40)'s mass**, including the 120 cells of H15-19 (43.84%, previously
-"none available" above) and the 190 cells of H22-40 that no later sweep can
-hold out. Two bits per row / one per cell, not a proof — a wrong a(40)
+— one bit per triangle CELL, not two per row. **820 cells, 0 mismatches, every cell of the
+triangle**, including the 120 cells of H15-19 (previously "none available"
+above) and the 190 cells of H22-40 that no later sweep can hold out. Two bits per row / one per cell, not a proof — a wrong a(40)
 survives iff its error is 0 mod 4.
 
 A free mod-8 by-product over the banked `Fix(g)` corpus (n <= 32, 0

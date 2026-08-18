@@ -60,7 +60,7 @@ conditionality (`MoatBound`) is a formalization gap, not a mathematical one.
 Rows 1–4 are the
 tier-4 core and are covered in detail by `docs/paper1-reproducibility.md`,
 including the coverage figures (57.2% / 72.2% / 95.4%) and the mass split
-(95.9% of a(40) enumerated, 4.1% composed from held-out closed forms).
+(21 cells of row 40 enumerated, 19 composed from held-out closed forms).
 
 ## Paper 2 — The structure of the polyplet height triangle
 

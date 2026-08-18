@@ -1,7 +1,8 @@
 # Closure — locking P_k with B1, and the RAM ladder that decides how far B1 reaches
 
 Thread name: **Closure**. Opened 2026-08-13. Two things are recorded here: the
-P_k result that makes 100% rule-independent coverage of a(40) reachable at all,
+P_k result that makes rule-independent coverage of every cell of a(40)
+reachable at all,
 and the memory plan for the engine that would deliver it.
 
 Engine: `cutcount_b1` — the colour-symmetrized spin transfer matrix over
@@ -17,21 +18,20 @@ Z[q]/(q^2) (candidate B1). Banked run, source and rows:
 **Every P_k needed for row 40 is anchored at H <= 20, so a B1 sweep to H = 20
 pins the entire H >= 22 band ab initio, at zero additional compute.**
 
-The band structure of a(40), recomputed this session from
-`results/ns_a40/perheight/` by summing T(40,H) (reproduces a(40) =
-56749893611764175164545926946127 exactly):
+Row 40 splits into three bands by how its cells were produced (the summed
+T(40,H) reproduce a(40) = 56749893611764175164545926946127 exactly):
 
-| band | share of a(40) |
-|---|---|
-| H <= 20 | 93.0120% |
-| H = 21 | 2.8431% |
-| H >= 22 | 4.1449% |
+| band | cells | how produced |
+|---|---|---|
+| H <= 20 | 20 | swept |
+| H = 21 | 1 | swept, and P_19's second fit point |
+| H >= 22 | 19 | wired P_k closed forms, never enumerated |
 
-The H >= 22 band was never enumerated by anything — it is wired P_k closed
-forms. The *shape* is a theorem (`docs/proofs/diagonal-law.md`, Lean-complete),
-but the two free coefficients per level are fit from real swept cells, and
-those cells came from the incumbent. So they inherited the incumbent's
-connectivity rule, and the 4.1449% was not rule-independent.
+The H >= 22 band was never enumerated by anything. The *shape* is a theorem
+(`docs/proofs/diagonal-law.md`, Lean-complete), but the two free coefficients
+per level are fit from real swept cells, and those cells came from the
+incumbent. So those 19 cells inherited the incumbent's connectivity rule and
+were not rule-independent.
 
 The onset is sharp — `diagonal-law.md` step 5: P_k governs n >= 2k+1 — so the
 cheapest pinning of level k is
@@ -51,7 +51,7 @@ Consequences:
   already doing — the engine outputs whole rows C_H(n), n = 1..40. **The P_k
   lock costs no additional compute.**
 - It converts H >= 22 from inherited-rule to rule-independent, so H <= 20
-  in RAM means **97.157% of a(40) two-sourced**, and the entire remaining gap
+  in RAM means **every cell of a(40) two-sourced but one**, and the remaining gap
   is one cell, T(40,21).
 - Better than pinned: each level gets a rule-independent holdout inside the
   same sweep. P_5's diagonal continues through H = 8..21, thirteen cells past
@@ -169,12 +169,12 @@ H18 **4.9x**, H19 **15.2x**, H20 **47.7x**, H21 **151x**.
 
 ### Where to stop
 
-- **Stop after A** and you have H = 17 — 9.06% of a(40), and, more to the
+- **Stop after A** and you have H = 17 and, more to the
   point, a measured wall, RSS and census ratio under every projection below.
 - **Stop after C** and you have H = 18. B and F buy no height on their own;
   they are the margin that lets D and E land, and F is a prerequisite for them
   being worth anything.
-- **Stop after D** and you have H = 19 at 87 GB — cumulative 88.85% of a(40)
+- **Stop after D** and you have H = 19 at 87 GB —
   swept, plus P_0..P_17 locked, which is the H >= 23 band as well.
 - **E + G together** are what H = 20 costs, and H = 20 is the height that
   finishes the job: 97.157% swept-or-locked, everything but T(40,21). E alone

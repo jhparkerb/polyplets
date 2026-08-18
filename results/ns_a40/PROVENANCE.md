@@ -33,8 +33,8 @@ phase C would **inject** H21 from P_19 instead of sweeping it — P_19
 being the formula fitted to that very cell. The value is provably
 unchanged (the closed-form H21 strip was checked against the real sweep
 and matches on all 20 rows), but the run's strongest validation
-artifact, the P_0..P_18 mass holdout below, would silently fail to
-regenerate.
+artifact, the P_0..P_18 holdout certification below, would silently fail
+to regenerate.
 
 `scripts/dalby_term.sh` therefore pins `--max-diag-k 18` on all three
 phases for N >= 40 (`b2fde69`, AUDIT-2026-07-30 D1). Reproducing this
@@ -113,60 +113,31 @@ and the recovery carries no remaining caveat.**
 - Growth a(40)/a(39) = 6.9352 (6.9212, 6.9261, 6.9308, 6.9352 — smooth
   approach to lambda ~= 7.11).
 
-## Corroboration by mass
+## Corroboration, cell by cell
 
-Confidence tiers are usually quoted per *term*; for a(40) the useful
-question is what fraction of the 5.67e31 polyplets is corroborated by
-something other than the one production sweep that produced it. Shares
-are of a(40) itself (recomputed from `perheight/h*.out`, row n=40):
+**Superseded 2026-08-18.** This section used to weigh each height band by its
+share of a(40) and report what fraction of the term was corroborated. That
+framing is withdrawn, and not for style: a(40) is wrong if any one of its cells
+is wrong, so the size of a cell says nothing about how much of the term can be
+trusted, and a percentage there invites exactly the reading it cannot support.
 
-| height band | share of a(40) | independent corroboration |
-|---|---|---|
-| H1-10 | 7.52% | yes — matches the decorrelated fixed-height GFs expanded to n=40 (355 cells) |
-| H11-14 | 37.49% | yes — strip TM N=40 run (2026-07-30, 469 cells, 0 mismatch; `results/strip-engine.md`) — second source, not fully independent (shares `core/transition.h`'s union-find rule) |
-| H15-19 | **43.84%** | congruence-level only — T(n,H) ≡ I_H(D2ax) mod 2 checked at all 120 cells of the band, 0 mismatches, by the subgroup census (`results/subgroup-mod4.md`, 2026-08-07, `gate-subgroup`); an algorithm sharing no code path with the column engine. Not an exact recount: a wrong value survives iff its error is 0 mod 4. No exact second source available. *(Row previously said "none available", stale 2026-08-07..14.)* |
-| H20 | 4.16% | yes — byte-identical standalone re-sweep (`recheck/h20.out`) |
-| H21 | 2.84% | real sweep, but this is P_19's second fit point; no holdout is possible at any n |
-| H22-40 | 4.14% | closed forms P_0..P_18, every one with a passed real-swept holdout |
+The corroboration record is now `results/provenance-table.md`, generated and
+gated (`make gate-provenance`), which states per cell which sources recomputed
+it. The standing facts, in the form that carries a decision:
 
-So a(40)'s bulk — four fifths of it — rests on the single kink-carry
-production sweep of heights 11-19. That is what the README's T2- grade
-means, quantified. Nothing here suggests a wrong value (see Validation
-above); it states the denominator honestly.
-
-### Holdout-confirmed mass, a(35)..a(40)
-
-The same accounting applied to the closing terms answers a sharper
-question: how much of each term did a *closed form predict first and a
-later real sweep then confirm*? Those are the cells in closed-form
-territory (k = n-H <= 18, the shipped fence) that the a(40) run's real
-sweeps (H <= 21) actually reach:
-
-| term | holdout-confirmed mass |
+| height band | independent corroboration |
 |---|---|
-| a(35) | 18.8% |
-| a(36) | 13.5% |
-| a(37) | 9.1% |
-| a(38) | 5.5% |
-| a(39) | 2.5% |
-| a(40) | **0.0%** |
+| H1-10 | yes — matches the decorrelated fixed-height GFs expanded to n=40 (355 cells) |
+| H11-14 | yes — strip TM N=40 run (2026-07-30, 469 cells, 0 mismatch; `results/strip-engine.md`) — second source, not fully independent (shares `core/transition.h`'s union-find rule) |
+| H15-19 | congruence-level only — `T(n,H) = I_H(D2ax) mod 2` at all 120 cells of the band, 0 mismatches (`results/subgroup-mod4.md`, `gate-subgroup`), an algorithm sharing no code path with the column engine. Not an exact recount: a wrong value survives iff its error is 0 mod 4 |
+| H20 | yes — byte-identical standalone re-sweep (`recheck/h20.out`) |
+| H21 | real sweep, but this is P_19's second fit point; no holdout is possible at any n |
+| H22-40 | closed forms P_0..P_18, every one with a passed real-swept holdout |
 
-It decays to exactly zero at a(40) for a structural reason, not a
-sloppy one: a(40)'s closed-form cells start at H=22, above every real
-sweep that will ever exist, because the sequence closes here. No later
-run can confirm them. This is the T2- grade from the other side — the
-same fact as "H21 is P_19's fit point" in the table above.
-
-### Strip second source
-
-The independent strip transfer-matrix engine
-(`results/strip-engine.md`) is bounded by its reach. As banked, that run
-is H<=14 and **n<=36**, so it touches no cell of rows 37-40: the strip
-second-sources **0%** of a(37), a(38), a(39) and a(40). The strip run
-extended to N=40 COMPLETED 2026-07-30 (dalby, ~8.6 h, 469 cells, 0
-mismatch; `results/strip_C14_n40_run.log`) and covers H<=14 at those
-rows, which is (recomputed from `perheight/h*.out`) **53.8%** of a(37),
-**50.8%** of a(38), **47.9%** of a(39) and **45.0%** of a(40).
+So the cells of heights 15-19, 21 rest on the single kink-carry production
+sweep plus a congruence. That is what the README's T2- grade means. Nothing
+here suggests a wrong value (see Validation above); it states which cells have
+one source.
 
 ## Notes
 

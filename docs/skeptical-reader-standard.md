@@ -50,21 +50,25 @@ and an afternoon. Any check they cannot execute is a claim, not a check.
 
 ## The exposure map
 
+Cell counts, not shares. A term is wrong if any one of its cells is wrong, so
+weighting a cell by its size states nothing about how far the term can be
+trusted; the share column this table used to carry was removed 2026-08-18.
+
 Measured from the banked triangle at the time of writing
 (`experiments/tristruct/triangle.py`, row 40 by provenance class):
 
-| band | share of a(40) | provenance |
+| band | cells in row 40 | provenance |
 |---|---|---|
-| H ≤ 14 | 45.01% | real sweep; also strip-TM confirmed, 0 mismatch |
-| H = 15…21 | 50.84% | real sweep; **single production sweep, no second computation** |
-| H = 15…19 | 43.84% | the largest unconfirmed block inside that band |
-| H ≥ 22 | 4.14% | wired P_k closed forms, never enumerated |
-| H ≤ 2 | < 0.01% | engine's analytic low-strip rows, never swept |
+| H ≤ 14 | 14 | real sweep; also strip-TM confirmed, 0 mismatch |
+| H = 15…21 | 7 | real sweep; **single production sweep, no second computation** |
+| H = 15…19 | 5 | the unconfirmed block inside that band |
+| H ≥ 22 | 19 | wired P_k closed forms, never enumerated |
+| H ≤ 2 | 2 | engine's analytic low-strip rows, never swept |
 
 Read the second row as the mission. An idea that touches only H ≥ 22 is
 checking a formula chain the reader is not worried about. An idea that touches
 only H ≤ 14 is re-confirming the confirmed. **State, in the first line of the
-claim, what share of a(40) the idea reaches and by which provenance class**, and
+claim, which cells the idea reaches and by which provenance class**, and
 quote `triangle.provenance(n,H)` for each cell rather than inferring it. The
 rule of thumb: H ≥ 22 is wired P_k at every n, H = 3…21 is real sweep, H ≤ 2 is
 the low strip.
@@ -134,7 +138,7 @@ Every candidate, in every deliverable, opens with this block filled in. A
 candidate without it is not scored.
 
     claim:
-    share of a(40) reached:            __%  (bands: ____; provenance: ____)
+    cells reached:                     ____  (bands: ____; provenance: ____)
     bits against enumeration error:    __
     bits against formula-chain error:  __   conditional on: ____
     rule independence:                 ____
@@ -172,7 +176,7 @@ Each of these has cost a real round. Any one of them zeroes the candidate.
 
 Rank by, in order:
 
-1. bits against enumeration error, over the share of a(40) reached;
+1. bits against enumeration error, over the cells reached;
 2. proof-backed over fitted, at equal bits;
 3. checker cost to the reader, cheapest first.
 
