@@ -91,9 +91,15 @@ series and no extrapolation, against a $700$-term enumeration plus
 extrapolation for $200$. We report $r$ to $251$ digits and find no integer
 relation for it in any box the precision supports.
 
-What none of this reaches is a sharp asymptotic. The repository has no proof
-that any series in this family satisfies $A(n) \sim C\mu^n$, so the second
-exponential is asking for strictly more than is known about the first.
+The measured spectrum turns out not to be a list of decimals: all four
+exponentials, the negative one included, are reciprocals of zeros of the
+$q$-Bessel-type kernel that solves the area-refined functional equation, which
+makes the subdominant ratio a ratio of two kernel zeros.
+
+What none of this reaches is a sharp asymptotic. The repository still has no
+proof that any series in this family satisfies $A(n) \sim C\mu^n$; what the
+kernel changes is that the missing step is now named --- simplicity of the
+remaining poles and control of the tail --- rather than absent.
 \end{abstract}
 
 \tableofcontents
@@ -315,6 +321,49 @@ the leading claims, each against the weaker of the two trusted counts.}
 Two negative controls are required to fail, and do: the block's $\lambda_1$ and
 $\lambda_2$ match no root of $D_{\mathrm{asc}}$, to $0$ and $1$ digits, and the
 staircase's $\lambda_2$ matches no root of $D_{\mathrm{desc}}$, to $1$.
+
+\subsection{The spectrum is the kernel's zero set}
+\label{sec:kernelspectrum}
+
+Prony's method measures those exponentials without any model. There is a model,
+and it accounts for all four.
+
+The companion paper's \S``The kernel, and what it certifies'' solves the
+area-refined functional equation by Temperley's method and reduces the
+generating function to $c_0 + c_1\alpha/K$, meromorphic on the unit disc with
+poles only at zeros of $K$ and of a $2\times2$ determinant. The leading
+exponential is $1/q_1$ with $q_1$ the smallest positive zero of $K$. The rest
+of the spectrum is the rest of the zeros:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l l}
+\toprule
+measured by Prony & zero of $K$ & $1/q$ \\
+\midrule
+$\lambda_1 = 3.12894326973088\dots$ & $q_1 = 0.3195967180593874655$ & $3.128943269730886252$ \\
+$\lambda_2 = 1.50504922775900\dots$ & $q_2 = 0.6644300940833578092$ & $1.505049227759003935$ \\
+$\lambda_3 = 1.28433727098118\dots$ & $q_3 = 0.7786116798090276394$ & $1.284337270981181429$ \\
+$\lambda_4 = -1.25776216033063\dots$ & $q_4 = -0.7950628755893912422$ & $-1.257762160330635483$ \\
+\bottomrule
+\end{tabular}
+\caption{Agreement to every digit Table~\ref{tab:prony} prints, and to $39$ on
+$\lambda_1$. $\lambda_4$ is negative, so it can only come from a negative zero;
+the certification work scanned the positive axis only and never saw it.}
+\label{tab:kernelzeros}
+\end{table}
+
+Two consequences. The subdominant ratio $\rho = \lambda_2/\lambda_1$ of
+Table~\ref{tab:tableB} is $q_1/q_2$, a ratio of two kernel zeros rather than a
+measured decimal. And the sign in $\lambda_4$, which a coefficient-level reading
+can only record, is the sign of a zero.
+
+What this does \emph{not} do is prove Conjecture~\ref{conj:sharp}. A
+meromorphic function with poles at $q_1, q_2, \dots$ gives the stated expansion
+once one knows the poles are simple, that nothing else contributes, and that the
+tail is controlled; the first is certified at $q_1$ and the rest is the analytic
+bookkeeping L5 states as an open problem. The conjecture's \emph{shape} is now
+explained; its status is unchanged.
 
 \subsection{Amplitudes and error terms}
 \label{sec:notbuy}
@@ -597,9 +646,31 @@ continuation that a proof of Conjecture~\ref{conj:sharp} needs.
 
 \begin{openproblem}[a sharp asymptotic, for anything in this family]
 Prove $A(n) \sim C\mu^n$, or the same for $M(n)$. Nothing in either paper
-reaches it, and Conjecture~\ref{conj:sharp} depends on it. The most concrete
-route is a proof of Kurkov's conjectured continued fraction for \oeis{A225114},
-which would supply the meromorphic continuation and the spectral gap.
+reaches it, and Conjecture~\ref{conj:sharp} depends on it. Two routes are now
+concrete rather than one: the kernel of \S\ref{sec:kernelspectrum}, which needs
+simplicity of the poles beyond $q_1$ and a controlled tail, and a proof of
+Kurkov's conjectured continued fraction for \oeis{A225114}, which would supply
+the meromorphic continuation and the spectral gap by a different road.
+\end{openproblem}
+
+\begin{openproblem}[does the second pole family explain $\nu$?]
+\label{op:det}
+The descending half's spectrum --- $2.51457964$, $1.43040460$, $1.24846593$,
+$1.17441805$ --- appears nowhere in Table~\ref{tab:kernelzeros}. But $K$ is only
+one of the two factors that can vanish: the solution's $2\times2$ determinant is
+the other, and its zeros are a second pole family nobody has scanned. If $\nu$
+is the reciprocal of the smallest of them, both halves of the interleaving in
+Table~\ref{tab:prony} have one mechanism and this paper's central observation
+becomes a statement about two zero sets rather than about two measurements.
+
+Attempted here and \emph{not} settled: building the determinant as a truncated
+$q$-series with the solver's own arithmetic and scanning it gives a smallest
+positive zero that moves with the truncation order --- $1.2433$ at $24$ terms,
+no sign change at all at $32$, $1.1794$ at $40$ and $48$ --- and returns the
+same value for the king and the control, which cannot be right. The
+determinant's zeros need a construction that converges, not a longer scan of
+this one. \repo{experiments/convex\_det\_zeros.py} is the negative attempt,
+kept so the next one starts after it rather than before.
 \end{openproblem}
 
 \begin{openproblem}[the block series $T$]

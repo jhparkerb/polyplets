@@ -781,3 +781,11 @@ The meromorphic structure has a second pole family, at the zeros of the 2x2
 determinant `det` of the s04 solution, and whether `nu = 2.5145796` is
 `1/(smallest zero of det)` is untested. If it is, both halves of L7's
 interleaving have one mechanism.
+
+**Negative attempt, 2026-08-18.** Testing whether `nu` is `1/(smallest zero of
+det)` by building det as a truncated q-series with the s04 solver's arithmetic
+does not converge: the smallest positive zero reads 1.2433 at 24 terms, no sign
+change at 32, and 1.1794 at 40 and 48, and king and control return identical
+values, which they cannot. Nothing is concluded about `nu`; the question needs a
+convergent construction of det, not a wider scan.
+`experiments/convex_det_zeros.py`.
