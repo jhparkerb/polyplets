@@ -14,9 +14,10 @@
 %  The min-end runs were already done: square4 deep boxes (W=15,17) 08-08 and
 %  ayr's square8 p=48 census 08-07.
 %
-%  NOVELTY STATUS: UNCHECKED, and additionally the square-lattice column
-%  REPRODUCES Asinowski-Barequet-Magal-Zheng, which is paywalled and held only
-%  as slides.  Say so; do not claim the square column.
+%  NOVELTY STATUS: swept 2026-08-18.  The square-lattice column REPRODUCES
+%  Asinowski-Barequet-Zheng, whose full text (ANALCO 2018) is now held and
+%  read.  Do not claim the square column; the king column is a separate
+%  derivation, NOT a corollary of their framework -- see sec:novelty.
 %
 %  Source material, all in this repository:
 %    results/perimeter-defect-diagonals.md   the maximum end
@@ -43,16 +44,17 @@
 \begin{document}
 \maketitle
 
-\firstdraftbanner[ Two further gates are specific to this paper. No literature
-sweep has been run on it, and the square-lattice column here \emph{reproduces}
-published work we hold only as slides (\S\ref{sec:novelty}); neither the king
-column nor the minimum end has been searched at all.]
+\firstdraftbanner[ One further gate is specific to this paper. A literature
+sweep ran on 2026-08-18 and the square-lattice column here \emph{reproduces}
+published work now held in full (\S\ref{sec:novelty}); the king column and the
+minimum end survived that sweep, but a negative from one pass is weaker than a
+positive.]
 
 \Ldisclosure{%
 \emph{The identity $k = 2c + t$ and the monotonicity that licenses the search
 prune} --- \textbf{proved}, and they are what make every measured value in this
 paper trustworthy. The identity is \textbf{not ours}: it is
-\cite{abmz2022}'s $k = e + 2f$ for the square lattice, re-derived here for king
+\cite{abz2018}'s $k = e + 2f$ for the square lattice, re-derived here for king
 in ignorance of that (Remark~\ref{rem:abzidentity}).
 \emph{The formulae of Tables~\ref{tab:maxend} and~\ref{tab:mincoeffs}} ---
 \textbf{measured and interpolated, not proved}. Degrees and onsets are read off
@@ -71,8 +73,9 @@ quotient with an explicit infinite product, verified to $n = 40$. It is
 (\S\ref{sec:k6}). The onset, the $\Phid_3$ exponent and the absence of
 $\Phid_4$ hold; the $\Phid_2$ leading diagonal's closed form does not, and is
 withdrawn here rather than repaired.
-\emph{Novelty} --- pass run 2026-08-18, and it found that both the defect
-identity and the cyclotomic-denominator theorem are \cite{abmz2022}'s.
+\emph{Novelty} --- pass run 2026-08-18, and it found that the defect
+identity, the cyclotomic-denominator theorem and the degree column are all
+\cite{abz2018}'s, the last as a conjecture this paper confirms.
 \S\ref{sec:novelty} lists what survives and what does not.
 \emph{Human verification:} none, as of this draft.}
 
@@ -157,7 +160,7 @@ a cell is added to an animal.
 \begin{remark}[this identity is published, for the square lattice]
 \label{rem:abzidentity}
 Proposition~\ref{prop:kct} is not ours on the square lattice. Asinowski,
-Barequet and Zheng~\cite{abmz2022} state it as $k = e + 2f$, with $e$ the total
+Barequet and Zheng~\cite{abz2018} state it as $k = e + 2f$, with $e$ the total
 excess summed over perimeter cells and $f$ the number of inner faces of the dual
 map --- the circuit rank. That is the present statement with $c = f$ and
 $t = e$, and their proof is the same accounting: four neighbours per cell, less
@@ -165,6 +168,10 @@ the excesses, less two per spanning-tree edge, less two per cycle-closing edge.
 It was re-derived here for the king lattice without knowing that, and the
 king case does not follow from theirs by substitution --- the per-cell degree,
 and hence $\pmaxx$, changes --- but the identity and its proof idea are theirs.
+Their full text was obtained after this paper was drafted, and it confirms the
+reading: their accounting is $p = 6n - e - 2|E|$ in three dimensions, the same
+two-sources-of-loss argument, with $|E| \ge n-1$ giving the bound and the
+circuit rank giving the excess over a spanning tree.
 \end{remark}
 
 \begin{proof}[Sketch, with the full argument in the enumerator's header]
@@ -216,6 +223,19 @@ coefficients do not.}
 \textbf{Onset.} $\mathrm{onset}(k) = \tbinom{k+1}{2} + 3$ for $k \ge 2$.
 \end{quote}
 
+\begin{quote}
+\textbf{Degree.} $\deg Q_k = k$, equivalently $\Phid_1^{k+1}$ exactly, for
+every $k \le 6$ on both lattices.
+\end{quote}
+
+That row is not an observation of ours either. \cite{abz2018} conjecture, in
+any dimension and for any fixed defect, that the highest-degree factor of the
+characteristic polynomial is $(x-1)^{k+1}$ --- contributed by the pattern of
+$k+1$ independent legs --- so that the count is asymptotically $\gamma n^k$.
+The square column here is evidence for that conjecture at $d = 2$ through
+$k = 6$, and the king column is evidence for the same statement on a lattice
+their framework does not reach.
+
 Five consecutive hits on each lattice ($6, 9, 13, 18, 24$). The degenerate
 cases $k = 0, 1$ have onsets $2$ and $3$ against the formula's $3$ and $4$,
 which is exactly why scanning the whole sequence $2,3,6,9,13,18$ found nothing.
@@ -257,10 +277,20 @@ coefficient, $\Phid_3$ only the constant --- gives, across $k \le 6$,
 $k = 6$, tested and not merely assumed).
 
 That the denominators are cyclotomic at all is, again, published on the square
-lattice: \cite{abmz2022} prove that for each fixed $k$ the generating function
+lattice: \cite{abz2018} prove that for each fixed $k$ the generating function
 of $(A(n, 2n+2-k))$ is rational \emph{with denominator a product of cyclotomic
 polynomials}, and record the same main result in $d$ dimensions for polycubes.
-So the frame of this subsection is the king analogue of their theorem. What is
+So the frame of this subsection is the king analogue of their theorem. It is an
+analogue and not a corollary: their proof shrinks maximal runs of grid slices
+whose projection is a set of pairwise non-adjacent cells, to a unique reduced
+representative per pattern class, and bounds the number of such classes through
+excess cells, $L$-cells and degree-1 cells. Every one of those steps is stated
+under face connectivity --- the perimeter accounting, the definition of an
+$L$-cell as an occupied cell with two occupied neighbours that are not
+opposite, the non-adjacency condition defining a cut, and a handshake bound at
+maximum degree $6$. King adjacency breaks the cut condition in particular. The
+shape of the argument transports; the theorem does not, which is why
+the king column of \S\ref{sec:max} is measured rather than cited. What is
 not in their work, as far as the pass of
 \repo{docs/priority-passes-2026-08-18.md} reached, is the exponent rule boxed
 below --- which $\Phid_d$ appears at which $k$ --- and everything the
@@ -683,11 +713,11 @@ lattices --- now runs through $k = 6$.
 \label{sec:novelty}
 
 A literature-priority pass ran on 2026-08-18
-(\repo{docs/priority-passes-2026-08-18.md}). It obtained the full text of the
-Asinowski slides, which the repository had previously recorded as unavailable,
-and the result is worse than the earlier note here claimed: the collision is not
-only that the square column reproduces \cite{abmz2022}, but that two statements
-this paper leans on are theirs.
+(\repo{docs/priority-passes-2026-08-18.md}). It obtained first the Asinowski
+slides and then the full paper behind them, both of which the repository had
+recorded as unavailable, and the result is worse than the earlier note here
+claimed: the collision is not only that the square column reproduces
+\cite{abz2018}, but that three statements this paper leans on are theirs.
 
 \begin{enumerate}
 \item \textbf{The defect identity} $k = 2c + t$ is their $k = e + 2f$
@@ -698,7 +728,29 @@ this paper leans on are theirs.
   \S\ref{sec:cyclo} is the king analogue of it.
 \item Their small cases agree with the square column here: $A(n,2n+2) = 1$ for
   $n \ge 2$, and $A(n,2n+1) = 4(n-2)$ for $n \ge 3$.
+\item \textbf{The degree column is their conjecture}, confirmed here and not
+  discovered here: their \S4 predicts a highest-degree factor $(x-1)^{k+1}$
+  and asymptotics $\gamma n^k$ in any dimension.
 \end{enumerate}
+
+A second pass the same day obtained the full text with proofs
+(\cite{abz2018}, the polycube companion to the note the slides were drawn
+from), which sharpens the verdict in one direction that matters. Their
+rationality proof runs by shrinking cuts to a unique reduced representative per
+pattern class and bounding the class count through excess cells, $L$-cells and
+degree-1 cells; every step of it is stated under face connectivity, down to a
+handshake bound at maximum degree $6$. \textbf{The king column is therefore a
+separate derivation and not a corollary of their framework} --- the argument's
+shape transports, its statements do not. That is the strongest thing this paper
+can claim on the structural side, and it is a claim about their proof, not a
+new theorem.
+
+\paragraph{The square column's reach is also not new.} \cite{barequetmagal2023}
+give an algorithm that emits the closed formulae and generating functions per
+defect on the square lattice up to $k = 5$, where $k \le 3$ was previously
+published. We hold that paper only by its abstract, so the comparison cannot be
+made line by line, but the square column here should be read as agreeing with
+it rather than extending it below $k = 6$.
 
 \paragraph{What the pass did not find anywhere.} The king column throughout; the
 onset formula $\binom{k+1}{2} + 3$; the two-lattice universality of period,
@@ -720,7 +772,9 @@ what an unqualified ``new'' would mean.
 \section{Open problems}
 
 \begin{openproblem}[prove the degree and the onset]
-Table~\ref{tab:maxend} is interpolation. The height grading has a proof
+Table~\ref{tab:maxend} is interpolation, and its degree column is a published
+conjecture (\cite{abz2018}, \S4) confirmed rather than proved. The height
+grading has a proof
 (polynomial times exponential, degree $\le k$, sharp onset $2k+1$) because a
 single-cell row is a cut and the decomposition is exact. The perimeter defect
 supports no such cut --- that is exactly why the row-transfer approach fails
