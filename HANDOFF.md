@@ -1,5 +1,21 @@
 # HANDOFF — live state (updated 2026-08-18)
 
+## RUNNING — k=7 defect calibration (dalby, window `k7-calib`, since 2026-08-18 17:40Z)
+
+`scripts/dalby_perimeter_defect_k7_calib.sh`, 12 single cores alongside
+Confetti, binary `git=6473890c` (the k=6 census stamp). Single-core wall at
+`n = 30, 34, 38` for `k = 6` and `k = 7`, both lattices; the `k = 6` cells are
+controls against the recorded 254/692/1666 s. **Purpose: price k=7 before
+anyone commits to it** --- the pool script's `n^7.9` model predicted 1.8 h for
+the k=6 census and the truth was 42 h king / 23 h square at 76-way, so that
+model is refuted and a fresh exponent plus a k=7:k=6 ratio are needed. Result
+tier: planning input, not a paper number. Resumable per cell; kill by PID.
+
+**The k=7 census is NOT approved and NOT launched.** If Phi_4 enters at k=7 as
+the exponent rule predicts, the fit needs ~44 series coefficients against 32,
+on an onset of 31 against 24 --- a materially larger n than the k=6 run's 78,
+against a cost that already came in 23x over its estimate.
+
 ## 2026-08-18 (latest) — THE ABZ PAPER WAS FREE; L6 EDITS PENDING
 
 The paywalled Asinowski--Barequet--Zheng paper the L6 pass wanted is obtained:
