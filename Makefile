@@ -42,7 +42,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         papers papers-verify papers-clean papers-list
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-receipts gate-provenance gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-receipts gate-provenance gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -66,6 +66,18 @@ endif
 
 gates:
 	@$(MAKE) --no-print-directory -j$(JOBS) $(GATE_TARGETS)
+
+# Gate BFILES: every uploaded OEIS b-file term, re-derived from banked data --
+# a(n) from the triangle's row sums, the whole symmetry family by Burnside from
+# results/sym_counts.txt, non-polyominoes against fixtures/b000105.txt -- plus
+# format hygiene (contiguous n, nonnegative values, no duplicates). A wrong
+# digit in a b-file is the most embarrassing failure available here and nothing
+# re-derived these artifacts before. Three RED controls, each of which must
+# fire, including a term dropped from the MIDDLE (a trailing drop is reported
+# as staleness, not failure). ~1 s.
+gate-bfiles:
+	python3 scripts/bfile_gate.py --selftest
+	python3 scripts/bfile_gate.py
 
 # Gate PROVENANCE: results/provenance-table.md is generated, and every headline
 # share it carries is recomputed here from the banked triangle and compared with
