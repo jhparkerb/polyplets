@@ -50,7 +50,15 @@ PLACEHOLDER = set("{}<>*?$:")
 EXEMPT_WORDS = ("deleted", "removed", "planned", "todo", "deliverable",
                 "never existed", "no such file", "in memory", "not a path",
                 "since removed", "to be written")
-EPHEMERAL_RE = re.compile(r"^(runs|build)/|^results/(ns_a\d+|redelmeier_)")
+# Trees a CLONE legitimately does not have.  Until 2026-08-18 this list was
+# tuned on a working tree, where untracked leftovers made citations look live;
+# in a clean clone -- which is what a reader gets -- 101 citations pointed at
+# nothing.  papers/ is the gitignored literature library (copyrighted PDFs stay
+# local, and paper/README.md says so); polyplets/.lake/ is vendored Mathlib that
+# `lake build` fetches.  Both are correct citations into a working copy and are
+# not repo content.
+EPHEMERAL_RE = re.compile(r"^(runs|build)/|^results/(ns_a\d+|redelmeier_)"
+                          r"|^papers/|^polyplets/\.lake/")
 
 
 # results/ghostship/ is a frozen record of a DIFFERENT filesystem: the sandbox
