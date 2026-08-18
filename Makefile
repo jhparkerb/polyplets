@@ -42,7 +42,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         papers papers-verify papers-clean papers-list
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-receipts gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-receipts gate-provenance gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -66,6 +66,18 @@ endif
 
 gates:
 	@$(MAKE) --no-print-directory -j$(JOBS) $(GATE_TARGETS)
+
+# Gate PROVENANCE: results/provenance-table.md is generated, and every headline
+# share it carries is recomputed here from the banked triangle and compared with
+# the note that publishes it. Five notes used to state these figures separately
+# and one pair had already drifted (strip cell coverage vs holdout mass). Also
+# pins the count of cells carrying ONLY the mod-4 congruence: if that grows,
+# something regressed; when Motley reaches H=18 it must shrink, which fires the
+# gate and forces the number to be updated deliberately rather than silently.
+# Includes a RED control (--selftest). ~1 s, no build needed.
+gate-provenance:
+	python3 scripts/provenance_table.py --selftest
+	python3 scripts/provenance_table.py --check
 
 # Gate PERIMETER-DEFECT: the pruned max-end search vs g2 --siteperim (A), vs
 # its own unpruned control (B), marginal consistency (C), and --split shards
