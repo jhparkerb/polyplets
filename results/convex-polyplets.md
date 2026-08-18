@@ -747,3 +747,37 @@ and polyomino give the identical law. Enting & Guttmann, "Area-weighted
 moments of convex polygons on the square lattice", J. Phys. A 22 (1989), is
 linked from A005436 and covers this ground for the control family; read it
 before any further work on moments here.
+
+### New 2026-08-18: the Prony spectrum is the reciprocal zero set of K
+
+The salvage identified `mu = 1/q_1` with `q_1` the smallest positive zero of the
+Temperley denominator `K(q)`. L7 measures the next three exponentials of the
+same series by Prony's method, with no kernel input at all. They are the next
+three zeros, sign included:
+
+| Prony (L7, measured) | zero of K | 1/q |
+|---|---|---|
+| `lambda_1 = 3.12894326973088...` | `q_1 = 0.3195967180593874655186029` | `3.128943269730886252277448` |
+| `lambda_2 = 1.50504922775900...` | `q_2 = 0.6644300940833578091864194` | `1.505049227759003934665694` |
+| `lambda_3 = 1.28433727098118...` | `q_3 = 0.7786116798090276393820133` | `1.284337270981181428551058` |
+| `lambda_4 = -1.25776216033063...` | `q_4 = -0.795062875589391242237668` | `-1.257762160330635483241742` |
+
+Agreement is to every digit L7 prints (14; `lambda_1` to 39). `lambda_4` is
+negative and can only come from a **negative** zero, which the salvage's
+positive-axis scan never looked for; it is there, at `q = -0.7950628755894`.
+So the measured exponential spectrum of the unrestricted and staircase series
+is `1/zeros(K)` as a set with multiplicity of sign, not merely in its first two
+members. Script: `experiments/convex_kernel_zeros.py` (mpmath, 60 dps, sign
+changes on a grid then bisected; both signs scanned).
+
+Consequence for L7: the subdominant rate `rho = lambda_2/lambda_1 = q_1/q_2 =
+0.481008794` stops being a measured decimal and becomes a ratio of two kernel
+zeros. It does not prove the sharp asymptotic — that still needs the analytic
+bookkeeping named in L5's Open Problem on the zeros of K.
+
+**Open, and the natural next test:** the descending half's spectrum
+(`2.51457964, 1.43040460, 1.24846593, 1.17441805`) is *not* in the list above.
+The meromorphic structure has a second pole family, at the zeros of the 2x2
+determinant `det` of the s04 solution, and whether `nu = 2.5145796` is
+`1/(smallest zero of det)` is untested. If it is, both halves of L7's
+interleaving have one mechanism.
