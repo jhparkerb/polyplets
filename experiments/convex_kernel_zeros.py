@@ -44,11 +44,14 @@ def K(q, terms=400):
 
 
 def bisect(lo, hi, iters=400):
+    """Plain bisection.  One K evaluation per step, not two -- K is a 400-term
+    series at 60 digits and this loop runs a few hundred times per zero."""
     flo = K(lo)
     for _ in range(iters):
         mid = (lo + hi) / 2
-        if K(mid) * flo > 0:
-            lo, flo = mid, K(mid)
+        fmid = K(mid)
+        if fmid * flo > 0:
+            lo, flo = mid, fmid
         else:
             hi = mid
     return (lo + hi) / 2

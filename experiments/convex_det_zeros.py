@@ -64,11 +64,11 @@ def build_det(king: bool, terms: int):
 
 
 def evaluate(coeffs, q):
+    """Horner.  The coefficients are exact rationals with large numerators, so
+    the running power this replaces was the expensive part of the scan."""
     out = Fraction(0)
-    p = Fraction(1)
-    for c in coeffs:
-        out += c * p
-        p *= q
+    for c in reversed(coeffs):
+        out = out * q + c
     return out
 
 

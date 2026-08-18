@@ -33,8 +33,11 @@ import descent_block_oracle as oracle  # noqa: E402
 
 
 def by_first_height(nmax):
-    """T_h(n) for every first-column height h, by the oracle's own DFS."""
-    table = {}
+    """T_h(n) for every first-column height h, by the oracle's own DFS.
+
+    One walk per starting height, which is inherent -- each h is a different
+    root -- and the walks together cost one full enumeration, not nmax of them.
+    """
     sys.setrecursionlimit(10000)
 
     def walk(b, t, area, out):
@@ -47,6 +50,7 @@ def by_first_height(nmax):
                     break
                 walk(bp, tp, area + hp, out)
 
+    table = {}
     for h in range(1, nmax + 1):
         out = [0] * (nmax + 1)
         walk(0, h - 1, h, out)
