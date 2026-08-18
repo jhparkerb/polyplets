@@ -5,10 +5,11 @@
 %  Category L (entirely machine-written); see paper/README.md and
 %  docs/publication-split.md.
 %
-%  NOVELTY STATUS: UNCHECKED.  No literature-priority pass has been run.  The
-%  identity is of a well-populated type (transfer-matrix connectivity counting
-%  by colourings), so a collision is more likely here than in most of this
-%  series, and nothing is claimed to be new.
+%  NOVELTY: PASS RUN 2026-08-18, and it COLLIDED.  The identity is an instance
+%  of the Fortuin-Kasteleyn / Potts spin correspondence; see
+%  docs/priority-passes-2026-08-18.md.  The paper claims no new theorem.  What
+%  it documents is the specific window-bounded scan-order rule and the proof
+%  that its window suffices, which is what licenses the second source.
 %
 %  Source material, all in this repository:
 %    docs/proofs/cutcount-identity.md      the proof, the verification, the ledger
@@ -33,11 +34,11 @@
 \begin{document}
 \maketitle
 
-\firstdraftbanner[ Two gates are specific to this paper. \textbf{No
-literature-priority pass has been run} (\S\ref{sec:novelty}), and the identity
-is of a type with a large literature, so nothing here is claimed to be new. And
-the bridge from the identity to the program that motivated it is \emph{not}
-crossed here (\S\ref{sec:tier2}); that is stated as a limit, not left implicit.]
+\firstdraftbanner[ Two gates are specific to this paper. Its identity is
+\textbf{not new} --- it is an instance of a classical correspondence, and
+\S\ref{sec:novelty} says exactly whose. And the bridge from the identity to the
+program that motivated it is \emph{not} crossed here (\S\ref{sec:tier2}); that
+is stated as a limit, not left implicit.]
 
 \Ldisclosure{%
 \emph{Theorem~\ref{thm:main} (the identity)} --- \textbf{proved} below, for
@@ -59,7 +60,11 @@ derived. A wrong reading would make the paper prove the wrong theorem, and no
 internal rigour would reveal that.
 \emph{That any program computes the sum} --- \textbf{not addressed}
 (\S\ref{sec:tier2}).
-\emph{Novelty} --- \textbf{unchecked}. See \S\ref{sec:novelty}.
+\emph{Novelty} --- \textbf{none claimed, and a collision found}. The identity
+is the Fortuin--Kasteleyn/Potts spin correspondence specialised to site clusters
+under a scan order (\S\ref{sec:novelty}). What is not in the literature we
+searched is this particular rule --- this window, this liveness convention ---
+together with the proof that the window suffices.
 \emph{Human verification:} none, as of this draft.}
 
 \begin{abstract}
@@ -80,13 +85,18 @@ where $c(S)$ is the number of connected components of $S$. Every configuration
 that fails to give each component exactly one birth cancels, exactly, with no
 truncation.
 
-The identity is proved here in five elementary lemmas. Its interest is not the
-statement but what it licenses: reducing modulo $q^2$ leaves the number of
-connected subsets, so a dynamic program over the window --- which never tests
-connectivity --- counts connected animals. That is the mathematical content of a
-second enumeration source, independent of the usual connectivity-tracking
-method, and independence of method is what a count with no closed form can
-otherwise never have.
+The identity is not new, and \S\ref{sec:novelty} says what it is: the
+Fortuin--Kasteleyn/Potts correspondence, in which $q^{c}$ is evaluated by
+colouring components rather than by tracking them, specialised to site clusters
+swept in scan order. It is proved here in five elementary lemmas because the
+specialisation is what a second enumeration source rests on, and because one
+step in it --- that a window of bounded size suffices --- is a real lemma about
+the scan order rather than a translation.
+
+What the identity licenses is the point: reducing modulo $q^2$ leaves the number
+of connected subsets, so a dynamic program over the window, which never tests
+connectivity, counts connected animals. Independence of method is what a count
+with no closed form can otherwise never have.
 
 What is not proved here is that any particular program computes this sum. That
 bridge is stated as an open piece of work with its three parts named, rather
@@ -111,6 +121,19 @@ coloured under local constraints; the weight of a colouring is a product over
 the cells that started a new colour; and the sum over colourings collapses to
 $q^{c(S)}$, so the coefficient of $q^1$ counts connected sets. Connectivity is
 never tested. It is recovered from cancellation.
+
+That idea is not ours and is stated as such here rather than at the back of the
+paper. Weighting a configuration by $q^{\#\text{clusters}}$ is the
+Fortuin--Kasteleyn random-cluster form of the Potts partition
+function~\cite{fortuinKasteleyn1972}, counting connected objects is its
+small-$q$ content, and evaluating $q^{c}$ by \emph{colouring} the components
+instead of tracking them is the Potts spin representation, which is the standard
+route to a transfer matrix that never carries a connectivity
+state~\cite{bloteNightingale1982}. Assigning those colours in one scan is
+Hoshen--Kopelman cluster labelling~\cite{hoshenKopelman1976}; the present model
+is its signed version. What this paper adds is a proof for one particular rule
+with one particular window, which is the rule an engine in this repository
+implements, and \S\ref{sec:novelty} draws that line precisely.
 
 The identity below is the whole mathematical content of that rule. It is stated
 for finite sets of cells and proved as combinatorics; no program appears in the
@@ -329,17 +352,43 @@ not addressed at all. And one further layer is disjoint from everything here: th
 accounting that turns per-board counts into counts by bounding-box height. The
 identity is per-board and says nothing about it.
 
-\section{Novelty}
+\section{Novelty, and what collided}
 \label{sec:novelty}
 
-\textbf{Unchecked.} No literature search has been run on this statement, and
-unlike most of this series the base rate is unfavourable: counting connected
-subgraphs by a colouring with signed weights, so that disconnected configurations
-cancel, is a well-populated idea, and the transfer-matrix literature on lattice
-animals is large. The honest expectation is that something close to
-Theorem~\ref{thm:main} exists. Nothing here is claimed to be new; what is claimed
-is that this particular rule, with this window and this liveness convention, is
-proved to compute $q^{c(S)}$.
+A literature-priority pass was run on this paper on 2026-08-18 and it collided.
+The record, with the searches, is \repo{docs/priority-passes-2026-08-18.md}.
+
+\paragraph{The statement is an instance of a classical correspondence.} The
+random-cluster partition function is
+$Z = \sum_g v^{b(g)}q^{c(g)}$~\cite{fortuinKasteleyn1972}, and counting
+connected subgraphs is its $q \to 0$, $v = 1$ content. The device that evaluates
+$q^{c}$ without a connectivity state is the Potts \emph{spin} representation:
+colour each component, and count colourings. Theorem~\ref{thm:main} is that
+device, specialised to site clusters and executed in scan order, and the
+telescoping in \S\ref{sec:proof} is the correspondence carried out cell by cell
+--- $b$ ways to reuse a colour against one birth of weight $q - b$, summing to
+$q$ per component. Read that way it is not a new theorem, and nothing here is
+claimed as one.
+
+\paragraph{Two more antecedents, named.} The unsigned ancestor of the scan-order
+labelling in \S\ref{sec:model} is Hoshen--Kopelman~\cite{hoshenKopelman1976},
+which assigns cluster labels in a single sweep with a merge structure. And the
+method this rule is an \emph{alternative} to --- maintaining the connectivity
+partition of a frontier --- is Jensen's algorithm for lattice
+animals~\cite{jensen2001}, which is what makes an independent second source
+worth having in the first place.
+
+\paragraph{What the searches did not find.} No source states this rule: the
+window of $H+1$ cells, the liveness convention that makes an expired label
+uncountable, the adopt branch offering every live label regardless of adjacency,
+and Lemma~\ref{lem:reach} showing that this window suffices under king
+adjacency. That lemma is the one step that is not translation --- it is a
+statement about the scan order, and it is what removes the hypothesis a reader
+would otherwise expect to see attached to Theorem~\ref{thm:main}.
+
+So the honest summary is a narrow one. The mathematics is classical; the
+specific rule is proved here, and it is proved because an engine implements it
+and a count with no closed form has nothing to lean on but a second method.
 
 \section{Open problems}
 

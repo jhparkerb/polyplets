@@ -5,9 +5,8 @@
 %  Category L (entirely machine-written); see paper/README.md and
 %  docs/publication-split.md.
 %
-%  NOVELTY STATUS: UNCHECKED.  No literature-priority pass has been run on any
-%  statement here.  The standing rule adopted 2026-08-17 (Ghost Ship Layer 3)
-%  requires one before any claim of novelty; this paper therefore claims none.
+%  NOVELTY: pass run 2026-08-18, no collision found -- but a weak negative, see
+%  the Novelty section.  docs/priority-passes-2026-08-18.md.  Claims none.
 %
 %  Source material, all in this repository:
 %    docs/proofs/diagonal-law.md              the law, its onset, its proof
@@ -35,9 +34,9 @@
 \begin{document}
 \maketitle
 
-\firstdraftbanner[ One gate is specific to this paper: \textbf{no
-literature-priority pass has been run on any statement in it}
-(\S\ref{sec:novelty}), so nothing here is claimed to be new.]
+\firstdraftbanner[ One gate is specific to this paper: its priority pass
+(\S\ref{sec:novelty}) is a weak negative, because the object it studies is
+defined relative to a law of our own. Nothing here is claimed to be new.]
 
 \Ldisclosure{%
 \emph{The diagonal law itself, its degree, its onset and its sharpness} ---
@@ -66,7 +65,8 @@ four named analytic assumptions} which are listed in full in
 $D_5$ beyond $k \le 19$ exists.
 \emph{The near-onset scaling of \S\ref{sec:crossover}} --- measurement,
 downgraded on adversarial review and reported at the strength that survived it.
-\emph{Novelty} --- \textbf{unchecked}, entirely. See \S\ref{sec:novelty}.
+\emph{Novelty} --- pass run 2026-08-18, no collision found, and
+\S\ref{sec:novelty} says why that is weaker evidence than it looks.
 \emph{Human verification:} none, as of this draft.}
 
 \begin{abstract}
@@ -415,15 +415,17 @@ uniform description of the below-onset region.
 \section{Novelty}
 \label{sec:novelty}
 
-\textbf{Unchecked, entirely.} No literature-priority pass has been run on the
-defect law, on the depth-$1$ quartic, on $\alpha$, or on the near-onset scaling.
-The standing rule in this repository, adopted after a result was derived at
-length and found afterwards to be published, is that a pass runs before anything
-is called new. Nothing here is called new.
+A pass ran on 2026-08-18 and found nothing close
+(\repo{docs/priority-passes-2026-08-18.md}): searches over corrections and error
+terms to fixed-height and bounding-box animal formulas, asymptotics of defects
+below a formula's threshold, and algebraic generating functions for the leading
+coefficients of such families.
 
-The one bibliographic fact available is negative in a useful direction: the
-diagonal law itself, its onset and its sharpness are covered by companion paper
-L1's searches, and those searches did not extend to the error term.
+That is a \emph{weak} negative and is worth saying why. The object here is
+defined relative to a diagonal law of our own, so a collision would have to be
+with work that had the law first --- which is what companion paper L1's searches
+cover, and they came back clean. A pass over an object nobody else has defined
+tests very little. Nothing here is called new.
 
 \section{Open problems}
 

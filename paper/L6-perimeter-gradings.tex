@@ -51,7 +51,9 @@ column nor the minimum end has been searched at all.]
 \Ldisclosure{%
 \emph{The identity $k = 2c + t$ and the monotonicity that licenses the search
 prune} --- \textbf{proved}, and they are what make every measured value in this
-paper trustworthy.
+paper trustworthy. The identity is \textbf{not ours}: it is
+\cite{abmz2022}'s $k = e + 2f$ for the square lattice, re-derived here for king
+in ignorance of that (Remark~\ref{rem:abzidentity}).
 \emph{The formulae of Tables~\ref{tab:maxend} and~\ref{tab:mincoeffs}} ---
 \textbf{measured and interpolated, not proved}. Degrees and onsets are read off
 data, not derived. Each row is an exact interpolation verified against at least
@@ -69,8 +71,9 @@ quotient with an explicit infinite product, verified to $n = 40$. It is
 (\S\ref{sec:k6}). The onset, the $\Phid_3$ exponent and the absence of
 $\Phid_4$ hold; the $\Phid_2$ leading diagonal's closed form does not, and is
 withdrawn here rather than repaired.
-\emph{Novelty} --- \textbf{unchecked}, and the square column reproduces
-\cite{abmz2022}, which we do not hold.
+\emph{Novelty} --- pass run 2026-08-18, and it found that both the defect
+identity and the cyclotomic-denominator theorem are \cite{abmz2022}'s.
+\S\ref{sec:novelty} lists what survives and what does not.
 \emph{Human verification:} none, as of this draft.}
 
 \begin{abstract}
@@ -150,6 +153,19 @@ animal, of (number of animal neighbours $- 1$).
 $k = 2c + t$, with both terms nonnegative. Consequently $k$ never decreases when
 a cell is added to an animal.
 \end{proposition}
+
+\begin{remark}[this identity is published, for the square lattice]
+\label{rem:abzidentity}
+Proposition~\ref{prop:kct} is not ours on the square lattice. Asinowski,
+Barequet and Zheng~\cite{abmz2022} state it as $k = e + 2f$, with $e$ the total
+excess summed over perimeter cells and $f$ the number of inner faces of the dual
+map --- the circuit rank. That is the present statement with $c = f$ and
+$t = e$, and their proof is the same accounting: four neighbours per cell, less
+the excesses, less two per spanning-tree edge, less two per cycle-closing edge.
+It was re-derived here for the king lattice without knowing that, and the
+king case does not follow from theirs by substitution --- the per-cell degree,
+and hence $\pmaxx$, changes --- but the identity and its proof idea are theirs.
+\end{remark}
 
 \begin{proof}[Sketch, with the full argument in the enumerator's header]
 Placing a cell raises $\pmaxx$ by $\deg/2$ and changes $p$ by $-1 + g$, where $g$
@@ -238,7 +254,17 @@ coefficient, $\Phid_3$ only the constant --- gives, across $k \le 6$,
   \boxed{\;\Phid_d \text{ first appears at } k = 2d-1\;}
 \]
 ($d=2$ at $k=3$, $d=3$ at $k=5$; $\Phid_4$ is correspondingly absent at
-$k = 6$, tested and not merely assumed). If that holds, ``quasi-polynomial'' is a
+$k = 6$, tested and not merely assumed).
+
+That the denominators are cyclotomic at all is, again, published on the square
+lattice: \cite{abmz2022} prove that for each fixed $k$ the generating function
+of $(A(n, 2n+2-k))$ is rational \emph{with denominator a product of cyclotomic
+polynomials}, and record the same main result in $d$ dimensions for polycubes.
+So the frame of this subsection is the king analogue of their theorem. What is
+not in their work, as far as the pass of
+\repo{docs/priority-passes-2026-08-18.md} reached, is the exponent rule boxed
+below --- which $\Phid_d$ appears at which $k$ --- and everything the
+coefficient triangle carries. If that rule holds, ``quasi-polynomial'' is a
 coarse label and each successive prime-power periodicity costs a fixed two
 units of defect.
 
@@ -654,19 +680,43 @@ claim that was an extrapolated \emph{formula} off three terms. The universality
 statement --- same period, degree, onset and leading coefficient on both
 lattices --- now runs through $k = 6$.
 
-\section{Novelty}
+\section{Novelty, and what is not ours}
 \label{sec:novelty}
 
-\textbf{Unchecked}, and with one specific and known problem. Asinowski, Barequet,
-Magal and Zheng~\cite{abmz2022} is the published work on the maximum end for
-polyominoes; it is paywalled and we hold only conference slides, recorded in
-\repo{papers/MISSING.md}. \textbf{The square-lattice column of this paper
-reproduces that work rather than extending it}, and the $k=3$ square formula
-above was written down partly to confirm we had not misread the slides --- the
-$(-1)^n$ is there, so we had not.
+A literature-priority pass ran on 2026-08-18
+(\repo{docs/priority-passes-2026-08-18.md}). It obtained the full text of the
+Asinowski slides, which the repository had previously recorded as unavailable,
+and the result is worse than the earlier note here claimed: the collision is not
+only that the square column reproduces \cite{abmz2022}, but that two statements
+this paper leans on are theirs.
 
-The king column, the onset formula, the coefficient triangle, the whole
-minimum end and the $n$/$H$/$p$ identity have not been searched for at all.
+\begin{enumerate}
+\item \textbf{The defect identity} $k = 2c + t$ is their $k = e + 2f$
+  (Remark~\ref{rem:abzidentity}). It is what licenses the enumeration prune, so
+  it is load-bearing for every measured number in the maximum-end sections.
+\item \textbf{Rationality with cyclotomic denominators}, for each fixed defect,
+  is their theorem --- stated for polyominoes and for $d$-dimensional polycubes.
+  \S\ref{sec:cyclo} is the king analogue of it.
+\item Their small cases agree with the square column here: $A(n,2n+2) = 1$ for
+  $n \ge 2$, and $A(n,2n+1) = 4(n-2)$ for $n \ge 3$.
+\end{enumerate}
+
+\paragraph{What the pass did not find anywhere.} The king column throughout; the
+onset formula $\binom{k+1}{2} + 3$; the two-lattice universality of period,
+degree, onset and leading coefficient, now tested through $k = 6$; the
+coefficient triangle and its one-diagonal-deep lattice independence; the whole
+minimum end, including the attainability criterion, the $P(x)^c$ hull
+factorisation and the identification of the diamond tip series with Andrews'
+$\phi_2$; and the $n/H/p$ identity. The published minimal-perimeter literature
+is structural rather than enumerative --- inflation of minimal-perimeter animals
+and the constant-isomer conjecture, on the square and hexagonal lattices --- and
+does not count by perimeter in the way \S\ref{sec:min} does.
+
+\paragraph{The honest shape of the contribution.} A published theorem about one
+lattice, re-proved for another where the constants differ, plus a family of
+structural statements about the pair that the published work does not address
+because it does not consider the pair. That is worth writing down and it is not
+what an unqualified ``new'' would mean.
 
 \section{Open problems}
 

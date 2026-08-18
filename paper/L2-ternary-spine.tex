@@ -62,8 +62,9 @@ rather than proofs. Everything above the frame is exact finite algebra.
 \emph{\S\ref{sec:sleeve} (sleeve zeros)} --- labelled measurement, complete for
 $n \le 40$, with no closed form claimed \emph{except} at deficit $3$, where
 Theorem~\ref{thm:d3} predicts them for all $k$.
-\emph{Novelty} --- \textbf{unchecked}. See the draft banner and
-\S\ref{sec:novelty}.
+\emph{Novelty} --- pass run 2026-08-18, no collision found on the spine cubic,
+the digit product or the Smith normal form count; the two bodies of machinery a
+reader will think of are named in \S\ref{sec:related}, with why neither applies.
 \emph{Human verification:} none, as of this draft.}
 
 \begin{abstract}
@@ -590,6 +591,30 @@ cell, against the final triangle:
 \item Every remaining in-regime cell modulo $3$, via the digit product.
   \textbf{Confirmed}.
 \end{itemize}
+
+\section{Related machinery, and why it does not apply}
+\label{sec:related}
+
+A reader who works on congruences for combinatorial sequences will reach for two
+tools here, and neither reaches this object.
+
+Rowland and Yassawi~\cite{rowlandYassawi2015} compute, for a sequence whose
+generating function is the diagonal of a rational power series, a finite
+automaton giving the sequence modulo $p^\alpha$ --- which would settle statements
+of the kind proved here mechanically. The hypothesis fails: companion paper L4
+proves the height generating function is not D-finite, so it is not the diagonal
+of a rational function, and no automaton of that provenance exists to compute.
+The obstruction is a theorem of ours rather than an absence of effort.
+
+The second tool is the family of methods for the mod-$3^k$ behaviour of
+sequences satisfying finite-depth recurrences with polynomial coefficients.
+Those apply to a sequence given by such a recurrence; $T(n,H)$ is given by no
+recurrence we know, which is the reason this paper works through the master
+equation and its fixed point instead.
+
+A literature-priority pass on the spine cubic, the digit product and the Smith
+normal form count found no collision (2026-08-18,
+\repo{docs/priority-passes-2026-08-18.md}).
 
 \section{Open problems}
 

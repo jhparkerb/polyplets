@@ -635,3 +635,23 @@ plain web "title + pdf" search NOT yet run on these):
 - Harary & Harborth, "Extremal animals," J. Comb. Inf. Syst. Sci. 1 (1976)
   1–8. — Earliest extremal min/max perimeter across lattices; the most likely
   place a king-lattice perimeter statement already exists. [low]
+
+## Claude's re-try pass, 2026-08-18
+
+**One entry came free, and it mattered.** The Asinowski–Barequet–Zheng
+conference slides ("Enumeration of polyominoes with fixed perimeter defect",
+Séminaire Lotharingien 79) are free at
+`mat.univie.ac.at/~slc/wpapers/s79vortrag/asinowski.pdf` and were pulled in
+full text. They carry the k = e + 2f defect identity and the theorem that each
+fixed-defect generating function is rational with cyclotomic denominator — both
+of which L6 had been treating as its own. See
+`docs/priority-passes-2026-08-18.md` §L6.
+
+The underlying paywalled paper is still wanted: the slides state the theorems
+without the proofs, and the pattern-classification method behind them is what
+would say whether the king column is a corollary of their framework or a
+separate derivation.
+
+**Lesson recorded, not just the entry.** Two of the three collisions found in
+the 2026-08-18 priority passes came from pulling full text of sources already
+listed here, not from new keyword searches. Re-try this file before searching.
