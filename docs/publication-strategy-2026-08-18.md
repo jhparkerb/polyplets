@@ -82,9 +82,10 @@ compute item, and the only thing that changes what P1 may claim: rule-independen
 closure 33 → 35 → 37, residual band on row 40 shrinking 9 → 7 → 5 → 3 cells.
 Runs alongside Track A without competing for anyone's attention.
 
-**Track C — the L papers, three at a time.** L3 (λ bracket), L1 (diagonal law),
-L4 (not D-finite): clean novelty verdicts, and warrants a stranger can re-run in
-exact arithmetic — which is exactly the kind of paper that survives having no
+**Track C — the L papers.** Nine now, not six: L7 was carved out of L5, and L8
+and L9 were written on 2026-08-18. Release order stays L3, L1, L4 first: clean
+novelty verdicts, and warrants a stranger can re-run in exact arithmetic, which
+is exactly the kind of paper that survives having no
 referee. Each needs, in order: a priority pass dated after its own drafting;
 enough reading from jasonp to replace "human verification: none" in the ledger
 with a specific line; then it goes in the repo with the rest.
@@ -119,24 +120,14 @@ three.
 
 ## 5. Open decisions
 
-**L6's perimeter gradings — no longer a decision, but a rewrite.** Both k = 6
-censuses turned out to have finished on dalby on 2026-08-09 and 08-10 and never
-to have been brought back into the repo; they were harvested 2026-08-18 and the
-verdict is in `results/perimeter-defect-diagonals.md`. Three of the paper's four
-k = 6 tests pass (onset 24, the Phi_3 exponent, no Phi_4) and **one fails**: the
-Phi_2 leading diagonal is 5/2, not the 15/4 the closed form predicted. A second
-k = 5 statement also fails to extend — the full Phi_3 block is lattice-
-independent at k = 5 and only its leading coefficient is at k = 6. The
-universality claim itself survives and now runs through k = 6. So L6 needs its
-placeholder section written, two claims withdrawn, and its do-not-submit banner
-removed — not a compute decision.
-
-**L5 and the 08-17 salvage.** `results/convex-polyplets.md` gained the box GF,
-the area q-series and 44-digit certified μ and A on 08-17, after L5 was drafted.
-Folding them in strengthens the paper and drags in the area-moment material,
-where Richard arXiv:0704.0716 and Enting–Guttmann (1989) become mandatory
-citations. Fold in and cite, or leave L5 as drafted and keep the salvage in
-`results/`.
+**L6, L5, L7 — done, not decisions.** All three were rewritten on 2026-08-18
+and the two questions this section originally posed are answered. L6's compute
+gate cleared: three of four k = 6 predictions held, the Φ₂ closed form was
+refuted and withdrawn, and the universality claim now runs through k = 6. L5
+folded in the salvage with Richard and Enting–Guttmann cited in three places,
+and L7 gained the kernel mechanism for its measured spectrum. Two new papers
+were written for material that had no home: **L8** (the below-onset defect
+campaign) and **L9** (the cut-count identity behind the second source).
 
 **How much of the tree is public.** A repo release makes this a real question
 the journal plan never had to ask. `papers/` is gitignored copyrighted PDFs and

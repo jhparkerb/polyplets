@@ -1,6 +1,67 @@
-# HANDOFF — live state (updated 2026-08-17)
+# HANDOFF — live state (updated 2026-08-18)
+
+## 2026-08-18 — L PAPERS BROUGHT CURRENT; TWO NEW ONES; k=6 HARVESTED
+
+**The k=6 censuses were already done.** Both n=78 runs finished on dalby
+2026-08-09 and 08-10 (456/456 shards ok, `git=6473890c`) and the output was
+never brought back into the repo; harvested 08-18, checksums matched against
+dalby, committed. Real cost: king 42 h wall at 76-way, square 23 h --- the
+pool script's own header predicted ~1.8 h, so that estimate is refuted and
+should not be used as calibration for anything else.
+
+**The k=6 verdict** (`results/perimeter-defect-diagonals.md`, appended):
+onset 24 CONFIRMED by scan rather than fit; the Phi_3 exponent k-4 CONFIRMED;
+Phi_4 absent CONFIRMED with D minimal and 39 spare zeros; **the Phi_2 leading
+diagonal's closed form REFUTED** --- 5/2 measured against 15/4 predicted, on
+both lattices. A second k=5 identity (the whole Phi_3 block agreeing across
+lattices) also fails to extend. Universality survives and now runs through
+k = 6: same period, degree, onset and leading coefficient on both lattices.
+
+**All L papers updated, and there are nine.**
+
+- **L6** --- compute gate cleared, placeholder section replaced by the verdict,
+  two claims withdrawn, do-not-submit banner gone.
+- **L5** --- the 08-17 salvage folded in: the q-Bessel kernel K, mu/q_c/A
+  certified to 44-45 digits by exact interval arithmetic (agreeing with all 44
+  corresponding extrapolated digits), area moments algebraic at every level.
+  The limit law those give is **Richard arXiv:0704.0716** and is cited as a
+  collision in three places, with Enting-Guttmann for the control.
+- **L7** --- new: all four Prony exponentials, the negative one included, are
+  reciprocals of zeros of K (`experiments/convex_kernel_zeros.py`). rho is
+  q_1/q_2, not a measured decimal. The follow-up test (is nu 1/(smallest zero
+  of det)?) does **not** converge under truncation and is recorded as a
+  negative attempt, in the paper and in `results/convex-polyplets.md`.
+- **L3** --- Proposition 6's proof was **false**: the Redelmeier decision
+  string is undefined on re-entrant animals (96,065 of 147,941 missed at n=8).
+  Replaced by the sound BFS-frame derivation of the same constant; the broken
+  argument kept as a labelled warning. Twig route recorded as closed at exactly
+  5^5/4^4.
+- **L2** --- deficit 3 folded in: `v_3(P_k(3k-2)) > 3 <=> k = 1 mod 3` for all
+  k, which predicts the deficit-3 sleeve zeros the census could only tabulate.
+  Frame (A1)-(A4) stated, with the weight on the two derivations.
+- **L1** --- the P_k denominator remark no longer calls minimality a fact about
+  the lattice (it is basis-dependent, and was demoted in-tree on 2026-07-31);
+  onset sharpness now points at L8's quartic, which gives it for large k
+  conditional on two named gaps.
+- **L8 (new)** --- below the onset: the diagonal law's error term. Exact frame,
+  depth 1 closed by an algebraic quartic with every constant derived from it,
+  depths 2-4 closed, theta_j = j-3/2 to j=7 with the estimator bias named, and
+  alpha = 50/81 with its four analytic assumptions stated rather than softened.
+- **L9 (new)** --- the cut-count identity: sum over scan-order colourings of
+  prod (q-b) = q^c(S), proved in five lemmas, verified on 223,296 subsets with
+  five RED controls, and explicit that the identity-to-program bridge is not
+  crossed.
+
+`paper/verify_l_papers.py` grows a k=6 check group (336 checks, 23 RED, all
+fire). `paper/README.md` and `docs/publication-strategy-2026-08-18.md` are
+current.
+
+**Open, his:** the priority passes (L2, L6, L8, L9 have had none; L9's base
+rate is unfavourable); every L ledger still reads "human verification: none";
+and whether `docs/` and the Ghost Ship tree go public at all.
 
 ## 2026-08-17 — GHOST SHIP FILED + TRIAGED; salvage pending, run 2 undecided
+
 
 Record committed (8336e02, 355 files incl. the loop's own sandbox tree).
 Value triage run (e35c549) — the axis grading never covered.

@@ -55,8 +55,13 @@ theorems, and every $N \le 36$ for the Smith normal form.
 \emph{Theorem~\ref{thm:deficit2} (the deficit-$2$ residue)} --- proved by
 Lagrange--B\"urmann over $\Z/27$ followed by an exact polynomial division on
 the mod-$27$ master curve; the division is a finite exact computation.
+\emph{Theorem~\ref{thm:d3} (the deficit-$3$ residue)} --- proved on the frame
+stated with it: (A1) and (A4) are proved and independently cross-checked, while
+(A2) and (A3) are symbolic derivations verified against banked data to $k \le 17$
+rather than proofs. Everything above the frame is exact finite algebra.
 \emph{\S\ref{sec:sleeve} (sleeve zeros)} --- labelled measurement, complete for
-$n \le 40$, with no closed form claimed.
+$n \le 40$, with no closed form claimed \emph{except} at deficit $3$, where
+Theorem~\ref{thm:d3} predicts them for all $k$.
 \emph{Novelty} --- \textbf{unchecked}. See the draft banner and
 \S\ref{sec:novelty}.
 \emph{Human verification:} none, as of this draft.}
@@ -494,12 +499,61 @@ again at $n = 40$, skipping only $n = 39$, which is the one sleeve free of zeros
 after $n = 31$. The excess $\vthree - d$ there reaches $3$, against a ceiling of
 $5$ over all $n$ (at $k=8$, $n=17$).
 
-\begin{openproblem}[the deficit-$d$ unit formulas]
-Theorems~\ref{thm:oddspine} and~\ref{thm:evenspine} are the cases $d = 0$ and
-$d = 1$ of a family: give the unit part of $P_k(n)$ at forced deficit $d$, for
-$d \ge 2$. A closed form there would predict the sleeve zeros rather than
-tabulate them, and it is the open remainder of the Witt-vector tower begun in
-\S\ref{sec:lift}.
+\subsection{Deficit two and three}
+\label{sec:deficit23}
+
+The census above is a census because no unit formula was available past the
+spine. Two more deficits now have one, by the same route: fix the tower of
+congruences that $H$ and $G$ satisfy modulo a power of $3$, then divide.
+
+At $d = 3$ the statement is
+\begin{theorem}
+\label{thm:d3}
+For every $k \ge 3$,
+\[
+  P_k(3k-2) \;\equiv\; 27\,r_k \pmod{81},
+  \qquad r_k = 2,\,0,\,1 \ \text{ for } k \equiv 0,\,1,\,2 \pmod 3 .
+\]
+Equivalently, on the deficit-$3$ family $(n,H) = (3k-2, 2k-2)$, where
+$T(3k-2,2k-2) = P_k(3k-2)/27$: $T \equiv 2 \pmod 3$ for $k \equiv 0$,
+$T \equiv 1 \pmod 3$ for $k \equiv 2$, and $\vthree(P_k(3k-2)) \ge 4$ for
+$k \equiv 1$. Since $r_k$ is a unit for $k \not\equiv 1$,
+\[
+  \vthree\bigl(P_k(3k-2)\bigr) > 3 \iff k \equiv 1 \pmod 3 .
+\]
+\end{theorem}
+
+The last line is what the sleeve census could only tabulate: at deficit $3$ the
+sleeve zeros are exactly the $k \equiv 1 \pmod 3$ cells, for \emph{all} $k$,
+rather than for the $k \le 11$ the data reached.
+
+\begin{remark}[the frame this rests on]
+Theorem~\ref{thm:d3} is proved on an explicit frame and the frame is not all
+theorem. (A1) the diagonal-law shape theorem and the grand form
+$P_k(n) = [u^k]G(u)H(u)^n$ --- both proved and Lean-checked. (A2) $H$ congruent
+to the fixed point of the mod-$81$ master equation at all orders, derived from
+the renewal formalism with completeness from a proved row bound, and
+machine-verified against the banked $h_k$ for $k \le 17$. (A3) the corresponding
+congruence for $G$, likewise derived and verified to $k \le 17$. (A4) eleven
+cluster weights, finite integers from a banked table with independent low-order
+enumeration cross-checks. Everything above those four is unconditional algebra:
+an inversion lemma, one implicit differentiation, a units inventory, and an exact
+polynomial division whose remainder vanishes identically mod $81$. So (A1) and
+(A4) are solid, and the weight sits on (A2) and (A3), which are derivations
+checked against data rather than proofs.
+\end{remark}
+
+Deficit $2$ closes the same way and was done first
+(Theorem~\ref{thm:deficit2}); the finer valuations at
+$k \equiv 1 \pmod 3$ --- $7, 4, 4, 5$ at $k = 4, 7, 10, 13$ --- are invisible
+modulo $81$ and belong to the higher levels of the tower.
+
+\begin{openproblem}[the deficit-$d$ unit formulas, $d \ge 4$]
+Theorems~\ref{thm:oddspine}, \ref{thm:evenspine} and~\ref{thm:d3} are the cases
+$d = 0, 1, 3$ of a family, with $d = 2$ proved the same way: give the unit part
+of $P_k(n)$ at forced deficit $d$ for $d \ge 4$. Each step costs one more level
+of the tower --- $d = 3$ needed mod $81$ --- and the open remainder of the
+Witt-vector tower of \S\ref{sec:lift} is exactly this.
 \end{openproblem}
 
 \section{The 3-adic lift}

@@ -46,35 +46,51 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 |---|---|---|
 | `technical-report.tex` | **P1** — Fixed polyplets through *a*(40) | in progress, jasonp's prose, roughly 40% built |
 | `polyplets-report.tex` | — | superseded. A complete machine-written draft of P1's material, trimmed 2026-08-01. Under the split it cannot be lifted into `technical-report.tex` sentence by sentence; it is **source material and notes** |
-| `L1-diagonal-law.tex` | **L1** — A diagonal law for row-local lattices | draft, 15pp |
+| `L1-diagonal-law.tex` | **L1** — A diagonal law for row-local lattices | draft, 14pp |
 | `L2-ternary-spine.tex` | **L2** — The mod-3 arithmetic of the height triangle | draft, 10pp — **novelty unchecked** |
-| `L3-lambda-bounds.tex` | **L3** — A certified two-sided bound for λ | draft, 14pp |
-| `L4-not-dfinite.tex` | **L4** — An arithmetic obstruction to D-finiteness | draft, 11pp |
-| `L5-convex-polyplets.tex` | **L5** — Convex polyplets | draft, 18pp |
-| `L6-perimeter-gradings.tex` | **L6** — Perimeter gradings of lattice animals | draft, 11pp — **compute-gated, do not submit** |
+| `L3-lambda-bounds.tex` | **L3** — A certified two-sided bound for λ | draft, 13pp |
+| `L4-not-dfinite.tex` | **L4** — An arithmetic obstruction to D-finiteness | draft, 10pp |
+| `L5-convex-polyplets.tex` | **L5** — Convex polyplets | draft, 14pp |
+| `L6-perimeter-gradings.tex` | **L6** — Perimeter gradings of lattice animals | draft, 12pp — compute gate **cleared** 2026-08-18 |
+| `L7-subdominant-amplitude.tex` | **L7** — The subdominant exponential and the amplitude ratio | draft, 10pp |
+| `L8-below-onset.tex` | **L8** — Below the onset: the diagonal law's error term | draft, 8pp — **novelty unchecked** |
+| `L9-cutcount-identity.tex` | **L9** — A cancellation identity for scan-order colourings | draft, 6pp — **novelty unchecked** |
 
 Every L paper carries a loud draft banner, because every one of their
-verification ledgers currently reads "human verification: none". Two carry a
-second banner as well, and those two are the ones to be careful with:
+verification ledgers currently reads "human verification: none". Three carry a
+second banner as well, and those three are the ones to be careful with:
 
 - **L2's novelty is unchecked.** The six N1–N6 sweeps never touched the spine
   cubic, the digit product or the Smith normal form count.
   `docs/publication-split.md` §5 wants a sweep *before* the paper is written. It
   was drafted anyway, deliberately — the ideas are recorded and the prerequisite
   is now named rather than vague — but nothing in it is claimed to be new.
-- **L6 is compute-gated.** Its central claim is that the perimeter grading
-  behaves identically on both lattices through defect *k* = 5, and the run
-  producing *k* = 6 was still going when it was drafted. Four live predictions
-  ride on it, one of which currently rests on a single data point.
-  `docs/publication-split.md` §5 is explicit that publishing first risks
-  publishing something *k* = 6 contradicts.
+- **L8 and L9 have had no literature-priority pass at all**, and L9's subject —
+  counting connected subgraphs by a signed colouring so that disconnected
+  configurations cancel — sits in a well-populated area. Both say so on page 1
+  and neither claims novelty anywhere.
+
+- **L6's compute gate is cleared** (2026-08-18). Both *k* = 6 censuses landed;
+  three of its four predictions held and the fourth, the Φ₂ leading diagonal's
+  closed form, was refuted and is withdrawn. The paper no longer carries a
+  do-not-submit banner. What it does still carry is the note that its
+  square-lattice column reproduces published work held only as slides.
 
 Planned and not yet drafted: **P2** (two stratifications of A006770) and **P3**
 (king animals by convexity and directedness). Both are jasonp's prose and are
 not the machine's to write.
 
-The numbering is `docs/publication-split.md`'s. L1, L3 and L4 were drafted first
-because their novelty verdicts came back clean and because P2 and P3 cite them.
+The numbering is `docs/publication-split.md`'s through L6; L7 was carved out of
+L5, and L8 and L9 were added 2026-08-18 for material that postdates that
+document (the below-onset campaign, and the cut-count identity behind the
+second-source engine). L1, L3 and L4 were drafted first because their novelty
+verdicts came back clean and because P2 and P3 cite them.
+
+**The standing literature-priority rule applies to all nine.** Adopted
+2026-08-17 after a result was derived at length and found afterwards to be
+published: a priority pass runs before anything is called new. Three papers here
+have had no pass at all and say so; the rest carry the verdicts of the N1–N6
+sweeps, which predate their own later sections.
 
 **L5 has a standing attribution requirement.** Gouyou-Beauchamps and Leroux
 (FPSAC 2004, §2.3) have its block decomposition and its mirror equality, for
@@ -120,7 +136,7 @@ parses it and checks its printed numbers against banked results in `results/`:
 | verifier | manuscript | needs |
 |---|---|---|
 | `verify_technical_report.py` | `technical-report.tex` | `results/ns_a40/`, b-files, `results/holes_n18.txt` |
-| `verify_l_papers.py` | `L1`, `L3`, `L4`, `L6` | `results/strip_mu_certificates.log`, `results/triangle.txt`, `results/perimmin_square8_p48_r6.txt` |
+| `verify_l_papers.py` | `L1`, `L3`, `L4`, `L6` | `results/strip_mu_certificates.log`, `results/triangle.txt`, `results/perimmin_square8_p48_r6.txt`, `results/perimdefect_square{4,8}_n78_k6.txt` |
 | `verify_claims.py` | `polyplets-report.tex` | `build/g2` — so it is not in `make papers-verify`; run it explicitly |
 
 Each is red-first: it fails on a manuscript whose tables have drifted, and each
