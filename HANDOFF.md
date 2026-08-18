@@ -1,20 +1,19 @@
 # HANDOFF — live state (updated 2026-08-18)
 
-## RUNNING — k=7 defect calibration (dalby, window `k7-calib`, since 2026-08-18 17:40Z)
+## DONE — k=7 defect calibration (dalby, finished 2026-08-18 23:53Z)
 
-`scripts/dalby_perimeter_defect_k7_calib.sh`, 12 single cores alongside
-Confetti, binary `git=6473890c` (the k=6 census stamp). Single-core wall at
-`n = 30, 34, 38` for `k = 6` and `k = 7`, both lattices; the `k = 6` cells are
-controls against the recorded 254/692/1666 s. **Purpose: price k=7 before
-anyone commits to it** --- the pool script's `n^7.9` model predicted 1.8 h for
-the k=6 census and the truth was 42 h king / 23 h square at 76-way, so that
-model is refuted and a fresh exponent plus a k=7:k=6 ratio are needed. Result
-tier: planning input, not a paper number. Resumable per cell; kill by PID.
+Numbers and the fits: `results/perimeter-defect-k7-pricing.md`. The k=6
+controls reproduce the census timings to under 0.1%, so the fits are trusted.
 
-**The k=7 census is NOT approved and NOT launched.** If Phi_4 enters at k=7 as
-the exponent rule predicts, the fit needs ~44 series coefficients against 32,
-on an onset of 31 against 24 --- a materially larger n than the k=6 run's 78,
-against a cost that already came in 23x over its estimate.
+- Cost exponent is not `n^7.9` in general --- that is square8 at `k=6` only.
+  Measured: square4 8.58 (k=6) / 10.08 (k=7), square8 7.95 / 9.23. The pool
+  model carried no `k` dependence, which is the 23x miss.
+- k=7 : k=6 at fixed `n` grows as `n^(e7-e6)`: 11-13x at n=38, ~25-29x
+  extrapolated to n=78.
+- **The k=7 census is months, not hours.** At the `n = 85`--`88` the fit
+  actually wants: square4 76--107 d, square8 130--179 d on the 76-way pool.
+  Still NOT approved and NOT launched --- and at this price the decision is
+  his, not a formality.
 
 ## 2026-08-18 (latest) — THE ABZ PAPER WAS FREE; L6 EDITS PENDING
 
