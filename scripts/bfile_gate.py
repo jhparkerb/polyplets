@@ -37,6 +37,7 @@ failure, not a rounding question.
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -185,6 +186,31 @@ def compare(name, banked, derived, path):
     return len(shared), beyond, shortfall
 
 
+# The front page asserts a(40) in full, and until 2026-08-19 nothing re-derived
+# it: verify_technical_report covers the manuscript, this gate covered the
+# b-files, and the one number every visitor reads first was checked by nobody.
+# Scoped to the top-level README deliberately. A tree-wide sweep would flag
+# results/ns_a26/PROVENANCE.md, which quotes the WRONG a(26) on purpose --- it
+# records the stale-binary near-miss --- so tree-wide wants an exemption
+# mechanism, and the front page does not.
+README_CLAIM_RE = re.compile(r"\ba\((\d+)\)\s*=\s*(\d{4,})")
+
+
+def readme_claims(fixed, text=None):
+    """Mismatches between the README's a(n) = ... assertions and the bank."""
+    if text is None:
+        text = (ROOT / "README.md").read_text()
+    found, bad = 0, []
+    for m in README_CLAIM_RE.finditer(text):
+        n, claimed = int(m.group(1)), int(m.group(2))
+        if n not in fixed:
+            continue
+        found += 1
+        if claimed != fixed[n]:
+            bad.append((n, claimed, fixed[n]))
+    return found, bad
+
+
 def run(mutate=None):
     """mutate: optional callable applied to the loaded b-files, for RED tests."""
     global failures, checks
@@ -224,6 +250,13 @@ def run(mutate=None):
 
     # The original OEIS terms are an outside check on a(n): the b-file must
     # agree with them everywhere they overlap.
+    # The front page's own numbers, against the same row sums.
+    found, bad = readme_claims(fixed)
+    ok(found > 0, "README.md asserts no a(n) value the bank knows -- the "
+                  "front page changed shape and this check went vacuous")
+    ok(not bad, "README.md disagrees with the bank: %s"
+       % ["a(%d) claims %d, bank has %d" % t for t in bad])
+
     orig = load_nv(FIXTURES / "b006770.txt")
     if "b006770" in banked:
         bad = [n for n in sorted(set(orig) & set(banked["b006770"]))
@@ -248,7 +281,22 @@ def main() -> int:
              lambda b: b.update({"b030234": b["b030235"],
                                  "b030235": b["b030234"]})),
         ]
+        # Two synthetic controls for the README check: a wrong digit must be
+        # caught, and a front page that stopped asserting anything must not
+        # pass by having nothing left to check.
+        fixed = fixed_from_triangle()
+        n40 = fixed[max(fixed)]
+        found, wrong = readme_claims(fixed, "a(%d) = %d\n" % (max(fixed), n40 + 1))
+        print("  RED %-42s %s" % ("one digit changed in the README's a(n)",
+                                  "FIRED" if wrong else "DID NOT FIRE"))
+        vacuous, _ = readme_claims(fixed, "no claims here\n")
+        print("  RED %-42s %s" % ("a README that asserts no a(n) at all",
+                                  "FIRED" if vacuous == 0 else "DID NOT FIRE"))
         bad = []
+        if not wrong:
+            bad.append("readme wrong-digit control")
+        if vacuous != 0:
+            bad.append("readme vacuous control")
         for label, mut in controls:
             run(mutate=mut)
             fired = bool(failures)
