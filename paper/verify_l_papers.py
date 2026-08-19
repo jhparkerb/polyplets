@@ -104,21 +104,12 @@ def prints_sequence(src, values, sep=", "):
     return sep.join(str(v) for v in values) in src
 
 
-# "$1, 2, 4$ $, 9$" and "$1, 2, 4, 9$" set identical type: an inline math group
-# closed and reopened is an ordinary interword space either way.  The manuscripts
-# split long number lists that way so TeX has somewhere to break the line, and a
-# verifier that reads the source rather than the page would call that a changed
-# number.  Collapse the seam before any check sees it -- this normalises the
-# ENCODING and never a digit, so a mistyped value still fails.
-_MATH_SEAM = re.compile(r"\$\s*\$")
-
-
 def tex(name):
     p = PAPER / name
     if not p.exists():
         failures.append(f"missing manuscript {p}")
         return ""
-    return _MATH_SEAM.sub(" ", p.read_text())
+    return p.read_text()
 
 
 # ---------------------------------------------------------------------------
@@ -265,17 +256,6 @@ def check_l4_boxes():
        "L4 must print the psi-degree list " + ", ".join(map(str, PSI_DEGREES)))
     red(prints_sequence(src, PSI_DEGREES[:-1] + [PSI_DEGREES[-1] + 9]),
         "a psi-degree list with the last degree mistyped")
-
-    # The seam normalisation must not launder a wrong digit.  Same split the
-    # manuscript uses, one value changed: it has to still fail.
-    seam_bad = ("$" + ", ".join(map(str, PSI_DEGREES[:5])) + ",$ $"
-                + ", ".join(map(str, [PSI_DEGREES[5] + 1] + PSI_DEGREES[6:])) + "$")
-    red(prints_sequence(_MATH_SEAM.sub(" ", seam_bad), PSI_DEGREES),
-        "a seam-split psi-degree list with one degree changed")
-    ok(prints_sequence(_MATH_SEAM.sub(" ", seam_bad.replace(str(PSI_DEGREES[5] + 1),
-                                                           str(PSI_DEGREES[5]), 1)),
-                       PSI_DEGREES),
-       "the seam-split psi-degree list reads as the plain one when correct")
 
     full = boxes_from(PSI_DEGREES)
     for r, D in ((5, 28), (4, 67), (3, 180), (2, 461), (1, 1253), (0, 3288)):

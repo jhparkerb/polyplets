@@ -65,8 +65,27 @@ else
   JOBS ?= $(shell nproc 2>/dev/null || echo 4)
 endif
 
+# The parallel run keeps its output live, and also lands in build/gates.log so
+# that a RED gate can be NAMED at the end.  make 3.81 -- what macOS ships, and
+# there is no gmake on gympie -- has no --output-sync, so the sub-make's
+# "*** [gate-foo] Error 1" line is printed several hundred lines above the
+# "*** [gates] Error 2" that ends the run.  A pre-push hook failing that way
+# reports nothing usable: this recipe pulls the target names back out.
+GATELOG = build/gates.log
+
 gates:
-	@$(MAKE) --no-print-directory -j$(JOBS) $(GATE_TARGETS)
+	@mkdir -p $(dir $(GATELOG))
+	@set -o pipefail; \
+	 $(MAKE) --no-print-directory -j$(JOBS) $(GATE_TARGETS) 2>&1 | tee $(GATELOG); \
+	 st=$$?; \
+	 if [ $$st -ne 0 ]; then \
+	   echo; \
+	   echo "=== RED gate(s):"; \
+	   sed -n 's/^.*\*\*\* \[\(gate-[a-z0-9-]*\)\] Error.*/    \1/p' $(GATELOG) | sort -u; \
+	   echo "=== full log: $(GATELOG)"; \
+	   echo "=== serial re-run, output no longer interleaved: make gates JOBS=1"; \
+	 fi; \
+	 exit $$st
 
 # Gate BFILES: every uploaded OEIS b-file term, re-derived from banked data --
 # a(n) from the triangle's row sums, the whole symmetry family by Burnside from
