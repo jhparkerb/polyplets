@@ -57,9 +57,11 @@ FAILS.  The unit is the PARAGRAPH for prose and the ROW for tables, because
 prose wraps and a triggered table header has its numbers in the body; a bullet
 starts a new unit so one marker cannot cover a list.  A unit that genuinely
 states no checkable number declares `<!--q:prose-->`, and that declaration is
-itself checked -- numbers that are names (a cell, a row, a term, a modulus, a
-height bound, Q1/Q2, a date) are stripped and any digit still standing rejects
-the declaration, so the escape hatch cannot smuggle a count past the gate.
+itself checked twice: numbers that are names (a cell, a row, a term, a modulus,
+a height bound, Q1/Q2, a date) are stripped and any digit still standing
+rejects the declaration, and a unit naming two or more cells is stating the
+residual SET and must declare a `.cells@H` fact instead -- otherwise the hatch
+smuggles a wrong list past the gate, which it did until 2026-08-19.
 
 Trigger matching runs with markdown emphasis stripped: HANDOFF.md wrote
 "**only** the mod-4 congruence" and the first version of the pattern walked
@@ -72,6 +74,7 @@ that everything is fine.
 from __future__ import annotations
 
 import argparse
+import functools
 import re
 import subprocess
 import sys
@@ -79,37 +82,52 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(ROOT / "tests"))
 import provenance_table as PT          # noqa: E402  (path set above)
+import gate_citations as GC            # noqa: E402  (path set above)
 
 OUT = ROOT / "results" / "residual-cells.md"
 CANONICAL = "results/residual-cells.md"
 
 NMAX = PT.NMAX
 # The ladder the notes actually discuss: banked step 0 through the height that
-# would close row 40 outright.  MOTLEY_H is where it stands today.
-LADDER = range(16, 22)
+# would close row 40 outright.  MOTLEY_H is where it stands today.  The top is
+# PT.SWEEP_H because that IS the closing height -- typing 21 here a second time
+# would leave the fact table one rung short if the sweep ceiling ever moved.
+LADDER = range(16, PT.SWEEP_H + 1)
 
 # results/ghostship/ is a frozen record of a different filesystem and a
-# different day's numbers; it is excluded by scope, not by markers, for the
-# same reason tests/gate_citations.py excludes it -- a record that gets edited
-# to keep a gate happy has stopped being a record.
-EXCLUDED_TREES = ("results/ghostship/",)
+# different day's numbers; it is excluded by scope, not by markers -- a record
+# that gets edited to keep a gate happy has stopped being a record.  Read from
+# gate_citations rather than restated, so the next frozen record tree is added
+# in one place instead of two.
+EXCLUDED_TREES = GC.EXCLUDED_TREES
 
 
 # --------------------------------------------------------------------------
 # The facts.
 # --------------------------------------------------------------------------
 
+@functools.lru_cache(maxsize=None)
 def formula_lo(n: int) -> int:
     """Lowest height on row n reached by the P_k closed-form band.
 
     Two constraints, both from docs/proofs/diagonal-law.md: the wired levels
     stop at k <= PT.PK_KMAX (h >= n - PK_KMAX), and the onset is sharp at
-    n >= 2k+1 (h >= (n+1)/2).  The band is whichever binds harder.  Both
-    numbers come from provenance_table so that the two generators cannot come
-    to disagree about where the band is.
+    n >= 2k+1 (h >= (n+1)/2).  The band is whichever binds harder.
+
+    Read off PT.sources() rather than re-derived here.  Taking the two
+    CONSTANTS from provenance_table was not enough: any change to the SHAPE of
+    the rule there -- a new onset condition, a per-level exception -- would
+    have left this file's Q2 band and closure figure silently disagreeing with
+    the provenance table, which is the exact drift this script exists to stop.
+    The band is contiguous upward in h, so its lowest height is the whole
+    story; a row with no band at all is a broken rule, not a 0.
     """
-    return max(n - PT.PK_KMAX, -(-(n + 1) // 2))
+    band = [h for h in range(1, n + 1) if {"P", "F"} & PT.sources(n, h)]
+    if not band:
+        raise ValueError("row %d has no closed-form band at all" % n)
+    return min(band)
 
 
 def row40_residual(motley_h: int) -> list[tuple[int, int]]:
@@ -223,6 +241,18 @@ NONCOUNT_RE = re.compile(
 GENERATED_PEER = "results/provenance-table.md"
 
 
+# TODO(2026-08-19, from the simplify pass): results/residual-cells.md -- the
+# file this gate calls "the one place", and the file every other document is
+# told to trust -- is the one restatement --check never reads.  tracked_docs()
+# excludes CANONICAL by design (it is generated, not quoted), so a stale
+# tracked copy carries yesterday's counts while the gate reports GREEN.  The
+# fix is to render write_note()'s content to a string in --check and fail on
+# any difference from the tracked file, missing file included; the same
+# regenerate-and-compare over results/provenance-table.md would then supersede
+# check_peer()'s wording-coupled regex, which needs two "went blind" alarms to
+# stay safe and only ever checks the two numbers a regex can find.  That is a
+# change to what --check IS, over freshly-validated code, so it is its own
+# change and not a drive-by.
 def tracked_docs() -> list[str]:
     out = subprocess.run(["git", "ls-files", "*.md", "*.tex"], cwd=ROOT,
                          capture_output=True, text=True, check=True)
@@ -231,14 +261,14 @@ def tracked_docs() -> list[str]:
             and not p.startswith(EXCLUDED_TREES)]
 
 
-def check_peer(F: dict) -> list[str]:
+def check_peer(F: dict, root: Path = ROOT) -> list[str]:
     """results/provenance-table.md states Q1 too; hold it to the same facts.
 
     Fail-closed on the parse: if neither the count nor the list can be found,
     the other generator's wording has moved and this check has silently stopped
     checking, which is worse than a disagreement.
     """
-    path = ROOT / GENERATED_PEER
+    path = root / GENERATED_PEER
     if not path.exists():
         return ["%s is missing; it is a generated file and `make "
                 "gate-provenance` writes it" % GENERATED_PEER]
@@ -359,11 +389,11 @@ def trigger_lines(text: str) -> list[tuple[int, str]]:
     return out
 
 
-def scan(F: dict, docs: list[str], verbose=False):
+def scan(F: dict, docs: list[str], verbose=False, root: Path = ROOT):
     """Check every residual claim in every tracked document.  Returns problems."""
     bad, checked, triggers = [], 0, 0
     for rel in docs:
-        text = (ROOT / rel).read_text(errors="replace")
+        text = (root / rel).read_text(errors="replace")
         for i, line in trigger_lines(text):
             triggers += 1
             markers = MARKER_RE.findall(line)
@@ -379,8 +409,29 @@ def scan(F: dict, docs: list[str], verbose=False):
                     continue
                 key, val = parsed
                 if key == "prose":
-                    # The escape hatch, and it is checked: a line declaring it
-                    # states no number may not contain one.
+                    # The escape hatch, and it is checked twice over.
+                    #
+                    # First: a line declaring it states no number may not
+                    # contain one, once the numbers that are NAMES are
+                    # stripped.
+                    #
+                    # Second, and this was a fail-OPEN until 2026-08-19:
+                    # NONCOUNT_RE strips every (n,h) and T(n,h) as a name, so a
+                    # unit that LISTS cells -- the residual set itself, the
+                    # thing this gate is for -- stripped to nothing and passed
+                    # as prose with its list unchecked.  A wrong six-cell list
+                    # scanned clean and was counted as verified.  A unit naming
+                    # two or more cells is stating the set, not talking about
+                    # it, so it must declare a `.cells@H` fact.  One named cell
+                    # stays prose-able: headers and pointers say "T(40,21)".
+                    ncells = len(CELL_RE.findall(MARKER_RE.sub("", line)))
+                    if ncells >= 2:
+                        bad.append("%s:%d: `q:prose` declared, but the line "
+                                   "lists %d cells -- that is the residual set "
+                                   "itself; declare a `.cells@H` fact -- %s"
+                                   % (rel, i, ncells,
+                                      " ".join(line.split())[:90]))
+                        continue
                     stripped = NONCOUNT_RE.sub("", MARKER_RE.sub("", line))
                     if DIGIT_RE.search(stripped):
                         bad.append("%s:%d: `q:prose` declared, but the line "
@@ -528,13 +579,7 @@ def selftest() -> int:
         with tempfile.TemporaryDirectory() as d:
             p = Path(d) / name
             p.write_text(body)
-            # scan() reads relative to ROOT, so hand it an absolute-ish shim
-            saved, globals()["ROOT"] = ROOT, Path(d)
-            try:
-                bad, checked, trig = scan(F, [name])
-            finally:
-                globals()["ROOT"] = saved
-            return bad, checked, trig
+            return scan(F, [name], root=Path(d))
 
     def run_peer(count, cells):
         """Scan a synthetic provenance-table.md through check_peer()."""
@@ -548,11 +593,7 @@ def selftest() -> int:
             if cells is not None:
                 body += "  " + ", ".join("T(%d,%d)" % c for c in cells) + "\n"
             (p / "provenance-table.md").write_text(body or "nothing here\n")
-            saved, globals()["ROOT"] = ROOT, Path(d)
-            try:
-                return check_peer(F)
-            finally:
-                globals()["ROOT"] = saved
+            return check_peer(F, root=Path(d))
 
     good_cells = ",".join("(%d,%d)" % c for c in F["congruence_only.cells@18"])
 
@@ -589,6 +630,27 @@ def selftest() -> int:
                     "<!--q:prose-->\n", "r4.md")
     if not any("states a number" in b for b in bad):
         problems.append("RED 4: `q:prose` on a line with a number was accepted")
+
+    # RED 16: the prose hatch used to smuggle a wrong cell LIST.  Every cell
+    # tuple is a "name" to NONCOUNT_RE, so a unit that listed the residual set
+    # stripped to nothing, passed as prose, and was counted as verified -- a
+    # fail-OPEN in the hatch that RED 4 guards the count half of.  A unit
+    # naming two or more cells is stating the set and must declare a fact.
+    bad, checked, _ = run(
+        "the residual band for row 40 is T(40,19), T(40,20), T(40,21), "
+        "T(40,23), T(40,25), T(40,27), congruence only. <!--q:prose-->\n",
+        "r16.md")
+    if not any("lists 6 cells" in b for b in bad) or checked:
+        problems.append("RED 16: `q:prose` on a line listing a WRONG cell set "
+                        "was accepted and counted as verified")
+
+    # GREEN 6: one named cell is a pointer, not the set, and stays prose-able.
+    bad, checked, _ = run("row 40's residual band still reaches T(40,21) "
+                          "under the congruence rule. <!--q:prose-->\n",
+                          "ok6.md")
+    if bad or checked != 1:
+        problems.append("GREEN 6: `q:prose` naming a single cell was rejected; "
+                        "the hatch has become unusable (%s)" % bad)
 
     # RED 5: a marker naming a fact that is not computed.
     bad, _, _ = run("congruence-only <!--q:invented.count@18=6-->\n", "r5.md")
@@ -703,7 +765,8 @@ def selftest() -> int:
         for p in problems:
             print("  " + p)
         return 1
-    print("residual-cells selftest ok: 5 green controls, 15 RED controls, all fired")
+    print("residual-cells selftest ok: 6 green controls, 16 RED controls, "
+          "all fired")
     return 0
 
 

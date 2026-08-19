@@ -229,7 +229,9 @@ def compare(name, banked, derived, path):
 # exists -- scripts/residual_cells.py's q-marker fact table, which has the
 # per-claim exemption facility this comment says a tree-wide sweep would need.
 # Adding a(40) to that fact table beats growing readme_claims into the third one.
-README_CLAIM_RE = re.compile(r"\ba\((\d+)\)\s*=\s*(\d{4,})")
+# No magnitude filter: `n in fixed` already bounds what is checked, and a
+# `\d{4,}` cutoff would skip a small a(n) claim without saying so.
+README_CLAIM_RE = re.compile(r"\ba\((\d+)\)\s*=\s*(\d+)")
 
 
 def readme_claims(fixed, text=None):
@@ -291,12 +293,6 @@ def run(mutate=None):
     ok(not bad, "README.md disagrees with the bank: %s"
        % ["a(%d) claims %d, bank has %d" % t for t in bad])
 
-    # The EXTERNAL anchor is n <= 18 and no further.  fixtures/b006770.txt
-    # carries 20 terms because the other gates read it as a general a(n)
-    # reference, but n = 19 and 20 in it are THIS PROJECT's -- comparing our
-    # upload against those is a self-check, and until 2026-08-19 this reported
-    # it as agreement with "the original OEIS terms".  Scoped, and the count is
-    # pinned so a future term appended to the fixture cannot quietly widen it.
     orig = load_nv(FIXTURES / "b006770.txt")
     if "b006770" in banked:
         # The external anchor: our a(n) against the terms OEIS carried before
@@ -326,21 +322,20 @@ def main() -> int:
         # caught, and a front page that stopped asserting anything must not
         # pass by having nothing left to check.
         fixed = fixed_from_triangle()
-        n40 = fixed[max(fixed)]
-        found, wrong = readme_claims(fixed, "a(%d) = %d\n" % (max(fixed), n40 + 1))
+        nmax = max(fixed)
+        _, wrong = readme_claims(fixed, "a(%d) = %d\n" % (nmax, fixed[nmax] + 1))
         vacuous, _ = readme_claims(fixed, "no claims here\n")
         # Three controls for the external anchor: a wrong digit inside the
         # anchor must fire; a disagreement ABOVE it must not (those terms are
         # ours, and treating them as external is the defect being fixed); and a
         # fixture that no longer reaches n = 18 must fire rather than shrink.
         real = load_nv(FIXTURES / "b006770.txt")
-        mine = dict(real)
         inside = dict(real); inside[10] = inside[10] + 1
-        ext_wrong = bool(external_anchor(inside, mine))
+        ext_wrong = bool(external_anchor(inside, real))
         above = dict(real); above[20] = above[20] + 1
-        ext_above = bool(external_anchor(above, mine))
+        ext_above = bool(external_anchor(above, real))
         short = {n: v for n, v in real.items() if n <= EXTERNAL_ANCHOR_NMAX - 1}
-        ext_short = bool(external_anchor(short, mine))
+        ext_short = bool(external_anchor(short, real))
         # One table, so the printed verdict and the exit code cannot drift
         # apart: every control names what it expects, and the same comparison
         # both prints and complains.

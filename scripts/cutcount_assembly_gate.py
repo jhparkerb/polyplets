@@ -90,6 +90,22 @@ def read_triangle(path: Path) -> dict[tuple[int, int], int]:
     return T
 
 
+def residue_rows(res_dir: Path) -> tuple[list[int], dict[int, Path]]:
+    """The banked residue rows for the top height, by prime.
+
+    Both arms below need exactly this, and they used to find it twice with two
+    copies of the glob, the filename pattern and the EXPECT_PRIMES pin -- which
+    had already drifted: one filtered names the pattern rejects, the other
+    called .group(1) on the failed match.  One reader, one posture.
+    """
+    found = {}
+    for path in sorted(res_dir.glob("C%d.p*.out" % EXPECT_TOP_H)):
+        m = re.fullmatch(r"C%d\.p(\d+)\.out" % EXPECT_TOP_H, path.name)
+        if m:
+            found[int(m.group(1))] = path
+    return sorted(found), found
+
+
 def check_assembly(rows_dir: Path, triangle: Path) -> tuple[list[str], int]:
     """T(n,H) from the banked C rows vs the incumbent triangle."""
     bad = []
@@ -139,17 +155,11 @@ def check_assembly(rows_dir: Path, triangle: Path) -> tuple[list[str], int]:
 def check_heldout(res_dir: Path, rows_dir: Path) -> tuple[list[str], int]:
     """CRT four primes, predict the fifth, and tie it to the banked exact row."""
     bad = []
-    res, primes = {}, []
-    for p in sorted(res_dir.glob("C%d.p*.out" % EXPECT_TOP_H)):
-        m = re.fullmatch(r"C%d\.p(\d+)\.out" % EXPECT_TOP_H, p.name)
-        if not m:
-            continue
-        prime = int(m.group(1))
-        primes.append(prime)
-        res[prime] = read_rows(p)
+    primes, paths = residue_rows(res_dir)
     if len(primes) != EXPECT_PRIMES:
         return (["found %d residue rows under %s, pinned at %d"
                  % (len(primes), show(res_dir), EXPECT_PRIMES)], 0)
+    res = {q: read_rows(paths[q]) for q in primes}
 
     # The runner held out the LAST prime of its list, which is the smallest of
     # the five; naming it by the rule rather than by the literal means this
@@ -224,13 +234,12 @@ def check_per_prime(res_dir: Path, rows_dir: Path,
     if not PRIME_CHECK.exists():
         return (["%s is missing; the per-prime check cannot run"
                  % show(PRIME_CHECK)], 0)
-    files = sorted(res_dir.glob("C%d.p*.out" % EXPECT_TOP_H))
-    if len(files) != EXPECT_PRIMES:
+    primes, paths = residue_rows(res_dir)
+    if len(primes) != EXPECT_PRIMES:
         return (["found %d residue rows for the per-prime check, pinned at %d"
-                 % (len(files), EXPECT_PRIMES)], 0)
-    for f in files:
-        prime = int(re.fullmatch(r"C%d\.p(\d+)\.out" % EXPECT_TOP_H,
-                                f.name).group(1))
+                 % (len(primes), EXPECT_PRIMES)], 0)
+    for prime in primes:
+        f = paths[prime]
         r = subprocess.run(
             [sys.executable, str(PRIME_CHECK), str(EXPECT_TOP_H), str(prime),
              str(f), str(rows_dir / ("C%d.out" % (EXPECT_TOP_H - 1))),
@@ -290,12 +299,13 @@ def selftest() -> int:
         problems.append("GREEN: the banked tree does not pass its own gate: %s"
                         % green)
 
-    def bump(path, factor=1):
+    def bump(path):
+        """Perturb the last cell of a banked file by one."""
         def m(d):
             p = d / path
             lines = p.read_text().splitlines()
             n, v = lines[-1].split()
-            lines[-1] = "%s %d" % (n, int(v) + factor)
+            lines[-1] = "%s %d" % (n, int(v) + 1)
             p.write_text("\n".join(lines) + "\n")
         return m
 
@@ -340,36 +350,36 @@ def selftest() -> int:
         problems.append("RED 5: an exact row out of step with its own residues "
                         "passed (%s)" % out[:2])
 
-    # RED 9: the per-prime arm must catch a corrupt row too, and it is the only
+    # RED 6: the per-prime arm must catch a corrupt row too, and it is the only
     # arm that reads the four CRT rows one at a time.
     out = staged(bump("residues/C18.p2147483579.out"))
     if not any("per-prime" in b and "2147483579" in b for b in out):
-        problems.append("RED 9: the per-prime check passed a corrupted row "
+        problems.append("RED 6: the per-prime check passed a corrupted row "
                         "(%s)" % out[:2])
 
-    # RED 6: a missing prime must fail, not shrink the check.
+    # RED 7: a missing prime must fail, not shrink the check.
     def drop_prime(d):
         (d / "residues" / "C18.p2147483587.out").unlink()
     if not any("pinned at %d" % EXPECT_PRIMES in b for b in staged(drop_prime)):
-        problems.append("RED 6: a dropped residue row shrank the check instead "
+        problems.append("RED 7: a dropped residue row shrank the check instead "
                         "of failing it")
 
-    # RED 7: a missing exact row must fail on contiguity and coverage, not pass
+    # RED 8: a missing exact row must fail on contiguity and coverage, not pass
     # with fewer cells.
     def drop_row(d):
         (d / "rows" / "C12.out").unlink()
     out = staged(drop_row)
     if not any("contiguous" in b for b in out) \
             or not any("coverage moved" in b for b in out):
-        problems.append("RED 7: a dropped C row did not fail contiguity and "
+        problems.append("RED 8: a dropped C row did not fail contiguity and "
                         "coverage (%s)" % out[:3])
 
-    # RED 8: vacuity -- an empty rows/ must fail rather than report clean.
+    # RED 9: vacuity -- an empty rows/ must fail rather than report clean.
     def empty(d):
         for p in (d / "rows").glob("C*.out"):
             p.unlink()
     if not any("not checking anything" in b for b in staged(empty)):
-        problems.append("RED 8: an empty rows/ reported clean")
+        problems.append("RED 9: an empty rows/ reported clean")
 
     if problems:
         print("cutcount-assembly selftest FAILED:")

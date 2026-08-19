@@ -84,6 +84,17 @@ endif
 # "*** [gate-foo] Error 1" line is printed several hundred lines above the
 # "*** [gates] Error 2" that ends the run.  A pre-push hook failing that way
 # reports nothing usable: this recipe pulls the target names back out.
+#
+# The bracket has TWO formats and the first version of this knew only one.
+# 3.81 prints "*** [gate-foo] Error 1"; GNU make 4.x -- 4.3 on ayr, 4.4.1 on
+# dalby -- prints "*** [Makefile:2: gate-foo] Error 1", so `\[gate-` matched
+# nothing and a red run on either Linux box printed an EMPTY list of red gates:
+# the very failure this recipe exists to fix, in the same worked-on-gympie-only
+# shape as the SHELL:=/bin/bash line at the top of this file.  The optional
+# "file:line: " prefix is part of the pattern now (POSIX BRE, so BSD and GNU
+# sed both take it), and a run that names no gate says so rather than printing
+# an empty heading -- a red PREREQUISITE ("*** [build/g2]") is named by no
+# gate line at all.
 GATELOG = build/gates.log
 
 gates:
@@ -94,7 +105,9 @@ gates:
 	 if [ $$st -ne 0 ]; then \
 	   echo; \
 	   echo "=== RED gate(s):"; \
-	   sed -n 's/^.*\*\*\* \[\(gate-[a-z0-9-]*\)\] Error.*/    \1/p' $(GATELOG) | sort -u; \
+	   named=$$(sed -n 's/^.*\*\*\* \[\(.*: \)\{0,1\}\(gate-[a-z0-9-]*\)\] Error.*/    \2/p' $(GATELOG) | sort -u); \
+	   if [ -n "$$named" ]; then echo "$$named"; \
+	   else echo "    (none named -- the failure was in a prerequisite; see the log)"; fi; \
 	   echo "=== full log: $(GATELOG)"; \
 	   echo "=== serial re-run, output no longer interleaved: make gates JOBS=1"; \
 	 fi; \
@@ -133,7 +146,8 @@ gate-provenance:
 # rule-independence band), and nothing defined either.  A residual claim with no
 # `<!--q:fact=value-->` marker fails; so does a marker that disagrees; so does a
 # scan that matches nothing at all.  15 RED controls (--selftest), one of them
-# for the fail-OPEN that let "**only** the mod-4" past the pattern.  ~2 s.
+# for the fail-OPEN that let "**only** the mod-4" past the pattern and one
+# for the hatch accepting a wrong cell LIST.  16 RED controls.  ~0.3 s.
 gate-residual-cells:
 	python3 scripts/residual_cells.py --selftest
 	python3 scripts/residual_cells.py --check
@@ -147,7 +161,7 @@ gate-residual-cells:
 # never touches, so a corrupted row would have sat in results/ unnoticed, and
 # the 40/40 was the runner's word until the residue rows were banked the same
 # day.  Coverage is pinned as well as agreement -- a dropped row or prime fails
-# rather than shrinking the check.  8 RED controls (--selftest).  ~1 s.
+# rather than shrinking the check.  9 RED controls (--selftest).  ~0.8 s.
 gate-cutcount-assembly:
 	python3 scripts/cutcount_assembly_gate.py --selftest
 	python3 scripts/cutcount_assembly_gate.py
@@ -511,6 +525,17 @@ build/severance_w3_families: cpp/severance_w3_families.cpp cpp/obs.h | build
 # builds them; the axiom audits are #guard_msgs blocks inside the modules
 # (AuditOutworks pattern), so axiom drift also fails the build. RED until the
 # wave-1 agents land their proofs.
+#
+# TODO(2026-08-19, from the simplify pass): this builds a MODULE LIST, and the
+# failure class 79dbc6e fixed is invisible to a module list -- every one of the
+# 8643 module targets was green while the root `Polyplets.lean` failed at
+# import, because `kingConnected_image` had been declared in two modules and
+# only the aggregate sees both.  PROOF-STATUS.md now says in bold "run the
+# whole lake build, not a module", which leaves the rule enforced by a human
+# remembering a sentence -- the shape a gate exists to replace.  Adding the
+# root target `Polyplets` here is the fix; not done in this pass because it
+# needs a Lean toolchain to verify (gympie only) and widens what can turn this
+# gate red, so it wants its own change with a real build behind it.
 NOTARY_MODULES := polyplets/Polyplets/GapWalkBridge.lean \
                   polyplets/Polyplets/DepthOneConstants.lean \
                   polyplets/Polyplets/DepthOneSeries.lean \
