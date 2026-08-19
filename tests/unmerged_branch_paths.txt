@@ -1,0 +1,33 @@
+# (branch, path) pairs behind every 'unmerged branch' declaration in this tree.
+# Written by tests/gate_citations.py --write-manifest from a tree that HAS those refs;
+# it is what a clone, which does not, checks the declarations against.
+half-measure cpp/cutcount_b1.cpp
+half-measure docs/second-source-team-brief.md
+half-measure results/king-column-motzkin.md
+half-measure results/scaling-exploration-A.md
+half-measure tests/gate_confetti.py
+half-measure tests/gate_cutcount_b1.py
+triangle-structure docs/triangle-round3-brief.md
+triangle-structure docs/triangle-round4.md
+triangle-structure docs/triangle-structure-round2-brief.md
+triangle-structure docs/triangle-structure-team-brief.md
+triangle-structure results/r4/WINDDOWN.md
+triangle-structure results/r4/queue.md
+triangle-structure results/r4/r4-adv-cost.md
+triangle-structure results/r4/r4-adv-ind.md
+triangle-structure results/r4/r4-gen3.md
+triangle-structure results/r4/r4-inv.md
+triangle-structure results/r4/r4-lean.md
+triangle-structure results/triangle-hunt-cross-lattice.md
+triangle-structure results/triangle-hunt-enumerator-crosscheck.md
+triangle-structure results/triangle-hunt-refutation-columns.md
+triangle-structure results/triangle-hunt-refutation-symmetry.md
+triangle-structure results/triangle-r3-adv-cost.md
+triangle-structure results/triangle-r3-adv-independence.md
+triangle-structure results/triangle-r3-blind-l4.md
+triangle-structure results/triangle-r3-blind-l6.md
+triangle-structure results/triangle-r3-l3-proofscope.md
+triangle-structure results/triangle-r3-l5-constraint.md
+triangle-structure results/triangle-r3-queue.md
+triangle-structure results/triangle-r3-spin.md
+triangle-structure results/triangle-r3-winddown.md

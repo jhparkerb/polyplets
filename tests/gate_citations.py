@@ -102,6 +102,28 @@ def history_paths(rev="HEAD"):
     return set(out.split())
 
 
+# (branch, path) pairs recorded from a tree that had the campaign refs. A clone
+# has the declarations and not the branches, so without this the declaration
+# would exempt anything at all in a declaring file -- fail-open in exactly the
+# environment the gate exists to protect. Regenerate with --write-manifest from
+# a tree that has the refs; the gate diffs it against them when they are there.
+MANIFEST_PATH = os.path.join(ROOT, "tests", "unmerged_branch_paths.txt")
+
+
+def read_manifest():
+    out = set()
+    if os.path.exists(MANIFEST_PATH):
+        with open(MANIFEST_PATH) as fh:
+            for line in fh:
+                line = line.split("#", 1)[0].strip()
+                if line:
+                    ref, path = line.split(None, 1)
+                    out.add((ref, path))
+    return out
+
+
+MANIFEST = read_manifest()
+
 _BRANCH_CACHE = {}
 
 
@@ -181,9 +203,15 @@ def classify(text, hist, source="<doc>"):
                 carried = [branch_carries(r, p) for r in declared]
                 if any(c is True for c in carried):
                     out["branch"].append(rec)
-                elif all(c is None for c in carried):
-                    out["branch"].append(rec)          # ref absent: unverifiable
+                elif any((r, p) in MANIFEST for r in declared):
+                    # Ref absent -- the reader's case. The manifest, written
+                    # from a tree that HAD the refs, is what stands in for
+                    # them, so a path nobody ever recorded still fails.
+                    out["branch"].append(rec)
                 else:
+                    # Either a declared ref is here and does not carry the path,
+                    # or none is here and the manifest has never seen it. Both
+                    # are a declaration that does not cover what it claims.
                     out["false_claim"].append(rec + (tuple(declared),))
             else:
                 out["MISSING"].append(rec)
@@ -200,6 +228,9 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--verbose", action="store_true",
                     help="list the history-only citations too")
+    ap.add_argument("--write-manifest", action="store_true",
+                    help="rewrite tests/unmerged_branch_paths.txt from the "
+                         "campaign refs in THIS tree (needs them present)")
     args = ap.parse_args()
 
     hist = history_paths()
@@ -230,6 +261,50 @@ def main():
             print(f"    {f}")
     for k in CLASSES:
         print(f"  {k:9s} {len(totals[k])}")
+
+    # What the branch class resolved through refs that are actually here. This
+    # is the manifest's content, and comparing it to the file on disk is the
+    # same regenerate-and-diff shape as gate-provenance.
+    resolved, present_refs = set(), set()
+    for f in files:
+        path = os.path.join(ROOT, f)
+        if not os.path.exists(path):
+            continue
+        with open(path, errors="replace") as fh:
+            text = fh.read()
+        for ref in BRANCH_DIRECTIVE_RE.findall(text):
+            if branch_carries(ref, "") is not None:
+                present_refs.add(ref)
+    for src, _, p_ in totals["branch"]:
+        with open(os.path.join(ROOT, src), errors="replace") as fh:
+            for ref in BRANCH_DIRECTIVE_RE.findall(fh.read()):
+                if ref in present_refs and branch_carries(ref, p_):
+                    resolved.add((ref, p_))
+
+    if args.write_manifest:
+        if not present_refs:
+            print("--write-manifest needs the campaign refs, and this tree has "
+                  "none of the ones the records declare")
+            return 1
+        with open(MANIFEST_PATH, "w") as out:
+            out.write("# (branch, path) pairs behind every 'unmerged branch' "
+                      "declaration in this tree.\n"
+                      "# Written by tests/gate_citations.py --write-manifest "
+                      "from a tree that HAS those refs;\n"
+                      "# it is what a clone, which does not, checks the "
+                      "declarations against.\n")
+            for ref, p_ in sorted(resolved):
+                out.write(f"{ref} {p_}\n")
+        print(f"wrote {MANIFEST_PATH} ({len(resolved)} pairs)")
+        return 0
+
+    manifest_drift = []
+    if present_refs:
+        for_present = {(r, p_) for (r, p_) in MANIFEST if r in present_refs}
+        for pair in sorted(resolved - for_present):
+            manifest_drift.append(("not in the manifest", pair))
+        for pair in sorted(for_present - resolved):
+            manifest_drift.append(("in the manifest, cited by nothing", pair))
 
     if totals["branch"]:
         srcs = sorted({src for src, _, _ in totals["branch"]})
@@ -277,6 +352,27 @@ def main():
     print("RED  a branch declaration does not exempt a path its own branch "
           "lacks  OK")
 
+    # RED control 3: the reader's case. The named ref is not in this tree at all
+    # (no clone has it), so the manifest is the only thing standing behind the
+    # declaration -- and a path the manifest has never seen must still fail.
+    # Without this the declaration would exempt anything in a declaring file.
+    absent_ref = classify("this record cites `results/definitely-not-here.md`, "
+                          "and its siblings\nlive on unmerged branch "
+                          "`no-such-branch-red-control`\n", hist, "<red3>")
+    if len(absent_ref["false_claim"]) != 1:
+        print("\nRED CONTROL FAILED: a declaration naming a branch this tree "
+              "does not have now exempts a path the manifest has never seen")
+        return 1
+    print("RED  a declaration for an absent branch does not exempt a path the "
+          "manifest has never seen  OK")
+
+    if manifest_drift:
+        print(f"\nGATE CITATIONS: RED -- tests/unmerged_branch_paths.txt is "
+              f"{len(manifest_drift)} row(s) out of step with the refs in this "
+              f"tree; rerun with --write-manifest:")
+        for why, (ref, p_) in manifest_drift:
+            print(f"  {ref} {p_}   {why}")
+
     if totals["false_claim"]:
         print(f"\nGATE CITATIONS: RED -- {len(totals['false_claim'])} "
               f"citation(s) sit under a branch declaration that does not carry "
@@ -297,7 +393,7 @@ def main():
     if absent:
         print("\nGATE CITATIONS: RED -- a tracked file is not in the working "
               "tree; commit the deletion or restore the file.")
-    if totals["MISSING"] or absent or totals["false_claim"]:
+    if totals["MISSING"] or absent or totals["false_claim"] or manifest_drift:
         return 1
 
     print("\nGATE CITATIONS: GREEN")
