@@ -46,11 +46,12 @@ its tier.
 | `tests/` | the gate suite (red-first, fail-closed; `make gates`) |
 | `oeis/`, `submissions/` | staged OEIS extensions and new-sequence drafts (nothing auto-submitted) |
 | `docs/` | reference docs (engineering standards, observability contract, job checklist, formats, glossary, engine + dmirror design), the proofs in `docs/proofs/`, and the campaign record — map: [`docs/README.md`](docs/README.md) |
-| `papers/` | the cited literature (PDFs) |
+| `papers/` | the cited literature. The PDFs are gitignored — copyrighted work stays local — so a clone gets `INDEX.txt` (provenance) and `MISSING.md` (what could not be obtained, and why) and none of the files |
 
 One-shot launch scripts, per-term plans, and the research-log corpus that
-produced all this were removed at project close (2026-07-06); they remain
-in git history.
+produced all this were removed when the enumeration ladder closed at a(40)
+(2026-07-06); they remain in git history. The ladder is what closed, not the
+project: the analytic, arithmetic and perimeter work above all postdates it.
 
 ## Reproducing
 
@@ -67,17 +68,17 @@ a(26), on 2026-07-02, took 4066 s on 80; the difference is the kink-carry
 kernel that replaced it. `scripts/dalby_term.sh 24` is the same thing in 8 s if
 you want to see it work before committing a minute.
 
-The rest, with wall times measured on a clean clone of this commit (ayr: 32
+The rest, with wall times measured on a clean clone on 2026-08-19 (ayr: 32
 cores, g++ 12.2, TeX Live 2022, no clang and no Lean):
 
 ```sh
 make                       # the gate suite; there is no separate build
-                           # step, because each gate builds what it needs. 409 s
-make ns-gates              # the production engine's own suite. 775 s
+                           # step, because each gate builds what it needs. 423 s
+make ns-gates              # the production engine's own suite. 787 s
 make -C paper              # the 11 PDFs, which are gitignored. 14 s
 python3 paper/verify_l_papers.py         # 336 checks, 23 of them RED controls
 python3 paper/verify_technical_report.py # 781 checks
-ALLOW_PARTIAL=1 python3 paper/verify_claims.py   # 425 of 428 checks. 905 s
+ALLOW_PARTIAL=1 python3 paper/verify_claims.py   # 425 of 428 checks. 912 s
 ```
 
 `verify_claims.py` is fail-closed on missing evidence and **exits 1 on a fresh
