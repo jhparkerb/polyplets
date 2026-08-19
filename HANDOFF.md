@@ -15,7 +15,7 @@ controls reproduce the census timings to under 0.1%, so the fits are trusted.
   Still NOT approved and NOT launched --- and at this price the decision is
   his, not a formality.
 
-## 2026-08-18 (latest) — THE ABZ PAPER WAS FREE; L6 EDITS PENDING
+## 2026-08-18 (latest) — THE ABZ PAPER WAS FREE; L6 EDITS DONE
 
 The paywalled Asinowski--Barequet--Zheng paper the L6 pass wanted is obtained:
 the ANALCO 2018 polycube companion, "Polycubes with small perimeter defect,"
@@ -31,9 +31,9 @@ read; full verdict in `docs/priority-passes-2026-08-18.md` §ABZ full text.
 - **They conjecture what we measured.** Their §4 conjectures highest-degree
   factor `(x-1)^(k+1)` and asymptotics `gamma n^k`. Our table has `Phi_1^(k+1)`
   and degree `k` for every `k <= 6` on both lattices.
-- **Pending, his call: the L6 edits.** Cite the ANALCO paper rather than the
-  slides, and restate the degree row as confirming a published conjecture
-  rather than as our own observation.
+- **The L6 edits landed** (`df60c8b`): the paper cites the ANALCO text rather
+  than the slides, and the degree row now reads as a published conjecture this
+  paper confirms rather than as an observation of ours.
 
 Re-confirmed unobtainable in the same pass: **Barequet--Magal 2023** (no
 preprint, no conference version; the author's page now offers only a
@@ -87,8 +87,8 @@ class with falling growth ratio. L3's repaired proof re-derived from scratch:
 shared sets are 4 cells orthogonal, 2 diagonal, frames 3 or 5 slots as claimed.
 
 Still open, his: every L ledger reads "human verification: none"; whether
-`docs/` and the Ghost Ship tree go public; the paywalled ABZ paper is still
-wanted (the slides state theorems without proofs).
+`docs/` and the Ghost Ship tree go public. (The ABZ paper this section wanted
+was obtained the same day -- see the section above it.)
 
 ## 2026-08-18 — L PAPERS BROUGHT CURRENT; TWO NEW ONES; k=6 HARVESTED
 
@@ -403,8 +403,8 @@ statement that did not survive contact.
   sequential 31-bit-prime passes, CRT from four + held-out fifth (RED-D),
   T(n,18) vs the incumbent triangle at the end; **~16 h/pass, ~82 h total,
   ~83 GB peak** (measured: modp wall ~0.47x u128 at H = 12, 13). Gate
-  battery GREEN on dalby (`tests/gate_confetti.py`, unmerged branch
-  `half-measure` at `3002104`;
+  battery GREEN on dalby (`tests/gate_confetti.py`, on the
+  unmerged branch `half-measure` at `3002104`;
   brute A030232-anchored oracle, 4 planted REDs all caught) and **receipt
   enforcement now exists and is red-tested** — the runner
   (`scripts/dalby_confetti_h18.sh`, master `443ed36`) refuses to run a

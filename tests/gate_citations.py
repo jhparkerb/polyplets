@@ -65,7 +65,9 @@ EXEMPT_WORDS = ("deleted", "removed", "planned", "todo", "deliverable",
 # merged declares that branch once, at the top of the file, and the declaration
 # governs the whole file: `unmerged branch `triangle-structure``. It is an
 # exemption with a checkable claim attached -- see branch_carries().
-BRANCH_DIRECTIVE_RE = re.compile(r"unmerged branch `([A-Za-z0-9._/-]+)`")
+# \s+ rather than a literal space: prose wraps, and the first file to use
+# this (HANDOFF.md) wrapped between "branch" and the name.
+BRANCH_DIRECTIVE_RE = re.compile(r"unmerged branch\s+`([A-Za-z0-9._/-]+)`")
 # Trees a CLONE legitimately does not have.  Until 2026-08-18 this list was
 # tuned on a working tree, where untracked leftovers made citations look live;
 # in a clean clone -- which is what a reader gets -- 101 citations pointed at

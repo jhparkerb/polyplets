@@ -61,10 +61,13 @@ door, and let the PDFs be what a visitor reads *second*.
 **Track A — the front door.** Acceptance-queue items 2–4, and they are the
 release, not the run-up to it.
 
-- A genuine clean-clone run on ayr or dalby. Currently broken two ways:
-  `build/ns/*_worker` isn't built by a bare `make`, and the citation gate wants
-  `papers/` PDFs a clone deliberately doesn't have. One documented command that
-  reproduces a(26) from nothing.
+- A genuine clean-clone run on ayr or dalby. **Run 2026-08-18 on ayr**
+  (`scripts/clean_clone_check.sh`), and it broke in three places the working
+  tree hid: the citations gate was judging against 50 local refs a clone does
+  not have, four translation units do not compile under GCC, and the term
+  runner started with `cd ~/src/polyominoes`. All three fixed. What the item
+  still wants is the documented command that reproduces a term from nothing,
+  with a measured cost against it.
 - **One per-cell provenance table**, gated against the banked rows so it cannot
   drift. Today "what is confirmed, by which independent source, covering what
   share" is spread across five files, and that spread already caused one
@@ -86,9 +89,10 @@ Runs alongside Track A without competing for anyone's attention.
 and L9 were written on 2026-08-18. Release order stays L3, L1, L4 first: clean
 novelty verdicts, and warrants a stranger can re-run in exact arithmetic, which
 is exactly the kind of paper that survives having no
-referee. Each needs, in order: a priority pass dated after its own drafting;
-enough reading from jasonp to replace "human verification: none" in the ledger
-with a specific line; then it goes in the repo with the rest.
+referee. The priority passes are done -- all nine, 2026-08-18,
+`docs/priority-passes-2026-08-18.md`. What each still needs is enough reading
+from jasonp to replace "human verification: none" in the ledger with a specific
+line; then it goes in the repo with the rest.
 
 **Track D — P1, after the provenance table exists.** The 30–50 hour estimate
 stands and most of it is the engine chapter and §Reproducibility. Writing
@@ -102,21 +106,24 @@ Then P2, P3, and the analytic papers.
 
 | | paper | drafted | gate before it goes public |
 |---|---|---|---|
-| **L3** | λ bracket 6.543 ≤ λ ≤ 9.3154 | yes, 14pp | priority pass; certificates regenerate on a clean box; **9.3154, never rounded back** |
-| **L1** | diagonal law | yes, 15pp | priority pass |
-| **L4** | not D-finite | yes, 11pp | priority pass |
-| **L2** | mod-3 arithmetic | yes, 10pp | **novelty never swept** — N1–N6 never touched the spine cubic, the digit product or the SNF count |
-| **L5** | convex polyplets | yes, 18pp | Gouyou-Beauchamps–Leroux cited in three places, every revision. See §5 |
+| **L3** | λ bracket 6.543 ≤ λ ≤ 9.3154 | yes, 14pp | pass done 08-18, no collision on the king constant; certificates regenerate on a clean box; **9.3154, never rounded back** |
+| **L1** | diagonal law | yes, 15pp | pass done 08-18 |
+| **L4** | not D-finite | yes, 11pp | pass done 08-18 (nothing re-searched since its own sweep) |
+| **L2** | mod-3 arithmetic | yes, 10pp | pass done 08-18, no collision on the spine cubic, the digit product or the SNF count; Rowland–Yassawi cited as the adjacent method |
+| **L5** | convex polyplets | yes, 18pp | Gouyou-Beauchamps–Leroux cited in three places, every revision; Richard arXiv:0704.0716 in three more. See §5 |
 | **L7** | subdominant exponential, amplitude ratio | yes, 11pp | same attribution, two places; the sharp-asymptotic conjecture stays labelled a conjecture |
-| **L6** | perimeter gradings | yes, 11pp | **compute-gated and unresolved** — §5 |
+| **L6** | perimeter gradings | yes, 11pp | compute gate **cleared**; cites the ANALCO text, and hands the degree column back to Asinowski–Barequet–Zheng as their conjecture |
+| **L8** | below the onset | yes, 8pp | pass done 08-18 and the paper says on page 1 why the negative is weak |
+| **L9** | the cut-count identity | yes, 6pp | **the identity is not new** — Fortuin–Kasteleyn/Potts in scan order; claims no theorem |
 | **P1** | fixed polyplets through a(40) | 40% | Track A |
 | **P2**, **P3** | — | not started | his prose; P3 additionally on the `hv-growth-sandwich` reading gate |
 
 Every L ledger currently reads "human verification: none", and every L paper
 carries a loud draft banner saying so. A repo release can honestly ship a draft
 banner in a way a journal cannot — but then the banner has to be true, and
-"none" across seven papers is a weaker position than "statements read" across
-three.
+"none" across nine papers is a weaker position than "statements read" across
+three. This is the one gate on the L side that no amount of machine work
+closes.
 
 ## 5. Open decisions
 
