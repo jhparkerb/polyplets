@@ -40,9 +40,18 @@
 # It exists so the chain check can be exercised without an N-hour run
 # (AUDIT-2026-07-30 P4).
 set -e
-cd ~/src/polyominoes
+# Repo root from the script's own location, not a hardcoded ~/src/polyominoes:
+# a fresh clone lands wherever the reader put it, and the acceptance-queue
+# item-2 run found this line was the first thing that broke outside our tree.
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 N="$1"
 [ -n "$N" ] || { echo "usage: dalby_term.sh N [--resume]   (or VALIDATE_ONLY=1 dalby_term.sh N)"; exit 2; }
+
+# Core count from the box, not from dalby's 80. CORES=n overrides. Every
+# measurement quoted in this header was taken at 80 on dalby, which is what
+# nproc returns there, so the validated configuration is unchanged where it was
+# validated; elsewhere the run fits the machine instead of oversubscribing it.
+CORES=${CORES:-$(nproc 2>/dev/null || sysctl -n hw.ncpu)}
 RUNDIR=${RUNDIR:-runs/ns_a${N}/dalby}
 
 RESUME_FLAG=""
@@ -249,12 +258,13 @@ if [ "$N" -ge 40 ]; then
   # each; malloc_trim now returns freed pages between requests, and the
   # smaller fleets bound the sum even at retained peaks. The poles are
   # disk-bound (eff_cores ~14), so the wall cost is small.
-  run_phase A "1-$((N-21)),$((N-18))-$N" 80 "$N" && \
-  run_phase B "$((N-20))" 48 1 && \
-  run_phase C "$((N-19))" 32 1 || RC=$?
+  # 80/48/32 on dalby, held as the same proportions of whatever CORES is.
+  run_phase A "1-$((N-21)),$((N-18))-$N" "$CORES" "$N" && \
+  run_phase B "$((N-20))" "$(( CORES * 6 / 10 ))" 1 && \
+  run_phase C "$((N-19))" "$(( CORES * 4 / 10 ))" 1 || RC=$?
 else
   ./build/ns/orchestrate --maxn "$N" --kernel kink --counter u128 \
-    --cores 80 --ram 1073741824 --overlap-heights "$N" \
+    --cores "$CORES" --ram 1073741824 --overlap-heights "$N" \
     --run-dir "$RUNDIR" --spill-dir "$RUNDIR/spill" $FASTMAP_FLAG \
     --checkpoint "$RUNDIR/POLYCKPT" --checkpoint-every 300 $RESUME_FLAG \
     --per-height-out runs/ns_a${N}/perheight \

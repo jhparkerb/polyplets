@@ -17,17 +17,28 @@ closed-form theory for the diagonals of two counting triangles (the laws'
 polynomial shapes proved, the higher-level constants fitted and
 holdout-validated).
 
-**The full account is the report: [`paper/polyplets-report.tex`](paper/polyplets-report.tex)**
-— results, methods ladder, and (critically) the confidence-tier system
-that says exactly how well-verified each number is. Nothing in this repo
-claims more than its tier.
+**Why believe the number:** one per-cell table,
+[`results/provenance-table.md`](results/provenance-table.md), says for every
+cell of the triangle what confirms it and by which independent source. It is
+generated, and `make gate-provenance` fails if any figure in it drifts from the
+banked rows.
+
+**The full account** is the confidence-tier system summarised below and set out
+in [`paper/polyplets-report.tex`](paper/polyplets-report.tex) — a complete
+machine-written draft, now superseded as a manuscript and kept as source
+material. The manuscript that replaces it,
+[`paper/technical-report.tex`](paper/technical-report.tex), is about 40% built.
+Nine shorter papers on the analytic and arithmetic side are drafted and carry
+their own verification ledgers; `paper/README.md` is their index and says which
+of them claim novelty and which do not. Nothing in this repo claims more than
+its tier.
 
 ## Layout
 
 | where | what |
 |---|---|
 | `results/` | banked evidence: per-term ledgers `ns_a*/` (triangle, PROVENANCE, per-height rows, cost), analysis notes, b-file staging (`b*_upload.txt`) |
-| `paper/` | the report + its self-contained claims checker `verify_claims.py` and fit/bound scripts |
+| `paper/` | the manuscripts — P1 (`technical-report.tex`) and the nine L papers — with the self-contained checkers `verify_claims.py`, `verify_technical_report.py`, `verify_l_papers.py` and the fit/bound scripts; index and authorship split: [`paper/README.md`](paper/README.md) |
 | `cpp/` | Redelmeier enumerators (`g2_redelmeier.cpp`, Method A), column transfer matrix (`tma*`), symmetric transfer matrices (`sym/symtm.cpp`) |
 | `core/`, `orchestrator/`, `worker/` | the production kink-carry transfer-matrix engine (Go orchestration, C++ kernels); design: `docs/engine-design.md` |
 | `scripts/` | the general toolchain: production runners (`dalby_term.sh`, `symtm_run.sh`, `dmirror_strips.sh`), derivers (`derive_pk_fast.py`, `dmirror_diagonals.py`, `derive_related.py`), assembly (`dmirror_sum.py`, `dmirror_hybrid_sum.py`), independent confirmation (`g2_campaign.sh`) |
