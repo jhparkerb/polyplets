@@ -1,5 +1,41 @@
 # HANDOFF — live state (updated 2026-08-18)
 
+## 2026-08-18 (latest, 23:55 EDT) — THE REPO NOW SURVIVES `git clone && make`
+
+Acceptance-queue item 2 is CLOSED. `scripts/clean_clone_check.sh` on ayr, rev
+`0171909`: `make` 404 s, `make ns-gates` 769 s, all three verifiers, all 11
+PDFs in 13 s, and **a(26) = 102607513847014153892 reproduced in 23 s on 32
+cores** with the whole chain to a(25) validated on the way. Every phase green.
+Table and per-defect detail: `docs/acceptance-queue.md` item 2.
+
+Four defects, none of them visible from this working tree:
+
+- **The citations gate was judging against my refs.** Its history class ran
+  `git log --all`; gympie has 50 local refs and a clone of master has one. 65
+  citations across 25 campaign records dangled in the clone, every one pointing
+  at `triangle-structure` or `half-measure` --- branches that never merged and
+  are **not on origin**. The gate now scopes history to HEAD and takes a
+  per-file declaration (`unmerged branch \`X\``) that it VERIFIES against the
+  ref when the ref is present. Proved both ways on ayr: green with the campaign
+  refs, green with them deleted, 0 MISSING either way.
+- **Four translation units do not compile under GCC.** `strip_mu_kink.cpp:132`
+  passed a compound literal to `matvec` and broke the build outright; the other
+  three were `-Werror` warnings clang does not raise. Note in passing:
+  `strip_mu.cpp`'s three `#pragma omp` have never been active, because its
+  build rule passes no `-fopenmp` --- every recorded mu_H is from a serial run.
+- **`scripts/dalby_term.sh` began with `cd ~/src/polyominoes`.** Repo root from
+  the script's own path now, cores from `nproc` (which is 80 on dalby, so every
+  measurement in its header still describes the box it was measured on).
+- **The papers do not build on a stock TeX Live.** `numprint` pulls `textcomp`,
+  and an install without `lmodern` answers a TS1 request with a METAFONT
+  bitmap, which microtype's expansion refuses. `shared/preamble.tex` takes the
+  good branch when `lmodern` is there and turns expansion off when it is not.
+
+**His, unchanged by any of this:** whether `triangle-structure` and
+`half-measure` get pushed (65 citations point into them), and whether `docs/`
+and the Ghost Ship tree go public at all.
+
+
 ## DONE — k=7 defect calibration (dalby, finished 2026-08-18 23:53Z)
 
 Numbers and the fits: `results/perimeter-defect-k7-pricing.md`. The k=6
@@ -15,7 +51,7 @@ controls reproduce the census timings to under 0.1%, so the fits are trusted.
   Still NOT approved and NOT launched --- and at this price the decision is
   his, not a formality.
 
-## 2026-08-18 (latest) — THE ABZ PAPER WAS FREE; L6 EDITS DONE
+## 2026-08-18 — THE ABZ PAPER WAS FREE; L6 EDITS DONE
 
 The paywalled Asinowski--Barequet--Zheng paper the L6 pass wanted is obtained:
 the ANALCO 2018 polycube companion, "Polycubes with small perimeter defect,"

@@ -7,7 +7,8 @@ Esoteric or deep-math results are deliberately out of scope here even where they
 are mathematically the more interesting open threads.
 
 Status column is the state at the time of writing; update in place.
-Last swept 2026-08-18 (items 3, 4 and 6 closed; item 1 rescoped).
+Last swept 2026-08-18 (item 2 closed by the ayr clean-clone run; items 3, 4
+and 6 closed earlier the same day; item 1 rescoped).
 
 ## 1. Finish the Motley ladder — Confetti (H=18), then Ticker Tape (H=19)
 
@@ -38,17 +39,37 @@ restart a healthy run.
 
 ## 2. Fresh-clone reproducibility, end to end, on a clean box
 
-STATUS: OPEN, half fixed. The citation half is closed --- `619fe40` exempts the
-two trees a clone legitimately lacks (`papers/`, `polyplets/.lake/`), and
-`gate-citations` is green on a tree without them. Still open: `build/ns/*_worker`
-is not built by a bare `make`, and **no genuine clean-clone run has been done**,
-which is the whole point of the item.
+STATUS: **DONE** (2026-08-18, ayr). `scripts/clean_clone_check.sh` clones from a
+bundle, runs every phase a reader would run, and records an exit code per phase
+instead of stopping at the first failure. Final run, rev `0171909`, all green:
 
-A referee's first act is `git clone && make`. Failing that on a project whose
-whole credibility rests on its gate battery is the worst available first
-impression. Do a genuine clean-clone run on ayr or dalby, fix what breaks, and
-add one documented command that reproduces a real value (a(26) is the right
-size) from nothing but the clone.
+| phase | wall |
+|---|---|
+| `make` (the gate suite; there is no separate build step) | 404 s |
+| `make ns-gates` | 769 s |
+| `ALLOW_PARTIAL=1 python3 paper/verify_claims.py` (425 of 428) | 902 s |
+| `python3 paper/verify_l_papers.py` (336 checks, 23 RED) | <1 s |
+| `python3 paper/verify_technical_report.py` (781 checks) | <1 s |
+| `make -C paper` (11 PDFs) | 13 s |
+| `scripts/dalby_term.sh 26` --- **a(26) = 102607513847014153892** | 23 s |
+
+Four things were broken and are fixed. The citations gate was scoping its
+history class to `git log --all`, so it passed on gympie's 50 local refs and
+went RED with 65 dangling citations in a clone of master --- every one of them
+on `triangle-structure` or `half-measure`, campaign branches that are not on
+origin. Four translation units did not compile under GCC (`strip_mu_kink`'s
+compound literal broke the build outright; the rest were `-Werror` warnings
+clang does not raise). `scripts/dalby_term.sh` began with `cd
+~/src/polyominoes`. And `make -C paper` died on a TeX Live without `lmodern`,
+because microtype cannot expand the bitmap font METAFONT hands back for a TS1
+glyph.
+
+Two things a reader should know rather than have fixed: `verify_claims.py`
+exits 1 on a clone without `ALLOW_PARTIAL=1`, because three of its checks read
+`runs/sym32` and that is run output; and the 65 branch citations are still
+citations into branches origin does not carry. **Whether those two branches get
+published is his call** --- the gate no longer passes on evidence the reader
+does not have either way.
 
 ## 3. One provenance table, per-cell, replacing the scattered accounting
 
