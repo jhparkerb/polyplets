@@ -156,20 +156,21 @@ def facts() -> dict:
         q2 = sorted(row40_residual(h))
         F["congruence_only.cells@%d" % h] = q1
         F["congruence_only.count@%d" % h] = len(q1)
-        F["row40_congruence_only.cells@%d" % h] = [c for c in q1 if c[0] == NMAX]
-        F["row40_congruence_only.count@%d" % h] = len(
-            [c for c in q1 if c[0] == NMAX])
+        row40_q1 = [c for c in q1 if c[0] == NMAX]
+        F["row40_congruence_only.cells@%d" % h] = row40_q1
+        F["row40_congruence_only.count@%d" % h] = len(row40_q1)
         F["row40_residual.cells@%d" % h] = q2
         F["row40_residual.count@%d" % h] = len(q2)
         F["closure_n@%d" % h] = closure_n(h)
         if prev_q1 is not None:
             # what the rung AT this height retires, which is the figure every
             # pricing note quotes and the one that was wrong.
-            F["retires.cells@%d" % h] = [c for c in prev_q1 if c not in q1]
-            F["retires.count@%d" % h] = len([c for c in prev_q1 if c not in q1])
-            F["row40_retires.cells@%d" % h] = [c for c in prev_q2 if c not in q2]
-            F["row40_retires.count@%d" % h] = len(
-                [c for c in prev_q2 if c not in q2])
+            retired = [c for c in prev_q1 if c not in q1]
+            row40_retired = [c for c in prev_q2 if c not in q2]
+            F["retires.cells@%d" % h] = retired
+            F["retires.count@%d" % h] = len(retired)
+            F["row40_retires.cells@%d" % h] = row40_retired
+            F["row40_retires.count@%d" % h] = len(row40_retired)
         prev_q1, prev_q2 = q1, q2
     return F
 
@@ -348,9 +349,6 @@ def trigger_lines(text: str) -> list[tuple[int, str]]:
         lo = i
         while lo > 0 and not boundary(lo - 1) and not BULLET_RE.match(lines[lo]):
             lo -= 1
-        if not BULLET_RE.match(lines[lo]):
-            while lo > 0 and not boundary(lo - 1):
-                lo -= 1
         hi = i
         while hi + 1 < len(lines) and not boundary(hi + 1):
             hi += 1
