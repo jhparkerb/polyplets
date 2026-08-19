@@ -113,10 +113,16 @@ def branch_carries(ref, path):
     path is a harder failure than the dangling citation it was meant to excuse.
     """
     if ref not in _BRANCH_CACHE:
-        exists = subprocess.run(["git", "-C", ROOT, "rev-parse", "--verify",
-                                 "--quiet", ref + "^{commit}"],
-                                capture_output=True, text=True).returncode == 0
-        _BRANCH_CACHE[ref] = history_paths(ref) if exists else None
+        # A clone gets the branch as origin/<name>, not <name>, and rev-parse
+        # does not DWIM from one to the other -- so try both before concluding
+        # the ref is absent.
+        _BRANCH_CACHE[ref] = None
+        for cand in (ref, "origin/" + ref):
+            if subprocess.run(["git", "-C", ROOT, "rev-parse", "--verify",
+                               "--quiet", cand + "^{commit}"],
+                              capture_output=True, text=True).returncode == 0:
+                _BRANCH_CACHE[ref] = history_paths(cand)
+                break
     paths = _BRANCH_CACHE[ref]
     return None if paths is None else path in paths
 

@@ -11,7 +11,11 @@
 # TARGET    ayr (32 cores, 78 GB). Needs ~/go/bin first in PATH for a modern Go;
 #           the Debian go1.19 in the default PATH will not build core/.
 #
-# COMMAND   ~/var/clean-clone/clean_clone_check.sh /path/to/polyplets.bundle
+# COMMAND   [REPRO_N=24] ~/var/clean-clone/clean_clone_check.sh /path/to/repo.bundle
+#
+#           Bundle it with --all, not just master: the citations gate verifies
+#           branch declarations against the refs the clone actually has, and a
+#           master-only bundle cannot exercise that path.
 #
 # COST      make gates measured 624 s serial / 467 s at -j10 on gympie
 #           (Makefile:53). Predict under 15 min at -j32 here; ns-gates adds an
@@ -66,6 +70,15 @@ step make-ns-gates   make-ns-gates.log   make ns-gates
 step verify-claims   verify-claims.log   python3 paper/verify_claims.py
 step verify-lpapers  verify-lpapers.log  python3 paper/verify_l_papers.py
 step verify-report   verify-report.log   python3 paper/verify_technical_report.py
+# The PDFs are gitignored, so a reader has the .tex and builds them himself.
+step build-papers    build-papers.log    make -C paper
+
+# The item's real deliverable: one command that reproduces a banked term from
+# nothing but the clone. a(24) is the size that fits an hour on 32 cores; set
+# REPRO_N to something else to price a different one.
+if [ -n "${REPRO_N:-}" ]; then
+    step "reproduce-a$REPRO_N" "reproduce.log" ./scripts/dalby_term.sh "$REPRO_N"
+fi
 
 say "binaries built: $(ls build 2>/dev/null | wc -l) in build/, $(ls build/ns 2>/dev/null | wc -l) in build/ns/"
 say "done=$(date -Is)"
