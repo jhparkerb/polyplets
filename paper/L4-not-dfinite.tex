@@ -104,7 +104,7 @@ We prove the corresponding statement for the king lattice, by a different
 mechanism.
 
 \begin{definition}
-$T(n,H)$ is the number of fixed polyplets --- animals on the king lattice ---
+$T(n,H)$ is the number of fixed polyplets (animals on the king lattice)
 of $n$ cells whose
 bounding box has height exactly $H$; $G_H(x) := \sum_n T(n,H)x^n$; and
 \[
@@ -168,8 +168,8 @@ the reciprocal of a pole, hence a root of the monic integral reversal, hence an
 algebraic integer.
 
 Every pole of $G_H$ has modulus at least the radius $1/\mu_H$, by definition of
-the radius of convergence. So every root of the reversal --- and in particular
-every conjugate of $\mu_H$ --- has modulus at most $\mu_H$.
+the radius of convergence. So every root of the reversal, and in particular
+every conjugate of $\mu_H$, has modulus at most $\mu_H$.
 \end{proof}
 
 The house bound is then $\mathrm{house}(\mu_H) = \mu_H < \lambda \le 9.3154$,
@@ -189,9 +189,9 @@ $j < H$.
 \begin{proof}
 Let $\nu_H$ be the growth constant of the height-$\le H$ strip counts, computed
 by the column-signature transfer matrix $M_H(x)$: states are boundary signatures
-under the nonempty-column invariant. The signature digraph is strongly connected
---- any state reaches the single-cell state by closing off its components with a
-spanning column, and any state is reachable from the single-cell state --- so
+under the nonempty-column invariant. The signature digraph is strongly connected:
+any state reaches the single-cell state by closing off its components with a
+spanning column, and any state is reachable from the single-cell state. So
 $M_H(x)$ is irreducible and nonnegative for $x > 0$.
 
 $M_H$ sits inside $M_{H+1}$ as a proper principal submatrix, namely the
@@ -334,7 +334,7 @@ flag, not a mathematical anomaly, and nothing above or below uses it.}
 Run the argument of Theorem~\ref{thm:dichotomy} with \emph{all} roots of
 $\psi_{H_0}$ in place of the single dominant one. Each is a pole of $G_{H_0}$ and,
 by construction, a root of no earlier $Q_j$, so each of the lower slices in
-\eqref{eq:rec} --- rational functions, all of them --- is finite there, and the
+\eqref{eq:rec} is a rational function finite there, and the
 same argument gives $c(\alpha,H_0-m) = 0$ at $\deg\psi_{H_0}$ distinct values
 $\alpha$. So $\deg\psi_{H_0} > D$ forces $c(\cdot,H_0-m) \equiv 0$ without any
 appeal to the degree of $\mu_{H_0}$, and the rest of the proof is unchanged. The
@@ -365,13 +365,13 @@ $\psi$-degree certificates at $H \le 10$.}
 Both families read $\psi_H$ off the banked $G_H$; they differ in what they then
 ask of it. The first extends Theorem~\ref{thm:dichotomy} to all roots of
 $\psi_{H_0}$ at once, for which $\psi_H$ squarefree and $P_H/Q_H$ in lowest terms
-is enough. The second uses Theorem~\ref{thm:dichotomy} exactly as proved --- one
-root, the dominant one --- and pays for that with irreducibility certificates,
+is enough. The second uses Theorem~\ref{thm:dichotomy} exactly as proved, at the
+dominant root only, and pays for that with irreducibility certificates,
 which are what turn $\deg\psi_H$ into $[\Q(\mu_H):\Q]$. It is the weaker family
 and is recorded because it exercises no more than the theorem above.
 
-$\psi_H$ is irreducible over $\Q$ for $H = 1,\dots,8$ --- degrees
-$1, 2, 4, 9, 29, 68, 181, 462$ --- by single-prime certificates for $H \le 4$ and
+$\psi_H$ is irreducible over $\Q$ for $H = 1,\dots,8$ (degrees
+$1, 2, 4, 9, 29, 68, 181, 462$) by single-prime certificates for $H \le 4$ and
 multi-prime subset-sum-intersection certificates for $H = 5,\dots,8$. (At degrees
 $1254$ and $3289$ the factoring cost was not paid.) Hence
 $[\Q(\mu_H):\Q] = \deg\psi_H$ at every certified level.
@@ -462,14 +462,14 @@ hypotheses is what we claim.
 
 Klazar's Theorem~1: if $F' = G(x,F)$ with $G$ a Laurent series, $F$ \emph{not}
 analytic, $G$ analytic and $\mathrm{ord}_y(G) < 0$, then $F$ is not $D_A$-finite
-and a fortiori not D-finite. The lever is divergence --- $F$ must have zero
-radius of convergence --- and it cannot engage with our object at all: every
+and a fortiori not D-finite. The lever is divergence, that $F$ must have zero
+radius of convergence, and it cannot engage with our object at all: every
 $G_H$ is rational with radius $1/\mu_H$, and $\mu_H < \lambda$, so $F$ is
 analytic in a bidisc and his first hypothesis fails outright.
 
-We record this because the negative is useful --- a one-variable
-non-$P$-recursiveness proof looked like it might be arithmetic, and it is not ---
-and because Klazar has one thing we do not. He enlarges the target class from
+We record this because the negative is useful, a one-variable
+non-$P$-recursiveness proof having looked as though it might be arithmetic, and
+because Klazar has one thing we do not. He enlarges the target class from
 D-finite to $D_A$-finite, with analytic rather than polynomial coefficients, on
 the explicit ground that ``the key lies in the analytic $\times$ nonanalytic
 dichotomy'', and so gets the stronger conclusion for free. Our theorem cannot follow: the degree comparison fails the instant the
@@ -535,8 +535,8 @@ Table~\ref{tab:irrboxes} toward Table~\ref{tab:psiboxes}.
 
 \begin{openproblem}[quantitative Northcott]
 Lemma~\ref{lem:northcott} is qualitative: for each $D$, finitely many heights
-have degree $\le D$. An effective version --- \emph{how many} $\mu_H$ can have
-degree $\le D$, given house $\le 9.3154$ --- would turn the exclusion boxes from
+have degree $\le D$. An effective version, counting \emph{how many} $\mu_H$ can
+have degree $\le D$ given house $\le 9.3154$, would turn the exclusion boxes from
 data-dependent into proved, since the counting bound in the proof is explicit.
 This looks like the most reachable of these four.
 \end{openproblem}

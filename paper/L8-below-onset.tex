@@ -84,7 +84,7 @@ It is false by a vanishing relative amount, and the error has structure that no
 algebraic search finds because the structure is analytic. Writing the defect at
 depth $j = 2k+1-n$ as $D_j(k)$, we report: an exact frame in which the entire
 below-onset content of a column is $k+1$ integers; a closed form at depth $1$,
-where the generating function is algebraic --- an irreducible quartic --- from
+where the generating function is algebraic, an irreducible quartic, from
 which the rate $9$, the exponent $-1/2$, the amplitude $\sqrt6/(27\sqrt\pi)$ and
 the next coefficient $a = 3293/92928 - 3251\sqrt3/185856 \in \Q(\sqrt3)$ all
 follow by singularity analysis; the same closure at depths $2$, $3$ and $4$; and
@@ -179,8 +179,8 @@ in its own right, with its own generating function.
 
 The obstacle to computing $D_1(k)$ far was that $P_k$ was known only to
 $k \le 19$. Equation~\eqref{eq:d1lead} removes the obstacle: the leading
-coefficient of $R_k$ assembles from the all-pairs cluster families alone --- the
-gap walk --- with no triangle data and no wired $P_k$ anywhere. Depth one is
+coefficient of $R_k$ assembles from the all-pairs cluster families alone, the
+gap walk, with no triangle data and no wired $P_k$ anywhere. Depth one is
 therefore exact to $k = 200$ in about $40$ seconds, against a previous ceiling
 of $19$.
 
@@ -217,8 +217,8 @@ $m \le 200$, $n \le 400$, exactly one value lies within $10^{-6}$ of the
 measurement.
 
 The coefficient $a$ is the useful one, because it explains a failure. It lies in
-$\Q(\sqrt3)$, which is why every attempt to recognise it at $k \le 19$ ---
-rationals, products of $\sqrt6$ and $\pi$ --- had to fail. Nothing was wrong with
+$\Q(\sqrt3)$, which is why every attempt to recognise it at $k \le 19$ over the
+rationals, or over products of $\sqrt6$ and $\pi$, had to fail. Nothing was wrong with
 those searches except the field they searched in.
 
 \section{Depths two, three and four}
@@ -285,7 +285,7 @@ bar at every depth. Bias-calibrated; see below.}
 estimator $L_k = k(D_k/D_{k-1}/9 - 1) \to \theta$ carries a systematic of up to
 $0.02$ in $\theta$ and $0.03$ in the rate when run against a control whose
 correction series does not terminate. An earlier reading of this data reported
-$\theta$ drifting low with $j$ and the rate falling away from $9$ --- $8.98$,
+$\theta$ drifting low with $j$ and the rate falling away from $9$: $8.98$,
 $8.91$, $8.77$ at $j = 3,4,5$. Both drifts are reproduced exactly by a control
 whose $\theta$ and rate are right by construction. They were the estimator.
 

@@ -103,8 +103,8 @@ makes the subdominant ratio a ratio of two kernel zeros.
 
 What none of this reaches is a sharp asymptotic. The repository still has no
 proof that any series in this family satisfies $A(n) \sim C\mu^n$; what the
-kernel changes is that the missing step is now named --- simplicity of the
-remaining poles and control of the tail --- rather than absent.
+kernel changes is that the missing step is now named, simplicity of the
+remaining poles and control of the tail, rather than absent.
 \end{abstract}
 
 \tableofcontents
@@ -142,7 +142,7 @@ A \emph{convex polyplet}, equivalently an \emph{HV-convex polyplet} or convex
 animal on the king lattice, is a finite king-connected set of cells of $\Z^2$ in
 which every row and every column is a single contiguous run, counted up to
 translation. Write $A(n)$ for the number with $n$ cells. A \emph{staircase}
-polyplet --- the king-lattice analogue of the parallelogram polyominoes --- is
+polyplet, the king-lattice analogue of the parallelogram polyominoes, is
 one in which, scanning columns left to right, both the bottom and the top of
 the column interval are nondecreasing; write $M(n)$ for their number
 (OEIS \oeis{A225114}).
@@ -224,8 +224,8 @@ The truncated $(0,0)$ block stays sub-exponential for a \emph{different} reason
 from L5's stack bound: with $h' \ge h$, the entry count
 $\min(2, h'-h+1)$ is $2$ only at a strict rise, strict rises take distinct
 heights, so there are at most $\sqrt{2n}$ of them and the weight is at most
-$2^{\sqrt{2n}}$. The truncated $(0,1)$ block is not height-monotone --- $h' \le
-h$ at weight $2$, $h' = h+1$ at weight $1$, $h' > h+1$ forbidden --- so heights
+$2^{\sqrt{2n}}$. The truncated $(0,1)$ block is not height-monotone ($h' \le
+h$ at weight $2$, $h' = h+1$ at weight $1$, $h' > h+1$ forbidden), so heights
 can climb one row at a time and the stack bound does not apply. Counted
 by area it is
 \[
@@ -298,7 +298,7 @@ method on the same terms.
 
 \subsection{The Prony spectrum}
 
-Reading the exponential spectrum of each $700$-term series by Prony's method ---
+Reading the exponential spectrum of each $700$-term series by Prony's method:
 solve for the constant-coefficient recurrence the tail obeys best and take the
 roots of its characteristic polynomial, so every $\lambda_i$ is measured in one
 solve, with no peeling and no assumed model:
@@ -398,7 +398,7 @@ A route exists and it is specific. The \oeis{A225114} entry carries a
   \text{g.f.} = \cfrac{1}{2 - \cfrac{1}{1 - \cfrac{x}{1 - \cfrac{x}{1 - \cfrac{x^2}{1 - \cfrac{x^2}{1 - \cdots}}}}}},
 \]
 whose depth-$24$ convergent reproduces $41$ terms and whose poles, as $1/x$,
-land on the measured staircase spectrum --- $30$, $27$, $14$ and $16$ digits on
+land on the measured staircase spectrum, to $30$, $27$, $14$ and $16$ digits on
 $\lambda_1,\dots,\lambda_4$, improving with depth. A proof of that continued
 fraction would supply the meromorphic continuation and the spectral gap that a
 coefficient-level argument cannot reach.
@@ -444,8 +444,8 @@ decimal. It has a closed expression.
 \begin{proposition}[the mirror halves]
 \label{prop:mirror}
 Partition the HV-convex animals by which middle phase their path visits. Then
-$A_{(1,0)}(n) = A_{(0,1)}(n)$ for every $n$, and the remainder --- the paths
-$(0,0)\to(1,1)$ --- is sub-exponential. Hence if $C_{\HV} = \lim A(n)/\mu^n$
+$A_{(1,0)}(n) = A_{(0,1)}(n)$ for every $n$, and the remainder, the paths
+$(0,0)\to(1,1)$, is sub-exponential. Hence if $C_{\HV} = \lim A(n)/\mu^n$
 exists, $C_{\HV} = 2\,C(A_{(1,0)})$.
 \end{proposition}
 
@@ -500,7 +500,7 @@ At such an $x$, $\varphi$ is positive: the differences
 $\delta(h) = \varphi(h)-\varphi(h{-}1)$ obey
 $\delta(h) = \delta(h{-}1) - x^{h-1}\varphi(h{-}1)$ with $\delta(1) = 1$, so
 $\delta$ strictly decreases while $\varphi > 0$, and $\delta(h) \to 0$ forces
-$\delta > 0$ throughout --- $\varphi$ increases from $2$ to $2.5374225302\dots$
+$\delta > 0$ throughout: $\varphi$ increases from $2$ to $2.5374225302\dots$
 $T(x)$ is positive and compact on $\{f : |f(h)| \le C(1+h)\}$, so by
 Krein--Rutman~\cite{kreinRutman1948} a positive eigenvector's eigenvalue is the
 spectral radius. The staircase generating function is
@@ -519,7 +519,7 @@ for $200$.
 \label{prop:ratio}
 Write $U(h,h') = h'-h+1$ and $U_4(h,h') = \min(2, h'-h+1)$ for $h' \ge h$ (the
 $(0,0)$ block, unrestricted and four-cone-truncated), $L(h,h') = \min(h,h'{+}1)$
-(the map $(0,0)\to(1,0)$, and also $(0,0)\to(0,1)$ --- the same matrix, which is
+(the map $(0,0)\to(1,0)$, and also $(0,0)\to(0,1)$, the same matrix, which is
 Proposition~\ref{prop:mirror} at the operator level), each carrying $x^{h'}$,
 and
 \[
@@ -540,7 +540,7 @@ The phase automaton makes the path decomposition exact as generating functions:
 $A_{(1,0)}(x) = w(x)(I-T(x))^{-1}q(x)$ with
 $q = 1 + L_{(1,0)\to(1,1)}(I-T_{(1,1)})^{-1}\mathbf 1$, and
 $D_{(1,0)}(x) = w_4(x)(I-T(x))^{-1}q(x)$ with the \emph{same} $T$ and the
-\emph{same} $q$ --- the four-cone floor bites only inside the $(0,0)$ block,
+\emph{same} $q$: the four-cone floor bites only inside the $(0,0)$ block,
 since every step out of $(1,0)$ and every step within $(1,1)$ already has
 $d \ge 0$. The $(0,0)$ and $(1,1)$ blocks are stacks
 (L5, stack bound), so $w$, $w_4$ and $q$ are finite at $x_c$. By
@@ -611,7 +611,7 @@ At $251$ digits, no integer relation in any in-capacity box:
 \]
 Nor over $\Q(\mu)$, the natural field since $\mu$ is the constant both series
 share: $\mu$-degree $\le 5$ with $r$-degree $\le 6$ at height $\le 10^2$, and
-three further boxes. A positive control runs on every pass --- $(1+\sqrt2)/3$
+three further boxes. A positive control runs on every pass: $(1+\sqrt2)/3$
 must be found at degree $2$, and is.
 
 $\mu$'s own arithmetic status limits how much this can mean. There is no
@@ -620,7 +620,7 @@ field of unknown degree and ``algebraic over $\Q(\mu)$'' cannot be settled
 either way by any argument available here. What \eqref{eq:ratio} contributes is
 a reason to expect the answer to be no: $r$ is a ratio of two $q$-series
 evaluated at $q = 1/\mu$, and $\mu$ is itself the reciprocal of the zero of an
-entire $q$-function (Proposition~\ref{prop:phi}) --- the same shape as Kurkov's
+entire $q$-function (Proposition~\ref{prop:phi}), the same shape as Kurkov's
 conjectured continued fraction.
 
 \section{Relation to existing work}
@@ -659,8 +659,8 @@ the meromorphic continuation and the spectral gap by a different road.
 
 \begin{openproblem}[does the second pole family explain $\nu$?]
 \label{op:det}
-The descending half's spectrum --- $2.51457964$, $1.43040460$, $1.24846593$,
-$1.17441805$ --- appears nowhere in Table~\ref{tab:kernelzeros}. But $K$ is only
+The descending half's spectrum, $2.51457964$, $1.43040460$, $1.24846593$ and
+$1.17441805$, appears nowhere in Table~\ref{tab:kernelzeros}. But $K$ is only
 one of the two factors that can vanish: the solution's $2\times2$ determinant is
 the other, and its zeros are a second pole family nobody has scanned. If $\nu$
 is the reciprocal of the smallest of them, both halves of the interleaving in
@@ -669,8 +669,8 @@ becomes a statement about two zero sets rather than about two measurements.
 
 Attempted here and \emph{not} settled: building the determinant as a truncated
 $q$-series with the solver's own arithmetic and scanning it gives a smallest
-positive zero that moves with the truncation order --- $1.2433$ at $24$ terms,
-no sign change at all at $32$, $1.1794$ at $40$ and $48$ --- and returns the
+positive zero that moves with the truncation order ($1.2433$ at $24$ terms,
+no sign change at all at $32$, $1.1794$ at $40$ and $48$) and returns the
 same value for the king and the control, which cannot be right. The
 determinant's zeros need a construction that converges, not a longer scan of
 this one. \repo{experiments/convex\_det\_zeros.py} is the negative attempt,

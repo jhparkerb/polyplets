@@ -89,8 +89,9 @@ The identity is not new. \S\ref{sec:novelty} names it: the
 Fortuin--Kasteleyn/Potts correspondence, in which $q^{c}$ is evaluated by
 colouring components rather than by tracking them, specialised to site clusters
 swept in scan order. It is proved here in five elementary lemmas because a second
-enumeration source rests on the specialisation, and because one step in it --- that a window of bounded size suffices --- is a real lemma about
-the scan order rather than a translation.
+enumeration source rests on the specialisation, and because one step in it, that
+a window of bounded size suffices, is a real lemma about the scan order rather
+than a translation.
 
 Its use is the point. Reducing modulo $q^2$ leaves the number of connected
 subsets, so a dynamic program over the window, which never tests
@@ -111,8 +112,8 @@ Counts of lattice animals are produced by programs, and a program's output is
 believed for two reasons: it agrees with independently computed values where
 they exist, and it agrees with a second program that shares no method with the
 first. The second reason is the stronger one and the harder to arrange, because
-the natural methods all track connectivity the same way --- by maintaining
-components of a frontier and merging them --- and two programs that both do
+the natural methods all track connectivity the same way, by maintaining
+components of a frontier and merging them, and two programs that both do
 that share their bugs.
 
 This paper is about a rule that does not track connectivity at all. Cells are
@@ -143,8 +144,8 @@ statement or in the proof.
 
 Fix integers $H, W \ge 1$ and let $\Gamma = \{(r,c) : 0 \le r < H,\ 0 \le c < W\}$,
 cells written (row, column). The \emph{scan order} is column-major:
-$\mathrm{ord}(r,c) = cH + r$. Adjacency is king adjacency --- Chebyshev distance
-one --- and $c(S)$ counts king-connected components of $S$, with $c(\emptyset) = 0$.
+$\mathrm{ord}(r,c) = cH + r$. Adjacency is king adjacency (Chebyshev distance
+one) and $c(S)$ counts king-connected components of $S$, with $c(\emptyset) = 0$.
 
 For a cell $v$ write $N^-(v)$ for its king neighbours earlier in scan order, and
 let the \emph{window} $\Win(v)$ be the $H+1$ cells immediately preceding $v$.
@@ -337,8 +338,8 @@ Two limits of this battery, stated rather than left to be discovered. It reaches
 $16$ cells and $H \le 5$, so a phenomenon first appearing at $H \ge 6$ would not
 be seen; the proof is uniform in $H$ and $W$, which is why a bounded check is the
 right shape of test, but it is not an unbounded one. And the controls test the
-ingredients identified as load-bearing --- an ingredient nobody thought of has no
-control.
+ingredients identified as load-bearing, and an ingredient nobody thought of has
+no control.
 
 \section{What is not proved here}
 \label{sec:tier2}
@@ -348,8 +349,8 @@ sum is a separate claim, and this paper does not make it. The argument has three
 parts, all mechanical and none carried out here:
 
 \begin{itemize}
-\item \textbf{Locality} --- the window sees all earlier neighbours. This half is
-  proved --- it is Lemma~\ref{lem:reach}.
+\item \textbf{Locality}: the window sees all earlier neighbours.
+  Lemma~\ref{lem:reach} proves this half.
 \item \textbf{Sufficient statistic} --- the rules consult the past only through
   equality of labels within the window and the number of distinct live labels, so
   the colour-coincidence partition of the window determines the remaining weight,
@@ -385,8 +386,8 @@ claimed as one.
 \paragraph{Two more antecedents, named.} The unsigned ancestor of the scan-order
 labelling in \S\ref{sec:model} is Hoshen--Kopelman~\cite{hoshenKopelman1976},
 which assigns cluster labels in a single sweep with a merge structure. And the
-method this rule is an \emph{alternative} to --- maintaining the connectivity
-partition of a frontier --- is Jensen's algorithm for lattice
+method this rule is an \emph{alternative} to, maintaining the connectivity
+partition of a frontier, is Jensen's algorithm for lattice
 animals~\cite{jensen2001}, which is why an independent second source is worth
 having at all.
 

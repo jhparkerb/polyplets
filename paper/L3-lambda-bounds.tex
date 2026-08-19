@@ -172,8 +172,8 @@ $\mu_H := \lim_n T_{\le H}(n)^{1/n}$.
 \end{definition}
 
 Each $\mu_H$ is the reciprocal of the radius of convergence of a rational
-generating function --- the height-$\le H$ column-signature transfer matrix is
-finite --- so it is an algebraic number, and the sequence is strictly increasing
+generating function, the height-$\le H$ column-signature transfer matrix being
+finite, so it is an algebraic number, and the sequence is strictly increasing
 and bounded by $\lambda$.
 
 \section{The lower bound}
@@ -306,8 +306,8 @@ $H \le 11$: the largest value ever held is $96.7$ bits against a $96$-bit vector
 ceiling, so the merges add $0.7$ bits.
 
 If the first candidate numerator fails, the tool searches for the largest one
-that passes. The check is monotone in the numerator --- a smaller numerator means
-a larger $x$, and every entry of $M(x)$ is nondecreasing in $x$ --- so it brackets
+that passes. The check is monotone in the numerator (a smaller numerator means
+a larger $x$, and every entry of $M(x)$ is nondecreasing in $x$), so it brackets
 by doubling and bisects, roughly $2\log_2(\text{gap})$ sweeps rather than
 hundreds. The winning numerator is re-verified last, so the receipt describes the
 rational that was actually certified. A failure is never absorbed into a
@@ -383,7 +383,7 @@ thing here taken on trust.
 
 Two engines were run against each other on every shared rung: an older hash-map
 sweep and a frozen-successor-array kernel roughly $250\times$ faster reproduce
-the receipts field for field at $H = 12, 13, 14$ --- same numerator, same state
+the receipts field for field at $H = 12, 13, 14$: same numerator, same state
 count, same minimum ratio to all nine printed digits.
 
 \subsection{An independent estimate of \texorpdfstring{$\lambda$}{lambda}}
@@ -394,13 +394,13 @@ This subsection is measurement, not proof, and is used nowhere above.
 A sliding three-point power-law fit $\mu_H = \lambda - cH^{-p}$ over the float
 ladder gives $\lambda$ estimates that march monotonically downward as the centre
 rises: $9.54, 8.41, 7.92, 7.66, 7.50, 7.40, 7.33, 7.29$ for centres
-$H = 5,\dots,12$, with the exponent $p$ tending to about $1$ --- a $1/H$
+$H = 5,\dots,12$, with the exponent $p$ tending to about $1$, a $1/H$
 finite-size correction. The sequence converges toward the value $\approx 7.11$
 that term ratios give.
 
 It is \emph{structurally} independent: strip spectra
 and row-sum ratios share no data and no algorithm. It is not yet sharper than the
-ratio estimate --- at $H = 12$ it is still $7.29$ --- but it corroborates it.
+ratio estimate, still $7.29$ at $H = 12$, but it corroborates it.
 
 Two caveats. Reaching $\mu_H$ through count ratios
 $T(n,H)/T(n-1,H)$ instead of eigenvalues is badly under-converged for
@@ -488,7 +488,7 @@ $\lambda_{\text{polyomino}} \approx 4.06$~\cite{barequetRoteShalah2016}. A king
 bound has no published number to check against; its rook analogue does, so every
 candidate bound here is run through that analogue first.
 
-The would-be repair --- a transfer matrix on the Redelmeier generation queue ---
+The would-be repair, a transfer matrix on the Redelmeier generation queue,
 fails because that state is unbounded, its length growing with the perimeter.
 There is therefore no simple finite-state valid bound between $12.2$ and the real
 method, and the unbounded dimension is what the Klarner--Rivest
@@ -522,7 +522,7 @@ Compare Proposition~\ref{prop:crude}'s $12.2$.}
 \label{tab:generic}
 \end{table}
 
-The window closes fast --- $8740$ types in about a second --- so the looseness is
+The window closes fast ($8740$ types in about a second), so the looseness is
 not a resolution problem. It is the \emph{case routing}: multi-neighbour cases
 were routed as lossy linear re-marks instead of as convolutions, and that throws
 away one of the two pieces every time.
@@ -548,8 +548,8 @@ move is to case on \emph{one} free cell $d$ at a time:
   \label{eq:split}
 \end{equation}
 where $T' = T \cup \{d \text{ forbidden}\}$ and $D$ is the type that splits off at
-$d$. The $d$-empty branch is an \emph{exact} partition --- animals of type $T$
-with $d$ empty are exactly the animals of type $T'$ --- and the $d$-occupied
+$d$. The $d$-empty branch is an \emph{exact} partition, the animals of type $T$
+with $d$ empty being exactly the animals of type $T'$, and the $d$-occupied
 branch is a valid split over-count.
 
 Two details make \eqref{eq:split} beat the generic version, and both
@@ -582,8 +582,8 @@ $0.096$.}
 \label{tab:rd}
 \end{table}
 
-The other lever available in a decomposition of this kind --- which free cell to
-case on --- has \emph{no effect} here. Lower-left, upper-right, diagonal
+The other lever available in a decomposition of this kind, which free cell to
+case on, has \emph{no effect} here. Lower-left, upper-right, diagonal
 and orthogonal orderings all produce the identical $185$-type closure and the
 identical $9.4022$ at window~$2$. The closure saturates to the same set
 regardless of casing order, and the bound is a spectral property of the closed
@@ -675,7 +675,7 @@ Osegueda's quasi-submultiplicativity~\cite{bbo2021} gives an upper bound from a
 single enumerated term: with $a(40)$ known, a degree-$2$ correction polynomial
 would yield $\lambda \le 7.745$, which would be a far better bound than ours.
 (Degree $4$ already yields nothing.) The obstruction is that their lexicographic
-split shatters a king comb into about $n/4$ components --- measured --- so the
+split shatters a king comb into about $n/4$ components (measured), so the
 reassembly code costs $n^{\Theta(n)}$, and the connected centroid split cannot
 prescribe the two halves' sizes to within $O(1)$. This is the same connectivity
 wall. A transfer check confirms the difficulty is not ours: the missing lemma

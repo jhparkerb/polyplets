@@ -169,8 +169,8 @@ translation. Write $A(n)$ for the number with $n$ cells:
   1,\; 4,\; 16,\; 61,\; 221,\; 766,\; 2566,\; 8390,\; 26982,\; 85834,\;
   271174,\; 853111,\; \dots
 \]
-A \emph{staircase} polyplet --- the king-lattice analogue of the parallelogram
-polyominoes --- is one in which, scanning columns left to right,
+A \emph{staircase} polyplet, the king-lattice analogue of the parallelogram
+polyominoes, is one in which, scanning columns left to right,
 both the bottom and the top of the column interval are nondecreasing. Write
 $M(n)$ for their number: $1, 3, 9, 28, 87, 272, \dots$ (OEIS \oeis{A225114}, the skew shapes with no empty row or column).
 \end{definition}
@@ -499,7 +499,7 @@ defects.
 
 The discriminator for the shape of the correction is the ratio of successive
 differences of $r_n = a(n{+}1)/a(n)$: a constant below $1$ means the correction
-is geometric --- an isolated subdominant singularity, no power-law factor ---
+is geometric (an isolated subdominant singularity, no power-law factor)
 while drift toward $1$ would mean a branch point and $\theta \ne 0$.
 
 \begin{table}[H]
@@ -552,8 +552,8 @@ matrix plus this extrapolation reproduce it and extend it by $116$ digits.
 The measurements above extrapolate from terms. There is also a closed route to
 the same constants, and it certifies its own digits.
 
-Solving the area-refined functional equation by Temperley's method --- the
-$q$-deformation of the semiperimeter solution of \S\ref{sec:perimeter} ---
+Solving the area-refined functional equation by Temperley's method, the
+$q$-deformation of the semiperimeter solution of \S\ref{sec:perimeter},
 writes the full generating function as an explicit finite combination of four
 $q$-adically convergent $q$-series, from which coefficient extraction is exact.
 The square-lattice antecedent is Bousquet-M\'elou and
@@ -600,9 +600,9 @@ Open Problem~\ref{op:kzeros}, not just the value of one residue.
 
 The same kernel, differentiated, gives the area moments. For every $r \ge 0$ the
 bivariate $r$-th area-moment generating function of convex polyplets with
-bounding box exactly $w \times h$ is algebraic over $\Q(x,y)$ --- explicitly an
+bounding box exactly $w \times h$ is algebraic over $\Q(x,y)$: explicitly an
 element of $\Q(x,y,\sqrt{\Delta})$ with $\Delta = (1-x-y)^2 - 4xy$, built by a
-recursive kernel construction --- so the univariate moment generating functions
+recursive kernel construction. So the univariate moment generating functions
 by semiperimeter are algebraic at every level.
 
 \textbf{The limit law that follows is published, and was rederived here in
@@ -671,9 +671,9 @@ search returned nothing at degree $3$.
 \section{Counting by semiperimeter}
 \label{sec:perimeter}
 
-By \emph{semiperimeter}
---- for a convex animal the box's $W + H$, with edge-perimeter $2(W{+}H)$ ---
-the same class is not merely D-finite but algebraic.
+By \emph{semiperimeter}, which for a convex animal is the box's $W + H$ against
+an edge-perimeter of $2(W{+}H)$, the same class is not merely D-finite but
+algebraic.
 
 \begin{table}[H]
 \centering\small
@@ -738,7 +738,7 @@ region; on the by-area series of the fifth arm the same grid is all zeros.
 
 For contrast, the neighbouring class is exactly solvable.
 Temperley's method~\cite{temperley1956} with the last column's height as
-catalytic variable --- king contact gives $h + h' + 1$ placements --- closes to a
+catalytic variable (king contact gives $h + h' + 1$ placements) closes to a
 $2\times2$ linear system and yields
 \[
   F(x) \;=\; \frac{x(1-x)^3}{1 - 7x + 13x^2 - 10x^3 + 2x^4},
@@ -781,9 +781,8 @@ exactly solved; and the squeeze over \emph{every} intermediate class
 convex polyominoes by area, and the parallelogram subclass \oeis{A006958}
 sharing it (measured here at $2.309138593330495$, flat from $n = 100$ to
 $n = 400$), mean that Proposition~\ref{prop:squeeze}'s \emph{conclusion} could
-have been read off the solved models one lattice over. It is the generality ---
-every intermediate class, on a lattice where nothing is solved --- that is the
-contribution.
+have been read off the solved models one lattice over. The contribution is the
+generality: every intermediate class, on a lattice where nothing is solved.
 
 \paragraph{Perimeter.} Delest and Viennot~\cite{delestViennot1984} is the
 classical algebraicity result and is used here as the positive control for the

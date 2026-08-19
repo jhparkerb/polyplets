@@ -64,8 +64,8 @@ proved.
 \begin{abstract}
 \noindent
 Let $T(n,H)$ count the fixed lattice animals of $n$ cells whose bounding box has
-height exactly $H$. We prove that for a broad class of lattices --- those whose
-adjacency moves the row index by at most one, which we call \emph{row-local} ---
+height exactly $H$. We prove that for the \emph{row-local} lattices, those whose
+adjacency moves the row index by at most one,
 the diagonals of this triangle have closed forms: for every $k \ge 0$ there is a
 polynomial $q_k$ of degree exactly $k$ with
 \[
@@ -81,9 +81,9 @@ instances of one theorem.
 Three consequences. First, $k+1$ enumerated values of a diagonal now
 \emph{determine} it, which turns a fitted formula into a proved one; we tabulate
 the resulting closed forms. Second, the
-conjecture recorded at OEIS \oeis{A308359} --- that the width-defect-$2$
-diagonal of the fixed polyomino triangle is $8n^2-51n+86$ for $n \ge 5$ ---
-follows, degree, onset and all. Third, modulo a prime $p$ dividing $b$ the
+conjecture recorded at OEIS \oeis{A308359} follows: the width-defect-$2$
+diagonal of the fixed polyomino triangle is $8n^2-51n+86$ for $n \ge 5$, degree
+and onset included. Third, modulo a prime $p$ dividing $b$ the
 generating function of the law satisfies one cubic, $W^3 = W^2 + t$, that does
 not depend on the lattice: the lattice chooses only the prime and a scaling.
 
@@ -108,8 +108,8 @@ hide.
 
 Write $T(n,H)$ for the number of fixed animals with $n$ cells whose bounding box
 has height exactly $H$. The rows of this triangle are the objects one normally
-wants; the \emph{diagonals} --- fix the \emph{defect} $k = n - H$ and let $H$
-grow --- are the objects that turn out to be tractable. Empirically, on every
+wants; the \emph{diagonals}, got by fixing the \emph{defect} $k = n - H$ and
+letting $H$ grow, are the objects that turn out to be tractable. Empirically, on every
 lattice anyone has tabulated, they are polynomial times exponential. This paper
 proves that, in the following form.
 
@@ -135,8 +135,8 @@ Barequet and Shalah~\cite{barequetShalah2017} give, for general $k$, the shape
   2^{\,n-2k+1}\, n^{\,n-2k-1}\,(n-k)\, h_k(n)
 \]
 for the count of $n$-cell polycubes proper in $n-k$ dimensions, with $h_k$
-polynomial. That is the same statement shape as ours --- fix a defect parameter,
-get polynomial times exponential, with the degree governed by the defect --- for
+polynomial. That is the same statement shape as ours (fix a defect parameter, get
+polynomial times exponential, with the degree governed by the defect) for
 one lattice family and one defect. Theorem~\ref{thm:A} quantifies over every
 row-local lattice instead, and is proved once for all of them.
 
@@ -295,7 +295,7 @@ and $P = \sum_c W^p_c\, y^{k_c} z^{\ell_c}$, all sums over cluster types $c$.
 
 \begin{proof}
 By Lemma~\ref{lem:sep} every animal decomposes \emph{uniquely} as either a single
-pure cluster --- the $P$ term --- or as an optional bottom-edge cluster, then an
+pure cluster (the $P$ term) or as an optional bottom-edge cluster, then an
 alternating chain of walk steps and clusters cut at its walk rows, then an
 optional top-edge cluster. Configurations of each piece are counted relative to
 the walk cell it shares with its neighbour, so the choices multiply; rows and
@@ -383,8 +383,8 @@ what an implementation should store, is the Newton-basis form implicit in
 statement is a theorem (integer-valuedness plus $\deg \le k$) and is formalized.
 $k!$ is not the \emph{minimal} denominator; the minimal one has been worked out
 for the king lattice, but it is a fact about a \emph{basis choice} rather than
-about the lattice --- in the Newton basis every coefficient is an integer by
-construction and there is no denominator to have a law about --- so it is quoted
+about the lattice: in the Newton basis every coefficient is an integer by
+construction, and there is no denominator left to describe. So it is quoted
 nowhere here and nothing below depends on it.
 \end{remark}
 
@@ -444,14 +444,14 @@ objects anyone studies, and all three are in Table~\ref{tab:instances}.
 
 \paragraph{Onset sharpness.} Theorem~\ref{thm:A} proves validity from
 $n = 2k+1$. That the formula \emph{fails} at $n = 2k$ is a non-cancellation
-statement --- it needs $\deg D = k$ exactly --- and we have it on all banked data
+statement, needing $\deg D = k$ exactly, and we have it on all banked data
 for the king lattice through $k \le 17$, and ab initio from the weight table for
 $k \le 5$, where $\deg R_k = 2k+1$ exactly with leading coefficients
 $1, 4, -80, 1753, -40928, 987355$. It is not proved for all $k$, and
 Corollary~\ref{cor:a308359} uses it only as a control, never as an input.
 
-The natural route --- a \emph{rational} generating function for the top
-coefficient --- is obstructed: the relevant all-pairs weight family is not
+The natural route, a \emph{rational} generating function for the top
+coefficient, is obstructed: the relevant all-pairs weight family is not
 C-finite, refuted at $\ell = 16$, because the walk between the pair cells has
 unbounded gap. The route that is not obstructed is the next one up. Companion
 paper L8 identifies that top coefficient with the depth-one below-onset defect,
@@ -539,8 +539,8 @@ proved by writing $[w^k](f\varphi^k) = \mathrm{res}_w(f\varphi^k w^{-k-1})$,
 summing the geometric series to $\mathrm{res}_w\bigl(f/(w - y\varphi(w))\bigr)$,
 and factoring $w - y\varphi(w) = (w-\hat w)v(w,y)$ by Step 1's induction with
 $v(\hat w) = 1 - y\varphi'(\hat w)$. Applying it with $f = C\mu^n$ and
-$\varphi = \mu^{-1}$ gives $\sum_k y^k [w^k](C\mu^{n-k}) = K(y)M(y)^n$ --- so $n$
-enters only through $M^n$ --- and renormalising to the law's units turns that
+$\varphi = \mu^{-1}$ gives $\sum_k y^k [w^k](C\mu^{n-k}) = K(y)M(y)^n$, in which $n$
+enters only through $M^n$; renormalising to the law's units turns that
 into the exponential display, with
 $a_j := [y^j]\log\bigl(b\,K(b^3 y)\bigr)$ and
 $b_j := [y^j]\log\bigl(M(b^3 y)/b\bigr)$. Every object at order $j$ is built from
@@ -695,8 +695,8 @@ $b = 1$ and no prime, so the theorem is vacuous there, correctly.
 
 Theorem~\ref{thm:A} plus Corollary~\ref{cor:two} converts enumeration into proof.
 Because the degree is at most $k$ and the onset is at $H \ge k+1$, it suffices to
-enumerate $k+1$ in-onset values of a diagonal --- or, using
-Corollary~\ref{cor:two}, just two --- to determine $q_k$.
+enumerate $k+1$ in-onset values of a diagonal, or just two by
+Corollary~\ref{cor:two}, to determine $q_k$.
 
 A surplus-budgeted row transfer, parametric in the
 step set $D$, carries as state the current row's occupied cells (normalised in
@@ -756,27 +756,27 @@ The conjecture holds.
 
 \begin{proof}
 This is Theorem~\ref{thm:A} at $b = 1$, $k = 2$. The theorem gives
-$\deg P_2 \le 2$ and validity from $n \ge 2k+1 = 5$ --- exactly the range the
-conjecture states --- so three enumerated in-onset values determine the
+$\deg P_2 \le 2$ and validity from $n \ge 2k+1 = 5$, exactly the range the
+conjecture states, so three enumerated in-onset values determine the
 polynomial and the conjecture is whatever those three values say. Enumerating
 $n = 5, 6, 7$ gives $8n^2 - 51n + 86$.
 \end{proof}
 
 We ran that from our own enumeration rather than from the entry's numbers, in
-three stages so that a disagreement would say where it lived: first the row sums
-against \oeis{A001168}, then the $k=1$ diagonal, which must reproduce the
-$4n-8$ that Mathar records as \emph{proved} --- that step is what certifies our
-triangle is the same object as theirs, and it is an independent third party's
-check on our machinery --- and only then the quadratic. It reproduces every value
+three stages so that a disagreement would say where it lived: the row sums
+against \oeis{A001168}; then the $k=1$ diagonal, which must reproduce the
+$4n-8$ that Mathar records as \emph{proved}, an independent third party's check
+that our triangle is the same object as theirs; and only then the quadratic. It reproduces every value
 of the entry's printed triangle through $n = 11$.
 
 Two controls, both of which must fail, and do
 (\repo{experiments/oeis\_a308359\_check.py}):
 \begin{itemize}
-\item a \emph{linear} fit through $n = 5, 6$ must miss at $n = 7$ --- it gives
-  $105$ against the true $121$ --- or the degree is not under test;
-\item the formula must \emph{fail} at $n = 2k = 4$, since the onset is sharp ---
-  $T(4,2) = 9$ where the quadratic says $10$ --- or the onset is not under test.
+\item a \emph{linear} fit through $n = 5, 6$ must miss at $n = 7$, giving
+  $105$ against the true $121$, or the degree is not under test;
+\item the formula must \emph{fail} at $n = 2k = 4$, since the onset is sharp,
+  giving $T(4,2) = 9$ where the quadratic says $10$, or the onset is not under
+  test.
 \end{itemize}
 
 \section{Polyiamonds, where the theorem stops}
@@ -819,13 +819,13 @@ mathlib~\cite{mathlib}, in a development of 65 modules and about 21{,}700 lines
 with \textbf{zero occurrences of \texttt{sorry}}. What is relevant here:
 
 \begin{itemize}
-\item The engine --- \texttt{Universal.universal\_shape\_d},
+\item The engine (\texttt{Universal.universal\_shape\_d},
   \texttt{universal\_shape}, \texttt{universal\_shape\_production},
-  \texttt{universal\_production\_int\_all} --- and the \texttt{kingSystem} and
+  \texttt{universal\_production\_int\_all}) and the \texttt{kingSystem} and
   \texttt{peelSystem} instances depend on \textbf{standard axioms only}
   (\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}).
-\item The product form --- \texttt{grand\_form} and \texttt{grand\_form\_prod},
-  Theorem~\ref{thm:C} --- likewise depends on standard axioms only. It was
+\item The product form (\texttt{grand\_form} and \texttt{grand\_form\_prod},
+  Theorem~\ref{thm:C}) likewise depends on standard axioms only. It was
   restructured for Lean as a \emph{staircase} route: in sequence form, Steps 1--3
   collapse to a convolution fixed point plus one strong induction, and Step 4's
   Lagrange lemma becomes a fixed point, with no power-series ring involved. Same
@@ -833,8 +833,8 @@ with \textbf{zero occurrences of \texttt{sorry}}. What is relevant here:
 \item \texttt{lead\_coeff\_25} (Corollary~\ref{cor:lead} for the king) adds a
   single named \texttt{native\_decide} leaf, which is the evaluation of one
   cluster weight.
-\item The per-lattice instance pins --- \texttt{king\_P1\_*},
-  \texttt{square\_P1\_*}, \texttt{hex\_P1\_*} --- and the cross-family row-sum
+\item The per-lattice instance pins (\texttt{king\_P1\_*},
+  \texttt{square\_P1\_*}, \texttt{hex\_P1\_*}) and the cross-family row-sum
   gates carry named leaves that amount to two triangle cells per lattice.
 \item The $k \le 18$ production pinning
   (\texttt{P\textit{k}\_grand\_of\_banked}) is \emph{conditional on enumerated

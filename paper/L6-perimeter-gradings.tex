@@ -166,8 +166,8 @@ map --- the circuit rank. That is the present statement with $c = f$ and
 $t = e$, and their proof is the same accounting: four neighbours per cell, less
 the excesses, less two per spanning-tree edge, less two per cycle-closing edge.
 It was re-derived here for the king lattice without knowing that, and the
-king case does not follow from theirs by substitution --- the per-cell degree,
-and hence $\pmaxx$, changes --- but the identity and its proof idea are theirs.
+king case does not follow from theirs by substitution, since the per-cell degree
+and hence $\pmaxx$ changes, but the identity and its proof idea are theirs.
 Their full text was obtained after this paper was drafted, and it confirms the
 reading: their accounting is $p = 6n - e - 2|E|$ in three dimensions, the same
 two-sources-of-loss argument, with $|E| \ge n-1$ giving the bound and the
@@ -189,8 +189,8 @@ list rather than re-tested at every node. That is worth about $20\times$ --- at
 $n = 20$, $k \le 5$ on the king lattice, $2.4\times10^8$ nodes fall to
 $1.4\times10^7$.
 
-The enumerator reaches $n = 70$ on both lattices on a single core --- $913$~s on
-square, $2017$~s on king --- where brute force stops at $n = 14$ on king. It is
+The enumerator reaches $n = 70$ on both lattices on a single core ($913$~s on
+square, $2017$~s on king), where brute force stops at $n = 14$ on king. It is
 gated: pruned counts match an independent brute-force census cell for cell on
 both lattices, the prune is confirmed to change nothing against an unpruned
 control run, and the $(c,H)$ marginals sum back.
@@ -230,8 +230,8 @@ every $k \le 6$ on both lattices.
 
 That row is not an observation of ours either. \cite{abz2018} conjecture, in
 any dimension and for any fixed defect, that the highest-degree factor of the
-characteristic polynomial is $(x-1)^{k+1}$ --- contributed by the pattern of
-$k+1$ independent legs --- so that the count is asymptotically $\gamma n^k$.
+characteristic polynomial is $(x-1)^{k+1}$, contributed by the pattern of
+$k+1$ independent legs, so that the count is asymptotically $\gamma n^k$.
 The square column here is evidence for that conjecture at $d = 2$ through
 $k = 6$, and the king column is evidence for the same statement on a lattice
 their framework does not reach.
@@ -266,8 +266,8 @@ different sub-leading coefficients:
 At $k = 5$ the fitted period is $6$, but the $\Phid_6$ component of the constant
 term is \emph{exactly zero}: what looks like period $6$ is $\Phid_2$ and
 $\Phid_3$ acting independently, not a primitive sixth root. Reading exponents off
-where each factor first perturbs a coefficient --- $\Phid_2$ enters the $n^3$
-coefficient, $\Phid_3$ only the constant --- gives, across $k \le 6$,
+where each factor first perturbs a coefficient ($\Phid_2$ enters the $n^3$
+coefficient, $\Phid_3$ only the constant), gives, across $k \le 6$,
 \[
   D_k \;=\; \Phid_1^{\,k+1}\,\Phid_2^{\,k-1}\,\Phid_3^{\,k-4},
   \qquad\text{with}\qquad
@@ -293,14 +293,14 @@ shape of the argument transports; the theorem does not, which is why
 the king column of \S\ref{sec:max} is measured rather than cited. What is
 not in their work, as far as the pass of
 \repo{docs/priority-passes-2026-08-18.md} reached, is the exponent rule boxed
-below --- which $\Phid_d$ appears at which $k$ --- and everything the
+below, which $\Phid_d$ appears at which $k$, and everything the
 coefficient triangle carries. If that rule holds, ``quasi-polynomial'' is a
 coarse label and each successive prime-power periodicity costs a fixed two
 units of defect.
 
 \paragraph{The denominators are predicted, then checked.} They are not fitted.
-$D_k$ is read off the table above and the census series --- through $n = 70$ for
-$k \le 5$, $n = 78$ for $k = 6$ --- is divided by it; a polynomial must be left,
+$D_k$ is read off the table above and the census series (through $n = 70$ for
+$k \le 5$, $n = 78$ for $k = 6$) is divided by it; a polynomial must be left,
 and one is, for every $k$ on both lattices, with $\gcd(N,D) = 1$ so no factor is
 spurious. At $k = 5$ that is \textbf{28 consecutive exact zero coefficients} the
 interpolation never saw, and at $k = 6$ \textbf{39}: a far harder test than the
@@ -376,8 +376,8 @@ Neither leading diagonal closes.
   5(k-2)!/2^{\,k-1}$, which predicts $15/4$ at $k = 6$. The measured value is
   \textbf{$5/2$}, on both lattices. Three terms, one formula, and it is wrong at
   the fourth; the entry above is a coincidence and is withdrawn. What survives
-  is the weaker and more robust statement --- the value is the same on both
-  lattices --- which is the universality claim and not a closed form.
+  is the weaker and more robust statement, that the value is the same on both
+  lattices, which is the universality claim and not a closed form.
 \end{itemize}
 
 Two identities that looked exact at $k = 5$ were the same kind of accident. The
@@ -437,8 +437,8 @@ Each of these was an attractive reading, and each is dead.
   at $k = 5$ the leading coefficient is $593/144$, whose product with $5!$ is
   not even an integer.
 \item \textbf{The numerators are not nonnegative.} Done properly on the tail
-  series, $\widetilde N_k$ is a polynomial of degree exactly $\deg D_k - 1$ ---
-  itself a fresh confirmation of the predicted denominators --- but its
+  series, $\widetilde N_k$ is a polynomial of degree exactly $\deg D_k - 1$,
+  itself a fresh confirmation of the predicted denominators, but its
   coefficients change sign from $k = 2$ on.
 \item \textbf{The onset is not the positivity threshold.} The least $n_0$ at
   which all forward differences are nonnegative is strictly \emph{below} the
@@ -494,8 +494,8 @@ $p \equiv 2 \pmod 4$ & 2 & 8 & 30 & 88 & 238 & 584 & 1360 \\
 \end{table}
 
 The $p \equiv 0$ row is now confirmed at five separate perimeters. The census
-reaches $p = 48$, and at $p = 32, 36, 40, 44, 48$ --- bounding boxes of side $7$
-through $11$ --- all seven columns read $1, 6, 22, 68, 187, 470, 1106$ with no
+reaches $p = 48$, and at $p = 32, 36, 40, 44, 48$ (bounding boxes of side $7$
+through $11$) all seven columns read $1, 6, 22, 68, 187, 470, 1106$ with no
 drift. Below that the columns are visibly still climbing, and each reaches its
 value exactly at the predicted rung: $i = 0$ at $p = 8$, $i = 1$ at $12$,
 $i = 2$ at $16$, and so on to $i = 6$ at $p = 32$. Seven of seven onsets land on
@@ -613,8 +613,8 @@ closed form.
 
 The reading is that the two corner types in this problem are the first two
 members of one family: a unimodular corner gives $\phi_1 = P(x)$, and the
-index-$2$ diamond tip gives $\phi_2$. The natural guess --- $\phi_m$ for index
-$m$ --- is \textbf{false} at $m = 3$, and is recorded here as a closed door rather
+index-$2$ diamond tip gives $\phi_2$. The natural guess, $\phi_m$ for index
+$m$, is \textbf{false} at $m = 3$, and is recorded here as a closed door rather
 than left as a suggestion.
 
 \subsection{The square lattice's min-end ladder}
@@ -668,8 +668,8 @@ diagonal sticks with $H = n$, which is why the king bound bites.
 \label{sec:k6}
 
 Four of the statements above were predictions about a value nobody had
-computed. The two censuses that decide them --- both lattices, $n = 78$,
-$k \le 6$ --- ran on 80-core hardware in 456 shards, merged only on every shard
+computed. The two censuses that decide them (both lattices, $n = 78$,
+$k \le 6$) ran on 80-core hardware in 456 shards, merged only on every shard
 reporting success, and are \repo{results/perimdefect\_square8\_n78\_k6.txt} and
 \repo{results/perimdefect\_square4\_n78\_k6.txt}: $3.95$ and $3.17$ trillion
 animals, $42$ and $23$ hours of wall time at $76$-way parallelism. The target
@@ -706,8 +706,8 @@ defect. That reading now has two confirmations instead of one.
 What $k = 6$ did to this paper: it strengthened the structural claims, which
 were predictions about \emph{shape}, and killed the one claim that was an
 extrapolated \emph{formula} off three terms. The universality
-statement --- same period, degree, onset and leading coefficient on both
-lattices --- now runs through $k = 6$.
+statement (same period, degree, onset and leading coefficient on both
+lattices) now runs through $k = 6$.
 
 \section{Novelty, and what is not ours}
 \label{sec:novelty}
@@ -759,8 +759,8 @@ coefficient triangle and its one-diagonal-deep lattice independence; the whole
 minimum end, including the attainability criterion, the $P(x)^c$ hull
 factorisation and the identification of the diamond tip series with Andrews'
 $\phi_2$; and the $n/H/p$ identity. The published minimal-perimeter literature
-is structural rather than enumerative --- inflation of minimal-perimeter animals
-and the constant-isomer conjecture, on the square and hexagonal lattices --- and
+is structural rather than enumerative (inflation of minimal-perimeter animals
+and the constant-isomer conjecture, on the square and hexagonal lattices), and
 does not count by perimeter in the way \S\ref{sec:min} does.
 
 \paragraph{What the contribution is.} A published theorem about one
@@ -777,13 +777,13 @@ conjecture (\cite{abz2018}, \S4) confirmed rather than proved. The height
 grading has a proof
 (polynomial times exponential, degree $\le k$, sharp onset $2k+1$) because a
 single-cell row is a cut and the decomposition is exact. The perimeter defect
-supports no such cut --- that is exactly why the row-transfer approach fails
-here --- so a proof would need a different mechanism.
+supports no such cut, which is why the row-transfer approach fails here, so a
+proof would need a different mechanism.
 \end{openproblem}
 
 \begin{openproblem}[is the two-variable generating function rational?]
 $\deg\widetilde N_k = \deg D_k - 1$ exactly, measured on both lattices at
-every $k = 2..6$ --- $2, 5, 7, 11, 15$ --- and so growing linearly, as a
+every $k = 2..6$ ($2, 5, 7, 11, 15$) and so growing linearly, as a
 rational $F(x,y) = \sum_k G_k(x)y^k$ would require. Seven terms across two
 denominator regimes are still not a proof of rationality.
 \end{openproblem}
