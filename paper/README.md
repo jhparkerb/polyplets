@@ -9,11 +9,12 @@ could not be obtained and why. Nothing in `papers/` is ours. Nothing in `paper/`
 is anyone else's.
 
 The top-level `.gitignore` starts by ignoring `papers/` — "copyrighted papers stay
-local, never pushed" — so the PDFs themselves never leave this machine. Three
-text files there predate that rule and are tracked: `INDEX.txt`, `MISSING.md`
-and `refs-transfer-matrix.md`. So a fresh clone gets the *record* of the library
-and none of its contents. Citations in `paper/` that point at a PDF under
-`papers/` are pointers into a working copy, not into the published tree;
+local, never pushed" — so the PDFs themselves never leave this machine. Five
+text files there are tracked anyway: `INDEX.txt`, `MISSING.md`, `README.md`,
+`refs-transfer-matrix.md` and `polyplets-2024-2026.bib`. So a fresh clone gets
+the *record* of the library and none of its contents. Citations in `paper/` that
+point at a PDF under `papers/` are pointers into a working copy, not into the
+published tree;
 bibliographic detail a reader actually needs is in `shared/refs.bib`.
 
 Two neighbours complete the picture: `oeis/` holds OEIS submission drafts and

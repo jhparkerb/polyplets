@@ -61,7 +61,9 @@ step clone clone.log git clone -q --branch master "$BUNDLE" "$CLONE" || {
 }
 cd "$CLONE" || exit 1
 say "rev=$(git rev-parse --short HEAD)  tracked_files=$(git ls-files | wc -l)"
-say "papers/ present? $(test -d papers && echo yes || echo 'no --- as a real clone should be')"
+# papers/ exists in a clone -- five text files there are tracked -- so the
+# question is whether a copyrighted PDF got in, and the answer must be zero.
+say "papers/ pdfs in the clone: $(ls papers/*.pdf 2>/dev/null | wc -l) (must be 0), tracked text files: $(ls papers/ 2>/dev/null | wc -l)"
 
 # The four phases a stranger would run, in the order the README implies.
 # `make` and `make gates` are the same target -- the Makefile has no `all` and

@@ -46,7 +46,7 @@ its tier.
 | `tests/` | the gate suite (red-first, fail-closed; `make gates`) |
 | `oeis/`, `submissions/` | staged OEIS extensions and new-sequence drafts (nothing auto-submitted) |
 | `docs/` | reference docs (engineering standards, observability contract, job checklist, formats, glossary, engine + dmirror design), the proofs in `docs/proofs/`, and the campaign record — map: [`docs/README.md`](docs/README.md) |
-| `papers/` | the cited literature. The PDFs are gitignored — copyrighted work stays local — so a clone gets `INDEX.txt` (provenance) and `MISSING.md` (what could not be obtained, and why) and none of the files |
+| `papers/` | the cited literature. The PDFs are gitignored — copyrighted work stays local — so a clone gets the five tracked text files — `INDEX.txt` (provenance), `MISSING.md` (what could not be obtained, and why), `README.md`, `refs-transfer-matrix.md` and `polyplets-2024-2026.bib` — and none of the PDFs |
 
 One-shot launch scripts, per-term plans, and the research-log corpus that
 produced all this were removed when the enumeration ladder closed at a(40)
