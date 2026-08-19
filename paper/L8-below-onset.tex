@@ -199,8 +199,11 @@ size of the true one.
 
 \subsection{Every depth-one constant, derived}
 
-From $\Phi$, singularity analysis gives the constants that the campaign had been
-measuring:
+From $\Phi$, singularity analysis~\cite[Ch.~VI--VII]{flajoletSedgewick2009}
+gives the constants that the campaign had been measuring; $\Phi$ is algebraic
+with a square-root branch point, which is the case
+\cite[Thm.~VII.8]{flajoletSedgewick2009} covers, and the $k^{-1/2}$ and the
+$1/k$ correction are read off the Puiseux expansion there:
 \[
   D_1(k) \;=\; C_1\,9^k\,k^{-1/2}\Bigl(1 + \frac{a}{k} + O(k^{-2})\Bigr),
   \qquad
@@ -492,10 +495,11 @@ records are \repo{results/onset-defect-law.md},
 \label{tab:repro}
 \end{table}
 
-% No \bibliography here: this paper cites no source. Its antecedents are the
-% companion papers, named in prose as they are throughout this directory, and
-% its priority pass (\S\ref{sec:novelty}) found nothing to cite. Declaring the
-% bibliography anyway left LaTeX asking for a rerun it never settled, because
-% there is no .bbl for it to read. Restore both lines with the first \cite.
+% The only citation here is the singularity-analysis machinery of
+% \S\ref{sec:depth1}. Its mathematical antecedents are the companion papers,
+% named in prose as they are throughout this directory, and its priority pass
+% (\S\ref{sec:novelty}) found nothing else to cite.
+\bibliographystyle{plain}
+\bibliography{shared/refs}
 
 \end{document}

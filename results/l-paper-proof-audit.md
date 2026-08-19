@@ -165,10 +165,39 @@ the constant polynomial because `T(n,n) = b^{n-1}` counts walks. Both hold. The
 mod-3 theorems are stated conditionally on congruences checked to `k <= 17` and
 were not re-derived here.
 
+### L1 — Theorem B, the one L1 declares unformalized. HOLDS.
+
+L1's own ledger says Theorem A is Lean-formalized and Theorem C
+(`grand_form`, `grand_form_prod`) depends on standard axioms only; Theorem B,
+the universal spine, is "paper proof only, not formalized", so it is the one
+worth re-deriving. Two steps could silently fail and neither does:
+
+- The valuation bound. `v_p(What_c) = (2k_c - l_c - 1) v_p(b) + v_p(W_c) >=
+  (k_c - 1) v_p(b)` needs `k_c >= l_c`, which is (2), and `v_p(W_c) >= 0`,
+  which holds because `W_c` is a count. The claim that this is `>= 1` for every
+  cluster *except* `k_c = l_c = 1` needs the `k_c = 1, l_c = 0` case checked
+  separately, since the stated bound gives only `>= 0` there: it is `2(1) - 0 -
+  1 = 1`, so `>= v_p(b) >= 1`, and it does vanish. The exception is exactly
+  `(1,1)`.
+- Uniqueness of the survivor. A cluster has every row size `>= 2` and length
+  `>= 1`, so surplus `1` forces length `1` and a single row of two cells. The
+  surviving weight is therefore one cluster type's `W_c` and not a sum, which
+  is what lets `w := Wpair mod p` be a single scalar. And `k_c >= 1` for every
+  cluster, so no `k_c = 0` term with a negative power of `b` can appear.
+
 ### Still not audited
 
-L1 (Theorem A is Lean-formalized; Theorems B and C are not, and their proofs
-were not re-derived this round), L6, L8.
+L6 (its one proposition is labelled a sketch, is attributed to Asinowski,
+Barequet and Zheng for the square lattice, and is exercised by the enumerator's
+brute-force gate) and L8 (every statement labelled derived, measured or
+assumed, with four named assumptions).
+
+### L8 — a citation gap, not a proof gap. FIXED.
+
+L8 cited no source at all, and its central derivation says "singularity
+analysis gives the constants". That is Flajolet--Sedgewick machinery and now
+says so, with the algebraic square-root branch point pointed at Theorem VII.8
+rather than left as a method name.
 
 ## The pattern worth keeping
 
