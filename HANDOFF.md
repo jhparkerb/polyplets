@@ -1,6 +1,35 @@
-# HANDOFF — live state (updated 2026-08-18)
+# HANDOFF — live state (updated 2026-08-19)
 
-## 2026-08-18 (latest, 23:55 EDT) — THE REPO NOW SURVIVES `git clone && make`
+## 2026-08-19 09:20 EDT (latest) — CONFETTI GREEN; THE ACCEPTANCE QUEUE IS EMPTY
+
+**Confetti (Motley rung 2, H = 18) finished 08:58 EDT, GREEN.**
+`results/motley-h18.md`. Five sequential single-core passes, 399,700 s of wall
+(4.63 days), peak RSS 65.9 GB, frontier 72,487,711 states. Held-out prime
+2147483563 predicted 40/40 residues from the CRT reconstruction over the other
+four. T(n,18) = C_18 − 2 C_17 + C_16 matches the incumbent triangle at all 23
+cells n = 18..40, 0 mismatch --- re-derived here from the banked rows after the
+harvest, so that is not the runner's word for it.
+
+**a(n) is closed rule-independently for all n <= 35**, up from 33.
+
+The gap, measured off `scripts/provenance_table.py` at MOTLEY_H 17 against 18
+rather than off any plan's forecast: cells carrying **only** the mod-4
+congruence drop **11 -> 6**. Retired: (36,18), (37,18), (38,18), (39,18),
+(40,18). Remaining: (38,19), (39,19), (39,20), (40,19), (40,20), (40,21). The
+pinned count in the provenance gate moved 11 -> 6 deliberately, which is what
+it was pinned for; the table is regenerated. Note that the "row 40 residual
+band 9 -> 7 -> 5" the acceptance queue used to quote does not reproduce off any
+figure that table computes, and has been replaced there by the 11 -> 6.
+
+Ticker Tape (H = 19) is the rung that would take four of the six remaining
+cells, and it stays priced-and-declined: ~197 GB against dalby's 125, ~26 days.
+
+**Every acceptance-queue item is now closed**, 1 through 6. What is left for
+publication is his and only his: the push, whether `triangle-structure` and
+`half-measure` go with it, whether `docs/` and Ghost Ship go public, the L
+ledgers' "human verification: none", and P1.
+
+## 2026-08-18 (23:55 EDT) — THE REPO NOW SURVIVES `git clone && make`
 
 Acceptance-queue item 2 is CLOSED. `scripts/clean_clone_check.sh` on ayr, rev
 `0171909`: `make` 404 s, `make ns-gates` 769 s, all three verifiers, all 11

@@ -29,7 +29,7 @@ Source rules, each traceable to the note that establishes it:
                                        k = n-H <= 18, n >= 2k+1, H <= 21
                                                         strip-engine.md
                                                         ("honest" rule)
-  M  Motley/cutcount, rule-independent H <= MOTLEY_H    motley-h17.md
+  M  Motley/cutcount, rule-independent H <= MOTLEY_H    motley-h18.md
   F  P_k formula-derived cell, the formula itself holdout-validated elsewhere
                                        k <= 18, n >= 2k+1, H > 21
                                                         ns_a40/PROVENANCE.md
@@ -55,7 +55,7 @@ TRIANGLE = ROOT / "results" / "triangle.txt"
 OUT = ROOT / "results" / "provenance-table.md"
 
 NMAX = 40
-MOTLEY_H = 17          # Half Measure banked; Confetti (H=18) not yet landed
+MOTLEY_H = 18          # Confetti landed 2026-08-19, results/motley-h18.md
 
 # Published figures this gate holds the table to.  Each is quoted in the note
 # named beside it; if the table stops reproducing one, either the table or the
@@ -72,9 +72,14 @@ EXPECTED = {
     # ruling, restated 2026-08-18.
     # The cells that carry ONLY the mod-4 congruence -- no exact recount and no
     # closed form.  This is the project's real gap, so it is pinned: if it grows
-    # something regressed, and when Confetti lands (Motley H=18) it must shrink,
+    # something regressed, and a rung that widens Motley's reach must shrink it,
     # which fires the gate and forces this number to be updated deliberately.
-    "congruence_only_cells": (11, "this table; Motley at H<=%d" % 17),
+    # It did: Confetti landed 2026-08-19 and took it from 11 to 6, retiring
+    # (36,18), (37,18), (38,18), (39,18) and (40,18).  What is left is
+    # (38,19), (39,19), (39,20), (40,19), (40,20), (40,21) -- and Ticker Tape,
+    # the rung that would have taken the H=19 cells, is priced and declined
+    # (results/ticker-tape-assessment.md), so this six is where the gap stands.
+    "congruence_only_cells": (6, "results/motley-h18.md; Motley at H<=%d" % 18),
 }
 
 

@@ -12,24 +12,38 @@ and 6 closed earlier the same day; item 1 rescoped).
 
 ## 1. Finish the Motley ladder — Confetti (H=18), then Ticker Tape (H=19)
 
-STATUS: Confetti RUNNING and healthy on dalby (tmux `motley-h18`, driver PID in
-`~/var/motley-h18/driver.pid`); four of five passes landed 08-15..08-18 at
-79,039 s each, peak RSS 65.9 GB, fifth ending ~08-19. **Ticker Tape is priced
-and not recommended** --- `results/ticker-tape-assessment.md`, 2026-08-18: on
-Confetti's measured constants H=19 needs ~197 GB against dalby's 125 and ~26
-days of wall, and it buys no statement the project can otherwise not make. So
-the ladder stops at H=18 unless the arena is redesigned first, and the honest
-end state of this item is **n <= 35 rule-independent**, not 37.
+STATUS: **DONE** (2026-08-19 08:58 EDT). **Confetti GREEN.**
+`results/motley-h18.md`. Five sequential single-core passes, 399,700 s total
+(4.63 days), peak RSS 65.9 GB, frontier 72,487,711 states; held-out prime
+2147483563 predicted 40/40 residues from the CRT reconstruction; T(n,18)
+matches the incumbent triangle at all 23 cells n = 18..40, 0 mismatch. The
+assembly was re-derived here from the banked rows after the harvest, so the
+23/0 is not the runner's word for it.
 
-The only item that moves the defensibility of the headline numbers. Today's
-honest statement: a(n) is closed rule-independently for n <= 33 (Motley H=17,
-`results/motley-h17.md`), and a(40)'s H15-19 band — 43.8% of the term — has no
-independent second source beyond the mod-2 / mod-4 congruences.
+**a(n) is now closed rule-independently for all n <= 35.** Measured off
+`scripts/provenance_table.py` at MOTLEY_H 17 against 18: the cells carrying
+only the mod-4 congruence drop **11 -> 6**, retiring (36,18), (37,18), (38,18),
+(39,18) and (40,18). What is left is (38,19), (39,19), (39,20), (40,19),
+(40,20), (40,21). The pinned count in the gate moved from 11 to 6 deliberately,
+which is what it was pinned for.
 
-- Confetti GREEN -> n <= 35 rule-independent.
-- Ticker Tape (H=19) -> n <= 37 --- priced, not recommended, see above.
-- Row 40's residual band: 9 -> 7 -> 5 cells with Confetti; the last 5 -> 3
-  step was Ticker Tape's and is not being bought.
+**Ticker Tape is priced and not recommended** --- `results/ticker-tape-assessment.md`,
+2026-08-18: on Confetti's measured constants H=19 needs ~197 GB against dalby's
+125 and ~26 days of wall, and it buys no statement the project can otherwise
+not make. So the ladder stops at H=18 unless the arena is redesigned first, and
+n <= 35 is where this ends.
+
+The only item that moves the defensibility of the headline numbers. It moved:
+a(n) is closed rule-independently for n <= 35, and the three cells of row 40 at
+H = 19, 20 and 21 are what still carry nothing but the congruence.
+
+- Confetti GREEN -> n <= 35 rule-independent. **Done.**
+- Ticker Tape (H=19) -> n <= 37 --- priced, not recommended, see above. It is
+  the rung that would have taken (38,19), (39,19), (39,20) and (40,19), which
+  is four of the six remaining congruence-only cells.
+- The "9 -> 7 -> 5 cells" band this entry used to quote does not reproduce off
+  any figure the provenance table computes; the 11 -> 6 above is measured and
+  replaces it.
 
 Every referee objection that will actually be raised about a(34)..a(40) is "one
 engine, one connectivity rule". This is the answer to it.

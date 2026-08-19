@@ -11,7 +11,8 @@ largest result and still at risk.
 
 | file | what |
 |---|---|
-| `rows/C<H>.out` | `n value` lines, H = 1..16, n <= 40 — the cut-and-count row sums |
+| `rows/C<H>.out` | `n value` lines, H = 1..18, n <= 40 — the cut-and-count row sums. H = 17 came from Motley rung 1 (`results/motley-h17.md`), H = 18 from rung 2 (`results/motley-h18.md`); H <= 16 are this run's |
+| `confetti_h18_run.log` | rung 2's own log, 2026-08-14..19, five prime passes and the held-out check |
 | `calib_run.log` | the run's own log, 2026-08-11 09:23–16:02 EDT, per-height self-checks and banked compare |
 | `calib_run.attempt1.log` | superseded false start, 09:18, kept for the record |
 | `cutcount_b1.cpp.59e90660` | the exact source that produced the rows |

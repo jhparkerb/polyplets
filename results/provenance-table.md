@@ -14,18 +14,18 @@ drifts from the note that publishes it.
 | R | small-height recurrences | H <= 4 | full |
 | S | strip transfer matrix | H <= 14 | shares the union-find rule |
 | P | closed forms P_k on really-swept cells | k <= 18, n >= 2k+1, H <= 21 | full where credited |
-| M | Motley/cutcount | H <= 17 | rule-independent |
+| M | Motley/cutcount | H <= 18 | rule-independent |
 | C | subgroup mod-2/mod-4 | every cell | congruence only |
 
 ## Coverage
 
 - cells: **820**; strip covers **469**; fixed-height GFs **355**
 - honest cell coverage: **72.2%**; strip alone **57.2%**
-- honest coverage counting **every** exact source now available (the published 72.2 percent predates Motley and the GF arm): **75.6%**
+- honest coverage counting **every** exact source now available (the published 72.2 percent predates Motley and the GF arm): **76.2%**
 - cells with no exact recount, whose value came from a closed form that is itself holdout-validated elsewhere: **189**
-- cells carrying **only** the mod-4 congruence — no exact recount, no closed form: **11**
+- cells carrying **only** the mod-4 congruence — no exact recount, no closed form: **6**
 
-  T(36,18), T(37,18), T(38,18), T(38,19), T(39,18), T(39,19), T(39,20), T(40,18), T(40,19), T(40,20), T(40,21)
+  T(38,19), T(39,19), T(39,20), T(40,19), T(40,20), T(40,21)
 
   Each is a cell whose value has one source. That is the statement; a(n) is no better than its worst cell, so how large these cells are is not a fact about how much of a(n) is trustworthy and is deliberately not reported.
 
@@ -50,7 +50,7 @@ drifts from the note that publishes it.
 | 15 | CM |
 | 16 | CM |
 | 17 | CM |
-| 18 | C |
+| 18 | CM |
 | 19 | C |
 | 20 | C |
 | 21 | C |
@@ -84,8 +84,8 @@ drifts from the note that publishes it.
 | 33 | 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 |
 | 34 | 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34 |
 | 35 | 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35 |
-| 36 | 18, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36 |
-| 37 | 18, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37 |
-| 38 | 18, 19, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38 |
-| 39 | 18, 19, 20, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39 |
-| 40 | 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40 |
+| 36 | 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36 |
+| 37 | 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37 |
+| 38 | 19, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38 |
+| 39 | 19, 20, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39 |
+| 40 | 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40 |
