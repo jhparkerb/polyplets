@@ -22,12 +22,16 @@ Each height Motley reaches closes rows at the bottom *and* extends the P_k
 lock at the top, so it removes two cells per rung from the top row's residue
 (`docs/b1-closure-plan.md` §1, §6):
 
-| after | Motley reaches | closes outright | row 40's residual band |
+Counts and cell lists below are generated in `results/residual-cells.md`, which
+is the one place they live; `make gate-residual-cells` checks every figure in
+this table against it.
+
+| after | Motley reaches | closes outright | row 40's residual band | <!--q:prose-->
 |---|---|---|---|
-| today (banked) | H <= 16 | a(n), n <= 31 | T(40,17)..T(40,25), 9 cells |
-| Half Measure | H <= 17 | n <= 33 | 7 cells |
-| Confetti | H <= 18 | n <= 35 | 5 cells |
-| Ticker Tape | H <= 19 | n <= 37 | T(40,20)..T(40,22), 3 cells |
+| today (banked) | H <= 16 | a(n), n <= 31 <!--q:closure_n@16=31--> | T(40,17)..T(40,25) <!--q:row40_residual.cells@16=T(40,17)..T(40,25)-->, 9 cells <!--q:row40_residual.count@16=9--> |
+| Half Measure | H <= 17 | n <= 33 <!--q:closure_n@17=33--> | 7 cells <!--q:row40_residual.count@17=7--> |
+| Confetti | H <= 18 | n <= 35 <!--q:closure_n@18=35--> | 5 cells <!--q:row40_residual.count@18=5--> |
+| Ticker Tape | H <= 19 | n <= 37 <!--q:closure_n@19=37--> | T(40,20)..T(40,22) <!--q:row40_residual.cells@19=T(40,20)..T(40,22)-->, 3 cells <!--q:row40_residual.count@19=3--> |
 
 The residual band is Coin Lift's target (`docs/coin-lift-plan.md`); nothing in
 this plan attempts it.

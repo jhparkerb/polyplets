@@ -22,10 +22,14 @@ assembly was re-derived here from the banked rows after the harvest, so the
 
 **a(n) is now closed rule-independently for all n <= 35.** Measured off
 `scripts/provenance_table.py` at MOTLEY_H 17 against 18: the cells carrying
-only the mod-4 congruence drop **11 -> 6**, retiring (36,18), (37,18), (38,18),
-(39,18) and (40,18). What is left is (38,19), (39,19), (39,20), (40,19),
-(40,20), (40,21). The pinned count in the gate moved from 11 to 6 deliberately,
-which is what it was pinned for.
+only the mod-4 congruence drop **11 -> 6**
+<!--q:congruence_only.count@17=11--><!--q:congruence_only.count@18=6-->, retiring
+(36,18), (37,18), (38,18), (39,18) and (40,18)
+<!--q:retires.cells@18=(36,18),(37,18),(38,18),(39,18),(40,18)-->. What is left
+is (38,19), (39,19), (39,20), (40,19), (40,20), (40,21)
+<!--q:congruence_only.cells@18=(38,19),(39,19),(39,20),(40,19),(40,20),(40,21)-->.
+The pinned count in the gate moved from 11 to 6 deliberately, which is what it
+was pinned for. Both figures are generated in `results/residual-cells.md`.
 
 **Ticker Tape is priced and not recommended** --- `results/ticker-tape-assessment.md`,
 2026-08-18: on Confetti's measured constants H=19 needs ~197 GB against dalby's
@@ -35,15 +39,23 @@ n <= 35 is where this ends.
 
 The only item that moves the defensibility of the headline numbers. It moved:
 a(n) is closed rule-independently for n <= 35, and the three cells of row 40 at
-H = 19, 20 and 21 are what still carry nothing but the congruence.
+H = 19, 20 and 21 are what still carry nothing but the congruence
+<!--q:row40_congruence_only.cells@18=T(40,19)..T(40,21)-->.
 
 - Confetti GREEN -> n <= 35 rule-independent. **Done.**
 - Ticker Tape (H=19) -> n <= 37 --- priced, not recommended, see above. It is
-  the rung that would have taken (38,19), (39,19), (39,20) and (40,19), which
-  is four of the six remaining congruence-only cells.
-- The "9 -> 7 -> 5 cells" band this entry used to quote does not reproduce off
-  any figure the provenance table computes; the 11 -> 6 above is measured and
-  replaces it.
+  the rung that would take (38,19), (39,19) and (40,19)
+  <!--q:retires.cells@19=(38,19),(39,19),(40,19)-->, which is three of the six
+  remaining congruence-only cells <!--q:retires.count@19=3-->. It leaves
+  (39,20), (40,20) and (40,21)
+  <!--q:congruence_only.cells@19=(39,20),(40,20),(40,21)-->.
+- The "9 -> 7 -> 5 cells" band this entry used to quote is **correct**, and the
+  note that said it does not reproduce was the error. It is a different
+  quantity: row 40's rule-independence band, computed off
+  `docs/b1-closure-plan.md` section 1's anchor rule rather than off the
+  provenance table. Both are now generated and checked in
+  `results/residual-cells.md`, which names them Q1 and Q2 so the next reader
+  does not have to work out that there were two.
 
 Every referee objection that will actually be raised about a(34)..a(40) is "one
 engine, one connectivity rule". This is the answer to it.

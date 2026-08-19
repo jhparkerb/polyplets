@@ -18,9 +18,12 @@ is written down rather than improvised.
 
 ## The goal
 
-Close a(n) rule-independently for **n <= 37**, and reduce row 40's residual
-band to three cells, by building three rungs on a frozen 80-line connectivity
-core.
+Close a(n) rule-independently for **n <= 37** <!--q:closure_n@19=37-->, and
+reduce row 40's residual band to three cells
+<!--q:row40_residual.count@19=3--> — `T(40,20)..T(40,22)`
+<!--q:row40_residual.cells@19=T(40,20)..T(40,22)--> — by building three rungs
+on a frozen 80-line connectivity core. Both figures are generated in
+`results/residual-cells.md`.
 
 Done means: `a(n)` for n <= 37 reproduced by Motley from an in-tree
 fail-closed binary with a gate receipt, matching the banked triangle byte for

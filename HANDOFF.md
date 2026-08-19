@@ -12,17 +12,40 @@ harvest, so that is not the runner's word for it.
 
 **a(n) is closed rule-independently for all n <= 35**, up from 33.
 
-The gap, measured off `scripts/provenance_table.py` at MOTLEY_H 17 against 18
-rather than off any plan's forecast: cells carrying **only** the mod-4
-congruence drop **11 -> 6**. Retired: (36,18), (37,18), (38,18), (39,18),
-(40,18). Remaining: (38,19), (39,19), (39,20), (40,19), (40,20), (40,21). The
-pinned count in the provenance gate moved 11 -> 6 deliberately, which is what
-it was pinned for; the table is regenerated. Note that the "row 40 residual
-band 9 -> 7 -> 5" the acceptance queue used to quote does not reproduce off any
-figure that table computes, and has been replaced there by the 11 -> 6.
+The gap: cells carrying **only** the mod-4 congruence drop **11 -> 6**
+<!--q:congruence_only.count@17=11--><!--q:congruence_only.count@18=6-->.
+Retired: (36,18), (37,18), (38,18), (39,18), (40,18)
+<!--q:retires.cells@18=(36,18),(37,18),(38,18),(39,18),(40,18)-->. Remaining:
+(38,19), (39,19), (39,20), (40,19), (40,20), (40,21)
+<!--q:congruence_only.cells@18=(38,19),(39,19),(39,20),(40,19),(40,20),(40,21)-->.
 
-Ticker Tape (H = 19) is the rung that would take four of the six remaining
-cells, and it stays priced-and-declined: ~197 GB against dalby's 125, ~26 days.
+**Two quantities were sharing one name, and this entry got it wrong on
+2026-08-19 before the sweep.** The "row 40 residual band 9 -> 7 -> 5"
+<!--q:row40_residual.count@16=9--><!--q:row40_residual.count@17=7-->
+<!--q:row40_residual.count@18=5--> it wrote off as not reproducing **does**
+reproduce — exactly, endpoints included — off
+`docs/b1-closure-plan.md` §1's anchor rule, which is row 40's
+*rule-independence* band and not the congruence-only count at all. Both are now
+computed and gated in `results/residual-cells.md`, which names them Q1 and Q2;
+every restatement anywhere in the repo is checked against it by
+`make gate-residual-cells`.
+
+Ticker Tape (H = 19) would retire three of the six congruence-only cells
+<!--q:retires.count@19=3-->, (38,19), (39,19) and (40,19)
+<!--q:retires.cells@19=(38,19),(39,19),(40,19)--> — this entry said four — and
+two of row 40's residual band, T(40,19) and T(40,23)
+<!--q:row40_retires.cells@19=T(40,19),T(40,23)-->. It stays
+priced-and-declined: ~197 GB against dalby's 125, ~26 days.
+
+**Confetti's results are fully in the tree as of 2026-08-19**, not just its
+answer. The five per-prime residue rows, the fuller console transcript and the
+prime checker came across from dalby (checksums verified on both sides), and
+`make gate-cutcount-assembly` now re-derives the whole thing from the repo
+alone: 567 cells assembled from every banked row H = 1..18 against
+`results/triangle.txt`, plus the CRT over four primes predicting the fifth,
+40/40, tied back to the banked exact row. Before this the assembly existed only
+inside `scripts/dalby_confetti_h18.sh` --- a runner `make` never touches --- so
+the 23/0 and the 40/40 were log lines.
 
 **Every acceptance-queue item is now closed**, 1 through 6. What is left for
 publication is his and only his: the push, whether `triangle-structure` and
@@ -524,10 +547,14 @@ Plans: `docs/motley-plan.md`, `docs/coin-lift-plan.md`. Goal docs:
   Measure** (`I256` -> `u128`, x1.9), **Confetti** (4 x 31-bit residues + CRT,
   x4), **Ticker Tape** (8 x 16-bit residues, x2, and it carries the check-split
   and the flat arena because H = 19 does not fit without them).
-- Motley's reach: Half Measure -> H = 17, closes a(n) for n <= 33; Confetti ->
-  H = 18, n <= 35; Ticker Tape -> H = 19, n <= 37. Row 40's residual band goes
-  9 -> 7 -> 5 -> 3 cells. **Step 0 is a 6.7 core-hour clean re-run of H <= 16**,
-  which makes the already-closed a(30) citable.
+- Motley's reach: Half Measure -> H = 17, closes a(n) for n <= 33
+  <!--q:closure_n@17=33-->; Confetti -> H = 18, n <= 35 <!--q:closure_n@18=35-->;
+  Ticker Tape -> H = 19, n <= 37 <!--q:closure_n@19=37-->. Row 40's residual
+  band goes 9 -> 7 -> 5 -> 3 cells <!--q:row40_residual.count@16=9-->
+  <!--q:row40_residual.count@17=7--><!--q:row40_residual.count@18=5-->
+  <!--q:row40_residual.count@19=3--> --- generated in
+  `results/residual-cells.md`. **Step 0 is a 6.7 core-hour clean re-run of
+  H <= 16**, which makes the already-closed a(30) citable.
 - **Coin Lift is capped, and the argument is from the repo's own numbers.** A
   Z/2^k realization of bounded dimension for all k gives a Z_2- hence
   Q-realization, and rank_Q >= rank_{F_p}; the measured mod-p Hankel rank

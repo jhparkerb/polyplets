@@ -36,14 +36,23 @@ saying it can.
 Each rung closes one cell at the bottom of row 40 and one at the top, and closes
 two more terms outright.
 
-| | closes outright | row 40's residual cells |
+| | closes outright | row 40's residual cells | <!--q:prose-->
 |---|---|---|
-| after Half Measure (H<=17) | n <= 33 | 7 |
-| after Confetti (H<=18, tomorrow) | n <= 35 | 5 |
-| after Ticker Tape (H<=19) | n <= 37 | 3 |
+| after Half Measure (H<=17) | n <= 33 <!--q:closure_n@17=33--> | 7 <!--q:row40_residual.count@17=7--> |
+| after Confetti (H<=18, tomorrow) | n <= 35 <!--q:closure_n@18=35--> | 5 <!--q:row40_residual.count@18=5--> |
+| after Ticker Tape (H<=19) | n <= 37 <!--q:closure_n@19=37--> | 3 <!--q:row40_residual.count@19=3--> |
 
-Ticker Tape's two cells are T(40,19) and T(40,23), and its two terms are a(36)
-and a(37).
+Every figure in this table is generated in `results/residual-cells.md` and
+checked against it by `make gate-residual-cells`. Note that this is row 40's
+**rule-independence** band --- Q2 there --- a different quantity from the
+congruence-only cells the provenance gate pins, Q1; the two were conflated for
+a day, which is why they now have names. <!--q:prose-->
+
+Ticker Tape's two cells are T(40,19) and T(40,23)
+<!--q:row40_retires.cells@19=T(40,19),T(40,23)-->, and its two terms are
+a(36) and a(37). In Q1 terms it would retire three congruence-only cells
+<!--q:retires.count@19=3-->, (38,19), (39,19) and (40,19)
+<!--q:retires.cells@19=(38,19),(39,19),(40,19)-->.
 
 ## The judgement
 

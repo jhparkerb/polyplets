@@ -27,7 +27,9 @@ is the deterministic ambition: lift the collapse from GF(2) to Z/2^k and read
 exact values, with no probability anywhere.
 
 Target: the residual band Motley cannot sweep — after `docs/motley-plan.md`,
-T(40,20), T(40,21), T(40,22).
+T(40,20), T(40,21), T(40,22)
+<!--q:row40_residual.cells@19=T(40,20)..T(40,22)--> (generated in
+`results/residual-cells.md`).
 
 ## 0. The measured ground, quoted
 

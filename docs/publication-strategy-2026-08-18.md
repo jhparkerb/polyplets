@@ -82,7 +82,9 @@ release, not the run-up to it.
 
 **Track B — the ladder.** Confetti (H=18), then Ticker Tape (H=19). The only
 compute item, and the only thing that changes what P1 may claim: rule-independent
-closure 33 → 35 → 37, residual band on row 40 shrinking 9 → 7 → 5 → 3 cells.
+closure 33 → 35 <!--q:closure_n@17=33--><!--q:closure_n@18=35--> → 37
+<!--q:closure_n@19=37-->, and row 40's residual band shrinking with it. The
+counts and the cells are generated in `results/residual-cells.md`.
 Runs alongside Track A without competing for anyone's attention.
 
 **Track C — the L papers.** Nine now, not six: L7 was carved out of L5, and L8

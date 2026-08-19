@@ -30,7 +30,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
         gate-compile-db gate-citations gate-docs-index gate-l-paper-verifier gate-receipts \
-        gate-cutcount-assembly \
+        gate-residual-cells gate-cutcount-assembly \
         gate-perimeter-min gate-perimeter-defect \
         gate-perimeter-min-shard clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
@@ -43,7 +43,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         papers papers-verify papers-clean papers-list
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-docs-index gate-receipts gate-provenance gate-cutcount-assembly gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-docs-index gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -91,6 +91,20 @@ gate-bfiles:
 gate-provenance:
 	python3 scripts/provenance_table.py --selftest
 	python3 scripts/provenance_table.py --check
+
+# Gate RESIDUAL-CELLS: results/residual-cells.md is the one place the "cells
+# that still have one source" figures live, and every restatement of them
+# anywhere in the tree is checked against it -- count AND cell list, which is
+# what gate-provenance did not do.  Written 2026-08-19 after a sweep found four
+# accounts of those figures in four notes, three of them right: TWO quantities
+# were sharing one name (Q1 congruence-only over all 820 cells; Q2 row 40's
+# rule-independence band), and nothing defined either.  A residual claim with no
+# `<!--q:fact=value-->` marker fails; so does a marker that disagrees; so does a
+# scan that matches nothing at all.  15 RED controls (--selftest), one of them
+# for the fail-OPEN that let "**only** the mod-4" past the pattern.  ~2 s.
+gate-residual-cells:
+	python3 scripts/residual_cells.py --selftest
+	python3 scripts/residual_cells.py --check
 
 # Gate CUTCOUNT-ASSEMBLY: Motley's banked rows still make the triangle, and the
 # held-out prime still predicts.  T(n,H) = C_H - 2 C_{H-1} + C_{H-2} over

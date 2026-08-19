@@ -19,9 +19,13 @@ rule-independent frontier from n ≤ 33 (`results/motley-h17.md`) to n ≤ 35.
 What it does to the gap, measured off `scripts/provenance_table.py` at
 `MOTLEY_H` 17 against 18 rather than off any plan's forecast: the cells
 carrying **only** the mod-4 congruence — no exact recount, no closed form —
-drop from **11 to 6**, and the six are (38,19), (39,19), (39,20), (40,19),
-(40,20), (40,21). On row 40 alone that is four cells down to three; (40,18) is
-what Confetti bought there. The count of cells with no exact source at all is
+drop from **11 to 6** <!--q:congruence_only.count@17=11-->
+<!--q:congruence_only.count@18=6-->, and the six are (38,19), (39,19), (39,20),
+(40,19), (40,20), (40,21)
+<!--q:congruence_only.cells@18=(38,19),(39,19),(39,20),(40,19),(40,20),(40,21)-->.
+On row 40 alone that is four cells down to three
+<!--q:row40_congruence_only.count@17=4--><!--q:row40_congruence_only.count@18=3-->;
+(40,18) is what Confetti bought there. The count of cells with no exact source at all is
 195, down from 200, the rest being formula-only and unchanged at 189.
 
 ## Provenance
@@ -32,9 +36,10 @@ what Confetti bought there. The count of cells with no exact source at all is
 | binary sha256 | `dd1732399703d5aa786e11c8b450fb2aa3a7af8dfd599906c79fb474193b883e` |
 | receipt | `verdict=GREEN`, sha256 matching the binary as hashed at launch, primes recorded — the runner refuses to start without it |
 | `C18.out` sha256 | `26b4fa322303c8b26798c41dd0daafb698bd6909ab440a834a0eb95bbd0aeb81`, verified on both sides after `scp` |
-| held-out prime | 2147483563: **40/40 residues predicted correctly** from the CRT reconstruction over the other four |
+| held-out prime | 2147483563: **40/40 residues predicted correctly** from the CRT reconstruction over the other four --- and re-derivable, not quoted: the five residue rows are banked at `results/cutcount_b1/residues/` and `make gate-cutcount-assembly` redoes the CRT, the prediction and the tie-back to `C18.out` from the repo alone |
 | oracle for the product | the incumbent triangle, independently computed |
 | inputs C_16, C_17 | banked rows from step 0 and rung 1 (`results/motley-step0.md`, `results/motley-h17.md`) |
+| standing check | `make gate-cutcount-assembly` --- 567 cells from every banked row H = 1..18 against `results/triangle.txt`, plus the held-out prediction. Added 2026-08-19; until then the assembly lived only in the dalby runner and nothing in `make` re-derived it |
 
 The harvest is `scp`, not `ssh cat`: the first attempt piped the row through a
 remote shell and the sha256 did not match. Whatever that inserted, it is the
