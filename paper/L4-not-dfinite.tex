@@ -248,38 +248,52 @@ infinitely many. So for every $D$ only finitely many have degree $\le D$.
 \begin{theorem}[dichotomy]
 \label{thm:dichotomy}
 Suppose $F$ is annihilated by a $y$-ODE of order $r$ with $x$-degrees at most
-$D$. Then $[\Q(\mu_H):\Q] \le D$ for all but at most $r$ values of $H$.
+$D$. Then $[\Q(\mu_H):\Q] \le D$ for all but at most $r$ values of $H \ge r$.
 \end{theorem}
 
 \begin{proof}
 Write the annihilating relation as $\sum_{i \le r}p_i(x,y)\partial_y^iF = 0$ with
-$p_i \in \Q[x,y]$ not all zero and $D = \max_i \deg_x p_i$. Extracting
-$y$-coefficients~\cite[Lemma~9]{bmr2002} gives, for every $H$,
+$p_i = \sum_j p_{ij}(x)y^j$ in $\Q[x,y]$, not all zero, and $D = \max_i \deg_x p_i$.
+Write $(N)_{(i)} := N(N-1)\cdots(N-i+1)$ for the falling factorial. Since
+$\partial_y^iF = \sum_k (k+i)_{(i)}G_{k+i}\,y^k$, the $(i,j)$ term
+contributes $p_{ij}(x)\,(H+i-j)_{(i)}\,G_{H+i-j}$ to the coefficient of $y^H$, so
+extracting $y$-coefficients~\cite[Lemma~9]{bmr2002} gives, for every $H \ge 0$,
 \begin{equation}
-  \sum_{\delta \le \sigma} c_\delta(x,H)\,G_{H-\delta}(x) \;=\; 0 ,
+  \sum_{i,j} p_{ij}(x)\,(H+i-j)_{(i)}\,G_{H+i-j}(x) \;=\; 0 .
   \label{eq:rec}
 \end{equation}
-with $\deg_x c_\delta \le D$, $\deg_H c_\delta \le r$, and with
-$\{c_\delta\} \equiv 0$ forcing $\{p_i\} \equiv 0$, since the falling factorials
-of $H$ are linearly independent.
 
-Fix $H_0$ and instance \eqref{eq:rec} at $H = H_0$, evaluating near
-$x = 1/\mu_{H_0}$. Every term with $\delta \ge 1$ refers to a height below $H_0$,
-where by Lemma~\ref{lem:mono} the radius of convergence is strictly larger, so
-those slices are finite at $1/\mu_{H_0}$. The $\delta = 0$ term has $G_{H_0}$,
-which has a genuine pole there. Hence $c_0(1/\mu_{H_0},H_0) = 0$.
+The height indices here are \emph{not} bounded above by $H$: the $(i,j)$ term
+sits at height $H + i - j$, which exceeds $H$ whenever $i > j$. For
+$\partial_yF = 0$ the only term is $G_{H+1}$ and no term of height $H$ occurs at
+all. So the face to run the argument on is the top one. Put
+\[
+  m \;:=\; \max\{\,i - j \;:\; p_{ij} \not\equiv 0\,\} \;\le\; r,
+  \qquad
+  c(x,H) \;:=\; \sum_{i} p_{i,\,i-m}(x)\,(H+m)_{(i)} ,
+\]
+so that $c$ is the coefficient of the highest slice $G_{H+m}$ in
+\eqref{eq:rec}. Then $\deg_x c \le D$ and $\deg_H c \le r$, and
+$c \not\equiv 0$: the falling factorials $(H+m)_{(i)}$ have distinct degrees in
+$H$, hence are linearly independent, and $m$ was chosen so that at least one
+$p_{i,i-m}$ survives.
 
-Now $c_0(\cdot,H_0)$ is a polynomial over $\Q$ of degree at most $D$. If
+Fix $H_0 \ge r$ and instance \eqref{eq:rec} at $H = H_0 - m$, which is a legal
+index since $m \le r$. The top slice is then $G_{H_0}$, with coefficient
+$c(x,H_0-m)$, and every other term refers to a height strictly below $H_0$.
+Evaluate near $x = 1/\mu_{H_0}$: by Lemma~\ref{lem:mono} the lower slices have
+strictly larger radius of convergence and so are finite there, while $G_{H_0}$
+has a genuine pole. Hence $c(1/\mu_{H_0},H_0-m) = 0$.
+
+Now $c(\cdot,H_0-m)$ is a polynomial over $\Q$ of degree at most $D$. If
 $[\Q(\mu_{H_0}):\Q] > D$, then $1/\mu_{H_0}$ also has degree $> D$ over $\Q$ and
 no nonzero rational polynomial of degree $\le D$ vanishes at it; so
-$c_0(\cdot,H_0) \equiv 0$.
+$c(\cdot,H_0-m) \equiv 0$.
 
-Suppose that happens at $r+1$ distinct heights. Then the polynomial
-$c_0(x,\cdot)$, of degree at most $r$ in $H$, vanishes at $r+1$ points for each
-fixed $x$, so $c_0 \equiv 0$ identically. Now recurse: with the $\delta = 0$ face
-gone, \eqref{eq:rec} anchored at $H_0 + 1$ makes $c_1$ the leading face, and the
-same argument at the same set of levels kills it; and so on through
-$\delta = 2, 3, \dots$. All faces vanish, so all $p_i$ vanish, contradiction.
+Suppose that happens at $r+1$ distinct heights $H_0 \ge r$. The polynomial
+$c(x,\cdot)$ has degree at most $r$ in its second argument and vanishes at the
+$r+1$ distinct points $H_0 - m$, for each fixed $x$; so $c \equiv 0$,
+contradicting $c \not\equiv 0$.
 \end{proof}
 
 \begin{proof}[Proof of Theorem~\ref{thm:main}]
@@ -288,8 +302,8 @@ is over $\Q(x,y)$: $F$ has rational coefficients, and D-finiteness over $\C$
 descends to the field of definition. Clearing denominators gives an operator of
 some order $r$ with $x$-degrees at most some $D$. By
 Theorem~\ref{thm:dichotomy}, $[\Q(\mu_H):\Q] \le D$ at all but at most $r$
-heights --- contradicting Lemma~\ref{lem:northcott}, which says only finitely
-many heights have degree $\le D$ while infinitely many heights exist.
+heights $H \ge r$ --- contradicting Lemma~\ref{lem:northcott}, which says only
+finitely many heights have degree $\le D$ while infinitely many heights exist.
 \end{proof}
 
 \section{The effective content}
@@ -317,13 +331,15 @@ here: its $Q_{11}$ shares no roots with $Q_9Q_{10}$ modulo $p$, which is
 inconsistent with the structure at every validated level. It is a data-hygiene
 flag, not a mathematical anomaly, and nothing above or below uses it.}
 
-Running the argument of Theorem~\ref{thm:dichotomy} with \emph{all} roots of
-$\psi_{H_0}$ instead of the single dominant one --- each is a pole of $G_{H_0}$
-and, by construction, not a pole of any earlier slice --- gives
-$c_0(\alpha,H_0) = 0$ for $\deg\psi_{H_0}$ distinct values $\alpha$. So
-$\deg\psi_{H_0} > D$ forces $c_0(\cdot,H_0) \equiv 0$, and the recursion is as
-before. The rule is: exclude $(r,D)$ whenever at least $r+1$ certified levels
-have $\deg\psi_H > D$.
+Run the argument of Theorem~\ref{thm:dichotomy} with \emph{all} roots of
+$\psi_{H_0}$ in place of the single dominant one. Each is a pole of $G_{H_0}$ and,
+by construction, a root of no earlier $Q_j$, so each of the lower slices in
+\eqref{eq:rec} --- rational functions, all of them --- is finite there, and the
+same argument gives $c(\alpha,H_0-m) = 0$ at $\deg\psi_{H_0}$ distinct values
+$\alpha$. So $\deg\psi_{H_0} > D$ forces $c(\cdot,H_0-m) \equiv 0$ without any
+appeal to the degree of $\mu_{H_0}$, and the rest of the proof is unchanged. The
+rule is: exclude $(r,D)$ whenever at least $r+1$ certified levels $H \ge r$ have
+$\deg\psi_H > D$.
 
 \begin{table}[H]
 \centering
@@ -344,11 +360,15 @@ $\psi$-degree certificates at $H \le 10$.}
 \label{tab:psiboxes}
 \end{table}
 
-\subsection{Boxes from monotonicity and irreducibility alone}
+\subsection{Boxes from the degree of \texorpdfstring{$\mu_H$}{mu\_H}}
 
-The $\psi$-construction needs the banked $G_H$. A second family of boxes rests
-only on Lemma~\ref{lem:mono} plus irreducibility certificates, and so is
-self-contained relative to this paper's own ingredients.
+Both families read $\psi_H$ off the banked $G_H$; they differ in what they then
+ask of it. The first extends Theorem~\ref{thm:dichotomy} to all roots of
+$\psi_{H_0}$ at once, for which $\psi_H$ squarefree and $P_H/Q_H$ in lowest terms
+is enough. The second uses Theorem~\ref{thm:dichotomy} exactly as proved --- one
+root, the dominant one --- and pays for that with irreducibility certificates,
+which are what turn $\deg\psi_H$ into $[\Q(\mu_H):\Q]$. It is the weaker family
+and is recorded because it exercises no more than the theorem above.
 
 $\psi_H$ is irreducible over $\Q$ for $H = 1,\dots,8$ --- degrees
 $1, 2, 4, 9, 29, 68, 181, 462$ --- by single-prime certificates for $H \le 4$ and
@@ -369,8 +389,8 @@ $r \le 1$ & $D \le 180$ \\
 $r = 0$   & $D \le 461$ \\
 \bottomrule
 \end{tabular}
-\caption{Weaker than Table~\ref{tab:psiboxes}, but resting only on strict
-monotonicity and the irreducibility certificates.}
+\caption{Weaker than Table~\ref{tab:psiboxes}, and using
+Theorem~\ref{thm:dichotomy} at the dominant root only.}
 \label{tab:irrboxes}
 \end{table}
 

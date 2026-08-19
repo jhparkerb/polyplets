@@ -89,6 +89,87 @@ since its own sweep), L6 (the k=6 claims were re-derived from census data in
 `paper/verify_l_papers.py` this week), L8 (every statement is already labelled
 derived, measured or assumed, with four named assumptions).
 
+## Round 2, 2026-08-19 — the papers round 1 skipped
+
+Round 1 audited L3, L5, L7 and L9 and left L1, L2, L4, L6 and L8 alone. L4's
+stated reason was "unchanged since its own sweep", and a sweep reads prose.
+
+### L4 — the coefficient-extraction recurrence was mis-indexed. FIXED.
+
+Theorem 6 (dichotomy) wrote the extracted recurrence as
+
+    sum_{delta <= sigma} c_delta(x,H) G_{H-delta}(x) = 0
+
+with no lower bound on `delta`, and then argued at `x = 1/mu_{H_0}`: "every term
+with `delta >= 1` refers to a height below `H_0` ... the `delta = 0` term has
+`G_{H_0}`, which has a genuine pole there."
+
+Extraction does not produce that shape. With `p_i = sum_j p_ij(x) y^j`, the
+coefficient of `y^H` in `p_i d_y^i F` sits at height `H + i - j`, so **height
+indices above `H` occur whenever `i > j`**. The smallest counterexample is the
+operator `d_y F = 0`: extraction gives `(H+1) G_{H+1} = 0`, a single term at
+height `H+1`, and no term of height `H` at all. The proof's leading face is then
+not present, and the terms it treats as bounded near `1/mu_{H_0}` include slices
+of *greater* height, whose radius of convergence is strictly **smaller** — they
+are not merely unbounded there, their series do not converge.
+
+The conclusion survives. The repair is to run the argument on the top face
+rather than on the `delta = 0` face: put `m := max{i - j : p_ij != 0} <= r` and
+let `c(x,H)` be the coefficient of the highest slice `G_{H+m}`. Instancing at
+`H = H_0 - m` (legal for `H_0 >= r`) puts `G_{H_0}` on top with every other term
+strictly below it, and the rest goes through as printed. Two things improve:
+
+- `c != 0` holds **by construction** — `m` is chosen so some `p_{i,i-m}`
+  survives, and the falling factorials `(H+m)_(i)` have distinct degrees in `H`.
+  So deriving `c == 0` is already the contradiction and the old proof's
+  recursion through `delta = 1, 2, ...` is not needed. The proof is shorter.
+- The theorem's conclusion picks up `H >= r`: at most `r` exceptional heights
+  among `H >= r`. **Both effective tables survive this unchanged** — re-checked
+  cell by cell against the psi-degrees `1,2,4,9,29,68,181,462,1254,3289`, every
+  box still has its `r+1` certified levels with `H >= r`.
+
+Class of error: an index range asserted rather than computed. Same family as
+L3's and L9's — a step that reads as bookkeeping and is not.
+
+### L4 §"Boxes from monotonicity and irreducibility alone" — overclaim. FIXED.
+
+"The psi-construction needs the banked `G_H`. A second family of boxes rests
+only on Lemma 4 plus irreducibility certificates, and so is self-contained."
+Both families read `psi_H` off the banked `G_H`; that is where `psi_H` comes
+from. The second needs *more*, not less: irreducibility certificates on top of
+the same data, which is why its table is the weaker of the two. Retitled and
+restated to say what actually separates them — the first extends the theorem to
+all roots of `psi_{H_0}`, the second uses it at the dominant root only.
+
+### L4 — the rest. HOLDS.
+
+- Lemma 3 (`mu_H` an algebraic integer, house `= mu_H`). Fatou gives `Q_H(0) =
+  1`; the reversal is monic and integral; in lowest terms every root of `Q_H` is
+  a pole, so every root of the reversal has modulus at most `mu_H`, and the
+  minimal polynomial of `mu_H` divides the reversal, so the conjugates are among
+  them. Holds.
+- Lemma 4 (strict monotonicity). The Perron-root half is standard. The
+  compressed last sentence — "exact-height counts are second differences of
+  strip counts, strictness rules out cancellation" — checks out: `G_H = C_H - 2
+  C_{H-1} + C_{H-2}` with `nu_H > nu_{H-1} > nu_{H-2}`, so the pole at
+  `1/nu_H` is not cancelled and nothing of smaller modulus is singular.
+- Lemma 5 (Northcott) and the exclusion-box arithmetic in both tables. Holds.
+
+### L2 — the unconditional half. HOLDS.
+
+Proposition 1 (Polya integrality): the window `[2k+1, 3k+1]` is exactly `k+1`
+consecutive integers, and on it `3^{3k+1-n}` has a nonnegative exponent while
+L1's Theorem A is in force (`n >= 2k+1`) — the two ranges meet exactly, which is
+the part that could have failed. Proposition 2 needs `P_0(0) = 1`, and `P_0` is
+the constant polynomial because `T(n,n) = b^{n-1}` counts walks. Both hold. The
+mod-3 theorems are stated conditionally on congruences checked to `k <= 17` and
+were not re-derived here.
+
+### Still not audited
+
+L1 (Theorem A is Lean-formalized; Theorems B and C are not, and their proofs
+were not re-derived this round), L6, L8.
+
 ## The pattern worth keeping
 
 Both defects found in two days — L3's false proof and L9's false factorisation —
