@@ -16,6 +16,15 @@ Green = a sorry-free tree: there are no `sorry`s anywhere in `Polyplets/`
 (the historical "intended sorrys" list is gone; `Diagonal.lean` closed the
 last one).
 
+**Run the whole `lake build`, not a module.** No `make` gate runs Lean --- the
+Linux boxes have no toolchain --- so the only thing standing between this tree
+and a red one is somebody typing `lake build` on gympie. Per-module success is
+not enough: on 2026-08-19 every one of the 8643 module targets was green and
+the root `Polyplets.lean` failed at import, because `kingConnected_image` had
+been declared independently in `Symmetry` and in `GapWalkStacks` and only the
+aggregate sees both. That failure was in the tree for the whole Notary piece-B
+campaign and nothing noticed.
+
 ## Landed (sorry-free, green, all committed)
 
 - `Defs.lean` — kingAdj, KingConnected, IsCanonical, T. (pre-goal)

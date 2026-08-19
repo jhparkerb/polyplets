@@ -728,7 +728,7 @@ private theorem reach_image_aux {S : Finset (ℤ × ℤ)} {f : ℤ × ℤ → �
         ⟨Finset.mem_image_of_mem f hbc.1, Finset.mem_image_of_mem f hbc.2.1,
           (hadj _ _).mpr hbc.2.2⟩
 
-theorem kingConnected_image {S : Finset (ℤ × ℤ)} {f : ℤ × ℤ → ℤ × ℤ}
+theorem kingConnected_image_of_adj_iff {S : Finset (ℤ × ℤ)} {f : ℤ × ℤ → ℤ × ℤ}
     (hf : Function.Injective f)
     (hadj : ∀ a b, kingAdj (f a) (f b) ↔ kingAdj a b)
     (h : KingConnected S) : KingConnected (S.image f) := by

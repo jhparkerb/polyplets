@@ -1917,7 +1917,7 @@ private theorem rowMinX_flipMap_image {S : Finset (ℤ × ℤ)} (cx cy y : ℤ)
   minus the original shift);
 * membership transport: `Finset.card_image_of_injective`
   (`flipMap_injective`) for the cardinality, `rowSize` under images of
-  injective maps for the row profile, `kingConnected_image` +
+  injective maps for the row profile, `kingConnected_image_of_adj_iff` +
   `kingAdj_flipMap` for connectivity, `mem_CFGVt` on the config side.
   For row extraction under the flip: `rowMinX (S.image (flipMap cx cy)) y
   = rowMinX S (cy − y) − cx` (min of a shifted image; prove as a private
@@ -2030,7 +2030,7 @@ theorem Vt_eq_BQ_card (ℓ : ℕ) (hℓ : 1 ≤ ℓ) : Vt ℓ ℓ = (BQ ℓ).car
       have heq : (ℓ : ℤ) + 1 - (i : ℤ) = ((ℓ + 1 - i : ℕ) : ℤ) := by omega
       rw [heq]
       exact hrowmid2 (ℓ + 1 - i) (Finset.mem_Icc.mpr ⟨by omega, by omega⟩)
-    · exact kingConnected_image (flipMap_injective _ _) (kingAdj_flipMap _ _) hconn
+    · exact kingConnected_image_of_adj_iff (flipMap_injective _ _) (kingAdj_flipMap _ _) hconn
   · -- backward: BQ ℓ → CFGVt ℓ ℓ
     intro D hD
     rw [mem_BQ hℓ] at hD
@@ -2070,7 +2070,7 @@ theorem Vt_eq_BQ_card (ℓ : ℕ) (hℓ : 1 ≤ ℓ) : Vt ℓ ℓ = (BQ ℓ).car
       rw [heq]
       have := hDrowmid (ℓ + 1 - i) (Finset.mem_Icc.mpr ⟨by omega, by omega⟩)
       omega
-    · exact kingConnected_image (flipMap_injective _ _) (kingAdj_flipMap _ _) hDconn
+    · exact kingConnected_image_of_adj_iff (flipMap_injective _ _) (kingAdj_flipMap _ _) hDconn
   · -- left_inv: j (i S') = S'
     intro S' hS'
     rw [mem_CFGVt] at hS'
