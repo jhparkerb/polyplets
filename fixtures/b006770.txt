@@ -1,5 +1,14 @@
-# A006770 (b-file synthesized from sequence entry)
-# n=19 cross-ISA + transfer-matrix confirmed; n=20 column transfer-matrix (docs/a20-submission-draft.md)
+# A006770. NOT uniformly external -- read this before treating it as an anchor.
+#   n = 1..18  the OEIS entry, pre-dating this work.  Re-checked live
+#              2026-08-19: entry revision 44 (2026-05-30), DATA still 18 terms,
+#              oeis.org/A006770/b006770.txt still auto-synthesized from DATA
+#              (no author-uploaded b-file), and identical to these 18 lines.
+#   n = 19,20  THIS PROJECT's, not OEIS's.  n=19 cross-ISA + transfer-matrix
+#              confirmed; n=20 column transfer-matrix.  Draft is deleted from
+#              the tree: git show 78602f8^:docs/a20-submission-draft.md
+# So the external anchor is n <= 18 (docs/external-anchors.md Tier 1).  The
+# other gates read this file as a general a(n) reference and want all 20; only
+# scripts/bfile_gate.py's EXTERNAL check is scoped to the 18.
 1 1
 2 4
 3 20

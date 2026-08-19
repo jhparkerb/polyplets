@@ -3,9 +3,11 @@
 # recomputes the whole height triangle T(n,H) -- low heights swept directly,
 # top heights via validated closed-form height-diagonals -- and byte-matches
 # all prior computed terms through n=N-1, and a(1)-a(18) against the values
-# OEIS serves today (checked live Jul 30 2026: A006770 has no author-uploaded
+# OEIS serves today (checked live Jul 30 2026, re-checked Aug 19 2026 and
+# unchanged -- entry revision 44 of May 30 2026: A006770 has no author-uploaded
 # b-file, so oeis.org/A006770/b006770.txt is auto-synthesized from the entry's
-# DATA field; a(1)-a(18) of this file match it line for line).
+# DATA field, which carries 18 terms; a(1)-a(18) of this file match it line for
+# line).
 # Independent (two-algorithm) confirmation frontier: a(1)-a(22). A three-
 # machine, three-architecture Redelmeier fleet run (24000 disjoint shards,
 # ~120 h wall per box, completed Jul 16 2026) reproduced every row n <= 22

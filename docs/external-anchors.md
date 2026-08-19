@@ -12,11 +12,25 @@ its receipt lives so the reader can check it.
 
 The ordering is by how little the reader has to take on faith.
 
+**One trap, fixed 2026-08-19.** `fixtures/b006770.txt` carries **20** terms, not
+18: the other gates read it as a general a(n) reference and want the extra two,
+but **n = 19 and 20 in it are this project's, not OEIS's**. Until that date
+`scripts/bfile_gate.py` compared our upload against all twenty and reported the
+result as agreement with "the original OEIS terms" — two of which were our own
+numbers on both sides. The external check is now scoped to `n <= 18` with the
+overlap size pinned, so appending a further term to the fixture cannot quietly
+widen the anchor. The live entry was re-checked the same day: revision 44 of
+2026-05-30, DATA still 18 terms, `oeis.org/A006770/b006770.txt` still
+auto-synthesized from DATA with no author-uploaded b-file, and identical to our
+first 18 lines. The fixture's own header now says which lines are which; that
+comment-only edit is why its `fixtures/SHA256SUMS` entry was re-pinned, with the
+20 data lines verified byte-identical to the previous pin first.
+
 ## Tier 1 — published integers, reproduced exactly
 
 | anchor | published by | what we reproduce | receipt | status |
 |---|---|---|---|---|
-| **A006770, a(1)–a(18)** | OEIS entry, pre-dating this work | all 18 terms, exactly | `fixtures/b006770.txt`; `make gate-bfiles` | **re-checked 2026-08-18** |
+| **A006770, a(1)–a(18)** | OEIS entry, pre-dating this work | all 18 terms, exactly | `fixtures/b006770.txt` lines n≤18; `make gate-bfiles` | **re-checked live 2026-08-19** |
 | **A067675 / A067676** | Kotesovec (convex polyominoes by area) | 50 terms each, from the control arm of the king kernel pipeline | `results/convex-polyplets.md` | recorded; not re-run today |
 | **A222205** | Sloane 2013, from Bacher | all 23 published terms, extended to 200 | `results/multi-directed.md`, `results/multidirected_terms_n200.txt` | recorded |
 | **A187077** | OEIS (column-convex) | the generating function, rediscovered verbatim by Temperley's method | L5 §column-convex | recorded |

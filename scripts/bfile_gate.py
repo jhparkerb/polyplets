@@ -45,9 +45,40 @@ ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "results"
 FIXTURES = ROOT / "fixtures"
 
+# How far the pre-existing OEIS entry goes.  A006770's DATA has carried 18
+# terms since well before this project touched it (entry revision 44,
+# 2026-05-30; re-checked live 2026-08-19).  Everything above n = 18 in
+# fixtures/b006770.txt is ours, so it is not an external anchor and the
+# external check must not reach it.  docs/external-anchors.md Tier 1.
+EXTERNAL_ANCHOR_NMAX = 18
+
 failures: list[str] = []
 checks = 0
 reds = 0
+
+
+def external_anchor(orig, ours):
+    """Compare our a(n) against the PRE-EXISTING OEIS terms only.
+
+    Returns a list of complaints.  Scoped to n <= EXTERNAL_ANCHOR_NMAX and the
+    overlap size is pinned: fixtures/b006770.txt carries 20 terms because the
+    other gates read it as a general a(n) reference, but 19 and 20 are ours,
+    and comparing our upload against our own numbers is a self-check.  Until
+    2026-08-19 this reported exactly that as agreement with "the original OEIS
+    terms".
+    """
+    bad = []
+    shared = sorted(n for n in set(orig) & set(ours)
+                    if n <= EXTERNAL_ANCHOR_NMAX)
+    if len(shared) != EXTERNAL_ANCHOR_NMAX:
+        bad.append("external anchor covers %d terms, pinned at %d -- the "
+                   "fixture or the upload changed extent"
+                   % (len(shared), EXTERNAL_ANCHOR_NMAX))
+    off = [n for n in shared if orig[n] != ours[n]]
+    if off:
+        bad.append("b006770 disagrees with the pre-existing OEIS terms "
+                   "(n <= %d) at %s" % (EXTERNAL_ANCHOR_NMAX, off[:3]))
+    return bad
 
 
 def ok(cond, msg):
@@ -257,11 +288,18 @@ def run(mutate=None):
     ok(not bad, "README.md disagrees with the bank: %s"
        % ["a(%d) claims %d, bank has %d" % t for t in bad])
 
+    # The EXTERNAL anchor is n <= 18 and no further.  fixtures/b006770.txt
+    # carries 20 terms because the other gates read it as a general a(n)
+    # reference, but n = 19 and 20 in it are THIS PROJECT's -- comparing our
+    # upload against those is a self-check, and until 2026-08-19 this reported
+    # it as agreement with "the original OEIS terms".  Scoped, and the count is
+    # pinned so a future term appended to the fixture cannot quietly widen it.
     orig = load_nv(FIXTURES / "b006770.txt")
     if "b006770" in banked:
-        bad = [n for n in sorted(set(orig) & set(banked["b006770"]))
-               if orig[n] != banked["b006770"][n]]
-        ok(not bad, "b006770 disagrees with the original OEIS terms at %s" % bad[:3])
+        # The external anchor: our a(n) against the terms OEIS carried before
+        # this project, and only those.  See external_anchor().
+        problems = external_anchor(orig, banked["b006770"])
+        ok(not problems, "; ".join(problems))
     return report
 
 
@@ -292,11 +330,40 @@ def main() -> int:
         vacuous, _ = readme_claims(fixed, "no claims here\n")
         print("  RED %-42s %s" % ("a README that asserts no a(n) at all",
                                   "FIRED" if vacuous == 0 else "DID NOT FIRE"))
+        # Three controls for the external anchor: a wrong digit inside the
+        # anchor must fire; a disagreement ABOVE it must not (those terms are
+        # ours, and treating them as external is the defect being fixed); and a
+        # fixture that no longer reaches n = 18 must fire rather than shrink.
+        real = load_nv(FIXTURES / "b006770.txt")
+        mine = dict(real)
+        inside = dict(real); inside[10] = inside[10] + 1
+        ext_wrong = bool(external_anchor(inside, mine))
+        above = dict(real); above[20] = above[20] + 1
+        ext_above = bool(external_anchor(above, mine))
+        short = {n: v for n, v in real.items() if n <= EXTERNAL_ANCHOR_NMAX - 1}
+        ext_short = bool(external_anchor(short, mine))
+        for label, fired, want in (
+                ("a wrong digit inside the external anchor", ext_wrong, True),
+                ("a disagreement above n=%d (ours, not OEIS's)"
+                 % EXTERNAL_ANCHOR_NMAX, ext_above, False),
+                ("a fixture that no longer reaches the anchor", ext_short, True)):
+            print("  RED %-42s %s" % (label,
+                  ("FIRED" if fired else "DID NOT FIRE")
+                  if want else
+                  ("correctly silent" if not fired else "FIRED WRONGLY")))
+
         bad = []
         if not wrong:
             bad.append("readme wrong-digit control")
         if vacuous != 0:
             bad.append("readme vacuous control")
+        if not ext_wrong:
+            bad.append("external anchor wrong-digit control")
+        if ext_above:
+            bad.append("external anchor reached above n=%d"
+                       % EXTERNAL_ANCHOR_NMAX)
+        if not ext_short:
+            bad.append("external anchor short-fixture control")
         for label, mut in controls:
             run(mutate=mut)
             fired = bool(failures)
