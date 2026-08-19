@@ -98,7 +98,20 @@ embarrassing failure mode available to this project.
 
 ## 5. The lambda bracket's two ends
 
-STATUS: OPEN on the clean-box half (rides on item 2); the paper half is clean
+STATUS: **DONE** (2026-08-19). Both halves.
+
+The clean-box half: `scripts/lambda_cert_reproduce.sh` rebuilt `strip_mu_cert`
+from a fresh clone on ayr and re-derived the H<=11 ladder and H=17, diffing
+every rational against the primary log --- fail-closed, a banked row it cannot
+find counts as a failure. **VERDICT: REPRODUCED**, eleven for eleven, `mu_17 >=
+6543/1000 PASS` among them. Receipts: `results/strip_mu_certificates_ayr.log`.
+That number had existed exactly once before, from one machine, from a binary
+built on that machine. `attempts`, `states` and `min_ratio` agree exactly and
+`mu_float` agrees to all ten printed digits, so the two runs land on the same
+value rather than a nearby one. H=17 cost 4559 s against gympie's 772.7 s,
+which is the machines.
+
+The paper half was already clean
 --- `paper/L3-lambda-bounds.tex` states the bound as 9.3154 (ten occurrences).
 Its only mentions of 9.3153 are a footnote that exists to forbid it (the
 certificate proves 20000/2147 = 9.31532..., so truncating would claim

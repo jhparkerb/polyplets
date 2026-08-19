@@ -1,0 +1,32 @@
+# Second-source certificate receipts for the lambda lower bound.
+#
+# results/strip_mu_certificates.log is the primary log, every row of it taken on
+# gympie in July 2026. L3 states 6.543 <= lambda <= 9.3154 and calls both ends
+# checkable in exact arithmetic, and the lower end rests on a single receipt:
+# mu_17 >= 6543/1000. Until 2026-08-19 that receipt had been produced once, on
+# one machine, by a binary built on that machine.
+#
+# These rows are the same certificates re-derived on ayr (Debian, g++ 12.2)
+# from a fresh clone, by scripts/lambda_cert_reproduce.sh, which diffs each
+# rational against the primary log and fails closed on any mismatch or on a
+# banked row it cannot find. Every one matched, H=17 included.
+#
+# Two things worth noting from the comparison:
+#   - attempts, states and min_ratio agree exactly, and mu_float agrees to all
+#     ten printed digits, so the double-precision power iteration is landing on
+#     the same value on both machines and not merely a nearby one.
+#   - H=17 took 4559 s here against 772.7 s on gympie, a factor of 5.9 in
+#     single-thread wall for identical work. That is the machines, not the
+#     arithmetic.
+#
+event=certificate t=2026-08-18T23:55:04-04:00 git=0171909 built=2026-08-18T23:19:26-0400 host=ayr H=2 result=PASS num=24142135 den=10000000 mu_lower=2.4142135 mu_float=2.414213562 states=3 digits=7 vbits=96 vrange_bits=1.3 acc_bits=96.5 attempts=1 min_ratio=1.000000030 checksum=sha256:2098531adb266ce088d0df788639c32d44cd473ce4c37eb75afeadbb24fe5e8f wall_s=0.0
+event=certificate t=2026-08-18T23:55:04-04:00 git=0171909 built=2026-08-18T23:19:26-0400 host=ayr H=3 result=PASS num=34437183 den=10000000 mu_lower=3.4437183 mu_float=3.443718375 states=8 digits=7 vbits=96 vrange_bits=3.6 acc_bits=96.4 attempts=1 min_ratio=1.000000029 checksum=sha256:ba8c0de12fcd8fa1e33a6dd48187b755d8737de2170d4188bea4021a720effd7 wall_s=0.0
+event=certificate t=2026-08-18T23:55:04-04:00 git=0171909 built=2026-08-18T23:19:26-0400 host=ayr H=4 result=PASS num=41823214 den=10000000 mu_lower=4.1823214 mu_float=4.182321413 states=20 digits=7 vbits=96 vrange_bits=5.9 acc_bits=96.6 attempts=1 min_ratio=1.000000004 checksum=sha256:464cdb2b4745c3c607f6de787e3a05176bf9a5840e46aef48e0a40ffefc6a754 wall_s=0.0
+event=certificate t=2026-08-18T23:55:04-04:00 git=0171909 built=2026-08-18T23:19:26-0400 host=ayr H=5 result=PASS num=47178012 den=10000000 mu_lower=4.7178012 mu_float=4.717801291 states=50 digits=7 vbits=96 vrange_bits=12.2 acc_bits=96.5 attempts=1 min_ratio=1.000000031 checksum=sha256:92c2e3a5fbf6b25739298d38e06dc580804984642b12f5ce4e542b5a13c3aed5 wall_s=0.0
+event=certificate t=2026-08-18T23:55:04-04:00 git=0171909 built=2026-08-18T23:19:26-0400 host=ayr H=6 result=PASS num=51153244 den=10000000 mu_lower=5.1153244 mu_float=5.115324460 states=126 digits=7 vbits=96 vrange_bits=15.8 acc_bits=96.6 attempts=1 min_ratio=1.000000020 checksum=sha256:3c1384f3bbacc2a50a73c31bac85e8456140699f8eb77abd33b1fe6e87ca9095 wall_s=0.0
+event=certificate t=2026-08-18T23:55:04-04:00 git=0171909 built=2026-08-18T23:19:26-0400 host=ayr H=7 result=PASS num=54178476 den=10000000 mu_lower=5.4178476 mu_float=5.417847610 states=322 digits=7 vbits=96 vrange_bits=20.6 acc_bits=96.6 attempts=1 min_ratio=1.000000003 checksum=sha256:5b35239636272cc69879b5e35cd2579bcb86da26a42fb4ed426ade35c0eebc99 wall_s=0.0
+event=certificate t=2026-08-18T23:55:04-04:00 git=0171909 built=2026-08-18T23:19:26-0400 host=ayr H=8 result=PASS num=56533727 den=10000000 mu_lower=5.6533727 mu_float=5.653372762 states=834 digits=7 vbits=96 vrange_bits=24.1 acc_bits=96.6 attempts=1 min_ratio=1.000000022 checksum=sha256:905e474025b1e34afe097a6053c065e4e72331b576f7eef5c4e0fc1cd2aed0c7 wall_s=0.0
+event=certificate t=2026-08-18T23:55:04-04:00 git=0171909 built=2026-08-18T23:19:26-0400 host=ayr H=9 result=PASS num=58404579 den=10000000 mu_lower=5.8404579 mu_float=5.840457941 states=2187 digits=7 vbits=96 vrange_bits=39.7 acc_bits=96.6 attempts=1 min_ratio=1.000000015 checksum=sha256:37c2c3aece98472b974bf36a68b75ae335fca0bf26dac139d78bf5891b68f84b wall_s=0.2
+event=certificate t=2026-08-18T23:55:05-04:00 git=0171909 built=2026-08-18T23:19:26-0400 host=ayr H=10 result=PASS num=59916957 den=10000000 mu_lower=5.9916957 mu_float=5.991695792 states=5797 digits=7 vbits=96 vrange_bits=44.8 acc_bits=96.7 attempts=1 min_ratio=1.000000033 checksum=sha256:71c91a3f5aa7d58c4fbdd7297088667b1674155f19eb72a6fb85be9d22073007 wall_s=1.0
+event=certificate t=2026-08-18T23:55:08-04:00 git=0171909 built=2026-08-18T23:19:26-0400 host=ayr H=11 result=PASS num=61158416 den=10000000 mu_lower=6.1158416 mu_float=6.115841628 states=15510 digits=7 vbits=96 vrange_bits=52.5 acc_bits=96.6 attempts=1 min_ratio=1.000000010 checksum=sha256:ec8bb2e1ff9ce3c92b61fb4fda309018e38afffcefe7f8d869b0032e87620eee wall_s=3.3
+event=certificate t=2026-08-19T01:11:07-04:00 git=0171909 built=2026-08-18T23:19:26-0400 host=ayr H=17 result=PASS num=6543 den=1000 mu_lower=6.543 mu_float=6.546486999 states=6536381 digits=3 vbits=110 vrange_bits=134.8 acc_bits=110.7 attempts=6 min_ratio=1.000000000 checksum=sha256:eb7fafb1c61d1159a66861e072d2013ee8e09e846f4a701627991cd18596295d wall_s=4559.0

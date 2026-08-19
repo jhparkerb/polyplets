@@ -31,6 +31,21 @@ Four defects, none of them visible from this working tree:
   bitmap, which microtype's expansion refuses. `shared/preamble.tex` takes the
   good branch when `lmodern` is there and turns expansion off when it is not.
 
+Also closed the same night: **acceptance item 5, the lambda certificates.**
+L3's `6.543` rested on one receipt (`mu_17 >= 6543/1000`) produced once, on
+gympie, by a binary built there. `scripts/lambda_cert_reproduce.sh` re-derived
+it and the H<=11 ladder on ayr from a clean clone and diffed every rational
+against the primary log: **eleven for eleven**, with `attempts`, `states`,
+`min_ratio` and all ten printed digits of `mu_float` agreeing, so the two runs
+land on the same value and not a nearby one. Receipts:
+`results/strip_mu_certificates_ayr.log`. H=17 cost 4559 s against gympie's
+772.7 s --- the machines, not the arithmetic.
+
+And **the front page's own number is gated now**: nothing re-derived a(40) as
+`README.md` prints it. `scripts/bfile_gate.py` does, off the triangle row sums
+it already loads, with a RED control for a changed digit and a second for the
+vacuous case where the page is reworded and the check silently finds nothing.
+
 **His, unchanged by any of this:** whether `triangle-structure` and
 `half-measure` get pushed (65 citations point into them), and whether `docs/`
 and the Ghost Ship tree go public at all.
