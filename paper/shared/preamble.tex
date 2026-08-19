@@ -28,6 +28,10 @@
 \usepackage{amsmath,amssymb}
 \usepackage{amsthm}
 \usepackage{booktabs}
+\usepackage{array}    % for the wrapping p-columns the repro tables need
+% A left-aligned wrapping column: repo paths are unbreakable \texttt runs,
+% so a justified p-column would still stick into the margin.
+\newcolumntype{R}[1]{>{\raggedright\arraybackslash}p{#1}}
 \usepackage{graphicx}
 \usepackage{numprint}
 \usepackage[table]{xcolor}
@@ -36,6 +40,14 @@
 \usepackage{float}     % [H] pins tables/figures exactly where written
 \usepackage[font=small,labelfont=bf,labelsep=period]{caption}
 \setlength{\intextsep}{16pt plus 3pt minus 3pt}
+
+% Repo paths and Lean identifiers are long unbreakable \texttt runs, and a
+% paragraph that ends on one has nowhere to break: that was 24 overfull boxes
+% across the nine L papers, eight of them past 60pt (about 2cm into the
+% margin). \emergencystretch gives TeX a third pass with extra glue rather
+% than letting the line stick out. Set before the tables below are widened,
+% so what it is covering is the prose case.
+\setlength{\emergencystretch}{3em}
 
 \npthousandsep{,}
 \npfourdigitsep
@@ -61,6 +73,16 @@
 % Repo-path citations.  Every one of these must resolve in the tree that ships
 % with the paper; `make gate-citations` checks the markdown, and
 % paper/verify_claims.py checks the manuscripts.
+% Paths and Lean identifiers are long unbreakable \texttt runs, and they were
+% most of the residual overfull boxes: \emergencystretch cannot divide a word
+% that has no break in it. They are written with escaped underscores, and \_ is
+% a control sequence whose meaning is resolved at typesetting time even inside
+% an already-tokenised argument (a \caption, say), so redefining it inside
+% \texttt gives TeX somewhere to divide. No hyphen is inserted -- a path with a
+% hyphen in it would read as a different path -- and pdftotext still recovers
+% the path intact, which matters for a PDF a reader copies a path out of.
+\let\LTTT\texttt
+\renewcommand{\texttt}[1]{{\def\_{\char`\_\discretionary{}{}{}}\LTTT{#1}}}
 \newcommand{\repo}[1]{\texttt{#1}}
 
 % OEIS links.
