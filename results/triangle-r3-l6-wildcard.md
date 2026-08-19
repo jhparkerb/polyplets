@@ -1,5 +1,7 @@
 # L6 wildcard — triaged survey, kill counts, and the costed survivors
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and the unmerged branch `half-measure` and never reached this one: `git show <branch>:<path>`.
+
 2026-08-12. Lane L6 of `docs/triangle-round3-brief.md`, scored under
 `docs/skeptical-reader-standard.md`. Blind list filed first at
 `results/triangle-r3-blind-l6.md` (timestamped 18:22:30 EDT, before any

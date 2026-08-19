@@ -1,5 +1,7 @@
 # r4-lean2 — the encoding layer: source written, gates written, nothing built
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 Scout/builder `r4-lean2`, round 4, 2026-08-13. Task: author the next increment
 of the definition-level theorem (r3's L3-5), chosen to reduce the most
 remaining risk; write it to compile; gate it GREEN/RED; and state the honest

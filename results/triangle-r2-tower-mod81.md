@@ -1,5 +1,7 @@
 # The mod-81 master equation: one tower level, measured
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 2026-08-11. Round-2 agent 1 (tower builder), per
 `docs/triangle-structure-round2-brief.md` §Team shape.
 Verifier: `experiments/tristruct/r2_tower_mod81.py` (exact integer

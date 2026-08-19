@@ -1,5 +1,7 @@
 # Round 3 "Second Crown" — synthesis and ranked verdict
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 2026-08-12. Lead's synthesis of the round defined by
 `docs/triangle-round3-brief.md`: one harness, five lane scouts, one
 queue-dispatched scout, two adversaries, run in waves against

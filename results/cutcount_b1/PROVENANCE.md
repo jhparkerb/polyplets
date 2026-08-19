@@ -1,5 +1,7 @@
 # B1 cancellation run — recovered from dalby, 2026-08-12
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 Round 4's first act, per `docs/triangle-round4.md`. Until now these files
 existed only as untracked working-tree state on one machine; the round-3
 wind-down (`results/triangle-r3-winddown.md`) flagged them as the round's

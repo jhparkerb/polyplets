@@ -1,5 +1,7 @@
 # Postmortem — the four-round triangle campaign, 2026-08-11..13
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 **Verdict: failure.** Four agent-team rounds (branch `triangle-structure`,
 `aa2b1eb..1e1a2ff`, ~44 hours wall) set out to buy a breakthrough on the
 polyplet count: a(40) checkable by a route that does not re-run the

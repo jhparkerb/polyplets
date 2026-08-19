@@ -19,16 +19,27 @@ file and classify it.
   exempt     the citing line marks it (deleted / removed / planned / TODO /
              deliverable / never existed / in memory), so the text already
              tells the reader not to look for it
-  history    gone from the tree but present in git history -- reported, and
-             allowed: the repo deletes scaffolding on purpose, and
-             `git show <rev>^:path` is a legitimate citation
+  history    gone from the tree but present in the history of the CHECKED-OUT
+             branch -- reported, and allowed: the repo deletes scaffolding on
+             purpose, and `git show <rev>^:path` is a legitimate citation
+  branch     absent from this branch's history, and the citing file declares
+             ("unmerged branch `X`") that it lives on another one -- allowed,
+             and the claim is VERIFIED when ref X is present locally
   MISSING    none of the above -- FAILS the gate
+
+The history class is deliberately scoped to HEAD and not to `--all`. Until
+2026-08-18 it used every local ref, which made the verdict depend on which
+branches the checker's clone happened to have: 65 citations across 25 campaign
+records resolved on gympie's 50 local refs and dangled in a clone of master,
+which is what a reader gets.
 
 MISSING is the class that catches a name that never existed, which is what a
 memory-name-as-path always is.
 
 RED control: a synthetic document citing `results/definitely-not-here.md` must
-land in MISSING, and one citing it on a line that says "deleted" must not.
+land in MISSING, and one citing it on a line that says "deleted" must not. A
+second control covers the branch class: a file declaring a branch that does not
+carry the cited path must not thereby exempt it, when that branch is present.
 
 Usage: python3 tests/gate_citations.py [--verbose]
 """
@@ -50,6 +61,11 @@ PLACEHOLDER = set("{}<>*?$:")
 EXEMPT_WORDS = ("deleted", "removed", "planned", "todo", "deliverable",
                 "never existed", "no such file", "in memory", "not a path",
                 "since removed", "to be written")
+# A campaign record whose sibling deliverables were filed on a branch that never
+# merged declares that branch once, at the top of the file, and the declaration
+# governs the whole file: `unmerged branch `triangle-structure``. It is an
+# exemption with a checkable claim attached -- see branch_carries().
+BRANCH_DIRECTIVE_RE = re.compile(r"unmerged branch `([A-Za-z0-9._/-]+)`")
 # Trees a CLONE legitimately does not have.  Until 2026-08-18 this list was
 # tuned on a working tree, where untracked leftovers made citations look live;
 # in a clean clone -- which is what a reader gets -- 101 citations pointed at
@@ -76,11 +92,33 @@ def tracked_markdown():
             if not f.startswith(EXCLUDED_TREES)]
 
 
-def history_paths():
-    out = subprocess.run(["git", "-C", ROOT, "log", "--all", "--pretty=format:",
+def history_paths(rev="HEAD"):
+    """Every path that has ever existed in `rev`'s history."""
+    out = subprocess.run(["git", "-C", ROOT, "log", rev, "--pretty=format:",
                           "--name-only"], capture_output=True, text=True,
                          check=True).stdout
     return set(out.split())
+
+
+_BRANCH_CACHE = {}
+
+
+def branch_carries(ref, path):
+    """Does `ref` carry `path` in its history?  None if the ref is not here.
+
+    A clone of the published branch will not have the campaign branches, and a
+    declaration cannot be verified against a ref that is absent -- so the gate
+    reports "unverified" rather than failing on it. Where the ref IS present the
+    claim is checked, and a declaration naming a branch that does not carry the
+    path is a harder failure than the dangling citation it was meant to excuse.
+    """
+    if ref not in _BRANCH_CACHE:
+        exists = subprocess.run(["git", "-C", ROOT, "rev-parse", "--verify",
+                                 "--quiet", ref + "^{commit}"],
+                                capture_output=True, text=True).returncode == 0
+        _BRANCH_CACHE[ref] = history_paths(ref) if exists else None
+    paths = _BRANCH_CACHE[ref]
+    return None if paths is None else path in paths
 
 
 def _paragraph_exempt(lines):
@@ -102,11 +140,20 @@ def _paragraph_exempt(lines):
     return flags
 
 
+CLASSES = ("exists", "template", "exempt", "history", "branch", "MISSING")
+
+
 def classify(text, hist, source="<doc>"):
-    """Classify every path citation in `text`. Returns {class: [(source, line, path)]}."""
-    out = {k: [] for k in ("exists", "template", "exempt", "history", "MISSING")}
+    """Classify every path citation in `text`. Returns {class: [(source, line, path)]}.
+
+    `false_claim` is not a class of citation but a defect in the file's own
+    branch declaration, carried alongside so the caller can fail on it.
+    """
+    out = {k: [] for k in CLASSES}
+    out["false_claim"] = []
     lines = text.split("\n")
     exempt_flags = _paragraph_exempt(lines)
+    declared = BRANCH_DIRECTIVE_RE.findall(text)
     for lineno, line in enumerate(lines, 1):
         exempt_line = exempt_flags[lineno - 1]
         for m in PATH_RE.finditer(line):
@@ -122,6 +169,14 @@ def classify(text, hist, source="<doc>"):
                   or any(h.startswith(p.rstrip("/") + "/") for h in hist)
                   or EPHEMERAL_RE.match(p)):
                 out["history"].append(rec)
+            elif declared:
+                carried = [branch_carries(r, p) for r in declared]
+                if any(c is True for c in carried):
+                    out["branch"].append(rec)
+                elif all(c is None for c in carried):
+                    out["branch"].append(rec)          # ref absent: unverifiable
+                else:
+                    out["false_claim"].append(rec + (tuple(declared),))
             else:
                 out["MISSING"].append(rec)
     return out
@@ -140,7 +195,8 @@ def main():
     args = ap.parse_args()
 
     hist = history_paths()
-    totals = {k: [] for k in ("exists", "template", "exempt", "history", "MISSING")}
+    totals = {k: [] for k in CLASSES}
+    totals["false_claim"] = []
     files = tracked_markdown()
     # A tracked file missing from the working tree is a deletion that has not
     # been committed.  That is a legitimate state to be in and an illegitimate
@@ -156,7 +212,7 @@ def main():
         with open(path, errors="replace") as fh:
             merge(totals, classify(fh.read(), hist, f))
 
-    n = sum(len(v) for v in totals.values())
+    n = sum(len(totals[k]) for k in CLASSES) + len(totals["false_claim"])
     print(f"{n} path citations across {len(files) - len(absent)} tracked "
           f"markdown files")
     if absent:
@@ -164,8 +220,14 @@ def main():
               f"(uncommitted deletion?):")
         for f in absent:
             print(f"    {f}")
-    for k in ("exists", "template", "exempt", "history", "MISSING"):
+    for k in CLASSES:
         print(f"  {k:9s} {len(totals[k])}")
+
+    if totals["branch"]:
+        srcs = sorted({src for src, _, _ in totals["branch"]})
+        print(f"\n  {len(totals['branch'])} citation(s) in {len(srcs)} file(s) "
+              f"declared to live on an unmerged branch; a reader who clones "
+              f"only the published branch cannot follow them.")
 
     if args.verbose and totals["history"]:
         print("\nhistory-only (allowed; cite with a rev if a reader needs it):")
@@ -194,17 +256,40 @@ def main():
           "paragraph says 'deleted', and the exemption does not leak across a "
           "blank line  OK")
 
+    # RED control 2: a declaration must not exempt a path the named ref lacks.
+    # Uses HEAD, which exists everywhere and provably does not carry the bogus
+    # path, so the control is real on any clone.
+    liar = classify("this record cites `results/definitely-not-here.md`, and its\n"
+                    "siblings live on unmerged branch `HEAD`\n",
+                    hist, "<red2>")
+    if len(liar["false_claim"]) != 1:
+        print("\nRED CONTROL FAILED: a branch declaration now exempts a path "
+              "that the branch it names does not carry")
+        return 1
+    print("RED  a branch declaration does not exempt a path its own branch "
+          "lacks  OK")
+
+    if totals["false_claim"]:
+        print(f"\nGATE CITATIONS: RED -- {len(totals['false_claim'])} "
+              f"citation(s) sit under a branch declaration that does not carry "
+              f"them:")
+        for src, line, p_, decl in sorted(set(totals["false_claim"])):
+            print(f"  {src}:{line}  ->  {p_}   declared on {', '.join(decl)}")
+
     if totals["MISSING"]:
         print(f"\nGATE CITATIONS: RED -- {len(totals['MISSING'])} citation(s) "
               f"point at paths that have never existed:")
         for src, line, p in sorted(set(totals["MISSING"])):
             print(f"  {src}:{line}  ->  {p}")
-        print("\nFix the path, or mark the line (deleted / planned / in memory) "
-              "if the reader is meant to know it is not there.")
+        print("\nFix the path; or mark the line (deleted / planned / in memory) "
+              "if the reader is meant to know it is not there; or, if the file "
+              "is a campaign record whose siblings were filed on a branch that "
+              "never merged, declare that branch once at the top of it: "
+              "unmerged branch `the-branch-name`.")
     if absent:
         print("\nGATE CITATIONS: RED -- a tracked file is not in the working "
               "tree; commit the deletion or restore the file.")
-    if totals["MISSING"] or absent:
+    if totals["MISSING"] or absent or totals["false_claim"]:
         return 1
 
     print("\nGATE CITATIONS: GREEN")

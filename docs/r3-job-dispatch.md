@@ -27,7 +27,8 @@ idle, and it does not run a "small version" locally while it waits.
 
 ## Job request format
 
-File it in `results/triangle-r3-queue.md` as a row with status JOB-REQUESTED,
+File it in `results/triangle-r3-queue.md` (the round's queue, filed on the
+unmerged branch `triangle-structure`) as a row with status JOB-REQUESTED,
 and state it in your reply to the lead. Every field is required; "unknown" is a
 valid value but the field must be present.
 

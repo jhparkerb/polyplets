@@ -1,5 +1,7 @@
 # tristruct — harness for the T(n,H) triangle structure hunt
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 Wave-0 deliverable for `docs/triangle-structure-team-brief.md`. Everything a
 proposer or refuter needs is in this directory; a stranger should be able to
 use it from the docstrings alone.

@@ -1,5 +1,7 @@
 # Round-3 provenance scout — ADV-2 (binary provenance of the a(40) run) and ADV-5 (transpose accounting)
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 2026-08-12, wave-4 scout off the idea queue. Carries queue rows ADV-2 (the
 cost adversary's row at `results/triangle-r3-queue.md` line 91 — note the
 queue has an id collision: a second, unrelated "ADV-2" from the independence

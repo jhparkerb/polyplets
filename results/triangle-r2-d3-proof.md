@@ -1,5 +1,7 @@
 # The d=3 sleeve unit formula, proved on the mod-81 curve
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 2026-08-11. Round-2 agent 2 (prover), per
 `docs/triangle-structure-round2-brief.md` §Team shape. Verifier:
 `experiments/tristruct/r2_prove_d3.py` (exact integer/symbolic arithmetic

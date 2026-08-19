@@ -1,5 +1,7 @@
 # Proved forced parity: T(n,H) is even for n odd, H even
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 2026-08-11, Proposer 2 (congruence/valuation/symmetry) of the
 triangle-structure hunt (`docs/triangle-structure-team-brief.md`).
 Candidate `experiments/tristruct/candidates/p2_congruence.py` (C1),

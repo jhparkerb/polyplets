@@ -209,7 +209,8 @@ Measure's run is where it first gets measured).
 **Product.** a(n) closed for n <= 35.
 
 **Status (2026-08-14): instrumented, gated, unlaunched.** The gate battery
-exists (`tests/gate_confetti.py` on `half-measure`, commit `3002104`): brute
+exists (`tests/gate_confetti.py`, on the unmerged branch `half-measure`,
+commit `3002104`): brute
 fixed-polyplet oracle (A030232-anchored) x 5 primes x H = 2..6, the exact
 battery wholesale, and four planted REDs (NW-drop, rook, bottom-anchored,
 weight-corrupt) — all caught; GREEN on dalby in 28 s against the H = 17

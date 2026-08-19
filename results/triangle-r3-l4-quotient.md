@@ -1,5 +1,7 @@
 # L4 — the symmetry quotient, pushed: routing audit, quotient-domain route, and the mod-8 ceiling
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and the unmerged branch `half-measure` and never reached this one: `git show <branch>:<path>`.
+
 2026-08-12, gympie. Round-3 lane deliverable per `docs/triangle-round3-brief.md`,
 scored under `docs/skeptical-reader-standard.md`. Blind list filed first at
 `results/triangle-r3-blind-l4.md` (18:21 EDT, before any code was read).

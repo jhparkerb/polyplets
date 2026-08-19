@@ -1,5 +1,7 @@
 # r4-ladder — what is the real plan for H=17, 18 and 19?
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 SCOUT, 2026-08-13. **No compute was run for this deliverable.** It is reading,
 read-only ssh to dalby, and arithmetic on numbers already on disk. Every table
 below is reproducible from `r4_a_modp_bpw.log` (baseline), `r4_perf_job1.log`

@@ -1,5 +1,7 @@
 # Triangle structure hunt — synthesis and ranked verdict
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and the unmerged branch `half-measure` and never reached this one: `git show <branch>:<path>`.
+
 2026-08-11. Lead's synthesis of the team run defined by
 `docs/triangle-structure-team-brief.md`: Wave 0 (harness), four proposers
 split by hypothesis class, two refuters, one round. Every claim below is

@@ -160,7 +160,8 @@ Each of these has cost a real round. Any one of them zeroes the candidate.
   **The `docs/*.md` term is not redundant** — measured 2026-08-12 by the round-3
   harness: `docs/**/*.md` alone matches 251 historical paths and misses 30 files
   at the top level of `docs/`, including `docs/second-source-team-brief.md`
-  (2b3115b), the ruling this standard cites. With both terms: 510.
+  (2b3115b, on the unmerged branch `half-measure`), the ruling this standard
+  cites. With both terms: 510.
 - **Fitted on every available cell.** Fit on a proper subset, hold out by n,
   report both regions.
 - **A consistency check presented as verification.** Strip-TM-class

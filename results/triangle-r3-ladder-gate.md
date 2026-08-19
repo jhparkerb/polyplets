@@ -1,5 +1,7 @@
 # Ladder gate prep (ADV-1) — the measured rows exist, and they change the plan
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and the unmerged branch `half-measure` and never reached this one: `git show <branch>:<path>`.
+
 2026-08-12, wave-5 scout on queue row ADV-1 and phase-2 gate work for L6-1,
 per `docs/r3-job-dispatch.md`. Everything below is reading, git, and READ-ONLY
 ssh; the one local script run was a seconds-scale banked-triangle share

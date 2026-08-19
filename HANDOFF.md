@@ -403,7 +403,8 @@ statement that did not survive contact.
   sequential 31-bit-prime passes, CRT from four + held-out fifth (RED-D),
   T(n,18) vs the incumbent triangle at the end; **~16 h/pass, ~82 h total,
   ~83 GB peak** (measured: modp wall ~0.47x u128 at H = 12, 13). Gate
-  battery GREEN on dalby (`tests/gate_confetti.py`, half-measure `3002104`;
+  battery GREEN on dalby (`tests/gate_confetti.py`, unmerged branch
+  `half-measure` at `3002104`;
   brute A030232-anchored oracle, 4 planted REDs all caught) and **receipt
   enforcement now exists and is red-tested** — the runner
   (`scripts/dalby_confetti_h18.sh`, master `443ed36`) refuses to run a

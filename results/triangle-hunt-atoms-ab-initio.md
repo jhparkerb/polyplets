@@ -1,5 +1,7 @@
 # Strip atoms q_1..q_6 computed ab initio; three surviving column candidates
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and the unmerged branch `half-measure` and never reached this one: `git show <branch>:<path>`.
+
 2026-08-11, Proposer 3 (slice recurrences) of the triangle structure hunt
 (`docs/triangle-structure-team-brief.md`). Scripts:
 `experiments/tristruct/p3_striptm.py` (strip TM from the lattice definition),

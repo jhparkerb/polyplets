@@ -1,5 +1,7 @@
 # Adversary audit of the d=3 proof: no gap found
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 **Bits against enumeration error: 0 new. Bits against formula-chain error:
 0 new** — this file re-verifies and probes; every cell it touches (the nine
 real-sweep d=3 family cells, k = 3..11) was banked in round 1.

@@ -1,5 +1,7 @@
 # r4-a — R4-1: is the committed `--modp` mode the residue binary LG-JOB-1 was blocked on?
 
+> Some files cited below were filed on the unmerged branch `half-measure` and never reached this one: `git show half-measure:<path>`.
+
 SCOUT, 2026-08-12. No compute was run for this deliverable: it is reading,
 `git show`, and arithmetic on numbers already on disk. The three sources were
 compared with `diff -u` over `git show` output; nothing was built or executed.

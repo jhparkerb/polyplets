@@ -1,5 +1,7 @@
 # Extension scout: what the tower method reaches past d=7, and what that buys
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 2026-08-11. Round-2 agent 4 (extension scout), per
 `docs/triangle-structure-round2-brief.md` §Team shape, run after agents 1-3
 went green. Verifier: `experiments/tristruct/r2_scout_d8.py` (subcommands

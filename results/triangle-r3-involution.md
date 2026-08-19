@@ -1,5 +1,7 @@
 # Involution hunt — queue rows L4-3, LEAD-2 (and the L4-4 desk survey)
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and the unmerged branch `half-measure` and never reached this one: `git show <branch>:<path>`.
+
 2026-08-12, gympie. Wave-3 queue-dispatched scout, round 3, per
 `docs/triangle-round3-brief.md`, scored under
 `docs/skeptical-reader-standard.md`. No blind list — the rows came from

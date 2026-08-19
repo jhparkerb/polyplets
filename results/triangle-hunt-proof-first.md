@@ -1,5 +1,7 @@
 # Proof-first proposer — ranked summary (Wave 1, triangle structure hunt)
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 2026-08-11, Proposer 1 (proof-first) of `docs/triangle-structure-team-brief.md`.
 Enumerator crosscheck (mandatory first task) is recorded in
 `results/triangle-hunt-enumerator-crosscheck.md` (zero mismatches, four

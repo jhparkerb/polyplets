@@ -1,5 +1,7 @@
 # Round-4 instruments — one line each, and the log that proves it ran
 
+> Some files cited below were filed on the unmerged branch `triangle-structure` and never reached this one: `git show triangle-structure:<path>`.
+
 Written 2026-08-13 by the lead, on `r4-gen7`'s row R4-G7-00, which caught the
 round claiming instruments ahead of what was on disk. Its meta-finding is the
 reason this file exists: **every drift it found upgraded a written-but-unrun
