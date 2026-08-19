@@ -133,7 +133,6 @@ def analyse(T, motley_h=MOTLEY_H):
     # What the table itself can now say, with every exact source counted.
     stats["exact_any_pct"] = round(
         100 * sum(1 for c in cells if exact[c]) / len(cells), 1)
-    stats["congruence_only_mass"] = {}
     stats["strip_alone_pct"] = round(100 * stats["strip_cells"] / len(cells), 1)
     # Cells, not shares: per row, which cells have no exact recount.
     stats["unsourced_cells"] = {

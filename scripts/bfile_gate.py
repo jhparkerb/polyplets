@@ -56,7 +56,14 @@ def ok(cond, msg):
         failures.append(msg)
 
 
-def load_nv(path, twocol=True):
+# TODO (deferred from the 2026-08-19 simplify checkpoint, too large for a
+# cleanup pass): four scripts hand-roll the same whitespace-column parse over
+# banked files -- this one, provenance_table.read_triangle, and the ls-files
+# walks in tests/gate_citations.tracked_markdown and
+# tests/gate_docs_index.tracked_docs. A shared module would have to sit above
+# both scripts/ and tests/, and these are freshly validated gates, so the
+# consolidation wants its own change rather than a drive-by.
+def load_nv(path):
     """Parse 'n value' lines, skipping comments."""
     out = {}
     for ln in Path(path).read_text().splitlines():

@@ -21,7 +21,9 @@
 set -e
 LOG=$HOME/var/exactchange/ayr_h13.log
 mkdir -p "$(dirname "$LOG")"
-cd "$HOME/src/polyominoes"
+# Repo root from the script's own path (this one is /bin/sh, so $0 rather
+# than BASH_SOURCE): a clone lands wherever the reader put it.
+cd "$(cd "$(dirname "$0")/.." && pwd)"
 echo "start $(date -u +%Y-%m-%dT%H:%M:%SZ) host=$(hostname) rev=$(git rev-parse --short HEAD)" >> "$LOG"
 python3 experiments/tristruct/exactchange_minauto.py 13 4 >> "$LOG" 2>&1
 echo "done $(date -u +%Y-%m-%dT%H:%M:%SZ) rc=$?" >> "$LOG"
