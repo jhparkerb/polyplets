@@ -5,7 +5,9 @@
 set -e
 H=$1
 N=$2
-cd ~/src/polyominoes
+# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 git pull --ff-only
 # native build (g++ -O3); strip_tm is standalone, no repo build deps
 g++ -O3 -std=c++17 -o build/strip_tm cpp/strip_tm.cpp

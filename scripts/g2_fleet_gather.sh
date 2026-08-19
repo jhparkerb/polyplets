@@ -16,7 +16,9 @@ rm -rf "$DIR"; mkdir -p "$DIR"
 
 for host in dalby.jhpb.org ayr gympie; do
   echo ">>> gathering $host"
-  ssh "$host" "cd ~/src/polyominoes/runs/$RUN && tar czf /tmp/${RUN}_gather.tgz w*.out w*.done"
+  ssh "$host" "# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"/runs/$RUN && tar czf /tmp/${RUN}_gather.tgz w*.out w*.done"
   scp -q "$host:/tmp/${RUN}_gather.tgz" "$DIR/$host.tgz"
   tar xzf "$DIR/$host.tgz" -C "$DIR"
   ssh "$host" "rm -f /tmp/${RUN}_gather.tgz"

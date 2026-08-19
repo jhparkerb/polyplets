@@ -14,7 +14,9 @@
 # Kill: kill <orchestrate PID> (ps -Ao pid,command | grep '[o]rchestrate')
 # Verdict line: A40_H20_RECHECK_MATCH or A40_H20_RECHECK_MISMATCH.
 set -e
-cd ~/src/polyominoes
+# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUNDIR=runs/a40_h20_recheck
 mkdir -p "$RUNDIR/spill" "$RUNDIR/perheight"
 

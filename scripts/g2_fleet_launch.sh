@@ -20,7 +20,9 @@ A_TO=$(( K * 80 / 100 ))     # ayr   [D_TO, A_TO)   gympie [A_TO, K)
 
 launch() {
   local host="$1" from="$2" to="$3" jobs="$4"
-  ssh "$host" "tmux new-window -t '0:' -n g2_a${N} \"cd ~/src/polyominoes && \
+  ssh "$host" "tmux new-window -t '0:' -n g2_a${N} \"# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" && \
     scripts/g2_wholerow.sh $N $S $K $jobs --range $from $to --no-combine \
     2>&1 | tee runs/g2row_N${N}.launch.log; exec bash\""
   echo ">>> launched $host  range [$from,$to)  jobs=$jobs"

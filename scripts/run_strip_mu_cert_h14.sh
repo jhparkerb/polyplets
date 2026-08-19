@@ -24,7 +24,9 @@
 set -e
 H_LO=${1:-14}
 H_HI=${2:-14}
-cd ~/src/polyominoes
+# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 make build/strip_mu_cert
 ./build/strip_mu_cert --selftest          # RED-first gate before the long run
 echo "=== strip_mu_cert H=$H_LO..$H_HI host=$(hostname -s) rev=$(git rev-parse --short HEAD) $(date -u +%FT%TZ) ==="

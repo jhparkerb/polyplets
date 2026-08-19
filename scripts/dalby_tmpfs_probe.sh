@@ -28,7 +28,9 @@
 # RUN:  scripts/dalby_tmpfs_probe.sh 34
 # KILL: kill the orchestrate PID; rm -rf /dev/shm/ns_a${N}_tmpfsprobe
 set -e
-cd ~/src/polyominoes
+# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 N="${1:?usage: dalby_tmpfs_probe.sh N [SECS]}"
 SECS="${2:-1500}"
 LOG="runs/ns_a${N}_tmpfsprobe"

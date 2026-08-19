@@ -127,8 +127,8 @@ MANIFEST = read_manifest()
 _BRANCH_CACHE = {}
 
 
-def branch_carries(ref, path):
-    """Does `ref` carry `path` in its history?  None if the ref is not here.
+def ref_paths(ref):
+    """Every path in `ref`'s history, or None if this tree has no such ref.
 
     A clone of the published branch will not have the campaign branches, and a
     declaration cannot be verified against a ref that is absent -- so the gate
@@ -147,7 +147,12 @@ def branch_carries(ref, path):
                               capture_output=True, text=True).returncode == 0:
                 _BRANCH_CACHE[ref] = history_paths(cand)
                 break
-    paths = _BRANCH_CACHE[ref]
+    return _BRANCH_CACHE[ref]
+
+
+def branch_carries(ref, path):
+    """True/False if `ref` is here and does/does not carry `path`; None if not."""
+    paths = ref_paths(ref)
     return None if paths is None else path in paths
 
 
@@ -173,7 +178,7 @@ def _paragraph_exempt(lines):
 CLASSES = ("exists", "template", "exempt", "history", "branch", "MISSING")
 
 
-def classify(text, hist, source="<doc>"):
+def classify(text, hist, source="<doc>", declared=None):
     """Classify every path citation in `text`. Returns {class: [(source, line, path)]}.
 
     `false_claim` is not a class of citation but a defect in the file's own
@@ -183,7 +188,8 @@ def classify(text, hist, source="<doc>"):
     out["false_claim"] = []
     lines = text.split("\n")
     exempt_flags = _paragraph_exempt(lines)
-    declared = BRANCH_DIRECTIVE_RE.findall(text)
+    if declared is None:
+        declared = BRANCH_DIRECTIVE_RE.findall(text)
     for lineno, line in enumerate(lines, 1):
         exempt_line = exempt_flags[lineno - 1]
         for m in PATH_RE.finditer(line):
@@ -242,16 +248,18 @@ def main():
     # state to crash on: the gate reports it and fails, rather than dying with a
     # traceback that hides every finding after it.  (Before this, one uncommitted
     # deletion masked nine real dangling citations for as long as it sat there.)
-    absent = []
+    absent, decls = [], {}
     for f in files:
         path = os.path.join(ROOT, f)
         if not os.path.exists(path):
             absent.append(f)
             continue
         with open(path, errors="replace") as fh:
-            merge(totals, classify(fh.read(), hist, f))
+            text = fh.read()
+        decls[f] = BRANCH_DIRECTIVE_RE.findall(text)
+        merge(totals, classify(text, hist, f, decls[f]))
 
-    n = sum(len(totals[k]) for k in CLASSES) + len(totals["false_claim"])
+    n = sum(len(v) for v in totals.values())
     print(f"{n} path citations across {len(files) - len(absent)} tracked "
           f"markdown files")
     if absent:
@@ -265,21 +273,11 @@ def main():
     # What the branch class resolved through refs that are actually here. This
     # is the manifest's content, and comparing it to the file on disk is the
     # same regenerate-and-diff shape as gate-provenance.
-    resolved, present_refs = set(), set()
-    for f in files:
-        path = os.path.join(ROOT, f)
-        if not os.path.exists(path):
-            continue
-        with open(path, errors="replace") as fh:
-            text = fh.read()
-        for ref in BRANCH_DIRECTIVE_RE.findall(text):
-            if branch_carries(ref, "") is not None:
-                present_refs.add(ref)
-    for src, _, p_ in totals["branch"]:
-        with open(os.path.join(ROOT, src), errors="replace") as fh:
-            for ref in BRANCH_DIRECTIVE_RE.findall(fh.read()):
-                if ref in present_refs and branch_carries(ref, p_):
-                    resolved.add((ref, p_))
+    present_refs = {r for refs in decls.values() for r in refs
+                    if ref_paths(r) is not None}
+    resolved = {(r, p_) for src, _, p_ in totals["branch"]
+                for r in decls.get(src, ())
+                if r in present_refs and branch_carries(r, p_)}
 
     if args.write_manifest:
         if not present_refs:

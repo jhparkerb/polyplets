@@ -18,7 +18,9 @@
 # RUN:  scripts/dalby_two_media_cal.sh 34 18
 # KILL: kill the two orchestrate PIDs (jobA.log/jobB.log name them); rm -rf /dev/shm/a{N}_2mA
 set -e
-cd ~/src/polyominoes
+# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 N="${1:?usage: dalby_two_media_cal.sh N TOPH}"
 TOPH="${2:?need TOPH (tallest real-swept height)}"
 LOG="runs/ns_a${N}_2media"

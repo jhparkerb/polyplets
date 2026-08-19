@@ -23,7 +23,9 @@
 # own overlap validation), +persistent-workers, +GOGC=1000.
 export GOGC=1000
 set -u
-cd ~/src/polyominoes
+# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 MAXN=$1; COUNTER=$2; REFDIR=$3; CERTFILE=${4:-}
 CORES=80; RAM=1073741824

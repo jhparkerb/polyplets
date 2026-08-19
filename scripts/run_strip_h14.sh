@@ -14,7 +14,9 @@
 # Kill/resume: plain kill of the strip_tm PID; single-unit job, no checkpoint —
 #   a kill costs the whole run (~70 min), accepted for a one-off validation run.
 set -e
-cd ~/src/polyominoes
+# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 g++ -O3 -std=c++17 -o build/strip_tm cpp/strip_tm.cpp
 echo "=== strip full Hmax=14 N=36 host=$(hostname -s) rev=$(git rev-parse --short HEAD) $(date -u +%FT%TZ) ==="
 echo "=== cpp/strip_tm.cpp blob $(git hash-object cpp/strip_tm.cpp) (file unmodified since 2026-07-10 run) ==="

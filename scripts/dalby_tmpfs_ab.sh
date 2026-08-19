@@ -32,7 +32,9 @@
 # RUN:  scripts/dalby_tmpfs_ab.sh 31
 # KILL: kill the orchestrate PID; then rm -rf /dev/shm/ns_a${N}_tmpfsab
 set -e
-cd ~/src/polyominoes
+# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 N="${1:?usage: dalby_tmpfs_ab.sh N}"
 LOG="runs/ns_a${N}_tmpfsab"
 NVME="$LOG/nvme_rundir"

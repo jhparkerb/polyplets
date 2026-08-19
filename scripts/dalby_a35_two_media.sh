@@ -30,7 +30,9 @@
 # RUN:  scripts/dalby_a35_two_media.sh
 # KILL: kill the two orchestrate PIDs (jobA.log/jobB.log name them).
 set -e
-cd ~/src/polyominoes
+# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 N=35
 TMPFS=/mnt/polytmp
 BASE=runs/ns_a35_2m

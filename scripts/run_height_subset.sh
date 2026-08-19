@@ -10,7 +10,9 @@
 # Standard a29-cell-validated kink config. RAM is per-worker spill bytes; keep
 # it (total_RAM*margin)/cores (dalby 80c/1GiB, ayr 32c/~1.5GiB).
 set -e
-cd ~/src/polyominoes
+# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 N="${1:?usage: run_height_subset.sh N HEIGHTS CORES RAM}"
 HEIGHTS="${2:?need HEIGHTS (e.g. 3-18 or 1-2,19-35)}"
 CORES="${3:?need CORES}"

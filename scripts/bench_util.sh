@@ -25,7 +25,9 @@
 # edit the script deliberately, the same way MERGE_MULT's comment asks for.
 export GOGC=1000
 set -e
-cd ~/src/polyominoes
+# Repo root from the script's own path, not a hardcoded ~/src/polyominoes:
+# a clone lands wherever the reader put it (acceptance-queue item 2).
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LABEL="$1"; MAXN="$2"; HEIGHTS="$3"; OVERLAP="${4:-1}"; GRAIN="${5:-0.05}"; MERGE_MULT="${6:-1}"
 [ -n "$HEIGHTS" ] || { echo "usage: bench_util.sh LABEL MAXN HEIGHTS [OVERLAP] [STEAL_GRAIN] [MERGE_MULT]"; exit 2; }
 
