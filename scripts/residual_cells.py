@@ -104,17 +104,19 @@ def formula_lo(n: int) -> int:
     """Lowest height on row n reached by the P_k closed-form band.
 
     Two constraints, both from docs/proofs/diagonal-law.md: the wired levels
-    stop at k <= 18 (h >= n - 18), and the onset is sharp at n >= 2k+1
-    (h >= (n+1)/2).  The band is whichever binds harder.
+    stop at k <= PT.PK_KMAX (h >= n - PK_KMAX), and the onset is sharp at
+    n >= 2k+1 (h >= (n+1)/2).  The band is whichever binds harder.  Both
+    numbers come from provenance_table so that the two generators cannot come
+    to disagree about where the band is.
     """
-    return max(n - 18, -(-(n + 1) // 2))
+    return max(n - PT.PK_KMAX, -(-(n + 1) // 2))
 
 
 def row40_residual(motley_h: int) -> list[tuple[int, int]]:
     """Q2: row 40's cells that still rest on the incumbent connectivity rule."""
     out = []
     for h in range(1, NMAX + 1):
-        if h <= 21:
+        if h <= PT.SWEEP_H:
             if h > motley_h:                 # swept, not yet re-swept by Motley
                 out.append((NMAX, h))
         else:

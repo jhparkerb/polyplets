@@ -224,6 +224,11 @@ def compare(name, banked, derived, path):
 # results/ns_a26/PROVENANCE.md, which quotes the WRONG a(26) on purpose --- it
 # records the stale-binary near-miss --- so tree-wide wants an exemption
 # mechanism, and the front page does not.
+# TODO(2026-08-19, from the simplify pass): this is a second bespoke mechanism
+# for "a document restates a banked number wrong", and the general one now
+# exists -- scripts/residual_cells.py's q-marker fact table, which has the
+# per-claim exemption facility this comment says a tree-wide sweep would need.
+# Adding a(40) to that fact table beats growing readme_claims into the third one.
 README_CLAIM_RE = re.compile(r"\ba\((\d+)\)\s*=\s*(\d{4,})")
 
 
@@ -279,8 +284,6 @@ def run(mutate=None):
                                             files[name])
         report.append((name, len(banked[name]), shared, len(beyond), shortfall))
 
-    # The original OEIS terms are an outside check on a(n): the b-file must
-    # agree with them everywhere they overlap.
     # The front page's own numbers, against the same row sums.
     found, bad = readme_claims(fixed)
     ok(found > 0, "README.md asserts no a(n) value the bank knows -- the "
@@ -325,11 +328,7 @@ def main() -> int:
         fixed = fixed_from_triangle()
         n40 = fixed[max(fixed)]
         found, wrong = readme_claims(fixed, "a(%d) = %d\n" % (max(fixed), n40 + 1))
-        print("  RED %-42s %s" % ("one digit changed in the README's a(n)",
-                                  "FIRED" if wrong else "DID NOT FIRE"))
         vacuous, _ = readme_claims(fixed, "no claims here\n")
-        print("  RED %-42s %s" % ("a README that asserts no a(n) at all",
-                                  "FIRED" if vacuous == 0 else "DID NOT FIRE"))
         # Three controls for the external anchor: a wrong digit inside the
         # anchor must fire; a disagreement ABOVE it must not (those terms are
         # ours, and treating them as external is the defect being fixed); and a
@@ -342,28 +341,28 @@ def main() -> int:
         ext_above = bool(external_anchor(above, mine))
         short = {n: v for n, v in real.items() if n <= EXTERNAL_ANCHOR_NMAX - 1}
         ext_short = bool(external_anchor(short, mine))
-        for label, fired, want in (
-                ("a wrong digit inside the external anchor", ext_wrong, True),
+        # One table, so the printed verdict and the exit code cannot drift
+        # apart: every control names what it expects, and the same comparison
+        # both prints and complains.
+        bad = []
+        for label, fired, want, complaint in (
+                ("one digit changed in the README's a(n)", bool(wrong), True,
+                 "readme wrong-digit control"),
+                ("a README that asserts no a(n) at all", vacuous == 0, True,
+                 "readme vacuous control"),
+                ("a wrong digit inside the external anchor", ext_wrong, True,
+                 "external anchor wrong-digit control"),
                 ("a disagreement above n=%d (ours, not OEIS's)"
-                 % EXTERNAL_ANCHOR_NMAX, ext_above, False),
-                ("a fixture that no longer reaches the anchor", ext_short, True)):
+                 % EXTERNAL_ANCHOR_NMAX, ext_above, False,
+                 "external anchor reached above n=%d" % EXTERNAL_ANCHOR_NMAX),
+                ("a fixture that no longer reaches the anchor", ext_short, True,
+                 "external anchor short-fixture control")):
             print("  RED %-42s %s" % (label,
                   ("FIRED" if fired else "DID NOT FIRE")
                   if want else
                   ("correctly silent" if not fired else "FIRED WRONGLY")))
-
-        bad = []
-        if not wrong:
-            bad.append("readme wrong-digit control")
-        if vacuous != 0:
-            bad.append("readme vacuous control")
-        if not ext_wrong:
-            bad.append("external anchor wrong-digit control")
-        if ext_above:
-            bad.append("external anchor reached above n=%d"
-                       % EXTERNAL_ANCHOR_NMAX)
-        if not ext_short:
-            bad.append("external anchor short-fixture control")
+            if fired != want:
+                bad.append(complaint)
         for label, mut in controls:
             run(mutate=mut)
             fired = bool(failures)

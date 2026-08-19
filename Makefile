@@ -36,7 +36,8 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 .PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
-        gate-compile-db gate-citations gate-docs-index gate-l-paper-verifier gate-receipts \
+        gate-compile-db gate-citations gate-docs-index gate-no-copyright-pdfs \
+        gate-l-paper-verifier gate-receipts \
         gate-residual-cells gate-cutcount-assembly \
         gate-perimeter-min gate-perimeter-defect \
         gate-perimeter-min-shard clean install \
@@ -49,8 +50,13 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify \
         papers papers-verify papers-clean papers-list
 
-# All currently existing gates
-GATE_TARGETS = gate-citations gate-docs-index gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+# All currently existing gates.
+# TODO(2026-08-19, from the simplify pass): nothing checks this list is
+# complete.  A `gate-foo:` recipe that never reaches GATE_TARGETS is a check
+# `make gates` does not run, which is the meta-version of the failure two of
+# this week's commits fixed.  A lint wants an allowlist for the deliberate
+# exclusions (papers, install-hooks, compile-commands), so it is its own change.
+GATE_TARGETS = gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -194,6 +200,13 @@ gate-compile-db: compile-commands
 # build deps, so it runs first.
 gate-citations:
 	python3 tests/gate_citations.py
+
+# Gate NO-COPYRIGHT-PDFS: no PDF is tracked at all.  .gitignore's first rule is
+# "copyrighted papers stay local, never pushed" and until 2026-08-19 nothing
+# enforced it -- the only check was a printed line in scripts/clean_clone_check.sh,
+# a runner make never touches, which set no exit code.  Sub-second, git only.
+gate-no-copyright-pdfs:
+	python3 tests/gate_no_copyright_pdfs.py
 
 # Gate DOCS-INDEX: docs/README.md names every file under docs/, by path or by
 # directory.  The citations gate closes the other direction (an index entry

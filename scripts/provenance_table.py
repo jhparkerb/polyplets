@@ -57,6 +57,15 @@ OUT = ROOT / "results" / "provenance-table.md"
 NMAX = 40
 MOTLEY_H = 18          # Confetti landed 2026-08-19, results/motley-h18.md
 
+# The closed-form band, in one place.  The production engine wires P_k for
+# k <= PK_KMAX, the diagonal law's onset is sharp at n >= 2k+1
+# (docs/proofs/diagonal-law.md), and a real sweep reached H <= SWEEP_H, which is
+# what separates source P from source F above.  scripts/residual_cells.py
+# derives its Q2 band and its closure figure from these same three, so a rung
+# that moves one of them cannot leave the two generators disagreeing.
+PK_KMAX = 18
+SWEEP_H = 21
+
 # Published figures this gate holds the table to.  Each is quoted in the note
 # named beside it; if the table stops reproducing one, either the table or the
 # note is wrong and the gate says so rather than letting them drift apart.
@@ -105,8 +114,8 @@ def sources(n, h, motley_h=MOTLEY_H):
     if h <= 14:
         out.add("S")
     k = n - h
-    if k <= 18 and n >= 2 * k + 1:
-        out.add("P" if h <= 21 else "F")
+    if k <= PK_KMAX and n >= 2 * k + 1:
+        out.add("P" if h <= SWEEP_H else "F")
     if h <= motley_h:
         out.add("M")
     out.add("C")

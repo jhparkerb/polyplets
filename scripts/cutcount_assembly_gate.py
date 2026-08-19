@@ -154,9 +154,20 @@ def check_heldout(res_dir: Path, rows_dir: Path) -> tuple[list[str], int]:
     # The runner held out the LAST prime of its list, which is the smallest of
     # the five; naming it by the rule rather than by the literal means this
     # keeps checking the same thing if the set is ever regenerated.
+    # TODO(2026-08-19, from the simplify pass): "last" and "smallest" coincide
+    # only because the current list happens to be sorted descending, and
+    # CRT_BOUND re-types the runner's own bound (dalby_confetti_h18.sh:98).
+    # Both belong in a manifest beside the residue rows, written by the run and
+    # read here, so a regenerated prime set cannot leave this gate verifying a
+    # different contract than the run enforced.  That is a change to banked
+    # evidence layout, so it is not a drive-by.
     heldout = min(primes)
     crt_primes = [p for p in primes if p != heldout]
 
+    # TODO(2026-08-19): fourth Python copy of this CRT loop (scripts/crt_combine.py,
+    # tests/gate_modp.py, and the runner's own).  Sharing one would still leave
+    # this a second source against the dalby runner, but crt_combine.py parses
+    # argv at import time, so it has to be made importable first.
     M = 1
     for p in crt_primes:
         M *= p
@@ -274,9 +285,10 @@ def selftest() -> int:
                        verbose=False)
 
     # GREEN: the tree as it stands passes.
-    if staged(lambda d: None):
+    green = staged(lambda d: None)
+    if green:
         problems.append("GREEN: the banked tree does not pass its own gate: %s"
-                        % staged(lambda d: None))
+                        % green)
 
     def bump(path, factor=1):
         def m(d):
