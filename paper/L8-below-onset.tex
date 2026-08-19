@@ -492,7 +492,10 @@ records are \repo{results/onset-defect-law.md},
 \label{tab:repro}
 \end{table}
 
-\bibliographystyle{plain}
-\bibliography{shared/refs}
+% No \bibliography here: this paper cites no source. Its antecedents are the
+% companion papers, named in prose as they are throughout this directory, and
+% its priority pass (\S\ref{sec:novelty}) found nothing to cite. Declaring the
+% bibliography anyway left LaTeX asking for a rerun it never settled, because
+% there is no .bbl for it to read. Restore both lines with the first \cite.
 
 \end{document}

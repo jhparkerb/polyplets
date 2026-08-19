@@ -10,13 +10,26 @@
 %
 %  Assumes \documentclass[11pt]{article} has already been issued.
 % ---------------------------------------------------------------------------
+% Fonts before microtype, and microtype's expansion only when the fonts under
+% it are scalable. A TeX Live install without lmodern (or cm-super) answers a
+% TS1 glyph request -- numprint pulls textcomp, so every paper here makes one --
+% by running METAFONT and handing back a BITMAP font, and microtype then dies
+% with "auto expansion is only possible with scalable fonts". That is how
+% `make -C paper` failed on the clean-clone run (ayr, TeX Live 2022/Debian,
+% 2026-08-18): L1 built, L2 stopped at a display in mid-document.
+%
+% With lmodern present: T1, scalable Computer Modern, expansion on, best output.
+% Without it: expansion off, and the PDFs still build. A reader gets the better
+% branch by installing texlive-latex-recommended (Debian) or the lmodern port.
+\IfFileExists{lmodern.sty}
+  {\usepackage[T1]{fontenc}\usepackage{lmodern}\usepackage{microtype}}
+  {\usepackage[expansion=false]{microtype}}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{amsthm}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{numprint}
-\usepackage{microtype}
 \usepackage[table]{xcolor}
 \usepackage[hidelinks]{hyperref}
 \usepackage{flafter}   % a float never appears before the text that introduces it

@@ -54,13 +54,40 @@ in git history.
 
 ## Reproducing
 
+**One command, from nothing but the clone:**
+
 ```sh
-make                 # builds engines into build/
-make gates           # the full validation gate suite
-python3 paper/verify_claims.py   # re-verifies the report's numeric claims
+make && scripts/dalby_term.sh 26
 ```
 
-Small-scale end-to-end check, two independent algorithms:
+That prints `a(26) = 102607513847014153892` and, before it does, re-derives
+a(1)–a(25) and checks every one against `fixtures/b006770.txt` and the banked
+per-term ledgers. **23 seconds** on 32 cores — the run that first produced
+a(26), on 2026-07-02, took 4066 s on 80; the difference is the kink-carry
+kernel that replaced it. `scripts/dalby_term.sh 24` is the same thing in 8 s if
+you want to see it work before committing a minute.
+
+The rest, with wall times measured on a clean clone of this commit (ayr: 32
+cores, g++ 12.2, TeX Live 2022, no clang and no Lean):
+
+```sh
+make                       # the gate suite; there is no separate build
+                           # step, because each gate builds what it needs. 409 s
+make ns-gates              # the production engine's own suite. 775 s
+make -C paper              # the 11 PDFs, which are gitignored. 14 s
+python3 paper/verify_l_papers.py         # 336 checks, 23 of them RED controls
+python3 paper/verify_technical_report.py # 781 checks
+ALLOW_PARTIAL=1 python3 paper/verify_claims.py   # 425 of 428 checks. 905 s
+```
+
+`verify_claims.py` is fail-closed on missing evidence and **exits 1 on a fresh
+clone without `ALLOW_PARTIAL`**: three of its checks read the `runs/sym32`
+strip manifest, which is run output and not in the tree. It says so, names the
+group it skipped, and falls back to the banked `results/sym_counts.txt`. That
+is the intended behaviour, not a defect to route around — the flag is how you
+say you know which three are missing.
+
+Two independent algorithms on the same small values:
 
 ```sh
 build/g2 square8 12            # Method A: Redelmeier, counts a(1..12)
