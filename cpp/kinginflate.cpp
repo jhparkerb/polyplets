@@ -47,7 +47,8 @@ int main() {
             for (int r=0;r<H;r++) for (int c=0;c<W;c++) if (m>>(r*W+c) & 1ULL) occ.insert({r,c});
             std::set<std::pair<int,int>> per;
             for (auto &p : occ) for (int dr=-1;dr<=1;dr++) for (int dc=-1;dc<=1;dc++) {
-                if(!dr&&!dc) continue; std::pair<int,int> q{p.first+dr,p.second+dc};
+                if (!dr && !dc) continue;
+                std::pair<int,int> q{p.first+dr,p.second+dc};
                 if (!occ.count(q)) per.insert(q); }
             int P = (int)per.size();
             auto it = minP.find(n);
@@ -70,7 +71,8 @@ int main() {
                 inf.insert({p.first+dr, p.second+dc});
             std::set<std::pair<int,int>> per;
             for (auto &p : inf) for (int dr=-1;dr<=1;dr++) for (int dc=-1;dc<=1;dc++) {
-                if(!dr&&!dc) continue; std::pair<int,int> q{p.first+dr,p.second+dc};
+                if (!dr && !dc) continue;
+                std::pair<int,int> q{p.first+dr,p.second+dc};
                 if (!inf.count(q)) per.insert(q); }
             infSize.insert((int)inf.size());
             infP.insert((int)per.size());

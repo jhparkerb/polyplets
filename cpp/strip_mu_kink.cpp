@@ -129,7 +129,12 @@ int main(int argc, char** argv) {
     };
 
     // bisect x for rho=1, warm-starting w
-    Vec w = w0; for (int i = 0; i < 8; ++i) { Vec t = matvec(w, H, (double[]){1.0,0.25}); if (!t.empty()) w.swap(t); }
+    const double warm_x[2] = {1.0, 0.25};
+    Vec w = w0;
+    for (int i = 0; i < 8; ++i) {
+      Vec t = matvec(w, H, warm_x);
+      if (!t.empty()) w.swap(t);
+    }
     double lo = 0.10, hi = 0.5;
     for (int it = 0; it < 55; ++it) {
       double mid = 0.5 * (lo + hi);

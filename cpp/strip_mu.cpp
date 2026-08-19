@@ -132,7 +132,14 @@ int main(int argc, char** argv) {
       double xp[17]; xp[0] = 1; for (int k = 1; k <= H; ++k) xp[k] = xp[k-1]*x;
       double r = 0;
       for (int it = 0; it < 20000; ++it) {
+        // The build rule passes no -fopenmp, so these three pragmas have never
+        // been active and every recorded mu_H came out of a serial run. They are
+        // guarded rather than deleted because -Wall makes an inactive
+        // `#pragma omp` a -Werror=unknown-pragmas failure under GCC, which is
+        // what broke the first clean-clone build (acceptance-queue item 2).
+        #ifdef _OPENMP
         #pragma omp parallel for schedule(static)
+        #endif
         for (int j = 0; j < nst; ++j) w2[j] = 0.0;
         // scatter with per-thread private accumulation avoided: use atomic-free
         // gather is not available (edges are by source), so do serial scatter in
@@ -140,10 +147,14 @@ int main(int argc, char** argv) {
         for (int i = 0; i < nst; ++i) { double wi = w[i]; if (wi == 0) continue;
           for (long long p = rs[i]; p < rs[i+1]; ++p) w2[col[p]] += xp[add[p]] * wi; }
         double s2 = 0, s1 = 0;
+        #ifdef _OPENMP
         #pragma omp parallel for reduction(+:s2,s1) schedule(static)
+        #endif
         for (int j = 0; j < nst; ++j) { s2 += w2[j]; s1 += w[j]; }
         double rn = s2 / s1, inv = 1.0 / s2;
+        #ifdef _OPENMP
         #pragma omp parallel for schedule(static)
+        #endif
         for (int j = 0; j < nst; ++j) w[j] = w2[j] * inv;
         if (it > 3 && std::fabs(rn - r) < 1e-11 * rn) { r = rn; break; }
         r = rn;
