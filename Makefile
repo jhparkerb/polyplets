@@ -30,6 +30,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
         gate-compile-db gate-citations gate-docs-index gate-l-paper-verifier gate-receipts \
+        gate-cutcount-assembly \
         gate-perimeter-min gate-perimeter-defect \
         gate-perimeter-min-shard clean install \
         ns-gates ns-gate-arch ns-gate-regression ns-gate-fold ns-gate-resume \
@@ -42,7 +43,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         papers papers-verify papers-clean papers-list
 
 # All currently existing gates
-GATE_TARGETS = gate-citations gate-docs-index gate-receipts gate-provenance gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-docs-index gate-receipts gate-provenance gate-cutcount-assembly gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -90,6 +91,20 @@ gate-bfiles:
 gate-provenance:
 	python3 scripts/provenance_table.py --selftest
 	python3 scripts/provenance_table.py --check
+
+# Gate CUTCOUNT-ASSEMBLY: Motley's banked rows still make the triangle, and the
+# held-out prime still predicts.  T(n,H) = C_H - 2 C_{H-1} + C_{H-2} over
+# results/cutcount_b1/rows/, 567 cells H=1..18 against results/triangle.txt;
+# then C_18 reconstructed by CRT from four of Confetti's five primes, the fifth
+# predicted (40/40) and the reconstruction tied back to the banked exact row.
+# Written 2026-08-19: the assembly existed only inside a dalby runner `make`
+# never touches, so a corrupted row would have sat in results/ unnoticed, and
+# the 40/40 was the runner's word until the residue rows were banked the same
+# day.  Coverage is pinned as well as agreement -- a dropped row or prime fails
+# rather than shrinking the check.  8 RED controls (--selftest).  ~1 s.
+gate-cutcount-assembly:
+	python3 scripts/cutcount_assembly_gate.py --selftest
+	python3 scripts/cutcount_assembly_gate.py
 
 # Gate PERIMETER-DEFECT: the pruned max-end search vs g2 --siteperim (A), vs
 # its own unpruned control (B), marginal consistency (C), and --split shards
