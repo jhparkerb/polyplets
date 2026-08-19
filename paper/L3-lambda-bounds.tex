@@ -190,7 +190,7 @@ $\rhoo(A) \ge 1$. Indeed $A$ is monotone on the nonnegative orthant, so
 $A^k v \ge v$ for every $k$; picking any $i$ with $v_i > 0$ gives
 $\|A^k\|_\infty \ge v_i/\|v\|_\infty$, and $\rhoo(A) = \lim_k \|A^k\|^{1/k} \ge 1$.
 
-Note what this does \emph{not} require: neither positivity of $v$ nor
+This requires \emph{neither} positivity of $v$ nor
 irreducibility of $A$. Only the lower half of the two-sided Collatz--Wielandt
 characterisation is used; the upper half, which does need irreducibility, never
 appears. See~\cite[Ch.~8]{hornJohnson2013} or~\cite[Ch.~2]{bermanPlemmons1994}.
@@ -257,8 +257,8 @@ $H$ & certified $\mu_H \ge$ & states & $\mu_H$ (float) & sweeps & wall (s) \\
 \end{tabular}
 \caption{The certified ladder. ``States'' is the in-edge-reachable boundary count
 of the transfer operator. ``Sweeps'' is how many candidate numerators the search
-tried before one passed; ``$\mu_H$ (float)'' is what the power-iteration search
-phase proposed, recorded for comparison and used nowhere in the proof. Receipts,
+tried before one passed; ``$\mu_H$ (float)'' is the value the power-iteration
+search phase proposed, recorded for comparison and used nowhere in the proof. Receipts,
 one line each with git revision, host, vector checksum and precision fields, are
 in \repo{results/strip\_mu\_certificates.log}. $H=2$ is the independent anchor:
 $\mu_2 = 1 + \sqrt2 = 2.41421356\dots$}
@@ -491,8 +491,9 @@ candidate bound here is run through that analogue first.
 The would-be repair, a transfer matrix on the Redelmeier generation queue,
 fails because that state is unbounded, its length growing with the perimeter.
 There is therefore no simple finite-state valid bound between $12.2$ and the real
-method, and the unbounded dimension is what the Klarner--Rivest
-functional-equation trick~\cite{klarnerRivest1973} exists to handle.
+method: the Klarner--Rivest functional-equation
+trick~\cite{klarnerRivest1973} exists to handle exactly that unbounded
+dimension.
 
 \subsection{The generic twig decomposition}
 
@@ -522,8 +523,8 @@ Compare Proposition~\ref{prop:crude}'s $12.2$.}
 \label{tab:generic}
 \end{table}
 
-The window closes fast ($8740$ types in about a second), so the looseness is
-not a resolution problem. It is the \emph{case routing}: multi-neighbour cases
+The window closes fast ($8740$ types in about a second), so the looseness comes
+from the \emph{case routing} rather than from resolution: multi-neighbour cases
 were routed as lossy linear re-marks instead of as convolutions, and that throws
 away one of the two pieces every time.
 
@@ -534,9 +535,8 @@ $10.5$ closes the route. It gives $5^5/4^4$ --- identical to
 Proposition~\ref{prop:crude}, to the digit. The mechanism that lets twigs beat
 the Eden level on the square lattice is deferral, and deferral is structurally
 blocked under king adjacency: a deferred cell always lands in its child's shared
-set. So the twig family cannot improve on the elementary bound here, and
-\S\ref{sec:convolution}'s method is not merely the better route but the only one
-of the two that moves.
+set. So the twig family cannot improve on the elementary bound here, and of the two
+routes only \S\ref{sec:convolution}'s moves.
 
 \subsection{The convolution system}
 \label{sec:convolution}
