@@ -64,10 +64,15 @@ say "rev=$(git rev-parse --short HEAD)  tracked_files=$(git ls-files | wc -l)"
 say "papers/ present? $(test -d papers && echo yes || echo 'no --- as a real clone should be')"
 
 # The four phases a stranger would run, in the order the README implies.
-step make-default    make-default.log    make -j"$(nproc)"
-step make-gates      make-gates.log      make gates
+# `make` and `make gates` are the same target -- the Makefile has no `all` and
+# no .DEFAULT_GOAL, so the first rule in the file wins. Run it once, under the
+# name a reader types.
+step make            make.log            make
 step make-ns-gates   make-ns-gates.log   make ns-gates
-step verify-claims   verify-claims.log   python3 paper/verify_claims.py
+# ALLOW_PARTIAL: three checks read the runs/sym32 strip manifest, which is run
+# output and not in any clone, and the verifier is fail-closed without it. This
+# is the invocation the README documents.
+step verify-claims   verify-claims.log   env ALLOW_PARTIAL=1 python3 paper/verify_claims.py
 step verify-lpapers  verify-lpapers.log  python3 paper/verify_l_papers.py
 step verify-report   verify-report.log   python3 paper/verify_technical_report.py
 # The PDFs are gitignored, so a reader has the .tex and builds them himself.
