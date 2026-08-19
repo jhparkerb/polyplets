@@ -1,3 +1,10 @@
+# Recipes run under bash, explicitly. The `gates` recipe needs `set -o
+# pipefail` to see through its `tee`, and make's default SHELL is /bin/sh --
+# which is dash on Debian and rejects that option outright. It worked on gympie
+# (macOS /bin/sh is bash in sh mode) and broke `make` at step one on a clean
+# Linux clone, 2026-08-19.
+SHELL := /bin/bash
+
 CXX ?= c++
 CXXFLAGS = -std=c++20 -Wall -Wextra -Werror
 
