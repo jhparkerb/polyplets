@@ -47,34 +47,39 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 | `technical-report.tex` | **P1** — Fixed polyplets through *a*(40) | in progress, jasonp's prose, roughly 40% built |
 | `polyplets-report.tex` | — | superseded. A complete machine-written draft of P1's material, trimmed 2026-08-01. Under the split it cannot be lifted into `technical-report.tex` sentence by sentence; it is **source material and notes** |
 | `L1-diagonal-law.tex` | **L1** — A diagonal law for row-local lattices | draft, 14pp |
-| `L2-ternary-spine.tex` | **L2** — The mod-3 arithmetic of the height triangle | draft, 10pp — **novelty unchecked** |
+| `L2-ternary-spine.tex` | **L2** — The mod-3 arithmetic of the height triangle | draft, 10pp — swept 2026-08-18, no collision |
 | `L3-lambda-bounds.tex` | **L3** — A certified two-sided bound for λ | draft, 13pp |
 | `L4-not-dfinite.tex` | **L4** — An arithmetic obstruction to D-finiteness | draft, 10pp |
 | `L5-convex-polyplets.tex` | **L5** — Convex polyplets | draft, 14pp |
 | `L6-perimeter-gradings.tex` | **L6** — Perimeter gradings of lattice animals | draft, 12pp — compute gate **cleared** 2026-08-18 |
 | `L7-subdominant-amplitude.tex` | **L7** — The subdominant exponential and the amplitude ratio | draft, 10pp |
-| `L8-below-onset.tex` | **L8** — Below the onset: the diagonal law's error term | draft, 8pp — **novelty unchecked** |
-| `L9-cutcount-identity.tex` | **L9** — A cancellation identity for scan-order colourings | draft, 6pp — **novelty unchecked** |
+| `L8-below-onset.tex` | **L8** — Below the onset: the diagonal law's error term | draft, 8pp — swept 2026-08-18, **weak negative** |
+| `L9-cutcount-identity.tex` | **L9** — A cancellation identity for scan-order colourings | draft, 6pp — **the identity is not new** |
 
 Every L paper carries a loud draft banner, because every one of their
-verification ledgers currently reads "human verification: none". Three carry a
-second banner as well, and those three are the ones to be careful with:
+verification ledgers currently reads "human verification: none". All nine have
+now had a literature-priority pass, dated after their own drafting and recorded
+in `docs/priority-passes-2026-08-18.md`. Three carry a second banner because of
+what that pass found:
 
-- **L2's novelty is unchecked.** The six N1–N6 sweeps never touched the spine
-  cubic, the digit product or the Smith normal form count.
-  `docs/publication-split.md` §5 wants a sweep *before* the paper is written. It
-  was drafted anyway, deliberately — the ideas are recorded and the prerequisite
-  is now named rather than vague — but nothing in it is claimed to be new.
-- **L8 and L9 have had no literature-priority pass at all**, and L9's subject —
-  counting connected subgraphs by a signed colouring so that disconnected
-  configurations cancel — sits in a well-populated area. Both say so on page 1
-  and neither claims novelty anywhere.
+- **L9's identity is not new.** It is the Fortuin–Kasteleyn/Potts
+  correspondence — evaluating $q^c$ by colouring components instead of tracking
+  them — specialised to site clusters in scan order, with Hoshen–Kopelman (1976)
+  as the unsigned ancestor of the labelling. The paper claims no theorem. What
+  survives is the specific rule and the proof that its window suffices.
+- **L6's square-lattice column reproduces published work.** Asinowski, Barequet
+  and Zheng have the defect identity $k = e + 2f$ and the theorem that each
+  fixed-defect generating function is rational with cyclotomic denominator; both
+  are attributed in place, to the ANALCO 2018 paper obtained 2026-08-18 rather
+  than to the slides. The king column, the onset formula, the two-lattice
+  universality, the coefficient triangle and the whole minimum end survive.
+- **L8's negative is weak**, and page 1 says so: the object it studies is defined
+  relative to this project's own diagonal law, so a pass over it tests little.
 
 - **L6's compute gate is cleared** (2026-08-18). Both *k* = 6 censuses landed;
   three of its four predictions held and the fourth, the Φ₂ leading diagonal's
   closed form, was refuted and is withdrawn. The paper no longer carries a
-  do-not-submit banner. What it does still carry is the note that its
-  square-lattice column reproduces published work held only as slides.
+  do-not-submit banner.
 
 Planned and not yet drafted: **P2** (two stratifications of A006770) and **P3**
 (king animals by convexity and directedness). Both are jasonp's prose and are
