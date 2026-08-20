@@ -115,6 +115,37 @@ cell H = 19 — and:
 H = 19.** The RED control is a perturbed level 20, and it fails the
 regression.
 
+## What the coverage bound actually says (and the measurement it waits on)
+
+With exact depths through `J` and a real sweep of heights `H <= Hs` at
+`Nmax = N`, level `k` is pinnable when two depths `j1 < j2 <= J` both satisfy
+`H' = k+1-j <= Hs` — which needs `J >= k+2-Hs`, i.e.
+
+    k_max = Hs + J - 2,        rows complete for   n <= 2*Hs + J - 1.
+
+Both pinning cells are then automatically inside the sweep: `n' = 2k+1-j <=
+k + Hs <= 2Hs + J - 2 <= N`. Against the onset-anchor rule's `n <= 2*Hs`,
+that is `J - 1` extra rows **from the same sweep height**.
+
+At `Hs = 21` — the height a(40) already swept — and `J = 4` that reads
+`n <= 45`. Whether that is real turns on one number nobody has measured: how a
+**fixed-height** sweep's cost grows in `Nmax`. The ladder's famous 4.4x per
+term is the cost of raising `Hs` AND `Nmax` together; at fixed `Hs` the
+frontier is bounded by the height's own state space and only the column count
+and payload width follow `Nmax`, which argues for polynomial. Arguing is not
+measuring: `scripts/nmax_scaling.sh` runs heights 14 and 15 at
+`Nmax = 40, 42, 45` on a fixed core count for exactly this ratio, and
+`runs/a41_low` (H <= 19 at Nmax 41, against a(40) phase A's H <= 19 at Nmax 40,
+6.3 h on 80 cores) is the same measurement at scale.
+
+Until those land, the claim this file will stand behind is the narrow one:
+**two heights off the sweep ceiling.** The several-rows-per-sweep version is
+a consequence of the bound above and an unmeasured cost model, in that order.
+
+Levels 20 through 23 would each carry only the `j = 3, 4` pair, so none of them
+gets a cross-check without depth 5 — the same weakness level 21 has today, and
+the same fix.
+
 ## Limits
 
 - Levels 20 and 21 have no above-onset cell to cross-check against, by
