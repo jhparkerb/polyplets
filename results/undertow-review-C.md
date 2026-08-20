@@ -247,18 +247,21 @@ Where the ceilings land, with J = 5 the practical depth ceiling:
   depths. At (hmax, J) = (18, 5) the short-cell tower ends exactly at
   n = 40 and never touches row 41.
 
-**Whether depth 5 fits at K = 21 — the two slopes disagree, measurably.**
-Applying the per-2K WALL slopes (4.18x, 2.68x, decelerating) to RSS gives
-the lead's 110–390 GB against dalby's 121 GB: does not fit. But the two
-banked RSS points at e = 3 — 83 MB at K = 10 (ayr ladder) and 494 MB at
-K = 19 (severance_w3_depths.py:129, C++ families run) — pin the measured
-RSS K-slope at ~6x per +9K ≈ 1.5x per +2K, an order below the wall slope.
-At that slope, emax = 4 at K = 21 extrapolates to ~4–40 GB: fits, with
-wall ~10^5–10^6 core-seconds (days on 32 cores). The K = 14/16 points the
-lead is dispatching measure exactly this divergence; if the gentle RSS
-slope holds, Motley + depth 5 = level 21 pinned incumbent-free and rows
-complete to n = 40 — with the standing caveat that D_j at k = 20, 21 is
-still derivation-extrapolation past the k ≤ 19 validation window (C-R3).
+**Whether depth 5 fits at K = 21 — measured, but confounded (2026-08-20,
+correction).** Two measured RSS ladders exist and disagree by an order:
+the lead's K = 8/10/12 points at e = 4 (138 MB / 577 MB / 1.54 GB, ayr)
+extrapolate emax = 4 at K = 21 to ~110–390 GB — does not fit dalby's
+121 GB — while the e = 3 pair of 83 MB at K = 10 (ayr) and 494 MB at
+K = 19 (severance_w3_depths.py:129) reads ~1.2x per +K, putting it near
+16 GB: fits. Neither slope is clean: the DP builds per-thread private
+maps and merges after, so RSS moves with thread count, and the quoted
+points mix 10, 16, and 40 threads (same (K=10, e=4) cell: 480 MB at 16
+threads, 577 MB at 40; the 494 MB point was gympie at 10). A same-thread
+K-ladder at 16 threads is running on ayr and is the first clean reading.
+If the gentle slope survives it, Motley + depth 5 = level 21 pinned
+incumbent-free and rows complete to n = 40, wall ~10^5–10^6 core-seconds
+— with the standing caveat that D_j at k = 20, 21 is still
+derivation-extrapolation past the k ≤ 19 validation window (C-R3).
 
 ## 7. Stop condition
 

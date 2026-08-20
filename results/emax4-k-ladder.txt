@@ -1,0 +1,37 @@
+event=start job=severance_w3_families t=2026-08-20T07:47:20-04:00 git=lastditch built=unknown host=ayr total=14 mode=families K=14 emax=4 threads=16 span=33
+event=heartbeat job=severance_w3_families t=2026-08-20T07:47:22-04:00 elapsed_s=1.4 rate=0.7381/s done=0.0714 eta=2026-08-20T07:47:39-04:00 level=1 states=745309
+event=heartbeat job=severance_w3_families t=2026-08-20T07:47:45-04:00 elapsed_s=24.9 rate=0.08028/s done=0.1429 eta=2026-08-20T07:50:14-04:00 level=2 states=1704137
+event=heartbeat job=severance_w3_families t=2026-08-20T07:48:20-04:00 elapsed_s=59.8 rate=0.05016/s done=0.2143 eta=2026-08-20T07:51:59-04:00 level=3 states=2410407
+event=heartbeat job=severance_w3_families t=2026-08-20T07:49:11-04:00 elapsed_s=110.4 rate=0.03624/s done=0.2857 eta=2026-08-20T07:53:46-04:00 level=4 states=3196977
+event=heartbeat job=severance_w3_families t=2026-08-20T07:50:13-04:00 elapsed_s=173.1 rate=0.02888/s done=0.3571 eta=2026-08-20T07:55:24-04:00 level=5 states=3933949
+event=heartbeat job=severance_w3_families t=2026-08-20T07:51:28-04:00 elapsed_s=247.8 rate=0.02422/s done=0.4286 eta=2026-08-20T07:56:58-04:00 level=6 states=4627455
+event=heartbeat job=severance_w3_families t=2026-08-20T07:52:56-04:00 elapsed_s=335.6 rate=0.02086/s done=0.5000 eta=2026-08-20T07:58:31-04:00 level=7 states=5276186
+event=heartbeat job=severance_w3_families t=2026-08-20T07:54:38-04:00 elapsed_s=438.0 rate=0.01826/s done=0.5714 eta=2026-08-20T08:00:06-04:00 level=8 states=5879879
+event=heartbeat job=severance_w3_families t=2026-08-20T07:56:37-04:00 elapsed_s=556.5 rate=0.01617/s done=0.6429 eta=2026-08-20T08:01:46-04:00 level=9 states=6438482
+event=heartbeat job=severance_w3_families t=2026-08-20T07:58:51-04:00 elapsed_s=690.9 rate=0.01447/s done=0.7143 eta=2026-08-20T08:03:27-04:00 level=10 states=6951990
+event=heartbeat job=severance_w3_families t=2026-08-20T07:59:04-04:00 elapsed_s=704.2 rate=0.01562/s done=0.7857 eta=2026-08-20T08:02:16-04:00 level=11 states=810053
+event=heartbeat job=severance_w3_families t=2026-08-20T07:59:06-04:00 elapsed_s=705.7 rate=0.017/s done=0.8571 eta=2026-08-20T08:01:03-04:00 level=12 states=68155
+event=heartbeat job=severance_w3_families t=2026-08-20T07:59:06-04:00 elapsed_s=705.9 rate=0.01842/s done=0.9286 eta=2026-08-20T08:00:00-04:00 level=13 states=3787
+event=heartbeat job=severance_w3_families t=2026-08-20T07:59:06-04:00 elapsed_s=705.9 rate=0.01983/s done=1.0000 level=14 states=119
+event=done job=severance_w3_families t=2026-08-20T07:59:06-04:00 start=2026-08-20T07:47:20-04:00 wall_s=705.9 cpu_s=1885.7 peak_rss_mb=2627.2
+K=14 emax=4 wall=705.92 rss_kb=2690240
+event=start job=severance_w3_families t=2026-08-20T07:59:06-04:00 git=lastditch built=unknown host=ayr total=16 mode=families K=16 emax=4 threads=16 span=37
+event=heartbeat job=severance_w3_families t=2026-08-20T07:59:09-04:00 elapsed_s=2.7 rate=0.3674/s done=0.0625 eta=2026-08-20T07:59:49-04:00 level=1 states=1310666
+event=heartbeat job=severance_w3_families t=2026-08-20T07:59:55-04:00 elapsed_s=48.7 rate=0.0411/s done=0.1250 eta=2026-08-20T08:05:35-04:00 level=2 states=2844846
+event=heartbeat job=severance_w3_families t=2026-08-20T08:01:07-04:00 elapsed_s=120.4 rate=0.02491/s done=0.1875 eta=2026-08-20T08:09:48-04:00 level=3 states=4000488
+event=heartbeat job=severance_w3_families t=2026-08-20T08:02:42-04:00 elapsed_s=216.2 rate=0.0185/s done=0.2500 eta=2026-08-20T08:13:30-04:00 level=4 states=5274864
+event=heartbeat job=severance_w3_families t=2026-08-20T08:04:46-04:00 elapsed_s=340.0 rate=0.01471/s done=0.3125 eta=2026-08-20T08:17:13-04:00 level=5 states=6476706
+event=heartbeat job=severance_w3_families t=2026-08-20T08:07:23-04:00 elapsed_s=496.8 rate=0.01208/s done=0.3750 eta=2026-08-20T08:21:11-04:00 level=6 states=7616800
+event=heartbeat job=severance_w3_families t=2026-08-20T08:10:13-04:00 elapsed_s=667.0 rate=0.01049/s done=0.4375 eta=2026-08-20T08:24:30-04:00 level=7 states=8693463
+event=heartbeat job=severance_w3_families t=2026-08-20T08:13:25-04:00 elapsed_s=859.3 rate=0.00931/s done=0.5000 eta=2026-08-20T08:27:44-04:00 level=8 states=9706392
+event=heartbeat job=severance_w3_families t=2026-08-20T08:16:58-04:00 elapsed_s=1071.8 rate=0.008397/s done=0.5625 eta=2026-08-20T08:30:51-04:00 level=9 states=10655527
+event=heartbeat job=severance_w3_families t=2026-08-20T08:20:57-04:00 elapsed_s=1311.3 rate=0.007626/s done=0.6250 eta=2026-08-20T08:34:03-04:00 level=10 states=11540863
+event=heartbeat job=severance_w3_families t=2026-08-20T08:25:18-04:00 elapsed_s=1571.6 rate=0.006999/s done=0.6875 eta=2026-08-20T08:37:12-04:00 level=11 states=12362399
+event=heartbeat job=severance_w3_families t=2026-08-20T08:30:08-04:00 elapsed_s=1861.8 rate=0.006446/s done=0.7500 eta=2026-08-20T08:40:28-04:00 level=12 states=13120135
+event=heartbeat job=severance_w3_families t=2026-08-20T08:30:35-04:00 elapsed_s=1889.2 rate=0.006881/s done=0.8125 eta=2026-08-20T08:37:50-04:00 level=13 states=1337577
+event=heartbeat job=severance_w3_families t=2026-08-20T08:30:38-04:00 elapsed_s=1891.9 rate=0.0074/s done=0.8750 eta=2026-08-20T08:35:08-04:00 level=14 states=98901
+event=heartbeat job=severance_w3_families t=2026-08-20T08:30:38-04:00 elapsed_s=1892.1 rate=0.007928/s done=0.9375 eta=2026-08-20T08:32:44-04:00 level=15 states=4847
+event=heartbeat job=severance_w3_families t=2026-08-20T08:30:38-04:00 elapsed_s=1892.1 rate=0.008456/s done=1.0000 level=16 states=135
+event=done job=severance_w3_families t=2026-08-20T08:30:38-04:00 start=2026-08-20T07:59:06-04:00 wall_s=1892.1 cpu_s=5221.2 peak_rss_mb=4675.6
+K=16 emax=4 wall=1892.19 rss_kb=4787860
+DONE

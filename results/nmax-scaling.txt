@@ -1,0 +1,7 @@
+H=14 maxn=40 wall=300.59 cpu=1685.92 rss_kb=84240
+H=14 maxn=42 wall=336.89 cpu=1925.49 rss_kb=83848
+H=14 maxn=45 wall=418.39 cpu=2431.97 rss_kb=75424
+H=15 maxn=40 wall=835.21 cpu=4669.89 rss_kb=107928
+H=15 maxn=42 wall=1056.50 cpu=5524.69 rss_kb=105000
+H=15 maxn=45 wall=1399.95 cpu=6845.26 rss_kb=95980
+DONE

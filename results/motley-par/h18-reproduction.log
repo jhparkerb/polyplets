@@ -1,0 +1,296 @@
+event=start job=motley_par t=2026-08-20T01:34:41-04:00 git=lastditch built=unknown host=ayr
+regrow c=0 r=10 want=23374
+regrow c=0 r=11 want=50034
+regrow c=0 r=12 want=125454
+regrow c=0 r=12 want=250908
+regrow c=0 r=13 want=342082
+regrow c=0 r=13 want=684164
+regrow c=0 r=14 want=973346
+regrow c=0 r=14 want=1946692
+regrow c=0 r=15 want=2838458
+regrow c=0 r=15 want=5676916
+regrow c=0 r=16 want=8422258
+regrow c=0 r=16 want=16844516
+regrow c=0 r=17 want=25352088
+regrow c=0 r=17 want=50704176
+regrow c=1 r=0 want=77310548
+event=heartbeat job=motley_par t=2026-08-20T01:36:15-04:00 elapsed_s=94.3 rate=0.02122/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:37:38-04:00 elapsed_s=176.8 rate=0.01697/s count=3 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:39:00-04:00 elapsed_s=258.6 rate=0.01547/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:40:22-04:00 elapsed_s=340.6 rate=0.01468/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:41:44-04:00 elapsed_s=422.8 rate=0.01419/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:43:06-04:00 elapsed_s=504.9 rate=0.01386/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:44:28-04:00 elapsed_s=587.2 rate=0.01362/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:45:51-04:00 elapsed_s=669.4 rate=0.01344/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:47:13-04:00 elapsed_s=751.7 rate=0.0133/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:48:35-04:00 elapsed_s=834.1 rate=0.01319/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:49:58-04:00 elapsed_s=916.4 rate=0.01309/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:51:20-04:00 elapsed_s=998.7 rate=0.01302/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:52:42-04:00 elapsed_s=1081.0 rate=0.01295/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:54:04-04:00 elapsed_s=1163.3 rate=0.01289/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:55:27-04:00 elapsed_s=1245.6 rate=0.01285/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:56:49-04:00 elapsed_s=1328.2 rate=0.0128/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:58:12-04:00 elapsed_s=1410.7 rate=0.01276/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T01:59:34-04:00 elapsed_s=1493.1 rate=0.01272/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:00:57-04:00 elapsed_s=1575.5 rate=0.01269/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:02:19-04:00 elapsed_s=1658.0 rate=0.01267/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:03:42-04:00 elapsed_s=1740.5 rate=0.01264/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:05:04-04:00 elapsed_s=1823.1 rate=0.01262/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:06:27-04:00 elapsed_s=1905.7 rate=0.01259/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:07:50-04:00 elapsed_s=1988.5 rate=0.01257/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:09:12-04:00 elapsed_s=2071.1 rate=0.01255/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:10:35-04:00 elapsed_s=2153.5 rate=0.01254/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:11:57-04:00 elapsed_s=2236.1 rate=0.01252/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:13:20-04:00 elapsed_s=2318.9 rate=0.01251/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:14:43-04:00 elapsed_s=2401.6 rate=0.01249/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:16:06-04:00 elapsed_s=2484.5 rate=0.01248/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:17:28-04:00 elapsed_s=2567.3 rate=0.01246/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:18:51-04:00 elapsed_s=2650.3 rate=0.01245/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:20:14-04:00 elapsed_s=2732.8 rate=0.01244/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:21:37-04:00 elapsed_s=2815.6 rate=0.01243/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:22:59-04:00 elapsed_s=2898.3 rate=0.01242/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:24:22-04:00 elapsed_s=2981.1 rate=0.01241/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:25:45-04:00 elapsed_s=3063.8 rate=0.0124/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:27:08-04:00 elapsed_s=3146.6 rate=0.01239/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:28:31-04:00 elapsed_s=3229.5 rate=0.01239/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:29:54-04:00 elapsed_s=3312.6 rate=0.01238/s count=41 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-20T02:29:54-04:00 start=2026-08-20T01:34:41-04:00 wall_s=3312.6 cpu_s=102442.9 peak_rss_mb=58749.4 mode=modp H=18
+p=2147483647 wall=3316.25 rss_kb=60159508
+p=2147483647 IDENTICAL to banked Confetti row
+event=start job=motley_par t=2026-08-20T02:29:57-04:00 git=lastditch built=unknown host=ayr
+regrow c=0 r=10 want=23374
+regrow c=0 r=11 want=50034
+regrow c=0 r=12 want=125454
+regrow c=0 r=12 want=250908
+regrow c=0 r=13 want=342082
+regrow c=0 r=13 want=684164
+regrow c=0 r=14 want=973346
+regrow c=0 r=14 want=1946692
+regrow c=0 r=15 want=2838458
+regrow c=0 r=15 want=5676916
+regrow c=0 r=16 want=8422258
+regrow c=0 r=16 want=16844516
+regrow c=0 r=17 want=25352088
+regrow c=0 r=17 want=50704176
+regrow c=1 r=0 want=77310548
+event=heartbeat job=motley_par t=2026-08-20T02:31:36-04:00 elapsed_s=98.8 rate=0.02024/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:33:00-04:00 elapsed_s=182.5 rate=0.01644/s count=3 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:34:22-04:00 elapsed_s=264.9 rate=0.0151/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:35:45-04:00 elapsed_s=347.2 rate=0.0144/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:37:07-04:00 elapsed_s=429.6 rate=0.01397/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:38:29-04:00 elapsed_s=511.8 rate=0.01368/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:39:51-04:00 elapsed_s=594.0 rate=0.01347/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:41:14-04:00 elapsed_s=676.3 rate=0.01331/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:42:36-04:00 elapsed_s=759.1 rate=0.01317/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:43:59-04:00 elapsed_s=841.5 rate=0.01307/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:45:21-04:00 elapsed_s=923.9 rate=0.01299/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:46:44-04:00 elapsed_s=1006.5 rate=0.01292/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:48:06-04:00 elapsed_s=1089.0 rate=0.01286/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:49:29-04:00 elapsed_s=1171.8 rate=0.0128/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:50:52-04:00 elapsed_s=1254.3 rate=0.01276/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:52:14-04:00 elapsed_s=1336.7 rate=0.01272/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:53:37-04:00 elapsed_s=1419.2 rate=0.01268/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:54:59-04:00 elapsed_s=1501.8 rate=0.01265/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:56:21-04:00 elapsed_s=1583.9 rate=0.01263/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:57:44-04:00 elapsed_s=1666.2 rate=0.0126/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T02:59:06-04:00 elapsed_s=1748.6 rate=0.01258/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:00:28-04:00 elapsed_s=1830.9 rate=0.01256/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:01:51-04:00 elapsed_s=1913.4 rate=0.01254/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:03:13-04:00 elapsed_s=1995.9 rate=0.01253/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:04:36-04:00 elapsed_s=2078.4 rate=0.01251/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:05:58-04:00 elapsed_s=2160.8 rate=0.0125/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:07:21-04:00 elapsed_s=2243.3 rate=0.01248/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:08:43-04:00 elapsed_s=2325.8 rate=0.01247/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:10:06-04:00 elapsed_s=2408.3 rate=0.01246/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:11:28-04:00 elapsed_s=2490.5 rate=0.01245/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:12:50-04:00 elapsed_s=2572.8 rate=0.01244/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:14:13-04:00 elapsed_s=2655.2 rate=0.01243/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:15:35-04:00 elapsed_s=2737.7 rate=0.01242/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:16:58-04:00 elapsed_s=2820.5 rate=0.01241/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:18:20-04:00 elapsed_s=2902.9 rate=0.0124/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:19:43-04:00 elapsed_s=2985.4 rate=0.01239/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:21:05-04:00 elapsed_s=3067.8 rate=0.01239/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:22:28-04:00 elapsed_s=3150.2 rate=0.01238/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:23:50-04:00 elapsed_s=3232.4 rate=0.01237/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:25:12-04:00 elapsed_s=3314.9 rate=0.01237/s count=41 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-20T03:25:12-04:00 start=2026-08-20T02:29:57-04:00 wall_s=3314.9 cpu_s=103031.2 peak_rss_mb=58751.3 mode=modp H=18
+p=2147483629 wall=3318.71 rss_kb=60161492
+p=2147483629 IDENTICAL to banked Confetti row
+event=start job=motley_par t=2026-08-20T03:25:16-04:00 git=lastditch built=unknown host=ayr
+regrow c=0 r=10 want=23374
+regrow c=0 r=11 want=50034
+regrow c=0 r=12 want=125454
+regrow c=0 r=12 want=250908
+regrow c=0 r=13 want=342082
+regrow c=0 r=13 want=684164
+regrow c=0 r=14 want=973346
+regrow c=0 r=14 want=1946692
+regrow c=0 r=15 want=2838458
+regrow c=0 r=15 want=5676916
+regrow c=0 r=16 want=8422258
+regrow c=0 r=16 want=16844516
+regrow c=0 r=17 want=25352088
+regrow c=0 r=17 want=50704176
+regrow c=1 r=0 want=77310548
+event=heartbeat job=motley_par t=2026-08-20T03:26:55-04:00 elapsed_s=98.7 rate=0.02026/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:28:19-04:00 elapsed_s=182.5 rate=0.01644/s count=3 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:29:41-04:00 elapsed_s=265.2 rate=0.01508/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:31:04-04:00 elapsed_s=347.9 rate=0.01437/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:32:27-04:00 elapsed_s=430.5 rate=0.01394/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:33:49-04:00 elapsed_s=512.9 rate=0.01365/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:35:12-04:00 elapsed_s=595.4 rate=0.01344/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:36:34-04:00 elapsed_s=678.1 rate=0.01327/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:37:57-04:00 elapsed_s=760.8 rate=0.01314/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:39:20-04:00 elapsed_s=843.7 rate=0.01304/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:40:43-04:00 elapsed_s=926.5 rate=0.01295/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:42:05-04:00 elapsed_s=1009.0 rate=0.01288/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:43:28-04:00 elapsed_s=1091.9 rate=0.01282/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:44:51-04:00 elapsed_s=1174.8 rate=0.01277/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:46:14-04:00 elapsed_s=1257.8 rate=0.01272/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:47:37-04:00 elapsed_s=1341.2 rate=0.01268/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:49:01-04:00 elapsed_s=1424.5 rate=0.01264/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:50:24-04:00 elapsed_s=1507.7 rate=0.0126/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:51:47-04:00 elapsed_s=1590.9 rate=0.01257/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:53:10-04:00 elapsed_s=1674.2 rate=0.01254/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:54:34-04:00 elapsed_s=1757.6 rate=0.01252/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:55:57-04:00 elapsed_s=1841.1 rate=0.01249/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:57:21-04:00 elapsed_s=1924.8 rate=0.01247/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T03:58:45-04:00 elapsed_s=2008.6 rate=0.01245/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:00:08-04:00 elapsed_s=2092.3 rate=0.01243/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:01:32-04:00 elapsed_s=2176.1 rate=0.01241/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:02:56-04:00 elapsed_s=2259.9 rate=0.01239/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:04:20-04:00 elapsed_s=2343.8 rate=0.01237/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:05:44-04:00 elapsed_s=2427.8 rate=0.01236/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:07:08-04:00 elapsed_s=2511.9 rate=0.01234/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:08:32-04:00 elapsed_s=2596.1 rate=0.01233/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:09:57-04:00 elapsed_s=2680.5 rate=0.01231/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:11:21-04:00 elapsed_s=2764.9 rate=0.0123/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:12:46-04:00 elapsed_s=2849.4 rate=0.01228/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:14:10-04:00 elapsed_s=2933.9 rate=0.01227/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:15:35-04:00 elapsed_s=3018.4 rate=0.01226/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:16:59-04:00 elapsed_s=3103.0 rate=0.01225/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:18:24-04:00 elapsed_s=3187.5 rate=0.01224/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:19:48-04:00 elapsed_s=3272.0 rate=0.01223/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:21:13-04:00 elapsed_s=3356.6 rate=0.01221/s count=41 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-20T04:21:13-04:00 start=2026-08-20T03:25:16-04:00 wall_s=3356.6 cpu_s=104077.3 peak_rss_mb=58749.5 mode=modp H=18
+p=2147483587 wall=3360.64 rss_kb=60159568
+p=2147483587 IDENTICAL to banked Confetti row
+event=start job=motley_par t=2026-08-20T04:21:17-04:00 git=lastditch built=unknown host=ayr
+regrow c=0 r=10 want=23374
+regrow c=0 r=11 want=50034
+regrow c=0 r=12 want=125454
+regrow c=0 r=12 want=250908
+regrow c=0 r=13 want=342082
+regrow c=0 r=13 want=684164
+regrow c=0 r=14 want=973346
+regrow c=0 r=14 want=1946692
+regrow c=0 r=15 want=2838458
+regrow c=0 r=15 want=5676916
+regrow c=0 r=16 want=8422258
+regrow c=0 r=16 want=16844516
+regrow c=0 r=17 want=25352088
+regrow c=0 r=17 want=50704176
+regrow c=1 r=0 want=77310548
+event=heartbeat job=motley_par t=2026-08-20T04:22:55-04:00 elapsed_s=97.7 rate=0.02046/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:24:19-04:00 elapsed_s=182.5 rate=0.01644/s count=3 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:25:43-04:00 elapsed_s=266.2 rate=0.01503/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:27:06-04:00 elapsed_s=349.7 rate=0.0143/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:28:30-04:00 elapsed_s=433.1 rate=0.01385/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:29:53-04:00 elapsed_s=516.5 rate=0.01355/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:31:17-04:00 elapsed_s=600.2 rate=0.01333/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:32:41-04:00 elapsed_s=683.9 rate=0.01316/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:34:05-04:00 elapsed_s=768.0 rate=0.01302/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:35:29-04:00 elapsed_s=852.1 rate=0.01291/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:36:53-04:00 elapsed_s=936.3 rate=0.01282/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:38:17-04:00 elapsed_s=1020.4 rate=0.01274/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:39:41-04:00 elapsed_s=1104.5 rate=0.01267/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:41:06-04:00 elapsed_s=1188.8 rate=0.01262/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:42:30-04:00 elapsed_s=1273.3 rate=0.01257/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:43:54-04:00 elapsed_s=1357.6 rate=0.01252/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:45:19-04:00 elapsed_s=1442.2 rate=0.01248/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:46:44-04:00 elapsed_s=1526.8 rate=0.01244/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:48:08-04:00 elapsed_s=1611.5 rate=0.01241/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:49:33-04:00 elapsed_s=1696.1 rate=0.01238/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:50:58-04:00 elapsed_s=1780.9 rate=0.01235/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:52:23-04:00 elapsed_s=1865.8 rate=0.01233/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:53:48-04:00 elapsed_s=1950.9 rate=0.0123/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:55:13-04:00 elapsed_s=2036.1 rate=0.01228/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:56:38-04:00 elapsed_s=2121.5 rate=0.01226/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:58:03-04:00 elapsed_s=2206.6 rate=0.01224/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T04:59:29-04:00 elapsed_s=2291.9 rate=0.01222/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:00:54-04:00 elapsed_s=2377.3 rate=0.0122/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:02:20-04:00 elapsed_s=2462.8 rate=0.01218/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:03:45-04:00 elapsed_s=2548.4 rate=0.01216/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:05:11-04:00 elapsed_s=2634.2 rate=0.01215/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:06:37-04:00 elapsed_s=2720.1 rate=0.01213/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:08:03-04:00 elapsed_s=2806.3 rate=0.01212/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:09:29-04:00 elapsed_s=2892.5 rate=0.0121/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:10:55-04:00 elapsed_s=2978.6 rate=0.01209/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:12:22-04:00 elapsed_s=3064.9 rate=0.01207/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:13:48-04:00 elapsed_s=3151.3 rate=0.01206/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:15:15-04:00 elapsed_s=3237.9 rate=0.01204/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:16:42-04:00 elapsed_s=3324.8 rate=0.01203/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:18:09-04:00 elapsed_s=3411.9 rate=0.01202/s count=41 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-20T05:18:09-04:00 start=2026-08-20T04:21:17-04:00 wall_s=3411.9 cpu_s=105532.9 peak_rss_mb=58749.5 mode=modp H=18
+p=2147483579 wall=3415.48 rss_kb=60159576
+p=2147483579 IDENTICAL to banked Confetti row
+event=start job=motley_par t=2026-08-20T05:18:12-04:00 git=lastditch built=unknown host=ayr
+regrow c=0 r=10 want=23374
+regrow c=0 r=11 want=50034
+regrow c=0 r=12 want=125454
+regrow c=0 r=12 want=250908
+regrow c=0 r=13 want=342082
+regrow c=0 r=13 want=684164
+regrow c=0 r=14 want=973346
+regrow c=0 r=14 want=1946692
+regrow c=0 r=15 want=2838458
+regrow c=0 r=15 want=5676916
+regrow c=0 r=16 want=8422258
+regrow c=0 r=16 want=16844516
+regrow c=0 r=17 want=25352088
+regrow c=0 r=17 want=50704176
+regrow c=1 r=0 want=77310548
+event=heartbeat job=motley_par t=2026-08-20T05:19:50-04:00 elapsed_s=97.6 rate=0.0205/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:21:14-04:00 elapsed_s=181.8 rate=0.0165/s count=3 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:22:37-04:00 elapsed_s=265.0 rate=0.01509/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:24:00-04:00 elapsed_s=348.2 rate=0.01436/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:25:23-04:00 elapsed_s=431.2 rate=0.01391/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:26:46-04:00 elapsed_s=514.1 rate=0.01362/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:28:09-04:00 elapsed_s=597.0 rate=0.0134/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:29:32-04:00 elapsed_s=680.0 rate=0.01323/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:30:55-04:00 elapsed_s=763.2 rate=0.0131/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:32:19-04:00 elapsed_s=846.4 rate=0.013/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:33:42-04:00 elapsed_s=929.6 rate=0.01291/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:35:05-04:00 elapsed_s=1012.9 rate=0.01283/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:36:29-04:00 elapsed_s=1096.3 rate=0.01277/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:37:52-04:00 elapsed_s=1179.7 rate=0.01272/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:39:15-04:00 elapsed_s=1263.1 rate=0.01267/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:40:39-04:00 elapsed_s=1346.7 rate=0.01262/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:42:03-04:00 elapsed_s=1430.5 rate=0.01258/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:43:27-04:00 elapsed_s=1514.2 rate=0.01255/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:44:50-04:00 elapsed_s=1598.0 rate=0.01252/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:46:14-04:00 elapsed_s=1682.0 rate=0.01249/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:47:38-04:00 elapsed_s=1766.0 rate=0.01246/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:49:02-04:00 elapsed_s=1850.1 rate=0.01243/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:50:27-04:00 elapsed_s=1934.4 rate=0.01241/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:51:51-04:00 elapsed_s=2019.0 rate=0.01238/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:53:16-04:00 elapsed_s=2103.6 rate=0.01236/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:54:40-04:00 elapsed_s=2188.2 rate=0.01234/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:56:05-04:00 elapsed_s=2272.8 rate=0.01232/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:57:30-04:00 elapsed_s=2357.6 rate=0.0123/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T05:58:54-04:00 elapsed_s=2442.2 rate=0.01228/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T06:00:19-04:00 elapsed_s=2526.9 rate=0.01227/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T06:01:44-04:00 elapsed_s=2612.0 rate=0.01225/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T06:03:09-04:00 elapsed_s=2697.1 rate=0.01224/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T06:04:34-04:00 elapsed_s=2782.0 rate=0.01222/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T06:05:59-04:00 elapsed_s=2867.2 rate=0.01221/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T06:07:24-04:00 elapsed_s=2952.2 rate=0.01219/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T06:08:50-04:00 elapsed_s=3037.3 rate=0.01218/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T06:10:15-04:00 elapsed_s=3122.3 rate=0.01217/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T06:11:40-04:00 elapsed_s=3207.3 rate=0.01216/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T06:13:05-04:00 elapsed_s=3292.4 rate=0.01215/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-20T06:14:30-04:00 elapsed_s=3377.5 rate=0.01214/s count=41 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-20T06:14:30-04:00 start=2026-08-20T05:18:12-04:00 wall_s=3377.5 cpu_s=104653.8 peak_rss_mb=58749.5 mode=modp H=18
+p=2147483563 wall=3380.87 rss_kb=60159564
+p=2147483563 IDENTICAL to banked Confetti row
+ALL FIVE BANKED H=18 RESIDUE ROWS REPRODUCED

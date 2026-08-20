@@ -1,0 +1,39 @@
+event=start job=motley_par t=2026-08-20T01:10:28-04:00 git=dbb5f86 built=unknown host=dalby
+event=heartbeat job=motley_par t=2026-08-20T01:11:13-04:00 elapsed_s=45.4 rate=0.4402/s count=20 modp H=13 states=306858
+event=heartbeat job=motley_par t=2026-08-20T01:11:59-04:00 elapsed_s=91.9 rate=0.4245/s count=39 modp H=13 states=306858
+event=done job=motley_par t=2026-08-20T01:12:04-04:00 start=2026-08-20T01:10:28-04:00 wall_s=96.8 cpu_s=96.8 peak_rss_mb=295.3 mode=modp H=13
+H=13 threads=1 wall=96.76 rss_kb=302348
+event=start job=motley_par t=2026-08-20T01:12:04-04:00 git=dbb5f86 built=unknown host=dalby
+event=done job=motley_par t=2026-08-20T01:12:31-04:00 start=2026-08-20T01:12:04-04:00 wall_s=26.4 cpu_s=211.3 peak_rss_mb=295.5 mode=modp H=13
+H=13 threads=8 wall=26.43 rss_kb=302596
+event=start job=motley_par t=2026-08-20T01:12:31-04:00 git=dbb5f86 built=unknown host=dalby
+event=done job=motley_par t=2026-08-20T01:12:58-04:00 start=2026-08-20T01:12:31-04:00 wall_s=27.2 cpu_s=866.3 peak_rss_mb=296.1 mode=modp H=13
+H=13 threads=32 wall=27.21 rss_kb=303156
+event=start job=motley_par t=2026-08-20T01:12:58-04:00 git=dbb5f86 built=unknown host=dalby
+event=done job=motley_par t=2026-08-20T01:13:22-04:00 start=2026-08-20T01:12:58-04:00 wall_s=24.0 cpu_s=1817.6 peak_rss_mb=291.4 mode=modp H=13
+H=13 threads=80 wall=24.04 rss_kb=298356
+H=13 all thread counts byte-identical
+event=start job=motley_par t=2026-08-20T01:13:22-04:00 git=dbb5f86 built=unknown host=dalby
+event=heartbeat job=motley_par t=2026-08-20T01:14:13-04:00 elapsed_s=51.1 rate=0.1564/s count=8 modp H=14 states=891074
+event=heartbeat job=motley_par t=2026-08-20T01:14:59-04:00 elapsed_s=97.3 rate=0.1439/s count=14 modp H=14 states=891074
+event=heartbeat job=motley_par t=2026-08-20T01:15:45-04:00 elapsed_s=143.4 rate=0.1394/s count=20 modp H=14 states=891074
+event=heartbeat job=motley_par t=2026-08-20T01:16:31-04:00 elapsed_s=189.5 rate=0.1372/s count=26 modp H=14 states=891074
+event=heartbeat job=motley_par t=2026-08-20T01:17:18-04:00 elapsed_s=235.6 rate=0.1358/s count=32 modp H=14 states=891074
+event=heartbeat job=motley_par t=2026-08-20T01:18:04-04:00 elapsed_s=281.9 rate=0.1348/s count=38 modp H=14 states=891074
+event=done job=motley_par t=2026-08-20T01:18:27-04:00 start=2026-08-20T01:13:22-04:00 wall_s=305.1 cpu_s=305.0 peak_rss_mb=949.7 mode=modp H=14
+H=14 threads=1 wall=305.10 rss_kb=972500
+event=start job=motley_par t=2026-08-20T01:18:27-04:00 git=dbb5f86 built=unknown host=dalby
+event=heartbeat job=motley_par t=2026-08-20T01:19:14-04:00 elapsed_s=47.0 rate=0.4897/s count=23 modp H=14 states=891074
+event=done job=motley_par t=2026-08-20T01:19:53-04:00 start=2026-08-20T01:18:27-04:00 wall_s=85.5 cpu_s=683.9 peak_rss_mb=948.7 mode=modp H=14
+H=14 threads=8 wall=85.51 rss_kb=971432
+event=start job=motley_par t=2026-08-20T01:19:53-04:00 git=dbb5f86 built=unknown host=dalby
+event=heartbeat job=motley_par t=2026-08-20T01:20:39-04:00 elapsed_s=46.3 rate=0.734/s count=34 modp H=14 states=891074
+event=done job=motley_par t=2026-08-20T01:20:49-04:00 start=2026-08-20T01:19:53-04:00 wall_s=56.0 cpu_s=1790.9 peak_rss_mb=950.8 mode=modp H=14
+H=14 threads=32 wall=56.04 rss_kb=973588
+event=start job=motley_par t=2026-08-20T01:20:49-04:00 git=dbb5f86 built=unknown host=dalby
+event=heartbeat job=motley_par t=2026-08-20T01:21:35-04:00 elapsed_s=45.9 rate=0.4361/s count=20 modp H=14 states=891074
+event=heartbeat job=motley_par t=2026-08-20T01:22:21-04:00 elapsed_s=92.2 rate=0.4339/s count=40 modp H=14 states=891074
+event=done job=motley_par t=2026-08-20T01:22:23-04:00 start=2026-08-20T01:20:49-04:00 wall_s=94.5 cpu_s=7140.3 peak_rss_mb=951.0 mode=modp H=14
+H=14 threads=80 wall=94.50 rss_kb=973872
+H=14 all thread counts byte-identical
+DONE
