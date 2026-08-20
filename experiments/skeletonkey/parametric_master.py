@@ -162,25 +162,36 @@ def solve_H(name, K, perturb=None):
     return H
 
 
-def wired_king_ck(K):
+def wired_king_ck(K, perturb=None):
     """King cumulant slopes read off the WIRED P_k, for k = 1..K.
 
     The gas says c_k(n) = A_k n + B_k. Both sides of that are available for
     king without touching a cluster weight: the wired diagonal table gives
     P_k(n) as an exact polynomial, so evaluating F(n,u) = sum_k P_k(n) u^k at
     several n and taking log F gives c_k(n) at those n. Linearity is then a
-    check with teeth (the P_k have degree k, so c_k's top k-1 coefficients
-    have to cancel) and the surviving slope is what the weights must predict.
+    check with teeth -- the P_k have degree k, so c_k's n^2..n^k coefficients
+    all have to cancel, k-1 conditions at order k -- and the surviving slope
+    is what the cluster weights have to predict.
 
-    Returns {k: (slope, constant)}, or {} if the wired table is too short.
-    Evaluating and fitting beats carrying polynomials: slog() already does
-    series log over any field, and Fractions make the fit exact.
+    Returns {k: (slope, constant)}; {} if the wired table is too short; None
+    if some c_k came out non-linear, which is the failure the caller decides
+    what to do about.
+
+    `perturb` is (k, i): add 1 to the i-th descending coefficient of P_k, for
+    RED controls. Evaluating and fitting beats carrying polynomials: slog()
+    already does series log over any field, and Fractions make the fit exact.
     """
     sys.path.insert(0, os.path.join(ROOT, "experiments"))
     from slope2_law_vs_truth import read_pk  # noqa: E402
-    wired = read_pk()
+    wired = dict(read_pk())
     if max(wired) < K:
         return {}
+    if perturb is not None:
+        k, i = perturb
+        co, den = wired[k]
+        co = list(co)
+        co[i] += 1
+        wired[k] = (co, den)
 
     ns = list(range(10, 13 + K))            # >= 3 points, so linearity is real
     rows = []
@@ -202,9 +213,7 @@ def wired_king_ck(K):
         const = y0 - slope * n0
         for n, y in pts:
             if y != slope * n + const:
-                sys.exit("GATE K FAILED: king c_%d is not linear in n "
-                         "(n=%d gives %s, fit says %s)"
-                         % (k, n, y, slope * n + const))
+                return None
         out[k] = (slope, const)
     return out
 
@@ -214,9 +223,37 @@ def main():
 
     if "--wired-only" in sys.argv:
         # The king half of gate K, with no cluster weights computed at all --
-        # so the target for a long K=4 run can be read off before it lands.
-        for k, (slope, const) in sorted(wired_king_ck(K).items()):
+        # so the target for a long K=4 run can be read off before it lands,
+        # and so the linearity cancellation can be run as an audit of the
+        # wired table in its own right, to k = 19 rather than the k = 2 that
+        # gas_cumulants.py can afford from the DP.
+        ck = wired_king_ck(K)
+        if ck is None:
+            sys.exit("AUDIT FAILED: wired king c_k is not linear in n")
+        if not ck:
+            sys.exit("wired table stops below k = %d" % K)
+        for k, (slope, const) in sorted(ck.items()):
             print("wired king c_%d = %s n + %s" % (k, slope, const))
+        print("# %d cancellations: c_k's n^2..n^k coefficients all vanish"
+              % sum(k - 1 for k in ck))
+
+        # RED: the n^2 coefficient of P_K is inside what linearity sees.
+        if K >= 2 and wired_king_ck(K, perturb=(K, K - 2)) is not None:
+            sys.exit("RED FAILED: bumping P_%d's n^2 coefficient left every "
+                     "c_k linear, so the audit has no teeth" % K)
+        print("# RED ok: +1 on P_%d's n^2 coefficient breaks linearity" % K)
+
+        # The blind spot, recorded rather than hidden. A perturbation of P_k's
+        # CONSTANT term enters c_k as a constant and nothing else, so it can
+        # never disturb linearity. Same for the n^1 term. The audit therefore
+        # pins the n^2..n^k coefficients of each P_k and says nothing about
+        # the other two.
+        if wired_king_ck(K, perturb=(K, K)) is None:
+            sys.exit("BLIND-SPOT CONTROL FAILED: bumping P_%d's constant term "
+                     "broke linearity, so the scope claim below is wrong" % K)
+        print("# scope: constant and n^1 coefficients are invisible to this "
+              "audit (control: bumping P_%d's constant term changes nothing)"
+              % K)
         return
     print("# parametric master equation: What_c = W_c * b^(2k-l-1), "
           "A_k = [u^k] log H, K = %d" % K, flush=True)
@@ -252,6 +289,8 @@ def main():
     # Gate K -- the banked table stops at k = 2 for king, so every king A_k
     # above that is checked against the WIRED P_k instead. See wired_king_ck.
     wired = wired_king_ck(K)
+    if wired is None:
+        sys.exit("GATE K FAILED: wired king c_k is not linear in n")
     if wired:
         A = slog(solve_H("king", K), K)
         for k in sorted(wired):
