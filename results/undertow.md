@@ -122,8 +122,9 @@ regression.
 `experiments/undertow_ri.py` answers each row with a tower that excludes that
 row from its own pinning set, built from nothing the incumbent produced:
 
-- levels 1..9 from Severance W1's ab-initio `P_k` (also the only way to start:
-  level 1's depth-2 cell would be `T(1,0)`);
+- levels 1..9 assembled from Severance W1's cluster weights themselves
+  (`results/severance_w1_weights_k9.txt`), not from the wired table — also the
+  only way to start, since level 1's depth-2 cell would be `T(1,0)`;
 - levels 10..20 pinned from **Motley's own cells**, telescoped
   `T = C_H - 2C_{H-1} + C_{H-2}` out of `results/cutcount_b1/rows/`, every
   pinning cell at `H <= 18`;
@@ -158,15 +159,15 @@ and the Motley band and the tower band overlapped at H = 17-18, double-counting
 those cells (the "sum WRONG" on rows 34 and 35 was the double count, not a
 wrong tower). Both fixed; the numbers above are after.
 
-**One caveat on "nothing the incumbent produced".** Levels 1..9 are read out of
-the wired `diagCoeffTable`, not out of W1's own output. Severance W1 derived
-`P_1..P_9` ab initio from cluster weights and matched that table *coefficient
-for coefficient* (`results/severance-w1-anchor-cut.md`), so the numbers are
-ones a second source independently produced — but the file they are read from
-is the incumbent's. Re-deriving them straight from
+**"Nothing the incumbent produced" is now literal.** Levels 1..9 were at first
+read out of the wired `diagCoeffTable` — Severance W1 matched that table
+coefficient for coefficient, so the numbers were a second source's, but the
+*file* was the incumbent's. They are now assembled straight from
 `results/severance_w1_weights_k9.txt` through
-`experiments/severance_w1_assemble.py` would close that gap and costs seconds;
-it is not done here, and the claim should carry the asterisk until it is.
+`experiments/severance_w1_assemble.py`'s own `assemble_R`/`pk_from_R`, and the
+grand form's linearity check is re-run on the result. Same answers; no
+incumbent file is opened anywhere in the construction. (`read_tri()` is still
+imported, but only to *compare against* — the thing being confirmed.)
 
 ## Row 40 is one cell short of rule-independent, from banked data alone
 

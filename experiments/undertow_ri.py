@@ -30,11 +30,31 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
-from undertow_pin import (all_pairs, extract_ab, grand_form, load_depths,  # noqa: E402
+from undertow_pin import (all_pairs, grand_form, load_depths, padd, ptrim,  # noqa: E402
                           peval, pin_level, pow3, read_tri_motley)
-from slope2_law_vs_truth import read_pk, read_tri                          # noqa: E402
+from slope2_law_vs_truth import read_tri                                   # noqa: E402
 
 W1_ABINITIO = 9
+AB0 = {}
+
+
+def abinitio_levels():
+    """(a_k, b_k) for k = 1..9 straight from Severance W1's cluster weights.
+
+    Not from the wired diagCoeffTable: W1 matched that table coefficient for
+    coefficient, but the table is the incumbent's file, and this whole exercise
+    is about not reading the incumbent's files."""
+    from severance_w1_assemble import load_weights, assemble_R, pk_from_R
+    W = load_weights(os.path.join(ROOT, "results", "severance_w1_weights_k9.txt"))
+    R = assemble_R(W, W1_ABINITIO)
+    ab = {}
+    for k in range(1, W1_ABINITIO + 1):
+        E = grand_form(ab, k)                       # levels < k
+        rem = ptrim(padd(pk_from_R(R[k], k), [-c for c in E[k]]))
+        if len(rem) > 2:
+            raise SystemExit(f"grand form violated at k={k} on the ab-initio P_k")
+        ab[k] = (rem[0] if rem else F(0), rem[1] if len(rem) > 1 else F(0))
+    return ab
 
 
 def opt(name, default):
@@ -56,7 +76,7 @@ def known_a():
 
 def build_tower(mtri, Dj, jmax, hmax, kcap, forbid_row):
     """Levels 1..kcap; W1 below, Motley-pinned above, `forbid_row` untouchable."""
-    ab = dict(extract_ab(read_pk(), W1_ABINITIO))
+    ab = dict(AB0)
     reached = W1_ABINITIO
     for k in range(W1_ABINITIO + 1, kcap + 1):
         pairs = [d for d in all_pairs(k, jmax, mtri, hmax)
@@ -76,6 +96,8 @@ def main():
     jmax = int(opt("--jmax", 4))
     rows = [int(x) for x in opt("--rows", "40").split(",") if x]
     mtri, inc, A = read_tri_motley(), read_tri(), known_a()
+    global AB0
+    AB0 = abinitio_levels()
     kcap = hmax + jmax - 2
     Dj = load_depths(jmax, kcap + 1)
     print(f"Motley triangle H <= {max(H for _, H in mtri)}; depths j <= {jmax}; "
