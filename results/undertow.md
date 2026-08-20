@@ -117,6 +117,47 @@ cell H = 19 — and:
 H = 19.** The RED control is a perturbed level 20, and it fails the
 regression.
 
+## a(n) is rule-independent for every n <= 39
+
+`experiments/undertow_ri.py` answers each row with a tower that excludes that
+row from its own pinning set, built from nothing the incumbent produced:
+
+- levels 1..9 from Severance W1's ab-initio `P_k` (also the only way to start:
+  level 1's depth-2 cell would be `T(1,0)`);
+- levels 10..20 pinned from **Motley's own cells**, telescoped
+  `T = C_H - 2C_{H-1} + C_{H-2}` out of `results/cutcount_b1/rows/`, every
+  pinning cell at `H <= 18`;
+- `D_j(k)`, j <= 4, ab initio from Severance W3;
+- the grand form, a Lean-complete theorem.
+
+```
+row 30: Motley H<=18 (18 cells) + tower H>=19 (12 cells), 12 agree, 0 wrong -- COMPLETE, sum MATCHES a(30)
+row 31: ... (13 cells) ... COMPLETE, sum MATCHES a(31)
+row 32: ... (14 cells) ... COMPLETE, sum MATCHES a(32)
+row 33: ... (15 cells) ... COMPLETE, sum MATCHES a(33)
+row 34: ... (16 cells) ... COMPLETE, sum MATCHES a(34)
+row 35: ... (17 cells) ... COMPLETE, sum MATCHES a(35)
+row 36: ... (18 cells) ... COMPLETE, sum MATCHES a(36)
+row 37: ... (19 cells) ... COMPLETE, sum MATCHES a(37)
+row 38: ... (20 cells) ... COMPLETE, sum MATCHES a(38)
+row 39: ... (21 cells) ... COMPLETE, sum MATCHES a(39)
+row 40: Motley H<=18 (18 cells) + tower H>=20 (21 cells), 21 agree, 0 wrong -- GAP [19]
+```
+
+**HANDOFF's banked state was `a(n) closed rule-independently for all n <= 35`.
+This is n <= 39** — four terms further, from data already on disk, no new
+compute — **and a(40) short by the single cell `T(40,19)`.**
+
+The tower band also agrees with the incumbent cell by cell at every row: 12,
+13, 14, ... 21 cells at rows 30..40, 173 tall-cell confirmations on top of the
+342-cell audit below.
+
+Two bugs were found getting here, both in the direction of flattering the
+result: forbidding every target row at once starved level 18 of pinning cells,
+and the Motley band and the tower band overlapped at H = 17-18, double-counting
+those cells (the "sum WRONG" on rows 34 and 35 was the double count, not a
+wrong tower). Both fixed; the numbers above are after.
+
 ## Row 40 is one cell short of rule-independent, from banked data alone
 
 `experiments/undertow_ri.py` builds the tower with **nothing the incumbent

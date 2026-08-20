@@ -1,37 +1,39 @@
 #!/usr/bin/env python3
-"""Rule-independent tower: every level pinned from MOTLEY's cells alone.
+"""How far is a(n) rule-independent, using nothing the incumbent produced?
 
-The wired diagCoeffTable came from the incumbent sweep, so a tower that reads
-it inherits the incumbent's connectivity rule.  This builds the tower from
-nothing but
+The wired `diagCoeffTable` came from the production sweep, so a tower that
+reads it inherits the incumbent's connectivity rule. This one is built from:
 
-  * Motley's own banked C_H rows, telescoped to T(n,H) for H <= HMAX -- a
-    different rule, proved in docs/proofs/cutcount-identity.md;
-  * the ab-initio depth identities D_j(k) of Severance W3, which read neither
+  * Severance W1's ab-initio P_1..P_9 (cluster weights; matched the wired
+    table coefficient for coefficient, results/severance-w1-anchor-cut.md) --
+    also the only way to start, since level 1's depth-2 cell would be T(1,0);
+  * MOTLEY's own banked C_H rows, telescoped T = C_H - 2C_{H-1} + C_{H-2},
+    for the higher levels -- a different rule, proved in
+    docs/proofs/cutcount-identity.md;
+  * the ab-initio depth defects D_j(k) of Severance W3, which read neither
     triangle nor wired table;
-  * the grand form, which is a Lean-complete theorem;
+  * the grand form, a Lean-complete theorem.
 
-and then asks what it says about the cells Motley cannot reach.
+Each row is answered with a tower that EXCLUDES that row from its own pinning
+set, so no cell is ever predicted from itself. Motley covers H <= hmax, the
+tower covers H > hmax, and the report says which heights neither reaches.
 
-Usage: undertow_ri.py [--hmax 18] [--jmax 3] [--row 40]
+Usage:
+  python3 experiments/undertow_ri.py [--hmax 18] [--jmax 4] [--rows 36,37,...]
 """
-import os, sys
+
+import os
+import sys
 from fractions import Fraction as F
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(HERE) if os.path.basename(HERE) == "experiments" else HERE
-sys.path.insert(0, os.path.join(ROOT, "experiments"))
+ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
 
-from undertow_pin import (all_pairs, extract_ab, grand_form, load_depths,  # noqa
+from undertow_pin import (all_pairs, extract_ab, grand_form, load_depths,  # noqa: E402
                           peval, pin_level, pow3, read_tri_motley)
-from slope2_law_vs_truth import read_pk, read_tri                          # noqa
+from slope2_law_vs_truth import read_pk, read_tri                          # noqa: E402
 
-# Levels 1..9 are ab initio: Severance W1 derived P_1..P_9 from cluster
-# weights alone and matched the wired table coefficient for coefficient
-# (results/severance-w1-anchor-cut.md).  Reading them out of the wired table
-# is reading numbers a second source already produced, not inheriting the
-# incumbent's rule.  Level 1 also cannot be pinned by depth at all -- its
-# depth-2 cell would be T(1,0).
 W1_ABINITIO = 9
 
 
@@ -39,58 +41,89 @@ def opt(name, default):
     return sys.argv[sys.argv.index(name) + 1] if name in sys.argv else default
 
 
-def main():
-    hmax = int(opt("--hmax", 18))
-    jmax = int(opt("--jmax", 3))
-    row = int(opt("--row", 40))
-    mtri = read_tri_motley()
-    inc = read_tri()
-    kcap = hmax + jmax - 2
-    Dj = load_depths(jmax, kcap + 1)
+def known_a():
+    out = {}
+    for cand in ("fixtures/b006770.txt", "results/b006770_upload.txt"):
+        p = os.path.join(ROOT, cand)
+        if not os.path.exists(p):
+            continue
+        for line in open(p):
+            q = line.split()
+            if len(q) == 2 and q[0].isdigit():
+                out[int(q[0])] = int(q[1])
+    return out
 
-    ab = {j: v for j, v in extract_ab(read_pk(), W1_ABINITIO).items()}
-    print(f"levels 1..{W1_ABINITIO} seeded from Severance W1's ab-initio P_k")
+
+def build_tower(mtri, Dj, jmax, hmax, kcap, forbid_row):
+    """Levels 1..kcap; W1 below, Motley-pinned above, `forbid_row` untouchable."""
+    ab = dict(extract_ab(read_pk(), W1_ABINITIO))
+    reached = W1_ABINITIO
     for k in range(W1_ABINITIO + 1, kcap + 1):
         pairs = [d for d in all_pairs(k, jmax, mtri, hmax)
-                 if all(2 * k + 1 - j != row for j in d)]
+                 if all(2 * k + 1 - j != forbid_row for j in d)]
         if not pairs:
-            print(f"  level k={k}: no Motley pair at j<={jmax}, H<={hmax} -- STOP")
-            kcap = k - 1
             break
         sols = {d: pin_level(k, dict(ab), d, mtri, Dj) for d in pairs}
         if len(set(sols.values())) != 1:
             raise SystemExit(f"level k={k}: Motley depth pairs DISAGREE")
         ab[k] = next(iter(sols.values()))
-    print(f"levels {W1_ABINITIO+1}..{kcap} pinned from MOTLEY cells only "
-          f"(jmax={jmax}, every pinning cell H<={hmax})")
+        reached = k
+    return ab, reached
 
-    E = grand_form(ab, kcap)
-    ok = bad = 0
-    covered = []
-    for H in range(row - kcap, row + 1):
-        k = row - H
-        if k == 0:
-            v = F(3) ** (row - 1)
-        else:
-            v = peval(E[k], row) * pow3(row - 1 - 3 * k)
+
+def main():
+    hmax = int(opt("--hmax", 18))
+    jmax = int(opt("--jmax", 4))
+    rows = [int(x) for x in opt("--rows", "40").split(",") if x]
+    mtri, inc, A = read_tri_motley(), read_tri(), known_a()
+    kcap = hmax + jmax - 2
+    Dj = load_depths(jmax, kcap + 1)
+    print(f"Motley triangle H <= {max(H for _, H in mtri)}; depths j <= {jmax}; "
+          f"levels 1..{W1_ABINITIO} ab initio")
+
+    for row in rows:
+        ab, reached = build_tower(mtri, Dj, jmax, hmax, kcap, forbid_row=row)
+        E = grand_form(ab, reached)
+        ok = bad = 0
+        total = F(0)
+        tower_h = []
+        for H in range(max(hmax + 1, row - reached), row + 1):
+            k = row - H
+            v = (F(3) ** (row - 1) if k == 0
+                 else peval(E[k], row) * pow3(row - 1 - 3 * k))
             j = 2 * k + 1 - row
-            if j > 0:
-                v += Dj[j][k] if j in Dj else None
-        if v.denominator != 1:
-            raise SystemExit(f"T({row},{H}) not integral")
-        covered.append(H)
-        if (row, H) in inc:
-            if int(v) == inc[(row, H)]:
-                ok += 1
-            else:
-                bad += 1
-                print(f"  MISMATCH T({row},{H}) k={k}: tower {int(v)} != incumbent {inc[(row,H)]}")
-    print(f"row {row}: tower covers H = {min(covered)}..{max(covered)} "
-          f"({len(covered)} cells); {ok} match the incumbent, {bad} wrong")
-    mot = [H for H in range(1, row + 1) if H <= hmax and (row, H) in mtri]
-    gap = sorted(set(range(1, row + 1)) - set(mot) - set(covered))
-    print(f"row {row}: Motley covers H = 1..{max(mot)} ({len(mot)} cells)")
-    print(f"row {row}: GAP = {gap if gap else 'NONE'}")
+            if k and j > 0:
+                if j not in Dj or k >= len(Dj[j]):
+                    continue                    # no exact depth here; not covered
+                v += Dj[j][k]
+            if v.denominator != 1:
+                raise SystemExit(f"T({row},{H}) not integral")
+            tower_h.append(H)
+            total += v
+            if (row, H) in inc:
+                ok += 1 if int(v) == inc[(row, H)] else 0
+                bad += 0 if int(v) == inc[(row, H)] else 1
+                if int(v) != inc[(row, H)]:
+                    print(f"    MISMATCH T({row},{H}) k={k}")
+        mot = [H for H in range(1, min(hmax, row) + 1) if (row, H) in mtri]
+        if not mot:
+            print(f"row {row:2d}: Motley has no cells for this row "
+                  f"(its C rows stop at Nmax) -- skipped")
+            continue
+        for H in mot:
+            total += mtri[(row, H)]
+        gap = sorted(set(range(1, row + 1)) - set(mot) - set(tower_h))
+        line = (f"row {row:2d}: Motley H<={max(mot):2d} ({len(mot)} cells) + "
+                f"tower H>={min(tower_h)} ({len(tower_h)} cells), "
+                f"levels to k={reached}, {ok} agree with the incumbent, {bad} wrong")
+        if gap:
+            line += f" -- GAP {gap}"
+        elif row in A:
+            line += (" -- COMPLETE, sum MATCHES a(%d)" % row if int(total) == A[row]
+                     else " -- COMPLETE but sum WRONG")
+        else:
+            line += f" -- COMPLETE, a({row}) = {int(total)}"
+        print(line)
 
 
 if __name__ == "__main__":
