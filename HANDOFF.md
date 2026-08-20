@@ -9,7 +9,47 @@
 > risk sits. Everything below is the campaign detail behind it.
 
 
-## 2026-08-20 (latest) — a(41) LANDED, AND a(n) IS RULE-INDEPENDENT TO n <= 39
+
+## 2026-08-20 (latest) — THE KING LATTICE MERGES THE FRONTIER, AND IT IS PARKED
+
+Branch `skeletonkey`. Record: `results/skeletonkey-nfamily-merge.md`. Probe
+`experiments/skeletonkey/nfamily_merge.py`. **PARKED at jasonp's direction
+2026-08-20** — established and banked, nothing built, no engine touched.
+
+The strip automaton is **not state-minimal**. Two frontiers carrying the same
+multiset of block reaches `N(b)` (the block's rows expanded `±1`, clipped) are
+indistinguishable to every later column and can be added together. Measured
+41,834 -> 8,539 at H = 12; **6.71x at H = 8** against what
+`core/kink_column.h` carries today, once the exact-height flags come off in
+favour of the `C_H` telescope.
+
+**This is a characteristic-0 fact, not a mod-2 one.** `results/r4/r4-floors.md`
+marks pairwise Nerode-distinguishability of the M(H+1)-1 column states NOT
+ESTABLISHED and calls it "the cheapest missing brick"; `exactchange-probes.md`
+§6 answered it the next day, filed it under GF(2), and §10 priced the campaign
+at one bit. The argument there is language-level. Re-derived here from
+scratch, gated on the banked `C_H` rows in exact integers: eight fail-closed
+gates, a RED control, and a **rook control** showing the key is the state on
+the square lattice, so the collapse is king adjacency and nothing else.
+
+Why it matters: `results/kink-carry.md` says "only end-of-column states leave
+a worker … the new wall = frontier RAM at `D_H ~ 2.6^H`". The merged set is
+that wall, and it grows at ~2.48^H.
+
+**Do not quote a number at H = 21.** The ratio compounds ~1.087/height and
+extrapolates near 10x, but that is nine heights out from nine points with no
+closed form, no OEIS match, and no recurrence with surplus.
+
+When it is unparked, cheapest first: (1) a C++ census of the key space to
+H = 18..21 generating successors cell-at-a-time (cost ~states x H, not
+states x 2^H) to replace the extrapolation with a measurement; (2) the
+congruence written down properly; (3) the build, which is one call —
+`kinkFinalizeColumn` canonicalizes with `canonicalizeSig` and then dedups, so
+a reach-canonicalization there makes the existing dedup do the merging, and
+the key fits the byte width already in the signature.
+
+
+## 2026-08-20 — a(41) LANDED, AND a(n) IS RULE-INDEPENDENT TO n <= 39
 
 Branch `lastditch`. Records: `results/undertow.md` (with its corrections
 section), `results/a41/PROVENANCE.md`, `results/undertow-picture.md`,
