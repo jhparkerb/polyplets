@@ -1,7 +1,8 @@
 # HANDOFF — live state (updated 2026-08-20)
 
-> **Resuming cold? `docs/resume-here.md`** has the one job still running and
-> exactly what to run when it finishes, with the expected answers.
+> **Resuming cold? `docs/resume-here.md`** has the jobs still running — the
+> dalby ladder and two ayr probes as of 2026-08-20 14:10 — and exactly what to
+> run when each lands, with the expected answers.
 >
 > **Start with `results/confidence.md`** if what you want is how far a(n) can
 > be trusted and why. It is in plain terms, it says which values rest on two
