@@ -55,6 +55,21 @@ if not os.path.exists(gmp_hdr):
 if not os.path.exists(zstd_hdr):
     zstd_flags = []
 
+# OpenMP, same detect-and-mirror pattern.  Apple clang rejects a bare
+# -fopenmp outright ("unsupported option"), so on Darwin it is
+# -Xpreprocessor -fopenmp plus MacPorts' own include dir; on Linux g++ takes
+# -fopenmp directly.  A host with neither gets [] and the source is dropped
+# from the database rather than recorded with flags that cannot compile --
+# see the note in scripts/compile_db_sources.txt.
+if darwin:
+    omp_hdr = "/opt/local/include/libomp/omp.h"
+    omp_flags = ["-Xpreprocessor", "-fopenmp", "-I/opt/local/include/libomp"]
+else:
+    omp_hdr = None
+    omp_flags = ["-fopenmp"]
+if omp_hdr is not None and not os.path.exists(omp_hdr):
+    omp_flags = []
+
 def flags_for(f):
     if not f.startswith("cpp/"):
         return args + zstd_flags
@@ -67,7 +82,12 @@ def flags_for(f):
     # check_compile_commands.sh fails on <omp.h> -- which is what it is for.
     # Mirrors the Makefile's own rule for that binary.
     if "<omp.h>" in src:
-        extra += ["-fopenmp"]
+        if not omp_flags:
+            sys.exit(f"{f} needs OpenMP and this host has no omp.h.\n"
+                     f"  macOS: sudo port install libomp\n"
+                     f"  Dropping it from the database instead would leave the\n"
+                     f"  silent hole check_compile_commands.sh exists to catch.")
+        extra += omp_flags
     return args + extra
 
 sources = sorted(f for pat in open("scripts/compile_db_sources.txt")
