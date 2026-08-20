@@ -218,8 +218,75 @@ def wired_king_ck(K, perturb=None):
     return out
 
 
+def wired_selfcheck():
+    """wired_king_ck against the moment-cumulant formulae, written out.
+
+    wired_king_ck gets c_k by evaluating F(n,u) at several n and fitting. That
+    is one code path for nineteen numbers, so it is checked here against the
+    other way of doing it: carry the P_k as polynomials in n and expand
+    log(1+x) explicitly, which is what the k=3 gate did before it was
+    generalised. Agreement means the fit is not an artefact of the fit.
+    """
+    sys.path.insert(0, os.path.join(ROOT, "experiments"))
+    from slope2_law_vs_truth import read_pk  # noqa: E402
+    wired = read_pk()
+
+    def poly(k):                            # ascending coefficients
+        co, den = wired[k]
+        return [F(c, den) for c in reversed(co)]
+
+    def pmul(a, b):
+        out = [F(0)] * (len(a) + len(b) - 1)
+        for i, x in enumerate(a):
+            for j, y in enumerate(b):
+                out[i + j] += x * y
+        return out
+
+    def padd(*ps):
+        out = [F(0)] * max(len(p) for p in ps)
+        for p in ps:
+            for i, x in enumerate(p):
+                out[i] += x
+        return out
+
+    def scale(p, c):
+        return [x * c for x in p]
+
+    P1, P2, P3, P4 = poly(1), poly(2), poly(3), poly(4)
+    # log(1+x) = x - x^2/2 + x^3/3 - x^4/4 at x = sum_k P_k u^k.
+    explicit = {
+        2: padd(P2, scale(pmul(P1, P1), F(-1, 2))),
+        3: padd(P3, scale(pmul(P1, P2), F(-1)),
+                scale(pmul(pmul(P1, P1), P1), F(1, 3))),
+        4: padd(P4, scale(pmul(P1, P3), F(-1)),
+                scale(pmul(P2, P2), F(-1, 2)),
+                pmul(pmul(P1, P1), P2),
+                scale(pmul(pmul(P1, P1), pmul(P1, P1)), F(-1, 4))),
+    }
+
+    fitted = wired_king_ck(4)
+    if fitted is None:
+        sys.exit("SELFCHECK FAILED: wired king c_k came out non-linear")
+    for k, p in sorted(explicit.items()):
+        while len(p) > 1 and p[-1] == 0:
+            p.pop()
+        if len(p) > 2:
+            sys.exit("SELFCHECK FAILED: explicit c_%d is not linear: %s"
+                     % (k, p))
+        slope, const = fitted[k]
+        if (p[1], p[0]) != (slope, const):
+            sys.exit("SELFCHECK FAILED: explicit c_%d = %s n + %s, fit says "
+                     "%s n + %s" % (k, p[1], p[0], slope, const))
+        print("# selfcheck ok k=%d: explicit expansion gives %s n + %s"
+              % (k, p[1], p[0]))
+
+
 def main():
     K = int(sys.argv[1]) if len(sys.argv) > 1 else 3
+
+    if "--selfcheck" in sys.argv:
+        wired_selfcheck()
+        return
 
     if "--wired-only" in sys.argv:
         # The king half of gate K, with no cluster weights computed at all --
