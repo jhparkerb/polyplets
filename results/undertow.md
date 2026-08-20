@@ -60,7 +60,7 @@ every wired level. It is.
     ...
     T(40,21) k=19: match
 
-`T(40,21)` — 2.8431% of a(40), the one cell `docs/b1-closure-plan.md` §3 says
+`T(40,21)` — the one cell `docs/b1-closure-plan.md` §3 says
 "never fits", the reason its §6 table reads "out of RAM at any rung" — comes
 out of the formula and matches the banked value. Every in-onset banked cell of
 rows 40 and below that the tower touches matches; the run prints them.
@@ -97,6 +97,23 @@ K = 10 and 265.0 s / 1.54 GB at K = 12 — about 1.82× per unit K in time and
 inside dalby, but at the wall, and it is the run that would let level 21 pin
 from `T(39,18)` and `T(38,17)`, both inside Motley's already-banked H ≤ 18
 rows — i.e. **a(40) rule-independent in every cell, with no new sweep at all.**
+
+## The row-40 regression
+
+`experiments/undertow_a41.py` runs the assembled tower back at n = 40, with
+row 40 **excluded from its own pinning set** (level 20's depth-1 cell is
+literally `T(40,20)`, and pinning from a cell you then call a prediction is
+circular). Level 20 then pins from `T(38,18)` and `T(39,19)` alone — tallest
+cell H = 19 — and:
+
+    level k=20 pinned from [(38, 18), (39, 19)] (tallest H=19)
+    row 40 regression: 21 cells reproduced, 0 wrong
+    banked row 40 re-sums to a(40) exactly
+
+**Twenty-one of row 40's forty cells — every one with H >= 20, including
+`T(40,20)` and `T(40,21)` — come back exactly from data no taller than
+H = 19.** The RED control is a perturbed level 20, and it fails the
+regression.
 
 ## Limits
 
