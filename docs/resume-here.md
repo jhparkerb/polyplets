@@ -17,7 +17,7 @@ Written to survive a `/clear`. If you are picking this up cold:
 |---|---|---|---|---|---|
 | dalby | Motley ladder H = 1..19 @ Nmax 41 | 2865283 (script), 2867331 (worker) | 10:38 | **~11:30 on 08-21** | `~/var/motley-ladder/` |
 | ayr | `cell_sparsity_modp.py 8` | 640243 | 12:11 | overdue, healthy | `~/var/skeletonkey/cellsparse.txt` |
-| ayr | `parametric_master.py 4` | 641483 | 13:49 | dies on its own `timeout 1500` at ~14:14 | stdout only, disposable |
+| ayr | `parametric_master.py 4` | **641839** | 14:28 | king leg, ~2 h on the measured king/hex ratio | `~/var/skeletonkey/parametric_master_k4.txt` |
 
 Nothing here needs restarting. **Do not restart the ladder** under any
 circumstance short of a dead box — see `a21-run-do-not-restart`.
@@ -137,18 +137,35 @@ changes.
 
 ---
 
-## 3. `parametric_master.py 4` (ayr) — disposable
+## 3. `parametric_master.py 4` (ayr) — relaunched properly at 14:28
 
-A fourth-order re-run of a probe whose K = 3 result is already banked in
-`results/skeletonkey-parametric-master.md`. It carries its own
-`timeout 1500` and dies at ~14:14 either way. It was launched over ssh rather
-than in a tmux window, which was a mistake and is why it is marked disposable:
-if the ssh dropped, it took SIGHUP with it.
+The ssh-launched run died inside `solve_H("hex", 4)` having printed only the
+square line, with no way to tell which cluster it was on. Relaunched in tmux
+window `pm4`, pid **641839**, logging to
+`~/var/skeletonkey/parametric_master_k4.txt`; the probe now prints each cluster
+weight with its wall time, so progress has a denominator (15 clusters at
+K = 4) and a hung run is distinguishable from a slow one.
 
-**If it produced a fourth order**, square `A_4` must equal `-3099/2` — that is
-the only k = 4 value banked anywhere — and the "NOT ESTABLISHED: k ≥ 4" bullet
-in the results file comes out. **If it did not**, nothing is lost; K = 3 with
-gate K is the banked result. Re-run it in a tmux window, not over ssh.
+**Landed already:**
+
+    square  A_k = 4, -19, 472/3, -3099/2      matches the banked table
+    hex     A_k = 9, -37/2, 32, 3915/4        first three banked; A_4 new
+
+**Still running: king**, whose four-row clusters are the expensive ones —
+measured `hex (2,2,2,2) = 1154 s`, and king runs about 4× hex per cluster
+(`king (2,2,2) = 47.3 s` against `hex (2,2,2) = 11.4 s`), so ~2 h for the leg.
+
+**King `A_4` must come out `-22701/4`.** That is not a prediction any more:
+`--wired-only` reads the king cumulants straight off the wired `P_k` table,
+which shares no code with the cluster weights. If it disagrees, one of the two
+routes is wrong and that is the result, not the `A_4` value. Hex `A_4 = 3915/4`
+has no such check — there is no wired hex table.
+
+Banked from the wired route while this ran (`results/skeletonkey-parametric-master.md`):
+king `A_k`/`B_k` to `k = 19`, and the linearity cancellation as an audit of the
+production `P_k` table — 171 coefficient cancellations, RED green, with the
+blind spot (constant and `n¹` terms are invisible to it) asserted by its own
+control rather than left to be assumed.
 
 ---
 
