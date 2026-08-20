@@ -38,9 +38,13 @@ disk peak. Neither was run.
 - **Growth**: `a(41)/a(40) = 6.9394`, continuing 6.9212, 6.9261, 6.9308,
   6.9352. The successive differences are 0.0049, 0.0047, 0.0044, **0.0042** —
   monotonically shrinking, as a series converging to λ ≈ 7.1 must.
-- The method itself: 18 levels re-derived exactly over 100 depth pairs, a
-  342-cell audit, and a(40)/a(39)/a(38)/a(37) reassembled exactly from short
-  sweeps. `results/undertow.md`.
+- The method itself: 18 levels re-derived exactly from below-onset cells
+  (100 depth pairs, ~36 of them independent), an audit in which **189
+  enumerated** banked cells come back from shorter cells with 0 wrong, and
+  `a(n)` rule-independent for every n <= 39. `results/undertow.md`, as
+  corrected by `results/undertow-review-A.md` — the earlier "342 cells" and
+  "four terms reassembled from short sweeps" figures were inflated and are
+  struck there.
 
 ## Independently recomputed
 
