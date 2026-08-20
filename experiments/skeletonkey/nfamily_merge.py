@@ -379,6 +379,21 @@ def main():
               "about king adjacency" % (H, len(rr) - 1, len(rk) - 1),
               flush=True)
 
+        # gate H -- the key fits the production signature's existing width.
+        # A row r is in N(b) only if b has a cell in {r-1, r, r+1}, and
+        # distinct blocks are >= 2 rows apart, so at most TWO blocks' N-sets
+        # can cover any row: two nibbles per row encode the whole key in the
+        # H bytes cpp/tma/signature.h already spends on labels.  If this ever
+        # fails, the key needs a wider Sig and the drop-in is not a drop-in.
+        for st in keys[1:]:
+            for r in range(H):
+                if sum(1 for N in st if (N >> r) & 1) > 2:
+                    sys.exit("GATE H FAILED H=%d: row %d covered by %d "
+                             "neighbourhoods" % (H, r,
+                             sum(1 for N in st if (N >> r) & 1)))
+        print("# gate H ok H=%d: no row is covered by more than two "
+              "neighbourhoods, so the key fits H bytes" % H, flush=True)
+
         # vertical mirror: does the merge subsume the R1 fold, or compose?
         def refl(k):
             out = []
