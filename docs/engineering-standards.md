@@ -94,9 +94,10 @@ What this cost before it was a rule, all in one night on one branch:
 - **A silent path bug.** `rsync -a a b c host:dir/` flattens — a generator
   edit landed at the repo root instead of `scripts/`, so a "fixed" gate run
   was silently testing the unfixed generator.
-- **A stray polluting a gate.** A hand-copied `cpp/motley_par_rel.cpp` left on
-  ayr was picked up by `cpp/*.cpp` in `scripts/compile_db_sources.txt` and
-  failed `gate-compile-db` on a file that is not in the repo at all.
+- **A stray polluting a gate.** A hand-copied engine source (same file, saved
+  beside the original under a `_rel` suffix) left on ayr was picked up by the
+  `cpp/*.cpp` glob in `scripts/compile_db_sources.txt` and failed
+  `gate-compile-db` on a file that is not in the repo at all.
 - **A missing build rule.** `cpp/motley_par.cpp` was built by hand on two
   boxes and had no Makefile rule for a whole night, so the engine that
   produced the night's results was not buildable from the tree. The

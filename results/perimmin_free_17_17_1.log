@@ -1,2 +1,5 @@
-event=start job=perimeter_min t=2026-08-07T13:04:39-04:00 git=154617a-dirty built=2026-08-07T13:01:11-0400 host=gympie lattice=square4 pmax=999 rmax=6
+event=start job=perimeter_min t=2026-08-07T13:05:49-04:00 git=4aa9017f-dirty built=2026-08-07T13:04:24-0400 host=dalby lattice=square4 pmax=999 rmax=6
 event=plan job=perimeter_min boxes=1
+event=plan job=perimeter_min shards=10441 cells=144
+event=heartbeat job=perimeter_min t=2026-08-07T13:16:45-04:00 elapsed_s=656.1 rate=12.49/s count=8192 shards=10441 nodes=0
+event=done job=perimeter_min t=2026-08-07T13:16:52-04:00 start=2026-08-07T13:05:49-04:00 wall_s=662.4 cpu_s=10598.4 peak_rss_mb=2.6 result=ok boxes=1 nodes=11642049421 emitted=11071456311 cells=28
