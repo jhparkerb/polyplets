@@ -52,7 +52,10 @@ tree and already gated.
     verify: 18 levels re-derived exactly over 100 depth pairs, 0 wrong, 1 skipped
     VERIFY GREEN
 
-(at depths 1..4: six pairs per level from k = 4 up, 100 pairs in all.)
+100 is the number of PAIRS, not of independent checks: pairs share cells, and
+a level with `c` usable cells carries `c - 2` independent checks — about two
+per level, ~36 in all at jmax 4. The conclusion is unaffected; the arithmetic
+of "100" is not a count of independent evidence and was quoted as if it were.
 
 Exactly — the same rationals, not agreement to some number of digits. The
 `k = 19` line is the one that matters: **P₁₉ re-derived from `T(38,19)` and
@@ -135,10 +138,15 @@ cell H = 19 — and:
     row 40 regression: 21 cells reproduced, 0 wrong
     banked row 40 re-sums to a(40) exactly
 
-**Twenty-one of row 40's forty cells — every one with H >= 20, including
-`T(40,20)` and `T(40,21)` — come back exactly from data no taller than
-H = 19.** The RED control is a perturbed level 20, and it fails the
-regression.
+Of those 21 cells, **one is a novel check**: `T(40,20)`, predicted from a
+level-20 pin whose cells are all H <= 19. `T(40,21)` is `P_19`'s own fit
+anchor, and the 19 cells at H >= 22 are `diagCoeffTable` evaluations that the
+a(40) run *injected* rather than enumerated (`results/ns_a40/PROVENANCE.md`:
+"Real sweeps H3-H21; H22-H40 via wired P_k closed forms"), so scoring the
+tower against them is formula against formula. The RED control is a perturbed
+level 20, and it fails the regression.
+
+The transitively-clean statement is `undertow_ri.py`'s, not this one.
 
 ## a(n) is rule-independent for every n <= 39
 
@@ -245,14 +253,25 @@ anywhere, which is what `all_pairs`' `hmax` is for. (It was not, at first: the
 first a(39) and a(38) runs claimed H <= 18 while pinning level 20 from a cell
 at H = 20. They now fail closed instead.)
 
-| term | swept heights | classical ceiling `(n+2)/2` | result |
-|---|---|---|---|
-| a(40) | 1..19 | 21 | EXACT |
-| a(39) | 1..19 | 20 | EXACT |
-| a(38) | 1..18 | 20 | EXACT |
-| a(37) | 1..18 | 19 | EXACT |
+| term | swept heights | classical ceiling `(n+2)/2` | result | Undertow content |
+|---|---|---|---|---|
+| a(40) | 1..19 | 21 | EXACT | level 20 pinned |
+| a(39) | 1..19 | 20 | EXACT | **none — pin loop empty** |
+| a(38) | 1..18 | 20 | EXACT | **none — pin loop empty** |
+| a(37) | 1..18 | 19 | EXACT | **none — pin loop empty** |
 
-All at depths j <= 3; depth 4 should take another height off each.
+**Three of those four rows contain no Undertow at all** (Lane A, verified:
+`undertow_a41.py:186 kmax_new = n - (hcap+1)` is 19, 19, 18 for a(39), a(38),
+a(37) against a wired table that already reaches k = 19, so the pin loop
+`range(max(P)+1, kmax_new+1)` is empty). They are the classical assembly
+replayed, and they consume wired constants fitted to cells ABOVE their own
+stated cap — a(39)'s H = 20 value *is* the swept `T(39,20)`, laundered through
+`P_19`'s two-parameter exact fit. Only the a(40) row pins anything.
+
+The sentence "a run that says heights <= H refuses to touch a taller cell
+anywhere" was written about `all_pairs`' `hmax`, which constrains only NEWLY
+pinned levels. It is **not true of the wired levels** and should not have been
+written without that qualification.
 
 ## The dry run: a(40) without phases B and C
 
@@ -295,7 +314,8 @@ on that diagonal it did not use.
     audit: 342 banked cells predicted from shorter cells, 0 wrong
     AUDIT GREEN
 
-**342 cells of the banked triangle re-derived from strictly shorter cells.**
+**189 cells of the banked triangle re-derived from strictly shorter cells**
+(the audit prints 342; see the correction below).
 The `k = 19` line is the tower's own foundations audited: the two cells it
 predicts are `T(39,20)` and `T(40,21)` — *the very anchors the wired P₁₉ was
 fitted from* — and it gets both, from H <= 18.
@@ -355,3 +375,50 @@ the same fix.
 - Everything below level 10 rests on Severance W1's ab-initio `P_k`; above it,
   on the wired table. Undertow does not change that dependency, it moves which
   *cells* the wired table needs.
+
+
+---
+
+# Corrections, from the Lane A audit
+
+`results/undertow-review-A.md`, 2026-08-20. An adversarial audit of the four
+headline claims. Every correction below was verified by the lead before being
+written in.
+
+| claim | grade | what changed |
+|---|---|---|
+| `a(n)` rule-independent for `n <= 39`, gap `T(40,19)` | **CLEAN** | strengthened: rows 19..39 all COMPLETE, not just 30..39 |
+| a(41) | **CLEAN on circularity** | one addition, below |
+| 342 cells from shorter cells | **weaker than stated** | 189 enumerated + 153 formula-vs-formula identities |
+| four terms from short sweeps | **weaker; three rows circular as independence claims** | see the table above |
+
+**The one fact that reprices most of the checks.** The banked triangle's
+H >= 22 cells are not enumerations — the a(40) run wrote `diagCoeffTable`
+evaluations into `h22.out..h40.out`. Lane A verified all 171 in-onset banked
+cells at H >= 22 equal the wired-law evaluation exactly. Since `extract_ab`
+and `grand_form` are an exact inverse pair, any tower built on wired levels
+evaluates to identically the polynomial the run injected, and every
+"tower reproduces the banked cell" comparison up there is guaranteed. Worth
+one line — "Python and Go evaluate the same polynomial the same way" — not
+153.
+
+**What is genuinely strongest**, per Lane A and I agree: the audit's 189 real
+cells include `T(39,20)` and `T(40,21)` predicted from H <= 18 pins (H <= 17
+at jmax 4). Every level up to 17 already had a holdout; **18 and 19 never
+did**. That is the first independent cross-check wired `P_19` has ever had.
+
+**Two further defects found**, both now open:
+
+- `undertow_ri.py` crashes on rows <= 18 (`min()` on an empty tower band), so
+  the pure-Motley rows are claimed but not attestable by the script. They
+  reduce to the 720-cell Motley agreement, which holds — the attestation is
+  the gap, not the claim.
+- The `k = 20..22` rows of `results/severance_w3_families_K22_e*.txt` rest on
+  the C++ enumerator alone; the Python cross-check stops at K = 19. The
+  extrapolation past W3's validated range has a **software** leg as well as a
+  mathematical one.
+
+**Also vacuous, and harmless**: in the a(40) dry run,
+`sweep_agrees_with_banked` compares `results/ns_a40/perheight` against
+`read_tri()`, which reads that same directory — file against itself. The same
+check inside the real a(41) run is real (760 cells, cross-Nmax, 0 disagree).
