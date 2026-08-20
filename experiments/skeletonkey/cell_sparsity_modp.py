@@ -176,7 +176,7 @@ def row_weights(d2, basis, keep):
 def run_height(H, p, want_weights=True):
     order2, d2, acc2 = build_cell_automaton(H)
     n = len(order2)
-    cap = min(n, 200000)
+    cap = n
     basis, keep = closure(d2, acc2, p, cap)
     d = basis.nb
     w = row_weights(d2, basis, keep) if want_weights else None
@@ -206,14 +206,25 @@ def main():
             f'(cell states {n})')
 
     # ---- RED control: a corrupted successor map must break the gate --------
+    # A single redirected edge does NOT move the rank (measured: it does not),
+    # so the control redirects a tenth of the filled-cell edges under three
+    # fixed seeds and requires ALL THREE to depart from the banked 93.  One
+    # survivor fails the run: a control that can pass on a broken object is
+    # not a control.
     order2, d2, acc2 = build_cell_automaton(5)
-    d2r = d2.copy()
-    d2r[0, 1] = d2r[0, 0]                      # collapse one filled-cell edge
-    basis, _ = closure(d2r, acc2, 2, min(len(order2), 200000))
-    if basis.nb == BANKED_GF2_CELL_RANK[5]:
-        say('RED CONTROL FAILED: corrupted successor map still gives 93')
+    live = np.flatnonzero(d2[:, 1] >= 0)
+    got = []
+    for seed in (1, 2, 3):
+        rng = np.random.default_rng(seed)
+        pick = rng.choice(live, size=max(2, live.size // 10), replace=False)
+        d2r = d2.copy()
+        d2r[pick, 1] = rng.permutation(d2r[pick, 1])
+        basis, _ = closure(d2r, acc2, 2, len(order2))
+        got.append(basis.nb)
+    if any(g == BANKED_GF2_CELL_RANK[5] for g in got):
+        say(f'RED CONTROL FAILED: perturbed maps gave {got}, one still 93')
         return 1
-    say(f'# RED ok: corrupted successor map gives {basis.nb}, not 93')
+    say(f'# RED ok: perturbed successor maps give {got}, none 93')
 
     say('')
     say('H  cellstates  colstates  d(p1)  d(p2)  A0 mean/max  A1 mean/max  '
