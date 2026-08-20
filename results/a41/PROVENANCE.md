@@ -42,6 +42,46 @@ disk peak. Neither was run.
   342-cell audit, and a(40)/a(39)/a(38)/a(37) reassembled exactly from short
   sweeps. `results/undertow.md`.
 
+## Independently recomputed
+
+Lane B of the review (`results/undertow-review-B.md` §5,
+`experiments/lane_b_a41_recount.py`) rebuilt the term by a route built to
+differ wherever difference was possible: levels k = 1..19 pinned from their two
+**onset anchors** in `results/triangle.txt` rather than read from
+`diagCoeffTable`, level 20 pinned from depths (1,2) with (3,4) held out — a
+different overdetermination cut from the assembler's — and its own polynomial,
+grand-form, solver and assembly code throughout. `undertow_a41.py` is never
+read or imported.
+
+**AGREE**, and the lead re-ran it rather than taking the report's word:
+
+    anchor-pinned k<=19 predict banked in-onset cells: 342 ok, 0 wrong
+    imported D_j vs own empirical extraction at k<=19: 70 ok, 0 wrong
+    level 20 pinned from depths (1,2); depths 3 and 4 hold out OK
+    T(41,21) = 12639811314502944123098075912198   (level 20, at onset)
+    T(41,20) = 18004779862205054677763902712770   (level 21, depth 2)
+    a(41) recount = 393811462683918679824582849262105  -- AGREE
+
+Because it never touches the wired table, the agreement additionally says the
+wired `diagCoeffTable` is consistent with a fresh fit to its own onset anchors.
+
+**What the agreement is worth, in Lane B's own grading: CLEAN as a second
+implementation, NOT a second source.** It retires assembly, transcription,
+fencing and arithmetic error across two disjoint codebases — the class that
+produced the Zero Harvest incident and the lead's own `hmax` bug tonight. It
+does not touch what the two routes share: `D_j` at k = 20, 21, the pinning
+cells `T(40,19)`/`T(39,18)`, and the grand-form theorem (Lean-complete, so
+shared *theorem* rather than shared *risk*).
+
+### One real, weak check on D_2(21)
+
+`T(41,20) = P_21(41)*3^(41-1-63) + D_2(21)` — the main term carries `3^-23`,
+and `D_2(21) = 1534183878653401344302049616588 / 94143178827` with
+`94143178827 = 3^23` exactly. Integrality of `T(41,20)` therefore forces
+`P_21(41) + N == 0 mod 3^23`. It is weak and it is mod a single prime power,
+but it is **the only check `D_2(21)` currently has**, and the assembler's
+integrality assert is what enforces it.
+
 ## The one weak point, stated plainly
 
 `T(41,20)` sits on level 21, and **level 21 pins from a single depth pair** —

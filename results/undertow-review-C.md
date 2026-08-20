@@ -112,7 +112,8 @@ measurement, not a family-DP one).
 Labels per the brief: MEASURED / EXTRAPOLATED / ASSERTED.
 
 **Route 1 — the excess ladder to depth 9: incumbent-freedom for the whole
-tower (recommended).** `D_series(j, K)` is generic in j — `emax = j−1`
+tower. [CLOSED 2026-08-20, queue row L-1 — the lead's ayr ladder killed it;
+§6 is the record. The pricing below stands as written-before-measurement.]** `D_series(j, K)` is generic in j — `emax = j−1`
 (severance_w3_depths.py:407) — so depths 5..9 are a compute job, not a
 derivation: family tables at emax ≤ 8, K = 21-22, through the existing
 identity. With depths 8 and 9 closed, undertow's own coverage bound
@@ -172,12 +173,98 @@ The §4 e-ladder timings were run by me, foreground, ~20 s total wall of
 build/severance_w3_families at K=8 — on gympie, which the brief bans. I
 caught it after the e=5 run and stopped; nothing else was run beyond
 grep/cat/ls. The numbers are retained above (they are seconds-scale and
-load-bearing for route 1's pricing) with this flag; re-run on ayr if anyone
-wants them clean.
+load-bearing for route 1's pricing) with this flag. The lead re-ran the
+ladder on ayr at K=10 the same morning; those numbers (§6) are the record and
+the gympie figures are out of it.
 
-## 6. Stop condition
+## 6. The excess ladder, measured properly: the deep-depth door closes
+
+2026-08-20, after the lead's C-R1 dispatch on ayr. Fixed K = 10, per-excess:
+
+    emax  wall     RSS      per-e wall  per-e RSS
+     0    0.01 s     4 MB       -          -
+     1    0.09 s     4 MB     9.0x       1.0x
+     2    0.74 s    17 MB     8.2x       4.1x
+     3    4.92 s    83 MB     6.6x       4.9x
+     4   46.71 s   480 MB     9.5x       6.0x
+
+### 6.1 The closed door, written down
+
+The route was: close depths 8 and 9 (excess ≤ 8 family tables at K = 21),
+and every tower level k ≤ 21 pins from strip-confirmed H ≤ 14 cells — the
+incumbent sweep exits the tower's dependency graph. It dies on this table.
+Excess is a second exponential axis, per-e wall 6.6–9.5x and per-e RSS ~6x
+AND RISING — slightly steeper than the height axis the route was built to
+bypass. From the (K=10, e=4) point, e = 8 costs another factor ~8^4 ≈ 4·10^3
+in wall and ~6^4 ≈ 1.3·10^3 in RSS before any K-scaling: 10^8–10^9
+core-seconds and TB-scale state on every K-slope in range. NVMe spill
+absorbs one, maybe two excess steps; four are needed. The door is
+double-locked — RAM kills it first, wall kills it independently.
+
+What would have to be true for it to live:
+
+- **A sub-6x per-excess representation** — states polynomial in e, a
+  representation theorem, not engineering (the gap to close is ~3–4 orders
+  at e = 8, K = 21). This is exactly §3's refutation target (a). Evidence
+  for: weight structure does collapse at small ℓ (single rows to (2s+1)²,
+  two-row families to degree-(a+1) polynomials, defect-gas.md). Evidence
+  against: the only direct measurement of e-compressibility is this ladder
+  (6x, rising), and the nearest rank measurement (Exact Change, column TM)
+  found no collapse. C-R2 — the kernel method at e = 1 against the banked
+  K60_e1 table — is the cheap probe either way.
+- **A K-ceiling far below 21 that still reaches level 21**: structurally
+  closed within the identity, not merely implausible. D_j(k) at level k
+  draws on families at surplus up to k itself (severance_w3_depths.py,
+  `r_coeff` sums `A[m][E][k]` and `pp[e][k]` AT the level's k), so no table
+  with K < 21 reaches level 21 through identity (C)/(D). Reviving this arm
+  means a NEW identity relating high-level defects to sub-level family
+  data; no candidate exists.
+
+### 6.2 Reach of the short-cell tower, repriced (in hmax and J)
+
+Pin condition: level k is pinnable from cells of height ≤ hmax iff two
+depths fit, i.e. **k ≤ k_max = hmax + J − 2** (undertow.md:320). Rows are
+complete through **n* = 2·hmax + J − 1**. Marginal value: **+1 row per unit
+of J, +2 rows per unit of hmax** — and the measured cost slopes now say a
+depth step (6.6–9.5x wall, ~6x RSS, RAM-capped) is STEEPER than a height
+step on a rule-independent sweep (the 3–4.4x class). Both directions are
+exponential; heights buy twice the rows at the shallower slope. That
+inverts route 1's premise — depths were attractive only while they looked
+polynomial.
+
+Where the ceilings land, with J = 5 the practical depth ceiling:
+
+- **Strip cells, hmax = 14** (n ≤ 40 all banked+second-sourced): J = 4
+  gives k_max = 16, n* = 31; J = 5 gives k_max = 17, n* = 32. Depth 5 here
+  needs emax = 4 only at K = 17.
+- **Motley cells, hmax = 18** (C1..C18 on disk, rows reach n = 40; a
+  DIFFERENT swept rule — incumbent-independent, not sweep-independent):
+  J = 4 gives k_max = 20, n* = 39, and its tables are ALREADY ON DISK
+  (severance_w3_families_K22_e3.txt). J = 5 gives k_max = 21, n* = 40 —
+  the full row-40 gap — iff emax = 4 fits at K = 21.
+- **Beyond n = 40 the construction is exhausted**: n* = 2·hmax + J − 1 with
+  J ≤ 5 hard means n = 41+ requires hmax ≥ 19 — new sweeps, not new
+  depths. At (hmax, J) = (18, 5) the short-cell tower ends exactly at
+  n = 40 and never touches row 41.
+
+**Whether depth 5 fits at K = 21 — the two slopes disagree, measurably.**
+Applying the per-2K WALL slopes (4.18x, 2.68x, decelerating) to RSS gives
+the lead's 110–390 GB against dalby's 121 GB: does not fit. But the two
+banked RSS points at e = 3 — 83 MB at K = 10 (ayr ladder) and 494 MB at
+K = 19 (severance_w3_depths.py:129, C++ families run) — pin the measured
+RSS K-slope at ~6x per +9K ≈ 1.5x per +2K, an order below the wall slope.
+At that slope, emax = 4 at K = 21 extrapolates to ~4–40 GB: fits, with
+wall ~10^5–10^6 core-seconds (days on 32 cores). The K = 14/16 points the
+lead is dispatching measure exactly this divergence; if the gentle RSS
+slope holds, Motley + depth 5 = level 21 pinned incumbent-free and rows
+complete to n = 40 — with the standing caveat that D_j at k = 20, 21 is
+still derivation-extrapolation past the k ≤ 19 validation window (C-R3).
+
+## 7. Stop condition
 
 Met: the question is answered with evidence. Strict freedom — no swept cell —
 is blocked by a family-level obstruction (§3) with two named refutation
-targets; practical freedom from the incumbent is priced (§4 route 1) and
-waits on one calibration measurement, filed as a job-request queue row.
+targets; the deep-depth route to incumbent-freedom is closed on measured
+arithmetic (§6.1, queue L-1); the surviving reach of the short-cell tower is
+stated in closed form in (hmax, J) with one measured disagreement left for
+the lead's K = 14/16 points to settle (§6.2).

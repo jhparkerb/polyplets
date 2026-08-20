@@ -155,3 +155,10 @@ measured 6x is close enough that the conclusion is the same one:
 | L-1 | lead | CLOSED | - | **Depths 8-9 (emax 7, 8) are dead by orders of magnitude.** At the measured ~6x/excess, emax=7 at K=21 is 10^4-10^5 GB on any per-K extrapolation in range. Lane C's "useful freedom" route -- pin every level from strip-confirmed H<=14 cells -- does not survive its own cost model. Closed on arithmetic, not on judgement. |
 | L-2 | lead | OPEN | 1 | Depth 5 (emax=4 at K=21) is between ~110 GB and ~390 GB depending on which per-K ratio you trust: K=8->10 is 4.18x per +2K, K=10->12 is 2.68x, so the ratio is DECELERATING and the geometric mean over the whole range overestimates the tail. Two more points (K=14, K=16 at emax=4, ~15 and ~50 min) settle it. Until then depth 5 is "marginal", not "16 h / 103 GB" as earlier plans assert. |
 | L-3 | lead | OPEN | 2 | Both L-1 and L-2 push the same way, and Lane B's shared-assumption finding (B4/B5) pushes the same way independently: **Motley C_19 is the buy for closing T(40,19)**, being the only route that crosses assumption families rather than adding another statement containing D_3(21). |
+
+## Lane B addendum — filed 2026-08-20 (lead-tasked a(41) recount)
+
+| id | lane | status | rank | what |
+|---|---|---|---|---|
+| B16 | B | CLOSED | 1 | a(41) independently recomputed (experiments/lane_b_a41_recount.py: anchor-pinned k<=19, no wired table, own code): AGREES = 393811462683918679824582849262105; T(41,21) matches the published prediction. Graded CLEAN second implementation, NOT second source — shares D_j(21) x3 and the pinning cells T(40,19)/T(39,18) with every tower route (B4). All 70 D_j(k<=19) values also re-verified by empirical extraction, 0 wrong. |
+| B17 | B | OPEN | 3 | Integrality of below-onset tower cells is a free mod-3^e congruence gate on D_j at the frontier (T(41,20): denominators 3^23 must cancel). Both assemblies assert it implicitly; worth stating in the provenance as the one check D_2(21) currently has. |

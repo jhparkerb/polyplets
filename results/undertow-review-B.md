@@ -243,3 +243,70 @@ For closing a(40)'s gap:
 R1 and R2 together would give T(40,19) three assumption-disjoint sources
 (incumbent enumeration, Motley enumeration, W3 tower) — more than any other
 cell of row 40 has. That is not needed; either one closes the gap as stated.
+
+## 5. Independent recount of a(41) — lead-tasked follow-up, 2026-08-20
+
+Script: `experiments/lane_b_a41_recount.py` (this lane's own code;
+`undertow_a41.py` not read or imported). Route, chosen to differ wherever
+difference is possible:
+
+- levels k = 1..19 pinned from their two **onset anchors** T(2k+1,k+1),
+  T(2k+2,k+2) in `results/triangle.txt` — classical rule, **no wired
+  diagCoeffTable, no defect series below k = 20**;
+- own polynomial representation, own grand-form recurrence, own solver,
+  own assembly loop;
+- `D_j` imported from `severance_w3_depths` / `depth1_gap_walk` only at
+  k >= 20, and first cross-checked at every k <= 19 against this script's
+  own empirical extraction (banked cell minus my own fitted main term);
+- level 20 pinned from depths (1,2) with depths 3, 4 as this run's own
+  holdouts; level 21 from the only banked pair, (3,4).
+
+Output (runs in 0.2 s):
+
+    swept a41 rows vs banked triangle: 589 shared cells, 0 mismatch
+    anchor-pinned k<=19 predict banked in-onset cells: 342 ok, 0 wrong
+    imported D_j vs own empirical extraction at k<=19: 70 ok, 0 wrong
+    level 20 pinned from depths (1,2); depths 3 and 4 hold out OK
+    seam: T(41,21) = 12639811314502944123098075912198   (level 20, at onset)
+          T(41,20) = 18004779862205054677763902712770   (level 21, depth 2)
+    a(41) recount = 393811462683918679824582849262105 -- AGREE
+    regression: a(40) from a41 swept rows + row-40-free tower = MATCHES
+
+**a(41) confirmed: 393811462683918679824582849262105.** T(41,21) matches
+`undertow.md --predict`'s published value digit for digit. T(41,20) carries
+`D_2(21) = 1534183878653401344302049616588 / 3^23`; the 3^23 denominators
+cancel against the main term exactly, so integrality acts as a (weak, mod-3^23)
+congruence check on D_2(21) — the assert would fire on a generic numerator
+error.
+
+### What this agreement is worth, graded by this lane's own B4/B5 lens
+
+Shared with the lead's route, unavoidably:
+
+1. the swept halves are the **same files** (`results/a41/h*.out`) — my extra
+   589-cell check against the banked triangle is same-rule only;
+2. the **grand-form theorem** — shared shape, but Lean-complete; the residual
+   risk is transcription, and the 342-cell mini-audit covers mine;
+3. **`D_series` at k = 20, 21** — the true shared component. Mitigation: my
+   own empirical extraction verified all 70 usable D_j(k) values at k <= 19
+   exactly (an independent reproduction of the W3 gate's 70-cell count by a
+   different method). At k = 21 nothing in either route checks D_2, D_3,
+   D_4(21) beyond the integrality congruence above;
+4. the level-21 **pinning cells** T(40,19), T(39,18) — necessarily shared;
+   T(39,18) is Motley-two-sourced, T(40,19) is not (the standing gap).
+
+NOT shared: the wired `diagCoeffTable` (never read here — so the agreement
+also confirms the wired table is consistent with a fresh anchor fit at
+k <= 19), the pin depths at k = 20, and every line of assembly code.
+
+**Grade: CLEAN as a second implementation; NOT a second source.** The
+agreement retires assembly, transcription, fencing and arithmetic error across
+two disjoint codebases — real, since that class has bitten this project
+(zero-harvest, the hmax bug undertow.md itself reports). It adds nothing on
+the three D_j(21) values or on T(40,19), exactly as B4 predicted: every tower
+route to row 41's seam shares them. Level 20 is genuinely solid (my (1,2)-pin
+with (3,4)-holdouts is a different overdetermination cut than the lead's, and
+both pass). The term's evidence state after this recount is unchanged in kind
+from `results/a41/PROVENANCE.md`'s own statement: computed-and-checked, with
+level 21 single-pair — and the instruments that would change its kind are
+still §2's R1/R2/V1.
