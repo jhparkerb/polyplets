@@ -5,6 +5,10 @@ either confirms a(40) by a second algorithm or reaches past n = 40. This is
 what happened, what it rests on, and what is still open. Entry point for
 anyone picking it up cold.
 
+**If you only read one file, read `results/confidence.md`** — the plain-terms
+statement of how far each value can be trusted and why. This one is the
+campaign record behind it.
+
 ## The two headline results
 
 **a(41) = 393811462683918679824582849262105.** The first term of A006770 past
@@ -123,9 +127,14 @@ priced at an affordable ~51 GB.
 
 ## Open
 
-- **Motley `C_19`** — running. Closes `T(40,19)` and with it a(40) in every
-  cell. u16, 9 primes, ~59 GB, ~15 h. Its gate went green first: the release
-  path reproduces a banked H = 18 residue row byte for byte.
+- **The Motley ladder at Nmax 41** (`scripts/motley_ladder.sh`) — running.
+  Heights 1..19, nine 16-bit primes, ~59 GB at the top height, ~25 h. It buys
+  BOTH a(40)'s last cell and a(41) entire: `T(n,H) = C_H - 2C_{H-1} + C_{H-2}`
+  needs every `C_H` at the same Nmax, and every banked Motley row stops at
+  n = 40, so a(41) has no second rule under it until this finishes. An earlier
+  launch of the same run at Nmax 40 would have bought only the first and was
+  killed for it. Its gate went green first: the release path reproduces a
+  banked H = 18 residue row byte for byte.
 - **H = 20 sweep at Nmax 41** (`scripts/dalby_a41_h20.sh`) — makes level 21's
   *output* a holdout against an enumeration. **~11 h / ~190 GB**; the 20-30 h
   / 450 GB this tree asserted before anything was measured is corrected in the

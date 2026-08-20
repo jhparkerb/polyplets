@@ -1,5 +1,11 @@
 # HANDOFF — live state (updated 2026-08-20)
 
+> **Start with `results/confidence.md`** if what you want is how far a(n) can
+> be trusted and why. It is in plain terms, it says which values rest on two
+> independent programs and which rest on one, and it names where the residual
+> risk sits. Everything below is the campaign detail behind it.
+
+
 ## 2026-08-20 (latest) — a(41) LANDED, AND a(n) IS RULE-INDEPENDENT TO n <= 39
 
 Branch `lastditch`. Records: `results/undertow.md` (with its corrections
