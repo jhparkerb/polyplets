@@ -74,10 +74,22 @@ class RREF:
     """Row-reduced echelon basis over F_p, grown one generator at a time."""
 
     def __init__(self, n, p, cap):
+        # Grown by doubling, NEVER preallocated to cap: cap is the number of
+        # cell states, and cap x n float64 is 340 GB at H = 8.  cap survives
+        # only as a fail-closed ceiling.
         self.n, self.p, self.cap = n, p, cap
-        self.B = np.zeros((cap, n), dtype=np.float64)
-        self.piv = np.zeros(cap, dtype=np.int64)
+        self.B = np.zeros((256, n), dtype=np.float64)
+        self.piv = np.zeros(256, dtype=np.int64)
         self.nb = 0
+
+    def _grow(self):
+        if self.nb < len(self.B):
+            return
+        if 2 * len(self.B) > self.cap:
+            raise RuntimeError('RREF capacity exceeded')
+        self.B = np.resize(self.B, (2 * len(self.B), self.n))
+        self.B[self.nb:] = 0.0
+        self.piv = np.resize(self.piv, 2 * len(self.piv))
 
     def coeffs(self, h):
         """Coefficient row of h against the current basis (exact iff h is in
@@ -96,8 +108,7 @@ class RREF:
         nz = np.flatnonzero(r)
         if nz.size == 0:
             return False
-        if self.nb == self.cap:
-            raise RuntimeError('RREF capacity exceeded')
+        self._grow()
         j = int(nz[0])
         r = (r * pow(int(r[j]), self.p - 2, self.p)) % self.p
         col = self.B[:self.nb, j].copy()
