@@ -282,7 +282,8 @@ def wired_selfcheck():
 
 
 def main():
-    K = int(sys.argv[1]) if len(sys.argv) > 1 else 3
+    pos = [a for a in sys.argv[1:] if not a.startswith("--")]
+    K = int(pos[0]) if pos else 3
 
     if "--selfcheck" in sys.argv:
         wired_selfcheck()
