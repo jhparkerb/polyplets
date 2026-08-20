@@ -59,6 +59,10 @@ carries the verdict.
   `docs/utilization-bottleneck-log.md` (named bottlenecks, never retried),
   `docs/terminal-velocity-plan.md`, `docs/a35-two-media-plan.md` (FAILED, do not
   re-run), `docs/redelmeier-tall-plan.md`
+- **Undertow** (the diagonal tower pinned from below) —
+  `docs/lastditch-ideas.md` (the candidate list, closed doors included),
+  `docs/five-terms-plan.md` (proposed, not launched). Result:
+  `results/undertow.md`.
 - **Motley / Coin Lift** (the second source) — `docs/b1-closure-plan.md`,
   `docs/motley-goal.md`, `docs/motley-plan.md`, `docs/coin-lift-goal.md`,
   `docs/coin-lift-plan.md` (CLOSED at G2)
