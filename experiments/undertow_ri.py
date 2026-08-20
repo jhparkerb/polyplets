@@ -20,6 +20,7 @@ tower covers H > hmax, and the report says which heights neither reaches.
 
 Usage:
   python3 experiments/undertow_ri.py [--hmax 18] [--jmax 4] [--rows 36,37,...]
+                                    [--rowdir DIR]
 """
 
 import os
@@ -95,7 +96,11 @@ def main():
     hmax = int(opt("--hmax", 18))
     jmax = int(opt("--jmax", 4))
     rows = [int(x) for x in opt("--rows", "40").split(",") if x]
-    mtri, inc, A = read_tri_motley(), read_tri(), known_a()
+    # --rowdir: which Motley C_H rows to telescope.  The banked
+    # results/cutcount_b1/rows/ stop at n = 40; a ladder run at a higher Nmax
+    # writes its own set, and row 41 can only be answered from those.
+    rowdir = opt("--rowdir", None)
+    mtri, inc, A = read_tri_motley(rowdir), read_tri(), known_a()
     global AB0
     AB0 = abinitio_levels()
     kcap = hmax + jmax - 2
