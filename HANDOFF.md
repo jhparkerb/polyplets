@@ -1,4 +1,71 @@
-# HANDOFF — live state (updated 2026-08-19)
+# HANDOFF — live state (updated 2026-08-20)
+
+## 2026-08-20 (latest) — UNDERTOW: THE DIAGONAL TOWER PINS FROM BELOW
+
+Branch `lastditch`. Full record `results/undertow.md`; candidate list, closed
+doors included, `docs/lastditch-ideas.md`.
+
+**`docs/b1-closure-plan.md` §1's rule was costing the two tallest cells per
+level, and it did not have to.** The grand form makes level `k` carry exactly
+two new constants, so any two independent linear equations pin it — and
+Severance W3's ab-initio `D_j(k)` turns every BELOW-onset cell into one:
+
+    T(2k+1-j, k+1-j) = P_k(2k+1-j) * 3^(2k-3k-j) + D_j(k)
+
+That cell sits `j` rows SHORTER than the onset anchor. `experiments/undertow_pin.py`:
+
+- **VERIFY GREEN — 18 of 18 wired levels re-derived exactly** (same rationals,
+  not agreement to digits), over every available depth pair, three RED controls
+  firing first. P_19 comes out of `T(38,19)` and `T(37,18)` — without
+  `T(39,20)` or `T(40,21)`.
+- **Row-40 regression, with row 40 excluded from its own pinning set**
+  (level 20's depth-1 cell IS `T(40,20)`): level 20 pins from `T(38,18)` and
+  `T(39,19)` alone, and **21 of row 40's 40 cells — every H >= 20, `T(40,20)`
+  and `T(40,21)` included — come back exactly from data no taller than H = 19.**
+  The banked row re-sums to a(40). `T(40,21)` is phase C: 36.4 h on 32 cores,
+  363 GB disk peak, and the cell §3 calls "never fits" at any rung.
+- Level 20 is pinned overdetermined (3 depth pairs, 2 independent checks) and
+  predicts `T(41,21)` and `T(42,22)`.
+
+**What it buys, stated carefully: two heights.** `H_sweep` drops from
+`(n+2)/2` to about `(n-3)/2` — for a(41), exactly the two poles that dominated
+a(40) (phase B H20 9.6 h/48c, phase C H21 36.4 h/32c). Whether that is worth
+more than one term depends on how sweep cost grows in Nmax at FIXED height,
+which is unmeasured; `runs/a41_low` (heights 1-19 at maxn 41, dalby, 40 cores)
+is the measurement.
+
+**Open before P_21 is wired anywhere:** it has one pin pair until depth 5
+exists (`families 21 4`, measured ladder says ~16 h / ~103 GB), and
+`diagCoeffTable`'s `kfact int64` cannot hold 21! — it needs a big.Int field
+first. Neither is done.
+
+## 2026-08-20 — PARALLEL MOTLEY, AND RUNG G
+
+`cpp/motley_par.cpp`, gate `tests/gate_motley_par.py`. The closure plan §4
+names single-threading as the wall after RAM and nobody had removed it;
+Confetti spent 399,700 s on one core of an 80-core box.
+
+- Same frozen rule core, transcribed from the 59e90660 spec. **GATE GREEN:
+  1560 cell-comparisons against the banked C_H rows** at three payload widths,
+  byte-identical to `cutcount_b1 --modp`, and identical at every thread count.
+- H = 14 / Nmax 40 / one 31-bit prime: 323.3 s at 1 thread, **11.8 s at 80**,
+  against `cutcount_b1`'s 596.0 s — 27x on cores, 1.84x before any core,
+  **50x end to end**. First cut scaled 4x while burning 76 cores: one global
+  row counter and spinlock bytes 64 to a cache line.
+- **Rung G is built** — "chunked release of the consumed buffer", the change
+  §3 calls fiddliest. Buckets 24 B -> 8 B (key lives once, in its payload
+  row), EMPTY moved to zero so `clear()` is a MADV_DONTNEED not a memset
+  (~7 TB of memset saved at H=20), and the cell-step iterates rows in chunks
+  and hands each chunk's pages back. Peak: two frontier buffers -> about one.
+  Release is only sound without regrow retries, so `--census --sizes-out`
+  writes exact per-cell-step counts and `--modp --sizes` pre-sizes from them.
+- Measured states — H=18 = 72,487,711, matching Confetti exactly — put
+  **H = 19 at ~55 GB and H = 20 at ~82 GB** with an 8-bit payload. The plan's
+  own table has H=20 at 92 GB as the best case of six rungs. H=21 is still out
+  (~250 GB).
+- ayr is reproducing Confetti's five banked H=18 residue rows now, ~53 min per
+  prime against 22 h.
+
 
 ## 2026-08-19 09:20 EDT (latest) — CONFETTI GREEN; THE ACCEPTANCE QUEUE IS EMPTY
 
