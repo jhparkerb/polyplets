@@ -45,7 +45,11 @@ Consequences if it holds:
   triangle's tallest cells, from short cells, through mathematics that shares
   nothing with the sweep.
 
-Status: `experiments/undertow_pin.py`, three RED controls green (perturbed
+Status: **VERIFY GREEN**, 18 of 18 wired levels re-derived exactly over every
+available depth pair; `T(40,21)` predicted and matching; level 20 pinned
+overdetermined (3 pairs, 2 independent checks) and predicting `T(41,21)`.
+Record: `results/undertow.md`. `experiments/undertow_pin.py`, three RED controls
+green (perturbed
 `D_j` breaks the pin; one equation twice refused as singular; corrupted lower
 level breaks the pin). `--verify` re-derives every wired level from below-onset
 cells — that is the decisive run.
@@ -55,6 +59,37 @@ by construction — the W3 gate keeps the two sides apart); the two depth
 equations being dependent (they are not: the 2×2 is `[[1,n₁],[1,n₂]]`); the
 grand form's residual failing to be linear at some level (checked in
 `extract_ab`, which raises).
+
+## 1a. The column-numerator form of the same idea (a much bigger check)
+
+`docs/proofs/diagonal-law.md` Step 4/5 make column `k` **finite data**:
+`[y^k]F = R_k(z)/(1-3z)^(k+1)` with a correction polynomial `D(z)` of degree
+≤ k, so the whole column is `2` grand-form constants plus `k+1` integers —
+`k+3` unknowns. Depth `j` is literally `[z^(k+1-j)] D(z)`, so depths 1..4
+supply four of them ab initio, and the swept cells at `H ≤ 18` supply eighteen
+equations. For `k = 19` that is 22 equations against 22 unknowns: the column is
+**exactly determined by short cells plus the depth identities**, `T(40,21)`
+included.
+
+Undertow only needs two of those equations, which is why it works at all. But
+solving the whole column is the stronger *test*: it turns the 3-agreeing-pairs
+check into an 18-equation consistency check per level. Worth building as the
+audit form of §1.
+
+## 1b. Cross-lattice validation against an external oracle
+
+`docs/proofs/universal-diagonal-law.md` proves the diagonal law for every
+row-local lattice — square (b=1), hex (b=2), king (b=3) — and the square
+lattice's diagonal polynomials, onset `2k+1` and depth-1 defect
+(`+1,-1,+1,-1,+1`) are all recorded in `results/onset-defect-law.md`. Square
+polyominoes are enumerated to n = 56 in the literature.
+
+So the pin can be run on a lattice where the answers are **published by other
+people**. That is the one validation channel this project structurally lacks
+above n = 20, and it costs a square-lattice `D_j` derivation, not machine time.
+The blocker is that Severance's ledger is king-only ("what remains king-only is
+the ledger — assembling c_k from the weights — and the master equation",
+`results/defect-gas.md`); the weight DP itself is already lattice-parametric.
 
 ## 2. Depths 5–8 (the multiplier on Undertow)
 
@@ -69,8 +104,21 @@ whole tower down to k = 21 would pin from **H ≤ 14** — the strip engine's
 independent range (`results/strip-engine.md`) — and the sweep for row n would
 stop near `H = (n-8)/2`.
 
-The unknown is how the family DP grows in `emax`. An `emax = 4` ladder at
-K = 8..18 is measuring it now; e = 3 at K = 19 was 146 s.
+The unknown is how the family DP grows in `emax`. Measured on dalby at
+emax = 4: **12.2 s / 138 MB at K = 8, 71.4 s / 577 MB at K = 10, 265.0 s /
+1.54 GB at K = 12** — about 1.82x per unit K in time and 1.6x in RSS, so
+`families 21 4` (depth 5) extrapolates to ~16 h and ~103 GB. Inside dalby,
+at the wall.
+
+**And there is an obvious lever on that DP nobody has pulled.** It caps the
+horizontal span at `2K + emax + 1` — 47 at K = 22 — for *every* level, but a
+cluster of `ell` rows cannot span more than `2*ell + e + 1`. At level 10 that
+is 25, not 47. The state counts in the heartbeat peak in the middle levels
+(2.7M around level 10), which is exactly where a per-level span cap would
+bite. It is a contained change to `cpp/severance_w3_families.cpp` with a free
+gate: the banked `results/severance_w3_families_K19_e3.txt` must come back
+byte-identical. If it buys 2-5x it puts depth 6 in range, and each depth is
+another row per sweep.
 
 ## 3. Parallel Motley (insurance, and it works today)
 
@@ -85,6 +133,20 @@ state per cell-step, OpenMP cell-step, payload width chosen from the prime,
 column-boundary checkpoint. Rows byte-identical to `cutcount_b1 --modp` at
 H = 6, 8, 10; **1.9× faster single-threaded** before any core is added (the
 per-state allocate-and-zero was that expensive).
+
+Measured on dalby, H = 14 / Nmax = 40 / one 31-bit prime:
+
+| threads | 1 | 8 | 32 | 80 | `cutcount_b1` |
+|---|---|---|---|---|---|
+| wall s | 323.3 | 41.2 | 13.1 | **11.8** | 596.0 |
+| RSS MB | 718 | 718 | 693 | 733 | 1048 |
+
+27× on cores, 1.84× before any core, **50× end to end**, and byte-identical at
+every thread count. The first cut scaled 4× while burning 76 cores: one global
+row counter and spinlock bytes packed 64 to a cache line. Per-thread index
+blocks and the lock moved into its own payload row fixed both. (An 8-bit
+payload then found a second one: `rb + 8 = 90` is not 4-aligned, and a
+misaligned `atomic<u32>` is a SIGBUS on aarch64, not a slow path.)
 
 Even with Undertow this is worth having: Motley H = 19 retires `T(40,19)`
 outright, and the H ≤ 18 rows Undertow pins from are Motley rows.
