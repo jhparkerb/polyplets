@@ -1,0 +1,1 @@
+square4 n=30 k=7 wall_s=601 stamp=git=6473890c

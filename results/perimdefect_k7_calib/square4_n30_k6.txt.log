@@ -1,0 +1,2 @@
+event=start job=perimdefect-square4-N30-K6 t=2026-08-18T13:40:23-04:00 git=6473890c built=2026-08-07T09:07:48-0400 host=dalby lattice=square4 kmax=6 prune=on
+event=done job=perimdefect-square4-N30-K6 t=2026-08-18T13:41:39-04:00 start=2026-08-18T13:40:23-04:00 wall_s=76.2 cpu_s=76.2 peak_rss_mb=2.6 result=ok nodes=1335666547 min_defect=0

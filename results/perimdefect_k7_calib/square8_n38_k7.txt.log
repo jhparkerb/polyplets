@@ -1,0 +1,2 @@
+event=start job=perimdefect-square8-N38-K7 t=2026-08-18T13:40:23-04:00 git=6473890c built=2026-08-07T09:07:48-0400 host=dalby lattice=square8 kmax=7 prune=on
+event=done job=perimdefect-square8-N38-K7 t=2026-08-18T19:53:29-04:00 start=2026-08-18T13:40:23-04:00 wall_s=22386.5 cpu_s=22382.3 peak_rss_mb=3.2 result=ok nodes=222600958310 min_defect=0
