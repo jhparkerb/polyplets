@@ -101,7 +101,24 @@ call it **15 h for the whole ladder across nine 16-bit primes** on dalby, or
 the same split across dalby and ayr since the passes are independent.
 
 Weak point, the same one as everywhere: level 21 pins from `T(40,19)` and
-`T(39,18)` and has no third cell until depth 5 exists.
+`T(39,18)` and has no third cell until depth 5 exists. Measured at `--jmax 4`:
+
+    k=20 pinned, 6 depth pairs AGREE (5 independent checks);
+         cells T(40,20), T(39,19), T(38,18), T(37,17)
+    k=21 pinned, 1 depth pairs AGREE (0 independent checks);
+         cells T(40,19), T(39,18)
+
+**So a(41) assembled off the H <= 19 sweep alone rests on a single-pair,
+unchecked P_21**, and should say so. Two ways out, and they are the same two
+as ever:
+
+- **sweep H = 20 at Nmax 41** (`scripts/dalby_a41_h20.sh`, staged, ~20-30 h,
+  ~450 GB): the tower then only has to reach k = 20, which has five
+  independent checks, and P_21's prediction of `T(41,20)` becomes a **real
+  holdout** against a swept value. This is the stronger of the two, because it
+  checks against an enumeration rather than against more of the same identity.
+- **depth 5** (`families 21 4`, ~16 h, ~103 GB): gives level 21 a second pin
+  pair from `T(38,17)`, i.e. agreement rather than a holdout.
 
 ## What it is not
 
