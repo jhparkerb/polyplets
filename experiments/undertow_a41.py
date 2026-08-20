@@ -50,6 +50,39 @@ def opt(name, default=None):
     return sys.argv[sys.argv.index(name) + 1] if name in sys.argv else default
 
 
+def sweep_agrees_with_banked(perheight, tri, hmax=None):
+    """A new sweep at a new Nmax also re-produces every row below it.  Those
+    rows are banked, so the run carries its own regression: if the engine or
+    the Nmax bump disturbed anything, the n <= 40 cells say so before the
+    n = 41 cell is used for anything."""
+    ok = bad = 0
+    for fn in os.listdir(perheight):
+        m = re.match(r"h(\d+)\.out$", fn)
+        if not m:
+            continue
+        H = int(m.group(1))
+        if hmax is not None and H > hmax:
+            continue
+        for line in open(os.path.join(perheight, fn)):
+            p = line.split()
+            if len(p) != 2:
+                continue
+            nn, v = int(p[0]), int(p[1])
+            if (nn, H) in tri:
+                if tri[(nn, H)] == int(v):
+                    ok += 1
+                else:
+                    bad += 1
+                    if bad <= 5:
+                        print(f"  SWEEP REGRESSION T({nn},{H}): run {v} != banked {tri[(nn,H)]}")
+    print(f"  sweep vs banked triangle: {ok} cells agree, {bad} disagree")
+    if bad:
+        raise SystemExit("REFUSING: the new sweep disagrees with banked cells")
+    if ok < 200:
+        raise SystemExit(f"REFUSING: only {ok} cells cross-checked -- vacuous")
+    return ok
+
+
 def sweep_rows(perheight, n, hmax=None):
     """T(n,H) for every H the sweep produced (optionally capped at hmax, which
     is how the a(40) dry run pretends the tall heights were never swept)."""
@@ -163,6 +196,8 @@ def main():
     regression(ab, Dj, tri, kw, n=n,
                hlo=(int(hcap0) + 1) if hcap0 else 20)
 
+    if os.path.isdir(perheight):
+        sweep_agrees_with_banked(perheight, tri, int(hcap) if hcap else None)
     swept = sweep_rows(perheight, n, int(hcap) if hcap else None)
     row = {}
     for H in range(1, n + 1):
