@@ -36,6 +36,7 @@ Run: python3 experiments/undertow_pin.py --verify
 """
 
 import os
+import re
 import sys
 from fractions import Fraction as F
 
@@ -44,6 +45,42 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
 from slope2_law_vs_truth import read_pk, read_tri, law  # noqa: E402
+
+
+def read_tri_motley(rowdir=None):
+    """T(n,H) assembled from MOTLEY's banked C_H rows alone.
+
+    T(n,H) = C_H - 2 C_{H-1} + C_{H-2}, the same telescope cutcount_b1
+    --assemble uses.  Nothing here reads the production sweep, so a pin built
+    on this triangle owes the incumbent connectivity rule nothing."""
+    rowdir = rowdir or os.path.join(ROOT, "results", "cutcount_b1", "rows")
+    C = {}
+    for fn in os.listdir(rowdir):
+        m = re.match(r"C(\d+)\.out$", fn)
+        if not m:
+            continue
+        H = int(m.group(1))
+        C[H] = {}
+        for line in open(os.path.join(rowdir, fn)):
+            p = line.split()
+            if len(p) == 2:
+                C[H][int(p[0])] = int(p[1])
+    if not C:
+        raise SystemExit(f"no Motley C rows in {rowdir}")
+    tri = {}
+    for H in sorted(C):
+        for n in C[H]:
+            v = C[H][n]
+            if H - 1 in C:
+                v -= 2 * C[H - 1].get(n, 0)
+            elif H - 1 >= 1:
+                continue                      # cannot telescope without C_{H-1}
+            if H - 2 in C:
+                v += C[H - 2].get(n, 0)
+            elif H - 2 >= 1:
+                continue
+            tri[(n, H)] = v
+    return tri
 
 
 # ------------------------------------------------------------------ polynomials
