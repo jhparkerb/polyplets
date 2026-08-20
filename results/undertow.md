@@ -200,6 +200,19 @@ The Motley triangle agrees with the incumbent on all 720 cells they share
 (H <= 18), which is the already-known part; what is new is that the tower
 built on it reaches H = 20 and reproduces every tall cell of row 40.
 
+## The parallel engine, at production scale
+
+ayr, `cpp/motley_par.cpp`, H = 18 / Nmax 40, 32 threads, reproducing the five
+banked Confetti residue rows (`results/cutcount_b1/residues/`):
+
+    p=2147483647 wall=3316.25 rss_kb=60159508
+    p=2147483647 IDENTICAL to banked Confetti row
+
+Frontier `states=72487711` — the same count HANDOFF records for Confetti.
+**3316 s per prime against Confetti's ~79,940 s**, i.e. 24x, on a box with
+fewer cores than the one Confetti ran on. Four more primes to go; the runner
+exits nonzero on any mismatch.
+
 ## Four terms reassembled from short sweeps
 
 `experiments/undertow_a41.py --nmax N --max-swept-h H` runs the a(41) pipeline
