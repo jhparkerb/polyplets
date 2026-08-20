@@ -162,8 +162,62 @@ def solve_H(name, K, perturb=None):
     return H
 
 
+def wired_king_ck(K):
+    """King cumulant slopes read off the WIRED P_k, for k = 1..K.
+
+    The gas says c_k(n) = A_k n + B_k. Both sides of that are available for
+    king without touching a cluster weight: the wired diagonal table gives
+    P_k(n) as an exact polynomial, so evaluating F(n,u) = sum_k P_k(n) u^k at
+    several n and taking log F gives c_k(n) at those n. Linearity is then a
+    check with teeth (the P_k have degree k, so c_k's top k-1 coefficients
+    have to cancel) and the surviving slope is what the weights must predict.
+
+    Returns {k: (slope, constant)}, or {} if the wired table is too short.
+    Evaluating and fitting beats carrying polynomials: slog() already does
+    series log over any field, and Fractions make the fit exact.
+    """
+    sys.path.insert(0, os.path.join(ROOT, "experiments"))
+    from slope2_law_vs_truth import read_pk  # noqa: E402
+    wired = read_pk()
+    if max(wired) < K:
+        return {}
+
+    ns = list(range(10, 13 + K))            # >= 3 points, so linearity is real
+    rows = []
+    for n in ns:
+        Fser = [F(1)]
+        for k in range(1, K + 1):
+            co, den = wired[k]
+            v = 0
+            for c in co:                    # descending, Horner
+                v = v * n + c
+            Fser.append(F(v, den))
+        rows.append((n, slog(Fser, K)))
+
+    out = {}
+    for k in range(1, K + 1):
+        pts = [(n, c[k]) for n, c in rows]
+        (n0, y0), (n1, y1) = pts[0], pts[1]
+        slope = (y1 - y0) / (n1 - n0)
+        const = y0 - slope * n0
+        for n, y in pts:
+            if y != slope * n + const:
+                sys.exit("GATE K FAILED: king c_%d is not linear in n "
+                         "(n=%d gives %s, fit says %s)"
+                         % (k, n, y, slope * n + const))
+        out[k] = (slope, const)
+    return out
+
+
 def main():
     K = int(sys.argv[1]) if len(sys.argv) > 1 else 3
+
+    if "--wired-only" in sys.argv:
+        # The king half of gate K, with no cluster weights computed at all --
+        # so the target for a long K=4 run can be read off before it lands.
+        for k, (slope, const) in sorted(wired_king_ck(K).items()):
+            print("wired king c_%d = %s n + %s" % (k, slope, const))
+        return
     print("# parametric master equation: What_c = W_c * b^(2k-l-1), "
           "A_k = [u^k] log H, K = %d" % K, flush=True)
 
@@ -195,40 +249,19 @@ def main():
     print("# %d cumulant slopes reproduced from the cluster weights alone"
           % ok, flush=True)
 
-    # Gate K -- king A_3 is not in the banked table (universal-diagonal-law.md
-    # stops at k = 2 for king), so check it against the WIRED P_k instead:
-    # c_3 = P_3 - P_1 P_2 + P_1^3/3, whose n^3 and n^2 parts must vanish
-    # (linearity) and whose slope must equal A_3.
-    if K >= 3:
-        sys.path.insert(0, os.path.join(ROOT, "experiments"))
-        from slope2_law_vs_truth import read_pk  # noqa: E402
-        wired = read_pk()
-
-        def poly(k):                       # descending coeffs / denominator
-            co, den = wired[k]
-            return [F(c, den) for c in reversed(co)]
-
-        def mul(a, b):
-            out = [F(0)] * (len(a) + len(b) - 1)
-            for i, x in enumerate(a):
-                for j, y in enumerate(b):
-                    out[i + j] += x * y
-            return out
-
-        P1, P2, P3 = poly(1), poly(2), poly(3)
-        c3 = [a - b + c for a, b, c in zip(
-            P3 + [F(0)] * 4, mul(P1, P2) + [F(0)] * 4,
-            [x / 3 for x in mul(mul(P1, P1), P1)] + [F(0)] * 4)]
-        while len(c3) > 1 and c3[-1] == 0:
-            c3.pop()
-        A3 = slog(solve_H("king", K), K)[3]
-        if len(c3) > 2:
-            sys.exit("GATE K FAILED: king c_3 is not linear in n: %s" % c3)
-        if c3[1] != A3:
-            sys.exit("GATE K FAILED: wired king c_3 slope %s != A_3 %s"
-                     % (c3[1], A3))
-        print("# gate K ok king: wired P_1..P_3 give c_3 = %s n + %s, slope "
-              "matches A_3 from the weights" % (c3[1], c3[0]), flush=True)
+    # Gate K -- the banked table stops at k = 2 for king, so every king A_k
+    # above that is checked against the WIRED P_k instead. See wired_king_ck.
+    wired = wired_king_ck(K)
+    if wired:
+        A = slog(solve_H("king", K), K)
+        for k in sorted(wired):
+            slope, const = wired[k]
+            if slope != A[k]:
+                sys.exit("GATE K FAILED: wired king c_%d slope %s != A_%d %s"
+                         % (k, slope, k, A[k]))
+            print("# gate K ok king k=%d: wired P_1..P_%d give c_%d = %s n + "
+                  "%s, slope matches A_%d from the weights"
+                  % (k, k, k, slope, const, k), flush=True)
 
     # RED: bump one cluster weight by 1 and the slopes must move.
     Ab = slog(solve_H("square", K, perturb=(2, 2)), K)
