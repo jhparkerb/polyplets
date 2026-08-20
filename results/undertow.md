@@ -282,6 +282,12 @@ independent range (`results/strip-engine.md`), so levels up to 15 can be
 pinned from cells a second source already covers, with no dependence on the
 production sweep at all.
 
+Re-run at `--jmax 4`, where the shortest pair is `(3, 4)`, the same 342 cells
+come back with 0 wrong from a **completely different pin**: level 19 now pins
+at `H <= 17` and still predicts `T(39,20)` and `T(40,21)`, and levels through
+16 pin at `H <= 14`. So `T(40,21)` — the 36.4-hour cell — is reachable from
+data no taller than H = 17.
+
 ## What the coverage bound actually says (and the measurement it waits on)
 
 With exact depths through `J` and a real sweep of heights `H <= Hs` at
