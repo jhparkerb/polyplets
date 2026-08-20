@@ -92,14 +92,14 @@ def canon(groups):
     return tuple(sorted(tuple(sorted(g)) for g in groups))
 
 
-def succ_state(state, mask, H):
+def succ_state(state, mask, H, expand=1):
     """Successor partition, or None if some live block strands.
 
     A block that no new cell attaches to can never be rejoined (every later
     cell is strictly to the right of the new column), so the configuration is
     dead."""
     R = runs_of(mask, H)
-    nb = [nbhd(b, H) for b in state]
+    nb = [nbhd(b, H, expand) for b in state]
     touch = [frozenset(i for i, N in enumerate(nb)
                        if any((N >> r) & 1 for r in run))
              for run in R]
@@ -194,7 +194,7 @@ def build(H, start, succ, expand=1):
         qi += 1
         row = []
         for mask in range(1, 1 << H):
-            t = succ(s, mask, H, expand) if expand != 1 else succ(s, mask, H)
+            t = succ(s, mask, H, expand)
             if t is None:
                 continue
             j = idx.get(t)
@@ -207,12 +207,53 @@ def build(H, start, succ, expand=1):
     return order, trans
 
 
+def build_flagged(H, start, succ, expand=1):
+    """Same automaton with the exact-height flags the production engine
+    carries (cpp/tma/signature.h b[H], b[H+1]).  The flags are updated from
+    the new column mask alone, so (state, ftop, fbot) is a congruence exactly
+    when state is -- but they BLOCK merges between states that differ in
+    whether row 0 or row H-1 was ever occupied, so this measures what the
+    merge is worth to an engine that does not telescope."""
+    top, bot = 1, 1 << (H - 1)
+    s0 = (start, 0, 0)
+    idx = {s0: 0}
+    order = [s0]
+    trans = []
+    qi = 0
+    while qi < len(order):
+        st, ft, fb = order[qi]
+        qi += 1
+        row = []
+        for mask in range(1, 1 << H):
+            t = succ(st, mask, H, expand)
+            if t is None:
+                continue
+            k = (t, ft | (1 if mask & top else 0), fb | (1 if mask & bot else 0))
+            j = idx.get(k)
+            if j is None:
+                j = len(order)
+                idx[k] = j
+                order.append(k)
+            row.append((bin(mask).count("1"), j))
+        trans.append(row)
+    return order, trans
+
+
+def count_T(order, trans, nmax):
+    """T(n,H): accept only when one block is left AND both boundary rows have
+    been touched, i.e. the animal spans exactly H."""
+    accept = [1 if (len(st) == 1 and ft and fb) else 0 for st, ft, fb in order]
+    return _count(order, trans, accept, nmax)
+
+
 def count_C(order, trans, nmax):
     """C_H(n): words over nonempty column fills whose final state has exactly
     one live block.  Start state is index 0 (the empty frontier)."""
-    accept = [0] * len(order)
-    for i, s in enumerate(order):
-        accept[i] = 1 if len(s) == 1 else 0
+    accept = [1 if len(s) == 1 else 0 for s in order]
+    return _count(order, trans, accept, nmax)
+
+
+def _count(order, trans, accept, nmax):
     dp = [[0] * (nmax + 1) for _ in order]
     dp[0][0] = 1
     tot = [0] * (nmax + 1)
@@ -301,6 +342,43 @@ def main():
             sys.exit("GATE E FAILED H=%d: %d classes vs exactchange's %d"
                      % (H, nkey, BANKED_N[H]))
 
+        # gate F -- the flagged machine emits T(n,H) directly, and it must
+        # agree with the telescope C_H - 2C_{H-1} + C_{H-2} over banked rows.
+        # Two different mechanisms for exact height, same numbers or bust.
+        fr, frT = build_flagged(H, (), succ_state)
+        fk, fkT = build_flagged(H, (), succ_key)
+        Cm1, Cm2 = banked_C(H - 1), banked_C(H - 2)
+        # counting the flagged machine is states x masks x nmax^2; it says
+        # nothing new above the heights where the telescope is already
+        # confirmed, so cap it and keep the state-count column at every H.
+        if H <= 7 and C is not None and Cm1 is not None:
+            Tflag = count_T(fr, frT, nmax)
+            if count_T(fk, fkT, nmax) != Tflag:
+                sys.exit("GATE F FAILED H=%d: flagged key machine disagrees" % H)
+            for n in range(1, nmax + 1):
+                if n not in C or n not in Cm1:
+                    continue
+                tel = C[n] - 2 * Cm1[n] + (Cm2[n] if Cm2 and n in Cm2 else 0)
+                if tel != Tflag[n]:
+                    sys.exit("GATE F FAILED H=%d n=%d: flags give %d, "
+                             "telescope gives %d" % (H, n, Tflag[n], tel))
+            print("# gate F ok H=%d: flagged machine == C_H telescope, n<=%d"
+                  % (H, nmax), flush=True)
+        nrawf, nkeyf = len(fr) - 1, len(fk) - 1
+
+        # rook control: with expand=0 the neighbourhood IS the block, so the
+        # key is the state and nothing merges.  The compression is a fact
+        # about KING adjacency blurring rows, not about strips.
+        rr, _ = build(H, (), succ_state, expand=0)
+        rk, _ = build(H, (), succ_key, expand=0)
+        if len(rr) != len(rk):
+            sys.exit("GATE G FAILED H=%d: rook merged %d -> %d, it must not"
+                     % (H, len(rr) - 1, len(rk) - 1))
+        print("# gate G ok H=%d: on the ROOK lattice the key is the state "
+              "(%d = %d), so nothing merges -- the compression is a fact "
+              "about king adjacency" % (H, len(rr) - 1, len(rk) - 1),
+              flush=True)
+
         # vertical mirror: does the merge subsume the R1 fold, or compose?
         def refl(k):
             out = []
@@ -315,9 +393,10 @@ def main():
         for s in keys[1:]:
             orb.add(min(s, refl(s)))
         rows.append((H, nraw, nkey, len(orb)))
-        print("H=%-3d raw=%-9d key=%-8d ratio=%.3f  key/mirror=%-8d  %.1fs"
-              % (H, nraw, nkey, nraw / nkey, len(orb), time.time() - t0),
-              flush=True)
+        print("H=%-3d raw=%-9d key=%-8d ratio=%.3f  mirror=%-7d "
+              "flagged %d/%d=%.3f  %.1fs"
+              % (H, nraw, nkey, nraw / nkey, len(orb), nrawf, nkeyf,
+                 nrawf / nkeyf, time.time() - t0), flush=True)
 
     # RED control: rook-only attachment must not reproduce king counts
     Hr = min(5, maxh_full)
