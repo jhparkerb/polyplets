@@ -226,3 +226,132 @@ No component of a(41) depends on anything derived from a(41):
 Everything run by this lane was seconds-scale foreground Python on banked
 files (longest single run 1.2 s); no jobs dispatched, nothing on gympie
 beyond reading and arithmetic. Successor queue rows S-A1..S-A4 filed.
+
+## §S-A4 — the software leg of the K=22 family tables (closed 2026-08-20)
+
+Question from the lead: the D_j consumed at k = 20, 21 come from the k = 20..22
+rows of `results/severance_w3_families_K22_e*.txt`, which rested on
+`cpp/severance_w3_families.cpp` alone (Python cross-checks stopped at
+(K, emax) = (9,3), (19,1), (19,2)). How far can the pure-Python path be pushed
+to overlap them, and does it agree?
+
+All runs foreground on banked files, `_load_table` monkeypatched out to force
+the Python DP; timing ladder measured first (K = 9/12/15 at emax 2: 2.6 / 9.5
+/ 25.9 s, ~1.4x per unit K) before committing to the big one.
+
+### emax <= 2: the C++ table is confirmed over its entire range
+
+`families(22, 2)` in pure Python: **150.2 s**. Against
+`results/severance_w3_families_K22_e2.txt`: **207 cells compared (e <= 2,
+k <= 22, all three weight kinds), 0 mismatch** — including all nine (e,k)
+cells at k = 20, 21, 22. The e <= 1 rows double as a check of the `_e1` table
+(a type of final excess <= 1 never passes through higher excess, so the
+emax cap cannot affect those cells; and the derived D_2 below agrees with the
+C++ `_e1`-table path, which closes the loop empirically).
+
+### D_2 and D_3 at k = 20, 21: independently derived, identical
+
+`D_series(2, 22)` and `D_series(3, 22)` computed twice — once from the Python
+families, once (fresh cache) from the C++ tables: **identical at every
+k <= 22**. In particular
+
+    D_2(20), D_3(20), D_2(21), D_3(21)  — all now two-source.
+
+Consequences for a(41)'s weakest joint:
+
+- **Level 20 is now fully grounded on two-source D.** Its three agreeing
+  pairs include the D_4-free pair (2,3), which alone determines the same
+  constants — so nothing at level 20 depends on single-source input anymore.
+- **`D_2(21)` — the defect inside `T(41,20)` itself — is confirmed outright.**
+  Lane B's mod-3^23 integrality argument was the only check it had; it now
+  has a full independent derivation (and the value matches the one Lane B
+  quotes, denominator 3^23 and all).
+- **Level 21's pin still consumes `D_4(21)`** (its only pair is depths (3,4)),
+  and D_4 needs e = 3.
+
+### emax = 3: pushed from k <= 9 to k <= 12; the residual named exactly
+
+Python e3 runs, each against `K22_e3`: K = 10 (62.5 s), 11 (105.5 s), 12
+(169.3 s) — **52 cells at K = 12, 0 mismatch**. Scaling ~1.6x per unit K puts
+Python K = 22 e3 at roughly 3-4 h plus the RAM growth that killed the K = 19
+attempt at 1.5 GB — not foreground; a job request if wanted, but see below
+for why it buys less than it appears to.
+
+Collateral re-verified: `K19_e3` vs `K22_e3` overlap (different C++ runs,
+different span caps 42/47): 228 cells, 0 mismatch.
+
+What actually remains single-source: `severance_w3_gate.py` already validates
+D_4 functionally against 16+ banked cells at k <= 19, which exercises the
+e = 3 family cells at k <= 19 in combination. So the unvalidated surface is
+precisely the **e = 3 rows at k = 20, 21, 22 of `K22_e3`** — nine numbers
+from one C++ run, no dual-run overlap (K19_e3 stops at 19), no Python check,
+no gate coverage — of which the k = 20, 21 cells feed `D_4(21)` and hence
+level 21's single pin pair. That, plus the pinning cells `T(40,19)`/
+`T(39,18)` themselves, is now the entire non-two-source content of a(41)'s
+tower half. A Python e3 push to K = 22 would retire those nine numbers;
+the H = 20 sweep at Nmax 41 would instead make the level-21 *output* a
+holdout and is the stronger artifact per hour.
+
+## §B17 — the integrality-congruence gate (built, GREEN, REDs proven)
+
+`experiments/undertow_congruence_gate.py`. Generalises Lane B's one-off
+D_2(21) observation: a below-onset cell at level k, depth j is
+`P_k(2k+1-j)*3^(-(k+j)) + D_j(k)`, an integer, and `den(D_j(k)) | 3^(k+j)`
+(checked, not assumed — it holds at every j <= 4, k <= 21). So integrality
+pins `D_j(k)`'s numerator mod `3^(k+j)` from `P_k` alone. The modulus grows
+with k and j: **the strongest congruences sit exactly on the frontier's
+unbanked cells**, which is where nothing else reaches.
+
+Ran (0.17 s, GREEN): 71 banked cells checked at full equality (strictly
+stronger than the congruence; subsumes the W3-gate surface and T(40,20)),
+pin cells reported but never counted (by construction), and the two FREE
+cells — the gate's new evidence:
+
+    T(42,21) (k=21, j=1): D_1(21) congruent mod 3^22   OK
+    T(41,20) (k=21, j=2): D_2(21) congruent mod 3^23   OK
+
+`D_1(21)` previously had **zero** checks of any kind; `D_2(21)` gains a third
+leg (C++ table, §S-A4 Python derivation, now the congruence). Fail-closed:
+the FREE surface going empty is itself a gate failure.
+
+RED controls, all fired (0.27 s):
+
+- RED 1: `D_2(21) + 3^-23` caught at the free cell (smallest representable
+  fractional perturbation).
+- RED 2: corrupted `a_21` caught.
+- RED 3 (the blind spot, demonstrated on purpose): an INTEGER shift of a
+  free cell's defect passes — the congruence sees only the fractional part,
+  k+j trits of the value, and the gate's docstring says so.
+- RED 4 (measured, not argued): `D_4(21) + 3^-25` — **the one single-source
+  constant left in a(41)'s tower** — is caught *transitively*: the perturbed
+  pin shifts (a_21, b_21) and integrality breaks at the free cells. So the
+  congruence gate reaches the pin inputs' fractional parts too, which no
+  other check touches. Coverage claim is exactly what RED 4 measured (a
+  3^-25 shift); the integer part of D_4(21) stays uncovered until depth 5
+  or the H=20 sweep.
+
+## §B13 — the depth-5 gate, red-first, predating D_5
+
+`experiments/severance_w3_depth5_gate.py`. The banked surface for depth 5
+already exists — the 15 cells `T(2k-4, k-4)`, k = 5..19 — and had no gate.
+This one is written while `D_5` does not exist, so the emax=4 table lands
+into a gate that predates it.
+
+- **Production run is RED today, by design and fail-closed** (exit 1,
+  verified): `D_series(5,19)` needs `results/severance_w3_families_K*_e4.txt`
+  (K >= 19), which the ayr emax=4 K-ladder has not yet produced. The gate
+  refuses to fall back to the pure-Python emax=4 DP (hours; a hang is not a
+  gate) and says exactly why it is red. A sub-19 intermediate rung of the
+  ladder will not turn it green — `_load_table` requires K >= 19.
+- **The comparator is `severance_w3_gate.check_depth` imported, not
+  reimplemented** — the code proved red here is the code the future table
+  faces.
+- `--selftest` runs today (0.1 s, GREEN): depth-1 anchor, then the empirical
+  depth-5 series (T - law, extracted from the banked cells — a tautological
+  pass, labelled as harness-sanity in the output itself), then a perturbed
+  entry (`+3^-17` at k=12) which the comparator catches. Red-first proof
+  complete with no D_5 anywhere.
+
+Neither gate is wired into `make gates`: `severance_w3_gate.py` itself is
+not, so the standalone-experiment-gate convention was followed — but see
+successor row S-A5, because the Makefile's own meta-warning applies.

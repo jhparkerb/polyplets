@@ -56,7 +56,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 # `make gates` does not run, which is the meta-version of the failure two of
 # this week's commits fixed.  A lint wants an allowlist for the deliberate
 # exclusions (papers, install-hooks, compile-commands), so it is its own change.
-GATE_TARGETS = gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -165,6 +165,23 @@ gate-residual-cells:
 gate-cutcount-assembly:
 	python3 scripts/cutcount_assembly_gate.py --selftest
 	python3 scripts/cutcount_assembly_gate.py
+
+# Undertow's 3-power congruence gate (results/undertow-review-A.md B17).  Every
+# below-onset tower cell is an integer, its main term carries 3^-(k+j) and
+# D_j(k)'s denominator divides 3^(k+j) -- verified, not assumed -- so
+# integrality forces a congruence on each defect mod 3^(k+j).  71 banked cells
+# are checked for full equality; the two defects with no banked cell at all,
+# D_1(21) and D_2(21), get their congruence.  It fails closed if that free set
+# empties.  Four RED controls, including one that catches the single-source
+# D_4(21) transitively through the pin it feeds.
+#
+# NOT here: experiments/severance_w3_depth5_gate.py, which is written red-first
+# and correctly exits 1 until a severance_w3_families_K>=19_e4 table exists.
+# It joins GATE_TARGETS the day depth 5 is computed, not before -- a gate that
+# cannot go green is not a gate the suite should run.
+gate-undertow-congruence:
+	python3 experiments/undertow_congruence_gate.py --selftest
+	python3 experiments/undertow_congruence_gate.py
 
 # Gate PERIMETER-DEFECT: the pruned max-end search vs g2 --siteperim (A), vs
 # its own unpruned control (B), marginal consistency (C), and --split shards
