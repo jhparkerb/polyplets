@@ -227,19 +227,24 @@ def main():
     say(f'# RED ok: perturbed successor maps give {got}, none 93')
 
     say('')
-    say('H  cellstates  colstates  d(p1)  d(p2)  A0 mean/max  A1 mean/max  '
-        'dense d/2  wall_s')
+    # char 2 goes through the IDENTICAL code path and the identical RREF basis
+    # convention, so any difference in the weights is the characteristic and
+    # not the basis choice.  That control is the whole point of the table.
+    say('H  cellstates  colstates | d_p  A0_p  A1_p  nnz_p | d_2  A0_2  A1_2  '
+        'nnz_2 | dense d_p/2  wall_s')
     for H in range(4, maxh + 1):
         t0 = time.time()
         n, d1, w = run_height(H, PRIMES[0])
-        _, d2_, _ = run_height(H, PRIMES[1], want_weights=False)
-        if d1 != d2_:
+        _, d1b, _ = run_height(H, PRIMES[1], want_weights=False)
+        if d1 != d1b:
             say(f'PRIME DISAGREEMENT H={H}: {PRIMES[0]}->{d1} '
-                f'{PRIMES[1]}->{d2_}')
+                f'{PRIMES[1]}->{d1b}')
             return 1
-        a0, a1 = w[0], w[1]
-        say(f'{H}  {n}  {motzkin(H+1)-1}  {d1}  {d2_}  '
-            f'{a0.mean():.2f}/{a0.max()}  {a1.mean():.2f}/{a1.max()}  '
+        _, d0, w0 = run_height(H, 2)
+        a0, a1 = w[0].mean(), w[1].mean()
+        b0, b1 = w0[0].mean(), w0[1].mean()
+        say(f'{H}  {n}  {motzkin(H+1)-1} | {d1}  {a0:.2f}  {a1:.2f}  '
+            f'{d1*(a0+a1):.0f} | {d0}  {b0:.2f}  {b1:.2f}  {d0*(b0+b1):.0f} | '
             f'{d1/2:.1f}  {time.time()-t0:.1f}')
     return 0
 
