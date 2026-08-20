@@ -125,6 +125,16 @@ anything. That file calls the kills "merely asserted". The queue rows live on
 the unmerged `triangle-structure` branch
 (`git show triangle-structure:results/triangle-r3-queue.md`).
 
+**Of those two, only L3-3 is actually open.** L3-4 is "sweep the 4-connected
+complement components (moats) instead of the foreground", which is the
+dual-connectivity TM that `lastditch-ideas.md` §6 closes with a counterexample
+and a measured state comparison — `b·Cat(b)` against `Bell(b)`, 11,440 vs
+4,140 at `b = 8`, so the dual is *worse*. That kill is sound and independent of
+any floor; r4-floors' objection lands only on the reason the queue gave, not on
+the conclusion. L3-3 has no such second kill, and its own queue row prices it
+"level-1 value only" — i.e. a candidate second source, not a reach lever, which
+is the lane the B1 ladder already occupies more cheaply.
+
 Same file's **INV-4** asks whether B1's coincidence-partition state compresses.
 That question is now known to be answerable, and to have answered "no, the
 states are not minimal" once — see #1. Flagged, not pursued, because #1 is
