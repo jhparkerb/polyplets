@@ -5,6 +5,14 @@
 Branch `lastditch`. Full record `results/undertow.md`; candidate list, closed
 doors included, `docs/lastditch-ideas.md`.
 
+**a(n) IS RULE-INDEPENDENT FOR EVERY n <= 39, AND a(40) IS SHORT ONE CELL.**
+`experiments/undertow_ri.py`, per-row towers each excluding their own row from
+their pinning set, built from W1's ab-initio levels 1-9, Motley's own cells at
+H <= 18, ab-initio `D_j` (j <= 4) and the grand form -- nothing the incumbent
+produced. Rows 30..39 come out COMPLETE with every reassembled sum matching
+the b-file; row 40's gap is `T(40,19)` alone. The banked state was n <= 35.
+`T(40,19)` is a Motley H = 19 run: priced at 27-40 days, now ~11 h.
+
 **`docs/b1-closure-plan.md` §1's rule was costing the two tallest cells per
 level, and it did not have to.** The grand form makes level `k` carry exactly
 two new constants, so any two independent linear equations pin it — and
