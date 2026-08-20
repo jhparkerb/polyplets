@@ -1,5 +1,88 @@
 # HANDOFF — live state (updated 2026-08-20)
 
+## 2026-08-20 (latest) — a(41) LANDED, AND a(n) IS RULE-INDEPENDENT TO n <= 39
+
+Branch `lastditch`. Records: `results/undertow.md` (with its corrections
+section), `results/a41/PROVENANCE.md`, `results/undertow-picture.md`,
+`docs/lastditch-ideas.md` (candidates and closed doors),
+`docs/five-terms-plan.md` (proposed, not launched), and the three review lanes
+`results/undertow-review-{A,B,C}.md` + `results/undertow-review-queue.md`.
+
+**a(41) = 393811462683918679824582849262105.** Heights 1..19 real (4.72 h on
+40 cores of dalby, cpu 605,643 s, rss 557 MB, run-dir under 100 GB); heights
+20..41 from the Undertow-pinned tower. The classical route needed H = 21 at
+Nmax 41, i.e. a(40)'s two tall phases: 9.6 h/48c and 36.4 h/32c with a
+363.4 GB disk peak. Neither was run. Independently recomputed by a second
+implementation that never reads the wired table (`lane_b_a41_recount.py`) —
+AGREE. Growth 6.9394, successive differences 0.0049, 0.0047, 0.0044, 0.0042.
+
+**a(n) is rule-independent for every n <= 39** (was n <= 35), and a(40) is
+short exactly one cell, `T(40,19)`. `experiments/undertow_ri.py`: per-row
+towers, each excluding its own row from its pinning set, built from Severance
+W1's cluster-weight file, Motley's own C_H rows at H <= 18, ab-initio `D_j`,
+and the grand form. No incumbent file is read.
+
+**Undertow** (`experiments/undertow_pin.py`): `docs/b1-closure-plan.md` §1
+costs a level its two tallest cells; the grand form only needs two independent
+linear equations, and W3's ab-initio `D_j(k)` makes every BELOW-onset cell one.
+Level `k` pins from height `k+1-j`. Sweep ceiling `(n+2)/2 -> (n-3)/2`.
+
+**The parallel Motley engine** (`cpp/motley_par.cpp`, gate
+`tests/gate_motley_par.py`): 1560 cell-comparisons against banked rows, all
+five banked H = 18 Confetti residue rows reproduced byte for byte at ~3350 s
+per prime against ~79,940 s, and rung G (chunked release) built. Measured
+H = 19 frontier: **224,529,648 states**.
+
+### What the Fable review changed — read this before quoting any figure
+
+`results/undertow-review-A.md` graded the claims. **No circularity anywhere**,
+but three figures were inflated and are corrected in place:
+
+- "342 cells re-derived from shorter cells" is **189 enumerated** plus 153
+  formula-vs-formula identities — the a(40) run INJECTED its H >= 22 cells
+  from `diagCoeffTable` rather than enumerating them.
+- "100 depth pairs" is 100 pairs, **~36 independent checks** (pairs share
+  cells; a level with c cells carries c-2).
+- a(39)/a(38)/a(37) "reassembled from short sweeps" contain **no Undertow at
+  all** — the pin loop is empty at those n — and consume wired constants
+  fitted to cells above their own stated cap.
+- The `--predict` "T(40,21) match" is by construction and worth zero; the
+  audit's re-derivation of the same cell from H <= 17 pins is the real result,
+  and it is **the first independent cross-check wired P_19 has ever had**.
+
+**The residual, named exactly** (Lane A, S-A4): `D_2` and `D_3` are now
+two-source through k = 22 (pure-Python family DP vs the C++ tables, verified
+by the lead with the tables hidden). The entire non-two-source content of
+a(41)'s tower half is **nine numbers** — the e=3 rows at k = 20, 21, 22 of
+`results/severance_w3_families_K22_e3.txt` — plus the two pinning cells
+`T(40,19)`, `T(39,18)`.
+
+**The decision that follows** (Lane B, B4/B5): every tower statement about
+`T(40,19)` contains `D_3(21)`, so two tower routes agreeing checks the pinning
+cells and never the shared machinery. **Only enumeration crosses assumption
+families**, which makes Motley `C_19` the buy for closing `T(40,19)` — not
+depth 5, which buys agreement inside the same machinery.
+
+**Closed doors, with counterexamples** (`docs/lastditch-ideas.md`): the
+dual-connectivity TM; the per-level span cap in the family DP (9x faster, 5x
+smaller, and it UNDERCOUNTS — a prefix's span is bounded by the FINAL
+cluster's cell count); and depths 8-9, killed on a measured ~6x per excess.
+
+### Open, and whose
+
+- **Motley `C_19`** closes `T(40,19)` and with it a(40). Gated on the H = 18
+  release-path check now running (that path has only ever run at H <= 13).
+  ~63 GB at u16 with release; census already done.
+- **H = 20 sweep at Nmax 41** (`scripts/dalby_a41_h20.sh`) makes level 21's
+  output a holdout against an enumeration. **~11 h / ~190 GB** — the earlier
+  20-30 h / 450 GB in this tree was asserted before anything was measured.
+- **Depth 5** is marginal, not cheap: emax=4 at K=21 is 16-355 GB depending on
+  the slope, and every slope quoted so far mixes thread counts (the DP builds
+  per-thread private maps). A same-thread K-ladder is running on ayr.
+- **The five-terms sweep** (`docs/five-terms-plan.md`) is disk-capped at
+  Nmax 43 as things stand, and is his call, not mine.
+
+
 ## 2026-08-20 (latest) — UNDERTOW: THE DIAGONAL TOWER PINS FROM BELOW
 
 Branch `lastditch`. Full record `results/undertow.md`; candidate list, closed
