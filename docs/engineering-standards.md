@@ -75,6 +75,42 @@ actually bit us (only a human verifying "is my fix *in* this binary?" can). See
 [job-checklist.md](job-checklist.md) item 4: before any run whose result you keep,
 confirm the deployed binary's rev is clean **and** contains the change you intend.
 
+## 5. Code reaches a remote box by `git pull`, and by nothing else
+
+**jasonp's ruling, 2026-08-20**, and the trade he named: in exchange for
+pushing whenever commits are made, code arrives on ayr and dalby **via git
+pulls only**, and runs from **one checkout** per box — or a sharply limited
+number of worktrees, each one a real worktree of that checkout.
+
+No `rsync`, no `scp` of source, no hand-copied `foo2.cpp` / `foo4.cpp`
+alongside `foo.cpp`. Job scripts are committed and invoked from the checkout.
+Binaries are built by the Makefile in the checkout, so `GIT_REV` is a rev.
+
+What this cost before it was a rule, all in one night on one branch:
+
+- **A tree that could not pull.** ayr's `~/src/polyominoes` had its `origin`
+  pointing at a **local bundle file**, so no amount of pushing would have
+  reached it; twenty-odd files arrived by `scp` instead and sat untracked.
+- **A silent path bug.** `rsync -a a b c host:dir/` flattens — a generator
+  edit landed at the repo root instead of `scripts/`, so a "fixed" gate run
+  was silently testing the unfixed generator.
+- **A stray polluting a gate.** A hand-copied `cpp/motley_par_rel.cpp` left on
+  ayr was picked up by `cpp/*.cpp` in `scripts/compile_db_sources.txt` and
+  failed `gate-compile-db` on a file that is not in the repo at all.
+- **A missing build rule.** `cpp/motley_par.cpp` was built by hand on two
+  boxes and had no Makefile rule for a whole night, so the engine that
+  produced the night's results was not buildable from the tree. The
+  compile-database gate is what eventually said so.
+- **A provenance defect on a record run.** The job meant to close a(40) was
+  launched from a binary built out of a hand-copied source stamped
+  `GIT_REV="lastditch3"` — not a rev. Item 4 above forbids exactly this, and
+  copying-not-pulling is how it happened anyway.
+
+The rule is cheap to follow and each of those was expensive to find. It also
+composes with item 4: if the only way code arrives is a pull, then "is the
+deployed binary's rev clean and does it contain my change?" is answerable by
+`git log` on the box instead of by memory.
+
 ## What these do NOT cover
 
 These catch **regressions vs. known-good behavior**, fast. They do not certify a
