@@ -189,12 +189,24 @@ def main():
     # Everything below is capped at the same height the assembly is: a run that
     # says "from heights <= H" must not pin from taller cells either.
 
-    # The target row must not pin its own tower.
+    # Two towers, because they answer different questions.
+    #  - the REGRESSION tower is pinned with row 40 excluded and is checked
+    #    against row 40's banked cells: does the machinery still agree with the
+    #    term we already have?
+    #  - the ASSEMBLY tower excludes the target row (row 41 has no cells to
+    #    exclude) and is what actually produces the new row.
+    # Pointing one tower at both jobs either makes the regression circular or
+    # makes it vacuous; the first run of this script made it vacuous, which is
+    # the better of the two failures but still a failure.
+    hlo = (int(hcap) + 1) if hcap else 20
+    if n != 40:
+        abr, Djr, tri, kwr = build(jmax, 40 - hlo, forbid_row=40,
+                                   hmax=int(hcap) if hcap else None)
+        regression(abr, Djr, tri, kwr, n=40, hlo=hlo)
     ab, Dj, tri, kw = build(jmax, kmax_new, forbid_row=n,
                             hmax=int(hcap) if hcap else None)
-    hcap0 = opt("--max-swept-h")
-    regression(ab, Dj, tri, kw, n=n,
-               hlo=(int(hcap0) + 1) if hcap0 else 20)
+    if n == 40:
+        regression(ab, Dj, tri, kw, n=40, hlo=hlo)
 
     if os.path.isdir(perheight):
         sweep_agrees_with_banked(perheight, tri, int(hcap) if hcap else None)
