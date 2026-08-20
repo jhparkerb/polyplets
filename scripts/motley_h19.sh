@@ -27,7 +27,11 @@
 # Kill: kill the PID in $OUT/pid.  Resume: re-run -- passes whose output file
 # exists are skipped, and each pass checkpoints at every column boundary.
 set -euo pipefail
-BIN=${MOTLEY_BIN:-$HOME/src/pm-lastditch/build/motley_par4}
+# Repo root from the script's own path, and the binary the Makefile built
+# there -- docs/engineering-standards.md 5: code arrives by pull, runs from a
+# checkout (or a worktree of one), and the binary carries a real GIT_REV.
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BIN=${MOTLEY_BIN:-$ROOT/build/motley_par}
 OUT=${MOTLEY_OUT:-$HOME/var/motley-h19}
 H=19
 NMAX=${MOTLEY_NMAX:-40}
