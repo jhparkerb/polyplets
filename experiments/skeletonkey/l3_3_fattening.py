@@ -131,6 +131,22 @@ def image(animal, convention):
     return img
 
 
+def decode(img):
+    """Recover the animal: the king cells are exactly the FULL 2x2 blocks.
+
+    Sound under "lex" for a reason that is a proof, not a measurement. Block
+    (x, y) owns refined cell (2x, 2y) at grid corner (x, y), and the two
+    candidates at that corner are always (x-1, y-1) and (x, y) -- so the block
+    itself is the lex-LARGER candidate there and never wins that mark. Its
+    bottom-left cell therefore stays empty unless the block is a real animal
+    cell, a block is never completed by marks, and the map is injective.
+    """
+    blocks = defaultdict(int)
+    for (u, v) in img:
+        blocks[(u // 2, v // 2)] += 1
+    return frozenset(k for k, c in blocks.items() if c == 4)
+
+
 def pinched(img):
     """A corner of the REFINED grid with exactly one diagonal pair filled."""
     for (x, y) in list(img):
@@ -158,6 +174,7 @@ def main():
         red = convention == "none"
         seen = defaultdict(list)
         bad_pinch = None
+        bad_decode = None
         for n, lv in enumerate(levels, start=1):
             for a in sorted(lv, key=sorted):
                 img = image(a, convention)
@@ -165,6 +182,8 @@ def main():
                     p = pinched(img)
                     if p is not None:
                         bad_pinch = (n, sorted(a), p)
+                if bad_decode is None and decode(img) != a:
+                    bad_decode = (n, sorted(a), sorted(decode(img)))
                 seen[norm(img)].append((n, tuple(sorted(a))))
 
         collisions = [v for v in seen.values() if len(v) > 1]
@@ -177,6 +196,13 @@ def main():
             n, a, p = bad_pinch
             print("%s   pinch-free : NO -- first at n=%d %s, refined corner "
                   "%s/%s" % (tag, n, a, p[0], p[1]))
+        if bad_decode is None:
+            print("%s   full-block decode : recovers the animal every time"
+                  % tag)
+        else:
+            n, a, got = bad_decode
+            print("%s   full-block decode : FAILS at n=%d %s -> %s"
+                  % (tag, n, a, got))
         if not collisions:
             print("%s   injective  : YES, %d distinct images"
                   % (tag, len(seen)))
