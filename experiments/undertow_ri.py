@@ -127,7 +127,19 @@ def main():
                 bad += 0 if int(v) == inc[(row, H)] else 1
                 if int(v) != inc[(row, H)]:
                     print(f"    MISMATCH T({row},{H}) k={k}")
+        # Rows at or below hmax are covered by Motley outright: the tower band
+        # is empty and there is nothing for it to do.  Reporting them as a
+        # crash (min() of an empty band) meant the pure-Motley rows were
+        # claimed and never attested -- Lane A, S-A3.
         mot = [H for H in range(1, min(hmax, row) + 1) if (row, H) in mtri]
+        if mot and not tower_h and len(mot) == row:
+            total_m = sum(mtri[(row, H)] for H in mot)
+            tag = "COMPLETE, sum MATCHES a(%d)" % row if A.get(row) == total_m \
+                else ("COMPLETE, a(%d) = %d" % (row, total_m) if row not in A
+                      else "COMPLETE but sum WRONG")
+            print(f"row {row:2d}: Motley H<={max(mot):2d} ({len(mot)} cells), "
+                  f"tower not needed -- {tag}")
+            continue
         if not mot:
             print(f"row {row:2d}: Motley has no cells for this row "
                   f"(its C rows stop at Nmax) -- skipped")

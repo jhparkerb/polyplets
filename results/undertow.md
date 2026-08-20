@@ -80,10 +80,18 @@ every wired level. It is.
     ...
     T(40,21) k=19: match
 
-`T(40,21)` — the one cell `docs/b1-closure-plan.md` §3 says
-"never fits", the reason its §6 table reads "out of RAM at any rung" — comes
-out of the formula and matches the banked value. Every in-onset banked cell of
-rows 40 and below that the tower touches matches; the run prints them.
+`T(40,21)` matches — **and that match is worth nothing.** `--predict` takes
+its wired levels from `extract_ab(read_pk())`, and level 19's only in-onset
+banked cells are `T(39,20)` and `T(40,21)`, which are `P_19`'s own two fit
+anchors. A two-constant exact fit reproduces its own fitting data. Every
+"match" line this mode can print is by construction: fit anchors, or the
+H >= 22 cells the a(40) run injected from `diagCoeffTable` rather than
+enumerating.
+
+The lead reported this line as the headline result before the audit caught
+it. The real re-derivation of `T(40,21)` is in the audit section below —
+level 19 pinned from cells at H <= 17, predicting a cell at H = 21 — and
+that one is genuine.
 
 Level 20, which the wired table never had, is pinned **overdetermined**: three
 depth pairs, two independent checks, all agreeing. It predicts
