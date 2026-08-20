@@ -37,6 +37,7 @@ Usage: python3 experiments/skeletonkey/parametric_master.py [KMAX]
 
 import os
 import sys
+import time
 from fractions import Fraction as F
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -115,13 +116,34 @@ def clusters(K):
     return out
 
 
+_WCACHE = {}
+
+
+def weight(name, sizes):
+    """cluster_weight, cached and timed.
+
+    Cached because the RED control re-solves square and would otherwise pay
+    for every weight twice; timed because at K = 4 a single weight is the
+    unit of progress, and a run that prints nothing for an hour is
+    indistinguishable from a hung one -- which is what the first K = 4
+    attempt looked like when it died inside hex.
+    """
+    key = (name, sizes)
+    if key not in _WCACHE:
+        t0 = time.time()
+        _WCACHE[key] = cluster_weight(LATTICES[name][0], sizes)
+        print("#   W %-6s %-14s = %-12d %8.1f s"
+              % (name, str(sizes), _WCACHE[key], time.time() - t0), flush=True)
+    return _WCACHE[key]
+
+
 def solve_H(name, K, perturb=None):
     D, b = LATTICES[name]
     hat = []
     for sizes in clusters(K):
         l = len(sizes)
         k = sum(sizes) - l
-        w = cluster_weight(D, sizes)
+        w = weight(name, sizes)
         if perturb is not None and sizes == perturb:
             w += 1
         hat.append((F(w) * F(b) ** (2 * k - l - 1), k, l))
@@ -145,9 +167,12 @@ def main():
     print("# parametric master equation: What_c = W_c * b^(2k-l-1), "
           "A_k = [u^k] log H, K = %d" % K, flush=True)
 
+    print("# clusters at K=%d: %s"
+          % (K, ", ".join(str(c) for c in clusters(K))), flush=True)
+
     for name, (D, b) in LATTICES.items():
         for sizes, want in BANKED_W[name].items():
-            got = cluster_weight(D, sizes)
+            got = weight(name, sizes)
             if got != want:
                 sys.exit("GATE W FAILED %s %s: %d != banked %d"
                          % (name, sizes, got, want))
