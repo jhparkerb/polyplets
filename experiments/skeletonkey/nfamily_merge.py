@@ -39,6 +39,13 @@ import sys
 import time
 from collections import defaultdict
 
+# results/exactchange-probes.md section 6, minimized state counts N(H),
+# H = 4..11, computed there by a separate implementation (a GF(2) Nerode
+# closure).  Gate E is a two-implementation cross-check: this probe never
+# reads that code, so agreement is independent corroboration and disagreement
+# means one of us is wrong.
+BANKED_N = {4: 8, 5: 19, 6: 43, 7: 101, 8: 239, 9: 575, 10: 1399, 11: 3441}
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 ROWDIR = os.path.join(ROOT, "results", "cutcount_b1", "rows")
@@ -63,15 +70,22 @@ def runs_of(mask, H):
 
 
 def nbhd(block, H, expand=1):
-    """N(b): the rows of the NEXT column that a new cell can use to attach to
-    block b.  King adjacency is |dr| <= 1, so expand=1.  expand=0 is the RED
-    control (rook-only attachment), which must not reproduce king counts."""
-    s = set()
+    """N(b) as a BITMASK: the rows of the NEXT column at which a new cell
+    attaches to block b.  King adjacency is |dr| <= 1, so expand=1.  expand=0
+    is the RED control (rook-only attachment), which must not reproduce king
+    counts.
+
+    A bitmask, not a frozenset, on purpose: an N-key is a SORTED multiset of
+    these, and `sorted` over frozensets sorts by the SUBSET partial order,
+    which is not a total order -- two equal multisets presented in different
+    orders can then canonicalize differently and split one class into two.
+    Integers sort totally, so the key is a genuine canonical form."""
+    m = 0
     for r in block:
         for d in range(-expand, expand + 1):
             if 0 <= r + d < H:
-                s.add(r + d)
-    return frozenset(s)
+                m |= 1 << (r + d)
+    return m
 
 
 def canon(groups):
@@ -86,7 +100,8 @@ def succ_state(state, mask, H):
     dead."""
     R = runs_of(mask, H)
     nb = [nbhd(b, H) for b in state]
-    touch = [frozenset(i for i, N in enumerate(nb) if any(r in N for r in run))
+    touch = [frozenset(i for i, N in enumerate(nb)
+                       if any((N >> r) & 1 for r in run))
              for run in R]
     used = set()
     for t in touch:
@@ -133,7 +148,8 @@ def succ_key(key, mask, H, expand=1):
     a-priori automaton.  Same shape as succ_state, reading each old block only
     through its neighbourhood set."""
     R = runs_of(mask, H)
-    touch = [frozenset(i for i, N in enumerate(key) if any(r in N for r in run))
+    touch = [frozenset(i for i, N in enumerate(key)
+                       if any((N >> r) & 1 for r in run))
              for run in R]
     used = set()
     for t in touch:
@@ -281,9 +297,20 @@ def main():
             sys.exit("GATE D FAILED H=%d: %d classes vs %d key states"
                      % (H, cls, nkey))
 
+        if H in BANKED_N and nkey != BANKED_N[H]:
+            sys.exit("GATE E FAILED H=%d: %d classes vs exactchange's %d"
+                     % (H, nkey, BANKED_N[H]))
+
         # vertical mirror: does the merge subsume the R1 fold, or compose?
         def refl(k):
-            return tuple(sorted(frozenset(H - 1 - r for r in N) for N in k))
+            out = []
+            for N in k:
+                m = 0
+                for r in range(H):
+                    if (N >> r) & 1:
+                        m |= 1 << (H - 1 - r)
+                out.append(m)
+            return tuple(sorted(out))
         orb = set()
         for s in keys[1:]:
             orb.add(min(s, refl(s)))
@@ -311,6 +338,9 @@ def main():
         keys, _ = build(H, (), succ_key, expand=1)
         nkey = len(keys) - 1
         want = motzkin(H + 1) - 1
+        if H in BANKED_N and nkey != BANKED_N[H]:
+            sys.exit("GATE E FAILED H=%d: %d classes vs exactchange's %d"
+                     % (H, nkey, BANKED_N[H]))
         print("H=%-3d raw=%-12d key=%-9d ratio=%.3f   %.1fs"
               % (H, want, nkey, want / nkey, time.time() - t0), flush=True)
         rows.append((H, want, nkey, None))
