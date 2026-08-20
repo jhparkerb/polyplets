@@ -451,7 +451,6 @@ static std::vector<size_t> load_sizes(const std::string& path, int H, int Nmax) 
 template <class T>
 static void step_modp(Buf* cur, Buf* nxt, int H, int Nmax, int r, int c, u64 p,
                       bool release) {
-  const int NA = Nmax + 1;
   run_step(cur, nxt, [&](size_t sid, Alloc& al) {
       Succ s[SUCC_CAP];
       int m = successors(cur->rowkey(sid), H, r, c, s);

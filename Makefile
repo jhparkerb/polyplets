@@ -346,6 +346,22 @@ build/strip_tm: cpp/strip_tm.cpp | build
 build/strip_mu: cpp/strip_mu.cpp | build
 	$(CXX) $(CXXFLAGS) -O3 $< -o $@
 
+# motley_par: the PARALLEL Motley engine (results/motley-par/README.md).  Same
+# frozen rule core as results/cutcount_b1/cutcount_b1.cpp.59e90660; the
+# parallelism, the flat arena and the chunked release are accounting.  -fopenmp
+# is not optional -- the cell-step is an OpenMP loop -- and scripts/
+# gen_compile_commands.sh mirrors that so clangd and gate-compile-db agree.
+build/motley_par: cpp/motley_par.cpp cpp/obs.h | build
+	$(CXX) $(CXXFLAGS) -O2 -fopenmp -o $@ $<
+
+# Gate the parallel engine against the BANKED exact C_H rows at three payload
+# widths, byte-identically against cutcount_b1, and for thread-count
+# determinism.  Not in GATE_TARGETS: it needs build/motley_par and a few
+# minutes, so it lives with the ns-gates rather than the fast suite.
+gate-motley-par: build/motley_par
+	python3 tests/gate_motley_par.py --selftest
+	python3 tests/gate_motley_par.py 10
+
 build/strip_mu_kink: cpp/strip_mu_kink.cpp core/signature.h core/transition.h | build
 	$(CXX) $(CXXFLAGS) -O3 -I. $< -o $@
 

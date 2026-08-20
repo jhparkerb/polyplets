@@ -60,8 +60,14 @@ def flags_for(f):
         return args + zstd_flags
     extra = ["-Icpp"]
     with open(f) as fh:
-        if "gmpxx.h" in fh.read():
-            extra += gmp_flags
+        src = fh.read()
+    if "gmpxx.h" in src:
+        extra += gmp_flags
+    # A source that really needs OpenMP must record it, or the DB lies and
+    # check_compile_commands.sh fails on <omp.h> -- which is what it is for.
+    # Mirrors the Makefile's own rule for that binary.
+    if "<omp.h>" in src:
+        extra += ["-fopenmp"]
     return args + extra
 
 sources = sorted(f for pat in open("scripts/compile_db_sources.txt")
