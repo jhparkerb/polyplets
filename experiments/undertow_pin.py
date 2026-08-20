@@ -162,6 +162,13 @@ def load_depths(jmax, K):
 
 
 # ------------------------------------------------------------------ modes
+def all_pairs(k, jmax, tri):
+    """Every depth pair whose two cells are banked, as (j1, j2)."""
+    have = [j for j in range(1, jmax + 1)
+            if k + 1 - j >= 1 and (2 * k + 1 - j, k + 1 - j) in tri]
+    return [(have[i], have[j]) for i in range(len(have)) for j in range(i + 1, len(have))]
+
+
 def verify(jmax=3):
     P, tri = read_pk(), read_tri()
     kmax = max(P)
@@ -171,29 +178,30 @@ def verify(jmax=3):
     Dj = load_depths(jmax, kmax)
     print(f"ab-initio depth series loaded for j = 1..{jmax}, k <= {kmax}")
 
-    ok = bad = skip = 0
+    ok = bad = skip = npairs = 0
     for k in sorted(ab):
-        cells = [j for j in range(1, jmax + 1)
-                 if k + 1 - j >= 1 and (2 * k + 1 - j, k + 1 - j) in tri]
-        if len(cells) < 2:
+        pairs = all_pairs(k, jmax, tri)
+        if not pairs:
             skip += 1
             continue
-        depths = cells[:2]
-        got = pin_level(k, {j: ab[j] for j in ab if j < k}, depths, tri, Dj)
+        lower = {j: ab[j] for j in ab if j < k}
         want = ab[k]
-        tallest = k + 1 - min(depths)
-        onset_h = k + 2
-        mark = "OK " if got == want else "BAD"
-        if got == want:
-            ok += 1
-        else:
+        wrong = [d for d in pairs if pin_level(k, lower, d, tri, Dj) != want]
+        npairs += len(pairs)
+        tallest = k + 1 - min(min(d) for d in pairs)
+        mark = "OK " if not wrong else "BAD"
+        if wrong:
             bad += 1
-        print(f"  k={k:2d} depths={depths} pin height {tallest:2d} "
-              f"(onset anchors need {onset_h:2d})  {mark}")
-        if got != want:
-            print(f"      got  a={got[0]} b={got[1]}")
-            print(f"      want a={want[0]} b={want[1]}")
-    print(f"\nverify: {ok} levels re-derived exactly, {bad} wrong, {skip} skipped")
+        else:
+            ok += 1
+        print(f"  k={k:2d} {len(pairs)} depth pairs, tallest cell H={tallest:2d} "
+              f"(onset anchors need H={k+2:2d})  {mark}")
+        for d in wrong:
+            got = pin_level(k, lower, d, tri, Dj)
+            print(f"      pair {d}: got a={got[0]} b={got[1]}")
+            print(f"                want a={want[0]} b={want[1]}")
+    print(f"\nverify: {ok} levels re-derived exactly over {npairs} depth pairs, "
+          f"{bad} wrong, {skip} skipped")
     return bad == 0 and ok >= 10
 
 
@@ -234,17 +242,24 @@ def predict(jmax=3, kmax_new=21):
     Dj = load_depths(jmax, kmax_new)
 
     for k in range(kw + 1, kmax_new + 1):
-        cells = [j for j in range(1, jmax + 1)
-                 if (2 * k + 1 - j, k + 1 - j) in tri]
-        if len(cells) < 2:
-            print(f"  k={k}: only {len(cells)} banked below-onset cells at "
-                  f"j <= {jmax} -- needs deeper depths")
+        pairs = all_pairs(k, jmax, tri)
+        if not pairs:
+            print(f"  k={k}: no banked below-onset pair at j <= {jmax} "
+                  f"-- needs deeper depths")
             continue
-        depths = cells[:2]
-        ab[k] = pin_level(k, {j: ab[j] for j in ab if j < k}, depths, tri, Dj)
-        print(f"  k={k:2d} pinned from depths {depths} "
-              f"= cells T({2*k+1-depths[0]},{k+1-depths[0]}), "
-              f"T({2*k+1-depths[1]},{k+1-depths[1]})")
+        lower = {j: ab[j] for j in ab if j < k}
+        sols = {d: pin_level(k, lower, d, tri, Dj) for d in pairs}
+        vals = set(sols.values())
+        if len(vals) != 1:
+            print(f"  k={k:2d} INCONSISTENT across {len(pairs)} depth pairs:")
+            for d, v in sols.items():
+                print(f"      {d}: a={v[0]} b={v[1]}")
+            raise SystemExit("PREDICT RED: depth pairs disagree")
+        ab[k] = vals.pop()
+        cells = ", ".join(f"T({2*k+1-j},{k+1-j})" for j in
+                          sorted({x for d in pairs for x in d}))
+        print(f"  k={k:2d} pinned, {len(pairs)} depth pairs AGREE "
+              f"({len(pairs)-1} independent checks); cells {cells}")
 
     print("\npredicted cells (formula vs banked where banked exists):")
     E = grand_form(ab, max(ab))
@@ -262,6 +277,45 @@ def predict(jmax=3, kmax_new=21):
                 print(f"  T({n},{H}) k={k}: {v}  [NEW -- no sweep has this cell]")
 
 
+def emit(jmax=4, kmax_new=21):
+    """Print orchestrator/sweep.go diagCoeffTable entries for the pinned levels.
+
+    Coefficients descending over kfact = k!, exactly as the wired table stores
+    them; a level whose coefficients are not integral over k! is refused rather
+    than rounded."""
+    import math
+    P, tri = read_pk(), read_tri()
+    kw = max(P)
+    ab = extract_ab(P, kw)
+    Dj = load_depths(jmax, kmax_new)
+    for k in range(kw + 1, kmax_new + 1):
+        pairs = all_pairs(k, jmax, tri)
+        if not pairs:
+            print(f"// k={k}: no banked below-onset pair at j <= {jmax}")
+            continue
+        lower = {j: ab[j] for j in ab if j < k}
+        sols = {d: pin_level(k, lower, d, tri, Dj) for d in pairs}
+        if len(set(sols.values())) != 1:
+            raise SystemExit(f"EMIT RED: depth pairs disagree at k={k}")
+        ab[k] = next(iter(sols.values()))
+        poly = grand_form(ab, k)[k]                    # ascending in n
+        kfact = math.factorial(k)
+        desc = []
+        for c in reversed(poly):
+            v = c * kfact
+            if v.denominator != 1:
+                raise SystemExit(f"EMIT RED: k={k} coefficient {c} not integral over {k}!")
+            desc.append(str(v.numerator))
+        while len(desc) < k + 1:                        # pad leading zeros
+            desc.insert(0, "0")
+        cells = ", ".join(f"T({2*k+1-j},{k+1-j})" for j in
+                          sorted({x for d in pairs for x in d}))
+        print(f"\t// k={k}: Undertow-pinned from below-onset cells {cells};")
+        print(f"\t// {len(pairs)} depth pairs agree ({len(pairs)-1} independent checks).")
+        print("\t%d: {[]string{%s}, %d}," %
+              (k, ", ".join('"%s"' % c for c in desc), kfact))
+
+
 def main():
     jmax = 3
     for a in sys.argv[1:]:
@@ -269,6 +323,8 @@ def main():
             jmax = int(a.split("=")[1])
     if "--selftest" in sys.argv:
         selftest(jmax)
+    elif "--emit" in sys.argv:
+        emit(jmax)
     elif "--predict" in sys.argv:
         predict(jmax)
     else:

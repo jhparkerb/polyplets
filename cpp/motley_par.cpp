@@ -148,6 +148,15 @@ struct Bucket {
   u32 pad;
 };
 
+// A thread's private slice of the index space.  The row counter is the one
+// truly global write in the cell-step, so it is handed out in blocks: 80
+// threads doing fetch_add per insertion serialise on one cache line and cost
+// more than the insertion.
+struct Alloc {
+  size_t next = 0, end = 0;
+};
+static const size_t ALLOC_BLOCK = 256;
+
 static inline size_t keyhash(u128 k) {
   u64 lo = (u64)k, hi = (u64)(k >> 64);
   u64 h = lo * 0x9E3779B97F4A7C15ull ^ (hi + 0x9E3779B97F4A7C15ull + (lo << 6) + (lo >> 2));
@@ -167,28 +176,36 @@ struct Buf {
   Bucket* b = nullptr;
   size_t nb = 0;                 // bucket count, power of two
   size_t cap = 0;                // payload rows allocated
-  unsigned char* pay = nullptr;  // cap * rowbytes
-  unsigned char* lk = nullptr;   // cap spinlock bytes
-  size_t rowbytes = 0;
-  std::atomic<size_t> n{0};
-  std::atomic<int> overflow{0};
+  unsigned char* pay = nullptr;  // cap * stride; row = [lock u32][pad][payload]
+  size_t rowbytes = 0;           // payload bytes per row
+  size_t stride = 0;             // rowbytes + LOCKOFF, 0 in census mode
+  alignas(64) std::atomic<size_t> n{0};
+  alignas(64) std::atomic<int> overflow{0};
+
+  static const size_t LOCKOFF = 8;   // the spinlock shares the row's cache line
+  inline unsigned char* row(size_t id) const { return pay + id * stride; }
+  inline std::atomic<u32>* rowlock(size_t id) const {
+    return reinterpret_cast<std::atomic<u32>*>(row(id));
+  }
+  inline unsigned char* rowpay(size_t id) const { return row(id) + LOCKOFF; }
 
   void release() {
-    std::free(b); std::free(pay); std::free(lk);
-    b = nullptr; pay = nullptr; lk = nullptr; nb = cap = 0;
+    std::free(b); std::free(pay);
+    b = nullptr; pay = nullptr; nb = cap = 0;
   }
   // Size for at least `want` states; keeps existing allocation when it fits.
   void ensure(size_t want, size_t rb) {
+    want += (size_t)omp_get_max_threads() * ALLOC_BLOCK;
     size_t needb = 1;
-    while (needb < want * 2) needb <<= 1;   // load factor <= 0.5
+    while (needb < want * 3 / 2) needb <<= 1;   // load factor <= 2/3
     if (needb < 1024) needb = 1024;
     if (needb > nb || want > cap || rb != rowbytes) {
       release();
       nb = needb; cap = want; rowbytes = rb;
+      stride = rb ? rb + LOCKOFF : 0;
       b = (Bucket*)std::malloc(nb * sizeof(Bucket));
-      pay = rb ? (unsigned char*)std::malloc(cap * rb) : nullptr;
-      lk = rb ? (unsigned char*)std::malloc(cap) : nullptr;
-      if (!b || (rb && (!pay || !lk))) {
+      pay = rb ? (unsigned char*)std::malloc(cap * stride) : nullptr;
+      if (!b || (rb && !pay)) {
         fprintf(stderr, "FATAL alloc buckets=%zu cap=%zu rowbytes=%zu\n", nb, cap, rb);
         std::exit(3);
       }
@@ -202,9 +219,19 @@ struct Buf {
   }
   inline u128 key(size_t i) const { return ((u128)b[i].hi << 64) | b[i].lo; }
 
+  // `n` is the reservation high-water, not the population: block allocation
+  // leaves a partial block per thread unused.  Counting means scanning.
+  size_t count_states() const {
+    size_t tot = 0;
+#pragma omp parallel for schedule(static) reduction(+ : tot)
+    for (size_t i = 0; i < nb; i++)
+      if (b[i].idx.load(std::memory_order_relaxed) < IDX_CLAIM) tot++;
+    return tot;
+  }
+
   // Returns the payload row for `k`, inserting it (zeroed) if new.
   // Returns IDX_EMPTY on capacity overflow (caller retries the whole step).
-  inline u32 find_or_insert(u128 k) {
+  inline u32 find_or_insert(u128 k, Alloc& al) {
     size_t h = keyhash(k) & (nb - 1);
     for (;;) {
       Bucket& B = b[h];
@@ -213,14 +240,18 @@ struct Buf {
         u32 exp = IDX_EMPTY;
         if (B.idx.compare_exchange_strong(exp, IDX_CLAIM, std::memory_order_acq_rel,
                                           std::memory_order_acquire)) {
-          size_t id = n.fetch_add(1, std::memory_order_relaxed);
+          if (al.next == al.end) {
+            al.next = n.fetch_add(ALLOC_BLOCK, std::memory_order_relaxed);
+            al.end = al.next + ALLOC_BLOCK;
+          }
+          size_t id = al.next++;
           if (id >= cap) {
             overflow.store(1, std::memory_order_relaxed);
             B.idx.store(IDX_EMPTY, std::memory_order_release);
             return IDX_EMPTY;
           }
           B.lo = (u64)k; B.hi = (u64)(k >> 64);
-          if (rowbytes) { std::memset(pay + id * rowbytes, 0, rowbytes); lk[id] = 0; }
+          if (stride) std::memset(row(id), 0, stride);
           B.idx.store((u32)id, std::memory_order_release);
           return (u32)id;
         }
@@ -233,17 +264,16 @@ struct Buf {
   }
 };
 
-static inline void lock_byte(unsigned char* p) {
-  auto* a = reinterpret_cast<std::atomic<unsigned char>*>(p);
-  unsigned char exp = 0;
+static inline void lock_row(std::atomic<u32>* a) {
+  u32 exp = 0;
   while (!a->compare_exchange_weak(exp, 1, std::memory_order_acquire,
                                    std::memory_order_relaxed)) {
     exp = 0;
     cpu_relax();
   }
 }
-static inline void unlock_byte(unsigned char* p) {
-  reinterpret_cast<std::atomic<unsigned char>*>(p)->store(0, std::memory_order_release);
+static inline void unlock_row(std::atomic<u32>* a) {
+  a->store(0, std::memory_order_release);
 }
 
 // ============================== census mode =================================
@@ -253,38 +283,43 @@ static void census(int H, int Nmax) {
   const int W = Nmax + 1;
   Buf a, b;
   a.ensure(1024, 0); a.clear();
-  a.find_or_insert(0);
+  { Alloc al; a.find_or_insert(0, al); }
   Buf* cur = &a; Buf* nxt = &b;
   size_t maxstates = 0;
   auto t0 = std::chrono::steady_clock::now();
   for (int c = 0; c < W; c++) {
     for (int r = 0; r < H; r++) {
-      size_t ns = cur->n.load();
-      size_t want = ns * 4 + 1024;
+      size_t ns = cur->count_states();
+      size_t want = ns + ns / 4 + 4096;
       for (;;) {
         nxt->ensure(want, 0);
         nxt->clear();
-#pragma omp parallel for schedule(dynamic, 512)
-        for (size_t i = 0; i < cur->nb; i++) {
-          u32 sid = cur->b[i].idx.load(std::memory_order_relaxed);
-          if (sid >= IDX_CLAIM) continue;
-          if (nxt->overflow.load(std::memory_order_relaxed)) continue;
-          Succ s[SUCC_CAP];
-          int m = successors(cur->key(i), H, r, c, s);
-          for (int j = 0; j < m; j++) nxt->find_or_insert(s[j].key);
+#pragma omp parallel
+        {
+          Alloc al;
+#pragma omp for schedule(dynamic, 512)
+          for (size_t i = 0; i < cur->nb; i++) {
+            u32 sid = cur->b[i].idx.load(std::memory_order_relaxed);
+            if (sid >= IDX_CLAIM) continue;
+            Succ s[SUCC_CAP];
+            int m = successors(cur->key(i), H, r, c, s);
+            for (int j = 0; j < m; j++)
+              if (nxt->find_or_insert(s[j].key, al) == IDX_EMPTY) break;
+          }
         }
         if (!nxt->overflow.load()) break;
         want *= 2;
         fprintf(stderr, "census regrow c=%d r=%d want=%zu\n", c, r, want);
       }
       std::swap(cur, nxt);
-      maxstates = std::max(maxstates, cur->n.load());
+      maxstates = std::max(maxstates, cur->count_states());
     }
+    size_t ncur = cur->count_states();
     double dt = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
-    printf("col %d states %zu max %zu wall %.1f\n", c, cur->n.load(), maxstates, dt);
+    printf("col %d states %zu max %zu wall %.1f\n", c, ncur, maxstates, dt);
     fflush(stdout);
     if (g_rep) g_rep->beat(c + 1, "census H=" + std::to_string(H) +
-                                      " states=" + std::to_string(cur->n.load()));
+                                      " states=" + std::to_string(ncur));
   }
   printf("H %d maxstates %zu\n", H, maxstates);
 }
@@ -294,33 +329,34 @@ static void census(int H, int Nmax) {
 template <class T>
 static void step_modp(Buf* cur, Buf* nxt, int H, int Nmax, int r, int c, u64 p) {
   const int NA = Nmax + 1;
-  const T* SP = (const T*)cur->pay;
-  T* DP = (T*)nxt->pay;
-#pragma omp parallel for schedule(dynamic, 256)
-  for (size_t i = 0; i < cur->nb; i++) {
-    u32 sid = cur->b[i].idx.load(std::memory_order_relaxed);
-    if (sid >= IDX_CLAIM) continue;
-    if (nxt->overflow.load(std::memory_order_relaxed)) continue;
-    Succ s[SUCC_CAP];
-    int m = successors(cur->key(i), H, r, c, s);
-    const T* P = SP + (size_t)sid * 2 * NA;
-    for (int j = 0; j < m; j++) {
-      u64 m0 = (u64)((s[j].m0 % (int64_t)p + (int64_t)p) % (int64_t)p);
-      u64 m1 = (u64)(s[j].m1 % (int64_t)p);
-      int dn = s[j].dn;
-      u32 did = nxt->find_or_insert(s[j].key);
-      if (did == IDX_EMPTY) break;               // overflow; step will be redone
-      T* Q = DP + (size_t)did * 2 * NA;
-      lock_byte(nxt->lk + did);
-      for (int n = 0; n + dn <= Nmax; n++) {
-        u64 c0 = P[2 * n], c1 = P[2 * n + 1];
-        if (!(c0 | c1)) continue;
-        T& d0 = Q[2 * (n + dn)];
-        T& d1 = Q[2 * (n + dn) + 1];
-        d0 = (T)((d0 + c0 * m0) % p);
-        d1 = (T)((d1 + c1 * m0 + c0 * m1) % p);
+#pragma omp parallel
+  {
+    Alloc al;
+#pragma omp for schedule(dynamic, 1024)
+    for (size_t i = 0; i < cur->nb; i++) {
+      u32 sid = cur->b[i].idx.load(std::memory_order_relaxed);
+      if (sid >= IDX_CLAIM) continue;
+      Succ s[SUCC_CAP];
+      int m = successors(cur->key(i), H, r, c, s);
+      const T* P = (const T*)cur->rowpay(sid);
+      for (int j = 0; j < m; j++) {
+        u64 m0 = (u64)((s[j].m0 % (int64_t)p + (int64_t)p) % (int64_t)p);
+        u64 m1 = (u64)(s[j].m1 % (int64_t)p);
+        int dn = s[j].dn;
+        u32 did = nxt->find_or_insert(s[j].key, al);
+        if (did == IDX_EMPTY) break;             // overflow; step will be redone
+        T* Q = (T*)nxt->rowpay(did);
+        lock_row(nxt->rowlock(did));
+        for (int n = 0; n + dn <= Nmax; n++) {
+          u64 c0 = P[2 * n], c1 = P[2 * n + 1];
+          if (!(c0 | c1)) continue;
+          T& d0 = Q[2 * (n + dn)];
+          T& d1 = Q[2 * (n + dn) + 1];
+          d0 = (T)((d0 + c0 * m0) % p);
+          d1 = (T)((d1 + c1 * m0 + c0 * m1) % p);
+        }
+        unlock_row(nxt->rowlock(did));
       }
-      unlock_byte(nxt->lk + did);
     }
   }
 }
@@ -329,8 +365,6 @@ static void step_modp(Buf* cur, Buf* nxt, int H, int Nmax, int r, int c, u64 p) 
 template <class T>
 static void column_sum(Buf* cur, int Nmax, u64 p, std::vector<u64>& out) {
   const int NA = Nmax + 1;
-  const T* P = (const T*)cur->pay;
-  size_t ns = cur->n.load();
   std::fill(out.begin(), out.end(), 0);
   const int nth = omp_get_max_threads();
   std::vector<u64> part((size_t)nth * 2 * NA, 0);
@@ -339,8 +373,10 @@ static void column_sum(Buf* cur, int Nmax, u64 p, std::vector<u64>& out) {
     int t = omp_get_thread_num();
     u64* q = part.data() + (size_t)t * 2 * NA;
 #pragma omp for schedule(static)
-    for (size_t i = 0; i < ns; i++) {
-      const T* row = P + i * 2 * NA;
+    for (size_t i = 0; i < cur->nb; i++) {
+      u32 id = cur->b[i].idx.load(std::memory_order_relaxed);
+      if (id >= IDX_CLAIM) continue;
+      const T* row = (const T*)cur->rowpay(id);
       for (int k = 0; k < 2 * NA; k++) q[k] = (q[k] + row[k]) % p;
     }
   }
@@ -361,17 +397,16 @@ static bool ckpt_write(const char* path, Buf* cur, int H, int Nmax, u64 p, int c
   if (!f) return false;
   const int NA = Nmax + 1;
   u64 hdr[7] = { CKPT_MAGIC, (u64)H, (u64)Nmax, p, (u64)sizeof(T), (u64)col,
-                 (u64)cur->n.load() };
+                 (u64)cur->count_states() };
   bool ok = fwrite(hdr, sizeof hdr, 1, f) == 1;
   ok = ok && fwrite(fprev.data(), sizeof(u64), 2 * NA, f) == (size_t)(2 * NA);
   ok = ok && fwrite(fcur.data(), sizeof(u64), 2 * NA, f) == (size_t)(2 * NA);
-  const T* P = (const T*)cur->pay;
   for (size_t i = 0; ok && i < cur->nb; i++) {
     u32 id = cur->b[i].idx.load(std::memory_order_relaxed);
     if (id >= IDX_CLAIM) continue;
     u64 kk[2] = { cur->b[i].lo, cur->b[i].hi };
     ok = fwrite(kk, sizeof kk, 1, f) == 1 &&
-         fwrite(P + (size_t)id * 2 * NA, sizeof(T), 2 * NA, f) == (size_t)(2 * NA);
+         fwrite(cur->rowpay(id), sizeof(T), 2 * NA, f) == (size_t)(2 * NA);
   }
   ok = ok && fflush(f) == 0;
   fclose(f);
@@ -400,6 +435,7 @@ static bool ckpt_read(const char* path, Buf* cur, int H, int Nmax, u64 p, int& c
   }
   cur->ensure(ns + ns / 4 + 1024, sizeof(T) * 2 * NA);
   cur->clear();
+  Alloc al;
   std::vector<T> row(2 * NA);
   for (size_t i = 0; i < ns; i++) {
     u64 kk[2];
@@ -408,9 +444,9 @@ static bool ckpt_read(const char* path, Buf* cur, int H, int Nmax, u64 p, int& c
       fclose(f); fprintf(stderr, "FATAL ckpt_short %s\n", path); std::exit(4);
     }
     u128 k = ((u128)kk[1] << 64) | kk[0];
-    u32 id = cur->find_or_insert(k);
+    u32 id = cur->find_or_insert(k, al);
     if (id == IDX_EMPTY) { fclose(f); fprintf(stderr, "FATAL ckpt_overflow\n"); std::exit(4); }
-    std::memcpy((T*)cur->pay + (size_t)id * 2 * NA, row.data(), sizeof(T) * 2 * NA);
+    std::memcpy(cur->rowpay(id), row.data(), sizeof(T) * 2 * NA);
   }
   fclose(f);
   return true;
@@ -431,20 +467,20 @@ static void run_modp(int H, int Nmax, u64 p, const char* outfile, const char* ck
   bool resumed = false;
   if (!ckpt.empty()) resumed = ckpt_read<T>(ckpt.c_str(), cur, H, Nmax, p, c0col, fprev, fcur);
   if (resumed) {
-    printf("resumed from column %d, states %zu\n", c0col, cur->n.load());
+    printf("resumed from column %d, states %zu\n", c0col, cur->count_states());
   } else {
     cur->ensure(1024, rowbytes);
     cur->clear();
-    u32 id = cur->find_or_insert(0);
-    ((T*)cur->pay)[2 * 0 + 0] = 1;   // n=0: c0 = 1
-    (void)id;
+    Alloc al;
+    u32 id = cur->find_or_insert(0, al);
+    ((T*)cur->rowpay(id))[0] = 1;    // n=0: c0 = 1
   }
 
   auto t0 = std::chrono::steady_clock::now();
   for (int c = c0col; c < W; c++) {
     for (int r = 0; r < H; r++) {
-      size_t ns = cur->n.load();
-      size_t want = ns * 3 + 1024;
+      size_t ns = cur->count_states();
+      size_t want = ns + ns / 4 + 4096;
       for (;;) {
         nxt->ensure(want, rowbytes);
         nxt->clear();
@@ -457,11 +493,12 @@ static void run_modp(int H, int Nmax, u64 p, const char* outfile, const char* ck
     }
     fprev = fcur;
     column_sum<T>(cur, Nmax, p, fcur);
+    size_t ncur = cur->count_states();
     double dt = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
-    printf("col %d states %zu wall %.1f\n", c, cur->n.load(), dt);
+    printf("col %d states %zu wall %.1f\n", c, ncur, dt);
     fflush(stdout);
     if (g_rep) g_rep->beat(c + 1, "modp H=" + std::to_string(H) +
-                                      " states=" + std::to_string(cur->n.load()));
+                                      " states=" + std::to_string(ncur));
     if (!ckpt.empty() && !ckpt_write<T>(ckpt.c_str(), cur, H, Nmax, p, c + 1, fprev, fcur))
       fprintf(stderr, "WARN ckpt_write_failed\n");
   }
