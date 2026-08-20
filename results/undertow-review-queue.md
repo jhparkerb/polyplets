@@ -131,3 +131,27 @@ Successor rows (different in kind):
   ~20 TB. Worth exactly two more end-to-end two-source rows and two fewer
   anchored levels; never a route to 21. File under "do if the certification
   map wants rows 25-26, not as tower strategy".
+
+## Lead triage, 2026-08-20 07:45 EDT — C-R1 answered
+
+C-R1 was reshaped (Lane C asked for K=22 EMAX=4,5,6; the first step alone
+extrapolates to ~46 h / ~220 GB from the measured K=8/10/12 ladder and does
+not fit the box) and run as a per-excess ladder at fixed K=10 on **ayr** —
+also replacing Lane C's gympie-run timings.
+
+| emax | wall | RSS | per-e wall | per-e RSS |
+|---|---|---|---|---|
+| 0 | 0.01 s | 4 MB | - | - |
+| 1 | 0.09 s | 4 MB | 9.0x | 1.0x |
+| 2 | 0.74 s | 17 MB | 8.2x | 4.1x |
+| 3 | 4.92 s | 83 MB | 6.6x | 4.9x |
+| 4 | 46.71 s | 480 MB | 9.5x | 6.0x |
+
+**Per-excess RSS costs ~6x and rising.** Lane C's threshold was 7x; the
+measured 6x is close enough that the conclusion is the same one:
+
+| id | lane | status | rank | what |
+|---|---|---|---|---|
+| L-1 | lead | CLOSED | - | **Depths 8-9 (emax 7, 8) are dead by orders of magnitude.** At the measured ~6x/excess, emax=7 at K=21 is 10^4-10^5 GB on any per-K extrapolation in range. Lane C's "useful freedom" route -- pin every level from strip-confirmed H<=14 cells -- does not survive its own cost model. Closed on arithmetic, not on judgement. |
+| L-2 | lead | OPEN | 1 | Depth 5 (emax=4 at K=21) is between ~110 GB and ~390 GB depending on which per-K ratio you trust: K=8->10 is 4.18x per +2K, K=10->12 is 2.68x, so the ratio is DECELERATING and the geometric mean over the whole range overestimates the tail. Two more points (K=14, K=16 at emax=4, ~15 and ~50 min) settle it. Until then depth 5 is "marginal", not "16 h / 103 GB" as earlier plans assert. |
+| L-3 | lead | OPEN | 2 | Both L-1 and L-2 push the same way, and Lane B's shared-assumption finding (B4/B5) pushes the same way independently: **Motley C_19 is the buy for closing T(40,19)**, being the only route that crosses assumption families rather than adding another statement containing D_3(21). |
