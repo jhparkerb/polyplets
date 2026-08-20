@@ -162,10 +162,15 @@ def load_depths(jmax, K):
 
 
 # ------------------------------------------------------------------ modes
-def all_pairs(k, jmax, tri):
-    """Every depth pair whose two cells are banked, as (j1, j2)."""
+def all_pairs(k, jmax, tri, hmax=None):
+    """Every depth pair whose two cells are banked, as (j1, j2).
+
+    hmax caps the HEIGHT of a usable pinning cell.  Without it a run that
+    claims to use only heights <= H can still pin its tower from taller ones,
+    which is exactly the sort of quiet circularity this file exists to avoid."""
     have = [j for j in range(1, jmax + 1)
-            if k + 1 - j >= 1 and (2 * k + 1 - j, k + 1 - j) in tri]
+            if k + 1 - j >= 1 and (2 * k + 1 - j, k + 1 - j) in tri
+            and (hmax is None or k + 1 - j <= hmax)]
     return [(have[i], have[j]) for i in range(len(have)) for j in range(i + 1, len(have))]
 
 

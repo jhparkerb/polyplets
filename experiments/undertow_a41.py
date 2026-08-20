@@ -85,7 +85,7 @@ def tower(ab, Dj, n, H, kmax_wired):
     return int(val)
 
 
-def build(jmax, kmax_new, forbid_row=None):
+def build(jmax, kmax_new, forbid_row=None, hmax=None):
     """Pin the levels past the wired table.
 
     forbid_row: a row n whose cells must NOT be used as pinning data.  Level
@@ -97,10 +97,11 @@ def build(jmax, kmax_new, forbid_row=None):
     ab = extract_ab(P, max(P))
     Dj = load_depths(jmax, kmax_new)
     for k in range(max(P) + 1, kmax_new + 1):
-        pairs = [d for d in all_pairs(k, jmax, tri)
+        pairs = [d for d in all_pairs(k, jmax, tri, hmax)
                  if all(2 * k + 1 - j != forbid_row for j in d)]
         if not pairs:
-            raise SystemExit(f"level k={k}: no banked below-onset depth pair at j <= {jmax}")
+            raise SystemExit(f"level k={k}: no below-onset depth pair at j <= {jmax} "
+                             f"with every cell at H <= {hmax}")
         lower = {j: ab[j] for j in ab if j < k}
         sols = {d: pin_level(k, lower, d, tri, Dj) for d in pairs}
         if len(set(sols.values())) != 1:
@@ -113,31 +114,31 @@ def build(jmax, kmax_new, forbid_row=None):
     return ab, Dj, tri, max(P)
 
 
-def regression(ab, Dj, tri, kw):
-    """The tower must still reproduce every banked cell of row 40 it covers."""
+def regression(ab, Dj, tri, kw, n=40, hlo=20):
+    """The tower must still reproduce every banked cell of row n it covers."""
     ok = bad = 0
-    for H in range(20, 41):
-        k = 40 - H
-        if (40, H) not in tri:
+    for H in range(hlo, n + 1):
+        if (n, H) not in tri:
             continue
-        got = tower(ab, Dj, 40, H, kw)
-        if got == tri[(40, H)]:
+        got = tower(ab, Dj, n, H, kw)
+        if got == tri[(n, H)]:
             ok += 1
         else:
             bad += 1
-            print(f"  REGRESSION T(40,{H}) k={k}: tower {got} != banked {tri[(40,H)]}")
-    print(f"  row 40 regression: {ok} cells reproduced, {bad} wrong")
+            print(f"  REGRESSION T({n},{H}) k={n-H}: tower {got} != banked {tri[(n,H)]}")
+    print(f"  row {n} regression: {ok} cells reproduced, {bad} wrong")
     if bad or ok < 15:
-        raise SystemExit("REFUSING: row-40 regression failed or vacuous")
-    tot = sum(tri[(40, H)] for H in range(1, 41) if (40, H) in tri)
-    if tot != A40:
-        raise SystemExit(f"REFUSING: banked row 40 sums to {tot}, not a(40)")
-    print("  banked row 40 re-sums to a(40) exactly")
+        raise SystemExit(f"REFUSING: row-{n} regression failed or vacuous")
+    if n == 40:
+        tot = sum(tri[(40, H)] for H in range(1, 41) if (40, H) in tri)
+        if tot != A40:
+            raise SystemExit(f"REFUSING: banked row 40 sums to {tot}, not a(40)")
+        print("  banked row 40 re-sums to a(40) exactly")
 
 
 def main():
     if "--selftest" in sys.argv:
-        ab, Dj, tri, kw = build(int(opt("--jmax", 3)), 20, forbid_row=40)
+        ab, Dj, tri, kw = build(int(opt("--jmax", 3)), 20, forbid_row=40, hmax=19)
         bad = dict(ab)
         bad[20] = (bad[20][0] + 1, bad[20][1])
         try:
@@ -150,13 +151,18 @@ def main():
     n = int(opt("--nmax", 41))
     jmax = int(opt("--jmax", 4))
     perheight = opt("--perheight", os.path.join(ROOT, "runs", "a41_low", "perheight"))
-    kmax_new = n - 20                      # the tower must reach H = 20
-
-    # Row 40 is the regression target, so it must not pin its own tower.
-    ab, Dj, tri, kw = build(jmax, kmax_new, forbid_row=40)
-    regression(ab, Dj, tri, kw)
-
     hcap = opt("--max-swept-h")
+    kmax_new = n - ((int(hcap) + 1) if hcap else 20)   # the tower covers above the sweep
+    # Everything below is capped at the same height the assembly is: a run that
+    # says "from heights <= H" must not pin from taller cells either.
+
+    # The target row must not pin its own tower.
+    ab, Dj, tri, kw = build(jmax, kmax_new, forbid_row=n,
+                            hmax=int(hcap) if hcap else None)
+    hcap0 = opt("--max-swept-h")
+    regression(ab, Dj, tri, kw, n=n,
+               hlo=(int(hcap0) + 1) if hcap0 else 20)
+
     swept = sweep_rows(perheight, n, int(hcap) if hcap else None)
     row = {}
     for H in range(1, n + 1):
@@ -176,12 +182,17 @@ def main():
     print(f"  edges exact: T({n},{n}) = 3^{n-1}, T({n},{n-1}) = (25n-45)*3^{n-4}")
 
     total = sum(row.values())
-    if n == 40:
-        if total != A40:
-            raise SystemExit(f"DRY RUN RED: reassembled a(40) = {total}, banked {A40}")
+    known = {40: A40,
+             39: 8182864667276277865830132493466,
+             38: 1180654489101178485738417779914,
+             37: 170463735577007360431441250424}
+    if n in known:
+        if total != known[n]:
+            raise SystemExit(f"DRY RUN RED: reassembled a({n}) = {total}, "
+                             f"banked {known[n]}")
         print(f"\nheights swept: {sorted(swept)}")
         print(f"heights from the tower: {sorted(set(range(1, n+1)) - set(swept))}")
-        print(f"\nDRY RUN GREEN: a(40) reassembled EXACTLY = {total}")
+        print(f"\nDRY RUN GREEN: a({n}) reassembled EXACTLY = {total}")
         return
     ratio = total / A40
     print(f"\nheights swept: {sorted(swept)}")

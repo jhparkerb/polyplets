@@ -115,6 +115,24 @@ cell H = 19 — and:
 H = 19.** The RED control is a perturbed level 20, and it fails the
 regression.
 
+## Four terms reassembled from short sweeps
+
+`experiments/undertow_a41.py --nmax N --max-swept-h H` runs the a(41) pipeline
+against terms we already have. The cap applies to the **pinning as well as the
+assembly** — a run that says "heights <= H" refuses to touch a taller cell
+anywhere, which is what `all_pairs`' `hmax` is for. (It was not, at first: the
+first a(39) and a(38) runs claimed H <= 18 while pinning level 20 from a cell
+at H = 20. They now fail closed instead.)
+
+| term | swept heights | classical ceiling `(n+2)/2` | result |
+|---|---|---|---|
+| a(40) | 1..19 | 21 | EXACT |
+| a(39) | 1..19 | 20 | EXACT |
+| a(38) | 1..18 | 20 | EXACT |
+| a(37) | 1..18 | 19 | EXACT |
+
+All at depths j <= 3; depth 4 should take another height off each.
+
 ## The dry run: a(40) without phases B and C
 
 `experiments/undertow_a41.py --nmax 40 --max-swept-h 19` runs the exact
