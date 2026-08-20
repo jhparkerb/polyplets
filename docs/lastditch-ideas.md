@@ -110,15 +110,24 @@ emax = 4: **12.2 s / 138 MB at K = 8, 71.4 s / 577 MB at K = 10, 265.0 s /
 `families 21 4` (depth 5) extrapolates to ~16 h and ~103 GB. Inside dalby,
 at the wall.
 
-**And there is an obvious lever on that DP nobody has pulled.** It caps the
-horizontal span at `2K + emax + 1` — 47 at K = 22 — for *every* level, but a
-cluster of `ell` rows cannot span more than `2*ell + e + 1`. At level 10 that
-is 25, not 47. The state counts in the heartbeat peak in the middle levels
-(2.7M around level 10), which is exactly where a per-level span cap would
-bite. It is a contained change to `cpp/severance_w3_families.cpp` with a free
-gate: the banked `results/severance_w3_families_K19_e3.txt` must come back
-byte-identical. If it buys 2-5x it puts depth 6 in range, and each depth is
-another row per sweep.
+**A per-level span cap was tried and is WRONG — do not re-pitch it.** The DP
+caps the horizontal span at `2K + emax + 1` for every level, and it looks
+obviously wasteful: a cluster of `ell` rows has `2*ell + e` cells and, being
+connected, spans at most `2*ell + e - 1`, so level 10 should need 25 and not
+47. Implemented behind `--global-span` and gated against the old behaviour: it
+is **9x faster, 5x smaller, and undercounts** — 333 against 339 at
+`(e, k) = (0, 2)`, K = 9.
+
+The argument fails on prefixes. A cluster of two 2-cell rows can be
+`{0,3}` over `{1,2}`: connected, four cells, span 3 = cells − 1, all correct —
+but its **first row alone spans 3 with only two cells**. A prefix's span is
+bounded by the *final* cluster's cell count, not its own, because a later row
+can bridge a gap an earlier row opened. The honest bound at level `ell` with
+excess `e2` is `span <= 2K - e2 - 1`, which is the global cap and a bit.
+
+So depth 5 costs what the measured ladder says: `families 21 4` at ~16 h and
+~103 GB. The gate did its job in about four minutes, which is the argument for
+building the gate first.
 
 ## 3. Parallel Motley (insurance, and it works today)
 
