@@ -61,6 +61,11 @@ carries the verdict.
   re-run), `docs/redelmeier-tall-plan.md`
 - **RESUMING COLD** — `docs/resume-here.md` (the running job and what to do
   when it lands), after `results/confidence.md`.
+- **Skeleton Key** (the hunt for a way past n = 40) —
+  `docs/skeletonkey-reprompt.md` is the **entry point**: the post-`/clear`
+  prompt for this mission plus the kill inventory that makes a breadth-first
+  pass cheap, and the two measured cost laws (height 1.70x per unit of n,
+  depth 7-9x). Results: `results/skeletonkey-cell-sparsity.md`.
 - **Undertow / last ditch** (the diagonal tower pinned from below) —
   `docs/lastditch-campaign.md` is the **entry point**; then
   `docs/lastditch-ideas.md` (the candidate list, closed doors included),
