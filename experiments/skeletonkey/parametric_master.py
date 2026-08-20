@@ -41,16 +41,14 @@ from fractions import Fraction as F
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-sys.path.insert(0, os.path.join(ROOT, "experiments"))
+sys.path.insert(0, ROOT)
 
-from gas_cumulants import cluster_weight  # noqa: E402  (D-parametric)
+from experiments.gas_cumulants import cluster_weight  # noqa: E402
+from experiments.diagonal_machine import LATTICES as DRIFT  # noqa: E402
 
-# Drift sets and their branching b = |D|.
-LATTICES = {
-    "square": ((0,), 1),
-    "hex":    ((-1, 0), 2),
-    "king":   ((-1, 0, 1), 3),
-}
+# b is the drift-step weight -- the number of continuations of a one-cell row
+# -- which is |D|, exactly as diagonal_machine.py computes it.
+LATTICES = {name: (D, len(D)) for name, D in DRIFT.items()}
 
 # universal-diagonal-law.md, "The gas, made lattice-parametric" table. These
 # came from a drift-parametric DP over the triangle; this probe reaches them
