@@ -74,10 +74,64 @@ obeys `n <= 2*H_max + J - 1`.
   `results/skeletonkey-cell-sparsity.md` (planned) before spending anything
   on it.
 
-## What this session closed
+## The breadth pass, and what it closed — 2026-08-20
+
+Twenty candidates generated in one pass against the inventory above. The kills
+are the point of this section: they are what a cold session would otherwise
+re-derive. Full status:
+
+| # | candidate | status |
+|---|---|---|
+| 1 | N-family / reach merge on the strip frontier | **ESTABLISHED, PARKED** — `results/skeletonkey-nfamily-merge.md` |
+| 2 | dense compressed transfer | killed, A-S1 "crossover: never" |
+| 3 | sparse compressed transfer in char 0 | see below |
+| 4 | another prime / extension field / grading / auxiliary group | killed, T1–T4 |
+| 5 | non-commutative realization | killed, T5 |
+| 6 | Cut&Count, rank-based, ZDD, #SAT, Potts, Tutte, FLM, CTM | killed, F1–F4 |
+| 7 | dual-connectivity TM | killed with counterexample |
+| 8 | interpolation in the component variable | killed |
+| 9 | 45°/anti-diagonal sweep | killed, king corner move |
+| 10 | MPS / spatial cut | killed, measured worse |
+| 11 | holonomic accelerator | killed, non-D-finite |
+| 12 | GPU, out-of-core | killed on arithmetic |
+| 13 | cluster/gas inversion | killed, F2 |
+| 14 | published king series | killed, stops at s = 22 permanently |
+| 15 | Sykes–Essam matching pair | alive, needs perimeter-graded enumeration; no sentence gets shorter |
+| 16 | B1 residue/CRT ladder | **RUNNING** on dalby; protocol in `docs/resume-here.md` |
+| 17 | column-numerator 22-equation audit | **KILLED 2026-08-20** — `lastditch-ideas.md` §1a correction |
+| 18 | square-lattice external validation | blocker removed, headline repriced — `results/skeletonkey-parametric-master.md` |
+| 19 | D2ax per-cell mod 2 | **DEAD — already shipped** on all 820 cells, `results/subgroup-mod4.md` |
+| 20 | holographic / matchgates | killed, INV-5 desk survey (`triangle-r3-involution.md`) |
+
+Three of these were closed this day and are worth naming, because each was
+closed by counting rather than by computing:
+
+- **#17 and `lastditch-ideas.md` §5.** Each below-onset cell brings one
+  equation *and* one unknown `D_j(k)`, so surplus is
+  `(cells at known depths) − 2` and the extra cells cancel. The P-finite
+  escape needs ~180 values of `k` where ~15 exist.
+- **#19.** Already shipped, on every cell of the triangle.
+- **#18.** The "king-only ledger" is one substitution: `b = |D|` for the 3 in
+  the renewal chain, `Ŵ_c = W_c·b^{2k−l−1}`. But the published-n=56 headline
+  still needs square cells below onset at `H ≤ 28`.
+
+### Still to re-open
+
+`results/r4/r4-floors.md` has a section "Routes the floors do not close that
+have been treated as closed" naming **L3-3** (fattening bijection to decorated
+polyominoes) and **L3-4** (dual/moat encoding) — both killed in the queue by a
+rank floor that sits ~1.5e4 at H = 21, which is not a cost objection to
+anything. That file calls the kills "merely asserted". The queue rows live on
+the unmerged `triangle-structure` branch
+(`git show triangle-structure:results/triangle-r3-queue.md`).
+
+Same file's **INV-4** asks whether B1's coincidence-partition state compresses.
+That question is now known to be answerable, and to have answered "no, the
+states are not minimal" once — see #1. Flagged, not pursued, because #1 is
+parked.
+
+## What this session measured
 
 `results/skeletonkey-cell-sparsity.md` (planned). A-S1's "crossover: never"
-rested on
-assuming the compressed transfer is dense, and named sparsity as its one
-unprobed rescue; Exact Change had measured that sparsity in GF(2) only. The
-char-0 measurement is now taken and the rescue fails.
+rested on assuming the compressed transfer is dense, and named sparsity as its
+one unprobed rescue; Exact Change had measured that sparsity in GF(2) only.
