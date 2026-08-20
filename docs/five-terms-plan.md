@@ -80,6 +80,29 @@ or held back until depth 5 exists (`families 21 4`, measured ladder ~16 h /
    a(39), a(38) and a(37) exactly from short sweeps before being pointed at
    anything new.
 
+## The other target: a(41) TWO-SOURCED FROM BIRTH
+
+Separate from the five-term plan and cheaper. The project's two-algorithm
+frontier is n = 22 (`results/redelmeier_row22/`); every term since has been
+single-sourced at birth and two-sourced later, if at all. Undertow plus the
+parallel Motley makes a(41) two-sourced on the day it lands:
+
+- **source 1**: the kink sweep, heights 1..19 at Nmax 41 (`runs/a41_low`,
+  running), plus the tower for H >= 20;
+- **source 2**: Motley heights 1..19 at Nmax 41, plus a tower pinned from
+  Motley's own cells. With `hmax = 19` and `J = 4`, `k_max = 21`, so rows are
+  complete for `n <= 2*19+3 = 41` — exactly reaching row 41, tower covering
+  H >= 20 and Motley H <= 19.
+
+Motley's cost at Nmax 41, from the measured parallel engine (H=14/Nmax 40 is
+11.8 s at 80 threads; ~3.4x per height; ~1.1x for the Nmax bump): H=19 about
+1.2 h per prime, H=18 about 0.35 h, everything below about an hour in total —
+call it **15 h for the whole ladder across nine 16-bit primes** on dalby, or
+the same split across dalby and ayr since the passes are independent.
+
+Weak point, the same one as everywhere: level 21 pins from `T(40,19)` and
+`T(39,18)` and has no third cell until depth 5 exists.
+
 ## What it is not
 
 It is not a new counting algorithm — the sweep is the same kink engine that
