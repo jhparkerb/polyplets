@@ -158,6 +158,16 @@ and the Motley band and the tower band overlapped at H = 17-18, double-counting
 those cells (the "sum WRONG" on rows 34 and 35 was the double count, not a
 wrong tower). Both fixed; the numbers above are after.
 
+**One caveat on "nothing the incumbent produced".** Levels 1..9 are read out of
+the wired `diagCoeffTable`, not out of W1's own output. Severance W1 derived
+`P_1..P_9` ab initio from cluster weights and matched that table *coefficient
+for coefficient* (`results/severance-w1-anchor-cut.md`), so the numbers are
+ones a second source independently produced — but the file they are read from
+is the incumbent's. Re-deriving them straight from
+`results/severance_w1_weights_k9.txt` through
+`experiments/severance_w1_assemble.py` would close that gap and costs seconds;
+it is not done here, and the claim should carry the asterisk until it is.
+
 ## Row 40 is one cell short of rule-independent, from banked data alone
 
 `experiments/undertow_ri.py` builds the tower with **nothing the incumbent
