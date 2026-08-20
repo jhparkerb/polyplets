@@ -316,6 +316,49 @@ def emit(jmax=4, kmax_new=21):
               (k, ", ".join('"%s"' % c for c in desc), kfact))
 
 
+def audit(jmax=3):
+    """Pin every level from its SHORTEST available cells, then check the tower
+    against every banked cell on that diagonal it did not use.
+
+    This is the systematic version of the row-40 regression: the incumbent's
+    tall cells, predicted from its short ones, through ab-initio depth
+    identities.  A transcription or dispatch error anywhere in the tall band
+    shows up here as a mismatch."""
+    P, tri = read_pk(), read_tri()
+    ab = extract_ab(P, max(P))
+    Dj = load_depths(jmax, max(P))
+    total_ok = total_bad = 0
+    for k in sorted(ab):
+        pairs = all_pairs(k, jmax, tri)
+        if not pairs:
+            continue
+        deep = max(pairs, key=lambda d: (min(d), max(d)))   # the two shortest cells
+        used = {(2 * k + 1 - j, k + 1 - j) for j in deep}
+        lower = {j: ab[j] for j in ab if j < k}
+        a, b = pin_level(k, lower, deep, tri, Dj)
+        E = grand_form({**lower, k: (a, b)}, k)
+        ok = bad = 0
+        for n in range(2 * k + 1, 41):          # in-onset cells only
+            H = n - k
+            if (n, H) not in tri or (n, H) in used:
+                continue
+            v = peval(E[k], n) * pow3(n - 1 - 3 * k)
+            if F(tri[(n, H)]) == v:
+                ok += 1
+            else:
+                bad += 1
+                print(f"  MISMATCH T({n},{H}) k={k}")
+        if ok or bad:
+            tall = max(H for _, H in used)
+            print(f"  k={k:2d} pinned at H<={tall:2d} (depths {deep}); "
+                  f"{ok} banked cells predicted, {bad} wrong")
+        total_ok += ok
+        total_bad += bad
+    print(f"audit: {total_ok} banked cells predicted from shorter cells, "
+          f"{total_bad} wrong")
+    return total_bad == 0 and total_ok >= 50
+
+
 def main():
     jmax = 3
     for a in sys.argv[1:]:
@@ -323,6 +366,10 @@ def main():
             jmax = int(a.split("=")[1])
     if "--selftest" in sys.argv:
         selftest(jmax)
+    elif "--audit" in sys.argv:
+        if not audit(jmax):
+            raise SystemExit("AUDIT RED")
+        print("AUDIT GREEN")
     elif "--emit" in sys.argv:
         emit(jmax)
     elif "--predict" in sys.argv:

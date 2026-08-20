@@ -115,6 +115,30 @@ cell H = 19 — and:
 H = 19.** The RED control is a perturbed level 20, and it fails the
 regression.
 
+## The triangle-wide audit
+
+`--audit` does the row-40 regression for every level at once: pin level `k`
+from its two SHORTEST available cells, then predict every in-onset banked cell
+on that diagonal it did not use.
+
+    k= 2 pinned at H<= 2 (depths (1, 2)); 36 banked cells predicted, 0 wrong
+    ...
+    k=15 pinned at H<=14 (depths (2, 3)); 10 banked cells predicted, 0 wrong
+    ...
+    k=19 pinned at H<=18 (depths (2, 3));  2 banked cells predicted, 0 wrong
+    audit: 342 banked cells predicted from shorter cells, 0 wrong
+    AUDIT GREEN
+
+**342 cells of the banked triangle re-derived from strictly shorter cells.**
+The `k = 19` line is the tower's own foundations audited: the two cells it
+predicts are `T(39,20)` and `T(40,21)` — *the very anchors the wired P₁₉ was
+fitted from* — and it gets both, from H <= 18.
+
+Note also `k = 15`, pinned at `H <= 14`: that is the strip engine's
+independent range (`results/strip-engine.md`), so levels up to 15 can be
+pinned from cells a second source already covers, with no dependence on the
+production sweep at all.
+
 ## What the coverage bound actually says (and the measurement it waits on)
 
 With exact depths through `J` and a real sweep of heights `H <= Hs` at
