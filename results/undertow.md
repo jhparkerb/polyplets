@@ -106,6 +106,14 @@ A height is ~3× compute, so the a(41) run stops needing both poles that
 dominated a(40) — phase B (H20, 9.6 h/48c) and phase C (H21, 36.4 h/32c) — and
 keeps only phase A's range, which was 6.3 h on 80 cores at Nmax 40.
 
+**And the disk wall goes with them.** `results/ns_a40/rundir_size.log` by
+phase: H <= 19 peaked at **69 GB**, H = 20 at 172 GB, H = 21 at 363 GB. The
+memory `reach-scaling-and-resourcing` calls the engine disk/spill-bound and
+puts the home boxes' ceiling there; the two heights Undertow removes are
+exactly the two that dominate the disk. A ladder that stops at H = 19 has a
+sub-100 GB footprint, which is a different resourcing conversation from a
+363 GB one.
+
 Deeper depths extend it one term per level. `D_j` needs excess ≤ j-1 cluster
 families, and `cpp/severance_w3_families.cpp` takes `emax` as an argument;
 measured on dalby, emax = 4 costs 12.2 s / 138 MB at K = 8, 71.4 s / 577 MB at
