@@ -115,6 +115,33 @@ cell H = 19 — and:
 H = 19.** The RED control is a perturbed level 20, and it fails the
 regression.
 
+## The dry run: a(40) without phases B and C
+
+`experiments/undertow_a41.py --nmax 40 --max-swept-h 19` runs the exact
+pipeline a(41) will use, on the term we already have — heights 1..19 from the
+banked sweep, heights 20..40 from the tower, row 40 excluded from its own
+pinning set:
+
+    level k=20 pinned from [(38, 18), (39, 19)] (tallest H=19)
+    row 40 regression: 21 cells reproduced, 0 wrong
+    banked row 40 re-sums to a(40) exactly
+    edges exact: T(40,40) = 3^39, T(40,39) = (25n-45)*3^36
+    heights swept: [1..19]
+    heights from the tower: [20..40]
+    DRY RUN GREEN: a(40) reassembled EXACTLY = 56749893611764175164545926946127
+
+**a(40) comes out of heights 1–19 alone.** The two phases that dominated the
+original run — phase B (H = 20 solo, 9.6 h on 48 cores) and phase C (H = 21
+solo, 36.4 h on 32 cores, 363 GB disk peak) — are both replaced by the tower.
+Phase A, the range this reproduces, was 6.3 h on 80 cores.
+
+What the dry run *is*: the end-to-end demonstration that the pipeline produces
+the right total on a known answer, which is what
+`validate-at-scale-before-record` asks for before it is pointed at an unknown
+one. What it is *not*: independent evidence beyond the 21-cell regression it
+contains — the assembly consumes the same tower values the regression checks.
+The independent evidence is the audit below.
+
 ## The triangle-wide audit
 
 `--audit` does the row-40 regression for every level at once: pin level `k`

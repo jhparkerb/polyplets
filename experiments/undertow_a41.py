@@ -50,8 +50,9 @@ def opt(name, default=None):
     return sys.argv[sys.argv.index(name) + 1] if name in sys.argv else default
 
 
-def sweep_rows(perheight, n):
-    """T(n,H) for every H the sweep produced."""
+def sweep_rows(perheight, n, hmax=None):
+    """T(n,H) for every H the sweep produced (optionally capped at hmax, which
+    is how the a(40) dry run pretends the tall heights were never swept)."""
     out = {}
     if not os.path.isdir(perheight):
         raise SystemExit(f"no sweep directory {perheight}")
@@ -60,6 +61,8 @@ def sweep_rows(perheight, n):
         if not m:
             continue
         H = int(m.group(1))
+        if hmax is not None and H > hmax:
+            continue
         for line in open(os.path.join(perheight, fn)):
             p = line.split()
             if len(p) == 2 and int(p[0]) == n:
@@ -153,7 +156,8 @@ def main():
     ab, Dj, tri, kw = build(jmax, kmax_new, forbid_row=40)
     regression(ab, Dj, tri, kw)
 
-    swept = sweep_rows(perheight, n)
+    hcap = opt("--max-swept-h")
+    swept = sweep_rows(perheight, n, int(hcap) if hcap else None)
     row = {}
     for H in range(1, n + 1):
         if H in swept:
@@ -172,6 +176,13 @@ def main():
     print(f"  edges exact: T({n},{n}) = 3^{n-1}, T({n},{n-1}) = (25n-45)*3^{n-4}")
 
     total = sum(row.values())
+    if n == 40:
+        if total != A40:
+            raise SystemExit(f"DRY RUN RED: reassembled a(40) = {total}, banked {A40}")
+        print(f"\nheights swept: {sorted(swept)}")
+        print(f"heights from the tower: {sorted(set(range(1, n+1)) - set(swept))}")
+        print(f"\nDRY RUN GREEN: a(40) reassembled EXACTLY = {total}")
+        return
     ratio = total / A40
     print(f"\nheights swept: {sorted(swept)}")
     print(f"heights from the tower: {sorted(set(range(1, n+1)) - set(swept))}")
