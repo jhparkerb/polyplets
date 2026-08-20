@@ -44,6 +44,8 @@
 #include <string>
 #include <vector>
 #include <omp.h>
+#include <sys/mman.h>
+#include <unistd.h>
 #include "obs.h"
 
 static obs::Reporter* g_rep = nullptr;
@@ -139,13 +141,25 @@ static inline int successors(u128 key, int H, int r, int c, Succ out[SUCC_CAP]) 
 // the key and the zeroed payload row are in place.  A reader that sees a
 // published index has, by the release/acquire pair, also seen the key.
 
-static const u32 IDX_EMPTY = 0xFFFFFFFFu;
-static const u32 IDX_CLAIM = 0xFFFFFFFEu;
+// A bucket's idx field holds row+1, so that the EMPTY sentinel is ZERO.  That
+// is what lets clear() be a MADV_DONTNEED instead of a memset: a refaulted
+// page reads back as zeroes, which reads back as empty.  At H = 20 the bucket
+// array is ~8 GB and there are 861 cell-steps, so this is 7 TB of memset that
+// does not happen.
+static const u32 IDX_EMPTY = 0u;
+static const u32 IDX_CLAIM = 0xFFFFFFFFu;
+static const u32 ROW_DEAD = 0xDEAD0001u;   // lock word of a reserved-but-unused row
+// find_or_insert's failure value.  It must NOT be IDX_EMPTY: with the zero
+// sentinel that is row 0, a perfectly good row.
+static const u32 IDX_BAD = 0xFFFFFFFEu;
 
+// 8 bytes, not 24: the key lives once, in its payload row, and the bucket
+// carries only a fingerprint to reject on and the row number.  At H = 20 that
+// is ~35 B/state saved in each of two buffers, which is the difference between
+// fitting dalby and not.
 struct Bucket {
-  u64 lo, hi;
+  u32 fp;
   std::atomic<u32> idx;
-  u32 pad;
 };
 
 // A thread's private slice of the index space.  The row counter is the one
@@ -182,12 +196,19 @@ struct Buf {
   alignas(64) std::atomic<size_t> n{0};
   alignas(64) std::atomic<int> overflow{0};
 
-  static const size_t LOCKOFF = 8;   // the spinlock shares the row's cache line
+  // row = [lock u32][pad u32][key lo u64][key hi u64][payload]
+  static const size_t LOCKOFF = 8;
+  static const size_t KEYOFF = 8;
+  static const size_t PAYOFF = 24;
   inline unsigned char* row(size_t id) const { return pay + id * stride; }
   inline std::atomic<u32>* rowlock(size_t id) const {
     return reinterpret_cast<std::atomic<u32>*>(row(id));
   }
-  inline unsigned char* rowpay(size_t id) const { return row(id) + LOCKOFF; }
+  inline u128 rowkey(size_t id) const {
+    const u64* k = reinterpret_cast<const u64*>(row(id) + KEYOFF);
+    return ((u128)k[1] << 64) | k[0];
+  }
+  inline unsigned char* rowpay(size_t id) const { return row(id) + PAYOFF; }
 
   void release() {
     std::free(b); std::free(pay);
@@ -197,12 +218,15 @@ struct Buf {
   void ensure(size_t want, size_t rb) {
     want += (size_t)omp_get_max_threads() * ALLOC_BLOCK;
     size_t needb = 1;
-    while (needb < want * 3 / 2) needb <<= 1;   // load factor <= 2/3
+    while (needb < want * 5 / 4) needb <<= 1;   // load factor <= 0.8
     if (needb < 1024) needb = 1024;
     if (needb > nb || want > cap || rb != rowbytes) {
       release();
       nb = needb; cap = want; rowbytes = rb;
-      stride = rb ? rb + LOCKOFF : 0;
+      // The row's first word is an atomic<u32> lock: an 8-byte-aligned stride
+      // keeps every row's lock aligned.  At an 8-bit payload rb+LOCKOFF is 90,
+      // and a misaligned atomic is a SIGBUS on aarch64, not a slow path.
+      stride = rb ? ((rb + PAYOFF + 7) / 8) * 8 : 0;
       b = (Bucket*)std::malloc(nb * sizeof(Bucket));
       pay = rb ? (unsigned char*)std::malloc(cap * stride) : nullptr;
       if (!b || (rb && !pay)) {
@@ -214,25 +238,60 @@ struct Buf {
   void clear() {
     n.store(0, std::memory_order_relaxed);
     overflow.store(0, std::memory_order_relaxed);
+    dead.clear();
+    // EMPTY is zero, so handing the pages back IS the clear.
+    if (madvise(b, nb * sizeof(Bucket), MADV_DONTNEED) != 0) {
 #pragma omp parallel for schedule(static)
-    for (size_t i = 0; i < nb; i++) b[i].idx.store(IDX_EMPTY, std::memory_order_relaxed);
+      for (size_t i = 0; i < nb; i++)
+        b[i].idx.store(IDX_EMPTY, std::memory_order_relaxed);
+    }
   }
-  inline u128 key(size_t i) const { return ((u128)b[i].hi << 64) | b[i].lo; }
+
+  // Rows a thread reserved in its last block and never used.  Tiny (threads x
+  // ALLOC_BLOCK at most), but they sit inside the id range the next step
+  // iterates, so they have to be marked.
+  std::vector<std::pair<size_t, size_t>> dead;
+  void mark_dead(size_t lo, size_t hi) {
+    if (lo >= hi || !stride) return;
+    for (size_t id = lo; id < hi && id < cap; id++)
+      rowlock(id)->store(ROW_DEAD, std::memory_order_relaxed);
+  }
+  inline bool live(size_t id) const {
+    return rowlock(id)->load(std::memory_order_relaxed) != ROW_DEAD;
+  }
+  inline size_t highwater() const { return std::min(n.load(), cap); }
+
+  // Hand back a consumed span of the payload slab.  Page-aligned inward, so a
+  // partially-consumed page at either end is left alone.
+  void release_rows(size_t lo, size_t hi) {
+    if (!pay || lo >= hi) return;
+    static const size_t PG = (size_t)sysconf(_SC_PAGESIZE);
+    size_t a = (size_t)(pay + lo * stride);
+    size_t z = (size_t)(pay + hi * stride);
+    a = (a + PG - 1) & ~(PG - 1);
+    z &= ~(PG - 1);
+    if (z > a) madvise((void*)a, z - a, MADV_DONTNEED);
+  }
+  inline u128 key(size_t i) const {
+    return rowkey(b[i].idx.load(std::memory_order_relaxed) - 1);
+  }
 
   // `n` is the reservation high-water, not the population: block allocation
   // leaves a partial block per thread unused.  Counting means scanning.
   size_t count_states() const {
-    size_t tot = 0;
+    size_t hw = std::min(n.load(), cap), tot = 0;
 #pragma omp parallel for schedule(static) reduction(+ : tot)
-    for (size_t i = 0; i < nb; i++)
-      if (b[i].idx.load(std::memory_order_relaxed) < IDX_CLAIM) tot++;
+    for (size_t id = 0; id < hw; id++)
+      if (live(id)) tot++;
     return tot;
   }
 
   // Returns the payload row for `k`, inserting it (zeroed) if new.
   // Returns IDX_EMPTY on capacity overflow (caller retries the whole step).
   inline u32 find_or_insert(u128 k, Alloc& al) {
-    size_t h = keyhash(k) & (nb - 1);
+    const size_t hh = keyhash(k);
+    const u32 fp = (u32)(hh >> 32) | 1u;        // never 0, so a stale slot is visible
+    size_t h = hh & (nb - 1);
     for (;;) {
       Bucket& B = b[h];
       u32 v = B.idx.load(std::memory_order_acquire);
@@ -248,21 +307,51 @@ struct Buf {
           if (id >= cap) {
             overflow.store(1, std::memory_order_relaxed);
             B.idx.store(IDX_EMPTY, std::memory_order_release);
-            return IDX_EMPTY;
+            return IDX_BAD;
           }
-          B.lo = (u64)k; B.hi = (u64)(k >> 64);
-          if (stride) std::memset(row(id), 0, stride);
-          B.idx.store((u32)id, std::memory_order_release);
+          B.fp = fp;
+          if (stride) {
+            std::memset(row(id), 0, stride);
+            u64* kk = reinterpret_cast<u64*>(row(id) + KEYOFF);
+            kk[0] = (u64)k; kk[1] = (u64)(k >> 64);
+          }
+          B.idx.store((u32)id + 1, std::memory_order_release);
           return (u32)id;
         }
         v = exp;
       }
       while (v == IDX_CLAIM) { cpu_relax(); v = B.idx.load(std::memory_order_acquire); }
-      if (v != IDX_EMPTY && B.lo == (u64)k && B.hi == (u64)(k >> 64)) return v;
+      if (v != IDX_EMPTY && B.fp == fp && rowkey(v - 1) == k) return v - 1;
       h = (h + 1) & (nb - 1);
     }
   }
 };
+
+// One cell-step: every live source row visited exactly once, in id order, in
+// chunks, and each chunk's pages handed back the moment it is consumed.  That
+// is what takes the peak from two full frontier buffers to about one -- the
+// factor docs/b1-closure-plan.md calls rung G and prices at 1.7x.
+template <class F>
+static void run_step(Buf* cur, Buf* nxt, F body, bool release) {
+  const size_t hw = cur->highwater();
+  const size_t CH = 4096;
+  const size_t nchunks = (hw + CH - 1) / CH;
+  std::vector<std::pair<size_t, size_t>> leftovers;
+#pragma omp parallel
+  {
+    Alloc al;
+#pragma omp for schedule(dynamic, 1)
+    for (size_t ch = 0; ch < nchunks; ch++) {
+      size_t lo = ch * CH, hi = std::min(lo + CH, hw);
+      for (size_t id = lo; id < hi; id++)
+        if (cur->live(id)) body(id, al);
+      if (release) cur->release_rows(lo, hi);
+    }
+#pragma omp critical
+    leftovers.push_back({al.next, al.end});
+  }
+  for (auto& r : leftovers) nxt->mark_dead(r.first, r.second);
+}
 
 static inline void lock_row(std::atomic<u32>* a) {
   u32 exp = 0;
@@ -278,12 +367,17 @@ static inline void unlock_row(std::atomic<u32>* a) {
 
 // ============================== census mode =================================
 
+static std::string g_sizes_out;
+static std::vector<size_t> g_sizes;
+
 static void census(int H, int Nmax) {
   check_height(H);
   const int W = Nmax + 1;
   Buf a, b;
-  a.ensure(1024, 0); a.clear();
-  { Alloc al; a.find_or_insert(0, al); }
+  a.ensure(1024, 1); a.clear();      // rowbytes 1: census keeps only the key
+  // The seed reserves a whole block; the rest of it is uninitialised and must
+  // be marked, or the first step walks garbage rows.
+  { Alloc al; a.find_or_insert(0, al); a.mark_dead(al.next, al.end); }
   Buf* cur = &a; Buf* nxt = &b;
   size_t maxstates = 0;
   auto t0 = std::chrono::steady_clock::now();
@@ -292,27 +386,22 @@ static void census(int H, int Nmax) {
       size_t ns = cur->count_states();
       size_t want = ns + ns / 4 + 4096;
       for (;;) {
-        nxt->ensure(want, 0);
+        nxt->ensure(want, 1);
         nxt->clear();
-#pragma omp parallel
-        {
-          Alloc al;
-#pragma omp for schedule(dynamic, 512)
-          for (size_t i = 0; i < cur->nb; i++) {
-            u32 sid = cur->b[i].idx.load(std::memory_order_relaxed);
-            if (sid >= IDX_CLAIM) continue;
-            Succ s[SUCC_CAP];
-            int m = successors(cur->key(i), H, r, c, s);
-            for (int j = 0; j < m; j++)
-              if (nxt->find_or_insert(s[j].key, al) == IDX_EMPTY) break;
-          }
-        }
+        run_step(cur, nxt, [&](size_t id, Alloc& al) {
+          Succ s[SUCC_CAP];
+          int m = successors(cur->rowkey(id), H, r, c, s);
+          for (int j = 0; j < m; j++)
+            if (nxt->find_or_insert(s[j].key, al) == IDX_BAD) return;
+        }, false);
         if (!nxt->overflow.load()) break;
         want *= 2;
         fprintf(stderr, "census regrow c=%d r=%d want=%zu\n", c, r, want);
       }
       std::swap(cur, nxt);
-      maxstates = std::max(maxstates, cur->count_states());
+      size_t got = cur->count_states();
+      g_sizes.push_back(got);
+      maxstates = std::max(maxstates, got);
     }
     size_t ncur = cur->count_states();
     double dt = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
@@ -322,29 +411,57 @@ static void census(int H, int Nmax) {
                                       " states=" + std::to_string(ncur));
   }
   printf("H %d maxstates %zu\n", H, maxstates);
+  if (!g_sizes_out.empty()) {
+    FILE* f = fopen(g_sizes_out.c_str(), "w");
+    if (!f) { perror(g_sizes_out.c_str()); std::exit(1); }
+    fprintf(f, "# motley_par sizes H=%d Nmax=%d steps=%zu\n", H, Nmax, g_sizes.size());
+    for (size_t v : g_sizes) fprintf(f, "%zu\n", v);
+    fclose(f);
+    printf("sizes -> %s (%zu cell-steps)\n", g_sizes_out.c_str(), g_sizes.size());
+  }
+}
+
+// Per-cell-step state counts, in sweep order, from a census pass.  With them
+// the modp passes size every table exactly, which removes the regrow retry --
+// and only without retries is it safe to hand the consumed source back.
+static std::vector<size_t> load_sizes(const std::string& path, int H, int Nmax) {
+  FILE* f = fopen(path.c_str(), "r");
+  if (!f) { perror(path.c_str()); std::exit(1); }
+  char line[256];
+  int hh = -1, nn = -1;
+  size_t want = 0;
+  if (!fgets(line, sizeof line, f) ||
+      sscanf(line, "# motley_par sizes H=%d Nmax=%d steps=%zu", &hh, &nn, &want) != 3 ||
+      hh != H || nn != Nmax) {
+    fprintf(stderr, "FATAL sizes_header %s (H=%d Nmax=%d)\n", path.c_str(), hh, nn);
+    std::exit(4);
+  }
+  std::vector<size_t> v;
+  while (fgets(line, sizeof line, f)) v.push_back(strtoull(line, nullptr, 10));
+  fclose(f);
+  if (v.size() != want) {
+    fprintf(stderr, "FATAL sizes_count %zu != %zu\n", v.size(), want);
+    std::exit(4);
+  }
+  return v;
 }
 
 // ============================== mod-p engine ================================
 
 template <class T>
-static void step_modp(Buf* cur, Buf* nxt, int H, int Nmax, int r, int c, u64 p) {
+static void step_modp(Buf* cur, Buf* nxt, int H, int Nmax, int r, int c, u64 p,
+                      bool release) {
   const int NA = Nmax + 1;
-#pragma omp parallel
-  {
-    Alloc al;
-#pragma omp for schedule(dynamic, 1024)
-    for (size_t i = 0; i < cur->nb; i++) {
-      u32 sid = cur->b[i].idx.load(std::memory_order_relaxed);
-      if (sid >= IDX_CLAIM) continue;
+  run_step(cur, nxt, [&](size_t sid, Alloc& al) {
       Succ s[SUCC_CAP];
-      int m = successors(cur->key(i), H, r, c, s);
+      int m = successors(cur->rowkey(sid), H, r, c, s);
       const T* P = (const T*)cur->rowpay(sid);
       for (int j = 0; j < m; j++) {
         u64 m0 = (u64)((s[j].m0 % (int64_t)p + (int64_t)p) % (int64_t)p);
         u64 m1 = (u64)(s[j].m1 % (int64_t)p);
         int dn = s[j].dn;
         u32 did = nxt->find_or_insert(s[j].key, al);
-        if (did == IDX_EMPTY) break;             // overflow; step will be redone
+        if (did == IDX_BAD) return;              // overflow; step will be redone
         T* Q = (T*)nxt->rowpay(did);
         lock_row(nxt->rowlock(did));
         for (int n = 0; n + dn <= Nmax; n++) {
@@ -357,8 +474,7 @@ static void step_modp(Buf* cur, Buf* nxt, int H, int Nmax, int r, int c, u64 p) 
         }
         unlock_row(nxt->rowlock(did));
       }
-    }
-  }
+  }, release);
 }
 
 // Column-boundary sums, per stream and area.
@@ -372,10 +488,10 @@ static void column_sum(Buf* cur, int Nmax, u64 p, std::vector<u64>& out) {
   {
     int t = omp_get_thread_num();
     u64* q = part.data() + (size_t)t * 2 * NA;
+    size_t hw = cur->highwater();
 #pragma omp for schedule(static)
-    for (size_t i = 0; i < cur->nb; i++) {
-      u32 id = cur->b[i].idx.load(std::memory_order_relaxed);
-      if (id >= IDX_CLAIM) continue;
+    for (size_t id = 0; id < hw; id++) {
+      if (!cur->live(id)) continue;
       const T* row = (const T*)cur->rowpay(id);
       for (int k = 0; k < 2 * NA; k++) q[k] = (q[k] + row[k]) % p;
     }
@@ -401,10 +517,11 @@ static bool ckpt_write(const char* path, Buf* cur, int H, int Nmax, u64 p, int c
   bool ok = fwrite(hdr, sizeof hdr, 1, f) == 1;
   ok = ok && fwrite(fprev.data(), sizeof(u64), 2 * NA, f) == (size_t)(2 * NA);
   ok = ok && fwrite(fcur.data(), sizeof(u64), 2 * NA, f) == (size_t)(2 * NA);
-  for (size_t i = 0; ok && i < cur->nb; i++) {
-    u32 id = cur->b[i].idx.load(std::memory_order_relaxed);
-    if (id >= IDX_CLAIM) continue;
-    u64 kk[2] = { cur->b[i].lo, cur->b[i].hi };
+  size_t hw = cur->highwater();
+  for (size_t id = 0; ok && id < hw; id++) {
+    if (!cur->live(id)) continue;
+    u128 k = cur->rowkey(id);
+    u64 kk[2] = { (u64)k, (u64)(k >> 64) };
     ok = fwrite(kk, sizeof kk, 1, f) == 1 &&
          fwrite(cur->rowpay(id), sizeof(T), 2 * NA, f) == (size_t)(2 * NA);
   }
@@ -445,21 +562,27 @@ static bool ckpt_read(const char* path, Buf* cur, int H, int Nmax, u64 p, int& c
     }
     u128 k = ((u128)kk[1] << 64) | kk[0];
     u32 id = cur->find_or_insert(k, al);
-    if (id == IDX_EMPTY) { fclose(f); fprintf(stderr, "FATAL ckpt_overflow\n"); std::exit(4); }
+    if (id == IDX_BAD) { fclose(f); fprintf(stderr, "FATAL ckpt_overflow\n"); std::exit(4); }
     std::memcpy(cur->rowpay(id), row.data(), sizeof(T) * 2 * NA);
   }
+  cur->mark_dead(al.next, al.end);
   fclose(f);
   return true;
 }
 
 template <class T>
-static void run_modp(int H, int Nmax, u64 p, const char* outfile, const char* ckptdir) {
+static void run_modp(int H, int Nmax, u64 p, const char* outfile, const char* ckptdir,
+                     const char* sizesfile) {
   check_height(H);
   const int W = Nmax + 1, NA = Nmax + 1;
   const size_t rowbytes = sizeof(T) * 2 * NA;
   Buf a, bb;
   Buf* cur = &a; Buf* nxt = &bb;
   std::vector<u64> fprev(2 * NA, 0), fcur(2 * NA, 0);
+  std::vector<size_t> sizes;
+  if (sizesfile && *sizesfile) sizes = load_sizes(sizesfile, H, Nmax);
+  const bool release = !sizes.empty();
+  size_t step = 0;
   int c0col = 0;
   std::string ckpt;
   if (ckptdir && *ckptdir) ckpt = std::string(ckptdir) + "/motley.ckpt";
@@ -473,19 +596,31 @@ static void run_modp(int H, int Nmax, u64 p, const char* outfile, const char* ck
     cur->clear();
     Alloc al;
     u32 id = cur->find_or_insert(0, al);
+    cur->mark_dead(al.next, al.end);
     ((T*)cur->rowpay(id))[0] = 1;    // n=0: c0 = 1
   }
 
   auto t0 = std::chrono::steady_clock::now();
+  step = (size_t)c0col * H;
   for (int c = c0col; c < W; c++) {
-    for (int r = 0; r < H; r++) {
+    for (int r = 0; r < H; r++, step++) {
       size_t ns = cur->count_states();
-      size_t want = ns + ns / 4 + 4096;
+      size_t want;
+      if (release) {
+        if (step >= sizes.size()) { fprintf(stderr, "FATAL sizes_short step=%zu\n", step); std::exit(4); }
+        want = sizes[step] + sizes[step] / 64 + 4096;   // exact + 1.5% slack
+      } else {
+        want = ns + ns / 4 + 4096;
+      }
       for (;;) {
         nxt->ensure(want, rowbytes);
         nxt->clear();
-        step_modp<T>(cur, nxt, H, Nmax, r, c, p);
+        step_modp<T>(cur, nxt, H, Nmax, r, c, p, release);
         if (!nxt->overflow.load()) break;
+        if (release) {   // the source is gone; there is nothing to retry from
+          fprintf(stderr, "FATAL sizes_overflow c=%d r=%d want=%zu\n", c, r, want);
+          std::exit(4);
+        }
         want *= 2;
         fprintf(stderr, "regrow c=%d r=%d want=%zu\n", c, r, want);
       }
@@ -520,12 +655,17 @@ int main(int argc, char** argv) {
   obs::Reporter rep("motley_par");
   g_rep = &rep;
   const char* ckptdir = nullptr;
+  const char* sizesfile = nullptr;
   std::vector<char*> pos;
   for (int i = 1; i < argc; i++) {
     if (!std::strcmp(argv[i], "--threads") && i + 1 < argc) {
       omp_set_num_threads(atoi(argv[++i]));
     } else if (!std::strcmp(argv[i], "--ckpt") && i + 1 < argc) {
       ckptdir = argv[++i];
+    } else if (!std::strcmp(argv[i], "--sizes") && i + 1 < argc) {
+      sizesfile = argv[++i];
+    } else if (!std::strcmp(argv[i], "--sizes-out") && i + 1 < argc) {
+      g_sizes_out = argv[++i];
     } else pos.push_back(argv[i]);
   }
   if (pos.size() >= 3 && !std::strcmp(pos[0], "--census")) {
@@ -543,15 +683,17 @@ int main(int argc, char** argv) {
     }
     // Payload width from the prime: the accumulator is u64, so the only
     // requirement is that a residue fits the stored type.
-    if (p < (1ull << 8)) run_modp<uint8_t>(H, Nmax, p, pos[4], ckptdir);
-    else if (p < (1ull << 16)) run_modp<uint16_t>(H, Nmax, p, pos[4], ckptdir);
-    else run_modp<uint32_t>(H, Nmax, p, pos[4], ckptdir);
+    if (p < (1ull << 8)) run_modp<uint8_t>(H, Nmax, p, pos[4], ckptdir, sizesfile);
+    else if (p < (1ull << 16)) run_modp<uint16_t>(H, Nmax, p, pos[4], ckptdir, sizesfile);
+    else run_modp<uint32_t>(H, Nmax, p, pos[4], ckptdir, sizesfile);
     printf("C_%d mod %llu, n<=%d -> %s\n", H, (unsigned long long)p, Nmax, pos[4]);
     rep.done("mode=modp H=" + std::to_string(H));
     return 0;
   }
   fprintf(stderr,
-          "usage: motley_par --census <H> <Nmax> [--threads T]\n"
-          "       motley_par --modp <H> <Nmax> <p> <out> [--threads T] [--ckpt DIR]\n");
+          "usage: motley_par --census <H> <Nmax> [--threads T] [--sizes-out FILE]\n"
+          "       motley_par --modp <H> <Nmax> <p> <out> [--threads T] [--ckpt DIR]\n"
+          "                  [--sizes FILE]   exact table sizes from a census pass;\n"
+          "                                   enables handing consumed rows back\n");
   return 1;
 }
