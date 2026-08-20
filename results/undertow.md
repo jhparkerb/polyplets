@@ -29,6 +29,21 @@ W3 gate exists to keep true. `P_k(n)` is linear in `(a_k, b_k)` with
 coefficient 1, so (*) is one linear equation, and its cell sits at height
 `k+1-j`: **j rows shorter than the onset anchor.**
 
+### What is new here, precisely
+
+No new theorem. The grand form is already proved and Lean-complete; `D_j(k)` is
+already derived ab initio by Severance W3 and already checked against banked
+cells. The content is the **choice of anchors**: `docs/b1-closure-plan.md` §1
+reasoned about the cheapest *in-onset* pinning of a level and concluded
+`T(2k+1,k+1)`, `T(2k+2,k+2)`, and every cost table in the campaign follows from
+that. Below-onset cells are equally valid equations the moment `D_j` is exact,
+and they are shorter. Two pieces of machinery that were built for different
+purposes — the grand form for the tower, W3 for the certification map — turn
+out to compose into a cheaper tower, and nothing else had to be true.
+
+That is also why it was cheap to test: everything it needs was already in the
+tree and already gated.
+
 ## Verify — 18 levels, every available depth pair
 
     grand form consistent on wired levels k = 1..19 (every residual linear in n)
