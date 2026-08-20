@@ -71,11 +71,13 @@ obeys `n <= 2*H_max + J - 1`.
   component" on the strip automaton. Something that counts a different object
   and assembles a(n) from it is unbounded here. This is the widest door.
 - The a-priori-basis construction question — but see
-  `results/skeletonkey-cell-sparsity.md` before spending anything on it.
+  `results/skeletonkey-cell-sparsity.md` (planned) before spending anything
+  on it.
 
 ## What this session closed
 
-`results/skeletonkey-cell-sparsity.md`. A-S1's "crossover: never" rested on
+`results/skeletonkey-cell-sparsity.md` (planned). A-S1's "crossover: never"
+rested on
 assuming the compressed transfer is dense, and named sparsity as its one
 unprobed rescue; Exact Change had measured that sparsity in GF(2) only. The
 char-0 measurement is now taken and the rescue fails.
