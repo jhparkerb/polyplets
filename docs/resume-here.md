@@ -1,21 +1,23 @@
-# Resume here — 2026-08-20, 14:10 EDT
+# Resume here — 2026-08-20, 15:15 EDT
 
 Written to survive a `/clear`. If you are picking this up cold:
 
 1. **`results/confidence.md`** — how far each value of A006770 can be trusted
    and why, in plain terms. Read it first.
 2. **`docs/lastditch-campaign.md`** — the campaign record behind it.
-3. **`docs/skeletonkey-reprompt.md`** — the kill inventory and the twenty-row
-   breadth pass, for the "beat n = 40" mission.
+3. **`docs/skeletonkey-reprompt.md`** — the kill inventory, the twenty-row
+   breadth pass, and **the v2 prompt**, which is the one to use. Do not run
+   another breadth pass; v2 replaces it with three triage tests and a
+   three-box placement.
 4. This file — the jobs still running and exactly what to do when they land.
 
 ---
 
-## Jobs running, at 14:10 EDT
+## Jobs running, at 15:15 EDT
 
 | host | job | pid | started | expect | output |
 |---|---|---|---|---|---|
-| dalby | Motley ladder H = 1..19 @ Nmax 41 | 2865283 (script), 2867331 (worker) | 10:38 | **~11:30 on 08-21** | `~/var/motley-ladder/` |
+| dalby | Motley ladder H = 1..19 @ Nmax 41 | 2865283 (script); worker pid changes per prime | 10:38 | **~11:30 on 08-21** | `~/var/motley-ladder/` |
 | ayr | `cell_sparsity_modp.py 8` | 640243 | 12:11 | overdue, healthy | `~/var/skeletonkey/cellsparse.txt` |
 | ayr | `parametric_master.py 4` | **641839** | 14:28 | king leg, ~2 h on the measured king/hex ratio | `~/var/skeletonkey/parametric_master_k4.txt` |
 
@@ -46,9 +48,16 @@ order.
     H=19 states        224,529,648      (Nmax-independent, as it must be)
 
 So H = 19 is ~14.1 h for its nine primes; heights 18 down to 1 add roughly
-another 63% of that, which is where the ~25 h total comes from. Prime 2
-(65519) was 87 min in at 14:09 and nearly done. `C19.p65521.out` is complete,
-41 lines.
+another 63% of that, which is where the ~25 h total comes from.
+
+**Pacing confirmed at 15:13.** Prime 2 ran 12:43 → 14:16, i.e. ~5,580 s
+against prime 1's 5,622 — the per-prime wall is flat, as it must be. Prime 3
+started 14:16 and was 3,411 s in at 15:13. Nine primes at ~5,600 s puts H = 19
+finishing ~01:15 on 08-21 and the whole ladder ~10:00–11:30, which is what the
+table says. Note the **worker pid changes with every prime** — the script pid
+2865283 is the stable one; a worker pid from an earlier reading being absent
+from `ps` is normal and is not a dead job. Read `timings.txt` heartbeats
+instead.
 
 **Why it matters.** `T(n,H) = C_H - 2C_{H-1} + C_{H-2}` needs every `C_H` at
 the SAME Nmax, and every banked Motley row stops at n = 40. So today a(41) has
@@ -103,9 +112,10 @@ ayr, tmux session 0, window `skelkey`. Appends one line per height to
 in flight.
 
 **Overdue but healthy.** Its own header predicted "H=8 ~5-15 min and ~2 GB";
-at 14:09 it was 102 minutes into H = 8 at 4.6 GB and 11.5 cores, on a box with
-70 GB free. Slower than predicted, not stuck. Heights 4..7 are already banked
-in the file.
+at 15:13 it was 2 h 46 min into H = 8 at **7.1 GB** and climbing (4.6 GB at
+14:09), on a box with 70 GB free. Slower and fatter than predicted, not stuck.
+Heights 4..7 are already banked in the file. The prediction in its own header
+is the thing that was wrong, and the write-up should say so.
 
 **What it settles.** A-S1 (`git show
 second-source:results/scaling-exploration-A.md`) rejected the rank-compressed
@@ -168,6 +178,27 @@ blind spot (constant and `n¹` terms are invisible to it) asserted by its own
 control rather than left to be assumed.
 
 ---
+
+## Closed since 14:10, so it is not re-derived
+
+- **L3-3 (the fattening bijection) is CLOSED** —
+  `results/skeletonkey-l3-3-fattening.md`. It was the one row
+  `skeletonkey-reprompt.md` called actually open. The construction turns out to
+  be **sound**: under a lex filling convention the image is pinch-free and the
+  map injective over all 176,138 king animals to n = 8, with a proof rather
+  than a measurement (a block is the lex-larger candidate at its own
+  bottom-left corner, never wins that mark, and so is never completed by marks
+  — full blocks are exactly the animal). It dies on what the working
+  construction costs, and that kill generalised into **the bijection test** now
+  at the top of the v2 prompt.
+- **Gate K generalised** from k = 3 to every k the wired `P_k` table reaches,
+  and the linearity cancellation banked as a 171-condition audit of the
+  production table, RED green with its blind spot asserted by its own control.
+  King `A_k`/`B_k` to k = 19 are in `results/skeletonkey-parametric-master.md`.
+  `--selfcheck` verifies the fit against the moment-cumulant expansion at
+  k = 2, 3, 4.
+- **The v2 prompt exists** — `docs/skeletonkey-reprompt.md`. Its instruction is
+  "do not run another breadth pass"; use the three boxes and three tests.
 
 ## After that — decisions, not chores
 

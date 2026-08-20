@@ -19,7 +19,92 @@ banked. The inventory is the expensive thing to reconstruct, not the ideas.
 
 **So: read the inventory first, generate breadth second, go deep last.**
 
-## The prompt
+## The prompt, v2 — 2026-08-20, after the breadth pass
+
+**Use this one.** v1 below is kept because its rationale is why the inventory
+exists, but its instruction — go breadth-first — has been carried out. Twenty
+candidates were generated in one pass and the yield was kills, not leads. A
+session that runs breadth again will produce the same twenty.
+
+The failure mode has moved. It is no longer "re-derives a killed idea". It is
+"generates a twenty-first candidate that is the incumbent in new clothes, and
+does not notice". L3-3 is the worked example: a construction that is genuinely
+correct, genuinely pretty, survived two rounds of triage, and buys nothing.
+
+> Goal: ironclad confidence in a(40), and/or a genuinely new way to count king
+> polyplets that reaches well past n = 40. Working the T(n,H) triangle harder is
+> explicitly NOT the kind of result wanted.
+>
+> **Do not run another breadth pass.** The twenty-row table in
+> `docs/skeletonkey-reprompt.md` is the breadth pass; read it and the three
+> triage tests below before anything else.
+>
+> Every counting method for this problem lands in one of three boxes. Place
+> your candidate in one, out loud, before opening a file:
+>
+> 1. **Cut methods** — anything whose sweep crosses a straight cut. Floor:
+>    `M(H/2+1)` independent quantities (L3-1), which is 15,511 at H = 21. The
+>    incumbent realises `Motzkin(H+1) − 1 = 400,763,222` column states there.
+>    The whole prize in this box is the gap between those two numbers, no
+>    construction for it is known, and A-S1 already called that headroom
+>    non-constructive (`docs/coin-lift-plan.md` §4).
+> 2. **No-cut methods** — Redelmeier/quotient DFS, involutions, Pfaffian-style.
+>    All λ^n. Involutions closed by INV-1, Pfaffian/matchgate by INV-5.
+> 3. **Cancellation** — count something whose exact value is *not* the animal
+>    count (mod 2^m, signed, graded), so that less information crosses the cut
+>    than an exact count requires. The only box with a measured escape: the
+>    char-2 rank collapse is real, ~1e6 at H = 21 against 9.4e8 (INV-6). Its
+>    blocker is constructive — no explicit basis — and that is the single
+>    largest open technical question in the mission.
+>
+> Then apply all three tests, and state the answers:
+>
+> - **The bijection test.** If your candidate maps king animals one-to-one onto
+>   some other class, it is dead, and no property of the target class rescues
+>   it. A bijection restates a counting problem; it does not reduce one. The
+>   image carries exactly the same information and pays exactly the same floor,
+>   however much published technology exists for the target. This is what
+>   killed L3-3 — see `results/skeletonkey-l3-3-fattening.md`, and note that
+>   L3-3 survived earlier triage only because its kill had been *misstated* as
+>   "pays L3-1's rank floor", which `results/r4/r4-floors.md` correctly
+>   rejected as a non-objection. Paying a floor is not the objection. Carrying
+>   identical information is.
+> - **The cancellation test** (L6-8, already in the queue). "Where is your
+>   cancellation identity?" A box-3 candidate without one is a box-1 candidate
+>   in a costume.
+> - **The accounting test.** Every kill made on 2026-08-20 came from counting
+>   rather than computing: equations against unknowns (#17), ansatz
+>   coefficients against available data (§5), image size against a literature
+>   record (L3-3). If a candidate's payoff can be priced in a paragraph of
+>   arithmetic, price it there before reading anything.
+>
+> A result that clears all three is worth going deep on. Show me the placement
+> and the three answers before you do.
+>
+> Machines: ayr and dalby; gympie is banned for project processes. Check what
+> is already running first (`docs/resume-here.md`). Nothing over an hour gets
+> launched without asking.
+
+### What "even harder" is actually being spent against
+
+Stated plainly so the next session does not mis-allocate. The mission has two
+halves and they are not equally likely.
+
+- **Ironclad a(40)** is in reach and mostly in flight — the Motley ladder
+  gives a(40) a second program in all forty cells and a(41) its first, and
+  Undertow pins the tower from below-onset cells. This half is engineering and
+  patience, not invention.
+- **Past n = 40 by a new method** is where the three boxes above say the
+  honest odds are poor. Box 1 is fenced by an information floor with no known
+  construction, box 2 is λ^n, and box 3 needs an explicit char-2 basis that
+  nobody in the literature has for this functional. That is not a reason to
+  stop; it is a reason to spend the effort on box 3's basis question rather
+  than on a twenty-first re-encoding.
+
+If a session has one expensive idea in it, the char-2 basis (INV-6, and
+`exactchange-basis-hunt` in MEMORY.md) is where it should go.
+
+## The prompt, v1 — superseded, kept for its rationale
 
 > Goal: ironclad confidence in a(40), and/or a genuinely new way to count king
 > polyplets that reaches well past n=40. Working the T(n,H) triangle harder is
@@ -150,6 +235,12 @@ per image puts a(40) at ≥ 160-cell polyominoes against a literature record of
 n = 56. Note that r4-floors was *right* that the rank floor was not the
 objection — the objection is that the information is identical, not that the
 floor is paid.
+
+**This section is now empty.** Both rows it named are closed, L3-4 on the dual
+state comparison and L3-3 on the bijection test. Nothing in `r4-floors.md`'s
+"treated as closed" list is still open except the two rows it raises that are
+not counting routes at all (R4-G18's premise, and the char-2 cut
+representation, which is INV-6's basis question wearing a different name).
 
 Same file's **INV-4** asks whether B1's coincidence-partition state compresses.
 That question is now known to be answerable, and to have answered "no, the
