@@ -148,24 +148,29 @@ def closure(d2, acc, p, cap):
     return basis, keep
 
 
-def row_weights(d2, basis, keep):
-    """Row weights of the two compressed transition matrices.
+def row_weights(d2, basis, rows, p):
+    """Row weights of a compressed transition matrix, in ONE basis.
 
-    B is in RREF, so for h in the span h = h[piv] . B exactly: the compressed
-    row IS h[piv].  Residual is checked -- a nonzero one means the closure is
-    not invariant and the whole measurement is void."""
+    `rows` is the domain basis, given as vectors in F_p^n.  B is in RREF with
+    pivot columns piv, so the coordinates of any vector v of the span are
+    exactly v[piv]; hence row i of the compressed A_b is (rows[i] o delta_b)[piv]
+    and its weight is a count_nonzero.  Domain and codomain are the same basis
+    only when `rows` IS B -- which is why B is what the headline number uses.
+    The residual is checked: a nonzero one means the closure is not invariant
+    and the measurement is void."""
     n = d2.shape[0]
     out = {}
     for b in (0, 1):
         d = d2[:, b]
         ok = d >= 0
-        w = np.empty(len(keep), dtype=np.int64)
-        for i, g in enumerate(keep):
-            h = np.zeros(n, dtype=np.uint8)
+        w = np.empty(len(rows), dtype=np.int64)
+        for i in range(len(rows)):
+            g = rows[i]
+            h = np.zeros(n, dtype=np.float64)
             h[ok] = g[d[ok]]
-            hf = h.astype(np.float64)
-            c = basis.coeffs(hf)
-            r = basis.residual(hf, c)
+            h %= p
+            c = basis.coeffs(h)
+            r = basis.residual(h, c)
             if np.flatnonzero(r).size:
                 raise AssertionError(f'closure not invariant at b={b}, i={i}')
             w[i] = int(np.count_nonzero(c))
@@ -176,11 +181,17 @@ def row_weights(d2, basis, keep):
 def run_height(H, p, want_weights=True):
     order2, d2, acc2 = build_cell_automaton(H)
     n = len(order2)
-    cap = n
-    basis, keep = closure(d2, acc2, p, cap)
+    basis, keep = closure(d2, acc2, p, n)
     d = basis.nb
-    w = row_weights(d2, basis, keep) if want_weights else None
-    return n, d, w
+    if not want_weights:
+        return n, d, None, None
+    # Headline: the RREF basis itself, so domain and codomain agree.
+    wB = row_weights(d2, basis, basis.B[:d], p)
+    # Control: the 0/1 closure generators as the domain basis -- a different
+    # legitimate basis, reported so the basis-sensitivity is visible rather
+    # than assumed away.
+    wK = row_weights(d2, basis, [g.astype(np.float64) for g in keep], p)
+    return n, d, wB, wK
 
 
 def main():
@@ -198,7 +209,7 @@ def main():
     for H, banked in sorted(BANKED_GF2_CELL_RANK.items()):
         if H > maxh:
             continue
-        n, d, _ = run_height(H, 2, want_weights=False)
+        n, d, _, _ = run_height(H, 2, want_weights=False)
         if d != banked:
             say(f'GATE FAILED H={H}: char-2 cell rank {d} != banked {banked}')
             return 1
@@ -230,21 +241,23 @@ def main():
     # char 2 goes through the IDENTICAL code path and the identical RREF basis
     # convention, so any difference in the weights is the characteristic and
     # not the basis choice.  That control is the whole point of the table.
-    say('H  cellstates  colstates | d_p  A0_p  A1_p  nnz_p | d_2  A0_2  A1_2  '
-        'nnz_2 | dense d_p/2  wall_s')
+    say('H  cellstates  colstates | d_p  A0_p  A1_p  nnz_p [generator-basis '
+        'A0/A1] | d_2  A0_2  A1_2  nnz_2 | dense d_p/2  wall_s')
     for H in range(4, maxh + 1):
         t0 = time.time()
-        n, d1, w = run_height(H, PRIMES[0])
-        _, d1b, _ = run_height(H, PRIMES[1], want_weights=False)
+        n, d1, wB, wK = run_height(H, PRIMES[0])
+        _, d1b, _, _ = run_height(H, PRIMES[1], want_weights=False)
         if d1 != d1b:
             say(f'PRIME DISAGREEMENT H={H}: {PRIMES[0]}->{d1} '
                 f'{PRIMES[1]}->{d1b}')
             return 1
-        _, d0, w0 = run_height(H, 2)
-        a0, a1 = w[0].mean(), w[1].mean()
-        b0, b1 = w0[0].mean(), w0[1].mean()
+        _, d0, vB, _ = run_height(H, 2)
+        a0, a1 = wB[0].mean(), wB[1].mean()
+        k0, k1 = wK[0].mean(), wK[1].mean()
+        b0, b1 = vB[0].mean(), vB[1].mean()
         say(f'{H}  {n}  {motzkin(H+1)-1} | {d1}  {a0:.2f}  {a1:.2f}  '
-            f'{d1*(a0+a1):.0f} | {d0}  {b0:.2f}  {b1:.2f}  {d0*(b0+b1):.0f} | '
+            f'{d1*(a0+a1):.0f}  [gen {k0:.2f}/{k1:.2f}] | '
+            f'{d0}  {b0:.2f}  {b1:.2f}  {d0*(b0+b1):.0f} | '
             f'{d1/2:.1f}  {time.time()-t0:.1f}')
     return 0
 
