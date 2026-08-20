@@ -85,12 +85,82 @@ our own square enumeration plus the tower can reach — worth having, and much
 cheaper than the king ladder, but not "a square-lattice `D_j` derivation, not
 machine time" as §1b puts it.
 
+## The wired route, and 171 cancellations — added 2026-08-20
+
+Gate K above checks king `A_3` against the **wired** `P_k` rather than against
+a banked `A_k`. That construction was written for `k = 3`, but nothing in it is
+specific to `k = 3`: it runs at every `k` the wired diagonal table reaches,
+which is `k ≤ 19`, and it computes no cluster weight at all. `--wired-only` is that half
+on its own, and it returns in under a second.
+
+Two things fall out of running it.
+
+**The two grand-form constants per level, for king, to `k = 19`.** `c_k(n) =
+A_k n + B_k`:
+
+| k | A_k | B_k |
+|---|---|---|
+| 1 | 25 | −45 |
+| 2 | −209/2 | −891/2 |
+| 3 | 4474/3 | −10350 |
+| 4 | −22701/4 | −846963/4 |
+| 5 | 16144 | −3781134 |
+| 6 | 15126941/3 | −119091015 |
+| 7 | −687296991/7 | −14478715359/7 |
+| 8 | 16995497259/8 | −422154856107/8 |
+| 9 | −74756868461/9 | −1487291768649 |
+| 10 | 987107242503/5 | −157865366062953/5 |
+| 11 | −167395577383614/11 | −5691866601417228/11 |
+| 12 | 2763085221702553/2 | −70608382970548959/2 |
+| 13 | −720698320820505951/13 | 725307892812247635/13 |
+| 14 | 23806059560272857169/14 | −336304442725786678509/14 |
+| 15 | −493233295413187159171/15 | −211243195829544461505 |
+| 16 | 4737043349049134006715/16 | −48607562060310698638155/16 |
+| 17 | 166978491890346163441779/17 | −7614668303432519358253869/17 |
+| 18 | −8798698594866651300807629/18 | 1842210899412762378532347/2 |
+| 19 | 215000982004527315731741127/19 | −3197921036512955745255968241/19 |
+
+`k·A_k` is an integer at every one of the nineteen orders. The sign of `A_k`
+alternates except between `k = 5, 6` and between `k = 16, 17`; both are stated
+as properties of the table, with no explanation offered.
+
+**171 coefficient cancellations, as an audit of the table.** `c_k` is assembled
+from `P_1 … P_k`, of degrees `1 … k`, so it is generically degree `k` in `n`.
+The gas requires it to be linear, which is `k − 1` vanishing coefficients at
+order `k` and `Σ_{k ≤ 19} (k−1) = 171` in all. All 171 hold.
+
+That is a consistency check between two things established separately:
+extensivity `c_k = A_k n + B_k` is a consequence of the grand form (proved,
+Lean-complete, `docs/proofs/grand-form.md`), while the wired `P_k` were fitted
+from swept cells. `experiments/gas_cumulants.py` already tests linearity, but
+it builds `P_k` from the drift-parametric DP and can only afford `k ≤ 2` for
+king (`KMAX` in that file). Off the wired table the same test reaches `k = 19`.
+
+**RED, and the scope.** Adding 1 to `P_19`'s `n²` coefficient breaks linearity,
+so the audit has teeth. It does not have total teeth, and the second control
+says so rather than leaving it to be assumed: a perturbation of `P_k`'s
+**constant** term enters `c_k` as a constant, and one of its `n¹` term enters
+as a slope, so neither can ever disturb linearity — the run asserts this by
+bumping `P_19`'s constant term and requiring that nothing breaks. The audit
+therefore pins the `n² … n^k` coefficients of each `P_k`, `k − 1` of its `k + 1`
+coefficients, and says nothing whatever about the other two.
+
+**What this does for `k = 4`.** King `A_4 = −22701/4` is now a target, not a
+prediction: the `K = 4` run of the weights route has to reproduce it, from
+cluster weights that share no code with the wired table. Hex has no wired
+table, so hex `A_4 = 3915/4` (measured from the weights, this run) stays an
+unchecked prediction.
+
 ## NOT ESTABLISHED
 
-- **`B_k`, the cumulant constants.** Only the slopes `A_k` come from `log H`;
-  the constants need `C(u)`, which this does not touch.
+- **`B_k` from the weights.** Only the slopes `A_k` come from `log H`; the
+  constants need `C(u)`, which this does not touch. The `B_k` tabulated above
+  come from the wired `P_k` instead, so they exist for king only and carry no
+  cross-route agreement — the weights route has never produced one.
 - **The below-onset `D_j` on any lattice but king.** The bounded-excess family
   DP (`cpp/severance_w3_families.cpp`) is a different machine from the gas
   weights and has not been checked for lattice-parametricity here.
-- **`k ≥ 4` on hex and king.** `universal-diagonal-law.md` banks square to
-  `k = 4` and hex to `k = 3`; there is nothing to check king's `c_3` against.
+- **`k ≥ 4` on hex.** `universal-diagonal-law.md` banks square to `k = 4` and
+  hex to `k = 3`, and there is no wired hex table, so hex `A_4 = 3915/4` is a
+  one-route number with nothing to check it against. King `k ≥ 4` is no longer
+  in this bullet: the wired route above supplies targets to `k = 19`.
