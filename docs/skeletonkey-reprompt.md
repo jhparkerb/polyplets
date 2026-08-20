@@ -135,6 +135,22 @@ the conclusion. L3-3 has no such second kill, and its own queue row prices it
 "level-1 value only" — i.e. a candidate second source, not a reach lever, which
 is the lane the B1 ladder already occupies more cheaply.
 
+**L3-3 CLOSED 2026-08-20** — `results/skeletonkey-l3-3-fattening.md`. The
+construction is *sound*, which is the new fact: under a lex filling convention
+the image is pinch-free and the map is injective over all 176,138 king animals
+to n = 8, with a proof (a block is the lex-larger candidate at its own
+bottom-left corner, so it never wins that mark and is never completed by marks
+— full blocks are exactly the animal). It dies on what the working construction
+costs. A bijection restates a counting problem rather than reducing one, so the
+image class carries exactly the king information; and the verbatim machinery the
+row wants to borrow is class-agnostic, so it pays for a column of height 2H —
+the incumbent's banked law `Motzkin(H+1) − 1` read at h = 42 is 1.6 × 10¹⁸
+against 4.0 × 10⁸ at H = 21. The level-1 reading dies on size alone: 4n cells
+per image puts a(40) at ≥ 160-cell polyominoes against a literature record of
+n = 56. Note that r4-floors was *right* that the rank floor was not the
+objection — the objection is that the information is identical, not that the
+floor is paid.
+
 Same file's **INV-4** asks whether B1's coincidence-partition state compresses.
 That question is now known to be answerable, and to have answered "no, the
 states are not minimal" once — see #1. Flagged, not pursued, because #1 is
