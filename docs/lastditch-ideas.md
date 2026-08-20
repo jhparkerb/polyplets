@@ -91,6 +91,48 @@ The blocker is that Severance's ledger is king-only ("what remains king-only is
 the ledger — assembling c_k from the weights — and the master equation",
 `results/defect-gas.md`); the weight DP itself is already lattice-parametric.
 
+### CORRECTION 2026-08-20 — §1a's payoff does not exist, and §5 dies with it
+
+Branch `skeletonkey`, desk arithmetic on banked files, no compute.
+
+**§1a as written is void.** The pin's own equation (`undertow_pin.py`
+docstring) is `T(2k+1-j, k+1-j) = P_k(2k+1-j)·3^(...) + D_j(k)`. A below-onset
+cell at depth `j` therefore contributes one equation **and one unknown**,
+`D_j(k)`, unless that depth's `D_j` is already known ab initio. Equivalently,
+in the Step-5 basis the cell at height `H` touches exactly one coefficient of
+the correction polynomial, `[z^H]D`. The map is one-to-one, so the eighteen
+`H ≤ 18` cells cancel against fifteen new unknowns and the redundancy is
+unchanged.
+
+The honest accounting is
+
+    surplus at level k  =  (banked cells whose depth has a known D_j)  −  2
+
+which at `k = 19`, `j ≤ 4`, `H ≤ 18` gives depths 2, 3, 4 and surplus 1 —
+exactly the "3 depth pairs, 2 independent checks" `results/undertow.md`
+already reports. §1a's "turns the 3-agreeing-pairs check into an 18-equation
+consistency check per level" was arrived at by counting the cells and not the
+unknowns they bring. **Nothing is gained by solving the whole column**; it is
+a reformulation of the same information, and what actually buys redundancy is
+one more *ab initio depth*, not one more cell.
+
+**§5 dies on the same arithmetic, from the other end.** The escape would be
+that `D_j(·)` is constrained in `k`, so that cells across levels share few
+unknowns. It is — `D_1` is P-finite — but at `(r,d) = (35,4)`, an ansatz with
+`36 × 5 = 180` unknown coefficients. That is why
+`results/onset-defect-depth1-closed.md` fitted it on 57 series orders with 144
+in holdout, off `D_1` evaluated ab initio to `k = 200`. Neither supply reaches
+180: there are ~15 banked cells per depth (`severance_w3_depth5_gate.py` names
+its own 15, `T(2k−4, k−4)` for `k = 5..19`), and the family DP that would
+supply more grows 1.52×/K in RSS (`results/lastditch-cost-ladders.md` §3).
+
+Two caveats, stated rather than buried. `(35,4)` is the *minimal* order for
+`j = 1` — the same file's mod-p scan proves nothing smaller works — so it is
+a floor for the easiest depth, not a ceiling for the others; that deeper `D_j`
+are no simpler is an expectation, not a measurement. And none of this touches
+**§2**, the direct family-DP route to depth 5, which stands at its measured
+~51 GB / ~23 h.
+
 ## 2. Depths 5–8 (the multiplier on Undertow)
 
 W3 says the frame already covers j ≥ 5 — "each depth adds finitely many
