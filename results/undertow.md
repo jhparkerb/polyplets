@@ -34,8 +34,10 @@ coefficient 1, so (*) is one linear equation, and its cell sits at height
     grand form consistent on wired levels k = 1..19 (every residual linear in n)
     ab-initio depth series loaded for j = 1..3, k <= 19
       k= 2 ... k=19, each OK
-    verify: 18 levels re-derived exactly, 0 wrong, 1 skipped
+    verify: 18 levels re-derived exactly over 100 depth pairs, 0 wrong, 1 skipped
     VERIFY GREEN
+
+(at depths 1..4: six pairs per level from k = 4 up, 100 pairs in all.)
 
 Exactly — the same rationals, not agreement to some number of digits. The
 `k = 19` line is the one that matters: **P₁₉ re-derived from `T(38,19)` and
@@ -114,6 +116,37 @@ cell H = 19 — and:
 `T(40,20)` and `T(40,21)` — come back exactly from data no taller than
 H = 19.** The RED control is a perturbed level 20, and it fails the
 regression.
+
+## Row 40 is one cell short of rule-independent, from banked data alone
+
+`experiments/undertow_ri.py` builds the tower with **nothing the incumbent
+produced**:
+
+- levels 1..9 from Severance W1's ab-initio `P_k` (cluster weights, matched
+  the wired table coefficient for coefficient);
+- levels 10..20 pinned from **Motley's own cells**, telescoped
+  `T = C_H - 2C_{H-1} + C_{H-2}` out of `results/cutcount_b1/rows/`, every
+  pinning cell at `H <= 18`, and row 40 excluded from its own pinning set;
+- `D_j(k)`, j <= 4, ab initio from Severance W3;
+- the grand form, a Lean-complete theorem.
+
+```
+levels 1..9 seeded from Severance W1's ab-initio P_k
+levels 10..20 pinned from MOTLEY cells only (jmax=4, every pinning cell H<=18)
+row 40: tower covers H = 20..40 (21 cells); 21 match the incumbent, 0 wrong
+row 40: Motley covers H = 1..18 (18 cells)
+row 40: GAP = [19]
+```
+
+**39 of row 40's 40 cells are rule-independent right now, with no new
+compute.** `docs/motley-plan.md`'s table has the residual band at 5 cells
+after Confetti and 3 after Ticker Tape; this is 1, and it is `T(40,19)` —
+which a Motley H = 19 run retires outright. That run was priced at 27–40 days
+and the parallel engine now puts it at ~11 h on dalby.
+
+The Motley triangle agrees with the incumbent on all 720 cells they share
+(H <= 18), which is the already-known part; what is new is that the tower
+built on it reaches H = 20 and reproduces every tall cell of row 40.
 
 ## Four terms reassembled from short sweeps
 
