@@ -169,7 +169,7 @@ re-derive. Full status:
 |---|---|---|
 | 1 | N-family / reach merge on the strip frontier | **ESTABLISHED, PARKED** — `results/skeletonkey-nfamily-merge.md` |
 | 2 | dense compressed transfer | killed, A-S1 "crossover: never" |
-| 3 | sparse compressed transfer in char 0 | see below |
+| 3 | sparse compressed transfer in char 0 | floor base measured **2.43, not 3** at H=11 — the room is real but still non-constructive; `results/skeletonkey-hankel-closure.md` |
 | 4 | another prime / extension field / grading / auxiliary group | killed, T1–T4 |
 | 5 | non-commutative realization | killed, T5 |
 | 6 | Cut&Count, rank-based, ZDD, #SAT, Potts, Tutte, FLM, CTM | killed, F1–F4 |

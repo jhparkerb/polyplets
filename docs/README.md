@@ -65,7 +65,9 @@ carries the verdict.
   `docs/skeletonkey-reprompt.md` is the **entry point**: the post-`/clear`
   prompt for this mission plus the kill inventory that makes a breadth-first
   pass cheap, and the two measured cost laws (height 1.70x per unit of n,
-  depth 7-9x). Results: `results/skeletonkey-cell-sparsity.md` (planned; the measurement
+  depth 7-9x). Results: `results/skeletonkey-hankel-closure.md` (the transfer
+  floor grows at 2.43, not 3 — both extrapolations missed),
+  `results/skeletonkey-cell-sparsity.md` (planned; the measurement
   is running on ayr).
 - **Undertow / last ditch** (the diagonal tower pinned from below) —
   `docs/lastditch-campaign.md` is the **entry point**; then
