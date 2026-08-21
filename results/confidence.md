@@ -1,6 +1,8 @@
 # What we know, and how well
 
-Written 2026-08-20 for jasonp, in plain terms, as a snapshot. It says how much
+Written 2026-08-20 for jasonp, in plain terms, as a snapshot; the running
+job named at the bottom landed 2026-08-21 08:43 and items 3 and 4 are
+rewritten to say what it settled. It says how much
 evidence stands behind each value of A006770 and where the weak points are.
 Supporting detail, with citations, is in `docs/lastditch-campaign.md`; this
 file is the version that does not assume you have read any of it.
@@ -76,40 +78,41 @@ nothing circular.
 Before this session these rows were only partly confirmed. They are now fully
 confirmed.
 
-**3. a(40) — high but not complete.**
-Thirty-nine of its forty cells now have that same independent standing. One
-does not — the cell at height 19. A run computing it is under way and takes
-about a day. Until then, that single cell rests on one program.
+**3. a(40) — complete, as of 2026-08-21.**
+All forty cells. The last one, at height 19, was the only cell in the row that
+had ever rested on a single program; the second program computed it directly
+and got 3247572468599336484342102174163, which is what the original program
+had. Every one of the nineteen heights the second program covers agrees with
+the original at n = 40, and the row sums to the published a(40).
 
-Before: 35 of 40 cells independently confirmed. Now: 39 of 40. After the run:
-40 of 40.
+Before this session: 35 of 40 cells independently confirmed. Now: 40 of 40.
 
-**4. a(41) = 393811462683918679824582849262105 — moderate. This is the weak
-one.**
+**4. a(41) = 393811462683918679824582849262105 — high, as of 2026-08-21. It
+was the weak one.**
 
-It was computed once, by the original program for the cheap part, plus
-formulas for the rest. **There is no second program anywhere in it.** The
-second program has never been run at this size — all of its stored results
-stop at n = 40.
+It now has a second program in it. The colouring program was run at all
+nineteen heights it can reach, at the size row 41 needs — which is the thing
+that had never been done, since every stored result it had stopped at n = 40.
+Those nineteen cells were rebuilt from it, the formulas for the remaining
+twenty-two cells were fitted to *its* data rather than the original program's,
+and the row was summed. It came out
+393811462683918679824582849262105, digit for digit.
 
-A teammate re-derived the formula arithmetic in independent code and got the
-identical answer. That is worth something: it rules out typos, bookkeeping
-slips and assembly errors. But it is re-doing the same mathematics a second
-time, not doing different mathematics — and it took 0.2 seconds, which is a
-fair measure of how much less it is than the weeks that went into confirming
-a(40).
+So a(41) is now on the same footing as a(36)-a(39): every cell either computed
+directly by the second program or derived by formula from that program's own
+data, with no part of it depending on the original program. Two methods that
+share no code and no strategy now agree on it.
 
-What supports it: the run that produced it also recomputed 760 previously
-known values with no disagreement; the two cells that have exact closed-form
-answers came out exactly right; and the growth ratio continues smoothly —
-6.9212, 6.9261, 6.9308, 6.9352, then 6.9394 — with the increments shrinking,
-as they must for a series converging.
+What still limits it, and it is the same limit a(36)-a(39) have: the top of the
+row is formula rather than direct computation, and the formula governing it is
+fixed by exactly two data points with nothing left over to check it against.
+That is a statement about the top twenty-two cells, not about the agreement —
+the agreement is real and was not available yesterday.
 
-What weakens it: the formula governing the top of the row is fixed by exactly
-two data points, with nothing left over to check it against. Everywhere else
-there is spare data providing redundancy. There, there is none.
-
-**It is a computed number with consistency checks, not a confirmed one.**
+The earlier reservation, that the independent re-derivation "took 0.2 seconds,
+which is a fair measure of how much less it is than the weeks that went into
+confirming a(40)", no longer applies to this item. The run that settled it took
+about 22 hours.
 
 **5. The rest of the table — a real consistency gain, weaker in kind.**
 A systematic audit re-derived 189 previously computed values from shorter,
@@ -130,21 +133,24 @@ independent derivations produced by different code. The third is constrained
 by an arithmetic property that would break if it were wrong. But if any of
 this fails, that is where.
 
-## What is running, and what it buys
+## What was running, and what it bought
 
-*As of 2026-08-20, mid-morning.* One job, about a day, on dalby. It runs the
-second program across all heights up to 19, at the size needed for row 41.
+*Launched 2026-08-20 10:38, finished 2026-08-21 08:43 — about 22 hours on
+dalby.* The second program across all heights up to 19, at the size row 41
+needs.
 
-When it finishes: **a(40) is complete — all forty cells independently
-confirmed. And a(41) moves to the same footing as a(36)-a(39): confirmed by a
-second program rather than merely computed.**
+It delivered both of the things it was launched for: a(40) complete, and a(41)
+confirmed by a second program rather than merely computed. Nineteen exact rows
+were reconstructed from nine modular runs each, with one prime held out of
+every reconstruction as a check — it predicted correctly at every length in
+every height, and the reconstruction tool exits non-zero if it ever does not.
 
 The job was originally launched at the wrong size — it would have finished
 a(40) and done nothing at all for a(41). jasonp caught that.
 
-After that, one further run of about eleven hours would test the single
-unchecked formula against a directly computed value, which is the last soft
-spot in the whole construction.
+One further run of about eleven hours would test the single unchecked formula
+against a directly computed value, which is now the last soft spot in the whole
+construction.
 
 ## On trusting this account
 

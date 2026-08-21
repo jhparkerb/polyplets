@@ -17,7 +17,7 @@ Written to survive a `/clear`. If you are picking this up cold:
 
 | host | job | pid | started | expect | output |
 |---|---|---|---|---|---|
-| dalby | Motley ladder H = 1..19 @ Nmax 41 | 2865283 (script); worker pid changes per prime | 10:38 | **~11:30 on 08-21** | `~/var/motley-ladder/` |
+| ~~dalby~~ | ~~Motley ladder H = 1..19 @ Nmax 41~~ | — | 08-20 10:38 | **LANDED 08-21 08:43** | banked, see below |
 | ayr | `cell_sparsity_modp.py 8` | 640243 | 12:11 | overdue, healthy | `~/var/skeletonkey/cellsparse.txt` |
 | ayr | `parametric_master.py 4` | **641839** | 14:28 | king leg, ~2 h on the measured king/hex ratio | `~/var/skeletonkey/parametric_master_k4.txt` |
 
@@ -26,7 +26,23 @@ circumstance short of a dead box — see `a21-run-do-not-restart`.
 
 ---
 
-## 1. The Motley ladder (dalby) — the important one
+## 1. The Motley ladder (dalby) — LANDED 2026-08-21 08:43, ~22 h
+
+**Done, and it did what it was launched for.** All nineteen heights, nine
+primes each, "LADDER COMPLETE H=1..19 Nmax=41". The four steps below were all
+run; the record is `results/cutcount_b1/rows41/README.md` and the rewritten
+items 3 and 4 of `results/confidence.md`.
+
+    CRT       19/19 heights exact; held-out prime correct at every cell
+    row 40    COMPLETE, sum MATCHES a(40) -- GAP [], all 40 cells
+    row 41    COMPLETE, 393811462683918679824582849262105 -- as expected
+    T(40,19)  3247572468599336484342102174163 == incumbent h19.out
+              (and all 19 heights agree with the incumbent at n = 40)
+
+Nothing below this line still needs doing. It is kept because it is the
+protocol, and the next ladder at another Nmax runs the same way.
+
+### The launch record, for reuse
 
 **Heights 1..19 at Nmax 41.** dalby, tmux session 0, window `ladder`. Script
 `scripts/motley_ladder.sh` run from the worktree `~/src/pm-run` (detached at
