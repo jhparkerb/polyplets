@@ -145,11 +145,35 @@ bumping `P_19`'s constant term and requiring that nothing breaks. The audit
 therefore pins the `n² … n^k` coefficients of each `P_k`, `k − 1` of its `k + 1`
 coefficients, and says nothing whatever about the other two.
 
-**What this does for `k = 4`.** King `A_4 = −22701/4` is now a target, not a
-prediction: the `K = 4` run of the weights route has to reproduce it, from
+**What this does for `k = 4`.** King `A_4 = −22701/4` was a target, not a
+prediction: the `K = 4` run of the weights route had to reproduce it, from
 cluster weights that share no code with the wired table. Hex has no wired
 table, so hex `A_4 = 3915/4` (measured from the weights, this run) stays an
 unchecked prediction.
+
+### The `k = 4` run: the two routes agree (2026-08-20)
+
+The king leg finished. From the cluster weights alone,
+
+    king  b = 3   A_k = 25, −209/2, 4474/3, −22701/4
+
+and the fourth entry is the wired table's number, to the fraction. Two routes
+that share no code — one summing cluster weights over the gas, one reading the
+production `P_k` table — land on `−22701/4`.
+
+Two further checks came out of the same run:
+
+    gate K   wired P_1..P_3 give c_3 = 4474/3 n − 10350; the slope is A_3
+             from the weights
+    RED      moving W(2,2) from 12 to 13 moves square A_k to
+             4, −18, 388/3, −1014 — the fit does depend on the weights
+
+The four-row king clusters are what cost: `(2,2,2,2) = 68314` took 6621 s,
+against `(2,3,2) = 18308` and `(2,2,3) = (3,2,2) = 13459`. Nine cumulant
+slopes were reproduced from the weights alone.
+
+Hex `A_4 = 3915/4` is unchanged in standing — it is the same one-route number
+it was, because there is no wired hex table to check it against.
 
 ## NOT ESTABLISHED
 
