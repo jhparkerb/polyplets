@@ -15,6 +15,12 @@ Every item carries what it costs where that is measured, an honest "asserted"
 where it is not, and the standing filter — *name the sentence that gets
 shorter*. Items that shorten no sentence say so.
 
+**STATUS 2026-08-22 — section C is complete.** Every C item is closed: eight
+were executed and are banked in `results/`, three were scoped and deliberately
+not run, and the reasons are per-item below. C returned four things that change
+A or B, folded in where they belong and listed together in "What C changed" at
+the end of this file.
+
 Three sections, and they are not equally urgent. **B is the only one that
 compounds**: every day the tree carries a stale duplicate is a day a reader
 might cite it. A and C are both optional in the strict sense — the repository
@@ -65,8 +71,19 @@ and the plan says to report it that way or hold it. Its two-data-point
 extrapolation of the Nmax exponent out six heights is flagged as weak by the
 plan itself.
 
-**A1.4 — Square-lattice validation against a published series. The channel
-this project structurally lacks.**
+**A1.4 — Square-lattice validation against a published series. DONE at J = 1**
+— `results/undertow-square-validation.md`, 2026-08-22. Undertow's core claim
+holds at every level k = 1..6 on a lattice whose counts are published: the
+below-onset fit equals the classical one as a polynomial and reproduces the
+tallest cell it was denied, with a RED control confirming the wrong defect sign
+breaks it. **What is left of this item** is depth, not principle: only square
+`D_1` is derived, so the saving is one height rather than the king's two or
+three, and the n = 56 headline still needs square below-onset cells at H ≤ 28
+against a triangle that stops at n = 21. Deriving square `D_2` via the now
+lattice-parametric ledger is the next step and is a derivation, not machine
+time.
+
+*Original framing, for the record:*
 
 `docs/lastditch-ideas.md` §1b: run the Undertow pin on a lattice where the
 answers are other people's. The blocker was that Severance's ledger was
@@ -79,7 +96,13 @@ derivation and below-onset square cells at H ≤ 28, not frontier machine time.
 *Sentence that gets shorter:* every claim in the tree that says the diagonal
 tower has never been checked against an external oracle.
 
-**A1.5 — Bank the cell-sparsity measurement.** It ran on ayr, it landed, and
+**A1.5 — Bank the cell-sparsity measurement. DONE** —
+`results/skeletonkey-cell-sparsity.md` and `results/skeletonkey/cellsparse.txt`,
+2026-08-22, with the three docs that promised it updated. Char-0 sparsity is
+real at 425×, the engine still loses on dimension, and H = 8 did not break the
+trend.
+
+*Original framing, for the record:* It ran on ayr, it landed, and
 it lives only in `~/var/skeletonkey/cellsparse.txt`. Three tracked files
 promise `results/skeletonkey-cell-sparsity.md` (planned, and it is this item)
 — `docs/skeletonkey-reprompt.md` twice, `docs/resume-here.md`, and
@@ -98,6 +121,21 @@ ladder delivered; **L-3** names Motley C_19 as the buy, and it was bought.
 Nine rows are CLOSED and twelve read OPEN, and some of those twelve are not.
 An open review queue that is stale in the *reader's* favour is worse than one
 that is stale against it.
+
+**A1.8 — Regenerate the provenance table; it is a height stale.** NEW, from
+C1.4. `scripts/provenance_table.py` line 58 has `MOTLEY_H = 18` with the
+comment "Confetti landed 2026-08-19", but the Nmax-41 ladder landed 08-21 with
+H = 1..19 banked in `results/cutcount_b1/rows41/`. Three of the six cells the
+table calls congruence-only
+<!--q:congruence_only.count@18=6--><!--q:congruence_only.cells@18=(38,19),(39,19),(39,20),(40,19),(40,20),(40,21)-->
+— T(38,19), T(39,19), T(40,19) — are at H = 19 and now have a second program; `results/confidence.md` already says a(40) is
+complete in all forty cells, so the two documents disagree. `make
+gate-provenance` cannot catch it: the gate compares the published note against
+the generator, and a stale constant makes both stale together, green. This is a
+front-door problem — `README.md` puts that table on page one as the answer to
+"why believe a(40)". Advancing the constant, regenerating, and re-reading the
+congruence-only set is the work; a gate that pins `MOTLEY_H` to the banked row
+directories rather than to a hand-edited constant is the follow-up.
 
 **A1.7 — The reach merge, if it is to be unparked.** `results/skeletonkey-nfamily-merge.md`
 is established and banked; parked at jasonp's direction 2026-08-20, and the
@@ -227,6 +265,14 @@ nowhere outside `experiments/` itself. The campaign's *conclusions* are in
 `docs/triangle-postmortem.md` and the `results/triangle-*` files and stay
 regardless. This is about how much of the working apparatus ships with them.
 
+**B8 — NEW, from C: nothing. C added files, it did not make any removable.**
+Worth stating so the section is not padded. The eight executed items produced
+eight `results/*.md`, five probes under `experiments/`, and two data files
+(`results/b001168_external.txt`, 72 lines, and
+`results/skeletonkey/cellsparse.txt`, 13 lines). All are cited. The one thing C
+*changes* about B is B1: five proof notes exist only inside the Ghost Ship
+sandbox, and C touched none of them, so that hazard is exactly as it was.
+
 **B7 — Two one-line tidies.** `.gitignore` lists `build/` twice. And the
 superseded v1 prompt is kept inline in `docs/skeletonkey-reprompt.md` "for its
 rationale" — which is a good reason, but the file is the *entry point* for the
@@ -349,14 +395,25 @@ All of these are new-paper-sized and none of them shortens a sentence in any
 current manuscript. That is stated, not hidden.
 
 **C3.1 — Universality: is the king lattice in the same class as the square
-one?** `results/unexplored-avenues.md` idea 6.2, untouched, and it survived the
+one? DONE** — `results/theta-universality.md`. θ_king = −0.9997 against
+θ_square = −0.9995 at matched length, and the same code reproduces the
+published square λ to six digits, which makes it an external anchor for the
+method the king exponent rests on.
+ `results/unexplored-avenues.md` idea 6.2, untouched, and it survived the
 closure of 6.1 because it does not run through the strip ladder. It is a
 comparison of two θ fits — a *prediction* being tested, rather than a count
 being extended. The repo measures θ = −1 by differential approximants and
 never says why that number; Parisi–Sourlas dimensional reduction and Yang–Lee
 appear nowhere in the tree.
 
-**C3.2 — The limit object, and the sampler that would make it measurable.**
+**C3.2 — The limit object, and the sampler that would make it measurable.
+SCOPED, NOT RUN.** The blocker is mixing, and mixing is not an afternoon: it
+needs a chain whose irreducibility holds at the n being sampled, a bound on
+its mixing time, and prior art checked (Janse van Rensburg–Madras, in
+`papers/MISSING.md`). This is the only route in this file that gets past n = 40
+by not counting, and it is a project rather than an item. Left open
+deliberately.
+
 Ideas 5 and 8 together. Idea 8's first gate is cleared — the move graph is
 connected at every n ≤ 10, one component, no animal with n ≥ 2 ever stuck.
 What was struck was collapsing that into a sampler: irreducibility is necessary
@@ -368,7 +425,12 @@ file that gets past n = 40 by not counting. Prior art likely exists; the
 Janse van Rensburg–Madras entry in `papers/MISSING.md` is the first place to
 look, and this project has a practice for un-findable papers.
 
-**C3.3 — Extremal questions that are not the one already closed.** Minimum
+**C3.3 — Extremal questions that are not the one already closed. DONE: three
+trivial, one open** — `results/king-extremal.md`. Max diameter is n−1, max
+articulation points n−2, min diameter ⌈√n⌉−1. Max hole *count* is the only
+non-trivial one — 0,0,0,1,1,2,2,3,4, no OEIS collision, and king-specific
+(four cells can enclose a hole where the square lattice needs eight).
+ Minimum
 site-perimeter is closed — the closed form was already published as A235382 and
 was not re-proved, by design. What idea 7 lists and nobody has touched: max
 and min diameter at fixed n, max articulation points, max hole *count* as
@@ -377,7 +439,13 @@ oracle already computes what is needed at oracle scale, so entry is a
 one-line reduction over data the repo can produce — and OEIS should be grepped
 before anything is called new, because the square-lattice cases are classical.
 
-**C3.4 — λ's upper bound, candidate 1.** `docs/open-problem-lambda-bracket.md`
+**C3.4 — λ's upper bound, candidate 1. SCOPED, NOT RUN — and it is not mine
+to run.** `docs/open-problem-lambda-bracket.md` is explicitly framed as a
+collaboration target where "the bottleneck is mathematical insight, not
+compute" and the decision of which direction to chance "is where a
+mathematician's judgment is the lever". Machine effort spent here without that
+judgment reproduces the bridge-credit sketch, which was closed as *unsound*.
+ `docs/open-problem-lambda-bracket.md`
 reads strip-decomposition-plus-vertical-join-bound as the most promising
 direction and flags that the join multiplicity may itself be non-local. The
 bridge-credit sketch that tried it is closed and was *unsound* rather than
@@ -387,7 +455,13 @@ claim, and step 2 held in everything measured. This is the item where a
 mathematician's judgment is the lever and machine effort is not, which is what
 the document was framed for.
 
-**C3.5 — Two fields away, listed for completeness.** Discrete tomography
+**C3.5 — Two fields away, listed for completeness. SCOPED, NOT RUN.**
+Different fields, different papers, and neither shortens a sentence here. The
+one piece worth carrying forward is the convention observation, which C3.3
+independently ran into: four king cells can enclose a hole where the square
+lattice needs eight, so "hole" is lattice-dependent in a way that matters if a
+published king number ever disagrees with ours.
+ Discrete tomography
 (reconstruct a polyplet from row and column sums; NP-hard in general for
 polyominoes, polynomial for hv-convex, and king-connectivity changes the
 constraint structure in a way that is not obviously either) and tiling, where
@@ -406,3 +480,45 @@ and §7 and the twenty-row breadth table in `docs/skeletonkey-reprompt.md`. The
 declined runs: Ticker Tape at H = 19, the k = 7 perimeter-defect census, the
 P19 holdout, the cross-ISA a(40) recount, the d = 15..19 triangle tower, the
 a(26)–a(30) diagonal ladder, the cloud. Anything in `PRE-LANDING.md`.
+
+---
+
+## What C changed
+
+Four things, all folded in above; collected here so the delta is visible in one
+place.
+
+1. **A1.4 and A1.5 are done**, and were done as part of C — the square-lattice
+   validation was C1.3, the cell-sparsity banking was C2.4's input.
+2. **A1.8 is new**: the provenance table is a height stale and its gate cannot
+   see it. C1.4 found it while checking what the table records.
+3. **Three banked readings are corrected in place**, none of them by
+   overturning a conclusion:
+   - `results/strip-growth-lambda-bounds.md` — the non-analyticity inference is
+     withdrawn; idea 6.1's closure stands on a quantified reason instead.
+   - `docs/lastditch-ideas.md` §6 — the dual-connectivity kill's baseline was
+     `Bell(b)` where the incumbent pays `Cat(b)`; corrected, the kill is
+     stronger and uniform in b.
+   - `docs/resume-here.md` — the compressed dimension is not catching up with
+     the column frontier, it was behind from H = 4.
+4. **Two external anchors were gained**, which the repo had few of: the DA code
+   reproduces the published square-lattice λ to six digits, and Undertow's
+   mechanism is validated against counts this project did not produce.
+
+Nothing in C changed what B should remove, and nothing in C is a reason to
+delay the landing.
+
+## What C did not settle
+
+Stated so that "section C is complete" is not read as more than it is.
+
+- **C1.1 delivered the question, not the atlas.** λ ≈ 8.97 for spread-8 is a
+  calibrated estimate from nine terms, not a bound. Certified brackets are a
+  priced, unlaunched compute item.
+- **C1.3 validated the frame at J = 1, not the king `D_j` values**, and not at
+  the n = 56 depth §1b hoped for.
+- **C3.2 and C3.4 are open on purpose** — one is a project, the other is
+  explicitly not the machine's to attempt.
+- **The max-hole-count sequence has nine terms and no conjecture.** It is a
+  candidate for guess-and-prove, not a result, and OEIS must be grepped before
+  it is called anything.

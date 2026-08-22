@@ -14,11 +14,12 @@ into a single per-cell warrant:
 - the Motley ladder produces every cell modulo nine primes near 2¹⁶ and
   reconstructs by CRT, holding one prime out as a check.
 
-**They do not compose, and the reason is that CRT is not partial.** Once eight
-primes reconstruct the exact integer, that integer determines its own parity.
-The D2ax bit is then a check on a value already known exactly — which is
-precisely how `subgroup-mod4.md` already uses it, and it is already recorded in
-`results/provenance-table.md` as source tag **C, "congruence only"**.
+**They do not compose, and the reason is that CRT is not partial.** <!--q:prose-->
+Once the reconstructing primes give the exact integer, that integer determines
+its own parity. The D2ax bit is then a check on a value already known exactly —
+which is precisely how `subgroup-mod4.md` already uses it, and it is already
+recorded in `results/provenance-table.md` as source tag **C, "congruence
+only"**.
 
 Nor does the parity substitute for a prime. Nine primes near 2¹⁶ give a modulus
 of about 2¹⁴⁴; adjoining the modulus 2 makes it 2¹⁴⁵, a gain of 0.7%. There is
@@ -46,9 +47,11 @@ Motley's rule-independent reach is 19, not 18, and has been since the day
 before this was written.
 
 The table's headline consequence is the six cells "carrying **only** the mod-4
-congruence — no exact recount, no closed form":
+congruence — no exact recount, no closed form"
+<!--q:congruence_only.count@18=6-->:
 
     T(38,19), T(39,19), T(39,20), T(40,19), T(40,20), T(40,21)
+    <!--q:congruence_only.cells@18=(38,19),(39,19),(39,20),(40,19),(40,20),(40,21)-->
 
 Three of those six are at H = 19 and are now directly computed by a second
 program. `make gate-provenance` does not catch this: the gate regenerates the
@@ -62,9 +65,9 @@ This is a front-door problem, not a bookkeeping one: `README.md` puts
 believe a(40)", and the answer currently on that page is a day out of date and
 understates itself.
 
-**Filed as an A item** — `docs/last-orders.md` A1.8 — because fixing it means
-advancing `MOTLEY_H`, regenerating, and checking what the congruence-only set
-actually becomes, which is work rather than a note.
+**Filed as an A item** in `docs/last-orders.md` — because fixing it means
+advancing `MOTLEY_H`, regenerating, and re-reading the congruence-only set,
+which is work rather than a note. <!--q:prose-->
 
 ## Honest limits
 
