@@ -128,14 +128,40 @@ H = 21: the ratio compounds and there is no closed form, no OEIS match on the
 class counts, and no recurrence with surplus. The census is the measurement that
 replaces the extrapolation.
 
-What it costs is now well constrained. The class counts are exact to H = 12
-(8,539 — re-run today, and H = 12's rank of 1,818 closed a cell
-`results/exactchange-probes.md` §7 had listed as pending). The ratios are
-2.375, 2.263, 2.349, 2.366, 2.406, 2.433, 2.460, 2.482 — rising by about 0.02 a
-height. Carried forward that puts H = 21 in the low tens of millions of classes,
-which at `states × H` successor generation is **minutes of C++ and a few GB**,
-not a campaign. The Python route does not reach: it is ~5.4× per height on build
-alone, so H = 14 is already over an hour.
+What it costs is now well constrained, and the extrapolation has been given a
+holdout rather than merely quoted.
+
+The class counts are exact to **H = 13** after two runs today: H = 12 gave 8,539
+states and rank 1,818 (closing a cell `results/exactchange-probes.md` §7 listed
+as pending), and a count-only run gave **H = 13 = 21,355**.
+
+**The H = 13 value was predicted before it landed.** From the ratios through
+H = 12 — 2.375, 2.263, 2.349, 2.366, 2.406, 2.433, 2.460, 2.482, rising by a
+decelerating increment — the projection was 21,348 against a measured 21,355.
+That is 0.03% one step out, which is the only evidence the numbers below carry,
+and it is more than the merge file had.
+
+Carrying the same decelerating increment forward:
+
+| H | 14 | 16 | 18 | 19 | 20 | 21 |
+|---|---|---|---|---|---|---|
+| ratio | 2.518 | 2.548 | 2.572 | 2.582 | 2.592 | 2.600 |
+| classes | 53,777 | 347,218 | 2,286,952 | 5,905,832 | 15,305,849 | **39,794,772** |
+
+So the key space at H = 21 is **tens of millions of classes, not billions**. At
+`states × H` successor generation that is under a billion unit steps — **minutes
+of C++**, with memory the real cost at roughly 40M canonical keys, so single-digit
+GB. This remains an extrapolation eight steps out and it is exactly what the
+census would replace; it is quoted here to price the census, not to stand in for
+it, and `results/skeletonkey-nfamily-merge.md`'s refusal to quote an H = 21
+number for any other purpose stands.
+
+**The Python route does not reach, measured rather than assumed.** The H = 13
+build took **962 s and 18 GB** on ayr, because it iterates all `2^H` masks per
+state; H = 14 alone would be over an hour and the RSS is already a third of what
+that box can spare. The cell-at-a-time C++ formulation A1.1 specifies replaces
+`2^H` work per state with `H` work per state — a factor of about 10^5 at H = 21 —
+which is the whole reason the item is a build and not a longer run.
 
 The two things the census does not settle are unchanged and are in the merge
 file: whether the mid-column stage tables inherit the cut (the congruence is
