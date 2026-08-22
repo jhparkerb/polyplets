@@ -145,7 +145,14 @@ H = 18..21, then the congruence written properly, then one call in
 
 ### A2. Authorship
 
-**A2.1 — The missing manuscript, and it is the most consequential gap.**
+**A2.1 — The missing manuscript. SOURCE MATERIAL WRITTEN** —
+`docs/undertow-chapter.md`, 2026-08-22: the claim, why it is not circular, what
+it bought with the measurements, the external validation, and what is still
+soft. **The decision is untouched and is jasonp's** — tenth L paper, section of
+P1, or his own prose. Written as source material precisely so that the decision
+stays open.
+
+*Why it is the most consequential gap:*
 
 `paper/L8-below-onset.tex` has the below-onset mathematics: the exact frame,
 the depth-1 closed form, depths 2–4, `θ_j = j − 3/2`, the velocity α = 50/81.
@@ -174,7 +181,12 @@ prose and not the machine's to write. P3 additionally sits behind the
 source material, which is what `docs/paper1-engine-chapter.md` and
 `docs/paper1-reproducibility.md` already are for P1.
 
-**A2.4 — The L papers predate a(41).** They were drafted when the frontier was
+**A2.4 — The L papers predate a(41). DONE as an inventory** —
+`docs/l-paper-currency.md`. Four of the nine are unaffected; five have something
+to absorb and only L8's is substantial. The three options — absorb, footnote,
+leave — are laid out for one decision across all nine.
+
+*Original framing:* They were drafted when the frontier was
 a(40) and the ladder was closed. Three results postdate all nine: a(41) with a
 second source, the parametric master equation (`b = |D|`, so the ledger is no
 longer king-only), and the transfer floor's base measured at 2.43 rather than
@@ -182,7 +194,16 @@ longer king-only), and the transfer floor's base measured at 2.43 rather than
 Each needs a decision — absorb, footnote, or leave — and the decision is
 cheaper made once across all nine than nine times.
 
-**A2.5 — The finite-type barrier as a result in its own right.**
+**A2.5 — The finite-type barrier as a result in its own right. DONE as an
+inventory, and this item OVERSTATED the gap** — `docs/l-paper-currency.md`.
+L3 does develop the barrier: its *What that rules out* paragraph argues that
+multi-cell casing only relocates the over-count and that king slack grows where
+the rook method's saturates, and it closes the quasi-submultiplicativity route
+on the same wall. What is actually absent is the **general** statement — the
+barrier as a property of the method class rather than of the king lattice —
+which is a paragraph, not a section. Corrected here rather than left standing.
+
+*Original framing, for the record:*
 `docs/open-problem-lambda-bracket.md` states it plainly: slack that *grows*
 with n is the signature of a non-local over-count, no finite context R can see
 it, and "this whole method class floors strictly above λ" — then adds that this
@@ -193,7 +214,13 @@ does not develop the barrier as the standalone negative the open-problem doc
 describes. Turning a measured obstruction into a stated limitation of a method
 class is the kind of result that survives having no referee.
 
-**A2.6 — There is no stranger-facing account of anything except a(n).**
+**A2.6 — DONE** — `results/mathematics.md`, 2026-08-22: the companion to
+`results/confidence.md`, covering the diagonal law, the λ bracket and why its
+upper half is stuck, counting from short cells, the arithmetic results, a
+section on what was tried and failed, and what is open. Every claim labelled
+theorem, certificate or measurement.
+
+*Original framing:*
 `results/confidence.md` does that job, in plain terms, for the sequence values
 — and it is the best-written document in the tree. Everything else a visitor
 might want to know (what the λ bracket is and why it is wide, what the diagonal

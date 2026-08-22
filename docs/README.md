@@ -45,6 +45,8 @@ certificate), `docs/proofs/convex-mirage.md`, `docs/proofs/T-n-nm1.md`,
 | `docs/reviewer-expertise-tiers.md` | what expertise each claim needs to assess |
 | `docs/external-anchors.md` | what this machinery reproduces that it did not produce |
 | `docs/paper1-engine-chapter.md`, `docs/paper1-reproducibility.md` | source material for P1 |
+| `docs/undertow-chapter.md` | source material for the Undertow manuscript that does not exist yet; P-vs-L is jasonp's decision |
+| `docs/l-paper-currency.md` | what each of the nine L papers would need to absorb, and the one decision that covers all of them |
 | `docs/main-paper-audit-2026-08-18.md` | findings on `paper/technical-report.tex`, unapplied by design |
 | `docs/priority-passes-2026-08-18.md` | literature-priority passes over the nine L papers |
 | `docs/oeis-ai-policy.md` | OEIS policy and precedent for AI-assisted submissions |
