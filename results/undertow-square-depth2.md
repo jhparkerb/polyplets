@@ -72,12 +72,32 @@ compute a square `P_k` more cheaply.
 
 On the king lattice the corresponding `D_j` come from the family DP
 (`cpp/severance_w3_families.cpp`), which computes them without knowing `P_k`.
+
+**A1.4's proposed route does not exist, and the file it cites says so.**
 A1.4 asked for the square `D_2` "through the now lattice-parametric ledger"
-(`results/skeletonkey-parametric-master.md`) — that derivation is what would
-close the gap, and it is untouched. This file supplies the target it has to hit:
-`−4, 8, −3, 10, −1` at k = 2..6. A ledger derivation that reproduces those five
-integers would be checkable immediately, which is worth more than a derivation
-with nothing to land on.
+(`results/skeletonkey-parametric-master.md`). That file makes the *above*-onset
+cumulant assembly lattice-parametric — `A_k` from the cluster weights, with the
+substitution 3 → b = |D| — and it excludes the below-onset half twice, in its
+own words:
+
+> **The below-onset `D_j` on any lattice but king.** The bounded-excess family
+> DP (`cpp/severance_w3_families.cpp`) is a different machine from the gas
+> weights and has not been checked for lattice-parametricity here.
+
+and, on the same claim in `docs/lastditch-ideas.md` §1b:
+
+> … but not "a square-lattice `D_j` derivation, not machine time" as §1b puts it.
+
+Checked here: the family DP is king-only in both its Python original and its C++
+port — king adjacency is baked into the row-transfer step and there is no
+lattice argument. So the gap is not one substitution away. Closing it means
+making the **family DP** lattice-parametric, which is the below-onset analogue
+of the gap `docs/proofs/universal-diagonal-law.md` names for the above-onset
+side, and it is a build.
+
+This file supplies the target that build has to hit: `−4, 8, −3, 10, −1` at
+k = 2..6. A derivation that reproduces those five integers is checkable
+immediately, which is worth more than a derivation with nothing to land on.
 
 The irregularity makes that derivation more interesting rather than less. Depth
 1 is `(−1)^(k+1)` and could plausibly have been guessed; depth 2 could not.
