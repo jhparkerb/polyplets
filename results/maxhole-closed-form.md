@@ -64,13 +64,45 @@ checked one cell at a time.
 the sublattice construction. The evidence is that it agrees with exhaustive
 enumeration for every n ≤ 10, which is all ten terms that exist.
 
-That gap is the interesting part and it is not obviously hard. An upper-bound
-argument would need to show that each hole, however large, forces enough boundary
-cells that the discrete isoperimetric bound applies — which is the same shape as
-the argument in `results/maxhole-proof.md`, the theorem this project already
-produced by exactly this route (measure at small n, guess the closed form, prove
-it). This is the second instance of that shape and it is stalled one step from
-the end.
+That gap is the interesting part and it is not obviously hard. It is the same
+shape as the argument in `results/maxhole-proof.md`, the theorem this project
+already produced by exactly this route — measure at small n, guess the closed
+form, prove it. This is the second instance of that shape and it is stalled one
+step from the end.
+
+### Reducing the upper bound to one lemma
+
+The statement wanted is: for every king-connected `A` with `|A| = n`, the number
+of bounded 4-components of the complement is at most `n − ⌈2√n⌉ + 1`.
+
+**On a single parity class it is the classical count.** If `A` lies inside one
+parity class, `A` is a subset of the rotated square lattice, and every complete
+unit square of that lattice encloses exactly one odd cell whose four orthogonal
+neighbours are all occupied — an isolated 4-component. So on such sets the hole
+count is at least the number of complete unit squares, and the maximum of *that*
+over `n` sites is exactly `n − ⌈2√n⌉ + 1`.
+
+**What is missing is a parity-compression lemma**, and it is worth stating
+sharply because it is the whole remaining gap:
+
+> **Conjecture (compression).** For every king-connected `A` there is a
+> single-parity king-connected `A'` with `|A'| ≤ |A|` and at least as many
+> bounded 4-components in its complement.
+
+Given that, the bound follows from the classical count. Two honest cautions
+before anyone starts on it.
+
+The single-parity direction proved above is a **lower** bound on holes even
+within that class: an even-parity set with gaps can have unoccupied even cells
+that join odd cells into one large 4-component, so "holes = complete unit
+squares" needs the set to be solid in the rotated lattice, and the general
+single-parity statement is itself not quite closed.
+
+And the compression conjecture is exactly the kind of statement that is either a
+short shifting argument or false, with nothing in between. The cheapest thing
+that would inform it is a search for a mixed-parity animal that beats every
+single-parity animal of the same size — which the exhaustive runs to n = 11
+would already have found if one existed that small.
 
 ## What this costs to extend
 

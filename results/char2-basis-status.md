@@ -104,6 +104,42 @@ height) puts it near **2 hours**, and it would be **minauto-only** — §7 says
 plainly that needs a second source before it counts. It is over the one-hour bar
 and it is jasonp's call, not a thing to slip in.
 
+## A candidate for L3, which the tree does not currently have
+
+The review finding on §8 is that the quotient identity is a subtraction: "no map
+between the top-row quotient and the height-(H−2) system has been exhibited".
+Here is one to test. It is a proposal, not a result, and it is written down
+because a named map can be refuted in an afternoon and a hope cannot.
+
+**Why H−2 and not H−1.** A word that touches the top row commits row H−1, and
+king adjacency reaches ±1, so it also commits row H−2. What is left free is rows
+0..H−3 — a height-(H−2) system. That is the heuristic the dimension count
+`r(H) − dim V_low = r(H−2)` is already consistent with, and it says which two
+rows to remove rather than merely how many.
+
+**The map.** For a word `w` over height H that touches the top row, let `w'` be
+`w` with rows H−1 and H−2 deleted from every column mask — a word over height
+H−2. Conjecture:
+
+> `w ↦ g_{w'}` induces a well-defined isomorphism `V_H / V_low → V_{H−2}`.
+
+**How to refute it, cheaply.** Both sides are computable with the machinery
+already in `experiments/tristruct/exactchange_minauto.py`:
+
+1. *Well-definedness* is the half that will fail if anything does. Take pairs
+   `w₁, w₂` with `g_{w₁} − g_{w₂} ∈ V_low` and check `g_{w₁'} = g_{w₂'}`. A
+   single counterexample kills it, and counterexamples are cheap to sample.
+2. *Injectivity and surjectivity* then follow from the dimension count already
+   measured, so only step 1 is real work.
+3. The obvious variant, if deletion fails, is the **pullback** direction the
+   review's phrasing suggests: insert two rows at the top of a height-(H−2) word
+   and ask whether that lands in a fixed complement of `V_low`. Same test,
+   opposite arrow.
+
+Run it at H = 6, 8 and 10, where `r(H)` and `dim V_low` are both banked. If step
+1 survives all three, the map is worth trying to prove; if it fails at H = 6 it
+cost an afternoon and the next candidate is better informed.
+
 ## What A1.2's "sentence that gets shorter" actually needs
 
 A1.2 aimed at `results/mathematics.md` §7's "Nobody has a basis, and without one
