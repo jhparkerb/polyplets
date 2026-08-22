@@ -131,7 +131,12 @@ Anchors: brute-force counts at H ≤ 3, W ≤ 4 (small -- see §9 item 3);
 state counts equal the banked Nerode counts; ranks equal both A034299 AND
 the independently-computed partition-automaton ranks at every H ≤ 11
 (two-implementation agreement; H = 12 pending, H = 13 would be minauto-only
-and needs a second source before it counts).  Fast numpy closure: 23x over
+and needs a second source before it counts).
+**H = 12 is no longer pending — run 2026-08-22 on ayr** (`results/char2-basis-status.md`):
+8,539 states, rank **1,818**, equal to A034299 and to the partition automaton's
+banked value, brute anchors green, 17 min and 3.9 GB. Two-implementation
+agreement now runs to H = 12. H = 13 is unchanged: ~2 h, minauto-only, still
+needs a second source.  Fast numpy closure: 23x over
 the int-loop version (H = 10 rank in 13 s).
 
 Layer 2 (relations among the N distinct phi values, dim N − r):
