@@ -156,8 +156,11 @@ obeys `n <= 2*H_max + J - 1`.
   component" on the strip automaton. Something that counts a different object
   and assembles a(n) from it is unbounded here. This is the widest door.
 - The a-priori-basis construction question — but see
-  `results/skeletonkey-cell-sparsity.md` (planned) before spending anything
-  on it.
+  `results/skeletonkey-cell-sparsity.md` before spending anything on it --
+  and note what it says: a sparse basis demonstrably EXISTS in char 0 (2.15
+  nonzeros/row against a dense 913 at H=8) and buys nothing there, because
+  dimension not density is what beats the char-0 engine. The basis hunt is
+  motivated by the char-2 COLLAPSE and never by char-0 sparsity.
 
 ## The breadth pass, and what it closed — 2026-08-20
 
@@ -249,6 +252,9 @@ parked.
 
 ## What this session measured
 
-`results/skeletonkey-cell-sparsity.md` (planned). A-S1's "crossover: never"
-rested on assuming the compressed transfer is dense, and named sparsity as its
-one unprobed rescue; Exact Change had measured that sparsity in GF(2) only.
+`results/skeletonkey-cell-sparsity.md` — BANKED 2026-08-22. A-S1's "crossover:
+never" rested on assuming the compressed transfer is dense, and named sparsity
+as its one unprobed rescue; Exact Change had measured that sparsity in GF(2)
+only. The char-0 answer: sparsity is real and 425x at H=8, and the engine loses
+anyway on dimension (2.748x/height against the column frontier's 2.541x, and
+already 1.6x behind at H=4). H=8 did not break the trend.

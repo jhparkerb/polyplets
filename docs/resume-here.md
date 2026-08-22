@@ -154,12 +154,12 @@ not a live-state count — it is exactly `colstates × (2^H − 1)` at every hei
 it to get a speedup ratio; that error was made once in this session and
 corrected.
 
-**When it lands:** append the H = 8 row's `d_p` to the growth series above,
-confirm or correct the ~2.78× figure, and write
-`results/skeletonkey-cell-sparsity.md` — which
-`docs/skeletonkey-reprompt.md` already cites as planned, so `gate-citations`
-is waiting for it. If H = 8 breaks the trend, the whole reading above is what
-changes.
+**LANDED, and banked 2026-08-22** — `results/skeletonkey-cell-sparsity.md`,
+data at `results/skeletonkey/cellsparse.txt`. H = 8 gives `d_p = 1826`, a
+2.639x rung and 2.748x geometric over H=4..8, so the ~2.78x figure stands and
+the trend did not break. The reading above is corrected in one respect: the
+compressed dimension is not catching up, it is already 1.6x the column frontier
+at H = 4 and 2.19x at H = 8, so there is no crossover to wait for.
 
 ---
 

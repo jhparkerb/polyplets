@@ -235,6 +235,15 @@ level. Cheap to try, and it feeds §2 directly.
   component counts) exceeds Bell(b) at exactly the block counts that dominate —
   `b·Cat(b)` vs `Bell(b)` is 11,440 vs 4,140 at b = 8. The dual is *worse*,
   and the reason is the reason connectivity is the wall.
+  **Baseline corrected 2026-08-22** (`results/dual-connectivity-blockcount.md`):
+  the incumbent does not pay `Bell(b)` per block pattern, it pays `Cat(b)` —
+  checkable, since `sum_b C(H+1,2b)Cat(b) = Motzkin(H+1)` and `Motzkin(22)-1`
+  is the banked 400,763,222 to the digit. So the ratio is **exactly b at every
+  block count**, 8x rather than 2.8x at b = 8, and the kill is uniform in b
+  rather than holding only where the block counts dominate. The hybrid that
+  would carry the dual only at small b has no regime: the ratio is <= 1 only at
+  `b <= 1`, which is 0.0001% of the H = 21 frontier, whose mass sits at
+  b = 6-8.
 - **Evaluation/interpolation in the component-count variable.** Truncating the
   `v`-polynomial is only valid as the doomed-configuration prune, which cannot
   be expressed at a single evaluation point; carrying the polynomial explicitly

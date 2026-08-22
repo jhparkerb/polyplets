@@ -68,8 +68,10 @@ carries the verdict.
   pass cheap, and the two measured cost laws (height 1.70x per unit of n,
   depth 7-9x). Results: `results/skeletonkey-hankel-closure.md` (the transfer
   floor grows at 2.43, not 3 — both extrapolations missed),
-  `results/skeletonkey-cell-sparsity.md` (planned; the measurement
-  is running on ayr).
+  `results/skeletonkey-cell-sparsity.md` (banked 2026-08-22: the char-0
+  sparsity rescue is real at 425x but the compressed dimension is already
+  1.6-2.2x the column frontier and grows faster, so "crossover: never"
+  survives for a new reason).
 - **Undertow / last ditch** (the diagonal tower pinned from below) —
   `docs/lastditch-campaign.md` is the **entry point**; then
   `docs/lastditch-ideas.md` (the candidate list, closed doors included),

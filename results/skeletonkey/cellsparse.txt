@@ -1,0 +1,13 @@
+# skeletonkey cell_sparsity_modp  maxh=8  primes=(131071, 65521)
+# gate ok H=4: char-2 cell rank 32 == banked 32 (cell states 300)
+# gate ok H=5: char-2 cell rank 93 == banked 93 (cell states 1550)
+# gate ok H=6: char-2 cell rank 210 == banked 210 (cell states 7938)
+# gate ok H=7: char-2 cell rank 516 == banked 516 (cell states 40894)
+# RED ok: perturbed successor maps give [373, 362, 374], none 93
+
+H  cellstates  colstates | d_p  A0_p  A1_p  nnz_p [generator-basis A0/A1] | d_2  A0_2  A1_2  nnz_2 | dense d_p/2  wall_s
+4  300  20 | 32  1.06  1.75  90  [gen 3.16/5.62] | 32  1.06  1.75  90 | 16.0  0.0
+5  1550  50 | 99  1.24  1.61  282  [gen 6.51/11.88] | 93  1.25  1.62  267 | 49.5  0.5
+6  7938  126 | 249  1.39  2.21  896  [gen 13.54/24.32] | 210  1.42  2.43  809 | 124.5  7.5
+7  40894  322 | 692  1.77  2.19  2743  [gen 28.92/51.60] | 516  1.76  2.84  2372 | 346.0  340.2
+8  212670  834 | 1826  2.15  2.68  8825  [gen 65.01/113.03] | 1155  2.06  3.84  6813 | 913.0  10097.7
