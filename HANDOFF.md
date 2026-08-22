@@ -8,6 +8,11 @@
 > be trusted and why. It is in plain terms, it says which values rest on two
 > independent programs and which rest on one, and it names where the residual
 > risk sits. Everything below is the campaign detail behind it.
+>
+> **Publishing the repo: `PRE-LANDING.md`** (root) is the checklist, and it
+> defines what "ready" means. Section A is jasonp's decisions and nothing else
+> blocks on them; section B is commands, and it is stale by design whenever
+> `HEAD` moves past the revision its boxes were measured at.
 
 
 
