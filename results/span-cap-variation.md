@@ -43,10 +43,16 @@ every level below the top became free, which it does not, since pass `l` still
 pays for levels 1..l.
 
 **On RAM it buys nothing at all.** The peak state set is level K at full span,
-present unchanged in pass K. Depth 5's problem is memory — 103 GB asserted,
-110–390 GB on the review's own decelerating-ratio reading
+present unchanged in pass K. Depth 5's problem was believed to be memory —
+103 GB asserted, 110–390 GB on the review's own decelerating-ratio reading
 (`results/undertow-review-queue.md` L-2), against dalby's 125 GB. A time-only
 1.86× does not move that.
+
+**Correction, 2026-08-22.** Depth 5's memory was measured and it is
+**~8.5 GB**, or 16.1 GB pessimistic (`results/depth5-cost-settled.md`). The
+argument above is unaffected — a time-only saving still buys nothing on RAM,
+and the span cap still undercounts — but the motivating pressure it was
+answering does not exist.
 
 ## Why the tightening looks bigger than it is
 

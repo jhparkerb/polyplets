@@ -7,8 +7,13 @@
 # heredoc or a `-c` one-liner.
 # Exact command:   scripts/run_full_make.sh results/make_full_<topic>.log
 # Target machine:  gympie (laptop), single make job.
-# Predicted cost:  ~5-10 min wall, from the sibling results/make_full_*.log
-#                  runs of 2026-08-05. No RAM or disk pressure.
+# Predicted cost:  ~11 min wall on gympie -- measured 10m47s on the one
+#                  2026-08-06 run that recorded a timing. (The sibling
+#                  results/make_full_*.log runs this line used to point at
+#                  were removed 2026-08-22; see results/removals-2026-08-22.md.
+#                  Fifteen of the sixteen never recorded a wall time, and the
+#                  "~5-10 min" they were said to support was not in any of
+#                  them.) No RAM or disk pressure.
 # Kill/resume:     plain SIGINT; make restarts from whatever is already built.
 set -u
 set -o pipefail

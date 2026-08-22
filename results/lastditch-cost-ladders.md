@@ -67,7 +67,24 @@ per-K slope in range. Closed on arithmetic, `results/undertow-review-C.md` §6.
 | 14 | 705.92 s | 2.69 GB |
 
 Same-thread slope: **1.521x per K** in RSS, 1.972x in wall. Projecting depth 5
-(`emax = 4` at `K = 21`) from K = 14: **~51 GB**, ~23 h at 16 threads.
+(`emax = 4` at `K = 21`) from K = 14: ~51 GB, ~23 h at 16 threads.
+
+> **Superseded 2026-08-22 — the extrapolation, not the measurements.** A
+> five-rung fixed-thread ladder at 8 threads (`results/depth5-cost-settled.md`)
+> measures the ratio *decelerating* monotonically with K, and projects
+> `families 21 4` at **~3.1 h / ~8.5 GB**, or 6.7 h / 16.1 GB holding the top
+> ratio flat. It carries a real holdout: K = 16 was predicted from the first
+> four rungs before it ran, and came in 6.9% under on wall and 8.0% over on
+> RSS.
+>
+> The two ladders do not disagree about any measurement. This one's K = 14 rung
+> is 705.92 s / 2.69 GB at 16 threads; the newer one's K = 14 is 731.86 s /
+> 2459 MB at 8 threads — the same cell, close on wall and lower on RSS
+> exactly as the thread-count effect below predicts. What is superseded is the
+> two-point projection: a slope taken from two rungs cannot see deceleration,
+> so it compounds the low-K ratio all the way to K = 21 and overshoots by an
+> order of magnitude. The methodology note below is why the newer ladder was
+> run at fixed threads at all, and it stands unchanged.
 
 ### The methodology note
 
@@ -79,7 +96,8 @@ wildly because of it:
 | e=4, K=8->12 | 40 | 1.828x/K | 184 GB |
 | e=4, K=10->12 | 40 | 1.636x/K | 84 GB |
 | e=3, K=10->22 | 10 vs 40 | 1.308x/K | 18 GB |
-| **e=4, K=10->14** | **16 both** | **1.521x/K** | **51 GB** |
+| **e=4, K=10->14** | **16 both** | **1.521x/K** | **51 GB** (superseded) |
+| **e=4, K=8->16, 5 rungs** | **8 both** | decelerating | **8.5-16 GB** |
 
 The DP builds per-thread private maps and merges them after
 (`std::vector<Map> parts(nth)` in `cpp/severance_w3_families.cpp::step`), so

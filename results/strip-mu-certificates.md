@@ -78,6 +78,11 @@ every digit printed here (`experiments/mu_H_precision_audit.py`).
 | 10 | 5.9916957 | 59916957 |  5797 | 5.991695792 | 5.9916958 |   36.2s |
 | 11 | 6.1158416 | 61158416 | 15510 | 6.115841628 | 6.1158416 |  120.9s |
 
+**This table stops at H=11 and the ladder does not.** H=12, 13 and 14 are
+certified too; their receipts are in *Honest scope* below, split out rather than
+appended here because the `banked` column has no 7-decimal source for H=12 and
+H=13 (`results/strip-growth-lambda-bounds.md` carries the ladder to four).
+
 (`H=2` is the independent anchor: `mu_2 = 1 + sqrt(2) = 2.41421356...`.)
 
 Vector checksums (SHA-256 over the states sorted by their raw signature bytes,
@@ -175,9 +180,29 @@ Bad arguments are refused rather than clamped: an out-of-range `H`, or a
   the `--vbits 55` stress case. That extrapolation is loose (the H=8->9 increment
   was 15.6 bits), but the failure mode is bounded: if the range runs ahead of it,
   the search absorbs the difference as lost digits, not as a wrong claim.
-- `H >= 12` is not certified yet. `H=14` (`mu_14 = 6.3800344`) is the interesting
-  one — it is the ladder's current top — and is a ~1.5h single-threaded job,
-  scheduled separately. Per-H cost measured here is ~3.3x (H=9: 11.2s,
+- ~~`H >= 12` is not certified yet.~~ **Stale, corrected 2026-08-22.** H=12,
+  13 and 14 were all certified on 2026-07-31 and the receipts are in
+  `results/strip_mu_certificates.log` — twice each, once under `git=4ab40fa`
+  and again under `900b4ff` after the frozen-kernel adoption, same `num` both
+  times. The addendum below has the detail; this bullet and the headline table
+  were simply never updated, and `paper/L3-lambda-bounds.tex` has published the
+  H=14 row since. The three receipts:
+
+  | H | certified `mu_H >=` | num / 10^7 | states | `mu_H` (float) | attempts | wall |
+  |---|---|---|---|---|---|---|
+  | 12 | 6.2191246 | 62191246 |  41834 | 6.219124621 |  1 |  393.5s |
+  | 13 | 6.3060712 | 63060712 | 113633 | 6.306071285 |  1 | 1469.8s |
+  | 14 | 6.3800149 | 63800149 | 310571 | 6.380034445 | 18 | 5832.8s |
+
+  H=14 is the one that steps down: 18 sweeps, certifying `6.3800149` against
+  the `6.3800344` its float phase found, which is the precision budget behaving
+  as designed and is discussed below. The walls are the original hash-map
+  binary's; the frozen-kernel binary does the same H=14 in 18.3 s.
+
+  What follows is the original bullet's reasoning, kept because its cost
+  extrapolation is what the runner script was budgeted from. `H=14`
+  (`mu_14 = 6.3800344`) is the interesting one — it is the ladder's current top
+  — and is a ~1.5h single-threaded job, scheduled separately. Per-H cost measured here is ~3.3x (H=9: 11.2s,
   H=10: 36.2s, H=11: 120.9s on gympie), extrapolating to ~70 min at H=14 and
   consistent with the banked `strip_mu_kink` H=14 float solve at 4851s
   (`results/strip_mu_H14.log`); peak RSS is 15 MB at H=11, so memory is a

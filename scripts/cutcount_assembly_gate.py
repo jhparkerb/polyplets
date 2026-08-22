@@ -47,7 +47,33 @@ ROWS = ROOT / "results" / "cutcount_b1" / "rows"
 RESIDUES = ROOT / "results" / "cutcount_b1" / "residues"
 TRIANGLE = ROOT / "results" / "triangle.txt"
 
-NMAX = 40
+def triangle_nmax():
+    """The greatest n the banked triangle carries, DERIVED rather than pinned.
+
+    Was `NMAX = 40`, hand-edited, and it made this gate's COVERAGE stale
+    without making it red -- the failure class `scripts/provenance_table.py`
+    already fixed for MOTLEY_H.  Planted 2026-08-22 during the gate-class
+    sweep (`results/gate-class-sweep.md`): with 41 fabricated rows appended to
+    results/triangle.txt this gate stayed GREEN, because the assembly loop is
+    `range(1, NMAX + 1)` and simply never looked at them, while
+    gate-provenance and gate-residual-cells both went red on the same plant.
+
+    Derived, the pinned counts below do the work instead: the day the triangle
+    grows, EXPECT_CELLS and EXPECT_HELDOUT_CELLS stop matching and the gate
+    fires, which forces the coverage question to be answered deliberately.
+    """
+    nmax = 0
+    for ln in TRIANGLE.read_text().splitlines():
+        ln = ln.strip()
+        if not ln or ln.startswith("#"):
+            continue
+        nmax = max(nmax, int(ln.split()[0]))
+    if nmax <= 0:
+        raise SystemExit("cutcount gate: %s carries no rows" % TRIANGLE)
+    return nmax
+
+
+NMAX = triangle_nmax()
 # Pinned coverage.  These are what the tree holds today; a rung that banks a new
 # row must move them deliberately, which is the point.
 EXPECT_TOP_H = 18                      # results/motley-h18.md (Confetti)

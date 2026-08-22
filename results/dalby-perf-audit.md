@@ -79,6 +79,26 @@ Real production-shaped run: `scripts/perf_audit_run.sh`, rev `5fadde3`, dalby,
 total cumulative-column-wall). Predicted ~30-40min from the maxn=22 calibration
 — matched.
 
+![dalby perf-audit probe: CPU busy, run queue, md3 %util and free memory
+against seconds since run start](dalby-perf-audit.png)
+
+The figure is `results/dalby-perf-audit.png`, plotted from this run's
+`mpstat`/`vmstat`/`iostat` streams (title stamp: `maxn=24 heights 1-15, rev
+5fadde3, wall=2281s, mean util=79.3%`; the 2281s there is the sampler's own
+span, against the engine's 2283.3s). Linked 2026-08-22 — it had been sitting in
+`results/` named by no tracked file, which made it indistinguishable from an
+orphan. What the four panels show, and no more: CPU busy sits pinned at ~100%
+through the first ~480s and then breaks into repeated deep troughs to near zero
+for the rest of the run; the run-queue panel tracks those troughs exactly,
+collapsing from the 80-core line to single digits and back, so the idle is
+work-starvation and not blocking; free memory rises during each trough, never
+falling below ~73 GB of 125; and `md3 %util` is at the floor for the whole run
+apart from two isolated spikes. The last of those is the
+disk-is-not-the-bottleneck finding below, measured a second way. The figure does
+**not** by itself say which of the troughs are H15's straggler tail as against
+between-height transitions — the per-column `map_units` counts below are what
+establish that, and the figure carries no height boundaries.
+
 **Aggregate utilization: 79.3%** (cpu_s=144,889.6 / (wall=2283.3s × 80 cores)).
 Cross-checked two independent ways — engine's own cpu_s/wall_s, and `mpstat`'s
 mean idle% across all 1141 samples (20.1% idle → 79.9% busy). They agree. This

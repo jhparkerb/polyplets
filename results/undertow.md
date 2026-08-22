@@ -129,8 +129,13 @@ Deeper depths extend it one term per level. `D_j` needs excess ≤ j-1 cluster
 families, and `cpp/severance_w3_families.cpp` takes `emax` as an argument;
 measured on dalby, emax = 4 costs 12.2 s / 138 MB at K = 8, 71.4 s / 577 MB at
 K = 10 and 265.0 s / 1.54 GB at K = 12 — about 1.82× per unit K in time and
-1.6× in RSS. `families 21 4` (depth 5) extrapolates to roughly 16 h and 103 GB:
-inside dalby, but at the wall, and it is the run that would let level 21 pin
+1.6× in RSS. This line extrapolated `families 21 4` (depth 5) to roughly 16 h
+and 103 GB; **a five-rung fixed-thread ladder measured on 2026-08-22 puts it at
+~3.1 h / ~8.5 GB, or 6.7 h / 16.1 GB pessimistic**
+(`results/depth5-cost-settled.md`) — a geometric mean over the whole K range
+overestimates the tail by an order of magnitude, because the ratio decelerates.
+So it is comfortably inside dalby rather than at the wall, and it is the run
+that would let level 21 pin
 from `T(39,18)` and `T(38,17)`, both inside Motley's already-banked H ≤ 18
 rows — i.e. **a(40) rule-independent in every cell, with no new sweep at all.**
 

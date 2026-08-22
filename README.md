@@ -21,7 +21,10 @@ holdout-validated).
 [`results/provenance-table.md`](results/provenance-table.md), says for every
 cell of the triangle what confirms it and by which independent source. It is
 generated, and `make gate-provenance` fails if any figure in it drifts from the
-banked rows.
+banked rows — verified fail-closed, not just asserted: planting a grown triangle
+turns all six of its figures red
+([`results/gate-class-sweep.md`](results/gate-class-sweep.md), which asks the
+same question of all 33 gates and records what it found).
 
 **The full account** is the confidence-tier system summarised below and set out
 in [`paper/polyplets-report.tex`](paper/polyplets-report.tex) — a complete

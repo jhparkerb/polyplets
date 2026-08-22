@@ -52,8 +52,15 @@ is the assumption the calibration rests on.
     king      1, 4, 20, 110, 638, 3832, 23592, 147941, 940982 (A006770)
     spread-8  1, 4, 24, 164, 1200, 9126, 71296, 567706, 4586448
 
-The spread-8 sequence is not in the repo and, at nine terms, is worth an OEIS
-check before anyone calls it anything.
+The spread-8 sequence is not in the repo, and **the OEIS check was run on
+2026-08-22: it is not in OEIS either.** Three query widths — all nine terms,
+the middle five `24, 164, 1200, 9126, 71296`, and the tail four `1200, 9126,
+71296, 567706` — each return no results. Controls in the same session: the
+square and king rows above return A001168 and A006770, so the search was
+working and the absence is an absence.
+
+Nine terms of a sequence nobody has entered. What to do with it is
+`docs/time-at-the-bar.md` B7's question, not this file's.
 
 ## RED controls
 

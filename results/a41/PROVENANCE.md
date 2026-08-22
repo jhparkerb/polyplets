@@ -102,7 +102,10 @@ k = 20, overdetermined. Level 21 is not. Two things would fix it, neither run:
   line asserted before the Nmax-scaling measurement existed):
   `T(41,20)` becomes a swept value and P_21's prediction of it becomes a real
   holdout against an enumeration;
-- **depth 5** (`families 21 4`, ~16 h, ~103 GB): level 21 gains a second pin
+- **depth 5** (`families 21 4`, **~3.1 h / ~8.5 GB at 8 threads**, or 6.7 h /
+  16.1 GB on the pessimistic bound — corrected 2026-08-22 from the ~16 h /
+  ~103 GB this line asserted before the ladder was measured, see
+  `results/depth5-cost-settled.md`): level 21 gains a second pin
   pair from `T(38,17)` — agreement rather than a holdout.
 
 Until one of those runs, a(41) should be quoted as computed-and-checked but

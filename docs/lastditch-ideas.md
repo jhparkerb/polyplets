@@ -131,7 +131,8 @@ Two caveats, stated rather than buried. `(35,4)` is the *minimal* order for
 a floor for the easiest depth, not a ceiling for the others; that deeper `D_j`
 are no simpler is an expectation, not a measurement. And none of this touches
 **§2**, the direct family-DP route to depth 5, which stands at its measured
-~51 GB / ~23 h.
+**~3.1 h / ~8.5 GB**, or 6.7 h / 16.1 GB pessimistic (corrected 2026-08-22
+from ~51 GB / ~23 h, `results/depth5-cost-settled.md`).
 
 ## 2. Depths 5–8 (the multiplier on Undertow)
 
@@ -150,7 +151,8 @@ The unknown is how the family DP grows in `emax`. Measured on dalby at
 emax = 4: **12.2 s / 138 MB at K = 8, 71.4 s / 577 MB at K = 10, 265.0 s /
 1.54 GB at K = 12** — about 1.82x per unit K in time and 1.6x in RSS, so
 `families 21 4` (depth 5) extrapolates to ~16 h and ~103 GB. Inside dalby,
-at the wall.
+at the wall. **[Superseded 2026-08-22 — see the corrected price at the end of
+this section: ~3.1 h / ~8.5 GB.]**
 
 **A per-level span cap was tried and is WRONG — do not re-pitch it.** The DP
 caps the horizontal span at `2K + emax + 1` for every level, and it looks
@@ -174,7 +176,8 @@ K=8 6.52 s / 129 MB through K=16 1988.13 s / 4239 MB, with both ratios
 decelerating monotonically (RSS 3.59, 2.48, 2.14, 1.72 per +2K). `families 21 4`
 projects to **~3.1 h and ~8.5 GB at 8 threads**, or ~6.7 h / ~16.1 GB on the
 pessimistic assumption that the deceleration stops dead. The ~16 h / ~103 GB
-below was a geometric mean over a decelerating range and is superseded; K=16 was
+quoted at the top of this section was a geometric mean over a decelerating
+range and is superseded; K=16 was
 predicted before it ran and came in within 8% on both axes. Depth 5 is not "at
 the wall"; it fits with headroom. The gate did its job in about four minutes, which is the argument for
 building the gate first.

@@ -18,7 +18,18 @@ disagrees with the live tree.
 
 ## The specific traps
 
-Three files here shadow live files under `docs/proofs/` and differ from them.
+**Corrected 2026-08-22.** This section said "three files"; a byte-level
+comparison of all 278 tracked files here against the live tree gives **nine**
+that shadow a live file and differ from it, not three. The three under
+`docs/proofs/` are tabulated below because they are the ones where the
+disagreement is a *claim*; the other six differ because the live file simply
+moved on, and are listed after the table. The same comparison found 12 files
+that are byte-identical to their live counterparts today — those are the
+pre-registered input slice, they are **not** duplication to be cleaned up, and
+removing them would break `results/ghostship/SANDBOX.md`'s published 21-file
+`git archive` command and its "zero dangling references" property. Their
+identity to the live tree is today's coincidence, not a property of the record.
+
 The live version is authoritative in every case.
 
 | file | this snapshot says | the live tree says |
@@ -30,6 +41,23 @@ The live version is authoritative in every case.
 **The λ one matters most.** `9.3154` is the correct value and the project has a
 standing rule not to round it back to `9.3153`. A grep across the whole tree
 returns both; this file is the reason.
+
+The other six that differ from live are not claim-level traps, but a grep will
+still return two versions of each:
+
+    experiments/cluster_weight_dp.py
+    experiments/convex_tm.py
+    results/convex-polyplets.md
+    results/defect-gas.md
+    results/directed-king-animals.md
+    results/strip-growth-lambda-bounds.md
+
+The twelve that are byte-identical as of 2026-08-22 — `certificate_bound.py`,
+`convex_polyplets.py`, `defect_gas.py`, `diagonal_law_proof_check.py`,
+`holefree_gas.py`, `kernel_bound.py`, `king_bound_fast.py`, `king_bui.py`,
+`king_certificate.py`, `king_slack.py`, `king_types.py` and `spine_deeper.py`,
+all under `experiments/` — will start returning two versions the moment any of
+them is edited on master. That is expected and is not a defect in this slice.
 
 ## The other eight files under `docs/proofs/` here
 

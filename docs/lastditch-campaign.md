@@ -105,7 +105,8 @@ Lane B: every tower statement about `T(40,19)` contains `D_3(21)`, so two
 tower routes agreeing checks the pinning cells and never the shared machinery.
 **Only enumeration crosses assumption families.** Hence Motley `C_19` — not
 depth 5, which buys agreement inside the same machinery even though it is now
-priced at an affordable ~51 GB.
+priced at an affordable ~8.5-16 GB (corrected 2026-08-22 from the ~51 GB this
+line asserted, `results/depth5-cost-settled.md`).
 
 ## Closed doors — with counterexamples, so they are not re-pitched
 
@@ -139,7 +140,10 @@ priced at an affordable ~51 GB.
   *output* a holdout against an enumeration. **~11 h / ~190 GB**; the 20-30 h
   / 450 GB this tree asserted before anything was measured is corrected in the
   script header.
-- **Depth 5** — ~51 GB, ~23 h at 16 threads. `severance_w3_depth5_gate.py` is
+- **Depth 5** — **~3.1 h / ~8.5 GB at 8 threads**, or 6.7 h / 16.1 GB on the
+  pessimistic bound (measured 2026-08-22, `results/depth5-cost-settled.md`;
+  this line asserted ~51 GB / ~23 h from a two-point slope).
+  `severance_w3_depth5_gate.py` is
   written red-first and joins `GATE_TARGETS` the day the table exists.
 - **The five-terms sweep** — disk-capped at Nmax 43 as things stand, and his
   call.

@@ -84,8 +84,10 @@ from real swept data and — this is the part the a(41)-only plan could not do
 
 So rows **41 through 44 are solidly founded**; row 45 additionally rests on a
 level with a single pin pair and no holdout, and should be reported that way
-or held back until depth 5 exists (`families 21 4`, measured ladder ~16 h /
-~103 GB).
+or held back until depth 5 exists (`families 21 4`, **~3.1 h / ~8.5 GB**, or
+6.7 h / 16.1 GB pessimistic — measured 2026-08-22,
+`results/depth5-cost-settled.md`; this line said ~16 h / ~103 GB before the
+ladder was run).
 
 ## What has to be true
 
@@ -139,7 +141,9 @@ as ever:
   independent checks, and P_21's prediction of `T(41,20)` becomes a **real
   holdout** against a swept value. This is the stronger of the two, because it
   checks against an enumeration rather than against more of the same identity.
-- **depth 5** (`families 21 4`, ~16 h, ~103 GB): gives level 21 a second pin
+- **depth 5** (`families 21 4`, **~3.1 h / ~8.5 GB**, 6.7 h / 16.1 GB
+  pessimistic — corrected 2026-08-22 from ~16 h / ~103 GB, see
+  `results/depth5-cost-settled.md`): gives level 21 a second pin
   pair from `T(38,17)`, i.e. agreement rather than a holdout.
 
 ## What it is not

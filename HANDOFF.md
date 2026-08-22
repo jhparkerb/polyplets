@@ -181,7 +181,11 @@ which is unmeasured; `runs/a41_low` (heights 1-19 at maxn 41, dalby, 40 cores)
 is the measurement.
 
 **Open before P_21 is wired anywhere:** it has one pin pair until depth 5
-exists (`families 21 4`, measured ladder says ~16 h / ~103 GB), and
+exists (`families 21 4`, **~3.1 h / ~8.5 GB at 8 threads**, or 6.7 h /
+16.1 GB on the pessimistic bound -- measured 2026-08-22,
+`results/depth5-cost-settled.md`; this line said "measured ladder says ~16 h /
+~103 GB", which was a geometric mean over the whole K range and not a measured
+ladder), and
 `diagCoeffTable`'s `kfact int64` cannot hold 21! — it needs a big.Int field
 first. Neither is done.
 

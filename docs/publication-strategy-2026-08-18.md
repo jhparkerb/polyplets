@@ -29,8 +29,12 @@ first.
 (the subdominant exponential and the amplitude ratio)**, carved out of L5 and
 never contemplated by the split doc. Then a five-phase trim (34,758 → 31,339
 words, −9.8%), an LLM-tic sweep, a coinage sweep that demoted "law" and renamed
-king animals to polyplets, and a readability pilot on L2. `paper/README.md` is
-stale on one point: it still lists six.
+king animals to polyplets, and a readability pilot on L2. `paper/README.md` was
+stale on one point: it still listed six.
+
+> **This remark is itself now stale (checked 2026-08-22).** `paper/README.md`
+> lists all nine, L1 through L9, each with its page count and its standing
+> caveat. It was brought current after this document was written.
 
 **The P side did not move.** `technical-report.tex` is 331 lines, ~40% built,
 read-only to the machine. The 08-07 order assumed P1 was in flight and the L
