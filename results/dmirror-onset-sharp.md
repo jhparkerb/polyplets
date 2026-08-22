@@ -96,6 +96,13 @@ the onset. It was not conservatism; the onset is sharp.
 **Not closed:** T4 itself, which stands verified exactly at k = 1..5 and untested
 at k = 6. Nothing here is evidence for or against it.
 
+**Also closed, the same day:** the one route that would have made k = 6 reachable
+without new data. A grand form for the dmirror family would reduce level 6 to two
+new constants, needing 2 points against the 7 and 6 available.
+`results/dmirror-grand-form-fails.md` tests it and it fails at the second
+cumulant on both parity classes — the family is a sum over two ground-state
+spines and the parity split does not separate them.
+
 **Also not closed, and cheaper than it looks:** at k = 6 the degree cannot even
 be *confirmed* from banked data — with seven points and an expected degree of 6,
 the sixth difference has one value and no flatness test can run. The probe
