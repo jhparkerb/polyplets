@@ -23,6 +23,7 @@ jasonp's machine, and are not missing from a clone by accident.
 | `docs/lean-environment.md` | toolchain paths, vendored deps, lemma search |
 | `docs/lean-artifact.md` | the Lean development as a citable object |
 | `docs/lean-below-onset-scope.md` | what Lean does and does not reach, and the cost of closing it |
+| `docs/time-at-the-bar-report.md` | what the last round did, and the five priced runs it did not launch |
 
 ## 2. `docs/proofs/` — the mathematical record
 

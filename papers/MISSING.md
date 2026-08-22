@@ -41,6 +41,25 @@ Two obtained, six confirmed paywalled with their metadata pinned, one new lead.
 - Ibn-Majdoub-Hassani 1996 — the thesis record exists, `theses.fr/1996PA112406`, with
   abstract and jury; **no digitised full text**. Confirms the desk is exhausted.
 
+**Sampling literature — found 2026-08-22, and it is NOT missing.**
+`docs/time-at-the-bar.md` A2.1 required a prior-art check before any sampler was
+designed, on the grounds that lattice animals under Rosenbluth sampling is not a
+new idea. It is not, and the two central papers are free on arXiv:
+
+- Hsu & Grassberger, "An improved Rosenbluth Monte Carlo scheme for cluster
+  counting and lattice animal enumeration" — `arXiv:physics/9911023`.
+- Hsu, Nadler & Grassberger, "Simulations of lattice animals and trees" —
+  `arXiv:cond-mat/0408061`.
+
+The method is PERM (pruned-enriched Rosenbluth), applied to lattice animals
+directly rather than only to polymers, reaching site animals on the square
+lattice to **n = 46** — past this project's n = 41 — and producing precise
+estimates of the partition sum and the entropic exponent. Estimates with error
+bars, never exact counts, which is the whole question for whether the channel
+can falsify a term. **These should be fetched into `papers/`;** the paywalled
+Janse van Rensburg–Madras 1997 entry above is not the state of that literature
+and this file should not be read as implying it is.
+
 **Also noted:** Madras 1999, which we hold, is on arXiv as `math/9902161` — cite the
 arXiv id, and it explains the copy's poor OCR.
 
