@@ -116,7 +116,7 @@ Each is over the one-hour bar or needs a second source, so each is jasonp's.
 |---|---|---|
 | **J = 6, one rung** | one `families K 5` cell; K = 14 was ~12 min at emax = 4 | turns the only asserted number in the B2 table into a measured one |
 | **A1.1 census**, H = 18..21 | a C++ build, then minutes — see below | whether H = 20 at Nmax 41 costs 190 GB or materially less, and whether H = 21 comes back inside disk |
-| **`minauto` H = 13** | ~2 h, minauto-only | A034299's predicted `r(13) = 3643`; needs a second source before it counts |
+| **`minauto` H = 13 RANK** | ~2 h on top of the 16 min build already done, minauto-only | A034299's predicted `r(13) = 3643`. The H = 13 *state* count is now measured (21,355); it is the **rank** that tests the identification, and it needs a second source before it counts |
 | **`king_extremal --nmax 11`** | ~2 h, ~55 GB on ayr | the first real test of `n − ⌈2√n⌉ + 1`, predicted 5 |
 | **λ atlas certification** | see A2.3 below | certified two-sided brackets for more than one lattice |
 
