@@ -33,7 +33,15 @@ LADDER = {
     10: (48.16,   473996 / 1024),
     12: (219.20, 1177684 / 1024),
     14: (731.86, 2518568 / 1024),
+    16: (1988.13, 4340916 / 1024),
 }
+
+# K=16 was PREDICTED from the first four rungs before it ran, and the
+# prediction is recorded here as the extrapolator's holdout:
+#   predicted 1859 s / 4607 MB   measured 1988 s / 4239 MB
+#   wall 6.9% under, RSS 8.0% over.  That is the only evidence that the
+#   extrapolation below is worth anything.
+HOLDOUT_K16 = {"predicted": (1859.0, 4607.0), "measured": (1988.13, 4239.2)}
 THREADS = 8
 
 # What the tree asserts, for comparison.
@@ -134,6 +142,31 @@ def main():
           f"{rss/1024:.0f} GB, i.e. it fits with room;")
     print(f"  the ~103 GB figure is consistent with this ladder at about "
           f"{103*1024/rss*THREADS:.0f} threads.")
+    print()
+
+    # The pessimistic bound: assume the deceleration STOPS at the top rung and
+    # the ratio holds flat the rest of the way.  This is the number to quote,
+    # because the deceleration is the part of the model doing the work and it
+    # is fitted from two ratios.
+    print("--- Pessimistic bound: no further deceleration ---")
+    ks = sorted(LADDER)
+    for idx, name, unit, div in ((0, "wall", "h", 3600.0),
+                                 (1, "RSS", "GB", 1024.0)):
+        r = ratios(LADDER, idx)[-1][1]
+        val = LADDER[ks[-1]][idx]
+        k = ks[-1]
+        while k + 2 <= args.target:
+            val *= r
+            k += 2
+        if k < args.target:
+            val *= r ** 0.5
+        best, _, _ = extrapolate(LADDER, idx, args.target)
+        print(f"  {name}: ratio held flat at {r:.2f}/+2K -> "
+              f"{val/div:.1f} {unit}   (decelerating model: "
+              f"{best/div:.1f} {unit})")
+    print()
+    print("  So the honest bracket at 8 threads is the pair of those, and even")
+    print("  its pessimistic end is well inside dalby.")
     return 0
 
 

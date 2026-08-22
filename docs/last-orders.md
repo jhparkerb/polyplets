@@ -62,7 +62,17 @@ construction.
 *Sentence that gets shorter:* confidence.md's "the formula governing it is
 fixed by exactly two data points with nothing left over to check it against".
 
-**A1.2 — Depth 5, and the gate before it.**
+**A1.2 — Depth 5, and the gate before it. DONE, and the price collapses** —
+`results/depth5-cost-settled.md`. Both halves ran. The gate's selftest is green
+and it stays correctly RED in production until the `emax=4` table exists. The
+ladder's two missing rungs were measured on ayr at fixed 8 threads: `families
+21 4` projects to **~3.1 h / ~8.5 GB**, or ~6.7 h / ~16.1 GB with the
+deceleration assumed to stop, against §2's asserted 16 h / 103 GB and L-2's
+110–390 GB. K=16 was predicted before it ran and came in within 8% on both axes.
+Depth 5 is not marginal and not at the wall. Review row L-2 closed; B13's gate
+requirement untouched and still binding.
+
+*Original framing:*
 `experiments/severance_w3_depth5_gate.py` is written red-first. The cost is
 **contested and should be treated as unpriced**: `docs/lastditch-ideas.md` §2
 says ~16 h / ~103 GB from a geometric mean, and `results/undertow-review-queue.md`

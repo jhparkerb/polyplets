@@ -167,8 +167,16 @@ bounded by the *final* cluster's cell count, not its own, because a later row
 can bridge a gap an earlier row opened. The honest bound at level `ell` with
 excess `e2` is `span <= 2K - e2 - 1`, which is the global cap and a bit.
 
-So depth 5 costs what the measured ladder says: `families 21 4` at ~16 h and
-~103 GB. The gate did its job in about four minutes, which is the argument for
+So depth 5 costs what the measured ladder says — and **the ladder was extended
+2026-08-22 and the price falls by an order of magnitude**
+(`results/depth5-cost-settled.md`). Five rungs at fixed 8 threads give
+K=8 6.52 s / 129 MB through K=16 1988.13 s / 4239 MB, with both ratios
+decelerating monotonically (RSS 3.59, 2.48, 2.14, 1.72 per +2K). `families 21 4`
+projects to **~3.1 h and ~8.5 GB at 8 threads**, or ~6.7 h / ~16.1 GB on the
+pessimistic assumption that the deceleration stops dead. The ~16 h / ~103 GB
+below was a geometric mean over a decelerating range and is superseded; K=16 was
+predicted before it ran and came in within 8% on both axes. Depth 5 is not "at
+the wall"; it fits with headroom. The gate did its job in about four minutes, which is the argument for
 building the gate first.
 
 ## 3. Parallel Motley (insurance, and it works today)
