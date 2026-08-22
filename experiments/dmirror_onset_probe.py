@@ -67,28 +67,30 @@ def load():
 
 
 def newton_fit(pts):
-    """Exact interpolating polynomial through (x, y) pairs, as a coefficient
-    list in the monomial basis, highest degree last.  Fractions throughout."""
+    """Exact interpolating polynomial through (x, y), monomial coefficients
+    lowest degree first.  Plain Lagrange with exact Fraction polynomial
+    arithmetic -- the first version of this hand-expanded the Newton form and
+    got it wrong for every degree above 0, which control (a) caught.
+    """
     xs = [Fraction(x) for x, _ in pts]
     ys = [Fraction(y) for _, y in pts]
     n = len(pts)
-    # divided differences
-    coef = list(ys)
-    for j in range(1, n):
-        for i in range(n - 1, j - 1, -1):
-            coef[i] = (coef[i] - coef[i - 1]) / (xs[i] - xs[i - j])
-    # expand Newton form into monomial coefficients
-    mono = [Fraction(0)] * n
-    mono[0] = coef[0]
-    basis = [Fraction(1)]          # product (x - x0)...(x - x_{j-1})
-    for j in range(1, n):
-        basis = [Fraction(0)] + basis            # multiply by x
-        shifted = [c * (-xs[j - 1]) for c in ([Fraction(0)] + basis)[1:]]
-        basis = [a + b for a, b in zip(basis, shifted + [Fraction(0)] * n)][:n + 1]
-        for i, c in enumerate(basis):
-            if i < n:
-                mono[i] += coef[j] * c
-    return mono
+    total = [Fraction(0)] * n
+    for i in range(n):
+        # basis_i(x) = prod_{j != i} (x - x_j) / (x_i - x_j)
+        num = [Fraction(1)]
+        den = Fraction(1)
+        for j in range(n):
+            if j == i:
+                continue
+            # multiply num by (x - x_j)
+            shifted = [Fraction(0)] + num
+            scaled = [c * (-xs[j]) for c in num] + [Fraction(0)]
+            num = [a + b for a, b in zip(shifted, scaled)]
+            den *= (xs[i] - xs[j])
+        for d, c in enumerate(num):
+            total[d] += ys[i] * c / den
+    return total
 
 
 def evalpoly(mono, x):
