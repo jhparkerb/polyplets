@@ -114,19 +114,24 @@ def controls():
           % (len(v1), "OK" if good else "FAILED"))
     ok &= good
 
-    # a convex single family must be clean both ways
-    conv = {n: 3 ** n * n ** 2 for n in range(1, 33)}
+    # A single log-convex family must be clean both ways.  The shape has to be
+    # the REAL one: a(n) ~ B*lam^n*n^theta with theta = -1, whose log is
+    # n*log(lam) - log(n) + const, and -log(n) is the convex part.  The first
+    # version of this control used lam^n * n^2, which is log-CONCAVE -- the
+    # control caught it before the script was used on anything.
+    SC = 10 ** 9   # fixed-point scale, so the arithmetic stays exact integers
+    conv = {n: (3 ** n * SC) // n for n in range(1, 33)}
     good = not violations(conv, 1) and not violations(conv, 2)
-    print("RED  a single log-convex family is clean interleaved AND "
+    print("RED  a single log-convex family (lam^n/n) is clean interleaved AND "
           "same-parity   %s" % ("OK" if good else "FAILED"))
     ok &= good
 
     # (b) the conjectured shape: second family switched on at even n.
     two = {}
     for n in range(1, 33):
-        v = 3 ** n * n ** 2
+        v = (3 ** n * SC) // n
         if n % 2 == 0:
-            v += 2 * (2 ** n) * n ** 2
+            v += (2 ** n * SC) // n
         two[n] = v
     iv, pv = violations(two, 1), violations(two, 2)
     good = len(iv) > 0 and not pv
