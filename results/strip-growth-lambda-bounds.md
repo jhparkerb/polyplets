@@ -408,6 +408,20 @@ no log term at all, would fit the same three points equally exactly. Nothing
 here is a claim about the correction's true shape, only that a log-shaped
 guess moves λ in the expected direction.
 
+**REVISITED 2026-08-22 — the reading above is lambda's error bar, not a log
+term.** `results/strip-fss-lambda-sensitivity.md`. The diagnostic feeds lambda
+in as a constant, and an error `d` in `ln lambda` adds `H*d` to the surface
+term, so every increment picks up a constant that does not decay. Solving for
+the lambda that makes the ladder look clean gives `lambda* = 7.2300`; the two
+values tested above differ by 8e-4, which is 150x too small a range to see it.
+`lambda*(H)` drifts monotonically down (7.604 at H=7 to 7.230 at H=17) and
+extrapolates to 7.1026, within 0.008 of the independent estimate; and with
+lambda held at 7.1102 a four-term analytic expansion fits H>=12 to rms 4.4e-7
+against a 1.5e-8 truncation floor. **The closure of idea 6.1 stands** -- no
+central charge is readable at H<=17, and the quantified reason is that the
+fitted lambda is still biased +0.04 high at the best window available. What is
+withdrawn is the inference that a term between `1/H` and `1/H^2` is *required*.
+
 **H≥18 cost, not run.** `results/strip-mu-fast.md`'s measured H=16
 throughputs (`sum|S_r|` growing a steady 2.95×/H, matvec count +~140/H,
 build RSS 4.94 GB) extrapolate to H=18: **build RSS ~43 GB, float solve

@@ -1,5 +1,11 @@
 # Differential-approximant series analysis: λ = 7.110(1), θ = −1.000(1)
 
+> **The universality prediction is now tested, not just quoted** (2026-08-22,
+> `results/theta-universality.md`). The same 42-approximant spectrum run
+> unchanged on the square lattice's 70 published terms gives θ = −0.9995 at
+> matched length against the king's −0.9997 — a difference of 2e-4 — and
+> λ = 4.06257 against the published ≈4.0625696.
+
 2026-07-11 (research during the a(22) fleet run). `experiments/series_da.py` on the
 exact 36-term sequence a(1..36)=A006770 (a(1..33) from the verified b-file, a(34..36)
 the banked frontier values).

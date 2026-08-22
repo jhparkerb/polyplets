@@ -70,6 +70,14 @@ uncertified one.
   rationality with cyclotomic denominators. The identity licenses our
   enumeration prune, so the prune rests on published mathematics.
 
+- **The square-lattice growth constant, from our own DA code.** The
+  differential-approximant spectrum written for A006770, run unchanged on
+  A001168's 70 published terms, returns λ = 4.06257 against the published
+  ≈4.0625696 — six digits, from code never tuned to that lattice. The same run
+  gives θ_square = −0.9995 against θ_king = −0.9997 at matched length, which is
+  the universality prediction tested rather than quoted.
+  `results/theta-universality.md`.
+
 ## Tier 4 — controls that are required to FAIL, and do
 
 These are anchors in the other direction: a method that would prove something

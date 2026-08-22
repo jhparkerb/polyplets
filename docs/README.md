@@ -36,6 +36,7 @@ certificate), `docs/proofs/convex-mirage.md`, `docs/proofs/T-n-nm1.md`,
 
 | file | what |
 |---|---|
+| `docs/last-orders.md` | **the round before the landing** — work that could be planned, what could be removed, research still worth doing; disjoint from `PRE-LANDING.md` by construction |
 | `docs/acceptance-queue.md` | **the live worklist** — what makes a(21)–a(40) defensible |
 | `docs/publication-strategy-2026-08-18.md` | current strategy: the repo is the publication |
 | `docs/publication-split.md` | P papers vs L papers, the disclosure blocks, the OEIS lineup |
