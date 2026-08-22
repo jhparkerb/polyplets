@@ -139,7 +139,17 @@ def fixed_from_triangle():
     return a
 
 
-def derive(sym, fixed):
+def derive(sym, fixed, report=None):
+    """Derive the four companion sequences from the fixed count and the
+    symmetric fixed-point counts.
+
+    `report`, if given, is a list that collects every n present in `fixed` but
+    NOT derivable, so the caller can SAY which terms fell out of coverage.
+    Until 2026-08-22 the skip below was silent (results/gate-class-sweep.md,
+    finding F4): a triangle row with no symmetry data produced no signal of any
+    kind, and the gate stayed green having quietly narrowed what it covers.
+    The skip itself is correct -- a term with no r180 is not derivable and
+    defaulting it would be worse -- so this reports rather than fails."""
     r90, r180 = sym["r90"], sym["r180"]
     H, D = sym["hmirror"], sym["dmirror"]
     out = {"onesided": {}, "free": {}, "bilateral": {}, "asym": {}}
@@ -148,6 +158,8 @@ def derive(sym, fixed):
         # is a real zero, and every other type must be present or the term is
         # simply not derivable and is skipped rather than defaulted.
         if n not in r180:
+            if report is not None:
+                report.append(n)
             continue
         q = fixed[n] + 2 * r90.get(n, 0) + r180[n]
         if q % 4 == 0:
@@ -271,7 +283,20 @@ def run(mutate=None):
     if mutate:
         mutate(banked)
 
-    der = derive(sym, fixed)
+    underived = []
+    der = derive(sym, fixed, report=underived)
+    if underived:
+        lo, hi = min(underived), max(underived)
+        print("  coverage: %d of %d triangle rows are NOT derivable "
+              "(no r180 count): n = %s%s"
+              % (len(underived), len(fixed),
+                 ", ".join(str(n) for n in underived[:12]),
+                 " ..." if len(underived) > 12 else ""))
+        print("  the companions therefore stop at n = %d while the fixed count "
+              "reaches n = %d." % (lo - 1 if lo <= hi else hi, max(fixed)))
+    else:
+        print("  coverage: every one of the %d triangle rows is derivable"
+              % len(fixed))
     a105 = load_nv(FIXTURES / "b000105.txt")
     nonpoly = {n: der["free"][n] - a105[n]
                for n in der["free"] if n in a105}

@@ -620,8 +620,14 @@ gate-convex-dfinite: build/prec_guess
 # in it needs a fresh convex_perim_tm run. Without GMP it would print one skip
 # line and return 0, so `make gates` reported a green gate that verified
 # nothing. Say so loudly instead; the aggregate still passes, but not quietly.
+# Always runs the gate script, even without GMP.  Until 2026-08-22 the no-GMP
+# branch was a bare `echo` and `make` exited 0, so this was the one gate that
+# could decline to run and still leave the suite green
+# (results/gate-class-sweep.md, finding F3).  The script now records the absent
+# binary as a SKIPPED CHECK and fails on it, waivable with
+# POLY_ALLOW_DEGRADED_GATES=1.
 gate-mk-dir4-perim: $(if $(GMP_LDFLAGS),build/convex_perim_tm) build/directed_cone_anchor
-	$(if $(GMP_LDFLAGS),python3 tests/gate_mk_dir4_perim.py,@echo "*** GATE MK-DIR4-PERIM NOT RUN: no GMP, and this gate has no banked-series fallback -- NOTHING was verified ***")
+	python3 tests/gate_mk_dir4_perim.py
 
 # Gate DIR4-PERIM-ALG: docs/middle-kingdom-followups-plan.md Phase 2b -- the
 # (dir4, HV-convex)-by-semiperimeter generating function is ALGEBRAIC of

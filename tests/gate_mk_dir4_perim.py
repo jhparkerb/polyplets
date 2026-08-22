@@ -64,8 +64,9 @@ def main():
     if not os.path.exists(TM):
         # convex_perim_tm needs GMP, which the Makefile treats as optional
         # (see gate-middle-kingdom/gate-convex-dfinite for the same pattern).
-        print(f"skip  {TM} absent (no GMP build) -- nothing to gate")
-        return 0
+        gate.skip(f"{TM} absent (no GMP build) -- the WHOLE gate; "
+                  f"nothing below ran and nothing was verified")
+        return gate.verdict("MK-DIR4-PERIM")
 
     accept_n = 12   # floor(7/2)*ceil(7/2) = 12: full coverage through s=7
     full_smax = 7   # inclusive

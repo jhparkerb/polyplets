@@ -130,13 +130,13 @@ def terms(mode, n):
 def main():
     gate = Gate()
     if not HAVE_BIN:
-        print(f"skip  fresh {BIN} runs (no GMP build); using the banked series")
+        gate.skip(f"fresh {BIN} runs (no GMP build); using the banked series")
 
     # --- positive: every column-convex cell vs Phase 0's brute force ---------
     for mode, ref in GRID.items():
         got = terms(mode, len(ref))
         if got is None:
-            print(f"skip  {mode} vs Phase 0 grid (needs a GMP build)")
+            gate.skip(f"{mode} vs Phase 0 grid (needs a GMP build)")
             continue
         bad = [i + 1 for i, (a, b) in enumerate(zip(got, ref)) if a != b]
         gate.check(got == ref,
@@ -212,8 +212,8 @@ def main():
                    "RED hvdir4ascbad (phase (1,0) deleted) MUST diverge from "
                    "hvdir4asc")
     else:
-        print("skip  ccmono/hv positives and the three RED controls "
-              "(no banked series for those modes)")
+        gate.skip("ccmono/hv positives and the three RED controls "
+                  "(no banked series for those modes)")
 
     # --- structural: dir5 subset ctrlB subset cc, and hvdir4 subset hv ------
     d5, cb, c0 = GRID["ccdir5"], GRID["ccctrlb"], GRID["cc"]
@@ -248,7 +248,7 @@ def main():
                        f"(no P-recurrence / algebraic relation of that size): "
                        f"got {v}")
     else:
-        print("skip prec_guess exclusions (build/prec_guess absent)")
+        gate.skip("prec_guess exclusions (build/prec_guess absent)")
 
     # --- the amplitude-ratio identity ---------------------------------------
     # results/hv-growth-sandwich.md, "The amplitude ratio is a ratio of two
@@ -345,7 +345,7 @@ def main():
         import amplitude_feed_vectors as afv
         from mpmath import mpf
     except ImportError:
-        print("skip  feed-vector amplitude identity (mpmath absent)")
+        gate.skip("feed-vector amplitude identity (mpmath absent)")
     else:
         mu, r, r_nohalf, r_cap3, minphi = afv.evaluate(120, 300)
         gate.check(minphi > 0,

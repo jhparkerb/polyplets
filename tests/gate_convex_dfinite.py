@@ -72,7 +72,7 @@ def main():
             got = [int(x) for x in out.strip().split(",")]
             g.check(got == ref, f"convex_area_tm 14 {king} reproduces {label}")
     else:
-        print("skip  convex_area_tm adjacency oracle (no GMP build)")
+        g.skip("convex_area_tm adjacency oracle (no GMP build)")
     g.check(read_terms_file(KING_TERMS)[:14] == KING14,
             "banked king series starts with the reference 14 terms")
     g.check(read_terms_file(POLY_TERMS)[:14] == POLY14,

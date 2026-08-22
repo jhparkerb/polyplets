@@ -136,18 +136,63 @@ def free_and_one_sided(fixed, r90, r180, hmirror, dmirror):
     return free_num // 8, one_num // 4
 
 
+# A gate that could not run part of itself is DEGRADED, and until 2026-08-22 a
+# degraded gate was indistinguishable from a green one.  `results/gate-class-sweep.md`
+# finding F3: tests/gate_middle_kingdom.py has three `skip` paths -- no GMP
+# build, no build/prec_guess, no mpmath -- and two of them skip RED CONTROLS,
+# so on a box missing any of the three the gate printed GREEN having never
+# established that its own checks can fail.  `make gates` then reported a full
+# green suite.
+#
+# The rule now: a skipped check is a FAILURE by default, and waiving it is an
+# explicit act.  Set POLY_ALLOW_DEGRADED_GATES=1 to downgrade skips to a loud
+# warning -- for the deliberate case of a box that genuinely lacks an optional
+# dependency and where somebody has decided that is acceptable for that run.
+# The waiver is per-run and leaves a line in the log naming every skip it
+# forgave, so "the suite was green" and "the suite was green with four checks
+# waived on a box without GMP" are never the same sentence.
+ALLOW_DEGRADED = os.environ.get("POLY_ALLOW_DEGRADED_GATES") == "1"
+
+
 class Gate:
     """Accumulates pass/fail results and prints a GREEN/RED verdict."""
 
     def __init__(self):
         self.failures = 0
+        self.skips = []
 
     def check(self, ok, label):
         print(("ok   " if ok else "FAIL ") + label)
         if not ok:
             self.failures += 1
 
+    def skip(self, label):
+        """Record a check that could not run.  Fails the gate unless waived.
+
+        Use this instead of `print("skip ...")` for anything that would
+        otherwise have been checked -- especially a RED control, whose absence
+        means nothing in this run established that the gate can fail."""
+        print(("SKIP " if not ALLOW_DEGRADED else "skip ") + label)
+        self.skips.append(label)
+
     def verdict(self, name):
-        print(f"GATE {name}:",
-              "GREEN" if self.failures == 0 else f"RED ({self.failures} failures)")
-        return 1 if self.failures else 0
+        if self.skips:
+            word = "waived" if ALLOW_DEGRADED else "NOT RUN"
+            print(f"  {len(self.skips)} check(s) {word}:")
+            for s in self.skips:
+                print(f"    - {s}")
+            if not ALLOW_DEGRADED:
+                print("  A skipped check is a failure: nothing in this run "
+                      "established what it would have established.")
+                print("  Install the missing dependency, or re-run with "
+                      "POLY_ALLOW_DEGRADED_GATES=1 to waive deliberately.")
+        degraded = bool(self.skips) and not ALLOW_DEGRADED
+        if self.failures == 0 and not degraded:
+            state = "GREEN" + (f" ({len(self.skips)} waived)" if self.skips else "")
+        elif self.failures:
+            state = f"RED ({self.failures} failures"
+            state += f", {len(self.skips)} not run)" if self.skips else ")"
+        else:
+            state = f"RED ({len(self.skips)} check(s) not run)"
+        print(f"GATE {name}: {state}")
+        return 1 if (self.failures or degraded) else 0
