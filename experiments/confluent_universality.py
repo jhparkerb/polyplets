@@ -27,18 +27,30 @@ measures BOTH from scratch, which is the only way the comparison means anything.
 
 THE ANSATZ, and why the fit is a scan and not a solve.
 
-    a(n) = B * lambda^n * n^theta * (1 + c * n^(-Delta))
+    a(n) = B * lambda^n * n^theta * exp(c * n^(-Delta))
 
-is nonlinear in Delta but LINEAR in (ln B, ln lambda, theta, c) once Delta is
-fixed and the correction is small enough to expand the log:
+is nonlinear in Delta but exactly LINEAR in (ln B, ln lambda, theta, c) once
+Delta is fixed:
 
-    ln a(n) = ln B + n*ln(lambda) + theta*ln(n) + c*n^(-Delta) + O(c^2 n^-2Delta)
+    ln a(n) = ln B + n*ln(lambda) + theta*ln(n) + c*n^(-Delta)
 
 So: put Delta on a grid, least-squares the other four at each grid point, and
-take the Delta that minimises the residual.  The shape of that residual curve is
-the answer to the real question -- a sharp minimum means 40 terms resolve
-Delta_1, a flat valley means they do not, and the honest report in the flat case
-is "cannot tell", not a number.
+take the Delta that minimises the residual.
+
+The exponentiated form is deliberate and it is not the textbook one, which is
+(1 + c*n^-Delta).  The two agree to first order and differ at O(c^2 n^-2Delta),
+i.e. inside the next correction the ansatz does not model either way.  Writing
+it as exp() makes the solve EXACT for its own ansatz instead of carrying a
+linearisation error that the fit then pays for by moving Delta.  That is not a
+hypothetical: the first version of this script planted (1 + c*n^-Delta) and
+fitted the linearised log, and control (a) below caught it -- planted Delta of
+0.5 and 1.0 came back as 0.290 and 0.860, a bias of the same size as the
+effect being measured.  The control did its job on the script before the script
+was used on anything.
+
+The shape of the residual curve is the answer to the real question -- a sharp
+minimum means 40 terms resolve Delta_1, a flat valley means they do not, and the
+honest report in the flat case is "cannot tell", not a number.
 
 THE CONTROLS ARE THE POINT, as in experiments/stretched_exponential_fit.py.
 
@@ -152,14 +164,33 @@ def valley(rows, best, factor=2.0):
 
 def synth(lam, theta, c, delta, N, extra=None):
     """B=1 series of exactly the modelled form, optionally with a second,
-    UNMODELLED correction `extra(n)` multiplied in."""
+    UNMODELLED correction `extra(n)` multiplied in.
+
+    Integers, because a real series is integers and the rounding is part of
+    what 40 terms can resolve."""
     out = [None]
     for n in range(1, N + 1):
-        v = lam ** n * n ** theta * (1.0 + c * n ** (-delta))
+        v = lam ** n * n ** theta * math.exp(c * n ** (-delta))
         if extra is not None:
             v *= extra(n)
         out.append(max(1, int(round(v))))
     return out
+
+
+def calibrate(lam, theta, c, N, lo, extra):
+    """Recovered Delta as a function of planted Delta.
+
+    The scan is BIASED -- an unmodelled higher correction pushes the recovered
+    exponent around -- so a recovered number is not a Delta and must not be
+    read as one.  What it is, is a monotone image of one.  This maps the image
+    so a real measurement can be inverted through it, and so the report can say
+    what real interval of Delta the data actually excludes."""
+    rows = []
+    for d in (0.25, 0.5, 0.75, 1.0, 1.5, 2.0):
+        s = synth(lam, theta, c, d, N, extra=extra)
+        best, _ = scan(s, lo, N)
+        rows.append((d, best[0] if best else float('nan')))
+    return rows
 
 
 def controls():
@@ -240,6 +271,14 @@ def main():
     king = load_bfile(KING_PATH, KING_HEAD, "A006770")
     square = load_bfile(SQUARE_PATH, SQUARE_HEAD, "A001168")
     print("\nking terms: %d   square terms: %d" % (len(king) - 1, len(square) - 1))
+
+    print("\ncalibration -- recovered Delta as a function of planted Delta,")
+    print("with an unmodelled 0.5/n^2 underneath (N=40, window from n=8):")
+    for lat, lam in (("king", 7.11), ("square", 4.06)):
+        rows = calibrate(lam, -1.0, 0.8, 40, 8, lambda n: 1.0 + 0.5 / n ** 2)
+        print("  %-8s " % lat
+              + "  ".join("%.2f->%.2f" % (a, b) for a, b in rows))
+    print("  A recovered value is a monotone IMAGE of Delta, not Delta.")
 
     print("\nmatched length, the comparison A1.5 asks for:")
     k = report("king", king, 40, 8)
