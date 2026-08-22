@@ -42,6 +42,16 @@ the repo was an absence of the word, not of a question worth asking.
 
 **Max hole count: 0, 0, 0, 1, 1, 2, 2, 3, 4.**
 
+> **SOLVED 2026-08-22 — `results/maxhole-closed-form.md`.** It is
+> `n − ⌈2√n⌉ + 1`, it is **A248333**, and n = 10 was measured at **4** as the
+> formula predicts. The construction is the even-parity sublattice: it is
+> king-connected by diagonal steps, and every enclosed odd cell has all four of
+> its orthogonal neighbours occupied, so it is a singleton hole. An `a × b`
+> block of that rotated lattice costs `ab` cells and encloses `(a−1)(b−1)` of
+> them. That proves `≥`; the reverse inequality is open. The paragraph below is
+> what the nine terms looked like before the construction existed, and the
+> `⌊n/2⌋ − 1` kill in it still stands.
+
 No OEIS collision on those nine terms. It is not `⌊n/2⌋ − 1` — that predicts 3
 at n = 9 and the true value is 4 — so it has no obvious closed form from this
 data, and its increments (0,0,1,0,1,0,1,1) do not settle into a pattern within

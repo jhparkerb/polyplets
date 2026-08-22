@@ -110,6 +110,14 @@ $\mathrm{lead}(P^{even}_k-P^{odd}_k)=(-1)^k/(k-1)!$ (verified exactly
 k=1..5). So T4 = "each of the two ground-state spines carries defect
 density 1" -- the combinatorial identity to prove is about leading
 coefficients, not numerator boundary values.
+**k = 6 is out of reach, and why — 2026-08-22** (`results/dmirror-onset-sharp.md`):
+the reduction means a k=6 test needs only the two quasi-polynomials, not $N_6$,
+but the onset is **sharp and parity-split** — $S \ge 2k+2$ on the even class and
+$S \ge 2k+3$ on the odd one, exactly, on all six pinnable levels. So there are no
+spare points below it. The even class is one point short of pinning with a
+holdout and the odd class two; the missing values are $d(27,33)$ and $d(29,35)$,
+i.e. dmirror strips at $n=33$ and $n=35$ — **the same $D(n)$ wall as
+`results/related-seqs-n33.md`**. T4 stands verified exactly at $k=1..5$.
 
 ## Also-rans (probed, not clean)
 - SNF individual exponents $e_i(N)$: no evident closed form (largest and count are
