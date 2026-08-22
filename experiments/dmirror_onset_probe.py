@@ -196,6 +196,35 @@ def main():
     if not ok:
         print("\nCONTROL FAILED -- the k=6 verdict below is not worth reading")
 
+    print("\nThe onset law, per parity -- measured, not assumed:")
+    law = True
+    for k in range(0, 6):
+        for parity, pname, want in ((0, "even", 2 * k + 2), (1, "odd", 2 * k + 3)):
+            res, _ = analyse(d, k, parity)
+            if res is None:
+                law = False
+                continue
+            got = res[1]
+            flag = "ok" if got == want else "MISMATCH (want %d)" % want
+            if got != want:
+                law = False
+            print("   k=%d %-5s onset %2d   %s" % (k, pname, got, flag))
+    print("   onset(even) = 2k+2 and onset(odd) = 2k+3 on every pinnable "
+          "level: %s" % ("HOLDS" if law else "does not hold"))
+    print("   results/dmirror-diagonals.md states the union bound S >= 2k+2.")
+    print("   The odd class starts one step later, which is the half that")
+    print("   decides whether k=6 is reachable.")
+
+    print("\nWhat k = 6 would need:")
+    for parity, pname, onset in ((0, "even", 14), (1, "odd", 15)):
+        avail = [S for (S, kk) in d if kk == 6 and S % 2 == parity and S >= onset]
+        print("   %-5s onset %d, banked points above it: %d, need %d "
+              "(7 to pin + 1 holdout)" % (pname, onset, len(avail), 8))
+    print("   The odd class is short by two and the even by one.  The missing")
+    print("   points are S=27,29 at k=6, i.e. dmirror strips at n=33 and n=35 --")
+    print("   the same D(n) wall that caps results/related-seqs-n33.md at n=33")
+    print("   and that docs/time-at-the-bar.md A1.3 is about.")
+
     print("\nT4 at k = 6, if it is reachable:")
     me, mo = fits.get((6, 0)), fits.get((6, 1))
     if me is None or mo is None:
