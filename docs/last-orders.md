@@ -15,6 +15,15 @@ Every item carries what it costs where that is measured, an honest "asserted"
 where it is not, and the standing filter — *name the sentence that gets
 shorter*. Items that shorten no sentence say so.
 
+**STATUS 2026-08-22 — all three sections worked.** A summary is at the end of
+this file under "Where it all landed". In short: **C** is complete (eight
+executed, three scoped); **A** is complete except for the four items that are
+decisions rather than work, plus one measurement still running; **B** is
+complete except for two items deliberately left as jasonp's judgment. Four
+items across A and B turned out to be **wrong or overstated as I wrote them**,
+and each is corrected in place next to the original wording rather than
+silently.
+
 **STATUS 2026-08-22 — section C is complete.** Every C item is closed: eight
 were executed and are banked in `results/`, three were scoped and deliberately
 not run, and the reasons are per-item below. C returned four things that change
@@ -582,3 +591,60 @@ Stated so that "section C is complete" is not read as more than it is.
 - **The max-hole-count sequence has nine terms and no conjecture.** It is a
   candidate for guess-and-prove, not a result, and OEIS must be grepped before
   it is called anything.
+
+---
+
+## Where it all landed
+
+Written 2026-08-22 after working all three sections.
+
+### Done
+
+**C — all eleven items.** Eight executed and banked in `results/`, three
+scoped and deliberately not run. Two banked readings corrected, two external
+anchors gained, and one item (C1.3) delivered the validation channel the
+project structurally lacked.
+
+**A — everything that was work rather than a decision.** A1.1 (desk half),
+A1.2 (free half plus the measurement), A1.4, A1.5, A1.6, A1.8, A2.1, A2.4,
+A2.5, A2.6.
+
+**B — every removal that was a removal.** B1 (marker, not deletion), B2, B3,
+B4, B7, with `results/removals-2026-08-22.md` as the audit trail.
+
+### Not done, and why
+
+| item | why |
+|---|---|
+| **A1.3** five-terms sweep | jasonp's call; a multi-day compute decision, and the plan's own recommendation (Nmax 43) is on the table unchanged |
+| **A1.7** unpark the reach merge | jasonp's call; parked at his direction 2026-08-20 |
+| **A2.2** P1 | `technical-report.tex` is read-only to the machine by design |
+| **A2.3** P2, P3 | his prose under the authorship split |
+| **B5** June telemetry, **B6** `experiments/tristruct/` | both cited; thinning them is a judgment about how much apparatus ships, the same class as PRE-LANDING's "does `docs/` go public" |
+
+### What I got wrong, listed together
+
+Four items were wrong or overstated as originally written, and finding that out
+was part of the work rather than a failure of it:
+
+1. **B1** — the five sandbox proof notes are the Ghost Ship run's *output*, not
+   lost repo content. Nothing needed recovering; what was real was three
+   shadowing files, the λ ≤ 9.3153 one above all.
+2. **B7** — the v1 Skeleton Key prompt was already after v2. The real
+   complaint was narrower and is fixed by a reorder.
+3. **A2.5** — L3 *does* develop the finite-type barrier. What is missing is the
+   general statement, which is a paragraph rather than a section.
+4. **C2.3's first cut** — my own probe used an asymptotic exponent formula
+   against an exact target, and read `q = 1.065` off a ladder that is exactly
+   `1/H²`. Its RED control caught it before the result was written down.
+
+### The one thing that should not wait
+
+**A1.8 is fixed but its class is not.** The front-door provenance table went a
+height stale and `make gate-provenance` stayed green, because the gate compares
+the published note against the generator and a hand-edited constant makes both
+stale together. The constant is now derived from the banked row sets, so that
+particular failure cannot recur — but the *pattern* (a gate that compares two
+derived artifacts and never touches ground truth) is worth a sweep across the
+other thirty-two gates before the landing. Not done here, and it is the single
+highest-value item left in this file.
