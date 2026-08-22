@@ -168,6 +168,32 @@ def main():
             mark = "   <- DROP (even n)" if n % 2 == 0 else "   <- DROP (odd n)"
         print("   n=%2d  ratio=%.5f%s" % (n, r, mark))
         prev = r
+
+    # The decomposition, made quantitative.  Write T for the through-cell
+    # family and B for the between-cell one, so b(odd) = T and b(even) = T + B,
+    # and let rho = B/T.  With T(n) ~ C mu^n n^theta the two consecutive
+    # ratios are
+    #
+    #     g(even) = b(even)/b(odd)  ~ mu * (1 + rho)
+    #     g(odd)  = b(odd)/b(even)  ~ mu / (1 + rho)
+    #
+    # so their product recovers mu with rho cancelling, and their quotient
+    # recovers (1 + rho)^2 with mu cancelling.  Neither needs a fit.
+    print("\nDecomposition.  b(odd) = T, b(even) = T + B, rho = B/T:")
+    print("   %-6s %-10s %-10s %-10s" % ("n", "mu_est", "rho", "B/T as 1 in"))
+    for n in ns:
+        if n % 2 or n - 1 not in b or n + 1 not in b or n - 2 not in b:
+            continue
+        g_even = b[n] / b[n - 1]
+        g_odd = b[n + 1] / b[n]
+        mu = (g_even * g_odd) ** 0.5
+        rho = (g_even / g_odd) ** 0.5 - 1.0
+        if n >= 8:
+            print("   %-6d %-10.5f %-10.5f 1 in %.1f"
+                  % (n, mu, rho, 1.0 / rho if rho else float('inf')))
+    print("\n   mu is the bilateral growth constant; sqrt(lambda_king) =")
+    print("   sqrt(7.1102) = 2.66650 is what it must approach if a symmetric")
+    print("   animal is determined by half of itself.")
     return 0
 
 
