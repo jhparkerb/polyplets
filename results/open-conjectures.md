@@ -32,7 +32,14 @@ banked sequence $n\le40$ (zero violations; re-checked 2026-07-31 against
 lower bound on $\lambda$ (so $a(40)/a(39)=6.935\le\lambda$). Companions: one-sided A030233, free
 A030222, asymmetric A030235 are log-convex past small $n$; **the bilateral count
 A030234 is NOT** — log-convexity fails at every even $n$, a parity effect worth its
-own look. (Exact witness lists for every companion, plus the family-wide
+own look. **Looked at, 2026-08-22** (`results/bilateral-parity.md`): it is two
+families interleaved, not one sequence misbehaving. A mirror axis is either
+through a column of cells (any $n$) or between two columns (forces $n$ even), so
+$b(n) = T(n) + [n\text{ even}]B(n)$, and **each parity class is log-convex with
+zero violations** while the interleaving fails at all fifteen even indices the
+data can test. The same ratios give $B/T = 0.0386$ at $n = 30$ and falling, and
+a bilateral growth constant of $2.605$ climbing toward $\sqrt{\lambda} = 2.6665$,
+neither by a fit. (Exact witness lists for every companion, plus the family-wide
 ratio-sequence sweep and two more converse kills — onset sharpness to $k\le13$,
 k!-minimality refuted — in `results/converse-sweep.md`, 2026-07-31.)
 - **Margin structure (measured 2026-07-31):** the violation margin
