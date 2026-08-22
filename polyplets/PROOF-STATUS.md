@@ -11,6 +11,28 @@ Scope/route decisions: `PLAN.md`. Architecture (the peeling recursion,
 replacing the paper's GF route): `DESIGN.md`. Pin inputs (production
 coefficients + banked onset points, fail-closed generated): `pin-data.md`.
 
+## What this formalization does NOT reach
+
+Added 2026-08-22 (`docs/time-at-the-bar.md` B5; full scope split in
+`docs/lean-below-onset-scope.md`). **The Lean development covers the route
+a(40) took, not the route a(41) took.**
+
+`Grand/PinGrand.lean` pins each level from two real-swept cells `A_k =
+T(2k+1, k+1)` and `B_k = T(2k+2, k+2)`, both at or above the onset. Undertow
+replaces one of those with a cell BELOW the onset corrected by `D_j(k)`, and
+**that substitution is not stated anywhere in Lean** — neither the below-onset
+identity nor the claim that a corrected cell may stand in for an anchor.
+
+`DepthAssembly.lean` is the piece most easily mistaken for covering this. It
+formalizes the `(C)`/`(D)` assembly for `D_j(k)` as exact rational arithmetic
+and is sorry-free, but its `sigTable`/`bbTable`/`ppTable` are hardcoded data and
+its theorems take them as hypotheses: they say "if the tables are these, then
+`D_1(k)` is that". The tables come from the family DP and are certificates, not
+theorems — the same class of input the rest of the pinning already takes.
+
+So "86 sorry-free modules, the grand form against standard axioms" should not be
+read as covering the project's newest result. It does not.
+
 Build: `cd polyplets && lake exe cache get` (once) then `lake build`.
 Green = a sorry-free tree: there are no `sorry`s anywhere in `Polyplets/`
 (the historical "intended sorrys" list is gone; `Diagonal.lean` closed the
