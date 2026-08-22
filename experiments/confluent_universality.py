@@ -278,7 +278,9 @@ def main():
         rows = calibrate(lam, -1.0, 0.8, 40, 8, lambda n: 1.0 + 0.5 / n ** 2)
         print("  %-8s " % lat
               + "  ".join("%.2f->%.2f" % (a, b) for a, b in rows))
-    print("  A recovered value is a monotone IMAGE of Delta, not Delta.")
+    print("  A recovered value is an IMAGE of Delta, not Delta -- and note the")
+    print("  map is NOT monotone at the bottom: 0.25 lands above 0.50 on both")
+    print("  lattices, so below about 0.75 it cannot be inverted at all.")
 
     print("\nmatched length, the comparison A1.5 asks for:")
     k = report("king", king, 40, 8)
@@ -289,18 +291,34 @@ def main():
         if len(square) - 1 >= N:
             report("square", square, N, 8)
 
-    print("\nwindow sensitivity (start of the fit window, matched N=40):")
+    # The residual valley is NOT the error bar.  It measures how sharply the
+    # grid resolves Delta at one fixed window, and the window sweep below moves
+    # the answer well outside it -- king's [0.57, 0.58] against a sweep that
+    # runs to 0.625.  The spread across windows is the honest uncertainty,
+    # because choosing a window start is a free parameter nobody has pinned.
+    print("\nwindow sensitivity (start of the fit window, matched N=40) --")
+    print("this spread, not the residual valley, is the error bar:")
+    kd, sd = [k[0]] if k else [], [s[0]] if s else []
     for lo in (6, 10, 12, 15):
-        report("king", king, 40, lo)
-        report("square", square, 40, lo)
+        rk = report("king", king, 40, lo)
+        rs = report("square", square, 40, lo)
+        if rk:
+            kd.append(rk[0])
+        if rs:
+            sd.append(rs[0])
 
-    if k and s:
-        gap = abs(k[0] - s[0])
-        overlap = not (k[2] < s[1] or s[2] < k[1])
-        print("\nDelta_king = %.3f [%.2f, %.2f]   Delta_square = %.3f "
-              "[%.2f, %.2f]" % (k[0], k[1], k[2], s[0], s[1], s[2]))
-        print("gap = %.3f; the within-2x-residual intervals %s"
-              % (gap, "OVERLAP" if overlap else "DO NOT overlap"))
+    if kd and sd:
+        print("\nking   Delta over windows: %s -> %.2f .. %.2f"
+              % (" ".join("%.3f" % d for d in kd), min(kd), max(kd)))
+        print("square Delta over windows: %s -> %.2f .. %.2f"
+              % (" ".join("%.3f" % d for d in sd), min(sd), max(sd)))
+        overlap = not (max(kd) < min(sd) or max(sd) < min(kd))
+        print("the window ranges %s"
+              % ("OVERLAP" % () if overlap else "DO NOT overlap"))
+        print("\nRead this against the calibration above before calling it a")
+        print("measurement of Delta_1: the bias depends on the size and SIGN of")
+        print("the corrections the ansatz does not model, and the real series")
+        print("have c < 0 where the calibration planted c > 0.")
     return 0
 
 
