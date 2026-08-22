@@ -30,6 +30,15 @@ of both spines, since the two disagree in about 2S cells, so
 
     d(S, S+k) = d_main(S, S+k) + d_anti(S, S+k)      (disjoint, S large)
 
+**Checked since, and the threshold is one step later than this says**
+(`results/dmirror-spine-split.md`): the two families partition `d` exactly for
+`S ≥ 2k+2`, and at `S = 2k+1` they *overlap* rather than partition. The
+conclusion below is unaffected — the pinning happens above the onset, which is
+`2k+2` — but "S large" is `S ≥ 2k+2` and not `S > 2k`. The same file also
+measures the two families' degrees and finds them different, `k−1` for
+`d_main` against `k` for `d_anti`, which is a sharper reason the sum has no
+single-exponential form.
+
 and the grand form is a statement about a **single** exponential:
 `T(H+k,H) = [y^k](C(y)·μ(y)^H)`, equivalently every cumulant exactly linear in
 the size parameter. The log of a sum of two exponentials is not linear unless
