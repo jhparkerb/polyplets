@@ -1,4 +1,4 @@
-# HANDOFF — live state (updated 2026-08-20)
+# HANDOFF — live state (updated 2026-08-22)
 
 > **Resuming cold? `docs/resume-here.md`** has the jobs still running — the
 > dalby ladder and two ayr probes as of 2026-08-20 14:10 — and exactly what to
@@ -16,7 +16,52 @@
 
 
 
-## 2026-08-20 (latest) — THE KING LATTICE MERGES THE FRONTIER, AND IT IS PARKED
+## 2026-08-22 (latest) — TIME AT THE BAR RUN END TO END
+
+Report: **`docs/time-at-the-bar-report.md`** — every item of
+`docs/time-at-the-bar.md` done or struck with a reason, which was the rule that
+file set for itself. Nothing below is authorisation; five runs are priced and
+unlaunched and four decisions are jasonp's.
+
+**What changed the repository.**
+
+- **The gate suite was swept, all 33** (`results/gate-class-sweep.md`),
+  red-first: for each gate, plant the staleness it is supposed to catch and
+  confirm it goes red. Two defects. `gate-cutcount-assembly` carried the same
+  hand-edited-constant defect that `gate-provenance` was fixed for and stayed
+  **green** under a planted triangle growth that turned two other gates red —
+  `NMAX` is derived now and re-probed red. `results/strip-mu-certificates.md` is
+  read by no gate and had drifted: it says "H ≥ 12 is not certified yet" while
+  its own log carries H = 12, 13, 14 as PASS twice each and L3 publishes the
+  H = 14 row. Corrected. Three further limits reported, not fixed.
+- **The maximum hole count is solved**: `n − ⌈2√n⌉ + 1`, which is **A248333**,
+  with a construction proving the lower bound (`results/maxhole-closed-form.md`).
+  n = 10 measured at 4 as predicted.
+- **The five-terms conclusion changes.** Done at the target Nmax rather than at
+  Nmax 41, the `Hs = 20` poles are 252 GB (n ≤ 44) and 277 GB (n ≤ 45) against
+  `Hs = 21`'s 580 GB, and dalby has **563 GB free** today, not ~496. Disk is no
+  longer binding; the **asserted** `J = 6` price is, and one rung of a ladder
+  would settle it the way five rungs settled depth 5.
+
+**Closed doors, with their reasons.** A1.3 dies at step 1 — the dmirror family
+is a sum over two ground-state spines and the parity split does not separate
+them, so the grand form does not transfer
+(`results/dmirror-grand-form-fails.md`). T4 at k = 6 is out of reach because the
+onset is *sharp*, 2k+2 even and 2k+3 odd, on all six pinnable levels
+(`results/dmirror-onset-sharp.md`). A1.2 is a re-pitch of work
+`results/exactchange-probes.md` §6 closed on 2026-08-14
+(`results/char2-basis-status.md`).
+
+**Done and standing.** Square Undertow holds at depth 2 with ten held-out cells
+(`results/undertow-square-depth2.md`); A030234's parity failure is two families,
+not one sequence misbehaving (`results/bilateral-parity.md`); the confluent
+exponent resolves on the king and not on the square, so
+`results/mathematics.md` is deliberately unchanged
+(`results/confluent-universality.md`); the Lean gap is written down and
+`polyplets/PROOF-STATUS.md` now says the formalization covers the route a(40)
+took, not the route a(41) took (`docs/lean-below-onset-scope.md`).
+
+## 2026-08-20 — THE KING LATTICE MERGES THE FRONTIER, AND IT IS PARKED
 
 Branch `skeletonkey`. Record: `results/skeletonkey-nfamily-merge.md`. Probe
 `experiments/skeletonkey/nfamily_merge.py`. **PARKED at jasonp's direction
