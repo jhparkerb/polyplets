@@ -116,7 +116,9 @@ question whether it goes public.
 `docs/process-proposal.md`, `docs/offside-brief.md`, `docs/offside-design.md`,
 `docs/state-minimal.md`, `docs/ghostship-preregistration.md`,
 `docs/triangle-postmortem.md` (a four-round failure, written up),
-`docs/lessons-learned.md`.
+`docs/lessons-learned.md`, `docs/project-postmortem.md` (the whole-project
+view: the arc, luck both ways, and thirteen action items for the next attempt
+at a mathematical contribution).
 
 The Ghost Ship run record itself is `results/ghostship/` — hash-sealed and
 frozen on purpose, because it cites a filesystem that is not this one.

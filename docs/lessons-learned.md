@@ -128,6 +128,14 @@ behind them, plus everything learned since.
 - All authorship representations (OEIS %C, paper authorship note) are the
   human's own words; the assistant meaning-checks only.
 
+## 6a. The whole-project view
+
+`docs/project-postmortem.md` (2026-08-22) is the companion to this file: the
+arc, an explicit account of where the project was lucky and unlucky, and
+thirteen transferable action items. It does not repeat the material above; the
+two are meant to be read together, this one for the practices and that one for
+the shape of the thing.
+
 ## 7. [JP] jasonp's sections — to write
 
 - [JP] What the project was for, and whether it delivered that.
