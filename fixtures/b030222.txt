@@ -1,3 +1,10 @@
+# A030222. Re-verified against OEIS 2026-08-22 by
+#   scripts/fixture_oeis_recheck.py: 17 shared terms, 0 disagreements.
+#   OEIS now carries a(18) = 2808898025438, which this snapshot does not.
+#   That term AGREES with this project's own computed value in
+#   results/b030222_upload.txt -- an external confirmation of a term we
+#   derived, gained free from the recheck. The fixture is left at 17 terms
+#   deliberately: it is a snapshot anchor, and no gate reads past n = 11.
 # A030222 (b-file synthesized from sequence entry)
 1 1
 2 2

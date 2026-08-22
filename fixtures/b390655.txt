@@ -1,3 +1,5 @@
+# A390655. Re-verified against OEIS 2026-08-22 by
+#   scripts/fixture_oeis_recheck.py: 29 shared terms, 0 disagreements.
 # A390655 (b-file synthesized from sequence entry)
 1 0
 2 1

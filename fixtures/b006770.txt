@@ -1,4 +1,7 @@
-# A006770. NOT uniformly external -- read this before treating it as an anchor.
+# A006770. Re-verified against OEIS 2026-08-22 by
+#   scripts/fixture_oeis_recheck.py: 18 shared terms, 0 disagreements;
+#   our n = 19, 20 are locally sourced, as the note below says.
+# NOT uniformly external -- read this before treating it as an anchor.
 #   n = 1..18  the OEIS entry, pre-dating this work.  Re-checked live
 #              2026-08-19: entry revision 44 (2026-05-30), DATA still 18 terms,
 #              oeis.org/A006770/b006770.txt still auto-synthesized from DATA

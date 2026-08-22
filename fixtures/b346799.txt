@@ -1,3 +1,5 @@
+# A346799. Re-verified against OEIS 2026-08-22 by
+#   scripts/fixture_oeis_recheck.py: 60 shared terms, 0 disagreements.
 1 1
 2 1
 3 2

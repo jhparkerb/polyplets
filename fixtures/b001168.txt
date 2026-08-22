@@ -1,3 +1,7 @@
+# A001168. Re-verified against OEIS 2026-08-22 by
+#   scripts/fixture_oeis_recheck.py: 71 shared terms, 0 disagreements.
+#   Our copy carries a(57)-a(66) from Barequet and
+#   Ben-Shachar (2024); all 71 shared terms agree with the OEIS b-file.
 # A001168 b-file with added a(57)-a(66) from Gill Barequet and Gil Ben-Shachar (2024)
 0 1
 1 1

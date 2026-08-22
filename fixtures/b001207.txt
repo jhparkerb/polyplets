@@ -1,3 +1,5 @@
+# A001207. Re-verified against OEIS 2026-08-22 by
+#   scripts/fixture_oeis_recheck.py: 46 shared terms, 0 disagreements.
 1 1
 2 3
 3 11
