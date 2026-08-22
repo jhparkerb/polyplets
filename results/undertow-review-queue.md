@@ -167,3 +167,19 @@ measured 6x is close enough that the conclusion is the same one:
 
 - S-A5 [gate wiring, lead decision]: the standalone experiment gates (severance_w3_gate.py, undertow_congruence_gate.py, severance_w3_depth5_gate.py) are outside Makefile GATE_TARGETS, and the Makefile's own warning says an unwired gate is a check `make gates` never runs. B17 is green-now and wireable today; B13 is red-by-design until the e4 table lands, so wiring it reddens the suite — needs either the table first or a documented deferral marker. Decide for the family, not per-file.
 - S-A6 [coverage hole, quantified target]: after B17, the only unchecked degree of freedom in a(41)'s tower half is the INTEGER part of D_4(21) (fractional part now congruence-covered transitively, RED 4). An integer error there shifts T(41,20) — and a(41) — by an integer through the pin; nothing currently running can see it except growth-ratio sanity. Depth 5 (level-21 second pair, pairs-agreement constrains the integer part) or the H=20 sweep at Nmax 41 (holdout) are the two closers; the ayr e4 ladder already in flight delivers the first.
+
+## Maintenance sweep — 2026-08-22, `docs/last-orders.md` A1.6
+
+This queue was last written **before the Nmax-41 Motley ladder landed**
+(2026-08-20 10:38 → 2026-08-21 08:43, `results/cutcount_b1/rows41/`), so it
+carried rows the ladder answered. An open queue that is stale in the reader's
+favour is worse than one stale against it. Appended rather than edited, per
+this file's append-only rule; the rows below supersede the ones they name.
+
+| id | lane | status | rank | what |
+|---|---|---|---|---|
+| S1 | sweep | CLOSES B4 | 2 | B4's requirement — "only agreement against an enumeration crosses assumption families" — is what the ladder delivered. Motley computed all nineteen heights at Nmax 41 and `T(40,19)` came out 3247572468599336484342102174163, the incumbent's value, from a program that never decides connectivity. Row 40 complete in all forty cells; row 41 reproduced digit for digit. The shared-assumption objection is retired for T(40,19) specifically, and stands unchanged for the cells still above Motley's reach (T(39,20), T(40,20), T(40,21)). |
+| S2 | sweep | CLOSES B6, B12 | 1 | Motley C_19's RAM is no longer unpriced and no census job is needed. MEASURED on dalby: census H=19 Nmax=41 wall 1824.75 s, rss 22.45 GB, states 224,529,648; the first full prime pass H=19 p=65521 ran 5622.86 s at **rss 63.03 GB**, against dalby's 125 GB. B6's u16 projection of ~110 GB was pessimistic by 1.7x and the run fit without narrower primes or extra passes. Nine primes at a flat ~5,600 s each. |
+| S3 | sweep | CLOSES L-3 | 1 | L-3 named Motley C_19 as the buy for closing T(40,19). It was bought and it delivered, at ~22 h for the whole H=1..19 ladder rather than the H=19 leg alone. |
+| S4 | sweep | CLOSES B7, B15 | 2 | All three scripts B7 and B15 called absent are in the repo: `scripts/dalby_a41_h20.sh`, `scripts/dalby_a41_low.sh`, `scripts/nmax_scaling.sh`. The h20 script's header now carries the CORRECTED price — ~10-11 h on 48 cores and ~185-190 GB, extrapolated from a(40)'s measured H20-solo phase through the measured Nmax scaling — i.e. the extrapolated figure B7 argued for, not the asserted 20-30 h / 450 GB. What remains is not a script but a correction: the stale 450 GB figure still stands in `docs/five-terms-plan.md`, `results/a41/PROVENANCE.md` and the script's own disk-fit paragraph, which computes 450 GB two lines above the correction that rejects it. Filed as `docs/last-orders.md` A1.1. |
+| S5 | sweep | OPEN, restated | 1 | L-2 (depth-5 cost between ~110 and ~390 GB) and B13 (extend the W3 gate to depth 5 against banked k<=19 cells before D_5 is used at k=21) are **untouched by the ladder** and remain the live blockers on depth 5. B17 (the mod-3^e integrality gate on below-onset tower cells) is likewise untouched and still free. |

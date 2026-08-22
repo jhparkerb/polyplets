@@ -97,7 +97,9 @@ integrality assert is what enforces it.
 Every other level in the tower is either wired-and-long-validated or, at
 k = 20, overdetermined. Level 21 is not. Two things would fix it, neither run:
 
-- **sweep H = 20 at Nmax 41** (`scripts/dalby_a41_h20.sh`, ~20-30 h, ~450 GB):
+- **sweep H = 20 at Nmax 41** (`scripts/dalby_a41_h20.sh`, **~10-11 h on 48
+  cores, ~185-190 GB** — corrected 2026-08-20 from the ~20-30 h / ~450 GB this
+  line asserted before the Nmax-scaling measurement existed):
   `T(41,20)` becomes a swept value and P_21's prediction of it becomes a real
   holdout against an enumeration;
 - **depth 5** (`families 21 4`, ~16 h, ~103 GB): level 21 gains a second pin

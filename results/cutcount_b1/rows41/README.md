@@ -19,6 +19,19 @@ n = 41. Do not overwrite it, and do not mix the two sets in one difference.
               C_18 from 4 primes and has a RED control that corrupts a
               residue and confirms the held-out prime catches it.
 
+## What these rows settle for the provenance table
+
+These rows raise Motley's rule-independent reach from H <= 18 to **H <= 19**,
+which is what `scripts/provenance_table.py` now derives rather than carrying as
+a hand-edited constant. The cells with no exact recount and no closed form
+drop from six to **three** <!--q:congruence_only.count@19=3-->:
+
+    T(39,20), T(40,20), T(40,21)
+    <!--q:congruence_only.cells@19=(39,20),(40,20),(40,21)-->
+
+The three retired are T(38,19), T(39,19) and T(40,19), each now computed
+directly by a second program that never decides connectivity.
+
 ## What these rows settle
 
     python3 experiments/undertow_ri.py --hmax 19 --jmax 4 \

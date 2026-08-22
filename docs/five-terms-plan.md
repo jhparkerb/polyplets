@@ -131,8 +131,11 @@ Weak point, the same one as everywhere: level 21 pins from `T(40,19)` and
 unchecked P_21**, and should say so. Two ways out, and they are the same two
 as ever:
 
-- **sweep H = 20 at Nmax 41** (`scripts/dalby_a41_h20.sh`, staged, ~20-30 h,
-  ~450 GB): the tower then only has to reach k = 20, which has five
+- **sweep H = 20 at Nmax 41** (`scripts/dalby_a41_h20.sh`, staged, **~10-11 h
+  on 48 cores, ~185-190 GB** — corrected 2026-08-20 after the Nmax-scaling
+  measurement; the ~20-30 h / ~450 GB this line carried was asserted before
+  anything was measured, and Lane B of the review called it out as such):
+  the tower then only has to reach k = 20, which has five
   independent checks, and P_21's prediction of `T(41,20)` becomes a **real
   holdout** against a swept value. This is the stronger of the two, because it
   checks against an enumeration rather than against more of the same identity.

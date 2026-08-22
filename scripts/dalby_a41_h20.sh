@@ -9,9 +9,11 @@
 # at all -- the tower only has to reach k = 20, which is pinned three ways.
 #
 # Target machine: dalby, 76 cores, 125 GB RAM.  Run ALONE: the a(40) phase
-# profile has H<=19 peaking at 69 GB of disk and H=20 at 172 GB at maxn=40,
-# and at maxn=41 those scale to roughly 175 GB and 450 GB -- together they do
-# not fit the 542 GB free, which is why a(40) ran phased and so does this.
+# profile has H<=19 peaking at 69 GB of disk and H=20 at 172 GB at maxn=40.
+# At maxn=41, on the MEASURED Nmax scaling below (~1.08x for 40->41, not the
+# ~2.6x an earlier version of this paragraph assumed), those become roughly
+# 75 GB and 185-190 GB.  They still run phased -- a(40) did, and there is no
+# reason to change that -- but the reason is caution, not arithmetic.
 # Predicted cost -- CORRECTED 2026-08-20 after the Nmax-scaling measurement,
 # and after Lane B of the review called the earlier figure out as ASSERTED:
 # a(40)'s H20-solo phase was 9.6 h on 48 cores with a 172 GB disk peak at

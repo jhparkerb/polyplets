@@ -31,6 +31,14 @@ is (38,19), (39,19), (39,20), (40,19), (40,20), (40,21)
 The pinned count in the gate moved from 11 to 6 deliberately, which is what it
 was pinned for. Both figures are generated in `results/residual-cells.md`.
 
+**Superseded 2026-08-22 by the Nmax-41 ladder.** The figures above are
+Confetti's and remain true of H <= 18. The Nmax-41 ladder (2026-08-21,
+`results/cutcount_b1/rows41/`) reached H <= 19, and the congruence-only set is
+now three cells <!--q:congruence_only.count@19=3--> rather than six —
+`results/provenance-table.md` is regenerated and
+`scripts/provenance_table.py` derives Motley's reach from the banked row sets
+instead of carrying it as a constant.
+
 **Ticker Tape is priced and not recommended** --- `results/ticker-tape-assessment.md`,
 2026-08-18: on Confetti's measured constants H=19 needs ~197 GB against dalby's
 125 and ~26 days of wall, and it buys no statement the project can otherwise

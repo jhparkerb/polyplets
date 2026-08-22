@@ -55,7 +55,47 @@ TRIANGLE = ROOT / "results" / "triangle.txt"
 OUT = ROOT / "results" / "provenance-table.md"
 
 NMAX = 40
-MOTLEY_H = 18          # Confetti landed 2026-08-19, results/motley-h18.md
+
+
+def motley_reach(nmax=None, root=None):
+    """The greatest height Motley covers, DERIVED from the banked row sets.
+
+    Was a hand-edited constant (`MOTLEY_H = 18`) and went stale the day the
+    Nmax-41 ladder landed: the generator kept saying 18 while
+    results/cutcount_b1/rows41/ held C1..C19, and `make gate-provenance` could
+    not see it, because the gate compares the published note against this
+    generator and a stale constant makes both stale together, green.
+
+    Derived instead.  `T(n,H) = C_H - 2C_{H-1} + C_{H-2}` needs all three
+    cut-count rows at the SAME Nmax, so a height H counts only when C_H,
+    C_{H-1} and C_{H-2} all live in one directory and all reach n >= nmax.
+    Returns the largest such H over every row set present.
+    """
+    root = Path(root) if root else ROOT
+    nmax = NMAX if nmax is None else nmax
+    best = 0
+    for d in sorted((root / "results" / "cutcount_b1").glob("rows*")):
+        if not d.is_dir():
+            continue
+        reach = {}
+        for f in d.glob("C*.out"):
+            try:
+                h = int(f.stem[1:])
+            except ValueError:
+                continue
+            top = 0
+            for ln in f.read_text().splitlines():
+                p = ln.split()
+                if len(p) == 2 and p[0].isdigit():
+                    top = max(top, int(p[0]))
+            reach[h] = top
+        for h in sorted(reach):
+            if all(reach.get(h - i, 0) >= nmax for i in (0, 1, 2) if h - i >= 1):
+                best = max(best, h)
+    return best
+
+
+MOTLEY_H = motley_reach()
 
 # The closed-form band, in one place.  The production engine wires P_k for
 # k <= PK_KMAX, the diagonal law's onset is sharp at n >= 2k+1
@@ -88,7 +128,9 @@ EXPECTED = {
     # (38,19), (39,19), (39,20), (40,19), (40,20), (40,21) -- and Ticker Tape,
     # the rung that would have taken the H=19 cells, is priced and declined
     # (results/ticker-tape-assessment.md), so this six is where the gap stands.
-    "congruence_only_cells": (6, "results/motley-h18.md; Motley at H<=%d" % 18),
+    "congruence_only_cells": (3, "results/cutcount_b1/rows41/README.md; "
+                                 "Motley at H<=%d, derived from the banked "
+                                 "row sets" % MOTLEY_H),
 }
 
 
