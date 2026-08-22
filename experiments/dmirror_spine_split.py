@@ -227,9 +227,12 @@ def main():
     bank = banked()
     print("dmirror spine split -- independent enumerator, anchored on the "
           "banked rows\n")
-    print("  %-4s %-5s %-12s %-12s %-10s %-10s %-8s"
+    print("The split is only DEFINED where S > 2k: below that the two corner-"
+          "count\nranges overlap and 'main' and 'anti' are not disjoint sets. "
+          "Rows with\nS <= 2k are anchored but not split.\n")
+    print("  %-4s %-4s %-14s %-14s %-10s %-10s %-9s"
           % ("S", "k", "total", "banked", "main", "anti", "neither"))
-    bad = 0
+    bad = mismatch = 0
     rows = {}
     for S in range(2, smax + 1):
         hist = sweep(S)
@@ -238,32 +241,50 @@ def main():
             bytotal[n] += v
         for n in sorted(bytotal):
             k = n - S
-            if k < 0 or k > 6:
+            if k < 0:
                 continue
             tot = bytotal[n]
             b = bank.get((S, n))
+            if b is not None and b != tot:
+                mismatch += 1
+                print("  %-4d %-4d %-14d %-14d %s" % (S, k, tot, b,
+                                                      "<== MISMATCH"))
+                continue
+            if S <= 2 * k:
+                continue
             main = sum(v for (nn, c), v in hist.items()
                        if nn == n and c >= S - k)
             anti = sum(v for (nn, c), v in hist.items()
                        if nn == n and c <= k + 1)
             other = tot - main - anti
-            ok = (b is None) or (b == tot)
-            if not ok:
+            if other:
                 bad += 1
             rows[(S, k)] = (main, anti, other)
-            print("  %-4d %-5d %-12d %-12s %-10d %-10d %-8d%s"
+            print("  %-4d %-4d %-14d %-14s %-10d %-10d %-9d%s"
                   % (S, k, tot, b if b is not None else "-", main, anti, other,
-                     "" if ok else "   <== MISMATCH"))
-    print("\nanchor: %s" % ("all banked cells reproduced"
-                            if bad == 0 else "%d MISMATCHES" % bad))
-    if bad:
-        print("This enumerator is WRONG. Nothing above may be used.")
+                     "   <== NEITHER SPINE" if other else ""))
+    print("\nanchor: %s"
+          % ("every banked cell reproduced, %d cells" % len(bank)
+             if mismatch == 0 else "%d MISMATCHES -- this file is WRONG" % mismatch))
+    if mismatch:
         return 1
-    nonempty = [(S, k) for (S, k), (m, a, o) in rows.items() if o]
-    print("exhaustiveness: %s"
-          % ("d = d_main + d_anti at every cell measured"
-             if not nonempty else
-             "cells with animals near NEITHER spine: %s" % nonempty[:12]))
+    print("exhaustiveness (S > 2k only): %s"
+          % ("d = d_main + d_anti at every cell measured, %d cells" % len(rows)
+             if bad == 0 else "%d cell(s) carry animals near NEITHER spine" % bad))
+
+    # the split, laid out per level for the cumulant test
+    print("\nd_main(S, S+k), the main-diagonal family alone:")
+    for k in range(0, 5):
+        pts = [(S, rows[(S, k)][0]) for S in range(2, smax + 1)
+               if (S, k) in rows]
+        if pts:
+            print("  k=%d  %s" % (k, "  ".join("%d:%d" % t for t in pts)))
+    print("\nd_anti(S, S+k), the anti-diagonal family alone:")
+    for k in range(0, 5):
+        pts = [(S, rows[(S, k)][1]) for S in range(2, smax + 1)
+               if (S, k) in rows]
+        if pts:
+            print("  k=%d  %s" % (k, "  ".join("%d:%d" % t for t in pts)))
     return 0
 
 
