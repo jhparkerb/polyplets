@@ -88,19 +88,26 @@ def banked():
 #                   covers.
 # --------------------------------------------------------------------------
 
-def within_pairs(L):
-    """Adjacent position pairs inside one hook of length L."""
-    return [(p, p + 1) for p in range(L - 1)]
+def hook_cells(S, k):
+    """Cells of hook k, as (position, (i, j)) with position 0 the corner.
 
-
-def between_pairs(L, L2):
-    """(p in hook k, q in hook k+1) adjacent pairs.  L = S-k, L2 = S-k-1."""
-    out = []
-    for p in range(L):
-        for q in (p - 2, p - 1, p):
-            if 0 <= q < L2:
-                out.append((p, q))
+    Position p >= 1 contributes TWO cells, (k, k+p) and (k+p, k).  They are the
+    same position because the mirror symmetry forces them to be occupied
+    together -- but they are DIFFERENT CELLS and are not adjacent to each other
+    unless p = 1, which is why they must carry separate component labels.  The
+    first version of this file collapsed each pair to one node and counted
+    disconnected animals as connected; the banked-row anchor caught it at
+    S = 4.
+    """
+    out = [(0, (k, k))]
+    for p in range(1, S - k):
+        out.append((p, (k, k + p)))
+        out.append((p, (k + p, k)))
     return out
+
+
+def adjacent(a, b):
+    return a != b and abs(a[0] - b[0]) <= 1 and abs(a[1] - b[1]) <= 1
 
 
 class DSU:
@@ -121,94 +128,97 @@ class DSU:
             self.p[max(ra, rb)] = min(ra, rb)
 
 
-def canon_labels(occ, L, extra_edges, inherited):
-    """Component labels for the occupied positions of one hook.
+def geometry(S):
+    """Per hook: the cell list, within-hook edges, and edges to the next hook.
 
-    `occ` is the mask, `extra_edges` the within-hook adjacent pairs, and
-    `inherited` a list of (position, oldlabel) links from the previous hook.
-    Returns (labels tuple over occupied positions in order, number of distinct
-    inherited old labels that reached this hook, mapping oldlabel -> newlabel).
-    """
-    pos = [p for p in range(L) if occ >> p & 1]
-    idx = {p: i for i, p in enumerate(pos)}
-    dsu = DSU(len(pos))
-    for a, b in extra_edges:
-        if a in idx and b in idx:
-            dsu.union(idx[a], idx[b])
-    # inherited links merge positions that shared an old component
+    Built from the coordinates by brute force -- no hand-derived adjacency
+    rules, which is where the first version went wrong."""
+    cells = [hook_cells(S, k) for k in range(S)]
+    within, between = [], []
+    for k in range(S):
+        cs = cells[k]
+        within.append([(a, b) for a in range(len(cs)) for b in range(a + 1, len(cs))
+                       if adjacent(cs[a][1], cs[b][1])])
+        if k + 1 < S:
+            ns = cells[k + 1]
+            between.append([(a, b) for a in range(len(cs)) for b in range(len(ns))
+                            if adjacent(cs[a][1], ns[b][1])])
+        else:
+            between.append([])
+    return cells, within, between
+
+
+def label_hook(cells, within, occ, inherited):
+    """Component labels over the OCCUPIED cells of one hook.
+
+    `occ` is a mask over POSITIONS; a cell is occupied iff its position's bit
+    is set.  `inherited` is a list of (cell index in this hook, old label).
+    Returns (tuple of occupied cell indices, canonical label tuple, set of old
+    labels that reached this hook)."""
+    idxs = [i for i, (p, _) in enumerate(cells) if occ >> p & 1]
+    pos_of = {i: n for n, i in enumerate(idxs)}
+    dsu = DSU(len(idxs))
+    for a, b in within:
+        if a in pos_of and b in pos_of:
+            dsu.union(pos_of[a], pos_of[b])
     byold = defaultdict(list)
-    for p, old in inherited:
-        if p in idx:
-            byold[old].append(idx[p])
+    for i, old in inherited:
+        byold[old].append(pos_of[i])
     for group in byold.values():
         for x in group[1:]:
             dsu.union(group[0], x)
-    roots = {}
-    labels = []
-    for i in range(len(pos)):
-        r = dsu.find(i)
+    roots, labels = {}, []
+    for n in range(len(idxs)):
+        r = dsu.find(n)
         if r not in roots:
             roots[r] = len(roots)
         labels.append(roots[r])
-    return tuple(pos), tuple(labels), byold, dsu, idx
+    return tuple(idxs), tuple(labels), set(byold)
 
 
 def sweep(S):
     """Histogram h[(n, corners)] of dmirror animals with bbox exactly SxS."""
+    cells, within, between = geometry(S)
     hist = defaultdict(int)
-    # state: (occupancy mask of the current hook, label tuple, touched flag)
-    #        -> {(n_so_far, corners_so_far): count}
-    L0 = S
-    cur = {}
-    within0 = within_pairs(L0)
-    for occ in range(1, 1 << L0):                    # hook 0 must be nonempty
-        pos, labels, _, _, _ = canon_labels(occ, L0, within0, [])
-        n = sum(1 if p == 0 else 2 for p in pos)
-        corners = 1 if occ & 1 else 0
-        touched = 1 if (occ >> (L0 - 1)) & 1 else 0  # reaches coordinate S-1
-        key = (occ, labels, touched)
-        cur.setdefault(key, defaultdict(int))[(n, corners)] += 1
+    npos = [S - k for k in range(S)]
 
-    for k in range(S - 1):
-        L, L2 = S - k, S - k - 1
-        between = between_pairs(L, L2)
-        within2 = within_pairs(L2)
+    cur = defaultdict(lambda: defaultdict(int))
+    cs0 = cells[0]
+    for occ in range(1, 1 << npos[0]):               # hook 0 must be nonempty
+        idxs, labels, _ = label_hook(cs0, within[0], occ, [])
+        n = len(idxs)
+        corners = 1 if occ & 1 else 0
+        touched = 1 if any(max(cs0[i][1]) == S - 1 for i in idxs) else 0
+        cur[(occ, idxs, labels, touched)][(n, corners)] += 1
+
+    for k in range(S):
         nxt = defaultdict(lambda: defaultdict(int))
-        for (occ, labels, touched), counts in cur.items():
-            pos = [p for p in range(L) if occ >> p & 1]
-            lab = {p: labels[i] for i, p in enumerate(pos)}
+        for (occ, idxs, labels, touched), counts in cur.items():
             nlab = len(set(labels))
-            # harvest: the animal ends at this hook iff it is connected and
-            # the bbox is exact.  Remaining hooks empty.
-            if nlab == 1 and touched:
-                for (n, c), v in counts.items():
-                    hist[(n, c)] += v
-            for occ2 in range(1 << L2):
-                if occ2 == 0:
-                    continue                          # a gap kills the animal
+            if nlab == 1 and touched:                # the animal ends here
+                for nc, v in counts.items():
+                    hist[nc] += v
+            if k + 1 >= S:
+                continue
+            lab = {i: labels[t] for t, i in enumerate(idxs)}
+            occ_set = set(idxs)
+            cs2 = cells[k + 1]
+            for occ2 in range(1, 1 << npos[k + 1]):
                 inherited = []
-                for p, q in between:
-                    if (occ >> p & 1) and (occ2 >> q & 1):
-                        inherited.append((q, lab[p]))
-                reached = {old for _, old in inherited}
-                if len(reached) != nlab:
+                for a, b in between[k]:
+                    if a in occ_set and (occ2 >> cs2[b][0] & 1):
+                        inherited.append((b, lab[a]))
+                if len({o for _, o in inherited}) != nlab:
                     continue                          # a component stranded
-                pos2, labels2, _, _, _ = canon_labels(
-                    occ2, L2, within2, inherited)
-                add_n = sum(1 if p == 0 else 2 for p in pos2)
+                idxs2, labels2, _ = label_hook(cs2, within[k + 1], occ2,
+                                               inherited)
+                add_n = len(idxs2)
                 add_c = 1 if occ2 & 1 else 0
-                t2 = touched or ((occ2 >> (L2 - 1)) & 1)
-                key2 = (occ2, labels2, 1 if t2 else 0)
-                dst = nxt[key2]
+                t2 = touched or any(max(cs2[i][1]) == S - 1 for i in idxs2)
+                dst = nxt[(occ2, idxs2, labels2, 1 if t2 else 0)]
                 for (n, c), v in counts.items():
                     dst[(n + add_n, c + add_c)] += v
         cur = nxt
-
-    # final hook (k = S-1, length 1): harvest whatever is closable
-    for (occ, labels, touched), counts in cur.items():
-        if len(set(labels)) == 1 and touched:
-            for (n, c), v in counts.items():
-                hist[(n, c)] += v
     return hist
 
 
