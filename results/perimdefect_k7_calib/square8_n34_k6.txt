@@ -1,1 +1,0 @@
-square8 n=34 k=6 wall_s=691 stamp=git=6473890c

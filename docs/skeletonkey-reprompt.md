@@ -104,23 +104,6 @@ halves and they are not equally likely.
 If a session has one expensive idea in it, the char-2 basis (INV-6, and
 `exactchange-basis-hunt` in MEMORY.md) is where it should go.
 
-## The prompt, v1 — superseded, kept for its rationale
-
-> Goal: ironclad confidence in a(40), and/or a genuinely new way to count king
-> polyplets that reaches well past n=40. Working the T(n,H) triangle harder is
-> explicitly NOT the kind of result wanted.
->
-> Before generating any ideas, read the kill inventory in
-> `docs/skeletonkey-reprompt.md` and the files it names. Then, breadth first:
-> produce **at least 15 candidate directions** in one pass, one line each, and
-> for every one state which inventory entry kills it or why it survives. Do not
-> open a single file to investigate a candidate until the whole list exists.
-> Score the survivors by payoff x plausibility, show me the table, and only
-> then go deep on one.
->
-> Machines: check ayr and dalby first. Experiments run on ayr unless it is
-> busy; gympie is banned for project processes.
-
 ## The inventory — read these before generating
 
 | file | what it closes |
@@ -258,3 +241,23 @@ as its one unprobed rescue; Exact Change had measured that sparsity in GF(2)
 only. The char-0 answer: sparsity is real and 425x at H=8, and the engine loses
 anyway on dimension (2.748x/height against the column frontier's 2.541x, and
 already 1.6x behind at H=4). H=8 did not break the trend.
+
+
+---
+
+## The prompt, v1 — superseded, kept for its rationale
+
+> Goal: ironclad confidence in a(40), and/or a genuinely new way to count king
+> polyplets that reaches well past n=40. Working the T(n,H) triangle harder is
+> explicitly NOT the kind of result wanted.
+>
+> Before generating any ideas, read the kill inventory in
+> `docs/skeletonkey-reprompt.md` and the files it names. Then, breadth first:
+> produce **at least 15 candidate directions** in one pass, one line each, and
+> for every one state which inventory entry kills it or why it survives. Do not
+> open a single file to investigate a candidate until the whole list exists.
+> Score the survivors by payoff x plausibility, show me the table, and only
+> then go deep on one.
+>
+> Machines: check ayr and dalby first. Experiments run on ayr unless it is
+> busy; gympie is banned for project processes.

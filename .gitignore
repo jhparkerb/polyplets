@@ -4,7 +4,6 @@ __pycache__/
 *.pyc
 build/
 runs/
-build/
 harness/harness
 
 # macOS filesystem cruft (esp. ._* AppleDouble files from Mac->Linux copies)

@@ -240,8 +240,20 @@ provenance record, a kill with its counterexample, or a measurement. Empty
 — a clean stderr is a finding — and they stay. What follows is duplicates,
 strays, and one genuine hazard.
 
-**B1 — The one that is actually dangerous: stale forks inside
-`results/ghostship/grading/run-record/sandbox/`.**
+**B1 — DONE, and this item was half wrong.** The fix is
+`results/ghostship/grading/run-record/sandbox/SNAPSHOT-WARNING.md`, not a
+deletion. **Correction:** the five files said to "exist nowhere else" are not
+lost repo content — they are the experiment's own *output*, written 2026-08-15
+inside the sandbox, never on master, already triaged in
+`results/ghostship/VALUE-TRIAGE.md`, with what survived imported in `a4c8085`
+and cited from `results/convex-polyplets.md` under an explicit `GS/` prefix.
+Nothing needs recovering. What was real is the three shadowing files, and the
+sharpest of those is `polyplet-upper-bound.md` carrying **λ ≤ 9.3153** against
+the live 9.3154 — the exact value this project has a standing rule not to round
+back. The sandbox is a mechanically derived slice at `74b2c20` and is evidence,
+so it gets a marker rather than an edit.
+
+*Original framing, which the correction above supersedes:*
 
 The sandbox holds a partial copy of the repo as it stood during the experiment.
 Eight proof notes under `sandbox/docs/proofs/`:
@@ -263,31 +275,46 @@ decision is in the landing checklist and is not repeated here — this hazard
 exists in either direction, because it is a hazard to *us* reading our own
 tree.
 
-**B2 — Uncited bulk data.** `results/a19_samples.txt`, 2.5 MB, named by no
+**B2 — DONE.** Both removed, `results/removals-2026-08-22.md` is the trail.
+
+*Original:* `results/a19_samples.txt`, 2.5 MB, named by no
 tracked file. `results/perimdefect_k7_calib/`, 36 files and 891 KB, named by
 no tracked file, from the k = 7 census that was priced at 76–179 days and
 declined. Both are outputs nothing reads.
 
-**B3 — `results/dead-2026-08-07-powercut/`.** Three files from the ayr power
+**B3 — DONE.** Removed.
+
+*Original:* Three files from the ayr power
 cut, one of them empty, cited only by `HANDOFF.md`'s account of the incident.
 The *lesson* is banked in `docs/lessons-learned.md` and stays; the three
 truncated output files are not evidence of anything except that the run died.
 
-**B4 — Twenty-four empty tracked files.** Fourteen are ghostship's `.err`
+**B4 — DONE.** Six stray empties removed; the fourteen ghostship `.err` files
+kept as evidence, and the two `a21fold` `.out` files kept because their sibling
+`.log` files are non-empty and the pair is the record.
+
+*Original:* Fourteen are ghostship's `.err`
 files and stay, per the rule above. The other ten are stray: four under
 `experiments/tristruct/`, two `.out` files under
 `results/dalby-run-telemetry-202606/a21fold/` that are empty where the
 sibling `.log` files are not, `results/j7_20260807.log`,
 `results/perimmin_free_15_15_0_r7.txt`, and the powercut file from B3.
 
-**B5 — June run telemetry.** `results/dalby-run-telemetry-202606/`, 217 files
+**B5 — NOT DONE, deliberately.** See `results/removals-2026-08-22.md`: it is
+cited by two documents and the thinning is a judgment about how much run
+telemetry ships, which is the same class of decision as PRE-LANDING's "does
+`docs/` go public" — jasonp's, not a cleanup.
+
+*Original:* `results/dalby-run-telemetry-202606/`, 217 files
 and 3.5 MB of run logs, cited by `HANDOFF.md` and
 `results/hole-free-growth-constant.md`. Not a straight removal — the a(35) and
 holes runs are provenance — but 217 files of console log is a lot of tree for
 what two documents actually cite, and a thinning down to what is cited is
 available if the tree wants to be smaller.
 
-**B6 — `experiments/tristruct/`**, 170 files and 1.7 MB, of which 78 are named
+**B6 — NOT DONE, deliberately**, same class as B5.
+
+*Original:* `experiments/tristruct/`, 170 files and 1.7 MB, of which 78 are named
 nowhere outside `experiments/` itself. The campaign's *conclusions* are in
 `docs/triangle-postmortem.md` and the `results/triangle-*` files and stay
 regardless. This is about how much of the working apparatus ships with them.
@@ -300,7 +327,13 @@ eight `results/*.md`, five probes under `experiments/`, and two data files
 *changes* about B is B1: five proof notes exist only inside the Ghost Ship
 sandbox, and C touched none of them, so that hazard is exactly as it was.
 
-**B7 — Two one-line tidies.** `.gitignore` lists `build/` twice. And the
+**B7 — DONE, and half of it was wrong.** The duplicate `build/` line is gone
+from `.gitignore`. On the v1 prompt: it was **already** after v2, so a reader
+does meet the current one first — the real complaint was that v1 sat between v2
+and the inventory that v2 tells you to read next, so it has been moved to the
+end of the file. A reorder, not a deletion.
+
+*Original:* `.gitignore` lists `build/` twice. And the
 superseded v1 prompt is kept inline in `docs/skeletonkey-reprompt.md` "for its
 rationale" — which is a good reason, but the file is the *entry point* for the
 whole Skeleton Key mission per `docs/README.md`, and a reader meets 40 lines of
