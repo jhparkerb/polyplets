@@ -30,7 +30,6 @@ Target machine: ayr or dalby.  Cost: instant, exact rational arithmetic.
 """
 
 import os
-import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -38,21 +37,7 @@ sys.path.insert(0, HERE)
 
 from dmirror_onset_probe import newton_fit, evalpoly  # noqa: E402
 
-ROW = re.compile(r"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+|-)\s+(\d+)\s+(\d+)\s+(-?\d+)")
-
-
-def load(path):
-    """{(S, k): (main, anti)} over the rows where the split is defined."""
-    out = {}
-    for ln in open(path):
-        m = ROW.match(ln)
-        if not m:
-            continue
-        S, k = int(m.group(1)), int(m.group(2))
-        if S < 2 * k + 2:
-            continue
-        out[(S, k)] = (int(m.group(5)), int(m.group(6)))
-    return out
+from dmirror_spine_cumulants import load  # noqa: E402  (both producers)
 
 
 def degree(points):

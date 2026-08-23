@@ -47,20 +47,32 @@ from dmirror_grand_form import (  # noqa: E402
     cumulants, pdeg, controls, report as gf_report)
 from dmirror_onset_probe import newton_fit, evalpoly  # noqa: E402
 
-ROW = re.compile(r"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+|-)\s+(\d+)\s+(\d+)\s+(-?\d+)")
-
-
 def load(path):
-    """{(S, k): (main, anti)} for rows where the split is defined."""
+    """{(S, k): (main, anti)} for rows where the split is defined.
+
+    Reads both producers.  experiments/dmirror_spine_split.py prints
+    S k total banked main anti neither; cpp/dmirror_spine.cpp has no banked
+    column (it gates against the banked rows rather than printing them), so its
+    rows are S k total main anti neither.  Anything else on the line is a
+    marker and is ignored.  A row whose numeric width is neither 6 nor 7 is
+    skipped rather than guessed at."""
     out = {}
     for ln in open(path):
-        m = ROW.match(ln)
-        if not m:
+        tok = []
+        for t in ln.split():
+            if t.lstrip("-").isdigit() or t == "-":
+                tok.append(t)
+            else:
+                break
+        if len(tok) not in (6, 7) or tok[0] == "-" or tok[1] == "-":
             continue
-        S, k = int(m.group(1)), int(m.group(2))
+        S, k = int(tok[0]), int(tok[1])
         if S < 2 * k + 2:
             continue
-        out[(S, k)] = (int(m.group(5)), int(m.group(6)))
+        mi, ai = (4, 5) if len(tok) == 7 else (3, 4)
+        if tok[mi] == "-" or tok[ai] == "-":
+            continue
+        out[(S, k)] = (int(tok[mi]), int(tok[ai]))
     return out
 
 
