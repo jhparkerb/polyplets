@@ -1,4 +1,4 @@
-# The reach-merged frontier, counted: H = 14 and H = 15 measured, and what stops at 16
+# The reach-merged frontier, counted: H = 14, 15 and 16 measured, and where the method stops
 
 2026-08-23, executing `docs/time-at-the-bar.md` A1.1. Binary
 `cpp/nkey_census.cpp`, run on dalby via `scripts/nkey_census_ladder.sh`, both
@@ -89,7 +89,7 @@ is a decision rather than a foregone conclusion.
 
 ## What can and cannot be said about H = 21
 
-**Cannot:** a measured number. The census reached 15 (16 in flight), not 21.
+**Cannot:** a measured number. The census reached 16, with 17 in flight, not 21.
 
 **Can:** the extrapolation is now anchored two heights further than the merge
 file's, and its shape is unchanged. The ratio increments decay by about 0.88
@@ -99,7 +99,7 @@ that forward gives
 | H | 16 | 17 | 18 | 19 | 20 | 21 |
 |---|---|---|---|---|---|---|
 | ratio | 2.545 | 2.557 | 2.567 | 2.575 | 2.583 | 2.590 |
-| classes | ~3.5e5 | ~8.9e5 | ~2.3e6 | ~5.9e6 | ~1.5e7 | **~3.9e7** |
+| classes | *346,539 measured* | ~8.9e5 | ~2.3e6 | ~5.9e6 | ~1.5e7 | **~3.9e7** |
 
 That is six steps of extrapolation from a two-parameter fit with no closed form
 underneath it, and it agrees with the pre-census projection to within a percent
