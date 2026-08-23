@@ -559,6 +559,12 @@ build/severance_w3_families: cpp/severance_w3_families.cpp cpp/obs.h | build
 build/nkey_census: cpp/nkey_census.cpp cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $< -o $@
 
+# The dmirror spine split with a cell budget (A1.3's live half): the hook
+# transfer matrix that reaches S = 16, 17, where the Python takes hours at 14.
+# Gates against every banked dmirror_strip cell it can reach before reporting.
+build/dmirror_spine: cpp/dmirror_spine.cpp cpp/obs.h | build
+	$(CXX) $(CXXFLAGS) -O3 -Icpp $< -o $@
+
 # Gate NOTARY: the Lean-ification of the depth-1 closure (campaign Notary,
 # docs/notary-lean-plan.md). Fails on any sorry in the Notary modules, then
 # builds them; the axiom audits are #guard_msgs blocks inside the modules
