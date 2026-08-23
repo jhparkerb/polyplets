@@ -29,7 +29,7 @@ doing.
 |---|---|---|---|---|
 | dalby | `nkey_census 17`, **pre-fix binary** (rev a825ad1) | 2940920 | started 23:45, ~15 h total | `~/var/nkey-census/census.txt` |
 | dalby | `nkey_census 17`, post-fix (rev 95fbb6c) | 2943918 | ~15 h from 09:27 | `~/var/nkey-census-postfix/census.txt` |
-| dalby | `severance_w3_families families 21 4 8` | 2943921 | 3.1-6.7 h from 09:27, 8.5-16.1 GB | `results/severance_w3_families_K21_e4.txt` |
+| dalby | `severance_w3_families families 21 4 8` | 2943921 | 3.1-6.7 h from 09:27, 8.5-16.1 GB | `results/severance_w3_families_K21_e4.txt` (planned, written by the run) |
 | dalby | `dmirror_spine_ladder.sh 20 21 6` | 2943897 | S=20 ~6.6 h, S=21 ~23 h from 09:27 | `~/var/dmirror-spine-2021/split.txt` |
 | ayr | `nkey_census 16`, re-run under the corrected retirement rule | 699744 | ~3 h from 08:42 | `~/tmp/census16_check.txt` |
 | ayr | `exactchange_minauto.py 13` | 700968 | ~2 h from 09:28, ~31 GB | `~/var/minauto-h13/rank.txt` |

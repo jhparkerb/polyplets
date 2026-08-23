@@ -271,6 +271,230 @@ void successors(const Key& src, int H, bool dilate_on, std::vector<Key>& out) {
   }
 }
 
+// ------------------------------------------------------------- shared sweep
+//
+// The same census, with the partial fills SHARED between source states.
+//
+// successors() above rebuilds the row-by-row refinement separately for every
+// source key, so a partial fill that a thousand sources admit is explored a
+// thousand times -- which is why results/nkey-census.md prices H = 18 at three
+// days and H = 21 out of reach.  The production engine does not have this
+// problem: its carry sweeps cells globally, so intermediate states are shared.
+// This does the same thing here.  A whole batch of sources is swept together,
+// one row at a time, and the state carries only what the REMAINING rows can
+// still see:
+//
+//   future[i]   old block i's dilated mask restricted to rows >= the current
+//               one -- so two sources that differ only below the sweep become
+//               the same state and their remaining work is done once
+//   Partial     exactly the structure successors() uses, unchanged
+//
+// The correctness argument is that dropping a block is only ever done when
+// nothing can reach it again: no later row attaches to it (no bit at or above
+// the next row) and the run in progress does not hold it.  Both halves are
+// needed -- leaving the second out is the merge failure 384bd2e fixed.  A
+// block dropped without ever having been touched strands a component, and that
+// column is dead, which is the same test successors() makes as `touched !=
+// allOld` at the end.
+//
+// Nothing here is trusted on that argument.  The two engines are separate
+// implementations of one count and --gate runs the banked king ladder and the
+// rook RED control through BOTH, so a wrong sharing rule has to reproduce
+// 8, 19, 43, 101, 239, 575, 1399, 3441, 8539, 21355 and Motzkin(H+1)-1 to hide.
+
+struct Shared {
+  std::vector<u32> future;  // old blocks still carried; index = touch bit
+  Partial p;
+
+  bool operator==(const Shared& o) const {
+    return future == o.future && p == o.p;
+  }
+};
+
+struct SharedHash {
+  size_t operator()(const Shared& s) const {
+    u64 h = PartialHash{}(s.p);
+    for (u32 v : s.future) {
+      h ^= v;
+      h *= 1099511628211ull;
+    }
+    h ^= s.future.size() * 0x9e3779b97f4a7c15ull;
+    h *= 1099511628211ull;
+    return static_cast<size_t>(h);
+  }
+};
+
+// Put the old blocks in an order that depends only on what they are and what
+// touches them, so two states that differ by a relabelling become one.  This
+// is an optimisation and nothing rests on it: a labelling that fails to
+// canonicalise costs duplicated work, never a wrong count, because the answer
+// is a set of KEYS and every key is sorted before it is counted.
+void canonBlocks(Shared& s) {
+  const size_t B = s.future.size();
+  if (B < 2) {
+    sortLive(s.p);
+    return;
+  }
+  std::vector<std::vector<u32>> sig(B);
+  for (size_t i = 0; i < B; ++i) {
+    sig[i].push_back(s.future[i]);
+    sig[i].push_back((s.p.curTouch >> i) & 1);
+    for (size_t j = 0; j < s.p.liveMask.size(); ++j)
+      if ((s.p.liveTouch[j] >> i) & 1) sig[i].push_back(s.p.liveMask[j]);
+    std::sort(sig[i].begin() + 2, sig[i].end());
+  }
+  std::vector<size_t> idx(B);
+  for (size_t i = 0; i < B; ++i) idx[i] = i;
+  std::sort(idx.begin(), idx.end(), [&sig](size_t a, size_t b) {
+    if (sig[a] != sig[b]) return sig[a] < sig[b];
+    return a < b;
+  });
+  bool identity = true;
+  for (size_t i = 0; i < B; ++i)
+    if (idx[i] != i) { identity = false; break; }
+  if (!identity) {
+    std::vector<int> pos(B);
+    for (size_t i = 0; i < B; ++i) pos[idx[i]] = static_cast<int>(i);
+    auto remap = [&pos, B](u32 m) {
+      u32 r = 0;
+      for (size_t i = 0; i < B; ++i)
+        if ((m >> i) & 1) r |= 1u << pos[i];
+      return r;
+    };
+    std::vector<u32> nf(B);
+    for (size_t i = 0; i < B; ++i) nf[i] = s.future[idx[i]];
+    s.future.swap(nf);
+    for (u32& t : s.p.liveTouch) t = remap(t);
+    s.p.touched = remap(s.p.touched);
+    s.p.curTouch = remap(s.p.curTouch);
+  }
+  sortLive(s.p);
+}
+
+// Advance the state to `nextRow`: forget the part of every old block that is
+// now behind the sweep, drop the blocks nothing can reach again, and put what
+// is left in canonical order.  False means the column strands a block.
+bool advance(Shared& s, int nextRow) {
+  const size_t B = s.future.size();
+  const u32 above = (nextRow >= 32) ? 0u : ~((1u << nextRow) - 1u);
+  bool drop = false;
+  for (size_t i = 0; i < B; ++i) {
+    const bool reach = (s.future[i] & above) != 0;
+    const bool held = (s.p.curTouch >> i) & 1;
+    if (reach || held) continue;
+    if (((s.p.touched >> i) & 1) == 0) return false;  // stranded: dead column
+    drop = true;
+  }
+  if (!drop) {
+    for (size_t i = 0; i < B; ++i) s.future[i] &= above;
+    canonBlocks(s);
+    return true;
+  }
+  std::vector<u32> nf;
+  nf.reserve(B);
+  std::vector<int> pos(B, -1);
+  for (size_t i = 0; i < B; ++i) {
+    const bool reach = (s.future[i] & above) != 0;
+    const bool held = (s.p.curTouch >> i) & 1;
+    if (!reach && !held) continue;
+    pos[i] = static_cast<int>(nf.size());
+    nf.push_back(s.future[i] & above);
+  }
+  auto remap = [&pos, B](u32 m) {
+    u32 r = 0;
+    for (size_t i = 0; i < B; ++i)
+      if (((m >> i) & 1) && pos[i] >= 0) r |= 1u << pos[i];
+    return r;
+  };
+  for (u32& t : s.p.liveTouch) t = remap(t);
+  s.p.touched = remap(s.p.touched);
+  s.p.curTouch = remap(s.p.curTouch);
+  s.future.swap(nf);
+  retire(s.p, 0xffffffffu);  // a group with nothing left to merge through
+  canonBlocks(s);
+  return true;
+}
+
+// Sweep one batch of source keys together, appending every successor key.
+void sweepBatch(const std::vector<Key>& srcs, int H, bool dilate_on,
+                std::vector<Key>& out, u64* peak) {
+  std::unordered_set<Shared, SharedHash> cur, next;
+  for (const Key& k : srcs) {
+    Shared s;
+    s.future = k;
+    canonBlocks(s);
+    cur.insert(std::move(s));
+  }
+  for (int row = 0; row < H; ++row) {
+    const u32 above = ~((1u << row) - 1u);
+    next.clear();
+    for (const Shared& s : cur) {
+      const size_t B = s.future.size();
+      u32 reachable = 0, attach = 0;
+      for (size_t i = 0; i < B; ++i) {
+        if (s.future[i] & above) reachable |= 1u << i;
+        if ((s.future[i] >> row) & 1) attach |= 1u << i;
+      }
+      {  // (a) leave the row empty
+        Shared q = s;
+        closeRun(q.p);
+        retire(q.p, reachable);
+        if (advance(q, row + 1)) next.insert(std::move(q));
+      }
+      {  // (b) fill it
+        Shared q = s;
+        q.p.curDil |= dilate(1u << row, H, dilate_on);
+        q.p.curTouch |= attach;
+        q.p.curOpen = true;
+        retire(q.p, reachable | q.p.curTouch);
+        if (advance(q, row + 1)) next.insert(std::move(q));
+      }
+    }
+    cur.swap(next);
+    if (peak && cur.size() > *peak) *peak = cur.size();
+  }
+  for (const Shared& s0 : cur) {
+    Shared s = s0;
+    closeRun(s.p);
+    retire(s.p, 0);
+    if (!advance(s, H)) continue;  // an old block stranded: dead
+    if (s.p.fin.empty()) continue; // the empty column is not a transition
+    Key k = s.p.fin;
+    std::sort(k.begin(), k.end());
+    out.push_back(std::move(k));
+  }
+}
+
+// The same reachable-key count as census(), by batched breadth-first rounds so
+// that a whole round's sources share their partial fills.
+u64 censusShared(int H, bool dilate_on, obs::Reporter* rep, size_t batch) {
+  std::unordered_set<Key, KeyHash> seen;
+  Key empty;
+  seen.insert(empty);
+  std::vector<Key> frontier{empty}, produced, grown;
+  u64 rounds = 0, peak = 0;
+
+  while (!frontier.empty()) {
+    grown.clear();
+    for (size_t off = 0; off < frontier.size(); off += batch) {
+      const size_t hi = std::min(frontier.size(), off + batch);
+      std::vector<Key> chunk(frontier.begin() + off, frontier.begin() + hi);
+      produced.clear();
+      sweepBatch(chunk, H, dilate_on, produced, &peak);
+      for (Key& t : produced)
+        if (seen.insert(t).second) grown.push_back(std::move(t));
+    }
+    frontier.swap(grown);
+    ++rounds;
+    if (rep)
+      rep->beat(static_cast<double>(rounds),
+                "seen=" + std::to_string(seen.size()) +
+                    " frontier=" + std::to_string(frontier.size()) +
+                    " peak_sweep=" + std::to_string(peak));
+  }
+  return seen.size() - 1;
+}
+
 // The reachable key set from the empty frontier, minus the empty start itself
 // -- the convention of experiments/skeletonkey/nfamily_merge.py, whose counts
 // this must reproduce.
@@ -297,14 +521,66 @@ u64 census(int H, bool dilate_on, obs::Reporter* rep) {
   return seen.size() - 1;
 }
 
+// Cross-check: the two engines must agree on the SUCCESSOR SET of every
+// reachable key, not merely on how many keys are reachable.
+//
+// This exists because agreeing on the count is too weak.  Disabling the
+// stranded-block prune in advance() -- letting a column that never touches an
+// old block count as a transition -- leaves every banked class count intact,
+// because the extra successors it invents are already reachable by other
+// routes.  A control that a real defect walks through is not a control, so the
+// comparison is made where the defect actually lives: per source, on the set
+// of keys produced.
+bool crossCheck(int H, bool dilate_on) {
+  std::unordered_set<Key, KeyHash> seen;
+  std::vector<Key> frontier, order;
+  Key empty;
+  seen.insert(empty);
+  frontier.push_back(empty);
+  order.push_back(empty);
+  std::vector<Key> work;
+  while (!frontier.empty()) {
+    Key s0 = std::move(frontier.back());
+    frontier.pop_back();
+    work.clear();
+    successors(s0, H, dilate_on, work);
+    for (Key& t : work)
+      if (seen.insert(t).second) {
+        frontier.push_back(t);
+        order.push_back(std::move(t));
+      }
+  }
+  std::vector<Key> a, b, one;
+  u64 bad = 0;
+  for (const Key& k : order) {
+    a.clear();
+    successors(k, H, dilate_on, a);
+    std::sort(a.begin(), a.end());
+    a.erase(std::unique(a.begin(), a.end()), a.end());
+    b.clear();
+    one.assign(1, k);
+    sweepBatch(one, H, dilate_on, b, nullptr);
+    std::sort(b.begin(), b.end());
+    b.erase(std::unique(b.begin(), b.end()), b.end());
+    if (a != b) ++bad;
+  }
+  std::printf("  H=%-3d %s  %zu sources, %llu disagree  %s\n", H,
+              dilate_on ? "king" : "rook", order.size(),
+              (unsigned long long)bad, bad ? "FAILED" : "ok");
+  std::fflush(stdout);
+  return bad == 0;
+}
+
 const u64 KING[] = {0, 0, 0, 0, 8, 19, 43, 101, 239, 575, 1399, 3441, 8539, 21355};
 const u64 ROOK[] = {0, 0, 3, 8, 20, 50, 126, 322, 834, 2187, 5797};
 
-bool gate() {
+bool gate(bool shared, size_t batch) {
   bool ok = true;
-  std::printf("gate king (class counts, results/skeletonkey-nfamily-merge.md)\n");
+  const char* eng = shared ? "shared" : "per-source";
+  std::printf("gate king [%s] (class counts, results/skeletonkey-nfamily-merge.md)\n", eng);
   for (int H = 4; H <= 13; ++H) {
-    const u64 got = census(H, true, nullptr);
+    const u64 got = shared ? censusShared(H, true, nullptr, batch)
+                           : census(H, true, nullptr);
     const u64 want = KING[H];
     const bool good = got == want;
     ok &= good;
@@ -313,10 +589,11 @@ bool gate() {
                 good ? "ok" : "FAILED");
     std::fflush(stdout);
   }
-  std::printf("gate rook (RED control: no dilation => key is the state, "
-              "so the count must be Motzkin(H+1)-1)\n");
+  std::printf("gate rook [%s] (RED control: no dilation => key is the state, "
+              "so the count must be Motzkin(H+1)-1)\n", eng);
   for (int H = 2; H <= 10; ++H) {
-    const u64 got = census(H, false, nullptr);
+    const u64 got = shared ? censusShared(H, false, nullptr, batch)
+                           : census(H, false, nullptr);
     const u64 want = ROOK[H];
     const bool good = got == want;
     ok &= good;
@@ -325,32 +602,50 @@ bool gate() {
                 good ? "ok" : "FAILED");
     std::fflush(stdout);
   }
-  std::printf("%s\n", ok ? "GATES PASS" : "GATES FAILED");
+  if (shared) {
+    std::printf("gate cross-engine (successor SETS per source, not just the "
+                "reachable count)\n");
+    for (int H = 2; H <= 11; ++H) ok &= crossCheck(H, true);
+    for (int H = 2; H <= 9; ++H) ok &= crossCheck(H, false);
+  }
+  std::printf("%s [%s]\n", ok ? "GATES PASS" : "GATES FAILED", eng);
   return ok;
 }
 
 }  // namespace
 
-int main(int argc, char** argv) {
-  if (argc < 2) {
-    std::fprintf(stderr,
-                 "usage: nkey_census --gate | [--rook] H [H2]\n");
-    return 2;
-  }
-  if (std::strcmp(argv[1], "--gate") == 0) return gate() ? 0 : 1;
+const char kUsage[] =
+    "usage: nkey_census --gate | [--rook] [--shared] [--batch=N] H [H2]\n";
 
-  bool dilate_on = true;
-  int a = 1;
-  if (std::strcmp(argv[a], "--rook") == 0) {
-    dilate_on = false;
-    ++a;
+int main(int argc, char** argv) {
+  bool dilate_on = true, shared = false;
+  size_t batch = 1u << 20;
+  std::vector<const char*> rest;
+  for (int i = 1; i < argc; ++i) {
+    if (std::strcmp(argv[i], "--rook") == 0) dilate_on = false;
+    else if (std::strcmp(argv[i], "--shared") == 0) shared = true;
+    else if (std::strncmp(argv[i], "--batch=", 8) == 0) {
+      batch = static_cast<size_t>(std::strtoull(argv[i] + 8, nullptr, 10));
+      if (batch == 0) { std::fprintf(stderr, "--batch must be positive\n"); return 2; }
+    } else rest.push_back(argv[i]);
   }
-  if (a >= argc) {
-    std::fprintf(stderr, "usage: nkey_census --gate | [--rook] H [H2]\n");
+  if (rest.empty()) { std::fprintf(stderr, kUsage); return 2; }
+
+  // --gate runs BOTH engines: they are two implementations of one count, and
+  // the banked ladder plus the rook RED control is what either has to clear.
+  if (std::strcmp(rest[0], "--gate") == 0)
+    return (gate(false, batch) && gate(true, batch)) ? 0 : 1;
+
+  const char** argp = rest.data();
+  const int an = static_cast<int>(rest.size());
+  int a = 0;
+  (void)argp;
+  if (a >= an) {
+    std::fprintf(stderr, kUsage);
     return 2;
   }
-  const int H1 = std::atoi(argv[a]);
-  const int H2 = (a + 1 < argc) ? std::atoi(argv[a + 1]) : H1;
+  const int H1 = std::atoi(rest[a]);
+  const int H2 = (a + 1 < an) ? std::atoi(rest[a + 1]) : H1;
   if (H1 < 1 || H2 < H1 || H2 > 30) {
     std::fprintf(stderr, "H out of range\n");
     return 2;
@@ -358,13 +653,15 @@ int main(int argc, char** argv) {
 
   // The gates run first, every time, so no height is ever reported by a binary
   // that has not just re-established that it reproduces the banked ladder.
-  if (!gate()) return 1;
+  if (!gate(shared, batch)) return 1;
 
   for (int H = H1; H <= H2; ++H) {
     obs::Reporter rep("nkey_census", 0,
                       "H=" + std::to_string(H) +
-                          (dilate_on ? " lattice=king" : " lattice=rook"));
-    const u64 n = census(H, dilate_on, &rep);
+                          (dilate_on ? " lattice=king" : " lattice=rook") +
+                          (shared ? " engine=shared" : " engine=per-source"));
+    const u64 n = shared ? censusShared(H, dilate_on, &rep, batch)
+                         : census(H, dilate_on, &rep);
     rep.done("H=" + std::to_string(H) + " classes=" + std::to_string(n));
     std::printf("%d %llu\n", H, (unsigned long long)n);
     std::fflush(stdout);
