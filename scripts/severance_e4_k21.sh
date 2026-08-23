@@ -35,11 +35,15 @@ THREADS=${2:-8}
 mkdir -p "$OUT"; echo $$ > "$OUT/pid"
 TABLE="$ROOT/results/severance_w3_families_K${K}_e4.txt"
 [ -e "$TABLE" ] && { echo "$TABLE already exists -- refusing to overwrite" >&2; exit 1; }
+# Stage outside the tree: a scratch file under results/ makes `git status`
+# dirty, and every binary built while it sits there is stamped -dirty, which
+# is a provenance gate failure for any run started in that window.
+STAGE="$OUT/severance_w3_families_K${K}_e4.txt.partial"
 {
   echo "=== severance_w3_families families $K 4 $THREADS: $(date -Is)"
   echo "=== rev $(cd "$ROOT" && git rev-parse --short HEAD)"
 } >> "$OUT/run.txt"
 /usr/bin/time -f "K=$K emax=4 threads=$THREADS wall=%e rss_kb=%M" \
-  "$BIN" families "$K" 4 "$THREADS" > "$TABLE.partial" 2>> "$OUT/events.txt"
-mv "$TABLE.partial" "$TABLE"
+  "$BIN" families "$K" 4 "$THREADS" > "$STAGE" 2>> "$OUT/events.txt"
+mv "$STAGE" "$TABLE"
 echo "-- done $(date -Is) -> $TABLE" >> "$OUT/run.txt"
