@@ -1,7 +1,7 @@
 # HANDOFF — live state (updated 2026-08-23)
 
-> **Resuming cold? `docs/resume-here.md`** is stale (2026-08-20); the live jobs
-> are the four listed under 2026-08-23 below.
+> **Resuming cold? `docs/resume-here.md`** — rewritten 2026-08-23 01:40 with
+> the four jobs then running and what to do when each lands.
 >
 > **Start with `results/confidence.md`** if what you want is how far a(n) can
 > be trusted and why. It is in plain terms, it says which values rest on two
