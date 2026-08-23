@@ -26,16 +26,23 @@ against this frontier.
 | 13 | 21,355 | 2.5009 | seconds | — |
 | **14** | **53,763** | 2.5176 | 293 s | 17 MB |
 | **15** | **136,145** | 2.5323 | 1,960 s | 35 MB |
+| **16** | **346,539** | 2.5454 | 10,454 s | 80 MB |
+
+H = 17 is in flight and had passed 886,106 classes after 4.1 h, so it will land
+above 2.55 as well.
 
 Wall times exclude the gate ladder, which runs before every height and costs
 84 s. H = 14 and H = 15 are new; everything at or below 13 was already banked,
 by the Python probe `experiments/skeletonkey/nfamily_merge.py`, and is
 reproduced here as a gate.
 
-**The extrapolation was good and it was still wrong.**
+**The extrapolation is good and it keeps being wrong.**
 `docs/time-at-the-bar-report.md` projected 53,777 at H = 14 from the ratio
-ladder through H = 13. The measured value is **53,763** — 0.026% out, which is
-close enough to be worth saying and wrong enough to be worth measuring.
+ladder through H = 13; measured **53,763**, 0.026% out. Re-anchored on H = 14
+and H = 15, the same method projected 346,533 at H = 16; measured **346,539**,
+0.002% out and this time *under* rather than over. Two heights, two directions,
+both inside a thousandth — which is what a decelerating-increment fit does when
+it is close to right and is exactly why it is not a substitute for the count.
 
 ## Gates
 
@@ -67,10 +74,11 @@ collapse. Same gates, 1 m 24 s.
 
 ## Where it stops, measured rather than assumed
 
-Wall time per height: 293 s at H = 14 against 1,960 s at H = 15, a factor of
-**6.7**. Carried forward that is ~3.6 h at H = 16, ~24 h at H = 17 and about a
-week at H = 18. **This implementation reaches H = 16, and H = 17 if someone
-wants to wait a day. It does not reach 21.**
+Wall time per height: 293 s at H = 14, 1,960 s at H = 15, 10,454 s at H = 16 —
+ratios of **6.7 and 5.3**, so the cost ratio decelerates too. At 5.0 per height
+from here, H = 17 is ~15 h, H = 18 ~3 days, H = 19 ~15 days. **This
+implementation reaches H = 17 (in flight, 4.1 h in) and H = 18 for anyone
+willing to spend a long weekend on it. It does not reach 21.**
 
 The reason is structural rather than incidental: successors are generated per
 source state, so a partial fill that could serve many sources is rebuilt for
@@ -106,6 +114,21 @@ and 363.4 GB of disk. The merge is a state-space cut of about an order of
 magnitude at that height, which is the thing worth knowing about the H = 20 and
 H = 21 decisions — and it is exactly what a census that reached 21 would turn
 from a lean into a number.
+
+## The retirement rule, and the check it needed
+
+The compression above retires a group when nothing can reach it. The first
+version tested that against the old blocks a *later row* can still attach to,
+and left out the ones the *run in progress* has already attached to — so a
+closed group and the open run could share an old block whose last row had just
+passed, be one component, and be filed as two. Found by reading the code rather
+than by any gate failing.
+
+Fixed, and then checked rather than assumed: with the stricter rule the binary
+reproduces **H = 14 = 53,763 and H = 15 = 136,145 exactly**, so the hazard is
+real in the code and unreachable at these heights, and every number above
+stands. H = 16 was produced by the pre-fix binary and is being re-run under the
+corrected rule; H = 17 likewise.
 
 ## What this does not settle
 
