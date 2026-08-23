@@ -25,6 +25,7 @@ L_PAPERS = [
     "L4-not-dfinite.tex", "L5-convex-polyplets.tex",
     "L6-perimeter-gradings.tex", "L7-subdominant-amplitude.tex",
     "L8-below-onset.tex", "L9-cutcount-identity.tex",
+    "L10-undertow.tex",
 ]
 CONTROLS = ["technical-report.tex", "polyplets-report.tex"]
 

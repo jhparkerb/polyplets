@@ -62,8 +62,7 @@ whose pin has no holdout rather than leaving it to be found.]
 stated.
 \emph{That a level carries exactly two new constants} (\S\ref{sec:frame}) ---
 \textbf{proved}, and formalized: \repo{docs/proofs/grand-form.md} is
-Lean-complete against the standard axioms. Everything this paper does rests on
-that count being two and not three.
+Lean-complete against the standard axioms.
 \emph{The below-onset identity} (\S\ref{sec:frame}, equation
 \eqref{eq:pin}) --- \textbf{proved} as a rearrangement, given $\Dj(k)$; it is
 the definition of the defect made into an equation, and it introduces no
@@ -102,24 +101,25 @@ search only and is provisional.
 
 \begin{abstract}
 \noindent
-On the king lattice, the number $T(n,H)$ of fixed animals with $n$ cells and
-bounding-box height exactly $H$ obeys a diagonal law: for fixed $k$ and
+Polyplets are animals on the king lattice. The number $T(n,H)$ of fixed
+polyplets with $n$ cells and bounding-box height exactly $H$ obeys a diagonal
+law: for fixed $k$ and
 $n \ge 2k+1$,
 \[
   T(n,\,n-k) \;=\; P_k(n)\cdot 3^{\,n-1-3k},
   \qquad \deg P_k = k,
 \]
 and the onset $n \ge 2k+1$ is sharp. The standard way to determine $P_k$ is to
-enumerate the two tallest cells on its diagonal --- both above the onset --- and
-solve. Those two cells are the most expensive computations in the whole
+enumerate the two tallest cells on its diagonal, both of them above the onset,
+and solve. Those two cells are the most expensive computations in the whole
 problem.
 
 This paper does it from the other side. Below the onset the law is false, but
 its error is exactly computable: at depth $j = 2k+1-n$ the defect $\Dj(k)$ is
 produced by a bounded-excess family enumeration that never reads the triangle.
 Adding it back turns a \emph{short} cell into an exact linear equation for the
-tall level, and since a level carries exactly two constants --- a proved,
-formalized fact --- two such equations pin it.
+tall level. A level carries exactly two constants, which is proved and
+formalized, so two such equations pin it.
 
 The consequence is a reach rule: exact depths up to $J$ give every level
 attainable from $n \le 2H_{\max} + J - 1$, so each two units of depth buy a
@@ -143,8 +143,9 @@ priority pass.
 % ===========================================================================
 \section{Introduction}\label{sec:intro}
 
-Let $T(n,H)$ count fixed king-lattice animals with $n$ cells whose bounding box
-has height exactly $H$. Reading the triangle along its diagonals
+A polyplet is an animal on the king lattice, in which two cells are adjacent
+when they share an edge or a corner. Let $T(n,H)$ count the fixed polyplets of
+$n$ cells whose bounding box has height exactly $H$. Reading the triangle along its diagonals
 $k = n - H$ rather than along its rows, the counts satisfy a law that is a
 theorem (\repo{docs/proofs/diagonal-law.md}, and companion paper L1 in the
 general row-local form): for each fixed $k$ there is a polynomial $P_k$ of
@@ -172,8 +173,8 @@ with a $363$\,GB disk peak.
 \noindent
 \textbf{What this paper does.} It supplies the same $P_k$ from cells
 \emph{below} the onset, where \eqref{eq:law} is false, by adding back an error
-term that is known exactly. Those cells are shorter --- $j$ rows shorter at
-depth $j$ --- so they sit inside data that has already been computed.
+term that is known exactly. Those cells are $j$ rows shorter at depth $j$, so
+they sit inside data that has already been computed.
 
 Three things have to hold, and the paper is organised around them. A level must
 carry few enough constants that a couple of equations determine it
@@ -182,17 +183,15 @@ carry few enough constants that a couple of equations determine it
 outside itself (\S\ref{sec:square}).
 
 % ===========================================================================
-\section{The frame: two constants, and one equation per short cell}
+\section{The frame}
 \label{sec:frame}
 
 \paragraph{Two constants.} The grand form
 (\repo{docs/proofs/grand-form.md}) states that the diagonal generating function
 factorises as $F(n,u) = C(u)\cdot H(u)^n$, from which level $k$ carries exactly
-two new constants over the levels below it. This is proved, and it is formalized
-in Lean against the standard axioms --- which matters here more than it usually
-would, because the entire construction is a consequence of that count being two.
-Any two independent linear equations in those constants therefore determine
-$P_k$ completely.
+two new constants over the levels below it. That is proved, and formalized in
+Lean against the standard axioms. Any two independent linear equations in those
+constants therefore determine $P_k$ completely.
 
 \paragraph{One equation per short cell.} Define the defect at depth
 $j = 2k+1-n$ by the difference between the truth and the law:
@@ -205,19 +204,16 @@ some route that does not involve $P_k$, and then it is one linear equation in
 the two unknown constants of level $k$, purchased at a cell that is $j$ rows
 shorter than the classical anchors.
 
-Two such equations, at two depths or two levels, pin the level. That is the
-whole mechanism.
+Two such equations, at two depths or two levels, pin the level.
 
 % ===========================================================================
-\section{Why it is not circular}\label{sec:circular}
+\section{Independence of the defect}\label{sec:circular}
 
-This is the first question a reader should ask, and the answer is structural
-rather than rhetorical: the defect is computed by a machine that cannot see the
-answer.
+The defect is computed by a machine that cannot see the answer.
 
-$\Dj(k)$ comes from bounded-excess cluster-weight families --- an enumeration
-over families with a bounded excess parameter, carried out by a dynamic program
-that reads neither the triangle $T$ nor any $P_k$. Companion paper L8 develops
+$\Dj(k)$ comes from bounded-excess cluster-weight families: an enumeration over
+families with a bounded excess parameter, carried out by a dynamic program that
+reads neither the triangle $T$ nor any $P_k$. Companion paper L8 develops
 that mathematics and closes depths $1$ through $4$; this paper consumes its
 output.
 
@@ -245,7 +241,7 @@ families is the second source (a different counting rule, in every cell of the
 row) and the external validation of \S\ref{sec:square}.
 
 % ===========================================================================
-\section{What it buys}\label{sec:bought}
+\section{Reach}\label{sec:bought}
 
 \paragraph{Reach.} With exact defects to depth $J$, the tower covers every level
 reachable from
@@ -261,9 +257,9 @@ rows that had already been banked at $H \le 18$, so $T(40,20)$ and $T(40,21)$
 became predictions from existing data rather than computations.
 
 \paragraph{$a(41)$.} Computed 2026-08-20 in two halves
-(\repo{results/a41/PROVENANCE.md}): heights $1$--$19$ by a real sweep --- wall
-$16{,}998.7$\,s ($4.72$ hours) on 40 cores, peak RSS $557$\,MB --- and heights
-$20$--$41$ by the tower, with $k \le 19$ from the wired table and $k = 20, 21$
+(\repo{results/a41/PROVENANCE.md}). Heights $1$--$19$ came from a real sweep, at
+wall $16{,}998.7$\,s ($4.72$ hours) on 40 cores with peak RSS $557$\,MB, and
+heights $20$--$41$ from the tower, with $k \le 19$ from the wired table and $k = 20, 21$
 pinned from below-onset cells. The result is
 \[
   a(41) \;=\; 393811462683918679824582849262105 .
@@ -281,34 +277,32 @@ the banked values against each other and the frame; it is not a second
 enumeration.
 
 % ===========================================================================
-\section{The external validation}\label{sec:square}
+\section{The square lattice}\label{sec:square}
 
-Everything above is internal to one lattice and one project. Companion paper L8
-carries the check that is not: on the square lattice, where the counts are
+Companion paper L8 carries the one check whose inputs are not ours: on the
+square lattice, where the counts are
 published by other people, a cell below the onset corrected by its defect gives
 the same polynomial as the classical fit and reproduces the tall cells it was
-denied --- at depth $1$ for $k \le 6$, and at depth $2$ for $k = 2,\dots,6$,
-where ten withheld cells are hit exactly. A corrupted defect breaks the fit at
+denied: at depth $1$ for $k \le 6$, and at depth $2$ for $k = 2,\dots,6$, where
+ten withheld cells are hit exactly. A corrupted defect breaks the fit at
 each depth, so the holdouts are not passing for some reason unrelated to the
 defect.
 
-That is the claim of this paper, tested where the inputs are not ours: a short
-cell, corrected, is as good an equation as a tall one. It is the only check in
-the whole construction that crosses out of the project, and the reason it
-matters more than its size is that every other second source here re-counts the
-same objects with different code, so a shared \emph{conceptual} error would
-survive all of them.
+That is this paper's claim, tested where the inputs are not ours: a short cell,
+corrected, is as good an equation as a tall one. Every other second source here
+re-counts the same objects with different code, so a shared \emph{conceptual}
+error would survive all of them and not this.
 
 Two limits, both stated in L8 and repeated here because this paper is the one
 making the operational claim. The square defects are measured against a $P_k$
 that was pinned classically, so the check validates the identity without
 supplying an independent route to $D_j$ away from the king lattice. And the
-family enumeration that does supply them on the king lattice is king-only ---
-adjacency is baked into its row transfer --- so carrying the method to another
-lattice is a build rather than a substitution.
+family enumeration that does supply them on the king lattice is king-only, with
+adjacency baked into its row transfer, so carrying the method to another lattice
+is a build rather than a substitution.
 
 % ===========================================================================
-\section{What is still soft}\label{sec:soft}
+\section{Limits}\label{sec:soft}
 
 \begin{itemize}
 \item \textbf{$P_{21}$ has one pin pair and no holdout.} Level $20$ is pinned
@@ -373,16 +367,14 @@ than a working hypothesis.
 \end{itemize}
 
 Together those make the output an exact value with a provenance rather than an
-extrapolation with an error estimate, and that --- not the idea of correcting
-finite-size data --- is what this paper puts forward.
+extrapolation with an error estimate. This paper puts forward that combination
+and not the idea of correcting finite-size data.
 
-\paragraph{The negative half is weak, and is labelled so.} No instance was found
-that applies a correction of this kind to bounding-box-height animal counts, or
-that corrects a diagonal law in order to pin its levels from below the onset.
-That search was web only: no citation-database sweep of the Baxter--Guttmann
-line, which is precisely where a closer instance would sit. The negative should
-be re-run against a citation database before circulation; the positive finding
-above stands on its own.
+\paragraph{The negative half.} No instance was found that applies a correction
+of this kind to bounding-box-height animal counts, or that corrects a diagonal
+law in order to pin its levels from below the onset. That search was web only;
+the record of what was and was not searched is
+\repo{docs/priority-pass-L10-2026-08-23.md}.
 
 % ===========================================================================
 \section{Open problems}\label{sec:open}
