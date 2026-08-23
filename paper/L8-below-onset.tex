@@ -1,15 +1,28 @@
 \documentclass[11pt]{article}
 
 % ---------------------------------------------------------------------------
-%  L8 — Below the onset: the diagonal law's error term.
+%  L8 — Below the onset: the diagonal law's error term, and the tower it pins.
 %  Category L (entirely machine-written); see paper/README.md and
 %  docs/publication-split.md.
 %
-%  NOVELTY: pass run 2026-08-18, no collision found -- but a weak negative, see
-%  the Novelty section.  docs/priority-passes-2026-08-18.md.  Claims none.
+%  MERGED 2026-08-23.  L10-undertow.tex was folded in here and withdrawn as a
+%  manuscript.  The 08-22 decision recorded in docs/state-2026-08-23.md §3 read
+%  "L8 absorbs the Undertow material" and was implemented as a tenth paper;
+%  jasonp's clarification on 08-23 is that absorb meant what it says.  L10 had
+%  spent about two of its seven pages restating this paper's law, frame and
+%  square-lattice check, and this paper carried no citations at all; merged,
+%  each fixes the other.  docs/l-corpus-contraction.md is the record.
+%
+%  NOVELTY: two passes, and they came back differently.  The defect mathematics
+%  was swept 2026-08-18 with no collision, but that negative is WEAK and the
+%  Novelty section says why.  The tower was swept 2026-08-23 and it FOUND A
+%  NEAR NEIGHBOUR -- correcting finite-size data by a known error term is
+%  standard practice in directed-percolation series work.  Both verdicts are in
+%  the Novelty section.  Claims: only the combination.
 %
 %  Source material, all in this repository:
 %    docs/proofs/diagonal-law.md              the law, its onset, its proof
+%    docs/proofs/grand-form.md                two constants per level, Lean
 %    results/diagonal-law-below-onset.md      how the law fails below onset
 %    results/onset-defect-law.md              rate 9, exponent j-3/2, amplitude
 %    results/onset-defect-depth1-closed.md    the quartic, and every j=1 constant
@@ -17,6 +30,15 @@
 %    results/ridgeline-depth-amplitudes.md    alpha = 50/81, and the limits ledger
 %    results/onset-defect-crossover.md        the near-onset layer, downgraded
 %    results/allpairs-kernel.md               the gap walk
+%    docs/undertow-chapter.md                 the tower, as a chapter
+%    results/undertow.md                      the tower's campaign record
+%    results/undertow-square-validation.md    the external check, J = 1
+%    results/undertow-square-depth2.md        depth 2 on the square lattice
+%    results/a41/PROVENANCE.md                a(41), how it was computed
+%    results/cutcount_b1/rows41/              the second source at Nmax 41
+%    results/undertow-review-{A,B,C}.md       the adversarial review
+% ---------------------------------------------------------------------------
+
 % ---------------------------------------------------------------------------
 
 \input{shared/preamble}
@@ -25,25 +47,36 @@
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\Q}{\mathbb{Q}}
 \newcommand{\R}{\mathbb{R}}
+\newcommand{\Dj}{D_j}
 
 \title{\textbf{Below the onset}\\[4pt]
-\large The error term of a diagonal law, depth by depth}
+\large The error term of a diagonal law, and the tower it pins}
 \author{[byline: jasonp's call --- \repo{docs/publication-split.md} \S1]}
 \date{August 2026}
 
 \begin{document}
 \maketitle
 
-\firstdraftbanner[ One gate is specific to this paper: its priority pass
-(\S\ref{sec:novelty}) is a weak negative, because the object it studies is
-defined relative to a law of our own. Nothing here is claimed to be new.]
+\firstdraftbanner[ Three gates are specific to this paper. Its two
+priority passes came back differently: the defect mathematics was swept
+2026-08-18 with \emph{no} collision, and \S\ref{sec:novelty} says why that
+negative is weak, because the object is defined relative to a law of our own;
+the tower of \S\ref{sec:tower} was swept 2026-08-23 and \textbf{found a near
+neighbour}, named in the same section. And the arithmetic here produced a
+published integer, $a(41)$, so \S\ref{sec:limits} states the one level whose pin
+has no holdout rather than leaving it to be found.]
 
 \Ldisclosure{%
 \emph{The diagonal law itself, its degree, its onset and its sharpness} ---
 proved elsewhere (companion paper L1), used here as stated.
+\emph{That a level carries exactly two new constants} (\S\ref{sec:frame}) ---
+\textbf{proved}, and formalized: \repo{docs/proofs/grand-form.md} is
+Lean-complete against the standard axioms.
 \emph{The exact frame of \S\ref{sec:frame}} --- proved: the entire below-onset
 content of column $k$ is the $k+1$ coefficients of one correction polynomial,
-which is a rearrangement of the chain identity and nothing more.
+which is a rearrangement of the chain identity and nothing more. The pin
+identity \eqref{eq:pin} is that definition rearranged again, and introduces no
+approximation.
 \emph{The depth-$1$ closure of \S\ref{sec:depth1}} --- the defect is computed
 exactly to $k = 200$ from independently enumerated cluster families, and the
 quartic $\Phi$ was fitted on $57$ series orders and holds on $144$ orders of
@@ -65,6 +98,21 @@ four named analytic assumptions} which are listed in full in
 $D_5$ beyond $k \le 19$ exists.
 \emph{The near-onset scaling of \S\ref{sec:crossover}} --- measurement,
 downgraded on adversarial review and reported at the strength that survived it.
+\emph{That the tower is not circular} (\S\ref{sec:tower}) --- \textbf{argued
+and gated}, not proved: the argument is that the two sides share no input, and
+the gate is a script that fails if they ever do, with three RED controls that
+fire.
+\emph{The reach rule and the row-40 consequences} (\S\ref{sec:reach}) ---
+arithmetic, and checked against the banked triangle at every cell it touches.
+\emph{$a(41)$} --- \textbf{computed}, once, by two halves whose provenance is
+recorded (\repo{results/a41/PROVENANCE.md}); heights $1$--$19$ by a real sweep
+and $20$--$41$ by the tower. A second, rule-independent program covers every
+cell of the row (\repo{results/cutcount\_b1/rows41/}).
+\emph{The audit of $18$ wired levels} --- exact re-derivation over every
+available depth pair, $18$ of $18$, which is a consistency check on banked
+values and not an independent confirmation of them (\S\ref{sec:tower}).
+\emph{$P_{21}$} --- \textbf{one pin pair, no holdout}. Stated in
+\S\ref{sec:limits} as the softest thing in the construction.
 \emph{The square-lattice check of \S\ref{sec:square}} --- \textbf{external}:
 the counts are other people's. At $k \le 6$ the below-onset fit equals the
 classical one and reproduces the cells it was denied, ten of them at depth $2$,
@@ -72,10 +120,11 @@ with a RED control at each depth that fires. Its limit is stated in place ---
 the square defects are measured against a classically pinned $P_k$, so this
 validates the identity and is not an independent route to $D_j$ off the king
 lattice.
-\emph{Novelty} --- pass run 2026-08-18, no collision found, and
-\S\ref{sec:novelty} says why that is weaker evidence than it looks. The
-square-lattice material of \S\ref{sec:square} postdates that pass and has not
-been swept.
+\emph{Novelty} --- two passes. The defect mathematics, 2026-08-18: no
+collision, and \S\ref{sec:novelty} says why that is weaker evidence than it
+looks. The tower, 2026-08-23: \textbf{a near neighbour was found} and is cited.
+The paper claims no new idea; what it claims is the specific combination. The
+negative half of the second pass is web search only and is provisional.
 \emph{Human verification:} none, as of this draft.}
 
 \begin{abstract}
@@ -87,11 +136,12 @@ $n \ge 2k+1$,
   T(n, n-k) \;=\; P_k(n)\cdot 3^{\,n-1-3k},
 \]
 with $P_k$ a polynomial of degree $k$. The onset $n \ge 2k+1$ is sharp. This
-paper is about what happens below it, where the law is false.
+paper is about what happens below it, where the law is false --- and about what
+that error is worth, which turns out to be a term of the sequence.
 
 It is false by a vanishing relative amount, and the error has structure that no
 algebraic search finds because the structure is analytic. Writing the defect at
-depth $j = 2k+1-n$ as $D_j(k)$, we report: an exact frame in which the entire
+depth $j = 2k+1-n$ as $\Dj(k)$, we report: an exact frame in which the entire
 below-onset content of a column is $k+1$ integers; a closed form at depth $1$,
 where the generating function is algebraic, an irreducible quartic, from
 which the rate $9$, the exponent $-1/2$, the amplitude $\sqrt6/(27\sqrt\pi)$ and
@@ -105,9 +155,24 @@ branch point moves when a cluster is allowed one unit of excess, computed exactl
 by a finite local count. That resolves an ambiguity the measurements alone could
 not --- at $j = 5$ the value is $35/8$, and the competing $118/27$, which fits
 the numbers better, is an artefact of the normalisation in which they were read.
-
 The derivation of $\alpha$ rests on four analytic assumptions which we state
 rather than prove.
+
+Because the defect is computed ab initio, by an enumeration that never reads the
+triangle, adding it back turns a \emph{short} cell into an exact linear equation
+for a tall level --- and a level carries exactly two constants, which is proved
+and formalized, so two such equations pin it. That inverts the usual cost. The
+standard route reads a level off the two tallest cells of its diagonal, which
+are the most expensive computations in the problem; this one reads it off cells
+that are already banked. The reach rule is that exact depths up to $J$ give
+every level attainable from $n \le 2H_{\max} + J - 1$, so each two units of
+depth buy a height, and a height costs a factor of about $2.9$. In practice it
+moved the two tallest cells of row $40$ inside existing data and produced
+\[
+  a(41) \;=\; 393811462683918679824582849262105
+\]
+for $4.72$ hours on 40 cores, against the $36.4$ hours and $363$\,GB that
+row~$40$'s single tallest cell had cost on its own.
 
 Finally, the construction is checked outside this project. On the square
 lattice, where the counts are published by other people, a below-onset cell
@@ -151,6 +216,17 @@ null. The reason, established here, is that those searches were looking in the
 wrong category and at the wrong scale: $D_1$ \emph{is} P-finite, at
 $(r,d) = (35,4)$, and the structure that explains the whole family is a moving
 branch point rather than a recurrence.
+
+\paragraph{And the error is a lever.} The second half of the paper is what
+that structure is for. The classical way to determine $P_k$ is to enumerate the
+two tallest cells of its diagonal, both above the onset, and solve --- and those
+two cells are the most expensive computations in the whole problem, because a
+sweep reaches the tallest heights last and each height costs a factor of about
+$2.9$. Since $\Dj(k)$ is computed by a machine that never reads the triangle,
+equation~\eqref{eq:pin} turns a cell \emph{below} the onset into an exact linear
+equation for the same level, purchased $j$ rows shorter. Section~\ref{sec:tower}
+is that construction, the argument that it is not circular, and the term of the
+sequence it produced.
 
 \paragraph{What this paper is not.} It is not a proof of the defect law. Rate
 $9$ and exponent $j - 3/2$ are proved at $j = 1$ and measured at $j \le 7$;
@@ -205,6 +281,29 @@ $D_j$ being P-finite in $k$, and an empirical search is the obvious thing to
 try. It is priced out rather than untried: fitting a recurrence of the orders in
 question needs on the order of $180$ values of $k$, and about $15$ exist.
 \end{remark}
+
+\subsection{Two constants per level, and one equation per short cell}
+\label{sec:pin}
+
+\paragraph{Two constants.} The grand form
+(\repo{docs/proofs/grand-form.md}) states that the diagonal generating function
+factorises as $F(n,u) = C(u)\cdot H(u)^n$, from which level $k$ carries exactly
+two new constants over the levels below it. That is proved, and formalized in
+Lean against the standard axioms. Any two independent linear equations in those
+constants therefore determine $P_k$ completely.
+
+\paragraph{One equation per short cell.} Define the defect at depth
+$j = 2k+1-n$ by the difference between the truth and the law:
+\begin{equation}\label{eq:pin}
+  T(2k+1-j,\; k+1-j) \;=\; P_k(2k+1-j)\cdot 3^{\,2k-3k-j} \;+\; \Dj(k).
+\end{equation}
+As an identity this is a definition rearranged; it introduces no approximation
+and no asymptotics. It becomes \emph{useful} exactly when $\Dj(k)$ is known by
+some route that does not involve $P_k$, and then it is one linear equation in
+the two unknown constants of level $k$, purchased at a cell that is $j$ rows
+shorter than the classical anchors.
+
+Two such equations, at two depths or two levels, pin the level.
 
 \section{Depth one closes}
 \label{sec:depth1}
@@ -449,6 +548,84 @@ they came back with; the family exclusions from the same analysis stand. The
 resummation is a near-onset statement and not a uniform description of the
 below-onset region.
 
+% ===========================================================================
+\section{The tower: pinning a level from below its onset}
+\label{sec:tower}
+
+Everything above is structure. This section is the use: the defect makes a
+short cell into an equation, and two equations pin a level.
+
+\subsection{The defect cannot see the answer}
+
+The defect is computed by a machine that cannot see the answer.
+
+$\Dj(k)$ comes from bounded-excess cluster-weight families: an enumeration over
+families with a bounded excess parameter, carried out by a dynamic program that
+reads neither the triangle $T$ nor any $P_k$: it is the enumeration of
+\S\ref{sec:depth1} and \S\ref{sec:depths}, which close depths $1$ through $4$.
+
+The separation is enforced rather than asserted. The W3 gate keeps the two
+sides apart and fails if they are ever joined, and the pin script
+carries three RED controls, each of which fires: a perturbed $\Dj$ breaks the
+pin; the same equation offered twice is refused as singular; a corrupted lower
+level breaks the pin.
+
+\paragraph{A sharper point, from the adversarial review.} The review of this
+construction (\repo{results/undertow-review-A.md} and its siblings) traced every
+input to its source, and its most useful finding is one this paper should carry
+in the open rather than answer defensively:
+
+\begin{quote}
+Two tower routes agreeing is \emph{not} two confirmations. Every tower statement
+about $T(40,19)$ contains $D_3(21)$, and the two routes share the grand form and
+most of the defect values. Only agreement against an enumeration crosses
+assumption families.
+\end{quote}
+
+The audit reported in \S\ref{sec:reach} is therefore a consistency check on the
+banked triangle, not an independent confirmation of it. What crosses assumption
+families is the second source (a different counting rule, in every cell of the
+row) and the external validation of \S\ref{sec:square}.
+
+% ===========================================================================
+
+\subsection{Reach, and what it bought}
+\label{sec:reach}
+
+With exact defects to depth $J$, the tower covers every level
+reachable from
+\[
+  n \;\le\; 2\,H_{\max} + J - 1 .
+\]
+Each two units of depth buy one height, and a height is a factor of about $2.9$
+in compute.
+
+\paragraph{Row 40, with no new compute.} $P_{19}$ pins from $T(37,18)$ and
+$T(36,17)$; $P_{20}$ from $T(38,18)$ and $T(37,17)$. All four cells lie inside
+rows that had already been banked at $H \le 18$, so $T(40,20)$ and $T(40,21)$
+became predictions from existing data rather than computations.
+
+\paragraph{$a(41)$.} Computed 2026-08-20 in two halves
+(\repo{results/a41/PROVENANCE.md}). Heights $1$--$19$ came from a real sweep, at
+wall $16{,}998.7$\,s ($4.72$ hours) on 40 cores with peak RSS $557$\,MB, and
+heights $20$--$41$ from the tower, with $k \le 19$ from the wired table and $k = 20, 21$
+pinned from below-onset cells. The result is
+\[
+  a(41) \;=\; 393811462683918679824582849262105 .
+\]
+The comparison worth making is not against the whole of row $40$ but against its
+single tallest cell: $36.4$ hours on 32 cores and a $363$\,GB disk peak, for one
+cell. Row $41$ did not pay it.
+
+\paragraph{The audit.} Depths $1$--$4$ together with the two onset anchors give
+six equations for two unknowns at each level, so four independent consistency
+checks per level, computed from short cells through mathematics that shares
+nothing with the sweep. All $18$ wired levels were re-derived exactly over every
+available depth pair: $18$ of $18$. As \S\ref{sec:tower} says, this checks
+the banked values against each other and the frame; it is not a second
+enumeration.
+
+% ===========================================================================
 \section{The square lattice}
 \label{sec:square}
 
@@ -503,8 +680,47 @@ substitution: its row transfer has king adjacency baked in, and the
 lattice-parametric machinery this project has elsewhere covers the
 \emph{above}-onset assembly only.
 
+\paragraph{Why this is the check that matters.} Every other second source
+in this project re-counts the same objects with different code, so a shared
+\emph{conceptual} error would survive all of them and not this. What
+\S\ref{sec:tower} claims operationally --- that a short cell, corrected, is as
+good an equation as a tall one --- is tested here where the inputs are not
+ours.
+
+% ===========================================================================
+\section{Limits}
+\label{sec:limits}
+
+\begin{itemize}
+\item \textbf{$P_{21}$ has one pin pair and no holdout.} Level $20$ is pinned
+six ways with five independent checks. Level $21$ pins from $T(40,19)$ and
+$T(39,18)$ and has nothing checking it until either depth $5$ is available or
+$T(41,20)$ is swept. This is the last soft spot in the construction and
+\repo{results/confidence.md} says so in the same terms.
+
+\item \textbf{Solving a whole column is a reformulation, not extra redundancy}
+--- the Remark in \S\ref{sec:frame}, restated here because it is the correction
+a referee finds. An earlier reading of the construction had it the other way.
+
+\item \textbf{Depth $5$ exists as a price, not as a table.} Its cost was
+asserted at $\sim16$ hours and $\sim103$\,GB and is now measured at $3.1$ hours
+and $8.5$\,GB, or $6.7$ hours and $16.1$\,GB on the pessimistic bound
+(\repo{results/depth5-cost-settled.md}) --- an order of magnitude below the
+assertion, which is worth recording as a caution about asserted prices in
+general. The gate that must pass before $D_5$ is used at $k = 21$ is written and
+is deliberately RED until the table exists.
+\end{itemize}
+
+
+% ===========================================================================
 \section{Novelty}
 \label{sec:novelty}
+
+Two priority passes ran over this material, on the two halves separately,
+and they came back differently.
+
+\subsection{The defect mathematics: no collision, and a weak negative}
+
 
 A pass ran on 2026-08-18 and found nothing close
 (\repo{docs/priority-passes-2026-08-18.md}): searches over corrections and error
@@ -518,7 +734,54 @@ with work that had the law first, which companion paper L1's searches cover, and
 they came back clean. A pass over an object nobody else has defined
 tests very little. Nothing here is called new.
 
+\subsection{The tower: a near neighbour, named}
+
+and it found a near neighbour, which is the outcome this section exists to
+report.
+
+\paragraph{The prior art.} Correcting a finite-size calculation by a term that
+describes how far it is wrong, in order to use it beyond the range where it is
+exact, is standard practice in series work on directed percolation. Baxter and
+Guttmann~\cite{baxter1988} extend the percolation-probability series for the
+directed square lattice by exactly that manoeuvre: a finite-lattice calculation
+of size $N$ is exact only to some order, the differences between the exact
+series and the finite ones are \emph{correction terms}, and knowing them buys
+series orders that the finite lattice alone does not reach. Jensen and
+Guttmann~\cite{jensen1995} carry it further on the square, honeycomb and
+triangular lattices. The ambient family is the finite-lattice method of Enting
+and of Jensen. This paper is a member of that family and does not claim the
+shape of the idea.
+
+\paragraph{What survives, and it is a combination rather than an idea.} In that
+literature the correction terms are \emph{conjectured and fitted} --- Baxter and
+Guttmann's ansatz makes them rational functions of Catalan numbers --- so the
+extended series is a prediction resting on the ansatz holding at the next
+order. Two things differ here.
+
+\begin{itemize}
+\item The correction is \textbf{computed exactly and independently}. $D_j(k)$
+comes from a bounded-excess family enumeration that never reads the triangle and
+never reads $P_k$ (\S\ref{sec:tower}); it is not fitted to the object it
+corrects, and it carries no ansatz.
+\item The number of unknowns per level is \textbf{proved, not assumed}. The
+grand form gives exactly two constants per level and is formalized in Lean
+against the standard axioms, so ``two equations suffice'' is a theorem rather
+than a working hypothesis.
+\end{itemize}
+
+Together those make the output an exact value with a provenance rather than an
+extrapolation with an error estimate. This paper puts forward that combination
+and not the idea of correcting finite-size data.
+
+\paragraph{The negative half.} No instance was found that applies a correction
+of this kind to bounding-box-height animal counts, or that corrects a diagonal
+law in order to pin its levels from below the onset. That search was web only;
+the record of what was and was not searched is
+\repo{docs/priority-pass-L10-2026-08-23.md}.
+
+% ===========================================================================
 \section{Open problems}
+\label{sec:open}
 
 \begin{openproblem}[prove the defect law]
 Rate $9$ and exponent $j - 3/2$ are derived at $j = 1$ from the quartic and
@@ -552,8 +815,33 @@ algebraic in $Y$ at every fixed order in $t$, which the depth-$1$ quartic
 establishes only at $t^0$.
 \end{openproblem}
 
+\begin{openproblem}
+Make the family DP lattice-parametric. The above-onset half of the ledger
+already is: the cumulant assembly carries over to any row-local lattice by the
+single substitution $3 \mapsto b = |D|$. The below-onset half does not, because
+adjacency is baked into the family DP's row transfer. Doing so would give
+$\Dj$ on the square lattice at every depth and turn the external check from a
+validation into a second instance.
+\end{openproblem}
+
+\begin{openproblem}
+Give $P_{21}$ a holdout without sweeping $H = 21$: either an exact $D_5$ at
+$k = 21$, or an independent route to one of the two cells its pin uses.
+\end{openproblem}
+
+\begin{openproblem}
+Is there a closed form for the square-lattice $D_2$? Five levels of exact values
+produced none, which is the first place the defect's structure has looked
+different away from the king lattice.
+\end{openproblem}
+
+% ===========================================================================
+% ===========================================================================
 \section{Reproduction}
 \label{sec:repro}
+
+Every number in this paper is reproducible from the repository.
+
 
 \begin{table}[H]
 \centering\small
@@ -587,6 +875,26 @@ records are \repo{results/onset-defect-law.md},
 % \S\ref{sec:depth1}. Its mathematical antecedents are the companion papers,
 % named in prose as they are throughout this directory, and its priority pass
 % (\S\ref{sec:novelty}) found nothing else to cite.
+
+The tower's own inputs and outputs:
+
+
+\begin{itemize}
+\item The pin itself, with its three RED controls:
+\repo{experiments/undertow\_pin.py}.
+\item The defect values and the family DP: the table above, and
+\repo{cpp/severance\_w3\_families.cpp}.
+\item $a(41)$'s provenance, both halves: \repo{results/a41/PROVENANCE.md}.
+\item The second source covering every cell of row $41$ under a different
+counting rule: \repo{results/cutcount\_b1/rows41/}.
+\item The external validation: \repo{results/undertow-square-validation.md} and
+\repo{results/undertow-square-depth2.md}.
+\item The adversarial review that produced \S\ref{sec:tower}'s quoted
+finding: \repo{results/undertow-review-A.md} and its siblings.
+\item What may be trusted and how far, in plain terms:
+\repo{results/confidence.md}.
+\end{itemize}
+
 \bibliographystyle{plain}
 \bibliography{shared/refs}
 

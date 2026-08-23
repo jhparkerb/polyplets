@@ -20,12 +20,16 @@ from pathlib import Path
 
 PAPER = Path(__file__).resolve().parents[3] / "paper"
 
+# Enumerated, not frozen.  The 2026-08-23 contraction merged four papers into
+# their partners and withdrew a fifth, and a hardcoded list turns that into a
+# FileNotFoundError rather than a measurement over the corpus that exists.
+# Sorted by the number in the stem so L10 would follow L9 rather than L1.
 L_PAPERS = [
-    "L1-diagonal-law.tex", "L2-ternary-spine.tex", "L3-lambda-bounds.tex",
-    "L4-not-dfinite.tex", "L5-convex-polyplets.tex",
-    "L6-perimeter-gradings.tex", "L7-subdominant-amplitude.tex",
-    "L8-below-onset.tex", "L9-cutcount-identity.tex",
-    "L10-undertow.tex",
+    f.name
+    for f in sorted(
+        PAPER.glob("L[0-9]*.tex"),
+        key=lambda f: int(f.name.split("-")[0][1:]),
+    )
 ]
 CONTROLS = ["technical-report.tex", "polyplets-report.tex"]
 

@@ -404,3 +404,42 @@ the connectivity rule; §3's identity is per-board and says nothing about it.
   column is 0), so Lemma 4 is checked only for `H ≥ 3`. That is correct
   behaviour, not a gap: for `H ≤ 2` a free cell's component cannot re-enter
   later. But the reader should not read 53,552 checks as spread evenly.
+
+## 9. Priority: the identity is classical
+
+Added 2026-08-23, when `paper/L9-cutcount-identity.tex` was withdrawn as a
+manuscript and folded back into this file. The section is the priority pass's
+finding, and it is the reason the withdrawal was the right call: the
+mathematics above is a specialisation of a correspondence from 1972, and this
+document is the engine's correctness argument rather than a result. The pass
+itself, with the searches it ran, is `docs/priority-passes-2026-08-18.md`.
+
+**The statement is an instance of Fortuin–Kasteleyn.** The random-cluster
+partition function is `Z = Σ_g v^{b(g)} q^{c(g)}` (Fortuin & Kasteleyn 1972),
+and counting connected subgraphs is its `q → 0`, `v = 1` content. The standard
+device for evaluating `q^c` without carrying a connectivity state is the Potts
+*spin* representation — colour each component, count colourings — and §3's
+identity is that device specialised to site clusters and executed in scan
+order. The telescoping of §4 is the correspondence performed cell by cell: `b`
+ways to reuse a live colour against one birth of weight `q − b`, summing to `q`
+per component. It is not a new theorem and none is claimed.
+
+**Two further antecedents.** The unsigned ancestor of §2's scan-order
+labelling is Hoshen–Kopelman (1976), which assigns cluster labels in one sweep
+with a merge structure. The method this rule is an *alternative* to — carrying
+the connectivity partition of a frontier — is Jensen's lattice-animal
+algorithm (2001), which is the whole reason an independent second source is
+worth building.
+
+**What the searches did not find.** No source states this particular rule: the
+window of `H+1` cells, the liveness convention that makes an expired label
+uncountable, the adopt branch offering every live label regardless of
+adjacency, and Lemma 1 showing that the window suffices under king adjacency.
+Lemma 1 is the one step that is not translation — it is a statement about the
+scan order, and it discharges the hypothesis a reader would otherwise expect
+to see attached to §3.
+
+So the durable content here is implementation-grade, which is what §8's limits
+ledger already said in its own words: the mathematics is classical, the rule is
+proved because an engine implements it, and a count with no closed form has
+nothing to lean on but a second method.
