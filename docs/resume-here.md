@@ -1,4 +1,4 @@
-# Resume here — 2026-08-23, 01:40 EDT
+# Resume here — 2026-08-23, 09:00 EDT
 
 Written to survive a `/clear`. If you are picking this up cold:
 
@@ -10,6 +10,10 @@ Written to survive a `/clear`. If you are picking this up cold:
 4. This file — the jobs running right now and exactly what to do when each
    lands.
 
+**Three of the four overnight runs have landed**; their results are in
+`docs/state-2026-08-23.md` §4 and in the files named there. What is left running
+is the census, twice.
+
 The previous version of this file described the Motley ladder and two Skeleton
 Key probes of 2026-08-20. All three landed; their protocols are in
 `results/cutcount_b1/rows41/README.md`, `results/skeletonkey-cell-sparsity.md`
@@ -18,20 +22,29 @@ doing.
 
 ---
 
-## Jobs running, at 01:40 EDT
+## Jobs running, at 09:00 EDT
 
-| host | job | pid | started | expect | output |
-|---|---|---|---|---|---|
-| dalby | depth-6 K-ladder, `scripts/lastditch/emax5_kladder.sh` | 2929077 | 23:04 | K=14 rung, ETA ~03:00–04:00 | `~/var/emax5-k/kladder.txt` |
-| dalby | frontier census, `scripts/nkey_census_ladder.sh 14 21` | 2935694 | 23:46 | H=16 ~04:00; H=17 is a day, see below | `~/var/nkey-census/census.txt` |
-| dalby | spine split S=19, `scripts/dmirror_spine_ladder.sh 19 19 6` | 2938697 | 00:52 | hours | `~/var/dmirror-spine-19/split.txt` |
-| ayr | n=11 hole count, `scripts/maxhole_n11.sh` | 688073 | 23:09 | ~2 h for the n=11 level; 62 GB of 78 in use | `~/var/maxhole-n11/run.log` |
+| host | job | pid | expect | output |
+|---|---|---|---|---|
+| dalby | `nkey_census 17` | 2935694 | ~9 h left as of 08:52 | `~/var/nkey-census/census.txt` |
+| ayr | `nkey_census 16`, re-run under the corrected retirement rule | 699744 | ~3 h from 08:42 | `~/tmp/census16_check.txt` |
 
-All four are killable at no cost beyond the unit in flight, and none needs
-restarting on a kill: each script says so in its own header.
+**When the ayr run lands:** it must return **346,539**. That is the number the
+pre-fix binary produced, and this run exists to confirm the retirement fix did
+not change it — the fix reproduced H = 14 and H = 15 exactly, and H = 16 is the
+one height that had not been re-checked. If it differs, H = 16 and H = 17 are
+both suspect and `results/nkey-census.md` must be corrected before anything
+else.
+
+**When the dalby run lands:** add H = 17 to `results/nkey-census.md`'s table and
+its ratio ladder, and stop the ladder there. H = 18 is three days by the
+measured cost ratio and buys one more anchor on a fit that is already good to a
+thousandth; the thing that would actually reach H = 21 is the shared-partial-fill
+build described in that file.
 
 ---
 
+## Landed overnight, kept here for the protocol
 ## 1. The depth-6 K-ladder (dalby) — the one that changes a plan
 
 **What it settles.** `J = 6` is the only asserted number in the five-terms

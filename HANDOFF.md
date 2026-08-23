@@ -1,7 +1,10 @@
 # HANDOFF — live state (updated 2026-08-23)
 
-> **Resuming cold? `docs/resume-here.md`** — rewritten 2026-08-23 01:40 with
-> the four jobs then running and what to do when each lands.
+> **Planning from scratch? `docs/state-2026-08-23.md`** — what is true now,
+> what is decided, what is open with its price and what it would change.
+>
+> **Resuming cold?** `docs/resume-here.md` has the two census runs still going
+> and what to do when each lands.
 >
 > **Start with `results/confidence.md`** if what you want is how far a(n) can
 > be trusted and why. It is in plain terms, it says which values rest on two
