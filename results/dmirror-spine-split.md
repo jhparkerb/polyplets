@@ -20,15 +20,25 @@ them in play. At `c_2` — where the summed family measures degree 2 —
 **both** families are linear. At `c_3`, which needs level `k = 3` pinned and
 therefore `S = 16` even and `S = 17` odd, they separate:
 
-|  | c_1 | c_2 | c_3 | |
-|---|---|---|---|---|
-| `d_main`, both parities | deg 0 | deg 1 | **deg 1** | grand-form shape |
-| `d_anti`, both parities | deg 1 | deg 1 | **deg 2** | **not linear** |
+|  | c_1 | c_2 | c_3 | c_4 | |
+|---|---|---|---|---|---|
+| `d_main`, both parities | deg 0 | deg 1 | **deg 1** | **deg 1** | grand-form shape |
+| `d_anti`, both parities | deg 1 | deg 1 | **deg 2** | — | **not linear** |
 
 So the two-spine sum is **not** the whole obstruction. The main-diagonal family
-looks like a single grand-form object as far as the data reaches; the
-anti-diagonal family does not, and the place it fails is one level past where
-the summed family fails.
+looks like a single grand-form object as far as the data reaches — **three
+nontrivial cumulants now, `c_2`, `c_3` and `c_4`, all linear on both parities**
+— while the anti-diagonal family fails at `c_3`, one level past where the
+summed family fails.
+
+`c_4` came out of the data already in hand, without another rung, once the
+analysis stopped assuming that level `k` has degree `k`. It does not on this
+family: `d_main` runs at `⌊k/2⌋`, so pinning it needs `⌊k/2⌋+2` points rather
+than `k+2`, and the levels the old criterion called unreachable were already
+determined. The pin now takes the **lowest** degree that fits and requires
+**every** remaining point to be reproduced, not merely the consecutive ones
+nearest the fitting window — strictly more data-efficient and strictly harder to
+pass. Re-run under it, the `c_2` and `c_3` verdicts above are unchanged.
 
 Both RED controls are green in the same run: planted single-family data reports
 LINEAR, planted two-family data reports NONLINEAR. They are the same pair
