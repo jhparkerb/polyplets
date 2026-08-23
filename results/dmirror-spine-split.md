@@ -192,6 +192,39 @@ predicted minutes. `cpp/dmirror_spine.cpp` does `S = 14` in 19 s and reached
 are enumerated in increasing cell count and cut off at the remaining budget
 rather than run over all `2^(S−k)` of them.
 
+## The label field was too narrow at S >= 17, and it changed nothing
+
+The guard added in `1a2ccac` fired 53 s into S = 20. Its reasoning — "the cell
+budget keeps a hook far below" the field width — is wrong for a plain geometric
+reason: hook 0 of an S x S board has 2S-1 cells, and a position `p >= 2`
+contributes its two mirror cells `(k,k+p)` and `(k+p,k)` as SEPARATE components,
+so an alternating occupancy reaches about S of them.
+
+The field is six bits now (63 labels against the 48 cells a hook can hold), and
+every run reports the largest hook it carried. **S = 12..19 was re-derived on
+it.** The measurement:
+
+| S | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 |
+|---|---|---|---|---|---|---|---|---|
+| max components in one hook | 11 | 13 | 13 | 15 | 15 | **17** | **17** | **19** |
+| four bits (16 labels) suffice | yes | yes | yes | yes | yes | **no** | **no** | **no** |
+| table identical to the four-bit run | yes | yes | yes | yes | yes | **yes** | **yes** | **yes** |
+
+So the four-bit binary really was aliasing at S = 17, 18 and 19 — the rows
+`c_3`, `c_4` and `c_5` rest on — and every cell it produced is right anyway. The
+reason is that aliasing can only merge two hooks carrying 17 or more components,
+and no such hook completes into a connected animal inside `n <= S + 6`: it would
+need more cells to join its pieces than the budget has. Aliasing merges two dead
+ends into one dead end. It is also why the totals second-sourced clean against
+the banked `dmirror_strip` rows at every cell.
+
+**Nothing in this file changes.** The verdicts above stand as measured, now on a
+field wide enough that the question cannot be asked again.
+
+Note the guard was one step tighter than the field: it refuses at 16 components,
+which four bits still hold, so the first value actually lost is the 17th. S = 20
+was refused, not corrupted.
+
 ## What is still open
 
 `c_4` on `d_main`, which needs `k = 4` pinned on both parities — six points

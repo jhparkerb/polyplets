@@ -46,8 +46,12 @@ wrong, and the totals at S = 15..18 were second-sourced against the banked
 `dmirror_strip` rows at all 21 cells and agreed exactly, which an aliasing
 merge would have had to survive. But that is evidence, not the check. The field
 is six bits now, every run reports the largest hook it carried, and
-**S = 12..19 is being re-derived** before S = 20 and 21 run. S = 12, 13 and 14
-have come back byte-identical.
+**S = 12..19 has been re-derived on it: every table byte-identical.** The
+maxima are 11, 13, 13, 15, 15, **17, 17, 19** at S = 12..19, so the four-bit
+binary really was aliasing at S = 17, 18 and 19 and produced the right answer
+anyway — a hook carrying 17 components needs more cells to join its pieces than
+`n <= S + 6` has, so aliasing merges two dead ends. **A1.3's verdict stands as
+written.** `results/dmirror-spine-split.md`.
 
 **The census has a second engine, and it is much faster.** The reason
 `results/nkey-census.md` stops at 17 is that successors are generated per
