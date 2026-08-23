@@ -16,6 +16,33 @@
 > blocks on them; section B is commands, and it is stale by design whenever
 > `HEAD` moves past the revision its boxes were measured at.
 
+## 2026-08-23 late — THE THREE REMAINING RUNS LANDED
+
+All three of the 09:27 launches finished. Two returned clean numbers and are
+filed; the third produced a file nobody has decided to use.
+
+**The H = 13 rank is 3643 — A034299's value exactly.** 21,355 minimized states,
+4 h 42 min and 19.8 GB on ayr at rev `95fbb6c`, log
+`ayr:~/var/minauto-h13/rank.txt`. Every banked rank is asserted before the new
+one prints, so a wrong build cannot report one: H = 4..12 came back 6, 15, 27,
+58, 112, 229, 453, 912, 1818, all OK, on brute anchors at H = 2, 3. Nine
+consecutive matches. **It does not promote the collapse.** H ≤ 12 has two
+implementations agreeing; H = 13 has minauto alone, because the partition
+automaton was never run there, and a fifth confirmation of the identification is
+not a second implementation of this rank. `results/exactchange-probes.md` §9
+item 3 stands. What it removes is the possibility that the agreement was going
+to break at the next height.
+
+**The ayr per-source census re-run returned 346,539.** H = 16 now has three
+routes agreeing — the pre-fix binary, the post-fix shared engine, and the
+post-fix per-source engine — so the retirement hazard is confirmed unreachable
+there by the slow route as well as the fast one. `results/nkey-census.md`.
+
+**The depth-5 `e4` table exists.** `dalby:~/src/polyominoes/results/severance_w3_families_K21_e4.txt`,
+K = 21, emax = 4, 4 h 54 min at 8 threads, 19.2 GB. **Not pulled and not acted
+on.** It is review row B13's gate input, and B13 is the stated blocker on the
+five-terms decision; turning that gate from RED to green is jasonp's call, not
+filing.
 
 ## 2026-08-23 afternoon — THE L CORPUS IS SIX PAPERS, NOT TEN
 
