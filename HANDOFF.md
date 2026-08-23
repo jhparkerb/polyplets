@@ -1,8 +1,7 @@
-# HANDOFF — live state (updated 2026-08-22)
+# HANDOFF — live state (updated 2026-08-23)
 
-> **Resuming cold? `docs/resume-here.md`** has the jobs still running — the
-> dalby ladder and two ayr probes as of 2026-08-20 14:10 — and exactly what to
-> run when each lands, with the expected answers.
+> **Resuming cold? `docs/resume-here.md`** is stale (2026-08-20); the live jobs
+> are the four listed under 2026-08-23 below.
 >
 > **Start with `results/confidence.md`** if what you want is how far a(n) can
 > be trusted and why. It is in plain terms, it says which values rest on two
@@ -16,7 +15,52 @@
 
 
 
-## 2026-08-22 (latest) — TIME AT THE BAR RUN END TO END
+## 2026-08-23 (latest) — THE OVERNIGHT SHIFT
+
+jasonp authorised four runs plus the L10 draft and went to bed. What landed
+while he was asleep, newest first. **Nothing here is a decision; the two that
+want one are marked.**
+
+**A1.3 is closed, and its cause moved.** The spine split rebuilt in C++
+(`cpp/dmirror_spine.cpp`, 19 s where the Python took 6 h 38 min, gated on 191
+banked cells and agreeing with the Python at every S = 14 value) reached
+S = 15..19. That put `c_3` in reach for the first time, and it **reverses** the
+morning's verdict: `d_main` stays linear at `c_3` and at `c_4`, `d_anti` does
+not. So the two-spine sum was never the whole obstruction — whatever breaks the
+grand form sits in the **anti-diagonal family specifically**. The flip rests on
+S = 16 and S = 17, whose totals were checked against the banked strip rows at
+all 21 cells before it was written down. `results/dmirror-spine-split.md`.
+
+**L10 exists, has had its priority pass, and the pass found something.**
+`paper/L10-undertow.tex`, 7pp. The pass (`docs/priority-pass-L10-2026-08-23.md`)
+found a near neighbour: correcting a finite-size calculation by a term for how
+far it is wrong, to use it past where it is exact, is standard practice in
+directed-percolation series work (Baxter–Guttmann 1988, Jensen–Guttmann 1995).
+Both are now cited and the paper claims only the combination that survives —
+there the corrections are conjectured, here they are computed ab initio, and the
+count of unknowns per level is proved. **L8 absorbed** the external check and
+the two corrections, per jasonp's ruling, and L10 cites it.
+
+**The square-lattice record is n = 70, not 56.** Known since
+`docs/rook-parity.md:151` and unswept; the sweep is done, six live sites
+corrected, `results/literature-record-56-corrected.md` is the one place, and no
+conclusion moves. `results/rook1/queue.md` K4 closed.
+
+**Readability round 4** covered tonight's prose and found what the rules had
+never had to name: paired-dash asides at 2.79 per thousand words in L10, seven
+times jasonp's own control. Now 0.47.
+`docs/reviews/llm-tics/round4-L10.md`.
+
+### The four runs
+
+| run | where | state |
+|---|---|---|
+| depth-6 K-ladder | dalby | K = 8, 10, 12 measured at 40 s / 370 s / 1951 s and 0.42 / 2.3 / 7.2 GB; K = 14 in flight, ETA 02:13 |
+| frontier census | dalby | **H = 14 = 53,763**, **H = 15 = 136,145**; H = 16 in flight |
+| n = 11 hole count | ayr | n ≤ 10 reproduced; n = 11 in flight |
+| spine split | dalby | S = 15..18 landed; S = 19 in flight |
+
+## 2026-08-22 — TIME AT THE BAR RUN END TO END
 
 Report: **`docs/time-at-the-bar-report.md`** — every item of
 `docs/time-at-the-bar.md` done or struck with a reason, which was the rule that
