@@ -16,7 +16,7 @@ be until the obstruction below is dealt with.
 > 2. So what this file establishes is that the grand form does not transfer to
 > the family **as summed**; it does not establish that the route is closed. The
 > obstruction is the sum and nothing else has been found behind it. That rests
-> on one nontrivial cumulant with one holdout per pin, and going deeper needs
+> on one nontrivial cumulant with one to two holdouts per pin, and going deeper needs
 > the split at larger `S` than pure Python reaches. Everything measured below
 > stands as measured.
 
@@ -56,7 +56,7 @@ families apart later the same day.** The threshold above is one step optimistic:
 the families partition `d` exactly for `S ≥ 2k+2`, and at `S = 2k+1` they
 *overlap* rather than partition. Nothing here depends on it — the pinning happens
 above the onset, which is `2k+2`. And the two families turn out to have
-*different degrees*, `k−1` for `d_main` against `k` for `d_anti`, which is a
+*different degrees*, `⌊k/2⌋` for `d_main` against `k` for `d_anti`, which is a
 sharper reason the sum has no single-exponential form than "two families with
 different growth".
 

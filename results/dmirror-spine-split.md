@@ -84,41 +84,58 @@ step optimistic and is corrected here.
 
 ## The two families
 
+Both tables list only the regime where the split is defined, `S ≥ 2k+2`.
+
 `d_main(S, S+k)`:
 
-| k | S = 2..14 |
+| k | values, S = 2..14 |
 |---|---|
 | 0 | 1 at every S |
 | 1 | 4 at every S |
-| 2 | 25, 27, 29, 31, 33, 35 (S = 6..11) |
-| 3 | 120, 129, 138, 147 (S = 8..11) |
-| 4 | 704, 780 (S = 10, 11) |
+| 2 | 25, 27, 29, 31, 33, 35, 37, 39, 41 |
+| 3 | 120, 129, 138, 147, 156, 165, 174 |
+| 4 | 704, 780, 860, 944, 1032 |
 
 `d_anti(S, S+k)`:
 
-| k | S = 2..14 |
+| k | values, S = 2..14 |
 |---|---|
 | 0 | 1 at every S |
-| 1 | 6, 8, 8, 10, 10, 12, 12, 14 (S = 4..11) |
-| 2 | 47, 53, 71, 77, 99, 105 (S = 6..11) |
-| 3 | 314, 447, 512, 697 (S = 8..11) |
-| 4 | 2656, 3190 (S = 10, 11) |
+| 1 | 6, 8, 8, 10, 10, 12, 12, 14, 14, 16, 16 |
+| 2 | 47, 53, 71, 77, 99, 105, 131, 137, 167 |
+| 3 | 314, 447, 512, 697, 774, 1019, 1108 |
+| 4 | 2656, 3190, 4516, 5228, 7156 |
 
-**The two families have different degrees, and that is the first real structural
-finding here.** Pinning each with a holdout gives
+**The two families have different degrees, and only one of them knows about
+parity.** Measured by `experiments/dmirror_spine_degrees.py`, which takes the
+lowest degree that pins and then requires every remaining point to survive as a
+holdout, on even `S`, odd `S`, and all `S` pooled:
 
-    d_main   degree 0, 0, 1  at k = 0, 1, 2
-    d_anti   degree 0, 1, 2  at k = 0, 1, 2
+| k | 0 | 1 | 2 | 3 | 4 |
+|---|---|---|---|---|---|
+| `d_main`, either parity or pooled | 0 | 0 | 1 | 1 | 2 |
+| `d_anti`, per parity | 0 | 1 | 2 | — | — |
 
-so `d_anti` behaves like a defect gas — degree `k`, one free position per defect
-— and `d_main` is **degenerate by one**, degree `k−1`. The main diagonal is
-king-connected as a path with every cell load-bearing, so a defect there is far
-more constrained than a defect on the anti-diagonal, whose cells are only
-diagonally adjacent and have slack. `d_main(k=1) = 4` at every `S` is the
-clearest case: one corner removed and one arm pair added, and only four ways to
-do it however long the spine.
+`d_anti` behaves like a defect gas: degree `k`, one free position per defect.
+`d_main` runs at **`⌊k/2⌋`**, and the pooled fits are what make that solid —
+degree 1 at `k = 3` with five holdouts and degree 2 at `k = 4` with two, where
+`k − 1` would have required 2 and 3.
 
-That degree gap is also why the sum misbehaves. Two families of *different*
+**An earlier reading of this file said `d_main` has degree `k−1`.** That was
+fitted on `S ≤ 11`, where `k ≤ 2` is all that pins and `k−1` and `⌊k/2⌋` agree.
+The `S = 12, 13, 14` rows separate them and it is `⌊k/2⌋`. The next test is
+`k = 5`, which the reading predicts at degree 2 and which needs `S = 15, 16`.
+
+**And `d_main` has no parity dependence at all.** One polynomial in `S` covers
+both classes at every pinned level, with 5 to 12 holdouts; `d_anti`'s pooled
+column is unpinned from `k = 1` on, so parity genuinely enters there. That is
+the mechanism `results/dmirror-grand-form-fails.md` argued, now measured
+instead: reflection in the main diagonal fixes every main-diagonal cell
+pointwise, while the anti-diagonal has a centre cell only for odd `S`. **All of
+the dmirror family's period-2 quasi-polynomiality comes from one of its two
+halves.**
+
+The degree gap is also why the sum misbehaves. Two families of *different*
 degree cannot combine into anything with a single-exponential form, which is a
 sharper statement than "two families with different growth".
 
@@ -155,3 +172,4 @@ grand form" from "each family agrees with it to second order". It needs
 
     python3 experiments/dmirror_spine_split.py 12          # ayr, minutes
     python3 experiments/dmirror_spine_cumulants.py LOG     # instant
+    python3 experiments/dmirror_spine_degrees.py LOG       # instant
