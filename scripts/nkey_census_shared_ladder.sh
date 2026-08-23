@@ -15,8 +15,12 @@
 # On gympie the whole gate suite -- both engines' king and rook ladders plus
 # the per-source cross-check -- is 24 s against 84 s for the per-source ladder
 # alone on dalby, which is the only speed evidence there is before this runs.
-# Memory is the sweep front, and --batch caps how many sources are swept at
-# once: smaller is less RAM and less sharing.
+# --batch caps how many sources are swept at once, and the default is set high
+# on purpose.  MEASURED on dalby at H = 17: batch 131072 took 519.55 s and
+# 1,463 MB; unbatched took 249.87 s and 1,483 MB.  Twice the speed for 1.4%
+# more memory, because the RAM is the reachable key SET and not the sweep
+# front -- so capping the batch throws away sharing and buys nothing.  Lower it
+# only if a height actually runs out of memory.
 #
 # THE BANKED VALUES it must reproduce: 21,355 / 53,763 / 136,145 / 346,539 at
 # H = 13, 14, 15, 16.  The binary re-runs the king ladder, the rook RED
@@ -29,7 +33,7 @@ BIN="$ROOT/build/nkey_census"
 OUT=${SHARED_OUT:-$HOME/var/nkey-shared}
 H1=${1:-13}
 H2=${2:-16}
-BATCH=${3:-131072}
+BATCH=${3:-1000000000}
 [ -x "$BIN" ] || { echo "no binary at $BIN -- make build/nkey_census" >&2; exit 1; }
 mkdir -p "$OUT"; echo $$ > "$OUT/pid"
 {
