@@ -137,7 +137,7 @@ std::vector<Hook> geometry(int S) {
 // of hook corners.
 struct State {
   u32 occ = 0;
-  std::array<u64, 3> lab{};  // 4 bits per occupied cell, first-seen order
+  std::array<u64, 5> lab{};  // 6 bits per occupied cell, first-seen order
   u8 touched = 0;
   u8 n = 0;
   u8 corners = 0;
@@ -159,12 +159,24 @@ struct StateHash {
   }
 };
 
-inline void setLab(std::array<u64, 3>& a, int i, int v) {
-  a[i >> 4] |= (u64(v & 15) << (4 * (i & 15)));
+// Six bits per cell, ten cells per word, five words -- 50 slots against the
+// 48 cells a hook can hold at MAXS, and 63 labels against the 48 components
+// those cells can form.  Four bits was not enough: hook 0 of an S x S board
+// has 2S-1 cells and a position p >= 2 contributes its two mirror cells as
+// SEPARATE components, so an alternating occupancy reaches ~S components --
+// nineteen at S = 20, and sixteen from S = 16 up.  See LABEL WIDTH below.
+inline void setLab(std::array<u64, 5>& a, int i, int v) {
+  a[i / 10] |= (u64(v & 63) << (6 * (i % 10)));
 }
-inline int getLab(const std::array<u64, 3>& a, int i) {
-  return static_cast<int>((a[i >> 4] >> (4 * (i & 15))) & 15);
+inline int getLab(const std::array<u64, 5>& a, int i) {
+  return static_cast<int>((a[i / 10] >> (6 * (i % 10))) & 63);
 }
+
+// The largest number of components any one hook has carried this run.  The
+// four-bit field silently aliased anything past 15, so this is reported with
+// every count: a run whose maximum is under the field width did not need the
+// width, and one at or over it would have been wrong before.
+int g_maxComp = 0;
 
 struct DSU {
   int p[MAXCELL];
@@ -185,7 +197,7 @@ struct DSU {
 // actually arrived -- the caller compares it against the number that were
 // live, and a shortfall means a component stranded.
 int labelHook(const Hook& h, u32 occ, const int* inhCell, const int* inhLab,
-              int nInh, std::array<u64, 3>& out, int* ncomp) {
+              int nInh, std::array<u64, 5>& out, int* ncomp) {
   int slot[MAXCELL];
   int m = 0;
   const int n = static_cast<int>(h.xy.size());
@@ -199,8 +211,8 @@ int labelHook(const Hook& h, u32 occ, const int* inhCell, const int* inhLab,
     if (slot[e.first] >= 0 && slot[e.second] >= 0)
       d.unite(slot[e.first], slot[e.second]);
   // Cells inheriting the same old label are one component.
-  int firstOf[16];
-  for (int i = 0; i < 16; ++i) firstOf[i] = -1;
+  int firstOf[64];
+  for (int i = 0; i < 64; ++i) firstOf[i] = -1;
   int arrived = 0;
   for (int t = 0; t < nInh; ++t) {
     const int c = slot[inhCell[t]];
@@ -220,20 +232,23 @@ int labelHook(const Hook& h, u32 occ, const int* inhCell, const int* inhLab,
   for (int i = 0; i < m; ++i) {
     const int r = d.find(i);
     if (root2lab[r] < 0) root2lab[r] = nl++;
-    // Labels are packed four bits each, so a hook with more than 15 live
-    // components would alias two of them into one and silently merge two
-    // components.  The cell budget keeps a hook far below that, and the
-    // uncapped gate at S <= 11 reaches about twelve; this is the guard that
-    // makes the bound checked rather than assumed.
-    if (nl > 15) {
+    // LABEL WIDTH.  Labels are packed six bits each, so a hook with more
+    // than 63 live components would alias two of them into one and silently
+    // merge two components.  A hook holds at most 2*MAXS cells, so 63 cannot
+    // be reached -- but this stays fail-closed rather than commented, because
+    // the four-bit version carried exactly the same reasoning ("the cell
+    // budget keeps a hook far below that") and its guard fired at S = 20,
+    // 53 s in, on hook 0.
+    if (nl > 63) {
       std::fprintf(stderr,
-                   "FATAL: %d components in one hook exceeds the 4-bit label "
+                   "FATAL: %d components in one hook exceeds the 6-bit label "
                    "field; raise the packing before trusting any count\n", nl);
       std::exit(3);
     }
     setLab(out, i, root2lab[r]);
   }
   *ncomp = nl;
+  if (nl > g_maxComp) g_maxComp = nl;
   return arrived;
 }
 
@@ -430,6 +445,9 @@ int main(int argc, char** argv) {
                 (S >= 2 * k + 2) ? "" : "   <== SPLIT UNDEFINED");
     std::fflush(stdout);
   }
-  rep.done("S=" + std::to_string(S) + " kmax=" + std::to_string(kmax));
+  std::printf("  max components in one hook: %d (label field holds 63; the "
+              "four-bit field this replaced held 15)\n", g_maxComp);
+  rep.done("S=" + std::to_string(S) + " kmax=" + std::to_string(kmax) +
+           " maxcomp=" + std::to_string(g_maxComp));
   return 0;
 }
