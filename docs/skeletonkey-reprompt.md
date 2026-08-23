@@ -183,8 +183,10 @@ closed by counting rather than by computing:
   escape needs ~180 values of `k` where ~15 exist.
 - **#19.** Already shipped, on every cell of the triangle.
 - **#18.** The "king-only ledger" is one substitution: `b = |D|` for the 3 in
-  the renewal chain, `Ŵ_c = W_c·b^{2k−l−1}`. But the published-n=56 headline
-  still needs square cells below onset at `H ≤ 28`.
+  the renewal chain, `Ŵ_c = W_c·b^{2k−l−1}`. But the published-n headline
+  still needs square cells below onset at `H ≤ 28`. (The published reach is
+  n = 70, not the 56 this file said — `results/literature-record-56-corrected.md`
+  — and it is totals only, so the blocker is unchanged.)
 
 ### Still to re-open
 

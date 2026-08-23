@@ -56,14 +56,14 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 | `L7-subdominant-amplitude.tex` | **L7** — The subdominant exponential and the amplitude ratio | draft, 10pp |
 | `L8-below-onset.tex` | **L8** — Below the onset: the diagonal law's error term | draft, 9pp — swept 2026-08-18, **weak negative**; absorbed the external check 2026-08-22 |
 | `L9-cutcount-identity.tex` | **L9** — A cancellation identity for scan-order colourings | draft, 6pp — **the identity is not new** |
-| `L10-undertow.tex` | **L10** — Undertow: pinning a diagonal tower from cells below its onset | draft, 6pp — **no priority pass run** |
+| `L10-undertow.tex` | **L10** — Undertow: pinning a diagonal tower from cells below its onset | draft, 7pp — swept 2026-08-23, **near neighbour found** |
 
 Every L paper carries a loud draft banner, because every one of their
-verification ledgers currently reads "human verification: none". Nine of the ten
-have had a literature-priority pass, dated after their own drafting and recorded
-in `docs/priority-passes-2026-08-18.md`; **L10 has not**, and its own page 1 and
-novelty section say so rather than implying otherwise. Three carry a second
-banner because of what that pass found:
+verification ledgers currently reads "human verification: none". All ten have
+had a literature-priority pass, dated after their own drafting: nine in
+`docs/priority-passes-2026-08-18.md` and L10's in
+`docs/priority-pass-L10-2026-08-23.md`. **Four** carry a second banner because
+of what that pass found:
 
 - **L9's identity is not new.** It is the Fortuin–Kasteleyn/Potts
   correspondence — evaluating $q^c$ by colouring components instead of tracking
@@ -78,6 +78,13 @@ banner because of what that pass found:
   universality, the coefficient triangle and the whole minimum end survive.
 - **L8's negative is weak**, and page 1 says so: the object it studies is defined
   relative to this project's own diagonal law, so a pass over it tests little.
+- **L10's manoeuvre is standard practice next door.** Correcting a finite-size
+  calculation by a term describing how far it is wrong, so as to use it beyond
+  where it is exact, is what Baxter–Guttmann (1988) and Jensen–Guttmann do for
+  directed-percolation series. L10 cites them and claims only the combination:
+  there the corrections are conjectured (a Catalan ansatz), here they are
+  computed ab initio, and the count of unknowns per level is proved rather than
+  assumed.
   Its new §​square-lattice section postdates the pass and has not been swept,
   which its own novelty section states.
 

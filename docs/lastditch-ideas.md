@@ -82,7 +82,10 @@ audit form of §1.
 row-local lattice — square (b=1), hex (b=2), king (b=3) — and the square
 lattice's diagonal polynomials, onset `2k+1` and depth-1 defect
 (`+1,-1,+1,-1,+1`) are all recorded in `results/onset-defect-law.md`. Square
-polyominoes are enumerated to n = 56 in the literature.
+polyominoes are enumerated to n = 70 in the literature
+(`results/literature-record-56-corrected.md`; this file said 56, which was one
+computation's reach and not the record). Only the TOTALS reach that far --
+the bounding-box triangle this needs is published at no n.
 
 So the pin can be run on a lattice where the answers are **published by other
 people**. That is the one validation channel this project structurally lacks

@@ -96,7 +96,9 @@ alignment — which is the king transfer matrix again, in refined coordinates.
 **And the sizes are out of reach on their own.** The image of an n-cell king
 animal has 4n cells before any marks, so a(40) would be carried by polyominoes
 of **≥ 160 cells** and a(41) by **≥ 164**. Square polyominoes are enumerated to
-n = 56 in the literature (`docs/lastditch-ideas.md` §1b). The route asks
+n = 70 in the literature (`results/literature-record-56-corrected.md`; this
+file said 56, and the argument is unaffected — 160 is still more than twice
+the record). The route asks
 polyomino technology to run at roughly three times its own world record, on a
 subclass a class-agnostic method cannot see. That kills the level-1 reading
 (second source for a banked value) as flatly as the reach reading.

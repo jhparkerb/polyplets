@@ -77,9 +77,10 @@ any `k`, by the same machine that produces them for king. One of the two
 pieces `universal-diagonal-law.md` called king-only is no longer king-only.
 
 **Not unblocked — and §1b oversells this.** The headline there is validating
-the pin against published square-lattice counts to `n = 56`. The law covers
+the pin against published square-lattice counts, which reach `n = 70` and not
+the `n = 56` this file first said (`results/literature-record-56-corrected.md`). The law covers
 `H ≥ (n+1)/2`; the rest of each row is below onset and must be enumerated, so
-`n = 56` needs square cells at `H ≤ 28`. That is Jensen's computation, not a
+`n = 56` needs square cells at `H ≤ 28`. That is somebody's enumeration, not a
 free ride. What is actually available is an external prediction test as far as
 our own square enumeration plus the tower can reach — worth having, and much
 cheaper than the king ladder, but not "a square-lattice `D_j` derivation, not

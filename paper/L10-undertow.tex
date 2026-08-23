@@ -49,11 +49,12 @@
 \begin{document}
 \maketitle
 
-\firstdraftbanner[ Two gates are specific to this paper. \textbf{No priority
-pass has been run} (\S\ref{sec:novelty}); the ledger below does not claim one.
-And the arithmetic this paper is about produced a published integer, $a(41)$,
-so \S\ref{sec:soft} states the one level whose pin has no holdout rather than
-leaving it to be found.]
+\firstdraftbanner[ Two gates are specific to this paper. Its priority pass ran
+2026-08-23 and it \textbf{found a near neighbour}: the manoeuvre this paper is
+built on is standard practice in directed-percolation series work, and
+\S\ref{sec:novelty} says whose and what survives it. And the arithmetic here
+produced a published integer, $a(41)$, so \S\ref{sec:soft} states the one level
+whose pin has no holdout rather than leaving it to be found.]
 
 \Ldisclosure{%
 \emph{The diagonal law, its degree and its sharp onset} --- proved elsewhere
@@ -92,7 +93,11 @@ limits are L8's and are repeated in \S\ref{sec:square} because this is the paper
 making the operational claim.
 \emph{$P_{21}$} --- \textbf{one pin pair, no holdout}. Stated in
 \S\ref{sec:soft} as the softest thing in the construction.
-\emph{Novelty} --- \textbf{no pass has been run}; see \S\ref{sec:novelty}.
+\emph{Novelty} --- pass run 2026-08-23
+(\repo{docs/priority-pass-L10-2026-08-23.md}): \textbf{a near neighbour was
+found} and is cited in \S\ref{sec:novelty}. The paper claims no new idea; what
+it claims is the specific combination. The negative half of that pass is web
+search only and is provisional.
 \emph{Human verification:} none, as of this draft.}
 
 \begin{abstract}
@@ -333,20 +338,51 @@ is deliberately RED until the table exists.
 % ===========================================================================
 \section{Novelty}\label{sec:novelty}
 
-\textbf{No priority pass has been run for this paper.} Every other paper in this
-series states the date of its pass and what it found; this one cannot, and the
-ledger above says so rather than leaving the omission to be inferred.
+A priority pass ran on 2026-08-23 (\repo{docs/priority-pass-L10-2026-08-23.md})
+and it found a near neighbour, which is the outcome this section exists to
+report.
 
-That pass is a gate before circulation rather than a formality, and the reason
-is specific. The mechanism here --- correcting an asymptotic law by an exactly
-computable error term in order to use data from the region where the law fails
---- is a natural idea, and the literature on series analysis and on
-finite-size corrections is exactly where a version of it would already live,
-possibly under a name this project would not think to search for. What would be
-new, if anything is, is not the idea but the combination: an error term that is
-\emph{exact and independently computable}, against a law whose constant count
-per level is \emph{proved}, in a setting where the saving is measured in banked
-compute.
+\paragraph{The prior art.} Correcting a finite-size calculation by a term that
+describes how far it is wrong, in order to use it beyond the range where it is
+exact, is standard practice in series work on directed percolation. Baxter and
+Guttmann~\cite{baxter1988} extend the percolation-probability series for the
+directed square lattice by exactly that manoeuvre: a finite-lattice calculation
+of size $N$ is exact only to some order, the differences between the exact
+series and the finite ones are \emph{correction terms}, and knowing them buys
+series orders that the finite lattice alone does not reach. Jensen and
+Guttmann~\cite{jensen1995} carry it further on the square, honeycomb and
+triangular lattices. The ambient family is the finite-lattice method of Enting
+and of Jensen. This paper is a member of that family and does not claim the
+shape of the idea.
+
+\paragraph{What survives, and it is a combination rather than an idea.} In that
+literature the correction terms are \emph{conjectured and fitted} --- Baxter and
+Guttmann's ansatz makes them rational functions of Catalan numbers --- so the
+extended series is a prediction resting on the ansatz holding at the next
+order. Two things differ here.
+
+\begin{itemize}
+\item The correction is \textbf{computed exactly and independently}. $D_j(k)$
+comes from a bounded-excess family enumeration that never reads the triangle and
+never reads $P_k$ (\S\ref{sec:circular}); it is not fitted to the object it
+corrects, and it carries no ansatz.
+\item The number of unknowns per level is \textbf{proved, not assumed}. The
+grand form gives exactly two constants per level and is formalized in Lean
+against the standard axioms, so ``two equations suffice'' is a theorem rather
+than a working hypothesis.
+\end{itemize}
+
+Together those make the output an exact value with a provenance rather than an
+extrapolation with an error estimate, and that --- not the idea of correcting
+finite-size data --- is what this paper puts forward.
+
+\paragraph{The negative half is weak, and is labelled so.} No instance was found
+that applies a correction of this kind to bounding-box-height animal counts, or
+that corrects a diagonal law in order to pin its levels from below the onset.
+That search was web only: no citation-database sweep of the Baxter--Guttmann
+line, which is precisely where a closer instance would sit. The negative should
+be re-run against a citation database before circulation; the positive finding
+above stands on its own.
 
 % ===========================================================================
 \section{Open problems}\label{sec:open}
@@ -391,5 +427,8 @@ finding: \repo{results/undertow-review-A.md} and its siblings.
 \item What may be trusted and how far, in plain terms:
 \repo{results/confidence.md}.
 \end{itemize}
+
+\bibliographystyle{plain}
+\bibliography{shared/refs}
 
 \end{document}

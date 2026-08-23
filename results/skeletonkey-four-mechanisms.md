@@ -261,7 +261,9 @@ gives animals weighted by tree-parity, which is not `a(n) mod 2`); 2 with the
 cell-level rank (section 3); 4 with the capture cause (section 5); and the
 Sykes-Essam matching pair, which stays closed on the accounting already made —
 reaching king `n = 40` through it needs square-lattice data to order about 200
-in the percolation variable, against a literature record of 56 by area.
+in the percolation variable, against a literature record of 70 by area
+(`results/literature-record-56-corrected.md`; this file said 56, and the
+record is totals only, which is not the graded data the route needs).
 
 What is left holding a real number is the cut-compression gap, and this day
 sharpens *why* it is unrealised rather than merely restating that it is. The

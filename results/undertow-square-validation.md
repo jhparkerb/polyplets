@@ -71,7 +71,8 @@ where every check is internal.
 
 **Does not establish.** That the *king* `D_j` are right — those are separate
 derivations, and this validates the frame they plug into rather than their
-values. Nor does it reach the n = 56 headline §1b hoped for: that still needs
+values. Nor does it reach the published-n headline §1b hoped for (that number is 70,
+not the 56 quoted here — `results/literature-record-56-corrected.md`): it still needs
 square below-onset cells at H ≤ 28, and `results/bbox_square4_n21.txt` stops at
 n = 21.
 
