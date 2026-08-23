@@ -553,6 +553,12 @@ build/severance_w1: cpp/severance_w1.cpp cpp/obs.h | build
 build/severance_w3_families: cpp/severance_w3_families.cpp cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp -pthread $< -o $@
 
+# The reach-merged frontier census (A1.1): how many N-key classes at height H,
+# measured rather than extrapolated.  Its own --gate reproduces the banked
+# class ladder and a rook RED control before it reports any new height.
+build/nkey_census: cpp/nkey_census.cpp cpp/obs.h | build
+	$(CXX) $(CXXFLAGS) -O3 -Icpp $< -o $@
+
 # Gate NOTARY: the Lean-ification of the depth-1 closure (campaign Notary,
 # docs/notary-lean-plan.md). Fails on any sorry in the Notary modules, then
 # builds them; the axiom audits are #guard_msgs blocks inside the modules
