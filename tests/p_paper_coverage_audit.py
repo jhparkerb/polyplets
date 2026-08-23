@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
-"""Which numbers in a P paper does its verifier actually read?  Shardable.
+"""Which numbers in a P paper does its verifier actually read?
 
-Same measurement tests/gate_p_paper_verifier.py makes, for a verifier too slow
-to be a gate.  `paper/verify_claims.py` guards `polyplets-report.tex` with 428
-checks and takes 431 s a run, so perturbing all 264 of the paper's numeric
-literals is ~32 core-hours -- an audit, not a gate, and sharded across cores.
+The measurement tests/gate_p_paper_verifier.py makes, for a verifier slow
+enough that it cannot be a gate.  paper/verify_claims.py guards
+polyplets-report.tex with 428 checks and takes 431 s a run.
 
-    python3 tests/p_paper_coverage_audit.py --paper polyplets \\
-        --shard 0 --of 24 --out ~/var/p-coverage/shard00.json
+Perturbing all 264 of the paper's numeric literals at that price would be 32
+core-hours.  It is not: profiling says 429 of the 431 s are nine
+subprocess.run calls to external binaries -- 352 s of it regenerating hole
+tables from build/g2 -- and none of them reads the .tex.  Under
+tests/_audit_subprocess_cache.py a warm run is **2.2 s**, so the sweep is ten
+minutes on one core.
 
-Every shard re-runs the GREEN control first: if the unmutated copy does not
-pass on this box, the shard exits 2 rather than reporting a wall of false
-"guarded" results.  Merge with --merge.
+    AUDIT_SUBPROC_CACHE=~/var/p-coverage/cache \\
+      python3 tests/p_paper_coverage_audit.py --paper polyplets
 
-Target: dalby only.  ayr has neither build/g2 nor the runs/sym3x directories
-verify_claims reads, and a shard there would fail its green control.
+The GREEN control runs first: if the unmutated copy does not pass on this box,
+it exits 2 rather than reporting a wall of false "guarded" results.  --shard/
+--of and --merge remain for a verifier that is slow even warm.
+
+Needs build/g2 and the runs/sym3x directories verify_claims reads; a box
+without them fails the green control rather than reporting nonsense.
 """
 import argparse
 import json

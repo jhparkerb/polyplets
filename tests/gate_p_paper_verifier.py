@@ -55,13 +55,29 @@ def literals(src):
     return sorted({m.group(0) for m in LITERAL.finditer(masked)})
 
 
+# Running the verifier as a child, optionally under the subprocess-output cache
+# that makes a slow verifier auditable (tests/_audit_subprocess_cache.py).
+_SHIM = ("import sys; sys.path.insert(0, {tests!r}); "
+         "import _audit_subprocess_cache; import runpy; "
+         "runpy.run_path({verifier!r}, run_name='__main__')")
+
+
+def _argv(verifier):
+    if os.environ.get("AUDIT_SUBPROC_CACHE"):
+        return [sys.executable, "-c",
+                _SHIM.format(tests=str(Path(__file__).resolve().parent),
+                             verifier=str(verifier))]
+    return [sys.executable, str(verifier)]
+
+
 def sweep(verifier, src, lits, tmpdir):
     """Return the literals whose perturbation the verifier does NOT catch."""
     path = os.path.join(tmpdir, "under-test.tex")
     env = dict(os.environ, VERIFY_TEX=path)
+    argv = _argv(verifier)
 
     open(path, "w").write(src)
-    green = subprocess.run([sys.executable, str(verifier)], env=env,
+    green = subprocess.run(argv, env=env,
                            capture_output=True, text=True)
     if green.returncode != 0:
         print("GREEN CONTROL FAILED: the unmutated copy does not pass, so no")
@@ -74,8 +90,7 @@ def sweep(verifier, src, lits, tmpdir):
         bumped = lit[:-1] + str((int(lit[-1]) + 1) % 10)
         open(path, "w").write(
             re.sub(r"(?<![0-9A-Za-z.])" + lit + r"(?![0-9])", bumped, src))
-        r = subprocess.run([sys.executable, str(verifier)], env=env,
-                           capture_output=True, text=True)
+        r = subprocess.run(argv, env=env, capture_output=True, text=True)
         if r.returncode == 0:
             unguarded.append(lit)
     return unguarded
