@@ -274,7 +274,7 @@ void successors(const Key& src, int H, bool dilate_on, std::vector<Key>& out) {
 // The reachable key set from the empty frontier, minus the empty start itself
 // -- the convention of experiments/skeletonkey/nfamily_merge.py, whose counts
 // this must reproduce.
-u64 census(int H, bool dilate_on, obs::Reporter* rep, double* peakStates) {
+u64 census(int H, bool dilate_on, obs::Reporter* rep) {
   std::unordered_set<Key, KeyHash> seen;
   std::vector<Key> frontier, work;
   Key empty;
@@ -294,7 +294,6 @@ u64 census(int H, bool dilate_on, obs::Reporter* rep, double* peakStates) {
       rep->beat(static_cast<double>(expanded),
                 "seen=" + std::to_string(seen.size()));
   }
-  if (peakStates) *peakStates = static_cast<double>(seen.size());
   return seen.size() - 1;
 }
 
@@ -305,7 +304,7 @@ bool gate() {
   bool ok = true;
   std::printf("gate king (class counts, results/skeletonkey-nfamily-merge.md)\n");
   for (int H = 4; H <= 13; ++H) {
-    const u64 got = census(H, true, nullptr, nullptr);
+    const u64 got = census(H, true, nullptr);
     const u64 want = KING[H];
     const bool good = got == want;
     ok &= good;
@@ -317,7 +316,7 @@ bool gate() {
   std::printf("gate rook (RED control: no dilation => key is the state, "
               "so the count must be Motzkin(H+1)-1)\n");
   for (int H = 2; H <= 10; ++H) {
-    const u64 got = census(H, false, nullptr, nullptr);
+    const u64 got = census(H, false, nullptr);
     const u64 want = ROOK[H];
     const bool good = got == want;
     ok &= good;
@@ -365,8 +364,7 @@ int main(int argc, char** argv) {
     obs::Reporter rep("nkey_census", 0,
                       "H=" + std::to_string(H) +
                           (dilate_on ? " lattice=king" : " lattice=rook"));
-    double states = 0;
-    const u64 n = census(H, dilate_on, &rep, &states);
+    const u64 n = census(H, dilate_on, &rep);
     rep.done("H=" + std::to_string(H) + " classes=" + std::to_string(n));
     std::printf("%d %llu\n", H, (unsigned long long)n);
     std::fflush(stdout);

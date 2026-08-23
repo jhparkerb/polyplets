@@ -186,15 +186,12 @@ struct DSU {
 // live, and a shortfall means a component stranded.
 int labelHook(const Hook& h, u32 occ, const int* inhCell, const int* inhLab,
               int nInh, std::array<u64, 3>& out, int* ncomp) {
-  int idx[MAXCELL], slot[MAXCELL];
+  int slot[MAXCELL];
   int m = 0;
   const int n = static_cast<int>(h.xy.size());
   for (int i = 0; i < n; ++i) {
     slot[i] = -1;
-    if ((occ >> h.pos[i]) & 1) {
-      slot[i] = m;
-      idx[m++] = i;
-    }
+    if ((occ >> h.pos[i]) & 1) slot[i] = m++;
   }
   DSU d;
   d.init(m);
@@ -223,10 +220,20 @@ int labelHook(const Hook& h, u32 occ, const int* inhCell, const int* inhLab,
   for (int i = 0; i < m; ++i) {
     const int r = d.find(i);
     if (root2lab[r] < 0) root2lab[r] = nl++;
+    // Labels are packed four bits each, so a hook with more than 15 live
+    // components would alias two of them into one and silently merge two
+    // components.  The cell budget keeps a hook far below that, and the
+    // uncapped gate at S <= 11 reaches about twelve; this is the guard that
+    // makes the bound checked rather than assumed.
+    if (nl > 15) {
+      std::fprintf(stderr,
+                   "FATAL: %d components in one hook exceeds the 4-bit label "
+                   "field; raise the packing before trusting any count\n", nl);
+      std::exit(3);
+    }
     setLab(out, i, root2lab[r]);
   }
   *ncomp = nl;
-  (void)idx;
   return arrived;
 }
 
