@@ -4,7 +4,10 @@
     python3 paper/verify_l_papers.py          # run from anywhere
 
 Covers paper/L1-diagonal-law.tex, paper/L3-lambda-bounds.tex,
-paper/L4-not-dfinite.tex and paper/L6-perimeter-gradings.tex.  Read-only with respect to the .tex files: it parses
+paper/L4-not-dfinite.tex and paper/L6-perimeter-gradings.tex.  It does NOT
+cover paper/L5-convex-polyplets.tex or paper/L8-below-onset.tex, which print
+numbers no check reads; tests/l_paper_coverage_audit.py measures how much of
+each manuscript is actually guarded.  Read-only with respect to the .tex files: it parses
 their tables and displayed constants and checks them against results/, against
 an independent brute-force enumeration, and against each other.
 
@@ -26,6 +29,7 @@ rejected:
 R3 and R5 are not bookkeeping: they are what puts the *onset* of the diagonal
 law under test rather than merely its shape.
 """
+import os
 import re
 import sys
 from collections import defaultdict
@@ -105,6 +109,18 @@ def prints_sequence(src, values, sep=", "):
 
 
 def tex(name):
+    """The manuscript's source, or a substitute for one named manuscript.
+
+    tests/l_paper_coverage_audit.py perturbs one numeric literal at a time and
+    re-runs this verifier, which needs a way to hand it a modified copy.  The
+    P-paper verifiers take VERIFY_TEX because each guards exactly one
+    manuscript; this one guards several, so the override names which.  Setting
+    VERIFY_TEX without VERIFY_TEX_NAME does nothing here rather than silently
+    replacing whichever manuscript happens to be read first.
+    """
+    override = os.environ.get("VERIFY_TEX")
+    if override and os.environ.get("VERIFY_TEX_NAME") == name:
+        return Path(override).read_text()
     p = PAPER / name
     if not p.exists():
         failures.append(f"missing manuscript {p}")
