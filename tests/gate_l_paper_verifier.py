@@ -76,14 +76,16 @@ ROOT = Path(__file__).resolve().parent.parent
 PAPER = ROOT / "paper"
 VERIFIER = PAPER / "verify_l_papers.py"
 
-L_PAPERS = [
-    "L1-diagonal-law.tex",
-    "L2-ternary-spine.tex",
-    "L3-lambda-bounds.tex",
-    "L4-not-dfinite.tex",
-    "L5-convex-polyplets.tex",
-    "L6-perimeter-gradings.tex",
-]
+# Enumerated, not frozen.  The 2026-08-23 contraction merged four manuscripts
+# into their partners (docs/l-corpus-contraction.md) and a hardcoded list turned
+# that into a FileNotFoundError in this gate's setup, which is a crash rather
+# than a verdict.  The gate copies whatever manuscripts exist; the mutation
+# matrix below names the sites it perturbs, and a site in a manuscript that is
+# gone is caught by the matrix's own pairing assertions, not by a missing file.
+L_PAPERS = sorted(
+    (p.name for p in PAPER.glob("L[0-9]*.tex")),
+    key=lambda n: int(n.split("-")[0][1:]),
+)
 
 RESULTS_FILES = [
     "strip_mu_certificates.log",
