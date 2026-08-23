@@ -17,7 +17,17 @@ their subjects.
 
 **Five have something to absorb**, and only one of the five is substantial.
 
-## L8 — below the onset. The substantial one.
+## L8 — below the onset. The substantial one. **DECIDED AND DONE 2026-08-22.**
+
+jasonp's decision, taken 2026-08-22: **absorb.** All three items below are now
+in `paper/L8-below-onset.tex` — the external check as its own section, and the
+two corrections as a remark in the frame section headed "what the k+1 integers
+do not buy". The paper went 8pp to 9pp, its verification ledger carries the
+square-lattice entry with its limit, and its novelty section records that the
+new section postdates the 2026-08-18 pass and has not been swept. Item 1's
+"whether it joins L8 or stands separately" was settled the other way in the same
+sitting: the application is `paper/L10-undertow.tex`, a separate paper, which
+now cites L8 for the validation rather than carrying it.
 
 Three things, in decreasing order of importance.
 

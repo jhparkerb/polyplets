@@ -85,10 +85,11 @@ cell of the row (\repo{results/cutcount\_b1/rows41/}).
 available depth pair, $18$ of $18$, which is a consistency check on banked
 values and not an independent confirmation of them (\S\ref{sec:circular}).
 \emph{The square-lattice validation} (\S\ref{sec:square}) ---
-\textbf{external}: the counts are other people's, the fit equals the classical
-one at $k = 1$--$6$, and it reproduces the tall cell it was denied. Its limit
-is $J = 1$ at first and $J = 2$ after \repo{results/undertow-square-depth2.md};
-no law for $D_2$ was found there.
+\textbf{external}, and \textbf{carried by companion paper L8}, which absorbed it
+on 2026-08-22: the counts are other people's, the fit equals the classical one
+at $k \le 6$, and it reproduces the tall cells it was denied at two depths. Its
+limits are L8's and are repeated in \S\ref{sec:square} because this is the paper
+making the operational claim.
 \emph{$P_{21}$} --- \textbf{one pin pair, no holdout}. Stated in
 \S\ref{sec:soft} as the softest thing in the construction.
 \emph{Novelty} --- \textbf{no pass has been run}; see \S\ref{sec:novelty}.
@@ -277,30 +278,29 @@ enumeration.
 % ===========================================================================
 \section{The external validation}\label{sec:square}
 
-Everything above is internal to one lattice and one project. The square lattice
-is where that stops being true, because its counts are published by other
-people.
+Everything above is internal to one lattice and one project. Companion paper L8
+carries the check that is not: on the square lattice, where the counts are
+published by other people, a cell below the onset corrected by its defect gives
+the same polynomial as the classical fit and reproduces the tall cells it was
+denied --- at depth $1$ for $k \le 6$, and at depth $2$ for $k = 2,\dots,6$,
+where ten withheld cells are hit exactly. A corrupted defect breaks the fit at
+each depth, so the holdouts are not passing for some reason unrelated to the
+defect.
 
-There the drift set has $b = |D| = 1$, so the law degenerates to a plain
-polynomial and the depth-$1$ defect is
-\[
-  D_1(k) \;=\; (-1)^{k+1}.
-\]
-At every level $k = 1, \dots, 6$ the below-onset fit \emph{equals} the classical
-one as a polynomial, and it \emph{reproduces the tallest cell it was denied},
-exactly. The square triangle's rows sum to \oeis{A001168} before any of this is
-attempted, which is what makes the input external rather than ours; a RED control
-confirms that the wrong defect sign breaks the fit.
+That is the claim of this paper, tested where the inputs are not ours: a short
+cell, corrected, is as good an equation as a tall one. It is the only check in
+the whole construction that crosses out of the project, and the reason it
+matters more than its size is that every other second source here re-counts the
+same objects with different code, so a shared \emph{conceptual} error would
+survive all of them.
 
-\paragraph{Its limits, stated plainly.} The first version of this check reached
-$J = 1$, so the saving it demonstrates is one height rather than the king
-lattice's two or three. A later measurement
-(\repo{results/undertow-square-depth2.md}) established depth $2$ ab initio on
-the square lattice, with held-out cells, so the identity is now checked
-externally at two depths --- but no closed form for square $D_2$ emerged in five
-levels, and the family DP that produces the king defects remains king-only:
-adjacency is baked into its row transfer, so making it lattice-parametric is a
-build and not a substitution.
+Two limits, both stated in L8 and repeated here because this paper is the one
+making the operational claim. The square defects are measured against a $P_k$
+that was pinned classically, so the check validates the identity without
+supplying an independent route to $D_j$ away from the king lattice. And the
+family enumeration that does supply them on the king lattice is king-only ---
+adjacency is baked into its row transfer --- so carrying the method to another
+lattice is a build rather than a substitution.
 
 % ===========================================================================
 \section{What is still soft}\label{sec:soft}

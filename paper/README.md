@@ -54,7 +54,7 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 | `L5-convex-polyplets.tex` | **L5** — Convex polyplets | draft, 14pp |
 | `L6-perimeter-gradings.tex` | **L6** — Perimeter gradings of lattice animals | draft, 12pp — compute gate **cleared** 2026-08-18 |
 | `L7-subdominant-amplitude.tex` | **L7** — The subdominant exponential and the amplitude ratio | draft, 10pp |
-| `L8-below-onset.tex` | **L8** — Below the onset: the diagonal law's error term | draft, 8pp — swept 2026-08-18, **weak negative** |
+| `L8-below-onset.tex` | **L8** — Below the onset: the diagonal law's error term | draft, 9pp — swept 2026-08-18, **weak negative**; absorbed the external check 2026-08-22 |
 | `L9-cutcount-identity.tex` | **L9** — A cancellation identity for scan-order colourings | draft, 6pp — **the identity is not new** |
 | `L10-undertow.tex` | **L10** — Undertow: pinning a diagonal tower from cells below its onset | draft, 6pp — **no priority pass run** |
 
@@ -78,6 +78,8 @@ banner because of what that pass found:
   universality, the coefficient triangle and the whole minimum end survive.
 - **L8's negative is weak**, and page 1 says so: the object it studies is defined
   relative to this project's own diagonal law, so a pass over it tests little.
+  Its new §​square-lattice section postdates the pass and has not been swept,
+  which its own novelty section states.
 
 - **L6's compute gate is cleared** (2026-08-18). Both *k* = 6 censuses landed;
   three of its four predictions held and the fourth, the Φ₂ leading diagonal's

@@ -65,8 +65,17 @@ four named analytic assumptions} which are listed in full in
 $D_5$ beyond $k \le 19$ exists.
 \emph{The near-onset scaling of \S\ref{sec:crossover}} --- measurement,
 downgraded on adversarial review and reported at the strength that survived it.
+\emph{The square-lattice check of \S\ref{sec:square}} --- \textbf{external}:
+the counts are other people's. At $k \le 6$ the below-onset fit equals the
+classical one and reproduces the cells it was denied, ten of them at depth $2$,
+with a RED control at each depth that fires. Its limit is stated in place ---
+the square defects are measured against a classically pinned $P_k$, so this
+validates the identity and is not an independent route to $D_j$ off the king
+lattice.
 \emph{Novelty} --- pass run 2026-08-18, no collision found, and
-\S\ref{sec:novelty} says why that is weaker evidence than it looks.
+\S\ref{sec:novelty} says why that is weaker evidence than it looks. The
+square-lattice material of \S\ref{sec:square} postdates that pass and has not
+been swept.
 \emph{Human verification:} none, as of this draft.}
 
 \begin{abstract}
@@ -99,6 +108,11 @@ the numbers better, is an artefact of the normalisation in which they were read.
 
 The derivation of $\alpha$ rests on four analytic assumptions which we state
 rather than prove.
+
+Finally, the construction is checked outside this project. On the square
+lattice, where the counts are published by other people, a below-onset cell
+corrected by its defect gives the same polynomial as the classical fit and
+reproduces the tall cells it was denied, at both depths tested.
 \end{abstract}
 
 \tableofcontents
@@ -171,6 +185,26 @@ particular the top one is a single coefficient of $R_k$:
 The rest is computable because of this. A defect defined as a difference of two
 large numbers would inherit their size; \eqref{eq:defectcoeff} makes it an object
 in its own right, with its own generating function.
+
+\begin{remark}[what the $k+1$ integers do not buy]
+Two readings of \eqref{eq:defectcoeff} are natural and both are wrong, so they
+are recorded here rather than left for a reader to try.
+
+\emph{They are not surplus equations.} A column below the onset holds $k+1$
+integers, which looks like $k+1$ constraints on a level that needs two. It is
+not: each below-onset cell brings one equation \emph{and} one unknown $D_j(k)$,
+so solving a whole column is a reformulation rather than extra redundancy. The
+honest accounting is
+\[
+  \text{surplus} \;=\; \bigl(\text{cells whose depth has a known } D_j\bigr) - 2,
+\]
+and a cell at a depth whose defect is unknown contributes nothing.
+
+\emph{And they are not enough to fit a recurrence.} Nothing above rules out
+$D_j$ being P-finite in $k$, and an empirical search is the obvious thing to
+try. It is priced out rather than untried: fitting a recurrence of the orders in
+question needs on the order of $180$ values of $k$, and about $15$ exist.
+\end{remark}
 
 \section{Depth one closes}
 \label{sec:depth1}
@@ -414,6 +448,61 @@ adversarial review and are reported here as measurement with the weaker status
 they came back with; the family exclusions from the same analysis stand. The
 resummation is a near-onset statement and not a uniform description of the
 below-onset region.
+
+\section{An external check: the same construction on the square lattice}
+\label{sec:square}
+
+Everything above is internal to one lattice and, in the end, to one project.
+Every second source in this repository re-counts the same objects with different
+code, so a shared \emph{conceptual} error would survive all of them. The square
+lattice is where that stops being true, because its counts are published by
+other people.
+
+There the drift set has $b = |D| = 1$, so the $3^{\,n-1-3k}$ factor is $1$ and
+the law is a plain polynomial $T_{\mathrm{sq}}(n, n-k) = P_k(n)$ of degree $k$
+for $n \ge 2k+1$. The depth-$1$ defect, measured ab initio on the banked square
+bounding-box triangle, is
+\[
+  D_1(k) \;=\; (-1)^{\,k+1},
+  \qquad k = 1,\dots,6 .
+\]
+
+\paragraph{Depth one.} Fit each $P_k$ twice: classically, from the $k+1$
+in-onset cells at $n = 2k+1, \dots, 3k+1$; and by dropping the \emph{tallest} of
+those and using the depth-$1$ cell at $n = 2k$ in its place. At every level
+$k = 1,\dots,6$ the two fits are equal as polynomials, and the second reproduces
+the tall cell it was denied. A RED control confirms that the wrong defect sign
+breaks the fit.
+
+\paragraph{Depth two.} Dropping the two tallest in-onset cells and using
+$n = 2k-1$ and $n = 2k$ instead gives exactly $k+1$ points for a degree-$k$
+polynomial, with the two tallest cells never seen. At $k = 2,\dots,6$ the fit
+again agrees with the classical one and predicts both withheld cells exactly:
+ten held-out cells, ten exact hits, in exact rational arithmetic. A $D_2$
+corrupted by $1$ breaks the fit at every $k$ --- without that second control the
+whole table would be consistent with $D_2$ being irrelevant.
+
+\paragraph{And $D_2$ has no law in five levels.} The measured values are
+\[
+  D_2(k) \;=\; -4,\; 8,\; -3,\; 10,\; -1
+  \qquad (k = 2,\dots,6).
+\]
+The sign alternates as $(-1)^{k+1}$, like $D_1$. The magnitudes $4, 8, 3, 10, 1$
+are not monotone, do not separate by parity, and support no fit worth writing
+down on three and two points. They are recorded here as five measurements and
+not as a law.
+
+\paragraph{The limit, which is the important part.} These square defects are
+measured \emph{against} a $P_k$ that was pinned classically. That is exactly
+what is needed to validate the identity --- a cell below the onset, corrected,
+is a valid equation for the same polynomial --- but it is not an independent
+route to $D_j$ on the square lattice, and so it does not by itself make a square
+$P_k$ cheaper. On the king lattice the corresponding defects come from the
+family enumeration of \S\ref{sec:depth1} and \S\ref{sec:depths}, which never
+sees $P_k$. Making that enumeration lattice-parametric is a build and not a
+substitution: its row transfer has king adjacency baked in, and the
+lattice-parametric machinery this project has elsewhere covers the
+\emph{above}-onset assembly only.
 
 \section{Novelty}
 \label{sec:novelty}
