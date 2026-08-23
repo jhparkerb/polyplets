@@ -18,6 +18,67 @@
 
 
 
+## 2026-08-23 10:00 — WHAT THE MORNING'S RUNS FOUND, AND WHAT IT COSTS A1.3
+
+jasonp's "everything you can do on your own that is waiting on me can run".
+Six jobs launched; two things came back that change what stands.
+
+**The spine's 4-bit label field was too narrow, and last night's A1.3 headline
+is provisional until the re-run lands.** The guard added in `1a2ccac` — written
+the same night, on the assumption that "the cell budget keeps a hook far below"
+15 components — **fired at S = 20, 53 s in**. The assumption is wrong for a
+plain geometric reason: hook 0 of an S x S board has 2S-1 cells, and a position
+`p >= 2` contributes its two mirror cells `(k,k+p)` and `(k+p,k)` as SEPARATE
+components, so an alternating occupancy reaches about S of them. Measured, the
+largest number of components in one hook is 11 at S = 12 and 13 at S = 13 and
+S = 14; 16 is reachable from S = 16 up on the position count alone.
+
+**The S = 15..19 rows were produced by the four-bit binary**, before the guard
+existed. Those are exactly the rows `c_3`, `c_4` and `c_5` rest on — which is
+to say the whole of "`d_main` stays linear, `d_anti` fails at `c_3`". Nothing
+says they are wrong: the totals at S = 15..18 were second-sourced against the
+banked `dmirror_strip` rows at all 21 cells and agreed exactly, which aliasing
+would have had to survive. But that is evidence, not the check. The field is
+six bits now (63 labels against the 48 cells a hook can hold, so unreachable
+rather than believed unreachable), every run reports the largest hook it
+carried, and **S = 12..19 is being re-derived** before S = 20 and 21 run.
+
+**The census has a second engine, and it is much faster.** The reason
+`results/nkey-census.md` stops at 17 is that successors are generated per
+source, so a partial fill a thousand sources admit is explored a thousand
+times. `nkey_census --shared` sweeps a batch of sources together one row at a
+time, carrying only what the remaining rows can see, so two sources that differ
+below the sweep become one state. On dalby H = 13 is **16.3 s including both
+gate ladders and the cross-engine check**, against 84 s for the per-source gate
+ladder alone. The H = 13..18 ladder is running; H = 14, 15 and 16 are banked at
+53,763 / 136,145 / 346,539 and are what it has to reproduce.
+
+It is a second engine and not a replacement, and the gate is what makes that
+worth anything. Count agreement turned out to be **too weak a control** —
+disabling the stranded-block prune leaves every banked class count intact,
+because the successors it invents are already reachable another way — so
+`--gate` also compares the two engines' successor SETS per source at H <= 11.
+Four planted defects: dropping a block the open run still holds fires, allowing
+a stranded block fires only on the set check, retiring a group the open run can
+merge with fires, and the two changes that are optimisation-only stay green.
+
+**The H = 17 census in flight was a pre-fix binary.** Stamped rev `a825ad114`,
+which predates `384bd2e` — the retirement fix. Its H = 17 would have been
+exactly as unchecked as the pre-fix H = 16 that ayr is re-running. dalby had 79
+idle cores, so a post-fix H = 17 runs alongside rather than replacing it, and
+agreement banks the height from two binaries. The ladder loop was stopped so no
+H = 18 follows.
+
+**A scratch file under `results/` was dirtying every binary built.** The e4
+run staged its output inside the tracked results directory, so `git status` was dirty
+and two binaries were stamped `-dirty` — the provenance gate the job checklist
+makes explicit. Staged outside the tree now, and rebuilt clean.
+
+**Running, with what each has to return:** `docs/resume-here.md`. The depth-5
+`e4` table at K = 21 is the one that matters most — it is the sole reason review
+row B13's gate is RED in production, and B13 is the stated blocker on the
+five-terms decision.
+
 ## 2026-08-23 (latest) — THE OVERNIGHT SHIFT
 
 jasonp authorised four runs plus the L10 draft and went to bed. What landed
