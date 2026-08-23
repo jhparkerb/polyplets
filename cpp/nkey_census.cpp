@@ -179,12 +179,18 @@ void closeRun(Partial& p) {
   sortLive(p);
 }
 
-// Retire every live group that no row from `row` on can reach.
-void retire(Partial& p, u32 reachable) {
+// Retire every live group that nothing can reach any more.
+//
+// `keep` must include BOTH the old blocks a later row can still attach to AND
+// the ones the run in progress has already attached to.  Leaving the second
+// out is a silent merge failure: a closed group and the open run can share an
+// old block whose last row has just passed, and they are then one component
+// that this would file as two.
+void retire(Partial& p, u32 keep) {
   size_t w = 0;
   bool moved = false;
   for (size_t i = 0; i < p.liveMask.size(); ++i) {
-    if ((p.liveTouch[i] & reachable) == 0) {
+    if ((p.liveTouch[i] & keep) == 0) {
       p.fin.push_back(p.liveMask[i]);
       moved = true;
     } else {
@@ -245,7 +251,7 @@ void successors(const Key& src, int H, bool dilate_on, std::vector<Key>& out) {
         q.curDil |= dilate(1u << row, H, dilate_on);
         q.curTouch |= attach;
         q.curOpen = true;
-        retire(q, reachable);
+        retire(q, reachable | q.curTouch);
         if (((q.touched | q.curTouch) & expired) == expired &&
             seen.insert(q).second)
           next.push_back(std::move(q));
