@@ -79,20 +79,28 @@ def load(path):
 def pin(points, k):
     """Exact polynomial through the deepest points, with a holdout.
 
-    A level of degree <= k needs k+1 points to pin and one more to check.
+    The LOWEST degree that fits is used, not degree k.  A level of degree d
+    needs d+1 points to pin and at least one more that it must then reproduce,
+    and the measured degrees are below k on one of the two families
+    (`results/dmirror-spine-split.md`: d_main runs at floor(k/2)), so assuming
+    degree k throws away levels the data can actually pin.  Degrees above k are
+    never tried, because the diagonal structure bounds the level's degree by k.
+
+    Fail-closed in two ways: every point outside the fitting window must be
+    reproduced exactly, not merely the consecutive ones nearest it; and a fit
+    with no point left over to check is rejected rather than reported.
+
     Returns (poly, holdouts) or (None, reason)."""
     pts = sorted(points)
-    if len(pts) < k + 2:
-        return None, "only %d points, need %d" % (len(pts), k + 2)
-    poly = newton_fit(pts[-(k + 1):])
-    hold = 0
-    for S, v in reversed(pts[:-(k + 1)]):
-        if evalpoly(poly, S) != v:
+    for d in range(0, k + 1):
+        if len(pts) < d + 2:
             break
-        hold += 1
-    if hold == 0:
-        return None, "pinned but the first holdout FAILED -- not degree %d" % k
-    return (poly, hold), None
+        poly = newton_fit(pts[-(d + 1):])
+        rest = pts[:-(d + 1)]
+        if rest and all(evalpoly(poly, S) == v for S, v in rest):
+            return (poly, len(rest)), None
+    return None, "no degree <= %d fits %d points with a surviving holdout" % (
+        k, len(pts))
 
 
 def analyse(name, data, which, kmax):
