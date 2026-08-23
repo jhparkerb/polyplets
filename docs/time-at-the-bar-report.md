@@ -82,7 +82,7 @@ unit of n. Applying that to the H = 20 pole's ~190 GB at Nmax 41:
 |---|---|---|---|---|
 | 19 | 4 | n ≤ 41 | done | — |
 | 19 | 5 | n ≤ 42 | depth 5 only, ≤ 16 GB | yes |
-| 19 | 6 | n ≤ 43 | depth 6, ~50–100 GB **asserted** | yes |
+| 19 | 6 | n ≤ 43 | depth 6, **~74 GB measured** (`results/depth6-cost-settled.md`) | yes |
 | 20 | 5 | n ≤ 44 | H = 20 at Nmax 44 ≈ **252 GB** | yes |
 | 20 | 6 | n ≤ 45 | H = 20 at Nmax 45 ≈ **277 GB** | yes |
 | 21 | 4 | n ≤ 45 | H = 21 at Nmax 45 ≈ **580 GB** | **no** |
@@ -95,12 +95,18 @@ comfortably impossible, which is a worse place to be than a clear no. And the
 
 **So the binding constraint has moved.** `Hs = 20` with `J = 6` reaches n ≤ 45
 against a 277 GB pole instead of a 580 GB one, and the thing standing in the way
-is no longer disk — it is that **`J = 6` is asserted**, at ~20–60 h and
-~50–100 GB, from applying the per-excess ladder's ~6× RSS and ~7–9× wall once to
-J = 5's projection. Depth 5 was asserted too, at 16 h / 103 GB, until a five-rung
-ladder measured it at 3.1 h / 8.5 GB — an order of magnitude out. **One rung of
-a J = 6 ladder would settle it the same way**, and it is the cheapest thing in
-this whole document that changes a plan.
+was that **`J = 6` was asserted**, at ~20–60 h and ~50–100 GB, from applying the
+per-excess ladder's ~6× RSS and ~7–9× wall once to J = 5's projection.
+
+**Settled 2026-08-23** (`results/depth6-cost-settled.md`): a four-rung ladder at
+fixed 8 threads projects **~36 h and ~74 GB**, or ~44 h and ~85 GB carrying its
+own holdout's 17.5% bias. The assertion holds — unlike depth 5's, which was an
+order of magnitude out. Two things the ladder adds. RAM forces the width: at 16
+threads the projection is ~148 GB and does not fit dalby, so depth 6 runs at 8
+threads and the wall is then 1.5–2 days. And the assertion's *method* was wrong
+even though its answer was right: the per-excess factor is not constant, it
+grows from 6.1× to 10.4× on wall across K = 8..14, so pricing `J = 7` that way
+would be badly wrong.
 
 Review row B13 stands and is unaffected: `experiments/severance_w3_depth5_gate.py`
 must pass against the banked depth-5 cells at k ≤ 19 before `D_5` is used at
