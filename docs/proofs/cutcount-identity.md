@@ -449,7 +449,8 @@ nothing to lean on but a second method.
 
 ## 10. Open problems
 
-Carried over from `paper/L9-cutcount-identity.tex` with its withdrawal, since
+Carried over from `paper/L9-cutcount-identity.tex`, deleted 2026-08-23 with
+its withdrawal, since
 §7 and §8 say what is *not* proved without saying which of it is worth doing.
 
 **Formalize the identity.** Lemmas 1–5 are elementary, finite in statement and

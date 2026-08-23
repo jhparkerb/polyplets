@@ -97,8 +97,15 @@ any check.** L5 and L8 are 0 of 144 and 0 of 69. The tool is
   are 0.16/1k against the P control's 0.40, and the two that remain are carrying
   epistemic status rather than habit. `docs/reviews/llm-tics/PLAN.md` says
   closed.
-- **`scripts/l_trim_gate.sh`.** Campaign-scoped, never wired into `make`, and
-  its baseline named two manuscripts that no longer exist. Retired in place.
+- **`scripts/l_trim_gate.sh`.** **Deleted.** Campaign-scoped and never wired
+  into `make`; it stood between a phase and a commit, and there are no more
+  phases. Two of the six manuscripts its baseline names are gone, and
+  `paper/verify_l_papers.py` had to leave its checksummed `FROZEN` list to admit
+  the coverage audit, so it had been red at `HEAD` for a stale-baseline reason
+  since before `docs/reviews/llm-tics/round5-L6.md` recorded it. Its check 7 —
+  the one that caught an attribution vanishing when a paper drops its last
+  `\cite` of a key — was run by hand over this contraction instead, and found
+  one: Blöte–Nightingale 1982, now carried in the proof doc.
 
 ## What was decided not to do
 
