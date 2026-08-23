@@ -148,14 +148,18 @@ nibbles per row. Gated, not argued (gate H).
 
 ## NOT ESTABLISHED
 
-- **The extrapolation to H = 21.** The ratio compounds at ~1.087×/height and
-  that factor is itself decaying ~0.1%/height; carried nine more heights it
-  lands near 10×. That is nine heights of extrapolation from nine points, both
-  series still drifting upward, with no closed form: no OEIS match for
-  `8, 19, 43, 101, 239, 575, 1399, 3441`, and no constant-coefficient
-  recurrence with any surplus (order 4 on 8 terms is exactly determined, with
-  coefficients over 41). `exactchange-probes.md` §9 records that this table has
-  already killed three pattern-matches. **A lean, not a number.**
+- ~~**The extrapolation to H = 21.**~~ **MEASURED 2026-08-23, and the lean was
+  right.** The census ladder reached H = 21 under the shared-partial-fill engine
+  (`results/nkey-census.md`): **39,314,963 classes**, against the a(40) run's
+  355,390,806-record frontier — a cut of **9.04×**, where the extrapolation
+  carried nine heights had said "near 10×". Every height gated. The
+  no-closed-form findings below the strike-through stand unchanged: there is
+  still no OEIS match for `8, 19, 43, 101, 239, 575, 1399, 3441`, no
+  constant-coefficient recurrence with any surplus, and
+  `exactchange-probes.md` §9's three killed pattern-matches are not revived by
+  having more terms. **What changed is that the 9.04× is a count and no longer
+  a lean.** What did not change is that this remains king-only and that
+  adoption is still unpriced — see *What adoption costs* above.
 - **Whether the mid-column stage tables inherit the cut.** The congruence is
   proved and measured at column boundaries only.
 - **What the telescope costs the completion prune.** `kinkFinalizeColumn`

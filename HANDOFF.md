@@ -15,6 +15,43 @@
 > defines what "ready" means. Section A is jasonp's decisions and nothing else
 > blocks on them; section B is commands, and it is stale by design whenever
 > `HEAD` moves past the revision its boxes were measured at.
+## 2026-08-23 evening — THE CENSUS LADDER REACHED H = 21
+
+The last of the day's runs, and the one that closes an open item.
+`results/nkey-census.md` and `results/skeletonkey-nfamily-merge.md`.
+
+| H | classes | ratio | wall | RSS |
+|---|---|---|---|---|
+| 18 | 2,275,103 | 2.5675 | 11.7 min | 3.60 GB |
+| 19 | 5,862,925 | 2.5770 | 35.2 min | 8.76 GB |
+| 20 | 15,159,215 | 2.5856 | 1 h 47 | 22.73 GB |
+| 21 | **39,314,963** | 2.5935 | 4 h 52 | 63.21 GB |
+
+One ladder, 7 h 20 min on dalby at rev `252921b10`, `~/var/nkey-shared-18up/`.
+The full gate ladder ran green before every height — king class counts to
+H = 13, the rook RED control, and the cross-engine successor-SET check on both
+adjacencies — 148 checks, nothing outside `ok`.
+
+**This closes `docs/state-2026-08-23.md` §5's "frontier census past H = 17".**
+The H = 20 and H = 21 decisions have a measured frontier now. The merge is a
+**9.04× state-space cut** at H = 21 against the a(40) run's 355,390,806-record
+frontier, where `skeletonkey-nfamily-merge.md` had a lean "near 10×" filed under
+NOT ESTABLISHED. That entry is struck; everything else under it stands, and the
+campaign is **still parked** — a measurement is not an adoption.
+
+**The class extrapolation was right seven times running and is now retired.**
+Chained off measured predecessors it missed by +0.020%, +0.077%, +0.101%,
++0.134% at H = 18..21 — monotone, always the same direction, always tiny.
+
+**Two other projections in that file were wrong, and how they were wrong is the
+part worth carrying.** Wall time was out by up to **8×** in the safe direction
+(H = 21 priced at 1.6 days, ran in 4 h 52), because the projection was anchored
+on capped-batch measurements and `252921b` removed the cap — a projection
+outlives the build it was measured on. And the RSS ratio is **not** the assumed
+constant 2.47: measured 2.434, 2.596, 2.781, climbing. **That is the one that
+binds.** H = 22 projects to ~176 GB against dalby's 125, so the ladder ends at
+21 on this fleet, for memory rather than time. Same shape of error as the
+depth-6 pricing's per-excess factor, and the same lesson.
 
 ## 2026-08-23 late — THE THREE REMAINING RUNS LANDED
 

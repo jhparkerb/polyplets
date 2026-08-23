@@ -29,10 +29,23 @@ against this frontier.
 | **15** | **136,145** | 2.5323 | 1,960 s | 25.3 s |
 | **16** | **346,539** | 2.5454 | 10,454 s | 103.8 s |
 | **17** | **886,111** | 2.5570 | not run | **235.7 s** |
+| **18** | **2,275,103** | 2.5675 | not run | **705.0 s** |
+| **19** | **5,862,925** | 2.5770 | not run | **2,114.5 s** |
+| **20** | **15,159,215** | 2.5856 | not run | **6,430.3 s** |
+| **21** | **39,314,963** | 2.5935 | not run | **17,532.6 s** |
 
 H = 17 is new and was produced by the second engine below. The extrapolation
 that priced it from H <= 16 said the ratio would be **2.557**; measured,
 2.5570.
+
+**H = 18 through 21 landed 2026-08-23**, rev `252921b10`, on dalby, in one
+ladder of 7 h 20 min wall (`dalby:~/var/nkey-shared-18up/census.txt`). The full
+gate ladder — the king class counts to H = 13, the rook RED control, and the
+cross-engine successor-SET check on both adjacencies — ran green before every
+one of the four heights, 148 checks with nothing outside `ok`. **This closes the
+open item that `docs/state-2026-08-23.md` §5 called "the frontier census past
+H = 17": the H = 20 and H = 21 decisions now have a measured frontier rather
+than a six-step extrapolation.**
 
 Wall times exclude the gate ladder, which runs before every height. H = 14
 through 17 are new; everything at or below 13 was already banked, by the Python
@@ -154,25 +167,50 @@ own 5.3 would need roughly **475 days** for the same height. That is the whole
 of what the second engine buys, and it is a constant factor of about a hundred
 rather than a change of exponent.
 
-**The extrapolation, for what it is still worth.** Anchored through H = 16 it
-predicted the H = 17 ratio at 2.557 and measured 2.5570 — a third height in a
-row inside a thousandth, after 0.026% at H = 14 and 0.002% at H = 16. Carried
-on:
+**The extrapolation held for four more heights, and it is now retired.** It was
+anchored through H = 16, predicted the H = 17 ratio at 2.557 against a measured
+2.5570, and was carried on to H = 21. Against the measurements, each row chained
+off its measured predecessor:
 
-| H | 17 | 18 | 19 | 20 | 21 |
-|---|---|---|---|---|---|
-| ratio | *2.5570 measured* | 2.567 | 2.575 | 2.583 | 2.590 |
-| classes | **886,111 measured** | ~2.3e6 | ~5.9e6 | ~1.5e7 | ~3.9e7 |
+| H | 18 | 19 | 20 | 21 |
+|---|---|---|---|---|
+| predicted ratio | 2.567 | 2.575 | 2.583 | 2.590 |
+| measured ratio | **2.5675** | **2.5770** | **2.5856** | **2.5935** |
+| predicted classes | 2,274,647 | 5,858,390 | 15,143,935 | 39,262,367 |
+| measured classes | **2,275,103** | **5,862,925** | **15,159,215** | **39,314,963** |
+| error | +0.020% | +0.077% | +0.101% | +0.134% |
 
-It is quoted to price a decision, not to stand in for the count, and
-`results/skeletonkey-nfamily-merge.md`'s refusal to quote an H = 21 number for
-any other purpose stands until the ladder lands.
+Seven heights now, all inside two parts in a thousand, with the error growing
+monotonically and always in the same direction — the decelerating-increment fit
+decelerates very slightly too fast. There is no longer any reason to quote it:
+the numbers it was standing in for are measured.
 
-**What it would mean if it held.** Tens of millions of classes at H = 21,
-against the a(40) run's measured end-of-column frontier of 355,390,806 records
-and 363.4 GB of disk. The merge is a state-space cut of about an order of
-magnitude at that height, which is the thing worth knowing about the H = 20 and
-H = 21 decisions.
+**Two other projections in this file were wrong, and the way they were wrong is
+the useful part.** The class counts were right to a thousandth seven times
+running. The other two quantities were not.
+
+- **Wall time was out by up to 8x, in the safe direction.** H = 18 was priced at
+  ~19 min and ran in 11.7; H = 21 was priced at ~1.6 days and ran in 4 h 52 min.
+  The error grows with height: 1.6x, 2.7x, 4.4x, 7.9x. The cause is known and is
+  not a modelling failure — the projection was anchored on measurements taken
+  with the sweep batch capped, and `252921b` removed the cap, which the same
+  file records as worth 2x on its own. A projection outlives the build it was
+  measured on.
+- **The RSS ratio is not constant, and that is the one that binds.** This file
+  assumed 2.47 per height and put H = 21 at ~55 GB. Measured: **3.60, 8.76,
+  22.73, 63.21 GB** at H = 18..21, with the ratio *climbing* — 2.434, 2.596,
+  2.781. Extending at the last measured ratio puts H = 22 at about **176 GB**
+  against dalby's 125, so **this ladder stops at H = 21 on this hardware**, and
+  it stops for memory rather than for time. Anyone extending it should re-derive
+  the ratio rather than reusing 2.47, exactly as the depth-6 pricing had to stop
+  treating its per-excess factor as constant
+  (`results/depth6-cost-settled.md`).
+
+**What it means, now that it is measured rather than assumed.** 39,314,963
+classes at H = 21, against the a(40) run's measured end-of-column frontier of
+355,390,806 records and 363.4 GB of disk. The merge is a state-space cut of
+**9.04x** at that height. That was the thing worth knowing about the H = 20 and
+H = 21 decisions, and it was previously a lean rather than a number.
 
 ## The retirement rule, and the check it needed
 
