@@ -49,11 +49,12 @@ certificate), `docs/proofs/convex-mirage.md`, `docs/proofs/T-n-nm1.md`,
 | `docs/reviewer-expertise-tiers.md` | what expertise each claim needs to assess |
 | `docs/external-anchors.md` | what this machinery reproduces that it did not produce |
 | `docs/paper1-engine-chapter.md`, `docs/paper1-reproducibility.md` | source material for P1 |
-| `docs/undertow-chapter.md` | source material for the Undertow manuscript; **decided 2026-08-22: it is L10**, `paper/L10-undertow.tex` |
-| `docs/l-paper-currency.md` | what each L paper would need to absorb; L8's was the substantial one and was **absorbed 2026-08-22** |
+| `docs/undertow-chapter.md` | source material for the Undertow material, which became L10 on 2026-08-22 and was **merged into `paper/L8-below-onset.tex` on 08-23**; `docs/l-corpus-contraction.md` |
+| `docs/l-paper-currency.md` | what each L paper would need to absorb; **superseded 2026-08-23** by `docs/l-corpus-contraction.md`, which merged four of the nine it describes |
 | `docs/main-paper-audit-2026-08-18.md` | findings on `paper/technical-report.tex`, unapplied by design |
 | `docs/priority-passes-2026-08-18.md` | literature-priority passes over the nine L papers |
-| `docs/priority-pass-L10-2026-08-23.md` | L10's pass: the near neighbour it found, and the limit of a web-only negative |
+| `docs/l-corpus-contraction.md` | **the L-paper contraction, 2026-08-23**: ten papers to six, what the assessment found, and the two campaigns it closed |
+| `docs/priority-pass-L10-2026-08-23.md` | the Undertow pass: the near neighbour it found, and the limit of a web-only negative. Its verdict now lives in L8 §Novelty |
 | `docs/oeis-ai-policy.md` | OEIS policy and precedent for AI-assisted submissions |
 | `docs/open-problem-lambda-bracket.md` | the framed open question on λ's upper bound |
 

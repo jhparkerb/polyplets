@@ -1,3 +1,12 @@
+> **SUPERSEDED 2026-08-23 by `docs/l-corpus-contraction.md`.** This file
+> describes nine manuscripts. Four of them no longer exist as manuscripts: L2
+> went into L1, L7 into L5, L10 into L8, and L9 was withdrawn to
+> `docs/proofs/cutcount-identity.md`. The one place this file is now actively
+> wrong is its L8/L10 paragraph, which records the 08-22 decision as settling
+> the application into a separate paper; jasonp's clarification on 08-23 is that
+> "absorb" meant L10 becomes part of L8, and it now is. Everything else here is
+> still readable as the currency ledger it was, against the merged papers.
+
 # What the nine L papers would need to absorb
 
 2026-08-22, executing `docs/last-orders.md` A2.4 and A2.5. **An inventory, not

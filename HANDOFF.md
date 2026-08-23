@@ -17,6 +17,59 @@
 > `HEAD` moves past the revision its boxes were measured at.
 
 
+## 2026-08-23 afternoon — THE L CORPUS IS SIX PAPERS, NOT TEN
+
+jasonp asked whether the L papers were truly worth the time spent, whether each
+deserved its own write-up, and how to condense. He agreed with the assessment
+and said execute. Record: **`docs/l-corpus-contraction.md`**.
+
+**What the assessment found.** Ten papers, 108 pages, 33,067 words of prose,
+sixteen days. The manuscripts were cheap — 36 commits. The process was not: the
+`l-trim` adversarial campaign's ledger is **52,175 words**, longer than the
+corpus it reviewed, and five phases of cutter-versus-defender removed 9.8% at
+about fifteen words of ledger per word cut, with 89 concessions and one RETAIN.
+That ladder ran *within* each paper, so it was structurally unable to propose
+the one cut that mattered: deleting a section because another paper already had
+it. And **all ten disclosure blocks read "human verification: none"** — the L
+scheme was priced at about eight hours of jasonp's reading, and sixteen days in
+that number was still zero. His own account: *"we keep coming up with new but
+not necessarily novel or interesting results right on the cusp of something
+great."*
+
+**The seven moves.** L3 and L4 kept as they are — the two whose novelty verdicts
+came back clean and whose results carry their pages. **L2 → L1** as Part II
+(L1's abstract already sold L2's spine cubic as its own third consequence).
+**L7 → L5** (L7 restated L5's block table verbatim, `tab:blocks` label collision
+included). **L10 → L8**, which is what "absorb" meant on 08-22. **L6 inverted** —
+the minimum end leads, being the half the priority pass left whole, and the
+standalone "k = 6 verdict" section dissolves into the four claims it decides.
+**L9 withdrawn** to `docs/proofs/cutcount-identity.md`, whose §9 now carries the
+FK/Potts finding the doc predated.
+
+Every merged paper builds with zero undefined references; `verify_l_papers.py`'s
+336 checks stay green with all 23 RED controls firing.
+
+**The measurement the merge made worth taking.** `results/l-paper-verifier-coverage.md`:
+**74 of 531 numeric literals in the L corpus are read by any check.** L5 and L8
+are 0 of 144 and 0 of 69 — not one number either prints is guarded, including µ
+to 199 digits, r to 251, and the whole θ_j table with its error bars. L3, at 50
+of 152, is the only paper whose headline numbers are both guarded. The tool is
+`tests/l_paper_coverage_audit.py`, 80 s for the whole corpus, and it is
+deliberately **not a gate**.
+
+**Two campaigns closed.** `llm-tics` on its own criterion (four of six markers at
+or near zero, dash-asides 0.16/1k against the P control's 0.40; the two that
+remain carry epistemic status, not habit) — `docs/reviews/llm-tics/round6-close.md`.
+And `l-trim`, whose gate `scripts/l_trim_gate.sh` is deleted: never wired into
+`make`, no phases left, and red at `HEAD` for a stale-baseline reason since
+before round 5 recorded it.
+
+**One decision recorded, not taken.** The short-rook certified brackets are a
+section of L3, not an eleventh paper. And of the five priced runs in
+`docs/state-2026-08-23.md` §5, none changes a sentence in any L paper.
+
+**Where the estimate was wrong.** L6 was priced at ~8pp and came out at 14. What
+makes it long is evidence and closed doors, and neither gets cut.
 
 ## 2026-08-23 10:00 — WHAT THE MORNING'S RUNS FOUND, AND WHAT IT COSTS A1.3
 
