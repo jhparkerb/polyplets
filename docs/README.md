@@ -52,6 +52,7 @@ certificate), `docs/proofs/convex-mirage.md`, `docs/proofs/T-n-nm1.md`,
 | `docs/l-paper-currency.md` | what each of the nine L papers would need to absorb, and the one decision that covers all of them |
 | `docs/main-paper-audit-2026-08-18.md` | findings on `paper/technical-report.tex`, unapplied by design |
 | `docs/priority-passes-2026-08-18.md` | literature-priority passes over the nine L papers |
+| `docs/priority-pass-L10-2026-08-23.md` | L10's pass: the near neighbour it found, and the limit of a web-only negative |
 | `docs/oeis-ai-policy.md` | OEIS policy and precedent for AI-assisted submissions |
 | `docs/open-problem-lambda-bracket.md` | the framed open question on λ's upper bound |
 
