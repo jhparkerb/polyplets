@@ -1,8 +1,9 @@
-# The reach-merged frontier, counted: H = 14, 15 and 16 measured, and where the method stops
+# The reach-merged frontier, counted: H = 17 measured, and the method that stopped has been replaced
 
 2026-08-23, executing `docs/time-at-the-bar.md` A1.1. Binary
-`cpp/nkey_census.cpp`, run on dalby via `scripts/nkey_census_ladder.sh`, both
-gates green before every reported height.
+`cpp/nkey_census.cpp` — two engines, `scripts/nkey_census_ladder.sh` and
+`scripts/nkey_census_shared_ladder.sh` — run on dalby, every gate green before
+every reported height.
 
 ## What A1.1 asked for
 
@@ -20,29 +21,32 @@ against this frontier.
 
 ## The measurement
 
-| H | classes | ratio | wall | peak RSS |
+| H | classes | ratio | wall (per-source) | wall (shared) |
 |---|---|---|---|---|
 | 4–12 | 8 … 8,539 | — | — | — |
-| 13 | 21,355 | 2.5009 | seconds | — |
-| **14** | **53,763** | 2.5176 | 293 s | 17 MB |
-| **15** | **136,145** | 2.5323 | 1,960 s | 35 MB |
-| **16** | **346,539** | 2.5454 | 10,454 s | 80 MB |
+| 13 | 21,355 | 2.5009 | seconds | 2.3 s |
+| **14** | **53,763** | 2.5176 | 293 s | 7.9 s |
+| **15** | **136,145** | 2.5323 | 1,960 s | 25.3 s |
+| **16** | **346,539** | 2.5454 | 10,454 s | 103.8 s |
+| **17** | **886,111** | 2.5570 | not run | **235.7 s** |
 
-H = 17 is in flight and had passed 886,106 classes after 4.1 h, so it will land
-above 2.55 as well.
+H = 17 is new and was produced by the second engine below. The extrapolation
+that priced it from H <= 16 said the ratio would be **2.557**; measured,
+2.5570.
 
-Wall times exclude the gate ladder, which runs before every height and costs
-84 s. H = 14 and H = 15 are new; everything at or below 13 was already banked,
-by the Python probe `experiments/skeletonkey/nfamily_merge.py`, and is
-reproduced here as a gate.
+Wall times exclude the gate ladder, which runs before every height. H = 14
+through 17 are new; everything at or below 13 was already banked, by the Python
+probe `experiments/skeletonkey/nfamily_merge.py`, and is reproduced here as a
+gate.
 
 **The extrapolation is good and it keeps being wrong.**
 `docs/time-at-the-bar-report.md` projected 53,777 at H = 14 from the ratio
 ladder through H = 13; measured **53,763**, 0.026% out. Re-anchored on H = 14
 and H = 15, the same method projected 346,533 at H = 16; measured **346,539**,
-0.002% out and this time *under* rather than over. Two heights, two directions,
-both inside a thousandth — which is what a decelerating-increment fit does when
-it is close to right and is exactly why it is not a substitute for the count.
+0.002% out and this time *under* rather than over. Through H = 16 it put the
+H = 17 ratio at 2.557; measured, 2.5570. Three heights, both directions, all
+inside a thousandth — which is what a decelerating-increment fit does when it is
+close to right and is exactly why it is not a substitute for the count.
 
 ## Gates
 
@@ -72,48 +76,103 @@ old block it attaches to: after that its identity cannot matter, only its
 dilated mask, so it drops into a plain sorted multiset and the two fills
 collapse. Same gates, 1 m 24 s.
 
-## Where it stops, measured rather than assumed
+## Where the first engine stops, measured rather than assumed
 
 Wall time per height: 293 s at H = 14, 1,960 s at H = 15, 10,454 s at H = 16 —
 ratios of **6.7 and 5.3**, so the cost ratio decelerates too. At 5.0 per height
-from here, H = 17 is ~15 h, H = 18 ~3 days, H = 19 ~15 days. **This
-implementation reaches H = 17 (in flight, 4.1 h in) and H = 18 for anyone
-willing to spend a long weekend on it. It does not reach 21.**
+from there, H = 17 is ~15 h, H = 18 ~3 days, H = 19 ~15 days. **That
+implementation reaches H = 17 and H = 18 for anyone willing to spend a long
+weekend on it. It does not reach 21.**
 
 The reason is structural rather than incidental: successors are generated per
 source state, so a partial fill that could serve many sources is rebuilt for
 each of them. The production engine does not have this problem — its carry
-sweeps cells globally, so intermediate states are shared — and porting that
-sharing here is what would make H = 18..21 affordable. That is a build, and it
-is a decision rather than a foregone conclusion.
+sweeps cells globally, so intermediate states are shared.
+
+## The second engine: the partial fills shared between sources
+
+`nkey_census --shared`. A whole batch of source keys is swept together, one row
+at a time, and the state carries only what the remaining rows can still see:
+each old block's dilated mask restricted to rows at or above the sweep, beside
+the partial-fill structure the first engine already used. Two sources that
+differ only below the sweep are then the same state and their remaining work is
+done once.
+
+A block is dropped only when nothing can reach it again — no later row attaches
+to it, **and** the run in progress does not hold it. Both halves are needed;
+leaving the second out is the merge failure `384bd2e` fixed, in a new place.
+A block dropped without ever having been touched strands a component and that
+column is dead, which is the first engine's `touched != allOld` test.
+
+**Measured against the first engine on the same box**, at the same heights,
+reproducing every banked value: **37x at H = 14, 77x at H = 15, 101x at
+H = 16**. Peak RSS 38.9, 95.1, 238.6, 578.5, 1,448.3 MB at H = 13..17 — a ratio
+of about 2.47 per height, which is the class count's own growth, so the memory
+is the reachable key set and not the sweep.
+
+**The batch cap was costing half the speed and buying nothing.** `--batch` was
+introduced to bound the sweep front. At H = 17: batch 131,072 is 505.3 s and
+1,429 MB, unbatched is **235.7 s and 1,448 MB**. Twice the speed for 1.4% more
+memory, because the memory is the key set. The default is high now and the flag
+is an escape hatch for a height that actually runs out.
+
+### The gate, and why count agreement was not enough
+
+Both engines run the banked king ladder and the rook RED control before any
+height is reported. That is not sufficient on its own, and this was checked
+rather than assumed: **disabling the stranded-block prune leaves every banked
+class count intact**, because the successors it invents are already reachable
+by another route. A control a real defect walks through is not a control.
+
+So `--gate` also compares the two engines' **successor sets per source**, at
+every reachable key, for H <= 11 king and H <= 9 rook. Five planted changes:
+
+| planted | class counts | successor sets |
+|---|---|---|
+| drop a block the open run still holds | FIRES | FIRES |
+| allow a stranded block | silent | **FIRES** |
+| retire a group the open run can merge with | FIRES | FIRES |
+| block masking off (optimisation only) | green | green |
+| canonical relabelling off (optimisation only) | green | green |
+
+The last two are the soundness argument for the sharing: a labelling that fails
+to canonicalise costs duplicated work and never a wrong count, because the
+answer is a set of keys and every key is sorted before it is counted.
 
 ## What can and cannot be said about H = 21
 
-**Cannot:** a measured number. The census reached 16, with 17 in flight, not 21.
+**Cannot, yet:** a measured number. The census has reached 17. The H = 18..21
+ladder is running on the shared engine, unbatched.
 
-**Can:** the extrapolation is now anchored two heights further than the merge
-file's, and its shape is unchanged. The ratio increments decay by about 0.88
-per height — `+0.0219, +0.0194, +0.0167, +0.0147` at H = 12..15 — and carrying
-that forward gives
+**What it now costs.** The shared engine's own ratio across H = 14..17 is 3.4,
+3.2, 4.1, 4.9 batched; the one unbatched height measured is H = 17 at 235.7 s.
+Carrying 4.9 forward from there — the least favourable of the four, and the
+ladder will replace it with measurements — puts H = 18 at ~19 min, H = 19 at
+~1.6 h, H = 20 at ~7.8 h and H = 21 at ~1.6 days, with RSS at the measured
+2.47 per height reaching ~55 GB against dalby's 125. The first engine at its
+own 5.3 would need roughly **475 days** for the same height. That is the whole
+of what the second engine buys, and it is a constant factor of about a hundred
+rather than a change of exponent.
 
-| H | 16 | 17 | 18 | 19 | 20 | 21 |
-|---|---|---|---|---|---|---|
-| ratio | 2.545 | 2.557 | 2.567 | 2.575 | 2.583 | 2.590 |
-| classes | *346,539 measured* | ~8.9e5 | ~2.3e6 | ~5.9e6 | ~1.5e7 | **~3.9e7** |
+**The extrapolation, for what it is still worth.** Anchored through H = 16 it
+predicted the H = 17 ratio at 2.557 and measured 2.5570 — a third height in a
+row inside a thousandth, after 0.026% at H = 14 and 0.002% at H = 16. Carried
+on:
 
-That is six steps of extrapolation from a two-parameter fit with no closed form
-underneath it, and it agrees with the pre-census projection to within a percent
-because it is the same fit with two more anchors. It is quoted to price a
-decision, not to stand in for the count, and
+| H | 17 | 18 | 19 | 20 | 21 |
+|---|---|---|---|---|---|
+| ratio | *2.5570 measured* | 2.567 | 2.575 | 2.583 | 2.590 |
+| classes | **886,111 measured** | ~2.3e6 | ~5.9e6 | ~1.5e7 | ~3.9e7 |
+
+It is quoted to price a decision, not to stand in for the count, and
 `results/skeletonkey-nfamily-merge.md`'s refusal to quote an H = 21 number for
-any other purpose stands.
+any other purpose stands until the ladder lands.
 
 **What it would mean if it held.** Tens of millions of classes at H = 21,
 against the a(40) run's measured end-of-column frontier of 355,390,806 records
 and 363.4 GB of disk. The merge is a state-space cut of about an order of
 magnitude at that height, which is the thing worth knowing about the H = 20 and
-H = 21 decisions — and it is exactly what a census that reached 21 would turn
-from a lean into a number.
+H = 21 decisions.
 
 ## The retirement rule, and the check it needed
 
@@ -127,8 +186,12 @@ than by any gate failing.
 Fixed, and then checked rather than assumed: with the stricter rule the binary
 reproduces **H = 14 = 53,763 and H = 15 = 136,145 exactly**, so the hazard is
 real in the code and unreachable at these heights, and every number above
-stands. H = 16 was produced by the pre-fix binary and is being re-run under the
-corrected rule; H = 17 likewise.
+stands. **H = 16 = 346,539 is now confirmed post-fix by the second engine**,
+which is a different algorithm and not merely a different build, and the
+per-source re-run on ayr is finishing alongside it. H = 17 was never produced
+by the four-bit-era binary: the run that would have was stamped `a825ad114`,
+which predates the fix, and it was stopped once the shared engine returned the
+height in four minutes.
 
 ## What this does not settle
 
@@ -143,6 +206,7 @@ which does not mean Motley's cancellation DP state admits the same cut.
 ## Reproduce
 
     make build/nkey_census
-    build/nkey_census --gate          # both ladders, 84 s
-    build/nkey_census 14 15           # the new heights
-    scripts/nkey_census_ladder.sh 14 21
+    build/nkey_census --gate          # BOTH engines' ladders + the cross-check
+    build/nkey_census --shared 17     # the new height, ~4 min
+    scripts/nkey_census_shared_ladder.sh 18 21
+    scripts/nkey_census_ladder.sh 14 17   # the first engine, for comparison
