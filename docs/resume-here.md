@@ -44,78 +44,26 @@ build described in that file.
 
 ---
 
-## Landed overnight, kept here for the protocol
-## 1. The depth-6 K-ladder (dalby) — the one that changes a plan
+## Landed overnight — results, and where each is written up
 
-**What it settles.** `J = 6` is the only asserted number in the five-terms
-table (`docs/time-at-the-bar-report.md` B2), at ~20–60 h and ~50–100 GB, got by
-applying a per-excess ratio once to `J = 5`'s projection. Depth 5 was asserted
-the same way at 16 h / 103 GB and measured at 3.1 h / 8.5 GB, an order of
-magnitude out. Four rungs at fixed 8 threads is what settled depth 5 and this
-is the same ladder at `emax = 5`.
+Kept short: each is banked in a results file, and that file is the record.
 
-**Measured so far**, against the header's predictions:
+**Depth-6 K-ladder** (dalby, 2.2 h for four rungs) — `families 21 5` projects to
+~36 h and ~74 GB at 8 threads, so the asserted 20–60 h / 50–100 GB holds.
+`results/depth6-cost-settled.md`, analysis `experiments/depth6_cost_ladder.py`,
+which imports depth 5's extrapolator so the two are priced by the same
+arithmetic. Rerun it with `python3 experiments/depth6_cost_ladder.py`.
 
-| K | predicted | measured |
-|---|---|---|
-| 8 | ~45 s, ~0.8 GB | **40.0 s, 0.42 GB** |
-| 10 | ~6 min, ~2.8 GB | **369.5 s, 2.28 GB** |
-| 12 | ~25 min, ~7 GB | **1951.1 s, 7.23 GB** |
-| 14 | ~1.4 h, ~15 GB | in flight, 12.5 GB at level 7 of 14 |
+**n = 11 hole count** (ayr, 4.28 h, 62.7 GB) — returned **5**, the formula's
+prediction, and `a(11) = 39,299,408` matching A006770.
+`results/maxhole-closed-form.md`.
 
-**When it lands:** fit the K-slope at `emax = 5` the way
-`results/depth5-cost-settled.md` did at `emax = 4`, extrapolate to `K = 21`,
-and re-run B2's table with `J = 6` measured instead of asserted. The row that
-matters is `Hs = 20` with `J = 6` reaching `n ≤ 45` against a 277 GB pole,
-versus `Hs = 21` at 580 GB, which does not fit dalby's 563 GB free.
-**Whether any of it then runs is jasonp's call, and the write-up should say so
-rather than implying a launch.**
+**Spine split S = 15..19** (dalby) — `d_main` linear at `c_2`..`c_5`, `d_anti`
+failing at `c_3`, and the `⌊k/2⌋` degree reading holding at seven consecutive
+levels. `results/dmirror-spine-split.md`. To re-derive, concatenate the three
+split logs under `~/var/dmirror-spine*/` and run
+`experiments/dmirror_spine_cumulants.py` and `experiments/dmirror_spine_degrees.py`
+over the result.
 
-Review row B13 is unaffected and still stands: the depth-5 gate must pass at
-`k ≤ 19` before `D_5` is used at `k = 21`, and it is correctly RED until the
-`emax = 4` table exists.
-
-## 2. The frontier census (dalby)
-
-**Already banked**: H = 14 = 53,763 and H = 15 = 136,145, in
-`results/nkey-census.md`, with both gates green.
-
-**When H = 16 lands:** add the row to that file's table and to its ratio
-ladder. Do not extend the run past H = 17 without a decision — wall time is
-6.7× per height (293 s at 14, 1,960 s at 15), so H = 17 is a day and H = 18 a
-week. Reaching H = 21 needs partial fills shared between source states rather
-than rebuilt per source, which is what the production engine's carry does. That
-is a build.
-
-## 3. The spine split S = 19 (dalby)
-
-**The question is already answered** and S = 19 is a holdout rather than a
-decider: `results/dmirror-spine-split.md` has `d_main` linear at `c_2`, `c_3`
-and `c_4`, and `d_anti` failing at `c_3`, so A1.3 is closed and the obstruction
-is the anti-diagonal family specifically.
-
-**When it lands:** append its rows to the combined log and re-run
-
-    python3 experiments/dmirror_spine_cumulants.py LOG
-    python3 experiments/dmirror_spine_degrees.py LOG
-
-The degree readings predict `d_main` at degree `⌊k/2⌋` and `d_anti` at degree
-`k` per parity; S = 19 adds an odd-parity point to both. A disagreement there
-would be a finding, since those readings have held as predictions twice.
-
-## 4. The n = 11 hole count (ayr)
-
-**Predicts 5.** `results/maxhole-closed-form.md` identifies the maximum number
-of holes an n-cell polyplet can enclose as `n − ⌈2√n⌉ + 1`, which is
-\oeis{A248333}, matching all ten measured terms with the lower bound proved by
-construction and the reverse inequality open. n = 11 is the first term the
-formula did not see.
-
-**When it lands:** if it is 5, add the term to that file and to
-`results/king-extremal.md`, and the formula has its first real test. If it is
-not 5, that is the more interesting outcome and the formula is refuted at the
-first opportunity — say so plainly, in the file, before anything else.
-
-The run also re-derives `a(11)` for the king lattice, which A006770's banked
-list does not reach in the probe's own table; the RED control now compares only
-where the reference reaches and says so.
+**Frontier census H = 14, 15, 16** — 53,763, 136,145, 346,539.
+`results/nkey-census.md`.
