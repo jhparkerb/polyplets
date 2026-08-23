@@ -51,14 +51,30 @@ never had to name: paired-dash asides at 2.79 per thousand words in L10, seven
 times jasonp's own control. Now 0.47.
 `docs/reviews/llm-tics/round4-L10.md`.
 
-### The four runs
+### The four runs — all four landed
 
-| run | where | state |
+| run | result | where |
 |---|---|---|
-| depth-6 K-ladder | dalby | K = 8, 10, 12 measured at 40 s / 370 s / 1951 s and 0.42 / 2.3 / 7.2 GB; K = 14 in flight, ETA 02:13 |
-| frontier census | dalby | **H = 14 = 53,763**, **H = 15 = 136,145**; H = 16 in flight |
-| n = 11 hole count | ayr | n ≤ 10 reproduced; n = 11 in flight |
-| spine split | dalby | S = 15..18 landed; S = 19 in flight |
+| depth-6 K-ladder | **~36 h / ~74 GB at 8 threads**; the asserted 20–60 h / 50–100 GB **holds**, unlike depth 5's | `results/depth6-cost-settled.md` |
+| n = 11 hole count | **5, as predicted**; and `a(11) = 39,299,408` matches A006770 | `results/maxhole-closed-form.md` |
+| frontier census | **H = 14 = 53,763, H = 15 = 136,145, H = 16 = 346,539**; H = 17 in flight | `results/nkey-census.md` |
+| spine split | S = 15..19; **`d_main` linear at `c_2`..`c_5`, `d_anti` fails at `c_3`** | `results/dmirror-spine-split.md` |
+
+**The one that changes a plan is the depth-6 price.** RAM forces the thread
+count — 8 threads fits dalby at ~74 GB, 16 threads does not at ~148 GB — so the
+wall is fixed at 1.5–2 days for the one `families 21 5` cell. And the
+assertion's *method* was wrong even though its answer was right: the per-excess
+factor grows from 6.1× to 10.4× across K = 8..14 rather than being constant, so
+pricing `J = 7` that way would be badly wrong. Whether any of it runs is
+jasonp's call.
+
+**Two hazards found by reading rather than by a gate.** The census's retirement
+rule could file one component as two (a closed group and the open run sharing an
+old block whose last row had just passed); fixed, and the fixed binary
+reproduces H = 14 and H = 15 exactly, with H = 16 being re-run to confirm. And
+the spine enumerator's 4-bit label field would silently alias two components
+past 15 of them; the cell budget keeps it far below that, and there is now a
+fail-closed guard rather than an assumption.
 
 ## 2026-08-22 — TIME AT THE BAR RUN END TO END
 
