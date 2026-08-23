@@ -1,4 +1,4 @@
-# Coordination number does not set lambda: two q=8 lattices, 26% apart
+# Coordination number does not set lambda: king against short rook, 26% apart
 
 2026-08-22, executing `docs/last-orders.md` C1.1 — the cheap half of
 `results/unexplored-avenues.md` idea 4 (the lambda atlas). Brute force to
@@ -16,13 +16,22 @@ coordination number q = 8:
 | lattice | q | triangles per site | λ |
 |---|---|---|---|
 | king — `(±1,0),(0,±1)` + four diagonals | 8 | 12 | **7.1102** (known) |
-| spread-8 — `(±1,0),(0,±1),(±2,0),(0,±2)` | 8 | **6** | **≈ 8.97** |
+| short-rook — `(±1,0),(0,±1),(±2,0),(0,±2)` | 8 | **6** | **≈ 8.97** |
 
 A 26% difference at identical q. Coordination number is not the parameter.
 
+**The name**, settled 2026-08-22 at jasonp's direction; this file's working
+label was `spread-8` and the code still uses that key. King animals are named
+for the king's move, which in fairy-chess terms is the wazir `(1,0)` plus the
+ferz `(1,1)`. The neighbourhood here is the wazir plus the **dabbaba** `(2,0)`,
+whose compound is a rook that may move one or two squares — the **short rook**.
+So the class is **short-rook animals**, by exactly the construction that names
+polyplets, and the sequence below is the number of fixed short-rook animals
+with `n` cells.
+
 Idea 4 stated its prediction before measuring — "spread-8 should land noticeably
 above king's 7.11, toward the tree bound, because clustering suppresses lambda"
-— and that is **confirmed in direction**: spread-8 lands above king by 1.86,
+— and that is **confirmed in direction**: the short rook lands above king by 1.86,
 which is 18% of the way from king to the q = 8 tree bound
 `(q−1)^(q−1)/(q−2)^(q−2) = 17.65`.
 
@@ -38,7 +47,7 @@ assumed:
 | square | 3.9949 | 4.0626 | 0.9833 |
 | king | 6.9885 | 7.1102 | 0.9829 |
 
-The two biases agree to **0.04%**. Applying the same correction to spread-8's
+The two biases agree to **0.04%**. Applying the same correction to the short rook's
 raw 8.8222 gives **8.974**, and the calibration's own spread bounds that to
 about ±0.01 — far tighter than the 1.86 gap being claimed.
 
@@ -50,9 +59,9 @@ is the assumption the calibration rests on.
 
     square    1, 2, 6, 19, 63, 216, 760, 2725, 9910          (A001168)
     king      1, 4, 20, 110, 638, 3832, 23592, 147941, 940982 (A006770)
-    spread-8  1, 4, 24, 164, 1200, 9126, 71296, 567706, 4586448
+    short-rook 1, 4, 24, 164, 1200, 9126, 71296, 567706, 4586448
 
-The spread-8 sequence is not in the repo, and **the OEIS check was run on
+The short-rook sequence is not in the repo, and **the OEIS check was run on
 2026-08-22: it is not in OEIS either.** Three query widths — all nine terms,
 the middle five `24, 164, 1200, 9126, 71296`, and the tail four `1200, 9126,
 71296, 567706` — each return no results. Controls in the same session: the
@@ -66,9 +75,9 @@ Nine terms of a sequence nobody has entered. What to do with it is
 
 - square and king reproduce A001168 and A006770 exactly, so the enumerator is
   the right enumerator;
-- spread-8 and king have the **same coordination number 8** — without this the
+- short-rook and king have the **same coordination number 8** — without this the
   comparison is not controlled;
-- spread-8 is **not** king: 6 triangles per site against 12, which is the whole
+- the short rook is **not** king: 6 triangles per site against 12, which is the whole
   point of the design;
 - the two q = 8 lattices give different counts from n = 3 on.
 
@@ -81,13 +90,13 @@ third instance of the row-local class they quantify over.
 
 **Does not deliver.** The atlas itself. Idea 4 wants *certified two-sided
 brackets* — the strip ladder with exact Collatz–Wielandt certificates on each
-lattice — and none of that is here. λ ≈ 8.97 for spread-8 is a calibrated
+lattice — and none of that is here. λ ≈ 8.97 for the short rook is a calibrated
 estimate, not a bound of any kind, and the calibration rests on two points.
 
 **The remaining work is a compute item and is priced, not launched.** Certified
 brackets need `cpp/strip_mu_cert.cpp` made lattice-parametric and then run per
 lattice per height; `results/strip-growth-lambda-bounds.md` measures H = 18 on
-the king lattice at tens of minutes and tens of GB, and a spread-8 strip has a
+the king lattice at tens of minutes and tens of GB, and a short-rook strip has a
 different (probably larger) frontier because the neighbourhood reaches two rows.
 That is a beg-and-agree decision, and this file exists so that the decision can
 be made against a measured motivation rather than a hunch.
@@ -101,5 +110,5 @@ the kind of fact a separate short paper is made of.
 
     python3 experiments/lambda_atlas_probe.py --nmax 9
 
-About twelve minutes, dominated by spread-8's n = 9 level (4.6M animals).
+About twelve minutes, dominated by the short rook's n = 9 level (4.6M animals).
 `--nmax 10` is roughly eight times that and would tighten the calibration.

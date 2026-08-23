@@ -33,11 +33,11 @@ decisions that are jasonp's.
 | A3.3 T4 at k = 6 | **closed on the cheap route** | `results/dmirror-onset-sharp.md` |
 | A3.4 λ upper bound | **STRUCK** — the file says it is not the machine's to run, and it is not |
 | B2 re-price at J = 5, 6 | **done** — the conclusion changes | below |
-| B3 Undertow chapter | **his** | below |
+| B3 Undertow chapter | **DECIDED 08-22 — L10, standing separate from L8** | below |
 | B4 L-paper currency | **his** | below |
 | B5 Lean below-onset frame | **done** — scope split written, recommendation made | `docs/lean-below-onset-scope.md` |
-| B6 P1/P2/P3 | **his**, unchanged | below |
-| B7 two candidate sequences | **one of them is no longer a candidate** | below |
+| B6 P1/P2/P3 | **DECIDED 08-22 — deferred indefinitely** | below |
+| B7 two candidate sequences | one is no longer a candidate; the other is **named: short-rook animals** | below |
 
 ## The three findings that change what the repository says
 
@@ -241,8 +241,10 @@ noticing as a pattern rather than twice as a surprise.
 
 ## The four decisions that are jasonp's
 
-**B3 — where the Undertow chapter goes.** `docs/undertow-chapter.md` is written
-as source material. Tenth L paper, a section of P1, or his own prose. Nine L
+**B3 — where the Undertow chapter goes. DECIDED 2026-08-22: the tenth L paper.**
+It stands separate rather than joining L8, so L8 stays the below-onset theory
+and L10 carries the application. `docs/undertow-chapter.md` is written
+as source material. The options were: tenth L paper, a section of P1, or his own prose. Nine L
 papers exist and the result that most changed what this project can compute is in
 none of them. Second half unchanged: `paper/L8-below-onset.tex` was drafted 08-18
 and its own material moved on 08-20, and a paper whose subject advanced after it
@@ -255,12 +257,20 @@ cheaper made once than nine times. One addition from this round: **L3 already
 publishes the H = 14 certificate row**, so the note it draws from is the stale
 one and has been corrected, not the paper.
 
-**B6 — P1, P2, P3.** Unchanged and his. `paper/technical-report.tex` is ~40%
+**B6 — P1, P2, P3. DECIDED 2026-08-22: deferred indefinitely**, off the
+current plan and not cancelled. `docs/publication-strategy-2026-08-18.md`'s
+Track D already says the repository is the publication and P1 comes later; this
+makes that the plan rather than a sequencing note. P3's `hv-growth-sandwich`
+reading gate parks with it, and `docs/main-paper-audit-2026-08-18.md`'s findings
+stay unapplied. Previously: `paper/technical-report.tex` is ~40%
 built and read-only to the machine; `docs/main-paper-audit-2026-08-18.md` holds
 findings on it that are unapplied by design.
 
-**B7 — the two candidate sequences, now one.** The spread-8 counts are confirmed
-absent from OEIS and remain a genuine candidate with no home. **The maximum hole
+**B7 — the two candidate sequences, now one.** The counts are confirmed
+absent from OEIS and remain a genuine candidate with no home. **Named
+2026-08-22: short-rook animals** — the wazir+dabbaba compound, as king animals
+are the wazir+ferz one (`results/lambda-atlas-probe.md`); `spread-8` was the
+working label and survives as the code's key. **The maximum hole
 count is no longer a candidate**: it is A248333, already entered, and what this
 project has instead is a new *identification* — that the maximum number of holes
 in a king animal equals the maximum number of unit squares enclosed by n lattice
