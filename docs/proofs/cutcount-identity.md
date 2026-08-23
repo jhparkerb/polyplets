@@ -443,3 +443,33 @@ So the durable content here is implementation-grade, which is what §8's limits
 ledger already said in its own words: the mathematics is classical, the rule is
 proved because an engine implements it, and a count with no closed form has
 nothing to lean on but a second method.
+
+## 10. Open problems
+
+Carried over from `paper/L9-cutcount-identity.tex` with its withdrawal, since
+§7 and §8 say what is *not* proved without saying which of it is worth doing.
+
+**Formalize the identity.** Lemmas 1–5 are elementary, finite in statement and
+uniform in the board. The repository's Lean development already carries the
+connectivity vocabulary (`kingAdj`, `KingConnected`,
+`kingConnected_iff_reachable`) and a comparable chain, so this is a scoped
+target rather than a research problem.
+
+**Cross the bridge of §7.** The three parts are stated: locality, sufficient
+statistic, colour reuse. Doing them turns "a program was checked against known
+values" into "a program provably computes a proved identity", which is the
+difference the second source exists to make.
+
+**Other adjacencies and other scan orders.** Nothing in the proof is specific to
+king adjacency beyond Lemma 1, which bounds the scan distance to earlier
+neighbours. For which adjacency and scan-order pairs does a window of bounded
+size suffice, and what is the minimal window?
+
+## 11. Where to read what this bought
+
+The identity exists because an engine implements it and a count with no closed
+form has nothing to lean on but a second method. What that second method has
+actually closed is `results/motley-h17.md`; why the engine's own self-checks
+were never going to be enough is `results/motley-step0.md`, which §4 already
+agrees with; and the banked source the model is a reading of, with its
+provenance, is `results/cutcount_b1/`.
