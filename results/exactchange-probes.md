@@ -135,8 +135,22 @@ and needs a second source before it counts).
 **H = 12 is no longer pending — run 2026-08-22 on ayr** (`results/char2-basis-status.md`):
 8,539 states, rank **1,818**, equal to A034299 and to the partition automaton's
 banked value, brute anchors green, 17 min and 3.9 GB. Two-implementation
-agreement now runs to H = 12. H = 13 is unchanged: ~2 h, minauto-only, still
-needs a second source.  Fast numpy closure: 23x over
+agreement now runs to H = 12.
+
+**H = 13 landed 2026-08-23 on ayr, and it is 3643 — A034299's value exactly.**
+21,355 minimized states, rank **3643**, wall 4 h 42 min (build 886 s, rank
+14,829 s) and 19.8 GB, rev `95fbb6c`, log `ayr:~/var/minauto-h13/rank.txt`. The
+run asserts every banked rank before it prints the new one, so a wrong build
+cannot report one: H = 4..12 came back 6, 15, 27, 58, 112, 229, 453, 912, 1818,
+all OK, on top of brute anchors at H = 2, 3. Nine consecutive matches now,
+H = 4..13.
+
+**It is still single-source and the §9 item-3 caveat stands unchanged.** H ≤ 12
+has two implementations agreeing; H = 13 has minauto alone, because the
+partition automaton was never run there. A fifth confirmation of the
+identification is not the same as a second implementation of this rank, and
+nothing here promotes the collapse from suggestive. What it does remove is the
+possibility that the agreement was going to break at the next height.  Fast numpy closure: 23x over
 the int-loop version (H = 10 rank in 13 s).
 
 Layer 2 (relations among the N distinct phi values, dim N − r):

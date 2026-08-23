@@ -187,8 +187,11 @@ Fixed, and then checked rather than assumed: with the stricter rule the binary
 reproduces **H = 14 = 53,763 and H = 15 = 136,145 exactly**, so the hazard is
 real in the code and unreachable at these heights, and every number above
 stands. **H = 16 = 346,539 is now confirmed post-fix by the second engine**,
-which is a different algorithm and not merely a different build, and the
-per-source re-run on ayr is finishing alongside it. H = 17 was never produced
+which is a different algorithm and not merely a different build. **The
+per-source re-run on ayr landed 2026-08-23 and returned 346,539 too**, so the
+height now has the post-fix per-source engine, the shared engine and the
+pre-fix binary all agreeing, and the retirement hazard is confirmed
+unreachable at H = 16 by the slow route as well as the fast one. H = 17 was never produced
 by the four-bit-era binary: the run that would have was stamped `a825ad114`,
 which predates the fix, and it was stopped once the shared engine returned the
 height in four minutes.
