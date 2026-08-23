@@ -173,9 +173,9 @@ inline int getLab(const std::array<u64, 5>& a, int i) {
 }
 
 // The largest number of components any one hook has carried this run.  The
-// four-bit field silently aliased anything past 15, so this is reported with
-// every count: a run whose maximum is under the field width did not need the
-// width, and one at or over it would have been wrong before.
+// four-bit field held 16 labels and aliased the 17th onto the first, so this
+// is the number that says whether a four-bit run was sound: at most 16 and it
+// was, 17 or more and it silently merged two components.
 int g_maxComp = 0;
 
 struct DSU {
@@ -232,13 +232,15 @@ int labelHook(const Hook& h, u32 occ, const int* inhCell, const int* inhLab,
   for (int i = 0; i < m; ++i) {
     const int r = d.find(i);
     if (root2lab[r] < 0) root2lab[r] = nl++;
-    // LABEL WIDTH.  Labels are packed six bits each, so a hook with more
-    // than 63 live components would alias two of them into one and silently
-    // merge two components.  A hook holds at most 2*MAXS cells, so 63 cannot
-    // be reached -- but this stays fail-closed rather than commented, because
-    // the four-bit version carried exactly the same reasoning ("the cell
-    // budget keeps a hook far below that") and its guard fired at S = 20,
-    // 53 s in, on hook 0.
+    // LABEL WIDTH.  Six bits hold labels 0..63, so 64 components fit and the
+    // 65th would alias onto label 0 and silently merge two components.  The
+    // test below is one step tighter than that -- it refuses at 64, before
+    // anything is lost -- and the four-bit version it replaces was tight in
+    // the same way: it refused at 16 components, which four bits still hold,
+    // so its firing at S = 20 was a refusal and not a corruption.  Kept
+    // fail-closed rather than argued away, because the four-bit version came
+    // with the argument ("the cell budget keeps a hook far below that") and
+    // the argument was wrong.
     if (nl > 63) {
       std::fprintf(stderr,
                    "FATAL: %d components in one hook exceeds the 6-bit label "
@@ -445,8 +447,9 @@ int main(int argc, char** argv) {
                 (S >= 2 * k + 2) ? "" : "   <== SPLIT UNDEFINED");
     std::fflush(stdout);
   }
-  std::printf("  max components in one hook: %d (label field holds 63; the "
-              "four-bit field this replaced held 15)\n", g_maxComp);
+  std::printf("  max components in one hook: %d (six bits hold 64; the "
+              "four-bit field this replaced held 16, and aliased at 17)\n",
+              g_maxComp);
   rep.done("S=" + std::to_string(S) + " kmax=" + std::to_string(kmax) +
            " maxcomp=" + std::to_string(g_maxComp));
   return 0;

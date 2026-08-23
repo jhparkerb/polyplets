@@ -23,25 +23,31 @@
 jasonp's "everything you can do on your own that is waiting on me can run".
 Six jobs launched; two things came back that change what stands.
 
-**The spine's 4-bit label field was too narrow, and last night's A1.3 headline
-is provisional until the re-run lands.** The guard added in `1a2ccac` — written
-the same night, on the assumption that "the cell budget keeps a hook far below"
-15 components — **fired at S = 20, 53 s in**. The assumption is wrong for a
-plain geometric reason: hook 0 of an S x S board has 2S-1 cells, and a position
+**The spine's 4-bit label field stopped the S = 20 run, and it puts a question
+over the S = 15..19 rows.** The guard added in `1a2ccac` — written the same
+night, on the assumption that "the cell budget keeps a hook far below" the
+field width — **fired at S = 20, 53 s in**. The assumption is wrong for a plain
+geometric reason: hook 0 of an S x S board has 2S-1 cells, and a position
 `p >= 2` contributes its two mirror cells `(k,k+p)` and `(k+p,k)` as SEPARATE
-components, so an alternating occupancy reaches about S of them. Measured, the
-largest number of components in one hook is 11 at S = 12 and 13 at S = 13 and
-S = 14; 16 is reachable from S = 16 up on the position count alone.
+components, so an alternating occupancy reaches about S of them.
 
-**The S = 15..19 rows were produced by the four-bit binary**, before the guard
-existed. Those are exactly the rows `c_3`, `c_4` and `c_5` rest on — which is
-to say the whole of "`d_main` stays linear, `d_anti` fails at `c_3`". Nothing
-says they are wrong: the totals at S = 15..18 were second-sourced against the
-banked `dmirror_strip` rows at all 21 cells and agreed exactly, which aliasing
-would have had to survive. But that is evidence, not the check. The field is
-six bits now (63 labels against the 48 cells a hook can hold, so unreachable
-rather than believed unreachable), every run reports the largest hook it
-carried, and **S = 12..19 is being re-derived** before S = 20 and 21 run.
+**The guard was one step tighter than the field, which is the difference
+between a refusal and a corruption.** It refuses at 16 components; four bits
+hold labels 0..15, so 16 components still fit and the first value actually lost
+is the 17th. So S = 20 was refused, not corrupted — and the S = 15..19 rows,
+produced before the guard existed, are wrong only if they reached **17**.
+Measured on the six-bit field, the largest number of components in one hook is
+11 at S = 12, 13 at S = 13 and S = 14, and **15 at S = 15** — climbing about one
+per S, which puts 17 somewhere around S = 17 or 18.
+
+Those are exactly the rows `c_3`, `c_4` and `c_5` rest on — the whole of
+"`d_main` stays linear, `d_anti` fails at `c_3`". Nothing yet says they are
+wrong, and the totals at S = 15..18 were second-sourced against the banked
+`dmirror_strip` rows at all 21 cells and agreed exactly, which an aliasing
+merge would have had to survive. But that is evidence, not the check. The field
+is six bits now, every run reports the largest hook it carried, and
+**S = 12..19 is being re-derived** before S = 20 and 21 run. S = 12, 13 and 14
+have come back byte-identical.
 
 **The census has a second engine, and it is much faster.** The reason
 `results/nkey-census.md` stops at 17 is that successors are generated per
