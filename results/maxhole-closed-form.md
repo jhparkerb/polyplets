@@ -104,18 +104,38 @@ that would inform it is a search for a mixed-parity animal that beats every
 single-parity animal of the same size — which the exhaustive runs to n = 11
 would already have found if one existed that small.
 
-## What this costs to extend
+## n = 11: the prediction was tested and it held
 
-The extremal probe is exhaustive over all king animals, so it grows with
-A006770: n = 8 is 31 s, n = 10 is 16 min at 8.8 GB, and the ratio is about 6.4×
-per term. **n = 11 is ~2 h and ~55 GB** and would be the first real test — it is
-the first n where the formula's increment pattern is not forced by n = 10, with
-a predicted 5. **n = 12 is ~11 h** and is not worth it for this.
+**Run 2026-08-23 on ayr at jasonp's direction. Predicted 5, measured 5.**
 
-n = 11 is not launched: it is over the one-hour bar and is jasonp's call. It is
-also the wrong tool — a targeted search for high-hole animals would settle far
-more terms for far less, since the extremal question does not need the other
-39 million animals.
+`n − ⌈2√n⌉ + 1` at n = 11 is `11 − 7 + 1 = 5`, and the exhaustive sweep over
+all 39,299,408 eleven-cell polyplets returns a maximum hole count of exactly 5.
+This is the first term the formula did not see: the ten it was found from end at
+n = 10, and n = 11 is where its increment pattern stops being forced.
+
+The sequence is now `0, 0, 0, 1, 1, 2, 2, 3, 4, 4, 5` for n = 1..11, matching
+\oeis{A248333} at every term.
+
+**An external check came free.** The run re-derives the animal counts as it
+goes, and its eleventh is `a(11) = 39,299,408`, which is A006770's value
+exactly. The probe's own control table stops at n = 10, so this is a term
+checked against OEIS rather than against the file's own reference — and the
+control now says which it did: "reproduce A006770 to n=10 (computed to n=11; no
+reference past n=10)".
+
+**Cost, measured against the prediction.** The header predicted ~2 h and
+~55 GB. Measured: **4.28 h and 62.7 GB** on ayr, single core — 2.1× the
+predicted wall and 1.14× the predicted memory. The wall prediction came from a
+6.4×-per-term ratio off n = 8 and n = 10; the real ratio to n = 11 is about 16×,
+so **the per-term ratio is not flat** and n = 12 is worse than the ~11 h that
+same model gives.
+
+## What extending further would cost
+
+n = 12 is not worth it by this route, and the reason is now measured rather
+than modelled. It is also the wrong tool: a targeted search for high-hole
+animals would settle far more terms for far less, since the extremal question
+does not need the other 250 million animals.
 
 ## Corrections to `results/king-extremal.md`
 

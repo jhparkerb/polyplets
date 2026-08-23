@@ -40,11 +40,13 @@ the repo was an absence of the word, not of a question worth asking.
 
 ## The one that is not trivial
 
-**Max hole count: 0, 0, 0, 1, 1, 2, 2, 3, 4.**
+**Max hole count: 0, 0, 0, 1, 1, 2, 2, 3, 4, 4, 5.**
 
 > **SOLVED 2026-08-22 — `results/maxhole-closed-form.md`.** It is
-> `n − ⌈2√n⌉ + 1`, it is **A248333**, and n = 10 was measured at **4** as the
-> formula predicts. The construction is the even-parity sublattice: it is
+> `n − ⌈2√n⌉ + 1`, it is **A248333**, and n = 10 and n = 11 were both measured
+> after the formula existed, at **4** and **5** as it predicts — n = 11 on
+> 2026-08-23, 4.28 h and 62.7 GB over all 39,299,408 eleven-cell animals, whose
+> count also matches A006770. The construction is the even-parity sublattice: it is
 > king-connected by diagonal steps, and every enclosed odd cell has all four of
 > its orthogonal neighbours occupied, so it is a singleton hole. An `a × b`
 > block of that rotated lattice costs `ab` cells and encloses `(a−1)(b−1)` of
