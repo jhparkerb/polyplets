@@ -56,12 +56,14 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 | `L7-subdominant-amplitude.tex` | **L7** — The subdominant exponential and the amplitude ratio | draft, 10pp |
 | `L8-below-onset.tex` | **L8** — Below the onset: the diagonal law's error term | draft, 8pp — swept 2026-08-18, **weak negative** |
 | `L9-cutcount-identity.tex` | **L9** — A cancellation identity for scan-order colourings | draft, 6pp — **the identity is not new** |
+| `L10-undertow.tex` | **L10** — Undertow: pinning a diagonal tower from cells below its onset | draft, 6pp — **no priority pass run** |
 
 Every L paper carries a loud draft banner, because every one of their
-verification ledgers currently reads "human verification: none". All nine have
-now had a literature-priority pass, dated after their own drafting and recorded
-in `docs/priority-passes-2026-08-18.md`. Three carry a second banner because of
-what that pass found:
+verification ledgers currently reads "human verification: none". Nine of the ten
+have had a literature-priority pass, dated after their own drafting and recorded
+in `docs/priority-passes-2026-08-18.md`; **L10 has not**, and its own page 1 and
+novelty section say so rather than implying otherwise. Three carry a second
+banner because of what that pass found:
 
 - **L9's identity is not new.** It is the Fortuin–Kasteleyn/Potts
   correspondence — evaluating $q^c$ by colouring components instead of tracking
@@ -89,10 +91,15 @@ not the machine's to write.
 The numbering is `docs/publication-split.md`'s through L6; L7 was carved out of
 L5, and L8 and L9 were added 2026-08-18 for material that postdates that
 document (the below-onset campaign, and the cut-count identity behind the
-second-source engine). L1, L3 and L4 were drafted first because their novelty
+second-source engine). **L10 was added 2026-08-22** on jasonp's decision that
+the Undertow material — the application of the below-onset defects, which is
+what produced a(41) — should stand as its own paper rather than join L8 or wait
+for P1. L8 keeps the defect mathematics; L10 uses it.
+
+L1, L3 and L4 were drafted first because their novelty
 verdicts came back clean and because P2 and P3 cite them.
 
-**The standing literature-priority rule applies to all nine.** Adopted
+**The standing literature-priority rule applies to all ten.** Adopted
 2026-08-17 after a result was derived at length and found afterwards to be
 published: a priority pass runs before anything is called new. Three papers here
 have had no pass at all and say so; the rest carry the verdicts of the N1–N6
