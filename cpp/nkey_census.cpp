@@ -87,23 +87,32 @@ inline u32 dilate(u32 rows, int H, bool dilate_on) {
 
 // One partial fill of the new column, swept bottom to top.
 //
-//   groups   the new blocks formed so far, as their ROW masks (not dilated);
-//            disjoint, so sorting by value is a canonical order
-//   gtouch   for each group, the set of old blocks it has attached to
-//   touched  the union of gtouch -- old blocks that will survive
-//   cur*     the run in progress, if the previous row was filled
+// The compression that makes this affordable is the merge applied DURING the
+// sweep rather than only at the end.  A new group can still absorb a later run
+// only if the two share an old block that some later row can still attach to.
+// Once every old block a group touches is out of reach, the group's identity
+// stops mattering and only its dilated mask survives into the key -- so it is
+// dropped into `fin`, a plain sorted multiset, and every partial fill that
+// differs only in how it produced those masks collapses to one state.
+//
+//   fin        dilated masks of groups that can no longer merge, sorted
+//   liveMask   dilated masks of groups that still can
+//   liveTouch  the old blocks each of those has attached to
+//   touched    every old block attached so far -- the survival test
+//   cur*       the run in progress, if the previous row was filled
 struct Partial {
-  std::vector<u32> groups;
-  std::vector<u32> gtouch;
+  std::vector<u32> fin;
+  std::vector<u32> liveMask;
+  std::vector<u32> liveTouch;
   u32 touched = 0;
-  u32 curRows = 0;
+  u32 curDil = 0;
   u32 curTouch = 0;
   bool curOpen = false;
 
   bool operator==(const Partial& o) const {
-    return touched == o.touched && curRows == o.curRows &&
-           curTouch == o.curTouch && curOpen == o.curOpen &&
-           groups == o.groups && gtouch == o.gtouch;
+    return touched == o.touched && curDil == o.curDil &&
+           curTouch == o.curTouch && curOpen == o.curOpen && fin == o.fin &&
+           liveMask == o.liveMask && liveTouch == o.liveTouch;
   }
 };
 
@@ -111,67 +120,91 @@ struct PartialHash {
   size_t operator()(const Partial& p) const {
     u64 h = 14695981039346656037ull;
     auto mix = [&h](u64 v) { h ^= v; h *= 1099511628211ull; };
-    for (size_t i = 0; i < p.groups.size(); ++i) {
-      mix(p.groups[i]);
-      mix(p.gtouch[i]);
+    for (u32 v : p.fin) mix(v);
+    mix(0x9e3779b9u);
+    for (size_t i = 0; i < p.liveMask.size(); ++i) {
+      mix(p.liveMask[i]);
+      mix(p.liveTouch[i]);
     }
     mix(p.touched);
-    mix(p.curRows);
+    mix(p.curDil);
     mix(p.curTouch);
     mix(p.curOpen ? 1 : 0);
     return static_cast<size_t>(h);
   }
 };
 
-// Close the run in progress into the group set, merging every group it shares
-// an old block with.  Runs that touch nothing are fresh components.
+// Canonical order for the live groups, so two equal partials compare equal.
+void sortLive(Partial& p) {
+  const size_t n = p.liveMask.size();
+  if (n < 2) return;
+  std::vector<size_t> idx(n);
+  for (size_t i = 0; i < n; ++i) idx[i] = i;
+  std::sort(idx.begin(), idx.end(), [&p](size_t a, size_t b) {
+    if (p.liveMask[a] != p.liveMask[b]) return p.liveMask[a] < p.liveMask[b];
+    return p.liveTouch[a] < p.liveTouch[b];
+  });
+  std::vector<u32> m(n), t(n);
+  for (size_t i = 0; i < n; ++i) {
+    m[i] = p.liveMask[idx[i]];
+    t[i] = p.liveTouch[idx[i]];
+  }
+  p.liveMask.swap(m);
+  p.liveTouch.swap(t);
+}
+
+// Close the run in progress, merging it with every live group it shares an old
+// block with.  A run that touches no old block is a fresh component.
 void closeRun(Partial& p) {
   if (!p.curOpen) return;
-  u32 rows = p.curRows, touch = p.curTouch;
+  u32 mask = p.curDil, touch = p.curTouch;
   size_t w = 0;
-  for (size_t i = 0; i < p.groups.size(); ++i) {
-    if (touch && (p.gtouch[i] & touch)) {
-      rows |= p.groups[i];
-      touch |= p.gtouch[i];
+  for (size_t i = 0; i < p.liveMask.size(); ++i) {
+    if (touch && (p.liveTouch[i] & touch)) {
+      mask |= p.liveMask[i];
+      touch |= p.liveTouch[i];
     } else {
-      p.groups[w] = p.groups[i];
-      p.gtouch[w] = p.gtouch[i];
+      p.liveMask[w] = p.liveMask[i];
+      p.liveTouch[w] = p.liveTouch[i];
       ++w;
     }
   }
-  p.groups.resize(w);
-  p.gtouch.resize(w);
-  p.groups.push_back(rows);
-  p.gtouch.push_back(touch);
+  p.liveMask.resize(w);
+  p.liveTouch.resize(w);
+  p.liveMask.push_back(mask);
+  p.liveTouch.push_back(touch);
   p.touched |= touch;
-  p.curRows = p.curTouch = 0;
+  p.curDil = p.curTouch = 0;
   p.curOpen = false;
-  // Canonical order: group row sets are disjoint, so sorting the pairs by row
-  // mask is a total order and two equal partials always compare equal.
-  std::vector<size_t> idx(p.groups.size());
-  for (size_t i = 0; i < idx.size(); ++i) idx[i] = i;
-  std::sort(idx.begin(), idx.end(),
-            [&p](size_t a, size_t b) { return p.groups[a] < p.groups[b]; });
-  std::vector<u32> g(p.groups.size()), t(p.groups.size());
-  for (size_t i = 0; i < idx.size(); ++i) {
-    g[i] = p.groups[idx[i]];
-    t[i] = p.gtouch[idx[i]];
+  sortLive(p);
+}
+
+// Retire every live group that no row from `row` on can reach.
+void retire(Partial& p, u32 reachable) {
+  size_t w = 0;
+  bool moved = false;
+  for (size_t i = 0; i < p.liveMask.size(); ++i) {
+    if ((p.liveTouch[i] & reachable) == 0) {
+      p.fin.push_back(p.liveMask[i]);
+      moved = true;
+    } else {
+      p.liveMask[w] = p.liveMask[i];
+      p.liveTouch[w] = p.liveTouch[i];
+      ++w;
+    }
   }
-  p.groups.swap(g);
-  p.gtouch.swap(t);
+  if (!moved) return;
+  p.liveMask.resize(w);
+  p.liveTouch.resize(w);
+  std::sort(p.fin.begin(), p.fin.end());
 }
 
 // All successor keys of one source key, generated cell at a time.
-//
-// The pruning that makes this cheap: an old block whose dilated mask has no
-// row at or above the current one can never be attached to again, so a partial
-// that has not touched it is dead and is dropped at that row rather than at
-// the end of the column.
 void successors(const Key& src, int H, bool dilate_on, std::vector<Key>& out) {
   const size_t B = src.size();
   const u32 allOld = (B >= 32) ? 0xffffffffu : ((1u << B) - 1);
 
-  // highestRow[i]: the top row at which old block i can still be attached.
+  // topRow[i]: the last row at which old block i can still be attached to.
   std::vector<int> topRow(B);
   for (size_t i = 0; i < B; ++i) {
     int t = -1;
@@ -185,12 +218,13 @@ void successors(const Key& src, int H, bool dilate_on, std::vector<Key>& out) {
   std::unordered_set<Partial, PartialHash> seen;
 
   for (int row = 0; row < H; ++row) {
-    // Old blocks whose last chance was the previous row must be touched by now.
-    u32 expired = 0;
-    for (size_t i = 0; i < B; ++i)
+    u32 expired = 0;    // out of reach from this row on -- must be touched
+    u32 reachable = 0;  // still attachable at this row or later
+    for (size_t i = 0; i < B; ++i) {
       if (topRow[i] < row) expired |= (1u << i);
-
-    u32 attach = 0;  // old blocks this row would attach to
+      else reachable |= (1u << i);
+    }
+    u32 attach = 0;  // old blocks a cell in this row would attach to
     for (size_t i = 0; i < B; ++i)
       if ((src[i] >> row) & 1) attach |= (1u << i);
 
@@ -201,17 +235,19 @@ void successors(const Key& src, int H, bool dilate_on, std::vector<Key>& out) {
       {
         Partial q = p;
         closeRun(q);
+        retire(q, reachable);
         if ((q.touched & expired) == expired && seen.insert(q).second)
           next.push_back(std::move(q));
       }
       // (b) fill it
       {
         Partial q = p;
-        q.curRows |= (1u << row);
+        q.curDil |= dilate(1u << row, H, dilate_on);
         q.curTouch |= attach;
         q.curOpen = true;
-        u32 haveIfClosed = q.touched | q.curTouch;
-        if ((haveIfClosed & expired) == expired && seen.insert(q).second)
+        retire(q, reachable);
+        if (((q.touched | q.curTouch) & expired) == expired &&
+            seen.insert(q).second)
           next.push_back(std::move(q));
       }
     }
@@ -220,11 +256,10 @@ void successors(const Key& src, int H, bool dilate_on, std::vector<Key>& out) {
 
   for (Partial& p : cur) {
     closeRun(p);
+    retire(p, 0);
     if (p.touched != allOld) continue;  // an old block stranded: dead
-    if (p.groups.empty()) continue;     // the empty column is not a transition
-    Key k;
-    k.reserve(p.groups.size());
-    for (u32 rows : p.groups) k.push_back(dilate(rows, H, dilate_on));
+    if (p.fin.empty()) continue;        // the empty column is not a transition
+    Key k = p.fin;
     std::sort(k.begin(), k.end());
     out.push_back(std::move(k));
   }
