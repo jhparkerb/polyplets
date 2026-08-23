@@ -5,12 +5,18 @@
 %  Category L (entirely machine-written); see paper/README.md and
 %  docs/publication-split.md.
 %
+%  CONTRACTED AND INVERTED 2026-08-23.  The minimum end -- the half the
+%  priority pass left standing whole -- now leads, and the maximum end is
+%  framed as the king analogue of Asinowski-Barequet-Zheng rather than as a
+%  discovery.  The standalone "k = 6 verdict" section is gone, dissolved into
+%  the four claims it decides.  docs/l-corpus-contraction.md is the record.
+%
 %  COMPUTE GATE CLEARED 2026-08-18.  Both k=6 censuses (n=78) finished on dalby
 %  2026-08-09 and 08-10, 456/456 shards ok, binary git=6473890c, and were
-%  harvested into results/ on 08-18.  §\ref{sec:k6} now carries the verdict:
-%  onset 24, Phi_3^2 and no Phi_4 all CONFIRMED; the Phi_2 leading diagonal's
-%  closed form REFUTED (5/2, not the predicted 15/4), and the k=5 identity of
-%  the WHOLE Phi_3 block across lattices does not extend either.
+%  harvested into results/ on 08-18.  The verdict, now carried at the four
+%  claims themselves: onset 24, Phi_3^2 and no Phi_4 all CONFIRMED; the Phi_2
+%  leading diagonal's closed form REFUTED (5/2, not the predicted 15/4), and
+%  the k=5 identity of the WHOLE Phi_3 block across lattices does not extend.
 %  The min-end runs were already done: square4 deep boxes (W=15,17) 08-08 and
 %  ayr's square8 p=48 census 08-07.
 %
@@ -69,10 +75,10 @@ with both contributing mechanisms checked directly rather than inferred.
 \emph{The tip series identification} --- $\phi_2$ of \cite{andrews1984}, an eta
 quotient with an explicit infinite product, verified to $n = 40$. It is
 \emph{not} a closed form.
-\emph{$k = 6$} --- computed, and it decided four predictions three to one
-(\S\ref{sec:k6}). The onset, the $\Phid_3$ exponent and the absence of
-$\Phid_4$ hold; the $\Phid_2$ leading diagonal's closed form does not, and is
-withdrawn here rather than repaired.
+\emph{$k = 6$} --- computed, and it decided four predictions three to one,
+each stated where the claim it decides lives. The onset, the $\Phid_3$ exponent
+and the absence of $\Phid_4$ hold; the $\Phid_2$ leading diagonal's closed form
+does not, and is withdrawn rather than repaired.
 \emph{Novelty} --- pass run 2026-08-18, and it found that the defect
 identity, the cyclotomic-denominator theorem and the degree column are all
 \cite{abz2018}'s, the last as a conjecture this paper confirms.
@@ -83,7 +89,26 @@ identity, the cyclotomic-denominator theorem and the degree column are all
 \noindent
 Let $A(n,p)$ count fixed lattice animals of $n$ cells with site-perimeter $p$.
 This table has two boundary curves, and grading from each gives a different kind
-of object.
+of object. We take the minimum end first, because it is the end where the
+objects are new; the maximum end is, on the square lattice, a published theorem
+of Asinowski, Barequet and Zheng, and what is contributed there is the king
+analogue and the comparison between the two lattices.
+
+At the \textbf{minimum} end the extremal animals are balls of the adjacency
+metric, $\pminn(n)$ grows like $\sqrt n$ and is a step function, so the natural
+index is $p$ rather than $n$. There the classes are eventually \emph{constant},
+with onset linear in the defect. On the king lattice the constants are a
+convolution of the 4-coloured partition function with the box-skew deficits ---
+fourteen of fourteen predicted values exact. What decides whether a column
+stabilises at all is not parity but \emph{attainability}: a column stabilises
+exactly when its $p$ is realised as $\pminn(n)$ for some $n$. The mechanism
+behind the constants is a Young diagram at each corner of the isoperimetric
+hull, giving a factor $P(x)^c$ with $c$ the corner count --- confirmed on a
+hexagonal hull as well as a square one. The square lattice's diamond is an
+apparent exception: its tips are not lattice-aligned, and each counts the order
+ideals of its own tangent cone, of which $P(x)$ is the aligned special case. The
+diamond's tip series is Andrews' $\phi_2$, so the two corner types here are the
+first two members of one family.
 
 At the \textbf{maximum} end the extremal animals are sticks, the natural index
 is the defect $k = \pmaxx(n) - p$, and the classes are quasi-polynomials in $n$
@@ -95,24 +120,6 @@ only sub-leading coefficients differ. The denominators are cyclotomic, with
 $\Phid_d$ first appearing at $k = 2d-1$, and the coefficients form their own
 triangle whose leading diagonal is lattice-independent and whose every lower
 diagonal is not.
-
-At the \textbf{minimum} end the extremal animals are balls of the adjacency
-metric, $\pminn(n)$ grows like $\sqrt n$ and is a step function, so the natural
-index is $p$ rather than $n$. There the classes are eventually \emph{constant},
-with onset linear in the defect. On the king lattice the constants are a
-convolution of the 4-coloured partition function with the box-skew deficits ---
-fourteen of fourteen predicted values exact. What decides whether a column
-stabilises at all is not parity but \emph{attainability}: a column stabilises
-exactly when its $p$ is realised as $\pminn(n)$ for some $n$.
-
-The mechanism behind the min-end constants is a Young diagram at each corner of
-the isoperimetric hull, giving a factor $P(x)^c$ with $c$ the corner count ---
-confirmed on a hexagonal hull as well as a square one. The square lattice's
-diamond is an apparent exception: its tips are not lattice-aligned, and each
-counts the order ideals of its own tangent cone, of which $P(x)$ is the aligned
-special case. The diamond's tip series is Andrews' $\phi_2$, so the two corner
-types here are the first two members of one family.
-
 \end{abstract}
 
 \tableofcontents
@@ -135,316 +142,15 @@ animals (polyominoes) and ``king'' means the king-connected ones (polyplets).
 Where a third lattice appears it is the six-neighbour triangular one, and it is
 used only to test whether a mechanism generalises.
 
-\section{The maximum end}
-\label{sec:max}
-
-\subsection{The defect is monotone}
-
-Grading by $k := \pmaxx(n) - p$ looks as though it should want a
-surplus-budgeted row transfer, on the model of the height grading in companion
-paper L1. It cannot: the perimeter defect does not bound the transverse extent
-of a linear sweep, since a U whose arms are far apart has $k = 3$ and unbounded
-spread. That is presumably why the published method classifies patterns instead
-of sweeping.
-
-Something simpler works. Let $c = e - n + 1$ be the cycle rank of the animal's
-adjacency graph, and let $t$ be the sum, over empty cells adjacent to the
-animal, of (number of animal neighbours $- 1$).
-
-\begin{proposition}
-\label{prop:kct}
-$k = 2c + t$, with both terms nonnegative. Consequently $k$ never decreases when
-a cell is added to an animal.
-\end{proposition}
-
-\begin{remark}[this identity is published, for the square lattice]
-\label{rem:abzidentity}
-Proposition~\ref{prop:kct} is not ours on the square lattice. Asinowski,
-Barequet and Zheng~\cite{abz2018} state it as $k = e + 2f$, with $e$ the total
-excess summed over perimeter cells and $f$ the number of inner faces of the dual
-map --- the circuit rank. That is the present statement with $c = f$ and
-$t = e$, and their proof is the same accounting: four neighbours per cell, less
-the excesses, less two per spanning-tree edge, less two per cycle-closing edge.
-It was re-derived here for the king lattice without knowing that, and the
-king case does not follow from theirs by substitution, since the per-cell degree
-and hence $\pmaxx$ changes, but the identity and its proof idea are theirs.
-Their full text was obtained after this paper was drafted, and it confirms the
-reading: their accounting is $p = 6n - e - 2|E|$ in three dimensions, the same
-two-sources-of-loss argument, with $|E| \ge n-1$ giving the bound and the
-circuit rank giving the excess over a spanning tree.
-\end{remark}
-
-\begin{proof}[Sketch, with the full argument in the enumerator's header]
-Placing a cell raises $\pmaxx$ by $\deg/2$ and changes $p$ by $-1 + g$, where $g$
-counts the neighbours that become fresh perimeter cells; $g$ is capped by the
-neighbours the new cell shares with the animal cell it touches. The bound is
-tight on both lattices --- a stick extends at $\Delta k = 0$.
-\end{proof}
-
-So a Redelmeier depth-first search that abandons a partial animal the moment
-$k > k_{\max}$ is \emph{exact}. A second monotonicity makes it fast: a candidate
-cell's cost $\Delta k$ is itself nondecreasing as the animal grows, so a
-candidate over budget is over budget forever and can be dropped from the untried
-list rather than re-tested at every node. That is worth about $20\times$ --- at
-$n = 20$, $k \le 5$ on the king lattice, $2.4\times10^8$ nodes fall to
-$1.4\times10^7$.
-
-The enumerator reaches $n = 70$ on both lattices on a single core ($913$~s on
-square, $2017$~s on king), where brute force stops at $n = 14$ on king. It is
-gated: pruned counts match an independent brute-force census cell for cell on
-both lattices, the prune is confirmed to change nothing against an unpruned
-control run, and the $(c,H)$ marginals sum back.
-
-\subsection{The classes and their onsets}
-
-\begin{table}[H]
-\centering\small
-\begin{tabular}{r r r r l l}
-\toprule
-$k$ & period & degree & onset & denominator & leading coefficient \\
-& & & & & \textbf{(both lattices)} \\
-\midrule
-0 & 1 & 0 & 2  & $\Phid_1$ & 2 \\
-1 & 1 & 1 & 3  & $\Phid_1^2$ & 4 \\
-2 & 1 & 2 & 6  & $\Phid_1^3$ & 6 \\
-3 & 2 & 3 & 9  & $\Phid_1^4\Phid_2^2$ & $13/2$ \\
-4 & 2 & 4 & 13 & $\Phid_1^5\Phid_2^3$ & $17/3$ \\
-5 & 6 & 5 & 18 & $\Phid_1^6\Phid_2^4\Phid_3$ & $593/144$ \\
-6 & 6 & 6 & 24 & $\Phid_1^7\Phid_2^5\Phid_3^2$ & $13325/5184$ \\
-\bottomrule
-\end{tabular}
-\caption{The defect-$k$ classes. Period, degree, onset and leading coefficient
-agree on the square and king lattices at every $k \le 6$; sub-leading
-coefficients do not.}
-\label{tab:maxend}
-\end{table}
-
-\begin{quote}
-\textbf{Onset.} $\mathrm{onset}(k) = \tbinom{k+1}{2} + 3$ for $k \ge 2$.
-\end{quote}
-
-\begin{quote}
-\textbf{Degree.} $\deg Q_k = k$, equivalently $\Phid_1^{k+1}$ exactly, for
-every $k \le 6$ on both lattices.
-\end{quote}
-
-That row is not an observation of ours either. \cite{abz2018} conjecture, in
-any dimension and for any fixed defect, that the highest-degree factor of the
-characteristic polynomial is $(x-1)^{k+1}$, contributed by the pattern of
-$k+1$ independent legs, so that the count is asymptotically $\gamma n^k$.
-The square column here is evidence for that conjecture at $d = 2$ through
-$k = 6$, and the king column is evidence for the same statement on a lattice
-their framework does not reach.
-
-Five consecutive hits on each lattice ($6, 9, 13, 18, 24$). The degenerate
-cases $k = 0, 1$ have onsets $2$ and $3$ against the formula's $3$ and $4$,
-which is exactly why scanning the whole sequence $2,3,6,9,13,18$ found nothing.
-The $k = 6$ hit is the first that was predicted before it was measured, and it
-was measured without interpolating: the smallest onset admitting \emph{any}
-cyclotomic denominator in the division test of \S\ref{sec:k6} is exactly $24$
-on both lattices. The formula predicts $\mathrm{onset}(7) = 31$.
-
-$k = 3$ carries a genuine period-$2$ term on \emph{both}
-lattices, so quasi-polynomiality is intrinsic to the perimeter grading and not a
-square-lattice artefact. On the square lattice, for $n \ge 9$,
-\[
-  Q_3(n) = \tfrac{13}{2}n^3 - 89n^2 + \tfrac{1947}{4}n - \tfrac{2107}{2}
-           + (-1)^n\Bigl(\tfrac{5n}{4} - \tfrac{21}{2}\Bigr),
-\]
-the parity part having degree $1$, not $0$. On the king lattice, same shape,
-different sub-leading coefficients:
-\[
-  Q_3(n) = \begin{cases}
-    \tfrac{13}{2}n^3 - 69n^2 + 360n - 860 & n \text{ even},\\[2pt]
-    \tfrac{13}{2}n^3 - 69n^2 + \tfrac{715}{2}n - 839 & n \text{ odd}.
-  \end{cases}
-\]
-
-\subsection{The cyclotomic content}
-\label{sec:cyclo}
-
-At $k = 5$ the fitted period is $6$, but the $\Phid_6$ component of the constant
-term is \emph{exactly zero}: what looks like period $6$ is $\Phid_2$ and
-$\Phid_3$ acting independently, not a primitive sixth root. Reading exponents off
-where each factor first perturbs a coefficient ($\Phid_2$ enters the $n^3$
-coefficient, $\Phid_3$ only the constant), gives, across $k \le 6$,
-\[
-  D_k \;=\; \Phid_1^{\,k+1}\,\Phid_2^{\,k-1}\,\Phid_3^{\,k-4},
-  \qquad\text{with}\qquad
-  \boxed{\;\Phid_d \text{ first appears at } k = 2d-1\;}
-\]
-($d=2$ at $k=3$, $d=3$ at $k=5$; $\Phid_4$ is correspondingly absent at
-$k = 6$, which was tested).
-
-That the denominators are cyclotomic at all is, again, published on the square
-lattice: \cite{abz2018} prove that for each fixed $k$ the generating function
-of $(A(n, 2n+2-k))$ is rational \emph{with denominator a product of cyclotomic
-polynomials}, and record the same main result in $d$ dimensions for polycubes.
-So the frame of this subsection is the king analogue of their theorem. It is an
-analogue and not a corollary: their proof shrinks maximal runs of grid slices
-whose projection is a set of pairwise non-adjacent cells, to a unique reduced
-representative per pattern class, and bounds the number of such classes through
-excess cells, $L$-cells and degree-1 cells. Every one of those steps is stated
-under face connectivity --- the perimeter accounting, the definition of an
-$L$-cell as an occupied cell with two occupied neighbours that are not
-opposite, the non-adjacency condition defining a cut, and a handshake bound at
-maximum degree $6$. King adjacency breaks the cut condition in particular. The
-shape of the argument transports; the theorem does not, which is why
-the king column of \S\ref{sec:max} is measured rather than cited. What is
-not in their work, as far as the pass of
-\repo{docs/priority-passes-2026-08-18.md} reached, is the exponent rule boxed
-below, which $\Phid_d$ appears at which $k$, and everything the
-coefficient triangle carries. If that rule holds, ``quasi-polynomial'' is a
-coarse label and each successive prime-power periodicity costs a fixed two
-units of defect.
-
-\paragraph{The denominators are predicted, then checked.} They are not fitted.
-$D_k$ is read off the table above and the census series (through $n = 70$ for
-$k \le 5$, $n = 78$ for $k = 6$) is divided by it; a polynomial must be left,
-and one is, for every $k$ on both lattices, with $\gcd(N,D) = 1$ so no factor is
-spurious. At $k = 5$ that is \textbf{28 consecutive exact zero coefficients} the
-interpolation never saw, and at $k = 6$ \textbf{39}: a far harder test than the
-two-spare-points-per-class bar at which the formulae were fitted. Each passing
-denominator is then retested with one factor removed at a time, so the
-denominator reported is the minimal one.
-
-\subsection{The coefficient triangle}
-\label{sec:coefftri}
-
-Writing the partial fractions with $R_k$ the polynomial part carrying the
-pre-onset holdouts, the king generating functions are
-\[
-\begin{aligned}
-  G_0 &= R_0 + \tfrac{2}{\Phid_1}, \\
-  G_1 &= R_1 + \tfrac{4}{\Phid_1^2} - \tfrac{12}{\Phid_1}, \\
-  G_2 &= R_2 + \tfrac{12}{\Phid_1^3} - \tfrac{48}{\Phid_1^2} + \tfrac{92}{\Phid_1}, \\
-  G_3 &= R_3 + \tfrac{39}{\Phid_1^4} - \tfrac{216}{\Phid_1^3}
-        + \tfrac{2445/4}{\Phid_1^2} - \tfrac{5135/4}{\Phid_1}
-        + \tfrac{5/4}{\Phid_2^2} - \tfrac{47/4}{\Phid_2},
-\end{aligned}
-\]
-and so on through $G_5$, whose $\Phid_3$ block is $(40x/27 + 8/3)/\Phid_3$. Each
-block is one piece of the quasi-polynomial: $a_j/\Phid_1^j$ contributes
-$a_j\binom{n+j-1}{j-1}$, the plain part; $b_j/\Phid_2^j$ the same times
-$(-1)^n$; the $\Phid_3$ block a bounded period-3 wobble.
-
-Those coefficients form their own triangle, and the lattice-independence in it
-is \emph{exactly one diagonal deep}. Writing rows by $k$ and columns by the
-offset $d$ from the top of each block, with $\ast$ marking entries identical on
-square and king:
-
-\begin{table}[H]
-\centering\small
-\begin{tabular}{r r r r r}
-\toprule
-$\Phid_1$ block & $d=0$ & $d=1$ & $d=2$ & $d=3$ \\
-\midrule
-$k=0$ & $2^\ast$ & & & \\
-$k=1$ & $4^\ast$ & $-12^\ast$ & & \\
-$k=2$ & $12^\ast$ & $-48$ & $92$ & \\
-$k=3$ & $39^\ast$ & $-216$ & $2445/4$ & $-5135/4$ \\
-$k=4$ & $136^\ast$ & $-1911/2$ & $14049/4$ & $-18863/2$ \\
-$k=5$ & $2965/6^\ast$ & $-4234$ & $685645/36$ & $-2225243/36$ \\
-$k=6$ & $66625/36^\ast$ & $-168514/9$ & $21478331/216$ & $-27170587/72$ \\
-\midrule
-$\Phid_2$ block & $d=0$ & $d=1$ & $d=2$ & $d=3$ \\
-\midrule
-$k=3$ & $5/4^\ast$ & $-47/4^\ast$ & & \\
-$k=4$ & $5/4^\ast$ & $-47/2$ & $349/2$ & \\
-$k=5$ & $15/8^\ast$ & $-293/8^\ast$ & $10503/32$ & $-28141/16$ \\
-$k=6$ & $5/2^\ast$ & $-1843/32$ & $37807/64$ & $-3556$ \\
-\bottomrule
-\end{tabular}
-\caption{King values, truncated at $d = 3$. Every $d = 0$ entry agrees across
-the lattices; $d = 1$ already fails from $k = 2$ in the $\Phid_1$ block, and the
-$k = 5$ agreement at $d = 1$ in the $\Phid_2$ block does not survive to
-$k = 6$ ($-1843/32$ against square's $-1831/32$).}
-\label{tab:coefftri}
-\end{table}
-
-The statement is a diagonal one about a triangle of \emph{coefficients} rather
-than about counts, which is the closest structural analogue to the
-height-diagonal law that this grading offers.
-
-Neither leading diagonal closes.
-
-\begin{itemize}
-\item \textbf{$\Phid_1$:} $a_{k+1} = c_k\,k! = 2, 4, 12, 39, 136,
-  593\cdot120/144, 66625/36$ --- integral through $k = 4$ and then not. No
-  closed form.
-\item \textbf{$\Phid_2$:} $5/4$, $5/4$, $15/8$ fits $b_{k-1} =
-  5(k-2)!/2^{\,k-1}$, which predicts $15/4$ at $k = 6$. The measured value is
-  \textbf{$5/2$}, on both lattices. Three terms, one formula, and it is wrong at
-  the fourth; the entry above is a coincidence and is withdrawn. What survives
-  is the weaker and more robust statement, that the value is the same on both
-  lattices, which is the universality claim and not a closed form.
-\end{itemize}
-
-Two identities that looked exact at $k = 5$ were the same kind of accident. The
-$\Phid_3$ block at $k = 5$ is identical on both lattices \emph{in full},
-$(40x/27 + 8/3)/\Phid_3$, which invited ``the entire period-$3$ content is
-lattice-independent''. At $k = 6$ only its \emph{leading} coefficient
-($-5920/243$) is shared: king carries
-$(-5920x^3 - 19128x^2 - 18528x - 12656)/243$ against square's
-$(-5920x^3 - 18768x^2 - 18168x - 12296)/243$. Likewise the $\Phid_2$ block's
-$d = 1$ entry agrees at $k = 3$ and $k = 5$ and disagrees at $k = 6$.
-
-The rule that survives all three corrections is the one this section opened
-with, now tested one row further: \textbf{the leading diagonal of
-each cyclotomic block is lattice-independent, and nothing below it is.}
-
-\subsection{The recentred basis is nonnegative integers}
-
-The partial-fraction basis $1/\Phid_1^j \mapsto \binom{n+j-1}{j-1}$ is centred at
-$n = 0$, which is why its coefficients are the awkward rationals above.
-Re-expand each residue class in $\binom{m}{j}$ with $m = (n - n_0)/\text{period}$
-stepping along the class from its first in-regime point, and \emph{every
-coefficient is a nonnegative integer}, on both lattices, in
-every residue class, for $k = 2,\dots,5$ (the $k = 6$ recentring has not
-been run):
-\[
-\begin{aligned}
-  k = 2:&\quad 92,\,48,\,12 \quad(\text{king}); \qquad 60,\,40,\,12 \quad(\text{square}) \\
-  k = 3,\ r = 1:&\quad 1528,\,1868,\,1164,\,312; \qquad 856,\,1324,\,1004,\,312 \\
-  k = 4,\ r = 1:&\quad 45753,\,48873,\,32438,\,12484,\,2176; \qquad 22993,\,30293,\,24222,\,10956,\,2176
-\end{aligned}
-\]
-The leading coefficient is lattice-independent ($312$, $2176$, $3842640$ for
-$k = 3,4,5$) --- it is $c_k\,k!\,\text{period}^k$, so this is the known leading
-diagonal in integer form. Defining the recentring at all needs
-the onset formula, so this is downstream of it.
-
-\subsection{Doors closed}
-\label{sec:closed}
-
-Each of these was an attractive reading, and each is dead.
-
-\begin{itemize}
-\item \textbf{The parity is not carried by the cyclic animals.} Splitting each
-  class by cycle rank: the $c \ge 1$ parts are plain polynomials and tiny
-  (square $k=3$, $c=1$ is the constant $8$; king $k=3$, $c=1$ is one animal at
-  $n=4$ and nothing after). All of the $(-1)^n$ sits in the \emph{acyclic}
-  animals, so the appealing ``a ring has an even cell count'' story is wrong.
-\item \textbf{It is not carried by any single height slice.} Every slice
-  $H = n - j$ at fixed $j$ is a plain polynomial on both lattices.
-\item \textbf{It is not the height floor.} The floor identity of \S\ref{sec:identity}
-  has period $k+1$, and the near-floor king slices do oscillate with period $4$
-  at $k=3$ --- but it predicts period $5$ at $k=4$ where the answer is $2$, and
-  the square lattice has no meaningful floor at all yet shows the identical
-  period. The floor contributes; it is not the source.
-\item \textbf{$c_k\,k! = 2\binom{2k}{k}$ is dead.} The products run
-  $2, 4, 12, 39, 136$ against $2, 4, 12, 40, 140$ --- tempting through $k = 4$;
-  at $k = 5$ the leading coefficient is $593/144$, whose product with $5!$ is
-  not even an integer.
-\item \textbf{The numerators are not nonnegative.} Done properly on the tail
-  series, $\widetilde N_k$ is a polynomial of degree exactly $\deg D_k - 1$,
-  itself a fresh confirmation of the predicted denominators, but its
-  coefficients change sign from $k = 2$ on.
-\item \textbf{The onset is not the positivity threshold.} The least $n_0$ at
-  which all forward differences are nonnegative is strictly \emph{below} the
-  onset in every class on both lattices ($k=5$: threshold $12$ against onset
-  $18$). Both facts are real; neither explains the other.
-\end{itemize}
+\paragraph{The order, and why.} The minimum end comes first. It is the end
+whose objects the 2026-08-18 literature pass left standing whole
+(\S\ref{sec:novelty}), and its mechanism --- a Young diagram at each corner of
+the isoperimetric hull --- is what the paper actually derives. The maximum end
+follows. There the two structural results, the defect identity and the
+cyclotomic denominators, are Asinowski, Barequet and Zheng's for the square
+lattice, and the degree column is their conjecture; what is contributed is the
+king analogue, which their proof does not reach, and the comparison of the two
+lattices, which their framework does not consider.
 
 \section{The minimum end}
 \label{sec:min}
@@ -644,6 +350,333 @@ $p = 6$ the small-$n$ exception.}
 \label{tab:sq4min}
 \end{table}
 
+\section{The maximum end}
+\label{sec:max}
+
+This end is where the published work is. Asinowski, Barequet and
+Zheng~\cite{abz2018} have the defect identity and the theorem that each
+fixed-defect generating function is rational with cyclotomic denominator, for
+polyominoes and for $d$-dimensional polycubes, and they conjecture the degree.
+Both are attributed in place below. What this section contributes is the king
+column, which is a separate derivation and not a corollary for the reason
+\S\ref{sec:novelty} gives, together with the comparison between the two
+lattices: the universality of period, degree, onset and leading coefficient
+through $k = 6$, and the coefficient triangle in which that universality is
+exactly one diagonal deep.
+
+\subsection{The defect is monotone}
+
+Grading by $k := \pmaxx(n) - p$ looks as though it should want a
+surplus-budgeted row transfer, on the model of the height grading in companion
+paper L1. It cannot: the perimeter defect does not bound the transverse extent
+of a linear sweep, since a U whose arms are far apart has $k = 3$ and unbounded
+spread. That is presumably why the published method classifies patterns instead
+of sweeping.
+
+Something simpler works. Let $c = e - n + 1$ be the cycle rank of the animal's
+adjacency graph, and let $t$ be the sum, over empty cells adjacent to the
+animal, of (number of animal neighbours $- 1$).
+
+\begin{proposition}
+\label{prop:kct}
+$k = 2c + t$, with both terms nonnegative. Consequently $k$ never decreases when
+a cell is added to an animal.
+\end{proposition}
+
+\begin{remark}[this identity is published, for the square lattice]
+\label{rem:abzidentity}
+Proposition~\ref{prop:kct} is not ours on the square lattice. Asinowski,
+Barequet and Zheng~\cite{abz2018} state it as $k = e + 2f$, with $e$ the total
+excess summed over perimeter cells and $f$ the number of inner faces of the dual
+map --- the circuit rank. That is the present statement with $c = f$ and
+$t = e$, and their proof is the same accounting: four neighbours per cell, less
+the excesses, less two per spanning-tree edge, less two per cycle-closing edge.
+It was re-derived here for the king lattice without knowing that, and the
+king case does not follow from theirs by substitution, since the per-cell degree
+and hence $\pmaxx$ changes, but the identity and its proof idea are theirs.
+\S\ref{sec:novelty} carries the reading of their full text that confirms it.
+\end{remark}
+
+\begin{proof}[Sketch, with the full argument in the enumerator's header]
+Placing a cell raises $\pmaxx$ by $\deg/2$ and changes $p$ by $-1 + g$, where $g$
+counts the neighbours that become fresh perimeter cells; $g$ is capped by the
+neighbours the new cell shares with the animal cell it touches. The bound is
+tight on both lattices --- a stick extends at $\Delta k = 0$.
+\end{proof}
+
+So a Redelmeier depth-first search that abandons a partial animal the moment
+$k > k_{\max}$ is \emph{exact}. A second monotonicity makes it fast: a candidate
+cell's cost $\Delta k$ is itself nondecreasing as the animal grows, so a
+candidate over budget is over budget forever and can be dropped from the untried
+list rather than re-tested at every node. That is worth about $20\times$ --- at
+$n = 20$, $k \le 5$ on the king lattice, $2.4\times10^8$ nodes fall to
+$1.4\times10^7$.
+
+The enumerator reaches $n = 70$ on both lattices on a single core ($913$~s on
+square, $2017$~s on king), where brute force stops at $n = 14$ on king. It is
+gated: pruned counts match an independent brute-force census cell for cell on
+both lattices, the prune is confirmed to change nothing against an unpruned
+control run, and the $(c,H)$ marginals sum back.
+
+\subsection{The classes and their onsets}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{r r r r l l}
+\toprule
+$k$ & period & degree & onset & denominator & leading coefficient \\
+& & & & & \textbf{(both lattices)} \\
+\midrule
+0 & 1 & 0 & 2  & $\Phid_1$ & 2 \\
+1 & 1 & 1 & 3  & $\Phid_1^2$ & 4 \\
+2 & 1 & 2 & 6  & $\Phid_1^3$ & 6 \\
+3 & 2 & 3 & 9  & $\Phid_1^4\Phid_2^2$ & $13/2$ \\
+4 & 2 & 4 & 13 & $\Phid_1^5\Phid_2^3$ & $17/3$ \\
+5 & 6 & 5 & 18 & $\Phid_1^6\Phid_2^4\Phid_3$ & $593/144$ \\
+6 & 6 & 6 & 24 & $\Phid_1^7\Phid_2^5\Phid_3^2$ & $13325/5184$ \\
+\bottomrule
+\end{tabular}
+\caption{The defect-$k$ classes. Period, degree, onset and leading coefficient
+agree on the square and king lattices at every $k \le 6$; sub-leading
+coefficients do not.}
+\label{tab:maxend}
+\end{table}
+
+\begin{quote}
+\textbf{Onset.} $\mathrm{onset}(k) = \tbinom{k+1}{2} + 3$ for $k \ge 2$.
+\end{quote}
+
+\begin{quote}
+\textbf{Degree.} $\deg Q_k = k$, equivalently $\Phid_1^{k+1}$ exactly, for
+every $k \le 6$ on both lattices.
+\end{quote}
+
+That row is not an observation of ours either. \cite{abz2018} conjecture, in
+any dimension and for any fixed defect, that the highest-degree factor of the
+characteristic polynomial is $(x-1)^{k+1}$, contributed by the pattern of
+$k+1$ independent legs, so that the count is asymptotically $\gamma n^k$.
+The square column here is evidence for that conjecture at $d = 2$ through
+$k = 6$, and the king column is evidence for the same statement on a lattice
+their framework does not reach.
+
+Five consecutive hits on each lattice ($6, 9, 13, 18, 24$). The degenerate
+cases $k = 0, 1$ have onsets $2$ and $3$ against the formula's $3$ and $4$,
+which is exactly why scanning the whole sequence $2,3,6,9,13,18$ found nothing.
+The $k = 6$ hit is the first that was predicted before it was measured, and it
+was measured without interpolating: a closed form valid from a given $n$ is
+valid from any larger one, so the \emph{smallest} onset at which the division
+test passes is the real one, and the scan puts it at exactly $24$ on both
+lattices, against the formula's $24$. The formula predicts
+$\mathrm{onset}(7) = 31$.
+
+$k = 3$ carries a genuine period-$2$ term on \emph{both}
+lattices, so quasi-polynomiality is intrinsic to the perimeter grading and not a
+square-lattice artefact. On the square lattice, for $n \ge 9$,
+\[
+  Q_3(n) = \tfrac{13}{2}n^3 - 89n^2 + \tfrac{1947}{4}n - \tfrac{2107}{2}
+           + (-1)^n\Bigl(\tfrac{5n}{4} - \tfrac{21}{2}\Bigr),
+\]
+the parity part having degree $1$, not $0$. On the king lattice, same shape,
+different sub-leading coefficients:
+\[
+  Q_3(n) = \begin{cases}
+    \tfrac{13}{2}n^3 - 69n^2 + 360n - 860 & n \text{ even},\\[2pt]
+    \tfrac{13}{2}n^3 - 69n^2 + \tfrac{715}{2}n - 839 & n \text{ odd}.
+  \end{cases}
+\]
+
+\subsection{The cyclotomic content}
+\label{sec:cyclo}
+
+At $k = 5$ the fitted period is $6$, but the $\Phid_6$ component of the constant
+term is \emph{exactly zero}: what looks like period $6$ is $\Phid_2$ and
+$\Phid_3$ acting independently, not a primitive sixth root. Reading exponents off
+where each factor first perturbs a coefficient ($\Phid_2$ enters the $n^3$
+coefficient, $\Phid_3$ only the constant), gives, across $k \le 6$,
+\[
+  D_k \;=\; \Phid_1^{\,k+1}\,\Phid_2^{\,k-1}\,\Phid_3^{\,k-4},
+  \qquad\text{with}\qquad
+  \boxed{\;\Phid_d \text{ first appears at } k = 2d-1\;}
+\]
+($d=2$ at $k=3$, $d=3$ at $k=5$; $\Phid_4$ is correspondingly absent at
+$k = 6$, which was tested). Both halves of that were $k = 6$ predictions and
+both held. $D_6$ carries $\Phid_3^2$, so the $\Phid_3$ exponent $k-4$ no longer
+rests on the single data point at $k = 5$; and every candidate denominator
+carrying a $\Phid_4$ passes the division test, as any multiple of the true
+denominator must, but each reduces when retested with one factor removed. The
+minimal passing denominator is $\Phid_1^7\Phid_2^5\Phid_3^2$ on both lattices,
+with $39$ spare zero coefficients.
+
+That the denominators are cyclotomic at all is, again, published on the square
+lattice: \cite{abz2018} prove that for each fixed $k$ the generating function
+of $(A(n, 2n+2-k))$ is rational \emph{with denominator a product of cyclotomic
+polynomials}, and record the same main result in $d$ dimensions for polycubes.
+So the frame of this subsection is the king analogue of their theorem, and an
+analogue rather than a corollary: every step of their proof is stated under face
+connectivity, and king adjacency breaks the cut condition it turns on
+(\S\ref{sec:novelty}). What is not in their work, as far as the pass of
+\repo{docs/priority-passes-2026-08-18.md} reached, is the exponent rule boxed
+below, which $\Phid_d$ appears at which $k$, and everything the
+coefficient triangle carries. If that rule holds, ``quasi-polynomial'' is a
+coarse label and each successive prime-power periodicity costs a fixed two
+units of defect.
+
+\paragraph{The denominators are predicted, then checked.} They are not fitted.
+$D_k$ is read off the table above and the census series (through $n = 70$ for
+$k \le 5$, $n = 78$ for $k = 6$) is divided by it; a polynomial must be left,
+and one is, for every $k$ on both lattices, with $\gcd(N,D) = 1$ so no factor is
+spurious. At $k = 5$ that is \textbf{28 consecutive exact zero coefficients} the
+interpolation never saw, and at $k = 6$ \textbf{39}: a far harder test than the
+two-spare-points-per-class bar at which the formulae were fitted. Each passing
+denominator is then retested with one factor removed at a time, so the
+denominator reported is the minimal one.
+
+\subsection{The coefficient triangle}
+\label{sec:coefftri}
+
+Writing the partial fractions with $R_k$ the polynomial part carrying the
+pre-onset holdouts, the king generating functions are
+\[
+\begin{aligned}
+  G_0 &= R_0 + \tfrac{2}{\Phid_1}, \\
+  G_1 &= R_1 + \tfrac{4}{\Phid_1^2} - \tfrac{12}{\Phid_1}, \\
+  G_2 &= R_2 + \tfrac{12}{\Phid_1^3} - \tfrac{48}{\Phid_1^2} + \tfrac{92}{\Phid_1}, \\
+  G_3 &= R_3 + \tfrac{39}{\Phid_1^4} - \tfrac{216}{\Phid_1^3}
+        + \tfrac{2445/4}{\Phid_1^2} - \tfrac{5135/4}{\Phid_1}
+        + \tfrac{5/4}{\Phid_2^2} - \tfrac{47/4}{\Phid_2},
+\end{aligned}
+\]
+and so on through $G_5$, whose $\Phid_3$ block is $(40x/27 + 8/3)/\Phid_3$. Each
+block is one piece of the quasi-polynomial: $a_j/\Phid_1^j$ contributes
+$a_j\binom{n+j-1}{j-1}$, the plain part; $b_j/\Phid_2^j$ the same times
+$(-1)^n$; the $\Phid_3$ block a bounded period-3 wobble.
+
+Those coefficients form their own triangle, and the lattice-independence in it
+is \emph{exactly one diagonal deep}. Writing rows by $k$ and columns by the
+offset $d$ from the top of each block, with $\ast$ marking entries identical on
+square and king:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{r r r r r}
+\toprule
+$\Phid_1$ block & $d=0$ & $d=1$ & $d=2$ & $d=3$ \\
+\midrule
+$k=0$ & $2^\ast$ & & & \\
+$k=1$ & $4^\ast$ & $-12^\ast$ & & \\
+$k=2$ & $12^\ast$ & $-48$ & $92$ & \\
+$k=3$ & $39^\ast$ & $-216$ & $2445/4$ & $-5135/4$ \\
+$k=4$ & $136^\ast$ & $-1911/2$ & $14049/4$ & $-18863/2$ \\
+$k=5$ & $2965/6^\ast$ & $-4234$ & $685645/36$ & $-2225243/36$ \\
+$k=6$ & $66625/36^\ast$ & $-168514/9$ & $21478331/216$ & $-27170587/72$ \\
+\midrule
+$\Phid_2$ block & $d=0$ & $d=1$ & $d=2$ & $d=3$ \\
+\midrule
+$k=3$ & $5/4^\ast$ & $-47/4^\ast$ & & \\
+$k=4$ & $5/4^\ast$ & $-47/2$ & $349/2$ & \\
+$k=5$ & $15/8^\ast$ & $-293/8^\ast$ & $10503/32$ & $-28141/16$ \\
+$k=6$ & $5/2^\ast$ & $-1843/32$ & $37807/64$ & $-3556$ \\
+\bottomrule
+\end{tabular}
+\caption{King values, truncated at $d = 3$. Every $d = 0$ entry agrees across
+the lattices; $d = 1$ already fails from $k = 2$ in the $\Phid_1$ block, and the
+$k = 5$ agreement at $d = 1$ in the $\Phid_2$ block does not survive to
+$k = 6$ ($-1843/32$ against square's $-1831/32$).}
+\label{tab:coefftri}
+\end{table}
+
+The statement is a diagonal one about a triangle of \emph{coefficients} rather
+than about counts, which is the closest structural analogue to the
+height-diagonal law that this grading offers.
+
+Neither leading diagonal closes.
+
+\begin{itemize}
+\item \textbf{$\Phid_1$:} $a_{k+1} = c_k\,k! = 2, 4, 12, 39, 136,
+  593\cdot120/144, 66625/36$ --- integral through $k = 4$ and then not. No
+  closed form.
+\item \textbf{$\Phid_2$:} $5/4$, $5/4$, $15/8$ fits $b_{k-1} =
+  5(k-2)!/2^{\,k-1}$, which predicts $15/4$ at $k = 6$. The measured value is
+  \textbf{$5/2$}, on both lattices. Three terms, one formula, and it is wrong at
+  the fourth; the entry above is a coincidence and is withdrawn. What survives
+  is the weaker and more robust statement, that the value is the same on both
+  lattices, which is the universality claim and not a closed form.
+
+  That trade is the one worth naming. A wrong \emph{coefficient formula} on a
+  leading diagonal is a withdrawn table entry; a wrong \emph{denominator}
+  slope would have taken the $\Phid_d$-at-$k = 2d-1$ statement with it, and
+  with that the reading that each successive periodicity costs two units of
+  defect. What $k = 6$ did to this paper was to strengthen the claims that were
+  predictions about \emph{shape} and kill the one that was a formula
+  extrapolated off three terms.
+\end{itemize}
+
+Two identities that looked exact at $k = 5$ were the same kind of accident. The
+$\Phid_3$ block at $k = 5$ is identical on both lattices \emph{in full},
+$(40x/27 + 8/3)/\Phid_3$, which invited ``the entire period-$3$ content is
+lattice-independent''. At $k = 6$ only its \emph{leading} coefficient
+($-5920/243$) is shared: king carries
+$(-5920x^3 - 19128x^2 - 18528x - 12656)/243$ against square's
+$(-5920x^3 - 18768x^2 - 18168x - 12296)/243$. Likewise the $\Phid_2$ block's
+$d = 1$ entry agrees at $k = 3$ and $k = 5$ and disagrees at $k = 6$.
+
+The rule that survives all three corrections is the one this section opened
+with, now tested one row further: \textbf{the leading diagonal of
+each cyclotomic block is lattice-independent, and nothing below it is.}
+
+\subsection{The recentred basis is nonnegative integers}
+
+The partial-fraction basis $1/\Phid_1^j \mapsto \binom{n+j-1}{j-1}$ is centred at
+$n = 0$, which is why its coefficients are the awkward rationals above.
+Re-expand each residue class in $\binom{m}{j}$ with $m = (n - n_0)/\text{period}$
+stepping along the class from its first in-regime point, and \emph{every
+coefficient is a nonnegative integer}, on both lattices, in
+every residue class, for $k = 2,\dots,5$ (the $k = 6$ recentring has not
+been run):
+\[
+\begin{aligned}
+  k = 2:&\quad 92,\,48,\,12 \quad(\text{king}); \qquad 60,\,40,\,12 \quad(\text{square}) \\
+  k = 3,\ r = 1:&\quad 1528,\,1868,\,1164,\,312; \qquad 856,\,1324,\,1004,\,312 \\
+  k = 4,\ r = 1:&\quad 45753,\,48873,\,32438,\,12484,\,2176; \qquad 22993,\,30293,\,24222,\,10956,\,2176
+\end{aligned}
+\]
+The leading coefficient is lattice-independent ($312$, $2176$, $3842640$ for
+$k = 3,4,5$) --- it is $c_k\,k!\,\text{period}^k$, so this is the known leading
+diagonal in integer form. Defining the recentring at all needs
+the onset formula, so this is downstream of it.
+
+\subsection{Doors closed}
+\label{sec:closed}
+
+Each of these was an attractive reading, and each is dead.
+
+\begin{itemize}
+\item \textbf{The parity is not carried by the cyclic animals.} Splitting each
+  class by cycle rank: the $c \ge 1$ parts are plain polynomials and tiny
+  (square $k=3$, $c=1$ is the constant $8$; king $k=3$, $c=1$ is one animal at
+  $n=4$ and nothing after). All of the $(-1)^n$ sits in the \emph{acyclic}
+  animals, so the appealing ``a ring has an even cell count'' story is wrong.
+\item \textbf{It is not carried by any single height slice.} Every slice
+  $H = n - j$ at fixed $j$ is a plain polynomial on both lattices.
+\item \textbf{It is not the height floor.} The floor identity of \S\ref{sec:identity}
+  has period $k+1$, and the near-floor king slices do oscillate with period $4$
+  at $k=3$ --- but it predicts period $5$ at $k=4$ where the answer is $2$, and
+  the square lattice has no meaningful floor at all yet shows the identical
+  period. The floor contributes; it is not the source.
+\item \textbf{$c_k\,k! = 2\binom{2k}{k}$ is dead.} The products run
+  $2, 4, 12, 39, 136$ against $2, 4, 12, 40, 140$ --- tempting through $k = 4$;
+  at $k = 5$ the leading coefficient is $593/144$, whose product with $5!$ is
+  not even an integer.
+\item \textbf{The numerators are not nonnegative.} Done properly on the tail
+  series, $\widetilde N_k$ is a polynomial of degree exactly $\deg D_k - 1$,
+  itself a fresh confirmation of the predicted denominators, but its
+  coefficients change sign from $k = 2$ on.
+\item \textbf{The onset is not the positivity threshold.} The least $n_0$ at
+  which all forward differences are nonnegative is strictly \emph{below} the
+  onset in every class on both lattices ($k=5$: threshold $12$ against onset
+  $18$). Both facts are real; neither explains the other.
+\end{itemize}
+
 \section{An exact identity relating \texorpdfstring{$n$, $H$ and $p$}{n, H and p}}
 \label{sec:identity}
 
@@ -666,50 +699,6 @@ reason is structural: the two square defect-$0$ animals are the horizontal
 ever more than one defect unit from optimal. Both king defect-$0$ animals are
 diagonal sticks with $H = n$, which is why the king bound bites.
 
-\section{The \texorpdfstring{$k = 6$}{k = 6} verdict}
-\label{sec:k6}
-
-Four of the statements above were predictions about a value nobody had
-computed. The two censuses that decide them (both lattices, $n = 78$,
-$k \le 6$) ran on 80-core hardware in 456 shards, merged only on every shard
-reporting success, and are \repo{results/perimdefect\_square8\_n78\_k6.txt} and
-\repo{results/perimdefect\_square4\_n78\_k6.txt}: $3.95$ and $3.17$ trillion
-animals, $42$ and $23$ hours of wall time at $76$-way parallelism. The target
-$n = 78$ was chosen because a period-$6$ degree-$6$ fit with two holdouts per
-residue class needs $54$ points above onset $24$.
-
-Three of the four hold and one fails.
-
-\begin{enumerate}
-\item \textbf{$\mathrm{onset}(6) = 24$ --- confirmed}, and by the scan rather
-  than by a fit. A closed form valid from a given $n$ is valid from any larger
-  one, so the \emph{smallest} onset at which the division test passes is the
-  real one; it is $24$ on both lattices, against the onset formula's $24$.
-\item \textbf{The $\Phid_2$ leading diagonal's $15/4$ --- refuted.} The measured
-  value is $5/2$. See \S\ref{sec:coefftri}: the closed form is withdrawn, the
-  lattice-independence it was riding on survives.
-\item \textbf{The $\Phid_3$ exponent $k - 4$ --- confirmed.} $D_6$ carries
-  $\Phid_3^2$, and the exponent no longer rests on the single data point at
-  $k = 5$.
-\item \textbf{$\Phid_4$ absent until $k = 7$ --- confirmed at $k = 6$.} Every
-  candidate denominator carrying a $\Phid_4$ also passes the division test, as
-  any multiple of the true denominator must; each is then retested with one
-  factor removed, and each reduces. The minimal passing denominator is
-  $\Phid_1^7\Phid_2^5\Phid_3^2$ on both lattices, with $39$ spare zero
-  coefficients.
-\end{enumerate}
-
-Item 2 costs less than item 3 failing would have. A wrong \emph{coefficient formula} on the leading diagonal is a
-withdrawn table entry. A wrong \emph{denominator} slope would have taken
-\S\ref{sec:cyclo}'s $\Phid_d$-first-appears-at-$k = 2d-1$ statement with it, and
-with that the reading that each successive periodicity costs two units of
-defect. That reading now has two confirmations instead of one.
-
-What $k = 6$ did to this paper: it strengthened the structural claims, which
-were predictions about \emph{shape}, and killed the one claim that was an
-extrapolated \emph{formula} off three terms. The universality
-statement (same period, degree, onset and leading coefficient on both
-lattices) now runs through $k = 6$.
 
 \section{Novelty, and what is not ours}
 \label{sec:novelty}
@@ -826,6 +815,15 @@ the pruned enumerator are \repo{results/siteperim\_square4\_n20.txt} and
 \repo{results/siteperim\_square8\_n14.txt}.}
 \label{tab:repro}
 \end{table}
+
+\paragraph{The $k = 6$ censuses.} The two runs that decided the four
+predictions --- both lattices, $n = 78$, $k \le 6$ --- ran on 80-core hardware
+in 456 shards, merged only on every shard reporting success, and are
+\repo{results/perimdefect\_square8\_n78\_k6.txt} and
+\repo{results/perimdefect\_square4\_n78\_k6.txt}: $3.95$ and $3.17$ trillion
+animals, $42$ and $23$ hours of wall time at $76$-way parallelism. The target
+$n = 78$ was chosen because a period-$6$ degree-$6$ fit with two holdouts per
+residue class needs $54$ points above onset $24$.
 
 \bibliographystyle{plain}
 \bibliography{shared/refs}
