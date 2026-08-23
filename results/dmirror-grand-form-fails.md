@@ -9,6 +9,17 @@ Exact rational arithmetic; instant.
 defect terms for the family, then the pinning) are not attempted and should not
 be until the obstruction below is dealt with.
 
+> **Superseded in one direction, later the same day.** "What would actually go"
+> below nominates splitting the count by spine. That was done
+> (`results/dmirror-spine-split.md`), and **each family separately is linear at
+> `c_2`, on both parities** — the exact place the summed family measures degree
+> 2. So what this file establishes is that the grand form does not transfer to
+> the family **as summed**; it does not establish that the route is closed. The
+> obstruction is the sum and nothing else has been found behind it. That rests
+> on one nontrivial cumulant with one holdout per pin, and going deeper needs
+> the split at larger `S` than pure Python reaches. Everything measured below
+> stands as measured.
+
 ## The answer in one line
 
 **Every cumulant past the first is nonlinear in S, on both parity classes.** The
@@ -97,6 +108,13 @@ pinning a degree-6 polynomial needs 7 points and the odd class has 6. A grand
 form would have reduced level 6 to **two** new constants, needing 2 points
 against the 7 and 6 available, and T4 would have got its first new test since
 2026-07-31 with 5 and 4 holdouts. That route is closed too.
+
+**With the split, the arithmetic changes and the input does not exist.** Four
+constants per level — two per family — still fits inside 7 even and 6 odd
+points with holdouts to spare, so the counting is not what blocks it. What
+blocks it is that those points would have to be `d_main` and `d_anti` at
+`S ≈ 14..17`, and the banked table carries only their sum. See
+`results/dmirror-spine-split.md`.
 
 ## What would actually go
 

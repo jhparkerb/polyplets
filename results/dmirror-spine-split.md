@@ -4,7 +4,7 @@
 Probe `experiments/dmirror_spine_split.py`, run on ayr. Exact integer
 arithmetic; anchored on every banked `dmirror_strip` cell.
 
-## The answer so far
+## The answer
 
 **An independent enumerator reproduces all 423 banked `dmirror_strip` cells
 exactly, and it splits the count into the two ground-state families.**
@@ -14,11 +14,25 @@ decomposition is clean exactly above the onset, which is not a coincidence:
 `results/dmirror-onset-sharp.md` measured that onset at `2k+2` (even) and
 `2k+3` (odd) the same day, from entirely different reasoning.
 
-The cumulant test — whether *each* family separately has the grand form
-`results/dmirror-grand-form-fails.md` showed the sum does not — needs `S = 13`
-and is running. `c_2` is the discriminator and it is one level out of reach at
-`S ≤ 12`; the analysis (`experiments/dmirror_spine_cumulants.py`) refuses to
-decide rather than fitting what it has.
+**And each family separately passes the test the sum fails.** The `S = 13` rows
+landed 2026-08-22 evening and `experiments/dmirror_spine_cumulants.py` decided
+on them: `c_2` — the discriminator, and the exact place
+`results/dmirror-grand-form-fails.md` measured degree 2 for the summed family —
+is **linear in `S` for `d_main` and for `d_anti`, on both parity classes**.
+
+    d_main   even  c_1:deg 0  c_2:deg 1      d_anti   even  c_1:deg 1  c_2:deg 1
+             odd   c_1:deg 0  c_2:deg 1               odd   c_1:deg 1  c_2:deg 1
+
+Both RED controls green in the same run: planted single-family data reports
+LINEAR, planted two-family data reports NONLINEAR. They are the same pair
+`dmirror_grand_form.py` uses, so the two scripts cannot disagree silently.
+
+**What it rests on, stated before what it means.** One nontrivial cumulant.
+Levels `k = 0, 1, 2` are pinned on both parities of both families, each with
+**exactly one holdout**, and `c_2` is the last cumulant those levels reach.
+`c_3` needs `k = 3`, which needs five points per parity — `S = 15` and `S = 16`
+— against `S = 14` in flight. So this is the same discriminator that killed the
+sum, applied to the parts, and it is one level deep and no deeper.
 
 ## Why the split is cheap
 
@@ -106,18 +120,34 @@ That degree gap is also why the sum misbehaves. Two families of *different*
 degree cannot combine into anything with a single-exponential form, which is a
 sharper statement than "two families with different growth".
 
+## What it opens, and what it costs
+
+A1.3's step 1 was declared dead on the summed family. **It is not dead on the
+parts**, at the one level the data reaches: the two-spine reading is confirmed
+as the whole of the obstruction so far, and the dmirror levels look finitely
+determined with **four** new constants per level rather than two — two per
+family.
+
+That does not hand the four stranded OEIS sequences anything yet, and the
+reason is a cost, not a doubt. The pinning would consume `d_main` and `d_anti`
+at the cells where it happens, and the banked `dmirror_strip` table carries
+only their **sum**; nothing but this enumerator produces the split. So the
+route now needs the split at larger `S` than pure Python reaches, which is a
+build (a hook-sweep DP, or the split folded into `cpp/sym/symtm.cpp`) rather
+than a longer run. Steps 2 and 3 of A1.3 — below-onset defect terms `D_j` per
+family, then the pinning — are unattempted and now have to be asked of each
+family separately.
+
+**The cost prediction in the enumerator's own docstring is wrong and is
+recorded as wrong.** It says "`S = 14` is minutes". The `S = 14` sweep was
+still running after **four hours** on ayr at 686 MB, single-core, having
+delivered `S = 13`.
+
 ## What is still open
 
-The cumulant test. `c_2` needs `k ≤ 2` pinned on both parities of both
-families, which needs `S = 13` for the odd class. Running. `c_3` would need
-`S = 17`, which is out of reach of this pure-Python sweep — the state space is
-exponential and `S = 13` is already minutes.
-
-If both families come back linear, the dmirror levels are finitely determined
-after all, with four new constants per level rather than two, and A1.3's step 1
-failed only because the two were summed. If either does not, the two-spine
-reading is not the whole obstruction and `dmirror-grand-form-fails.md`'s
-diagnosis is incomplete.
+`c_3`, which is the first cumulant that could distinguish "each family has the
+grand form" from "each family agrees with it to second order". It needs
+`S = 15, 16` on this enumerator, i.e. the build above.
 
 ## Reproduce
 

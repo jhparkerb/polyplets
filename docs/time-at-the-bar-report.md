@@ -22,7 +22,7 @@ decisions that are jasonp's.
 | B1 gate-class sweep | **done** — 33 gates, 2 defects, 3 limits | `results/gate-class-sweep.md` |
 | A1.1 reach-merge census | **priced, unlaunched** | below |
 | A1.2 char-2 basis on N-keys | **re-pitch** — plus the H=12 cell closed | `results/char2-basis-status.md` |
-| A1.3 dmirror grand form | **dead at step 1**, as the item allowed | `results/dmirror-grand-form-fails.md` |
+| A1.3 dmirror grand form | dead at step 1 **as summed**; each spine family separately passes at `c_2` | `results/dmirror-grand-form-fails.md`, `results/dmirror-spine-split.md` |
 | A1.4 square depth 2 | **done** — identity holds, `D_2` has no law | `results/undertow-square-depth2.md` |
 | A1.5 confluent exponent | **done** — king resolves, square does not | `results/confluent-universality.md` |
 | A2.1 sequential importance sampling | **prior art found**, see below | below |
