@@ -14,27 +14,39 @@ decomposition is clean exactly above the onset, which is not a coincidence:
 `results/dmirror-onset-sharp.md` measured that onset at `2k+2` (even) and
 `2k+3` (odd) the same day, from entirely different reasoning.
 
-**And each family separately passes the test the sum fails.** The `S = 13` rows
-landed 2026-08-22 evening and `experiments/dmirror_spine_cumulants.py` decided
-on them: `c_2` — the discriminator, and the exact place
-`results/dmirror-grand-form-fails.md` measured degree 2 for the summed family —
-is **linear in `S` for `d_main` and for `d_anti`, on both parity classes**.
+**One family passes the test the sum fails; the other does not.** The
+discriminator is the first cumulant that is not forced, and there are two of
+them in play. At `c_2` — where the summed family measures degree 2 —
+**both** families are linear. At `c_3`, which needs level `k = 3` pinned and
+therefore `S = 16` even and `S = 17` odd, they separate:
 
-    d_main   even  c_1:deg 0  c_2:deg 1      d_anti   even  c_1:deg 1  c_2:deg 1
-             odd   c_1:deg 0  c_2:deg 1               odd   c_1:deg 1  c_2:deg 1
+|  | c_1 | c_2 | c_3 | |
+|---|---|---|---|---|
+| `d_main`, both parities | deg 0 | deg 1 | **deg 1** | grand-form shape |
+| `d_anti`, both parities | deg 1 | deg 1 | **deg 2** | **not linear** |
 
-Both RED controls green in the same run: planted single-family data reports
+So the two-spine sum is **not** the whole obstruction. The main-diagonal family
+looks like a single grand-form object as far as the data reaches; the
+anti-diagonal family does not, and the place it fails is one level past where
+the summed family fails.
+
+Both RED controls are green in the same run: planted single-family data reports
 LINEAR, planted two-family data reports NONLINEAR. They are the same pair
 `dmirror_grand_form.py` uses, so the two scripts cannot disagree silently.
 
-**What it rests on, stated before what it means.** One nontrivial cumulant.
-Levels `k = 0, 1, 2` are pinned on both parities of both families and `c_2` is
-the last cumulant those levels reach. The `S = 14` sweep landed at 6 h 38 min
-wall on ayr and raised the even-parity `k = 2` pin from one holdout to **two**;
-the odd side stands at one, and the verdict is unchanged either way. `c_3`
-needs `k = 3`, five points per parity, which is `S = 16` even and `S = 17` odd.
-So this is the same discriminator that killed the sum, applied to the parts,
-and it is one level deep and no deeper.
+**This corrects a verdict banked earlier the same day.** On `S ≤ 14` the same
+script reported *both* families of grand-form shape, and that reading was one
+level deep — `c_2` was the last cumulant those levels reached, and this file
+said so. `c_3` reverses it for `d_anti`. What was measured then is unchanged;
+what it was evidence for was less than it appeared.
+
+**What the reversal rests on, checked before it was written down.** The flip
+turns entirely on `S = 16` and `S = 17`, cells no other program in this tree had
+produced. Their **totals** are second-sourced: summed over corner counts, all
+21 cells at `S = 15..18` and `k ≤ 6` agree exactly with the banked
+`dmirror_strip` rows from `cpp/sym/symtm.cpp`. The split of those totals into
+the two families is not independently checked at `S ≥ 15`; it is checked at
+every `S ≤ 14` against the Python enumerator, which agrees on every value.
 
 ## Why the split is cheap
 
@@ -84,92 +96,104 @@ step optimistic and is corrected here.
 
 ## The two families
 
-Both tables list only the regime where the split is defined, `S ≥ 2k+2`.
+Both tables list only the regime where the split is defined, `S ≥ 2k+2`, and
+both are the C++ enumerator's output (`cpp/dmirror_spine.cpp`), which agrees
+with the Python at every `S ≤ 14` value and whose totals agree with the banked
+strip rows at every cell shown.
 
-`d_main(S, S+k)`:
+`d_main(S, S+k)`, `S = 2k+2 … 17`:
 
-| k | values, S = 2..14 |
+| k | values |
 |---|---|
 | 0 | 1 at every S |
 | 1 | 4 at every S |
-| 2 | 25, 27, 29, 31, 33, 35, 37, 39, 41 |
-| 3 | 120, 129, 138, 147, 156, 165, 174 |
-| 4 | 704, 780, 860, 944, 1032 |
+| 2 | 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47 |
+| 3 | 120, 129, 138, 147, 156, 165, 174, 183, 192, 201 |
+| 4 | 704, 780, 860, 944, 1032, 1124, 1220, 1320 |
+| 5 | 3564, 3943, 4342, 4761, 5200, 5659 |
+| 6 | 20420, 22956, 25697, 28651 |
 
-`d_anti(S, S+k)`:
+`d_anti(S, S+k)`, `S = 2k+2 … 17`:
 
-| k | values, S = 2..14 |
+| k | values |
 |---|---|
 | 0 | 1 at every S |
-| 1 | 6, 8, 8, 10, 10, 12, 12, 14, 14, 16, 16 |
-| 2 | 47, 53, 71, 77, 99, 105, 131, 137, 167 |
-| 3 | 314, 447, 512, 697, 774, 1019, 1108 |
-| 4 | 2656, 3190, 4516, 5228, 7156 |
+| 1 | 10, 12, 12, 14, 14, 16, 16, 18, 18, 20 |
+| 2 | 71, 77, 99, 105, 131, 137, 167, 173, 207, 213 |
+| 3 | 314, 447, 512, 697, 774, 1019, 1108, 1421, 1522, 1911 |
+| 4 | 2656, 3190, 4516, 5228, 7156, 8070, 10752, 11892 |
+| 5 | 19094, 27895, 33412, 47197, 54922, 75487 |
+| 6 | 167220, 206168, 298707, 357249 |
 
 **The two families have different degrees, and only one of them knows about
 parity.** Measured by `experiments/dmirror_spine_degrees.py`, which takes the
 lowest degree that pins and then requires every remaining point to survive as a
 holdout, on even `S`, odd `S`, and all `S` pooled:
 
-| k | 0 | 1 | 2 | 3 | 4 |
-|---|---|---|---|---|---|
-| `d_main`, either parity or pooled | 0 | 0 | 1 | 1 | 2 |
-| `d_anti`, per parity | 0 | 1 | 2 | — | — |
+| k | 0 | 1 | 2 | 3 | 4 | 5 |
+|---|---|---|---|---|---|---|
+| `d_main`, either parity or pooled | 0 | 0 | 1 | 1 | 2 | 2 |
+| `d_anti`, per parity | 0 | 1 | 2 | 3 | — | — |
 
 `d_anti` behaves like a defect gas: degree `k`, one free position per defect.
-`d_main` runs at **`⌊k/2⌋`**, and the pooled fits are what make that solid —
-degree 1 at `k = 3` with five holdouts and degree 2 at `k = 4` with two, where
-`k − 1` would have required 2 and 3.
+`d_main` runs at **`⌊k/2⌋`**, now measured at six consecutive levels with the
+pooled fits carrying 5 to 9 holdouts.
 
 **An earlier reading of this file said `d_main` has degree `k−1`.** That was
 fitted on `S ≤ 11`, where `k ≤ 2` is all that pins and `k−1` and `⌊k/2⌋` agree.
-The `S = 12, 13, 14` rows separate them and it is `⌊k/2⌋`. The next test is
-`k = 5`, which the reading predicts at degree 2 and which needs `S = 15, 16`.
+`k = 3, 4, 5` separate them and it is `⌊k/2⌋` — and at `k = 3` and `k = 4` the
+`⌊k/2⌋` reading was stated as a prediction before `S = 15` landed, then hit its
+predicted 183 and 1124 exactly.
 
 **And `d_main` has no parity dependence at all.** One polynomial in `S` covers
-both classes at every pinned level, with 5 to 12 holdouts; `d_anti`'s pooled
-column is unpinned from `k = 1` on, so parity genuinely enters there. That is
-the mechanism `results/dmirror-grand-form-fails.md` argued, now measured
-instead: reflection in the main diagonal fixes every main-diagonal cell
-pointwise, while the anti-diagonal has a centre cell only for odd `S`. **All of
-the dmirror family's period-2 quasi-polynomiality comes from one of its two
-halves.**
-
-The degree gap is also why the sum misbehaves. Two families of *different*
-degree cannot combine into anything with a single-exponential form, which is a
-sharper statement than "two families with different growth".
+both classes at every pinned level; `d_anti`'s pooled column is unpinned from
+`k = 1` on, so parity genuinely enters there. That is the mechanism
+`results/dmirror-grand-form-fails.md` argued, now measured instead: reflection
+in the main diagonal fixes every main-diagonal cell pointwise, while the
+anti-diagonal has a centre cell only for odd `S`. **All of the dmirror family's
+period-2 quasi-polynomiality comes from one of its two halves.**
 
 ## What it opens, and what it costs
 
-A1.3's step 1 was declared dead on the summed family. **It is not dead on the
-parts**, at the one level the data reaches: the two-spine reading is confirmed
-as the whole of the obstruction so far, and the dmirror levels look finitely
-determined with **four** new constants per level rather than two — two per
-family.
+A1.3's step 1 was declared dead on the summed family, and splitting the count
+does not revive it. `d_anti` is not a single grand-form object either, so the
+dmirror levels are **not** finitely determined by two constants per family, and
+the four stranded OEIS sequences do not move by this route. What the split
+bought is a sharper diagnosis than "the sum misbehaves":
 
-That does not hand the four stranded OEIS sequences anything yet, and the
-reason is a cost, not a doubt. The pinning would consume `d_main` and `d_anti`
-at the cells where it happens, and the banked `dmirror_strip` table carries
-only their **sum**; nothing but this enumerator produces the split. So the
-route now needs the split at larger `S` than pure Python reaches, which is a
-build (a hook-sweep DP, or the split folded into `cpp/sym/symtm.cpp`) rather
-than a longer run. Steps 2 and 3 of A1.3 — below-onset defect terms `D_j` per
-family, then the pinning — are unattempted and now have to be asked of each
-family separately.
+- the obstruction is **not** the two-spine sum alone, which was the standing
+  hypothesis until `c_3` landed;
+- `d_main` — the family on the spine that is a king-connected path with every
+  cell load-bearing — is grand-form-shaped as far as five levels reach, and is
+  degree `⌊k/2⌋` with no parity dependence, which is a much more rigid object
+  than the defect gas the anti-diagonal gives;
+- so whatever breaks the grand form lives in the **anti-diagonal** family,
+  whose cells are only diagonally adjacent and have slack. That is where anyone
+  returning to this should look, and it is a statement about one specific
+  family rather than about the symmetry class as a whole.
 
-**The cost prediction in the enumerator's own docstring is wrong and is
-recorded as wrong.** It says "`S = 14` is minutes". Measured: **6 h 38 min**
-single-core on ayr, 686 MB, exit 0. Three more lengths are needed for `c_3`.
+**The cost is no longer the obstacle, which is worth recording since it was.**
+The Python enumerator took 6 h 38 min for `S = 14` alone and its own docstring
+predicted minutes. `cpp/dmirror_spine.cpp` does `S = 14` in 19 s and reached
+`S = 17` inside twenty minutes, by sweeping hooks with a cell budget: only
+`n ≤ S + KMAX` is wanted, `n` never decreases, and the next hook's occupancies
+are enumerated in increasing cell count and cut off at the remaining budget
+rather than run over all `2^(S−k)` of them.
 
 ## What is still open
 
-`c_3`, which is the first cumulant that could distinguish "each family has the
-grand form" from "each family agrees with it to second order". It needs
-`S = 16` and `S = 17` on this enumerator, against a measured 6 h 38 min for
-`S = 14` — i.e. the build above, not a longer run.
+`c_4` on `d_main`, which needs `k = 4` pinned on both parities — six points
+each, so `S = 18` even and `S = 19` odd. `d_main` is the only half still
+consistent with a grand form, and one more level is what would either extend
+that or close it the way `c_3` closed `d_anti`.
 
 ## Reproduce
 
-    python3 experiments/dmirror_spine_split.py 12          # ayr, minutes
+    build/dmirror_spine --gate                             # 191 banked cells
+    build/dmirror_spine 17 6                               # one length, minutes
+    scripts/dmirror_spine_ladder.sh 15 18 6                # the ladder
     python3 experiments/dmirror_spine_cumulants.py LOG     # instant
     python3 experiments/dmirror_spine_degrees.py LOG       # instant
+
+`experiments/dmirror_spine_split.py` is the original Python enumerator and is
+kept as the second source, not as the way to run this.

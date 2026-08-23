@@ -56,7 +56,8 @@ families apart later the same day.** The threshold above is one step optimistic:
 the families partition `d` exactly for `S ≥ 2k+2`, and at `S = 2k+1` they
 *overlap* rather than partition. Nothing here depends on it — the pinning happens
 above the onset, which is `2k+2`. And the two families turn out to have
-*different degrees*, `⌊k/2⌋` for `d_main` against `k` for `d_anti`, which is a
+*different degrees*, `⌊k/2⌋` for `d_main` against `k` for `d_anti` — measured
+to `k = 5` and `k = 3` respectively — which is a
 sharper reason the sum has no single-exponential form than "two families with
 different growth".
 
