@@ -373,7 +373,10 @@ else:
 # These parse the report's tables straight out of the .tex, so transcription
 # errors in the paper are caught, then validate against the banked data.
 
-TEX = open(os.path.join(ROOT, "paper", "polyplets-report.tex")).read()
+# Overridable ONLY for tests/gate_p_paper_verifier.py, which points it at a
+# mutated COPY to prove the checks go red.  The real file is never written.
+TEX = open(os.environ.get("VERIFY_TEX")
+           or os.path.join(ROOT, "paper", "polyplets-report.tex")).read()
 
 def table_text(label):
     i = TEX.find("\\label{%s}" % label)

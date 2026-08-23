@@ -10,12 +10,16 @@ companion b-files, and results/holes_n18.txt. Run from anywhere:
 Exit 0 iff all checks pass. The a(40) abstract/table placeholder shows up
 as a plain FAIL until the real value is typed in.
 """
+import os
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TEX = ROOT / "paper" / "technical-report.tex"
+# The .tex under test.  Overridable ONLY so tests/gate_p_paper_verifier.py can
+# point this at a mutated COPY and prove the checks go red; the real file is
+# jasonp's prose and is never written by anything in this tree.
+TEX = Path(os.environ.get("VERIFY_TEX") or (ROOT / "paper" / "technical-report.tex"))
 
 failures = []
 checks = 0

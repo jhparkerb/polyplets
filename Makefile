@@ -37,7 +37,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
         gate-compile-db gate-citations gate-docs-index gate-no-copyright-pdfs \
-        gate-l-paper-verifier gate-receipts \
+        gate-l-paper-verifier gate-p-paper-verifier gate-receipts \
         gate-residual-cells gate-cutcount-assembly \
         gate-perimeter-min gate-perimeter-defect \
         gate-perimeter-min-shard clean install \
@@ -56,7 +56,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 # `make gates` does not run, which is the meta-version of the failure two of
 # this week's commits fixed.  A lint wants an allowlist for the deliberate
 # exclusions (papers, install-hooks, compile-commands), so it is its own change.
-GATE_TARGETS = gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-bfiles gate-l-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -280,6 +280,18 @@ gate-receipts:
 # to go red every time. Sub-second, no build deps.
 gate-l-paper-verifier:
 	python3 tests/gate_l_paper_verifier.py
+
+# Gate P-PAPER-VERIFIER: the RED control the human-authored paper's verifier
+# never had.  verify_technical_report.py reports 781 green checks; this
+# perturbs every numeric literal in technical-report.tex, in a copy, and
+# requires the verifier to go red for each -- 199 of 200, the exception being
+# the year on the title page.  Its --selftest runs the same sweep against a
+# stub verifier that always exits 0 and requires every literal to come back
+# unguarded, so a harness that cannot see a verifier checking nothing fails
+# before it can pass anything.  ~30 s.
+gate-p-paper-verifier:
+	python3 tests/gate_p_paper_verifier.py --selftest
+	python3 tests/gate_p_paper_verifier.py
 
 # Gate G1: naive Python oracle vs pinned OEIS fixtures (quick tier, ~3 s)
 gate-g1:
