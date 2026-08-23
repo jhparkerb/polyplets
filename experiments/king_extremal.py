@@ -140,9 +140,14 @@ def hole_count(cells):
 
 def red_controls(counts):
     ok = True
-    good = counts == A006770[:len(counts)]
-    print(f"RED  animal counts reproduce A006770 to n={len(counts)}  "
-          f"{'OK' if good else 'FAILED ' + str(counts)}")
+    # Compare only where the reference reaches: past n = 10 there is no banked
+    # term here, and a shorter reference list must not read as a failed control.
+    m = min(len(counts), len(A006770))
+    good = counts[:m] == A006770[:m]
+    print(f"RED  animal counts reproduce A006770 to n={m}"
+          + (f" (computed to n={len(counts)}; no reference past n={m})"
+             if len(counts) > m else "")
+          + f"  {'OK' if good else 'FAILED ' + str(counts[:m])}")
     ok &= good
 
     line = canon([(i, 0) for i in range(6)])
