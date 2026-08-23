@@ -28,11 +28,13 @@ LINEAR, planted two-family data reports NONLINEAR. They are the same pair
 `dmirror_grand_form.py` uses, so the two scripts cannot disagree silently.
 
 **What it rests on, stated before what it means.** One nontrivial cumulant.
-Levels `k = 0, 1, 2` are pinned on both parities of both families, each with
-**exactly one holdout**, and `c_2` is the last cumulant those levels reach.
-`c_3` needs `k = 3`, which needs five points per parity — `S = 15` and `S = 16`
-— against `S = 14` in flight. So this is the same discriminator that killed the
-sum, applied to the parts, and it is one level deep and no deeper.
+Levels `k = 0, 1, 2` are pinned on both parities of both families and `c_2` is
+the last cumulant those levels reach. The `S = 14` sweep landed at 6 h 38 min
+wall on ayr and raised the even-parity `k = 2` pin from one holdout to **two**;
+the odd side stands at one, and the verdict is unchanged either way. `c_3`
+needs `k = 3`, five points per parity, which is `S = 16` even and `S = 17` odd.
+So this is the same discriminator that killed the sum, applied to the parts,
+and it is one level deep and no deeper.
 
 ## Why the split is cheap
 
@@ -139,15 +141,15 @@ family, then the pinning — are unattempted and now have to be asked of each
 family separately.
 
 **The cost prediction in the enumerator's own docstring is wrong and is
-recorded as wrong.** It says "`S = 14` is minutes". The `S = 14` sweep was
-still running after **four hours** on ayr at 686 MB, single-core, having
-delivered `S = 13`.
+recorded as wrong.** It says "`S = 14` is minutes". Measured: **6 h 38 min**
+single-core on ayr, 686 MB, exit 0. Three more lengths are needed for `c_3`.
 
 ## What is still open
 
 `c_3`, which is the first cumulant that could distinguish "each family has the
 grand form" from "each family agrees with it to second order". It needs
-`S = 15, 16` on this enumerator, i.e. the build above.
+`S = 16` and `S = 17` on this enumerator, against a measured 6 h 38 min for
+`S = 14` — i.e. the build above, not a longer run.
 
 ## Reproduce
 
