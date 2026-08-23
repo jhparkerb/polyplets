@@ -415,21 +415,24 @@ document is the engine's correctness argument rather than a result. The pass
 itself, with the searches it ran, is `docs/priority-passes-2026-08-18.md`.
 
 **The statement is an instance of Fortuin–Kasteleyn.** The random-cluster
-partition function is `Z = Σ_g v^{b(g)} q^{c(g)}` (Fortuin & Kasteleyn 1972),
-and counting connected subgraphs is its `q → 0`, `v = 1` content. The standard
-device for evaluating `q^c` without carrying a connectivity state is the Potts
-*spin* representation — colour each component, count colourings — and §3's
-identity is that device specialised to site clusters and executed in scan
-order. The telescoping of §4 is the correspondence performed cell by cell: `b`
+partition function is `Z = Σ_g v^{b(g)} q^{c(g)}` (Fortuin & Kasteleyn, *Physica*
+57 (1972) 536–564), and counting connected subgraphs is its `q → 0`, `v = 1`
+content. The standard device for evaluating `q^c` without carrying a
+connectivity state is the Potts *spin* representation — colour each component,
+count colourings — which is the usual route to a transfer matrix that never
+carries a connectivity state (Blöte & Nightingale, *Physica A* 112 (1982)
+405–465). §3's identity is that device specialised to site clusters and executed
+in scan order. The telescoping of §4 is the correspondence performed cell by cell: `b`
 ways to reuse a live colour against one birth of weight `q − b`, summing to `q`
 per component. It is not a new theorem and none is claimed.
 
 **Two further antecedents.** The unsigned ancestor of §2's scan-order
-labelling is Hoshen–Kopelman (1976), which assigns cluster labels in one sweep
-with a merge structure. The method this rule is an *alternative* to — carrying
-the connectivity partition of a frontier — is Jensen's lattice-animal
-algorithm (2001), which is the whole reason an independent second source is
-worth building.
+labelling is Hoshen–Kopelman (*Phys. Rev. B* 14 (1976) 3438), which assigns
+cluster labels in one sweep with a merge structure; the model of §2 is its
+signed version. The method this rule is an *alternative* to — carrying the
+connectivity partition of a frontier — is Jensen's lattice-animal algorithm
+(2001), which is the whole reason an independent second source is worth
+building.
 
 **What the searches did not find.** No source states this particular rule: the
 window of `H+1` cells, the liveness convention that makes an expired label
