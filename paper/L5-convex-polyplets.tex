@@ -1,20 +1,25 @@
 \documentclass[11pt]{article}
 
 % ---------------------------------------------------------------------------
-%  L5 — Convex polyplets.
+%  L5 — Convex polyplets, leading term and below.
+%
+%  MERGED 2026-08-23.  L7-subdominant-amplitude.tex was folded in and withdrawn
+%  as a manuscript.  L7 called itself the companion in its own first paragraph,
+%  restated this paper's definition and four-block table verbatim -- label
+%  collision `tab:blocks' included -- quoted three of its results without
+%  reproof, and was advertised in this paper's abstract.  One object, one paper.
+%  docs/l-corpus-contraction.md is the record.
 %  Category L (entirely machine-written); see paper/README.md and
 %  docs/publication-split.md.
 %
 %  N3 COLLISION.  Gouyou-Beauchamps & Leroux, FPSAC 2004, §2.3, have the block
-%  decomposition of \label{lem:blocks} and the mirror equality that now lives in
-%  L7, for convex polyominoes on the honeycomb lattice.
+%  decomposition of \label{lem:blocks} and the mirror equality of
+%  \label{prop:mirror}, for convex polyominoes on the honeycomb lattice.
 %  docs/publication-split.md requires that citation in THREE places, marked
-%  "attribution --- k of n".  Since the L5/L7 split separated the two results,
-%  the placements are: HERE rem:attr1 (at lem:blocks) and the paragraph opening
-%  \label{sec:related}; in L7 rem:attr2 (at prop:mirror) and its own
-%  \label{sec:related} paragraph.  Four placements, none droppable, and the
-%  total must not fall below three.  docs/publication-split.md still describes
-%  the pre-split arrangement and needs jasonp's sign-off to match.
+%  "attribution --- k of n".  The 08-23 merge puts all three back in one file,
+%  which is the arrangement that document describes: rem:attr1 (at lem:blocks),
+%  rem:attr2 (at prop:mirror), and the paragraph opening \label{sec:related}.
+%  None is droppable and the total must not fall below three.
 %  (Labels, not compiled numbers, on purpose: numbering drifts under revision,
 %  labels do not.)
 %
@@ -35,7 +40,7 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\HV}{\mathrm{HV}}
 
-\title{\textbf{Convex polyplets}\\[4pt]
+\title{\textbf{Convex polyplets}\\[2pt]\large the leading term, and what sits under it\\[4pt]
 \large Intractable by area, algebraic by perimeter, and one growth
 constant for every class in between}
 \author{[byline: jasonp's call --- \repo{docs/publication-split.md} \S1]}
@@ -46,8 +51,9 @@ constant for every class in between}
 
 \firstdraftbanner[ One further gate is specific to this paper: the attribution
 to Gouyou-Beauchamps and Leroux (\S\ref{sec:related}) must survive every
-revision, in both of the places it appears here and in both of the places it
-appears in companion paper L7.]
+revision, in all three of the places it appears: the block decomposition, the
+mirror equality, and the related-work section.]
+
 
 \Ldisclosure{%
 \emph{Proposition~\ref{prop:squeeze} (the squeeze) and Lemmas~\ref{lem:blocks},
@@ -86,13 +92,33 @@ only in the narrow form \S\ref{sec:moments} states.
 numerically, with two named gaps (Open Problem~\ref{op:kzeros}).
 \emph{The PSLQ verdicts} --- labelled measurement, stated as falsifiable box
 exclusions and never as ``$\mu$ is transcendental''.
-\emph{The subdominant exponential and the amplitude ratio} --- moved to
-companion paper L7, with their own ledger.
 \emph{Novelty} --- N1 and N2 clean; \textbf{N3 is a real collision}, cited here
-and in L7; \textbf{a second collision} on the area limit law, \S\ref{sec:moments}.
+here; \textbf{a second collision} on the area limit law, \S\ref{sec:moments}.
 The semiperimeter series, the $60$-term area series and the directed-convex area
 series were searched against OEIS on 2026-08-17 and are absent, with a control
 query that hits \oeis{A005436} exactly.
+\emph{Lemma~\ref{lem:T} and Proposition~\ref{prop:split} (the exact split, and
+both rates)} --- proved below, from Fekete's lemma and this paper's
+three-block factorisation. Every step of Lemma~\ref{lem:T} was additionally
+checked against the enumerated block through $n = 16$, against two independent
+oracles, with the slack in each step measured and reported: steps (i) and (iv)
+run about a factor of $2$ from failing and step (vi) a factor of $34$, so the
+check confirms the shape of each step and not its constants
+(\repo{results/l-paper-proof-audit.md}).
+\emph{Propositions~\ref{prop:mirror} and \ref{prop:phi}} --- proved below.
+\emph{Proposition~\ref{prop:ratio} (the amplitude ratio)} --- proved,
+conditional on the two amplitudes existing, which is strictly weaker than
+Conjecture~\ref{conj:sharp}.
+\emph{Conjecture~\ref{conj:sharp}} --- \textbf{a conjecture}, and the paper is
+explicit that the repository has no proof of a sharp asymptotic for \emph{any}
+series in this family.
+\emph{$\nu$, $r$, the Prony spectra, the amplitudes} --- labelled measurement,
+with the trusted digit count itself measured rather than asserted.
+\emph{The PSLQ verdicts} --- labelled measurement, stated as falsifiable box
+exclusions and never as ``$r$ is transcendental''.
+\emph{Novelty} --- the mirror equality is \textbf{a real collision} with
+\cite{gblRoux2004}, which is the same source as the block decomposition's;
+three marked placements carry it.
 \emph{Human verification:} none, as of this draft.}
 
 \begin{abstract}
@@ -135,13 +161,25 @@ By \textbf{semiperimeter} the same class is algebraic, of degree $2$; imposing a
 directedness condition strong enough to cut the population to about $1\%$ raises
 the degree to $4$ and does not leave the algebraic class. Convexity is a
 perimeter lever rather than an area lever, for polyplets as for polyominoes.
+What sits underneath the leading term is the second half of the paper.
+The four-cone-directed subclass splits exactly into an ascending half growing at
+$\mu$ and a descending half growing at a second constant
+$\nu = 2.5145796\dots$, both rates proved, and read by Prony's method the
+directed class's exponential spectrum is the two halves' interleaved. The
+amplitude ratio of the directed and unrestricted classes, previously known only
+as $54$ measured digits, has a closed expression: a ratio of two explicit
+vectors against $\varphi$, the bounded solution of the three-term recurrence
+$\varphi(h) = (2 - x^{h-1})\varphi(h{-}1) - \varphi(h{-}2)$. The same recurrence
+computes $\mu$ by shooting, reaching $987$ digits in $1.6$ seconds with no
+series and no extrapolation, against a $700$-term enumeration plus
+extrapolation for $200$. All four measured exponentials, the negative one
+included, are reciprocals of zeros of the same kernel, which makes the
+subdominant ratio a ratio of two kernel zeros.
 
-What sits underneath the leading term is the subject of companion paper L7,
-\emph{The subdominant exponential and the amplitude ratio of convex
-polyplets}: the four-cone-directed subclass splits into an ascending half growing
-at $\mu$ and a descending half growing at a second constant
-$\nu = 2.5145796\dots$, and the amplitude ratio of the two classes has a closed
-expression.
+What none of this reaches is a sharp asymptotic. The repository has no proof
+that any series in this family satisfies $A(n) \sim C\mu^n$; what the kernel
+changes is that the missing step is now named --- simplicity of the remaining
+poles and control of the tail --- rather than absent.
 \end{abstract}
 
 \tableofcontents
@@ -209,6 +247,10 @@ kernel and its mirror; blocks $(0,0)$ and $(1,1)$ are stacks.}
 \label{tab:blocks}
 \end{table}
 
+The \emph{four-cone-directed} (dir4) condition, which \S\ref{sec:subdominant}
+starts from, restricts the step set further; its effect on this table is
+confined to the $(0,0)$ and $(0,1)$ blocks.
+
 The unbounded state variable is the column height, and the coupling in it is
 the single kernel $\min(h,h')+1$, appearing once in each middle block. That
 kernel is the whole of the king lattice's difference from the square one, where
@@ -262,12 +304,13 @@ upper and lower profiles, with the column state an ordered pair, the transitions
 one-way, the extreme blocks $H_{00}$ and $H_{22}$ identified as \emph{stack}
 polyominoes and the middle blocks as \emph{staircase} polyominoes with
 $H_{02} = Pa = H_{20}$. That is Lemma~\ref{lem:blocks} here, together with
-Lemma~\ref{lem:stacks}'s identification, and the mirror equality that companion
-paper L7 attributes to them, for convex polyominoes on the honeycomb lattice.
+Lemma~\ref{lem:stacks}'s identification, and the mirror equality of
+Proposition~\ref{prop:mirror}, for convex polyominoes on the honeycomb lattice.
 Their square-lattice companion~\cite{lrr1998} reaches the same objects by a
 different route, so 2004 is the source to cite. What is not theirs: the king
 lattice, where their middle kernel $\min(h,h')$ becomes $\min(h,h')+1$; a class
-with no exact solution; and what Proposition~\ref{prop:squeeze} and L7 do with
+with no exact solution; and what Proposition~\ref{prop:squeeze} and
+\S\ref{sec:subdominant} do with
 the blocks.
 \end{remark}
 
@@ -758,24 +801,459 @@ on the hexagonal one. Second, the sequence counts row-convex
 \emph{polyplets}; column-convex polyplets are the transpose and give the same
 counts.
 
+% ===========================================================================
+\section{The subdominant structure}
+\label{sec:subdominant}
+
+The squeeze settles the leading term and says nothing about the corrections,
+which is where the four-cone class differs from the unrestricted one.
+Table~\ref{tab:blocks} locates the corrections too: of the four diagonal blocks,
+exactly two carry exponential weight standalone.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{c l l}
+\toprule
+block & unrestricted & under the four-cone condition \\
+\midrule
+$(0,0)$ & sub-exponential (L5, stack bound) & still sub-exponential \\
+$(1,0)$ & staircase, growth $\mu = 3.1289\dots$ & untouched \\
+$(0,1)$ & mirror staircase, growth $\mu$ & \textbf{truncated, growth $\nu = 2.5146\dots$} \\
+$(1,1)$ & sub-exponential (L5, stack bound) & untouched \\
+\bottomrule
+\end{tabular}
+\caption{The truncated $(0,1)$ block is the exception, and the only one.}
+\label{tab:subdom}
+\end{table}
+
+The truncated $(0,0)$ block stays sub-exponential for a \emph{different} reason
+from the stack bound: with $h' \ge h$, the entry count
+$\min(2, h'-h+1)$ is $2$ only at a strict rise, strict rises take distinct
+heights, so there are at most $\sqrt{2n}$ of them and the weight is at most
+$2^{\sqrt{2n}}$. The truncated $(0,1)$ block is not height-monotone ($h' \le
+h$ at weight $2$, $h' = h+1$ at weight $1$, $h' > h+1$ forbidden), so heights
+can climb one row at a time and the stack bound does not apply. Counted
+by area it is
+\[
+  T(n) \;=\; 1,\, 3,\, 8,\, 21,\, 54,\, 138,\, 350,\, 885,\, 2233,\, 5626,\, \dots
+\]
+with no OEIS match on ten terms. (Its six-term prefix collides with
+\oeis{A127358} and two others, all of which diverge by $n = 9$: $2230$ against
+$2233$.)
+
+\subsection{The two rates}
+
+Partition the four-cone class by whether an animal's phase path ever visits
+$(0,1)$:
+\[
+  D(n) \;=\; D_{\mathrm{asc}}(n) + D_{\mathrm{desc}}(n).
+\]
+
+\begin{lemma}
+\label{lem:T}
+$\lim_n T(n)^{1/n}$ exists. Write $\nu$ for it.
+\end{lemma}
+
+\begin{proof}
+Let $T_h(n)$ count runs whose first column has height $h$, and write
+$T_1 = T_{h=1}$.
+(i) $T(n) \ge 2T(n{-}1)$: append a height-$1$ column, which the truncated kernel
+admits at weight $2$ from any height.
+(ii) $T_h(n) \le 2T(n{-}h)$: delete the first column, the step out of it having
+weight at most $2$. With (i), $T_h(n) \le 2^{2-h}T(n{-}1)$, so
+$\sum_{h\ge4}T_h(n) \le T(n{-}1)/2 \le T(n)/4$ and
+$T(n) \le 4\max_{h\le3}T_h(n)$.
+(iii) $T_h(n) \le T_1\bigl(n + h(h{-}1)/2\bigr)$: prepend the climb
+$1,2,\dots,h{-}1$, every step of which is the weight-$1$ transition $h' = h+1$;
+for $h \le 3$ that costs at most $3$. So $T(n) \le 4T_1(n{+}3)$.
+(iv) $T_1(i)T_1(j) \le T_1(i{+}j)$: join two runs that both start at height $1$
+by the step ``last height $\to 1$'', weight $2$; the pair is recovered from the
+join and the prefix area.
+Fekete gives $\lim T_1(n)^{1/n} = \sup_n T_1(n)^{1/n}$, and
+$T_1 \le T \le 4T_1(\cdot{+}3)$ squeezes $T$ onto the same limit.
+\end{proof}
+
+\begin{proposition}
+\label{prop:split}
+$\lim_n D_{\mathrm{asc}}(n)^{1/n} = \mu$ and
+$\lim_n D_{\mathrm{desc}}(n)^{1/n} = \nu$.
+\end{proposition}
+
+\begin{proof}
+$D_{\mathrm{asc}} \ge M$ termwise: a staircase polyplet has $d \ge 0$ and
+$d \ge s$ at every step, so it can never enter $(0,1)$, which needs $d \le 0$
+and $d < s$. With $D_{\mathrm{asc}} \le D$ and the squeeze, the first claim follows.
+
+For the second, the three-block factorisation with $T$ in place of $M$
+gives $D_{\mathrm{desc}}(n) \le 2(n{+}1)^4E(n)^2C_\varepsilon(\nu+\varepsilon)^n$,
+so $\limsup D_{\mathrm{desc}}(n)^{1/n} \le \nu$. Conversely take a $T$-run of
+area $m$ whose first column is $[0,h{-}1]$ and prepend the column $[0,h]$: the
+joining step has $d = 0 \le 0$ and $s = 1 > d$, so it enters $(0,1)$, the run's
+own steps keep it there, and the result is a (dir4, HV-convex) animal of area
+$m + h + 1$. Restricting to $h = 1$ gives $D_{\mathrm{desc}}(n) \ge T_1(n{-}2)$,
+so $\liminf D_{\mathrm{desc}}(n)^{1/n} \ge \nu$ by Lemma~\ref{lem:T}.
+\end{proof}
+
+Measured,
+\begin{quote}\small
+$\nu = 2.5145796438787291885104371943430998201410308559007832719354957107238\\
+4099229632690389299337761749953732175539964789209170137762869374741150849461805388232$
+\end{quote}
+to $153$ trusted digits by the conservative extrapolation and $242$ by Prony's
+method on the same terms.
+
+\subsection{The Prony spectrum}
+
+Reading the exponential spectrum of each $700$-term series by Prony's method:
+solve for the constant-coefficient recurrence the tail obeys best and take the
+roots of its characteristic polynomial, so every $\lambda_i$ is measured in one
+solve, with no peeling and no assumed model:
+
+\begin{table}[H]
+\centering\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l l l l l}
+\toprule
+series & $\lambda_1$ & $\lambda_2$ & $\lambda_3$ & $\lambda_4$ \\
+\midrule
+staircase & $3.12894326973088\dots$ & $1.50504922775900\dots$ & $1.28433727098118\dots$ & $-1.25776216033063\dots$ \\
+HV-convex & same & same & same & same \\
+$D_{\mathrm{asc}}$ & same & same & same & same \\
+block $T$ & $2.51457964387872\dots$ & $1.43040460381247\dots$ & $1.24846593371011\dots$ & $1.17441805313317\dots$ \\
+$D_{\mathrm{desc}}$ & same & same & same & same \\
+$D$ = dir4 & $3.12894326973088\dots$ & $2.51457964387872\dots$ & $1.50504922775900\dots$ & $1.43040460381247\dots$ \\
+\bottomrule
+\end{tabular}
+\caption{$D$'s spectrum is the other two interleaved, and the interleaving
+continues past $\lambda_4$. Agreements run to $310$, $246$ and $236$ digits on
+the leading claims, each against the weaker of the two trusted counts.}
+\label{tab:prony}
+\end{table}
+
+Two negative controls are required to fail, and do: the block's $\lambda_1$ and
+$\lambda_2$ match no root of $D_{\mathrm{asc}}$, to $0$ and $1$ digits, and the
+staircase's $\lambda_2$ matches no root of $D_{\mathrm{desc}}$, to $1$.
+
+\subsection{The spectrum is the kernel's zero set}
+\label{sec:kernelspectrum}
+
+Prony's method measures those exponentials without any model. There is a model,
+and it accounts for all four.
+
+Section~\ref{sec:kernel} solves the
+area-refined functional equation by Temperley's method and reduces the
+generating function to $c_0 + c_1\alpha/K$, meromorphic on the unit disc with
+poles only at zeros of $K$ and of a $2\times2$ determinant. The leading
+exponential is $1/q_1$ with $q_1$ the smallest positive zero of $K$. The rest
+of the spectrum is the rest of the zeros:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l l}
+\toprule
+measured by Prony & zero of $K$ & $1/q$ \\
+\midrule
+$\lambda_1 = 3.12894326973088\dots$ & $q_1 = 0.3195967180593874655$ & $3.128943269730886252$ \\
+$\lambda_2 = 1.50504922775900\dots$ & $q_2 = 0.6644300940833578092$ & $1.505049227759003935$ \\
+$\lambda_3 = 1.28433727098118\dots$ & $q_3 = 0.7786116798090276394$ & $1.284337270981181429$ \\
+$\lambda_4 = -1.25776216033063\dots$ & $q_4 = -0.7950628755893912422$ & $-1.257762160330635483$ \\
+\bottomrule
+\end{tabular}
+\caption{Agreement to every digit Table~\ref{tab:prony} prints, and to $39$ on
+$\lambda_1$. $\lambda_4$ is negative, so it can only come from a negative zero;
+the certification work scanned the positive axis only and never saw it.}
+\label{tab:kernelzeros}
+\end{table}
+
+Two consequences. The subdominant ratio $\rho = \lambda_2/\lambda_1$ of
+Table~\ref{tab:tableB} is $q_1/q_2$, a ratio of two kernel zeros rather than a
+measured decimal. And the sign in $\lambda_4$, which a coefficient-level reading
+can only record, is the sign of a zero.
+
+This does \emph{not} prove Conjecture~\ref{conj:sharp}. A
+meromorphic function with poles at $q_1, q_2, \dots$ gives the stated expansion
+once one knows the poles are simple, that nothing else contributes, and that the
+tail is controlled; the first is certified at $q_1$ and the rest is the analytic
+bookkeeping L5 states as an open problem. The conjecture's \emph{shape} is now
+explained; its status is unchanged.
+
+\subsection{Amplitudes and error terms}
+\label{sec:notbuy}
+
+\begin{conjecture}
+\label{conj:sharp}
+$D_{\mathrm{asc}}(n) = C\mu^n(1 + O(\rho^n))$ with $\rho = 0.48100879370959\dots$
+and $D_{\mathrm{desc}}(n) = C'\nu^n(1 + O(\sigma^n))$ with
+$\sigma = 0.568844421888\dots$, where $C = 0.4503031857123411823536\dots$ and
+$C' = 2.5795006951239199769\dots$
+\end{conjecture}
+
+Granting it, $D(n) = C\mu^n + C'\nu^n + O((\mu\rho)^n + (\nu\sigma)^n)$ with
+$\mu\rho = 1.50504\dots$ and $\nu\sigma = 1.43040\dots$, both below $\nu$, so the
+subdominant exponential of $D$ is exactly $\nu$.
+
+The gap is not peculiar to the subdominant. The repository has no proof that
+\emph{any} series in this family has a sharp asymptotic at all:
+the squeeze and staircase supermultiplicativity give exponential
+rates, never $A(n) \sim C\mu^n$, and the tabulated amplitudes are all measured, none derived. Asking for the second
+exponential as a theorem is asking for strictly more than is known about the
+first.
+
+A route exists and it is specific. The \oeis{A225114} entry carries a
+\emph{conjectured} continued fraction (Kurkov, September 2024),
+\[
+  \text{g.f.} = \cfrac{1}{2 - \cfrac{1}{1 - \cfrac{x}{1 - \cfrac{x}{1 - \cfrac{x^2}{1 - \cfrac{x^2}{1 - \cdots}}}}}},
+\]
+whose depth-$24$ convergent reproduces $41$ terms and whose poles, as $1/x$,
+land on the measured staircase spectrum, to $30$, $27$, $14$ and $16$ digits on
+$\lambda_1,\dots,\lambda_4$, improving with depth. A proof of that continued
+fraction would supply the meromorphic continuation and the spectral gap that a
+coefficient-level argument cannot reach.
+
+\subsection{The \texorpdfstring{$d_n/d_{n-1}$}{d\_n/d\_\{n-1\}} diagnostic}
+
+The two series share their subdominant correction; the four-cone series carries
+an extra exponential in front of it, which the diagnostic reports instead:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l l}
+\toprule
+series & $d_n/d_{n-1}$ & identification \\
+\midrule
+HV-convex, staircase & $0.481008794$ & $\lambda_2/\lambda_1$, the staircase block's own correction \\
+$D_{\mathrm{asc}}$ & $\mathbf{0.48100879371}$ & the same one \\
+$D_{\mathrm{desc}}$, block $T$ & $0.568844421888$ & the block's own correction \\
+(dir4, HV-convex) & $0.803651401483$ & $\nu/\mu$, the \emph{extra} exponential in front \\
+\bottomrule
+\end{tabular}
+\caption{The restricted series has an extra exponential in front of the shared
+one, and the $d_n/d_{n-1}$ diagnostic reports only the largest correction
+present.}
+\label{tab:tableB}
+\end{table}
+
+The second row is measured on four-cone-directed animals directly, with no
+peeling and no annihilator. Deleting the descending half stops the $2.5146$ from
+polluting the extrapolation, and the same run's $\mu$ rises from $51$ trusted
+digits to $200$.
+
+This rules out a bijection between the two classes: a bijection would have to
+account for a half of one side, growing at $\nu$, with no counterpart on the
+other.
+
+\section{The amplitude ratio}
+\label{sec:amplitude}
+
+The ratio $r = C_{\text{dir4}}/C_{\HV}$ was for a long time just a measured
+decimal. It has a closed expression.
+
+\begin{proposition}[the mirror halves]
+\label{prop:mirror}
+Partition the HV-convex animals by which middle phase their path visits. Then
+$A_{(1,0)}(n) = A_{(0,1)}(n)$ for every $n$, and the remainder, the paths
+$(0,0)\to(1,1)$, is sub-exponential. Hence if $C_{\HV} = \lim A(n)/\mu^n$
+exists, $C_{\HV} = 2\,C(A_{(1,0)})$.
+\end{proposition}
+
+\begin{proof}
+The vertical mirror $[b(j),t(j)] \mapsto [-t(j),-b(j)]$ is an area-preserving
+involution of the class that leaves every column height alone. It carries
+$d(j) = b(j{+}1)-b(j)$ to $-(t(j{+}1)-t(j))$, so ``$b$ has risen'' becomes
+``$t$ has fallen'': the phase bits swap. Phases $(0,0)$ and $(1,1)$ are fixed
+and $(1,0)\leftrightarrow(0,1)$, so the involution is a bijection between the
+first two parts. The remainder factors as a phase-$(0,0)$ block joined to a
+phase-$(1,1)$ block at one step, both stacks by the stack bound, so it is
+at most $(n{+}1)^2E(n)^2 = \mu^{o(n)}$.
+\end{proof}
+
+\begin{remark}[attribution --- 2 of 3]
+\label{rem:attr2}
+The mirror equality of the two middle blocks is Gouyou-Beauchamps and Leroux's
+$H_{02} = Pa = H_{20}$ in the convex-polyomino setting~\cite{gblRoux2004}; see
+\S\ref{sec:related}. This proposition adds the factor
+$\tfrac12$ and the sub-exponential bound on the remainder.
+\end{remark}
+
+\begin{proposition}[the staircase eigenvector is a three-term recurrence]
+\label{prop:phi}
+Let $T(x)_{h,h'} = x^{h'}(\min(h,h')+1)$ for $h,h' \ge 1$ be the staircase
+block's operator, and let $\varphi$ solve
+\[
+  \varphi(0) = 1, \quad \varphi(1) = 2, \quad
+  \varphi(h) = \bigl(2 - x^{h-1}\bigr)\varphi(h{-}1) - \varphi(h{-}2)
+  \quad (h \ge 2).
+\]
+For $0 < x < 1$: $T(x)\varphi = \varphi$ if and only if
+$\varphi(h) - \varphi(h{-}1) \to 0$; that happens at exactly one $x = x_c$; and
+$x_c = 1/\mu$.
+\end{proposition}
+
+\begin{proof}
+Write $Q(h) = \sum_{h'>h}x^{h'}\varphi(h')$. Splitting $T(x)\varphi = \varphi$
+at $h' = h$ gives $\varphi(h) = \sum_{h'\le h}x^{h'}(h'{+}1)\varphi(h') +
+(h{+}1)Q(h)$; differencing once gives
+$\varphi(h)-\varphi(h{-}1) = x^h\varphi(h) + Q(h)$, and differencing again gives
+the recurrence. Conversely, \emph{define}
+$Q(h) := \varphi(h)-\varphi(h{-}1)-x^h\varphi(h)$ from the recurrence's
+solution; the second difference makes $Q(h{-}1)-Q(h) = x^h\varphi(h)$ an
+identity, so $Q(h) = Q(\infty) + \sum_{h'>h}x^{h'}\varphi(h')$ and the
+eigenvector equation holds exactly when $Q(\infty) = 0$. Since $x < 1$ the
+recurrence's coefficient tends to $2$ and its solution space is spanned by one
+asymptotically constant and one asymptotically linear solution; $Q(\infty) = 0$
+says the linear one is absent, one analytic condition on $x$.
+
+At such an $x$, $\varphi$ is positive: the differences
+$\delta(h) = \varphi(h)-\varphi(h{-}1)$ obey
+$\delta(h) = \delta(h{-}1) - x^{h-1}\varphi(h{-}1)$ with $\delta(1) = 1$, so
+$\delta$ strictly decreases while $\varphi > 0$, and $\delta(h) \to 0$ forces
+$\delta > 0$ throughout: $\varphi$ increases from $2$ to $2.5374225302\dots$
+$T(x)$ is positive and compact on $\{f : |f(h)| \le C(1+h)\}$, so by
+Krein--Rutman~\cite{kreinRutman1948} a positive eigenvector's eigenvalue is the
+spectral radius. The staircase generating function is
+$M(x) = v_0(x)(I-T(x))^{-1}\mathbf 1$ with $v_0(h) = x^h$, of radius $1/\mu$,
+and the spectral radius of $T(x)$ increases continuously in $x$, so it reaches
+$1$ at $x = 1/\mu$.
+\end{proof}
+
+Shooting on that recurrence computes $\mu$ to arbitrary precision in
+$O(h_{\max})$ operations, with no series and no extrapolation: it reproduces
+all $199$ banked digits, continues past them, and reaches $987$ digits in
+$1.6$ seconds on one core, against a $700$-term enumeration plus extrapolation
+for $200$.
+
+\begin{proposition}[the ratio]
+\label{prop:ratio}
+Write $U(h,h') = h'-h+1$ and $U_4(h,h') = \min(2, h'-h+1)$ for $h' \ge h$ (the
+$(0,0)$ block, unrestricted and four-cone-truncated), $L(h,h') = \min(h,h'{+}1)$
+(the map $(0,0)\to(1,0)$, and also $(0,0)\to(0,1)$, the same matrix, which is
+Proposition~\ref{prop:mirror} at the operator level), each carrying $x^{h'}$,
+and
+\[
+  w = v_0(I-U)^{-1}L, \qquad w_4 = v_0(I-U_4)^{-1}L,
+  \qquad\text{evaluated at } x_c .
+\]
+If $C(D_{\mathrm{asc}}) = \lim D_{\mathrm{asc}}(n)/\mu^n$ and
+$C_{\HV} = \lim A(n)/\mu^n$ exist, then
+\begin{equation}
+  r \;=\; \frac{C_{\text{dir4}}}{C_{\HV}}
+    \;=\; \frac12\cdot\frac{w_4\cdot\varphi}{w\cdot\varphi} .
+  \label{eq:ratio}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The phase automaton makes the path decomposition exact as generating functions:
+$A_{(1,0)}(x) = w(x)(I-T(x))^{-1}q(x)$ with
+$q = 1 + L_{(1,0)\to(1,1)}(I-T_{(1,1)})^{-1}\mathbf 1$, and
+$D_{(1,0)}(x) = w_4(x)(I-T(x))^{-1}q(x)$ with the \emph{same} $T$ and the
+\emph{same} $q$: the four-cone floor bites only inside the $(0,0)$ block,
+since every step out of $(1,0)$ and every step within $(1,1)$ already has
+$d \ge 0$. The $(0,0)$ and $(1,1)$ blocks are stacks
+(L5, stack bound), so $w$, $w_4$ and $q$ are finite at $x_c$. By
+Proposition~\ref{prop:phi} and Krein--Rutman the pole of $(I-T(x))^{-1}$ at
+$x_c$ is simple with rank-one residue $\varphi\psi^{\mathsf T}/\langle\psi,
+\varphi\rangle$, so the two limits
+$\lim_{x\to x_c^-}(1-\mu x)A_{(1,0)}(x)$ and
+$\lim_{x\to x_c^-}(1-\mu x)D_{(1,0)}(x)$ are $N(w\cdot\varphi)$ and
+$N(w_4\cdot\varphi)$ with the same $N$, which cancels. If the amplitudes exist
+then Abel's theorem identifies those limits with $C(A_{(1,0)})$ and
+$C(D_{(1,0)})$. Finally $C_{\HV} = 2C(A_{(1,0)})$
+(Proposition~\ref{prop:mirror}) and $C_{\text{dir4}} = C(D_{(1,0)})$, the
+$D_{\mathrm{desc}}$ and ``via neither'' parts being $o(\mu^n)$ by
+Proposition~\ref{prop:split} and the stack bound.
+\end{proof}
+
+The hypothesis is strictly weaker than Conjecture~\ref{conj:sharp}, which asks
+for the error terms as well. Equation~\eqref{eq:ratio} settles what a closed form would have to look like: a ratio of two $q$-series in $q = 1/\mu$, both computed
+by $O(h_{\max})$ prefix-sum recurrences, with
+$w\cdot\varphi = 1.29770192341040021939895\dots$ and
+$w_4\cdot\varphi = 1.19935960397018718067118\dots$
+
+\subsection{Three determinations of \texorpdfstring{$r$}{r}}
+
+\begin{quote}\small
+$r$, $251$ trusted digits:\\[2pt]
+\texttt{0.4621090492099424400356623877003058328411634397299804247065092921445}\\
+\texttt{22950511444483541019804848618234062089755257041466533204384387638170139}\\
+\texttt{068144091014356289934131553812178862045404673728300959682539208197483810}\\
+\texttt{09549588646431928574874902351771539511812}
+\end{quote}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l r}
+\toprule
+route & own cross-check & trusted \\
+\midrule
+$D/A$ extrapolated & raw vs Aitken, $n=600$ vs $700$ & 54 \\
+$D_{\mathrm{asc}}/A$ extrapolated & raw vs Aitken, $n=600$ vs $700$ & 185 \\
+identity~\eqref{eq:ratio} & $h_{\max}$ $1200$ vs $1000$ & 492 \\
+\bottomrule
+\end{tabular}
+\caption{Three determinations of $r$.}
+\label{tab:ratio}
+\end{table}
+
+The extrapolation and the identity agree to $293$ digits, and the two routes
+share no arithmetic: the identity comes from an exact operator factorisation,
+the extrapolation touches no operator at all. The first row reproduces the
+historical $54$-digit figure character for character, which makes it the control
+on the method; the $185$ of the second row is bought by the phase split.
+
+Negative controls, all required to fail and doing so: dropping the factor
+$\tfrac12$ agrees with the measurement to $0$ digits; truncating the $(0,0)$
+block at $\min(3,\cdot)$ instead of $\min(2,\cdot)$ agrees to $1$; and the
+$\varphi$ recurrence at $x = 1/3.13$ fails its own eigen-equation at $10^{-2}$
+where $x_c$ gives $10^{-528}$.
+
+\subsection{Is \texorpdfstring{$r$}{r} algebraic?}
+\label{sec:ralg}
+
+At $251$ digits, no integer relation in any in-capacity box:
+\[
+  \text{degree} \le 30 \text{ at height} \le 10^4, \;\le 20 \text{ at } 10^5,
+  \;\le 10 \text{ at } 10^{11}, \;\le 5 \text{ at } 10^{20},
+  \;\le 3 \text{ at } 10^{30}, \;\le 2 \text{ at } 10^{40}.
+\]
+Nor over $\Q(\mu)$, the natural field since $\mu$ is the constant both series
+share: $\mu$-degree $\le 5$ with $r$-degree $\le 6$ at height $\le 10^2$, and
+three further boxes. A positive control runs on every pass: $(1+\sqrt2)/3$
+must be found at degree $2$, and is.
+
+$\mu$'s own arithmetic status limits how much this can mean. There is no
+proof that $\mu$ is irrational, let alone transcendental, so $\Q(\mu)$ is a
+field of unknown degree and ``algebraic over $\Q(\mu)$'' cannot be settled
+either way by any argument available here. What \eqref{eq:ratio} contributes is
+a reason to expect the answer to be no: $r$ is a ratio of two $q$-series
+evaluated at $q = 1/\mu$, and $\mu$ is itself the reciprocal of the zero of an
+entire $q$-function (Proposition~\ref{prop:phi}), the same shape as Kurkov's
+conjectured continued fraction.
+
+% ===========================================================================
 \section{Relation to existing work}
 \label{sec:related}
 
-\paragraph{Attribution --- 2 of 2.} The block decomposition of
-Lemma~\ref{lem:blocks}, and the identification of the extreme blocks as stacks
-and the middle blocks as staircases, are present in Gouyou-Beauchamps and
-Leroux~\cite{gblRoux2004}, \S2.3, for convex polyominoes on the honeycomb
-lattice. Their square-lattice companion~\cite{lrr1998} reaches the same objects
-by a different route, through partitions, stacks, shifted stacks and directed
-convex via Temperley and Bousquet-M\'elou, so~\cite{gblRoux2004} is the source
-to cite for the decomposition itself. The third placement that
-\repo{docs/publication-split.md} requires sits with the mirror equality, in
-companion paper L7.
 
-What is not theirs, and is claimed here: the king lattice, where the
-middle kernel is $\min(h,h')+1$ rather than $\min(h,h')$ and neither class is
-exactly solved; and the squeeze over \emph{every} intermediate class
-(Proposition~\ref{prop:squeeze}).
+\paragraph{Attribution --- 3 of 3.} Two of this paper's structural results are
+Gouyou-Beauchamps and Leroux's~\cite{gblRoux2004}, \S2.3, for convex
+polyominoes on the honeycomb lattice. The block decomposition of
+Lemma~\ref{lem:blocks}, with the extreme blocks identified as stacks and the
+middle ones as staircases, is theirs; so is the mirror equality of
+Proposition~\ref{prop:mirror}, their $H_{02} = Pa = H_{20}$, which sits inside
+that same decomposition. Their square-lattice companion~\cite{lrr1998} reaches
+the same objects by a different route, through partitions, stacks, shifted
+stacks and directed convex via Temperley and Bousquet-M\'elou,
+so~\cite{gblRoux2004} is the source to cite for both. The other two placements
+\repo{docs/publication-split.md} requires are Remarks~\ref{rem:attr1}
+and~\ref{rem:attr2}, at the two results themselves.
+
+What is not theirs, and is claimed here: the king lattice, where the middle
+kernel is $\min(h,h')+1$ rather than $\min(h,h')$ and neither class is exactly
+solved; the squeeze over \emph{every} intermediate class
+(Proposition~\ref{prop:squeeze}); the exponential split and its two proved rates
+(Lemma~\ref{lem:T}, Proposition~\ref{prop:split}); the eigenvector recurrence
+and the shooting method (Proposition~\ref{prop:phi}); and the amplitude-ratio
+identity (Proposition~\ref{prop:ratio}).
 
 \paragraph{The square-lattice analogue.} Bender's $2.30914$~\cite{bender1974} for
 convex polyominoes by area, and the parallelogram subclass \oeis{A006958}
@@ -795,8 +1273,8 @@ convex-polyomino $q$-differential system~\cite{bousquetMelouFedou1995}, whose
 denominator is the Klarner--Rivest function~\cite{klarnerRivest1973} that our
 control arm reproduces to certified precision. The certified interval treatment
 of the constants, the negative zero, and the identification of the measured
-exponential spectrum with the kernel's zero set (companion paper L7) were not
-found in the literature searched.
+exponential spectrum with the kernel's zero set (\S\ref{sec:subdominant})
+were not found in the literature searched.
 
 \paragraph{Area moments.} Richard~\cite{richard2007} and Enting and
 Guttmann~\cite{entingGuttmann1989} hold the area limit law for convex polygons,
@@ -809,7 +1287,14 @@ have removed is worse than the omission it papers over.
 \oeis{A187077} by Temperley's method~\cite{temperley1956}, together with a
 correction to that entry's comment.
 
+\paragraph{The continued fraction.} The \oeis{A225114} entry carries a
+conjectured continued fraction due to Kurkov (September 2024), quoted in
+\S\ref{sec:notbuy}. It is the most concrete route to the meromorphic
+continuation that a proof of Conjecture~\ref{conj:sharp} needs.
+
+% ===========================================================================
 \section{Open problems}
+\label{sec:open}
 
 \begin{openproblem}[a sharp asymptotic, for anything in this family]
 Prove $A(n) \sim C\mu^n$, or the same for $M(n)$. Proposition~\ref{prop:squeeze}
@@ -821,7 +1306,7 @@ the amplitude's value but the analytic bookkeeping around it --- that the
 remaining singularities of the kernel quotient are strictly farther out and that
 the tail they contribute is $O(\rho^n)$. A second route, independent of the
 kernel, is a proof of Kurkov's conjectured continued fraction for
-\oeis{A225114}; companion paper L7 states what would follow from it.
+\oeis{A225114}; \S\ref{sec:notbuy} states what would follow from it.
 \end{openproblem}
 
 \begin{openproblem}[the zeros of $K$, and a route to non-D-finiteness]
@@ -851,8 +1336,52 @@ class is not by height. Open Problem~\ref{op:kzeros} is the more promising
 route.
 \end{openproblem}
 
+\begin{openproblem}[a sharp asymptotic, for anything in this family]
+Prove $A(n) \sim C\mu^n$, or the same for $M(n)$. Nothing in either paper
+reaches it, and Conjecture~\ref{conj:sharp} depends on it. Two routes are now
+concrete rather than one: the kernel of \S\ref{sec:kernelspectrum}, which needs
+simplicity of the poles beyond $q_1$ and a controlled tail, and a proof of
+Kurkov's conjectured continued fraction for \oeis{A225114}, which would supply
+the meromorphic continuation and the spectral gap by a different road.
+\end{openproblem}
+
+\begin{openproblem}[does the second pole family explain $\nu$?]
+\label{op:det}
+The descending half's spectrum, $2.51457964$, $1.43040460$, $1.24846593$ and
+$1.17441805$, appears nowhere in Table~\ref{tab:kernelzeros}. But $K$ is only
+one of the two factors that can vanish: the solution's $2\times2$ determinant is
+the other, and its zeros are a second pole family nobody has scanned. If $\nu$
+is the reciprocal of the smallest of them, both halves of the interleaving in
+Table~\ref{tab:prony} have one mechanism and this paper's central observation
+becomes a statement about two zero sets rather than about two measurements.
+
+Attempted here and \emph{not} settled: building the determinant as a truncated
+$q$-series with the solver's own arithmetic and scanning it gives a smallest
+positive zero that moves with the truncation order ($1.2433$ at $24$ terms,
+no sign change at all at $32$, $1.1794$ at $40$ and $48$) and returns the
+same value for the king and the control, which cannot be right. The
+determinant's zeros need a construction that converges, not a longer scan of
+this one. \repo{experiments/convex\_det\_zeros.py} is the negative attempt,
+kept so the next one starts after it rather than before.
+\end{openproblem}
+
+\begin{openproblem}[the block series $T$]
+$1, 3, 8, 21, 54, 138, 350, 885, 2233, 5626, \dots$ has no OEIS match and no
+conjectured form. It is the truncated $(0,1)$ block, its growth constant $\nu$
+is the subdominant exponential of the four-cone class, and it deserves the same
+treatment \oeis{A225114} has had.
+\end{openproblem}
+
+\begin{openproblem}[is $r$ algebraic over $\Q(\mu)$?]
+\S\ref{sec:ralg} excludes boxes and nothing more. Since $\mu$ is not known to be
+irrational, $\Q(\mu)$ is a field of unknown degree and the question cannot be
+settled either way by any argument available here.
+\end{openproblem}
+
+% ===========================================================================
 \section{Reproduction}
 \label{sec:repro}
+
 
 \begin{table}[H]
 \centering\small
@@ -880,6 +1409,29 @@ paper proof above or a Lean theorem; everything in this table is a measurement
 or a reproduction of one.}
 \label{tab:repro}
 \end{table}
+
+
+The subdominant half's own checks:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}l R{0.56\textwidth}@{}}
+\toprule
+claim & check \\
+\midrule
+the block series $T$ & \repo{experiments/dir4\_descent\_block.py}, \repo{experiments/descent\_block\_oracle.py} \\
+Table~\ref{tab:prony} & \repo{experiments/prony\_spectrum.py} \\
+Propositions~\ref{prop:phi}--\ref{prop:ratio} & \repo{experiments/amplitude\_feed\_vectors.py} \\
+the PSLQ boxes for $r$ & \repo{experiments/amplitude\_pslq.py} \\
+$\nu$ and the amplitudes & \repo{experiments/convex\_growth.py} \\
+the series this paper reads & \texttt{make build/convex\_area\_tm} \\
+\bottomrule
+\end{tabular}
+\caption{Where each claim is checked. Every proof-relevant item is a paper proof
+above; everything in this table is a measurement or a reproduction of one.}
+\label{tab:repro2}
+\end{table}
+
 
 \bibliographystyle{plain}
 \bibliography{shared/refs}
