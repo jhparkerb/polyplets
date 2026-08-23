@@ -2,6 +2,23 @@
 > making the L papers read as human prose. Written for jasonp to edit; execution
 > resumes from this file post-/clear. Deliberately uncommitted until he has
 > marked it up.
+> **CAMPAIGN CLOSED 2026-08-23.** Five rounds ran. Four of the six tracked
+> constructions — cleft, serves-as, scaffold, dash-aside — are at or near zero
+> across the whole corpus, and dash-asides, the worst marker at 2.20/1k when the
+> ruler was frozen, finished at **0.16/1k against the P control's 0.40**. The
+> two that remain, contrastive negation and short-declarative cadence, are the
+> case round 5 was written for: read in context, most of what those regexes
+> catch is carrying a value or an epistemic status rather than a habit, and this
+> plan's own warning is that "rewriting to hit numbers produces flat mush, which
+> is the failure mode this phase exists to avoid". So the campaign ends on its
+> own criterion rather than on a number.
+>
+> `density.py` stays: it is the ruler, it enumerates the corpus rather than a
+> frozen list, and it is worth running over new prose. What ends is the
+> round-by-round rewriting. The 2026-08-23 contraction
+> (`docs/l-corpus-contraction.md`) merged four manuscripts into their partners,
+> and the connective prose written for those merges was measured and fixed the
+> same day: two paired-dash asides introduced, two removed.
 
 # A proscription on model usage
 

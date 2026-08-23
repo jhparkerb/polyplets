@@ -1,6 +1,21 @@
 > **NOTE: authored by Claude at jasonp's direction, 2026-08-07.** This is the
 > working agreement for a review campaign, not a result.
 
+> **CAMPAIGN CLOSED, and its gate retired, 2026-08-23.** All five phases ran
+> and are recorded in this directory; `STATE.md` has the commit trail.
+> `scripts/l_trim_gate.sh` is **deleted**. It was never wired into `make` or
+> into a hook — it existed to stand between a phase and a commit, and there are
+> no more phases — and by 2026-08-23 two of the six manuscripts its baseline
+> names were gone (`L2-ternary-spine`, merged away that day, and
+> `L5-convex-king-animals`, renamed earlier), while `paper/verify_l_papers.py`
+> sat in its checksummed `FROZEN` list and had to change to admit the coverage
+> audit. It had been reporting RED at `HEAD` for a stale-baseline reason since
+> before `docs/reviews/llm-tics/round5-L6.md` recorded it. A permanently red unwired
+> gate teaches a reader to ignore red, which is worse than not having it.
+> `baseline.tsv` stays as this campaign's record of what the papers were.
+> The references to the gate throughout these ledgers are history and are
+> accurate as history. `docs/l-corpus-contraction.md` is what happened next.
+
 # The L-paper trim campaign
 
 Two agents argue about every line of the six L papers. One argues for removal,
