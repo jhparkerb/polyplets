@@ -14,22 +14,21 @@ decomposition is clean exactly above the onset, which is not a coincidence:
 `results/dmirror-onset-sharp.md` measured that onset at `2k+2` (even) and
 `2k+3` (odd) the same day, from entirely different reasoning.
 
-**One family passes the test the sum fails; the other does not.** The
-discriminator is the first cumulant that is not forced, and there are two of
-them in play. At `c_2` — where the summed family measures degree 2 —
-**both** families are linear. At `c_3`, which needs level `k = 3` pinned and
-therefore `S = 16` even and `S = 17` odd, they separate:
+**One family passes the test the sum fails; the other does not.** At `c_2` —
+where the summed family measures degree 2 — **both** families are linear. At
+`c_3`, which needs level `k = 3` pinned and therefore `S = 16` even and `S = 17`
+odd, they separate, and the separation widens with every level the data reaches:
 
-|  | c_1 | c_2 | c_3 | c_4 | |
-|---|---|---|---|---|---|
-| `d_main`, both parities | deg 0 | deg 1 | **deg 1** | **deg 1** | grand-form shape |
-| `d_anti`, both parities | deg 1 | deg 1 | **deg 2** | — | **not linear** |
+|  | c_1 | c_2 | c_3 | c_4 | c_5 | |
+|---|---|---|---|---|---|---|
+| `d_main`, both parities | deg 0 | deg 1 | **deg 1** | **deg 1** | **deg 1** | grand-form shape |
+| `d_anti`, both parities | deg 1 | deg 1 | **deg 2** | — | — | **not linear** |
 
 So the two-spine sum is **not** the whole obstruction. The main-diagonal family
-looks like a single grand-form object as far as the data reaches — **three
-nontrivial cumulants now, `c_2`, `c_3` and `c_4`, all linear on both parities**
-— while the anti-diagonal family fails at `c_3`, one level past where the
-summed family fails.
+looks like a single grand-form object as far as the data reaches — **four
+nontrivial cumulants, `c_2` through `c_5`, all linear on both parities** —
+while the anti-diagonal family fails at `c_3`, one level past where the summed
+family fails.
 
 `c_4` came out of the data already in hand, without another rung, once the
 analysis stopped assuming that level `k` has degree `k`. It does not on this
@@ -111,49 +110,52 @@ both are the C++ enumerator's output (`cpp/dmirror_spine.cpp`), which agrees
 with the Python at every `S ≤ 14` value and whose totals agree with the banked
 strip rows at every cell shown.
 
-`d_main(S, S+k)`, `S = 2k+2 … 17`:
+`d_main(S, S+k)`, from `S = 2k+2` up to `S = 19`:
 
 | k | values |
 |---|---|
 | 0 | 1 at every S |
 | 1 | 4 at every S |
-| 2 | 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47 |
-| 3 | 120, 129, 138, 147, 156, 165, 174, 183, 192, 201 |
-| 4 | 704, 780, 860, 944, 1032, 1124, 1220, 1320 |
-| 5 | 3564, 3943, 4342, 4761, 5200, 5659 |
-| 6 | 20420, 22956, 25697, 28651 |
+| 2 | 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51 |
+| 3 | 120, 129, 138, 147, 156, 165, 174, 183, 192, 201, 210, 219 |
+| 4 | 704, 780, 860, 944, 1032, 1124, 1220, 1320, 1424, 1532 |
+| 5 | 3564, 3943, 4342, 4761, 5200, 5659, 6138, 6637 |
+| 6 | 20420, 22956, 25697, 28651, 31826, 35230 |
 
-`d_anti(S, S+k)`, `S = 2k+2 … 17`:
+`d_anti(S, S+k)`, same range:
 
 | k | values |
 |---|---|
 | 0 | 1 at every S |
-| 1 | 10, 12, 12, 14, 14, 16, 16, 18, 18, 20 |
-| 2 | 71, 77, 99, 105, 131, 137, 167, 173, 207, 213 |
-| 3 | 314, 447, 512, 697, 774, 1019, 1108, 1421, 1522, 1911 |
-| 4 | 2656, 3190, 4516, 5228, 7156, 8070, 10752, 11892 |
-| 5 | 19094, 27895, 33412, 47197, 54922, 75487 |
-| 6 | 167220, 206168, 298707, 357249 |
+| 1 | 10, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 22 |
+| 2 | 71, 77, 99, 105, 131, 137, 167, 173, 207, 213, 251, 257 |
+| 3 | 314, 447, 512, 697, 774, 1019, 1108, 1421, 1522, 1911, 2024, 2497 |
+| 4 | 2656, 3190, 4516, 5228, 7156, 8070, 10752, 11892, 15496, 16886 |
+| 5 | 19094, 27895, 33412, 47197, 54922, 75487, 85920, 115429 |
+| 6 | 167220, 206168, 298707, 357249, 503722, 588226 |
 
 **The two families have different degrees, and only one of them knows about
 parity.** Measured by `experiments/dmirror_spine_degrees.py`, which takes the
 lowest degree that pins and then requires every remaining point to survive as a
 holdout, on even `S`, odd `S`, and all `S` pooled:
 
-| k | 0 | 1 | 2 | 3 | 4 | 5 |
-|---|---|---|---|---|---|---|
-| `d_main`, either parity or pooled | 0 | 0 | 1 | 1 | 2 | 2 |
-| `d_anti`, per parity | 0 | 1 | 2 | 3 | — | — |
+| k | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|---|
+| `d_main`, either parity or pooled | 0 | 0 | 1 | 1 | 2 | 2 | 3 |
+| `d_anti`, per parity | 0 | 1 | 2 | 3 | — | — | — |
 
 `d_anti` behaves like a defect gas: degree `k`, one free position per defect.
-`d_main` runs at **`⌊k/2⌋`**, now measured at six consecutive levels with the
-pooled fits carrying 5 to 9 holdouts.
+`d_main` runs at **`⌊k/2⌋`**, now measured at **seven consecutive levels**,
+`k = 0..6`, with the pooled fits carrying 2 to 11 holdouts.
 
 **An earlier reading of this file said `d_main` has degree `k−1`.** That was
 fitted on `S ≤ 11`, where `k ≤ 2` is all that pins and `k−1` and `⌊k/2⌋` agree.
-`k = 3, 4, 5` separate them and it is `⌊k/2⌋` — and at `k = 3` and `k = 4` the
-`⌊k/2⌋` reading was stated as a prediction before `S = 15` landed, then hit its
-predicted 183 and 1124 exactly.
+`k = 3, 4, 5` separate them and it is `⌊k/2⌋`. The reading has now been used as
+a prediction three times and held each time: `k = 3` and `k = 4` were predicted
+before `S = 15` landed and hit 183 and 1124 exactly; `k = 5` was predicted at
+degree 2 before `S = 16..18`; and `k = 6` was predicted at degree 3 before
+`S = 19`. At `S = 19` itself the three pinned polynomials predicted 51, 219 and
+1532 at `k = 2, 3, 4` and returned exactly those.
 
 **And `d_main` has no parity dependence at all.** One polynomial in `S` covers
 both classes at every pinned level; `d_anti`'s pooled column is unpinned from
