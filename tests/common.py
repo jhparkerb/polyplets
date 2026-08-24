@@ -3,6 +3,7 @@
 import concurrent.futures
 import os
 import subprocess
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -155,14 +156,24 @@ ALLOW_DEGRADED = os.environ.get("POLY_ALLOW_DEGRADED_GATES") == "1"
 
 
 class Gate:
-    """Accumulates pass/fail results and prints a GREEN/RED verdict."""
+    """Accumulates pass/fail results and prints a GREEN/RED verdict.
+
+    Each check line carries the seconds since the previous one -- which is the
+    work that produced it, since a gate is a straight-line chain of engine runs
+    scored in printed order. `make gates` reports per-GATE time; this is the
+    next level down, and it is what a gate needs to be shrunk on evidence rather
+    than by guessing which check is the expensive one. Costs one clock read.
+    """
 
     def __init__(self):
         self.failures = 0
         self.skips = []
+        self._t = time.monotonic()
 
     def check(self, ok, label):
-        print(("ok   " if ok else "FAIL ") + label)
+        now = time.monotonic()
+        dt, self._t = now - self._t, now
+        print(("ok   " if ok else "FAIL ") + f"[{dt:6.2f}s] " + label)
         if not ok:
             self.failures += 1
 
