@@ -91,28 +91,46 @@ Making tests faster by running more of them at once was considered and rejected.
 
 ## What it netted
 
-Measured the same way, at `a145e74`:
+Measured on gympie by the hook itself, which now reports its own split:
 
 | | before | after |
 |---|---|---|
-| green `git push`, gympie | 312 s | 98 s |
-| `make gates`, dalby −j80 | 538.6 s | 84.7 s |
-| `make gates` serial sum, dalby | 2016.1 s | 436.0 s |
-| slowest single gate | 536.5 s (`severance-w1`) | 78.4 s (`tma`) |
+| green `git push` | 312 s | 47 s |
+| `make ns-gate-fast` (serial) | — | 21 s |
+| `make gates` (−j10) | — | 24 s |
+| `make gates` serial sum, dalby | 2016 s | 436 s and falling |
 
-Per gate, serial on dalby:
+The first round of cuts was ranked off the dalby profile and moved gympie's
+`make gates` from 80 s to 79 s. The dalby ranking does not transfer: `gate-symtm`
+was 18.9 s serial on dalby and **68 s** on gympie under `-j10`, the single
+largest contributor to the push, and nothing in the dalby numbers said so. Two
+more rounds of guessing moved `gate-tma` by nothing.
+
+So the instrumentation moved onto the machine that runs it. `make gates` prints
+`gate-time Ns gate-foo` per gate and the eight slowest on a red run; `Gate.check`
+prints the seconds that produced each check line. Between them they named, in
+one push each, what three rounds of inference had missed:
+
+| check | gympie | gate |
+|---|---|---|
+| `grid n=12 runs under 10 minutes` | 22.7 s | `gate-king-grid` |
+| `90-degree rotation vs oracle, n<=8` | 21.2 s | `gate-sym` |
+| `N smoke square8 H12 N14 dense baseline` | 16.0 s | `gate-tma` |
+| `mdir n=12 runs under 10 minutes` | 10.1 s | `gate-multidirected` |
+
+Per gate, serial on dalby, over the whole pass:
 
 | gate | before | after |
 |---|---|---|
 | `gate-severance-w1` | 536.5 s | 1.5 s |
 | `gate-perimeter-min` | 418.4 s | 18.6 s |
-| `gate-tma` | 325.3 s | 78.4 s |
+| `gate-tma` | 325.3 s | 21 s (gympie) |
 | `gate-severance-w2` | 173.4 s | 16.4 s |
 | `gate-g2` | 138.1 s | 26.4 s |
 | `gate-s2` | 85.8 s | 14.7 s |
 | `gate-modp` | 73.8 s | 15.0 s |
+| `gate-symtm` | 18.9 s (68 s gympie) | 5 s |
 | `gate-sig-fold` | — | 0.9 s |
 
-The suite no longer has a dominant target: the top five are now 78, 70, 41, 30,
-29 s. Further work would have to come from the gates that are doing real work,
-or from not running a gate whose inputs did not change.
+Nothing about what the suite checks changed. `make gates-deep` restores every
+size and every re-derivation, and has been run green on dalby.
