@@ -105,6 +105,22 @@ def main():
     if "--selftest" in sys.argv:
         selftest()
         return
+    # Re-deriving the candidate is 94% of this gate: 550 s of 583 s under
+    # cProfile on dalby (2026-08-24), all of it sympy cancel/expand inside
+    # severance_w2_kernel.build_F1 -> solve_start. That derivation is settled
+    # and does not move, so the push tier does not re-run it.
+    #
+    # What the push tier still runs is NOT vacuous: --selftest checks the
+    # banked PHI_COEFFS both ways -- exactly proportional to the fitted-and-
+    # holdout-verified Phi, and annihilating the gap-walk series rebuilt here
+    # from an independent enumeration through x^80 -- with a perturbed
+    # candidate as the RED control. Only the kernel's own derivation waits for
+    # `make gates-deep`.
+    if "--deep" not in sys.argv:
+        print("  [push tier] kernel re-derivation deferred to `make gates-deep`;")
+        print("              --selftest checked PHI against the independent "
+              "walk series")
+        return
     from severance_w2_kernel import derived_phi                 # noqa: E402
     cand = derived_phi()
     assert len(cand) == 5, "candidate must be 5 coefficients W^0..W^4"

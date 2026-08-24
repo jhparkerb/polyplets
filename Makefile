@@ -221,7 +221,7 @@ gate-severance-w1:
 
 gate-severance-w2:
 	python3 experiments/severance_w2_gate.py --selftest
-	python3 experiments/severance_w2_gate.py
+	python3 experiments/severance_w2_gate.py $(GATE_DEEP)
 
 gate-severance-w3:
 	python3 experiments/severance_w3_gate.py --selftest
