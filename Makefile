@@ -177,6 +177,27 @@ DEPS_gate-no-copyright-pdfs = $(PAPER_SRC) tests/gate_no_copyright_pdfs.py
 DEPS_gate-tma = build/tma build/tma_asan build/tma_holes build/g2 \
                 tests/gate_tma.py tests/common.py \
                 fixtures/b001168.txt fixtures/b006770.txt results/holes_n14.txt
+DEPS_gate-s2  = tests/gate_s2.py tests/common.py oracle/g1_naive.py \
+                fixtures/b000105.txt fixtures/b030222.txt
+DEPS_gate-sym = build/symcount_fast tests/gate_sym.py tests/common.py \
+                oracle/g1_naive.py sym/symcount.py \
+                fixtures/b006770.txt fixtures/b030222.txt
+DEPS_gate-subgroup = build/symcount_fast build/symtm tests/gate_subgroup.py \
+                tests/common.py oracle/g1_naive.py sym/symcount.py \
+                fixtures/b006770.txt
+DEPS_gate-symtm = build/symtm build/symcount_fast tests/gate_symtm.py \
+                tests/common.py
+DEPS_gate-modp = build/tma build/tma_modp_test tests/gate_modp.py
+DEPS_gate-perimeter-min = build/perimeter_min build/g2 \
+                scripts/perimeter_min_gate.sh experiments/diamond_free_removals.py \
+                results/siteperim_square8_n14.txt results/siteperim_square4_n20.txt \
+                results/siteperim_tri6_n12.txt
+DEPS_gate-severance-w1 = build/severance_w1 experiments/severance_w1_gate.py \
+                experiments/cluster_weight_dp.py
+DEPS_gate-severance-w2 = experiments/severance_w2_gate.py \
+                experiments/severance_w2_kernel.py experiments/depth1_recurrence.py \
+                experiments/depth1_gap_walk.py experiments/cluster_weight_dp.py \
+                experiments/slope2_law_vs_truth.py
 DEPS_gate-g2  = build/g2 build/g2_asan \
                 tests/gate_g2.py tests/common.py oracle/g1_naive.py \
                 fixtures/b001168.txt fixtures/b006770.txt fixtures/b001207.txt

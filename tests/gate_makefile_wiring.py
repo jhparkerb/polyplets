@@ -144,7 +144,8 @@ def check_gate_deps(text):
                     body.append(line)
                 elif line.strip():
                     break
-        scripts = set(re.findall(r"[\w/]+\.(?:py|sh)", "\n".join(body)))
+        # not [\w/]+ -- that swallows the leading slash of "./scripts/foo.sh"
+        scripts = set(re.findall(r"\w[\w/]*\.(?:py|sh)", "\n".join(body)))
         missing = sorted(x for x in scripts if x not in deps)
         if missing:
             bad.append(f"DEPS_{gate} does not list the script its recipe runs, "
@@ -154,7 +155,7 @@ def check_gate_deps(text):
 
 
 # Where a gate script can import a repo-local module from.
-_IMPORT_DIRS = ("tests", "experiments", "oracle", "scripts", "paper")
+_IMPORT_DIRS = ("tests", "experiments", "oracle", "scripts", "paper", "sym")
 
 
 def _local_imports(path, seen):
