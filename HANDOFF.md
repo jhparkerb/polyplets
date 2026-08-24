@@ -1,4 +1,4 @@
-# HANDOFF — live state (updated 2026-08-23)
+# HANDOFF — live state (updated 2026-08-24)
 
 > **Planning from scratch? `docs/state-2026-08-23.md`** — what is true now,
 > what is decided, what is open with its price and what it would change.
@@ -15,6 +15,42 @@
 > defines what "ready" means. Section A is jasonp's decisions and nothing else
 > blocks on them; section B is commands, and it is stale by design whenever
 > `HEAD` moves past the revision its boxes were measured at.
+## 2026-08-24 — B13 IS GREEN, THE DEPTH-5 GATE PASSED
+
+`results/depth5-gate-green.md`. The `emax = 4` family table that the depth-5
+gate had been waiting for landed on dalby 2026-08-23; it was pulled into the
+tree 2026-08-24 and the gate was run. `D_5` computed ab initio from that table
+reproduces all 15 banked cells `T(2k-4, k-4)`, `k = 5..19`, exactly.
+
+**Review row B13 closes.** `docs/state-2026-08-23.md` §5 named it as the
+blocker on the five-terms decision, and it is no longer one. Nothing here
+launches the five-terms sweep — that is still unauthorised and still jasonp's
+call. This removes a gate, not a decision.
+
+Two things the green does not say, both measured rather than argued:
+
+- **It covers two of the table's three columns.** Mutation-testing the table
+  (perturb one entry, re-run, see if the gate fires) kills 21/21 `sig` mutants
+  and 21/21 `bb` mutants, and 0/21 `pp` mutants. That is not a hole — `pp` is
+  structurally inert above depth 1, verified table-independently by injecting
+  a perturbed `pp` straight into the family cache: `D_series(j,·)` moves at
+  `j = 1` and is bit-identical at `j = 2,3,4,5`. A gate cannot catch what
+  cannot change the answer. The e4 table's `e ≤ 3` rows are covered anyway —
+  it agrees cell-for-cell, all three columns, with six banked tables it
+  overlaps, 0 mismatches, two of them produced weeks earlier.
+- **The run overshot its own RAM bracket.** `families 21 4` came in at
+  4 h 54 m and **18,743 MB** at 8 threads. The wall projection in
+  `results/depth5-cost-settled.md` bracketed that (3.1–6.7 h); the RSS
+  projection did not — 18.3 GB is 14% above even its pessimistic end. That
+  file's title claimed "9–16 GB" and has been corrected. The same method
+  prices `families 21 5` at ~74–85 GB in `docs/state-2026-08-23.md` §5, so
+  read that as a floor, not a bracket.
+
+Successor row S-A5 becomes actionable as a side effect: the depth-5 gate was
+unwireable into `make gates` while it was red-by-design, and it is now green.
+Wiring the standalone experiment gates is still a decision, still open, and
+S-A5 asks for it to be made for the family rather than per-file.
+
 ## 2026-08-23 evening — THE CENSUS LADDER REACHED H = 21
 
 The last of the day's runs, and the one that closes an open item.

@@ -96,6 +96,10 @@ must pass against the banked depth-5 cells at `k ≤ 19` before `D_5` is used at
 `k = 21`, and it is correctly RED in production until the `emax = 4` table
 exists. A measured price for depth 6 does not create the depth-5 table that
 gate is waiting for, and depth 6 is one rung further out than that.
+[**2026-08-24: B13 closed** — the table landed and the gate is green
+(`results/depth5-gate-green.md`). Depth 6 is still one rung further out. Note
+also that the depth-5 run overshot its own RSS bracket by 14%, and this file's
+depth-6 projection uses the same method.]
 
 The projection is also two and a half rungs of extrapolation from four points,
 with a holdout that missed by 17.5%. It is a price, not a measurement, and the

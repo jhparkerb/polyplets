@@ -1,9 +1,21 @@
-# Depth 5 costs 3–7 hours and 9–16 GB, not 103 GB
+# Depth 5 costs about 5 hours and 18 GB, not 103 GB
 
 2026-08-22, executing `docs/last-orders.md` A1.2 and closing
 `results/undertow-review-queue.md` row L-2. Measured on ayr; ladder at
 `results/depth5/ladder.txt`, analysis
 `experiments/depth5_cost_ladder.py`.
+
+> **OUTCOME, 2026-08-23 — the run happened, and the RAM bracket missed.**
+> `families 21 4` ran on dalby at 8 threads: **4 h 54 m** (17,660 s) and
+> **18,743 MB** peak RSS. The wall projection below bracketed that correctly
+> (3.1 h to 6.7 h). The RSS projection did **not** — 18.3 GB is 14% above even
+> the pessimistic end, the one that assumed the deceleration stopped dead.
+> The original title of this file claimed "9–16 GB" and was wrong; it has been
+> corrected above. The headline conclusion survives — depth 5 is nowhere near
+> 103 GB and fits dalby with room — but the *method* here brackets wall well
+> and under-predicts RSS, so treat every RSS figure it produces, including the
+> ~74–85 GB it implies for `families 21 5`, as a floor rather than a bracket.
+> Gate outcome and mutation audit: `results/depth5-gate-green.md`.
 
 ## The answer
 
@@ -72,6 +84,8 @@ last soft spot in the whole construction.
 depth-5 cells at `k ≤ 19` before `D_5` is used at `k = 21`. That gate's selftest
 is green and it is correctly RED in production until the `emax = 4` table
 exists. This file prices the table; it does not license using it.
+[**2026-08-24: the table exists and the gate passed** — all 15 cells match
+exactly. B13 closed. `results/depth5-gate-green.md`.]
 
 ## Honest limits
 

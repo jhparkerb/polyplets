@@ -442,6 +442,8 @@ row needs the sweep re-run at the target Nmax, not just the last lever. And
 review row B13 stands: `experiments/severance_w3_depth5_gate.py` must pass
 against the banked depth-5 cells at k ≤ 19 before `D_5` is used at k = 21, and
 that gate is correctly RED in production until the `emax = 4` table exists.
+[**Closed 2026-08-24** — the table landed and the gate is green;
+`results/depth5-gate-green.md`.]
 
 **Whether any of it runs is jasonp's call.** This item is the arithmetic, not
 the request.

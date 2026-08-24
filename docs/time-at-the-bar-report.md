@@ -111,6 +111,8 @@ would be badly wrong.
 Review row B13 stands and is unaffected: `experiments/severance_w3_depth5_gate.py`
 must pass against the banked depth-5 cells at k ≤ 19 before `D_5` is used at
 k = 21, and it is correctly RED in production until the `emax = 4` table exists.
+[**Closed 2026-08-24** — the table landed and the gate is green;
+`results/depth5-gate-green.md`.]
 
 **None of this is a request.** It is the arithmetic B2 asked for.
 

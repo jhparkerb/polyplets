@@ -70,7 +70,9 @@ ladder's two missing rungs were measured on ayr at fixed 8 threads: `families
 deceleration assumed to stop, against §2's asserted 16 h / 103 GB and L-2's
 110–390 GB. K=16 was predicted before it ran and came in within 8% on both axes.
 Depth 5 is not marginal and not at the wall. Review row L-2 closed; B13's gate
-requirement untouched and still binding.
+requirement untouched and still binding. [**B13 closed 2026-08-24** — table
+landed, gate green, `results/depth5-gate-green.md`. The run came in at 4 h 54 m
+and 18.3 GB, inside the wall bracket but above both ends of the RAM bracket.]
 
 *Original framing:*
 `experiments/severance_w3_depth5_gate.py` is written red-first. The cost is

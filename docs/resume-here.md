@@ -54,13 +54,12 @@ the ladder loop (pid 2935694) was killed 09:26 so no H = 18 follows it, since
 H = 18 is three days for one more anchor on a fit already good to a thousandth.
 What would actually reach H = 21 is the shared-partial-fill build.
 
-**When the depth-5 table lands:** run
-`python3 experiments/severance_w3_depth5_gate.py` — it has been RED in
-production for one reason, that no `severance_w3_families_K*_e4.txt` with
-K >= 19 exists, and this is that file. Green closes review row B13, which
-`docs/state-2026-08-23.md` §5 names as the blocker on the five-terms decision.
-Red is the more interesting outcome and stops the depth-5 route where it stands.
-The table's arrival does not license using `D_5` at k = 21; the gate does.
+~~**When the depth-5 table lands:**~~ **DONE 2026-08-24 — GREEN.** The table
+landed on dalby 2026-08-23 and `python3 experiments/severance_w3_depth5_gate.py`
+passes: `D_5` ab initio reproduces all 15 banked cells `k = 5..19` exactly.
+Review row B13 closes; `docs/state-2026-08-23.md` §5 named it as the blocker on
+the five-terms decision, and it is no longer one. Record, with the mutation
+audit and the cost-versus-prediction: `results/depth5-gate-green.md`.
 
 **When the spine ladder lands:** `python3
 experiments/dmirror_spine_cumulants.py` and `..._degrees.py` over the
