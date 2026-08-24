@@ -47,9 +47,18 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
         ns-gate-verify ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
         ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan \
         ns-gate-frontier-zstd ns-gate-diag-pins \
-        ns-driver0 build/ns/map_worker build/ns/merge_worker build/ns/driver0 \
-        build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/gate_holes build/ns/verify \
+        ns-driver0 \
+        build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/verify \
         papers papers-verify papers-clean papers-list
+
+# The C++ ns binaries used to be on that .PHONY list. They are real files with
+# real recipes and complete prerequisites (their source plus every core/ header),
+# so declaring them phony did two things, neither wanted: recompiled all four on
+# every single make, and told make to ignore the prerequisites that say when they
+# actually need it. It also defeated the input gating -- a gate whose declared
+# input is the binary it runs can never skip if the binary is rebuilt each time.
+# The Go ones stay: build/ns/orchestrate bakes GIT_REV in at link time on
+# purpose, and go build is cache-backed anyway.
 
 # All currently existing gates.
 # TODO(2026-08-19, from the simplify pass): nothing checks this list is
