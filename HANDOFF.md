@@ -15,6 +15,34 @@
 > defines what "ready" means. Section A is jasonp's decisions and nothing else
 > blocks on them; section B is commands, and it is stale by design whenever
 > `HEAD` moves past the revision its boxes were measured at.
+## 2026-08-24 — SIX GATES WIRED, AND THE LINT THAT STOPS THE SEVENTH
+
+Successor row S-A5 closed. It asked for the standalone experiment gates to be
+decided for the family rather than per-file. Decision: wire them all.
+
+It named three. There were six. `severance_w1_gate.py` (219 s),
+`severance_w2_gate.py` (69 s), `severance_w3_gate.py`,
+`severance_w3_depth5_gate.py`, and `tests/gate_modp.py` — the R3 mod-p CRT
+gate, referenced in `docs/engine-design.md` since August, green in 31 s, and
+never once run by `make gates`. All are now in GATE_TARGETS. Full `make` green,
+4.8 min, exit 0.
+
+The sixth is `gate-makefile-wiring`, the lint the GATE_TARGETS comment has been
+asking for. The thing worth knowing about it: **checking that every `gate-*:`
+recipe is in GATE_TARGETS would have passed the tree on the day S-A5 was
+filed.** The Severance gates were not recipes missing from a list — they had no
+recipe at all, and a consistent-Makefile check finds a consistent Makefile.
+What catches them is the second surface, script-vs-Makefile: a gate script on
+disk that no recipe names. That surface is also what turned up `gate_modp.py`.
+
+Two details that are the difference between a lint and a decoration. Matching
+is restricted to tab-indented recipe lines, because the pre-fix Makefile named
+the depth-5 gate in a comment saying it was deliberately unwired, and a
+whole-file substring search reads that comment as coverage. And both allowlists
+are red on a stale entry or on an excuse for something since wired, so an
+exclusion cannot quietly become permanent. Verified against `610405b`: recipe
+surface reports nothing, script surface reports all five.
+
 ## 2026-08-24 — B13 IS GREEN, THE DEPTH-5 GATE PASSED
 
 `results/depth5-gate-green.md`. The `emax = 4` family table that the depth-5

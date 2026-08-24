@@ -56,7 +56,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 # `make gates` does not run, which is the meta-version of the failure two of
 # this week's commits fixed.  A lint wants an allowlist for the deliberate
 # exclusions (papers, install-hooks, compile-commands), so it is its own change.
-GATE_TARGETS = gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -175,13 +175,70 @@ gate-cutcount-assembly:
 # empties.  Four RED controls, including one that catches the single-source
 # D_4(21) transitively through the pin it feeds.
 #
-# NOT here: experiments/severance_w3_depth5_gate.py, which is written red-first
-# and correctly exits 1 until a severance_w3_families_K>=19_e4 table exists.
-# It joins GATE_TARGETS the day depth 5 is computed, not before -- a gate that
-# cannot go green is not a gate the suite should run.
 gate-undertow-congruence:
 	python3 experiments/undertow_congruence_gate.py --selftest
 	python3 experiments/undertow_congruence_gate.py
+
+# The Severance gate family (W1, W2, W3, and W3 at depth 5).  These four were
+# outside GATE_TARGETS until 2026-08-24 -- successor row S-A5 in
+# results/undertow-review-queue.md, which asked for the decision to be made for
+# the family rather than per-file.  It is made here: all four are wired.
+#
+# The one that had a real reason to stay out was the depth-5 gate, written
+# red-first and correctly exiting 1 until a severance_w3_families_K>=19_e4
+# table existed.  That table landed 2026-08-23 and the gate is green
+# (results/depth5-gate-green.md), so the reason is spent.  The other three had
+# no reason beyond nobody having wired them, which is exactly the failure the
+# GATE_TARGETS comment above warns about: a gate-foo: recipe that never reaches
+# GATE_TARGETS is a check `make gates` does not run.
+#
+# Each recipe runs the RED control first and the production check second, so a
+# gate that has quietly stopped being able to fail is caught before its green
+# is believed.  Measured on gympie 2026-08-24, production run: W1 219 s,
+# W2 69 s, W3 0.1 s, depth 5 0.1 s.  W1 is the only slow one and it is well
+# inside the suite's parallel critical path, so wiring these does not move the
+# `make gates` wall.  They are separate targets rather than one gate-severance
+# so that -j schedules them independently and a RED one gets NAMED by the
+# recipe at the end of `gates`.
+gate-severance-w1:
+	python3 experiments/severance_w1_gate.py --selftest
+	python3 experiments/severance_w1_gate.py
+
+gate-severance-w2:
+	python3 experiments/severance_w2_gate.py --selftest
+	python3 experiments/severance_w2_gate.py
+
+gate-severance-w3:
+	python3 experiments/severance_w3_gate.py --selftest
+	python3 experiments/severance_w3_gate.py
+
+gate-severance-depth5:
+	python3 experiments/severance_w3_depth5_gate.py --selftest
+	python3 experiments/severance_w3_depth5_gate.py
+
+# Gate MODP: the R3 u32 mod-p sweep.  CRT of sum_H B_H(n) mod p_i over three
+# primes must equal the exact a(n) from build/tma, both unfolded and under
+# --fold (the R1xR3 composition).  Written 2026-08 and referenced by
+# docs/engine-design.md and results/r4/r4-a.md, but never wired -- it was found
+# by gate-makefile-wiring below, green and unrun since August.  ~31 s.
+gate-modp: build/tma
+	python3 tests/gate_modp.py
+
+# Gate MAKEFILE-WIRING: the lint the GATE_TARGETS comment above asks for.
+# It checks TWO surfaces.  Recipe-vs-GATE_TARGETS is the obvious one.  The
+# other -- script-vs-Makefile -- is the one that actually bit us: the four
+# Severance gates above had no recipe AT ALL, so a recipe-level check sees a
+# consistent Makefile and passes.  Verified against the pre-fix tree: the
+# recipe surface alone reports nothing on it.  The script surface reports all
+# four, and turned up gate-modp as a fifth.
+#
+# Both surfaces have an allowlist carrying a written reason per entry, and both
+# are red on a stale entry or on an excuse for something now wired, so an
+# allowlist cannot rot into a permanent exclusion nobody revisits.  7 RED
+# controls.  Instant.
+gate-makefile-wiring:
+	python3 tests/gate_makefile_wiring.py --selftest
+	python3 tests/gate_makefile_wiring.py
 
 # Gate PERIMETER-DEFECT: the pruned max-end search vs g2 --siteperim (A), vs
 # its own unpruned control (B), marginal consistency (C), and --split shards
