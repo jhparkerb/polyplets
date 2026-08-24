@@ -50,9 +50,13 @@ Against the a(40) run (`results/ns_a40/PROVENANCE.md`): phase A (H1-19,
 32 cores) 36.4 h, disk peak 363.4 GB. At the measured 1.6x:
 
 - wall ~84 h across the same three phases, so **3.5 days on dalby**;
-- **disk peak ~580 GB against 496 GB free — it does not fit.** Clearing
-  `runs/a41_low` and other run dirs gets free space to roughly 600-690 GB,
-  which makes it marginal rather than impossible;
+- ~~**disk peak ~580 GB against 496 GB free — it does not fit.**~~ **WRONG,
+  corrected 2026-08-24 by measurement — `results/nmax-disk-scaling.md`.** This
+  line applied the measured CPU factor to disk. Disk does not scale like CPU:
+  measured 40→45 is 1.505x at H=15 and 1.387x at H=16 (*falling* with height,
+  where CPU *rises*), against the 1.62x assumed here. Projected peak is
+  504-547 GB against dalby's 563 GB free, so **it fits, with nothing deleted**.
+  `runs/a41_low` is separately already down to 2.8 MB;
 - RAM unchanged (kink is RAM-light; rss_max was ~4 GB at the H21 pole).
 
 **Disk, not time, is what caps this.** Scaled the same way:
@@ -66,7 +70,12 @@ Against the a(40) run (`results/ns_a40/PROVENANCE.md`): phase A (H1-19,
 
 So the honest recommendation is **Nmax 43** — three new terms, inside the disk
 budget as it stands — or Nmax 44/45 only after the run dirs are cleared and
-with a disk guard that aborts phase C rather than filling the filesystem. The
+with a disk guard that aborts phase C rather than filling the filesystem.
+[**Superseded 2026-08-24.** The disk measurement above puts Nmax 44 at
+484-512 GB and Nmax 45 at 504-547 GB against 563 GB free, so no clearing is
+needed for either. The disk guard now exists and is proved in both directions
+on dalby: `scripts/dalby_disk_guard.sh`. What still separates 44 from 45 is not
+disk but the k=23 pin — see "What each new level rests on" below.] The
 orchestrator checkpoints per column, so an abort costs one column, not a run.
 
 ## What each new level rests on
