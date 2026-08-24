@@ -89,27 +89,27 @@ doing real, non-redundant work at moderate cost.
 The suite is still run serially per gate and in one `make gates` invocation.
 Making tests faster by running more of them at once was considered and rejected.
 
-## What it netted
+## Instrumenting the machine that runs it
 
-Measured on gympie by the hook itself, which now reports its own split:
+The first round of cuts was ranked off a dalby profile and moved gympie's
+`make gates` from 80 s to 79 s. The dalby ranking does not transfer:
+`gate-symtm` was 18.9 s serial on dalby and **68 s** on gympie under `-j10`, the
+single largest contributor to the push, and nothing in the dalby numbers said
+so. Two further rounds of inference moved `gate-tma` by nothing.
 
-| | before | after |
-|---|---|---|
-| green `git push` | 312 s | 47 s |
-| `make ns-gate-fast` (serial) | — | 21 s |
-| `make gates` (−j10) | — | 24 s |
-| `make gates` serial sum, dalby | 2016 s | 436 s and falling |
+Only the hook executes on gympie, so the hook is what reports. Three levels, all
+permanent:
 
-The first round of cuts was ranked off the dalby profile and moved gympie's
-`make gates` from 80 s to 79 s. The dalby ranking does not transfer: `gate-symtm`
-was 18.9 s serial on dalby and **68 s** on gympie under `-j10`, the single
-largest contributor to the push, and nothing in the dalby numbers said so. Two
-more rounds of guessing moved `gate-tma` by nothing.
+- `.githooks/pre-push` prints its own split (`ns-gate-fast Ns, gates Ns`) and
+  keeps it in `build/pre-push.log`.
+- `make gates` and `make ns-gate-fast` print `gate-time Ns <target>` per gate,
+  and a red run prints the eight slowest.
+- `Gate.check` prints the seconds that produced each check line — a gate is a
+  straight-line chain of engine runs scored in printed order, so the gap between
+  check lines is the work behind the second one.
 
-So the instrumentation moved onto the machine that runs it. `make gates` prints
-`gate-time Ns gate-foo` per gate and the eight slowest on a red run; `Gate.check`
-prints the seconds that produced each check line. Between them they named, in
-one push each, what three rounds of inference had missed:
+Between them they named, in one push each, what three rounds of inference had
+missed:
 
 | check | gympie | gate |
 |---|---|---|
@@ -118,18 +118,52 @@ one push each, what three rounds of inference had missed:
 | `N smoke square8 H12 N14 dense baseline` | 16.0 s | `gate-tma` |
 | `mdir n=12 runs under 10 minutes` | 10.1 s | `gate-multidirected` |
 
-Per gate, serial on dalby, over the whole pass:
+## Input gating, opt-in
+
+`ns-gate-go` was 16 s of a 47 s push, serially, on every push including
+documentation-only ones — and `go test ./orchestrator/... ./verify/...` reads Go
+packages and nothing else in this tree.
+
+The default is unchanged: every gate runs, every time. A gate is skipped only if
+it is DECLARED (`DEPS_<gate>` in the Makefile) with the full set of things it
+reads, and its stamp is newer than all of them. Undeclared is the safe state, so
+forgetting to declare a gate costs time, not coverage — the opposite of the
+failure this repo has had twice, where a curated allowlist quietly stopped
+running something.
+
+Declaring one wrong is caught two ways: `gate_makefile_wiring` requires a
+declared gate's own script to be among its deps (RED 10), so editing a gate
+always re-runs it; and a dep that has gone missing makes the gate run rather
+than skip. `make gates-force` ignores every stamp, `gates-deep` implies it, and
+the hook forces on a new ref.
+
+Also fixed while here: the hook's `docs_only` test counted every `.txt` as
+prose, while gates read `results/holes_n14.txt`, `results/siteperim_*.txt` and
+`fixtures/b*.txt` as data — so editing a gate's own fixture skipped the gate
+that checks it.
+
+## What it netted
+
+Measured on gympie by the hook itself:
+
+| | before | after |
+|---|---|---|
+| green `git push`, code | 312 s | 31 s |
+| green `git push`, docs only | — | 8 s |
+| `make gates` serial sum, dalby | 2016 s | 436 s and lower since |
+
+Per gate, serial on dalby except where noted:
 
 | gate | before | after |
 |---|---|---|
 | `gate-severance-w1` | 536.5 s | 1.5 s |
-| `gate-perimeter-min` | 418.4 s | 18.6 s |
+| `gate-perimeter-min` | 418.4 s | 14 s (gympie) |
 | `gate-tma` | 325.3 s | 21 s (gympie) |
-| `gate-severance-w2` | 173.4 s | 16.4 s |
-| `gate-g2` | 138.1 s | 26.4 s |
-| `gate-s2` | 85.8 s | 14.7 s |
-| `gate-modp` | 73.8 s | 15.0 s |
-| `gate-symtm` | 18.9 s (68 s gympie) | 5 s |
+| `gate-severance-w2` | 173.4 s | 12 s (gympie) |
+| `gate-g2` | 138.1 s | 20 s (gympie) |
+| `gate-s2` | 85.8 s | 11 s (gympie) |
+| `gate-symtm` | 68 s (gympie) | 5 s |
+| `ns-gate-go` | 16 s (gympie) | 0 s unless Go changed |
 | `gate-sig-fold` | — | 0.9 s |
 
 Nothing about what the suite checks changed. `make gates-deep` restores every
