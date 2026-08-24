@@ -33,7 +33,9 @@ from symcount import (HMIRROR_PLACEMENTS, SUBGROUP_TYPES,  # noqa: E402
                       SYMMETRY_TYPES, _anchor_xmin0, count_symmetry_type)
 from g1_naive import count_by_box, count_symmetry  # noqa: E402
 
-ORACLE_MAXN = 8   # brute force generates every animal, so this is the cheap wall
+# Brute force generates every animal, so this is the wall. ~4x per n; --deep
+# restores 8.
+ORACLE_MAXN = 8 if "--deep" in sys.argv else 7
 # Python reference depth and the C++ cross-check depth. Same ~3x per n as
 # gate_sym, whose table this duplicates. Push tier 10; --deep restores 11.
 MAXN = 11 if "--deep" in sys.argv else 10

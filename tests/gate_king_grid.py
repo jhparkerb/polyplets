@@ -103,7 +103,11 @@ def main():
     if not require_binary(BIN, "build/directed_cone_anchor"):
         return 1
 
-    accept_n = 12
+    # The engine run this line makes is 22.7 s on gympie -- the single most
+    # expensive check in the whole suite -- and it grows ~4x per n. accept_n is
+    # the depth the series comparison below reaches; the shape it checks holds
+    # at every n. --deep restores 12.
+    accept_n = 12 if "--deep" in sys.argv else 11
     grid, wall = run_engine("grid", accept_n)
     print(f"grid n={accept_n}: wall={wall:.1f}s (budget 600s)")
     gate.check(wall < 600, f"grid n={accept_n} runs under 10 minutes")

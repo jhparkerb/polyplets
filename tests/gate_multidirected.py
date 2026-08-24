@@ -84,7 +84,7 @@ def main():
     gate.check(d[1:11] == A047781, "series D = A047781 (directed king animals)")
 
     # --- brute force vs series ---------------------------------------------
-    accept_n = 12
+    accept_n = 12 if "--deep" in sys.argv else 11   # ~4x per n; --deep restores 12
     brute, wall = run_filter("mdir", accept_n)
     print(f"brute mdir n={accept_n}: wall={wall:.1f}s (budget 600s)")
     gate.check(wall < 600, f"mdir n={accept_n} runs under 10 minutes")

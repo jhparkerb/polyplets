@@ -22,7 +22,9 @@ sys.path.insert(0, os.path.join(ROOT, "oracle"))
 from symcount import SYMMETRY_TYPES, count_symmetry_type  # noqa: E402
 from g1_naive import count_symmetry  # noqa: E402
 
-ORACLE_MAXN = 8   # how far the brute oracle (generates all animals) reaches
+# How far the brute oracle (generates every animal) reaches. Building it was
+# 21.2 s on gympie, the second most expensive check in the suite, at ~4x per n.
+ORACLE_MAXN = 8 if "--deep" in sys.argv else 7
 # Python symmetric counts at ~3x per further n, and gate-subgroup computes the
 # same table again in its own process. Push tier stops at 10; --deep restores 11.
 MAXN = 11 if "--deep" in sys.argv else 10

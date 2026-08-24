@@ -59,7 +59,12 @@ def main():
     f_base_oh = spawn(TMA, "square8", depth_m, "--only-height", H_m)
     f_fold_oh = spawn(TMA, "square8", depth_m, "--only-height", H_m,
                       "--fold", "--threads", 4)
-    f_smoke = spawn(TMA, "square8", 14, "--only-height", 12)
+    # The standing smoke fixture is n=14 H=12 and it is the LAST of the spawned
+    # runs to finish -- 16.0 s on gympie, and the floor under this whole gate no
+    # matter what else is trimmed. It is a backend-swap byte oracle (see check N),
+    # not a regression check: what it would catch, checks A/D/E/G/H already catch
+    # against b-files and against G2, on every push. Deep tier.
+    f_smoke = spawn(TMA, "square8", 14, "--only-height", 12) if deep else None
 
     # A. totals vs fixture
     depth_a = 12
@@ -233,10 +238,17 @@ def main():
     #    that changes one count is a defect. As the swappable backends land behind
     #    statedb.h (experiments/bench_column.cpp's Backend seam), add them to this
     #    loop -- each must reproduce `base` byte-for-byte (absent backends skipped).
-    smoke = parse_counts(f_smoke.result())
     base = {(12,): 177147, (13,): 5511240, (14,): 97548948}  # dense H12/N14 marginal
-    gate.check({k: v for k, v in smoke.items() if v} == base,
-          "N smoke       square8 H12 N14 dense baseline == 177147/5511240/97548948")
+    if f_smoke is None:
+        # NOT gate.skip(): that is for a check that could not run, and it fails
+        # the gate on purpose. This one is a tier decision, announced the way
+        # the other tiered gates announce theirs.
+        print("     [push tier] N smoke square8 H12 N14 deferred to "
+              "`make gates-deep`")
+    else:
+        smoke = parse_counts(f_smoke.result())
+        gate.check({k: v for k, v in smoke.items() if v} == base,
+              "N smoke       square8 H12 N14 dense baseline == 177147/5511240/97548948")
     # backend reproduction (build/tma gains --backend as each store lands; skip til then):
     # for backend in ("hash", "sort", "concurrent", "compressed", "u128"):
     #     got = run(TMA, "square8", 14, "--only-height", 12, "--backend", backend)
