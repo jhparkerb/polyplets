@@ -170,7 +170,15 @@ def main():
     # L. intra-height checkpoint: a single --only-height sweep killed mid-height
     #    (env hook _Exit's right after the column-k save) resumes from the on-disk
     #    boundary state to a byte-identical result -- for serial AND MT.
-    depth_l, H_l, kill_col = 14, 10, 5
+    # Check L is 8 single-height sweeps and, after M's trim, the largest thing
+    # left in this gate. What it proves is about the CHECKPOINT machinery -- a
+    # sweep killed mid-column resumes to a byte-identical result -- not about n.
+    # n and H must move together, though: the kill fires at column 5 only if the
+    # state db is still live there, and a height-H animal spanning w columns
+    # needs at least H + (w-1) cells, so what matters is the slack n - H. It is
+    # 4 at (14, 10) and 4 at (12, 8). --deep restores (14, 10).
+    depth_l, H_l = (14, 10) if deep else (12, 8)
+    kill_col = 5
     ckdir = os.path.join(ROOT, "runs", "ckpt", "gate_ih")
     base_l = run(TMA_HOLES, "square8", depth_l, "--only-height", H_l)  # clean baseline
     for threads in (1, 4):

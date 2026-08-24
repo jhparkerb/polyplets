@@ -33,6 +33,7 @@ import re
 import subprocess
 import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -70,14 +71,29 @@ def _argv(verifier):
     return [sys.executable, str(verifier)]
 
 
+# One verifier run is 0.32 s of real work (measured; a bare interpreter is
+# 0.01 s, so this is not startup), and there are 200 of them -- 70 s serial.
+# Sampling the literals is not available: the whole statement is COVERAGE, and a
+# sample would let coverage drop silently, which is the one thing this gate
+# exists to prevent. So all 200 still run; they just stop waiting in line.
+#
+# They are independent by construction -- each is one perturbed copy judged on
+# its own -- and each now writes its OWN copy, where the serial version reused a
+# single under-test.tex that concurrency would have had them fighting over.
+# ex.map preserves input order, so the output is identical to the serial sweep's.
+# Same pattern as gate_tma's spawn block, and for the same reason.
+WORKERS = min(8, os.cpu_count() or 4)
+
+
 def sweep(verifier, src, lits, tmpdir):
     """Return the literals whose perturbation the verifier does NOT catch."""
-    path = os.path.join(tmpdir, "under-test.tex")
-    env = dict(os.environ, VERIFY_TEX=path)
     argv = _argv(verifier)
 
+    # The green control runs alone and first: if the unmutated copy does not
+    # pass, no RED result below would mean anything.
+    path = os.path.join(tmpdir, "under-test.tex")
     open(path, "w").write(src)
-    green = subprocess.run(argv, env=env,
+    green = subprocess.run(argv, env=dict(os.environ, VERIFY_TEX=path),
                            capture_output=True, text=True)
     if green.returncode != 0:
         print("GREEN CONTROL FAILED: the unmutated copy does not pass, so no")
@@ -85,15 +101,18 @@ def sweep(verifier, src, lits, tmpdir):
         print(green.stdout[-2000:])
         sys.exit(2)
 
-    unguarded = []
-    for lit in lits:
+    def probe(lit):
+        """-> lit if the verifier did NOT catch its perturbation, else None."""
         bumped = lit[:-1] + str((int(lit[-1]) + 1) % 10)
-        open(path, "w").write(
+        p = os.path.join(tmpdir, f"under-test-{lit}.tex")
+        open(p, "w").write(
             re.sub(r"(?<![0-9A-Za-z.])" + lit + r"(?![0-9])", bumped, src))
-        r = subprocess.run(argv, env=env, capture_output=True, text=True)
-        if r.returncode == 0:
-            unguarded.append(lit)
-    return unguarded
+        r = subprocess.run(argv, env=dict(os.environ, VERIFY_TEX=p),
+                           capture_output=True, text=True)
+        return lit if r.returncode == 0 else None
+
+    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        return [lit for lit in ex.map(probe, lits) if lit is not None]
 
 
 def context(src, lit):
