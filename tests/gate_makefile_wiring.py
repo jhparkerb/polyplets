@@ -45,6 +45,7 @@ Exit 0 = GATE GREEN; anything else = red.
 
 import os
 import re
+import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,6 +81,75 @@ EXCUSED_SCRIPTS = {
         "stops. Running it inside the suite would be running a fault injector "
         "in parallel with the gate it injects into",
 }
+
+
+# The `gates` recipe names the RED gate(s) by sed-ing its own log. That sed has
+# been wrong twice: once because GNU make prints "[Makefile:2: gate-foo]" where
+# 3.81 prints "[gate-foo]", and a red run on both Linux boxes printed an EMPTY
+# list; and now the targets are timed-gate-foo, so there is a third format. A
+# parser with no test is how both happened, so this runs the REAL pattern --
+# lifted out of the Makefile, not a copy -- over every format it must handle.
+SED_EXPR = re.compile(r"named=\$\$\(sed -n '(.*?)' \$\(GATELOG\)")
+
+RED_LINE_CASES = [
+    ("make: *** [gate-tma] Error 1", "gate-tma"),
+    ("make[1]: *** [Makefile:2: gate-tma] Error 1", "gate-tma"),
+    ("make: *** [timed-gate-tma] Error 1", "gate-tma"),
+    ("make[1]: *** [Makefile:126: timed-gate-severance-w1] Error 1",
+     "gate-severance-w1"),
+    # a red PREREQUISITE names no gate, and must not invent one
+    ("make: *** [build/g2] Error 1", None),
+    ("ok   H holes-sum square8 n<=9", None),
+]
+
+
+def check_red_naming(text):
+    """Failures in the RED-gate namer. Empty list = green."""
+    m = SED_EXPR.search(text)
+    if not m:
+        return ["cannot find the RED-gate sed in the `gates` recipe -- if it "
+                "was rewritten, this lint has to be rewritten with it"]
+    expr = m.group(1)
+    bad = []
+    for line, want in RED_LINE_CASES:
+        out = subprocess.run(["sed", "-n", expr], input=line + "\n",
+                             capture_output=True, text=True).stdout.strip()
+        got = out or None
+        if got != want:
+            bad.append(f"RED-gate namer on {line!r}: got {got!r}, want {want!r}")
+    return bad
+
+
+def check_prereqs(text):
+    """GATE_PREREQS must be a superset of every gate-*: prerequisite.
+
+    `make gates` builds GATE_PREREQS once, then runs a sub-make per gate to time
+    it. A binary that is a prerequisite of two gates but missing from
+    GATE_PREREQS would be built by two sub-makes at once, into the same output
+    file. A superset can only build something unnecessary; a subset is a race.
+    """
+    m = re.search(r"^GATE_PREREQS\s*=\s*((?:.*\\\n)*.*)$", text, re.M)
+    if not m:
+        return ["no GATE_PREREQS assignment found in Makefile"]
+    declared = set(m.group(1).replace("\\\n", " ").split())
+    # Only the WIRED gates matter: `make gates` runs exactly GATE_TARGETS, so an
+    # excused gate's binary (build/motley_par) is never built concurrently and
+    # listing it here would just make every push compile something nothing runs.
+    w = re.search(r"^GATE_TARGETS\s*=\s*(.*)$", text, re.M)
+    wired = set(w.group(1).split()) if w else set()
+    needed = set()
+    for line in text.splitlines():
+        g = re.match(r"^(gate-[A-Za-z0-9_-]+)\s*:(.*)$", line)
+        if g and g.group(1) in wired:
+            needed.update(g.group(2).split())
+    # $(if $(GMP_LDFLAGS),...) tokens appear in both sides verbatim; compare
+    # only the build/ artifacts, which is what can actually be raced.
+    missing = sorted(t for t in needed
+                     if t.startswith("build/") and t not in declared)
+    if missing:
+        return ["GATE_PREREQS is missing gate prerequisites -- two sub-makes "
+                "could race to build them: " + ", ".join(missing)]
+    return []
 
 
 def parse(text):
@@ -163,8 +233,10 @@ def main():
     text = open(MAKEFILE).read()
     recipes, wired = parse(text)
     scripts = scripts_on_disk(ROOT)
-    bad = check(recipes, wired, EXCUSED) + check_scripts(scripts, text,
-                                                         EXCUSED_SCRIPTS)
+    bad = (check(recipes, wired, EXCUSED)
+           + check_scripts(scripts, text, EXCUSED_SCRIPTS)
+           + check_red_naming(text)
+           + check_prereqs(text))
     if bad:
         for b in bad:
             print("  RED: " + b)
@@ -178,6 +250,9 @@ def main():
         print(f"  excused (recipe): {t} -- {why}")
     for t, why in sorted(EXCUSED_SCRIPTS.items()):
         print(f"  excused (script): {t} -- {why}")
+    print("  prereqs:   GATE_PREREQS covers every gate-*: build/ prerequisite")
+    print(f"  red-namer: {len(RED_LINE_CASES)} bracket formats parsed "
+          "correctly by the Makefile's own sed")
     print("GATE GREEN")
 
 
@@ -240,6 +315,28 @@ def selftest():
     assert any("obsolete" in b for b in bad), bad
     print("  [RED 7] excuse for a referenced script caught")
 
+    # RED 8: the namer must be able to FAIL. A pattern that anchors on the
+    # bare "[gate-" -- the one that was live until the Linux boxes caught it --
+    # has to be reported wrong by this check, or the check is decoration.
+    stale = ("named=$$(sed -n 's/^.*\\*\\*\\* \\[\\(gate-[a-z0-9-]*\\)\\] "
+             "Error.*/    \\1/p' $(GATELOG)")
+    bad = check_red_naming(stale)
+    assert any("Makefile:2" in b or "timed-gate" in b for b in bad), bad
+    print("  [RED 8] the pre-2026-08 sed, which missed GNU make's format, "
+          "is caught")
+
+    # RED 9: a gate prerequisite missing from GATE_PREREQS is the race.
+    fake = ("GATE_PREREQS = build/a build/b\nGATE_TARGETS = gate-x\n"
+            "gate-x: build/a build/zzz\n")
+    bad = check_prereqs(fake)
+    assert any("build/zzz" in b for b in bad), bad
+    # ...and an EXCUSED gate's binary is not required, because `make gates`
+    # never builds it.
+    unwired = ("GATE_PREREQS = build/a\nGATE_TARGETS = gate-x\n"
+               "gate-x: build/a\ngate-y: build/only_for_y\n")
+    assert not check_prereqs(unwired), check_prereqs(unwired)
+    print("  [RED 9] a gate prerequisite missing from GATE_PREREQS is caught")
+
     # And the real Makefile must parse -- a lint that cannot read its own
     # subject is not a lint.
     real = open(MAKEFILE).read()
@@ -249,7 +346,7 @@ def selftest():
     assert len(disk) > 20, f"script glob found only {len(disk)} -- globs broken?"
     print(f"  [parse] real Makefile: {len(r)} recipes, {len(w)} wired, "
           f"{len(disk)} gate scripts on disk")
-    print("GATE SELFTEST GREEN: 7/7 red controls fired")
+    print("GATE SELFTEST GREEN: 9/9 red controls fired")
 
 
 if __name__ == "__main__":

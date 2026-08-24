@@ -33,7 +33,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 G2CXX := $(shell command -v clang++-19 2>/dev/null || command -v clang++ 2>/dev/null || echo $(CXX))
 G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),,-Wno-error=restrict)
 
-.PHONY: gates gates-deep gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
+.PHONY: gates gates-deep timed-gate-% gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
         gate-sig-fold \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
@@ -105,6 +105,11 @@ endif
 # sed both take it), and a run that names no gate says so rather than printing
 # an empty heading -- a red PREREQUISITE ("*** [build/g2]") is named by no
 # gate line at all.
+#
+# A THIRD format now: the targets make runs are timed-gate-foo (see below), so
+# the bracket reads "[timed-gate-foo]" or "[Makefile:2: timed-gate-foo]". The
+# pattern takes any prefix and anchors on the last "gate-" in the bracket, which
+# covers all three. tests/gate_makefile_wiring.py holds it to that.
 GATELOG = build/gates.log
 
 # Every gate at full size -- the deep tier. Same targets, same assertions; the
@@ -112,17 +117,47 @@ GATELOG = build/gates.log
 gates-deep:
 	$(MAKE) gates GATE_DEEP=--deep
 
+# Everything the gates need built, built ONCE before the timed run below.
+# The timed run is a sub-make per gate, and two sub-makes that share a binary --
+# build/g2 is a prerequisite of three gates -- would otherwise race to compile
+# it into the same output file. Building them first in a single make process
+# makes that impossible. tests/gate_makefile_wiring.py holds this list to being
+# a superset of every gate-*: prerequisite, so it cannot drift out from under
+# the gates it protects.
+GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
+  build/g2_asan build/perimeter_defect build/perimeter_min build/prec_guess \
+  build/sig_fold_unit build/strip_mu_cert build/strip_mu_fast \
+  build/strip_mu_kink build/subgraph_count build/symcount_fast build/symtm \
+  build/tma build/tma_asan build/tma_holes build/tma_modp_test \
+  $(if $(GMP_LDFLAGS),build/convex_perim_tm build/middle_kingdom_tm)
+
+# Per-gate wall time, on every run, from the machine that actually ran it.
+# -j interleaves output, so a gate that has quietly grown to minutes is
+# invisible in the log unless it says so itself -- which is how gate-perimeter-min
+# reached 417 s under a comment claiming "~2 s". The wrapper is one sub-make per
+# gate: milliseconds against gates measured in seconds. `make gates | grep
+# gate-time | sort -rn -k2` is the ranking.
+timed-gate-%:
+	@t0=$$(date +%s); \
+	 $(MAKE) --no-print-directory gate-$* ; st=$$?; \
+	 echo "gate-time $$(( $$(date +%s) - t0 ))s gate-$*"; \
+	 exit $$st
+
 gates:
 	@mkdir -p $(dir $(GATELOG))
+	@$(MAKE) --no-print-directory -j$(JOBS) $(GATE_PREREQS)
 	@set -o pipefail; \
-	 $(MAKE) --no-print-directory -j$(JOBS) $(GATE_TARGETS) 2>&1 | tee $(GATELOG); \
+	 $(MAKE) --no-print-directory -j$(JOBS) $(addprefix timed-,$(GATE_TARGETS)) 2>&1 | tee $(GATELOG); \
 	 st=$$?; \
 	 if [ $$st -ne 0 ]; then \
 	   echo; \
 	   echo "=== RED gate(s):"; \
-	   named=$$(sed -n 's/^.*\*\*\* \[\(.*: \)\{0,1\}\(gate-[a-z0-9-]*\)\] Error.*/    \2/p' $(GATELOG) | sort -u); \
+	   named=$$(sed -n 's/^.*\*\*\* \[.*\(gate-[a-z0-9-]*\)\] Error.*/    \1/p' $(GATELOG) | sort -u); \
 	   if [ -n "$$named" ]; then echo "$$named"; \
 	   else echo "    (none named -- the failure was in a prerequisite; see the log)"; fi; \
+	   echo "=== full log: $(GATELOG)"; \
+	   echo "=== slowest gates:"; \
+	   grep '^gate-time ' $(GATELOG) | sort -rn -k2 | head -8 | sed 's/^/    /'; \
 	   echo "=== full log: $(GATELOG)"; \
 	   echo "=== serial re-run, output no longer interleaved: make gates JOBS=1"; \
 	 fi; \
