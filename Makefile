@@ -34,6 +34,7 @@ G2CXX := $(shell command -v clang++-19 2>/dev/null || command -v clang++ 2>/dev/
 G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),,-Wno-error=restrict)
 
 .PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
+        gate-sig-fold gate-tma-deep gate-severance-w1-deep \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
         gate-compile-db gate-citations gate-docs-index gate-no-copyright-pdfs \
@@ -56,7 +57,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 # `make gates` does not run, which is the meta-version of the failure two of
 # this week's commits fixed.  A lint wants an allowlist for the deliberate
 # exclusions (papers, install-hooks, compile-commands), so it is its own change.
-GATE_TARGETS = gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -221,8 +222,16 @@ gate-severance-depth5:
 # --fold (the R1xR3 composition).  Written 2026-08 and referenced by
 # docs/engine-design.md and results/r4/r4-a.md, but never wired -- it was found
 # by gate-makefile-wiring below, green and unrun since August.  ~31 s.
-gate-modp: build/tma
+gate-modp: build/tma build/tma_modp_test
 	python3 tests/gate_modp.py
+
+# The mod-p test engine. It used to be compiled INSIDE tests/gate_modp.py, with
+# a subprocess c++ call on every single run -- so every push paid an -O3 build
+# of it whether or not anything it depends on had changed. As a make target it
+# is built once and then skipped, and its rebuild is triggered by the right
+# thing (its own source and the headers it includes).
+build/tma_modp_test: cpp/tma_modp_test.cpp cpp/tma/*.h | build
+	$(CXX) $(CXXFLAGS) -O3 -pthread $< -o $@
 
 # Gate MAKEFILE-WIRING: the lint the GATE_TARGETS comment above asks for.
 # It checks TWO surfaces.  Recipe-vs-GATE_TARGETS is the obvious one.  The
@@ -477,9 +486,37 @@ gate-euler: build/euler_unit
 build/euler_unit: tests/euler_unit.cpp cpp/tma/euler.h | build
 	$(CXX) $(CXXFLAGS) -O2 $< -o $@
 
+# Gate SIG-FOLD: the R1 vertical-mirror fold, settled at the SIGNATURE level
+# instead of by enumeration.  reflectSig/foldSig are ~40 lines; that reflection
+# is a symmetry of the column step is a property of those lines and of
+# stepColumnSquare8, and tests/sig_fold_unit.cpp checks it exhaustively over
+# every canonical signature at H<=6 (not merely the reachable ones) in well
+# under a second, with three mutant folds as RED controls.
+#
+# It replaces the expensive half of gate-tma check M, which proved the same
+# statement by enumerating square8 to n=14 twice -- 391 s of that gate's 429 s
+# by its own measurement.  It also restores a check that had gone missing:
+# signature.h cites experiments/r1_sym_fold_check.py as the fold's validation
+# and that file was deleted in 91bdcdc.
+gate-sig-fold: build/sig_fold_unit
+	./build/sig_fold_unit --selftest
+	./build/sig_fold_unit
+
+build/sig_fold_unit: tests/sig_fold_unit.cpp cpp/tma/signature.h cpp/tma/transition_square8.h | build
+	$(CXX) $(CXXFLAGS) -O2 $< -o $@
+
 # Gate TMA: transfer-matrix engine vs fixtures + G2 height marginals
 gate-tma: build/tma build/tma_asan build/tma_holes build/g2
 	python3 tests/gate_tma.py
+
+# Deep tier, NOT in GATE_TARGETS (see EXCUSED in tests/gate_makefile_wiring.py):
+# the same gates with their banked/limited halves recomputed at full size.
+# Run before a release, or when the code they cover changes.
+gate-tma-deep: build/tma build/tma_asan build/tma_holes build/g2
+	python3 tests/gate_tma.py --deep
+
+gate-severance-w1-deep: build/severance_w1
+	python3 experiments/severance_w1_gate.py --deep
 
 build/tma: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_main.cpp -o $@
@@ -771,7 +808,7 @@ build/ns:
 # for T(n,H) and the polyplet totals) has an automatic correctness gate: its hot
 # kernel took a burst of perf work (L1..L4, dropped reachedUndo) with no routine
 # gate covering it — a miscount would otherwise rely on a dev running `make gates`.
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-frontier-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan ns-gate-diag-pins gate-g2
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-frontier-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan ns-gate-diag-pins gate-g2 gate-tma-deep gate-severance-w1-deep
 
 # Diagonal-pin audit gate (AUDIT-2026-07-30 D4): re-derives nothing, but
 # fail-closed checks every wired P_k (k=1..19) against every REAL-swept

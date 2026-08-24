@@ -57,6 +57,15 @@ EXCUSED = {
     "gate-motley-par":
         "needs build/motley_par and a few minutes; lives with the ns-gates "
         "rather than the fast suite (documented at its recipe)",
+    "gate-tma-deep":
+        "deep tier: gate-tma with its size-limited halves recomputed at full "
+        "size (square8 n=14 fold sweeps). The property those sweeps were "
+        "proving is settled by gate-sig-fold in under a second; this runs "
+        "before a release or when the sweep code changes",
+    "gate-severance-w1-deep":
+        "deep tier: gate-severance-w1 with the level-6 holdout recomputed by "
+        "the Python DP instead of read from its bank. 536 s on dalby, and it "
+        "reprints numbers that have not moved -- release tier, not push",
     "gate-notary":
         "runs `lake build` over the Lean development, which needs the Lean "
         "toolchain and vendored Mathlib present and is minutes even warm; "
@@ -182,7 +191,9 @@ def main():
 
 
 def selftest():
-    recipes = {"gate-a", "gate-b", "gate-motley-par", "gate-notary"}
+    # Same rule as the script surface below: every excused gate must exist on
+    # the synthetic tree, or adding an excuse turns the baseline red.
+    recipes = {"gate-a", "gate-b"} | set(EXCUSED)
     wired = {"gate-a", "gate-b"}
     ok = check(recipes, wired, EXCUSED)
     assert not ok, f"selftest baseline should be green, got {ok}"

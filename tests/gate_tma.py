@@ -34,14 +34,25 @@ def main():
             print(f"FAIL missing binary {b} (run: make)")
             return 1
 
-    # Checks M and N are the expensive end of this gate -- five square8 n<=14
-    # sweeps, 391 s of the gate's 429 s serial (2026-08-06, gympie) -- and none
-    # of them reads state another writes, so they run in the background while
-    # A..L do their (cheap) work in front. Same binaries, same arguments, same
+    # Checks M and N are the expensive end of this gate -- five square8 sweeps,
+    # 391 s of the gate's 429 s serial (2026-08-06, gympie) -- and none of them
+    # reads state another writes, so they run in the background while A..L do
+    # their (cheap) work in front. Same binaries, same arguments, same
     # assertions, same printed order; only the waiting overlaps. Block measured
     # at 140 s concurrent vs 406 s serial. Everything below stays straight-line:
     # J and L resume from checkpoints their own previous step banked.
-    depth_m, H_m = 14, 11
+    #
+    # M's depth: the STATEMENT M used to prove at n=14 -- that the R1 fold is a
+    # symmetry of the column step -- is now settled exhaustively over the whole
+    # signature space by gate-sig-fold (tests/sig_fold_unit.cpp), in under a
+    # second and without enumerating anything. What is left for M is that the
+    # SWEEP applies the fold correctly: right place in the column loop, orbit
+    # sums accumulated, MT path agreeing. n=12 exercises every one of those with
+    # a real multi-height state space at ~1/16 the cost (cost is ~4x per n).
+    # H_m follows depth to stay a mid-height rather than a near-degenerate top
+    # one. --deep restores n=14 (gate-tma-deep, the release tier).
+    deep = "--deep" in sys.argv
+    depth_m, H_m = (14, 11) if deep else (12, 9)
     f_plain_m = spawn(TMA, "square8", depth_m)
     f_fold_m = {t: spawn(TMA, "square8", depth_m, "--fold", "--threads", t)
                 for t in (1, 4)}
@@ -195,7 +206,7 @@ def main():
         fold_m = parse_counts(f_fold_m[threads].result())
         gate.check(fold_m == plain_m,
               f"M fold T={threads}    square8 n<={depth_m} --fold == unfolded")
-    # H_m = 11 is a heavy mid-height, the exact unit the driver invokes
+    # H_m is a heavy mid-height, the shape of unit the driver invokes
     base_oh = parse_counts(f_base_oh.result())
     fold_oh = parse_counts(f_fold_oh.result())
     gate.check(fold_oh == base_oh,

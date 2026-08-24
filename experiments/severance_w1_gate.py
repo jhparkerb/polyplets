@@ -2,8 +2,10 @@
 
 Checks the C++ cluster-weight port (build/severance_w1) against:
   A. the banked per-composition KNOWN_WEIGHTS, k <= 5, exactly;
-  B. level-6 holdouts: (7,) fully via the Python DP, (4,4)/(3,5) interior
-     against banked TWO_ROW_INTERIOR, their boundary/pure via the Python DP;
+  B. level-6 holdouts against BANKED Python-DP values (LEVEL6 below), the
+     same practice TWO_ROW_INTERIOR already uses and for the same reason --
+     the DP that produces them is minutes and produces the same numbers every
+     time.  Re-derive with --emit-level6; --deep recomputes them live;
   C. structural invariants at EVERY level present (deep files included):
      composition list complete and in reference order, reversal symmetry
      (interior and pure palindromic, boundaries swap), single-row closed
@@ -14,6 +16,8 @@ Usage:
   python3 experiments/severance_w1_gate.py               # A+B+C on binary k<=6
   python3 experiments/severance_w1_gate.py FILE [FILE..] # + C on deep files
   python3 experiments/severance_w1_gate.py --selftest
+  python3 experiments/severance_w1_gate.py --deep        # recompute B live
+  python3 experiments/severance_w1_gate.py --emit-level6 # print LEVEL6 to re-bank
 
 Exit 0 = gate green; any mismatch raises and exits nonzero.
 """
@@ -69,17 +73,55 @@ def check_known(table):
     print(f"  [A] all {len(KNOWN_WEIGHTS)} banked compositions k<=5 match exactly")
 
 
-def check_level6(table):
-    v = (7,)
-    ref = (interior(v), boundary(v), boundary(tuple(reversed(v))), pure(v))
-    assert table[v] == ref, f"[B] level-6 DP holdout fails at {v}: {table[v]} != {ref}"
+# Level-6 holdout, DP-derived and BANKED.  Re-running the DP for these on every
+# push cost 536 s of a 538 s gate suite (dalby, 2026-08-24) to reprint numbers
+# that have not moved since they were derived.  Banking them keeps the holdout
+# exactly as strong -- the C++ is still compared against a value the Python DP
+# produced independently -- and moves only the recomputation, which --deep and
+# gate-severance-w1-deep still do.  Same practice as TWO_ROW_INTERIOR.
+#
+# (7,)'s interior is not in TWO_ROW_INTERIOR because it is a ONE-row stack; the
+# other two take their interior from that table and only their boundary/pure
+# were being recomputed here.
+LEVEL6 = {}   # composition -> (interior, boundary_bottom, boundary_top, pure)
+
+
+def dp_ref(v):
+    """The holdout reference for one composition, straight from the Python DP."""
+    return (interior(v), boundary(v), boundary(tuple(reversed(v))), pure(v))
+
+
+def emit_level6():
+    print("LEVEL6 = {")
+    for v in [(7,), (4, 4), (3, 5)]:
+        print(f"    {v}: {dp_ref(v)},")
+    print("}")
+
+
+def check_dp_alive():
+    """Banked holdouts are only as good as the DP that produced them, so the DP
+    itself runs on every gate -- on a level-3 composition, which is a second and
+    exercises exactly the same count_stack/interior/boundary/pure call graph."""
+    v = (3, 2)
+    ref = dp_ref(v)
+    assert ref == KNOWN_WEIGHTS[v], \
+        f"[D] the Python DP no longer reproduces KNOWN_WEIGHTS at {v}: {ref}"
+    print(f"  [D] Python DP live at {v} -> {ref}, matches KNOWN_WEIGHTS")
+
+
+def check_level6(table, deep=False):
+    bank = {v: dp_ref(v) for v in LEVEL6} if deep else LEVEL6
+    assert bank, "[B] LEVEL6 is empty -- re-bank with --emit-level6 (fail-closed)"
+    for v, ref in bank.items():
+        assert table[v] == ref, \
+            f"[B] level-6 holdout fails at {v}: {table[v]} != {ref}"
+    # The two-row interiors are ALSO in TWO_ROW_INTERIOR; cross-check the two
+    # banks against each other so a typo in either one is caught.
     for v in [(4, 4), (3, 5)]:
-        wi, wb, wt, wp = table[v]
-        assert wi == TWO_ROW_INTERIOR[v], \
-            f"[B] banked interior mismatch at {v}: {wi} != {TWO_ROW_INTERIOR[v]}"
-        ref = (boundary(v), boundary(tuple(reversed(v))), pure(v))
-        assert (wb, wt, wp) == ref, f"[B] boundary/pure DP holdout fails at {v}"
-    print("  [B] level-6 holdouts match: (7,) full DP; (4,4),(3,5) banked+DP")
+        assert bank[v][0] == TWO_ROW_INTERIOR[v], \
+            f"[B] LEVEL6 and TWO_ROW_INTERIOR disagree at {v}"
+    src = "recomputed live" if deep else "banked DP values"
+    print(f"  [B] level-6 holdouts match ({src}): {sorted(bank)}")
 
 
 def selftest():
@@ -103,17 +145,22 @@ def main():
     if "--selftest" in sys.argv:
         selftest()
         return
+    if "--emit-level6" in sys.argv:
+        emit_level6()
+        return
+    deep = "--deep" in sys.argv
     out = subprocess.run([BINARY, "6"], capture_output=True, text=True, check=True)
     table, order = parse(out.stdout)
     check_known(table)
     check_structure(table, order, f"{BINARY} 6")
-    check_level6(table)
-    for path in sys.argv[1:]:
+    check_level6(table, deep)
+    check_dp_alive()
+    for path in [a for a in sys.argv[1:] if not a.startswith("--")]:
         with open(path) as f:
             t, o = parse(f.read())
         check_structure(t, o, path)
         check_known(t)   # deep files contain the shallow levels too
-        check_level6(t)
+        check_level6(t, deep)
     print("GATE GREEN")
 
 

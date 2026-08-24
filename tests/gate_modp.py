@@ -2,6 +2,7 @@
 # Gate for R3 (u32 mod-p plain sweep). CRT of sum_H B_H(n) mod p_i over several
 # ~31-bit primes must equal the exact a(n) from build/tma -- tested both unfolded
 # and with --fold (the R1xR3 composition). Also reports the per-state memory win.
+import os
 import subprocess
 import sys
 
@@ -27,9 +28,12 @@ def rows(args):
 
 
 def main():
-    subprocess.run(
-        ["c++", "-std=c++20", "-O3", "-pthread", "cpp/tma_modp_test.cpp",
-         "-o", "build/tma_modp_test"], check=True)
+    # build/tma_modp_test is a make target (gate-modp depends on it). This used
+    # to compile it here on every run; fail closed if it is missing rather than
+    # rebuilding it behind make's back.
+    if not os.path.exists("build/tma_modp_test"):
+        print("  MISSING build/tma_modp_test (run: make build/tma_modp_test)")
+        sys.exit(2)
     exact = rows(["build/tma", "square8", str(N)])
     ok = True
     for fold in (False, True):

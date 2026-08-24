@@ -22,10 +22,22 @@ make -s build/perimeter_min build/g2
 
 fail=0
 
+# Enumerate once per (lattice, pmax) and cache.  The RED control below compares
+# the SQUARE4 enumeration against the KING census, which is the same enumeration
+# the real square4 check already ran -- running it twice bought nothing but a
+# second full brute force.
+enum_file () {                  # lattice pmax -> path to the enumeration
+  local lat=$1 pmax=$2 f="$TMP/enum.$lat.$pmax.txt"
+  if [ ! -s "$f" ]; then
+    ./build/perimeter_min "$lat" "$pmax" -1 2>"$TMP/$lat.log" >"$f"
+  fi
+  printf '%s\n' "$f"
+}
+
 check () {                      # lattice pmax census
-  local lat=$1 pmax=$2 census=$3
-  ./build/perimeter_min "$lat" "$pmax" -1 2>"$TMP/$lat.log" >"$TMP/$lat.txt"
-  python3 - "$TMP/$lat.txt" "$census" "$pmax" <<'PY'
+  local lat=$1 pmax=$2 census=$3 enum
+  enum=$(enum_file "$lat" "$pmax")
+  python3 - "$enum" "$census" "$pmax" <<'PY'
 import sys
 from collections import defaultdict
 enum_path, census_path, pmax = sys.argv[1], sys.argv[2], int(sys.argv[3])
