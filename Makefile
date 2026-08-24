@@ -154,7 +154,7 @@ STAMPS = build/stamps
 
 GO_SRC    = $(wildcard orchestrator/*.go orchestrator/*/*.go \
               orchestrator/*/*/*.go verify/*.go verify/*/*.go \
-              verify/*/*/*.go) go.mod go.sum
+              verify/*/*/*.go go.mod go.sum)
 PAPER_SRC = $(wildcard paper/*.tex paper/*.py paper/*.bib)
 DOCS_SRC  = $(wildcard docs/*.md docs/*/*.md docs/*/*/*.md)
 
@@ -174,9 +174,16 @@ DEPS_gate-no-copyright-pdfs = $(PAPER_SRC) tests/gate_no_copyright_pdfs.py
 # reached 417 s under a comment claiming "~2 s". The wrapper is one sub-make per
 # gate: milliseconds against gates measured in seconds. `make gates | grep
 # gate-time | sort -rn -k2` is the ranking.
+# The stamp holds the sorted dependency LIST, not just a timestamp. Comparing
+# mtimes alone would miss a file being deleted or added: the survivors are all
+# older than the stamp, so the gate would skip a tree that no longer builds the
+# same way. Three ways to run rather than skip -- the list differs, a listed
+# file has gone missing, or one is newer -- and all three are the safe direction.
 timed-%:
 	@deps='$(DEPS_$*)'; stamp=$(STAMPS)/$*; skip=; \
-	 if [ -n "$$deps" ] && [ -z "$(FORCE_GATES)" ] && [ -f "$$stamp" ]; then \
+	 list=$$(printf '%s\n' $$deps | sort); \
+	 if [ -n "$$deps" ] && [ -z "$(FORCE_GATES)" ] && [ -f "$$stamp" ] && \
+	    [ "$$list" = "$$(cat "$$stamp")" ]; then \
 	   skip=1; \
 	   for f in $$deps; do \
 	     if [ ! -e "$$f" ] || [ "$$f" -nt "$$stamp" ]; then skip=; break; fi; \
@@ -188,7 +195,9 @@ timed-%:
 	 fi; \
 	 t0=$$(date +%s); \
 	 $(MAKE) --no-print-directory $* ; st=$$?; \
-	 if [ $$st -eq 0 ] && [ -n "$$deps" ]; then mkdir -p $(STAMPS); touch "$$stamp"; fi; \
+	 if [ $$st -eq 0 ] && [ -n "$$deps" ]; then \
+	   mkdir -p $(STAMPS); printf '%s\n' $$deps | sort > "$$stamp"; \
+	 fi; \
 	 echo "gate-time $$(( $$(date +%s) - t0 ))s $*"; \
 	 exit $$st
 
