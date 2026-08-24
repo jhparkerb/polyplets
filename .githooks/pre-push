@@ -25,16 +25,29 @@ while read -r _lref lsha _rref rsha; do
   fi
   while read -r f; do
     case "$f" in
-      *.md|*.tex|*.bib|*.txt|*.log|*.pdf|*.png|*.svg) ;;   # prose/assets only
-      *) docs_only=0 ;;                                    # scripts anywhere = code
+      # Prose and assets only. .txt and .log are NOT here: gates read
+      # results/holes_n14.txt, results/siteperim_*.txt and fixtures/b*.txt as
+      # DATA, so treating any .txt as prose let an edit to a gate's own fixture
+      # skip the gate that checks it -- the same fail-open shape as the
+      # ns-gate-fast allowlist this hook's header warns about.
+      *.md|*.tex|*.bib|*.pdf|*.png|*.svg) ;;
+      *) docs_only=0 ;;                                    # anything else = code
     esac
   done < <(git -C "$root" diff --name-only "$rsha" "$lsha")
 done
 
+# Say what the push spent. A hook that costs a minute and does not report how
+# it was spent cannot be profiled from the outside.
+t0=$SECONDS
 echo "pre-push: make ns-gate-fast"
 make -C "$root" ns-gate-fast
+t_fast=$((SECONDS - t0))
 
+t_gates=0
 if [ "$docs_only" -eq 0 ]; then
-  echo "pre-push: push touches code — full 'make gates' (~3 min; emergency bypass: git push --no-verify)"
+  echo "pre-push: push touches code — full 'make gates' (emergency bypass: git push --no-verify)"
+  t1=$SECONDS
   make -C "$root" gates
+  t_gates=$((SECONDS - t1))
 fi
+echo "pre-push: ns-gate-fast ${t_fast}s, gates ${t_gates}s, total $((SECONDS - t0))s"
