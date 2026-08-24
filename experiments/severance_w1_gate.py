@@ -83,7 +83,15 @@ def check_known(table):
 # (7,)'s interior is not in TWO_ROW_INTERIOR because it is a ONE-row stack; the
 # other two take their interior from that table and only their boundary/pure
 # were being recomputed here.
-LEVEL6 = {}   # composition -> (interior, boundary_bottom, boundary_top, pure)
+# Derived by cluster_weight_dp on dalby, 2026-08-24, at 8e96d1f (the revision
+# whose gate ran them live and green).  The two-row interiors agree with
+# TWO_ROW_INTERIOR and (7,)'s row agrees with the single-row closed form
+# ((2m+1)^2, 2m+1, 2m+1, 1) at m=7 -- both cross-checked below, every run.
+LEVEL6 = {   # composition -> (interior, boundary_bottom, boundary_top, pure)
+    (7,): (225, 15, 15, 1),
+    (4, 4): (28559, 3012, 3012, 321),
+    (3, 5): (19671, 2585, 1743, 231),
+}
 
 
 def dp_ref(v):
@@ -120,6 +128,9 @@ def check_level6(table, deep=False):
     for v in [(4, 4), (3, 5)]:
         assert bank[v][0] == TWO_ROW_INTERIOR[v], \
             f"[B] LEVEL6 and TWO_ROW_INTERIOR disagree at {v}"
+    m = 7   # and the one-row entry against the single-row closed form
+    assert bank[(m,)] == ((2 * m + 1) ** 2, 2 * m + 1, 2 * m + 1, 1), \
+        f"[B] LEVEL6's ({m},) row disagrees with the single-row closed form"
     src = "recomputed live" if deep else "banked DP values"
     print(f"  [B] level-6 holdouts match ({src}): {sorted(bank)}")
 
