@@ -247,7 +247,6 @@ gates:
 	   named=$$(sed -n 's/^.*\*\*\* \[.*\(gate-[a-z0-9-]*\)\] Error.*/    \1/p' $(GATELOG) | sort -u); \
 	   if [ -n "$$named" ]; then echo "$$named"; \
 	   else echo "    (none named -- the failure was in a prerequisite; see the log)"; fi; \
-	   echo "=== full log: $(GATELOG)"; \
 	   echo "=== slowest gates:"; \
 	   grep '^gate-time ' $(GATELOG) | sort -rn -k2 | head -8 | sed 's/^/    /'; \
 	   echo "=== full log: $(GATELOG)"; \
