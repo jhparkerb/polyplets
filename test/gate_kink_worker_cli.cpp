@@ -131,8 +131,17 @@ static void testOneColumnMatchesColumnKernel(int H, int maxn) {
   runOrDie("rm -rf " + dir);
 }
 
-int main() {
-  for (int H : {4, 6, 8}) {
+// H=8 (maxn 12) costs about as much as H=4 and H=6 together, and these two
+// gates are 21 s of a 46 s push -- the serial half the hook runs before
+// anything else. What they assert holds at every H: the persistent/CLI-driven
+// chain reproduces the column kernel exactly. --deep restores H=8.
+int main(int argc, char** argv) {
+  bool deep = false;
+  for (int i = 1; i < argc; ++i)
+    if (std::strcmp(argv[i], "--deep") == 0) deep = true;
+  std::vector<int> heights = deep ? std::vector<int>{4, 6, 8}
+                                  : std::vector<int>{4, 6};
+  for (int H : heights) {
     testOneColumnMatchesColumnKernel(H, H + 4);
   }
   std::puts("gate_kink_worker_cli PASS");

@@ -946,7 +946,7 @@ build/ns/gate_kink_stage_file: test/gate_kink_stage_file.cpp $(NS_HEADERS) | bui
 # compiled map_worker binary through --kernel kink --stage seed/<r>/finalize
 # for one column and byte-matches --kernel column on the same input.
 ns-gate-kink-worker-cli: build/ns/gate_kink_worker_cli build/ns/map_worker
-	./build/ns/gate_kink_worker_cli
+	./build/ns/gate_kink_worker_cli $(GATE_DEEP)
 
 build/ns/gate_kink_worker_cli: test/gate_kink_worker_cli.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
@@ -956,7 +956,7 @@ build/ns/gate_kink_worker_cli: test/gate_kink_worker_cli.cpp $(NS_HEADERS) | bui
 # requests) and byte-matches the column-kernel one-shot path; also checks
 # two independent columns replayed through one process don't bleed state.
 ns-gate-persistent-worker: build/ns/gate_persistent_worker build/ns/map_worker build/ns/merge_worker
-	./build/ns/gate_persistent_worker
+	./build/ns/gate_persistent_worker $(GATE_DEEP)
 
 build/ns/gate_persistent_worker: test/gate_persistent_worker.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
