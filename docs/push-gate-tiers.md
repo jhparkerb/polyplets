@@ -148,25 +148,39 @@ Measured on gympie by the hook itself:
 
 | | before | after |
 |---|---|---|
-| green `git push`, code | 312 s | 31 s |
-| green `git push`, docs only | — | 8 s |
+| green `git push`, code | 312 s | 18 s |
+| green `git push`, docs only | — | 9 s |
+| `make gates` (−j10) | 250+ s | 8 s |
+| `make ns-gate-fast` (serial) | — | 8 s |
 | `make gates` serial sum, dalby | 2016 s | 436 s and lower since |
 
-Per gate, serial on dalby except where noted:
+Three things account for it, in order of how much they gave:
 
-| gate | before | after |
-|---|---|---|
-| `gate-severance-w1` | 536.5 s | 1.5 s |
-| `gate-perimeter-min` | 418.4 s | 14 s (gympie) |
-| `gate-tma` | 325.3 s | 21 s (gympie) |
-| `gate-severance-w2` | 173.4 s | 12 s (gympie) |
-| `gate-g2` | 138.1 s | 20 s (gympie) |
-| `gate-s2` | 85.8 s | 11 s (gympie) |
-| `gate-symtm` | 68 s (gympie) | 5 s |
-| `ns-gate-go` | 16 s (gympie) | 0 s unless Go changed |
-| `gate-sig-fold` | — | 0.9 s |
+1. **Gates that re-derived settled facts** stopped doing so on the push, and
+   `make gates-deep` re-derives them. `gate-severance-w1` 536.5 → 1.5 s,
+   `gate-severance-w2` 173.4 → 12 s, `gate-tma` 325.3 → 21 s.
+2. **Gates that ran the same command twice.** `gate-perimeter-min` was one
+   `perimeter_min square4 999 6 --only 13 13 0` at 198.55 s, plus a RED control
+   that re-ran the identical command (199.56 s) to compare the same row against
+   a different radius: 415 of its 417 s. `gate_tma` checks H and I likewise.
+3. **Gates whose inputs had not changed** stopped running at all — 15 of them
+   on a typical push.
+
+`gate-sig-fold` is the one addition: 0.9 s, and it settles a statement that used
+to cost 391 s to make.
 
 Nothing about what the suite checks changed. `make gates-deep` restores every
-size and every re-derivation, and has been run green on dalby.
+size, every re-derivation, and ignores every stamp; it has been run green on
+dalby.
 
-<!-- profiled 2026-08-24 -->
+## What is left
+
+`make gates` is 8 s and bounded by `gate-perimeter-defect` (8 s), which is
+undeclared and so runs every time. `ns-gate-fast` is 8 s. Both can go lower by
+declaring more gates, one at a time, each declaration being a small piece of
+careful reading that the import lint checks half of.
+
+`gate-p-paper-verifier` is 200 verifier runs at 0.32 s of real work each. It is
+declared, so it only runs when the paper or the verifier changes — but when it
+does run it is 8 s even at 8-way concurrency, and sampling the literals is not
+available: the statement is coverage, and a sample lets coverage drop silently.
