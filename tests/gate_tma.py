@@ -127,45 +127,51 @@ def main():
     #    carried in the column DP via the Euler characteristic (cpp/tma/euler.h,
     #    sweep8_holes.h); this is the fast regression that the engine's hole
     #    accounting still agrees with the flood. PRIMARY convention = 4-bg holes.
-    depth_h = 11
+    # Checks H..K all sweep the SAME thing -- square8 --holes to one depth --
+    # and H and I were literally running the identical command and keeping one
+    # result each. One sweep now serves as the baseline for all four.
+    #
+    # Depth: six of these sweeps at ~4x per n was most of what remained in this
+    # gate. H compares against the flood oracle and I/J/K are invariances of the
+    # sweep against itself (MT == serial, checkpoint+resume == plain, --reserve
+    # == plain); none of the four needs the last term to say what it says.
+    # --deep restores n=11.
+    depth_holes = 11 if deep else 10
     oracle_path = os.path.join(ROOT, "results", "holes_n14.txt")
     flood = {}
     with open(oracle_path) as f:
         for line in f:
             n, holes, count = map(int, line.split())
-            if n <= depth_h:
+            if n <= depth_holes:
                 flood[(n, holes)] = count
-    holes_serial = parse_counts(run(TMA_HOLES, "square8", depth_h, "--holes"))
-    holes_serial = {k: v for k, v in holes_serial.items() if k[0] <= depth_h}
-    gate.check(holes_serial == flood,
-          f"H holes       square8 n<={depth_h} tma_holes==flood oracle "
+    base = parse_counts(run(TMA_HOLES, "square8", depth_holes, "--holes"))
+    base = {k: v for k, v in base.items() if k[0] <= depth_holes}
+    gate.check(base == flood,
+          f"H holes       square8 n<={depth_holes} tma_holes==flood oracle "
           f"({len(flood)} (n,#holes) classes)")
 
     # I. holes path multithreaded == serial: the sharded MT sweep
     #    (sweepSquare8HeightHolesMT) must be bit-identical to the single-thread one.
-    depth_i = 11
-    base = parse_counts(run(TMA_HOLES, "square8", depth_i, "--holes"))
-    mt = parse_counts(run(TMA_HOLES, "square8", depth_i, "--holes", "--threads", "4"))
+    mt = parse_counts(run(TMA_HOLES, "square8", depth_holes, "--holes", "--threads", "4"))
     gate.check(base == mt,
-          f"I holes MT    square8 n<={depth_i} --threads 4 == serial")
+          f"I holes MT    square8 n<={depth_holes} --threads 4 == serial")
 
     # J. holes per-height checkpoint: a full --checkpoint run equals plain, and a
     #    second run over the populated dir (every height resumed from disk)
     #    reproduces it -- exercises both the bank and the resume/load paths.
-    depth_j = 11
     ckdir = os.path.join(ROOT, "runs", "ckpt", "gate_holes")
     shutil.rmtree(ckdir, ignore_errors=True)
-    ck1 = parse_counts(run(TMA_HOLES, "square8", depth_j, "--holes", "--checkpoint", ckdir))
-    ck2 = parse_counts(run(TMA_HOLES, "square8", depth_j, "--holes", "--checkpoint", ckdir))
+    ck1 = parse_counts(run(TMA_HOLES, "square8", depth_holes, "--holes", "--checkpoint", ckdir))
+    ck2 = parse_counts(run(TMA_HOLES, "square8", depth_holes, "--holes", "--checkpoint", ckdir))
     shutil.rmtree(ckdir, ignore_errors=True)
     gate.check(base == ck1 and ck1 == ck2,
-          f"J holes ckpt  square8 n<={depth_j} write+resume == plain")
+          f"J holes ckpt  square8 n<={depth_holes} write+resume == plain")
 
     # K. --reserve N pre-sizes the store (to skip the doubling-grow transient) but
     #    must not change the result -- it's pure allocation strategy.
-    resv = parse_counts(run(TMA_HOLES, "square8", depth_i, "--holes", "--reserve", "200000"))
+    resv = parse_counts(run(TMA_HOLES, "square8", depth_holes, "--holes", "--reserve", "200000"))
     gate.check(base == resv,
-          f"K holes resv  square8 n<={depth_i} --reserve == plain")
+          f"K holes resv  square8 n<={depth_holes} --reserve == plain")
 
     # L. intra-height checkpoint: a single --only-height sweep killed mid-height
     #    (env hook _Exit's right after the column-k save) resumes from the on-disk

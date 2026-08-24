@@ -23,7 +23,9 @@ from symcount import SYMMETRY_TYPES, count_symmetry_type  # noqa: E402
 from g1_naive import count_symmetry  # noqa: E402
 
 ORACLE_MAXN = 8   # how far the brute oracle (generates all animals) reaches
-MAXN = 11         # depth for Python counts, the C++ cross-check, and free assembly
+# Python symmetric counts at ~3x per further n, and gate-subgroup computes the
+# same table again in its own process. Push tier stops at 10; --deep restores 11.
+MAXN = 11 if "--deep" in sys.argv else 10
 
 # brute oracle D4 fixed-point index per symmetry type.
 # D4 order in g1_naive.py: e(0) r90(1) r180(2) r270(3) h(4) v(5) d1(6) d2(7)

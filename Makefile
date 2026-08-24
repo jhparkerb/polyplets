@@ -597,11 +597,11 @@ gate-symtm: build/symtm build/symcount_fast
 
 # Gate sym: symmetric-polyplet counters (4 types) + free count vs A030222
 gate-sym: build/symcount_fast
-	python3 tests/gate_sym.py
+	python3 tests/gate_sym.py $(GATE_DEEP)
 
 # Gate subgroup: per-SUBGROUP invariant counts + the a(n) mod 4 congruence
 gate-subgroup: build/symcount_fast build/symtm
-	python3 tests/gate_subgroup.py
+	python3 tests/gate_subgroup.py $(GATE_DEEP)
 
 # Gate E0: weighted connected-subgraph counter vs brute force
 gate-e0: build/subgraph_count
