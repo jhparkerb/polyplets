@@ -177,6 +177,31 @@ DEPS_gate-no-copyright-pdfs = $(PAPER_SRC) tests/gate_no_copyright_pdfs.py
 DEPS_gate-tma = build/tma build/tma_asan build/tma_holes build/g2 \
                 tests/gate_tma.py tests/common.py \
                 fixtures/b001168.txt fixtures/b006770.txt results/holes_n14.txt
+FIXTURES  = $(wildcard fixtures/*)
+
+# Gates whose recipe just runs a binary: the binary IS the input. Make rebuilds
+# it from its own sources before the sweep (GATE_PREREQS / NS_FAST_PREREQS), so
+# a change under core/, cpp/ or worker/ reaches these as a newer binary.
+DEPS_ns-gate-closedform        = $(GO_SRC)
+DEPS_ns-gate-math              = build/ns/gate_math
+DEPS_ns-gate-run               = build/ns/gate_run
+DEPS_ns-gate-runfile           = build/ns/gate_runfile
+DEPS_ns-gate-kink              = build/ns/gate_kink
+DEPS_ns-gate-kink-column       = build/ns/gate_kink_column
+DEPS_ns-gate-kink-stage-file   = build/ns/gate_kink_stage_file
+DEPS_ns-gate-kink-worker-cli   = build/ns/gate_kink_worker_cli build/ns/map_worker
+DEPS_ns-gate-persistent-worker = build/ns/gate_persistent_worker \
+                build/ns/map_worker build/ns/merge_worker
+DEPS_gate-strip-cert           = build/strip_mu_cert
+
+DEPS_gate-strip-fast = build/strip_mu_fast build/strip_mu_kink \
+                tests/gate_strip_fast.py tests/common.py $(FIXTURES)
+DEPS_gate-king-grid = build/directed_cone_anchor tests/gate_king_grid.py \
+                tests/common.py $(FIXTURES)
+DEPS_gate-multidirected = build/directed_cone_anchor tests/gate_multidirected.py \
+                tests/common.py experiments/multidirected_king.py $(FIXTURES)
+DEPS_gate-g1 = tests/gate_g1.py tests/common.py oracle/g1_naive.py $(FIXTURES)
+
 DEPS_gate-s2  = tests/gate_s2.py tests/common.py oracle/g1_naive.py \
                 fixtures/b000105.txt fixtures/b030222.txt
 DEPS_gate-sym = build/symcount_fast tests/gate_sym.py tests/common.py \
@@ -972,7 +997,16 @@ NS_FAST_TARGETS = ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile \
 # are readable the same way. This half is 20 s of a 22 s docs-only push and
 # nothing said where it went. Serial by construction (one sub-make at a time),
 # so unlike the `gates` sweep there is no shared-prerequisite race to prevent.
-ns-gate-fast:
+# Built before the sweep, for the same reason GATE_PREREQS is: the timed wrapper
+# compares a gate's stamp against the BINARY it runs, so the binary has to be
+# current before that comparison happens, or an edited source leaves a stale
+# binary and the gate skips on it.
+NS_FAST_PREREQS = build/ns/gate_math build/ns/gate_run build/ns/gate_runfile \
+  build/ns/gate_kink build/ns/gate_kink_column build/ns/gate_kink_stage_file \
+  build/ns/gate_kink_worker_cli build/ns/gate_persistent_worker \
+  build/ns/map_worker build/ns/merge_worker build/strip_mu_cert
+
+ns-gate-fast: $(NS_FAST_PREREQS)
 	@for t in $(NS_FAST_TARGETS); do \
 	   $(MAKE) --no-print-directory timed-$$t || exit $$?; \
 	 done
