@@ -872,7 +872,21 @@ ns-gate-diag-pins:
 # gate-strip-cert rides here (sub-second) because it guards a PUBLISHED rigorous
 # bound: a regression that made the exact checker pass unconditionally would turn
 # a proof into a wrong number silently. Cheapest possible tripwire for it.
-ns-gate-fast: ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile ns-gate-go ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker gate-strip-cert
+NS_FAST_TARGETS = ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile \
+  ns-gate-go ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file \
+  ns-gate-kink-worker-cli ns-gate-persistent-worker gate-strip-cert
+
+# Run them one at a time, in this order, each reporting its own wall time -- the
+# same 'gate-time Ns target' line `make gates` prints, so the hook's two halves
+# are readable the same way. This half is 20 s of a 22 s docs-only push and
+# nothing said where it went. Serial by construction (one sub-make at a time),
+# so unlike the `gates` sweep there is no shared-prerequisite race to prevent.
+ns-gate-fast:
+	@for t in $(NS_FAST_TARGETS); do \
+	   t0=$$(date +%s); \
+	   $(MAKE) --no-print-directory $$t || exit $$?; \
+	   echo "gate-time $$(( $$(date +%s) - t0 ))s $$t"; \
+	 done
 
 # Closed-form invariant gate: assert the engine contributes every KNOWN closed
 # form (top strip H=N=3^(N-1); low strips T(n,1)=1, T(n,2) recurrence) DIRECTLY,
