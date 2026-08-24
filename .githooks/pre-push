@@ -38,16 +38,25 @@ done
 
 # Say what the push spent. A hook that costs a minute and does not report how
 # it was spent cannot be profiled from the outside.
+# ...and keep it. The terminal scrolls; build/pre-push.log is where the last
+# push's per-gate times can still be read afterwards.
+log="$root/build/pre-push.log"
+mkdir -p "$root/build"
+: > "$log"
+
 t0=$SECONDS
 echo "pre-push: make ns-gate-fast"
-make -C "$root" ns-gate-fast
+set -o pipefail
+make -C "$root" ns-gate-fast 2>&1 | tee -a "$log"
 t_fast=$((SECONDS - t0))
 
 t_gates=0
 if [ "$docs_only" -eq 0 ]; then
   echo "pre-push: push touches code — full 'make gates' (emergency bypass: git push --no-verify)"
   t1=$SECONDS
-  make -C "$root" gates
+  make -C "$root" gates 2>&1 | tee -a "$log"
   t_gates=$((SECONDS - t1))
 fi
-echo "pre-push: ns-gate-fast ${t_fast}s, gates ${t_gates}s, total $((SECONDS - t0))s"
+summary="pre-push: ns-gate-fast ${t_fast}s, gates ${t_gates}s, total $((SECONDS - t0))s"
+echo "$summary" | tee -a "$log"
+echo "pre-push: per-gate times in build/pre-push.log (grep gate-time | sort -rn -k2)"
