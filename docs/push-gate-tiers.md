@@ -168,3 +168,5 @@ Per gate, serial on dalby except where noted:
 
 Nothing about what the suite checks changed. `make gates-deep` restores every
 size and every re-derivation, and has been run green on dalby.
+
+<!-- profiled 2026-08-24 -->
