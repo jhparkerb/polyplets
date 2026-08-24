@@ -11,16 +11,23 @@
 # ns-gate-fast. Fail closed: new refs and unrecognized paths get the full
 # chain.
 #
+# A few gates are input-gated (Makefile, DEPS_*): they are skipped while their
+# stamp is newer than everything they read. Declaring a gate is opt-in and
+# undeclared is the safe default, so a gate nobody has declared still runs on
+# every push. A new ref forces the lot, stamps ignored.
+#
 # Genuine emergency bypass: `git push --no-verify` — then fix what you skipped.
 set -euo pipefail
 root="$(git rev-parse --show-toplevel)"
 zero=0000000000000000000000000000000000000000
 
 docs_only=1
+force=
 while read -r _lref lsha _rref rsha; do
   [ "$lsha" = "$zero" ] && continue          # ref deletion: nothing to test
   if [ "$rsha" = "$zero" ]; then
     docs_only=0                              # new ref: no base to diff, fail closed
+    force=1                                  # ...and ignore every gate stamp
     continue
   fi
   while read -r f; do
@@ -47,14 +54,14 @@ mkdir -p "$root/build"
 t0=$SECONDS
 echo "pre-push: make ns-gate-fast"
 set -o pipefail
-make -C "$root" ns-gate-fast 2>&1 | tee -a "$log"
+make -C "$root" ns-gate-fast FORCE_GATES=$force 2>&1 | tee -a "$log"
 t_fast=$((SECONDS - t0))
 
 t_gates=0
 if [ "$docs_only" -eq 0 ]; then
   echo "pre-push: push touches code — full 'make gates' (emergency bypass: git push --no-verify)"
   t1=$SECONDS
-  make -C "$root" gates 2>&1 | tee -a "$log"
+  make -C "$root" gates FORCE_GATES=$force 2>&1 | tee -a "$log"
   t_gates=$((SECONDS - t1))
 fi
 summary="pre-push: ns-gate-fast ${t_fast}s, gates ${t_gates}s, total $((SECONDS - t0))s"

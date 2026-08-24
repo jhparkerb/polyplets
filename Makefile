@@ -33,7 +33,7 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 G2CXX := $(shell command -v clang++-19 2>/dev/null || command -v clang++ 2>/dev/null || echo $(CXX))
 G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),,-Wno-error=restrict)
 
-.PHONY: gates gates-deep timed-gate-% gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
+.PHONY: gates gates-deep gates-force timed-% gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
         gate-sig-fold \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
@@ -115,7 +115,12 @@ GATELOG = build/gates.log
 # Every gate at full size -- the deep tier. Same targets, same assertions; the
 # ones that bank or bound something re-derive it instead.
 gates-deep:
-	$(MAKE) gates GATE_DEEP=--deep
+	$(MAKE) gates GATE_DEEP=--deep FORCE_GATES=1
+
+# Every gate, ignoring every stamp -- what to run when you want the suite to
+# have actually executed rather than to have decided it did not need to.
+gates-force:
+	$(MAKE) gates FORCE_GATES=1
 
 # Everything the gates need built, built ONCE before the timed run below.
 # The timed run is a sub-make per gate, and two sub-makes that share a binary --
@@ -131,16 +136,60 @@ GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
   build/tma build/tma_asan build/tma_holes build/tma_modp_test \
   $(if $(GMP_LDFLAGS),build/convex_perim_tm build/middle_kingdom_tm)
 
+# --- input gating -----------------------------------------------------------
+# A gate that re-runs when nothing it reads has changed is pure waiting. A gate
+# that does NOT run when something it reads HAS changed is a silent hole, and
+# this repo has been bitten by that twice (the sym/symcount.py deletion, the
+# four unwired Severance gates). So the default is: every gate runs, every time.
+# A gate is skipped only if it is DECLARED here with the full set of things it
+# reads, and its stamp is newer than all of them.
+#
+# Undeclared is the safe state, so forgetting to declare a gate costs time, not
+# coverage. Declaring one wrong is caught two ways: tests/gate_makefile_wiring.py
+# requires a declared gate's own script to be among its deps, and a dep that has
+# gone missing makes the gate run rather than skip.
+#
+# `make gates-force` ignores every stamp. So does the hook on a new ref.
+STAMPS = build/stamps
+
+GO_SRC    = $(wildcard orchestrator/*.go orchestrator/*/*.go \
+              orchestrator/*/*/*.go verify/*.go verify/*/*.go \
+              verify/*/*/*.go) go.mod go.sum
+PAPER_SRC = $(wildcard paper/*.tex paper/*.py paper/*.bib)
+DOCS_SRC  = $(wildcard docs/*.md docs/*/*.md docs/*/*/*.md)
+
+# `go test ./orchestrator/... ./verify/...` reads Go packages and nothing else
+# in this tree -- it has no Makefile prerequisites and builds nothing. 16 s on
+# gympie, serially, on every push including documentation-only ones.
+DEPS_ns-gate-go             = $(GO_SRC)
+DEPS_gate-p-paper-verifier  = $(PAPER_SRC) tests/gate_p_paper_verifier.py \
+                              tests/_audit_subprocess_cache.py
+DEPS_gate-l-paper-verifier  = $(PAPER_SRC) tests/gate_l_paper_verifier.py
+DEPS_gate-docs-index        = $(DOCS_SRC) tests/gate_docs_index.py
+DEPS_gate-no-copyright-pdfs = $(PAPER_SRC) tests/gate_no_copyright_pdfs.py
+
 # Per-gate wall time, on every run, from the machine that actually ran it.
 # -j interleaves output, so a gate that has quietly grown to minutes is
 # invisible in the log unless it says so itself -- which is how gate-perimeter-min
 # reached 417 s under a comment claiming "~2 s". The wrapper is one sub-make per
 # gate: milliseconds against gates measured in seconds. `make gates | grep
 # gate-time | sort -rn -k2` is the ranking.
-timed-gate-%:
-	@t0=$$(date +%s); \
-	 $(MAKE) --no-print-directory gate-$* ; st=$$?; \
-	 echo "gate-time $$(( $$(date +%s) - t0 ))s gate-$*"; \
+timed-%:
+	@deps='$(DEPS_$*)'; stamp=$(STAMPS)/$*; skip=; \
+	 if [ -n "$$deps" ] && [ -z "$(FORCE_GATES)" ] && [ -f "$$stamp" ]; then \
+	   skip=1; \
+	   for f in $$deps; do \
+	     if [ ! -e "$$f" ] || [ "$$f" -nt "$$stamp" ]; then skip=; break; fi; \
+	   done; \
+	 fi; \
+	 if [ -n "$$skip" ]; then \
+	   echo "gate-time 0s $* (skipped: declared inputs unchanged)"; \
+	   exit 0; \
+	 fi; \
+	 t0=$$(date +%s); \
+	 $(MAKE) --no-print-directory $* ; st=$$?; \
+	 if [ $$st -eq 0 ] && [ -n "$$deps" ]; then mkdir -p $(STAMPS); touch "$$stamp"; fi; \
+	 echo "gate-time $$(( $$(date +%s) - t0 ))s $*"; \
 	 exit $$st
 
 gates:
@@ -883,9 +932,7 @@ NS_FAST_TARGETS = ns-gate-closedform ns-gate-math ns-gate-run ns-gate-runfile \
 # so unlike the `gates` sweep there is no shared-prerequisite race to prevent.
 ns-gate-fast:
 	@for t in $(NS_FAST_TARGETS); do \
-	   t0=$$(date +%s); \
-	   $(MAKE) --no-print-directory $$t || exit $$?; \
-	   echo "gate-time $$(( $$(date +%s) - t0 ))s $$t"; \
+	   $(MAKE) --no-print-directory timed-$$t || exit $$?; \
 	 done
 
 # Closed-form invariant gate: assert the engine contributes every KNOWN closed

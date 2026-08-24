@@ -120,6 +120,39 @@ def check_red_naming(text):
     return bad
 
 
+def check_gate_deps(text):
+    """A DECLARED gate must list its own script among its inputs.
+
+    `make gates` skips a declared gate while its stamp is newer than everything
+    in DEPS_<gate>. Leaving the gate's own script out of that list means editing
+    the gate does not re-run it -- a green suite that silently skipped the check
+    you just changed. Undeclared gates always run, so this only has to police
+    the declarations that exist.
+    """
+    bad = []
+    for m in re.finditer(r"^DEPS_(gate-[A-Za-z0-9_-]+|ns-gate-[A-Za-z0-9_-]+)"
+                         r"\s*=\s*((?:.*\\\n)*.*)$", text, re.M):
+        gate, deps = m.group(1), m.group(2).replace("\\\n", " ")
+        # the scripts the gate's own recipe names, from its tab-indented lines
+        body, seen = [], False
+        for line in text.splitlines():
+            if re.match(rf"^{re.escape(gate)}\s*:", line):
+                seen = True
+                continue
+            if seen:
+                if line.startswith("\t"):
+                    body.append(line)
+                elif line.strip():
+                    break
+        scripts = set(re.findall(r"[\w/]+\.(?:py|sh)", "\n".join(body)))
+        missing = sorted(x for x in scripts if x not in deps)
+        if missing:
+            bad.append(f"DEPS_{gate} does not list the script its recipe runs, "
+                       f"so editing it would not re-run the gate: "
+                       + ", ".join(missing))
+    return bad
+
+
 def check_prereqs(text):
     """GATE_PREREQS must be a superset of every gate-*: prerequisite.
 
@@ -236,7 +269,8 @@ def main():
     bad = (check(recipes, wired, EXCUSED)
            + check_scripts(scripts, text, EXCUSED_SCRIPTS)
            + check_red_naming(text)
-           + check_prereqs(text))
+           + check_prereqs(text)
+           + check_gate_deps(text))
     if bad:
         for b in bad:
             print("  RED: " + b)
@@ -251,6 +285,7 @@ def main():
     for t, why in sorted(EXCUSED_SCRIPTS.items()):
         print(f"  excused (script): {t} -- {why}")
     print("  prereqs:   GATE_PREREQS covers every gate-*: build/ prerequisite")
+    print("  gate-deps: every DECLARED gate lists its own script")
     print(f"  red-namer: {len(RED_LINE_CASES)} bracket formats parsed "
           "correctly by the Makefile's own sed")
     print("GATE GREEN")
@@ -337,6 +372,17 @@ def selftest():
     assert not check_prereqs(unwired), check_prereqs(unwired)
     print("  [RED 9] a gate prerequisite missing from GATE_PREREQS is caught")
 
+    # RED 10: a declared gate whose deps omit its own script would never
+    # re-run when that script is edited.
+    fake = ("DEPS_gate-x = paper/a.tex\n"
+            "gate-x:\n\tpython3 tests/gate_x.py\n")
+    bad = check_gate_deps(fake)
+    assert any("tests/gate_x.py" in b for b in bad), bad
+    ok_case = ("DEPS_gate-x = paper/a.tex tests/gate_x.py\n"
+               "gate-x:\n\tpython3 tests/gate_x.py\n")
+    assert not check_gate_deps(ok_case), check_gate_deps(ok_case)
+    print("  [RED 10] a declared gate that omits its own script is caught")
+
     # And the real Makefile must parse -- a lint that cannot read its own
     # subject is not a lint.
     real = open(MAKEFILE).read()
@@ -346,7 +392,7 @@ def selftest():
     assert len(disk) > 20, f"script glob found only {len(disk)} -- globs broken?"
     print(f"  [parse] real Makefile: {len(r)} recipes, {len(w)} wired, "
           f"{len(disk)} gate scripts on disk")
-    print("GATE SELFTEST GREEN: 9/9 red controls fired")
+    print("GATE SELFTEST GREEN: 10/10 red controls fired")
 
 
 if __name__ == "__main__":
