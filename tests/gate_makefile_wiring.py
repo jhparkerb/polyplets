@@ -153,6 +153,55 @@ def check_gate_deps(text):
     return bad
 
 
+# Where a gate script can import a repo-local module from.
+_IMPORT_DIRS = ("tests", "experiments", "oracle", "scripts", "paper")
+
+
+def _local_imports(path, seen):
+    """Transitive repo-local modules imported by `path`, as repo-relative paths."""
+    import ast as _ast
+    if path in seen or not os.path.exists(path):
+        return
+    seen.add(path)
+    try:
+        tree = _ast.parse(open(path).read())
+    except SyntaxError:
+        return
+    names = set()
+    for node in _ast.walk(tree):
+        if isinstance(node, _ast.Import):
+            names.update(a.name.split(".")[0] for a in node.names)
+        elif isinstance(node, _ast.ImportFrom) and node.level == 0 and node.module:
+            names.add(node.module.split(".")[0])
+    for name in names:
+        for d in _IMPORT_DIRS:
+            cand = os.path.join(ROOT, d, name + ".py")
+            if os.path.exists(cand):
+                yield os.path.relpath(cand, ROOT)
+                yield from _local_imports(cand, seen)
+
+
+def check_gate_imports(text):
+    """A declared gate must list every repo-local module its script imports.
+
+    DEPS_<gate> is what makes the gate skip. `tests/common.py` is imported by
+    nearly every gate script and named in none of their recipes, so a
+    hand-written dependency list is exactly where it goes missing -- and then
+    editing common.py stops re-running the gates that use it. Computed, not
+    trusted.
+    """
+    bad = []
+    for m in re.finditer(r"^DEPS_((?:ns-)?gate-[A-Za-z0-9_-]+)"
+                         r"\s*=\s*((?:.*\\\n)*.*)$", text, re.M):
+        gate, deps = m.group(1), m.group(2).replace("\\\n", " ")
+        for script in re.findall(r"[\w/]+\.py", deps):
+            for mod in _local_imports(os.path.join(ROOT, script), set()):
+                if mod not in deps:
+                    bad.append(f"DEPS_{gate} omits {mod}, which {script} "
+                               f"imports -- editing it would not re-run the gate")
+    return sorted(set(bad))
+
+
 def check_prereqs(text):
     """GATE_PREREQS must be a superset of every gate-*: prerequisite.
 
@@ -270,7 +319,8 @@ def main():
            + check_scripts(scripts, text, EXCUSED_SCRIPTS)
            + check_red_naming(text)
            + check_prereqs(text)
-           + check_gate_deps(text))
+           + check_gate_deps(text)
+           + check_gate_imports(text))
     if bad:
         for b in bad:
             print("  RED: " + b)
@@ -285,7 +335,7 @@ def main():
     for t, why in sorted(EXCUSED_SCRIPTS.items()):
         print(f"  excused (script): {t} -- {why}")
     print("  prereqs:   GATE_PREREQS covers every gate-*: build/ prerequisite")
-    print("  gate-deps: every DECLARED gate lists its own script")
+    print("  gate-deps: every DECLARED gate lists its own script and every\n             repo-local module that script imports")
     print(f"  red-namer: {len(RED_LINE_CASES)} bracket formats parsed "
           "correctly by the Makefile's own sed")
     print("GATE GREEN")
@@ -383,6 +433,12 @@ def selftest():
     assert not check_gate_deps(ok_case), check_gate_deps(ok_case)
     print("  [RED 10] a declared gate that omits its own script is caught")
 
+    # RED 11: a declared gate that omits a module its script imports.
+    probe = "DEPS_gate-tma = tests/gate_tma.py\n"
+    bad = check_gate_imports(probe)
+    assert any("tests/common.py" in b for b in bad), bad
+    print("  [RED 11] a declared gate that omits an imported module is caught")
+
     # And the real Makefile must parse -- a lint that cannot read its own
     # subject is not a lint.
     real = open(MAKEFILE).read()
@@ -392,7 +448,7 @@ def selftest():
     assert len(disk) > 20, f"script glob found only {len(disk)} -- globs broken?"
     print(f"  [parse] real Makefile: {len(r)} recipes, {len(w)} wired, "
           f"{len(disk)} gate scripts on disk")
-    print("GATE SELFTEST GREEN: 10/10 red controls fired")
+    print("GATE SELFTEST GREEN: 11/11 red controls fired")
 
 
 if __name__ == "__main__":

@@ -168,6 +168,19 @@ DEPS_gate-l-paper-verifier  = $(PAPER_SRC) tests/gate_l_paper_verifier.py
 DEPS_gate-docs-index        = $(DOCS_SRC) tests/gate_docs_index.py
 DEPS_gate-no-copyright-pdfs = $(PAPER_SRC) tests/gate_no_copyright_pdfs.py
 
+# The two 20 s gates. Their inputs are exact and small: the binaries they run
+# (rebuilt by the GATE_PREREQS pass before this sweep, so a cpp/ or core/ change
+# reaches them as a newer binary), the scripts they import, and the fixtures
+# they read by name. tests/gate_makefile_wiring.py checks the import side of
+# that mechanically -- every repo-local module these scripts import,
+# transitively, has to be listed.
+DEPS_gate-tma = build/tma build/tma_asan build/tma_holes build/g2 \
+                tests/gate_tma.py tests/common.py \
+                fixtures/b001168.txt fixtures/b006770.txt results/holes_n14.txt
+DEPS_gate-g2  = build/g2 build/g2_asan \
+                tests/gate_g2.py tests/common.py oracle/g1_naive.py \
+                fixtures/b001168.txt fixtures/b006770.txt fixtures/b001207.txt
+
 # Per-gate wall time, on every run, from the machine that actually ran it.
 # -j interleaves output, so a gate that has quietly grown to minutes is
 # invisible in the log unless it says so itself -- which is how gate-perimeter-min
