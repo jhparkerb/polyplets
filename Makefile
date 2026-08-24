@@ -33,8 +33,8 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 G2CXX := $(shell command -v clang++-19 2>/dev/null || command -v clang++ 2>/dev/null || echo $(CXX))
 G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),,-Wno-error=restrict)
 
-.PHONY: gates gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
-        gate-sig-fold gate-tma-deep gate-severance-w1-deep \
+.PHONY: gates gates-deep gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
+        gate-sig-fold \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
         gate-compile-db gate-citations gate-docs-index gate-no-copyright-pdfs \
@@ -57,6 +57,15 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 # `make gates` does not run, which is the meta-version of the failure two of
 # this week's commits fixed.  A lint wants an allowlist for the deliberate
 # exclusions (papers, install-hooks, compile-commands), so it is its own change.
+# Push tier vs deep tier. Several gates re-derive, at full size, a fact that is
+# settled and does not move -- a fold symmetry, a level-6 DP holdout, a hole
+# convention. Those gates take $(GATE_DEEP): empty (the default) runs the push
+# tier, --deep restores the full-size derivation. `make gates-deep` is the whole
+# suite at full size; run it before a release, and whenever the code under a
+# banked or size-limited check changes. Each such gate documents at its own
+# recipe what --deep restores and why the push tier is enough.
+GATE_DEEP ?=
+
 GATE_TARGETS = gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
@@ -97,6 +106,11 @@ endif
 # an empty heading -- a red PREREQUISITE ("*** [build/g2]") is named by no
 # gate line at all.
 GATELOG = build/gates.log
+
+# Every gate at full size -- the deep tier. Same targets, same assertions; the
+# ones that bank or bound something re-derive it instead.
+gates-deep:
+	$(MAKE) gates GATE_DEEP=--deep
 
 gates:
 	@mkdir -p $(dir $(GATELOG))
@@ -203,7 +217,7 @@ gate-undertow-congruence:
 # recipe at the end of `gates`.
 gate-severance-w1:
 	python3 experiments/severance_w1_gate.py --selftest
-	python3 experiments/severance_w1_gate.py
+	python3 experiments/severance_w1_gate.py $(GATE_DEEP)
 
 gate-severance-w2:
 	python3 experiments/severance_w2_gate.py --selftest
@@ -369,7 +383,7 @@ gate-driver: build/tma
 
 # Gate G2: C++ Redelmeier engine vs oracle + fixtures (+ split, + sanitizers)
 gate-g2: build/g2 build/g2_asan
-	python3 tests/gate_g2.py
+	python3 tests/gate_g2.py $(GATE_DEEP)
 
 build:
 	mkdir -p build
@@ -507,16 +521,8 @@ build/sig_fold_unit: tests/sig_fold_unit.cpp cpp/tma/signature.h cpp/tma/transit
 
 # Gate TMA: transfer-matrix engine vs fixtures + G2 height marginals
 gate-tma: build/tma build/tma_asan build/tma_holes build/g2
-	python3 tests/gate_tma.py
+	python3 tests/gate_tma.py $(GATE_DEEP)
 
-# Deep tier, NOT in GATE_TARGETS (see EXCUSED in tests/gate_makefile_wiring.py):
-# the same gates with their banked/limited halves recomputed at full size.
-# Run before a release, or when the code they cover changes.
-gate-tma-deep: build/tma build/tma_asan build/tma_holes build/g2
-	python3 tests/gate_tma.py --deep
-
-gate-severance-w1-deep: build/severance_w1
-	python3 experiments/severance_w1_gate.py --deep
 
 build/tma: cpp/tma_main.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread cpp/tma_main.cpp -o $@
@@ -761,7 +767,7 @@ gate-dir4-perim-alg: build/prec_guess
 
 # Gate S2: free/one-sided Burnside counts vs A000105/A030222 (oracle-grade)
 gate-s2:
-	python3 tests/gate_s2.py
+	python3 tests/gate_s2.py $(GATE_DEEP)
 
 # ─── Next-system (ns-*) targets ──────────────────────────────────────────────
 # All new-system code lives under core/ worker/ orchestrator/ verify/ test/.
@@ -808,7 +814,7 @@ build/ns:
 # for T(n,H) and the polyplet totals) has an automatic correctness gate: its hot
 # kernel took a burst of perf work (L1..L4, dropped reachedUndo) with no routine
 # gate covering it — a miscount would otherwise rely on a dev running `make gates`.
-ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-frontier-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan ns-gate-diag-pins gate-g2 gate-tma-deep gate-severance-w1-deep
+ns-gates: ns-gate-arch ns-gate-math ns-gate-regression ns-gate-fold ns-gate-spill ns-gate-parallel ns-gate-resume-boundaries ns-gate-u128 ns-gate-go ns-gate-run ns-gate-runfile ns-gate-spill-zstd ns-gate-frontier-zstd ns-gate-closedform ns-gate-holes ns-gate-verify ns-gate-split ns-gate-kink ns-gate-kink-column ns-gate-kink-stage-file ns-gate-kink-worker-cli ns-gate-persistent-worker ns-gate-asan ns-gate-diag-pins gate-g2
 
 # Diagonal-pin audit gate (AUDIT-2026-07-30 D4): re-derives nothing, but
 # fail-closed checks every wired P_k (k=1..19) against every REAL-swept

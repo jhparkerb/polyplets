@@ -57,15 +57,6 @@ EXCUSED = {
     "gate-motley-par":
         "needs build/motley_par and a few minutes; lives with the ns-gates "
         "rather than the fast suite (documented at its recipe)",
-    "gate-tma-deep":
-        "deep tier: gate-tma with its size-limited halves recomputed at full "
-        "size (square8 n=14 fold sweeps). The property those sweeps were "
-        "proving is settled by gate-sig-fold in under a second; this runs "
-        "before a release or when the sweep code changes",
-    "gate-severance-w1-deep":
-        "deep tier: gate-severance-w1 with the level-6 holdout recomputed by "
-        "the Python DP instead of read from its bank. 536 s on dalby, and it "
-        "reprints numbers that have not moved -- release tier, not push",
     "gate-notary":
         "runs `lake build` over the Lean development, which needs the Lean "
         "toolchain and vendored Mathlib present and is minutes even warm; "

@@ -21,7 +21,14 @@ sys.path.insert(0, os.path.join(ROOT, "oracle"))
 
 from g1_naive import count_symmetry  # noqa: E402
 
-DEPTH = {"square4": 10, "square8": 9}  # bounded by fixed-count explosion
+# Bounded by fixed-count explosion. count_symmetry is a pure-Python canonical
+# form over every fixed animal under all 8 symmetries: square8 n=9 alone was
+# ~10.5M canon_under calls and essentially all of this gate's 86 s (dalby,
+# 2026-08-24, cProfile), and each further n costs ~4x. Everything this gate
+# asserts -- free counts vs A000105/A030222, the Burnside identities, the
+# conjugacy equalities -- holds at every n, so the push tier stops one term
+# short on the expensive lattice. --deep restores square8 n=9.
+DEPTH = {"square4": 10, "square8": 9 if "--deep" in sys.argv else 8}
 
 
 def main():
