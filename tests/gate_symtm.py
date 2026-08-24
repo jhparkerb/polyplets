@@ -12,10 +12,18 @@ three symtm modes.
 
 import os
 import subprocess
+import sys
 
 from common import ROOT, Gate
 
-GATE_MAXN = 18  # symcount_fast hmirror@18 ~4s on gympie; @20 is 33s, too slow
+# Six sequential runs (three types x two binaries) and, by this file's own
+# note, ~2.9x per further n: hmirror@18 ~4 s, @20 33 s. Measured 68 s on gympie
+# under `make gates -j10`, the largest single contributor to the push -- and
+# only 18.9 s serial on dalby, which is why the dalby ranking never showed it.
+# What the gate asserts is that two independent algorithms agree at every n;
+# a cross-algorithm divergence does not wait until n=16 to appear. --deep
+# restores n=18.
+GATE_MAXN = 18 if "--deep" in sys.argv else 15
 TYPES = ["hmirror", "r180", "dmirror"]
 
 SYMTM = os.path.join(ROOT, "build", "symtm")

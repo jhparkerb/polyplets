@@ -593,7 +593,7 @@ build/symtm: cpp/sym/symtm.cpp core/signature.h core/transition.h | build
 
 # Gate symtm: TM symmetric counter vs symcount_fast (cross-algorithm, live)
 gate-symtm: build/symtm build/symcount_fast
-	python3 tests/gate_symtm.py
+	python3 tests/gate_symtm.py $(GATE_DEEP)
 
 # Gate sym: symmetric-polyplet counters (4 types) + free count vs A030222
 gate-sym: build/symcount_fast
