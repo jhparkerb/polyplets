@@ -70,6 +70,10 @@ SCRIPT_GLOBS = ("tests/gate_*.py", "experiments/*_gate.py", "scripts/*gate*.sh")
 
 # Scripts that are deliberately not run by the Makefile, with the reason.
 EXCUSED_SCRIPTS = {
+    "scripts/profile_gates.sh":
+        "not a gate -- it is the PROFILER for the gate suite, and it runs "
+        "`make gates` itself. Wiring it into the Makefile would make `make "
+        "gates` recurse into itself; it is run by hand when a push feels slow",
     "scripts/dir4_perim_gate_red_check.sh":
         "not a gate -- it is the manual RED demonstration FOR gate-dir4-perim-"
         "alg, and it deliberately damages its own input file to prove the gate "
@@ -206,7 +210,10 @@ def selftest():
 
     # --- script surface ---
     text = "gate-x:\n\tpython3 tests/gate_seen.py\n"
-    scr = {"tests/gate_seen.py", "scripts/dir4_perim_gate_red_check.sh"}
+    # Every excused script must be on the synthetic disk, or the baseline goes
+    # red on "no longer exists" the moment an excuse is added -- which is how
+    # this selftest broke the first time a second entry landed.
+    scr = {"tests/gate_seen.py"} | set(EXCUSED_SCRIPTS)
     ok = check_scripts(scr, text, EXCUSED_SCRIPTS)
     assert not ok, f"script baseline should be green, got {ok}"
     print("  [baseline] script named + script excused -> green")
