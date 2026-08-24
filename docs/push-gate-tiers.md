@@ -148,13 +148,13 @@ Measured on gympie by the hook itself:
 
 | | before | after |
 |---|---|---|
-| green `git push`, code | 312 s | 18 s |
-| green `git push`, docs only | — | 9 s |
-| `make gates` (−j10) | 250+ s | 8 s |
-| `make ns-gate-fast` (serial) | — | 8 s |
+| green `git push`, code | 312 s | 9 s |
+| green `git push`, docs only | — | 3 s |
+| `make gates` (−j10) | 250+ s | 7 s |
+| `make ns-gate-fast` (serial) | — | 1 s |
 | `make gates` serial sum, dalby | 2016 s | 436 s and lower since |
 
-Three things account for it, in order of how much they gave:
+Four things account for it, in order of how much they gave:
 
 1. **Gates that re-derived settled facts** stopped doing so on the push, and
    `make gates-deep` re-derives them. `gate-severance-w1` 536.5 → 1.5 s,
@@ -163,24 +163,23 @@ Three things account for it, in order of how much they gave:
    `perimeter_min square4 999 6 --only 13 13 0` at 198.55 s, plus a RED control
    that re-ran the identical command (199.56 s) to compare the same row against
    a different radius: 415 of its 417 s. `gate_tma` checks H and I likewise.
-3. **Gates whose inputs had not changed** stopped running at all — 15 of them
-   on a typical push.
+3. **Gates whose inputs had not changed** stopped running at all — most of the
+   suite, on most pushes.
+4. **Four C++ binaries were declared `.PHONY`**, so make recompiled
+   `build/ns/map_worker`, `merge_worker`, `driver0` and `gate_holes` on every
+   single invocation and ignored the prerequisites that say when it needs to.
+   That one surfaced only because input gating exposed it: a gate whose declared
+   input is the binary it runs can never skip if the binary is rebuilt each time.
 
 `gate-sig-fold` is the one addition: 0.9 s, and it settles a statement that used
 to cost 391 s to make.
 
 Nothing about what the suite checks changed. `make gates-deep` restores every
-size, every re-derivation, and ignores every stamp; it has been run green on
-dalby.
+size, every re-derivation, and ignores every stamp.
 
 ## What is left
 
-`make gates` is 8 s and bounded by `gate-perimeter-defect` (8 s), which is
-undeclared and so runs every time. `ns-gate-fast` is 8 s. Both can go lower by
-declaring more gates, one at a time, each declaration being a small piece of
-careful reading that the import lint checks half of.
-
-`gate-p-paper-verifier` is 200 verifier runs at 0.32 s of real work each. It is
-declared, so it only runs when the paper or the verifier changes — but when it
-does run it is 8 s even at 8-way concurrency, and sampling the literals is not
-available: the statement is coverage, and a sample lets coverage drop silently.
+`make gates` is 7 s and bounded by the gates that are still undeclared —
+`gate-perimeter-defect` foremost. Each further declaration is a small piece of
+careful reading; the import half of it is checked mechanically, the data half is
+not. Undeclared costs 7 s, not coverage, so there is no hurry.
