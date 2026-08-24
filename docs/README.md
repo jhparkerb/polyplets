@@ -19,6 +19,7 @@ jasonp's machine, and are not missing from a clone by accident.
 | `docs/dmirror-design.md` | the Hall of Mirrors symmetric transfer matrix |
 | `docs/observability.md` | the provenance/heartbeat contract every long job obeys |
 | `docs/engineering-standards.md` | red-first tests, fail-closed guards, hooks |
+| `docs/push-gate-tiers.md` | what the push gates cost, and what `make gates-deep` restores |
 | `docs/job-checklist.md` | consult before launching any compute job |
 | `docs/lean-environment.md` | toolchain paths, vendored deps, lemma search |
 | `docs/lean-artifact.md` | the Lean development as a citable object |
