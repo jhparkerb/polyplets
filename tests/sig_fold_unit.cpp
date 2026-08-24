@@ -33,7 +33,7 @@
 //      reflection-invariant, so folded and unfolded states harvest alike
 //
 // Build: c++ -std=c++20 -O2 -Wall tests/sig_fold_unit.cpp -o build/sig_fold_unit
-// Usage: sig_fold_unit [HMAX]   (default 6)
+// Usage: sig_fold_unit [HMAX|--deep]   (default 6, --deep = 8)
 //        sig_fold_unit --selftest   RED controls: three mutant folds must fail
 //
 // Exit 0 = green.
@@ -237,7 +237,11 @@ static int selftest() {
 
 int main(int argc, char** argv) {
   if (argc > 1 && std::string(argv[1]) == "--selftest") return selftest();
-  const int Hmax = argc > 1 ? std::atoi(argv[1]) : 6;
+  // H=6 is 3508 canonical signatures and the whole check is milliseconds; the
+  // deep tier goes to H=8, which is ~85k signatures and a few seconds. The
+  // statement is the same at every H -- more of them is more of the same.
+  int Hmax = 6;
+  if (argc > 1) Hmax = std::string(argv[1]) == "--deep" ? 8 : std::atoi(argv[1]);
   if (Hmax < 2 || Hmax > 12) {
     std::printf("HMAX out of range (2..12)\n");
     return 2;

@@ -237,7 +237,7 @@ gate-severance-depth5:
 # docs/engine-design.md and results/r4/r4-a.md, but never wired -- it was found
 # by gate-makefile-wiring below, green and unrun since August.  ~31 s.
 gate-modp: build/tma build/tma_modp_test
-	python3 tests/gate_modp.py
+	python3 tests/gate_modp.py $(GATE_DEEP)
 
 # The mod-p test engine. It used to be compiled INSIDE tests/gate_modp.py, with
 # a subprocess c++ call on every single run -- so every push paid an -O3 build
@@ -277,9 +277,13 @@ gate-perimeter-defect: build/perimeter_defect build/g2
 # Run with removals unbounded on small boxes it degenerates to a complete brute
 # force, so it can be compared cell for cell against build/g2's --siteperim
 # census -- a different search entirely. A hypothesis violation shows up as a
-# missing animal. Includes a RED control. ~2 s.
+# missing animal. Includes a RED control.
+#
+# The "~2 s" this comment used to claim was the three census cross-checks, which
+# really are ~1 s together. The gate measured 417 s (dalby, 2026-08-24): check
+# E's W=13 second-source case, run twice. See the script.
 gate-perimeter-min: build/perimeter_min build/g2
-	./scripts/perimeter_min_gate.sh
+	./scripts/perimeter_min_gate.sh $(GATE_DEEP)
 
 # Gate PERIMETER-MIN-SHARD: the sharded driver that makes a min-end census
 # resumable must be a drop-in for the monolithic run, or a resumed census is a
@@ -514,7 +518,7 @@ build/euler_unit: tests/euler_unit.cpp cpp/tma/euler.h | build
 # and that file was deleted in 91bdcdc.
 gate-sig-fold: build/sig_fold_unit
 	./build/sig_fold_unit --selftest
-	./build/sig_fold_unit
+	./build/sig_fold_unit $(GATE_DEEP)
 
 build/sig_fold_unit: tests/sig_fold_unit.cpp cpp/tma/signature.h cpp/tma/transition_square8.h | build
 	$(CXX) $(CXXFLAGS) -O2 $< -o $@

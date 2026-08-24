@@ -6,10 +6,16 @@ import os
 import subprocess
 import sys
 
-# Small primes whose product (6.4e13) >> a(12) (2.6e8) but each < a(12), so the
+# Small primes whose product (6.4e13) >> a(n) but each is far below it, so the
 # CRT genuinely recombines reduced residues (not a no-op). The u32 storage win is
 # independent of prime size; reach deployment uses ~31-bit primes (fewer needed).
-N = 12
+#
+# Depth: this gate is seven square8 sweeps -- three primes x {plain, --fold},
+# plus the exact build/tma run -- and each further n costs ~4x. What it asserts
+# is an IDENTITY (CRT of the residues == the exact count), which holds at every
+# n, so the push tier runs it at n=11: a(11) = 39,299,408, still four orders
+# above the primes and seven below their product. --deep restores n=12.
+N = 12 if "--deep" in sys.argv else 11
 PRIMES = [40009, 40013, 40031]
 
 

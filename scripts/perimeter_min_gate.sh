@@ -12,8 +12,12 @@
 # this is the real test of the completeness argument, not the runtime assert.
 #
 #   scripts/perimeter_min_gate.sh          # prints GATE PASSED or exits nonzero
+#   scripts/perimeter_min_gate.sh --deep   # + the W=13 second-source case
 set -euo pipefail
 cd "$(dirname "$0")/.."
+
+DEEP=""
+case "${1:-}" in --deep) DEEP=1 ;; esac
 
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -160,8 +164,18 @@ fi
 # that W=15's 8193 at j=8 was the box running out and not the model failing
 # (results/perimeter-both-ends.md), so it needs to stay honest.  r=5 and r=6 are
 # small enough to cost a second each.
+#
+# Depth.  The comment above says r=5 and r=6 "cost a second each"; that was
+# measured on the PYTHON side.  The C++ side of the W=13 case --
+# `perimeter_min square4 999 6 --only 13 13 0` -- is ~195 s (dalby, 2026-08-24,
+# traced), and the RED control below used to run that identical command a
+# SECOND time: 390 s of this gate's 417 s, for one extra box width.  W=11 makes
+# the same second-source statement, at 16.8 s.  --deep adds W=13 back.
 echo "== check E: free-removal row == experiments/diamond_free_removals.py"
-for spec in "11 5 6" "13 6 6"; do
+SPECS=("11 5 6")
+if [ -n "$DEEP" ]; then SPECS+=("13 6 6"); fi
+red_cpp="" red_jm="" red_r=""
+for spec in "${SPECS[@]}"; do
   set -- $spec
   w=$1 r=$2 jm=$3
   cpp=$(./build/perimeter_min square4 999 "$jm" --only "$w" "$w" 0 2>/dev/null \
@@ -176,22 +190,26 @@ for spec in "11 5 6" "13 6 6"; do
     echo "    py : $py"
     fail=1
   fi
+  if [ -z "$red_cpp" ]; then red_cpp=$cpp; red_jm=$jm; red_r=$((r - 1)); fi
 done
 
 # RED control for check E: the comparison must be able to fail.  The two
 # implementations agree on the diamond of radius r, so pointing the Python at
 # radius r-1 has to disagree -- if it does not, the sed above is producing empty
 # strings and the check is comparing nothing to nothing.
+# Reuses the row check E just computed -- re-running that enumeration to compare
+# it against a different radius bought nothing but a second brute force.
 echo "== RED control: check E against the wrong radius (must mismatch)"
-cpp=$(./build/perimeter_min square4 999 6 --only 13 13 0 2>/dev/null \
-      | sed -n 's/.*free: //p')
-py=$(python3 experiments/diamond_free_removals.py 6 5 \
+py=$(python3 experiments/diamond_free_removals.py "$red_jm" "$red_r" \
      | sed -n 's/^r=.*pbox=[0-9]*: //p')
-if [ -n "$cpp" ] && [ "$cpp" = "$py" ]; then
-  echo "  RED CONTROL DID NOT FIRE -- r=6 and r=5 compared equal"
+if [ -z "$red_cpp" ]; then
+  echo "  RED CONTROL CANNOT RUN -- check E produced no row"
+  fail=1
+elif [ "$red_cpp" = "$py" ]; then
+  echo "  RED CONTROL DID NOT FIRE -- r=$((red_r + 1)) and r=$red_r compared equal"
   fail=1
 else
-  echo "  fired as expected (r=6 != r=5)"
+  echo "  fired as expected (r=$((red_r + 1)) != r=$red_r)"
 fi
 
 # The runtime (H1) assert must not have tripped in either real run.
