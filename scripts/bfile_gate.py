@@ -293,7 +293,7 @@ def run(mutate=None):
                  ", ".join(str(n) for n in underived[:12]),
                  " ..." if len(underived) > 12 else ""))
         print("  the companions therefore stop at n = %d while the fixed count "
-              "reaches n = %d." % (lo - 1 if lo <= hi else hi, max(fixed)))
+              "reaches n = %d." % (lo - 1, max(fixed)))
     else:
         print("  coverage: every one of the %d triangle rows is derivable"
               % len(fixed))

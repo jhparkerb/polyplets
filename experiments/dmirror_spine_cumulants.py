@@ -36,15 +36,13 @@ Target machine: ayr or dalby.  Cost: instant, exact rational arithmetic.
 """
 
 import os
-import re
 import sys
-from fractions import Fraction as F
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 from dmirror_grand_form import (  # noqa: E402
-    cumulants, pdeg, controls, report as gf_report)
+    cumulants, pdeg, controls)
 from dmirror_onset_probe import newton_fit, evalpoly  # noqa: E402
 
 def load(path):

@@ -531,6 +531,11 @@ u64 census(int H, bool dilate_on, obs::Reporter* rep) {
 // routes.  A control that a real defect walks through is not a control, so the
 // comparison is made where the defect actually lives: per source, on the set
 // of keys produced.
+// TODO(2026-08-24, /simplify): every reachable key's successor set is computed
+// twice -- once inside the reachability BFS (discarded past dedup) and again in
+// the comparison loop. Keeping each key's successors from the BFS, or comparing
+// inside it, halves that. Seconds at the gated H<=11, so worth doing only if
+// this gate ever runs deeper.
 bool crossCheck(int H, bool dilate_on) {
   std::unordered_set<Key, KeyHash> seen;
   std::vector<Key> frontier, order;
@@ -636,16 +641,9 @@ int main(int argc, char** argv) {
   if (std::strcmp(rest[0], "--gate") == 0)
     return (gate(false, batch) && gate(true, batch)) ? 0 : 1;
 
-  const char** argp = rest.data();
-  const int an = static_cast<int>(rest.size());
-  int a = 0;
-  (void)argp;
-  if (a >= an) {
-    std::fprintf(stderr, kUsage);
-    return 2;
-  }
-  const int H1 = std::atoi(rest[a]);
-  const int H2 = (a + 1 < an) ? std::atoi(rest[a + 1]) : H1;
+  // rest is non-empty (checked above), so H1 always exists; H2 defaults to it.
+  const int H1 = std::atoi(rest[0]);
+  const int H2 = rest.size() > 1 ? std::atoi(rest[1]) : H1;
   if (H1 < 1 || H2 < H1 || H2 > 30) {
     std::fprintf(stderr, "H out of range\n");
     return 2;

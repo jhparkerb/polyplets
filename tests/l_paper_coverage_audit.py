@@ -79,6 +79,14 @@ def literals(src):
     return sorted({m.group(0) for m in LITERAL.finditer(SEP.sub("", masked))})
 
 
+# TODO(2026-08-24, /simplify): sweep() and context() below are a hand-copied
+# variant of tests/gate_p_paper_verifier.py's, which the SIBLING audit
+# (tests/p_paper_coverage_audit.py) imports rather than copies. The differences
+# are small and parametrizable: a pattern() tolerating {,} thousands
+# separators, the VERIFY_TEX_NAME env var, and no cache shim. Parametrizing the
+# gate's sweep on a pattern-builder plus extra env would let this import it too
+# -- one mutation harness instead of two. Not done here because it edits a gate
+# on the per-push path to serve an unwired audit.
 def sweep(src, lits, name, tmpdir):
     """Return the literals whose perturbation the verifier does NOT catch."""
     path = os.path.join(tmpdir, "under-test.tex")
@@ -116,10 +124,24 @@ def manuscripts():
     # Enumerated, not frozen: the 2026-08-23 contraction merged four
     # manuscripts into their partners, and a hardcoded list would have gone
     # stale that day.
+    # Numeric key, matching tests/gate_l_paper_verifier.py and
+    # docs/reviews/llm-tics/density.py, which enumerate the same glob. Plain
+    # sorted() is lexicographic, which put L10 between L1 and L2 here and
+    # nowhere else -- three copies of one enumeration, already drifting.
     return {p.name.split("-")[0]: p
-            for p in sorted((ROOT / "paper").glob("L[0-9]*.tex"))}
+            for p in sorted((ROOT / "paper").glob("L[0-9]*.tex"),
+                            key=lambda f: int(f.name.split("-")[0][1:]))}
 
 
+# TODO(2026-08-24, /simplify): this measures L-corpus literal coverage and
+# always exits 0, so coverage can regress silently while gate-l-paper-verifier
+# stays green -- the kill matrix proves EXISTING checks can fail, it says
+# nothing about NEW literals being read at all. The full sweep is ~80 s, less
+# than the wired gate-severance-w1 was. A per-paper unguarded-count ceiling
+# seeded from the banked table (results/l-paper-verifier-coverage.md) would
+# ratchet it; the readability campaign only lowers counts, so a ceiling never
+# fights it. ~30 lines + a recipe. Not now: that campaign is mid-flight and
+# rewriting these files.
 def main():
     papers = manuscripts()
     ap = argparse.ArgumentParser()

@@ -278,6 +278,61 @@ def check_deep_wiring(text):
     return bad
 
 
+# The ns-gate-* family is carried by two aggregate lists rather than by
+# GATE_TARGETS, and BOTH of this lint's original surfaces missed it: parse()
+# anchors on ^gate-, and a binary-backed ns gate has no script for the script
+# surface to see. So an ns-gate-foo recipe dropped from ns-gates and
+# ns-gate-fast would go unrun AND unlinted -- the same shape as the four
+# Severance gates, in the one family the lint could not see.
+NS_AGGREGATES = ("ns-gates", "ns-gate-fast")
+
+# Deliberate exclusions in the ns family. Separate from EXCUSED because that
+# one is checked for staleness against gate-* recipes only.
+EXCUSED_NS = {
+    "ns-gate-resume":
+        "the AC-1 long-run gate: ./build/ns/driver1 --compare at maxn 18, "
+        "hours to days depending on box, invoked by hand (documented at its "
+        "recipe). No aggregate can carry a gate measured in days",
+}
+
+
+def check_ns_wiring(text, excused=EXCUSED_NS):
+    """Every ns-gate-* recipe is carried by an aggregate, and vice versa."""
+    recipes = set(re.findall(r"^(ns-gate-[A-Za-z0-9_-]+)\s*:", text, re.M))
+    recipes -= set(NS_AGGREGATES)
+
+    carried = set()
+    m = re.search(r"^ns-gates:\s*((?:.*\\\n)*.*)$", text, re.M)
+    if m:
+        carried |= set(m.group(1).replace("\\\n", " ").split())
+    m = re.search(r"^NS_FAST_TARGETS\s*=\s*((?:.*\\\n)*.*)$", text, re.M)
+    if m:
+        carried |= set(m.group(1).replace("\\\n", " ").split())
+
+    bad = []
+    unwired = sorted(r for r in recipes
+                     if r not in carried and r not in excused)
+    if unwired:
+        bad.append("ns-gate recipes carried by neither ns-gates nor "
+                   "ns-gate-fast (a check nothing runs): " + ", ".join(unwired))
+    stale = sorted(x for x in excused if x not in recipes)
+    if stale:
+        bad.append("EXCUSED_NS names ns-gates that no longer exist: "
+                   + ", ".join(stale))
+    both = sorted(x for x in excused if x in carried)
+    if both:
+        bad.append("EXCUSED_NS names ns-gates that ARE carried -- the excuse "
+                   "is obsolete: " + ", ".join(both))
+    # and the other direction: an aggregate naming something with no recipe
+    all_recipes = recipes | set(re.findall(r"^(gate-[A-Za-z0-9_-]+)\s*:",
+                                           text, re.M))
+    orphan = sorted(t for t in carried if t not in all_recipes)
+    if orphan:
+        bad.append("an ns aggregate names targets with no recipe: "
+                   + ", ".join(orphan))
+    return bad
+
+
 def check_prereqs(text):
     """GATE_PREREQS must be a superset of every gate-*: prerequisite.
 
@@ -405,7 +460,8 @@ def main():
            + check_prereqs(text)
            + check_gate_deps(text)
            + check_gate_imports(text)
-           + check_deep_wiring(text))
+           + check_deep_wiring(text)
+           + check_ns_wiring(text))
     if bad:
         for b in bad:
             print("  RED: " + b)
@@ -417,9 +473,12 @@ def main():
           f"{len(EXCUSED_SCRIPTS)} excused, 0 unaccounted")
     for t, why in sorted(EXCUSED.items()):
         print(f"  excused (recipe): {t} -- {why}")
+    for t, why in sorted(EXCUSED_NS.items()):
+        print(f"  excused (ns):     {t} -- {why}")
     for t, why in sorted(EXCUSED_SCRIPTS.items()):
         print(f"  excused (script): {t} -- {why}")
     print("  deep-tier: every gate that reads --deep is passed $(GATE_DEEP)")
+    print("  ns-wiring: every ns-gate-* recipe is carried by an aggregate")
     print("  prereqs:   GATE_PREREQS and NS_FAST_PREREQS each cover their\n             own targets' build/ prerequisites")
     print("  gate-deps: every DECLARED gate lists its own script and every\n             repo-local module that script imports")
     print(f"  red-namer: {len(RED_LINE_CASES)} bracket formats parsed "
@@ -537,6 +596,23 @@ def selftest():
     assert not check_deep_wiring(ok_case), check_deep_wiring(ok_case)
     print("  [RED 12] a gate that reads --deep but is never passed it is caught")
 
+    # RED 13: an ns-gate recipe carried by neither aggregate, and an aggregate
+    # entry with no recipe. Neither of the original two surfaces could see the
+    # ns family at all.
+    base = ("ns-gates: ns-gate-a\nNS_FAST_TARGETS = ns-gate-b\n"
+            "ns-gate-a:\n\ttrue\nns-gate-b:\n\ttrue\n")
+    assert not check_ns_wiring(base, {}), check_ns_wiring(base, {})
+    bad = check_ns_wiring(base + "ns-gate-lost:\n\ttrue\n", {})
+    assert any("ns-gate-lost" in b for b in bad), bad
+    bad = check_ns_wiring(base, {"ns-gate-gone": "removed"})
+    assert any("no longer exist" in b for b in bad), bad
+    bad = check_ns_wiring(base, {"ns-gate-a": "but it IS carried"})
+    assert any("obsolete" in b for b in bad), bad
+    bad = check_ns_wiring("ns-gates: ns-gate-typo\nNS_FAST_TARGETS =\n", {})
+    assert any("no recipe" in b for b in bad), bad
+    print("  [RED 13] unwired ns-gate, stale excuse, obsolete excuse, and an "
+          "aggregate entry with no recipe -- all four caught")
+
     # And the real Makefile must parse -- a lint that cannot read its own
     # subject is not a lint.
     real = open(MAKEFILE).read()
@@ -546,7 +622,7 @@ def selftest():
     assert len(disk) > 20, f"script glob found only {len(disk)} -- globs broken?"
     print(f"  [parse] real Makefile: {len(r)} recipes, {len(w)} wired, "
           f"{len(disk)} gate scripts on disk")
-    print("GATE SELFTEST GREEN: 12/12 red controls fired")
+    print("GATE SELFTEST GREEN: 13/13 red controls fired")
 
 
 if __name__ == "__main__":

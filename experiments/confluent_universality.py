@@ -314,7 +314,7 @@ def main():
               % (" ".join("%.3f" % d for d in sd), min(sd), max(sd)))
         overlap = not (max(kd) < min(sd) or max(sd) < min(kd))
         print("the window ranges %s"
-              % ("OVERLAP" % () if overlap else "DO NOT overlap"))
+              % ("OVERLAP" if overlap else "DO NOT overlap"))
         print("\nRead this against the calibration above before calling it a")
         print("measurement of Delta_1: the bias depends on the size and SIGN of")
         print("the corrections the ansatz does not model, and the real series")

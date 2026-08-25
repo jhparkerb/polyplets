@@ -55,6 +55,12 @@ def merge(paths, tex):
     return 0
 
 
+# TODO(2026-08-24, /simplify): the 32-core-hour cold sweep rightly stays
+# offline, but nothing notices the polyplets literal SET drifting since the
+# 2026-08-23 measurement (154/264 guarded). A regex-only drift check --
+# recompute the literal list, compare against the banked shard jsons, red means
+# "re-run the audit" -- is gate-cheap at ~25 lines. Subsumed if verify_claims
+# ever banks its hole tables (see tests/_audit_subprocess_cache.py).
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--paper", choices=sorted(PAPERS), default="polyplets")

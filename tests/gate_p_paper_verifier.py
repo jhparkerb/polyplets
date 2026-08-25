@@ -129,6 +129,13 @@ def main():
     src = TEX.read_text()
     lits = literals(src)
 
+    # TODO(2026-08-24, /simplify): the selftest sweeps ALL ~200 literals against
+    # a stub that is sys.exit(0). The stub's verdict is literal-independent by
+    # construction, so lits[:10] asserting 10/10 unguarded proves the same
+    # property of the harness -- and every literal's regex is exercised anyway
+    # by the production sweep below, in the same recipe. Left as-is because
+    # narrowing a RED control's coverage deserves its own decision, and the
+    # gate is stamp-gated now, so it runs only when the paper or verifier moves.
     if "--selftest" in sys.argv:
         with tempfile.TemporaryDirectory() as d:
             stub = os.path.join(d, "stub_verifier.py")

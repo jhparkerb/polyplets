@@ -97,7 +97,6 @@ def describe(name, d):
              ("clean" if not inter else "%d viol, first %d, last %d"
               % (len(inter), inter[0], inter[-1])),
              ("clean" if not par else "%d viol: %s" % (len(par), par[:8]))))
-    return inter, par
 
 
 def controls():

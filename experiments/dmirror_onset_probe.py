@@ -47,6 +47,7 @@ Target machine: ayr or dalby.  Cost: instant, exact rational arithmetic on a
 tracked 423-row table.
 """
 
+import math
 import os
 import sys
 from fractions import Fraction
@@ -66,6 +67,14 @@ def load():
     return d
 
 
+# TODO(2026-08-24, /simplify): newton_fit and degree_of, and analyse()'s
+# walk-back-to-onset, re-implement scripts/dmirror_diagonals.py's newton_fit /
+# tail_degree and the identical pin-then-walk-backward loop, over the same
+# sym-count data family. This file's own docstring records that the first
+# hand-rolled fit here "got it wrong for every degree above 0" -- which is the
+# bug importing would have avoided. Nothing here claims second-source
+# independence from dmirror_diagonals, so this is a reuse miss, not a control.
+# Not changed now: the fit sits behind landed conclusions.
 def newton_fit(pts):
     """Exact interpolating polynomial through (x, y), monomial coefficients
     lowest degree first.  Plain Lagrange with exact Fraction polynomial
@@ -180,7 +189,6 @@ def main():
             print("  k=%d  NOT PINNED -- control cannot run" % k)
             ok = False
             continue
-        import math
         want_lead = Fraction(1, math.factorial(k))
         le, lo = me[k], mo[k]
         diff = [a - b for a, b in zip(me, mo)]
@@ -233,7 +241,6 @@ def main():
               % (me is not None, mo is not None))
         print("  T4 stands verified to k = 5 and untested at k = 6.")
         return 0
-    import math
     want_lead = Fraction(1, math.factorial(6))
     diff = [a - b for a, b in zip(me, mo)]
     want_diff = Fraction(1, math.factorial(5))

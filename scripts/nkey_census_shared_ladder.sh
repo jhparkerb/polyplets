@@ -1,4 +1,10 @@
 #!/bin/bash
+# TODO(2026-08-24, /simplify): this is a ~46-line copy of
+# scripts/nkey_census_ladder.sh differing in four lines (OUT default, H
+# defaults, BATCH arg, the --shared --batch flags). scripts/nkey_census_h17_postfix.sh
+# already shows the cheaper pattern in this same campaign: set env and exec the
+# other script. Left as a copy for now because a ladder driver cannot be tested
+# from here without a box and a multi-hour run.
 # The frontier census under the SHARED-partial-fill engine, H = 13 up.
 #
 # WHY.  results/nkey-census.md measures H = 14, 15, 16 at 293 s, 1,960 s and
