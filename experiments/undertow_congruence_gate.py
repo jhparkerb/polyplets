@@ -103,6 +103,14 @@ def run_gate(ab, Dj, tri, quiet=False):
     return n_banked, n_free
 
 
+# TODO(2026-08-24, /simplify): two couplings worth loosening, neither unsafe
+# today (both fail loud rather than silently green). RED 4 monkeypatches
+# load_depths in TWO modules because undertow_a41 from-imports the name, so an
+# innocent import refactor turns the suite red; build() taking an optional Dj
+# override would end that. And this file restates a(41)'s recipe as its own
+# JMAX/KMAX/HMAX_PIN constants plus a reimplemented pin_cells(), so if the
+# recipe moves, the gate keeps green-lighting the old one -- import the
+# constants from undertow_a41 and have build() return the cells it consumed.
 def build_tower():
     return build(JMAX, KMAX, forbid_row=None, hmax=HMAX_PIN)
 

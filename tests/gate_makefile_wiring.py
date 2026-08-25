@@ -67,10 +67,19 @@ EXCUSED = {
 
 # Where gate scripts live, and what a gate script looks like. Kept broad on
 # purpose: a gate that hides from the glob is a gate that hides from the lint.
-SCRIPT_GLOBS = ("tests/gate_*.py", "experiments/*_gate.py", "scripts/*gate*.sh")
+SCRIPT_GLOBS = ("tests/gate_*.py", "experiments/*_gate.py", "scripts/*gate*.sh",
+                "scripts/*/*gate*.sh")
 
 # Scripts that are deliberately not run by the Makefile, with the reason.
 EXCUSED_SCRIPTS = {
+    "scripts/lastditch/h18_release_gate.sh":
+        "not a suite gate -- a one-shot remote release check from the last-ditch "
+        "campaign, run by hand on a specific box against a specific build. Kept "
+        "as the campaign's run record",
+    "scripts/lastditch/gate_sizes_wrap.sh":
+        "not a gate -- the argv wrapper that hands gate-motley-par a census "
+        "sizes file so it exercises the release path. It is invoked BY that "
+        "gate's command line, not by the Makefile",
     "scripts/profile_gates.sh":
         "not a gate -- it is the PROFILER for the gate suite, and it runs "
         "`make gates` itself. Wiring it into the Makefile would make `make "

@@ -128,9 +128,10 @@ def main():
             tower_h.append(H)
             total += v
             if (row, H) in inc:
-                ok += 1 if int(v) == inc[(row, H)] else 0
-                bad += 0 if int(v) == inc[(row, H)] else 1
-                if int(v) != inc[(row, H)]:
+                if int(v) == inc[(row, H)]:
+                    ok += 1
+                else:
+                    bad += 1
                     print(f"    MISMATCH T({row},{H}) k={k}")
         # Rows at or below hmax are covered by Motley outright: the tower band
         # is empty and there is nothing for it to do.  Reporting them as a

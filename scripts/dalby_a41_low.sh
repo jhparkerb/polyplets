@@ -18,7 +18,7 @@
 # live ETA from its own cost profile -- read that, do not trust this comment.
 # Resume: dalby_a41_low.sh --resume     Kill: kill the orchestrate PID.
 set -e
-cd ~/src/polyominoes
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUNDIR=runs/a41_low
 mkdir -p "$RUNDIR/spill" "$RUNDIR/perheight"
 RESUME_FLAG=""

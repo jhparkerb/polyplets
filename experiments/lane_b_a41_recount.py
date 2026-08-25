@@ -95,7 +95,7 @@ def solve2(eqs):
     assert det != 0, "singular"
     return ((u * t - q * v) / det, (p * v - u * r) / det)
 
-def pin_from_cells(k, ab, cells, tri, D):
+def pin_from_cells(k, ab, cells, tri):
     """cells: list of (n, defect_value).  T(n,n-k) = P_k(n)*3^(n-1-3k) + D."""
     E = gf(ab, k)
     eqs = []
@@ -120,7 +120,7 @@ def main():
     # 1. levels 1..19 from ONSET anchors only (no defects, no wired table)
     ab = {}
     for k in range(1, 20):
-        ab[k] = pin_from_cells(k, ab, [(2 * k + 1, F(0)), (2 * k + 2, F(0))], tri, None)
+        ab[k] = pin_from_cells(k, ab, [(2 * k + 1, F(0)), (2 * k + 2, F(0))], tri)
 
     # 2. own mini-audit: every other banked in-onset cell predicted
     E = gf(ab, 19)
@@ -152,7 +152,7 @@ def main():
     assert bad == 0
 
     # 4. level 20 from depths (1,2), then depths 3,4 as own holdouts
-    ab[20] = pin_from_cells(20, ab, [(40, D[1][20]), (39, D[2][20])], tri, D)
+    ab[20] = pin_from_cells(20, ab, [(40, D[1][20]), (39, D[2][20])], tri)
     E = gf(ab, 20)
     for j, tag in ((3, "T(38,18)"), (4, "T(37,17)")):
         n = 41 - j
@@ -161,7 +161,7 @@ def main():
     print("level 20 pinned from depths (1,2); depths 3 and 4 hold out OK")
 
     # 5. level 21 from depths (3,4) -- the only banked pair; no check exists
-    ab[21] = pin_from_cells(21, ab, [(40, D[3][21]), (39, D[4][21])], tri, D)
+    ab[21] = pin_from_cells(21, ab, [(40, D[3][21]), (39, D[4][21])], tri)
     print("level 21 pinned from T(40,19)+D_3(21), T(39,18)+D_4(21) -- no third cell")
 
     # 6. assemble a(41): swept H<=19, tower H=20..41
@@ -193,7 +193,7 @@ def main():
 
     # 7. regression: a(40) from the same pipeline, row 40 forbidden
     ab40 = {k: ab[k] for k in range(1, 20)}
-    ab40[20] = pin_from_cells(20, ab40, [(39, D[2][20]), (38, D[3][20])], tri, D)
+    ab40[20] = pin_from_cells(20, ab40, [(39, D[2][20]), (38, D[3][20])], tri)
     E40 = gf(ab40, 20)
     a40 = sum(tri[(40, H)] for H in range(1, 41))   # banked row-40 sum
     t40 = sum(swept[(40, H)] for H in range(1, 20))

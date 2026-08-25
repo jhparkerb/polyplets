@@ -40,7 +40,7 @@ from fractions import Fraction as Fr
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from slope2_law_vs_truth import read_pk, read_tri, law           # noqa: E402
+from slope2_law_vs_truth import read_pk, read_tri           # noqa: E402
 from severance_w3_gate import anchors, banked_defects, check_depth  # noqa: E402
 
 J = 5

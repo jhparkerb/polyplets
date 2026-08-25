@@ -238,7 +238,6 @@ struct Buf {
   void clear() {
     n.store(0, std::memory_order_relaxed);
     overflow.store(0, std::memory_order_relaxed);
-    dead.clear();
     // EMPTY is zero, so handing the pages back IS the clear.
     if (madvise(b, nb * sizeof(Bucket), MADV_DONTNEED) != 0) {
 #pragma omp parallel for schedule(static)
@@ -249,8 +248,8 @@ struct Buf {
 
   // Rows a thread reserved in its last block and never used.  Tiny (threads x
   // ALLOC_BLOCK at most), but they sit inside the id range the next step
-  // iterates, so they have to be marked.
-  std::vector<std::pair<size_t, size_t>> dead;
+  // iterates, so they have to be marked.  The sentinel IS the record -- there
+  // is no list of dead ranges to keep.
   void mark_dead(size_t lo, size_t hi) {
     if (lo >= hi || !stride) return;
     for (size_t id = lo; id < hi && id < cap; id++)
@@ -272,10 +271,6 @@ struct Buf {
     z &= ~(PG - 1);
     if (z > a) madvise((void*)a, z - a, MADV_DONTNEED);
   }
-  inline u128 key(size_t i) const {
-    return rowkey(b[i].idx.load(std::memory_order_relaxed) - 1);
-  }
-
   // `n` is the reservation high-water, not the population: block allocation
   // leaves a partial block per thread unused.  Counting means scanning.
   size_t count_states() const {
@@ -603,12 +598,15 @@ static void run_modp(int H, int Nmax, u64 p, const char* outfile, const char* ck
   step = (size_t)c0col * H;
   for (int c = c0col; c < W; c++) {
     for (int r = 0; r < H; r++, step++) {
-      size_t ns = cur->count_states();
       size_t want;
       if (release) {
         if (step >= sizes.size()) { fprintf(stderr, "FATAL sizes_short step=%zu\n", step); std::exit(4); }
         want = sizes[step] + sizes[step] / 64 + 4096;   // exact + 1.5% slack
       } else {
+        // count_states() is a full parallel scan of the frontier, so it runs
+        // only where its answer is read: --sizes (the production path) sizes
+        // the next buffer from the banked table instead.
+        const size_t ns = cur->count_states();
         want = ns + ns / 4 + 4096;
       }
       for (;;) {
@@ -633,6 +631,13 @@ static void run_modp(int H, int Nmax, u64 p, const char* outfile, const char* ck
     fflush(stdout);
     if (g_rep) g_rep->beat(c + 1, "modp H=" + std::to_string(H) +
                                       " states=" + std::to_string(ncur));
+    // TODO(2026-08-24, /simplify): this checkpoints the FULL frontier at every
+    // column boundary, with no cadence control -- the sibling engine gates its
+    // saves on elapsed time (cpp/tma/sweep8.h, ckptDue / TMA_CKPT_SECS). At
+    // H=19 the frontier saturates by column 1, so every one of the ~41 columns
+    // writes a near-peak state dump to buy ~1 column of recompute. Unmeasured
+    // here, and it changes resume granularity, so it is jasonp's call rather
+    // than a cleanup: time-gate it, or write every k-th column.
     if (!ckpt.empty() && !ckpt_write<T>(ckpt.c_str(), cur, H, Nmax, p, c + 1, fprev, fcur))
       fprintf(stderr, "WARN ckpt_write_failed\n");
   }

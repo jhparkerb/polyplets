@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 """Draw what Undertow changed, from banked numbers only.
 
-Emits results/undertow-picture.md.  Every figure here is either read out of a
-banked file or is a constant with its citation in the caption; nothing is
-estimated in this script.  Run it after any change to the underlying data so
-the picture cannot drift from the record.
+Emits results/undertow-picture.md.  Every figure is a constant TRANSCRIBED from
+the record with its citation in the caption; nothing is estimated here, and
+nothing is read either -- this script reads no files at all.  So it does not
+regenerate: if a cited number is ever corrected, this file has to be corrected
+with it.  (The docstring used to claim the opposite -- "run it after any change
+to the underlying data so the picture cannot drift" -- which would have been a
+promise nothing here keeps.)
 
 Usage: python3 scripts/undertow_picture.py [> results/undertow-picture.md]
 """
 
-import os
-import sys
-
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # results/ns_a40/PROVENANCE.md, phases A/B/C
 PHASES = [

@@ -25,7 +25,7 @@
 # Read the orchestrator's own per-column profile, not this comment.
 # Resume: dalby_a41_h20.sh --resume    Kill: kill the orchestrate PID.
 set -e
-cd ~/src/polyominoes
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUNDIR=runs/a41_h20
 mkdir -p "$RUNDIR/spill" "$RUNDIR/perheight"
 RESUME_FLAG=""

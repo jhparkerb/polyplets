@@ -44,7 +44,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
-from slope2_law_vs_truth import read_pk, read_tri, law  # noqa: E402
+from slope2_law_vs_truth import read_pk, read_tri  # noqa: E402
 
 
 def read_tri_motley(rowdir=None):
@@ -159,9 +159,16 @@ def extract_ab(P, kmax):
 
 # ------------------------------------------------------------------ the pin
 def pow3(e):
-    return F(3) ** e if e >= 0 else F(1, 3 ** (-e))
+    return F(3) ** e      # Fraction handles a negative exponent exactly
 
 
+# TODO(2026-08-24, /simplify): the pin-and-check loop -- all_pairs, pin_level
+# per pair, refuse unless every depth pair agrees -- exists in four variants
+# (here in predict and emit, undertow_a41.build, undertow_ri.build_tower) with
+# divergent refusal text and slightly different pair filters. That all-pairs
+# agreement IS the campaign's safety invariant, so it is restated four times.
+# One pin_levels(tri, Dj, jmax, hmax, forbid_row, krange) consumed by all four
+# is ~50 lines moved across 4 call sites -- deferred off landed, validated code.
 def pin_level(k, ab_lower, depths, tri, Dj):
     """Solve (a_k, b_k) from below-onset cells at the two depths given.
 

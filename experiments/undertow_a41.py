@@ -103,7 +103,7 @@ def sweep_rows(perheight, n, hmax=None):
     return out
 
 
-def tower(ab, Dj, n, H, kmax_wired):
+def tower(ab, Dj, n, H):
     """T(n,H) from the tower, with the below-onset correction when needed."""
     k = n - H
     E = grand_form(ab, k)
@@ -153,7 +153,7 @@ def regression(ab, Dj, tri, kw, n=40, hlo=20):
     for H in range(hlo, n + 1):
         if (n, H) not in tri:
             continue
-        got = tower(ab, Dj, n, H, kw)
+        got = tower(ab, Dj, n, H)
         if got == tri[(n, H)]:
             ok += 1
         else:
@@ -185,7 +185,9 @@ def main():
     jmax = int(opt("--jmax", 4))
     perheight = opt("--perheight", os.path.join(ROOT, "runs", "a41_low", "perheight"))
     hcap = opt("--max-swept-h")
-    kmax_new = n - ((int(hcap) + 1) if hcap else 20)   # the tower covers above the sweep
+    hmax = int(hcap) if hcap else None          # tallest swept height, or uncapped
+    hlo = (hmax + 1) if hmax else 20            # first height the tower must cover
+    kmax_new = n - hlo                          # the tower covers above the sweep
     # Everything below is capped at the same height the assembly is: a run that
     # says "from heights <= H" must not pin from taller cells either.
 
@@ -198,25 +200,22 @@ def main():
     # Pointing one tower at both jobs either makes the regression circular or
     # makes it vacuous; the first run of this script made it vacuous, which is
     # the better of the two failures but still a failure.
-    hlo = (int(hcap) + 1) if hcap else 20
     if n != 40:
-        abr, Djr, tri, kwr = build(jmax, 40 - hlo, forbid_row=40,
-                                   hmax=int(hcap) if hcap else None)
+        abr, Djr, tri, kwr = build(jmax, 40 - hlo, forbid_row=40, hmax=hmax)
         regression(abr, Djr, tri, kwr, n=40, hlo=hlo)
-    ab, Dj, tri, kw = build(jmax, kmax_new, forbid_row=n,
-                            hmax=int(hcap) if hcap else None)
+    ab, Dj, tri, kw = build(jmax, kmax_new, forbid_row=n, hmax=hmax)
     if n == 40:
         regression(ab, Dj, tri, kw, n=40, hlo=hlo)
 
     if os.path.isdir(perheight):
-        sweep_agrees_with_banked(perheight, tri, int(hcap) if hcap else None)
-    swept = sweep_rows(perheight, n, int(hcap) if hcap else None)
+        sweep_agrees_with_banked(perheight, tri, hmax)
+    swept = sweep_rows(perheight, n, hmax)
     row = {}
     for H in range(1, n + 1):
         if H in swept:
             row[H] = swept[H]
         else:
-            row[H] = tower(ab, Dj, n, H, kw)
+            row[H] = tower(ab, Dj, n, H)
     missing = [H for H in range(1, n + 1) if H not in row]
     if missing:
         raise SystemExit(f"REFUSING: heights not covered: {missing}")

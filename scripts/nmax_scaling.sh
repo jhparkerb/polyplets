@@ -13,7 +13,7 @@
 # Predicted cost: H=14/maxn=40 is minutes; six runs, well under an hour, RSS
 # ~1 GB, disk a few GB.  Kill: kill the PID in ~/var/nmax-scale/pid.
 set -euo pipefail
-cd ~/src/polyominoes
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT=$HOME/var/nmax-scale
 mkdir -p "$OUT"; echo $$ > "$OUT/pid"; : > "$OUT/scaling.txt"
 for H in 14 15; do
