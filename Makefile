@@ -48,7 +48,7 @@ G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),
 export G2CXX G2_RESTRICT
 endif
 
-.PHONY: gates gates-deep gates-force timed-% print-% gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
+.PHONY: gates gates-deep gates-force timed-% print-% gate-motley-crt gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
         gate-sig-fold \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
@@ -90,7 +90,7 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -252,6 +252,9 @@ DEPS_gate-subgroup = build/symcount_fast build/symtm tests/gate_subgroup.py \
                 tests/common.py oracle/g1_naive.py sym/symcount.py $(FIXTURES)
 DEPS_gate-symtm = build/symtm build/symcount_fast tests/gate_symtm.py \
                 tests/common.py
+DEPS_gate-motley-crt = scripts/motley_crt.py \
+                $(wildcard results/cutcount_b1/residues/*) \
+                results/cutcount_b1/rows/C18.out
 DEPS_gate-modp = build/tma build/tma_modp_test tests/gate_modp.py tests/common.py
 DEPS_gate-perimeter-min = build/perimeter_min build/g2 \
                 scripts/perimeter_min_gate.sh experiments/diamond_free_removals.py \
@@ -436,6 +439,15 @@ gate-modp: build/tma build/tma_modp_test
 # thing (its own source and the headers it includes).
 build/tma_modp_test: cpp/tma_modp_test.cpp cpp/tma/*.h | build
 	$(CXX) $(CXXFLAGS) -O3 -pthread $< -o $@
+
+# Gate MOTLEY-CRT: scripts/motley_crt.py was extracted out of a runner heredoc
+# precisely because a heredoc is code `make` never touches -- and then its own
+# --selftest sat in exactly the same position, run by nothing. It reconstructs
+# C_18 from the banked residues, requires it to equal the banked row exactly,
+# and holds out a prime as a RED control. Every input is tracked and it is
+# 0.03 s (dalby, 2026-08-24), so there is no reason for it to be by-hand.
+gate-motley-crt:
+	python3 scripts/motley_crt.py --selftest
 
 # Gate MAKEFILE-WIRING: the lint the GATE_TARGETS comment above asks for.
 # It checks TWO surfaces.  Recipe-vs-GATE_TARGETS is the obvious one.  The
@@ -642,8 +654,15 @@ build/motley_par: cpp/motley_par.cpp cpp/obs.h | build
 
 # Gate the parallel engine against the BANKED exact C_H rows at three payload
 # widths, byte-identically against cutcount_b1, and for thread-count
-# determinism.  Not in GATE_TARGETS: it needs build/motley_par and a few
-# minutes, so it lives with the ns-gates rather than the fast suite.
+# determinism.
+#
+# Wired NOWHERE, and this comment used to claim it "lives with the ns-gates",
+# which was not true -- ns-gates has never listed it. The real reason is
+# -fopenmp: build/motley_par does not compile on gympie (Apple clang, no
+# libomp by default) or on dalby (no omp.h), so putting it in any automatic
+# chain would make that chain fail on two of the three boxes. It runs on ayr,
+# by hand: `make gate-motley-par`. Verified green there 2026-08-24 -- 1200
+# cell-comparisons over H=1..10, both RED controls firing.
 gate-motley-par: build/motley_par
 	python3 tests/gate_motley_par.py --selftest
 	python3 tests/gate_motley_par.py 10

@@ -177,7 +177,6 @@ def red_controls(rook_levels, king_levels):
     # relation must FAIL.  Without this the test cannot tell a right
     # convention from a wrong one.
     N = 4
-    g8_wrong = gnt(king_levels, KING)
     g8_wrong = {}
     for n, lv in enumerate(king_levels, start=1):
         for a in lv:
@@ -219,11 +218,9 @@ def main():
           f"at each size")
     for n in sorted(mp):
         print(f"  {n:>3}  {mp[n]:>7}")
-    tmax_complete = max(mp[n] for n in mp)
     # An order-N test needs EVERY rook animal with t <= N.  The largest N for
     # which the enumeration is complete is the smallest min-perimeter among
     # sizes NOT enumerated, minus one.
-    nxt = args.nmax_rook + 1
     # min t_4 is non-decreasing in n over this range; the first omitted size
     # bounds what is complete.
     bound = mp[args.nmax_rook]

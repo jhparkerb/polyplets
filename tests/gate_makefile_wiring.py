@@ -56,8 +56,11 @@ MAKEFILE = os.path.join(ROOT, "Makefile")
 # this gate: the reason is printed on every green run.
 EXCUSED = {
     "gate-motley-par":
-        "needs build/motley_par and a few minutes; lives with the ns-gates "
-        "rather than the fast suite (documented at its recipe)",
+        "needs build/motley_par, which needs -fopenmp: it does not compile on "
+        "gympie (Apple clang, no libomp) or dalby (no omp.h), so no automatic "
+        "chain can carry it without failing on two of the three boxes. Run by "
+        "hand on ayr. The reason used to read 'lives with the ns-gates', which "
+        "ns-gates has never done -- an allowlist reason that was not true",
     "gate-notary":
         "runs `lake build` over the Lean development, which needs the Lean "
         "toolchain and vendored Mathlib present and is minutes even warm; "
@@ -67,8 +70,9 @@ EXCUSED = {
 
 # Where gate scripts live, and what a gate script looks like. Kept broad on
 # purpose: a gate that hides from the glob is a gate that hides from the lint.
-SCRIPT_GLOBS = ("tests/gate_*.py", "experiments/*_gate.py", "scripts/*gate*.sh",
-                "scripts/*/*gate*.sh")
+SCRIPT_GLOBS = ("tests/gate_*.py", "experiments/*_gate.py",
+                "experiments/*/*_gate.py",          # tristruct/, skeletonkey/, ...
+                "scripts/*gate*.sh", "scripts/*/*gate*.sh")
 
 # Scripts that are deliberately not run by the Makefile, with the reason.
 EXCUSED_SCRIPTS = {

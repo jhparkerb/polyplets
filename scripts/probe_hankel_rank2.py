@@ -57,6 +57,14 @@ def observability_dim(H, x_weight=1):
         per_fill.append(tgt)
         fillw.append(pow(x_weight, bin(c).count('1'), P))
     basis = []          # rows in echelon form: list of (pivot_index, vector)
+        # TODO(2026-08-24, /simplify): row-at-a-time reduction. Each candidate
+    # loops over every basis row in Python (d ~ 3000+ at H=11) with one O(S)
+    # numpy subtraction per hit, and candidates number ~d*|alphabet|. The
+    # sibling probe skeletonkey/cell_sparsity_modp.py keeps its basis in RREF
+    # and reduces with one gather + one matvec. Caveat: at p = 2^31-1 an int64
+    # matmul overflows, so the matvec form needs a ~16-bit prime (what
+    # cell_sparsity chose) or chunked accumulation. Integer-factor win on the
+    # longest probe in this range -- worth it only if H=11 gets re-run.
     def reduce_add(v):
         v = v % P
         for piv, b in basis:
@@ -76,8 +84,9 @@ def observability_dim(H, x_weight=1):
         for tgt, w in zip(per_fill, fillw):
             nv = np.where(tgt >= 0, v[np.clip(tgt, 0, S-1)], 0) * w % P
             if nv.any():
-                nvr = nv.copy()
-                if reduce_add(nvr):
+                # reduce_add rebinds v on its first statement, so it never
+                # mutates the caller's array -- the defensive copy was dead.
+                if reduce_add(nv):
                     work.append(nv)
         now = time.time()
         if now - last >= HEARTBEAT_S:

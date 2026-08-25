@@ -58,9 +58,11 @@ if not os.path.exists(zstd_hdr):
 # OpenMP, same detect-and-mirror pattern.  Apple clang rejects a bare
 # -fopenmp outright ("unsupported option"), so on Darwin it is
 # -Xpreprocessor -fopenmp plus MacPorts' own include dir; on Linux g++ takes
-# -fopenmp directly.  A host with neither gets [] and the source is dropped
-# from the database rather than recorded with flags that cannot compile --
-# see the note in scripts/compile_db_sources.txt.
+# -fopenmp directly.  A host with neither gets [], and flags_for below then
+# REFUSES -- it exits rather than emitting an entry, because dropping the
+# source would leave exactly the silent hole check_compile_commands.sh exists
+# to catch.  (This comment used to claim the source was dropped, which is the
+# design the code rejects.)
 if darwin:
     omp_hdr = "/opt/local/include/libomp/omp.h"
     omp_flags = ["-Xpreprocessor", "-fopenmp", "-I/opt/local/include/libomp"]

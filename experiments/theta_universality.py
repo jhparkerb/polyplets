@@ -41,7 +41,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from series_da import spectrum, report, load_sequence  # noqa: E402
+from series_da import spectrum, load_sequence  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

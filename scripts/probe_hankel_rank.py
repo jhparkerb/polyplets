@@ -107,7 +107,7 @@ def build(H):
 def hankel_rank(H, x_weight=None, colfactor=1.5, seed=1):
     alphabet, states, trans = build(H)
     S = len(states)
-    idx = {s: i for s, i in states.items()}
+    idx = states      # read-only alias; the comprehension rebuilt it verbatim
     accept = np.zeros(S, dtype=np.int64)
     for s, i in states.items():
         blocks = {v for v in s if v}

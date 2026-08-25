@@ -200,10 +200,14 @@ def check_heldout(res_dir: Path, rows_dir: Path) -> tuple[list[str], int]:
     heldout = min(primes)
     crt_primes = [p for p in primes if p != heldout]
 
-    # TODO(2026-08-19): fourth Python copy of this CRT loop (scripts/crt_combine.py,
-    # tests/gate_modp.py, and the runner's own).  Sharing one would still leave
-    # this a second source against the dalby runner, but crt_combine.py parses
-    # argv at import time, so it has to be made importable first.
+    # TODO(2026-08-19, updated 2026-08-24): now the FIFTH Python copy of this
+    # CRT loop (scripts/crt_combine.py, tests/gate_modp.py, the runner's own,
+    # and scripts/motley_crt.py).  The stated blocker is gone: motley_crt.py
+    # was extracted from the runner's heredoc and IS importable -- it parses no
+    # argv at import time, where crt_combine.py does.  So motley_crt is the
+    # candidate to share, not crt_combine.  Note that consolidating THIS copy
+    # would erode the gate's second-source role against the dalby runner, so
+    # the other three are the ones to collapse.
     M = 1
     for p in crt_primes:
         M *= p

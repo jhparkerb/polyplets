@@ -178,6 +178,11 @@ def row_weights(d2, basis, rows, p):
     return out
 
 
+# TODO(2026-08-24, /simplify): build_cell_automaton(H) is rebuilt once per
+# prime, and it is p-INDEPENDENT -- so the table loop below builds it three
+# times per height (two primes plus char 2), and for H<=7 recomputes the char-2
+# closure twice (fail-closed gate, then table). Building (order2, d2, acc2)
+# once per H and passing it in is a real fraction of the H=8 run (5-15 min).
 def run_height(H, p, want_weights=True):
     order2, d2, acc2 = build_cell_automaton(H)
     n = len(order2)

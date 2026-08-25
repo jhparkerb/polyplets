@@ -57,17 +57,14 @@ Usage: python3 experiments/strip_fss_lambda_sensitivity.py
 import math
 import sys
 
-# The banked ladder, at the precision it is banked to -- identical to
-# experiments/strip_fss.py's MU, which cites
+# The banked ladder comes FROM strip_fss.py rather than being copied beside it.
+# It was a verbatim duplicate, under a comment saying so ("identical to
+# experiments/strip_fss.py's MU") -- two hand-edited copies of a banked ladder
+# that H=18 would have to land in twice. strip_fss is import-safe: argparse
+# lives inside its __name__-guarded main. Citations stay at the original:
 # results/strip-mu-engine-resumption.md (H<=14) and
 # results/strip-mu-certificates.md's addendum table (H=15..17).
-MU = {
-    2: 2.4142136, 3: 3.4437184, 4: 4.1823214, 5: 4.7178013, 6: 5.1153245,
-    7: 5.4178476, 8: 5.6533728, 9: 5.8404579, 10: 5.9916958, 11: 6.1158416,
-    12: 6.2191246, 13: 6.3060713, 14: 6.3800344, 15: 6.4435408,
-    16: 6.4985245, 17: 6.5464870,
-}
-LAST_DIGIT_UNIT = 1e-7
+from strip_fss import MU, LAST_DIGIT_UNIT      # noqa: E402
 
 # The two banked lambda estimates, and the quoted uncertainty on the first.
 LAMBDA_DA = 7.1102        # differential approximants, results/series-analysis-da.md
@@ -290,23 +287,7 @@ def fit_three_term(mu, lam):
     Hs = sorted(mu)
     rows = [[1.0 / H, 1.0 / H ** 2, 1.0 / H ** 3] for H in Hs]
     rhs = [math.log(lam) - math.log(mu[H]) for H in Hs]
-    # normal equations A^T A x = A^T b, solved by Gaussian elimination
-    n = 3
-    ata = [[sum(rows[i][r] * rows[i][c] for i in range(len(Hs)))
-            for c in range(n)] for r in range(n)]
-    atb = [sum(rows[i][r] * rhs[i] for i in range(len(Hs))) for r in range(n)]
-    for i in range(n):
-        piv = max(range(i, n), key=lambda r: abs(ata[r][i]))
-        ata[i], ata[piv] = ata[piv], ata[i]
-        atb[i], atb[piv] = atb[piv], atb[i]
-        for r in range(i + 1, n):
-            f = ata[r][i] / ata[i][i]
-            for c in range(i, n):
-                ata[r][c] -= f * ata[i][c]
-            atb[r] -= f * atb[i]
-    x = [0.0] * n
-    for i in reversed(range(n)):
-        x[i] = (atb[i] - sum(ata[i][c] * x[c] for c in range(i + 1, n))) / ata[i][i]
+    x = _solve_normal(rows, rhs, 3)
     return x[0], x[1], x[2]
 
 

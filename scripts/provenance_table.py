@@ -123,11 +123,13 @@ EXPECTED = {
     # closed form.  This is the project's real gap, so it is pinned: if it grows
     # something regressed, and a rung that widens Motley's reach must shrink it,
     # which fires the gate and forces this number to be updated deliberately.
-    # It did: Confetti landed 2026-08-19 and took it from 11 to 6, retiring
-    # (36,18), (37,18), (38,18), (39,18) and (40,18).  What is left is
-    # (38,19), (39,19), (39,20), (40,19), (40,20), (40,21) -- and Ticker Tape,
-    # the rung that would have taken the H=19 cells, is priced and declined
-    # (results/ticker-tape-assessment.md), so this six is where the gap stands.
+    # It did, twice.  Confetti landed 2026-08-19 and took it from 11 to 6,
+    # retiring (36,18), (37,18), (38,18), (39,18) and (40,18).  Then Motley's
+    # reach went to H<=19 -- MOTLEY_H above is derived from the banked row sets
+    # now, not hand-set -- which retired the three H=19 cells (38,19), (39,19)
+    # and (40,19).  What is left is (39,20), (40,20), (40,21): the three below.
+    # This narration said "six" for a while after the pin already said 3; the
+    # pin is the thing the gate checks, so the story was the half that drifted.
     "congruence_only_cells": (3, "results/cutcount_b1/rows41/README.md; "
                                  "Motley at H<=%d, derived from the banked "
                                  "row sets" % MOTLEY_H),

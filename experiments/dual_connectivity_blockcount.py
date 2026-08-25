@@ -36,6 +36,7 @@ Usage: python3 experiments/dual_connectivity_blockcount.py [--height 21]
 """
 import argparse
 import sys
+from functools import lru_cache
 from math import comb
 
 # The incumbent's banked column-state count at H = 21, from
@@ -58,8 +59,20 @@ def bell(n):
     return B[n][0]
 
 
+@lru_cache(None)
 def motzkin(n):
-    return sum(comb(n, 2 * k) * catalan(k) for k in range(n // 2 + 1))
+    """Motzkin numbers by their three-term recurrence.
+
+    NOT sum_k C(n,2k)Cat(k), which is what this used to be -- and that made the
+    first RED control below a tautology: it checks sum_b C(H+1,2b)*Cat(b)
+    against motzkin(H+1), so with motzkin DEFINED as that sum, both sides ran
+    the same code and the control could not fail. The recurrence is a second
+    route (same one experiments/tristruct/r3_inv_rank_probe.py uses), so the
+    identity is now actually being tested. The division is exact at every n.
+    """
+    if n <= 1:
+        return 1
+    return ((2 * n + 1) * motzkin(n - 1) + (3 * n - 3) * motzkin(n - 2)) // (n + 2)
 
 
 def patterns(H, b):

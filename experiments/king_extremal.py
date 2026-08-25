@@ -82,6 +82,11 @@ def is_connected(cells):
     return bfs_ecc(cells, next(iter(cells)))[1] == len(cells)
 
 
+# TODO(2026-08-24, /simplify): O(n^2) per animal where O(n) exists. This
+# removes every vertex in turn -- a fresh set() allocation each -- and re-checks
+# connectivity by BFS. Tarjan's articulation points is one DFS. At nmax=10 that
+# is ~7.8M animals, and this is the long pole after enumeration. Worth doing if
+# the probe is ever re-run or pushed past n=10.
 def articulation_count(cells):
     if len(cells) <= 1:
         return 0

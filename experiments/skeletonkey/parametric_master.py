@@ -138,7 +138,7 @@ def weight(name, sizes):
 
 
 def solve_H(name, K, perturb=None):
-    D, b = LATTICES[name]
+    _, b = LATTICES[name]   # D is re-looked-up inside weight()
     hat = []
     for sizes in clusters(K):
         l = len(sizes)
@@ -329,7 +329,7 @@ def main():
     print("# clusters at K=%d: %s"
           % (K, ", ".join(str(c) for c in clusters(K))), flush=True)
 
-    for name, (D, b) in LATTICES.items():
+    for name in LATTICES:
         for sizes, want in BANKED_W[name].items():
             got = weight(name, sizes)
             if got != want:
