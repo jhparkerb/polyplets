@@ -82,6 +82,10 @@ def _argv(verifier):
 # single under-test.tex that concurrency would have had them fighting over.
 # ex.map preserves input order, so the output is identical to the serial sweep's.
 # Same pattern as gate_tma's spawn block, and for the same reason.
+# TODO(2026-08-24, from the simplify pass): this is a second pool-size policy
+# beside tests/common.py's spawn()/_POOL_MAX. Reusing that pool needs
+# common.spawn to grow env= and check=False (the probe needs both VERIFY_TEX and
+# the returncode), which is a change to shared code outside this gate's diff.
 WORKERS = min(8, os.cpu_count() or 4)
 
 

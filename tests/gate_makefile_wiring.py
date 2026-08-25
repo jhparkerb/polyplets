@@ -120,6 +120,26 @@ def check_red_naming(text):
     return bad
 
 
+# One spelling of the DEPS_<gate> line, used by both checks below.
+DEPS_RE = re.compile(r"^DEPS_((?:ns-)?gate-[A-Za-z0-9_-]+)\s*=\s*"
+                     r"((?:.*\\\n)*.*)$", re.M)
+
+
+def recipe_lines(text, gate):
+    """The tab-indented recipe lines of one target."""
+    body, seen = [], False
+    for line in text.splitlines():
+        if re.match(rf"^{re.escape(gate)}\s*:", line):
+            seen = True
+            continue
+        if seen:
+            if line.startswith("\t"):
+                body.append(line)
+            elif line.strip():
+                break
+    return body
+
+
 def check_gate_deps(text):
     """A DECLARED gate must list its own script among its inputs.
 
@@ -130,20 +150,9 @@ def check_gate_deps(text):
     the declarations that exist.
     """
     bad = []
-    for m in re.finditer(r"^DEPS_(gate-[A-Za-z0-9_-]+|ns-gate-[A-Za-z0-9_-]+)"
-                         r"\s*=\s*((?:.*\\\n)*.*)$", text, re.M):
+    for m in DEPS_RE.finditer(text):
         gate, deps = m.group(1), m.group(2).replace("\\\n", " ")
-        # the scripts the gate's own recipe names, from its tab-indented lines
-        body, seen = [], False
-        for line in text.splitlines():
-            if re.match(rf"^{re.escape(gate)}\s*:", line):
-                seen = True
-                continue
-            if seen:
-                if line.startswith("\t"):
-                    body.append(line)
-                elif line.strip():
-                    break
+        body = recipe_lines(text, gate)
         # not [\w/]+ -- that swallows the leading slash of "./scripts/foo.sh"
         scripts = set(re.findall(r"\w[\w/]*\.(?:py|sh)", "\n".join(body)))
         missing = sorted(x for x in scripts if x not in deps)
@@ -192,8 +201,7 @@ def check_gate_imports(text):
     trusted.
     """
     bad = []
-    for m in re.finditer(r"^DEPS_((?:ns-)?gate-[A-Za-z0-9_-]+)"
-                         r"\s*=\s*((?:.*\\\n)*.*)$", text, re.M):
+    for m in DEPS_RE.finditer(text):
         gate, deps = m.group(1), m.group(2).replace("\\\n", " ")
         for script in re.findall(r"[\w/]+\.py", deps):
             for mod in _local_imports(os.path.join(ROOT, script), set()):
@@ -201,6 +209,60 @@ def check_gate_imports(text):
                     bad.append(f"DEPS_{gate} omits {mod}, which {script} "
                                f"imports -- editing it would not re-run the gate")
     return sorted(set(bad))
+
+
+def _recipe_sources(text, body):
+    """The repo files a recipe actually executes.
+
+    Scripts appear by name. A binary does not, so it is resolved through its own
+    build rule to the source it is built from -- which is where a --deep flag
+    would live.
+    """
+    out = set()
+    for tok in re.findall(r"\.?/?([\w][\w/.-]*\.(?:py|sh))", "\n".join(body)):
+        out.add(tok)
+    for binary in re.findall(r"\b(build/[\w/]+)", "\n".join(body)):
+        rule = re.search(rf"^{re.escape(binary)}\s*:\s*(\S+)", text, re.M)
+        if rule:
+            out.add(rule.group(1))
+    return out
+
+
+def check_deep_wiring(text):
+    """A gate whose code reads --deep must have $(GATE_DEEP) on its recipe.
+
+    The push-tier/deep-tier split is carried from the recipe to the gate by
+    $(GATE_DEEP), and that transport is a wiring surface like any other: a gate
+    that sniffs --deep but is never passed it runs at PUSH depth under
+    `make gates-deep`, while the deep tier reports itself green at full size.
+    That is not hypothetical -- gate-king-grid and gate-multidirected both
+    landed that way, in the same change that added the tier.
+    """
+    # A file that merely MENTIONS --deep (this lint does, in its own controls)
+    # is not a consumer of it. Match the three ways a gate actually reads it.
+    consumes = re.compile(r'"--deep"\s+in\s+sys\.argv'      # python
+                          r'|^\s*--deep\)'                    # shell case arm
+                          r'|argv\[\w+\],\s*"--deep"'        # C++ strcmp
+                          r'|==\s*"--deep"', re.M)             # C++ string compare
+    bad = []
+    for gate in sorted(set(re.findall(r"^((?:ns-)?gate-[A-Za-z0-9_-]+)\s*:",
+                                      text, re.M))):
+        body = recipe_lines(text, gate)
+        if not body:
+            continue
+        recipe = "\n".join(body)
+        for src in sorted(_recipe_sources(text, body)):
+            path = os.path.join(ROOT, src)
+            if not os.path.exists(path):
+                continue
+            if not consumes.search(open(path, errors="ignore").read()):
+                continue
+            if "$(GATE_DEEP)" not in recipe:
+                bad.append(f"{gate} runs {src}, which reads --deep, but its "
+                           f"recipe never passes $(GATE_DEEP) -- "
+                           f"`make gates-deep` would run it at push depth")
+            break
+    return bad
 
 
 def check_prereqs(text):
@@ -211,18 +273,26 @@ def check_prereqs(text):
     GATE_PREREQS would be built by two sub-makes at once, into the same output
     file. A superset can only build something unnecessary; a subset is a race.
     """
-    m = re.search(r"^GATE_PREREQS\s*=\s*((?:.*\\\n)*.*)$", text, re.M)
+    bad = []
+    for pv, tv in (("GATE_PREREQS", "GATE_TARGETS"),
+                   ("NS_FAST_PREREQS", "NS_FAST_TARGETS")):
+        bad += _prereqs_one(text, pv, tv)
+    return bad
+
+
+def _prereqs_one(text, prereq_var, target_var):
+    m = re.search(rf"^{prereq_var}\s*=\s*((?:.*\\\n)*.*)$", text, re.M)
     if not m:
-        return ["no GATE_PREREQS assignment found in Makefile"]
+        return [f"no {prereq_var} assignment found in Makefile"]
     declared = set(m.group(1).replace("\\\n", " ").split())
-    # Only the WIRED gates matter: `make gates` runs exactly GATE_TARGETS, so an
+    # Only the WIRED gates matter: the sweep runs exactly the target list, so an
     # excused gate's binary (build/motley_par) is never built concurrently and
     # listing it here would just make every push compile something nothing runs.
-    w = re.search(r"^GATE_TARGETS\s*=\s*(.*)$", text, re.M)
-    wired = set(w.group(1).split()) if w else set()
+    w = re.search(rf"^{target_var}\s*=\s*((?:.*\\\n)*.*)$", text, re.M)
+    wired = set(w.group(1).replace("\\\n", " ").split()) if w else set()
     needed = set()
     for line in text.splitlines():
-        g = re.match(r"^(gate-[A-Za-z0-9_-]+)\s*:(.*)$", line)
+        g = re.match(r"^((?:ns-)?gate-[A-Za-z0-9_-]+)\s*:(.*)$", line)
         if g and g.group(1) in wired:
             needed.update(g.group(2).split())
     # $(if $(GMP_LDFLAGS),...) tokens appear in both sides verbatim; compare
@@ -230,8 +300,8 @@ def check_prereqs(text):
     missing = sorted(t for t in needed
                      if t.startswith("build/") and t not in declared)
     if missing:
-        return ["GATE_PREREQS is missing gate prerequisites -- two sub-makes "
-                "could race to build them: " + ", ".join(missing)]
+        return [f"{prereq_var} is missing gate prerequisites -- the stamp "
+                f"comparison would see a stale binary: " + ", ".join(missing)]
     return []
 
 
@@ -321,7 +391,8 @@ def main():
            + check_red_naming(text)
            + check_prereqs(text)
            + check_gate_deps(text)
-           + check_gate_imports(text))
+           + check_gate_imports(text)
+           + check_deep_wiring(text))
     if bad:
         for b in bad:
             print("  RED: " + b)
@@ -335,7 +406,8 @@ def main():
         print(f"  excused (recipe): {t} -- {why}")
     for t, why in sorted(EXCUSED_SCRIPTS.items()):
         print(f"  excused (script): {t} -- {why}")
-    print("  prereqs:   GATE_PREREQS covers every gate-*: build/ prerequisite")
+    print("  deep-tier: every gate that reads --deep is passed $(GATE_DEEP)")
+    print("  prereqs:   GATE_PREREQS and NS_FAST_PREREQS each cover their\n             own targets' build/ prerequisites")
     print("  gate-deps: every DECLARED gate lists its own script and every\n             repo-local module that script imports")
     print(f"  red-namer: {len(RED_LINE_CASES)} bracket formats parsed "
           "correctly by the Makefile's own sed")
@@ -413,12 +485,14 @@ def selftest():
 
     # RED 9: a gate prerequisite missing from GATE_PREREQS is the race.
     fake = ("GATE_PREREQS = build/a build/b\nGATE_TARGETS = gate-x\n"
+            "NS_FAST_PREREQS =\nNS_FAST_TARGETS =\n"
             "gate-x: build/a build/zzz\n")
     bad = check_prereqs(fake)
     assert any("build/zzz" in b for b in bad), bad
     # ...and an EXCUSED gate's binary is not required, because `make gates`
     # never builds it.
     unwired = ("GATE_PREREQS = build/a\nGATE_TARGETS = gate-x\n"
+               "NS_FAST_PREREQS =\nNS_FAST_TARGETS =\n"
                "gate-x: build/a\ngate-y: build/only_for_y\n")
     assert not check_prereqs(unwired), check_prereqs(unwired)
     print("  [RED 9] a gate prerequisite missing from GATE_PREREQS is caught")
@@ -440,6 +514,16 @@ def selftest():
     assert any("tests/common.py" in b for b in bad), bad
     print("  [RED 11] a declared gate that omits an imported module is caught")
 
+    # RED 12: the hole this check was written for -- a gate whose script reads
+    # --deep, whose recipe does not pass it. Uses a REAL script known to read
+    # --deep, so the control cannot pass by the file simply being absent.
+    probe = "gate-king-grid:\n\tpython3 tests/gate_king_grid.py\n"
+    bad = check_deep_wiring(probe)
+    assert any("gate-king-grid" in b for b in bad), bad
+    ok_case = "gate-king-grid:\n\tpython3 tests/gate_king_grid.py $(GATE_DEEP)\n"
+    assert not check_deep_wiring(ok_case), check_deep_wiring(ok_case)
+    print("  [RED 12] a gate that reads --deep but is never passed it is caught")
+
     # And the real Makefile must parse -- a lint that cannot read its own
     # subject is not a lint.
     real = open(MAKEFILE).read()
@@ -449,7 +533,7 @@ def selftest():
     assert len(disk) > 20, f"script glob found only {len(disk)} -- globs broken?"
     print(f"  [parse] real Makefile: {len(r)} recipes, {len(w)} wired, "
           f"{len(disk)} gate scripts on disk")
-    print("GATE SELFTEST GREEN: 11/11 red controls fired")
+    print("GATE SELFTEST GREEN: 12/12 red controls fired")
 
 
 if __name__ == "__main__":

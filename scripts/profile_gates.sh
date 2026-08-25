@@ -42,20 +42,34 @@ run() {   # run <phase> <label> <make-args...>
     "$([ "$st" -eq 0 ] && echo ok || echo "RED(exit $st) -- $log")"
 }
 
-# Target lists come from the Makefile itself so this cannot drift from what the
-# hook runs. Fail closed: an empty list means the parse broke, not that there
-# is nothing to profile.
-fastlist="$(sed -n 's/^ns-gate-fast: *//p' Makefile)"
-gatelist="$(sed -n 's/^GATE_TARGETS = *//p' Makefile)"
-[ -n "$fastlist" ] || { echo "profile_gates: cannot parse ns-gate-fast from Makefile" >&2; exit 2; }
-[ -n "$gatelist" ] || { echo "profile_gates: cannot parse GATE_TARGETS from Makefile" >&2; exit 2; }
+# Target lists come from make itself, not from sed-ing the Makefile. The sed
+# version claimed it "cannot drift from what the hook runs" and drifted within
+# the same change: once `ns-gate-fast:` grew a prerequisite, the scrape returned
+# the literal string $(NS_FAST_PREREQS) -- non-empty, so the fail-closed check
+# passed it straight through to `make`.
+#
+# So the check is on the SHAPE now, not just on emptiness: every token has to
+# look like a gate target, which a stray variable reference or a filename does
+# not.
+fastlist="$(make -s -C "$root" print-NS_FAST_TARGETS)"
+gatelist="$(make -s -C "$root" print-GATE_TARGETS)"
+jobs_n="$(make -s -C "$root" print-JOBS)"
 
-# What -j did `gates` actually use? Same expression the Makefile uses.
-if [ "$(uname -s)" = Darwin ]; then
-  jobs_n="$(sysctl -n hw.perflevel0.logicalcpu 2>/dev/null || sysctl -n hw.ncpu)"
-else
-  jobs_n="$(nproc 2>/dev/null || echo 4)"
-fi
+check_list() {                  # check_list <name> <tokens...>
+  local name="$1"; shift
+  [ "$#" -gt 0 ] || { echo "profile_gates: $name is empty" >&2; exit 2; }
+  local t
+  for t in "$@"; do
+    case "$t" in
+      gate-*|ns-gate-*) ;;
+      *) echo "profile_gates: $name has a token that is not a gate target: $t" >&2
+         exit 2 ;;
+    esac
+  done
+}
+check_list NS_FAST_TARGETS $fastlist
+check_list GATE_TARGETS $gatelist
+
 
 echo "=== host $(hostname -s)  rev $(git rev-parse --short HEAD)  JOBS=$jobs_n"
 echo

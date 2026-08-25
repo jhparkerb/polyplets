@@ -25,6 +25,7 @@ Exit 0 = gate green; any mismatch raises and exits nonzero.
 import subprocess
 import sys
 import os
+from functools import lru_cache
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cluster_weight_dp import (compositions, interior, boundary, pure,
@@ -94,14 +95,21 @@ LEVEL6 = {   # composition -> (interior, boundary_bottom, boundary_top, pure)
 }
 
 
+@lru_cache(maxsize=None)
 def dp_ref(v):
-    """The holdout reference for one composition, straight from the Python DP."""
+    """The holdout reference for one composition, straight from the Python DP.
+
+    Cached: --deep recomputes the bank, and with deep files on the command line
+    check_level6 runs once per file -- without this the same minutes-long
+    derivation runs again for each of them."""
     return (interior(v), boundary(v), boundary(tuple(reversed(v))), pure(v))
 
 
 def emit_level6():
+    """Re-derive the bank. Iterates LEVEL6 rather than a second copy of its
+    keys, so a composition added to the bank is re-derived by definition."""
     print("LEVEL6 = {")
-    for v in [(7,), (4, 4), (3, 5)]:
+    for v in sorted(LEVEL6, key=lambda t: (len(t), t)):
         print(f"    {v}: {dp_ref(v)},")
     print("}")
 
@@ -125,7 +133,7 @@ def check_level6(table, deep=False):
             f"[B] level-6 holdout fails at {v}: {table[v]} != {ref}"
     # The two-row interiors are ALSO in TWO_ROW_INTERIOR; cross-check the two
     # banks against each other so a typo in either one is caught.
-    for v in [(4, 4), (3, 5)]:
+    for v in [v for v in bank if len(v) == 2]:
         assert bank[v][0] == TWO_ROW_INTERIOR[v], \
             f"[B] LEVEL6 and TWO_ROW_INTERIOR disagree at {v}"
     m = 7   # and the one-row entry against the single-row closed form

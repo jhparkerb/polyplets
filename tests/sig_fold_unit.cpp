@@ -37,6 +37,16 @@
 //        sig_fold_unit --selftest   RED controls: three mutant folds must fail
 //
 // Exit 0 = green.
+//
+// TODO(2026-08-24, from the simplify pass): two known redundancies, both left
+// in on purpose. (1) enumSigs yields both members of every mirror orbit, and
+// P1-P6 are symmetric under the swap, so the whole sweep runs twice; skipping
+// one representative would halve it. (2) P5's budget loop re-steps every mask
+// once per budget, and P4 has already stepped them all -- a per-signature
+// mask table would serve both. Neither was applied because this is a
+// VERIFIER: it is 0.9 s on the push tier, and stating each property as its own
+// straight-line loop is what makes it readable against the six claims in the
+// header. Revisit if the deep tier (92 s at H=8) ever becomes a bottleneck.
 
 #include <algorithm>
 #include <cstdio>

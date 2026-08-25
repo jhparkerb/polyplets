@@ -13,15 +13,27 @@ CXXFLAGS = -std=c++20 -Wall -Wextra -Werror
 # whatever the tree is now. GIT_REV carries a -dirty suffix when the tree differs
 # from HEAD at all (untracked included), matching Python obs.py's porcelain check.
 # cpp/obs.h reads these via -D; absent them it falls back to "unknown".
+#
+# Probed ONCE, at the top level, and exported. `make gates` is ~40 nested makes
+# now (one per gate, so each can be timed), and every Makefile parse used to
+# re-run all of this -- including `git status --porcelain`, a full worktree
+# walk, and two compiler --version probes below. Sub-makes inherit these from
+# the environment; MAKELEVEL is 0 only in the outermost one.
+ifeq ($(MAKELEVEL),0)
 GIT_REV    := $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
 GIT_DIRTY  := $(shell test -n "$$(git status --porcelain 2>/dev/null)" && echo -dirty)
 BUILD_TIME := $(shell date +%Y-%m-%dT%H:%M:%S%z)
+export GIT_REV GIT_DIRTY BUILD_TIME
+endif
 CXXFLAGS += -DGIT_REV='"$(GIT_REV)$(GIT_DIRTY)"' -DBUILD_TIME='"$(BUILD_TIME)"'
 
 # -Wno-error=restrict is a gcc-only workaround (gcc-12 false positive on the
 # Redelmeier generator, see build/g2 below). clang rejects the unknown flag, so
 # apply it only when the compiler is gcc; empty for clang.
+ifeq ($(MAKELEVEL),0)
 RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),,-Wno-error=restrict)
+export RESTRICT_FLAG
+endif
 
 # The Redelmeier kernel (build/g2) is measurably faster built with clang on
 # aarch64: ~9% over gcc-15 on Neoverse-N1 (measured, results/terminal-velocity.md),
@@ -30,10 +42,13 @@ RESTRICT_FLAG := $(if $(findstring clang,$(shell $(CXX) --version 2>/dev/null)),
 # clang is absent (e.g. ayr uses g++). g2_asan stays on $(CXX): keeping the two
 # builds on different compilers turns gate-g2 check D into a two-compiler count
 # cross-check for free.
+ifeq ($(MAKELEVEL),0)
 G2CXX := $(shell command -v clang++-19 2>/dev/null || command -v clang++ 2>/dev/null || echo $(CXX))
 G2_RESTRICT := $(if $(findstring clang,$(shell $(G2CXX) --version 2>/dev/null)),,-Wno-error=restrict)
+export G2CXX G2_RESTRICT
+endif
 
-.PHONY: gates gates-deep gates-force timed-% gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
+.PHONY: gates gates-deep gates-force timed-% print-% gate-g1 gate-g2 gate-euler gate-strip-cert gate-strip-fast \
         gate-sig-fold \
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
@@ -119,12 +134,22 @@ endif
 # the bracket reads "[timed-gate-foo]" or "[Makefile:2: timed-gate-foo]". The
 # pattern takes any prefix and anchors on the last "gate-" in the bracket, which
 # covers all three. tests/gate_makefile_wiring.py holds it to that.
+# Ask make for the value of any variable: `make print-GATE_TARGETS`. Tools that
+# need these lists should read them this way rather than sed the Makefile --
+# which is how scripts/profile_gates.sh broke the day `ns-gate-fast:` grew a
+# prerequisite and its scrape started returning the literal $(NS_FAST_PREREQS).
+print-%:
+	@echo '$($*)'
+
 GATELOG = build/gates.log
 
 # Every gate at full size -- the deep tier. Same targets, same assertions; the
 # ones that bank or bound something re-derive it instead.
+# ns-gate-fast is in here because two of its gates take $(GATE_DEEP) as well
+# (the worker-CLI H=8 case): running only `gates` left their deep tier with
+# nothing that ever restores it. Command-line overrides propagate to sub-makes.
 gates-deep:
-	$(MAKE) gates GATE_DEEP=--deep FORCE_GATES=1
+	$(MAKE) gates ns-gate-fast GATE_DEEP=--deep FORCE_GATES=1
 
 # Every gate, ignoring every stamp -- what to run when you want the suite to
 # have actually executed rather than to have decided it did not need to.
@@ -185,7 +210,16 @@ DEPS_gate-no-copyright-pdfs = $(PAPER_SRC) tests/gate_no_copyright_pdfs.py
 # transitively, has to be listed.
 DEPS_gate-tma = build/tma build/tma_asan build/tma_holes build/g2 \
                 tests/gate_tma.py tests/common.py \
-                fixtures/b001168.txt fixtures/b006770.txt results/holes_n14.txt
+                $(FIXTURES) results/holes_n14.txt
+# Every declared gate that reads ANY fixture takes the whole directory. The
+# module side of a dependency list is computed (check_gate_imports); the data
+# side is hand-written, and naming individual b-files is where it goes wrong --
+# a gate that gains a fixture would skip while that fixture changed. Over-broad
+# is the safe direction, and fixtures/ changes rarely.
+# TODO(2026-08-24): the computed version -- grep each declared script and its
+# imports for fixtures/ and results/ literals, require them in DEPS -- is a
+# third lint of moderate fragility. Same family as the GATE_TARGETS-completeness
+# TODO above.
 FIXTURES  = $(wildcard fixtures/*)
 
 # Gates whose recipe just runs a binary: the binary IS the input. Make rebuilds
@@ -211,17 +245,14 @@ DEPS_gate-multidirected = build/directed_cone_anchor tests/gate_multidirected.py
                 tests/common.py experiments/multidirected_king.py $(FIXTURES)
 DEPS_gate-g1 = tests/gate_g1.py tests/common.py oracle/g1_naive.py $(FIXTURES)
 
-DEPS_gate-s2  = tests/gate_s2.py tests/common.py oracle/g1_naive.py \
-                fixtures/b000105.txt fixtures/b030222.txt
+DEPS_gate-s2  = tests/gate_s2.py tests/common.py oracle/g1_naive.py $(FIXTURES)
 DEPS_gate-sym = build/symcount_fast tests/gate_sym.py tests/common.py \
-                oracle/g1_naive.py sym/symcount.py \
-                fixtures/b006770.txt fixtures/b030222.txt
+                oracle/g1_naive.py sym/symcount.py $(FIXTURES)
 DEPS_gate-subgroup = build/symcount_fast build/symtm tests/gate_subgroup.py \
-                tests/common.py oracle/g1_naive.py sym/symcount.py \
-                fixtures/b006770.txt
+                tests/common.py oracle/g1_naive.py sym/symcount.py $(FIXTURES)
 DEPS_gate-symtm = build/symtm build/symcount_fast tests/gate_symtm.py \
                 tests/common.py
-DEPS_gate-modp = build/tma build/tma_modp_test tests/gate_modp.py
+DEPS_gate-modp = build/tma build/tma_modp_test tests/gate_modp.py tests/common.py
 DEPS_gate-perimeter-min = build/perimeter_min build/g2 \
                 scripts/perimeter_min_gate.sh experiments/diamond_free_removals.py \
                 results/siteperim_square8_n14.txt results/siteperim_square4_n20.txt \
@@ -233,8 +264,7 @@ DEPS_gate-severance-w2 = experiments/severance_w2_gate.py \
                 experiments/depth1_gap_walk.py experiments/cluster_weight_dp.py \
                 experiments/slope2_law_vs_truth.py
 DEPS_gate-g2  = build/g2 build/g2_asan \
-                tests/gate_g2.py tests/common.py oracle/g1_naive.py \
-                fixtures/b001168.txt fixtures/b006770.txt fixtures/b001207.txt
+                tests/gate_g2.py tests/common.py oracle/g1_naive.py $(FIXTURES)
 
 # Per-gate wall time, on every run, from the machine that actually ran it.
 # -j interleaves output, so a gate that has quietly grown to minutes is
@@ -264,7 +294,7 @@ timed-%:
 	 t0=$$(date +%s); \
 	 $(MAKE) --no-print-directory $* ; st=$$?; \
 	 if [ $$st -eq 0 ] && [ -n "$$deps" ]; then \
-	   mkdir -p $(STAMPS); printf '%s\n' $$deps | sort > "$$stamp"; \
+	   mkdir -p $(STAMPS); printf '%s\n' "$$list" > "$$stamp"; \
 	 fi; \
 	 echo "gate-time $$(( $$(date +%s) - t0 ))s $*"; \
 	 exit $$st
@@ -745,7 +775,7 @@ build/directed_cone_anchor: cpp/directed_cone_anchor.cpp cpp/argparse.h cpp/obs.
 # Gate KING-GRID: docs/middle-kingdom-plan.md Phase 0 -- the 16-cell grid mode
 # vs the plan's reference table + RED controls (existing + gridbad staircase).
 gate-king-grid: build/directed_cone_anchor
-	python3 tests/gate_king_grid.py
+	python3 tests/gate_king_grid.py $(GATE_DEEP)
 
 # Gate SITE-PERIM: docs/middle-kingdom-followups-plan.md Phase 4a -- the
 # grid-mode min-reduce of site perimeter (KING adjacency, minSPKing) vs the
@@ -760,7 +790,7 @@ gate-site-perim: build/directed_cone_anchor build/g2
 # the RED controls (keystone condition dropped; "control B") and the
 # 6.4752-not-6.118 growth-constant trap. results/multi-directed.md.
 gate-multidirected: build/directed_cone_anchor
-	python3 tests/gate_multidirected.py
+	python3 tests/gate_multidirected.py $(GATE_DEEP)
 
 # GMP (mpz_class/gmpxx): headers live in /usr/include on Linux, /opt/local on
 # macOS/MacPorts. AUTO-DETECTED same as zstd above -- if the dev header is
@@ -1016,9 +1046,7 @@ NS_FAST_PREREQS = build/ns/gate_math build/ns/gate_run build/ns/gate_runfile \
   build/ns/map_worker build/ns/merge_worker build/strip_mu_cert
 
 ns-gate-fast: $(NS_FAST_PREREQS)
-	@for t in $(NS_FAST_TARGETS); do \
-	   $(MAKE) --no-print-directory timed-$$t || exit $$?; \
-	 done
+	@$(MAKE) --no-print-directory -j1 $(addprefix timed-,$(NS_FAST_TARGETS))
 
 # Closed-form invariant gate: assert the engine contributes every KNOWN closed
 # form (top strip H=N=3^(N-1); low strips T(n,1)=1, T(n,2) recurrence) DIRECTLY,

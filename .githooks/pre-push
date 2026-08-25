@@ -53,7 +53,6 @@ mkdir -p "$root/build"
 
 t0=$SECONDS
 echo "pre-push: make ns-gate-fast"
-set -o pipefail
 make -C "$root" ns-gate-fast FORCE_GATES=$force 2>&1 | tee -a "$log"
 t_fast=$((SECONDS - t0))
 
