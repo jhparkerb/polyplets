@@ -3,7 +3,7 @@
 2026-08-09. Continues `results/onset-defect-law.md` and `results/discarded-term.md`;
 supersedes their depth-1 content. Scripts, run from repo root, each seconds to
 ~45 s: `experiments/depth1_gap_walk.py`, `depth1_asymptotics.py`,
-`depth1_minpoly.py`, `depth1_recurrence.py`.
+`depth1_minpoly.py`, `depth1_recurrence.py`, `depth1_sharpness.py`.
 
 Summary of what changed today:
 
@@ -13,8 +13,9 @@ Summary of what changed today:
   `results/allpairs-kernel.md`. This removes the `P_k ≤ 19` wall entirely:
   `D_1(k)` is now computed exactly to `k = 200` in 42 s.
 - The generating function is **algebraic**: an irreducible quartic
-  `Φ(x, W) = 0` pins it, fitted on 57 series orders and holding on **144 orders
-  of pure holdout**, plus a mod-p scan proving nothing smaller works.
+  `Φ(x, W) = 0` pins it, **derived** by the kernel method (§3), the earlier fit
+  and its 144 holdout orders now confirmation. Its mod-3 reduction proves the
+  onset is sharp: `D_1(k) ≠ 0` for every `k ≥ 1` (§3, 2026-09-05).
 - From `Φ`, every measured constant of the depth-1 campaign is **derived
   exactly**: rate `9`, exponent `−1/2`, amplitude `C_1 = √6/(27√π)`, and the
   1/k coefficient
@@ -84,14 +85,12 @@ The numerators `4, 80, 1753, 40928, 987355, …` are not in OEIS (2026-08-09).
 
 ## 3. The generating function is algebraic
 
-Write `N(x) = Σ N_k x^k`, `N_k = 3^(k+1) D_1(k)` (so `N = 3F_1(3x)`, integer
-coefficients). `experiments/depth1_minpoly.py`:
-
-- **mod-p scan** (2⁶¹−1, holdout past order 70): nullspace dimension 0 for
-  every box with `deg_W ≤ 3`; dimensions `1, 2, 3, 4, 5` at `deg_W = 4`,
-  `deg_x = 8..12` — the signature of a unique minimal polynomial at `(8,4)`.
-- **exact solve** at `(8,4)`: nullspace dimension exactly 1 over `Q`, giving
-  the irreducible quartic (coprime integer coefficients):
+Write `N(x) = Σ N_k x^k`, `N_0 = 0`, `N_k = 3^(k+1) D_1(k)` (so `N = 3F_1(3x)`).
+The coefficients are integers: `N_k = 3^(k+1)T(2k,k) − P_k(2k)`, and `P_k`, of
+degree `k`, takes the integer values `T(n,n−k)·3^(3k+1−n)` at the `k+1`
+consecutive integers `n = 2k+1..3k+1`, hence integer values on all of ℤ. `experiments/depth1_minpoly.py` finds the minimal box by
+a mod-p dimension scan (nothing below `deg_W = 4`, `deg_x = 8`) and solves it
+exactly over `Q` — an irreducible quartic with coprime integer coefficients:
 
 ```
 Φ(x,W) =   (27x−1)²(2187x⁶−5751x⁵+5502x⁴+3486x³−4329x²+449x+392)·W⁴
@@ -101,8 +100,8 @@ coefficients). `experiments/depth1_minpoly.py`:
          + x(19683x⁷−30618x⁶+89667x⁵−63720x⁴−4920x³+16560x²+2736x−64)
 ```
 
-- **verification**: `Φ(x, N(x)) = 0` through `x^200` exactly — the fit used
-  orders 0..56, so **144 orders are holdout**.
+`Φ(x, N(x)) = 0` through `x^200` exactly; the fit used orders 0..56, so 144
+orders are holdout.
 
 Status — **DERIVED, 2026-08-09 (Severance W2,
 `experiments/severance_w2_kernel.py`).** The kernel method executed exactly
@@ -111,13 +110,37 @@ branches in `s = √y` (small roots in `Q(s)[A,B]`,
 `A² = (1−3s)(1+s)`, `B² = (1+3s)(1−s)` — the `1−3s` branch point is Φ's
 `27x−1`); a 6×6 closure over the two analyticity conditions per small root,
 the `[u³]` self-consistency, and `J(1)` pins the boundary unknowns; (II)
-assembles `F_1 = c₀+c₁A+c₂B+c₃AB`, fixed by the order-8 dihedral Galois
-group's subgroup of index 4, and the degree-4 norm is `Φ` **coefficient-for-
-coefficient (scale 1)** after `y = 3x`, `W = 3F₁+1`. No series data enters
+assembles `F_1 = c₀+c₁A+c₂B+c₃AB` and the degree-4 norm is `Φ` **coefficient-
+for-coefficient (scale 1)** after `y = 3x`, `W = 3F₁+1`. No series data enters
 the derivation; gate `experiments/severance_w2_gate.py` (RED selftest
-fires) confirms exact equality and independent annihilation to `x^80`. The
-localized eigenvalue ρ never appears: it is a pole of `S`, `B`, `P̂`
-individually and cancels in `F_1` before elimination begins.
+fires) confirms exact equality and independent annihilation to `x^80`.
+
+**Onset sharpness, proved (2026-09-05).** Reduce `Φ` mod 3. It factors:
+
+```
+Φ(x, W) ≡ 2 (W−1)³ ((1+x)W − x)          in F_3[x, W].              (III)
+```
+
+`F_3[[x]]` is an integral domain, so the reduction `N̄` of `N` must kill one
+factor. `N̄ = 1` would need `N_1 ≡ 0`, and `N_1 = 4`; so `(1+x)N̄ = x`, i.e.
+`N̄ = Σ_{k≥1} (−1)^(k+1) x^k`. Hence `N_k ≡ (−1)^(k+1) (mod 3)` for every
+`k ≥ 1`, so `3 ∤ N_k`, so `N_k ≠ 0`, so
+
+```
+D_1(k) = N_k / 3^(k+1) ≠ 0        for every k ≥ 1.
+```
+
+The diagonal formula therefore fails at `n = 2k` for every `k ≥ 1`: **the onset
+`n ≥ 2k+1` is sharp.** No tail bound, no `K_0`, no asymptotics — the whole
+argument is (III) plus one integer. It also upgrades §2's observation that the
+denominator of `D_1(k)` is exactly `3^(k+1)` from a check to a consequence.
+Gate `experiments/depth1_sharpness.py` (45 s): rebuilds `D_1` to `k = 200` from
+the gap walk alone, then checks integrality, annihilation through `x^200`,
+(III) coefficient-by-coefficient in `F_3[x,W]`, the branch selection, and the
+congruence — RED selftest fires on a perturbed `Φ` and on a perturbed series.
+The proof inherits the standing of (II) (see Limits): derived from the proved
+chain identity, machine-verified at 19 exact cells, not yet written up as a
+standalone document.
 
 ## 4. Every constant of the campaign, derived
 
@@ -182,10 +205,8 @@ the true recurrence was an order of magnitude away.
   the remaining constants were computed without any high-order cluster
   weights, closing the obstacle that section named (the cumulant-inversion
   route around it was never needed).
-- `diagonal-law.md` open item "onset sharpness in general": sharpness at
-  depth 1 is `D_1(k) ≠ 0`, now verified to k = 200 and reduced for all k to a
-  statement about the curve (a nonvanishing branch coefficient); a proof of
-  (II)-plus-`Φ` would close it.
+- `diagonal-law.md` open item "onset sharpness in general": **closed at
+  depth 1** by (III) above — `D_1(k) ≠ 0` for every `k ≥ 1`.
 - The below-onset smoke test (`defect_holdout.py`) can now use exact `D_1` at
   any k — the depth-1 line needs no fitted amplitude at all.
 
@@ -213,10 +234,7 @@ the real work. Desk work, no machine time.
   observation (top degree ⟺ all rows of size 2); the bookkeeping is spelled
   out in §2 of this note and machine-verified at 19 exact cells plus the
   ℓ ≤ 8 / ℓ ≤ 6 weight validations. It is not yet written as a standalone
-  proof document.
-- ~~`Φ` is fitted, not derived~~ **closed 2026-08-09**: derived by the
-  kernel method (`experiments/severance_w2_kernel.py`, §3 above); the fit
-  and its 144 holdout orders are now confirmation, not evidence.
+  proof document — the one thing the §3 sharpness proof still rests on.
 - The Puiseux branch through `V₀` is selected by the measured `a` (the other
   sheet gives 0.0657…); `C_1` is branch-independent.
 - Everything here is depth 1. The depth-j family and the boundary-layer /

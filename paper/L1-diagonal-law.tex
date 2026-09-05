@@ -518,28 +518,32 @@ objects anyone studies, and all three are in Table~\ref{tab:instances}.
 
 \paragraph{Onset sharpness.} Theorem~\ref{thm:A} proves validity from
 $n = 2k+1$. That the formula \emph{fails} at $n = 2k$ is a non-cancellation
-statement, needing $\deg D = k$ exactly, and we have it on all banked data
-for the king lattice through $k \le 17$, and ab initio from the weight table for
-$k \le 5$, where $\deg R_k = 2k+1$ exactly with leading coefficients
-$1, 4, -80, 1753, -40928, 987355$. It is not proved for all $k$, and
-Corollary~\ref{cor:a308359} uses it only as a control, never as an input.
-
-The natural route, a \emph{rational} generating function for the top
-coefficient, is obstructed: the relevant all-pairs weight family is not
-C-finite, refuted at $\ell = 16$, because the walk between the pair cells has
-unbounded gap. The route that is not obstructed is the next one up. Companion
-paper L8 identifies that top coefficient with the depth-one below-onset defect,
-computes it exactly to $k = 200$ from the cluster families alone, and exhibits an
-irreducible quartic satisfied by its generating function; singularity analysis of
-that quartic gives
+statement, needing $\deg D = k$ exactly. On the king lattice it holds for every
+$k \ge 1$. Companion paper L8 identifies the top coefficient of $R_k$ with the
+depth-one below-onset defect $D_1(k) = T(2k,k) - P_k(2k)\,3^{-(k+1)}$ and derives,
+by the kernel method and with no series data, an irreducible quartic $\Phi(x,W)$
+annihilating $N(x) = \sum_{k \ge 1} 3^{k+1} D_1(k)\,x^k$. The coefficients
+$N_k = 3^{k+1}T(2k,k) - P_k(2k)$ are integers, because $P_k$ has degree $k$ and
+takes the integer values $T(n,n-k)\,3^{3k+1-n}$ at the $k+1$ consecutive integers
+$n = 2k+1, \dots, 3k+1$, hence integer values on all of $\mathbb{Z}$. Reduce
+$\Phi$ modulo $3$. It factors:
 \[
-  D_1(k) \;\sim\; \frac{\sqrt6}{27\sqrt\pi}\,9^k\,k^{-1/2},
+  \Phi(x,W) \;\equiv\; 2\,(W-1)^3\bigl((1+x)W - x\bigr)
+  \qquad\text{in } \F_3[x,W].
 \]
-whose amplitude is positive, so $D_1(k) \ne 0$ for all sufficiently large $k$ ---
-which is exactly $\deg R_k = 2k+1$, which is onset sharpness. Two things stop
-that from closing the problem here. The quartic is fitted and held on holdout
-orders, not proved; and ``sufficiently large'' is not made effective, so it would
-not by itself cover any particular $k$. Both are stated in L8's ledger.
+Since $\F_3[[x]]$ is an integral domain, the reduction of $N$ kills one factor,
+and $W \equiv 1$ would force $N_1 \equiv 0$ against $N_1 = 4$. So the reduction
+is $x/(1+x)$, giving $N_k \equiv (-1)^{k+1} \pmod 3$, hence $N_k \ne 0$, hence
+$D_1(k) \ne 0$, for every $k \ge 1$. That is $\deg R_k = 2k+1$, which is onset
+sharpness. Corollary~\ref{cor:a308359} still uses it only as a control.
+
+The generating function is algebraic and not rational: the all-pairs weight
+family is not C-finite, refuted at $\ell = 16$, because the walk between the pair
+cells has unbounded gap. The argument rests on L8's identity expressing $D_1$
+through the all-pairs cluster families, derived from the chain identity and
+machine-verified at $19$ exact cells but not written out as a standalone proof.
+It is king-specific: $\Phi$ is derived from the king weight families, and no
+analogue has been computed for the square or polyhex instances.
 
 \section{The product form}
 \label{sec:grand}
@@ -1513,6 +1517,7 @@ Table~\ref{tab:cumulants} & \repo{experiments/gas\_cumulants.py} \\
 $\Wp$, two independent routes & \repo{experiments/universal\_pair\_weights.py} \\
 Corollary~\ref{cor:a308359} and its two controls & \repo{experiments/oeis\_a308359\_check.py} \\
 onset sharpness, $k \le 5$ ab initio & \repo{experiments/spine\_deeper.py} \\
+onset sharpness, all $k$ (mod 3) & \repo{experiments/depth1\_sharpness.py} \\
 Section~\ref{sec:polyiamond} & \repo{experiments/universal\_law\_check.py} \\
 Section~\ref{sec:formal} & \texttt{cd polyplets \&\& lake build} \\
 this paper's printed numbers & \repo{paper/verify\_l\_papers.py} \\

@@ -19,7 +19,8 @@ x = 1 and x = -1, of total order <= k+1 at each.
 
 (The sharp onset -- the single condition S_0 = 2k+2, no parity split:
 2k+3 on the odd class is just the least odd integer past 2k+2 -- is NOT
-proved here; as with the king diagonal law, sharpness stays data-grade.
+proved here; it stays data-grade. King sharpness, by contrast, was closed
+2026-09-05: `docs/proofs/diagonal-law.md`, "What remains open".
 The pole multiplicities (k+1, k) are NOT an independent data-grade item:
 writing d(S,S+k) = A(S) + (-1)^S B(S), they are equivalent to deg A = k
 and deg B = k-1, i.e. to the banked equal-leading-coefficients fact plus
@@ -163,8 +164,10 @@ each. QED
   enumerated data (S <= 13), and classes partition d(S, S+k) —
   `experiments/dm_phase_census.py`.
 - NOT proved: sharp onset (2k+2 / 2k+3) and the exact multiplicity split
-  (k+1 at x=1, k at x=-1); both remain data-grade, as does onset
-  sharpness in the king law.
+  (k+1 at x=1, k at x=-1); both remain data-grade. The king analogue is no
+  longer a companion in that: it was proved 2026-09-05
+  (`docs/proofs/diagonal-law.md`), by a route that has no dm-mirror
+  counterpart yet — no quartic is known for the dm-mirror defect.
 
 ## Consequences
 

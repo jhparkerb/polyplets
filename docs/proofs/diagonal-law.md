@@ -138,13 +138,20 @@ many enumerated weights that enter each modulus (5 integers mod 27).
 
 ## What remains open (deliberately)
 
-- **Onset sharpness in general**: the theorem proves validity from n = 2k+1;
-  failure at n = 2k is a non-cancellation (deg D = k exactly). Verified on
-  all banked data AND ab initio for k ≤ 5 from the weight table (deg R_k =
-  2k+1 exactly; leading coefficients 1, 4, −80, 1753, −40928, 987355 —
-  `experiments/spine_deeper.py`). Not proved for all k; note the natural
-  route (rational GF for the top coefficient) fails because the all-pairs
-  weight family is not C-finite (refuted at ℓ=16; unbounded gap walk).
+- **Onset sharpness in general — CLOSED 2026-09-05.** The theorem proves
+  validity from n = 2k+1; failure at n = 2k is a non-cancellation
+  (deg D = k exactly), i.e. `D_1(k) = T(2k,k) − P_k(2k)/3^(k+1) ≠ 0`. With
+  `N_k = 3^(k+1) D_1(k)` — an integer, since `P_k` has degree `k` and takes
+  the integer values `T(n,n−k)·3^(3k+1−n)` at the `k+1` consecutive integers
+  `n = 2k+1..3k+1`, hence integer values on all of ℤ — the derived quartic Φ of
+  `results/onset-defect-depth1-closed.md` §3 reduces mod 3 to
+  `2(W−1)³((1+x)W − x)`; the branch `W ≡ 1` is killed by `N_1 = 4`, leaving
+  `N_k ≡ (−1)^(k+1) (mod 3)`, so `N_k ≠ 0` for every `k ≥ 1`. Proof and gate
+  (`experiments/depth1_sharpness.py`) in that note; it rests on its
+  identity (II), derived from the chain identity here but not yet written up
+  standalone. The old worry that the natural route (rational GF for the top
+  coefficient) fails — the all-pairs family is not C-finite, refuted at
+  ℓ=16 — is moot: the GF is algebraic, not rational.
 - **Denominator k! — CLOSED both ways (2026-07-31).** k!·P_k ∈ ℤ[n] is a
   THEOREM for all k (integer-valuedness + deg ≤ k; Lean
   `production_factorial_int` in `IntCoeff.lean`) — it is how

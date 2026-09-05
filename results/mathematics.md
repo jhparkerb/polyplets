@@ -43,7 +43,11 @@ giving a triangle `T(n,H)`. Look along a diagonal — fix `k` and vary `n`, with
 > The onset `n ≥ 2k+1` is sharp.
 
 This is a **theorem**, not a fit: `docs/proofs/diagonal-law.md`, with the shape,
-the onset, and the integrality proved. It holds on every *row-local* lattice,
+the onset, and the integrality proved. Sharpness — the formula fails at
+`n = 2k` for every `k` — was closed in 2026-09-05 by reducing the depth-1
+defect's derived quartic mod 3 (`results/onset-defect-depth1-closed.md` §3);
+it rests on that note's identity (II), which is derived but not yet written up
+standalone. It holds on every *row-local* lattice,
 not just the king lattice — square, hex, king and beyond
 (`docs/proofs/universal-diagonal-law.md`) — with the `3` replaced by the size of
 the local neighbourhood.
