@@ -184,7 +184,10 @@ Neither audit is a gate, deliberately; both say where the exposure is.
 ## Scripts
 
 `atom_degrees.py`, `gf_bound.py` and `lambda_fit.py` generate figures and fitted
-numbers quoted by the manuscripts. `restructure-plan.md`,
+numbers quoted by the manuscripts. `technical-report.bib` is P1's bibliography
+(2026-09-05, every entry checked against `papers/`), and
+`technical-report-cites.md` says which sentence of the `.tex` each key is for;
+the `.tex` itself carries no `\cite` until jasonp places them. `restructure-plan.md`,
 `related-work-notes.md`, `technical-report-gaps.md` and
 `polyplets-report-cuts.md` are working notes, not manuscripts;
 `polyplets-report-cuts.md` in particular is the audit trail of the 2026-08-01
