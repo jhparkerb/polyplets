@@ -1,4 +1,4 @@
-# The universal diagonal law (all row-local lattices)
+# The universal diagonal law (row-local lattices, and rows with a fibre)
 
 2026-07-15. Generalizes `docs/proofs/diagonal-law.md` (king lattice) to a
 class of lattices; the two instances proved there and in
@@ -6,7 +6,8 @@ class of lattices; the two instances proved there and in
 lattice joins as the degenerate b = 1 case. Machine checks:
 `experiments/universal_law_check.py` (square, this doc),
 `experiments/diagonal_law_proof_check.py` (king),
-`experiments/hex_gas.py` (hex).
+`experiments/hex_gas.py` (hex),
+`experiments/polyiamond_fibre_check.py` (polyiamonds, the fibred case).
 
 ## The lattice class
 
@@ -32,59 +33,87 @@ the triangular *point* lattice, which is why the literature also calls this the
 triangular lattice (Madras's §3.1(b) "Tri"). This repo's "hex" label is the
 cell-side name and is correct.
 
-**Polyiamonds are a different object and are NOT in the class.** Cells are
-equilateral triangles, each with **three** edge-neighbours, and the up/down
-orientation alternates — so the adjacency is parity-dependent, not
-translation-invariant, and (U) fails: there is no single drift set D. Counts
-are A001420 (2, 3, 6, 14, 36, 94, 250, 675, 1838 …), nothing like A001207.
-Two names collide here and it is worth stating once: *triangular lattice* as a
-point lattice means six neighbours and gives polyhexes; *tiling by triangles*
-means three neighbours and gives polyiamonds. OEIS itself files polyiamonds
-under "the 2-dimensional hexagonal lattice".
+### Rows with a fibre
 
-Theorem A does not cover polyiamonds — but the law appears to survive in
-**periodic** form, which is the natural extension to want.
-`experiments/universal_law_check.py` `polyiamond_probe()` checks to n = 12
-that the top two diagonals are `T(2H−2, H) = 2^(H−2)` and
-`T(2H−1, H) = H·2^(H−1)`, and that the k = 2 diagonal is quadratic in
-`T/2^H`. Note the indexing differs: the maximal n at height H is 2H−1, not H,
-because a height-H strip holds two triangle orientations per column. Making
-that a theorem would mean allowing a period-2 drift and asking for q_k
-quasi-polynomial with period 2. Not proved, not attempted.
+Some lattices have no single-cell interior rows at all, and the theorem covers
+them once the row unit is enlarged. Take cells indexed by Z^2 × B with B finite
+(the **fibre**), adjacency translation-invariant in Z^2, locally finite,
+changing the row index by at most 1, and each row connected. Call a row of an
+animal *interior* if it is neither its top nor its bottom row. The proof uses
+
+- (M) for some m >= 1, every interior row has at least m cells; every interior
+  row of exactly m cells is connected and holds exactly one cell that can take
+  an edge from below (its **entry**) and exactly one that can pass an edge up
+  (its **exit**); and from a fixed entry cell the number of ways to continue —
+  pairs (minimal row with that entry, edge upward out of its exit) — is **b**,
+  independent of where the entry cell sits.
+
+A row-local lattice satisfies (M) with m = 1 and b = |D|: a single-cell row is
+its own entry and exit, and its b continuations are the b up-offsets. Write
+n_min(H) for the least cell count at height H; it is H in the row-local case.
+
+**Polyiamonds are in the class, with a fibre of two.** Cells are equilateral
+triangles, each with **three** edge-neighbours, and the up/down orientation
+alternates: with cell (x, y) an up- or down-triangle by the parity of x + y,
+adjacency is (x ± 1, y) always and (x, y + 1) only when x + y is odd. Condition
+(U) fails outright — there is no single drift set D. Condition (M) holds with
+m = 2. Only a cell of even x + y can take an edge from below and only a cell of
+odd x + y can pass one up, so an interior row needs one of each: two cells at
+least, and a two-cell interior row must be horizontally adjacent, since
+otherwise each of its two cells has degree one and the animal falls apart. That
+adjacent pair is a **rhombus** — one entry, one exit — and from a fixed entry
+there are exactly two of them, the odd cell to its left or to its right; each
+exit has a single edge upward, so b = 2. Hence
+n_min(H) = 1 + 2(H − 2) + 1 = 2H − 2, and in the coordinate j = ⌊(x − y)/2⌋
+the exit offsets are D = {0, −1}: the rhombus walk is the polyhex walk.
+`experiments/polyiamond_fibre_check.py` checks every clause against brute
+force to n = 14, the change of variables included: the map
+(x, y) ↦ (j, y, entry/exit) is an isomorphism onto the honeycomb graph carrying
+its translation group, height for height, so polyiamonds are the site animals
+of the honeycomb lattice — a Z^2 lattice with a two-point fibre. Their counts
+are A001420 (2, 3, 6, 14, 36, 94, 250, 675, 1838 …), nothing like A001207,
+and two names collide here: *triangular lattice*
+as a point lattice means six neighbours and gives polyhexes; *tiling by
+triangles* means three neighbours and gives polyiamonds. OEIS itself files
+polyiamonds under "the 2-dimensional hexagonal lattice".
 
 ## Theorem A (universal diagonal law)
 
-For every row-local lattice and every k >= 0 there is a polynomial q_k of
-degree <= k with
+For every lattice satisfying (M) and every k >= 0 there is a polynomial q_k
+of degree <= k with
 
-    T(H+k, H) = q_k(H) * b^H    for ALL H >= k+1,
+    T(n_min(H)+k, H) = q_k(H) * b^H    for ALL H >= k+1.
 
+For a row-local lattice n_min(H) = H, so this reads T(H+k, H) = q_k(H) b^H,
 equivalently T(n, n-k) = P_k(n) * b^(n-1-3k) for n >= 2k+1 with
 P_k(n) = b^(1+2k) q_k(n-k), and P_k(n) is an integer for all integers
-n.
+n. (The n-indexed form is row-local only: at m = 2 the height is not
+recoverable from n and k alone.)
 
-*Proof* -- the five steps of the king proof, none of which used b = 3:
+*Proof* -- the five steps of the king proof, none of which used b = 3 or
+m = 1:
 
 1. **Separation.** Adjacency changes the row index by at most 1, so any
-   path from below row r to above it contains a cell of row r; a
-   single-cell row is a cut. Animals decompose uniquely at their
-   single-cell rows into a drift walk decorated by clusters (maximal runs
-   of multi-cell rows).
+   path from below row r to above it contains a cell of row r; a minimal
+   interior row is a cut, with a single entry and a single exit by (M).
+   Animals decompose uniquely at their minimal rows into a drift walk
+   decorated by clusters (maximal runs of non-minimal interior rows).
 2. **Finiteness.** A connected piece of c cells has x-spread at most
    (c-1) * max|dx| (finite by (R), (U)), so each cluster type has a finite
    weight (configurations relative to its contact cells), and the cluster
    types of surplus k are the compositions of k: finitely many.
-3. **Chain identity.** With y marking surplus and z marking rows,
-   F(y,z) = E_b (1 - S)^{-1} E_t + P exactly, where
+3. **Chain identity.** With y marking surplus over n_min and z marking
+   rows, F(y,z) = E_b (1 - S)^{-1} E_t + P exactly, where
    S = b z + sum_c W_c y^{k_c} z^{l_c + 1} (a drift step has b choices by
-   (U)) and E_b, E_t, P are the finite boundary/pure sums. Uniqueness of
+   (M)) and E_b, E_t, P are the finite boundary/pure sums. Uniqueness of
    the decomposition and x-translation-invariance give exactness.
-4. **Degree bound.** Every cluster row carries at least one surplus cell,
-   so l_c <= k_c; hence [y^k] F = R_k(z)/(1 - bz)^{k+1} with R_k an
-   integer polynomial of degree <= 2k+1.
+4. **Degree bound.** Every cluster row is an interior row of more than m
+   cells, so carries at least one surplus cell, so l_c <= k_c; hence
+   [y^k] F = R_k(z)/(1 - bz)^{k+1} with R_k an integer polynomial of
+   degree <= 2k+1.
 5. **Partial fractions + integrality.** Expanding R_k in the (1 - bz)
-   basis (coefficients in b^{-(2k+1)} Z) gives T(H+k, H) = q_k(H) b^H for
-   H > deg of the correction polynomial <= k, i.e. for H >= k+1, with
+   basis (coefficients in b^{-(2k+1)} Z) gives T(n_min(H)+k, H) = q_k(H) b^H
+   for H > deg of the correction polynomial <= k, i.e. for H >= k+1, with
    deg q_k <= k; and P_k = b^{1+2k} q_k has integer values since the basis
    coefficients have p-adic valuation >= -(2k+1) v_p(b) for every prime
    p | b and no other denominators. QED
@@ -226,6 +255,11 @@ that produces its two coefficients.
 | square | 1 | n>=2k+1 | 4 = 2^2 | 4(n-2) | vacuous (no prime) |
 | hex | 2 | n>=2k+1 | 9 = 3^2 | 9n-15 | H^3=H^2+u over F_2 (w=1) |
 | king | 3 | n>=2k+1 | 25 = 5^2 | 25n-45 | H^3=H^2+u over F_3 (w=1) |
+| polyiamond (m=2) | 2 | H>=k+1 | 2 (in H, not measured as a gadget) | q_1 = H/2 | not examined |
+
+The polyiamond row is indexed by height, not by n, and its measured onsets are
+⌊k/2⌋+2, earlier than the k+1 guaranteed; diagonals to k = 4 in
+`results/polyiamond-diagonal-law.md`.
 
 CORRECTION 2026-07-31 (hygiene sweep; `experiments/universal_pair_weights.py`,
 two independent methods: direct gadget count with no gap cap, and
@@ -281,23 +315,6 @@ all six test lattices above (slope = W_pair), hex k <= 2 (banked lead
 81/2 = 9^2/2!, `results/hex-diagonal-law.md`), square deg-k diagonals
 (`experiments/universal_law_check.py`). Since W_pair >= 4 > 0, the
 "degree <= k" of Theorem A is never slack at the top.
-
-## Periodic extension: polyiamonds (data-grade, 2026-07-15)
-
-The triangular lattice is row-local only with period-2 x-translation
-(orientation parity), outside the theorem's literal class. The law
-extends: fixed polyiamonds (A001420 control, n <= 12) have minimal
-height-H animals with 2H-2 cells (up-down domino ground states) and
-
-  T(2H-2, H) = 2^(H-2),   T(2H-1, H) = H 2^(H-1),
-  T(2H-2+k, H) = q_k(H) 2^H with q_k rational of degree k, for
-  H >= k+1 by analogy (onset below that unexamined; k = 2: constant
-  second differences, verified).
-
-So periodic row-local lattices obey the same law with b = per-period
-drift and rational q_k; proving the periodic version = rerunning the five
-steps with a transfer over one period (a matrix drift step). Left as the
-stated extension, not formalized.
 
 ## Scope notes
 

@@ -6,11 +6,11 @@
 > not triangles. **Polyiamonds — animals of equilateral triangles — are a
 > different object**: three neighbours per cell, alternating orientation,
 > counts A001420 (2, 3, 6, 14, 36, …) against A001207's (1, 3, 11, 44, 186, …)
-> here. They fall outside the row-local class because the adjacency is
-> parity-dependent; the law does look to survive there in periodic form, probed
-> in `experiments/universal_law_check.py`. See
-> `docs/proofs/universal-diagonal-law.md` §The lattice class. The A001207
-> validation below is what pins which of the two this note is about.
+> here. Condition (U) fails for them because the adjacency is parity-dependent,
+> but they satisfy condition (M) with a rhombus row unit and the same b = 2, so
+> they are an instance too. See `docs/proofs/universal-diagonal-law.md` §The
+> lattice class. The A001207 validation below is what pins which of the two
+> this note is about.
 
 Question #1 of the fresh menu: does the walk-plus-clusters diagonal law
 transfer to other lattices? Answer for the hexagonal lattice: YES, with
@@ -64,5 +64,5 @@ p | b (so king 25 == 1 mod 3 and hex 9 == 1 mod 2 are both "4"), and
 w == floor(b/2) (mod 2) for p = 2, degenerate iff 4 | b -- canonical
 statement and corrected pair weights in
 `docs/proofs/universal-diagonal-law.md` (Instances/CORRECTION section).
-Open: polyiamonds (triangular lattice -- row structure alternates, drift
-count TBD); higher-coordination lattices.
+Open: higher-coordination lattices. (Polyiamonds are settled --
+`results/polyiamond-diagonal-law.md`.)

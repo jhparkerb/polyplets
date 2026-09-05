@@ -1,25 +1,26 @@
-# Polyiamonds: the diagonal law survives outside the row-local class
+# Polyiamonds: the diagonal law with a row unit of two
 
-2026-08-06. Measured, not proved. Verifier:
-`experiments/polyiamond_diagonal.py` (~7 min).
+2026-08-06, revised 2026-09-05. Diagonals measured by
+`experiments/polyiamond_diagonal.py` (~7 min); the theorem's hypotheses checked
+by `experiments/polyiamond_fibre_check.py` (~20 s).
 
 Polyiamonds are animals of equilateral triangles: cell `(x, y)` is an up- or
 down-triangle by the parity of `x + y`, adjacency is `(x ± 1, y)` always and
 `(x, y + 1)` **iff `x + y` is odd**. The up-neighbour set therefore depends on
-position, there is no single drift set `D`, and condition (U) of
-`docs/proofs/universal-diagonal-law.md` fails. **Theorem A does not apply.**
-The question was whether its conclusion does anyway, and if so in what form —
-the natural guess being a quasi-polynomial of period 2.
-
-**It is not quasi-polynomial. The diagonals are plain polynomials.**
+position and there is no single drift set `D`, so condition (U) of
+`docs/proofs/universal-diagonal-law.md` fails. Condition (M) of that document
+holds instead, with the **rhombus** — a receiver glued to a horizontally
+adjacent sender — as the row unit: `m = 2`, `b = 2`, and the rhombus walk is
+the polyhex walk in the coordinate `j = ⌊(x − y)/2⌋`. **Theorem A applies**, and
+its conclusion is a plain polynomial rather than the quasi-polynomial of
+period 2 that the parity dependence suggests.
 
 ## The structure
 
-The minimum cell count at height `H` is `n = 2H − 2`, not `H`. Reason, and it
-is a proof rather than an observation: a cell that receives from below has even
-`x + y` parity, so it cannot itself send upward. Every row except the first and
-the last therefore needs **two** cells, the first needs one, and the cheapest
-ladder costs `1 + 2(H − 2) + 1 = 2H − 2`.
+The minimum cell count at height `H` is `n = 2H − 2`, not `H`: a cell that
+receives from below has even `x + y` parity, so it cannot itself send upward.
+Every row except the first and the last therefore needs **two** cells, the
+first needs one, and the cheapest ladder costs `1 + 2(H − 2) + 1 = 2H − 2`.
 
 Index the diagonals by cells above that minimum, `n = 2H − 2 + k`. Then
 `T(2H − 2 + k, H) / 2^H` is a polynomial of degree exactly `k` in `H`:
@@ -35,10 +36,10 @@ Index the diagonals by cells above that minimum, `n = 2H − 2 + k`. Then
 The k = 0 and k = 1 rows are `2^(H−2)` and `H·2^(H−1)`, which
 `experiments/universal_law_check.py` has probed since July; the rest are new.
 
-**Onsets go as ⌊k/2⌋ + 2**, checked at every k above, against `k + 1` for the
-row-local lattices. Later diagonals become valid *earlier*, relative to k, which
-fits the cost structure: each row of a polyiamond ladder buys two cells rather
-than one.
+Theorem A guarantees validity from `H ≥ k + 1`. The **measured onsets are
+⌊k/2⌋ + 2**, checked at every k above, so later diagonals become valid
+*earlier* than the theorem promises — which fits the cost structure: each row
+of a polyiamond ladder buys two cells rather than one.
 
 ## The gas laws hold, with W = 2
 
@@ -51,18 +52,8 @@ Normalize by `q_0 = 1/4` so that `p_0 = 1`. Then:
 
 That is the defect gas of `docs/proofs/universal-diagonal-law.md` §The gas,
 made lattice-parametric — extensive cumulants, an ideal gas of defects with the
-interactions in the constants — on a lattice the theorem does not reach. So
-**condition (U) is sufficient for the law, not necessary**, and the parity
-dependence washes out of the counts entirely rather than surviving as a period.
-
-## What would make it a theorem
-
-Theorem A's proof uses a single drift set in the separation step and in the
-chain identity. The polyiamond case needs a period-2 version of both — a
-two-row transfer whose composite is translation-invariant. Nothing in the
-evidence suggests an obstruction, and the composite of two parity steps *is*
-uniform, which is presumably why the answer comes out polynomial rather than
-quasi-polynomial. Not attempted.
+interactions in the constants. `W = 2` is in `H`; the pair-row weight has not
+been counted as a gadget the way the row-local ones were.
 
 ## Method, and a bug worth recording
 
