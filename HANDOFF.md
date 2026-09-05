@@ -15,6 +15,54 @@
 > defines what "ready" means. Section A is jasonp's decisions and nothing else
 > blocks on them; section B is commands, and it is stale by design whenever
 > `HEAD` moves past the revision its boxes were measured at.
+## 2026-09-05 evening — NINE IDENTIFICATIONS LANDED (Opus agents, Fable review, one commit each)
+
+Asked for: two records that are one object once a result, computation or
+perspective is added. Nine landed, all pushed:
+
+- **Onset sharpness is a theorem for every k** (`0e39859`). The derived depth-1
+  quartic Φ factors mod 3 as `2(W−1)³((1+x)W−x)`; `N_k = 3^(k+1)D_1(k)` is an
+  integer (P_k integer-valued on k+1 consecutive integers) with `N_1 = 4`, so
+  `N_k ≡ (−1)^(k+1) mod 3 ≠ 0`. No tail bound. Gate
+  `experiments/depth1_sharpness.py`. L1/L8, `docs/proofs/diagonal-law.md`,
+  `results/mathematics.md` say so; the one dependency is identity (II) of
+  `results/onset-defect-depth1-closed.md`, derived, not written up standalone.
+- **Depth 1 is drift-parametric** (`12aa8b5`). Bulk kernel
+  `u^(b−1) − y(1+…+u^(b−1))²`; square `D_1 = (−1)^(k+1)` derived; hex Φ is a
+  quadratic that factors mod 2, so the **hex onset is sharp** too. Hex cells to
+  k ≤ 6 (`results/hex_diagonal_cells.txt`) give **A_4 = 3915/4 by a second
+  route**. `experiments/depth1_parametric.py`, `experiments/hex_diag_deep.py`.
+- **Polyiamonds are inside the class** (`7b67f3f`). Condition (M), rows with a
+  finite fibre; rhombus row unit, m = 2, b = 2, the polyhex walk in
+  `j = ⌊(x−y)/2⌋`. `docs/proofs/universal-diagonal-law.md` restated over
+  `n_min(H)`; periodic-extension section deleted.
+- **One formula-cell rule for both towers** (`6b220f5`, `results/confidence.md`):
+  proved shape, proved onset, pinned with a holdout. a(41) passes; D(33) fails
+  on the data-grade dm-mirror onset and stays T3. Burnside tie
+  `B(n,S,S) ≡ d(S,n) mod 2` checked (weak: 3 odd comparisons of 48).
+- **King max-perimeter end is the square column re-graded** (`bd37b7a`):
+  `k_king = k_square + c + h` for same-parity animals (proved), plus an
+  orthogonal-edge family of degree k−1; explains the shared leading coefficient
+  and onset. CORRECTION: `k = 2c+t` is square-only; general
+  `k = 2c+t−(deg/2−2)(n−1)`; king cycle cap ⌊k/3⌋. L6 updated.
+- **Motley in three sentences** (`92aafbb`): FK/Potts in the engine's own terms,
+  opening `docs/proofs/cutcount-identity.md`; gaps C1/B4 points at it.
+- **H = 11 fixed-height GF REFUTED** (`9fb4f0e`): 133-prime CRT wraparound,
+  first bad coefficient at degree 8159 (`experiments/gf_h11_validate.py`; receipt
+  re-run 2026-09-05 evening: same first mismatch n = 8170, sweep 805.9 s). The
+  "no shared roots" anomaly was its symptom. **Re-recovery priced, not
+  launched: 48 CPU-h, ~2.5 h on ayr / 6.4 h gympie — his call.**
+- **Five height-H sizes named in one place** (`06a6514`,
+  `results/skeletonkey-hankel-closure.md` "Five ladders"), with which bounds
+  which; reach-merged classes = Exact Change's Nerode counts.
+
+Open from the pass: identity (II) write-up; dm-mirror onset (needs a defect
+series the two-spine sum does not give); depth j ≥ 2 off king; the H = 11
+re-recovery. **Consolidation of the 459 markdown files**: theme map (21 themes →
+24–30 files) proposed in chat, awaiting his two decisions (raw campaign records
+kept as appendices or deleted-with-history; closed campaigns first or
+mathematics first).
+
 ## 2026-09-05 11:41 EDT — a(41) H = 20 SWEEP RUNNING ON DALBY
 
 `scripts/dalby_a41_h20.sh`, dalby, tmux window `a41h20` in session 0,
