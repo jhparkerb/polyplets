@@ -14,15 +14,31 @@ let it go stale.
 exists in the repo, written up and checked; only his prose is missing.
 `DONE` — in the paper.
 
-**Comparison base:** `paper/technical-report.tex` at 2026-08-23 — abstract
-through a(40), the a(n) table, the T(n,H) block with the T(n,n) / T(n,n-1) /
-grand-form paragraphs, one-sided / free / bilateral / asymmetric / A194596
-tables, the hole table, a one-line growth-rate remark, three Methods
-paragraphs, an empty Reproducibility section, and **no bibliography**.
+**Comparison base:** `paper/technical-report.tex` at 2026-09-04 — the
+rewritten abstract through a(40), the a(n) table, the T(n,H) block with the
+T(n,n) / T(n,n-1) / grand-form paragraphs, one-sided / free / bilateral /
+asymmetric / A194596 tables, the hole table, a one-line growth-rate remark,
+three Methods paragraphs, an empty Reproducibility section, and a bibliography
+file not yet wired in.
 
 The mechanical state is good and is gated: `paper/verify_technical_report.py`
-is 781 checks green, and `tests/gate_p_paper_verifier.py` establishes that 199
-of the paper's 200 numeric literals are actually read by one of them.
+is 2722 checks green (the tables, the closed forms, and since 2026-09-05 the
+prose: each scope number read out of its sentence and the T(n,n−1) derivation
+re-counted by enumeration), and `tests/gate_p_paper_verifier.py` establishes
+that 287 of the paper's 288 numeric literals of two or more digits are read by
+one of them. `results/figs/triangle_provenance.svg` colours the 820 cells by
+what checked them, from the gated table; `docs/glossary.md` ends with the
+paper's words against the repo's.
+
+**2026-09-05, the support pass** (jasonp: "make technical-report.tex easier to
+back up and understand", then "we have to pay down technical debt"): the
+sentence-by-sentence table in §A, the prose checks and the T(n,n−1) census in
+the verifier, the RED gate widened to two-digit literals, the provenance
+figure (replacing two unused triangle figures), provenance headers on the hole
+files, and the concordance in the glossary. Dropped as more files than value:
+an engine block diagram and generated `\input` tables for the engine chapter,
+a tripleplet figure for the definition, a generated recipe list. Net files:
+−6.
 
 ---
 
@@ -50,52 +66,53 @@ of the paper's 200 numeric literals are actually read by one of them.
 
 ---
 
-# A. Corrections — things the paper says now
+# A. What the paper says now, sentence by sentence
 
-From `docs/main-paper-audit-2026-08-18.md`, which changed nothing.
+2026-09-05. Every non-numeric claim in the paper, the record it rests on, and
+the check that reads it. `paper/verify_technical_report.py` (2722 checks)
+reads each scope number out of its sentence and compares it with the record;
+`tests/gate_p_paper_verifier.py` perturbs every literal of two or more digits
+in a copy and requires the verifier to go red (287 of 288; the exception is
+the year on the title page). BACKED = the record says what the sentence says.
+SCOPE = the sentence reaches further than the record. What a sentence leaves
+out is not a row.
 
-## A1. `OPEN` "$\lambda \approx 7.11$, checkable from Table~\ref{tab:an}"
+| line | the sentence says | record | check | status |
+|---|---|---|---|---|
+| 37–41 | A006770 expanded through a(40) | `results/ns_a40/PROVENANCE.md`; `results/triangle.txt` | abstract a(40); tab:an ×40; row sums ×40 | BACKED |
+| 43–45 | T(n,H) proposed; for H > n/2 a polynomial factor fixed from earlier rows times an exponential | `docs/proofs/diagonal-law.md` (Lean); `orchestrator/sweep.go` `diagCoeffTable` | 171 real-swept in-onset cells against a refit from the two earliest per level; `ns-gate-diag-pins` | BACKED |
+| 47 | a(19) computed directly with Redelmeier | commit `6598dcd` (2026-06-14: two decorrelated Redelmeier campaigns, gympie and ayr); the transfer-matrix check came after, `55f3053` | Redelmeier rows 1–22 == banked | BACKED |
+| 47–48 | a(20)–a(23) by transfer matrix | `results/ns_a20/PROVENANCE.md` (`cpp/tma`); `ns_a21`, `ns_a23` (column kernel) | the run records | BACKED |
+| 48–49 | a(24)–a(40): earlier rows fix the polynomial factors for the most expensive cells | `results/ns_a24/PROVENANCE.md` (first injection, k ≤ 7) through `ns_a40` (k ≤ 18, H ≥ 22) | `ns-gate-diag-pins`; 171 injected cells self-consistent with the refit | BACKED |
+| 51–52 | for n ≤ 22 transfer matrix and Redelmeier agree | `results/redelmeier_row22/PROVENANCE.md` (fleet, 2026-07-16) | rows 1–22 == banked; the sentence's 22 == the top row of the record | BACKED |
+| 52–53 | for n ≤ 40 the colouring method confirms the T(n,H ≤ 19) cells | `results/cutcount_b1/rows41/`; `docs/proofs/cutcount-identity.md` | 589 cells re-derived from C_H by second difference == triangle; the sentence's 19 and 40 == the record's reach; `gate-cutcount-assembly` | BACKED |
+| 53–54 | all a(n) pass Burnside-congruence checks and the closed forms | `results/subgroup-mod4.md`; `results/subgroup_counts.txt` | a(n) mod 4 recomputed from I(C4)+I(D2ax)+I(D2diag)−2I(D4) for n ≤ 40; the diagonal checks | BACKED. The in-make `gate-subgroup` reaches n ≤ 11; n ≤ 40 is the banked 2026-08-07 census |
+| 70–79, 166 | each symmetry class names its OEIS entry | `oeis/A0*.txt`; `results/b0*_upload.txt` | the A-number in each item == the b-file its column is checked against | BACKED |
+| 82–83 | a 1-cell hole needs 4 cells; a domino or two 1-cell holes need 6 | `results/holes_n18.txt`; `results/maxhole.txt` | smallest n with k ≥ 1 is 4, with k ≥ 2 is 6, with hole area ≥ 2 is 6 | BACKED |
+| 85–86 | row sums of T(n,H) give a(n) | `results/triangle.txt` | row sums ×40 | BACKED |
+| 127 | terms 1–18 match A006770 | `fixtures/b006770.txt` (lines ≤ 18 are OEIS's; 19–20 ours, `docs/external-anchors.md`) | banked vs OEIS ×18; `gate-bfiles` | BACKED |
+| 131–133 | T(n,n) = 3^{n−1}, one cell per row | `docs/proofs/T-n-nm1.md` | ×40 | BACKED |
+| 133–135 | H > n/2: T = P_{n−H}(n)·3^{3H−2n−1}, P_k integer-valued of degree k with leading coefficient 25^k/k! | `docs/proofs/diagonal-law.md` | integrality at every banked in-onset cell, k ≤ 19; leading coefficient of each refit P_k, k ≤ 18, the 25 read from the sentence | BACKED |
+| 135 | P_k explicitly known for k ≤ 19 | `orchestrator/sweep.go` `maxDiagKMax` | the sentence's 19 == the constant | BACKED |
+| 136 | fitted against computed values and verified against values from later rows | the 171 real-swept cells beyond the two fit cells, k ≤ 18; `docs/paper1-reproducibility.md` §6, §8 | as above | **SCOPE.** True for k ≤ 18. P_19's diagonal has two in-onset real cells, T(39,20) and T(40,21), and both fit it; no later row exists. The Undertow re-derivation from short cells is a consistency check on those two values, not a holdout. |
+| 136–137 | P_k can be fixed after computing the 3k-th row | `docs/main-paper-audit-2026-08-18.md` §2.2 | with 25^k/k! fixed, rows 2k+1..3k pin P_k and predict every later banked in-onset cell, k ≤ 13 | BACKED, given the previous sentence: see A4 |
+| 160 | shaded cells can be computed using formulas | — | shaded ⇔ H > n/2, all 78 cells | BACKED |
+| 164–168 | new one-sided, free, bilateral, asymmetric and non-polyomino counts; few polyplets are polyominoes; one-sided → a(n)/4, free → a(n)/8 | `results/b0*_upload.txt`; `fixtures/b000105.txt` | tables ×92; non-polyomino = free − A000105 (n = 18..32); polyominoes under 1 in 1000 of free; 4·one-sided/a(n) − 1 and 8·free/a(n) − 1 positive, decreasing two steps apart (they alternate by parity), under 10⁻⁶ at the last row | BACKED |
+| 220–222 | bilateral + asymmetric = free | — | ×15 | BACKED |
+| 226–229 | holes counted in the transfer matrix by the Euler characteristic through n = 18; Redelmeier flood-fill checked n ≤ 14 | `results/holes_n18.txt` (`tma_holes`, `cpp/tma/euler.h`; dalby copy identical); `results/holes_n14.txt` (`g2 --holes`); headers in the files | the sentences' 18 and 14 == the files' reach; the files agree on every (n,k) with n ≤ 14; hole rows sum to a(n); `gate-tma` check H | BACKED |
+| 289 | a(n)^{1/n} → λ ≈ 7.11, checkable from Table 1 | `results/series-analysis-da.md`; `results/concatenation-upper-bound.md` | a(m+n) ≥ a(m)a(n) on the table | **SCOPE.** The table gives a(40)^{1/40} = 6.2208 and a(40)/a(39) = 6.9352; 7.11 is an extrapolation of the ratios. The comment block above the sentence has the numbers and anchors. Cite-or-drop, your item 5. |
+| 294–296 | Redelmeier used to extend a(n) and to confirm; only through n = 22 | as 47 and 51–52 | as 51–52 | BACKED |
+| 298–302 | the transfer matrix: frozen left side, previous-column constraints, top and bottom flags, connectivity, cells remaining | `core/signature.h`, `core/transition.h`, the prune at `core/signature.h:123-174`; `docs/paper1-engine-chapter.md` §0 | the engine gates | BACKED |
+| 304–345 | the T(n,n−1) derivation: three options per single cell; one doubled row; domino or split, a gap of three cannot be spanned; n−3 interior rows; 16 and 4·1+1·5 per interior joiner; 2·5 at the ends; (25n−45)·3^{n−4} | `docs/proofs/T-n-nm1.md`; `docs/main-paper-audit-2026-08-18.md` §2.1 | every fixed polyplet of size ≤ 8 enumerated (Redelmeier); for n = 4..8 the interior-domino, interior-split, end-domino and end-split counts and the zero for gap ≥ 3 each equal the paper's coefficient, read from its formula, times (n−3)·3^{n−4} or 3^{n−4}; the total ×37 | BACKED |
 
-2026-09-04: comment block with the numbers and anchors placed above the
-sentence in `paper/technical-report.tex`; the growth-rate sentence itself is
-unchanged (item 5 of the finish list, cite-or-drop).
-
-A reader who checks gets neither number: `a(40)^(1/40) = 6.2208` (the Fekete
-floor) and `a(40)/a(39) = 6.9352`. 7.11 comes from extrapolating the ratio
-sequence. The sentence invites a check that fails; naming the operation costs
-one clause. Audit §2.3.
-
-## A2. `DONE` The abstract's provenance sentence, in both directions
-
-2026-09-04: comment block placed above the sentence in
-`paper/technical-report.tex` — per-term second-source table from
-`AUDIT-2026-09-02.md:126-175`, the re-derivation record per run, and the M2
-overstatement to avoid. **Abstract rewritten and declared DONE 2026-09-04**:
-a(19) Redelmeier, a(20)–a(23) swept, a(24)–a(40) composed for the tall
-heights; Redelmeier agreement to 22; Motley confirmation scoped to H ≤ 19;
-a(41) not mentioned. Verifier 781 green, compiles. The comment block above the
-sentence is now stale and stays until he says to pull it.
-
-It says 23-35 twice and a(36)-a(40) once. The run records show every run
-recomputes the whole triangle up to its own n, so **a(36) was computed five
-times, a(37) four, a(38) three, a(39) twice, and only a(40) once** — four
-terms' worth of corroboration given away. In the other direction, "twice" for
-23-35 was the same engine and the same connectivity rule on two machines and
-two instruction sets: the independence is hardware and ISA, not method, and the
-OEIS entry's own comment is more careful than the abstract. Audit §2.4.
-
-## A3. `STALE` `P_k` known for `k <= 19`
-
-Was: the pinned range on record is `k <= 18`. Since Undertow the wired table
-reaches `k = 19` (`orchestrator/sweep.go:2306`, `maxDiagKMax = 19`), so the
-paper's 19 is correct. What remains true is that `P_19` has no holdout
-(`docs/paper1-reproducibility.md:154-155`). Item C13.
-
-## A4. `OPEN` Keep the two `P_k` sentences adjacent
+## A4. `OPEN` Keep the two P_k sentences adjacent
 
 "Fixed after computing the 3k-th row" is correct *because* the previous
 sentence supplies the leading coefficient `25^k/k!`. Separated, it reads off by
 one. Audit §2.2.
+
+The comment block above the abstract's old provenance sentence (item A2 of the
+2026-08-18 audit, DONE 2026-09-04) is stale and stays until you say to pull it.
 
 ---
 

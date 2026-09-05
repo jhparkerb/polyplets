@@ -146,6 +146,8 @@ def main():
     flood = {}
     with open(oracle_path) as f:
         for line in f:
+            if line.startswith("#"):
+                continue
             n, holes, count = map(int, line.split())
             if n <= depth_holes:
                 flood[(n, holes)] = count

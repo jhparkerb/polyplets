@@ -1,3 +1,11 @@
+# A(n,k): fixed polyplets of size n with exactly k holes, a hole being a
+# 4-connected component of the empty cells that does not reach the outside.
+# Columns: n k A(n,k).  1 <= n <= 14.  Row sums give A006770.
+# Redelmeier enumeration with a flood fill per animal: g2 square8 14 --holes
+# (cpp/g2_redelmeier.cpp), 7311 s on one core, committed e2b32dd 2026-06-18.
+# It is the oracle tests/gate_tma.py holds the transfer matrix's hole
+# accounting to (n <= 10; 11 with --deep), and results/holes_n18.txt agrees
+# with it on every (n, k) with n <= 14 (paper/verify_technical_report.py).
 1 0 1
 2 0 4
 3 0 20

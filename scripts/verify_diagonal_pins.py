@@ -22,11 +22,11 @@ Checks (all fail-closed):
      n >= 2k+1) interpolation through real data determines P_k uniquely.
      Verifies the interpolant equals the production polynomial identically.
      KPIN is derived from the real point counts, not hardcoded.
-  C. Decomposes each a(n), n = 29..40, into real-swept cells, formula cells
-     pinned by B (k <= KPIN), and formula cells conditional on the defect-gas
-     structure (k > KPIN, docs/proofs/diagonal-law.md Corollary).  This is
-     the project's circularity map: it says exactly what share of each
-     banked term rests on a fitted formula.
+  C. Counts, per row n = 29..40, the cells that are real-swept, the formula
+     cells pinned by B (k <= KPIN), and the formula cells conditional on the
+     defect-gas structure (k > KPIN, docs/proofs/diagonal-law.md Corollary),
+     and asserts the three groups sum to the banked a(n).  Cells, not shares
+     of a(n): a wrong cell ruins a(n) whatever its size.
 """
 import re
 import sys
@@ -151,19 +151,19 @@ def main():
               f"== production polynomial: {same}")
 
     print()
-    print(f"== C: a(n) decomposition, n = 29..{NMAX} ==")
+    print(f"== C: cells per row, n = 29..{NMAX} ==")
     print(f"   n   real H<={REAL_HMAX}   formula k<={KPIN}   "
           f"formula k>{KPIN} (conditional)")
     for n in range(29, NMAX + 1):
         an = sum(tri[(n, H)] for H in range(1, n + 1))
         lo = REAL_HMAX + 1
-        r = sum(tri[(n, H)] for H in range(1, lo))
-        safe = sum(tri[(n, H)] for H in range(lo, n + 1) if n - H <= KPIN)
-        cond = sum(tri[(n, H)] for H in range(lo, n + 1) if n - H > KPIN)
-        if r + safe + cond != an:
+        real = [H for H in range(1, lo)]
+        safe = [H for H in range(lo, n + 1) if n - H <= KPIN]
+        cond = [H for H in range(lo, n + 1) if n - H > KPIN]
+        if sum(tri[(n, H)] for H in real + safe + cond) != an:
             sys.exit(f"row decomposition mismatch at n={n}")
-        print(f"  {n}   {100 * r / an:8.4f}%     {100 * safe / an:8.4f}%     "
-              f"{100 * cond / an:8.4f}%")
+        print(f"  {n}   {len(real):5d}          {len(safe):5d}           "
+              f"{len(cond):5d}")
 
     fresh = all(tri[(n, H)] == T_formula(n - H, n)
                 for n in range(29, NMAX + 1)

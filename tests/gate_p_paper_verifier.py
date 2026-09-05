@@ -8,14 +8,19 @@ HUMAN-authored papers -- `paper/verify_technical_report.py` (781 checks) and
 established that they would be anything else if the paper were wrong.  A
 verifier with no RED control is an assertion about itself.
 
-WHAT THIS DOES.  Every numeric literal of four or more digits in
+WHAT THIS DOES.  Every numeric literal of two or more digits in
 `paper/technical-report.tex` is perturbed in its last digit, in a COPY, and the
 verifier is re-run.  A literal whose perturbation still passes is UNGUARDED --
-the paper prints it and no check reads it.  Measured 2026-08-23: 199 of 200
-guarded.  The one exception is the year on the title page, which is not a
-claim, and it is named in ALLOWED below with its reason.  Any new unguarded
-literal fails this gate, so the coverage cannot silently drop when the paper
-gains a number.
+the paper prints it and no check reads it.  Measured 2026-08-23 at four or
+more digits: 199 of 200 guarded.  Widened 2026-09-05 to two or more, because
+the paper's scope claims are two-digit (Redelmeier to 22, Motley to H = 19,
+P_k to 19, holes to 18 and 14, 25^k/k!) and the verifier now reads each of
+them out of its sentence; and the shading macro's brace-less argument
+(\\g1480) is a literal too, where the old lookbehind skipped it.  The
+exceptions -- the year on the title page, the type size -- are not claims and
+are named in ALLOWED below with their reasons.  Any new unguarded literal
+fails this gate, so the coverage cannot silently drop when the paper gains a
+number.
 
 jasonp's prose is never written.  The verifier takes VERIFY_TEX purely so this
 gate can point it at a temporary copy; `paper/technical-report.tex` is opened
@@ -48,7 +53,10 @@ ALLOWED = {
 # Numbers inside these never assert anything about the mathematics.
 STRIP = re.compile(
     r"\\(cite|label|ref|eqref|url|href|arxiv|includegraphics)\{[^}]*\}|%[^\n]*")
-LITERAL = re.compile(r"(?<![0-9A-Za-z.])[0-9]{4,}(?![0-9])")
+# A literal stands alone (not part of a longer number, identifier or decimal)
+# or follows the brace-less shading macro \g.
+BOUNDARY = r"(?:(?<![0-9A-Za-z.])|(?<=\\g)|(?<=A))"
+LITERAL = re.compile(BOUNDARY + r"[0-9]{2,}(?![0-9])")
 
 
 def literals(src):
@@ -110,7 +118,7 @@ def sweep(verifier, src, lits, tmpdir):
         bumped = lit[:-1] + str((int(lit[-1]) + 1) % 10)
         p = os.path.join(tmpdir, f"under-test-{lit}.tex")
         open(p, "w").write(
-            re.sub(r"(?<![0-9A-Za-z.])" + lit + r"(?![0-9])", bumped, src))
+            re.sub(BOUNDARY + lit + r"(?![0-9])", bumped, src))
         r = subprocess.run(argv, env=dict(os.environ, VERIFY_TEX=p),
                            capture_output=True, text=True)
         return lit if r.returncode == 0 else None
@@ -120,7 +128,7 @@ def sweep(verifier, src, lits, tmpdir):
 
 
 def context(src, lit):
-    m = re.search(r"(?<![0-9A-Za-z.])" + lit + r"(?![0-9])", src)
+    m = re.search(BOUNDARY + lit + r"(?![0-9])", src)
     a, b = max(0, m.start() - 70), min(len(src), m.end() + 40)
     return re.sub(r"\s+", " ", src[a:b]).strip()
 

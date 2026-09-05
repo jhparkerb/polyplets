@@ -1,3 +1,6 @@
+# The dalby (ARM, clang) run of tma_holes square8 18 --holes, committed
+# 4b16c63 2026-06-21, identical in every row to results/holes_n18.txt (ayr,
+# x86, GCC), whose header carries the provenance.
 1 0 1
 2 0 4
 3 0 20

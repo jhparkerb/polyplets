@@ -128,3 +128,28 @@ that boundary, by size. Exponential in boundary width (~3^W states) instead of
 in n (~λ^n shapes), which is why every modern record on every lattice is a
 TMA result. Jensen's algorithm (2001–2003) and the Barequet–Ben-Shachar
 45°-rotated variant (2024) are the square-lattice instances.
+
+## The technical report's words
+
+`paper/technical-report.tex` (jasonp's prose) and the repo's notes name the
+same things differently. The paper's word first, then the repo's, then the
+literature's or OEIS's where one exists. Where the two columns differ the
+paper's usage is recorded, not argued with.
+
+| paper | repo, code, notes | literature / OEIS |
+|---|---|---|
+| polyplet, king polyplet | polyplet; king animal; `square8` (the lattice name in `g2` and `tma`) | polyplet, polyking, pseudo-polyomino; site animal on the king lattice; A006770 "polyominoes which need only touch at corners" |
+| height H of the bounding box | H; a "column" of the sweep is one height | — |
+| T(n,H) | the triangle, `results/triangle.txt`; per-height rows `h<H>.out` | staged as the T(n,H) triangle, `oeis/draft-Tnh-triangle.txt` |
+| diagonals of the triangle, H > n/2 | level k = n − H; the diagonal law; in-onset means n ≥ 2k+1 | — |
+| formulas, closed forms | P_k; the wired table `diagCoeffTable`; a height is injected when composed from P_k instead of swept | — |
+| fixed from earlier rows; fitted; verified against values from later rows | pinned, two anchors per level; holdout; re-pinned from below-onset cells (Undertow) | — |
+| transfer matrix | the column kernel (`core/transition.h`) and the kink kernel (`core/kink.h`); the sweep; `orchestrate` | the finite-lattice or transfer-matrix method, Jensen 2001 |
+| a transfer-matrix method that uses coloring instead of tracking connectivity | Motley, cutcount; `cpp/motley_par.cpp`, `results/cutcount_b1/` | the Fortuin–Kasteleyn / Potts spin representation of q^{components} |
+| Redelmeier enumeration | `g2` (`cpp/g2_redelmeier.cpp`); brute force; the fleet run | Redelmeier 1981 |
+| Burnsides congruences | the subgroup census, a(n) mod 4, `results/subgroup-mod4.md` | Burnside's lemma; D4 orbit sizes |
+| double-checked, agree, confirms | two-source (two programs sharing no code); rule-independent (a second connectivity rule); tiers T1, T2, T2⁻ in `paper/polyplets-report.tex` | — |
+| joiner, domino, split | the doubled row; the pair weight 25 = 16 + 9 (`docs/proofs/T-n-nm1.md`, `results/defect-gas.md`) | — |
+| holes | hole count k; the Euler-characteristic coordinate (`cpp/tma/euler.h`); flood fill (`g2 --holes`) | the A(n,k) hole triangle, staged |
+| one-sided, free, bilateral, asymmetric, non-polyominoes | the companions; the symmetry corpus `results/sym_counts.txt` | A030233, A030222, A030234, A030235, A194596 |
+| growth rate λ | λ; the Fekete floor a(40)^{1/40}; the differential-approximant estimate; the certified bracket (L3) | Klarner's constant, the growth constant |

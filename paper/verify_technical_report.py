@@ -3,7 +3,13 @@
 
 Read-only with respect to the .tex: parses its tables and checks them
 against results/ns_a40/ (triangle + per-height columns), the staged
-companion b-files, and results/holes_n18.txt. Run from anywhere:
+companion b-files, and results/holes_n18.txt; then reads the scope numbers
+out of the paper's prose sentences (Redelmeier to 22, Motley to H = 19,
+P_k to 19, holes to 18 and 14, the 3k-th row, 25^k/k!, a(n)/4, a(n)/8,
+the enclosure sizes) and checks each against the record it rests on, and
+re-derives the T(n,n-1) derivation's intermediate counts by enumeration.
+The sentence is the anchor: a sentence that goes missing is a failure.
+Run from anywhere:
 
     python3 paper/verify_technical_report.py
 
@@ -13,6 +19,8 @@ as a plain FAIL until the real value is typed in.
 import os
 import re
 import sys
+from fractions import Fraction as Fr
+from math import factorial
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -220,7 +228,6 @@ for n in range(4, 41):
 #     here is a self-consistency check of the refit-vs-wired coefficients,
 #     not independent evidence.
 # Before this was widened it only covered H in (20,21), 35 cells.
-from fractions import Fraction as Fr
 
 def pcell(n, k):  # P_k(n) = T(n,n-k) * 3^(1+3k-n), exact
     return Fr(col[n - k][n]) * Fr(3) ** (1 + 3 * k - n)
@@ -271,6 +278,270 @@ if (n_real, n_injected) != (171, 171):
 
 print(f"diagonal closed forms: {n_real} real-swept cells (independent) + "
       f"{n_injected} injected cells (self-consistency)")
+
+# ---------------- the prose: scope claims, anchored to their sentences --------
+# Each check reads a number out of one sentence of the paper (the regex is the
+# sentence) and compares it with the record that sentence rests on.  The
+# RED-first gate perturbs every literal of two or more digits, so a scope
+# number that drifts from its record goes red, and so does a sentence that
+# disappears.
+
+def said(label, pattern):
+    m = re.search(pattern, tex, re.S)
+    if not m:
+        failures.append(f"FAIL {label}: sentence not found: /{pattern}/")
+        return None
+    return int(m.group(1))
+
+
+# Abstract 51-52 and Methods 294-296: Redelmeier agrees with the transfer
+# matrix through n = 22.  Record: the 2026-07-16 fleet run.
+red = load_pairs(ROOT / "results/redelmeier_row22/combined.txt")
+for n in sorted(red):
+    check(f"Redelmeier row {n} == banked a({n})", red[n], banked_an[n])
+check("abstract: Redelmeier agreement reach",
+      said("abstract Redelmeier", r"for \$n\\le\{\}(\d+)\$, transfer matrix and Redelmeier"),
+      max(red))
+check("methods: Redelmeier reach",
+      said("methods Redelmeier", r"only terms through \$n=(\d+)\$ could be confirmed"),
+      max(red))
+
+# Abstract 52-53: the colouring transfer matrix (Motley) confirms T(n,H) for
+# H <= 19 at every n <= 40.  Record: results/cutcount_b1/rows41/C<H>.out holds
+# C_H(n) = sum_{h<=H} (H-h+1) T(n,h); the triangle is its second difference.
+rowdir = ROOT / "results/cutcount_b1/rows41"
+motley_top = max(int(f.stem[1:]) for f in rowdir.glob("C*.out"))
+C = {H: load_pairs(rowdir / f"C{H}.out") for H in range(1, motley_top + 1)}
+C[0] = C[-1] = {}
+nmax_said = said("abstract Motley n", r"for \$n\\le\{\}(\d+)\$, a transfer-matrix method that uses coloring")
+check("abstract: Motley reach in n", nmax_said, 40)
+motley_cells = 0
+for H in range(1, motley_top + 1):
+    for n in range(H, 41):
+        t = C[H][n] - 2 * C[H - 1].get(n, 0) + C[H - 2].get(n, 0)
+        check(f"Motley T({n},{H}) == banked", t, col[H][n])
+        motley_cells += 1
+check("abstract: Motley reach in H",
+      said("abstract Motley H", r"confirms the \$T\(n,H\\le\{\}(\d+)\)\$ cells"), motley_top)
+if motley_cells != 589:
+    failures.append(f"FAIL Motley coverage: {motley_cells} cells, expected 589")
+
+# Abstract 53-54: every a(n) passes the Burnside congruence.  Record: the
+# subgroup-invariant counts I(H), n <= 40 (results/subgroup-mod4.md):
+#   a(n) = I(C4) + I(D2ax) + I(D2diag) - 2 I(D4)   (mod 4)
+I = {}
+for line in (ROOT / "results/subgroup_counts.txt").read_text().splitlines():
+    p = line.split()
+    if len(p) == 3 and p[1].isdigit():
+        I[(p[0], int(p[1]))] = int(p[2])
+if not re.search(r"pass checks based on Burnsides? congruences", tex):
+    failures.append("FAIL abstract: the Burnside-congruence sentence not found")
+for n in range(1, 41):
+    rhs = (I.get(("c4", n), 0) + I.get(("d2ax", n), 0)
+           + I.get(("d2diag", n), 0) - 2 * I.get(("d4", n), 0))
+    check(f"a({n}) mod 4 == subgroup census", banked_an[n] % 4, rhs % 4)
+
+# Definitions 70-79 and Results 166: each symmetry class names its OEIS entry.
+# The A-number in the sentence must be the one whose b-file that column was
+# checked against above.
+for label, pattern, fname in (
+        ("fixed", r"\\item\[Fixed\].*?oeis\.org/A(\d+)", "b006770_upload.txt"),
+        ("one-sided", r"\\item\[One-sided\].*?oeis\.org/A(\d+)", "b030233_upload.txt"),
+        ("free", r"\\item\[Free\].*?oeis\.org/A(\d+)", "b030222_upload.txt"),
+        ("bilateral", r"bilateral\}.*?oeis\.org/A(\d+)", "b030234_upload.txt"),
+        ("asymmetric", r"asymmetric\}.*?oeis\.org/A(\d+)", "b030235_upload.txt"),
+        ("non-polyomino", r"not polyominoes \(\\href\{https://oeis\.org/A(\d+)", "b194596_upload.txt")):
+    check(f"OEIS id for {label}", said(f"OEIS id {label}", pattern), int(fname[1:7]))
+
+# Every OEIS link shows the number it points at.
+for url, shown in re.findall(r"\\href\{https://oeis\.org/(A\d+)\}\{(A\d+)\}", tex):
+    check(f"href {url} shows its own number", shown, url)
+
+# Definitions 82-83: a 1-cell hole needs a 4-cell polyplet; a domino hole or
+# two 1-cell holes need 6.  Record: the hole table and the max-hole-area table.
+maxhole = load_pairs(ROOT / "results/maxhole.txt")
+n_one = said("enclosure 1", r"hole of size \$1\$ may be enclosed by a polyplet of size \$(\d+)\$")
+n_two = said("enclosure 2", r"two size-\$1\$ holes may be enclosed by a polyplet of size \$(\d+)\$")
+check("smallest polyplet with a hole", min(n for (n, k) in holes if k >= 1), n_one)
+check("smallest polyplet with two holes", min(n for (n, k) in holes if k >= 2), n_two)
+check("smallest polyplet enclosing a domino (max hole area 2)",
+      min(n for n in maxhole if maxhole[n] >= 2), n_two)
+
+# Table 1 caption: terms 1-18 match A006770.  The OEIS overlap is the 18 the
+# loop at the top used; fixtures/b006770.txt lines 19-20 are ours.
+check("caption: terms matching A006770",
+      said("caption OEIS", r"Terms \$1\$--\$(\d+)\$ match A006770"), 18)
+
+# Results 133-135: T(n,H) = P_k(n) 3^(3H-2n-1) with P_k integer-valued of
+# degree k and leading coefficient 25^k/k!  (3H-2n-1 = n-3k-1 at H = n-k, the
+# convention pcell() uses).  Integrality on every banked in-onset cell, and
+# the leading coefficient of every refit P_k.
+lead = said("leading coefficient", r"leading coefficient is exactly \$(\d+)\^k/k!\$")
+for k in range(1, 20):
+    for n in range(2 * k + 1, 41):
+        if pcell(n, k).denominator != 1:
+            failures.append(f"FAIL P_{k}({n}) is not an integer")
+        checks += 1
+for k in range(1, 19):
+    ak, bk = ab[k]
+    vals = [qpart(n, k) + ak + bk * n for n in range(2 * k + 1, 3 * k + 2)]
+    for _ in range(k):                       # k-th finite difference
+        vals = [b - a for a, b in zip(vals, vals[1:])]
+    check(f"leading coefficient of P_{k} == {lead}^k/k!",
+          vals[0] / factorial(k), Fr(lead ** k, factorial(k)))
+
+# Results 135: P_k explicitly known for k <= 19.  Record: the wired table.
+sweep_go = (ROOT / "orchestrator/sweep.go").read_text()
+wired = int(re.search(r"const maxDiagKMax = (\d+)", sweep_go).group(1))
+check("P_k wired to k <=", said("P_k known", r"explicitly known for \$k\\le(\d+)\$"), wired)
+
+# Results 136-137: P_k can be fixed after the 3k-th row -- because the
+# previous sentence supplies the leading coefficient, so the k in-onset rows
+# 2k+1..3k pin the remaining degree-(k-1) part.  Check: interpolate from
+# exactly those rows and demand every later banked in-onset cell.
+m3k = said("3k-th row", r"after computing the \$(\d)k\$-th row")
+for k in range(1, 14):                       # 3k <= 40 with a row to spare
+    xs = list(range(2 * k + 1, m3k * k + 1))
+    ys = [pcell(n, k) - Fr(lead ** k, factorial(k)) * n ** k for n in xs]
+
+    def lagrange(x):
+        tot = Fr(0)
+        for i, xi in enumerate(xs):
+            term = ys[i]
+            for j, xj in enumerate(xs):
+                if j != i:
+                    term *= Fr(x - xj, xi - xj)
+            tot += term
+        return tot
+    for n in range(m3k * k + 1, 41):
+        check(f"P_{k} from rows 2k+1..{m3k}k predicts T({n},{n - k})",
+              pcell(n, k), lagrange(n) + Fr(lead ** k, factorial(k)) * n ** k)
+
+# Table 2 caption / Results 133: the shaded cells are exactly H > n/2.
+env = table_body("tab:tnh")
+for chunk in re.findall(r"\\midrule(.*?)\\bottomrule", env, re.S):
+    for row in chunk.split(r"\\"):
+        if "&" not in row:
+            continue
+        raw = row.split("&")
+        n = int(re.sub(r"\D", "", raw[0]))
+        for H, c in enumerate(raw[1:], start=1):
+            if re.sub(r"\D", "", c):
+                check(f"tab:tnh shading T({n},{H}) <=> H > n/2",
+                      "\\g" in c, 2 * H > n)
+
+# Results 164-168: non-polyominoes, and the a(n)/4 and a(n)/8 limits.
+# Record: A000105 (free polyominoes) for the difference; the ratios from the
+# tables themselves.
+a000105 = load_pairs(ROOT / "fixtures/b000105.txt")
+for n in sorted(nonpoly):
+    if n in free and n >= 18:                 # the rows the table prints
+        check(f"non-polyomino({n}) == free - A000105", nonpoly[n], free[n] - a000105[n])
+        if a000105[n] * 1000 >= free[n]:
+            failures.append(f"FAIL 'few polyplets are polyominoes' at n={n}")
+        checks += 1
+d1 = said("one-sided limit", r"one-sided count approaches\s+\$a\(n\)/(\d)\$")
+d8 = said("free limit", r"free count approaches \$a\(n\)/(\d)\$")
+for name, table, d in (("one-sided", onesided, d1), ("free", free, d8)):
+    ns = sorted(n for n in table if 18 <= n <= 40)
+    exc = [Fr(d * table[n], banked_an[n]) - 1 for n in ns]
+    # The excess alternates by parity (the rotation-invariant terms do), so
+    # "approaches as n grows" is tested two steps apart, not one.
+    ok = all(e > 0 for e in exc) and all(a > b for a, b in zip(exc, exc[2:]))
+    check(f"{name} count approaches a(n)/{d} from above (decreasing in n+2)", ok, True)
+    check(f"{name}: {d} x count / a(n) - 1 < 1e-6 at n={ns[-1]}", exc[-1] < Fr(1, 10 ** 6), True)
+
+# Holes 226-229: Euler-characteristic tracking in the transfer matrix to
+# n = 18; Redelmeier flood-fill to n = 14 checked it.  Record: the two files,
+# and their agreement on the overlap.
+holes14 = load_pairs(ROOT / "results/holes_n14.txt", cols=3)
+check("holes: transfer-matrix reach",
+      said("holes TM reach", r"Euler characteristic through \$n=(\d+)\$"), max(n for n, k in holes))
+check("holes: flood-fill reach",
+      said("holes flood reach", r"flood-fill to verify counts\s+for \$n\\le(\d+)\$"), max(n for n, k in holes14))
+for key in sorted(holes14):
+    check(f"holes {key}: flood-fill == Euler tracking", holes14[key], holes.get(key))
+for n in range(1, 19):
+    check(f"hole row {n} sums to a({n})", sum(v for (m, k), v in holes.items() if m == n), banked_an[n])
+
+# Table 1 as a whole: a(m+n) >= a(m) a(n), the supermultiplicativity behind any
+# growth-rate statement read off the table (results/concatenation-upper-bound.md).
+for m in range(1, 21):
+    for n in range(m, 41 - m):
+        if banked_an[m + n] < banked_an[m] * banked_an[n]:
+            failures.append(f"FAIL supermultiplicativity at ({m},{n})")
+        checks += 1
+
+# Methods 307-345: the T(n,n-1) derivation, count by count.  Every fixed
+# polyplet of size n <= 8 is generated (Redelmeier 1981); those of height
+# exactly n-1 have one doubled row, and the row's two cells are a domino
+# (gap 1) or a split (gap 2), in an interior row or an end row.  The paper's
+# coefficients are read from its own formulas.
+NB8 = [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
+
+
+def redelmeier(nmax):
+    out = {n: [] for n in range(1, nmax + 1)}
+
+    def rec(animal, untried, tried):
+        while untried:
+            c = untried.pop()
+            new = animal | {c}
+            out[len(new)].append(new)
+            if len(new) < nmax:
+                fresh = [(c[0] + dx, c[1] + dy) for dx, dy in NB8
+                         if (c[1] + dy > 0 or (c[1] + dy == 0 and c[0] + dx >= 0))
+                         and (c[0] + dx, c[1] + dy) not in new
+                         and (c[0] + dx, c[1] + dy) not in tried]
+                rec(new, untried + fresh, tried | set(fresh))
+            tried = tried | {c}
+    rec(frozenset(), [(0, 0)], set())
+    return out
+
+
+CENSUS_N = 8
+animals = redelmeier(CENSUS_N)
+for n in range(1, CENSUS_N + 1):
+    check(f"census: {len(animals[n])} fixed polyplets of size {n}", len(animals[n]), banked_an[n])
+c_dom = said("domino joiner", r"we have \$(\d+)\(n-3\)\\cdot\{\}3\^\{n-4\}\$ junction")
+sp = re.search(r"giving \$\((\d)\\cdot\{\}(\d) \+ (\d)\\cdot\{\}(\d)\)\(n-3\)\\cdot\{\}3\^\{n-4\}\$", tex)
+if not sp:
+    failures.append("FAIL split-joiner sentence not found")
+c_split = int(sp.group(1)) * int(sp.group(2)) + int(sp.group(3)) * int(sp.group(4)) if sp else None
+c_int = said("interior joiner", r"give us \$(\d+)\(n-3\)\\cdot\{\}3\^\{n-4\}\$ options")
+ends = re.search(r"giving \$(\d)\\cdot\{\}(\d)\\cdot\{\}3\^\{n-3\} = (\d+)\\cdot\{\}3\^\{n-4\}\$", tex)
+if not ends:
+    failures.append("FAIL end-joiner sentence not found")
+tot = re.search(r"T\(n, n-1\) = (\d+)\(n-3\)\\cdot\{\}3\^\{n-4\} \+ (\d+)\\cdot\{\}3\^\{n-4\} = \((\d+)n - (\d+)\)\\cdot\{\}3\^\{n-4\}", tex)
+if not tot:
+    failures.append("FAIL T(n,n-1) display not found")
+if sp and ends and tot:
+    check("25 = 16 + 9 (interior joiner)", c_int, c_dom + c_split)
+    check("end joiners: 2 x 5 x 3 = 30", int(ends.group(3)), int(ends.group(1)) * int(ends.group(2)) * 3)
+    check("display: interior term", int(tot.group(1)), c_int)
+    check("display: end term", int(tot.group(2)), int(ends.group(3)))
+    check("display: 25n - 45", (int(tot.group(3)), int(tot.group(4))), (c_int, 3 * c_int - int(ends.group(3))))
+    for n in range(4, CENSUS_N + 1):
+        tally = {}
+        for a in animals[n]:
+            rows = {}
+            for x, y in a:
+                rows.setdefault(y, []).append(x)
+            if len(rows) != n - 1:
+                continue
+            (y2, xs), = [(y, xs) for y, xs in rows.items() if len(xs) == 2]
+            gap = abs(xs[0] - xs[1])
+            kind = {1: "domino", 2: "split"}.get(gap, "gap>=3")
+            pos = "end" if y2 in (min(rows), max(rows)) else "interior"
+            tally[(kind, pos)] = tally.get((kind, pos), 0) + 1
+        p3 = 3 ** (n - 4)
+        check(f"census n={n}: interior domino joiners", tally.get(("domino", "interior"), 0), c_dom * (n - 3) * p3)
+        check(f"census n={n}: interior split joiners", tally.get(("split", "interior"), 0), c_split * (n - 3) * p3)
+        check(f"census n={n}: end domino joiners (4 placements each end)", tally.get(("domino", "end"), 0), 2 * 4 * 3 * p3)
+        check(f"census n={n}: end split joiners (1 placement each end)", tally.get(("split", "end"), 0), 2 * 1 * 3 * p3)
+        check(f"census n={n}: a gap of three or more cannot be spanned", tally.get(("gap>=3", "interior"), 0) + tally.get(("gap>=3", "end"), 0), 0)
+        check(f"census n={n}: T({n},{n - 1}) by enumeration", sum(tally.values()), col[n - 1][n])
+
 print(f"{checks} checks, {len(failures)} failures")
 for f in failures:
     print(" ", f)

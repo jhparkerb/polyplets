@@ -1,3 +1,12 @@
+# A(n,k): fixed polyplets of size n with exactly k holes, a hole being a
+# 4-connected component of the empty cells that does not reach the outside.
+# Columns: n k A(n,k).  1 <= n <= 18.  Row sums give A006770.
+# Column transfer matrix carrying the hole count as an additive Euler-
+# characteristic coordinate (cpp/tma/euler.h, cpp/tma/sweep8_holes.h):
+# tma_holes square8 18 --holes, ayr (x86, GCC), 44 h on one core, committed
+# 8e41a63 2026-06-21.  results/holes_n18.dalby.txt is the same run on dalby
+# (ARM, clang), identical in every row.  n <= 14 agrees with the Redelmeier
+# flood-fill oracle results/holes_n14.txt on every (n, k).
 1 0 1
 2 0 4
 3 0 20
