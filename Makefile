@@ -90,7 +90,7 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-undertow-pairs gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-undertow-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -168,6 +168,7 @@ GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
   build/sig_fold_unit build/strip_mu_cert build/strip_mu_fast \
   build/strip_mu_kink build/subgraph_count build/symcount_fast build/symtm \
   build/tma build/tma_asan build/tma_holes build/tma_modp_test \
+  build/ns/orchestrate build/ns/map_worker build/ns/merge_worker \
   $(if $(GMP_LDFLAGS),build/convex_perim_tm build/middle_kingdom_tm)
 
 # --- input gating -----------------------------------------------------------
@@ -270,6 +271,9 @@ DEPS_gate-severance-w2 = experiments/severance_w2_gate.py \
                 experiments/slope2_law_vs_truth.py
 DEPS_gate-g2  = build/g2 build/g2_asan \
                 tests/gate_g2.py tests/common.py oracle/g1_naive.py $(FIXTURES)
+DEPS_gate-kink-oracle = build/ns/orchestrate build/ns/map_worker \
+                build/ns/merge_worker tests/gate_kink_oracle.py tests/common.py \
+                $(FIXTURES)
 
 # Per-gate wall time, on every run, from the machine that actually ran it.
 # -j interleaves output, so a gate that has quietly grown to minutes is
@@ -420,6 +424,22 @@ gate-undertow-congruence:
 gate-undertow-pairs:
 	python3 experiments/undertow_pairs_gate.py --selftest
 	python3 experiments/undertow_pairs_gate.py
+
+# Gate KINK-ORACLE (AUDIT-2026-09-02, a(23)..a(35)).  The kink-carry kernel
+# produced a(30)..a(41)'s swept half, and its only in-make oracle coverage was
+# the maxn-14 sweeps where the wired diagonals inject every H >= 8 -- so the
+# kernel itself was checked at H <= 7.  --max-diag-k 0 disables the injection
+# (orchestrator/maxdiagk_test.go).  Two all-real sweeps: kink at maxn 18, row
+# sums against the externally published a(1..18) of fixtures/b006770.txt (the
+# whole known sequence, every height enumerated); and kink vs column at maxn
+# 16, per-height rows byte-identical.  Both comparisons are done by the script
+# from h<H>.out, not read off the orchestrator's --compare line.  Measured on
+# gympie 2026-09-05: kink 18 = 68 s at 8 cores / 90 MB, column 16 = 101 s at
+# 4 cores / 300 MB, kink 16 = 0.7 s; the recipe runs at 4 cores.  Declared, so
+# it is skipped while the binaries and inputs are unchanged.  4 RED controls.
+gate-kink-oracle: build/ns/orchestrate build/ns/map_worker build/ns/merge_worker
+	python3 tests/gate_kink_oracle.py --selftest
+	python3 tests/gate_kink_oracle.py
 
 # The Severance gate family (W1, W2, W3, and W3 at depth 5).  These four were
 # outside GATE_TARGETS until 2026-08-24 -- successor row S-A5 in
