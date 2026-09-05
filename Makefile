@@ -90,7 +90,7 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-undertow-pairs gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -381,11 +381,29 @@ gate-cutcount-assembly:
 # are checked for full equality; the two defects with no banked cell at all,
 # D_1(21) and D_2(21), get their congruence.  It fails closed if that free set
 # empties.  Four RED controls, including one that catches the single-source
-# D_4(21) transitively through the pin it feeds.
+# D_4(21) transitively through the pin it feeds -- for a FRACTIONAL error only.
+# An integer shift of a defect passes (its RED 3, by design), and every error a
+# real family-table entry can carry is an integer shift: gate-undertow-pairs
+# below is what catches those.
 #
 gate-undertow-congruence:
 	python3 experiments/undertow_congruence_gate.py --selftest
 	python3 experiments/undertow_congruence_gate.py
+
+# Gate UNDERTOW-PAIRS (AUDIT-2026-09-02 M1).  Level 21 of the a(41) tower had
+# one below-onset pin pair at depths j <= 4 and so no check at its own level;
+# +9 on sig[3][21] of results/severance_w3_families_K22_e3.txt leaves the
+# congruence gate green and moves the depth-4 a(41) by exactly 9 (measured).
+# At depth 5 -- results/severance_w3_families_K21_e4.txt, banked 2026-08-23 and
+# never wired into the assembler -- level 21 has THREE pin pairs through
+# T(38,17), T(39,18), T(40,19), and any single-entry error in that row makes
+# them disagree.  The gate builds the depth-5 tower with the pin cells and pair
+# counts pinned, requires a(41) from results/a41/h*.out plus the tower to equal
+# the banked value, and runs five RED controls, the first being that mutation
+# end to end.  Pure Python over tracked files, ~1 s.
+gate-undertow-pairs:
+	python3 experiments/undertow_pairs_gate.py --selftest
+	python3 experiments/undertow_pairs_gate.py
 
 # The Severance gate family (W1, W2, W3, and W3 at depth 5).  These four were
 # outside GATE_TARGETS until 2026-08-24 -- successor row S-A5 in

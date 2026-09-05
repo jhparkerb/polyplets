@@ -156,6 +156,20 @@ unreachable 2026-09-04; dalby refused the key from the session shell). Run it
 before the asterisk is worded. "Conjecture" undersells the 19 swept heights;
 the audit's own phrasing at `:128-138` is the accurate one.
 
+**2026-09-05, Claude: M1's test run, and gated.** `undertow_a41.py --jmax 5
+--perheight results/a41`: level 21 pinned from `T(38,17)`, `T(39,18)`,
+`T(40,19)`, three pairs, two independent checks, a(41) reproduced digit for
+digit; `--verify --jmax=5` 18 levels over 160 pairs, `--audit --jmax=5` 342
+cells, 0 wrong. The blind spot measured: `sig[3][21] + 9` in a shadow table
+leaves the congruence gate green and moves the depth-4 a(41) by exactly 9;
+depth 5 refuses it. `make gate-undertow-pairs` now carries that as a RED
+control. What the asterisk can carry is therefore: heights 1–19 swept by two
+engines agreeing on all 19 cells (gated, `gate-cutcount-assembly`); heights
+20–41 from the tower, every level overdetermined, sharing `D_j(20..21)` between
+its two fits; no enumeration of `T(41,20)` exists (the H = 20 sweep, ~11 h on
+dalby, unrun). `results/a41/PROVENANCE.md` and `results/confidence.md` say the
+same. Wording is yours.
+
 ---
 
 # C. Results in the repo but not in the paper

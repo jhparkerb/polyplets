@@ -2,7 +2,8 @@
 
 Written 2026-08-20 for jasonp, in plain terms, as a snapshot; the running
 job named at the bottom landed 2026-08-21 08:43 and items 3 and 4 are
-rewritten to say what it settled. It says how much
+rewritten to say what it settled; they were rewritten again 2026-09-05 after
+AUDIT-2026-09-02 found both overstated. It says how much
 evidence stands behind each value of A006770 and where the weak points are.
 Supporting detail, with citations, is in `docs/lastditch-campaign.md`; this
 file is the version that does not assume you have read any of it.
@@ -36,7 +37,7 @@ been run up to height 18. Because of how the table assembles, that was enough
 to independently confirm **a(n) for n <= 35 entirely**.
 
 Above that, confirmation was partial. Row 40 had five of its forty cells that
-no second program had ever touched. The plan to fix that was to run the second
+no second program had ever touched <!--q:row40_residual.count@18=5-->. The plan to fix that was to run the second
 program at heights 19, 20 and 21. Height 19 was priced at 27-40 days. Heights
 20 and 21 were believed impossible on the hardware we have.
 
@@ -78,41 +79,57 @@ nothing circular.
 Before this session these rows were only partly confirmed. They are now fully
 confirmed.
 
-**3. a(40) — complete, as of 2026-08-21.**
-All forty cells. The last one, at height 19, was the only cell in the row that
-had ever rested on a single program; the second program computed it directly
-and got 3247572468599336484342102174163, which is what the original program
-had. Every one of the nineteen heights the second program covers agrees with
-the original at n = 40, and the row sums to the published a(40).
+**3. a(40) — every height the second program reaches agrees, as of 2026-08-21.**
+The second program covers heights 1 to 19, and at n = 40 every one of those
+nineteen cells matches the original. Height 19 was the last swept cell resting
+on the original alone; the second program computed it directly and got
+3247572468599336484342102174163, which is what the original had. The row sums
+to the published a(40).
 
-Before this session: 35 of 40 cells independently confirmed. Now: 40 of 40.
+The twenty-one cells above height 19 are not enumerated by any second program.
+They are reproduced by the formula tower fitted to the second program's own
+data, and item 4 says what that is worth. Before this session, 35 of 40 cells
+had a second program, or a formula anchored on the second program's cells,
+behind them <!--q:row40_residual.count@18=5-->; now 37 of 40 do
+<!--q:row40_residual.count@19=3-->, and the other three, T(40,20), T(40,21)
+and T(40,22), rest on the tower alone. The 2026-08-21 text here said
+"40 of 40"; that counted the tower as a second program, which it is not
+(AUDIT-2026-09-02 M2).
 
-**4. a(41) = 393811462683918679824582849262105 — high, as of 2026-08-21. It
-was the weak one.**
+**4. a(41) = 393811462683918679824582849262105 — computed, with a second
+program under nineteen of its forty-one heights, as of 2026-08-21; the top
+formula overdetermined as of 2026-09-05.**
 
-It now has a second program in it. The colouring program was run at all
-nineteen heights it can reach, at the size row 41 needs — which is the thing
-that had never been done, since every stored result it had stopped at n = 40.
-Those nineteen cells were rebuilt from it, the formulas for the remaining
-twenty-two cells were fitted to *its* data rather than the original program's,
-and the row was summed. It came out
-393811462683918679824582849262105, digit for digit.
+The colouring program was run at all nineteen heights it can reach, at the size
+row 41 needs — the thing that had never been done, since every stored result it
+had stopped at n = 40. Those nineteen cells agree with the original program's
+sweep cell for cell (`results/cutcount_b1/rows41/`, gated by
+`make gate-cutcount-assembly`).
 
-So a(41) is now on the same footing as a(36)-a(39): every cell either computed
-directly by the second program or derived by formula from that program's own
-data, with no part of it depending on the original program. Two methods that
-share no code and no strategy now agree on it.
+The remaining twenty-two cells, heights 20 to 41, come from the formula tower,
+and here the 2026-08-21 text of this item overstated. It said "two methods that
+share no code and no strategy now agree on it". That is true of the nineteen
+swept heights. Above them there is one tower strategy: its levels up to 19 are
+the wired formulas, levels 20 and 21 are fitted below onset, and
+`experiments/undertow_ri.py` refits them to the colouring program's own cells
+and reproduces the row digit for digit — but that refit shares the correction
+tables (`D_j` at levels 20 and 21) and the grand form with the original route.
+The accurate statement is: **19 swept heights two-source with no shared code;
+heights 20 and up one tower strategy pinned from the colouring program's data,
+sharing `D_j(20..21)`** (AUDIT-2026-09-02 M2).
 
-What still limits it, and it is the same limit a(36)-a(39) have: the top of the
-row is formula rather than direct computation, and the formula governing it is
+What still limits it: the top of the row is formula rather than direct
+computation. Until 2026-09-05 the formula governing the tallest tower level was
 fixed by exactly two data points with nothing left over to check it against.
-That is a statement about the top twenty-two cells, not about the agreement —
-the agreement is real and was not available yesterday.
+A fifth correction table, banked 2026-08-23 and never wired into the assembler,
+gives it a third point; the three fits agree, and `make gate-undertow-pairs`
+fails if they stop (`results/a41/PROVENANCE.md`). That is agreement between
+fits sharing their correction tables, not an enumeration of the cell.
 
 The earlier reservation, that the independent re-derivation "took 0.2 seconds,
 which is a fair measure of how much less it is than the weeks that went into
-confirming a(40)", no longer applies to this item. The run that settled it took
-about 22 hours.
+confirming a(40)", no longer applies to this item. The run that settled the
+nineteen heights took about 22 hours.
 
 **5. The rest of the table — a real consistency gain, weaker in kind.**
 A systematic audit re-derived 189 previously computed values from shorter,
@@ -128,10 +145,16 @@ The formulas rely on correction terms that were verified against known data up
 to a certain size and then used slightly beyond it. That extrapolation is the
 one place where something could be wrong and not show up.
 
-It is narrow. Two of the three correction values involved now have fully
-independent derivations produced by different code. The third is constrained
-by an arithmetic property that would break if it were wrong. But if any of
-this fails, that is where.
+It is narrow. Two of the three correction values involved have fully
+independent derivations produced by different code. The third was said here to
+be "constrained by an arithmetic property that would break if it were wrong";
+that was overstated. The property is integrality, it catches only a fractional
+error, and every error the table behind that value can actually carry is an
+integer one — measured 2026-09-05, an error of 9 in one table entry moves
+a(41) by 9 and passes it. What checks the third value now is a fourth, at the
+next depth, which gives the top formula a third data point; the three agree,
+and `make gate-undertow-pairs` fails if they stop. But if any of this fails,
+that is where.
 
 ## What was running, and what it bought
 
@@ -139,8 +162,9 @@ this fails, that is where.
 dalby.* The second program across all heights up to 19, at the size row 41
 needs.
 
-It delivered both of the things it was launched for: a(40) complete, and a(41)
-confirmed by a second program rather than merely computed. Nineteen exact rows
+It delivered both of the things it was launched for: every height the second
+program reaches, agreed at n = 40 and at n = 41; and a(41) with a second
+program under its nineteen swept heights rather than under none. Nineteen exact rows
 were reconstructed from nine modular runs each, with one prime held out of
 every reconstruction as a check — it predicted correctly at every length in
 every height, and the reconstruction tool exits non-zero if it ever does not.
@@ -148,9 +172,10 @@ every height, and the reconstruction tool exits non-zero if it ever does not.
 The job was originally launched at the wrong size — it would have finished
 a(40) and done nothing at all for a(41). jasonp caught that.
 
-One further run of about eleven hours would test the single unchecked formula
-against a directly computed value, which is now the last soft spot in the whole
-construction.
+One further run of about eleven hours (height 20 at the size row 41 needs)
+would test the top formula against a directly computed value. That is the last
+soft spot: as of 2026-09-05 the formula is overdetermined (item 4), but nothing
+has enumerated T(41,20).
 
 ## On trusting this account
 

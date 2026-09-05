@@ -92,6 +92,12 @@ the tables hidden). The entire non-two-source content of a(41)'s tower half is:
   K=19 table, no Python check;
 - **two cells** — `T(40,19)` and `T(39,18)`, level 21's single pin pair.
 
+  (Corrected 2026-09-05, AUDIT-2026-09-02 M1: **three** integers, not nine —
+  `sig`, `bb`, `pp` at e = 3, k = 21. The k = 22 row is truncated away by
+  `D_series(4, 21)` and the k = 20 row is pinned by level 20's pair agreement.
+  And the single pin pair is now three at depth 5, gated by
+  `make gate-undertow-pairs`; `results/a41/PROVENANCE.md`.)
+
 `experiments/undertow_congruence_gate.py` (in `GATE_TARGETS`) narrowed it
 further: integrality of each below-onset cell forces a congruence on its
 defect mod `3^(k+j)`, which gives `D_1(21)` its first check of any kind and

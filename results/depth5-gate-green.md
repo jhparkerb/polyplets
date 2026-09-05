@@ -64,6 +64,17 @@ the answer.
 So B13's green is a statement about `sig` and `bb`. The e4 table's `pp` column
 is not exercised by it.
 
+**Correction, 2026-09-05 (AUDIT-2026-09-02, small items).** "Structurally
+inert in the depth-5 assembly" is wrong as a general statement. Measured on
+`D_series(j, 10)` with one entry injected into `_FAM`: `pp[e][8] + 1` moves
+`D_{e+1}(8)` by exactly 1 and no other depth — `pp[0]` moves `D_1`, `pp[1]`
+moves `D_2`, ..., `pp[4]` moves `D_5`. The mutation sample above was `e <= 2`,
+which feeds depths 1-3, none of which this gate checks; that is why 0/21 were
+killed. The e4 table's `pp[4][k]` column IS exercised by depth 5, and
+`pp[3][21]` is one of the three integers that feed `D_4(21)` in the a(41)
+tower (`results/a41/PROVENANCE.md`); `experiments/undertow_pairs_gate.py`
+RED 3 shows `pp[3][21] + 1` refused at depth 5.
+
 ## The pp column has independent coverage anyway, for e <= 3
 
 The new table agrees cell-for-cell, all three columns, with every banked table

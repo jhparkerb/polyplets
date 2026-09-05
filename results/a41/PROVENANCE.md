@@ -86,27 +86,62 @@ and `D_2(21) = 1534183878653401344302049616588 / 94143178827` with
 but it is **the only check `D_2(21)` currently has**, and the assembler's
 integrality assert is what enforces it.
 
-## The one weak point, stated plainly
+## The one weak point, stated plainly — and closed at depth 5 (2026-09-05)
 
-`T(41,20)` sits on level 21, and **level 21 pins from a single depth pair** —
-`T(40,19)` and `T(39,18)` — with **no independent check at its own level**:
+`T(41,20)` sits on level 21. At depths j <= 4 **level 21 pins from a single
+depth pair** — `T(40,19)` and `T(39,18)` — with **no independent check at its
+own level**:
 
-    level k=20 pinned from [(37,17), (38,18), (39,19)], 3 pairs, 2 independent checks
-    level k=21 pinned from [(39,18), (40,19)],          1 pair,  0 independent checks
+    level k=20 pinned from [(36,16), (37,17), (38,18), (39,19)], 6 pairs, 5 independent checks
+    level k=21 pinned from [(39,18), (40,19)],                   1 pair,  0 independent checks
 
-Every other level in the tower is either wired-and-long-validated or, at
-k = 20, overdetermined. Level 21 is not. Two things would fix it, neither run:
+(The 2026-08-20 text of this section gave level 20 as "3 pairs, 2 independent
+checks"; that was the `--jmax 3` count. At `--jmax 4`, the recipe the run used,
+it is 6 and 5. AUDIT-2026-09-02 M1.)
 
-- **sweep H = 20 at Nmax 41** (`scripts/dalby_a41_h20.sh`, **~10-11 h on 48
-  cores, ~185-190 GB** — corrected 2026-08-20 from the ~20-30 h / ~450 GB this
-  line asserted before the Nmax-scaling measurement existed):
-  `T(41,20)` becomes a swept value and P_21's prediction of it becomes a real
-  holdout against an enumeration;
-- **depth 5** (`families 21 4`, **~3.1 h / ~8.5 GB at 8 threads**, or 6.7 h /
-  16.1 GB on the pessimistic bound — corrected 2026-08-22 from the ~16 h /
-  ~103 GB this line asserted before the ladder was measured, see
-  `results/depth5-cost-settled.md`): level 21 gains a second pin
-  pair from `T(38,17)` — agreement rather than a holdout.
+**What the single-source constant's stated guard was worth.** The congruence
+gate of 2026-08-24 was described, here and in `results/confidence.md`, as
+constraining `D_4(21)` transitively. It constrains its fractional part only.
+A shift Δ in `D_4(21)` moves `T(41,20)` by 9Δ, and every single-entry error in
+the e = 3 row of `results/severance_w3_families_K22_e3.txt` enters `D_4(21)`
+with a coefficient in (1/9)Z, so every error a real table can carry is an
+integer shift of a(41), invisible to an integrality test. Measured 2026-09-05
+on a shadow copy of the table: `sig[3][21] + 9` leaves
+`gate-undertow-congruence` green and moves the depth-4 assembler's a(41) by
+exactly 9. The exposed surface was three integers — `sig`, `bb`, `pp` at
+e = 3, k = 21 — not the "nine numbers" of `docs/lastditch-campaign.md`: the
+k = 22 row is truncated away by `D_series(4, 21)` and the k = 20 row is pinned
+by level 20's pair agreement.
 
-Until one of those runs, a(41) should be quoted as computed-and-checked but
-**not** as carrying the validation a(40) does.
+**Depth 5 closes it.** `results/severance_w3_families_K21_e4.txt` (banked
+2026-08-23, `results/depth5-gate-green.md`) supplies `D_5`, and at `--jmax 5`
+level 21 gains `T(38,17)`, a Motley-covered cell:
+
+    python3 experiments/undertow_a41.py --jmax 5 --perheight results/a41
+    level k=20 pinned from [(36,16), (37,17), (38,18), (39,19)] (tallest H=19), 6 pair(s), 5 independent check(s)
+    level k=21 pinned from [(38,17), (39,18), (40,19)] (tallest H=19), 3 pair(s), 2 independent check(s)
+    sweep vs banked triangle: 760 cells agree, 0 disagree
+    a(41) = 393811462683918679824582849262105
+
+`pp[3][21]` enters `D_4(21)` but not `D_5(21)`, and `sig`, `bb` enter the two
+with different coefficients, so any single-entry error in that row makes the
+three pairs disagree and `build()` refuses. Also run 2026-09-05:
+`undertow_pin.py --verify --jmax=5`, 18 levels re-derived exactly over 160
+depth pairs, 0 wrong; `--audit --jmax=5`, 342 banked cells predicted from
+shorter cells, 0 wrong.
+
+Gated: `make gate-undertow-pairs` (`experiments/undertow_pairs_gate.py`)
+rebuilds the depth-5 tower with the pin cells and pair counts pinned, requires
+a(41) from `results/a41/h*.out` plus the tower to equal the value above, and
+carries five RED controls, each refused at depth 5: the +9 mutation measured
+end to end (congruence gate green, depth-4 shift 9, depth-5 refusal), `bb` and
+`pp` at (3, 21), the K21_e4 table's own e = 4 row, and a corrupted pin cell.
+
+**What remains open.** Three pairs agreeing is agreement between fits that
+share `D_j(20..21)` and the grand form; it is not an enumeration of
+`T(41,20)`. The only assumption-disjoint holdout of that cell is the H = 20
+sweep at Nmax 41 (`scripts/dalby_a41_h20.sh`, **~10-11 h on 48 cores,
+~185-190 GB** on dalby), unrun. Until it runs, a(41) is computed, second-sourced
+at heights 1-19 (`results/cutcount_b1/rows41/`, 19 cells at n = 41 agreeing
+with `h*.out` here), and overdetermined at every tower level — and still
+**not** carrying the enumeration-level validation a(40) does.
