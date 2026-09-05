@@ -59,7 +59,14 @@ a tripleplet figure for the definition, a generated recipe list. Net files:
   k = 0 and k = 1 columns (`oeis/SUBMISSION.md:48-58`). Nothing more unless it
   earns its place.
 - **a(41):** in, with an asterisk. See B5.
-- **Spelling and punctuation:** last.
+- **T(n,n−2) (C5), 2026-09-05: in.** He writes it in the T(n,n−1) style from
+  `docs/proofs/T-n-nm2-and-general.md` §1 (one triple: 49 interior, 7 at an
+  end; two doubles separated: two independent 25/5 gadgets, the quadratic;
+  two doubles adjacent: 339/66, linear). If he cannot keep the explanation
+  straight, he cuts it. When the paragraph lands the verifier gets what the
+  T(n,n−1) paragraph has: the display checked on every banked cell and a
+  census of the three cases at n = 5..8 against his coefficients.
+- **Spelling and punctuation:** last, and not before he says.
 - **Abstract: DONE** (end of session 2026-09-04). Next by the finish list:
   Reproducibility (B1), then the engine chapter (B2) from
   `docs/paper1-engine-chapter.md`, then item 6 (C13 wording) by Q&A.
@@ -229,7 +236,7 @@ exactly the two-cell cluster weight and that the same bookkeeping generates
 every P_k. One paragraph, and it makes the hand derivation the k=1 case of a
 machine.
 
-## C5. `OPEN` T(n,n−2) in closed form
+## C5. `IN (2026-09-05, his call; cut if the explanation will not hold)` T(n,n−2) in closed form
 
 `docs/proofs/T-n-nm2-and-general.md`. T(n,n−2) = ½(625n²−2459n+1134)·3^{n−7}
 for n≥5, proved in the same style as the n−1 case (one row of 3, or two rows
