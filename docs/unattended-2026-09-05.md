@@ -115,3 +115,35 @@ Two departures from the text above, both recorded here rather than asked:
   with item 2. It is a file copy, not compute. The H = 20 sweep at Nmax 41
   (~11 h, ~190 GB) stays unlaunched: frontier rule, >1 h needs his explicit
   go, and it is his call in the audit's own words.
+
+## Outcome, 2026-09-05 ~11:30
+
+All seven landed, on master, pushed: `ac83a56` (7), `666a253` (1), `e8e94cc`
+(3), `17ca0ce` (2 + M3 banking), `624d06c` (4), `5b43302` (5, 6), and this
+note. Full `make` after the last of them: exit 0, 8m56s wall on gympie, 55
+gates; slowest `gate-severance-w1` 517 s, `gate-kink-oracle` 261 s under that
+load (199 s alone), `gate-tma` 219 s.
+
+1. Level 21 pins three ways at depth 5 and a(41) reproduces; the +9 blind spot
+   measured (congruence gate green, depth-4 a(41) off by 9, depth-5 refusal)
+   and made `gate-undertow-pairs` RED 1. Records corrected.
+2. Tier U pinned at 192 cells, Motley's reach verified against the triangle,
+   the "N of 40 cells" trigger, rows41 arms at 589 / 19 / 779 cells, exit codes
+   in `undertow_ri.py`; `confidence.md`, `state-2026-08-23.md`, L8 reworded.
+   M3's banking done: 171 residue rows and the run logs from dalby, sha256
+   checked, `motley_crt.py --selftest` covering C_19.
+3. Five gates that passed on nothing and two tautological RED controls, each
+   shown red on the unfixed code first (commit message has the evidence).
+4. `gate-kink-oracle`: kink kernel, no injection, maxn 18 against the published
+   a(1..18); kink == column per height at maxn 16. Declared, so it skips when
+   its binaries and fixtures are unchanged.
+5. `docs/paper1-reproducibility.md` rewritten in cells; check E in cells,
+   check F (Motley) added.
+6. `paper/technical-report.bib` and `paper/technical-report-cites.md`; nothing
+   for `papers/MISSING.md`.
+
+**Not done, deliberately.** The H = 20 sweep at Nmax 41 (the only enumeration
+of `T(41,20)`; ~11 h, ~190 GB on dalby) — jasonp's call. `README.md:111-121`
+and the staged OEIS text still say a(23)–a(40) are single-algorithm; his to
+align or freeze. The a(30) H17 column cross-check close-out on ayr; ayr did
+not resolve.
