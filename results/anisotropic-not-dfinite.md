@@ -8,8 +8,9 @@ rigorous certificate over ℚ).
 ## Object and ingredients
 
 F(x,y) = Σ_H G_H(x) y^H, with G_H the banked fixed-height generating
-functions (validated H ≤ 10; the H=11 entry is validated=False and behaves
-anomalously — excluded). Define the **new-root content**
+functions (validated H ≤ 10; the H=11 entry is excluded — it was refuted on
+2026-09-05 as a CRT wraparound, see the closing section). Define the
+**new-root content**
 ψ_H = Q_H / gcd(Q_H, Q_1 Q_2 ⋯ Q_{H−1}): the denominator factors appearing
 first at height H. Certified:
 
@@ -54,8 +55,9 @@ a(x) remains untouched.
 - The paper's "not expected to be D-finite" sentence for the by-height
   columns can now cite the corollary.
 - H=11 anomaly recorded: the unvalidated Q₁₁ shares no roots with Q₉Q₁₀
-  (mod p), inconsistent with the atom law — that banked entry deserves a
-  re-recovery before use anywhere.
+  (mod p), inconsistent with the atom law. **Resolved 2026-09-05 — see the
+  closing section. There was no anomaly to explain: the banked Q₁₁ is a
+  failed reconstruction, and the certificates never used it.**
 
 
 ## Unconditionalization push (2026-07-15): the dominant-pole dichotomy
@@ -364,3 +366,17 @@ absence cannot be established by search, and we claim the argument with that
 qualification. MathSciNet is now recorded as closed rather than pending —
 Scholar covers a superset of venues and searches full text, so a fourth
 negative would not change the sentence.
+
+### The H=11 anomaly, resolved (2026-09-05)
+
+The banked `Q₁₁` is a failed reconstruction: a CRT lift from 133 primes whose
+modulus half (1241 digits) is below the true coefficient size (about 1299 digits
+at degree 13381), so every coefficient from degree 8159 up is a residue. Proved
+by the pipeline's own soundness gate on the banked entry
+(`experiments/gf_h11_validate.py`: `Q₁₁ · B₁₁ ≠ P₁₁` mod a fresh prime, first
+mismatch at n = 8170); the full account and the price of a re-recovery (about
+48 CPU-hours, not launched) are in [gf-head-check.md](gf-head-check.md).
+"`Q₁₁` shares no roots with `Q₉Q₁₀`" was a restatement of the wraparound, not a
+fact about height 11. Nothing here used it: the ψ-ladder and irreducibility
+certificates, the monotonicity lemma and the theorem read `validated=True`
+blocks only and stop at H=10.
