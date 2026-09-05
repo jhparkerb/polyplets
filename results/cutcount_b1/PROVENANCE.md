@@ -19,6 +19,9 @@ largest result and still at risk.
 | `calib_run.log` | the run's own log, 2026-08-11 09:23–16:02 EDT, per-height self-checks and banked compare |
 | `calib_run.attempt1.log` | superseded false start, 09:18, kept for the record |
 | `cutcount_b1.cpp.59e90660` | the exact source that produced the rows |
+| `rows41/C<H>.out` | the Nmax-41 ladder, H = 1..19, n <= 41 (`rows41/README.md`); banked 2026-08-21 |
+| `residues41/C<H>.p<prime>.out` | the ladder's 171 measured residue rows, nine 16-bit primes per height; the largest prime of each nine is the held-out one (`scripts/motley_crt.py`'s rule). Banked 2026-09-05 so `make gate-cutcount-assembly` re-derives every height's held-out verdict |
+| `rows41/run/` | the ladder's own `timings.txt` (wall and RSS per prime pass), `console.H*.log`, `census.H*.log`, `sizes.H*.N41.txt`; banked 2026-09-05 |
 
 Copied by `scp` from `dalby:~/src/polyominoes/`, sha256 verified on both sides.
 

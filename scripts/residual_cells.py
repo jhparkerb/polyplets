@@ -204,11 +204,20 @@ def facts() -> dict:
 # anchored to this triangle: results/onset-defect-crossover.md and
 # results/v5-denominator-law.md talk about fit residuals over cells and are not
 # about this at all.
+# "N of 40 cells" is the fourth shape (AUDIT-2026-09-02 M2): results/confidence.md
+# wrote "35 of 40 cells independently confirmed. Now: 40 of 40" and the gate
+# never saw it, because none of the words above appear.  Number words count as
+# numbers; only row 40's cell count is a trigger, since the facts this gate can
+# check are row-40 facts.
+_NUMWORD = (r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven"
+            r"|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen"
+            r"|nineteen|twenty(?:-\w+)?|thirty(?:-\w+)?|forty)")
 TRIGGER_RE = re.compile(
     r"congruence[- ]only"
     r"|only the mod-4|only the congruence|nothing but the congruence"
     r"|residual (?:cells|band)\b(?=.*(?:row 40|T\(40|Motley|Ticker|congruence))"
-    r"|row 40'?s residual",
+    r"|row 40'?s residual"
+    r"|\b" + _NUMWORD + r" of (?:its )?(?:40|forty) cells\b",
     re.I)
 
 # Emphasis inside the phrase must not hide it.  "**only** the mod-4 congruence"
@@ -733,6 +742,28 @@ def selftest() -> int:
         problems.append("RED 15: emphasis inside the trigger phrase hid the "
                         "claim (triggers=%d)" % trig)
 
+    # RED 17: the "N of 40 cells" shape.  results/confidence.md's "35 of 40
+    # cells independently confirmed" carried a row-40 figure past this gate for
+    # sixteen days (AUDIT-2026-09-02 M2).  Unmarked it must fail; the same
+    # sentence with a row-40 fact marked must pass; and a number word is a
+    # number.
+    bad, _, trig = run("Before the run, 35 of 40 cells had a second source.\n",
+                       "r17.md")
+    if trig != 1 or not any("no `<!--q:" in b for b in bad):
+        problems.append("RED 17: an unmarked 'N of 40 cells' claim was not "
+                        "caught (triggers=%d)" % trig)
+    bad, checked, trig = run(
+        "Row 40 had five of its forty cells that no second program had "
+        "touched <!--q:row40_residual.count@18=5-->.\n", "ok17.md")
+    if bad or checked != 1 or trig != 1:
+        problems.append("GREEN 17: a marked 'five of its forty cells' claim "
+                        "did not pass (%s, checked=%d, triggers=%d)"
+                        % (bad, checked, trig))
+    bad, _, trig = run("469 of 820 cells are strip-covered.\n", "ok17b.md")
+    if trig != 0:
+        problems.append("GREEN 17b: 'N of 820 cells' is not a row-40 claim "
+                        "and must not trigger")
+
     h = PT.MOTLEY_H
     want = F["congruence_only.cells@%d" % h]
 
@@ -765,7 +796,7 @@ def selftest() -> int:
         for p in problems:
             print("  " + p)
         return 1
-    print("residual-cells selftest ok: 6 green controls, 16 RED controls, "
+    print("residual-cells selftest ok: 8 green controls, 17 RED controls, "
           "all fired")
     return 0
 

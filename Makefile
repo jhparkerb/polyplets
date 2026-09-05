@@ -254,7 +254,9 @@ DEPS_gate-symtm = build/symtm build/symcount_fast tests/gate_symtm.py \
                 tests/common.py
 DEPS_gate-motley-crt = scripts/motley_crt.py \
                 $(wildcard results/cutcount_b1/residues/*) \
-                results/cutcount_b1/rows/C18.out
+                results/cutcount_b1/rows/C18.out \
+                $(wildcard results/cutcount_b1/residues41/*) \
+                results/cutcount_b1/rows41/C19.out
 DEPS_gate-modp = build/tma build/tma_modp_test tests/gate_modp.py tests/common.py
 DEPS_gate-perimeter-min = build/perimeter_min build/g2 \
                 scripts/perimeter_min_gate.sh experiments/diamond_free_removals.py \
@@ -341,6 +343,12 @@ gate-bfiles:
 # something regressed; when Motley reaches H=18 it must shrink, which fires the
 # gate and forces the number to be updated deliberately rather than silently.
 # Includes a RED control (--selftest). ~1 s, no build needed.
+# Since 2026-09-05 (AUDIT-2026-09-02 M2/M3): Motley's reach is VERIFIED --
+# a banked C row that does not assemble to the triangle caps it, RED control
+# included -- and the tower-from-Motley source (tag U, experiments/undertow_ri.py
+# run per row) is a fourth tier in the table, pinned at 192 cells, so the
+# "one tower strategy pinned from Motley's data" statement is carried by a
+# check rather than by prose.
 gate-provenance:
 	python3 scripts/provenance_table.py --selftest
 	python3 scripts/provenance_table.py --check
@@ -355,7 +363,10 @@ gate-provenance:
 # `<!--q:fact=value-->` marker fails; so does a marker that disagrees; so does a
 # scan that matches nothing at all.  15 RED controls (--selftest), one of them
 # for the fail-OPEN that let "**only** the mod-4" past the pattern and one
-# for the hatch accepting a wrong cell LIST.  16 RED controls.  ~0.3 s.
+# for the hatch accepting a wrong cell LIST.  A fourth trigger shape, "N of 40
+# cells", added 2026-09-05 after results/confidence.md carried "35 of 40 cells
+# ... Now: 40 of 40" past the gate for sixteen days (AUDIT-2026-09-02 M2).
+# 17 RED controls.  ~0.3 s.
 gate-residual-cells:
 	python3 scripts/residual_cells.py --selftest
 	python3 scripts/residual_cells.py --check
@@ -369,7 +380,12 @@ gate-residual-cells:
 # never touches, so a corrupted row would have sat in results/ unnoticed, and
 # the 40/40 was the runner's word until the residue rows were banked the same
 # day.  Coverage is pinned as well as agreement -- a dropped row or prime fails
-# rather than shrinking the check.  9 RED controls (--selftest).  ~0.8 s.
+# rather than shrinking the check.  Three more arms since 2026-09-05
+# (AUDIT-2026-09-02 M3): the Nmax-41 ladder's rows41/ assembled against the
+# triangle (589 cells) and against the kink engine's own Nmax-41 sweep at
+# n = 41 (19 cells -- the two-engine agreement on a(41)'s swept half), and its
+# held-out verdict re-derived at every one of the 19 heights from the 171
+# residue rows banked in residues41/ (779 cells).  16 RED controls.  ~1.5 s.
 gate-cutcount-assembly:
 	python3 scripts/cutcount_assembly_gate.py --selftest
 	python3 scripts/cutcount_assembly_gate.py

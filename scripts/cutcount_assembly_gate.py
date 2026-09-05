@@ -31,6 +31,26 @@ Fail-closed on coverage, not just on disagreement: the cell and residue counts
 are pinned, so a row that stops being read, a glob that matches nothing, or a
 prime that quietly drops out fails the gate instead of shrinking it silently.
 
+The Nmax-41 ladder (AUDIT-2026-09-02 M3), added 2026-09-05.  Commit 3a8d566
+banked results/cutcount_b1/rows41/C1..C19.out, the colouring program's rows
+at Nmax 41, with a README saying "8 primes reconstruct, the 9th is held out
+and must predict every cell; all 19 heights passed" -- and nothing in `make`
+read those rows or could re-derive that sentence.  The 171 residue rows and the
+run logs were banked 2026-09-05 (results/cutcount_b1/residues41/,
+rows41/run/), and three more arms run over them:
+
+  ASSEMBLY-41  rows41 assembled and compared against results/triangle.txt at
+               n <= 40: 589 cells, H = 1..19.
+  ROW-41       rows41 assembled at n = 41 and compared against the kink
+               engine's own sweep, results/a41/h<H>.out: 19 cells.  This is
+               the two-engine agreement on the swept half of a(41), which the
+               audit found "recorded nowhere in the tree".
+  HELD-OUT-41  at EVERY height H = 1..19: CRT over the eight smaller primes,
+               the largest predicted (scripts/motley_crt.py's rule, the one
+               that produced the rows), the reconstruction tied back to
+               rows41/C<H>.out, and each value under the runner's 2^112
+               guard.  19 x 41 = 779 cells.
+
     python3 scripts/cutcount_assembly_gate.py            # gate
     python3 scripts/cutcount_assembly_gate.py --selftest # RED controls
 """
@@ -84,6 +104,18 @@ CRT_BOUND = 1 << 112                   # the runner's overflow guard
 PRIME_CHECK = ROOT / "scripts" / "confetti_prime_check.py"
 EXPECT_PER_PRIME_CELLS = 23            # n = 18..40, the cells the triangle has
 
+# The Nmax-41 ladder (results/cutcount_b1/rows41/README.md).
+ROWS41 = ROOT / "results" / "cutcount_b1" / "rows41"
+RESIDUES41 = ROOT / "results" / "cutcount_b1" / "residues41"
+A41_SWEEP = ROOT / "results" / "a41"   # the kink engine's h<H>.out at Nmax 41
+NMAX41 = 41
+EXPECT41_TOP_H = 19
+EXPECT41_CELLS = 589                   # rows H=1..19 vs the triangle, n <= 40
+EXPECT41_ROW41_CELLS = 19              # T(41,H), H=1..19, vs results/a41
+EXPECT41_PRIMES = 9                    # eight for the CRT, the largest held out
+EXPECT41_HELDOUT_CELLS = 19 * 41       # every height, n = 1..41
+CRT_BOUND41 = 1 << 112                 # scripts/motley_ladder.sh: "< 2^112"
+
 
 def show(path: Path) -> str:
     """Repo-relative when it is in the repo, absolute when the selftest stages
@@ -116,8 +148,8 @@ def read_triangle(path: Path) -> dict[tuple[int, int], int]:
     return T
 
 
-def residue_rows(res_dir: Path) -> tuple[list[int], dict[int, Path]]:
-    """The banked residue rows for the top height, by prime.
+def residue_rows(res_dir: Path, H: int = EXPECT_TOP_H) -> tuple[list[int], dict[int, Path]]:
+    """The banked residue rows for height H, by prime.
 
     Both arms below need exactly this, and they used to find it twice with two
     copies of the glob, the filename pattern and the EXPECT_PRIMES pin -- which
@@ -125,15 +157,19 @@ def residue_rows(res_dir: Path) -> tuple[list[int], dict[int, Path]]:
     called .group(1) on the failed match.  One reader, one posture.
     """
     found = {}
-    for path in sorted(res_dir.glob("C%d.p*.out" % EXPECT_TOP_H)):
-        m = re.fullmatch(r"C%d\.p(\d+)\.out" % EXPECT_TOP_H, path.name)
+    for path in sorted(res_dir.glob("C%d.p*.out" % H)):
+        m = re.fullmatch(r"C%d\.p(\d+)\.out" % H, path.name)
         if m:
             found[int(m.group(1))] = path
     return sorted(found), found
 
 
-def check_assembly(rows_dir: Path, triangle: Path) -> tuple[list[str], int]:
-    """T(n,H) from the banked C rows vs the incumbent triangle."""
+def check_assembly(rows_dir: Path, triangle: Path, top_h: int = EXPECT_TOP_H,
+                   expect_cells: int = EXPECT_CELLS) -> tuple[list[str], int]:
+    """T(n,H) from the banked C rows vs the incumbent triangle.
+
+    Only cells the triangle has are compared, so a row set at Nmax 41 is
+    checked at n <= 40 here and its n = 41 cells by check_row41()."""
     bad = []
     C = {0: {}, -1: {}}
     heights = []
@@ -151,10 +187,10 @@ def check_assembly(rows_dir: Path, triangle: Path) -> tuple[list[str], int]:
     if sorted(heights) != list(range(1, top + 1)):
         bad.append("banked rows are not H = 1..%d contiguous: %s"
                    % (top, sorted(heights)))
-    if top != EXPECT_TOP_H:
+    if top != top_h:
         bad.append("top banked row is H = %d, pinned at %d -- a rung landed or "
                    "a row vanished; update the pin deliberately"
-                   % (top, EXPECT_TOP_H))
+                   % (top, top_h))
     T = read_triangle(triangle)
     cells = 0
     for h in sorted(heights):
@@ -172,19 +208,75 @@ def check_assembly(rows_dir: Path, triangle: Path) -> tuple[list[str], int]:
             if t != T[(n, h)]:
                 bad.append("T(%d,%d): assembled %d, triangle %d"
                            % (n, h, t, T[(n, h)]))
-    if cells != EXPECT_CELLS:
+    if cells != expect_cells:
         bad.append("compared %d cells, pinned at %d -- coverage moved"
-                   % (cells, EXPECT_CELLS))
+                   % (cells, expect_cells))
     return bad, cells
 
 
-def check_heldout(res_dir: Path, rows_dir: Path) -> tuple[list[str], int]:
-    """CRT four primes, predict the fifth, and tie it to the banked exact row."""
+def read_sweep_row(sweep_dir: Path, n: int) -> dict[int, int]:
+    """T(n,H) for every h<H>.out in a per-height sweep directory."""
+    T = {}
+    for p in sorted(sweep_dir.glob("h*.out")):
+        m = re.fullmatch(r"h(\d+)\.out", p.name)
+        if not m:
+            continue
+        for line in p.read_text().splitlines():
+            q = line.split()
+            if len(q) == 2 and int(q[0]) == n:
+                T[int(m.group(1))] = int(q[1])
+    return T
+
+
+def check_row41(rows_dir: Path, sweep_dir: Path) -> tuple[list[str], int]:
+    """T(41,H) assembled from the Nmax-41 Motley rows vs the kink engine's own
+    Nmax-41 sweep -- two engines, no shared code, on every swept cell of a(41).
+    """
     bad = []
-    primes, paths = residue_rows(res_dir)
-    if len(primes) != EXPECT_PRIMES:
-        return (["found %d residue rows under %s, pinned at %d"
-                 % (len(primes), show(res_dir), EXPECT_PRIMES)], 0)
+    C = {0: {}, -1: {}}
+    for p in sorted(rows_dir.glob("C*.out")):
+        m = re.fullmatch(r"C(\d+)\.out", p.name)
+        if m:
+            C[int(m.group(1))] = read_rows(p)
+    sweep = read_sweep_row(sweep_dir, NMAX41)
+    if not sweep:
+        return (["no h<H>.out with an n = %d line under %s -- nothing to compare"
+                 % (NMAX41, show(sweep_dir))], 0)
+    cells = 0
+    for h in range(1, EXPECT41_TOP_H + 1):
+        if h not in C or (h - 1) not in C or (h - 2) not in C:
+            bad.append("rows41 C%d.out (or a predecessor) is missing" % h)
+            continue
+        if NMAX41 not in C[h]:
+            bad.append("rows41 C%d.out carries no n = %d line" % (h, NMAX41))
+            continue
+        if h not in sweep:
+            bad.append("%s has no h%d.out with an n = %d line"
+                       % (show(sweep_dir), h, NMAX41))
+            continue
+        t = C[h][NMAX41] - 2 * C[h - 1].get(NMAX41, 0) + C[h - 2].get(NMAX41, 0)
+        cells += 1
+        if t != sweep[h]:
+            bad.append("T(%d,%d): Motley %d, kink sweep %d" % (NMAX41, h, t, sweep[h]))
+    if cells != EXPECT41_ROW41_CELLS:
+        bad.append("row 41: compared %d cells, pinned at %d"
+                   % (cells, EXPECT41_ROW41_CELLS))
+    return bad, cells
+
+
+def check_heldout(res_dir: Path, rows_dir: Path, H: int = EXPECT_TOP_H,
+                  expect_primes: int = EXPECT_PRIMES, heldout_rule: str = "min",
+                  nmax: int = NMAX, expect_cells: int = EXPECT_HELDOUT_CELLS,
+                  bound: int = CRT_BOUND) -> tuple[list[str], int]:
+    """CRT all primes but one, predict that one, tie the result to the banked
+    exact row.  `heldout_rule` names which prime the RUN held out: Confetti's
+    runner held out the last of its list, the smallest ("min"); the Nmax-41
+    ladder used scripts/motley_crt.py, which holds out the largest ("max")."""
+    bad = []
+    primes, paths = residue_rows(res_dir, H)
+    if len(primes) != expect_primes:
+        return (["C%d: found %d residue rows under %s, pinned at %d"
+                 % (H, len(primes), show(res_dir), expect_primes)], 0)
     res = {q: read_rows(paths[q]) for q in primes}
 
     # The runner held out the LAST prime of its list, which is the smallest of
@@ -197,7 +289,7 @@ def check_heldout(res_dir: Path, rows_dir: Path) -> tuple[list[str], int]:
     # read here, so a regenerated prime set cannot leave this gate verifying a
     # different contract than the run enforced.  That is a change to banked
     # evidence layout, so it is not a drive-by.
-    heldout = min(primes)
+    heldout = min(primes) if heldout_rule == "min" else max(primes)
     crt_primes = [p for p in primes if p != heldout]
 
     # TODO(2026-08-19, updated 2026-08-24): now the FIFTH Python copy of this
@@ -211,7 +303,7 @@ def check_heldout(res_dir: Path, rows_dir: Path) -> tuple[list[str], int]:
     M = 1
     for p in crt_primes:
         M *= p
-    exact_path = rows_dir / ("C%d.out" % EXPECT_TOP_H)
+    exact_path = rows_dir / ("C%d.out" % H)
     if exact_path.exists():
         exact = read_rows(exact_path)
     else:
@@ -222,31 +314,46 @@ def check_heldout(res_dir: Path, rows_dir: Path) -> tuple[list[str], int]:
                    "back to the banked exact row" % show(exact_path))
 
     checked = 0
-    for n in range(1, NMAX + 1):
+    for n in range(1, nmax + 1):
         if not all(n in res[p] for p in primes):
-            bad.append("n=%d missing from a residue row" % n)
+            bad.append("C%d n=%d missing from a residue row" % (H, n))
             continue
         x = 0
         for p in crt_primes:
             Mi = M // p
             x = (x + res[p][n] * Mi * pow(Mi, -1, p)) % M
-        if x >= CRT_BOUND:
-            bad.append("n=%d: CRT reconstruction >= 2^112, the runner's "
-                       "overflow guard" % n)
+        if x >= bound:
+            bad.append("C%d n=%d: CRT reconstruction >= 2^%d, the runner's "
+                       "overflow guard" % (H, n, bound.bit_length() - 1))
             continue
         if x % heldout != res[heldout][n]:
-            bad.append("n=%d: held-out prime %d predicts %d, measured %d"
-                       % (n, heldout, x % heldout, res[heldout][n]))
+            bad.append("C%d n=%d: held-out prime %d predicts %d, measured %d"
+                       % (H, n, heldout, x % heldout, res[heldout][n]))
             continue
         if n in exact and exact[n] != x:
-            bad.append("n=%d: CRT reconstruction %d != banked C%d.out %d"
-                       % (n, x, EXPECT_TOP_H, exact[n]))
+            bad.append("C%d n=%d: CRT reconstruction %d != banked C%d.out %d"
+                       % (H, n, x, H, exact[n]))
             continue
         checked += 1
-    if checked != EXPECT_HELDOUT_CELLS:
-        bad.append("held-out check covered %d of %d cells, pinned at %d"
-                   % (checked, NMAX, EXPECT_HELDOUT_CELLS))
+    if checked != expect_cells:
+        bad.append("C%d held-out check covered %d of %d cells, pinned at %d"
+                   % (H, checked, nmax, expect_cells))
     return bad, checked
+
+
+def check_heldout41(res_dir: Path, rows_dir: Path) -> tuple[list[str], int]:
+    """The ladder's held-out verdict at every height, re-derived."""
+    bad, total = [], 0
+    for H in range(1, EXPECT41_TOP_H + 1):
+        b, n = check_heldout(res_dir, rows_dir, H=H, expect_primes=EXPECT41_PRIMES,
+                             heldout_rule="max", nmax=NMAX41, expect_cells=NMAX41,
+                             bound=CRT_BOUND41)
+        bad += b
+        total += n
+    if total != EXPECT41_HELDOUT_CELLS:
+        bad.append("Nmax-41 held-out check covered %d cells, pinned at %d"
+                   % (total, EXPECT41_HELDOUT_CELLS))
+    return bad, total
 
 
 def check_per_prime(res_dir: Path, rows_dir: Path,
@@ -290,20 +397,32 @@ def check_per_prime(res_dir: Path, rows_dir: Path,
     return bad, total
 
 
-def run(rows_dir=ROWS, res_dir=RESIDUES, triangle=TRIANGLE, verbose=True):
+def run(rows_dir=ROWS, res_dir=RESIDUES, triangle=TRIANGLE, verbose=True,
+        rows41_dir=ROWS41, res41_dir=RESIDUES41, sweep41_dir=A41_SWEEP):
     bad_a, cells = check_assembly(rows_dir, triangle)
     bad_h, checked = check_heldout(res_dir, rows_dir)
     bad_p, per_prime = check_per_prime(res_dir, rows_dir, triangle)
+    bad_a41, cells41 = check_assembly(rows41_dir, triangle, EXPECT41_TOP_H,
+                                      EXPECT41_CELLS)
+    bad_r41, row41 = check_row41(rows41_dir, sweep41_dir)
+    bad_h41, held41 = check_heldout41(res41_dir, rows41_dir)
     if verbose:
-        print("  assembly  %d cells from rows H = 1..%d vs results/triangle.txt"
+        print("  assembly     %d cells from rows H = 1..%d vs results/triangle.txt"
               % (cells, EXPECT_TOP_H))
-        print("  held-out  %d/%d residues predicted from the CRT over the "
+        print("  held-out     %d/%d residues predicted from the CRT over the "
               "other four, and equal to the banked exact row"
               % (checked, NMAX))
-        print("  per-prime %d cells over %d residue rows, each against the "
+        print("  per-prime    %d cells over %d residue rows, each against the "
               "incumbent triangle via scripts/confetti_prime_check.py"
               % (per_prime, EXPECT_PRIMES))
-    return bad_a + bad_h + bad_p
+        print("  assembly-41  %d cells from rows41 H = 1..%d vs results/triangle.txt"
+              % (cells41, EXPECT41_TOP_H))
+        print("  row-41       %d cells T(41,H) from rows41 vs the kink sweep "
+              "results/a41/h*.out" % row41)
+        print("  held-out-41  %d cells over %d heights: CRT over eight primes, "
+              "the ninth predicted, tied to rows41/C<H>.out"
+              % (held41, EXPECT41_TOP_H))
+    return bad_a + bad_h + bad_p + bad_a41 + bad_r41 + bad_h41
 
 
 def selftest() -> int:
@@ -319,9 +438,15 @@ def selftest() -> int:
             shutil.copytree(ROWS, d / "rows")
             shutil.copytree(RESIDUES, d / "residues")
             shutil.copy(TRIANGLE, d / "triangle.txt")
+            shutil.copytree(ROWS41, d / "rows41")
+            shutil.copytree(RESIDUES41, d / "residues41")
+            (d / "a41").mkdir()
+            for f in A41_SWEEP.glob("h*.out"):
+                shutil.copy(f, d / "a41")
             mutate(d)
             return run(d / "rows", d / "residues", d / "triangle.txt",
-                       verbose=False)
+                       verbose=False, rows41_dir=d / "rows41",
+                       res41_dir=d / "residues41", sweep41_dir=d / "a41")
 
     # GREEN: the tree as it stands passes.
     green = staged(lambda d: None)
@@ -329,13 +454,13 @@ def selftest() -> int:
         problems.append("GREEN: the banked tree does not pass its own gate: %s"
                         % green)
 
-    def bump(path):
-        """Perturb the last cell of a banked file by one."""
+    def bump(path, index=-1):
+        """Perturb one cell (the last by default) of a banked file by one."""
         def m(d):
             p = d / path
             lines = p.read_text().splitlines()
-            n, v = lines[-1].split()
-            lines[-1] = "%s %d" % (n, int(v) + 1)
+            n, v = lines[index].split()
+            lines[index] = "%s %d" % (n, int(v) + 1)
             p.write_text("\n".join(lines) + "\n")
         return m
 
@@ -411,12 +536,54 @@ def selftest() -> int:
     if not any("not checking anything" in b for b in staged(empty)):
         problems.append("RED 9: an empty rows/ reported clean")
 
+    # --- the Nmax-41 ladder.  Same failure classes, second row set.
+    # RED 10: one wrong digit in rows41's C19 at n = 41 is visible ONLY to the
+    # row-41 arm (the triangle has no row 41); it must fire there.
+    out = staged(bump("rows41/C19.out"))
+    if not any("T(41,19): Motley" in b for b in out):
+        problems.append("RED 10: a corrupted rows41/C19.out at n = 41 passed "
+                        "the row-41 arm (%s)" % out[:2])
+    # RED 11: the same row corrupted at n = 40 must fire the triangle arm, and
+    # at n = 41 the cell the kink sweep has -- both arms read the same file.
+    out = staged(bump("rows41/C12.out", index=-2))
+    if not any("T(40,12): assembled" in b for b in out):
+        problems.append("RED 11: a corrupted rows41/C12.out at n = 40 passed "
+                        "the assembly-41 arm (%s)" % out[:2])
+    # RED 12: the kink sweep itself corrupted: the row-41 arm compares two
+    # engines, so a wrong h<H>.out must fire too.
+    out = staged(bump("a41/h7.out"))
+    if not any("T(41,7): Motley" in b for b in out):
+        problems.append("RED 12: a corrupted results/a41/h7.out passed (%s)"
+                        % out[:2])
+    # RED 13: a corrupted residue at a LOW height of the ladder must be named
+    # -- the held-out arm runs at every height, not just the top one.
+    out = staged(bump("residues41/C5.p65413.out"))
+    if not any(b.startswith("C5 n=41") for b in out):
+        problems.append("RED 13: a corrupted C5 residue passed the Nmax-41 "
+                        "held-out arm (%s)" % out[:2])
+    # RED 14: the held-out row of the ladder (the largest prime) corrupted.
+    out = staged(bump("residues41/C19.p65521.out"))
+    if not any("C19 n=41: held-out prime 65521" in b for b in out):
+        problems.append("RED 14: a corrupted held-out row of the ladder passed "
+                        "(%s)" % out[:2])
+    # RED 15: a dropped prime shrinks nothing; it fails on the pin.
+    def drop41(d):
+        (d / "residues41" / "C9.p65479.out").unlink()
+    if not any("C9: found 8 residue rows" in b for b in staged(drop41)):
+        problems.append("RED 15: a dropped Nmax-41 residue row shrank the check")
+    # RED 16: a missing kink sweep must fail rather than compare nothing.
+    def drop_sweep(d):
+        for f in (d / "a41").glob("h*.out"):
+            f.unlink()
+    if not any("nothing to compare" in b for b in staged(drop_sweep)):
+        problems.append("RED 16: an empty results/a41 reported clean")
+
     if problems:
         print("cutcount-assembly selftest FAILED:")
         for p in problems:
             print("  " + p)
         return 1
-    print("cutcount-assembly selftest ok: 1 green control, 9 RED controls, "
+    print("cutcount-assembly selftest ok: 1 green control, 16 RED controls, "
           "all fired")
     return 0
 

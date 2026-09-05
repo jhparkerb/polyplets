@@ -15,6 +15,7 @@ drifts from the note that publishes it.
 | S | strip transfer matrix | H <= 14 | shares the union-find rule |
 | P | closed forms P_k on really-swept cells | k <= 18, n >= 2k+1, H <= 21 | full where credited |
 | M | Motley/cutcount | H <= 19 | rule-independent |
+| U | Undertow tower refitted to Motley's cells | H > 19, rows 20-40, measured per cell | formula-level: shares D_j and the grand form with P/F; agrees with the incumbent at every tagged cell |
 | C | subgroup mod-2/mod-4 | every cell | congruence only |
 
 ## Coverage
@@ -27,7 +28,8 @@ drifts from the note that publishes it.
 
   T(39,20), T(40,20), T(40,21)
 
-  Each is a cell whose value has one source. That is the statement; a(n) is no better than its worst cell, so how large these cells are is not a fact about how much of a(n) is trustworthy and is deliberately not reported.
+  Each is a cell whose value has one enumeration. That is the statement; a(n) is no better than its worst cell, so how large these cells are is not a fact about how much of a(n) is trustworthy and is deliberately not reported.
+- cells with no exact recount that the Undertow tower refitted to Motley's cells reproduces (tag U): **192** of the 192, the 189 formula-derived cells and the 3 above included. A formula-level check sharing the depth tables with the wired route, not a second enumeration (AUDIT-2026-09-02 M2).
 
 ## Row 40, cell by cell
 
@@ -52,27 +54,27 @@ drifts from the note that publishes it.
 | 17 | CM |
 | 18 | CM |
 | 19 | CM |
-| 20 | C |
-| 21 | C |
-| 22 | CF |
-| 23 | CF |
-| 24 | CF |
-| 25 | CF |
-| 26 | CF |
-| 27 | CF |
-| 28 | CF |
-| 29 | CF |
-| 30 | CF |
-| 31 | CF |
-| 32 | CF |
-| 33 | CF |
-| 34 | CF |
-| 35 | CF |
-| 36 | CF |
-| 37 | CF |
-| 38 | CF |
-| 39 | CF |
-| 40 | CF |
+| 20 | CU |
+| 21 | CU |
+| 22 | CFU |
+| 23 | CFU |
+| 24 | CFU |
+| 25 | CFU |
+| 26 | CFU |
+| 27 | CFU |
+| 28 | CFU |
+| 29 | CFU |
+| 30 | CFU |
+| 31 | CFU |
+| 32 | CFU |
+| 33 | CFU |
+| 34 | CFU |
+| 35 | CFU |
+| 36 | CFU |
+| 37 | CFU |
+| 38 | CFU |
+| 39 | CFU |
+| 40 | CFU |
 
 ## Cells with no exact second source, by row
 

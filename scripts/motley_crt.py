@@ -29,9 +29,10 @@ Usage:
         "n value" lines.
 
   motley_crt.py --selftest
-        Reconstructs C_18 from results/cutcount_b1/residues/ and requires it to
-        equal the banked results/cutcount_b1/rows/C18.out exactly, then checks
-        that a corrupted residue is caught.
+        Reconstructs C_18 from results/cutcount_b1/residues/ (Confetti, five
+        primes) and C_19 from results/cutcount_b1/residues41/ (the Nmax-41
+        ladder, nine primes), requires each to equal its banked exact row
+        exactly, then checks at both heights that a corrupted residue is caught.
 """
 
 import os
@@ -103,23 +104,24 @@ def reconstruct(res, height, nmax=None):
     return exact, crt_primes, heldout, checked
 
 
-def selftest():
-    d = os.path.join(ROOT, "results", "cutcount_b1", "residues")
-    banked = os.path.join(ROOT, "results", "cutcount_b1", "rows", "C18.out")
-    res = find_residues(d, 18)
+def selftest_height(H, res_dir, banked, min_common, label):
+    """Reconstruct C_H from the banked residue rows, require equality with the
+    banked exact row, then corrupt one residue and require the held-out prime
+    to catch it.  One height, one posture; called once per banked ladder."""
+    res = find_residues(res_dir, H)
     if len(res) < 2:
-        sys.exit(f"FATAL selftest: found {len(res)} residue rows in {d}")
-    exact, crt_p, held, n = reconstruct(res, 18)
+        sys.exit(f"FATAL selftest: found {len(res)} residue rows for C_{H} in {res_dir}")
+    exact, crt_p, held, n = reconstruct(res, H)
     want = read_row(banked)
     bad = [k for k in exact if k in want and exact[k] != want[k]]
     if bad:
-        sys.exit(f"SELFTEST RED: {len(bad)} cells differ from the banked row, "
-                 f"first n={bad[0]}")
+        sys.exit(f"SELFTEST RED ({label}): {len(bad)} cells differ from the "
+                 f"banked row, first n={bad[0]}")
     common = sum(1 for k in exact if k in want)
-    if common < 30:
-        sys.exit(f"SELFTEST RED: only {common} cells compared -- vacuous")
-    print(f"selftest: C_18 reconstructed from {len(crt_p)} primes, held out "
-          f"{held}, {n} cells; {common} match the banked row exactly")
+    if common < min_common:
+        sys.exit(f"SELFTEST RED ({label}): only {common} cells compared -- vacuous")
+    print(f"selftest {label}: C_{H} reconstructed from {len(crt_p)} primes, held "
+          f"out {held}, {n} cells; {common} match the banked row exactly")
 
     # RED control: corrupt one residue and require the held-out check to fire.
     p0 = crt_p[0]
@@ -130,14 +132,27 @@ def selftest():
     if pid == 0:
         sys.stdout = sys.stderr = open(os.devnull, "w")
         try:
-            reconstruct(res, 18)
+            reconstruct(res, H)
         except SystemExit as e:
             os._exit(1 if e.code else 0)
         os._exit(0)
     _, status = os.waitpid(pid, 0)
     if os.WEXITSTATUS(status) == 0:
-        sys.exit("SELFTEST RED: a corrupted residue was NOT caught")
-    print("RED control GREEN: a corrupted residue is caught by the held-out prime")
+        sys.exit(f"SELFTEST RED ({label}): a corrupted residue was NOT caught")
+    print(f"RED control GREEN ({label}): a corrupted residue is caught by the "
+          f"held-out prime")
+
+
+def selftest():
+    """Both banked ladders.  Confetti (H = 18, five ~31-bit primes, Nmax 40)
+    and the Nmax-41 ladder (H = 19, nine ~16-bit primes, banked 2026-09-05 per
+    AUDIT-2026-09-02 M3).  Until then this selftest covered C_18 only and the
+    nineteen held-out verdicts of the ladder were a README sentence."""
+    cb = os.path.join(ROOT, "results", "cutcount_b1")
+    selftest_height(18, os.path.join(cb, "residues"),
+                    os.path.join(cb, "rows", "C18.out"), 30, "Confetti")
+    selftest_height(19, os.path.join(cb, "residues41"),
+                    os.path.join(cb, "rows41", "C19.out"), 41, "Nmax-41 ladder")
 
 
 def main():

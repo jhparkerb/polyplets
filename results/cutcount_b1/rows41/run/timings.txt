@@ -1,0 +1,1579 @@
+event=start job=motley_par t=2026-08-20T10:38:17-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+census regrow c=0 r=11 want=50034
+census regrow c=0 r=12 want=125454
+census regrow c=0 r=13 want=342082
+census regrow c=0 r=13 want=684164
+census regrow c=0 r=14 want=973346
+census regrow c=0 r=14 want=1946692
+census regrow c=0 r=15 want=2838458
+census regrow c=0 r=15 want=5676916
+census regrow c=0 r=16 want=8422258
+census regrow c=0 r=16 want=16844516
+census regrow c=0 r=17 want=25352088
+census regrow c=0 r=17 want=50704176
+census regrow c=0 r=18 want=77310548
+census regrow c=0 r=18 want=154621096
+census regrow c=1 r=0 want=238651136
+event=heartbeat job=motley_par t=2026-08-20T10:39:21-04:00 elapsed_s=64.6 rate=0.03095/s count=2 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:40:08-04:00 elapsed_s=111.0 rate=0.02703/s count=3 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:41:36-04:00 elapsed_s=199.6 rate=0.02505/s count=5 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:43:04-04:00 elapsed_s=287.7 rate=0.02433/s count=7 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:44:33-04:00 elapsed_s=376.0 rate=0.02393/s count=9 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:46:00-04:00 elapsed_s=463.6 rate=0.02373/s count=11 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:47:28-04:00 elapsed_s=551.4 rate=0.02358/s count=13 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:48:56-04:00 elapsed_s=639.0 rate=0.02348/s count=15 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:50:23-04:00 elapsed_s=726.4 rate=0.0234/s count=17 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:51:51-04:00 elapsed_s=814.2 rate=0.02333/s count=19 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:53:19-04:00 elapsed_s=902.4 rate=0.02327/s count=21 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:54:47-04:00 elapsed_s=990.5 rate=0.02322/s count=23 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:56:15-04:00 elapsed_s=1078.7 rate=0.02318/s count=25 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:57:43-04:00 elapsed_s=1166.4 rate=0.02315/s count=27 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T10:59:11-04:00 elapsed_s=1254.1 rate=0.02312/s count=29 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:00:39-04:00 elapsed_s=1342.0 rate=0.0231/s count=31 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:02:06-04:00 elapsed_s=1429.5 rate=0.02308/s count=33 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:03:33-04:00 elapsed_s=1516.7 rate=0.02308/s count=35 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:05:01-04:00 elapsed_s=1604.5 rate=0.02306/s count=37 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:06:29-04:00 elapsed_s=1692.4 rate=0.02304/s count=39 census H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:07:57-04:00 elapsed_s=1780.8 rate=0.02302/s count=41 census H=19 states=224529648
+event=done job=motley_par t=2026-08-20T11:08:41-04:00 start=2026-08-20T10:38:17-04:00 wall_s=1824.7 cpu_s=145698.8 peak_rss_mb=21924.4 mode=census H=19
+census H=19 N=41 wall=1824.75 rss_kb=22450628
+event=start job=motley_par t=2026-08-20T11:08:41-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-20T11:11:27-04:00 elapsed_s=166.0 rate=0.01205/s count=2 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:13:41-04:00 elapsed_s=299.3 rate=0.01003/s count=3 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:15:56-04:00 elapsed_s=434.2 rate=0.009211/s count=4 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:18:11-04:00 elapsed_s=569.6 rate=0.008779/s count=5 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:20:26-04:00 elapsed_s=704.8 rate=0.008513/s count=6 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:22:41-04:00 elapsed_s=839.7 rate=0.008337/s count=7 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:24:56-04:00 elapsed_s=974.9 rate=0.008206/s count=8 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:27:12-04:00 elapsed_s=1110.5 rate=0.008104/s count=9 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:29:27-04:00 elapsed_s=1245.1 rate=0.008031/s count=10 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:31:41-04:00 elapsed_s=1380.0 rate=0.007971/s count=11 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:33:57-04:00 elapsed_s=1516.0 rate=0.007916/s count=12 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:36:13-04:00 elapsed_s=1651.5 rate=0.007872/s count=13 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:38:28-04:00 elapsed_s=1786.7 rate=0.007836/s count=14 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:40:43-04:00 elapsed_s=1921.8 rate=0.007805/s count=15 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:42:58-04:00 elapsed_s=2056.5 rate=0.00778/s count=16 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:45:13-04:00 elapsed_s=2191.6 rate=0.007757/s count=17 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:47:28-04:00 elapsed_s=2326.7 rate=0.007736/s count=18 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:49:43-04:00 elapsed_s=2461.9 rate=0.007718/s count=19 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:51:59-04:00 elapsed_s=2597.4 rate=0.0077/s count=20 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:54:13-04:00 elapsed_s=2731.7 rate=0.007687/s count=21 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:56:29-04:00 elapsed_s=2867.6 rate=0.007672/s count=22 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T11:58:44-04:00 elapsed_s=3002.5 rate=0.00766/s count=23 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:00:59-04:00 elapsed_s=3137.2 rate=0.00765/s count=24 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:03:14-04:00 elapsed_s=3273.0 rate=0.007638/s count=25 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:05:29-04:00 elapsed_s=3407.7 rate=0.00763/s count=26 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:07:44-04:00 elapsed_s=3542.6 rate=0.007622/s count=27 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:09:59-04:00 elapsed_s=3677.5 rate=0.007614/s count=28 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:12:14-04:00 elapsed_s=3812.4 rate=0.007607/s count=29 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:14:29-04:00 elapsed_s=3947.2 rate=0.0076/s count=30 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:16:44-04:00 elapsed_s=4082.5 rate=0.007593/s count=31 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:18:59-04:00 elapsed_s=4217.5 rate=0.007587/s count=32 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:21:14-04:00 elapsed_s=4352.1 rate=0.007583/s count=33 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:23:29-04:00 elapsed_s=4487.5 rate=0.007577/s count=34 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:25:45-04:00 elapsed_s=4623.1 rate=0.007571/s count=35 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:28:00-04:00 elapsed_s=4758.4 rate=0.007566/s count=36 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:30:15-04:00 elapsed_s=4893.3 rate=0.007561/s count=37 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:32:30-04:00 elapsed_s=5028.4 rate=0.007557/s count=38 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:34:46-04:00 elapsed_s=5164.4 rate=0.007552/s count=39 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:37:01-04:00 elapsed_s=5299.5 rate=0.007548/s count=40 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:39:17-04:00 elapsed_s=5435.2 rate=0.007543/s count=41 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:41:33-04:00 elapsed_s=5571.0 rate=0.007539/s count=42 modp H=19 states=224529648
+event=done job=motley_par t=2026-08-20T12:42:19-04:00 start=2026-08-20T11:08:41-04:00 wall_s=5617.5 cpu_s=297911.7 peak_rss_mb=61557.0 mode=modp H=19
+H=19 p=65521 wall=5622.86 rss_kb=63034368
+event=start job=motley_par t=2026-08-20T12:42:30-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-20T12:45:15-04:00 elapsed_s=165.1 rate=0.01212/s count=2 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:47:27-04:00 elapsed_s=297.5 rate=0.01009/s count=3 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:49:43-04:00 elapsed_s=433.4 rate=0.009229/s count=4 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:51:58-04:00 elapsed_s=568.4 rate=0.008797/s count=5 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:54:15-04:00 elapsed_s=704.9 rate=0.008511/s count=6 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:56:30-04:00 elapsed_s=840.2 rate=0.008331/s count=7 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T12:58:45-04:00 elapsed_s=975.4 rate=0.008202/s count=8 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:01:00-04:00 elapsed_s=1110.5 rate=0.008105/s count=9 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:03:15-04:00 elapsed_s=1245.7 rate=0.008028/s count=10 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:05:30-04:00 elapsed_s=1380.4 rate=0.007968/s count=11 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:07:45-04:00 elapsed_s=1515.4 rate=0.007919/s count=12 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:10:00-04:00 elapsed_s=1650.3 rate=0.007878/s count=13 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:12:15-04:00 elapsed_s=1785.2 rate=0.007842/s count=14 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:14:30-04:00 elapsed_s=1920.2 rate=0.007812/s count=15 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:16:44-04:00 elapsed_s=2054.4 rate=0.007788/s count=16 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:18:58-04:00 elapsed_s=2188.5 rate=0.007768/s count=17 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:21:13-04:00 elapsed_s=2323.4 rate=0.007747/s count=18 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:23:28-04:00 elapsed_s=2458.4 rate=0.007729/s count=19 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:25:44-04:00 elapsed_s=2594.4 rate=0.007709/s count=20 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:28:00-04:00 elapsed_s=2730.3 rate=0.007691/s count=21 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:30:16-04:00 elapsed_s=2866.2 rate=0.007676/s count=22 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:32:31-04:00 elapsed_s=3001.8 rate=0.007662/s count=23 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:34:47-04:00 elapsed_s=3137.6 rate=0.007649/s count=24 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:37:04-04:00 elapsed_s=3274.1 rate=0.007636/s count=25 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:39:20-04:00 elapsed_s=3410.0 rate=0.007625/s count=26 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:41:35-04:00 elapsed_s=3545.8 rate=0.007615/s count=27 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:43:51-04:00 elapsed_s=3681.4 rate=0.007606/s count=28 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:46:06-04:00 elapsed_s=3816.6 rate=0.007598/s count=29 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:48:21-04:00 elapsed_s=3951.5 rate=0.007592/s count=30 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:50:37-04:00 elapsed_s=4087.1 rate=0.007585/s count=31 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:52:53-04:00 elapsed_s=4223.1 rate=0.007577/s count=32 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:55:10-04:00 elapsed_s=4360.4 rate=0.007568/s count=33 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:57:26-04:00 elapsed_s=4496.1 rate=0.007562/s count=34 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T13:59:41-04:00 elapsed_s=4631.9 rate=0.007556/s count=35 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:01:57-04:00 elapsed_s=4767.6 rate=0.007551/s count=36 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:04:13-04:00 elapsed_s=4902.9 rate=0.007546/s count=37 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:06:28-04:00 elapsed_s=5038.3 rate=0.007542/s count=38 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:08:44-04:00 elapsed_s=5174.0 rate=0.007538/s count=39 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:10:59-04:00 elapsed_s=5309.0 rate=0.007534/s count=40 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:13:14-04:00 elapsed_s=5444.6 rate=0.00753/s count=41 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:15:30-04:00 elapsed_s=5580.3 rate=0.007526/s count=42 modp H=19 states=224529648
+event=done job=motley_par t=2026-08-20T14:16:16-04:00 start=2026-08-20T12:42:30-04:00 wall_s=5626.1 cpu_s=298794.1 peak_rss_mb=61009.8 mode=modp H=19
+H=19 p=65519 wall=5631.49 rss_kb=62474080
+event=start job=motley_par t=2026-08-20T14:16:26-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-20T14:19:11-04:00 elapsed_s=164.7 rate=0.01215/s count=2 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:21:23-04:00 elapsed_s=296.4 rate=0.01012/s count=3 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:23:39-04:00 elapsed_s=432.2 rate=0.009255/s count=4 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:25:55-04:00 elapsed_s=568.2 rate=0.0088/s count=5 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:28:10-04:00 elapsed_s=703.7 rate=0.008527/s count=6 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:30:26-04:00 elapsed_s=839.6 rate=0.008338/s count=7 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:32:42-04:00 elapsed_s=975.6 rate=0.0082/s count=8 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:34:58-04:00 elapsed_s=1111.2 rate=0.008099/s count=9 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:37:13-04:00 elapsed_s=1246.2 rate=0.008024/s count=10 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:39:28-04:00 elapsed_s=1381.6 rate=0.007962/s count=11 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:41:43-04:00 elapsed_s=1516.1 rate=0.007915/s count=12 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:43:58-04:00 elapsed_s=1651.6 rate=0.007871/s count=13 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:46:14-04:00 elapsed_s=1787.1 rate=0.007834/s count=14 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:48:30-04:00 elapsed_s=1923.3 rate=0.007799/s count=15 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:50:45-04:00 elapsed_s=2058.9 rate=0.007771/s count=16 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:53:01-04:00 elapsed_s=2194.5 rate=0.007747/s count=17 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:55:16-04:00 elapsed_s=2330.0 rate=0.007725/s count=18 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:57:32-04:00 elapsed_s=2465.3 rate=0.007707/s count=19 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T14:59:46-04:00 elapsed_s=2600.0 rate=0.007692/s count=20 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:02:01-04:00 elapsed_s=2734.9 rate=0.007678/s count=21 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:04:17-04:00 elapsed_s=2870.3 rate=0.007665/s count=22 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:06:32-04:00 elapsed_s=3005.4 rate=0.007653/s count=23 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:08:47-04:00 elapsed_s=3140.5 rate=0.007642/s count=24 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:11:02-04:00 elapsed_s=3275.8 rate=0.007632/s count=25 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:13:18-04:00 elapsed_s=3411.2 rate=0.007622/s count=26 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:15:33-04:00 elapsed_s=3547.0 rate=0.007612/s count=27 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:17:49-04:00 elapsed_s=3682.5 rate=0.007604/s count=28 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:20:04-04:00 elapsed_s=3818.0 rate=0.007596/s count=29 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:22:19-04:00 elapsed_s=3953.0 rate=0.007589/s count=30 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:24:36-04:00 elapsed_s=4089.4 rate=0.007581/s count=31 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:26:52-04:00 elapsed_s=4225.3 rate=0.007573/s count=32 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:29:07-04:00 elapsed_s=4360.5 rate=0.007568/s count=33 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:31:23-04:00 elapsed_s=4496.5 rate=0.007561/s count=34 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:33:39-04:00 elapsed_s=4632.2 rate=0.007556/s count=35 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:35:54-04:00 elapsed_s=4767.4 rate=0.007551/s count=36 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:38:10-04:00 elapsed_s=4903.6 rate=0.007545/s count=37 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:40:25-04:00 elapsed_s=5038.8 rate=0.007541/s count=38 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:42:41-04:00 elapsed_s=5174.4 rate=0.007537/s count=39 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:44:56-04:00 elapsed_s=5310.1 rate=0.007533/s count=40 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:47:13-04:00 elapsed_s=5446.6 rate=0.007528/s count=41 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:49:28-04:00 elapsed_s=5582.0 rate=0.007524/s count=42 modp H=19 states=224529648
+event=done job=motley_par t=2026-08-20T15:50:14-04:00 start=2026-08-20T14:16:26-04:00 wall_s=5627.8 cpu_s=298331.4 peak_rss_mb=60350.4 mode=modp H=19
+H=19 p=65497 wall=5633.15 rss_kb=61798824
+event=start job=motley_par t=2026-08-20T15:50:25-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-20T15:53:11-04:00 elapsed_s=165.8 rate=0.01206/s count=2 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:55:24-04:00 elapsed_s=299.2 rate=0.01003/s count=3 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:57:40-04:00 elapsed_s=434.8 rate=0.0092/s count=4 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T15:59:55-04:00 elapsed_s=570.5 rate=0.008765/s count=5 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:02:10-04:00 elapsed_s=705.3 rate=0.008507/s count=6 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:04:25-04:00 elapsed_s=840.4 rate=0.008329/s count=7 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:06:41-04:00 elapsed_s=976.0 rate=0.008197/s count=8 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:08:56-04:00 elapsed_s=1111.1 rate=0.0081/s count=9 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:11:11-04:00 elapsed_s=1246.3 rate=0.008023/s count=10 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:13:27-04:00 elapsed_s=1381.5 rate=0.007962/s count=11 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:15:42-04:00 elapsed_s=1516.6 rate=0.007913/s count=12 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:17:57-04:00 elapsed_s=1651.6 rate=0.007871/s count=13 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:20:12-04:00 elapsed_s=1787.2 rate=0.007834/s count=14 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:22:27-04:00 elapsed_s=1921.6 rate=0.007806/s count=15 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:24:42-04:00 elapsed_s=2057.1 rate=0.007778/s count=16 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:26:58-04:00 elapsed_s=2193.1 rate=0.007751/s count=17 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:29:13-04:00 elapsed_s=2328.3 rate=0.007731/s count=18 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:31:28-04:00 elapsed_s=2462.9 rate=0.007715/s count=19 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:33:43-04:00 elapsed_s=2598.0 rate=0.007698/s count=20 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:35:58-04:00 elapsed_s=2733.3 rate=0.007683/s count=21 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:38:14-04:00 elapsed_s=2868.6 rate=0.007669/s count=22 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:40:29-04:00 elapsed_s=3004.4 rate=0.007655/s count=23 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:42:45-04:00 elapsed_s=3140.1 rate=0.007643/s count=24 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:45:01-04:00 elapsed_s=3275.8 rate=0.007632/s count=25 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:47:17-04:00 elapsed_s=3411.6 rate=0.007621/s count=26 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:49:33-04:00 elapsed_s=3547.7 rate=0.007611/s count=27 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:51:49-04:00 elapsed_s=3684.1 rate=0.0076/s count=28 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:54:05-04:00 elapsed_s=3820.0 rate=0.007592/s count=29 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:56:21-04:00 elapsed_s=3955.8 rate=0.007584/s count=30 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T16:58:37-04:00 elapsed_s=4092.2 rate=0.007575/s count=31 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:00:53-04:00 elapsed_s=4227.8 rate=0.007569/s count=32 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:03:09-04:00 elapsed_s=4363.7 rate=0.007562/s count=33 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:05:25-04:00 elapsed_s=4499.6 rate=0.007556/s count=34 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:07:40-04:00 elapsed_s=4635.2 rate=0.007551/s count=35 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:09:56-04:00 elapsed_s=4771.0 rate=0.007546/s count=36 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:12:12-04:00 elapsed_s=4906.5 rate=0.007541/s count=37 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:14:27-04:00 elapsed_s=5042.3 rate=0.007536/s count=38 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:16:44-04:00 elapsed_s=5178.5 rate=0.007531/s count=39 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:19:00-04:00 elapsed_s=5314.5 rate=0.007527/s count=40 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:21:16-04:00 elapsed_s=5450.5 rate=0.007522/s count=41 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:23:32-04:00 elapsed_s=5586.5 rate=0.007518/s count=42 modp H=19 states=224529648
+event=done job=motley_par t=2026-08-20T17:24:18-04:00 start=2026-08-20T15:50:25-04:00 wall_s=5633.1 cpu_s=298370.8 peak_rss_mb=59344.2 mode=modp H=19
+H=19 p=65479 wall=5638.43 rss_kb=60768492
+event=start job=motley_par t=2026-08-20T17:24:29-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-20T17:27:12-04:00 elapsed_s=163.5 rate=0.01223/s count=2 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:29:25-04:00 elapsed_s=296.3 rate=0.01013/s count=3 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:31:41-04:00 elapsed_s=432.0 rate=0.00926/s count=4 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:33:57-04:00 elapsed_s=567.7 rate=0.008808/s count=5 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:36:12-04:00 elapsed_s=703.3 rate=0.008531/s count=6 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:38:28-04:00 elapsed_s=839.2 rate=0.008341/s count=7 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:40:44-04:00 elapsed_s=975.1 rate=0.008205/s count=8 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:43:00-04:00 elapsed_s=1110.6 rate=0.008104/s count=9 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:45:15-04:00 elapsed_s=1245.9 rate=0.008026/s count=10 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:47:30-04:00 elapsed_s=1381.4 rate=0.007963/s count=11 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:49:46-04:00 elapsed_s=1517.1 rate=0.00791/s count=12 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:52:02-04:00 elapsed_s=1652.8 rate=0.007865/s count=13 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:54:18-04:00 elapsed_s=1789.0 rate=0.007826/s count=14 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:56:33-04:00 elapsed_s=1924.3 rate=0.007795/s count=15 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T17:58:49-04:00 elapsed_s=2059.6 rate=0.007768/s count=16 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:01:05-04:00 elapsed_s=2196.1 rate=0.007741/s count=17 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:03:21-04:00 elapsed_s=2332.0 rate=0.007719/s count=18 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:05:36-04:00 elapsed_s=2467.2 rate=0.007701/s count=19 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:07:51-04:00 elapsed_s=2601.6 rate=0.007688/s count=20 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:10:06-04:00 elapsed_s=2737.2 rate=0.007672/s count=21 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:12:21-04:00 elapsed_s=2872.5 rate=0.007659/s count=22 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:14:37-04:00 elapsed_s=3007.7 rate=0.007647/s count=23 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:16:52-04:00 elapsed_s=3143.1 rate=0.007636/s count=24 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:19:07-04:00 elapsed_s=3278.3 rate=0.007626/s count=25 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:21:23-04:00 elapsed_s=3413.9 rate=0.007616/s count=26 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:23:38-04:00 elapsed_s=3549.4 rate=0.007607/s count=27 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:25:54-04:00 elapsed_s=3685.1 rate=0.007598/s count=28 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:28:09-04:00 elapsed_s=3820.4 rate=0.007591/s count=29 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:30:25-04:00 elapsed_s=3956.0 rate=0.007583/s count=30 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:32:40-04:00 elapsed_s=4091.1 rate=0.007577/s count=31 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:34:56-04:00 elapsed_s=4227.5 rate=0.007569/s count=32 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:37:12-04:00 elapsed_s=4362.9 rate=0.007564/s count=33 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:39:28-04:00 elapsed_s=4499.1 rate=0.007557/s count=34 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:41:44-04:00 elapsed_s=4635.0 rate=0.007551/s count=35 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:43:59-04:00 elapsed_s=4770.2 rate=0.007547/s count=36 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:46:14-04:00 elapsed_s=4905.1 rate=0.007543/s count=37 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:48:30-04:00 elapsed_s=5040.8 rate=0.007539/s count=38 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:50:44-04:00 elapsed_s=5175.4 rate=0.007536/s count=39 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:53:00-04:00 elapsed_s=5310.9 rate=0.007532/s count=40 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:55:15-04:00 elapsed_s=5445.9 rate=0.007529/s count=41 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T18:57:30-04:00 elapsed_s=5580.9 rate=0.007526/s count=42 modp H=19 states=224529648
+event=done job=motley_par t=2026-08-20T18:58:16-04:00 start=2026-08-20T17:24:29-04:00 wall_s=5627.0 cpu_s=298743.0 peak_rss_mb=60032.8 mode=modp H=19
+H=19 p=65449 wall=5632.32 rss_kb=61473580
+event=start job=motley_par t=2026-08-20T18:58:27-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-20T19:01:12-04:00 elapsed_s=165.3 rate=0.0121/s count=2 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:03:24-04:00 elapsed_s=297.7 rate=0.01008/s count=3 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:05:40-04:00 elapsed_s=433.0 rate=0.009238/s count=4 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:07:56-04:00 elapsed_s=569.0 rate=0.008787/s count=5 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:10:11-04:00 elapsed_s=704.5 rate=0.008517/s count=6 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:12:26-04:00 elapsed_s=839.7 rate=0.008336/s count=7 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:14:42-04:00 elapsed_s=975.2 rate=0.008204/s count=8 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:16:57-04:00 elapsed_s=1110.3 rate=0.008106/s count=9 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:19:13-04:00 elapsed_s=1246.2 rate=0.008025/s count=10 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:21:28-04:00 elapsed_s=1381.1 rate=0.007965/s count=11 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:23:43-04:00 elapsed_s=1516.4 rate=0.007914/s count=12 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:25:58-04:00 elapsed_s=1651.7 rate=0.007871/s count=13 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:28:14-04:00 elapsed_s=1787.4 rate=0.007832/s count=14 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:30:30-04:00 elapsed_s=1923.3 rate=0.007799/s count=15 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:32:46-04:00 elapsed_s=2059.0 rate=0.007771/s count=16 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:35:01-04:00 elapsed_s=2194.1 rate=0.007748/s count=17 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:37:17-04:00 elapsed_s=2330.1 rate=0.007725/s count=18 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:39:32-04:00 elapsed_s=2465.5 rate=0.007706/s count=19 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:41:48-04:00 elapsed_s=2601.0 rate=0.007689/s count=20 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:44:03-04:00 elapsed_s=2736.3 rate=0.007675/s count=21 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:46:19-04:00 elapsed_s=2872.3 rate=0.007659/s count=22 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:48:35-04:00 elapsed_s=3008.2 rate=0.007646/s count=23 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:50:51-04:00 elapsed_s=3144.0 rate=0.007634/s count=24 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:53:06-04:00 elapsed_s=3279.6 rate=0.007623/s count=25 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:55:22-04:00 elapsed_s=3415.3 rate=0.007613/s count=26 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:57:38-04:00 elapsed_s=3551.4 rate=0.007603/s count=27 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T19:59:53-04:00 elapsed_s=3686.9 rate=0.007595/s count=28 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:02:09-04:00 elapsed_s=3822.3 rate=0.007587/s count=29 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:04:25-04:00 elapsed_s=3958.4 rate=0.007579/s count=30 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:06:41-04:00 elapsed_s=4094.5 rate=0.007571/s count=31 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:08:57-04:00 elapsed_s=4230.2 rate=0.007565/s count=32 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:11:13-04:00 elapsed_s=4366.1 rate=0.007558/s count=33 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:13:28-04:00 elapsed_s=4501.8 rate=0.007553/s count=34 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:15:44-04:00 elapsed_s=4637.8 rate=0.007547/s count=35 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:18:00-04:00 elapsed_s=4773.4 rate=0.007542/s count=36 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:20:16-04:00 elapsed_s=4909.2 rate=0.007537/s count=37 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:22:31-04:00 elapsed_s=5044.8 rate=0.007533/s count=38 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:24:48-04:00 elapsed_s=5181.1 rate=0.007527/s count=39 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:27:04-04:00 elapsed_s=5317.0 rate=0.007523/s count=40 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:29:19-04:00 elapsed_s=5452.7 rate=0.007519/s count=41 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:31:35-04:00 elapsed_s=5588.5 rate=0.007515/s count=42 modp H=19 states=224529648
+event=done job=motley_par t=2026-08-20T20:32:21-04:00 start=2026-08-20T18:58:27-04:00 wall_s=5634.5 cpu_s=298468.8 peak_rss_mb=59671.7 mode=modp H=19
+H=19 p=65447 wall=5639.72 rss_kb=61103796
+event=start job=motley_par t=2026-08-20T20:32:32-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-20T20:35:16-04:00 elapsed_s=164.0 rate=0.01219/s count=2 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:37:29-04:00 elapsed_s=297.2 rate=0.01009/s count=3 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:39:45-04:00 elapsed_s=433.4 rate=0.009229/s count=4 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:42:02-04:00 elapsed_s=569.7 rate=0.008776/s count=5 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:44:18-04:00 elapsed_s=706.3 rate=0.008495/s count=6 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:46:34-04:00 elapsed_s=842.6 rate=0.008308/s count=7 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:48:52-04:00 elapsed_s=979.9 rate=0.008164/s count=8 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:51:08-04:00 elapsed_s=1116.2 rate=0.008063/s count=9 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:53:25-04:00 elapsed_s=1252.8 rate=0.007982/s count=10 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:55:41-04:00 elapsed_s=1389.4 rate=0.007917/s count=11 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T20:57:58-04:00 elapsed_s=1526.0 rate=0.007864/s count=12 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:00:15-04:00 elapsed_s=1662.7 rate=0.007818/s count=13 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:02:31-04:00 elapsed_s=1798.8 rate=0.007783/s count=14 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:04:47-04:00 elapsed_s=1934.7 rate=0.007753/s count=15 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:07:02-04:00 elapsed_s=2070.5 rate=0.007728/s count=16 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:09:19-04:00 elapsed_s=2207.2 rate=0.007702/s count=17 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:11:36-04:00 elapsed_s=2343.7 rate=0.00768/s count=18 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:13:52-04:00 elapsed_s=2480.1 rate=0.007661/s count=19 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:16:08-04:00 elapsed_s=2616.2 rate=0.007645/s count=20 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:18:25-04:00 elapsed_s=2753.1 rate=0.007628/s count=21 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:20:41-04:00 elapsed_s=2889.1 rate=0.007615/s count=22 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:22:58-04:00 elapsed_s=3025.8 rate=0.007601/s count=23 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:25:14-04:00 elapsed_s=3162.2 rate=0.00759/s count=24 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:27:31-04:00 elapsed_s=3298.8 rate=0.007579/s count=25 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:29:48-04:00 elapsed_s=3435.9 rate=0.007567/s count=26 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:32:05-04:00 elapsed_s=3572.7 rate=0.007557/s count=27 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:34:20-04:00 elapsed_s=3708.5 rate=0.00755/s count=28 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:36:37-04:00 elapsed_s=3844.7 rate=0.007543/s count=29 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:38:53-04:00 elapsed_s=3981.4 rate=0.007535/s count=30 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:41:10-04:00 elapsed_s=4118.0 rate=0.007528/s count=31 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:43:28-04:00 elapsed_s=4255.8 rate=0.007519/s count=32 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:45:45-04:00 elapsed_s=4392.6 rate=0.007513/s count=33 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:48:01-04:00 elapsed_s=4528.6 rate=0.007508/s count=34 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:50:17-04:00 elapsed_s=4664.9 rate=0.007503/s count=35 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:52:33-04:00 elapsed_s=4801.4 rate=0.007498/s count=36 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:54:50-04:00 elapsed_s=4937.7 rate=0.007493/s count=37 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:57:06-04:00 elapsed_s=5073.9 rate=0.007489/s count=38 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T21:59:22-04:00 elapsed_s=5210.5 rate=0.007485/s count=39 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:01:39-04:00 elapsed_s=5346.7 rate=0.007481/s count=40 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:03:55-04:00 elapsed_s=5483.3 rate=0.007477/s count=41 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:06:12-04:00 elapsed_s=5620.0 rate=0.007473/s count=42 modp H=19 states=224529648
+event=done job=motley_par t=2026-08-20T22:06:59-04:00 start=2026-08-20T20:32:32-04:00 wall_s=5666.9 cpu_s=298756.8 peak_rss_mb=59925.6 mode=modp H=19
+H=19 p=65437 wall=5672.29 rss_kb=61363844
+event=start job=motley_par t=2026-08-20T22:07:10-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-20T22:09:55-04:00 elapsed_s=165.0 rate=0.01212/s count=2 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:12:09-04:00 elapsed_s=298.9 rate=0.01004/s count=3 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:14:25-04:00 elapsed_s=434.9 rate=0.009198/s count=4 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:16:41-04:00 elapsed_s=571.7 rate=0.008746/s count=5 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:18:58-04:00 elapsed_s=708.6 rate=0.008468/s count=6 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:21:14-04:00 elapsed_s=844.3 rate=0.008291/s count=7 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:23:29-04:00 elapsed_s=979.6 rate=0.008167/s count=8 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:25:46-04:00 elapsed_s=1116.1 rate=0.008064/s count=9 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:28:02-04:00 elapsed_s=1252.5 rate=0.007984/s count=10 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:30:18-04:00 elapsed_s=1388.7 rate=0.007921/s count=11 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:32:35-04:00 elapsed_s=1524.9 rate=0.007869/s count=12 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:34:50-04:00 elapsed_s=1660.8 rate=0.007828/s count=13 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:37:06-04:00 elapsed_s=1796.5 rate=0.007793/s count=14 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:39:22-04:00 elapsed_s=1932.0 rate=0.007764/s count=15 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:41:37-04:00 elapsed_s=2067.2 rate=0.00774/s count=16 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:43:53-04:00 elapsed_s=2202.9 rate=0.007717/s count=17 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:46:09-04:00 elapsed_s=2339.1 rate=0.007695/s count=18 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:48:24-04:00 elapsed_s=2474.4 rate=0.007679/s count=19 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:50:40-04:00 elapsed_s=2610.0 rate=0.007663/s count=20 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:52:56-04:00 elapsed_s=2746.2 rate=0.007647/s count=21 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:55:12-04:00 elapsed_s=2882.2 rate=0.007633/s count=22 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:57:28-04:00 elapsed_s=3018.5 rate=0.00762/s count=23 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T22:59:44-04:00 elapsed_s=3154.2 rate=0.007609/s count=24 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:02:00-04:00 elapsed_s=3290.1 rate=0.007599/s count=25 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:04:15-04:00 elapsed_s=3425.6 rate=0.00759/s count=26 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:06:31-04:00 elapsed_s=3561.5 rate=0.007581/s count=27 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:08:46-04:00 elapsed_s=3696.7 rate=0.007574/s count=28 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:11:02-04:00 elapsed_s=3832.3 rate=0.007567/s count=29 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:13:18-04:00 elapsed_s=3968.1 rate=0.00756/s count=30 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:15:34-04:00 elapsed_s=4104.6 rate=0.007553/s count=31 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:17:49-04:00 elapsed_s=4239.5 rate=0.007548/s count=32 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:20:05-04:00 elapsed_s=4375.0 rate=0.007543/s count=33 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:22:20-04:00 elapsed_s=4510.0 rate=0.007539/s count=34 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:24:35-04:00 elapsed_s=4645.3 rate=0.007535/s count=35 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:26:50-04:00 elapsed_s=4780.8 rate=0.00753/s count=36 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:29:06-04:00 elapsed_s=4916.3 rate=0.007526/s count=37 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:31:21-04:00 elapsed_s=5051.2 rate=0.007523/s count=38 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:33:36-04:00 elapsed_s=5186.3 rate=0.00752/s count=39 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:35:52-04:00 elapsed_s=5322.3 rate=0.007516/s count=40 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:38:08-04:00 elapsed_s=5458.2 rate=0.007512/s count=41 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:40:24-04:00 elapsed_s=5594.0 rate=0.007508/s count=42 modp H=19 states=224529648
+event=done job=motley_par t=2026-08-20T23:41:10-04:00 start=2026-08-20T22:07:10-04:00 wall_s=5640.4 cpu_s=298567.2 peak_rss_mb=60886.9 mode=modp H=19
+H=19 p=65423 wall=5645.72 rss_kb=62348216
+event=start job=motley_par t=2026-08-20T23:41:21-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-20T23:44:06-04:00 elapsed_s=165.4 rate=0.01209/s count=2 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:46:18-04:00 elapsed_s=297.2 rate=0.01009/s count=3 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:48:34-04:00 elapsed_s=432.9 rate=0.009241/s count=4 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:50:48-04:00 elapsed_s=567.4 rate=0.008812/s count=5 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:53:03-04:00 elapsed_s=702.1 rate=0.008545/s count=6 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:55:18-04:00 elapsed_s=837.5 rate=0.008358/s count=7 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:57:33-04:00 elapsed_s=972.5 rate=0.008226/s count=8 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-20T23:59:48-04:00 elapsed_s=1107.1 rate=0.008129/s count=9 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:02:03-04:00 elapsed_s=1242.2 rate=0.008051/s count=10 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:04:18-04:00 elapsed_s=1376.7 rate=0.00799/s count=11 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:06:33-04:00 elapsed_s=1511.8 rate=0.007937/s count=12 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:08:48-04:00 elapsed_s=1647.3 rate=0.007892/s count=13 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:11:04-04:00 elapsed_s=1782.8 rate=0.007853/s count=14 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:13:20-04:00 elapsed_s=1918.8 rate=0.007817/s count=15 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:15:35-04:00 elapsed_s=2054.4 rate=0.007788/s count=16 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:17:51-04:00 elapsed_s=2190.0 rate=0.007763/s count=17 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:20:07-04:00 elapsed_s=2326.0 rate=0.007739/s count=18 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:22:23-04:00 elapsed_s=2461.8 rate=0.007718/s count=19 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:24:39-04:00 elapsed_s=2598.2 rate=0.007698/s count=20 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:26:55-04:00 elapsed_s=2733.9 rate=0.007681/s count=21 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:29:10-04:00 elapsed_s=2868.8 rate=0.007669/s count=22 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:31:24-04:00 elapsed_s=3003.4 rate=0.007658/s count=23 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:33:40-04:00 elapsed_s=3139.3 rate=0.007645/s count=24 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:35:56-04:00 elapsed_s=3275.0 rate=0.007634/s count=25 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:38:11-04:00 elapsed_s=3410.1 rate=0.007624/s count=26 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:40:27-04:00 elapsed_s=3545.7 rate=0.007615/s count=27 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:42:42-04:00 elapsed_s=3680.9 rate=0.007607/s count=28 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:44:57-04:00 elapsed_s=3816.5 rate=0.007599/s count=29 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:47:12-04:00 elapsed_s=3951.7 rate=0.007592/s count=30 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:49:28-04:00 elapsed_s=4087.2 rate=0.007585/s count=31 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:51:43-04:00 elapsed_s=4222.5 rate=0.007579/s count=32 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:53:58-04:00 elapsed_s=4357.4 rate=0.007573/s count=33 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:56:13-04:00 elapsed_s=4492.6 rate=0.007568/s count=34 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T00:58:28-04:00 elapsed_s=4627.4 rate=0.007564/s count=35 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T01:00:43-04:00 elapsed_s=4762.6 rate=0.007559/s count=36 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T01:03:00-04:00 elapsed_s=4898.8 rate=0.007553/s count=37 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T01:05:15-04:00 elapsed_s=5034.3 rate=0.007548/s count=38 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T01:07:30-04:00 elapsed_s=5169.6 rate=0.007544/s count=39 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T01:09:47-04:00 elapsed_s=5305.8 rate=0.007539/s count=40 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T01:12:03-04:00 elapsed_s=5442.1 rate=0.007534/s count=41 modp H=19 states=224529648
+event=heartbeat job=motley_par t=2026-08-21T01:14:19-04:00 elapsed_s=5578.1 rate=0.007529/s count=42 modp H=19 states=224529648
+event=done job=motley_par t=2026-08-21T01:15:05-04:00 start=2026-08-20T23:41:21-04:00 wall_s=5624.1 cpu_s=298368.7 peak_rss_mb=60495.8 mode=modp H=19
+H=19 p=65413 wall=5629.39 rss_kb=61947652
+H=19 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T01:15:16-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+census regrow c=0 r=11 want=50034
+census regrow c=0 r=12 want=125454
+census regrow c=0 r=13 want=342082
+census regrow c=0 r=13 want=684164
+census regrow c=0 r=14 want=973346
+census regrow c=0 r=14 want=1946692
+census regrow c=0 r=15 want=2838458
+census regrow c=0 r=15 want=5676916
+census regrow c=0 r=16 want=8422258
+census regrow c=0 r=16 want=16844516
+census regrow c=0 r=17 want=25352088
+census regrow c=0 r=17 want=50704176
+census regrow c=1 r=0 want=77310548
+event=heartbeat job=motley_par t=2026-08-21T01:16:05-04:00 elapsed_s=49.3 rate=0.08109/s count=4 census H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:16:56-04:00 elapsed_s=100.3 rate=0.07974/s count=8 census H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:17:47-04:00 elapsed_s=151.4 rate=0.07927/s count=12 census H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:18:38-04:00 elapsed_s=202.4 rate=0.07906/s count=16 census H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:19:29-04:00 elapsed_s=253.5 rate=0.0789/s count=20 census H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:20:20-04:00 elapsed_s=304.7 rate=0.07877/s count=24 census H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:21:11-04:00 elapsed_s=355.3 rate=0.0788/s count=28 census H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:22:02-04:00 elapsed_s=406.0 rate=0.07882/s count=32 census H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:22:52-04:00 elapsed_s=456.7 rate=0.07883/s count=36 census H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:23:43-04:00 elapsed_s=507.3 rate=0.07885/s count=40 census H=18 states=72487711
+event=done job=motley_par t=2026-08-21T01:24:08-04:00 start=2026-08-21T01:15:16-04:00 wall_s=532.5 cpu_s=42478.7 peak_rss_mb=6498.2 mode=census H=18
+census H=18 N=41 wall=532.55 rss_kb=6654208
+event=start job=motley_par t=2026-08-21T01:24:08-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T01:25:10-04:00 elapsed_s=61.6 rate=0.03249/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:26:39-04:00 elapsed_s=151.0 rate=0.02649/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:27:25-04:00 elapsed_s=196.8 rate=0.02541/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:28:10-04:00 elapsed_s=242.2 rate=0.02477/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:28:56-04:00 elapsed_s=287.6 rate=0.02434/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:29:41-04:00 elapsed_s=332.9 rate=0.02403/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:30:27-04:00 elapsed_s=378.4 rate=0.02378/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:31:12-04:00 elapsed_s=423.7 rate=0.0236/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:31:57-04:00 elapsed_s=469.2 rate=0.02345/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:32:43-04:00 elapsed_s=514.5 rate=0.02333/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:33:28-04:00 elapsed_s=559.8 rate=0.02322/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:34:14-04:00 elapsed_s=605.3 rate=0.02313/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:34:59-04:00 elapsed_s=650.5 rate=0.02306/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:35:44-04:00 elapsed_s=695.8 rate=0.02299/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:36:29-04:00 elapsed_s=741.2 rate=0.02294/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:37:15-04:00 elapsed_s=786.8 rate=0.02288/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:38:01-04:00 elapsed_s=832.4 rate=0.02283/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:38:46-04:00 elapsed_s=878.0 rate=0.02278/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:39:32-04:00 elapsed_s=923.4 rate=0.02274/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:40:17-04:00 elapsed_s=968.8 rate=0.02271/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:41:03-04:00 elapsed_s=1014.4 rate=0.02267/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:41:48-04:00 elapsed_s=1059.7 rate=0.02265/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:42:33-04:00 elapsed_s=1105.0 rate=0.02263/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:43:19-04:00 elapsed_s=1150.3 rate=0.0226/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:44:04-04:00 elapsed_s=1195.8 rate=0.02258/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:44:49-04:00 elapsed_s=1241.1 rate=0.02256/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:45:35-04:00 elapsed_s=1286.4 rate=0.02254/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:46:20-04:00 elapsed_s=1331.9 rate=0.02252/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:47:06-04:00 elapsed_s=1377.3 rate=0.02251/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:47:51-04:00 elapsed_s=1422.7 rate=0.02249/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:48:36-04:00 elapsed_s=1468.0 rate=0.02248/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:49:22-04:00 elapsed_s=1513.5 rate=0.02246/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:50:07-04:00 elapsed_s=1558.9 rate=0.02245/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:50:53-04:00 elapsed_s=1604.4 rate=0.02244/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:51:38-04:00 elapsed_s=1649.9 rate=0.02243/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:52:24-04:00 elapsed_s=1695.4 rate=0.02241/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:53:09-04:00 elapsed_s=1740.8 rate=0.0224/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:53:55-04:00 elapsed_s=1786.4 rate=0.02239/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:54:40-04:00 elapsed_s=1831.9 rate=0.02238/s count=41 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:55:26-04:00 elapsed_s=1877.5 rate=0.02237/s count=42 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-21T01:55:45-04:00 start=2026-08-21T01:24:08-04:00 wall_s=1896.3 cpu_s=89799.2 peak_rss_mb=19024.1 mode=modp H=18
+H=18 p=65521 wall=1898.03 rss_kb=19480708
+event=start job=motley_par t=2026-08-21T01:55:48-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T01:56:50-04:00 elapsed_s=61.9 rate=0.0323/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:58:19-04:00 elapsed_s=151.5 rate=0.0264/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:59:05-04:00 elapsed_s=197.0 rate=0.02539/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T01:59:51-04:00 elapsed_s=242.5 rate=0.02474/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:00:36-04:00 elapsed_s=288.2 rate=0.02429/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:01:22-04:00 elapsed_s=333.6 rate=0.02398/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:02:07-04:00 elapsed_s=379.0 rate=0.02374/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:02:52-04:00 elapsed_s=424.5 rate=0.02356/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:03:38-04:00 elapsed_s=470.1 rate=0.0234/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:04:24-04:00 elapsed_s=515.6 rate=0.02328/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:05:09-04:00 elapsed_s=561.0 rate=0.02317/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:05:55-04:00 elapsed_s=606.6 rate=0.02308/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:06:40-04:00 elapsed_s=652.2 rate=0.023/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:07:26-04:00 elapsed_s=697.8 rate=0.02293/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:08:11-04:00 elapsed_s=743.3 rate=0.02287/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:08:57-04:00 elapsed_s=788.8 rate=0.02282/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:09:42-04:00 elapsed_s=834.3 rate=0.02277/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:10:28-04:00 elapsed_s=879.9 rate=0.02273/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:11:13-04:00 elapsed_s=925.3 rate=0.0227/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:11:59-04:00 elapsed_s=970.8 rate=0.02266/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:12:44-04:00 elapsed_s=1016.4 rate=0.02263/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:13:30-04:00 elapsed_s=1062.1 rate=0.0226/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:14:16-04:00 elapsed_s=1107.8 rate=0.02257/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:15:01-04:00 elapsed_s=1153.3 rate=0.02254/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:15:47-04:00 elapsed_s=1198.7 rate=0.02252/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:16:32-04:00 elapsed_s=1244.3 rate=0.0225/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:17:18-04:00 elapsed_s=1289.9 rate=0.02248/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:18:04-04:00 elapsed_s=1335.6 rate=0.02246/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:18:49-04:00 elapsed_s=1381.1 rate=0.02245/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:19:35-04:00 elapsed_s=1426.7 rate=0.02243/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:20:20-04:00 elapsed_s=1472.2 rate=0.02242/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:21:06-04:00 elapsed_s=1517.8 rate=0.0224/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:21:51-04:00 elapsed_s=1563.4 rate=0.02239/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:22:37-04:00 elapsed_s=1609.0 rate=0.02237/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:23:23-04:00 elapsed_s=1654.6 rate=0.02236/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:24:08-04:00 elapsed_s=1700.4 rate=0.02235/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:24:54-04:00 elapsed_s=1745.9 rate=0.02234/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:25:39-04:00 elapsed_s=1791.5 rate=0.02233/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:26:25-04:00 elapsed_s=1837.2 rate=0.02232/s count=41 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:27:11-04:00 elapsed_s=1882.8 rate=0.02231/s count=42 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-21T02:27:30-04:00 start=2026-08-21T01:55:48-04:00 wall_s=1901.9 cpu_s=89807.1 peak_rss_mb=18621.7 mode=modp H=18
+H=18 p=65519 wall=1903.64 rss_kb=19068660
+event=start job=motley_par t=2026-08-21T02:27:33-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T02:28:35-04:00 elapsed_s=61.9 rate=0.03229/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:30:05-04:00 elapsed_s=151.8 rate=0.02635/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:30:51-04:00 elapsed_s=197.4 rate=0.02533/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:31:36-04:00 elapsed_s=242.9 rate=0.0247/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:32:22-04:00 elapsed_s=288.4 rate=0.02427/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:33:07-04:00 elapsed_s=333.9 rate=0.02396/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:33:53-04:00 elapsed_s=379.4 rate=0.02372/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:34:38-04:00 elapsed_s=424.9 rate=0.02354/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:35:24-04:00 elapsed_s=470.6 rate=0.02338/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:36:09-04:00 elapsed_s=516.2 rate=0.02325/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:36:55-04:00 elapsed_s=561.7 rate=0.02314/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:37:40-04:00 elapsed_s=607.1 rate=0.02306/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:38:26-04:00 elapsed_s=652.5 rate=0.02299/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:39:11-04:00 elapsed_s=698.0 rate=0.02292/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:39:57-04:00 elapsed_s=743.3 rate=0.02287/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:40:42-04:00 elapsed_s=788.9 rate=0.02282/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:41:28-04:00 elapsed_s=834.4 rate=0.02277/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:42:13-04:00 elapsed_s=880.0 rate=0.02273/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:42:59-04:00 elapsed_s=925.5 rate=0.02269/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:43:45-04:00 elapsed_s=971.2 rate=0.02265/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:44:30-04:00 elapsed_s=1016.7 rate=0.02262/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:45:16-04:00 elapsed_s=1062.3 rate=0.02259/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:46:01-04:00 elapsed_s=1107.8 rate=0.02257/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:46:47-04:00 elapsed_s=1153.3 rate=0.02254/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:47:32-04:00 elapsed_s=1198.9 rate=0.02252/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:48:18-04:00 elapsed_s=1244.5 rate=0.0225/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:49:03-04:00 elapsed_s=1290.0 rate=0.02248/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:49:49-04:00 elapsed_s=1335.4 rate=0.02246/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:50:34-04:00 elapsed_s=1380.9 rate=0.02245/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:51:20-04:00 elapsed_s=1426.4 rate=0.02243/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:52:05-04:00 elapsed_s=1471.8 rate=0.02242/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:52:51-04:00 elapsed_s=1517.3 rate=0.02241/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:53:36-04:00 elapsed_s=1562.9 rate=0.02239/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:54:22-04:00 elapsed_s=1608.4 rate=0.02238/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:55:07-04:00 elapsed_s=1653.9 rate=0.02237/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:55:53-04:00 elapsed_s=1699.4 rate=0.02236/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:56:38-04:00 elapsed_s=1745.0 rate=0.02235/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:57:24-04:00 elapsed_s=1790.7 rate=0.02234/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:58:09-04:00 elapsed_s=1836.2 rate=0.02233/s count=41 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T02:58:55-04:00 elapsed_s=1881.8 rate=0.02232/s count=42 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-21T02:59:14-04:00 start=2026-08-21T02:27:33-04:00 wall_s=1900.7 cpu_s=89814.2 peak_rss_mb=18605.4 mode=modp H=18
+H=18 p=65497 wall=1902.44 rss_kb=19051908
+event=start job=motley_par t=2026-08-21T02:59:17-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T03:00:19-04:00 elapsed_s=62.0 rate=0.03224/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:01:49-04:00 elapsed_s=151.5 rate=0.0264/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:02:34-04:00 elapsed_s=196.8 rate=0.02541/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:03:19-04:00 elapsed_s=242.0 rate=0.02479/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:04:05-04:00 elapsed_s=287.5 rate=0.02435/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:04:51-04:00 elapsed_s=333.1 rate=0.02402/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:05:36-04:00 elapsed_s=378.7 rate=0.02377/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:06:22-04:00 elapsed_s=424.2 rate=0.02357/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:07:07-04:00 elapsed_s=469.7 rate=0.02342/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:07:53-04:00 elapsed_s=515.2 rate=0.02329/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:08:38-04:00 elapsed_s=560.6 rate=0.02319/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:09:23-04:00 elapsed_s=606.0 rate=0.0231/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:10:09-04:00 elapsed_s=651.4 rate=0.02303/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:10:54-04:00 elapsed_s=696.7 rate=0.02296/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:11:40-04:00 elapsed_s=742.4 rate=0.0229/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:12:25-04:00 elapsed_s=787.8 rate=0.02285/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:13:11-04:00 elapsed_s=833.2 rate=0.0228/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:13:56-04:00 elapsed_s=878.6 rate=0.02276/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:14:41-04:00 elapsed_s=923.8 rate=0.02273/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:15:27-04:00 elapsed_s=969.3 rate=0.0227/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:16:12-04:00 elapsed_s=1014.9 rate=0.02266/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:16:58-04:00 elapsed_s=1060.4 rate=0.02263/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:17:43-04:00 elapsed_s=1105.9 rate=0.02261/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:18:29-04:00 elapsed_s=1151.4 rate=0.02258/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:19:14-04:00 elapsed_s=1196.9 rate=0.02256/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:20:00-04:00 elapsed_s=1242.4 rate=0.02254/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:20:45-04:00 elapsed_s=1288.0 rate=0.02252/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:21:31-04:00 elapsed_s=1333.6 rate=0.0225/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:22:16-04:00 elapsed_s=1379.0 rate=0.02248/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:23:02-04:00 elapsed_s=1424.4 rate=0.02247/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:23:47-04:00 elapsed_s=1470.0 rate=0.02245/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:24:33-04:00 elapsed_s=1515.7 rate=0.02243/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:25:18-04:00 elapsed_s=1560.9 rate=0.02242/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:26:04-04:00 elapsed_s=1606.3 rate=0.02241/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:26:49-04:00 elapsed_s=1651.8 rate=0.0224/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:27:35-04:00 elapsed_s=1697.1 rate=0.02239/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:28:20-04:00 elapsed_s=1742.7 rate=0.02238/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:29:06-04:00 elapsed_s=1788.2 rate=0.02237/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:29:51-04:00 elapsed_s=1833.6 rate=0.02236/s count=41 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:30:36-04:00 elapsed_s=1879.0 rate=0.02235/s count=42 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-21T03:30:55-04:00 start=2026-08-21T02:59:17-04:00 wall_s=1897.8 cpu_s=89908.6 peak_rss_mb=18760.5 mode=modp H=18
+H=18 p=65479 wall=1899.51 rss_kb=19210736
+event=start job=motley_par t=2026-08-21T03:30:59-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T03:32:01-04:00 elapsed_s=62.0 rate=0.03225/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:33:30-04:00 elapsed_s=151.5 rate=0.0264/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:34:16-04:00 elapsed_s=197.0 rate=0.02538/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:35:01-04:00 elapsed_s=242.4 rate=0.02475/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:35:47-04:00 elapsed_s=288.1 rate=0.0243/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:36:32-04:00 elapsed_s=333.5 rate=0.02399/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:37:18-04:00 elapsed_s=379.1 rate=0.02374/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:38:03-04:00 elapsed_s=424.5 rate=0.02356/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:38:49-04:00 elapsed_s=469.9 rate=0.02341/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:39:34-04:00 elapsed_s=515.6 rate=0.02327/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:40:20-04:00 elapsed_s=561.1 rate=0.02317/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:41:05-04:00 elapsed_s=606.6 rate=0.02308/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:41:51-04:00 elapsed_s=652.1 rate=0.023/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:42:36-04:00 elapsed_s=697.6 rate=0.02294/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:43:22-04:00 elapsed_s=743.2 rate=0.02287/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:44:07-04:00 elapsed_s=788.5 rate=0.02283/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:44:53-04:00 elapsed_s=833.9 rate=0.02278/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:45:38-04:00 elapsed_s=879.2 rate=0.02275/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:46:23-04:00 elapsed_s=924.6 rate=0.02271/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:47:09-04:00 elapsed_s=970.0 rate=0.02268/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:47:54-04:00 elapsed_s=1015.2 rate=0.02266/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:48:39-04:00 elapsed_s=1060.5 rate=0.02263/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:49:25-04:00 elapsed_s=1106.0 rate=0.0226/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:50:10-04:00 elapsed_s=1151.7 rate=0.02258/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:50:56-04:00 elapsed_s=1197.3 rate=0.02255/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:51:41-04:00 elapsed_s=1242.6 rate=0.02253/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:52:27-04:00 elapsed_s=1288.0 rate=0.02251/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:53:12-04:00 elapsed_s=1333.7 rate=0.02249/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:53:58-04:00 elapsed_s=1379.1 rate=0.02248/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:54:43-04:00 elapsed_s=1424.8 rate=0.02246/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:55:29-04:00 elapsed_s=1470.3 rate=0.02244/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:56:14-04:00 elapsed_s=1515.7 rate=0.02243/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:57:00-04:00 elapsed_s=1561.0 rate=0.02242/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:57:45-04:00 elapsed_s=1606.6 rate=0.02241/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:58:31-04:00 elapsed_s=1651.9 rate=0.0224/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T03:59:16-04:00 elapsed_s=1697.2 rate=0.02239/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:00:01-04:00 elapsed_s=1742.6 rate=0.02238/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:00:47-04:00 elapsed_s=1788.1 rate=0.02237/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:01:32-04:00 elapsed_s=1833.7 rate=0.02236/s count=41 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:02:18-04:00 elapsed_s=1879.4 rate=0.02235/s count=42 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-21T04:02:37-04:00 start=2026-08-21T03:30:59-04:00 wall_s=1898.3 cpu_s=89786.8 peak_rss_mb=18702.9 mode=modp H=18
+H=18 p=65449 wall=1900.04 rss_kb=19151816
+event=start job=motley_par t=2026-08-21T04:02:40-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T04:03:42-04:00 elapsed_s=61.5 rate=0.03251/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:05:11-04:00 elapsed_s=150.6 rate=0.02656/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:05:57-04:00 elapsed_s=196.0 rate=0.0255/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:06:42-04:00 elapsed_s=241.4 rate=0.02485/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:07:27-04:00 elapsed_s=286.8 rate=0.02441/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:08:13-04:00 elapsed_s=332.3 rate=0.02408/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:08:58-04:00 elapsed_s=377.8 rate=0.02382/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:09:44-04:00 elapsed_s=423.2 rate=0.02363/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:10:29-04:00 elapsed_s=468.6 rate=0.02348/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:11:14-04:00 elapsed_s=513.8 rate=0.02335/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:12:00-04:00 elapsed_s=559.2 rate=0.02325/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:12:45-04:00 elapsed_s=604.7 rate=0.02315/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:13:31-04:00 elapsed_s=650.2 rate=0.02307/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:14:16-04:00 elapsed_s=695.5 rate=0.02301/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:15:01-04:00 elapsed_s=740.9 rate=0.02294/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:15:47-04:00 elapsed_s=786.3 rate=0.02289/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:16:32-04:00 elapsed_s=831.8 rate=0.02284/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:17:18-04:00 elapsed_s=877.2 rate=0.0228/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:18:03-04:00 elapsed_s=922.6 rate=0.02276/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:18:49-04:00 elapsed_s=968.1 rate=0.02272/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:19:34-04:00 elapsed_s=1013.4 rate=0.0227/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:20:19-04:00 elapsed_s=1058.7 rate=0.02267/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:21:05-04:00 elapsed_s=1104.1 rate=0.02264/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:21:50-04:00 elapsed_s=1149.6 rate=0.02262/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:22:36-04:00 elapsed_s=1195.0 rate=0.02259/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:23:21-04:00 elapsed_s=1240.5 rate=0.02257/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:24:06-04:00 elapsed_s=1285.8 rate=0.02255/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:24:52-04:00 elapsed_s=1331.2 rate=0.02254/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:25:37-04:00 elapsed_s=1376.6 rate=0.02252/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:26:22-04:00 elapsed_s=1422.0 rate=0.0225/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:27:08-04:00 elapsed_s=1467.5 rate=0.02249/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:27:53-04:00 elapsed_s=1512.9 rate=0.02247/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:28:39-04:00 elapsed_s=1558.4 rate=0.02246/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:29:24-04:00 elapsed_s=1604.0 rate=0.02244/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:30:10-04:00 elapsed_s=1649.4 rate=0.02243/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:30:55-04:00 elapsed_s=1694.9 rate=0.02242/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:31:41-04:00 elapsed_s=1740.3 rate=0.02241/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:32:26-04:00 elapsed_s=1785.8 rate=0.0224/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:33:12-04:00 elapsed_s=1831.2 rate=0.02239/s count=41 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:33:57-04:00 elapsed_s=1876.9 rate=0.02238/s count=42 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-21T04:34:16-04:00 start=2026-08-21T04:02:40-04:00 wall_s=1895.6 cpu_s=89832.0 peak_rss_mb=18781.4 mode=modp H=18
+H=18 p=65447 wall=1897.36 rss_kb=19232140
+event=start job=motley_par t=2026-08-21T04:34:19-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T04:35:21-04:00 elapsed_s=61.5 rate=0.03253/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:36:50-04:00 elapsed_s=150.7 rate=0.02654/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:37:36-04:00 elapsed_s=196.1 rate=0.0255/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:38:21-04:00 elapsed_s=241.4 rate=0.02485/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:39:06-04:00 elapsed_s=286.7 rate=0.02442/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:39:51-04:00 elapsed_s=332.0 rate=0.0241/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:40:37-04:00 elapsed_s=377.4 rate=0.02385/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:41:22-04:00 elapsed_s=422.8 rate=0.02365/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:42:08-04:00 elapsed_s=468.1 rate=0.0235/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:42:53-04:00 elapsed_s=513.6 rate=0.02336/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:43:38-04:00 elapsed_s=559.0 rate=0.02326/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:44:24-04:00 elapsed_s=604.5 rate=0.02316/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:45:09-04:00 elapsed_s=649.8 rate=0.02308/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:45:55-04:00 elapsed_s=695.2 rate=0.02302/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:46:40-04:00 elapsed_s=740.6 rate=0.02296/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:47:26-04:00 elapsed_s=786.1 rate=0.0229/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:48:11-04:00 elapsed_s=831.4 rate=0.02285/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:48:56-04:00 elapsed_s=876.6 rate=0.02282/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:49:41-04:00 elapsed_s=921.9 rate=0.02278/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:50:27-04:00 elapsed_s=967.4 rate=0.02274/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:51:12-04:00 elapsed_s=1012.8 rate=0.02271/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:51:58-04:00 elapsed_s=1058.1 rate=0.02268/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:52:43-04:00 elapsed_s=1103.4 rate=0.02266/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:53:28-04:00 elapsed_s=1148.8 rate=0.02263/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:54:14-04:00 elapsed_s=1194.0 rate=0.02261/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:54:59-04:00 elapsed_s=1239.3 rate=0.02259/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:55:44-04:00 elapsed_s=1284.7 rate=0.02257/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:56:30-04:00 elapsed_s=1330.3 rate=0.02255/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:57:15-04:00 elapsed_s=1375.8 rate=0.02253/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:58:01-04:00 elapsed_s=1421.3 rate=0.02251/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:58:46-04:00 elapsed_s=1466.7 rate=0.0225/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T04:59:32-04:00 elapsed_s=1512.1 rate=0.02248/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:00:17-04:00 elapsed_s=1557.5 rate=0.02247/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:01:03-04:00 elapsed_s=1603.0 rate=0.02246/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:01:48-04:00 elapsed_s=1648.5 rate=0.02244/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:02:33-04:00 elapsed_s=1694.0 rate=0.02243/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:03:19-04:00 elapsed_s=1739.3 rate=0.02242/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:04:04-04:00 elapsed_s=1784.9 rate=0.02241/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:04:50-04:00 elapsed_s=1830.3 rate=0.0224/s count=41 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:05:35-04:00 elapsed_s=1875.8 rate=0.02239/s count=42 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-21T05:05:54-04:00 start=2026-08-21T04:34:19-04:00 wall_s=1894.9 cpu_s=89615.1 peak_rss_mb=18688.0 mode=modp H=18
+H=18 p=65437 wall=1896.66 rss_kb=19136524
+event=start job=motley_par t=2026-08-21T05:05:58-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T05:07:00-04:00 elapsed_s=62.0 rate=0.03226/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:08:30-04:00 elapsed_s=151.7 rate=0.02637/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:09:15-04:00 elapsed_s=197.4 rate=0.02533/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:10:01-04:00 elapsed_s=243.2 rate=0.02467/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:10:47-04:00 elapsed_s=288.9 rate=0.02423/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:11:32-04:00 elapsed_s=334.5 rate=0.02391/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:12:18-04:00 elapsed_s=380.3 rate=0.02367/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:13:04-04:00 elapsed_s=425.8 rate=0.02348/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:13:49-04:00 elapsed_s=471.5 rate=0.02333/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:14:35-04:00 elapsed_s=517.3 rate=0.0232/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:15:21-04:00 elapsed_s=563.0 rate=0.02309/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:16:06-04:00 elapsed_s=608.7 rate=0.023/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:16:52-04:00 elapsed_s=654.4 rate=0.02292/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:17:38-04:00 elapsed_s=700.1 rate=0.02285/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:18:24-04:00 elapsed_s=745.7 rate=0.0228/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:19:09-04:00 elapsed_s=791.2 rate=0.02275/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:19:55-04:00 elapsed_s=836.7 rate=0.02271/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:20:40-04:00 elapsed_s=882.3 rate=0.02267/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:21:26-04:00 elapsed_s=927.7 rate=0.02264/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:22:11-04:00 elapsed_s=973.2 rate=0.02261/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:22:56-04:00 elapsed_s=1018.6 rate=0.02258/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:23:42-04:00 elapsed_s=1064.3 rate=0.02255/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:24:28-04:00 elapsed_s=1110.0 rate=0.02252/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:25:14-04:00 elapsed_s=1155.7 rate=0.0225/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:25:59-04:00 elapsed_s=1201.4 rate=0.02247/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:26:45-04:00 elapsed_s=1247.2 rate=0.02245/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:27:31-04:00 elapsed_s=1292.9 rate=0.02243/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:28:16-04:00 elapsed_s=1338.6 rate=0.02241/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:29:02-04:00 elapsed_s=1384.2 rate=0.0224/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:29:48-04:00 elapsed_s=1429.9 rate=0.02238/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:30:33-04:00 elapsed_s=1475.4 rate=0.02237/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:31:19-04:00 elapsed_s=1521.1 rate=0.02235/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:32:05-04:00 elapsed_s=1566.7 rate=0.02234/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:32:50-04:00 elapsed_s=1612.1 rate=0.02233/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:33:36-04:00 elapsed_s=1657.9 rate=0.02232/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:34:21-04:00 elapsed_s=1703.5 rate=0.02231/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:35:07-04:00 elapsed_s=1749.1 rate=0.0223/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:35:52-04:00 elapsed_s=1794.6 rate=0.02229/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:36:38-04:00 elapsed_s=1840.1 rate=0.02228/s count=41 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:37:23-04:00 elapsed_s=1885.6 rate=0.02227/s count=42 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-21T05:37:42-04:00 start=2026-08-21T05:05:58-04:00 wall_s=1904.7 cpu_s=89809.4 peak_rss_mb=18765.2 mode=modp H=18
+H=18 p=65423 wall=1906.39 rss_kb=19215584
+event=start job=motley_par t=2026-08-21T05:37:46-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T05:38:48-04:00 elapsed_s=61.9 rate=0.0323/s count=2 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:40:17-04:00 elapsed_s=151.5 rate=0.0264/s count=4 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:41:03-04:00 elapsed_s=197.0 rate=0.02539/s count=5 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:41:48-04:00 elapsed_s=242.5 rate=0.02474/s count=6 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:42:34-04:00 elapsed_s=288.1 rate=0.0243/s count=7 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:43:20-04:00 elapsed_s=333.6 rate=0.02398/s count=8 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:44:05-04:00 elapsed_s=379.1 rate=0.02374/s count=9 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:44:51-04:00 elapsed_s=424.8 rate=0.02354/s count=10 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:45:36-04:00 elapsed_s=470.1 rate=0.0234/s count=11 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:46:22-04:00 elapsed_s=515.6 rate=0.02327/s count=12 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:47:07-04:00 elapsed_s=561.0 rate=0.02317/s count=13 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:47:52-04:00 elapsed_s=606.3 rate=0.02309/s count=14 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:48:38-04:00 elapsed_s=651.7 rate=0.02302/s count=15 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:49:23-04:00 elapsed_s=697.1 rate=0.02295/s count=16 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:50:08-04:00 elapsed_s=742.4 rate=0.0229/s count=17 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:50:54-04:00 elapsed_s=787.7 rate=0.02285/s count=18 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:51:39-04:00 elapsed_s=833.0 rate=0.02281/s count=19 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:52:24-04:00 elapsed_s=878.3 rate=0.02277/s count=20 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:53:10-04:00 elapsed_s=923.6 rate=0.02274/s count=21 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:53:55-04:00 elapsed_s=969.1 rate=0.0227/s count=22 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:54:41-04:00 elapsed_s=1014.6 rate=0.02267/s count=23 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:55:26-04:00 elapsed_s=1060.0 rate=0.02264/s count=24 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:56:11-04:00 elapsed_s=1105.3 rate=0.02262/s count=25 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:56:56-04:00 elapsed_s=1150.5 rate=0.0226/s count=26 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:57:42-04:00 elapsed_s=1195.8 rate=0.02258/s count=27 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:58:27-04:00 elapsed_s=1241.2 rate=0.02256/s count=28 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:59:12-04:00 elapsed_s=1286.5 rate=0.02254/s count=29 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T05:59:58-04:00 elapsed_s=1331.8 rate=0.02253/s count=30 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:00:43-04:00 elapsed_s=1377.1 rate=0.02251/s count=31 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:01:28-04:00 elapsed_s=1422.5 rate=0.0225/s count=32 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:02:14-04:00 elapsed_s=1468.0 rate=0.02248/s count=33 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:02:59-04:00 elapsed_s=1513.4 rate=0.02247/s count=34 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:03:45-04:00 elapsed_s=1558.9 rate=0.02245/s count=35 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:04:30-04:00 elapsed_s=1604.3 rate=0.02244/s count=36 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:05:16-04:00 elapsed_s=1649.7 rate=0.02243/s count=37 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:06:01-04:00 elapsed_s=1694.9 rate=0.02242/s count=38 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:06:46-04:00 elapsed_s=1739.9 rate=0.02241/s count=39 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:07:31-04:00 elapsed_s=1785.1 rate=0.02241/s count=40 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:08:16-04:00 elapsed_s=1830.3 rate=0.0224/s count=41 modp H=18 states=72487711
+event=heartbeat job=motley_par t=2026-08-21T06:09:01-04:00 elapsed_s=1875.5 rate=0.02239/s count=42 modp H=18 states=72487711
+event=done job=motley_par t=2026-08-21T06:09:20-04:00 start=2026-08-21T05:37:46-04:00 wall_s=1894.4 cpu_s=89646.6 peak_rss_mb=18838.4 mode=modp H=18
+H=18 p=65413 wall=1896.11 rss_kb=19290556
+H=18 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T06:09:24-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+census regrow c=0 r=11 want=50034
+census regrow c=0 r=12 want=125454
+census regrow c=0 r=13 want=342082
+census regrow c=0 r=13 want=684164
+census regrow c=0 r=14 want=973346
+census regrow c=0 r=14 want=1946692
+census regrow c=0 r=15 want=2838458
+census regrow c=0 r=15 want=5676916
+census regrow c=0 r=16 want=8422258
+census regrow c=0 r=16 want=16844516
+census regrow c=1 r=0 want=25352088
+event=heartbeat job=motley_par t=2026-08-21T06:10:09-04:00 elapsed_s=45.3 rate=0.3531/s count=16 census H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:10:56-04:00 elapsed_s=92.3 rate=0.3573/s count=33 census H=17 states=23681423
+event=done job=motley_par t=2026-08-21T06:11:21-04:00 start=2026-08-21T06:09:24-04:00 wall_s=117.2 cpu_s=9314.3 peak_rss_mb=2496.4 mode=census H=17
+census H=17 N=41 wall=117.19 rss_kb=2556300
+event=start job=motley_par t=2026-08-21T06:11:21-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T06:12:10-04:00 elapsed_s=48.6 rate=0.08234/s count=4 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:12:57-04:00 elapsed_s=96.3 rate=0.07266/s count=7 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:13:45-04:00 elapsed_s=144.2 rate=0.06937/s count=10 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:14:33-04:00 elapsed_s=192.0 rate=0.06772/s count=13 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:15:21-04:00 elapsed_s=239.9 rate=0.0667/s count=16 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:16:09-04:00 elapsed_s=287.6 rate=0.06607/s count=19 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:16:56-04:00 elapsed_s=335.2 rate=0.06564/s count=22 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:17:44-04:00 elapsed_s=382.8 rate=0.06531/s count=25 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:18:31-04:00 elapsed_s=430.4 rate=0.06505/s count=28 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:19:19-04:00 elapsed_s=478.0 rate=0.06485/s count=31 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:20:07-04:00 elapsed_s=525.6 rate=0.06469/s count=34 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:20:54-04:00 elapsed_s=573.3 rate=0.06454/s count=37 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:21:42-04:00 elapsed_s=620.9 rate=0.06442/s count=40 modp H=17 states=23681423
+event=done job=motley_par t=2026-08-21T06:22:21-04:00 start=2026-08-21T06:11:21-04:00 wall_s=660.0 cpu_s=28760.8 peak_rss_mb=5984.3 mode=modp H=17
+H=17 p=65521 wall=660.49 rss_kb=6127904
+event=start job=motley_par t=2026-08-21T06:22:22-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T06:23:10-04:00 elapsed_s=48.0 rate=0.08328/s count=4 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:23:57-04:00 elapsed_s=95.4 rate=0.07336/s count=7 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:24:45-04:00 elapsed_s=143.0 rate=0.06994/s count=10 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:25:32-04:00 elapsed_s=190.4 rate=0.06826/s count=13 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:26:20-04:00 elapsed_s=238.0 rate=0.06722/s count=16 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:27:08-04:00 elapsed_s=285.6 rate=0.06652/s count=19 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:27:55-04:00 elapsed_s=333.1 rate=0.06604/s count=22 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:28:42-04:00 elapsed_s=380.4 rate=0.06571/s count=25 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:29:30-04:00 elapsed_s=427.7 rate=0.06546/s count=28 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:30:17-04:00 elapsed_s=475.2 rate=0.06524/s count=31 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:31:05-04:00 elapsed_s=522.8 rate=0.06503/s count=34 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:31:52-04:00 elapsed_s=570.2 rate=0.06489/s count=37 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:32:40-04:00 elapsed_s=617.7 rate=0.06475/s count=40 modp H=17 states=23681423
+event=done job=motley_par t=2026-08-21T06:33:19-04:00 start=2026-08-21T06:22:22-04:00 wall_s=656.8 cpu_s=28716.0 peak_rss_mb=6031.9 mode=modp H=17
+H=17 p=65519 wall=657.33 rss_kb=6176704
+event=start job=motley_par t=2026-08-21T06:33:20-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T06:34:08-04:00 elapsed_s=48.1 rate=0.08309/s count=4 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:34:55-04:00 elapsed_s=95.5 rate=0.07328/s count=7 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:35:43-04:00 elapsed_s=143.0 rate=0.06991/s count=10 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:36:30-04:00 elapsed_s=190.4 rate=0.06827/s count=13 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:37:18-04:00 elapsed_s=237.9 rate=0.06727/s count=16 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:38:05-04:00 elapsed_s=285.2 rate=0.06663/s count=19 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:38:52-04:00 elapsed_s=332.5 rate=0.06616/s count=22 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:39:40-04:00 elapsed_s=379.9 rate=0.06581/s count=25 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:40:27-04:00 elapsed_s=427.2 rate=0.06554/s count=28 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:41:15-04:00 elapsed_s=474.7 rate=0.06531/s count=31 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:42:02-04:00 elapsed_s=522.1 rate=0.06512/s count=34 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:42:49-04:00 elapsed_s=569.5 rate=0.06497/s count=37 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:43:37-04:00 elapsed_s=616.8 rate=0.06485/s count=40 modp H=17 states=23681423
+event=done job=motley_par t=2026-08-21T06:44:16-04:00 start=2026-08-21T06:33:20-04:00 wall_s=655.7 cpu_s=28677.7 peak_rss_mb=5972.7 mode=modp H=17
+H=17 p=65497 wall=656.24 rss_kb=6116004
+event=start job=motley_par t=2026-08-21T06:44:17-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T06:45:05-04:00 elapsed_s=48.5 rate=0.08242/s count=4 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:45:53-04:00 elapsed_s=96.1 rate=0.07281/s count=7 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:46:41-04:00 elapsed_s=143.8 rate=0.06952/s count=10 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:47:28-04:00 elapsed_s=191.5 rate=0.06787/s count=13 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:48:16-04:00 elapsed_s=239.1 rate=0.06691/s count=16 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:49:03-04:00 elapsed_s=286.6 rate=0.06629/s count=19 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:49:51-04:00 elapsed_s=334.3 rate=0.0658/s count=22 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:50:39-04:00 elapsed_s=382.2 rate=0.06542/s count=25 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:51:26-04:00 elapsed_s=429.7 rate=0.06516/s count=28 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:52:14-04:00 elapsed_s=477.4 rate=0.06494/s count=31 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:53:02-04:00 elapsed_s=525.0 rate=0.06476/s count=34 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:53:49-04:00 elapsed_s=572.6 rate=0.06461/s count=37 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:54:37-04:00 elapsed_s=620.2 rate=0.06449/s count=40 modp H=17 states=23681423
+event=done job=motley_par t=2026-08-21T06:55:16-04:00 start=2026-08-21T06:44:17-04:00 wall_s=659.2 cpu_s=28661.1 peak_rss_mb=5996.0 mode=modp H=17
+H=17 p=65479 wall=659.70 rss_kb=6139892
+event=start job=motley_par t=2026-08-21T06:55:17-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T06:56:05-04:00 elapsed_s=48.1 rate=0.08314/s count=4 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:56:52-04:00 elapsed_s=95.4 rate=0.07336/s count=7 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:57:40-04:00 elapsed_s=142.8 rate=0.07002/s count=10 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:58:27-04:00 elapsed_s=190.2 rate=0.06836/s count=13 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T06:59:15-04:00 elapsed_s=237.6 rate=0.06733/s count=16 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:00:02-04:00 elapsed_s=285.1 rate=0.06664/s count=19 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:00:49-04:00 elapsed_s=332.4 rate=0.06619/s count=22 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:01:37-04:00 elapsed_s=379.8 rate=0.06583/s count=25 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:02:24-04:00 elapsed_s=427.2 rate=0.06554/s count=28 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:03:12-04:00 elapsed_s=474.7 rate=0.0653/s count=31 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:03:59-04:00 elapsed_s=521.9 rate=0.06514/s count=34 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:04:46-04:00 elapsed_s=569.3 rate=0.06499/s count=37 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:05:34-04:00 elapsed_s=616.7 rate=0.06486/s count=40 modp H=17 states=23681423
+event=done job=motley_par t=2026-08-21T07:06:12-04:00 start=2026-08-21T06:55:17-04:00 wall_s=655.4 cpu_s=28694.6 peak_rss_mb=6005.8 mode=modp H=17
+H=17 p=65449 wall=655.92 rss_kb=6149916
+event=start job=motley_par t=2026-08-21T07:06:14-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T07:07:02-04:00 elapsed_s=48.0 rate=0.08333/s count=4 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:07:49-04:00 elapsed_s=95.2 rate=0.07352/s count=7 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:08:36-04:00 elapsed_s=142.4 rate=0.0702/s count=10 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:09:23-04:00 elapsed_s=189.8 rate=0.06851/s count=13 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:10:10-04:00 elapsed_s=236.9 rate=0.06753/s count=16 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:10:58-04:00 elapsed_s=284.1 rate=0.06687/s count=19 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:11:45-04:00 elapsed_s=331.3 rate=0.0664/s count=22 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:12:32-04:00 elapsed_s=378.7 rate=0.06601/s count=25 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:13:20-04:00 elapsed_s=426.1 rate=0.06571/s count=28 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:14:07-04:00 elapsed_s=473.5 rate=0.06547/s count=31 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:14:55-04:00 elapsed_s=521.0 rate=0.06526/s count=34 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:15:42-04:00 elapsed_s=568.3 rate=0.0651/s count=37 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:16:29-04:00 elapsed_s=615.7 rate=0.06497/s count=40 modp H=17 states=23681423
+event=done job=motley_par t=2026-08-21T07:17:08-04:00 start=2026-08-21T07:06:14-04:00 wall_s=654.4 cpu_s=28600.9 peak_rss_mb=5992.0 mode=modp H=17
+H=17 p=65447 wall=654.90 rss_kb=6135792
+event=start job=motley_par t=2026-08-21T07:17:09-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T07:17:57-04:00 elapsed_s=48.4 rate=0.08263/s count=4 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:18:45-04:00 elapsed_s=96.1 rate=0.07288/s count=7 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:19:33-04:00 elapsed_s=143.7 rate=0.06959/s count=10 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:20:20-04:00 elapsed_s=191.2 rate=0.06799/s count=13 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:21:08-04:00 elapsed_s=239.0 rate=0.06695/s count=16 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:21:56-04:00 elapsed_s=286.7 rate=0.06627/s count=19 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:22:43-04:00 elapsed_s=334.4 rate=0.06579/s count=22 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:23:31-04:00 elapsed_s=381.9 rate=0.06546/s count=25 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:24:18-04:00 elapsed_s=429.5 rate=0.0652/s count=28 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:25:06-04:00 elapsed_s=477.2 rate=0.06496/s count=31 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:25:54-04:00 elapsed_s=524.8 rate=0.06478/s count=34 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:26:42-04:00 elapsed_s=572.6 rate=0.06462/s count=37 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:27:29-04:00 elapsed_s=620.4 rate=0.06448/s count=40 modp H=17 states=23681423
+event=done job=motley_par t=2026-08-21T07:28:09-04:00 start=2026-08-21T07:17:09-04:00 wall_s=659.6 cpu_s=28745.0 peak_rss_mb=6007.1 mode=modp H=17
+H=17 p=65437 wall=660.13 rss_kb=6151304
+event=start job=motley_par t=2026-08-21T07:28:10-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T07:28:58-04:00 elapsed_s=48.3 rate=0.08279/s count=4 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:29:46-04:00 elapsed_s=95.9 rate=0.07299/s count=7 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:30:33-04:00 elapsed_s=143.3 rate=0.06978/s count=10 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:31:21-04:00 elapsed_s=190.8 rate=0.06812/s count=13 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:32:08-04:00 elapsed_s=238.2 rate=0.06718/s count=16 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:32:56-04:00 elapsed_s=285.9 rate=0.06646/s count=19 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:33:43-04:00 elapsed_s=333.6 rate=0.06595/s count=22 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:34:31-04:00 elapsed_s=381.1 rate=0.0656/s count=25 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:35:18-04:00 elapsed_s=428.7 rate=0.06532/s count=28 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:36:06-04:00 elapsed_s=476.1 rate=0.06511/s count=31 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:36:53-04:00 elapsed_s=523.6 rate=0.06494/s count=34 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:37:41-04:00 elapsed_s=571.1 rate=0.06479/s count=37 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:38:28-04:00 elapsed_s=618.7 rate=0.06465/s count=40 modp H=17 states=23681423
+event=done job=motley_par t=2026-08-21T07:39:07-04:00 start=2026-08-21T07:28:10-04:00 wall_s=657.7 cpu_s=28676.3 peak_rss_mb=6049.9 mode=modp H=17
+H=17 p=65423 wall=658.20 rss_kb=6195132
+event=start job=motley_par t=2026-08-21T07:39:09-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T07:39:57-04:00 elapsed_s=48.2 rate=0.08306/s count=4 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:40:44-04:00 elapsed_s=95.7 rate=0.07316/s count=7 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:41:32-04:00 elapsed_s=143.1 rate=0.06986/s count=10 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:42:19-04:00 elapsed_s=190.6 rate=0.06822/s count=13 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:43:07-04:00 elapsed_s=238.0 rate=0.06723/s count=16 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:43:54-04:00 elapsed_s=285.3 rate=0.06658/s count=19 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:44:41-04:00 elapsed_s=332.7 rate=0.06612/s count=22 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:45:29-04:00 elapsed_s=380.1 rate=0.06578/s count=25 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:46:16-04:00 elapsed_s=427.4 rate=0.06551/s count=28 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:47:03-04:00 elapsed_s=474.7 rate=0.06531/s count=31 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:47:51-04:00 elapsed_s=522.0 rate=0.06513/s count=34 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:48:38-04:00 elapsed_s=569.3 rate=0.06499/s count=37 modp H=17 states=23681423
+event=heartbeat job=motley_par t=2026-08-21T07:49:25-04:00 elapsed_s=616.9 rate=0.06484/s count=40 modp H=17 states=23681423
+event=done job=motley_par t=2026-08-21T07:50:04-04:00 start=2026-08-21T07:39:09-04:00 wall_s=655.8 cpu_s=28683.1 peak_rss_mb=6024.4 mode=modp H=17
+H=17 p=65413 wall=656.33 rss_kb=6168948
+H=17 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T07:50:05-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+census regrow c=0 r=11 want=50034
+census regrow c=0 r=12 want=125454
+census regrow c=0 r=13 want=342082
+census regrow c=0 r=13 want=684164
+census regrow c=0 r=14 want=973346
+census regrow c=0 r=14 want=1946692
+census regrow c=0 r=15 want=2838458
+census regrow c=0 r=15 want=5676916
+census regrow c=1 r=0 want=8422258
+event=done job=motley_par t=2026-08-21T07:50:49-04:00 start=2026-08-21T07:50:05-04:00 wall_s=43.7 cpu_s=3410.3 peak_rss_mb=760.8 mode=census H=16
+census H=16 N=41 wall=43.74 rss_kb=779076
+event=start job=motley_par t=2026-08-21T07:50:49-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T07:51:36-04:00 elapsed_s=47.0 rate=0.2129/s count=10 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T07:52:21-04:00 elapsed_s=92.1 rate=0.2063/s count=19 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T07:53:07-04:00 elapsed_s=137.3 rate=0.2039/s count=28 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T07:53:52-04:00 elapsed_s=182.4 rate=0.2029/s count=37 modp H=16 states=7832667
+event=done job=motley_par t=2026-08-21T07:54:19-04:00 start=2026-08-21T07:50:49-04:00 wall_s=209.7 cpu_s=8662.6 peak_rss_mb=2105.7 mode=modp H=16
+H=16 p=65521 wall=209.87 rss_kb=2156268
+event=start job=motley_par t=2026-08-21T07:54:19-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T07:55:06-04:00 elapsed_s=46.7 rate=0.2142/s count=10 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T07:55:56-04:00 elapsed_s=96.5 rate=0.2072/s count=20 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T07:56:46-04:00 elapsed_s=146.3 rate=0.2051/s count=30 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T07:57:31-04:00 elapsed_s=191.4 rate=0.2038/s count=39 modp H=16 states=7832667
+event=done job=motley_par t=2026-08-21T07:57:48-04:00 start=2026-08-21T07:54:19-04:00 wall_s=208.9 cpu_s=8625.6 peak_rss_mb=2096.3 mode=modp H=16
+H=16 p=65519 wall=209.06 rss_kb=2146572
+event=start job=motley_par t=2026-08-21T07:57:49-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T07:58:35-04:00 elapsed_s=46.7 rate=0.2143/s count=10 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T07:59:25-04:00 elapsed_s=96.3 rate=0.2076/s count=20 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:00:10-04:00 elapsed_s=141.3 rate=0.2052/s count=29 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:01:00-04:00 elapsed_s=191.3 rate=0.2039/s count=39 modp H=16 states=7832667
+event=done job=motley_par t=2026-08-21T08:01:17-04:00 start=2026-08-21T07:57:49-04:00 wall_s=208.7 cpu_s=8649.5 peak_rss_mb=2104.1 mode=modp H=16
+H=16 p=65497 wall=208.83 rss_kb=2154548
+event=start job=motley_par t=2026-08-21T08:01:18-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:02:04-04:00 elapsed_s=46.7 rate=0.2141/s count=10 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:02:54-04:00 elapsed_s=96.4 rate=0.2074/s count=20 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:03:44-04:00 elapsed_s=146.3 rate=0.2051/s count=30 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:04:34-04:00 elapsed_s=196.1 rate=0.204/s count=40 modp H=16 states=7832667
+event=done job=motley_par t=2026-08-21T08:04:46-04:00 start=2026-08-21T08:01:18-04:00 wall_s=208.5 cpu_s=8642.7 peak_rss_mb=2097.6 mode=modp H=16
+H=16 p=65479 wall=208.71 rss_kb=2147960
+event=start job=motley_par t=2026-08-21T08:04:47-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:05:33-04:00 elapsed_s=46.5 rate=0.2152/s count=10 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:06:23-04:00 elapsed_s=96.4 rate=0.2075/s count=20 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:07:08-04:00 elapsed_s=141.5 rate=0.205/s count=29 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:07:53-04:00 elapsed_s=186.8 rate=0.2034/s count=38 modp H=16 states=7832667
+event=done job=motley_par t=2026-08-21T08:08:16-04:00 start=2026-08-21T08:04:47-04:00 wall_s=209.3 cpu_s=8631.9 peak_rss_mb=2100.1 mode=modp H=16
+H=16 p=65449 wall=209.45 rss_kb=2150468
+event=start job=motley_par t=2026-08-21T08:08:16-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:09:03-04:00 elapsed_s=46.6 rate=0.2147/s count=10 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:09:53-04:00 elapsed_s=96.4 rate=0.2074/s count=20 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:10:43-04:00 elapsed_s=146.3 rate=0.205/s count=30 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:11:32-04:00 elapsed_s=196.2 rate=0.2039/s count=40 modp H=16 states=7832667
+event=done job=motley_par t=2026-08-21T08:11:45-04:00 start=2026-08-21T08:08:16-04:00 wall_s=208.6 cpu_s=8658.1 peak_rss_mb=2102.1 mode=modp H=16
+H=16 p=65447 wall=208.76 rss_kb=2152508
+event=start job=motley_par t=2026-08-21T08:11:45-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:12:32-04:00 elapsed_s=46.7 rate=0.2141/s count=10 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:13:17-04:00 elapsed_s=91.8 rate=0.207/s count=19 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:14:02-04:00 elapsed_s=137.0 rate=0.2044/s count=28 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:14:48-04:00 elapsed_s=182.4 rate=0.2029/s count=37 modp H=16 states=7832667
+event=done job=motley_par t=2026-08-21T08:15:15-04:00 start=2026-08-21T08:11:45-04:00 wall_s=210.0 cpu_s=8672.1 peak_rss_mb=2106.4 mode=modp H=16
+H=16 p=65437 wall=210.13 rss_kb=2157000
+event=start job=motley_par t=2026-08-21T08:15:16-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:16:02-04:00 elapsed_s=46.8 rate=0.2138/s count=10 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:16:47-04:00 elapsed_s=91.9 rate=0.2066/s count=19 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:17:33-04:00 elapsed_s=137.2 rate=0.2041/s count=28 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:18:18-04:00 elapsed_s=182.4 rate=0.2028/s count=37 modp H=16 states=7832667
+event=done job=motley_par t=2026-08-21T08:18:45-04:00 start=2026-08-21T08:15:16-04:00 wall_s=209.9 cpu_s=8659.3 peak_rss_mb=2103.7 mode=modp H=16
+H=16 p=65423 wall=210.06 rss_kb=2154192
+event=start job=motley_par t=2026-08-21T08:18:46-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:19:32-04:00 elapsed_s=46.6 rate=0.2146/s count=10 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:20:22-04:00 elapsed_s=96.5 rate=0.2072/s count=20 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:21:12-04:00 elapsed_s=146.5 rate=0.2048/s count=30 modp H=16 states=7832667
+event=heartbeat job=motley_par t=2026-08-21T08:21:57-04:00 elapsed_s=191.5 rate=0.2036/s count=39 modp H=16 states=7832667
+event=done job=motley_par t=2026-08-21T08:22:15-04:00 start=2026-08-21T08:18:46-04:00 wall_s=209.0 cpu_s=8668.4 peak_rss_mb=2112.6 mode=modp H=16
+H=16 p=65413 wall=209.19 rss_kb=2163328
+H=16 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:22:15-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+census regrow c=0 r=11 want=50034
+census regrow c=0 r=12 want=125454
+census regrow c=0 r=13 want=342082
+census regrow c=0 r=13 want=684164
+census regrow c=0 r=14 want=973346
+census regrow c=0 r=14 want=1946692
+census regrow c=1 r=0 want=2838458
+event=done job=motley_par t=2026-08-21T08:22:27-04:00 start=2026-08-21T08:22:15-04:00 wall_s=12.3 cpu_s=910.7 peak_rss_mb=249.8 mode=census H=15
+census H=15 N=41 wall=12.28 rss_kb=255780
+event=start job=motley_par t=2026-08-21T08:22:27-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:23:13-04:00 elapsed_s=46.0 rate=0.6086/s count=28 modp H=15 states=2624197
+event=done job=motley_par t=2026-08-21T08:23:38-04:00 start=2026-08-21T08:22:27-04:00 wall_s=70.5 cpu_s=2758.3 peak_rss_mb=732.6 mode=modp H=15
+H=15 p=65521 wall=70.56 rss_kb=750208
+event=start job=motley_par t=2026-08-21T08:23:38-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:24:24-04:00 elapsed_s=46.2 rate=0.6055/s count=28 modp H=15 states=2624197
+event=done job=motley_par t=2026-08-21T08:24:49-04:00 start=2026-08-21T08:23:38-04:00 wall_s=71.0 cpu_s=2761.3 peak_rss_mb=725.2 mode=modp H=15
+H=15 p=65519 wall=71.05 rss_kb=742616
+event=start job=motley_par t=2026-08-21T08:24:49-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:25:35-04:00 elapsed_s=46.1 rate=0.6078/s count=28 modp H=15 states=2624197
+event=done job=motley_par t=2026-08-21T08:26:00-04:00 start=2026-08-21T08:24:49-04:00 wall_s=70.7 cpu_s=2767.7 peak_rss_mb=722.8 mode=modp H=15
+H=15 p=65497 wall=70.78 rss_kb=740196
+event=start job=motley_par t=2026-08-21T08:26:00-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:26:46-04:00 elapsed_s=46.1 rate=0.6071/s count=28 modp H=15 states=2624197
+event=done job=motley_par t=2026-08-21T08:27:11-04:00 start=2026-08-21T08:26:00-04:00 wall_s=70.6 cpu_s=2764.7 peak_rss_mb=728.0 mode=modp H=15
+H=15 p=65479 wall=70.68 rss_kb=745444
+event=start job=motley_par t=2026-08-21T08:27:11-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:27:57-04:00 elapsed_s=45.9 rate=0.6095/s count=28 modp H=15 states=2624197
+event=done job=motley_par t=2026-08-21T08:28:22-04:00 start=2026-08-21T08:27:11-04:00 wall_s=70.6 cpu_s=2765.5 peak_rss_mb=733.5 mode=modp H=15
+H=15 p=65449 wall=70.65 rss_kb=751148
+event=start job=motley_par t=2026-08-21T08:28:22-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:29:08-04:00 elapsed_s=46.1 rate=0.6067/s count=28 modp H=15 states=2624197
+event=done job=motley_par t=2026-08-21T08:29:32-04:00 start=2026-08-21T08:28:22-04:00 wall_s=70.8 cpu_s=2751.5 peak_rss_mb=724.3 mode=modp H=15
+H=15 p=65447 wall=70.83 rss_kb=741648
+event=start job=motley_par t=2026-08-21T08:29:33-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:30:19-04:00 elapsed_s=46.2 rate=0.6067/s count=28 modp H=15 states=2624197
+event=done job=motley_par t=2026-08-21T08:30:43-04:00 start=2026-08-21T08:29:33-04:00 wall_s=70.6 cpu_s=2764.3 peak_rss_mb=722.4 mode=modp H=15
+H=15 p=65437 wall=70.64 rss_kb=739716
+event=start job=motley_par t=2026-08-21T08:30:43-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:31:29-04:00 elapsed_s=46.1 rate=0.6077/s count=28 modp H=15 states=2624197
+event=done job=motley_par t=2026-08-21T08:31:54-04:00 start=2026-08-21T08:30:43-04:00 wall_s=70.7 cpu_s=2757.8 peak_rss_mb=722.8 mode=modp H=15
+H=15 p=65423 wall=70.72 rss_kb=740112
+event=start job=motley_par t=2026-08-21T08:31:54-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=heartbeat job=motley_par t=2026-08-21T08:32:40-04:00 elapsed_s=46.1 rate=0.6078/s count=28 modp H=15 states=2624197
+event=done job=motley_par t=2026-08-21T08:33:05-04:00 start=2026-08-21T08:31:54-04:00 wall_s=70.8 cpu_s=2767.5 peak_rss_mb=723.7 mode=modp H=15
+H=15 p=65413 wall=70.82 rss_kb=741028
+H=15 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:33:05-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+census regrow c=0 r=11 want=50034
+census regrow c=0 r=12 want=125454
+census regrow c=0 r=13 want=342082
+census regrow c=0 r=13 want=684164
+census regrow c=1 r=0 want=973346
+event=done job=motley_par t=2026-08-21T08:33:10-04:00 start=2026-08-21T08:33:05-04:00 wall_s=4.6 cpu_s=291.0 peak_rss_mb=82.6 mode=census H=14
+census H=14 N=41 wall=4.55 rss_kb=84628
+event=start job=motley_par t=2026-08-21T08:33:10-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:33:35-04:00 start=2026-08-21T08:33:10-04:00 wall_s=25.6 cpu_s=967.1 peak_rss_mb=282.9 mode=modp H=14
+H=14 p=65521 wall=25.64 rss_kb=289740
+event=start job=motley_par t=2026-08-21T08:33:35-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:34:01-04:00 start=2026-08-21T08:33:35-04:00 wall_s=25.4 cpu_s=958.3 peak_rss_mb=282.2 mode=modp H=14
+H=14 p=65519 wall=25.44 rss_kb=288996
+event=start job=motley_par t=2026-08-21T08:34:01-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:34:26-04:00 start=2026-08-21T08:34:01-04:00 wall_s=25.6 cpu_s=960.0 peak_rss_mb=282.2 mode=modp H=14
+H=14 p=65497 wall=25.64 rss_kb=288936
+event=start job=motley_par t=2026-08-21T08:34:26-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:34:52-04:00 start=2026-08-21T08:34:26-04:00 wall_s=25.2 cpu_s=939.9 peak_rss_mb=284.4 mode=modp H=14
+H=14 p=65479 wall=25.19 rss_kb=291228
+event=start job=motley_par t=2026-08-21T08:34:52-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:35:17-04:00 start=2026-08-21T08:34:52-04:00 wall_s=25.1 cpu_s=943.3 peak_rss_mb=283.3 mode=modp H=14
+H=14 p=65449 wall=25.16 rss_kb=290116
+event=start job=motley_par t=2026-08-21T08:35:17-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:35:42-04:00 start=2026-08-21T08:35:17-04:00 wall_s=25.4 cpu_s=959.6 peak_rss_mb=286.1 mode=modp H=14
+H=14 p=65447 wall=25.39 rss_kb=292988
+event=start job=motley_par t=2026-08-21T08:35:42-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:36:08-04:00 start=2026-08-21T08:35:42-04:00 wall_s=25.5 cpu_s=954.1 peak_rss_mb=285.2 mode=modp H=14
+H=14 p=65437 wall=25.50 rss_kb=292028
+event=start job=motley_par t=2026-08-21T08:36:08-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:36:33-04:00 start=2026-08-21T08:36:08-04:00 wall_s=25.4 cpu_s=951.0 peak_rss_mb=281.7 mode=modp H=14
+H=14 p=65423 wall=25.43 rss_kb=288444
+event=start job=motley_par t=2026-08-21T08:36:33-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:36:59-04:00 start=2026-08-21T08:36:33-04:00 wall_s=25.3 cpu_s=942.4 peak_rss_mb=281.5 mode=modp H=14
+H=14 p=65413 wall=25.34 rss_kb=288272
+H=14 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:36:59-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+census regrow c=0 r=11 want=50034
+census regrow c=0 r=12 want=125454
+census regrow c=1 r=0 want=342082
+event=done job=motley_par t=2026-08-21T08:37:01-04:00 start=2026-08-21T08:36:59-04:00 wall_s=2.6 cpu_s=156.6 peak_rss_mb=20.9 mode=census H=13
+census H=13 N=41 wall=2.59 rss_kb=21372
+event=start job=motley_par t=2026-08-21T08:37:01-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:37:16-04:00 start=2026-08-21T08:37:01-04:00 wall_s=14.2 cpu_s=575.2 peak_rss_mb=147.2 mode=modp H=13
+H=13 p=65521 wall=14.24 rss_kb=150696
+event=start job=motley_par t=2026-08-21T08:37:16-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:37:30-04:00 start=2026-08-21T08:37:16-04:00 wall_s=14.2 cpu_s=575.7 peak_rss_mb=145.8 mode=modp H=13
+H=13 p=65519 wall=14.26 rss_kb=149336
+event=start job=motley_par t=2026-08-21T08:37:30-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:37:44-04:00 start=2026-08-21T08:37:30-04:00 wall_s=14.3 cpu_s=576.7 peak_rss_mb=145.9 mode=modp H=13
+H=13 p=65497 wall=14.31 rss_kb=149412
+event=start job=motley_par t=2026-08-21T08:37:44-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:37:58-04:00 start=2026-08-21T08:37:44-04:00 wall_s=14.2 cpu_s=579.2 peak_rss_mb=146.3 mode=modp H=13
+H=13 p=65479 wall=14.19 rss_kb=149844
+event=start job=motley_par t=2026-08-21T08:37:58-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:38:13-04:00 start=2026-08-21T08:37:58-04:00 wall_s=14.4 cpu_s=580.4 peak_rss_mb=144.3 mode=modp H=13
+H=13 p=65449 wall=14.42 rss_kb=147768
+event=start job=motley_par t=2026-08-21T08:38:13-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:38:27-04:00 start=2026-08-21T08:38:13-04:00 wall_s=14.2 cpu_s=575.0 peak_rss_mb=143.7 mode=modp H=13
+H=13 p=65447 wall=14.18 rss_kb=147144
+event=start job=motley_par t=2026-08-21T08:38:27-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:38:41-04:00 start=2026-08-21T08:38:27-04:00 wall_s=14.2 cpu_s=580.1 peak_rss_mb=141.7 mode=modp H=13
+H=13 p=65437 wall=14.22 rss_kb=145100
+event=start job=motley_par t=2026-08-21T08:38:41-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:38:56-04:00 start=2026-08-21T08:38:41-04:00 wall_s=14.2 cpu_s=579.6 peak_rss_mb=148.1 mode=modp H=13
+H=13 p=65423 wall=14.24 rss_kb=151604
+event=start job=motley_par t=2026-08-21T08:38:56-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:39:10-04:00 start=2026-08-21T08:38:56-04:00 wall_s=14.2 cpu_s=577.1 peak_rss_mb=144.3 mode=modp H=13
+H=13 p=65413 wall=14.21 rss_kb=147748
+H=13 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:39:10-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+census regrow c=0 r=11 want=50034
+census regrow c=1 r=0 want=125454
+event=done job=motley_par t=2026-08-21T08:39:13-04:00 start=2026-08-21T08:39:10-04:00 wall_s=3.4 cpu_s=171.8 peak_rss_mb=8.2 mode=census H=12
+census H=12 N=41 wall=3.37 rss_kb=8404
+event=start job=motley_par t=2026-08-21T08:39:13-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:39:22-04:00 start=2026-08-21T08:39:13-04:00 wall_s=9.2 cpu_s=269.5 peak_rss_mb=64.5 mode=modp H=12
+H=12 p=65521 wall=9.18 rss_kb=66084
+event=start job=motley_par t=2026-08-21T08:39:22-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:39:32-04:00 start=2026-08-21T08:39:22-04:00 wall_s=9.2 cpu_s=267.7 peak_rss_mb=64.3 mode=modp H=12
+H=12 p=65519 wall=9.25 rss_kb=65832
+event=start job=motley_par t=2026-08-21T08:39:32-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:39:41-04:00 start=2026-08-21T08:39:32-04:00 wall_s=9.1 cpu_s=270.2 peak_rss_mb=67.3 mode=modp H=12
+H=12 p=65497 wall=9.07 rss_kb=68940
+event=start job=motley_par t=2026-08-21T08:39:41-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:39:50-04:00 start=2026-08-21T08:39:41-04:00 wall_s=9.0 cpu_s=269.8 peak_rss_mb=63.7 mode=modp H=12
+H=12 p=65479 wall=9.04 rss_kb=65244
+event=start job=motley_par t=2026-08-21T08:39:50-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:39:59-04:00 start=2026-08-21T08:39:50-04:00 wall_s=8.9 cpu_s=267.5 peak_rss_mb=63.5 mode=modp H=12
+H=12 p=65449 wall=8.95 rss_kb=65068
+event=start job=motley_par t=2026-08-21T08:39:59-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:40:08-04:00 start=2026-08-21T08:39:59-04:00 wall_s=9.2 cpu_s=271.7 peak_rss_mb=64.9 mode=modp H=12
+H=12 p=65447 wall=9.23 rss_kb=66452
+event=start job=motley_par t=2026-08-21T08:40:08-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:40:17-04:00 start=2026-08-21T08:40:08-04:00 wall_s=8.8 cpu_s=264.8 peak_rss_mb=65.3 mode=modp H=12
+H=12 p=65437 wall=8.85 rss_kb=66840
+event=start job=motley_par t=2026-08-21T08:40:17-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:40:26-04:00 start=2026-08-21T08:40:17-04:00 wall_s=9.2 cpu_s=269.6 peak_rss_mb=63.9 mode=modp H=12
+H=12 p=65423 wall=9.23 rss_kb=65460
+event=start job=motley_par t=2026-08-21T08:40:26-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:40:35-04:00 start=2026-08-21T08:40:26-04:00 wall_s=9.1 cpu_s=266.0 peak_rss_mb=69.5 mode=modp H=12
+H=12 p=65413 wall=9.13 rss_kb=71196
+H=12 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:40:35-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:40:38-04:00 start=2026-08-21T08:40:35-04:00 wall_s=2.8 cpu_s=136.6 peak_rss_mb=3.2 mode=census H=11
+census H=11 N=41 wall=2.81 rss_kb=3236
+event=start job=motley_par t=2026-08-21T08:40:38-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:40:45-04:00 start=2026-08-21T08:40:38-04:00 wall_s=6.9 cpu_s=185.9 peak_rss_mb=45.8 mode=modp H=11
+H=11 p=65521 wall=6.93 rss_kb=46892
+event=start job=motley_par t=2026-08-21T08:40:45-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:40:52-04:00 start=2026-08-21T08:40:45-04:00 wall_s=6.7 cpu_s=175.6 peak_rss_mb=45.0 mode=modp H=11
+H=11 p=65519 wall=6.75 rss_kb=46036
+event=start job=motley_par t=2026-08-21T08:40:52-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:40:59-04:00 start=2026-08-21T08:40:52-04:00 wall_s=6.9 cpu_s=184.7 peak_rss_mb=47.8 mode=modp H=11
+H=11 p=65497 wall=6.90 rss_kb=48940
+event=start job=motley_par t=2026-08-21T08:40:59-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:41:05-04:00 start=2026-08-21T08:40:59-04:00 wall_s=6.6 cpu_s=179.1 peak_rss_mb=45.5 mode=modp H=11
+H=11 p=65479 wall=6.63 rss_kb=46588
+event=start job=motley_par t=2026-08-21T08:41:05-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:41:12-04:00 start=2026-08-21T08:41:05-04:00 wall_s=6.8 cpu_s=182.4 peak_rss_mb=44.5 mode=modp H=11
+H=11 p=65449 wall=6.84 rss_kb=45596
+event=start job=motley_par t=2026-08-21T08:41:12-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:41:19-04:00 start=2026-08-21T08:41:12-04:00 wall_s=6.8 cpu_s=173.5 peak_rss_mb=45.5 mode=modp H=11
+H=11 p=65447 wall=6.77 rss_kb=46556
+event=start job=motley_par t=2026-08-21T08:41:19-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:41:26-04:00 start=2026-08-21T08:41:19-04:00 wall_s=6.8 cpu_s=178.3 peak_rss_mb=46.9 mode=modp H=11
+H=11 p=65437 wall=6.78 rss_kb=48032
+event=start job=motley_par t=2026-08-21T08:41:26-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:41:33-04:00 start=2026-08-21T08:41:26-04:00 wall_s=6.9 cpu_s=183.6 peak_rss_mb=44.9 mode=modp H=11
+H=11 p=65423 wall=6.90 rss_kb=46020
+event=start job=motley_par t=2026-08-21T08:41:33-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:41:40-04:00 start=2026-08-21T08:41:33-04:00 wall_s=6.9 cpu_s=185.0 peak_rss_mb=44.3 mode=modp H=11
+H=11 p=65413 wall=6.89 rss_kb=45364
+H=11 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:41:40-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:41:42-04:00 start=2026-08-21T08:41:40-04:00 wall_s=2.3 cpu_s=113.6 peak_rss_mb=3.2 mode=census H=10
+census H=10 N=41 wall=2.30 rss_kb=3244
+event=start job=motley_par t=2026-08-21T08:41:42-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:41:47-04:00 start=2026-08-21T08:41:42-04:00 wall_s=5.3 cpu_s=141.3 peak_rss_mb=37.4 mode=modp H=10
+H=10 p=65521 wall=5.34 rss_kb=38348
+event=start job=motley_par t=2026-08-21T08:41:47-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:41:52-04:00 start=2026-08-21T08:41:47-04:00 wall_s=5.1 cpu_s=126.4 peak_rss_mb=36.9 mode=modp H=10
+H=10 p=65519 wall=5.13 rss_kb=37764
+event=start job=motley_par t=2026-08-21T08:41:52-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:41:58-04:00 start=2026-08-21T08:41:52-04:00 wall_s=5.1 cpu_s=124.9 peak_rss_mb=39.6 mode=modp H=10
+H=10 p=65497 wall=5.09 rss_kb=40592
+event=start job=motley_par t=2026-08-21T08:41:58-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:03-04:00 start=2026-08-21T08:41:58-04:00 wall_s=5.1 cpu_s=121.7 peak_rss_mb=35.1 mode=modp H=10
+H=10 p=65479 wall=5.06 rss_kb=35984
+event=start job=motley_par t=2026-08-21T08:42:03-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:08-04:00 start=2026-08-21T08:42:03-04:00 wall_s=5.2 cpu_s=135.5 peak_rss_mb=38.3 mode=modp H=10
+H=10 p=65449 wall=5.24 rss_kb=39268
+event=start job=motley_par t=2026-08-21T08:42:08-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:13-04:00 start=2026-08-21T08:42:08-04:00 wall_s=5.4 cpu_s=144.9 peak_rss_mb=37.9 mode=modp H=10
+H=10 p=65447 wall=5.37 rss_kb=38852
+event=start job=motley_par t=2026-08-21T08:42:13-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:18-04:00 start=2026-08-21T08:42:13-04:00 wall_s=5.1 cpu_s=125.1 peak_rss_mb=41.5 mode=modp H=10
+H=10 p=65437 wall=5.06 rss_kb=42472
+event=start job=motley_par t=2026-08-21T08:42:18-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:24-04:00 start=2026-08-21T08:42:18-04:00 wall_s=5.3 cpu_s=140.4 peak_rss_mb=39.2 mode=modp H=10
+H=10 p=65423 wall=5.32 rss_kb=40108
+event=start job=motley_par t=2026-08-21T08:42:24-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:29-04:00 start=2026-08-21T08:42:24-04:00 wall_s=5.1 cpu_s=123.6 peak_rss_mb=38.4 mode=modp H=10
+H=10 p=65413 wall=5.06 rss_kb=39276
+H=10 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:42:29-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:30-04:00 start=2026-08-21T08:42:29-04:00 wall_s=1.0 cpu_s=49.2 peak_rss_mb=3.2 mode=census H=9
+census H=9 N=41 wall=1.00 rss_kb=3296
+event=start job=motley_par t=2026-08-21T08:42:30-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:32-04:00 start=2026-08-21T08:42:30-04:00 wall_s=2.3 cpu_s=49.5 peak_rss_mb=17.1 mode=modp H=9
+H=9 p=65521 wall=2.33 rss_kb=17552
+event=start job=motley_par t=2026-08-21T08:42:32-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:34-04:00 start=2026-08-21T08:42:32-04:00 wall_s=2.3 cpu_s=56.7 peak_rss_mb=15.5 mode=modp H=9
+H=9 p=65519 wall=2.35 rss_kb=15872
+event=start job=motley_par t=2026-08-21T08:42:34-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:38-04:00 start=2026-08-21T08:42:34-04:00 wall_s=3.1 cpu_s=70.9 peak_rss_mb=21.0 mode=modp H=9
+H=9 p=65497 wall=3.15 rss_kb=21492
+event=start job=motley_par t=2026-08-21T08:42:38-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:41-04:00 start=2026-08-21T08:42:38-04:00 wall_s=3.3 cpu_s=73.5 peak_rss_mb=19.8 mode=modp H=9
+H=9 p=65479 wall=3.32 rss_kb=20248
+event=start job=motley_par t=2026-08-21T08:42:41-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:43-04:00 start=2026-08-21T08:42:41-04:00 wall_s=2.4 cpu_s=52.7 peak_rss_mb=17.5 mode=modp H=9
+H=9 p=65449 wall=2.43 rss_kb=17936
+event=start job=motley_par t=2026-08-21T08:42:43-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:46-04:00 start=2026-08-21T08:42:43-04:00 wall_s=2.4 cpu_s=48.6 peak_rss_mb=14.5 mode=modp H=9
+H=9 p=65447 wall=2.38 rss_kb=14864
+event=start job=motley_par t=2026-08-21T08:42:46-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:49-04:00 start=2026-08-21T08:42:46-04:00 wall_s=3.2 cpu_s=69.3 peak_rss_mb=25.2 mode=modp H=9
+H=9 p=65437 wall=3.17 rss_kb=25804
+event=start job=motley_par t=2026-08-21T08:42:49-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:52-04:00 start=2026-08-21T08:42:49-04:00 wall_s=2.6 cpu_s=59.1 peak_rss_mb=15.8 mode=modp H=9
+H=9 p=65423 wall=2.62 rss_kb=16152
+event=start job=motley_par t=2026-08-21T08:42:52-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:53-04:00 start=2026-08-21T08:42:52-04:00 wall_s=1.8 cpu_s=38.9 peak_rss_mb=12.6 mode=modp H=9
+H=9 p=65413 wall=1.77 rss_kb=12912
+H=9 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:42:53-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:54-04:00 start=2026-08-21T08:42:53-04:00 wall_s=0.8 cpu_s=52.1 peak_rss_mb=3.2 mode=census H=8
+census H=8 N=41 wall=0.83 rss_kb=3244
+event=start job=motley_par t=2026-08-21T08:42:54-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:56-04:00 start=2026-08-21T08:42:54-04:00 wall_s=1.4 cpu_s=44.0 peak_rss_mb=10.2 mode=modp H=8
+H=8 p=65521 wall=1.38 rss_kb=10432
+event=start job=motley_par t=2026-08-21T08:42:56-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:57-04:00 start=2026-08-21T08:42:56-04:00 wall_s=1.1 cpu_s=33.8 peak_rss_mb=6.0 mode=modp H=8
+H=8 p=65519 wall=1.07 rss_kb=6120
+event=start job=motley_par t=2026-08-21T08:42:57-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:42:58-04:00 start=2026-08-21T08:42:57-04:00 wall_s=1.7 cpu_s=68.9 peak_rss_mb=13.3 mode=modp H=8
+H=8 p=65497 wall=1.69 rss_kb=13660
+event=start job=motley_par t=2026-08-21T08:42:58-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:00-04:00 start=2026-08-21T08:42:58-04:00 wall_s=1.8 cpu_s=74.0 peak_rss_mb=9.4 mode=modp H=8
+H=8 p=65479 wall=1.77 rss_kb=9612
+event=start job=motley_par t=2026-08-21T08:43:00-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:01-04:00 start=2026-08-21T08:43:00-04:00 wall_s=1.0 cpu_s=35.3 peak_rss_mb=7.3 mode=modp H=8
+H=8 p=65449 wall=1.01 rss_kb=7440
+event=start job=motley_par t=2026-08-21T08:43:01-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:03-04:00 start=2026-08-21T08:43:01-04:00 wall_s=1.3 cpu_s=47.4 peak_rss_mb=6.9 mode=modp H=8
+H=8 p=65447 wall=1.31 rss_kb=7060
+event=start job=motley_par t=2026-08-21T08:43:03-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:04-04:00 start=2026-08-21T08:43:03-04:00 wall_s=1.4 cpu_s=48.3 peak_rss_mb=7.7 mode=modp H=8
+H=8 p=65437 wall=1.36 rss_kb=7844
+event=start job=motley_par t=2026-08-21T08:43:04-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:05-04:00 start=2026-08-21T08:43:04-04:00 wall_s=1.4 cpu_s=55.9 peak_rss_mb=8.2 mode=modp H=8
+H=8 p=65423 wall=1.44 rss_kb=8364
+event=start job=motley_par t=2026-08-21T08:43:05-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:07-04:00 start=2026-08-21T08:43:05-04:00 wall_s=1.8 cpu_s=78.6 peak_rss_mb=8.8 mode=modp H=8
+H=8 p=65413 wall=1.82 rss_kb=9052
+H=8 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:43:07-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:08-04:00 start=2026-08-21T08:43:07-04:00 wall_s=0.7 cpu_s=45.4 peak_rss_mb=3.2 mode=census H=7
+census H=7 N=41 wall=0.70 rss_kb=3236
+event=start job=motley_par t=2026-08-21T08:43:08-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:09-04:00 start=2026-08-21T08:43:08-04:00 wall_s=0.7 cpu_s=40.2 peak_rss_mb=6.5 mode=modp H=7
+H=7 p=65521 wall=0.65 rss_kb=6680
+event=start job=motley_par t=2026-08-21T08:43:09-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:09-04:00 start=2026-08-21T08:43:09-04:00 wall_s=0.6 cpu_s=39.9 peak_rss_mb=7.0 mode=modp H=7
+H=7 p=65519 wall=0.64 rss_kb=7136
+event=start job=motley_par t=2026-08-21T08:43:09-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:10-04:00 start=2026-08-21T08:43:09-04:00 wall_s=0.7 cpu_s=41.1 peak_rss_mb=7.5 mode=modp H=7
+H=7 p=65497 wall=0.70 rss_kb=7724
+event=start job=motley_par t=2026-08-21T08:43:10-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:11-04:00 start=2026-08-21T08:43:10-04:00 wall_s=0.7 cpu_s=40.8 peak_rss_mb=7.5 mode=modp H=7
+H=7 p=65479 wall=0.67 rss_kb=7676
+event=start job=motley_par t=2026-08-21T08:43:11-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:11-04:00 start=2026-08-21T08:43:11-04:00 wall_s=0.7 cpu_s=40.6 peak_rss_mb=8.3 mode=modp H=7
+H=7 p=65449 wall=0.67 rss_kb=8524
+event=start job=motley_par t=2026-08-21T08:43:11-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:12-04:00 start=2026-08-21T08:43:11-04:00 wall_s=0.7 cpu_s=40.9 peak_rss_mb=7.0 mode=modp H=7
+H=7 p=65447 wall=0.68 rss_kb=7128
+event=start job=motley_par t=2026-08-21T08:43:12-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:13-04:00 start=2026-08-21T08:43:12-04:00 wall_s=0.7 cpu_s=40.6 peak_rss_mb=6.3 mode=modp H=7
+H=7 p=65437 wall=0.69 rss_kb=6444
+event=start job=motley_par t=2026-08-21T08:43:13-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:13-04:00 start=2026-08-21T08:43:13-04:00 wall_s=0.7 cpu_s=41.4 peak_rss_mb=6.9 mode=modp H=7
+H=7 p=65423 wall=0.69 rss_kb=7076
+event=start job=motley_par t=2026-08-21T08:43:13-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:14-04:00 start=2026-08-21T08:43:13-04:00 wall_s=0.7 cpu_s=40.1 peak_rss_mb=7.0 mode=modp H=7
+H=7 p=65413 wall=0.66 rss_kb=7120
+H=7 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:43:14-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:15-04:00 start=2026-08-21T08:43:14-04:00 wall_s=0.5 cpu_s=33.4 peak_rss_mb=3.2 mode=census H=6
+census H=6 N=41 wall=0.49 rss_kb=3292
+event=start job=motley_par t=2026-08-21T08:43:15-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:15-04:00 start=2026-08-21T08:43:15-04:00 wall_s=0.3 cpu_s=21.4 peak_rss_mb=5.0 mode=modp H=6
+H=6 p=65521 wall=0.29 rss_kb=5164
+event=start job=motley_par t=2026-08-21T08:43:15-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:15-04:00 start=2026-08-21T08:43:15-04:00 wall_s=0.5 cpu_s=35.2 peak_rss_mb=6.3 mode=modp H=6
+H=6 p=65519 wall=0.53 rss_kb=6444
+event=start job=motley_par t=2026-08-21T08:43:15-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:16-04:00 start=2026-08-21T08:43:15-04:00 wall_s=0.5 cpu_s=33.0 peak_rss_mb=5.7 mode=modp H=6
+H=6 p=65497 wall=0.49 rss_kb=5804
+event=start job=motley_par t=2026-08-21T08:43:16-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:16-04:00 start=2026-08-21T08:43:16-04:00 wall_s=0.4 cpu_s=25.6 peak_rss_mb=5.7 mode=modp H=6
+H=6 p=65479 wall=0.37 rss_kb=5804
+event=start job=motley_par t=2026-08-21T08:43:16-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:16-04:00 start=2026-08-21T08:43:16-04:00 wall_s=0.2 cpu_s=15.1 peak_rss_mb=5.4 mode=modp H=6
+H=6 p=65449 wall=0.21 rss_kb=5572
+event=start job=motley_par t=2026-08-21T08:43:16-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:17-04:00 start=2026-08-21T08:43:16-04:00 wall_s=0.4 cpu_s=29.8 peak_rss_mb=6.3 mode=modp H=6
+H=6 p=65447 wall=0.44 rss_kb=6436
+event=start job=motley_par t=2026-08-21T08:43:17-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:17-04:00 start=2026-08-21T08:43:17-04:00 wall_s=0.5 cpu_s=34.7 peak_rss_mb=6.3 mode=modp H=6
+H=6 p=65437 wall=0.51 rss_kb=6444
+event=start job=motley_par t=2026-08-21T08:43:17-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:18-04:00 start=2026-08-21T08:43:17-04:00 wall_s=0.5 cpu_s=34.8 peak_rss_mb=5.7 mode=modp H=6
+H=6 p=65423 wall=0.53 rss_kb=5804
+event=start job=motley_par t=2026-08-21T08:43:18-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:19-04:00 start=2026-08-21T08:43:18-04:00 wall_s=0.5 cpu_s=34.7 peak_rss_mb=5.7 mode=modp H=6
+H=6 p=65413 wall=0.52 rss_kb=5804
+H=6 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:43:19-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:19-04:00 start=2026-08-21T08:43:19-04:00 wall_s=0.3 cpu_s=19.9 peak_rss_mb=3.2 mode=census H=5
+census H=5 N=41 wall=0.27 rss_kb=3244
+event=start job=motley_par t=2026-08-21T08:43:19-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:19-04:00 start=2026-08-21T08:43:19-04:00 wall_s=0.4 cpu_s=29.7 peak_rss_mb=8.0 mode=modp H=5
+H=5 p=65521 wall=0.44 rss_kb=8152
+event=start job=motley_par t=2026-08-21T08:43:19-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:20-04:00 start=2026-08-21T08:43:19-04:00 wall_s=0.4 cpu_s=29.8 peak_rss_mb=7.8 mode=modp H=5
+H=5 p=65519 wall=0.44 rss_kb=8016
+event=start job=motley_par t=2026-08-21T08:43:20-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:20-04:00 start=2026-08-21T08:43:20-04:00 wall_s=0.3 cpu_s=21.6 peak_rss_mb=6.9 mode=modp H=5
+H=5 p=65497 wall=0.30 rss_kb=7084
+event=start job=motley_par t=2026-08-21T08:43:20-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:20-04:00 start=2026-08-21T08:43:20-04:00 wall_s=0.5 cpu_s=30.3 peak_rss_mb=7.5 mode=modp H=5
+H=5 p=65479 wall=0.45 rss_kb=7724
+event=start job=motley_par t=2026-08-21T08:43:20-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:21-04:00 start=2026-08-21T08:43:20-04:00 wall_s=0.2 cpu_s=16.4 peak_rss_mb=5.6 mode=modp H=5
+H=5 p=65449 wall=0.22 rss_kb=5756
+event=start job=motley_par t=2026-08-21T08:43:21-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:21-04:00 start=2026-08-21T08:43:21-04:00 wall_s=0.4 cpu_s=30.4 peak_rss_mb=8.2 mode=modp H=5
+H=5 p=65447 wall=0.45 rss_kb=8364
+event=start job=motley_par t=2026-08-21T08:43:21-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:22-04:00 start=2026-08-21T08:43:21-04:00 wall_s=0.4 cpu_s=28.1 peak_rss_mb=8.2 mode=modp H=5
+H=5 p=65437 wall=0.41 rss_kb=8364
+event=start job=motley_par t=2026-08-21T08:43:22-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:22-04:00 start=2026-08-21T08:43:22-04:00 wall_s=0.5 cpu_s=30.3 peak_rss_mb=6.3 mode=modp H=5
+H=5 p=65423 wall=0.45 rss_kb=6428
+event=start job=motley_par t=2026-08-21T08:43:22-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:22-04:00 start=2026-08-21T08:43:22-04:00 wall_s=0.4 cpu_s=25.0 peak_rss_mb=7.1 mode=modp H=5
+H=5 p=65413 wall=0.36 rss_kb=7316
+H=5 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:43:22-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:23-04:00 start=2026-08-21T08:43:22-04:00 wall_s=0.4 cpu_s=24.8 peak_rss_mb=3.2 mode=census H=4
+census H=4 N=41 wall=0.36 rss_kb=3244
+event=start job=motley_par t=2026-08-21T08:43:23-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:23-04:00 start=2026-08-21T08:43:23-04:00 wall_s=0.3 cpu_s=23.1 peak_rss_mb=8.2 mode=modp H=4
+H=4 p=65521 wall=0.34 rss_kb=8364
+event=start job=motley_par t=2026-08-21T08:43:23-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:23-04:00 start=2026-08-21T08:43:23-04:00 wall_s=0.3 cpu_s=23.2 peak_rss_mb=6.3 mode=modp H=4
+H=4 p=65519 wall=0.34 rss_kb=6436
+event=start job=motley_par t=2026-08-21T08:43:23-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:24-04:00 start=2026-08-21T08:43:23-04:00 wall_s=0.4 cpu_s=25.2 peak_rss_mb=8.8 mode=modp H=4
+H=4 p=65497 wall=0.37 rss_kb=9052
+event=start job=motley_par t=2026-08-21T08:43:24-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:24-04:00 start=2026-08-21T08:43:24-04:00 wall_s=0.1 cpu_s=11.2 peak_rss_mb=5.9 mode=modp H=4
+H=4 p=65479 wall=0.15 rss_kb=6016
+event=start job=motley_par t=2026-08-21T08:43:24-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:24-04:00 start=2026-08-21T08:43:24-04:00 wall_s=0.4 cpu_s=25.4 peak_rss_mb=8.2 mode=modp H=4
+H=4 p=65449 wall=0.37 rss_kb=8356
+event=start job=motley_par t=2026-08-21T08:43:24-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:25-04:00 start=2026-08-21T08:43:24-04:00 wall_s=0.4 cpu_s=25.7 peak_rss_mb=8.8 mode=modp H=4
+H=4 p=65447 wall=0.38 rss_kb=9004
+event=start job=motley_par t=2026-08-21T08:43:25-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:25-04:00 start=2026-08-21T08:43:25-04:00 wall_s=0.4 cpu_s=25.4 peak_rss_mb=12.3 mode=modp H=4
+H=4 p=65437 wall=0.37 rss_kb=12628
+event=start job=motley_par t=2026-08-21T08:43:25-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:26-04:00 start=2026-08-21T08:43:25-04:00 wall_s=0.4 cpu_s=25.3 peak_rss_mb=7.5 mode=modp H=4
+H=4 p=65423 wall=0.36 rss_kb=7700
+event=start job=motley_par t=2026-08-21T08:43:26-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:26-04:00 start=2026-08-21T08:43:26-04:00 wall_s=0.4 cpu_s=25.8 peak_rss_mb=6.9 mode=modp H=4
+H=4 p=65413 wall=0.38 rss_kb=7096
+H=4 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:43:26-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:26-04:00 start=2026-08-21T08:43:26-04:00 wall_s=0.3 cpu_s=21.2 peak_rss_mb=3.2 mode=census H=3
+census H=3 N=41 wall=0.31 rss_kb=3244
+event=start job=motley_par t=2026-08-21T08:43:26-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:27-04:00 start=2026-08-21T08:43:26-04:00 wall_s=0.3 cpu_s=20.7 peak_rss_mb=8.0 mode=modp H=3
+H=3 p=65521 wall=0.29 rss_kb=8164
+event=start job=motley_par t=2026-08-21T08:43:27-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:27-04:00 start=2026-08-21T08:43:27-04:00 wall_s=0.2 cpu_s=17.7 peak_rss_mb=8.5 mode=modp H=3
+H=3 p=65519 wall=0.25 rss_kb=8708
+event=start job=motley_par t=2026-08-21T08:43:27-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:27-04:00 start=2026-08-21T08:43:27-04:00 wall_s=0.3 cpu_s=20.1 peak_rss_mb=7.5 mode=modp H=3
+H=3 p=65497 wall=0.28 rss_kb=7724
+event=start job=motley_par t=2026-08-21T08:43:27-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:27-04:00 start=2026-08-21T08:43:27-04:00 wall_s=0.3 cpu_s=20.7 peak_rss_mb=8.2 mode=modp H=3
+H=3 p=65479 wall=0.31 rss_kb=8412
+event=start job=motley_par t=2026-08-21T08:43:27-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:28-04:00 start=2026-08-21T08:43:27-04:00 wall_s=0.3 cpu_s=20.3 peak_rss_mb=8.2 mode=modp H=3
+H=3 p=65449 wall=0.29 rss_kb=8364
+event=start job=motley_par t=2026-08-21T08:43:28-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:28-04:00 start=2026-08-21T08:43:28-04:00 wall_s=0.2 cpu_s=11.9 peak_rss_mb=7.5 mode=modp H=3
+H=3 p=65447 wall=0.16 rss_kb=7692
+event=start job=motley_par t=2026-08-21T08:43:28-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:28-04:00 start=2026-08-21T08:43:28-04:00 wall_s=0.3 cpu_s=20.7 peak_rss_mb=5.7 mode=modp H=3
+H=3 p=65437 wall=0.30 rss_kb=5788
+event=start job=motley_par t=2026-08-21T08:43:28-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:29-04:00 start=2026-08-21T08:43:28-04:00 wall_s=0.3 cpu_s=20.5 peak_rss_mb=8.9 mode=modp H=3
+H=3 p=65423 wall=0.30 rss_kb=9132
+event=start job=motley_par t=2026-08-21T08:43:29-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:29-04:00 start=2026-08-21T08:43:29-04:00 wall_s=0.3 cpu_s=20.6 peak_rss_mb=9.7 mode=modp H=3
+H=3 p=65413 wall=0.29 rss_kb=9964
+H=3 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:43:29-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:29-04:00 start=2026-08-21T08:43:29-04:00 wall_s=0.2 cpu_s=15.0 peak_rss_mb=3.2 mode=census H=2
+census H=2 N=41 wall=0.21 rss_kb=3244
+event=start job=motley_par t=2026-08-21T08:43:29-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:29-04:00 start=2026-08-21T08:43:29-04:00 wall_s=0.1 cpu_s=8.8 peak_rss_mb=5.0 mode=modp H=2
+H=2 p=65521 wall=0.12 rss_kb=5164
+event=start job=motley_par t=2026-08-21T08:43:29-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:29-04:00 start=2026-08-21T08:43:29-04:00 wall_s=0.2 cpu_s=15.5 peak_rss_mb=5.7 mode=modp H=2
+H=2 p=65519 wall=0.21 rss_kb=5800
+event=start job=motley_par t=2026-08-21T08:43:29-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:30-04:00 start=2026-08-21T08:43:29-04:00 wall_s=0.2 cpu_s=16.0 peak_rss_mb=5.6 mode=modp H=2
+H=2 p=65497 wall=0.22 rss_kb=5716
+event=start job=motley_par t=2026-08-21T08:43:30-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:30-04:00 start=2026-08-21T08:43:30-04:00 wall_s=0.2 cpu_s=15.2 peak_rss_mb=6.3 mode=modp H=2
+H=2 p=65479 wall=0.21 rss_kb=6444
+event=start job=motley_par t=2026-08-21T08:43:30-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:30-04:00 start=2026-08-21T08:43:30-04:00 wall_s=0.2 cpu_s=15.7 peak_rss_mb=6.1 mode=modp H=2
+H=2 p=65449 wall=0.22 rss_kb=6196
+event=start job=motley_par t=2026-08-21T08:43:30-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:30-04:00 start=2026-08-21T08:43:30-04:00 wall_s=0.2 cpu_s=15.8 peak_rss_mb=5.8 mode=modp H=2
+H=2 p=65447 wall=0.22 rss_kb=5900
+event=start job=motley_par t=2026-08-21T08:43:30-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:31-04:00 start=2026-08-21T08:43:30-04:00 wall_s=0.2 cpu_s=15.5 peak_rss_mb=5.7 mode=modp H=2
+H=2 p=65437 wall=0.22 rss_kb=5804
+event=start job=motley_par t=2026-08-21T08:43:31-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:31-04:00 start=2026-08-21T08:43:31-04:00 wall_s=0.2 cpu_s=16.0 peak_rss_mb=5.7 mode=modp H=2
+H=2 p=65423 wall=0.23 rss_kb=5852
+event=start job=motley_par t=2026-08-21T08:43:31-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:31-04:00 start=2026-08-21T08:43:31-04:00 wall_s=0.2 cpu_s=15.7 peak_rss_mb=5.7 mode=modp H=2
+H=2 p=65413 wall=0.22 rss_kb=5856
+H=2 COMPLETE (9 primes)
+event=start job=motley_par t=2026-08-21T08:43:31-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:31-04:00 start=2026-08-21T08:43:31-04:00 wall_s=0.1 cpu_s=8.3 peak_rss_mb=3.2 mode=census H=1
+census H=1 N=41 wall=0.11 rss_kb=3292
+event=start job=motley_par t=2026-08-21T08:43:31-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:31-04:00 start=2026-08-21T08:43:31-04:00 wall_s=0.2 cpu_s=10.7 peak_rss_mb=4.4 mode=modp H=1
+H=1 p=65521 wall=0.15 rss_kb=4524
+event=start job=motley_par t=2026-08-21T08:43:31-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:31-04:00 start=2026-08-21T08:43:31-04:00 wall_s=0.1 cpu_s=10.3 peak_rss_mb=4.4 mode=modp H=1
+H=1 p=65519 wall=0.14 rss_kb=4524
+event=start job=motley_par t=2026-08-21T08:43:31-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:32-04:00 start=2026-08-21T08:43:31-04:00 wall_s=0.1 cpu_s=10.3 peak_rss_mb=4.5 mode=modp H=1
+H=1 p=65497 wall=0.14 rss_kb=4576
+event=start job=motley_par t=2026-08-21T08:43:32-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:32-04:00 start=2026-08-21T08:43:32-04:00 wall_s=0.1 cpu_s=10.4 peak_rss_mb=4.5 mode=modp H=1
+H=1 p=65479 wall=0.14 rss_kb=4576
+event=start job=motley_par t=2026-08-21T08:43:32-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:32-04:00 start=2026-08-21T08:43:32-04:00 wall_s=0.1 cpu_s=10.3 peak_rss_mb=5.0 mode=modp H=1
+H=1 p=65449 wall=0.14 rss_kb=5164
+event=start job=motley_par t=2026-08-21T08:43:32-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:32-04:00 start=2026-08-21T08:43:32-04:00 wall_s=0.1 cpu_s=10.6 peak_rss_mb=4.4 mode=modp H=1
+H=1 p=65447 wall=0.15 rss_kb=4524
+event=start job=motley_par t=2026-08-21T08:43:32-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:32-04:00 start=2026-08-21T08:43:32-04:00 wall_s=0.2 cpu_s=10.5 peak_rss_mb=5.0 mode=modp H=1
+H=1 p=65437 wall=0.15 rss_kb=5164
+event=start job=motley_par t=2026-08-21T08:43:32-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:32-04:00 start=2026-08-21T08:43:32-04:00 wall_s=0.1 cpu_s=10.4 peak_rss_mb=4.4 mode=modp H=1
+H=1 p=65423 wall=0.14 rss_kb=4524
+event=start job=motley_par t=2026-08-21T08:43:32-04:00 git=18b90ab6 built=2026-08-20T10:38:14-0400 host=dalby
+event=done job=motley_par t=2026-08-21T08:43:33-04:00 start=2026-08-21T08:43:32-04:00 wall_s=0.1 cpu_s=10.2 peak_rss_mb=4.4 mode=modp H=1
+H=1 p=65413 wall=0.14 rss_kb=4524
+H=1 COMPLETE (9 primes)
+LADDER COMPLETE H=1..19 Nmax=41

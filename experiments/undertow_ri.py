@@ -21,6 +21,11 @@ tower covers H > hmax, and the report says which heights neither reaches.
 Usage:
   python3 experiments/undertow_ri.py [--hmax 18] [--jmax 4] [--rows 36,37,...]
                                     [--rowdir DIR]
+
+Exit 0 unless a tower cell disagrees with the incumbent (MISMATCH) or a
+complete row sums to something other than the banked a(n) ("sum WRONG").
+Until 2026-09-05 both were printed and the script exited 0 (AUDIT-2026-09-02
+M3); a GAP is a report, not a failure, and still exits 0.
 """
 
 import os
@@ -92,28 +97,32 @@ def build_tower(mtri, Dj, jmax, hmax, kcap, forbid_row):
     return ab, reached
 
 
-def main():
-    hmax = int(opt("--hmax", 18))
-    jmax = int(opt("--jmax", 4))
-    rows = [int(x) for x in opt("--rows", "40").split(",") if x]
-    # --rowdir: which Motley C_H rows to telescope.  The banked
-    # results/cutcount_b1/rows/ stop at n = 40; a ladder run at a higher Nmax
-    # writes its own set, and row 41 can only be answered from those.
-    rowdir = opt("--rowdir", None)
-    mtri, inc, A = read_tri_motley(rowdir), read_tri(), known_a()
+def cover(hmax=18, jmax=4, rows=(40,), rowdir=None):
+    """Per row: how Motley (H <= hmax) and the Motley-pinned tower (H > hmax)
+    cover it, and whether the tower agrees with the incumbent where it can.
+
+    Returns one dict per row: row, mot (Motley heights), tower (tower heights),
+    agree (tower cells equal to the incumbent, as (row, H)), wrong (tower cells
+    that differ), gap (heights neither reaches), reached (top pinned level),
+    total (the row sum, or None), status in
+      MATCH   complete, sums to the banked a(row)
+      NEW     complete, no banked a(row) to compare against
+      WRONG   complete, sum differs from the banked a(row)
+      GAP     some height covered by neither
+      SKIP    Motley has no cells for this row at all
+    scripts/provenance_table.py reads `agree` to tag the tower-from-Motley
+    cells; main() prints the report and exits non-zero on wrong or WRONG."""
     global AB0
+    mtri, inc, A = read_tri_motley(rowdir), read_tri(), known_a()
     AB0 = abinitio_levels()
     kcap = hmax + jmax - 2
     Dj = load_depths(jmax, kcap + 1)
-    print(f"Motley triangle H <= {max(H for _, H in mtri)}; depths j <= {jmax}; "
-          f"levels 1..{W1_ABINITIO} ab initio")
-
+    out = []
     for row in rows:
         ab, reached = build_tower(mtri, Dj, jmax, hmax, kcap, forbid_row=row)
         E = grand_form(ab, reached)
-        ok = bad = 0
+        agree, wrong, tower_h = [], [], []
         total = F(0)
-        tower_h = []
         for H in range(max(hmax + 1, row - reached), row + 1):
             k = row - H
             v = (F(3) ** (row - 1) if k == 0
@@ -128,42 +137,69 @@ def main():
             tower_h.append(H)
             total += v
             if (row, H) in inc:
-                if int(v) == inc[(row, H)]:
-                    ok += 1
-                else:
-                    bad += 1
-                    print(f"    MISMATCH T({row},{H}) k={k}")
-        # Rows at or below hmax are covered by Motley outright: the tower band
-        # is empty and there is nothing for it to do.  Reporting them as a
-        # crash (min() of an empty band) meant the pure-Motley rows were
-        # claimed and never attested -- Lane A, S-A3.
+                (agree if int(v) == inc[(row, H)] else wrong).append((row, H))
         mot = [H for H in range(1, min(hmax, row) + 1) if (row, H) in mtri]
-        if mot and not tower_h and len(mot) == row:
-            total_m = sum(mtri[(row, H)] for H in mot)
-            tag = "COMPLETE, sum MATCHES a(%d)" % row if A.get(row) == total_m \
-                else ("COMPLETE, a(%d) = %d" % (row, total_m) if row not in A
-                      else "COMPLETE but sum WRONG")
-            print(f"row {row:2d}: Motley H<={max(mot):2d} ({len(mot)} cells), "
-                  f"tower not needed -- {tag}")
-            continue
+        rec = dict(row=row, mot=mot, tower=tower_h, agree=agree, wrong=wrong,
+                   gap=[], reached=reached, total=None, status="SKIP",
+                   mtri_top=max(H for _, H in mtri))
         if not mot:
-            print(f"row {row:2d}: Motley has no cells for this row "
-                  f"(its C rows stop at Nmax) -- skipped")
+            out.append(rec)
             continue
         for H in mot:
             total += mtri[(row, H)]
         gap = sorted(set(range(1, row + 1)) - set(mot) - set(tower_h))
-        line = (f"row {row:2d}: Motley H<={max(mot):2d} ({len(mot)} cells) + "
-                f"tower H>={min(tower_h)} ({len(tower_h)} cells), "
-                f"levels to k={reached}, {ok} agree with the incumbent, {bad} wrong")
+        rec["gap"], rec["total"] = gap, int(total)
         if gap:
-            line += f" -- GAP {gap}"
-        elif row in A:
-            line += (" -- COMPLETE, sum MATCHES a(%d)" % row if int(total) == A[row]
-                     else " -- COMPLETE but sum WRONG")
+            rec["status"] = "GAP"
+        elif row not in A:
+            rec["status"] = "NEW"
         else:
-            line += f" -- COMPLETE, a({row}) = {int(total)}"
-        print(line)
+            rec["status"] = "MATCH" if int(total) == A[row] else "WRONG"
+        out.append(rec)
+    return out
+
+
+def main():
+    hmax = int(opt("--hmax", 18))
+    jmax = int(opt("--jmax", 4))
+    rows = [int(x) for x in opt("--rows", "40").split(",") if x]
+    # --rowdir: which Motley C_H rows to telescope.  The banked
+    # results/cutcount_b1/rows/ stop at n = 40; a ladder run at a higher Nmax
+    # writes its own set, and row 41 can only be answered from those.
+    rowdir = opt("--rowdir", None)
+    recs = cover(hmax, jmax, rows, rowdir)
+    print(f"Motley triangle H <= {recs[0]['mtri_top']}; depths j <= {jmax}; "
+          f"levels 1..{W1_ABINITIO} ab initio")
+    red = False
+    for r in recs:
+        row, mot, tower_h = r["row"], r["mot"], r["tower"]
+        for n, H in r["wrong"]:
+            print(f"    MISMATCH T({n},{H}) k={n-H}")
+        if r["status"] == "SKIP":
+            print(f"row {row:2d}: Motley has no cells for this row "
+                  f"(its C rows stop at Nmax) -- skipped")
+            continue
+        # Rows at or below hmax are covered by Motley outright: the tower band
+        # is empty and there is nothing for it to do.  Reporting them as a
+        # crash (min() of an empty band) meant the pure-Motley rows were
+        # claimed and never attested -- Lane A, S-A3.
+        tag = {"MATCH": "COMPLETE, sum MATCHES a(%d)" % row,
+               "NEW": "COMPLETE, a(%d) = %s" % (row, r["total"]),
+               "WRONG": "COMPLETE but sum WRONG",
+               "GAP": "GAP %s" % r["gap"]}[r["status"]]
+        if not tower_h and len(mot) == row:
+            print(f"row {row:2d}: Motley H<={max(mot):2d} ({len(mot)} cells), "
+                  f"tower not needed -- {tag}")
+        else:
+            print(f"row {row:2d}: Motley H<={max(mot):2d} ({len(mot)} cells) + "
+                  f"tower H>={min(tower_h)} ({len(tower_h)} cells), "
+                  f"levels to k={r['reached']}, {len(r['agree'])} agree with "
+                  f"the incumbent, {len(r['wrong'])} wrong -- {tag}")
+        if r["wrong"] or r["status"] == "WRONG":
+            red = True
+    if red:
+        raise SystemExit("undertow_ri RED: a tower cell or a row sum disagrees "
+                         "with the incumbent")
 
 
 if __name__ == "__main__":

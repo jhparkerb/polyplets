@@ -106,13 +106,16 @@ fire.
 arithmetic, and checked against the banked triangle at every cell it touches.
 \emph{$a(41)$} --- \textbf{computed}, once, by two halves whose provenance is
 recorded (\repo{results/a41/PROVENANCE.md}); heights $1$--$19$ by a real sweep
-and $20$--$41$ by the tower. A second, rule-independent program covers every
-cell of the row (\repo{results/cutcount\_b1/rows41/}).
+and $20$--$41$ by the tower. A second, rule-independent program covers heights
+$1$--$19$ of the row (\repo{results/cutcount\_b1/rows41/}); heights $20$ and
+up are one tower strategy, refitted to that program's cells and sharing
+$D_j(20..21)$ with the route above.
 \emph{The audit of $18$ wired levels} --- exact re-derivation over every
 available depth pair, $18$ of $18$, which is a consistency check on banked
 values and not an independent confirmation of them (\S\ref{sec:tower}).
-\emph{$P_{21}$} --- \textbf{one pin pair, no holdout}. Stated in
-\S\ref{sec:limits} as the softest thing in the construction.
+\emph{$P_{21}$} --- \textbf{three pin pairs at depth $5$, agreeing; no
+enumeration holdout}. Stated in \S\ref{sec:limits} as the softest thing in
+the construction.
 \emph{The square-lattice check of \S\ref{sec:square}} --- \textbf{external}:
 the counts are other people's. At $k \le 6$ the below-onset fit equals the
 classical one and reproduces the cells it was denied, ten of them at depth $2$,
@@ -584,8 +587,9 @@ assumption families.
 
 The audit reported in \S\ref{sec:reach} is therefore a consistency check on the
 banked triangle, not an independent confirmation of it. What crosses assumption
-families is the second source (a different counting rule, in every cell of the
-row) and the external validation of \S\ref{sec:square}.
+families is the second source (a different counting rule, at heights $1$--$19$
+of the row; the tower above is refitted to its cells) and the external
+validation of \S\ref{sec:square}.
 
 % ===========================================================================
 
@@ -691,11 +695,14 @@ as a tall one, is tested here where the inputs are not ours.
 \label{sec:limits}
 
 \begin{itemize}
-\item \textbf{$P_{21}$ has one pin pair and no holdout.} Level $20$ is pinned
-six ways with five independent checks. Level $21$ pins from $T(40,19)$ and
-$T(39,18)$ and has nothing checking it until either depth $5$ is available or
-$T(41,20)$ is swept. This is the last soft spot in the construction and
-\repo{results/confidence.md} says so in the same terms.
+\item \textbf{$P_{21}$ has three pin pairs and no enumeration holdout.} Level
+$20$ is pinned six ways with five independent checks. At depths $j \le 4$
+level $21$ pinned from $T(40,19)$ and $T(39,18)$ alone, with nothing checking
+it; depth $5$ (the $e = 4$ family table, banked 2026-08-23) adds $T(38,17)$,
+and the three pairs agree (\repo{experiments/undertow\_pairs\_gate.py}, in
+\texttt{make gates}). That agreement is between fits sharing $D_j(20..21)$;
+nothing has swept $T(41,20)$. This is the last soft spot in the construction
+and \repo{results/confidence.md} says so in the same terms.
 
 \item \textbf{Solving a whole column is a reformulation, not extra redundancy}
 --- the Remark in \S\ref{sec:frame}, restated here because it is the correction
@@ -884,8 +891,8 @@ The tower's own inputs and outputs:
 \item The defect values and the family DP: the table above, and
 \repo{cpp/severance\_w3\_families.cpp}.
 \item $a(41)$'s provenance, both halves: \repo{results/a41/PROVENANCE.md}.
-\item The second source covering every cell of row $41$ under a different
-counting rule: \repo{results/cutcount\_b1/rows41/}.
+\item The second source covering heights $1$--$19$ of row $41$ under a
+different counting rule: \repo{results/cutcount\_b1/rows41/}.
 \item The external validation: \repo{results/undertow-square-validation.md} and
 \repo{results/undertow-square-depth2.md}.
 \item The adversarial review that produced \S\ref{sec:tower}'s quoted

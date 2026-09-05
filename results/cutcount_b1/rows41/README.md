@@ -18,6 +18,13 @@ n = 41. Do not overwrite it, and do not mix the two sets in one difference.
               All 19 heights passed. Its --selftest reproduces the banked
               C_18 from 4 primes and has a RED control that corrupts a
               residue and confirms the held-out prime catches it.
+    banked    2026-09-05 (AUDIT-2026-09-02 M3): the 171 residue rows are in
+              `../residues41/`, the run's own timings.txt, console.H*.log,
+              census.H*.log and sizes.H*.N41.txt in `run/`, copied from
+              dalby:~/var/motley-ladder with sha256 verified on both sides
+              (249 files, 0 mismatches). `make gate-cutcount-assembly` now
+              re-derives the held-out verdict at every height from those
+              files, and `scripts/motley_crt.py --selftest` covers C_19.
 
 ## What these rows settle for the provenance table
 
@@ -46,7 +53,12 @@ Row 40's last uncovered cell is closed here: `T(40,19)` from these rows is
 `results/ns_a40/perheight/h19.out`. All nineteen heights agree with the
 incumbent at n = 40.
 
-Row 41 shows "0 agree with the incumbent" because the incumbent has no
-per-height data at n = 41 — that is the point. The row is built from Motley
+Row 41 shows "0 agree with the incumbent" because `undertow_ri.py` compares
+tower cells (H >= 20) against `results/triangle.txt`, which stops at n = 40;
+the incumbent's n = 41 data, `results/a41/` h1..h19.out, are the swept heights,
+and those nineteen cells are compared against these rows by
+`make gate-cutcount-assembly` (19 of 19 agree). The row is built from Motley
 cells plus tower formulas fitted to Motley's own data, and it reproduces the
-banked a(41) digit for digit.
+banked a(41) digit for digit. What that is worth: heights 1-19 two-source with
+no shared code; heights 20 and up one tower strategy pinned from Motley's data,
+sharing `D_j(20..21)` with the incumbent's tower (AUDIT-2026-09-02 M2).
