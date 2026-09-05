@@ -10,9 +10,9 @@ every height H >= 8, so the kernel itself was exercised at H <= 7 only
 cell-diff against the column kernel (scripts/kink_validate.sh) and the Motley
 agreement, neither in `make`.  This gate is the automated version.
 
-Two runs of build/ns/orchestrate with --max-diag-k 0, which disables every
-wired diagonal (orchestrator/maxdiagk_test.go, TestMaxDiagKZeroDisablesInjection),
-so every height is a real sweep:
+Two runs of build/ns/orchestrate, started together, with --max-diag-k 0, which
+disables every wired diagonal (orchestrator/maxdiagk_test.go,
+TestMaxDiagKZeroDisablesInjection), so every height is a real sweep:
 
   ORACLE   --kernel kink --maxn 18: the per-height rows h<H>.out must be
            present for every H = 1..18, carry every n, and sum over H to the
@@ -21,10 +21,11 @@ so every height is a real sweep:
            the kink kernel reproducing the whole known sequence with every
            height enumerated.  Measured 2026-09-05 on gympie: 68 s at 8 cores,
            90 MB.
-  TWIN     --kernel kink and --kernel column at --maxn 16, both all-real: the
-           two per-height directories must be byte-identical, every height,
-           every n.  The column kernel is the reference implementation kept as
-           the correctness oracle (orchestrate --help).  0.7 s + ~10 s.
+  TWIN     --kernel column at --maxn 16, all-real, against the kink rows at
+           n <= 16 of the ORACLE sweep (T(n,H) does not depend on maxn): the
+           two per-height sets must be identical, every height, every n.  The
+           column kernel is the reference implementation kept as the
+           correctness oracle (orchestrate --help).
 
 Both checks are done here in Python from the h<H>.out files; the
 orchestrator's own --compare line is not what is trusted.  Fail-closed on
@@ -54,7 +55,7 @@ RAM = 256 * 1024 * 1024
 
 
 def sweep(kernel, maxn, workdir):
-    """Run one all-real sweep; return the per-height directory."""
+    """Start one all-real sweep; return (process, per-height directory)."""
     run_dir = os.path.join(workdir, f"{kernel}{maxn}")
     ph = os.path.join(run_dir, "ph")
     os.makedirs(os.path.join(run_dir, "spill"))
@@ -65,11 +66,15 @@ def sweep(kernel, maxn, workdir):
            "--run-dir", run_dir, "--spill-dir", os.path.join(run_dir, "spill"),
            "--checkpoint", os.path.join(run_dir, "POLYCKPT"),
            "--checkpoint-every", "0", "--per-height-out", ph]
-    r = subprocess.run(cmd, capture_output=True, text=True)
-    if r.returncode != 0:
-        raise RuntimeError(f"orchestrate {kernel} maxn={maxn} rc={r.returncode}\n"
-                           f"{r.stdout[-800:]}\n{r.stderr[-800:]}")
-    return ph
+    return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            text=True), ph
+
+
+def wait(proc, kernel, maxn):
+    out, err = proc.communicate()
+    if proc.returncode != 0:
+        raise RuntimeError(f"orchestrate {kernel} maxn={maxn} rc={proc.returncode}\n"
+                           f"{out[-800:]}\n{err[-800:]}")
 
 
 def read_perheight(ph, maxn):
@@ -102,9 +107,8 @@ def check_oracle(ph, maxn, fixture):
     return bad, maxn * maxn
 
 
-def check_twin(ph_kink, ph_col, maxn):
+def check_twin(A, B, maxn):
     """The two kernels' per-height rows are identical, cell for cell."""
-    A, B = read_perheight(ph_kink, maxn), read_perheight(ph_col, maxn)
     bad = [(n, H) for H in range(1, maxn + 1) for n in range(1, maxn + 1)
            if A[H].get(n) != B[H].get(n)]
     return bad, maxn * maxn
@@ -119,15 +123,20 @@ def main():
     keep = sys.argv[sys.argv.index("--keep") + 1] if "--keep" in sys.argv else None
     work = keep or tempfile.mkdtemp(prefix="gate_kink_oracle.")
     try:
-        ph18 = sweep("kink", MAXN_ORACLE, work)
+        kink, ph18 = sweep("kink", MAXN_ORACLE, work)
+        column, phc = sweep("column", MAXN_TWIN, work)   # independent; runs beside it
+        wait(kink, "kink", MAXN_ORACLE)
         bad, cells = check_oracle(ph18, MAXN_ORACLE, fixture)
         gate.check(not bad,
                    f"ORACLE kink, every height real, maxn={MAXN_ORACLE}: row sums "
                    f"== published a(1..{MAXN_ORACLE}) ({cells} cells summed)"
                    + (f"  MISMATCH at n={[b[0] for b in bad]}" if bad else ""))
-        phk = sweep("kink", MAXN_TWIN, work)
-        phc = sweep("column", MAXN_TWIN, work)
-        bad, cells = check_twin(phk, phc, MAXN_TWIN)
+        wait(column, "column", MAXN_TWIN)
+        # T(n,H) does not depend on maxn, so the kink rows at n <= 16 are read
+        # off the maxn-18 sweep rather than swept a second time.
+        K = {H: rows for H, rows in read_perheight(ph18, MAXN_ORACLE).items()
+             if H <= MAXN_TWIN}
+        bad, cells = check_twin(K, read_perheight(phc, MAXN_TWIN), MAXN_TWIN)
         gate.check(not bad,
                    f"TWIN   kink == column, every height real, maxn={MAXN_TWIN}: "
                    f"{cells} cells byte-identical"
@@ -178,7 +187,7 @@ def selftest():
         bad, _ = check_oracle(off, maxn, fixture)
         if [b[0] for b in bad] != [4]:
             problems.append(f"RED 1: a +1 cell was not caught by the oracle sum ({bad})")
-        bad, _ = check_twin(good, off, maxn)
+        bad, _ = check_twin(read_perheight(good, maxn), read_perheight(off, maxn), maxn)
         if bad != [(4, 2)]:
             problems.append(f"RED 1: a +1 cell was not caught by the twin diff ({bad})")
 
@@ -196,8 +205,8 @@ def selftest():
         empty = os.path.join(d, "empty")
         os.makedirs(empty)
         try:
-            check_twin(empty, empty, maxn)
-            problems.append("RED 3: two empty directories compared equal")
+            read_perheight(empty, maxn)
+            problems.append("RED 3: an empty directory read as a per-height set")
         except ValueError:
             pass
 

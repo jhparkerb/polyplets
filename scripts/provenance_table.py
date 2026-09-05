@@ -56,14 +56,27 @@ claimed only at the measured Motley reach.
 from __future__ import annotations
 
 import argparse
+import functools
 import sys
 from pathlib import Path
+
+from cutcount_assembly_gate import assemble_rows
 
 ROOT = Path(__file__).resolve().parent.parent
 TRIANGLE = ROOT / "results" / "triangle.txt"
 OUT = ROOT / "results" / "provenance-table.md"
 
 NMAX = 40
+
+
+def read_triangle(path=TRIANGLE):
+    T = {}
+    for line in path.read_text().splitlines():
+        if not line.strip() or line.startswith("#"):
+            continue
+        n, h, v = line.split()
+        T[(int(n), int(h))] = int(v)
+    return T
 
 
 def _reach_by_rowdir(nmax, root):
@@ -73,46 +86,23 @@ def _reach_by_rowdir(nmax, root):
     SAME Nmax, so a height counts only when C_H, C_{H-1}, C_{H-2} all live in
     one directory, all reach n >= nmax, AND the assembled T(n,H) equals the
     banked triangle at every cell n <= nmax the triangle has.  Reach is
-    contiguous from H = 1: the first height that fails caps it.  Until
-    2026-09-05 the values were never read -- a C19.out full of wrong numbers
-    reaching n >= 40 credited H = 19 (AUDIT-2026-09-02 M3).  Now a corrupt row
-    shrinks the reach, and the pinned count below fires.
+    contiguous from H = 1: the first height that fails caps it, so a corrupt
+    banked row shrinks the reach and the pinned count below fires
+    (AUDIT-2026-09-02 M3).
     """
-    T = {}
-    for line in (root / "results" / "triangle.txt").read_text().splitlines():
-        if line.strip() and not line.startswith("#"):
-            n, h, v = line.split()
-            T[(int(n), int(h))] = int(v)
+    T = read_triangle(root / "results" / "triangle.txt")
     out = {}
     for d in sorted((root / "results" / "cutcount_b1").glob("rows*")):
         if not d.is_dir():
             continue
-        C = {}
-        for f in d.glob("C*.out"):
-            try:
-                h = int(f.stem[1:])
-            except ValueError:
-                continue
-            C[h] = {}
-            for ln in f.read_text().splitlines():
-                p = ln.split()
-                if len(p) == 2 and p[0].isdigit():
-                    C[h][int(p[0])] = int(p[1])
+        C, M = assemble_rows(d)
         reach = 0
-        for h in range(1, max(C, default=0) + 1):
-            rows = [C.get(h - i, {}) for i in (0, 1, 2) if h - i >= 1]
-            if any(max(r, default=0) < nmax for r in rows):
+        for h in sorted(C):
+            if any(max(C.get(h - i, {}), default=0) < nmax
+                   for i in (0, 1, 2) if h - i >= 1):
                 break
-            ok = True
-            for n in range(h, nmax + 1):
-                if (n, h) not in T:
-                    continue
-                t = C[h].get(n, 0) - 2 * C.get(h - 1, {}).get(n, 0) \
-                    + C.get(h - 2, {}).get(n, 0)
-                if t != T[(n, h)]:
-                    ok = False
-                    break
-            if not ok:
+            if any(M.get((n, h)) != T[(n, h)]
+                   for n in range(h, nmax + 1) if (n, h) in T):
                 break
             reach = h
         out[d] = reach
@@ -121,14 +111,9 @@ def _reach_by_rowdir(nmax, root):
 
 def motley_reach(nmax=None, root=None):
     """The greatest height Motley covers, DERIVED from the banked row sets and
-    VERIFIED against the triangle (see _reach_by_rowdir).
-
-    Was a hand-edited constant (`MOTLEY_H = 18`) and went stale the day the
-    Nmax-41 ladder landed: the generator kept saying 18 while
-    results/cutcount_b1/rows41/ held C1..C19, and `make gate-provenance` could
-    not see it, because the gate compares the published note against this
-    generator and a stale constant makes both stale together, green.
-    """
+    VERIFIED against the triangle (see _reach_by_rowdir).  A hand-edited
+    constant here went stale the day the Nmax-41 ladder landed, and the gate,
+    which compares the published note against this generator, stayed green."""
     root = Path(root) if root else ROOT
     nmax = NMAX if nmax is None else nmax
     return max(_reach_by_rowdir(nmax, root).values(), default=0)
@@ -146,6 +131,7 @@ MOTLEY_H = motley_reach()
 MOTLEY_DIR = motley_rowdir()
 
 
+@functools.lru_cache(maxsize=None)
 def tower_cells(motley_h=None, rowdir=None, jmax=4):
     """The cells above Motley's reach that the Motley-pinned Undertow tower
     reproduces EXACTLY -- experiments/undertow_ri.py, one tower per row with
@@ -167,9 +153,6 @@ def tower_cells(motley_h=None, rowdir=None, jmax=4):
                              "the incumbent at %s" % r["wrong"])
         cells.update(r["agree"])
     return cells
-
-
-U_CELLS = tower_cells()
 
 # The closed-form band, in one place.  The production engine wires P_k for
 # k <= PK_KMAX, the diagonal law's onset is sharp at n >= 2k+1
@@ -217,16 +200,6 @@ EXPECTED = {
 }
 
 
-def read_triangle():
-    T = {}
-    for line in TRIANGLE.read_text().splitlines():
-        if not line.strip() or line.startswith("#"):
-            continue
-        n, h, v = line.split()
-        T[(int(n), int(h))] = int(v)
-    return T
-
-
 def sources(n, h, motley_h=MOTLEY_H):
     """The corroborating sources for one cell, by the rules in the docstring."""
     out = set()
@@ -243,7 +216,7 @@ def sources(n, h, motley_h=MOTLEY_H):
         out.add("P" if h <= SWEEP_H else "F")
     if h <= motley_h:
         out.add("M")
-    if motley_h == MOTLEY_H and (n, h) in U_CELLS:
+    if motley_h == MOTLEY_H and (n, h) in tower_cells():
         out.add("U")                 # measured at this reach only, not a rule
     out.add("C")
     return out
@@ -409,14 +382,11 @@ def selftest(T):
                   "Motley with H=%d" % got)
             return 1
     # RED 3: a tower cell that stops agreeing must refuse, not drop out of U.
+    # A canned record stands in for the 21 towers; the refusal path is the same.
     import undertow_ri
     real = undertow_ri.cover
-
-    def tampered(**kw):
-        recs = real(**kw)
-        recs[-1]["wrong"].append(recs[-1]["agree"].pop())
-        return recs
-    undertow_ri.cover = tampered
+    undertow_ri.cover = lambda **kw: [{"agree": [(40, 20)], "wrong": [(40, 21)]}]
+    tower_cells.cache_clear()
     try:
         try:
             tower_cells()
@@ -427,6 +397,7 @@ def selftest(T):
             return 1
     finally:
         undertow_ri.cover = real
+        tower_cells.cache_clear()
     print("selftest ok: a one-height change in Motley's reach moves the "
           "pinned count; a corrupt banked row shrinks the derived reach "
           "(%d -> %d); a disagreeing tower cell refuses" % (MOTLEY_H, got))

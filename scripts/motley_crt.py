@@ -104,7 +104,7 @@ def reconstruct(res, height, nmax=None):
     return exact, crt_primes, heldout, checked
 
 
-def selftest_height(H, res_dir, banked, min_common, label):
+def selftest_height(H, res_dir, banked, expect_common, label):
     """Reconstruct C_H from the banked residue rows, require equality with the
     banked exact row, then corrupt one residue and require the held-out prime
     to catch it.  One height, one posture; called once per banked ladder."""
@@ -118,8 +118,9 @@ def selftest_height(H, res_dir, banked, min_common, label):
         sys.exit(f"SELFTEST RED ({label}): {len(bad)} cells differ from the "
                  f"banked row, first n={bad[0]}")
     common = sum(1 for k in exact if k in want)
-    if common < min_common:
-        sys.exit(f"SELFTEST RED ({label}): only {common} cells compared -- vacuous")
+    if common != expect_common:
+        sys.exit(f"SELFTEST RED ({label}): {common} cells compared, pinned at "
+                 f"{expect_common}")
     print(f"selftest {label}: C_{H} reconstructed from {len(crt_p)} primes, held "
           f"out {held}, {n} cells; {common} match the banked row exactly")
 
@@ -144,13 +145,12 @@ def selftest_height(H, res_dir, banked, min_common, label):
 
 
 def selftest():
-    """Both banked ladders.  Confetti (H = 18, five ~31-bit primes, Nmax 40)
-    and the Nmax-41 ladder (H = 19, nine ~16-bit primes, banked 2026-09-05 per
-    AUDIT-2026-09-02 M3).  Until then this selftest covered C_18 only and the
-    nineteen held-out verdicts of the ladder were a README sentence."""
+    """Both banked ladders: Confetti (H = 18, five ~31-bit primes, Nmax 40)
+    and the Nmax-41 ladder (H = 19, nine ~16-bit primes; AUDIT-2026-09-02 M3).
+    The cell count each compares is pinned, so a truncated row cannot pass."""
     cb = os.path.join(ROOT, "results", "cutcount_b1")
     selftest_height(18, os.path.join(cb, "residues"),
-                    os.path.join(cb, "rows", "C18.out"), 30, "Confetti")
+                    os.path.join(cb, "rows", "C18.out"), 40, "Confetti")
     selftest_height(19, os.path.join(cb, "residues41"),
                     os.path.join(cb, "rows41", "C19.out"), 41, "Nmax-41 ladder")
 

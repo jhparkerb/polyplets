@@ -35,6 +35,11 @@ def read_terms_file(path):
     return vals
 
 
+# TODO(2026-09-05, /simplify): gate_g2, gate_holes, gate_modp and gate_tma each
+# grew their own guard against an engine that prints nothing or dies after
+# printing (AUDIT-2026-09-02, gate hygiene).  The shared fix is for run() to
+# refuse empty stdout and parse_counts() an empty table, with gate_holes moved
+# onto run().  Deferred: it changes every gate's contract in one edit.
 def run(binary, *args):
     """Run an engine binary, returning its stdout; raise on nonzero exit.
 

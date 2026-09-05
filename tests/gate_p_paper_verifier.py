@@ -15,8 +15,8 @@ the paper prints it and no check reads it.  Measured 2026-08-23 at four or
 more digits: 199 of 200 guarded.  Widened 2026-09-05 to two or more, because
 the paper's scope claims are two-digit (Redelmeier to 22, Motley to H = 19,
 P_k to 19, holes to 18 and 14, 25^k/k!) and the verifier now reads each of
-them out of its sentence; and the shading macro's brace-less argument
-(\\g1480) is a literal too, where the old lookbehind skipped it.  The
+them out of its sentence; and a letter before the digits no longer exempts
+them (\\g1480, A030233 and $k\\le19$ were all skipped by the old lookbehind).  The
 exceptions -- the year on the title page, the type size -- are not claims and
 are named in ALLOWED below with their reasons.  Any new unguarded literal
 fails this gate, so the coverage cannot silently drop when the paper gains a
@@ -53,9 +53,10 @@ ALLOWED = {
 # Numbers inside these never assert anything about the mathematics.
 STRIP = re.compile(
     r"\\(cite|label|ref|eqref|url|href|arxiv|includegraphics)\{[^}]*\}|%[^\n]*")
-# A literal stands alone (not part of a longer number, identifier or decimal)
-# or follows the brace-less shading macro \g.
-BOUNDARY = r"(?:(?<![0-9A-Za-z.])|(?<=\\g)|(?<=A))"
+# A literal is a maximal digit run that is not the fraction of a decimal.  A
+# letter before it does not exempt it: \g1480 (the shading macro's brace-less
+# argument), A030233 and $k\le19$ are all claims the verifier reads.
+BOUNDARY = r"(?<![0-9.])"
 LITERAL = re.compile(BOUNDARY + r"[0-9]{2,}(?![0-9])")
 
 

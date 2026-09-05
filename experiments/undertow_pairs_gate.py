@@ -49,6 +49,7 @@ Exit 0 = GATE GREEN; anything else = red.  ~1 s.
 
 import contextlib
 import io
+import math
 import os
 import shutil
 import sys
@@ -60,24 +61,22 @@ sys.path.insert(0, HERE)
 
 import severance_w3_depths as swd                                 # noqa: E402
 import slope2_law_vs_truth as sl                                  # noqa: E402
-from undertow_pin import all_pairs                                # noqa: E402
 from undertow_a41 import build, sweep_rows, tower                 # noqa: E402
 import undertow_congruence_gate as ucg                            # noqa: E402
+from lane_b_a41_recount import CLAIM as A41                       # noqa: E402
 
-A41 = 393811462683918679824582849262105        # results/a41/PROVENANCE.md
-JMAX = 5
-KMAX = 21
-HMAX_PIN = 19                                  # the a(41) sweep's top height
+JMAX = 5                                       # one depth past the congruence gate's
+KMAX, HMAX_PIN = ucg.KMAX, ucg.HMAX_PIN
 SWEEP = os.path.join(ROOT, "results", "a41")
 TABLES = os.path.join(ROOT, "results")
 
 # Pinned shape of the two Undertow levels at depths <= 5, cells no taller than
-# H = 19.  Level k, depth j is the cell (2k+1-j, k+1-j).
+# H = 19.  Level k, depth j is the cell (2k+1-j, k+1-j); every pair of its
+# cells is a depth pair, so the pair count follows from the cell count.
 EXPECT_CELLS = {
     20: {(36, 16), (37, 17), (38, 18), (39, 19)},          # j = 5, 4, 3, 2
     21: {(38, 17), (39, 18), (40, 19)},                     # j = 5, 4, 3
 }
-EXPECT_PAIRS = {20: 6, 21: 3}
 
 
 def quiet(fn, *a, **kw):
@@ -85,9 +84,9 @@ def quiet(fn, *a, **kw):
         return fn(*a, **kw)
 
 
-def assemble(jmax, forbid_row=41):
+def assemble(jmax):
     """(ab, Dj, tri, a41) with the tower pinned at depths <= jmax."""
-    ab, Dj, tri, _ = build(jmax, KMAX, forbid_row=forbid_row, hmax=HMAX_PIN)
+    ab, Dj, tri, _ = build(jmax, KMAX, forbid_row=41, hmax=HMAX_PIN)
     swept = sweep_rows(SWEEP, 41, HMAX_PIN)
     row = {H: swept[H] if H in swept else tower(ab, Dj, 41, H)
            for H in range(1, 42)}
@@ -100,19 +99,14 @@ def assemble(jmax, forbid_row=41):
 def run_gate(verbose=True):
     ab, Dj, tri, total = quiet(assemble, JMAX)
     bad = []
-    for k in (20, 21):
-        pairs = all_pairs(k, JMAX, tri, HMAX_PIN)
-        cells = {(2 * k + 1 - j, k + 1 - j) for d in pairs for j in d}
+    for k, cells in ucg.pin_cells(tri, JMAX, HMAX_PIN).items():
         if cells != EXPECT_CELLS[k]:
             bad.append(f"level {k} pin cells {sorted(cells)}, pinned at "
                        f"{sorted(EXPECT_CELLS[k])}")
-        if len(pairs) != EXPECT_PAIRS[k]:
-            bad.append(f"level {k}: {len(pairs)} depth pairs, pinned at "
-                       f"{EXPECT_PAIRS[k]}")
         elif verbose:
-            print(f"  level k={k}: {len(pairs)} depth pairs over "
-                  f"{sorted(cells)} agree ({len(pairs) - 1} independent "
-                  f"checks)")
+            pairs = math.comb(len(cells), 2)
+            print(f"  level k={k}: {pairs} depth pairs over {sorted(cells)} "
+                  f"agree ({pairs - 1} independent checks)")
     if total != A41:
         bad.append(f"a(41) assembled {total}, banked {A41}")
     elif verbose:
@@ -158,9 +152,9 @@ def bump(fname, e, k, col, delta):
     return m
 
 
-def refuses(jmax, forbid_row=41):
+def refuses(jmax):
     try:
-        quiet(assemble, jmax, forbid_row)
+        quiet(assemble, jmax)
     except SystemExit as ex:
         return "disagree" in str(ex)
     return False

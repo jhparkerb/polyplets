@@ -79,7 +79,7 @@ def triangle_nmax():
     gate-provenance and gate-residual-cells both went red on the same plant.
 
     Derived, the pinned counts below do the work instead: the day the triangle
-    grows, EXPECT_CELLS and EXPECT_HELDOUT_CELLS stop matching and the gate
+    grows, EXPECT_CELLS and NMAX stop matching and the gate
     fires, which forces the coverage question to be answered deliberately.
     """
     nmax = 0
@@ -99,7 +99,6 @@ NMAX = triangle_nmax()
 EXPECT_TOP_H = 18                      # results/motley-h18.md (Confetti)
 EXPECT_CELLS = 567                     # rows H=1..18 against the triangle
 EXPECT_PRIMES = 5                      # four for the CRT, one held out
-EXPECT_HELDOUT_CELLS = NMAX            # 40/40, results/motley-h18.md
 CRT_BOUND = 1 << 112                   # the runner's overflow guard
 PRIME_CHECK = ROOT / "scripts" / "confetti_prime_check.py"
 EXPECT_PER_PRIME_CELLS = 23            # n = 18..40, the cells the triangle has
@@ -114,7 +113,6 @@ EXPECT41_CELLS = 589                   # rows H=1..19 vs the triangle, n <= 40
 EXPECT41_ROW41_CELLS = 19              # T(41,H), H=1..19, vs results/a41
 EXPECT41_PRIMES = 9                    # eight for the CRT, the largest held out
 EXPECT41_HELDOUT_CELLS = 19 * 41       # every height, n = 1..41
-CRT_BOUND41 = 1 << 112                 # scripts/motley_ladder.sh: "< 2^112"
 
 
 def show(path: Path) -> str:
@@ -164,6 +162,25 @@ def residue_rows(res_dir: Path, H: int = EXPECT_TOP_H) -> tuple[list[int], dict[
     return sorted(found), found
 
 
+def assemble_rows(rows_dir: Path):
+    """The banked C rows under rows_dir, {H: {n: C_H(n)}}, and the triangle
+    they assemble to, {(n, H): T(n,H)} with T = C_H - 2 C_{H-1} + C_{H-2}
+    (C_0 = C_{-1} = 0).  A height whose two predecessors are not both banked
+    is left unassembled rather than read against a zero row, which would make
+    a wrong T out of a gap; contiguity and coverage report the gap instead."""
+    C = {0: {}, -1: {}}
+    for p in sorted(rows_dir.glob("C*.out")):
+        m = re.fullmatch(r"C(\d+)\.out", p.name)
+        if m:
+            C[int(m.group(1))] = read_rows(p)
+    T = {}
+    for h in sorted(h for h in C if h >= 1):
+        if (h - 1) in C and (h - 2) in C:
+            for n, c in C[h].items():
+                T[(n, h)] = c - 2 * C[h - 1].get(n, 0) + C[h - 2].get(n, 0)
+    return {h: r for h, r in C.items() if h >= 1}, T
+
+
 def check_assembly(rows_dir: Path, triangle: Path, top_h: int = EXPECT_TOP_H,
                    expect_cells: int = EXPECT_CELLS) -> tuple[list[str], int]:
     """T(n,H) from the banked C rows vs the incumbent triangle.
@@ -171,43 +188,27 @@ def check_assembly(rows_dir: Path, triangle: Path, top_h: int = EXPECT_TOP_H,
     Only cells the triangle has are compared, so a row set at Nmax 41 is
     checked at n <= 40 here and its n = 41 cells by check_row41()."""
     bad = []
-    C = {0: {}, -1: {}}
-    heights = []
-    for p in sorted(rows_dir.glob("C*.out")):
-        m = re.fullmatch(r"C(\d+)\.out", p.name)
-        if not m:
-            continue
-        h = int(m.group(1))
-        C[h] = read_rows(p)
-        heights.append(h)
-    if not heights:
+    C, M = assemble_rows(rows_dir)
+    if not C:
         return (["no C<H>.out rows found under %s -- the gate is not checking "
                  "anything" % show(rows_dir)], 0)
-    top = max(heights)
-    if sorted(heights) != list(range(1, top + 1)):
+    top = max(C)
+    if sorted(C) != list(range(1, top + 1)):
         bad.append("banked rows are not H = 1..%d contiguous: %s"
-                   % (top, sorted(heights)))
+                   % (top, sorted(C)))
     if top != top_h:
         bad.append("top banked row is H = %d, pinned at %d -- a rung landed or "
                    "a row vanished; update the pin deliberately"
                    % (top, top_h))
     T = read_triangle(triangle)
     cells = 0
-    for h in sorted(heights):
-        # A height whose two predecessors are not both banked cannot be
-        # assembled at all.  Skip it rather than reading a missing row as
-        # zero -- that would assemble a wrong T and call it a mismatch, when
-        # the real fault is the gap, which contiguity and coverage both report.
-        if (h - 1) not in C or (h - 2) not in C:
+    for (n, h), t in sorted(M.items()):
+        if (n, h) not in T:
             continue
-        for n in sorted(C[h]):
-            if (n, h) not in T:
-                continue
-            t = C[h][n] - 2 * C[h - 1].get(n, 0) + C[h - 2].get(n, 0)
-            cells += 1
-            if t != T[(n, h)]:
-                bad.append("T(%d,%d): assembled %d, triangle %d"
-                           % (n, h, t, T[(n, h)]))
+        cells += 1
+        if t != T[(n, h)]:
+            bad.append("T(%d,%d): assembled %d, triangle %d"
+                       % (n, h, t, T[(n, h)]))
     if cells != expect_cells:
         bad.append("compared %d cells, pinned at %d -- coverage moved"
                    % (cells, expect_cells))
@@ -233,31 +234,25 @@ def check_row41(rows_dir: Path, sweep_dir: Path) -> tuple[list[str], int]:
     Nmax-41 sweep -- two engines, no shared code, on every swept cell of a(41).
     """
     bad = []
-    C = {0: {}, -1: {}}
-    for p in sorted(rows_dir.glob("C*.out")):
-        m = re.fullmatch(r"C(\d+)\.out", p.name)
-        if m:
-            C[int(m.group(1))] = read_rows(p)
+    _, M = assemble_rows(rows_dir)
     sweep = read_sweep_row(sweep_dir, NMAX41)
     if not sweep:
         return (["no h<H>.out with an n = %d line under %s -- nothing to compare"
                  % (NMAX41, show(sweep_dir))], 0)
     cells = 0
     for h in range(1, EXPECT41_TOP_H + 1):
-        if h not in C or (h - 1) not in C or (h - 2) not in C:
-            bad.append("rows41 C%d.out (or a predecessor) is missing" % h)
-            continue
-        if NMAX41 not in C[h]:
-            bad.append("rows41 C%d.out carries no n = %d line" % (h, NMAX41))
+        if (NMAX41, h) not in M:
+            bad.append("rows41 C%d.out, or a predecessor, is missing or carries "
+                       "no n = %d line" % (h, NMAX41))
             continue
         if h not in sweep:
             bad.append("%s has no h%d.out with an n = %d line"
                        % (show(sweep_dir), h, NMAX41))
             continue
-        t = C[h][NMAX41] - 2 * C[h - 1].get(NMAX41, 0) + C[h - 2].get(NMAX41, 0)
         cells += 1
-        if t != sweep[h]:
-            bad.append("T(%d,%d): Motley %d, kink sweep %d" % (NMAX41, h, t, sweep[h]))
+        if M[(NMAX41, h)] != sweep[h]:
+            bad.append("T(%d,%d): Motley %d, kink sweep %d"
+                       % (NMAX41, h, M[(NMAX41, h)], sweep[h]))
     if cells != EXPECT41_ROW41_CELLS:
         bad.append("row 41: compared %d cells, pinned at %d"
                    % (cells, EXPECT41_ROW41_CELLS))
@@ -265,13 +260,13 @@ def check_row41(rows_dir: Path, sweep_dir: Path) -> tuple[list[str], int]:
 
 
 def check_heldout(res_dir: Path, rows_dir: Path, H: int = EXPECT_TOP_H,
-                  expect_primes: int = EXPECT_PRIMES, heldout_rule: str = "min",
-                  nmax: int = NMAX, expect_cells: int = EXPECT_HELDOUT_CELLS,
-                  bound: int = CRT_BOUND) -> tuple[list[str], int]:
+                  expect_primes: int = EXPECT_PRIMES, heldout=min,
+                  nmax: int = NMAX) -> tuple[list[str], int]:
     """CRT all primes but one, predict that one, tie the result to the banked
-    exact row.  `heldout_rule` names which prime the RUN held out: Confetti's
-    runner held out the last of its list, the smallest ("min"); the Nmax-41
-    ladder used scripts/motley_crt.py, which holds out the largest ("max")."""
+    exact row, at every n = 1..nmax.  `heldout` picks the prime the RUN held
+    out: Confetti's runner held out the last of its list, the smallest (min);
+    the Nmax-41 ladder used scripts/motley_crt.py, which holds out the largest
+    (max)."""
     bad = []
     primes, paths = residue_rows(res_dir, H)
     if len(primes) != expect_primes:
@@ -289,17 +284,18 @@ def check_heldout(res_dir: Path, rows_dir: Path, H: int = EXPECT_TOP_H,
     # read here, so a regenerated prime set cannot leave this gate verifying a
     # different contract than the run enforced.  That is a change to banked
     # evidence layout, so it is not a drive-by.
-    heldout = min(primes) if heldout_rule == "min" else max(primes)
-    crt_primes = [p for p in primes if p != heldout]
+    held = heldout(primes)
+    crt_primes = [p for p in primes if p != held]
 
-    # TODO(2026-08-19, updated 2026-08-24): now the FIFTH Python copy of this
+    # TODO(2026-08-19, updated 2026-09-05): the FIFTH Python copy of this
     # CRT loop (scripts/crt_combine.py, tests/gate_modp.py, the runner's own,
-    # and scripts/motley_crt.py).  The stated blocker is gone: motley_crt.py
-    # was extracted from the runner's heredoc and IS importable -- it parses no
-    # argv at import time, where crt_combine.py does.  So motley_crt is the
-    # candidate to share, not crt_combine.  Note that consolidating THIS copy
-    # would erode the gate's second-source role against the dalby runner, so
-    # the other three are the ones to collapse.
+    # and scripts/motley_crt.py).  motley_crt.py is importable (no argv at
+    # import) and is the candidate to share; consolidating THIS copy would
+    # erode the gate's second-source role against the dalby runner, so the
+    # other three are the ones to collapse.  The Nmax-41 arm re-encodes
+    # motley_crt's hold-out rule as `heldout=max`, and both gates carry the
+    # ladder's paths, Nmax and prime count separately: one ladder record in
+    # motley_crt.py, read by both, is the consolidation, deferred with the rest.
     M = 1
     for p in crt_primes:
         M *= p
@@ -322,22 +318,21 @@ def check_heldout(res_dir: Path, rows_dir: Path, H: int = EXPECT_TOP_H,
         for p in crt_primes:
             Mi = M // p
             x = (x + res[p][n] * Mi * pow(Mi, -1, p)) % M
-        if x >= bound:
+        if x >= CRT_BOUND:
             bad.append("C%d n=%d: CRT reconstruction >= 2^%d, the runner's "
-                       "overflow guard" % (H, n, bound.bit_length() - 1))
+                       "overflow guard" % (H, n, CRT_BOUND.bit_length() - 1))
             continue
-        if x % heldout != res[heldout][n]:
+        if x % held != res[held][n]:
             bad.append("C%d n=%d: held-out prime %d predicts %d, measured %d"
-                       % (H, n, heldout, x % heldout, res[heldout][n]))
+                       % (H, n, held, x % held, res[held][n]))
             continue
         if n in exact and exact[n] != x:
             bad.append("C%d n=%d: CRT reconstruction %d != banked C%d.out %d"
                        % (H, n, x, H, exact[n]))
             continue
         checked += 1
-    if checked != expect_cells:
-        bad.append("C%d held-out check covered %d of %d cells, pinned at %d"
-                   % (H, checked, nmax, expect_cells))
+    if checked != nmax:
+        bad.append("C%d held-out check covered %d of %d cells" % (H, checked, nmax))
     return bad, checked
 
 
@@ -346,8 +341,7 @@ def check_heldout41(res_dir: Path, rows_dir: Path) -> tuple[list[str], int]:
     bad, total = [], 0
     for H in range(1, EXPECT41_TOP_H + 1):
         b, n = check_heldout(res_dir, rows_dir, H=H, expect_primes=EXPECT41_PRIMES,
-                             heldout_rule="max", nmax=NMAX41, expect_cells=NMAX41,
-                             bound=CRT_BOUND41)
+                             heldout=max, nmax=NMAX41)
         bad += b
         total += n
     if total != EXPECT41_HELDOUT_CELLS:

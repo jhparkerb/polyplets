@@ -24,9 +24,8 @@ Checks (all fail-closed):
      KPIN is derived from the real point counts, not hardcoded.
   C. Counts, per row n = 29..40, the cells that are real-swept, the formula
      cells pinned by B (k <= KPIN), and the formula cells conditional on the
-     defect-gas structure (k > KPIN, docs/proofs/diagonal-law.md Corollary),
-     and asserts the three groups sum to the banked a(n).  Cells, not shares
-     of a(n): a wrong cell ruins a(n) whatever its size.
+     defect-gas structure (k > KPIN, docs/proofs/diagonal-law.md Corollary).
+     Cells, not shares of a(n): a wrong cell ruins a(n) whatever its size.
 """
 import re
 import sys
@@ -155,15 +154,10 @@ def main():
     print(f"   n   real H<={REAL_HMAX}   formula k<={KPIN}   "
           f"formula k>{KPIN} (conditional)")
     for n in range(29, NMAX + 1):
-        an = sum(tri[(n, H)] for H in range(1, n + 1))
         lo = REAL_HMAX + 1
-        real = [H for H in range(1, lo)]
-        safe = [H for H in range(lo, n + 1) if n - H <= KPIN]
-        cond = [H for H in range(lo, n + 1) if n - H > KPIN]
-        if sum(tri[(n, H)] for H in real + safe + cond) != an:
-            sys.exit(f"row decomposition mismatch at n={n}")
-        print(f"  {n}   {len(real):5d}          {len(safe):5d}           "
-              f"{len(cond):5d}")
+        safe = sum(1 for H in range(lo, n + 1) if n - H <= KPIN)
+        print(f"  {n}   {lo - 1:5d}          {safe:5d}           "
+              f"{n - lo + 1 - safe:5d}")
 
     fresh = all(tri[(n, H)] == T_formula(n - H, n)
                 for n in range(29, NMAX + 1)

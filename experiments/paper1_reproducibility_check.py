@@ -21,16 +21,14 @@ the campaign:
      doc-style / honest figures of results/strip-engine.md
   E. per row n = 29..40, how many CELLS were really swept (H <= 21), how
      many are wired closed forms whose level is pinned by real data alone
-     (k <= 10), and how many are wired closed forms above that (k > 10) --
-     the decomposition scripts/verify_diagonal_pins.py prints as shares of
-     a(n), restated in cells.  Cells, not shares: a wrong cell ruins a(n)
-     whatever its size, so a percentage of a(n) carries no decision
-     (standing ruling, 2026-08-18).  Until 2026-09-05 this check printed
-     "share of each late row's mass" inside the strip engine's reach.
+     (k <= 10: a level k has the k+1 real in-onset points it needs iff
+     k <= (21-1)/2), and how many are wired closed forms above that.  Cells,
+     not shares: a wrong cell ruins a(n) whatever its size, so a percentage
+     of a(n) carries no decision (standing ruling, 2026-08-18).
   F. the Motley (colouring) second source: results/cutcount_b1/rows41/
      assembles to the banked triangle at every cell with H <= 19 and n <= 40
      (589 cells) and to the kink sweep's own n = 41 row at H <= 19 (19
-     cells); the same two numbers `make gate-cutcount-assembly` pins.
+     cells) -- the two arms of `make gate-cutcount-assembly`, called here.
 
 RED controls, all required to fail: each diagonal formula perturbed in its
 leading coefficient must break check B, a single altered digit in the
@@ -42,15 +40,23 @@ Usage: python3 experiments/paper1_reproducibility_check.py
 import argparse
 import glob
 import os
+import shutil
 import sys
+import tempfile
 from fractions import Fraction
+from pathlib import Path
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "scripts"))
+import cutcount_assembly_gate as CAG        # noqa: E402
+import provenance_table as PT               # noqa: E402
+
 PERHEIGHT = os.path.join(ROOT, "results", "ns_a40", "perheight")
-ROWS41 = os.path.join(ROOT, "results", "cutcount_b1", "rows41")
-A41 = os.path.join(ROOT, "results", "a41")
-SWEEP_H = 21            # the a(40) run's tallest real sweep
-PINNED_K = 10           # levels the diag-pins audit shows pinned by real data alone
+TRIANGLE = Path(ROOT, "results", "triangle.txt")
+ROWS41 = Path(ROOT, "results", "cutcount_b1", "rows41")
+A41 = Path(ROOT, "results", "a41")
+SWEEP_H = PT.SWEEP_H                        # the a(40) run's tallest real sweep
+PINNED_K = (SWEEP_H - 1) // 2               # levels with k+1 real in-onset points
 TERMS = os.path.join(ROOT, "results", "b006770_upload.txt")
 REDELMEIER = os.path.join(ROOT, "results", "redelmeier_row22", "combined.txt")
 NMAX = 40
@@ -162,41 +168,36 @@ def main():
     assert (len(cells), len(S), len(honest), len(doc)) == (820, 469, 592, 782), \
         "coverage arithmetic no longer reproduces results/strip-engine.md"
 
-    # E. cells per row by how they were produced.  H <= 21 was really swept
-    # in the a(40) run; above it every cell is a wired closed form P_k,
-    # k = n - H, and verify_diagonal_pins.py shows k <= 10 pinned by real
-    # data alone.  Checked against the row length so nothing is dropped.
-    print("E. cells per row: really swept (H<=21) / wired P_k, k<=10 / wired P_k, k>10")
+    # E. cells per row by how they were produced.  H <= SWEEP_H was really
+    # swept in the a(40) run; above it every cell is a wired closed form P_k,
+    # k = n - H, and a level is pinned by real data alone iff k <= PINNED_K.
+    print(f"E. cells per row: really swept (H<={SWEEP_H}) / wired P_k, "
+          f"k<={PINNED_K} / wired P_k, k>{PINNED_K}")
     for n in range(29, NMAX + 1):
-        swept = sum(1 for H in range(1, n + 1) if H <= SWEEP_H)
         low = sum(1 for H in range(SWEEP_H + 1, n + 1) if n - H <= PINNED_K)
-        high = sum(1 for H in range(SWEEP_H + 1, n + 1) if n - H > PINNED_K)
-        assert swept + low + high == n
-        print(f"   n={n}: {swept} swept, {low} formula k<=10, {high} formula k>10")
+        print(f"   n={n}: {SWEEP_H} swept, {low} formula k<={PINNED_K}, "
+              f"{n - SWEEP_H - low} formula k>{PINNED_K}")
 
-    # F. the colouring second source at Nmax 41.
-    C = {0: {}, -1: {}}
-    for f in glob.glob(os.path.join(ROWS41, "C*.out")):
-        H = int(os.path.basename(f)[1:-4])
-        C[H] = read_terms(f)
-    tri = {}
-    for H in range(1, 20):
-        for n in range(1, 41):
-            if H in C and H - 1 in C and H - 2 in C and n in C[H]:
-                tri[(n, H)] = C[H][n] - 2 * C[H - 1].get(n, 0) + C[H - 2].get(n, 0)
-    cells = [(n, H) for (n, H) in tri if (n, H) in T]
-    bad = [c for c in cells if tri[c] != T[c]]
-    assert not bad and len(cells) == 589, \
-        f"Motley rows41 vs the triangle: {len(cells)} cells, mismatches {bad[:3]}"
-    a41 = read_triangle(A41)
-    top = [(41, H) for H in range(1, 20)]
-    bad = [c for c in top if a41.get(c) !=
-           C[c[1]][41] - 2 * C[c[1] - 1].get(41, 0) + C[c[1] - 2].get(41, 0)]
+    # F. the colouring second source at Nmax 41: the gate's two arms, against
+    # results/triangle.txt, which is this script's own T.
+    tri = CAG.read_triangle(TRIANGLE)
+    assert all(tri[c] == T.get(c) for c in tri), "results/triangle.txt != the per-height sweep"
+    bad, cells = CAG.check_assembly(ROWS41, TRIANGLE, CAG.EXPECT41_TOP_H, CAG.EXPECT41_CELLS)
+    assert not bad, f"Motley rows41 vs the triangle: {bad[:3]}"
+    bad, top = CAG.check_row41(ROWS41, A41)
     assert not bad, f"Motley rows41 vs the kink sweep at n = 41: {bad[:3]}"
-    print(f"F. Motley rows41: {len(cells)} cells H<=19, n<=40 equal the triangle; "
-          f"{len(top)} cells at n = 41 equal the kink sweep  OK")
-    C[19][40] += 1
-    assert C[19][40] - 2 * C[18][40] + C[17][40] != T[(40, 19)], "RED control alive"
+    print(f"F. Motley rows41: {cells} cells H<=19, n<=40 equal the triangle; "
+          f"{top} cells at n = 41 equal the kink sweep  OK")
+    with tempfile.TemporaryDirectory() as d:
+        shutil.copytree(ROWS41, os.path.join(d, "rows41"))
+        p = os.path.join(d, "rows41", "C19.out")
+        lines = open(p).read().splitlines()
+        n, v = lines[-2].split()                     # n = 40, a cell the triangle has
+        lines[-2] = f"{n} {int(v) + 1}"
+        open(p, "w").write("\n".join(lines) + "\n")
+        bad, _ = CAG.check_assembly(Path(d, "rows41"), TRIANGLE,
+                                    CAG.EXPECT41_TOP_H, CAG.EXPECT41_CELLS)
+    assert bad, "RED control alive"
     print("   RED one altered Motley cell breaks the agreement  OK")
     return 0
 

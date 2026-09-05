@@ -20,6 +20,7 @@ import os
 import re
 import sys
 from fractions import Fraction as Fr
+from functools import cache
 from math import factorial
 from pathlib import Path
 
@@ -234,6 +235,7 @@ def pcell(n, k):  # P_k(n) = T(n,n-k) * 3^(1+3k-n), exact
 
 ab = {}  # k -> (a_k, b_k) cumulant constants
 
+@cache
 def qpart(n, k):  # [y^k] exp(sum_{j<k} (a_j+b_j n) y^j)
     c = [Fr(0)] * (k + 1)
     c[0] = Fr(1)
@@ -473,36 +475,47 @@ for m in range(1, 21):
         checks += 1
 
 # Methods 307-345: the T(n,n-1) derivation, count by count.  Every fixed
-# polyplet of size n <= 8 is generated (Redelmeier 1981); those of height
-# exactly n-1 have one doubled row, and the row's two cells are a domino
-# (gap 1) or a split (gap 2), in an interior row or an end row.  The paper's
-# coefficients are read from its own formulas.
+# polyplet of size n <= 8 is generated (Redelmeier 1981) and tallied as it
+# appears: those of height exactly n-1 have one doubled row, and the row's
+# two cells are a domino (gap 1) or a split (gap 2), in an interior row or an
+# end row.  The paper's coefficients are read from its own formulas.
 NB8 = [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
-
-
-def redelmeier(nmax):
-    out = {n: [] for n in range(1, nmax + 1)}
-
-    def rec(animal, untried, tried):
-        while untried:
-            c = untried.pop()
-            new = animal | {c}
-            out[len(new)].append(new)
-            if len(new) < nmax:
-                fresh = [(c[0] + dx, c[1] + dy) for dx, dy in NB8
-                         if (c[1] + dy > 0 or (c[1] + dy == 0 and c[0] + dx >= 0))
-                         and (c[0] + dx, c[1] + dy) not in new
-                         and (c[0] + dx, c[1] + dy) not in tried]
-                rec(new, untried + fresh, tried | set(fresh))
-            tried = tried | {c}
-    rec(frozenset(), [(0, 0)], set())
-    return out
-
-
 CENSUS_N = 8
-animals = redelmeier(CENSUS_N)
+census = {n: 0 for n in range(1, CENSUS_N + 1)}
+tally = {n: {} for n in range(1, CENSUS_N + 1)}
+
+
+def visit(animal):
+    n = len(animal)
+    census[n] += 1
+    rows = {}
+    for x, y in animal:
+        rows.setdefault(y, []).append(x)
+    if len(rows) != n - 1:
+        return
+    (y2, xs), = [(y, xs) for y, xs in rows.items() if len(xs) == 2]
+    kind = {1: "domino", 2: "split"}.get(abs(xs[0] - xs[1]), "gap>=3")
+    pos = "end" if y2 in (min(rows), max(rows)) else "interior"
+    tally[n][(kind, pos)] = tally[n].get((kind, pos), 0) + 1
+
+
+def redelmeier(animal, untried, tried):
+    while untried:
+        c = untried.pop()
+        new = animal | {c}
+        visit(new)
+        if len(new) < CENSUS_N:
+            fresh = [(c[0] + dx, c[1] + dy) for dx, dy in NB8
+                     if (c[1] + dy > 0 or (c[1] + dy == 0 and c[0] + dx >= 0))
+                     and (c[0] + dx, c[1] + dy) not in new
+                     and (c[0] + dx, c[1] + dy) not in tried]
+            redelmeier(new, untried + fresh, tried | set(fresh))
+        tried = tried | {c}
+
+
+redelmeier(frozenset(), [(0, 0)], set())
 for n in range(1, CENSUS_N + 1):
-    check(f"census: {len(animals[n])} fixed polyplets of size {n}", len(animals[n]), banked_an[n])
+    check(f"census: fixed polyplets of size {n}", census[n], banked_an[n])
 c_dom = said("domino joiner", r"we have \$(\d+)\(n-3\)\\cdot\{\}3\^\{n-4\}\$ junction")
 sp = re.search(r"giving \$\((\d)\\cdot\{\}(\d) \+ (\d)\\cdot\{\}(\d)\)\(n-3\)\\cdot\{\}3\^\{n-4\}\$", tex)
 if not sp:
@@ -522,25 +535,13 @@ if sp and ends and tot:
     check("display: end term", int(tot.group(2)), int(ends.group(3)))
     check("display: 25n - 45", (int(tot.group(3)), int(tot.group(4))), (c_int, 3 * c_int - int(ends.group(3))))
     for n in range(4, CENSUS_N + 1):
-        tally = {}
-        for a in animals[n]:
-            rows = {}
-            for x, y in a:
-                rows.setdefault(y, []).append(x)
-            if len(rows) != n - 1:
-                continue
-            (y2, xs), = [(y, xs) for y, xs in rows.items() if len(xs) == 2]
-            gap = abs(xs[0] - xs[1])
-            kind = {1: "domino", 2: "split"}.get(gap, "gap>=3")
-            pos = "end" if y2 in (min(rows), max(rows)) else "interior"
-            tally[(kind, pos)] = tally.get((kind, pos), 0) + 1
-        p3 = 3 ** (n - 4)
-        check(f"census n={n}: interior domino joiners", tally.get(("domino", "interior"), 0), c_dom * (n - 3) * p3)
-        check(f"census n={n}: interior split joiners", tally.get(("split", "interior"), 0), c_split * (n - 3) * p3)
-        check(f"census n={n}: end domino joiners (4 placements each end)", tally.get(("domino", "end"), 0), 2 * 4 * 3 * p3)
-        check(f"census n={n}: end split joiners (1 placement each end)", tally.get(("split", "end"), 0), 2 * 1 * 3 * p3)
-        check(f"census n={n}: a gap of three or more cannot be spanned", tally.get(("gap>=3", "interior"), 0) + tally.get(("gap>=3", "end"), 0), 0)
-        check(f"census n={n}: T({n},{n - 1}) by enumeration", sum(tally.values()), col[n - 1][n])
+        t, p3 = tally[n], 3 ** (n - 4)
+        check(f"census n={n}: interior domino joiners", t.get(("domino", "interior"), 0), c_dom * (n - 3) * p3)
+        check(f"census n={n}: interior split joiners", t.get(("split", "interior"), 0), c_split * (n - 3) * p3)
+        check(f"census n={n}: end domino joiners (4 placements each end)", t.get(("domino", "end"), 0), 2 * 4 * 3 * p3)
+        check(f"census n={n}: end split joiners (1 placement each end)", t.get(("split", "end"), 0), 2 * 1 * 3 * p3)
+        check(f"census n={n}: a gap of three or more cannot be spanned", sum(v for (kind, _), v in t.items() if kind == "gap>=3"), 0)
+        check(f"census n={n}: T({n},{n - 1}) by enumeration", sum(t.values()), col[n - 1][n])
 
 print(f"{checks} checks, {len(failures)} failures")
 for f in failures:

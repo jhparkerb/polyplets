@@ -37,6 +37,8 @@ Run: python3 experiments/undertow_pin.py --verify
 
 import os
 import re
+import contextlib
+import io
 import sys
 from fractions import Fraction as F
 
@@ -128,17 +130,24 @@ def wired_poly(P, k):
 # polynomial in n.  Computed by the standard exp-of-series recurrence
 #   k * E_k = sum_{j=1..k} j * L_j * E_{k-j},   E_0 = 1.
 
+_GRAND = {}   # (ab, K) -> E; pin_level asks for the same E once per depth pair
+
+
 def grand_form(ab, K):
-    """ab: dict j -> (a_j, b_j).  Returns list E[0..K] of polynomials in n."""
-    L = {j: [F(a), F(b)] for j, (a, b) in ab.items()}
-    E = [[F(1)]]
-    for k in range(1, K + 1):
-        acc = []
-        for j in range(1, k + 1):
-            if j in L:
-                acc = padd(acc, pmul([F(j) * c for c in L[j]], E[k - j]))
-        E.append(ptrim([c / k for c in acc]))
-    return E
+    """ab: dict j -> (a_j, b_j).  Returns list E[0..K] of polynomials in n.
+    Cached: callers read E and must not mutate it."""
+    key = (tuple((j, tuple(v)) for j, v in sorted(ab.items())), K)
+    if key not in _GRAND:
+        L = {j: [F(a), F(b)] for j, (a, b) in ab.items()}
+        E = [[F(1)]]
+        for k in range(1, K + 1):
+            acc = []
+            for j in range(1, k + 1):
+                if j in L:
+                    acc = padd(acc, pmul([F(j) * c for c in L[j]], E[k - j]))
+            E.append(ptrim([c / k for c in acc]))
+        _GRAND[key] = E
+    return _GRAND[key]
 
 
 def extract_ab(P, kmax):
@@ -218,19 +227,11 @@ def all_pairs(k, jmax, tri, hmax=None):
     return [(have[i], have[j]) for i in range(len(have)) for j in range(i + 1, len(have))]
 
 
-def verify(jmax=3, P=None, tri=None, Dj=None, quiet=False):
+def verify(jmax=3, P=None, tri=None, Dj=None):
     """Re-derive every wired level from below-onset cells and compare.
 
     P, tri, Dj default to the banked table, triangle and ab-initio depths;
     the selftest injects corrupted copies to prove this comparator fires."""
-    import contextlib
-    import io
-    sink = contextlib.redirect_stdout(io.StringIO()) if quiet else contextlib.nullcontext()
-    with sink:
-        return _verify(jmax, P, tri, Dj)
-
-
-def _verify(jmax, P, tri, Dj):
     P = read_pk() if P is None else P
     tri = read_tri() if tri is None else tri
     kmax = max(P)
@@ -288,7 +289,9 @@ def selftest(jmax=3):
     # the smallest error a family-table entry can produce (an integer shift).
     bad = {j: list(v) for j, v in Dj.items()}
     bad[1][k] += 1
-    if verify(jmax, P=P, tri=tri, Dj=bad, quiet=True):
+    with contextlib.redirect_stdout(io.StringIO()):
+        red = verify(jmax, P=P, tri=tri, Dj=bad)
+    if red:
         raise SystemExit("RED CONTROL FAILED: --verify stayed GREEN with D_1(15) + 1")
     print("RED 1 GREEN: a perturbed D_j turns --verify red")
 
@@ -307,7 +310,9 @@ def selftest(jmax=3):
     coeffs, den = P[top]
     badP = dict(P)
     badP[top] = (list(coeffs[:-1]) + [coeffs[-1] + den], den)   # constant + 1
-    if verify(jmax, P=badP, tri=tri, Dj=Dj, quiet=True):
+    with contextlib.redirect_stdout(io.StringIO()):
+        red = verify(jmax, P=badP, tri=tri, Dj=Dj)
+    if red:
         raise SystemExit(f"RED CONTROL FAILED: --verify stayed GREEN with P_{top} corrupted")
     print(f"RED 3 GREEN: a corrupted wired P_{top} turns --verify red")
 

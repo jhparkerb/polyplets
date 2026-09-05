@@ -346,13 +346,12 @@ gate-bfiles:
 # pins the count of cells carrying ONLY the mod-4 congruence: if that grows,
 # something regressed; when Motley reaches H=18 it must shrink, which fires the
 # gate and forces the number to be updated deliberately rather than silently.
-# Includes a RED control (--selftest). ~1 s, no build needed.
-# Since 2026-09-05 (AUDIT-2026-09-02 M2/M3): Motley's reach is VERIFIED --
-# a banked C row that does not assemble to the triangle caps it, RED control
-# included -- and the tower-from-Motley source (tag U, experiments/undertow_ri.py
-# run per row) is a fourth tier in the table, pinned at 192 cells, so the
-# "one tower strategy pinned from Motley's data" statement is carried by a
-# check rather than by prose.
+# Motley's reach is derived from the banked C rows and VERIFIED against the
+# triangle (a row that does not assemble caps it, RED control included), and
+# the tower-from-Motley source (tag U, experiments/undertow_ri.py run per row)
+# is a fourth tier, pinned at 192 cells, so "one tower strategy pinned from
+# Motley's data" (AUDIT-2026-09-02 M2/M3) is carried by a check, not prose.
+# Three RED controls (--selftest). ~0.5 s, no build needed.
 gate-provenance:
 	python3 scripts/provenance_table.py --selftest
 	python3 scripts/provenance_table.py --check

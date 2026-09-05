@@ -57,11 +57,11 @@ KMAX = 21          # wired 1..19 + Undertow-pinned 20, 21, as in the a(41) run
 HMAX_PIN = 19      # the a(41) pin cap: no pinning cell taller than the sweep
 
 
-def pin_cells(tri):
+def pin_cells(tri, jmax=JMAX, hmax=HMAX_PIN):
     """The cells each pinned level consumed, per the a(41) recipe."""
     used = {}
     for k in (20, 21):
-        pairs = all_pairs(k, JMAX, tri, HMAX_PIN)
+        pairs = all_pairs(k, jmax, tri, hmax)
         used[k] = {(2 * k + 1 - j, k + 1 - j) for d in pairs for j in d}
     return used
 
