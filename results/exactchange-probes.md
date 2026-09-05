@@ -20,10 +20,8 @@ of A000975) at offset r(H) = a(H−1):
     GF   = 1 / ((1−x²)(1−x−2x²))  — partial sums of Jacobsthal numbers
 
 The 0.44·2^H fit is exactly 4/9 · 2^H asymptotically — a 3² denominator in a
-characteristic-2 rank — and the ⌊(H+1)/2⌋ correction has the same shape as
-the engine's measured successor fan-out ceil(H/2)+1. The extrapolated
-dimension at H = 21 becomes an exact prediction: **r(21) = 932,071**
-(A034299's own data, and the closed form).
+characteristic-2 rank. The extrapolated dimension at H = 21 becomes an exact
+prediction: **r(21) = 932,071** (A034299's own data, and the closed form).
 
 Match is 9 consecutive terms of a 4-term linear recurrence: identification,
 not proof. Nothing below leans on it beyond the measured range.
@@ -35,9 +33,9 @@ every mask class** at H = 4..8: no two partitions of the same column mask are
 Hankel-equivalent. All compression is cross-mask linear algebra. Consequently
 no key of the form (mask, small local data) parametrizes the quotient —
 (mask), (mask, #blocks mod 2), (mask, #blocks) all fail (split counts in the
-probe output). Nerode class counts 8, 19, 43, 101, 239 at H = 4..8; no OEIS
-match. A greedy pivot basis in canonical state order shows no clean
-combinatorial law (order-dependent; mixed contiguous/non-contiguous states).
+probe output; the class counts themselves are §6). A greedy pivot basis in
+canonical state order shows no clean combinatorial rule (order-dependent;
+mixed contiguous/non-contiguous states).
 
 ## 3. Probe 2 — the cell-level rank, and the 10³ becoming 10¹
 
@@ -50,18 +48,19 @@ presentation-independent):
     cell rank  32    93    210   516      — vs column rank 6, 15, 27, 58
     ratio      5.3   6.2   7.8   8.9      — growing ~linearly in H
 
-So cell rank ≈ Θ(H · 2^H), extrapolating to **~2×10⁷ at H = 21** — against
-the spin engine's reachable 1.3×10⁸ (H-orientation) at the same height. The
-column-level compression (~10³ vs partition states) is **~6x** where an
-algorithm would actually live. INV-4's conditional pricing ("~10⁶ dimension,
-megabytes, laptop hours") implicitly priced column-level transitions that
-cannot be stored; the honest compressed dimension is 20x larger.
+So cell rank ≈ Θ(H · 2^H), extrapolating to **~2×10⁷ at H = 21**, and the
+column-level compression is **~6x** where an algorithm would actually live.
+INV-4's conditional pricing ("~10⁶ dimension, megabytes, laptop hours")
+implicitly priced column-level transitions that cannot be stored; the honest
+compressed dimension is 20x larger. Column rank against cell rank, and either
+against the char-0 ladder, is `results/skeletonkey-hankel-closure.md`
+"Five ladders".
 
 ## 4. Sparsity: the CKN shape exists here, non-constructively
 
 In the pivot basis the closure hands over, the two compressed transition
 matrices are **sparse**: average row weight 1.8→3.6 (A₀) and 2.7→5.0 (A₁)
-across H = 4..7, ~O(H) growth, against dense ~r/2. Conditional on having the
+across H = 4..7, against dense ~r/2. Conditional on having the
 basis at H = 21: nnz ~ 5×10⁸ (a few GB), wall ~10¹¹ sparse GF(2) ops —
 laptop hours. This is the Cygan–Kratsch–Nederlof signature: low rank AND
 sparse factorization. **But the basis here is extracted from the
@@ -75,20 +74,19 @@ like a height-recursive basis decomposition.
 
 T(40,20) mod 2 and T(40,21) mod 2 are **already banked** (spin twin runs,
 2026-08-13, `results/triangle-salvage.md` §1.2). Exact Change compresses the
-same functional in the same characteristic, so it would re-derive an
-already-banked bit ~6x cheaper — its residual value is dynamics diversity
-against the B1 family, which the salvage file already flags as limited (one
-identity, two extractions). The exact value of T(40,21) stays single-sourced
-whatever happens here. The construction hunt is mathematically live and
-now well-scented, but it is not on any critical path.
+same functional in the same characteristic, so it would re-derive a banked bit
+~6x cheaper; its residual value is dynamics diversity against the B1 family,
+which the salvage file flags as limited. The exact value of T(40,21) stays
+single-sourced whatever happens here, so the construction hunt is live but not
+on any critical path.
 
 ## NOT ESTABLISHED (as of probes 1-2; superseded in part below)
 
-- A034299 identification beyond H = 12 (9 terms vs a 4-term recurrence).
-- The Θ(H·2^H) cell-rank law (four points; ratio still rising at H = 7).
-- Sparsity in any a-priori basis. Measured only in the closure's pivot
-  basis, which is not available at production heights.
-- Any lower bound forcing sparse transitions to exist at H = 21.
+- A034299 identification beyond the measured range (now H = 13, §7).
+- The Θ(H·2^H) cell-rank shape (four points; ratio still rising at H = 7).
+- Sparsity in any a-priori basis, or any lower bound forcing sparse
+  transitions to exist at H = 21. Measured only in the closure's pivot basis,
+  which is not available at production heights.
 
 ---
 
@@ -116,9 +114,11 @@ candidate keys (run-collapse, parity, masks) fail; this one does not split a
 single class.
 
 Minimized state counts N(H), H = 4..11: 8, 19, 43, 101, 239, 575, 1399,
-3441.  Growth ~2.4x/height.  (An A001333/NSW identification was tried on the
-early terms and DIED at H = 9-10: 575 vs 577, 1399 vs 1393.  Recorded as a
-warning about pattern-matching this table.)
+3441 -- the same ladder `results/nkey-census.md` later censused to H = 21, and
+sized against the ranks in `results/skeletonkey-hankel-closure.md` "Five
+ladders".  (An A001333/NSW identification was tried on the early terms and
+DIED at H = 9-10: 575 vs 577, 1399 vs 1393.  Recorded as a warning about
+pattern-matching this table.)
 
 Consequence: the strip DFA's minimal automaton is constructible A PRIORI --
 states are N-families, no observability closure needed.  Layer 1 of the
@@ -129,13 +129,9 @@ basis hunt (probe 3's framing) is closed.
 `exactchange_minauto.py` builds the automaton directly on N-families.
 Anchors: brute-force counts at H ≤ 3, W ≤ 4 (small -- see §9 item 3);
 state counts equal the banked Nerode counts; ranks equal both A034299 AND
-the independently-computed partition-automaton ranks at every H ≤ 11
-(two-implementation agreement; H = 12 pending, H = 13 would be minauto-only
-and needs a second source before it counts).
-**H = 12 is no longer pending — run 2026-08-22 on ayr** (`results/char2-basis-status.md`):
-8,539 states, rank **1,818**, equal to A034299 and to the partition automaton's
-banked value, brute anchors green, 17 min and 3.9 GB. Two-implementation
-agreement now runs to H = 12.
+the independently-computed partition-automaton ranks at every H ≤ 12
+(two-implementation agreement, H = 12 run 2026-08-22 on ayr per
+`results/char2-basis-status.md`: 8,539 states, rank **1,818**, 17 min, 3.9 GB).
 
 **H = 13 landed 2026-08-23 on ayr, and it is 3643 — A034299's value exactly.**
 21,355 minimized states, rank **3643**, wall 4 h 42 min (build 886 s, rank
@@ -145,13 +141,12 @@ cannot report one: H = 4..12 came back 6, 15, 27, 58, 112, 229, 453, 912, 1818,
 all OK, on top of brute anchors at H = 2, 3. Nine consecutive matches now,
 H = 4..13.
 
-**It is still single-source and the §9 item-3 caveat stands unchanged.** H ≤ 12
-has two implementations agreeing; H = 13 has minauto alone, because the
-partition automaton was never run there. A fifth confirmation of the
-identification is not the same as a second implementation of this rank, and
-nothing here promotes the collapse from suggestive. What it does remove is the
-possibility that the agreement was going to break at the next height.  Fast numpy closure: 23x over
-the int-loop version (H = 10 rank in 13 s).
+**It is still single-source and the §9 item-3 caveat stands unchanged:** H ≤ 12
+has two implementations agreeing, H = 13 has minauto alone, and a fifth
+confirmation of the identification is not a second implementation of this rank.
+What it removes is the possibility that the agreement would break at the next
+height.  Fast numpy closure: 23x over the int-loop version (H = 10 rank in
+13 s).
 
 Layer 2 (relations among the N distinct phi values, dim N − r):
 - **No weight-3 relations exist at any measured height** -- the distinct phi
@@ -231,32 +226,18 @@ quotient-subspace comparison for L3.
 ## 10. What this would NOT give: king-animal counting stays hard
 
 Even if L1-L3 are proved and the layer-2 basis hunt fully succeeds, the
-object compressed is the GF(2) rank -- the mod-2 bit of T(n,H), nothing
-else.  The mod-p ranks (A-S1: 6, 17, 35, 88, 204, 501, 1217; growth
-~2.79x/height) show NO collapse, so exact and odd-prime counting keep
-their floor; Coin Lift's exact-value exclusion stands.  And for the mod-2
-bit itself the spin engine already runs in the coloring space
-(~(1+√2)^H = 2.414^H states), so the ceiling on the whole campaign is a
-(2.414/2)^H ≈ 1.21^H factor on one bit -- at H = 21, roughly 55x on a
-computation that is already cheap relative to the exact engines.  The
-structure is the prize here, not the wall clock.
+object compressed is the GF(2) rank -- the mod-2 bit of T(n,H), nothing else.
+The char-0 rank shows no comparable collapse, so exact and odd-prime counting
+keep their floor and Coin Lift's exact-value exclusion stands; what the two
+ranks are and how they bound each other is
+`results/skeletonkey-hankel-closure.md` "Five ladders", the one place that
+compares them.  For the mod-2 bit itself the spin engine already runs in the
+coloring space (~(1+√2)^H = 2.414^H states), so the ceiling on the whole
+campaign is a (2.414/2)^H ≈ 1.21^H factor on one bit -- at H = 21, roughly
+55x on a computation that is already cheap relative to the exact engines.
 
-## Still running / next when resumed
+## Next when resumed
 
-- ~~minauto H = 12 fast-closure confirmation (dalby, in flight)~~ **DONE
-  2026-08-14** (dalby run landed, exit 0; brute anchors H=2,3 OK 27/286/1906):
-
-      H   minstates   rank   A034299         (build, rank wall)
-      10      1,399    453   453  OK         (4.6 s,   13.2 s)
-      11      3,441    912   912  OK         (24.6 s,  152.3 s)
-      12      8,539  1,818  1,818 OK         (130.4 s, 1696.3 s)
-
-  The N-family automaton route independently reproduces the G1 ladder's
-  three top points, so the A034299 match no longer rests on the retired
-  gympie run alone. Rank wall grew ~11.1x from H = 11 to 12; naive
-  extrapolation puts the H = 13 rank step at ~5-6 h single-core, matching
-  the projection below.
-- H = 13 decisive test of A034299's 3643: ~5-6 h single-core projected
-  (now calibrated off the measured H = 12 wall), PLUS a second source per
-  §9 item 3.  Needs sign-off.
-- The three settling checks above; the L1-L3 proof program.
+The H = 12 and H = 13 rungs both landed (§7), so the A034299 match no longer
+rests on the retired gympie run alone. What is left: the three settling checks
+in §9, and the L1-L3 proof program.

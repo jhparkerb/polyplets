@@ -8,16 +8,15 @@ C2.4 in the same pass.
 Data: `results/skeletonkey/cellsparse.txt`, produced by
 `experiments/skeletonkey/cell_sparsity_modp.py` on ayr, H = 4..8, primes
 131071 and 65521. The H = 8 row took 2 h 47 min and ~7 GB against its own
-header's prediction of "5-15 min and ~2 GB" — the prediction was wrong and is
-recorded here as wrong.
+header's prediction of "5-15 min and ~2 GB", recorded here as wrong.
 
 ## Why it was run
 
 `git show second-source:results/scaling-exploration-A.md` (A-S1) rejected the
 rank-compressed engine on compute growth — "crossover: never" — **assuming the
 compressed transfer is dense**, and named sparsity as the one unprobed rescue.
-`results/exactchange-probes.md` had measured that sparsity in GF(2) only. This
-is the characteristic-0 measurement.
+`results/exactchange-probes.md` measured that sparsity in GF(2); this is the
+characteristic-0 measurement.
 
 ## The numbers
 
@@ -30,8 +29,8 @@ is the characteristic-0 measurement.
 | 8 | 212,670 | 834 | 1,826 | 2.19 | 2.639 | 2.590 | 2.15 | 913.0 | 425× |
 
 `d_p` is the compressed dimension in characteristic 0; `col` is the incumbent's
-column frontier, which is `Motzkin(H+1) − 1` exactly at every row here. A₀ is
-the mean nonzeros per row of the compressed transfer.
+column frontier, `Motzkin(H+1) − 1` at every row here. A₀ is the mean nonzeros
+per row of the compressed transfer.
 
 **Gates in the file itself:** the char-2 cell rank reproduces the banked value
 at H = 4, 5, 6, 7 (32, 93, 210, 516), and a RED control confirms that perturbed
@@ -47,16 +46,14 @@ more than two orders of magnitude, exactly as it suspected it might be.
 **The engine still loses, for a different reason than A-S1 gave.** The
 compressed dimension is *already larger* than the object it would replace, at
 every height measured — 1.60× at H = 4 rising to 2.19× at H = 8 — and it grows
-faster: **2.748×/height against the column frontier's 2.541×**. There is no
-crossover to wait for. Extrapolating the ratio's own 1.082×/height gives
-**~6× worse at H = 21**, which is worse than the ~2× the provisional H ≤ 7
-reading projected.
-
-So **"crossover: never" survives, and the H = 8 point does not break the
-trend** — the geometric growth over the full range, 2.748×, sits inside the
-2.78× the H ≤ 7 rows predicted. What changes is the reason: the compressed
-engine is not beaten by density, it is beaten by dimension, and it was behind
-from H = 4 rather than catching up.
+faster. There is no crossover to wait for; extrapolating the ratio's own
+1.082×/height gives **~6× worse at H = 21**. So **"crossover: never" survives,
+and the H = 8 point does not break the trend.** What changes is the reason: the
+compressed engine is not beaten by density, it is beaten by dimension, and it
+was behind from H = 4 rather than catching up. `d_p` is a cell-granularity
+dimension and the frontier is a column-granularity state count; what each one
+measures, and which of the five height ladders bounds which, is
+`results/skeletonkey-hankel-closure.md` "Five ladders".
 
 ## C2.4: what this says about the basis question
 
@@ -64,8 +61,8 @@ from H = 4 rather than catching up.
 largest open technical question in the mission", and C2.4 asked whether the
 char-0 sparsity pattern shows structure a basis could be read off.
 
-**It does, and that is the least useful place it could have shown up.** The
-file records row weights in two bases at once. At H = 8:
+**It does, and that is the least useful place it could have shown up.** Row
+weights in two bases at H = 8:
 
     generator basis      A0 = 65.01,  A1 = 113.03
     compressed basis     A0 =  2.15,  A1 =   2.68
@@ -79,19 +76,12 @@ about +0.27 per height (1.06, 1.24, 1.39, 1.77, 2.15) while the dimension grows
 
 But an explicit description of that basis **would not rescue anything**,
 because density is not what is killing the char-0 engine — dimension is, and
-writing the basis down does not change `d_p`. The two questions separate
-cleanly:
-
-- **characteristic 0**: sparse basis demonstrably exists, would buy nothing,
-  because `d_p` exceeds the incumbent and grows faster;
-- **characteristic 2**: `d_2` is the quantity that actually *collapses*
-  (1,155 against 1,826 at H = 8, and ~1e6 against 9.4e8 at H = 21 per INV-6),
-  and there the basis is unknown and would buy the collapse.
-
-**So the basis hunt should be motivated by the char-2 collapse and never by
-char-0 sparsity.** A session that sees "2.15 nonzeros per row, therefore
-structure, therefore look for the basis" is looking in the field where finding
-it changes nothing. That redirection is what C2.4 bought.
+writing the basis down does not change `d_p`. In characteristic 2 the same
+cell-level dimension `d_2` is smaller (1,155 against 1,826 at H = 8) and there
+the basis is unknown, so **the basis hunt should be motivated by the char-2
+collapse and never by char-0 sparsity.** A session that sees "2.15 nonzeros per
+row, therefore structure, therefore look for the basis" is looking in the field
+where finding it changes nothing. That redirection is what C2.4 bought.
 
 ## Reading the file
 
@@ -103,10 +93,9 @@ data and corrected there.
 
 ## Honest limits
 
-- Five heights, and the extrapolation to H = 21 runs thirteen rungs out from
-  the last one. The ratio `d_p/col` is decelerating (1.24, 1.00, 1.09, 1.02 per
-  rung), so 6× is an upper-ish reading and 3× is defensible from the last three
-  rungs alone. Both are above 1, which is the only part the conclusion needs.
+- Five heights, and the extrapolation to H = 21 runs thirteen rungs out. The
+  ratio `d_p/col` is decelerating (1.24, 1.00, 1.09, 1.02 per rung), so 3× is
+  as defensible as 6×. Both are above 1, which is all the conclusion needs.
 - Two primes, both around 2¹⁷ and 2¹⁶. `d_p` is a rank over `F_p` used as a
   proxy for the characteristic-0 rank; the two primes agree, which is evidence
   and not proof that neither is unlucky.
@@ -118,6 +107,5 @@ data and corrected there.
 
 - `results/skeletonkey/cellsparse.txt` — the run's own output, gates included.
 - `experiments/skeletonkey/cell_sparsity_modp.py` — the probe.
-- `results/skeletonkey-four-mechanisms.md` §3 reads the H = 8 row through the
-  published `results/exactchange-probes.md` figures rather than on its own; with
-  this file banked it can be read directly.
+- `results/skeletonkey-four-mechanisms.md` §3 read the H = 8 row through
+  `results/exactchange-probes.md`; with this file banked it can be read here.
