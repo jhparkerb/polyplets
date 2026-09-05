@@ -148,9 +148,9 @@ coefficients, and says nothing whatever about the other two.
 
 **What this does for `k = 4`.** King `A_4 = −22701/4` was a target, not a
 prediction: the `K = 4` run of the weights route had to reproduce it, from
-cluster weights that share no code with the wired table. Hex has no wired
-table, so hex `A_4 = 3915/4` (measured from the weights, this run) stays an
-unchecked prediction.
+cluster weights that share no code with the wired table. Hex had no wired
+table, so hex `A_4 = 3915/4` was a prediction with nothing to land on — see
+the second route below.
 
 ### The `k = 4` run: the two routes agree (2026-08-20)
 
@@ -173,8 +173,85 @@ The four-row king clusters are what cost: `(2,2,2,2) = 68314` took 6621 s,
 against `(2,3,2) = 18308` and `(2,2,3) = (3,2,2) = 13459`. Nine cumulant
 slopes were reproduced from the weights alone.
 
-Hex `A_4 = 3915/4` is unchanged in standing — it is the same one-route number
-it was, because there is no wired hex table to check it against.
+### Hex `A_4`: the second route agrees (2026-09-05)
+
+The missing hex table was built rather than waited for.
+`experiments/hex_diag_deep.py` re-runs `hex_gas.py`'s row-transfer DP with the
+surplus budget raised from 2 to 6 — the old transition step takes every subset
+of a window and does not finish at budget 4, so the new row is generated left
+to right with two exact prunes — and it produces `T_hex(n, n−k)` for `k ≤ 6`,
+`H ≤ 20`, in 19 s. The cells are banked in `results/hex_diagonal_cells.txt`.
+Fitting `T_hex(n, n−k) = P_k(n)·2^(n−1−3k)` on them gives `P_1 … P_6` with 72
+holdout cells all exact, and the cumulants `c_k = A_k n + B_k` come out linear
+as the gas requires:
+
+| k | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| `A_k` | 9 | −37/2 | 32 | **3915/4** | −103671/5 | 968878/3 |
+
+`A_4 = 3915/4` — the weights-route number, to the fraction. The two routes
+share no code: one sums cluster weights over the gas, the other fits a
+polynomial to an enumerated triangle. `A_1`, `A_2`, `A_3` and `P_3` reproduce
+the drift-parametric DP of `docs/proofs/universal-diagonal-law.md`, which is
+the control that the fit is reading the same object. `A_5` and `A_6` are new,
+and are targets the weights route can now be run against.
+
+## The below-onset `D_1` is parametric too (2026-09-05)
+
+`experiments/depth1_parametric.py`. `results/onset-defect-depth1-closed.md`
+closes depth 1 on king; every piece of it is written for king adjacency. Taking
+the drift set `D` as the parameter (square `{0}`, hex `{−1,0}`, king `{−1,0,1}`)
+moves the whole construction across.
+
+**Derived.** The gap walk's generic row is counting, not fitting. A new pair at
+gap `gp` far from the old pair has `2|D ∪ (D−gp)|` placements, of which
+`2|D ∩ (D−gp)|` leave the pair joined; near the old gap the two ends can touch
+different old cells, which happens with the autocorrelation weight `k_d` of `D`,
+and those were already counted once, so class P loses `2k_d` where J gains
+`k_d`. The bulk block is therefore the autocorrelation of `D`, i.e. the kernel
+is `u^(b−1) − y·(1 + u + … + u^(b−1))²`, and the *only* rows that are not this
+template are the finitely many gaps `g < b`: two for king, one for hex, none at
+all for square. The assembly identity (II) is the same substitution as this
+file's: `D_1(k) = [y^k]( P̂ − B²/(b + S) )`, with `b` where the king note has 3.
+The script checks the template against the enumerated table on all three
+lattices and refuses a non-interval drift set.
+
+**Square, derived.** With `b = 1` the walk closes on two states — the J-mass at
+gap 1 triples each row, and no P-state ever returns — so
+`S = 4y/(1−3y)`, `B = (1−y)/(1−3y)`, `P̂ = y/(1−3y)`, and
+
+    F_1 = P̂ − B²/(1+S) = −1/(1+y),   hence   D_1(k) = (−1)^(k+1),  k ≥ 1.
+
+`results/undertow-square-validation.md` had this from five measured values plus
+the obvious pattern; it is now a consequence of the identity, for every `k`.
+
+**Hex, derived.** With `b = 2` the kernel `u − y(1+u)²` has one small root
+`u₁ = (1−A)/(1+A)`, `A = √(1−4y)`, and the closure has four unknowns —
+J-mass at gaps 1 and 2, total J-mass at gaps ≥ 2, and P-mass at gap 2, P-mass
+at gap 1 being identically zero. Solving it gives `F_1` in `Q(A)`, so `F_1` is
+quadratic over `Q(y)` where king's is quartic. In the king normalisation
+`y = bx`, `N = b·F_1(bx) + 1`:
+
+    Φ_hex(x, W) = (8x−1)(8x²−9x+3)·W² − (2x−1)(8x−1)·W + x
+
+with branch point `x = 1/8 = 1/b³` against king's `1/27`. `N_k = 2^(k+1) D_1(k)`
+is integral — `1, 7, 45, 303, 2133, 15447, 113869, …`, not in OEIS (2026-09-05)
+— and `Φ_hex` annihilates it through `x^25`.
+
+**Hex onset sharpness, proved.** `Φ_hex ≡ (W+1)((1+x)W + x)` in `F_2[x, W]`.
+`F_2[[x]]` is a domain, `N(0) = 0` kills the first factor, so `(1+x)N̄ = x` and
+`N_k` is odd for every `k ≥ 1`. Hence `D_1(k) ≠ 0` and the hex onset
+`n ≥ 2k+1` is sharp — the same argument, and the same shape of factorisation,
+as the king mod-3 proof of `onset-defect-depth1-closed.md` §3. On the square
+lattice `N(x) = x/(1+x)` outright, which is what both of the others reduce to
+mod `b`.
+
+**Checked.** The parametric walk reproduces `experiments/depth1_gap_walk.py` for
+king at `k ≤ 20`; the square closed form against the enumerated walk to `k = 25`;
+the hex closed form against the walk to `k = 25` and against
+`T_hex(2k,k) − P_k(2k)/2^(k+1)` from the enumerated triangle at `k ≤ 6`. RED:
+`b → b+1` breaks all three lattices, a perturbed `N_3` is not annihilated, and
+the template is refused by a non-interval `D`.
 
 ## NOT ESTABLISHED
 
@@ -182,10 +259,12 @@ it was, because there is no wired hex table to check it against.
   constants need `C(u)`, which this does not touch. The `B_k` tabulated above
   come from the wired `P_k` instead, so they exist for king only and carry no
   cross-route agreement — the weights route has never produced one.
-- **The below-onset `D_j` on any lattice but king.** The bounded-excess family
-  DP (`cpp/severance_w3_families.cpp`) is a different machine from the gas
-  weights and has not been checked for lattice-parametricity here.
-- **`k ≥ 4` on hex.** `universal-diagonal-law.md` banks square to `k = 4` and
-  hex to `k = 3`, and there is no wired hex table, so hex `A_4 = 3915/4` is a
-  one-route number with nothing to check it against. King `k ≥ 4` is no longer
-  in this bullet: the wired route above supplies targets to `k = 19`.
+- **Depth `j ≥ 2` on any lattice but king.** Depth 1 is now parametric, but the
+  bounded-excess family DP (`cpp/severance_w3_families.cpp`) that supplies
+  `D_2` and below is a different machine from the gap walk, and remains
+  king-only in both its Python original and its C++ port. The square targets
+  `−4, 8, −3, 10, −1` of `results/undertow-square-depth2.md` are still
+  unclaimed.
+- **The `A_k` beyond the enumeration.** Hex now has a table to `k = 6` and the
+  weights route has been run to `k = 4`; `A_5` and `A_6` are one-route numbers
+  the other way round, waiting on a `K = 5` weights run.

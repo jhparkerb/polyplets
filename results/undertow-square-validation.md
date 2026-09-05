@@ -87,9 +87,13 @@ this channel is wanted deeper, and it is a derivation rather than machine time.
 - Six levels, k = 1..6, and the tallest cell involved has height 13. The king
   case runs to k = 21. Small-k agreement is real evidence for a mechanism and
   weak evidence about large-k behaviour.
-- `D_1(k) = (−1)^(k+1)` is read off five measured values in
-  `onset-defect-law.md` and extended to k = 6 by the obvious pattern; the k = 6
-  row of this table is therefore also a (passing) test of that extension.
+- `D_1(k) = (−1)^(k+1)` was read off five measured values in
+  `onset-defect-law.md` and extended to k = 6 by the obvious pattern. **No
+  longer a pattern (2026-09-05):** the square gap walk closes on two states and
+  gives `F_1 = −1/(1+y)` outright, so the sign alternation holds for every `k`
+  — `results/skeletonkey-parametric-master.md`,
+  `experiments/depth1_parametric.py`. The k = 6 row of this table is a passing
+  test of it.
 - Nothing here touches the *grand form* — the claim that a level carries
   exactly two new constants — which is what lets the king pin use two equations
   rather than k+1. The square test fits all k+1 coefficients directly. So this

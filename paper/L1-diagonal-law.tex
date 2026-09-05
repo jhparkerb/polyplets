@@ -542,8 +542,12 @@ family is not C-finite, refuted at $\ell = 16$, because the walk between the pai
 cells has unbounded gap. The argument rests on L8's identity expressing $D_1$
 through the all-pairs cluster families, derived from the chain identity and
 machine-verified at $19$ exact cells but not written out as a standalone proof.
-It is king-specific: $\Phi$ is derived from the king weight families, and no
-analogue has been computed for the square or polyhex instances.
+The same construction with the drift set as a parameter
+(\repo{experiments/depth1\_parametric.py}) gives the square and polyhex
+instances: on the square lattice $N(x) = x/(1+x)$ outright, so
+$D_1(k) = (-1)^{k+1}$, and the polyhex equation is a quadratic that factors
+modulo $2$ as $(W+1)((1+x)W+x)$, so $N_k$ is odd. The onset is sharp on all
+three row-local instances.
 
 \section{The product form}
 \label{sec:grand}

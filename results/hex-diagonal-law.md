@@ -25,12 +25,28 @@ And for k = n-H:
 
   T_hex(n, n-k) = P_k(n) * 2^(n-1-3k),   deg P_k = k,  onset n >= 2k+1
 
-with P_1(n) = 9n - 15 (exact, 11 holdouts, H <= 14) and
-P_2(n) = (81n^2 - 307n + 142)/2 (exact, 9 holdouts). Same exponent-3
+with P_1(n) = 9n - 15 and P_2(n) = (81n^2 - 307n + 142)/2. Same exponent-3
 structure, same onset as the king lattice. The proof template
 (docs/proofs/diagonal-law.md) transfers verbatim: single-cell rows are cut
 vertices on any row-adjacency lattice, clusters are finite, rows <= surplus
 caps the numerator degree, partial fractions in (1-2z).
+
+**Deeper cells, k <= 6 (2026-09-05).** `experiments/hex_diag_deep.py` raises
+the DP's surplus budget from 2 to 6 -- `hex_gas.py` builds a row transition by
+taking every subset of a window, which does not finish at budget 4, so the new
+row is built left to right and dead prefixes are abandoned. 140 cells,
+`H <= 20`, 19 s, banked in `results/hex_diagonal_cells.txt` and validated
+cell-for-cell against the brute enumerator for `n <= 9`. The fit gives
+`P_1 .. P_6` with 72 holdout cells all exact; leading coefficients are `9^k/k!`
+throughout, and
+
+  P_3 = (243n^3 - 1548n^2 + 1897n + 56)/2
+  P_4 = (2187n^4 - 20574n^3 + 46657n^2 - 4502n - 67336)/8
+
+`P_3` is the number `docs/proofs/universal-diagonal-law.md` obtained from the
+drift-parametric DP, which is the control on the fit. `P_4` is the second route
+to hex `A_4 = 3915/4` that `results/skeletonkey-parametric-master.md` was
+missing.
 
 ## The gas structure
 

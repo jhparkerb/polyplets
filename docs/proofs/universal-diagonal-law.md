@@ -261,6 +261,12 @@ The polyiamond row is indexed by height, not by n, and its measured onsets are
 ⌊k/2⌋+2, earlier than the k+1 guaranteed; diagonals to k = 4 in
 `results/polyiamond-diagonal-law.md`.
 
+Onset sharpness — the formula fails at `n = 2k` for every `k` — is proved on
+square, hex and king through the depth-1 defect, whose generating function is
+algebraic and reduces mod `b` (mod 2 for hex, mod 3 for king; on square it is
+`x/(1+x)` outright): `results/skeletonkey-parametric-master.md` §The below-onset
+`D_1` is parametric, `results/onset-defect-depth1-closed.md` §3.
+
 CORRECTION 2026-07-31 (hygiene sweep; `experiments/universal_pair_weights.py`,
 two independent methods: direct gadget count with no gap cap, and
 end-to-end k = 1 diagonal enumeration with holdouts — [n]P_1 = W_pair

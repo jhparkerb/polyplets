@@ -235,6 +235,9 @@ the real work. Desk work, no machine time.
   out in §2 of this note and machine-verified at 19 exact cells plus the
   ℓ ≤ 8 / ℓ ≤ 6 weight validations. It is not yet written as a standalone
   proof document — the one thing the §3 sharpness proof still rests on.
+- Nothing here is king-specific except the constants: `experiments/depth1_parametric.py`
+  runs the same construction with the drift set as a parameter and closes depth 1
+  on square and hex too (`results/skeletonkey-parametric-master.md`).
 - The Puiseux branch through `V₀` is selected by the measured `a` (the other
   sheet gives 0.0657…); `C_1` is branch-independent.
 - Everything here is depth 1. The depth-j family and the boundary-layer /
