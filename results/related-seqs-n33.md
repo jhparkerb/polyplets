@@ -2,8 +2,15 @@
 
 2026-07-06. Extends `results/related-seqs-n32.md` by one term for the four
 D-dependent sequences. **These values are tier T3**: exact computation
-composed with empirically pinned but unproven quasi-polynomial formulas.
-For OEIS they are COMMENT-ONLY (never b-file data), per the batch rule.
+composed with quasi-polynomial formulas whose shape is proved but whose onset
+is not. For OEIS they are COMMENT-ONLY (never b-file data), per the batch rule.
+
+The tier follows from the formula-cell rule in `results/confidence.md`, which
+governs both this tower and a(41)'s: shape proved, cell inside a proved onset,
+constants pinned with a holdout. D(33) meets the first and third and fails the
+second — the onset S >= 2k+2 is data-grade
+(`results/dmirror-onset-sharp.md`), so cells taken from the formula inherit
+that grade however far past it they sit.
 
 ## D(33) assembly (the T3 step)
 
@@ -17,6 +24,24 @@ P_0..P_4 for the 15 sparse cells S=29..33 (`scripts/dmirror_hybrid_sum.py
 - only PINNED classes usable (P_5-odd is fitted -> hard refusal if needed;
   it is not needed at maxn=33);
 - prefix: the hybrid dmirror.out matches banked n<=32 exactly.
+
+The five formula cells that enter D(33) itself, with their standing (onset
+and holdout counts from `results/dmirror-onset-sharp.md`, per parity class):
+
+| cell | k | onset | margin | holdouts below the pin |
+|---|---|---|---|---|
+| d(29,33) | 4 | S >= 11 | 18 | 4 |
+| d(30,33) | 3 | S >= 8  | 22 | 7 |
+| d(31,33) | 2 | S >= 7  | 24 | 9 |
+| d(32,33) | 1 | S >= 4  | 28 | 12 |
+| d(33,33) | 0 | S >= 3  | 30 | 14 |
+
+The other ten of the fifteen sit at n < 33 on levels k <= 3, and the smallest
+margin over all fifteen is the 18 above. So no cell is anywhere near the edge;
+the tier turns entirely on that onset being data-grade rather than proved.
+Four of the five above are checked
+mod 2 against an independent program — `results/dmirror-diagonals.md`, the
+Burnside tie.
 
 Direct strips: dalby, 2026-07-05 07:41 -> 07-06 07:39 (24.0h wall,
 6.71M cpu-s ≈ 1864 core-h, peak strip RSS 126.2GB = S=28, brushed into

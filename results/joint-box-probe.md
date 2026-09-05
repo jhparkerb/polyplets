@@ -23,7 +23,10 @@ matches the banked T(n,H)).
 
 ## Disposition
 
-Parked. If ever revisited: (i) prove the k=0 mod-3 digit law (easy,
+Parked, but no longer unused: the square-box column B(n,S,S) is the other side
+of the Burnside tie against the diagonal-mirror strip counts
+(`results/dmirror-diagonals.md`, `experiments/dmirror_burnside_check.py`).
+If ever revisited: (i) prove the k=0 mod-3 digit law (easy,
 known-math flavor), (ii) decode the k>=1 stripes (the only genuinely
 open pattern), (iii) the full production-scale table costs an a(36)-sized
 re-run and should wait for a reason.

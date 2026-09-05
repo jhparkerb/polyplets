@@ -139,6 +139,39 @@ check at all. This is the mathematics checking itself rather than a second
 program checking it, so it is weaker than item 2 — but it covers the whole
 table.
 
+## When a cell may come from a formula instead of a computation
+
+Two frontier values here are assembled with some of their cells supplied by a
+formula rather than enumerated: a(41) for the main sequence, and D(33), the
+diagonal-mirror count that four of the related sequences depend on
+(`results/related-seqs-n33.md`). One rule decides whether that is allowed, and
+it is the same rule for both towers.
+
+A formula cell may enter a banked value when all three of these hold, and the
+value has to declare which of its cells they are.
+
+1. The **shape** of the formula is proved, not observed in data.
+2. The cell lies where the formula is **known** to hold, at the same grade as
+   the claim: an onset that is proved, not one read off data.
+3. The **constants** are fixed from enumerated cells, with at least one
+   enumerated cell held back and reproduced.
+
+**a(41) passes all three** (`results/a41/PROVENANCE.md`): shape and onset are
+both theorems for the main tower, the onset was proved sharp on 2026-09-05
+(`docs/proofs/diagonal-law.md`), and every level is pinned with cells left over
+to check it. What limits a(41) is not this rule but the separate extrapolation
+in the next section, which is why item 4 stops short of calling the top of the
+row second-sourced.
+
+**D(33) fails the second condition.** The shape of the diagonal-mirror formula
+is a theorem (`docs/proofs/dm-diagonal-law.md`); the onset the assembly uses,
+S >= 2k+2, is data-grade. The formula cells sit eighteen or more steps past
+that onset with every intervening cell reproduced, but far past an unproved
+bound is not the same grade as past a proved one. D(33) stays
+conjecture-assisted and out of OEIS b-files. The mod-3 argument that settled
+sharpness for the main tower has no diagonal-mirror counterpart
+(`docs/proofs/dm-diagonal-law.md`).
+
 ## Where the residual risk actually sits
 
 The formulas rely on correction terms that were verified against known data up

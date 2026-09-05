@@ -24,6 +24,21 @@ The classical rule would have needed a real sweep to H = 21 at Nmax 41 — the
 a(40) run's two tall phases were 9.6 h/48c and 36.4 h/32c with a **363.4 GB**
 disk peak. Neither was run.
 
+Twenty-two of the forty-one cells are therefore formula, not enumeration. The
+rule that permits that — shape proved, cell inside a **proved** onset,
+constants pinned from real cells with a holdout — is written once in
+`results/confidence.md` and governs the diagonal-mirror tower as well. This
+tower meets all three: the shape and the onset `n >= 2k+1` are theorems
+(`docs/proofs/diagonal-law.md`), the onset was proved sharp 2026-09-05, and
+every level below is overdetermined. The diagonal-mirror tower fails the second
+condition and its assembled term stays conjecture-assisted
+(`results/related-seqs-n33.md`).
+
+What the rule does **not** cover is the one thing that actually limits this
+term, and the sections below are about it: the depth-`j` corrections `D_j` let
+levels 20 and 21 be pinned from cells *below* onset, and those corrections were
+checked against banked cells only at `k <= 19`.
+
 ## Checks, all of them
 
 - **The sweep's own regression: 760 banked cells agree, 0 disagree.** A run at

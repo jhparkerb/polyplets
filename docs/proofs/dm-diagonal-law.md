@@ -168,6 +168,12 @@ each. QED
   longer a companion in that: it was proved 2026-09-05
   (`docs/proofs/diagonal-law.md`), by a route that has no dm-mirror
   counterpart yet — no quartic is known for the dm-mirror defect.
+  The same route would need a below-onset defect series for this family and
+  an algebraic equation for it from a kernel argument; the family is a sum
+  over two ground spines and no single kernel covers the sum
+  (`results/dmirror-grand-form-fails.md`), so the first step has no instance.
+  This is why D(33) fails condition 2 of the formula-cell rule in
+  `results/confidence.md` while a(41) passes it.
 
 ## Consequences
 

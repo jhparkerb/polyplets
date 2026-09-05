@@ -31,10 +31,6 @@ later) confirm forward.
 | 3 | even   | S^3/6 + 3S^2 + 40S/3 + 50            | 4       | (S=30 pending)    |
 | 3 | odd    | S^3/6 + 7S^2/2 + 83S/6 + 93/2        | 4       | S=29              |
 
-k=4 is degree 4 but its constant tail still spans pre-onset points at
-S<=26 reach; the n=32 farm's S=26..28 strips (in flight) are the exact
-points that clean and pin it.
-
 **Update 2026-07-05 (n=32 farm complete, all 32 strips):** P_4 now pinned
 on BOTH parities (dmirror_diagonals.py: 10 class-polynomials across
 k=0..4; the S=23 strip supplied the odd-parity pin):
@@ -139,3 +135,30 @@ patterns live in the rational-GF basis G_k(x) = sum_S d(S,S+k) x^S:
    level needs its fresh cumulant pair (a_k, b_k). The pattern is the
    FORM (denominator law + boundary values + 2-per-level freshness), not
    a closed form across k.
+
+## Burnside tie to the joint box table (2026-09-05) — checked
+
+The transpose acts on the fixed polyplets with n cells whose bounding box is
+exactly S x S, and its fixed points are exactly these strip counts. Burnside
+makes the orbit count `(B(n,S,S) + d(S,n))/2` a non-negative integer, so
+
+    B(n, S, S) == d(S, n)   (mod 2)
+
+with `B` the joint box table of `results/joint-box-probe.md`. The two sides come
+from unrelated programs — a row transfer with connectivity partitions against
+the hook-sweep symtm engine — so this is a real cross-check, and mod 2 is all
+of it. `experiments/dmirror_burnside_check.py`, 3m54 on gympie, exit 0:
+
+- **arm A, both sides enumerated:** 44 cells at S <= 12, k <= 3, all agree.
+- **arm B, the D(33) formula cells:** `d(33,33)`, `d(32,33)`, `d(31,33)` and
+  `d(30,33)` agree, the `d` side evaluated from `P_k` re-pinned by exact
+  differencing off the banked strips, the `B` side enumerated. The fifth cell
+  `d(29,33)` is out of reach — the row transfer's shape cache blows up at
+  surplus 4, so the check runs at `k <= 3`.
+- Two RED controls, one strip count and one box count each shifted by 1, both
+  fire; the script also refuses on a missing input, an unpinnable level, a pin
+  with no holdout, too few cells, or an all-even comparison.
+
+Weak in one nameable way: only three of the forty-eight comparisons are odd on
+both sides — `(S,k) = (1,0)`, `(2,2)`, `(3,1)` — so most of it is `0 == 0`. It
+says nothing about the onset and is not evidence for the sharp onset.
