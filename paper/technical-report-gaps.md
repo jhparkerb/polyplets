@@ -49,6 +49,9 @@ a tripleplet figure for the definition, a generated recipe list. Net files:
   strip engine to H ≤ 14, every run re-deriving all rows below it, the
   external anchors) and reports the Motley agreement as machine work with a
   pointer, or not at all. Explanation on request, Q&A form.
+  The defensible three-sentence version of what Motley computes — the
+  Fortuin–Kasteleyn/Potts statement, in the engine's own terms — is the opening
+  paragraph of `docs/proofs/cutcount-identity.md` and can be lifted verbatim.
 - **Growth rate (C2/C3):** he cannot defend most of it. The Fekete floor is
   his (one argument, in the tex comment); Madras, the differential-approximant
   estimate and the L3 bracket are cite-or-drop.

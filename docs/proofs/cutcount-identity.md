@@ -1,17 +1,31 @@
 # The cut-count cancellation identity
 
-Thread **Birthright**, 2026-08-14. Tier 1 of `docs/b1-closure-plan.md` §7: the
-mathematical content of the Motley/B1 second-source engine, stated in closed
-form and proved as combinatorics. Ground truth for the rule is the banked
-source `results/cutcount_b1/cutcount_b1.cpp.59e90660` (sha256
-`59e90660b42a0d94ceae5459287db35b4d93f87a5e62753ccd549235edaa8d3d`), lines
-93–173 — `slot`, `canon`, `gather`, `shifted`, `successors`. The core of
-`experiments/cutcount/cutcount_b1_probe.cpp` is byte-identical over those
-lines, so there is one rule, not two.
+**What it means.** The identity is the Potts spin form of the Fortuin–Kasteleyn
+correspondence (§9 for the references), specialised to king-adjacent cell sets
+in scan order: the colourings of a cell set `S` that are constant on its
+king-connected components number `q^{c(S)}`, so in the sum over all `n`-cell
+subsets of the board the connected subsets are exactly the coefficient of `q¹`.
+In the engine `q` is a formal variable and not a number of colours: an occupied
+cell with no earlier occupied king neighbour either adopts a colour live in its
+window or takes a fresh one at weight `q − b`, the sum over all such labellings
+is truncated to `ℤ[q]/(q²)`, and `[q¹]` of that truncation is the connected
+count, computed either exactly in one pass (wide fixed-width integers) or one
+prime at a time and reassembled by CRT. Constancy on components is enforced
+locally — every other occupied cell copies its earlier neighbours' colour, and
+contributes weight 0 if they carry two distinct colours — so the frontier state
+is only the colour-coincidence partition of the last `H + 1` cells, and the
+engine never decides connectivity.
 
-No program appears in the proof. The engine, its 256-bit arithmetic, its
-window state and its translation accounting are all outside the statement;
-what is proved here is a fact about finite sets of cells.
+Thread **Birthright**, 2026-08-14. Tier 1 of `docs/b1-closure-plan.md` §7: the
+mathematical content of the Motley/B1 second-source engine, in closed form and
+proved as combinatorics. Ground truth for the rule is the banked source
+`results/cutcount_b1/cutcount_b1.cpp.59e90660` (sha256
+`59e90660b42a0d94ceae5459287db35b4d93f87a5e62753ccd549235edaa8d3d`), lines
+93–173 — `slot`, `canon`, `gather`, `shifted`, `successors`; the core of
+`experiments/cutcount/cutcount_b1_probe.cpp` is byte-identical over those
+lines, so there is one rule, not two. No program appears in the proof: the
+engine, its arithmetic, its window state and its translation accounting are
+outside the statement, and what is proved is a fact about finite sets of cells.
 
 ## 0. Vocabulary
 
@@ -19,9 +33,8 @@ The objects are those of `polyplets/Polyplets/Defs.lean`: `kingAdj p q` is
 Chebyshev-distance-one adjacency (`p ≠ q ∧ |p.1 − q.1| ≤ 1 ∧ |p.2 − q.2| ≤ 1`)
 and `KingConnected S` is pairwise reachability inside `S` under that relation,
 shown equivalent to `SimpleGraph.Reachable` in `kingGraph S` by
-`kingConnected_iff_reachable` in `Polyplets/Graph.lean`. This document is a
-paper proof and cites that vocabulary only for agreement on definitions; it is
-not a Lean task.
+`kingConnected_iff_reachable` in `Polyplets/Graph.lean`, cited for agreement on
+definitions only: this is a paper proof, not a Lean task.
 
 Write `c(S)` for the number of king-connected components of a finite cell set
 `S`, with `c(∅) = 0`.
@@ -120,10 +133,10 @@ what §7 and the engine's header claim, and it is discussed in §6 below.
 so `[q¹] A_n(q)` counts the connected `n`-cell subsets of the board and
 `[q⁰] A_n(q) = 0` for `n ≥ 1`. Setting `q = 1` gives `Σ_{φ} w(φ)|_{q=1} = 1`
 for every `S`, so the `q = 1` evaluation counts all subsets, `C(HW, n)`. Those
-two consequences are exactly the engine's `q0_zero` and `q1eval_binomial`
-self-checks; note that neither of them consults connectivity, which is why
-`results/motley-step0.md` is right that only comparison against independently
-computed values can catch the rule going wrong.
+two consequences are the engine's `q0_zero` and `q1eval_binomial` self-checks,
+and neither consults connectivity — which is why `results/motley-step0.md` is
+right that only comparison against independently computed values catches the
+rule going wrong.
 
 ## 4. Proof
 
@@ -211,10 +224,10 @@ makes the induction go through. Taking `i = 1` and using Lemma 5,
     Σ_{φ ∈ Cfg(S)} w(φ) = F_1(∅) = q^c = q^{c(S)}.   ∎
 
 That is the whole cancellation: at each component minimum the `b` adopt terms
-of weight 1 and the birth term of weight `q − b` sum to `q` regardless of `b`,
-and because the branches downstream contribute a factor independent of `b`, the
-`b`-dependence never reaches the total. The "join a block it does not touch"
-branch is not an optimisation — it is the term that cancels `−b`.
+of weight 1 and the birth term of weight `q − b` sum to `q`, and the downstream
+factor is independent of `b`, so the `b`-dependence never reaches the total.
+The "join a block it does not touch" branch is not an optimisation — it is the
+term that cancels `−b`.
 
 **Where each ingredient is used.** Removing the clash rule breaks Lemma 2;
 counting all labels rather than live ones breaks the `b + (q − b)` sum at the
@@ -226,11 +239,10 @@ mutates each of these in turn and each mutation fails at small size.
 ## 5. Verification
 
 `experiments/birthright_identity_check.py` checks the identity **as stated
-above**, not the engine: it enumerates the model of §2 directly by brute force
-over every subset of ten small boards, sums weights exactly in `ℤ[q]`, and
-compares against `q^{c(S)}` with `c(S)` from flood fill. It also audits
-Lemma 4 (every free non-minimal cell, is its component's label live?) and
-measures the king reach of Lemma 1. Pure `python3` stdlib.
+above**, not the engine: over every subset of ten small boards it enumerates the
+model of §2, sums weights exactly in `ℤ[q]`, and compares against `q^{c(S)}`
+with `c(S)` from flood fill. It also audits Lemma 4 (every free non-minimal
+cell, is its component's label live?) and measures the king reach of Lemma 1.
 
 Run on **dalby**, 2026-08-14 23:18 UTC, python 3.13.12, script sha256
 `d2dc1fbf763b2ffd2e1aba32a2cd14f43ee1444f0a13708b290aa1dcb76dc672`
@@ -267,11 +279,7 @@ RED-5  liveness window shortened to H-2       FIRED   H=3 W=4 S=[(0, 0), (2, 0),
 RESULT: GREEN (identity holds on every subset of every board; all 5 RED controls fired)
 ```
 
-223,296 subsets, 331,935 configurations, 0 mismatches, in 5.4 s; 53,552
-instances of Lemma 4 checked with 0 failures. Every number quoted in this
-document is printed by that script.
-
-Two things the numbers say beyond "it passes".
+Every number quoted in this document is printed by that script.
 
 **The reach bound is tight where it can be.** The `reach` column equals `H + 1`
 on every board with `H ≥ 2`, attained by the north-west neighbour, and equals 1
@@ -303,14 +311,13 @@ rather than the engine's, and carries RED controls.
 Four points, none of which invalidates §7's conclusion, all of which would
 mis-state the identity if copied into a theorem.
 
-1. **The identity is exact in `ℤ[q]`, not merely mod `q²`.** Both §7 and the
-   engine header say the count is computed "exactly in the ring `ℤ[q]/(q²)`".
-   The truncation is a computational economy — only `[q¹]` is wanted, and a
-   two-coefficient payload is cheap — but the sum over configurations equals
-   `q^{c(S)}` on the nose. §7's remark that `(q−b₁)(q−b₂) = −q(b₁+b₂) + b₁b₂`
-   mod `q²` invites the reading that the cancellation is a mod-`q²`
-   phenomenon. It is not: it is the identity `b·1 + (q − b) = q` repeated once
-   per component, in `ℤ[q]`. The `q²` truncation happens afterwards.
+1. **The identity is exact in `ℤ[q]`, not merely mod `q²`.** The truncation
+   both §7 and the engine header describe is a computational economy — only
+   `[q¹]` is wanted — but the sum over configurations equals `q^{c(S)}` on the
+   nose. §7's remark that `(q−b₁)(q−b₂) = −q(b₁+b₂) + b₁b₂` mod `q²` invites
+   the reading that the cancellation is a mod-`q²` phenomenon. It is not: it is
+   `b·1 + (q − b) = q` repeated once per component, in `ℤ[q]`, and the `q²`
+   truncation happens afterwards.
 
 2. **"A product of `(q − b_i)` factors, one per component birth" describes one
    term, not the subset's value.** §7's phrasing suggests each subset carries a
@@ -319,12 +326,10 @@ mis-state the identity if copied into a theorem.
    existing colour instead. The all-birth configuration is one term of that
    sum. This is the paraphrase most likely to produce a false statement.
 
-3. **`b` counts live labels, not live components.** The brief's "b = number of
-   live blocks" is right if "block" means colour class; `successors` counts
-   distinct ids present in the window, and since adopt lets a component take
-   another component's colour, two live components can contribute 1 to `b`.
-   The proof is indifferent to the value of `b`, but a statement that said
-   "number of live components" would be false.
+3. **`b` counts live labels, not live components** (§2, second point). The
+   brief's "b = number of live blocks" is right only if "block" means colour
+   class. The proof is indifferent to the value of `b`, but a statement that
+   said "number of live components" would be false.
 
 4. **The window-reach lemma is Tier 1, not Tier 2.** §7 files "king adjacency
    reaches at most `H+1` cells back in scan order" under Tier 2 as part of the
@@ -336,8 +341,8 @@ mis-state the identity if copied into a theorem.
 Two smaller observations on the source, neither a defect:
 
 - The frontier-key comment says "a window of `H+2` cells" while the window is
-  `H+1` cells (`H+1` slots, slot `k` holding the cell `k+1` back). Comment
-  only; `canon` keeps ids at most `H+2`, comfortably inside the 5-bit field.
+  `H+1` cells (`H+1` slots, slot `k` holding the cell `k+1` back). Comment only;
+  `canon` keeps ids at most `H+2`, inside the 5-bit field.
 - `gather` would evaluate `slot(key, H−2)` with `H−2 = −1` at `H = 1`, but the
   guard `r + 1 < H` is false there, so it never does.
 
@@ -368,8 +373,8 @@ is not addressed at all.
 **Proved.** The identity of §3, for every `H, W ≥ 1` and every `S ⊆ Γ`, in
 `ℤ[q]`, unconditionally — no hypothesis was needed and none is carried. The
 one place a condition looked likely (a window-size proviso tying `H+1` to king
-reach) is discharged by Lemma 1, which is a theorem about the scan order, not
-an assumption. Lemmas 1–5 are elementary and self-contained.
+reach) is discharged by Lemma 1, a theorem about the scan order rather than an
+assumption.
 
 **Checked, not proved.** That the model of §2 is the rule implemented by
 `successors`. That reading is mine, from lines 93–173 of the banked source; it
@@ -409,30 +414,25 @@ the connectivity rule; §3's identity is per-board and says nothing about it.
 
 Added 2026-08-23, when `paper/L9-cutcount-identity.tex` was withdrawn as a
 manuscript and folded back into this file. The section is the priority pass's
-finding, and it is the reason the withdrawal was the right call: the
-mathematics above is a specialisation of a correspondence from 1972, and this
-document is the engine's correctness argument rather than a result. The pass
-itself, with the searches it ran, is `docs/priority-passes-2026-08-18.md`.
+finding and the reason the withdrawal was right: this document is the engine's
+correctness argument, not a result. The pass itself, with the searches it ran,
+is `docs/priority-passes-2026-08-18.md`.
 
 **The statement is an instance of Fortuin–Kasteleyn.** The random-cluster
 partition function is `Z = Σ_g v^{b(g)} q^{c(g)}` (Fortuin & Kasteleyn, *Physica*
 57 (1972) 536–564), and counting connected subgraphs is its `q → 0`, `v = 1`
-content. The standard device for evaluating `q^c` without carrying a
-connectivity state is the Potts *spin* representation — colour each component,
-count colourings — which is the usual route to a transfer matrix that never
-carries a connectivity state (Blöte & Nightingale, *Physica A* 112 (1982)
-405–465). §3's identity is that device specialised to site clusters and executed
-in scan order. The telescoping of §4 is the correspondence performed cell by cell: `b`
-ways to reuse a live colour against one birth of weight `q − b`, summing to `q`
-per component. It is not a new theorem and none is claimed.
+content; the device of the opening paragraph — colour each component, count
+colourings — is its Potts *spin* representation, the usual route to a transfer
+matrix carrying no connectivity state (Blöte & Nightingale, *Physica A* 112
+(1982) 405–465). §3 is that device specialised to site clusters in scan order,
+and §4's telescoping is it performed cell by cell. It is not a new theorem and
+none is claimed.
 
-**Two further antecedents.** The unsigned ancestor of §2's scan-order
-labelling is Hoshen–Kopelman (*Phys. Rev. B* 14 (1976) 3438), which assigns
-cluster labels in one sweep with a merge structure; the model of §2 is its
-signed version. The method this rule is an *alternative* to — carrying the
-connectivity partition of a frontier — is Jensen's lattice-animal algorithm
-(2001), which is the whole reason an independent second source is worth
-building.
+**Two further antecedents.** §2's scan-order labelling is the signed version of
+Hoshen–Kopelman (*Phys. Rev. B* 14 (1976) 3438), which assigns cluster labels in
+one sweep with a merge structure. The method this rule is an *alternative* to —
+carrying the connectivity partition of a frontier — is Jensen's lattice-animal
+algorithm (2001), which is why an independent second source is worth building.
 
 **What the searches did not find.** No source states this particular rule: the
 window of `H+1` cells, the liveness convention that makes an expired label
@@ -442,16 +442,15 @@ Lemma 1 is the one step that is not translation — it is a statement about the
 scan order, and it discharges the hypothesis a reader would otherwise expect
 to see attached to §3.
 
-So the durable content here is implementation-grade, which is what §8's limits
-ledger already said in its own words: the mathematics is classical, the rule is
-proved because an engine implements it, and a count with no closed form has
-nothing to lean on but a second method.
+So the durable content here is implementation-grade, as §8's limits ledger
+already said: the mathematics is classical, and the rule is proved because an
+engine implements it.
 
 ## 10. Open problems
 
-Carried over from `paper/L9-cutcount-identity.tex`, deleted 2026-08-23 with
-its withdrawal, since
-§7 and §8 say what is *not* proved without saying which of it is worth doing.
+Carried over from `paper/L9-cutcount-identity.tex`, deleted 2026-08-23 with its
+withdrawal, since §7 and §8 say what is *not* proved without saying which of it
+is worth doing.
 
 **Formalize the identity.** Lemmas 1–5 are elementary, finite in statement and
 uniform in the board. The repository's Lean development already carries the
@@ -471,9 +470,8 @@ size suffice, and what is the minimal window?
 
 ## 11. Where to read what this bought
 
-The identity exists because an engine implements it and a count with no closed
-form has nothing to lean on but a second method. What that second method has
-actually closed is `results/motley-h17.md`; why the engine's own self-checks
-were never going to be enough is `results/motley-step0.md`, which §4 already
-agrees with; and the banked source the model is a reading of, with its
-provenance, is `results/cutcount_b1/`.
+A count with no closed form has nothing to lean on but a second method. What
+this one has closed is `results/motley-h17.md` and `results/motley-h18.md`; why
+the engine's own self-checks were never going to be enough is
+`results/motley-step0.md`, which §3's corollary agrees with; the banked source
+the model is a reading of is `results/cutcount_b1/`.
