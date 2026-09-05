@@ -379,9 +379,14 @@ animal, of (number of animal neighbours $- 1$).
 
 \begin{proposition}
 \label{prop:kct}
-$k = 2c + t$, with both terms nonnegative. Consequently $k$ never decreases when
-a cell is added to an animal.
+On a lattice of degree $\deg$,
+$k = 2c + t - (\deg/2 - 2)(n-1)$: that is $2c+t$ on the square lattice and
+$2c + t - 2(n-1)$ on the king lattice. The square form does \emph{not} carry
+over --- a king diagonal stick has $c = 0$, $t = 2(n-1)$ and $k = 0$.
 \end{proposition}
+
+\noindent The monotonicity is separate, holds on both lattices, and is what the
+prune uses; no count depends on the identity.
 
 \begin{remark}[this identity is published, for the square lattice]
 \label{rem:abzidentity}
@@ -392,8 +397,8 @@ map --- the circuit rank. That is the present statement with $c = f$ and
 $t = e$, and their proof is the same accounting: four neighbours per cell, less
 the excesses, less two per spanning-tree edge, less two per cycle-closing edge.
 It was re-derived here for the king lattice without knowing that, and the
-king case does not follow from theirs by substitution, since the per-cell degree
-and hence $\pmaxx$ changes, but the identity and its proof idea are theirs.
+king case does not follow from theirs by substitution: the per-cell degree, and
+hence $\pmaxx$, changes, which is exactly the $(\deg/2 - 2)(n-1)$ shift.
 \S\ref{sec:novelty} carries the reading of their full text that confirms it.
 \end{remark}
 
@@ -418,6 +423,56 @@ gated: pruned counts match an independent brute-force census cell for cell on
 both lattices, the prune is confirmed to change nothing against an unpruned
 control run, and the $(c,H)$ marginals sum back.
 
+\subsection{The king column is the square column re-graded}
+\label{sec:reduction}
+
+Diagonal king steps preserve the parity of $x+y$, so a king animal with no
+orthogonal edge lives on one parity class and
+$(x,y) \mapsto (u,v) = (\tfrac{x+y}{2}, \tfrac{x-y}{2})$ carries it bijectively
+onto a polyomino $B$ of the same size.
+
+\begin{proposition}
+\label{prop:reduction}
+For such an animal $A$, $k_{\text{king}}(A) = k_{\text{square}}(B) + c(B) +
+h(B)$, with $c$ the cycle rank of $B$'s adjacency graph and $h$ its number of
+holes.
+\end{proposition}
+
+\begin{proof}
+With $S$ the $3\times3$ box, $p = |A \oplus S| - n$ and $\pmaxx = 4n+4$, so
+$k = 5n + 4 - |A \oplus S|$. Cells of the animal's own parity in $A \oplus S$
+are $B$ and its edge neighbours in the $(u,v)$ frame, $n + p_4(B)$ of them.
+Cells of the other parity are in bijection with the grid vertices of the $(u,v)$
+lattice --- an odd cell's four orthogonal neighbours are the four cells meeting
+at one vertex --- and lie in $A \oplus S$ exactly when one of those four is in
+$B$, giving $\mathrm{Vert}(B)$. Euler on the cell complex of $B$ ($V - E + F =
+1-h$, $F = n$, $E = 4n-a$, $a$ the number of adjacent pairs) gives
+$\mathrm{Vert}(B) = 3n - a + 1 - h$. Substituting both and using
+$k_{\text{square}} = 2n+2-p_4$ and $c = a-n+1$ gives the claim.
+\end{proof}
+
+Three things follow. Writing $P(n,j,c)$ for the square census graded by cycle
+rank and $M(n,k)$ for the king animals that do carry an orthogonal edge,
+$A_{\text{king}}(n,k) = \sum_c P(n,k-c,c) + M(n,k)$ exactly for $k \le 3$, where
+no hole is affordable (the cheapest holed polyomino is $3\times3$ less its
+centre and one corner, at $k_{\text{square}} = 4$, $c = 0$, $h = 1$, so a hole
+costs $k_{\text{king}} = 5$). $M$ has degree $k-1$ and the $c \ge 1$ terms
+degree at most $k-2$, so \textbf{the leading coefficient of the king class is
+the leading coefficient of the square class}, which Table~\ref{tab:maxend}
+otherwise reports as a coincidence. And $M$'s onsets ($3, 4, 8, 12$) sit below
+the class onsets ($6, 9, 13, 18$) at every $k$, so the king onset is the square
+onset. A cycle in $B$ forces $k_{\text{square}} \ge 2c$, hence
+$k_{\text{king}} \ge 3c$ and $c \le \lfloor k/3 \rfloor$ on the king lattice ---
+the census maxima are $1,1,1,2$ at $k = 3,4,5,6$, exactly that.
+
+Proposition~\ref{prop:reduction} is checked cell by cell on $489{,}603$
+same-parity animals to $n = 13$, $k \le 6$, and the closed forms it yields
+against both censuses to $n = 78$, by
+\repo{experiments/perimeter\_defect\_features.py};
+\repo{results/perimeter-defect-diagonals.md} carries the feature-cost table (a
+turn 1, an orthogonal step 2, a $3$-branch 2, a $4$-branch 4) and the residual
+formulae.
+
 \subsection{The classes and their onsets}
 
 \begin{table}[H]
@@ -438,7 +493,8 @@ $k$ & period & degree & onset & denominator & leading coefficient \\
 \end{tabular}
 \caption{The defect-$k$ classes. Period, degree, onset and leading coefficient
 agree on the square and king lattices at every $k \le 6$; sub-leading
-coefficients do not.}
+coefficients do not. Period, degree and denominator are interpolated; the shared
+onset and the shared leading coefficient are derived in \S\ref{sec:reduction}.}
 \label{tab:maxend}
 \end{table}
 
@@ -712,8 +768,8 @@ this paper leans on are theirs.
 
 \begin{enumerate}
 \item \textbf{The defect identity} $k = 2c + t$ is their $k = e + 2f$
-  (Remark~\ref{rem:abzidentity}). It licenses the enumeration prune, so it is
-  load-bearing for every measured number in the maximum-end sections.
+  (Remark~\ref{rem:abzidentity}), on the square lattice. What licenses the
+  enumeration prune is the monotonicity, not the identity.
 \item \textbf{Rationality with cyclotomic denominators}, for each fixed defect,
   is their theorem --- stated for polyominoes and for $d$-dimensional polycubes.
   \S\ref{sec:cyclo} is the king analogue of it.
@@ -730,10 +786,13 @@ from), which sharpens the verdict in one direction that matters. Their
 rationality proof runs by shrinking cuts to a unique reduced representative per
 pattern class and bounding the class count through excess cells, $L$-cells and
 degree-1 cells; every step of it is stated under face connectivity, down to a
-handshake bound at maximum degree $6$. \textbf{The king column is therefore a
-separate derivation and not a corollary of their framework} --- the argument's
-shape transports, its statements do not. That is the strongest thing this paper
-can claim on the structural side, and it is a claim about their proof.
+handshake bound at maximum degree $6$, so \emph{their argument} does not
+transport. What does transport is the parity reduction of
+\S\ref{sec:reduction}: the king animals with no orthogonal edge \emph{are}
+polyominoes, so their rationality theorem covers that part of the king column
+once the square census is graded by cycle rank. The king-only part --- the
+animals carrying an orthogonal edge --- is outside it. The king column is a
+corollary of theirs plus a re-grading, on all but a family of degree $k-1$.
 
 \paragraph{The square column's reach.} \cite{barequetmagal2023}
 give an algorithm that emits the closed formulae and generating functions per
@@ -743,8 +802,10 @@ made line by line, but the square column here should be read as agreeing with
 it rather than extending it below $k = 6$.
 
 \paragraph{What the pass did not find anywhere.} The king column throughout; the
-onset formula $\binom{k+1}{2} + 3$; the two-lattice universality of period,
-degree, onset and leading coefficient, now tested through $k = 6$; the
+parity reduction of \S\ref{sec:reduction}; the onset formula
+$\binom{k+1}{2} + 3$; the two-lattice universality of period, degree, onset and
+leading coefficient, now tested through $k = 6$ and derived for the last two;
+the
 coefficient triangle and its one-diagonal-deep lattice independence; the whole
 minimum end, including the attainability criterion, the $P(x)^c$ hull
 factorisation and the identification of the diamond tip series with Andrews'
@@ -795,6 +856,7 @@ claim & check \\
 \midrule
 the enumerator and its gate & \texttt{make build/perimeter\_defect}; \repo{scripts/perimeter\_defect\_gate.sh} \\
 Table~\ref{tab:maxend} & \repo{experiments/perimeter\_defect\_fit.py} \\
+Propositions~\ref{prop:kct} and~\ref{prop:reduction}, and the closed forms they give & \repo{experiments/perimeter\_defect\_features.py} \\
 the onset formula & \repo{experiments/perimeter\_max\_structure.py} \\
 the denominators, predicted then divided & \repo{experiments/perimeter\_defect\_gf.py} \texttt{--kmax 6} \\
 the onset and $D_k$ minimality, by scan & \repo{experiments/perimeter\_defect\_denominator.py} \texttt{--k 6} \\

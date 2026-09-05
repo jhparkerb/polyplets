@@ -2,7 +2,10 @@
 
 2026-08-07. Extends `results/perimeter-defect-diagonals.md`, which graded
 `A(n,p)` by `k = pmax(n) - p` only. The table has two boundary curves; this
-pass grades from both and asks what each end's ladder looks like.
+pass grades from both and asks what each end's ladder looks like. The
+maximum-end king classes are since derived rather than measured — the parity
+reduction `k_king = k_square + c + h` in `perimeter-defect-diagonals.md` — which
+is where the triangular onset's lattice-independence comes from.
 
 ## The answer in one paragraph
 

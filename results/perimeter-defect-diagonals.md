@@ -6,37 +6,45 @@
 
 Grading fixed animals by **site-perimeter defect** `k = pmax(n) - p` gives a
 quasi-polynomial count on the king lattice exactly as it does on the square one:
-`k = 3` carries a genuine period-2 term on both. So quasi-polynomiality is
-**intrinsic to the perimeter grading, not a square-lattice artefact** — the
-brief's question 1, answered. But the finding is stronger and cuts both ways.
-Through `k = 5` the period, the degree, the onset and the *leading coefficient*
-of the defect-k formula are **identical on square and king**; only the
-sub-leading coefficients differ. The height grading is the reverse: plain
-polynomials (proved, `docs/proofs/universal-diagonal-law.md`), but with
-thoroughly lattice-dependent coefficients — `4n - 8` on square against
-`25n - 45` on king. So the height grading is cleaner in *form* and the perimeter
-grading is more universal in *content*. Neither dominates, and the honest claim
-for Paper 2 is the narrow one: the diagonal law is clean because it is a proved
-plain polynomial with a sharp onset, not because the perimeter grading is
-somehow defective.
+`k = 3` carries a genuine period-2 term on both, so quasi-polynomiality is
+**intrinsic to the perimeter grading, not a square-lattice artefact**. Through
+`k = 6` the period, the degree, the onset and the *leading coefficient* are
+identical on square and king; only the sub-leading coefficients differ.
+
+That agreement is no longer a measured coincidence. Diagonal king steps preserve
+the parity of `x+y`, so a king animal with no orthogonal edge **is** a polyomino
+in rotated coordinates, and its defect is the polyomino's defect plus one unit
+per independent cycle and one per hole. The king column is the square column
+re-graded by cycle rank, plus the animals that do carry an orthogonal edge — a
+family of degree `k-1`, which is why the leading coefficient is
+lattice-independent. The height grading is the reverse: plain polynomials
+(proved, `docs/proofs/universal-diagonal-law.md`), but with thoroughly
+lattice-dependent coefficients — `4n - 8` on square against `25n - 45` on king.
 
 ## What made this cheap: the defect is monotone
 
-The plan proposed a surplus-budgeted row DP on the model of
-`experiments/diagonal_machine.py`. That cannot work here — the perimeter defect
-does not bound the transverse extent of a linear sweep (a U with arms far apart
-has `k = 3` and unbounded spread), which is presumably why the published method
-classifies patterns instead of sweeping.
-
-What does work is simpler. Write `c` for the cycle rank `e - n + 1` of the
+A surplus-budgeted row DP cannot work here: the perimeter defect does not bound
+the transverse extent of a linear sweep (a U with arms far apart has `k = 3` and
+unbounded spread), which is presumably why the published method classifies
+patterns instead of sweeping. What does work is simpler. Write `c` for the cycle rank `e - n + 1` of the
 adjacency graph and `t` for the sum over empty adjacent cells of
-(animal-neighbours − 1). Then
+(animal-neighbours − 1). Then, for a lattice of degree `deg`,
 
-    k = 2c + t,
+    k = 2c + t - (deg/2 - 2)(n - 1),
 
-both terms non-negative, and consequently **k never decreases when a cell is
-added**: placing a cell raises `pmax` by `deg/2` and changes `p` by `-1 + g`,
-where `g` counts the neighbours that become fresh perimeter cells, and `g` is
+which is `2c + t` on square4 and `2c + t - 2(n-1)` on square8. **The square form
+does not carry over**: a king diagonal stick has `c = 0`, `t = 2(n-1)` and
+`k = 0`. Only the square form is published (Asinowski, Barequet & Zheng, as
+`k = e + 2f`); the shift is what the extra 4 neighbours per cell buy.
+`paper/L6-perimeter-gradings.tex` Proposition kct and the header of
+`cpp/perimeter_defect.cpp` both state the square form for both lattices and are
+wrong there. **No count moves**: the enumerator prunes on the monotonicity, not
+on the identity.
+
+The monotonicity is separate and does hold on both lattices. **k never decreases
+when a cell is added**: placing a cell raises `pmax` by `deg/2` and changes `p`
+by `-1 + g`, where `g` counts the neighbours that become fresh perimeter cells,
+and `g` is
 capped by the neighbours the new cell shares with the animal cell it touches.
 The bound is tight on both lattices (a stick extends at `dk = 0`). So a
 Redelmeier DFS that abandons a partial animal the moment `k > kmax` is exact.
@@ -46,18 +54,110 @@ non-decreasing as the animal grows, so a candidate over budget is over budget
 forever and can be dropped from the untried list rather than re-tested at every
 node. That is worth ~20x (king n=20, k<=5: 2.4e8 nodes to 1.4e7).
 
-`cpp/perimeter_defect.cpp`, gated by `scripts/perimeter_defect_gate.sh`:
-pruned counts match `build/g2 --siteperim` cell for cell on both lattices, the
-prune is confirmed to change nothing against an unpruned control run, and the
-(c, H) marginals sum back. It reaches **n = 70** on both lattices on a single
-gympie core — 913 s on square, 2017 s on king — where brute force stops at 14 on
-king.
+`cpp/perimeter_defect.cpp`, gated by `scripts/perimeter_defect_gate.sh`: pruned
+counts match `build/g2 --siteperim` cell for cell on both lattices, the prune
+changes nothing against an unpruned control, and the (c, H) marginals sum back.
+It reaches **n = 70** on one gympie core — 913 s square, 2017 s king — where
+brute force stops at 14 on king.
+
+## The king column is the square column re-graded
+
+Write `S` for the 3x3 box. Site perimeter is `p = |A + S| - n` and `pmax = 4n+4`,
+so on the king lattice
+
+    k = 5n + 4 - |A + S|.
+
+Diagonal steps `(±1,±1)` preserve the parity of `x+y`; orthogonal steps flip it.
+A king animal with **no orthogonal edge** therefore lives on one parity class,
+and `(x, y) -> (u, v) = ((x+y)/2, (x-y)/2)` carries it bijectively onto a
+polyomino `B` with the same cell count, king diagonal adjacency becoming
+ordinary edge adjacency. Split `A + S` by parity:
+
+- Cells of the animal's own parity in `A + S` are `B` together with its edge
+  neighbours in the `(u,v)` frame — `n + p_4(B)` of them.
+- Cells of the other parity are in bijection with the **grid vertices** of the
+  `(u,v)` lattice: an odd cell's four orthogonal neighbours are exactly the four
+  `(u,v)` cells meeting at one vertex. Such a cell is in `A + S` exactly when one
+  of those four is in `B`, so there are `Vert(B)` of them.
+
+Euler on the cell complex of `B` — `V - E + F = 1 - h` with `F = n`,
+`E = 4n - a`, and `a` the number of adjacent cell pairs — gives
+`Vert(B) = 3n - a + 1 - h`. Substituting both counts:
+
+    k_king(A) = k_square(B) + c(B) + h(B),        c = a - n + 1.
+
+**PROVED**, and checked cell by cell on 489,603 same-parity animals to `n = 13`,
+`k <= 6` (`experiments/perimeter_defect_features.py`).
+
+### What it costs to bend, branch and switch parity
+
+The reduction is an isomorphism of the two pictures, so every square-lattice
+feature keeps its square price. Costs are for a feature standing alone; two
+features interfere only within Chebyshev distance 2, and that interference is
+what the onsets measure.
+
+| feature (king) | what it is in `B` | defect cost |
+|---|---|---|
+| straight diagonal step | straight step | 0 |
+| 90-degree turn | bend | 1 |
+| cell with 3 diagonal neighbours | T-branch | 2 |
+| cell with 4 diagonal neighbours | cross | 4 |
+| independent cycle | cycle | its square cost, `+1` |
+| enclosed cell | hole | its square cost, `+1` |
+| **orthogonal step** | not in `B` at all | 2 |
+
+An animal of defect `k` is a tree of diagonal segments carrying features of total
+cost `k` — the reduction plus the square-lattice classification, not an
+independent statement. Only the last row escapes the reduction, an orthogonal
+edge leaving the parity class; every animal enumerated has at most `floor(k/2)`
+of them.
+
+### The counts
+
+Let `P(n, j, c)` be the square census graded by cycle rank (the `c` column of
+`results/perimdefect_square4_n78_k6.txt`) and `M(n, k)` the king animals that do
+carry an orthogonal edge. For `k <= 3` no hole is affordable — the cheapest holed
+polyomino is 3x3 less its centre and one corner, `k_sq = 4`, `c = 0`, `h = 1`, so
+a hole costs `k_king = 5` — and
+
+    A_king(n, k) = sum_c P(n, k-c, c) + M(n, k)          k <= 3, exact.
+
+Past `k = 3` the banked square census cannot supply the `h` correction, grading
+by `c` and not by `h`; there the identity is checked against an independent
+enumeration. Write `R(n,k)` for `A_king(n,k) - sum_c P(n, k-c, c)`, which is
+`M(n,k)` for `k <= 3`:
+
+    R(n,2) = 8n - 16                                  n >= 3
+    R(n,3) = 20n^2 - 128n + 212                       n >= 4
+    R(n,4) = 191/6 n^3 - 811/2 n^2 + 5786/3 n - 3456        n >= 8 even
+             191/6 n^3 - 811/2 n^2 + 11581/6 n - 6937/2     n >= 9 odd
+    R(n,5) = 109/3 n^4 - 2368/3 n^3 + 44155/6 n^2
+                       - 104759/3 n + 69848                 n >= 12 even
+                       - 104780/3 n + 139841/2              n >= 13 odd
+
+`R(n,2) = 8(n-2)` is **derived**: at defect 2 with an orthogonal edge the animal
+is two straight diagonal sticks, `a + b = n`, joined by one orthogonal edge — 16
+configurations per unordered pair `{a,b}`, halved when `a=1` (a one-cell stick
+has no direction) or `a=b` (the sticks swap). The enumeration confirms every
+defect-2 mixed animal has that shape. The rest are interpolated and checked
+against the whole census. Three consequences, derived rather than measured:
+
+- **The leading coefficient cannot depend on the lattice.** `deg R = k-1`, and
+  `P(n, k-c, c)` for `c >= 1` has degree at most `k-2`, so the `n^k` coefficient
+  of `A_king(n,k)` is the `n^k` coefficient of `A_square(n,k)`.
+- **The onset is the square onset.** `R`'s onsets are `3, 4, 8, 12` against class
+  onsets `6, 9, 13, 18`, below at every `k`, so nothing in the king-only family
+  delays the class. The triangular value `k(k+1)/2 + 3` itself remains a check on
+  the square side, matched at `k = 2..6`, not a derivation.
+- **The king cycle-rank cap is `c <= floor(k/3)`, not `floor(k/2)`.** A cycle in
+  `B` forces `k_sq >= 2c` by the square identity, so `k_king >= 3c`. The census
+  maxima are `1, 1, 1, 2` at `k = 3, 4, 5, 6` — exactly `floor(k/3)`.
 
 ## The formulae
 
-Both lattices, `k = pmax(n) - p` with `pmax = 2n+2` (square4) and `4n+4`
-(square8). Fits are exact interpolations verified against at least 2 spare
-points per residue class, with the onset checked to be sharp.
+Period, degree, onset and denominator are interpolations verified against at
+least 2 spare points per residue class; the shared leading coefficient is derived
+above, not fitted.
 
 | k | period | degree | onset | denominator | leading coeff (BOTH lattices) |
 |---|---|---|---|---|---|
@@ -67,50 +167,33 @@ points per residue class, with the onset checked to be sharp.
 | 3 | 2 | 3 | 9  | Φ₁⁴Φ₂²  | 13/2 |
 | 4 | 2 | 4 | 13 | Φ₁⁵Φ₂³  | 17/3 |
 | 5 | 6 | 5 | 18 | Φ₁⁶Φ₂⁴Φ₃ | 593/144 |
+| 6 | 6 | 6 | 24 | Φ₁⁷Φ₂⁵Φ₃² | 13325/5184 |
 
 Square (`k=3`, n >= 9), reproducing the published result the brief could only
-reach through talk slides:
+reach through talk slides — the `(-1)^n` is there, so we have not misread the
+convention, and its part has degree 1, not 0:
 
     Q_3(n) = 13/2 n^3 - 89 n^2 + 1947/4 n - 2107/2 + (-1)^n (5n/4 - 21/2)
 
-The `(-1)^n` is there, so we have not misread the slides or the convention.
-Note the parity part has degree 1, not 0. King (`k=3`, n >= 9), the same shape
-with different sub-leading coefficients:
-
-    n even:  13/2 n^3 - 69 n^2 + 360 n   - 860
-    n odd:   13/2 n^3 - 69 n^2 + 715/2 n - 839
-
-King `k=4` (n >= 13) and both lattices' `k=5` (n >= 18, period 6) are in
-`results/perimdefect_square*_n*_k5.txt` and refit in seconds by
-`experiments/perimeter_defect_fit.py`.
-
-## The cyclotomic content is finer than the period
-
-At `k = 5` the fitted period is 6, but the Φ₆ component of the constant term is
-**exactly zero**: the period-6 behaviour is Φ₂ and Φ₃ acting independently, not
-a primitive 6th root. Reading the exponents off where each factor first
-perturbs a coefficient: Φ₂ enters the `n^3` coefficient (so Φ₂⁴) and Φ₃ only the
-constant (Φ₃¹).
-
-So across `k <= 5` the denominator is `Φ₁^(k+1) · Φ₂^(k-1) · Φ₃^(k-4)`, with
-each factor switching on at
-
-    Φ_d first appears at k = 2d - 1        (d=2 at k=3, d=3 at k=5)
-
-**Prediction: Φ₄ first appears at k = 7**, and no `k <= 6` formula carries a
-period-4 term. Untested — `k = 7` needs a run well past n = 70. If it holds, the
-"quasi-polynomial" label is coarse and what is really happening is that each
-successive prime-power periodicity costs a fixed 2 units of defect to buy.
+King `k=3` and `k=4` are the square ones plus `R(n,k)`, less the `c >= 1` term;
+all refit in seconds by `experiments/perimeter_defect_fit.py`.
 
 ## The generating functions, and the triangle their coefficients form
 
+At `k = 5` the fitted period is 6, but the Φ₆ component of the constant term is
+**exactly zero**: the period-6 behaviour is Φ₂ and Φ₃ acting independently, not
+a primitive 6th root. Φ₂ enters the `n^3` coefficient (Φ₂⁴), Φ₃ only the constant
+(Φ₃¹), so across `k <= 6` the denominator is `Φ₁^(k+1) · Φ₂^(k-1) · Φ₃^(k-4)`
+with each factor switching on at `Φ_d first appears at k = 2d - 1` (d=2 at k=3,
+d=3 at k=5). **Prediction: Φ₄ first appears at k = 7**, untested — it needs a run
+well past n = 70. If it holds, each successive prime-power periodicity costs a
+fixed 2 units of defect to buy.
+
 `experiments/perimeter_defect_gf.py` produces `G_k(x) = sum_n A(n, pmax(n)-k) x^n`
-exactly. The denominator is not fitted: it is *predicted* from the table above as
-`Phi_1^(k+1) . Phi_2^(k-1) . Phi_3^(k-4)` and then checked — dividing the n<=70
-series by it must leave a polynomial. It does, for every k on both lattices, with
-`gcd(N, D) = 1` so no factor is spurious. For k=5 that is 28 consecutive exact
-zero coefficients the interpolation never saw, a far harder test than the
-2-spare-per-class bar the formulae were fitted at.
+exactly. The denominator is *predicted* from the table above, not fitted, then
+checked: dividing the series by it must leave a polynomial, with `gcd(N,D) = 1`
+so no factor is spurious. It does, for every k on both lattices — 28 spare zero
+coefficients at k=5 that the interpolation never saw.
 
 King, with `Phi_1 = 1-x`, `Phi_2 = 1+x`, `Phi_3 = 1+x+x^2`, and `R_k` the
 polynomial part carrying the pre-onset holdouts:
@@ -131,8 +214,8 @@ polynomial part carrying the pre-onset holdouts:
                + (40x/27 + 8/3)/Phi_3
 
 Each block is one piece of the quasi-polynomial: `a_j/Phi_1^j` gives
-`a_j*C(n+j-1, j-1)`, the plain part; `b_j/Phi_2^j` the same times `(-1)^n`; the
-`Phi_3` block a bounded period-3 wobble.
+`a_j*C(n+j-1, j-1)`; `b_j/Phi_2^j` the same times `(-1)^n`; `Phi_3` a bounded
+period-3 wobble.
 
 **These coefficients form their own triangle, and lattice-independence in it is
 exactly one diagonal deep.** Writing rows k and columns by offset d from the top
@@ -152,89 +235,95 @@ of each block, `*` marking entries identical on square and king:
       k=5            15/8*    -293/8*    10503/32    -28141/16
 
 Every `d = 0` entry agrees across the lattices; `d = 1` already fails from k=2 in
-the `Phi_1` block. So the leading diagonal of each cyclotomic block is universal
-and everything beneath it is lattice-specific. That is a diagonal statement about
-a triangle of *coefficients* rather than about counts, and it is the closest
-structural analogue to the diagonal law that this grading offers.
+the `Phi_1` block. The leading diagonal of each cyclotomic block is universal and
+everything beneath it is lattice-specific — a diagonal statement about a triangle
+of *coefficients* rather than about counts, and the closest structural analogue
+to the diagonal law this grading offers. The reduction accounts for the `Phi_1`
+column: `R` has degree `k-1`, so it perturbs `d >= 1` and cannot touch `d = 0`.
 
-Of the two leading diagonals, one closes and one does not:
+Neither leading diagonal has a closed form:
 
-- **`Phi_2`: b_(k-1) = 5(k-2)!/2^(k-1)`, exactly, both lattices** (5/4, 5/4,
-  15/8). Predicts 15/4 at k=6.
+- `Phi_2`: `b_(k-1)` runs 5/4, 5/4, 15/8, 5/2. `5(k-2)!/2^(k-1)` fits the first
+  three and predicts 15/4 at k=6, where the answer is 5/2 on both lattices — a
+  coincidence of three terms. The value stays lattice-independent.
 - `Phi_1`: `a_(k+1) = c_k * k!` = 2, 4, 12, 39, 136, 2965/6 — integral through
-  k=4 and then not, which is what killed the `2*C(2k,k)` guess. No closed form.
+  k=4 and then not, which is what killed the `2*C(2k,k)` guess.
 - `Phi_3` at k=5 is identical on both lattices **in full**, not merely in its
-  leading term: `(40x/27 + 8/3)/Phi_3`. The entire period-3 content of the
-  perimeter grading is lattice-independent.
+  leading term: `(40x/27 + 8/3)/Phi_3`. That too is a k=5 accident: at k=6 king
+  carries `(-5920x^3 - 19128x^2 - 18528x - 12656)/243` against square's
+  `(-5920x^3 - 18768x^2 - 18168x - 12296)/243`, agreeing only in the top
+  coefficient.
 
 The obvious triangle — `B(n,k) = A(n, pmax(n)-k)`, rows n, columns k, row sums
-a(n), with the `G_k` as its column GFs — exists but is a much weaker object than
-the height triangle. The diagonal law covers every `k <= (n-1)/2` from ONE
-theorem with ONE onset formula; here each k is its own problem with its own
-onset (2, 3, 6, 9, 13, 18 — no law found) and its own denominator. Neither
-triangle has been checked against OEIS or the literature.
+a(n), with the `G_k` as its column GFs — is a much weaker object than the height
+triangle: the diagonal law covers every `k <= (n-1)/2` from one theorem with one
+onset formula, while here each k has its own denominator. Neither triangle has
+been checked against OEIS or the literature.
 
 ## An exact identity relating n, H and p on the king lattice
 
 The minimum defect over king animals of `n` cells and bounding-box height `H` is
-**exactly**
-
-    k_min(n, H) = ceil((n - H) / (H - 1))        for H >= 2
-
-— zero violations and equality *attained* in all 672 (n,H) cells present at
-`k <= 5`, `n <= 40`, so it is sharp and no better bound exists. Equivalently
-
-    H >= (n + k) / (k + 1)     i.e.    p <= 4n + 4 - ceil((n-H)/(H-1))
-
-and by transposition the same with the width `W`. Hence `k = 0` forces
-`H = W = n` (the diagonal sticks) and `k = 1` forces both dimensions `>= (n+1)/2`.
+**exactly** `k_min(n,H) = ceil((n-H)/(H-1))` for `H >= 2` — zero violations and
+equality *attained* in all 672 (n,H) cells present at `k <= 5`, `n <= 40`, so no
+better bound exists. Equivalently `H >= (n+k)/(k+1)`, and by transposition the
+same with the width. Hence `k = 0` forces `H = W = n` (the diagonal sticks) and
+`k = 1` forces both dimensions `>= (n+1)/2`.
 
 **On the square lattice there is essentially nothing**: `k_min(n,H) = 0` for
-`H in {1, n}` and `1` for every `H` between. The reason is structural — the two
-square defect-0 animals are the horizontal *and* vertical sticks, at opposite
-ends of the height range, so no height is ever more than one defect unit from
-optimal. Both king defect-0 animals are diagonal sticks with `H = n`, which is
-why the king law bites. This is the same asymmetry that
+`H in {1, n}` and `1` for every `H` between, because the two square defect-0
+animals are the horizontal *and* vertical sticks, at opposite ends of the height
+range. Both king defect-0 animals are diagonal sticks with `H = n`, which is why
+the king bound bites — the asymmetry
 `experiments/perimeter_vs_height_defect.py` saw from the marginal side.
 
 ## Closed doors
 
-- **The parity is not carried by the cyclic animals.** Splitting each class by
-  cycle rank: the `c >= 1` parts are plain polynomials and tiny (square k=3,
-  c=1 is the constant 8; king k=3, c=1 is one animal at n=4 and nothing after).
-  All of the `(-1)^n` sits in the acyclic animals, so the appealing "a ring has
-  an even cell count" story is dead.
-- **It is not carried by any single height slice.** Every slice `H = n - j` at
-  fixed `j` is a plain polynomial on both lattices.
-- **It is not the height floor either.** The floor law above has period `k+1`,
-  and the near-floor king slices do oscillate with period 4 at `k=3`
-  (`[4, 2, 20, 12, 4, 2]`) — but it predicts period 5 at `k=4` where the answer
-  is 2, and the square lattice has no meaningful floor at all yet shows the
-  identical period. The floor contributes; it is not the source.
-- **`c_k · k! = 2·C(2k,k)` is dead.** The leading coefficients times `k!` run
-  2, 4, 12, 39, 136 against `2·C(2k,k)` = 2, 4, 12, 40, 140, tempting through
-  `k=4`; `k=5` gives 593/144, whose product with `5!` is not even an integer.
-- **Task A (the dalby enumeration run) is not worth doing.** It was scoped to
-  reach n=16 on king in ~17 CPU-hours as an independent source for k=3/k=4. The
-  pruned enumerator reaches n=70 on king in 2017 s on one gympie core and is
-  already cross-validated against g2 over the whole range g2 can reach, which is
-  a stronger check than a second brute-force run at n=16 would have been.
+- **The king parity term is the square parity term.** `R(n,3)` has period 1, so
+  by the reduction the king `k=3` quasi-polynomial differs from the square one by
+  a plain polynomial: even minus odd is `5n/2 - 21` on both. The hunt for a
+  king-side source of the `(-1)^n` is therefore over — it is inherited. It is
+  carried by the acyclic animals (the `c >= 1` parts are plain and tiny: square
+  k=3, c=1 is the constant 8), by no single height slice (every `H = n - j` is a
+  plain polynomial on both lattices), and not by the height floor, whose period
+  `k+1` predicts 5 at `k=4` where the answer is 2.
+- **`c_k · k! = 2·C(2k,k)` is dead.** Leading coefficients times `k!` run
+  2, 4, 12, 39, 136 against 2, 4, 12, 40, 140; at `k=5` the product is not even
+  an integer.
+- **Task A (the dalby enumeration run) is not worth doing.** Scoped to reach
+  n=16 on king in ~17 CPU-hours as an independent source; the pruned enumerator
+  reaches n=70 in 2017 s on one gympie core, cross-validated against g2 over the
+  whole range g2 can reach.
+- **`scripts/dalby_perimeter_defect_pool.sh`'s cost header is refuted.** It
+  predicted ~136 core-hours and ~1.8 h wall for king n=78 from `time ~ n^7.9`;
+  the run took 42 h wall at 76-way, ~23x. Not calibration for anything else.
 
 ## Status of these claims
 
-Everything above is **measured and interpolated, not proved**. The degree bound
-and onset are read off the data, not derived, so each row of the table is a
-conjecture supported by exact values with holdouts and spare-point checks — the
-opposite of the height diagonal law, which is a theorem with a proved degree
-bound and a proved sharp onset (`docs/proofs/universal-diagonal-law.md`,
-[[diagonal-law-proved]]). The `k = 2c + t` identity and the monotonicity that
-licenses the prune ARE proved, in the header of `cpp/perimeter_defect.cpp`, and
-they are what makes the values trustworthy.
+| claim | status |
+|---|---|
+| `k = 2c + t - (deg/2 - 2)(n-1)`, and the monotonicity | proved |
+| `k_king = k_square + c + h` for animals with no orthogonal edge | proved |
+| `A_king(n,k) = sum_c P(n,k-c,c) + M(n,k)`, `k <= 3` | proved |
+| the same for `k = 4, 5, 6` | checked, `n <= 12` |
+| leading coefficient lattice-independent; onset = square onset | derived from the above |
+| `A_king(n,k)` for `k <= 4`, `R(n,k)` for `k <= 5` | checked to n=78 |
+| `M(n,2) = 8(n-2)` | derived |
+| period, degree, denominator, onset per class | interpolated, not derived |
+| the triangular onset `k(k+1)/2 + 3` | checked at k=2..6 |
 
-Novelty unchecked against the literature: Asinowski, Barequet, Magal & Zheng
-(Comput. Geom. 108 (2022) 101919) is paywalled and we hold only the talk slides,
-so the square column here reproduces rather than extends them. The king column
-and the `n`/`H`/`p` identity have not been searched for in the literature.
+The interpolated rows are conjectures supported by exact values with holdouts —
+the opposite of the height diagonal law, a theorem with a proved degree bound and
+a proved sharp onset (`docs/proofs/universal-diagonal-law.md`,
+[[diagonal-law-proved]]). Note that the onset is *not* the first appearance of a
+defect-k animal: a tight zigzag reaches defect k at n = k+2, far below
+`k(k+1)/2 + 3`. The onset is where the last short-range interference between
+features dies out.
+
+Novelty: the 2026-08-18 priority pass obtained the Asinowski--Barequet--Zheng
+full text (`papers/asinowski_barequet_zheng_2018_polycubes_small_perimeter_defect.pdf`),
+so the square column reproduces rather than extends them, and the identity, the
+rationality theorem and the degree conjecture are theirs. The king column, the
+parity reduction and the `n`/`H`/`p` identity were not found anywhere.
 
 ## Reproduce
 
@@ -245,77 +334,23 @@ and the `n`/`H`/`p` identity have not been searched for in the literature.
     python3 experiments/perimeter_defect_gf.py results/perimdefect_square8_n70_k5.txt
     python3 experiments/perimeter_defect_gf.py \
         results/perimdefect_square{8,4}_n70_k5.txt --compare
+    python3 experiments/perimeter_defect_features.py   # the reduction and the
+                                                       # closed forms, fail-closed
 
-Census data kept: `results/perimdefect_square{4,8}_n{40,60,70}_k5.txt` (n, k, c,
-H, count), `results/siteperim_square4_n20.txt` and
-`results/siteperim_square8_n14.txt` (the g2 brute-force cross-checks),
-`results/king_joint_nhp_n9.txt` and `results/king_triple_classes_n9.txt` (the
-(n,H,p) joint census behind the identity above), `results/bbox_square4_n21.txt`.
+Census data kept: `results/perimdefect_square{4,8}_n{40,60,70,78}_k{5,6}.txt`
+(n, k, c, H, count); `results/siteperim_square4_n20.txt` and
+`results/siteperim_square8_n14.txt` (g2 brute-force cross-checks);
+`results/king_joint_nhp_n9.txt`, `results/king_triple_classes_n9.txt` and
+`results/bbox_square4_n21.txt`.
 
----
+## The n = 78, k <= 6 censuses
 
-## The k = 6 verdict (2026-08-18): universality extends, the Phi_2 closed form dies
-
-The two `n = 78, k <= 6` censuses were run on dalby 2026-08-07/08-10 under
-`scripts/dalby_perimeter_defect_pool.sh` (456 shards, 76-way, splitS=14,
-binary `git=6473890c`, clean stamp), and **were not brought back into the repo
-until 2026-08-18**. Both merged with 456/456 shards `result=ok`:
-
-| lattice | file | wall | animals |
-|---|---|---|---|
-| king (square8) | `results/perimdefect_square8_n78_k6.txt` | 151,915 s (42 h) | 3,948,974,545,893 |
-| square (square4) | `results/perimdefect_square4_n78_k6.txt` | 83,667 s (23 h) | 3,168,296,567,027 |
-
-Analysis: `python3 experiments/perimeter_defect_gf.py <file> --kmax 6`
-(the default `--kmax` is 5, which is why a first pass shows nothing at k = 6).
-
-### The denominator, both lattices
-
-    Phi_1^7 Phi_2^5 Phi_3^2      deg(N) = 39, gcd(N,D) = 1,
-                                 22 consecutive zero coefficients in deg 40..61
-
-Exactly as predicted by `Phi_1^(k+1) Phi_2^(k-1) Phi_3^(k-4)`. The 22 zeros are
-a check the prediction never saw.
-
-### Grading the four k = 6 tests
-
-1. **Onset 24 — CONFIRMED.** `deg(N) - deg(D) = 39 - 16 = 23`, so the
-   quasi-polynomial holds from n = 24, and the triangular onset law
-   `k(k+1)/2 + 3` gives 24. (The same computation reproduces onset 18 at
-   k = 5: `29 - 12 = 17`.)
-2. **The Phi_2 leading diagonal — REFUTED.** `5(k-2)!/2^(k-1)` predicts
-   **15/4**; the measured value is **5/2**, on *both* lattices. So the closed
-   form 5/4, 5/4, 15/8 that held for k = 3, 4, 5 is a coincidence of three
-   terms, not a law. What survives is that the value is still lattice-
-   independent — the universality statement, not the formula.
-3. **The Phi_3 exponent k-4 — CONFIRMED.** `Phi_3^2` at k = 6, and it was the
-   prediction that the division test then validated. The slope no longer rests
-   on one data point.
-4. **Phi_4 absent until k = 7 — CONFIRMED at k = 6.** The predicted denominator
-   divides the series exactly, so no fourth cyclotomic factor is needed.
-
-### What the universality claim becomes
-
-Through **k = 6**, both lattices share the denominator, the period, the degree,
-the onset, and the leading coefficient of every cyclotomic block:
-
-    Phi_1 top, k=6:  66625/36     identical
-    Phi_2 top, k=6:  5/2          identical
-    Phi_3 top, k=6:  -5920/243    identical (coefficient of x^3)
-
-**But one k = 5 statement does not extend.** At k = 5 the *entire* Phi_3 block
-was identical on both lattices (`(40x/27 + 8/3)/Phi_3`). At k = 6 only its
-leading coefficient is: king carries
-`(-5920x^3 - 19128x^2 - 18528x - 12656)/243` against square's
-`(-5920x^3 - 18768x^2 - 18168x - 12296)/243`. So "the entire period-3 content
-of the perimeter grading is lattice-independent" was also a k = 5 accident.
-The rule that survives both corrections is the original one: **the leading
-diagonal of each cyclotomic block is universal, everything beneath it is
-lattice-specific.**
-
-### Cost, measured against the estimate
-
-`scripts/dalby_perimeter_defect_pool.sh`'s header predicted ~136 core-hours and
-~1.8 h wall for king n = 78, extrapolating `time ~ n^7.9` from n <= 38. The
-real king run took **42 h wall at 76-way**, ~23x the estimate. The header's
-prediction should be treated as refuted, not as calibration for anything else.
+Run on dalby 2026-08-07/08-10 under `scripts/dalby_perimeter_defect_pool.sh`
+(456 shards, 76-way, splitS=14, `git=6473890c`), both merged 456/456
+`result=ok`: king 151,915 s wall and 3,948,974,545,893 animals, square 83,667 s
+and 3,168,296,567,027. Analysed with `perimeter_defect_gf.py --kmax 6` (the
+default `--kmax` is 5, which is why a first pass shows nothing at k = 6). The
+predicted `Phi_1^7 Phi_2^5 Phi_3^2` divides exactly — `deg(N) = 39`,
+`gcd(N,D) = 1`, 22 spare zero coefficients — so the `Phi_3` exponent `k-4` no
+longer rests on the single point at k = 5, no `Phi_4` factor is needed, and
+`deg(N) - deg(D) = 23` puts the onset at 24, as the triangular formula predicts.
