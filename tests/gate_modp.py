@@ -2,10 +2,9 @@
 # Gate for R3 (u32 mod-p plain sweep). CRT of sum_H B_H(n) mod p_i over several
 # ~31-bit primes must equal the exact a(n) from build/tma -- tested both unfolded
 # and with --fold (the R1xR3 composition). Also reports the per-state memory win.
-import subprocess
 import sys
 
-from common import require_binary
+from common import require_binary, run
 
 # Small primes whose product (6.4e13) >> a(n) but each is far below it, so the
 # CRT genuinely recombines reduced residues (not a no-op). The u32 storage win is
@@ -30,8 +29,12 @@ def crt(residues, mods):
 
 
 def rows(args):
-    out = subprocess.run(args, capture_output=True, text=True)
-    return {int(n): int(c) for n, c in (ln.split() for ln in out.stdout.splitlines())}
+    # common.run raises on a non-zero exit.  Until 2026-09-05 this used
+    # subprocess.run without checking, so an engine that printed its rows and
+    # then died (an assert after the output, a failed final check) was GREEN
+    # here (AUDIT-2026-09-02, gate hygiene).
+    out = run(args[0], *args[1:])
+    return {int(n): int(c) for n, c in (ln.split() for ln in out.splitlines())}
 
 
 def main():

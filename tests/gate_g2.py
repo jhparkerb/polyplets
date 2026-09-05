@@ -118,13 +118,19 @@ def main():
     a006770 = read_bfile("b006770.txt")
     E_DEPTH = 11
 
-    rb_ok = True
+    # An all() over an empty loop is True: until 2026-09-05 an engine that
+    # printed nothing passed both this check and F below (AUDIT-2026-09-02,
+    # gate hygiene).  Every row 1..E_DEPTH must be present.
+    rb_rows = {}
     for line in run(G2, "square8", E_DEPTH, "--rook-bishop").strip().splitlines():
         n, tot, rook, bish = (int(x) for x in line.split())
-        if not (tot == a006770[n] and rook == bish == a001168[n]):
-            rb_ok = False
+        rb_rows[n] = (tot, rook, bish)
+    rb_ok = all(n in rb_rows and rb_rows[n][0] == a006770[n]
+                and rb_rows[n][1] == rb_rows[n][2] == a001168[n]
+                for n in range(1, E_DEPTH + 1))
     gate.check(rb_ok,
-          f"E rook/bish square8 n<={E_DEPTH}: total=A006770, rook==bishop==A001168")
+          f"E rook/bish square8 n<={E_DEPTH}: total=A006770, rook==bishop==A001168"
+          + ("" if len(rb_rows) == E_DEPTH else f"  ({len(rb_rows)} rows, not {E_DEPTH})"))
 
     psum, p4n = {}, {}
     for line in run(G2, "square8", E_DEPTH, "--perimeter").strip().splitlines():
@@ -143,10 +149,16 @@ def main():
     #    (no external sequence) that catches any width/height-asymmetric miscount.
     F_DEPTH = 11
     box = parse_counts(run(G2, "square8", F_DEPTH, "--per-box"))
-    sym_ok = all(c == box.get((n, h, w), 0) for (n, w, h), c in box.items())
+    rowsum_box = {}
+    for (n, w, h), c in box.items():
+        rowsum_box[n] = rowsum_box.get(n, 0) + c
+    # The transpose identity holds vacuously on an empty table; anchor the
+    # table to A006770 row by row so that "nothing printed" fails.
+    sym_ok = (all(rowsum_box.get(n) == a006770[n] for n in range(1, F_DEPTH + 1))
+              and all(c == box.get((n, h, w), 0) for (n, w, h), c in box.items()))
     gate.check(sym_ok,
-          f"F transpose square8 n<={F_DEPTH}: byBox[n][w][h]==byBox[n][h][w] "
-          f"({len(box)} (n,w,h) cells)")
+          f"F transpose square8 n<={F_DEPTH}: byBox[n][w][h]==byBox[n][h][w], "
+          f"rows sum to A006770 ({len(box)} (n,w,h) cells)")
 
     # H. hole counting (--holes / --holes8). Two independent guarantees:
     #    (1) the by-hole-count partition must sum to the total for BOTH background

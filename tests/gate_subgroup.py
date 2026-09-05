@@ -75,7 +75,8 @@ def main():
             gate.check(cpp_counts(name, MAXN) == ref,
                        f"C++ symcount_fast {name:6s} == Python, n<={MAXN}")
     else:
-        print(f"note: {FAST_BIN} absent, skipping C++ cross-check")
+        # gate.skip(), not a note: see tests/gate_sym.py.
+        gate.skip(f"C++ symcount_fast == Python, n<={MAXN}: {FAST_BIN} absent")
 
     # 3. The congruence itself, against the published sequence.
     fixed = read_bfile("b006770.txt")

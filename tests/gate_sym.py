@@ -95,7 +95,10 @@ def main():
             ref = {n: v for n, v in sym[name].items() if v}
             gate.check(cpp == ref, f"C++ {name:20s} == Python, n<={MAXN}")
     else:
-        print(f"note: {FAST_BIN} absent, skipping C++ cross-check")
+        # gate.skip() fails the verdict unless POLY_ALLOW_DEGRADED_GATES=1.  A
+        # printed note left the gate GREEN with the C++ counter unchecked
+        # (AUDIT-2026-09-02, gate hygiene).
+        gate.skip(f"C++ symcount_fast == Python, n<={MAXN}: {FAST_BIN} absent")
 
     return gate.verdict("symmetric/free")
 

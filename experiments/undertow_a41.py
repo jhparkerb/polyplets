@@ -173,10 +173,17 @@ def main():
     if "--selftest" in sys.argv:
         ab, Dj, tri, kw = build(int(opt("--jmax", 3)), 20, forbid_row=40, hmax=19)
         bad = dict(ab)
-        bad[20] = (bad[20][0] + 1, bad[20][1])
+        # a_20 + 1 shifts T(40,20) by 3^(39-60) = 3^-21, a non-integer, and
+        # tower() refused THAT -- so until 2026-09-05 this control never
+        # reached the regression it claims to test (AUDIT-2026-09-02).  Shift by
+        # 3^21: T(40,20) moves by exactly 1 and stays an integer.
+        bad[20] = (bad[20][0] + 3 ** 21, bad[20][1])
         try:
             regression(bad, Dj, tri, kw)
-        except SystemExit:
+        except SystemExit as ex:
+            if "regression" not in str(ex):
+                raise SystemExit(f"RED CONTROL FAILED: tripped {ex!s:.60}, "
+                                 f"not the row-40 regression")
             print("RED GREEN: a perturbed level 20 fails the row-40 regression")
             return
         raise SystemExit("RED CONTROL FAILED: perturbation not caught")

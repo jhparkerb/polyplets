@@ -218,13 +218,26 @@ def all_pairs(k, jmax, tri, hmax=None):
     return [(have[i], have[j]) for i in range(len(have)) for j in range(i + 1, len(have))]
 
 
-def verify(jmax=3):
-    P, tri = read_pk(), read_tri()
+def verify(jmax=3, P=None, tri=None, Dj=None, quiet=False):
+    """Re-derive every wired level from below-onset cells and compare.
+
+    P, tri, Dj default to the banked table, triangle and ab-initio depths;
+    the selftest injects corrupted copies to prove this comparator fires."""
+    import contextlib
+    import io
+    sink = contextlib.redirect_stdout(io.StringIO()) if quiet else contextlib.nullcontext()
+    with sink:
+        return _verify(jmax, P, tri, Dj)
+
+
+def _verify(jmax, P, tri, Dj):
+    P = read_pk() if P is None else P
+    tri = read_tri() if tri is None else tri
     kmax = max(P)
     ab = extract_ab(P, kmax)
     print(f"grand form consistent on wired levels k = 1..{kmax} "
           f"(every residual linear in n)")
-    Dj = load_depths(jmax, kmax)
+    Dj = load_depths(jmax, kmax) if Dj is None else Dj
     print(f"ab-initio depth series loaded for j = 1..{jmax}, k <= {kmax}")
 
     ok = bad = skip = npairs = 0
@@ -255,6 +268,15 @@ def verify(jmax=3):
 
 
 def selftest(jmax=3):
+    """RED controls for --verify.
+
+    Until 2026-09-05 RED 1 and RED 3 asserted that pin_level() returned
+    something other than the wired value after its inputs were perturbed.  A
+    nonsingular 2x2 solve ALWAYS moves when its right-hand side moves, so both
+    passed with the comparator that --verify actually runs replaced by a stub
+    (AUDIT-2026-09-02: "linear-algebra tautologies").  They now go through
+    verify() itself: the perturbed input must make it report the level BAD.
+    """
     P, tri = read_pk(), read_tri()
     kmax = max(P)
     ab = extract_ab(P, kmax)
@@ -262,11 +284,13 @@ def selftest(jmax=3):
     k = 15
     lower = {j: ab[j] for j in ab if j < k}
 
+    # RED 1: a perturbed ab-initio depth value must turn --verify red.  +1 is
+    # the smallest error a family-table entry can produce (an integer shift).
     bad = {j: list(v) for j, v in Dj.items()}
     bad[1][k] += 1
-    got = pin_level(k, lower, [1, 2], tri, bad)
-    assert got != ab[k], "RED CONTROL FAILED: perturbed D_1 still pinned the level"
-    print("RED 1 GREEN: a perturbed D_j breaks the pin")
+    if verify(jmax, P=P, tri=tri, Dj=bad, quiet=True):
+        raise SystemExit("RED CONTROL FAILED: --verify stayed GREEN with D_1(15) + 1")
+    print("RED 1 GREEN: a perturbed D_j turns --verify red")
 
     try:
         pin_level(k, lower, [1, 1], tri, Dj)
@@ -275,11 +299,17 @@ def selftest(jmax=3):
     else:
         raise SystemExit("RED CONTROL FAILED: singular system accepted")
 
-    wrong = dict(lower)
-    wrong[k - 1] = (lower[k - 1][0] + 1, lower[k - 1][1])
-    got = pin_level(k, wrong, [1, 2], tri, Dj)
-    assert got != ab[k], "RED CONTROL FAILED: corrupted lower level still pinned"
-    print("RED 3 GREEN: a corrupted lower level breaks the pin")
+    # RED 3: a corrupted WIRED level must turn --verify red -- the wired table
+    # is the thing --verify re-derives.  The top level, so the grand-form
+    # linearity check (which would catch a corrupted lower level on its own,
+    # before verify compares anything) is not what fires.
+    top = max(P)
+    coeffs, den = P[top]
+    badP = dict(P)
+    badP[top] = (list(coeffs[:-1]) + [coeffs[-1] + den], den)   # constant + 1
+    if verify(jmax, P=badP, tri=tri, Dj=Dj, quiet=True):
+        raise SystemExit(f"RED CONTROL FAILED: --verify stayed GREEN with P_{top} corrupted")
+    print(f"RED 3 GREEN: a corrupted wired P_{top} turns --verify red")
 
 
 def predict(jmax=3, kmax_new=21):

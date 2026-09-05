@@ -40,6 +40,16 @@ def run_new(maxn):
 oracle = run_oracle(MAXN)
 new    = run_new(MAXN)
 
+# Two empty lists are equal.  Until 2026-09-05 an engine that printed nothing
+# (or nothing this parser accepted) passed this gate with "0 tuples matched"
+# (AUDIT-2026-09-02, gate hygiene).  Every height 1..MAXN has at least the
+# hole-free class, so fewer than MAXN tuples is not a run.
+if len(oracle) < MAXN or len(new) < MAXN:
+    print(f"gate_holes FAIL  (maxn={MAXN}): vacuous -- oracle produced "
+          f"{len(oracle)} tuples, new engine {len(new)}; the comparison would "
+          f"prove nothing")
+    sys.exit(1)
+
 if oracle == new:
     print(f"gate_holes PASS  (maxn={MAXN}, {len(oracle)} (H,n,k) tuples matched)")
     sys.exit(0)
