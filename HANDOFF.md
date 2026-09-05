@@ -15,6 +15,23 @@
 > defines what "ready" means. Section A is jasonp's decisions and nothing else
 > blocks on them; section B is commands, and it is stale by design whenever
 > `HEAD` moves past the revision its boxes were measured at.
+## 2026-09-05 11:41 EDT — a(41) H = 20 SWEEP RUNNING ON DALBY
+
+`scripts/dalby_a41_h20.sh`, dalby, tmux window `a41h20` in session 0,
+orchestrate pid 3496823 (also `runs/a41_h20/pid`), rev `b88b38bc5` clean,
+76 cores, run dir `runs/a41_h20`, log `runs/a41_h20/run.log`. Started at
+jasonp's direction ("Run T(41,20). Just start it now"). Predicted from the
+a(40) H20 phase and the measured Nmax scaling: ~10-11 h on 48 cores, ~185-190
+GB disk peak; read the orchestrator's own profile, not that. What it returns:
+a swept `T(41,20)`, the only enumeration of that cell and the only
+assumption-disjoint holdout of `P_21` — the tower predicts
+18004779862205054677763902712770 (`results/a41/PROVENANCE.md`). On landing:
+compare, bank `h20.out` into `results/a41/`, re-run
+`experiments/undertow_a41.py --perheight results/a41 --jmax 5`, and a(41)
+stops depending on `P_21` at all. Result tier if it agrees: a(41)'s top cell
+swept, the rest of the tower still formula. Kill: `kill 3496823`. Resume:
+`scripts/dalby_a41_h20.sh --resume`.
+
 ## 2026-08-24 — SIX GATES WIRED, AND THE LINT THAT STOPS THE SEVENTH
 
 Successor row S-A5 closed. It asked for the standalone experiment gates to be

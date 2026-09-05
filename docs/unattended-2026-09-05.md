@@ -142,8 +142,10 @@ load (199 s alone), `gate-tma` 219 s.
 6. `paper/technical-report.bib` and `paper/technical-report-cites.md`; nothing
    for `papers/MISSING.md`.
 
-**Not done, deliberately.** The H = 20 sweep at Nmax 41 (the only enumeration
-of `T(41,20)`; ~11 h, ~190 GB on dalby) — jasonp's call. `README.md:111-121`
+**Not done, deliberately, then done at his word.** The H = 20 sweep at Nmax 41
+(the only enumeration of `T(41,20)`; ~11 h, ~190 GB on dalby) was his call, and
+at 11:39 he made it: launched 11:41 EDT, pid 3496823, window `a41h20`
+(HANDOFF.md, top entry). `README.md:111-121`
 and the staged OEIS text still say a(23)–a(40) are single-algorithm; his to
 align or freeze. The a(30) H17 column cross-check close-out on ayr; ayr did
 not resolve.
