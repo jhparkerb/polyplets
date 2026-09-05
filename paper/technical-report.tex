@@ -38,14 +38,20 @@ The king-lattice polyplet sequence \href{https://oeis.org/A006770}{A006770} has 
 through
 \[
   a(40) = \num{56749893611764175164545926946127};
-\]
-terms through $a(22)$ were computed via the transfer matrix method and Redelmeier enumeration.
-Terms for $23 \le{} n \le{} 35$ were computed twice on different machines; $a(36)$--$a(40)$ were
-computed once.  All terms pass a battery of consistency checks.
+\].
 
 A new triangular sequence $T(n,H), H\le{}n$ is proposed that counts the king polyplets of size $n$
-and height exactly $H$.  Formulas for small $H$ and the region where $H>n/2$ are derived that
-allowed computation of larger $a(n)$.
+and height exactly $H$.  Diagonals in the triangle ($H>n/2$) have special forms such that a
+polynomial factor can be fixed from earlier rows and the other factor is exponential in $n$ and $H$.
+
+$a(19)$ was computed directly with Redelmeier enumeration; $a(20)$--$a(23)$ were computed via
+transfer matrix; $a(24)$--$a(40)$ used earlier rows to fix polynomial factors to compute the most
+expensive $T(n,H)$ by evaluation of the closed forms.
+
+All $a(n)$ values were double-checked; for $n\le{}22$, transfer matrix and Redelmeier enumeration
+agree; for $n\le{}40$, a transfer-matrix method that uses coloring instead of directly tracking
+connectivity confirms the $T(n,H\le{}19)$ cells that do not have closed forms.  All $a(n)$ values
+pass checks based on Burnsides congruences as well as the triangle's closed forms.
 
 This work is completed with heavy assistance from Claude Code, especially the Fable model.
 \end{abstract}
@@ -267,6 +273,19 @@ $n$ & $k=4$ & 5 & 6 & 7 & 8 & 9 & 10\\
 \label{tab:holes}
 \end{table}
 
+% CLAUDE 2026-09-04, item 3. "checkable from Table 1": a reader who checks gets
+%   a(40)^(1/40) = 6.2208 and a(40)/a(39) = 6.9352, not 7.11. 7.11 is an extrapolation
+%   of the ratio sequence (paper/technical-report-gaps.md:33-38,
+%   docs/main-paper-audit-2026-08-18.md:59-72).
+%   Defensible from the table alone: a(m+n) >= a(m) a(n) (place one animal
+%   diagonally off the corner of the other's box), so lambda = sup a(n)^(1/n) exists
+%   and lambda >= a(40)^(1/40) = 6.2208  (results/concatenation-upper-bound.md:9).
+%   Machine results, to cite rather than defend, if kept at all (your item 5):
+%     ratio limit a(n+1)/a(n) -> lambda is a theorem, Madras 1999
+%       (paper/technical-report-gaps.md:136-140)
+%     lambda = 7.110(1), theta = -1.000(1) by differential approximants
+%       (results/series-analysis-da.md:1)
+%     6.543 <= lambda <= 9.3154, exact certificates, paper/L3-lambda-bounds.tex
 \paragraph{Growth rate} $a(n)^{1/n} \to \lambda$ where $\lambda\approx7.11$, checkable from Table~\ref{tab:an}
 
 \section{Methods}

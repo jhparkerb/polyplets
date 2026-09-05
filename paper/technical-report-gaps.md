@@ -26,18 +26,55 @@ of the paper's 200 numeric literals are actually read by one of them.
 
 ---
 
+# Decisions, 2026-09-04 (jasonp's replies to the finish list)
+
+- **Validation section (C1/B4):** he does not understand Motley and will not
+  defend it. The section states what he can defend (Redelmeier to 22, the
+  strip engine to H ≤ 14, every run re-deriving all rows below it, the
+  external anchors) and reports the Motley agreement as machine work with a
+  pointer, or not at all. Explanation on request, Q&A form.
+- **Growth rate (C2/C3):** he cannot defend most of it. The Fekete floor is
+  his (one argument, in the tex comment); Madras, the differential-approximant
+  estimate and the L3 bracket are cite-or-drop.
+- **Diagonal wording (C13):** he will fix it by asking questions, not by
+  taking wording. Pending.
+- **Holes (C6, C7, C11, C17):** deferred. The existing table stays because it
+  is the data behind three staged OEIS sequences — the hole triangle and its
+  k = 0 and k = 1 columns (`oeis/SUBMISSION.md:48-58`). Nothing more unless it
+  earns its place.
+- **a(41):** in, with an asterisk. See B5.
+- **Spelling and punctuation:** last.
+- **Abstract: DONE** (end of session 2026-09-04). Next by the finish list:
+  Reproducibility (B1), then the engine chapter (B2) from
+  `docs/paper1-engine-chapter.md`, then item 6 (C13 wording) by Q&A.
+
+---
+
 # A. Corrections — things the paper says now
 
 From `docs/main-paper-audit-2026-08-18.md`, which changed nothing.
 
 ## A1. `OPEN` "$\lambda \approx 7.11$, checkable from Table~\ref{tab:an}"
 
+2026-09-04: comment block with the numbers and anchors placed above the
+sentence in `paper/technical-report.tex`; the growth-rate sentence itself is
+unchanged (item 5 of the finish list, cite-or-drop).
+
 A reader who checks gets neither number: `a(40)^(1/40) = 6.2208` (the Fekete
 floor) and `a(40)/a(39) = 6.9352`. 7.11 comes from extrapolating the ratio
 sequence. The sentence invites a check that fails; naming the operation costs
 one clause. Audit §2.3.
 
-## A2. `OPEN` The abstract's provenance sentence, in both directions
+## A2. `DONE` The abstract's provenance sentence, in both directions
+
+2026-09-04: comment block placed above the sentence in
+`paper/technical-report.tex` — per-term second-source table from
+`AUDIT-2026-09-02.md:126-175`, the re-derivation record per run, and the M2
+overstatement to avoid. **Abstract rewritten and declared DONE 2026-09-04**:
+a(19) Redelmeier, a(20)–a(23) swept, a(24)–a(40) composed for the tall
+heights; Redelmeier agreement to 22; Motley confirmation scoped to H ≤ 19;
+a(41) not mentioned. Verifier 781 green, compiles. The comment block above the
+sentence is now stale and stays until he says to pull it.
 
 It says 23-35 twice and a(36)-a(40) once. The run records show every run
 recomputes the whole triangle up to its own n, so **a(36) was computed five
@@ -47,9 +84,12 @@ terms' worth of corroboration given away. In the other direction, "twice" for
 two instruction sets: the independence is hardware and ISA, not method, and the
 OEIS entry's own comment is more careful than the abstract. Audit §2.4.
 
-## A3. `OPEN` `P_k` known for `k <= 19`
+## A3. `STALE` `P_k` known for `k <= 19`
 
-The pinned range on record is `k <= 18`. Item C13.
+Was: the pinned range on record is `k <= 18`. Since Undertow the wired table
+reaches `k = 19` (`orchestrator/sweep.go:2306`, `maxDiagKMax = 19`), so the
+paper's 19 is correct. What remains true is that `P_19` has no holdout
+(`docs/paper1-reproducibility.md:154-155`). Item C13.
 
 ## A4. `OPEN` Keep the two `P_k` sentences adjacent
 
@@ -72,12 +112,13 @@ pins it, and the limit past which it must not be pushed, all regenerated from
 banked artifacts rather than copied from notes. Also `docs/acceptance-queue.md`
 items 2-4. This is the section a stranger reads first under a repo release.
 
-## B2. `OPEN` The engine chapter
+## B2. `MATERIAL READY` The engine chapter
 
-Methods currently has three paragraphs. The column sweep, the frontier, the
-kink carry, the disk and spill architecture, and where the wall is and why are
-documented across the repo and nowhere in a form to write from. Nothing
-assembled.
+Methods currently has three paragraphs. `docs/paper1-engine-chapter.md`
+(2026-08-06, **updated 2026-09-04** at jasonp's direction) is the source:
+every component with a code anchor, which kernel produced which term, the
+per-term cost ledger a(26)–a(41), the a(41) route, and the 2026-09-02 audit's
+list of engine sentences not to write.
 
 ## B3. `OPEN` The paper has no bibliography
 
@@ -104,6 +145,16 @@ the one the abstract tells, and the route that produced it — heights 1-19 real
 20-41 from the Undertow-pinned tower — is not in Methods at all.
 `results/confidence.md` is the plain-terms version; `results/a41/PROVENANCE.md`
 and `results/undertow.md` are the record. Interacts with A2.
+
+**2026-09-04, jasonp: a(41) goes in, with an asterisk.** What the asterisk can
+honestly carry: heights 1–19 swept by two engines that agree on all 19 cells;
+heights 20–41 composed from the diagonal tower, levels `k <= 19` wired and
+`k = 20, 21` pinned from below-onset cells; level 21 rests on one depth pair
+whose stated guard tests integrality only (`AUDIT-2026-09-02.md:44-80`, M1).
+The one-second depth-5 re-pin test that closes M1 has not been run (ayr
+unreachable 2026-09-04; dalby refused the key from the session shell). Run it
+before the asterisk is worded. "Conjecture" undersells the 19 swept heights;
+the audit's own phrasing at `:128-138` is the accurate one.
 
 ---
 
@@ -154,13 +205,13 @@ for n≥5, proved in the same style as the n−1 case (one row of 3, or two rows
 of 2), brute-verified n=4..8 and against the triangle to n=20. Natural next
 paragraph after the one already written.
 
-## C6. `OPEN` The hole-fill bijection
+## C6. `DEFERRED 2026-09-04` The hole-fill bijection
 
 `results/hole-fill-interior-cell-identity.md`. An n-cell polyplet with one
 area-1 hole ↔ (hole-free (n+1)-cell polyplet, choice of interior cell). Exact,
 provable, three sentences, and it sits directly under the existing hole table.
 
-## C7. `OPEN` Maximum enclosed hole area: M(n) = ⌊((n−2)²+4)/8⌋
+## C7. `DEFERRED 2026-09-04` Maximum enclosed hole area: M(n) = ⌊((n−2)²+4)/8⌋
 
 `results/maxhole-proof.md`, `results/maxhole.txt`. Exact by enumeration to
 n=17 (M(17)=28 predicted and confirmed). The hole section counts holes but
@@ -200,7 +251,7 @@ neither fixed-small-H nor n/2. Plus a universal limit shape under rescaling.
 State qualitatively — both notes were explicitly narrowed to drop the ν
 exponent claim.
 
-## C11. `OPEN` Hole-free polyplets grow strictly slower, exponentially so
+## C11. `DEFERRED 2026-09-04` Hole-free polyplets grow strictly slower, exponentially so
 
 `results/hole-free-growth-constant.md`. The hole-free fraction decays
 exponentially, not polynomially: a hole is an entropic gain, not a rare
@@ -227,7 +278,8 @@ says P_k was "fitted against computed values of T(n,H) and verified against
 values from later rows." The shape is proved: degree ≤ k, the 3-power,
 integrality of P_k, and the sharp onset n ≥ 2k+1 (failure at n=2k verified on
 all banked data). Also worth checking: the report says P_k known for k≤19; the
-pinned range on record is k≤18.
+pinned range on record is k≤18. **Stale 2026-09-04:** `k <= 19` is wired
+(`orchestrator/sweep.go:2306`); see A3.
 
 ## C14. `OPEN` The diagonal-mirror triangle
 
@@ -249,7 +301,7 @@ governed by one algebraic series: the unique W ∈ 𝔽₃[[t]] with W(0)=1 solv
 W³ = W² + t. 15/15 checks including a 342-cell check against the banked
 triangle. Compact statement; the derivation is where it starts costing.
 
-## C17. `OPEN` The maximum number of holes: `n - ceil(2*sqrt(n)) + 1`
+## C17. `DEFERRED 2026-09-04` The maximum number of holes: `n - ceil(2*sqrt(n)) + 1`
 
 `results/maxhole-closed-form.md`. This is **A248333**, with a construction
 proving the lower bound; n = 10 measured at 4 and n = 11 at 5, both predicted
