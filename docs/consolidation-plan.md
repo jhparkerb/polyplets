@@ -184,7 +184,7 @@ entry, the clean-clone step and the README lines that named them. Raised by an o
 reader on 2026-09-06 and deferred to jasonp (a CI run of the gates was
 proposed and declined, 2026-09-06; the pre-push hook is the gate): splitting
 the closed-form injection out of `orchestrator/sweep.go`
-into its own package; the module name `polyominoes` in `go.mod`; `test/`
+into its own package; the module name `polyominoes` in `go.mod`; `tests/engine/`
 beside `tests/`; the author's name differing between `README.md` and the
 paper. The mathematics half consolidates the diagonal-formula,
 arithmetic, growth, subclass and perimeter themes into one file each, and

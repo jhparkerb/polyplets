@@ -587,7 +587,7 @@ lengths.
   and paid fork and exec every time. `--persistent-workers` keeps one map and
   one merge process per pool slot alive for the run, reading request lines from
   stdin (`worker/map_worker.cpp`, `worker/merge_worker.cpp`,
-  `orchestrator/workerpool.go`; gate `test/gate_persistent_worker.cpp` drives
+  `orchestrator/workerpool.go`; gate `tests/engine/gate_persistent_worker.cpp` drives
   the real binaries through one process against the one-shot path). dalby,
   `maxn = 30`: 282.5 s / 7,755.3 cpu-s → 265.0 s / 7,155.8 cpu-s, 6.2% and 7.7%,
   zero orphaned processes after normal exit and after a real SIGTERM. A
@@ -847,7 +847,7 @@ a(14), a(16) and a(18) `--compare`.
 
 | change | measured | validation |
 |---|---|---|
-| `combine` grow-in-place when `new_lo == lo` (`core/run.h`) | 0 allocations on the in-window path; map sort-dedup-write phase 39% → 32% at `maxn = 18`; merge combine bucket 58% → 56% (the timer includes the heap drain) | `test/gate_run.cpp` requires 0 heap allocations over 1,000 in-window combines; identical a(14), a(16), a(18) |
+| `combine` grow-in-place when `new_lo == lo` (`core/run.h`) | 0 allocations on the in-window path; map sort-dedup-write phase 39% → 32% at `maxn = 18`; merge combine bucket 58% → 56% (the timer includes the heap drain) | `tests/engine/gate_run.cpp` requires 0 heap allocations over 1,000 in-window combines; identical a(14), a(16), a(18) |
 | `sigCmp`, 8-byte-chunk key compare (`core/signature.h`) | 1.29–1.52× on the sort and heap comparator, 13 sites | microbenchmark; identical a(14), a(18) |
 
 End to end, multi-process orchestration at `maxn = 18`, 4 repetitions each,

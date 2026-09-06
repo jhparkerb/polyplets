@@ -321,7 +321,7 @@ full recompute, not a cheap full proof (none exists for counting).
 ## 13. Repo layout (promotes `docs/layout.md`, adjusted for holes/GF in v1)
 
 `core/` (libenum ~700) · `worker/` (map+merge ~160) · `orchestrator/` (Go ~1820) · `verify/` (Go ~700) ·
-`test/` (gates + `arch_fitness.go` ~330) · `data/` (published triangle/manifests/residues) ·
+`tests/engine/` (gates + `arch_fitness.go` ~330) · `data/` (published triangle/manifests/residues) ·
 `docs/` (NEXT-SYSTEM, correctness, formats). Total ~3.7k LOC vs ~13.1k today. **v1 is a strict subset
 (~2k LOC):** core + worker + a simple orchestrator (scheduler+governor+checkpoint, no store-abstraction/
 distribution) + regression/fold/resume gates + the verifier's consistency checks. Holes = the `holes`

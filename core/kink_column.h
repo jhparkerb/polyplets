@@ -19,8 +19,8 @@
 // invariant kept.
 //
 // Deliberately a separate header from core/kink.h: kink.h's map_shard_stage
-// is already committed and gated (test/gate_kink.cpp); keeping these two
-// column-boundary functions here means this phase's gate (test/gate_kink_column.cpp)
+// is already committed and gated (tests/engine/gate_kink.cpp); keeping these two
+// column-boundary functions here means this phase's gate (tests/engine/gate_kink_column.cpp)
 // cannot regress Phase 1's.
 
 #pragma once

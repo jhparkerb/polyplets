@@ -966,7 +966,7 @@ func sweepHeightKink(
 		// disjoint key range and is internally sorted+deduplicated — their
 		// concatenation IS the sorted stage-0 table, and a merge would be a pure
 		// pass-through fork over the column's largest frontier (invariant gated
-		// in test/gate_kink_column.cpp testSeedOutputSortedAndUnique).
+		// in tests/engine/gate_kink_column.cpp testSeedOutputSortedAndUnique).
 		runRound := func(name string, in []string, mapKeyLen int, stage string, mergeKeyLen int, mergeless bool) ([]string, []map[int]map[int]*big.Int, error) {
 			frontierRecs := sumFrontierRecords(in)
 			t0 := time.Now()

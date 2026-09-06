@@ -18,8 +18,8 @@
 # auto-detects. Without those, clangd reported gmpxx.h as missing and cascaded
 # fake "unknown type name 'mpz_class'" through every use.
 #
-# test/ and worker/ get the zstd flags for the same reason: without -DPOLY_ZSTD
-# the POLY_ZSTD-guarded call sites in test/gate_runfile.cpp vanish and its
+# tests/engine/ and worker/ get the zstd flags for the same reason: without -DPOLY_ZSTD
+# the POLY_ZSTD-guarded call sites in tests/engine/gate_runfile.cpp vanish and its
 # helpers read as -Wunused-function errors under the -Werror this DB mirrors.
 #
 # GMP and zstd are both detected per host exactly as the Makefile does it

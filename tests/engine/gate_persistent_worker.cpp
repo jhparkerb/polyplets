@@ -3,7 +3,7 @@
 // so the process exits 1 immediately (map_worker's "unknown arg" path).
 //
 // Drives the SAME kink seed -> H stages -> finalize chain
-// (test/gate_kink_worker_cli.cpp) through ONE persistent process fed all
+// (tests/engine/gate_kink_worker_cli.cpp) through ONE persistent process fed all
 // H+2 requests via stdin, instead of H+2 separate spawns -- the exact
 // scenario the feature exists for. Asserts the persistent-mode result is
 // byte-identical to a column-kernel one-shot run (same assertion the

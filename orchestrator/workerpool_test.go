@@ -13,7 +13,7 @@ import (
 // pool, and checks each result matches the old one-shot RunMapWorker exactly
 // (same triangle contributions, same output record count) -- this is the
 // Go-side half of Bottleneck #5 (docs/engine-record.md): the
-// C++ --persistent plumbing is gated separately (test/gate_persistent_worker.cpp);
+// C++ --persistent plumbing is gated separately (tests/engine/gate_persistent_worker.cpp);
 // this proves the pool wrapper (checkout/checkin, request-line building,
 // response scanning, lazy per-role start) is correct.
 func TestWorkerPoolMapMatchesOneShot(t *testing.T) {

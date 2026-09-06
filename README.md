@@ -62,7 +62,7 @@ the names this project gave its own machinery.
 | `scripts/` | the general toolchain: production runners (`dalby_term.sh`, `symtm_run.sh`), derivers (`derive_pk_fast.py`, `derive_related.py`), assembly and combination, the naive oracles the gates check against (`g1_naive.py`, `symcount.py`), and the observability runtime `obs.py` |
 | `experiments/` | one-shot derivations and probes, one file per question asked. Some are gate inputs (`grep experiments/ Makefile` says which); the rest are the working behind a paragraph in `results/`, kept for reproduction, not for reuse |
 | `tests/` | the gate suite: red-first, fail-closed, `make gates`. Python and one C++ unit |
-| `test/` | the C++ gate drivers and unit tests of the production engine, built by `make` into `build/ns/` |
+| `tests/engine/` | the C++ gate drivers and unit tests of the production engine, built by `make` into `build/ns/` |
 | `verify/` | a small Go tool and package that reads run artifacts independently of the engine: CRC and architecture-fitness checks |
 | `fixtures/` | external ground truth — OEIS b-files with their checksums — that most gates compare against |
 | `polyplets/` | the **Lean 4 formalization** (34 files, sorry-free): the peeling recursion, the diagonal-law shape theorem, and the grand form, with the production P_k pinned for k≤18 from two real-swept cells per level; axiom footprints are `#guard_msgs`-enforced. Status: `polyplets/PROOF-STATUS.md` |

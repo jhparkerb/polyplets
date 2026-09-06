@@ -1017,7 +1017,7 @@ gate-s2:
 	python3 tests/gate_s2.py $(GATE_DEEP)
 
 # ─── Next-system (ns-*) targets ──────────────────────────────────────────────
-# All new-system code lives under core/ worker/ orchestrator/ verify/ test/.
+# All new-system code lives under core/ worker/ orchestrator/ verify/ tests/engine/.
 # Oracle (build/tma, build/g2) stays in cpp/; both coexist.
 
 NSFLAGS = -std=c++20 -Wall -Wextra -Werror \
@@ -1132,7 +1132,7 @@ ns-gate-go:
 ns-gate-math: build/ns/gate_math
 	./build/ns/gate_math
 
-build/ns/gate_math: test/gate_math.cpp $(NS_HEADERS) | build/ns
+build/ns/gate_math: tests/engine/gate_math.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 # Run-record gate: serialize round-trip, sort order, combine correctness +
@@ -1140,7 +1140,7 @@ build/ns/gate_math: test/gate_math.cpp $(NS_HEADERS) | build/ns
 ns-gate-run: build/ns/gate_run
 	./build/ns/gate_run
 
-build/ns/gate_run: test/gate_run.cpp $(NS_HEADERS) | build/ns
+build/ns/gate_run: tests/engine/gate_run.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 # Kink-carry stage kernel gate (Design 14 Phase 1): map_shard_stage (core/kink.h)
@@ -1148,7 +1148,7 @@ build/ns/gate_run: test/gate_run.cpp $(NS_HEADERS) | build/ns
 ns-gate-kink: build/ns/gate_kink
 	./build/ns/gate_kink
 
-build/ns/gate_kink: test/gate_kink.cpp $(NS_HEADERS) | build/ns
+build/ns/gate_kink: tests/engine/gate_kink.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # Kink-carry column-boundary gate (Design 14 Phase 2.2): kinkSeedStage0 +
@@ -1157,7 +1157,7 @@ build/ns/gate_kink: test/gate_kink.cpp $(NS_HEADERS) | build/ns
 ns-gate-kink-column: build/ns/gate_kink_column
 	./build/ns/gate_kink_column
 
-build/ns/gate_kink_column: test/gate_kink_column.cpp $(NS_HEADERS) | build/ns
+build/ns/gate_kink_column: tests/engine/gate_kink_column.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # Kink-carry file-backed stage gate (Design 14 Phase 2.3): map_shard_stage_file
@@ -1166,7 +1166,7 @@ build/ns/gate_kink_column: test/gate_kink_column.cpp $(NS_HEADERS) | build/ns
 ns-gate-kink-stage-file: build/ns/gate_kink_stage_file
 	./build/ns/gate_kink_stage_file
 
-build/ns/gate_kink_stage_file: test/gate_kink_stage_file.cpp $(NS_HEADERS) | build/ns
+build/ns/gate_kink_stage_file: tests/engine/gate_kink_stage_file.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # Kink-carry map_worker CLI gate (Design 14 Phase 2.4): drives the REAL
@@ -1175,7 +1175,7 @@ build/ns/gate_kink_stage_file: test/gate_kink_stage_file.cpp $(NS_HEADERS) | bui
 ns-gate-kink-worker-cli: build/ns/gate_kink_worker_cli build/ns/map_worker
 	./build/ns/gate_kink_worker_cli $(GATE_DEEP)
 
-build/ns/gate_kink_worker_cli: test/gate_kink_worker_cli.cpp $(NS_HEADERS) | build/ns
+build/ns/gate_kink_worker_cli: tests/engine/gate_kink_worker_cli.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # Persistent-worker gate (Bottleneck #5): drives map_worker --persistent
@@ -1185,7 +1185,7 @@ build/ns/gate_kink_worker_cli: test/gate_kink_worker_cli.cpp $(NS_HEADERS) | bui
 ns-gate-persistent-worker: build/ns/gate_persistent_worker build/ns/map_worker build/ns/merge_worker
 	./build/ns/gate_persistent_worker $(GATE_DEEP)
 
-build/ns/gate_persistent_worker: test/gate_persistent_worker.cpp $(NS_HEADERS) | build/ns
+build/ns/gate_persistent_worker: tests/engine/gate_persistent_worker.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # Run-file on-disk format gate: atomic publish, sub-CRC, header/.idx magic,
@@ -1194,7 +1194,7 @@ build/ns/gate_persistent_worker: test/gate_persistent_worker.cpp $(NS_HEADERS) |
 ns-gate-runfile: build/ns/gate_runfile
 	./build/ns/gate_runfile
 
-build/ns/gate_runfile: test/gate_runfile.cpp $(NS_HEADERS) | build/ns
+build/ns/gate_runfile: tests/engine/gate_runfile.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
 # Frontier-compression gate (E3 "Unlit Levers"): the block-framed compression-2
@@ -1221,10 +1221,10 @@ ns-gate-spill-zstd: build/ns/gate_spill_zstd build/ns/gate_spill_zstd_noz
 	./build/ns/gate_spill_zstd
 	./build/ns/gate_spill_zstd_noz
 
-build/ns/gate_spill_zstd: test/gate_spill_zstd.cpp $(NS_HEADERS) | build/ns
+build/ns/gate_spill_zstd: tests/engine/gate_spill_zstd.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) $(ZSTD_CFLAGS) -O2 -I. $< -o $@ $(ZSTD_LDFLAGS)
 
-build/ns/gate_spill_zstd_noz: test/gate_spill_zstd_noz.cpp $(NS_HEADERS) | build/ns
+build/ns/gate_spill_zstd_noz: tests/engine/gate_spill_zstd_noz.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 # Architecture fitness: Go boundary tests
@@ -1239,7 +1239,7 @@ ns-gate-regression: build/ns/driver0
 ns-gate-fold: build/ns/driver0
 	./build/ns/driver0 --maxn 12 --fold-check
 
-build/ns/driver0: test/driver0.cpp $(NS_HEADERS) | build/ns
+build/ns/driver0: tests/engine/driver0.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 build/ns/map_worker: worker/map_worker.cpp $(NS_HEADERS) | build/ns
@@ -1278,7 +1278,7 @@ ns-gate-asan: build/ns_asan/map_worker build/ns_asan/merge_worker build/ns/orche
 	    --run-dir /tmp/ns_asan_kink --spill-dir /tmp/ns_asan_kink/spill \
 	    --checkpoint /tmp/ns_asan_kink/POLYCKPT --checkpoint-every 0 --compare
 
-build/ns/driver1: test/driver1.cpp $(NS_HEADERS) | build/ns
+build/ns/driver1: tests/engine/driver1.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 # M1 gate: spill-backed driver, n<=14, ram=1 MB forces spill even at this small scale
@@ -1366,7 +1366,7 @@ install: $(addprefix build/ns/,$(NS_INSTALL_BINS))
 	    echo "installed $(PREFIX)/$$b-$(INSTALL_REV)"; \
 	done
 
-build/ns/gate_holes: test/gate_holes.cpp $(NS_HEADERS) | build/ns
+build/ns/gate_holes: tests/engine/gate_holes.cpp $(NS_HEADERS) | build/ns
 	$(CXX) $(NSFLAGS) -O2 -I. $< -o $@
 
 # AC-1 long-run gate (manual invocation; hours to days depending on maxn and box):

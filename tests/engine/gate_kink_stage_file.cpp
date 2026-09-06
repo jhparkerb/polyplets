@@ -44,7 +44,7 @@ struct SigLess {
 };
 using DenseMap = std::map<Sig, std::vector<W>, SigLess>;
 
-// Same random-mixed-state builder as test/gate_kink.cpp (kept independent,
+// Same random-mixed-state builder as tests/engine/gate_kink.cpp (kept independent,
 // not shared, so this gate does not silently depend on that file).
 static Sig randomMixedState(std::mt19937& rng, int H) {
   Sig s;

@@ -8,6 +8,6 @@
 # it -- the completeness check would pass vacuously, on exactly the failure it
 # exists to catch.
 worker/*.cpp
-test/*.cpp
+tests/engine/*.cpp
 cpp/*.cpp
 cpp/*/*.cpp
