@@ -36,6 +36,16 @@ which is what a reader gets.
 MISSING is the class that catches a name that never existed, which is what a
 memory-name-as-path always is.
 
+The second check is on markdown LINKS -- `[text](path)` -- and is stricter than
+the one on backticked paths: a link is clickable, so a reader who follows one
+to a file that is not there gets nothing at all, and no exemption word on the
+line changes that.  There is no history class for a link either; a deleted file
+is a fine thing to name in prose and a broken thing to link to.  Added
+2026-09-06, when README.md's own "why believe the number" paragraph linked
+`results/gate-class-sweep.md`, merged into `docs/engine-record.md` a commit
+earlier -- the front door's first outbound link, and the backtick check passed
+it as history.
+
 RED control: a synthetic document citing `results/definitely-not-here.md` must
 land in MISSING, and one citing it on a line that says "deleted" must not. A
 second control covers the branch class: a file declaring a branch that does not
@@ -224,6 +234,37 @@ def classify(text, hist, source="<doc>", declared=None):
     return out
 
 
+LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
+
+
+def dead_links(text, source):
+    """Markdown links in `source` whose target is not in the working tree.
+
+    Relative to the citing file, the way a reader's browser resolves it.
+    External schemes and same-file anchors are not ours to check; the
+    ephemeral trees are the ones a clone legitimately lacks.
+    """
+    out = []
+    base = os.path.dirname(source)
+    # Math in these documents is full of things a link regex reads as one --
+    # `[the bulk](G*u^m)`, `O(f\u03c6^k)` -- so a target only counts as a path
+    # when it is spelled like one: ASCII word characters, dots, dashes and
+    # slashes, with at least one dot or slash in it.
+    pathish = re.compile(r"^[A-Za-z0-9_./-]+$")
+    for lineno, line in enumerate(text.split("\n"), 1):
+        for m in LINK_RE.finditer(line):
+            target = m.group(1).split("#", 1)[0]
+            if not target or "://" in target or target.startswith("mailto:"):
+                continue
+            if not pathish.match(target) or not re.search(r"[./]", target):
+                continue
+            rel = os.path.normpath(os.path.join(base, target))
+            if EPHEMERAL_RE.match(rel) or os.path.exists(os.path.join(ROOT, rel)):
+                continue
+            out.append((source, lineno, target))
+    return out
+
+
 def merge(dst, src):
     for k, v in src.items():
         dst[k].extend(v)
@@ -248,7 +289,7 @@ def main():
     # state to crash on: the gate reports it and fails, rather than dying with a
     # traceback that hides every finding after it.  (Before this, one uncommitted
     # deletion masked nine real dangling citations for as long as it sat there.)
-    absent, decls = [], {}
+    absent, decls, broken_links = [], {}, []
     for f in files:
         path = os.path.join(ROOT, f)
         if not os.path.exists(path):
@@ -258,6 +299,7 @@ def main():
             text = fh.read()
         decls[f] = BRANCH_DIRECTIVE_RE.findall(text)
         merge(totals, classify(text, hist, f, decls[f]))
+        broken_links.extend(dead_links(text, f))
 
     n = sum(len(v) for v in totals.values())
     print(f"{n} path citations across {len(files) - len(absent)} tracked "
@@ -269,6 +311,7 @@ def main():
             print(f"    {f}")
     for k in CLASSES:
         print(f"  {k:9s} {len(totals[k])}")
+    print(f"  {len(broken_links)} broken markdown link(s)")
 
     # What the branch class resolved through refs that are actually here. This
     # is the manifest's content, and comparing it to the file on disk is the
@@ -337,6 +380,23 @@ def main():
           "paragraph says 'deleted', and the exemption does not leak across a "
           "blank line  OK")
 
+    # RED control 4: a link to a file that is not here must be caught, and
+    # neither an exemption word on the line nor the file's presence in history
+    # may excuse it -- both excuse a backticked path and neither un-breaks a
+    # link. Synthetic text, so the tree cannot satisfy it.
+    link_red = dead_links("see [the sweep](results/definitely-not-here.md) "
+                          "(deleted) for it\n", "<red4>")
+    link_ok = dead_links("see [the gate](tests/gate_citations.py), "
+                         "[OEIS](https://oeis.org/A006770) and the bulk term "
+                         "[G](G*u^m)\n", "<red4>")
+    if len(link_red) != 1 or link_ok:
+        print("\nRED CONTROL FAILED: a markdown link to a file that is not "
+              "here is no longer caught, or a live link is now flagged")
+        return 1
+    print("RED  a link to a file that is not here is caught even when the line "
+          "says 'deleted'; live links, external links and math that reads as a "
+          "link are not  OK")
+
     # RED control 2: a declaration must not exempt a path the named ref lacks.
     # Uses HEAD, which exists everywhere and provably does not carry the bogus
     # path, so the control is real on any clone.
@@ -378,6 +438,16 @@ def main():
         for src, line, p_, decl in sorted(set(totals["false_claim"])):
             print(f"  {src}:{line}  ->  {p_}   declared on {', '.join(decl)}")
 
+    if broken_links:
+        print(f"\nGATE CITATIONS: RED -- {len(broken_links)} markdown link(s) "
+              f"point at a file that is not in the tree; a reader who clicks "
+              f"gets nothing:")
+        for src, line, t in sorted(set(broken_links)):
+            print(f"  {src}:{line}  ->  {t}")
+        print("\nRepoint the link at what absorbed the file, or unlink it and "
+              "name the file in prose (that the backtick check will pass as "
+              "history).")
+
     if totals["MISSING"]:
         print(f"\nGATE CITATIONS: RED -- {len(totals['MISSING'])} citation(s) "
               f"point at paths that have never existed:")
@@ -391,7 +461,8 @@ def main():
     if absent:
         print("\nGATE CITATIONS: RED -- a tracked file is not in the working "
               "tree; commit the deletion or restore the file.")
-    if totals["MISSING"] or absent or totals["false_claim"] or manifest_drift:
+    if (totals["MISSING"] or absent or totals["false_claim"]
+            or manifest_drift or broken_links):
         return 1
 
     print("\nGATE CITATIONS: GREEN")

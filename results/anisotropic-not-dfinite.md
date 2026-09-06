@@ -375,7 +375,7 @@ at degree 13381), so every coefficient from degree 8159 up is a residue. Proved
 by the pipeline's own soundness gate on the banked entry
 (`experiments/gf_h11_validate.py`: `Q₁₁ · B₁₁ ≠ P₁₁` mod a fresh prime, first
 mismatch at n = 8170); the full account and the price of a re-recovery (about
-48 CPU-hours, not launched) are in [gf-head-check.md](gf-head-check.md).
+48 CPU-hours, not launched) are in [`results/diagonal-formula.md`](diagonal-formula.md).
 "`Q₁₁` shares no roots with `Q₉Q₁₀`" was a restatement of the wraparound, not a
 fact about height 11. Nothing here used it: the ψ-ladder and irreducibility
 certificates, the monotonicity lemma and the theorem read `validated=True`
