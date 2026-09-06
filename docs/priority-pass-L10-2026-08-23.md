@@ -1,8 +1,9 @@
 # Priority pass for L10 (Undertow)
 
-2026-08-23, run overnight at jasonp's direction. `paper/L10-undertow.tex` was
-drafted 2026-08-22 carrying a banner saying no pass had been run and naming one
-as a gate before circulation. This is that pass.
+2026-08-23, run overnight at jasonp's direction. The manuscript it passed over,
+`paper/L10-undertow.tex`, was drafted 2026-08-22 and merged into
+`paper/L8-below-onset.tex` the next day, where this pass's verdict now stands
+as §Novelty; this file is the search behind that verdict.
 
 **Verdict: a near neighbour exists, in a different problem, and the paper must
 cite it. No collision on the specific claim.**

@@ -4,9 +4,11 @@
 per module cluster, each briefed by the supervising session and armed with
 `lake env lean` probes against the compiled library; the supervising session
 cross-verified the load-bearing findings (including re-running the Northcott
-refutation probe). Ground truth: the eight execution briefs
-(`polyplets/briefs/OW*.md`), `polyplets/OUTWORKS-PLAN.md`, and
-`polyplets/PROOF-STATUS.md` §"Outworks — second campaign". The tree was
+refutation probe). Ground truth at the time: the eight execution briefs
+(`polyplets/briefs/OW*.md`) and `polyplets/OUTWORKS-PLAN.md`, both deleted in
+the 2026-09 consolidation and readable at the commit `docs/consolidation-plan.md`
+names for wave 1, plus `polyplets/PROOF-STATUS.md` §"Outworks — second
+campaign", which is still here and carries the verdict this review reached. The tree was
 verified green locally before review (`lake build --no-build`: all 8615 jobs
 up-to-date at HEAD, so every `#guard_msgs` gate passed as built).
 
