@@ -168,7 +168,7 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
    (b_1·n·y)^k/k!, so [n^k]P_k = b_1^k/k!. From the first-principles
    P_1(n) = 25n − 45 (`T-n-nm1.md`): b_1 = 25, a_1 = −45. Hence
    **[n^k]P_k = 25^k/k! for all k** — the conjecture of
-   `results/k8-pinning.md` (and the deferred stretch goal of `Shape.lean`) —
+   `results/diagonal-formula.md` (and the deferred stretch goal of `Shape.lean`) —
    and deg P_k = k exactly.
 3. **Conditionality ledger.** a(30)..a(40) (wired cells on diagonals
    k = 10..19) now rest on: the real sweeps (H ≤ 21 as of a(40)), the shape theorem
@@ -204,7 +204,7 @@ tier. The item
 - **Denominator k! — CLOSED both ways (2026-07-31)**: `k!·P_k ∈ ℤ[n]` is
   proved for all k (Lean `production_factorial_int`); minimality is FALSE —
   the minimal denominator is k!/5^{ĉ_k}, ĉ_k = v₅(k!) − v₅(⌊k/2⌋!) +
-  [k ≡ 1 (mod 10)] (`results/v5-denominator-law.md`; lower bound proved,
+  [k ≡ 1 (mod 10)] (`results/arithmetic-structure.md`; lower bound proved,
   exact k ≤ 19). The old "25^k/k! shows k! is necessary" pointed the wrong
   way — it is why the 5-part drops.
   (Corrected 2026-07-30, AUDIT-2026-07-30 P8: this entry previously read

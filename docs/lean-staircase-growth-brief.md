@@ -8,7 +8,7 @@ Proposition 6 stays a paper proof.
 
 Two theorems in Lean, sorry-free:
 
-1. `M i * M j ≤ M (i + j)` — `results/hv-growth-sandwich.md` Lemma 3, where `M n`
+1. `M i * M j ≤ M (i + j)` — `results/subclasses.md` Lemma 3, where `M n`
    counts staircase king animals of area `n` up to translation.
 2. `µ = lim M(n)^(1/n)` exists, with the limit-is-supremum half, so
    `M n ≤ µ ^ n` for every `n`.
@@ -82,7 +82,7 @@ Budget: **~300 lines**, of which the ceiling is the largest single piece.
   footprint regression fails the build rather than passing quietly — that is the
   safety net, use it.
 - **Naming.** Phase labels like `(1,1)` mean nothing outside
-  `results/hv-growth-sandwich.md`'s table. If any appear, name the bits
+  `results/subclasses.md`'s table. If any appear, name the bits
   (`bottomRising`, `topFalling`).
 
 ## Acceptance

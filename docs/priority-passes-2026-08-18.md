@@ -209,7 +209,7 @@ theorem re-derived.
 **They conjecture what we measured.** Their §4 conjectures that for any `d` and
 fixed `k` the highest-degree factor of the characteristic polynomial is
 `(x−1)^{k+1}`, so that the count is asymptotically `γ n^k`. Our table in
-`results/perimeter-defect-diagonals.md` has exactly `Φ₁^{k+1}` and degree `k`
+`results/perimeter.md` has exactly `Φ₁^{k+1}` and degree `k`
 for every `k <= 6` on **both** lattices. That reframes the degree row: for the
 square lattice it is evidence for a published conjecture rather than an
 observation of ours, and for king it is evidence for the same conjecture on a

@@ -40,7 +40,7 @@ n): a(22)/a(21) = 6.7953, a(23)/a(22) = 6.8087, **a(24)/a(23) = 6.8210**.
   `results/ns_a23/RESULT.md`'s recorded values instead).
 - **T(24,16) = 42,594,477,635,772,598** — this run's headline new cell.
   **Matches the pre-a(24) falsifiable k=8 prediction from
-  `results/k8-pinning.md` exactly** (the sum-of-roots extrapolation of the
+  `results/diagonal-formula.md` exactly** (the sum-of-roots extrapolation of the
   P₈ pattern, made before this run existed). Strong independent confirmation
   that the leading-coefficient conjecture (`[n^8]P_8 = 25^8/8!`) and the
   quadratic sum-of-roots pattern both extend correctly to k=8.

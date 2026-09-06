@@ -25,8 +25,8 @@ perspective is added. Nine landed, all pushed:
   integer (P_k integer-valued on k+1 consecutive integers) with `N_1 = 4`, so
   `N_k ≡ (−1)^(k+1) mod 3 ≠ 0`. No tail bound. Gate
   `experiments/depth1_sharpness.py`. L1/L8, `docs/proofs/diagonal-law.md`,
-  `results/mathematics.md` say so; the one dependency is identity (II) of
-  `results/onset-defect-depth1-closed.md`, derived, not written up standalone.
+  `docs/publication.md` say so; the one dependency is identity (II) of
+  `results/below-onset.md`, derived, not written up standalone.
 - **Depth 1 is drift-parametric** (`12aa8b5`). Bulk kernel
   `u^(b−1) − y(1+…+u^(b−1))²`; square `D_1 = (−1)^(k+1)` derived; hex Φ is a
   quadratic that factors mod 2, so the **hex onset is sharp** too. Hex cells to
@@ -53,7 +53,7 @@ perspective is added. Nine landed, all pushed:
   "no shared roots" anomaly was its symptom. **Re-recovery priced, not
   launched: 48 CPU-h, ~2.5 h on ayr / 6.4 h gympie — his call.**
 - **Five height-H sizes named in one place** (`06a6514`,
-  `results/skeletonkey-hankel-closure.md` "Five ladders"), with which bounds
+  `results/closed-doors.md` "Five ladders"), with which bounds
   which; reach-merged classes = Exact Change's Nerode counts.
 
 Open from the pass: identity (II) write-up; dm-mirror onset (needs a defect
@@ -97,7 +97,7 @@ mathematics first).
   Decided 2026-09-05: closed campaigns first, raw records deleted, conclusions
   in the theme file. Wave 2a (same day) removed 41 of the 43 files code still
   named; the two Middle Kingdom plans stay until their tables fold into
-  `results/middle-kingdom.md`. The receipts gate, scope-less once the rook
+  `results/subclasses.md`. The receipts gate, scope-less once the rook
   campaign was deleted, is retired. Wave 2b, the mathematics, is not started.
 
 ## 2026-09-05 late — the machine-written report, and the evening's checks
@@ -199,7 +199,7 @@ surface reports nothing, script surface reports all five.
 
 ## 2026-08-24 — B13 IS GREEN, THE DEPTH-5 GATE PASSED
 
-`results/depth5-gate-green.md`. The `emax = 4` family table that the depth-5
+`results/undertow.md`. The `emax = 4` family table that the depth-5
 gate had been waiting for landed on dalby 2026-08-23; it was pulled into the
 tree 2026-08-24 and the gate was run. `D_5` computed ab initio from that table
 reproduces all 15 banked cells `T(2k-4, k-4)`, `k = 5..19`, exactly.
@@ -222,7 +222,7 @@ Two things the green does not say, both measured rather than argued:
   overlaps, 0 mismatches, two of them produced weeks earlier.
 - **The run overshot its own RAM bracket.** `families 21 4` came in at
   4 h 54 m and **18,743 MB** at 8 threads. The wall projection in
-  `results/depth5-cost-settled.md` bracketed that (3.1–6.7 h); the RSS
+  `results/undertow.md` bracketed that (3.1–6.7 h); the RSS
   projection did not — 18.3 GB is 14% above even its pessimistic end. That
   file's title claimed "9–16 GB" and has been corrected. The same method
   prices `families 21 5` at ~74–85 GB in `docs/state-2026-08-23.md` §5, so
@@ -236,7 +236,7 @@ S-A5 asks for it to be made for the family rather than per-file.
 ## 2026-08-23 evening — THE CENSUS LADDER REACHED H = 21
 
 The last of the day's runs, and the one that closes an open item.
-`results/nkey-census.md` and `results/skeletonkey-nfamily-merge.md`.
+`results/closed-doors.md` and `results/closed-doors.md`.
 
 | H | classes | ratio | wall | RSS |
 |---|---|---|---|---|
@@ -284,14 +284,14 @@ one prints, so a wrong build cannot report one: H = 4..12 came back 6, 15, 27,
 consecutive matches. **It does not promote the collapse.** H ≤ 12 has two
 implementations agreeing; H = 13 has minauto alone, because the partition
 automaton was never run there, and a fifth confirmation of the identification is
-not a second implementation of this rank. `results/exactchange-probes.md` §9
+not a second implementation of this rank. `results/arithmetic-structure.md` §9
 item 3 stands. What it removes is the possibility that the agreement was going
 to break at the next height.
 
 **The ayr per-source census re-run returned 346,539.** H = 16 now has three
 routes agreeing — the pre-fix binary, the post-fix shared engine, and the
 post-fix per-source engine — so the retirement hazard is confirmed unreachable
-there by the slow route as well as the fast one. `results/nkey-census.md`.
+there by the slow route as well as the fast one. `results/closed-doors.md`.
 
 **The depth-5 `e4` table exists.** `dalby:~/src/polyominoes/results/severance_w3_families_K21_e4.txt`,
 K = 21, emax = 4, 4 h 54 min at 8 threads, 19.2 GB. **Not pulled and not acted
@@ -386,10 +386,10 @@ maxima are 11, 13, 13, 15, 15, **17, 17, 19** at S = 12..19, so the four-bit
 binary really was aliasing at S = 17, 18 and 19 and produced the right answer
 anyway — a hook carrying 17 components needs more cells to join its pieces than
 `n <= S + 6` has, so aliasing merges two dead ends. **A1.3's verdict stands as
-written.** `results/dmirror-spine-split.md`.
+written.** `results/symmetry-classes.md`.
 
 **The census has a second engine, and it is much faster.** The reason
-`results/nkey-census.md` stops at 17 is that successors are generated per
+`results/closed-doors.md` stops at 17 is that successors are generated per
 source, so a partial fill a thousand sources admit is explored a thousand
 times. `nkey_census --shared` sweeps a batch of sources together one row at a
 time, carrying only what the remaining rows can see, so two sources that differ
@@ -438,7 +438,7 @@ morning's verdict: `d_main` stays linear at `c_3` and at `c_4`, `d_anti` does
 not. So the two-spine sum was never the whole obstruction — whatever breaks the
 grand form sits in the **anti-diagonal family specifically**. The flip rests on
 S = 16 and S = 17, whose totals were checked against the banked strip rows at
-all 21 cells before it was written down. `results/dmirror-spine-split.md`.
+all 21 cells before it was written down. `results/symmetry-classes.md`.
 
 **L10 exists, has had its priority pass, and the pass found something.**
 `paper/L10-undertow.tex`, 7pp. The pass (`docs/priority-pass-L10-2026-08-23.md`)
@@ -451,8 +451,8 @@ count of unknowns per level is proved. **L8 absorbed** the external check and
 the two corrections, per jasonp's ruling, and L10 cites it.
 
 **The square-lattice record is n = 70, not 56.** Known since
-`docs/rook-parity.md:151` and unswept; the sweep is done, six live sites
-corrected, `results/literature-record-56-corrected.md` is the one place, and no
+`docs/lessons-learned.md:151` and unswept; the sweep is done, six live sites
+corrected, `docs/publication.md` is the one place, and no
 conclusion moves. `results/rook1/queue.md` K4 closed.
 
 **Readability round 4** covered tonight's prose and found what the rules had
@@ -464,10 +464,10 @@ times jasonp's own control. Now 0.47.
 
 | run | result | where |
 |---|---|---|
-| depth-6 K-ladder | **~36 h / ~74 GB at 8 threads**; the asserted 20–60 h / 50–100 GB **holds**, unlike depth 5's | `results/depth6-cost-settled.md` |
-| n = 11 hole count | **5, as predicted**; and `a(11) = 39,299,408` matches A006770 | `results/maxhole-closed-form.md` |
-| frontier census | **H = 14 = 53,763, H = 15 = 136,145, H = 16 = 346,539**; H = 17 in flight | `results/nkey-census.md` |
-| spine split | S = 15..19; **`d_main` linear at `c_2`..`c_5`, `d_anti` fails at `c_3`** | `results/dmirror-spine-split.md` |
+| depth-6 K-ladder | **~36 h / ~74 GB at 8 threads**; the asserted 20–60 h / 50–100 GB **holds**, unlike depth 5's | `results/undertow.md` |
+| n = 11 hole count | **5, as predicted**; and `a(11) = 39,299,408` matches A006770 | `results/subclasses.md` |
+| frontier census | **H = 14 = 53,763, H = 15 = 136,145, H = 16 = 346,539**; H = 17 in flight | `results/closed-doors.md` |
+| spine split | S = 15..19; **`d_main` linear at `c_2`..`c_5`, `d_anti` fails at `c_3`** | `results/symmetry-classes.md` |
 
 **The one that changes a plan is the depth-6 price.** RAM forces the thread
 count — 8 threads fits dalby at ~74 GB, 16 threads does not at ~148 GB — so the
@@ -494,17 +494,17 @@ unlaunched and four decisions are jasonp's.
 
 **What changed the repository.**
 
-- **The gate suite was swept, all 33** (`results/gate-class-sweep.md`),
+- **The gate suite was swept, all 33** (`docs/engine-record.md`),
   red-first: for each gate, plant the staleness it is supposed to catch and
   confirm it goes red. Two defects. `gate-cutcount-assembly` carried the same
   hand-edited-constant defect that `gate-provenance` was fixed for and stayed
   **green** under a planted triangle growth that turned two other gates red —
-  `NMAX` is derived now and re-probed red. `results/strip-mu-certificates.md` is
+  `NMAX` is derived now and re-probed red. `results/growth-constant.md` is
   read by no gate and had drifted: it says "H ≥ 12 is not certified yet" while
   its own log carries H = 12, 13, 14 as PASS twice each and L3 publishes the
   H = 14 row. Corrected. Three further limits reported, not fixed.
 - **The maximum hole count is solved**: `n − ⌈2√n⌉ + 1`, which is **A248333**,
-  with a construction proving the lower bound (`results/maxhole-closed-form.md`).
+  with a construction proving the lower bound (`results/subclasses.md`).
   n = 10 measured at 4 as predicted.
 - **The five-terms conclusion changes.** Done at the target Nmax rather than at
   Nmax 41, the `Hs = 20` poles are 252 GB (n ≤ 44) and 277 GB (n ≤ 45) against
@@ -515,24 +515,24 @@ unlaunched and four decisions are jasonp's.
 **Closed doors, with their reasons.** A1.3 dies at step 1 — the dmirror family
 is a sum over two ground-state spines and the parity split does not separate
 them, so the grand form does not transfer
-(`results/dmirror-grand-form-fails.md`). T4 at k = 6 is out of reach because the
+(`results/symmetry-classes.md`). T4 at k = 6 is out of reach because the
 onset is *sharp*, 2k+2 even and 2k+3 odd, on all six pinnable levels
-(`results/dmirror-onset-sharp.md`). A1.2 is a re-pitch of work
-`results/exactchange-probes.md` §6 closed on 2026-08-14
-(`results/char2-basis-status.md`).
+(`results/symmetry-classes.md`). A1.2 is a re-pitch of work
+`results/arithmetic-structure.md` §6 closed on 2026-08-14
+(`results/arithmetic-structure.md`).
 
 **Done and standing.** Square Undertow holds at depth 2 with ten held-out cells
-(`results/undertow-square-depth2.md`); A030234's parity failure is two families,
-not one sequence misbehaving (`results/bilateral-parity.md`); the confluent
+(`results/undertow.md`); A030234's parity failure is two families,
+not one sequence misbehaving (`results/symmetry-classes.md`); the confluent
 exponent resolves on the king and not on the square, so
-`results/mathematics.md` is deliberately unchanged
-(`results/confluent-universality.md`); the Lean gap is written down and
+`docs/publication.md` is deliberately unchanged
+(`results/growth-constant.md`); the Lean gap is written down and
 `polyplets/PROOF-STATUS.md` now says the formalization covers the route a(40)
 took, not the route a(41) took (`docs/lean-below-onset-scope.md`).
 
 ## 2026-08-20 — THE KING LATTICE MERGES THE FRONTIER, AND IT IS PARKED
 
-Branch `skeletonkey`. Record: `results/skeletonkey-nfamily-merge.md`. Probe
+Branch `skeletonkey`. Record: `results/closed-doors.md`. Probe
 `experiments/skeletonkey/nfamily_merge.py`. **PARKED at jasonp's direction
 2026-08-20** — established and banked, nothing built, no engine touched.
 
@@ -552,7 +552,7 @@ scratch, gated on the banked `C_H` rows in exact integers: eight fail-closed
 gates, a RED control, and a **rook control** showing the key is the state on
 the square lattice, so the collapse is king adjacency and nothing else.
 
-Why it matters: `results/kink-carry.md` says "only end-of-column states leave
+Why it matters: `docs/engine-record.md` says "only end-of-column states leave
 a worker … the new wall = frontier RAM at `D_H ~ 2.6^H`". The merged set is
 that wall, and it grows at ~2.48^H.
 
@@ -591,7 +591,7 @@ towers, each excluding its own row from its pinning set, built from Severance
 W1's cluster-weight file, Motley's own C_H rows at H <= 18, ab-initio `D_j`,
 and the grand form. No incumbent file is read.
 
-**Undertow** (`experiments/undertow_pin.py`): `docs/b1-closure-plan.md` §1
+**Undertow** (`experiments/undertow_pin.py`): `results/second-sources.md` §1
 costs a level its two tallest cells; the grand form only needs two independent
 linear equations, and W3's ab-initio `D_j(k)` makes every BELOW-onset cell one.
 Level `k` pins from height `k+1-j`. Sweep ceiling `(n+2)/2 -> (n-3)/2`.
@@ -604,7 +604,7 @@ H = 19 frontier: **224,529,648 states**.
 
 ### What the Fable review changed — read this before quoting any figure
 
-`results/undertow-review-A.md` graded the claims. **No circularity anywhere**,
+`results/undertow.md` graded the claims. **No circularity anywhere**,
 but three figures were inflated and are corrected in place:
 
 - "342 cells re-derived from shorter cells" is **189 enumerated** plus 153
@@ -665,7 +665,7 @@ produced. Rows 30..39 come out COMPLETE with every reassembled sum matching
 the b-file; row 40's gap is `T(40,19)` alone. The banked state was n <= 35.
 `T(40,19)` is a Motley H = 19 run: priced at 27-40 days, now ~11 h.
 
-**`docs/b1-closure-plan.md` §1's rule was costing the two tallest cells per
+**`results/second-sources.md` §1's rule was costing the two tallest cells per
 level, and it did not have to.** The grand form makes level `k` carry exactly
 two new constants, so any two independent linear equations pin it — and
 Severance W3's ab-initio `D_j(k)` turns every BELOW-onset cell into one:
@@ -697,7 +697,7 @@ is the measurement.
 **Open before P_21 is wired anywhere:** it has one pin pair until depth 5
 exists (`families 21 4`, **~3.1 h / ~8.5 GB at 8 threads**, or 6.7 h /
 16.1 GB on the pessimistic bound -- measured 2026-08-22,
-`results/depth5-cost-settled.md`; this line said "measured ladder says ~16 h /
+`results/undertow.md`; this line said "measured ladder says ~16 h /
 ~103 GB", which was a geometric mean over the whole K range and not a measured
 ladder), and
 `diagCoeffTable`'s `kfact int64` cannot hold 21! — it needs a big.Int field
@@ -734,7 +734,7 @@ Confetti spent 399,700 s on one core of an 80-core box.
 ## 2026-08-19 09:20 EDT (latest) — CONFETTI GREEN; THE ACCEPTANCE QUEUE IS EMPTY
 
 **Confetti (Motley rung 2, H = 18) finished 08:58 EDT, GREEN.**
-`results/motley-h18.md`. Five sequential single-core passes, 399,700 s of wall
+`results/second-sources.md`. Five sequential single-core passes, 399,700 s of wall
 (4.63 days), peak RSS 65.9 GB, frontier 72,487,711 states. Held-out prime
 2147483563 predicted 40/40 residues from the CRT reconstruction over the other
 four. T(n,18) = C_18 − 2 C_17 + C_16 matches the incumbent triangle at all 23
@@ -755,7 +755,7 @@ Retired: (36,18), (37,18), (38,18), (39,18), (40,18)
 <!--q:row40_residual.count@16=9--><!--q:row40_residual.count@17=7-->
 <!--q:row40_residual.count@18=5--> it wrote off as not reproducing **does**
 reproduce — exactly, endpoints included — off
-`docs/b1-closure-plan.md` §1's anchor rule, which is row 40's
+`results/second-sources.md` §1's anchor rule, which is row 40's
 *rule-independence* band and not the congruence-only count at all. Both are now
 computed and gated in `results/residual-cells.md`, which names them Q1 and Q2;
 every restatement anywhere in the repo is checked against it by
@@ -789,7 +789,7 @@ Acceptance-queue item 2 is CLOSED. `scripts/clean_clone_check.sh` on ayr, rev
 `0171909`: `make` 404 s, `make ns-gates` 769 s, all three verifiers, all 11
 PDFs in 13 s, and **a(26) = 102607513847014153892 reproduced in 23 s on 32
 cores** with the whole chain to a(25) validated on the way. Every phase green.
-Table and per-defect detail: `docs/acceptance-queue.md` item 2.
+Table and per-defect detail: `docs/publication.md` item 2.
 
 Four defects, none of them visible from this working tree:
 
@@ -836,7 +836,7 @@ and the Ghost Ship tree go public at all.
 
 ## DONE — k=7 defect calibration (dalby, finished 2026-08-18 23:53Z)
 
-Numbers and the fits: `results/perimeter-defect-k7-pricing.md`. The k=6
+Numbers and the fits: `results/perimeter.md`. The k=6
 controls reproduce the census timings to under 0.1%, so the fits are trusted.
 
 - Cost exponent is not `n^7.9` in general --- that is square8 at `k=6` only.
@@ -904,7 +904,7 @@ mirror is recorded as exhausted for us in `papers/MISSING.md`.
 pulling full text of sources already listed there, not from new searches.
 Re-try that file before searching.**
 
-**Proof audit** (`results/l-paper-proof-audit.md`) found **one real defect**:
+**Proof audit** (`docs/publication.md`) found **one real defect**:
 L9 printed its final step as a product over component minima, but `b` depends
 on the history of earlier choices -- the source proof uses downward induction
 for exactly that reason. Fixed. Same family as L3's broken proof: a step that
@@ -934,7 +934,7 @@ dalby, committed. Real cost: king 42 h wall at 76-way, square 23 h --- the
 pool script's own header predicted ~1.8 h, so that estimate is refuted and
 should not be used as calibration for anything else.
 
-**The k=6 verdict** (`results/perimeter-defect-diagonals.md`, appended):
+**The k=6 verdict** (`results/perimeter.md`, appended):
 onset 24 CONFIRMED by scan rather than fit; the Phi_3 exponent k-4 CONFIRMED;
 Phi_4 absent CONFIRMED with D minimal and 39 spare zeros; **the Phi_2 leading
 diagonal's closed form REFUTED** --- 5/2 measured against 15/4 predicted, on
@@ -955,7 +955,7 @@ k = 6: same period, degree, onset and leading coefficient on both lattices.
   reciprocals of zeros of K (`experiments/convex_kernel_zeros.py`). rho is
   q_1/q_2, not a measured decimal. The follow-up test (is nu 1/(smallest zero
   of det)?) does **not** converge under truncation and is recorded as a
-  negative attempt, in the paper and in `results/convex-polyplets.md`.
+  negative attempt, in the paper and in `results/subclasses.md`.
 - **L3** --- Proposition 6's proof was **false**: the Redelmeier decision
   string is undefined on re-entrant animals (96,065 of 147,941 missed at n=8).
   Replaced by the sound BFS-frame derivation of the same constant; the broken
@@ -978,7 +978,7 @@ k = 6: same period, degree, onset and leading coefficient on both lattices.
   crossed.
 
 `paper/verify_l_papers.py` grows a k=6 check group (336 checks, 23 RED, all
-fire). `paper/README.md` and `docs/publication-strategy-2026-08-18.md` are
+fire). `paper/README.md` and `docs/publication.md` are
 current.
 
 **Open, his:** the priority passes (L2, L6, L8, L9 have had none; L9's base
@@ -990,7 +990,7 @@ and whether `docs/` and the Ghost Ship tree go public at all.
 
 Record committed (8336e02, 355 files incl. the loop's own sandbox tree).
 Value triage run (e35c549) — the axis grading never covered.
-**`results/ghostship/DISPOSITION.md` is the decision layer**; REPORT.md is
+**`docs/lessons-learned.md` is the decision layer**; REPORT.md is
 the graded record, VALUE-TRIAGE.md the novelty evidence.
 
 Triage findings: all four king sequences absent from OEIS at full and
@@ -1029,7 +1029,7 @@ shared one blind spot (they audited what the loop asserts, never what it
 forecloses).
 
 SALVAGE DONE (a4c8085): Layer 1 + Layer 2 imported as a dated section at
-the end of `results/convex-polyplets.md`. The import found that half of
+the end of `results/subclasses.md`. The import found that half of
 Layer 1 was already banked here — the s≤200 series and degree-2
 algebraicity, 2026-08-05, matching the loop's 200 terms exactly — so the
 loop re-derived repo work as well as literature, and the sealed denominator
@@ -1050,7 +1050,7 @@ Superseded section below kept for the record. The run compressed to one
 day at jasonp's direction (all 14 sessions banked 10:20–20:38 EDT
 08-15; deviations with receipts in `results/ghostship/DIVERGENCES.md`),
 then graded the same evening per §7 with all blinds enforced.
-**`results/ghostship/REPORT.md` is the record**; claim table (hashed
+**`docs/lessons-learned.md` is the record**; claim table (hashed
 before predictions opened), three provenance-stripped verify files, and
 blind prediction scores under `results/ghostship/grading/`.
 
@@ -1118,7 +1118,7 @@ Kingdom) with Exact Change (1) deferred on a running job. State:
   2026-08-01 (three databases, no collision; paper already scoped) and
   Middle Kingdom is complete through Phase 4 and committed. Both memory
   entries were stale and are fixed; nothing was re-run.
-- **2 — King twigs CLOSED, closed door** (`results/king-twigs-l1.md`,
+- **2 — King twigs CLOSED, closed door** (`results/growth-constant.md`,
   harness `experiments/kingtwigs/l1_schemes.py`, GREEN on dalby). Level-1
   king twig bound = 5⁵/4⁴ = 12.207 **exactly**; the KR/BS deferral gain is
   structurally blocked on king adjacency (a deferred cell always lands in
@@ -1135,7 +1135,7 @@ Kingdom) with Exact Change (1) deferred on a running job. State:
   **exactly in ℤ[q]**, unconditional; five lemmas; check
   `experiments/birthright_identity_check.py` (223k subsets, 0 mismatches,
   5 RED controls fire) independently re-run, sha-matched. Its §6 lists four
-  corrections to `docs/b1-closure-plan.md` §7's paraphrase (updated) and
+  corrections to `results/second-sources.md` §7's paraphrase (updated) and
   records that the engine header's cited `probe_cutcount_dp.py` was deleted
   from the tree. Tier 2 delimited, not done; Lean formalization open.
   **Gate wiring undecided**: the check is a natural `gate-cutcount-identity`
@@ -1143,11 +1143,11 @@ Kingdom) with Exact Change (1) deferred on a running job. State:
 - **1 unblocked**: the running job was `exactchange_minauto.py` fast-closure
   on dalby; it landed clean — N-family automaton ranks H=10/11/12 =
   453/912/1818, all A034299, brute anchors OK. Banked in
-  `results/exactchange-probes.md`; H=13 test now priced ~5–6 h single-core
+  `results/arithmetic-structure.md`; H=13 test now priced ~5–6 h single-core
   off the measured H=12 wall (1696 s); still needs sign-off + second source.
 
 **Ridgeline (item 6) LANDED and VERIFIED** —
-`results/ridgeline-depth-amplitudes.md`, scripts `experiments/ridgeline_*.py`
+`results/below-onset.md`, scripts `experiments/ridgeline_*.py`
 (hash-matched repo↔dalby, master + vertex independently re-run GREEN, RED
 controls fire). **The depth-amplitude family is derived: j = 5 is 35/8**,
 and the whole family is one constant — the onset branch-point velocity
@@ -1167,11 +1167,11 @@ H=18 still running on dalby per the entry below; today's desk-scale runs
 went to dalby scratch (`~/tmp/kingtwigs`, `~/tmp/birthright`,
 `~/tmp/ridgeline` — disposable). **Everything from this set is
 uncommitted** for review: modified `docs/king-twigs-plan.md` (closed
-header), `docs/proofs/polyplet-upper-bound.md`, `docs/b1-closure-plan.md`,
-`results/exactchange-probes.md`; new `results/king-twigs-l1.md`,
+header), `docs/proofs/polyplet-upper-bound.md`, `results/second-sources.md`,
+`results/arithmetic-structure.md`; new `results/growth-constant.md`,
 `docs/proofs/cutcount-identity.md`, `experiments/kingtwigs/`,
 `experiments/birthright_identity_check.py`, the two brief files. jasonp's
-own pending edits (`docs/rook-parity.md` deletion, `results/coin-lift-g2.md`)
+own pending edits (`docs/lessons-learned.md` deletion, `results/second-sources.md`)
 untouched.
 
 ## 2026-08-14 — both plans reviewed, reconciled, and executed as far as they go
@@ -1186,14 +1186,14 @@ statement that did not survive contact.
   the generic rank exactly, and mu_2/mu_1 grows every height (1.00 → 2.00 over
   H = 4..9). **Coin Flip, Coin Roll and Biased Coin Flip are untouched** — one
   deterministic bit, or a probabilistic fingerprint. G3 and G4 never run.
-  `results/coin-lift-g2.md`, probe `experiments/tristruct/r3_lift_snf_probe.py`.
+  `results/second-sources.md`, probe `experiments/tristruct/r3_lift_snf_probe.py`.
 - **G2 as written could never have fired**, and the shape of the error is worth
   carrying: "the Z/4 free rank" counts the invariant factors that are units mod
   4, which is identically the GF(2) rank. The well-posed object is
   `mu_k = #{invariant factors with v_2 < k}`, the minimal generator count of
   the Hankel column module over Z/2^k.
 - **Other characteristics are also dead, and now it is a theorem plus an
-  exhaustive sweep** — `results/coin-flip-characteristic-landscape.md`,
+  exhaustive sweep** — `results/arithmetic-structure.md`,
   commit `8861523`. Every weighted automaton over every commutative ring has
   dimension >= min_p rank_{F_p} (reduce mod a maximal ideal), field extensions
   of char 2 are rank-identical, and multiplicative grading is exactly
@@ -1208,7 +1208,7 @@ statement that did not survive contact.
   deterministic bit is the unique optimum of the class.
   Round 1 found rook has no char-2 crack; the collapse is specific to the
   characteristic *and* the stencil.
-- **Motley Step 0 is DONE and GREEN** — `results/motley-step0.md`. 16 of 16
+- **Motley Step 0 is DONE and GREEN** — `results/second-sources.md`. 16 of 16
   rows byte-identical to the banked rows, 640 of 640 cells against the banked
   triangle, from a clean worktree (`~/src/pm-b1-step0`, stamp `48ac1089`, no
   `-dirty`) with `gate-cutcount-b1` GREEN on that build and the binary's
@@ -1223,7 +1223,7 @@ statement that did not survive contact.
   100 GB / ~15 h to **91 GB / ~7-10 h**, and the +-20% census band's bad end
   (109 GB) now fits dalby with 13 GB to spare. The check-split does not need to
   be pulled forward.
-- **H = 17 is DONE, GREEN** (receipt `results/motley-h17.md`; row banked as
+- **H = 17 is DONE, GREEN** (receipt `results/second-sources.md`; row banked as
   `results/cutcount_b1/rows/C17.out`): T(n,17) matches the incumbent triangle
   at all 24 cells, 0 mismatch — **a(n) closed rule-independently for
   n <= 33**. Measured: wall 39,117 s (10.9 h), peak RSS 95.0 GB (91
@@ -1244,7 +1244,7 @@ statement that did not survive contact.
   (`scripts/dalby_confetti_h18.sh`, master `443ed36`) refuses to run a
   binary whose sha256 lacks a green receipt. Product on GREEN: a(n)
   rule-independent for n <= 35.
-- **Exact Change** (char-2 basis hunt, `results/exactchange-probes.md`,
+- **Exact Change** (char-2 basis hunt, `results/arithmetic-structure.md`,
   `afec943`): rank = A034299 exactly (nine points, r(21) = 932,071
   predicted); quotient is cross-mask linear algebra; cell-level rank
   ~Theta(H 2^H) shrinks the compression to ~6x vs the spin engine; sparse
@@ -1264,7 +1264,7 @@ statement that did not survive contact.
   `second-source` and carries two streams, not three, so Confetti's A(1) check
   rests on the held-out prime and the banked rows alone; and the receipt
   enforcement Confetti's gate battery names **does not exist yet**.
-- **Open for jasonp**: `docs/b1-closure-plan.md` §7 argues the Tier-1
+- **Open for jasonp**: `results/second-sources.md` §7 argues the Tier-1
   cancellation-identity write-up should come *before* the engineering ladder;
   neither Motley doc mentions it. Nothing was decided here.
 
@@ -1309,7 +1309,7 @@ Plans: `docs/motley-plan.md`, `docs/coin-lift-plan.md`. Goal docs:
 
 ## 2026-08-13 — Closure: the P_k lock, and B1's RAM ceiling
 
-Full record and arithmetic: `docs/b1-closure-plan.md`.
+Full record and arithmetic: `results/second-sources.md`.
 
 - **Every P_k needed for row 40 is anchored at H <= 20**, so a B1 sweep to
   H = 20 pins the whole H >= 22 band ab initio at **zero additional compute**
@@ -1342,7 +1342,7 @@ One desk-only round, six Fable agents, no compute dispatched. Brief
 `docs/rook1-brief.md`, product `docs/rook-parity-bar.md`, lane files and the
 ledger/queue/INSTRUMENTS under `results/rook1/`. Commits `e72e5ac`..`4a90412`.
 
-**The goal in `docs/rook-parity.md` is not well-formed, and the round is what
+**The goal in `docs/lessons-learned.md` is not well-formed, and the round is what
 established that.** jasonp's verdict, and the evidence agrees: the pin sits
 0.31% above what the incumbent already measures, the test is passable by the
 incumbent, and the bar contradicts the pin. Do not restart it as written; do not
@@ -1363,7 +1363,7 @@ correction below lives in the brief, the bar file, or the lane files.
   base.
 - **Gate 0 fired its kill: the ab-initio P_k tower is DEAD** (R1-B). g ≈ 20 per
   level (ratio 21.0 at k=4→5, MEASURED lower bound 8.15 at k=5→6,
-  `results/defect-gas.md:242`). At even g = 3, k=9 → k=19 is 7.4 years of
+  `results/diagonal-formula.md:242`). At even g = 3, k=9 → k=19 is 7.4 years of
   16-thread dalby.
 - **But gate 0 measured the wrong object** (R1-E): the a(40) assembly consumes
   two rational constants per level, not the weight DP, and depth ≤ 4 below-onset
@@ -1408,7 +1408,7 @@ correction below lives in the brief, the bar file, or the lane files.
 ## 2026-08-13 — triangle salvage merged; reading pass; king twigs opened
 
 - **Triangle-structure agent campaign closed as a FAILURE** (four rounds;
-  `docs/triangle-postmortem.md`). Salvage merged to master (`bb897b1`);
+  `docs/lessons-learned.md`). Salvage merged to master (`bb897b1`);
   the index of what survived, with verification labels and remaining work
   per item, is `results/triangle-salvage.md`. Per-agent round records stay
   on the `triangle-structure` branch. New banked numbers from the salvage:
@@ -1519,7 +1519,7 @@ thing** — they are `tail --pid` over ssh and do not survive a session change.
 | box | job | PID to watch | state at 18:09 |
 |---|---|---|---|
 | ayr | `scripts/ayr_pmin48.sh` → square8 min-end p=48, tmux `0:pmin48`, log `results/ayr_pmin48.runlog` | 2261 | **DONE 2026-08-07 22:12 UTC** — `AYR_PMIN48_DONE`, 121/121 frames, census `results/perimmin_square8_p48_r6.txt` (1526 rows) identical on ayr and here by sha256; script and runlog committed 2026-08-08 |
-| dalby | `scripts/dalby_square4_deep.sh` → square4 min-end deep boxes, tmux `0:j7w17` | 2423184 | **DONE 2026-08-08 08:51 EDT** — `DEEP_DONE`, both boxes `result=ok`. `W=15` `1 4 18 60 187 524 1388 3452 8193`, `W=17` `... 3452 8229`. Censuses and logs committed here 2026-08-09; the `j=7,8` predictions are confirmed and the `8193`/`8229` split is explained and measured (`results/perimeter-both-ends.md`) |
+| dalby | `scripts/dalby_square4_deep.sh` → square4 min-end deep boxes, tmux `0:j7w17` | 2423184 | **DONE 2026-08-08 08:51 EDT** — `DEEP_DONE`, both boxes `result=ok`. `W=15` `1 4 18 60 187 524 1388 3452 8193`, `W=17` `... 3452 8229`. Censuses and logs committed here 2026-08-09; the `j=7,8` predictions are confirmed and the `8193`/`8229` split is explained and measured (`results/perimeter.md`) |
 | dalby | `dalby_perimeter_defect_pool.sh square8 78 6`, tmux `0:pdk6big` | 2420612 (stage 1) | all 456 shards dispatched, a couple still running. **Stage 2 (`square4 78 6`) starts automatically after**, then `STAGE2_ALLDONE` and a `sleep 86400` — so watch 2420612, not the outer 2420610, and re-arm on stage 2 |
 
 gympie is idle; its three finished windows (percell mod-4, symtm strip profile,
@@ -1536,7 +1536,7 @@ do not touch dalby's clone while the drivers hold it.
 ## LANDED — ayr, king min-end census at p=48 (started 2026-08-07 18:01 EDT, done 22:12 UTC)
 `scripts/ayr_pmin48.sh`, tmux `0:pmin48`, driver PID 2261, log
 `results/ayr_pmin48.runlog`. Feeds the minimum end of
-`results/perimeter-both-ends.md` — the king partner to the square4 deep boxes
+`results/perimeter.md` — the king partner to the square4 deep boxes
 on dalby — and through it the perimeter-grading paper (L6 in
 `docs/publication-split.md`). Tier: reproducible measurement. Budget 5-8 h at
 32 threads; p=48 has never finished, so anything tighter is unmeasured.
@@ -1566,7 +1566,7 @@ restart script); pushing runs the full gate suite and would steal cores from
 the census, so it waits for the run to finish.
 
 ## Subgroup census — H15-19 now HAS a second source (2026-08-07)
-`results/subgroup-mod4.md`. The orbit-SIZE distribution needs per-SUBGROUP
+`results/symmetry-classes.md`. The orbit-SIZE distribution needs per-SUBGROUP
 invariant counts `I(H)` — a different object from the banked per-element
 `Fix(g)`, and none were banked. They are lambda^(n/4) families, so 31 min on
 gympie buys `a(n) mod 4` at every n <= 40 (a(40) = 3 both ways) by an
@@ -1583,7 +1583,7 @@ A free mod-8 by-product over the banked `Fix(g)` corpus (n <= 32, 0
 mismatches) caught its own first version's algebra error, 21 of 33 rows;
 both congruences are now in `gate-subgroup` (13 checks, 5 controls).
 
-Idea 1 of `results/unexplored-avenues.md` is marked EXECUTED there, with its
+Idea 1 of `results/closed-doors.md` is marked EXECUTED there, with its
 A030222-unstranding payoff STRUCK: Burnside needs per-element `Fix(d)`, the
 24h/126GB blocker, which subgroup counts do not supply.
 
@@ -1594,7 +1594,7 @@ height), plus `--strips` and `--maxwidth`. The refinement
 `T(n,H) = I_H(<h>) + I_H(<v>) + I_H(C2) - 2 I_H(D2ax) (mod 4)` is gated at
 n<=8 with a control that fails if the height grouping is reused for both
 mirrors instead of transposed. **Do not resume the n=40 push** without reading
-`results/subgroup-mod4.md` §"why it is NOT being bought": r180's cost peaks on
+`results/symmetry-classes.md` §"why it is NOT being bought": r180's cost peaks on
 exactly the H=15..19 band (H=15,19,20,25,30 all past a 120s cap at N=40, while
 H=34,38,40 collapse to seconds), `I_H(<v>)` has no bounded-height route short
 of a new vmirror sweep mode, and the bit it buys hardens single-cell errors —
@@ -1606,8 +1606,8 @@ the one failure mode this project has never had.
 (~500 cells instead of 78), not to reach n=40 — the mod-8 companion shipped
 with a wrong coefficient and only banked data caught it. Heartbeat ETA was
 drifting 17:27 -> 16:25 as the tall strips cleared; budget ~1h from its 15:39
-start. On completion: `results/percell-mod4.md` **does not exist yet and is
-already referenced from `results/subgroup-mod4.md`** — write it.
+start. On completion: `results/symmetry-classes.md` **does not exist yet and is
+already referenced from `results/symmetry-classes.md`** — write it.
 
 **`make` NOT re-run since the symtm edit.** `gate-subgroup` is GREEN on its
 own (17 checks, 7 controls); the full suite was last green at `16236db`. Run a
@@ -1655,11 +1655,11 @@ replaced by the true statement behind it — **k!·P_k ∈ ℤ[n]**, observed at
 all 19 wired levels, load-bearing for `diagCoeffTable`'s representation
 and the k!-divide guard — and since proved (Lean `IntCoeff.lean`,
 `production_factorial_int`, via integer-valuedness). 2026-07-31 sharpening
-(`results/converse-sweep.md`): k! is NOT the minimal denominator — from
+(`results/closed-doors.md`): k! is NOT the minimal denominator — from
 k = 5 the true minimum is k!/5 (k!/25 at k = 11 and k = 15..18); only
 5-adic content drops. **So quote the divisibility, never the minimality — and
 stop there.** The law behind the drop was proved the same day
-(`results/v5-denominator-law.md`: the 5-part collapses from v₅(k!) to
+(`results/arithmetic-structure.md`: the 5-part collapses from v₅(k!) to
 v₅(⌊k/2⌋!) because Λ − 1 vanishes to order 2 mod 5) and then **DEMOTED to a
 closed door** in the claim-pruning pass above: the minimal denominator is a
 property of the *monomial-basis representation* of an integer-valued
@@ -1682,7 +1682,7 @@ to N=40 covers heights H<=14 on those rows — **53.8% / 50.8% / 47.9% /
 45.0%** of a(37)/a(38)/a(39)/a(40) respectively. This is the single
 highest-value remaining validation action the campaign found, and it is
 one command with no new code. When it lands, update
-`results/strip-engine.md`'s mass table and
+`results/second-sources.md`'s mass table and
 `results/ns_a40/PROVENANCE.md`'s corroboration section.
 
 Still jasonp's, unchanged: the two `paper/technical-report.tex`
@@ -1699,7 +1699,7 @@ placeholders (a(40) appears as 5.7e31 in the abstract and Table `tab:an`
   resume at phase C, fixed dd748c4) whose relaunch triggered Zero
   Harvest (above).
 - **Fan-In Tax FIXED + branch deployed/validated on dalby (2026-07-23,
-  `results/fanin-tax.md`):** the dalby bench A/B exposed ~75% of worker CPU
+  `docs/engine-record.md`):** the dalby bench A/B exposed ~75% of worker CPU
   going to (units x input-files) open/seek overhead + 256KB-peek reads +
   mmap-threshold buffer churn + byte-at-a-time request getline — none of it
   visible on gympie. Four fixes (orchestrator input pruning [red-first
@@ -1781,7 +1781,7 @@ placeholders (a(40) appears as 5.7e31 in the abstract and Table `tab:an`
   fresh a(20) --compare PASS. (c) **--max-diag-k** (gated): forces a wired
   diagonal back to a real sweep — the strict route is `--max-diag-k 16` at
   maxn=37 (real H20 = P_17's first independent holdout). (d) a(37) plan +
-  dalby checklist: `results/second-wind.md`. Pending: dalby rebuild + bench A/B (needs
+  dalby checklist: `docs/engine-record.md`. Pending: dalby rebuild + bench A/B (needs
   ssh-agent; jasonp travelling, ayr out of reach — dalby_term.sh is
   dalby-solo anyway). Predicted a(37): trusted ~1.2-2.5h, strict ~2.5-5h.
   **Resume state 2026-07-22:** branch `second-wind` (7 commits off master
@@ -1796,7 +1796,7 @@ placeholders (a(40) appears as 5.7e31 in the abstract and Table `tab:an`
   network change — expected, its run was already banked.
 - **strip C_14 COMPLETE 2026-07-22** (dalby, 7.5h): 413 cells, **0 mismatch —
   columns H≤14 independently confirmed to n=36** (`results/strip_C14_run.log`,
-  `results/strip-engine.md`). PinGrand anchors T(26,14)/T(27,14) now
+  `results/second-sources.md`). PinGrand anchors T(26,14)/T(27,14) now
   multi-source; single-algorithm anchor set down to 7 cells (levels 13B–16).
   Hostile-witness audit + full fix list applied same day
   (`docs/lean-hostile-witness.md`): Audit.lean now #guard_msgs-enforced,
@@ -1814,7 +1814,7 @@ history — not repeated here. Read this file, then `MEMORY.md`'s index.
   `results/ns_a{n}/`; a(1)-a(20) match the b-file, a(21)+ chain-match each prior term.
 - **P17 derivable+validatable** (fit real T(34,17)+T(35,18), holdout real T(36,19));
   wiring it makes a(37)'s top real height H19. **Atom Ledger** banked
-  (`results/triangle-structure.md`): triangle dependency structure fully mapped,
+  (`results/diagonal-formula.md`): triangle dependency structure fully mapped,
   root-separation theorem proves no bounded-depth cross-column relation.
 - **a(20) two-algorithm CONFIRMED 2026-07-11** (Redelmeier `build/g2` rev 7eab237 vs
   the TM engine): whole row n≤20 matches banked exactly, 0 mismatches. Banked
@@ -1826,12 +1826,12 @@ history — not repeated here. Read this file, then `MEMORY.md`'s index.
   exactly** (row 21 = 6954084405510437, row 22 = 47255332844367680).
   **Two-algorithm frontier now 22.** Boxes ALL FREE. Unblocked, jasonp's
   call: a(37) (~3.5h trusted-P17 / ~10h strict) and the H=11 GF
-  re-recovery. Run history in results/terminal-velocity.md + provenance.
+  re-recovery. Run history in docs/engine-record.md + provenance.
 
 ## Rigorous λ bounds (NEW 2026-07-11)
 - **Two-sided rigorous bracket 6.543 ≤ λ ≤ 9.3154**, numerical λ≈7.111 inside.
   Lower (2026-07-31): certified strip ladder — exact Collatz–Wielandt certificates
-  μ₂..μ₁₇, μ₁₇ ≥ 6543/1000 (`results/strip-mu-certificates.md`, receipts in
+  μ₂..μ₁₇, μ₁₇ ≥ 6543/1000 (`results/growth-constant.md`, receipts in
   `results/strip_mu_certificates.log`); supersedes directed/multi-directed
   (3+2√2 exact, 6.475 numerical), which remain the best closed-form/lightweight
   bounds. Upper
@@ -1853,7 +1853,7 @@ n=32; a(36)/a(33) staged as conjectured comments). Full pre-submission audit
 2026-07-16: every staged term verified against live OEIS + banked data; one
 confabulated cross-ref (A337601) caught and fixed. **Submission is jasonp's,
 gated on his own readiness process** (OEIS AI policy makes the author personally
-responsible; `docs/oeis-ai-policy.md`).
+responsible; `docs/publication.md`).
 - **Viva** (local-only, git-excluded: docs/viva-exam.md, viva-reserve.md [chmod 000],
   viva-state.md, drill{1,2}-*.md): first exam 56.5/100 vs bar ≥80. Drills 1 & 2 graded;
   cold retake variants (V8/V12/V13, V18/V19/V20) still pending after a spacing gap.
@@ -1900,7 +1900,7 @@ spine digit-product on all in-band cells).
   4.47% dalby win, gates+ASan clean); `redesign` / kink-sharded (K-shard private-sweep
   kernel, opt-in `--kernel kink-sharded`, real 4.93x at H14/maxn26, still not the default
   and not head-to-head'd at dominant-height scale).
-- **steal-tail diagnostic** (`results/steal-tail-h18.md`): banked, not deployed.
+- **steal-tail diagnostic** (`docs/engine-record.md`): banked, not deployed.
 - **a(37) READY on branch `second-wind` (2026-07-22, supersedes the 07-12
   shelf costing):** P_17 wired (see Second Wind above; the 07-12 note's "fit
   uses the out-of-onset n=34 point" was wrong — n=34 is off the polynomial,
@@ -1909,16 +1909,16 @@ spine digit-product on all in-band cells).
   route adds the real H20 sweep (~2.5-5h), which certifies P17, retires
   a(36)'s T2-, and ends the banked range at an odd frontier
   (frontier-parity law). jasonp's call which route; dalby deploy checklist
-  in results/second-wind.md.
-  **P17-from-the-gas MEASURED DEAD 2026-07-13** (results/defect-gas.md): weight-DP
+  in docs/engine-record.md.
+  **P17-from-the-gas MEASURED DEAD 2026-07-13** (results/diagonal-formula.md): weight-DP
   cost ~20x/k, k=17 ~10^17s; the strict H20 sweep is the only certification route.
 - **Ternary Spine (2026-07-12, BANKED):** the height triangle mod 3 is governed by
   the spine cubic **W³ = W² + t** over 𝔽₃ — digit-product law, first-nonzero-per-
   column ≡ 1, and the **SNF count ⌈(N−1)/3⌉ PROVED** modulo the diagonal law + a
-  3-item ladder. `results/ternary-spine.md`, `experiments/ternary_spine.py` (15/15).
+  3-item ladder. `results/arithmetic-structure.md`, `experiments/ternary_spine.py` (15/15).
   **Ladder RETIRED as empirical input 2026-07-12** by the defect gas (below).
   Open: individual SNF exponents. Candidate paper paragraph — jasonp's call.
-- **Defect gas / MASTER EQUATION (2026-07-12, BANKED):** `results/defect-gas.md`,
+- **Defect gas / MASTER EQUATION (2026-07-12, BANKED):** `results/diagonal-formula.md`,
   `experiments/defect_gas.py` (row model + `master`/`ladder` checks). The diagonal
   law's H is the grand-partition factor of a 1D cluster gas; exact chain identity
   (40/40 vs banked triangle incl. boundaries); master equation
@@ -1953,11 +1953,11 @@ spine digit-product on all in-band cells).
   subset* of ℤ² — **Wang & Wang 1977**, the primary, with the ℤ² count explicit
   in Altshuler et al. 2006 — applied to the union of all the holes closes the
   multi-hole case in three lines
-  (`results/maxhole-proof.md` §The union argument; both PDFs now in `papers/`).
+  (`results/subclasses.md` §The union argument; both PDFs now in `papers/`).
   It ships as a cited corollary plus our n ≤ 17 enumeration; the repo's own
   chain is an independent reproof, kept as a check.
   *Superseded account of the same item, from 2026-07:*
-  (`results/maxhole-proof.md`, figs `results/figs/maxhole_{ring,seal}.svg`, checker
+  (`results/subclasses.md`, figs `results/figs/maxhole_{ring,seal}.svg`, checker
   `experiments/maxhole_proof_check.py`). Near-complete proof: construction = diagonal
   diamond ring (done for n≡0 mod 4); upper bound reduced to **one open lemma (II')
   n≥ha+hm+2** (a closed king-curve enclosing an ha×hm diagonal region needs ≥ha+hm+2
@@ -1967,7 +1967,7 @@ spine digit-product on all in-band cells).
   needs a winding/Jordan-curve argument. Also open: clean elongated-diamond family for
   n≢0 mod 4. Jasonp to examine the (II') winding argument. Session-research thread;
   companions this session: [[hole-free-growth-constant]], [[height-distribution-collapse]],
-  results/series-analysis-da.md (θ=−1).
+  results/growth-constant.md (θ=−1).
 
 - **dm-mirror law PROVED (shape) 2026-07-15** (docs/proofs/dm-diagonal-law.md):
   segment grammar (<=2k+1 perfect diag/anti segments, reversal lemma tight) +
@@ -1978,7 +1978,7 @@ spine digit-product on all in-band cells).
   Referee pressure point: Lemma 5 (rank/telescoping). Paper updated in 5
   places (abstract/intro/contributions/T3 tier/dmdiag section; T3
   degree-transition failure mode eliminated, onset-shift mode remains,
-  bounded); verify_claims 407/407, compiles clean. Program history: `results/dm-diagonal-recon.md`,
+  bounded); verify_claims 407/407, compiles clean. Program history: `results/symmetry-classes.md`,
   `experiments/dm_sym_enum.py` (validated vs banked law). d(S,S)=2 PROVED
   (permutation skeleton: monotone king permutations). Two-family dichotomy
   refuted (anti-excursion family = the known parity anomaly); proof frame =
@@ -1987,7 +1987,7 @@ spine digit-product on all in-band cells).
 
 - **Kernel/haruspicy/ACSV program (2026-07-14, in flight):** order K2 -> H1 ->
   ACSV -> K1 -> H2 -> K3. K2 DONE (Temperley on column-convex polyplets =
-  rediscovery of A187077, pipeline validated; results/convex-polyplets.md).
+  rediscovery of A187077, pipeline validated; results/subclasses.md).
   H1 DONE + UNCONDITIONALIZATION PUSH 2026-07-15 (results/anisotropic-not-dfinite.md):
   dominant-pole dichotomy theorem (y-D-finite => deg_Q(mu_H) <= D for all but
   r heights); strip growth constants proven strictly monotone (PF route,
@@ -2005,11 +2005,11 @@ spine digit-product on all in-band cells).
   full non-D-finiteness conditional on deg psi -> infinity. H=11 banked GF
   found anomalous (validated=False, shares no roots with Q9Q10) — needs
   re-recovery before any use. ACSV DONE
-  (appendix of results/height-distribution-collapse.md): tall-flank rate
+  (appendix of results/growth-constant.md): tall-flank rate
   function psi(alpha) = (1-3a)ln3 + Legendre(ln H); saddle reproduces exact
   T(36,36-k) to ~1-3% for k=3..14, breaks at the alpha->1/2 band edge as
   expected; experiments/flank_saddle.py. K1 DONE
-  (results/allpairs-kernel.md): gap-walk reformulation exact (l<=8); constant
+  (results/below-onset.md): gap-walk reformulation exact (l<=8); constant
   **rho ~= 14.41** (37 digits CUT 2026-07-31, claim-pruning pass: the constant
   is ours alone, appears nowhere else, and has no known minimal polynomial, so
   the precision only sharpened an unanswerable question — the CLAIM is the
@@ -2019,7 +2019,7 @@ spine digit-product on all in-band cells).
   P-plateau confirmed; algebraic but no low-degree form (PSLQ excludes
   deg<=10, coeffs<=1e10; two spurious fits exposed -- the cautionary half);
   exact elimination documented, NOT to be executed.
-  H2 DONE (results/convex-anisotropic.md): convex strip GFs recovered
+  H2 DONE (results/subclasses.md): convex strip GFs recovered
   exactly H<=7 (orders 1,3,7,14,25,36,53); finding = root RECYCLING (psi
   degrees 1,2,3,5,7,6,8), opposite of the full family's separation -- weak
   exclusion boxes only, Mirage unstrengthened, but sharpens that the H1
@@ -2029,7 +2029,7 @@ spine digit-product on all in-band cells).
   units mod 2, no collapse).
 
 - **UNIVERSALITY (2026-07-15): the diagonal law holds on the hex lattice**
-  (results/hex-diagonal-law.md, experiments/hex_gas.py): T_hex(n,n-k) =
+  (results/diagonal-formula.md, experiments/hex_gas.py): T_hex(n,n-k) =
   P_k(n)*2^(n-1-3k), P_1 = 9n-15 (11 holdouts), same onset; single-row
   weights (s+1)^2, gap pairs impossible; **dyadic spine = the SAME cubic
   H^3 = H^2 + u over F_2** with G = 1 + uH^-3. Lattice picks the prime
@@ -2082,7 +2082,7 @@ newest first:
 
 - **`5b9e569` two-row weights filed.** The long DP run from the prior session
   landed: eight interior weights W(a,b) — (2,7) (2,8) (3,5) (3,6) (3,7) (4,4)
-  (4,5) (5,5), W(5,5) alone 8.4 h — banked in `results/defect-gas.md` with
+  (4,5) (5,5), W(5,5) alone 8.4 h — banked in `results/diagonal-formula.md` with
   costs and in `cluster_weight_dp.py` as `TWO_ROW_INTERIOR`; new CLI
   `cluster_weight_dp.py pair A B` reproduces a cell and self-checks.
   Consequences: the a=2 cubic now has three holdouts; **the a=3 row is the
@@ -2103,7 +2103,7 @@ newest first:
   alone. verify_claims **448/448**, pdflatex clean. Unrun and optional:
   MathSciNet, Google Scholar's own Cited-by.
 - **`a621ee2` comb shatter** — the concatenation route to a better λ upper
-  bound, priced then closed (`results/concatenation-upper-bound.md`,
+  bound, priced then closed (`results/growth-constant.md`,
   `experiments/concatenation_bound_check.py`). A degree-2 P would have given
   λ ≤ 7.745 (deg 3 → 8.642, deg 4 → nothing), and 40 terms refute no such
   relation; but the lexicographic split shatters a king comb into ~n/4
@@ -2160,7 +2160,7 @@ local, NOT pushed. Newest first:
 - **Gate CITATIONS added** (`tests/gate_citations.py`, wired first in
   `make gates`). Every repo path cited in a tracked markdown file must exist;
   templates, lines marked deleted/planned, and paths in git history are
-  allowed. Written because `results/beyond-polyplets.md` cited a
+  allowed. Written because `results/subclasses.md` cited a
   `results/cloud-investigation-2026-07-07.md` that has never existed — the name
   belongs to a *memory* entry, not the repo. Six citation fixes landed with it
   (beyond-polyplets, certificate-squeeze-plan Phase 3 deliverables never
@@ -2168,7 +2168,7 @@ local, NOT pushed. Newest first:
   removed, related-seqs-n24's brace-glob path). Full `make`: 16 gates GREEN,
   10m17s.
 - **Proposition 6 rewritten for a reader, not a checker.**
-  `results/hv-growth-sandwich.md` gains a 215-word notation-free orientation at
+  `results/subclasses.md` gains a 215-word notation-free orientation at
   the head of §The proof (fatten / shear / thin; the ends are free, the middle
   has the entropy), and Lemmas 2 and 3 are re-proved in the same register —
   Lemma 2 split explicitly into its bijection half and its counting half with a
@@ -2178,7 +2178,7 @@ local, NOT pushed. Newest first:
   `make gate-middle-kingdom` GREEN after.
 - **Status of the tier-1 gate: still open.** jasonp follows the *sketch* as of
   this session; he has not vetted Lemmas 2 and 3, which is what
-  `docs/sortie-publication-plan.md` §3 actually asks for. So the Lean route (P1)
+  `docs/publication.md` §3 actually asks for. So the Lean route (P1)
   is not yet demoted to nice-to-have in practice.
 - **Lean cost, estimated against the tree (2026-08-06).** Lemma 3 alone ≈400
   lines and no new mathematics — `Polyplets/StairAnimals.lean` already has
@@ -2204,7 +2204,7 @@ local, NOT pushed. Newest first:
   Two things the pass corrected: the numeric floor `µ ≥ 3.1234…` is
   *conditional* on the banked `M 700` in any Lean version (the
   `lambda_gt_of_banked` shape), and Corollary 4 is a four-line elementary gap
-  argument (`results/middle-kingdom-phase3.md:86`), not the `maxhole`-style
+  argument (`results/subclasses.md:86`), not the `maxhole`-style
   theory gap first feared.
 - **Lean route EXECUTED — Lemma 3 and `µ` are theorems.**
   `polyplets/Polyplets/Fekete.lean` (the ladder, once: supermultiplicative +
@@ -2239,7 +2239,7 @@ local, NOT pushed. Newest first:
    Cost scales ×4.2/term off a measured n=19 baseline of 61 h summed per-height wall
    (201 CPU-h) with a 21.6 h critical-path height, so n=20 is ~11 days of summed wall
    and n=22 ~190 days. Cost model + fit impact in
-   `results/hole-free-growth-constant.md`.
+   `results/subclasses.md`.
 
 ## Starting a fresh session from here
 Read this file, then `MEMORY.md`'s index (auto-loaded) for standing practices. No open

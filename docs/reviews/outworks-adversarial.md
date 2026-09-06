@@ -163,7 +163,7 @@ Grouped by theme; file:line detail preserved where actionable.
 **Holes (OW-6) — documentation vs the improved construction.**
 - The landed diagonal-frame family (`hullBox ∖ boxHole`, card a+b+2 for ALL
   a,b) is a genuine, *documented* improvement over the brief and the python
-  family — but `results/maxhole-proof.md` and paper §8 still carry the
+  family — but `results/subclasses.md` and paper §8 still carry the
   now-known-false unqualified claim that the 4-neighbour ring "has exactly
   a+b+2 cells" (it has a+b+1 when min(a,b)=1 with max even — measured over
   all 144 pairs a,b ≤ 12) and is a single-hole witness (false for
@@ -349,7 +349,7 @@ only (paper is read-only).
   sets exactly); HolesUpper doc numbers replaced with the deterministic
   ones and the u-level fixed; MoatBound corroboration recorded in the
   module doc; `rookStep` made public; disconnection warning added to
-  `ringAnimal_singleHole`; caveat added to `results/maxhole-proof.md`.
+  `ringAnimal_singleHole`; caveat added to `results/subclasses.md`.
 - Universal set: the three out-of-sample examples made enforcing
   (`rw [← T_*_5_4]` so the anchor numeral meets the law in one statement);
   `gd3_Tc_agrees` docstring corrected; `Compute.lean` reach-1 list fixed;

@@ -1,6 +1,6 @@
 > **NOTE: authored by Claude at jasonp's direction, 2026-08-07.** This is a
 > planning document, not a result. It supersedes §2 and §6 of
-> `docs/sortie-publication-plan.md`; that file's §3 (Proposition 6 / B1), §4
+> `docs/publication.md`; that file's §3 (Proposition 6 / B1), §4
 > (the Lean push) and §5 (the N1–N6 novelty sweep) still stand and are not
 > restated here.
 
@@ -65,7 +65,7 @@ closed forms are how a(37)–a(40) were composed — and in P2 as *object*: the 
 the mechanism, the arithmetic. Say so in both, once.
 
 **P3's open gate is unchanged.** Proposition 6 is tier-1-eligible but the
-reading gate on `results/hv-growth-sandwich.md` Lemmas 2 and 3 is still open. If
+reading gate on `results/subclasses.md` Lemmas 2 and 3 is still open. If
 jasonp reads them, µ = 3.128943… is his; if he does not, it moves to L5 and P3
 cites it.
 
@@ -126,8 +126,8 @@ nothing else:
 
 | job | box | feeds | state |
 |---|---|---|---|
-| `scripts/dalby_square4_deep.sh` (window `j7w17`, PID 2423184) | dalby | the **minimum end** of `results/perimeter-both-ends.md` — square4 boxes W = 15, 17 at parity 0, rmax = 8; the `1, 4, 18, 60, 187` ladder that diverges from king's `1, 4, 14, 40, 105` | running, 4.6 h in at 17:38 |
-| `dalby_perimeter_defect_pool.sh square8 78 6` then `square4 78 6` (window `pdk6big`, stage-1 driver PID 2420612, outer PID 2420610) | dalby | **k = 6** for `results/perimeter-defect-diagonals.md`, which is currently banked only through k = 5 — the claim "identical degree, period, onset and leading coefficient on both lattices through k = 5" either extends or breaks here | running, 7.5 h in at 17:38; stage 2 (square4) has not started |
+| `scripts/dalby_square4_deep.sh` (window `j7w17`, PID 2423184) | dalby | the **minimum end** of `results/perimeter.md` — square4 boxes W = 15, 17 at parity 0, rmax = 8; the `1, 4, 18, 60, 187` ladder that diverges from king's `1, 4, 14, 40, 105` | running, 4.6 h in at 17:38 |
+| `dalby_perimeter_defect_pool.sh square8 78 6` then `square4 78 6` (window `pdk6big`, stage-1 driver PID 2420612, outer PID 2420610) | dalby | **k = 6** for `results/perimeter.md`, which is currently banked only through k = 5 — the claim "identical degree, period, onset and leading coefficient on both lattices through k = 5" either extends or breaks here | running, 7.5 h in at 17:38; stage 2 (square4) has not started |
 | `scripts/ayr_pmin48.sh` (driver PID 2261, tmux `0:pmin48`) | ayr | the **king-lattice** minimum end at p = 48, the partner of the square4 run above | restarted 18:01 EDT on the resumable per-frame driver, after the first attempt lost 3.9 h to a 0-byte all-or-nothing output. Gates and a p=40 reproduction check both green first |
 
 So L6 cannot be written until the k = 6 pool lands on both lattices and both
@@ -142,17 +142,17 @@ all complete and validated.
 ### Gated on reading, not compute
 
 - **P1** — the mod-2 / mod-4 subgroup census landed *today*
-  (`results/subgroup-mod4.md`, `results/percell-mod4.md`): a parity bit on all
+  (`results/symmetry-classes.md`, `results/symmetry-classes.md`): a parity bit on all
   820 cells of the a(40) triangle with 0 mismatches, covering every cell of
   mass including the 43.84% band that previously had no second source at all,
   plus a(n) mod 4 confirmed at every n ≤ 40 and a mod-8 cross-check to n ≤ 32.
   That is a material change to the validation chapter, which until today topped
   out at the strip engine's 72.2% cell coverage. Read both notes before writing
-  §Reproducibility. `results/stretched-exponential-test.md` also landed today
+  §Reproducibility. `results/growth-constant.md` also landed today
   and belongs in the growth paragraph: µ₁ → 1.0068 against a method calibrated
   to resolve 1%, so the stretched exponential is tested and absent, and the same
   fit returns θ → −0.981 while free to blame one.
-- **P3** — `results/hv-growth-sandwich.md` Lemmas 2 and 3 and Proposition 6.
+- **P3** — `results/subclasses.md` Lemmas 2 and 3 and Proposition 6.
   Reading only; decides whether µ = 3.128943… is P3's or L5's.
 - **L2 and L6** — a novelty sweep each, in the N1–N6 style. No compute. N1–N6
   covered the diagonal law, haruspicy, the staircase squeeze, HV-convex king

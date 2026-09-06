@@ -86,7 +86,7 @@ predictions get NO bits number unless the proposer justifies one
 holdout predictions are implied by prior work are CULLED
 KNOWN-COINCIDENT; `known.py` currently encodes the diagonal law
 (`docs/proofs/diagonal-law.md`, exact, k ≤ 13 fully determined in-grid),
-the ternary spine mod 3 (`results/ternary-spine.md`: T4 activation zeros,
+the ternary spine mod 3 (`results/arithmetic-structure.md`: T4 activation zeros,
 T1 digit-product spine values, T3 even boundary, deficit-2 ≡ 2), and the
 engine's low-strip columns H ≤ 2. Restating anything on the brief's
 prior-work list that `known.py` does NOT encode (column TM results,
@@ -118,7 +118,7 @@ Results (`sweep_report.md` has the full record):
   period 4, and an order-7 constant-coefficient recurrence for T(n,3)
   (each 17/17 holdout rows + row 40). All four were then **culled
   KNOWN-COINCIDENT** once `known.py` grew the `ColumnCFinite` family
-  (`results/triangle-structure.md` §1–2: minimal column recurrences for
+  (`results/diagonal-formula.md` §1–2: minimal column recurrences for
   H≤4, orders 1,3,7,15). They are restatements: the order-7 recurrence IS
   the banked H=3 column recurrence, and eventual residue periodicity mod m
   follows from any C-finite integer sequence — so the congruences are

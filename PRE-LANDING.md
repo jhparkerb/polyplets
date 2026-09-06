@@ -58,7 +58,7 @@ already closed and is here so that nobody re-opens it during the landing.
       stay local regardless — confirmed: `git ls-files | grep viva` is empty.)
 - [ ] **Does `results/ghostship/` go public?** A graded experiment on the
       project's own process, including the grading and the divergence record.
-      `results/ghostship/DISPOSITION.md` decides what it licensed; it does not
+      `docs/lessons-learned.md` decides what it licensed; it does not
       decide whether a stranger reads it.
 - [ ] **The L ledgers' "human verification: none".** All nine say it. Either
       you read enough of a paper to replace that with a specific per-result
@@ -68,7 +68,7 @@ already closed and is here so that nobody re-opens it during the landing.
 - [ ] **Byline per L paper.** `docs/publication-split.md` §1 makes this a
       per-paper decision, explicitly not a policy. Nine papers, nine answers.
 - [ ] **P1.** `paper/technical-report.tex` is ~40% built, and
-      `docs/main-paper-audit-2026-08-18.md` holds findings on it that are
+      `docs/publication.md` holds findings on it that are
       unapplied by design. Publish the repo without it (the current strategy
       doc's Track D says the repo is the publication and P1 is later), or hold
       the landing for it.
@@ -226,7 +226,7 @@ would publish.
 
 ## D. Closed — do not re-open during the landing
 
-- Acceptance queue items 1–6: **all closed** (`docs/acceptance-queue.md`).
+- Acceptance queue items 1–6: **all closed** (`docs/publication.md`).
 - Ticker Tape (H=19): priced at ~197 GB against dalby's 125 and ~26 days,
   declined. The ladder ends at H=18 and `a(n)` is rule-independent for n ≤ 35.
 - The k=7 perimeter-defect census: 76–179 days on the 76-way pool. Not

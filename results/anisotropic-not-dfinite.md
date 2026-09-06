@@ -48,7 +48,7 @@ a(x) remains untouched.
 ## Notes
 
 - This is the Atom Ledger's root-separation theorem
-  (`results/triangle-structure.md` §6) re-run at the generating-function
+  (`results/diagonal-formula.md` §6) re-run at the generating-function
   level, where a pole-localization argument replaces the Vandermonde; the
   ψ-construction removes any reliance on the triple-product atom law (whose
   no-cancellation part was only verified for H ≤ 7).
@@ -277,7 +277,7 @@ rather than left for a referee to notice.
 and (cro_n) are P-recursive modulo 2^k for every k — an object with no
 P-recursive description whose reductions mod a prime power are algebraic.
 That is structurally the same phenomenon as our ternary spine
-(`results/ternary-spine.md`): the height triangle admits no C-finite
+(`results/arithmetic-structure.md`): the height triangle admits no C-finite
 recurrence, yet mod 3 it is governed by the cubic W^3 = W^2 + t. Different
 combinatorics, same shape of answer. Whether the mechanisms are related is
 open and nobody has looked.

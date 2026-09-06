@@ -31,8 +31,8 @@ comment-only edit is why its `fixtures/SHA256SUMS` entry was re-pinned, with the
 | anchor | published by | what we reproduce | receipt | status |
 |---|---|---|---|---|
 | **A006770, a(1)–a(18)** | OEIS entry, pre-dating this work | all 18 terms, exactly | `fixtures/b006770.txt` lines n≤18; `make gate-bfiles` | **re-checked live 2026-08-19** |
-| **A067675 / A067676** | Kotesovec (convex polyominoes by area) | 50 terms each, from the control arm of the king kernel pipeline | `results/convex-polyplets.md` | recorded; not re-run today |
-| **A222205** | Sloane 2013, from Bacher | all 23 published terms, extended to 200 | `results/multi-directed.md`, `results/multidirected_terms_n200.txt` | recorded |
+| **A067675 / A067676** | Kotesovec (convex polyominoes by area) | 50 terms each, from the control arm of the king kernel pipeline | `results/subclasses.md` | recorded; not re-run today |
+| **A222205** | Sloane 2013, from Bacher | all 23 published terms, extended to 200 | `results/subclasses.md`, `results/multidirected_terms_n200.txt` | recorded |
 | **A187077** | OEIS (column-convex) | the generating function, rediscovered verbatim by Temperley's method | L5 §column-convex | recorded |
 | **A053993** | Andrews, Memoirs AMS 301 (1984), `phi_2` | the square lattice's diamond-tip series, to n = 40 | `experiments/cone_order_ideals.py`; L6 §min | recorded |
 | **A(n,2n+2) = 1, A(n,2n+1) = 4(n−2)** | Asinowski–Barequet–Zheng | our square-lattice defect column's k = 0 and k = 1 rows | L6 §max | recorded |
@@ -42,7 +42,7 @@ comment-only edit is why its `fixtures/SHA256SUMS` entry was re-pinned, with the
 | anchor | published value | ours | receipt |
 |---|---|---|---|
 | **Bender's convex-polyomino growth constant** | 2.30914 | same, extended to **121 trusted digits** by the control arm | L5 §μ |
-| **Klarner–Rivest constant (A276994)** | ~75 digits | every published digit, from the control kernel's smallest positive zero | `results/convex-polyplets.md` |
+| **Klarner–Rivest constant (A276994)** | ~75 digits | every published digit, from the control kernel's smallest positive zero | `results/subclasses.md` |
 | **Kotesovec's amplitude for A067675** | ~71 digits | every published digit, from the same residue formula | same |
 
 The control arm matters more than the king numbers beside it: it shares all its
@@ -76,7 +76,7 @@ uncertified one.
   ≈4.0625696 — six digits, from code never tuned to that lattice. The same run
   gives θ_square = −0.9995 against θ_king = −0.9997 at matched length, which is
   the universality prediction tested rather than quoted.
-  `results/theta-universality.md`.
+  `results/growth-constant.md`.
 
 ## Tier 4 — controls that are required to FAIL, and do
 

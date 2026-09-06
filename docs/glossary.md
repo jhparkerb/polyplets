@@ -52,7 +52,7 @@ independent μ_H strip-extrapolation, both converging on ~7.11). Rigorously
 bracketed **6.543 ≤ λ ≤ 9.3154**: lower from the certified strip ladder (μ₁₇ ≥
 6.543, exact Collatz–Wielandt certificate 2026-07-31, superseding Bacher's
 3+2√2 ≈ 5.828 directed / 6.475 multi-directed, extended to 6.475196280297,
-results/multi-directed.md); upper 9.3154 from a
+results/subclasses.md); upper 9.3154 from a
 Bui-style finite-type convolution certificate, machine-verified in exact rational
 arithmetic (the first polyplet upper bound, ours — none published). Derivation:
 [proofs/polyplet-upper-bound.md](proofs/polyplet-upper-bound.md).
@@ -147,9 +147,9 @@ paper's usage is recorded, not argued with.
 | transfer matrix | the column kernel (`core/transition.h`) and the kink kernel (`core/kink.h`); the sweep; `orchestrate` | the finite-lattice or transfer-matrix method, Jensen 2001 |
 | a transfer-matrix method that uses coloring instead of tracking connectivity | Motley, cutcount; `cpp/motley_par.cpp`, `results/cutcount_b1/` | the Fortuin–Kasteleyn / Potts spin representation of q^{components} |
 | Redelmeier enumeration | `g2` (`cpp/g2_redelmeier.cpp`); brute force; the fleet run | Redelmeier 1981 |
-| Burnsides congruences | the subgroup census, a(n) mod 4, `results/subgroup-mod4.md` | Burnside's lemma; D4 orbit sizes |
+| Burnsides congruences | the subgroup census, a(n) mod 4, `results/symmetry-classes.md` | Burnside's lemma; D4 orbit sizes |
 | double-checked, agree, confirms | two-source (two programs sharing no code); rule-independent (a second connectivity rule); tiers T1, T2, T2⁻ in `paper/polyplets-report.tex` | — |
-| joiner, domino, split | the doubled row; the pair weight 25 = 16 + 9 (`docs/proofs/T-n-nm1.md`, `results/defect-gas.md`) | — |
+| joiner, domino, split | the doubled row; the pair weight 25 = 16 + 9 (`docs/proofs/T-n-nm1.md`, `results/diagonal-formula.md`) | — |
 | holes | hole count k; the Euler-characteristic coordinate (`cpp/tma/euler.h`); flood fill (`g2 --holes`) | the A(n,k) hole triangle, staged |
 | one-sided, free, bilateral, asymmetric, non-polyominoes | the companions; the symmetry corpus `results/sym_counts.txt` | A030233, A030222, A030234, A030235, A194596 |
 | growth rate λ | λ; the Fekete floor a(40)^{1/40}; the differential-approximant estimate; the certified bracket (L3) | Klarner's constant, the growth constant |

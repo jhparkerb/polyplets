@@ -4,7 +4,7 @@ a(37) = 170463735577007360431441250424
 
 Computed 2026-07-23 on dalby alone (ARM Ampere Altra, 80 core), engine rev
 28e4056c (branch `second-wind`: P_17 wired + Fan-In Tax fixes,
-results/fanin-tax.md), launched 12:05 EDT via `scripts/dalby_term.sh 37`,
+docs/engine-record.md), launched 12:05 EDT via `scripts/dalby_term.sh 37`,
 foreground in tmux window 0:a37 with tee'd log.
 
 - Real sweeps H3-H19; H20-H37 via wired P_k closed forms (k = 37-H <= 17,

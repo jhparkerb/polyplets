@@ -5,8 +5,8 @@ the *shape* of the diagonal law — polynomial × 3-power, degree ≤ k, onset
 n ≥ 2k+1, integer-valued P_k — is proved below from an exact combinatorial
 decomposition. Machine checks: `experiments/diagonal_law_proof_check.py`
 (rational structure, degree bounds tight, exactness for every banked H,
-sharp onset, k ≤ 3). Companions: `results/defect-gas.md` (the decomposition
-and the enumerated weights), `results/ternary-spine.md` (the downstream
+sharp onset, k ≤ 3). Companions: `results/diagonal-formula.md` (the decomposition
+and the enumerated weights), `results/arithmetic-structure.md` (the downstream
 mod-3 structure).
 
 ## Statement
@@ -71,7 +71,7 @@ per-order to H = 33 in the checker.
 Each cluster row carries ≥ 1 surplus, so **ℓ_c ≤ k_c**. At surplus level k
 the catalogue is the 2^(k−1) compositions of k, all weights finite. This is
 the load-bearing triviality (it also drives the mod-3 collapse in
-`results/defect-gas.md`).
+`results/diagonal-formula.md`).
 
 ## Step 4 — rational structure
 
@@ -131,8 +131,8 @@ series); the residue resummation of Step 5 across k gives formal series
 C(y), μ(y) = 1/z* with A_H(y) := Σ_k T(H+k,H) y^k = C(y)·μ(y)^H per y-order
 for H ≥ k+1. Taking logs, the cumulants of A_H are *exactly linear in H* in
 the law's range — this is the G(y)H(y)^n grand form used throughout
-(`results/diagonal-closed-forms.md`), with H = μ/3 in the law's units, and
-it is what the master equation of `results/defect-gas.md` solves. The
+(`results/diagonal-formula.md`), with H = μ/3 in the law's units, and
+it is what the master equation of `results/diagonal-formula.md` solves. The
 Ternary Spine's remaining conditionality therefore reduces to the finitely
 many enumerated weights that enter each modulus (5 integers mod 27).
 
@@ -144,7 +144,7 @@ many enumerated weights that enter each modulus (5 integers mod 27).
   `N_k = 3^(k+1) D_1(k)` — an integer, since `P_k` has degree `k` and takes
   the integer values `T(n,n−k)·3^(3k+1−n)` at the `k+1` consecutive integers
   `n = 2k+1..3k+1`, hence integer values on all of ℤ — the derived quartic Φ of
-  `results/onset-defect-depth1-closed.md` §3 reduces mod 3 to
+  `results/below-onset.md` §3 reduces mod 3 to
   `2(W−1)³((1+x)W − x)`; the branch `W ≡ 1` is killed by `N_1 = 4`, leaving
   `N_k ≡ (−1)^(k+1) (mod 3)`, so `N_k ≠ 0` for every `k ≥ 1`. Proof and gate
   (`experiments/depth1_sharpness.py`) in that note; it rests on its
@@ -159,7 +159,7 @@ many enumerated weights that enter each modulus (5 integers mod 27).
   k!-divide guard checks exactness at each evaluation. But k! is NOT
   minimal: the minimal denominator is D_k = k!/5^{ĉ_k} with
   ĉ_k = v₅(k!) − H(k), H(k) = v₅(⌊k/2⌋!) − [k ≡ 1 (mod 10)]
-  (`results/v5-denominator-law.md`; lower bound proved, equality exact
+  (`results/arithmetic-structure.md`; lower bound proved, equality exact
   k ≤ 19). Only the 5-part ever drops: v_p(D_k) = v_p(k!) for p ≠ 5 at
   every measured level. (The old sentence here, "25^k/k! shows k! cannot
   be improved", was wrong: 25^k/k! in lowest terms has no 5-part in its

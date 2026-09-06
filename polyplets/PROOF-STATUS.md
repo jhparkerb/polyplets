@@ -174,7 +174,7 @@ Headline results and their audited axioms (verbatim from
 
   - **19 strip-second-sourced** — the anchors with H ≤ 14 and n ≤ 36, the
     reach of the banked independent strip transfer-matrix run
-    (`results/strip-engine.md`, 413 cells, 0 mismatch).
+    (`results/second-sources.md`, 413 cells, 0 mismatch).
   - **11 kink-only** — beyond strip reach even at N = 40 (all have H ≥ 15):
 
         T(28,15) T(29,15) T(30,16) T(31,16) T(32,17) T(33,17)
@@ -263,7 +263,7 @@ branch `lean-outworks`, orchestrator-reviewed per unit. Targets from the
     reaches H ≤ 14 only. So the theorem is conditional on a number, and the
     number has one algorithm behind it.
   - **Still weaker than the unformalized ladder.** The certified strip
-    ladder gives μ₁₇ ≥ 6.543 (`results/strip-mu-certificates.md`, addendum
+    ladder gives μ₁₇ ≥ 6.543 (`results/growth-constant.md`, addendum
     2026-07-31; bracket 6.543 ≤ λ ≤ 9.3154) — but it is not formalized. `6.22` is
     near-sharp for *this* route: `a(40)^(1/40) = 6.22084…`, so `6.23` is
     false, and no single banked term can do better than 6.221.
@@ -292,7 +292,7 @@ branch `lean-outworks`, orchestrator-reviewed per unit. Targets from the
   argument (module doc has both). `MoatBound` itself: 0 violations on
   the same 104,727 animals. Finding: `boxHole a b` is rook-DISCONNECTED iff min(a,b) = 1
   and max ≥ 3 (multi-hole rings, invisible to the total-area checks of
-  `results/maxhole-proof.md`).
+  `results/subclasses.md`).
 - `Northcott.lean` (OW-8) — house-arrest finiteness: bounded degree +
   bounded house ⇒ finitely many algebraic integers (bridges Mathlib's
   2025 `finite_mahlerMeasure_le`; the claims audit's "Mathlib lacks it"
@@ -420,8 +420,8 @@ translation-invariance form), duplicate `kingAdj_symm`s dropped for
 
 ## v5 denominator law (LANDED 2026-07-31, `V5Denominator.lean`)
 
-The corrected 5-adic denominator law of `results/v5-denominator-law.md`
-(replacing the refuted `⌈v₅(k!)/2⌉` fit of `results/converse-sweep.md` §2),
+The corrected 5-adic denominator law of `results/arithmetic-structure.md`
+(replacing the refuted `⌈v₅(k!)/2⌉` fit of `results/closed-doors.md` §2),
 kernel-checked against the pinned production data:
 
 - `N1..N18` + `Pp<k>_data` — the numerator lists, certified identical to
@@ -444,12 +444,12 @@ Axioms: `v5_law_all`, `ceil_fit_refuted`, `eleven_no_harvest` carry
 [propext, Quot.sound]; `u1_seed`/`g1_seed` add Classical.choice (norm_num).
 No native leaves. NOT formalized (open item): the general-`k` lower bound
 `ĉ_k ≥ v₅(k!) − H(k)` (Newton/multinomial over the boundary series G, Λ —
-paper-level proof in `results/v5-denominator-law.md`; would need formal
+paper-level proof in `results/arithmetic-structure.md`; would need formal
 finite differences + multinomial valuation bookkeeping over `ℤ[[y]]`).
 
 ## Staircase growth constant µ (LANDED 2026-08-06, `StairGrowth.lean`)
 
-`results/hv-growth-sandwich.md` Lemma 3 and the Fekete step on top of it —
+`results/subclasses.md` Lemma 3 and the Fekete step on top of it —
 the authorized slice of Proposition 6 (`docs/lean-staircase-growth-brief.md`;
 everything else about Proposition 6 stays a paper proof, deliberately).
 Three files:
@@ -509,8 +509,8 @@ Those five are written down as typechecking contracts in
 `Draft/Prop6Skeleton.lean`, which is outside the build (`defaultTargets =
 ["Polyplets"]`) and is the only file in the repo containing `sorry`. Its
 header names each contract, the paper proof that establishes it
-(`results/hv-growth-sandwich.md` Lemmas 1 and 2, Corollary 4 of
-`results/middle-kingdom-phase3.md`), and the numeric check that backs it.
+(`results/subclasses.md` Lemmas 1 and 2, Corollary 4 of
+`results/subclasses.md`), and the numeric check that backs it.
 `make gate-middle-kingdom` reaches all five, but not equally: Lemma 2's bound
 is verified outright to `n ≤ 120` with a RED control, the stack class and the
 HV-convex predicate are brute-forced against the grid, while Lemma 1's

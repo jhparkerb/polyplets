@@ -1,6 +1,6 @@
 # The dm-mirror diagonal law: proof
 
-2026-07-15. Completes the program of `results/dm-diagonal-recon.md`
+2026-07-15. Completes the program of `results/symmetry-classes.md`
 (step 1 = the reversal lemma, proved there; this document is steps 2-4).
 Machine anchors: `experiments/dm_sym_enum.py` (ground truth, matches the
 banked strip data), `experiments/dm_phase_census.py` (reversal lemma tight;
@@ -25,7 +25,7 @@ The pole multiplicities (k+1, k) are NOT an independent data-grade item:
 writing d(S,S+k) = A(S) + (-1)^S B(S), they are equivalent to deg A = k
 and deg B = k-1, i.e. to the banked equal-leading-coefficients fact plus
 lead(P_even - P_odd) = (-1)^k/(k-1)! -- see
-`results/dmirror-diagonals.md`, 2026-07-31.)
+`results/symmetry-classes.md`, 2026-07-31.)
 
 ## Setup and the skeleton
 
@@ -39,7 +39,7 @@ come in pairs, the number of surplus ORBITS is at most k.
 Reading rows y = 1..S: rows outside the fat set W (|W| <= k) carry a
 single cell at position pi(y); between consecutive single rows,
 king-connectivity forces |pi(y+1) - pi(y)| <= 1, and pi(y+1) = pi(y)
-costs a column surplus (results/dm-diagonal-recon.md, step 1). Maximal
+costs a column surplus (results/symmetry-classes.md, step 1). Maximal
 constant-direction stretches of the single-cell path are **segments**:
 perfect diagonal runs (x = y + d, offset d) or perfect anti-diagonal runs
 (x = c - y, center c). Everything else -- fat rows, zero-steps, and the
@@ -171,7 +171,7 @@ each. QED
   The same route would need a below-onset defect series for this family and
   an algebraic equation for it from a kernel argument; the family is a sum
   over two ground spines and no single kernel covers the sum
-  (`results/dmirror-grand-form-fails.md`), so the first step has no instance.
+  (`results/symmetry-classes.md`), so the first step has no instance.
   This is why D(33) fails condition 2 of the formula-cell rule in
   `results/confidence.md` while a(41) passes it.
 

@@ -2,7 +2,7 @@
 
 2026-07-15. Generalizes `docs/proofs/diagonal-law.md` (king lattice) to a
 class of lattices; the two instances proved there and in
-`results/hex-diagonal-law.md` become cases of one theorem, and the square
+`results/diagonal-formula.md` become cases of one theorem, and the square
 lattice joins as the degenerate b = 1 case. Machine checks:
 `experiments/universal_law_check.py` (square, this doc),
 `experiments/diagonal_law_proof_check.py` (king),
@@ -184,7 +184,7 @@ It reproduces every independently known form and then keeps going:
 | square | 1 | 2 | 8n² − 51n + 86 | matches A308359's **conjecture** |
 | square | 1 | 3 | 32/3 n³ − 140n² + 1960/3 n − 1090 | new |
 | square | 1 | 4 | 32/3 n⁴ − 712/3 n³ + 12635/6 n² − 52813/6 n + 14496 | new |
-| hex | 2 | 1 | 9n − 15 | matches `results/hex-diagonal-law.md` |
+| hex | 2 | 1 | 9n − 15 | matches `results/diagonal-formula.md` |
 | hex | 2 | 2 | 81/2 n² − 307/2 n + 71 | new |
 | hex | 2 | 3 | 243/2 n³ − 774n² + 1897/2 n + 28 | new |
 | king | 3 | 1 | 25n − 45 | matches `docs/proofs/diagonal-law.md` |
@@ -259,13 +259,13 @@ that produces its two coefficients.
 
 The polyiamond row is indexed by height, not by n, and its measured onsets are
 ⌊k/2⌋+2, earlier than the k+1 guaranteed; diagonals to k = 4 in
-`results/polyiamond-diagonal-law.md`.
+`results/diagonal-formula.md`.
 
 Onset sharpness — the formula fails at `n = 2k` for every `k` — is proved on
 square, hex and king through the depth-1 defect, whose generating function is
 algebraic and reduces mod `b` (mod 2 for hex, mod 3 for king; on square it is
-`x/(1+x)` outright): `results/skeletonkey-parametric-master.md` §The below-onset
-`D_1` is parametric, `results/onset-defect-depth1-closed.md` §3.
+`x/(1+x)` outright): `results/closed-doors.md` §The below-onset
+`D_1` is parametric, `results/below-onset.md` §3.
 
 CORRECTION 2026-07-31 (hygiene sweep; `experiments/universal_pair_weights.py`,
 two independent methods: direct gadget count with no gap cap, and
@@ -318,7 +318,7 @@ coefficient [n^k]P_k = W_pair^k / k!: proved for king (grand-form
 Corollary 2, Lean `lead_coeff_25`; the argument is uniform in the weights
 with 25 -> W_pair, not written out for general b), and measured: k = 1 at
 all six test lattices above (slope = W_pair), hex k <= 2 (banked lead
-81/2 = 9^2/2!, `results/hex-diagonal-law.md`), square deg-k diagonals
+81/2 = 9^2/2!, `results/diagonal-formula.md`), square deg-k diagonals
 (`experiments/universal_law_check.py`). Since W_pair >= 4 > 0, the
 "degree <= k" of Theorem A is never slack at the top.
 
@@ -333,10 +333,10 @@ all six test lattices above (slope = W_pair), hex k <= 2 (banked lead
   which is also lattice-universal, the two structural results about
   by-height triangles hold across the class.
 
-## Prior art (2026-08-06, `results/novelty-sortie.md` N5)
+## Prior art (2026-08-06, `docs/publication.md` N5)
 
 No height-diagonal law for lattice-animal triangles was found in print, and
-`results/diagonal-closed-forms.md` had already recorded no published T(n,n−k)
+`results/diagonal-formula.md` had already recorded no published T(n,n−k)
 closed forms. The nearest published relative measures the defect in
 **dimension** rather than in height, on polycubes:
 

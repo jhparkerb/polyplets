@@ -40,12 +40,12 @@ Flattened: 1, 1,3, 1,10,9, 1,27,55,27, 1,68,248,240,81, …
 - Column `H=1` = all-1s (horizontal bars).
 - Sub-diagonals `T(n,n-k)` have closed forms `P_k(n)·3^n`, deg `P_k = k`,
   e.g. `T(n,n-1)=5(5n-9)3^{n-4}`; the defect ideal gas (leading coeff
-  `25^k/(3^{3k+1}k!)`). See results/diagonal-closed-forms.md. Do NOT submit the
+  `25^k/(3^{3k+1}k!)`). See results/diagonal-formula.md. Do NOT submit the
   sub-diagonals separately — they are derivable diagonals of this triangle.
 
 **Regenerate / extend:** `results/ns_a36/perheight/h{H}.out` gives `T(n,H)` for
 H<=18, all n<=36 (main a36 engine). Or `build/g2 --per-box`. Independently
-cross-checked by the strip second source (results/strip-engine.md) over
+cross-checked by the strip second source (results/second-sources.md) over
 H<=14 **and n<=36** — the banked strip run's reach. Cells with H>14, and all
 cells at n=37..40, are not strip-covered as banked (an N=40 extension run was
 launched 2026-07-30).
@@ -118,4 +118,4 @@ Confirmed NOT in OEIS.
 The five anti-diagonal sequences `T(n,n-k)` (k=1..5) — derivable diagonals of
 Candidate A; their closed forms belong in A's comments, not as separate entries.
 Submitting them would be the OEIS flood jasonp flagged. (Values + closed forms:
-results/diagonal-closed-forms.md.)
+results/diagonal-formula.md.)

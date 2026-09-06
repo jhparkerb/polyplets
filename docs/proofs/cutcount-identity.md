@@ -16,7 +16,7 @@ contributes weight 0 if they carry two distinct colours — so the frontier stat
 is only the colour-coincidence partition of the last `H + 1` cells, and the
 engine never decides connectivity.
 
-Thread **Birthright**, 2026-08-14. Tier 1 of `docs/b1-closure-plan.md` §7: the
+Thread **Birthright**, 2026-08-14. Tier 1 of `results/second-sources.md` §7: the
 mathematical content of the Motley/B1 second-source engine, in closed form and
 proved as combinatorics. Ground truth for the rule is the banked source
 `results/cutcount_b1/cutcount_b1.cpp.59e90660` (sha256
@@ -134,7 +134,7 @@ so `[q¹] A_n(q)` counts the connected `n`-cell subsets of the board and
 `[q⁰] A_n(q) = 0` for `n ≥ 1`. Setting `q = 1` gives `Σ_{φ} w(φ)|_{q=1} = 1`
 for every `S`, so the `q = 1` evaluation counts all subsets, `C(HW, n)`. Those
 two consequences are the engine's `q0_zero` and `q1eval_binomial` self-checks,
-and neither consults connectivity — which is why `results/motley-step0.md` is
+and neither consults connectivity — which is why `results/second-sources.md` is
 right that only comparison against independently computed values catches the
 rule going wrong.
 
@@ -471,7 +471,7 @@ size suffice, and what is the minimal window?
 ## 11. Where to read what this bought
 
 A count with no closed form has nothing to lean on but a second method. What
-this one has closed is `results/motley-h17.md` and `results/motley-h18.md`; why
+this one has closed is `results/second-sources.md` and `results/second-sources.md`; why
 the engine's own self-checks were never going to be enough is
-`results/motley-step0.md`, which §3's corollary agrees with; the banked source
+`results/second-sources.md`, which §3's corollary agrees with; the banked source
 the model is a reading of is `results/cutcount_b1/`.

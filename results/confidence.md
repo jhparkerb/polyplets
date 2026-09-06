@@ -145,7 +145,7 @@ table.
 Two frontier values here are assembled with some of their cells supplied by a
 formula rather than enumerated: a(41) for the main sequence, and D(33), the
 diagonal-mirror count that four of the related sequences depend on
-(`results/related-seqs-n33.md`). One rule decides whether that is allowed, and
+(`results/symmetry-classes.md`). One rule decides whether that is allowed, and
 it is the same rule for both towers.
 
 A formula cell may enter a banked value when all three of these hold, and the

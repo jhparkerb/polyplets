@@ -14,7 +14,7 @@ rev 8ce1bc5c (branch `second-wind`), launched 2026-07-23 ~16:20 EDT via
 - H20 pole reality: peak frontier 127.3M records (2.8x H19's 45.3M peak,
   above the x2.15 model), peak columns ~5,500s each, eff_cores ~14 during
   the pole (disk-stall on the saturated NVMe mirror — the Mirror Toll
-  measurement, results/fanin-tax.md). Work-stealing active in the tail
+  measurement, docs/engine-record.md). Work-stealing active in the tail
   (steals ~200+/column). The pre-run 4-8h wall prediction was wrong on
   both frontier growth and per-record cost (x1.6 vs H19).
 

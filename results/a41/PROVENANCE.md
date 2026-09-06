@@ -36,7 +36,7 @@ tower meets all three: the shape and the onset `n >= 2k+1` are theorems
 (`docs/proofs/diagonal-law.md`), the onset was proved sharp 2026-09-05, and
 every level below is overdetermined. The diagonal-mirror tower fails the second
 condition and its assembled term stays conjecture-assisted
-(`results/related-seqs-n33.md`).
+(`results/symmetry-classes.md`).
 
 What the rule does **not** cover is the one thing that actually limits this
 term, and the sections below are about it: the depth-`j` corrections `D_j` let
@@ -61,13 +61,13 @@ checked against banked cells only at `k <= 19`.
   (100 depth pairs, ~36 of them independent), an audit in which **189
   enumerated** banked cells come back from shorter cells with 0 wrong, and
   `a(n)` rule-independent for every n <= 39. `results/undertow.md`, as
-  corrected by `results/undertow-review-A.md` — the earlier "342 cells" and
+  corrected by `results/undertow.md` — the earlier "342 cells" and
   "four terms reassembled from short sweeps" figures were inflated and are
   struck there.
 
 ## Independently recomputed
 
-Lane B of the review (`results/undertow-review-B.md` §5,
+Lane B of the review (`results/undertow.md` §5,
 `experiments/lane_b_a41_recount.py`) rebuilt the term by a route built to
 differ wherever difference was possible: levels k = 1..19 pinned from their two
 **onset anchors** in `results/triangle.txt` rather than read from
@@ -133,7 +133,7 @@ k = 22 row is truncated away by `D_series(4, 21)` and the k = 20 row is pinned
 by level 20's pair agreement.
 
 **Depth 5 closes it.** `results/severance_w3_families_K21_e4.txt` (banked
-2026-08-23, `results/depth5-gate-green.md`) supplies `D_5`, and at `--jmax 5`
+2026-08-23, `results/undertow.md`) supplies `D_5`, and at `--jmax 5`
 level 21 gains `T(38,17)`, a Motley-covered cell:
 
     python3 experiments/undertow_a41.py --jmax 5 --perheight results/a41

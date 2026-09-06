@@ -96,9 +96,9 @@ are two instances of it.
 `maxhole_upper` are standard-axioms-only, and `maxhole` is **conditional on the
 hypothesis `MoatBound`**. That conditionality is a formalization gap, not a
 mathematical one: (II') is proved on paper by the moat-cycle winding argument
-(`results/maxhole-proof.md`), and mathlib has no discrete-Jordan material to
+(`results/subclasses.md`), and mathlib has no discrete-Jordan material to
 carry it. The *multi-hole* reduction the Lean file does not attempt is no
-longer open either (`results/maxhole-proof.md` §The union argument, 2026-08-06)
+longer open either (`results/subclasses.md` §The union argument, 2026-08-06)
 — but formalizing it would mean assuming the grid isoperimetric inequality for
 arbitrary finite subsets, a bigger hypothesis than `MoatBound`, so the file
 stays as it is.
@@ -109,7 +109,7 @@ Nothing about the engine, the banked triangle, or the anchor values. Those
 enter as explicit hypotheses or as named native leaves; `PROOF-STATUS.md` is
 the per-theorem ledger. A paper that cites the development for a(40) itself
 would be citing the wrong artifact — a(40)'s warrant is
-`docs/paper1-reproducibility.md`, not this.
+`docs/publication.md`, not this.
 
 ## Packaging
 

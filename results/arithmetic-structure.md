@@ -286,7 +286,7 @@ Theorem 9 adds is that on the region its right side is zero by proof.
 **Even columns mod 2.** T(n,4) has period 4; T(n,6) and T(n,8) have period 8
 out to n = 40; H = 10 is the first aperiodic even column. The diagonal formula
 fixes parity only on the k ≤ 13 diagonal entries, a corner of the region.
-The campaign behind Theorem 9 is recorded in `docs/triangle-postmortem.md`.
+The campaign behind Theorem 9 is recorded in `docs/lessons-learned.md`.
 
 ## The prime 5: the denominators of P_k
 

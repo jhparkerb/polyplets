@@ -46,7 +46,7 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 | file | paper | state |
 |---|---|---|
 | `technical-report.tex` | **P1** — Fixed polyplets through *a*(40) | in progress, jasonp's prose, roughly 40% built |
-| `technical-report-draft.tex` | — | **L**, 2026-09-05. Complete machine-written draft with the same structure, scope and tables as `technical-report.tex`, every claim's backing sentence filled in; `\Ldisclosure` + draft banner; 12 pp, builds clean. Written at jasonp's word for him to strike from; not liftable into the P file |
+| `technical-report-draft.tex` | — | **L**, read in full and approved for release by its named author on 2026-09-06; he did not independently re-derive the mathematics. Same structure, scope and tables as `technical-report.tex`, every claim's backing sentence filled in; `\Ldisclosure`, no draft banner; 10 pp. It is the report `README.md` sends a reader to, and is not liftable into the P file |
 | `L1-diagonal-law.tex` | **L1** — A diagonal law for row-local lattices, and the mod-3 arithmetic of the king instance | draft, 23pp — **absorbed L2** 2026-08-23 as Part II |
 | `L3-lambda-bounds.tex` | **L3** — A certified two-sided bound for λ | draft, 13pp |
 | `L4-not-dfinite.tex` | **L4** — An arithmetic obstruction to D-finiteness | draft, 10pp |

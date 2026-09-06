@@ -14,7 +14,7 @@ sentence is the mistake that hid here for a day.
 
 ## Q1 — congruence-only cells
 
-All 820 cells. A cell is **congruence-only** when nothing recomputed it and no closed form covers it, so the only check it carries is the mod-2/mod-4 subgroup census (`results/subgroup-mod4.md`) — which catches an error if and only if the error is nonzero mod 4. Computed by `scripts/provenance_table.py`.
+All 820 cells. A cell is **congruence-only** when nothing recomputed it and no closed form covers it, so the only check it carries is the mod-2/mod-4 subgroup census (`results/symmetry-classes.md`) — which catches an error if and only if the error is nonzero mod 4. Computed by `scripts/provenance_table.py`.
 
 | Motley reaches | congruence-only | retired by this rung | cells |
 |---|---|---|---|
@@ -27,7 +27,7 @@ All 820 cells. A cell is **congruence-only** when nothing recomputed it and no c
 
 ## Q2 — row 40's residual band
 
-Row 40 only, and a different question: which cells still rest on the incumbent engine's union-find connectivity rule. Rule: `docs/b1-closure-plan.md` §1.
+Row 40 only, and a different question: which cells still rest on the incumbent engine's union-find connectivity rule. Rule: `results/second-sources.md` §1.
 
 - `h ≤ 21` — swept by the incumbent, and rule-independent once Motley re-sweeps that height.
 - `h ≥ 22` — never enumerated; wired from the closed form at level `k = 40 − h`. The shape is a theorem (`docs/proofs/diagonal-law.md`) but the two free coefficients per level are fit from real swept cells, so the cell is rule-independent exactly when both anchors `T(2k+1,k+1)` and `T(2k+2,k+2)` — heights `41−h` and `42−h` — are inside Motley's reach.
@@ -56,7 +56,7 @@ Motley covers `h ≤ H` from below; the closed-form band covers `h ≥ max(n−1
 
 ## Where the ladder stops
 
-Q1 and Q2 both reach zero only at **H = 21**, and H = 21 does not fit in RAM at any rung of the arena ladder (`docs/b1-closure-plan.md` §3). The formula end cannot substitute: level 19's own two anchors are `T(39,20)` and `T(40,21)`, so pinning `P_19` from them to corroborate them is circular, and the non-circular route — `(a_19, b_19)` ab initio from surplus-19 cluster weights (`docs/proofs/grand-form.md`) — is ten levels past the k ≤ 9 the Severance campaign reached. Ticker Tape (H = 19) is priced and declined in `results/ticker-tape-assessment.md`.
+Q1 and Q2 both reach zero only at **H = 21**, and H = 21 does not fit in RAM at any rung of the arena ladder (`results/second-sources.md` §3). The formula end cannot substitute: level 19's own two anchors are `T(39,20)` and `T(40,21)`, so pinning `P_19` from them to corroborate them is circular, and the non-circular route — `(a_19, b_19)` ab initio from surplus-19 cluster weights (`docs/proofs/grand-form.md`) — is ten levels past the k ≤ 9 the Severance campaign reached. Ticker Tape (H = 19) is priced and declined in `results/second-sources.md`.
 
 
 ## How to quote these numbers

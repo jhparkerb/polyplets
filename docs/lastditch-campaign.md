@@ -21,7 +21,7 @@ peak. Neither was run. `results/a41/PROVENANCE.md`.
 short exactly one cell, `T(40,19)`. `results/undertow.md`.
 
 Neither needed a new counting algorithm. Both came from noticing that
-`docs/b1-closure-plan.md` §1 was buying the wrong anchors.
+`results/second-sources.md` §1 was buying the wrong anchors.
 
 ## Undertow, in one paragraph
 
@@ -46,7 +46,7 @@ machinery built for different purposes composing.
 | `results/undertow-picture.md` | the figures; regenerate with `scripts/undertow_picture.py` |
 | `results/a41/` | the term, its provenance, the 19 swept rows |
 | `results/motley-par/` | the parallel engine's record and receipts |
-| `results/lastditch-cost-ladders.md` | three measured ladders + the methodology note |
+| `results/undertow.md` | three measured ladders + the methodology note |
 | `docs/lastditch-ideas.md` | the candidate list, **including the closed doors** |
 | `docs/five-terms-plan.md` | a(41)-a(45) from one sweep; proposed, not launched |
 | `docs/undertow-review-brief.md` | the review brief, committed before any lane ran |
@@ -112,7 +112,7 @@ tower routes agreeing checks the pinning cells and never the shared machinery.
 **Only enumeration crosses assumption families.** Hence Motley `C_19` — not
 depth 5, which buys agreement inside the same machinery even though it is now
 priced at an affordable ~8.5-16 GB (corrected 2026-08-22 from the ~51 GB this
-line asserted, `results/depth5-cost-settled.md`).
+line asserted, `results/undertow.md`).
 
 ## Closed doors — with counterexamples, so they are not re-pitched
 
@@ -130,7 +130,7 @@ line asserted, `results/depth5-cost-settled.md`).
 - **Strict freedom from fitting.** `(a_k,b_k)` is *equivalent* to the
   surplus-<=k cluster weights, which are connected-animal counts of the same
   species; every known route carries the frontier connectivity partition, ~20x
-  per level. Family-level, not instance-level. `results/undertow-review-C.md`.
+  per level. Family-level, not instance-level. `results/undertow.md`.
 
 ## Open
 
@@ -148,7 +148,7 @@ line asserted, `results/depth5-cost-settled.md`).
   script header. **RAN 2026-09-05: 9.63 h on 76 cores, rc = 0; the swept
   `T(41,20)` equals the tower's prediction** (`results/a41/PROVENANCE.md`).
 - **Depth 5** — **~3.1 h / ~8.5 GB at 8 threads**, or 6.7 h / 16.1 GB on the
-  pessimistic bound (measured 2026-08-22, `results/depth5-cost-settled.md`;
+  pessimistic bound (measured 2026-08-22, `results/undertow.md`;
   this line asserted ~51 GB / ~23 h from a two-point slope).
   `severance_w3_depth5_gate.py` is
   written red-first and joins `GATE_TARGETS` the day the table exists.

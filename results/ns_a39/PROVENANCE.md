@@ -7,7 +7,7 @@ rev 0057f2c5 (branch `second-wind`), launched 2026-07-24 ~13:50 EDT via
 `FRONTIER_LEVERS=1 scripts/dalby_term.sh 39` — the FIRST production run
 with the Mirror Toll disk-IO levers on (block-framed frontier zstd at
 64-record frames = 1.45x, plus /dev/shm map-output routing with
-per-round headroom fallback; results/fanin-tax.md).
+per-round headroom fallback; docs/engine-record.md).
 
 - Real sweeps H3-H20; H21-H39 via wired P_k closed forms (k = 39-H <= 18,
   H21 is P_18's first production use). wall 39957s (11.1h), cpu

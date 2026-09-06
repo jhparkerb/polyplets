@@ -3,7 +3,7 @@
 > **OUTCOME (achieved below): λ ≤ 9.3154, PROVED** (exact rational Bui
 > convolution certificate; see the BREAKTHROUGH + Certificate-Squeeze sections).
 > The two-sided rigorous bracket is **6.543 ≤ λ ≤ 9.3154** (lower side upgraded
-> 2026-07-31 to the certified strip ladder μ₁₇, `results/strip-mu-certificates.md`;
+> 2026-07-31 to the certified strip ladder μ₁₇, `results/growth-constant.md`;
 > at this doc's writing it was 5.828). The intro/plan/crux/
 > "Verdict" text below is the ORIGINAL pre-breakthrough scaffolding, kept as the
 > derivation record — it says "not yet done"; it was done later in this same doc.
@@ -35,7 +35,7 @@ This note: a clean crude bound, and the design + crux for a tight one.
 
 ## Crude rigorous bound: λ ≤ 5⁵/4⁴ = 3125/256 ≈ 12.2
 
-**Proof REPAIRED 2026-08-14** (king-twigs round, `results/king-twigs-l1.md`,
+**Proof REPAIRED 2026-08-14** (king-twigs round, `results/growth-constant.md`,
 harness `experiments/kingtwigs/l1_schemes.py`). The original argument below
 is broken; the constant survives by a sound BFS-frame derivation.
 
@@ -67,7 +67,7 @@ The "overlap accounting improves toward ~9–10" remark previously here is
 withdrawn: the improvement it gestured at is the Klarner–Rivest deferral
 mechanism, and that is structurally blocked on king adjacency (a deferred
 cell always lands in the child's shared set) — see
-`results/king-twigs-l1.md`, which closes the twig route at exactly 5⁵/4⁴.
+`results/growth-constant.md`, which closes the twig route at exactly 5⁵/4⁴.
 
 **NB — the tempting "≤ 8" is FALSE.** Encoding by spanning-tree parent-direction
 (≤8/cell ⇒ λ≤8) is not an injection: for ordinary polyominoes the same argument
@@ -101,7 +101,7 @@ height-handling that makes the eigenvalue a plane bound rather than a strip one.
 **Status:** crude λ ≤ 12.2 is a real, first-of-its-kind bound (bankable). The
 tight version is open research — the dual of this session's μ_H lower-bound
 ladder (μ_H ≤ λ from below; a relaxed cross-section ν_w ≥ λ from above would
-bracket it). See results/strip-growth-lambda-bounds.md.
+bracket it). See results/growth-constant.md.
 
 ## PLAN: bound λ, simply then tightly
 
@@ -313,7 +313,7 @@ neighbours go to the c-side, so they're empty in the `d`-piece.
   it and keeps improving with context. Target ~7.11 from above; realistic landing
   ~8 for feasible RD. First-ever polyplet upper bound below the crude bound.
 
-- **Concatenation route also closed (2026-08-01, `results/concatenation-upper-bound.md`).**
+- **Concatenation route also closed (2026-08-01, `results/growth-constant.md`).**
   Barequet–Ben-Shachar–Osegueda's quasi sub-multiplicativity gives an upper bound
   from a single term: with `a(40)` banked, a degree-2 `P` would yield λ ≤ 7.745
   (degree 4 already yields nothing). But their lexicographic split shatters a king

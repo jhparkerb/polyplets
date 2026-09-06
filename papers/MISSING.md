@@ -22,7 +22,7 @@ Two obtained, six confirmed paywalled with their metadata pinned, one new lead.
   on no list. Found while hunting the 1990 punctured-discs paper. It matters: its
   Appendix proves k-punctured polyominoes share the unpunctured growth constant with the
   exponent shifting by exactly 1 per puncture, which is the asymptotic content of our
-  hole-fill bijection. `results/hole-fill-interior-cell-identity.md` now cites it. It
+  hole-fill bijection. `results/subclasses.md` now cites it. It
   also reproduces van Rensburg & Whittington's method, which largely discharges that want.
 
 **Metadata pinned, no free copy (all confirmed paywalled at Springer/IOP):**
@@ -174,7 +174,7 @@ Sieben 2008 and Altshuler et al. 2006, obtained 2026-08-06 — both read the sam
 day, and they answered more than was asked: Sieben's Thm 4.1 is M(n) verbatim
 rather than inverted, the two papers' statements do coincide (checked at every
 k ≤ 200,000 in `experiments/maxhole_sieben_check.py`), and the no-connectivity
-hypothesis closed the multi-hole case outright — `results/maxhole-proof.md`
+hypothesis closed the multi-hole case outright — `results/subclasses.md`
 §The union argument._
 
 ## Citation scan of the isoperimetry batch, 2026-08-06 — three found, six not
@@ -192,7 +192,7 @@ and Bezrukov cite cube isoperimetry only.
   357–384. → `papers/madras_1999_*.pdf`. **The find.** Covers the king lattice
   (his §3.1(f) at M=1, sup norm). λ₀ < λ for hole-free animals is a corollary
   of his Theorem 2.1, and `a(n+1)/a(n) → λ` is his Theorem 2.2. See
-  `results/hole-free-growth-constant.md`, which retracted a claim on the
+  `results/subclasses.md`, which retracted a claim on the
   strength of it.
 - M. E. Fisher, A. J. Guttmann & S. G. Whittington, J. Phys. A **24** (1991)
   3095–3106. → `papers/fisher_guttmann_whittington_1991_*.pdf`. States the
@@ -221,7 +221,7 @@ Do not re-search these from the desk; the desk has been tried.
 - F. Ibn-Majdoub-Hassani, "Combinatoire des polyominos et des tableaux décalés oscillants,"
   PhD thesis, Université de Paris Sud, Orsay, November 1996. — reference [6] of
   Gouyou-Beauchamps & Leroux 2004, the source of the C-convex hexagonal class, and the one
-  candidate origin of the growth-phase block decomposition that `results/novelty-sortie.md`
+  candidate origin of the growth-phase block decomposition that `docs/publication.md`
   N3 could not obtain either. His 1997 FPSAC paper uses strata instead, so this is a long
   shot, and it is now the only untested one. **Not found; very small result set.** A French
   institutional repository (theses.fr, Orsay) is the remaining route. **[med]**
@@ -245,7 +245,7 @@ Not found in the second round (the citation scan above), same disposition:
   the top. Correct order is Whittington & Soteros.
 - E. J. Janse van Rensburg & S. G. Whittington, "Punctured discs on the square lattice,"
   J. Phys. A **23** (1990) 1287–1294. — the nearest thing to prior art on *holes* the scan
-  turned up; `results/maxhole-proof.md` claims no paper measures hole area, and this is the
+  turned up; `results/subclasses.md` claims no paper measures hole area, and this is the
   one that could contradict it. **[med]**
 - I. G. Enting & A. J. Guttmann, "On the area of square lattice polygons," J. Stat. Phys.
   **58** (1990) 475–484. — was wanted as the possible primary for the bond-perimeter
@@ -271,16 +271,16 @@ of these previously listed:
   Madras 1999 points at its §2.4 and §2.8 for "further applications of the pattern theorem
   for weighted animals". Those sections are where the corollaries were drawn, so if anyone
   has already stated "simply-connected animals are exponentially rare", it is there — and
-  that is the one thing we still call ours in `results/hole-free-growth-constant.md`.
+  that is the one thing we still call ours in `results/subclasses.md`.
 
   **Second reason to want it, added 2026-08-07 — it now settles two questions.**
   A Metropolis chain on lattice animals cannot be published without establishing
   its own irreducibility, and the move it uses is the connectivity-preserving
   single-cell move. So the square-lattice case of idea 8 of
-  `results/unexplored-avenues.md` — is the move graph connected — is almost
+  `results/closed-doors.md` — is the move graph connected — is almost
   certainly a lemma in this paper, along with whatever they know about its
   mixing. We have now measured the king case directly
-  (`results/move-graph-connectivity.md`); what this paper would supply is the
+  (`results/subclasses.md`); what this paper would supply is the
   proof technique for all `n`, and the honest prior art. Check §2 for the chain's
   definition and ergodicity argument before anything in that results file is
   described as new. **[high]**
@@ -293,7 +293,7 @@ of these previously listed:
   J. Phys. A **26** (1993) 3085–3091. — Madras's [3], cited for numerical growth constants
   of bond trees vs bond animals vs site animals across several directed 2D lattices. Wanted
   only to see whether their lattice list includes the king/diagonal case, against
-  `results/directed-king-animals.md`. Distinct from the two A. R. Conway 1995 percolation
+  `results/subclasses.md`. Distinct from the two A. R. Conway 1995 percolation
   papers listed above. **[low-med]**
 - D. J. Klein, "Rigorous results for branched polymers with excluded volume," J. Chem.
   Phys. **75** (1981) 5186–5189. — Madras's [11], cited beside Klarner 1967 as the other
@@ -311,7 +311,7 @@ Vanderzande 1998 (polymer textbook); Grimmett 1989; Hammersley–Morton 1954; Ca
 
 ## Cleared 2026-08-06 — the polycube defect-diagonal line, both obtained
 
-Wanted by `results/novelty-sortie.md` N5: the same "fix the defect, get polynomial ×
+Wanted by `docs/publication.md` N5: the same "fix the defect, get polynomial ×
 exponential" statement shape as our universal diagonal law, with the defect measured in
 dimension instead of height. Paper 2 should cite both. **Both now in `papers/`; neither
 has been read past the abstract.**
@@ -358,7 +358,7 @@ following up and it is not the one first flagged.**
   bracket. Whether king animals admit a concatenation-based sub-multiplicative
   bound below 9.3154 is a live question that would shorten a sentence in the
   paper. Not attempted. **[the one worth a look]**
-  **LOOKED, 2026-08-01 — CLOSED, no gain** (`results/concatenation-upper-bound.md`,
+  **LOOKED, 2026-08-01 — CLOSED, no gain** (`results/growth-constant.md`,
   `experiments/concatenation_bound_check.py`). Priced first: with `a(40)` banked,
   a degree-2 `P` would give `lambda <= 7.745` (degree 3 gives 8.642; degree 4
   gives 9.642 and helps nothing), and the measured `a(m+n)/(a(m)a(n))` grows

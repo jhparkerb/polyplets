@@ -84,7 +84,7 @@ The reasoning about what cross-ISA and cross-revision re-runs can and cannot
 catch is unchanged and still applies to the 11.
 
 Two documentation errors found:
-1. **Strip-engine coverage is H ≤ 13, not H ≤ 14** (`results/strip-engine.md:44-47`:
+1. **Strip-engine coverage is H ≤ 13, not H ≤ 14** (`results/second-sources.md:44-47`:
    C_14 was never completed; the H=14 log only computed the growth constant, no
    per-cell diff). The "0 mismatch H ≤ 14" note in project memory overstated by one
    column. Corrected.
@@ -205,4 +205,4 @@ pinned tier are exactly as strong as the kink engine and no stronger.
    n = 36** (`results/strip_C14_run.log`; ran on dalby after the gympie
    attempt thrashed at a measured ~38 GB footprint). Anchors T(26,14) and
    T(27,14) flip to MULTI-SOURCE; the single-algorithm set shrinks from 9
-   cells to the 7 of levels 13B–16. Recorded in `results/strip-engine.md`.
+   cells to the 7 of levels 13B–16. Recorded in `results/second-sources.md`.

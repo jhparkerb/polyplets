@@ -3,7 +3,7 @@
 2026-08-20, branch `lastditch`. Source `cpp/motley_par.cpp`, gate
 `tests/gate_motley_par.py`. Every number below is in a file in this directory.
 
-`docs/b1-closure-plan.md` §4 named the wall this removes and left it standing:
+`results/second-sources.md` §4 named the wall this removes and left it standing:
 
 > The engine is still single-threaded. Everything above is per-process peak
 > RSS, which is what the budget constrains; the wall figures ... demand a
@@ -84,7 +84,7 @@ Against ayr's 60.2 GB for the same height and payload **without** release:
 ### The H = 19 census
 
 **224,529,648 states**, saturated at column 1 — measured, replacing the
-±20% projection band of `docs/b1-closure-plan.md` §2. Per-state cost derived
+±20% projection band of `results/second-sources.md` §2. Per-state cost derived
 from the H=18 release measurement is 445 B at stride 352, giving:
 
 | H = 19 payload | B/state | total | passes | wall |

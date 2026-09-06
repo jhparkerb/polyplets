@@ -5,7 +5,7 @@ a(40) = 56749893611764175164545926946127
 Computed 2026-07-25..28 on dalby alone (ARM Ampere Altra, 80 core),
 branch `second-wind`, launched 2026-07-25 20:42 EDT via
 `FRONTIER_LEVERS=1 scripts/dalby_term.sh 40` — the first production run
-of the PHASED driver (Overcommit Hydra, results/overcommit-hydra.md):
+of the PHASED driver (Overcommit Hydra, docs/engine-record.md):
 maxn=40 with full overlap does not fit 125GB RAM, so the two tall poles
 run as solo phases with bounded working sets.
 
@@ -128,8 +128,8 @@ it. The standing facts, in the form that carries a decision:
 | height band | independent corroboration |
 |---|---|
 | H1-10 | yes — matches the decorrelated fixed-height GFs expanded to n=40 (355 cells) |
-| H11-14 | yes — strip TM N=40 run (2026-07-30, 469 cells, 0 mismatch; `results/strip-engine.md`) — second source, not fully independent (shares `core/transition.h`'s union-find rule) |
-| H15-19 | congruence-level only — `T(n,H) = I_H(D2ax) mod 2` at all 120 cells of the band, 0 mismatches (`results/subgroup-mod4.md`, `gate-subgroup`), an algorithm sharing no code path with the column engine. Not an exact recount: a wrong value survives iff its error is 0 mod 4 |
+| H11-14 | yes — strip TM N=40 run (2026-07-30, 469 cells, 0 mismatch; `results/second-sources.md`) — second source, not fully independent (shares `core/transition.h`'s union-find rule) |
+| H15-19 | congruence-level only — `T(n,H) = I_H(D2ax) mod 2` at all 120 cells of the band, 0 mismatches (`results/symmetry-classes.md`, `gate-subgroup`), an algorithm sharing no code path with the column engine. Not an exact recount: a wrong value survives iff its error is 0 mod 4 |
 | H20 | yes — byte-identical standalone re-sweep (`recheck/h20.out`) |
 | H21 | real sweep, but this is P_19's second fit point; no holdout is possible at any n |
 | H22-40 | closed forms P_0..P_18, every one with a passed real-swept holdout |

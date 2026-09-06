@@ -11,7 +11,7 @@ largest result and still at risk.
 
 | file | what |
 |---|---|
-| `rows/C<H>.out` | `n value` lines, H = 1..18, n <= 40 — the cut-and-count row sums. H = 17 came from Motley rung 1 (`results/motley-h17.md`), H = 18 from rung 2 (`results/motley-h18.md`); H <= 16 are this run's |
+| `rows/C<H>.out` | `n value` lines, H = 1..18, n <= 40 — the cut-and-count row sums. H = 17 came from Motley rung 1 (`results/second-sources.md`), H = 18 from rung 2 (`results/second-sources.md`); H <= 16 are this run's |
 | `confetti_h18_run.log` | rung 2's own log, 2026-08-14..19, five prime passes and the held-out check |
 | `confetti_h18_console.log` | rung 2's fuller console transcript, banked 2026-08-19 |
 | `residues/C18.p<prime>.out` | rung 2's five measured residue rows --- four are the CRT inputs, the fifth (2147483563) is the held-out one. Banked 2026-08-19 so `make gate-cutcount-assembly` can re-derive the 40/40 instead of quoting the runner |
