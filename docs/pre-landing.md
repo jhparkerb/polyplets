@@ -33,14 +33,13 @@ already closed and is here so that nobody re-opens it during the landing.
 - [ ] **Flip `origin` to public.** `git@github.com:jhparkerb/polyplets.git` is
       private today. This is the landing action itself; everything else is
       preparation for it.
-- [ ] **Licence.** There is no `LICENSE` file — and **86 Lean files already
-      assert one**: `Copyright (c) 2026 Jason H Parker ... Released under
+- [x] ~~**Licence.**~~ **Closed 2026-09-06: Apache 2.0, jasonp's decision**,
+      on the ground of least hassle against the 86 Lean modules that already
+      asserted it (`Copyright (c) 2026 Jason H Parker ... Released under
       Apache 2.0 license as described in the file LICENSE`, naming a file that
-      does not exist in `polyplets/` or at the root. The tree mixes code (C++, Go,
-      Python, Lean), data (banked rows, b-files), and prose (the manuscripts) —
-      a single choice may not fit all three. A public repo with no stated terms
-      is all-rights-reserved by default, which is a position, but pick it
-      deliberately if that is the answer.
+      until now did not exist). `LICENSE` is at the root and covers the whole
+      tree — code, data and prose — except `literature/`, which is other
+      people's copyrighted work and is gitignored.
 - [x] ~~**`triangle-structure` and `half-measure`.**~~ **Closed by inspection
       2026-08-22: both are on `origin` now**, so the decision made itself. 65
       citations across 25 campaign records point into them (21 and 10 by

@@ -157,6 +157,13 @@ gated (`make gate-provenance`) so it cannot drift from the banked rows.
 - **T3** n=33 companions: exact computation composed with empirically
   pinned but unproven quasi-polynomial formulas — labeled, never silently.
 
+## License
+
+Apache License 2.0, `LICENSE` at the root: code, proofs, records and
+manuscripts alike. The Lean modules carry the header form of the same grant.
+The one exception is `literature/`, which is other people's copyrighted work,
+is gitignored, and is not distributed with this repository at all.
+
 ## Authorship
 
 An amateur project by Jason H Parker, built in collaboration with an AI
