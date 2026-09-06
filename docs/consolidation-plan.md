@@ -28,7 +28,7 @@ follow say what went into each and at which commit the sources are readable.
 | routes that did not work, and the open problems | `results/closed-doors.md` |
 | Lean | `polyplets/PROOF-STATUS.md`, `polyplets/DESIGN.md`, `docs/lean-environment.md`, `docs/lean-record.md`, `docs/lean-record.md` |
 | the papers | `paper/README.md`, `docs/publication-split.md`, `docs/publication.md`, `docs/l-papers-record.md` |
-| how the work was run, and what to do differently | `docs/lessons-learned.md` |
+| how the work was run, and what to do differently | the project retrospective (removed from the repository) |
 | standards and process | `docs/engineering-standards.md`, `docs/job-checklist.md`, `docs/push-gate-tiers.md`, `docs/glossary.md`, `docs/external-anchors.md` |
 | OEIS staging (no submission) | `oeis/`, `results/oeis-candidates.md` |
 
@@ -40,7 +40,7 @@ Deleted at the commit after `e5e7870`: 443 tracked files, readable with
 | what | files | conclusion now in |
 |---|---|---|
 | Ghost Ship: the 2026-07-12 sandbox snapshot, session logs, prompts, usage, grading lanes, review lanes, sealed predictions | `results/ghostship/` except `REPORT.md` and `DISPOSITION.md`; `scripts/ghostship/instructions.md` | `results/ghostship/REPORT.md`, `results/ghostship/DISPOSITION.md` |
-| Offside and the process proposal | `results/offside/`, `docs/offside-*.md`, `docs/process-proposal.md`, `docs/state-minimal.md` | `docs/lessons-learned.md` |
+| Offside and the process proposal | `results/offside/`, `docs/offside-*.md`, `docs/process-proposal.md`, `docs/state-minimal.md` | the project retrospective (removed from the repository) |
 | Rook parity round 1 | `results/rook1/`, `docs/rook1-brief.md` | `docs/rook-parity.md` |
 | Triangle-structure hunt rounds 2--4 (working files) | `results/triangle-r2-extension-scout.md`, `results/triangle-r3-*` (five), `results/triangle-salvage.md`, `results/r4/` (most), `experiments/tristruct/sweep_report.md`, `docs/triangle-structure-d9-d12-plan.md` | `docs/triangle-postmortem.md`; the proofs stay in `results/triangle-r2-d3-proof.md` and `results/triangle-hunt-klein-parity.md` |
 | L-paper review campaigns (trim, tics, coinage) | `docs/reviews/l-trim/` (all but `PROTOCOL.md`), `docs/reviews/llm-tics/` (all but `density.py`), `paper/L-coinage-candidates.md`, `paper/polyplets-report-cuts.md`, `docs/l-paper-currency.md` | `paper/L-readability-rules.md`, `docs/l-papers-record.md` |
@@ -89,7 +89,7 @@ first, so the pattern is set before the large ones.
 | `results/second-sources.md` (planned) | `strip-engine.md`, `motley-h17.md`, `motley-h18.md`, `motley-step0.md`, `coin-lift-g2.md`, `ticker-tape-assessment.md`, `congruence-crt-combination.md`, `redelmeier_row20/RESULT.md`, `docs/b1-closure-plan.md` (the directories `cutcount_b1/`, `motley-par/`, `redelmeier_row22/` keep their own records) |
 | `docs/engine-record.md` (planned) | `docs/paper1-engine-chapter.md` as the base; `a34-utilization-postmortem.md`, `utilization-fix-and-ceiling.md`, `docs/utilization-bottleneck-log.md`, `docs/full-utilization-redesign.md`, `fanin-tax.md`, `overcommit-hydra.md`, `overlap-kink-design-sketch.md`, `steal-tail-h18.md`, `sub-record-interrupt-design.md`, `scheduling.md`, `perf-outcomes.md`, `map-profile.md`, `map-body-profile.md`, `merge-ledger.md`, `dalby-perf-audit.md`, the four `kink-carry*.md`, `kink-resume-sigterm-bug.md`, `completion-oracle.md`, `completion-pruning-audit.md`, `nmax-disk-scaling.md`, `terminal-velocity.md`, `second-wind.md`, `crt-counter-shaping.md`, `gate-class-sweep.md` |
 | `docs/publication.md` (planned) | `docs/publication-strategy-2026-08-18.md`, `docs/sortie-publication-plan.md`, `docs/provenance-tables.md`, `docs/reviewer-expertise-tiers.md`, `docs/skeptical-reader-standard.md`, `docs/main-paper-audit-2026-08-18.md`, `docs/prove2me-note.md`, `docs/oeis-ai-policy.md`, `docs/acceptance-queue.md`, `docs/paper1-reproducibility.md`, `results/removals-2026-08-22.md`, `results/novelty-sortie.md`, `results/l-paper-proof-audit.md`, `results/literature-record-56-corrected.md`, `results/mathematics.md` |
-| `docs/lessons-learned.md` (rewritten) (planned) | `docs/project-postmortem.md`, `docs/triangle-postmortem.md`, `docs/rook-parity.md`, `results/ghostship/REPORT.md`, `results/ghostship/DISPOSITION.md`, `results/skeletonkey-four-mechanisms.md` (as the closed-campaign summaries) |
+| the project retrospective (removed from the repository) (rewritten) (planned) | `docs/project-postmortem.md`, `docs/triangle-postmortem.md`, `docs/rook-parity.md`, `results/ghostship/REPORT.md`, `results/ghostship/DISPOSITION.md`, `results/skeletonkey-four-mechanisms.md` (as the closed-campaign summaries) |
 
 Untouched by design: the per-term records (`results/ns_a*/`, `results/a41/`,
 `results/redelmeier_row22/`, `results/cutcount_b1/`, `results/motley-par/`),

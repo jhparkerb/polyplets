@@ -1071,7 +1071,7 @@ disagreement at the 19th. A degree-3 relation of height `3.4e4` absorbs about
 Imported 2026-08-17 from the Ghost Ship experiment, fourteen unattended
 sessions run against a sandbox cut at `74b2c20` and blind to everything above
 dated 2026-08-05 or later; the record of that experiment is
-`docs/lessons-learned.md`, and its receipts are readable with
+the project retrospective (removed from the repository), and its receipts are readable with
 `git show e5e7870:results/ghostship/grading/run-record/sandbox/<path>`
 (abbreviated `GS/` below). The loop independently re-derived the
 semiperimeter series to `s = 200` and its degree-2 algebraicity, matching

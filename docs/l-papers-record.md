@@ -446,7 +446,7 @@ Barequet and Ben-Shachar, runs to **n = 70**, and Shirakawa,
 *Enumeration of Polyominoes up to Size N=59* ([arXiv:2510.22446](https://arxiv.org/abs/2510.22446),
 October 2025) independently reaches 59.
 
-**This project found that first** — `docs/lessons-learned.md:151` says so, and
+**This project found that first** — the project retrospective (removed from the repository) says so, and
 `results/rook1/queue.md` row K4 is an open chore to sweep the stale mentions.
 So the correct status is "known, unswept", not "found tonight". The sweep has
 now been done and K4 is closed:

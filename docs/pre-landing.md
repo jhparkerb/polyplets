@@ -57,7 +57,7 @@ already closed and is here so that nobody re-opens it during the landing.
       stay local regardless — confirmed: `git ls-files | grep viva` is empty.)
 - [ ] **Does `results/ghostship/` go public?** A graded experiment on the
       project's own process, including the grading and the divergence record.
-      `docs/lessons-learned.md` decides what it licensed; it does not
+      the project retrospective (removed from the repository) decides what it licensed; it does not
       decide whether a stranger reads it.
 - [ ] **The L ledgers' "human verification: none".** All nine say it. Either
       you read enough of a paper to replace that with a specific per-result

@@ -451,7 +451,7 @@ count of unknowns per level is proved. **L8 absorbed** the external check and
 the two corrections, per jasonp's ruling, and L10 cites it.
 
 **The square-lattice record is n = 70, not 56.** Known since
-`docs/lessons-learned.md:151` and unswept; the sweep is done, six live sites
+the project retrospective (removed from the repository) and unswept; the sweep is done, six live sites
 corrected, `docs/publication.md` is the one place, and no
 conclusion moves. `results/rook1/queue.md` K4 closed.
 
@@ -990,7 +990,7 @@ and whether `docs/` and the Ghost Ship tree go public at all.
 
 Record committed (8336e02, 355 files incl. the loop's own sandbox tree).
 Value triage run (e35c549) — the axis grading never covered.
-**`docs/lessons-learned.md` is the decision layer**; REPORT.md is
+**the project retrospective (removed from the repository) is the decision layer**; REPORT.md is
 the graded record, VALUE-TRIAGE.md the novelty evidence.
 
 Triage findings: all four king sequences absent from OEIS at full and
@@ -1050,7 +1050,7 @@ Superseded section below kept for the record. The run compressed to one
 day at jasonp's direction (all 14 sessions banked 10:20–20:38 EDT
 08-15; deviations with receipts in `results/ghostship/DIVERGENCES.md`),
 then graded the same evening per §7 with all blinds enforced.
-**`docs/lessons-learned.md` is the record**; claim table (hashed
+**the project retrospective (removed from the repository) is the record**; claim table (hashed
 before predictions opened), three provenance-stripped verify files, and
 blind prediction scores under `results/ghostship/grading/`.
 
@@ -1171,7 +1171,7 @@ header), `docs/proofs/polyplet-upper-bound.md`, `results/second-sources.md`,
 `results/arithmetic-structure.md`; new `results/growth-constant.md`,
 `docs/proofs/cutcount-identity.md`, `experiments/kingtwigs/`,
 `experiments/birthright_identity_check.py`, the two brief files. jasonp's
-own pending edits (`docs/lessons-learned.md` deletion, `results/second-sources.md`)
+own pending edits (the project retrospective (removed from the repository) deletion, `results/second-sources.md`)
 untouched.
 
 ## 2026-08-14 — both plans reviewed, reconciled, and executed as far as they go
@@ -1342,7 +1342,7 @@ One desk-only round, six Fable agents, no compute dispatched. Brief
 `docs/rook1-brief.md`, product `docs/rook-parity-bar.md`, lane files and the
 ledger/queue/INSTRUMENTS under `results/rook1/`. Commits `e72e5ac`..`4a90412`.
 
-**The goal in `docs/lessons-learned.md` is not well-formed, and the round is what
+**The goal in the project retrospective (removed from the repository) is not well-formed, and the round is what
 established that.** jasonp's verdict, and the evidence agrees: the pin sits
 0.31% above what the incumbent already measures, the test is passable by the
 incumbent, and the bar contradicts the pin. Do not restart it as written; do not
@@ -1408,7 +1408,7 @@ correction below lives in the brief, the bar file, or the lane files.
 ## 2026-08-13 — triangle salvage merged; reading pass; king twigs opened
 
 - **Triangle-structure agent campaign closed as a FAILURE** (four rounds;
-  `docs/lessons-learned.md`). Salvage merged to master (`bb897b1`);
+  the project retrospective (removed from the repository)). Salvage merged to master (`bb897b1`);
   the index of what survived, with verification labels and remaining work
   per item, is `results/triangle-salvage.md`. Per-agent round records stay
   on the `triangle-structure` branch. New banked numbers from the salvage:
@@ -2056,7 +2056,7 @@ spine digit-product on all in-band cells).
   polyiamonds (needs row conventions).
   Paper's not-D-finite theorem landed (thm:notdfinite, verify_claims 407/407).
 
-- **Lessons-learned DRAFTED 2026-07-15** (docs/lessons-learned.md): six failure
+- **Lessons-learned DRAFTED 2026-07-15** (removed from the repository): six failure
   classes, verification war stories, bug bestiary, process/ops/collaboration
   lessons; sections marked [JP] are jasonp's to write.
 - **EVERYTHING ELSE BLOCKED OR COMPLETE (2026-07-15).** Blocked on time/boxes:

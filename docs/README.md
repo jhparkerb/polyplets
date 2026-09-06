@@ -50,7 +50,6 @@ jasonp's machine, and are not missing from a clone by accident.
 | `docs/engine-record.md` | the enumerator's measured history: kernels, scheduling, memory, negatives, per-term costs, a(41) |
 | `docs/consolidation-plan.md` | the 2026-09 consolidation: theme map, and the ledger of deleted records with the commit each is readable at |
 | `docs/external-anchors.md` | what this machinery reproduces that it did not produce |
-| `docs/lessons-learned.md` | how the work was run, and what the next attempt should do differently |
 | `docs/handoff.md` | the project's own live state: what is running, what is decided, what is open. Internal, and the longest file here |
 | `docs/pre-landing.md` | the go/no-go checklist written before the repository was made public |
 | `docs/audits/` | four dated correctness audits of the engine and the claims, 2026-06-28 through 2026-09-02; the last one is cited by the current records |
@@ -67,5 +66,4 @@ jasonp's machine, and are not missing from a clone by accident.
 |---|---|
 | `docs/l-papers-record.md` | the L papers' own record: the contraction that took ten manuscripts to six, and every literature-priority pass behind them |
 
-The Ghost Ship experiment's record was folded into `docs/lessons-learned.md`;
 no part of it is tracked any more.

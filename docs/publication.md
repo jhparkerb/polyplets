@@ -914,7 +914,7 @@ kept because a clean stderr is a finding. Recover any with
 |---|---|---|
 | a file of 10,000 uniform random 19-cell specimens | 2.5 MB, 120,248 lines | cited by nothing; regenerable from its header (seed 0x13) |
 | the k = 7 perimeter-defect calibration runs | 891 KB, 36 files | the census was priced at 76–179 days on the 76-way pool and declined; conclusions in `results/perimeter.md` |
-| the remains of the ayr power cut of 2026-08-07 | 3 files | the lesson is in `docs/lessons-learned.md` |
+| the remains of the ayr power cut of 2026-08-07 | 3 files | the lesson is in the project retrospective (removed from the repository) |
 | six stray empty files under `experiments/tristruct/` and `results/` | 0 bytes each | empty where their siblings are not |
 | three k = 5 perimeter-defect censuses | 256 KB, 17,557 lines | exact subsets of the k = 6 censuses by `comm -23`; their `.log` run records kept |
 | sixteen gate-suite console logs of 2026-08-05..07 | 324 KB | read by no document |
