@@ -54,15 +54,11 @@ formula holds, with correction terms checked at smaller $k$
 \repo{docs/proofs/diagonal-law.md} and \repo{docs/proofs/grand-form.md},
 formalized in Lean~4 against standard axioms with no \texttt{sorry}
 (\repo{polyplets/PROOF-STATUS.md}).
-\emph{$T(n,n)$, $T(n,n-1)$, $T(n,n-2)$} --- derivations below, each weight
-checked by exhaustive enumeration for $n \le 8$, the formulas on every
-computed entry.
+\emph{$T(n,n)$, $T(n,n-1)$} --- derivations below, each weight checked by
+exhaustive enumeration for $n \le 8$, the formulas on every computed entry.
 \emph{Symmetry tables} --- fixed-point counts by two programs, combined by
 Burnside's lemma, checked mod $8$ for $n \le 32$ (\repo{results/sym\_counts.txt}).
-\emph{Hole table} --- transfer matrix with Euler accounting to $n = 18$,
-agreeing with a Redelmeier flood fill for $n \le 14$.
-\emph{Growth rate} --- the lower bound is proved below; the estimate is a
-labeled measurement (\repo{results/series-analysis-da.md}).
+\emph{Growth rate} --- the lower bound is proved below.
 \emph{Human verification of this document} --- none.}
 
 \begin{abstract}
@@ -87,9 +83,8 @@ Every new $a(n)$ has been checked by a second computation that shares no code
 with the first: for $n \le 22$ by Redelmeier enumeration, and for larger $n$
 by a transfer matrix that colors cells instead of tracking connectivity,
 with the closed forms supplying the entries above its reach. Counts of
-one-sided, free, bilateral,
-asymmetric and non-polyomino polyplets are extended, and polyplets are
-counted by number of holes to $n = 18$.
+one-sided, free, bilateral, asymmetric and non-polyomino polyplets are
+extended.
 
 This work was completed with heavy assistance from Claude Code, especially
 the Fable model, which wrote this document.
@@ -120,15 +115,6 @@ lattice:
 Within the free polyplets, those that are \textbf{bilateral} have at least one
 reflection symmetry (\oeis{A030234}); those that are \textbf{asymmetric} have
 no reflective symmetry (\oeis{A030235}).
-
-A polyplet may have one or more \textbf{holes}, polyominoes of unfilled cells
-enclosed by king-connected occupied cells. A hole of size $1$ may be enclosed
-by a polyplet of size $4$, and a domino of $2$ cells or two size-$1$ holes may
-be enclosed by a polyplet of size $6$: an empty cell is enclosed only when
-its four edge neighbors are occupied, and those four cells are pairwise
-king-adjacent; a domino has six edge neighbors; two one-cell holes need their
-two sets of four, which share at most two cells, and six is attained when the
-holes are diagonal neighbors.
 
 $\mathbf{T(n,H)}$, $1 \le H \le n$, is the number of fixed polyplets of size
 $n$ whose bounding box is of height exactly $H$; the row sums produce $a(n)$,
@@ -189,9 +175,7 @@ with one cell per row, and since consecutive cells must be king-adjacent
 there are three choices for each row after the first: $T(n,n) = 3^{\,n-1}$.
 One row of two cells gives
 \[ T(n,n-1) = (25n - 45)\,3^{\,n-4}, \qquad n \ge 3, \]
-and one row of three or two rows of two give
-\[ T(n,n-2) = \tfrac12\,(625n^2 - 2459n + 1134)\,3^{\,n-7}, \qquad n \ge 5; \]
-both are derived in Section~\ref{sec:formulas}. In general, when $H > n/2$
+derived in Section~\ref{sec:formulas}. In general, when $H > n/2$
 the cell placements are constrained enough to force a closed form. The general
 statement is a theorem, proved on paper and checked by machine in Lean~4:
 
@@ -317,57 +301,6 @@ non-polyomino free polyplets. Bilateral plus asymmetric equals free.}
 \label{tab:bisym}
 \end{table}
 
-\paragraph{Holes} Table~\ref{tab:holes} counts fixed polyplets by their
-number of holes. The transfer matrix counted them through $n = 18$, and
-Redelmeier enumeration with a flood fill of each animal's complement checked
-the counts for $n \le 14$.
-
-\begin{table}[H]
-\centering\small
-\begin{tabular}{r | r r r r}
-\toprule
-$n$ & $k=0$ & 1 & 2 & 3\\
-\midrule
- 1 & 1\\
- 2 & 4\\
- 3 & 20\\
- 4 & 109 & 1\\
- 5 & 622 & 16\\
- 6 & \num{3664} & 166 & 2\\
- 7 & \num{22094} & \num{1456} & 42\\
- 8 & \num{135609} & \num{11788} & 538 & 6\\
- 9 & \num{843941} & \num{91300} & \num{5596} & 144\\
-10 & \num{5310754} & \num{688034} & \num{52268} & \num{2082}\\
-11 & \num{33724862} & \num{5091820} & \num{457754} & \num{24144}\\
-12 & \num{215793158} & \num{37209939} & \num{3841776} & \num{248526}\\
-13 & \num{1389673091} & \num{269452496} & \num{31290820} & \num{2374520}\\
-14 & \num{8998648488} & \num{1937956658} & \num{249306876} & \num{21556520}\\
-15 & \num{58548155506} & \num{13865448048} & \num{1953275736} & \num{188568632}\\
-16 & \num{382526638033} & \num{98796744112} & \num{15103433472} & \num{1603972074}\\
-17 & \num{2508473632910} & \num{701664375696} & \num{115556223626} & \num{13348948048}\\
-18 & \num{16503616943998} & \num{4970078092354} & \num{876484089730} & \num{109173877126}\\
-\bottomrule
-\end{tabular}\\[2ex]
-\begin{tabular}{r | r r r r r r r}
-\toprule
-$n$ & $k=4$ & 5 & 6 & 7 & 8 & 9 & 10\\
-\midrule
- 9 & 1\\
-10 & 42\\
-11 & 820 & 8\\
-12 & \num{11482} & 263 & 2\\
-13 & \num{135235} & \num{4808} & 96\\
-14 & \num{1437090} & \num{67020} & \num{2186} & 22\\
-15 & \num{14261808} & \num{804084} & \num{35086} & 808 & 6\\
-16 & \num{134769521} & \num{8779911} & \num{465138} & \num{16410} & 314 & 1\\
-17 & \num{1227552608} & \num{89826208} & \num{5490242} & \num{251104} & \num{7847} & 104\\
-18 & \num{10866411352} & \num{876032532} & \num{59950610} & \num{3272674} & \num{137298} & \num{3460} & 30\\
-\bottomrule
-\end{tabular}
-\caption{Count of fixed polyplets of size $n$ with exactly $k$ holes.}
-\label{tab:holes}
-\end{table}
-
 \paragraph{Growth rate} The growth constant $\lambda = \lim_{n\to\infty}
 a(n)^{1/n}$ exists and equals $\sup_n a(n)^{1/n}$ \cite{klarner1967}, so
 $a(n) \le \lambda^n$ for every $n$. Given a polyplet $A$ of size $m$ and a
@@ -379,16 +312,8 @@ as its lowest $m$ cells. Distinct pairs therefore give distinct unions, and
 $a(m+n) \ge a(m)\,a(n)$. In particular $a(40k) \ge a(40)^k$ for every $k$,
 and therefore, from Table~\ref{tab:an} alone,
 \[ \lambda \ge a(40)^{1/40} = 6.2208. \]
-The ratios $a(n+1)/a(n)$ converge to the same $\lambda$ \cite{madras1999}.
-A differential-approximant analysis of the first $36$ terms estimates
-\[ \lambda = 7.110(1), \qquad \theta = -1.000(1) \]
-in $a(n) \sim A\,\lambda^n n^{\theta}$. With $\theta = -1$ the ratios
-approach $\lambda$ from below like $\lambda(1 - 1/n)$, and the last one fits:
-$\lambda(1 - 1/40) = 6.932$ against the observed $a(40)/a(39) = 6.9352$. The
-same code returns $4.06257$ for the polyomino constant against the accepted
-$4.0625696$. Rigorous bounds
-$6.543 \le \lambda \le 9.3154$ are proved by exact certificates in a
-companion paper \cite{L3}.
+The ratios $a(n+1)/a(n)$ converge to the same $\lambda$ \cite{madras1999};
+the last is $a(40)/a(39) = 6.9352$.
 
 % ===========================================================================
 \section{Methods}
@@ -397,8 +322,8 @@ companion paper \cite{L3}.
 \paragraph{Redelmeier enumeration} Redelmeier's algorithm
 \cite{redelmeier1981} grows animals one cell at a time from a fixed starting
 cell, in an order that produces each fixed animal exactly once. The implementation records
-each animal's bounding box, so it produces the triangle $T(n,H)$ rather than just
-$a(n)$, and with a flood fill of the complement, it counts holes. Its cost is
+each animal's bounding box, so it produces the triangle $T(n,H)$ rather than
+just $a(n)$. Its cost is
 proportional to the number of animals, so it was used to compute $a(19)$, in
 two independent campaigns on two machines, and to confirm the transfer
 matrix's counts up to $n = 22$; the confirmation of the row $n = 22$ took
@@ -502,13 +427,14 @@ Symmetric polyplets are rare, which is why the one-sided count approaches
 $a(n)/4$ and the free count $a(n)/8$ (Section~\ref{sec:results}). A polyplet
 left unchanged by a nontrivial $g$ is determined by its cells on one side of
 the axis or center of $g$ together with the position of that axis or center.
-Those cells form at most two connected pieces with at most $n/2 + 1$ cells
-between them, so $\mathrm{Fix}_g(n)$ is at most a polynomial in $n$ times
-$\lambda^{n/2+1}$, using $a(m) \le \lambda^m$. On the other side,
-$a(m+n) \ge a(m)\,a(n)$ gives $a(n) \ge a(40)^{\lfloor n/40 \rfloor} \ge
-6.2208^{\,n-39}$. So $\mathrm{Fix}_g(n)/a(n)$ is at most a polynomial times
-$(\sqrt{\lambda}/6.2208)^{n}$, and $\sqrt{\lambda} \le \sqrt{9.3154} < 3.1$,
-so the ratio decays exponentially.
+Those cells form at most two connected pieces, of sizes $m_1$ and $m_2$ with
+$m_1 + m_2 \le n/2 + 1$, so $\mathrm{Fix}_g(n)$ is at most a polynomial in
+$n$ times $a(m_1)\,a(m_2)$. On the other side, applying $a(m+n) \ge
+a(m)\,a(n)$ twice gives $a(n) \ge a(m_1)\,a(m_2)\,a(n - m_1 - m_2)$. So
+$\mathrm{Fix}_g(n)/a(n)$ is at most a polynomial in $n$ divided by
+$a(n - m_1 - m_2)$, and $n - m_1 - m_2 \ge n/2 - 1$, where $a$ grows at least
+like $6.2208^{\,n-39}$ from $a(40k) \ge a(40)^k$; the ratio therefore decays
+exponentially.
 
 \paragraph{Burnside congruences} Grouping the fixed polyplets by their exact
 symmetry group, the orbits of size $8$ and $4$ vanish modulo $4$, which leaves
@@ -523,13 +449,6 @@ I_H(D_2^{\mathrm{ax}}) \pmod 2$. The invariant counts come from an unrelated
 algorithm in minutes, and both congruences hold on every $a(n)$ and every cell
 for $n \le 40$. They are weak checks, two bits per row and one per cell, and
 are reported as such.
-
-\paragraph{Holes} The transfer matrix counted holes by carrying the Euler
-characteristic of the partial animal as a running sum. With king-adjacent
-cells and edge-adjacent background it equals components minus holes and is a
-sum of local terms over $2 \times 2$ windows \cite{gray1971}, each of which
-lies within one pair of adjacent columns; a completed polyplet has $1 - E$
-holes.
 
 \paragraph{Formulas}
 \label{sec:formulas}
@@ -567,18 +486,6 @@ Each of the four weights $16$, $9$, $4$, $1$ was confirmed by enumerating
 every fixed polyplet of size $n \le 8$ and classifying its doubled row, and
 the formula holds on all $38$ computed entries $3 \le n \le 40$.
 
-$T(n,n-2)$: either one row of three or two rows of two. A row of three has two
-internal gaps, each $1$ or $2$ by the same argument; summing over gap types
-and neighbor placements gives an interior weight of $49$ and an end weight
-of $7$, so $(49n - 154)\,3^{\,n-5}$. Two doubled rows that are not adjacent
-are two independent joiners of weight $25$, or $5$ at an end, and summing over
-their placements gives $\tfrac12(625n^2 - 5375n + 11700)\,3^{\,n-7}$. Two
-adjacent doubled rows form one compound joiner of weight $339$, or $66$ at an
-end, giving $(1017n - 3897)\,3^{\,n-7}$. The three parts sum to
-$\tfrac12(625n^2 - 2459n + 1134)\,3^{\,n-7}$; each part separately
-matches the exhaustive count for $5 \le n \le 8$, and the sum holds on all
-$36$ computed entries $5 \le n \le 40$ (\repo{docs/proofs/T-n-nm2-and-general.md}).
-
 The general law (Theorem~\ref{thm:diag}) is the same bookkeeping carried to
 all orders. Read a polyplet row by row: rows with one cell are walk rows, and
 maximal runs of rows with two or more cells are clusters. A walk row is a cut,
@@ -603,10 +510,7 @@ confirmed. A value computed once and found consistent with proved structure
 is checked, which catches gross errors and not a subtle systematic one.
 
 \paragraph{Anchors} $a(1)$--$a(18)$ equal the eighteen terms the OEIS serves
-for A006770, from both enumeration programs. Run on other classes of animals,
-the same programs reproduce published counts: the fixed polyominoes A001168
-through their published range, and Bacher's directed king animals
-\cite{bacher2015} (\repo{docs/external-anchors.md}).
+for A006770, from both enumeration programs.
 
 \paragraph{Every run re-derives everything below it} Each production run
 computes the whole triangle for its size from scratch rather than extending a
@@ -671,23 +575,14 @@ and are reproduced by the formulas fixed on the coloring program's entries;
 none has been enumerated twice.
 
 \paragraph{The forty-first term} $a(41)$ is an enumeration of heights
-$1$--$20$ at size $41$, heights $1$--$19$ in $4.7$ hours on $40$ cores and
-height $20$ in $9.6$ hours on $76$, plus the formulas for heights $21$--$41$,
-with $P_k$ for $k \le 19$ as fixed above and $P_{20}$ fixed from entries
-below its range. The nineteen lowest entries agree with the coloring program,
-which has not been run at height $20$: on its measured passes at heights $17$
-to $19$, that run would need $170$ to $200$~GB of memory, more than the
-machine has.
-
-Before height $20$ was enumerated, $P_{21}$, fixed three ways from
-$T(38,17)$, $T(39,18)$ and $T(40,19)$ with the three fits agreeing, predicted
-$T(41,20)$. The enumeration returned exactly that value,
-$T(41,20) = \num{18004779862205054677763902712770}$, so that formula has
-met an enumeration it did not use, and $a(41)$ no longer needs it
-(\repo{make gate-undertow-pairs}). An independent re-derivation with its own
-code reproduces the term (\repo{results/undertow-review-B.md}).
-What remains: $T(41,20)$ has one enumeration and one formula prediction
-behind it, and heights $21$--$41$ are formula.
+$1$--$20$ at size $41$ plus the closed forms for heights $21$--$41$, with
+$P_k$ for $k \le 19$ as fixed above and $P_{20}$ fixed from entries below its
+range. The nineteen lowest entries agree with the coloring program, which has
+not been run at height $20$. Before height $20$ was enumerated, $P_{21}$
+predicted $T(41,20)$; the enumeration returned exactly that value,
+$T(41,20) = \num{18004779862205054677763902712770}$, and $a(41)$ no longer
+needs $P_{21}$ (\repo{make gate-undertow-pairs}). Heights $21$--$41$ remain
+formula.
 
 \paragraph{Checks that run in minutes} The repository holds every stored
 number beside the run record that produced it, and checks a reader can run
@@ -716,8 +611,7 @@ Each term's run record is the \repo{PROVENANCE.md} in its
 \repo{results/ns\_a\textit{NN}/} directory, $19 \le NN \le 40$, and in
 \repo{results/a41/}; the triangle is
 \repo{results/triangle.txt}; the symmetry fixed-point counts
-\repo{results/sym\_counts.txt}; the hole counts \repo{results/holes\_n18.txt}
-and \repo{results/holes\_n14.txt}; the Lean development \repo{polyplets/},
+\repo{results/sym\_counts.txt}; the Lean development \repo{polyplets/},
 whose \repo{PROOF-STATUS.md} says what it covers and what it does not. The
 plain-language account of how well each value is supported, kept current, is
 \repo{results/confidence.md}.

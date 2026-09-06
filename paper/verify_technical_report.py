@@ -674,11 +674,6 @@ if DRAFT.exists():
               int(re.search(r"tag U\): \*\*(\d+)\*\* of the", ptab).group(1)), cov[2] + 3)
     check("draft: Redelmeier reach", dsaid("Redelmeier", r"confirm the transfer matrix's counts up to \$n = (\d+)\$"), max(red))
     check("draft: Redelmeier cells agree everywhere", dsaid("Redelmeier rows", r"Every entry of every row \$n \\le (\d+)\$ agrees between Redelmeier"), max(red))
-    prof = (a41_dir / "h20_cost_profile.tsv").read_text()
-    wall = float(re.search(r"wall=([\d.]+)s", prof).group(1))
-    cores = int(re.search(r"cores=(\d+)", prof).group(1))
-    check("draft: H=20 sweep hours and cores",
-          dsaid("H20 cost", r"height \$20\$ in \$([\d.]+)\$ hours on \$(\d+)\$", float), (round(wall / 3600, 1), float(cores)))
     check("draft: a(40)^(1/40)", dsaid("fekete", r"\\lambda \\ge a\(40\)\^\{1/40\} = (\d+\.\d+)", float),
           round(banked_an[40] ** (1 / 40), 4))
     check("draft: a(40)/a(39)", dsaid("ratio", r"a\(40\)/a\(39\) = (\d+\.\d+)", float),
@@ -689,15 +684,7 @@ if DRAFT.exists():
         e8 = Fr(8 * free[n32], banked_an[n32]) - 1
         check(f"draft: one-sided excess at n={n32} in (0, 1e-6)", 0 < e4 < Fr(1, 10 ** 6), True)
         check(f"draft: free excess at n={n32} in (0, 1e-6)", 0 < e8 < Fr(1, 10 ** 6), True)
-    check("draft: holes by Euler through n =", dsaid("holes TM", r"The transfer matrix counted them through \$n = (\d+)\$"), max(n for n, k in holes))
-    check("draft: holes flood-fill through n <=", dsaid("holes flood", r"checked the counts for \$n \\le (\d+)\$"), max(n for n, k in holes14))
-    nm2 = dsaid("T(n,n-2) display", r"T\(n,n-2\) = \\tfrac12\\,\((\d+)n\^2 - (\d+)n \+ (\d+)\)\\,3\^\{\\,n-7\}")
-    check("draft: T(n,n-2) display coefficients", nm2, (625, 2459, 1134))
-    check("draft: triple weights", dsaid("triple", r"interior weight of \$(\d+)\$ and an end weight of \$(\d+)\$, so \$\((\d+)n - (\d+)\)\\,3\^\{\\,n-5\}\$"), (49, 7, 49, 154))
-    check("draft: separated doubles quadratic", dsaid("sep", r"\\tfrac12\((\d+)n\^2 - (\d+)n \+ (\d+)\)\\,3\^\{\\,n-7\}\$\. Two adjacent"), (625, 5375, 11700))
-    check("draft: adjacent doubles", dsaid("adj", r"compound joiner of weight \$(\d+)\$, or \$(\d+)\$ at an end, giving \$\((\d+)n - (\d+)\)\\,3\^\{\\,n-7\}\$"), (339, 66, 1017, 3897))
     check("draft: T(n,n-1) display", dsaid("nm1", r"T\(n,n-1\) = (\d+)\(n-3\)\\,3\^\{\\,n-4\} \+ (\d+) \\cdot 3\^\{\\,n-4\} = \((\d+)n - (\d+)\)\\,3\^\{\\,n-4\}"), (25, 30, 25, 45))
-    check("draft: T(n,n-2) cells checked", dsaid("nm2 cells", r"the sum holds on all \$(\d+)\$ computed entries \$5 \\le n \\le 40\$"), 36)
     check("draft: T(n,n-1) cells checked", dsaid("nm1 cells", r"the formula holds on all \$(\d+)\$ computed entries \$3 \\le n \\le 40\$"), 38)
 
 print(f"{checks} checks, {len(failures)} failures")
