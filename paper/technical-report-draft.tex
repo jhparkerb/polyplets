@@ -35,33 +35,34 @@
 \emph{$a(1)$--$a(18)$} --- equal the OEIS terms for A006770, reproduced by both
 enumeration programs (\repo{make gate-bfiles}).
 \emph{$a(19)$--$a(22)$} --- Redelmeier enumeration and the column transfer
-matrix, sharing no counting logic, agree on every cell
+matrix, sharing no counting logic, agree on every entry
 (\repo{results/redelmeier\_row22/PROVENANCE.md}).
-\emph{$a(23)$--$a(39)$} --- every cell either enumerated by the colouring
-transfer matrix, which shares no code with the production engine, or given
-by a proved closed form whose constants are fixed from that engine's cells;
-every row re-sums to the published value (\repo{results/undertow.md}).
-\emph{$a(40)$} --- heights $1$--$19$ enumerated by both engines; heights
-$20$--$40$ from the closed forms fixed on the colouring engine's cells; the
-cells $T(39,20)$, $T(40,20)$, $T(40,21)$ have one enumeration only
+\emph{$a(23)$--$a(39)$} --- every entry either enumerated by the coloring
+transfer matrix, which shares no code with the main program, or given by a
+proved closed form whose constants are fixed from that program's entries; every
+row sums to the published value (\repo{results/undertow.md}).
+\emph{$a(40)$} --- heights $1$--$19$ enumerated by both programs; heights
+$20$--$40$ from the closed forms fixed on the coloring program's entries; the
+entries $T(39,20)$, $T(40,20)$, $T(40,21)$ have one enumeration only
 (\repo{results/confidence.md}).
-\emph{$a(41)$} --- heights $1$--$19$ by both engines; height $20$ enumerated
-once, equal to the closed forms' prediction for it; heights $21$--$41$ from
-the closed forms, the top level fixed from cells below onset with correction
-terms checked at the lower levels (\repo{results/a41/PROVENANCE.md}).
+\emph{$a(41)$} --- heights $1$--$19$ by both programs; height $20$ enumerated
+once, equal to what the closed forms predicted for it; heights $21$--$41$ from
+the closed forms, the top diagonal fixed from entries below the range where its
+formula holds, with correction terms checked at smaller $k$
+(\repo{results/a41/PROVENANCE.md}).
 \emph{Theorem~\ref{thm:diag}} --- paper proof in
 \repo{docs/proofs/diagonal-law.md} and \repo{docs/proofs/grand-form.md},
-formalised in Lean~4 against standard axioms with no \texttt{sorry}
+formalized in Lean~4 against standard axioms with no \texttt{sorry}
 (\repo{polyplets/PROOF-STATUS.md}).
-\emph{$T(n,n)$, $T(n,n-1)$, $T(n,n-2)$} --- derivations below, each gadget
-weight checked by exhaustive enumeration for $n \le 8$, the formulas on
-every banked cell.
+\emph{$T(n,n)$, $T(n,n-1)$, $T(n,n-2)$} --- derivations below, each weight
+checked by exhaustive enumeration for $n \le 8$, the formulas on every
+computed entry.
 \emph{Symmetry tables} --- fixed-point counts by two programs, combined by
 Burnside's lemma, checked mod $8$ for $n \le 32$ (\repo{results/sym\_counts.txt}).
 \emph{Hole table} --- transfer matrix with Euler accounting to $n = 18$,
 agreeing with a Redelmeier flood fill for $n \le 14$.
 \emph{Growth rate} --- the lower bound is proved below; the estimate is a
-labelled measurement (\repo{results/series-analysis-da.md}).
+labeled measurement (\repo{results/series-analysis-da.md}).
 \emph{Human verification of this document} --- none.}
 
 \begin{abstract}
@@ -72,7 +73,9 @@ A triangular sequence $T(n,H)$ is introduced that counts the fixed king
 polyplets of size $n$ and height exactly $H \le n$, so that $a(n) = \sum_H
 T(n,H)$. Above the line $H > n/2$ the triangle obeys a proved closed form,
 $T(n,H) = P_{n-H}(n)\,3^{\,3H-2n-1}$ with $P_k$ an integer-valued polynomial
-of degree $k$, and each $P_k$ is fixed by two computed cells.
+of degree $k$, and each $P_k$ is fixed by two computed entries. The closed form,
+its range of validity and the two-cell determination are proved on paper and
+formalized in Lean~4 against standard axioms.
 
 $a(1)$--$a(18)$ were already known. $a(19)$ was computed by Redelmeier
 enumeration; $a(20)$--$a(23)$ by transfer matrix; $a(24)$--$a(40)$ by
@@ -82,9 +85,9 @@ term is given with its evidence stated separately.
 
 Every new $a(n)$ has been checked by a second computation that shares no code
 with the first: for $n \le 22$ by Redelmeier enumeration, and for larger $n$
-by a transfer matrix that colours cells instead of tracking connectivity,
-with the closed forms supplying the cells above its reach. All $a(n)$ pass
-checks based on Burnside congruences. Counts of one-sided, free, bilateral,
+by a transfer matrix that colors cells instead of tracking connectivity,
+with the closed forms supplying the entries above its reach. Counts of
+one-sided, free, bilateral,
 asymmetric and non-polyomino polyplets are extended, and polyplets are
 counted by number of holes to $n = 18$.
 
@@ -100,9 +103,9 @@ An \textbf{animal} is a finite, connected set of cells on a lattice; the
 \textbf{size} of an animal is the number of cells that comprise it; the
 \textbf{height} of an animal is the height of its bounding box. The
 \textbf{king polyplets} (or polyplets) are the animals of the king lattice,
-where a cell is connected to its eight neighbours in the compass directions;
+where a cell is connected to its eight neighbors in the compass directions;
 the rook-connected animals, connected only through the four edge-sharing
-neighbours, are the \textbf{polyominoes}. Every polyomino is a polyplet.
+neighbors, are the \textbf{polyominoes}. Every polyomino is a polyplet.
 
 The polyplets can be counted with respect to the symmetries of the king
 lattice:
@@ -122,10 +125,10 @@ A polyplet may have one or more \textbf{holes}, polyominoes of unfilled cells
 enclosed by king-connected occupied cells. A hole of size $1$ may be enclosed
 by a polyplet of size $4$, and a domino of $2$ cells or two size-$1$ holes may
 be enclosed by a polyplet of size $6$: an empty cell is enclosed only when
-its four edge neighbours are occupied, and those four cells are pairwise
-king-adjacent; a domino has six edge neighbours; two one-cell holes need their
+its four edge neighbors are occupied, and those four cells are pairwise
+king-adjacent; a domino has six edge neighbors; two one-cell holes need their
 two sets of four, which share at most two cells, and six is attained when the
-holes are diagonal neighbours.
+holes are diagonal neighbors.
 
 $\mathbf{T(n,H)}$, $1 \le H \le n$, is the number of fixed polyplets of size
 $n$ whose bounding box is of height exactly $H$; the row sums produce $a(n)$,
@@ -136,10 +139,10 @@ the number of fixed polyplets of size $n$ (\oeis{A006770}).
 \label{sec:results}
 
 \paragraph{Enumeration of the fixed polyplets} Table~\ref{tab:an} gives all
-known $a(n)$. Terms $1$--$18$ were known from Redelmeier's unpublished
-%% JP:  "unpublished"???  how were they known if they weren't published??
-counts, Mertens \cite{mertens1990} and Tremblay and Vernay
-\cite{tremblayVernay2024}, as recorded in the OEIS entry \cite{oeisA006770}.
+known $a(n)$. Terms $1$--$18$ were known before this work: Redelmeier's
+counts, communicated to the OEIS and recorded in its entry
+\cite{oeisA006770}, Mertens's Table~1 \cite{mertens1990}, and Tremblay and
+Vernay for $a(18)$ \cite{tremblayVernay2024}.
 
 \begin{table}[H]
 \centering
@@ -189,7 +192,8 @@ One row of two cells gives
 and one row of three or two rows of two give
 \[ T(n,n-2) = \tfrac12\,(625n^2 - 2459n + 1134)\,3^{\,n-7}, \qquad n \ge 5; \]
 both are derived in Section~\ref{sec:formulas}. In general, when $H > n/2$
-the cell placements are constrained enough to force a closed form.
+the cell placements are constrained enough to force a closed form. The general
+statement is a theorem, proved on paper and checked by machine in Lean~4:
 
 \begin{theorem}[diagonal law]
 \label{thm:diag}
@@ -198,17 +202,22 @@ values at integers, with leading coefficient $25^k/k!$, such that
 \[ T(n,H) = P_{n-H}(n)\,3^{\,3H-2n-1} \qquad \text{whenever } H > n/2, \]
 and the identity fails at $H = n/2$ for every even $n \ge 2$. Moreover
 $P_k(n) = Q_k(n) + a_k + b_k n$ where $Q_k$ is determined by $P_1, \dots,
-P_{k-1}$, so two cells of the $k$-th diagonal with $H > n/2$ fix $P_k$
+P_{k-1}$, so two entries of the $k$-th diagonal with $H > n/2$ fix $P_k$
 exactly.
 \end{theorem}
 
-The proof is sketched in Section~\ref{sec:formulas}. $P_k$ is wired into the
-production engine for $k \le 19$; each level was fixed from its two earliest
-cells above the line $H > n/2$ and then checked against every later
-real-swept cell on its diagonal, $171$ cells in all, every one exact. The
-$k$-th diagonal is fixed once the $3k$-th row of $T(n,H)$ has been computed:
-with the leading coefficient known, $P_k$ has $k$ free coefficients, and the
-rows $2k+1, \dots, 3k$ supply $k$ cells with $H > n/2$.
+The Lean~4 formalization covers the shape, the range $H > n/2$, the
+integer values and the two-cell determination, with each $P_k$ for $k \le 18$
+derived from two computed entries inside the proof assistant; it rests on
+Lean's standard axioms and its compiled integer arithmetic, and nothing else
+is assumed. The paper proof is sketched in
+Section~\ref{sec:formulas}. The program that computes the triangle carries
+$P_k$ for $k \le 19$. Each was fixed from the
+two entries of smallest $n$ on its diagonal with $H > n/2$ and then checked
+against every later enumerated entry on that diagonal, $171$ entries in all,
+every one exact. The $k$-th diagonal is fixed once the $3k$-th row of $T(n,H)$ has been
+computed: with the leading coefficient known, $P_k$ has $k$ free coefficients,
+and the rows $2k+1, \dots, 3k$ supply $k$ entries with $H > n/2$.
 
 \begin{table}[H]
 \centering\footnotesize
@@ -231,7 +240,7 @@ $n$ & $H=1$ & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12\\
 12 & 1 & 33459 & 2156027 & 16922729 & 44372452 & 62471842 & \g59434367 & \g41336884 & \g21039624 & \g7487559 & \g1673055 & \g177147\\
 \bottomrule
 \end{tabular}
-\caption{Fixed polyplets by height, $T(n,H)$. Shaded cells have $H > n/2$
+\caption{Fixed polyplets by height, $T(n,H)$. Shaded entries have $H > n/2$
 and are given by the closed forms.}
 \label{tab:tnh}
 \end{table}
@@ -240,7 +249,9 @@ and are given by the closed forms.}
 Table~\ref{tab:bisym} give new counts for one-sided, free, bilateral and
 asymmetric polyplets of size $n$, and for the free polyplets that are not
 polyominoes (\oeis{A194596}), which are the free polyplets less the free
-polyominoes (\oeis{A000105}). Few polyplets are polyominoes, since the
+polyominoes (\oeis{A000105}).
+
+Few polyplets are polyominoes, since the
 polyomino growth constant is at most $4.65$ \cite{klarnerRivest1973} against
 the lower bound $6.22$ for polyplets below; and the one-sided count approaches
 $a(n)/4$ and the free count $a(n)/8$ as $n$ grows, since a polyplet with a
@@ -306,11 +317,10 @@ non-polyomino free polyplets. Bilateral plus asymmetric equals free.}
 \label{tab:bisym}
 \end{table}
 
-\paragraph{Holes} Polyplets with holes were tracked and counted during
-transfer-matrix enumeration by carrying the Euler characteristic, through
-$n = 18$. Redelmeier enumeration with a flood fill of each animal's
-complement checked these counts for $n \le 14$. Counts are given in
-Table~\ref{tab:holes}.
+\paragraph{Holes} Table~\ref{tab:holes} counts fixed polyplets by their
+number of holes. The transfer matrix counted them through $n = 18$, and
+Redelmeier enumeration with a flood fill of each animal's complement checked
+the counts for $n \le 14$.
 
 \begin{table}[H]
 \centering\small
@@ -358,22 +368,25 @@ $n$ & $k=4$ & 5 & 6 & 7 & 8 & 9 & 10\\
 \label{tab:holes}
 \end{table}
 
-\paragraph{Growth rate} Placing one polyplet diagonally off the corner of
-another's bounding box joins them into a polyplet from which both are
-recoverable, so $a(m+n) \ge a(m)\,a(n)$, and by Fekete's lemma
-%% JP:  I don't understand Fekete's lemma; I'd prefer that it come out of this document
-$a(n)^{1/n}$ converges to $\lambda = \sup_n a(n)^{1/n}$, which is finite
-because animals containing a given cell are bounded by rooted spanning trees
-\cite{klarner1967}. Hence, from Table~\ref{tab:an} alone,
-\[ \lambda \ge a(40)^{1/40} = 6.2208, \]
-and $a(n) \le \lambda^n$ for every $n$. The ratios $a(n+1)/a(n)$ converge
-to the same $\lambda$ \cite{madras1999}; the last is $a(40)/a(39) = 6.9352$
-and they are still rising. A differential-approximant analysis of the first
-$36$ terms estimates
+\paragraph{Growth rate} The growth constant $\lambda = \lim_{n\to\infty}
+a(n)^{1/n}$ exists and equals $\sup_n a(n)^{1/n}$ \cite{klarner1967}, so
+$a(n) \le \lambda^n$ for every $n$. Given a polyplet $A$ of size $m$ and a
+polyplet $B$ of size $n$, place $B$ so that its lowest, leftmost cell is
+diagonally above and to the right of the highest, rightmost cell of $A$. The
+two cells are king-adjacent, so the union is a polyplet of size $m+n$; every
+cell of $B$ lies above every cell of $A$, so $A$ is recovered from the union
+as its lowest $m$ cells. Distinct pairs therefore give distinct unions, and
+$a(m+n) \ge a(m)\,a(n)$. In particular $a(40k) \ge a(40)^k$ for every $k$,
+and therefore, from Table~\ref{tab:an} alone,
+\[ \lambda \ge a(40)^{1/40} = 6.2208. \]
+The ratios $a(n+1)/a(n)$ converge to the same $\lambda$ \cite{madras1999}.
+A differential-approximant analysis of the first $36$ terms estimates
 \[ \lambda = 7.110(1), \qquad \theta = -1.000(1) \]
-in $a(n) \sim A\,\lambda^n n^{\theta}$, the exponent matching the universal
-value for two-dimensional lattice animals; the same code returns $4.06257$
-for the polyomino constant against the accepted $4.0625696$. Rigorous bounds
+in $a(n) \sim A\,\lambda^n n^{\theta}$. With $\theta = -1$ the ratios
+approach $\lambda$ from below like $\lambda(1 - 1/n)$, and the last one fits:
+$\lambda(1 - 1/40) = 6.932$ against the observed $a(40)/a(39) = 6.9352$. The
+same code returns $4.06257$ for the polyomino constant against the accepted
+$4.0625696$. Rigorous bounds
 $6.543 \le \lambda \le 9.3154$ are proved by exact certificates in a
 companion paper \cite{L3}.
 
@@ -382,130 +395,141 @@ companion paper \cite{L3}.
 \label{sec:methods}
 
 \paragraph{Redelmeier enumeration} Redelmeier's algorithm
-\cite{redelmeier1981} generates each fixed animal exactly once by growing
-from a scan-minimal cell through an untried set. The implementation records
+\cite{redelmeier1981} grows animals one cell at a time from a fixed starting
+cell, in an order that produces each fixed animal exactly once. The implementation records
 each animal's bounding box, so it produces the triangle $T(n,H)$ rather than just
 $a(n)$, and with a flood fill of the complement, it counts holes. Its cost is
 proportional to the number of animals, so it was used to compute $a(19)$, in
 two independent campaigns on two machines, and to confirm the transfer
 matrix's counts up to $n = 22$; the confirmation of the row $n = 22$ took
 about $120$ hours on each of three machines, split into $24\,000$ disjoint
-subtrees. Beyond $n = 22$ it cannot follow.
+subtrees. Beyond $n = 22$ its cost is prohibitive.
 
 \paragraph{Transfer matrix method} Each height $H$ is an independent job. A
-strip of height $H$ is swept column by column; a partial polyplet is
-summarised by a signature recording, for each row of the most recent column,
-%% JP:  American spellings please
+strip of height $H$ is processed column by column. A partial polyplet is
+summarized by a signature recording, for each row of the most recent column,
 whether the cell is occupied and if so which connected component of the
 partial animal it belongs to, together with two flags for whether the top
 and bottom rows of the strip have been reached. Two partial animals with the
 same signature have the same completions, so counts are carried on
-signatures. Each signature carries a vector of counts indexed by the number
-of cells placed so far; combining two records adds the vectors,
-%% and since addition is commutative and associative
-%% JP:  wow really???!!
-the result does not depend on how
-the work was split across cores or machines. A signature is dropped when the
-cells placed plus a lower bound on the cells still needed to reach both ends
-of the strip and to join the components exceeds $n$. A signature whose next
-column is empty, whose cells form one component and whose flags are both set
-is one fixed polyplet of height exactly $H$. Because king adjacency lets
-components cross, the non-crossing signature encodings used for polyominoes
-\cite{jensen2001} do not apply.
+signatures. Because king adjacency lets components cross, the non-crossing
+signature encodings used for polyominoes \cite{jensen2001} do not apply.
 
-Two transition kernels were used, and checked against each other on every
-cell of the rows $n \le 29$. The first transfers a whole column per step,
-resolving connectivity by union--find over the new column's cells and the old
-%% JP:  union-find, surely?
-column's components. The second advances one cell per step, as the polyomino
-transfer matrices do, keeping the one already-overwritten north-west
-neighbour a new cell may still attach to as a carried byte in the signature;
-it is between $11\times$ and $55\times$ faster at the heights measured and
-carried $a(30)$--$a(41)$. Counts are native $64$-bit integers through
-$a(25)$ and $128$-bit from $a(26)$, with every addition guarded against overflow.
+Each signature carries a vector of counts indexed by the number of cells
+placed so far. Combining two records adds their vectors, so the result does
+not depend on how the work was split across cores or machines. A signature is
+dropped when the cells placed, plus a lower bound on the cells still needed
+to reach both ends of the strip and to join the components, exceed $n$. A
+signature whose next column is empty, whose cells form one component and
+whose flags are both set is one fixed polyplet of height exactly $H$.
 
-Several heights share one core pool, so that one height's merge phase hides
-behind another's map phase; $a(40)$ ran as three phases on an $80$-core
-machine, because its three tallest heights did not fit in memory together,
-for $5.3$ million CPU-seconds and a peak of $363$~GB of disk.
+Two versions of the transition were used and checked against each other on
+every cell of the rows $n \le 29$. The first transfers a whole column per
+step, resolving connectivity by union-find over the new column's cells and
+the old column's components. The second advances one cell per step, as the
+polyomino transfer matrices do, keeping the one already-overwritten
+north-west neighbor a new cell may still attach to as a carried byte in the
+signature. It is between $11\times$ and $55\times$ faster at the heights
+measured and computed $a(30)$--$a(41)$. The counts are exact integers, not
+remainders modulo a prime: machine words of $64$ bits suffice through $a(25)$, and
+$a(26)$ onward used $128$-bit words, with a check on every addition so that
+an overflowed count stops the run instead of passing silently.
+
+Several heights run at once on one machine, so that the sorting one height
+does between columns overlaps another height's counting. $a(40)$ ran in three
+stages on an $80$-core machine, because its three tallest heights did not fit
+in memory together, for $5.3$ million CPU-seconds and a peak of $363$~GB of
+disk.
 
 \paragraph{Evaluating the tall heights} From $a(24)$ on, the heights with
-$H > n/2$ and $k = n - H$ in the wired table were evaluated from $P_k$ rather
-than swept, the table growing as levels were fixed: $k \le 7$ at $a(24)$ and
-%% JP: "swept"/"sweep" is a terrible verb/noun.  you mean somethig specific by
-%% it but I guarantee no-one will know what.  replace it with something less
-%% fancy.
-$k \le 18$ at $a(40)$, where heights up to $21$ were still swept. The sweep
-of $a(40)$'s height $21$ alone took $36$ hours on $32$ cores; the tall
-heights are the expensive ones because a height's cost follows its number of
-signatures, not its count.
+$H > n/2$ whose $P_k$ had already been fixed were evaluated from $P_k$ rather
+than enumerated, and that set grew as more $P_k$ were fixed: $k \le 7$ at $a(24)$
+and $k \le 18$ at $a(40)$, where heights up to $21$ were still enumerated.
+The enumeration of height $21$ for $a(40)$ alone took $36$ hours on $32$
+cores. The tall heights are the expensive ones because a height's cost
+follows its number of signatures, not its count.
 
-\paragraph{The colouring transfer matrix} The second source never decides
+\paragraph{The coloring transfer matrix} The second program computes a
+different quantity: $C_H(n)$, the number of connected $n$-cell subsets of a
+strip of height $H$ whose leftmost column is fixed. It never decides
 connectivity. For each $n$ it computes the sum over all $n$-cell subsets $S$
-of a height-$H$ strip of $q^{c(S)}$, $c(S)$ the number of king-connected
-components of $S$, by a frontier dynamic program over colour-coincidence
-partitions in $\mathbb{Z}[q]/(q^2)$: an occupied cell with no earlier
-occupied neighbour either adopts a colour already live or takes a fresh one
-at weight $q - b$, and a cell whose earlier neighbours carry two different
-colours contributes zero. The coefficient of $q$ is the number of connected
-subsets. This is the Fortuin--Kasteleyn representation of the Potts partition
-function specialised to site clusters \cite{fortuinKasteleyn1972}; the proof
-in the engine's own terms is \repo{docs/proofs/cutcount-identity.md}. A
-polyplet of height $h$ sits in a strip of height $H$ in $H - h + 1$
-positions, so the strip count is $C_H(n) = \sum_{h \le H} (H-h+1)\,T(n,h)$
-and $T(n,H) = C_H(n) - 2C_{H-1}(n) + C_{H-2}(n)$. The program runs one
-prime at a time and reassembles exact counts by the Chinese remainder
-theorem, with one prime always held out and predicted as a check. It shares
-no code with either engine above.
+of the strip of $q^{c(S)}$, $c(S)$ the number of king-connected components of
+$S$, working in polynomials in $q$ truncated after the linear term. Cells are
+processed one at a time and the only state kept is which recent cells share a
+color: an occupied cell with no earlier occupied neighbor either adopts a
+color already in use or takes a fresh one at weight $q - b$, and a cell whose
+earlier neighbors carry two different colors contributes zero. The
+coefficient of $q$ is $C_H(n)$. The same sum appears in statistical
+mechanics as the random-cluster model \cite{fortuinKasteleyn1972}; the proof
+that the program computes it is \repo{docs/proofs/cutcount-identity.md}.
 
-%% JP:  Read to here
+$C_H$ and $T$ carry the same information. A polyplet of height $h$ fits in a
+strip of height $H$ in $H - h + 1$ vertical positions, so $C_H(n) = \sum_{h
+\le H} (H-h+1)\,T(n,h)$, and inverting, $T(n,H) = C_H(n) - 2C_{H-1}(n) +
+C_{H-2}(n)$. Neither identity counts anything by itself: the work is in
+computing $C_H$, whose states multiply with $H$ as the main program's do. The
+identities only convert one program's output into the other's, which is what
+makes the comparison possible. The program works modulo one prime at a time and
+reassembles the exact counts by the Chinese remainder theorem; one prime is
+always left out of the reassembly and its remainders predicted from the
+others as a check. It shares no code with either program above.
+
 \paragraph{Symmetry counts}
 \label{sec:symmetry}
-By Burnside's lemma \cite{stanley2012}, with $\mathrm{Fix}_g(n)$ the number
-of fixed polyplets of size $n$ invariant under $g$ in the symmetry group
-$D_4$,
+Let $\mathrm{Fix}_g(n)$ be the number of fixed polyplets of size $n$ left
+unchanged by the symmetry $g$ of the square, so that $\mathrm{Fix}_e(n) =
+a(n)$ for the identity $e$. Write $r_{90}$ and $r_{180}$ for the rotations,
+$h$ for a reflection in a horizontal or vertical axis and $d$ for a
+reflection in a diagonal; the two reflections of each kind have the same
+fixed-point count, as do the two quarter turns. Burnside's lemma
+\cite{stanley2012} gives
 \begin{align*}
   \text{one-sided}(n) &= \tfrac14\bigl(a(n) + \mathrm{Fix}_{r_{180}}(n)
       + 2\,\mathrm{Fix}_{r_{90}}(n)\bigr), \\
   \text{free}(n) &= \tfrac18\bigl(a(n) + \mathrm{Fix}_{r_{180}}(n)
       + 2\,\mathrm{Fix}_{r_{90}}(n) + 2\,\mathrm{Fix}_{h}(n)
-      + 2\,\mathrm{Fix}_{d}(n)\bigr),
+      + 2\,\mathrm{Fix}_{d}(n)\bigr).
 \end{align*}
-$h$ an axis reflection and $d$ a diagonal one, and the bilateral count is the
-number of free classes containing a mirror-symmetric polyplet, obtained from
-the same fixed-point counts by inclusion and exclusion over the reflection
-subgroups. The fixed-point counts were computed by two programs, a direct
-counter of symmetric animals and a transfer matrix restricted to them, which
-agree where they overlap. A polyplet invariant under a nontrivial $g$ is
-determined by its cells in a fundamental domain of $g$, so
-$\mathrm{Fix}_g(n)$ is at most a polynomial in $n$ times $a(m)^2$ for
-$m \le n/2 + 1$, while $a(n) \ge 6.2208^{\,n-39}$ and $a(m) \le \lambda^m$
-with $\lambda \le 9.3154$; the ratio $\mathrm{Fix}_g(n)/a(n)$ therefore
-decays exponentially, which is the claim about $a(n)/4$ and $a(n)/8$ in
-Section~\ref{sec:results}.
+The bilateral count is the number of free polyplets with at least one
+reflection symmetry; it comes from the same fixed-point counts by inclusion
+and exclusion over the reflections.
 
-\paragraph{Burnside congruences} Grouping the fixed polyplets by the exact
-subgroup of $D_4$ that stabilises them, and writing $I(K)$ for the number
-invariant under every element of a subgroup $K$, orbits of sizes $8$ and $4$
-vanish modulo $4$ and the rest give
+The fixed-point counts were computed by two programs, a direct counter of
+symmetric animals and a transfer matrix restricted to them, and the two agree
+wherever both were run.
+
+Symmetric polyplets are rare, which is why the one-sided count approaches
+$a(n)/4$ and the free count $a(n)/8$ (Section~\ref{sec:results}). A polyplet
+left unchanged by a nontrivial $g$ is determined by its cells on one side of
+the axis or center of $g$ together with the position of that axis or center.
+Those cells form at most two connected pieces with at most $n/2 + 1$ cells
+between them, so $\mathrm{Fix}_g(n)$ is at most a polynomial in $n$ times
+$\lambda^{n/2+1}$, using $a(m) \le \lambda^m$. On the other side,
+$a(m+n) \ge a(m)\,a(n)$ gives $a(n) \ge a(40)^{\lfloor n/40 \rfloor} \ge
+6.2208^{\,n-39}$. So $\mathrm{Fix}_g(n)/a(n)$ is at most a polynomial times
+$(\sqrt{\lambda}/6.2208)^{n}$, and $\sqrt{\lambda} \le \sqrt{9.3154} < 3.1$,
+so the ratio decays exponentially.
+
+\paragraph{Burnside congruences} Grouping the fixed polyplets by their exact
+symmetry group, the orbits of size $8$ and $4$ vanish modulo $4$, which leaves
 \[ a(n) \equiv I(C_4) + I(D_2^{\mathrm{ax}}) + I(D_2^{\mathrm{diag}})
    - 2\,I(D_4) \pmod 4, \]
-with $C_4$ the rotations, $D_2^{\mathrm{ax}}$ the identity, both axis
-reflections and the half turn, and $D_2^{\mathrm{diag}}$ likewise with the
-diagonal reflections. Since $D_2^{\mathrm{ax}}$ is exactly the subgroup
-preserving height, the same argument on the polyplets of one height gives
-$T(n,H) \equiv I_H(D_2^{\mathrm{ax}}) \pmod 2$ for every cell. The invariant
-counts are computed by an unrelated algorithm on the quotient domain in
-minutes. The congruence holds for every $a(n)$, $n \le 40$, and the parity
-for every one of the $820$ cells of the $n \le 40$ triangle.
+where $I(K)$ counts the fixed polyplets invariant under every element of the
+subgroup $K$, $C_4$ is the rotations, $D_2^{\mathrm{ax}}$ the identity, the two
+axis reflections and the half turn, and $D_2^{\mathrm{diag}}$ the same with
+the diagonal reflections. Since $D_2^{\mathrm{ax}}$ is the subgroup that
+preserves height, the same argument on one height gives $T(n,H) \equiv
+I_H(D_2^{\mathrm{ax}}) \pmod 2$. The invariant counts come from an unrelated
+algorithm in minutes, and both congruences hold on every $a(n)$ and every cell
+for $n \le 40$. They are weak checks, two bits per row and one per cell, and
+are reported as such.
 
-\paragraph{Holes by the Euler characteristic} With king-adjacent foreground
-and edge-adjacent background, the Euler number of a cell set is its number
-of components minus its number of holes, and it is a sum over $2 \times 2$
-windows of a local contribution \cite{gray1971}. Each window lies within one
-pair of adjacent columns, so the Euler number accumulates over exactly the
-column transitions the sweep already performs, as an additive coordinate
-beside the cell count; a completed polyplet has $1 - E$ holes.
+\paragraph{Holes} The transfer matrix counted holes by carrying the Euler
+characteristic of the partial animal as a running sum. With king-adjacent
+cells and edge-adjacent background it equals components minus holes and is a
+sum of local terms over $2 \times 2$ windows \cite{gray1971}, each of which
+lies within one pair of adjacent columns; a completed polyplet has $1 - E$
+holes.
 
 \paragraph{Formulas}
 \label{sec:formulas}
@@ -514,7 +538,7 @@ king adjacency changes the row by at most one, a row holding a single cell is
 a cut: every path from below it to above it passes through that cell.
 
 $T(n,n)$: one cell per row, consecutive cells adjacent, so after fixing the
-first cell's column each next cell is left, centre or right of the one
+first cell's column each next cell is left, center or right of the one
 before it, $3^{\,n-1}$ in all.
 
 $T(n,n-1)$: there are $n-1$ rows and $n-2$ junctions between rows where a
@@ -522,25 +546,30 @@ choice is made for the placement of the next cell or cells. A single cell has
 exactly three options. To place $n$ cells in $n-1$ rows, one row must have
 two cells, both connected to the rest: a joiner that is either a left--right
 domino or a split, two cells separated by exactly one empty cell, since a
-larger gap could not be bridged by the single cell of a neighbouring row. The
-joiner may sit at any of the $n-3$ interior rows. For a domino joiner one
+larger gap could not be bridged by the single cell of a neighboring row. The
+joiner may sit at any of the $n-3$ interior rows.
+
+For a domino joiner one
 junction has $4$ possibilities rather than $3$ and the other also $4$, since
 the domino may connect diagonally or orthogonally to the left or right of the
 previous cell and the next cell may be placed likewise: $16(n-3)\,3^{\,n-4}$.
+
 For a split joiner, when the split sits exactly left and right of the
 previous cell there are five placements for the next cell, and otherwise
 there are four placements for the split that each force one placement of the
-next cell: $(4 \cdot 1 + 1 \cdot 5)(n-3)\,3^{\,n-4}$. Together $25(n-3)\,
-3^{\,n-4}$ for an interior joiner. A joiner at the top or bottom has five
-placements, giving $2 \cdot 5 \cdot 3^{\,n-3} = 30 \cdot 3^{\,n-4}$, and
+next cell: $(4 \cdot 1 + 1 \cdot 5)(n-3)\,3^{\,n-4}$. Together, $25(n-3)\,
+3^{\,n-4}$ for an interior joiner.
+
+A joiner at the top or bottom has five placements, giving $2 \cdot 5 \cdot
+3^{\,n-3} = 30 \cdot 3^{\,n-4}$, and
 \[ T(n,n-1) = 25(n-3)\,3^{\,n-4} + 30 \cdot 3^{\,n-4} = (25n - 45)\,3^{\,n-4}. \]
 Each of the four weights $16$, $9$, $4$, $1$ was confirmed by enumerating
 every fixed polyplet of size $n \le 8$ and classifying its doubled row, and
-the formula holds on all $38$ banked cells $3 \le n \le 40$.
+the formula holds on all $38$ computed entries $3 \le n \le 40$.
 
 $T(n,n-2)$: either one row of three or two rows of two. A row of three has two
 internal gaps, each $1$ or $2$ by the same argument; summing over gap types
-and neighbour placements gives an interior weight of $49$ and an end weight
+and neighbor placements gives an interior weight of $49$ and an end weight
 of $7$, so $(49n - 154)\,3^{\,n-5}$. Two doubled rows that are not adjacent
 are two independent joiners of weight $25$, or $5$ at an end, and summing over
 their placements gives $\tfrac12(625n^2 - 5375n + 11700)\,3^{\,n-7}$. Two
@@ -548,71 +577,66 @@ adjacent doubled rows form one compound joiner of weight $339$, or $66$ at an
 end, giving $(1017n - 3897)\,3^{\,n-7}$. The three parts sum to
 $\tfrac12(625n^2 - 2459n + 1134)\,3^{\,n-7}$; each part separately
 matches the exhaustive count for $5 \le n \le 8$, and the sum holds on all
-$36$ banked cells $5 \le n \le 40$ (\repo{docs/proofs/T-n-nm2-and-general.md}).
+$36$ computed entries $5 \le n \le 40$ (\repo{docs/proofs/T-n-nm2-and-general.md}).
 
 The general law (Theorem~\ref{thm:diag}) is the same bookkeeping carried to
-all orders. Read a polyplet row by row; rows with one cell are walk rows and
-maximal runs of rows with two or more cells are clusters, a cluster of
-surplus $k$ having at most $k$ rows. A walk row is a cut, so a polyplet
-decomposes uniquely into an optional bottom cluster, an alternating chain of
-clusters and walk rows, and an optional top cluster. Counting each piece
-relative to its walk cell, the generating function $F(y,z) = \sum T(n,H)\,
-y^{\,n-H} z^{H}$ satisfies $F = E_b (1 - S)^{-1} E_t + P$ with $S = 3z +
-\sigma$, where $\sigma$, $E_b$, $E_t$, $P$ are the cluster sums and every
-term of $\sigma$ has positive $y$-order. Extracting the coefficient of $y^k$
-involves finitely many clusters and at most $k$ factors of $\sigma$, so it is
-a rational function of $z$ with denominator $(1 - 3z)^{k+1}$ plus a
-polynomial of bounded degree, which is a polynomial of degree at most $k$ in
-$H$ times $3^H$ once $H \ge k+1$, that is $n \ge 2k+1$. Resumming the chain
-in one mode shows that each level $k$ adds exactly two new constants, $P_k(n)
-= [y^k] \exp \sum_j (a_j + b_j n) y^j$, from which the leading coefficient
-$25^k/k!$ follows from $P_1 = 25n - 45$. The full proofs are
-\repo{docs/proofs/diagonal-law.md} and \repo{docs/proofs/grand-form.md}, and
-the theorem is formalised in Lean~4.
+all orders. Read a polyplet row by row: rows with one cell are walk rows, and
+maximal runs of rows with two or more cells are clusters. A walk row is a cut,
+so a polyplet is an alternating chain of clusters and walk rows, each cluster
+weighted independently of the rest. A cluster with $k$ cells beyond one per
+row has at most $k$ rows, so at surplus $k$ only finitely many cluster shapes
+occur, and summing the chain gives $T(n,n-k)$ as a polynomial in $n$ of degree
+at most $k$ times $3^{\,n-3k-1}$ once $n \ge 2k+1$. A further resummation
+shows each $k$ adds exactly two new constants, which is why two entries fix
+$P_k$, and the leading coefficient $25^k/k!$ follows from $P_1 = 25n - 45$.
+The full proofs are \repo{docs/proofs/diagonal-law.md} and
+\repo{docs/proofs/grand-form.md}; the theorem is formalized in Lean~4.
 
 % ===========================================================================
 \section{Reproducibility}
 \label{sec:reproduce}
 
-No reader can re-run the computations, so this section says what stands
-behind each number. A value computed twice by programs sharing no code is
+Re-running the enumerations behind the later terms costs CPU-months, so this
+section says what stands behind each number; the checks that run in minutes
+are listed at the end. A value computed twice by programs sharing no code is
 confirmed. A value computed once and found consistent with proved structure
 is checked, which catches gross errors and not a subtle systematic one.
 
 \paragraph{Anchors} $a(1)$--$a(18)$ equal the eighteen terms the OEIS serves
-for A006770, from both enumeration programs. Pointed at other classes, the
-same machinery reproduces published integers it was never told: the fixed
-polyominoes A001168 through their published range, Bacher's directed king
-animals \cite{bacher2015}, and the polyomino growth constant from the
-differential-approximant code (\repo{docs/external-anchors.md}).
+for A006770, from both enumeration programs. Run on other classes of animals,
+the same programs reproduce published counts: the fixed polyominoes A001168
+through their published range, and Bacher's directed king animals
+\cite{bacher2015} (\repo{docs/external-anchors.md}).
 
 \paragraph{Every run re-derives everything below it} Each production run
-computes the whole triangle for its target size rather than extending a
-stored one, and every earlier term is compared byte for byte. The $a(41)$
-sweep reproduces the banked triangle at every one of the $610$ cells of
-heights $1$--$20$ in rows $1$--$40$.
+computes the whole triangle for its size from scratch rather than extending a
+stored one, and every earlier term is checked against the stored value. The
+run for $a(41)$ reproduces the stored triangle at every one of the $610$
+entries of heights $1$--$20$ in rows $1$--$40$.
 
-\paragraph{Second sources} Every cell of every row $n \le 22$ agrees between
-Redelmeier enumeration and the transfer matrix. The colouring transfer matrix,
-run to height $19$ at the size row $41$ needs, agrees with the production
-engine on all $589$ cells with $n \le 40$ and $H \le 19$ and on the $19$
-swept cells of row $41$, the held-out prime predicting every residue. A
+\paragraph{Second computations} Every entry of every row $n \le 22$ agrees
+between Redelmeier enumeration and the transfer matrix. The coloring transfer
+matrix, run to height $19$ at the size row $41$ needs, agrees with the main
+program on all $589$ entries with $n \le 40$ and $H \le 19$ and on the $19$
+entries of row $41$ it reaches; in every reconstruction one prime was left
+out and its remainders were predicted correctly from the others. A
 third program, a strip transfer matrix with the same connectivity idea as the
-production engine but none of its code, agrees on all $469$ cells with $H
-\le 14$.
+main program but none of its code, agrees on all $469$ entries with $H \le 14$.
 
-\paragraph{The closed forms} Each wired $P_k$ was fixed from two cells and
-then met later real-swept cells it had not seen: $P_{15}$ at $T(33,18)$,
-$P_{16}$ at $T(35,19)$, $P_{17}$ at $T(37,20)$, $P_{18}$ at $T(39,21)$.
-Refitting every level from its two earliest cells above onset reproduces all
-$171$ other real-swept cells above onset. Below the onset a cell obeys
-$T(2k+1-j,\,k+1-j) = P_k(2k+1-j)\,3^{-(k+j)} + D_j(k)$ with a correction
-$D_j(k)$ computed from the clusters of bounded surplus without reading the
-triangle (\repo{results/undertow.md}); fixing every level $k \le 19$ from
-cells of height at most $19$, all of which the colouring engine covers,
-reproduces every cell of every row $n \le 39$ and re-sums each row to the
-published term with no input from the production engine. That is the sense
-in which $a(23)$--$a(39)$ are confirmed.
+\paragraph{The closed forms} Each $P_k$ was fixed from two entries and then met
+later enumerated entries it had not used: $P_{15}$ at $T(33,18)$, $P_{16}$ at
+$T(35,19)$, $P_{17}$ at $T(37,20)$, $P_{18}$ at $T(39,21)$. Refitting every
+$P_k$ from its two entries of smallest $n$ with $H > n/2$ reproduces all $171$
+other enumerated entries with $H > n/2$.
+
+Just below that range the formula still holds up to a correction:
+$T(2k+1-j,\,k+1-j) = P_k(2k+1-j)\,3^{-(k+j)} + D_j(k)$, where $D_j(k)$ is
+computed from the clusters of bounded surplus without reading the triangle
+(\repo{results/undertow.md}). Fixing every $P_k$, $k \le 19$, from entries of
+height at most $19$, all of which the coloring program covers, reproduces
+every entry of every row $n \le 39$ and sums each row to the published term
+with no input from the main program. That is the sense in which
+$a(23)$--$a(39)$ are confirmed.
 
 \paragraph{What stands behind each term}
 
@@ -623,64 +647,67 @@ in which $a(23)$--$a(39)$ are confirmed.
 terms & evidence \\
 \midrule
 $a(1)$--$a(18)$ & published; reproduced by both enumeration programs \\
-$a(19)$--$a(22)$ & two algorithms sharing no code agree on every cell \\
-$a(23)$--$a(39)$ & every cell enumerated by the colouring engine or given by a
-  proved formula fixed from its cells; every row re-sums to the published
+$a(19)$--$a(22)$ & two algorithms sharing no code agree on every entry \\
+$a(23)$--$a(39)$ & every entry enumerated by the coloring program or given by a
+  proved formula fixed from its entries; every row sums to the published
   term \\
-$a(40)$ & heights $1$--$19$ two-source; heights $20$--$40$ from the formulas
-  fixed on the colouring engine's cells; $T(40,20)$ and $T(40,21)$ enumerated
-  once \\
-$a(41)$ & heights $1$--$19$ two-source; height $20$ enumerated once and equal
-  to the formula prediction; heights $21$--$41$ from the formulas, level $20$
-  fixed below onset \\
+$a(40)$ & heights $1$--$19$ by both programs; heights $20$--$40$ from the
+  formulas fixed on the coloring program's entries; $T(40,20)$ and $T(40,21)$
+  enumerated once \\
+$a(41)$ & heights $1$--$19$ by both programs; height $20$ enumerated once and
+  equal to the formula prediction; heights $21$--$41$ from the formulas,
+  $P_{20}$ fixed from entries below its range \\
 \bottomrule
 \end{tabular}
 \caption{What stands behind each term.}
 \label{tab:tiers}
 \end{table}
 
-Over the $820$ cells of the $n \le 40$ triangle, $628$ are enumerated by at
-least one second program, $189$ are wired-formula cells above height $21$,
-and three, $T(39,20)$, $T(40,20)$ and $T(40,21)$, have one enumeration and
-no wired closed form. Those three are checked by the Burnside congruence and
-parity and are reproduced by the formulas fixed on the colouring engine's
-cells; none has been enumerated twice.
+Over the $820$ entries of the $n \le 40$ triangle, $628$ are enumerated by at
+least one second program, $189$ are formula entries above height $21$, and
+three, $T(39,20)$, $T(40,20)$ and $T(40,21)$, have one enumeration and no
+closed form. Those three are checked by the Burnside congruence and parity
+and are reproduced by the formulas fixed on the coloring program's entries;
+none has been enumerated twice.
 
-\paragraph{The forty-first term} $a(41)$ is a real sweep of heights
+\paragraph{The forty-first term} $a(41)$ is an enumeration of heights
 $1$--$20$ at size $41$, heights $1$--$19$ in $4.7$ hours on $40$ cores and
-height $20$ in $9.6$ hours on $76$, plus the formulas for heights
-$21$--$41$, with levels $k \le 19$ from the wired table and level $20$ fixed
-from cells below its onset. The nineteen lowest swept cells agree with the
-colouring engine, which has not been run at height $20$; that run is priced
-at about a day and $100$~GB of memory. Before height $20$ was swept
-the tower predicted $T(41,20)$ from level $21$, fixed three ways from
-$T(38,17)$, $T(39,18)$ and $T(40,19)$ with the three fits agreeing; the sweep
-returned exactly that value, $T(41,20) = \num{18004779862205054677763902712770}$, so the tower's top level has met an enumeration
-it did not see, and $a(41)$ no longer uses it (\repo{make
-gate-undertow-pairs}). A re-derivation built to differ wherever it could, with
-its own solver and assembly and a different choice of held-out cells,
-reproduces the term digit for digit (\repo{results/undertow-review-B.md}).
-What remains: $T(41,20)$ has one enumeration and one formula prediction behind
-it, not two enumerations, and heights $21$--$41$ are formula.
+height $20$ in $9.6$ hours on $76$, plus the formulas for heights $21$--$41$,
+with $P_k$ for $k \le 19$ as fixed above and $P_{20}$ fixed from entries
+below its range. The nineteen lowest entries agree with the coloring program,
+which has not been run at height $20$: on its measured passes at heights $17$
+to $19$, that run would need $170$ to $200$~GB of memory, more than the
+machine has.
 
-\paragraph{Recipes} The repository holds every banked number beside the run
-record that produced it, and checks a reader can run in minutes. Each is
-red-first, carrying a control that must fail.
+Before height $20$ was enumerated, $P_{21}$, fixed three ways from
+$T(38,17)$, $T(39,18)$ and $T(40,19)$ with the three fits agreeing, predicted
+$T(41,20)$. The enumeration returned exactly that value,
+$T(41,20) = \num{18004779862205054677763902712770}$, so that formula has
+met an enumeration it did not use, and $a(41)$ no longer needs it
+(\repo{make gate-undertow-pairs}). An independent re-derivation with its own
+code reproduces the term (\repo{results/undertow-review-B.md}).
+What remains: $T(41,20)$ has one enumeration and one formula prediction
+behind it, and heights $21$--$41$ are formula.
+
+\paragraph{Checks that run in minutes} The repository holds every stored
+number beside the run record that produced it, and checks a reader can run
+in minutes. Each check is also run against a deliberately corrupted input,
+which it must reject.
 
 \begin{center}\small
 \begin{tabular}{l R{0.5\textwidth}}
 \toprule
-command & what it pins \\
+command & what it checks \\
 \midrule
-\repo{make gate-bfiles} & $a(1)$--$a(18)$ and the symmetry b-files against the OEIS \\
-\repo{make gate-g2} & the Redelmeier engine against an oracle and fixtures \\
-\repo{make gate-kink-oracle} & the cell-at-a-time kernel, every height real, against $a(1)$--$a(18)$ \\
-\repo{make gate-cutcount-assembly} & the colouring engine's rows assemble to the triangle; held-out primes \\
-\repo{make ns-gate-diag-pins} & every wired $P_k$ against every real-swept cell above onset \\
-\repo{make gate-undertow-pairs} & the $a(41)$ tower, level $21$ three ways, and the swept $T(41,20)$ against its prediction \\
+\repo{make gate-bfiles} & $a(1)$--$a(18)$ and the symmetry counts against the OEIS term lists \\
+\repo{make gate-g2} & the Redelmeier program against reference values \\
+\repo{make gate-kink-oracle} & the cell-at-a-time transition, every height enumerated, against $a(1)$--$a(18)$ \\
+\repo{make gate-cutcount-assembly} & the coloring program's rows assemble to the triangle, with a left-out prime predicted at every height \\
+\repo{make ns-gate-diag-pins} & every $P_k$ against every enumerated entry with $H > n/2$ \\
+\repo{make gate-undertow-pairs} & $P_{20}$ and $P_{21}$ each fixed several ways, and the enumerated $T(41,20)$ against its prediction \\
 \repo{make gate-subgroup} & the Burnside congruence \\
-\repo{make gate-provenance} & the per-cell source table and its counts \\
-\repo{python3 paper/verify\_technical\_report.py} & every number in the tables against the banked results \\
+\repo{make gate-provenance} & the table of which program produced each entry \\
+\repo{python3 paper/verify\_technical\_report.py} & every number in the tables and in this document's prose against the stored results \\
 \bottomrule
 \end{tabular}
 \end{center}
