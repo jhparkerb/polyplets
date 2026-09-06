@@ -40,7 +40,7 @@ Lemma~\ref{lem:mono}. Not formalized. Its opening move --- extracting a
 coefficient relation from the ODE --- is not ours and is cited to
 Bousquet-M\'elou and Rechnitzer~\cite[Lemma~9]{bmr2002}.
 \emph{Lemma~\ref{lem:mono} (strict monotonicity)} --- proved below by
-Perron--Frobenius; the numerical values in Table~\ref{tab:mu} are labelled
+Perron--Frobenius; the numerical values in Table~\ref{tab:mu} are labeled
 measurement, and the strictness the proof needs does not depend on them.
 \emph{The exclusion boxes of \S\ref{sec:effective}} --- rest on
 certificates computed modulo a $61$-bit prime, where a gcd equal to $1$ with
@@ -95,7 +95,7 @@ Counting lattice animals by size alone gives a sequence, $a(n)$, about which
 almost nothing exact is known. Counting them by size \emph{and height} gives a
 two-variable object, and the extra variable turns out to be what makes a proof
 possible. This is Rechnitzer's observation in the haruspicy
-programme~\cite{rechnitzer2003,rechnitzer2006}: the anisotropic generating
+program~\cite{rechnitzer2003,rechnitzer2006}: the anisotropic generating
 function can be shown not to be D-finite even when the isotropic one is out of
 reach, and the mechanism is that the height slices are individually rational and
 their poles proliferate.
@@ -139,7 +139,7 @@ Klazar 2003~\cite{klazar2003} & analytic & zero radius of convergence vs.\ force
 this paper & \textbf{arithmetic} & degree and house of algebraic numbers \\
 \bottomrule
 \end{tabular}
-\caption{Three obstruction types in the same neighbourhood.}
+\caption{Three obstruction types in the same neighborhood.}
 \label{tab:three}
 \end{table}
 
@@ -316,7 +316,7 @@ therefore independently usable.
 
 \subsection{New-root content}
 
-For the banked fixed-height generating functions $G_H = P_H/Q_H$ in lowest terms,
+For the stored fixed-height generating functions $G_H = P_H/Q_H$ in lowest terms,
 define the \emph{new-root content}
 \[
   \psi_H \;:=\; \frac{Q_H}{\gcd\bigl(Q_H,\; Q_1Q_2\cdots Q_{H-1}\bigr)} ,
@@ -329,10 +329,10 @@ $H = 1,\dots,10$:
 Every $\psi_H$ is squarefree, and every $P_H/Q_H$ is in lowest terms, so every
 root is active. The certificates are computed modulo the prime $p = 2^{61}-1$, where a
 gcd equal to $1$ with preserved degrees is a rigorous certificate over
-$\Q$.\footnote{The banked $H = 11$ entry is marked unvalidated and is excluded
+$\Q$.\footnote{The stored $H = 11$ entry is marked unvalidated and is excluded
 here: its $Q_{11}$ shares no roots with $Q_9Q_{10}$ modulo $p$, which is
 inconsistent with the structure at every validated level. It is a data-hygiene
-flag, not a mathematical anomaly, and nothing above or below uses it. The banked
+flag, not a mathematical anomaly, and nothing above or below uses it. The stored
 $Q_{11}$ is a CRT wraparound, wrong from degree $8159$ up.}
 
 Run the argument of Theorem~\ref{thm:dichotomy} with \emph{all} roots of
@@ -366,7 +366,7 @@ $\psi$-degree certificates at $H \le 10$.}
 
 \subsection{Boxes from the degree of \texorpdfstring{$\mu_H$}{mu\_H}}
 
-Both families read $\psi_H$ off the banked $G_H$; they differ in what they then
+Both families read $\psi_H$ off the stored $G_H$; they differ in what they then
 ask of it. The first extends Theorem~\ref{thm:dichotomy} to all roots of
 $\psi_{H_0}$ at once, for which $\psi_H$ squarefree and $P_H/Q_H$ in lowest terms
 is enough. The second uses Theorem~\ref{thm:dichotomy} exactly as proved, at the
@@ -481,7 +481,7 @@ coefficients are analytic, since an analytic function may vanish at
 $1/\mu_{H_0}$ without vanishing identically. \textbf{Theorem~\ref{thm:main} is not-D-finite over $\Q(x)$ and does
 not extend to $D_A$-finite.}
 
-\subsection{Arithmetic neighbours}
+\subsection{Arithmetic neighbors}
 
 Height theory has been applied to D-finiteness directly. Bell, Nguyen and
 Zannier, \emph{D-finiteness, rationality, and height}~\cite{bnz2020}, with its
@@ -493,7 +493,7 @@ bound degree and house of the \emph{slice growth constants} and conclude a
 contradiction. Bell, Gerhold, Klazar and Luca~\cite{bgkl2008} is a
 zero-counting argument, again analytic.
 
-We name these so that this section rests on the arithmetic neighbourhood being
+We name these so that this section rests on the arithmetic neighborhood being
 mapped, rather than on absence.
 
 \subsection{What the searches establish}
@@ -558,7 +558,7 @@ $\psi$-degrees, squarefreeness, lowest terms & \repo{experiments/anisotropic\_df
 Table~\ref{tab:psiboxes} and Table~\ref{tab:irrboxes} & \repo{experiments/anisotropic\_dfinite.py} \\
 irreducibility certificates, $H \le 8$ & \repo{experiments/anisotropic\_dfinite.py} \\
 Table~\ref{tab:mu} & \repo{experiments/mu\_H\_from\_atoms.py} \\
-the banked $G_H$ & \repo{results/fixed\_height\_gfs.txt} \\
+the stored $G_H$ & \repo{results/fixed\_height\_gfs.txt} \\
 the house bound $\lambda \le 9.3154$ & companion paper; \repo{docs/proofs/polyplet-upper-bound.md} \\
 the literature record & \repo{papers/MISSING.md}, \repo{experiments/citation\_crawl.py} \\
 this paper's printed numbers & \repo{paper/verify\_l\_papers.py} \\

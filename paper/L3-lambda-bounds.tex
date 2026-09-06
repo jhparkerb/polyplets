@@ -44,7 +44,7 @@ a nonnegative integer vector and a rational $x$ for which $M(x)v \ge v$ is
 verified componentwise in exact $128$-bit integer arithmetic, with every
 rounding downward. The receipt is
 \repo{results/strip\_mu\_certificates.log}; the checker carries a four-part
-RED-first self-test that includes a case it must reject
+self-test that includes a case it must reject
 (\S\ref{sec:selftest}). The transfer operator itself is the production kernel
 and is \emph{trusted, not certified} --- see \S\ref{sec:honest}.
 \emph{The upper bound $\lambda \le 9.3154$} --- an exact rational
@@ -57,13 +57,13 @@ certificate \texttt{lambda\_le\_of\_bui\_rd3} adds one named
 check).
 \emph{The elementary bound $\lambda \le 5^5/4^4$
 (Proposition~\ref{prop:crude})} --- proved, by a BFS-frame encoding that is
-machine-verified over every animal with $n \le 8$ with a RED control. Its
+machine-verified over every animal with $n \le 8$ with a negative control. Its
 \emph{earlier} proof, by the Redelmeier decision string, was found to be false
 on re-entrant animals and is retained in \S\ref{sec:crudebound} as a warning
 rather than deleted; the constant never moved.
-\emph{The slack audit of \S\ref{sec:gap}} --- labelled measurement against
+\emph{The slack audit of \S\ref{sec:gap}} --- labeled measurement against
 brute-force counts, not a theorem.
-\emph{The estimate $\lambda \approx 7.11$} --- labelled measurement
+\emph{The estimate $\lambda \approx 7.11$} --- labeled measurement
 (extrapolation), and used nowhere in the proofs.
 \emph{Human verification:} none, as of this draft.}
 
@@ -101,7 +101,7 @@ We also report, as measurement rather than theorem, why the upper bound stops
 where it does. An audit of every recurrence in the system shows the over-count
 is diffuse (median slack $1.144$, maximum $1.222$) and that it
 \emph{grows with $n$} --- so it is not a local defect that a larger window or
-per-type tuning could remove, but the same eight-neighbour connectivity
+per-type tuning could remove, but the same eight-neighbor connectivity
 obstruction that closed the other routes we tried.
 \end{abstract}
 
@@ -235,7 +235,7 @@ $\lambda \ge 6.543$.
 \centering\small
 \begin{tabular}{r r r r r r}
 \toprule
-$H$ & certified $\mu_H \ge$ & states & $\mu_H$ (float) & sweeps & wall (s) \\
+$H$ & certified $\mu_H \ge$ & states & $\mu_H$ (float) & tries & wall (s) \\
 \midrule
  2 & 2.4142135 &         3 & 2.414213562 &  1 &   0.0 \\
  3 & 3.4437183 &         8 & 3.443718375 &  1 &   0.0 \\
@@ -256,7 +256,7 @@ $H$ & certified $\mu_H \ge$ & states & $\mu_H$ (float) & sweeps & wall (s) \\
 \bottomrule
 \end{tabular}
 \caption{The certified ladder. ``States'' is the in-edge-reachable boundary count
-of the transfer operator. ``Sweeps'' is how many candidate numerators the search
+of the transfer operator. ``Tries'' is how many candidate numerators the search
 tried before one passed; ``$\mu_H$ (float)'' is the value the power-iteration
 search phase proposed, recorded for comparison and used nowhere in the proof. Receipts,
 one line each with git revision, host, vector checksum and precision fields, are
@@ -284,7 +284,7 @@ $M(\mathit{den}/\mathit{num})\,v \ge v$ in \texttt{unsigned \_\_int128}.
 
 Three things make that sound.
 
-\paragraph{Every rounding is downward.} Each of the $H$ stages of a column sweep
+\paragraph{Every rounding is downward.} Each of the $H$ stages of processing a column
 is a nonnegative linear map, hence monotone, and the ``cell placed'' branch
 contributes $\lfloor \mathit{val}\cdot\mathit{den}/\mathit{num}\rfloor \le
 \mathit{val}\cdot x$. So the computed vector is componentwise \emph{at most} the
@@ -308,7 +308,7 @@ ceiling, so the merges add $0.7$ bits.
 If the first candidate numerator fails, the tool searches for the largest one
 that passes. The check is monotone in the numerator (a smaller numerator means
 a larger $x$, and every entry of $M(x)$ is nondecreasing in $x$), so it brackets
-by doubling and bisects, roughly $2\log_2(\text{gap})$ sweeps rather than
+by doubling and bisects, roughly $2\log_2(\text{gap})$ tries rather than
 hundreds. The winning numerator is re-verified last, so the receipt describes the
 rational that was actually certified. A failure is never absorbed into a
 tolerance.
@@ -365,7 +365,7 @@ $H = 10$, where the smallest entry becomes about $2^{10}$ instead of $2^{51}$,
 the first candidate fails at four states with a minimum ratio of $0.99994$: the
 binding state is short by one unit in the last place, so the flooring loss is
 $O(1)$, not $O(H)$.
-The bracket-and-bisect then lands on a slightly weaker rational in twenty sweeps,
+The bracket-and-bisect then lands on a slightly weaker rational in twenty tries,
 at a wall time indistinguishable from the full-precision run.
 
 \subsection{Scope}
@@ -375,14 +375,14 @@ What is certified is the inequality $\mu_H \ge \mathit{num}/\mathit{den}$,
 \emph{given} that $M(x)$ is the height-$\le H$ strip transfer operator. The
 operator itself is trusted, not certified here. It is the production kernel,
 exercised by its own gates, and the resulting $\mu_H$ are cross-checked for
-$H \le 11$ against roots of independently banked fixed-height generating
+$H \le 11$ against roots of independently computed fixed-height generating
 functions, agreeing to $9$--$10$ significant digits --- every digit those receipts
 record. The certificates do not rest on that agreement; they are exact integer
 arithmetic on the operator. That the operator is the strip operator is the one
 thing here taken on trust.
 
 Two engines were run against each other on every shared rung: an older hash-map
-sweep and a frozen-successor-array kernel roughly $250\times$ faster reproduce
+program and a frozen-successor-array kernel roughly $250\times$ faster reproduce
 the receipts field for field at $H = 12, 13, 14$: same numerator, same state
 count, same minimum ratio to all nine printed digits.
 
@@ -392,7 +392,7 @@ count, same minimum ratio to all nine printed digits.
 This subsection is measurement, not proof, and is used nowhere above.
 
 A sliding three-point power-law fit $\mu_H = \lambda - cH^{-p}$ over the float
-ladder gives $\lambda$ estimates that march monotonically downward as the centre
+ladder gives $\lambda$ estimates that march monotonically downward as the center
 rises: $9.54, 8.41, 7.92, 7.66, 7.50, 7.40, 7.33, 7.29$ for centres
 $H = 5,\dots,12$, with the exponent $p$ tending to about $1$, a $1/H$
 finite-size correction. The sequence converges toward the value $\approx 7.11$
@@ -430,7 +430,7 @@ $N(u)$ less $\{d\}$ less the shared set $N(u) \cap N(d)$. Shared sets have four
 cells for an orthogonal $d$ and two for a diagonal one, so every frame has three
 or five slots, and coverage holds because $N(u)$ is the parent together with the
 shared set and the frame, with the shared set contained in $N(\mathrm{parent}(u))$
-and the recursion terminating at the root, whose frame is all eight neighbours.
+and the recursion terminating at the root, whose frame is all eight neighbors.
 A replay decoder recovers the animal from the letter sequence, so each $n$-cell
 animal maps injectively to $n$ letters of total weight $x^{n-1}y^n$. The letter
 alphabet is the $5$-bit mask family with $\sum x^{\mathrm{opens}} = (1+x)^5$,
@@ -442,10 +442,10 @@ $\lambda \le \min_b (1+b)^5/b = 5^5/4^4$ at $b = 1/4$.
 \label{rem:repair}
 An earlier version of this proposition ran the Redelmeier scan directly: include
 or exclude each cell entering the untried frontier, note that an included cell
-newly exposes only its four neighbours ahead in scan order, and conclude
+newly exposes only its four neighbors ahead in scan order, and conclude
 $a(n) \le \binom{5n}{n}$. That argument is \textbf{false}, and the constant it
 reaches is nevertheless right. ``Behind in scan order'' does not mean ``already
-considered'': a re-entrant animal can contain a cell that is the ahead-neighbour
+considered'': a re-entrant animal can contain a cell that is the ahead-neighbor
 of no included cell, so it never enters the frontier at all and the map from
 animals to decision strings is undefined on it. The witness is the hook
 $\{(0,3),(0,2),(0,1),(0,0),(1,0),(2,0),(3,0),(3,1)\}$, in which $(3,1)$ is
@@ -454,7 +454,7 @@ $2$ of $20$ animals at $n = 3$ and $96{,}065$ of $147{,}941$ at $n = 8$.
 
 The BFS-frame derivation above proves the same constant soundly, and is
 machine-verified --- round trip, distinctness, weight identity and alphabet
-census over every animal with $n \le 8$, with a RED slot-dropping control.
+census over every animal with $n \le 8$, with a negative control that drops a slot.
 \end{remark}
 
 The bound is rigorous and needs no machinery. In the language of the twig
@@ -468,14 +468,14 @@ is a useful cross-check on the derivation.
 
 Both are tempting, and one control kills both.
 
-\paragraph{``$\lambda \le 8$ because each cell has eight neighbours.''} False.
+\paragraph{``$\lambda \le 8$ because each cell has eight neighbors.''} False.
 The idea is to encode an animal by its spanning-tree parent directions, at most
 eight per cell. The map is not injective: the parent-direction string does not
 reconstruct the animal, because the spanning tree drops the animal's cycles.
 
 \paragraph{``$\lambda \le 4^4/3^3 = 256/27 \approx 9.48$ from the growth tree.''}
 Also false, and for the same reason. Each cell has at most four forward
-king-neighbours, so the Redelmeier growth \emph{tree} is a $4$-ary tree on $n$
+king-neighbors, so the Redelmeier growth \emph{tree} is a $4$-ary tree on $n$
 nodes; but animal $\mapsto$ tree is not injective, again because the tree drops
 the exclude decisions on already-adjacent cells, which is exactly where the
 cycles live. What is injective is the BFS-frame letter sequence of
@@ -500,7 +500,7 @@ dimension.
 A generic twig decomposition was built and verified against brute force: the
 enumerator reproduces \oeis{A006770}; the base fact
 $a(n) \le G_8(n) \le n\,a(n)$ holds, where $G_8$ counts animals with a marked
-cell whose W, SW, S, SE neighbours are forbidden, so that
+cell whose W, SW, S, SE neighbors are forbidden, so that
 $\lambda = \mathrm{growth}(G_8)$; the corner cell decomposes into twelve leaf
 cases and three cut cases, and every leaf reduction and every cut convolution is
 a numerically verified valid over-count.
@@ -524,7 +524,7 @@ Compare Proposition~\ref{prop:crude}'s $12.2$.}
 \end{table}
 
 The window closes fast ($8740$ types in about a second), so the looseness comes
-from the \emph{case routing} rather than from resolution: multi-neighbour cases
+from the \emph{case routing} rather than from resolution: multi-neighbor cases
 were routed as lossy linear re-marks instead of as convolutions, and that throws
 away one of the two pieces every time.
 
@@ -555,9 +555,9 @@ branch is a valid split over-count.
 Two details make \eqref{eq:split} beat the generic version, and both
 were the difference between $12.5$ and $9.3$:
 \begin{enumerate}
-\item multi-neighbour cases stay \emph{convolutions}, preserving both pieces,
+\item multi-neighbor cases stay \emph{convolutions}, preserving both pieces,
   rather than becoming lossy re-marks;
-\item the split-off type $D$ knows that all of the cut cell's other neighbours
+\item the split-off type $D$ knows that all of the cut cell's other neighbors
   belong to the other side, so they are empty in the $d$-piece.
 \end{enumerate}
 
@@ -707,7 +707,7 @@ For scale, the corresponding polyomino problem has been worked on for fifty
 years: Klarner and Rivest's method~\cite{klarnerRivest1973} gives $4.65$, pushed
 by Barequet and Shalah to $4.5252$, against a true value near $4.0626$ and a
 proved lower bound above $4$~\cite{barequetRoteShalah2016}. Our $31\%$ upper gap
-against their $11\%$ quantifies the eight-neighbour penalty.
+against their $11\%$ quantifies the eight-neighbor penalty.
 
 \section{Open problems}
 

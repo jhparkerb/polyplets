@@ -51,9 +51,9 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 | `L1-diagonal-law.tex` | **L1** — A diagonal law for row-local lattices, and the mod-3 arithmetic of the king instance | draft, 23pp — **absorbed L2** 2026-08-23 as Part II |
 | `L3-lambda-bounds.tex` | **L3** — A certified two-sided bound for λ | draft, 13pp |
 | `L4-not-dfinite.tex` | **L4** — An arithmetic obstruction to D-finiteness | draft, 10pp |
-| `L5-convex-polyplets.tex` | **L5** — Convex polyplets: the leading term, and what sits under it | draft, 21pp — **absorbed L7** 2026-08-23 |
+| `L5-convex-polyplets.tex` | **L5** — Convex polyplets: by area, by semiperimeter, and the growth constant | draft, 21pp — **absorbed L7** 2026-08-23 |
 | `L6-perimeter-gradings.tex` | **L6** — Perimeter gradings of lattice animals | draft, 14pp — inverted 2026-08-23, minimum end first |
-| `L8-below-onset.tex` | **L8** — Below the onset: the error term, and the tower it pins | draft, 15pp — **absorbed L10** 2026-08-23 |
+| `L8-below-onset.tex` | **L8** — Below the onset: the error term of the diagonal formula | draft, 15pp — **absorbed L10** 2026-08-23 |
 
 Every L paper carries a loud draft banner, because every one of their
 verification ledgers currently reads "human verification: none". All six have

@@ -70,7 +70,7 @@ instance is Lean, standard axioms only (\texttt{grand\_form},
 $k \le 18$ carries one named \texttt{native\_decide} leaf per weight card.
 \emph{The closed forms of Table~\ref{tab:machine}} --- each is a consequence of
 Theorem~\ref{thm:A} applied to $k+1$ enumerated values, and each survives 5--11
-held-out values that were not used to fit it.
+withheld values that were not used to fit it.
 \emph{Corollary~\ref{cor:a308359}} --- deduced from Theorem~\ref{thm:A}; the
 enumeration behind it independently reproduces the case Mathar records as
 proved.
@@ -91,9 +91,9 @@ Lagrange--B\"urmann over $\Z/27$ followed by an exact polynomial division on
 the mod-$27$ master curve; the division is a finite exact computation.
 \emph{Theorem~\ref{thm:d3} (the deficit-$3$ residue)} --- proved on the frame
 stated with it: (A1) and (A4) are proved and independently cross-checked, while
-(A2) and (A3) are symbolic derivations verified against banked data to $k \le 17$
+(A2) and (A3) are symbolic derivations verified against computed data to $k \le 17$
 rather than proofs. Everything above the frame is exact finite algebra.
-\emph{\S\ref{sec:sleeve} (sleeve zeros)} --- labelled measurement, complete for
+\emph{\S\ref{sec:sleeve} (sleeve zeros)} --- labeled measurement, complete for
 $n \le 40$, with no closed form claimed \emph{except} at deficit $3$, where
 Theorem~\ref{thm:d3} predicts them for all $k$.
 \emph{Novelty} --- pass run 2026-08-18, no collision found on the spine cubic,
@@ -249,7 +249,7 @@ single cell a cut, which is Lemma~\ref{lem:sep}. Conditions (R) and (U) are fini
 \item \textbf{Square lattice.} $A = \{(\pm1,0),(0,\pm1)\}$, so $D = \{0\}$ and
   $b=1$. Animals are fixed polyominoes, \oeis{A001168}.
 \item \textbf{Polyhexes.} $D = \{-1,0\}$, $b=2$. Cells are hexagons, each with
-  six neighbours; $T$'s row sums are $1, 3, 11, 44, 186, 814, 3652, 16689,
+  six neighbors; $T$'s row sums are $1, 3, 11, 44, 186, 814, 3652, 16689,
   \dots$ = \oeis{A001207}, fixed hexagonal polyominoes.
 \item \textbf{Polyplets (the king lattice).} $A$ is all eight compass offsets, so
   $D = \{-1,0,1\}$ and $b=3$. Row sums are \oeis{A006770}.
@@ -260,9 +260,9 @@ single cell a cut, which is Lemma~\ref{lem:sep}. Conditions (R) and (U) are fini
 \label{rem:names}
 The centres of the $b=2$ cells form the triangular \emph{point} lattice, so the
 literature sometimes calls this the triangular lattice --- Madras's
-``Tri''~\cite{madras1999}, for instance. That is the six-neighbour object and it
+``Tri''~\cite{madras1999}, for instance. That is the six-neighbor object and it
 gives polyhexes. \emph{Tiling by triangles} is a different object: each
-equilateral cell has three edge-neighbours, the counts are
+equilateral cell has three edge-neighbors, the counts are
 $2, 3, 6, 14, 36, 94, 250, 675, 1838, \dots$ = \oeis{A001420}, and OEIS files
 these polyiamonds under ``the 2-dimensional hexagonal lattice''.
 Definition~\ref{def:rowlocal} covers the first and not the second; see
@@ -372,7 +372,7 @@ By Lemma~\ref{lem:sep} every animal decomposes \emph{uniquely} as either a singl
 pure cluster (the $P$ term) or as an optional bottom-edge cluster, then an
 alternating chain of walk steps and clusters cut at its walk rows, then an
 optional top-edge cluster. Configurations of each piece are counted relative to
-the walk cell it shares with its neighbour, so the choices multiply; rows and
+the walk cell it shares with its neighbor, so the choices multiply; rows and
 surplus add, so the monomials multiply. A plain walk step contributes $b z$,
 since by (U) there are exactly $b$ ways to place the next single cell above the
 current one; a cluster together with the walk row above it contributes
@@ -644,7 +644,7 @@ $b \ne 0$ and $\mathrm{ord}_y(g_i) \ge i-1$ respectively.
 $P_k(n) = \mathrm{known}_k(n) + a_k + b_k\,n$, where $\mathrm{known}_k$ is
 determined by the levels below $k$. Consequently, given
 Theorem~\ref{thm:A}'s degree bound, \emph{any two} in-onset values of a diagonal
-pin $(a_k,b_k)$ by a nonsingular $2\times2$ rational solve, and every further
+determine $(a_k,b_k)$ by a nonsingular $2\times2$ rational solve, and every further
 in-onset value is then a theorem rather than a test.
 \end{corollary}
 
@@ -722,7 +722,7 @@ on every run.
 \section{The universal spine}
 \label{sec:spine}
 
-The mod-$p$ behaviour of the law is where quantifying over lattices pays off. The
+The mod-$p$ behavior of the law is where quantifying over lattices pays off. The
 answer is one curve; the lattice contributes only a prime and a scalar.
 
 \begin{theorem}[universal spine]
@@ -783,7 +783,7 @@ enumerate $k+1$ in-onset values of a diagonal, or just two by
 Corollary~\ref{cor:two}, to determine $q_k$.
 
 A surplus-budgeted row transfer, parametric in the
-step set $D$, carries as state the current row's occupied cells (normalised in
+step set $D$, carries as state the current row's occupied cells (normalized in
 $x$), which component of the animal-so-far each belongs to, and the surplus spent
 so far; components that lose their foothold in the current row are pruned as
 unreconnectable. The cost therefore depends on $k$ and $H$, not on the number of
@@ -800,7 +800,7 @@ square & 1 & 1 & $4n-8$ & matches \oeis{A308359} (proved there) \\
 square & 1 & 2 & $8n^2-51n+86$ & \textbf{A308359's conjecture} (Cor.~\ref{cor:a308359}) \\
 square & 1 & 3 & $\tfrac{32}{3}n^3-140n^2+\tfrac{1960}{3}n-1090$ & no published form found \\
 square & 1 & 4 & $\tfrac{32}{3}n^4-\tfrac{712}{3}n^3+\tfrac{12635}{6}n^2-\tfrac{52813}{6}n+14496$ & no published form found \\
-hex & 2 & 1 & $9n-15$ & reproduces the banked $b=2$ form \\
+hex & 2 & 1 & $9n-15$ & reproduces the computed $b=2$ form \\
 hex & 2 & 2 & $\tfrac{81}{2}n^2-\tfrac{307}{2}n+71$ & no published form found \\
 hex & 2 & 3 & $\tfrac{243}{2}n^3-774n^2+\tfrac{1897}{2}n+28$ & no published form found \\
 king & 3 & 1 & $25n-45$ & reproduces the from-scratch derivation \\
@@ -809,7 +809,7 @@ king & 3 & 2 & $\tfrac{625}{2}n^2-\tfrac{2459}{2}n+567$ & reproduces the hand de
 \end{tabular}
 \caption{Diagonal closed forms. Each is a theorem: Theorem~\ref{thm:A} supplies
 the degree and the onset, and the tabulated values supply the coefficients.
-Every row additionally survives 5--11 held-out values past the ones used to
+Every row additionally survives 5--11 withheld values past the ones used to
 determine it.}
 \label{tab:machine}
 \end{table}
@@ -867,7 +867,7 @@ Two controls, both of which must fail, and do
 \label{sec:polyiamond}
 
 Polyiamonds are the natural next lattice to try and they are \emph{not} in the
-class. Cells are equilateral triangles; each has three edge-neighbours; and the
+class. Cells are equilateral triangles; each has three edge-neighbors; and the
 up/down orientation alternates along a row, so the adjacency is parity-dependent
 rather than translation-invariant and hypothesis (U) fails --- there is no single
 step set $D$ to count. This is not a technicality that a little more care would
@@ -917,7 +917,7 @@ with \textbf{zero occurrences of \texttt{sorry}}. What is relevant here:
 \item \texttt{lead\_coeff\_25} (Corollary~\ref{cor:lead} for the king) adds a
   single named \texttt{native\_decide} leaf, which is the evaluation of one
   cluster weight.
-\item The per-lattice instance pins (\texttt{king\_P1\_*},
+\item The per-lattice instance determinations (\texttt{king\_P1\_*},
   \texttt{square\_P1\_*}, \texttt{hex\_P1\_*}) and the cross-family row-sum
   gates carry named leaves that amount to two triangle cells per lattice.
 \item The $k \le 18$ production pinning
@@ -932,7 +932,7 @@ footprints but are informational. There is no \texttt{sorryAx} and no anonymous
 \texttt{Lean.ofReduceBool}; every compiled-evaluation leaf is named, so the
 trusted surface is enumerable rather than diffuse.
 
-The development does \emph{not} certify the enumeration engine, the banked
+The development does \emph{not} certify the enumeration engine, the stored
 triangle, or any anchor value. Those enter as explicit hypotheses or as named
 leaves.
 
@@ -970,7 +970,7 @@ nontrivial factors & 1 & 2 & 2 & 2 & 3 & 3 & 3 & 4 & 4 & 4 & 5 \\
 \label{sec:setup}
 
 Part I's Theorem~\ref{thm:A}, re-indexed by $n$ rather than $H$ and
-specialised to the king lattice ($b = 3$, $\Wp = 25$), reads
+specialized to the king lattice ($b = 3$, $\Wp = 25$), reads
 \begin{equation}
   T(n,\,n-k) \;=\; P_k(n)\cdot 3^{\,n-1-3k}
   \qquad\text{for every } n \ge 2k+1,
@@ -1022,7 +1022,7 @@ Proposition~\ref{prop:GH} computes $H$ from the diagonal polynomials, and with
 $P_k$ known through $k = 17$ it begins $1, 25, 208, 1483, 20688, 130208, \dots$
 It is the per-row transfer series of Part I's cluster decomposition, and its
 first coefficient $25$ counts the single-defect species of one row, which is
-Part I's pair weight $\Wp$. Whether $H$ is a known sequence is for the missing novelty sweep
+Part I's pair weight $\Wp$. Whether $H$ is a known sequence is for the missing novelty search
 to settle; it has not been looked up in the OEIS~\cite{oeis}.
 
 \section{Three coefficient identities}
@@ -1347,9 +1347,9 @@ theorem. (A1) the diagonal-law shape theorem and the grand form
 $P_k(n) = [u^k]G(u)H(u)^n$ --- both proved and Lean-checked. (A2) $H$ congruent
 to the fixed point of the mod-$81$ master equation at all orders, derived from
 the renewal formalism with completeness from a proved row bound, and
-machine-verified against the banked $h_k$ for $k \le 17$. (A3) the corresponding
+machine-verified against the computed $h_k$ for $k \le 17$. (A3) the corresponding
 congruence for $G$, likewise derived and verified to $k \le 17$. (A4) eleven
-cluster weights, finite integers from a banked table with independent low-order
+cluster weights, finite integers from a stored table with independent low-order
 enumeration cross-checks. Everything above those four is unconditional algebra:
 an inversion lemma, one implicit differentiation, a units inventory, and an exact
 polynomial division whose remainder vanishes identically mod $81$. So (A1) and
@@ -1419,7 +1419,7 @@ proves the height generating function is not D-finite, so it is not the diagonal
 of a rational function, and no automaton of that provenance exists to compute.
 The obstruction is a theorem of ours rather than an absence of effort.
 
-The second tool is the family of methods for the mod-$3^k$ behaviour of
+The second tool is the family of methods for the mod-$3^k$ behavior of
 sequences satisfying finite-depth recurrences with polynomial coefficients.
 Those apply to a sequence given by such a recurrence; $T(n,H)$ is given by no
 recurrence we know, which is the reason this paper works through the master
@@ -1434,25 +1434,25 @@ normal form count found no collision (2026-08-18,
 \label{sec:novelty}
 
 Part I's material was covered by the project's first six literature
-sweeps and by the 2026-08-18 pass, which looked only at what postdated them;
+searches and by the 2026-08-18 pass, which looked only at what postdated them;
 neither found a collision on the law, the spine or the product form. The pass
 over Part II is recorded in the same place
 (\repo{docs/priority-passes-2026-08-18.md}) and is quoted here because its
 searches were different.
 
 
-\textbf{Swept, no collision.} The project's first six literature sweeps covered
+\textbf{Searched, no collision.} The project's first six literature searches covered
 the diagonal law, haruspicy and non-D-finiteness, the staircase squeeze,
 HV-convex polyplets and the growth-constant upper bound, and none of them
 touched this paper's objects. A seventh ran on 2026-08-18 and is recorded in
 \repo{docs/priority-passes-2026-08-18.md}: congruences modulo powers of $3$ for
 combinatorial sequences, the Krattenthaler--M\"uller method for mod-$3^k$
-behaviour of recursive sequences, Rowland--Yassawi automatic congruences for
+behavior of recursive sequences, Rowland--Yassawi automatic congruences for
 diagonals of rational functions, Smith normal forms of combinatorial triangles,
 and base-$3$ digit-product formulas. It found no collision on the spine cubic,
 the digit product or the Smith normal form count. It did find one
 adjacent method, Rowland--Yassawi, treated in \S\ref{sec:related}. The nearest
-neighbours otherwise are Christol's theorem, which makes ``algebraic over
+neighbors otherwise are Christol's theorem, which makes ``algebraic over
 $\F_3$'' and ``$3$-automatic'' the same statement, and the theory of
 Artin--Schreier curves, to which the cubic below belongs.
 

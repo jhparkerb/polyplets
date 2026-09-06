@@ -43,7 +43,7 @@
 \newcommand{\pminn}{p_{\min}}
 
 \title{\textbf{Perimeter gradings of lattice animals}\\[4pt]
-\large Two ends of one table, and two different onsets}
+\large The two ends of the perimeter table}
 \author{[byline: jasonp's call --- \repo{docs/publication-split.md} \S1]}
 \date{August 2026}
 
@@ -51,9 +51,9 @@
 \maketitle
 
 \firstdraftbanner[ One further gate is specific to this paper. A literature
-sweep ran on 2026-08-18 and the square-lattice column here \emph{reproduces}
+search ran on 2026-08-18 and the square-lattice column here \emph{reproduces}
 published work now held in full (\S\ref{sec:novelty}); the king column and the
-minimum end survived that sweep, but a negative from one pass is weaker than a
+minimum end survived that search, but a negative from one pass is weaker than a
 positive.]
 
 \Ldisclosure{%
@@ -70,7 +70,7 @@ predicted cyclotomic denominator is confirmed by exact division of the census
 series --- at $k=5$ that is 28 consecutive exact zero coefficients the
 interpolation never saw. That is strong evidence and it is not a proof.
 \emph{The king min-end constants} --- measured against a predicted convolution
-of the 4-coloured partition function at $i = 0..6$: fourteen of fourteen exact,
+of the 4-colored partition function at $i = 0..6$: fourteen of fourteen exact,
 with both contributing mechanisms checked directly rather than inferred.
 \emph{The tip series identification} --- $\phi_2$ of \cite{andrews1984}, an eta
 quotient with an explicit infinite product, verified to $n = 40$. It is
@@ -98,9 +98,9 @@ At the \textbf{minimum} end the extremal animals are balls of the adjacency
 metric, $\pminn(n)$ grows like $\sqrt n$ and is a step function, so the natural
 index is $p$ rather than $n$. There the classes are eventually \emph{constant},
 with onset linear in the defect. On the king lattice the constants are a
-convolution of the 4-coloured partition function with the box-skew deficits ---
+convolution of the 4-colored partition function with the box-skew deficits ---
 fourteen of fourteen predicted values exact. What decides whether a column
-stabilises at all is not parity but \emph{attainability}: a column stabilises
+stabilizes at all is not parity but \emph{attainability}: a column stabilizes
 exactly when its $p$ is realised as $\pminn(n)$ for some $n$. The mechanism
 behind the constants is a Young diagram at each corner of the isoperimetric
 hull, giving a factor $P(x)^c$ with $c$ the corner count --- confirmed on a
@@ -139,7 +139,7 @@ want different indices, and this paper grades from both.
 
 \paragraph{Which lattices.} Throughout, ``square'' means the rook-connected
 animals (polyominoes) and ``king'' means the king-connected ones (polyplets).
-Where a third lattice appears it is the six-neighbour triangular one, and it is
+Where a third lattice appears it is the six-neighbor triangular one, and it is
 used only to test whether a mechanism generalises.
 
 \paragraph{The order, and why.} The minimum end comes first. It is the end
@@ -155,7 +155,7 @@ lattices, which their framework does not consider.
 \section{The minimum end}
 \label{sec:min}
 
-$\pminn(n)$ grows like $\sqrt n$ and is a step function, so an $n$-indexed ladder
+$\pminn(n)$ grows like $\sqrt n$ and is a step function, so an $n$-indexed sequence
 there would have columns polynomial in $\sqrt n$ at best. The right row index is
 $p$:
 \[
@@ -171,7 +171,7 @@ Data at this end comes from \emph{complementation} rather than growth: enumerate
 the isoperimetric hulls and remove cells, since the defect is not monotone under
 addition here.
 
-\subsection{King: the constants are the 4-coloured partition function}
+\subsection{King: the constants are the 4-colored partition function}
 
 $C(p,i)$ is eventually constant in $p$ along each residue class mod $4$, and the
 constants are
@@ -183,7 +183,7 @@ constants are
 \end{aligned}
 \]
 with $q_4(j) = [x^j]\prod_n (1-x^n)^{-4} = 1, 4, 14, 40, 105, 252, 574$ the
-4-coloured partition numbers.
+4-colored partition numbers.
 
 \begin{table}[H]
 \centering\small
@@ -203,7 +203,7 @@ The $p \equiv 0$ row is now confirmed at five separate perimeters. The census
 reaches $p = 48$, and at $p = 32, 36, 40, 44, 48$ (bounding boxes of side $7$
 through $11$) all seven columns read $1, 6, 22, 68, 187, 470, 1106$ with no
 drift. Below that the columns are visibly still climbing, and each reaches its
-value exactly at the predicted rung: $i = 0$ at $p = 8$, $i = 1$ at $12$,
+value exactly at the predicted step: $i = 0$ at $p = 8$, $i = 1$ at $12$,
 $i = 2$ at $16$, and so on to $i = 6$ at $p = 32$. Seven of seven onsets land on
 $4i + 8$.
 
@@ -223,7 +223,7 @@ $s(s+1)$ when odd. Different deficit sets, hence different columns, hence period
 $4$ in $p$.
 
 \begin{quote}
-\textbf{Stabilisation onset.} $p^\ast = 4i + 8$ for $p \equiv 0$ and $4i + 10$
+\textbf{Stabilization onset.} $p^\ast = 4i + 8$ for $p \equiv 0$ and $4i + 10$
 for $p \equiv 2 \pmod 4$, exact for $i = 0,\dots,6$.
 \end{quote}
 
@@ -231,14 +231,14 @@ Both say the same thing, that the balanced box side must exceed $i$, and both
 are \emph{linear} in the defect, against the maximum end's triangular
 $\binom{k+1}{2}+3$.
 
-\subsection{What decides stabilisation}
+\subsection{What decides stabilization}
 
-King's odd-$p$ rows do not stabilise; they grow. The square lattice's odd-$p$
-rows do stabilise, so parity is not the rule. The rule, tested on both lattices,
+King's odd-$p$ rows do not stabilize; they grow. The square lattice's odd-$p$
+rows do stabilize, so parity is not the rule. The rule, tested on both lattices,
 is attainability:
 
 \begin{quote}
-$C(p,\cdot)$ stabilises $\iff$ $p$ is \textbf{attained} as $\pminn(n)$ for some
+$C(p,\cdot)$ stabilizes $\iff$ $p$ is \textbf{attained} as $\pminn(n)$ for some
 $n$.
 \end{quote}
 
@@ -247,8 +247,8 @@ an isoperimetric perimeter, and every odd column counts animals that are one uni
 worse than any optimum --- a different population, with a positional freedom
 along the boundary that grows with it. The square lattice's
 $\pminn = 2 + \lceil\sqrt{8n-4}\rceil$ attains every integer in range
-\emph{except} $5$, and correspondingly every one of its four columns stabilises.
-The hypothesis was checked class by class against the measured stabilisation on
+\emph{except} $5$, and correspondingly every one of its four columns stabilizes.
+The hypothesis was checked class by class against the measured stabilization on
 both lattices, with no exceptions.
 
 The non-attained columns are quadratic in $p$, fitted exactly with holdouts:
@@ -325,15 +325,15 @@ index-$2$ diamond tip gives $\phi_2$. The natural guess, $\phi_m$ for index
 $m$, is \textbf{false} at $m = 3$, and is recorded here as a closed door rather
 than left as a suggestion.
 
-\subsection{The square lattice's min-end ladder}
+\subsection{The square lattice's minimum-end sequence}
 
-All four residue classes stabilise here, the odd ones included.
+All four residue classes stabilize here, the odd ones included.
 
 \begin{table}[H]
 \centering\small
 \begin{tabular}{l r r r r r l}
 \toprule
- & $i=0$ & $i=1$ & $i=2$ & $i=3$ & $i=4$ & stabilises from \\
+ & $i=0$ & $i=1$ & $i=2$ & $i=3$ & $i=4$ & stabilizes from \\
 \midrule
 $p \equiv 0 \pmod 4$ & 1 & 9  & 52  & 206 & 719 & $p^\ast = 4i+4$ \\
 $p \equiv 2 \pmod 4$ & 4 & 22 & 106 & 392 & --- & $p^\ast = 4i+6$ ($i\ge1$) \\
@@ -341,7 +341,7 @@ $p \equiv 1 \pmod 4$ & 4 & 28 & 124 & 456 & --- & $p^\ast = 4i+9$ \\
 $p \equiv 3 \pmod 4$ & 4 & 28 & 124 & 456 & --- & $p^\ast = 4i+7$ \\
 \bottomrule
 \end{tabular}
-\caption{The linear stabilisation onset holds here too, exactly, with a
+\caption{The linear stabilization onset holds here too, exactly, with a
 different constant per class --- four or five points per class, no exceptions
 above $i = 0$. The two odd classes agree with each other on every converged
 value. $C(p,0) = 1$ when $p \equiv 0$ (the perfect diamond, unique) and $4$
@@ -369,13 +369,13 @@ exactly one diagonal deep.
 Grading by $k := \pmaxx(n) - p$ looks as though it should want a
 surplus-budgeted row transfer, on the model of the height grading in companion
 paper L1. It cannot: the perimeter defect does not bound the transverse extent
-of a linear sweep, since a U whose arms are far apart has $k = 3$ and unbounded
+of a linear scan, since a U whose arms are far apart has $k = 3$ and unbounded
 spread. That is presumably why the published method classifies patterns instead
 of sweeping.
 
 Something simpler works. Let $c = e - n + 1$ be the cycle rank of the animal's
 adjacency graph, and let $t$ be the sum, over empty cells adjacent to the
-animal, of (number of animal neighbours $- 1$).
+animal, of (number of animal neighbors $- 1$).
 
 \begin{proposition}
 \label{prop:kct}
@@ -394,7 +394,7 @@ Proposition~\ref{prop:kct} is not ours on the square lattice. Asinowski,
 Barequet and Zheng~\cite{abz2018} state it as $k = e + 2f$, with $e$ the total
 excess summed over perimeter cells and $f$ the number of inner faces of the dual
 map --- the circuit rank. That is the present statement with $c = f$ and
-$t = e$, and their proof is the same accounting: four neighbours per cell, less
+$t = e$, and their proof is the same accounting: four neighbors per cell, less
 the excesses, less two per spanning-tree edge, less two per cycle-closing edge.
 It was re-derived here for the king lattice without knowing that, and the
 king case does not follow from theirs by substitution: the per-cell degree, and
@@ -404,8 +404,8 @@ hence $\pmaxx$, changes, which is exactly the $(\deg/2 - 2)(n-1)$ shift.
 
 \begin{proof}[Sketch, with the full argument in the enumerator's header]
 Placing a cell raises $\pmaxx$ by $\deg/2$ and changes $p$ by $-1 + g$, where $g$
-counts the neighbours that become fresh perimeter cells; $g$ is capped by the
-neighbours the new cell shares with the animal cell it touches. The bound is
+counts the neighbors that become fresh perimeter cells; $g$ is capped by the
+neighbors the new cell shares with the animal cell it touches. The bound is
 tight on both lattices --- a stick extends at $\Delta k = 0$.
 \end{proof}
 
@@ -441,9 +441,9 @@ holes.
 \begin{proof}
 With $S$ the $3\times3$ box, $p = |A \oplus S| - n$ and $\pmaxx = 4n+4$, so
 $k = 5n + 4 - |A \oplus S|$. Cells of the animal's own parity in $A \oplus S$
-are $B$ and its edge neighbours in the $(u,v)$ frame, $n + p_4(B)$ of them.
+are $B$ and its edge neighbors in the $(u,v)$ frame, $n + p_4(B)$ of them.
 Cells of the other parity are in bijection with the grid vertices of the $(u,v)$
-lattice --- an odd cell's four orthogonal neighbours are the four cells meeting
+lattice --- an odd cell's four orthogonal neighbors are the four cells meeting
 at one vertex --- and lie in $A \oplus S$ exactly when one of those four is in
 $B$, giving $\mathrm{Vert}(B)$. Euler on the cell complex of $B$ ($V - E + F =
 1-h$, $F = n$, $E = 4n-a$, $a$ the number of adjacent pairs) gives
@@ -455,7 +455,7 @@ Three things follow. Writing $P(n,j,c)$ for the square census graded by cycle
 rank and $M(n,k)$ for the king animals that do carry an orthogonal edge,
 $A_{\text{king}}(n,k) = \sum_c P(n,k-c,c) + M(n,k)$ exactly for $k \le 3$, where
 no hole is affordable (the cheapest holed polyomino is $3\times3$ less its
-centre and one corner, at $k_{\text{square}} = 4$, $c = 0$, $h = 1$, so a hole
+center and one corner, at $k_{\text{square}} = 4$, $c = 0$, $h = 1$, so a hole
 costs $k_{\text{king}} = 5$). $M$ has degree $k-1$ and the $c \ge 1$ terms
 degree at most $k-2$, so \textbf{the leading coefficient of the king class is
 the leading coefficient of the square class}, which Table~\ref{tab:maxend}
@@ -527,7 +527,7 @@ $\mathrm{onset}(7) = 31$.
 
 $k = 3$ carries a genuine period-$2$ term on \emph{both}
 lattices, so quasi-polynomiality is intrinsic to the perimeter grading and not a
-square-lattice artefact. On the square lattice, for $n \ge 9$,
+square-lattice artifact. On the square lattice, for $n \ge 9$,
 \[
   Q_3(n) = \tfrac{13}{2}n^3 - 89n^2 + \tfrac{1947}{4}n - \tfrac{2107}{2}
            + (-1)^n\Bigl(\tfrac{5n}{4} - \tfrac{21}{2}\Bigr),
@@ -680,9 +680,9 @@ The rule that survives all three corrections is the one this section opened
 with, now tested one row further: \textbf{the leading diagonal of
 each cyclotomic block is lattice-independent, and nothing below it is.}
 
-\subsection{The recentred basis is nonnegative integers}
+\subsection{The recentered basis is nonnegative integers}
 
-The partial-fraction basis $1/\Phid_1^j \mapsto \binom{n+j-1}{j-1}$ is centred at
+The partial-fraction basis $1/\Phid_1^j \mapsto \binom{n+j-1}{j-1}$ is centered at
 $n = 0$, which is why its coefficients are the awkward rationals above.
 Re-expand each residue class in $\binom{m}{j}$ with $m = (n - n_0)/\text{period}$
 stepping along the class from its first in-regime point, and \emph{every

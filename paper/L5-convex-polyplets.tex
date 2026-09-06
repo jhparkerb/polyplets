@@ -40,9 +40,8 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\HV}{\mathrm{HV}}
 
-\title{\textbf{Convex polyplets}\\[2pt]\large the leading term, and what sits under it\\[4pt]
-\large Intractable by area, algebraic by perimeter, and one growth
-constant for every class in between}
+\title{\textbf{Convex polyplets}\\[4pt]
+\large By area, by semiperimeter, and the growth constant}
 \author{[byline: jasonp's call --- \repo{docs/publication-split.md} \S1]}
 \date{August 2026}
 
@@ -76,8 +75,8 @@ for it (\repo{results/l-paper-proof-audit.md}).
 \emph{The exclusions of \S\ref{sec:exclusions}} --- rigorous in the direction
 claimed: full column rank modulo a prime is a proof of full rank over $\Q$.
 Four positive and negative control arms, and a fifth on an unrelated series,
-are pinned by a gate.
-\emph{$\mu$ to 199 digits, $\theta = 0$, the amplitudes} --- labelled
+are held by a check.
+\emph{$\mu$ to 199 digits, $\theta = 0$, the amplitudes} --- labeled
 measurement, with the trusted digit count itself measured rather than asserted.
 \emph{$q_c$, $\mu$ and $A$ to 44--45 digits (\S\ref{sec:kernel})} --- certified,
 by exact rational interval arithmetic with no floating point in the chain; those
@@ -90,7 +89,7 @@ proved, by an explicit recursive kernel construction.
 only in the narrow form \S\ref{sec:moments} states.
 \emph{The zeros of $K$ and the non-D-finiteness route} --- \textbf{a lead}, firm
 numerically, with two named gaps (Open Problem~\ref{op:kzeros}).
-\emph{The PSLQ verdicts} --- labelled measurement, stated as falsifiable box
+\emph{The PSLQ verdicts} --- labeled measurement, stated as falsifiable box
 exclusions and never as ``$\mu$ is transcendental''.
 \emph{Novelty} --- N1 and N2 clean; \textbf{N3 is a real collision}, cited here
 here; \textbf{a second collision} on the area limit law, \S\ref{sec:moments}.
@@ -112,9 +111,9 @@ Conjecture~\ref{conj:sharp}.
 \emph{Conjecture~\ref{conj:sharp}} --- \textbf{a conjecture}, and the paper is
 explicit that the repository has no proof of a sharp asymptotic for \emph{any}
 series in this family.
-\emph{$\nu$, $r$, the Prony spectra, the amplitudes} --- labelled measurement,
+\emph{$\nu$, $r$, the Prony spectra, the amplitudes} --- labeled measurement,
 with the trusted digit count itself measured rather than asserted.
-\emph{The PSLQ verdicts} --- labelled measurement, stated as falsifiable box
+\emph{The PSLQ verdicts} --- labeled measurement, stated as falsifiable box
 exclusions and never as ``$r$ is transcendental''.
 \emph{Novelty} --- the mirror equality is \textbf{a real collision} with
 \cite{gblRoux2004}, which is the same source as the block decomposition's;
@@ -142,7 +141,7 @@ $700$ terms the generating function satisfies no P-recurrence of order $\le 24$
 with polynomial coefficients of degree $\le 24$, and no algebraic equation of
 degree $\le 20$ in $F$ with coefficients of degree $\le 20$ in $t$; the same
 holds for the classical convex-polyomino control regenerated to the same length.
-We pin $\mu$ to $199$ digits and measure the correction to pure exponential
+We determine $\mu$ to $199$ digits and measure the correction to pure exponential
 growth to be geometric: $\theta = 0$, no power-law factor and nothing resembling
 a stretched exponential. Integer-relation searches find no polynomial with $\mu$
 as a root of degree $\le 20$ and height $\le 10^8$, $\le 30$ and $\le 10^6$, or
@@ -396,7 +395,7 @@ alongside the join, so distinct pairs have distinct images.
 Fekete's lemma in supermultiplicative form finishes.
 \end{proof}
 
-\begin{corollary}[every banked term is a floor]
+\begin{corollary}[every computed term is a floor]
 \label{cor:floor}
 $\mu \ge M(n)^{1/n}$ for every $n$, with no extrapolation. At $n = 700$,
 \[
@@ -448,7 +447,7 @@ HV-convex & $1,4,16,61,221,766$ & 199 & $0.97445221313500464915$ \\
 \bottomrule
 \end{tabular}
 \caption{Four classes, one constant. The staircase value reproduces all $199$
-digits the HV-convex series pins, and continues to $204$.}
+digits the HV-convex series determines, and continues to $204$.}
 \label{tab:fourrungs}
 \end{table}
 
@@ -465,7 +464,7 @@ $\deg q_j \le 24$. The same holds for HV-convex polyominoes by area
 (\oeis{A067675}), regenerated to the same length.
 \end{theorem}
 
-Two facts make this one test rather than a $25\times25$ sweep.
+Two facts make this one test rather than a $25\times25$ search.
 
 \paragraph{The boxes nest.} A solution with $J' \le J$ and $D' \le D$ is a
 solution of the $(J,D)$ ansatz with the unused $p_i$ set to zero. Excluding the
@@ -476,7 +475,7 @@ are integers. Full column rank modulo $p$ means some maximal minor is nonzero
 mod $p$, hence nonzero over $\Q$, hence the only rational solution is trivial.
 Rank can drop mod $p$, never rise, so \emph{this} direction is rigorous. A rank
 \emph{defect} would only be a candidate --- which is the branch that gets the
-holdout and the second prime.
+withheld data and the second prime.
 
 \begin{table}[H]
 \centering\small
@@ -525,9 +524,9 @@ out as stated:
 \toprule
 arm & series & box & must be & is \\
 \midrule
-prec $+$ & HV-convex by semiperimeter & $(5,2)$ & CANDIDATE & nullity 1; predicts all 172 held-out rows \\
+prec $+$ & HV-convex by semiperimeter & $(5,2)$ & CANDIDATE & nullity 1; predicts all 172 withheld rows \\
 prec $-$ & same series & $(2,1)$ & EXCLUDED & rank 6 of 6 \\
-alg $+$ & \oeis{A005436}, algebraic~\cite{delestViennot1984} & $(2,8)$ & CANDIDATE & nullity 1; holds on all 69 held-out rows \\
+alg $+$ & \oeis{A005436}, algebraic~\cite{delestViennot1984} & $(2,8)$ & CANDIDATE & nullity 1; holds on all 69 withheld rows \\
 alg $-$ & same series & $(2,4)$ & EXCLUDED & rank 15 of 15 \\
 \bottomrule
 \end{tabular}
@@ -632,7 +631,7 @@ at the same precision with a simple pole at $q_c$ and a nonzero residue.
 Certified means exact rational interval arithmetic with no floating point in
 the chain: alternating-series bracketing of $K$, an analytic positivity bound on
 $(0, 29/100]$, a certified Lipschitz bound on $[0.29, 0.33]$, and a $270$-step
-march that pins $q_c$ inside an interval of width $4\times10^{-46}$ and
+march that determines $q_c$ inside an interval of width $4\times10^{-46}$ and
 establishes that it is the smallest positive zero. Those $44$ digits agree with
 every corresponding digit of the $199$ extrapolated above: two methods sharing
 no machinery, one a series extrapolation and one an interval-arithmetic
@@ -785,7 +784,7 @@ region; on the by-area series of the fifth arm the same grid is all zeros.
 
 \subsection{Column-convex polyplets}
 
-For contrast, the neighbouring class is exactly solvable.
+For contrast, the neighboring class is exactly solvable.
 Temperley's method~\cite{temperley1956} with the last column's height as
 catalytic variable (king contact gives $h + h' + 1$ placements) closes to a
 $2\times2$ linear system and yields
@@ -1123,7 +1122,7 @@ $1$ at $x = 1/\mu$.
 
 Shooting on that recurrence computes $\mu$ to arbitrary precision in
 $O(h_{\max})$ operations, with no series and no extrapolation: it reproduces
-all $199$ banked digits, continues past them, and reaches $987$ digits in
+all $199$ stored digits, continues past them, and reaches $987$ digits in
 $1.6$ seconds on one core, against a $700$-term enumeration plus extrapolation
 for $200$.
 
@@ -1407,7 +1406,7 @@ Lemma~\ref{lem:blocks}, brute force & \repo{experiments/monotone\_block\_growth.
 the block series $T$ & \repo{experiments/dir4\_descent\_block.py}, \repo{experiments/descent\_block\_oracle.py} \\
 \S\ref{sec:perimeter} & \repo{experiments/dir4\_perim\_find\_alg.py}, \texttt{make gate-dir4-perim-alg} \\
 column-convex & \repo{experiments/colconvex\_king.py} \\
-the squeeze, pinned & \texttt{make gate-middle-kingdom} \\
+the squeeze, checked & \texttt{make gate-middle-kingdom} \\
 \bottomrule
 \end{tabular}
 \caption{Where each claim is checked. Every proof-relevant item is either a
