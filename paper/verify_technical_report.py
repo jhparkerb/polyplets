@@ -288,8 +288,14 @@ print(f"diagonal closed forms: {n_real} real-swept cells (independent) + "
 # number that drifts from its record goes red, and so does a sentence that
 # disappears.
 
+# Prose checks match against the text with every run of whitespace collapsed
+# to one space, so re-wrapping a sentence in the .tex (which happens every
+# edit) cannot turn a check red; the table parsers above keep the raw text.
+prose = re.sub(r"\s+", " ", tex)
+
+
 def said(label, pattern):
-    m = re.search(pattern, tex, re.S)
+    m = re.search(pattern, prose, re.S)
     if not m:
         failures.append(f"FAIL {label}: sentence not found: /{pattern}/")
         return None
@@ -336,7 +342,7 @@ for line in (ROOT / "results/subgroup_counts.txt").read_text().splitlines():
     p = line.split()
     if len(p) == 3 and p[1].isdigit():
         I[(p[0], int(p[1]))] = int(p[2])
-if not re.search(r"pass checks based on Burnsides? congruences", tex):
+if not re.search(r"pass checks based on Burnsides? congruences", prose):
     failures.append("FAIL abstract: the Burnside-congruence sentence not found")
 for n in range(1, 41):
     rhs = (I.get(("c4", n), 0) + I.get(("d2ax", n), 0)
@@ -491,12 +497,48 @@ def visit(animal):
     rows = {}
     for x, y in animal:
         rows.setdefault(y, []).append(x)
+    if len(rows) == n - 2 and n >= 5:
+        visit_nm2(n, rows)
     if len(rows) != n - 1:
         return
     (y2, xs), = [(y, xs) for y, xs in rows.items() if len(xs) == 2]
     kind = {1: "domino", 2: "split"}.get(abs(xs[0] - xs[1]), "gap>=3")
     pos = "end" if y2 in (min(rows), max(rows)) else "interior"
     tally[n][(kind, pos)] = tally[n].get((kind, pos), 0) + 1
+
+
+# Height n-2 (docs/proofs/T-n-nm2-and-general.md): one row of three cells, or
+# two rows of two.  A triple is classified by position (end / interior) and
+# by its two internal gaps (each must be 1 or 2); two doubles by whether
+# their rows are adjacent and how many of them sit at an end.  Two ADJACENT
+# doubles bridge each other, so their gaps are unconstrained (0 and 3 with 1
+# and 2 above it is connected); a separated double is bridged by a single
+# cell and its gap is 1 or 2, like the n-1 case.
+tally2 = {n: {} for n in range(1, CENSUS_N + 1)}
+
+
+def visit_nm2(n, rows):
+    lo, hi = min(rows), max(rows)
+    fat = sorted((y, sorted(xs)) for y, xs in rows.items() if len(xs) >= 2)
+    if len(fat) == 1:
+        y, xs = fat[0]
+        assert len(xs) == 3
+        g = (xs[1] - xs[0], xs[2] - xs[1])
+        kind = "triple" if max(g) <= 2 else "triple gap>=3"
+        pos = "end" if y in (lo, hi) else "interior"
+        key = (kind, pos)
+    else:
+        (ya, xa), (yb, xb) = fat
+        assert len(xa) == len(xb) == 2
+        ends = (ya in (lo, hi)) + (yb in (lo, hi))
+        where = {0: "interior", 1: "one end", 2: "both ends"}[ends]
+        if yb - ya == 1:
+            key = ("adjacent", where)       # the pair bridges itself: any gaps
+        elif max(xa[1] - xa[0], xb[1] - xb[0]) >= 3:
+            key = ("separated gap>=3", "")  # a lone double is bridged by one cell
+        else:
+            key = ("separated", where)
+    tally2[n][key] = tally2[n].get(key, 0) + 1
 
 
 def redelmeier(animal, untried, tried):
@@ -517,15 +559,15 @@ redelmeier(frozenset(), [(0, 0)], set())
 for n in range(1, CENSUS_N + 1):
     check(f"census: fixed polyplets of size {n}", census[n], banked_an[n])
 c_dom = said("domino joiner", r"we have \$(\d+)\(n-3\)\\cdot\{\}3\^\{n-4\}\$ junction")
-sp = re.search(r"giving \$\((\d)\\cdot\{\}(\d) \+ (\d)\\cdot\{\}(\d)\)\(n-3\)\\cdot\{\}3\^\{n-4\}\$", tex)
+sp = re.search(r"giving \$\((\d)\\cdot\{\}(\d) \+ (\d)\\cdot\{\}(\d)\)\(n-3\)\\cdot\{\}3\^\{n-4\}\$",prose)
 if not sp:
     failures.append("FAIL split-joiner sentence not found")
 c_split = int(sp.group(1)) * int(sp.group(2)) + int(sp.group(3)) * int(sp.group(4)) if sp else None
 c_int = said("interior joiner", r"give us \$(\d+)\(n-3\)\\cdot\{\}3\^\{n-4\}\$ options")
-ends = re.search(r"giving \$(\d)\\cdot\{\}(\d)\\cdot\{\}3\^\{n-3\} = (\d+)\\cdot\{\}3\^\{n-4\}\$", tex)
+ends = re.search(r"giving \$(\d)\\cdot\{\}(\d)\\cdot\{\}3\^\{n-3\} = (\d+)\\cdot\{\}3\^\{n-4\}\$",prose)
 if not ends:
     failures.append("FAIL end-joiner sentence not found")
-tot = re.search(r"T\(n, n-1\) = (\d+)\(n-3\)\\cdot\{\}3\^\{n-4\} \+ (\d+)\\cdot\{\}3\^\{n-4\} = \((\d+)n - (\d+)\)\\cdot\{\}3\^\{n-4\}", tex)
+tot = re.search(r"T\(n, n-1\) = (\d+)\(n-3\)\\cdot\{\}3\^\{n-4\} \+ (\d+)\\cdot\{\}3\^\{n-4\} = \((\d+)n - (\d+)\)\\cdot\{\}3\^\{n-4\}",prose)
 if not tot:
     failures.append("FAIL T(n,n-1) display not found")
 if sp and ends and tot:
@@ -542,6 +584,121 @@ if sp and ends and tot:
         check(f"census n={n}: end split joiners (1 placement each end)", t.get(("split", "end"), 0), 2 * 1 * 3 * p3)
         check(f"census n={n}: a gap of three or more cannot be spanned", sum(v for (kind, _), v in t.items() if kind == "gap>=3"), 0)
         check(f"census n={n}: T({n},{n - 1}) by enumeration", sum(t.values()), col[n - 1][n])
+
+
+# T(n,n-2) = (625n^2 - 2459n + 1134)/2 * 3^(n-7), n >= 5 (jasonp's 2026-09-05
+# decision C5 in paper/technical-report-gaps.md; docs/proofs/T-n-nm2-and-general.md).
+# The closed form on every banked cell, and each of its seven pieces against
+# the enumeration for n = 5..8.  A triple has interior weight 49 (tromino 25,
+# split-and-domino 11 each way, double split 2) and end weight 7; a doubled
+# row keeps its 25 / 5 from the n-1 case; two adjacent doubled rows form one
+# compound gadget of weight 339 interior, 66 at an end.
+def t_nm2(n):
+    num = 625 * n * n - 2459 * n + 1134
+    assert num % 2 == 0
+    return num // 2 * 3 ** (n - 7) if n >= 7 else Fr(num, 2) / 3 ** (7 - n)
+
+for n in range(5, 41):
+    check(f"T({n},{n - 2}) == (625n^2-2459n+1134)/2 * 3^(n-7)", Fr(col[n - 2][n]), Fr(t_nm2(n)))
+for n in range(3, 41):
+    check(f"T({n},{n - 1}) == (25n-45) 3^(n-4)", Fr(col[n - 1][n]), Fr(25 * n - 45) * Fr(3) ** (n - 4))
+for n in range(5, CENSUS_N + 1):
+    t = tally2[n]
+    p = lambda e: Fr(3) ** e
+    check(f"census n={n}: interior triples, 49 per position", t.get(("triple", "interior"), 0), 49 * (n - 4) * p(n - 5))
+    check(f"census n={n}: end triples, 7 per end", t.get(("triple", "end"), 0), 14 * p(n - 4))
+    check(f"census n={n}: two separated doubles, both interior (25*25)", t.get(("separated", "interior"), 0), Fr(625 * (n - 5) * (n - 6), 2) * p(n - 7))
+    check(f"census n={n}: two separated doubles, one at an end (25*5)", t.get(("separated", "one end"), 0), 250 * (n - 5) * p(n - 6))
+    check(f"census n={n}: two separated doubles, both ends (5*5)", t.get(("separated", "both ends"), 0), 25 * p(n - 5))
+    check(f"census n={n}: adjacent doubles interior (339)", t.get(("adjacent", "interior"), 0), 339 * (n - 5) * p(n - 6))
+    check(f"census n={n}: adjacent doubles at an end (66)", t.get(("adjacent", "one end"), 0), 132 * p(n - 5))
+    check(f"census n={n}: no gap of three in a triple or a separated double", sum(v for (k, _), v in t.items() if "gap" in k), 0)
+    check(f"census n={n}: T({n},{n - 2}) by enumeration", sum(t.values()), col[n - 2][n])
+
+# ---------------- the L draft's scope numbers ----------------------------
+# paper/technical-report-draft.tex (category L, 2026-09-05) states the same
+# record in its own sentences.  Every number it puts in prose is read here and
+# compared with the record, so that when jasonp strikes paragraphs from it
+# what remains stays right.  Skipped silently if the draft is gone.
+DRAFT = ROOT / "paper" / "technical-report-draft.tex"
+if DRAFT.exists():
+    dprose = re.sub(r"\s+", " ", DRAFT.read_text())
+
+    def dsaid(label, pattern, conv=int):
+        m = re.search(pattern, dprose)
+        if not m:
+            failures.append(f"FAIL draft {label}: sentence not found: /{pattern}/")
+            return None
+        return tuple(conv(g) for g in m.groups()) if len(m.groups()) > 1 else conv(m.group(1))
+
+    a41_dir = ROOT / "results" / "a41"
+    a41h = {int(f.stem[1:]): load_pairs(f) for f in a41_dir.glob("h*.out")}
+    check("draft: a(41) value", dsaid("a(41)", r"a\(41\) = \\num\{(\d+)\}"),
+          393811462683918679824582849262105)
+    check("draft: swept heights of a(41) are 1..20", sorted(a41h), list(range(1, 21)))
+    check("draft: a(41) assembled from heights 1..20",
+          dsaid("a(41) heights", r"assembled from an enumeration of heights \$1\$--\$(\d+)\$"), max(a41h))
+    for H, rows_ in sorted(a41h.items()):
+        for n in range(H, 41):
+            check(f"draft: a(41) sweep T({n},{H}) == banked", rows_.get(n, 0), col[H][n])
+    check("draft: regression cells of the a(41) sweep",
+          dsaid("regression", r"reproduces the banked triangle at every one of the \$(\d+)\$ cells"),
+          sum(41 - H for H in a41h))
+    check("draft: T(41,20) swept equals what the text quotes",
+          dsaid("T(41,20)", r"T\(41,20\) = \\num\{(\d+)\}"), a41h[20][41])
+    for H in range(1, motley_top + 1):
+        t = C[H][41] - 2 * C[H - 1].get(41, 0) + C[H - 2].get(41, 0)
+        check(f"draft: Motley T(41,{H}) == a(41) sweep", t, a41h[H][41])
+    check("draft: Motley cells at n<=40 and the 19 at n=41",
+          dsaid("Motley", r"on all \$(\d+)\$ cells with \$n \\le 40\$ and \$H \\le 19\$ and on the \$(\d+)\$ swept cells of row \$41\$"),
+          (motley_cells, motley_top))
+    check("draft: Motley reach in H", dsaid("Motley H", r"run to height \$(\d+)\$ at the size row \$41\$ needs"), motley_top)
+    check("draft: strip cells H<=14", dsaid("strip", r"agrees on all \$(\d+)\$ cells with \$H \\le 14\$"), sum(41 - H for H in range(1, 15)))
+    check("draft: refit reproduces the other real-swept cells",
+          dsaid("171", r"reproduces all \$(\d+)\$ other real-swept cells above onset"), n_real)
+    check("draft: 171 in the results paragraph",
+          dsaid("171b", r"real-swept cell on its diagonal, \$(\d+)\$ cells in all"), n_real)
+    check("draft: P_k wired to", dsaid("wired", r"\$P_k\$ is wired into the production engine for \$k \\le (\d+)\$"), wired)
+    for k, n, H in re.findall(r"\$P_\{(\d+)\}\$ at \$T\((\d+),(\d+)\)\$", dprose):
+        k, n, H = int(k), int(n), int(H)
+        check(f"draft: holdout P_{k} at T({n},{H}) is on its diagonal, in onset, not a fit cell",
+              (n - H == k, n >= 2 * k + 1, n not in (2 * k + 1, 2 * k + 2), H <= 21), (True, True, True, True))
+    cov = dsaid("coverage", r"Over the \$(\d+)\$ cells of the \$n \\le 40\$ triangle, \$(\d+)\$ are enumerated by at least one second program, \$(\d+)\$ are wired-formula cells above height \$21\$, and three")
+    ptab = (ROOT / "results" / "provenance-table.md").read_text()
+    if cov:
+        check("draft: 820 cells", cov[0], 40 * 41 // 2)
+        check("draft: 189 formula-only cells (provenance table)", cov[2],
+              int(re.search(r"holdout-validated elsewhere: \*\*(\d+)\*\*", ptab).group(1)))
+        check("draft: 628 + 189 + 3 = 820", cov[1] + cov[2] + 3, cov[0])
+        check("draft: 192 = 189 + 3 (provenance table)",
+              int(re.search(r"tag U\): \*\*(\d+)\*\* of the", ptab).group(1)), cov[2] + 3)
+    check("draft: Redelmeier reach", dsaid("Redelmeier", r"confirm the transfer matrix's counts up to \$n = (\d+)\$"), max(red))
+    check("draft: Redelmeier cells agree everywhere", dsaid("Redelmeier rows", r"Every cell of every row \$n \\le (\d+)\$ agrees between Redelmeier"), max(red))
+    prof = (a41_dir / "h20_cost_profile.tsv").read_text()
+    wall = float(re.search(r"wall=([\d.]+)s", prof).group(1))
+    cores = int(re.search(r"cores=(\d+)", prof).group(1))
+    check("draft: H=20 sweep hours and cores",
+          dsaid("H20 cost", r"height \$20\$ in \$([\d.]+)\$ hours on \$(\d+)\$", float), (round(wall / 3600, 1), float(cores)))
+    check("draft: a(40)^(1/40)", dsaid("fekete", r"\\lambda \\ge a\(40\)\^\{1/40\} = ([\d.]+)", float),
+          round(banked_an[40] ** (1 / 40), 4))
+    check("draft: a(40)/a(39)", dsaid("ratio", r"a\(40\)/a\(39\) = ([\d.]+)", float),
+          round(banked_an[40] / banked_an[39], 4))
+    n32 = dsaid("limits", r"At \$n = (\d+)\$ the one-sided count exceeds \$a\(n\)/4\$ and the free count \$a\(n\)/8\$ by less than one part in a million")
+    if n32:
+        e4 = Fr(4 * onesided[n32], banked_an[n32]) - 1
+        e8 = Fr(8 * free[n32], banked_an[n32]) - 1
+        check(f"draft: one-sided excess at n={n32} in (0, 1e-6)", 0 < e4 < Fr(1, 10 ** 6), True)
+        check(f"draft: free excess at n={n32} in (0, 1e-6)", 0 < e8 < Fr(1, 10 ** 6), True)
+    check("draft: holes by Euler through n =", dsaid("holes TM", r"carrying the Euler characteristic, through \$n = (\d+)\$"), max(n for n, k in holes))
+    check("draft: holes flood-fill through n <=", dsaid("holes flood", r"checked these counts for \$n \\le (\d+)\$"), max(n for n, k in holes14))
+    nm2 = dsaid("T(n,n-2) display", r"T\(n,n-2\) = \\tfrac12\\,\((\d+)n\^2 - (\d+)n \+ (\d+)\)\\,3\^\{\\,n-7\}")
+    check("draft: T(n,n-2) display coefficients", nm2, (625, 2459, 1134))
+    check("draft: triple weights", dsaid("triple", r"interior weight of \$(\d+)\$ and an end weight of \$(\d+)\$, so \$\((\d+)n - (\d+)\)\\,3\^\{\\,n-5\}\$"), (49, 7, 49, 154))
+    check("draft: separated doubles quadratic", dsaid("sep", r"\\tfrac12\((\d+)n\^2 - (\d+)n \+ (\d+)\)\\,3\^\{\\,n-7\}\$\. Two adjacent"), (625, 5375, 11700))
+    check("draft: adjacent doubles", dsaid("adj", r"compound joiner of weight \$(\d+)\$, or \$(\d+)\$ at an end, giving \$\((\d+)n - (\d+)\)\\,3\^\{\\,n-7\}\$"), (339, 66, 1017, 3897))
+    check("draft: T(n,n-1) display", dsaid("nm1", r"T\(n,n-1\) = (\d+)\(n-3\)\\,3\^\{\\,n-4\} \+ (\d+) \\cdot 3\^\{\\,n-4\} = \((\d+)n - (\d+)\)\\,3\^\{\\,n-4\}"), (25, 30, 25, 45))
+    check("draft: T(n,n-2) cells checked", dsaid("nm2 cells", r"the sum holds on all \$(\d+)\$ banked cells \$5 \\le n \\le 40\$"), 36)
+    check("draft: T(n,n-1) cells checked", dsaid("nm1 cells", r"the formula holds on all \$(\d+)\$ banked cells \$3 \\le n \\le 40\$"), 38)
 
 print(f"{checks} checks, {len(failures)} failures")
 for f in failures:

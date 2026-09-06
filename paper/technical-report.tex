@@ -33,25 +33,26 @@
 \begin{document}
 \maketitle
 
-\begin{abstract}
-The king-lattice polyplet sequence \href{https://oeis.org/A006770}{A006770} has been expanded
-through
-\[
-  a(40) = \num{56749893611764175164545926946127};
-\].
+\begin{abstract} The king-lattice polyplet sequence \href{https://oeis.org/A006770}{A006770} has
+been expanded through \[a(40) = \num{56749893611764175164545926946127}.\]
 
-A new triangular sequence $T(n,H), H\le{}n$ is proposed that counts the king polyplets of size $n$
-and height exactly $H$.  Diagonals in the triangle ($H>n/2$) have special forms such that a
-polynomial factor can be fixed from earlier rows and the other factor is exponential in $n$ and $H$.
+A new triangular sequence $T(n,H)$  is proposed that counts the fixed king polyplets of size $n$ and
+height exactly $H\le{}n$. Clearly $a(n) = \sum_H\,T(n,H)$. Diagonals in the triangle ($H>n/2$) have
+special forms such that a polynomial factor can be fixed from earlier rows and the other factor is
+exponential in $n$ and $H$.
 
-$a(19)$ was computed directly with Redelmeier enumeration; $a(20)$--$a(23)$ were computed via
-transfer matrix; $a(24)$--$a(40)$ used earlier rows to fix polynomial factors to compute the most
-expensive $T(n,H)$ by evaluation of the closed forms.
+$a(1)$--$a(18)$ were already known; $a(19)$ was computed directly with Redelmeier enumeration;
+$a(20)$--$a(23)$ were computed via transfer matrix; $a(24)$--$a(40)$ used earlier rows to fix
+polynomial factors to compute the most expensive $T(n,H)$ by evaluation of the closed forms.
 
-All $a(n)$ values were double-checked; for $n\le{}22$, transfer matrix and Redelmeier enumeration
-agree; for $n\le{}40$, a transfer-matrix method that uses coloring instead of directly tracking
-connectivity confirms the $T(n,H\le{}19)$ cells that do not have closed forms.  All $a(n)$ values
-pass checks based on Burnsides congruences as well as the triangle's closed forms.
+All $a(n)$ values for $n<40$ were double-checked; for $n\le{}22$, transfer matrix and Redelmeier
+enumeration agree; for $n\le{}40$, a transfer-matrix method that uses coloring instead of directly
+tracking connectivity confirms the $T(n,H\le{}19)$ cells.  All $a(n)$ values pass checks based on
+Burnside congruences.
+
+Every new $a(n)$ value has been checked by a second computation that shares no code; for $n\le{}22$
+the confirmation comes from Redelmeier enumeration; for larger $n$ the confirmation is from a
+transfer matrix that colors cells instead of tracking connectivity.
 
 This work is completed with heavy assistance from Claude Code, especially the Fable model.
 \end{abstract}
@@ -82,8 +83,9 @@ A polyplet may have one or more \textbf{holes}, polyominoes of unfilled cells en
 king-connected occupied cells.  Thus a hole of size $1$ may be enclosed by a polyplet of size $4$,
 and a domino of $2$ cells or two size-$1$ holes may be enclosed by a polyplet of size $6$.
 
-$\mathbf{T(n,H)}$, $1\le{H}\le{n}$ is the number of fixed polyplets of size $n$ whose bounding box is of
-height exactly $H$; the row sums produce $a(n)$, the number of fixed polyplets of size $n$ (A006770).
+$\mathbf{T(n,H)}$, $1\le{H}\le{n}$ is the number of fixed polyplets of size $n$ whose bounding box
+is of height exactly $H$; the row sums produce $a(n)$, the number of fixed polyplets of size $n$
+(\href{https://oeis.org/A006770}{A006770}).
 
 \section{Results}
 \label{sec:results}

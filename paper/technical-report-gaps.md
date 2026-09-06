@@ -69,6 +69,13 @@ a tripleplet figure for the definition, a generated recipe list. Net files:
   straight, he cuts it. When the paragraph lands the verifier gets what the
   T(n,n−1) paragraph has: the display checked on every banked cell and a
   census of the three cases at n = 5..8 against his coefficients.
+  **2026-09-05 late: the verifier already carries it**, independent of the
+  sentence: the closed form on all 36 banked cells, and the enumeration census
+  for n = 5..8 split seven ways (interior triple 49, end triple 7, separated
+  doubles 25·25 / 25·5 / 5·5, adjacent doubles 339 / 66), each equal to its
+  formula; two adjacent doubled rows bridge each other, so their gaps are
+  unconstrained, which the first cut of the census got wrong and the count
+  caught. When his paragraph lands, only the sentence-reading needs adding.
 - **Spelling and punctuation:** last, and not before he says.
 - **Abstract: DONE** (end of session 2026-09-04). Next by the finish list:
   Reproducibility (B1), then the engine chapter (B2) from
@@ -196,6 +203,16 @@ engines agreeing on all 19 cells (gated, `gate-cutcount-assembly`); heights
 its two fits; no enumeration of `T(41,20)` exists (the H = 20 sweep, ~11 h on
 dalby, unrun). `results/a41/PROVENANCE.md` and `results/confidence.md` say the
 same. Wording is yours.
+
+**2026-09-05 21:19 EDT, Claude: the H = 20 sweep landed.** 9.63 h on dalby's
+76 cores, rc = 0. `T(41,20) = 18004779862205054677763902712770`, equal to the
+tower's prediction digit for digit; banked as `results/a41/h20.out`; the
+assembler now sweeps H <= 20 and takes 21..41 from the tower (800 regression
+cells agree); `gate-undertow-pairs` carries the holdout comparison with a RED
+control. What the asterisk can now carry: heights 1-19 by two engines, height
+20 enumerated once and equal to the formula that predicted it, heights 21-41
+from the tower with a(41) no longer touching `P_21`. Still not a(40)'s grade:
+the colouring engine stops at H = 19, so `T(41,20)` has one enumeration.
 
 ---
 
@@ -368,3 +385,124 @@ order of remove:
   `results/convex-anisotropic.md`) — q-series, empirically non-D-finite.
 - **The differential-approximant methodology** behind item 3 (the numbers it
   produces are in scope; the method is not).
+
+---
+
+# D. Every result the paper must state and prove, in dependency order
+
+2026-09-05, at jasonp's request ("list all the results that the current
+technical report requires me to state and prove, even if already done, order
+them topologically"). Line numbers are into `technical-report.tex` at the
+comparison base above. "Needs" names the earlier items each one rests on.
+Onset sharpness (failure at n = 2k) is not asserted by the current text and
+is not required.
+
+## Lattice facts
+
+1. **Polyominoes are polyplets.** Rook adjacency implies king adjacency.
+   Implicit; used by the A194596 column and by "few polyplets are
+   polyominoes" (line 165). Needs nothing.
+2. **Row occupancy and the walk-row cut.** A connected animal occupies every
+   row of its bounding box; king adjacency changes the row by at most one, so
+   a one-cell row separates the animal. Not in the paper. The engine of every
+   closed form below. Proved: `docs/proofs/diagonal-law.md` step 1. Needs
+   nothing.
+3. **Height partition.** Σ_H T(n,H) = a(n). Stated as a definition, line 85.
+   Needs nothing.
+
+## Closed forms
+
+4. **T(n,n) = 3^(n−1).** Consecutive one-cell rows connect iff the column
+   offset is in {−1,0,1}. In the paper with proof, lines 131 and 293.
+   Needs 2.
+5. **Doubled-row gap lemma.** Two cells in one row join only as a domino or
+   with a gap of exactly one empty cell, bridged by a single cell in the
+   middle column of a neighbouring row. One clause, line 314. Proved:
+   `docs/proofs/T-n-nm1.md` §3. Needs 2.
+6. **T(n,n−1) = (25n−45)·3^(n−4)**, n ≥ 3. In the paper with derivation,
+   lines 304–345; census n = 4..8 in the verifier. Needs 2, 4, 5.
+7. **The diagonal law.** For n ≥ 2k+1, T(n,n−k) = P_k(n)·3^(n−3k−1), P_k of
+   degree ≤ k, integer-valued. Stated lines 133–135 as a fitted fact.
+   Proved: `docs/proofs/diagonal-law.md` and Lean; not in the paper.
+   Needs 2, 3.
+8. **Leading coefficient 25^k/k!**, so deg P_k = k exactly. Stated line 135.
+   Proved: `docs/proofs/grand-form.md`, taking 25 from item 6. Not in the
+   paper. Needs 6, 7.
+9. **P_k pinned by rows 2k+1..3k.** With the leading coefficient fixed, k
+   unknowns, k in-onset cells, nonsingular Vandermonde. Stated line 136.
+   Needs 7, 8. Item A4: wrong if separated from the sentence before it.
+10. **Composition of a(24)–a(40).** Cells with H > n/2 are in onset, so swept
+    cells plus closed-form evaluations sum to a(n), and the closed forms
+    check the swept cells. Abstract. Needs 3, 9.
+11. **T(n,n−2) = ½(625n²−2459n+1134)·3^(n−7)**, n ≥ 5. Decided in
+    2026-09-05, not yet in the tex. Proof: `docs/proofs/T-n-nm2-and-general.md`
+    §1, in the style of item 6. Needs 2, 4, 5. Leading coefficient 625/2 is
+    the k = 2 instance of item 8.
+
+## Growth
+
+12. **Exponential upper bound a(n) ≤ C^n.** Spanning-tree count for connected
+    n-sets through a fixed cell in a degree-8 graph, C ≤ 7e or so. Not in the
+    paper. Makes λ finite; used by 17. Cite or prove in two lines. Needs
+    nothing.
+13. **Supermultiplicativity and Fekete.** Diagonal-corner concatenation is
+    injective, so a(m+n) ≥ a(m)a(n); hence a(n)^(1/n) → λ = sup a(n)^(1/n),
+    λ ≥ a(40)^(1/40) = 6.2208, a(n) ≤ λ^n. Convergence asserted line 289
+    without proof; his argument is in the tex comment above it. Needs 12.
+14. **λ ≈ 7.11.** Not a theorem. 2026-09-04 decision: cite or drop (Madras
+    ratio theorem, differential approximants, L3 bracket 6.543 ≤ λ ≤ 9.3154).
+    Needs 13 to be well defined.
+
+## Symmetry
+
+15. **Burnside on D4.** Free = ⅛ Σ_{D4} Fix(g); one-sided = ¼ Σ_{C4} Fix(g);
+    bilateral = free classes with a reflection; bilateral + asymmetric =
+    free. Only the last is in the paper, line 220. Cite Burnside. Needs
+    definitions only.
+16. **The Burnside congruence** a(n) ≡ I(C4) + I(D2ax) + I(D2diag) − 2·I(D4)
+    (mod 4), from the orbit-size count with F(H) for stabiliser exactly H.
+    Invoked abstract line 53, never stated. Three lines in
+    `results/subgroup-mod4.md`. Needs 15.
+17. **Symmetric polyplets are negligible.** Each nontrivial Fix(g)(n) ≤
+    poly(n)·a(⌈n/2⌉ + O(1)) (a symmetric animal is a half plus an axis);
+    a(n) ≥ 6.2208^(n−39) from 13; the ratio vanishes exponentially provided
+    C^(1/2) < 6.2208. This is "one-sided → a(n)/4, free → a(n)/8", line 166.
+    Not in the paper, not in the repo as a proof. Needs 12, 13, 15.
+18. **Polyominoes are a vanishing share.** Fixed polyominoes ≤ 4.65^n
+    (Klarner–Rivest) against a(n) ≥ 6.2208^(n−39). "Few polyplets are
+    polyominoes thanks to the higher growth rate", line 165; A194596 = free
+    polyplets − A000105 rests on item 1. Needs 1, 13, 15 for the free
+    version, one citation.
+
+## Holes
+
+19. **Hole definition and the Euler count.** A hole is a bounded
+    rook-connected component of the complement. With 8-connected foreground
+    and 4-connected background, Gray's 2×2-window formula with the −2·Q_D
+    branch gives E = components − holes, so holes = 1 − E for a connected
+    animal, and E accumulates over column pairs. What "tracking the Euler
+    characteristic" (line 226) rests on. Not stated. Cite Gray 1971 or
+    Rosenfeld. Needs the definition at line 81.
+20. **Minimal enclosures.** A 1-cell hole needs its four rook neighbours,
+    pairwise king-adjacent, so 4 is minimal and unique; a domino hole needs
+    its six; two 1-cell holes need ≥ 6 (two 4-sets share ≤ 2 cells), achieved
+    diagonally. Stated lines 82–83 without proof. Needs 19.
+
+## Methods
+
+21. **Transfer-matrix signature sufficiency.** Equal frozen column,
+    connectivity partition, top/bottom flags and remaining budget give equal
+    completions, so the count over signatures is T(n,H) exactly. Described
+    lines 298–302, correctness never stated. Cite Jensen or Conway; state the
+    invariant. Needs 2, 3.
+22. **The colouring second source.** C_H(n) = Σ_{h≤H} (H−h+1)·T(n,h), T its
+    second difference in H; the connected count is the q¹ coefficient of the
+    Fortuin–Kasteleyn polynomial. Abstract line 52. 2026-09-04 decision:
+    machine work with a pointer, or drop. If kept, state only the
+    second-difference identity and cite `docs/proofs/cutcount-identity.md`.
+    Needs 3.
+23. **Redelmeier.** Citation only.
+
+**Status summary.** Stated and proved in the paper: 4, 6. Stated or invoked
+without proof: 3, 7, 8, 9, 13, 15, 16, 20. Needed by the text, never stated:
+1, 2, 5, 12, 17, 18, 19, 21. Decided in, unwritten: 11. Cite-or-drop: 14, 22.

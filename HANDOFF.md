@@ -63,7 +63,59 @@ re-recovery. **Consolidation of the 459 markdown files**: theme map (21 themes �
 kept as appendices or deleted-with-history; closed campaigns first or
 mathematics first).
 
-## 2026-09-05 11:41 EDT — a(41) H = 20 SWEEP RUNNING ON DALBY
+## 2026-09-05 late — the machine-written report, and the evening's checks
+
+- `paper/technical-report-draft.tex` (**category L**, `\Ldisclosure` + draft
+  banner) written at jasonp's word ("write me a paper"), same structure and
+  scope as `technical-report.tex`: Definitions / Results / Methods /
+  Reproducibility, his five tables unchanged, the sentences that back each
+  claim filled in. Builds clean, 12 pp. He strikes what he will not defend;
+  then the repo is published whole. `technical-report.tex` untouched.
+  `technical-report.bib` gained fortuinKasteleyn1972, gray1971, L3; its
+  working notes moved to comments so they no longer print.
+- `paper/technical-report-gaps.md` §D: every result the report must state and
+  prove, in dependency order (23 items).
+- `paper/verify_technical_report.py`: the Burnside-sentence regex tolerates
+  line breaks anywhere (his re-wrapped abstract turned it red twice).
+- Full `make` (gates-deep): **GREEN, 55 gates**, third run of the night
+  (`~/tmp/make-full-2026-09-05c.log`); the first two aborted on the red
+  paper-verifier gate above. Slowest: severance-w1 566 s, tma 259 s.
+- `paper/verify_technical_report.py` 2730 -> 3504 checks: prose regexes match
+  whitespace-collapsed text; T(n,n−2) closed form on 36 cells plus a seven-way
+  census n = 5..8 (gaps C5); every scope number in the L draft's prose read
+  and compared with the record (a(41) sweep 610 cells, Motley 589 + 19, strip
+  469, 171, 820/628/189, holdout cells, H = 20 hours and cores from
+  `results/a41/h20_cost_profile.tsv`, growth ratios, the n = 32 limits, hole
+  reaches, every gadget weight).
+- **Simplify checkpoint** (`simplified` tag advanced to `a441f46`, pushed):
+  four-angle review of the eight 2026-09-05 experiment scripts + the C++
+  comment change; reuse (LATTICES, phi_at_series, hex_gas brute/rowpart,
+  polyiamond_diagonal nbr/interpolate/ev, motzkin), dead code, the QUIET
+  global replaced by a sink list, the excess identity through one
+  parametric helper. Every script re-run green; deferred items are TODOs in
+  the code and in the commit message.
+  Post-checkpoint, uncommitted: `joint_box_probe.set_budget(bud)` owns the
+  BUD/M derivation and the cache clear that `dmirror_burnside_check` used to
+  poke by hand (one of the deferred items); both scripts re-run.
+- ayr unreachable from gympie (name does not resolve; `ayr.jhpb.org` times
+  out), as on 2026-09-04.
+- jasonp's standing for the future, verbatim in substance: scope fixed up
+  front; the paper his file from day one; math he cannot follow is a stop.
+
+## 2026-09-05 21:19 EDT — a(41) H = 20 SWEEP LANDED: T(41,20) = tower prediction
+
+Finished rc = 0 after 9.63 h wall on 76 cores (cpu 1,766,882 s, rss 815 MB).
+`T(41,20) = 18004779862205054677763902712770`, equal to the tower's level-21
+depth-2 prediction. Banked `results/a41/h20.out`; column H = 20 agrees with the
+banked triangle on all 40 cells n <= 40. `undertow_a41.py --jmax 5 --perheight
+results/a41`: heights 1-20 swept, 21-41 tower, 800 cells agree, a(41)
+unchanged. `gate-undertow-pairs` gained the holdout comparison and a sixth RED
+control. Records: `results/a41/PROVENANCE.md` (new section),
+`results/confidence.md` item 4, `paper/technical-report-gaps.md` B5. a(41) no
+longer depends on `P_21`. The launch entry below is kept as the record of what
+was predicted.
+
+## 2026-09-05 11:41 EDT — a(41) H = 20 SWEEP (launch record; landed, see above)
 
 `scripts/dalby_a41_h20.sh`, dalby, tmux window `a41h20` in session 0,
 orchestrate pid 3496823 (also `runs/a41_h20/pid`), rev `b88b38bc5` clean,

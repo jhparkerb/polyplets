@@ -17,6 +17,14 @@ BUD = 2
 M = 3 + 2 * BUD
 
 
+def set_budget(bud):
+    """Change the surplus budget and the window width that follows from it,
+    and drop the cached transitions, which depend on both."""
+    global BUD, M
+    BUD, M = bud, 3 + 2 * bud
+    shape_transitions.cache_clear()
+
+
 def rowpart(cells):
     lab = list(range(len(cells)))
     for i in range(len(cells) - 1):

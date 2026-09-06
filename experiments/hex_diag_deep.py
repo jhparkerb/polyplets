@@ -119,27 +119,34 @@ def transitions(cells, part, budget, halo):
 
 
 
-def hex_T(H, budget, halo):
-    """{n: T_hex(n, H)} for n = H .. H + budget.
-
-    TODO(simplify 2026-09-05): every call restarts the row DP from row 1; one
-    sweep to hmax harvesting after each row would serve every H at once.
-    """
+def hex_T_all(hmax, budget, halo):
+    """{H: {n: T_hex(n, H)}} for H = 1 .. hmax and n = H .. H + budget, from ONE
+    row sweep: after each row the connected states are harvested for that
+    height and the sweep continues, so hmax heights cost hmax row steps
+    rather than hmax(hmax+1)/2."""
     dp = defaultdict(int)
     for s in range(1, budget + 2):
         for T in _first_rows(s, halo):
             dp[(T, rowpart(T), s - 1)] += 1
-    for _ in range(H - 1):
-        ndp = defaultdict(int)
+    out = {}
+    for H in range(1, hmax + 1):
+        if H > 1:
+            ndp = defaultdict(int)
+            for (cells, part, sur), v in dp.items():
+                for nc, np_, ds in transitions(cells, part, budget - sur, halo):
+                    ndp[(nc, np_, sur + ds)] += v
+            dp = ndp
+        row = defaultdict(int)
         for (cells, part, sur), v in dp.items():
-            for nc, np_, ds in transitions(cells, part, budget - sur, halo):
-                ndp[(nc, np_, sur + ds)] += v
-        dp = ndp
-    out = defaultdict(int)
-    for (cells, part, sur), v in dp.items():
-        if len(set(part)) == 1:
-            out[H + sur] += v
-    return dict(out)
+            if len(set(part)) == 1:
+                row[H + sur] += v
+        out[H] = dict(row)
+    return out
+
+
+def hex_T(H, budget, halo):
+    """{n: T_hex(n, H)} for n = H .. H + budget (one height; see hex_T_all)."""
+    return hex_T_all(H, budget, halo)[H]
 
 
 def _first_rows(s, halo):
@@ -233,16 +240,17 @@ def generate(kmax, hmax, halo):
     tot, TB = brute(9)
     assert [tot[n] for n in sorted(tot)] == A001207, 'brute != A001207'
     rows = []
+    t1 = time.time()
+    table = hex_T_all(hmax, kmax, halo)
+    print(f"  one sweep to H={hmax}: {time.time() - t1:.2f}s", flush=True)
     for H in range(1, hmax + 1):
-        t1 = time.time()
-        vals = hex_T(H, kmax, halo)
+        vals = table[H]
         for k in range(kmax + 1):
             n = H + k
             if (n, H) in TB or n <= 9:
                 assert vals.get(n, 0) == TB.get((n, H), 0), ('brute', n, H)
             rows.append((n, H, vals.get(n, 0)))
-        print(f"  H={H:2d}  {time.time() - t1:7.2f}s  "
-              f"{ {k: vals.get(H + k, 0) for k in range(kmax + 1)} }", flush=True)
+        print(f"  H={H:2d}  { {k: vals.get(H + k, 0) for k in range(kmax + 1)} }", flush=True)
     with open(DATA, 'w') as fh:
         fh.write("# T_hex(n, H): fixed polyhexes of n cells, bounding-box height H.\n")
         fh.write("# Row-transfer DP, experiments/hex_diag_deep.py --generate.\n")

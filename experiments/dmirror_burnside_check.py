@@ -97,9 +97,7 @@ def main():
                     help="surplus cap k <= bud for the row transfer")
     args = ap.parse_args()
 
-    JB.BUD = args.bud
-    JB.M = 3 + 2 * JB.BUD
-    JB.shape_transitions.cache_clear()
+    JB.set_budget(args.bud)
 
     d = OP.load()
     if not d:
