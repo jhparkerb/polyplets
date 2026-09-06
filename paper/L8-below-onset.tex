@@ -23,17 +23,17 @@
 %  Source material, all in this repository:
 %    docs/proofs/diagonal-law.md              the law, its onset, its proof
 %    docs/proofs/grand-form.md                two constants per level, Lean
-%    results/diagonal-law-below-onset.md      how the law fails below onset
-%    results/onset-defect-law.md              rate 9, exponent j-3/2, amplitude
-%    results/onset-defect-depth1-closed.md    the quartic, and every j=1 constant
-%    results/onset-defect-depths234.md        depths 2,3,4 closed the same way
-%    results/ridgeline-depth-amplitudes.md    alpha = 50/81, and the limits ledger
-%    results/onset-defect-crossover.md        the near-onset layer, downgraded
-%    results/allpairs-kernel.md               the gap walk
+%    results/below-onset.md      how the law fails below onset
+%    results/below-onset.md              rate 9, exponent j-3/2, amplitude
+%    results/below-onset.md    the quartic, and every j=1 constant
+%    results/below-onset.md        depths 2,3,4 closed the same way
+%    results/below-onset.md    alpha = 50/81, and the limits ledger
+%    results/below-onset.md        the near-onset layer, downgraded
+%    results/below-onset.md               the gap walk
 %    docs/undertow-chapter.md                 the tower, as a chapter
 %    results/undertow.md                      the tower's campaign record
-%    results/undertow-square-validation.md    the external check, J = 1
-%    results/undertow-square-depth2.md        depth 2 on the square lattice
+%    results/undertow.md    the external check, J = 1
+%    results/undertow.md        depth 2 on the square lattice
 %    results/a41/PROVENANCE.md                a(41), how it was computed
 %    results/cutcount_b1/rows41/              the second source at Nmax 41
 %    results/undertow-review-{A,B,C}.md       the adversarial review
@@ -573,7 +573,7 @@ $\Dj$ breaks the solution; the same equation offered twice is refused as
 singular; a corrupted lower level breaks the solution.
 
 \paragraph{From the adversarial review.} The review of this construction
-(\repo{results/undertow-review-A.md} and its siblings) traced every input to
+(\repo{results/undertow.md} and its siblings) traced every input to
 its source, and its most useful finding is this:
 
 \begin{quote}
@@ -707,9 +707,11 @@ $20$ enumerated, $a(41)$ no longer uses $P_{21}$ at all
 redundancy}: the Remark in \S\ref{sec:frame}.
 
 \item \textbf{Depth $5$.} Its cost was estimated at about $16$ hours and
-$103$\,GB before it was run and measured at $3.1$ hours and $8.5$\,GB
-(\repo{results/depth5-cost-settled.md}); its table has existed since
-2026-08-23 and is what determines $P_{21}$ three ways above.
+$103$\,GB before anything was measured, re-priced at $3.1$ hours and
+$8.5$\,GB from a small calibration, and the run itself took $4$ hours
+$54$ minutes and $18.7$\,GB on dalby (2026-08-23; the record is
+\repo{results/undertow.md}); its table is what determines $P_{21}$ three
+ways above.
 \end{itemize}
 
 % ===========================================================================
@@ -846,10 +848,10 @@ the master identity and $\alpha$ & \repo{experiments/ridgeline\_master.py}, \rep
 the near-onset layer & \repo{experiments/boundary\_layer.py} \\
 \bottomrule
 \end{tabular}
-\caption{Where each claim is checked. The records are \repo{results/onset-defect-law.md},
-\repo{results/onset-defect-depth1-closed.md},
-\repo{results/onset-defect-depths234.md} and
-\repo{results/ridgeline-depth-amplitudes.md}.}
+\caption{Where each claim is checked. The records are \repo{results/below-onset.md},
+\repo{results/below-onset.md},
+\repo{results/below-onset.md} and
+\repo{results/below-onset.md}.}
 \label{tab:repro}
 \end{table}
 
@@ -870,11 +872,11 @@ The construction's own inputs and outputs:
 \item The second program covering heights $1$--$19$ of row $41$ under a
 different counting rule: \repo{results/cutcount\_b1/rows41/}.
 \item The external validation at depth $1$:
-\repo{results/undertow-square-validation.md}.
+\repo{results/undertow.md}.
 \item The external validation at depth $2$:
-\repo{results/undertow-square-depth2.md}.
+\repo{results/undertow.md}.
 \item The adversarial review that produced \S\ref{sec:tower}'s quoted
-finding: \repo{results/undertow-review-A.md} and its siblings.
+finding: \repo{results/undertow.md} and its siblings.
 \item What may be trusted and how far, in plain terms:
 \repo{results/confidence.md}.
 \end{itemize}

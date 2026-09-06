@@ -63,6 +63,24 @@ re-recovery. **Consolidation of the 459 markdown files**: theme map (21 themes �
 kept as appendices or deleted-with-history; closed campaigns first or
 mathematics first).
 
+## 2026-09-06, 03:00 EDT — consolidation waves 2a, 2b, 3, 4a; the receipts gate retired
+
+- Wave 2b, the mathematics: thirteen survivors written fresh from 175 records
+  by merge lanes and installed by the lead (`docs/consolidation-plan.md`, map
+  and lane brief). `results/`: perimeter, growth-constant, symmetry-classes,
+  below-onset, undertow, diagonal-formula, arithmetic-structure, closed-doors,
+  subclasses, second-sources. `docs/`: engine-record, publication,
+  lessons-learned. Every folded file is named in its survivor's `## Sources`
+  and readable with `git show <commit>:<path>`.
+- Findings the lanes made while folding, each verified by the lead against the
+  source before being acted on: L8 §Limits had quoted the depth-5 projection
+  as the measurement (fixed: 4 h 54 m, 18.7 GB); the old engine chapter's PGO
+  profile numbers were g2's, not the transfer matrix's; work stealing was not
+  inert but throttled, and fired after the 2026-07-08 fix (memory corrected).
+- Wave 3: `paper/polyplets-report.tex` and `paper/verify_claims.py` retired.
+  Wave 4a: 146 code files nothing cites, deleted. The receipts gate retired.
+- Markdown files: 459 at the start of 2026-09-05, 104 now.
+
 ## 2026-09-06 — repo PUBLIC; report approved; L papers under his standards; consolidation wave 1
 
 - `github.com/jhparkerb/polyplets` made public 05:42 UTC at jasonp's word

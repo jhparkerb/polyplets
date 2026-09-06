@@ -93,7 +93,17 @@ Untouched by design: the per-term records (`results/ns_a*/`, `results/a41/`,
 `docs/proofs/`, the four audits, the reference docs of `docs/README.md` group 1,
 `HANDOFF.md`, `paper/`, `oeis/`, `polyplets/`, `papers/`, `tests/`.
 
-Not started.
+Done 2026-09-06, 03:00 EDT, by thirteen merge lanes and the lead: seven
+survivors installed first (perimeter, growth-constant, symmetry-classes,
+below-onset, undertow, diagonal-formula, arithmetic-structure; 72 sources),
+then six (closed-doors, subclasses, second-sources, engine-record,
+publication, lessons-learned; 103 sources). Each survivor ends with a
+`## Sources` list naming its folded files. Every lane filed the
+contradictions it found between sources, each kept with the later record
+named; the commit messages carry them. Manuscript citations were repointed;
+comments in tests that named the Middle Kingdom plan tables now name
+`results/subclasses.md`. Five lanes stopped at the account's usage limit
+after their files were complete; the lead linted and installed those files.
 
 ## Lane brief for wave 2b (2026-09-06, the lead's text; agents execute it)
 

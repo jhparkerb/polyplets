@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate MULTIDIRECTED: docs/middle-kingdom-plan.md Phase 1c acceptance.
+"""Gate MULTIDIRECTED: results/subclasses.md (formerly docs/middle-kingdom-plan.md) Phase 1c acceptance.
 
 Two independent routes to the number m(n) of MULTI-DIRECTED king animals of
 area n, in Bacher's sense (arXiv:1301.1365, Definition 2):

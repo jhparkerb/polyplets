@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate KING-GRID: docs/middle-kingdom-plan.md Phase 0 acceptance.
+"""Gate KING-GRID: results/subclasses.md (formerly docs/middle-kingdom-plan.md) Phase 0 acceptance.
 
 build/directed_cone_anchor's "grid" mode does one Redelmeier pass over ALL
 fixed king animals and tallies all 20 (directedness x convexity) cells at
@@ -29,7 +29,7 @@ both the equalities that must hold AND the four that must NOT
 ((dir4,HV-convex) and the three column-convex cells), which is what stops a
 degenerate predicate -- one that accepted everything -- from passing.
 
-Reference values are transcribed from docs/middle-kingdom-plan.md's table,
+Reference values are transcribed from results/subclasses.md (formerly docs/middle-kingdom-plan.md)'s table,
 which is the plan's stated source of truth -- a mismatch here means the
 ENGINE is wrong, not the reference (the plan is explicit: "does not adjust
 the reference").
@@ -49,7 +49,7 @@ BIN = os.path.join(ROOT, "build", "directed_cone_anchor")
 DIR_NAMES = ["none", "dir5", "dir4", "ctrlB", "mdir"]
 CONV_NAMES = ["none", "colconvex", "hvconvex", "staircase"]
 
-# docs/middle-kingdom-plan.md reference table -- row-1 (dir=none) and
+# results/subclasses.md (formerly docs/middle-kingdom-plan.md) reference table -- row-1 (dir=none) and
 # column-1 (conv=none) entries only; "?" cells are untested here (Phase 3's
 # job). ctrlB/none uses the "cone-anchor control B" row; Phase 1c settled that
 # this is a distinct class, incomparable with Bacher's multi-directed one

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The (dir4, HV-convex) / HV-convex amplitude ratio, from the block structure.
 
-docs/middle-kingdom-followups-plan.md Table B measured
+results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md) Table B measured
     r = C_dir4 / C_HV = 0.46210904920994244003566238770030583284116343972998...
 and found no integer relation.  results/hv-growth-sandwich.md's block picture
 says what r *is* -- "a ratio of residues of the same staircase resolvent
@@ -78,7 +78,7 @@ MU_BANKED = (
     "8257615823063288164783234634835221018937039608167576493048146233778414064847543"
     "298805623983850111109827008627878918922549")
 
-# docs/middle-kingdom-followups-plan.md Table B, MEASURED and never edited: the
+# results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md) Table B, MEASURED and never edited: the
 # amplitude ratio of the UNSPLIT (dir4, HV-convex) series against HV-convex, to
 # its 54 trusted digits.  D_desc contributes nothing at order mu^n, so the
 # split ratio must reproduce this to Table B's own precision.

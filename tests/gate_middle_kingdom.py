@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate MIDDLE-KINGDOM: docs/middle-kingdom-plan.md Phase 3 acceptance.
+"""Gate MIDDLE-KINGDOM: results/subclasses.md (formerly docs/middle-kingdom-plan.md) Phase 3 acceptance.
 
 build/middle_kingdom_tm is a COLUMN transfer matrix for the column-convex
 cells of the Phase 3 grid. Phase 3's finding is that on a column-convex king
@@ -255,7 +255,7 @@ def main():
     # explicit feed vectors". Two things carry that section and neither is
     # checked anywhere else: Proposition 9's mirror involution (which is the
     # whole content of the factor 1/2) and the feed-vector evaluation of the
-    # ratio, which has to reproduce docs/middle-kingdom-followups-plan.md
+    # ratio, which has to reproduce results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md)
     # Table B's 54 MEASURED digits. Both run in under a second.
     sys.path.insert(0, os.path.join(ROOT, "experiments"))
     import descent_block_oracle as dbo

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate DIR4-PERIM-ALG: docs/middle-kingdom-followups-plan.md Phase 2b.
+"""Gate DIR4-PERIM-ALG: results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md) Phase 2b.
 
 The claim guarded here is a POSITIVE one -- (dir4, HV-convex) king animals by
 semiperimeter have an algebraic generating function -- so the gate's job is
