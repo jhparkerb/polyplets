@@ -26,7 +26,7 @@ ALL the holes at once, that closes the multi-hole case: the union's
 4-neighbourhood is still foreground, so n >= eps(total area), and the overlap
 question the earlier note stopped on never arises.
 
-Checks (the papers are held locally now, papers/INDEX.txt; the formulas are
+Checks (the papers are held locally now, literature/INDEX.txt; the formulas are
 still checked here rather than taken on trust):
 
   1. eps brute-forced over all fixed polyominoes n <= NMAX_BRUTE, against

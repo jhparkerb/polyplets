@@ -159,7 +159,7 @@ list of engine sentences not to write.
 Zero `\cite`, no `thebibliography`. Under the P disclosure the machine does the
 novelty search and the citations, so this is assembled work, not his:
 Redelmeier, Klarner-Rivest, Jensen, Barequet-Ben-Shachar, Bacher, Madras, and
-the OEIS entries. Anything un-findable goes to `papers/MISSING.md`.
+the OEIS entries. Anything un-findable goes to `literature/MISSING.md`.
 
 ## B4. `OPEN` External anchors, as a subsection of the validation chapter
 

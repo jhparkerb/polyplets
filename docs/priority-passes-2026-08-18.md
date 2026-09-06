@@ -11,7 +11,7 @@ literature, following named authors and citation chains rather than keyword
 alone; full text pulled where free. This is a search, not a proof of absence,
 and the sections below say which searches were run so the next pass starts
 after this one rather than before it. Anything unobtainable goes to
-`papers/MISSING.md`.
+`literature/MISSING.md`.
 
 **Headline: three real collisions, two of them on load-bearing statements.**
 
@@ -171,14 +171,14 @@ at what postdates those sweeps.
 
 Two of the three collisions were found by pulling **full text of a source we
 already knew about** rather than by a new search. The slides had been sitting in
-`papers/MISSING.md` as unobtainable; they were free. Before the next round of
+`literature/MISSING.md` as unobtainable; they were free. Before the next round of
 keyword searching, re-try every entry in that file.
 
 ## ABZ full text — obtained the same day, and it answers the question the slides left open
 
 The paywalled Asinowski–Barequet–Zheng paper the L6 pass wanted is free: the
 ANALCO 2018 polycube companion, "Polycubes with small perimeter defect,"
-Proc. ANALCO 2018, 93–100. Filed in `papers/`. It carries the proofs the slides
+Proc. ANALCO 2018, 93–100. Filed in `literature/`. It carries the proofs the slides
 only stated.
 
 **What the proof actually is.** For a polycube `P` in `Z^d` under face

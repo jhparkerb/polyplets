@@ -497,7 +497,7 @@ discuss-first wave.
 
 Source: Axel Bacher, *Directed and multi-directed animals in the king's
 lattice*, arXiv:1301.1365 (v3, 2015),
-`papers/bacher_2015_directed_multidirected_king_lattice.pdf`. Exact results,
+`literature/bacher_2015_directed_multidirected_king_lattice.pdf`. Exact results,
 verified against the paper and OEIS:
 
 - count `d(n) = 1, 4, 19, 96, 501, 2668, 14407, 78592, …` = A047781;
@@ -1454,7 +1454,7 @@ so it takes at most `n + 1` values, and
 
 *Attribution.* Gouyou-Beauchamps and Leroux, *Enumeration of symmetry classes
 of convex polyominoes on the honeycomb lattice*, FPSAC 2004
-(arXiv:math/0403168, `papers/gouyou-beauchamps_leroux_2004_convex_polyominoes_honeycomb.pdf`),
+(arXiv:math/0403168, `literature/gouyou-beauchamps_leroux_2004_convex_polyominoes_honeycomb.pdf`),
 §2.3, decompose a convex polyomino into blocks by the growth phases of its two
 profiles, with the extreme blocks identified as stack polyominoes and the
 middle blocks as staircase polyominoes with `H02 = Pa = H20`. That is Lemma 1,
@@ -1511,7 +1511,7 @@ mathlib's `Subadditive.tendsto_lim` applied to `−log M`, as
 exact arithmetic on a recorded term. An earlier version of the lemma paid a
 factor `i + j` for the index of `X`'s last column and cited Barequet,
 Ben-Shachar and Osegueda, Comput. Geom. 98 (2021) 101790, §2.2
-(`papers/barequet_benshachar_osegueda_2021_concatenation_arguments.pdf`); the
+(`literature/barequet_benshachar_osegueda_2021_concatenation_arguments.pdf`); the
 index is not free information, so neither is needed here.
 Measured (`experiments/staircase_supermul.py`, 0.6 s): brute force over
 `(h, d)` reproduces `M(1..12)`; over all `i + j ≤ 12` every one of 1182960
@@ -2216,7 +2216,7 @@ against `g2 --holes` at small `n` by `tests/gate_holes.py` and `tests/gate_g2.py
 **Theorem (Madras 1999, corollary).** `λ₀ < λ` strictly, and the hole-free
 fraction `A₀(n)/a(n)` decays exponentially. Madras's pattern theorem
 (*A pattern theorem for lattice clusters*, Ann. Comb. 3 (1999) 357–384,
-`papers/madras_1999_pattern_theorem_lattice_clusters.pdf`, Theorem 2.1): for a
+`literature/madras_1999_pattern_theorem_lattice_clusters.pdf`, Theorem 2.1): for a
 proper pattern `P = (P₁, P₂)` of sites required present and absent, clusters
 containing at most `εn` translates are exponentially rare. Take `P₁` = the
 eight neighbors of a cell, `P₂` = the cell: hole-free animals contain zero
@@ -2225,7 +2225,7 @@ is the king lattice at `M = 1`, so it applies directly; his Theorem 2.2 and
 Corollary 3.6 also make the ratio limit `a(n+1)/a(n) → λ` a theorem for king
 animals. The same argument proves the polyomino statement (`P₁` = four
 neighbors), which is therefore not merely believed. Whittington and Soteros's
-1990 survey (`papers/soteros_whittington_1990_rigorous_results_wild_guesses.pdf`,
+1990 survey (`literature/soteros_whittington_1990_rigorous_results_wild_guesses.pdf`,
 §4) does exactly this and records that such gaps can be made quantitative
 (`λ − λ₀ ≥ 0.00003758·λ₀`, Madras et al. 1988). Madras never mentions holes;
 the corollary is ours, the theorem his.
@@ -2253,7 +2253,7 @@ poses the shape of this measurement as an open problem (pure exponential decay
 of a pattern-avoiding fraction with no power-law factor, ratio equal to the
 ratio of growth constants), so the measurement is a data point on a stated
 problem. Guttmann, Jensen, Wong and Enting (J. Phys. A 33 (2000) 1735–1764,
-`papers/guttmann_jensen_wong_enting_2000_punctured_polygons_polyominoes.pdf`)
+`literature/guttmann_jensen_wong_enting_2000_punctured_polygons_polyominoes.pdf`)
 give `κ = 3.9709` for hole-free square polyominoes against `τ = 4.062591(9)`,
 with finitely-punctured classes sharing `κ` and the exponent rising by one per
 puncture, `a_n^(k) ~ κⁿ n^{k−1}`; their `κ/τ = 0.97743` against our
@@ -2348,11 +2348,11 @@ edge-perimeter, the 8 of `√(8n−4)`.
 
 *Proof of the multi-hole bound (the union argument).* The inequality holds for
 an arbitrary finite subset of `Z²` with no connectivity hypothesis: Wang and
-Wang 1977 (`papers/wang_wang_1977_discrete_isoperimetric_problems.pdf`, an
+Wang 1977 (`literature/wang_wang_1977_discrete_isoperimetric_problems.pdf`, an
 ordering of `Zⁿ` whose every prefix minimizes the boundary, the points not in
 the set at Euclidean distance 1, which in `Z²` is `N(A)`), with the `Z²` count
 explicit in Altshuler, Yanovsky, Vainsencher, Wagner and Bruckstein (DGCI 2006,
-`papers/altshuler_etal_2006_minimal_perimeter_polyominoes.pdf`, Theorem 1,
+`literature/altshuler_etal_2006_minimal_perimeter_polyominoes.pdf`, Theorem 1,
 reproved in their §3.1; their minimizers are connected, so `n(k) = ε(k)` and
 allowing disconnection buys nothing). Let `A = ⋃ᵢ Hᵢ` be the union of the
 bounded 4-components of `Z² ∖ F`. Take `c ∈ N(A)`: `c ∉ A`, and `c` is
@@ -2457,7 +2457,7 @@ Kahle and Roldán, Baralić and Uppal, Guttmann et al., rather than measuring
 their area), the enumeration to `n = 17`, and the reproofs. A paper states
 both halves with the citations. Citations in order: Wang and Wang, SIAM J.
 Appl. Math. 32(4) (1977) 860–870; Sieben, European J. Combin. 29(1) (2008)
-108–117 (`papers/sieben_2008_minimum_site_perimeter.pdf`); Altshuler et al.,
+108–117 (`literature/sieben_2008_minimum_site_perimeter.pdf`); Altshuler et al.,
 DGCI 2006, LNCS 4245, 17–28 (five authors).
 
 ### Maximum hole count
@@ -2559,7 +2559,7 @@ census, not a proof (the proof route, every animal reaches a canonical bar, is
 not written); irreducibility says nothing about mixing time, so no sampler
 payoff follows. The square-lattice case is very likely a lemma of Janse van
 Rensburg and Madras, J. Phys. A 30 (1997) 8035–8066, wanted in
-`papers/MISSING.md`; novelty is not claimed.
+`literature/MISSING.md`; novelty is not claimed.
 
 ## Machinery retargetable beyond polyplets
 

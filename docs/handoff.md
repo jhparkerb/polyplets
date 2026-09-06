@@ -84,7 +84,7 @@ mathematics first).
 ## 2026-09-06 — repo PUBLIC; report approved; L papers under his standards; consolidation wave 1
 
 - `github.com/jhparkerb/polyplets` made public 05:42 UTC at jasonp's word
-  ("draft good. publish."). No credentials in tracked files; `papers/`,
+  ("draft good. publish."). No credentials in tracked files; `literature/`,
   `docs/viva-*.md`, `docs/drill*.md`, `runs/`, `build/` ignored. **No contact
   with the OEIS, at his explicit instruction.**
 - `paper/technical-report-draft.tex` approved by him after two review rounds;
@@ -853,7 +853,7 @@ controls reproduce the census timings to under 0.1%, so the fits are trusted.
 
 The paywalled Asinowski--Barequet--Zheng paper the L6 pass wanted is obtained:
 the ANALCO 2018 polycube companion, "Polycubes with small perimeter defect,"
-93--100, free from Simon Plouffe's OEIS citation mirror. Filed in `papers/`,
+93--100, free from Simon Plouffe's OEIS citation mirror. Filed in `literature/`,
 read; full verdict in `docs/priority-passes-2026-08-18.md` §ABZ full text.
 
 - **The king column is a separate derivation, not a corollary of their
@@ -874,7 +874,7 @@ preprint, no conference version; the author's page now offers only a
 reprint-request mailto -- this is the remaining high-priority want),
 **Andrews Memoirs 301**, **Rands & Welsh 1981**. Ben-Shachar's minimal-perimeter
 paper is pinned as Algorithmica 85(1) (2023) 75--99, no arXiv. The Plouffe
-mirror is recorded as exhausted for us in `papers/MISSING.md`.
+mirror is recorded as exhausted for us in `literature/MISSING.md`.
 
 ## 2026-08-18 (later) — PRIORITY PASSES AND PROOF AUDIT OVER ALL NINE L PAPERS
 
@@ -900,7 +900,7 @@ mirror is recorded as exhausted for us in `papers/MISSING.md`.
   machinery with why neither applies (L4's non-D-finiteness kills the
   hypothesis). **L8**'s pass found nothing and the paper says why that is weak.
 
-**Lesson recorded in `papers/MISSING.md`: two of the three collisions came from
+**Lesson recorded in `literature/MISSING.md`: two of the three collisions came from
 pulling full text of sources already listed there, not from new searches.
 Re-try that file before searching.**
 
@@ -1415,7 +1415,7 @@ correction below lives in the brief, the bar file, or the lane files.
   **T(40,20) ≡ 1 and T(40,21) ≡ 1 (mod 2)** — spin/involution route, twin
   runs byte-identical across ayr/dalby, oracle-checked vs the B1 recount
   (caveat pre-registered: not independent of B1).
-- **Decade bibliography built**: `papers/polyplets-2024-2026.bib`,
+- **Decade bibliography built**: `literature/polyplets-2024-2026.bib`,
   2016–2026 year-by-year arXiv sweep, search provenance in comments;
   15 PDFs fetched and indexed, 5 unobtainable filed in MISSING.md.
   Across all eleven years: zero papers use "polyplet"/"polyking"; the
@@ -1953,7 +1953,7 @@ spine digit-product on all in-band cells).
   subset* of ℤ² — **Wang & Wang 1977**, the primary, with the ℤ² count explicit
   in Altshuler et al. 2006 — applied to the union of all the holes closes the
   multi-hole case in three lines
-  (`results/subclasses.md` §The union argument; both PDFs now in `papers/`).
+  (`results/subclasses.md` §The union argument; both PDFs now in `literature/`).
   It ships as a cited corollary plus our n ≤ 17 enumeration; the repo's own
   chain is an independent reproof, kept as a check.
   *Superseded account of the same item, from 2026-07:*
@@ -1997,7 +1997,7 @@ spine digit-product on all in-band cells).
   degree + bounded house + infinitude of distinct mu_H = contradiction):
   **THEOREM: the height-anisotropic polyplet GF is NOT D-finite,
   unconditional** — proof template lattice-universal (polyominoes by height
-  etc.); literature check flagged in papers/MISSING.md before claiming
+  etc.); literature check flagged in literature/MISSING.md before claiming
   novelty externally. Candidate paper paragraph — jasonp's call. Also: pole-argument theorem
   excludes y-ODEs for the height-anisotropic GF in quantified (order,
   x-degree) boxes (up to r<=5 & D<=28 ... r=0 & D<=3288), from mod-p-certified
@@ -2063,7 +2063,7 @@ spine digit-product on all in-band cells).
   a(22) (~07-16; then gather+bank, frontier->22), H=11 GF re-recovery, a(37)
   decision. Blocked on jasonp: viva -> OEIS batch + 3 comment drafts,
   [JP] lessons sections, ~~Northcott literature check~~ **CLOSED
-  2026-08-01** (papers/MISSING.md + results/anisotropic-not-dfinite.md:
+  2026-08-01** (literature/MISSING.md + results/anisotropic-not-dfinite.md:
   criterion traced to BM-R 2002 Lemma 9, not Haruspicy 1; shared opening
   step now cited in the paper; remaining leads swept, no collision;
   D_A-finiteness ceiling recorded; **forward citation crawl DONE 2026-08-01**
@@ -2091,7 +2091,7 @@ newest first:
   fixed-degree bivariate polynomial can be the closed form. Corrected target,
   not a lead. Next cell if ever revived: W(4,6), wants the C++ path.
 - **`a5e778e` citation graph crawled** (the standing next action in
-  `papers/MISSING.md`, now spent). OpenAlex + Semantic Scholar over BM-R 2002,
+  `literature/MISSING.md`, now spent). OpenAlex + Semantic Scholar over BM-R 2002,
   Haruspicy 2/3, Chan-Rechnitzer, BBEP, Bell-Hu-Satriano, BGKL. **No
   collision**; every BM-R descendant proving non-D-finiteness runs on pole
   accumulation. Find: **Bell-Nguyen-Zannier, "D-finiteness, rationality, and

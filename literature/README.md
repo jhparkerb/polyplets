@@ -1,4 +1,4 @@
-# `papers/` — the literature library
+# `literature/` — the literature library
 
 The papers this project **reads**. Nothing here is ours.
 

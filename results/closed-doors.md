@@ -1209,7 +1209,7 @@ every item and the cost estimates there were growth-rate arithmetic.
   `−θ/n²` (`n² ·` margin climbs from 0.89 to 0.97 over `n = 5..39`), so a
   refuting term would contradict the whole smooth-asymptotics picture and has
   no finite-certificate route short of a term past a(40). Liu–Wang 2007
-  (`papers/liu_wang_2007_log_convexity_combinatorial_sequences.pdf`) has two
+  (`literature/liu_wang_2007_log_convexity_combinatorial_sequences.pdf`) has two
   kinds of tool, closure operations on already-log-convex sequences and
   three-term recurrences, and `a(n)` has neither; the concatenation arguments
   give quasi-supermultiplicativity, a different inequality. Never attempted:
@@ -1266,7 +1266,7 @@ None was authorized or costed beyond the figures quoted.
   run here, and the a(40) record then showed `H = 15..19`, 43.84% of the row,
   with no independent program. Since then `a(n)` is rule-independent for
   `n ≤ 39` and a(40) is short one entry (`docs/lastditch-campaign.md`).
-- **Papers** (`papers/MISSING.md`): Conway 1995 on the finite-lattice method
+- **Papers** (`literature/MISSING.md`): Conway 1995 on the finite-lattice method
   for percolation series, Conway and Guttmann 1995, Enting 1980. The first
   decides whether the four-direction bounding-box decomposition is a
   rediscovery.

@@ -2,7 +2,7 @@
 
 Papers we reference but do **not** have a local copy of and could not access a free
 version of online. For university-library lookup. Add to this list any time a paper
-can't be found; remove (and drop the PDF in `papers/`) once obtained.
+can't be found; remove (and drop the PDF in `literature/`) once obtained.
 
 Format: `Author(s), "Title," Venue Vol (Year) pages. DOI/ID. — why we want it. [priority]`
 
@@ -56,7 +56,7 @@ directly rather than only to polymers, reaching site animals on the square
 lattice to **n = 46** — past this project's n = 41 — and producing precise
 estimates of the partition sum and the entropic exponent. Estimates with error
 bars, never exact counts, which is the whole question for whether the channel
-can falsify a term. **These should be fetched into `papers/`;** the paywalled
+can falsify a term. **These should be fetched into `literature/`;** the paywalled
 Janse van Rensburg–Madras 1997 entry above is not the state of that literature
 and this file should not be read as implying it is.
 
@@ -189,18 +189,18 @@ and Bezrukov cite cube isoperimetry only.
 **Obtained and read:**
 
 - N. Madras, "A pattern theorem for lattice clusters," Ann. Comb. **3** (1999)
-  357–384. → `papers/madras_1999_*.pdf`. **The find.** Covers the king lattice
+  357–384. → `literature/madras_1999_*.pdf`. **The find.** Covers the king lattice
   (his §3.1(f) at M=1, sup norm). λ₀ < λ for hole-free animals is a corollary
   of his Theorem 2.1, and `a(n+1)/a(n) → λ` is his Theorem 2.2. See
   `results/subclasses.md`, which retracted a claim on the
   strength of it.
 - M. E. Fisher, A. J. Guttmann & S. G. Whittington, J. Phys. A **24** (1991)
-  3095–3106. → `papers/fisher_guttmann_whittington_1991_*.pdf`. States the
+  3095–3106. → `literature/fisher_guttmann_whittington_1991_*.pdf`. States the
   bond-perimeter maximum (m²/16, or (m²−4)/16) as "clearly", exactly as
   Prellberg–Owczarek does. **Question closed with a negative: the 1/16 twin is
   folklore and has no primary.** Don't keep hunting for one.
 - A. Asinowski, G. Barequet, R. Barequet & G. Rote, J. Integer Seq. **15**
-  (2012) #12.8.4. → `papers/asinowski_etal_2012_*.pdf`. Open access.
+  (2012) #12.8.4. → `literature/asinowski_etal_2012_*.pdf`. Open access.
 
 **New wants raised by Madras's own reference list** (Madras 1995 searched in the
 pass at the top of this file — paywalled, metadata pinned; MSW 1988 unsearched):
@@ -313,7 +313,7 @@ Vanderzande 1998 (polymer textbook); Grimmett 1989; Hammersley–Morton 1954; Ca
 
 Wanted by `docs/publication.md` N5: the same "fix the defect, get polynomial ×
 exponential" statement shape as our universal diagonal law, with the defect measured in
-dimension instead of height. Paper 2 should cite both. **Both now in `papers/`; neither
+dimension instead of height. Paper 2 should cite both. **Both now in `literature/`; neither
 has been read past the abstract.**
 
 - R. Barequet, G. Barequet & G. Rote, "Formulae and growth rates of high-dimensional
@@ -325,10 +325,10 @@ has been read past the abstract.**
 
 - H. Tremblay & J. Vernay, "On the generation of discrete figures with connectivity
   constraints," RAIRO-Theor. Inf. Appl. 58 (2024) Art. 16. — held since 2026-06-11 as
-  `papers/tremblay_vernay.pdf`. Source of the record a(18) for A006770; code at
+  `literature/tremblay_vernay.pdf`. Source of the record a(18) for A006770; code at
   github.com/J-Vernay/discrete-figures.
 - G. Barequet, M. Moffie, A. Ribó, G. Rote, "Counting polyominoes on twisted cylinders."
-  Held since 2026-06-28 as `papers/barequet_rote_twisted_cylinders.pdf`; **the uncertain
+  Held since 2026-06-28 as `literature/barequet_rote_twisted_cylinders.pdf`; **the uncertain
   venue is settled from its own title page** — INTEGERS: Electronic Journal of
   Combinatorial Number Theory **6** (2006), #A22, four authors. `INDEX.txt` corrected.
 - G. Aleksandrowicz & G. Barequet, "Counting d-dimensional polycubes and nonrectangular
@@ -338,7 +338,7 @@ has been read past the abstract.**
   (venue uncertain — INTEGERS / Electronic J.? ~2006). — the cleanest "width W alone bounds
   TM cost" realization; want exact venue + free version.
 
-## Obtained 2026-08-01 from jasonp's lattice-animal searches — all in papers/
+## Obtained 2026-08-01 from jasonp's lattice-animal searches — all in literature/
 Six papers, all now held. First-pass dispositions below; **one is worth
 following up and it is not the one first flagged.**
 
@@ -403,7 +403,7 @@ enumerative results on two-dimensional directed animals" (1998).
   Jensen math/0506317, Guttmann-Jensen cond-mat/0603833, Clisby-Jensen 1111.5877,
   Barequet-Shalah 1906.11447, Shirakawa 2510.22446, Bui 2511.00461 & 2412.20143,
   Foster-Pinettes cond-mat/0210548, BM-Linusson-Nevo math/0701890, BM-Brak 0811.4415.
-- In papers/: Jensen 2001, Jensen 2003 (ICCS), Barequet–Ben-Shachar 2024
+- In literature/: Jensen 2001, Jensen 2003 (ICCS), Barequet–Ben-Shachar 2024
   (counting_polyominoes_revisited.pdf), Vöge–Guttmann 2003,
   **barequet_moffie_2007_jensen_complexity.pdf, mertens_1990_lattice_animals.pdf,
   read_1962_cell_growth.pdf, klarner_rivest_1973_upper_bound.pdf,
@@ -427,7 +427,7 @@ D-finiteness *test* the Haruspicy papers use is not in Haruspicy 1. Both
 Haruspicy 2 (Theorem 15) and Haruspicy 3 (Theorem 5) attribute it verbatim
 to **Bousquet-Melou & Rechnitzer, "Lattice animals and heaps of dimers,"
 Discrete Math. 258 (2002) 235-274, Lemma 9** — which is free from
-labri.fr/perso/bousquet and is now in `papers/` along with both Haruspicy
+labri.fr/perso/bousquet and is now in `literature/` along with both Haruspicy
 papers (arXiv math/0406450, math/0408054). Side-by-side comparison against
 our dominant-pole dichotomy: `results/anisotropic-not-dfinite.md`. Summary:
 the opening move (extract y-coefficients from the ODE to get a linear
@@ -443,7 +443,7 @@ the original list were checked and none collides:
 
 - **Bell, Gerhold, Klazar & Luca**, "Non-holonomicity of sequences defined
   via elementary functions," Ann. Comb. (2008), arXiv math/0605142 (saved to
-  `papers/`). Method is **analytic** -- counting zeros of elementary and
+  `literature/`). Method is **analytic** -- counting zeros of elementary and
   analytic functions -- and the class is sequences obtained by evaluating an
   elementary function at positive integers. T(n,H) is not of that form.
 - **Gerhold**, "On some non-holonomic sequences," Electron. J. Combin. 11
@@ -549,7 +549,7 @@ pass (Pitt Hillman or CMU Hunt, read-only — see the notes above). Google
 Scholar's "Cited by" is the free approximation and can be done from the desk.
 
 **Haruspicy 1 OBTAINED 2026-08-01** (jasonp, ScienceDirect) →
-`papers/rechnitzer_2003_haruspicy1_anisotropic_gf.pdf`. Confirms the reading
+`literature/rechnitzer_2003_haruspicy1_anisotropic_gf.pdf`. Confirms the reading
 above from the source: its content is the combinatorial section/density
 machinery (coefficient of y^n rational, numerator degree <= denominator
 degree, denominator a product of cyclotomic polynomials, plus a tight
@@ -683,7 +683,7 @@ proofs is free from Simon Plouffe's OEIS citation mirror,
 A. Asinowski, G. Barequet & Y. Zheng, "Polycubes with small perimeter defect,"
 Proc. ANALCO 2018, 93–100 (SIAM), the 3-dimensional companion to the ENDM 2017
 polyomino note the slides were drawn from. Filed as
-`papers/asinowski_barequet_zheng_2018_polycubes_small_perimeter_defect.pdf`.
+`literature/asinowski_barequet_zheng_2018_polycubes_small_perimeter_defect.pdf`.
 Read; verdict in `docs/priority-passes-2026-08-18.md` §ABZ full text.
 
 **Method note for whoever chases the remaining wants:** that mirror is a flat

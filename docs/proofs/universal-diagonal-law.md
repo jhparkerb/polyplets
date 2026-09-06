@@ -352,4 +352,4 @@ governed by the defect — for one lattice family and one defect parameter.
 Theorem A quantifies over every row-local lattice instead, and is proved once
 for all of them. Cite that line as the precedent for the shape; do not present
 the phenomenon as unheard-of. Neither paper is held locally
-(`papers/MISSING.md`).
+(`literature/MISSING.md`).

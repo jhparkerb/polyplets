@@ -213,12 +213,12 @@ would publish.
       `CITATION.cff`; the DOI is the one that survives the repo moving.
 - [ ] **Release assets, if any.** The eleven PDFs and possibly the b-files.
       Only worth doing if the answer to "does a visitor need a TeX Live" is no.
-- [x] **`papers/` stays local.** Verified at `813f4e0` in the clone itself:
-      `papers/ pdfs in the clone: 0 (must be 0), tracked text files: 5`. Five,
+- [x] **`literature/` stays local.** Verified at `813f4e0` in the clone itself:
+      `literature/ pdfs in the clone: 0 (must be 0), tracked text files: 5`. Five,
       not three — `README.md` and `polyplets-2024-2026.bib` join the three the
       docs named, and three places that said otherwise are corrected
       (`3554c66`). The check in `clean_clone_check.sh` used to ask whether
-      `papers/` existed at all and call the clone's honest "yes" the wrong
+      `literature/` existed at all and call the clone's honest "yes" the wrong
       answer; it counts PDFs now.
 - [ ] **The draft banners stay on.** Every L paper carries one; L6, L8 and L9
       carry a second naming what the priority pass found. They are the reason

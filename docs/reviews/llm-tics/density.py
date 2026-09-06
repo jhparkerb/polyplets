@@ -121,7 +121,7 @@ def main():
 
 
 # --- published-corpus mode: python3 density.py --corpus [dir] -----------------
-# Extracts text from every PDF in papers/ (pdftotext) and reports the same
+# Extracts text from every PDF in literature/ (pdftotext) and reports the same
 # marker rates, so the control band comes from published, journal-edited
 # English rather than two in-house files.  PDF extraction turns math into
 # token noise, which inflates word counts and so *deflates* rates slightly;

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gate NO-COPYRIGHT-PDFS: no copyrighted PDF is tracked in this repo.
 
-`papers/` is the literature library --- other people's work, read locally, and
+`literature/` is the literature library --- other people's work, read locally, and
 the top line of `.gitignore` says "copyrighted papers stay local, never pushed".
 That rule was enforced by nothing.  The closest thing to a check was a `say`
 line in `scripts/clean_clone_check.sh`, a one-shot runner `make` never touches,
@@ -58,12 +58,12 @@ def main():
     bad = offenders(paths)
     print("%d tracked files, %d of them PDFs" % (len(paths), len(bad)))
     if args.verbose:
-        print("  papers/ tracked text files: %s"
-              % " ".join(p for p in paths if p.startswith("papers/")))
+        print("  literature/ tracked text files: %s"
+              % " ".join(p for p in paths if p.startswith("literature/")))
 
     # RED control 1: a tracked PDF must be reported.
-    if offenders(paths + ["papers/someone_elses_2019_paper.pdf"]) != \
-            ["papers/someone_elses_2019_paper.pdf"]:
+    if offenders(paths + ["literature/someone_elses_2019_paper.pdf"]) != \
+            ["literature/someone_elses_2019_paper.pdf"]:
         print("GATE NO-COPYRIGHT-PDFS: RED CONTROL DID NOT FIRE -- a tracked "
               "PDF was not reported; the check is vacuous")
         return 1
@@ -86,7 +86,7 @@ def main():
               % len(bad))
         for p in bad:
             print("  %s" % p)
-        print("\nPDFs in papers/ are other people's copyrighted work and must "
+        print("\nPDFs in literature/ are other people's copyrighted work and must "
               "stay local; PDFs in paper/ are build outputs of `make -C paper`. "
               "Either way: `git rm --cached <path>`.")
         return 1

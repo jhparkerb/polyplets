@@ -61,12 +61,12 @@ step clone clone.log git clone -q --branch master "$BUNDLE" "$CLONE" || {
 }
 cd "$CLONE" || exit 1
 say "rev=$(git rev-parse --short HEAD)  tracked_files=$(git ls-files | wc -l)"
-# papers/ exists in a clone -- five text files there are tracked.  Whether a
+# literature/ exists in a clone -- five text files there are tracked.  Whether a
 # copyrighted PDF got in is NOT decided here: `step make` below runs the gate
 # suite, which includes gate-no-copyright-pdfs, and that one sets an exit code.
 # A second "(must be 0)" line that only prints is the fail-open shape the gate
 # was written to replace, so this reports the clone's shape and nothing more.
-say "papers/ in the clone: $(ls papers/ 2>/dev/null | wc -l) files (gate-no-copyright-pdfs rules on PDFs, under \`step make\`)"
+say "literature/ in the clone: $(ls literature/ 2>/dev/null | wc -l) files (gate-no-copyright-pdfs rules on PDFs, under \`step make\`)"
 
 # The four phases a stranger would run, in the order the README implies.
 # `make` and `make gates` are the same target -- the Makefile has no `all` and

@@ -2,7 +2,7 @@
 """Multi-directed king animals: exact terms from Bacher's Nordic-decomposition GF.
 
 Source: Axel Bacher, "Directed and multi-directed animals in the king's lattice",
-arXiv:1301.1365v3 (papers/bacher_2015_directed_multidirected_king_lattice.pdf).
+arXiv:1301.1365v3 (literature/bacher_2015_directed_multidirected_king_lattice.pdf).
 
 The scheme (Theorem 8, Lemma 9, Lemma 11):
 

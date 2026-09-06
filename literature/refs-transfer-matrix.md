@@ -1,6 +1,6 @@
 # Transfer-matrix / enumeration references
 
-Indexed 2026-06-25 during the a(24)+ scheduling + compression design. NOTE: papers/ already
+Indexed 2026-06-25 during the a(24)+ scheduling + compression design. NOTE: literature/ already
 holds a rich collection from prior sessions (redelmeier_1981, tremblay_vernay, jensen_*,
 klarner_*, mertens_*, etc.) — this file just points the scheduling-relevant ones at their
 local files and notes WHY they matter here.
@@ -11,7 +11,7 @@ local files and notes WHY they matter here.
   *fixed*-polyomino record: **n=70** (A001168), by running the transfer matrix on a
   **45°-rotated** bounding box — an equivalent but computationally-easier problem — extending
   Jensen's n=56. A(70) took ~15,000 CPU-h on 32-CPU / **only 32 GB RAM** (the method is
-  memory-lean). THE engine to study. papers/counting_polyominoes_revisited.pdf ·
+  memory-lean). THE engine to study. literature/counting_polyominoes_revisited.pdf ·
   https://barequet.cs.technion.ac.il/papers.html
 - **Jensen, I., doctoral thesis** (and "A parallel algorithm for the enumeration of
   self-avoiding polygons," cond-mat/0301468). Origin of the **Motzkin-path state encoding**:
@@ -25,12 +25,12 @@ local files and notes WHY they matter here.
   Free/one-sided (A000105 / A000988) via Burnside symmetry classes; uses Jensen's Motzkin
   encoding for the mirror-symmetric transfer matrix. CALIBRATION GIFT: hit the **memory limit
   ~n=60 on 512 GB RAM** even with the compact encoding → RAM is the universal frontier wall.
-  papers/shirakawa_n59.pdf
+  literature/shirakawa_n59.pdf
 - **Counting Polyominoes: A Parallel Implementation for Cluster Computing** (Springer,
   3-540-44863-2_21). Redelmeier on a cluster; cross-machine distribution patterns.
   [paywalled → library]
 - **Luther & Mertens, "Counting Lattice Animals in High Dimensions," arXiv:1106.1078.**
-  Redelmeier in d≥3. papers/1106.1078.pdf
+  Redelmeier in d≥3. literature/1106.1078.pdf
 
 ## Leads these opened (tracked in docs/scheduling-design.md)
 

@@ -1375,7 +1375,7 @@ ns-gate-resume:
 	@echo "AC-1 gate (long): ./build/ns/driver1 --maxn 18 --ram 67108864 --spill /tmp/ns_ac1 --compare"
 
 # ─── manuscripts ─────────────────────────────────────────────────────────────
-# paper/ holds the manuscripts; papers/ holds the literature this project reads.
+# paper/ holds the manuscripts; literature/ holds the literature this project reads.
 # The two are told apart in paper/README.md, which is also where the P/L
 # authorship split is spelled out.
 #

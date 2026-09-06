@@ -171,7 +171,7 @@ polyhexes, polyiamonds, and generally to any lattice-animal family with a
 column transfer matrix — a universal anisotropic non-D-finiteness
 criterion. We have not found this Northcott-plus-monotonicity argument in
 the literature (Rechnitzer's haruspicy proves the SAP analog by very
-different means); flagged in papers/MISSING.md for a literature check
+different means); flagged in literature/MISSING.md for a literature check
 before any external claim of novelty.
 
 **Status ledger for this document:** the quantified psi-boxes and the
@@ -182,7 +182,7 @@ the conditional statements are all retired.
 ## Prior art, read and compared (2026-08-01)
 
 The novelty flag above sent us to the literature. Papers now held in
-`papers/`: Haruspicy 2 (arXiv math/0406450), Haruspicy 3 (math/0408054),
+`literature/`: Haruspicy 2 (arXiv math/0406450), Haruspicy 3 (math/0408054),
 and — the one that actually matters — **Bousquet-Melou & Rechnitzer,
 "Lattice animals and heaps of dimers," Discrete Math. 258 (2002) 235-274**,
 free from labri.fr/perso/bousquet.
@@ -295,7 +295,7 @@ CMU Hunt), or asking Rechnitzer directly. Both jasonp's call.
 
 The remaining leads named in the original todo -- Bell, Gerhold, Mezzarobba,
 Guttmann's solvability tests, the Bousquet-Melou anisotropic surveys -- were
-swept; detail and verdict in `papers/MISSING.md`. No collision. Every method
+swept; detail and verdict in `literature/MISSING.md`. No collision. Every method
 located is topological (BM-R) or analytic (Klazar divergence; Bell-Gerhold-
 Klazar-Luca zero-counting); the one paper pairing heights with D-finiteness
 (Bell-Hu-Satriano, arXiv 2003.01255) is arithmetic dynamics along orbits of
@@ -321,7 +321,7 @@ Semantic Scholar (`experiments/citation_crawl.py`) over BM-R 2002 (83/74
 citing), Haruspicy 2 (13/17), Haruspicy 3 (4/4), Chan-Rechnitzer 2018 (20/2),
 BBEP 2020 (3/20), plus the arithmetic relatives Bell-Hu-Satriano (5) and
 Bell-Gerhold-Klazar-Luca (25). Table and per-seed notes in
-`papers/MISSING.md`. Every descendant of BM-R that proves non-D-finiteness
+`literature/MISSING.md`. Every descendant of BM-R that proves non-D-finiteness
 uses pole/singularity accumulation; no arithmetic endgame on a family of
 slice growth constants appears anywhere in those sets.
 
@@ -360,7 +360,7 @@ runs the opposite direction — exhibiting ODEs for solvable models, not
 supplying a non-D-finiteness criterion.
 
 Three independent databases, no collision, and the strongest of the three
-searches full text. Table and per-term notes in `papers/MISSING.md`. The
+searches full text. Table and per-term notes in `literature/MISSING.md`. The
 paper's "Relation to existing work" scoping is unchanged and stays correct:
 absence cannot be established by search, and we claim the argument with that
 qualification. MathSciNet is now recorded as closed rather than pending —

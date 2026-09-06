@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Forward citation crawl (OpenAlex) for the non-D-finiteness prior-art check.
 
-papers/MISSING.md's standing next action: everything we have was found by
+literature/MISSING.md's standing next action: everything we have was found by
 keyword or by following references BACKWARDS. This asks "who cites this?" for
 the seeds that a colliding paper would have to cite -- above all
 Bousquet-Melou & Rechnitzer 2002, whose Lemma 9 is the extraction step our

@@ -2,18 +2,18 @@
 
 This directory holds the papers this project is **writing**.
 
-`papers/` — one letter different, and the source of every filename confusion in
-this tree — holds the papers this project **reads**: the literature library, with
-`papers/INDEX.txt` recording provenance and `papers/MISSING.md` recording what
-could not be obtained and why. Nothing in `papers/` is ours. Nothing in `paper/`
-is anyone else's.
+`literature/` holds the papers this project **reads**: the library of other
+people's work, with `literature/INDEX.txt` recording provenance and
+`literature/MISSING.md` recording what could not be obtained and why. It was
+called `papers/` until 2026-09-06, one letter from this directory and the
+source of every filename confusion in the tree.
 
-The top-level `.gitignore` starts by ignoring `papers/` — "copyrighted papers stay
+The top-level `.gitignore` starts by ignoring `literature/` — "copyrighted papers stay
 local, never pushed" — so the PDFs themselves never leave this machine. Five
 text files there are tracked anyway: `INDEX.txt`, `MISSING.md`, `README.md`,
 `refs-transfer-matrix.md` and `polyplets-2024-2026.bib`. So a fresh clone gets
 the *record* of the library and none of its contents. Citations in `paper/` that
-point at a PDF under `papers/` are pointers into a working copy, not into the
+point at a PDF under `literature/` are pointers into a working copy, not into the
 published tree;
 bibliographic detail a reader actually needs is in `shared/refs.bib`.
 
@@ -163,7 +163,7 @@ Neither audit is a gate, deliberately; both say where the exposure is.
 
 `atom_degrees.py`, `gf_bound.py` and `lambda_fit.py` generate figures and fitted
 numbers quoted by the manuscripts. `technical-report.bib` is P1's bibliography
-(2026-09-05, every entry checked against `papers/`), and
+(2026-09-05, every entry checked against `literature/`), and
 `technical-report-cites.md` says which sentence of the `.tex` each key is for;
 the `.tex` itself carries no `\cite` until jasonp places them. `related-work-notes.md` and `technical-report-gaps.md` are working notes, not
 manuscripts.

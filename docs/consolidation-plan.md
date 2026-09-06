@@ -95,7 +95,7 @@ Untouched by design: the per-term records (`results/ns_a*/`, `results/a41/`,
 `results/redelmeier_row22/`, `results/cutcount_b1/`, `results/motley-par/`),
 `results/confidence.md`, `results/provenance-table.md`, `results/residual-cells.md`,
 `docs/proofs/`, the four audits, the reference docs of `docs/README.md` group 1,
-`docs/handoff.md`, `paper/`, `oeis/`, `polyplets/`, `papers/`, `tests/`.
+`docs/handoff.md`, `paper/`, `oeis/`, `polyplets/`, `literature/`, `tests/`.
 
 Done 2026-09-06, 03:00 EDT, by thirteen merge lanes and the lead: seven
 survivors installed first (perimeter, growth-constant, symmetry-classes,

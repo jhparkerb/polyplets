@@ -751,11 +751,11 @@ finds them.
 ## Novelty searches, N1–N6
 
 Run 2026-08-06, gating Papers 2 and 3. Method: the citation neighborhoods of
-the Bacher, Bousquet-Mélou, Rechnitzer and Barequet papers in `papers/`, then
+the Bacher, Bousquet-Mélou, Rechnitzer and Barequet papers in `literature/`, then
 targeted searches, then the source read rather than the snippet; every verdict
 rests on a PDF held locally or a measurement in this repository. "No OEIS
 match on nine terms" is weak evidence when the class was defined here.
-Unobtainable papers go to `papers/MISSING.md`.
+Unobtainable papers go to `literature/MISSING.md`.
 
 | # | question | verdict |
 |---|---|---|
@@ -783,7 +783,7 @@ Bousquet-Mélou 1996 Theorem 3.4, Burnside for the classes), not phase blocks;
 the FPSAC'04 French abstract is the same paper; Denise, Dürr &
 Ibn-Majdoub-Hassani FPSAC'97, recovered from the Wayback Machine, uses strata
 column by column; Ibn-Majdoub-Hassani's 1996 Orsay thesis was not obtained
-(`papers/MISSING.md`) and is unlikely, unchecked, to hold the phase blocks. So
+(`literature/MISSING.md`) and is unlikely, unchecked, to hold the phase blocks. So
 2004 is the earliest source. What survives as the project's: the class is
 HV-convex king animals, whose middle-block weight min(h,h′) + 1 against the
 square lattice's min(h,h′) is the whole difference between µ = 3.1289… and
@@ -847,7 +847,7 @@ unordered defects). BBR 2010 Theorem 12 derives the ratio limit from Madras
 1999, the citation the project uses for a(n+1)/a(n) → λ. A re-run on the
 field's own key found two more families: Barequet & Magal, Comput. Geom. 108
 (2022/23) 101919, a perimeter-defect algorithm to k ≤ 5 (not held;
-`papers/MISSING.md`); and OEIS A308359 (R. J. Mathar, 2019), fixed polyominoes
+`literature/MISSING.md`); and OEIS A308359 (R. J. Mathar, 2019), fixed polyominoes
 by bounding-box width, the transposed square T(n,H), with T(n,n−1) = 4n−8 for
 n ≥ 3 known and T(n,n−2) = 8n²−51n+86 for n ≥ 5 an open conjecture that
 Theorem A settles (`docs/proofs/universal-diagonal-law.md`,
@@ -873,8 +873,8 @@ set). The shared ingredient, extracting the y-coefficients of the ODE to get a
 linear recurrence, Bousquet-Mélou & Rechnitzer 2002 Lemma 9, was credited in
 `results/anisotropic-not-dfinite.md` on 2026-08-01.
 
-Neither paper was blocked; two PDFs were added to `papers/` and two references
-to `papers/MISSING.md`. The later per-paper passes (the L9 identity is the
+Neither paper was blocked; two PDFs were added to `literature/` and two references
+to `literature/MISSING.md`. The later per-paper passes (the L9 identity is the
 FK/Potts correspondence; L6's defect identity and cyclotomic theorem are
 Asinowski–Barequet–Zheng's; Bousquet-Mélou–Fédou is L5's antecedent;
 Baxter–Guttmann and Jensen–Guttmann are Undertow's near neighbor) are in
@@ -1121,7 +1121,7 @@ is what costs.
     python3 experiments/oeis_lookup.py 1,4,16,61,221,766,2566,8390,26982
     python3 experiments/oeis_a308359_check.py
     python3 experiments/ternary_spine.py
-    pdftotext papers/gouyou-beauchamps_leroux_2004_convex_polyominoes_honeycomb.pdf - \
+    pdftotext literature/gouyou-beauchamps_leroux_2004_convex_polyominoes_honeycomb.pdf - \
       | sed -n '/Growth phases of convex polyominoes/,/H00 and H22/p'
     git log --diff-filter=D -- <path>                     # find a removed file's commit
 
