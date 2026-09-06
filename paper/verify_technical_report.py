@@ -635,6 +635,11 @@ if DRAFT.exists():
     a41h = {int(f.stem[1:]): load_pairs(f) for f in a41_dir.glob("h*.out")}
     check("draft: a(41) value", dsaid("a(41)", r"a\(41\) = \\num\{(\d+)\}"),
           393811462683918679824582849262105)
+    check("draft abstract: A006770 reach", dsaid("A006770 reach", r"\\oeis\{A006770\} to \$n = (\d+)\$"), max(banked_an))
+    check("draft abstract: A030233 reach", dsaid("A030233 reach", r"\\oeis\{A030233\} to \$n = (\d+)\$"), max(onesided))
+    r = dsaid("free-class reach", r"\\oeis\{A194596\} to \$n = (\d+)\$")
+    check("draft abstract: A030222/A030234/A030235/A194596 reach", (r, r, r, r),
+          (max(free), max(bilateral), max(asymmetric), max(nonpoly)))
     check("draft: swept heights of a(41) are 1..20", sorted(a41h), list(range(1, 21)))
     check("draft: a(41) assembled from heights 1..20",
           dsaid("a(41) heights", r"assembled from an enumeration of heights \$1\$--\$(\d+)\$"), max(a41h))
