@@ -27,7 +27,7 @@ import sys
 import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "oracle"))
+sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from g1_naive import NEIGHBORS  # noqa: E402
 

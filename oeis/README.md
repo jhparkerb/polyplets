@@ -14,7 +14,7 @@ service. Normal care for outward-facing steps; no signoff ceremony.
   asserts these are not in OEIS; submitting contradicts it. Discuss with OEIS
   editors first (jasonp).
 - Superseded drafts (maxholearea, standalone A_0/A_1) were removed 2026-07-06;
-  the canonical versions live in `submissions/oeis/`. Git history has them.
+  the canonical versions live in `oeis/wave2/`. Git history has them.
 
 ## Files
 - `A######.txt` — an **existing** OEIS entry we extend. Commit history per file:
@@ -69,7 +69,7 @@ https://oeis.org/history?user=Jason%20H%20Parker). Only new-draft `%A` lines and
 | draft GF orders / atom degrees | Superseeker-novel; NOT READY (see flags) |
 | draft free-polyplet symmetry classes (8: draft-sym-*.txt) | new, plain-search novel; D4 breakdown of A030222 to n=19, validated (classes sum to A030222/A030234) |
 
-Submission is jasonp's, gated on the readiness process in HANDOFF.md.
+Submission is jasonp's, gated on the readiness process in docs/handoff.md.
 
 ## Novelty re-checks (OEIS, 2026-06-19)
 - **A_0 (hole-free) and A_1 (one-hole): confirmed not in OEIS via Superseeker**
@@ -96,7 +96,7 @@ Submission is jasonp's, gated on the readiness process in HANDOFF.md.
   breakdown of A030222. Each class's distinctive term-window returns "No results" on
   the OEIS consecutive-term search (only the coarse A030234/A030235 split existed for
   polyplets). Plain-search clean; a Superseeker pass per class is the gold standard
-  still to run before submission. Derivation (`sym/symmetry_classes.py`) is validated:
+  still to run before submission. Derivation (`scripts/symmetry_classes.py`) is validated:
   the 8 classes sum to A030222(n) and the five reflection classes to A030234(n) for all
   n <= 19 (the latter is the proven bilateral = (H+D)/2 identity).
 - (Lesson from A030233: always search before claiming novelty.)

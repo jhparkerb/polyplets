@@ -12,8 +12,10 @@ campaign record behind it.
 ## The two headline results
 
 **a(41) = 393811462683918679824582849262105.** The first term of A006770 past
-a(40). Heights 1..19 real (4.72 h on 40 cores, run-dir under 100 GB); heights
-20..41 from the diagonal tower. The classical route needed H = 21 at Nmax 41,
+a(40). Heights 1..20 are enumerated -- 1..19 in the campaign itself (4.72 h on
+40 cores, run-dir under 100 GB) and height 20 in the 9.6-hour sweep that landed
+2026-09-05 and agreed with what the tower had predicted for it; heights 21..41
+come from the diagonal tower. The classical route needed H = 21 at Nmax 41,
 i.e. a(40)'s two tall phases — 9.6 h/48c and 36.4 h/32c with a 363.4 GB disk
 peak. Neither was run. `results/a41/PROVENANCE.md`.
 
@@ -132,9 +134,11 @@ line asserted, `results/undertow.md`).
   species; every known route carries the frontier connectivity partition, ~20x
   per level. Family-level, not instance-level. `results/undertow.md`.
 
-## Open
+## What was open at the campaign's end, and what became of it
 
-- **The Motley ladder at Nmax 41** (`scripts/motley_ladder.sh`) — running.
+Two of the four have since run; the entries say which, and with what result.
+
+- **The Motley ladder at Nmax 41** — DONE. `scripts/motley_ladder.sh` finished 2026-08-21: nine primes, peak 61.6 GB (`results/second-sources.md`, `results/cutcount_b1/rows41/README.md`).
   Heights 1..19, nine 16-bit primes, ~59 GB at the top height, ~25 h. It buys
   BOTH a(40)'s last cell and a(41) entire: `T(n,H) = C_H - 2C_{H-1} + C_{H-2}`
   needs every `C_H` at the same Nmax, and every banked Motley row stops at
@@ -142,7 +146,7 @@ line asserted, `results/undertow.md`).
   launch of the same run at Nmax 40 would have bought only the first and was
   killed for it. Its gate went green first: the release path reproduces a
   banked H = 18 residue row byte for byte.
-- **H = 20 sweep at Nmax 41** (`scripts/dalby_a41_h20.sh`) — makes level 21's
+- **H = 20 sweep at Nmax 41** — DONE. (`scripts/dalby_a41_h20.sh`) — makes level 21's
   *output* a holdout against an enumeration. **~11 h / ~190 GB**; the 20-30 h
   / 450 GB this tree asserted before anything was measured is corrected in the
   script header. **RAN 2026-09-05: 9.63 h on 76 cores, rc = 0; the swept

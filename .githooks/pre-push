@@ -2,11 +2,11 @@
 # Pre-push gate: run the fast regression subset before anything leaves the
 # machine. Targets the classes this repo has actually shipped — closed-form
 # brute-force, silent-wrong guards, combine/runfile integrity (see
-# AUDIT-2026-06-28.md). Install once with `make install-hooks`.
+# docs/audits/AUDIT-2026-06-28.md). Install once with `make install-hooks`.
 #
 # Additionally run the FULL default `gates` chain (~3 min) when the push
 # touches anything beyond documentation. The fast subset is a curated
-# allowlist, and curated subsets have blind spots: the sym/symcount.py
+# allowlist, and curated subsets have blind spots: the scripts/symcount.py
 # deletion (754871a) broke bare `make` for 27 days while every push passed
 # ns-gate-fast. Fail closed: new refs and unrecognized paths get the full
 # chain.

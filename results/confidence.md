@@ -28,7 +28,7 @@ This catches gross errors. It does not catch a subtle systematic one.
 
 Everything below is a statement about which of those two a given number has.
 
-## Before this session
+## Where things stood before 2026-08-20
 
 Every value up to a(40) had been computed by one program — the column sweep
 that has produced the frontier for years. A second, genuinely different
@@ -41,7 +41,7 @@ no second program had ever touched <!--q:row40_residual.count@18=5-->. The plan 
 program at heights 19, 20 and 21. Height 19 was priced at 27-40 days. Heights
 20 and 21 were believed impossible on the hardware we have.
 
-## What changed
+## What the work of 2026-08-20 to 09-05 changed
 
 **One mathematical thing.** The cells near one edge of the table follow exact
 formulas. Each formula has two unknown constants that have to be fixed from
@@ -65,7 +65,10 @@ about a day.
 ## The numbers, in order of confidence
 
 **1. a(n) for n <= 35 — highest. Unchanged.**
-Two independent programs agreed. This session did not touch it.
+Two independent programs agreed on every cell: each is either recounted by the
+second program directly, or given by a formula pinned on that program's own
+cells. Whole-row enumeration by a third, unrelated program (Redelmeier) reaches
+n = 22. The work of 2026-08-20 onward did not touch any of this.
 
 **2. a(n) for n = 36 to 39 — high, and this is the largest gain of the
 session.**
@@ -76,7 +79,7 @@ and compared: every cell matches, and every row sums to the published value
 exactly. An adversarial review traced every input back to its source and found
 nothing circular.
 
-Before this session these rows were only partly confirmed. They are now fully
+Before 2026-08-20 these rows were only partly confirmed. They are now fully
 confirmed.
 
 **3. a(40) — every height the second program reaches agrees, as of 2026-08-21.**
@@ -88,11 +91,14 @@ to the published a(40).
 
 The twenty-one cells above height 19 are not enumerated by any second program.
 They are reproduced by the formula tower fitted to the second program's own
-data, and item 4 says what that is worth. Before this session, 35 of 40 cells
+data, and item 4 says what that is worth. Before 2026-08-20, 35 of 40 cells
 had a second program, or a formula anchored on the second program's cells,
 behind them <!--q:row40_residual.count@18=5-->; now 37 of 40 do
 <!--q:row40_residual.count@19=3-->, and the other three, T(40,20), T(40,21)
-and T(40,22), rest on the tower alone. The 2026-08-21 text here said
+and T(40,22), rest on the tower alone. Those three are row 40's band; the
+repo-wide list of cells carrying only the mod-4 congruence is a different
+three, T(39,20), T(40,20) and T(40,21), and `results/residual-cells.md` is the
+one place both are computed. The 2026-08-21 text here said
 "40 of 40"; that counted the tower as a second program, which it is not
 (AUDIT-2026-09-02 M2).
 
@@ -219,7 +225,7 @@ and one prediction behind it, not two enumerations
 
 ## On trusting this account
 
-Several characterizations written during the session were wrong and were
+Several characterizations written while that work was in progress were wrong and were
 corrected — by the review team, by the automated checks, and by jasonp. The
 numbers themselves never changed; the descriptions of how well-supported they
 were did. Every correction is written into the repository next to the claim it

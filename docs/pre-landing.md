@@ -96,7 +96,7 @@ already closed and is here so that nobody re-opens it during the landing.
       in whatever state it was abandoned in. Publish all, prune to the cited
       three plus `master`, or leave the rest and say in the README that
       `explore/*` is unmaintained.
-- [ ] **OEIS.** Nothing in `oeis/` or `submissions/oeis/` auto-submits, and the
+- [ ] **OEIS.** Nothing in `oeis/` or `oeis/wave2/` auto-submits, and the
       submission gate is yours and unchanged. This box exists so the list can
       close; it is not a prompt.
 
@@ -246,5 +246,5 @@ would publish.
   refs, and the credential scan, which is in B because it is a command); found
   C's README box red on its own (a(41), the Lean file count, the branches);
   corrected the header, which described this file as untracked while it was
-  tracked. Wired it into `HANDOFF.md`'s pointer block — nothing referenced it
+  tracked. Wired it into `docs/handoff.md`'s pointer block — nothing referenced it
   before, which is how a landing checklist gets 95 commits out of date.

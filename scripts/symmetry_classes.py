@@ -12,7 +12,7 @@ S = M m with M the table of marks of D4, so m = M^{-1} S.
 
 S for |K|<=2 is the cross-ISA-confirmed runs/sym20 data:
   S(C1)=Fixed (A006770), S(C2)=R180, S(C4)=R90, S(side-mirror)=H, S(diag-mirror)=D.
-S(D2_ortho), S(D2_diag), S(D4) are computed here via sym/symcount.py (small).
+S(D2_ortho), S(D2_diag), S(D4) are computed here via scripts/symcount.py (small).
 
 Hard validation (must hold on the whole known overlap, else abort):
   sum of all classes == A030222 (free);

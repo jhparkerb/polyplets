@@ -7,7 +7,7 @@ FOUR mutually inconsistent accounts of "the cells that still have one source":
   docs/motley-plan.md (deleted)           row 40's residual band 9 -> 7 -> 5 -> 3
   results/second-sources.md   Ticker Tape's two cells: T(40,19), T(40,23)
   docs/publication.md      Ticker Tape takes "four of the six"
-  HANDOFF.md                    the 9 -> 7 -> 5 band "does not reproduce"
+  docs/handoff.md                    the 9 -> 7 -> 5 band "does not reproduce"
 
 Three of the four are right and they disagree because **two different
 quantities share one name**.  Nothing anywhere defined either of them, and
@@ -63,7 +63,7 @@ rejects the declaration, and a unit naming two or more cells is stating the
 residual SET and must declare a `.cells@H` fact instead -- otherwise the hatch
 smuggles a wrong list past the gate, which it did until 2026-08-19.
 
-Trigger matching runs with markdown emphasis stripped: HANDOFF.md wrote
+Trigger matching runs with markdown emphasis stripped: docs/handoff.md wrote
 "**only** the mod-4 congruence" and the first version of the pattern walked
 straight past it, which is a fail-OPEN and has its own RED control.
 
@@ -221,7 +221,7 @@ TRIGGER_RE = re.compile(
     re.I)
 
 # Emphasis inside the phrase must not hide it.  "**only** the mod-4 congruence"
-# is the exact wording HANDOFF.md used and the trigger walked straight past it,
+# is the exact wording docs/handoff.md used and the trigger walked straight past it,
 # which is a fail-OPEN and the worst kind of gate defect.  Trigger matching runs
 # on the line with markdown emphasis stripped.
 EMPHASIS_RE = re.compile(r"[*_`]")
@@ -734,7 +734,7 @@ def selftest() -> int:
                         "(triggers=%d, %s)" % (trig, bad))
 
     # RED 15: markdown emphasis inside the trigger phrase must not hide it.
-    # This one was live -- HANDOFF.md wrote "**only** the mod-4 congruence" and
+    # This one was live -- docs/handoff.md wrote "**only** the mod-4 congruence" and
     # the pattern walked past it.  Fail-open, so it gets its own control.
     bad, _, trig = run("cells carrying **only** the mod-4 congruence "
                        "drop 11 -> 6\n", "r15.md")

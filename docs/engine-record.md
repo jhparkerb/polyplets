@@ -14,7 +14,7 @@ labeled as such. One statement is proved by exhaustion: the completion bound is
 admissible at every signature for `H ≤ 12`. The design as built is
 `docs/engine-design.md`; the file formats are `docs/formats.md`; the per-term
 records are `results/ns_a*/PROVENANCE.md` and `results/a41/PROVENANCE.md`; the
-read-only correctness audit of 2026-09-02 is `AUDIT-2026-09-02.md`.
+read-only correctness audit of 2026-09-02 is `docs/audits/AUDIT-2026-09-02.md`.
 
 Terms used throughout. A **height run** is the enumeration of `T(·,H)` for one
 `H`; heights are independent jobs. The run proceeds **column by column** across
@@ -1548,7 +1548,7 @@ they match. An independent recount by a route that never reads the assembler
 agrees. For the 19 enumerated heights, two programs with no shared code agree
 on every entry; for heights 20 and up, the formulas are a second
 implementation fed the same defect tables, not a second enumeration
-(`AUDIT-2026-09-02.md`).
+(`docs/audits/AUDIT-2026-09-02.md`).
 
 The one enumeration that crosses assumption families for `T(41,20)`, the
 `H = 20` run at `Nmax 41`, ran 2026-09-05 (`scripts/dalby_a41_h20.sh`, dalby, rev

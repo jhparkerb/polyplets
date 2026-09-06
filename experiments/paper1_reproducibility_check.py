@@ -3,7 +3,7 @@
 
 `paper/technical-report.tex`'s Reproducibility section is empty, and
 `paper/technical-report-gaps.md` item 1 calls it the biggest hole. The material
-is spread over HANDOFF.md, results/second-sources.md and results/ns_a40/. This
+is spread over docs/handoff.md, results/second-sources.md and results/ns_a40/. This
 script recomputes it from the banked artifacts rather than copying it forward,
 so the section can be written against checked numbers.
 

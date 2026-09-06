@@ -15,7 +15,7 @@ Each worker traverses only the shared size<S prefix plus its OWN size-S subtrees
 linear speedup. Worker 0 additionally records all size<S animals.
 
 Usage:
-    python3 sampling/maxhole_split.py N [K] [--split-size S] [--bg8]
+    python3 scripts/maxhole_split.py N [K] [--split-size S] [--bg8]
       N : maximum size (compute M(1..N))
       K : number of parallel workers (default min(16, cpu_count-2))
       S : split depth (default 8; needs a(S) >> K subtrees for balance)

@@ -8,25 +8,29 @@ accepts such citations (class `history`).
 
 ## Theme map — where a conclusion lives now
 
+Written before the waves ran as a plan, and rewritten 2026-09-06 to name the
+files that came out of them. Every file below is in the tree; the waves that
+follow say what went into each and at which commit the sources are readable.
+
 | theme | surviving file(s) |
 |---|---|
-| live state, decisions, what is running | `HANDOFF.md` |
-| the terms and their evidence | `results/confidence.md`, `results/ns_a*/PROVENANCE.md`, `results/a41/PROVENANCE.md`, `results/provenance-table.md`, `results/residual-cells.md`, `AUDIT-2026-09-02.md` |
-| the engine | `docs/engine-design.md`, `docs/paper1-engine-chapter.md`, `docs/formats.md`, `docs/observability.md` |
-| second sources | `results/strip-engine.md`, `results/cutcount_b1/rows41/README.md`, `results/motley-par/README.md`, `docs/proofs/cutcount-identity.md`, `results/redelmeier_row22/PROVENANCE.md` |
-| the diagonal formula and its tower | `docs/proofs/diagonal-law.md`, `docs/proofs/grand-form.md`, `docs/proofs/universal-diagonal-law.md`, `results/defect-gas.md`, `results/undertow.md`, `results/onset-defect-*.md`, `results/ridgeline-depth-amplitudes.md` |
-| the mod-3 and arithmetic structure | `results/ternary-spine.md`, `results/triangle-snf.md`, `results/v5-denominator-law.md`, `results/triangle-hunt-klein-parity.md`, `results/triangle-r2-d3-proof.md` |
-| growth constant | `results/strip-mu-certificates.md`, `results/strip-growth-lambda-bounds.md`, `docs/proofs/polyplet-upper-bound.md`, `results/series-analysis-da.md`, `results/concatenation-upper-bound.md` |
-| symmetry classes | `results/subgroup-mod4.md`, `results/sym_counts.txt`, `results/related-seqs-n3*.md`, `results/bilateral-parity.md` |
-| holes | `results/holes_n18.txt`, `results/maxhole-*.md`, `results/hole-*.md` |
-| subclasses (convex, directed, middle kingdom) | `results/middle-kingdom.md`, `results/convex-polyplets.md`, `results/hv-growth-sandwich.md`, `results/directed-*.md`, `results/multi-directed.md`, `docs/proofs/convex-mirage.md` |
-| perimeter | `results/perimeter-both-ends.md`, `results/perimeter-defect-diagonals.md`, `results/min-site-perimeter.md` |
-| non-D-finiteness | `results/anisotropic-not-dfinite.md`, `results/isotropic-dfinite-boxes.md` |
+| live state, decisions, what is running | `docs/handoff.md` |
+| the terms and their evidence | `results/confidence.md`, `results/provenance-table.md`, `results/residual-cells.md`, `results/ns_a*/PROVENANCE.md`, `results/a41/PROVENANCE.md`, `docs/audits/AUDIT-2026-09-02.md` |
+| the engine | `docs/engine-record.md` (as it ran), `docs/engine-design.md` (the 2026-06 build design), `docs/formats.md`, `docs/observability.md` |
+| second sources | `results/second-sources.md`, `docs/proofs/cutcount-identity.md` |
+| the diagonal formula and its tower | `docs/proofs/diagonal-law.md`, `docs/proofs/grand-form.md`, `docs/proofs/universal-diagonal-law.md`, `results/diagonal-formula.md`, `results/below-onset.md`, `results/undertow.md` |
+| the mod-3 and arithmetic structure | `results/arithmetic-structure.md` |
+| growth constant | `results/growth-constant.md`, `docs/proofs/polyplet-upper-bound.md` |
+| symmetry classes | `results/symmetry-classes.md` |
+| holes, convex, directed, poly-time subclasses | `results/subclasses.md`, `docs/proofs/convex-mirage.md` |
+| perimeter | `results/perimeter.md` |
+| non-D-finiteness | `results/anisotropic-not-dfinite.md` |
+| routes that did not work, and the open problems | `results/closed-doors.md` |
 | Lean | `polyplets/PROOF-STATUS.md`, `polyplets/DESIGN.md`, `docs/lean-environment.md`, `docs/lean-artifact.md`, `docs/lean-below-onset-scope.md` |
-| the papers | `paper/README.md`, `docs/publication-split.md`, `paper/L-readability-rules.md`, `docs/l-corpus-contraction.md`, `docs/priority-pass*.md` |
-| closed campaigns, as records | `docs/triangle-postmortem.md`, `docs/rook-parity.md`, `results/ghostship/REPORT.md`, `results/skeletonkey-four-mechanisms.md`, `docs/lastditch-campaign.md`, `docs/project-postmortem.md`, `docs/lessons-learned.md` |
+| the papers | `paper/README.md`, `docs/publication-split.md`, `docs/publication.md`, `docs/l-corpus-contraction.md` |
+| how the work was run, and what to do differently | `docs/lessons-learned.md` |
 | standards and process | `docs/engineering-standards.md`, `docs/job-checklist.md`, `docs/push-gate-tiers.md`, `docs/glossary.md`, `docs/external-anchors.md` |
-| OEIS staging (no submission) | `oeis/`, `submissions/oeis/README.md`, `results/oeis-candidates.md` |
+| OEIS staging (no submission) | `oeis/`, `results/oeis-candidates.md` |
 
 ## Wave 1 — closed campaigns, 2026-09-06
 
@@ -40,7 +44,7 @@ Deleted at the commit after `e5e7870`: 443 tracked files, readable with
 | Rook parity round 1 | `results/rook1/`, `docs/rook1-brief.md` | `docs/rook-parity.md` |
 | Triangle-structure hunt rounds 2--4 (working files) | `results/triangle-r2-extension-scout.md`, `results/triangle-r3-*` (five), `results/triangle-salvage.md`, `results/r4/` (most), `experiments/tristruct/sweep_report.md`, `docs/triangle-structure-d9-d12-plan.md` | `docs/triangle-postmortem.md`; the proofs stay in `results/triangle-r2-d3-proof.md` and `results/triangle-hunt-klein-parity.md` |
 | L-paper review campaigns (trim, tics, coinage) | `docs/reviews/l-trim/` (all but `PROTOCOL.md`), `docs/reviews/llm-tics/` (all but `density.py`), `paper/L-coinage-candidates.md`, `paper/polyplets-report-cuts.md`, `docs/l-paper-currency.md` | `paper/L-readability-rules.md`, `docs/l-corpus-contraction.md` |
-| session-state and plan documents superseded by `HANDOFF.md` | `docs/resume-here.md`, `docs/unattended-2026-09-05.md`, `docs/agent-types.md`, `docs/undertow-review-brief.md`, `docs/motley-goal.md`, `docs/coin-lift-goal.md`, `docs/certificate-squeeze-plan.md`, `docs/notary-k-handoff.md`, `docs/notary-simplify-deferred.md`, `docs/severance-w4-scoping.md`, `docs/terminal-velocity-plan.md`, `polyplets/OUTWORKS-PLAN.md`, `polyplets/PLAN.md` | `HANDOFF.md`, `polyplets/PROOF-STATUS.md` |
+| session-state and plan documents superseded by `docs/handoff.md` | `docs/resume-here.md`, `docs/unattended-2026-09-05.md`, `docs/agent-types.md`, `docs/undertow-review-brief.md`, `docs/motley-goal.md`, `docs/coin-lift-goal.md`, `docs/certificate-squeeze-plan.md`, `docs/notary-k-handoff.md`, `docs/notary-simplify-deferred.md`, `docs/severance-w4-scoping.md`, `docs/terminal-velocity-plan.md`, `polyplets/OUTWORKS-PLAN.md`, `polyplets/PLAN.md` | `docs/handoff.md`, `polyplets/PROOF-STATUS.md` |
 
 Held back from this wave because code, a manuscript or a gate still names
 them (43 files, listed in the commit message): they go when the citing comment
@@ -91,7 +95,7 @@ Untouched by design: the per-term records (`results/ns_a*/`, `results/a41/`,
 `results/redelmeier_row22/`, `results/cutcount_b1/`, `results/motley-par/`),
 `results/confidence.md`, `results/provenance-table.md`, `results/residual-cells.md`,
 `docs/proofs/`, the four audits, the reference docs of `docs/README.md` group 1,
-`HANDOFF.md`, `paper/`, `oeis/`, `polyplets/`, `papers/`, `tests/`.
+`docs/handoff.md`, `paper/`, `oeis/`, `polyplets/`, `papers/`, `tests/`.
 
 Done 2026-09-06, 03:00 EDT, by thirteen merge lanes and the lead: seven
 survivors installed first (perimeter, growth-constant, symmetry-classes,

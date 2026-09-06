@@ -177,7 +177,7 @@ def check_gate_deps(text):
 
 
 # Where a gate script can import a repo-local module from.
-_IMPORT_DIRS = ("tests", "experiments", "oracle", "scripts", "paper", "sym")
+_IMPORT_DIRS = ("tests", "experiments", "scripts", "paper")
 
 
 def _local_imports(path, seen):

@@ -95,7 +95,7 @@ I am not going to quote hours. What can be said from the tree:
 
 **Do not start F1 now.** Two reasons, in order:
 
-1. It is not on the landing path. `PRE-LANDING.md` does not need it, and B1 —
+1. It is not on the landing path. `docs/pre-landing.md` does not need it, and B1 —
    the gate sweep, done — was the item about the repository being trustworthy.
    F1 makes the repository *more proved*, which is a different axis and a slower
    one.

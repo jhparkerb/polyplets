@@ -51,6 +51,9 @@ jasonp's machine, and are not missing from a clone by accident.
 | `docs/consolidation-plan.md` | the 2026-09 consolidation: theme map, and the ledger of deleted records with the commit each is readable at |
 | `docs/external-anchors.md` | what this machinery reproduces that it did not produce |
 | `docs/lessons-learned.md` | how the work was run, and what the next attempt should do differently |
+| `docs/handoff.md` | the project's own live state: what is running, what is decided, what is open. Internal, and the longest file here |
+| `docs/pre-landing.md` | the go/no-go checklist written before the repository was made public |
+| `docs/audits/` | four dated correctness audits of the engine and the claims, 2026-06-28 through 2026-09-02; the last one is cited by the current records |
 
 ## 4. Campaigns still open, and their entry points
 
@@ -69,5 +72,5 @@ jasonp's machine, and are not missing from a clone by accident.
 | `docs/priority-pass-L10-2026-08-23.md` | the Undertow pass; its verdict now lives in `paper/L8-below-onset.tex` §Novelty |
 | `docs/reviews/outworks-adversarial.md` | the adversarial pass over the Outworks Lean material |
 
-The Ghost Ship run record is `results/ghostship/` — hash-sealed and frozen on
-purpose, because it cites a filesystem that is not this one.
+The Ghost Ship experiment's record was folded into `docs/lessons-learned.md`;
+no part of it is tracked any more.

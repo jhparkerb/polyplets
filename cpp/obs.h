@@ -1,6 +1,6 @@
 // Observability & provenance for the C++ engines -- the compiled-language half
 // of docs/observability.md, emitting the SAME logfmt event stream as the Python
-// obs.py so a job's log alone answers "what code, alive, how far, when done".
+// scripts/obs.py so a job's log alone answers "what code, alive, how far, when done".
 //
 // Provenance is baked at BUILD time (GIT_REV / BUILD_TIME via -D in the Makefile):
 // a binary outlives its source, so it reports the commit it was *built* at, not
@@ -33,7 +33,7 @@
 namespace obs {
 
 // ISO-8601 to the second WITH local tz offset, colon form (2026-06-20T15:30:00-04:00)
-// -- matches obs.py so a cross-machine log diff is clean. strftime's %z gives the
+// -- matches scripts/obs.py so a cross-machine log diff is clean. strftime's %z gives the
 // basic "-0400"; we splice the colon in to mirror Python's isoformat.
 inline std::string iso_of(std::time_t t) {
   std::tm tm{};

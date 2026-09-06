@@ -361,7 +361,7 @@ with either engine above.
 | Nmax 40, `results/cutcount_b1/rows/` | H ≤ 18 | 567 entries equal the triangle; C_18 reconstructed by CRT from four primes with the fifth held out and predicted at every n (`make gate-cutcount-assembly`) |
 | Nmax 41, `results/cutcount_b1/rows41/`, dalby 2026-08-20/21, about 22 h, nine 16-bit primes per height | H ≤ 19 | 589 entries with n ≤ 40 equal the triangle; the 19 entries at n = 41 equal the production engine's enumeration (`results/a41/`); the withheld prime predicts every entry at all 19 heights, 779 entries, from the 171 residue rows in `results/cutcount_b1/residues41/` (check F; `make gate-cutcount-assembly`; `make gate-motley-crt`) |
 
-What this settles, in the words of `AUDIT-2026-09-02.md` (M2): for n ≤ 35
+What this settles, in the words of `docs/audits/AUDIT-2026-09-02.md` (M2): for n ≤ 35
 every entry is direct from the coloring program or on a formula diagonal whose
 two anchors are its entries, two programs sharing no code; for a(36)–a(39)
 every entry is direct or determined from its entries and ab-initio constants,
@@ -933,7 +933,7 @@ old number.
 ## OEIS: policy and staging
 
 Nothing has been submitted, and as of 2026-09-06 the OEIS is not to be
-contacted; `oeis/` and `submissions/oeis/` are staged only. The lineup and the
+contacted; `oeis/` and `oeis/wave2/` are staged only. The lineup and the
 rule that an entry may cite a P paper as warrant and never an L paper are in
 `docs/publication-split.md` §4. Policy research of 2026-07-05: October 2023, a
 blanket ban approved two days after A361990's ChatGPT credit; 16 April 2026,

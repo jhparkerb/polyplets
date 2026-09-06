@@ -1,10 +1,17 @@
 # Engine design — the production polyplet enumerator
 
-Status: as built (the engine that computed a(21)-a(36); a(35)/a(36) via the
-varint evolution of this run-file engine). Written 2026-06-26
-as the build design; the planning trilogy around it (PRD, implementation
-plan, and the frontier investigation corpus it cites) was removed at
-project close and lives in git history.
+Status: the build design of the run-file engine, written 2026-06-26, as built
+for a(21)-a(36) (a(35) and a(36) via its varint evolution). **It is not the
+engine that produced a(40) and a(41):** the kink-carry column kernel replaced
+the transition of section 4 afterwards, and the engine as it actually ran, with
+the measurements, is `docs/engine-record.md`. Read this one for the run-file
+layer -- spilled runs, sort-merge, checkpoint and resume -- which survives
+unchanged.
+
+Names cited below that are not in the tree: `NEXT-SYSTEM.md`, the PRD,
+`IMPLEMENTATION-PLAN.md` and `docs/layout.md` were the planning trilogy around
+this design, removed at project close and readable in git history. `data/` is
+the published-output directory this design proposed; it shipped as `results/`.
 
 Design rule throughout: **re-express the validated engine, do not reinvent it.** Every transition,
 signature, prune, and fold below is lifted from the working `cpp/tma/` code (cited inline); the *new*
@@ -341,14 +348,3 @@ IMPLEMENTATION-PLAN builds on a confirmed base:
   "bounded loss" (NFR-2). Sub-unit resume is unnecessary at unit grain.
 - **D-5 Counter/classifier = compile-time templates** (monomorphized, in the hot loop); store/distribution
   = runtime (cold). This is forced by the hot/cold boundary, not a free choice — noted for completeness.
-
-## 15. Traceability to requirements
-
-FR-1↔§0,4,5,6 · FR-2↔§4 (mid-shard spill) · FR-3↔§6,9 (mid-column checkpoint) · FR-4↔§8,9 (idempotent
-resume) · FR-5↔§7 · FR-6↔governor §1 · FR-7↔§3,10 (counter template) · FR-8↔§10,11 (modp) · FR-9/10↔§9
-(run/checkpoint accounting) · FR-11/12/13↔§9,12 · FR-O1/O2/O3↔§3,10,13 · NFR-1↔§11 · NFR-4↔§10 ·
-NFR-5↔§3,13 (~700-line core).
-
----
-_Next: IMPLEMENTATION-PLAN.md sequences this into milestones with per-checkpoint functional tests and
-pre-documented responses to adverse results, at a grain Sonnet can execute._

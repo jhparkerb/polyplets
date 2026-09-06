@@ -11,7 +11,7 @@ CXXFLAGS = -std=c++20 -Wall -Wextra -Werror
 # Provenance baked at BUILD time (docs/observability.md): a compiled binary
 # outlives the source state, so it must report the commit it was BUILT at, not
 # whatever the tree is now. GIT_REV carries a -dirty suffix when the tree differs
-# from HEAD at all (untracked included), matching Python obs.py's porcelain check.
+# from HEAD at all (untracked included), matching Python scripts/obs.py's porcelain check.
 # cpp/obs.h reads these via -D; absent them it falls back to "unknown".
 #
 # Probed ONCE, at the top level, and exported. `make gates` is ~40 nested makes
@@ -174,7 +174,7 @@ GATE_PREREQS = build/directed_cone_anchor build/euler_unit build/g2 \
 # --- input gating -----------------------------------------------------------
 # A gate that re-runs when nothing it reads has changed is pure waiting. A gate
 # that does NOT run when something it reads HAS changed is a silent hole, and
-# this repo has been bitten by that twice (the sym/symcount.py deletion, the
+# this repo has been bitten by that twice (the scripts/symcount.py deletion, the
 # four unwired Severance gates). So the default is: every gate runs, every time.
 # A gate is skipped only if it is DECLARED here with the full set of things it
 # reads, and its stamp is newer than all of them.
@@ -244,13 +244,13 @@ DEPS_gate-king-grid = build/directed_cone_anchor tests/gate_king_grid.py \
                 tests/common.py $(FIXTURES)
 DEPS_gate-multidirected = build/directed_cone_anchor tests/gate_multidirected.py \
                 tests/common.py experiments/multidirected_king.py $(FIXTURES)
-DEPS_gate-g1 = tests/gate_g1.py tests/common.py oracle/g1_naive.py $(FIXTURES)
+DEPS_gate-g1 = tests/gate_g1.py tests/common.py scripts/g1_naive.py $(FIXTURES)
 
-DEPS_gate-s2  = tests/gate_s2.py tests/common.py oracle/g1_naive.py $(FIXTURES)
+DEPS_gate-s2  = tests/gate_s2.py tests/common.py scripts/g1_naive.py $(FIXTURES)
 DEPS_gate-sym = build/symcount_fast tests/gate_sym.py tests/common.py \
-                oracle/g1_naive.py sym/symcount.py $(FIXTURES)
+                scripts/g1_naive.py scripts/symcount.py $(FIXTURES)
 DEPS_gate-subgroup = build/symcount_fast build/symtm tests/gate_subgroup.py \
-                tests/common.py oracle/g1_naive.py sym/symcount.py $(FIXTURES)
+                tests/common.py scripts/g1_naive.py scripts/symcount.py $(FIXTURES)
 DEPS_gate-symtm = build/symtm build/symcount_fast tests/gate_symtm.py \
                 tests/common.py
 DEPS_gate-motley-crt = scripts/motley_crt.py \
@@ -270,7 +270,7 @@ DEPS_gate-severance-w2 = experiments/severance_w2_gate.py \
                 experiments/depth1_gap_walk.py experiments/cluster_weight_dp.py \
                 experiments/slope2_law_vs_truth.py
 DEPS_gate-g2  = build/g2 build/g2_asan \
-                tests/gate_g2.py tests/common.py oracle/g1_naive.py $(FIXTURES)
+                tests/gate_g2.py tests/common.py scripts/g1_naive.py $(FIXTURES)
 DEPS_gate-kink-oracle = build/ns/orchestrate build/ns/map_worker \
                 build/ns/merge_worker tests/gate_kink_oracle.py tests/common.py \
                 $(FIXTURES)

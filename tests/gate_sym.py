@@ -16,8 +16,8 @@ import sys
 
 from common import ROOT, Gate, free_and_one_sided, read_bfile
 
-sys.path.insert(0, os.path.join(ROOT, "sym"))
-sys.path.insert(0, os.path.join(ROOT, "oracle"))
+sys.path.insert(0, os.path.join(ROOT, "scripts"))
+sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from symcount import SYMMETRY_TYPES, count_symmetry_type  # noqa: E402
 from g1_naive import count_symmetry  # noqa: E402

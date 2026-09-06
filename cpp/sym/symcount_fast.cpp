@@ -1,11 +1,11 @@
-// Fast symmetric-polyplet counter (C++ port of sym/symcount.py).
+// Fast symmetric-polyplet counter (C++ port of scripts/symcount.py).
 //
 // Counts connected king-move animals invariant under a chosen symmetry type,
 // summed over that type's centre/axis placements, by size 1..MAXN. Method
 // matches the validated Python: Redelmeier over the ORBIT GRAPH (nodes =
 // orbits of cells under the symmetry group), keeping only subsets whose lifted
 // cell set is genuinely king-connected, with a per-type anchor pinning any
-// residual translation a mirror axis leaves free. See sym/symcount.py and
+// residual translation a mirror axis leaves free. See scripts/symcount.py and
 // docs-s2-symmetric-enumerator.md.
 //
 // CLI:  symcount_fast {r90|r180|hmirror|dmirror|c4|d2ax|d2diag|d4} MAXN
@@ -69,7 +69,7 @@ static SymType makeType(const std::string& name) {
   if (name == "dmirror")
     return {{{{ID, {0,1,0, 1,0,0}}}},
             Anchor::Diag};
-  // --- SUBGROUP-invariant types (see sym/symcount.py). Each subgroup below
+  // --- SUBGROUP-invariant types (see scripts/symcount.py). Each subgroup below
   // has a centre, so every placement pins translation and no anchor applies.
   // c4 is r90's group: invariance under r90 is invariance under all of C4.
   if (name == "c4") return makeType("r90");

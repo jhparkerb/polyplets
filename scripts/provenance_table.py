@@ -3,7 +3,7 @@
 
 Until now "what is confirmed, by which independent source, covering what share"
 was spread over results/ns_a40/PROVENANCE.md, results/second-sources.md,
-results/symmetry-classes.md, results/second-sources.md and HANDOFF.md.  Five places
+results/symmetry-classes.md, results/second-sources.md and docs/handoff.md.  Five places
 drift, and one of them already did: the strip-coverage-vs-holdout-mass
 confusion recorded in strip-engine.md.
 
@@ -293,8 +293,14 @@ def write_table(T, a, src, exact, stats):
     L.append("| R | small-height recurrences | H <= 4 | full |")
     L.append("| S | strip transfer matrix | H <= 14 | shares the union-find rule |")
     L.append("| P | closed forms P_k on really-swept cells | k <= 18, n >= 2k+1, H <= 21 | full where credited |")
-    L.append("| M | Motley/cutcount | H <= %d | rule-independent |" % MOTLEY_H)
-    L.append("| U | Undertow tower refitted to Motley's cells | H > %d, rows %d-%d, "
+    L.append("| M | Motley/cutcount, the second enumerator: it counts by "
+             "colouring and never decides connectivity, so it is what "
+             "`results/confidence.md` calls the second program | H <= %d | "
+             "rule-independent |" % MOTLEY_H)
+    L.append("| U | Undertow tower refitted to Motley's cells -- the closed "
+             "forms of `docs/proofs/diagonal-law.md` with their constants "
+             "pinned from Motley's own cells, which `results/confidence.md` "
+             "calls the formula tower | H > %d, rows %d-%d, "
              "measured per cell | formula-level: shares D_j and the grand form "
              "with P/F; agrees with the incumbent at every tagged cell |"
              % (MOTLEY_H, MOTLEY_H + 1, NMAX))

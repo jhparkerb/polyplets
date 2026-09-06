@@ -29,7 +29,7 @@ purpose, lost provenance.** Don't launch until every box is checked.
    `start`/`heartbeat`/`done` event stream (ISO-8601, stated denominator,
    self-computed ETA) to a persistent log — a result you keep must not trace to a
    dirty/unknown tree, and a long binary must report its own progress. Scripts
-   should do the same (cheap via `obs.py`) but it's nice-to-have, not a gate.
+   should do the same (cheap via `scripts/obs.py`) but it's nice-to-have, not a gate.
    Binaries go in `build/`, never `/tmp`. See `docs/observability.md`.
 
    - **Clean, current rev — explicit gate for any run whose result you'll keep.**

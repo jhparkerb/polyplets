@@ -184,7 +184,7 @@ and `results/undertow.md` are the record. Interacts with A2.
 honestly carry: heights 1–19 swept by two engines that agree on all 19 cells;
 heights 20–41 composed from the diagonal tower, levels `k <= 19` wired and
 `k = 20, 21` pinned from below-onset cells; level 21 rests on one depth pair
-whose stated guard tests integrality only (`AUDIT-2026-09-02.md:44-80`, M1).
+whose stated guard tests integrality only (`docs/audits/AUDIT-2026-09-02.md:44-80`, M1).
 The one-second depth-5 re-pin test that closes M1 has not been run (ayr
 unreachable 2026-09-04; dalby refused the key from the session shell). Run it
 before the asterisk is worded. "Conjecture" undersells the 19 swept heights;
@@ -223,7 +223,7 @@ the colouring engine stops at H = 19, so `T(41,20)` has one enumeration.
 
 ## C1. `MATERIAL READY` Validation architecture — see B1
 
-`HANDOFF.md`, `results/second-sources.md`, `paper/polyplets-report.tex:485`.
+`docs/handoff.md`, `results/second-sources.md`, `paper/polyplets-report.tex:485`.
 Every production run re-derives all smaller terms; Redelmeier confirms to
 n=22; an independent strip transfer-matrix engine sharing no enumeration code
 confirms T(n,H) for H≤14 across all n≤40 (469 cells, 0 mismatches). Also the

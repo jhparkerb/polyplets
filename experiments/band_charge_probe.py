@@ -30,7 +30,7 @@ import sys
 from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "oracle"))
+sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from g1_naive import NEIGHBORS, normalize  # noqa: E402
 

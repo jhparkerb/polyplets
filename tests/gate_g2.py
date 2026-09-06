@@ -18,7 +18,7 @@ import sys
 
 from common import ROOT, Gate, parse_counts, read_bfile, run
 
-sys.path.insert(0, os.path.join(ROOT, "oracle"))
+sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from g1_naive import count_by_box  # noqa: E402
 

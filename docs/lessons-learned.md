@@ -252,7 +252,7 @@ Operations (`docs/job-checklist.md`, `docs/observability.md`,
 rebalancing by contiguous ID ranges, per-worker RAM as total times margin
 over cores; one tmux session per machine, jobs in foreground windows with
 logs and heartbeat lines carrying progress and eta, no jobs from standard
-input, no pattern-kill; the observability standard as shared code (`obs.py`,
+input, no pattern-kill; the observability standard as shared code (`scripts/obs.py`,
 `cpp/obs.h`); the job-start checklist before any compute launch.
 
 The contract, as converged: direct answers in the asked format first, no
@@ -424,7 +424,7 @@ against n = 70.
 **What round 1 found.** One desk-only round, six Fable agents, no compute
 (`e72e5ac..4a90412`; the consolidation note of 2026-09-06 dates the round
 2026-08-16..17, the commits are dated 2026-08-13, and the commits are the
-record). From `HANDOFF.md`, the 2026-08-14 entry:
+record). From `docs/handoff.md`, the 2026-08-14 entry:
 
 - The production engine's base is b = 1.7266 = √2.9813, from the a(40)
   run's per-height processor-time ratio, phase C over phase B
@@ -665,7 +665,7 @@ enough to justify a compute job, which is the point of the day.
 
 Two rounds designed a replacement for the ad-hoc session state: Offside (six
 lanes and a queue) and the process proposal. The candidate was recorded
-2026-08-14 and never adopted; `HANDOFF.md` remained the live state and
+2026-08-14 and never adopted; `docs/handoff.md` remained the live state and
 worked. Records deleted 2026-09-06: `results/offside/`, `docs/offside-*.md`,
 `docs/process-proposal.md`, `docs/state-minimal.md`
 (`git show e5e7870:<path>`).

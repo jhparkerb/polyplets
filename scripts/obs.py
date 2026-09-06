@@ -382,7 +382,7 @@ class Checkpoint:
 
 
 # --------------------------------------------------------------------------- #
-# self-test: `python obs.py` exercises the stream without any project compute.
+# self-test: `python scripts/obs.py` exercises the stream without any project compute.
 # --------------------------------------------------------------------------- #
 if __name__ == "__main__":
     sys.stdout.write(file_header("obs-selftest", "demo", __file__))

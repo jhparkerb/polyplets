@@ -17,7 +17,7 @@ import sys
 
 from common import ROOT, Gate, read_bfile
 
-sys.path.insert(0, os.path.join(ROOT, "oracle"))
+sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 from g1_naive import count_symmetry  # noqa: E402
 

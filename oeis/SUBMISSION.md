@@ -1,7 +1,7 @@
 # OEIS submission — authoritative index and case file
 
 2026-07-16. **This file decides scope and order.** The three older lists
-(`submissions/oeis/README.md`, `oeis/README.md`, `results/oeis-candidates.md`)
+(`oeis/wave2/README.md`, `oeis/README.md`, `results/oeis-candidates.md`)
 keep their per-item detail but their status sections defer here.
 
 **Nothing is submitted by Claude, ever.** jasonp pushes every button
@@ -47,7 +47,7 @@ not "bulk."
 
 ### Wave 2 — new sequences: the hole family + two singletons (staged, READY*)
 
-`submissions/oeis/` — see its README for per-item provenance.
+`oeis/wave2/` — see its README for per-item provenance.
 
 | # | sequence | status |
 |---|---|---|
@@ -201,5 +201,5 @@ it requires trusting prose.
 - **2026-07-17 green board**: full `make ns-gates` suite GREEN (incl. the
   newly-wired gate-g2); the paper's self-contained claim checker passes
   412/412; the paper compiles warning-free.
-- Engine audits: `AUDIT-2026-06-28.md`, `AUDIT-2026-07-13.md` (all fixes
+- Engine audits: `docs/audits/AUDIT-2026-06-28.md`, `docs/audits/AUDIT-2026-07-13.md` (all fixes
   red-first-tested; no banked value affected).

@@ -267,7 +267,7 @@ and T(39,18).
 **Level 21.** With depths j <= 4, level 21 has one determining pair, T(40,19)
 and T(39,18), and no check at its own level. Level 20's redundancy was first
 reported as 3 pairs and 2 checks (depths <= 3); at depths <= 4, the recipe
-the run used, it is 6 pairs and 5 checks (`AUDIT-2026-09-02.md` M1). The
+the run used, it is 6 pairs and 5 checks (`docs/audits/AUDIT-2026-09-02.md` M1). The
 content of the assembly resting on a single computation was first named as
 nine numbers, the e = 3 rows at k = 20, 21, 22 of
 `results/severance_w3_families_K22_e3.txt`, plus the two determining entries;

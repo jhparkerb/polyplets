@@ -1,17 +1,17 @@
-# HANDOFF — live state (updated 2026-08-24)
+# HANDOFF — live state (updated 2026-09-06)
 
-> **Planning from scratch? `docs/state-2026-08-23.md`** — what is true now,
-> what is decided, what is open with its price and what it would change.
+> **This file is the project's own working record, not an entry point for a
+> reader.** It is written inward: campaign detail, agent commits, what was
+> running on which machine. If you have arrived from `README.md`, the five
+> files it names are what you want.
 >
-> **Resuming cold?** `docs/resume-here.md` has the two census runs still going
-> and what to do when each lands.
+> **Planning from scratch?** `results/confidence.md` says how far a(n) can be
+> trusted and why; `docs/consolidation-plan.md` says where every merged record
+> went and at which commit its sources are readable. The two files this banner
+> used to name, `docs/state-2026-08-23.md` and `docs/resume-here.md`, were
+> merged into those two and deleted on 2026-09-06.
 >
-> **Start with `results/confidence.md`** if what you want is how far a(n) can
-> be trusted and why. It is in plain terms, it says which values rest on two
-> independent programs and which rest on one, and it names where the residual
-> risk sits. Everything below is the campaign detail behind it.
->
-> **Publishing the repo: `PRE-LANDING.md`** (root) is the checklist, and it
+> **Publishing the repo: `docs/pre-landing.md`** (root) is the checklist, and it
 > defines what "ready" means. Section A is jasonp's decisions and nothing else
 > blocks on them; section B is commands, and it is stale by design whenever
 > `HEAD` moves past the revision its boxes were measured at.
@@ -1484,7 +1484,7 @@ Third adversarial campaign (after 2026-06-28 and 2026-07-13), run at
 publish: five parallel read-only audits (Second Wind C++ data path,
 orchestrator resume/phasing/fastmap, diagonal injection, publish
 artifacts/checkers, Lean + strip second source), ~35 findings.
-Dispositions and the headline write-ups: **`AUDIT-2026-07-30.md`**.
+Dispositions and the headline write-ups: **`docs/audits/AUDIT-2026-07-30.md`**.
 Fix batches A/B/C/D all landed on master (`git log --grep
 AUDIT-2026-07-30`). Bottom line unchanged by any of it: **no banked
 value is wrong.**

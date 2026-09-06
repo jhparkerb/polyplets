@@ -44,24 +44,32 @@ than its tier.
 **Read these five files first:** `paper/technical-report-draft.tex` (or its
 PDF), `results/confidence.md` (how well each term is supported, in plain
 terms), `results/provenance-table.md` (which program produced each entry of
-the triangle), `docs/engine-design.md` (the enumerator), and
-`docs/proofs/diagonal-law.md` (the closed form the tall heights rest on).
-Everything else is record.
+the triangle), `docs/engine-record.md` (the enumerator as it ran, with the
+measurements), and `docs/proofs/diagonal-law.md` (the closed form the tall
+heights rest on). Everything else is record, and `docs/glossary.md` decodes
+the names this project gave its own machinery.
 
 ## Layout
 
 | where | what |
 |---|---|
-| `results/` | banked evidence: per-term ledgers `ns_a*/` (triangle, PROVENANCE, per-height rows, cost), analysis notes, b-file staging (`b*_upload.txt`) |
+| `results/` | the evidence and the record of what it shows: the triangle, the per-term ledgers `ns_a*/` and `a41/`, and fifteen result documents — index: [`results/README.md`](results/README.md) |
 | `paper/` | the manuscripts — the report (`technical-report-draft.tex`), jasonp's own partial `technical-report.tex`, and the six L papers — with the self-contained checkers `verify_technical_report.py` and `verify_l_papers.py`; index and authorship split: [`paper/README.md`](paper/README.md) |
-| `cpp/` | Redelmeier enumerators (`g2_redelmeier.cpp`, Method A), column transfer matrix (`tma*`), symmetric transfer matrices (`sym/symtm.cpp`) |
-| `core/`, `orchestrator/`, `worker/` | the production kink-carry transfer-matrix engine (Go orchestration, C++ kernels); design: `docs/engine-design.md` |
-| `scripts/` | the general toolchain: production runners (`dalby_term.sh`, `symtm_run.sh`, `dmirror_strips.sh`), derivers (`derive_pk_fast.py`, `dmirror_diagonals.py`, `derive_related.py`), assembly (`dmirror_sum.py`, `dmirror_hybrid_sum.py`), independent confirmation (`g2_campaign.sh`) |
+| `papers/` | the cited literature, one letter away from `paper/` and the opposite thing: work this project reads, not work it writes. The PDFs are gitignored — copyrighted work stays local — so a clone gets `INDEX.txt` (provenance), `MISSING.md` (what could not be obtained, and why), `README.md`, `refs-transfer-matrix.md` and `polyplets-2024-2026.bib`, and none of the PDFs |
+| `docs/` | reference, proofs and record: the engine, the formats, the glossary, the proofs in `docs/proofs/`, the audits in `docs/audits/`, and the project's own working state in `docs/handoff.md` — index: [`docs/README.md`](docs/README.md) |
+| `core/`, `orchestrator/`, `worker/` | the production kink-carry transfer-matrix engine (Go orchestration, C++ kernels); as it ran: `docs/engine-record.md`; the 2026-06 build design of the run-file layer it grew out of: `docs/engine-design.md` |
+| `cpp/` | the standalone C++ programs: Redelmeier enumerators (`g2_redelmeier.cpp`, Method A), the column transfer matrix (`tma*`), the coloring second source (`motley_par.cpp`), symmetric transfer matrices (`sym/symtm.cpp`) |
+| `scripts/` | the general toolchain: production runners (`dalby_term.sh`, `symtm_run.sh`), derivers (`derive_pk_fast.py`, `derive_related.py`), assembly and combination, the naive oracles the gates check against (`g1_naive.py`, `symcount.py`), and the observability runtime `obs.py` |
+| `experiments/` | one-shot derivations and probes, one file per question asked. Some are gate inputs (`grep experiments/ Makefile` says which); the rest are the working behind a paragraph in `results/`, kept for reproduction, not for reuse |
+| `tests/` | the gate suite: red-first, fail-closed, `make gates`. Python and one C++ unit |
+| `test/` | the C++ gate drivers and unit tests of the production engine, built by `make` into `build/ns/` |
+| `verify/` | a small Go tool and package that reads run artifacts independently of the engine: CRC and architecture-fitness checks |
+| `fixtures/` | external ground truth — OEIS b-files with their checksums — that most gates compare against |
 | `polyplets/` | the **Lean 4 formalization** (34 files, sorry-free): the peeling recursion, the diagonal-law shape theorem, and the grand form, with the production P_k pinned for k≤18 from two real-swept cells per level; axiom footprints are `#guard_msgs`-enforced. Status: `polyplets/PROOF-STATUS.md` |
-| `tests/` | the gate suite (red-first, fail-closed; `make gates`) |
-| `oeis/`, `submissions/` | staged OEIS extensions and new-sequence drafts (nothing auto-submitted) |
-| `docs/` | reference docs (engineering standards, observability contract, job checklist, formats, glossary, engine + dmirror design), the proofs in `docs/proofs/`, and the campaign record — map: [`docs/README.md`](docs/README.md) |
-| `papers/` | the cited literature. The PDFs are gitignored — copyrighted work stays local — so a clone gets the five tracked text files — `INDEX.txt` (provenance), `MISSING.md` (what could not be obtained, and why), `README.md`, `refs-transfer-matrix.md` and `polyplets-2024-2026.bib` — and none of the PDFs |
+| `oeis/` | staged OEIS extensions, b-files and new-sequence drafts, `wave2/` included. Nothing has been submitted and nothing is auto-submitted |
+
+The repository is called polyominoes for historical reasons; the object it
+counts is the polyplet, a polyomino whose cells may touch at a corner.
 
 One-shot launch scripts, per-term plans, and the research-log corpus that
 produced all this were removed when the enumeration ladder closed at a(40)
@@ -116,7 +124,11 @@ gated (`make gate-provenance`) so it cannot drift from the banked rows.
 
 - **T1** a(1)–a(22): two algorithms sharing no counting logic agree
   (whole-row Redelmeier fleet vs transfer matrix, completed 2026-07-16).
-- **T2** a(23)–a(38): one algorithm family, multiply decorrelated
+- **T2** a(23)–a(38): one algorithm family, multiply decorrelated. Whole-row
+  double enumeration stops at 22, but the cells do not: through a(35) every
+  cell is either recounted by the coloring second source or given by a formula
+  pinned on that source's own cells, and through a(39) the same holds row by
+  row (`results/confidence.md` items 1 and 2). The tier is about whole rows
   (full-chain regression on every run; cross-architecture recounts where
   run — full at a(34), partial at a(35), split at a(36), none for
   a(37)–a(38); and the held-out closed-form diagonal chain
