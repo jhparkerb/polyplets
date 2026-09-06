@@ -69,7 +69,7 @@ https://oeis.org/history?user=Jason%20H%20Parker). Only new-draft `%A` lines and
 | draft GF orders / atom degrees | Superseeker-novel; NOT READY (see flags) |
 | draft free-polyplet symmetry classes (8: draft-sym-*.txt) | new, plain-search novel; D4 breakdown of A030222 to n=19, validated (classes sum to A030222/A030234) |
 
-Submission is jasonp's, gated on the readiness process in docs/handoff.md.
+Submission is jasonp's, gated on the readiness process in the project handoff file (removed).
 
 ## Novelty re-checks (OEIS, 2026-06-19)
 - **A_0 (hole-free) and A_1 (one-hole): confirmed not in OEIS via Superseeker**

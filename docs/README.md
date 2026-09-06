@@ -10,9 +10,6 @@ deleted then is listed, with the commit it is readable at, in
 Findings live in `results/`. This directory is how the machinery works, what was
 proved, and how the work was run.
 
-`docs/viva-*.md` and `docs/drill*.md` are gitignored study notes, local to
-jasonp's machine, and are not missing from a clone by accident.
-
 ## 1. Reference — read these to use or check the repo
 
 | file | what |
@@ -25,8 +22,8 @@ jasonp's machine, and are not missing from a clone by accident.
 | `docs/push-gate-tiers.md` | what the push gates cost, and what `make gates-deep` restores |
 | `docs/job-checklist.md` | consult before launching any compute job |
 | `docs/lean-environment.md` | toolchain paths, vendored deps, lemma search |
-| `docs/lean-record.md` | the Lean development: what it proves, what it does not reach, the adversarial audit of 2026-07-21, and how a reader checks it |
-| `docs/reviews/outworks-adversarial.md` | the adversarial pass over the Outworks Lean material, 2026-07-31 |
+| `docs/lean-record.md` | the Lean development: what it proves, what it does not reach |
+| `docs/reviews/outworks-adversarial.md` | the adversarial pass over the Lean material |
 
 ## 2. `docs/proofs/` — the mathematical record
 
@@ -45,14 +42,13 @@ jasonp's machine, and are not missing from a clone by accident.
 
 | file | what |
 |---|---|
-| `docs/publication-split.md` | P papers vs L papers, the disclosure blocks, the OEIS lineup |
+| `docs/publication-split.md` | the P/L authorship categories, the disclosure blocks, and the OEIS lineup |
 | `docs/publication.md` | the publication record: strategy, warrant tables, standards, audits, novelty searches, removals |
 | `docs/engine-record.md` | the enumerator's measured history: kernels, scheduling, memory, negatives, per-term costs, a(41) |
 | `docs/consolidation-plan.md` | the 2026-09 consolidation: theme map, and the ledger of deleted records with the commit each is readable at |
 | `docs/external-anchors.md` | what this machinery reproduces that it did not produce |
-| `docs/handoff.md` | the project's own live state: what is running, what is decided, what is open. Internal, and the longest file here |
 | `docs/pre-landing.md` | the go/no-go checklist written before the repository was made public |
-| `docs/audits/` | four dated correctness audits of the engine and the claims, 2026-06-28 through 2026-09-02; the last one is cited by the current records |
+| `docs/audits/` | four dated correctness audits of the engine and the claims, 2026-06-28 through 2026-09-02 |
 
 ## 4. Campaigns still open, and their entry points
 
@@ -62,8 +58,8 @@ jasonp's machine, and are not missing from a clone by accident.
 
 ## 5. The L papers
 
+"L" papers are "L"LM-generated as opposed to (unwritten) "P" papers that were intended to be human-authored.
+
 | file | what |
 |---|---|
 | `docs/l-papers-record.md` | the L papers' own record: the contraction that took ten manuscripts to six, and every literature-priority pass behind them |
-
-no part of it is tracked any more.

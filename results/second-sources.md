@@ -225,7 +225,7 @@ those with `h ≥ 22`, computed from `P_k` at `k = 40 − h`, until both fit poi
 | `H ≤ 21` | 0 <!--q:row40_residual.count@21=0--> | `n ≤ 39` <!--q:closure_n@21=39--> |
 
 Both counts reach zero only at `H = 21`, which does not fit in memory (below).
-The later record (`results/undertow.md`, 2026-08-20; `docs/handoff.md`) states a(n)
+The later record (`results/undertow.md`, 2026-08-20; the project handoff file (removed from the repository)) states a(n)
 rule-independent for every `n ≤ 39` with Motley at `H ≤ 18`, by fitting each
 level from entries below the range where its formula holds, with the ab initio
 defect; `docs/audits/AUDIT-2026-09-02.md` (M2) grades that route as one formula strategy

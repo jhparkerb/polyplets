@@ -223,7 +223,7 @@ the colouring engine stops at H = 19, so `T(41,20)` has one enumeration.
 
 ## C1. `MATERIAL READY` Validation architecture — see B1
 
-`docs/handoff.md`, `results/second-sources.md`, `paper/polyplets-report.tex:485`.
+the project handoff file (removed from the repository), `results/second-sources.md`, `paper/polyplets-report.tex:485`.
 Every production run re-derives all smaller terms; Redelmeier confirms to
 n=22; an independent strip transfer-matrix engine sharing no enumeration code
 confirms T(n,H) for H≤14 across all n≤40 (469 cells, 0 mismatches). Also the

@@ -1,6 +1,6 @@
 # results/ — the evidence, and the record of what it shows
 
-Two kinds of thing live here. **The banked data**: the triangle itself
+Two kinds of thing live here. **The banked data**: the area-height triangle itself
 (`triangle.txt`), the per-term ledgers `ns_a20/` through `ns_a40/` and `a41/`
 (each with its own `PROVENANCE.md`: which binary, which host, which
 validations), the second-source rows under `cutcount_b1/` and `motley-par/`,

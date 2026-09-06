@@ -5,17 +5,15 @@ This directory holds the papers this project is **writing**.
 `literature/` holds the papers this project **reads**: the library of other
 people's work, with `literature/INDEX.txt` recording provenance and
 `literature/MISSING.md` recording what could not be obtained and why. It was
-called `papers/` until 2026-09-06, one letter from this directory and the
-source of every filename confusion in the tree.
+called `papers/` until 2026-09-06.
 
 The top-level `.gitignore` starts by ignoring `literature/` — "copyrighted papers stay
-local, never pushed" — so the PDFs themselves never leave this machine. Five
+local, never pushed" - so the PDFs themselves never leave this machine. Five
 text files there are tracked anyway: `INDEX.txt`, `MISSING.md`, `README.md`,
-`refs-transfer-matrix.md` and `polyplets-2024-2026.bib`. So a fresh clone gets
+`refs-transfer-matrix.md` and `polyplets-2024-2026.bib`. A fresh clone gets
 the *record* of the library and none of its contents. Citations in `paper/` that
 point at a PDF under `literature/` are pointers into a working copy, not into the
-published tree;
-bibliographic detail a reader actually needs is in `shared/refs.bib`.
+published tree; bibliographic detail a reader actually needs is in `shared/refs.bib`.
 
 Two neighbours complete the picture: `oeis/` holds OEIS submission drafts and
 b-files, and `docs/` holds planning and proof notes. A proof note in
@@ -69,7 +67,7 @@ had a literature-priority pass, dated after their own drafting, recorded in
 - **L8's negative is weak on its first half**, and page 1 says so: the defect is
   defined relative to this project's own diagonal law, so a pass over it tests
   little.
-- **L8's second half has a near neighbour.** Correcting a finite-size
+- **L8's second half has a near neighbor.** Correcting a finite-size
   calculation by a term describing how far it is wrong, so as to use it beyond
   where it is exact, is what Baxter–Guttmann (1988) and Jensen–Guttmann do for
   directed-percolation series. L8 cites them and claims only the combination:
@@ -83,7 +81,7 @@ had a literature-priority pass, dated after their own drafting, recorded in
   do-not-submit banner.
 
 **The numbering has gaps.** L2, L7, L9 and L10 were merged into their
-neighbours or withdrawn in the contraction of 2026-08-23, which took ten papers
+neighbors or withdrawn in the contraction of 2026-08-23, which took ten papers
 and 108 pages to six and 96; `docs/l-papers-record.md` is that record, and
 L9's material lives in `docs/proofs/cutcount-identity.md`. Those four numbers
 are retired and are not reused.
@@ -137,7 +135,7 @@ carry inline `thebibliography` environments while the L papers use
 rather than with `command not found`.
 
 `make papers` is **not** part of `make gates`. The gate suite has to stay
-runnable on dalby and ayr, which are compute boxes with no TeX.
+runnable on machines with no TeX.
 
 ## Verifying
 
@@ -162,9 +160,10 @@ Neither audit is a gate, deliberately; both say where the exposure is.
 
 ## Scripts
 
-`atom_degrees.py`, `gf_bound.py` and `lambda_fit.py` generate figures and fitted
-numbers quoted by the manuscripts. `technical-report.bib` is P1's bibliography
-(2026-09-05, every entry checked against `literature/`), and
+`atom_degrees.py`, `gf_bound.py` and `lambda_fit.py` generate figures and
+fitted numbers quoted by the manuscripts. `technical-report.bib` is the report's
+bibliography (2026-09-05, every entry checked against `literature/`), and
 `technical-report-cites.md` says which sentence of the `.tex` each key is for;
-the `.tex` itself carries no `\cite` until jasonp places them. `related-work-notes.md` and `technical-report-gaps.md` are working notes, not
+the `.tex` itself carries no `\cite` until jasonp places them.
+`related-work-notes.md` and `technical-report-gaps.md` are working notes, not
 manuscripts.

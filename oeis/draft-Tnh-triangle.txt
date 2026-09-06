@@ -2,8 +2,9 @@ DRAFT — OEIS submission: T(n,H), fixed king-polyplets by exact bounding-box he
 Status: FINAL — data complete & validated for n<=40 (820-cell b-file, the project's
 full banked triangle; extended from the 20-row staging 2026-07-29, prefix
 byte-identical). Superseeker pass still OWED before submission (SUBMISSION.md Wave 3).
-Novelty: the triangle, its row-flattening, the H=2/H=3 columns, and the T(n,n-1)
-sub-diagonal all returned no OEIS hits (per project notes); jasonp pushes submit.
+Novelty: re-checked 2026-09-06 by direct OEIS search, four queries, all "No
+results": the flattened rows (two forms), the H=2 column 3,10,27,68,167, and the
+row-3 onward prefix. Earlier project notes agree. jasonp pushes submit.
 
 %S  (read by rows; offset 1; first rows shown)
 1,
@@ -28,6 +29,18 @@ sub-diagonal all returned no OEIS hits (per project notes); jasonp pushes submit
     (shape proved by an exact walk-plus-clusters decomposition; constants derived
     ab initio for k<=5, fitted and holdout-validated for 6<=k<=18). In particular
     T(n,n-1) = (25n-45)*3^(n-4) for n >= 4.
+%C  How the entries were obtained, and how far each is confirmed. The short
+    heights of each row are enumerated by a column transfer matrix. For n >= 24
+    the tall heights, those above the line H > n/2, are not enumerated: they are
+    evaluated from the closed forms above, whose shape and range of validity are
+    proved and whose two constants per level are fixed from computed entries of
+    the same triangle. A second program sharing no counting logic with the
+    first, a transfer matrix that counts by coloring cells and never decides
+    connectivity, recounts every entry of height at most 19; for 23 <= n <= 39
+    that leaves every entry either recounted by it or given by a closed form
+    pinned on its entries. Three entries of the table have one enumeration
+    behind them and no closed form: T(39,20), T(40,20) and T(40,21).
+
 %C  Verified: every row sum matches the banked A006770(n) for n<=40, and the
     row sums for n<=18 match the A006770 DATA field as OEIS serves it today
     (that entry has no author-uploaded b-file; its b-file is auto-synthesized
@@ -45,10 +58,14 @@ sub-diagonal all returned no OEIS hits (per project notes); jasonp pushes submit
       n=5:  1  68 248 240  81
       n=6:  1 167 996 1480 945 243
 
+%H  Jason H Parker, <a href="https://github.com/jhparkerb/polyplets">Enumeration
+    code, the banked triangle, and its per-entry provenance</a>
+
 %Y  Row sums A006770. Right diagonal A000244 (3^(n-1)). Left column A000012.
     Companion (novel) sequences from this project: hole-stratified counts, hole GFs,
     fixed-height GFs G_H(x).
-%K  nonn,tabl
+%K  nonn,tabl,hard   (jasonp's call: "hard" is defensible -- the tall entries
+    cost a week of compute at the top row -- but "tabl,nonn" alone is safer)
 %O  1,3  (offset 1; first nontrivial term T(2,2)=3)
 
 Provenance: rows n<=20 from the new-engine transfer-matrix run a(20) on ayr (rev

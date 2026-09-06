@@ -3,7 +3,7 @@
 
 Until now "what is confirmed, by which independent source, covering what share"
 was spread over results/ns_a40/PROVENANCE.md, results/second-sources.md,
-results/symmetry-classes.md, results/second-sources.md and docs/handoff.md.  Five places
+results/symmetry-classes.md, results/second-sources.md and the project handoff file (removed).  Five places
 drift, and one of them already did: the strip-coverage-vs-holdout-mass
 confusion recorded in strip-engine.md.
 

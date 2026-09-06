@@ -1,4 +1,9 @@
-# What the P-paper verifier actually reads
+# What the report's verifier actually reads
+
+Called the P-paper coverage measurement for historical reasons: it was built
+when `paper/technical-report.tex` was a P paper, jasonp's own prose. That file
+is now the machine-written report and no P paper exists, but the measurement
+and its gate are unchanged and would cover a P paper if one were written.
 
 Measured, not assumed. `tests/p_paper_coverage_audit.py` perturbs the last
 digit of every numeric literal of four or more digits in a COPY of the `.tex`

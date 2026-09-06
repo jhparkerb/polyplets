@@ -6,6 +6,14 @@
 
 # The publication split: which papers are jasonp's, which are Claude's
 
+**As of 2026-09-06 there are no P papers.** Every manuscript in `paper/` is
+category L. P1 was retired that day: jasonp read the machine-written report,
+approved it for release and put it in place of his own partial, which is in git
+history. P2 and P3 below are plans, not drafts, and nothing has been written
+for either. The P category is kept because it is what the disclosure rule is
+built on and what P2 and P3 would be filed under; read every "P1", "P2" and
+"P3" below as scoping, not as a description of a document that exists.
+
 2026-08-07. The earlier plan was cut on a *warrant* axis — jasonp writes all
 prose, and results past his vetting ship as statement-plus-citation. This one is
 cut on an **authorship** axis: papers whose mathematics jasonp can read and

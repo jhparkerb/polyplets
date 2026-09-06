@@ -14,7 +14,7 @@ follow say what went into each and at which commit the sources are readable.
 
 | theme | surviving file(s) |
 |---|---|
-| live state, decisions, what is running | `docs/handoff.md` |
+| live state, decisions, what is running | the project handoff file (removed from the repository) |
 | the terms and their evidence | `results/confidence.md`, `results/provenance-table.md`, `results/residual-cells.md`, `results/ns_a*/PROVENANCE.md`, `results/a41/PROVENANCE.md`, `docs/audits/AUDIT-2026-09-02.md` |
 | the engine | `docs/engine-record.md` (as it ran), `docs/engine-design.md` (the 2026-06 build design), `docs/formats.md`, `docs/observability.md` |
 | second sources | `results/second-sources.md`, `docs/proofs/cutcount-identity.md` |
@@ -44,7 +44,7 @@ Deleted at the commit after `e5e7870`: 443 tracked files, readable with
 | Rook parity round 1 | `results/rook1/`, `docs/rook1-brief.md` | `docs/rook-parity.md` |
 | Triangle-structure hunt rounds 2--4 (working files) | `results/triangle-r2-extension-scout.md`, `results/triangle-r3-*` (five), `results/triangle-salvage.md`, `results/r4/` (most), `experiments/tristruct/sweep_report.md`, `docs/triangle-structure-d9-d12-plan.md` | `docs/triangle-postmortem.md`; the proofs stay in `results/triangle-r2-d3-proof.md` and `results/triangle-hunt-klein-parity.md` |
 | L-paper review campaigns (trim, tics, coinage) | `docs/reviews/l-trim/` (all but `PROTOCOL.md`), `docs/reviews/llm-tics/` (all but `density.py`), `paper/L-coinage-candidates.md`, `paper/polyplets-report-cuts.md`, `docs/l-paper-currency.md` | `paper/L-readability-rules.md`, `docs/l-papers-record.md` |
-| session-state and plan documents superseded by `docs/handoff.md` | `docs/resume-here.md`, `docs/unattended-2026-09-05.md`, `docs/agent-types.md`, `docs/undertow-review-brief.md`, `docs/motley-goal.md`, `docs/coin-lift-goal.md`, `docs/certificate-squeeze-plan.md`, `docs/notary-k-handoff.md`, `docs/notary-simplify-deferred.md`, `docs/severance-w4-scoping.md`, `docs/terminal-velocity-plan.md`, `polyplets/OUTWORKS-PLAN.md`, `polyplets/PLAN.md` | `docs/handoff.md`, `polyplets/PROOF-STATUS.md` |
+| session-state and plan documents superseded by the project handoff file (removed from the repository) | `docs/resume-here.md`, `docs/unattended-2026-09-05.md`, `docs/agent-types.md`, `docs/undertow-review-brief.md`, `docs/motley-goal.md`, `docs/coin-lift-goal.md`, `docs/certificate-squeeze-plan.md`, `docs/notary-k-handoff.md`, `docs/notary-simplify-deferred.md`, `docs/severance-w4-scoping.md`, `docs/terminal-velocity-plan.md`, `polyplets/OUTWORKS-PLAN.md`, `polyplets/PLAN.md` | the project handoff file (removed from the repository), `polyplets/PROOF-STATUS.md` |
 
 Held back from this wave because code, a manuscript or a gate still names
 them (43 files, listed in the commit message): they go when the citing comment
@@ -95,7 +95,7 @@ Untouched by design: the per-term records (`results/ns_a*/`, `results/a41/`,
 `results/redelmeier_row22/`, `results/cutcount_b1/`, `results/motley-par/`),
 `results/confidence.md`, `results/provenance-table.md`, `results/residual-cells.md`,
 `docs/proofs/`, the four audits, the reference docs of `docs/README.md` group 1,
-`docs/handoff.md`, `paper/`, `oeis/`, `polyplets/`, `literature/`, `tests/`.
+the project handoff file (removed from the repository), `paper/`, `oeis/`, `polyplets/`, `literature/`, `tests/`.
 
 Done 2026-09-06, 03:00 EDT, by thirteen merge lanes and the lead: seven
 survivors installed first (perimeter, growth-constant, symmetry-classes,

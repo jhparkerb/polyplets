@@ -41,6 +41,20 @@ dropped, %E/header updated. These five terms postdate the 2026-07-16 audit:
 byte-match vs live OEIS re-verified 2026-07-29 by
 `paper/verify_technical_report.py`; the other five entries are untouched).
 
+**2026-09-06 — the A006770 re-audit of the note above is done, and the staged
+text is rewritten.** The staged b-file was diffed against the live one
+(`oeis.org/A006770/b006770.txt`, still auto-synthesized from an 18-term DATA):
+18 shared indices, zero disagreements. The two comments dated Jul 16 2026 were
+stale in a way that *understated* the evidence -- they called a(23)-a(40)
+single-algorithm results, which stopped being true when the coloring transfer
+matrix landed on 2026-08-21. They now say what is true: every entry for
+23 <= n <= 39 is either recounted by that program or given by a closed form
+pinned on its entries, a(40) has 19 of its 40 heights recounted, and three
+entries of the whole table have one enumeration behind them. Every signature
+date is now the token `~~~~`, which the OEIS edit form expands to the
+contributor's name and the day of submission, so a staged date can no longer go
+stale. A `%H` link to the now-public repository was added.
+
 Checklist rule 1 (linked entries move together) is satisfied by submitting the
 six as one batch — the policy notes six related extensions is normal practice,
 not "bulk."

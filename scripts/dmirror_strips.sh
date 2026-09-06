@@ -9,7 +9,7 @@
 # combine with scripts/dmirror_sum.py. Machines: dalby (fat strips) + ayr
 # (tails) for the n=32 push, 2026-07-04. Predicted n=32 total ~3.0M cpu-s
 # (~830 cpu-h) across both; peak strip RSS is the binding resource — see
-# docs/handoff.md. Kill = kill the symtm PID printed per strip; resume = rerun
+# the project handoff file (removed). Kill = kill the symtm PID printed per strip; resume = rerun
 # with the not-yet-done strips.
 set -euo pipefail
 cd "$(dirname "$0")/.."

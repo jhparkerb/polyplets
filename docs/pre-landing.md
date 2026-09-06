@@ -66,11 +66,11 @@ already closed and is here so that nobody re-opens it during the landing.
       draft banners already announce. Per paper, not in aggregate.
 - [ ] **Byline per L paper.** `docs/publication-split.md` §1 makes this a
       per-paper decision, explicitly not a policy. Nine papers, nine answers.
-- [ ] **P1.** `paper/technical-report.tex` is ~40% built, and
-      `docs/publication.md` holds findings on it that are
-      unapplied by design. Publish the repo without it (the current strategy
-      doc's Track D says the repo is the publication and P1 is later), or hold
-      the landing for it.
+- [x] ~~**P1.**~~ **Closed 2026-09-06: there is no P1.** His own partial, then
+      about 40% built, was retired and the machine-written report took its
+      place as `paper/technical-report.tex` under the L disclosure. The repo
+      was published without a P paper, which is what the strategy doc's Track D
+      had assumed.
 - [ ] **Machine names and paths in the tree.** 27 tracked files contain
       `/Users/jasonp`, 10 contain `dalby.jhpb.org` (including
       `scripts/g2_fleet_launch.sh` and `results/ns_a40/dalby-run-evidence/`) —
@@ -245,5 +245,5 @@ would publish.
   refs, and the credential scan, which is in B because it is a command); found
   C's README box red on its own (a(41), the Lean file count, the branches);
   corrected the header, which described this file as untracked while it was
-  tracked. Wired it into `docs/handoff.md`'s pointer block — nothing referenced it
+  tracked. Wired it into the project handoff file (removed from the repository)'s pointer block — nothing referenced it
   before, which is how a landing checklist gets 95 commits out of date.
