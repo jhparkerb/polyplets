@@ -164,6 +164,14 @@ message. The rest of `experiments/tristruct/` (64 files, cited by the
 triangle records that wave 2b folds) goes with them once those records are
 merged.
 
+## Wave 4b — code nothing cites after the merges, 2026-09-06
+
+24 more files under `experiments/` and `scripts/` that no tracked text file
+names once the records were merged: 20 of `experiments/tristruct/`, two
+figure and probe scripts, two shell launchers. Readable with
+`git show 01b62ea:<path>`. What remains of `experiments/tristruct/` is
+cited by `results/arithmetic-structure.md` or `results/diagonal-formula.md`.
+
 ## Wave 3 — the superseded manuscript, and what a public reader flagged
 
 `paper/polyplets-report.tex` (1,122 lines, superseded 2026-08) and its checker
