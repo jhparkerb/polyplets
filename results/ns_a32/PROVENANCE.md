@@ -3,7 +3,7 @@
 **a(32) = 10818203977457804418974036**  (new frontier term)
 
 - **Computed:** 2026-07-03, dalby-solo, **KINK kernel**. rev `3ffeed2b`
-  (P13 wired), u128 counter. `scripts/dalby_term.sh 32`. orchestrate wall
+  (P13 wired), u128 counter. `scripts/term.sh 32`. orchestrate wall
   **10945.3s (~182.4 min / ~3.04h)**, 80 cores (dalby = aarch64 / ARM
   Neoverse-N1).
   - Config = the a29-cell-validated kink config: `--kernel kink --counter

@@ -524,14 +524,14 @@ would run, and records an exit code per phase. Final run, revision 0171909:
 | `python3 paper/verify_l_papers.py` (336 checks, 23 must-fail controls) | under 1 s |
 | `python3 paper/verify_technical_report.py` (781 checks) | under 1 s |
 | `make -C paper` (11 PDFs) | 13 s |
-| `scripts/dalby_term.sh 26`, giving a(26) = 102607513847014153892 | 23 s |
+| `scripts/term.sh 26`, giving a(26) = 102607513847014153892 | 23 s |
 
 Four things were broken and fixed: the citations gate scoped its history class
 to `git log --all`, so it passed on gympie's 50 local refs and failed with 65
 dangling citations in a clone of master, every one into the campaign branches
 `triangle-structure` or `half-measure`, not on origin; four translation units
 did not compile under GCC (a compound literal in `strip_mu_kink`, the rest
-`-Werror` warnings clang does not raise); `scripts/dalby_term.sh` began with
+`-Werror` warnings clang does not raise); `scripts/term.sh` began with
 `cd ~/src/polyominoes`; `make -C paper` died on a TeX Live without `lmodern`.
 Known rather than fixed: the superseded checker exited 1 on a clone without
 `ALLOW_PARTIAL=1` because three checks read run output under `runs/sym32`; and

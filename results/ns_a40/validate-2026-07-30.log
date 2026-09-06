@@ -5,7 +5,7 @@ A40_H20_RECHECK_MATCH existed only as prose in PROVENANCE.md, with no
 artifact behind them (AUDIT-2026-07-30 P5, "Assertion, Not Artifact").
 Regenerated 2026-07-30 on gympie (macOS/arm64) at rev fac2b85, as part of
 the AUDIT-2026-07-30 fix campaign.  NO SWEEP AND NO COMBINE WAS RUN:
-this is scripts/dalby_term.sh's VALIDATE_ONLY=1 path (added by the same
+this is scripts/term.sh's VALIDATE_ONLY=1 path (added by the same
 campaign, finding P4) reading the ALREADY-BANKED artifacts:
 
   a(40) run values : results/ns_a40/triangle.txt (copied to the throwaway
@@ -22,7 +22,7 @@ the original 2026-07-26..28 run printed.
 
 Command:
   VALIDATE_ONLY=1 RUNDIR=runs/ns_a40/validate-posthoc \
-      bash scripts/dalby_term.sh 40
+      bash scripts/term.sh 40
 =========================================================================
 
 === a40 KINK run starting: 2026-07-30T12:40:35-04:00 ===

@@ -404,7 +404,7 @@ it does not redo it. Peak RSS for the pair was 2.7 GB.
 | 15 (all owned) | 378.2 s | 11,742.2 | 38.8% | correct |
 
 A 1.82× wall speedup with near-identical cpu-seconds. Deployed in
-`scripts/dalby_term.sh` as `--overlap-heights "$N"`; over-provisioning the pool
+`scripts/term.sh` as `--overlap-heights "$N"`; over-provisioning the pool
 past the enumerated count is harmless, and the co-resident RAM of all
 enumerated heights at this scale was under 100 MB. A full production run at
 `maxn = 32` through the same driver: wall 834.1 s, cpu 29,350.3 s, utilization
@@ -1107,7 +1107,7 @@ The budget identity: workers × (spill budget + about 0.5 GB overhead) + shm +
 reader army + orchestrator + page-cache floor. At 72–80 workers the first term
 alone is 90–120 GB; no option setting closes it while all heights run
 concurrently, and three attempts each moved the spike. The design that fit is
-phasing (`scripts/dalby_term.sh` for `N ≥ 40`): phase A, the cheap heights with
+phasing (`scripts/term.sh` for `N ≥ 40`): phase A, the cheap heights with
 full overlap on 80 cores; phase B, `H = 20` alone; phase C, `H = 21` alone on
 fewer cores, safe by construction because a single height bounds RAM at one
 working set, and cheap because the tallest height is disk-bound at about 14
@@ -1524,7 +1524,7 @@ enumerated half on 40 cores cost about what a(37) did on 80 (605,643 against
 ### 11.2 a(40), three phases
 
 `maxn = 40` with full overlap does not fit 125 GB (section 6.3), so a(40) ran
-2026-07-25..28 on dalby alone as `FRONTIER_LEVERS=1 scripts/dalby_term.sh 40`:
+2026-07-25..28 on dalby alone as `FRONTIER_LEVERS=1 scripts/term.sh 40`:
 
 | phase | heights | cores | wall | cpu s | RSS max |
 |---|---|---|---|---|---|
@@ -1536,7 +1536,7 @@ Disk peak 363.4 GB mid-`H = 21`, above the about 234 GB projection that had
 paused the sequence at a(39); phasing plus post-a(39) cleanup made it fit. The
 `H = 21` frontier peaked at 355,390,806 records, a stable about 2.7× per-column
 cost over `H = 20`. `H = 21` is the tallest height ever enumerated by the
-project. `scripts/dalby_term.sh` sets `--max-diag-k 18` for `N ≥ 40` so that a
+project. `scripts/term.sh` sets `--max-diag-k 18` for `N ≥ 40` so that a
 re-run keeps `H = 21` an enumeration rather than an injection from `P_19`, the
 formula fitted to that very entry.
 
@@ -1629,8 +1629,8 @@ Production runs and their validation (dalby unless noted; the driver's own
 validation compares a(1..20) with `fixtures/b006770.txt` and the chain of
 recorded terms):
 
-    scripts/dalby_term.sh N                    # one term; phased for N >= 40; --resume per phase
-    FRONTIER_LEVERS=1 scripts/dalby_term.sh 40 # a(40) as run
+    scripts/term.sh N                    # one term; phased for N >= 40; --resume per phase
+    FRONTIER_LEVERS=1 scripts/term.sh 40 # a(40) as run
     scripts/dalby_a41_low.sh                   # a(41) heights 1..19 at Nmax 41
     scripts/dalby_a41_h20.sh                   # a(41) height 20 at Nmax 41, 9.63 h on 76 cores
     python3 experiments/undertow_a41.py --jmax 5 --perheight results/a41

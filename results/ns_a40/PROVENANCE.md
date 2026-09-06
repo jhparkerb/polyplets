@@ -4,7 +4,7 @@ a(40) = 56749893611764175164545926946127
 
 Computed 2026-07-25..28 on dalby alone (ARM Ampere Altra, 80 core),
 branch `second-wind`, launched 2026-07-25 20:42 EDT via
-`FRONTIER_LEVERS=1 scripts/dalby_term.sh 40` — the first production run
+`FRONTIER_LEVERS=1 scripts/term.sh 40` — the first production run
 of the PHASED driver (Overcommit Hydra, docs/engine-record.md):
 maxn=40 with full overlap does not fit 125GB RAM, so the two tall poles
 run as solo phases with bounded working sets.
@@ -36,7 +36,7 @@ and matches on all 20 rows), but the run's strongest validation
 artifact, the P_0..P_18 holdout certification below, would silently fail
 to regenerate.
 
-`scripts/dalby_term.sh` therefore pins `--max-diag-k 18` on all three
+`scripts/term.sh` therefore pins `--max-diag-k 18` on all three
 phases for N >= 40 (`b2fde69`, AUDIT-2026-07-30 D1). Reproducing this
 run at HEAD keeps H21 a real 36.4-hour sweep. Anyone re-running by hand
 must pass the same cap; anyone deliberately re-running *without* it gets

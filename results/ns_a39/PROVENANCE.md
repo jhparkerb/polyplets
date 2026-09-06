@@ -4,7 +4,7 @@ a(39) = 8182864667276277865830132493466
 
 Computed 2026-07-24/25 on dalby alone (ARM Ampere Altra, 80 core), engine
 rev 0057f2c5 (branch `second-wind`), launched 2026-07-24 ~13:50 EDT via
-`FRONTIER_LEVERS=1 scripts/dalby_term.sh 39` — the FIRST production run
+`FRONTIER_LEVERS=1 scripts/term.sh 39` — the FIRST production run
 with the Mirror Toll disk-IO levers on (block-framed frontier zstd at
 64-record frames = 1.45x, plus /dev/shm map-output routing with
 per-round headroom fallback; docs/engine-record.md).

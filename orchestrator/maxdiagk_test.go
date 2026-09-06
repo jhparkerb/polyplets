@@ -72,7 +72,7 @@ func TestMaxDiagKZeroDisablesInjection(t *testing.T) {
 }
 
 // TestPhasedRecipeDiagCap pins the height/cap algebra of the recorded a(N>=40)
-// reproduction recipe (scripts/dalby_term.sh, AUDIT-2026-07-30 D1 "Phase C
+// reproduction recipe (scripts/term.sh, AUDIT-2026-07-30 D1 "Phase C
 // Phantom"). The diagonal index is k = N-H and the phase split uses fixed
 // offsets from N, so the same k ranges hold for every N >= 40:
 //
@@ -86,7 +86,7 @@ func TestMaxDiagKZeroDisablesInjection(t *testing.T) {
 // The script pins --max-diag-k 18 on all three phases. This test is the
 // executable form of that argument: the shell driver has no test harness.
 func TestPhasedRecipeDiagCap(t *testing.T) {
-	const phaseDiagCap = 18 // must match PHASE_DIAG_CAP in scripts/dalby_term.sh
+	const phaseDiagCap = 18 // must match PHASE_DIAG_CAP in scripts/term.sh
 	for _, N := range []int{40, 41, 44} {
 		cfg := SweepConfig{Maxn: N, MaxDiagK: phaseDiagCap}
 		// The cap is load-bearing, not decorative: uncapped, phase C's

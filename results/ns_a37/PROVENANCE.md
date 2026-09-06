@@ -4,7 +4,7 @@ a(37) = 170463735577007360431441250424
 
 Computed 2026-07-23 on dalby alone (ARM Ampere Altra, 80 core), engine rev
 28e4056c (branch `second-wind`: P_17 wired + Fan-In Tax fixes,
-docs/engine-record.md), launched 12:05 EDT via `scripts/dalby_term.sh 37`,
+docs/engine-record.md), launched 12:05 EDT via `scripts/term.sh 37`,
 foreground in tmux window 0:a37 with tee'd log.
 
 - Real sweeps H3-H19; H20-H37 via wired P_k closed forms (k = 37-H <= 17,
@@ -22,7 +22,7 @@ foreground in tmux window 0:a37 with tee'd log.
 - a(1)..a(20) match fixtures/b006770.txt exactly (full b-file extent).
 - a(21), a(26)..a(36) match the banked plain-format triangles exactly
   (a(22)-a(25) have no plain-format banked file; skipped, as in prior runs).
-- A37_VALIDATE_PASS from the dalby_term.sh built-in check.
+- A37_VALIDATE_PASS from the term.sh built-in check.
 - T(37,37) = 3^36 exactly (king-chain identity T(n,n) = 3^(n-1)).
 - T(37,36) = 880 * 3^33 with 880 = 25*37 - 45 = P_1(37) exactly.
 - Growth a(37)/a(36) = 6.9212 vs a(36)/a(35) = 6.9157 — smooth, monotone

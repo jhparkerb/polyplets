@@ -806,7 +806,7 @@ Four defects, none of them visible from this working tree:
   three were `-Werror` warnings clang does not raise. Note in passing:
   `strip_mu.cpp`'s three `#pragma omp` have never been active, because its
   build rule passes no `-fopenmp` --- every recorded mu_H is from a serial run.
-- **`scripts/dalby_term.sh` began with `cd ~/src/polyominoes`.** Repo root from
+- **`scripts/term.sh` began with `cd ~/src/polyominoes`.** Repo root from
   the script's own path now, cores from `nproc` (which is 80 on dalby, so every
   measurement in its header still describes the box it was measured on).
 - **The papers do not build on a stock TeX Live.** `numprint` pulls `textcomp`,
@@ -1706,7 +1706,7 @@ placeholders (a(40) appears as 5.7e31 in the abstract and Table `tab:an`
   test], merge-range record cap, adaptive peek reads, arena-sized buffers +
   POSIX getline): dalby H15/maxn30 bench **336s/20.1k cpu-s → 104.5s/3.9k**
   (3.2x wall, 5.2x cpu), now 1.35x FASTER than the pre-varint D5 baseline.
-  Validated: full ns-gates (55) per step + `dalby_term.sh 26` full
+  Validated: full ns-gates (55) per step + `term.sh 26` full
   production-shape run on dalby (b-file n≤20 exact, chain exact,
   A26_VALIDATE_PASS). gympie gains ~5% (its pair count was always small).
   **Ladder insight:** a(38)'s intrinsic real H20 sweep yields T(37,20) =
@@ -1782,14 +1782,14 @@ placeholders (a(40) appears as 5.7e31 in the abstract and Table `tab:an`
   diagonal back to a real sweep — the strict route is `--max-diag-k 16` at
   maxn=37 (real H20 = P_17's first independent holdout). (d) a(37) plan +
   dalby checklist: `docs/engine-record.md`. Pending: dalby rebuild + bench A/B (needs
-  ssh-agent; jasonp travelling, ayr out of reach — dalby_term.sh is
+  ssh-agent; jasonp travelling, ayr out of reach — term.sh is
   dalby-solo anyway). Predicted a(37): trusted ~1.2-2.5h, strict ~2.5-5h.
   **Resume state 2026-07-22:** branch `second-wind` (7 commits off master
   316b5ca) is LOCAL-ONLY on gympie — `git push -u origin second-wind` first
   (needs agent), then the dalby checklist: fetch + checkout +
   `make ns-gates && make install` on dalby, `bench_util.sh` A/B vs the
   140.9s H15/maxn30 baseline to pin the real I/O-win factor, then
-  `dalby_term.sh 37` (trusted) or add `--max-diag-k 16` in the script's
+  `term.sh 37` (trusted) or add `--max-diag-k 16` in the script's
   orchestrate line (strict, real H20). Validation already banked on-branch:
   full ns-gates, a(20) --compare, a(26) production-shape chain-match
   (runs/second_wind_a26). The old dalby strip_tm tail-waiter died with the
@@ -1905,7 +1905,7 @@ spine digit-product on all in-band cells).
   shelf costing):** P_17 wired (see Second Wind above; the 07-12 note's "fit
   uses the out-of-onset n=34 point" was wrong — n=34 is off the polynomial,
   sharp onset; fit is T(35,18)+T(36,19), no holdout until H20). Trusted
-  route = `dalby_term.sh 37` (~1.2-2.5h predicted post-I/O-fix); strict
+  route = `term.sh 37` (~1.2-2.5h predicted post-I/O-fix); strict
   route adds the real H20 sweep (~2.5-5h), which certifies P17, retires
   a(36)'s T2-, and ends the banked range at an odd frontier
   (frontier-parity law). jasonp's call which route; dalby deploy checklist

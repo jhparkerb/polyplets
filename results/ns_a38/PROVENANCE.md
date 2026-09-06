@@ -4,7 +4,7 @@ a(38) = 1180654489101178485738417779914
 
 Computed 2026-07-23/24 on dalby alone (ARM Ampere Altra, 80 core), engine
 rev 8ce1bc5c (branch `second-wind`), launched 2026-07-23 ~16:20 EDT via
-`scripts/dalby_term.sh 38`, foreground in tmux window 0:a38 with tee'd log.
+`scripts/term.sh 38`, foreground in tmux window 0:a38 with tee'd log.
 
 - Real sweeps H3-H20 (first production H20 sweep); H21-H38 via wired P_k
   closed forms (k = 38-H <= 17). wall 56994s (15.8h), cpu 1,783,598s,

@@ -167,7 +167,7 @@ would publish.
       likely to find something, because it is the only one that runs on
       evidence a reader actually has — it caught all four defects last time and
       none of them were visible from this working tree.
-- [ ] `make && scripts/dalby_term.sh 26` on the clean clone — prints
+- [ ] `make && scripts/term.sh 26` on the clean clone — prints
       `a(26) = 102607513847014153892`, ~23 s on 32 cores. This is the command
       the README puts on the front page, so it is the one that must not lie.
 - [ ] Working tree clean, `master` pushed, and the published revision is the

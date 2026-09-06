@@ -1,6 +1,13 @@
 #!/bin/bash
-# dalby_term.sh N -- compute a(N) dalby-solo on the kink kernel, then validate.
-# Generalizes dalby_a30.sh for the successive-term loop (a31, a32, ...).
+# term.sh N -- compute a(N) on the kink kernel, then validate.
+#
+# Called dalby_term.sh until 2026-09-06, after the box it was tuned on; the
+# name said nothing to anyone else and the script was never dalby-specific.
+# It reads its core count from the machine it is on and its repository root
+# from its own location, so it runs anywhere.  Run records and log files from
+# before the rename name the old path; it is the same script.
+#
+# Generalizes dalby_a30.sh (deleted) for the successive-term loop (a31, a32, ...).
 # Config = the a29-cell-validated kink config. maxn=N: P9-P12 closed-form
 # diagonals cover H(N-2)..H(N-12); real sweep is H3..H(N-13) (top real height
 # grows +1 per term). counter=u128. RAM 80c x 1GiB (kink is RAM-light).
@@ -27,7 +34,7 @@
 # total waste -- a real net win on wall-clock and CPU-seconds, not a
 # regression despite the lower ratio.)
 #
-# Resume: dalby_term.sh N --resume
+# Resume: term.sh N --resume
 # The kink real-SIGTERM + resume over-count bug is FIXED (2026-07-09,
 # docs/engine-record.md: seed contributions are now folded into
 # hTri only after a column fully completes, so mid-column checkpoints are
@@ -35,7 +42,7 @@
 # never affected anyway. Gated by TestKinkResumeMidColumn +
 # overlap_resume_test.go. Resume is safe again.
 #
-# VALIDATE_ONLY=1 [RUNDIR=...] dalby_term.sh N runs the post-run validation
+# VALIDATE_ONLY=1 [RUNDIR=...] term.sh N runs the post-run validation
 # block against an existing $RUNDIR/a_n.txt and exits -- no sweep, no combine.
 # It exists so the chain check can be exercised without an N-hour run
 # (AUDIT-2026-07-30 P4).
@@ -45,7 +52,7 @@ set -e
 # item-2 run found this line was the first thing that broke outside our tree.
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 N="$1"
-[ -n "$N" ] || { echo "usage: dalby_term.sh N [--resume]   (or VALIDATE_ONLY=1 dalby_term.sh N)"; exit 2; }
+[ -n "$N" ] || { echo "usage: term.sh N [--resume]   (or VALIDATE_ONLY=1 term.sh N)"; exit 2; }
 
 # Core count from the box, not from dalby's 80. CORES=n overrides. Every
 # measurement quoted in this header was taken at 80 on dalby, which is what

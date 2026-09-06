@@ -83,7 +83,7 @@ step build-papers    build-papers.log    make -C paper
 # nothing but the clone. a(24) is the size that fits an hour on 32 cores; set
 # REPRO_N to something else to price a different one.
 if [ -n "${REPRO_N:-}" ]; then
-    step "reproduce-a$REPRO_N" "reproduce.log" ./scripts/dalby_term.sh "$REPRO_N"
+    step "reproduce-a$REPRO_N" "reproduce.log" ./scripts/term.sh "$REPRO_N"
 fi
 
 say "binaries built: $(ls build 2>/dev/null | wc -l) in build/, $(ls build/ns 2>/dev/null | wc -l) in build/ns/"
