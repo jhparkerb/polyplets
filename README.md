@@ -34,7 +34,7 @@ into each of the 33 gates the staleness it should catch and records which
 caught it; the rest of that file is the engine's measurement log and is not
 required reading).
 
-**The report** is [`paper/technical-report-draft.tex`](paper/technical-report-draft.tex),
+**The report** is [`paper/technical-report.tex`](paper/technical-report.tex),
 ten pages, machine-written under the authorship rules of `docs/publication-split.md`
 and approved by the author on 2026-09-06: definitions, the tables, the methods,
 and what stands behind each term. Its tables are the banked values, and
@@ -50,7 +50,7 @@ machine-checked, which is 74 of 531 numbers, with L5 and L8 at zero.
 `paper/README.md` is their index. Nothing in this repo claims more
 than its tier.
 
-**Read these five files first:** `paper/technical-report-draft.tex` (or its
+**Read these five files first:** `paper/technical-report.tex` (or its
 PDF), `results/confidence.md` (how well each term is supported, in plain
 terms), `results/provenance-table.md` (which program produced each entry of
 the triangle), `docs/engine-record.md` (the enumerator as it ran, with the
@@ -63,7 +63,7 @@ the names this project gave its own machinery.
 | where | what |
 |---|---|
 | `results/` | the evidence and the record of what it shows: the triangle, the per-term ledgers `ns_a*/` and `a41/`, and fifteen result documents — index: [`results/README.md`](results/README.md) |
-| `paper/` | the manuscripts — the report (`technical-report-draft.tex`), jasonp's own partial `technical-report.tex`, and the six L papers — with the self-contained checkers `verify_technical_report.py` and `verify_l_papers.py`; index and authorship split: [`paper/README.md`](paper/README.md) |
+| `paper/` | the manuscripts — the report (`technical-report.tex`) and the six L papers — with the self-contained checkers `verify_technical_report.py` and `verify_l_papers.py`; index and authorship split: [`paper/README.md`](paper/README.md) |
 | `literature/` | the cited literature: work this project reads, not work it writes (it was `papers/` until 2026-09-06). The PDFs are gitignored — copyrighted work stays local — so a clone gets `INDEX.txt` (provenance), `MISSING.md` (what could not be obtained, and why), `README.md`, `refs-transfer-matrix.md` and `polyplets-2024-2026.bib`, and none of the PDFs |
 | `docs/` | reference, proofs and record: the engine, the formats, the glossary, the proofs in `docs/proofs/`, the audits in `docs/audits/`, and the project's own working state in `docs/handoff.md` — index: [`docs/README.md`](docs/README.md) |
 | `core/`, `orchestrator/`, `worker/` | the production kink-carry transfer-matrix engine (Go orchestration, C++ kernels); as it ran: `docs/engine-record.md`; the 2026-06 build design of the run-file layer it grew out of: `docs/engine-design.md` |

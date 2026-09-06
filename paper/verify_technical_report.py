@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
 """Verify every number in paper/technical-report.tex against banked results.
 
-Read-only with respect to the .tex: parses its tables and checks them
-against results/ns_a40/ (triangle + per-height columns), the staged
-companion b-files, and results/holes_n18.txt; then reads the scope numbers
-out of the paper's prose sentences (Redelmeier to 22, Motley to H = 19,
-P_k to 19, holes to 18 and 14, the 3k-th row, 25^k/k!, a(n)/4, a(n)/8,
-the enclosure sizes) and checks each against the record it rests on, and
-re-derives the T(n,n-1) derivation's intermediate counts by enumeration.
-The sentence is the anchor: a sentence that goes missing is a failure.
+Read-only with respect to the .tex: parses its tables and checks them against
+results/ns_a40/ (triangle + per-height columns), the staged companion b-files
+and results/a41/; then reads the scope numbers out of the paper's prose
+sentences (Redelmeier to 22, the coloring program to H = 19, P_k to 19, the
+3k-th row, 25^k/k!, a(n)/4, a(n)/8, the a(41) assembly) and checks each against
+the record it rests on, and re-derives the T(n,n-1) and T(n,n-2) intermediate
+counts by enumeration.  The sentence is the anchor: a sentence that goes
+missing is a failure.
+
+The file under test is the machine-written report that replaced jasonp's
+earlier partial on 2026-09-06; the checks written for each are now one set.
 Run from anywhere:
 
     python3 paper/verify_technical_report.py
 
-Exit 0 iff all checks pass. The a(40) abstract/table placeholder shows up
-as a plain FAIL until the real value is typed in.
+Exit 0 iff all checks pass.
 """
 import os
 import re
@@ -26,8 +28,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 # The .tex under test.  Overridable ONLY so tests/gate_p_paper_verifier.py can
-# point this at a mutated COPY and prove the checks go red; the real file is
-# jasonp's prose and is never written by anything in this tree.
+# point this at a mutated COPY and prove the checks go red.
 TEX = Path(os.environ.get("VERIFY_TEX") or (ROOT / "paper" / "technical-report.tex"))
 
 failures = []
@@ -115,7 +116,6 @@ EXPECTED_CELLS = {
     "tab:tnh": 78,       # lower triangle T(n,H), n=1..12
     "tab:onefree": 32,   # 17 one-sided + 15 free (n=33,34 free not yet known)
     "tab:bisym": 60,     # 15 rows x (bilateral, asymmetric, nonpoly, sum)
-    "tab:holes": 93,     # both stacked tabulars, k=0..10
 }
 
 
@@ -181,25 +181,6 @@ for r in rows(env):
     seen += 4
 coverage("tab:bisym", seen)
 
-# Table 5: holes, two stacked tabulars (k=0..3, then k=4..10)
-env = table_body("tab:holes")
-blocks = re.findall(r"\$n\$\s*&\s*\$k=(\d+)\$(.*?)\\bottomrule", env, re.S)
-seen = 0
-for k0, body in blocks:
-    k0 = int(k0)
-    for row in body.split(r"\\"):
-        row = row.strip()
-        if not row or "&" not in row or "midrule" in row:
-            continue
-        r = cells(row)
-        n = r[0]
-        if n is None:  # remainder of the header row
-            continue
-        for j, v in enumerate(r[1:]):
-            if v is not None:
-                check(f"tab:holes ({n},k={k0 + j})", v, holes[(n, k0 + j)])
-                seen += 1
-coverage("tab:holes", seen)
 
 # Abstract: the inline a(40) display
 m = re.search(r"a\(40\) = \\num\{(\d+)\}", tex)
@@ -294,12 +275,12 @@ print(f"diagonal closed forms: {n_real} real-swept cells (independent) + "
 prose = re.sub(r"\s+", " ", tex)
 
 
-def said(label, pattern):
+def said(label, pattern, conv=int):
     m = re.search(pattern, prose, re.S)
     if not m:
         failures.append(f"FAIL {label}: sentence not found: /{pattern}/")
         return None
-    return int(m.group(1))
+    return conv(m.group(1))
 
 
 # Abstract 51-52 and Methods 294-296: Redelmeier agrees with the transfer
@@ -308,10 +289,10 @@ red = load_pairs(ROOT / "results/redelmeier_row22/combined.txt")
 for n in sorted(red):
     check(f"Redelmeier row {n} == banked a({n})", red[n], banked_an[n])
 check("abstract: Redelmeier agreement reach",
-      said("abstract Redelmeier", r"for \$n\\le\{\}(\d+)\$, transfer matrix and Redelmeier"),
+      said("abstract Redelmeier", r"\\emph\{\$a\(19\)\$--\$a\((\d+)\)\$\} --- Redelmeier enumeration and the column transfer matrix"),
       max(red))
 check("methods: Redelmeier reach",
-      said("methods Redelmeier", r"only terms through \$n=(\d+)\$ could be confirmed"),
+      said("methods Redelmeier", r"\$a\(19\)\$--\$a\((\d+)\)\$ & two algorithms sharing no code agree on every entry"),
       max(red))
 
 # Abstract 52-53: the colouring transfer matrix (Motley) confirms T(n,H) for
@@ -321,7 +302,7 @@ rowdir = ROOT / "results/cutcount_b1/rows41"
 motley_top = max(int(f.stem[1:]) for f in rowdir.glob("C*.out"))
 C = {H: load_pairs(rowdir / f"C{H}.out") for H in range(1, motley_top + 1)}
 C[0] = C[-1] = {}
-nmax_said = said("abstract Motley n", r"for \$n\\le\{\}(\d+)\$, a transfer-matrix method that uses coloring")
+nmax_said = said("abstract Motley n", r"agrees with the main program on all \$589\$ entries with \$n \\le (\d+)\$")
 check("abstract: Motley reach in n", nmax_said, 40)
 motley_cells = 0
 for H in range(1, motley_top + 1):
@@ -330,7 +311,7 @@ for H in range(1, motley_top + 1):
         check(f"Motley T({n},{H}) == banked", t, col[H][n])
         motley_cells += 1
 check("abstract: Motley reach in H",
-      said("abstract Motley H", r"confirms the \$T\(n,H\\le\{\}(\d+)\)\$ cells"), motley_top)
+      said("abstract Motley H", r"The coloring transfer matrix, run to height \$(\d+)\$ at the size row \$41\$ needs"), motley_top)
 if motley_cells != 589:
     failures.append(f"FAIL Motley coverage: {motley_cells} cells, expected 589")
 
@@ -342,7 +323,7 @@ for line in (ROOT / "results/subgroup_counts.txt").read_text().splitlines():
     p = line.split()
     if len(p) == 3 and p[1].isdigit():
         I[(p[0], int(p[1]))] = int(p[2])
-if not re.search(r"pass checks based on Burnsides? congruences", prose):
+if not re.search(r"combined by Burnside's lemma, checked mod \$8\$ for \$n \\le 32\$", prose):
     failures.append("FAIL abstract: the Burnside-congruence sentence not found")
 for n in range(1, 41):
     rhs = (I.get(("c4", n), 0) + I.get(("d2ax", n), 0)
@@ -353,27 +334,31 @@ for n in range(1, 41):
 # The A-number in the sentence must be the one whose b-file that column was
 # checked against above.
 for label, pattern, fname in (
-        ("fixed", r"\\item\[Fixed\].*?oeis\.org/A(\d+)", "b006770_upload.txt"),
-        ("one-sided", r"\\item\[One-sided\].*?oeis\.org/A(\d+)", "b030233_upload.txt"),
-        ("free", r"\\item\[Free\].*?oeis\.org/A(\d+)", "b030222_upload.txt"),
-        ("bilateral", r"bilateral\}.*?oeis\.org/A(\d+)", "b030234_upload.txt"),
-        ("asymmetric", r"asymmetric\}.*?oeis\.org/A(\d+)", "b030235_upload.txt"),
-        ("non-polyomino", r"not polyominoes \(\\href\{https://oeis\.org/A(\d+)", "b194596_upload.txt")):
+        ("fixed", r"\\item\[Fixed\].*?\\oeis\{A(\d+)\}", "b006770_upload.txt"),
+        ("one-sided", r"\\item\[One-sided\].*?\\oeis\{A(\d+)\}", "b030233_upload.txt"),
+        ("free", r"\\item\[Free\].*?\\oeis\{A(\d+)\}", "b030222_upload.txt"),
+        ("bilateral", r"bilateral\}.*?\\oeis\{A(\d+)\}", "b030234_upload.txt"),
+        ("asymmetric", r"asymmetric\}.*?\\oeis\{A(\d+)\}", "b030235_upload.txt"),
+        ("non-polyomino", r"not polyominoes \(\\oeis\{A(\d+)\}", "b194596_upload.txt")):
     check(f"OEIS id for {label}", said(f"OEIS id {label}", pattern), int(fname[1:7]))
 
 # Every OEIS link shows the number it points at.
+# \oeis{A006770} expands to \href{https://oeis.org/A006770}{A006770}, so the
+# number shown and the number linked cannot differ; any bare \href to OEIS can.
 for url, shown in re.findall(r"\\href\{https://oeis\.org/(A\d+)\}\{(A\d+)\}", tex):
     check(f"href {url} shows its own number", shown, url)
+check("every OEIS reference goes through the \\oeis macro",
+      re.findall(r"\\href\{https://oeis\.org/", tex), [])
 
-# Definitions 82-83: a 1-cell hole needs a 4-cell polyplet; a domino hole or
-# two 1-cell holes need 6.  Record: the hole table and the max-hole-area table.
+# The hole enclosure sizes.  The report dropped its holes section on 2026-09-05,
+# so nothing here reads the .tex any more; these three are kept because they are
+# the only cross-check between the two banked hole tables and the max-hole-area
+# table, and dropping the paragraph is no reason to stop checking the data.
 maxhole = load_pairs(ROOT / "results/maxhole.txt")
-n_one = said("enclosure 1", r"hole of size \$1\$ may be enclosed by a polyplet of size \$(\d+)\$")
-n_two = said("enclosure 2", r"two size-\$1\$ holes may be enclosed by a polyplet of size \$(\d+)\$")
-check("smallest polyplet with a hole", min(n for (n, k) in holes if k >= 1), n_one)
-check("smallest polyplet with two holes", min(n for (n, k) in holes if k >= 2), n_two)
+check("smallest polyplet with a hole", min(n for (n, k) in holes if k >= 1), 4)
+check("smallest polyplet with two holes", min(n for (n, k) in holes if k >= 2), 6)
 check("smallest polyplet enclosing a domino (max hole area 2)",
-      min(n for n in maxhole if maxhole[n] >= 2), n_two)
+      min(n for n in maxhole if maxhole[n] >= 2), 6)
 
 # Table 1 caption: terms 1-18 match A006770.  The OEIS overlap is the 18 the
 # loop at the top used; fixtures/b006770.txt lines 19-20 are ours.
@@ -384,7 +369,7 @@ check("caption: terms matching A006770",
 # degree k and leading coefficient 25^k/k!  (3H-2n-1 = n-3k-1 at H = n-k, the
 # convention pcell() uses).  Integrality on every banked in-onset cell, and
 # the leading coefficient of every refit P_k.
-lead = said("leading coefficient", r"leading coefficient is exactly \$(\d+)\^k/k!\$")
+lead = said("leading coefficient", r"leading coefficient \$(\d+)\^k/k!\$")
 for k in range(1, 20):
     for n in range(2 * k + 1, 41):
         if pcell(n, k).denominator != 1:
@@ -401,13 +386,13 @@ for k in range(1, 19):
 # Results 135: P_k explicitly known for k <= 19.  Record: the wired table.
 sweep_go = (ROOT / "orchestrator/sweep.go").read_text()
 wired = int(re.search(r"const maxDiagKMax = (\d+)", sweep_go).group(1))
-check("P_k wired to k <=", said("P_k known", r"explicitly known for \$k\\le(\d+)\$"), wired)
+check("P_k wired to k <=", said("P_k known", r"The program that computes the triangle carries \$P_k\$ for \$k \\le (\d+)\$"), wired)
 
 # Results 136-137: P_k can be fixed after the 3k-th row -- because the
 # previous sentence supplies the leading coefficient, so the k in-onset rows
 # 2k+1..3k pin the remaining degree-(k-1) part.  Check: interpolate from
 # exactly those rows and demand every later banked in-onset cell.
-m3k = said("3k-th row", r"after computing the \$(\d)k\$-th row")
+m3k = said("3k-th row", r"\$(\d)k\$-th row of \$T\(n,H\)\$ has been computed")
 for k in range(1, 14):                       # 3k <= 40 with a row to spare
     xs = list(range(2 * k + 1, m3k * k + 1))
     ys = [pcell(n, k) - Fr(lead ** k, factorial(k)) * n ** k for n in xs]
@@ -449,7 +434,7 @@ for n in sorted(nonpoly):
             failures.append(f"FAIL 'few polyplets are polyominoes' at n={n}")
         checks += 1
 d1 = said("one-sided limit", r"one-sided count approaches\s+\$a\(n\)/(\d)\$")
-d8 = said("free limit", r"free count approaches \$a\(n\)/(\d)\$")
+d8 = said("free limit", r"free count \$a\(n\)/(\d)\$ by less than one part in a million")
 for name, table, d in (("one-sided", onesided, d1), ("free", free, d8)):
     ns = sorted(n for n in table if 18 <= n <= 40)
     exc = [Fr(d * table[n], banked_an[n]) - 1 for n in ns]
@@ -463,10 +448,8 @@ for name, table, d in (("one-sided", onesided, d1), ("free", free, d8)):
 # n = 18; Redelmeier flood-fill to n = 14 checked it.  Record: the two files,
 # and their agreement on the overlap.
 holes14 = load_pairs(ROOT / "results/holes_n14.txt", cols=3)
-check("holes: transfer-matrix reach",
-      said("holes TM reach", r"Euler characteristic through \$n=(\d+)\$"), max(n for n, k in holes))
-check("holes: flood-fill reach",
-      said("holes flood reach", r"flood-fill to verify counts\s+for \$n\\le(\d+)\$"), max(n for n, k in holes14))
+check("holes: transfer-matrix reach is n = 18", max(n for n, k in holes), 18)
+check("holes: flood-fill reach is n = 14", max(n for n, k in holes14), 14)
 for key in sorted(holes14):
     check(f"holes {key}: flood-fill == Euler tracking", holes14[key], holes.get(key))
 for n in range(1, 19):
@@ -558,16 +541,16 @@ def redelmeier(animal, untried, tried):
 redelmeier(frozenset(), [(0, 0)], set())
 for n in range(1, CENSUS_N + 1):
     check(f"census: fixed polyplets of size {n}", census[n], banked_an[n])
-c_dom = said("domino joiner", r"we have \$(\d+)\(n-3\)\\cdot\{\}3\^\{n-4\}\$ junction")
-sp = re.search(r"giving \$\((\d)\\cdot\{\}(\d) \+ (\d)\\cdot\{\}(\d)\)\(n-3\)\\cdot\{\}3\^\{n-4\}\$",prose)
+c_dom = said("domino joiner", r"the next cell may be placed likewise: \$(\d+)\(n-3\)\\,3\^\{\\,n-4\}\$")
+sp = re.search(r"\$\((\d) \\cdot (\d) \+ (\d) \\cdot (\d)\)\(n-3\)\\,3\^\{\\,n-4\}\$", prose)
 if not sp:
     failures.append("FAIL split-joiner sentence not found")
 c_split = int(sp.group(1)) * int(sp.group(2)) + int(sp.group(3)) * int(sp.group(4)) if sp else None
-c_int = said("interior joiner", r"give us \$(\d+)\(n-3\)\\cdot\{\}3\^\{n-4\}\$ options")
-ends = re.search(r"giving \$(\d)\\cdot\{\}(\d)\\cdot\{\}3\^\{n-3\} = (\d+)\\cdot\{\}3\^\{n-4\}\$",prose)
+c_int = said("interior joiner", r"Together, \$(\d+)\(n-3\)\\, 3\^\{\\,n-4\}\$ for an interior joiner")
+ends = re.search(r"giving \$(\d) \\cdot (\d) \\cdot 3\^\{\\,n-3\} = (\d+) \\cdot 3\^\{\\,n-4\}\$", prose)
 if not ends:
     failures.append("FAIL end-joiner sentence not found")
-tot = re.search(r"T\(n, n-1\) = (\d+)\(n-3\)\\cdot\{\}3\^\{n-4\} \+ (\d+)\\cdot\{\}3\^\{n-4\} = \((\d+)n - (\d+)\)\\cdot\{\}3\^\{n-4\}",prose)
+tot = re.search(r"T\(n,n-1\) = (\d+)\(n-3\)\\,3\^\{\\,n-4\} \+ (\d+) \\cdot 3\^\{\\,n-4\} = \((\d+)n - (\d+)\)\\,3\^\{\\,n-4\}", prose)
 if not tot:
     failures.append("FAIL T(n,n-1) display not found")
 if sp and ends and tot:
@@ -615,82 +598,113 @@ for n in range(5, CENSUS_N + 1):
     check(f"census n={n}: no gap of three in a triple or a separated double", sum(v for (k, _), v in t.items() if "gap" in k), 0)
     check(f"census n={n}: T({n},{n - 2}) by enumeration", sum(t.values()), col[n - 2][n])
 
-# ---------------- the L draft's scope numbers ----------------------------
-# paper/technical-report-draft.tex (category L, 2026-09-05) states the same
-# record in its own sentences.  Every number it puts in prose is read here and
-# compared with the record, so that when jasonp strikes paragraphs from it
-# what remains stays right.  Skipped silently if the draft is gone.
-DRAFT = ROOT / "paper" / "technical-report-draft.tex"
-if DRAFT.exists():
-    dprose = re.sub(r"\s+", " ", DRAFT.read_text())
+# ---------------- the engineering numbers the prose states ---------------
+# Measurements, not table values: each is read out of the record document that
+# banked it, so a figure cannot drift in the paper without going red here.
+red22 = (ROOT / "results/redelmeier_row22/PROVENANCE.md").read_text()
+engrec = (ROOT / "docs/engine-record.md").read_text()
+
+check("row 22: the shard count the paper quotes",
+      said("row 22 shards", r"split into \$24\\,(\d+)\$ disjoint subtrees") ,
+      int(re.search(r"([\d,]+) shards split by", red22).group(1).split(",")[1]))
+hours = said("row 22 hours", r"took about \$(\d+)\$ hours on each of three machines")
+walls = [float(h) for h in re.findall(r"wall [\d,]+s = ([\d.]+)h", red22)]
+check("row 22: the paper quotes three machines", len(walls), 3)
+check("row 22: 'about N hours' is the longest wall to the nearest ten hours",
+      hours, round(max(walls) / 10) * 10)
+
+check("a(40): the disk peak the paper quotes",
+      said("a40 disk", r"a peak of \$(\d+)\$~GB of disk"),
+      int(float(re.search(r"\| 40 \|.*?\| ([\d.]+) GB \|", engrec).group(1))))
+cpu = int(re.search(r"\| 40 \|.*?\| ([\d,]+) \(sum\)", engrec).group(1).replace(",", ""))
+check("a(40): the CPU-seconds the paper quotes, to two figures",
+      said("a40 cpu", r"for \$(\d\.\d)\$ million CPU-seconds", float),
+      round(cpu / 1e6, 1))
+check("a(40): the core count the paper quotes",
+      said("a40 cores", r"ran in three stages on an \$(\d+)\$-core machine"),
+      int(re.search(r"dalby is an (\d+)-core", engrec).group(1)))
+w1 = said("word width 1", r"machine words of \$(\d+)\$ bits suffice through")
+w2 = said("word width 2", r"onward used \$(\d+)\$-bit words")
+check("counter widths: the paper's pair is the engine's pair", (w1, w2),
+      tuple(int(x) for x in re.search(r"native (\d+)- or (\d+)-bit", engrec).groups()))
+
+# ---------------- the scope numbers the prose states ---------------------
+# These checks were written on 2026-09-05 against technical-report-draft.tex,
+# the machine-written draft that on 2026-09-06 replaced the earlier report and
+# became technical-report.tex itself.  They read every number the prose states
+# and compare it with the record, so that striking a paragraph cannot leave a
+# wrong sentence behind.  Same file as everything above; kept as its own block
+# because it anchors on sentences rather than on tables.
+if True:
+    dprose = prose
 
     def dsaid(label, pattern, conv=int):
         m = re.search(pattern, dprose)
         if not m:
-            failures.append(f"FAIL draft {label}: sentence not found: /{pattern}/")
+            failures.append(f"FAIL prose {label}: sentence not found: /{pattern}/")
             return None
         return tuple(conv(g) for g in m.groups()) if len(m.groups()) > 1 else conv(m.group(1))
 
     a41_dir = ROOT / "results" / "a41"
     a41h = {int(f.stem[1:]): load_pairs(f) for f in a41_dir.glob("h*.out")}
-    check("draft: a(41) value", dsaid("a(41)", r"a\(41\) = \\num\{(\d+)\}"),
+    check("prose: a(41) value", dsaid("a(41)", r"a\(41\) = \\num\{(\d+)\}"),
           393811462683918679824582849262105)
-    check("draft abstract: A006770 reach", dsaid("A006770 reach", r"\\oeis\{A006770\} to \$n = (\d+)\$"), max(banked_an))
-    check("draft abstract: A030233 reach", dsaid("A030233 reach", r"\\oeis\{A030233\} to \$n = (\d+)\$"), max(onesided))
+    check("prose abstract: A006770 reach", dsaid("A006770 reach", r"\\oeis\{A006770\} to \$n = (\d+)\$"), max(banked_an))
+    check("prose abstract: A030233 reach", dsaid("A030233 reach", r"\\oeis\{A030233\} to \$n = (\d+)\$"), max(onesided))
     r = dsaid("free-class reach", r"\\oeis\{A194596\} to \$n = (\d+)\$")
-    check("draft abstract: A030222/A030234/A030235/A194596 reach", (r, r, r, r),
+    check("prose abstract: A030222/A030234/A030235/A194596 reach", (r, r, r, r),
           (max(free), max(bilateral), max(asymmetric), max(nonpoly)))
-    check("draft: swept heights of a(41) are 1..20", sorted(a41h), list(range(1, 21)))
-    check("draft: a(41) assembled from heights 1..20",
+    check("prose: swept heights of a(41) are 1..20", sorted(a41h), list(range(1, 21)))
+    check("prose: a(41) assembled from heights 1..20",
           dsaid("a(41) heights", r"assembled from an enumeration of heights \$1\$--\$(\d+)\$"), max(a41h))
     for H, rows_ in sorted(a41h.items()):
         for n in range(H, 41):
-            check(f"draft: a(41) sweep T({n},{H}) == banked", rows_.get(n, 0), col[H][n])
-    check("draft: regression cells of the a(41) sweep",
+            check(f"prose: a(41) sweep T({n},{H}) == banked", rows_.get(n, 0), col[H][n])
+    check("prose: regression cells of the a(41) sweep",
           dsaid("regression", r"reproduces the stored triangle at every one of the \$(\d+)\$ entries"),
           sum(41 - H for H in a41h))
-    check("draft: T(41,20) swept equals what the text quotes",
+    check("prose: T(41,20) swept equals what the text quotes",
           dsaid("T(41,20)", r"T\(41,20\) = \\num\{(\d+)\}"), a41h[20][41])
     for H in range(1, motley_top + 1):
         t = C[H][41] - 2 * C[H - 1].get(41, 0) + C[H - 2].get(41, 0)
-        check(f"draft: Motley T(41,{H}) == a(41) sweep", t, a41h[H][41])
-    check("draft: Motley cells at n<=40 and the 19 at n=41",
+        check(f"prose: Motley T(41,{H}) == a(41) sweep", t, a41h[H][41])
+    check("prose: Motley cells at n<=40 and the 19 at n=41",
           dsaid("Motley", r"on all \$(\d+)\$ entries with \$n \\le 40\$ and \$H \\le 19\$ and on the \$(\d+)\$ entries of row \$41\$ it reaches"),
           (motley_cells, motley_top))
-    check("draft: Motley reach in H", dsaid("Motley H", r"run to height \$(\d+)\$ at the size row \$41\$ needs"), motley_top)
-    check("draft: strip cells H<=14", dsaid("strip", r"agrees on all \$(\d+)\$ entries with \$H \\le 14\$"), sum(41 - H for H in range(1, 15)))
-    check("draft: refit reproduces the other real-swept cells",
+    check("prose: Motley reach in H", dsaid("Motley H", r"run to height \$(\d+)\$ at the size row \$41\$ needs"), motley_top)
+    check("prose: strip cells H<=14", dsaid("strip", r"agrees on all \$(\d+)\$ entries with \$H \\le 14\$"), sum(41 - H for H in range(1, 15)))
+    check("prose: refit reproduces the other real-swept cells",
           dsaid("171", r"reproduces all \$(\d+)\$ other enumerated entries with \$H > n/2\$"), n_real)
-    check("draft: 171 in the results paragraph",
+    check("prose: 171 in the results paragraph",
           dsaid("171b", r"later enumerated entry on that diagonal, \$(\d+)\$ entries in all"), n_real)
-    check("draft: P_k wired to", dsaid("wired", r"computes the triangle carries \$P_k\$ for \$k \\le (\d+)\$"), wired)
+    check("prose: P_k wired to", dsaid("wired", r"computes the triangle carries \$P_k\$ for \$k \\le (\d+)\$"), wired)
     for k, n, H in re.findall(r"\$P_\{(\d+)\}\$ at \$T\((\d+),(\d+)\)\$", dprose):
         k, n, H = int(k), int(n), int(H)
-        check(f"draft: holdout P_{k} at T({n},{H}) is on its diagonal, in onset, not a fit cell",
+        check(f"prose: holdout P_{k} at T({n},{H}) is on its diagonal, in onset, not a fit cell",
               (n - H == k, n >= 2 * k + 1, n not in (2 * k + 1, 2 * k + 2), H <= 21), (True, True, True, True))
     cov = dsaid("coverage", r"Over the \$(\d+)\$ entries of the \$n \\le 40\$ triangle, \$(\d+)\$ are enumerated by at least one second program, \$(\d+)\$ are formula entries above height \$21\$, and three")
     ptab = (ROOT / "results" / "provenance-table.md").read_text()
     if cov:
-        check("draft: 820 cells", cov[0], 40 * 41 // 2)
-        check("draft: 189 formula-only cells (provenance table)", cov[2],
+        check("prose: 820 cells", cov[0], 40 * 41 // 2)
+        check("prose: 189 formula-only cells (provenance table)", cov[2],
               int(re.search(r"holdout-validated elsewhere: \*\*(\d+)\*\*", ptab).group(1)))
-        check("draft: 628 + 189 + 3 = 820", cov[1] + cov[2] + 3, cov[0])
-        check("draft: 192 = 189 + 3 (provenance table)",
+        check("prose: 628 + 189 + 3 = 820", cov[1] + cov[2] + 3, cov[0])
+        check("prose: 192 = 189 + 3 (provenance table)",
               int(re.search(r"tag U\): \*\*(\d+)\*\* of the", ptab).group(1)), cov[2] + 3)
-    check("draft: Redelmeier reach", dsaid("Redelmeier", r"confirm the transfer matrix's counts up to \$n = (\d+)\$"), max(red))
-    check("draft: Redelmeier cells agree everywhere", dsaid("Redelmeier rows", r"Every entry of every row \$n \\le (\d+)\$ agrees between Redelmeier"), max(red))
-    check("draft: a(40)^(1/40)", dsaid("fekete", r"\\lambda \\ge a\(40\)\^\{1/40\} = (\d+\.\d+)", float),
+    check("prose: Redelmeier reach", dsaid("Redelmeier", r"confirm the transfer matrix's counts up to \$n = (\d+)\$"), max(red))
+    check("prose: Redelmeier cells agree everywhere", dsaid("Redelmeier rows", r"Every entry of every row \$n \\le (\d+)\$ agrees between Redelmeier"), max(red))
+    check("prose: a(40)^(1/40)", dsaid("fekete", r"\\lambda \\ge a\(40\)\^\{1/40\} = (\d+\.\d+)", float),
           round(banked_an[40] ** (1 / 40), 4))
-    check("draft: a(40)/a(39)", dsaid("ratio", r"a\(40\)/a\(39\) = (\d+\.\d+)", float),
+    check("prose: a(40)/a(39)", dsaid("ratio", r"a\(40\)/a\(39\) = (\d+\.\d+)", float),
           round(banked_an[40] / banked_an[39], 4))
     n32 = dsaid("limits", r"At \$n = (\d+)\$ the one-sided count exceeds \$a\(n\)/4\$ and the free count \$a\(n\)/8\$ by less than one part in a million")
     if n32:
         e4 = Fr(4 * onesided[n32], banked_an[n32]) - 1
         e8 = Fr(8 * free[n32], banked_an[n32]) - 1
-        check(f"draft: one-sided excess at n={n32} in (0, 1e-6)", 0 < e4 < Fr(1, 10 ** 6), True)
-        check(f"draft: free excess at n={n32} in (0, 1e-6)", 0 < e8 < Fr(1, 10 ** 6), True)
-    check("draft: T(n,n-1) display", dsaid("nm1", r"T\(n,n-1\) = (\d+)\(n-3\)\\,3\^\{\\,n-4\} \+ (\d+) \\cdot 3\^\{\\,n-4\} = \((\d+)n - (\d+)\)\\,3\^\{\\,n-4\}"), (25, 30, 25, 45))
-    check("draft: T(n,n-1) cells checked", dsaid("nm1 cells", r"the formula holds on all \$(\d+)\$ computed entries \$3 \\le n \\le 40\$"), 38)
+        check(f"prose: one-sided excess at n={n32} in (0, 1e-6)", 0 < e4 < Fr(1, 10 ** 6), True)
+        check(f"prose: free excess at n={n32} in (0, 1e-6)", 0 < e8 < Fr(1, 10 ** 6), True)
+    check("prose: T(n,n-1) display", dsaid("nm1", r"T\(n,n-1\) = (\d+)\(n-3\)\\,3\^\{\\,n-4\} \+ (\d+) \\cdot 3\^\{\\,n-4\} = \((\d+)n - (\d+)\)\\,3\^\{\\,n-4\}"), (25, 30, 25, 45))
+    check("prose: T(n,n-1) cells checked", dsaid("nm1 cells", r"the formula holds on all \$(\d+)\$ computed entries \$3 \\le n \\le 40\$"), 38)
 
 print(f"{checks} checks, {len(failures)} failures")
 for f in failures:

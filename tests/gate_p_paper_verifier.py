@@ -47,7 +47,13 @@ VERIFIER = ROOT / "paper" / "verify_technical_report.py"
 
 # literal -> why it is not a claim the verifier should read
 ALLOWED = {
-    "2026": r"the year in \date{July 18, 2026} on the title page",
+    "2026": r"the year in \date{} on the title page",
+    "09": r"the month of the release-approval date in the disclosure block",
+    "06": r"the day of the release-approval date in the disclosure block",
+    "90": r"the subscript of the rotation r_{90} in the Burnside setup",
+    "180": r"the subscript of the rotation r_{180} in the Burnside setup",
+    "000105": r"A000105, the free polyominoes: an OEIS entry this project "
+              r"does not compute, subtracted to define A194596",
 }
 
 # Numbers inside these never assert anything about the mathematics.

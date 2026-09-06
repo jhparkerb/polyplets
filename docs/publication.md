@@ -6,7 +6,7 @@ standards a reviewer and a skeptical reader are held to, the audits of the
 main report and of the machine-written papers, the literature searches and
 their verdicts, the removals made before release, one corrected literature
 fact, and a plain summary of what is proved. State as of 2026-09-06: the
-repository is public; the report is `paper/technical-report-draft.tex`,
+repository is public; the report is `paper/technical-report.tex`,
 approved; the OEIS is not to be contacted, and every OEIS item below is
 staged only. Grades follow `results/confidence.md`: a theorem is proved and
 its proof is named; a certificate is an exact computation a reader can re-run

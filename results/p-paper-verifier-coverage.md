@@ -10,11 +10,19 @@ that keeps the answer from drifting. jasonp's prose is never written to.
 
 | paper | verifier | literals | guarded | unguarded |
 |---|---|---|---|---|
-| `paper/technical-report.tex` and `paper/technical-report-draft.tex` | `paper/verify_technical_report.py` (3499 checks) | 294 | **293** | 1 |
+| `paper/technical-report.tex` | `paper/verify_technical_report.py` (3406 checks) | 235 | **229** | 6 |
 
-The one exception is the year in the report's `\date{}`. It is named in the
-gate's `ALLOWED` with that reason, and any new unguarded literal fails the
-gate, so coverage cannot silently drop.
+The six exceptions are named in the gate's `ALLOWED`, each with its reason:
+the year in the report's `\date{}`, the month and day of the release-approval
+date in its disclosure block, the two rotation subscripts of the Burnside
+setup, and A000105, an OEIS entry this project does not compute and subtracts
+only to define A194596. Any new unguarded literal fails the gate, so coverage
+cannot silently drop.
+
+The count changed on 2026-09-06, when the machine-written report replaced the
+partial one and became `technical-report.tex`: a different file, with different
+literals, audited the same way. The measurement before the swap was 293 of 294
+on the file it replaced.
 
 ## Why this measurement exists
 

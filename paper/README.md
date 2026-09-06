@@ -45,8 +45,7 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 
 | file | paper | state |
 |---|---|---|
-| `technical-report.tex` | **P1** — Fixed polyplets through *a*(40) | in progress, jasonp's prose, roughly 40% built |
-| `technical-report-draft.tex` | — | **L**, read in full and approved for release by its named author on 2026-09-06; he did not independently re-derive the mathematics. Same structure, scope and tables as `technical-report.tex`, every claim's backing sentence filled in; `\Ldisclosure`, no draft banner; 10 pp. It is the report `README.md` sends a reader to, and is not liftable into the P file |
+| `technical-report.tex` | **P1** — Fixed polyplets through *a*(40) | **L**, 10 pp, read in full and approved for release by its named author on 2026-09-06; he did not independently re-derive the mathematics. It carries the `\Ldisclosure`. It was written as `technical-report-draft.tex` beside his own partial P1, and promoted in its place at his direction on 2026-09-06; that partial is in git history |
 | `L1-diagonal-law.tex` | **L1** — A diagonal law for row-local lattices, and the mod-3 arithmetic of the king instance | draft, 23pp — **absorbed L2** 2026-08-23 as Part II |
 | `L3-lambda-bounds.tex` | **L3** — A certified two-sided bound for λ | draft, 13pp |
 | `L4-not-dfinite.tex` | **L4** — An arithmetic obstruction to D-finiteness | draft, 10pp |
@@ -110,14 +109,16 @@ paragraph.
 
 ## Who may edit what
 
-**`technical-report.tex` is read-only to the machine.** It is jasonp's prose,
-under the P disclosure, and a machine-written sentence in it would falsify that
-disclosure. Claude does not edit it — not to fix a typo, not to reformat, not to
-revert its own earlier change — without explicit per-instance direction. It also
-deliberately does not `\input shared/preamble.tex`: the duplicated preamble is
-the price of leaving the file alone.
+Everything in this directory is machine-writable today, because every
+manuscript here is category L.
 
-Everything else here is machine-writable.
+That was not true until 2026-09-06. `technical-report.tex` was jasonp's own
+prose under the P disclosure, and was read-only to the machine — not a typo,
+not a reformat, not a revert, without explicit per-instance direction — because
+one machine-written sentence in it would have falsified its disclosure. He
+replaced it with the machine-written report on 2026-09-06. **The rule stands
+for the P papers that get written**: P2 and P3 are his prose, and the same
+prohibition applies to them from their first line.
 
 ## Building
 
@@ -145,7 +146,7 @@ parses it and checks its printed numbers against banked results in `results/`:
 
 | verifier | manuscript | needs |
 |---|---|---|
-| `verify_technical_report.py` | `technical-report.tex`, and every prose number of `technical-report-draft.tex` when that file is present | `results/ns_a40/`, b-files, `results/holes_n18.txt`, `results/a41/`, `results/cutcount_b1/rows41/` |
+| `verify_technical_report.py` | `technical-report.tex`: its tables, and every number it states in prose | `results/ns_a40/`, b-files, `results/holes_n18.txt`, `results/a41/`, `results/cutcount_b1/rows41/` |
 | `verify_l_papers.py` | `L1`, `L3`, `L4`, `L6` — **not `L5` or `L8`** | `results/strip_mu_certificates.log`, `results/triangle.txt`, `results/perimmin_square8_p48_r6.txt`, `results/perimdefect_square{4,8}_n78_k6.txt` |
 
 Each is red-first: it fails on a manuscript whose tables have drifted, and each
