@@ -308,11 +308,14 @@ def write_table(T, a, src, exact, stats):
     L.append("\n## Coverage\n")
     L.append("- cells: **%d**; strip covers **%d**; fixed-height GFs **%d**"
              % (stats["cells_total"], stats["strip_cells"], stats["gf_cells"]))
-    L.append("- honest cell coverage: **%.1f%%**; strip alone **%.1f%%**"
+    L.append("- entries with at least one exact second source: **%d of %d "
+             "(%.1f%%)** -- counting every exact source now available"
+             % (round(stats["exact_any_pct"] * stats["cells_total"] / 100.0),
+                stats["cells_total"], stats["exact_any_pct"]))
+    L.append("- the figures published before Motley and the GF arm, kept for "
+             "comparison: **%.1f%%** with the sources of the day, **%.1f%%** "
+             "from the strip engine alone"
              % (stats["honest_pct"], stats["strip_alone_pct"]))
-    L.append("- honest coverage counting **every** exact source now available "
-             "(the published 72.2 percent predates Motley and the GF arm): "
-             "**%.1f%%**" % stats["exact_any_pct"])
     L.append("- cells with no exact recount, whose value came from a closed "
              "form that is itself holdout-validated elsewhere: **%d**"
              % len(stats["formula_only"]))

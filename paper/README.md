@@ -83,34 +83,15 @@ had a literature-priority pass, dated after their own drafting, recorded in
   closed form, was refuted and is withdrawn. The paper no longer carries a
   do-not-submit banner.
 
-**Withdrawn.** `L9-cutcount-identity.tex` was folded back into
-`docs/proofs/cutcount-identity.md` on 2026-08-23 and is not a manuscript. Its
-own ledger said novelty none claimed and a collision found — the identity is
-the Fortuin–Kasteleyn/Potts correspondence specialised to site clusters in scan
-order — its load-bearing step is a reading of C++, and "that any program
-computes the sum" was not addressed. The proof doc it was drawn from is better
-than it in every part except one: the doc predated the 08-18 pass, so L9's
-FK/Potts finding is now its §9.
+**The numbering has gaps.** L2, L7, L9 and L10 were merged into their
+neighbours or withdrawn in the contraction of 2026-08-23, which took ten papers
+and 108 pages to six and 96; `docs/l-corpus-contraction.md` is that record, and
+L9's material lives in `docs/proofs/cutcount-identity.md`. Those four numbers
+are retired and are not reused.
 
 Planned and not yet drafted: **P2** (two stratifications of A006770) and **P3**
 (king animals by convexity and directedness). Both are jasonp's prose and are
 not the machine's to write.
-
-The numbering is `docs/publication-split.md`'s through L6, and it now has gaps.
-L7 was carved out of L5 and went back into it; L8 and L9 were added 2026-08-18
-for material postdating that document; L10 was added 2026-08-22 and merged into
-L8 the next day, jasonp's "absorb" having meant exactly that. The **2026-08-23
-contraction** (`docs/l-corpus-contraction.md`) is the record: ten papers and 108
-pages became six papers and 96, on the finding that the trim campaign's
-five adversarial phases ran *within* each paper and so could never propose the
-one cut that mattered — deleting a section because another paper already had it.
-**L2, L7, L9 and L10 are retired numbers and are not to be reused.**
-
-L1, L3 and L4 were drafted first because their novelty
-verdicts came back clean and because P2 and P3 cite them. They are also the
-three the 2026-08-23 assessment found carried their weight, which is not a
-coincidence: a clean priority verdict and a result worth the pages are close to
-the same property.
 
 **The standing literature-priority rule applies to all six.** Adopted
 2026-08-17 after a result was derived at length and found afterwards to be
@@ -124,10 +105,8 @@ which its own novelty section states.
 convex polyominoes on the honeycomb lattice. `docs/publication-split.md` requires
 that citation in three places — at the block decomposition, at the mirror
 equality, and in the related-work section. A revision that drops one of them is
-a regression. Before the L7 merge those three were split across two files and
-numbered as two separate "k of 2" pairs, so both said "2 of 2" and neither
-counted to three; they are now `rem:attr1`, `rem:attr2` and the related-work
-paragraph, counted 1-2-3 in one file.
+a regression. They are `rem:attr1`, `rem:attr2` and the related-work
+paragraph.
 
 ## Who may edit what
 

@@ -2,9 +2,9 @@
 
 A map of every other file in this directory, held true by `make gate-docs-index`
 (it fails if a file here is not named below) and by `make gate-citations` (it
-fails if a name below points at nothing). Rewritten 2026-09-06 after the
-consolidation, which merged most of this directory into the four records of
-group 3; the deleted files and the commit each is readable at are listed in
+fails if a name below points at nothing). Most of what used to be in this
+directory was merged into the records of group 3 in September 2026; every file
+deleted then is listed, with the commit it is readable at, in
 `docs/consolidation-plan.md`.
 
 Findings live in `results/`. This directory is how the machinery works, what was
@@ -18,7 +18,7 @@ jasonp's machine, and are not missing from a clone by accident.
 | file | what |
 |---|---|
 | `docs/glossary.md` | terms used across every doc and result note |
-| `docs/engine-design.md` | the production enumerator, as built |
+| `docs/engine-design.md` | the 2026-06 build design of the run-file engine; superseded in part, and the as-shipped record is `docs/engine-record.md` |
 | `docs/formats.md` | POLYRUN run files, checkpoints, cost profiles |
 | `docs/observability.md` | the provenance/heartbeat contract every long job obeys |
 | `docs/engineering-standards.md` | red-first tests, fail-closed guards, hooks |

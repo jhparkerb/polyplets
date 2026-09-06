@@ -70,8 +70,8 @@ second program directly, or given by a formula pinned on that program's own
 cells. Whole-row enumeration by a third, unrelated program (Redelmeier) reaches
 n = 22. The work of 2026-08-20 onward did not touch any of this.
 
-**2. a(n) for n = 36 to 39 — high, and this is the largest gain of the
-session.**
+**2. a(n) for n = 36 to 39 — high. This was the largest gain of the work of
+2026-08-20 to 09-05.**
 Every cell of every one of those rows is now either computed directly by the
 second program, or derived by formula from that program's own data. No part
 depends on the original program. Each row was rebuilt from scratch that way

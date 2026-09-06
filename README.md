@@ -29,16 +29,25 @@ cell of the triangle what confirms it and by which independent source. It is
 generated, and `make gate-provenance` fails if any figure in it drifts from the
 banked rows — verified fail-closed, not just asserted: planting a grown triangle
 turns all six of its figures red
-([`docs/engine-record.md`](docs/engine-record.md) section 8.4, which asks the
-same question of all 33 gates and records what it found).
+([`docs/engine-record.md`](docs/engine-record.md) section 8.4, which plants
+into each of the 33 gates the staleness it should catch and records which
+caught it; the rest of that file is the engine's measurement log and is not
+required reading).
 
 **The report** is [`paper/technical-report-draft.tex`](paper/technical-report-draft.tex),
 ten pages, machine-written under the authorship rules of `docs/publication-split.md`
 and approved by the author on 2026-09-06: definitions, the tables, the methods,
-and what stands behind each term. Its every number is read back from the
-stored results by `paper/verify_technical_report.py`. Six shorter papers on the
-analytic and arithmetic side are drafted and carry their own verification
-ledgers; `paper/README.md` is their index. Nothing in this repo claims more
+and what stands behind each term. Its tables are the banked values, and
+`paper/verify_technical_report.py` re-reads every one of them, and every number
+in its prose, from `results/` (3499 checks). The perturbation audit that
+measures what a verifier actually reads has been run on `technical-report.tex`
+(293 of 294 literals guarded, `results/p-paper-verifier-coverage.md`) and not
+yet on the draft. Six shorter papers on the analytic and arithmetic side are
+drafts. Each states a per-result verification ledger, and every one of those
+ledgers currently reads "human verification: none";
+`results/l-paper-verifier-coverage.md` measures how much of each is
+machine-checked, which is 74 of 531 numbers, with L5 and L8 at zero.
+`paper/README.md` is their index. Nothing in this repo claims more
 than its tier.
 
 **Read these five files first:** `paper/technical-report-draft.tex` (or its
@@ -65,7 +74,7 @@ the names this project gave its own machinery.
 | `tests/engine/` | the C++ gate drivers and unit tests of the production engine, built by `make` into `build/ns/` |
 | `verify/` | a small Go tool and package that reads run artifacts independently of the engine: CRC and architecture-fitness checks |
 | `fixtures/` | external ground truth — OEIS b-files with their checksums — that most gates compare against |
-| `polyplets/` | the **Lean 4 formalization** (34 files, sorry-free): the peeling recursion, the diagonal-law shape theorem, and the grand form, with the production P_k pinned for k≤18 from two real-swept cells per level; axiom footprints are `#guard_msgs`-enforced. Status: `polyplets/PROOF-STATUS.md` |
+| `polyplets/` | the **Lean 4 formalization** (86 sorry-free modules, plus one deliberately unproved skeleton kept outside the build): the peeling recursion, the diagonal-law shape theorem, and the grand form, with the production P_k pinned for k≤18 from two real-swept cells per level; axiom footprints are `#guard_msgs`-enforced. Status: `polyplets/PROOF-STATUS.md` |
 | `oeis/` | staged OEIS extensions, b-files and new-sequence drafts, `wave2/` included. Nothing has been submitted and nothing is auto-submitted |
 
 The repository is called polyominoes for historical reasons; the object it
@@ -85,6 +94,9 @@ and perimeter work all postdate it.
 ```sh
 make && scripts/dalby_term.sh 26
 ```
+
+(The runner is named for the machine it was tuned on; it reads its core count
+and its repository root from the box it is on, and runs anywhere.)
 
 That prints `a(26) = 102607513847014153892` and, before it does, re-derives
 a(1)–a(25) and checks every one against `fixtures/b006770.txt` and the banked

@@ -19,8 +19,9 @@ equivalently, with P_k(n) := 3^(1+2k) q_k(n−k):
 
 > T(n, n−k) = P_k(n) · 3^(n−1−3k)  for all n ≥ 2k+1,
 
-and P_k takes integer values at every integer. (Validity from n = 2k+1 is
-proved; that it *fails* at n = 2k is verified on all banked data, k ≤ 17.)
+and P_k takes integer values at every integer. Validity from n = 2k+1 is
+proved below; so is failure at n = 2k, by the mod-3 argument under "Loose
+ends" at the foot of this file, so the onset is sharp for every k.
 
 ## Setup
 
@@ -110,14 +111,10 @@ v₃(a_j) ≥ −(2k+1) with binomials integer, so **P_k(n) ∈ ℤ for every in
 n**. Equivalently, P_k's coefficients in the Newton (binomial) basis are
 integers — verified numerically at every wired level k = 1..19.
 
-(An earlier note here claimed integer *coefficients in the monomial basis*
-as a stronger fact "banked empirically for k ≤ 17". That is FALSE for every
-k ≥ 2 and always was: the leading coefficient is 25^k/k!, so P_2's is 625/2.
-Measured at all 19 wired levels, no monomial coefficient set is integral.
-Retracted AUDIT-2026-07-30 P8. The nearby fact that *is* true, and is what
-the engine's storage form relies on, is stated as an open item below:
-k!·P_k ∈ ℤ[n]. Nothing downstream needs either — all mod-3^j arguments use
-values.)
+P_k is integer-*valued*; its monomial coefficients are not integers, the
+leading one being 25^k/k!. What the engine's storage form relies on is the
+weaker k!·P_k ∈ ℤ[n], stated below. Nothing downstream needs either: every
+mod-3^j argument uses values.
 
 ## Corollary — the grand form G·H^n
 
@@ -136,7 +133,7 @@ it is what the master equation of `results/diagonal-formula.md` solves. The
 Ternary Spine's remaining conditionality therefore reduces to the finitely
 many enumerated weights that enter each modulus (5 integers mod 27).
 
-## What remains open (deliberately)
+## Loose ends, and the two items that closed
 
 - **Onset sharpness in general — CLOSED 2026-09-05.** The theorem proves
   validity from n = 2k+1; failure at n = 2k is a non-cancellation
@@ -149,9 +146,9 @@ many enumerated weights that enter each modulus (5 integers mod 27).
   `N_k ≡ (−1)^(k+1) (mod 3)`, so `N_k ≠ 0` for every `k ≥ 1`. Proof and gate
   (`experiments/depth1_sharpness.py`) in that note; it rests on its
   identity (II), derived from the chain identity here but not yet written up
-  standalone. The old worry that the natural route (rational GF for the top
-  coefficient) fails — the all-pairs family is not C-finite, refuted at
-  ℓ=16 — is moot: the GF is algebraic, not rational.
+  standalone. The route through a rational generating function for the top
+  coefficient does not exist — the all-pairs family is not C-finite, refuted
+  at ℓ=16 — and is not needed: the generating function is algebraic.
 - **Denominator k! — CLOSED both ways (2026-07-31).** k!·P_k ∈ ℤ[n] is a
   THEOREM for all k (integer-valuedness + deg ≤ k; Lean
   `production_factorial_int` in `IntCoeff.lean`) — it is how
@@ -161,13 +158,7 @@ many enumerated weights that enter each modulus (5 integers mod 27).
   ĉ_k = v₅(k!) − H(k), H(k) = v₅(⌊k/2⌋!) − [k ≡ 1 (mod 10)]
   (`results/arithmetic-structure.md`; lower bound proved, equality exact
   k ≤ 19). Only the 5-part ever drops: v_p(D_k) = v_p(k!) for p ≠ 5 at
-  every measured level. (The old sentence here, "25^k/k! shows k! cannot
-  be improved", was wrong: 25^k/k! in lowest terms has no 5-part in its
-  denominator — that is exactly WHY the 5-part drops.)
-  (This replaces a garbled entry that claimed integer coefficients in the
-  MONOMIAL basis "observed k ≤ 17" — measured false at every k ≥ 2, since
-  25^k/k! is not an integer; retracted AUDIT-2026-07-30 P8. Integer *values*
-  are proved above, and the equivalent Newton-basis integrality is verified
-  numerically k = 1..19.)
+  every measured level. The 5-part is the part that drops because
+  25^k/k! in lowest terms has no 5 in its denominator.
 - Closed forms for multi-row cluster weights (open question raised, not a
   gap in this proof).

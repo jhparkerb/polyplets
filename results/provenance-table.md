@@ -22,8 +22,8 @@ drifts from the note that publishes it.
 ## Coverage
 
 - cells: **820**; strip covers **469**; fixed-height GFs **355**
-- honest cell coverage: **72.2%**; strip alone **57.2%**
-- honest coverage counting **every** exact source now available (the published 72.2 percent predates Motley and the GF arm): **76.6%**
+- entries with at least one exact second source: **628 of 820 (76.6%)** -- counting every exact source now available
+- the figures published before Motley and the GF arm, kept for comparison: **72.2%** with the sources of the day, **57.2%** from the strip engine alone
 - cells with no exact recount, whose value came from a closed form that is itself holdout-validated elsewhere: **189**
 - cells carrying **only** the mod-4 congruence — no exact recount, no closed form: **3**
 
