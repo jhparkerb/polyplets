@@ -6,8 +6,8 @@
 // first task: an independent connectivity rule per proposer).
 //
 // Lattices:
-//   king   : cells Z^2, u ~ v iff max(|dx|,|dy|) == 1   (8 neighbours)
-//   square : cells Z^2, u ~ v iff |dx|+|dy| == 1        (4 neighbours)
+//   king   : cells Z^2, u ~ v iff max(|dx|,|dy|) == 1   (8 neighbors)
+//   square : cells Z^2, u ~ v iff |dx|+|dy| == 1        (4 neighbors)
 //   tri    : polyiamonds in the (x,y,orientation-by-parity) coordinates:
 //            (x,y) ~ (x+-1,y) always; (x,y) ~ (x,y+1) iff x+y+p odd,
 //            where p in {0,1} is the run's parity offset. Fixed polyiamonds
@@ -18,7 +18,7 @@
 // Method: Redelmeier untried-set enumeration of connected sets containing the
 // root (0,0), restricted to the half-plane y > 0 or (y == 0 and x >= 0), so
 // each translation class is counted exactly once (the lex-min cell in (y,x)
-// order is normalised to the origin). All cells have y >= 0 and the root has
+// order is normalized to the origin). All cells have y >= 0 and the root has
 // y = 0, so bounding-box height = maxy + 1.
 //
 // Output: lines "n H count" for 1 <= n <= N, plus row sums "n SUM count".
@@ -42,9 +42,9 @@ static int parityOff;              // tri only
 
 static inline int cid(int x, int y) { return y * W + (x + N); }
 
-// neighbours of (x,y) under the current lattice rule, within the allowed
+// neighbors of (x,y) under the current lattice rule, within the allowed
 // half-plane (y>0, or y==0 && x>=0), into out[]; returns count.
-static inline int neighbours(int x, int y, int out[][2]) {
+static inline int neighbors(int x, int y, int out[][2]) {
     int m = 0;
     if (lattice == 0) {                       // king: Chebyshev distance 1
         for (int dy = -1; dy <= 1; dy++)
@@ -83,7 +83,7 @@ static void rec(int size, int ufirst, int maxy) {
         if (size + 1 < N) {
             int save = ulen;
             int nb[8][2];
-            int k = neighbours(x, y, nb);
+            int k = neighbors(x, y, nb);
             for (int j = 0; j < k; j++) {
                 int id = cid(nb[j][0], nb[j][1]);
                 if (!reached[id]) { reached[id] = 1; untried[ulen++] = id; }

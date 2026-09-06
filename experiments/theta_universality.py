@@ -32,7 +32,7 @@ RED controls (all must fire):
   - a synthetic series at the square lambda with theta = -1 must recover it,
     so a null result on real square data is not the scaling being wrong;
   - the square series must be rejected if its first terms do not match the
-    known head 1, 2, 6, 19, 63, 216 -- a wrong file must not be analysed.
+    known head 1, 2, 6, 19, 63, 216 -- a wrong file must not be analyzed.
 
 Usage: python3 experiments/theta_universality.py [--square-bfile PATH]
 """
@@ -46,7 +46,7 @@ from series_da import spectrum, load_sequence  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # The head of A001168 (fixed polyominoes), n = 1..6.  A file that does not
-# start this way is not the square-lattice series and must not be analysed.
+# start this way is not the square-lattice series and must not be analyzed.
 SQUARE_HEAD = [1, 2, 6, 19, 63, 216]
 
 # Rescaling anchors: the series is divided by lam0^n before the linear solve,

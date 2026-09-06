@@ -154,7 +154,7 @@ static void check(bool ok, const char* what) {
   }
 }
 
-// Run all identities on one grid. `name` non-null prints a labelled report.
+// Run all identities on one grid. `name` non-null prints a labeled report.
 static void exercise(const Grid& g, const char* name) {
   const int H = rows(g), W = cols(g);
   const int e8 = eulerBrute4(g, Conn::FG8);  // 4*E_8fg

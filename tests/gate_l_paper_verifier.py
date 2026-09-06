@@ -32,7 +32,7 @@ some in loops).  Kill mechanisms, in preference order:
 
 The matrix is the SITES table below: one row per ok() site, in verifier
 source order, each carrying its kill(s) and the failure-message fragment that
-attributes a detection to that site and not to a neighbour.  RED_SITES lists
+attributes a detection to that site and not to a neighbor.  RED_SITES lists
 the negative controls, which corrupt their own inputs on every verifier run;
 the baseline run (which must be clean) is the proof each of them fired.
 

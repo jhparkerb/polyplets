@@ -251,7 +251,7 @@ That criterion cannot engage with our object at all. Every G_H is rational
 with radius 1/mu_H, and mu_H < lambda, so F(x,y) is analytic in a bidisc.
 Condition (i) fails at the first hurdle.
 
-**Three distinct obstruction types now mapped in this neighbourhood:**
+**Three distinct obstruction types now mapped in this neighborhood:**
 
 | | obstruction | lever |
 |---|---|---|
@@ -307,7 +307,7 @@ at the extraction step, carries a "Relation to existing work" paragraph
 stating what is shared and what diverges, claims the Northcott endgame with
 the absence caveat explicit instead of implied, and records the
 D_A-finiteness ceiling. A stale citation was fixed in passing: the
-`rechnitzer` bibitem had labelled JCTA 113 (2006) 520-546 as "Haruspicy 3";
+`rechnitzer` bibitem had labeled JCTA 113 (2006) 520-546 as "Haruspicy 3";
 that is Haruspicy 2 (Haruspicy 3 is the directed bond-animal paper).
 
 Nothing further is owed here. The two optional levers above are for a
@@ -334,7 +334,7 @@ different configuration: they bound the Weil heights of the *coefficients*
 and conclude rationality; we bound degree and house of the *slice growth
 constants* and conclude a contradiction. Their forward citations (15/3/4)
 contain no combinatorial application. Now cited in the paper's "Relation to
-existing work" paragraph, so that paragraph names the arithmetic neighbours
+existing work" paragraph, so that paragraph names the arithmetic neighbors
 instead of resting on absence alone.
 
 Coverage caveat kept honest: OpenAlex and Semantic Scholar disagree on counts

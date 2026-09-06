@@ -27,12 +27,12 @@ BREAKTHROUGH section; `experiments/king_bui.py`).
 
 The intended witnesses are the marked-corner counting functions
 `φ i n = #(P, c)` — `P` an `n`-cell king animal (fixed polyplet), `c` a cell
-of `P` whose neighbourhood avoids type `i`'s forbidden set (the type table is
+of `P` whose neighborhood avoids type `i`'s forbidden set (the type table is
 in `Upper/BuiData2.lean`) — with type `0` the G8 corner type (W, SW, S, SE
 forbidden). For them:
 
 * the **base bounds** hold because a marked cell with all eight king
-  neighbours forbidden is an isolated animal (`n = 1` only, one such pair);
+  neighbors forbidden is an isolated animal (`n = 1` only, one such pair);
 * the **casing recurrences** hold because casing on the free cell `d`
   partitions into `d`-empty (exactly type `T' = T + {d}`, an equality) and
   `d`-occupied, which the split into the `d`-piece (type `D`) convolved with

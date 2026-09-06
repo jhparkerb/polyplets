@@ -26,13 +26,13 @@ Let the double row's cells sit at columns c and c+g, g ≥ 1.
 - **g = 1** (domino, c and c+1): mutually adjacent. ✓
 - **g = 2** (c and c+2): not mutually adjacent. They join **only** through a
   "bridge" — a cell at column c+1 in an adjacent row, which is king-adjacent to
-  both. ✓ exactly when a neighbour row's single cell is at c+1.
-- **g ≥ 3**: no single neighbour cell is within 1 of both, and the two would-be
+  both. ✓ exactly when a neighbor row's single cell is at c+1.
+- **g ≥ 3**: no single neighbor cell is within 1 of both, and the two would-be
   components (below ∪ {c} vs. above ∪ {c+g}) share no joining edge. **Impossible.**
 
 *Proof of the g≥3 impossibility / g=2 bridge:* the cell at c connects only to
-neighbour cells in columns {c−1,c,c+1}; the cell at c+g only to {c+g−1,c+g,c+g+1}.
-For both to be non-isolated and in one component, some neighbour cell must be
+neighbor cells in columns {c−1,c,c+1}; the cell at c+g only to {c+g−1,c+g,c+g+1}.
+For both to be non-isolated and in one component, some neighbor cell must be
 adjacent to both — possible iff those two intervals overlap, i.e. g ≤ 2, and for
 g = 2 the unique common column is c+1.
 
@@ -46,22 +46,22 @@ total count is a **product** over transitions, summed over the doubled row's
 position and gap.
 
 - A **single→single** transition has offset ∈ {−1, 0, +1}: **3** choices.
-- The doubled row + its neighbour transition(s) form a **gadget**; the remaining
+- The doubled row + its neighbor transition(s) form a **gadget**; the remaining
   transitions are a free 3-chain. Of the n−2 total transitions, the gadget
   consumes 2 (if the double row is interior) or 1 (if it is a boundary row).
 
-**Gadget multiplicities** (single neighbour must be king-adjacent to the pair; for
-g=2 at least one neighbour sits on the bridge column c+1):
+**Gadget multiplicities** (single neighbor must be king-adjacent to the pair; for
+g=2 at least one neighbor sits on the bridge column c+1):
 
 | | interior (2 sides) | boundary (1 side) |
 |---|---|---|
 | **g = 1** (domino) | 4 × 4 = **16** | **4** |
 | **g = 2** (split + bridge) | 5² − 4² = **9** | **1** |
 
-- *g=1 side:* the single neighbour ∈ {c−1, c, c+1, c+2} → 4 offsets.
+- *g=1 side:* the single neighbor ∈ {c−1, c, c+1, c+2} → 4 offsets.
 - *g=2 interior:* each side ∈ {c−1,…,c+3} = 5 offsets, minus the 4×4 with neither
   side on the bridge → 9.
-- *g=2 boundary:* the lone neighbour is forced onto c+1 → 1.
+- *g=2 boundary:* the lone neighbor is forced onto c+1 → 1.
 
 ## 5. Sum over position and gap
 

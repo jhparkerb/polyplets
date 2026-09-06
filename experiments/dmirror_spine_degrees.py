@@ -9,7 +9,7 @@ parities, which is degree 1 where k-1 would be 2.
 
 This measures the degree properly, with holdouts, and asks the second question
 the tables raise: `d_anti` is period-2 quasi-polynomial (the anti-diagonal has
-a centre cell only for odd S), but does `d_main` have any parity dependence at
+a center cell only for odd S), but does `d_main` have any parity dependence at
 all, or is one polynomial in S enough?
 
 METHOD.  For each family and each level k, take the cells where the split is

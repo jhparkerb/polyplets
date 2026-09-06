@@ -2,7 +2,7 @@
 """SECOND TERM (docs/onset-defect-plans.md (deleted) §1).
 
 D_1(k) = C_1 * 9^k * k^(-1/2) * (1 + a/k + b/k^2 + ...) with
-C_1 = sqrt(6)/(27 sqrt(pi)).  Extract `a` and try to recognise it.
+C_1 = sqrt(6)/(27 sqrt(pi)).  Extract `a` and try to recognize it.
 
 Two things fall out for free:
 

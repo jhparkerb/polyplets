@@ -1,7 +1,7 @@
 # L-paper readability rules
 
 Rules 1–9 are derived from jasonp's edits to L2; 10–14 from the issues those
-edits pointed at, generalised across all seven papers; 15–17 from his rulings
+edits pointed at, generalized across all seven papers; 15–17 from his rulings
 on the coinage sweep of `L-coinage-candidates.md`.
 
 ## Sentence and paragraph
@@ -51,7 +51,7 @@ on the coinage sweep of `L-coinage-candidates.md`.
     lattice" — not our compressions "king animals", "staircase animals", "rook
     lattice". A compression that survives must be defined at first use against
     the cited phrase, as L1 does for polyplets.
-17. **Engine artefacts keep their names.** frozen-successor-array kernel,
+17. **Engine artifacts keep their names.** frozen-successor-array kernel,
     production column-sweep kernel, compiled-evaluation leaf and surface,
     parent-direction string: the names match the reproduction section and the
     repo, so a reader can find the code they name. This is the one place a bare

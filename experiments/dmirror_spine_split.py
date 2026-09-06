@@ -22,7 +22,7 @@ with no geometry beyond what the sweep already tracks:
   * a main-spine animal at level k is within k defects of the full diagonal, so
     it has >= S-k occupied corners;
   * an anti-spine animal has the anti-diagonal (i, S-1-i), whose cells are ARM
-    cells at offset p = S-1-2i, never corners -- except the centre cell when S
+    cells at offset p = S-1-2i, never corners -- except the center cell when S
     is odd, which is the corner of hook (S-1)/2.  So it has <= k+1 corners.
 
 For S > 2k those ranges are disjoint, which is exactly the regime the pinning
@@ -78,7 +78,7 @@ def banked():
 #   within a hook   corner ~ position 1 (both arms touch the corner and each
 #                   other); position p ~ position p+1 along each arm; the two
 #                   arms meet only at p = 1 (cells (k,k+1) and (k+1,k) are
-#                   diagonal neighbours).  So positions p and p+1 are adjacent
+#                   diagonal neighbors).  So positions p and p+1 are adjacent
 #                   for every p >= 0.
 #   hook k to k+1   column-arm cell (k, k+p) touches (k+1, k+1+q) iff
 #                   |p - q - 1| <= 1, i.e. q in {p-2, p-1, p}; the corner of

@@ -57,7 +57,7 @@ three with clean novelty verdicts, which is not a coincidence.
 | **L4** not D-finite | kept as is | 10 | Unconditional, cheap, transports verbatim to polyominoes, polyhexes and polyiamonds |
 | **L2 → L1** | merged, as Part II | 24 → **23** | L1's abstract already sold L2's spine cubic as its own third consequence; every L2 theorem was conditional on L1's Theorems A and C; L2 cited L1 eight times and spent its whole Setup restating the two results it imported |
 | **L7 → L5** | merged | 25 → **21** | L7 called itself the companion in its first paragraph, restated L5's definition and four-block table verbatim — `tab:blocks` label collision included — quoted three L5 results without reproof, and was advertised in L5's abstract |
-| **L10 → L8** | merged | 16 → **15** | jasonp's 08-22 ruling was "L8 absorbs the Undertow material", and absorb meant this. L10 spent about two of its seven pages restating L8's law, frame and square-lattice check; L8 carried zero `\cite` keys and L10 carried the near neighbour the priority pass found |
+| **L10 → L8** | merged | 16 → **15** | jasonp's 08-22 ruling was "L8 absorbs the Undertow material", and absorb meant this. L10 spent about two of its seven pages restating L8's law, frame and square-lattice check; L8 carried zero `\cite` keys and L10 carried the near neighbor the priority pass found |
 | **L6** | inverted and contracted | 13 → **14** | The minimum end leads, being the half the priority pass left whole; the maximum end now opens by saying it is the king analogue of a published theorem. The standalone "k = 6 verdict" section is dissolved into the four claims it decides |
 | **L9** | withdrawn | 7 → **0** | Its own ledger: *novelty none claimed, and a collision found*; the load-bearing step is a reading of C++; "that any program computes the sum" is not addressed. Folded into `docs/proofs/cutcount-identity.md`, which was better than it in every part except one — the doc predated the 08-18 priority pass, so L9's FK/Potts finding is now its §9 |
 
@@ -127,7 +127,7 @@ into a family of them. That is a stronger L3, not a thinner L11.
 **Of the five priced runs in `docs/state-2026-08-23.md` §5, none changes a
 sentence in any L paper.** The five terms, the census past H = 17 and the H = 13
 rank test are ladder and reach work, and the ladder closed at a(41). c₆ on the
-main-diagonal spine is a day of compute to settle a judgement call about a
+main-diagonal spine is a day of compute to settle a judgment call about a
 family no paper claims.
 
 ## 2. The priority passes over L1-L9, 2026-08-18
@@ -159,16 +159,16 @@ after this one rather than before it. Anything unobtainable goes to
 
 Searched: connected-subgraph counting by transfer matrix with `q^{components}`
 weights; Fortuin–Kasteleyn random-cluster versus Potts spin representation;
-Blöte–Nightingale transfer matrices; Hoshen–Kopelman cluster labelling;
+Blöte–Nightingale transfer matrices; Hoshen–Kopelman cluster labeling;
 Jensen's polyomino algorithm and the Barequet-group complexity analyses of it.
 
 **Finding.** The identity is an instance of the Fortuin–Kasteleyn/Potts
 correspondence. The random-cluster partition function is
 `Z = Σ_g v^{bonds} q^{clusters}`, and counting connected subgraphs is its
 `q → 0`, `v = 1` content; the standard device for evaluating `q^{c}` without
-tracking connectivity is exactly the **spin representation** — colour the
+tracking connectivity is exactly the **spin representation** — color the
 components, count colourings — which is what our model does, scan order and
-all. The unsigned ancestor of the scan-order labelling is Hoshen–Kopelman
+all. The unsigned ancestor of the scan-order labeling is Hoshen–Kopelman
 (1976). The connectivity-tracking method our engine is an alternative to is
 Jensen's signature algorithm.
 
@@ -191,7 +191,7 @@ the second source, and nothing published states that rule.
 ### L6 — perimeter gradings. COLLISION on the structure, as suspected, and worse than recorded.
 
 Searched: Asinowski–Barequet–Zheng and Barequet–Magal on fixed perimeter
-defect; the polycube generalisation; minimal-perimeter animals and the
+defect; the polycube generalization; minimal-perimeter animals and the
 constant-isomer conjecture. **The Asinowski slides were obtained in full text
 this pass** (`mat.univie.ac.at/~slc/wpapers/s79vortrag/asinowski.pdf`), where
 the repository previously held only the fact of their existence.
@@ -253,7 +253,7 @@ Enting–Guttmann 1989) is unchanged and remains cited in three places.
 ### L2 — the mod-3 arithmetic. No collision; one adjacent method.
 
 Searched: congruences modulo powers of 3 for combinatorial sequences;
-Krattenthaler–Müller's method for mod-`3^k` behaviour of recursive sequences;
+Krattenthaler–Müller's method for mod-`3^k` behavior of recursive sequences;
 Rowland–Yassawi automatic congruences for diagonals of rational functions;
 Smith normal form of combinatorial triangles; base-3 digit-product formulas.
 
@@ -316,10 +316,10 @@ connectivity: `p = 6n − e − 2|E|` counting the two ways perimeter is lost,
 giving `p <= 4n+2` and `k = e + 2r` with `r` the circuit rank (their
 Proposition 2.1 — our `k = 2c + t`). Rationality (their Theorem 3.1) is proved
 by *cut shrinking*: a `j`-orthogonal cut is a maximal run of grid slices whose
-projection is a set of pairwise non-adjacent cells with no common neighbours;
+projection is a set of pairwise non-adjacent cells with no common neighbors;
 deleting a cut's slices and regluing preserves the defect, cuts are pairwise
 independent, so every polycube shrinks to a unique reduced one. A pattern class
-is a fibre of that map, its generating function is `x^b` times a product of
+is a fiber of that map, its generating function is `x^b` times a product of
 `1/(1−x^s)` (s = number of ports of a cut), hence cyclotomic. Finiteness of the
 class count comes from bounding three kinds of special cell — excess cells,
 L-cells, and degree-1 cells — each against `k = e + 2r`, with the degree-1
@@ -328,7 +328,7 @@ degree 6.
 
 **Verdict for L6: the king column is a separate derivation, not a corollary.**
 Every mechanical step above is stated in face-adjacency terms — the perimeter
-accounting `6n − e − 2|E|`, the L-cell definition ("occupied neighbours that
+accounting `6n − e − 2|E|`, the L-cell definition ("occupied neighbors that
 are not opposite"), the non-adjacency condition defining a cut, and the
 handshake bound at max degree 6. None of it is stated lattice-generically, and
 king adjacency breaks the cut condition in particular. The *shape* of the
@@ -360,7 +360,7 @@ drafted the day before with a banner saying no pass had been run. The
 manuscript was merged into `paper/L8-below-onset.tex` the next day and this
 pass's verdict stands there as its Novelty section.
 
-**Verdict: a near neighbour exists, in a different problem, and the paper must
+**Verdict: a near neighbor exists, in a different problem, and the paper must
 cite it. No collision on the specific claim.**
 
 ### What was searched
@@ -378,11 +378,11 @@ Five web searches, in this order:
 5. "finite lattice method" + corrections known exactly + quasi-polynomial +
    onset + validity range + animals.
 
-### What it found — the near neighbour, and it is close
+### What it found — the near neighbor, and it is close
 
 **Directed-percolation series extrapolation by correction terms.** Baxter and
 Guttmann (1988), then Jensen and Guttmann through the 1990s, extend the
-percolation-probability series for directed lattices by exactly the manoeuvre
+percolation-probability series for directed lattices by exactly the maneuver
 this paper's method is built on: a finite-lattice calculation of size `N` is
 exact only up to some order, the difference between the exact infinite series
 and the finite one is a *correction term* `d_{N,r}`, and knowing those

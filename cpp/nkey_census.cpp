@@ -2,7 +2,7 @@
 // height H, exactly, with no extrapolation.
 //
 // WHY.  results/closed-doors.md establishes that two strip states
-// are equivalent iff they carry the same multiset of block neighbourhoods
+// are equivalent iff they carry the same multiset of block neighborhoods
 // N(b) = rows(b) dilated by +-1 -- a congruence, gated exhaustively, over any
 // semiring.  The merged set IS the end-of-column frontier that
 // docs/engine-record.md names as the engine's wall.  What the merge file
@@ -326,7 +326,7 @@ struct SharedHash {
 
 // Put the old blocks in an order that depends only on what they are and what
 // touches them, so two states that differ by a relabelling become one.  This
-// is an optimisation and nothing rests on it: a labelling that fails to
+// is an optimization and nothing rests on it: a labeling that fails to
 // canonicalise costs duplicated work, never a wrong count, because the answer
 // is a set of KEYS and every key is sorted before it is counted.
 void canonBlocks(Shared& s) {

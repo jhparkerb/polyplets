@@ -1,4 +1,4 @@
-// motley_par.cpp — PARALLEL colour-symmetrized spin transfer matrix (Motley).
+// motley_par.cpp — PARALLEL color-symmetrized spin transfer matrix (Motley).
 //
 // Same rule, same answer, more cores.  `results/second-sources.md` §4 names the
 // wall this file removes: "The engine is still single-threaded ... the wall
@@ -164,7 +164,7 @@ struct Bucket {
 
 // A thread's private slice of the index space.  The row counter is the one
 // truly global write in the cell-step, so it is handed out in blocks: 80
-// threads doing fetch_add per insertion serialise on one cache line and cost
+// threads doing fetch_add per insertion serialize on one cache line and cost
 // more than the insertion.
 struct Alloc {
   size_t next = 0, end = 0;

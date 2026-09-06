@@ -222,7 +222,7 @@ def sources(n, h, motley_h=MOTLEY_H):
     return out
 
 
-def analyse(T, motley_h=MOTLEY_H):
+def analyze(T, motley_h=MOTLEY_H):
     cells = sorted(T)
     a = {}
     for (n, h), v in T.items():
@@ -294,7 +294,7 @@ def write_table(T, a, src, exact, stats):
     L.append("| S | strip transfer matrix | H <= 14 | shares the union-find rule |")
     L.append("| P | closed forms P_k on really-swept cells | k <= 18, n >= 2k+1, H <= 21 | full where credited |")
     L.append("| M | Motley/cutcount, the second enumerator: it counts by "
-             "colouring and never decides connectivity, so it is what "
+             "coloring and never decides connectivity, so it is what "
              "`results/confidence.md` calls the second program | H <= %d | "
              "rule-independent |" % MOTLEY_H)
     L.append("| U | Undertow tower refitted to Motley's cells -- the closed "
@@ -353,7 +353,7 @@ def write_table(T, a, src, exact, stats):
 
 def selftest(T):
     """RED control: a corrupted rule must be caught."""
-    a, src, exact, stats = analyse(T, motley_h=MOTLEY_H)
+    a, src, exact, stats = analyze(T, motley_h=MOTLEY_H)
     bad = check(stats, verbose=False)
     if bad:
         print("SELFTEST FAILED: clean run should pass:", bad)
@@ -362,7 +362,7 @@ def selftest(T):
     # of congruence-only cells.  (The old control doubled a cell's value and
     # watched a share move; shares are gone, and a cell count is the right
     # thing to guard anyway -- it is what the table asserts.)
-    _, _, _, stats2 = analyse(T, motley_h=MOTLEY_H + 1)
+    _, _, _, stats2 = analyze(T, motley_h=MOTLEY_H + 1)
     if not check(stats2, verbose=False):
         print("SELFTEST FAILED: Motley at H=%d left the pinned cell count "
               "unchanged" % (MOTLEY_H + 1))
@@ -421,7 +421,7 @@ def main() -> int:
     T = read_triangle()
     if args.selftest:
         return selftest(T)
-    a, src, exact, stats = analyse(T)
+    a, src, exact, stats = analyze(T)
     if args.check:
         print("provenance table vs the notes that publish its figures:")
         bad = check(stats)

@@ -37,7 +37,7 @@ using Cells = std::vector<std::pair<int, int>>;
 // ---- Independent verifier: NO transfer-matrix code below this line ----------
 // A specimen is valid iff it has exactly n cells, its bounding box is anchored
 // at column 0 and spans rows 0..H-1 (height exactly H), and it is a single
-// king-connected (8-neighbour) component. Connectivity is a fresh BFS over the
+// king-connected (8-neighbor) component. Connectivity is a fresh BFS over the
 // raw cell set -- it does not consult signatures, union-find, or any engine
 // state, so it is a genuine second opinion.
 static bool verifySpecimen(const Cells& cells, int n, int H, std::string& why) {

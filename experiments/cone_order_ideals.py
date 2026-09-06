@@ -196,7 +196,7 @@ def main():
     small = min(nmax, 9)
     assert index_m_cone_series(1, small) == ideal_series(small, offset=0)[: small + 1]
     assert index_m_cone_series(2, small) == tip[: small + 1]
-    print("index-3 cone (phi_m generalisation FAILS here; phi_3 is A053992):")
+    print("index-3 cone (phi_m generalization FAILS here; phi_3 is A053992):")
     print("  ", " ".join(str(x) for x in index_m_cone_series(3, small)))
 
 

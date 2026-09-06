@@ -67,7 +67,7 @@ def load():
     return d
 
 
-# TODO(2026-08-24, /simplify): newton_fit and degree_of, and analyse()'s
+# TODO(2026-08-24, /simplify): newton_fit and degree_of, and analyze()'s
 # walk-back-to-onset, re-implement scripts/dmirror_diagonals.py's newton_fit /
 # tail_degree and the identical pin-then-walk-backward loop, over the same
 # sym-count data family. This file's own docstring records that the first
@@ -136,7 +136,7 @@ def series(d, k, parity):
     return out
 
 
-def analyse(d, k, parity, verbose=True):
+def analyze(d, k, parity, verbose=True):
     pts = series(d, k, parity)
     if len(pts) < k + 2:
         return None, "only %d contiguous points, need %d to pin with a " \
@@ -170,7 +170,7 @@ def main():
     fits = {}
     for k in range(0, 8):
         for parity, pname in ((0, "even"), (1, "odd")):
-            res, err = analyse(d, k, parity)
+            res, err = analyze(d, k, parity)
             if res is None:
                 print("  %-4d %-7s %s" % (k, pname, err))
                 continue
@@ -208,7 +208,7 @@ def main():
     law = True
     for k in range(0, 6):
         for parity, pname, want in ((0, "even", 2 * k + 2), (1, "odd", 2 * k + 3)):
-            res, _ = analyse(d, k, parity)
+            res, _ = analyze(d, k, parity)
             if res is None:
                 law = False
                 continue

@@ -34,11 +34,11 @@ using u64 = std::uint64_t;
 
 struct Offset { int dx, dy; };
 
-// Offsets ordered by grid-index delta ascending (see kSquare8) so the neighbour
+// Offsets ordered by grid-index delta ascending (see kSquare8) so the neighbor
 // probes walk memory low-to-high.
 static constexpr Offset kSquare4[] = {{0,-1},{-1,0},{1,0},{0,1}};
 // Ordered by grid-index delta (dy*gridW+dx) ascending: the 8 status[] probes in
-// the neighbour loop then walk memory low-to-high (bottom row, middle row, top
+// the neighbor loop then walk memory low-to-high (bottom row, middle row, top
 // row), which streams/prefetches better. Order is enumeration-order only; the
 // counts are offset-order-independent (gate C confirms split-sum invariance).
 static constexpr Offset kSquare8[] = {{-1,-1},{0,-1},{1,-1},{-1,0},
@@ -61,10 +61,10 @@ struct Counter {
   // test a single add + load. A cell's status never changes while it is
   // placed: it was already 1 when it entered an untried list, and the
   // tried-set rule keeps it 1 after unplacement until its adder unwinds.
-  // Fixed compile-time grid stride (L3): the neighbour deltas dj[k] = dy*gridW+dx
+  // Fixed compile-time grid stride (L3): the neighbor deltas dj[k] = dy*gridW+dx
   // then fold into immediate load offsets instead of being reloaded from the
   // struct and added to j every node (the post-L1 hot spot). A row is 128 bytes
-  // = 2 cache lines; the 3-row neighbour stencil stays trivially L1-resident.
+  // = 2 cache lines; the 3-row neighbor stencil stays trivially L1-resident.
   // Holds any maxn with 2*maxn+2 < 128, i.e. maxn <= 62 (binary caps at 40).
   static constexpr int gridW = 128;
   std::vector<char> status;
@@ -87,14 +87,14 @@ struct Counter {
   // polyplet we test whether it is connected under edge (rook) adjacency and,
   // separately, under corner (bishop) adjacency; both subset counts must equal
   // A001168 (fixed polyominoes) -- rook-connected polyplets ARE polyominoes,
-  // and bishop-connected ones are polyominoes in disguise (one colour class:
+  // and bishop-connected ones are polyominoes in disguise (one color class:
   // the rook lattice rotated 45 degrees). So rookConn == bishopConn == A001168.
   bool connCheck = false;
   std::vector<u64> rookConn, bishopConn;   // [n]
   std::vector<int> placed;                 // grid indices of placed cells
   std::vector<int> pidx;                   // cell -> index within `placed`
   std::vector<char> inAnimal;              // cell -> currently placed?
-  int rookOff[4] = {0}, bishOff[4] = {0};  // neighbour deltas, grid-index space
+  int rookOff[4] = {0}, bishOff[4] = {0};  // neighbor deltas, grid-index space
 
   // optional (size, edge-perimeter) joint distribution (off by default). Edge
   // perimeter = exposed unit edges = 4*size - (sum of rook adjacencies). Shares
@@ -149,7 +149,7 @@ struct Counter {
   bool contactsCheck = false;
   std::vector<u64> byContacts;
   int contactStride = 0;
-  int diagOff[4] = {0};                      // the 4 diagonal neighbour deltas (grid-index)
+  int diagOff[4] = {0};                      // the 4 diagonal neighbor deltas (grid-index)
   bool needsCells = false;                   // any analysis needing inAnimal/placed (set in init)
 
   static int findp(int* p, int x) { while (p[x] != x) { p[x] = p[p[x]]; x = p[x]; } return x; }
@@ -406,10 +406,10 @@ struct Counter {
       if (a > maxAreaBySize[size]) maxAreaBySize[size] = a;
     }
     if (siteperimCheck) {
-      ++hstamp;                                  // dedup empty neighbours per animal
+      ++hstamp;                                  // dedup empty neighbors per animal
       int sp = 0;
       for (int i = 0; i < size; ++i)
-        for (int k = 0; k < deg; ++k) {          // deg king-neighbour offsets
+        for (int k = 0; k < deg; ++k) {          // deg king-neighbor offsets
           const int nb = placed[i] + dj[k];
           if (!inAnimal[nb] && hseen[nb] != hstamp) { hseen[nb] = hstamp; ++sp; }
         }
@@ -433,14 +433,14 @@ struct Counter {
 
   // The hot recursion. The run-constant modes are template parameters, so each
   // instantiation is a straight-line kernel with the dead machinery compiled out:
-  //   DEG    - neighbour count (4/6/8) -> the neighbour loop unrolls, dj[] offsets fold
+  //   DEG    - neighbor count (4/6/8) -> the neighbor loop unrolls, dj[] offsets fold
   //   PERBOX - maintain/emit the (w,h) bounding-box histogram
   //   NEEDS  - any per-cell analysis (holes/perim/... needs the cell actually placed)
   //   SPLIT  - subtree partition for --split workers
   // TRACKBOX folds in the fact that the analyses also read minx/maxx/maxy: in pure
   // aggregate mode (no box, no analysis) the box save/update/restore is skipped
   // entirely. run() dispatches to the right instantiation once.
-  // Compile-time neighbour deltas in grid-index space, folded from the constexpr
+  // Compile-time neighbor deltas in grid-index space, folded from the constexpr
   // offset table and the fixed stride (L3). Used in the kernel so `j + DJ[k]`
   // becomes an immediate load offset instead of a per-node reload+add of dj[].
   // Value-identical to the member dj[] that init() computes for the analysis path.
@@ -516,9 +516,9 @@ struct Counter {
         // want. The marks/pushes such a node would make are never read (nothing
         // recurses below it; the unmark walk erases them at once), and the DEG
         // probed cells are pairwise distinct, so the child count is just the
-        // remaining siblings plus the fresh neighbours = numUntried + (DEG minus
+        // remaining siblings plus the fresh neighbors = numUntried + (DEG minus
         // the number of already-blocked probed cells). status[] is only ever
-        // 0/1, so that is DEG - sum(st over the DEG neighbours): pure loads, no
+        // 0/1, so that is DEG - sum(st over the DEG neighbors): pure loads, no
         // stores, no data branches, no recursion, no unmark. This is 85% of the
         // work at the frontier (a(maxn-1)/Sum a(1..maxn-1)); collapsing it here
         // is the dominant kernel win. The old batch below still handles PERBOX
@@ -573,7 +573,7 @@ struct Counter {
         // child works on its own memcpy'd copy and never writes through this buffer,
         // so those slots still hold them. Unmark by walking the slots -- no separate
         // reachedUndo stack needed (removing it drops a std::vector push/pop per
-        // neighbour from the hot loop).
+        // neighbor from the hot loop).
         for (int t = numUntried; t < newCount; ++t) st[untried[t]] = 0;
         }
       }
@@ -714,7 +714,7 @@ int main(int argc, char** argv) {
                            static_cast<unsigned long long>(v));
       }
   } else if (c.siteperimCheck) {
-    // "n  site-perimeter  count"; site-perim = # distinct empty king-neighbours.
+    // "n  site-perimeter  count"; site-perim = # distinct empty king-neighbors.
     // Sum over sp == bySize[n]. Cross-check vs Mertens 1990 Table IVB (nnSquare).
     for (int n = 1; n <= c.maxn; ++n)
       for (int p = 0; p < c.spStride; ++p) {

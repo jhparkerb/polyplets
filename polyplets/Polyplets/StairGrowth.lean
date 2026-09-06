@@ -24,7 +24,7 @@ of it, and the Fekete step:
 The last two are the point. `make gate-middle-kingdom` checks
 supermultiplicativity on 700 computed terms; `M_supermul` makes it a theorem for
 all `i` and `j`, and Fekete then converts *any* banked term into a rigorous
-floor under `µ` rather than an extrapolation towards it.
+floor under `µ` rather than an extrapolation toward it.
 
 What is deliberately not here: Lemma 1 (the phase split), Lemma 2 (the stack
 bound), the geometric layer, and the squeeze that turns the three into

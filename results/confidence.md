@@ -32,7 +32,7 @@ Everything below is a statement about which of those two a given number has.
 
 Every value up to a(40) had been computed by one program — the column sweep
 that has produced the frontier for years. A second, genuinely different
-program (it counts by colouring, and never decides connectivity at all) had
+program (it counts by coloring, and never decides connectivity at all) had
 been run up to height 18. Because of how the table assembles, that was enough
 to independently confirm **a(n) for n <= 35 entirely**.
 
@@ -107,7 +107,7 @@ program under nineteen of its forty-one heights, as of 2026-08-21; the top
 formula overdetermined as of 2026-09-05; height 20 enumerated the same
 evening, and it equals what the formula predicted.**
 
-The colouring program was run at all nineteen heights it can reach, at the size
+The coloring program was run at all nineteen heights it can reach, at the size
 row 41 needs — the thing that had never been done, since every stored result it
 had stopped at n = 40. Those nineteen cells agree with the original program's
 sweep cell for cell (`results/cutcount_b1/rows41/`, gated by
@@ -118,11 +118,11 @@ and here the 2026-08-21 text of this item overstated. It said "two methods that
 share no code and no strategy now agree on it". That is true of the nineteen
 swept heights. Above them there is one tower strategy: its levels up to 19 are
 the wired formulas, levels 20 and 21 are fitted below onset, and
-`experiments/undertow_ri.py` refits them to the colouring program's own cells
+`experiments/undertow_ri.py` refits them to the coloring program's own cells
 and reproduces the row digit for digit — but that refit shares the correction
 tables (`D_j` at levels 20 and 21) and the grand form with the original route.
 The accurate statement is: **19 swept heights two-source with no shared code;
-heights 20 and up one tower strategy pinned from the colouring program's data,
+heights 20 and up one tower strategy pinned from the coloring program's data,
 sharing `D_j(20..21)`** (AUDIT-2026-09-02 M2).
 
 What still limits it: the top of the row is formula rather than direct

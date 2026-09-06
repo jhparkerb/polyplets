@@ -82,7 +82,7 @@ the chunked weight cards as leaves.
 
 **Paper 3 — Proposition 6's Lemma 3, and `µ`.** `Stair.join_valid`,
 `Stair.cut_join` and `Stair.join_injOn` (`Polyplets/StairAnimals.lean`, sortie
-B1) formalise the column-join and its inverse: the join stays in the class, and
+B1) formalize the column-join and its inverse: the join stays in the class, and
 the cut at cumulative area `i` inverts it, so the map is injective once both
 areas are fixed. Guarded, and their footprint is `[propext, Quot.sound]` — not
 even `Classical.choice`. Since 2026-08-06 the counting layer and the Fekete
@@ -94,7 +94,7 @@ approximations), and the conditional `Stair.mu_gt_of_banked` giving
 `3.1234 < µ ≤ 4` from the banked `M 700`.
 
 What Paper 3 must *not* claim from this: Proposition 6. Lemmas 1 and 2, the
-geometric HV-convex layer and the squeeze are **not** formalised, so Lean
+geometric HV-convex layer and the squeeze are **not** formalized, so Lean
 states the growth constant of the *staircase* class, not the sandwich. Cite
 the paper proof for Proposition 6 and this development for Lemma 3.
 
@@ -255,7 +255,7 @@ should happen whatever is decided about the Lean hours.
 
 ## 3. The staircase growth constant: the one authorized slice of Proposition 6
 
-Written 2026-08-06 as a brief, after a sceptical pass over four routes to
+Written 2026-08-06 as a brief, after a skeptical pass over four routes to
 Proposition 6 in Lean, and **executed**: `Polyplets/StairGrowth.lean` carries
 `Stair.M_supermul`, `Stair.M_tendsto`, `Stair.M_le_mu_pow` and the conditional
 `Stair.mu_gt_of_banked`, and `Fekete.lean` carries the ladder once with

@@ -35,7 +35,7 @@ closure is taken over F_p with the basis held in REDUCED row echelon form, which
 is what makes the sparsity free: for an RREF basis B with pivot columns piv,
 any h in the span satisfies h = h[piv] . B exactly, so the row of the compressed
 matrix IS h[piv] and its weight is a count_nonzero.  No reduction, no basis-order
-artefact beyond the pivot choice itself.
+artifact beyond the pivot choice itself.
 
 FAIL-CLOSED.  Runs p = 2 through the identical code path first and asserts the
 banked char-2 cell ranks 32, 93, 210, 516 at H = 4..7 (results/arithmetic-structure.md

@@ -137,7 +137,7 @@ def main():
                   else " -- IT DID NOT"))
 
     # I(D4) is supported only on n = 0, 1 (mod 4): a D4-invariant animal splits
-    # into cell-orbits of size 8, 4 (axis or diagonal) and 1 (the centre only).
+    # into cell-orbits of size 8, 4 (axis or diagonal) and 1 (the center only).
     off = [n for n in range(1, MAXN + 1)
            if n % 4 in (2, 3) and sym["d4"].get(n, 0)]
     gate.check(not off,

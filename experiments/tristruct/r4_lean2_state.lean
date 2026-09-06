@@ -228,7 +228,7 @@ theorem strand_dead {P M : Finset (ℤ × ℤ)} {c : ℤ} {a b : ℤ × ℤ}
   sorry
 
 /-- **HOLE 3 — `sufficiency`** (r4-lean §1.1 D3, increment 2). The theorem the
-whole programme rests on: two prefixes with the same encoded state are
+whole program rests on: two prefixes with the same encoded state are
 interchangeable in front of any future. Stated with `encodeCol` equality rather
 than with the raw pair (cut-column equality, restricted-reachability
 agreement), because `encode_faithful_colAt` in `r4_lean2_encode.lean` converts

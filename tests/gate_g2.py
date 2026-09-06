@@ -111,7 +111,7 @@ def main():
     # E. rook/bishop + perimeter cross-checks (independent structural checks on
     #    the king-animal generator). Of the generated polyplets, those connected
     #    under edge (rook) or corner (bishop) adjacency must each equal A001168
-    #    (fixed polyominoes); rook==bishop is the 45-degree colour-class
+    #    (fixed polyominoes); rook==bishop is the 45-degree color-class
     #    invariant. The (size,perimeter) distribution must sum to A006770, and
     #    its perimeter=4n slice (no rook edges) must again equal A001168.
     a001168 = read_bfile("b001168.txt")

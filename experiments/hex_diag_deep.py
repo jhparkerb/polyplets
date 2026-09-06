@@ -58,7 +58,7 @@ def transitions(cells, part, budget, halo):
     """Every new row over the old row (cells, part), as (newcells, newpart, ds).
 
     A new cell `t` touches an old cell `c` iff `t == c` or `t == c - 1` (the hex
-    up-neighbours of `(c, y)` are `(c, y+1)` and `(c-1, y+1)`).  Every old
+    up-neighbors of `(c, y)` are `(c, y+1)` and `(c-1, y+1)`).  Every old
     component must be touched, else it is sealed off below and the animal can
     never be connected.  `ds = len(new) - 1` is the surplus the row spends.
     """

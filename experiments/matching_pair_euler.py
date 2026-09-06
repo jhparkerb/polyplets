@@ -5,8 +5,8 @@ CONVENTION by brute force before any of the percolation machinery is built.
 The plan says the convention decides whether the whole idea works -- "Get this
 wrong and nothing will check out" -- and states it as: in the matching identity
 each cluster's boundary is measured in the OTHER lattice, i.e. a polyomino's
-perimeter w.r.t. the king neighbourhood and a polyplet's w.r.t. the rook
-neighbourhood.
+perimeter w.r.t. the king neighborhood and a polyplet's w.r.t. the rook
+neighborhood.
 
 This probe tests that claim instead of assuming it, over EVERY subset of a
 small box, by checking the two Euler identities the matching pair is built on:
@@ -22,7 +22,7 @@ the complement (the holes).
 If those hold, then the pairing is (foreground a-connectivity <-> background
 (matching-a)-connectivity), and the perimeter that goes with an a-cluster in a
 cluster generating function is the a-perimeter -- the SAME lattice, because a
-maximal a-connected occupied set is exactly one whose a-neighbours are all
+maximal a-connected occupied set is exactly one whose a-neighbors are all
 vacant. That is the opposite of what the plan says.
 
 Usage: python3 experiments/matching_pair_euler.py [BOX]

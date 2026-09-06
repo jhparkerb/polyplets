@@ -60,7 +60,7 @@ in Lean, and neither is weaker for that; what a reader should not do is treat
      against the 16-cell grid table, and
      `experiments/descent_block_oracle.py`'s `brute_hv_mirror(11)` reproduces
      the grid totals `n ≤ 11` from the phase split itself.
-   * The cost centre. Not the definition — the bridge from this predicate to
+   * The cost center. Not the definition — the bridge from this predicate to
      the column-list encoding `StairAnimals.lean` uses.
 
 4. `lemma1` — the convolution inequality `A(n) ≤ 2(n+1)² Σ P·M·P`.
@@ -140,7 +140,7 @@ theorem lemma2 (n : ℕ) : P n ≤ (n + 1) ^ (4 * Nat.sqrt n + 6) := sorry
 /-- **Lemma 1.** The three-block factorisation, as a counting inequality: phase
 bits are monotone, so the columns split `C1 C2 C3`, and the animal is recovered
 from the three blocks, two junction offsets and one phase bit. Needs Corollary 4
-first, then a `Finset` injection. The cost centre, ~1500 lines.
+first, then a `Finset` injection. The cost center, ~1500 lines.
 
 **Contract 4** — paper: `results/subclasses.md` Lemma 1, with the
 FPSAC 2004 attribution note. Checked: the phase split's totals `n ≤ 11` in the

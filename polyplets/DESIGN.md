@@ -39,7 +39,7 @@ bottom since ℓ ≤ j ≤ k ≤ H−2):
 1. second-top row walk: peel the top cell — 3 offsets relative to the unique
    second-top cell; remainder is walk-top, height H−1, same surplus
    (connectivity of the remainder: separation lemma; the removed cell's only
-   S-neighbours are in the second-top row, which is a single cell).
+   S-neighbors are in the second-top row, which is a single cell).
 2. second-top row multi: peel top cell + the maximal cluster [b, H−2] under
    it, down to the walk row b−1; the peeled data is exactly a V-config
    (p = row-(b−1) cell, q = top cell); remainder is walk-top, height H−1−ℓ.

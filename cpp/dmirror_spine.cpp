@@ -130,7 +130,7 @@ std::vector<Hook> geometry(int S) {
 
 // ------------------------------------------------------------------- the DP
 //
-// A state is one hook's occupancy together with the component labelling of its
+// A state is one hook's occupancy together with the component labeling of its
 // occupied cells, whether the animal has reached coordinate S-1 yet, and the
 // two statistics being accumulated: cells so far and occupied corners so far.
 // Corners are what separate the spines -- the main diagonal is exactly the set

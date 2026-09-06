@@ -35,7 +35,7 @@ NBRS = NEIGHBORS["square8"]
 
 
 def pack(cells):
-    """Normalise to min x = min y = 0 and pack as bytes, one byte per cell.
+    """Normalize to min x = min y = 0 and pack as bytes, one byte per cell.
 
     n <= 10 bounds every coordinate below 16, so x*16+y fits a byte and the
     sorted byte string is a canonical key for the translation class."""
@@ -97,7 +97,7 @@ class DSU:
             self.p[ra] = rb
 
 
-def analyse(n, verbose=True):
+def analyze(n, verbose=True):
     t0 = time.time()
     keys = sorted(grow(n))
     idx = {k: i for i, k in enumerate(keys)}
@@ -167,7 +167,7 @@ def main():
     print("Idea 8: connectivity of the single-cell-move graph on fixed "
           "king animals\n")
     for n in range(1, maxn + 1):
-        analyse(n)
+        analyze(n)
     return 0
 
 

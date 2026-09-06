@@ -55,7 +55,7 @@ reflections (translate by a fixed reflection), so this is
 `½ ∑_{x achiral} #(stabilizer of x)` — which Burnside, applied to the
 `D4`-invariant set of achiral animals, evaluates as `½ · 8 · Bilateral n`.
 
-`r90_vanish` is elementary and centre-free. A quarter-turn-fixed `S` satisfies
+`r90_vanish` is elementary and center-free. A quarter-turn-fixed `S` satisfies
 `S.image σ = S` for the affine map `σ p = ρ p + t` (`ρ` the quarter turn, `t`
 the re-anchoring translation). Since `ρ² = -1`, one has `σ⁴ = id`, and a point
 fixed by `σ²` is already fixed by `σ` (`2 p` is pinned by `t`, and so is

@@ -5,7 +5,7 @@
 defect `D_1(k) = T(2k,k) - P_k(2k)/3^(k+1)` assembles from the all-pairs cluster
 families by the gap-walk identity (II), and its generating function is the
 quartic `Phi`.  Every piece of that is written for king adjacency.  Here the
-same machine runs on any row-local lattice whose up-neighbours of `(c, y)` are
+same machine runs on any row-local lattice whose up-neighbors of `(c, y)` are
 `(c+d, y+1)` for `d` in a drift set `D` -- square `D = {0}`, hex `D = {-1, 0}`,
 king `D = {-1, 0, 1}` -- with `b = |D|`.
 
@@ -382,7 +382,7 @@ def hex_defects(kmax):
     return out
 
 
-# ------------------------------------------------- the normalised equations
+# ------------------------------------------------- the normalized equations
 
 def phi_hex(mp):
     """Phi(x, W) for hex, with W = N(x) = sum_k N_k x^k, N_k = 2^(k+1) D_1(k).

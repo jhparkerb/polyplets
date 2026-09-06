@@ -305,7 +305,7 @@ func BalancedCutsMulti(paths []string, keyLen, numCuts int) ([]string, error) {
 			continue
 		}
 		// No usable .idx: fall back to SampleKeys's own body-scan path so a
-		// missing/unreadable sidecar degrades to today's behaviour instead of
+		// missing/unreadable sidecar degrades to today's behavior instead of
 		// silently dropping the file's records from the quantile. Rare in
 		// practice -- production runs always write_index=true. H is read from
 		// the file's own header (self-consistent) rather than threaded through
@@ -373,7 +373,7 @@ func allIndexKeys(idxPath string, keyLen int) ([]string, error) {
 // Cuts are strictly inside (lo, hi) and ascending, so every sub-range is
 // non-empty.  Returns fewer than numCuts (possibly zero) when the indexes hold
 // too few in-range samples to cut finely — the caller then steals less (or not
-// at all), which is the correct degenerate behaviour.
+// at all), which is the correct degenerate behavior.
 // keyLen: see SampleKeys.
 func SplitRangeByIndex(frontier []string, H, keyLen int, loHex, hiHex string, numCuts int) ([]string, error) {
 	if numCuts <= 0 {

@@ -2,7 +2,7 @@
 """Birthright — brute-force check of the cut-count cancellation identity.
 
 Checks the IDENTITY AS STATED in docs/proofs/cutcount-identity.md, not the
-engine.  For every subset S of a small H x W board, enumerate the colouring
+engine.  For every subset S of a small H x W board, enumerate the coloring
 model of the statement directly (scan order, H+1-cell window, clash-void /
 forced / adopt-or-birth rules, birth weight q - b with b the live-label count),
 sum the weights exactly in Z[q], and compare against q^{c(S)} with c(S) from
@@ -34,7 +34,7 @@ def rc(i, H):
 
 
 def king_neighbours(H, W):
-    """nb[i] = all king neighbours of i; pred[i] = those with index < i."""
+    """nb[i] = all king neighbors of i; pred[i] = those with index < i."""
     n = H * W
     nb = [[] for _ in range(n)]
     pred = [[] for _ in range(n)]
@@ -111,17 +111,17 @@ def monomial(c):
 #   b_global   : birth weight uses every label ever used, not the live ones
 #   no_adopt   : a free cell may only give birth, never adopt a live label
 #   win        : liveness window size, default H+1
-#   blind      : earlier neighbours outside the window are invisible to the
+#   blind      : earlier neighbors outside the window are invisible to the
 #                clash/forced rule, as they would be in a DP whose state is
 #                only the window -- this is what makes H+1 the necessary slot
-#                count (the NW neighbour sits exactly H+1 back)
+#                count (the NW neighbor sits exactly H+1 back)
 
 VARIANTS = {
     "GREEN  identity as stated": {},
     "RED-1  clash-voiding dropped": {"no_clash": True},
     "RED-2  b counts all labels, not live ones": {"b_global": True},
     "RED-3  free cell cannot adopt a live label": {"no_adopt": True},
-    "RED-4  window of H cells, neighbours outside it unseen":
+    "RED-4  window of H cells, neighbors outside it unseen":
         {"win": "H", "blind": True},
     "RED-5  liveness window shortened to H-2": {"win": "H-2"},
 }
@@ -279,7 +279,7 @@ def run_green(boards):
     print("maxgap: largest gap a free cell actually needed to see its own "
           "component; observed = H-1 on every board with H>=3, i.e. two short "
           "of the window.  Liveness alone would fit in H-1 slots -- the H+1st "
-          "slot is demanded by the NW neighbour in the clash/forced rule, not "
+          "slot is demanded by the NW neighbor in the clash/forced rule, not "
           "by liveness.")
     print("wall_s=%.1f" % dt)
     return bad == 0 and tot_loc_failed == 0

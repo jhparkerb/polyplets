@@ -18,7 +18,7 @@ interpolated.  This script checks the derivation that replaces the measurement:
   where P(n, j, c) is the square census graded by cycle rank -- the c column of
   results/perimdefect_square4_n78_k6.txt -- and M(n, k) counts the king animals
   that do carry an orthogonal edge.  That last step needs h = 0, which holds for
-  k <= 3: the cheapest polyomino with a hole is 3x3 less its centre and one
+  k <= 3: the cheapest polyomino with a hole is 3x3 less its center and one
   corner, with k_square = 4, c = 0, h = 1, so a hole costs k_king = 5.  Past
   k = 3 the banked square census cannot supply the correction, since it grades
   by c and not by h, and the identity is checked instead against this script's
@@ -237,7 +237,7 @@ def check_features():
 
 
 def excess(cells, offsets):
-    """t = sum over perimeter cells of (animal neighbours - 1)."""
+    """t = sum over perimeter cells of (animal neighbors - 1)."""
     m = defaultdict(int)
     for x, y in cells:
         for dx, dy in offsets:

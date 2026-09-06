@@ -232,8 +232,8 @@ def identify():
 
     Guards against a mislabelling that would be easy to make and hard to spot:
     D = (-1, 0) is SIX-regular, i.e. polyhexes -- cells are HEXAGONS, and it is
-    their centres that form the triangular point lattice. Animals of equilateral
-    TRIANGLES (polyiamonds) are a different object: three neighbours per cell,
+    their centers that form the triangular point lattice. Animals of equilateral
+    TRIANGLES (polyiamonds) are a different object: three neighbors per cell,
     alternating orientation, A001420 rather than A001207, and outside this class
     entirely because the adjacency is parity-dependent.
     """

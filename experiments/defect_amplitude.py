@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Extract the amplitude C_j in  D_j(k) ~ C_j * 9^k * k^(j-3/2)  and try to
-recognise it.  Richardson in 1/k to several orders; the control is the same
+recognize it.  Richardson in 1/k to several orders; the control is the same
 pipeline run on an exactly-built sequence with a KNOWN amplitude, so the number
 of trustworthy digits is measured rather than assumed."""
 import math, os, sys
@@ -41,7 +41,7 @@ CONTROLS = [
      lambda k: 1 + 0.4*math.log(k)/k),
 ]
 print("== control suite, C=%.7f, k=2..19 (same window as the j=1 data)" % CC)
-print("   %-38s %s" % ("flavour", "".join("  order %d " % o for o in range(2,6))))
+print("   %-38s %s" % ("flavor", "".join("  order %d " % o for o in range(2,6))))
 for name, f in CONTROLS:
     pts = [(k, CC*f(k)) for k in range(2, 20)]
     row = "   %-38s" % name

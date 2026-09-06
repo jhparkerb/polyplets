@@ -18,7 +18,7 @@ exhaustive counts, and bank the review's independent verifications:
        u0-1 <= l <= u1 carries >= 2 animal cells, likewise v
        (expect 0 violations — holds but is too weak, see the module doc).
   3. The diagonal-frame family: |hullBox \\ boxHole| = a+b+2 for ALL a, b
-     (vs the 4-neighbour ring's a+b+1 when min=1 & max even), and
+     (vs the 4-neighbor ring's a+b+1 when min=1 & max even), and
      boxHole rook-disconnected iff min(a,b) = 1 and max(a,b) >= 3.
 
 Exact command:  python3 experiments/maxhole_review_checks.py \
@@ -165,7 +165,7 @@ def family_checks(amax=12):
             if not rook_conn(box):
                 disc.append((a, b))
     print(f"|hullBox \\ boxHole| = a+b+2: all {amax * amax} pairs PASS")
-    print(f"4-neighbour ring short of a+b+2 at: {ring_short}")
+    print(f"4-neighbor ring short of a+b+2 at: {ring_short}")
     expect = [(a, b) for a in range(1, amax + 1) for b in range(1, amax + 1)
               if min(a, b) == 1 and max(a, b) >= 3]
     print(f"boxHole rook-disconnected at: {sorted(disc)}")

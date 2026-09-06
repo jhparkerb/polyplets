@@ -73,7 +73,7 @@ def canon_hex(cells):
     return frozenset((j - mj, y - my, t) for j, y, t in cells)
 
 
-def grow(seeds, neighbours, canon, nmax):
+def grow(seeds, neighbors, canon, nmax):
     """All animals up to nmax cells, keyed by canonical form."""
     seen = {canon({s}) for s in seeds}
     frontier = list(seen)
@@ -86,7 +86,7 @@ def grow(seeds, neighbours, canon, nmax):
             if len(a) >= nmax:
                 continue
             for c in a:
-                for b in neighbours(c):
+                for b in neighbors(c):
                     if b in a:
                         continue
                     q = canon(a | {b})

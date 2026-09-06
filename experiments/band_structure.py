@@ -4,7 +4,7 @@
   2. Hankel determinants / J-fraction of the slice (exact integers)
   3. finite-size scaling of the certified mu_H ladder toward lambda
 
-Controls throughout: a sequence whose structure is KNOWN must be recognised,
+Controls throughout: a sequence whose structure is KNOWN must be recognized,
 and a deliberately structureless sequence must be rejected.
 """
 import glob, re, math

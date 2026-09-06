@@ -68,7 +68,7 @@ THE CONTROLS ARE THE POINT, as in experiments/stretched_exponential_fit.py.
       onto the correction; the control plants theta = -1, Delta = 1 and checks
       both come back.
   (d) PROVENANCE.  A square series whose head is not A001168, or a king series
-      whose head is not A006770, is refused rather than analysed.
+      whose head is not A006770, is refused rather than analyzed.
 
 Usage:
     python3 experiments/confluent_universality.py            # controls + both lattices
@@ -136,7 +136,7 @@ def fit_at_delta(seq, lo, hi, delta):
 
 
 def scan(seq, lo, hi):
-    """Minimise the residual over the Delta grid.  Returns the best fit and the
+    """Minimize the residual over the Delta grid.  Returns the best fit and the
     grid, so callers can report the width of the valley rather than a point."""
     rows = []
     for d in DELTA_GRID:
@@ -163,7 +163,7 @@ def valley(rows, best, factor=2.0):
 
 
 def synth(lam, theta, c, delta, N, extra=None):
-    """B=1 series of exactly the modelled form, optionally with a second,
+    """B=1 series of exactly the modeled form, optionally with a second,
     UNMODELLED correction `extra(n)` multiplied in.
 
     Integers, because a real series is integers and the rounding is part of

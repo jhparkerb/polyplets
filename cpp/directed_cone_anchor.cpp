@@ -113,7 +113,7 @@ namespace {
 enum class Mode { Dir5, Dir4, Dir5NoBottom, Cone5, Grid, GridBadStaircase,
                   MultiDir, MultiDirNoKeystone, GridPerim };
 
-// Grid with a one-cell margin on every side so BFS neighbour steps never need a
+// Grid with a one-cell margin on every side so BFS neighbor steps never need a
 // bounds check: x in [-N, N] (stride W), y in [-1, N]. Only x in [-(N-1), N-1],
 // y in [0, N-1] can ever be occupied, so the margin ring reads as empty.
 int N = 0, W = 0, GRID = 0;
@@ -126,14 +126,14 @@ inline bool allowed(int x, int y) {
   return y >= 0 && y < N && x > -N && x < N && !(y == 0 && x < 0);
 }
 
-// 8 king neighbours (growth), and the forward cones (reachability filter).
+// 8 king neighbors (growth), and the forward cones (reachability filter).
 const int KDX[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
 const int KDY[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
 const int C5DX[5] = {-1, -1, 0, 1, 1};  // W, NW, N, NE, E
 const int C5DY[5] = {0, 1, 1, 1, 0};
 const int C4DX[4] = {0, 1, 1, 1};  // N, E, NE, SE
 const int C4DY[4] = {1, 0, 1, -1};
-const int RDX[4] = {0, 0, -1, 1};  // rook (orthogonal) neighbours -- Phase 4a
+const int RDX[4] = {0, 0, -1, 1};  // rook (orthogonal) neighbors -- Phase 4a
 const int RDY[4] = {-1, 1, 0, 0};  // RED control for site-perimeter adjacency
 
 struct Ctx {
@@ -441,7 +441,7 @@ ConvexResult convexity(Ctx& g, int size, bool checkTops) {
 // Phase 4a: number of distinct EMPTY cells king- (king=true) or rook-
 // (king=false) adjacent to the animal. O(size) per call via the same
 // generation-stamp trick as reach()/multiDirected() -- margin is exactly one
-// cell wide on every side of the grid (file header), so every neighbour
+// cell wide on every side of the grid (file header), so every neighbor
 // offset from an occupied cell is in bounds without a check.
 int sitePerim(Ctx& g, int size, bool king) {
   const uint32_t mark = bump(g.gen, g.stamp);

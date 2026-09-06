@@ -122,7 +122,7 @@ lemma isCanonical_iff (n H : ℕ) (S : Finset (ℤ × ℤ)) :
 coordinate `proj` vanishes somewhere on a king-connected `S`, then it is at most
 `n - 1` everywhere on `S`: the values `0, 1, …, proj p` are *all* attained (king
 paths skip no value, `exists_proj_eq_of_cross`), so `S` has at least
-`proj p + 1` distinct `proj`-fibres. This is `Finite.lean`'s `canonical_x_le`
+`proj p + 1` distinct `proj`-fibers. This is `Finite.lean`'s `canonical_x_le`
 argument, stated once for both coordinates — and, as the proof shows, without
 needing `proj` to be nonnegative on `S`. -/
 lemma card_bound_of_anchored {n : ℕ} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ}

@@ -42,7 +42,7 @@ hedging in the body.
 - **L — entirely machine-written.** The block states that the document was
   written end to end by a large language model, exactly how much of it jasonp
   verified (per result, not in aggregate), and what warrants the rest — Lean
-  kernel, exact certificate, or labelled measurement.
+  kernel, exact certificate, or labeled measurement.
 
 **On the byline for L-papers.** The Leiden Declaration's "Affirm the humanity of
 authorship" clause would forbid naming Claude as author. jasonp's ruling,
@@ -58,7 +58,7 @@ is what carries the honesty — not the author line.
 |---|---|---|---|---|---|---|
 | **P1** | Fixed polyplets through a(40) | a(19)–a(40); the five symmetry companions; hole stratification; the engine; the validation architecture; λ≈7.111 with the Fekete floor 6.2208 and the Madras ratio theorem; log-convexity C2 and the ratio log-concavity theorem | 20–28 | **30–50** | low | **highest** |
 | **P2** | Two stratifications of A006770 | T(n,H); his hand-derived T(n,n−1) and T(n,n−2); the defect gas and 25 = 16 + 9; onset and integrality; C(n,c) and the C(n,1) = C(n,n) = A001168 bijection; the universal law *stated*, cited to L1 | 12–16 | 15–25 | low | med-high |
-| **P3** | King animals by convexity and directedness | the 5×4 grid; the eight collapse propositions; A018902's first lattice-animal interpretation; the A187077 correction; A222205 to 200 terms and µ = 6.475196280297; 3 + 2√2 reproduced; µ = 3.128943… for the staircase→HV band; the λ bracket *stated*, cited to L3; the five novel sequences as labelled data | 14–20 | 20–30 | low-med | med-high |
+| **P3** | King animals by convexity and directedness | the 5×4 grid; the eight collapse propositions; A018902's first lattice-animal interpretation; the A187077 correction; A222205 to 200 terms and µ = 6.475196280297; 3 + 2√2 reproduced; µ = 3.128943… for the staircase→HV band; the λ bracket *stated*, cited to L3; the five novel sequences as labeled data | 14–20 | 20–30 | low-med | med-high |
 
 **P1 is now an L paper.** For most of the project `paper/technical-report.tex`
 was jasonp's own prose, 331 lines and roughly 40% built, with a complete
@@ -91,7 +91,7 @@ cites it.
 | **L4** | The by-height GF is not D-finite | the quantified ψ-degree argument; mod-p certificates with preserved degrees; transport to polyominoes, polyhexes, polyiamonds | 12–16 | 3 | ~1 | high | N6 clean |
 | **L2** | The mod-3 arithmetic of the height triangle | the spine cubic W³ = W² + t; the base-3 digit-product formula; SNF all 3-powers with ⌈(N−1)/3⌉ nontrivial factors; the 3-adic lift | 10–12 | 2 | ~1 | medium | **UNCHECKED** — N1–N6 never covered it |
 | **L5** | Convex king animals | non-D-finite and non-algebraic exclusions at order/degree ≤ 24 on 700 terms; µ to 199 digits; the squeeze in full; subdominant Lemma 4 / Prop 7 / Conjecture 8; the amplitude ratio and the PSLQ negative | 16–22 | 4–5 | ~1 | medium | N1/N2 clean; **N3 is a real collision** (Gouyou-Beauchamps & Leroux) — cite in three places |
-| **L6** | Perimeter gradings, king and square | quasi-polynomiality on both lattices with identical leading coefficients through k = 5; the triangular onset at the max end and the linear one at the min; the 4-coloured partition convolution | 10–14 | 3 | ~1 | low-med | **UNCHECKED**, and days old |
+| **L6** | Perimeter gradings, king and square | quasi-polynomiality on both lattices with identical leading coefficients through k = 5; the triangular onset at the max end and the linear one at the min; the 4-colored partition convolution | 10–14 | 3 | ~1 | low-med | **UNCHECKED**, and days old |
 
 Plus the Lean development as a citable Zenodo artifact — not a paper, cited by
 P2, P3, L1 and L3.
@@ -115,7 +115,7 @@ never an L-paper.**
 | Wave 2 — hole triangle, hole-free column, one-hole column, square bounding box, max distinct holes | **P1** | max hole area cites Sieben and Wang & Wang; claim the enumeration, not the theorem. Square-bbox still owes a Superseeker pass |
 | Wave 3A — T(n,H) height triangle | **P2** | %C carries *his* k = 1, 2 closed forms; the universal law is a citation to L1, not a claim in the entry. Superseeker owed |
 | Wave 3B — C(n,c) component triangle | **P2** | Superseeker owed |
-| Wave 3C — HV-convex king animals by area, 700 terms | **P3** | the non-D-finite %C survives only as a *labelled measurement he ran* — "excluded at order ≤ 24, degree ≤ 24 on 700 terms" — never as L5's theorem |
+| Wave 3C — HV-convex king animals by area, 700 terms | **P3** | the non-D-finite %C survives only as a *labeled measurement he ran* — "excluded at order ≤ 24, degree ≤ 24 on 700 terms" — never as L5's theorem |
 | A222205 b-file, 23 → 200 terms | **P3** | pure extension, no novelty claim |
 | The five comments and corrections — A018902, A187077, A055834, A007052, A225114 | **P3** | highest value per word; all his to vet |
 | The five novel Middle Kingdom sequences | **P3** | after the N3 citation fix lands |

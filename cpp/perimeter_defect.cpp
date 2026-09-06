@@ -7,7 +7,7 @@
 // The extra two coordinates are cheap to carry and answer the two questions the
 // bare defect census cannot.  c is the cycle rank e - n + 1 of the adjacency
 // graph: k = 2c + t - (deg/2 - 2)(n - 1) with t >= 0 (t = sum over empty adjacent
-// cells of (animal-neighbours - 1)), i.e. 2c + t on square4 and 2c + t - 2(n-1) on
+// cells of (animal-neighbors - 1)), i.e. 2c + t on square4 and 2c + t - 2(n-1) on
 // square8; the defect budget caps c at floor(k/2) on square4 and floor(k/3) on
 // square8 (results/perimeter.md), and splitting
 // a defect class by c says whether a quasi-polynomial's parity part is carried by
@@ -18,11 +18,11 @@
 // WHY A PRUNED SEARCH IS EXACT.  The defect k := pmax(n) - p, with
 // pmax(n) = (deg/2)(n+1) -- 2n+2 on square4, 4n+4 on square8 -- never decreases
 // when a cell is added.  Adding a cell v raises pmax by
-// deg/2 and changes p by (-1 + g), where g counts v's neighbours that were not
+// deg/2 and changes p by (-1 + g), where g counts v's neighbors that were not
 // already perimeter cells.  A cell v adjacent to the animal shares at least
-// s(deg) neighbours with whichever animal cell u it touches -- s = 0 on square4,
+// s(deg) neighbors with whichever animal cell u it touches -- s = 0 on square4,
 // s = 2 on square8 (the diagonal case; the orthogonal case shares 4) -- and u is
-// itself one of v's neighbours and is not empty.  So g <= deg - 1 - s, giving
+// itself one of v's neighbors and is not empty.  So g <= deg - 1 - s, giving
 //
 //     dk = deg/2 - (-1 + g) = deg/2 + 1 - g >= deg/2 + 1 - (deg - 1 - s).
 //
@@ -77,7 +77,7 @@ struct Search {
   int gridW = 0, xOrigin = 0, yOrigin = 0;
   std::vector<char> status;        // 1 = never place here (tried/blocked/border)
   std::vector<char> inAnimal;
-  std::vector<int> nbr;            // animal-neighbour count of each cell
+  std::vector<int> nbr;            // animal-neighbor count of each cell
   int dj[8] = {0};
 
   int size = 0;
@@ -105,7 +105,7 @@ struct Search {
 
   void init() {
     // Animal cells live in x in [-(maxn-1), maxn-1], y in [0, maxn-1]; their
-    // neighbours reach one further, and the perimeter counts those, so the grid
+    // neighbors reach one further, and the perimeter counts those, so the grid
     // must hold real (not border) entries for them.  One extra ring beyond that
     // is never touched and exists only so a stray index cannot walk off the end.
     xOrigin = maxn + 2;
@@ -135,10 +135,10 @@ struct Search {
   }
 
   // Placing a cell: it stops being a perimeter cell (if it was one), and each of
-  // its empty neighbours becomes one if it was not already.
+  // its empty neighbors becomes one if it was not already.
   void place(int j) {
     if (nbr[j] > 0) --perim;
-    bonds += nbr[j];               // nbr[j] counts j's neighbours already placed
+    bonds += nbr[j];               // nbr[j] counts j's neighbors already placed
     inAnimal[j] = 1;
     for (int k = 0; k < deg; ++k) {
       const int j2 = j + dj[k];
@@ -163,7 +163,7 @@ struct Search {
   // What placing cell j would cost.  j is adjacent to the animal (everything in
   // an untried list is), so its own perimeter slot is reclaimed and g fresh ones
   // open up, giving dk = deg/2 + 1 - g.  Crucially g is non-increasing as the
-  // animal grows -- a neighbour can only ever become occupied or become an
+  // animal grows -- a neighbor can only ever become occupied or become an
   // already-counted perimeter cell -- so dk is non-DEcreasing.  A candidate that
   // is over budget now is therefore over budget for the whole subtree and can be
   // dropped from the untried list rather than re-tested at every node.  Without

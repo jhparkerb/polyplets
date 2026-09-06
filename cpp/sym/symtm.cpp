@@ -16,14 +16,14 @@
 // completion prune — is the production transition, unchanged. The R1 fold
 // is skipped: reflectSig is the identity on every reachable state.
 //
-// r180 mode: the 180-degree rotation centre of a fixed animal is its bbox
-// centre, and the rotation maps column j to column W-1-j row-reversed — so
+// r180 mode: the 180-degree rotation center of a fixed animal is its bbox
+// center, and the rotation maps column j to column W-1-j row-reversed — so
 // the RIGHT half is the rotated image of the left and only the left half is
 // swept (budget maxn/2 cells). At every column boundary the state closes by
 // self-gluing to its own rotation: even widths glue the boundary column to
 // its row-reversal across the seam (glueEven), odd widths insert one
 // vertically-palindromic middle column between the halves (glueOdd; W=1 is
-// the seed's odd glue). All four rotation-centre classes (cell / edge x2 /
+// the seed's odd glue). All four rotation-center classes (cell / edge x2 /
 // vertex) arise as the W x H parities. Left states are NOT palindromic and
 // need not touch either strip edge (the rotated half can supply top or
 // bottom), so the sweep uses the general mask generator with its top-reach
@@ -93,7 +93,7 @@ static bool closable(const Sig& s, int H) {
 
 // Enumerate the vertically-palindromic column masks of a height-H strip
 // worth trying against `old`, mirroring forEachViableMask's generator prunes
-// pair-wise (a "pair" i is rows {i, H-1-i}, or the centre row alone when H
+// pair-wise (a "pair" i is rows {i, H-1-i}, or the center row alone when H
 // is odd, weight 1). fn(mask, cells) — `cells` is the full popcount (pairs
 // weigh 2). Both prunes cut strict subsets of what the post-enumeration
 // authorities (stepColumnSquare8's stranding check, completionLowerBound)
@@ -366,7 +366,7 @@ static u64 pairCov(u64 mask, int H) {
 
 // Future n owed by the uncovered pairs: a covering cell is a future left
 // cell (weight 2 with its rotated image) or a middle pair (weight 2; the
-// centre row, its own mirror, weighs 1), one distinct row each.
+// center row, its own mirror, weighs 1), one distinct row each.
 static int uncWeight(u64 unc, int H) {
   int w = 2 * __builtin_popcountll(unc);
   if ((H & 1) && ((unc >> ((H - 1) / 2)) & 1)) --w;
@@ -374,7 +374,7 @@ static int uncWeight(u64 unc, int H) {
 }
 
 // Middle-column masks worth glueOdd-ing against `s`: vertically palindromic
-// (pair i = rows {i, H-1-i}, centre row weight 1), popcount <= budget, plus
+// (pair i = rows {i, H-1-i}, center row weight 1), popcount <= budget, plus
 // two generator prunes, both strict subsets of what glueOdd itself rejects:
 //   - coverage: every left component needs a king-adjacent middle cell (all
 //     connectivity flows through the middle); palindromy makes left
@@ -443,7 +443,7 @@ static void forEachMiddleMask(const Sig& s, int H, int budget, u64 forced,
 // half has touched NEITHER edge, the finished animal still needs a king
 // chain from the boundary to row 0 or row H-1 — every chain cell costs 2
 // toward n (a left cell has a distinct rotated image; a middle cell below
-// the centre row has a distinct mirror), so the state owes
+// the center row has a distinct mirror), so the state owes
 // 2*min(topGap, botGap) future n on top of its banked 2*(ms+cells).
 struct RVal {
   std::vector<u64> c;  // counts by LEFT cells (dmirror: by full n)
@@ -656,7 +656,7 @@ static bool closableDm(const Sig& s) {
 // corner (k,k) is the one +-2 stencil — it sees old col 0..2 AND old row
 // 1..2 (five cells). Within the new hook the arms chain vertically and
 // {corner, col 1, row 1} are mutually adjacent (col 1 = (k,k+1) and row 1
-// = (k+1,k) are diagonal neighbours even without the corner). Union-find
+// = (k+1,k) are diagonal neighbors even without the corner). Union-find
 // slots: new corner 0, new col j -> j, new row j -> 40+j, old label L ->
 // 80+L (components per hook <= ~35, an independent set of two 33-paths + a
 // corner, so labels fit both the slot space and a u64 bitmask).
@@ -688,7 +688,7 @@ static Outcome dmStep(const Sig& old, int k, int S, u64 mask, Sig& out) {
     }
   }
   if (mask & 2) {
-    s8::unite(p, 1, 41);  // col 1 <-> row 1 (diagonal neighbours)
+    s8::unite(p, 1, 41);  // col 1 <-> row 1 (diagonal neighbors)
     if (mask & 1) s8::unite(p, 0, 1);
   }
   bool rootNew[160] = {false};

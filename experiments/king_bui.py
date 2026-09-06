@@ -3,7 +3,7 @@
   d empty    -> type T' = T + {d forbidden}, same n
   d occupied -> split: d's piece (type D) convolved with the c-side (type T')
   =>  phi_T = phi_{T'} + phi_{T'} * phi_D          (T' = T+{d forbidden})
-Base: all 8 neighbours forbidden -> isolated marked cell -> phi = x (n=1 only).
+Base: all 8 neighbors forbidden -> isolated marked cell -> phi = x (n=1 only).
 Verified against brute force, then the certificate iteration gives the bound.
 """
 import sys, time
@@ -16,7 +16,7 @@ RD = int(sys.argv[1]) if len(sys.argv) > 1 else 2
 WD = [(dx,dy) for dx in range(-RD,RD+1) for dy in range(-RD,RD+1) if (dx,dy)!=(0,0)]
 def d_type(f, d):
     """type of d when split off. Empty in the d-piece = c=(0,0), all of c's OTHER
-    neighbours (go to c-side), and T's forbidden cells; window RD around d."""
+    neighbors (go to c-side), and T's forbidden cells; window RD around d."""
     ke = {(0,0)} | (set(KING8) - {d}) | set(f)
     return frozenset(o for o in WD if (d[0]+o[0], d[1]+o[1]) in ke)
 

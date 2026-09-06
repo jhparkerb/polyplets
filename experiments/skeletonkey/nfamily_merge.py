@@ -11,7 +11,7 @@ Two files in the tree disagree without noticing each other:
 
   results/arithmetic-structure.md section 6 (2026-08-14) answers it: two strip
   states are equivalent iff they carry the same multiset of block
-  neighbourhoods N(b) = rows(b) expanded +-1, clipped to [0,H).  Measured
+  neighborhoods N(b) = rows(b) expanded +-1, clipped to [0,H).  Measured
   2187 -> 575 at H = 9.  But that file states the result as GF(2)-Nerode
   equivalence and section 10 prices the whole campaign as one mod-2 bit.
 
@@ -146,7 +146,7 @@ def key_of(state, H, expand=1):
 def succ_key(key, mask, H, expand=1):
     """Successor of an N-key, computed WITHOUT any partition state: this is the
     a-priori automaton.  Same shape as succ_state, reading each old block only
-    through its neighbourhood set."""
+    through its neighborhood set."""
     R = runs_of(mask, H)
     touch = [frozenset(i for i, N in enumerate(key)
                        if any((N >> r) & 1 for r in run))
@@ -366,7 +366,7 @@ def main():
                   % (H, nmax), flush=True)
         nrawf, nkeyf = len(fr) - 1, len(fk) - 1
 
-        # rook control: with expand=0 the neighbourhood IS the block, so the
+        # rook control: with expand=0 the neighborhood IS the block, so the
         # key is the state and nothing merges.  The compression is a fact
         # about KING adjacency blurring rows, not about strips.
         rr, _ = build(H, (), succ_state, expand=0)
@@ -389,10 +389,10 @@ def main():
             for r in range(H):
                 if sum(1 for N in st if (N >> r) & 1) > 2:
                     sys.exit("GATE H FAILED H=%d: row %d covered by %d "
-                             "neighbourhoods" % (H, r,
+                             "neighborhoods" % (H, r,
                              sum(1 for N in st if (N >> r) & 1)))
         print("# gate H ok H=%d: no row is covered by more than two "
-              "neighbourhoods, so the key fits H bytes" % H, flush=True)
+              "neighborhoods, so the key fits H bytes" % H, flush=True)
 
         # vertical mirror: does the merge subsume the R1 fold, or compose?
         def refl(k):

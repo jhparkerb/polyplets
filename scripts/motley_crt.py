@@ -6,7 +6,7 @@ residue rows into the banked exact C_18 lived inside a heredoc in
 scripts/dalby_confetti_h18.sh -- a runner that executes on dalby and that
 `make` never touches.  That is the same defect scripts/cutcount_assembly_gate.py
 was written to fix one level up, and it means the next ladder has nothing to
-run.  This is that code, extracted, generalised over the prime count, and
+run.  This is that code, extracted, generalized over the prime count, and
 given a self-test against the banked Confetti data.
 
 THE METHOD.  Run the engine once per prime.  Reconstruct C_H(n) by CRT over

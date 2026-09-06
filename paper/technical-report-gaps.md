@@ -26,7 +26,7 @@ is 2722 checks green (the tables, the closed forms, and since 2026-09-05 the
 prose: each scope number read out of its sentence and the T(n,n−1) derivation
 re-counted by enumeration), and `tests/gate_p_paper_verifier.py` establishes
 that 287 of the paper's 288 numeric literals of two or more digits are read by
-one of them. `results/figs/triangle_provenance.svg` colours the 820 cells by
+one of them. `results/figs/triangle_provenance.svg` colors the 820 cells by
 what checked them, from the gated table; `docs/glossary.md` ends with the
 paper's words against the repo's.
 
@@ -102,7 +102,7 @@ out is not a row.
 | 47–48 | a(20)–a(23) by transfer matrix | `results/ns_a20/PROVENANCE.md` (`cpp/tma`); `ns_a21`, `ns_a23` (column kernel) | the run records | BACKED |
 | 48–49 | a(24)–a(40): earlier rows fix the polynomial factors for the most expensive cells | `results/ns_a24/PROVENANCE.md` (first injection, k ≤ 7) through `ns_a40` (k ≤ 18, H ≥ 22) | `ns-gate-diag-pins`; 171 injected cells self-consistent with the refit | BACKED |
 | 51–52 | for n ≤ 22 transfer matrix and Redelmeier agree | `results/redelmeier_row22/PROVENANCE.md` (fleet, 2026-07-16) | rows 1–22 == banked; the sentence's 22 == the top row of the record | BACKED |
-| 52–53 | for n ≤ 40 the colouring method confirms the T(n,H ≤ 19) cells | `results/cutcount_b1/rows41/`; `docs/proofs/cutcount-identity.md` | 589 cells re-derived from C_H by second difference == triangle; the sentence's 19 and 40 == the record's reach; `gate-cutcount-assembly` | BACKED |
+| 52–53 | for n ≤ 40 the coloring method confirms the T(n,H ≤ 19) cells | `results/cutcount_b1/rows41/`; `docs/proofs/cutcount-identity.md` | 589 cells re-derived from C_H by second difference == triangle; the sentence's 19 and 40 == the record's reach; `gate-cutcount-assembly` | BACKED |
 | 53–54 | all a(n) pass Burnside-congruence checks and the closed forms | `results/symmetry-classes.md`; `results/subgroup_counts.txt` | a(n) mod 4 recomputed from I(C4)+I(D2ax)+I(D2diag)−2I(D4) for n ≤ 40; the diagonal checks | BACKED. The in-make `gate-subgroup` reaches n ≤ 11; n ≤ 40 is the banked 2026-08-07 census |
 | 70–79, 166 | each symmetry class names its OEIS entry | `oeis/A0*.txt`; `results/b0*_upload.txt` | the A-number in each item == the b-file its column is checked against | BACKED |
 | 82–83 | a 1-cell hole needs 4 cells; a domino or two 1-cell holes need 6 | `results/holes_n18.txt`; `results/maxhole.txt` | smallest n with k ≥ 1 is 4, with k ≥ 2 is 6, with hole area ≥ 2 is 6 | BACKED |
@@ -212,7 +212,7 @@ cells agree); `gate-undertow-pairs` carries the holdout comparison with a RED
 control. What the asterisk can now carry: heights 1-19 by two engines, height
 20 enumerated once and equal to the formula that predicted it, heights 21-41
 from the tower with a(41) no longer touching `P_21`. Still not a(40)'s grade:
-the colouring engine stops at H = 19, so `T(41,20)` has one enumeration.
+the coloring engine stops at H = 19, so `T(41,20)` has one enumeration.
 
 ---
 
@@ -315,7 +315,7 @@ exponent claim.
 exponentially, not polynomially: a hole is an entropic gain, not a rare
 accident. Qualitative only — the note forbids quoting λ₀≈6.94.
 **Revised 2026-08-06: this is a corollary of Madras 1999's pattern theorem**
-(take the pattern "eight neighbours present, centre absent"; hole-free animals
+(take the pattern "eight neighbors present, center absent"; hole-free animals
 contain zero translates, hence are exponentially rare), so print it as a cited
 consequence, not a measurement. The measured ratio λ₀/λ ≈ 0.978 is the part
 that is ours, and it is n ≤ 18 data.
@@ -348,13 +348,13 @@ conjectural — the last unproved law — which is itself worth saying in print.
 ## C15. `OPEN` The same law holds on every row-local lattice
 
 `docs/proofs/universal-diagonal-law.md`, `results/diagonal-formula.md`.
-T(H+k,H) = q_k(H)·b^H where b is the number of up-neighbours: b=1 square, b=2
+T(H+k,H) = q_k(H)·b^H where b is the number of up-neighbors: b=1 square, b=2
 hex, b=3 king. The report's 3^{n−1} is the b=3 instance of a theorem. Proved,
 all three instances machine-checked.
 
 ## C16. `OPEN` The triangle mod 3
 
-`results/arithmetic-structure.md`. The whole diagonal family's mod-3 behaviour is
+`results/arithmetic-structure.md`. The whole diagonal family's mod-3 behavior is
 governed by one algebraic series: the unique W ∈ 𝔽₃[[t]] with W(0)=1 solving
 W³ = W² + t. 15/15 checks including a 342-cell check against the banked
 triangle. Compact statement; the derivation is where it starts costing.
@@ -417,7 +417,7 @@ is not required.
    Needs 2.
 5. **Doubled-row gap lemma.** Two cells in one row join only as a domino or
    with a gap of exactly one empty cell, bridged by a single cell in the
-   middle column of a neighbouring row. One clause, line 314. Proved:
+   middle column of a neighboring row. One clause, line 314. Proved:
    `docs/proofs/T-n-nm1.md` §3. Needs 2.
 6. **T(n,n−1) = (25n−45)·3^(n−4)**, n ≥ 3. In the paper with derivation,
    lines 304–345; census n = 4..8 in the verifier. Needs 2, 4, 5.
@@ -483,7 +483,7 @@ is not required.
     animal, and E accumulates over column pairs. What "tracking the Euler
     characteristic" (line 226) rests on. Not stated. Cite Gray 1971 or
     Rosenfeld. Needs the definition at line 81.
-20. **Minimal enclosures.** A 1-cell hole needs its four rook neighbours,
+20. **Minimal enclosures.** A 1-cell hole needs its four rook neighbors,
     pairwise king-adjacent, so 4 is minimal and unique; a domino hole needs
     its six; two 1-cell holes need ≥ 6 (two 4-sets share ≤ 2 cells), achieved
     diagonally. Stated lines 82–83 without proof. Needs 19.
@@ -495,7 +495,7 @@ is not required.
     completions, so the count over signatures is T(n,H) exactly. Described
     lines 298–302, correctness never stated. Cite Jensen or Conway; state the
     invariant. Needs 2, 3.
-22. **The colouring second source.** C_H(n) = Σ_{h≤H} (H−h+1)·T(n,h), T its
+22. **The coloring second source.** C_H(n) = Σ_{h≤H} (H−h+1)·T(n,h), T its
     second difference in H; the connected count is the q¹ coefficient of the
     Fortuin–Kasteleyn polynomial. Abstract line 52. 2026-09-04 decision:
     machine work with a pointer, or drop. If kept, state only the

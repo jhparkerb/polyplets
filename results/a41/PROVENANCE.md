@@ -194,7 +194,7 @@ regression, not a second source). Re-assembly with the swept height:
 What changes: a(41) no longer depends on `P_21` at all (H = 21 is level 20 at
 onset, pinned ten ways at depth 5 once `T(40,20)` joins its pins), and the
 tower's top level has the one holdout that crosses assumption families. What
-does not change: heights 21-41 are still formula; the colouring second source
+does not change: heights 21-41 are still formula; the coloring second source
 still stops at H = 19, so `T(41,20)` has one enumeration and one formula
 prediction, not two enumerations.
 

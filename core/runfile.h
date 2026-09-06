@@ -152,7 +152,7 @@ inline int frontierZstdLevel() {
 // production fan-in of ~640 inputs a 64-slot pool serves only ~10% of the
 // round's acquires and the rest pay ZSTD_createDStream's multi-MB workspace
 // allocation (the very cost the pool exists to avoid), while raising it
-// multiplies idle retention across every worker. Unlike every neighbouring
+// multiplies idle retention across every worker. Unlike every neighboring
 // lever (POLY_FRONTIER_ZSTD*, POLY_SPILL_ZSTD_LEVEL, POLY_NO_SEEK) it had NO
 // knob, so the trade could not be moved without a rebuild. POLY_ZSTD_CTX_POOL
 // overrides it; default 64, unchanged. Parsed once per process, like the rest.

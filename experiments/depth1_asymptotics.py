@@ -54,7 +54,7 @@ def control_bar(K, max_order=8):
     ks = range(1, K + 1)
     base = [mp.exp(mp.mpf(1) / (10 * k) - mp.mpf(1) / (30 * k ** 2))
             for k in ks]
-    flavours = {
+    flavors = {
         'smooth':  base,
         'geom':    [base[k - 1] + mp.mpf('0.02') * mp.mpf('0.8') ** k
                     for k in ks],
@@ -63,9 +63,9 @@ def control_bar(K, max_order=8):
         'logk':    [base[k - 1] + mp.mpf('5e-4') * mp.log(k) / k for k in ks],
     }
     worst = {}
-    for name, s in flavours.items():
+    for name, s in flavors.items():
         errs = [abs(v - 1) for v in rich_ladder(s, 1, max_order)]
-        worst[name] = min(errs)          # best order that flavour allows
+        worst[name] = min(errs)          # best order that flavor allows
     return worst
 
 

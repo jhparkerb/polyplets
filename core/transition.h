@@ -6,7 +6,7 @@
 // all king adjacencies (old rows r-1,r,r+1 to new row r) are available with no
 // carry. Connectivity is resolved by union-find over the new column's cells and
 // the old column's components, so crossing partitions and k-way merges (a new
-// cell can fuse up to its W/NW/SW old neighbours plus N/S new neighbours) are
+// cell can fuse up to its W/NW/SW old neighbors plus N/S new neighbors) are
 // handled without special cases.
 //
 // Operates on the fixed-size Sig (no allocation on the hot path). No published

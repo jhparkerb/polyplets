@@ -23,7 +23,7 @@ Altshuler, Yanovsky, Vainsencher, Wagner & Bruckstein (DGCI 2006, LNCS 4245,
 connectivity hypothesis anywhere (their Thm 1, and the self-contained
 slanted-bounding-rectangle argument of their Thm 7). Applied to the union of
 ALL the holes at once, that closes the multi-hole case: the union's
-4-neighbourhood is still foreground, so n >= eps(total area), and the overlap
+4-neighborhood is still foreground, so n >= eps(total area), and the overlap
 question the earlier note stopped on never arises.
 
 Checks (the papers are held locally now, literature/INDEX.txt; the formulas are
@@ -213,7 +213,7 @@ PAD = 8
 
 
 def _masks(cells):
-    """(occupied, 4-neighbourhood) as bitmasks, for a normalized polyomino."""
+    """(occupied, 4-neighborhood) as bitmasks, for a normalized polyomino."""
     c = n = 0
     for (x, y) in cells:
         c |= 1 << ((x + PAD) * STRIDE + (y + PAD))
@@ -309,13 +309,13 @@ def check_disconnected():
         print("    FAIL: a disconnected subset beat the minimum site-perimeter")
         return False
     if not overlap_seen:
-        print("    FAIL: no configuration with SHARED neighbours was reached "
+        print("    FAIL: no configuration with SHARED neighbors was reached "
               "-- the search never left the far-apart regime, so a negative "
               "result would be vacuous")
         return False
     print("    OK -- splitting never beats eps (it ties at k = 2, where a")
-    print("    diagonal pair shares two neighbours), and the search does reach")
-    print("    configurations whose components share neighbours")
+    print("    diagonal pair shares two neighbors), and the search does reach")
+    print("    configurations whose components share neighbors")
     return True
 
 

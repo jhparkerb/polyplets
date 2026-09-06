@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Holdout: does the onset-defect law add real digits to cells it never saw?
 
-Constants fitted on k <= 14 ONLY (or taken as the recognised exact value), then
+Constants fitted on k <= 14 ONLY (or taken as the recognized exact value), then
 used to predict T(2k, k) for k = 15..19 -- banked cells excluded from the fit.
 Reported as digits of T correct, law alone vs law + defect estimate.
 """
@@ -18,7 +18,7 @@ pts = [(k, float(F(tri[(2*k,k)])-law(2*k,k,P))*9.0**-k*math.sqrt(k))
 C_fit = richardson(pts, 4)
 C_rec = math.sqrt(6)/(27*math.sqrt(math.pi))
 print("C_1 fitted on k<=14 : %.10f" % C_fit)
-print("C_1 recognised      : %.10f   (rel diff %+.2e)"
+print("C_1 recognized      : %.10f   (rel diff %+.2e)"
       % (C_rec, (C_fit-C_rec)/C_rec))
 print()
 print("  %3s %12s %12s %14s" % ("k","law alone","law+defect","gain (digits)"))

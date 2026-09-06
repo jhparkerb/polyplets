@@ -29,7 +29,7 @@ Copied by `scp` from `dalby:~/src/polyominoes/`, sha256 verified on both sides.
 
 With `A_n(q) = Sum_S q^{c(S)}` over n-cell subsets weighted by component count,
 the king-connected count is `[q^1] A_n(q)`, computed by a frontier DP over
-colour-coincidence partitions in `Z[q]/(q^2)`. Nothing in it decides
+color-coincidence partitions in `Z[q]/(q^2)`. Nothing in it decides
 connectivity: clashes zero rather than join, there is no union-find verdict, no
 stranded-component death and no completion predicate. Connectivity is read off
 a coefficient at the end. That is why the rows matter — they are the only

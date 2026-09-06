@@ -1,7 +1,7 @@
 # rows41 — the Motley ladder at Nmax = 41
 
 `C1.out` .. `C19.out`: the cut-count totals `C_H(n)` for n = 1..41, one file
-per height, produced by the colouring program (Motley) — the second source
+per height, produced by the coloring program (Motley) — the second source
 that never decides connectivity.
 
 **Why this set exists alongside `../rows/`.** `T(n,H) = C_H - 2C_{H-1} +

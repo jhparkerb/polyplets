@@ -5,7 +5,7 @@ Input is a build/perimeter_min census (`n p count`).  The claim under test:
 
   C(p, i) = A(nmax(p) - i, p), the number of animals at perimeter p and area
   deficit i, is EVENTUALLY CONSTANT in p along each residue class -- and the
-  constants are a convolution of the 4-coloured partition function.
+  constants are a convolution of the 4-colored partition function.
 
 WHY THAT SHAPE.  Take king (square8), where the fat shapes are filled boxes.
 An animal of perimeter exactly p lives in a box with pbox <= p.  A box with
@@ -68,7 +68,7 @@ def partitions_4colour(nmax):
     q = [0] * (nmax + 1)
     q[0] = 1
     for n in range(1, nmax + 1):
-        for _ in range(4):                    # four colours = four factors
+        for _ in range(4):                    # four colors = four factors
             for j in range(n, nmax + 1):
                 q[j] += q[j - n]
     return q
@@ -135,7 +135,7 @@ def main() -> int:
                 running[p] = best
 
     q4 = partitions_4colour(imax + 2)
-    print("4-coloured partition numbers q4(0..%d) = %s"
+    print("4-colored partition numbers q4(0..%d) = %s"
           % (imax, q4[:imax + 1]))
     print()
 

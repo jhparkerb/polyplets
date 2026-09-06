@@ -5,7 +5,7 @@ nonneg coeffs), the growth-constant upper bound is  lambda = Q'(z*)  where z* is
 the smallest positive root of  Q(z) - z*Q'(z) = 0  (the saddle/branch point,
 dx/dz=0). Validated on the polyiamond result lambda_T <= 3.6108.
 
-Once the KING twig/neighbourhood convolution system is derived (the load-bearing
+Once the KING twig/neighborhood convolution system is derived (the load-bearing
 geometric lemma, docs/proofs/polyplet-upper-bound.md), feed its kernel Q here to
 read off the polyplet upper bound. MUST clear the sanity gate: result > a(n)
 ratios (~6.9) and > mu_13 = 6.306, and the rook analog must reproduce a TRUE
@@ -15,7 +15,7 @@ import numpy as np
 
 def eden_bound(K):
     """Crudest twig (Eden) bound: alphabet = all 2^K occupancy patterns of the K
-    newly-exposed neighbours per BFS step. lambda <= K^K/(K-1)^(K-1)."""
+    newly-exposed neighbors per BFS step. lambda <= K^K/(K-1)^(K-1)."""
     return K**K / (K-1)**(K-1)
 
 def kernel_bound(Qc):
@@ -43,5 +43,5 @@ assert abs(lam - 3.6108) < 1e-3, "polyiamond validation FAILED"
 print("  VALIDATION PASSED (matches 3.6108).")
 
 print("\n=== KING kernel: PENDING the geometric lemma ===")
-print("  Derive king twig/neighbourhood convolution system -> Q_king(z), then:")
+print("  Derive king twig/neighborhood convolution system -> Q_king(z), then:")
 print("  kernel_bound(Q_king)  ->  polyplet upper bound.  (Sanity-gate the result.)")

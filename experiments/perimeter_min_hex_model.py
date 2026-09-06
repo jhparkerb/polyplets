@@ -30,12 +30,12 @@ import sys
 from collections import defaultdict
 
 
-def qc(colours, nmax):
-    """[x^j] prod_n (1-x^n)^-colours, exact."""
+def qc(colors, nmax):
+    """[x^j] prod_n (1-x^n)^-colors, exact."""
     q = [0] * (nmax + 1)
     q[0] = 1
     for n in range(1, nmax + 1):
-        for _ in range(colours):
+        for _ in range(colors):
             for j in range(n, nmax + 1):
                 q[j] += q[j - n]
     return q
@@ -45,7 +45,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("hulls", help="'# box ...' lines from --boxes")
     ap.add_argument("census", help="an n p count census from a real run")
-    ap.add_argument("--colours", type=int, default=6)
+    ap.add_argument("--colors", type=int, default=6)
     ap.add_argument("--period", type=int, default=6)
     args = ap.parse_args()
 
@@ -85,11 +85,11 @@ def main() -> int:
             best = max(best, cells)
         nmax_of[p] = best
 
-    q = qc(args.colours, imax + 2)
-    print("q%d(0..%d) = %s" % (args.colours, imax, q[:imax + 1]))
+    q = qc(args.colors, imax + 2)
+    print("q%d(0..%d) = %s" % (args.colors, imax, q[:imax + 1]))
     print()
     print("Model: C(p,i) = sum over hulls with pbox = p of q%d(i - deficit)"
-          % args.colours)
+          % args.colors)
     print("Nothing is fitted; hull areas and multiplicities come from --boxes.")
     print()
 

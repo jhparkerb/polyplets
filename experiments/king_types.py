@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Ground-truth enumerator for the king upper-bound derivation. Brute-force all
 fixed polyplets, and count marked-cell "types" N(n) = #(P, c) where P is an
-n-cell polyplet, c a cell of P, and c's local neighbourhood matches a pattern
+n-cell polyplet, c a cell of P, and c's local neighborhood matches a pattern
 (some offsets FORBIDDEN = must be empty, some REQUIRED = must be occupied).
 
 Everything downstream (the convolution recurrences, the certificate bound) gets

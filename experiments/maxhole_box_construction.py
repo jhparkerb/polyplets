@@ -2,7 +2,7 @@
 """The uniform extremal family for M(n): parity-aligned diagonal-box holes.
 
 Hole(a,b) = all cells with u=x+y in [0,a-1], v=x-y in [0,b-1] (corner-aligned:
-only u=v mod 2 cells exist). Animal = its 4-neighbour ring. Facts verified here:
+only u=v mod 2 cells exist). Animal = its 4-neighbor ring. Facts verified here:
   - |ring| = a+b+2 for all non-degenerate (a,b) (a,b>=2, or =1 with odd partner)
   - the ring is king-connected and encloses exactly the box, area ceil(ab/2)
   - maximizing over a+b = n-2 gives round((n-2)^2/8) = M(n) for EVERY n>=4

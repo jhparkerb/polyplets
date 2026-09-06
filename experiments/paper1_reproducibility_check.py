@@ -25,7 +25,7 @@ the campaign:
      k <= (21-1)/2), and how many are wired closed forms above that.  Cells,
      not shares: a wrong cell ruins a(n) whatever its size, so a percentage
      of a(n) carries no decision (standing ruling, 2026-08-18).
-  F. the Motley (colouring) second source: results/cutcount_b1/rows41/
+  F. the Motley (coloring) second source: results/cutcount_b1/rows41/
      assembles to the banked triangle at every cell with H <= 19 and n <= 40
      (589 cells) and to the kink sweep's own n = 41 row at H <= 19 (19
      cells) -- the two arms of `make gate-cutcount-assembly`, called here.
@@ -178,7 +178,7 @@ def main():
         print(f"   n={n}: {SWEEP_H} swept, {low} formula k<={PINNED_K}, "
               f"{n - SWEEP_H - low} formula k>{PINNED_K}")
 
-    # F. the colouring second source at Nmax 41: the gate's two arms, against
+    # F. the coloring second source at Nmax 41: the gate's two arms, against
     # results/triangle.txt, which is this script's own T.
     tri = CAG.read_triangle(TRIANGLE)
     assert all(tri[c] == T.get(c) for c in tri), "results/triangle.txt != the per-height sweep"

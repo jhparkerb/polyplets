@@ -121,7 +121,7 @@ def main():
     got = 0
     for k in range(args.bud + 1):
         S = FORMULA_N - k
-        res, err = OP.analyse(d, k, S % 2, verbose=False)
+        res, err = OP.analyze(d, k, S % 2, verbose=False)
         if err:
             fail("arm B k=%d: level not pinned (%s)" % (k, err))
             continue

@@ -87,9 +87,9 @@ def gf(seq, nmax, k):
     q, r = sp.div(Np, sp.Poly(D, x), x)
     F = sp.cancel(r.as_expr() / D)
 
-    def principal(centre, m):
+    def principal(center, m):
         """Coefficients of 1/(1-x)^j or 1/(1+x)^j, j = 1..m, at that pole."""
-        g = sp.simplify(u**m * F.subs(x, centre))
+        g = sp.simplify(u**m * F.subs(x, center))
         pol = sp.Poly(sp.expand(sp.series(g, u, 0, m + 1).removeO()), u)
         return {j: pol.coeff_monomial(u ** (m - j)) for j in range(1, m + 1)}
 

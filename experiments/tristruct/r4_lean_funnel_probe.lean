@@ -26,13 +26,13 @@ It tests one question and is sized to answer only that:
 
 r3 (`results/triangle-r3-l3-proofscope.md (deleted)` §4, §7) identified the
 partition-sufficiency induction as the load-bearing risk of the whole
-programme and could not calibrate it. The construction below claims the answer
+program and could not calibrate it. The construction below claims the answer
 is the first: funnel every prefix cell to a representative in the cut column,
 and the induction is Mathlib's (`Mathlib/Logic/Relation.lean:737`), leaving a
 four-case single-step lemma (`redStep_of_step`) as the only content.
 
 **If this file compiles, the crux is a day, not a month, and the residual risk
-of the programme moves to the state-encoding layer. If `redStep_of_step` fails
+of the program moves to the state-encoding layer. If `redStep_of_step` fails
 with `unsolved goals`, the claim above is wrong and the schedule reverts to
 r3's — which is exactly the information the increment is bought to get.** A
 failure naming an identifier is neither answer; see "fragile points".
@@ -292,7 +292,7 @@ theorem sufficiency {P P' M : Finset (ℤ × ℤ)} {c : ℤ}
     KingConnected (P ∪ M) ↔ KingConnected (P' ∪ M)
 ```
 
-That is the theorem the whole programme rests on: the DP may forget everything
+That is the theorem the whole program rests on: the DP may forget everything
 about the past except `colAt P c` and the restricted relation `hrel` names. It
 follows from a `reduction` lemma packaging `redReach_of_reach` and
 `reach_of_redReach` into an iff on `colAt P c ∪ M`, plus the degenerate cases

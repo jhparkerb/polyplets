@@ -1,4 +1,4 @@
-/- R3 L5: definition-level formalisation of T(n,H).
+/- R3 L5: definition-level formalization of T(n,H).
 
    T(n,H) = number of king-connected n-cell subsets of Z^2 with bounding-box
    height exactly H, counted up to translation.

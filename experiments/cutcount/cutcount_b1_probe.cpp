@@ -1,8 +1,8 @@
-// cutcount_b1.cpp — colour-symmetrized spin transfer matrix with clash-zeroing,
+// cutcount_b1.cpp — color-symmetrized spin transfer matrix with clash-zeroing,
 // for the polyplet triangle T(n,H): candidate B1 of
 // results/second-source-candidates-B.md (deleted). (NOT the FK/random-cluster TM: that
 // one joins partitions on adjacency; this one ZEROES on a clash of distinct
-// colours and never joins — connectivity is never decided, only extracted.)
+// colors and never joins — connectivity is never decided, only extracted.)
 //
 // Counts A_n(q) = sum over cell sets S of a height-H king strip of q^{c(S)}
 // (c = number of king-connected components), exactly in the ring Z[q]/(q^2).

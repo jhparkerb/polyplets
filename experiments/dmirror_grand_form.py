@@ -33,7 +33,7 @@ that is a much more tractable obstruction because it suggests its own repair.
 WHERE THE PARITY COMES FROM, and why it is the same effect as A3.2's.
 Reflection in the main diagonal fixes every cell of the main diagonal
 pointwise, but reverses the anti-diagonal: (i, S-1-i) -> (S-1-i, i), which is
-fixed only when S is odd.  So the anti-spine has a centre cell exactly when S
+fixed only when S is odd.  So the anti-spine has a center cell exactly when S
 is odd and none when S is even.  That is the period-2 quasi-polynomiality, and
 it is the same mechanism as the through-cell / between-cell axis split that
 results/symmetry-classes.md found in A030234.
@@ -74,7 +74,7 @@ from fractions import Fraction as F
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from dmirror_onset_probe import load, analyse  # noqa: E402
+from dmirror_onset_probe import load, analyze  # noqa: E402
 
 KMAX = 5           # levels pinnable with a holdout on banked data
 
@@ -227,7 +227,7 @@ def main():
     okc = True
     for k in range(0, kmax + 1):
         for parity in (0, 1):
-            res, err = analyse(d, k, parity)
+            res, err = analyze(d, k, parity)
             if res is None:
                 print("  k=%d parity=%d NOT PINNED (%s)" % (k, parity, err))
                 okc = False

@@ -175,7 +175,7 @@ theorem area_max (n ha hm : ℕ) (h : ha + hm + 2 ≤ n) :
 
 /-! ### Sealing: the unconditional fragments of (II′) -/
 
-/-- **Sealing.** A rook neighbour of an enclosed cell is either an animal cell or
+/-- **Sealing.** A rook neighbor of an enclosed cell is either an animal cell or
 is itself enclosed: otherwise the hole would leak to infinity. -/
 lemma mem_or_enclosed_of_rookAdj {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ}
     (hp : p ∈ enclosed S) (hadj : rookAdj p q) : q ∈ S ∨ q ∈ enclosed S := by
@@ -186,7 +186,7 @@ lemma mem_or_enclosed_of_rookAdj {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ}
     exact Relation.ReflTransGen.head ⟨hp.1, hq, hadj⟩ hr
 
 /-- The animal reaches the level `u + 1` above a `u`-maximal hole cell, in *both*
-of that cell's upward rook neighbours. -/
+of that cell's upward rook neighbors. -/
 lemma moat_above {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ} (hp : p ∈ enclosed S)
     (hmax : ∀ q ∈ enclosed S, q.1 + q.2 ≤ p.1 + p.2) :
     (p.1 + 1, p.2) ∈ S ∧ (p.1, p.2 + 1) ∈ S := by

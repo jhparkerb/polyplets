@@ -37,8 +37,8 @@
 // i.e. filled boxes, and the frame is the plain (x,y) one.  On square4 (rook)
 // they are L-1 balls -- DIAMONDS -- which do not fill any (x,y) box, and the
 // complement trick would enumerate half-empty boxes and die.  So square4 is
-// worked in the rotated frame u = x+y, v = x-y, where the four rook neighbours
-// become the four DIAGONAL neighbours and every cell carries u+v even.  A
+// worked in the rotated frame u = x+y, v = x-y, where the four rook neighbors
+// become the four DIAGONAL neighbors and every cell carries u+v even.  A
 // diamond of radius r is then exactly the parity-restricted (2r+1)x(2r+1) box:
 // full again, and the same code runs.  The map is a bijection onto the even
 // sublattice ((u,v) -> ((u+v)/2, (u-v)/2)), so nothing is lost or double
@@ -119,12 +119,12 @@ struct Mask {
 
 struct Offset { int du, dv; };
 
-// square8 in the plain frame: the 8 king neighbours.
+// square8 in the plain frame: the 8 king neighbors.
 static constexpr Offset kKing[] = {{-1,-1},{0,-1},{1,-1},{-1,0},
                                    {1,0},{-1,1},{0,1},{1,1}};
-// square4 in the rotated frame: the 4 rook neighbours become the 4 diagonals.
+// square4 in the rotated frame: the 4 rook neighbors become the 4 diagonals.
 static constexpr Offset kDiag[] = {{-1,-1},{1,-1},{-1,1},{1,1}};
-// tri6, the 6-neighbour triangular/hex lattice, in axial coordinates -- the
+// tri6, the 6-neighbor triangular/hex lattice, in axial coordinates -- the
 // same offsets g2 uses, so its --siteperim census gates this one too.
 static constexpr Offset kTri6[] = {{0,-1},{1,-1},{-1,0},{1,0},{-1,1},{0,1}};
 
@@ -138,7 +138,7 @@ static constexpr Offset kTri6[] = {{0,-1},{1,-1},{-1,0},{1,0},{-1,1},{0,1}};
 //   tri6     balls are HEXAGONS, which are no parallelogram in any frame, so a
 //            third constraint is needed     -> u, v, u+v     (a hexagon)
 //
-// Two functionals is the old behaviour exactly; the third is inert unless the
+// Two functionals is the old behavior exactly; the third is inert unless the
 // lattice asks for it (see the `hex3` flag below).
 
 struct BoxResult {
@@ -163,10 +163,10 @@ struct BoxRun {
       : W(W_), H(H_), parity(parity_), mult(mult_), rmax(rmax_),
         off(off_), noff(noff_), hex3(hex3_), slo(slo_), shi(shi_) {}
 
-  // frame geometry, expanded by one ring so neighbours are always in range
+  // frame geometry, expanded by one ring so neighbors are always in range
   int EW = 0, EH = 0;
   std::vector<int> cellPos;                    // cell index -> expanded pos
-  std::vector<std::vector<int>> nbrPos;        // cell index -> neighbour posns
+  std::vector<std::vector<int>> nbrPos;        // cell index -> neighbor posns
   std::vector<Mask> nbrIdx;                    // cell index -> in-box nbr mask
   std::vector<int> cellU, cellV;
   int M = 0;
@@ -250,7 +250,7 @@ struct BoxRun {
       if (cnt[q] > 0 && !inAnimal[q]) ++perim;
     pbox = perim;
 
-    // Size verdict last, so pbox is filled in before it is passed judgement on.
+    // Size verdict last, so pbox is filled in before it is passed judgment on.
     // The caller compares pbox against PMAX and only then decides whether an
     // over-mask frame is a problem or merely out of range.
     if (M > kMaxCells) { tooBig = true; return true; }
@@ -473,7 +473,7 @@ int main(int argc, char** argv) {
       const int smax = W + H - 2;
       for (int par : parities) {
         // hex3: walk every window [slo,shi] of u+v. Without it the single
-        // full window is the plain rectangle, i.e. the old behaviour.
+        // full window is the plain rectangle, i.e. the old behavior.
         for (int slo = 0; slo <= (hex3 ? smax : 0); ++slo)
           for (int shi = (hex3 ? slo : smax); shi <= smax; ++shi) {
             BoxRun probe(W, H, par, 1, 0, off, noff, hex3, slo, shi);

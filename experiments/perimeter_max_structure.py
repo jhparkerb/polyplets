@@ -12,7 +12,7 @@ Reads `build/perimeter_defect` census rows (`n k c H count`) and asks:
      law against data rather than against a table someone typed.
 
   2. RECENTRED BASIS.  The partial-fraction basis 1/Phi_1^j expands the plain
-     part in C(n+j-1, j-1), i.e. centred at n = 0, which is why its coefficients
+     part in C(n+j-1, j-1), i.e. centered at n = 0, which is why its coefficients
      are ugly rationals.  Re-expand each residue class in C(m, j) where
      m = (n - n0)/period steps ALONG the class from its first in-regime point.
      Non-negative integers there would be evidence of a direct combinatorial

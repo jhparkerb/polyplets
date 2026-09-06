@@ -33,7 +33,7 @@ The exploration is a breadth-first flood from the origin, run as a pure
 transition function `expStep : ExpState → Bool → ExpState` on a queue of
 *candidates*. Each step pops the head candidate and consumes one `Bool` — the
 answer to "is this cell in the animal?". Accepted cells push their king
-neighbours (those scan-greater than the origin, and not yet seen) onto the
+neighbors (those scan-greater than the origin, and not yet seen) onto the
 queue. Two runs of that transition are compared:
 
 * `runO D k` drives it with the membership oracle of a fixed shape `D`;
@@ -44,11 +44,11 @@ accept-position set, which is what makes `S ↦ accept positions` injective.
 
 Two facts bound the number of steps:
 
-* the origin proposes only `4` candidates (the other four king neighbours are
+* the origin proposes only `4` candidates (the other four king neighbors are
   scan-smaller, hence never cells of a expShape), and
 * every later accepted cell `c` proposes at most `5`: its proposer `p` and all
-  of `p`'s neighbours were already seen when `p` was accepted, and `p` shares
-  at least two neighbours with `c` (`countP_new_le`).
+  of `p`'s neighbors were already seen when `p` was accepted, and `p` shares
+  at least two neighbors with `c` (`countP_new_le`).
 
 So at most `5n` cells are ever considered, the run halts inside `5 * n` steps
 (`runO_queue_nil`), and the accept positions form an `n`-subset of
@@ -155,9 +155,9 @@ theorem choose_le_pow (n : ℕ) : Nat.choose (5 * n) n * 256 ^ n ≤ 3125 ^ n :=
     have := Nat.le_of_mul_le_mul_right key hM
     rwa [show 5 * (n + 1) = 5 * n + 5 by ring]
 
-/-! ## King neighbourhoods, as ordered lists
+/-! ## King neighborhoods, as ordered lists
 
-The exploration needs neighbours in a *fixed order* (determinism is the whole
+The exploration needs neighbors in a *fixed order* (determinism is the whole
 point), so they are produced as a `List`, not a `Finset`. Everything about the
 proposal budget is a statement about `List.countP` over these eight cells. -/
 
@@ -165,7 +165,7 @@ proposal budget is a statement about `List.countP` over these eight cells. -/
 def nbrOffsets : List (ℤ × ℤ) :=
   [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
 
-/-- The eight king neighbours of `c`, in the fixed order of `nbrOffsets`. -/
+/-- The eight king neighbors of `c`, in the fixed order of `nbrOffsets`. -/
 def nbrsOf (c : ℤ × ℤ) : List (ℤ × ℤ) :=
   nbrOffsets.map fun o => (c.1 + o.1, c.2 + o.2)
 
@@ -184,7 +184,7 @@ lemma mem_nbrsOf {c q : ℤ × ℤ} : q ∈ nbrsOf c ↔ kingAdj c q := by
   simp only [List.mem_cons, List.not_mem_nil, or_false, kingAdj, ne_eq, Prod.mk.injEq, abs_le]
   omega
 
-/-- The eight neighbours are distinct. -/
+/-- The eight neighbors are distinct. -/
 lemma nbrsOf_nodup (c : ℤ × ℤ) : (nbrsOf c).Nodup := by
   obtain ⟨cx, cy⟩ := c
   rw [nbrsOf_eq]
@@ -198,7 +198,7 @@ own anchor. -/
 def scanPos (q : ℤ × ℤ) : Bool :=
   decide (0 < q.2) || (decide (q.2 = 0) && decide (0 < q.1))
 
-/-- **The origin proposes only four candidates.** Of its eight king neighbours,
+/-- **The origin proposes only four candidates.** Of its eight king neighbors,
 the four scan-predecessors `(x-1..x+1, y-1)` and `(x-1, y)` are scan-smaller
 than the origin, hence never proposed. -/
 lemma countP_scanPos_origin : (nbrsOf (0, 0)).countP scanPos = 4 := by decide
@@ -210,7 +210,7 @@ private def offsetFar (e o : ℤ × ℤ) : Bool :=
   decide (o ≠ e) &&
     decide (¬ (e.1 - o.1 ≤ 1 ∧ o.1 - e.1 ≤ 1 ∧ e.2 - o.2 ≤ 1 ∧ o.2 - e.2 ≤ 1))
 
-/-- **The eight-case neighbour-overlap check.** For each king offset `e`, at
+/-- **The eight-case neighbor-overlap check.** For each king offset `e`, at
 most five of the eight king offsets are neither `e` itself nor king-adjacent to
 `e`: an orthogonal `e` leaves three, a diagonal `e` leaves five. This is the
 `|N(p) ∩ N(c)| ∈ {2, 4}` fact of the paper's decision-tree count. -/
@@ -218,8 +218,8 @@ private lemma offsetFar_count_le : ∀ e ∈ nbrOffsets, nbrOffsets.countP (offs
   decide
 
 /-- **The proposal budget for a non-anchor cell.** If `c` has an already-decided
-king neighbour `p`, then any predicate that only holds on cells distinct from
-`p` and not adjacent to `p` selects at most five of `c`'s eight neighbours.
+king neighbor `p`, then any predicate that only holds on cells distinct from
+`p` and not adjacent to `p` selects at most five of `c`'s eight neighbors.
 Applied with `P` = "scan-positive and not yet considered", `p` = the proposer of
 `c`: the proposer and the two-to-four cells it shares with `c` were all recorded
 when `p` was accepted. -/
@@ -264,7 +264,7 @@ structure ExpState where
   /-- Indices of the decisions that were "yes". -/
   accPos : Finset ℕ
 
-/-- The candidates a newly accepted cell `c` proposes: its king neighbours that
+/-- The candidates a newly accepted cell `c` proposes: its king neighbors that
 are scan-greater than the origin (a shape has no others) and have not been
 considered yet. -/
 def newCells (con : Finset (ℤ × ℤ)) (c : ℤ × ℤ) : List (ℤ × ℤ) :=
@@ -275,11 +275,11 @@ lemma mem_newCells {con : Finset (ℤ × ℤ)} {c q : ℤ × ℤ} :
     q ∈ newCells con c ↔ q ∈ nbrsOf c ∧ scanPos q = true ∧ q ∉ con := by
   simp [newCells, List.mem_filter]
 
-/-- Proposals are distinct: the eight king neighbours are. -/
+/-- Proposals are distinct: the eight king neighbors are. -/
 lemma newCells_nodup (con : Finset (ℤ × ℤ)) (c : ℤ × ℤ) : (newCells con c).Nodup :=
   (nbrsOf_nodup c).filter _
 
-/-- The proposal count as a `countP` over the neighbour list. -/
+/-- The proposal count as a `countP` over the neighbor list. -/
 lemma newCells_length (con : Finset (ℤ × ℤ)) (c : ℤ × ℤ) :
     (newCells con c).length
       = (nbrsOf c).countP fun q => scanPos q && !decide (q ∈ con) :=
@@ -301,7 +301,7 @@ private def expStepAux (st : ExpState) (b : Bool) :
 
 /-- **One decision step.** Pop the head candidate and consume one `Bool`: the
 answer to "does the animal contain this cell?". A "yes" records the cell and
-queues its unseen scan-positive neighbours; a "no" simply drops it. With an
+queues its unseen scan-positive neighbors; a "no" simply drops it. With an
 empty queue the run has finished and the step is inert apart from the counter.
 -/
 def expStep (st : ExpState) (b : Bool) : ExpState := expStepAux st b st.queue
@@ -453,7 +453,7 @@ structure Good (D : Finset (ℤ × ℤ)) (st : ExpState) : Prop where
   qNotAcc : ∀ e ∈ st.queue, e.1 ∉ st.accepted
   /-- Every candidate but the origin carries an accepted, adjacent proposer. -/
   qParent : ∀ e ∈ st.queue, (e.2 ∈ st.accepted ∧ kingAdj e.2 e.1) ∨ e.1 = (0, 0)
-  /-- An accepted cell has proposed all of its scan-positive neighbours. -/
+  /-- An accepted cell has proposed all of its scan-positive neighbors. -/
   closure : ∀ q ∈ st.accepted, ∀ r ∈ nbrsOf q, scanPos r = true → r ∈ st.considered
   /-- Before the origin is accepted, nothing has happened at all. -/
   base : (0, 0) ∈ st.accepted ∨ (st.accepted = ∅ ∧ st.considered = {(0, 0)})
@@ -492,7 +492,7 @@ lemma good_init (D : Finset (ℤ × ℤ)) : Good D expInit where
 /-- **The invariant is preserved by an oracle-driven step.** The rejecting and
 inert steps only shrink the queue; the accepting step is where the budget
 argument lives — the origin proposes four candidates, and any later cell
-proposes at most five because its proposer and their shared neighbours are
+proposes at most five because its proposer and their shared neighbors are
 already recorded (`countP_new_le`). -/
 lemma good_step {D : Finset (ℤ × ℤ)} {st : ExpState} (hg : Good D st) :
     Good D (expStep st (oracleBit D st)) := by
@@ -932,7 +932,7 @@ theorem a_le_choose (n : ℕ) (hn : 1 ≤ n) : a n ≤ Nat.choose (5 * n) n := b
 
 Plain `#print axioms`; the `#guard_msgs`-wrapped versions are integrated into
 the campaign audit point by the orchestrator. Both results must carry the
-standard three — no `native_decide` enters this file, the eight-case neighbour
+standard three — no `native_decide` enters this file, the eight-case neighbor
 check being a kernel `decide`. -/
 
 #print axioms a_le_choose

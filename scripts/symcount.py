@@ -1,7 +1,7 @@
 """S2 symmetric-animal counter (corrected design, June 13, 2026).
 
 Counts connected g-symmetric lattice animals by size, for a symmetry group g
-acting on the square (king) lattice with its centre/axis pinned at a fixed
+acting on the square (king) lattice with its center/axis pinned at a fixed
 location. Method: Redelmeier over the ORBIT GRAPH (nodes = <g>-orbits of
 cells) to enumerate connected orbit-subsets once each, then keep only those
 whose lifted CELL set is genuinely king-connected. That connectivity filter is
@@ -9,8 +9,8 @@ the fix over the rejected pure orbit-subgraph count (which scored
 symmetric-but-disconnected sets like {(1,0),(-1,0)} as valid). See
 docs-s2-symmetric-enumerator.md.
 
-Pinning the centre removes translation freedom, so each symmetric
-translation-class is counted once; summing over all centre placements of a
+Pinning the center removes translation freedom, so each symmetric
+translation-class is counted once; summing over all center placements of a
 symmetry type reproduces Burnside's Fix(g).
 """
 
@@ -19,7 +19,7 @@ KING = [(dx, dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1) if (dx, dy) != (0, 0)
 
 def build_orbit_graph(group, R):
     """group: list of cell->cell transforms (a group, incl. identity).
-    R: animals of size <= R fit within radius R of the pinned centre.
+    R: animals of size <= R fit within radius R of the pinned center.
     Returns (orbits, adj): orbits[i] = frozenset of cells; adj[i] = set of
     orbit indices king-adjacent to i. Orbits leaving the box are dropped.
     """
@@ -69,10 +69,10 @@ def _connected(cells):
 
 def count_symmetric(group, maxn, anchor=None):
     """Return {n: # connected g-symmetric animals of size n} for 1<=n<=maxn,
-    with g's centre/axis pinned (one placement).
+    with g's center/axis pinned (one placement).
 
     anchor: optional predicate(cells)->bool used to pin any residual
-    translation a pinned *axis* still allows (a rotation centre pins
+    translation a pinned *axis* still allows (a rotation center pins
     everything, so anchor=None there; a mirror line leaves translation ALONG
     it free, so the anchor selects one canonical translate)."""
     orbits, adj = build_orbit_graph(group, maxn + 2)
@@ -120,14 +120,14 @@ def count_symmetric(group, maxn, anchor=None):
 ID = lambda x, y: (x, y)
 
 R180_PLACEMENTS = {
-    "C":  [ID, lambda x, y: (-x, -y)],       # centre on a cell
+    "C":  [ID, lambda x, y: (-x, -y)],       # center on a cell
     "Mh": [ID, lambda x, y: (1 - x, -y)],    # horizontal-edge midpoint
     "Mv": [ID, lambda x, y: (-x, 1 - y)],    # vertical-edge midpoint
     "V":  [ID, lambda x, y: (1 - x, 1 - y)], # vertex
 }
 
-# 90-degree rotational symmetry: the 4-fold centre sits on a cell or a vertex
-# (never an edge midpoint). Each group is the 4 rotations about that centre.
+# 90-degree rotational symmetry: the 4-fold center sits on a cell or a vertex
+# (never an edge midpoint). Each group is the 4 rotations about that center.
 R90_PLACEMENTS = {
     "cell":   [ID,
                lambda x, y: (-y, x),
@@ -148,7 +148,7 @@ HMIRROR_PLACEMENTS = {
 }
 
 # Diagonal mirror (main diagonal only; coefficient 2 covers the anti-diagonal).
-# A diagonal lattice reflection must run through cell centres, so there is just
+# A diagonal lattice reflection must run through cell centers, so there is just
 # the one placement.
 DMIRROR_PLACEMENTS = {
     "through_cells": [ID, lambda x, y: (y, x)],
@@ -159,7 +159,7 @@ DMIRROR_PLACEMENTS = {
 # The four types above are the per-ELEMENT fixed-point counts Burnside needs.
 # The orbit-SIZE distribution needs per-SUBGROUP invariant counts instead, and
 # those are different objects: I(D2ax) is the set of animals fixed by BOTH axis
-# mirrors, not Fix(h).  Each subgroup below has a fixed point (its centre), so
+# mirrors, not Fix(h).  Each subgroup below has a fixed point (its center), so
 # every placement pins translation completely and no anchor is needed.
 #
 # C4 = <r90> is already R90_PLACEMENTS: invariance under r90 IS invariance
@@ -176,9 +176,9 @@ D2AX_PLACEMENTS = {
 }
 
 # D2diag = {e, d, ad, r180}: the two diagonal mirrors.  A diagonal lattice
-# reflection must run through cell centres, so the axes are y = x and
+# reflection must run through cell centers, so the axes are y = x and
 # x + y = D; translation moves the pair by (-a+b, a+b), so only D mod 2
-# survives -- two placements, centred on a cell (D=0) or a vertex (D=1).
+# survives -- two placements, centered on a cell (D=0) or a vertex (D=1).
 D2DIAG_PLACEMENTS = {
     f"d{D}": [ID,
               lambda x, y: (y, x),
@@ -187,7 +187,7 @@ D2DIAG_PLACEMENTS = {
     for D in (0, 1)
 }
 
-# D4, the full group: centre on a cell (V=0) or a vertex (V=1), as for r90.
+# D4, the full group: center on a cell (V=0) or a vertex (V=1), as for r90.
 D4_PLACEMENTS = {
     f"c{V}": [ID,
               (lambda V: lambda x, y: (V - y, x))(V),
@@ -201,7 +201,7 @@ D4_PLACEMENTS = {
 }
 
 
-# Residual-translation anchors: a rotation centre pins position fully (None);
+# Residual-translation anchors: a rotation center pins position fully (None);
 # a horizontal mirror axis leaves x free -> pin leftmost cell at x=0; a
 # diagonal axis leaves the (1,1) direction free -> pin min(x+y) to {0,1}
 # (translation along the diagonal moves x+y in steps of 2).
@@ -236,7 +236,7 @@ SUBGROUP_TYPES = {
 
 
 def count_symmetry_type(placements, maxn, anchor=None):
-    """Sum counts over all centre/axis placements of one symmetry type."""
+    """Sum counts over all center/axis placements of one symmetry type."""
     total = {}
     for group in placements.values():
         for n, c in count_symmetric(group, maxn, anchor).items():

@@ -10,7 +10,7 @@ import Mathlib
 
 The generic front of the universal diagonal law
 (`docs/proofs/universal-diagonal-law.md`). A **row-local lattice** `L` is a
-finite nonempty set `D` of *up-offsets*; adjacency is nearest-neighbour inside a
+finite nonempty set `D` of *up-offsets*; adjacency is nearest-neighbor inside a
 row together with the offsets of `D` between consecutive rows:
 
 ```
@@ -20,7 +20,7 @@ Adj L p q ↔ p ≠ q ∧ ((p.2 = q.2 ∧ |p.1 - q.1| = 1) ∨
 ```
 
 The named instances are square (`D = {0}`), hexagonal/brick (`D = {-1, 0}`),
-king (`D = {-1, 0, 1}`), the five-neighbour lattice (`D = Icc (-2) 2`) and the
+king (`D = {-1, 0, 1}`), the five-neighbor lattice (`D = Icc (-2) 2`) and the
 degenerate `D = {-2, 0, 2}`. The drift count is `b = D.card`.
 
 **Scope note.** The paper's condition (R) allows an arbitrary finite
@@ -41,7 +41,7 @@ Two numbers control the geometry:
 namespace Polyplets.Universal
 
 /-- **A row-local lattice**: a finite nonempty set `D` of up-offsets. Within-row
-adjacency is nearest-neighbour; between consecutive rows the allowed
+adjacency is nearest-neighbor; between consecutive rows the allowed
 x-displacements are exactly the elements of `D`. -/
 structure RowLocal where
   /-- The up-offset set: `q` sits above `p` iff `q.2 = p.2 + 1` and
@@ -81,7 +81,7 @@ end RowLocal
 
 /-! ## Adjacency -/
 
-/-- **Row-local adjacency**: distinct cells that are neighbours inside a row, or
+/-- **Row-local adjacency**: distinct cells that are neighbors inside a row, or
 sit on consecutive rows at an x-displacement drawn from `L.D`. (The `p ≠ q`
 clause is implied by each disjunct; it is kept to match the paper's phrasing.)
 -/

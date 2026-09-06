@@ -114,17 +114,17 @@ labels = [label(h) for h in reps]
 
 # ---------- S(K): doubly-symmetric counts via symcount placements ----------
 ID = sc.ID
-D2O = {  # {e, r^2, h, v} centred on cell / vertex / h-edge / v-edge
+D2O = {  # {e, r^2, h, v} centered on cell / vertex / h-edge / v-edge
     "cell": [ID, lambda x, y: (-x, -y), lambda x, y: (x, -y), lambda x, y: (-x, y)],
     "vert": [ID, lambda x, y: (1 - x, 1 - y), lambda x, y: (x, 1 - y), lambda x, y: (1 - x, y)],
     "he":   [ID, lambda x, y: (1 - x, -y), lambda x, y: (x, -y), lambda x, y: (1 - x, y)],
     "ve":   [ID, lambda x, y: (-x, 1 - y), lambda x, y: (x, 1 - y), lambda x, y: (-x, y)],
 }
-D2D = {  # {e, r^2, d, d'} centred on cell / vertex
+D2D = {  # {e, r^2, d, d'} centered on cell / vertex
     "cell": [ID, lambda x, y: (-x, -y), lambda x, y: (y, x), lambda x, y: (-y, -x)],
     "vert": [ID, lambda x, y: (1 - x, 1 - y), lambda x, y: (y, x), lambda x, y: (1 - y, 1 - x)],
 }
-D4F = {  # full D4 centred on cell / vertex
+D4F = {  # full D4 centered on cell / vertex
     "cell": [ID, lambda x, y: (-y, x), lambda x, y: (-x, -y), lambda x, y: (y, -x),
              lambda x, y: (x, -y), lambda x, y: (-x, y), lambda x, y: (y, x), lambda x, y: (-y, -x)],
     "vert": [ID, lambda x, y: (1 - y, x), lambda x, y: (1 - x, 1 - y), lambda x, y: (y, 1 - x),

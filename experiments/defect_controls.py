@@ -9,7 +9,7 @@ had no control at all on the fitted rate r.
 
 This script supplies:
 
-  1. a control SUITE of non-terminating flavours with KNOWN amplitude C, run
+  1. a control SUITE of non-terminating flavors with KNOWN amplitude C, run
      through the identical Richardson pipeline over the same k window the real
      data has -> the achievable digit count per Richardson order;
   2. the C_1 extraction redone in mpmath at 60 digits from the exact Fractions,
@@ -17,7 +17,7 @@ This script supplies:
   3. a control for the fitted exponential rate r (true rates 9, 8.9, 8.95,
      9.1), with and without a realistic 1/k correction;
   4. a theta-coherence scan: for candidate theta, the SPREAD of C across
-     Richardson orders is minimised at the true theta; calibrated against an
+     Richardson orders is minimized at the true theta; calibrated against an
      exactly-built sequence of known theta;
   5. per-j amplitude-family table with error bars taken from (1) at that j's
      window, plus the theta-misspecification term.
@@ -141,7 +141,7 @@ def matched_control(pts, ks, order=5, ntail=80, rho_cap=mp.mpf(4)):
 
 
 def control_points(fn, ks, th, C=CTRL_C, th_used=None):
-    """Build A_k = value * 9^-k * k^-th_used for the control flavour fn."""
+    """Build A_k = value * 9^-k * k^-th_used for the control flavor fn."""
     if th_used is None:
         th_used = th
     return [(k, fn(C, k, th) * mp.mpf(9) ** (-k) * mp.mpf(k) ** (-th_used))
@@ -204,7 +204,7 @@ def task1():
     print("  k window = %d..%d (%d points), same as the j=1 data. True C = %s"
           % (ks[0], ks[-1], len(ks), mp.nstr(CTRL_C, 8)))
     print()
-    hdr = "  %-24s" % "flavour" + "".join("  order %d " % o for o in range(2, 7))
+    hdr = "  %-24s" % "flavor" + "".join("  order %d " % o for o in range(2, 7))
     print(hdr)
     for name, fn in FLAVOURS:
         pts = control_points(fn, ks, -0.5)
@@ -295,8 +295,8 @@ def task23():
     print()
     print("  Signature test: how does |C(o) - C(o-1)| behave with order?")
     print("  A convergent smooth 1/k series shrinks it; a half-power or log")
-    print("  contaminant stalls it.  Real data vs the three flavours,")
-    print("  each normalised to its own order-2 step:")
+    print("  contaminant stalls it.  Real data vs the three flavors,")
+    print("  each normalized to its own order-2 step:")
     ks = [k for k, _ in pts]
     rows = [("real data", vals)]
     for name, fn in FLAVOURS[1:]:
@@ -385,7 +385,7 @@ def task4():
                   % (r_true, mp.nstr(th, 3), float(raw), float(rich),
                      float(r3)))
     print()
-    print("  (ii) realistic controls: same rates times the flavour-(a) smooth")
+    print("  (ii) realistic controls: same rates times the flavor-(a) smooth")
     print("       1/k series -- i.e. what a real asymptotic sequence looks like.")
     print("  %8s %6s %12s %14s %14s"
           % ("true r", "theta", "raw r(19)", "Rich (order1)", "Rich order3"))
@@ -401,7 +401,7 @@ def task4():
                      float(r3)))
     print()
     print("  (iii) theta misspecified by delta, true rate exactly 9,")
-    print("        flavour-(a) correction present:")
+    print("        flavor-(a) correction present:")
     print("  %8s %12s %14s %14s" % ("delta", "raw r(19)", "Rich order1",
                                     "Rich order3"))
     for d in ("-0.2", "-0.1", "0", "0.1", "0.2"):
@@ -509,8 +509,8 @@ def task5():
     print("  its own band, and how wide is that band.")
     print()
 
-    def scan(label, pts_fn, centre, half=0.12, step=0.001, truth=None):
-        thetas = [centre - half + i * step
+    def scan(label, pts_fn, center, half=0.12, step=0.001, truth=None):
+        thetas = [center - half + i * step
                   for i in range(int(round(2 * half / step)) + 1)]
         res = coherence(pts_fn, thetas)
         if not res:
@@ -578,7 +578,7 @@ def task6():
     print("  C_j extracted by Richardson (order = min(4, pts-1)) at theta=j-3/2.")
     print()
     # error budget: per-j, run the control suite over that j's k window and take
-    # the worst relative error across flavours (a),(b),(c) at the same order.
+    # the worst relative error across flavors (a),(b),(c) at the same order.
     print("  (a) control-suite relative error in C over each j's own k window")
     print("  %3s %6s %8s %10s %10s %10s %10s"
           % ("j", "pts", "order", "(a)", "(a')", "(b)", "(c)"))

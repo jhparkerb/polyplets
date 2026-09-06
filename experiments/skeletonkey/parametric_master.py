@@ -225,7 +225,7 @@ def wired_selfcheck():
     is one code path for nineteen numbers, so it is checked here against the
     other way of doing it: carry the P_k as polynomials in n and expand
     log(1+x) explicitly, which is what the k=3 gate did before it was
-    generalised. Agreement means the fit is not an artefact of the fit.
+    generalized. Agreement means the fit is not an artifact of the fit.
     """
     sys.path.insert(0, os.path.join(ROOT, "experiments"))
     from slope2_law_vs_truth import read_pk  # noqa: E402

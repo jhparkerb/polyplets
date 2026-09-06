@@ -1,7 +1,7 @@
 // Fast symmetric-polyplet counter (C++ port of scripts/symcount.py).
 //
 // Counts connected king-move animals invariant under a chosen symmetry type,
-// summed over that type's centre/axis placements, by size 1..MAXN. Method
+// summed over that type's center/axis placements, by size 1..MAXN. Method
 // matches the validated Python: Redelmeier over the ORBIT GRAPH (nodes =
 // orbits of cells under the symmetry group), keeping only subsets whose lifted
 // cell set is genuinely king-connected, with a per-type anchor pinning any
@@ -70,7 +70,7 @@ static SymType makeType(const std::string& name) {
     return {{{{ID, {0,1,0, 1,0,0}}}},
             Anchor::Diag};
   // --- SUBGROUP-invariant types (see scripts/symcount.py). Each subgroup below
-  // has a centre, so every placement pins translation and no anchor applies.
+  // has a center, so every placement pins translation and no anchor applies.
   // c4 is r90's group: invariance under r90 is invariance under all of C4.
   if (name == "c4") return makeType("r90");
   if (name == "d2ax") {   // {e, h, v, r180}: mirrors x = E/2, y = F/2
@@ -92,7 +92,7 @@ static SymType makeType(const std::string& name) {
                                {-1,0,D, 0,-1,D}}});
     return t;
   }
-  if (name == "d4") {     // the full group, centred on a cell (V=0) or vertex
+  if (name == "d4") {     // the full group, centered on a cell (V=0) or vertex
     SymType t{{}, Anchor::None};
     for (int V = 0; V <= 1; ++V)
       t.placements.push_back({{ID,
@@ -127,7 +127,7 @@ struct Counter {
   std::vector<int> bfsStack;     // reused BFS work buffer (no per-node alloc)
   std::vector<int> list;         // shared untried pool (no per-node alloc): a
                                  // node owns list[start..end); its children
-                                 // append new neighbours past end, so each
+                                 // append new neighbors past end, so each
                                  // child's untried range stays contiguous.
   std::vector<u64> counts;
   // Optional (n, height) refinement. The height-preserving subgroup of D4 is
@@ -176,7 +176,7 @@ struct Counter {
     const int V = static_cast<int>(orbitCells.size());
     weight.assign(V, 0);
     for (int i = 0; i < V; ++i) weight[i] = static_cast<int>(orbitCells[i].size());
-    // adjacency (per-orbit mark vector dedups neighbours; V is small and this
+    // adjacency (per-orbit mark vector dedups neighbors; V is small and this
     // runs once per placement, not in the search hot path)
     adj.assign(V, {});
     for (int i = 0; i < V; ++i) {
@@ -238,7 +238,7 @@ struct Counter {
 
   // Allocation-free Redelmeier over the shared `list` pool. This node owns the
   // untried range list[start..end); it tries each candidate forward, appending
-  // a candidate's newly-reached neighbours past the current end so the child's
+  // a candidate's newly-reached neighbors past the current end so the child's
   // untried range list[i+1..newEnd) is a single contiguous slice — no per-node
   // vector copy (the old `next = untried` + `newly` was ~3 heap allocs/node).
   // On backtrack the appended tail is unmarked and truncated. Forward vs the
@@ -274,7 +274,7 @@ struct Counter {
 
   // Enumerate every animal rooted at orbit r (the min-index orbit it contains,
   // via the u>root guard). Self-contained: resets reached, seeds the untried
-  // pool from r's neighbours, sweeps, unwinds. Roots are independent, so this
+  // pool from r's neighbors, sweeps, unwinds. Roots are independent, so this
   // is the unit of parallelism.
   void runRoot(int r) {
     const int V = static_cast<int>(orbitCells.size());
@@ -293,7 +293,7 @@ struct Counter {
   // Parallel over roots: each thread takes an independent copy of the (cheap,
   // read-only-after-build) orbit graph + its own search buffers, and pulls
   // roots off an atomic counter. Dynamic pull because subtree sizes vary
-  // wildly (a centred animal's root is its upper-left orbit; low-index roots
+  // wildly (a centered animal's root is its upper-left orbit; low-index roots
   // reach far more than edge ones). Thread-local counts reduce under a mutex.
   void runPlacementParallel(const std::vector<Aff>& group, int nthreads) {
     buildOrbits(group);

@@ -68,9 +68,9 @@ def counts(nmax, nbrs):
 
 
 def triangles_per_site(nbrs):
-    """Unordered triples {0, u, v} with u, v and u-v all in the neighbourhood.
+    """Unordered triples {0, u, v} with u, v and u-v all in the neighborhood.
 
-    A measure of local cycle structure: how much the neighbourhood clusters.
+    A measure of local cycle structure: how much the neighborhood clusters.
     """
     s = set(nbrs)
     t = 0

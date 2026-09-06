@@ -6,7 +6,7 @@ Thread: king twigs (docs/king-twigs-plan.md (deleted), Phases 0-2).
 Verifies, over ALL fixed animals up to --maxn:
   1. The enumeration itself (A006770 / A001168 prefixes).
   2. counterexample: the crude-bound decision tree of
-     docs/proofs/polyplet-upper-bound.md ("only ahead-neighbours newly enter
+     docs/proofs/polyplet-upper-bound.md ("only ahead-neighbors newly enter
      the frontier") MISSES re-entrant animals — reachable count < a(n).
   3. Scheme D0 (eager, parent-frame slots, no deferral): encode/decode
      round-trip, weight identity (n-1 opens, n letters), alphabet census.
@@ -95,7 +95,7 @@ def build_frames(dirs):
         order = [ends[0]] if ends else [sorted(unknown)[0]]
         seen = {order[0]}
         # walk the path greedily (slot graphs here are paths + one chord;
-        # walk by fewest-unseen-neighbours to follow the path spine)
+        # walk by fewest-unseen-neighbors to follow the path spine)
         while len(order) < len(unknown):
             last = order[-1]
             nxt = [e for e in g[last] if e not in seen]
@@ -186,7 +186,7 @@ class Scheme:
 # ---------- the broken crude-bound decision tree ----------
 def crude_reachable(P, dirs):
     """docs/proofs/polyplet-upper-bound.md scheme: frontier grows ONLY by
-    ahead-in-scan-order neighbours of included cells. True iff every cell of
+    ahead-in-scan-order neighbors of included cells. True iff every cell of
     P ever enters the frontier (i.e. P is generatable by that tree)."""
     ahead = [d for d in dirs if skey(d) > skey((0, 0))]
     root = min(P, key=skey)

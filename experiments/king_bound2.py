@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Tightened king twig system: a type is (forbidden, required) offsets -- track
-which neighbours are known-OCCUPIED, not just empty, so multi-neighbour leaf
+which neighbors are known-OCCUPIED, not just empty, so multi-neighbor leaf
 reductions don't forget context. Everything verified against brute force, then
 the certificate/monotone iteration gives the bound.
 """
@@ -28,7 +28,7 @@ def cluster(cells):
 
 def reduce_type(f, r, S, comp):
     """re-mark u = lowest-leftmost occupied cell of `comp`; new (forbidden,required)."""
-    occ = set(r) | set(S)                     # occupied neighbours of c (c itself removed)
+    occ = set(r) | set(S)                     # occupied neighbors of c (c itself removed)
     ke  = set(f) | (set(free_cells(f,r)) - set(S)) | {(0,0)}   # known-empty (c-frame)
     u   = min(comp, key=lambda p:(p[1],p[0]))
     fu  = frozenset(o for o in WIN if (u[0]+o[0],u[1]+o[1]) in ke)

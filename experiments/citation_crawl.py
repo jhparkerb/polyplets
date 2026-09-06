@@ -30,7 +30,7 @@ SEEDS = [
     ("Chan & Rechnitzer 2018 (corner transfer matrix bounds)", None,
      "Upper bounds on the growth rates of independent sets"),
     ("Bevan-Brignall-Elvey Price-Pantone 2020 (Av(1324) bounds)", None,
-     "A structural characterisation of Av(1324) and new bounds on its growth rate"),
+     "A structural characterization of Av(1324) and new bounds on its growth rate"),
 ]
 
 # vocabulary a colliding paper would use

@@ -171,7 +171,7 @@ def facts() -> dict:
     F = {}
     prev_q1 = prev_q2 = None
     for h in LADDER:
-        _, _, _, stats = PT.analyse(T, motley_h=h)
+        _, _, _, stats = PT.analyze(T, motley_h=h)
         q1 = sorted(stats["congruence_only"])
         q2 = sorted(row40_residual(h))
         F["congruence_only.cells@%d" % h] = q1

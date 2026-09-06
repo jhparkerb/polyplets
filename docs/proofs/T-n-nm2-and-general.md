@@ -21,7 +21,7 @@ with **gadgets at the defect rows**, summed over placements.
 
 **Case A — one triple (a single defect ⇒ linear):** an interior triple's two
 internal gaps are each 1 or 2 (gap ≥3 ⇒ an unbridgeable cell ⇒ disconnected).
-Summing over gap-type and the two neighbour offsets:
+Summing over gap-type and the two neighbor offsets:
 
 | gaps | (1,1) tromino | (1,2)/(2,1) split | (2,2) | **interior** | boundary |
 |---|---|---|---|---|---|
@@ -112,8 +112,8 @@ single-cluster weights so far (excess j, summed over cluster types):
 span 1) has boundary weight **2e+3** and interior weight **(2e+3)²** — verified
 e=1,2,3 (double 5/25, triple 7/49, quad 9/81). This *closes the span-1 sub-family
 of the cluster GF for all excess*: `Σ_e (2e+3)² yᵉ` is rational. (Interior =
-boundary² because the two neighbour sides are independent, each contributing the
-2e+3 single-neighbour factor.)
+boundary² because the two neighbor sides are independent, each contributing the
+2e+3 single-neighbor factor.)
 
 Proven single-cluster **interior** weights by (excess e, span s) (brute force):
 
@@ -131,7 +131,7 @@ Proven single-cluster **interior** weights by (excess e, span s) (brute force):
   local gadget enumerator (single | multi | multi | single, wide column window —
   a too-narrow window silently *under*-counts, so it must be validated against the
   exhaustive brute force, which it now is) extends span-2 to
-  **Wi(e,2) = 339, 1860, 7311, 25080** (e=2…5). Normalised by 3ᵉ these are
+  **Wi(e,2) = 339, 1860, 7311, 25080** (e=2…5). Normalized by 3ᵉ these are
   37.7, 68.9, 90.3, 103.2 — increasing and decelerating (so ~C·3ᵉ asymptotically,
   i.e. a *sum* of geometric terms / rational GF), but **no low-order linear
   recurrence fits 4 points**, and span-3 (4778, 45226) has even fewer. A span-s
@@ -206,7 +206,7 @@ denominators still pure powers of 3). Re-running the falsifiable equation search
 at that ceiling — algebraic `P(f,y)=0` up to (deg_f 8 × deg_y 1) and linear ODEs
 up to order 4, on both `λ_raw` and `log λ_raw` — **every falsifiable form returns
 the trivial solution only**. So the 2026-06-29 negative is not a data-starvation
-artefact: at doubled precision, inside the 15–20-term window, B(y) still shows no
+artifact: at doubled precision, inside the 15–20-term window, B(y) still shows no
 algebraic or D-finite closed form. This is strong evidence it is genuinely
 non-D-finite, consistent with the polyomino-growth lore. (Restored + extended
 extractor: `experiments/braw_from_data.py [NMAX]`, log `build/braw_a40.log`.)

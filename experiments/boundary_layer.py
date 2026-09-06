@@ -46,7 +46,7 @@ def surface():
     return out
 
 def collapse_score(rows, p, nbin=12):
-    """Spread of residual within bins of u = j/k^p, normalised by total spread.
+    """Spread of residual within bins of u = j/k^p, normalized by total spread.
     0 = perfect collapse onto one curve, 1 = no collapse."""
     pts = [(j/float(k)**p, r) for k, j, r in rows]
     lo = min(u for u,_ in pts); hi = max(u for u,_ in pts)

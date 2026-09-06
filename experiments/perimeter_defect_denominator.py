@@ -104,7 +104,7 @@ def main() -> int:
           % (args.census, k, nmax, pred_onset))
     print()
 
-    # The predicted denominator, and neighbours of it in every exponent.
+    # The predicted denominator, and neighbors of it in every exponent.
     base = {1: k + 1, 2: max(0, k - 1), 3: max(0, k - 4)}
     cands = []
     for d3 in range(0, max(1, k - 4) + 2):

@@ -6,7 +6,7 @@ so  a(n) = n1 + 2 n2 + 4 n4 + 8 n8  with n_k = #orbits of size k.
 Hence  a(n) = n1 (mod 2),  a(n) = n1 + 2 n2 (mod 4), etc.
 
 n1 counts animals with FULL D4 symmetry.  Their cells fall into D4-orbits of
-size 8, 4 (on an axis or a diagonal) or 1 (the centre), so n = 8p + 4q + r
+size 8, 4 (on an axis or a diagonal) or 1 (the center), so n = 8p + 4q + r
 with r in {0,1}: no such animal exists unless n = 0 or 1 (mod 4).
 
 Prediction: a(n) is EVEN whenever n = 2 or 3 (mod 4).

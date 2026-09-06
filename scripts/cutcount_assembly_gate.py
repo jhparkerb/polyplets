@@ -32,7 +32,7 @@ are pinned, so a row that stops being read, a glob that matches nothing, or a
 prime that quietly drops out fails the gate instead of shrinking it silently.
 
 The Nmax-41 ladder (AUDIT-2026-09-02 M3), added 2026-09-05.  Commit 3a8d566
-banked results/cutcount_b1/rows41/C1..C19.out, the colouring program's rows
+banked results/cutcount_b1/rows41/C1..C19.out, the coloring program's rows
 at Nmax 41, with a README saying "8 primes reconstruct, the 9th is held out
 and must predict every cell; all 19 heights passed" -- and nothing in `make`
 read those rows or could re-derive that sentence.  The 171 residue rows and the

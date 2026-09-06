@@ -295,7 +295,7 @@ check("methods: Redelmeier reach",
       said("methods Redelmeier", r"\$a\(19\)\$--\$a\((\d+)\)\$ & two algorithms sharing no code agree on every entry"),
       max(red))
 
-# Abstract 52-53: the colouring transfer matrix (Motley) confirms T(n,H) for
+# Abstract 52-53: the coloring transfer matrix (Motley) confirms T(n,H) for
 # H <= 19 at every n <= 40.  Record: results/cutcount_b1/rows41/C<H>.out holds
 # C_H(n) = sum_{h<=H} (H-h+1) T(n,h); the triangle is its second difference.
 rowdir = ROOT / "results/cutcount_b1/rows41"

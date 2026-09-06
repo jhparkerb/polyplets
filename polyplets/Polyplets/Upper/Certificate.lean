@@ -13,7 +13,7 @@ convolution-certificate method (`experiments/king_bui.py`,
 `experiments/king_certificate.py`): a finite family of marked-animal counting
 functions `φ_T` closes, by single-free-cell casing, into recurrences
 
-* base types (`rule T = none`, all eight king neighbours forbidden):
+* base types (`rule T = none`, all eight king neighbors forbidden):
   `φ_T 1 ≤ 1` and `φ_T n = 0` for `n ≥ 2` — the marked cell is isolated;
 * split types (`rule T = some (T', D)`):
   `φ_T n ≤ φ_{T'} n + ∑_{i=1}^{n-1} φ_{T'} i · φ_D (n-i)` — the cased free
@@ -31,7 +31,7 @@ The two layers:
 
 * `BuiSystem` / `BuiSystem.Sat` / `BuiSystem.Super` — the abstract system over
   an arbitrary index type: `rule` (the casing table), `rank` (a termination
-  measure: the number of free king neighbours in the concrete system) with
+  measure: the number of free king neighbors in the concrete system) with
   `rank_lt` making the `T'`-chain well-founded.
 * `BuiSystem.certSum_le` — the monotone-iteration bound: the truncated
   weighted sums `certSum φ x T N = ∑_{n=1}^N x^n φ_T n` are dominated by `u`,
@@ -64,7 +64,7 @@ open scoped Topology
 either a *base* type (`rule T = none`) or cases into a pair
 `rule T = some (T', D)` — the `d`-empty continuation `T'` and the split-off
 convolution factor `D`. `rank` is a termination measure for the `T'`-chain
-(concretely: the number of free king neighbours, which the casing strictly
+(concretely: the number of free king neighbors, which the casing strictly
 decreases); the `D`-factor needs no measure because it only ever appears at a
 strictly smaller truncation order. -/
 structure BuiSystem (ι : Type*) where
@@ -347,7 +347,7 @@ structure RatCert where
   root : ℕ
   /-- The casing table. -/
   rules : List (Option (ℕ × ℕ))
-  /-- The termination measure (free-neighbour counts). -/
+  /-- The termination measure (free-neighbor counts). -/
   ranks : List ℕ
   /-- Certificate numerators: `u_i = nums[i] / CD`. -/
   nums : List ℕ

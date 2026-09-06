@@ -9,7 +9,7 @@ import Polyplets.Universal.Compute
 # The hexagonal lattice: polyhexes
 
 `D = {-1, 0}`, so `b = |D| = 2`. In the brick (sheared-square) coordinates used
-throughout, the six neighbours of a cell are
+throughout, the six neighbors of a cell are
 
 ```
 (±1, 0),  (0, ±1),  (-1, +1),  (+1, -1)
@@ -60,7 +60,7 @@ lemma M_hex_le : hexLattice.M ≤ 1 :=
   M_le_one _ (by decide)
 
 /-- **The instance anchor**: row-local adjacency at the hexagonal lattice is
-adjacency to one of the six hexagonal neighbours. -/
+adjacency to one of the six hexagonal neighbors. -/
 theorem adj_hex {p q : ℤ × ℤ} :
     Adj hexLattice p q ↔ (q.1 - p.1, q.2 - p.2) ∈
       ({(1, 0), (-1, 0), (0, 1), (-1, 1), (0, -1), (1, -1)} : Finset (ℤ × ℤ)) := by

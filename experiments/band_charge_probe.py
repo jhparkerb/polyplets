@@ -72,7 +72,7 @@ def components(cells):
 
 def band_code(cells, H):
     """The idea-3 code: per band, the left-to-right sequence of component
-    shapes (translation-normalised) plus the gap lengths between consecutive
+    shapes (translation-normalized) plus the gap lengths between consecutive
     components.  Deliberately faithful to the sketch as written, including its
     assumption that a band's components are x-ordered."""
     bands = defaultdict(set)

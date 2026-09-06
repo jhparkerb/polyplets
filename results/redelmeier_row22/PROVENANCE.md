@@ -3,7 +3,7 @@
 **Two-algorithm confirmation frontier: 20 -> 22** (subsumes 21).
 
 Fleet run launched 2026-07-11 13:41 EDT (Terminal Velocity kernel, 2.06x:
-L1 terminal pure-count, L3 compile-time neighbour offsets, L4 u16 untried,
+L1 terminal pure-count, L3 compile-time neighbor offsets, L4 u16 untried,
 clang++; ledger docs/engine-record.md). 24,000 shards split by
 all-core throughput, REBALANCED 2026-07-11 16:40 after measured all-core
 rates ([[fleet-benchmark-allcore]]):

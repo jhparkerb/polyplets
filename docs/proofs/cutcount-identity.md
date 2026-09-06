@@ -1,19 +1,19 @@
 # The cut-count cancellation identity
 
 **What it means.** The identity is the Potts spin form of the Fortuin–Kasteleyn
-correspondence (§9 for the references), specialised to king-adjacent cell sets
+correspondence (§9 for the references), specialized to king-adjacent cell sets
 in scan order: the colourings of a cell set `S` that are constant on its
 king-connected components number `q^{c(S)}`, so in the sum over all `n`-cell
 subsets of the board the connected subsets are exactly the coefficient of `q¹`.
-In the engine `q` is a formal variable and not a number of colours: an occupied
-cell with no earlier occupied king neighbour either adopts a colour live in its
+In the engine `q` is a formal variable and not a number of colors: an occupied
+cell with no earlier occupied king neighbor either adopts a color live in its
 window or takes a fresh one at weight `q − b`, the sum over all such labellings
 is truncated to `ℤ[q]/(q²)`, and `[q¹]` of that truncation is the connected
 count, computed either exactly in one pass (wide fixed-width integers) or one
 prime at a time and reassembled by CRT. Constancy on components is enforced
-locally — every other occupied cell copies its earlier neighbours' colour, and
-contributes weight 0 if they carry two distinct colours — so the frontier state
-is only the colour-coincidence partition of the last `H + 1` cells, and the
+locally — every other occupied cell copies its earlier neighbors' color, and
+contributes weight 0 if they carry two distinct colors — so the frontier state
+is only the color-coincidence partition of the last `H + 1` cells, and the
 engine never decides connectivity.
 
 Thread **Birthright**, 2026-08-14. Tier 1 of `results/second-sources.md` §7: the
@@ -60,7 +60,7 @@ This is exactly the engine's frontier key: `slot k` of the key holds the label
 of the cell `k + 1` positions back, for `0 ≤ k ≤ H`. Unrolling the indices,
 slot 0 is `(r−1, c)`, slot `H−2` is `(r+1, c−1)`, slot `H−1` is `(r, c−1)` and
 slot `H` is `(r−1, c−1)` — the north, south-west, west and north-west
-neighbours, which are precisely the four king neighbours of `(r, c)` that
+neighbors, which are precisely the four king neighbors of `(r, c)` that
 precede it in scan order. `gather` reads those four slots under exactly those
 in-board guards.
 
@@ -78,11 +78,11 @@ this is `−H + Δr ≤ −H + 1 ≤ 0`, contradicting `u ≺ v`; the only way t
 would be `H = 1` with `Δr = 1`, impossible because `H = 1` forces `r = 0` for
 every cell. So `Δc ∈ {0, 1}` and `H·Δc + Δr ≤ H + 1`. ∎
 
-The bound is attained (for `H ≥ 2`) by the north-west neighbour, `Δc = Δr = 1`.
+The bound is attained (for `H ≥ 2`) by the north-west neighbor, `Δc = Δr = 1`.
 For `H = 1` there is no vertical step and the largest gap is 1. The check
 script measures both, per board.
 
-## 2. The colouring model
+## 2. The coloring model
 
 Fix `S ⊆ Γ`. A **configuration** of `S` is a map `φ : S → ℤ_{>0}` built by
 visiting the cells of `S` in scan order and, at each `v`, obeying:
@@ -110,10 +110,10 @@ offers *every* live label, including labels of blocks the cell does not touch �
 `successors` loops `for (x = 1; x <= mx; x++) if (present[x])`, with no
 adjacency test. Second, `b` is the number of distinct live **labels**, not of
 live components: `successors` counts distinct ids present in the window, so two
-components that share a colour are counted once. Because adopt lets one
-component take another's colour, that distinction is real, not cosmetic. Third,
+components that share a color are counted once. Because adopt lets one
+component take another's color, that distinction is real, not cosmetic. Third,
 "live" means *in the window*, so a label whose last cell has left the window is
-gone and is not counted in `b` — which is why the engine can recycle colours.
+gone and is not counted in `b` — which is why the engine can recycle colors.
 
 ## 3. The identity
 
@@ -158,7 +158,7 @@ rule fails to violate. ∎
 `N⁻(v_i) = ∅`, so `v_i` is a free cell. Conversely, for `φ ∈ Cfg(S)`,
 `B(φ) ⊆ {v_1, …, v_c}`.
 
-*Proof.* A king neighbour of `v_i` lying in `S` lies in `C_i`; if it preceded
+*Proof.* A king neighbor of `v_i` lying in `S` lies in `C_i`; if it preceded
 `v_i` it would contradict minimality, so `N⁻(v_i) = ∅`. For the converse, let
 `v ∈ B(φ)` and let `C` be its component with minimum `m`. By Lemma 2,
 `φ(m) = φ(v)`. If `v ≠ m` then `m ≺ v`, so the label `φ(v)` is already in use
@@ -226,7 +226,7 @@ makes the induction go through. Taking `i = 1` and using Lemma 5,
 That is the whole cancellation: at each component minimum the `b` adopt terms
 of weight 1 and the birth term of weight `q − b` sum to `q`, and the downstream
 factor is independent of `b`, so the `b`-dependence never reaches the total.
-The "join a block it does not touch" branch is not an optimisation — it is the
+The "join a block it does not touch" branch is not an optimization — it is the
 term that cancels `−b`.
 
 **Where each ingredient is used.** Removing the clash rule breaks Lemma 2;
@@ -273,7 +273,7 @@ RED controls (each must fire):
 RED-1  clash-voiding dropped                  FIRED   H=3 W=4 S=[(0, 0), (2, 0), (1, 1)]  sum=[0, 0, 1]  q^c=[0, 1]
 RED-2  b counts all labels, not live ones     FIRED   H=1 W=6 S=[(0, 0), (0, 3)]  sum=[0, -1, 1]  q^c=[0, 0, 1]
 RED-3  free cell cannot adopt a live label    FIRED   H=1 W=6 S=[(0, 0), (0, 2)]  sum=[0, -1, 1]  q^c=[0, 0, 1]
-RED-4  window of H cells, neighbours outside it unseen FIRED   H=2 W=5 S=[(0, 0), (1, 1)]  sum=[0, 0, 1]  q^c=[0, 1]
+RED-4  window of H cells, neighbors outside it unseen FIRED   H=2 W=5 S=[(0, 0), (1, 1)]  sum=[0, 0, 1]  q^c=[0, 1]
 RED-5  liveness window shortened to H-2       FIRED   H=3 W=4 S=[(0, 0), (2, 0), (1, 1)]  sum=[0]  q^c=[0, 1]
 
 RESULT: GREEN (identity holds on every subset of every board; all 5 RED controls fired)
@@ -282,18 +282,18 @@ RESULT: GREEN (identity holds on every subset of every board; all 5 RED controls
 Every number quoted in this document is printed by that script.
 
 **The reach bound is tight where it can be.** The `reach` column equals `H + 1`
-on every board with `H ≥ 2`, attained by the north-west neighbour, and equals 1
+on every board with `H ≥ 2`, attained by the north-west neighbor, and equals 1
 for `H = 1`, which has no diagonal step. Lemma 1 is not slack.
 
 **Liveness alone would fit in a shorter window.** The `maxgap` column — the
 largest distance from a free cell back to the nearest earlier cell of its own
 component — is `H − 1` on every board with `H ≥ 3`, two short of the window.
 Sharpening the proof of Lemma 4: if `v` is free then `y ≠ v` (else `x` would be
-an earlier neighbour of `v`), so `ord(v) − ord(x) ≤ H`, and a gap of exactly
-`H` forces `Δc = 1, Δr = 0`, i.e. `x = (r, c−1)`, again a neighbour of `v`.
+an earlier neighbor of `v`), so `ord(v) − ord(x) ≤ H`, and a gap of exactly
+`H` forces `Δc = 1, Δr = 0`, i.e. `x = (r, c−1)`, again a neighbor of `v`.
 Hence `ord(v) − ord(x) ≤ H − 1`. So the `(H+1)`-st slot is demanded by the
-clash/forced rule — the north-west neighbour sits exactly `H + 1` back — and
-not by liveness. RED-4 (window of `H`, with neighbours outside it unseen) and
+clash/forced rule — the north-west neighbor sits exactly `H + 1` back — and
+not by liveness. RED-4 (window of `H`, with neighbors outside it unseen) and
 RED-5 (liveness window `H − 2`) fire on either side of that, which is why both
 controls are in the battery.
 
@@ -323,11 +323,11 @@ mis-state the identity if copied into a theorem.
    term, not the subset's value.** §7's phrasing suggests each subset carries a
    single product. It carries a sum over all configurations, most of which have
    *fewer* than `c(S)` birth factors because some component minima adopted an
-   existing colour instead. The all-birth configuration is one term of that
+   existing color instead. The all-birth configuration is one term of that
    sum. This is the paraphrase most likely to produce a false statement.
 
 3. **`b` counts live labels, not live components** (§2, second point). The
-   brief's "b = number of live blocks" is right only if "block" means colour
+   brief's "b = number of live blocks" is right only if "block" means color
    class. The proof is indifferent to the value of `b`, but a statement that
    said "number of live components" would be false.
 
@@ -351,15 +351,15 @@ Two smaller observations on the source, neither a defect:
 Not proved here, and deliberately: that the engine's window DP computes the sum
 of §3. The argument has three parts, all mechanical.
 
-- **Locality.** Lemma 1 says every earlier king neighbour of `v` lies in
+- **Locality.** Lemma 1 says every earlier king neighbor of `v` lies in
   `Win(v)`, so `gather` sees all of `N⁻(v)` — this half is proved above,
   because Lemma 4 needed it.
 - **Sufficient statistic.** The rules of §2 consult the past only through
   *equality* of labels within the window and the *number* of distinct live
-  labels. So the colour-coincidence partition of the window determines the
+  labels. So the color-coincidence partition of the window determines the
   remaining weight, and `canon` is the canonical form of that partition
   (first-occurrence relabelling, slot 0 upward).
-- **Colour reuse.** The engine's birth label `mx + 1` is fresh only within the
+- **Color reuse.** The engine's birth label `mx + 1` is fresh only within the
   window, whereas §2's births are globally fresh. The two agree because an
   expired label is never consulted again — neither by the clash rule (Lemma 1)
   nor by the adopt/`b` rules, which range over the window.
@@ -407,7 +407,7 @@ the connectivity rule; §3's identity is per-board and says nothing about it.
   and is not claimed.
 - The `H = 1` boards exercise no free non-minimal cells at all (`loc_checks`
   column is 0), so Lemma 4 is checked only for `H ≥ 3`. That is correct
-  behaviour, not a gap: for `H ≤ 2` a free cell's component cannot re-enter
+  behavior, not a gap: for `H ≤ 2` a free cell's component cannot re-enter
   later. But the reader should not read 53,552 checks as spread evenly.
 
 ## 9. Priority: the identity is classical
@@ -421,14 +421,14 @@ is `docs/l-papers-record.md`.
 **The statement is an instance of Fortuin–Kasteleyn.** The random-cluster
 partition function is `Z = Σ_g v^{b(g)} q^{c(g)}` (Fortuin & Kasteleyn, *Physica*
 57 (1972) 536–564), and counting connected subgraphs is its `q → 0`, `v = 1`
-content; the device of the opening paragraph — colour each component, count
+content; the device of the opening paragraph — color each component, count
 colourings — is its Potts *spin* representation, the usual route to a transfer
 matrix carrying no connectivity state (Blöte & Nightingale, *Physica A* 112
-(1982) 405–465). §3 is that device specialised to site clusters in scan order,
+(1982) 405–465). §3 is that device specialized to site clusters in scan order,
 and §4's telescoping is it performed cell by cell. It is not a new theorem and
 none is claimed.
 
-**Two further antecedents.** §2's scan-order labelling is the signed version of
+**Two further antecedents.** §2's scan-order labeling is the signed version of
 Hoshen–Kopelman (*Phys. Rev. B* 14 (1976) 3438), which assigns cluster labels in
 one sweep with a merge structure. The method this rule is an *alternative* to —
 carrying the connectivity partition of a frontier — is Jensen's lattice-animal
@@ -459,13 +459,13 @@ connectivity vocabulary (`kingAdj`, `KingConnected`,
 target rather than a research problem.
 
 **Cross the bridge of §7.** The three parts are stated: locality, sufficient
-statistic, colour reuse. Doing them turns "a program was checked against known
+statistic, color reuse. Doing them turns "a program was checked against known
 values" into "a program provably computes a proved identity", which is the
 difference the second source exists to make.
 
 **Other adjacencies and other scan orders.** Nothing in the proof is specific to
 king adjacency beyond Lemma 1, which bounds the scan distance to earlier
-neighbours. For which adjacency and scan-order pairs does a window of bounded
+neighbors. For which adjacency and scan-order pairs does a window of bounded
 size suffice, and what is the minimal window?
 
 ## 11. Where to read what this bought

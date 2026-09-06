@@ -76,7 +76,7 @@ int main() {
                 if (!inf.count(q)) per.insert(q); }
             infSize.insert((int)inf.size());
             infP.insert((int)per.size());
-            // normalise translation for the injectivity check
+            // normalize translation for the injectivity check
             int mr=1e9, mc=1e9; for (auto &p:inf){ mr=std::min(mr,p.first); mc=std::min(mc,p.second);}
             std::vector<std::pair<int,int>> key;
             for (auto &p:inf) key.push_back({p.first-mr, p.second-mc});

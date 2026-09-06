@@ -16,7 +16,7 @@ j = r and undercuts from j = r+1 on.  See results/perimeter.md.
 
 Removing cell c from animal A changes the site perimeter by
 
-    delta = [c still has a filled neighbour]  -  #{empty q adjacent to A only
+    delta = [c still has a filled neighbor]  -  #{empty q adjacent to A only
                                                   through c}
 
 so the removal is FREE exactly when delta = 0.  That is O(1), where recounting

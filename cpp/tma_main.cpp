@@ -414,8 +414,8 @@ int main(int argc, char** argv) {
       }
       // Top strip height H==N: a trivial closed form, not worth sweeping the largest,
       // emptiest strip. A height-N king-polyomino of N cells has exactly one cell per
-      // row, and each of the N-1 inter-row steps shifts the column by -1/0/+1 (8-neighbour
-      // adjacency), so B_N(N) = 3^(N-1) (fixed: the first cell is translation-normalised);
+      // row, and each of the N-1 inter-row steps shifts the column by -1/0/+1 (8-neighbor
+      // adjacency), so B_N(N) = 3^(N-1) (fixed: the first cell is translation-normalized);
       // n<N cannot span N rows, so B_N(n<N)=0. Byte-identical to the real --only-height N
       // sweep (verified n<=8); for a(20) this replaced a ~2-day h20 sweep.
       if (onlyHeight == maxn) {

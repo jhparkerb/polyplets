@@ -40,13 +40,13 @@ harness `experiments/kingtwigs/l1_schemes.py`). The original argument below
 is broken; the constant survives by a sound BFS-frame derivation.
 
 *The broken version (kept as a warning):* "scan row-major; when a cell is
-included, only its king-neighbours ahead in scan order (E, SW, S, SE, ≤ 4)
+included, only its king-neighbors ahead in scan order (E, SW, S, SE, ≤ 4)
 newly enter the frontier — the other four are already behind — so
 a(n) ≤ C(5n, n)." The parenthetical is false: *behind* does not mean
 *already considered*. A re-entrant animal whose cell attaches only from
 below-behind — witness the hook
 `{(0,3),(0,2),(0,1),(0,0),(1,0),(2,0),(3,0),(3,1)}`, where `(3,1)` is an
-ahead-neighbour of no included cell — never enters the frontier, so the map
+ahead-neighbor of no included cell — never enters the frontier, so the map
 animal → decision string is undefined on it. Measured: the scheme misses 2
 of 20 animals at n = 3 and 96,065 of 147,941 at n = 8.
 
@@ -115,7 +115,7 @@ The `C(5n,n)` argument above. No machinery. Bankable now.
 
 ### Stage 1 — optimize the crude count: NO simple valid improvement (checked 2026-07-11)
 Attempted: encode each animal by its Redelmeier growth TREE (each cell has ≤4
-forward king-neighbours ⇒ ≤4-ary tree, n nodes) ⇒ `λ ≤ 4⁴/3³ = 256/27 ≈ 9.48`.
+forward king-neighbors ⇒ ≤4-ary tree, n nodes) ⇒ `λ ≤ 4⁴/3³ = 256/27 ≈ 9.48`.
 **INVALID.** Rook sanity check kills it: the same argument gives ordinary
 polyominoes `λ_poly ≤ 4`, but `λ_poly ≈ 4.06 > 4`. The growth tree is a SPANNING
 tree — it drops the animal's cycles, so animal→tree is NOT injective and
@@ -135,20 +135,20 @@ candidate bound against the rook analog before quoting it.)
 NOT a column cross-section transfer matrix (my earlier guess). The real method is
 the **twig / BFS-spanning-tree encoding**:
 - Encode each animal by a canonical BFS from its corner cell → a unique sequence
-  of local "twigs" (the occupancy pattern of the newly-exposed neighbours at each
+  of local "twigs" (the occupancy pattern of the newly-exposed neighbors at each
   discovery step) from a finite alphabet. animal → sequence is INJECTIVE; not
   every formal sequence is a valid animal ⇒ counting all formal sequences
   over-counts. Unbounded size is handled by a geometric series (algebraic GF),
   and the bound is the **diagonal of a 2-variable rational GF** `x/(1 − y·A(x))`
   where `A(x)` sums the twig-alphabet weights.
 - **Eden level (= our Stage 0, now explained):** alphabet = all occupancy
-  patterns of the `K` newly-exposed neighbours ⇒ `A(x)=(1+x)^K`, diagonal
+  patterns of the `K` newly-exposed neighbors ⇒ `A(x)=(1+x)^K`, diagonal
   `~ C(Kn,n)` ⇒ `λ ≤ K^K/(K−1)^{K−1}`. Rook `K=3 → 6.75`; **king `K=5 → 12.2`**
   — identical to our `C(5n,n)`. Good cross-check.
 
 ### Stage 2 — tighten via context (the real work), TWO templates
 Both reduce the effective alphabet by exploiting that king diagonal coupling
-already DETERMINES some newly-exposed neighbours from earlier BFS steps, so fewer
+already DETERMINES some newly-exposed neighbors from earlier BFS steps, so fewer
 free bits per twig ⇒ smaller `A(x)` ⇒ smaller diagonal growth ⇒ tighter bound.
 
 - **(A) Klarner–Rivest "L-context" + cut hierarchy.** Reduces rook 6.75 → 4.83 →
@@ -157,7 +157,7 @@ free bits per twig ⇒ smaller `A(x)` ⇒ smaller diagonal growth ⇒ tighter bo
   trillions of twigs), computer search.
 - **(B) Bui's convolution-certificate method (RECOMMENDED port, arXiv:2510.06806).**
   A small system of convolution GF inequalities over a handful of local
-  forbidden/free neighbourhood shapes ⇒ a single algebraic **kernel equation**;
+  forbidden/free neighborhood shapes ⇒ a single algebraic **kernel equation**;
   the bound is proved by exhibiting a positive rational certificate satisfying the
   inequality system — verifiable by ARITHMETIC, no residue calculus, no
   high-degree root-finding. Polyiamond example: `z/x = 1+z+z²+z³` ⇒ root of
@@ -165,12 +165,12 @@ free bits per twig ⇒ smaller `A(x)` ⇒ smaller diagonal growth ⇒ tighter bo
   lattice-agnostic ("applies elsewhere").
 
 **The load-bearing crux (NOT yet derived — do carefully, sanity-gate it):** the
-king-adjacency version of the "which neighbours are already determined at each BFS
+king-adjacency version of the "which neighbors are already determined at each BFS
 step" geometric lemma. King BFS discovers a cell whose already-visited context
 includes cells diagonal to *two* earlier cells — so the context window is a
-`3×3`-minus-centre-ish shape, not the rook L-tromino. Getting this case analysis
+`3×3`-minus-center-ish shape, not the rook L-tromino. Getting this case analysis
 right is the whole game (and where the Stage-1 tree bound went wrong). Derive the
-king twig alphabet / Bui neighbourhood shapes from it, write the king kernel
+king twig alphabet / Bui neighborhood shapes from it, write the king kernel
 equation, extract the bound. **Do NOT quote a number until it clears the rook
 sanity gate AND stays above our a(n) ratios (~6.9) and μ_13=6.306.**
 
@@ -192,10 +192,10 @@ The extraction pipeline is built and validated on two lattices:
 
 **The ONE remaining step — the king twig system** (careful; no published number
 to check against, so validity is on us):
-1. King BFS closure lemma: which of the 8 neighbours are already-determined at a
+1. King BFS closure lemma: which of the 8 neighbors are already-determined at a
    discovery step (rook's is "left + 3-below" = the L; king's is larger, includes
    diagonals shared by two earlier cells). → the king forbidden-shape alphabet.
-2. King neighbourhood types (expect MORE than 6; diagonal occupancy doubles local
+2. King neighborhood types (expect MORE than 6; diagonal occupancy doubles local
    state) and their convolution inequalities — the cut/allocate step MUST stay an
    over-count under corner (diagonal) seams, else it under-counts and the bound is
    INVALID. Expect triple convolutions `Σ_{i+j+k}` (Bui's §4 already needs them).
@@ -229,7 +229,7 @@ with more context:**
 
 R=2 closes fast (8740 types, ~1s; `experiments/king_bound_fast.py`); window size
 is NOT the lever for the *generic* decomposition. The looseness was the
-**case-routing**: routing multi-neighbour cases as lossy linear re-marks instead
+**case-routing**: routing multi-neighbor cases as lossy linear re-marks instead
 of convolutions.
 
 ### BREAKTHROUGH (2026-07-11): Bui mechanism ported → λ ≤ 10.35, verified
@@ -237,9 +237,9 @@ of convolutions.
 `φ_T = φ_{T'} + φ_{T'}·φ_D` where `T' = T+{d forbidden}` and `D` = `d`'s split-off
 type. The `d`-empty branch is an EXACT partition (`{type-T, d empty} = type-T'`);
 the `d`-occupied branch is a valid split over-count. The key fix over the generic
-version: (1) multi-neighbour cases stay CONVOLUTIONS (preserve both pieces), not
+version: (1) multi-neighbor cases stay CONVOLUTIONS (preserve both pieces), not
 lossy re-marks; (2) the split-off type `D` knows that ALL of `c`'s other
-neighbours go to the c-side, so they're empty in the `d`-piece.
+neighbors go to the c-side, so they're empty in the `d`-piece.
 - All recurrences verified valid over-counts against brute force (RD<=2); larger
   RD valid by construction (more genuinely-empty cells in the split type = tighter,
   still an over-count).
@@ -263,8 +263,8 @@ neighbours go to the c-side, so they're empty in the `d`-piece.
 
   λ ≤ 9.31 is the floor of this single-cell-split decomposition. Going lower (toward the
   polyomino-method-analogous ~8) would require Bui's full multi-type-with-certificate
-  apparatus — substantially more machinery, diminishing returns. The 8-neighbour
-  connectivity makes the convolution over-count looser than the 4-neighbour rook case
+  apparatus — substantially more machinery, diminishing returns. The 8-neighbor
+  connectivity makes the convolution over-count looser than the 4-neighbor rook case
   (there the same method leaves ~14%: 4.63 vs true 4.06; here ~31%: 9.31 vs true 7.11).
 
   #### EXACT rational certificate (Certificate Squeeze, Phase 1)

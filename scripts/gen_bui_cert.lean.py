@@ -15,7 +15,7 @@ ceil-to-CD repair sweeps).  Fail-closed:
     (the same check king_certificate.py performs), AND in the cleared-
     denominator integer form that the emitted Lean `decide` re-checks;
   * every certificate value must have denominator dividing CD;
-  * the rank table (free king neighbours) must strictly decrease along every
+  * the rank table (free king neighbors) must strictly decrease along every
     T'-edge, and every rule index must be in range;
   * unless --skip-oracle, `python3 -m experiments.king_certificate <RD>` is
     run as an independent oracle and must print the same x and PASS.
@@ -308,7 +308,7 @@ set_option linter.style.longLine false
         lines.append("-/\n")
     lines.append("\n/-- Casing table: `none` = base, `some (T', D)` = split. -/\n")
     lines.append(emit_chunks(f"buiRD{rd}Rules", "List (Option (ℕ × ℕ))", rule, fmt_rule))
-    lines.append("\n/-- Free-king-neighbour counts (the termination measure). -/\n")
+    lines.append("\n/-- Free-king-neighbor counts (the termination measure). -/\n")
     lines.append(emit_chunks(f"buiRD{rd}Ranks", "List ℕ", ranks, str))
     lines.append(f"\n/-- Certificate numerators: `u_i = nums[i] / {CD}`. -/\n")
     lines.append(emit_chunks(f"buiRD{rd}Nums", "List ℕ", nums, str))

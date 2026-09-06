@@ -33,7 +33,7 @@ already closed and is here so that nobody re-opens it during the landing.
 - [ ] **Flip `origin` to public.** `git@github.com:jhparkerb/polyplets.git` is
       private today. This is the landing action itself; everything else is
       preparation for it.
-- [x] ~~**Licence.**~~ **Closed 2026-09-06: Apache 2.0, jasonp's decision**,
+- [x] ~~**License.**~~ **Closed 2026-09-06: Apache 2.0, jasonp's decision**,
       on the ground of least hassle against the 86 Lean modules that already
       asserted it (`Copyright (c) 2026 Jason H Parker ... Released under
       Apache 2.0 license as described in the file LICENSE`, naming a file that

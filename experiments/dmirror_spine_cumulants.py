@@ -101,7 +101,7 @@ def pin(points, k):
         k, len(pts))
 
 
-def analyse(name, data, which, kmax):
+def analyze(name, data, which, kmax):
     print("\n%s:" % name)
     polys = {}
     for parity in (0, 1):
@@ -152,8 +152,8 @@ def main():
         return 1
     ks = sorted({k for _, k in data})
     print("\n%d split rows, levels k = %d..%d" % (len(data), ks[0], ks[-1]))
-    m = analyse("d_main (the main-diagonal family)", data, 0, max(ks))
-    a = analyse("d_anti (the anti-diagonal family)", data, 1, max(ks))
+    m = analyze("d_main (the main-diagonal family)", data, 0, max(ks))
+    a = analyze("d_anti (the anti-diagonal family)", data, 1, max(ks))
 
     print("\nVERDICT")
     if m and a and all(m.values()) and all(a.values()):

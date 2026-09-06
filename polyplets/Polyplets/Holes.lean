@@ -30,13 +30,13 @@ Everything is easiest in the diagonal coordinates `u = x + y`, `v = x − y`
   is the hole together with its diagonal frame; the animal is the frame
   `ringAnimal a b = hullBox a b \ boxHole a b`, of cardinality `a + b + 2`.
 * `enclosed (ringAnimal a b) = boxHole a b` (`enclosed_ringAnimal`): the box is
-  sealed (every rook neighbour of a box cell is in the box or in the ring) and
+  sealed (every rook neighbor of a box cell is in the box or in the ring) and
   every cell outside the hull escapes to infinity along a horizontal ray.
 * Taking `a + b = n − 2` as equal as possible gives the extremal areas.
 
 This is the family of `experiments/maxhole_box_construction.py`, adapted;
 see `results/subclasses.md`. Note that `hullBox \ boxHole` has `a + b + 2`
-cells for *all* `a, b`, whereas the python 4-neighbour ring has only
+cells for *all* `a, b`, whereas the python 4-neighbor ring has only
 `a + b + 1` at every `min(a,b) = 1` with `max(a,b)` even (measured for all
 `a, b ≤ 12`, `experiments/maxhole_review_checks.py`); at `(2,1)` the frame
 strictly contains the ring, so the `n = 5` "padding cell" of the python
@@ -47,7 +47,7 @@ namespace Polyplets
 
 /-! ### Rook adjacency, components, holes -/
 
-/-- Rook (4-neighbour) adjacency on the integer grid. -/
+/-- Rook (4-neighbor) adjacency on the integer grid. -/
 def rookAdj (p q : ℤ × ℤ) : Prop :=
   p ≠ q ∧ ((p.1 = q.1 ∧ |p.2 - q.2| = 1) ∨ (p.2 = q.2 ∧ |p.1 - q.1| = 1))
 
@@ -257,7 +257,7 @@ private abbrev kingStep (S : Finset (ℤ × ℤ)) (x y : ℤ × ℤ) : Prop :=
   x ∈ S ∧ y ∈ S ∧ kingAdj x y
 
 /-- Every box cell reaches the corner `(0,0)` by rook steps inside the box
-(fuelled induction on `3x + |y|`, which strictly decreases along the descent). -/
+(fueled induction on `3x + |y|`, which strictly decreases along the descent). -/
 private lemma boxHole_reach_aux (a b : ℕ) (ha : 2 ≤ a) (hb : 2 ≤ b) :
     ∀ (N : ℕ) (p : ℤ × ℤ), p ∈ boxHole a b → 3 * p.1.toNat + p.2.natAbs ≤ N →
       Relation.ReflTransGen (rookStep (boxHole a b)) p (0, 0) := by

@@ -47,7 +47,7 @@ open Polynomial
 /-! ## The lattice -/
 
 /-- **The square lattice**: the single up-offset `0`. Together with the
-nearest-neighbour row adjacency this is ordinary (rook-step) polyomino
+nearest-neighbor row adjacency this is ordinary (rook-step) polyomino
 adjacency. -/
 def squareLattice : RowLocal where
   D := {0}

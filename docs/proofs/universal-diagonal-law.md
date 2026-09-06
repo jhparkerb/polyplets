@@ -1,4 +1,4 @@
-# The universal diagonal law (row-local lattices, and rows with a fibre)
+# The universal diagonal law (row-local lattices, and rows with a fiber)
 
 2026-07-15. Generalizes `docs/proofs/diagonal-law.md` (king lattice) to a
 class of lattices; the two instances proved there and in
@@ -28,16 +28,16 @@ nonempty rows spanning a height-H window.
 (`experiments/diagonal_machine.py` `identify()`, brute force to n = 8, run on
 every invocation so the labels cannot drift). D = {−1, 0} is **six**-regular,
 totals 1, 3, 11, 44, 186, 814, 3652, 16689 = **A001207: fixed hexagonal
-polyominoes**. Cells are hexagons; each has six neighbours; their centres form
+polyominoes**. Cells are hexagons; each has six neighbors; their centers form
 the triangular *point* lattice, which is why the literature also calls this the
 triangular lattice (Madras's §3.1(b) "Tri"). This repo's "hex" label is the
 cell-side name and is correct.
 
-### Rows with a fibre
+### Rows with a fiber
 
 Some lattices have no single-cell interior rows at all, and the theorem covers
 them once the row unit is enlarged. Take cells indexed by Z^2 × B with B finite
-(the **fibre**), adjacency translation-invariant in Z^2, locally finite,
+(the **fiber**), adjacency translation-invariant in Z^2, locally finite,
 changing the row index by at most 1, and each row connected. Call a row of an
 animal *interior* if it is neither its top nor its bottom row. The proof uses
 
@@ -52,8 +52,8 @@ A row-local lattice satisfies (M) with m = 1 and b = |D|: a single-cell row is
 its own entry and exit, and its b continuations are the b up-offsets. Write
 n_min(H) for the least cell count at height H; it is H in the row-local case.
 
-**Polyiamonds are in the class, with a fibre of two.** Cells are equilateral
-triangles, each with **three** edge-neighbours, and the up/down orientation
+**Polyiamonds are in the class, with a fiber of two.** Cells are equilateral
+triangles, each with **three** edge-neighbors, and the up/down orientation
 alternates: with cell (x, y) an up- or down-triangle by the parity of x + y,
 adjacency is (x ± 1, y) always and (x, y + 1) only when x + y is odd. Condition
 (U) fails outright — there is no single drift set D. Condition (M) holds with
@@ -70,11 +70,11 @@ the exit offsets are D = {0, −1}: the rhombus walk is the polyhex walk.
 force to n = 14, the change of variables included: the map
 (x, y) ↦ (j, y, entry/exit) is an isomorphism onto the honeycomb graph carrying
 its translation group, height for height, so polyiamonds are the site animals
-of the honeycomb lattice — a Z^2 lattice with a two-point fibre. Their counts
+of the honeycomb lattice — a Z^2 lattice with a two-point fiber. Their counts
 are A001420 (2, 3, 6, 14, 36, 94, 250, 675, 1838 …), nothing like A001207,
 and two names collide here: *triangular lattice*
-as a point lattice means six neighbours and gives polyhexes; *tiling by
-triangles* means three neighbours and gives polyiamonds. OEIS itself files
+as a point lattice means six neighbors and gives polyhexes; *tiling by
+triangles* means three neighbors and gives polyiamonds. OEIS itself files
 polyiamonds under "the 2-dimensional hexagonal lattice".
 
 ## Theorem A (universal diagonal law)

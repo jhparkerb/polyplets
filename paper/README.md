@@ -15,7 +15,7 @@ the *record* of the library and none of its contents. Citations in `paper/` that
 point at a PDF under `literature/` are pointers into a working copy, not into the
 published tree; bibliographic detail a reader actually needs is in `shared/refs.bib`.
 
-Two neighbours complete the picture: `oeis/` holds OEIS submission drafts and
+Two neighbors complete the picture: `oeis/` holds OEIS submission drafts and
 b-files, and `docs/` holds planning and proof notes. A proof note in
 `docs/proofs/` is the *source material* for a manuscript here; it is not itself a
 manuscript and is not written to be read by a stranger.
@@ -35,7 +35,7 @@ work, and every paper says on page 1 which of the two categories it is in.
 Both blocks live in `shared/disclosure.tex` and nowhere else, so that a paper
 cannot quietly soften its own disclosure. The L block takes exactly one
 argument: the per-result verification ledger — for each result, what warrants it
-(Lean kernel, exact rational certificate, or labelled measurement) and how much
+(Lean kernel, exact rational certificate, or labeled measurement) and how much
 of it a human has checked. `docs/publication-split.md` §1 requires that ledger to
 be **per result, not in aggregate**, and that is the whole point of the block.
 

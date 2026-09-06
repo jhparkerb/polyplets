@@ -19,7 +19,7 @@ lattice-generic but live outside the shape engine:
   takes the box width `W` as a parameter and `Tc_eq_T` asks for
   `M · (n − 1) ≤ W − 1`; `Tc_eq_T_of_M_le_one` is the convenient corollary
   `W = n` for every lattice of reach `1` (square, hex, king — the named
-  instances except the five-neighbour `D = Icc (-2) 2` and the degenerate
+  instances except the five-neighbor `D = Icc (-2) 2` and the degenerate
   `D = {-2, 0, 2}`, both of reach `2`).
 * **the pin lemma** `pin` — `Pin.lean`'s Lagrange-uniqueness argument with
   `T ↦ T L` and `3 ↦ L.b`. A degree-`≤ k` polynomial matching the production
@@ -41,13 +41,13 @@ open Polynomial
 instance instDecidableAdj (L : RowLocal) : DecidableRel (Adj L) := fun p q => by
   unfold Adj; infer_instance
 
-/-- One round of neighbour expansion inside `S`: adjoin to `R` every cell of `S`
+/-- One round of neighbor expansion inside `S`: adjoin to `R` every cell of `S`
 `L`-adjacent to some cell of `R`. -/
 def stepExpand (L : RowLocal) (S R : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
   R ∪ S.filter fun q => ∃ p ∈ R, Adj L p q
 
 /-- The cells of `S` reachable from `p` by `L`-steps inside `S`, computed as
-`S.card` rounds of neighbour expansion from the seed `{p}`. -/
+`S.card` rounds of neighbor expansion from the seed `{p}`. -/
 def reachSet (L : RowLocal) (S : Finset (ℤ × ℤ)) (p : ℤ × ℤ) : Finset (ℤ × ℤ) :=
   (stepExpand L S)^[S.card] {p}
 
