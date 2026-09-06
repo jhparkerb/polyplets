@@ -6,7 +6,7 @@ RAM-infeasible but whose counts sit on pinned diagonals d(S,S+k), k small).
     D(n) = sum_{S<=SMAX} d(S, n)_direct + sum_{S>SMAX} P_{n-S}^{parity(S)}(S)
 
 Every P_k used must be PINNED (exact differencing + holdout + forward
-confirmation — results/dmirror-diagonals.md); the script hard-refuses if a
+confirmation — results/symmetry-classes.md); the script hard-refuses if a
 needed (k, parity) class is not in its table. This is the T3 (conjecture-
 assisted) step of the n=33 companions: exact computation composed with
 empirically pinned but unproven formulas.
@@ -23,7 +23,7 @@ import re
 import sys
 from fractions import Fraction as F
 
-# Pinned classes only (results/dmirror-diagonals.md, pinned 2026-07-05/06;
+# Pinned classes only (results/symmetry-classes.md, pinned 2026-07-05/06;
 # P_5 even is pinned, P_5 odd is FITTED -> deliberately absent).
 PINNED = {
     (0, 0): [2], (0, 1): [2],

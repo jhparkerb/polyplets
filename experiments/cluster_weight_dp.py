@@ -21,7 +21,7 @@ pending components that fail to touch the next row can never reconnect
 Purpose (2026-07-13): measure where P_k-from-the-gas dies. Direct enumeration
 is Omega(W) = Omega(14^l) for stacked pairs -- hopeless past k ~ 6. The DP
 evades that floor; this file measures its state growth instead.
-Validated against every enumerated weight in results/defect-gas.md.
+Validated against every enumerated weight in results/diagonal-formula.md.
 """
 import sys
 import time
@@ -157,7 +157,7 @@ def validate():
 # Two-row interior weights W(a,b) past the k <= 5 table below, banked
 # 2026-08-01 (wall time in the comment; W(5,5) alone took 8.4 h). Reproduce a
 # single cell with `python3 experiments/cluster_weight_dp.py pair A B`.
-# Consequences in results/defect-gas.md: the a=2 cubic holds at b=7,8, the a=3
+# Consequences in results/diagonal-formula.md: the a=2 cubic holds at b=7,8, the a=3
 # row is the quartic 24b^4+16b^3+110b^2-19b+16 (holdout W(3,7) exact), and the
 # symmetric-bicubic target is refuted -- deg_b W(a,.) = a+1.
 TWO_ROW_INTERIOR = {

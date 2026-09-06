@@ -7,7 +7,7 @@ convex-mirage row sums). BM recovery with holdouts gives exact rational
 GFs, denominator orders 1, 3, 7, 14, 25, 36, 53 (H = 1..7), stored in
 results/convex_height_denominators.json. New-root contents psi_H have
 degrees 1, 2, 3, 5, 7, 6, 8 -- root RECYCLING, the opposite of the full
-family's Atom Ledger separation. See results/convex-anisotropic.md.
+family's Atom Ledger separation. See results/subclasses.md.
 """
 import json
 import os

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify A235382's closed form against Phase 4a's measured minSPKing, n=1..14.
 
-docs/middle-kingdom-followups-plan.md Phase 4b: the kill criterion fired --
+results/subclasses.md Phase 4b: the kill criterion fired --
 experiments/oeis_lookup.py hit A235382, which already carries the closed form
 a(n) = A027709(n) + 4 = 2*ceiling(2*sqrt(n)) + 4. So this is a verification,
 not a derivation: nothing here re-proves A235382.
@@ -24,7 +24,7 @@ Exit 0 if every n matches, 1 (and a printed diff) if any n does not.
 import math
 import sys
 
-# results/min-site-perimeter.md, "The sequence, n = 1..14", minSPKing column.
+# results/perimeter.md, "The sequence, n = 1..14", minSPKing column.
 # MEASURED -- build/directed_cone_anchor grid 14 8. Never edit to fit a guess.
 MEASURED = [8, 10, 12, 12, 14, 14, 16, 16, 16, 18, 18, 18, 20, 20]
 

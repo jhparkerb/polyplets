@@ -1017,7 +1017,7 @@ func sweepHeightKink(
 		// the pre-column input frontier) carried hTri that already included this
 		// column, so a resume re-ran the column and double-counted its seed
 		// contribution — a consistent over-count from the killed height upward
-		// (results/kink-resume-sigterm-bug.md, kink_resume_midcolumn_test.go).
+		// (docs/engine-record.md, kink_resume_midcolumn_test.go).
 
 		if cfg.afterSeedRound != nil {
 			cfg.afterSeedRound(H, col)
@@ -1168,7 +1168,7 @@ const indexStride = 64
 //     case — cheap to check, no rate math needed).
 //   - the slow path: this unit's remaining record count is small, but at its
 //     OWN observed rate the remaining WALL TIME exceeds grainSeconds. This is
-//     the fix for results/steal-tail-h18.md's diagnosed miss — a
+//     the fix for docs/engine-record.md's diagnosed miss — a
 //     compute-heavy straggler (a handful of pathological keys) can have few
 //     records left yet dominate the column tail; the record-only floor
 //     filtered it out before stealScore's own wall-time ranking ever saw it.
@@ -1202,7 +1202,7 @@ func stealEligible(r *runningUnit, grainRecs uint64, grainSeconds float64, now t
 // running (see TestRefGrainSecondsStableAcrossElapsedTime — this is a
 // measured-regression test, not a hypothetical: the cumulative-elapsed
 // formula measured zero steals on a real H17 column with a textbook
-// flat-cpu/growing-wall straggler, see results/steal-tail-h18.md).
+// flat-cpu/growing-wall straggler, see docs/engine-record.md).
 // Returns 0 (disables the wall-time slow path, record-only fallback) until
 // at least one unit has finished.
 func refGrainSeconds(grainRecs uint64, completedRecords uint64, completedSeconds float64) float64 {
@@ -1350,7 +1350,7 @@ func mapPhase(
 	los, his := cutsToBounds(cuts)
 	n0 := len(los)
 
-	// Per-unit input pruning (Fan-In Tax, results/fanin-tax.md): frontier
+	// Per-unit input pruning (Fan-In Tax, docs/engine-record.md): frontier
 	// files are disjoint stamped ranges, so a unit needs only the ~1-2 files
 	// overlapping its [lo,hi) -- not all of them. One header parse per file
 	// here replaces (units x files) header+idx+buffer setups in the workers,
@@ -2054,7 +2054,7 @@ type diagCoeffs struct {
 // out n=23-25 matched exactly; P_10: 7 of 11 from theory+the b7 recovered
 // from P_9's own n^3 coefficient, 4 from 4 of 5 structurally-valid real
 // points n=21-24, 1 held out n=25 matched exactly — see
-// docs/a26-a30-diagonal-plan.md); j=11..19 from scripts/derive_pk_fast.py,
+// docs/a26-a30-diagonal-plan.md (deleted)); j=11..19 from scripts/derive_pk_fast.py,
 // each documented at its own table entry below. All cases share one big.Int Horner
 // evaluator (hornerDiag) instead of j=1..6 doing native int64/uint64
 // arithmetic, since the guard-threshold fix (n>=2k+1, see applyPow3) invokes
@@ -2334,7 +2334,7 @@ func diagonalStripEnabled(cfg SweepConfig, k int) bool {
 // a(23)/a(24)/a25 sweeps (their swept H=16..18 == k=5..7 reproduce the formulas
 // exactly; j=8 is pinned from
 // a(24)'s T(24,16), matched the pre-a(24) falsifiable sum-of-roots prediction
-// exactly -- see results/k8-pinning.md, scripts/pin_diagonal_k8_final.py; j=9
+// exactly -- see results/diagonal-formula.md, scripts/pin_diagonal_k8_final.py; j=9
 // and j=10 are P_9/P_10 from scripts/derive_p9.py / derive_p10.py, see
 // diagCoeffTable). Each is a degree-j polynomial in n times a power of 3; the
 // numerator is divisible by j! for all valid n (verified), so the integer

@@ -1,7 +1,7 @@
 // gomemlimit.go — soft memory limit for the orchestrator process.
 //
 // AUDIT-2026-07-30 O6 "Unbounded Orchestrator Heap", closing the open item in
-// results/overcommit-hydra.md. The orchestrator sets GOGC=1000 (the
+// docs/engine-record.md. The orchestrator sets GOGC=1000 (the
 // utilization work: default GOGC=100 churned ~8000 GC cycles against a tiny
 // heap goal for no reason). GOGC alone is a RATIO, with no ceiling: the heap
 // is allowed to grow to 11x live before a collection, which is how head #4

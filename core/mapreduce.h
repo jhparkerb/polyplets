@@ -200,7 +200,7 @@ Run<W> mergeRuns(std::vector<Run<W>>& runs) {
 // "event=progress" lines — see orchestrator/telemetry.go unitProgress). MUST
 // stay well below realistic per-unit key counts or a unit's processed count
 // never leaves 0 for its entire life, making it permanently ineligible for
-// stealing regardless of how slow it runs (results/scheduling.md, the
+// stealing regardless of how slow it runs (docs/engine-record.md, the
 // overlap+steal coexistence investigation). Was 1<<14=16384, ABOVE typical
 // per-unit counts at both test scale (~12K, maxn20) and a24/a25 production
 // scale (H16 ~18K, only ~1.1x the old stride) — i.e. it almost never fired.

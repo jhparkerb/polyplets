@@ -9,14 +9,14 @@ import Polyplets.DepthOneConstants
 /-!
 # Notary wave 2: `Φ` annihilates the walk series — finitely, in Lean
 
-Campaign *Notary* (`docs/notary-lean-plan.md`; wave-2 scope note in
-`docs/notary-kernel-scoping.md`). `DepthOneConstants.lean` pins the quartic
+Campaign *Notary* (`docs/notary-lean-plan.md (deleted)`; wave-2 scope note in
+`docs/notary-kernel-scoping.md (deleted)`). `DepthOneConstants.lean` pins the quartic
 `Φ` and its branch data; `GapWalkBridge.lean` closes the assembly at
 `k ≤ 8` and pins the walk to `k ≤ 19`. This module extends the finite anchor
 to the algebraic claim itself:
 
 * `nSeries` — the integer series `N(x) = 3·F₁(3x) + 1` of
-  `results/onset-defect-depth1-closed.md` §3, built from the walk assembly
+  `results/below-onset.md` §3, built from the walk assembly
   `F₁ = P̂ − B²/(3+S)` (`GapWalkBridge.f1Series`);
 * `n_matches_banked` — its coefficients at `k ≤ 19` against the banked
   two-source numerators (`N_k = 3^(k+1)·D_1(k)`);
@@ -30,14 +30,14 @@ to the algebraic claim itself:
 
 What this module does **not** prove: `Φ(x, N(x)) = 0` at all orders — that
 is the kernel-method formalization priced in
-`docs/notary-kernel-scoping.md` (piece K). This is the strongest finite
+`docs/notary-kernel-scoping.md (deleted)` (piece K). This is the strongest finite
 statement short of it.
 
 Provenance of the literals: `build/notary_series_check.py` (log
 `build/notary_series_check.log`) recomputes both theorem statements in
 exact arithmetic from `experiments/depth1_gap_walk.py` +
 `experiments/depth1_recurrence.py::PHI_COEFFS`; the `k ≤ 19` numerators
-match the banked defect of `results/onset-defect-depth1-closed.md` §2–3.
+match the banked defect of `results/below-onset.md` §2–3.
 -/
 
 namespace Polyplets
@@ -54,7 +54,7 @@ def nSeries (K : ℕ) : List ℚ :=
 
 /-- The walk series against the banked numerators, `k ≤ 19`
 (`N_k = 3^(k+1) D_1(k)`; `4, 80, 1753, …` are `lead(R_k)` up to sign,
-`results/onset-defect-depth1-closed.md` §2). -/
+`results/below-onset.md` §2). -/
 theorem n_matches_banked :
     (nSeries 19) =
       [0, 4, 80, 1753, 40928, 987355, 24323825, 607833256, 15348306104,

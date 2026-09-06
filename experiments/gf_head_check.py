@@ -17,7 +17,7 @@ Fails closed: any parse surprise, any missing cell, or any mismatch exits 1.
 
 Run:  python3 experiments/gf_head_check.py [gf_file]
       (the optional argument points at an alternate/corrupted GF file; the
-       RED control in results/gf-head-check.md uses it.)
+       RED control in results/diagonal-formula.md uses it.)
 """
 import os
 import re

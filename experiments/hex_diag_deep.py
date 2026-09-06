@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Hex diagonal cells T_hex(n, n-k) for k <= 4, and the second route to hex A_4.
 
-Purpose: `results/skeletonkey-parametric-master.md` gives hex `A_4 = 3915/4`
+Purpose: `results/closed-doors.md` gives hex `A_4 = 3915/4`
 from the cluster weights alone, with nothing to check it against because there
 is no wired hex `P_k` table.  This file supplies the other route: enumerate the
 hex height triangle deep enough to fit `P_4` directly, then read `A_4` off the
@@ -42,7 +42,7 @@ from hex_gas import A001207, brute, rowpart                        # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'results', 'hex_diagonal_cells.txt')
 
-# Banked, from results/hex-diagonal-law.md.
+# Banked, from results/diagonal-formula.md.
 P1 = lambda n: 9 * n - 15
 P2 = lambda n: Fr(81 * n * n - 307 * n + 142, 2)
 A_WEIGHTS = {1: Fr(9), 2: Fr(-37, 2), 3: Fr(32)}   # banked hex c_k slopes
@@ -309,7 +309,7 @@ def main():
     P, hold = fit(cells, a.kmax)
     print(f"  {hold} holdout cells, all exact")
 
-    print("== control: P_1, P_2 against results/hex-diagonal-law.md")
+    print("== control: P_1, P_2 against results/diagonal-formula.md")
     for n in range(3, 20):
         assert evalp(P[1], n) == P1(n), ('P_1', n)
         assert evalp(P[2], n) == P2(n), ('P_2', n)

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Per-cell mod 4 on the a(40) triangle, as far as the existing engines reach.
 #
-# PURPOSE: `results/subgroup-mod4.md` ships T(n,H) = I_H(D2ax) (mod 2) on all
+# PURPOSE: `results/symmetry-classes.md` ships T(n,H) = I_H(D2ax) (mod 2) on all
 # 820 cells. The mod-4 refinement
 #
 #   T(n,H) = I_H(<h>) + I_H(<v>) + I_H(C2) - 2 I_H(D2ax)   (mod 4)

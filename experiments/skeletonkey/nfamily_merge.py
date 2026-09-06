@@ -4,12 +4,12 @@ the production column automaton, in characteristic 0?
 
 Two files in the tree disagree without noticing each other:
 
-  results/r4/r4-floors.md (2026-08-13) calls the pairwise Nerode-
+  results/r4/r4-floors.md (deleted) (2026-08-13) calls the pairwise Nerode-
   distinguishability of the M(H+1)-1 column states "the single highest-value
   missing brick" and marks it NOT ESTABLISHED -- "nobody appears to have
   asked".
 
-  results/exactchange-probes.md section 6 (2026-08-14) answers it: two strip
+  results/arithmetic-structure.md section 6 (2026-08-14) answers it: two strip
   states are equivalent iff they carry the same multiset of block
   neighbourhoods N(b) = rows(b) expanded +-1, clipped to [0,H).  Measured
   2187 -> 575 at H = 9.  But that file states the result as GF(2)-Nerode
@@ -39,7 +39,7 @@ import sys
 import time
 from collections import defaultdict
 
-# results/exactchange-probes.md section 6, minimized state counts N(H),
+# results/arithmetic-structure.md section 6, minimized state counts N(H),
 # H = 4..11, computed there by a separate implementation (a GF(2) Nerode
 # closure).  Gate E is a two-implementation cross-check: this probe never
 # reads that code, so agreement is independent corroboration and disagreement

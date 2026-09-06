@@ -1,5 +1,5 @@
 // middle_kingdom_tm.cpp -- column transfer matrix for the column-convex cells
-// of the docs/middle-kingdom-plan.md Phase 3 grid, by area.
+// of the results/subclasses.md Phase 3 grid, by area.
 //
 // A column-convex king animal is a sequence of nonempty column intervals
 // [b(j), t(j)], j = 1..k, with t(j) = b(j) + h(j) - 1, consecutive columns
@@ -7,7 +7,7 @@
 //   d := b(j+1) - b(j)  in  [-h(j+1), h(j)]        (h(j) + h(j+1) + 1 choices).
 // Counted up to translation, so the profile is determined by the d's.
 //
-// Phase 3's structural finding (results/middle-kingdom-phase3.md): ON A
+// Phase 3's structural finding (results/subclasses.md): ON A
 // COLUMN-CONVEX ANIMAL every directedness predicate of the grid collapses to a
 // condition on the bottom profile b alone, because the cone {W,NW,N,NE,E} (and
 // {N,NE,E,SE}) can climb a column but never descend inside it, so a column is
@@ -29,7 +29,7 @@
 //   stair       staircase (A225114)                d >= 0 AND d >= h - h'
 //                                                  (b AND t nondecreasing)
 //   hvdir4asc   hvdir4 minus every animal whose phase path visits (0,1)
-//               (results/hv-growth-sandwich.md, the spectrum split): the
+//               (results/subclasses.md, the spectrum split): the
 //               phase-(0,1) state is deleted from the automaton, so what
 //               survives is the part of (dir4, HV-convex) the truncated
 //               descending block cannot reach; hvdir4 - hvdir4asc is the rest.

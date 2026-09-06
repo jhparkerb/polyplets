@@ -2,7 +2,7 @@
 """The mod-p recovery pipeline's own soundness gate, run on a BANKED fixed-height GF.
 
 Purpose: results/fixed_height_gfs.txt banks H=11 with validated=False; the owed
-question (results/gf-head-check.md, results/anisotropic-not-dfinite.md) was whether
+question (results/diagonal-formula.md, results/anisotropic-not-dfinite.md) was whether
 P_11/Q_11 is WRONG -- a CRT wraparound -- or merely unvalidated.  Test: Q_H * B_H ==
 P_H as power series modulo a fresh prime disjoint from the recovery pool, for
 n = 0..2*order+30, with B_H(n) from the transfer-matrix engine build/gf_modp.

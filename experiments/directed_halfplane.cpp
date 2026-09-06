@@ -3,7 +3,7 @@
 // reachable from the origin by steps (0,1), (1,0), (1,1), (1,-1) without
 // leaving the set. Redelmeier untried-set DFS (each animal generated exactly
 // once; every generated set is reachable-closed by construction).
-// Claimed identification: this equals OEIS A055834 (results/king-subfamilies.md).
+// Claimed identification: this equals OEIS A055834 (results/subclasses.md).
 //
 // Usage: directed_halfplane N   -> prints a(1)..a(N), one per line.
 #include <cstdint>

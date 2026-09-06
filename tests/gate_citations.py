@@ -3,9 +3,9 @@
 
 Written 2026-08-06 after two citation defects in two days. One was a paper
 mis-read (a 1998 PDF written off as a scan without opening it); the other was
-`results/beyond-polyplets.md` citing `results/cloud-investigation-2026-07-07.md`,
+`results/subclasses.md` citing `results/cloud-investigation-2026-07-07.md`,
 a file that has never existed in this repo -- the name belongs to an entry in
-Claude's memory directory, and `docs/utilization-bottleneck-log.md` cites it
+Claude's memory directory, and `docs/engine-record.md` cites it
 correctly as `[[cloud-investigation-2026-07-07]] in memory`. A memory note is
 not a repo artifact and cannot be cited by a paper. The same sweep turned up
 `results/pgo-no-go` and `results/reach-scaling-and-resourcing.md`, two more
@@ -42,7 +42,7 @@ to a file that is not there gets nothing at all, and no exemption word on the
 line changes that.  There is no history class for a link either; a deleted file
 is a fine thing to name in prose and a broken thing to link to.  Added
 2026-09-06, when README.md's own "why believe the number" paragraph linked
-`results/gate-class-sweep.md`, merged into `docs/engine-record.md` a commit
+`docs/engine-record.md`, merged into `docs/engine-record.md` a commit
 earlier -- the front door's first outbound link, and the backtick check passed
 it as history.
 
@@ -50,6 +50,10 @@ RED control: a synthetic document citing `results/definitely-not-here.md` must
 land in MISSING, and one citing it on a line that says "deleted" must not. A
 second control covers the branch class: a file declaring a branch that does not
 carry the cited path must not thereby exempt it, when that branch is present.
+
+The third check is on SOURCE files -- module docstrings and Lean headers cite
+documents, and the consolidation left 588 of those pointing at merged-away
+records.  Same rule as the prose check: repoint it, or say deleted.
 
 Usage: python3 tests/gate_citations.py [--verbose]
 """
@@ -234,6 +238,47 @@ def classify(text, hist, source="<doc>", declared=None):
     return out
 
 
+# Source files cite documents too -- a module docstring or a Lean header saying
+# where the argument it implements is written down. The consolidation of
+# 2026-09-06 left 588 of those pointing at merged-away records, which is the
+# same dead end as a bad citation in prose and is not covered by the markdown
+# sweep above. Same exemption rule: a line that says the file is deleted is
+# telling the reader the truth and passes.
+SOURCE_EXTS = (".py", ".go", ".sh", ".cpp", ".h", ".lean")
+# Paths the gates themselves name on purpose: the RED controls need a path that
+# has never existed, and the docstrings that explain them quote the incident
+# names. Listing them here keeps the check fail-closed everywhere else.
+SYNTHETIC = frozenset((
+    "results/definitely-not-here.md", "docs/synthetic/not-in-the-index.md",
+    "results/cloud-investigation-2026-07-07.md",
+    "results/reach-scaling-and-resourcing.md", "results/pgo-no-go.md",
+))
+
+
+def tracked_sources():
+    out = subprocess.run(["git", "-C", ROOT, "ls-files"],
+                         capture_output=True, text=True, check=True).stdout
+    return [f for f in out.split() if f.endswith(SOURCE_EXTS)
+            and not f.startswith(EXCLUDED_TREES)]
+
+
+def dead_source_citations(text, source):
+    """Documents a source file names that are not in the tree and not marked."""
+    out = []
+    for lineno, line in enumerate(text.split("\n"), 1):
+        low = line.lower()
+        if "deleted" in low or "removed" in low or "planned" in low:
+            continue
+        for m in SOURCE_PATH_RE.finditer(line):
+            p = m.group(1).rstrip(".,;:)")
+            if p in SYNTHETIC or os.path.exists(os.path.join(ROOT, p)):
+                continue
+            out.append((source, lineno, p))
+    return out
+
+
+SOURCE_PATH_RE = re.compile(r"\b((?:" + "|".join(TOP) + r")/[A-Za-z0-9_./-]+\.md)")
+
 LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
 
 
@@ -301,6 +346,14 @@ def main():
         merge(totals, classify(text, hist, f, decls[f]))
         broken_links.extend(dead_links(text, f))
 
+    dead_src = []
+    for f in tracked_sources():
+        path = os.path.join(ROOT, f)
+        if not os.path.exists(path):
+            continue
+        with open(path, errors="replace") as fh:
+            dead_src.extend(dead_source_citations(fh.read(), f))
+
     n = sum(len(v) for v in totals.values())
     print(f"{n} path citations across {len(files) - len(absent)} tracked "
           f"markdown files")
@@ -312,6 +365,8 @@ def main():
     for k in CLASSES:
         print(f"  {k:9s} {len(totals[k])}")
     print(f"  {len(broken_links)} broken markdown link(s)")
+    print(f"  {len(dead_src)} source file(s) citation(s) to a document that is "
+          f"gone and unmarked")
 
     # What the branch class resolved through refs that are actually here. This
     # is the manifest's content, and comparing it to the file on disk is the
@@ -397,6 +452,21 @@ def main():
           "says 'deleted'; live links, external links and math that reads as a "
           "link are not  OK")
 
+    # RED control 5: a source file citing a document that is not here fails,
+    # and the same line passes once it says the document was deleted.
+    # Assembled at runtime rather than written out, so this gate's own source
+    # does not contain the bogus path it is checking for.
+    bogus = "results/" + "no-such-record-red5" + ".md"
+    src_red = dead_source_citations(f"# see {bogus}\n", "<red5>")
+    src_ok = dead_source_citations(f"# see {bogus} (deleted)\n", "<red5>")
+    if len(src_red) != 1 or src_ok:
+        print("\nRED CONTROL FAILED: a source file citing a document that is "
+              "gone is no longer caught, or the deleted marker no longer "
+              "excuses one")
+        return 1
+    print("RED  a source file citing a document that is gone is caught, and "
+          "the same line passes once it says deleted  OK")
+
     # RED control 2: a declaration must not exempt a path the named ref lacks.
     # Uses HEAD, which exists everywhere and provably does not carry the bogus
     # path, so the control is real on any clone.
@@ -448,6 +518,14 @@ def main():
               "name the file in prose (that the backtick check will pass as "
               "history).")
 
+    if dead_src:
+        print(f"\nGATE CITATIONS: RED -- {len(dead_src)} citation(s) in source "
+              f"files point at a document that is not in the tree:")
+        for src, line, p in sorted(set(dead_src)):
+            print(f"  {src}:{line}  ->  {p}")
+        print("\nRepoint at whatever absorbed it, or say '(deleted)' on the "
+              "line so the reader does not go looking.")
+
     if totals["MISSING"]:
         print(f"\nGATE CITATIONS: RED -- {len(totals['MISSING'])} citation(s) "
               f"point at paths that have never existed:")
@@ -462,7 +540,7 @@ def main():
         print("\nGATE CITATIONS: RED -- a tracked file is not in the working "
               "tree; commit the deletion or restore the file.")
     if (totals["MISSING"] or absent or totals["false_claim"]
-            or manifest_drift or broken_links):
+            or manifest_drift or broken_links or dead_src):
         return 1
 
     print("\nGATE CITATIONS: GREEN")

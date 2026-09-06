@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Exact Change probe 3: the kernel, in two layers.
 
-Context: results/exactchange-probes.md.  The GF(2) observability quotient of
+Context: results/arithmetic-structure.md.  The GF(2) observability quotient of
 the strip functional has rank r(H) = A034299(H-1); the state space has
 Motzkin(H+1)-1 states but only N(H) = 8, 19, 43, 101, 239 (H=4..8) distinct
 phi values (Nerode classes).  So the kernel of phi splits:

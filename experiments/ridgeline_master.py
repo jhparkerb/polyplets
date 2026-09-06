@@ -49,7 +49,7 @@ contaminate t^(j-1) while j-1 <= k.)
 binomial double sum (C)/(D) and makes the depth variable t what it structurally
 is: a marker for cluster excess, i.e. a perturbation of the row-transfer of the
 all-pairs gap walk.  At t = 0 it is identity (II) of
-results/onset-defect-depth1-closed.md: Phat_0 - Bb_0^2/(3 + Sig_0).
+results/below-onset.md: Phat_0 - Bb_0^2/(3 + Sig_0).
 
 This script verifies (M') against severance_w3_depths.D_series (which computes the
 same defects through the independent route (C)/(D)) and, at j = 1, against

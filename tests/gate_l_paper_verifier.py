@@ -2,7 +2,7 @@
 """Gate: the kill matrix for paper/verify_l_papers.py.
 
 RED-first, and it is a gate on the *verifier*, not on the papers.  PROTOCOL
-Amendment 1 (docs/reviews/l-trim/PROTOCOL.md): confidence in a checker is a
+Amendment 1 (docs/reviews/l-trim/PROTOCOL.md (deleted)): confidence in a checker is a
 demonstrated kill, never a count.  This file pairs every ok() site in
 paper/verify_l_papers.py with the specific corruption that has been watched
 turning it red, runs every corruption, and fails if any pairing stops holding.

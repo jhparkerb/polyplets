@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """How many digits does the mu_H cross-check actually establish?
 
-results/strip-growth-lambda-bounds.md used to say cpp/strip_mu.cpp "reproduces
+results/growth-constant.md used to say cpp/strip_mu.cpp "reproduces
 the GF-root mu_H exactly for H<=11". It does not, and could not: this script
 measures the two sides of that comparison, and the write-ups now state what it
 found (agreement to the engine's 7 printed decimals, 7.8-8.9 significant

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The depth-1 below-onset defect, with the lattice as a parameter.
 
-`results/onset-defect-depth1-closed.md` closes depth 1 on the king lattice: the
+`results/below-onset.md` closes depth 1 on the king lattice: the
 defect `D_1(k) = T(2k,k) - P_k(2k)/3^(k+1)` assembles from the all-pairs cluster
 families by the gap-walk identity (II), and its generating function is the
 quartic `Phi`.  Every piece of that is written for king adjacency.  Here the
@@ -22,12 +22,12 @@ What this file establishes, and how:
   DERIVED  The assembly identity (II) is parametric with `3 -> b`:
            `D_1(k) = [y^k]( Phat - B^2 / (b + S) )`.  The 3 is the drift-step
            weight of the renewal chain, exactly as in
-           `results/skeletonkey-parametric-master.md`; the derivation in
+           `results/closed-doors.md`; the derivation in
            `onset-defect-depth1-closed.md` Sec. 2 never uses anything else about
            the king lattice.
 
   CHECKED  square, `D_1(k) = (-1)^(k+1)` -- to k = 40, against
-           `results/undertow-square-validation.md`, which measured it at k <= 6.
+           `results/undertow.md`, which measured it at k <= 6.
   CHECKED  hex, against `T_hex(2k,k) - P_k(2k)/2^(k+1)` from
            `results/hex_diagonal_cells.txt` -- to k = 6.
   CHECKED  king, against `experiments/depth1_gap_walk.py`'s banked series.
@@ -388,7 +388,7 @@ def phi_hex(mp):
     """Phi(x, W) for hex, with W = N(x) = sum_k N_k x^k, N_k = 2^(k+1) D_1(k).
 
     `mp` is the minimal polynomial from hex_kernel().  Same normalisation as
-    the king quartic of `results/onset-defect-depth1-closed.md` Sec. 3: y = b x
+    the king quartic of `results/below-onset.md` Sec. 3: y = b x
     and N = b F_1(b x) + 1, here with b = 2.
     """
     import sympy as sp
@@ -474,7 +474,7 @@ def main():
         if d1_sq[k] != Fr((-1) ** (k + 1)):
             raise SystemExit(f"FAIL: square D_1({k}) = {d1_sq[k]}")
     print(f"  the enumerated walk agrees k <= {a.kmax}; "
-          f"results/undertow-square-validation.md measured k <= 6  OK")
+          f"results/undertow.md measured k <= 6  OK")
 
     print("== hex: the b = 2 kernel closure  [DERIVED]")
     A, yh, Sh, Bh, Phh, F1h, mp = hex_kernel()

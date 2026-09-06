@@ -23,7 +23,7 @@ Two checks, both from files in the tree:
              of them and the fifth is PREDICTED and compared against its
              measured row.  This is the run's decisive internal check and until
              the residue rows were banked (same day) it could not be re-run off
-             the repo at all -- results/motley-h18.md quoted the runner for it.
+             the repo at all -- results/second-sources.md quoted the runner for it.
              The reconstruction is also compared against the banked exact row,
              which ties the residues to results/cutcount_b1/rows/C18.out.
 
@@ -73,7 +73,7 @@ def triangle_nmax():
     Was `NMAX = 40`, hand-edited, and it made this gate's COVERAGE stale
     without making it red -- the failure class `scripts/provenance_table.py`
     already fixed for MOTLEY_H.  Planted 2026-08-22 during the gate-class
-    sweep (`results/gate-class-sweep.md`): with 41 fabricated rows appended to
+    sweep (`docs/engine-record.md`): with 41 fabricated rows appended to
     results/triangle.txt this gate stayed GREEN, because the assembly loop is
     `range(1, NMAX + 1)` and simply never looked at them, while
     gate-provenance and gate-residual-cells both went red on the same plant.
@@ -96,7 +96,7 @@ def triangle_nmax():
 NMAX = triangle_nmax()
 # Pinned coverage.  These are what the tree holds today; a rung that banks a new
 # row must move them deliberately, which is the point.
-EXPECT_TOP_H = 18                      # results/motley-h18.md (Confetti)
+EXPECT_TOP_H = 18                      # results/second-sources.md (Confetti)
 EXPECT_CELLS = 567                     # rows H=1..18 against the triangle
 EXPECT_PRIMES = 5                      # four for the CRT, one held out
 CRT_BOUND = 1 << 112                   # the runner's overflow guard

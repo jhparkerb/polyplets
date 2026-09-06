@@ -200,7 +200,7 @@ static int selftest() {
   }
 
   // B. Boundary state counts are a fixed fingerprint of the enumeration
-  // (banked in results/strip-mu-certificates.md).
+  // (banked in results/growth-constant.md).
   {
     const std::size_t want[] = {3, 8, 20, 50, 126, 322, 834};
     std::printf("selftest B: states H=2..8 =");

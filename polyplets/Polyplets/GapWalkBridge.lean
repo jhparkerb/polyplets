@@ -12,7 +12,7 @@ import Polyplets.Weights3Heavy
 # Notary N0: the bridge between the gap walk, the enumerated weights, and
 # the depth identities
 
-Campaign *Notary* (`docs/notary-lean-plan.md` §3, workstream N0). Three jobs:
+Campaign *Notary* (`docs/notary-lean-plan.md (deleted)` §3, workstream N0). Three jobs:
 
 1. **Cross-links.** The walk values of `GapWalk.lean` equal the enumerated
    cluster weights of `Weights.lean` / `Weights3Heavy.lean` at every level
@@ -29,7 +29,7 @@ Campaign *Notary* (`docs/notary-lean-plan.md` §3, workstream N0). Three jobs:
    `ℓ = 1, 2, 3` and cross-links `W^p(2^ℓ) = Vp ℓ ℓ`.
 
 3. **The assembly closed inside Lean.** Identity (II) of
-   `results/onset-defect-depth1-closed.md`,
+   `results/below-onset.md`,
 
        `D_1(k) = [y^k]( P̂(y) − B(y)² / (3 + S(y)) )`,
 
@@ -54,7 +54,7 @@ Campaign *Notary* (`docs/notary-lean-plan.md` §3, workstream N0). Three jobs:
 
 The bijection between `CFGV*` configurations and walk paths (all `ℓ`), and
 identity (II) itself for all `k` — the truncation and tightness arguments —
-remain paper-only (`docs/notary-lean-plan.md` §1, N4). This module closes the
+remain paper-only (`docs/notary-lean-plan.md (deleted)` §1, N4). This module closes the
 finite anchor.
 -/
 

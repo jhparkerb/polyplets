@@ -48,8 +48,6 @@ the triangle), `docs/engine-design.md` (the enumerator), and
 `docs/proofs/diagonal-law.md` (the closed form the tall heights rest on).
 Everything else is record.
 
-> Comments in code and manuscript headers still name design and plan documents deleted in the consolidation of 2026-09-06. `docs/consolidation-plan.md` is the ledger; each is readable with `git show <commit>:<path>` at the commit it names.
-
 ## Layout
 
 | where | what |

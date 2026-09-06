@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Extremal king-animal statistics that the repo has never computed.
 
-`results/unexplored-avenues.md` idea 7 lists, after the minimum-site-perimeter
+`results/closed-doors.md` idea 7 lists, after the minimum-site-perimeter
 bullet it closed: "Max diameter, min diameter at fixed n; max articulation
 points; max hole *count* (as opposed to max single-hole area, which is M(n))",
-and notes that "diameter" appears nowhere in the repo.  `docs/last-orders.md`
+and notes that "diameter" appears nowhere in the repo.  `docs/last-orders.md (deleted)`
 C3.3.
 
 Cheap by construction: the oracle scale is where these live, the reduction is
@@ -16,7 +16,7 @@ Computed per n, over all FIXED king animals:
   max articulation points  (cut vertices of the king adjacency graph)
   max hole count           (bounded 4-components of the complement --
                             the matching convention of
-                            results/matching-pair-convention.md)
+                            results/closed-doors.md)
 
 RED controls:
   - the animal counts must reproduce A006770;

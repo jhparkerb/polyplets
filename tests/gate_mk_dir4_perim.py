@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Gate MK-DIR4-PERIM: results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md) Phase 2a
+"""Gate MK-DIR4-PERIM: results/subclasses.md (formerly results/subclasses.md) Phase 2a
 acceptance.
 
 cpp/convex_perim_tm.cpp's new dir4 mode filters HV-convex king animals BY
 SEMIPERIMETER down to the half-plane-4-cone-directed subset (Proposition 2 of
-results/middle-kingdom-phase3.md, translated onto this row-built transfer
+results/subclasses.md, translated onto this row-built transfer
 matrix -- see the header comment there for the derivation). This gate is the
 brute-force validator, plus the RED control and the termwise sanity check the
 plan's acceptance requires.
@@ -39,7 +39,7 @@ TM = os.path.join(ROOT, "build", "convex_perim_tm")
 ANCHOR = os.path.join(ROOT, "build", "directed_cone_anchor")
 
 # A005436 (convex polyominoes by semiperimeter), banked reference prefix --
-# results/convex-polyplets.md / Delest-Viennot.
+# results/subclasses.md / Delest-Viennot.
 A005436_REF = [1, 2, 7, 28, 120, 528, 2344, 10416, 46160, 203680]
 
 

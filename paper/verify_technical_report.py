@@ -335,7 +335,7 @@ if motley_cells != 589:
     failures.append(f"FAIL Motley coverage: {motley_cells} cells, expected 589")
 
 # Abstract 53-54: every a(n) passes the Burnside congruence.  Record: the
-# subgroup-invariant counts I(H), n <= 40 (results/subgroup-mod4.md):
+# subgroup-invariant counts I(H), n <= 40 (results/symmetry-classes.md):
 #   a(n) = I(C4) + I(D2ax) + I(D2diag) - 2 I(D4)   (mod 4)
 I = {}
 for line in (ROOT / "results/subgroup_counts.txt").read_text().splitlines():
@@ -473,7 +473,7 @@ for n in range(1, 19):
     check(f"hole row {n} sums to a({n})", sum(v for (m, k), v in holes.items() if m == n), banked_an[n])
 
 # Table 1 as a whole: a(m+n) >= a(m) a(n), the supermultiplicativity behind any
-# growth-rate statement read off the table (results/concatenation-upper-bound.md).
+# growth-rate statement read off the table (results/growth-constant.md).
 for m in range(1, 21):
     for n in range(m, 41 - m):
         if banked_an[m + n] < banked_an[m] * banked_an[n]:

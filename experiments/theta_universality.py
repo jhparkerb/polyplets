@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Are king and square lattice animals in the same universality class?
 
-`results/unexplored-avenues.md` idea 6.2, the half of the Parisi-Sourlas item
+`results/closed-doors.md` idea 6.2, the half of the Parisi-Sourlas item
 that survived 6.1's closure because it does not run through the strip ladder:
 
 > Is the king lattice in the same class as the square lattice?  It must be if
 > universality holds.  That is a *prediction*, testable against the two theta
 > fits, rather than a count.
 
-`results/series-analysis-da.md` pins the king exponent at theta = -1.000(1)
+`results/growth-constant.md` pins the king exponent at theta = -1.000(1)
 from 40 terms by first-order inhomogeneous differential approximants.  The
 square-lattice exponent is not measured anywhere in this repo -- it is quoted
 from the literature, which is a different kind of statement.

@@ -4,7 +4,7 @@ package orchestrator
 // ("Unbounded Orchestrator Heap"). cmd/orchestrate set GOGC=1000 with no
 // memory limit, so the heap could grow to ~11x live before a collection —
 // the mechanism behind head #4's 4.4 GB-and-climbing RSS in
-// results/overcommit-hydra.md (the audit found no leak).
+// docs/engine-record.md (the audit found no leak).
 //
 // debug.SetMemoryLimit(-1) reads the current limit without changing it, so
 // the applied bound is directly observable.

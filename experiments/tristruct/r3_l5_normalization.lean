@@ -2,7 +2,7 @@
    written as Lean theorems.
 
    STATUS: WRITTEN BUT NOT COMPILED (2026-08-12, restart agent). Lean and lake
-   are banned on gympie for this round (docs/r3-job-dispatch.md); this file has
+   are banned on gympie for this round (docs/r3-job-dispatch.md (deleted)); this file has
    never been elaborated. The proofs were written and checked by eye only.
 
    Check command (ayr or dalby, or any machine with the project toolchain

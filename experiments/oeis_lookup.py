@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Read-only OEIS lookup by term list -- the novelty check, nothing else.
 
-docs/middle-kingdom-plan.md Phase 3 needs a novelty verdict per grid cell, and
+results/subclasses.md Phase 3 needs a novelty verdict per grid cell, and
 the repo's practice is that submission is jasonp's call, gated on the viva.
 This script therefore ONLY reads: it GETs oeis.org/search?fmt=json and prints
 what came back. It has no write path of any kind.
 
-oeis.org answers 403 to some clients (recorded in results/multi-directed.md on
+oeis.org answers 403 to some clients (recorded in results/subclasses.md on
 2026-08-05, which is why that note's novelty check is marked unchecked); a
 plain curl-style User-Agent gets through, so one is set here.
 

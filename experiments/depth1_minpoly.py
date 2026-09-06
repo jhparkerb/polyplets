@@ -281,7 +281,7 @@ def main():
     print(f"   Phi irreducible over Q: {len(sp.factor_list(Phi)[1]) == 1}")
     print("   discriminant factors have degree <= 10; rho (~14.41, the")
     print("   localized eigenvalue) has no minimal polynomial of degree <= 10")
-    print("   (PSLQ, results/allpairs-kernel.md) -- the curve provably does")
+    print("   (PSLQ, results/below-onset.md) -- the curve provably does")
     print("   not contain rho: the localized-mode singularities of Phat, B, S")
     print("   cancel identically in F1 = Phat - B^2/(3+S).")
 

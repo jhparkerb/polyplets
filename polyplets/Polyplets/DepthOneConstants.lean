@@ -11,8 +11,8 @@ import Mathlib.Analysis.SpecialFunctions.Sqrt
 /-!
 # Notary N3: the depth-1 constants as branch data of `Φ`
 
-Campaign *Notary* (`docs/notary-lean-plan.md` §3, workstream N3). The
-constants of `results/onset-defect-depth1-closed.md` §4 — rate, exponent,
+Campaign *Notary* (`docs/notary-lean-plan.md (deleted)` §3, workstream N3). The
+constants of `results/below-onset.md` §4 — rate, exponent,
 amplitude, and the `1/k` coefficient `a` — are **branch data of the quartic
 `Φ(x, W)`**. This module states that branch data as pure field algebra, over
 an arbitrary field `K` of characteristic zero equipped with square roots
@@ -42,7 +42,7 @@ What is proved (all statements checked in exact arithmetic by
 6. `a_value`: `a := −1/8 − V₂/(2V₀) = 3293/92928 − 3251·s3/185856` — the
    `1/k` coefficient of the campaign, an element of `ℚ(√3)`.
 
-**Not** in scope (docs/notary-lean-plan.md §1): the transfer from branch data
+**Not** in scope (docs/notary-lean-plan.md (deleted) §1): the transfer from branch data
 to coefficient asymptotics (`C₁ = √6/(27√π)` with its `√π`) — real-analytic
 singularity analysis with no Mathlib support. The constants are pinned here
 exactly as the derivation produced them: as algebra of the curve.

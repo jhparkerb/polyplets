@@ -2,7 +2,7 @@
 """Independent strip transfer-matrix engine for the polyplet triangle T(n,H).
 
 A SECOND, kink-independent computation path (the lever from
-results/triangle-structure.md). It sweeps a height-H strip column by column
+results/diagonal-formula.md). It sweeps a height-H strip column by column
 with a king-connectivity partition state, counting king-connected cell sets by
 area with horizontal translation fixed (leftmost occupied column = 0). That
 yields the strip cumulative

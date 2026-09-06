@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Kurkov's conjectured continued fraction for A225114, and where its poles are.
 
-results/hv-growth-sandwich.md identifies the staircase king animals (A225114)
+results/subclasses.md identifies the staircase king animals (A225114)
 as the block that carries mu, and the spectrum measured by
 experiments/prony_spectrum.py says the staircase series behaves like a sum of
 exponentials 3.12894..., 1.50504..., 1.28433..., -1.25776..., i.e. like a

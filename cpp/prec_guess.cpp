@@ -1,6 +1,6 @@
 // prec_guess.cpp -- P-recurrence and algebraic-relation exclusion, mod p.
 //
-// docs/middle-kingdom-plan.md Phase 2a. docs/proofs/convex-mirage.md banked
+// results/subclasses.md Phase 2a. docs/proofs/convex-mirage.md banked
 // "no P-recurrence of order <= 6, degree <= 5 on 38 terms" for HV-convex king
 // animals by area and for the HV-convex polyomino control. This pushes the
 // same question to order <= 20 / degree <= 20 on ~700 terms, which the

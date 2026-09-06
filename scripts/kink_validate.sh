@@ -15,8 +15,8 @@
 # dalby: 80 cores, 1 GiB/worker (ram-budget-per-worker: 125GiB*0.6/80 ~ 0.94).
 #
 # Utilization flags brought up to the dalby_term.sh-validated production
-# config (docs/utilization-bottleneck-log.md, results/scheduling.md,
-# results/utilization-fix-and-ceiling.md) -- this is a real production-scale
+# config (docs/engine-record.md, docs/engine-record.md,
+# docs/engine-record.md) -- this is a real production-scale
 # sweep, not a small gate, so it pays the same fork/GC/merge-fanin/idle-pool
 # costs dalby_term.sh was fixed for: unit-mult 4->8, +merge-mult 1,
 # +overlap-heights (deliberate overshoot at MAXN, harmless per dalby_term.sh's

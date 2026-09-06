@@ -31,7 +31,7 @@ the theorem follow.
 Conditional frame (same as the proved d=1,2 cases): diagonal-law shape
 theorem + grand form (both proved, Lean-checked) + the defect-gas renewal
 formalism's master equation and boundary residue formula reduced mod 81
-(derived in results/defect-gas.md / results/triangle-r2-tower-mod81.md from
+(derived in results/diagonal-formula.md / results/triangle-r2-tower-mod81.md (deleted) from
 the exact chain identity; verified against banked g_k, h_k mod 81, k <= 17).
 
 Exact integer / symbolic arithmetic throughout.  Runtime ~15 s.

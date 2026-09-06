@@ -16,7 +16,7 @@ Findings (n<=36):
   - Its moments converge: std/mean -> ~0.225, skew -> ~0.35 (right-skewed tail).
   - <H> ~ n^nu_eff with nu_eff drifting 0.72 -> 0.68 (n=10->36), slowly toward the
     asymptotic 2D lattice-animal value 0.6407; n<=36 is still pre-asymptotic.
-See results/height-distribution-collapse.md.
+See results/growth-constant.md.
 """
 import os, sys, math
 

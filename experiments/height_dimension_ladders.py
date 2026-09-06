@@ -3,16 +3,16 @@
 
 Banked numbers only, no enumeration; runs in well under a second.  Every
 assertion is one of the inequalities argued in the "Five ladders" section of
-results/skeletonkey-hankel-closure.md, or a re-check of a negative result
+results/closed-doors.md, or a re-check of a negative result
 quoted there.  Exits nonzero on the first failure.
 
 Sources:
-  char-2 column rank r(H)      results/exactchange-probes.md  (A034299)
-  char-0 Hankel rank           results/skeletonkey-hankel-closure.md
-  reach-merged classes N(H)    results/nkey-census.md
+  char-2 column rank r(H)      results/arithmetic-structure.md  (A034299)
+  char-0 Hankel rank           results/closed-doors.md
+  reach-merged classes N(H)    results/closed-doors.md
   raw column frontier          Motzkin(H+1) - 1
   deg psi_H                    results/anisotropic-not-dfinite.md
-  cell-level d_p, d_2          results/skeletonkey-cell-sparsity.md
+  cell-level d_p, d_2          results/closed-doors.md
 """
 import os
 import sys

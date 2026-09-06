@@ -1,6 +1,6 @@
 // Perimeter-defect enumerator: fixed animals graded by site-perimeter defect,
 // pruned so the cost tracks the (polynomially many) low-defect animals rather
-// than the (exponentially many) animals.  docs/perimeter-defect-plan.md, Task B.
+// than the (exponentially many) animals.  docs/perimeter-defect-plan.md (deleted), Task B.
 //
 //   perimeter_defect {square4|square8} NMAX KMAX  ->  lines "n k c H count"
 //
@@ -9,7 +9,7 @@
 // graph: k = 2c + t - (deg/2 - 2)(n - 1) with t >= 0 (t = sum over empty adjacent
 // cells of (animal-neighbours - 1)), i.e. 2c + t on square4 and 2c + t - 2(n-1) on
 // square8; the defect budget caps c at floor(k/2) on square4 and floor(k/3) on
-// square8 (results/perimeter-defect-diagonals.md), and splitting
+// square8 (results/perimeter.md), and splitting
 // a defect class by c says whether a quasi-polynomial's parity part is carried by
 // the cyclic animals -- a ring has an even cell count, so a family that requires
 // a cycle can only live on one parity.  H is the bounding-box height, which turns

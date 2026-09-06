@@ -4,7 +4,7 @@ triangle I(n,H) = I_H(D2ax) = number of fixed king animals of height exactly H
 invariant under the full height-preserving Klein group {e, h, v, r180}.
 
 Banked source: results/subgroup_d2ax_byheight.txt (n H count, n <= 40),
-computed by symcount_fast (subgroup census, results/subgroup-mod4.md).
+computed by symcount_fast (subgroup census, results/symmetry-classes.md).
 Independent small-n source: p2_enum --sym klein column (own recursion, own
 connectivity rule; data/p2_sym_n13.txt).
 

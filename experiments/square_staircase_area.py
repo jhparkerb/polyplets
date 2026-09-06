@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""N1 of results/novelty-sortie.md: the square-lattice analogue of Proposition 6.
+"""N1 of docs/publication.md: the square-lattice analogue of Proposition 6.
 
-Proposition 6 (results/hv-growth-sandwich.md) says every class between staircase
+Proposition 6 (results/subclasses.md) says every class between staircase
 and HV-convex KING animals has growth constant mu = 3.128943269730886...  The
 novelty question is whether the same statement for ordinary polyominoes is
 already implicit in the solved models. It is: Bender (1974) gives convex
@@ -86,7 +86,7 @@ def main():
         f"staircase ratio {ratio} is not Bender's {BENDER} -- N1's premise fails"
     print("ok   the subclass carries the superclass's exponential growth, so the "
           "square-lattice\n     analogue of Proposition 6 is implicit in the solved "
-          "models (results/novelty-sortie.md N1)")
+          "models (docs/publication.md N1)")
     return 0
 
 

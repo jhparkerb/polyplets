@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """The correction-to-scaling exponent, king against square, one method, matched
-length -- docs/time-at-the-bar.md A1.5.
+length -- docs/time-at-the-bar.md (deleted) A1.5.
 
-WHAT THIS IS FOR.  results/theta-universality.md compared the LEADING exponents
+WHAT THIS IS FOR.  results/growth-constant.md compared the LEADING exponents
 of the two lattices (theta_king = -0.9997, theta_square = -0.9995 at N = 40)
 and found them equal to the resolution the method has.  A leading exponent is
 the weakest thing universality predicts: -1 is a round number that several
@@ -12,7 +12,7 @@ match.  This measures it on both lattices with one script, one grid, and the
 same number of terms on each side.
 
 WHAT THE TREE SAYS BEFORE THIS RUNS, stated so the item is not oversold.
-docs/time-at-the-bar.md A1.5 says results/series-analysis-da.md "already fits a
+docs/time-at-the-bar.md (deleted) A1.5 says results/growth-constant.md "already fits a
 confluent term on the king side (Delta_1 = 1/2)".  That is not quite what that
 file says, and the difference matters:
 

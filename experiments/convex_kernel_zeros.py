@@ -2,7 +2,7 @@
 """Does the Prony spectrum of the convex-polyplet area series equal 1/zeros(K)?
 
 K(q) = sum_{m>=0} (-1)^m (2 - q^m) q^{m(m+1)/2} / (q;q)_m^2 is the Temperley
-denominator of the area generating function (results/convex-polyplets.md, the
+denominator of the area generating function (results/subclasses.md, the
 2026-08-17 salvage).  Its smallest positive zero q_1 gives mu = 1/q_1.  L7
 measures the next exponentials by Prony's method, without any kernel:
 

@@ -1,5 +1,5 @@
 /-
-Proposition 6 (`results/hv-growth-sandwich.md`) as a Lean *architecture*: every
+Proposition 6 (`results/subclasses.md`) as a Lean *architecture*: every
 statement is real and typechecks; every `sorry` is a contract with a line
 estimate. The final theorem is genuinely proved from the contracts above it.
 
@@ -30,7 +30,7 @@ in Lean, and neither is weaker for that; what a reader should not do is treat
 
 1. `Stack.Valid` — the stack class: bottoms rise and tops fall, so the column
    intervals nest.
-   * **Paper**: `results/hv-growth-sandwich.md` Lemma 1 (the two outer blocks
+   * **Paper**: `results/subclasses.md` Lemma 1 (the two outer blocks
      are stacks) and Lemma 2 part 1 (a stack is a weakly unimodal
      composition, `P(n) = A001523`).
    * **Checked**: `make gate-middle-kingdom`, via
@@ -41,7 +41,7 @@ in Lean, and neither is weaker for that; what a reader should not do is treat
      `d ≤ p`, so `Stair.cand` already contains them.
 
 2. `lemma2` — `P n ≤ (n+1)^(4√n+6)`, hence `P(n)^(1/n) → 1`.
-   * **Paper**: `results/hv-growth-sandwich.md` Lemma 2 part 2, the `√n` split
+   * **Paper**: `results/subclasses.md` Lemma 2 part 2, the `√n` split
      of a partition. Hardy–Ramanujan is not used and not needed.
    * **Checked**: `make gate-middle-kingdom`, via
      `experiments/monotone_block_growth.py`: `p(n) ≤ (n+1)^(s+L+1) ≤
@@ -53,7 +53,7 @@ in Lean, and neither is weaker for that; what a reader should not do is treat
 
 3. `IsHVCanonical` — HV-convex king animals as a geometric predicate on
    `Finset (ℤ × ℤ)`.
-   * **Paper**: Corollary 4 of `results/middle-kingdom-phase3.md` (line 86):
+   * **Paper**: Corollary 4 of `results/subclasses.md` (line 86):
      HV-convex = column-convex + `b` valley-unimodal + `t` peak-unimodal, a
      four-line gap argument in both directions.
    * **Checked**: `make gate-middle-kingdom` brute-forces HV-convex animals
@@ -64,7 +64,7 @@ in Lean, and neither is weaker for that; what a reader should not do is treat
      the column-list encoding `StairAnimals.lean` uses.
 
 4. `lemma1` — the convolution inequality `A(n) ≤ 2(n+1)² Σ P·M·P`.
-   * **Paper**: `results/hv-growth-sandwich.md` Lemma 1. The decomposition is
+   * **Paper**: `results/subclasses.md` Lemma 1. The decomposition is
      not new in kind: Gouyou-Beauchamps & Leroux, FPSAC 2004
      (arXiv:math/0403168) §2.3, for convex polyominoes on the honeycomb
      lattice; the attribution note in that file says what is and is not
@@ -76,7 +76,7 @@ in Lean, and neither is weaker for that; what a reader should not do is treat
 
 5. `A_tendsto` — the squeeze: contracts 2 and 4 kill the outer factors,
    `Stair.M_tendsto` supplies `µ` for the middle.
-   * **Paper**: `results/hv-growth-sandwich.md`, Proposition 6.
+   * **Paper**: `results/subclasses.md`, Proposition 6.
    * **Checked**: `µ` itself is measured to 204 digits there, and the 49-digit
      agreement between `(dir4, HV-convex)` and the unrestricted HV-convex
      series is the observation Proposition 6 explains.
@@ -100,7 +100,7 @@ reversing the column order swaps the fattening block with the thinning block
 (both stacks), and flipping top-to-bottom swaps the two staircase orientations.
 Each is an area-preserving involution, so each halves a development.
 
-**Contract 1** — paper: `results/hv-growth-sandwich.md` Lemmas 1 and 2 part 1.
+**Contract 1** — paper: `results/subclasses.md` Lemmas 1 and 2 part 1.
 Checked: `make gate-middle-kingdom` (`experiments/staircase_supermul.py`,
 `P(n) = A001523` as the RED control). -/
 def Stack.Valid : List Stair.Col → Prop := sorry
@@ -114,7 +114,7 @@ noncomputable def P (n : ℕ) : ℕ :=
 This is the layer that does not exist yet, and Corollary 4 — that it forces
 valley-unimodal bottoms and peak-unimodal tops — is proved against it.
 
-**Contract 3** — paper: Corollary 4 of `results/middle-kingdom-phase3.md:86`.
+**Contract 3** — paper: Corollary 4 of `results/subclasses.md:86`.
 Checked: `make gate-middle-kingdom`, brute force against the 16-cell grid table
 and `experiments/descent_block_oracle.py`'s `brute_hv_mirror(11)`. -/
 def IsHVCanonical (n : ℕ) (S : Finset (ℤ × ℤ)) : Prop := sorry
@@ -131,7 +131,7 @@ onto weakly unimodal compositions) plus the `√n` split. Mathlib has `Nat.Parti
 and its `Fintype` but nothing on unimodality and no cardinality bound, so both
 halves are built from scratch. ~600–900 lines.
 
-**Contract 2** — paper: `results/hv-growth-sandwich.md` Lemma 2 part 2.
+**Contract 2** — paper: `results/subclasses.md` Lemma 2 part 2.
 Checked: `make gate-middle-kingdom` (`experiments/monotone_block_growth.py`)
 verifies both factors of this bound to `n ≤ 120`, with a RED control on the
 large-part cap. -/
@@ -142,7 +142,7 @@ bits are monotone, so the columns split `C1 C2 C3`, and the animal is recovered
 from the three blocks, two junction offsets and one phase bit. Needs Corollary 4
 first, then a `Finset` injection. The cost centre, ~1500 lines.
 
-**Contract 4** — paper: `results/hv-growth-sandwich.md` Lemma 1, with the
+**Contract 4** — paper: `results/subclasses.md` Lemma 1, with the
 FPSAC 2004 attribution note. Checked: the phase split's totals `n ≤ 11` in the
 gate; the inequality itself is nowhere checked directly. -/
 theorem lemma1 (n : ℕ) :
@@ -157,7 +157,7 @@ theorem lemma1 (n : ℕ) :
 because `(n+1) ^ (4√n+6)` has `n`-th root `→ 1`; `Stair.M_tendsto` supplies `µ`
 for the middle. ε-management in `ℝ`, ~250 lines.
 
-**Contract 5** — paper: `results/hv-growth-sandwich.md`, Proposition 6.
+**Contract 5** — paper: `results/subclasses.md`, Proposition 6.
 Checked: `µ` measured there to 204 digits. -/
 theorem A_tendsto :
     Tendsto (fun n : ℕ => (A n : ℝ) ^ ((n : ℝ)⁻¹)) atTop (𝓝 Stair.mu) := sorry

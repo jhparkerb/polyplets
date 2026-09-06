@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Why some minimum-perimeter columns go constant and others grow.
 
-results/perimeter-both-ends.md reports, without explaining it, that on king the
+results/perimeter.md reports, without explaining it, that on king the
 even-p columns of C(p,i) = A(nmax(p)-i, p) stabilise while the odd-p ones grow,
 and that on square4 ALL FOUR residue classes stabilise. The hypothesis tested
 here is that the split has nothing to do with parity as such:

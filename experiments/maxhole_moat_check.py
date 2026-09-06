@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Machine-check of the MOAT-CYCLE proof of max-hole lemma (II'): n >= ha+hm+2.
 
-The 5-step argument (results/maxhole-proof.md):
+The 5-step argument (results/subclasses.md):
   1. moat walk: trace the outer contour of the hole region; the cell across each
      boundary edge is foreground (else leak/extension), and consecutive outside
      cells are king-adjacent (incl. at pinch corners, where they are the diagonal

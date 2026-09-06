@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Settle the depth-5 (emax=4) cost from a measured K-ladder at fixed threads.
 
-`results/undertow-review-queue.md` row L-2 is the open question:
+`results/undertow-review-queue.md (deleted)` row L-2 is the open question:
 
 > Depth 5 (emax=4 at K=21) is between ~110 GB and ~390 GB depending on which
 > per-K ratio you trust: K=8->10 is 4.18x per +2K, K=10->12 is 2.68x, so the

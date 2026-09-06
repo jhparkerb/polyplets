@@ -5,7 +5,7 @@
 // WHAT IS CERTIFIED.  mu_H = 1/x*, where x* is the radius of convergence of the
 // height-<=H strip generating function = the x at which the king connectivity
 // transfer operator M(x) has spectral radius 1 (rho is continuous and strictly
-// increasing in x; see results/strip-growth-lambda-bounds.md).  Hence
+// increasing in x; see results/growth-constant.md).  Hence
 //
 //     rho(M(x)) >= 1  ==>  x >= x*  ==>  mu_H = 1/x* >= 1/x.
 //
@@ -44,7 +44,7 @@
 // for the certificate check.  Same operator, same state set, same arithmetic as
 // cpp/strip_mu_fast.cpp's --verify, which re-verifies these receipts
 // independently.  Measured ~240x the previous hash-map sweep at H=11/12
-// (results/strip-mu-fast.md, results/strip-mu-certificates.md).
+// (results/growth-constant.md, results/growth-constant.md).
 //
 // Usage:
 //   strip_mu_cert <Hmin> <Hmax> [--digits D] [--vbits B] [--log FILE]
@@ -191,7 +191,7 @@ static std::vector<char> supportMask(const StageOps& O) {
 // than hash order, so the converged doubles differ in their last ulp and a few
 // quantized entries differ in their low bits. Same rule, different vector -- the
 // certified num/den, states and PASS are identical. See
-// results/strip-mu-certificates.md.
+// results/growth-constant.md.
 static std::string vectorChecksum(const StageOps& O, const std::vector<u128>& v,
                                   const std::vector<char>& inSupport) {
   std::vector<std::size_t> ord;

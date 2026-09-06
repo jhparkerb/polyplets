@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""BOUNDARY LAYER (docs/onset-defect-plans.md §2).
+"""BOUNDARY LAYER (docs/onset-defect-plans.md (deleted) §2).
 
 The near-onset resummation  D ~ (sqrt6/27)*binom(2N,N)/4^N*binom(N,k)*9^k*(50/81)^(j-1),
 N = k+j-1, holds near the onset line and degrades with depth.  Degradation is

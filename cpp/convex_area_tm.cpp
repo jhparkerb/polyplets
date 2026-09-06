@@ -1,7 +1,7 @@
 // convex_area_tm.cpp -- HV-convex king animals (convex polyplets) by area,
 // row transfer matrix, C++/GMP port of experiments/convex_tm.py.
 //
-// docs/middle-kingdom-plan.md Phase 1a: the Python DP (already collapsed from
+// results/subclasses.md Phase 1a: the Python DP (already collapsed from
 // N^5 to N^4 by folding the per-dl loop into O(1) box-count sub-intervals,
 // see the same comment in convex_tm.py) still costs O(N^4) DP steps x O(N)
 // bigint digits; Python's per-object overhead puts n=500 at ~30 min, over the

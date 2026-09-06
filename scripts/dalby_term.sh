@@ -6,9 +6,9 @@
 # grows +1 per term). counter=u128. RAM 80c x 1GiB (kink is RAM-light).
 #
 # --overlap-heights N: sweeps ALL owned heights concurrently in one core pool
-# (results/scheduling.md's own recommendation -- "overlap = number of swept
+# (docs/engine-record.md's own recommendation -- "overlap = number of swept
 # heights owned"; overshooting the real count is harmless, RAM co-resident
-# for all real-swept heights is <100MB, see docs/utilization-bottleneck-log.md
+# for all real-swept heights is <100MB, see docs/engine-record.md
 # Bottleneck #1). Validated real dalby maxn=30 A/B on identical code+range
 # (H3-H15 real sweep): overlap=1 689.6s/21.6% util vs overlap=15 378.2s/38.8%
 # util, near-identical CPU-seconds (11926.6 vs 11742.2), byte-identical
@@ -29,7 +29,7 @@
 #
 # Resume: dalby_term.sh N --resume
 # The kink real-SIGTERM + resume over-count bug is FIXED (2026-07-09,
-# results/kink-resume-sigterm-bug.md: seed contributions are now folded into
+# docs/engine-record.md: seed contributions are now folded into
 # hTri only after a column fully completes, so mid-column checkpoints are
 # consistent). This script runs overlap mode, whose height-set resume was
 # never affected anyway. Gated by TestKinkResumeMidColumn +
@@ -57,7 +57,7 @@ RUNDIR=${RUNDIR:-runs/ns_a${N}/dalby}
 RESUME_FLAG=""
 [ "$2" = "--resume" ] && RESUME_FLAG="--resume"
 
-# Disk-IO levers (results/fanin-tax.md ladder section), opt-in via
+# Disk-IO levers (docs/engine-record.md ladder section), opt-in via
 # FRONTIER_LEVERS=1 until a(39) validates them at production scale:
 #  - POLY_FRONTIER_ZSTD=1: block-framed zstd on map/merge outputs (~1.85x
 #    fewer bytes through the saturated NVMe mirror, measured on a(38) H20).
@@ -94,7 +94,7 @@ fi
 # any earlier run into this run's utilization numbers (bit us once this
 # round: a stale a33 cost_profile.tsv from before P13-15 closed-form were
 # wired made a genuinely-fixed height look like it was still real-swept --
-# docs/utilization-bottleneck-log.md). Resume must NOT touch it (or the
+# docs/engine-record.md). Resume must NOT touch it (or the
 # checkpoint/spill state); only clear it on a fresh start.
 [ -z "$RESUME_FLAG" ] && rm -f "$RUNDIR/cost_profile.tsv" "$RUNDIR/run.log"
 
@@ -206,7 +206,7 @@ fi
 
 mkdir -p "$RUNDIR/spill" runs/ns_a${N}/perheight
 T0=$(date +%s)
-# PHASED EXECUTION for N>=40 (Overcommit Hydra, results/overcommit-hydra.md):
+# PHASED EXECUTION for N>=40 (Overcommit Hydra, docs/engine-record.md):
 # maxn>=40 with full --overlap-heights does NOT fit dalby's 125GB — worker
 # RSS alone hits 90-120GB when H19+H20+H21 rounds co-reside (four measured
 # OOM kills 2026-07-25). Single-height phases bound RAM at ONE height's

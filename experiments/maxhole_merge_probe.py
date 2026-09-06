@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The multi-hole margin of M(n), and one refuted route to it.
 
-results/maxhole-proof.md: the SINGLE-hole bound is a two-sided theorem (the
+results/subclasses.md: the SINGLE-hole bound is a two-sided theorem (the
 moat-cycle argument proves (II') n >= ha+hm+2). What is still open is the
 multi-hole reduction, currently routed through the "master inequality"
 interior_4(F') <= round((|shell_4(F')|-2)^2/8) and its peeling lemma, whose two

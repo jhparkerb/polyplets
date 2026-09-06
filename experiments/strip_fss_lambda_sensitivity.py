@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """How much of the strip ladder's non-analyticity is really lambda's error bar?
 
-`results/strip-growth-lambda-bounds.md` closes
-`results/unexplored-avenues.md` idea 6.1 (the central-charge finite-size fit)
+`results/growth-constant.md` closes
+`results/closed-doors.md` idea 6.1 (the central-charge finite-size fit)
 on one diagnostic: the surface term
 
     S(H) = H * (ln lambda - ln mu_H)
@@ -62,12 +62,12 @@ import sys
 # experiments/strip_fss.py's MU") -- two hand-edited copies of a banked ladder
 # that H=18 would have to land in twice. strip_fss is import-safe: argparse
 # lives inside its __name__-guarded main. Citations stay at the original:
-# results/strip-mu-engine-resumption.md (H<=14) and
-# results/strip-mu-certificates.md's addendum table (H=15..17).
+# results/growth-constant.md (H<=14) and
+# results/growth-constant.md's addendum table (H=15..17).
 from strip_fss import MU, LAST_DIGIT_UNIT      # noqa: E402
 
 # The two banked lambda estimates, and the quoted uncertainty on the first.
-LAMBDA_DA = 7.1102        # differential approximants, results/series-analysis-da.md
+LAMBDA_DA = 7.1102        # differential approximants, results/growth-constant.md
 LAMBDA_DA_SIGMA = 0.0001  # the "(1)" in 7.1102(1)
 LAMBDA_RATIO = 7.111      # the a(n)-ratio fit
 

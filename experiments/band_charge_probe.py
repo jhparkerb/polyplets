@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Kill or keep idea 3 of results/unexplored-avenues.md (the bridge-credit
+"""Kill or keep idea 3 of results/closed-doors.md (the bridge-credit
 sketch for a lambda UPPER bound).
 
 The sketch, in three steps:

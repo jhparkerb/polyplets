@@ -1,7 +1,7 @@
 package orchestrator
 
 // kink_resume_midcolumn_test.go — red-first regression for the kink kernel's
-// real-SIGTERM + resume over-count (results/kink-resume-sigterm-bug.md).
+// real-SIGTERM + resume over-count (docs/engine-record.md).
 //
 // The existing exhaustive resume gate (resume_test.go) cancels only at
 // COMPLETED column boundaries via the afterColumn seam, and defaults to the

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """What degree is each spine family's level k, and does parity matter?
 
-`results/dmirror-spine-split.md` states, from the S <= 11 data available when
+`results/symmetry-classes.md` states, from the S <= 11 data available when
 it was written, that `d_main` has degree k-1 and `d_anti` degree k.  The
 S = 12, 13, 14 rows are now measured and the k-1 reading does not survive
 them: d_main's k=3 row is a single arithmetic progression across BOTH

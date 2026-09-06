@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Symbolic proof of the deficit-2 spine law (see results/ternary-spine.md):
+"""Symbolic proof of the deficit-2 spine law (see results/arithmetic-structure.md):
 
     T(3m+2, 2m+1) == 2 (mod 3)  for all m >= 1,
     equivalently P_{m+1}(3m+2) == 18 (mod 27).

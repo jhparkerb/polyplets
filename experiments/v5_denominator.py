@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """5-adic structure of the grand-form constants (v5 denominator problem).
 
-Open question (results/converse-sweep.md #2): D_k = k!/5^{c_k} is the minimal
+Open question (results/closed-doors.md #2): D_k = k!/5^{c_k} is the minimal
 common denominator of P_k; measured c_k = 0 (k<=4), 1 (k=5..10,12..14),
 2 (k=11, 15..18).  Conjectured law c_k = ceil(v5(k!)/2), exception k=11.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The hex diagonal law + dyadic spine -- see results/hex-diagonal-law.md.
+"""The hex diagonal law + dyadic spine -- see results/diagonal-formula.md.
 
 Checks: (1) brute hex enumerator reproduces A001207 (n<=9 here for speed);
 (2) hex row-transfer DP (asymmetric touch x' in {x-1,x}) matches brute on

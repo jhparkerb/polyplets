@@ -23,7 +23,7 @@ prints %.7f, so the comparison establishes agreement to those 7 decimals (7.8
 to 8.9 significant digits, measured) and nothing beyond them. The same
 iteration recorded at 10 digits in results/strip_mu_certificates.log agrees to
 9-10 significant digits, which is the sharpest form of the cross-check. See
-experiments/mu_H_precision_audit.py and results/strip-growth-lambda-bounds.md.
+experiments/mu_H_precision_audit.py and results/growth-constant.md.
 
 Cost: 5m16s for H<=11, measured (the confirmation run at 2*dps dominates, and
 H=11 escalates once). Left in mpmath rather than ported: it is a one-shot

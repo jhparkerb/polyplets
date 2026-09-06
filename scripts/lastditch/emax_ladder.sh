@@ -1,7 +1,7 @@
 #!/bin/bash
 # Per-EXCESS cost ratio of the bounded-excess family DP, at fixed K.
 #
-# Lane C (results/undertow-review-C.md, C-R1) asks whether depths 8-9 are
+# Lane C (results/undertow.md, C-R1) asks whether depths 8-9 are
 # reachable, which decides whether the tower can be pinned entirely from
 # strip-confirmed H<=14 cells.  Depth j needs emax = j-1.  Lane C requested
 # K=22 at EMAX=4,5,6; the lead reshaped it, because emax=4 at K=22 alone

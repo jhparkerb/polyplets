@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The test results/series-analysis-da.md names and has never run: refit the 40
+"""The test results/growth-constant.md names and has never run: refit the 40
 banked terms admitting a stretched-exponential factor as a fourth parameter,
 and see whether mu_1 is driven to 1.
 
@@ -19,7 +19,7 @@ Taking logs makes the ansatz LINEAR in the four unknowns:
 
 so a 4-term window has an exact solve, and a sliding window shows drift -- the
 same shape as the exact 3-point triple solves used for the mu_H ladder in
-results/strip-growth-lambda-bounds.md.
+results/growth-constant.md.
 
 THE CONTROL IS THE POINT, TWICE OVER.
 

@@ -7,7 +7,7 @@ import (
 
 // BenchmarkSampleIndexKeys measures the hot allocation path SampleKeysMulti
 // exercises on every map/merge round of every column of every height
-// (docs/utilization-bottleneck-log.md Bottleneck #4). A real dalby A/B for
+// (docs/engine-record.md Bottleneck #4). A real dalby A/B for
 // an allocation-only question is a ~5min round trip; this gives the same
 // signal (via -benchmem) in milliseconds, locally, no dalby needed. Use this
 // for iterating on this hot path; reserve real dalby runs for confirming a

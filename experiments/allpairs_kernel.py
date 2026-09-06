@@ -90,7 +90,7 @@ def W_via_walk(l):
     return tot
 
 
-RHO_25 = "14.408713986270365838148040"   # 37-digit value in results/allpairs-kernel.md
+RHO_25 = "14.408713986270365838148040"   # 37-digit value in results/below-onset.md
 
 
 def spectral_check(gmax=60):

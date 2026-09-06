@@ -2,7 +2,7 @@
 """r3_char_landscape.py -- is characteristic 2 the ONLY place the strip
 functional collapses?
 
-Coin Lift died at G2 (results/coin-lift-g2.md): lifting GF(2) to Z/4 or Z/8
+Coin Lift died at G2 (results/second-sources.md): lifting GF(2) to Z/4 or Z/8
 buys nothing.  This asks the wider question that kill invites -- whether some
 other characteristic, or some other ring, or some other auxiliary object, can
 do what GF(2) does.  The answer is a floor plus a finite sweep; this computes

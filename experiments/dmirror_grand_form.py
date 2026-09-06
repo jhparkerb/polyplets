@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Does a grand form hold for the dmirror family? -- docs/time-at-the-bar.md A1.3
+"""Does a grand form hold for the dmirror family? -- docs/time-at-the-bar.md (deleted) A1.3
 step 1, which the item says is the step that decides it.
 
 THE KING STATEMENT (docs/proofs/grand-form.md, a theorem, Lean-complete):
@@ -22,7 +22,7 @@ cannot be within k defects of both spines, since the two spines disagree in
 
 and the grand form is a statement about a SINGLE exponential.  log of a sum of
 two exponentials is not linear in S unless the two are proportional.  This is
-not speculation: results/dmirror-diagonals.md already measured it -- "The
+not speculation: results/symmetry-classes.md already measured it -- "The
 cumulants u_j, v_j of the exp fit are messy -- expected, since they are the log
 of a SUM of families."
 
@@ -36,7 +36,7 @@ pointwise, but reverses the anti-diagonal: (i, S-1-i) -> (S-1-i, i), which is
 fixed only when S is odd.  So the anti-spine has a centre cell exactly when S
 is odd and none when S is even.  That is the period-2 quasi-polynomiality, and
 it is the same mechanism as the through-cell / between-cell axis split that
-results/bilateral-parity.md found in A030234.
+results/symmetry-classes.md found in A030234.
 
 THE REPAIR THIS TESTS.  If the parity split already separates the two families'
 contributions cleanly, then EACH PARITY CLASS ON ITS OWN may satisfy a grand
@@ -45,7 +45,7 @@ quasi-polynomials: form A^p_S(y) = sum_k P^p_k(S) y^k per parity p, take
 log in Q[[y]] with coefficients polynomial in S, and ask whether every cumulant
 is linear in S.
 
-THE PAYOFF IF IT HOLDS.  results/dmirror-onset-sharp.md showed T4 cannot be
+THE PAYOFF IF IT HOLDS.  results/symmetry-classes.md showed T4 cannot be
 tested at k = 6 because pinning a degree-6 polynomial needs 7 points and the
 odd class has 6.  Under a per-parity grand form, level 6 carries only TWO new
 constants given levels below, so it needs 2 points, not 7 -- and there are 7
@@ -59,7 +59,7 @@ CONTROLS.
   (b) Planted two-family data C_A mu_A^S + C_B mu_B^S with mu_A != mu_B must be
       reported NONLINEAR.  Otherwise the test cannot fail and proves nothing.
   (c) The P^p_k used must reproduce the banked leading coefficients 1/k!, the
-      same anchor results/dmirror-onset-sharp.md uses.
+      same anchor results/symmetry-classes.md uses.
 
 Usage: python3 experiments/dmirror_grand_form.py
 

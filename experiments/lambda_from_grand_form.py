@@ -8,7 +8,7 @@ As s -> infinity the saddle condition tends to y_c B'(y_c) = 1 and
 
    ln lambda = B(y_c) - ln y_c - 2 ln 3.
 
-Tested against lambda = 7.110(1) (results/series-analysis-da.md).  The honest
+Tested against lambda = 7.110(1) (results/growth-constant.md).  The honest
 question is whether the 19-term truncation of B reaches y_c at all -- printed.
 """
 import math, os, re, sys

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Idea 8 of results/unexplored-avenues.md: is the graph on n-polyplets under
+"""Idea 8 of results/closed-doors.md: is the graph on n-polyplets under
 connectivity-preserving single-cell moves connected?
 
 MOVE.  From an n-animal A, pick a cell c that is not a cut vertex (so

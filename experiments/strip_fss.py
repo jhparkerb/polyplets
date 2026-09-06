@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Finite-size-scaling ladder for the strip growth constants mu_H.
 
-docs/middle-kingdom-followups-plan.md Phase 5. Supersedes the Phase-0-scoped
+results/subclasses.md Phase 5. Supersedes the Phase-0-scoped
 probe `experiments/strip_fss_probe.py` (folded in here, deleted) and turns
 Table D of the plan into a reproducible section of
-results/strip-growth-lambda-bounds.md.
+results/growth-constant.md.
 
 Reproduces, from one command:
   1. The two-parameter fit  ln mu_H = ln lambda - a/H - b/H^2  on consecutive
@@ -20,12 +20,12 @@ Reproduces, from one command:
   5. Optional third ansatz  ln mu_H = ln lambda - a/H - c*ln(H)/H^2  --
      cheap since the machinery is already here; report only, no claim.
   6. An H>=18 cost estimate, extrapolated from the measured throughputs in
-     results/strip-mu-fast.md (NOT a new compute job -- H>=18 is a
+     results/growth-constant.md (NOT a new compute job -- H>=18 is a
      beg-and-agree item per the plan's hard rules).
 
 mu_H values below are the banked ladder at its *original* precision --
-results/strip-mu-engine-resumption.md:30 (H<=14) and
-results/strip-mu-certificates.md's "the ladder extended to H=17" addendum
+results/growth-constant.md:30 (H<=14) and
+results/growth-constant.md's "the ladder extended to H=17" addendum
 table, `mu_float` column, H=15..17 -- 7 decimal digits throughout. This is
 the input precision Table D's fits used (confirmed in Phase 0: refitting
 from the 9-decimal results/strip_mu_certificates.log mu_float moves *all
@@ -121,8 +121,8 @@ def conditioning(h1, h2, h3):
 def section_two_param():
     print("## two-parameter fit ln mu_H = ln lambda - a/H - b/H^2, exact "
           "3-point solve")
-    print("(7-decimal mu_H, results/strip-mu-engine-resumption.md:30 for "
-          "H<=14 / results/strip-mu-certificates.md addendum mu_float for "
+    print("(7-decimal mu_H, results/growth-constant.md:30 for "
+          "H<=14 / results/growth-constant.md addendum mu_float for "
           "H=15..17)")
     print(f"{'triple':>12} | {'lambda':>10} | {'a':>10} | {'b':>10}")
     fits = {}
@@ -227,7 +227,7 @@ def section_cost_estimate():
         matvecs = row['matvecs'] + MATVEC_GROWTH_PER_H * n
         float_solve_s = build_s + matvecs * float_matvec_s
         # certificate ~ 1 sweep for a quick estimate (varies 3-8 sweeps
-        # across H=15..17 in results/strip-mu-certificates.md)
+        # across H=15..17 in results/growth-constant.md)
         cert_s = float_solve_s * CERT_TOLERANCE_FACTOR + exact_sweep_s
         print(f"  H={H}: sum|S_r|~{sum_sr:,.0f}  table~{table_mb/1024:.2f} GB  "
               f"build_rss~{build_rss_gb:.1f} GB  float_solve~{float_solve_s/60:.1f} min "

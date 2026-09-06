@@ -2,7 +2,7 @@
 // SEMIPERIMETER, exact-box row transfer matrix, C++/GMP port of
 // experiments/convex_perimeter.py's count_by_box/perim_series.
 //
-// docs/middle-kingdom-plan.md Phase 1b. Unlike the by-area DP (convex_area_tm,
+// results/subclasses.md Phase 1b. Unlike the by-area DP (convex_area_tm,
 // Phase 1a), the by-box state stores the exact column boundaries (l, r), not
 // a phase-relative delta -- future transitions need the absolute box
 // coordinates, so distinct rp values can't be merged into one scaled count
@@ -18,8 +18,8 @@
 // (Python prototype) against the original nested-loop count_by_box for
 // Smax in {12, 20, 30}, exact match, before this port.
 //
-// docs/middle-kingdom-followups-plan.md Phase 2a adds a dir4-filtered mode.
-// results/middle-kingdom-phase3.md's Proposition 2 (proved on the COLUMN-built
+// results/subclasses.md Phase 2a adds a dir4-filtered mode.
+// results/subclasses.md's Proposition 2 (proved on the COLUMN-built
 // transfer matrix, cpp/middle_kingdom_tm.cpp) says a column-convex king animal
 // is half-plane-4-cone directed iff the column-bottom profile b(j) never
 // drops by more than one row: b(j+1) >= b(j) - 1. This DP is ROW-built

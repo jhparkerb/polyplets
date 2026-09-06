@@ -9,7 +9,7 @@ import Polyplets.GapWalkExact
 /-!
 # Notary piece K, module 5: the column series and the master identities
 
-Campaign *Notary*, piece **K** of `docs/notary-k-plan.md`, wave K-β. The
+Campaign *Notary*, piece **K** of `docs/notary-k-plan.md (deleted)`, wave K-β. The
 gap walk's per-gap generating series, in the `y`-variable
 (`X = y`; the `s`-variable `y = s²` enters later via `expand 2`):
 
@@ -18,7 +18,7 @@ gap walk's per-gap generating series, in the `y`-variable
 * `JmY F` — `Σ_m (Σ_{3 ≤ g ≤ 2m+2} jE F m g) · y^m`, the deep-`J` mass
   (finite per order by `J`-support).
 
-The payload is the **two master identities of `docs/notary-k-plan.md` §2,
+The payload is the **two master identities of `docs/notary-k-plan.md (deleted)` §2,
 per `u`-column**: each column of `D·J₃ = u²·Q` and of
 `D·(P₃ − 2J₃) = u²·(P0 − p₂u² − 2J₃ + y·R_P)` is one series identity among
 the columns — the exceptional columns `u³..u⁶` as literal identities, the

@@ -9,7 +9,7 @@ import Polyplets.GapWalkCanon
 /-!
 # Notary piece T, module 3: truncation exactness of the gap walk
 
-Campaign *Notary*, piece **T** of `docs/notary-kernel-scoping.md`, closing
+Campaign *Notary*, piece **T** of `docs/notary-kernel-scoping.md (deleted)`, closing
 the truncation half of `GapWalk.lean`'s stated open item. Head theorem:
 
     walkFamiliesCap M L = walkFamilies L    for every M ≥ 2L + 3,

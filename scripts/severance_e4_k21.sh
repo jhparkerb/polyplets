@@ -2,18 +2,18 @@
 # The depth-5 excess<=4 family table at K = 21 -- the thing review row B13 is
 # waiting for.
 #
-# WHY.  results/undertow-review-queue.md B13 refuses the depth-5 route until
+# WHY.  results/undertow-review-queue.md (deleted) B13 refuses the depth-5 route until
 # experiments/severance_w3_depth5_gate.py passes against the 15 banked cells
 # T(2k-4, k-4), k = 5..19.  That gate is correctly RED in production today for
 # one reason only: _load_table(19, 4) finds no
 # results/severance_w3_families_K*_e4.txt with K >= 19, so D_series(5,19) has
 # no table and the gate refuses to fall back to the hours-long pure-Python DP.
 # B13 is the stated blocker on the five-terms decision
-# (docs/state-2026-08-23.md section 5).  This run produces the table; it does
+# (docs/state-2026-08-23.md (deleted) section 5).  This run produces the table; it does
 # not license using D_5 at k = 21 -- that is what the gate is for, and the
 # gate runs after this lands.
 #
-# WHAT IT COSTS.  results/depth5-cost-settled.md, from a five-rung ladder at
+# WHAT IT COSTS.  results/undertow.md, from a five-rung ladder at
 # 8 threads throughout with K = 16 held out and predicted to 6.9% / 8.0%:
 # ~3.1 h and ~8.5 GB decelerating, ~6.7 h and ~16.1 GB if the deceleration is
 # assumed to stop dead.  8 threads is not a detail -- the family DP's RSS

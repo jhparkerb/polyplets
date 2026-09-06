@@ -1,6 +1,6 @@
 """r3_l1_piece_states.py -- L1 (corner gluing) state-space measurement.
 
-Question (docs/triangle-round3-brief.md, lane L1): does a height-H strip make
+Question (docs/triangle-round3-brief.md (deleted), lane L1): does a height-H strip make
 coarse piece-assembly a smaller state space than the cell frontier?
 
 Two column-sweep DPs over the H-strip, identical framework:
@@ -23,7 +23,7 @@ union-find; the geometry facts only bound what can appear.
 Subcommands:
   validate  -- both DPs reproduce banked T(n,H) (triangle.py) for H<=6,
                n<=10, and the PIECE DP reproduces the C(n,c) stratification
-               table of results/component-stratification.md for n<=7
+               table of results/subclasses.md for n<=7
                (c tracked exactly: completed pieces + live pieces).
                RED control: plant a corrupted expected value, must FAIL.
   closure   -- reachable live-state closure per H (flagless core state),
@@ -240,8 +240,8 @@ def cmd_validate():
             if n >= H:  # only print the nonzero region
                 print("  T(%2d,%d) dp=%-12d banked=%-12d %s" % (n, H, g, want, status))
 
-    print("== C(n,c) validation vs results/component-stratification.md, n<=7 ==")
-    # banked table, results/component-stratification.md lines 11-17
+    print("== C(n,c) validation vs results/subclasses.md, n<=7 ==")
+    # banked table, results/subclasses.md lines 11-17
     C = {
         (1, 1): 1,
         (2, 1): 2, (2, 2): 2,

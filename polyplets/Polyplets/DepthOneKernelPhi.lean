@@ -13,7 +13,7 @@ set_option linter.style.longLine false
 /-!
 # Notary piece K, module 9: the kernel closed form annihilates `Φ`
 
-Campaign *Notary*, piece **K** of `docs/notary-k-plan.md`, wave K-δ, the
+Campaign *Notary*, piece **K** of `docs/notary-k-plan.md (deleted)`, wave K-δ, the
 capstone.  The six walk unknowns are the transcribed closed forms
 (`DepthOneKernelSol` / `DepthOneKernelUnique`); assembled through
 `F₁ = P̂ − B²/(3+S)` they give the rational `s`-series `phiF1` with unit

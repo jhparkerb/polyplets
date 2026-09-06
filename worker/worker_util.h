@@ -196,7 +196,7 @@ inline int runWorkerMain(
   // POSIX getline, not std::getline(std::cin): cin's stdio_sync_filebuf pulls
   // one BYTE per virtual underflow call, and a merge request line listing
   // every map output of a round runs to tens of KB — measured as a top-3
-  // merge_worker cost at fan-in scale (Fan-In Tax, results/fanin-tax.md).
+  // merge_worker cost at fan-in scale (Fan-In Tax, docs/engine-record.md).
   char* line = nullptr;
   size_t cap = 0;
   ssize_t n;
@@ -213,7 +213,7 @@ inline int runWorkerMain(
     // 64 idle merge workers each held ~1GB while the 64 map workers ran
     // their own ~1.3GB round — the two fleets' retained peaks summed past
     // 125GB and the kernel OOM killer fired (5th a(40) death, 2026-07-26;
-    // results/overcommit-hydra.md). Cost: ~ms per request, paid off-round.
+    // docs/engine-record.md). Cost: ~ms per request, paid off-round.
     malloc_trim(0);
 #endif
   }

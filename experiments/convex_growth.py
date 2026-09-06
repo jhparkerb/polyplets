@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Growth constant, subexponential exponent, and algebraicity test for a series.
 
-docs/middle-kingdom-plan.md Phase 2b. Given an exact integer series file
+results/subclasses.md Phase 2b. Given an exact integer series file
 ("n value" per line), assume a(n) ~ C mu^n n^theta and pin mu and theta.
 
 Diagnostics, in the order they are meant to be read:

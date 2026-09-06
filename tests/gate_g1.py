@@ -27,7 +27,7 @@ CASES = {
 
 # Every fixture must SAY where it came from and when anyone last looked.
 #
-# results/gate-class-sweep.md finding F5: SHA256SUMS pins the fixtures against
+# docs/engine-record.md finding F5: SHA256SUMS pins the fixtures against
 # accident but is itself regenerable, so it is no defence against a deliberate
 # edit of both, and nothing in the suite can re-check a fixture against OEIS --
 # the gates run with no network.  The control for that is

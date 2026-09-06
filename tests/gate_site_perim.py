@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate SITE-PERIM: results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md) Phase 4a acceptance.
+"""Gate SITE-PERIM: results/subclasses.md (formerly results/subclasses.md) Phase 4a acceptance.
 
 build/directed_cone_anchor's "grid" mode already does one Redelmeier pass over
 ALL fixed king animals of every size <= N (Phase 0 of the middle-kingdom

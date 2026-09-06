@@ -9,7 +9,7 @@ it as JSON for the skeleton author (plus a human-readable report):
       and numerator polynomials N_{k,i}(s) (basis 1, A, B, AB), so that
           s^{e_k} * d_k(s) * x_k = (N_{k,0} + N_{k,1} A + N_{k,2} B
                                      + N_{k,3} A B) ,
-      the right side a series with unit denominator (docs/notary-k-plan.md
+      the right side a series with unit denominator (docs/notary-k-plan.md (deleted)
       wave-delta architecture note).  Each is verified two ways: exactly in
       sympy against the solve_start solution, and numerically against the
       WALK's own series (depth1_gap_walk.transitions) to s-order ~24.

@@ -2,7 +2,7 @@
 """Generate Polyplets/Grand/PinGrand.lean: the grand-form pinning of the
 production polynomials P_1..P_18 from TWO real banked cells per level.
 
-Task GF-5 of the grand-form Lean formalization (polyplets/GRANDFORM-PLAN.md,
+Task GF-5 of the grand-form Lean formalization (polyplets/GRANDFORM-PLAN.md (deleted),
 polyplets/briefs/GF5-pingrand.md, deleted at close; in git history).
 Fail-closed: recomputes the mu table
 level-by-level from results/triangle.txt exactly as experiments/staircase_check.py

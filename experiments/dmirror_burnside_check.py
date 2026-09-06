@@ -4,7 +4,7 @@
 THE IDENTITY.  Fix n and S.  Let B(n, S, S) be the number of fixed polyplets
 with n cells whose bounding box is exactly S x S, and let d(S, n) be the number
 of those that are invariant under the transpose (the dm-mirror strip count,
-`results/dmirror-diagonals.md`).  The transpose maps an exact S x S box to
+`results/symmetry-classes.md`).  The transpose maps an exact S x S box to
 itself, so C_2 = {id, transpose} acts on the B(n, S, S) animals with exactly
 d(S, n) fixed points.  Burnside makes the orbit count
 
@@ -44,7 +44,7 @@ sys.path.insert(0, os.path.join(ROOT, "experiments"))
 import joint_box_probe as JB              # noqa: E402
 import dmirror_onset_probe as OP          # noqa: E402
 
-FORMULA_N = 33          # the D(33) assembly; results/related-seqs-n33.md
+FORMULA_N = 33          # the D(33) assembly; results/symmetry-classes.md
 MIN_ARM_A = 30          # cells arm A must actually compare
 FAILURES = []
 _TABLES = {}
@@ -81,7 +81,7 @@ def arm_a(d, smax, bud, sink):
 
 def edge_control(H, B):
     """Independent identities the row transfer must reproduce at every height
-    it is asked for (results/joint-box-probe.md): the width-2 column."""
+    it is asked for (results/symmetry-classes.md): the width-2 column."""
     if H >= 2:
         if B.get((H, 2), 0) != 2 ** H - 2:
             fail("edge control B(%d,2,%d) != 2^%d-2" % (H, H, H))

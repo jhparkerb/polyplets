@@ -11,7 +11,7 @@ A0/a decays as a clean geometric (lambda_0/lambda)^n.
 
 Result (n<=18): lambda~7.10, lambda_0~6.94, ratio 0.978 (pinned by the clean
 exponential fraction decay); hole-free = simple-connectivity is ~2.2%/cell costly.
-See results/hole-free-growth-constant.md.
+See results/subclasses.md.
 
 Pass results/holes_n19.txt to include the n=19 term -- note that table is
 TIER-DEGRADED (dirty binary stamp); see its header.

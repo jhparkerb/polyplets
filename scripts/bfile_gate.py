@@ -145,7 +145,7 @@ def derive(sym, fixed, report=None):
 
     `report`, if given, is a list that collects every n present in `fixed` but
     NOT derivable, so the caller can SAY which terms fell out of coverage.
-    Until 2026-08-22 the skip below was silent (results/gate-class-sweep.md,
+    Until 2026-08-22 the skip below was silent (docs/engine-record.md,
     finding F4): a triangle row with no symmetry data produced no signal of any
     kind, and the gate stayed green having quietly narrowed what it covers.
     The skip itself is correct -- a term with no r180 is not derivable and

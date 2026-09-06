@@ -2,7 +2,7 @@
 """r3_inv_rank_probe.py -- queue row INV-4: does the minimal linear dimension
 of the strip-counting functional COLLAPSE in characteristic 2?
 
-Background. A-S1 (git show second-source:results/scaling-exploration-A.md)
+Background. A-S1 (git show second-source:results/scaling-exploration-A.md (deleted))
 measured the temporal Hankel rank of the height-H strip automaton mod
 p = 2^31-1: H=4..10 -> 6,17,35,88,204,501,1217 against Motzkin(H+1)-1 states,
 floor growth ~2.79x/height, non-constructive.  The CKN/BCKN literature gets

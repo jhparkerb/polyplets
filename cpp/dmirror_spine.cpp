@@ -1,7 +1,7 @@
 // The dmirror spine split, in C++ and with a cell budget -- the enumerator
 // that reaches the levels the grand-form test needs.
 //
-// WHY.  results/dmirror-spine-split.md counts diagonal-mirror animals apart by
+// WHY.  results/symmetry-classes.md counts diagonal-mirror animals apart by
 // which ground-state spine they sit on, and finds each family separately
 // linear at c_2 where the summed family is quadratic.  The next cumulant, c_3,
 // is what would distinguish "has the grand form" from "agrees with it to

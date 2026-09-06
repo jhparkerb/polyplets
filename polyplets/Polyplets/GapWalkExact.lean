@@ -13,7 +13,7 @@ import Polyplets.GapWalkRowVals
 /-!
 # Notary piece K, module 4: the exact walk
 
-Campaign *Notary*, piece **K** of `docs/notary-k-plan.md`, wave K-β. Piece
+Campaign *Notary*, piece **K** of `docs/notary-k-plan.md (deleted)`, wave K-β. Piece
 T's cone lemma (`GapWalkTrunc.iter_agree`) says the capped walks agree
 wherever the cone allows; this module names the **exact** (cap-free) walk
 values it therefore defines,

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Solvable-subfamily sweep of the king lattice; see results/king-subfamilies.md."""
+"""Solvable-subfamily sweep of the king lattice; see results/subclasses.md."""
 from collections import deque
 
 

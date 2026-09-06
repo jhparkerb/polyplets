@@ -423,7 +423,7 @@ if __name__ == "__main__" and __import__("sys").argv[-1] == "master":
 # (Z/27)[[u]] (u-adic contraction), computable by pure algebra with no
 # enumeration; S = (H^3 - H(u^3))/3 == u^2 + uW (mod 3) verified on it to
 # u^300 (checked in check_ladder()).  All three ladder items of
-# results/ternary-spine.md now stand on the gas.
+# results/arithmetic-structure.md now stand on the gas.
 # ---------------------------------------------------------------------------
 def boundary_weight(sizes, W=9):
     """Bottom-boundary cluster weight: rows 1..m the cluster, row m+1 = q fixed."""

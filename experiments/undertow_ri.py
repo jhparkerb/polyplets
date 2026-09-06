@@ -5,7 +5,7 @@ The wired `diagCoeffTable` came from the production sweep, so a tower that
 reads it inherits the incumbent's connectivity rule. This one is built from:
 
   * Severance W1's ab-initio P_1..P_9 (cluster weights; matched the wired
-    table coefficient for coefficient, results/severance-w1-anchor-cut.md) --
+    table coefficient for coefficient, results/below-onset.md) --
     also the only way to start, since level 1's depth-2 cell would be T(1,0);
   * MOTLEY's own banked C_H rows, telescoped T = C_H - 2C_{H-1} + C_{H-2},
     for the higher levels -- a different rule, proved in

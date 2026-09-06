@@ -1,5 +1,5 @@
 // directed_cone_anchor.cpp -- the "Cone anchor" validation hook of
-// results/directed-king-animals.md: filter the fixed king-animal (polyplet)
+// results/subclasses.md: filter the fixed king-animal (polyplet)
 // enumeration down to DIRECTED king animals and check it against Bacher's
 // closed form D(t) = (1/4)((1+t)/sqrt(1-6t+t^2) - 1)  [OEIS A047781].
 //
@@ -14,7 +14,7 @@
 //     Redelmeier machinery, restricted step set, so each directed animal is
 //     generated exactly once; much higher reach, and a cross-check on the filter.
 //
-// Cone conventions (results/directed-king-animals.md, results/king-subfamilies.md):
+// Cone conventions (results/subclasses.md, results/subclasses.md):
 //   dir5  Bacher: forward cone {W, NW, N, NE, E} = (-1,0)(-1,1)(0,1)(1,1)(1,0),
 //         source = leftmost-bottommost cell. Expect A047781 1,4,19,96,501,...
 //   dir4  half-plane variant {N, NE, E, SE} = (0,1)(1,0)(1,1)(1,-1),
@@ -23,7 +23,7 @@
 //   dir5nb  RED control: dir5's cone but the bottom-row contiguity requirement
 //         waived (BFS seeded from EVERY bottom-row cell). Must NOT match A047781.
 //         This is "control B"; it is NOT Bacher's multi-directed class -- see
-//         mdir below and results/multi-directed.md.
+//         mdir below and results/subclasses.md.
 //   cone5 direct-growth twin of dir5.
 //   mdir  Bacher's MULTI-DIRECTED animals, Definition 2 of arXiv:1301.1365,
 //         evaluated directly on every animal generated. Sources are the local
@@ -35,19 +35,19 @@
 //   mdirbad  RED control for mdir: Definition 2's keystone condition dropped,
 //         leaving only "every cell reachable from some local-minimum source".
 //         A strict superset; must NOT reproduce the mdir counts.
-//   grid  docs/middle-kingdom-plan.md Phase 0: a single Redelmeier pass over
+//   grid  results/subclasses.md Phase 0: a single Redelmeier pass over
 //         ALL fixed king animals (unfiltered growth, like dir5/dir4/dir5nb),
 //         tallying all 20 (directedness x convexity) cells at once instead of
 //         one filter. Directedness: none, dir5, dir4, ctrlB (= dir5nb's
 //         predicate -- a class of its own, incomparable with mdir's, NOT a
-//         stand-in for it; results/multi-directed.md), mdir (Bacher's
+//         stand-in for it; results/subclasses.md), mdir (Bacher's
 //         Definition 2 -- the fifth row Phase 3 added, since Phase 1c settled
 //         that ctrlB could not stand in for it). Convexity: none, column-convex,
 //         HV-convex, staircase (column-convex + nondecreasing column bottoms
 //         AND tops, left to right).
 //   gridbad  RED control for grid's staircase predicate: monotonicity checked
 //         on column bottoms only, tops dropped. Must NOT reproduce A225114.
-//   gridperim  docs/middle-kingdom-followups-plan.md Phase 2a: the SAME
+//   gridperim  results/subclasses.md Phase 2a: the SAME
 //         Redelmeier pass, reusing reach(Dir4) and convexity() verbatim (no
 //         new predicate code), but bucketed by SEMIPERIMETER s = W+H (the
 //         bounding box) instead of by area n -- the brute-force validator for
@@ -58,7 +58,7 @@
 //         area up to ~s^2/4); larger s in the output are LOWER bounds, not
 //         exact counts.
 //
-// Phase 4a of docs/middle-kingdom-followups-plan.md: grid/gridbad's pass
+// Phase 4a of results/subclasses.md: grid/gridbad's pass
 // already generates every fixed king animal of every size <= N, so a per-n
 // MIN-REDUCE of the site perimeter rides for free (no new search). Site
 // perimeter = the number of distinct EMPTY cells adjacent to the animal.
@@ -159,7 +159,7 @@ struct Ctx {
   // convention; Rook is the RED control. Sentinel UINT64_MAX means "no
   // animal of this size seen by this shard yet".
   std::vector<uint64_t> minSPKing, minSPRook;
-  // Phase 2a (docs/middle-kingdom-followups-plan.md): per-semiperimeter
+  // Phase 2a (results/subclasses.md): per-semiperimeter
   // (s = W+H, 0..2N+1 to be safe) tallies for gridperim mode.
   std::vector<uint64_t> perimHV, perimHVDir4;
   // mdir scratch: source/keystone marks over the grid, the keystone list, and a
@@ -462,7 +462,7 @@ int sitePerim(Ctx& g, int size, bool king) {
   return sp;
 }
 
-// Phase 0 of docs/middle-kingdom-plan.md: tally all 16 (directedness x
+// Phase 0 of results/subclasses.md: tally all 16 (directedness x
 // convexity) cells for one animal in a single pass. checkTops=false is
 // gridbad's deliberately-wrong staircase predicate (RED control). Phase 4a
 // rides the same pass: every animal here is unconditionally counted in the
@@ -497,7 +497,7 @@ void gridTally(Ctx& g, int size, bool checkTops) {
   if (spR < g.minSPRook[size]) g.minSPRook[size] = spR;
 }
 
-// Phase 2a (docs/middle-kingdom-followups-plan.md): the brute-force validator
+// Phase 2a (results/subclasses.md): the brute-force validator
 // for cpp/convex_perim_tm.cpp's dir4 mode. Reuses reach(Dir4) and convexity()
 // verbatim -- no new predicate, only a new bucketing key. HV-convex is
 // checkTops=true (row AND column contiguity); non-HV-convex animals don't

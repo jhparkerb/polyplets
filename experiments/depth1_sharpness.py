@@ -9,7 +9,7 @@ nonzero for every k >= 1.
 No tail bound is needed.  Put N(x) = sum_k N_k x^k, N_0 = 0 and
 N_k = 3^(k+1) D_1(k) in Z for k >= 1 (an integer: P_k has degree k and is
 integer-valued at the k+1 consecutive integers 2k+1..3k+1, hence on Z) -- the
-normalization of results/onset-defect-depth1-closed.md sec 3, annihilated by the DERIVED
+normalization of results/below-onset.md sec 3, annihilated by the DERIVED
 quartic Phi (experiments/severance_w2_kernel.py, gated by
 experiments/severance_w2_gate.py).  Reduce Phi mod 3.  It factors:
 

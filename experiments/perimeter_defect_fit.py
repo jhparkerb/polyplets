@@ -3,7 +3,7 @@
 
 Input is g2's `--siteperim` table, one `n p count` row per line.  The defect is
 k = pmax(n) - p with pmax(n) = 2n+2 on square4 and 4n+4 on square8 (the second
-is measured, not proved -- see docs/perimeter-defect-plan.md).
+is measured, not proved -- see docs/perimeter-defect-plan.md (deleted)).
 
 For each k we look for the cheapest closed form that fits: a plain polynomial
 first, then a quasi-polynomial of period 2, then 3.  A fit is only reported if
@@ -12,7 +12,7 @@ ones consumed by the interpolation, or we have fitted noise.
 
     python3 experiments/perimeter_defect_fit.py results/siteperim_square4_n20.txt --lattice square4
 
-docs/perimeter-defect-plan.md, question 1 and question 3.
+docs/perimeter-defect-plan.md (deleted), question 1 and question 3.
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ PMAX = {
 
 # Every residue class of a candidate quasi-polynomial must survive this many
 # checks beyond the points its own interpolation used.  Two is the bar the
-# height-grading work used (results/polyiamond-diagonal-law.md); one spare
+# height-grading work used (results/diagonal-formula.md); one spare
 # point is a coincidence, two is a fit.
 SPARE_PER_CLASS = 2
 

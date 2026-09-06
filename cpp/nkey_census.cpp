@@ -1,11 +1,11 @@
 // Census of the reach-merged column frontier: how many N-key classes exist at
 // height H, exactly, with no extrapolation.
 //
-// WHY.  results/skeletonkey-nfamily-merge.md establishes that two strip states
+// WHY.  results/closed-doors.md establishes that two strip states
 // are equivalent iff they carry the same multiset of block neighbourhoods
 // N(b) = rows(b) dilated by +-1 -- a congruence, gated exhaustively, over any
 // semiring.  The merged set IS the end-of-column frontier that
-// results/kink-carry.md names as the engine's wall.  What the merge file
+// docs/engine-record.md names as the engine's wall.  What the merge file
 // refuses to do, correctly, is quote a class count at H = 21: the ratio
 // compounds with no closed form, no OEIS match on 8, 19, 43, 101, 239, 575,
 // 1399, 3441, 8539, and no recurrence with surplus.  This measures it instead.
@@ -25,7 +25,7 @@
 //
 // GATES, both fail-closed and both run by --gate before any new height:
 //   king  the class counts must be 8, 19, 43, 101, 239, 575, 1399, 3441, 8539
-//         at H = 4..12 (results/skeletonkey-nfamily-merge.md, and Exact
+//         at H = 4..12 (results/closed-doors.md, and Exact
 //         Change's independent minauto at H = 12) and 21355 at H = 13
 //         (measured 2026-08-22 by the Python probe).
 //   rook  with the dilation switched off, N(b) = rows(b), so the key IS the
@@ -277,7 +277,7 @@ void successors(const Key& src, int H, bool dilate_on, std::vector<Key>& out) {
 //
 // successors() above rebuilds the row-by-row refinement separately for every
 // source key, so a partial fill that a thousand sources admit is explored a
-// thousand times -- which is why results/nkey-census.md prices H = 18 at three
+// thousand times -- which is why results/closed-doors.md prices H = 18 at three
 // days and H = 21 out of reach.  The production engine does not have this
 // problem: its carry sweeps cells globally, so intermediate states are shared.
 // This does the same thing here.  A whole batch of sources is swept together,
@@ -582,7 +582,7 @@ const u64 ROOK[] = {0, 0, 3, 8, 20, 50, 126, 322, 834, 2187, 5797};
 bool gate(bool shared, size_t batch) {
   bool ok = true;
   const char* eng = shared ? "shared" : "per-source";
-  std::printf("gate king [%s] (class counts, results/skeletonkey-nfamily-merge.md)\n", eng);
+  std::printf("gate king [%s] (class counts, results/closed-doors.md)\n", eng);
   for (int H = 4; H <= 13; ++H) {
     const u64 got = shared ? censusShared(H, true, nullptr, batch)
                            : census(H, true, nullptr);

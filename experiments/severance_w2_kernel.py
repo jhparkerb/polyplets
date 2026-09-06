@@ -7,7 +7,7 @@ conventions, all re-read and asserted below) and (b) the assembly identity
 
     D_1(k) = [y^k]( Phat(y) - B(y)^2 / (3 + S(y)) )                          (II)
 
-of `results/onset-defect-depth1-closed.md` Sec. 2.  No series of D_1 is ever
+of `results/below-onset.md` Sec. 2.  No series of D_1 is ever
 consulted, no linear system is solved against data, and `PHI_COEFFS` of
 `experiments/depth1_recurrence.py` is never imported.
 

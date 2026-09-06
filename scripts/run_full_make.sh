@@ -10,7 +10,7 @@
 # Predicted cost:  ~11 min wall on gympie -- measured 10m47s on the one
 #                  2026-08-06 run that recorded a timing. (The sibling
 #                  results/make_full_*.log runs this line used to point at
-#                  were removed 2026-08-22; see results/removals-2026-08-22.md.
+#                  were removed 2026-08-22; see docs/publication.md.
 #                  Fifteen of the sixteen never recorded a wall time, and the
 #                  "~5-10 min" they were said to support was not in any of
 #                  them.) No RAM or disk pressure.

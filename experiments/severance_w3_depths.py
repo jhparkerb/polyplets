@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Severance W3: below-onset defects at depth j from bounded-excess cluster weights.
 
-Deliverable of docs/onset-defect-severance-plan.md Sec.3 W3.  Exposes
+Deliverable of docs/onset-defect-severance-plan.md (deleted) Sec.3 W3.  Exposes
 
     D_series(j, K) -> [Fraction] of length K+1, entry k = D_j(k)
 

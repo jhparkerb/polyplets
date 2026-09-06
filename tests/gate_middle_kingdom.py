@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Gate MIDDLE-KINGDOM: results/subclasses.md (formerly docs/middle-kingdom-plan.md) Phase 3 acceptance.
+"""Gate MIDDLE-KINGDOM: results/subclasses.md (formerly results/subclasses.md) Phase 3 acceptance.
 
 build/middle_kingdom_tm is a COLUMN transfer matrix for the column-convex
 cells of the Phase 3 grid. Phase 3's finding is that on a column-convex king
 animal every directedness predicate in the grid reduces to a condition on the
-bottom profile b(j) alone (results/middle-kingdom-phase3.md):
+bottom profile b(j) alone (results/subclasses.md):
 
   dir5   b valley-unimodal (nonincreasing then nondecreasing)
   dir4   b(j) >= b(j-1) - 1 (the bottom drops at most one row per step right)
@@ -14,7 +14,7 @@ bottom profile b(j) alone (results/middle-kingdom-phase3.md):
 The transfer matrix counts bottom profiles directly, so it is a completely
 different machine from the Redelmeier brute force in
 build/directed_cone_anchor -- which is exactly what makes the agreement below
-worth having. Phase 0's brute-force table (results/middle-kingdom-grid.md,
+worth having. Phase 0's brute-force table (results/subclasses.md,
 n = 1..14, 20 cells since Phase 3 added the mdir row) is the oracle; the plan is explicit that no transfer matrix is
 trusted until it matches that table on its overlap.
 
@@ -22,7 +22,7 @@ Positive controls the TM must PASS (the machinery is calibrated by sequences
 that were known before Phase 3):
   cc      column-convex king animals = A187077
   ccmono  column-convex + bottoms nondecreasing = A007052 (the identity
-          results/king-subfamilies.md proves, and Phase 0 Finding 1's
+          results/subclasses.md proves, and Phase 0 Finding 1's
           "fifth convexity variant")
   hv      HV-convex king animals by area = the novel convex-polyplet series,
           checked against ALL 700 terms of results/convex_area_terms_n700_king.txt,
@@ -61,7 +61,7 @@ TERMS_FILE = {
 }
 HAVE_BIN = os.path.exists(BIN)
 
-# results/middle-kingdom-grid.md, the brute-force grid table, n = 1..14.
+# results/subclasses.md, the brute-force grid table, n = 1..14.
 # Column-convex block (conv=colconvex) for each directedness row, plus the
 # HV-convex column for none/dir4.
 GRID = {
@@ -78,14 +78,14 @@ GRID = {
     "hvdir4": [1, 4, 15, 53, 177, 567, 1767, 5417, 16465, 49897, 151288,
                459836, 1402387, 4292477],
     # staircase column of results/mk_grid20_n14.txt = A225114 (skew shapes with
-    # no empty row or column, results/king-subfamilies.md). It is the LOWER rung
-    # of the growth sandwich in results/hv-growth-sandwich.md, so the transfer
+    # no empty row or column, results/subclasses.md). It is the LOWER rung
+    # of the growth sandwich in results/subclasses.md, so the transfer
     # matrix has to reproduce it before that proof's numerics mean anything.
     "stair": [1, 3, 9, 28, 87, 272, 850, 2659, 8318, 26025, 81427, 254777,
               797175, 2494307],
     # (dir4, HV-convex) animals whose unimodality-phase path never visits
     # (0,1) -- the half of the series the truncated descending block cannot
-    # reach (results/hv-growth-sandwich.md, "The series splits"). Oracle:
+    # reach (results/subclasses.md, "The series splits"). Oracle:
     # experiments/descent_block_oracle.py --phases 14, an independent DFS over
     # explicit column intervals that carries the two phase bits itself.
     "hvdir4asc": [1, 3, 10, 34, 115, 382, 1244, 3993, 12689, 40065, 126005,
@@ -98,7 +98,7 @@ HVDIR4ASCBAD = [1, 3, 9, 27, 79, 222, 602, 1589, 4112, 10497, 26565, 66879,
                 167900, 421000]
 A007052 = [1, 3, 10, 34, 116, 396, 1352, 4616, 15760, 53808, 183712, 627232]
 
-# Phase 3's closed forms (results/middle-kingdom-phase3.md): denominator and
+# Phase 3's closed forms (results/subclasses.md): denominator and
 # numerator of the rational generating function F(x) = sum_{n>=1} a(n) x^n,
 # low-order coefficient first. Each was DERIVED (the transfer operator on a
 # column-convex animal has rank <= 2, because the number of ways to place a
@@ -182,7 +182,7 @@ def main():
         gate.check(terms("ccmono", 14) != GRID["stair"],
                    "RED ccmono (tops unconstrained) MUST diverge from stair")
 
-        # --- structural: the growth sandwich of results/hv-growth-sandwich.md
+        # --- structural: the growth sandwich of results/subclasses.md
         # stair subset hvmono subset hvdir4 subset hv, termwise. The middle two
         # have no independent brute force, so this nesting is what pins them.
         st, hm = terms("stair", 14), terms("hvmono", 14)
@@ -193,7 +193,7 @@ def main():
         gate.check(st != hm and hm != GRID["hvdir4"][:14],
                    "the sandwich is strict somewhere (no rung is a duplicate)")
 
-        # --- the phase split of results/hv-growth-sandwich.md ---------------
+        # --- the phase split of results/subclasses.md ---------------
         # hvdir4 = hvdir4asc + (the animals whose phase path visits (0,1)).
         # The split is what turns "the 4-cone series' subdominant equals the
         # descending block's growth constant" from a coincidence between two
@@ -251,11 +251,11 @@ def main():
         gate.skip("prec_guess exclusions (build/prec_guess absent)")
 
     # --- the amplitude-ratio identity ---------------------------------------
-    # results/hv-growth-sandwich.md, "The amplitude ratio is a ratio of two
+    # results/subclasses.md, "The amplitude ratio is a ratio of two
     # explicit feed vectors". Two things carry that section and neither is
     # checked anywhere else: Proposition 9's mirror involution (which is the
     # whole content of the factor 1/2) and the feed-vector evaluation of the
-    # ratio, which has to reproduce results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md)
+    # ratio, which has to reproduce results/subclasses.md (formerly results/subclasses.md)
     # Table B's 54 MEASURED digits. Both run in under a second.
     sys.path.insert(0, os.path.join(ROOT, "experiments"))
     import descent_block_oracle as dbo
@@ -271,8 +271,8 @@ def main():
                "remainder (else the split is vacuous)")
 
     # --- Lemma 3: the column-join is injective at FIXED (i, j) --------------
-    # results/hv-growth-sandwich.md Lemma 3, strengthened to M(i)M(j) <=
-    # M(i+j) (docs/sortie-publication-plan.md B1). What the proof turns on is
+    # results/subclasses.md Lemma 3, strengthened to M(i)M(j) <=
+    # M(i+j) (docs/publication.md B1). What the proof turns on is
     # that column areas are positive, so the area-i prefix is unique and no
     # split index has to be carried; the checks below are the join landing in
     # the class, the injectivity, and the inequality on all 700 banked terms.

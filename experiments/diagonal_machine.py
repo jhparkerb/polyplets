@@ -46,7 +46,7 @@ LATTICES = {
 KNOWN = {
     ("square", 1): "4n - 8",          # A308359, proved there
     ("square", 2): "8n^2 - 51n + 86",  # A308359, CONJECTURED there
-    ("hex", 1): "9n - 15",            # results/hex-diagonal-law.md
+    ("hex", 1): "9n - 15",            # results/diagonal-formula.md
     ("king", 1): "25n - 45",          # docs/proofs/diagonal-law.md
 }
 

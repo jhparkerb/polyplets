@@ -9,7 +9,7 @@ import Polyplets.GapWalk
 /-!
 # Notary piece B, module 1: partial stacks and the reach toolkit
 
-Campaign *Notary*, piece **B** of `docs/notary-kernel-scoping.md` — the
+Campaign *Notary*, piece **B** of `docs/notary-kernel-scoping.md (deleted)` — the
 walk-path ↔ configuration bijection. This module defines the objects the
 bijection counts and the connectivity toolkit every later module uses.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Settle the depth-6 (emax=5) cost from a measured K-ladder at fixed threads.
 
-`docs/time-at-the-bar-report.md` B2 found that disk is no longer what caps the
+`docs/time-at-the-bar-report.md (deleted)` B2 found that disk is no longer what caps the
 five terms: done at the target Nmax, the `Hs = 20` poles are 252 GB (n <= 44)
 and 277 GB (n <= 45) against `Hs = 21`'s 580 GB, and dalby has 563 GB free.
 What binds instead is that **`J = 6` is asserted** -- ~20-60 h and ~50-100 GB,
@@ -9,7 +9,7 @@ obtained by applying the per-excess ladder's ~6x RSS and ~7-9x wall once to
 `J = 5`'s projection.
 
 Depth 5 was asserted the same way at 16 h / 103 GB until five rungs measured it
-at 3.1 h / 8.5 GB, an order of magnitude out (`results/depth5-cost-settled.md`).
+at 3.1 h / 8.5 GB, an order of magnitude out (`results/undertow.md`).
 These are those rungs for depth 6.
 
 METHOD: the extrapolator is imported from `depth5_cost_ladder.py` rather than
@@ -49,8 +49,8 @@ LADDER = {
 THREADS = 8
 
 # What the tree asserts for J = 6, and what it is measured against.
-ASSERTED = {"docs/time-at-the-bar-report.md B2 low": (20 * 3600, 50 * 1024),
-            "docs/time-at-the-bar-report.md B2 high": (60 * 3600, 100 * 1024)}
+ASSERTED = {"docs/time-at-the-bar-report.md (deleted) B2 low": (20 * 3600, 50 * 1024),
+            "docs/time-at-the-bar-report.md (deleted) B2 high": (60 * 3600, 100 * 1024)}
 
 
 def main():

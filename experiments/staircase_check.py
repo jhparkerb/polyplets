@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Numeric validation for the staircase route to Lean grand-form pinning.
 
-The planned Lean proof (polyplets/GRANDFORM-PLAN.md) rests on:
+The planned Lean proof (polyplets/GRANDFORM-PLAN.md (deleted)) rests on:
 
   mu-recursion   d k (H+1) = sum_{i<=k} mu_i * d (k-i) H          (H >= k+1)
   staircase      T(H+1+k, H+1) = sum_{i<=k} mu_i * T(H+k-i, H)    (H >= k+1)

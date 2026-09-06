@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Does coordination number set lambda, or does local cycle structure move it?
 
-`results/unexplored-avenues.md` idea 4 (the lambda atlas) proposes a designed
+`results/closed-doors.md` idea 4 (the lambda atlas) proposes a designed
 family of row-local lattices and states a prediction before measuring:
 
 > is lambda a function of coordination number, or does local cycle structure
@@ -10,7 +10,7 @@ family of row-local lattices and states a prediction before measuring:
 > king's 7.11, toward the tree bound (q-1)^(q-1)/(q-2)^(q-2), because
 > clustering suppresses lambda.
 
-`docs/last-orders.md` C1.1.  The full atlas wants certified two-sided brackets
+`docs/last-orders.md (deleted)` C1.1.  The full atlas wants certified two-sided brackets
 and is a compute item.  This is the cheap half that makes the prediction
 falsifiable now: enumerate three lattices to the SAME small n by brute force,
 estimate lambda the same way on each, and calibrate that estimator against the

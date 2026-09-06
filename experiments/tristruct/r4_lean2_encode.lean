@@ -10,13 +10,13 @@ import Polyplets.Compute
 
 **UNCOMPILED. Written 2026-08-13 by scout/builder `r4-lean2`, which ran no Lean
 on any machine. Nothing in this file is a theorem until a build says so.** See
-`results/r4/r4-lean2.md`.
+`results/r4/r4-lean2.md (deleted)`.
 
 ## Why this file and not increment 2
 
 `experiments/tristruct/r4_lean_funnel_probe.lean` compiled on 2026-08-13
 (gate A silent, exit 0, `[propext, Classical.choice, Quot.sound]`, no
-`sorryAx`), retiring the partition-sufficiency crux. `results/r4/r4-adv-cost.md`
+`sorryAx`), retiring the partition-sufficiency crux. `results/r4/r4-adv-cost.md (deleted)`
 §5.2 then named the one place the programme is still priced on nothing and
 attacked on nothing: **the encoding layer, E2 `encode_faithful`**, and
 specifically its reverse direction, which the adversary expects to need "a

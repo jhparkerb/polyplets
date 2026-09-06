@@ -7,7 +7,7 @@ the cyclotomic factorisation of its denominator, and the partial-fraction
 decomposition into one block per cyclotomic factor.
 
 The denominator is not fitted -- it is predicted from the measured period/degree
-structure (results/perimeter-defect-diagonals.md) as
+structure (results/perimeter.md) as
 
     Phi_1^(k+1) . Phi_2^(k-1) . Phi_3^(k-4)      (nonpositive exponents dropped)
 
@@ -20,7 +20,7 @@ The partial-fraction form is the useful one. Each block maps to one piece of the
 quasi-polynomial: a_j/Phi_1^j contributes a_j*C(n+j-1, j-1), the plain part;
 b_j/Phi_2^j contributes (-1)^n times the same, the parity part; the Phi_3 block a
 bounded period-3 wobble. Reading the top coefficient off each block is how the
-lattice-independence in results/perimeter-defect-diagonals.md was found.
+lattice-independence in results/perimeter.md was found.
 
     python3 experiments/perimeter_defect_gf.py results/perimdefect_square8_n70_k5.txt
     python3 experiments/perimeter_defect_gf.py A.txt B.txt --compare

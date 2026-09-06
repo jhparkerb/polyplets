@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Joint box table B(n, W, H) probe -- see results/joint-box-probe.md.
+"""Joint box table B(n, W, H) probe -- see results/symmetry-classes.md.
 
 Row transfer with connectivity partitions plus box-edge offsets (dl, dr);
 transitions cached per row shape. Validates every computed marginal against

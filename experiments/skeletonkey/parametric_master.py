@@ -7,7 +7,7 @@ ends with what is still missing:
     What is still king-only: assembling c_k for k >= 2 *from* the cluster
     weights, i.e. defect_gas.py's ledger and the master equation.
 
-`docs/lastditch-ideas.md` §1b names that same gap as the blocker on running
+`docs/lastditch-ideas.md (deleted)` §1b names that same gap as the blocker on running
 the Undertow pin against an external oracle (square-lattice polyominoes,
 published to n = 56).
 

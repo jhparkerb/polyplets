@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate MULTIDIRECTED: results/subclasses.md (formerly docs/middle-kingdom-plan.md) Phase 1c acceptance.
+"""Gate MULTIDIRECTED: results/subclasses.md (formerly results/subclasses.md) Phase 1c acceptance.
 
 Two independent routes to the number m(n) of MULTI-DIRECTED king animals of
 area n, in Bacher's sense (arXiv:1301.1365, Definition 2):
@@ -20,11 +20,11 @@ RED controls, all fail-closed (an agreement here FAILS the gate):
   mdirbad  Definition 2 with condition (2) -- the keystone two-sided
            requirement -- dropped. A strict superset predicate; must NOT
            reproduce m(n).
-  dir5nb   "control B" of results/directed-cone-anchor.md: forward flood from
-           every GLOBAL-bottom-row cell. results/directed-king-animals.md used
+  dir5nb   "control B" of results/subclasses.md: forward flood from
+           every GLOBAL-bottom-row cell. results/subclasses.md used
            to call this predicate "multi-directed"; it is not, and this check
            pins that (it diverges at n=4, 106 vs 110). See
-           results/multi-directed.md.
+           results/subclasses.md.
   dir5     Bacher's DIRECTED animals, A047781. Must be a strict subset:
            d(n) <= m(n) with strict inequality somewhere.
 
@@ -45,7 +45,7 @@ import multidirected_king as mdk  # noqa: E402
 BIN = os.path.join(ROOT, "build", "directed_cone_anchor")
 
 A047781 = [1, 4, 19, 96, 501, 2668, 14407, 78592, 432073, 2390004]
-# results/middle-kingdom-grid.md, ctrlB column (bottom-row-waived flood).
+# results/subclasses.md, ctrlB column (bottom-row-waived flood).
 CTRL_B = [1, 4, 20, 106, 576, 3179, 17736, 99748, 564430, 3209194,
           18316729, 104872413]
 MU = 6.4752      # Bacher Corollary 12, 1/rho_M

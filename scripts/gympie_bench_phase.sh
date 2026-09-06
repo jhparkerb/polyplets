@@ -9,7 +9,7 @@
 # Target machine: gympie (Apple Silicon laptop), 10 perf cores HARD cap.
 # Predicted cost: ~3-6 min wall, 10 cores, <4 GB RAM, <1 GB disk under
 # runs/bench_phase/<LABEL>. Basis: dalby ran the same H15/maxn30 sweep in
-# 141s at 80 cores / 4554 cpu-s (docs/full-utilization-redesign.md D5);
+# 141s at 80 cores / 4554 cpu-s (docs/engine-record.md D5);
 # gympie cores are ~3x a dalby core, so ~4554/30 =~ 150-450s here.
 # Kill: kill $(cat runs/bench_phase/<LABEL>/orchestrate.pid). No resume
 # (throwaway benchmark).

@@ -124,7 +124,7 @@ static size_t writeRunFile(const Run<W>& run, const std::string& out_path,
 // cost paid on every single work unit (thousands of sub-second invocations
 // per real run; confirmed the dominant real cost via a real heap-alloc
 // profile plus direct observation, not a hunch -- see
-// docs/utilization-bottleneck-log.md Bottleneck #5).
+// docs/engine-record.md Bottleneck #5).
 // `tokens` is the flag/value list with no program name (argv+1..argc in the
 // one-shot path; a tokenized stdin line in persistent mode) -- byte-for-byte
 // the same flags, same semantics, same output contract either way.

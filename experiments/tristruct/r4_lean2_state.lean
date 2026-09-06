@@ -9,13 +9,13 @@ import Polyplets.Compute
 # r4 increment 3b — the packaged frontier state, and the three holes that remain
 
 **UNCOMPILED. Written 2026-08-13 by scout/builder `r4-lean2`, which ran no Lean
-on any machine.** See `results/r4/r4-lean2.md`.
+on any machine.** See `results/r4/r4-lean2.md (deleted)`.
 
 ## What this file is and what its gate means
 
 Unlike `r4_lean2_encode.lean`, this file is **not** claimed to be a proof. It
 carries **exactly three `sorry`s**, each named and each corresponding to one
-row of `results/r4/r4-lean.md` §1.1. Its gate is therefore not "silence": it is
+row of `results/r4/r4-lean.md (deleted)` §1.1. Its gate is therefore not "silence": it is
 
 > zero `error:` lines, exactly three `declaration uses 'sorry'` warnings, and
 > no other output.
@@ -42,7 +42,7 @@ What the compile does settle, with no `sorry` involved:
 - **HOLE 1 `labelFin_faithful`** — the `Fin H` packaging is injective on
   height-bounded prefixes, so `encodeCol`'s faithfulness
   (`r4_lean2_encode.lean`, claimed) transfers to the finite state. This is the
-  *only* part of `results/r4/r4-adv-cost.md` §5.2's E2 objection that the
+  *only* part of `results/r4/r4-adv-cost.md (deleted)` §5.2's E2 objection that the
   encode file does not address, and it is bookkeeping in the accurate sense:
   `rowFin` is injective on `[0, H)` and every label lies there.
 - **HOLE 2 `strand_dead`** — r4-lean §1.1 D2, rated M there and singled out by
@@ -64,7 +64,7 @@ their statements. A transition function has to be written against the
 at the shape of an object nobody has built, and a `def step := sorry` would
 make every theorem downstream of it vacuous while looking like progress. The
 same goes for `frontierT` (F1), `prefix_census` (F2) and `frontierT_eq_T` (G2).
-`results/r4/r4-lean2.md` §4 prices them as NOT ESTABLISHED rather than
+`results/r4/r4-lean2.md (deleted)` §4 prices them as NOT ESTABLISHED rather than
 guessing.
 
 ## Fragile points (mechanical risk, each with its repair)
@@ -203,7 +203,7 @@ cut-column cell, hence in `[0, H)`, where `rowFin` is injective, and every
 out-of-range row is unoccupied in both prefixes so both labels are `⊤`.
 Backward: `labelFin` is a function of `lbl`, so it needs no hypotheses at all.
 
-This is the residue of `results/r4/r4-adv-cost.md` §5.2's E2 objection that the
+This is the residue of `results/r4/r4-adv-cost.md (deleted)` §5.2's E2 objection that the
 encode file does not touch, and it is the one part of it that really is
 bookkeeping. -/
 theorem labelFin_faithful (H : ℕ) (P P' : Finset (ℤ × ℤ)) (c : ℤ)
@@ -259,7 +259,7 @@ Exactly three, and the gate script counts them:
 Not stated at all, deliberately: `step` (E3), `step_correct` (E4),
 `frontierT` (F1), `prefix_census` (F2), `completion` (G1), `frontierT_eq_T`
 (G2), pins (H1). A `def step := sorry` would make everything downstream of it
-vacuous while looking like progress. `results/r4/r4-lean2.md` §4 prices those
+vacuous while looking like progress. `results/r4/r4-lean2.md (deleted)` §4 prices those
 rows as NOT ESTABLISHED rather than guessing at them.
 -/
 

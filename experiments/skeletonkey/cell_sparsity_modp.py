@@ -2,7 +2,7 @@
 """Skeleton Key probe 1 -- is the compressed cell-level transfer SPARSE in
 characteristic 0, as it is in characteristic 2?
 
-WHY THIS ONE NUMBER.  A-S1 (git show second-source:results/scaling-exploration-A.md,
+WHY THIS ONE NUMBER.  A-S1 (git show second-source:results/scaling-exploration-A.md (deleted),
 "Crossover: never") priced the rank-compressed engine and rejected it on compute:
 the compressed column transfer was taken to be a DENSE d x d matrix, so per-column
 cost grows as d^2 ~ 5.7x/height against the incumbent's sparse states x H ~
@@ -13,12 +13,12 @@ escape:
      structure (sparsity, low displacement rank) the d^2 could drop; nothing
      measured here supports that and the burden is on it."
 
-Exact Change probe 2/4 (results/exactchange-probes.md sec. 4) then measured exactly
+Exact Change probe 2/4 (results/arithmetic-structure.md sec. 4) then measured exactly
 that -- in GF(2) -- and found the two compressed cell-level transition matrices
 SPARSE: average row weight 1.8->3.6 (A_0) and 2.7->5.0 (A_1) at H = 4..7, ~O(H),
 against dense ~r/2.  Nobody has measured it in characteristic 0, which is the only
 characteristic that can carry an exact value (the T3 theorem in
-results/coin-flip-characteristic-landscape.md makes p = 2 the sole collapsing
+results/arithmetic-structure.md makes p = 2 the sole collapsing
 prime, so mod-2 is worth one bit and nothing else).
 
 So the live question is a two-line table:
@@ -38,7 +38,7 @@ matrix IS h[piv] and its weight is a count_nonzero.  No reduction, no basis-orde
 artefact beyond the pivot choice itself.
 
 FAIL-CLOSED.  Runs p = 2 through the identical code path first and asserts the
-banked char-2 cell ranks 32, 93, 210, 516 at H = 4..7 (results/exactchange-probes.md
+banked char-2 cell ranks 32, 93, 210, 516 at H = 4..7 (results/arithmetic-structure.md
 sec. 3).  Exits non-zero on mismatch.  RED control: a corrupted successor map must
 break that gate.  Two primes per height; a disagreement is fatal, not a warning.
 
@@ -61,11 +61,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
 from exactchange_cell_rank import build_cell_automaton          # noqa: E402
 from r3_inv_rank_probe import motzkin                           # noqa: E402
 
-# results/exactchange-probes.md sec. 3, char-2 cell-level rank.
+# results/arithmetic-structure.md sec. 3, char-2 cell-level rank.
 BANKED_GF2_CELL_RANK = {4: 32, 5: 93, 6: 210, 7: 516}
 
 # Two primes well clear of the only two that can move the rank (p = 2, p = 3;
-# results/coin-flip-characteristic-landscape.md).  Both small enough that a
+# results/arithmetic-structure.md).  Both small enough that a
 # float64 dot of length d stays exact: d * (p-1)^2 < 2^53 for d up to ~5e5.
 PRIMES = (131071, 65521)
 

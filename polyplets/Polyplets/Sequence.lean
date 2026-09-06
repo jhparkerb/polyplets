@@ -271,7 +271,7 @@ theorem a_6 : a 6 = 3832 := by rw [← ac_eq_a 6]; native_decide
 `a 3 ^ 3 * a 1 ≤ a 2 ^ 3 * a 4`; the banked values give `8000 > 7040`, refuting
 it. One exact triple settles the universal claim — and in the data the ratios
 are strictly log-concave at every `n = 3 .. 39`
-(`results/open-conjectures.md`, C2 entry). Complements C2 (ratios increase,
+(`results/closed-doors.md`, C2 entry). Complements C2 (ratios increase,
 conjectural): increasing, at decreasing pace, as `θ = -1` predicts. Axioms:
 inherits the `a_1 .. a_4` native leaves only. -/
 theorem ratio_not_logConvex : a 2 ^ 3 * a 4 < a 3 ^ 3 * a 1 := by

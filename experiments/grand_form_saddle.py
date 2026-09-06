@@ -10,7 +10,7 @@ Chain of reasoning being tested:
      that every log coefficient is LINEAR in n -- checked here for j=1..19,
      which is a simultaneous consistency check on all 19 production polynomials.
 
-  2. results/diagonal-law-below-onset.md measures the closed form to be
+  2. results/below-onset.md measures the closed form to be
      asymptotically exact below its onset: at fixed x = H/k the relative defect
      is exp(-|g(x)| k).  So on any ray k = kappa*H (kappa = s-1) the TRUE slice
      T(sH+c, H) has the same exponential growth as the LAW value
@@ -24,7 +24,7 @@ Chain of reasoning being tested:
      Hence   mu_s = 3^(1-2 kappa) * exp(phi(kappa)).
 
   4. Compare against the slice growth measured directly from the banked
-     triangle (results/slope-slicings.md: mu ~ 41.85 at s=2, still drifting).
+     triangle (results/diagonal-formula.md: mu ~ 41.85 at s=2, still drifting).
 
 Two independent estimators of the same constant, one from 19 exact polynomials
 and one from 20 raw counts.  Run: python3 experiments/grand_form_saddle.py

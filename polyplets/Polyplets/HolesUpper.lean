@@ -25,7 +25,7 @@ rectangle in `(u, v)` containing it.
   `ha + hm + 2 ≤ n` — integer AM–GM. Unconditional.
 * **(II′) the moat bound** (`MoatBound`): an `n`-cell single-hole animal whose
   hole has window `ha × hm` satisfies `n ≥ ha + hm + 2`. This is the
-  discrete-Jordan step of `results/maxhole-proof.md` (the moat-cycle argument),
+  discrete-Jordan step of `results/subclasses.md` (the moat-cycle argument),
   and it is **assumed here as a named hypothesis**: the paper proof runs through
   a winding number for a closed king-walk, machinery Mathlib does not have. See
   the discussion below for what *is* proved unconditionally and why the cheap
@@ -38,7 +38,7 @@ lower bound `maxhole_lower` of `Polyplets.Holes` is unconditional.
 
 `mem_or_enclosed_of_rookAdj` (sealing), the four `moat_*` lemmas and
 `moat_beyond_window` give the partial progress recorded in
-`results/maxhole-proof.md`: the animal reaches one diagonal step beyond the hole
+`results/subclasses.md`: the animal reaches one diagonal step beyond the hole
 on all four sides, so its `u`-extent is at least `ha + 2` and its `v`-extent at
 least `hm + 2`. As the proof doc records, this yields only
 `n ≥ max(ha, hm) + 2`-grade bounds: a king step changes `|u| + |v|` by at most
@@ -74,7 +74,7 @@ Two combinatorial substitutes were tried and both fail for that reason.
 Mathlib has neither Menger's theorem nor any digital-topology/Jordan-curve
 material to build the walk on (it does have Hall's theorem, which is not enough
 by itself), so (II′) stays a hypothesis here. Beyond the paper proof and the
-3,927-animal machine check of `results/maxhole-proof.md`, (II′) as stated —
+3,927-animal machine check of `results/subclasses.md`, (II′) as stated —
 with this file's exact `enclosed`/`SingleHole` definitions — was checked
 exhaustively against all 104,727 single-hole king animals with `n ≤ 9`
 (0 violations, tight on the box rings; `experiments/maxhole_review_checks.py`,
@@ -235,7 +235,7 @@ lemma moat_vbelow {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ} (hp : p ∈ enclose
     · have := hmin _ h; simp only at this; omega
 
 /-- **The moat lies one diagonal step beyond the hole on all four sides** — the
-unconditional fragment of (II′) recorded in `results/maxhole-proof.md`. If the
+unconditional fragment of (II′) recorded in `results/subclasses.md`. If the
 hole fills a tight `ha × hm` window then the animal has cells at `u = u0 - 1`,
 `u = u0 + ha`, `v = v0 - 1` and `v = v0 + hm`.
 
@@ -365,7 +365,7 @@ If the hole of an `n`-cell single-hole king animal fits in a tight `ha × hm`
 window in the diagonal coordinates `u = x + y`, `v = x - y` (tight: all four
 sides are touched), then `n ≥ ha + hm + 2`.
 
-`results/maxhole-proof.md` proves this by tracing the outer contour of the hole
+`results/subclasses.md` proves this by tracing the outer contour of the hole
 into a closed king-walk in the animal, erasing it to a simple cycle with nonzero
 winding number about every hole cell, and counting `Σ|Δu| ≥ 2(ha+1)`,
 `Σ|Δv| ≥ 2(hm+1)` against `|Δu| + |Δv| ≤ 2` per king step. It was

@@ -2,7 +2,7 @@
 # g2_campaign.sh — Redelmeier (Method A) count of A006770 a(1..MAXN) as a split
 # campaign of K single-core workers on this box, combined to per-height T(n,H)
 # and totals a(n). This is the INDEPENDENT confirmation algorithm — it shares no
-# counting logic with the transfer-matrix engine (oeis/submission-a19.md).
+# counting logic with the transfer-matrix engine (`oeis/SUBMISSION.md`).
 #
 # Usage:  g2_campaign.sh MAXN K OUTDIR [SPLIT_S]
 #   MAXN     target n

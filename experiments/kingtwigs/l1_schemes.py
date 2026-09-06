@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """king twigs, level 1 — machine verification of the twig-scheme bounds.
 
-Thread: king twigs (docs/king-twigs-plan.md, Phases 0-2).
+Thread: king twigs (docs/king-twigs-plan.md (deleted), Phases 0-2).
 
 Verifies, over ALL fixed animals up to --maxn:
   1. The enumeration itself (A006770 / A001168 prefixes).

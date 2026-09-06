@@ -8,7 +8,7 @@ import Mathlib
 /-!
 # Staircase king animals: the column-join is injective at fixed area
 
-`results/hv-growth-sandwich.md` Lemma 3, and B1 of `docs/sortie-publication-plan.md`.
+`results/subclasses.md` Lemma 3, and B1 of `docs/publication.md`.
 
 A *staircase king animal* is a king animal whose column intervals have both
 boundaries nondecreasing (A225114 in OEIS; the middle block of the HV-convex
@@ -178,7 +178,7 @@ theorem cut_join {x y : List Col} (hx : Valid x) (hy : Valid y) :
 
 /-- **Injectivity at fixed areas**: the pair is recovered from the join alone,
 so distinct pairs of equal areas have distinct joins. This is the step
-`results/hv-growth-sandwich.md` Lemma 3 turns into `M i * M j ≤ M (i + j)`. -/
+`results/subclasses.md` Lemma 3 turns into `M i * M j ≤ M (i + j)`. -/
 theorem join_injOn {x y x' y' : List Col} (hx : Valid x) (hy : Valid y)
     (hx' : Valid x') (hy' : Valid y') (harea : area x = area x')
     (h : join x y = join x' y') : x = x' ∧ y = y' := by

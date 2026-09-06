@@ -2,7 +2,7 @@
 # PURPOSE: restart the square8 (king) min-end site-perimeter census at p=48 that
 #   the 2026-08-07 power cut destroyed, on the resumable per-frame driver rather
 #   than the monolithic run that lost 3.9 h and wrote a 0-byte file.
-#   Feeds the minimum end of results/perimeter-both-ends.md -- the king partner
+#   Feeds the minimum end of results/perimeter.md -- the king partner
 #   to the square4 deep boxes running on dalby -- and through it paper L6.
 #
 # COMMAND:  scripts/ayr_pmin48.sh          (THREADS=32 by default)

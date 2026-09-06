@@ -2,7 +2,7 @@
 """r3_l3_schema_dp.py — the frontier rule schema, transcribed literally.
 
 Purpose (L3-2 proof scoping): a from-scratch column DP implementing EXACTLY
-the three shared propositions of results/triangle-r3-harness.md Part 3 —
+the three shared propositions of results/triangle-r3-harness.md (deleted) Part 3 —
 (1) cross-cut stencil = previous column rows r-1, r, r+1;
 (2) state = component-label partition of the boundary column + sticky
     touch-top/touch-bottom flags, stranded old component => dead;

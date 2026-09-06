@@ -8,7 +8,7 @@ import Polyplets.GapWalk
 /-!
 # Notary piece T, module 1: vanishing rows of the gap-walk transition table
 
-Campaign *Notary*, piece **T** of `docs/notary-kernel-scoping.md` — truncation
+Campaign *Notary*, piece **T** of `docs/notary-kernel-scoping.md (deleted)` — truncation
 exactness. This module proves the four **vanishing** facts about `stepMul`
 that the truncation argument consumes, plus the support of the two start
 vectors. No closed-form row values are computed here (those belong to piece

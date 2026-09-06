@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Can T4 be tested at k = 6?  -- docs/time-at-the-bar.md A3.3.
+"""Can T4 be tested at k = 6?  -- docs/time-at-the-bar.md (deleted) A3.3.
 
-T4 (results/open-conjectures.md) is N_k(+-1) = (+-2)^k for the diagonal-mirror
+T4 (results/closed-doors.md) is N_k(+-1) = (+-2)^k for the diagonal-mirror
 numerators, and it was REDUCED on 2026-07-31 to a pair of leading-coefficient
 statements about the quasi-polynomials themselves:
 
@@ -14,7 +14,7 @@ quasi-polynomials, NOT the numerator N_6, so the whole question is whether P_6
 can be pinned on both parity classes with something left over to check it
 against.
 
-WHY IT WAS THOUGHT TO REFUSE.  results/dmirror-diagonals.md measures the onset
+WHY IT WAS THOUGHT TO REFUSE.  results/symmetry-classes.md measures the onset
 at S >= 2k+2.  At k = 6 that is S >= 14, and the banked dmirror strip data in
 results/sym_counts.txt gives seven even points and six odd ones above it.
 Degree k = 6 needs k+1 = 7 points to pin, so the even class pins with ZERO
@@ -219,7 +219,7 @@ def main():
             print("   k=%d %-5s onset %2d   %s" % (k, pname, got, flag))
     print("   onset(even) = 2k+2 and onset(odd) = 2k+3 on every pinnable "
           "level: %s" % ("HOLDS" if law else "does not hold"))
-    print("   results/dmirror-diagonals.md states the union bound S >= 2k+2.")
+    print("   results/symmetry-classes.md states the union bound S >= 2k+2.")
     print("   The odd class starts one step later, which is the half that")
     print("   decides whether k=6 is reachable.")
 
@@ -230,8 +230,8 @@ def main():
               "(7 to pin + 1 holdout)" % (pname, onset, len(avail), 8))
     print("   The odd class is short by two and the even by one.  The missing")
     print("   points are S=27,29 at k=6, i.e. dmirror strips at n=33 and n=35 --")
-    print("   the same D(n) wall that caps results/related-seqs-n33.md at n=33")
-    print("   and that docs/time-at-the-bar.md A1.3 is about.")
+    print("   the same D(n) wall that caps results/symmetry-classes.md at n=33")
+    print("   and that docs/time-at-the-bar.md (deleted) A1.3 is about.")
 
     print("\nT4 at k = 6, if it is reachable:")
     me, mo = fits.get((6, 0)), fits.get((6, 1))

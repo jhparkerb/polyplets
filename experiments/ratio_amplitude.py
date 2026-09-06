@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Amplitude ratio of two series sharing a dominant growth constant.
 
-docs/middle-kingdom-followups-plan.md Phase 0, Table B: (dir4, HV-convex)
+results/subclasses.md Phase 0, Table B: (dir4, HV-convex)
 against unrestricted HV-convex, both by area. a_dir4(n) and a_HV(n) share
 the same dominant singularity (mu = 3.1289..., checked to 49+ digits in
-results/middle-kingdom-phase3.md and results/convex-polyplets.md), so the
+results/subclasses.md and results/subclasses.md), so the
 ratio r(n) = a_dir4(n)/a_HV(n) converges to a constant, the amplitude ratio
 C_dir4/C_HV -- unlike experiments/convex_growth.py, which extrapolates a
 sequence of *term ratios* a(n+1)/a(n) to a growth constant, this script

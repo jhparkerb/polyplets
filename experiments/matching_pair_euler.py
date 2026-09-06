@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Idea 2 of results/unexplored-avenues.md, step 0: pin the matching-pair
+"""Idea 2 of results/closed-doors.md, step 0: pin the matching-pair
 CONVENTION by brute force before any of the percolation machinery is built.
 
 The plan says the convention decides whether the whole idea works -- "Get this

@@ -10,7 +10,7 @@ import Mathlib.Tactic.NormNum
 /-!
 # The depth-`j` below-onset defect: the assembly arithmetic of `(C)` / `(D)`
 
-Campaign *Severance* W4, slice 2 (`docs/severance-w4-scoping.md` §4(a), §5).
+Campaign *Severance* W4, slice 2 (`docs/severance-w4-scoping.md (deleted)` §4(a), §5).
 The below-onset correction to the diagonal law at depth `j`,
 
     `D_j(k) = [z^(k+1-j)] D(z)`,

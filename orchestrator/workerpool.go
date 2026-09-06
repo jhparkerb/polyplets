@@ -8,7 +8,7 @@
 // machinery (SlicePtrFromStrings, dedupEnvCase, Cmd.Start, startProcess)
 // as a real, substantial share of total allocation, on top of the direct
 // process-creation syscall cost -- not just a hunch, see
-// docs/utilization-bottleneck-log.md Bottleneck #5.
+// docs/engine-record.md Bottleneck #5.
 //
 // WorkerPool holds `size` long-lived slots. Each slot lazily starts (at
 // most) one persistent map_worker and one persistent merge_worker process

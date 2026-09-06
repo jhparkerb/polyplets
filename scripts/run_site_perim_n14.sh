@@ -1,7 +1,7 @@
 #!/bin/bash
-# Phase 4a of docs/middle-kingdom-followups-plan.md: the grid-mode min-reduce
+# Phase 4a of results/subclasses.md: the grid-mode min-reduce
 # of site perimeter, at the same depth/thread count as the 512 s baseline
-# (results/middle-kingdom-grid.md, results/middle-kingdom-phase3.md).
+# (results/subclasses.md, results/subclasses.md).
 #
 # Purpose: measure whether adding the two site-perimeter min-reduce columns
 # (minSPKing, minSPRook) moves the grid pass's wall time or peak RSS

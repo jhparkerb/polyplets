@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The 4-cone-truncated descending block of results/hv-growth-sandwich.md.
+"""The 4-cone-truncated descending block of results/subclasses.md.
 
 Phase (0,1) of the HV-convex transfer operator -- bottoms still falling, tops
 already falling -- has kernel min(h,h')+1 unrestricted. The 4-cone condition

@@ -1,6 +1,6 @@
 """Column transfer-matrix for fixed animals by exact bounding-box height,
 on the SQUARE lattice and the TRIANGULAR lattice (polyiamonds), written for
-the cross-lattice control role of docs/triangle-structure-team-brief.md.
+the cross-lattice control role of docs/triangle-structure-team-brief.md (deleted).
 
 Independent of every kernel in this repo (reads none of core/, cpp/,
 orchestrator/); the only inputs are the lattice definitions, matching

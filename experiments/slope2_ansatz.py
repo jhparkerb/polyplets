@@ -5,7 +5,7 @@ Discipline, fixed before any number is read:
   * every model is linear in log space -- no optimizer, no starting guess.
   * CONTROL: the identical pipeline is run on 20 terms of a(n), whose answer is
     known independently from 40 terms + differential approximants
-    (lambda = 7.110(1), theta = -1.000(1), results/series-analysis-da.md).
+    (lambda = 7.110(1), theta = -1.000(1), results/growth-constant.md).
     Whatever resolving power the pipeline has there is the ceiling here.
   * CONFUSION: synthesize from each model at its own fitted parameters, refit
     all models, and see whether the generating model actually wins.

@@ -2,7 +2,7 @@
 # Settle depth 6's cost the way depth 5's was settled: an emax=5 K-ladder at
 # FIXED thread count.
 #
-# WHY.  docs/time-at-the-bar-report.md's B2 re-price found that disk is no
+# WHY.  docs/time-at-the-bar-report.md (deleted)'s B2 re-price found that disk is no
 # longer what caps the five terms -- done at the target Nmax, the Hs=20 poles
 # are 252 GB (n<=44) and 277 GB (n<=45) against Hs=21's 580 GB, and dalby has
 # 563 GB free.  What binds instead is that J=6 is ASSERTED: ~20-60 h and
@@ -13,8 +13,8 @@
 #
 # FIXED THREADS IS NOT A DETAIL.  The family DP builds per-thread private maps
 # and merges after, so RSS scales with thread count and a K-slope that mixes
-# thread counts is not a slope (results/lastditch-cost-ladders.md, methodology
-# note).  8 threads throughout, matching results/depth5-cost-settled.md so the
+# thread counts is not a slope (results/undertow.md, methodology
+# note).  8 threads throughout, matching results/undertow.md so the
 # two ladders are comparable rung for rung.
 #
 # Target: dalby, 8 threads.  Predicted from the emax=4 ladder at 8 threads

@@ -8,7 +8,7 @@ whose location moves analytically with the excess marker t, then
     1 - 9 Y_c(t) = alpha t + O(t^2)   and   C_(M+1) = C_1 alpha^M / M!,
 
 C_j being the coefficient amplitude of D_j(k) ~ C_j 9^k k^(j-3/2).  The measured
-family of results/onset-defect-law.md Sec.2 is exactly this with alpha = 50/81.
+family of results/below-onset.md Sec.2 is exactly this with alpha = 50/81.
 
 This script *derives* alpha = 50/81 by a finite local enumeration.
 

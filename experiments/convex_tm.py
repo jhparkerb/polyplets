@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Convex polyplets (HV-convex king animals) by area -- row transfer matrix.
 
-Restores the lost 38-term tool flagged as TODO in results/convex-polyplets.md
+Restores the lost 38-term tool flagged as TODO in results/subclasses.md
 (primary analysis: docs/proofs/convex-mirage.md). An HV-convex king animal is
 a sequence of row intervals [l_i, r_i] with l unimodal (non-increasing then
 non-decreasing), r unimodal (non-decreasing then non-increasing), and

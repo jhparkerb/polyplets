@@ -2,7 +2,7 @@
 # PURPOSE: production census for the isoperimetric end of the site-perimeter
 #   table -- the counts A(n,p) for p up to PMAX and area deficit i <= RMAX,
 #   which is exactly the domain build/perimeter_min is complete on. Feeds
-#   experiments/perimeter_min_ladder.py and results/perimeter-min-ladder.md.
+#   experiments/perimeter_min_ladder.py and results/perimeter-min-ladder.md (deleted).
 #
 # COMMAND (both lattices, in order):
 #   scripts/run_perimeter_min.sh

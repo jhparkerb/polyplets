@@ -8,7 +8,7 @@ import Polyplets.GapWalkRows
 /-!
 # Notary piece K, module 1: closed-form values of the gap-walk rows
 
-Campaign *Notary*, piece **K** of `docs/notary-k-plan.md` — the kernel method
+Campaign *Notary*, piece **K** of `docs/notary-k-plan.md (deleted)` — the kernel method
 at all orders. `GapWalkRows.lean` proved the *vanishing* facts about
 `stepMul`; this module proves the **values**: the generic rows at `g ≥ 3`
 (bulk `(1,2,3,2,1)` kernel, `J`-background `8/2/8/12`, fold-downs at

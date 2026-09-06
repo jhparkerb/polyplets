@@ -72,7 +72,7 @@ inline constexpr size_t kSpillBlockBytes = 256 * 1024;
 // WRITER-SIDE ONLY: readers decompress whatever frames they find and idx
 // entries always point at the containing frame's start, so any mix of frame
 // sizes coexists (a default change never invalidates existing files).
-// The curve is U-shaped, both ends measured (results/fanin-tax.md):
+// The curve is U-shaped, both ends measured (docs/engine-record.md):
 //  - ratio on identical live a(39) H20 records (plain 158.8 B/rec):
 //    64 -> 1.45x, 256 -> 1.72x, 512 -> 1.78x, 1024 -> 1.81x
 //    (experiments/reframe_measure.cpp);
@@ -400,7 +400,7 @@ class RunFileWriter {
     // Assemble the whole record in a stack buffer and emit ONCE. Field-at-a-time
     // emit() was ~10-35 stdio calls per record (worst: one per varint byte), and
     // per-call FILE-lock + dispatch overhead dominated map/merge worker busy time
-    // (measured ~90% of busy samples on gympie, results/second-wind.md). Max
+    // (measured ~90% of busy samples on gympie, docs/engine-record.md). Max
     // record size: keyLen<=SIGMAX-2+... sig (<=34) + lo,len (2) + up to
     // (maxn+1)<=40 counts x <=19 varint bytes = well under the 1KB below.
     uint8_t rec[1024];
@@ -682,7 +682,7 @@ class RunFileReader {
     // (body reads are explicit >=kFirstFillBytes freads, which glibc serves
     // directly). The default 4KB buffer made every open cost a 4KB read —
     // material at merge fan-in scale, where a round is ranges x inputs opens
-    // for one-record peeks (Fan-In Tax, results/fanin-tax.md).
+    // for one-record peeks (Fan-In Tax, docs/engine-record.md).
     std::setvbuf(fp_, nullptr, _IOFBF, 512);
     if (!parseHeader()) {
       std::fprintf(stderr, "RunFileReader: bad header in %s\n", path.c_str());
@@ -884,7 +884,7 @@ class RunFileReader {
   // Read body bytes: plain files from a block buffer + fold the FNV CRC;
   // compressed files from a decompressed block buffer fed by the zstd stream.
   // Field-at-a-time fread (worst: one locked stdio call per varint BYTE) was
-  // ~60% of map-worker busy samples (results/second-wind.md); both paths now
+  // ~60% of map-worker busy samples (docs/engine-record.md); both paths now
   // hit stdio/zstd one kSpillBlockBytes block at a time.
   bool bodyRead(void* dst, size_t n) {
 #ifdef POLY_ZSTD
@@ -919,7 +919,7 @@ class RunFileReader {
         // vector per reader put every allocation over glibc's mmap threshold,
         // so ranges x inputs reader instances per round each paid an
         // mmap+page-zero+munmap cycle (gdb-sampled as brk/sbrk churn in
-        // reader destructors; Fan-In Tax, results/fanin-tax.md). An 8KB peek
+        // reader destructors; Fan-In Tax, docs/engine-record.md). An 8KB peek
         // buffer stays arena-served and gets reused across readers.
         const size_t want = std::min(next_fill_, kSpillBlockBytes);
         if (rbuf_.size() < want) rbuf_.resize(want);
@@ -1110,7 +1110,7 @@ static constexpr unsigned kMergeProgressStrideMask = (1u << 10) - 1;
 // terminate/stop_key_out (both optional, nullptr = no steal support, the
 // original behavior): mergeRunFiles is a k-way heap merge, so unlike a
 // mid-record enumeration (kink's viableRec-shaped problem, deliberately
-// NOT given an interrupt point -- see results/sub-record-interrupt-design.md),
+// NOT given an interrupt point -- see docs/engine-record.md),
 // its "resume" semantics are simple and already native to this function:
 // stopping early just means "everything with sig < stop_key has been
 // written; call mergeRunFiles again with lo_hex=stop_key to cover the

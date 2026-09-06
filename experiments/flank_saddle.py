@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tall-flank large-deviation check: saddle-point on the grand form G*H^n
 reproduces the exact banked diagonal cells (see the appendix of
-results/height-distribution-collapse.md). Asserts ratio in [0.98, 1.06]
+results/growth-constant.md). Asserts ratio in [0.98, 1.06]
 for k = 3..14 at n = 36.
 """
 import types, os, sys, io, contextlib, math

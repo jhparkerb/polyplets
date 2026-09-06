@@ -10,7 +10,7 @@ import Polyplets.GapWalkBridge
 /-!
 # Notary piece K, module 2: locally finite sums over `ℚ⟦X⟧`
 
-Campaign *Notary*, piece **K** of `docs/notary-k-plan.md`. The kernel
+Campaign *Notary*, piece **K** of `docs/notary-k-plan.md (deleted)`. The kernel
 derivation evaluates the walk's gap-generating series at the small kernel
 roots — sums `Σ_g a_g·u^g` with infinitely many terms. Because `u` has
 positive order, term `g` contributes nothing below coefficient `g`, so the

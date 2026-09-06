@@ -38,7 +38,7 @@
 // arm of a symmetric animal is the mirror of its column arm, so masks
 // enumerate (corner, column arm) only — but the STATE stores the hook
 // UNFOLDED (corner + column arm + row arm labels). That deviates from
-// docs/dmirror-design.md's folded selfPaired-bit state, which is
+// results/symmetry-classes.md's folded selfPaired-bit state, which is
 // under-specified: a component can straddle the diagonal without touching
 // it, so its mirror can be a SECOND visible column-arm label — the pairing
 // is a general involution on labels, not one bit per label. Unfolding makes
@@ -1106,7 +1106,7 @@ int main(int argc, char** argv) {
   // dmirror's unfolded-hook layout caps the bbox at 34 (POLY_SIGMAX=70 fits
   // 34 + 33 label bytes + flag); hmirror/r180 signatures are H + 2 bytes, so
   // they are limited only by the u64 masks and run to 40 for the subgroup
-  // congruences (results/subgroup-mod4.md).
+  // congruences (results/symmetry-classes.md).
   if (maxn < 1 || maxn > (isDm ? 34 : 40)) {
     std::fprintf(stderr, "MAXN out of range (1..%d for %s)\n",
                  isDm ? 34 : 40, type.c_str());

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Motley step 0 — the provenance re-run (docs/motley-plan.md §"Step 0").
+# Motley step 0 — the provenance re-run (docs/motley-plan.md (deleted) §"Step 0").
 #
 # Purpose: reproduce the banked C_H(n) rows, H = 1..16, Nmax = 40, using the
 # COMMITTED fail-closed engine (second-source 48ac108) instead of the dirty

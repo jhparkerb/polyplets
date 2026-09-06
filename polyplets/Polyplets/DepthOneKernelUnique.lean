@@ -14,7 +14,7 @@ set_option linter.style.longLine false
 /-!
 # Notary piece K, module 8: uniqueness — the walk IS the closed form
 
-Campaign *Notary*, piece **K** of `docs/notary-k-plan.md`, wave K-δ. The
+Campaign *Notary*, piece **K** of `docs/notary-k-plan.md (deleted)`, wave K-δ. The
 walk's six unknown series satisfy the cleared polynomial system (rows
 from the six closing equations of `GapWalkClosing.lean`); the closed-form
 numerators satisfy the same system (`DepthOneKernelSol.lean`). This

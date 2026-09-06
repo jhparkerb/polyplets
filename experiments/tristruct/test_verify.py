@@ -214,7 +214,7 @@ class TestLowStripCull(unittest.TestCase):
 
 class TestColumnCfiniteCull(unittest.TestCase):
     """The four sweep survivors of 2026-08-11 are restatements of the pinned
-    column recurrences (results/triangle-structure.md sections 1-2): columns
+    column recurrences (results/diagonal-formula.md sections 1-2): columns
     H<=4 are C-finite (orders 1,3,7,15), and a C-finite integer sequence's
     residues mod m are forced by the recurrence + initial terms. The extended
     known.py must cull all four as KNOWN-COINCIDENT."""

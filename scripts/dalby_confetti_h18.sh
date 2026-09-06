@@ -6,17 +6,17 @@
 # 31-bit primes run as SEQUENTIAL passes; exact C_18 reconstructed by CRT
 # from the first FOUR primes (product ~2^124 against values < 2^112), the
 # FIFTH prime held out: its residue is PREDICTED from the reconstruction and
-# compared (RED-D of results/triangle-r3-ladder-gate.md §4).
+# compared (RED-D of results/triangle-r3-ladder-gate.md (deleted) §4).
 #
 # Target machine: dalby.  Binary: ~/src/pm-halfmeasure/build/cutcount_b1.
 #
-# RECEIPT ENFORCEMENT (new with this rung, per docs/motley-plan.md): this
+# RECEIPT ENFORCEMENT (new with this rung, per docs/motley-plan.md (deleted)): this
 # runner refuses to start unless <binary>.confetti-receipt exists, says
 # verdict=GREEN, and its sha256 matches the binary AS HASHED NOW.  The
 # receipt is written only by tests/gate_confetti.py on a fully-green
 # battery (brute oracle x 5 primes, exact battery, 4 mutant REDs caught).
 #
-# Predicted cost (docs/motley-plan.md, re-priced after the measured H=17
+# Predicted cost (docs/motley-plan.md (deleted), re-priced after the measured H=17
 # point): census H=18 ~ 71.5M windows (x3.02/height, measured); RAM well
 # under the H=17 run's 95 GB (u32 2-stream payload is 328 B/window vs
 # u128 3-stream 1968 B); wall unmeasured for the residue loop -- the first

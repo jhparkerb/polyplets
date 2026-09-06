@@ -7,7 +7,7 @@
 # from here without a box and a multi-hour run.
 # The frontier census under the SHARED-partial-fill engine, H = 13 up.
 #
-# WHY.  results/nkey-census.md measures H = 14, 15, 16 at 293 s, 1,960 s and
+# WHY.  results/closed-doors.md measures H = 14, 15, 16 at 293 s, 1,960 s and
 # 10,454 s and names the reason it stops: "successors are generated per source
 # state, so a partial fill that could serve many sources is rebuilt for each of
 # them", which prices H = 18 at three days and puts 21 out of reach.  The

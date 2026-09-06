@@ -5,7 +5,7 @@ C1 -- PROVED forced-parity congruence on the {n odd, H even} region.
 Theorem (proved from the lattice definition alone, no banked input):
 for H even and n odd, T(n,H) is even.
 
-Proof sketch (full statement in results/triangle-hunt-klein-parity.md):
+Proof sketch (full statement in results/arithmetic-structure.md):
 top-bottom reflection about the bounding-box horizontal midline is an
 involution on the translation classes counted by T(n,H) (it preserves cell
 count and box height). Its non-fixed points pair up, so T(n,H) is congruent
@@ -15,7 +15,7 @@ every column has even size and n is even. Hence for n odd there are no fixed
 points and T(n,H) is even.
 
 This is NOT the ternary spine (mod 3), not the diagonal law, and not the
-subgroup-census identity T = I_H(D2ax) mod 2 (results/subgroup-mod4.md) --
+subgroup-census identity T = I_H(D2ax) mod 2 (results/symmetry-classes.md) --
 that banked identity equates two computed quantities; this candidate needs
 no computed input at all: the predicted residue is the constant 0, from a
 proof. The sweep could not find it for a structural reason: it tests

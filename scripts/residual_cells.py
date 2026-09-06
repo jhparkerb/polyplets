@@ -4,9 +4,9 @@
 Written 2026-08-19 after the Confetti harvest, when a sweep of the notes found
 FOUR mutually inconsistent accounts of "the cells that still have one source":
 
-  docs/motley-plan.md           row 40's residual band 9 -> 7 -> 5 -> 3
-  results/ticker-tape-assessment.md   Ticker Tape's two cells: T(40,19), T(40,23)
-  docs/acceptance-queue.md      Ticker Tape takes "four of the six"
+  docs/motley-plan.md (deleted)           row 40's residual band 9 -> 7 -> 5 -> 3
+  results/second-sources.md   Ticker Tape's two cells: T(40,19), T(40,23)
+  docs/publication.md      Ticker Tape takes "four of the six"
   HANDOFF.md                    the 9 -> 7 -> 5 band "does not reproduce"
 
 Three of the four are right and they disagree because **two different
@@ -21,11 +21,11 @@ The two quantities:
       exact recount and no closed form, so the only thing standing behind the
       value is the mod-2/mod-4 subgroup census, which catches an error iff it
       is nonzero mod 4.  This is what scripts/provenance_table.py computes and
-      pins.  Rule: results/subgroup-mod4.md, results/provenance-table.md.
+      pins.  Rule: results/symmetry-classes.md, results/provenance-table.md.
 
   Q2  ROW 40'S RESIDUAL BAND.  Row 40 only: the cells that are not
       RULE-INDEPENDENT -- that still rest on the incumbent engine's union-find
-      connectivity rule.  Two ends, per docs/b1-closure-plan.md section 1:
+      connectivity rule.  Two ends, per results/second-sources.md section 1:
         h <= 21   swept by the incumbent; rule-independent once Motley reaches h
         h >= 22   never enumerated, wired from the P_k closed form at level
                   k = 40 - h.  The shape is a theorem (docs/proofs/
@@ -152,7 +152,7 @@ def closure_n(motley_h: int) -> int:
     h >= formula_lo(n) from above.  The published figure requires the two to
     OVERLAP -- at least one cell where both methods produce the value and can
     be compared -- not merely to abut.  That is the conservative reading and it
-    is the one results/motley-h18.md publishes ("n <= 35" at H = 18).
+    is the one results/second-sources.md publishes ("n <= 35" at H = 18).
 
     The shortcut "n <= 2H - 1" agrees with this for H <= 19 and parts company
     above it (H = 20 gives 38, not 39), so the criterion is computed, not the
@@ -201,8 +201,8 @@ def facts() -> dict:
 
 # A line is a residual claim if it names the subject unambiguously, or if it
 # says "residual" in the same breath as a cell.  The second half is deliberately
-# anchored to this triangle: results/onset-defect-crossover.md and
-# results/v5-denominator-law.md talk about fit residuals over cells and are not
+# anchored to this triangle: results/below-onset.md and
+# results/arithmetic-structure.md talk about fit residuals over cells and are not
 # about this at all.
 # "N of 40 cells" is the fourth shape (AUDIT-2026-09-02 M2): results/confidence.md
 # wrote "35 of 40 cells independently confirmed. Now: 40 of 40" and the gate
@@ -360,7 +360,7 @@ def trigger_lines(text: str) -> list[tuple[int, str]]:
     TABLE -- the unit is the row, and a triggered HEADER extends the trigger
     over the body.  The header is where the word "residual" appears and the
     body is where the numbers are, so checking only the matched line would
-    leave every figure unguarded -- docs/motley-plan.md keeps the whole ladder
+    leave every figure unguarded -- docs/motley-plan.md (deleted) keeps the whole ladder
     in rows under a header that says "residual band".
     """
     out, lines = [], text.splitlines()
@@ -499,7 +499,7 @@ def write_note(F: dict):
     L.append("All 820 cells. A cell is **congruence-only** when nothing "
              "recomputed it and no closed form covers it, so the only check it "
              "carries is the mod-2/mod-4 subgroup census "
-             "(`results/subgroup-mod4.md`) — which catches an error if and only "
+             "(`results/symmetry-classes.md`) — which catches an error if and only "
              "if the error is nonzero mod 4. Computed by "
              "`scripts/provenance_table.py`.\n")
     L.append("| Motley reaches | congruence-only | retired by this rung | cells |")
@@ -514,7 +514,7 @@ def write_note(F: dict):
     L.append("\n## Q2 — row 40's residual band\n")
     L.append("Row 40 only, and a different question: which cells still rest on "
              "the incumbent engine's union-find connectivity rule. Rule: "
-             "`docs/b1-closure-plan.md` §1.\n")
+             "`results/second-sources.md` §1.\n")
     L.append("- `h ≤ 21` — swept by the incumbent, and rule-independent once "
              "Motley re-sweeps that height.")
     L.append("- `h ≥ 22` — never enumerated; wired from the closed form at "
@@ -548,13 +548,13 @@ def write_note(F: dict):
     L.append("\n## Where the ladder stops\n")
     L.append("Q1 and Q2 both reach zero only at **H = 21**, and H = 21 does not "
              "fit in RAM at any rung of the arena ladder "
-             "(`docs/b1-closure-plan.md` §3). The formula end cannot substitute: "
+             "(`results/second-sources.md` §3). The formula end cannot substitute: "
              "level 19's own two anchors are `T(39,20)` and `T(40,21)`, so "
              "pinning `P_19` from them to corroborate them is circular, and the "
              "non-circular route — `(a_19, b_19)` ab initio from surplus-19 "
              "cluster weights (`docs/proofs/grand-form.md`) — is ten levels past "
              "the k ≤ 9 the Severance campaign reached. Ticker Tape (H = 19) is "
-             "priced and declined in `results/ticker-tape-assessment.md`.\n")
+             "priced and declined in `results/second-sources.md`.\n")
 
     L.append("\n## How to quote these numbers\n")
     L.append("Mark the claim inline with the fact it quotes; the gate verifies "

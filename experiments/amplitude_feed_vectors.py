@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """The (dir4, HV-convex) / HV-convex amplitude ratio, from the block structure.
 
-results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md) Table B measured
+results/subclasses.md (formerly results/subclasses.md) Table B measured
     r = C_dir4 / C_HV = 0.46210904920994244003566238770030583284116343972998...
-and found no integer relation.  results/hv-growth-sandwich.md's block picture
+and found no integer relation.  results/subclasses.md's block picture
 says what r *is* -- "a ratio of residues of the same staircase resolvent
 against two different feed vectors".  This script writes those feed vectors
 down and evaluates them, so the ratio becomes an explicit convergent
@@ -70,15 +70,15 @@ from mpmath import mp, mpf, nstr, findroot
 
 from seriestools import agree_digits, read_terms
 
-# results/convex-polyplets.md's 199 banked digits of mu, reproduced by three
-# further series in results/hv-growth-sandwich.md.  Used only as a cross-check
+# results/subclasses.md's 199 banked digits of mu, reproduced by three
+# further series in results/subclasses.md.  Used only as a cross-check
 # on the shooting, never as an input to it.
 MU_BANKED = (
     "3.1289432697308862522774479953877541605320912219043941349649746499492443858371"
     "8257615823063288164783234634835221018937039608167576493048146233778414064847543"
     "298805623983850111109827008627878918922549")
 
-# results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md) Table B, MEASURED and never edited: the
+# results/subclasses.md (formerly results/subclasses.md) Table B, MEASURED and never edited: the
 # amplitude ratio of the UNSPLIT (dir4, HV-convex) series against HV-convex, to
 # its 54 trusted digits.  D_desc contributes nothing at order mu^n, so the
 # split ratio must reproduce this to Table B's own precision.

@@ -7,7 +7,7 @@
 #   1. the OLD engine (build/strip_mu_kink, unordered_map, validated against the
 #      fixed-height GF roots) -- same mu_H to all printed digits and the same state
 #      count, for every H it is cheap to run both at;
-#   2. the PUBLISHED certificates (results/strip-mu-certificates.md) -- the exact
+#   2. the PUBLISHED certificates (results/growth-constant.md) -- the exact
 #      unsigned-__int128 Collatz-Wielandt check must PASS at the certified numerator
 #      and FAIL at numerator+1, which brackets mu_H to the last certified digit.
 #
@@ -21,7 +21,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HMAX = 8                      # both engines finish H<=8 in ~3 s total
-# Certified numerators over 10^7, from results/strip-mu-certificates.md. Pinned here
+# Certified numerators over 10^7, from results/growth-constant.md. Pinned here
 # rather than parsed from results/strip_mu_certificates.log: the log is append-only and
 # a scheduled run may be writing to it while the gate runs.
 CERTS = {2: 24142135, 3: 34437183, 4: 41823214, 5: 47178012,

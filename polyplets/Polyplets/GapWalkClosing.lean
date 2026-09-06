@@ -12,7 +12,7 @@ import Polyplets.KernelRoots
 /-!
 # Notary piece K, module 6: evaluation at the kernel roots — the closing
 
-Campaign *Notary*, piece **K** of `docs/notary-k-plan.md`, wave K-γ. This
+Campaign *Notary*, piece **K** of `docs/notary-k-plan.md (deleted)`, wave K-γ. This
 is where the three K-α/K-β strands meet: the column identities of
 `GapWalkColumns` (transported to the `s`-variable by `expand 2`), the
 locally-finite-sum library of `KernelSeries`, and the kernel roots of

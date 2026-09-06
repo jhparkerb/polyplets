@@ -90,7 +90,7 @@ func TestStealAllowedGatesOnActiveHeights(t *testing.T) {
 }
 
 // TestStealEligibleWallTimeFloor — RED before the record-floor fix
-// (results/steal-tail-h18.md). A compute-heavy straggler with few RECORDS
+// (docs/engine-record.md). A compute-heavy straggler with few RECORDS
 // left but a rate far below the pool average must still be eligible: its
 // remaining WALL TIME (at its own slow rate) can exceed the grain even
 // though its remaining record count does not. Pre-fix, stealEligible only
@@ -170,7 +170,7 @@ func TestRemainingFallsBackWhenEstimateGrosslyExceeded(t *testing.T) {
 
 // TestRefGrainSecondsStableAcrossElapsedTime — measured regression test for
 // the bug the FIRST version of the wall-time floor shipped with (caught on a
-// real dalby H17 column, results/steal-tail-h18.md): using
+// real dalby H17 column, docs/engine-record.md): using
 // totalDone/elapsedSincePhaseStart as the reference rate is self-defeating —
 // as a straggler drags on, elapsed keeps growing while total-done plateaus,
 // so the "average" DEGRADES the longer the tail runs, inflating grainSeconds

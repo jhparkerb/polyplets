@@ -162,7 +162,7 @@ fi
 # removal set one cell at a time and keeping what stays perimeter-neutral --
 # different language, different algorithm, no shared code.  It is what confirmed
 # that W=15's 8193 at j=8 was the box running out and not the model failing
-# (results/perimeter-both-ends.md), so it needs to stay honest.  r=5 and r=6 are
+# (results/perimeter.md), so it needs to stay honest.  r=5 and r=6 are
 # small enough to cost a second each.
 #
 # Depth.  The comment above says r=5 and r=6 "cost a second each"; that was

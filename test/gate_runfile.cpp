@@ -228,7 +228,7 @@ static void testMergeReaderOpenFailureAborts() {
 // and then resuming must reproduce byte-identical total output to an
 // uninterrupted merge over the same inputs. A wrong stop_key boundary
 // (off-by-one, wrong sig, etc.) would silently duplicate or drop records --
-// exactly the failure mode results/sub-record-interrupt-design.md flagged
+// exactly the failure mode docs/engine-record.md flagged
 // as the reason NOT to build this for kink's mask enumeration; merge's
 // simpler seek-based resume avoids that class of bug, but the boundary
 // arithmetic itself still needs a real test, not just an argument.

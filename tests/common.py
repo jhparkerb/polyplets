@@ -143,7 +143,7 @@ def free_and_one_sided(fixed, r90, r180, hmirror, dmirror):
 
 
 # A gate that could not run part of itself is DEGRADED, and until 2026-08-22 a
-# degraded gate was indistinguishable from a green one.  `results/gate-class-sweep.md`
+# degraded gate was indistinguishable from a green one.  `docs/engine-record.md`
 # finding F3: tests/gate_middle_kingdom.py has three `skip` paths -- no GMP
 # build, no build/prec_guess, no mpmath -- and two of them skip RED CONTROLS,
 # so on a box missing any of the three the gate printed GREEN having never

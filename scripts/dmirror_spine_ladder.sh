@@ -1,7 +1,7 @@
 #!/bin/bash
 # The spine split at the lengths c_3 needs: S = 15..18, cells n <= S+6.
 #
-# WHY.  results/dmirror-spine-split.md pins levels k <= 2 on both parities of
+# WHY.  results/symmetry-classes.md pins levels k <= 2 on both parities of
 # both families and finds c_2 linear for each -- the discriminator that kills
 # the summed family.  c_3 needs k = 3 pinned, which is five points per parity:
 # S = 16 on the even class and S = 17 on the odd.  S = 18 is the first holdout

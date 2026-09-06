@@ -4,8 +4,8 @@
 # Purpose: promote mu_14 = 6.3800344 from a floating-point power-iteration value
 #   to a machine-checkable rational, so the project's rigorous lambda bracket can
 #   quote the lower end at certificate grade (mu_14 <= lambda by subfamily
-#   containment, results/strip-growth-lambda-bounds.md). Method and the H<=11
-#   receipts: results/strip-mu-certificates.md.
+#   containment, results/growth-constant.md). Method and the H<=11
+#   receipts: results/growth-constant.md.
 # Machine: any; single-threaded, ~350 MB peak (17 MB measured at H=11, states
 #   grow 15510 -> 310571). No spill, no checkpoint.
 # Predicted cost: ~1.2-1.5 h wall. Basis: MEASURED on gympie H=9 11.2s,

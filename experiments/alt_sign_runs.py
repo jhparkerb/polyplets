@@ -51,4 +51,4 @@ ns = np.array(sorted(mean)); ms = np.array([mean[n] for n in ns])
 sel = ns >= 12
 c2 = np.polyfit(np.log(ns[sel]), np.log(ms[sel]), 1)
 print(f"mean_H ~ n^{c2[0]:.3f} measured directly over n>=12  "
-      f"(banked nu_eff at n=40 is 0.676, results/nu-exponent.md)")
+      f"(banked nu_eff at n=40 is 0.676, results/growth-constant.md)")

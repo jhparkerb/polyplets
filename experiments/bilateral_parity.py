@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Why A030234 alone among the companions is not log-convex --
-docs/time-at-the-bar.md A3.2.
+docs/time-at-the-bar.md (deleted) A3.2.
 
-results/open-conjectures.md C2 records the fact and calls it "a parity effect
+results/closed-doors.md C2 records the fact and calls it "a parity effect
 worth its own look", and nobody has looked.  A006770, A030222, A030233 and
 A030235 are all log-convex past small n; the bilateral count A030234 fails
 "at every even n".  A failure that systematic is usually two families added

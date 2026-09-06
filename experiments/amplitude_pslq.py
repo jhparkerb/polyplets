@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Integer-relation search for the (dir4, HV-convex)/HV-convex amplitude ratio.
 
-docs/middle-kingdom-followups-plan.md Table B ran this at 54 digits and found
+results/subclasses.md Table B ran this at 54 digits and found
 nothing in any in-capacity box (degree <= 12 at height <= 1e2, <= 5 at 1e4,
 <= 3 at 1e6, <= 2 at 1e8).  The digit count is what bounds the boxes: a
 relation of degree d and height H is only detectable when its CAPACITY
@@ -17,7 +17,7 @@ could not afford:
     a search over Q alone would never see it.
   * over Q(mu) with the reciprocal:  { mu^i r^j } including j < 0 is the same
     box, so it is not run separately; instead 2r is checked, since
-    results/hv-growth-sandwich.md's feed-vector identity makes 2r, not r, the
+    results/subclasses.md's feed-vector identity makes 2r, not r, the
     natural object (r = (1/2)(w4.phi)/(w.phi)).
 
 POSITIVE CONTROL, run at every precision: a genuine algebraic number of

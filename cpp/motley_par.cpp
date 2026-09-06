@@ -1,6 +1,6 @@
 // motley_par.cpp — PARALLEL colour-symmetrized spin transfer matrix (Motley).
 //
-// Same rule, same answer, more cores.  `docs/b1-closure-plan.md` §4 names the
+// Same rule, same answer, more cores.  `results/second-sources.md` §4 names the
 // wall this file removes: "The engine is still single-threaded ... the wall
 // figures demand a parallel frontier that does not exist yet.  RAM is the wall
 // this document plans around; cores are the next one."  Confetti (H = 18) spent
@@ -27,7 +27,7 @@
 // Modes:
 //   motley_par --census <H> <Nmax> [--threads T]
 //        reachable frontier states per cell-step; no payload.  This is the
-//        measurement docs/b1-closure-plan.md §2 projects with a +-20% census
+//        measurement results/second-sources.md §2 projects with a +-20% census
 //        ratio.
 //   motley_par --modp <H> <Nmax> <p> <outfile> [--threads T] [--ckpt DIR]
 //        C_H(n) mod p for n = 1..Nmax, "n value" lines, same format as
@@ -325,7 +325,7 @@ struct Buf {
 // One cell-step: every live source row visited exactly once, in id order, in
 // chunks, and each chunk's pages handed back the moment it is consumed.  That
 // is what takes the peak from two full frontier buffers to about one -- the
-// factor docs/b1-closure-plan.md calls rung G and prices at 1.7x.
+// factor results/second-sources.md calls rung G and prices at 1.7x.
 template <class F>
 static void run_step(Buf* cur, Buf* nxt, F body, bool release) {
   const size_t hw = cur->highwater();

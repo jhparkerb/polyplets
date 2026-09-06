@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Derive the king perimeter-defect classes from the square ones, and check it.
 
-The maximum-end census in results/perimeter-defect-diagonals.md was measured and
+The maximum-end census in results/perimeter.md was measured and
 interpolated.  This script checks the derivation that replaces the measurement:
 
   PARITY REDUCTION.  Diagonal king steps preserve the parity of x+y, so a king

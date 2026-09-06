@@ -12,14 +12,14 @@
 #   OVERLAP     --overlap-heights value (default 1 = sequential)
 #   STEAL_GRAIN default 0.05 (0 = steal off)
 #   MERGE_MULT  default 1, matching dalby_term.sh's deployed default
-#               (docs/utilization-bottleneck-log.md Bottleneck #2) -- pass a
+#               (docs/engine-record.md Bottleneck #2) -- pass a
 #               different value deliberately to A/B against it, not by
 #               omission, so a benchmark run doesn't silently diverge from
 #               the production config it's meant to be compared against.
 #
 # unit-mult 8, --persistent-workers, GOGC=1000: same reasoning as MERGE_MULT
 # above -- these are the dalby_term.sh-validated production baseline
-# (docs/utilization-bottleneck-log.md Bottlenecks #3, #5, #6), not
+# (docs/engine-record.md Bottlenecks #3, #5, #6), not
 # parameters this script varies, so they're hardcoded rather than left at
 # stale pre-fix defaults. A future A/B of one of these specifically should
 # edit the script deliberately, the same way MERGE_MULT's comment asks for.

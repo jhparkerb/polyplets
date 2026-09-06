@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""SPECTRAL EDGE (docs/onset-defect-plans.md §3), with its premise corrected.
+"""SPECTRAL EDGE (docs/onset-defect-plans.md (deleted) §3), with its premise corrected.
 
-FRAMING CORRECTION FOUND WHILE RUNNING THIS. `results/onset-defect-law.md` §4
+FRAMING CORRECTION FOUND WHILE RUNNING THIS. `results/below-onset.md` §4
 reads the defect rate as "9 = the square of the thin-diagonal growth 3". But on
 the depth-j line n = 2k+1-j, so 9^k = 3^(n+j-1): measured PER CELL the defect
 rate is exactly 3, the thin-diagonal rate itself, not its square. The two
@@ -18,7 +18,7 @@ the reciprocal roots of Q_H ARE the strip spectrum. Read them for H = 1..8 and
 ask whether anything accumulates at 3.
 
 Controls: the dominant reciprocal root must reproduce mu_2 = 1+sqrt(2) and
-mu_3 = 3.4437 (results/boundary-push-recurrence.md), which validates the whole
+mu_3 = 3.4437 (results/closed-doors.md), which validates the whole
 extraction independently.
 """
 import os, sys, math

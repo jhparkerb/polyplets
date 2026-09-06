@@ -39,7 +39,7 @@ RED controls (--selftest), each in a shadow copy of the family tables:
                        (the blind spot, measured), depth-5 build REFUSES;
   2  bb[3][21]  += 1   depth-5 build refuses;
   3  pp[3][21]  += 1   depth-5 build refuses (the column
-                       results/depth5-gate-green.md called inert; it is not,
+                       results/undertow.md called inert; it is not,
                        above depth 1);
   4  the e = 4, k = 21 row of the K21_e4 table, sig += 1: D_5's own input,
                        depth-5 build refuses;

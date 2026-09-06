@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Ternary Spine: the mod-3 structure of the height triangle's diagonal family.
 
-Verifies every link in the chain of results/ternary-spine.md:
+Verifies every link in the chain of results/arithmetic-structure.md:
 
   Setup (the diagonal cumulant law, empirically exact, holdout-validated k<=17):
     T(n, n-k) = P_k(n) * 3^(n-1-3k)  for n >= 2k+1, with

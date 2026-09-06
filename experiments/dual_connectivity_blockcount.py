@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Is there a small-b regime where the dual-connectivity TM wins?
 
-`docs/lastditch-ideas.md` sec. 6 closes the dual-connectivity transfer matrix
+`docs/lastditch-ideas.md (deleted)` sec. 6 closes the dual-connectivity transfer matrix
 (track the complement's 4-connectivity, planar hence non-crossing, and recover
 the component count from C = chi + holes) with a state comparison:
 
@@ -9,7 +9,7 @@ the component count from C = chi + holes) with a state comparison:
 > block counts that dominate -- b*Cat(b) vs Bell(b) is 11,440 vs 4,140 at
 > b = 8.  The dual is *worse*.
 
-`docs/last-orders.md` C2.2 asks the variation that is not the same idea: the
+`docs/last-orders.md (deleted)` C2.2 asks the variation that is not the same idea: the
 arithmetic is only lopsided at large block counts, so does a hybrid that
 carries the dual only where b is small buy anything?  That needs the block-count
 DISTRIBUTION over a real frontier, which is banked data, not an opinion.
@@ -40,7 +40,7 @@ from functools import lru_cache
 from math import comb
 
 # The incumbent's banked column-state count at H = 21, from
-# docs/skeletonkey-reprompt.md ("the incumbent realises Motzkin(H+1) - 1 =
+# docs/skeletonkey-reprompt.md (deleted) ("the incumbent realises Motzkin(H+1) - 1 =
 # 400,763,222 column states there").
 BANKED_H21_STATES = 400_763_222
 

@@ -59,7 +59,7 @@ struct RunRecord {
   // H, keyLen: bounded <=SIGMAX-2 (<=38 even at the keyLen=H+4 kink-stage
   // width), so uint8_t is exact, not lossy -- was `int`, wasting 6 bytes/record
   // (measured: sizeof(RunRecord)=72->64) purely on alignment padding a value
-  // that never exceeds 38. See results/hotpath-optim.md.
+  // that never exceeds 38. See results/hotpath-optim.md (deleted).
   uint8_t H;            // height (needed to interpret sig and lo/len)
   uint8_t keyLen;       // key length in bytes: H+2 for triangle, H+3 for holes
   uint8_t lo;         // first nonzero index in counts[]
@@ -101,7 +101,7 @@ struct RunRecord {
     // no left-shift is needed, so we extend our OWN counts buffer at the high end
     // (a no-op when o is fully within our window) and add o in. This avoids the
     // fresh allocate-copy-free that dominated merge CPU (combine was ~58% of merge
-    // wall and alloc-bound — results/merge-ledger.md A5 / the run.h:51 lever). When
+    // wall and alloc-bound — docs/engine-record.md A5 / the run.h:51 lever). When
     // the same record accumulates many collisions (the k-way merge / dedup pattern)
     // the buffer grows once and every subsequent in-window combine is zero-alloc.
     // Silent Carry: guard each add against unsigned wrap; slot < prev means a u64
@@ -254,7 +254,7 @@ inline bool recordLess(const RunRecord<W>& a, const RunRecord<W>& b) {
   // expensive path can never fire for this call site. Confirmed the
   // mechanism first with a real benchmark (experiments/bench_dedup.cpp) --
   // collision rate x window width was shown to compound combine() cost;
-  // this is the fix for why, not a guess (docs/utilization-bottleneck-log.md
+  // this is the fix for why, not a guess (docs/engine-record.md
   // Bottleneck #6). mergeRunFiles' cross-file k-way merge doesn't get the
   // full benefit (per-file order still depends on which file a record came
   // from) but each file's OWN prior sortRun already carries this tiebreak,

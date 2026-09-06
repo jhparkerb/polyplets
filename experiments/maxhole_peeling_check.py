@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The peeling route to the master inequality (multi-hole M(n) reduction).
 
-Chain (results/maxhole-proof.md):
+Chain (results/subclasses.md):
   PEELING LEMMA:  hole-free F', interior I with |I|>=2  =>  |shell4(I)| <= |S|-4
   + recursion f(m) <= (m-4) + f(m-4) with bases f(4)=1,f(5)=1,f(6)=2,f(7)=3
   => f(m) = round((m-2)^2/8) EXACTLY  =>  master inequality  =>  multi-hole M(n).

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Gate for build/perimeter_defect: the pruned search must reproduce build/g2's
 # site-perimeter census cell for cell, on both lattices, before any number it
-# produces past g2's reach is believed.  docs/perimeter-defect-plan.md, Task B.
+# produces past g2's reach is believed.  docs/perimeter-defect-plan.md (deleted), Task B.
 #
 # Three checks, all fail-closed:
 #   A  pruned counts == g2 --siteperim, for every (n, k) with k <= KMAX

@@ -1,13 +1,13 @@
 #!/bin/bash
 # The reach-merged frontier census, H = 14 up, one height at a time.
 #
-# WHY.  results/skeletonkey-nfamily-merge.md forbids quoting a class count at
+# WHY.  results/closed-doors.md forbids quoting a class count at
 # H = 21 and is right to: the ratio compounds ~1.087x/height from nine points
 # with no closed form, no OEIS match, and no recurrence with surplus.  The two
 # soft spots results/confidence.md names -- the H = 20 sweep that would turn
 # P_21 into a holdout, and the H = 21 cell that never fitted -- are both priced
 # against this frontier, so the number decides whether they are affordable.
-# docs/time-at-the-bar.md A1.1 is the item; this is its measurement.
+# docs/time-at-the-bar.md (deleted) A1.1 is the item; this is its measurement.
 #
 # WHAT IT COSTS.  Unknown above H = 14 and that is the point.  Measured on
 # dalby: the whole gate ladder (king H = 4..13, rook H = 2..10) is 1 m 24 s, so

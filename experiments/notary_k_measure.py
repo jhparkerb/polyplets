@@ -2,7 +2,7 @@
 """Notary piece K, measurement 0: price the cleared 6x6 system and pre-verify
 the planned Lean statement set.
 
-Campaign Notary piece K (docs/notary-kernel-scoping.md): formalize the kernel
+Campaign Notary piece K (docs/notary-kernel-scoping.md (deleted)): formalize the kernel
 method at all orders, ending in `Phi(x, N(x)) = 0` exactly in Lean.  Before any
 skeleton is written this script measures the objects the decomposition depends
 on and numerically verifies every statement class the skeletons will assert.

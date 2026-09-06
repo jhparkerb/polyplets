@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Exact Change probe 1: is the GF(2) observability quotient locally computable?
 
-Context: results/triangle-r3-involution.md INV-4.  The char-2 Hankel rank of
+Context: results/triangle-r3-involution.md (deleted) INV-4.  The char-2 Hankel rank of
 the strip functional is measured at H = 4..12 as 6, 15, 27, 58, 112, 229,
 453, 912, 1818 = A034299(H-1), closed form (2^(H+4) - (-1)^H (6H+7) - 9)/36.
 The minimal GF(2) weighted automaton of that dimension exists abstractly; an

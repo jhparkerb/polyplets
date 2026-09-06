@@ -519,7 +519,7 @@ info: 'Polyplets.lambda_le_of_bui_rd3' depends on axioms: [propext,
 
 /-! ## Sortie B1: the staircase column-join
 
-`results/hv-growth-sandwich.md` Lemma 3. The join stays in the class and is
+`results/subclasses.md` Lemma 3. The join stays in the class and is
 injective once both areas are fixed, which is what makes the staircase count
 supermultiplicative on the nose. Not even `Classical.choice` -- the join and
 the cut are computable and the proofs are constructive.

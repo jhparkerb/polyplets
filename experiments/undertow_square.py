@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Undertow's core claim, tested on a lattice whose answers other people publish.
 
-`docs/lastditch-ideas.md` sec. 1b: the pin can be run on the square lattice,
+`docs/lastditch-ideas.md (deleted)` sec. 1b: the pin can be run on the square lattice,
 where the counts are published, and that is "the one validation channel this
-project structurally lacks above n = 20".  `docs/last-orders.md` C1.3/A1.4.
+project structurally lacks above n = 20".  `docs/last-orders.md (deleted)` C1.3/A1.4.
 
 Undertow's claim, stripped of king-specific machinery:
 
@@ -16,7 +16,7 @@ the king's 3^(n-1-3k) factor is 1):
 
     T_sq(n, n-k) = P_k(n)          for n >= 2k+1, deg P_k = k
 
-and `results/onset-defect-law.md` records the depth-1 defect measured ab
+and `results/below-onset.md` records the depth-1 defect measured ab
 initio on `results/bbox_square4_n21.txt`:
 
     T_sq(2k, k) - P_k(2k) = +1, -1, +1, -1, +1   for k = 1..5
@@ -102,7 +102,7 @@ def peval(c, x):
 
 
 def D1(k):
-    """The square lattice's depth-1 defect, from results/onset-defect-law.md."""
+    """The square lattice's depth-1 defect, from results/below-onset.md."""
     return 1 if k % 2 == 1 else -1
 
 

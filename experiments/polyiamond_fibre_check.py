@@ -8,7 +8,7 @@ RHOMBUS as the row unit: a receiver (even x + y, the only cell that can take an
 edge from below) glued to a horizontally adjacent sender (odd x + y, the only
 cell that can pass one up). This script checks, fail-closed, every hypothesis
 that reading needs, plus the conclusion against the banked polynomials of
-results/polyiamond-diagonal-law.md.
+results/diagonal-formula.md.
 
   [1] brute enumeration reproduces A001420 (fixed polyiamonds, n >= 2);
   [2] the change of variables (x, y) -> (j, y, type) with j = (x - y) // 2 is
@@ -40,7 +40,7 @@ NMAX = 14
 A001420 = [3, 6, 14, 36, 94, 250, 675, 1838, 5053, 14016,
            39169, 110194, 311751]                      # A001420, n = 2..14
 
-# results/polyiamond-diagonal-law.md, high coefficient first, in H.
+# results/diagonal-formula.md, high coefficient first, in H.
 BANKED = {
     0: ([F(1, 4)], 2),
     1: ([F(1, 2), F(0)], 2),

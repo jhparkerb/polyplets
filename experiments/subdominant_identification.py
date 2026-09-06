@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Is the (dir4, HV-convex) spectrum the union of two known spectra?
 
-The question left open by results/hv-growth-sandwich.md: the 4-cone series'
+The question left open by results/subclasses.md: the 4-cone series'
 subdominant exponential growth rate looks like the growth constant of the
 truncated (0,1) descent block, and the unrestricted subdominant looks like it
-is still present behind it.  results/hv-growth-sandwich.md measured that with
+is still present behind it.  results/subclasses.md measured that with
 Aitken plus a two-exponential peel.  This measures it with
 experiments/prony_spectrum.py, which reads every exponential in one solve, and
 then does the identification arithmetic:

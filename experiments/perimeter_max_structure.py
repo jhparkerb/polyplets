@@ -3,7 +3,7 @@
 
 Reads `build/perimeter_defect` census rows (`n k c H count`) and asks:
 
-  1. ONSET LAW.  results/perimeter-defect-diagonals.md records onsets
+  1. ONSET LAW.  results/perimeter.md records onsets
      2, 3, 6, 9, 13, 18 for k = 0..5 and says "no law found".  Test
      onset(k) = k(k+1)/2 + 3 for k >= 2 (the two smallest k being degenerate),
      which reproduces 6, 9, 13, 18 and predicts 24 at k=6.  The onset is
@@ -40,7 +40,7 @@ form exists".
 
     python3 experiments/perimeter_max_structure.py results/perimdefect_square8_n70_k5.txt --lattice square8
 
-results/perimeter-defect-diagonals.md is the companion write-up.
+results/perimeter.md is the companion write-up.
 """
 
 from __future__ import annotations

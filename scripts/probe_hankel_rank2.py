@@ -5,7 +5,7 @@
 # closed under every fill; with all states reachable from length-1 prefixes,
 # this IS the Hankel rank of f over F_p, and rank over Q is >= it.
 #
-# PURPOSE (H=11, 2026-08-20). A-S1 (second-source:results/scaling-exploration-A.md)
+# PURPOSE (H=11, 2026-08-20). A-S1 (second-source:results/scaling-exploration-A.md (deleted))
 # measured this ladder to H=10: 6, 17, 35, 88, 204, 501, 1217, independently
 # reproduced by lane C. Two readings of those seven points disagree about the
 # asymptotics, and H=11 separates them:
@@ -34,7 +34,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from probe_hankel_rank import build
 
-# A-S1's ladder, second-source:results/scaling-exploration-A.md.
+# A-S1's ladder, second-source:results/scaling-exploration-A.md (deleted).
 BANKED = {4: 6, 5: 17, 6: 35, 7: 88, 8: 204, 9: 501, 10: 1217}
 HEARTBEAT_S = 60.0
 

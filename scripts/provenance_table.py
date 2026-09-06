@@ -2,8 +2,8 @@
 """One per-cell provenance table for the a(40) triangle, and a gate over it.
 
 Until now "what is confirmed, by which independent source, covering what share"
-was spread over results/ns_a40/PROVENANCE.md, results/strip-engine.md,
-results/subgroup-mod4.md, results/motley-h17.md and HANDOFF.md.  Five places
+was spread over results/ns_a40/PROVENANCE.md, results/second-sources.md,
+results/symmetry-classes.md, results/second-sources.md and HANDOFF.md.  Five places
 drift, and one of them already did: the strip-coverage-vs-holdout-mass
 confusion recorded in strip-engine.md.
 

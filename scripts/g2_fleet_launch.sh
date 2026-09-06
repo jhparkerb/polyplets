@@ -3,7 +3,7 @@
 # DISJOINT IDX range of the SAME N/S/K split; split-sum invariance (gate-g2 C)
 # makes the union exact regardless of which box ran which shard. Shares are
 # ~ measured (per-core throughput x cores): dalby 53% / ayr 27% / gympie 20%
-# (results/terminal-velocity.md). Each box runs in a FOREGROUND tmux window on
+# (docs/engine-record.md). Each box runs in a FOREGROUND tmux window on
 # its existing session 0 (survives ssh disconnect), tee'd to a launch log, and is
 # per-shard resumable -- re-running this script relaunches only unfinished shards.
 #

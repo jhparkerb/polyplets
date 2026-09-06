@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate CONVEX-DFINITE: results/subclasses.md (formerly docs/middle-kingdom-plan.md) Phase 2a/2b acceptance.
+"""Gate CONVEX-DFINITE: results/subclasses.md (formerly results/subclasses.md) Phase 2a/2b acceptance.
 
 Guards the sharpened non-D-finite verdict for HV-convex animals BY AREA --
 king (convex polyplets, novel) and edge-adjacent (A067675, the control) --
@@ -11,7 +11,7 @@ must PASS (find a relation that is known to exist) or a negative control it
 must reject:
 
   prec positive  HV-convex by semiperimeter has a banked order-5 degree-2
-                 P-recurrence (results/convex-polyplets.md). build/prec_guess
+                 P-recurrence (results/subclasses.md). build/prec_guess
                  must find it -- rank-deficient AND the fitted nullspace must
                  predict every held-out row.
   prec negative  the same series in the (2,1) box, too small to hold that
@@ -37,7 +37,7 @@ AREA = os.path.join(ROOT, "build", "convex_area_tm")
 
 KING14 = [1, 4, 16, 61, 221, 766, 2566, 8390, 26982, 85834, 271174, 853111,
           2677214, 8389720]
-# A067675, fixed convex polyominoes by area (results/subclasses.md (formerly docs/middle-kingdom-plan.md)
+# A067675, fixed convex polyominoes by area (results/subclasses.md (formerly results/subclasses.md)
 # reference table, "convex polyomino by area (CONTROL)").
 POLY14 = [1, 2, 6, 19, 59, 176, 502, 1374, 3630, 9312, 23320, 57279,
           138536, 331032]

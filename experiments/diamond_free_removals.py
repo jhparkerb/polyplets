@@ -12,7 +12,7 @@ what settled the j=8 term: W=15 measured 8193 against the cone model's 8229, and
 the question was whether the model was wrong or the box too small.  This script
 reproduces both C++ rows exactly and then reaches W=19, where j=8 is 8229 again
 -- so the box was too small.  A radius-r diamond holds free removals through
-j = r and undercuts from j = r+1 on.  See results/perimeter-both-ends.md.
+j = r and undercuts from j = r+1 on.  See results/perimeter.md.
 
 Removing cell c from animal A changes the site perimeter by
 

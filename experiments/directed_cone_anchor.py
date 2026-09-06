@@ -2,10 +2,10 @@
 """Cone anchor -- directed king animals: enumerate+filter vs Bacher's closed form.
 
 Purpose: close the "validation hook (feasible, not yet built)" of
-results/directed-king-animals.md. Filter the fixed king-animal (polyplet)
+results/subclasses.md. Filter the fixed king-animal (polyplet)
 enumeration down to DIRECTED king animals and check the result against the
 exact generating function D(t) = 1/4 * ((1+t)/sqrt(1-6t+t^2) - 1) = A047781.
-Write-up: results/directed-cone-anchor.md.
+Write-up: results/subclasses.md.
 
 Compute lives in build/directed_cone_anchor (C++); this is glue + the exact
 closed-form arithmetic + the fail-closed comparisons.
@@ -40,11 +40,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BIN = os.path.join(ROOT, "build", "directed_cone_anchor")
 
 # Published reference terms, hard-coded with provenance (no b-file exists in
-# fixtures/ for either sequence -- see results/directed-cone-anchor.md).
-# A047781, first 8 terms as listed in results/directed-king-animals.md line 9
+# fixtures/ for either sequence -- see results/subclasses.md).
+# A047781, first 8 terms as listed in results/subclasses.md line 9
 # (that note states they were verified against Bacher arXiv:1301.1365 + OEIS).
 A047781_DOC = [1, 4, 19, 96, 501, 2668, 14407, 78592]
-# A055834, first 6 terms as listed in results/king-subfamilies.md (addendum
+# A055834, first 6 terms as listed in results/subclasses.md (addendum
 # 2026-07-23), where they were checked against the OEIS entry to n=15.
 A055834_DOC = [1, 4, 18, 85, 413, 2044]
 

@@ -6,7 +6,7 @@
 // MERGE) -> finalize.  Both hold every intermediate stage in an
 // unordered_map<Sig, value> and RE-DERIVE the transition for every state on
 // every one of the thousands of matvecs a bisection-over-power-iteration needs.
-// Measured at H=11 (results/strip-mu-fast.md): 37% of the sweep is the hash-map
+// Measured at H=11 (results/growth-constant.md): 37% of the sweep is the hash-map
 // accumulate and the remaining 63% is the union-find + canonMixed + bucket walk
 // — i.e. ~100% of the sweep is work whose ANSWER never changes with x or with
 // the iterate.

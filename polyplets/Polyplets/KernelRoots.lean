@@ -11,7 +11,7 @@ import Mathlib.Data.List.GetD
 /-!
 # Notary piece K, module 3: the kernel's square roots and small roots
 
-Campaign *Notary*, piece **K** of `docs/notary-k-plan.md`. The kernel of the
+Campaign *Notary*, piece **K** of `docs/notary-k-plan.md (deleted)`. The kernel of the
 gap walk is `D(u) = u² − y(1+u+u²)²` with `y = s²`; its two small roots are
 
     u₁ = ((1−s) − A)/(2s),   A = √(1−2s−3s²),

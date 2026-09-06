@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Square-lattice Undertow at depth 2 -- docs/time-at-the-bar.md A1.4.
+"""Square-lattice Undertow at depth 2 -- docs/time-at-the-bar.md (deleted) A1.4.
 
-results/undertow-square-validation.md put an EXTERNAL oracle under Undertow for
+results/undertow.md put an EXTERNAL oracle under Undertow for
 the first time, at depth 1 only: the square lattice's counts are published by
 other people, so a shared conceptual error in this project's king machinery
 cannot hide there.  One depth is one height of saving.  This measures the
@@ -20,7 +20,7 @@ n = 2k+1-j:
     depth 1   n = 2k     D_1(k) = T_sq(2k,   k)   - P_k(2k)
     depth 2   n = 2k-1   D_2(k) = T_sq(2k-1, k-1) - P_k(2k-1)
 
-results/onset-defect-law.md measured D_1(k) = (-1)^(k+1) from five levels.
+results/below-onset.md measured D_1(k) = (-1)^(k+1) from five levels.
 D_2 has never been measured on this lattice.
 
 WHAT LIMITS THE RANGE.  P_k has to be pinned from in-onset cells alone, which

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate DIR4-PERIM-ALG: results/subclasses.md (formerly docs/middle-kingdom-followups-plan.md) Phase 2b.
+"""Gate DIR4-PERIM-ALG: results/subclasses.md (formerly results/subclasses.md) Phase 2b.
 
 The claim guarded here is a POSITIVE one -- (dir4, HV-convex) king animals by
 semiperimeter have an algebraic generating function -- so the gate's job is
@@ -14,7 +14,7 @@ that a guesser which said CANDIDATE to everything would fail here.
                minimal in BOTH directions, so one notch smaller must fail.
   null control 199 terms of the by-area king series -- the same length, and
                rigorously non-D-finite (EXCLUDED at (24,24) on its 700 terms,
-               results/convex-polyplets.md). Must be EXCLUDED in every box
+               results/subclasses.md). Must be EXCLUDED in every box
                where the dir4 series is a CANDIDATE. Re-cut from that series
                into build/ on every run (see cut_null_control): the gate keeps
                no derived copy of its own input, so there is no stale file to
@@ -111,7 +111,7 @@ def cut_null_control():
     if not os.path.isfile(AREA700):
         stop(f"null control source missing: {AREA700}\n"
              "  It is the 700-term HV-convex-polyplets-by-area series"
-             " (results/convex-polyplets.md).\n"
+             " (results/subclasses.md).\n"
              "  Regenerate (needs GMP, ~8 min; the engine prints the terms"
              " comma-separated,\n  this file is one 'n a(n)' pair per line):\n"
              "    build/convex_area_tm 700 1 | tr ',' '\\n' |"

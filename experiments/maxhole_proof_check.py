@@ -4,7 +4,7 @@
 M(n) = max total enclosed empty area over n-cell king-polyplets (4-connected
 background). Confirmed exactly by g2 --maxhole for n<=17 (results/maxhole.txt).
 
-This checks the proof strategy (results/maxhole-proof.md):
+This checks the proof strategy (results/subclasses.md):
   - CONSTRUCTION (lower bound): the diamond ring |x|+|y|=r has n=4r cells and
     encloses 2r^2-2r+1 = round((n-2)^2/8) cells -> M(4r) achieved exactly.
   - UPPER BOUND: reduce to a single hole (multi-hole is less efficient), then for a

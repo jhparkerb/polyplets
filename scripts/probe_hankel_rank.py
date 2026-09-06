@@ -11,7 +11,7 @@
 # rank-compressed DP) can beat the frontier dimension — a lower bound.
 # If rank << #states: an exactly-compressed transfer exists; measure its growth.
 #
-# Distinct from results/boundary-push-tensornetwork.md, which measured the
+# Distinct from results/closed-doors.md, which measured the
 # SPATIAL (within-column) Schmidt rank of the frontier vector. This is the
 # TEMPORAL cut: prefix x suffix over column words.
 #

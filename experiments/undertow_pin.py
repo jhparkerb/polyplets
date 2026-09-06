@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Undertow: pin P_k from BELOW-onset cells, so the tower stops needing the tall sweep.
 
-The standing rule (docs/b1-closure-plan.md §1) is that level k costs two
+The standing rule (results/second-sources.md §1) is that level k costs two
 above-onset anchors, T(2k+1, k+1) and T(2k+2, k+2) -- the two TALLEST cells on
 its diagonal.  That is what makes row 40 expensive: level 19's anchors are
 T(39,20) and T(40,21), and T(40,21) is the 36-hour cell.
@@ -12,7 +12,7 @@ carries exactly two new constants,
     P_k(n) = [y^k] exp( sum_j (a_j + b_j n) y^j ),
 
 so ANY two independent linear equations in (a_k, b_k) pin it -- and Severance W3
-(results/onset-defect-depths234.md) supplies them from cells that are far SHORTER
+(results/below-onset.md) supplies them from cells that are far SHORTER
 than the onset anchors.  For a below-onset cell at depth j,
 
     T(2k+1-j, k+1-j) = P_k(2k+1-j) * 3^(2k-3k-j) + D_j(k),                  (*)

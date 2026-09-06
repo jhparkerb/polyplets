@@ -16,7 +16,7 @@ Sleeve of row n: k from floor((n-1)/3)+1 (first k with d >= 1) up to the law's
 diagonal reach k_max(n) = floor((n-1)/2).
 
 Run: python3 experiments/sleeve_zero_census.py [nmax]
-Doc: results/ternary-spine.md, "Row reading ... and the sleeve zeros".
+Doc: results/arithmetic-structure.md, "Row reading ... and the sleeve zeros".
 """
 import os, sys
 

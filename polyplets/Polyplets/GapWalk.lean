@@ -9,7 +9,7 @@ import Mathlib.Tactic.NormNum
 # The two-class gap walk, and the all-pairs cluster weights it computes
 
 The transfer object behind the depth-1 closure of the below-onset defect
-(`results/onset-defect-depth1-closed.md`, campaign *Severance* W4). A cluster
+(`results/below-onset.md`, campaign *Severance* W4). A cluster
 whose every row holds exactly two cells is traversed row by row; the state is
 the **gap** `g ≥ 1` between the two cells of the current row together with a
 **class** flag saying whether the partial animal below is already joined

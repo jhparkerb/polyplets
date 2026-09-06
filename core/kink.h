@@ -4,7 +4,7 @@
 // Kink-carry instead moves the boundary ONE CELL at a time (H micro-stages per
 // column), carrying the one NW cell each stage overwrites so king adjacency
 // stays available without needing the whole old column. Serial win measured
-// in experiments/kink_tm/kink_tm.cpp: results/kink-carry.md.
+// in experiments/kink_tm/kink_tm.cpp: docs/engine-record.md.
 //
 // Mixed-state key during a stage sweep (32-byte Sig, keyLen = H+4):
 //   b[0..H)   mixed boundary: new-column cells for rows < stage (this

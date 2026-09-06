@@ -9,7 +9,7 @@
 // Heap-allocation counter (global new/delete) for the combine alloc-churn gate.
 // combine() on the dominant merge path must NOT allocate when the incoming
 // record's window is already contained in this record's window — see
-// results/merge-ledger.md A5 (combine was 58% of merge wall, alloc-bound).
+// docs/engine-record.md A5 (combine was 58% of merge wall, alloc-bound).
 static size_t g_allocs = 0;
 void* operator new(std::size_t n) { ++g_allocs; void* p = std::malloc(n); if (!p) std::abort(); return p; }
 void* operator new[](std::size_t n) { ++g_allocs; void* p = std::malloc(n); if (!p) std::abort(); return p; }

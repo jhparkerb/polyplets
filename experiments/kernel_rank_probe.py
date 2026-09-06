@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Adversarial check of the finite-rank criterion in
-results/countable-subpopulations-criterion.md.
+results/subclasses.md.
 
 The criterion says: for a 1D column-profile family counted by AREA, write
 K(h, h') for the number of ways a column of height h' may follow one of height

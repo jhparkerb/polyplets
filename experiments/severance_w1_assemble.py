@@ -19,7 +19,7 @@ exactly k <= L.  Nothing is extrapolated and no swept value ever enters the
 derivation -- the wired table and the banked cells are compared against, never
 used as inputs.
 
-Pathologies avoided (results/defect-gas.md:242-251): no fixed-point iteration
+Pathologies avoided (results/diagonal-formula.md:242-251): no fixed-point iteration
 of mu (this route is finite polynomial algebra, order-by-order by construction),
 and no mixing of the u-series master equation H with the y-series chain -- only
 the y-series chain appears here.

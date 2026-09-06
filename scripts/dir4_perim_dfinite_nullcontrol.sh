@@ -4,7 +4,7 @@
 #
 # The reference series is HV-convex king animals BY AREA truncated to 199
 # terms. That series is known non-D-finite -- rigorously EXCLUDED at (20,20)
-# and (24,24) on its full 700 terms (results/convex-polyplets.md, Phase 2a/2b).
+# and (24,24) on its full 700 terms (results/subclasses.md, Phase 2a/2b).
 # So any CANDIDATE it returns at 199 terms is, by construction, spurious:
 # a box that 199 terms cannot decide. Run the same boxes on it and on the
 # dir4 series and compare.

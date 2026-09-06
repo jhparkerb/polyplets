@@ -13,7 +13,7 @@ with t marking cluster *excess*.
 ===========================================================================
 
 Two different quantities are both called an "amplitude" in this campaign.
-results/onset-defect-law.md Sec.2 uses A_j := C_j Gamma(j-1/2), where C_j is the
+results/below-onset.md Sec.2 uses A_j := C_j Gamma(j-1/2), where C_j is the
 coefficient amplitude of the defect itself:
 
     D_j(k) ~ C_j 9^k k^(j-3/2).
@@ -27,7 +27,7 @@ R_j := (C_j/C_1)(81/25)^(j-1) resp. (A_j/A_1)(81/25)^(j-1).
 ===========================================================================
 
 Every depth has its singularity at the same point Y = 1/9 (the rate is 9 at every
-depth: results/onset-defect-law.md Sec.1); only the exponent moves,
+depth: results/below-onset.md Sec.1); only the exponent moves,
 
     F_j(Y) = sum_k D_j(k) Y^k ~ C_j Gamma(j-1/2) (1-9Y)^(-(j-1/2)).
 
@@ -61,7 +61,7 @@ with h and psi analytic at t = 0, psi(0) = 0, psi'(0) = alpha, and the exponent
 Equivalently: depth M+1 is the M-th derivative of depth 1,
 F_(M+1) = (-alpha)^M/M! * d^M F_1/d(1-9Y)^M + less singular.
 
-The conjectured family of results/onset-defect-law.md Sec.2,
+The conjectured family of results/below-onset.md Sec.2,
 A_j = (sqrt6/27)(25/81)^(j-1) binom(2j-2,j-1)/2^(j-1), is *exactly* (*) with
 alpha = 50/81: using binom(2M,M)/2^M = 2^M (1/2)_M/M!,
 

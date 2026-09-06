@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """L3-3: the fattening bijection from king animals to decorated polyominoes.
 
-`results/r4/r4-floors.md` sec."Routes the floors do not close that have been
+`results/r4/r4-floors.md (deleted)` sec."Routes the floors do not close that have been
 treated as closed" objects that L3-3 was pruned by a rank floor -- "paying a
 floor of ~1.5e4 at H=21 is not a cost objection to anything" -- and calls the
-kill "merely asserted". `docs/skeletonkey-reprompt.md` then finds that L3-4,
+kill "merely asserted". `docs/skeletonkey-reprompt.md (deleted)` then finds that L3-4,
 its twin, has a second and sound kill, leaving L3-3 as the one open row.
 
-The row (`git show triangle-structure:results/triangle-r3-queue.md`, L3-3):
+The row (`git show triangle-structure:results/triangle-r3-queue.md (deleted)`, L3-3):
 
     Object change, not encoding change: bijection from king animals to a
     decorated polyomino class on a refined lattice (fatten each cell to a 2x2

@@ -3,7 +3,7 @@
 // A map round writes ~the frontier volume as map_*.bin, which the merge
 // round reads once and deletes: half of a run's device writes and reads never
 // need to touch the durable disk at all (measured: dalby's H20 pole saturates
-// its NVMe mirror; results/fanin-tax.md Mirror Toll). Routing those files to
+// its NVMe mirror; docs/engine-record.md Mirror Toll). Routing those files to
 // a tmpfs-backed dir (e.g. /dev/shm/<run>) removes the round trip — measured
 // 1.5x on a(39)'s H20 pole columns.
 //

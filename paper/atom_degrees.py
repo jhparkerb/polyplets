@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Lifetime-3 byproduct sequences (results/lifetime3-proof.md), from the recovered
+# Lifetime-3 byproduct sequences (results/lifetime3-proof.md (deleted)), from the recovered
 # fixed-height GF orders in results/fixed_height_gfs.txt:
 #   orders     deg Q_H  -- read directly (H=1..10)
 #   atom degs  deg N_H  -- via the lifetime-3 degree law deg Q_H = deg N_{H-2} +

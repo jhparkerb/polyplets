@@ -60,7 +60,7 @@ func ParseHeader(path string) (PolyrunHeader, int64, error) {
 	// is called once per SampleKeys call -- i.e. once per file per map/merge
 	// round -- so the oversized default buffer showed up as the largest
 	// remaining allocator in a real heap profile after fixing the two
-	// wasted-reader call sites above (docs/utilization-bottleneck-log.md
+	// wasted-reader call sites above (docs/engine-record.md
 	// Bottleneck #4).
 	br := bufio.NewReaderSize(f, 256)
 	var hdr PolyrunHeader
@@ -278,7 +278,7 @@ func subsampleEvenly(keys []string, numCuts int) []string {
 // fixed number of samples FROM EACH FILE, so a file holding 590M records
 // contributed the same number of samples as one holding 64K -- the big file
 // was under-sampled and its records collapsed into one open-ended bucket (the
-// measured straggler, docs/full-utilization-redesign.md).
+// measured straggler, docs/engine-record.md).
 //
 // Each .idx sidecar holds exactly one entry per 64 records (core/runfile.h
 // kIndexStride), uniformly spaced. The union of ALL files' FULL index
@@ -429,7 +429,7 @@ const (
 // header before switching to positioned f.ReadAt calls were each allocating
 // a full bufio.Reader (4KB default buffer) just to decode 19 bytes, then
 // discarding it -- confirmed via a real heap-alloc profile as ~35% of a real
-// run's total allocation (docs/utilization-bottleneck-log.md Bottleneck #4).
+// run's total allocation (docs/engine-record.md Bottleneck #4).
 func readIndexHeader(r io.Reader, wantKeyLen int) (uint64, error) {
 	var hdr [idxHeaderBytes]byte
 	if _, err := io.ReadFull(r, hdr[:]); err != nil {
@@ -733,7 +733,7 @@ func loadKeyBounds(paths []string, keyLen int) []keyBounds {
 // overlaps the unit range [loHex, hiHex) ("" = open end). The writer stamps
 // the REQUESTED range, so every record in a file lies inside its stamp; a
 // file whose stamp misses the unit range cannot contribute a record and is
-// safely dropped (Fan-In Tax, results/fanin-tax.md). Unstamped files are
+// safely dropped (Fan-In Tax, docs/engine-record.md). Unstamped files are
 // always kept. If nothing overlaps (a steal-child remnant can shrink past
 // every file), the FULL list is returned: the unit then range-filters to an
 // empty output, byte-identical to pre-prune behavior.

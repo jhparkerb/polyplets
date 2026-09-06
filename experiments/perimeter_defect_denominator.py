@@ -24,7 +24,7 @@ Two things are scanned rather than assumed:
 
     python3 experiments/perimeter_defect_denominator.py results/perimdefect_square8_n60_k6.txt --k 6
 
-results/perimeter-both-ends.md, "What this run did not buy".
+results/perimeter.md, "What this run did not buy".
 """
 
 from __future__ import annotations

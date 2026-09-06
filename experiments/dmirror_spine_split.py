@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Split the dmirror count by which ground-state spine the animal sits on.
 
-docs/time-at-the-bar-report.md, A1.3's live half.  `results/dmirror-grand-form-fails.md`
+docs/time-at-the-bar-report.md (deleted), A1.3's live half.  `results/symmetry-classes.md`
 showed the grand form does not transfer to the dmirror family, and diagnosed
 why: d(S, S) = 2 for every S >= 2, so the family is a SUM over two ground
 states -- the main diagonal and the anti-diagonal -- and the log of a sum of

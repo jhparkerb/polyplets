@@ -5,7 +5,7 @@
 # T(n,17) = C_17(n) - 2*C_16(n) + C_15(n), which closes a(n) for n <= 33
 # rule-independently, and -- the point of the height -- the first MEASURED
 # wall, RSS and state census above H = 16, which every RAM projection in
-# docs/b1-closure-plan.md currently rests on.
+# results/second-sources.md currently rests on.
 #
 # Target machine: dalby.  Binary: ~/src/pm-halfmeasure/build/cutcount_b1,
 # stamped b9d725be, clean worktree, gate-cutcount-b1 GREEN on that build.

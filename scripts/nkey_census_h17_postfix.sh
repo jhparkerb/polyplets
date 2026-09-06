@@ -4,7 +4,7 @@
 # WHY.  The H = 17 run started on dalby 2026-08-22T23:45 is stamped rev
 # a825ad114, which predates 384bd2e -- the fix for the retirement rule that
 # could file one component as two when a closed group and the open run share
-# an old block whose last row has just passed.  results/nkey-census.md says
+# an old block whose last row has just passed.  results/closed-doors.md says
 # H = 16 "was produced by the pre-fix binary and is being re-run under the
 # corrected rule; H = 17 likewise", and this is that re-run.  The fix is known
 # to change nothing at H = 14 and H = 15 and is being confirmed at H = 16 on

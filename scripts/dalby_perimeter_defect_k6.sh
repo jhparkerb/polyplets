@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PURPOSE: the k=6 site-perimeter defect census, which tests four live
-#   predictions of results/perimeter-both-ends.md and
-#   results/perimeter-defect-diagonals.md at once:
+#   predictions of results/perimeter.md and
+#   results/perimeter.md at once:
 #     onset(6) = 24                     (the triangular onset law T_k + 3)
 #     the Phi_2 leading diagonal's 15/4 (5(k-2)!/2^(k-1) at k=6)
 #     the Phi_3 exponent k-4            (today that slope rests on ONE point)

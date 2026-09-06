@@ -52,7 +52,7 @@ func main() {
 	fold := flag.Bool("fold", true, "R1 vertical-mirror fold")
 	cores := flag.Int("cores", runtime.NumCPU(), "max parallel workers")
 	// Scheduling knob DEFAULTS are the validated production values (the
-	// utilization work: docs/utilization-bottleneck-log.md). A bare
+	// utilization work: docs/engine-record.md). A bare
 	// `orchestrate --kernel kink` run gets the deployed config; the flags
 	// remain for A/B and for the ns-gate-split partition-invariance gate,
 	// which must be able to vary --unit-mult to prove partition boundaries
@@ -235,7 +235,7 @@ func main() {
 	}
 
 	// Diagnostic only (POLY_MEMPROFILE=path): root-causing the GC-churn finding
-	// in docs/utilization-bottleneck-log.md Bottleneck #3 -- GOGC=1000 masks
+	// in docs/engine-record.md Bottleneck #3 -- GOGC=1000 masks
 	// frequent collection but doesn't explain WHY the allocation rate is high
 	// enough to trigger ~26 GCs/sec against an 8MB heap goal in the first
 	// place. runtime.GC() forces a final collection first so the profile

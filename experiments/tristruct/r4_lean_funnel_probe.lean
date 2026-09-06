@@ -10,7 +10,7 @@ import Polyplets.Finite
 
 **UNCOMPILED. Written 2026-08-12 by scout `r4-lean`, which ran no Lean on any
 machine. Nothing in this file is a theorem until a build says so.** See
-`results/r4/r4-lean.md`, job request R4-LEAN-JOB-1.
+`results/r4/r4-lean.md (deleted)`, job request R4-LEAN-JOB-1.
 
 ## What this file is for
 
@@ -24,7 +24,7 @@ It tests one question and is sized to answer only that:
 > require a hand-rolled path-splitting induction over the vertex list of a
 > king walk?
 
-r3 (`results/triangle-r3-l3-proofscope.md` §4, §7) identified the
+r3 (`results/triangle-r3-l3-proofscope.md (deleted)` §4, §7) identified the
 partition-sufficiency induction as the load-bearing risk of the whole
 programme and could not calibrate it. The construction below claims the answer
 is the first: funnel every prefix cell to a representative in the cut column,

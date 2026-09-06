@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """r3_lift_snf_probe.py -- Coin Lift gate G2, in its well-posed form.
 
-docs/coin-lift-plan.md §2 G2 asks for "the Z/4 free rank" of the Hankel
+docs/coin-lift-plan.md (deleted) §2 G2 asks for "the Z/4 free rank" of the Hankel
 matrices and kills the program if it "jumps toward the mod-p curve".  As
 written that gate can never fire: the free rank over Z/4 -- the number of
 invariant factors that are units mod 4 -- counts the ODD invariant factors,

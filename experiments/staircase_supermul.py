@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""B1 of docs/sortie-publication-plan.md: staircase animals are supermultiplicative.
+"""B1 of docs/publication.md: staircase animals are supermultiplicative.
 
-results/hv-growth-sandwich.md Lemma 3 paid a factor (i+j) for the column-join,
+results/subclasses.md Lemma 3 paid a factor (i+j) for the column-join,
 because it recovered the pair (X, Y) from the join plus the index of X's last
 column. That index is not free information: column areas are positive, so the
 prefix of columns of total area exactly i is unique, and at FIXED (i, j) the

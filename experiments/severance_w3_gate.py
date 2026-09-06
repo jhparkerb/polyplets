@@ -1,4 +1,4 @@
-"""Fail-closed gate for Severance W3 (docs/onset-defect-severance-plan.md §3).
+"""Fail-closed gate for Severance W3 (docs/onset-defect-severance-plan.md (deleted) §3).
 
 The W3 deliverable is experiments/severance_w3_depths.py exposing
 

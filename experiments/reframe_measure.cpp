@@ -1,5 +1,5 @@
 // reframe_measure.cpp -- measure the frontier-zstd ratio-vs-frame-size curve
-// on a REAL frontier file (results/fanin-tax.md, Mirror Toll thread). Reads a
+// on a REAL frontier file (docs/engine-record.md, Mirror Toll thread). Reads a
 // POLYRUN file (plain or compressed) and rewrites it at each candidate frame
 // size, reporting bytes and bytes/record. The 1.83x whole-file measurement
 // does not survive tiny frames (~1.08x realized at 64 records on live a(39)

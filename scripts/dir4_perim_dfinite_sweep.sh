@@ -1,5 +1,5 @@
 #!/bin/bash
-# Phase 2b of docs/middle-kingdom-followups-plan.md: is the "area wild,
+# Phase 2b of results/subclasses.md: is the "area wild,
 # perimeter tame" D-finiteness lever robust to the dir4 restriction?
 #
 # Runs build/prec_guess over the (dir4, HV-convex)-by-semiperimeter series

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """r2 tower builder (triangle-structure round 2, agent 1): the mod-81 master
 equation made explicit, with G mod 81 -- one boundary-cluster level past the
-mod-27 equation of results/defect-gas.md.
+mod-27 equation of results/diagonal-formula.md.
 
 Prior art (credited, not re-claimed): experiments/spine_deeper.py check 1
 already holds the mod-81 H-equation numerically (2026-07-13). New here:

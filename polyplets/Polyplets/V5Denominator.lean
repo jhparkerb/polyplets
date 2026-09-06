@@ -8,7 +8,7 @@ import Polyplets.Pin
 /-!
 # V5Denominator: the 5-adic law of the production-polynomial denominators
 
-`results/v5-denominator-law.md` (2026-07-31): the minimal 5-adic valuation
+`results/arithmetic-structure.md` (2026-07-31): the minimal 5-adic valuation
 over the `k!`-basis numerator coefficients of `P_k` obeys
 
 > `chat k = v5(k!) - H k`,   `H k = v5((k/2)!)` for even `k`
@@ -35,7 +35,7 @@ at every pinned level and formalizes the `k = 11` obstruction:
 
 The general-`k` lower bound `chat k >= v5 (k!) - H k` (Newton/multinomial
 over the boundary series, from integer-valuedness + grand form + `P_1`)
-is paper-level in `results/v5-denominator-law.md`; formalizing it is a
+is paper-level in `results/arithmetic-structure.md`; formalizing it is a
 known open item, tracked in `PROOF-STATUS.md`.
 
 Data provenance: `polyplets/pin-data.md` == `Pin.lean` literals
@@ -265,7 +265,7 @@ theorem g1_seed : Pp1.eval 0 = -45 ∧ v5q (-45) = 1 := by
   · decide
 
 /-- `u₁ = P₁(1) - P₁(0) = 25`, with `v₅ = 2` — the order-2 vanishing of
-`Λ - 1` mod 5 that collapses the denominator (`results/v5-denominator-law.md`). -/
+`Λ - 1` mod 5 that collapses the denominator (`results/arithmetic-structure.md`). -/
 theorem u1_seed : Pp1.eval 1 - Pp1.eval 0 = 25 ∧ v5q 25 = 2 := by
   constructor
   · simp only [Pp1_data, prodPoly_eval]; norm_num [N1]

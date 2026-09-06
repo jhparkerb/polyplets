@@ -168,7 +168,7 @@ def multidirected(n, progress=None):
 A001003 = [1, 1, 3, 11, 45, 197, 903, 4279, 20793, 103049, 518859, 2646723]
 A047781 = [1, 4, 19, 96, 501, 2668, 14407, 78592, 432073, 2390004]
 
-# results/middle-kingdom-grid.md, ctrlB column (bottom-row-waived BFS), n=1..14.
+# results/subclasses.md, ctrlB column (bottom-row-waived BFS), n=1..14.
 # NOT multi-directed -- kept here so the two can be compared explicitly.
 CTRL_B = [1, 4, 20, 106, 576, 3179, 17736, 99748, 564430, 3209194,
           18316729, 104872413, 602013085, 3463412836]
@@ -242,7 +242,7 @@ def is_multidirected(A, check_keystones=True):
 
 
 def is_ctrl_b(A):
-    """'Control B' of results/directed-cone-anchor.md: forward flood seeded from
+    """'Control B' of results/subclasses.md: forward flood seeded from
     every cell of the GLOBAL bottom row."""
     ys = min(y for _, y in A)
     seeds = [(x, y) for x, y in A if y == ys]

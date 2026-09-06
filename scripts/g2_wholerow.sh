@@ -4,7 +4,7 @@
 # PURPOSE: independent whole-row confirmation of the polyplet count a(N)=A006770(N)
 #   (and, with --per-box, the h-resolved triangle T(N,w,h)). g2 is the standalone
 #   Redelmeier enumerator -- a different algorithm from the transfer-matrix engine --
-#   so a match is a two-algorithm confirmation. See docs/redelmeier-tall-plan.md sec.5.
+#   so a match is a two-algorithm confirmation. See docs/redelmeier-tall-plan.md (deleted) sec.5.
 #
 # Each worker enumerates a deterministic 1/K share of the size>=S subtrees (worker 0
 # also counts the size<S nodes); summing all workers elementwise == the unsplit run

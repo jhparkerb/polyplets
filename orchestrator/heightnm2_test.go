@@ -36,7 +36,7 @@ func TestHeightNm2Formula(t *testing.T) {
 		{22, 7, 1035856891052731}, // T(22,15)  (k=7, big.Int; pinned+validated by a(23))
 		{23, 7, 4492550651512074}, // T(23,16)
 		{24, 7, 19111727676683781}, // T(24,17)  (k=7, validated by a(24))
-		// k=8, big.Int; pinned by a(24)'s T(24,16) (results/k8-pinning.md,
+		// k=8, big.Int; pinned by a(24)'s T(24,16) (results/diagonal-formula.md,
 		// scripts/pin_diagonal_k8_final.py). Historically (a24/a25) only ever
 		// invoked at n=25, back when the dispatch guard required n>=3*8+1=25;
 		// the true validity threshold is n>=2*8+1=17 (applyPow3 handles the

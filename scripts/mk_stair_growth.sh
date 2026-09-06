@@ -1,12 +1,12 @@
 #!/bin/sh
-# Purpose: the numerical arm of results/hv-growth-sandwich.md. Generate the two
+# Purpose: the numerical arm of results/subclasses.md. Generate the two
 # new rungs of the growth sandwich
 #
 #     staircase  <=  (HV-convex, b nondecreasing)  <=  (dir4, HV-convex)  <=  HV-convex
 #
 # by area to n = 700, and measure their growth constants against the banked
-# 199-digit HV-convex mu (results/convex-polyplets.md). The proposition in
-# results/hv-growth-sandwich.md predicts all four constants are equal; this is
+# 199-digit HV-convex mu (results/subclasses.md). The proposition in
+# results/subclasses.md predicts all four constants are equal; this is
 # what would falsify it.
 #
 # Command:        scripts/mk_stair_growth.sh

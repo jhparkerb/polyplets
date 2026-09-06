@@ -12,7 +12,7 @@ set_option linter.style.longLine false
 /-!
 # Notary piece K, module 7: the transcribed solution satisfies the system
 
-Campaign *Notary*, piece **K** of `docs/notary-k-plan.md`, wave K-δ. The
+Campaign *Notary*, piece **K** of `docs/notary-k-plan.md (deleted)`, wave K-δ. The
 closed forms of the six walk unknowns, in pole-free transcription: per
 entry a shift `e`, a unit denominator `den*`, and a numerator series
 `num* = N₀ + N₁·A + N₂·B + N₃·A·B` with explicit integer-coefficient

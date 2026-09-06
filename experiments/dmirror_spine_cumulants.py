@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Does EACH spine family have a grand form? -- the second half of A1.3.
 
-`results/dmirror-grand-form-fails.md` established that the dmirror family as a
+`results/symmetry-classes.md` established that the dmirror family as a
 whole does not: every cumulant past the first is nonlinear in S, on both parity
 classes, and deg(c_j) = 2*floor(j/2) is the signature of exactly two families
 added together.  `experiments/dmirror_spine_split.py` then counted the two
@@ -80,7 +80,7 @@ def pin(points, k):
     The LOWEST degree that fits is used, not degree k.  A level of degree d
     needs d+1 points to pin and at least one more that it must then reproduce,
     and the measured degrees are below k on one of the two families
-    (`results/dmirror-spine-split.md`: d_main runs at floor(k/2)), so assuming
+    (`results/symmetry-classes.md`: d_main runs at floor(k/2)), so assuming
     degree k throws away levels the data can actually pin.  Degrees above k are
     never tried, because the diagonal structure bounds the level's degree by k.
 
@@ -168,7 +168,7 @@ def main():
     else:
         print("  At least one family is NOT of grand-form shape.  The")
         print("  two-spine sum is then not the whole obstruction, and")
-        print("  results/dmirror-grand-form-fails.md's diagnosis is incomplete.")
+        print("  results/symmetry-classes.md's diagnosis is incomplete.")
     return 0
 
 

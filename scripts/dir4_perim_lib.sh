@@ -25,7 +25,7 @@ NULL=build/dir4_perim_null199.txt
 SRC=results/convex_area_terms_n700_king.txt   # the null control's real source
 
 # The first 14 terms of HV-convex king animals by area
-# (docs/middle-kingdom-plan.md reference table). Same constant as
+# (results/subclasses.md reference table). Same constant as
 # tests/gate_dir4_perim_alg.py's KING14.
 KING14=1,4,16,61,221,766,2566,8390,26982,85834,271174,853111,2677214,8389720
 
@@ -36,7 +36,7 @@ KING14=1,4,16,61,221,766,2566,8390,26982,85834,271174,853111,2677214,8389720
 # stops the script rather than falling back to a previously cut file.
 cut_null_control() {
   [ -f "$SRC" ] || {
-    echo "missing null-control source $SRC (results/convex-polyplets.md)" >&2
+    echo "missing null-control source $SRC (results/subclasses.md)" >&2
     exit 1
   }
   local n got

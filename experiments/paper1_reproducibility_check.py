@@ -3,7 +3,7 @@
 
 `paper/technical-report.tex`'s Reproducibility section is empty, and
 `paper/technical-report-gaps.md` item 1 calls it the biggest hole. The material
-is spread over HANDOFF.md, results/strip-engine.md and results/ns_a40/. This
+is spread over HANDOFF.md, results/second-sources.md and results/ns_a40/. This
 script recomputes it from the banked artifacts rather than copying it forward,
 so the section can be written against checked numbers.
 
@@ -18,7 +18,7 @@ the campaign:
   C. Redelmeier's independent enumeration agrees on a(1)..a(22)
      (results/redelmeier_row22/combined.txt)
   D. the strip engine's coverage arithmetic: 820 cells, 469 swept, and the
-     doc-style / honest figures of results/strip-engine.md
+     doc-style / honest figures of results/second-sources.md
   E. per row n = 29..40, how many CELLS were really swept (H <= 21), how
      many are wired closed forms whose level is pinned by real data alone
      (k <= 10: a level k has the k+1 real in-onset points it needs iff
@@ -61,7 +61,7 @@ TERMS = os.path.join(ROOT, "results", "b006770_upload.txt")
 REDELMEIER = os.path.join(ROOT, "results", "redelmeier_row22", "combined.txt")
 NMAX = 40
 
-# results/diagonal-closed-forms.md and docs/proofs/T-n-nm1.md,
+# results/diagonal-formula.md and docs/proofs/T-n-nm1.md,
 # T-n-nm2-and-general.md. Each is (k, onset n, callable).
 DIAGONALS = [
     (0, 1, lambda n: 3 ** (n - 1)),
@@ -166,7 +166,7 @@ def main():
           f"honest {len(honest)} = {100 * len(honest) / len(cells):.1f}%; "
           f"doc-style {len(doc)} = {100 * len(doc) / len(cells):.1f}%")
     assert (len(cells), len(S), len(honest), len(doc)) == (820, 469, 592, 782), \
-        "coverage arithmetic no longer reproduces results/strip-engine.md"
+        "coverage arithmetic no longer reproduces results/second-sources.md"
 
     # E. cells per row by how they were produced.  H <= SWEEP_H was really
     # swept in the a(40) run; above it every cell is a wired closed form P_k,

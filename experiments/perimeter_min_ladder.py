@@ -16,7 +16,7 @@ are not mirror images:
     is the isoperimetric maximum area at perimeter p.
 
 pmin is not fitted here.  It is taken from the closed forms already banked in
-`results/min-site-perimeter.md`, both of them published OEIS results:
+`results/perimeter.md`, both of them published OEIS results:
 
     square4 (rook adjacency):  A261491, pmin(n) = ceil(2 + sqrt(8n-4))
     square8 (king adjacency):  A235382, pmin(n) = 2*ceil(2*sqrt(n)) + 4
@@ -35,8 +35,8 @@ that exists).
     python3 experiments/perimeter_min_ladder.py results/siteperim_square4_n20.txt --lattice square4
     python3 experiments/perimeter_min_ladder.py results/siteperim_square8_n14.txt --lattice square8
 
-docs/perimeter-defect-plan.md; the max-end companion is
-results/perimeter-defect-diagonals.md.
+docs/perimeter-defect-plan.md (deleted); the max-end companion is
+results/perimeter.md.
 """
 
 from __future__ import annotations

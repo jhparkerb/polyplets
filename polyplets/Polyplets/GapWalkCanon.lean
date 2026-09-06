@@ -8,7 +8,7 @@ import Polyplets.GapWalk
 /-!
 # Notary piece T, module 2: the walk as an iterated state function
 
-Campaign *Notary*, piece **T** of `docs/notary-kernel-scoping.md` — truncation
+Campaign *Notary*, piece **T** of `docs/notary-kernel-scoping.md (deleted)` — truncation
 exactness. `GapWalk.lean` runs the DP on association lists aligned with
 `states gmax`; comparing two caps on that representation is painful. This
 module rewrites the walk as iteration of a *function* `St → ℕ`:

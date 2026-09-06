@@ -3,7 +3,7 @@
 
 n = 2H  <=>  k = n-H = H  <=>  x = H/k = 1.  The diagonal law's proved region is
 n >= 2k+1, i.e. H >= k+1, so EVERY slope-2 cell sits one step below onset (depth
-j = 2k+1-n = 1).  results/diagonal-law-below-onset.md measures the relative
+j = 2k+1-n = 1).  results/below-onset.md measures the relative
 defect there as exp(-|g(1)| k) with |g(1)| ~ 1.3.
 
 Three things checked, all exact where exactness is possible:

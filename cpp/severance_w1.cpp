@@ -1,5 +1,5 @@
 // Cluster-weight row-transfer DP -- C++ port of experiments/cluster_weight_dp.py
-// (Severance W1, docs/onset-defect-severance-plan.md section 3).
+// (Severance W1, docs/onset-defect-severance-plan.md (deleted) section 3).
 //
 // Purpose: the ab-initio cluster weights (interior, boundary_bottom,
 // boundary_top, pure) for every composition at levels k = 1..K, where a

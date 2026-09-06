@@ -10,7 +10,7 @@ import Polyplets.StairAnimals
 # `µ`: the staircase king animals have a growth constant
 
 `StairAnimals.lean` proves the combinatorial core of
-`results/hv-growth-sandwich.md` Lemma 3 — the column-join stays in the class and
+`results/subclasses.md` Lemma 3 — the column-join stays in the class and
 is injective once both areas are fixed. This file is the counting layer on top
 of it, and the Fekete step:
 
@@ -199,7 +199,7 @@ theorem M_le_pow (n : ℕ) : M n ≤ 4 ^ n := by
     _ ≤ (0 + 1) * 4 ^ n := card_cand n 0
     _ = 4 ^ n := by ring
 
-/-- **Lemma 3** (`results/hv-growth-sandwich.md`): the staircase count is
+/-- **Lemma 3** (`results/subclasses.md`): the staircase count is
 supermultiplicative, on the nose and with no factor. `StairAnimals.lean`'s
 `join_valid` says the join lands in the class and `join_injOn` says the pair is
 recovered from the join alone once both areas are fixed; this is those two read
@@ -236,7 +236,7 @@ noncomputable def stairFekete : Fekete where
   ceiling := fun k => by exact_mod_cast M_le_pow k
 
 /-- **The staircase growth constant** `µ = lim M(n)^{1/n}`. The measured value is
-`3.128943269730886…` (`results/hv-growth-sandwich.md`); what is proved here is
+`3.128943269730886…` (`results/subclasses.md`); what is proved here is
 that the limit exists, plus the two-sided bracket below. -/
 noncomputable def mu : ℝ := stairFekete.growth
 

@@ -15,7 +15,7 @@ Implemented (exact statements from the cited files):
    returns None there. (Using banked cells is fine HERE: this is the cull
    baseline, not a candidate.)
 
-2. Ternary spine mod 3 (results/ternary-spine.md):
+2. Ternary spine mod 3 (results/arithmetic-structure.md):
    The full mod-3 value of every in-regime cell. With k = n-H:
      * T4 activation: T(n,H) == 0 (mod 3) for n < floor(3H/2)  [column reading]
      * in-regime (n >= 2k+1) with exponent e = n-1-3k >= 1: T == 0 (mod 3)
@@ -116,7 +116,7 @@ def _spine_W(deg):
 
 
 class TernarySpineMod3:
-    name = "ternary-spine mod 3 (results/ternary-spine.md)"
+    name = "ternary-spine mod 3 (results/arithmetic-structure.md)"
 
     def __init__(self):
         self._W = _spine_W(NMAX)
@@ -214,7 +214,7 @@ def _polymul(a, b):
 
 class ColumnCFinite:
     """Pinned constant-coefficient column recurrences for H <= 4
-    (results/triangle-structure.md sections 1-2). Atoms (measured minimal
+    (results/diagonal-formula.md sections 1-2). Atoms (measured minimal
     char polys, coefficients descending):
         q_1 = x - 1
         q_2 = x^2 - 2x - 1
@@ -237,7 +237,7 @@ class ColumnCFinite:
     --selftest). A candidate restating it scores zero by definition.
     """
 
-    name = "column C-finite H<=4 (results/triangle-structure.md sections 1-2)"
+    name = "column C-finite H<=4 (results/diagonal-formula.md sections 1-2)"
 
     Q = {
         1: [1, -1],

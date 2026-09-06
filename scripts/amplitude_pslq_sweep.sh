@@ -1,7 +1,7 @@
 #!/bin/bash
 # Enlarged PSLQ sweep for the (dir4, HV-convex)/HV-convex amplitude ratio.
 #
-# Purpose: docs/middle-kingdom-followups-plan.md Table B excluded integer
+# Purpose: results/subclasses.md Table B excluded integer
 # relations at 54 trusted digits.  experiments/amplitude_feed_vectors.py raised
 # the trusted count, and PSLQ box size scales with digits, so every box Table B
 # could afford is now enlarged by the same capacity rule

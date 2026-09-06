@@ -6,7 +6,7 @@ never reaches GATE_TARGETS is a check `make gates` does not run, which is the
 meta-version of the failure two of this week's commits fixed." It then asks for
 a lint with an allowlist for the deliberate exclusions. This is that lint.
 
-It was written after successor row S-A5 (results/undertow-review-queue.md)
+It was written after successor row S-A5 (results/undertow-review-queue.md (deleted))
 found FOUR unwired gates at once -- the whole Severance family -- three of
 which had no reason to be out beyond nobody having wired them. A green suite
 that silently skips four real checks is worse than a red one.

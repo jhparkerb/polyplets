@@ -1,6 +1,6 @@
 #!/bin/bash
 # Ghost Ship session launcher -- cron: 0 4,12,20 * * * (dalby, EDT).
-# Protocol: docs/ghostship-preregistration.md (repo; NOT in the sandbox).
+# Protocol: docs/ghostship-preregistration.md (deleted) (repo; NOT in the sandbox).
 set -u
 BASE="$HOME/var/ghostship"
 cd "$BASE" || exit 1

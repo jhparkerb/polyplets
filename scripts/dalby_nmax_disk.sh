@@ -1,7 +1,7 @@
 #!/bin/bash
 # How does a FIXED-height sweep's DISK footprint grow in Nmax?
 #
-# WHY.  docs/five-terms-plan.md prices the Nmax-45 sweep's disk peak at ~580 GB
+# WHY.  docs/five-terms-plan.md (deleted) prices the Nmax-45 sweep's disk peak at ~580 GB
 # by taking the MEASURED CPU factor for Nmax 40->45 (1.442x at H=14, 1.466x at
 # H=15, from results/nmax-scaling.txt) and applying it to the a(40) run's
 # measured 363.4 GB disk peak.  Disk is not CPU, and nothing has ever checked

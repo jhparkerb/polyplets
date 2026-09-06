@@ -1,4 +1,4 @@
-// Fan-In Tax (results/fanin-tax.md): every map unit opened EVERY input range
+// Fan-In Tax (docs/engine-record.md): every map unit opened EVERY input range
 // file of the prior round (~80 files x ~640 units x ~0.45ms of header+idx+
 // buffer setup per open = ~50k opens/round), measured as ~75% of all worker
 // CPU on the dalby H15/maxn30 bench -- drowning the real transition work.

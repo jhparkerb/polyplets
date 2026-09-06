@@ -35,7 +35,7 @@ Everything is easiest in the diagonal coordinates `u = x + y`, `v = x − y`
 * Taking `a + b = n − 2` as equal as possible gives the extremal areas.
 
 This is the family of `experiments/maxhole_box_construction.py`, adapted;
-see `results/maxhole-proof.md`. Note that `hullBox \ boxHole` has `a + b + 2`
+see `results/subclasses.md`. Note that `hullBox \ boxHole` has `a + b + 2`
 cells for *all* `a, b`, whereas the python 4-neighbour ring has only
 `a + b + 1` at every `min(a,b) = 1` with `max(a,b)` even (measured for all
 `a, b ≤ 12`, `experiments/maxhole_review_checks.py`); at `(2,1)` the frame

@@ -1,4 +1,4 @@
-"""Fail-closed gate for Severance W1 (docs/onset-defect-severance-plan.md §3).
+"""Fail-closed gate for Severance W1 (docs/onset-defect-severance-plan.md (deleted) §3).
 
 Checks the C++ cluster-weight port (build/severance_w1) against:
   A. the banked per-composition KNOWN_WEIGHTS, k <= 5, exactly;

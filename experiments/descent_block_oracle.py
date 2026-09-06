@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Independent re-derivation of the 4-cone-truncated (0,1) descent block.
 
-Written to CHECK results/hv-growth-sandwich.md's block series without reusing
+Written to CHECK results/subclasses.md's block series without reusing
 experiments/dir4_descent_block.py's recursion.  The block is defined here from
 the geometry, not from a height kernel:
 
@@ -167,7 +167,7 @@ def brute_hvdir4(nmax):
 def brute_hv_mirror(nmax):
     """UNRESTRICTED HV-convex animals, split by which middle phase they visit.
 
-    results/hv-growth-sandwich.md's feed-vector identity for the amplitude
+    results/subclasses.md's feed-vector identity for the amplitude
     ratio turns on C_HV = 2 C(A_(1,0)), which follows from the vertical mirror
     [b,t] -> [-t,-b]: it preserves area and every column height, and swaps the
     phase bits (pb,pt) -> (pt,pb), so it is an involution carrying the

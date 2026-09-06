@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Re-verify every fixture against OEIS, over the network. NOT a gate.
 
-`results/gate-class-sweep.md` finding F5: `fixtures/` is protected by
+`docs/engine-record.md` finding F5: `fixtures/` is protected by
 `SHA256SUMS`, and `tests/gate_g1.py` checks it before doing anything else --
 corrupting `fixtures/b006770.txt` by 1 turns gate-g1, gate-g2 and gate-sym red.
 But SHA256SUMS is itself regenerable, so the pinning is against ACCIDENT and not

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """The Sykes-Essam matching relation, tested to the order the repo can reach.
 
-`docs/last-orders.md` C1.2 asked whether the perimeter-defect campaign's
+`docs/last-orders.md (deleted)` C1.2 asked whether the perimeter-defect campaign's
 square-lattice series supply the perimeter-graded enumeration that
-`results/matching-pair-convention.md` names as idea 2's real cost.  This
+`results/closed-doors.md` names as idea 2's real cost.  This
 script answers that by doing the arithmetic rather than arguing it, and by
 verifying the relation as far as brute force reaches.
 
@@ -173,7 +173,7 @@ def red_controls(rook_levels, king_levels):
     ok &= good
 
     # The convention control: pair king CONNECTIVITY with rook PERIMETER --
-    # the reading results/matching-pair-convention.md corrected -- and the
+    # the reading results/closed-doors.md corrected -- and the
     # relation must FAIL.  Without this the test cannot tell a right
     # convention from a wrong one.
     N = 4

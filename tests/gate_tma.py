@@ -233,7 +233,7 @@ def main():
     gate.check(fold_oh == base_oh,
           f"M fold only-h  square8 n<={depth_m} H{H_m} --fold MT == unfolded")
 
-    # N. standing smoke fixture (docs/frontier/harness-spec.md Part 1): a FIXED,
+    # N. standing smoke fixture (docs/frontier/harness-spec.md (deleted) Part 1): a FIXED,
     #    off-frontier (N,H) that runs in well under a minute on one core -- the
     #    dead-on-arrival check every engine-swap idea's `## Smoke test` cites. The
     #    dense FlatDB baseline (build/tma now) is the byte oracle; a backend swap

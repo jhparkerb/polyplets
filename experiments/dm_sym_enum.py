@@ -4,7 +4,7 @@
 Grows connected sets by symmetric orbits {(x,y),(y,x)}, canonicalizes by
 diagonal translation, classifies by (S, n) with box exactly SxS. Validated
 against the banked dm diagonal law (d(S,S)=2; d(S,S+1)=S+6/S+7; the k=2
-quadratics) for S <= 10. Ground truth for results/dm-diagonal-recon.md.
+quadratics) for S <= 10. Ground truth for results/symmetry-classes.md.
 """
 from collections import deque, defaultdict
 
