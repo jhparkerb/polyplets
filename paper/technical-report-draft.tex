@@ -29,8 +29,6 @@
 \begin{document}
 \maketitle
 
-\firstdraftbanner
-
 \Ldisclosure{%
 \emph{$a(1)$--$a(18)$} --- equal the OEIS terms for A006770, reproduced by both
 enumeration programs (\repo{make gate-bfiles}).
@@ -59,7 +57,9 @@ exhaustive enumeration for $n \le 8$, the formulas on every computed entry.
 \emph{Symmetry tables} --- fixed-point counts by two programs, combined by
 Burnside's lemma, checked mod $8$ for $n \le 32$ (\repo{results/sym\_counts.txt}).
 \emph{Growth rate} --- the lower bound is proved below.
-\emph{Human verification of this document} --- none.}
+\emph{Human verification of this document} --- read in full and approved for
+release by its named author on 2026-09-06; he did not independently re-derive
+the mathematics.}
 
 \begin{abstract}
 The king-lattice polyplet sequence \oeis{A006770} has been expanded through
@@ -585,8 +585,8 @@ range. The nineteen lowest entries agree with the coloring program, which has
 not been run at height $20$. Before height $20$ was enumerated, $P_{21}$
 predicted $T(41,20)$; the enumeration returned exactly that value,
 $T(41,20) = \num{18004779862205054677763902712770}$, and $a(41)$ no longer
-needs $P_{21}$ (\repo{make gate-undertow-pairs}). Heights $21$--$41$ remain
-formula.
+needs $P_{21}$ (\repo{make gate-undertow-pairs}). Heights $21$--$41$ are
+still given by the closed forms, not enumerated.
 
 \paragraph{Checks that run in minutes} The repository holds every stored
 number beside the run record that produced it, and checks a reader can run
