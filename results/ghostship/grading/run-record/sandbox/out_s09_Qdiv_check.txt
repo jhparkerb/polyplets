@@ -1,4 +1,0 @@
-s09 post-check: fitted slice numerators Q_r(y) from out_s09_slice_PQ.json
-vanish at BOTH roots y=1/4 and y=9/4 of Delta(1/4,y) for r=1..8, both
-modes, both primes => Delta_x | Q_r on the slice (consistent with the
-global conjecture Delta | B_r, r>=1).  Result: True

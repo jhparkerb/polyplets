@@ -1,6 +1,0 @@
-A_1(q): [y^1] of q-Temperley F(1,y,q) vs s01 banked rational form, 15 coefficients: OK
-A_2(q): [y^2] of q-Temperley F(1,y,q) vs s01 banked rational form, 15 coefficients: OK
-A_3(q): [y^3] of q-Temperley F(1,y,q) vs s01 banked rational form, 15 coefficients: OK
-A_4(q): [y^4] of q-Temperley F(1,y,q) vs s01 banked rational form, 15 coefficients: OK
-
-fixed-height slices of the q-solution match s01's rational A_H(q); rationality/cyclotomic denominators now have a mechanism (finite y-iteration of the explicit q-series).

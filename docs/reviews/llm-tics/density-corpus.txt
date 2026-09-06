@@ -1,6 +1,0 @@
-corpus: 64 English papers, 807718 words
-    median      0.07/1k     0.00/1k     0.00/1k     0.00/1k     0.00/1k     0.47/1k
-       p75      0.19/1k     0.00/1k     0.00/1k     0.00/1k     0.13/1k     0.72/1k
-       p90      0.31/1k     0.13/1k     0.19/1k     0.22/1k     0.17/1k     0.94/1k
-       max      1.27/1k     0.23/1k     0.66/1k     3.30/1k     0.37/1k     1.90/1k
-   markers: contrast-neg  cleft  serves-as  dash-aside  scaffold  punch

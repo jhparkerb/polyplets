@@ -143,3 +143,14 @@ the shape of the thing.
 - [JP] The viva experience: did the self-certification bar work?
 - [JP] Cost/benefit of the hardware-months and the AI collaboration.
 - [JP] Anything the assistant's account above gets wrong or misses.
+
+
+## The Offside and process-design campaigns (closed, 2026-09-06)
+
+Two rounds designed a replacement for the ad-hoc session state, Offside
+(`results/offside/`, six lanes and a queue, 2026-08) and the process proposal
+(`docs/process-proposal.md`, `docs/state-minimal.md`, `docs/offside-brief.md`,
+`docs/offside-design.md`). The candidate was banked 2026-08-14 and never
+adopted: `HANDOFF.md` remained the live state and worked. The records were
+deleted with their history in the consolidation of 2026-09-06; read them with
+`git show e5e7870:<path>`.

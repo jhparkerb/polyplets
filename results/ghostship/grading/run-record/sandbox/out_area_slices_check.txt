@@ -1,8 +1,0 @@
-sum_H A_H coeffs n=1..12: [1, 4, 16, 61, 221, 766, 2566, 8390, 26982, 85834, 271174, 853111]
-banked area seq        : [1, 4, 16, 61, 221, 766, 2566, 8390, 26982, 85834, 271174, 853111]
-MATCH
-D4 multiplicity of (1-q): 7
-D4 multiplicity of (1+q): 1
-D4 multiplicity of (1+q+q^2): 2
-D4 multiplicity of (1+q^2): 1
-D4 residual: [Fraction(1, 1)]

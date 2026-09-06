@@ -63,6 +63,22 @@ re-recovery. **Consolidation of the 459 markdown files**: theme map (21 themes �
 kept as appendices or deleted-with-history; closed campaigns first or
 mathematics first).
 
+## 2026-09-06 — repo PUBLIC; report approved; L papers under his standards; consolidation wave 1
+
+- `github.com/jhparkerb/polyplets` made public 05:42 UTC at jasonp's word
+  ("draft good. publish."). No credentials in tracked files; `papers/`,
+  `docs/viva-*.md`, `docs/drill*.md`, `runs/`, `build/` ignored. **No contact
+  with the OEIS, at his explicit instruction.**
+- `paper/technical-report-draft.tex` approved by him after two review rounds;
+  banner removed, ledger records the read (e5e7870). Ten pages.
+- All six L papers under his standards (94fe9bb): vocabulary, American
+  spelling, L8 rewritten under the rulebook and its facts updated for the
+  height-20 enumeration; L5 and L6 retitled under rule 10.
+- Consolidation wave 1: 443 tracked files deleted with history (see
+  `docs/consolidation-plan.md`; read any of them with `git show e5e7870:<path>`).
+  Decided 2026-09-05: closed campaigns first, raw records deleted, conclusions
+  in the theme file. Wave 2 is the mathematics and the 43 files code still cites.
+
 ## 2026-09-05 late — the machine-written report, and the evening's checks
 
 - `paper/technical-report-draft.tex` (**category L**, `\Ldisclosure` + draft

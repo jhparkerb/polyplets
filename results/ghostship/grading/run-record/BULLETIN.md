@@ -1,1 +1,0 @@
-(no operator notes yet)

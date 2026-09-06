@@ -1,5 +1,0 @@
-b(s) = 2a(s)+a(s-1) = (18s+49)*4^(s-5) - (9n^2-3n-1)/(2n-1)*C(2n,n),  n=s-3
-checked s=5..199 against 200-term series: ALL MATCH
-
-classical Delest-Viennot: p(n+2) = (2n+11)4^n - 4(2n+1)C(2n,n)  [convex polyominoes, semiperim n+2]
-king analog (s>=5):  2a(s)+a(s-1) = (18s+49)4^(s-5) - (9n^2-3n-1)/(2n-1) C(2n,n), n=s-3

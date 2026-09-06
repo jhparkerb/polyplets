@@ -1,7 +1,0 @@
-king: check1 brute-force per-area, 38 boxes wh<=16: OK
-king: check2 sum_n f(w,h;n) == f(w,h) all w,h<=10: OK
-king: check3 area marginal n<=10 vs banked: OK
-poly: check1 brute-force per-area, 38 boxes wh<=16: OK
-poly: check2 sum_n f(w,h;n) == f(w,h) all w,h<=10: OK
-poly: check3 area marginal n<=10 vs banked: OK
-joint truth table (w,h<=10, all areas, both modes) -> out_s04_area_truth.json

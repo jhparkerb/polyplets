@@ -45,13 +45,13 @@ certificate), `docs/proofs/convex-mirage.md`, `docs/proofs/T-n-nm1.md`,
 | `docs/acceptance-queue.md` | **the live worklist** — what makes a(21)–a(40) defensible |
 | `docs/publication-strategy-2026-08-18.md` | current strategy: the repo is the publication |
 | `docs/publication-split.md` | P papers vs L papers, the disclosure blocks, the OEIS lineup |
+| `docs/consolidation-plan.md` | the 2026-09 consolidation: theme map, and the ledger of deleted records with the commit they are readable at |
 | `docs/sortie-publication-plan.md` | the earlier plan; its §3–§5 still stand |
 | `docs/provenance-tables.md` | the per-paper warrant tables |
 | `docs/reviewer-expertise-tiers.md` | what expertise each claim needs to assess |
 | `docs/external-anchors.md` | what this machinery reproduces that it did not produce |
 | `docs/paper1-engine-chapter.md`, `docs/paper1-reproducibility.md` | source material for P1 |
 | `docs/prove2me-note.md` | 2026-09-04 note on Anthropic's Lean FLT tooling: take the architecture, do not join the platform, do not start the formalization yet |
-| `docs/unattended-2026-09-05.md` | the unattended-work menu proposed 2026-09-05 for a several-hour absence; disposition recorded in the file |
 | `docs/undertow-chapter.md` | source material for the Undertow material, which became L10 on 2026-08-22 and was **merged into `paper/L8-below-onset.tex` on 08-23**; `docs/l-corpus-contraction.md` |
 | `docs/l-paper-currency.md` | what each L paper would need to absorb; **superseded 2026-08-23** by `docs/l-corpus-contraction.md`, which merged four of the nine it describes |
 | `docs/main-paper-audit-2026-08-18.md` | findings on `paper/technical-report.tex`, unapplied by design |

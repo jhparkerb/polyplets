@@ -1,4 +1,0 @@
-h=2: deg 2 poly in w: ['-1', '0', '2'] | valid w>=2..38: ALL OK | w=1 value: 1 poly(1)= 1
-h=3: deg 4 poly in w: ['2', '-13/6', '-1/2', '2/3', '1'] | valid w>=2..38: ALL OK | w=1 value: 1 poly(1)= 1
-h=4: deg 6 poly in w: ['-2', '49/15', '-29/180', '-4/3', '17/36', '17/30', '17/90'] | valid w>=2..38: ALL OK | w=1 value: 1 poly(1)= 1
-h=5: deg 8 poly in w: ['2', '-1583/420', '4379/2520', '173/180', '-11/18', '8/45', '16/45', '41/315', '1/56'] | valid w>=2..38: ALL OK | w=1 value: 1 poly(1)= 1

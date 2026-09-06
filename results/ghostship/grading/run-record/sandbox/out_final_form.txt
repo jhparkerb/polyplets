@@ -1,5 +1,0 @@
-R = Q/(1-4t) = [Fraction(2, 1), Fraction(-10, 1), Fraction(14, 1), Fraction(-5, 1), Fraction(-4, 1)] rem []
-R(1/4) = 9/32
-leading: a(s) ~ c2 * (s+1) * 4^s with c2 = 1/128 = 0.0078125
-s=199: c2*(s+1)*4^s / a(s) = 1.17492886538808
-(approx - rad)/act = 0.987554490507544

@@ -1,6 +1,0 @@
-Delta = [0, 0, 0, 0, 0, 0, 4, -48, 96, 768, -2496, -5376, 18432, 24576, -49152, -65536]
-gcd(D,D') = [Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(1, 2048), Fraction(-5, 1024), Fraction(3, 512), Fraction(17, 256), Fraction(-1, 8), Fraction(-3, 8), Fraction(1, 2), Fraction(1, 1)]
-D / g^2 = [Fraction(0, 1)] rem [Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(4, 1), Fraction(-48, 1), Fraction(96, 1), Fraction(768, 1), Fraction(-2496, 1), Fraction(-5376, 1), Fraction(18432, 1), Fraction(24576, 1), Fraction(-49152, 1), Fraction(-65536, 1)]
-P2/(1-4t) = [Fraction(2, 1), Fraction(-23, 1), Fraction(84, 1), Fraction(-80, 1), Fraction(-64, 1)] rem []
-P2/(1-4t)^2 = [Fraction(2, 1), Fraction(-15, 1), Fraction(24, 1), Fraction(16, 1)] rem []
-P2/(1-4t)^2/(1+2t) = [Fraction(-23, 2), Fraction(8, 1), Fraction(8, 1)] rem [Fraction(27, 2)]

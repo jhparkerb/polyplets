@@ -156,3 +156,14 @@ The base has moved twice on record — kink carry 4.4 → ~2.5, and Barequet–B
 56 → 70 terms — both by pricing a design choice nobody had priced. The proven
 Motzkin exponent of the straight-cut vocabulary has never moved, on any lattice,
 by anyone. Parity means matching it, not breaking it.
+
+
+## Closed, 2026-09-06 (consolidation wave 1)
+
+Round 1 ran 2026-08-16..17 and closed the goal as not well-formed: the rook
+Hankel ranks at small $H$ gave $b = 1.7266$, and both the $P_k$-tower route and
+the transport route were shown dead by the adversary lanes. The round's
+working records, `results/rook1/` (eight files), `docs/rook1-brief.md`,
+`docs/rook-parity-bar.md` and `docs/rook-parity-team-process.md`, were deleted
+with their history in the consolidation of 2026-09-06; read them with
+`git show e5e7870:<path>`. This file is the record.

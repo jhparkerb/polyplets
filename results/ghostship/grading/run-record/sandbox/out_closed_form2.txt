@@ -1,7 +1,0 @@
-inner: [Fraction(1, 1), Fraction(-12, 1), Fraction(24, 1), Fraction(192, 1), Fraction(-624, 1), Fraction(-1344, 1), Fraction(4608, 1), Fraction(6144, 1), Fraction(-12288, 1), Fraction(-16384, 1)]
-inner/(1-2t-8t^2)^3 = [Fraction(1, 1), Fraction(-6, 1), Fraction(0, 1), Fraction(32, 1)] rem []
-inner/K = [Fraction(1, 1), Fraction(-10, 1), Fraction(12, 1), Fraction(136, 1), Fraction(-256, 1), Fraction(-768, 1), Fraction(1024, 1), Fraction(2048, 1)] rem []
-inner/K^2 = [Fraction(1, 1), Fraction(-8, 1), Fraction(4, 1), Fraction(80, 1), Fraction(-64, 1), Fraction(-256, 1)] rem []
-inner/K^3 = [Fraction(1, 1), Fraction(-6, 1), Fraction(0, 1), Fraction(32, 1)] rem []
-multiplicity of (1-4t) in inner: 5; cofactor after removing: [Fraction(1, 1), Fraction(8, 1), Fraction(24, 1), Fraction(32, 1), Fraction(16, 1)]
-multiplicity of (1+2t) in inner: 4; cofactor after removing: [Fraction(1, 1), Fraction(-20, 1), Fraction(160, 1), Fraction(-640, 1), Fraction(1280, 1), Fraction(-1024, 1)]

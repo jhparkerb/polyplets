@@ -1,4 +1,0 @@
-KING: functional equation matches DP on ALL f(w,h), w<=12, h<=12  OK
-   sample f(5,5)=23020 f(12,12)=8866240197368
-POLYOMINO(control): functional equation matches DP on ALL f(w,h), w<=12, h<=12  OK
-   sample f(5,5)=19010 f(12,12)=8202665891316

@@ -1,3 +1,0 @@
-A153337 closed form c_h = h*4^(h-1) - 2(h-1)*C(2h-2,h-1) matches all 18 N_h(1) values
-N_{2k}(-1) = (-1)^(k+1) * 4 * N_k(1) verified k=1..9
-N_{2k+1}(-1) = (-1)^k (2k+1) 4^k verified k=1..8
