@@ -101,8 +101,9 @@ Not started.
 `paper/verify_claims.py` go together, with the coverage-audit entry, the
 clean-clone step and the README lines that name them; that is a code change
 across `tests/` and `scripts/` and is its own commit. Raised by an outside
-reader on 2026-09-06 and deferred to jasonp: a visible CI run of the fast gate
-subset; splitting the closed-form injection out of `orchestrator/sweep.go`
+reader on 2026-09-06 and deferred to jasonp (a CI run of the gates was
+proposed and declined, 2026-09-06; the pre-push hook is the gate): splitting
+the closed-form injection out of `orchestrator/sweep.go`
 into its own package; the module name `polyominoes` in `go.mod`; `test/`
 beside `tests/`; the author's name differing between `README.md` and the
 paper. The mathematics half consolidates the diagonal-formula,
