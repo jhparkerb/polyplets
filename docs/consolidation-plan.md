@@ -95,6 +95,53 @@ Untouched by design: the per-term records (`results/ns_a*/`, `results/a41/`,
 
 Not started.
 
+## Lane brief for wave 2b (2026-09-06, the lead's text; agents execute it)
+
+**Mission.** Write one survivor file from its sources, for a reader of the
+public repository, losing no result. The sources are then deleted with their
+history by the lead.
+
+**Keep, verbatim where it is exact:** every theorem and proposition
+statement; every measured number with what measured it (script path, run
+date, machine) and its grade (proved, certified, measured, conjectured);
+every closed door with the obstruction that closed it; every open problem;
+every table of values a paper or test cites. **Drop:** process narrative,
+status updates whose only content is when something happened, repeated
+definitions, chat-like framing, apologies, importance-talk, transitions
+that only announce a turn, anything addressed to an earlier reader of the
+file rather than to a reader of the result.
+
+**Prose standard (jasonp's, binding):** American spelling; define before
+asserting; no insider words (sweep, swept, wire, wired, tower, banked, pin,
+pinned, onset unless defined at first use, holdout, RED, rung, ladder except
+the strip ladder μ_H, kernel except as an artifact name, incumbent, second
+source); "entry" for a value of the triangle, "cell" only for a lattice
+cell; no "byte for byte" or "digit for digit"; one idea per sentence; a
+number goes in a table or on its own line; no aphoristic closers.
+
+**Citations.** Cite only paths that exist in the tree after the merge: the
+survivors named in the map, `docs/proofs/`, `results/ns_a*/`, `results/a41/`,
+`results/cutcount_b1/`, `experiments/`, `scripts/`, `tests/`, `paper/`,
+`polyplets/`, data files under `results/`. Do not cite a source file that is
+being folded; instead end the survivor with a section `## Sources` listing
+each folded file on its own line with the word "deleted" on that line, e.g.
+`- \`results/foo.md\` (deleted 2026-09-06; its content is above)`. That
+wording is what the citation gate exempts.
+
+**Structure.** Title; a paragraph saying what the theme's results are and
+their grades; sections by topic, not by source file; `## Open problems`;
+`## Reproduce` (the commands and scripts that recompute the numbers, taken
+from the sources); `## Sources`. Length: as short as fidelity allows, and
+not more than about two fifths of the sources' total.
+
+**Conduct.** Read-only in the repository. No jobs, no builds, no `lake`,
+nothing under `timeout`; a Python one-liner to check an arithmetic identity
+in a source is fine. Write the survivor to the scratch path the lead gives,
+not into the tree. If a source contradicts another, keep both statements
+and say which is later and which the record now holds; do not adjudicate.
+Report, in the final message, only: the scratch path, the length ratio,
+any contradiction between sources, and any number you could not attribute.
+
 ## Wave 3 — the superseded manuscript, and what a public reader flagged
 
 `paper/polyplets-report.tex` (1,122 lines, superseded 2026-08) and its checker
