@@ -1,8 +1,0 @@
-hmirror H=15: 2871 reachable states, 586491 edges, 255 seeds, BFS 4.1s
-hmirror H=15: exact dp vs banked symtm, n=1..32: 0 mismatches
-hmirror H=15: N=512 -> BM orders p1:256 p2:256 (0s)
-hmirror H=15: N=1024 -> BM orders p1:512 p2:512 (1s)
-hmirror H=15: N=2048 -> BM orders p1:1024 p2:1024 (1s)
-hmirror H=15: N=4096 -> BM orders p1:2048 p2:2048 (3s)
-hmirror H=15: N=8192 -> BM orders p1:2656 p2:2656 (5s)
-hmirror H=15: MINIMAL ORDER 2656 (two primes agree, N=8192 >= 2r+64; 2871 states)

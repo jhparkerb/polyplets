@@ -1,9 +1,0 @@
-hmirror N=12 wall=0.03s Fix(N)=14192 cells=78 mismatches=0 ratio_vs_prev=nan
-hmirror N=14 wall=0.14s Fix(N)=92180 cells=105 mismatches=0 ratio_vs_prev=4.402
-hmirror N=16 wall=1.20s Fix(N)=605076 cells=136 mismatches=0 ratio_vs_prev=8.476
-hmirror N=18 wall=7.49s Fix(N)=4004454 cells=171 mismatches=0 ratio_vs_prev=6.259
-r180 N=12 wall=0.09s Fix(N)=34546 cells=78 mismatches=0 ratio_vs_prev=nan
-r180 N=14 wall=0.87s Fix(N)=228312 cells=105 mismatches=0 ratio_vs_prev=9.974
-r180 N=16 wall=7.05s Fix(N)=1522666 cells=136 mismatches=0 ratio_vs_prev=8.063
-r180 N=18 wall=53.08s Fix(N)=10226480 cells=171 mismatches=0 ratio_vs_prev=7.531
-done

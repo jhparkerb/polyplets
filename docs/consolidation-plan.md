@@ -142,6 +142,18 @@ and say which is later and which the record now holds; do not adjudicate.
 Report, in the final message, only: the scratch path, the length ratio,
 any contradiction between sources, and any number you could not attribute.
 
+## Wave 4a — code nothing cites, 2026-09-06
+
+146 files under `scripts/` and `experiments/` that no tracked text file names
+(the reference corpus is every tracked file that is text, including data
+headers): 101 of the triangle-structure hunt's harness `experiments/tristruct/`,
+the `experiments/rook1/` probes and their logs, five of the `scripts/lastditch/`
+launchers, and 35 one-off launchers, probes and figure scripts for campaigns
+already deleted. Readable at the commit named in the deleting commit's
+message. The rest of `experiments/tristruct/` (64 files, cited by the
+triangle records that wave 2b folds) goes with them once those records are
+merged.
+
 ## Wave 3 — the superseded manuscript, and what a public reader flagged
 
 `paper/polyplets-report.tex` (1,122 lines, superseded 2026-08) and its checker
