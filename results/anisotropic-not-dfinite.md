@@ -302,7 +302,7 @@ Klazar-Luca zero-counting); the one paper pairing heights with D-finiteness
 rational maps, a different configuration.
 
 The paper was updated the same day rather than left carrying the unattributed
-version: `paper/polyplets-report.tex` now cites BM-R Lemma 9 inside the proof
+version: the P1 draft of the day now cites BM-R Lemma 9 inside the proof
 at the extraction step, carries a "Relation to existing work" paragraph
 stating what is shared and what diverges, claims the Northcott endgame with
 the absence caveat explicit instead of implied, and records the

@@ -38,6 +38,22 @@ mirror, one thread per core, one socket; ayr is a 32-core x86-64 AMD
 Threadripper 2990WX with 78 GB; gympie is an Apple Silicon laptop with 10
 performance cores.
 
+## What is in here
+
+| section | what it answers |
+|---|---|
+| 1. The engine, component by component | what the program is: orchestrator, workers, run files, checkpoints |
+| 2. The two transitions | the column kernel and the kink-carry kernel, and the price of the choice |
+| 3. Utilization | what kept the cores idle, what moved it, and what the ceiling is |
+| 4. The C++ hot path | where the time goes inside a worker |
+| 5. The completion prune | measured within a few percent of optimal, admissible by exhaustion for H <= 12 |
+| 6. Memory and disk | the layouts, the spills, the peaks, and what each term needed |
+| 7. Counters | why production carries no modular arithmetic |
+| 8. Correctness incidents | every one found, and what the checks now cover |
+| 9. The Redelmeier program | the independent enumerator's throughput |
+| 10. Negative results | eight of them, each with the measurement that closed it |
+| 11. The cost of each term | the per-term table: wall, cores, disk, date |
+
 ## 1. The engine, component by component
 
 Code anchors are file names; line numbers, where given, are at commit `25d7f61`.

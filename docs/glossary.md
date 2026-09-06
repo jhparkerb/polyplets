@@ -148,7 +148,7 @@ paper's usage is recorded, not argued with.
 | a transfer-matrix method that uses coloring instead of tracking connectivity | Motley, cutcount; `cpp/motley_par.cpp`, `results/cutcount_b1/` | the Fortuin–Kasteleyn / Potts spin representation of q^{components} |
 | Redelmeier enumeration | `g2` (`cpp/g2_redelmeier.cpp`); brute force; the fleet run | Redelmeier 1981 |
 | Burnsides congruences | the subgroup census, a(n) mod 4, `results/symmetry-classes.md` | Burnside's lemma; D4 orbit sizes |
-| double-checked, agree, confirms | two-source (two programs sharing no code); rule-independent (a second connectivity rule); tiers T1, T2, T2⁻ in `paper/polyplets-report.tex` | — |
+| double-checked, agree, confirms | two-source (two programs sharing no code); rule-independent (a second connectivity rule); tiers T1, T2, T2⁻ in `README.md` and `results/confidence.md` | — |
 | joiner, domino, split | the doubled row; the pair weight 25 = 16 + 9 (`docs/proofs/T-n-nm1.md`, `results/diagonal-formula.md`) | — |
 | holes | hole count k; the Euler-characteristic coordinate (`cpp/tma/euler.h`); flood fill (`g2 --holes`) | the A(n,k) hole triangle, staged |
 | one-sided, free, bilateral, asymmetric, non-polyominoes | the companions; the symmetry corpus `results/sym_counts.txt` | A030233, A030222, A030234, A030235, A194596 |

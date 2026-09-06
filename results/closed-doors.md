@@ -10,6 +10,20 @@ then checked against enumerated entries; the matching-pair relation of
 section 4 is verified in exact arithmetic through order 9; everything under
 open problems is conjectured or measured, not proved.
 
+## What is in here
+
+| section | the door, and what shut it |
+|---|---|
+| 1. The frontier does not compress | every attempt to make the transfer matrix smaller: low-rank states, the Hankel floor that grows at 2.43 per height, the char-0 cell-level transfer, the 2-adic filtration, and the one that worked as a congruence rather than a saving |
+| 2. Re-slicing, recurrences, finite-lattice inclusion-exclusion | other ways to cut the lattice, the C-finite order each one costs, and why the finite-lattice method does not stack |
+| 3. Handles on connectivity other than a partition | determinants, blocking, fattening, dual connectivity, relaxation hierarchies, exact-bulk-plus-tail: eight ideas and the four causes they all reduce to |
+| 4. The percolation matching pair | the relation, verified in exact arithmetic through order 9, and what it does not buy |
+| 5. Below the onset | two probes for the defect constants that did not yield them |
+| 6. The master equation is lattice-parametric | proved, then checked against enumerated entries on three lattices |
+| 7. Converse checks on the universal claims | where the universal statements stop being true |
+| 8. Ideas not taken | what was measured before each was set aside |
+| Open problems | what is still open, conjectured or measured but not proved |
+
 ## Terms
 
 A **polyplet** is a finite set of cells of the square grid, connected under
@@ -715,8 +729,11 @@ collapse extrapolates quantiles, not tail shares: row 40 predicted from row
 30 gives 14.6, 19.4, 24.3, 26.7, 29.2 against exact 15, 20, 24, 27, 29, while
 the same prediction read as tail shares is off by 2 to 4 at the far end. Nor
 is the bulk free: `results/fixed_height_gfs.txt` stops at `H = 11` with
-recurrence orders 1, 3, 7, 15, 42, 106, 278, 711, 1897, 5005, 13381, 2.65 per
-height, and `H = 19` would need about `2e7` terms. In general, covering all
+recurrence orders 1, 3, 7, 15, 42, 106, 278, 711, 1897, 5005 through H = 10,
+about 2.6 per height, and `H = 19` would need on the order of `1e7` terms.
+(The banked H = 11 order, 13381, is not used here: that entry was refuted on
+2026-09-05 as a CRT wraparound and the argument is refitted through H = 10 --
+`results/diagonal-formula.md`, `results/anisotropic-not-dfinite.md`.) In general, covering all
 but a vanishing part of the class needs `H_max ≈ 2 n^0.68` at cost about
 `3^H_max`, against about `3^(n/2)` for the entire exact computation; those
 cross near `n = 76`. Computing the bulk exactly and estimating the tail is

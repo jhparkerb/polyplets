@@ -19,6 +19,26 @@ box, not a proof; the sharp asymptotics of the phase-split series and the
 parity-compression step of the maximum hole count are conjectured. Nothing
 here has been submitted to OEIS.
 
+## What is in here
+
+The twenty classes of the directedness-convexity grid are identified below,
+under "The directedness-convexity grid"; that table is the quickest answer to
+"is this class known, and as what".
+
+| section | what it holds |
+|---|---|
+| The directedness-convexity grid | five directedness predicates by four convexity predicates, every class named or shown equal to another |
+| Directed and multi-directed king animals | Bacher's classes, the two controls, A222205 to 200 terms |
+| Column-convex, staircase and grounded families | rational generating functions, and the growth constants they give |
+| Convex polyplets by area and by semiperimeter | the closed forms, their derivations and their checks |
+| Every class between staircase and HV-convex | the squeeze: all of them share one growth constant, proved |
+| When does a subclass have a closed form? | the pattern behind which restrictions are tractable |
+| Component-count and hole stratifications | C(n,c), the hole triangle, the maximum hole area and the rarity of hole-free polyplets |
+| Structure of a typical polyplet | rook and diagonal edges, and the shape at n = 12 |
+| The single-cell move graph | connected for n <= 10, by exhaustion |
+| Machinery retargetable beyond polyplets | what of this carries to other lattices |
+| Open problems | what is conjectured or measured but not proved |
+
 ## Definitions
 
 All classes are sets of cells of `Z²`, 8-connected, counted up to translation

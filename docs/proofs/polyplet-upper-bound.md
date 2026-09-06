@@ -17,7 +17,7 @@
 > round away from the truth, so the four-decimal form is **9.3154**.
 >
 > Swept across 32 files (docs, results, experiments, `polyplets/` comments,
-> `paper/polyplets-report.tex`). Where the number appears as an *approximation*
+> and the manuscripts of the day). Where the number appears as an *approximation*
 > rather than a bound it now reads 9.31532, so that no bare "9.3153" is left in
 > the tree to be quoted as the bound. The Lean statements were already exact
 > (`lambda ≤ 20000/2147`) and only their comments moved. Receipts and logs were

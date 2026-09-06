@@ -52,12 +52,13 @@ is what carries the honesty — not the author line.
 | **P2** | Two stratifications of A006770 | T(n,H); his hand-derived T(n,n−1) and T(n,n−2); the defect gas and 25 = 16 + 9; onset and integrality; C(n,c) and the C(n,1) = C(n,n) = A001168 bijection; the universal law *stated*, cited to L1 | 12–16 | 15–25 | low | med-high |
 | **P3** | King animals by convexity and directedness | the 5×4 grid; the eight collapse propositions; A018902's first lattice-animal interpretation; the A187077 correction; A222205 to 200 terms and µ = 6.475196280297; 3 + 2√2 reproduced; µ = 3.128943… for the staircase→HV band; the λ bracket *stated*, cited to L3; the five novel sequences as labelled data | 14–20 | 20–30 | low-med | med-high |
 
-**P1 has two drafts and only one is usable.** `paper/polyplets-report.tex` is
-1122 lines of complete, trimmed, machine-written prose;
-`paper/technical-report.tex` is 331 lines in jasonp's words, roughly 40% built.
-Under a three-category scheme with no ambiguity the first cannot be lifted into
-the second — sentence-level reuse is exactly the blur being ruled out. Treat
-`polyplets-report.tex` as notes and source material. Most of the 30–50 hours is
+**P1 has two drafts and only one is usable.** `paper/technical-report.tex` is
+331 lines in jasonp's words, roughly 40% built; beside it stands a complete
+machine-written draft, `paper/technical-report-draft.tex`, under the L
+disclosure. Under a scheme with no ambiguity the second cannot be lifted into
+the first — sentence-level reuse is exactly the blur being ruled out. Treat the
+draft as notes and source material. (An earlier machine-written P1 draft,
+`paper/polyplets-report.tex`, was retired in the 2026-09 consolidation.) Most of the 30–50 hours is
 the engine chapter and §Reproducibility, both still unwritten.
 
 **P2's boundary with P1 is real.** T(n,H) appears in P1 as *method* — the P_k

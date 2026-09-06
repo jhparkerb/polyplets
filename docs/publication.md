@@ -13,6 +13,18 @@ its proof is named; a certificate is an exact computation a reader can re-run
 in integer or rational arithmetic; a measurement is a number that came out of
 a program, with its control and its limits.
 
+## What is in here, and what kind of thing each section is
+
+Five of these are **decisions** and bind: the release and its shape, warrant
+tiers, the skeptical-reader standard, removals before publication, and the
+OEIS policy. The rest are **dated record**: audits, novelty searches and
+findings, true as of the date each carries.
+
+| section | decision or record |
+|---|---|
+| The release and its shape; warrant tiers; the skeptical-reader standard; removals before publication; OEIS policy and staging | decisions |
+| Reviewer expertise; defending a(40); the acceptance queue; the two audits; novelty searches N1-N6; the square-lattice record; formalization tooling; what was found and how much is proved | record, dated |
+
 ## The release and its shape
 
 **The venue** (jasonp, 2026-08-18) is a public git repository with its code,

@@ -24,8 +24,8 @@ behind it.
 | `L8-below-onset.tex` | 15 | 69 | **0** | 69 |
 | **corpus** | 96 | **531** | **74** | **457** |
 
-74 of 531. For comparison, `technical-report.tex` is 199 of 200 and
-`polyplets-report.tex` is 154 of 264. The whole sweep is **80 seconds** on one
+74 of 531. For comparison, the technical report is 293 of 294
+(`results/p-paper-verifier-coverage.md`). The whole sweep is **80 seconds** on one
 core, because `verify_l_papers.py` runs in 0.16 s and needs no subprocess cache.
 
 ## The measurement is not vacuous
