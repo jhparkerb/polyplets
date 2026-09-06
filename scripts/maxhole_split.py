@@ -4,7 +4,7 @@
 Fans `build/g2 square8 N --maxhole` across K workers using the enumerator's own
 --split subtree partition, then combines the per-worker outputs by elementwise
 MAX (max combines that way -- counts would sum). This supersedes the slow,
-RAM-heavy pure-Python sampling/amax_brute.py: the C++ Redelmeier+flood enumerator
+RAM-heavy pure-Python amax_brute.py (deleted): the C++ Redelmeier+flood enumerator
 is ~100x faster and O(n) memory (no dedup table), so n past 9 becomes tractable.
 
 Background convention: --maxhole (4-connected background, the primary convention,
