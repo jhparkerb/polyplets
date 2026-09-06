@@ -14,11 +14,15 @@ Two halves, per `results/undertow.md`:
   --overlap-heights 19 --heights 1-19`. Rows in `results/a41/h*.out`.
   **wall 16,998.7 s (4.72 h) on 40 cores, cpu 605,643 s, rss_max 557 MB**,
   run-dir peak well under 100 GB.
-- **heights 20..41, the diagonal tower**, `experiments/undertow_a41.py`:
-  levels k = 41-H = 0..21, with k <= 19 from the wired table and k = 20, 21
-  pinned from BELOW-onset cells (Undertow). `T(41,20)` is depth 2 on level 21,
-  so it carries the exact `D_2(21)` defect; `T(41,21)` is exactly at onset on
-  level 20.
+- **height 20, real sweep, 2026-09-05** (`scripts/dalby_a41_h20.sh`, dalby, 76
+  cores, 9.63 h; section "The H = 20 sweep landed" below): `results/a41/h20.out`,
+  equal to the tower's prediction for `T(41,20)`.
+- **heights 21..41, the diagonal tower**, `experiments/undertow_a41.py`:
+  levels k = 41-H = 0..20, with k <= 19 from the wired table and k = 20 pinned
+  from BELOW-onset cells (Undertow); `T(41,21)` is exactly at onset on level
+  20. Until 2026-09-05 the tower also supplied `T(41,20)` as depth 2 on level
+  21, carrying the exact `D_2(21)` defect; that cell is now swept and the value
+  agreed.
 
 The classical rule would have needed a real sweep to H = 21 at Nmax 41 — the
 a(40) run's two tall phases were 9.6 h/48c and 36.4 h/32c with a **363.4 GB**
@@ -152,11 +156,49 @@ carries five RED controls, each refused at depth 5: the +9 mutation measured
 end to end (congruence gate green, depth-4 shift 9, depth-5 refusal), `bb` and
 `pp` at (3, 21), the K21_e4 table's own e = 4 row, and a corrupted pin cell.
 
-**What remains open.** Three pairs agreeing is agreement between fits that
-share `D_j(20..21)` and the grand form; it is not an enumeration of
-`T(41,20)`. The only assumption-disjoint holdout of that cell is the H = 20
-sweep at Nmax 41 (`scripts/dalby_a41_h20.sh`, **~10-11 h on 48 cores,
-~185-190 GB** on dalby), unrun. Until it runs, a(41) is computed, second-sourced
-at heights 1-19 (`results/cutcount_b1/rows41/`, 19 cells at n = 41 agreeing
-with `h*.out` here), and overdetermined at every tower level — and still
-**not** carrying the enumeration-level validation a(40) does.
+**What remained open, and closed 2026-09-05 21:19 EDT.** Three pairs agreeing
+is agreement between fits that share `D_j(20..21)` and the grand form; it is
+not an enumeration of `T(41,20)`. The assumption-disjoint holdout of that cell
+was the H = 20 sweep at Nmax 41, and it has now run: see the next section. The
+swept cell equals the tower's prediction digit for digit.
+
+## The H = 20 sweep landed (2026-09-05)
+
+`scripts/dalby_a41_h20.sh`, dalby, rev `b88b38bc5`, kink kernel, u128, fold,
+76 cores, `--max-diag-k -1` (nothing injected). Started 11:41 EDT at jasonp's
+word, finished 21:19:14 EDT, rc = 0. From `runs/a41_h20/run.log`:
+
+    wall=34678.8s cpu_s=1766882.070 wall_s=1987133.775 rss_max_mb=814.7
+
+9.63 h on 76 cores against the script header's 10-11 h on 48. Per-column
+profile (`runs/a41_h20/cost_profile.tsv` on dalby, banked here as
+`results/a41/h20_cost_profile.tsv` with the run.log summary line): the frontier peaks at
+129,487,745 records at column 7, and columns 6-8 each take ~2,300 s of wall at
+~126,000 cpu-s. The run directory is 860 KB after the orchestrator's own
+cleanup, so the disk peak is not recorded (the header predicted 185-190 GB;
+nothing measured it).
+
+    T(41,20) = 18004779862205054677763902712770    swept
+    T(41,20) = 18004779862205054677763902712770    tower, level 21 depth 2 (above)
+
+Banked as `results/a41/h20.out` (this file's `h*.out` set is now H = 1..20).
+The sweep's rows at n <= 40 agree with the banked triangle on all 40 cells of
+column H = 20, including `T(40,20)` (same kernel at a different Nmax, so a
+regression, not a second source). Re-assembly with the swept height:
+
+    python3 experiments/undertow_a41.py --jmax 5 --perheight results/a41
+    heights swept: 1..20;  heights from the tower: 21..41
+    sweep vs banked triangle: 800 cells agree, 0 disagree
+    a(41) = 393811462683918679824582849262105
+
+What changes: a(41) no longer depends on `P_21` at all (H = 21 is level 20 at
+onset, pinned ten ways at depth 5 once `T(40,20)` joins its pins), and the
+tower's top level has the one holdout that crosses assumption families. What
+does not change: heights 21-41 are still formula; the colouring second source
+still stops at H = 19, so `T(41,20)` has one enumeration and one formula
+prediction, not two enumerations.
+
+Gated: `make gate-undertow-pairs` now also compares the swept `T(41,20)` with
+the tower's prediction for it, the tower built without that cell among its
+pins, and carries a sixth RED control (the swept value +1 in a shadow copy of
+`results/a41` is reported).

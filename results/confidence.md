@@ -98,7 +98,8 @@ and T(40,22), rest on the tower alone. The 2026-08-21 text here said
 
 **4. a(41) = 393811462683918679824582849262105 — computed, with a second
 program under nineteen of its forty-one heights, as of 2026-08-21; the top
-formula overdetermined as of 2026-09-05.**
+formula overdetermined as of 2026-09-05; height 20 enumerated the same
+evening, and it equals what the formula predicted.**
 
 The colouring program was run at all nineteen heights it can reach, at the size
 row 41 needs — the thing that had never been done, since every stored result it
@@ -205,10 +206,16 @@ every height, and the reconstruction tool exits non-zero if it ever does not.
 The job was originally launched at the wrong size — it would have finished
 a(40) and done nothing at all for a(41). jasonp caught that.
 
-One further run of about eleven hours (height 20 at the size row 41 needs)
-would test the top formula against a directly computed value. That is the last
-soft spot: as of 2026-09-05 the formula is overdetermined (item 4), but nothing
-has enumerated T(41,20).
+*Landed 2026-09-05 21:19 EDT, 9.6 hours on dalby's 76 cores.* Height 20 at
+the size row 41 needs was enumerated by the original program
+(`results/a41/h20.out`), and the value, 18004779862205054677763902712770, is
+exactly what the formula tower had predicted for it from shorter cells. That
+was the last soft spot named above. What it settles: the tallest formula
+level is checked against an enumeration, and a(41) no longer uses it at all.
+What it does not settle: heights 21 to 41 of row 41 are still formula, and the
+second program still reaches only height 19, so T(41,20) has one enumeration
+and one prediction behind it, not two enumerations
+(`results/a41/PROVENANCE.md`, `make gate-undertow-pairs`).
 
 ## On trusting this account
 

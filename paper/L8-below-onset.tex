@@ -723,14 +723,18 @@ as a tall one, is tested here where the inputs are not ours.
 \label{sec:limits}
 
 \begin{itemize}
-\item \textbf{$P_{21}$ has three pin pairs and no enumeration holdout.} Level
-$20$ is pinned six ways with five independent checks. At depths $j \le 4$
-level $21$ pinned from $T(40,19)$ and $T(39,18)$ alone, with nothing checking
-it; depth $5$ (the $e = 4$ family table, banked 2026-08-23) adds $T(38,17)$,
-and the three pairs agree (\repo{experiments/undertow\_pairs\_gate.py}, in
-\texttt{make gates}). That agreement is between fits sharing $D_j(20..21)$;
-nothing has swept $T(41,20)$. This is the last soft spot in the construction
-and \repo{results/confidence.md} says so in the same terms.
+\item \textbf{$P_{21}$ has three pin pairs, and since 2026-09-05 one
+enumeration holdout.} Level $20$ is pinned six ways with five independent
+checks. At depths $j \le 4$ level $21$ pinned from $T(40,19)$ and $T(39,18)$
+alone, with nothing checking it; depth $5$ (the $e = 4$ family table, banked
+2026-08-23) adds $T(38,17)$, and the three pairs agree
+(\repo{experiments/undertow\_pairs\_gate.py}, in \texttt{make gates}). That
+agreement is between fits sharing $D_j(20..21)$. The cell they predict,
+$T(41,20)$, was then swept on 2026-09-05 ($9.6$ hours on $76$ cores,
+\repo{results/a41/h20.out}) and equals the prediction, so level $21$ has met
+an enumeration it did not see; the same gate now compares the two. With
+height $20$ swept, $a(41)$ no longer uses $P_{21}$ at all
+(\repo{results/confidence.md}).
 
 \item \textbf{Solving a whole column is a reformulation, not extra redundancy}
 --- the Remark in \S\ref{sec:frame}, restated here because it is the correction

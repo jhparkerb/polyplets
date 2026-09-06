@@ -73,6 +73,12 @@ every wired level. It is.
 
 ## Predict — the cell that could not be swept
 
+> **2026-09-05: swept after all.** The H = 20 sweep at Nmax 41 ran on dalby
+> (9.63 h, 76 cores) and `T(41,20)` came back equal to the prediction below,
+> digit for digit; `results/a41/PROVENANCE.md`, section "The H = 20 sweep
+> landed". The heading stays as the record of what this section meant when
+> it was written.
+
 `--predict` pins past the wired table and prints what the tower then says:
 
     k=20 pinned, 3 depth pairs AGREE (2 independent checks);

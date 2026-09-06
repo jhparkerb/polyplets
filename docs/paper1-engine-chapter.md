@@ -448,9 +448,11 @@ What the tower is and is not, for the chapter's wording: for the 19 swept
 heights, two engines with no shared code agree on every cell; for heights 20
 and up, the tower is a second *implementation* of the same closed forms fed
 the same defect tables, not a second source (`AUDIT-2026-09-02.md:81-104`).
-The only enumeration that would cross assumption families for `T(41,20)` is
-the H = 20 sweep at Nmax 41, priced at about 11 h and 190 GB on dalby and not
-run (`AUDIT-2026-09-02.md:78-79, 224-226`).
+The one enumeration that crosses assumption families for `T(41,20)`, the
+H = 20 sweep at Nmax 41 (`AUDIT-2026-09-02.md:78-79, 224-226`), **ran
+2026-09-05: 9.63 h on 76 cores, and the swept cell equals the tower's
+prediction** (`results/a41/PROVENANCE.md`, `results/a41/h20_cost_profile.tsv`).
+a(41) is now heights 1-20 swept, 21-41 tower.
 
 ## 9. What the 2026-09-02 audit says the chapter must and must not claim
 

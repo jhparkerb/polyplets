@@ -145,7 +145,8 @@ line asserted, `results/depth5-cost-settled.md`).
 - **H = 20 sweep at Nmax 41** (`scripts/dalby_a41_h20.sh`) — makes level 21's
   *output* a holdout against an enumeration. **~11 h / ~190 GB**; the 20-30 h
   / 450 GB this tree asserted before anything was measured is corrected in the
-  script header.
+  script header. **RAN 2026-09-05: 9.63 h on 76 cores, rc = 0; the swept
+  `T(41,20)` equals the tower's prediction** (`results/a41/PROVENANCE.md`).
 - **Depth 5** — **~3.1 h / ~8.5 GB at 8 threads**, or 6.7 h / 16.1 GB on the
   pessimistic bound (measured 2026-08-22, `results/depth5-cost-settled.md`;
   this line asserted ~51 GB / ~23 h from a two-point slope).

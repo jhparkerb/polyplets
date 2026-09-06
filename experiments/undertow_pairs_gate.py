@@ -27,7 +27,12 @@ its shape:
     fail rather than pass with less);
   * every depth pair at each level agrees (build() refuses otherwise);
   * a(41) reassembled from the tracked sweep `results/a41/h*.out` plus the
-    tower equals the banked value, digit for digit.
+    tower equals the banked value, digit for digit;
+  * the HOLDOUT (2026-09-05): the swept `T(41,20)` in `results/a41/h20.out`
+    (dalby, 9.6 h on 76 cores, `scripts/dalby_a41_h20.sh`) equals the value
+    the tower predicts for it from level 21 at depth 2, WITHOUT that cell
+    among its pins.  This is the one enumeration that crosses assumption
+    families for the tower's top level; a(41) itself no longer needs P_21.
 
 RED controls (--selftest), each in a shadow copy of the family tables:
   1  sig[3][21] += 9   congruence gate GREEN, depth-4 a(41) shifted by +9
@@ -39,6 +44,8 @@ RED controls (--selftest), each in a shadow copy of the family tables:
   4  the e = 4, k = 21 row of the K21_e4 table, sig += 1: D_5's own input,
                        depth-5 build refuses;
   5  a banked pin cell T(38,17) += 1 in the triangle: refuses.
+  6  the swept T(41,20) += 1 in a shadow copy of results/a41: the holdout
+                       comparison reports the disagreement.
 
 Usage:
   python3 experiments/undertow_pairs_gate.py             # the gate
@@ -96,7 +103,25 @@ def assemble(jmax):
     return ab, Dj, tri, sum(row.values())
 
 
-def run_gate(verbose=True):
+HOLDOUT = (41, 20)                             # swept 2026-09-05; level 21, depth 2
+
+
+def holdout_check(ab, Dj, sweep_dir):
+    """The swept T(41,20) against the tower's prediction for it.  The tower is
+    built with hmax = HMAX_PIN, so the swept cell is not among its pins."""
+    n, H = HOLDOUT
+    swept = sweep_rows(sweep_dir, n)
+    if H not in swept:
+        return [f"holdout: {sweep_dir}/h{H}.out missing; T({n},{H}) was swept "
+                f"2026-09-05 and must stay banked"]
+    predicted = tower(ab, Dj, n, H)
+    if swept[H] != predicted:
+        return [f"holdout: swept T({n},{H}) = {swept[H]}, tower predicts "
+                f"{predicted}"]
+    return []
+
+
+def run_gate(verbose=True, sweep_dir=SWEEP):
     ab, Dj, tri, total = quiet(assemble, JMAX)
     bad = []
     for k, cells in ucg.pin_cells(tri, JMAX, HMAX_PIN).items():
@@ -112,6 +137,12 @@ def run_gate(verbose=True):
     elif verbose:
         print(f"  a(41) = {total} from the tracked sweep + the depth-5 tower, "
               f"equal to the banked value")
+    hb = holdout_check(ab, Dj, sweep_dir)
+    bad += hb
+    if not hb and verbose:
+        n, H = HOLDOUT
+        print(f"  holdout: swept T({n},{H}) equals the tower's level-{n-H} "
+              f"depth-{2*(n-H)+1-n} prediction, that cell not among its pins")
     return bad
 
 
@@ -219,19 +250,40 @@ def selftest():
     finally:
         sl.read_tri, undertow_a41.read_tri = real, real
 
+    # RED 6: the swept holdout cell, corrupted in a shadow copy of the sweep.
+    with tempfile.TemporaryDirectory() as d:
+        shutil.copytree(SWEEP, os.path.join(d, "a41"))
+        p = os.path.join(d, "a41", "h20.out")
+        lines = open(p).read().splitlines()
+        hit = 0
+        for i, ln in enumerate(lines):
+            q = ln.split()
+            if q and q[0] == "41":
+                q[1] = str(int(q[1]) + 1)
+                lines[i] = " ".join(q)
+                hit += 1
+        assert hit == 1, f"h20.out: n = 41 matched {hit} lines"
+        open(p, "w").write("\n".join(lines) + "\n")
+        ab, Dj, tri, _ = quiet(assemble, JMAX)
+        if holdout_check(ab, Dj, os.path.join(d, "a41")):
+            print("RED 6 GREEN: swept T(41,20)+1 disagrees with the tower")
+        else:
+            problems.append("RED 6: a corrupted swept T(41,20) passed the holdout")
+
     if problems:
         print("undertow-pairs selftest FAILED:")
         for p in problems:
             print("  " + p)
         return 1
-    print("undertow-pairs selftest ok: 1 green control, 5 RED controls, all fired")
+    print("undertow-pairs selftest ok: 1 green control, 6 RED controls, all fired")
     return 0
 
 
 def main():
     if "--selftest" in sys.argv:
         return selftest()
-    print("undertow pairs, levels 20 and 21 at depths <= 5, pins at H <= 19:")
+    print("undertow pairs, levels 20 and 21 at depths <= 5, pins at H <= 19, "
+          "holdout T(41,20) swept:")
     bad = run_gate()
     if bad:
         print("\nundertow-pairs gate RED:")

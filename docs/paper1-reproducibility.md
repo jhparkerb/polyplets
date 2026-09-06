@@ -225,11 +225,12 @@ rule under the anchor criterion of `results/residual-cells.md`.
   Motley's data.
 - **Not** that every banked cell is second-sourced. Three are enumerated once:
   T(39,20), T(40,20), T(40,21) <!--q:congruence_only.cells@19=(39,20),(40,20),(40,21)-->.
-- **Not** that a(41) carries a(40)'s validation. Its 19 swept heights are
-  two-engine; its top 22 cells are the tower, every level overdetermined;
-  nothing has enumerated T(41,20) (the H = 20 sweep at Nmax 41, ~11 h on
-  dalby, unrun). `paper/technical-report-gaps.md` B5 has jasonp's asterisk
-  decision and the 2026-09-05 status.
+- **Not** that a(41) carries a(40)'s validation. Its 19 lowest swept heights
+  are two-engine; height 20 was swept 2026-09-05 (dalby, 9.6 h, 76 cores,
+  `results/a41/h20.out`) and equals the tower's prediction for it; heights
+  21-41 are the tower. `T(41,20)` has one enumeration and one formula
+  prediction, not two enumerations. `paper/technical-report-gaps.md` B5 has
+  jasonp's asterisk decision and the 2026-09-05 status.
 - **Not** that the tower's agreement with itself is a second source: the two
   fits of levels 20–21 share `D_j(20..21)` and the grand form (a theorem).
 - **Not** that the strip check could be pushed further on this hardware. C_14
