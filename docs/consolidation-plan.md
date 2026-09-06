@@ -26,8 +26,8 @@ follow say what went into each and at which commit the sources are readable.
 | perimeter | `results/perimeter.md` |
 | non-D-finiteness | `results/anisotropic-not-dfinite.md` |
 | routes that did not work, and the open problems | `results/closed-doors.md` |
-| Lean | `polyplets/PROOF-STATUS.md`, `polyplets/DESIGN.md`, `docs/lean-environment.md`, `docs/lean-artifact.md`, `docs/lean-below-onset-scope.md` |
-| the papers | `paper/README.md`, `docs/publication-split.md`, `docs/publication.md`, `docs/l-corpus-contraction.md` |
+| Lean | `polyplets/PROOF-STATUS.md`, `polyplets/DESIGN.md`, `docs/lean-environment.md`, `docs/lean-record.md`, `docs/lean-record.md` |
+| the papers | `paper/README.md`, `docs/publication-split.md`, `docs/publication.md`, `docs/l-papers-record.md` |
 | how the work was run, and what to do differently | `docs/lessons-learned.md` |
 | standards and process | `docs/engineering-standards.md`, `docs/job-checklist.md`, `docs/push-gate-tiers.md`, `docs/glossary.md`, `docs/external-anchors.md` |
 | OEIS staging (no submission) | `oeis/`, `results/oeis-candidates.md` |
@@ -43,7 +43,7 @@ Deleted at the commit after `e5e7870`: 443 tracked files, readable with
 | Offside and the process proposal | `results/offside/`, `docs/offside-*.md`, `docs/process-proposal.md`, `docs/state-minimal.md` | `docs/lessons-learned.md` |
 | Rook parity round 1 | `results/rook1/`, `docs/rook1-brief.md` | `docs/rook-parity.md` |
 | Triangle-structure hunt rounds 2--4 (working files) | `results/triangle-r2-extension-scout.md`, `results/triangle-r3-*` (five), `results/triangle-salvage.md`, `results/r4/` (most), `experiments/tristruct/sweep_report.md`, `docs/triangle-structure-d9-d12-plan.md` | `docs/triangle-postmortem.md`; the proofs stay in `results/triangle-r2-d3-proof.md` and `results/triangle-hunt-klein-parity.md` |
-| L-paper review campaigns (trim, tics, coinage) | `docs/reviews/l-trim/` (all but `PROTOCOL.md`), `docs/reviews/llm-tics/` (all but `density.py`), `paper/L-coinage-candidates.md`, `paper/polyplets-report-cuts.md`, `docs/l-paper-currency.md` | `paper/L-readability-rules.md`, `docs/l-corpus-contraction.md` |
+| L-paper review campaigns (trim, tics, coinage) | `docs/reviews/l-trim/` (all but `PROTOCOL.md`), `docs/reviews/llm-tics/` (all but `density.py`), `paper/L-coinage-candidates.md`, `paper/polyplets-report-cuts.md`, `docs/l-paper-currency.md` | `paper/L-readability-rules.md`, `docs/l-papers-record.md` |
 | session-state and plan documents superseded by `docs/handoff.md` | `docs/resume-here.md`, `docs/unattended-2026-09-05.md`, `docs/agent-types.md`, `docs/undertow-review-brief.md`, `docs/motley-goal.md`, `docs/coin-lift-goal.md`, `docs/certificate-squeeze-plan.md`, `docs/notary-k-handoff.md`, `docs/notary-simplify-deferred.md`, `docs/severance-w4-scoping.md`, `docs/terminal-velocity-plan.md`, `polyplets/OUTWORKS-PLAN.md`, `polyplets/PLAN.md` | `docs/handoff.md`, `polyplets/PROOF-STATUS.md` |
 
 Held back from this wave because code, a manuscript or a gate still names

@@ -12,7 +12,7 @@ import Polyplets.Grand.PinGrand
 Single audit point for the staircase formalization (`GRANDFORM-PLAN.md`).
 Every `#print axioms` below is wrapped in `#guard_msgs`, so the build FAILS
 if any axiom set drifts from the recorded expectation (previously these were
-advisory; hardened 2026-07-21, `docs/lean-hostile-witness.md`).
+advisory; hardened 2026-07-21, `docs/lean-record.md`).
 
 Expected footprints, recorded in `PROOF-STATUS.md`:
 

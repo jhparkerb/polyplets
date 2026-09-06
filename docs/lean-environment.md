@@ -24,7 +24,7 @@ verified with `ls`/`find` against this machine on this date.
   Universal/` (13 files), `Polyplets/Upper/` (5 files).
 - `polyplets/Draft/Prop6Skeleton.lean` — deliberately outside the build
   (contains `sorry`s, states architecture only). Not in `Polyplets.lean`,
-  never compiled by `lake build`. See `docs/lean-artifact.md`.
+  never compiled by `lake build`. See `docs/lean-record.md`.
 - Non-Lean surroundings for context: `polyplets/PLAN.md`,
   `polyplets/PROOF-STATUS.md` (per-theorem ledger), `polyplets/
   GRANDFORM-PLAN.md`, `polyplets/OUTWORKS-PLAN.md`, `polyplets/DESIGN.md`,
@@ -119,7 +119,7 @@ All `lake` invocations below run from `polyplets/` and use
   build dominates; the project's own 77 files build in minutes once
   mathlib's `.olean`s are cached.
 - Verify already-current: `cd polyplets && ~/.elan/bin/lake build
-  --no-build` (~6 s per `docs/lean-artifact.md`).
+  --no-build` (~6 s per `docs/lean-record.md`).
 - Repo gate for the notary campaign, `make gate-notary` (repo root,
   `Makefile:393-400`): greps `NOTARY_MODULES` (ten named files under
   `polyplets/Polyplets/GapWalk*` and `DepthOne*`) for `sorry`/`axiom`/
@@ -156,7 +156,7 @@ immediately above; if the real footprint drifts (a new axiom, a dropped
 errors — so axiom-footprint drift is a build failure, not something a
 reviewer has to remember to check. 88 theorems are guarded this way; 148
 more print footprints unguarded (informational only). See
-`docs/lean-artifact.md` for the full standard/native breakdown.
+`docs/lean-record.md` for the full standard/native breakdown.
 
 ## 6. Editor/config, linter conventions
 
@@ -179,7 +179,7 @@ more print footprints unguarded (informational only). See
 
 ## See also
 
-- `docs/lean-artifact.md` — the development as a citable artifact: module
+- `docs/lean-record.md` — the development as a citable artifact: module
   count, line count, sorry count, the full axiom-footprint accounting.
 - `docs/notary-lean-plan.md` — an example of a Lean work plan in this
   repo's style, including which modules are/aren't formalized for a given

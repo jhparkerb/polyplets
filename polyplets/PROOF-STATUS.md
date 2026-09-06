@@ -14,7 +14,7 @@ coefficients + banked onset points, fail-closed generated): `pin-data.md`.
 ## What this formalization does NOT reach
 
 Added 2026-08-22 (`docs/time-at-the-bar.md` B5; full scope split in
-`docs/lean-below-onset-scope.md`). **The Lean development covers the route
+`docs/lean-record.md`). **The Lean development covers the route
 a(40) took, not the route a(41) took.**
 
 `Grand/PinGrand.lean` pins each level from two real-swept cells `A_k =
@@ -450,7 +450,7 @@ finite differences + multinomial valuation bookkeeping over `ℤ[[y]]`).
 ## Staircase growth constant µ (LANDED 2026-08-06, `StairGrowth.lean`)
 
 `results/subclasses.md` Lemma 3 and the Fekete step on top of it —
-the authorized slice of Proposition 6 (`docs/lean-staircase-growth-brief.md`;
+the authorized slice of Proposition 6 (`docs/lean-record.md`;
 everything else about Proposition 6 stays a paper proof, deliberately).
 Three files:
 
@@ -528,7 +528,7 @@ Shape/Peel/Separation themselves: no native_decide anywhere.
 **Enforced, not advisory (2026-07-21):** every `#print axioms` in
 `Grand/Audit.lean` is wrapped in `#guard_msgs` against the recorded expected
 output, so any axiom-set drift FAILS the build (hostile-witness audit fix;
-`docs/lean-hostile-witness.md`).
+`docs/lean-record.md`).
 
 **Extended to the Shape/Peel chain (2026-07-30, AUDIT-2026-07-30 L3):** the
 guards previously covered only the Grand results, so the sentence above

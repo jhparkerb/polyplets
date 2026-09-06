@@ -724,7 +724,7 @@ D-finite relation at reachable complexity (`experiments/braw_from_data.py`;
 order: Lean at `k ≤ 8`, two programs at `k ≤ 19`, annihilation to order 60.
 (2) The analytic transfer from branch data to `k^(-1/2)` and `√π` is
 real-analytic, without Mathlib support, and out of scope. Separately,
-`docs/lean-below-onset-scope.md` records that using the below-onset
+`docs/lean-record.md` records that using the below-onset
 identity to determine a level (F1) and substituting a corrected entry for
 an onset entry (F2) are not stated in Lean.
 
@@ -744,7 +744,7 @@ an onset entry (F2) are not stated in Lean.
   state-space reduction in the stack DP).
 - In Lean: discharge `hbridge` to a chosen finite order; fixed-`k` cases
   `k = 3, 4` in `Diagonal.lean`; F1 and F2 of
-  `docs/lean-below-onset-scope.md`.
+  `docs/lean-record.md`.
 
 ## Reproduce
 

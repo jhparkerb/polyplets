@@ -77,7 +77,7 @@ PAPER = ROOT / "paper"
 VERIFIER = PAPER / "verify_l_papers.py"
 
 # Enumerated, not frozen.  The 2026-08-23 contraction merged four manuscripts
-# into their partners (docs/l-corpus-contraction.md) and a hardcoded list turned
+# into their partners (docs/l-papers-record.md) and a hardcoded list turned
 # that into a FileNotFoundError in this gate's setup, which is a crash rather
 # than a verdict.  The gate copies whatever manuscripts exist; the mutation
 # matrix below names the sites it perturbs, and a site in a manuscript that is

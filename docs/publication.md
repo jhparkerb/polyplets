@@ -58,7 +58,7 @@ queue below holds the receipts. The coloring program at height 18 closed a(n)
 under a second connectivity rule for n ≤ 35; height 19 under the same design
 was priced and not run, and was reached by the Nmax-41 run of 2026-08-20/21
 (`results/second-sources.md`). The L papers, nine by 2026-08-18, contracted to
-six on 2026-08-23 (`docs/l-corpus-contraction.md`; `paper/README.md` is the
+six on 2026-08-23 (`docs/l-papers-record.md`; `paper/README.md` is the
 current list), every ledger reading "human verification: none" under a draft
 banner. The report was written after the provenance table existed.
 
@@ -633,8 +633,8 @@ king version. The list became `docs/external-anchors.md`.
 
 ## Proof audit of the L papers
 
-The priority passes (`docs/priority-passes-2026-08-18.md`,
-`docs/priority-pass-L10-2026-08-23.md`) asked whether each result is new; this
+The priority passes (`docs/l-papers-record.md`,
+`docs/l-papers-record.md`) asked whether each result is new; this
 audit asked whether it is right, prompted by L3, whose Proposition 6 carried a
 false proof through a five-phase trim, a tic pass and a coinage pass, all of
 which read prose rather than arguments. Method: re-derive the step that could
@@ -878,7 +878,7 @@ to `literature/MISSING.md`. The later per-paper passes (the L9 identity is the
 FK/Potts correspondence; L6's defect identity and cyclotomic theorem are
 Asinowski–Barequet–Zheng's; Bousquet-Mélou–Fédou is L5's antecedent;
 Baxter–Guttmann and Jensen–Guttmann are Undertow's near neighbor) are in
-`docs/priority-passes-2026-08-18.md` and `docs/priority-pass-L10-2026-08-23.md`.
+`docs/l-papers-record.md` and `docs/l-papers-record.md`.
 
 ## The square-lattice record is n = 70, not n = 56
 

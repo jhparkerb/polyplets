@@ -664,7 +664,7 @@ Séminaire Lotharingien 79) are free at
 full text. They carry the k = e + 2f defect identity and the theorem that each
 fixed-defect generating function is rational with cyclotomic denominator — both
 of which L6 had been treating as its own. See
-`docs/priority-passes-2026-08-18.md` §L6.
+`docs/l-papers-record.md` §L6.
 
 The underlying paywalled paper is still wanted: the slides state the theorems
 without the proofs, and the pattern-classification method behind them is what
@@ -684,7 +684,7 @@ A. Asinowski, G. Barequet & Y. Zheng, "Polycubes with small perimeter defect,"
 Proc. ANALCO 2018, 93–100 (SIAM), the 3-dimensional companion to the ENDM 2017
 polyomino note the slides were drawn from. Filed as
 `literature/asinowski_barequet_zheng_2018_polycubes_small_perimeter_defect.pdf`.
-Read; verdict in `docs/priority-passes-2026-08-18.md` §ABZ full text.
+Read; verdict in `docs/l-papers-record.md` §ABZ full text.
 
 **Method note for whoever chases the remaining wants:** that mirror is a flat
 directory of ~800 PDFs at `plouffe.fr/OEIS/citations/`, filenames mostly

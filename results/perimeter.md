@@ -336,7 +336,7 @@ diagonal sticks with `H = n`.
 
 ### Novelty
 
-Priority pass of 2026-08-18 (`docs/priority-passes-2026-08-18.md`): the
+Priority pass of 2026-08-18 (`docs/l-papers-record.md`): the
 identity, the cyclotomic rationality theorem and the degree conjecture are
 Asinowski, Barequet and Zheng's; Barequet and Magal (2023) give square formulae
 to `k = 5`, held by abstract only. The king column, the parity reduction, the

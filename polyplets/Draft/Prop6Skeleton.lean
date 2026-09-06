@@ -10,7 +10,7 @@ they use is `Polyplets/Fekete.lean`, a structure with `Growth.lean`'s `lambda`
 and `Stair.mu` as its two instances. Those are `lake build` material now, not
 drafts, and this file imports them.
 
-What is left below is what `docs/lean-staircase-growth-brief.md` puts
+What is left below is what `docs/lean-record.md` puts
 explicitly OUT of scope: Lemma 2's stack bound, Lemma 1's phase split, the
 geometric layer, and the squeeze. Their estimates stand; nobody is authorized
 to spend them.

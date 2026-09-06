@@ -57,7 +57,7 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 Every L paper carries a loud draft banner, because every one of their
 verification ledgers currently reads "human verification: none". All six have
 had a literature-priority pass, dated after their own drafting, recorded in
-`docs/priority-passes-2026-08-18.md` and `docs/priority-pass-L10-2026-08-23.md`.
+`docs/l-papers-record.md` and `docs/l-papers-record.md`.
 **Three** carry a second banner because of what that pass found:
 
 - **L6's square-lattice column reproduces published work.** Asinowski, Barequet
@@ -85,7 +85,7 @@ had a literature-priority pass, dated after their own drafting, recorded in
 
 **The numbering has gaps.** L2, L7, L9 and L10 were merged into their
 neighbours or withdrawn in the contraction of 2026-08-23, which took ten papers
-and 108 pages to six and 96; `docs/l-corpus-contraction.md` is that record, and
+and 108 pages to six and 96; `docs/l-papers-record.md` is that record, and
 L9's material lives in `docs/proofs/cutcount-identity.md`. Those four numbers
 are retired and are not reused.
 

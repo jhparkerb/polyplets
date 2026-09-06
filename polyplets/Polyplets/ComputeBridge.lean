@@ -10,7 +10,7 @@ import Polyplets.Compute
 
 `Compute.lean` machine-checks a sparse set of nine nonzero cells against
 `results/triangle.txt`. The hostile-witness audit (2026-07-21,
-`docs/lean-hostile-witness.md`) found that set thinner than the prose
+`docs/lean-record.md`) found that set thinner than the prose
 implied: the remaining nonzero `n ≤ 5` cells were unchecked, and the two
 `n = 6` probes existed only as an "verified out-of-file" comment. This
 module makes every nonzero cell with `n ≤ 5` — the full rows 1..5 — plus

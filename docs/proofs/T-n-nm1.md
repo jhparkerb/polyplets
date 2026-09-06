@@ -119,7 +119,7 @@ V(1,1) = 25, Vᵗ(1,1) = 5 of `Weights.lean` (the same 25 = 16+9 split).
   k ≤ 3 outright, k = 4..18 as conditional theorems whose explicit
   hypotheses are the two real-swept onset cells per level — engine values
   assumed, not proved in Lean (levels ≥ 12 single-algorithm; see
-  `docs/lean-hostile-witness.md`). k = 19, the engine's last wired
+  `docs/lean-record.md`). k = 19, the engine's last wired
   diagonal, is deliberately excluded: fitted-no-holdout, load-bearing for
   no banked term.
 

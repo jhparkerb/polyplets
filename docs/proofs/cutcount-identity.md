@@ -416,7 +416,7 @@ Added 2026-08-23, when `paper/L9-cutcount-identity.tex` was withdrawn as a
 manuscript and folded back into this file. The section is the priority pass's
 finding and the reason the withdrawal was right: this document is the engine's
 correctness argument, not a result. The pass itself, with the searches it ran,
-is `docs/priority-passes-2026-08-18.md`.
+is `docs/l-papers-record.md`.
 
 **The statement is an instance of Fortuin–Kasteleyn.** The random-cluster
 partition function is `Z = Σ_g v^{b(g)} q^{c(g)}` (Fortuin & Kasteleyn, *Physica*

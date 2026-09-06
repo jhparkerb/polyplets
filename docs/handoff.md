@@ -303,7 +303,7 @@ filing.
 
 jasonp asked whether the L papers were truly worth the time spent, whether each
 deserved its own write-up, and how to condense. He agreed with the assessment
-and said execute. Record: **`docs/l-corpus-contraction.md`**.
+and said execute. Record: **`docs/l-papers-record.md`**.
 
 **What the assessment found.** Ten papers, 108 pages, 33,067 words of prose,
 sixteen days. The manuscripts were cheap — 36 commits. The process was not: the
@@ -441,7 +441,7 @@ S = 16 and S = 17, whose totals were checked against the banked strip rows at
 all 21 cells before it was written down. `results/symmetry-classes.md`.
 
 **L10 exists, has had its priority pass, and the pass found something.**
-`paper/L10-undertow.tex`, 7pp. The pass (`docs/priority-pass-L10-2026-08-23.md`)
+`paper/L10-undertow.tex`, 7pp. The pass (`docs/l-papers-record.md`)
 found a near neighbour: correcting a finite-size calculation by a term for how
 far it is wrong, to use it past where it is exact, is standard practice in
 directed-percolation series work (Baxter–Guttmann 1988, Jensen–Guttmann 1995).
@@ -528,7 +528,7 @@ exponent resolves on the king and not on the square, so
 `docs/publication.md` is deliberately unchanged
 (`results/growth-constant.md`); the Lean gap is written down and
 `polyplets/PROOF-STATUS.md` now says the formalization covers the route a(40)
-took, not the route a(41) took (`docs/lean-below-onset-scope.md`).
+took, not the route a(41) took (`docs/lean-record.md`).
 
 ## 2026-08-20 — THE KING LATTICE MERGES THE FRONTIER, AND IT IS PARKED
 
@@ -854,7 +854,7 @@ controls reproduce the census timings to under 0.1%, so the fits are trusted.
 The paywalled Asinowski--Barequet--Zheng paper the L6 pass wanted is obtained:
 the ANALCO 2018 polycube companion, "Polycubes with small perimeter defect,"
 93--100, free from Simon Plouffe's OEIS citation mirror. Filed in `literature/`,
-read; full verdict in `docs/priority-passes-2026-08-18.md` §ABZ full text.
+read; full verdict in `docs/l-papers-record.md` §ABZ full text.
 
 - **The king column is a separate derivation, not a corollary of their
   framework.** Their proof is cut-shrinking to unique reduced representatives,
@@ -879,7 +879,7 @@ mirror is recorded as exhausted for us in `literature/MISSING.md`.
 ## 2026-08-18 (later) — PRIORITY PASSES AND PROOF AUDIT OVER ALL NINE L PAPERS
 
 **Three literature collisions, two of them load-bearing.** Record:
-`docs/priority-passes-2026-08-18.md`.
+`docs/l-papers-record.md`.
 
 - **L9 collides at the level of its whole statement.** The cut-count identity
   is the Fortuin-Kasteleyn/Potts correspondence -- evaluating `q^c` by colouring
@@ -1799,7 +1799,7 @@ placeholders (a(40) appears as 5.7e31 in the abstract and Table `tab:an`
   `results/second-sources.md`). PinGrand anchors T(26,14)/T(27,14) now
   multi-source; single-algorithm anchor set down to 7 cells (levels 13B–16).
   Hostile-witness audit + full fix list applied same day
-  (`docs/lean-hostile-witness.md`): Audit.lean now #guard_msgs-enforced,
+  (`docs/lean-record.md`): Audit.lean now #guard_msgs-enforced,
   ComputeBridge.lean completes the n≤6 definitional bridge. C_14 footprint
   MEASURED ~38 GB (gympie attempt thrashed, killed) — C_15 ~200+ GB, off table.
 
@@ -2192,7 +2192,7 @@ local, NOT pushed. Newest first:
   lines, ~60% of it the geometric layer that does not exist yet — HV-convexity
   on `Finset (ℤ × ℤ)` in the `Defs.lean` idiom, Corollary 4, and Lemma 1's phase
   split as a `Finset` injection. For scale: the whole development is 21k lines.
-- **Lean route decided: `docs/lean-staircase-growth-brief.md`.** After a
+- **Lean route decided: `docs/lean-record.md`.** After a
   sceptical pass over four routes, the authorized slice is Lemma 3 + Fekete
   only, ~300 lines — the counting layer on `StairAnimals.lean`, the `4^n`
   ceiling, and Fekete *generalized* out of `Growth.lean:648-730` into a `Fekete`
@@ -2220,7 +2220,7 @@ local, NOT pushed. Newest first:
   `mu_gt_of_banked` — bracket **`3.1234 < µ ≤ 4`**, the floor from the banked
   `M 700`, no native leaf. Out-of-scope per the brief and NOT attempted:
   Lemmas 1 and 2, the geometric layer, the squeeze. `lake build` green, full
-  `make` 16 gates green, `PROOF-STATUS.md` + `docs/lean-artifact.md` +
+  `make` 16 gates green, `PROOF-STATUS.md` + `docs/lean-record.md` +
   the build receipt updated (the receipt's old `a(6) = 524` and its
   19/66 guarded split were both wrong; measured 18/70, total 88).
 - **Not committed, deliberately:** `paper/technical-report.tex` (jasonp's,

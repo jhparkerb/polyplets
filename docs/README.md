@@ -25,8 +25,8 @@ jasonp's machine, and are not missing from a clone by accident.
 | `docs/push-gate-tiers.md` | what the push gates cost, and what `make gates-deep` restores |
 | `docs/job-checklist.md` | consult before launching any compute job |
 | `docs/lean-environment.md` | toolchain paths, vendored deps, lemma search |
-| `docs/lean-artifact.md` | the Lean development as a citable object |
-| `docs/lean-below-onset-scope.md` | what Lean does and does not reach, and the cost of closing it |
+| `docs/lean-record.md` | the Lean development: what it proves, what it does not reach, the adversarial audit of 2026-07-21, and how a reader checks it |
+| `docs/reviews/outworks-adversarial.md` | the adversarial pass over the Outworks Lean material, 2026-07-31 |
 
 ## 2. `docs/proofs/` — the mathematical record
 
@@ -60,17 +60,12 @@ jasonp's machine, and are not missing from a clone by accident.
 | file | what |
 |---|---|
 | `docs/lastditch-campaign.md` | pinning the diagonal tower from below the onset — the route that gave a(41) |
-| `docs/lean-staircase-growth-brief.md` | the growth-constant formalization brief |
-| `docs/lean-hostile-witness.md` | an adversarial audit of the Lean development |
 
 ## 5. The L papers
 
 | file | what |
 |---|---|
-| `docs/l-corpus-contraction.md` | the contraction of 2026-08-23: ten papers to six, and the two campaigns it closed |
-| `docs/priority-passes-2026-08-18.md` | literature-priority passes over the L papers |
-| `docs/priority-pass-L10-2026-08-23.md` | the Undertow pass; its verdict now lives in `paper/L8-below-onset.tex` §Novelty |
-| `docs/reviews/outworks-adversarial.md` | the adversarial pass over the Outworks Lean material |
+| `docs/l-papers-record.md` | the L papers' own record: the contraction that took ten manuscripts to six, and every literature-priority pass behind them |
 
 The Ghost Ship experiment's record was folded into `docs/lessons-learned.md`;
 no part of it is tracked any more.

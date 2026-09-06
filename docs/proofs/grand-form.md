@@ -193,7 +193,7 @@ and `T_staircase` depend on **standard axioms only**; `lead_coeff_25`
 polynomials are pinned for k ≤ 18 from two real-swept cells per level
 (`P<k>_grand_of_banked`) — *conditional on those cells*: they are
 hypotheses of the Lean theorems, engine values assumed, not proved in
-Lean (`docs/lean-hostile-witness.md`). This retires the Lean PREDICTED
+Lean (`docs/lean-record.md`). This retires the Lean PREDICTED
 tier. The item
 "Lean formalization" below is CLOSED.
 

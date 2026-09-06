@@ -3,7 +3,7 @@
 #
 # Purpose: extend the second-source per-cell confirmation from H<=13 to H<=14
 #   (flips PinGrand anchors T(26,14)/T(27,14) to multi-source; fix 7 of
-#   docs/lean-hostile-witness.md). The 2026-07-10 Hmax=14 run was stopped after
+#   docs/lean-record.md). The 2026-07-10 Hmax=14 run was stopped after
 #   C_13, so its end-of-run banked compare never executed; this run re-prints
 #   the per-height match counts for ALL H<=14 in one log.
 # Machine: dalby (128 GB). Predicted cost: ~40 GB RAM peak, 1 core, ~60-90 min

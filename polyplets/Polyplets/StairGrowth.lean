@@ -28,7 +28,7 @@ floor under `µ` rather than an extrapolation towards it.
 
 What is deliberately not here: Lemma 1 (the phase split), Lemma 2 (the stack
 bound), the geometric layer, and the squeeze that turns the three into
-Proposition 6. Those stay paper proofs; see `docs/lean-staircase-growth-brief.md`
+Proposition 6. Those stay paper proofs; see `docs/lean-record.md`
 for why this slice and no more.
 
 ## Counting without a bijection
