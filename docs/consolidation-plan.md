@@ -60,6 +60,10 @@ whose measured tables the gates and tests cite as their source (they fold into
 comments that named the deleted files stand as written; the note at the top of
 `README.md` says where the files are.
 
+The receipts gate (`scripts/check_receipts.sh`, `make gate-receipts`, four
+fixtures) was the rook-parity campaign's control; with its scope deleted it
+could only pass vacuously, so it is retired in the same wave.
+
 ## Wave 2b — the mathematics
 
 Not started. The mathematics half consolidates the diagonal-formula,

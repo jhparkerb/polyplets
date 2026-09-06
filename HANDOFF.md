@@ -79,7 +79,8 @@ mathematics first).
   Decided 2026-09-05: closed campaigns first, raw records deleted, conclusions
   in the theme file. Wave 2a (same day) removed 41 of the 43 files code still
   named; the two Middle Kingdom plans stay until their tables fold into
-  `results/middle-kingdom.md`. Wave 2b, the mathematics, is not started.
+  `results/middle-kingdom.md`. The receipts gate, scope-less once the rook
+  campaign was deleted, is retired. Wave 2b, the mathematics, is not started.
 
 ## 2026-09-05 late — the machine-written report, and the evening's checks
 

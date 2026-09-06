@@ -53,7 +53,7 @@ endif
         gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite \
         gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg \
         gate-compile-db gate-citations gate-docs-index gate-no-copyright-pdfs \
-        gate-l-paper-verifier gate-p-paper-verifier gate-receipts \
+        gate-l-paper-verifier gate-p-paper-verifier \
         gate-residual-cells gate-cutcount-assembly \
         gate-perimeter-min gate-perimeter-defect \
         gate-perimeter-min-shard clean install \
@@ -90,7 +90,7 @@ endif
 # recipe what --deep restores and why the push tier is enough.
 GATE_DEEP ?=
 
-GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-receipts gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-undertow-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
+GATE_TARGETS = gate-motley-crt gate-citations gate-docs-index gate-no-copyright-pdfs gate-provenance gate-residual-cells gate-cutcount-assembly gate-undertow-congruence gate-undertow-pairs gate-kink-oracle gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-severance-depth5 gate-modp gate-makefile-wiring gate-bfiles gate-l-paper-verifier gate-p-paper-verifier gate-perimeter-min gate-perimeter-min-shard gate-perimeter-defect gate-g1 gate-g2 gate-sig-fold gate-tma gate-s2 gate-e0 gate-sym gate-symtm gate-subgroup gate-euler gate-driver gate-strip-cert gate-strip-fast gate-king-grid gate-site-perim gate-multidirected gate-convex-dfinite gate-middle-kingdom gate-mk-dir4-perim gate-dir4-perim-alg gate-compile-db
 
 # The gate suite runs the gates CONCURRENTLY: they are independent processes
 # over read-only fixtures, and the only two that write scratch state write to
@@ -584,25 +584,6 @@ gate-no-copyright-pdfs:
 gate-docs-index:
 	python3 tests/gate_docs_index.py
 
-# Gate RECEIPTS: in the rook-parity campaign's deliverables and briefs, a status
-# token that says something executed (PROVED/VERIFIED/GREEN/RUN/CONFIRMED/
-# PASSED/MATCHED, in a table cell or on a `status:` line) must carry an in-tree,
-# non-empty path on the same line.
-#
-# Written because the round-4 status drift had a sign: every discrepancy
-# upgraded a written-but-unrun instrument to a completed one, none went the
-# other way (results/r4/INSTRUMENTS.md:4-8). The rule that ended it was
-# disciplinary; every disciplinary control in that campaign was waived at least
-# once, usually by the lead, so this is the mechanical form. In-tree is
-# load-bearing: the campaign's largest result sat only on dalby for two days.
-#
-# It proves a receipt EXISTS, not that the receipt says what the claim says --
-# that is the numbers adversary's job, and the gate exists so the adversary
-# spends its pass reading logs instead of hunting for their absence. Red-first:
-# --self-test runs before every scan and requires three planted claims (no
-# receipt, absent file, remote path) to be rejected. Sub-second, no build deps.
-gate-receipts:
-	./scripts/check_receipts.sh
 
 # Gate L-PAPER-VERIFIER: mutation-tests paper/verify_l_papers.py, which is the
 # only thing standing between the L manuscripts and a wrong printed number.
