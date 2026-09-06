@@ -125,7 +125,7 @@ struct Search {
     yOf.assign(status.size(), 0);
     for (int y = -2; y <= maxn + 1; ++y)
       for (int x = -(maxn + 2); x <= maxn + 2; ++x) yOf[cellIndex(x, y)] = y;
-    cmax = kmax / 2;               // k = 2c + t with t >= 0
+    cmax = kmax / 2;               // c <= floor(k/2) on square (k = 2c + t), floor(k/3) on king: a cap on both
     hstride = maxn + 1;
     counts.assign(static_cast<size_t>(maxn + 1) * (kmax + 1) * (cmax + 1) * hstride, 0);
   }
@@ -220,7 +220,7 @@ struct Search {
         const int c = bonds - size + 1;
         if (c < 0 || c > cmax) {
           std::fprintf(stderr, "FATAL: cycle rank %d outside [0, %d] at k=%d -- "
-                               "the k = 2c + t identity is wrong\n", c, cmax, k);
+                               "the cycle-rank cap from k = 2c + t - (deg/2-2)(n-1) is wrong\n", c, cmax, k);
           std::exit(3);
         }
         counts[slot(size, k, c, maxy + 1)] += 1;

@@ -154,26 +154,26 @@ def main():
 
     # ---- RED controls: real mutations, run through arm A itself ------------
     # Tables are cached, so each replay costs nothing.
-    for label, mutate in (
-            ("one strip count off by 1", lambda t: t.__setitem__(
-                (args.smax, 0), t[(args.smax, 0)] + 1)),
-            ("one box count off by 1", None)):
-        shadow = dict(d)
-        if mutate is None:
-            H = args.smax
-            saved = _TABLES[H]
-            _TABLES[H] = dict(saved)
-            _TABLES[H][(H, H)] = _TABLES[H].get((H, H), 0) + 1
-        else:
-            mutate(shadow)
+    def replay(shadow, label):
         red = []
         arm_a(shadow, args.smax, args.bud, red)
-        if mutate is None:
-            _TABLES[H] = saved
         if not red:
             fail("RED control did not fire: %s" % label)
         else:
             print("RED control fired (%s): %s" % (label, red[0]))
+
+    shadow = dict(d)
+    shadow[(args.smax, 0)] += 1
+    replay(shadow, "one strip count off by 1")
+
+    H = args.smax
+    saved = _TABLES[H]
+    _TABLES[H] = dict(saved)
+    _TABLES[H][(H, H)] = _TABLES[H].get((H, H), 0) + 1
+    try:
+        replay(dict(d), "one box count off by 1")
+    finally:
+        _TABLES[H] = saved
 
     return finish()
 

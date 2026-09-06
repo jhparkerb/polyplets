@@ -36,6 +36,9 @@ from collections import defaultdict
 from fractions import Fraction as Fr
 from functools import lru_cache
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from hex_gas import A001207, brute, rowpart                        # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'results', 'hex_diagonal_cells.txt')
 
@@ -44,25 +47,14 @@ P1 = lambda n: 9 * n - 15
 P2 = lambda n: Fr(81 * n * n - 307 * n + 142, 2)
 A_WEIGHTS = {1: Fr(9), 2: Fr(-37, 2), 3: Fr(32)}   # banked hex c_k slopes
 A4_CLUSTER = Fr(3915, 4)                       # the one-route number under test
-A001207 = [1, 3, 11, 44, 186, 814, 3652, 16689, 77359]
 
 
 # ------------------------------------------------------------------ the walk
 
-def rowpart(cells):
-    """In-row connectivity of a sorted cell tuple, as canonical block labels."""
-    lab, out, cmap = 0, [], {}
-    prev = None
-    for c in cells:
-        if prev is not None and c - prev != 1:
-            lab += 1
-        cmap.setdefault(lab, len(cmap))
-        out.append(cmap[lab])
-        prev = c
-    return tuple(out)
 
 
-def _transitions(cells, part, budget, halo):
+@lru_cache(maxsize=None)
+def transitions(cells, part, budget, halo):
     """Every new row over the old row (cells, part), as (newcells, newpart, ds).
 
     A new cell `t` touches an old cell `c` iff `t == c` or `t == c - 1` (the hex
@@ -126,15 +118,13 @@ def _transitions(cells, part, budget, halo):
     return res
 
 
-@lru_cache(maxsize=None)
-def transitions(cells, part, budget, halo):
-    return _transitions(cells, part, budget, halo)
 
+def hex_T(H, budget, halo):
+    """{n: T_hex(n, H)} for n = H .. H + budget.
 
-def hex_T(H, budget, halo=None):
-    """{n: T_hex(n, H)} for n = H .. H + budget."""
-    if halo is None:
-        halo = budget
+    TODO(simplify 2026-09-05): every call restarts the row DP from row 1; one
+    sweep to hmax harvesting after each row would serve every H at once.
+    """
     dp = defaultdict(int)
     for s in range(1, budget + 2):
         for T in _first_rows(s, halo):
@@ -169,39 +159,6 @@ def _first_rows(s, halo):
 
 # --------------------------------------------------------------- brute force
 
-def brute(nmax):
-    def canon(cs):
-        mx = min(x for x, _ in cs)
-        my = min(y for _, y in cs)
-        return frozenset((x - mx, y - my) for x, y in cs)
-
-    def nbrs(c):
-        x, y = c
-        return [(x - 1, y), (x + 1, y), (x, y + 1), (x - 1, y + 1),
-                (x, y - 1), (x + 1, y - 1)]
-
-    seen = {canon({(0, 0)})}
-    frontier, tot, T = list(seen), {1: 1}, defaultdict(int)
-    T[(1, 1)] = 1
-    while frontier:
-        new = []
-        for A in frontier:
-            if len(A) >= nmax:
-                continue
-            cand = {nb for c in A for nb in nbrs(c) if nb not in A}
-            for c in cand:
-                B = canon(set(A) | {c})
-                if B not in seen:
-                    seen.add(B)
-                    new.append(B)
-        frontier = new
-        if new:
-            n = len(new[0])
-            tot[n] = len(new)
-            for A in new:
-                H = max(y for _, y in A) - min(y for _, y in A) + 1
-                T[(n, H)] += 1
-    return tot, dict(T)
 
 
 # ------------------------------------------------------------- fit and gate
@@ -303,8 +260,7 @@ def fit(cells, kmax, verbose=True):
         for (n, H), v in sorted(cells.items()):
             if n - H != k or n < 2 * k + 1:
                 continue
-            pts.append((n, Fr(v, 2 ** (n - 1 - 3 * k)) if n - 1 - 3 * k >= 0
-                        else Fr(v * 2 ** (3 * k + 1 - n))))
+            pts.append((n, Fr(v) / Fr(2) ** (n - 1 - 3 * k)))
         assert len(pts) >= k + 1, f'k={k}: {len(pts)} in-onset cells, need {k + 1}'
         c = lagrange(pts[:k + 1])
         for x, y in pts[k + 1:]:

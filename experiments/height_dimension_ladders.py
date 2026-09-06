@@ -14,8 +14,12 @@ Sources:
   deg psi_H                    results/anisotropic-not-dfinite.md
   cell-level d_p, d_2          results/skeletonkey-cell-sparsity.md
 """
+import os
 import sys
 from fractions import Fraction
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from dual_connectivity_blockcount import motzkin                  # noqa: E402
 
 fail = []
 
@@ -36,14 +40,6 @@ merged = dict(zip(range(4, 22),
 psi = dict(zip(range(1, 11), [1, 2, 4, 9, 29, 68, 181, 462, 1254, 3289]))
 d_p = dict(zip(range(4, 9), [32, 99, 249, 692, 1826]))
 d_2 = dict(zip(range(4, 9), [32, 93, 210, 516, 1155]))
-
-
-def motzkin(n):
-    m = [1, 1]
-    while len(m) <= n:
-        k = len(m) - 1
-        m.append(m[k] + sum(m[i] * m[k - 1 - i] for i in range(k)))
-    return m[n]
 
 
 frontier = {H: motzkin(H + 1) - 1 for H in range(2, 22)}

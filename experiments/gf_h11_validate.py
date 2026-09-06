@@ -48,23 +48,19 @@ d, flag, P, Q = int(m.group(1)), m.group(2), eval(m.group(3)), eval(m.group(4))
 if perturb is not None:
     Q[perturb] += 1
 N = 2 * d + 30
-vp = VAL_PRIME
-print(f"banked H={H}: order={d} validated={flag}; testing to N={N} mod {vp}"
+print(f"banked H={H}: order={d} validated={flag}; testing to N={N} mod {VAL_PRIME}"
       + (f"; RED control: Q[{perturb}] += 1" if perturb is not None else ""), flush=True)
 t0 = time.time()
-B = seq_modp(H, N, vp)
+B = seq_modp(H, N, VAL_PRIME)
 print(f"engine sweep done in {time.time()-t0:.1f}s", flush=True)
 
 t1 = time.time()
-Qp = [q % vp for q in Q]                       # pre-reduce ONCE (bignum mods are the trap)
-Pp = [p % vp for p in P] + [0] * (N + 1)
+Qp = [q % VAL_PRIME for q in Q]                       # pre-reduce ONCE (bignum mods are the trap)
+Pp = [p % VAL_PRIME for p in P] + [0] * (N + 1)
 first = None
 for n in range(N + 1):
-    if n - d >= 0:
-        acc = sum(map(mul, Qp, B[n::-1][:d + 1]))
-    else:
-        acc = sum(map(mul, Qp[:n + 1], B[n::-1]))
-    if acc % vp != Pp[n]:
+    acc = sum(map(mul, Qp, B[n::-1]))      # map stops at the shorter operand
+    if acc % VAL_PRIME != Pp[n]:
         first = n
         break
 print(f"convolution check done in {time.time()-t1:.1f}s", flush=True)

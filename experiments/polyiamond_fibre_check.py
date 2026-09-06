@@ -28,9 +28,13 @@ results/polyiamond-diagonal-law.md.
 
 Usage: python3 -m experiments.polyiamond_fibre_check
 """
+import os
 import sys
 from collections import defaultdict
 from fractions import Fraction as F
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from polyiamond_diagonal import nbr, interpolate, ev                # noqa: E402
 
 NMAX = 14
 A001420 = [3, 6, 14, 36, 94, 250, 675, 1838, 5053, 14016,
@@ -46,11 +50,6 @@ BANKED = {
 }
 
 
-def nbr(c):
-    """Triangle (x, y) is a sender iff x + y is odd; only senders reach up."""
-    x, y = c
-    return [(x - 1, y), (x + 1, y),
-            ((x, y + 1) if (x + y) % 2 else (x, y - 1))]
 
 
 def canon_tri(cells):
@@ -100,11 +99,11 @@ def grow(seeds, neighbours, canon, nmax):
     return byn
 
 
-def table(byn, ykey):
+def table(byn):
     T = defaultdict(int)
     for n, animals in byn.items():
         for a in animals:
-            ys = [ykey(c) for c in a]
+            ys = [c[1] for c in a]
             T[(n, max(ys) - min(ys) + 1)] += 1
     return T
 
@@ -132,28 +131,8 @@ def minimal_rows(x, y, span=4):
     return out
 
 
-def interpolate(points):
-    n = len(points)
-    acc = [F(0)] * n
-    for i, (xi, yi) in enumerate(points):
-        basis, den = [F(1)], F(1)
-        for j, (xj, _) in enumerate(points):
-            if i == j:
-                continue
-            basis = [a - b for a, b in
-                     zip([F(0)] + basis, [F(xj) * c for c in basis] + [F(0)])]
-            den *= F(xi - xj)
-        s = F(yi) / den
-        for idx, c in enumerate(basis):
-            acc[idx] += c * s
-    return acc[::-1]
 
 
-def ev(p, x):
-    v = F(0)
-    for c in p:
-        v = v * x + c
-    return v
 
 
 def main():
@@ -175,8 +154,8 @@ def main():
         if want != set(hnbr(to_hex(c))):
             fails.append(f"adjacency not carried at {c}")
             break
-    Ttri = table(tri, lambda c: c[1])
-    Thex = table(hexa, lambda c: c[1])
+    Ttri = table(tri)
+    Thex = table(hexa)
     if Ttri != Thex:
         diff = [k for k in set(Ttri) | set(Thex)
                 if Ttri.get(k, 0) != Thex.get(k, 0)]
@@ -227,7 +206,7 @@ def main():
               "{0, -1} in j -- the polyhex drift set  OK")
     for H in range(2, 8):
         want, got_ = 2 ** (H - 2), Ttri.get((2 * H - 2, H), 0)
-        if 2 * H - 2 <= NMAX and want != got_:
+        if want != got_:
             fails.append(f"T({2*H-2}, {H}) = {got_}, want 2^{H-2} = {want}")
     print(f"    n_min(H) = 2H-2 and T(2H-2, H) = 2^(H-2) to H = 7  OK")
 

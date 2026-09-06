@@ -58,13 +58,9 @@ KING_CENSUS = "results/perimdefect_square8_n78_k6.txt"
 FAILURES: list[str] = []
 
 
-QUIET = False
-
-
 def fail(msg: str) -> None:
     FAILURES.append(msg)
-    if not QUIET:
-        print("FAIL: " + msg)
+    print("FAIL: " + msg)
 
 
 # --------------------------------------------------------------------------
@@ -136,7 +132,7 @@ def canon(cells):
     return frozenset((p[0] - mx, p[1] - my) for p in cells)
 
 
-def grow(nmax, kmax, offsets, moves):
+def grow(nmax, kmax, moves):
     """All fixed animals up to n = nmax with king defect <= kmax, by growth.
 
     The defect never decreases when a cell is added (cpp/perimeter_defect.cpp),
@@ -156,7 +152,7 @@ def grow(nmax, kmax, offsets, moves):
                     B = canon(set(A) | {c})
                     if B in nxt:
                         continue
-                    k = defect(B, offsets)
+                    k = defect(B, KING)
                     if k <= kmax:
                         nxt[B] = k
         level = nxt
@@ -170,7 +166,7 @@ def grow(nmax, kmax, offsets, moves):
 
 def check_reduction(nmax, kmax):
     """k_king = k_square + c + h on every same-parity animal."""
-    animals = grow(nmax, kmax, KING, DIAG)
+    animals = grow(nmax, kmax, DIAG)
     tot = 0
     for n in sorted(animals):
         for A, k in animals[n].items():
@@ -196,7 +192,6 @@ def check_reduction(nmax, kmax):
     print("  reduction verified on %d same-parity animals, n <= %d, k <= %d"
           % (tot, nmax, kmax))
     print("  no hole below k = 5, so h = 0 is forced for k <= 3")
-    return animals
 
 
 def check_features():
@@ -259,17 +254,21 @@ def check_excess_identity(animals_all):
     both lattices, which is false on king -- a diagonal stick has t = 2(n-1) and
     k = 0.  The enumerator only ever uses the monotonicity, so no count moves.
     """
+    def holds(cells, offsets):
+        n = len(cells)
+        c = edges(cells, offsets) - n + 1
+        shift = (len(offsets) // 2 - 2) * (n - 1)      # 0 on square, 2(n-1) on king
+        return defect(cells, offsets) == 2 * c + excess(cells, offsets) - shift
+
     for n in sorted(animals_all):
         for A, k in animals_all[n].items():
-            c = edges(A, KING) - n + 1
-            if k != 2 * c + excess(A, KING) - 2 * (n - 1):
+            if not holds(A, KING):
                 fail("excess identity fails on king at n=%d k=%d" % (n, k))
                 return
     stick = frozenset((i, 0) for i in range(9))
     ell = frozenset([(0, 0), (1, 0), (2, 0), (2, 1), (2, 2)])
     for cells in (stick, ell):
-        c = edges(cells, ORTH) - len(cells) + 1
-        if defect(cells, ORTH) != 2 * c + excess(cells, ORTH):
+        if not holds(cells, ORTH):
             fail("excess identity fails on square")
             return
     print("  excess identity verified: k = 2c + t on square, 2c + t - 2(n-1) on king")
@@ -287,8 +286,7 @@ def check_cycle_rank_cap(king):
 def check_orthogonal_bound(animals_all):
     for n in sorted(animals_all):
         for A, k in animals_all[n].items():
-            e = sum(1 for x, y in A for dx, dy in [(1, 0), (0, 1)]
-                    if (x + dx, y + dy) in A)
+            e = edges(A, ORTH)
             if e > k // 2:
                 fail("orthogonal-edge bound: n=%d k=%d has %d orthogonal edges"
                      % (n, k, e))
@@ -339,8 +337,7 @@ def check_mixed_against_enumeration(animals_all, M, nmax):
     got = defaultdict(int)
     for n in sorted(animals_all):
         for A, k in animals_all[n].items():
-            if any((x + dx, y + dy) in A
-                   for x, y in A for dx, dy in [(1, 0), (0, 1)]):
+            if edges(A, ORTH):
                 got[(n, k)] += 1
     for n in range(1, nmax + 1):
         for k in range(0, 4):
@@ -388,7 +385,9 @@ def evaluate(spec, n):
     return sum(c[j] * Fraction(n) ** j for j in range(len(c)))
 
 
-def check_formulas(table, values, nmax_data, label, perturb=None):
+def check_formulas(table, values, nmax_data, label, perturb=None, sink=None):
+    """`sink` collects failures silently (the red control's own list); the
+    default reports through fail()."""
     checked = 0
     for k, spec in sorted(table.items()):
         onset = spec[0]
@@ -398,28 +397,28 @@ def check_formulas(table, values, nmax_data, label, perturb=None):
             if perturb is not None and (n, k) == perturb:
                 got += 1
             if got != want:
-                fail("%s k=%d n=%d: formula gives %s, census gives %d"
-                     % (label, k, n, got, want))
+                msg = ("%s k=%d n=%d: formula gives %s, census gives %d"
+                       % (label, k, n, got, want))
+                if sink is None:
+                    fail(msg)
+                else:
+                    sink.append(msg)
                 return checked
             checked += 1
-    if not QUIET:
+    if sink is None:
         print("  %s: %d values matched, k in %s" % (label, checked, sorted(table)))
     return checked
 
 
 def check_red_control(table, values, nmax_data, label):
     """A perturbed formula must be rejected -- otherwise the check is asleep."""
-    global QUIET
-    before = len(FAILURES)
-    QUIET = True
     k = max(table)
     n = min(nmax_data, table[k][0] + 3)
-    check_formulas(table, values, nmax_data, label + " (red control)", perturb=(n, k))
-    QUIET = False
-    if len(FAILURES) == before:
+    red = []
+    check_formulas(table, values, nmax_data, label + " (red control)", perturb=(n, k), sink=red)
+    if not red:
         fail("red control: a perturbed %s formula was accepted" % label)
         return
-    del FAILURES[before:]
     print("  red control for %s rejected a perturbed formula, as it must" % label)
 
 
@@ -438,7 +437,7 @@ def main():
     check_features()
 
     print("3. orthogonal-edge bound and the excess identity")
-    animals_all = grow(args.nmax, 4, KING, KING)
+    animals_all = grow(args.nmax, 4, KING)
     check_orthogonal_bound(animals_all)
     check_excess_identity(animals_all)
 

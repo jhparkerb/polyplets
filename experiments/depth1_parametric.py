@@ -49,12 +49,11 @@ import sys
 from collections import defaultdict
 from fractions import Fraction as Fr
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-LATTICES = {'square': (0,), 'hex': (-1, 0), 'king': (-1, 0, 1)}
+from diagonal_machine import LATTICES                             # noqa: E402
+from depth1_sharpness import phi_at_series                       # noqa: E402
 PAIR_WEIGHT = {'square': 4, 'hex': 9, 'king': 25}       # W_pair(b) = b^3 - b(b+1)/2 + 4
-HEX_CELLS = os.path.join(ROOT, 'results', 'hex_diagonal_cells.txt')
 
 
 # ---------------------------------------------------------------- the gap walk
@@ -137,7 +136,7 @@ def walk_families(D, L):
 
     dp_int = defaultdict(int)
     for g in range(1, gmax + 1):
-        for a in sorted({d for d in Ds} | {d - g for d in Ds}):
+        for a in sorted(set(Ds) | {d - g for d in Ds}):
             T = (a, a + g)
             if not any(t in Ds for t in T):
                 continue
@@ -236,8 +235,8 @@ def template_row(D, g, gp_max):
             bulk[d2 - d1] = bulk.get(d2 - d1, 0) + 1
     outJ, outP = defaultdict(int), defaultdict(int)
     for gp in range(1, gp_max + 1):
-        tot = 2 * len({a for a in Ds} | {a - gp for a in Ds})
-        joined = 2 * len({a for a in Ds} & {a - gp for a in Ds})
+        tot = 2 * len(set(Ds) | {a - gp for a in Ds})
+        joined = 2 * len(set(Ds) & {a - gp for a in Ds})
         if gp == 1:
             outJ[(1, 'J')] += tot
         else:
@@ -294,13 +293,10 @@ def square_closed_form():
     # So j -> 3j on the J side, and no P state ever returns to J.  The end
     # functionals see the J mass only: q_end weighs a g = 1 J state by
     # |D | (1+D)| = 2, and a P state at g >= 2 by |D & (g+D)| = 0.
-    for g in range(2, 6):
-        assert len({0} & {g}) == 0
     j0_int, j0_bare = 2, 1              # dp_int (1,J) = 2, dp_bare (1,J) = 1
-    S = sum(2 * j0_int * 3 ** (l - 1) * y ** l for l in range(1, 40))
-    Bser = 1 + sum(2 * j0_bare * 3 ** (l - 1) * y ** l for l in range(1, 40))
-    S = sp.cancel(4 * y / (1 - 3 * y))
-    B = sp.cancel(1 + 2 * y / (1 - 3 * y))
+    # S = sum_l 2 j0_int 3^(l-1) y^l and B = 1 + sum_l 2 j0_bare 3^(l-1) y^l, summed.
+    S = sp.cancel(2 * j0_int * y / (1 - 3 * y))
+    B = sp.cancel(1 + 2 * j0_bare * y / (1 - 3 * y))
     Ph = sp.cancel(y / (1 - 3 * y))
     F1 = sp.cancel(Ph - B ** 2 / (1 + S))
     return y, S, B, Ph, sp.simplify(F1)
@@ -388,15 +384,15 @@ def hex_defects(kmax):
 
 # ------------------------------------------------- the normalised equations
 
-def phi_hex():
+def phi_hex(mp):
     """Phi(x, W) for hex, with W = N(x) = sum_k N_k x^k, N_k = 2^(k+1) D_1(k).
 
-    Same normalisation as the king quartic of `results/onset-defect-depth1-closed.md`
-    Sec. 3: y = b x and N = b F_1(b x) + 1, here with b = 2.
+    `mp` is the minimal polynomial from hex_kernel().  Same normalisation as
+    the king quartic of `results/onset-defect-depth1-closed.md` Sec. 3: y = b x
+    and N = b F_1(b x) + 1, here with b = 2.
     """
     import sympy as sp
     x, W, Y = sp.symbols('x W yy')
-    _, _, _, _, _, _, mp = hex_kernel()
     cs = [sp.expand(c) for c in mp.all_coeffs()][::-1]
     Phi = sp.expand(4 * sum(cs[k].subs(Y, 2 * x) * ((W - 1) / sp.Integer(2)) ** k
                             for k in range(3)))
@@ -410,23 +406,11 @@ def phi_hex():
 
 
 def annihilates(co, N, order):
-    """Phi(x, N(x)) = 0 through x^order, in exact rationals."""
+    """Phi(x, N(x)) = 0 through x^order, in exact integers (N is integral)."""
     import sympy as sp
     x = sp.symbols('x')
-
-    def mul(a, b):
-        return [sum(a[i] * b[m - i] for i in range(m + 1)) for m in range(order + 1)]
-
-    pw = [[Fr(1)] + [Fr(0)] * order]
-    for _ in range(2):
-        pw.append(mul(pw[-1], N))
-    tot = [Fr(0)] * (order + 1)
-    for k, c in enumerate(co):
-        cc = sp.Poly(c, x).all_coeffs()[::-1]
-        cc = [Fr(int(v)) for v in cc] + [Fr(0)] * (order + 1)
-        t = mul(cc[:order + 1], pw[k])
-        tot = [tot[m] + t[m] for m in range(order + 1)]
-    return all(v == 0 for v in tot)
+    phi = [[int(v) for v in sp.Poly(c, x).all_coeffs()[::-1]] for c in co]
+    return all(v == 0 for v in phi_at_series(phi, [int(v) for v in N], order))
 
 
 # ---------------------------------------------------------------------- gates
@@ -463,6 +447,8 @@ def main():
     print("== pair weights W(2) = b^3 - b(b+1)/2 + 4")
     fams = {}
     for name, D in LATTICES.items():
+        # TODO(simplify 2026-09-05): king is capped at 20 because the reference
+        # walk below is enumerated to 20; --kmax above 20 does not reach king.
         fams[name] = walk_families(D, a.kmax if name != 'king' else 20)
         got = fams[name][0][0]
         assert got == PAIR_WEIGHT[name], (name, got)
@@ -501,7 +487,7 @@ def main():
         if c != d1_hex[k]:
             raise SystemExit(f"FAIL: hex F_1 coefficient {k}: {c} vs walk {d1_hex[k]}")
     print(f"  the closed form reproduces the enumerated walk, k <= {a.kmax}  OK")
-    x, W, co = phi_hex()
+    x, W, co = phi_hex(mp)
     print("  Phi_hex(x, W) = " + " + ".join(
         f"({sp.factor(c)})*W^{k}" for k, c in enumerate(co) if c != 0))
     N = [Fr(0)] + [d1_hex[k] * 2 ** (k + 1) for k in range(1, a.kmax + 1)]
