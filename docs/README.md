@@ -24,8 +24,6 @@ jasonp's machine, and are not missing from a clone by accident.
 | `docs/lean-environment.md` | toolchain paths, vendored deps, lemma search |
 | `docs/lean-artifact.md` | the Lean development as a citable object |
 | `docs/lean-below-onset-scope.md` | what Lean does and does not reach, and the cost of closing it |
-| `docs/state-2026-08-23.md` | **the planning view** — what is true now, what is decided, what is open with its price and what it would change |
-| `docs/time-at-the-bar-report.md` | what the last round did, and the five priced runs it did not launch |
 
 ## 2. `docs/proofs/` — the mathematical record
 
@@ -40,8 +38,6 @@ certificate), `docs/proofs/convex-mirage.md`, `docs/proofs/T-n-nm1.md`,
 
 | file | what |
 |---|---|
-| `docs/time-at-the-bar.md` | **the last round before the landing** — research still worth doing, work that could be planned, what could be removed; the round after `docs/last-orders.md`, and disjoint from `PRE-LANDING.md` by construction |
-| `docs/last-orders.md` | **the round before the landing** — work that could be planned, what could be removed, research still worth doing; disjoint from `PRE-LANDING.md` by construction |
 | `docs/acceptance-queue.md` | **the live worklist** — what makes a(21)–a(40) defensible |
 | `docs/publication-strategy-2026-08-18.md` | current strategy: the repo is the publication |
 | `docs/publication-split.md` | P papers vs L papers, the disclosure blocks, the OEIS lineup |

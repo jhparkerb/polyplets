@@ -36,6 +36,8 @@ their own verification ledgers; `paper/README.md` is their index and says which
 of them claim novelty and which do not. Nothing in this repo claims more than
 its tier.
 
+> Comments in code and manuscript headers still name design and plan documents deleted in the consolidation of 2026-09-06. `docs/consolidation-plan.md` is the ledger; each is readable with `git show <commit>:<path>` at the commit it names.
+
 ## Layout
 
 | where | what |

@@ -48,7 +48,19 @@ is repointed, in wave 2.
 
 By directory: results/ghostship/grading/run-record/sandbox 167; results/ghostship/grading/run-record/sandbox/experiments 74; results/ghostship/grading/run-record/logs 29; docs/reviews/l-trim 22; docs 18; results/ghostship/grading/run-record/sandbox/results 15; results/ghostship/grading/run-record/sandbox/reports 14; results/ghostship/grading/run-record/usage 14; docs/reviews/llm-tics 11; results/rook1 11; results/ghostship/grading 8; results/ghostship/grading/run-record/sandbox/docs/proofs 8.
 
-## Wave 2 — the mathematics, and the held-back 43
+## Wave 2a — the held-back files, 2026-09-06
+
+Deleted at the commit after `b054dea`: 41 files, readable with
+`git show b054dea:<path>`. Forty of the 43 held back from wave 1, plus
+`scripts/undertow_picture.py`, the generator of a deleted picture. Kept:
+`docs/middle-kingdom-plan.md` and `docs/middle-kingdom-followups-plan.md`,
+whose measured tables the gates and tests cite as their source (they fold into
+`results/middle-kingdom.md` in the mathematics wave), and
+`docs/reviews/llm-tics/density.py`, which the coverage audit runs. The code
+comments that named the deleted files stand as written; the note at the top of
+`README.md` says where the files are.
+
+## Wave 2b — the mathematics
 
 Not started. The mathematics half consolidates the diagonal-formula,
 arithmetic, growth, subclass and perimeter themes into one file each, and

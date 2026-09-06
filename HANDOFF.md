@@ -77,7 +77,9 @@ mathematics first).
 - Consolidation wave 1: 443 tracked files deleted with history (see
   `docs/consolidation-plan.md`; read any of them with `git show e5e7870:<path>`).
   Decided 2026-09-05: closed campaigns first, raw records deleted, conclusions
-  in the theme file. Wave 2 is the mathematics and the 43 files code still cites.
+  in the theme file. Wave 2a (same day) removed 41 of the 43 files code still
+  named; the two Middle Kingdom plans stay until their tables fold into
+  `results/middle-kingdom.md`. Wave 2b, the mathematics, is not started.
 
 ## 2026-09-05 late — the machine-written report, and the evening's checks
 
