@@ -118,6 +118,11 @@ inline void viableRec(int r, int H, M mask, int bits, std::uint32_t cov,
 // at the default unsigned and are unchanged.
 template <class M = unsigned, class F>
 inline void forEachViableMask(const Sig& old, int H, int budget, F&& fn) {
+  // `all`, rowSup and sufSup are bitmasks indexed by component LABEL, and stay
+  // uint32 whatever M is: a column of H rows holds at most ceil(H/2) components
+  // (two occupied rows one apart are king-adjacent), labels are 1-based, so
+  // the highest bit used is ceil(SIGMAX/2), which must be below 32.
+  static_assert((SIGMAX + 1) / 2 < 32, "label bitmasks are uint32: ceil(SIGMAX/2) must be < 32");
   std::uint32_t all = 0, rowSup[SIGMAX], sufSup[SIGMAX + 1];
   for (int i = 0; i < H; ++i)
     if (old.b[i]) all |= 1u << old.b[i];

@@ -93,7 +93,19 @@ Untouched by design: the per-term records (`results/ns_a*/`, `results/a41/`,
 `docs/proofs/`, the four audits, the reference docs of `docs/README.md` group 1,
 `HANDOFF.md`, `paper/`, `oeis/`, `polyplets/`, `papers/`, `tests/`.
 
-Not started. The mathematics half consolidates the diagonal-formula,
+Not started.
+
+## Wave 3 — the superseded manuscript, and what a public reader flagged
+
+`paper/polyplets-report.tex` (1,122 lines, superseded 2026-08) and its checker
+`paper/verify_claims.py` go together, with the coverage-audit entry, the
+clean-clone step and the README lines that name them; that is a code change
+across `tests/` and `scripts/` and is its own commit. Raised by an outside
+reader on 2026-09-06 and deferred to jasonp: a visible CI run of the fast gate
+subset; splitting the closed-form injection out of `orchestrator/sweep.go`
+into its own package; the module name `polyominoes` in `go.mod`; `test/`
+beside `tests/`; the author's name differing between `README.md` and the
+paper. The mathematics half consolidates the diagonal-formula,
 arithmetic, growth, subclass and perimeter themes into one file each, and
 folds the remaining dated records. `docs/paper1-engine-chapter.md` and
 `docs/paper1-reproducibility.md`, absorbed by `paper/technical-report-draft.tex`,

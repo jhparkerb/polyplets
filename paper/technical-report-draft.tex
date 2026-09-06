@@ -194,6 +194,10 @@ P_{k-1}$, so two entries of the $k$-th diagonal with $H > n/2$ fix $P_k$
 exactly.
 \end{theorem}
 
+The exponent $3H - 2n - 1$ is negative for $n/2 < H < (2n+1)/3$, and there
+the statement is that $3^{\,2n+1-3H}$ divides $P_{n-H}(n)$ and the quotient is
+$T(n,H)$; for example $T(7,4) = P_3(7)/27$.
+
 The Lean~4 formalization covers the shape, the range $H > n/2$, the
 integer values and the two-cell determination, with each $P_k$ for $k \le 18$
 derived from two computed entries inside the proof assistant; it rests on
@@ -399,9 +403,10 @@ C_{H-2}(n)$. Neither identity counts anything by itself: the work is in
 computing $C_H$, whose states multiply with $H$ as the main program's do. The
 identities only convert one program's output into the other's, which is what
 makes the comparison possible. The program works modulo one prime at a time and
-reassembles the exact counts by the Chinese remainder theorem; one prime is
-always left out of the reassembly and its remainders predicted from the
-others as a check. It shares no code with either program above.
+reassembles the exact counts by the Chinese remainder theorem: nine primes
+near $2^{16}$ per height, eight of which reconstruct any value below
+$2^{128}$, above every count in the table, while the ninth is left out of the
+reassembly and its remainders predicted from the others as a check. It shares no code with either program above.
 
 \paragraph{Symmetry counts}
 \label{sec:symmetry}
@@ -514,7 +519,9 @@ confirmed. A value computed once and found consistent with proved structure
 is checked, which catches gross errors and not a subtle systematic one.
 
 \paragraph{Anchors} $a(1)$--$a(18)$ equal the eighteen terms the OEIS serves
-for A006770, from both enumeration programs.
+for A006770, from both enumeration programs, and the difference between the
+free polyplets and the free polyplets that are not polyominoes equals the
+free polyominoes A000105 at every $n$ from $18$ to $32$.
 
 \paragraph{Every run re-derives everything below it} Each production run
 computes the whole triangle for its size from scratch rather than extending a

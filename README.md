@@ -7,7 +7,13 @@ sequence from a(18) to
 
     a(40) = 56749893611764175164545926946127
 
-with a(1)–a(22) confirmed digit-for-digit by two independent algorithms
+and, with the closed forms of the height triangle standing in for the two
+tallest heights,
+
+    a(41) = 393811462683918679824582849262105
+
+(`results/a41/PROVENANCE.md`; heights 1–20 enumerated, 21–41 from the closed
+forms). a(1)–a(22) are confirmed exactly by two independent algorithms
 sharing no counting logic (Redelmeier enumeration vs transfer matrix;
 three-architecture fleet run completed 2026-07-16), together with its
 symmetry companions (free A030222, one-sided A030233,
@@ -26,15 +32,21 @@ turns all six of its figures red
 ([`results/gate-class-sweep.md`](results/gate-class-sweep.md), which asks the
 same question of all 33 gates and records what it found).
 
-**The full account** is the confidence-tier system summarised below and set out
-in [`paper/polyplets-report.tex`](paper/polyplets-report.tex) — a complete
-machine-written draft, now superseded as a manuscript and kept as source
-material. The manuscript that replaces it,
-[`paper/technical-report.tex`](paper/technical-report.tex), is about 40% built.
-Nine shorter papers on the analytic and arithmetic side are drafted and carry
-their own verification ledgers; `paper/README.md` is their index and says which
-of them claim novelty and which do not. Nothing in this repo claims more than
-its tier.
+**The report** is [`paper/technical-report-draft.tex`](paper/technical-report-draft.tex),
+ten pages, machine-written under the authorship rules of `docs/publication-split.md`
+and approved by the author on 2026-09-06: definitions, the tables, the methods,
+and what stands behind each term. Its every number is read back from the
+stored results by `paper/verify_technical_report.py`. Six shorter papers on the
+analytic and arithmetic side are drafted and carry their own verification
+ledgers; `paper/README.md` is their index. Nothing in this repo claims more
+than its tier.
+
+**Read these five files first:** `paper/technical-report-draft.tex` (or its
+PDF), `results/confidence.md` (how well each term is supported, in plain
+terms), `results/provenance-table.md` (which program produced each entry of
+the triangle), `docs/engine-design.md` (the enumerator), and
+`docs/proofs/diagonal-law.md` (the closed form the tall heights rest on).
+Everything else is record.
 
 > Comments in code and manuscript headers still name design and plan documents deleted in the consolidation of 2026-09-06. `docs/consolidation-plan.md` is the ledger; each is readable with `git show <commit>:<path>` at the commit it names.
 
@@ -43,7 +55,7 @@ its tier.
 | where | what |
 |---|---|
 | `results/` | banked evidence: per-term ledgers `ns_a*/` (triangle, PROVENANCE, per-height rows, cost), analysis notes, b-file staging (`b*_upload.txt`) |
-| `paper/` | the manuscripts — P1 (`technical-report.tex`) and the nine L papers — with the self-contained checkers `verify_claims.py`, `verify_technical_report.py`, `verify_l_papers.py` and the fit/bound scripts; index and authorship split: [`paper/README.md`](paper/README.md) |
+| `paper/` | the manuscripts — the report (`technical-report-draft.tex`), jasonp's own partial `technical-report.tex`, and the six L papers — with the self-contained checkers `verify_technical_report.py`, `verify_l_papers.py` and `verify_claims.py`; index and authorship split: [`paper/README.md`](paper/README.md) |
 | `cpp/` | Redelmeier enumerators (`g2_redelmeier.cpp`, Method A), column transfer matrix (`tma*`), symmetric transfer matrices (`sym/symtm.cpp`) |
 | `core/`, `orchestrator/`, `worker/` | the production kink-carry transfer-matrix engine (Go orchestration, C++ kernels); design: `docs/engine-design.md` |
 | `scripts/` | the general toolchain: production runners (`dalby_term.sh`, `symtm_run.sh`, `dmirror_strips.sh`), derivers (`derive_pk_fast.py`, `dmirror_diagonals.py`, `derive_related.py`), assembly (`dmirror_sum.py`, `dmirror_hybrid_sum.py`), independent confirmation (`g2_campaign.sh`) |
@@ -55,8 +67,10 @@ its tier.
 
 One-shot launch scripts, per-term plans, and the research-log corpus that
 produced all this were removed when the enumeration ladder closed at a(40)
-(2026-07-06); they remain in git history. The ladder is what closed, not the
-project: the analytic, arithmetic and perimeter work above all postdates it.
+(2026-07-06), and most of the campaign records went in the consolidation of
+2026-09-06 (`docs/consolidation-plan.md`); everything remains in git history.
+The ladder is what closed, not the project: a(41), the analytic, arithmetic
+and perimeter work all postdate it.
 
 ## Reproducing
 
@@ -82,7 +96,7 @@ make                       # the gate suite; there is no separate build
 make ns-gates              # the production engine's own suite. 787 s
 make -C paper              # the 11 PDFs, which are gitignored. 14 s
 python3 paper/verify_l_papers.py         # 336 checks, 23 of them RED controls
-python3 paper/verify_technical_report.py # 781 checks
+python3 paper/verify_technical_report.py # 3499 checks, the report's tables and prose
 ALLOW_PARTIAL=1 python3 paper/verify_claims.py   # 425 of 428 checks. 912 s
 ```
 
