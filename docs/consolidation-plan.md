@@ -145,9 +145,8 @@ any contradiction between sources, and any number you could not attribute.
 ## Wave 3 — the superseded manuscript, and what a public reader flagged
 
 `paper/polyplets-report.tex` (1,122 lines, superseded 2026-08) and its checker
-`paper/verify_claims.py` go together, with the coverage-audit entry, the
-clean-clone step and the README lines that name them; that is a code change
-across `tests/` and `scripts/` and is its own commit. Raised by an outside
+`paper/verify_claims.py` went together on 2026-09-06, with the coverage-audit
+entry, the clean-clone step and the README lines that named them. Raised by an outside
 reader on 2026-09-06 and deferred to jasonp (a CI run of the gates was
 proposed and declined, 2026-09-06; the pre-push hook is the gate): splitting
 the closed-form injection out of `orchestrator/sweep.go`

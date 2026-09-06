@@ -74,10 +74,6 @@ say "papers/ in the clone: $(ls papers/ 2>/dev/null | wc -l) files (gate-no-copy
 # name a reader types.
 step make            make.log            make
 step make-ns-gates   make-ns-gates.log   make ns-gates
-# ALLOW_PARTIAL: three checks read the runs/sym32 strip manifest, which is run
-# output and not in any clone, and the verifier is fail-closed without it. This
-# is the invocation the README documents.
-step verify-claims   verify-claims.log   env ALLOW_PARTIAL=1 python3 paper/verify_claims.py
 step verify-lpapers  verify-lpapers.log  python3 paper/verify_l_papers.py
 step verify-report   verify-report.log   python3 paper/verify_technical_report.py
 # The PDFs are gitignored, so a reader has the .tex and builds them himself.

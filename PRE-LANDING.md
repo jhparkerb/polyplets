@@ -77,7 +77,7 @@ already closed and is here so that nobody re-opens it during the landing.
       `scripts/g2_fleet_launch.sh` and `results/ns_a40/dalby-run-evidence/`) —
       both counts one higher than on 08-19, so this drifts upward on its own
       and a scrub decided today needs re-measuring at R. Your email is in
-      `paper/technical-report.tex` and `paper/polyplets-report.tex` by design.
+      `paper/technical-report.tex` and `paper/technical-report-draft.tex` by design.
       Fine, or scrub — but decide once rather than per-file after the fact.
 - [ ] **The history goes public, not just the tree.** The flip publishes 1475
       commits on `master` and 1585 across all refs, not the 27 files above.
@@ -147,9 +147,6 @@ would publish.
       fired. Green at `184664d`; re-run at R.
 - [~] `python3 paper/verify_technical_report.py` — 781 checks, 0 failures.
       Green at `184664d`; re-run at R.
-- [ ] `ALLOW_PARTIAL=1 python3 paper/verify_claims.py` — 425 of 428, ~912 s.
-      The three skipped read `runs/sym32`, which is run output; the flag is how
-      a reader says they know which three.
 - [ ] `make -C paper` — 11 PDFs, ~14 s. They are gitignored, so a visitor
       builds them. If built PDFs should be downloadable without a TeX Live,
       they have to be release assets, which is a separate decision (see C).

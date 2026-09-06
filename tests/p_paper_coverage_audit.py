@@ -2,8 +2,8 @@
 """Which numbers in a P paper does its verifier actually read?
 
 The measurement tests/gate_p_paper_verifier.py makes, for a verifier slow
-enough that it cannot be a gate.  paper/verify_claims.py guards
-polyplets-report.tex with 428 checks and takes 431 s a run.
+enough that it cannot be a gate.  paper/verify_claims.py (retired 2026-09-06 with
+polyplets-report.tex) took 431 s a run.
 
 Perturbing all 264 of the paper's numeric literals at that price would be 32
 core-hours.  It is not: profiling says 429 of the 431 s are nine
@@ -13,13 +13,13 @@ tests/_audit_subprocess_cache.py a warm run is **2.2 s**, so the sweep is ten
 minutes on one core.
 
     AUDIT_SUBPROC_CACHE=~/var/p-coverage/cache \\
-      python3 tests/p_paper_coverage_audit.py --paper polyplets
+      python3 tests/p_paper_coverage_audit.py --paper technical
 
 The GREEN control runs first: if the unmutated copy does not pass on this box,
 it exits 2 rather than reporting a wall of false "guarded" results.  --shard/
 --of and --merge remain for a verifier that is slow even warm.
 
-Needs build/g2 and the runs/sym3x directories verify_claims reads; a box
+Once needed build/g2 and the runs/sym3x directories the retired verify_claims read; a box
 without them fails the green control rather than reporting nonsense.
 """
 import argparse
@@ -35,8 +35,6 @@ ROOT = Path(__file__).resolve().parent.parent
 PAPERS = {
     "technical": (ROOT / "paper" / "technical-report.tex",
                   ROOT / "paper" / "verify_technical_report.py"),
-    "polyplets": (ROOT / "paper" / "polyplets-report.tex",
-                  ROOT / "paper" / "verify_claims.py"),
 }
 
 
@@ -55,15 +53,9 @@ def merge(paths, tex):
     return 0
 
 
-# TODO(2026-08-24, /simplify): the 32-core-hour cold sweep rightly stays
-# offline, but nothing notices the polyplets literal SET drifting since the
-# 2026-08-23 measurement (154/264 guarded). A regex-only drift check --
-# recompute the literal list, compare against the banked shard jsons, red means
-# "re-run the audit" -- is gate-cheap at ~25 lines. Subsumed if verify_claims
-# ever banks its hole tables (see tests/_audit_subprocess_cache.py).
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--paper", choices=sorted(PAPERS), default="polyplets")
+    ap.add_argument("--paper", choices=sorted(PAPERS), default="technical")
     ap.add_argument("--shard", type=int, default=0)
     ap.add_argument("--of", type=int, default=1)
     ap.add_argument("--out")

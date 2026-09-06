@@ -47,7 +47,6 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 |---|---|---|
 | `technical-report.tex` | **P1** — Fixed polyplets through *a*(40) | in progress, jasonp's prose, roughly 40% built |
 | `technical-report-draft.tex` | — | **L**, 2026-09-05. Complete machine-written draft with the same structure, scope and tables as `technical-report.tex`, every claim's backing sentence filled in; `\Ldisclosure` + draft banner; 12 pp, builds clean. Written at jasonp's word for him to strike from; not liftable into the P file |
-| `polyplets-report.tex` | — | superseded. A complete machine-written draft of P1's material, trimmed 2026-08-01. Under the split it cannot be lifted into `technical-report.tex` sentence by sentence; it is **source material and notes** |
 | `L1-diagonal-law.tex` | **L1** — A diagonal law for row-local lattices, and the mod-3 arithmetic of the king instance | draft, 23pp — **absorbed L2** 2026-08-23 as Part II |
 | `L3-lambda-bounds.tex` | **L3** — A certified two-sided bound for λ | draft, 13pp |
 | `L4-not-dfinite.tex` | **L4** — An arithmetic obstruction to D-finiteness | draft, 10pp |
@@ -169,7 +168,6 @@ parses it and checks its printed numbers against banked results in `results/`:
 |---|---|---|
 | `verify_technical_report.py` | `technical-report.tex`, and every prose number of `technical-report-draft.tex` when that file is present | `results/ns_a40/`, b-files, `results/holes_n18.txt`, `results/a41/`, `results/cutcount_b1/rows41/` |
 | `verify_l_papers.py` | `L1`, `L3`, `L4`, `L6` — **not `L5` or `L8`** | `results/strip_mu_certificates.log`, `results/triangle.txt`, `results/perimmin_square8_p48_r6.txt`, `results/perimdefect_square{4,8}_n78_k6.txt` |
-| `verify_claims.py` | `polyplets-report.tex` | `build/g2` — so it is not in `make papers-verify`; run it explicitly |
 
 Each is red-first: it fails on a manuscript whose tables have drifted, and each
 carries at least one control that must fail.
@@ -188,8 +186,5 @@ Neither audit is a gate, deliberately; both say where the exposure is.
 numbers quoted by the manuscripts. `technical-report.bib` is P1's bibliography
 (2026-09-05, every entry checked against `papers/`), and
 `technical-report-cites.md` says which sentence of the `.tex` each key is for;
-the `.tex` itself carries no `\cite` until jasonp places them. `restructure-plan.md`,
-`related-work-notes.md`, `technical-report-gaps.md` and
-`polyplets-report-cuts.md` are working notes, not manuscripts;
-`polyplets-report-cuts.md` in particular is the audit trail of the 2026-08-01
-trim and is kept for that reason.
+the `.tex` itself carries no `\cite` until jasonp places them. `related-work-notes.md` and `technical-report-gaps.md` are working notes, not
+manuscripts.

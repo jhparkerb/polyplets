@@ -43,7 +43,7 @@ toolchain:
 
 # Three passes with a conditional bibtex between the first and second.  The
 # bibtex run needs BOTH conditions in the .aux: a \bibdata line (the manuscript
-# uses refs.bib at all -- polyplets-report.tex and technical-report.tex still
+# uses refs.bib at all -- technical-report.tex still
 # carry inline thebibliography environments and bibtex exits 1 on them) and at
 # least one \citation (bibtex also exits 1 on "I found no \citation commands",
 # which a manuscript that has not started citing yet would trip).
@@ -70,8 +70,6 @@ toolchain:
 verify:
 	@cd .. && python3 paper/verify_technical_report.py
 	@cd .. && python3 paper/verify_l_papers.py
-	@echo "paper/Makefile: verify_claims.py (polyplets-report.tex) needs build/g2;"
-	@echo "  run it explicitly:  make build/g2 && python3 paper/verify_claims.py"
 
 list:
 	@echo "manuscripts:"

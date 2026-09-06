@@ -55,7 +55,7 @@ Everything else is record.
 | where | what |
 |---|---|
 | `results/` | banked evidence: per-term ledgers `ns_a*/` (triangle, PROVENANCE, per-height rows, cost), analysis notes, b-file staging (`b*_upload.txt`) |
-| `paper/` | the manuscripts — the report (`technical-report-draft.tex`), jasonp's own partial `technical-report.tex`, and the six L papers — with the self-contained checkers `verify_technical_report.py`, `verify_l_papers.py` and `verify_claims.py`; index and authorship split: [`paper/README.md`](paper/README.md) |
+| `paper/` | the manuscripts — the report (`technical-report-draft.tex`), jasonp's own partial `technical-report.tex`, and the six L papers — with the self-contained checkers `verify_technical_report.py` and `verify_l_papers.py`; index and authorship split: [`paper/README.md`](paper/README.md) |
 | `cpp/` | Redelmeier enumerators (`g2_redelmeier.cpp`, Method A), column transfer matrix (`tma*`), symmetric transfer matrices (`sym/symtm.cpp`) |
 | `core/`, `orchestrator/`, `worker/` | the production kink-carry transfer-matrix engine (Go orchestration, C++ kernels); design: `docs/engine-design.md` |
 | `scripts/` | the general toolchain: production runners (`dalby_term.sh`, `symtm_run.sh`, `dmirror_strips.sh`), derivers (`derive_pk_fast.py`, `dmirror_diagonals.py`, `derive_related.py`), assembly (`dmirror_sum.py`, `dmirror_hybrid_sum.py`), independent confirmation (`g2_campaign.sh`) |
@@ -94,18 +94,10 @@ cores, g++ 12.2, TeX Live 2022, no clang and no Lean):
 make                       # the gate suite; there is no separate build
                            # step, because each gate builds what it needs. 423 s
 make ns-gates              # the production engine's own suite. 787 s
-make -C paper              # the 11 PDFs, which are gitignored. 14 s
+make -C paper              # the 8 PDFs, which are gitignored
 python3 paper/verify_l_papers.py         # 336 checks, 23 of them RED controls
 python3 paper/verify_technical_report.py # 3499 checks, the report's tables and prose
-ALLOW_PARTIAL=1 python3 paper/verify_claims.py   # 425 of 428 checks. 912 s
 ```
-
-`verify_claims.py` is fail-closed on missing evidence and **exits 1 on a fresh
-clone without `ALLOW_PARTIAL`**: three of its checks read the `runs/sym32`
-strip manifest, which is run output and not in the tree. It says so, names the
-group it skipped, and falls back to the banked `results/sym_counts.txt`. That
-is the intended behaviour, not a defect to route around — the flag is how you
-say you know which three are missing.
 
 Two independent algorithms on the same small values:
 
