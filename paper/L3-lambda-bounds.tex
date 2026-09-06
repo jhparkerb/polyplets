@@ -119,7 +119,10 @@ position, in a way that keeps the result connected and keeps the map injective,
 gives $a(m)a(n) \le a(m+n)$; Fekete's lemma then makes
 $\lambda := \lim_n a(n)^{1/n}$ exist, with $a(n) \le \lambda^n$ for every $n$ ---
 so every enumerated term is a floor on $\lambda$ and never an approximation to
-it. Ratios of enumerated terms put $\lambda$ near $7.11$.
+it. The largest such floor is $a(40)^{1/40} = 6.2208$ and the last successive
+ratio is $a(40)/a(39) = 6.9352$; extrapolating that ratio sequence, by
+differential approximants on the 40 terms, gives the estimate
+$\lambda = 7.110(1)$, which is a measurement and not a bound.
 
 The state of rigorous knowledge before this work was one-sided. Bacher's directed
 animals on the king lattice give $\lambda \ge 3 + 2\sqrt2 \approx 5.828$ in closed
@@ -395,8 +398,8 @@ A sliding three-point power-law fit $\mu_H = \lambda - cH^{-p}$ over the float
 ladder gives $\lambda$ estimates that march monotonically downward as the center
 rises: $9.54, 8.41, 7.92, 7.66, 7.50, 7.40, 7.33, 7.29$ for centres
 $H = 5,\dots,12$, with the exponent $p$ tending to about $1$, a $1/H$
-finite-size correction. The sequence converges toward the value $\approx 7.11$
-that term ratios give.
+finite-size correction. The sequence converges toward $\approx 7.11$, the value the
+differential-approximant extrapolation of the term ratios gives.
 
 It is \emph{structurally} independent: strip spectra
 and row-sum ratios share no data and no algorithm. It is not yet sharper than the
