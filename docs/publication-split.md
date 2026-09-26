@@ -6,11 +6,12 @@
 
 # The publication split: which papers are jasonp's, which are Claude's
 
-**As of 2026-09-06 there are no P papers.** Every manuscript in `paper/` is
-category L. P1 was retired that day: jasonp read the machine-written report,
-approved it for release and put it in place of his own partial, which is in git
-history. P2 and P3 below are plans, not drafts, and nothing has been written
-for either. The P category is kept because it is what the disclosure rule is
+**P1 is jasonp's prose again as of 2026-09-25.** On 2026-09-06 he read the
+machine-written report, approved it for release and put it in place of his own
+partial; on 2026-09-25 he restored that partial (33a0436) to rewrite the report
+in his own words, and the machine-written report went back to git history. The
+six L papers are the only other manuscripts in `paper/`. P2 and P3 below are
+plans, not drafts, and nothing has been written for either. The P category is kept because it is what the disclosure rule is
 built on and what P2 and P3 would be filed under; read every "P1", "P2" and
 "P3" below as scoping, not as a description of a document that exists.
 
@@ -60,18 +61,17 @@ is what carries the honesty — not the author line.
 | **P2** | Two stratifications of A006770 | T(n,H); his hand-derived T(n,n−1) and T(n,n−2); the defect gas and 25 = 16 + 9; onset and integrality; C(n,c) and the C(n,1) = C(n,n) = A001168 bijection; the universal law *stated*, cited to L1 | 12–16 | 15–25 | low | med-high |
 | **P3** | King animals by convexity and directedness | the 5×4 grid; the eight collapse propositions; A018902's first lattice-animal interpretation; the A187077 correction; A222205 to 200 terms and µ = 6.475196280297; 3 + 2√2 reproduced; µ = 3.128943… for the staircase→HV band; the λ bracket *stated*, cited to L3; the five novel sequences as labeled data | 14–20 | 20–30 | low-med | med-high |
 
-**P1 is now an L paper.** For most of the project `paper/technical-report.tex`
-was jasonp's own prose, 331 lines and roughly 40% built, with a complete
-machine-written draft beside it. On 2026-09-06, having read the draft in full
-and approved it for release, he promoted it in place of his own file: the
-report is `paper/technical-report.tex`, it carries the `\Ldisclosure`, and the
-partial P1 is in git history. What was ruled out by the split still holds --
-the two were never merged sentence by sentence, and no P paper contains
-machine-written prose. (Two earlier machine-written P1 drafts,
-`paper/polyplets-report.tex` and `paper/technical-report-draft.tex`, were
-retired: the first in the 2026-09 consolidation, the second by becoming this
-file.) Most of the 30–50 hours is
-the engine chapter and §Reproducibility, both still unwritten.
+**P1 is jasonp's prose, and the machine-written report is not liftable into
+it.** `paper/technical-report.tex` is his own partial, 352 lines. From
+2026-09-06 to 2026-09-25 the machine-written report (category L, approved for
+release on 2026-09-06) stood in its place; he then restored his own version to
+rewrite the report in his words. The machine-written report is in git history
+(`git show aac6f4f:paper/technical-report.tex`) and is notes and source
+material only: sentence-level reuse is exactly the blur the split rules out.
+(Two earlier machine-written P1 drafts, `paper/polyplets-report.tex` and
+`paper/technical-report-draft.tex`, were retired: the first in the 2026-09
+consolidation, the second by being promoted and then withdrawn.) Most of the
+30–50 hours is the engine chapter and §Reproducibility, both still unwritten.
 
 **P2's boundary with P1 is real.** T(n,H) appears in P1 as *method* — the P_k
 closed forms are how a(37)–a(40) were composed — and in P2 as *object*: the law,

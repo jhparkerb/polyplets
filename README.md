@@ -10,9 +10,10 @@ contact counts, and `a(n)` counts those with `n` cells up to translation: OEIS
 (A provisional value for `a(41)` is available in the repo but the level of
 confidence that can be ascribed to it is nuanced.)
 
-The ten-page technical report
-[`paper/technical-report.tex`](paper/technical-report.tex) states the results
-and what stands behind each one. Then
+The technical report
+[`paper/technical-report.tex`](paper/technical-report.tex) is in the author's
+own words; the machine-written report that stood in its place from 2026-09-06
+to 2026-09-25 is in git history (`git show aac6f4f:paper/technical-report.tex`).
 [`results/confidence.md`](results/confidence.md) says in plain terms how
 far each term can be trusted.
 
@@ -83,7 +84,7 @@ make                       # the gate suite; there is no separate build
 make ns-gates              # the production engine's own suite. 787 s
 make -C paper              # the 8 PDFs, which are gitignored
 python3 paper/verify_l_papers.py         # 336 checks, 23 of them RED controls
-python3 paper/verify_technical_report.py # 3406 checks, the report's tables and prose
+python3 paper/verify_technical_report.py # 2840 checks, the report's tables and prose
 ```
 
 Two independent algorithms on the same small values:
@@ -135,6 +136,6 @@ An amateur project by Jason H Parker, built in collaboration with an AI
 assistant (Anthropic's Claude); the author owns all decisions and the
 correctness of every claim.
 
-See the report's AI note for the division of labor. AI assistance spans
+`docs/publication-split.md` sets out the division of labor. AI assistance spans
 essentially the entire commit history; treat the history as AI-assisted
 throughout.

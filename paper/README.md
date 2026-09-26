@@ -43,7 +43,7 @@ be **per result, not in aggregate**, and that is the whole point of the block.
 
 | file | paper | state |
 |---|---|---|
-| `technical-report.tex` | **P1** — Fixed polyplets through *a*(40) | **L**, 10 pp, read in full and approved for release by its named author on 2026-09-06; he did not independently re-derive the mathematics. It carries the `\Ldisclosure`. It was written as `technical-report-draft.tex` beside his own partial P1, and promoted in its place at his direction on 2026-09-06; that partial is in git history |
+| `technical-report.tex` | **P1** — Fixed polyplets through *a*(40) | jasonp's prose, 6 pp. From 2026-09-06 this file held the machine-written report (category L, approved for release that day); on 2026-09-25 he restored his own last version (33a0436) to rewrite the report in his own words. The machine-written report is in git history (`git show aac6f4f:paper/technical-report.tex`) |
 | `L1-diagonal-law.tex` | **L1** — A diagonal law for row-local lattices, and the mod-3 arithmetic of the king instance | draft, 23pp — **absorbed L2** 2026-08-23 as Part II |
 | `L3-lambda-bounds.tex` | **L3** — A certified two-sided bound for λ | draft, 13pp |
 | `L4-not-dfinite.tex` | **L4** — An arithmetic obstruction to D-finiteness | draft, 10pp |
@@ -107,16 +107,18 @@ paragraph.
 
 ## Who may edit what
 
-Everything in this directory is machine-writable today, because every
-manuscript here is category L.
+**`technical-report.tex` is read-only to the machine.** It is jasonp's prose,
+under the P disclosure, and a machine-written sentence in it would falsify that
+disclosure. Claude does not edit it — not to fix a typo, not to reformat, not to
+revert its own earlier change — without explicit per-instance direction. It also
+deliberately does not `\input shared/preamble.tex`: the duplicated preamble is
+the price of leaving the file alone.
 
-That was not true until 2026-09-06. `technical-report.tex` was jasonp's own
-prose under the P disclosure, and was read-only to the machine — not a typo,
-not a reformat, not a revert, without explicit per-instance direction — because
-one machine-written sentence in it would have falsified its disclosure. He
-replaced it with the machine-written report on 2026-09-06. **The rule stands
-for the P papers that get written**: P2 and P3 are his prose, and the same
-prohibition applies to them from their first line.
+The rule was suspended from 2026-09-06 to 2026-09-25, while the file held the
+machine-written report, and came back when he restored his own version. It
+applies equally to P2 and P3 from their first line.
+
+Everything else here is machine-writable.
 
 ## Building
 

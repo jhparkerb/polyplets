@@ -66,17 +66,17 @@ already closed and is here so that nobody re-opens it during the landing.
       draft banners already announce. Per paper, not in aggregate.
 - [ ] **Byline per L paper.** `docs/publication-split.md` §1 makes this a
       per-paper decision, explicitly not a policy. Nine papers, nine answers.
-- [x] ~~**P1.**~~ **Closed 2026-09-06: there is no P1.** His own partial, then
-      about 40% built, was retired and the machine-written report took its
-      place as `paper/technical-report.tex` under the L disclosure. The repo
-      was published without a P paper, which is what the strategy doc's Track D
-      had assumed.
+- [x] ~~**P1.**~~ **Closed 2026-09-06, reopened 2026-09-25.** On 2026-09-06
+      his own partial was retired and the machine-written report took its
+      place as `paper/technical-report.tex` under the L disclosure. On
+      2026-09-25 he restored his own version and finished it in his own words;
+      the machine-written report is in git history.
 - [ ] **Machine names and paths in the tree.** 27 tracked files contain
       `/Users/jasonp`, 10 contain `dalby.jhpb.org` (including
       `scripts/g2_fleet_launch.sh` and `results/ns_a40/dalby-run-evidence/`) —
       both counts one higher than on 08-19, so this drifts upward on its own
       and a scrub decided today needs re-measuring at R. Your email is in
-      `paper/technical-report.tex` and `paper/technical-report-draft.tex` by design.
+      `paper/technical-report.tex` by design.
       Fine, or scrub — but decide once rather than per-file after the fact.
 - [ ] **The history goes public, not just the tree.** The flip publishes 1475
       commits on `master` and 1585 across all refs, not the 27 files above.

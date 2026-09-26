@@ -1,9 +1,8 @@
 # What the report's verifier actually reads
 
 Called the P-paper coverage measurement for historical reasons: it was built
-when `paper/technical-report.tex` was a P paper, jasonp's own prose. That file
-is now the machine-written report and no P paper exists, but the measurement
-and its gate are unchanged and would cover a P paper if one were written.
+when `paper/technical-report.tex` was a P paper, jasonp's own prose, and it is
+one again as of 2026-09-25.
 
 Measured, not assumed. `tests/p_paper_coverage_audit.py` perturbs the last
 digit of every numeric literal of four or more digits in a COPY of the `.tex`
@@ -11,23 +10,19 @@ and re-runs the verifier: a literal whose perturbation still passes is one the
 paper prints and no check reads. `tests/gate_p_paper_verifier.py` is the gate
 that keeps the answer from drifting. jasonp's prose is never written to.
 
-## The answer, re-measured 2026-09-06
+## The answer, re-measured 2026-09-25
 
 | paper | verifier | literals | guarded | unguarded |
 |---|---|---|---|---|
-| `paper/technical-report.tex` | `paper/verify_technical_report.py` (3406 checks) | 235 | **229** | 6 |
+| `paper/technical-report.tex` | `paper/verify_technical_report.py` (2840 checks) | 294 | **293** | 1 |
 
-The six exceptions are named in the gate's `ALLOWED`, each with its reason:
-the year in the report's `\date{}`, the month and day of the release-approval
-date in its disclosure block, the two rotation subscripts of the Burnside
-setup, and A000105, an OEIS entry this project does not compute and subtracts
-only to define A194596. Any new unguarded literal fails the gate, so coverage
-cannot silently drop.
+The one exception is the year in the report's `\date{}`. It is named in the
+gate's `ALLOWED` with that reason, and any new unguarded literal fails the
+gate, so coverage cannot silently drop.
 
-The count changed on 2026-09-06, when the machine-written report replaced the
-partial one and became `technical-report.tex`: a different file, with different
-literals, audited the same way. The measurement before the swap was 293 of 294
-on the file it replaced.
+From 2026-09-06 to 2026-09-25 the file held the machine-written report, which
+measured 229 of 235 with six named exceptions; the figure above is for his
+restored text.
 
 ## Why this measurement exists
 
