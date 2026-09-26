@@ -68,7 +68,7 @@ rook-connected animals known as \textbf{polyominoes} are also relevant.
 
 The polyplets can be counted with respect to the symmetries of the king lattice:
 \begin{description}
-\item[Fixed] polyplets are distinct up to translation (\href{https://oeis.org/A006770}{A006770});
+\item[Fixed] polyplets are distinct up to translation (\href{https://oeis.org/A006770}{A006770}~\cite{oeis});
 \item[One-sided] polyplets are distinct up to translation and rotation
 	(\href{https://oeis.org/A030233}{A030233});
 \item[Free] polyplets are distinct up to translation, rotation and reflection
@@ -281,7 +281,7 @@ Table~\ref{tab:an}.
 \section{Methods}
 \label{sec:methods}
 
-\paragraph{Redelmeier enumeration} An implementation of Redelmeier enumeration was used to extend
+\paragraph{Redelmeier enumeration} An implementation of Redelmeier enumeration~\cite{redelmeier1981} was used to extend
 $a(n)$ and to confirm the correctness of the counts for larger $n$.  As runtime and storage
 increases with $a(n)$ only terms through $n=22$ could be confirmed with this software.
 
@@ -289,7 +289,7 @@ increases with $a(n)$ only terms through $n=22$ could be confirmed with this sof
 polyplet classes were counted by height of the bounding box by freezing the left-hand-side of each animal
 class in progress and considering how the polyplets could grow given constraints on the previous column,
 whether the top and/or bottom of the bounding box had been reached, cell connectivity rules and the number
-of cells still able to be placed.
+of cells still able to be placed~\cite{jensen2001}.
 
 \paragraph{Formulas} Formulas exist for $T(n,H)$ where $n=H$ and $H>n/2$.  $T(n,n)=3^{n-1}$
 by simply choosing 1 of 3 positions to occupy in each row besides the first.
@@ -337,5 +337,8 @@ options to add to the interior joiner options:
 \paragraph{Use of formulas} The $P_k$ formulas were derived and used to ease the cost of computing
 transfer matrix results; in particular, the most expensive values for $T(n,H)$ that could be derived
 in closed form per the above were used for $a(24)$--$a(40)$.
+
+\bibliographystyle{plain}
+\bibliography{technical-report}
 
 \end{document}
