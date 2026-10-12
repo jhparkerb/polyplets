@@ -163,7 +163,7 @@ conditionality (`MoatBound`) is a formalization gap, not a mathematical one.
 |---|---|---|---|---|
 | 1 | the hand-derived diagonals T(n,n−1), T(n,n−2) | 1 | `docs/proofs/T-n-nm1.md`, `docs/proofs/T-n-nm2-and-general.md` | as Paper 1 rows 6–7 |
 | 2 | the defect gas: 25 = 16 + 9, and the same bookkeeping generates every P_k | 1 | `results/diagonal-formula.md` | the note's derivation |
-| 3 | the universal diagonal formula: T(H+k,H) = q_k(H)·b^H for every row-local lattice, deg q_k ≤ k, H ≥ k+1 | 2 | `docs/proofs/universal-diagonal-law.md`; Lean `Universal.exists_delta`, `exists_q`, `exists_isDiagonalPoly`, `IsDiagonalPoly.intValued`, standard axioms | `lake build --no-build`; the four names guarded |
+| 3 | the universal diagonal formula: T(H+k,H) = q_k(H)·b^H for every row-local lattice, deg q_k ≤ k, H ≥ k+1 | 2 | `docs/proofs/universal-diagonal-law.md`; Lean `RowLocal.exists_delta`, `exists_q`, `exists_isDiagonalPoly`, `IsDiagonalPoly.intValued`, standard axioms | `lake build --no-build`; the four names guarded |
 | 4 | the lattice instances (king b = 3, hex b = 2, square b = 1) | 2 | Lean `T_sub_one`, `hex_T_sub_one`, `square_T_sub_one` (renamed 2026-10-12) | named native leaves, two triangle entries per lattice; the table must say so |
 | 5 | the grand form | 2 | `docs/proofs/grand-form.md`; Lean `T_staircase`, `climb` (renamed 2026-10-12), standard axioms | guarded |
 | 6 | P_k determined to k ≤ 18 from production data | 2 | Lean `isDiagonalPoly_Pk` under `EnumeratedCells` (renamed 2026-10-12) | named leaves: the chunked weight cards |

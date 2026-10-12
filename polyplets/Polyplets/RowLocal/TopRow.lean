@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Polyplets.Universal.Weights
+import Polyplets.RowLocal.Weights
 
 /-!
 # Peeling: the two top-row identities, for every row-local lattice
@@ -42,7 +42,7 @@ propositional characterizations `mem_walkTop` and `mem_configs`.
 
 ## The verbatim wager, settled
 
-This file is `Universal/TopRow.lean` transcribed with `kingAdj ↦ Adj L` and
+This file is `RowLocal/TopRow.lean` transcribed with `kingAdj ↦ Adj L` and
 `KingConnected ↦ Connected L`. Every proof carries over unchanged. The drift count
 enters at exactly **three** places, all inside class A:
 
@@ -59,13 +59,13 @@ Classes B and C mention adjacency only through connectivity lemmas
 proof needed the reach `L.reach`, the shape of `D`, or any arithmetic of `b`.
 -/
 
-namespace Polyplets.Universal
+namespace Polyplets.RowLocal
 
-variable {L : RowLocal}
+variable {L : Lattice}
 
 /-! ## Translation toolkit, in the `(a, b)` coordinates the bijections use
 
-Everything here is `translate` of `Universal/Defs.lean` with the vector split
+Everything here is `translate` of `RowLocal/Defs.lean` with the vector split
 into its two coordinates, which is how the peel and glue maps are written. -/
 
 /-- Translate a cell by `(a, b)`. -/
@@ -777,7 +777,7 @@ lemma capWalk_zero {H : ℕ} {S : Finset (ℤ × ℤ)} : CapWalk 0 H S := by
 
 /-- The target of classes B and C: configurations with `cap` walk rows on top,
 paired with walk-top remainders, indexed by `(j, ℓ)`. -/
-noncomputable def target (L : RowLocal) (cap k H : ℕ) : Finset PeelData :=
+noncomputable def target (L : Lattice) (cap k H : ℕ) : Finset PeelData :=
   (Finset.Icc 1 k).sigma fun j => (Finset.Icc 1 j).sigma fun ℓ =>
     configs L cap ℓ j ×ˢ walkTop L (k - j) (H - cap - ℓ)
 
@@ -1339,7 +1339,7 @@ lemma card_clusterTop (k H : ℕ) (hH : k + 1 ≤ H) :
 splits by its second-top row — walk (class A: `b` up-offsets on a height-`H-1`
 walk-top remainder) or the base of a cluster (class B: an interior
 `V`-configuration capping a shorter walk-top remainder). -/
-theorem d_rec (L : RowLocal) (k H : ℕ) (hH : k + 2 ≤ H) :
+theorem d_rec (L : Lattice) (k H : ℕ) (hH : k + 2 ≤ H) :
     d L k H = L.b * d L k (H - 1) +
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, V L ℓ j * d L (k - j) (H - 1 - ℓ) := by
   classical
@@ -1350,7 +1350,7 @@ theorem d_rec (L : RowLocal) (k H : ℕ) (hH : k + 2 ≤ H) :
 /-- **The top-row identity**: for `H ≥ k + 1`, an animal has a walk top
 row (counted by `d L k H`) or a multi top row — a top-edge `Vᵗ`-configuration
 capping a shorter walk-top remainder (class C). -/
-theorem T_of_d (L : RowLocal) (k H : ℕ) (hH : k + 1 ≤ H) :
+theorem T_of_d (L : Lattice) (k H : ℕ) (hH : k + 1 ≤ H) :
     T L (H + k) H = d L k H +
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, Vt L ℓ j * d L (k - j) (H - ℓ) := by
   classical
@@ -1359,4 +1359,4 @@ theorem T_of_d (L : RowLocal) (k H : ℕ) (hH : k + 1 ≤ H) :
   rw [← card_animals, ← hsplit, filter_animals_walkTop, card_clusterTop k H hH]
   rfl
 
-end Polyplets.Universal
+end Polyplets.RowLocal

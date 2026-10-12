@@ -3,13 +3,13 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Polyplets.Universal.Instance
+import Polyplets.RowLocal.Instance
 import Polyplets.Weights
 
 /-!
 # The king lattice: the polyplet development as an instance
 
-`Universal/` proves the peeling recursion and the diagonal law for every
+`RowLocal/` proves the peeling recursion and the diagonal law for every
 row-local lattice. The king lattice is `D = {-1, 0, 1}`, `b = 3`, and this
 file is the dictionary between the two vocabularies:
 
@@ -27,10 +27,10 @@ decides `V 1 1 = 25` and `d 0 1 = 1`, which `LeadingCoeff.lean` consumes);
 `V_king`/`Vt_king` identify them with the generic, noncomputable ones.
 -/
 
-namespace Polyplets.Universal
+namespace Polyplets.RowLocal
 
 /-- The king lattice: up-offsets `{-1, 0, 1}`. -/
-def kingLattice : RowLocal where
+def kingLattice : Lattice where
   D := {-1, 0, 1}
   hD := ⟨0, by decide⟩
 
@@ -132,11 +132,11 @@ theorem topConfigs_king (ℓ j : ℕ) : topConfigs kingLattice ℓ j = Polyplets
   change (topConfigs kingLattice ℓ j).card = (Polyplets.topConfigs ℓ j).card
   rw [topConfigs_king]
 
-end Polyplets.Universal
+end Polyplets.RowLocal
 
 namespace Polyplets
 
-open Polynomial Universal
+open Polynomial RowLocal
 
 /-! ## The peeling identities -/
 
@@ -147,7 +147,7 @@ remainder). -/
 theorem d_rec (k H : ℕ) (hH : k + 2 ≤ H) :
     d k H = 3 * d k (H - 1) +
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, V ℓ j * d (k - j) (H - 1 - ℓ) := by
-  simpa using Universal.d_rec kingLattice k H hH
+  simpa using RowLocal.d_rec kingLattice k H hH
 
 /-- **The top-row identity**: for `H ≥ k + 1`, a polyplet has a walk top row
 (counted by `d k H`) or a multi top row — a top-edge `Vᵗ`-configuration
@@ -155,7 +155,7 @@ capping a shorter walk-top remainder. -/
 theorem T_of_d (k H : ℕ) (hH : k + 1 ≤ H) :
     T (H + k) H = d k H +
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, Vt ℓ j * d (k - j) (H - ℓ) := by
-  have h := Universal.T_of_d kingLattice k H hH
+  have h := RowLocal.T_of_d kingLattice k H hH
   rw [T_king] at h
   simpa using h
 
@@ -165,14 +165,14 @@ theorem T_of_d (k H : ℕ) (hH : k + 1 ≤ H) :
 `H ≥ k + 1`, with `δ_k ∈ ℚ[X]` of degree `≤ k`. -/
 theorem exists_delta (k : ℕ) : ∃ δ : Polynomial ℚ, δ.natDegree ≤ k ∧
     ∀ H : ℕ, k + 1 ≤ H → (d k H : ℚ) = δ.eval (H : ℚ) * 3 ^ H := by
-  obtain ⟨δ, hdeg, h⟩ := Universal.exists_delta kingLattice k
+  obtain ⟨δ, hdeg, h⟩ := RowLocal.exists_delta kingLattice k
   exact ⟨δ, hdeg, fun H hH => by simpa using h H hH⟩
 
 /-- **Shape of the k-th diagonal**: `T(H+k, H) = q_k(H) · 3^H` for all
 `H ≥ k + 1`, with `q_k ∈ ℚ[X]` of degree `≤ k`. -/
 theorem exists_q (k : ℕ) : ∃ q : Polynomial ℚ, q.natDegree ≤ k ∧
     ∀ H : ℕ, k + 1 ≤ H → (T (H + k) H : ℚ) = q.eval (H : ℚ) * 3 ^ H := by
-  obtain ⟨q, hdeg, h⟩ := Universal.exists_q kingLattice k
+  obtain ⟨q, hdeg, h⟩ := RowLocal.exists_q kingLattice k
   refine ⟨q, hdeg, fun H hH => ?_⟩
   have hh := h H hH
   rw [T_king] at hh
@@ -187,14 +187,14 @@ def IsDiagonalPoly (k : ℕ) (P : Polynomial ℚ) : Prop :=
 
 /-- The king instance of the row-local predicate. -/
 lemma isDiagonalPoly_king {k : ℕ} {P : Polynomial ℚ} :
-    Universal.IsDiagonalPoly kingLattice k P ↔ IsDiagonalPoly k P := by
-  simp only [Universal.IsDiagonalPoly, IsDiagonalPoly, T_king, b_king, Nat.cast_ofNat]
+    RowLocal.IsDiagonalPoly kingLattice k P ↔ IsDiagonalPoly k P := by
+  simp only [RowLocal.IsDiagonalPoly, IsDiagonalPoly, T_king, b_king, Nat.cast_ofNat]
 
 /-- **The diagonal law**: for every `k` there is `P_k ∈ ℚ[X]` of degree `≤ k`
 with `T(n, n-k) = P_k(n) · 3^(n-1-3k)` for all `n ≥ 2k + 1`. -/
 theorem exists_isDiagonalPoly (k : ℕ) : ∃ P : Polynomial ℚ, P.natDegree ≤ k ∧
     IsDiagonalPoly k P := by
-  obtain ⟨P, hdeg, h⟩ := Universal.exists_isDiagonalPoly kingLattice k
+  obtain ⟨P, hdeg, h⟩ := RowLocal.exists_isDiagonalPoly kingLattice k
   exact ⟨P, hdeg, isDiagonalPoly_king.mp h⟩
 
 /-- The zpow-free form of the law: `3^(3k+1) · T(n, n-k) = P(n) · 3^n`. -/

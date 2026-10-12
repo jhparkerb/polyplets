@@ -4,12 +4,12 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
-import Polyplets.Universal.Defs
+import Polyplets.RowLocal.Defs
 
 /-!
 # The lattice graph of a cell set: bridge to mathlib's `SimpleGraph`
 
-`Universal/Defs.lean` states `L`-connectivity of a finite cell set `S` via
+`RowLocal/Defs.lean` states `L`-connectivity of a finite cell set `S` via
 `Relation.ReflTransGen`. The walk surgery ahead (the separation lemma, the width
 bound, the peeling bijections) wants mathlib's `SimpleGraph.Walk` API —
 `dropUntil`, boundary darts, `toPath` — so this file packages the step relation
@@ -20,24 +20,24 @@ relation) and proves the two connectivity notions coincide
 This is `Graph.lean` with `kingAdj ↦ Adj L`.
 -/
 
-namespace Polyplets.Universal
+namespace Polyplets.RowLocal
 
 /-- The `L`-graph induced by `S`: vertices are all of `ℤ × ℤ`, and two cells are
 adjacent iff both lie in `S` and are `L`-adjacent. `Adj` is definitionally the
 step relation of `Connected`. -/
-def graph (L : RowLocal) (S : Finset (ℤ × ℤ)) : SimpleGraph (ℤ × ℤ) where
+def graph (L : Lattice) (S : Finset (ℤ × ℤ)) : SimpleGraph (ℤ × ℤ) where
   Adj a b := a ∈ S ∧ b ∈ S ∧ Adj L a b
   symm := ⟨fun _ _ h => ⟨h.2.1, h.1, adj_symm h.2.2⟩⟩
   loopless := ⟨fun _ h => h.2.2.1 rfl⟩
 
 /-- `graph` adjacency, unfolded. -/
-lemma graph_adj {L : RowLocal} {S : Finset (ℤ × ℤ)} {a b : ℤ × ℤ} :
+lemma graph_adj {L : Lattice} {S : Finset (ℤ × ℤ)} {a b : ℤ × ℤ} :
     (graph L S).Adj a b ↔ a ∈ S ∧ b ∈ S ∧ Adj L a b := Iff.rfl
 
 /-- **The bridge.** `Connected L S` is pairwise `Reachable` in `graph L S`: the
-`ReflTransGen` of `Universal/Defs.lean` is literally
+`ReflTransGen` of `RowLocal/Defs.lean` is literally
 `ReflTransGen (graph L S).Adj`. -/
-theorem connected_iff_reachable (L : RowLocal) (S : Finset (ℤ × ℤ)) :
+theorem connected_iff_reachable (L : Lattice) (S : Finset (ℤ × ℤ)) :
     Connected L S ↔ ∀ p ∈ S, ∀ q ∈ S, (graph L S).Reachable p q := by
   unfold Connected
   constructor
@@ -50,7 +50,7 @@ theorem connected_iff_reachable (L : RowLocal) (S : Finset (ℤ × ℤ)) :
 
 /-- **Walks stay inside `S`.** Every vertex on a `graph L S`-walk starting
 inside `S` lies in `S`. -/
-lemma mem_of_mem_walk_support {L : RowLocal} {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ}
+lemma mem_of_mem_walk_support {L : Lattice} {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ}
     (hp : p ∈ S) (w : (graph L S).Walk p q) : ∀ v ∈ w.support, v ∈ S := by
   revert hp
   induction w with
@@ -65,4 +65,4 @@ lemma mem_of_mem_walk_support {L : RowLocal} {S : Finset (ℤ × ℤ)} {p q : �
     · exact hp
     · exact ih hadj.2.1 v hv
 
-end Polyplets.Universal
+end Polyplets.RowLocal

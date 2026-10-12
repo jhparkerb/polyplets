@@ -7,7 +7,7 @@ import Mathlib.Order.Interval.Finset.Nat
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.NormNum.Basic
 import Polyplets.Compute
-import Polyplets.Universal.Separation
+import Polyplets.RowLocal.Separation
 
 /-!
 # Peeling weights: walk-top counts `d` and cluster configurations `V`, `Vᵗ`
@@ -29,7 +29,7 @@ decide the smallest values. The enumeration windows are an encoding artifact: th
 **window-independence lemmas** `mem_walkTop`, `mem_interiorConfigs`, `mem_topConfigs` characterize
 membership by the propositional descriptions alone (the x-spread of a connected
 set containing the origin is bounded by its cell count, `connected_abs_x_le`).
-Downstream bijections (`Universal/TopRow.lean`) must match against those propositional
+Downstream bijections (`RowLocal/TopRow.lean`) must match against those propositional
 descriptions, never the window encoding.
 
 ## The values the proofs consume
@@ -42,12 +42,12 @@ and the identities at their onset are in `Checks.lean`.
 
 namespace Polyplets
 
-open Universal (IsWalkRow)
+open RowLocal (IsWalkRow)
 
 /-! ## Row size and walk-top polyplets -/
 
 /-- The number of cells of `S` in row `y`. `rowSize S r = 1` is exactly
-`Universal.IsWalkRow S r` (`isWalkRow_iff_rowSize`). -/
+`RowLocal.IsWalkRow S r` (`isWalkRow_iff_rowSize`). -/
 def rowSize (S : Finset (ℤ × ℤ)) (y : ℤ) : ℕ :=
   (S.filter fun c => c.2 = y).card
 
@@ -65,7 +65,7 @@ def walkTop (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
 /-- `d k H`: the number of polyplets of height `H` and surplus `k` whose top
 row is a walk row — the primary object of the peeling recursion
 (`d_k(H) = 3·d_k(H−1) + Σ V(ℓ,j)·d_{k−j}(H−1−ℓ)` for `H ≥ k + 2`,
-proved in `Universal/TopRow.lean`). -/
+proved in `RowLocal/TopRow.lean`). -/
 def d (k H : ℕ) : ℕ := (walkTop k H).card
 
 /-- **Propositional characterization of `walkTop`** (window independence):

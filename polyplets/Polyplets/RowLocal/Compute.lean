@@ -5,7 +5,7 @@ Authors: Jason H Parker
 -/
 import Mathlib.LinearAlgebra.Lagrange
 import Polyplets.Compute
-import Polyplets.Universal.Instance
+import Polyplets.RowLocal.Instance
 
 /-!
 # Instance toolkit: a computable counter for `T L`, and the values lemma
@@ -17,7 +17,7 @@ lattice-generic but live outside the shape engine:
   enumerator with `kingAdj ↦ Adj L`, plus `Tc_eq_T`. The one genuine change is
   the enumeration box: the king file's box is `[0, n-1] × [0, H-1]`, but a
   general row-local lattice can skip columns, so the width bound of
-  `Universal/Finite.lean` is `p.1 ≤ M · (n − 1)`. Rather than compute `M`, `Tc`
+  `RowLocal/Finite.lean` is `p.1 ≤ M · (n − 1)`. Rather than compute `M`, `Tc`
   takes the box width `W` as a parameter and `Tc_eq_T` asks for
   `M · (n − 1) ≤ W − 1`; `Tc_eq_T_of_reach_le_one` is the convenient corollary
   `W = n` for every lattice of reach `1` (square, hex, king — the named
@@ -27,11 +27,11 @@ lattice-generic but live outside the shape engine:
   degree-`≤ k` polynomial matching the witness at `k + 1` of the `k + 1` onset
   points *is* the witness, so it satisfies the diagonal law for `L`.
 
-Nothing here is instance-specific; `King.lean` and `Universal/{Square,Hex}.lean`
+Nothing here is instance-specific; `King.lean` and `RowLocal/{Square,Hex}.lean`
 supply the lattices and the enumerated cells.
 -/
 
-namespace Polyplets.Universal
+namespace Polyplets.RowLocal
 
 open Polynomial
 
@@ -39,25 +39,25 @@ open Polynomial
 
 /-- Row-local adjacency is decidable: a conjunction of decidable integer
 (in)equalities and a `Finset` membership. -/
-instance instDecidableAdj (L : RowLocal) : DecidableRel (Adj L) := fun p q => by
+instance instDecidableAdj (L : Lattice) : DecidableRel (Adj L) := fun p q => by
   unfold Adj; infer_instance
 
 /-- One round of neighbor expansion inside `S`: adjoin to `R` every cell of `S`
 `L`-adjacent to some cell of `R`. -/
-def stepExpand (L : RowLocal) (S R : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
+def stepExpand (L : Lattice) (S R : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
   R ∪ S.filter fun q => ∃ p ∈ R, Adj L p q
 
 /-- The cells of `S` reachable from `p` by `L`-steps inside `S`, computed as
 `S.card` rounds of neighbor expansion from the seed `{p}`. -/
-def reachSet (L : RowLocal) (S : Finset (ℤ × ℤ)) (p : ℤ × ℤ) : Finset (ℤ × ℤ) :=
+def reachSet (L : Lattice) (S : Finset (ℤ × ℤ)) (p : ℤ × ℤ) : Finset (ℤ × ℤ) :=
   (stepExpand L S)^[S.card] {p}
 
 /-- Expansion only ever grows the reached set. -/
-lemma subset_stepExpand (L : RowLocal) (S R : Finset (ℤ × ℤ)) : R ⊆ stepExpand L S R :=
+lemma subset_stepExpand (L : Lattice) (S R : Finset (ℤ × ℤ)) : R ⊆ stepExpand L S R :=
   Finset.subset_union_left
 
 /-- Starting from a seed inside `S`, every expansion round stays inside `S`. -/
-lemma iterate_stepExpand_subset {L : RowLocal} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ} (hp : p ∈ S) :
+lemma iterate_stepExpand_subset {L : Lattice} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ} (hp : p ∈ S) :
     ∀ k, (stepExpand L S)^[k] {p} ⊆ S := by
   intro k
   induction k with
@@ -71,7 +71,7 @@ lemma iterate_stepExpand_subset {L : RowLocal} {S : Finset (ℤ × ℤ)} {p : �
       · exact hqS
 
 /-- The seed survives every expansion round. -/
-lemma mem_iterate_self (L : RowLocal) (S : Finset (ℤ × ℤ)) (p : ℤ × ℤ) :
+lemma mem_iterate_self (L : Lattice) (S : Finset (ℤ × ℤ)) (p : ℤ × ℤ) :
     ∀ k, p ∈ (stepExpand L S)^[k] {p} := by
   intro k
   induction k with
@@ -82,7 +82,7 @@ lemma mem_iterate_self (L : RowLocal) (S : Finset (ℤ × ℤ)) (p : ℤ × ℤ)
 
 /-- **Soundness of the closure**: every cell reached from a seed `p ∈ S` is
 joined to `p` by an `L`-path inside `S`. -/
-lemma reachSet_sound {L : RowLocal} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ} (hp : p ∈ S) :
+lemma reachSet_sound {L : Lattice} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ} (hp : p ∈ S) :
     ∀ k, ∀ q ∈ (stepExpand L S)^[k] {p},
       Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ Adj L a b) p q := by
   intro k
@@ -102,7 +102,7 @@ lemma reachSet_sound {L : RowLocal} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ} (
 
 /-- While the expansion chain has not stalled, its cardinality grows by at
 least one per round. -/
-lemma iterate_card_grow (L : RowLocal) (S : Finset (ℤ × ℤ)) (p : ℤ × ℤ) :
+lemma iterate_card_grow (L : Lattice) (S : Finset (ℤ × ℤ)) (p : ℤ × ℤ) :
     ∀ k, (∀ j < k, (stepExpand L S)^[j + 1] {p} ≠ (stepExpand L S)^[j] {p}) →
       k + 1 ≤ ((stepExpand L S)^[k] {p}).card := by
   intro k
@@ -121,7 +121,7 @@ lemma iterate_card_grow (L : RowLocal) (S : Finset (ℤ × ℤ)) (p : ℤ × ℤ
       omega
 
 /-- **The chain stalls**: `reachSet L S p` is a fixed point of `stepExpand L S`. -/
-lemma stepExpand_reachSet {L : RowLocal} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ} (hp : p ∈ S) :
+lemma stepExpand_reachSet {L : Lattice} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ} (hp : p ∈ S) :
     stepExpand L S (reachSet L S p) = reachSet L S p := by
   by_cases h : ∃ j < S.card, (stepExpand L S)^[j + 1] {p} = (stepExpand L S)^[j] {p}
   · obtain ⟨j, hj, hfix⟩ := h
@@ -138,7 +138,7 @@ lemma stepExpand_reachSet {L : RowLocal} {S : Finset (ℤ × ℤ)} {p : ℤ × �
 
 /-- **Completeness of the closure**: every cell `L`-path-reachable from `p ∈ S`
 lies in `reachSet L S p`. -/
-lemma reachSet_complete {L : RowLocal} {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} (hp : p ∈ S)
+lemma reachSet_complete {L : Lattice} {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} (hp : p ∈ S)
     (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ Adj L a b) p q) :
     q ∈ reachSet L S p := by
   induction h with
@@ -149,7 +149,7 @@ lemma reachSet_complete {L : RowLocal} {S : Finset (ℤ × ℤ)} {p q : ℤ × �
       exact Or.inr ⟨hbc.2.1, b, ih, hbc.2.2⟩
 
 /-- `Connected L` in terms of the computable closure. -/
-lemma connected_iff_reach (L : RowLocal) (S : Finset (ℤ × ℤ)) :
+lemma connected_iff_reach (L : Lattice) (S : Finset (ℤ × ℤ)) :
     Connected L S ↔ ∀ p ∈ S, ∀ q ∈ S, q ∈ reachSet L S p := by
   constructor
   · intro h p hp q hq
@@ -158,11 +158,11 @@ lemma connected_iff_reach (L : RowLocal) (S : Finset (ℤ × ℤ)) :
     exact reachSet_sound hp S.card q (h p hp q hq)
 
 /-- `L`-connectivity is decidable, via the closure characterization. -/
-instance instDecidableConnected (L : RowLocal) : DecidablePred (Connected L) := fun S =>
+instance instDecidableConnected (L : Lattice) : DecidablePred (Connected L) := fun S =>
   decidable_of_iff _ (connected_iff_reach L S).symm
 
 /-- Canonicality is decidable. -/
-instance instDecidableIsAnimal (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × ℤ)) :
+instance instDecidableIsAnimal (L : Lattice) (n H : ℕ) (S : Finset (ℤ × ℤ)) :
     Decidable (IsAnimal L n H S) :=
   decidable_of_iff _ isAnimal_iff_and.symm
 
@@ -172,13 +172,13 @@ instance instDecidableIsAnimal (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × �
 box `[0, W-1] × [0, H-1]` and count the animals. Pure brute force —
 exponential in `W · H`, meant for the smallest cells only. The box is
 `Compute.lean`'s (`Polyplets.box`), reused with an explicit width. -/
-def Tc (L : RowLocal) (W n H : ℕ) : ℕ :=
+def Tc (L : Lattice) (W n H : ℕ) : ℕ :=
   (((Polyplets.box W H).powersetCard n).filter fun S => IsAnimal L n H S).card
 
 /-- **The computable counter agrees with `T L`**, provided the box is wide
 enough to contain every canonical animal: `M · (n − 1) ≤ W − 1`
-(`Universal/Finite.lean`'s `animal_x_le`). -/
-theorem Tc_eq_T (L : RowLocal) (W n H : ℕ) (hW : L.reach * ((n : ℤ) - 1) ≤ (W : ℤ) - 1) :
+(`RowLocal/Finite.lean`'s `animal_x_le`). -/
+theorem Tc_eq_T (L : Lattice) (W n H : ℕ) (hW : L.reach * ((n : ℤ) - 1) ≤ (W : ℤ) - 1) :
     Tc L W n H = T L n H := by
   have hset : ((Polyplets.box W H).powersetCard n).filter (fun S => IsAnimal L n H S)
       = (animals_finite L n H).toFinset := by
@@ -200,7 +200,7 @@ theorem Tc_eq_T (L : RowLocal) (W n H : ℕ) (hW : L.reach * ((n : ℤ) - 1) ≤
 
 /-- **Reach one**: a lattice all of whose up-offsets are `0` or `±1` has
 `M = 1`. -/
-lemma reach_le_one (L : RowLocal) (h : ∀ d ∈ L.D, |d| ≤ 1) : L.reach ≤ 1 := by
+lemma reach_le_one (L : Lattice) (h : ∀ d ∈ L.D, |d| ≤ 1) : L.reach ≤ 1 := by
   refine Finset.max'_le _ _ _ fun y hy => ?_
   rcases Finset.mem_insert.mp hy with rfl | hy
   · exact le_rfl
@@ -209,7 +209,7 @@ lemma reach_le_one (L : RowLocal) (h : ∀ d ∈ L.D, |d| ≤ 1) : L.reach ≤ 1
 
 /-- The convenient specialization of `Tc_eq_T` for a reach-`1` lattice: the box
 `[0, n-1] × [0, H-1]` suffices, exactly as in the king case. -/
-theorem Tc_eq_T_of_reach_le_one {L : RowLocal} (hM : L.reach ≤ 1) (n H : ℕ) :
+theorem Tc_eq_T_of_reach_le_one {L : Lattice} (hM : L.reach ≤ 1) (n H : ℕ) :
     Tc L n n H = T L n H := by
   refine Tc_eq_T L n n H ?_
   have h1 := L.one_le_reach
@@ -226,7 +226,7 @@ theorem Tc_eq_T_of_reach_le_one {L : RowLocal} (hM : L.reach ≤ 1) (n H : ℕ) 
 /-- The `n`-th row sum of the height triangle, computably: the number of fixed
 `L`-animals with `n` cells, summed over all heights `H ≤ n`. (Heights above `n`
 contribute nothing: a height-`H` animal needs at least `H` cells.) -/
-def rowSum (L : RowLocal) (W n : ℕ) : ℕ := ∑ H ∈ Finset.range (n + 1), Tc L W n H
+def rowSum (L : Lattice) (W n : ℕ) : ℕ := ∑ H ∈ Finset.range (n + 1), Tc L W n H
 
 /-! ## The diagonal polynomial from its values -/
 
@@ -236,7 +236,7 @@ points `s ⊆ [2k+1, 3k+1]` *is* that witness (Lagrange uniqueness,
 `Polynomial.eq_of_degrees_lt_of_eval_finset_eq`), hence satisfies the law for
 `L`. The hypothesis at each point is the count `T(n, n-k) · b^(3k+1-n)` that
 `IsDiagonalPoly.eval_onset` forces on the witness. -/
-theorem isDiagonalPoly_of_eval (L : RowLocal) (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k)
+theorem isDiagonalPoly_of_eval (L : Lattice) (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k)
     (s : Finset ℕ) (hcard : k + 1 ≤ s.card)
     (hin : ∀ n ∈ s, 2 * k + 1 ≤ n ∧ n ≤ 3 * k + 1)
     (hpts : ∀ n ∈ s, p.eval (n : ℚ) = ((T L n (n - k) * L.b ^ (3 * k + 1 - n) : ℕ) : ℚ)) :
@@ -263,4 +263,4 @@ theorem isDiagonalPoly_of_eval (L : RowLocal) (k : ℕ) (p : Polynomial ℚ) (hp
   rw [hpP]
   exact hP
 
-end Polyplets.Universal
+end Polyplets.RowLocal

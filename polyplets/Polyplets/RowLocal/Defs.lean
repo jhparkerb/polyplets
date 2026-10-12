@@ -37,28 +37,28 @@ Two numbers control the geometry:
 
 * `L.b = L.D.card` — the drift count, the `3` of the king case;
 * `L.reach = max (1 ∪ {|d| : d ∈ D})` — the x-reach of a single step, the `1` of
-  the king case. `reach` is what the width bound (`Universal/Finite.lean`) is
+  the king case. `reach` is what the width bound (`RowLocal/Finite.lean`) is
   stated in terms of; it never enters the counting identities.
 
 `IsAnimal L n H S` and `T L n H` are `Defs.lean`'s `heightClass n H` and `T n H`
 with `kingAdj` replaced by `Adj L` (`King.lean`'s `isAnimal_king`).
 -/
 
-namespace Polyplets.Universal
+namespace Polyplets.RowLocal
 
 /-- **A row-local lattice**: a finite nonempty set `D` of up-offsets. Within-row
 adjacency is nearest-neighbor; between consecutive rows the allowed
 x-displacements are exactly the elements of `D`. -/
-structure RowLocal where
+structure Lattice where
   /-- The up-offset set: `q` sits above `p` iff `q.2 = p.2 + 1` and
   `q.1 - p.1 ∈ D`. -/
   D : Finset ℤ
   /-- The up-offset set is nonempty (condition (U)). -/
   hD : D.Nonempty
 
-namespace RowLocal
+namespace Lattice
 
-variable (L : RowLocal)
+variable (L : Lattice)
 
 /-- **The drift count** `b = |D|`: the number of choices for a single upward
 walk step. This is the `3` of the king lattice and the `b` of the universal
@@ -83,7 +83,7 @@ lemma reach_nonneg : 0 ≤ L.reach := le_trans (by norm_num) L.one_le_reach
 lemma abs_le_reach {d : ℤ} (hd : d ∈ L.D) : |d| ≤ L.reach :=
   Finset.le_max' _ _ (Finset.mem_insert_of_mem (Finset.mem_image_of_mem _ hd))
 
-end RowLocal
+end Lattice
 
 /-! ## Adjacency -/
 
@@ -91,14 +91,14 @@ end RowLocal
 sit on consecutive rows at an x-displacement drawn from `L.D`. (The `p ≠ q`
 clause is implied by each disjunct; it is kept to match the paper's phrasing.)
 -/
-def Adj (L : RowLocal) (p q : ℤ × ℤ) : Prop :=
+def Adj (L : Lattice) (p q : ℤ × ℤ) : Prop :=
   p ≠ q ∧ ((p.2 = q.2 ∧ |p.1 - q.1| = 1) ∨
     (q.2 = p.2 + 1 ∧ q.1 - p.1 ∈ L.D) ∨
     (p.2 = q.2 + 1 ∧ p.1 - q.1 ∈ L.D))
 
 /-- Row-local adjacency is symmetric: the row case is symmetric in `|dx|`, and
 the two vertical cases swap. -/
-lemma adj_symm {L : RowLocal} {p q : ℤ × ℤ} (h : Adj L p q) : Adj L q p := by
+lemma adj_symm {L : Lattice} {p q : ℤ × ℤ} (h : Adj L p q) : Adj L q p := by
   obtain ⟨hne, hcase⟩ := h
   refine ⟨hne.symm, ?_⟩
   rcases hcase with ⟨hy, hx⟩ | ⟨hy, hd⟩ | ⟨hy, hd⟩
@@ -108,7 +108,7 @@ lemma adj_symm {L : RowLocal} {p q : ℤ × ℤ} (h : Adj L p q) : Adj L q p := 
 
 /-- **Adjacency is row-local**: a step changes the row index by at most one.
 This is the *only* property of adjacency that the separation surgery uses. -/
-lemma adj_abs_dy_le {L : RowLocal} {p q : ℤ × ℤ} (h : Adj L p q) : |p.2 - q.2| ≤ 1 := by
+lemma adj_abs_dy_le {L : Lattice} {p q : ℤ × ℤ} (h : Adj L p q) : |p.2 - q.2| ≤ 1 := by
   obtain ⟨-, hcase⟩ := h
   rw [abs_le]
   rcases hcase with ⟨hy, -⟩ | ⟨hy, -⟩ | ⟨hy, -⟩ <;> omega
@@ -116,7 +116,7 @@ lemma adj_abs_dy_le {L : RowLocal} {p q : ℤ × ℤ} (h : Adj L p q) : |p.2 - q
 /-- **Adjacency has bounded x-reach**: a step moves the x-coordinate by at most
 `L.reach`. In the king lattice `reach = 1`, which is why king paths cannot skip a
 column; in general they can, and only this weaker bound survives. -/
-lemma adj_abs_dx_le {L : RowLocal} {p q : ℤ × ℤ} (h : Adj L p q) : |p.1 - q.1| ≤ L.reach := by
+lemma adj_abs_dx_le {L : Lattice} {p q : ℤ × ℤ} (h : Adj L p q) : |p.1 - q.1| ≤ L.reach := by
   obtain ⟨-, hcase⟩ := h
   rcases hcase with ⟨-, hx⟩ | ⟨-, hd⟩ | ⟨-, hd⟩
   · rw [hx]; exact L.one_le_reach
@@ -129,7 +129,7 @@ lemma adj_abs_dx_le {L : RowLocal} {p q : ℤ × ℤ} (h : Adj L p q) : |p.1 - q
 
 /-- **Reading off the drift**: if `q` sits one row above `p` and the two are
 adjacent, their x-displacement is an up-offset. -/
-lemma adj_up_mem {L : RowLocal} {p q : ℤ × ℤ} (h : Adj L p q) (hy : q.2 = p.2 + 1) :
+lemma adj_up_mem {L : Lattice} {p q : ℤ × ℤ} (h : Adj L p q) (hy : q.2 = p.2 + 1) :
     q.1 - p.1 ∈ L.D := by
   obtain ⟨-, hcase⟩ := h
   rcases hcase with ⟨hy', -⟩ | ⟨-, hd⟩ | ⟨hy', -⟩
@@ -140,7 +140,7 @@ lemma adj_up_mem {L : RowLocal} {p q : ℤ × ℤ} (h : Adj L p q) (hy : q.2 = p
 /-- **Realizing the drift**: any up-offset gives an adjacency between
 consecutive rows. Converse of `adj_up_mem`; together they are the class-A
 bijection's `b` choices. -/
-lemma adj_of_up {L : RowLocal} {p q : ℤ × ℤ} (hy : q.2 = p.2 + 1)
+lemma adj_of_up {L : Lattice} {p q : ℤ × ℤ} (hy : q.2 = p.2 + 1)
     (hd : q.1 - p.1 ∈ L.D) : Adj L p q := by
   refine ⟨fun heq => ?_, Or.inr (Or.inl ⟨hy, hd⟩)⟩
   rw [heq] at hy
@@ -150,7 +150,7 @@ lemma adj_of_up {L : RowLocal} {p q : ℤ × ℤ} (hy : q.2 = p.2 + 1)
 
 /-- A finite cell set is `L`-connected: every pair of its cells is joined by a
 path of `L`-adjacent steps that stays inside the set. -/
-def Connected (L : RowLocal) (S : Finset (ℤ × ℤ)) : Prop :=
+def Connected (L : Lattice) (S : Finset (ℤ × ℤ)) : Prop :=
   ∀ p ∈ S, ∀ q ∈ S,
     Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ Adj L a b) p q
 
@@ -205,7 +205,7 @@ lemma translate_erase (v : ℤ × ℤ) (c : ℤ × ℤ) (S : Finset (ℤ × ℤ)
 
 /-- **Adjacency is translation-invariant**: every clause of `Adj` is a
 statement about coordinate differences. -/
-lemma adj_add {L : RowLocal} (v : ℤ × ℤ) {c d : ℤ × ℤ} (h : Adj L c d) :
+lemma adj_add {L : Lattice} (v : ℤ × ℤ) {c d : ℤ × ℤ} (h : Adj L c d) :
     Adj L (c + v) (d + v) := by
   obtain ⟨hne, hcase⟩ := h
   refine ⟨fun heq => hne (add_left_injective v heq), ?_⟩
@@ -216,7 +216,7 @@ lemma adj_add {L : RowLocal} (v : ℤ × ℤ) {c d : ℤ × ℤ} (h : Adj L c d)
   · exact Or.inr (Or.inr ⟨by omega, by rwa [show c.1 + v.1 - (d.1 + v.1) = c.1 - d.1 by omega]⟩)
 
 /-- **Connectivity transports along any adjacency-preserving map.** -/
-lemma connected_image {L : RowLocal} {f : ℤ × ℤ → ℤ × ℤ}
+lemma connected_image {L : Lattice} {f : ℤ × ℤ → ℤ × ℤ}
     (hf : ∀ p q, Adj L p q → Adj L (f p) (f q)) {S : Finset (ℤ × ℤ)} (hS : Connected L S) :
     Connected L (S.image f) := by
   intro p hp q hq
@@ -227,7 +227,7 @@ lemma connected_image {L : RowLocal} {f : ℤ × ℤ → ℤ × ℤ}
   exact ⟨Finset.mem_image_of_mem f hxy.1, Finset.mem_image_of_mem f hxy.2.1, hf _ _ hxy.2.2⟩
 
 /-- Connectivity is translation-invariant. -/
-lemma connected_translate {L : RowLocal} (v : ℤ × ℤ) {S : Finset (ℤ × ℤ)} (h : Connected L S) :
+lemma connected_translate {L : Lattice} (v : ℤ × ℤ) {S : Finset (ℤ × ℤ)} (h : Connected L S) :
     Connected L (translate v S) :=
   connected_image (fun _ _ => adj_add v) h
 
@@ -253,7 +253,7 @@ lemma Anchored.nonempty {S : Finset (ℤ × ℤ)} (hS : Anchored S) : S.Nonempty
 the representative of its translation class with the bounding box at the
 origin: `n` cells, `L`-connected, anchored, maximum y-coordinate `H - 1`. The
 x-extent is unconstrained. -/
-structure IsAnimal (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+structure IsAnimal (L : Lattice) (n H : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
   /-- `n` cells. -/
   card : S.card = n
   /-- `L`-connected. -/
@@ -266,7 +266,7 @@ structure IsAnimal (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × ℤ)) : Prop w
   y_top : ∃ p ∈ S, p.2 = (H : ℤ) - 1
 
 /-- `IsAnimal` as a conjunction (for decidability and for unfolding). -/
-lemma isAnimal_iff_and {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)} :
+lemma isAnimal_iff_and {L : Lattice} {n H : ℕ} {S : Finset (ℤ × ℤ)} :
     IsAnimal L n H S ↔ S.card = n ∧ Connected L S ∧
       (∀ p ∈ S, 0 ≤ p.1) ∧ (∃ p ∈ S, p.1 = 0) ∧
       (∀ p ∈ S, 0 ≤ p.2) ∧ (∃ p ∈ S, p.2 = 0) ∧
@@ -277,8 +277,8 @@ lemma isAnimal_iff_and {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)} :
 
 /-- `T L n H`: the number of fixed `L`-animals of `n` cells whose bounding box
 has height exactly `H`, i.e. the number of origin-anchored representatives.
-Finiteness is `Universal/Finite.lean`. -/
-noncomputable def T (L : RowLocal) (n H : ℕ) : ℕ :=
+Finiteness is `RowLocal/Finite.lean`. -/
+noncomputable def T (L : Lattice) (n H : ℕ) : ℕ :=
   {S : Finset (ℤ × ℤ) | IsAnimal L n H S}.ncard
 
-end Polyplets.Universal
+end Polyplets.RowLocal

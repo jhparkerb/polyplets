@@ -80,8 +80,8 @@ are finite and proves `a n = Σ_H T n H`; `Compute.lean` decides
 king-connectivity, so `IsPolyplet` is decidable; the small cells are decided
 by the kernel through the enumerator of `Enum.lean`.
 
-The peeling recursion (`Universal/Separation`, `Universal/Weights`,
-`Universal/TopRow`, proved for every row-local lattice; `King.lean` reads the
+The peeling recursion (`RowLocal/Separation`, `RowLocal/Weights`,
+`RowLocal/TopRow`, proved for every row-local lattice; `King.lean` reads the
 king instance off it, `Weights.lean` keeps the king weights as computable
 enumerations for the kernel). Write surplus
 k = n − H. A row with one cell is a *walk row*; `d k H` counts the height-H
@@ -89,14 +89,14 @@ surplus-k animals whose top row is a walk row. A maximal run of multi-cell
 rows is a *cluster*; `V ℓ j` counts the cluster shapes spanning ℓ rows with
 surplus j between a walk cell below and a walk cell above, `Vt ℓ j` the same
 with nothing above. A walk row separates the animal
-(`Universal/Separation.lean`), and peeling the top row gives two bijections
-(`Universal/TopRow.lean`, the long pole), with the drift count `b`
+(`RowLocal/Separation.lean`), and peeling the top row gives two bijections
+(`RowLocal/TopRow.lean`, the long pole), with the drift count `b`
 (3 for the king lattice) in place of the 3:
 
     d k H     = 3·d k (H−1) + Σ_{j≤k} Σ_{ℓ≤j} V ℓ j · d (k−j) (H−1−ℓ)      (H ≥ k+2)
     T (H+k) H = d k H + Σ_{j≤k} Σ_{ℓ≤j} Vt ℓ j · d (k−j) (H−ℓ)              (H ≥ k+1)
 
-Shape (`Universal/DiagonalLaw.lean`, from the two identities alone through
+Shape (`RowLocal/DiagonalLaw.lean`, from the two identities alone through
 the `TopRowRecursion` interface; `DiscreteCalculus.lean` supplies the discrete
 antiderivative and integer values by finite differences). Strong induction on
 k through the first identity:
@@ -173,9 +173,9 @@ L-paper modules:
 
 | module | paper | what |
 |---|---|---|
-| `Universal/Defs`, `Graph`, `Finite`, `Separation`, `RowProfile`, `Weights`, `Universal/TopRow` | report, L1 | the peeling recursion for every row-local lattice (a finite set `D` of up-offsets, `b = |D|`) |
-| `Universal/DiagonalLaw`, `Instance` | report, L1 | the diagonal law as a theorem about any `TopRowRecursion`, hence for every row-local lattice |
-| `Universal/Compute`, `Hex`, `Square` | L1 | the generic enumerator and the values lemma; the hex and square instances and their `P_1` |
+| `RowLocal/Defs`, `Graph`, `Finite`, `Separation`, `RowProfile`, `Weights`, `RowLocal/TopRow` | report, L1 | the peeling recursion for every row-local lattice (a finite set `D` of up-offsets, `b = |D|`) |
+| `RowLocal/DiagonalLaw`, `Instance` | report, L1 | the diagonal law as a theorem about any `TopRowRecursion`, hence for every row-local lattice |
+| `RowLocal/Compute`, `Hex`, `Square` | L1 | the generic enumerator and the values lemma; the hex and square instances and their `P_1` |
 | `Upper/Certificate` | L3 | the convolution-certificate bound `λ ≤ 1/x` from a rational super-solution, and `RatCert`, the exported-data check |
 | `Upper/BuiData2`, `BuiRD2`, `BuiData3`, `BuiRD3` | L3 | the 185-type (λ ≤ 9.4117) and 5930-type (λ ≤ 9.3154) certificates as balanced lookup trees the kernel checks (`decide +kernel`, 11 s for RD = 3), conditional on the named system hypotheses |
 | `StairAnimals`, `StairGrowth` | L5 | staircase king animals: the column join is injective at fixed area (Lemma 3), µ exists, 3.1234 < µ ≤ 4 given M(700) |

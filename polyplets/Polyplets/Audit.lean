@@ -5,7 +5,7 @@ Authors: Jason H Parker
 -/
 import Polyplets.Report
 import Polyplets.StairGrowth
-import Polyplets.Universal.Instance
+import Polyplets.RowLocal.Instance
 import Polyplets.Upper.BuiRD2
 import Polyplets.Upper.BuiRD3
 
@@ -134,21 +134,21 @@ namespace Polyplets
 #guard_msgs in
 #print axioms R90_eq_zero
 
-/-- info: 'Polyplets.Universal.exists_delta' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.RowLocal.exists_delta' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Universal.exists_delta
+#print axioms RowLocal.exists_delta
 
-/-- info: 'Polyplets.Universal.exists_q' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.RowLocal.exists_q' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Universal.exists_q
+#print axioms RowLocal.exists_q
 
-/-- info: 'Polyplets.Universal.exists_isDiagonalPoly' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.RowLocal.exists_isDiagonalPoly' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Universal.exists_isDiagonalPoly
+#print axioms RowLocal.exists_isDiagonalPoly
 
-/-- info: 'Polyplets.Universal.IsDiagonalPoly.intValued' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.RowLocal.IsDiagonalPoly.intValued' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Universal.IsDiagonalPoly.intValued
+#print axioms RowLocal.IsDiagonalPoly.intValued
 
 /-- info: 'Polyplets.Stair.M_supermul' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in

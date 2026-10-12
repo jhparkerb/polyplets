@@ -54,7 +54,7 @@ height defect, and the mod-$3$ arithmetic of the king instance}
 \textbf{Part I --- the law.}
 \emph{Theorem~\ref{thm:A} (shape, onset, integrality)} --- proved below, and
 formalized for every row-local lattice in Lean~4 against mathlib
-(\repo{polyplets/Polyplets/Universal/}: \texttt{exists\_delta},
+(\repo{polyplets/Polyplets/RowLocal/}: \texttt{exists\_delta},
 \texttt{exists\_q}, \texttt{exists\_isDiagonalPoly},
 \texttt{IsDiagonalPoly.intValued}) and depends on standard axioms only,
 with no \texttt{sorry} and no \texttt{native\_decide} anywhere in the
@@ -909,11 +909,11 @@ lines with \textbf{no \texttt{sorry} and no
 is relevant here:
 
 \begin{itemize}
-\item The engine (\texttt{Universal.exists\_delta},
+\item The engine (\texttt{RowLocal.exists\_delta},
   \texttt{exists\_q}, \texttt{exists\_isDiagonalPoly},
   \texttt{IsDiagonalPoly.intValued}) is proved for every row-local
   lattice, as a theorem about any \texttt{TopRowRecursion}
-  (\repo{polyplets/Polyplets/Universal/}); the king lattice is the instance
+  (\repo{polyplets/Polyplets/RowLocal/}); the king lattice is the instance
   \texttt{kingLattice} of \repo{polyplets/Polyplets/King.lean}, and the
   report's king-named theorems are the universal ones read at it.
 \item The product form (\texttt{T\_staircase}, \texttt{d\_staircase},

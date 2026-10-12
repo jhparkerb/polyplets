@@ -6,9 +6,9 @@ Authors: Jason H Parker
 import Polyplets.EnumData
 import Polyplets.Staircase.Diagonal
 import Polyplets.Sequence
-import Polyplets.Universal.Hex
+import Polyplets.RowLocal.Hex
 import Polyplets.King
-import Polyplets.Universal.Square
+import Polyplets.RowLocal.Square
 
 /-!
 # Checks: validation facts that no theorem consumes
@@ -116,13 +116,13 @@ theorem T_self_4_4 : T 4 4 = 27 := by
 /-! ## The generic enumerator against three families -/
 
 /-- A006770 at `n = 3`: `1 + 10 + 9 = 20` fixed polyplets. -/
-theorem king_rowSum_3 : Universal.rowSum Universal.kingLattice 3 3 = 20 := by decide +kernel
+theorem king_rowSum_3 : RowLocal.rowSum RowLocal.kingLattice 3 3 = 20 := by decide +kernel
 
 /-- A001207 at `n = 3`: `1 + 6 + 4 = 11` fixed 3-cell polyhexes. -/
-theorem hex_rowSum_3 : Universal.rowSum Universal.hexLattice 3 3 = 11 := by decide +kernel
+theorem hex_rowSum_3 : RowLocal.rowSum RowLocal.hexLattice 3 3 = 11 := by decide +kernel
 
 /-- A001168 at `n = 3`: `1 + 4 + 1 = 6` fixed trominoes. -/
-theorem square_rowSum_3 : Universal.rowSum Universal.squareLattice 3 3 = 6 := by decide +kernel
+theorem square_rowSum_3 : RowLocal.rowSum RowLocal.squareLattice 3 3 = 6 := by decide +kernel
 
 /-! ## The bit-board enumerator: rows `≤ 6` of the triangle and everything on them -/
 

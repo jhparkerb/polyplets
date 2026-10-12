@@ -8,7 +8,7 @@ import Mathlib.Data.Int.Interval
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Ring.Basic
 import Mathlib.Tactic.Set
-import Polyplets.Universal.Graph
+import Polyplets.RowLocal.Graph
 
 /-!
 # Finiteness of the canonical set
@@ -35,14 +35,14 @@ port.
   confined to this file.
 -/
 
-namespace Polyplets.Universal
+namespace Polyplets.RowLocal
 
 /-- **Paths don't skip a coordinate value.** For any `1`-Lipschitz coordinate
 `proj`, if a path inside `S` runs from a cell with `proj ≤ k` to a cell with
 `proj ≥ k+1`, then some cell of `S` sits exactly at `proj = k`. Instantiated at
 `Prod.snd` for rows below; the `Prod.fst` instantiation of the king file has no
 generic analogue (see the module doc). -/
-lemma exists_proj_eq_of_cross {L : RowLocal} {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
+lemma exists_proj_eq_of_cross {L : Lattice} {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
     (proj : ℤ × ℤ → ℤ)
     (hlip : ∀ a b : ℤ × ℤ, Adj L a b → |proj a - proj b| ≤ 1)
     (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ Adj L a b) p q)
@@ -57,14 +57,14 @@ lemma exists_proj_eq_of_cross {L : RowLocal} {S : Finset (ℤ × ℤ)} {p q : �
       · exact ⟨b, hbc.1, by have h2 := hlip b c hbc.2.2; rw [abs_le] at h2; omega⟩
 
 /-- Row specialization of `exists_proj_eq_of_cross` (`proj = Prod.snd`). -/
-lemma exists_y_eq_of_cross {L : RowLocal} {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
+lemma exists_y_eq_of_cross {L : Lattice} {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
     (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ Adj L a b) p q)
     (hp : p.2 ≤ k) (hq : k + 1 ≤ q.2) : ∃ c ∈ S, c.2 = k :=
   exists_proj_eq_of_cross Prod.snd (fun _ _ hab => adj_abs_dy_le hab) h hp hq
 
 /-- **The crossing step is an edge.** A path from `proj ≤ k` to `proj ≥ k+1`
 contains an adjacent pair `a, b ∈ S` with `proj a = k` and `proj b = k+1`. -/
-lemma exists_adj_cross_of_reflTransGen {L : RowLocal} {S : Finset (ℤ × ℤ)}
+lemma exists_adj_cross_of_reflTransGen {L : Lattice} {S : Finset (ℤ × ℤ)}
     {p q : ℤ × ℤ} {k : ℤ} (proj : ℤ × ℤ → ℤ)
     (hlip : ∀ a b : ℤ × ℤ, Adj L a b → |proj a - proj b| ≤ 1)
     (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ Adj L a b) p q)
@@ -85,7 +85,7 @@ lemma exists_adj_cross_of_reflTransGen {L : RowLocal} {S : Finset (ℤ × ℤ)}
 
 /-- **Reach along a walk**: each step moves x by at most `M`, so a walk of
 length `n` moves x by at most `M · n`. -/
-lemma abs_dx_le_of_walk {L : RowLocal} {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ}
+lemma abs_dx_le_of_walk {L : Lattice} {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ}
     (w : (graph L S).Walk p q) : |p.1 - q.1| ≤ L.reach * (w.length : ℤ) := by
   induction w with
   | nil => simp
@@ -103,7 +103,7 @@ so at most `card − 1` steps, each of reach `M`.
 
 At `M = 1` this is the king file's `connected_sub_x_le`; the king proof (every
 intermediate column is occupied) is unavailable in general. -/
-lemma connected_abs_sub_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : Connected L S)
+lemma connected_abs_sub_x_le {L : Lattice} {S : Finset (ℤ × ℤ)} (hconn : Connected L S)
     {a p : ℤ × ℤ} (ha : a ∈ S) (hp : p ∈ S) :
     |p.1 - a.1| ≤ L.reach * ((S.card : ℤ) - 1) := by
   classical
@@ -128,8 +128,8 @@ lemma connected_abs_sub_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : C
 
 /-- **x-spread bound at the origin.** In an `L`-connected set containing the
 origin, every cell's `|x|` is at most `M · (card − 1)`. This is what makes the
-enumeration windows of `Universal/Weights.lean` finite. -/
-lemma connected_abs_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : Connected L S)
+enumeration windows of `RowLocal/Weights.lean` finite. -/
+lemma connected_abs_x_le {L : Lattice} {S : Finset (ℤ × ℤ)} (hconn : Connected L S)
     (h0 : ((0 : ℤ), (0 : ℤ)) ∈ S) {p : ℤ × ℤ} (hp : p ∈ S) :
     |p.1| ≤ L.reach * ((S.card : ℤ) - 1) := by
   have h := connected_abs_sub_x_le hconn h0 hp
@@ -137,7 +137,7 @@ lemma connected_abs_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : Conne
 
 /-- **Uniform width bound.** In a canonical `L`-animal of `n` cells, every
 cell's x-coordinate is at most `M · (n − 1)`. -/
-lemma animal_x_le {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)}
+lemma animal_x_le {L : Lattice} {n H : ℕ} {S : Finset (ℤ × ℤ)}
     (hS : IsAnimal L n H S) {p : ℤ × ℤ} (hp : p ∈ S) : p.1 ≤ L.reach * ((n : ℤ) - 1) := by
   obtain ⟨p0, hp0S, hp0⟩ := hS.anchored.x_zero
   have h := connected_abs_sub_x_le hS.conn hp0S hp
@@ -147,7 +147,7 @@ lemma animal_x_le {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)}
 
 /-- **Finiteness.** `{S | IsAnimal L n H S}` is contained in the powerset of
 the finite box `[0, M(n-1)] × [0, H-1]`, hence finite. -/
-lemma animals_finite (L : RowLocal) (n H : ℕ) :
+lemma animals_finite (L : Lattice) (n H : ℕ) :
     {S : Finset (ℤ × ℤ) | IsAnimal L n H S}.Finite := by
   apply Set.Finite.subset
     (Finset.powerset
@@ -163,8 +163,8 @@ lemma animals_finite (L : RowLocal) (n H : ℕ) :
   · exact hS.y_le p hpS
 
 /-- **`T` is a genuine cardinality.** -/
-theorem T_eq_toFinset_card (L : RowLocal) (n H : ℕ) :
+theorem T_eq_toFinset_card (L : Lattice) (n H : ℕ) :
     T L n H = (animals_finite L n H).toFinset.card := by
   rw [T, Set.ncard_eq_toFinset_card _ (animals_finite L n H)]
 
-end Polyplets.Universal
+end Polyplets.RowLocal

@@ -10,7 +10,7 @@ import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Set
 import Polyplets.Enum
 import Polyplets.King
-import Polyplets.Universal.Compute
+import Polyplets.RowLocal.Compute
 
 /-!
 # DiagonalPolys: the explicit diagonal polynomials `P_k`
@@ -113,17 +113,17 @@ degree `≤ k` that matches the witness of `exists_isDiagonalPoly` at the `k+1`
 onset points `[2k+1, 3k+1]` *is* that witness, hence satisfies the diagonal
 law. The hypothesis `hpts` states, at each onset point, that `p(n)` equals the
 count `T(n,n-k)·3^(3k+1-n)` that `IsDiagonalPoly.eval_onset` forces on the
-witness. This is `Universal.isDiagonalPoly_of_eval` at the king lattice. -/
+witness. This is `RowLocal.isDiagonalPoly_of_eval` at the king lattice. -/
 theorem isDiagonalPoly_of_eval_Icc (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k)
     (hpts : ∀ n ∈ Finset.Icc (2 * k + 1) (3 * k + 1),
       p.eval (n : ℚ) = ((T n (n - k) * 3 ^ (3 * k + 1 - n) : ℕ) : ℚ)) :
     IsDiagonalPoly k p := by
   intro n hn
-  have h := Universal.isDiagonalPoly_of_eval Universal.kingLattice k p hp
+  have h := RowLocal.isDiagonalPoly_of_eval RowLocal.kingLattice k p hp
     (Finset.Icc (2 * k + 1) (3 * k + 1))
     (by rw [Nat.card_Icc]; omega) (fun n hn => Finset.mem_Icc.mp hn)
-    (fun n hn => by rw [hpts n hn, Universal.T_king, Universal.b_king]) n hn
-  rw [Universal.T_king, Universal.b_king] at h
+    (fun n hn => by rw [hpts n hn, RowLocal.T_king, RowLocal.b_king]) n hn
+  rw [RowLocal.T_king, RowLocal.b_king] at h
   exact_mod_cast h
 
 /-! ## The `k = 1` diagonal, unconditionally -/

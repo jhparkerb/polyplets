@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.Tactic.Push
-import Polyplets.Universal.Finite
+import Polyplets.RowLocal.Finite
 
 /-!
 # Separation: walk rows glue and cut `L`-connected sets
@@ -31,7 +31,7 @@ hiding place for a king dependence — is `adj_abs_dy_le` (`|Δrow| ≤ 1`). No
 x-offset, no `|Δx| ≤ 1`, no cardinality of `D` appears.
 -/
 
-namespace Polyplets.Universal
+namespace Polyplets.RowLocal
 
 /-- The row band `[a, b]` of `S`: the cells whose row lies in `[a, b]`. -/
 def band (S : Finset (ℤ × ℤ)) (a b : ℤ) : Finset (ℤ × ℤ) :=
@@ -52,14 +52,14 @@ lemma IsWalkRow.eq_of_mem {S : Finset (ℤ × ℤ)} {r : ℤ} (h : IsWalkRow S r
     a (Finset.mem_filter.mpr ⟨ha, har⟩) b (Finset.mem_filter.mpr ⟨hb, hbr⟩)
 
 /-- **Monotonicity.** A path inside `A` is a path inside any superset `S`. -/
-lemma path_mono {L : RowLocal} {A S : Finset (ℤ × ℤ)} (hAS : A ⊆ S) {p q : ℤ × ℤ}
+lemma path_mono {L : Lattice} {A S : Finset (ℤ × ℤ)} (hAS : A ⊆ S) {p q : ℤ × ℤ}
     (h : Relation.ReflTransGen (fun a b => a ∈ A ∧ b ∈ A ∧ Adj L a b) p q) :
     Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ Adj L a b) p q :=
   Relation.ReflTransGen.mono (fun _ _ hab => ⟨hAS hab.1, hAS hab.2.1, hab.2.2⟩) h
 
 /-- **Glue.** A union of two `L`-connected sets sharing a cell is `L`-connected:
 route any pair through the shared cell. No walk-row hypothesis needed. -/
-theorem connected_union {L : RowLocal} {S A B : Finset (ℤ × ℤ)} (hS : S = A ∪ B)
+theorem connected_union {L : Lattice} {S A B : Finset (ℤ × ℤ)} (hS : S = A ∪ B)
     (hA : Connected L A) (hB : Connected L B) (hAB : (A ∩ B).Nonempty) :
     Connected L S := by
   subst hS
@@ -106,7 +106,7 @@ two cells of the band, the band endpoints are reachable inside
 walk-row cell on the crossed cut line, and the rest of the walk must re-enter
 through that same cell (`exists_walk_from_cut`), so the excursion is excised
 and the walk shortened. -/
-private lemma reachable_seg_aux {L : RowLocal} {S : Finset (ℤ × ℤ)} {r r' : ℤ}
+private lemma reachable_seg_aux {L : Lattice} {S : Finset (ℤ × ℤ)} {r r' : ℤ}
     (hr : IsWalkRow S r ∨ ∀ p ∈ S, r ≤ p.2)
     (hr' : IsWalkRow S r' ∨ ∀ p ∈ S, p.2 ≤ r') :
     ∀ N (p q : ℤ × ℤ), p ∈ band S r r' → q ∈ band S r r' →
@@ -183,7 +183,7 @@ private lemma reachable_seg_aux {L : RowLocal} {S : Finset (ℤ × ℤ)} {r r' :
 /-- **Cut.** Restricting an `L`-connected `S` to the row band `[r, r']`
 preserves `L`-connectivity, provided each cut line is either a walk row of `S`
 or a boundary. -/
-theorem connected_band {L : RowLocal} {S : Finset (ℤ × ℤ)} (hS : Connected L S)
+theorem connected_band {L : Lattice} {S : Finset (ℤ × ℤ)} (hS : Connected L S)
     {r r' : ℤ}
     (hr : IsWalkRow S r ∨ ∀ p ∈ S, r ≤ p.2)
     (hr' : IsWalkRow S r' ∨ ∀ p ∈ S, p.2 ≤ r') :
@@ -201,7 +201,7 @@ lemma band_eq_self {S : Finset (ℤ × ℤ)} {a b : ℤ}
 /-- **Erase-top** (consumed by peeling case 1). If every cell of `S` sits in row
 `≤ t`, rows `t` and `t - 1` are both walk rows, and `w` is the unique row-`t`
 cell, then removing `w` keeps `S` `L`-connected. -/
-theorem connected_erase_top {L : RowLocal} {S : Finset (ℤ × ℤ)} {t : ℤ} {w : ℤ × ℤ}
+theorem connected_erase_top {L : Lattice} {S : Finset (ℤ × ℤ)} {t : ℤ} {w : ℤ × ℤ}
     (hS : Connected L S) (htop : ∀ p ∈ S, p.2 ≤ t)
     (hwt : IsWalkRow S t) (hwt' : IsWalkRow S (t - 1))
     (hwS : w ∈ S) (hw2 : w.2 = t) :
@@ -226,4 +226,4 @@ theorem connected_erase_top {L : RowLocal} {S : Finset (ℤ × ℤ)} {t : ℤ} {
   rw [← hseg]
   exact connected_band hS (Or.inr hm) (Or.inl hwt')
 
-end Polyplets.Universal
+end Polyplets.RowLocal

@@ -18,9 +18,9 @@ verified with `ls`/`find` against this machine on this date.
   `fabf563a7c95a166b8d7b6efca11c8b4dc9d911f` (tag `v4.31.0`).
 - `polyplets/Polyplets.lean` — the root import file, one `import
   Polyplets.<Module>` per module (top-level modules plus `Staircase.*`,
-  `Universal.*`, `Upper.*`).
+  `RowLocal.*`, `Upper.*`).
 - `polyplets/Polyplets/` — the module tree: 42 `.lean` files, in
-  `Polyplets/` (top level, 20), `Polyplets/Staircase/` (5), `Polyplets/Universal/`
+  `Polyplets/` (top level, 20), `Polyplets/Staircase/` (5), `Polyplets/RowLocal/`
   (12) and `Polyplets/Upper/` (5). Since the 2026-10-12 overhaul the tree is
   the import cone of `Report.lean`, the modules the L-papers cite, and
   `Audit.lean`; the rest was deleted (list and reasons in

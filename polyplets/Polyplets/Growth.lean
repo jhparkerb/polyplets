@@ -68,7 +68,7 @@ open scoped Topology
 
 /-! ## Translating a cell set
 
-Everything in the concatenation is a `translate` (`Universal/Defs.lean`;
+Everything in the concatenation is a `translate` (`RowLocal/Defs.lean`;
 invariance of the king structure in `Defs.lean`); `mem_translate_mk` is its
 membership in the component form every proof below wants. -/
 

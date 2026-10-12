@@ -7,7 +7,7 @@ import Mathlib.Algebra.Order.Group.Abs
 import Mathlib.Data.Int.ConditionallyCompleteOrder
 import Mathlib.Data.Int.Interval
 import Mathlib.Data.Set.Card
-import Polyplets.Universal.Defs
+import Polyplets.RowLocal.Defs
 
 /-!
 # Fixed polyplets: basic definitions
@@ -38,7 +38,7 @@ def KingConnected (S : Finset (ℤ × ℤ)) : Prop :=
   ∀ p ∈ S, ∀ q ∈ S,
     Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q
 
-export Universal (Anchored translate mem_translate translate_mem translate_translate translate_zero
+export RowLocal (Anchored translate mem_translate translate_mem translate_translate translate_zero
   card_translate translate_union translate_insert translate_erase)
 
 /-- King adjacency is translation-invariant. -/

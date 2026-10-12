@@ -5,13 +5,13 @@ Authors: Jason H Parker
 -/
 import Mathlib.Tactic.FinCases
 import Mathlib.Tactic.NormNum
-import Polyplets.Universal.Compute
+import Polyplets.RowLocal.Compute
 
 /-!
 # The square lattice: ordinary polyominoes
 
 `D = {0}`, so `b = |D| = 1` and the universal diagonal law
-(`Universal/Instance.lean`) reads
+(`RowLocal/Instance.lean`) reads
 
 ```
 T(n, n-k) = P_k(n) · 1^(n-1-3k) = P_k(n)     for n ≥ 2k+1,
@@ -31,13 +31,13 @@ counts fixed polyominoes of `n` cells and bounding-box height exactly `H`.
   `T(n, n−1) = 4n − 8` for `n ≥ 3` (paper instance table, density `4 = 2²`),
   given the second cell `T(4,3) = 8` as a hypothesis. The first
   `T(3,2) = 4` the kernel decides from the generic enumerator `Tc`, and
-  `Universal/Compute.lean`'s `isDiagonalPoly_of_eval` does the Lagrange step; `T(4,3)` needs more
+  `RowLocal/Compute.lean`'s `isDiagonalPoly_of_eval` does the Lagrange step; `T(4,3)` needs more
   than 8 GB in the kernel (measured 2026-10-12).
 * `Checks.lean`: the row sum of the computed height triangle at `n = 3`
   reproduces A001168 (fixed polyominoes) `6`.
 -/
 
-namespace Polyplets.Universal
+namespace Polyplets.RowLocal
 
 open Polynomial
 
@@ -46,7 +46,7 @@ open Polynomial
 /-- **The square lattice**: the single up-offset `0`. Together with the
 nearest-neighbor row adjacency this is ordinary (rook-step) polyomino
 adjacency. -/
-def squareLattice : RowLocal where
+def squareLattice : Lattice where
   D := {0}
   hD := ⟨0, by decide⟩
 
@@ -110,7 +110,7 @@ lemma sqP1_eval_four (h43 : T squareLattice 4 3 = 8) :
 
 /-- **The square `P₁`**, given the second cell
 `T(4,3) = 8`: Lagrange uniqueness identifies `4X − 8` with the witness of
-`Universal.exists_isDiagonalPoly`. -/
+`RowLocal.exists_isDiagonalPoly`. -/
 theorem isDiagonalPoly_sqP1 (h43 : T squareLattice 4 3 = 8) :
     IsDiagonalPoly squareLattice 1 sqP1 := by
   refine isDiagonalPoly_of_eval squareLattice 1 sqP1 sqP1_deg ({3, 4} : Finset ℕ) (by decide) ?_ ?_
@@ -132,4 +132,4 @@ theorem square_T_sub_one (h43 : T squareLattice 4 3 = 8) (n : ℕ) (hn : 3 ≤ n
   rw [b_square] at h
   simpa [sqP1_eval] using h
 
-end Polyplets.Universal
+end Polyplets.RowLocal

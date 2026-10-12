@@ -6,7 +6,7 @@ Authors: Jason H Parker
 import Mathlib.Tactic.FinCases
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
-import Polyplets.Universal.Compute
+import Polyplets.RowLocal.Compute
 
 /-!
 # The hexagonal lattice: polyhexes
@@ -35,14 +35,14 @@ by-height diagonals of fixed polyhexes are a polynomial times `2^n`.**
   for the square lattice against A001168.
 -/
 
-namespace Polyplets.Universal
+namespace Polyplets.RowLocal
 
 open Polynomial
 
 /-! ## The lattice -/
 
 /-- **The hexagonal lattice** in brick coordinates: up-offsets `{-1, 0}`. -/
-def hexLattice : RowLocal where
+def hexLattice : Lattice where
   D := {-1, 0}
   hD := ⟨0, by decide⟩
 
@@ -122,4 +122,4 @@ theorem hex_T_sub_one (h43 : T hexLattice 4 3 = 21) (n : ℕ) (hn : 3 ≤ n) :
   rw [h]
   ring_nf
 
-end Polyplets.Universal
+end Polyplets.RowLocal

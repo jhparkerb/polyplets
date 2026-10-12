@@ -32,7 +32,7 @@ The only arithmetic fact about `b` the proofs use is `(b : ℚ) ≠ 0`
 (`TopRowRecursion.b_ne_zero`, from the field `hb : 1 ≤ b`), which is why the
 "verbatim wager" of `docs/proofs/universal-diagonal-law.md` holds: steps 3–5
 of that proof carry over with `b` in place of `3`. The geometric half (steps
-1–2, a `TopRowRecursion` from any row-local lattice) is `Universal/Instance.lean`;
+1–2, a `TopRowRecursion` from any row-local lattice) is `RowLocal/Instance.lean`;
 the king instance with its original names is `King.lean`.
 
 ## What the shape law needs from a lattice
@@ -62,7 +62,7 @@ the *natural number* `T(n,n-k) · b^(3k+1-n)` on the onset window
 onset points. Both are prime-agnostic; `b` is never factored.
 -/
 
-namespace Polyplets.Universal
+namespace Polyplets.RowLocal
 
 open Polynomial
 
@@ -72,7 +72,7 @@ open Polynomial
 diagonal-law algebra consumes. `b` is the drift count (`3` for the king lattice, `|D|` in
 general); `d k H` counts walk-top animals of surplus `k` and height `H`;
 `T n H` counts all canonical animals; `V`/`Vt` are the interior and top-edge
-cluster weights. The two recursions are `Universal/TopRow.lean`'s `d_rec` and `T_of_d`
+cluster weights. The two recursions are `RowLocal/TopRow.lean`'s `d_rec` and `T_of_d`
 verbatim with `3 ↦ b`. -/
 structure TopRowRecursion where
   /-- The drift count: the number of up-offsets of the lattice. -/
@@ -376,4 +376,4 @@ theorem IsDiagonalPoly.intValued {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDeg
 
 end TopRowRecursion
 
-end Polyplets.Universal
+end Polyplets.RowLocal
