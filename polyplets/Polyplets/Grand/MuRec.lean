@@ -9,7 +9,7 @@ import Polyplets.Peel
 /-!
 # MuRec: the μ-recursion (the core theorem)
 
-The mathematical heart of the grand-form staircase (`GRANDFORM-PLAN.md`): one
+The mathematical heart of the grand-form staircase (`docs/proofs/grand-form.md`): one
 transfer step multiplies the walk-top diagonal family `d k H` by the fixed
 multiplier series `μ`, exactly, for `H ≥ k + 1` (sharp onset):
 
@@ -30,7 +30,8 @@ the diagonal `s = j + t`, at which point `Mu.mu_bigRange` recognizes the
 coefficient as `μ s − 3·eps s` and the algebra closes.
 
 The statement was verified on banked data at all 170 in-range instances
-(`experiments/staircase_check.py`); the numeric gate reproduces `d 2 4 = 1019`.
+(`experiments/staircase_check.py`); the numeric gate below reproduces
+`d 1 3 = 40 = 3·5 + (25/3)·3`.
 -/
 
 namespace Polyplets
@@ -210,8 +211,10 @@ theorem d_mu_rec_check_k1_H2 :
   have h := d_mu_rec 2 1 (by norm_num)
   simpa only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Nat.sub_zero] using h
 
-/-- The `(1, 2)` gate evaluates: `40 = 3·5 + (25/3)·3` (verified arithmetic). -/
-theorem d_mu_rec_value_check : (40 : ℚ) = 3 * 5 + (25 / 3) * 3 := by norm_num
+/-- The `(1, 2)` gate evaluates: `μ₀·d 1 2 + μ₁·d 0 2 = 3·5 + (25/3)·3 = 40`,
+from the kernel-decided values `d 1 2 = 5`, `d 0 2 = 3`. -/
+theorem d_mu_rec_value_check : mu 0 * (d 1 2 : ℚ) + mu 1 * (d 0 2 : ℚ) = 40 := by
+  rw [mu_zero, mu_one, d_1_2, d_0_2]; norm_num
 
 /-- **Gate (k, H) = (2, 3).** The recursion at `d 2 4`:
 `d 2 4 = μ₀·d 2 3 + μ₁·d 1 3 + μ₂·d 0 3`. -/
@@ -219,13 +222,6 @@ theorem d_mu_rec_check_k2_H3 :
     (d 2 4 : ℚ) = mu 0 * d 2 3 + mu 1 * d 1 3 + mu 2 * d 0 3 := by
   have h := d_mu_rec 3 2 (by norm_num)
   simpa only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Nat.sub_zero] using h
-
-/-- The `(2, 3)` gate reproduces the banked `d 2 4 = 1019` from the native_decide
-values `d 2 3 = 136`, `d 1 3 = 40`, `d 0 3 = 9` and `μ₀ = 3, μ₁ = 25/3,
-μ₂ = 833/27`: `3·136 + (25/3)·40 + (833/27)·9 = 408 + 611 = 1019`. -/
-theorem d_mu_rec_value_check_k2 :
-    mu 0 * (d 2 3 : ℚ) + mu 1 * (d 1 3 : ℚ) + mu 2 * (d 0 3 : ℚ) = 1019 := by
-  rw [mu_zero, mu_one, mu_two, d_2_3, d_1_3, d_0_3]; norm_num
 
 /-! ## Axiom sanity check -/
 

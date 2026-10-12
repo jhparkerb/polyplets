@@ -151,7 +151,7 @@ many enumerated weights that enter each modulus (5 integers mod 27).
   at ℓ=16 — and is not needed: the generating function is algebraic.
 - **Denominator k! — CLOSED both ways (2026-07-31).** k!·P_k ∈ ℤ[n] is a
   THEOREM for all k (integer-valuedness + deg ≤ k; Lean
-  `production_factorial_int` in `IntCoeff.lean`) — it is how
+  `production_factorial_int` in `IntCoeff.lean`, (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376)) — it is how
   `orchestrator/sweep.go`'s `diagCoeffTable` stores each P_k, and the
   k!-divide guard checks exactness at each evaluation. But k! is NOT
   minimal: the minimal denominator is D_k = k!/5^{ĉ_k} with

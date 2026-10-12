@@ -21,8 +21,8 @@ weights aggregate cluster configurations by (rows `ℓ`, surplus `j`) only:
 * `Vt ℓ j` — top-edge weight: the same without `q`.
 
 Everything is a `Finset.card` of a computable enumeration in the style of
-`Compute.lean` (window + `powersetCard` + decidable filter), so `native_decide`
-reaches it. The enumeration windows are an encoding artifact: the
+`Compute.lean` (window + `powersetCard` + decidable filter), so the kernel can
+decide the smallest values. The enumeration windows are an encoding artifact: the
 **window-independence lemmas** `mem_Dc`, `mem_CFGV`, `mem_CFGVt` characterize
 membership by the propositional descriptions alone (the x-spread of a connected
 set containing the origin is bounded by its cell count, `connected_abs_x_le`).
@@ -31,23 +31,16 @@ descriptions, never the window encoding.
 
 ## Validation (anti-confabulation gates)
 
-All values `native_decide`-checked below; independently cross-checked by a
-direct out-of-Lean enumeration (2026-07-20):
+The values the kernel can decide (each under 3 GB; the next ones up need
+6–9 GB, measured 2026-10-12), independently cross-checked by a direct
+out-of-Lean enumeration (2026-07-20):
 
 * `V 1 1 = 25`, `Vt 1 1 = 5` — the banked paper enumeration (the `16 + 9`
-  and `4 + 1` gadgets of `docs/proofs/T-n-nm1.md`).
-* `V 1 2 = 49`, `Vt 1 2 = 7`, `V 2 2 = 339`, `Vt 2 2 = 66` — new values.
-* `d 0 H = 3^(H-1)` at `H = 1..4` (`1, 3, 9, 27` — the free walk chain);
-  `d 1 2 = 5`, `d 1 3 = 40`, `d 2 3 = 136`, `d 2 4 = 1019`.
+  and `4 + 1` gadgets of `docs/proofs/T-n-nm1.md`); `Vt 1 2 = 7`.
+* `d 0 1 = 1`, `d 0 2 = 3` (the free walk chain `3^(H-1)`), `d 1 2 = 5`.
 
-Identity gates against banked `results/triangle.txt` values, checked BEFORE
-`Peel.lean` invests in the bijection proofs:
-
-* c-identity at `k = 2, H = 3`: `T(5,3) = 248 = 136 + 5·5 + 7·3 + 66·1`.
-* d-recursion at `k = 2, H = 4`: `1019 = 3·136 + 25·5 + 49·3 + 339·1`.
-* d-recursion at `k = 1, H = 3`: `40 = 3·5 + 25·1`.
-* c-identity at `k = 1, H = 3` and at the onset `H = k + 1 = 2`:
-  `T(4,3) = 55 = 40 + 5·3`, `T(3,2) = 10 = 5 + 5·1`.
+One identity gate against a banked `results/triangle.txt` value: the
+c-identity at the onset `k = 1, H = 2`, `T(3,2) = 10 = 5 + 5·1`.
 -/
 
 namespace Polyplets
@@ -385,14 +378,13 @@ theorem mem_CFGVt {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
 
 /-! ## Validation against banked and cross-checked values
 
-The `native_decide` battery. Weight values are recorded as named theorems so
-the identity gates below consume each enumeration exactly once. All values
+Weight values the kernel decides, recorded as named theorems. All values
 independently cross-checked by a direct enumeration outside Lean (2026-07-20);
 `V 1 1`/`Vt 1 1` additionally match the paper gadget counts of
-`docs/proofs/T-n-nm1.md`, and the triangle values are the banked
-two-algorithm-confirmed `results/triangle.txt` entries. -/
-
-set_option linter.style.nativeDecide false
+`docs/proofs/T-n-nm1.md`. Larger values (`V 1 2 = 49`, `V 2 2 = 339`,
+`Vt 2 2 = 66`, `d 0 3 = 9`, `d 1 3 = 40`, `d 2 3 = 136`, `d 2 4 = 1019`,
+`T 5 3 = 248`) were `native_decide` facts until 2026-10-12; the kernel needs
+6–9 GB for them, and nothing in the development consumes them. -/
 
 /-- `V 1 1 = 25`: the paper-enumerated `16 + 9` gadget count. -/
 theorem V_1_1 : V 1 1 = 25 := by decide +kernel
@@ -400,73 +392,21 @@ theorem V_1_1 : V 1 1 = 25 := by decide +kernel
 /-- `Vt 1 1 = 5`: the paper-enumerated `4 + 1` gadget count. -/
 theorem Vt_1_1 : Vt 1 1 = 5 := by decide +kernel
 
-/-- `V 1 2 = 49` (cross-checked enumeration). -/
-theorem V_1_2 : V 1 2 = 49 := by native_decide
-
 /-- `Vt 1 2 = 7` (cross-checked enumeration). -/
-theorem Vt_1_2 : Vt 1 2 = 7 := by native_decide
-
-/-- `V 2 2 = 339` (cross-checked enumeration). -/
-theorem V_2_2 : V 2 2 = 339 := by native_decide
-
-/-- `Vt 2 2 = 66` (cross-checked enumeration). -/
-theorem Vt_2_2 : Vt 2 2 = 66 := by native_decide
+theorem Vt_1_2 : Vt 1 2 = 7 := by decide +kernel
 
 /-! `d 0 H = 3^(H-1)` — surplus 0 forces every row to a single cell, a free
 walk chain of offsets. -/
 
 theorem d_0_1 : d 0 1 = 1 := by decide +kernel
-theorem d_0_2 : d 0 2 = 3 := by native_decide
-theorem d_0_3 : d 0 3 = 9 := by native_decide
-theorem d_0_4 : d 0 4 = 27 := by native_decide
+theorem d_0_2 : d 0 2 = 3 := by decide +kernel
 
 /-- `d 1 2 = 5`: of the `T(3,2) = 10` animals, five have a walk top row. -/
-theorem d_1_2 : d 1 2 = 5 := by native_decide
-
-/-- `d 1 3 = 40`: the DESIGN.md paper value (`15 + 25` across peel classes). -/
-theorem d_1_3 : d 1 3 = 40 := by native_decide
-
-/-- `d 2 3 = 136` (cross-checked enumeration). -/
-theorem d_2_3 : d 2 3 = 136 := by native_decide
-
-/-- `d 2 4 = 1019` (cross-checked enumeration). -/
-theorem d_2_4 : d 2 4 = 1019 := by native_decide
-
-/-- `T 5 3 = 248` (banked, `results/triangle.txt`), the total the `k = 2`
-c-identity gate splits. -/
-theorem T_5_3 : T 5 3 = 248 := by rw [← Tc_eq_T]; native_decide
-
-/-! ### The anti-confabulation gates (numeric instances of `Peel.lean`'s
-target identities, from the independently validated values above) -/
-
-/-- **Gate: c-identity at `k = 2, H = 3`.**
-`T(5,3) = 248 = 136 + 5·5 + 7·3 + 66·1`: the animals split by top-row profile
-into walk-top (`d 2 3`) plus a top-edge cluster of each shape `(ℓ, j)` capping
-a walk-top remainder. -/
-theorem c_ident_check_k2_H3 :
-    T 5 3 = d 2 3 + Vt 1 1 * d 1 2 + Vt 1 2 * d 0 2 + Vt 2 2 * d 0 1 := by
-  norm_num [T_5_3, d_2_3, Vt_1_1, d_1_2, Vt_1_2, d_0_2, Vt_2_2, d_0_1]
-
-/-- **Gate: d-recursion at `k = 2, H = 4`.**
-`1019 = 3·136 + 25·5 + 49·3 + 339·1`: walk-top animals split by the
-second-top row — walk (3 offsets on a height-3 remainder) or the start of an
-interior cluster of each shape `(ℓ, j)`. -/
-theorem d_rec_check_k2_H4 :
-    d 2 4 = 3 * d 2 3 + V 1 1 * d 1 2 + V 1 2 * d 0 2 + V 2 2 * d 0 1 := by
-  norm_num [d_2_4, d_2_3, V_1_1, d_1_2, V_1_2, d_0_2, V_2_2, d_0_1]
-
-/-- **Gate: d-recursion at `k = 1, H = 3`.** `40 = 3·5 + 25·1` — the
-DESIGN.md paper sanity check, now machine-checked. -/
-theorem d_rec_check_k1_H3 : d 1 3 = 3 * d 1 2 + V 1 1 * d 0 1 := by
-  norm_num [d_1_3, d_1_2, V_1_1, d_0_1]
-
-/-- **Gate: c-identity at `k = 1, H = 3`.** `T(4,3) = 55 = 40 + 5·3` — the
-`15 + 25 + 15` paper decomposition regrouped as walk-top + capped. -/
-theorem c_ident_check_k1_H3 : T 4 3 = d 1 3 + Vt 1 1 * d 0 2 := by
-  norm_num [T_4_3, d_1_3, Vt_1_1, d_0_2]
+theorem d_1_2 : d 1 2 = 5 := by decide +kernel
 
 /-- **Gate: c-identity at the onset `k = 1, H = k + 1 = 2`.**
-`T(3,2) = 10 = 5 + 5·1`. -/
+`T(3,2) = 10 = 5 + 5·1`, a numeric instance of `Peel.lean`'s target identity
+from the values above. -/
 theorem c_ident_check_k1_H2 : T 3 2 = d 1 2 + Vt 1 1 * d 0 1 := by
   norm_num [T_3_2, d_1_2, Vt_1_1, d_0_1]
 

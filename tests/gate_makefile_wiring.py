@@ -61,10 +61,6 @@ EXCUSED = {
         "chain can carry it without failing on two of the three boxes. Run by "
         "hand on ayr. The reason used to read 'lives with the ns-gates', which "
         "ns-gates has never done -- an allowlist reason that was not true",
-    "gate-notary":
-        "runs `lake build` over the Lean development, which needs the Lean "
-        "toolchain and vendored Mathlib present and is minutes even warm; "
-        "the Lean tree has its own build discipline (docs/lean-environment.md)",
 }
 
 

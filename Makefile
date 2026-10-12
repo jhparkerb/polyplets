@@ -64,7 +64,7 @@ endif
         ns-gate-frontier-zstd ns-gate-diag-pins \
         ns-driver0 \
         build/ns/orchestrate build/ns/runcat build/ns/predict build/ns/combine build/ns/verify \
-        papers papers-verify papers-clean papers-list
+        papers papers-verify papers-clean papers-list lean
 
 # The C++ ns binaries used to be on that .PHONY list. They are real files with
 # real recipes and complete prerequisites (their source plus every core/ header),
@@ -924,53 +924,20 @@ build/nkey_census: cpp/nkey_census.cpp cpp/obs.h | build
 build/dmirror_spine: cpp/dmirror_spine.cpp cpp/obs.h | build
 	$(CXX) $(CXXFLAGS) -O3 -Icpp $< -o $@
 
-# Gate NOTARY: the Lean-ification of the depth-1 closure (campaign Notary,
-# docs/notary-lean-plan.md). Fails on any sorry in the Notary modules, then
-# builds them; the axiom audits are #guard_msgs blocks inside the modules
-# (AuditOutworks pattern), so axiom drift also fails the build. RED until the
-# wave-1 agents land their proofs.
-#
-# TODO(2026-08-19, from the simplify pass): this builds a MODULE LIST, and the
-# failure class 79dbc6e fixed is invisible to a module list -- every one of the
-# 8643 module targets was green while the root `Polyplets.lean` failed at
-# import, because `kingConnected_image` had been declared in two modules and
-# only the aggregate sees both.  PROOF-STATUS.md now says in bold "run the
-# whole lake build, not a module", which leaves the rule enforced by a human
-# remembering a sentence -- the shape a gate exists to replace.  Adding the
-# root target `Polyplets` here is the fix; not done in this pass because it
-# needs a Lean toolchain to verify (gympie only) and widens what can turn this
-# gate red, so it wants its own change with a real build behind it.
-NOTARY_MODULES := polyplets/Polyplets/GapWalkBridge.lean \
-                  polyplets/Polyplets/DepthOneConstants.lean \
-                  polyplets/Polyplets/DepthOneSeries.lean \
-                  polyplets/Polyplets/GapWalkRows.lean \
-                  polyplets/Polyplets/GapWalkCanon.lean \
-                  polyplets/Polyplets/GapWalkTrunc.lean \
-                  polyplets/Polyplets/GapWalkStacks.lean \
-                  polyplets/Polyplets/GapWalkPeel.lean \
-                  polyplets/Polyplets/GapWalkEnds.lean \
-                  polyplets/Polyplets/GapWalkBij.lean \
-                  polyplets/Polyplets/GapWalkRowVals.lean \
-                  polyplets/Polyplets/KernelSeries.lean \
-                  polyplets/Polyplets/KernelRoots.lean \
-                  polyplets/Polyplets/GapWalkExact.lean \
-                  polyplets/Polyplets/GapWalkColumns.lean \
-                  polyplets/Polyplets/GapWalkClosing.lean \
-                  polyplets/Polyplets/DepthOneKernelSol.lean \
-                  polyplets/Polyplets/DepthOneKernelUnique.lean \
-                  polyplets/Polyplets/DepthOneKernelPhi.lean
-gate-notary:
-	@if grep -wn 'sorry\|axiom\|admit' $(NOTARY_MODULES); then \
-	  echo 'gate-notary: RED — sorry/axiom/admit present'; exit 1; fi
-	cd polyplets && lake build Polyplets.GapWalkBridge \
-	  Polyplets.DepthOneConstants Polyplets.DepthOneSeries \
-	  Polyplets.GapWalkRows Polyplets.GapWalkCanon Polyplets.GapWalkTrunc \
-	  Polyplets.GapWalkStacks Polyplets.GapWalkPeel Polyplets.GapWalkEnds \
-	  Polyplets.GapWalkBij Polyplets.GapWalkRowVals \
-	  Polyplets.KernelSeries Polyplets.KernelRoots \
-	  Polyplets.GapWalkExact Polyplets.GapWalkColumns \
-	  Polyplets.GapWalkClosing Polyplets.DepthOneKernelSol \
-	  Polyplets.DepthOneKernelUnique Polyplets.DepthOneKernelPhi
+# The Lean development (gympie only: the toolchain and vendored Mathlib live
+# there, so this is not in `gates`). Builds the root target `Polyplets`, which
+# fails on any compile error and on axiom-footprint drift (the #guard_msgs in
+# polyplets/Polyplets/Audit.lean pin every Report.lean theorem to the standard
+# three axioms). The greps are belt and braces: a `sorry` or a `native_decide`
+# in a module the root does not import would otherwise pass unnoticed. Serial
+# (LEAN_NUM_THREADS=1): a lean process on this tree peaks at ~3.5 GB.
+lean:
+	@if grep -rwn 'sorry' polyplets/Polyplets polyplets/Polyplets.lean; then \
+	  echo 'lean: RED -- sorry present'; exit 1; fi
+	@if grep -rnE '(by|;) *native_decide' polyplets/Polyplets; then \
+	  echo 'lean: RED -- native_decide present'; exit 1; fi
+	cd polyplets && LEAN_NUM_THREADS=1 ~/.elan/bin/lake build
+	@echo 'lean: GREEN'
 
 # Gate CONVEX-DFINITE: the sharpened order<=20/degree<=20 non-D-finite verdict
 # for HV-convex animals by area, king and edge-adjacent, plus the growth

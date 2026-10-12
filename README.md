@@ -55,7 +55,7 @@ own machinery.
 | `tests/engine/` | the C++ gate drivers and unit tests of the production engine, built by `make` into `build/ns/` |
 | `verify/` | a small Go tool and package that reads run artifacts independently of the engine: CRC and architecture-fitness checks |
 | `fixtures/` | external ground truth --- OEIS b-files with their checksums --- that most gates compare against |
-| `polyplets/` | the **Lean 4 formalization** (86 sorry-free modules): the peeling recursion, the diagonal-law shape theorem, and the grand form, with the production P_k pinned for k≤18 from two real-swept cells per level; axiom footprints are `#guard_msgs`-enforced. Status: `polyplets/PROOF-STATUS.md` |
+| `polyplets/` | the **Lean 4 formalization**: `Polyplets/Report.lean` states the technical report's claims as theorems, proved from the peeling recursion, the diagonal-law shape theorem and the grand-form staircase, with the production P_k pinned for k≤18 from two enumerated cells per level; every Report theorem is on standard axioms only, enforced by `#guard_msgs`. Ledger: `polyplets/README.md` |
 | `oeis/` | staged OEIS extensions, b-files and new-sequence drafts |
 
 One-shot launch scripts, per-term plans, and the research-log corpus that

@@ -5,14 +5,13 @@ Authors: Jason H Parker
 -/
 import Polyplets.Grand.Series
 import Polyplets.Weights
-import Polyplets.Weights3
 
 /-!
 # Mu: the root series `ν` and the multiplier `μ`
 
 The coefficient-form root/multiplier of the grand-form staircase
-(`GRANDFORM-PLAN.md`). This layer sits on the convolution toolkit of
-`Series.lean` and the cluster weights of `Weights.lean`/`Weights3.lean`.
+(`docs/proofs/grand-form.md`). This layer sits on the convolution toolkit
+of `Series.lean` and the cluster weights of `Weights.lean`.
 
 * `v ℓ` — the interior weights `V ℓ ·` as a `y`-sequence, guarded to vanish
   below index `ℓ` (and identically for `ℓ = 0`).
@@ -24,9 +23,9 @@ The coefficient-form root/multiplier of the grand-form staircase
 * `mu` — the multiplier `1/z*`, defined **non-recursively** from `ν`; the
   inverse law `mu ∗ ν = eps` (`mu_conv_nu`) follows from `root`.
 
-The numeric gates `mu_one`, `mu_two` (unconditional) and `mu_three_of`
-(conditional on the heavy leaf `V 3 3 = 4778`) reuse the `native_decide`
-weight theorems of `Weights.lean`/`Weights3.lean` — no new `native_decide`.
+The numeric gate `mu_one` reuses the kernel-decided `V_1_1` of `Weights.lean`.
+(`mu_two` and the conditional `mu_three_of` rested on `native_decide` weights
+and were removed 2026-10-12.)
 -/
 
 namespace Polyplets
@@ -207,33 +206,19 @@ theorem nu_conv_mu : conv nu mu = eps := by rw [conv_comm, mu_conv_nu]
 theorem mu_conv_nu_pow (ℓ : ℕ) : conv (convPow mu ℓ) (convPow nu ℓ) = eps :=
   conv_convPow_inv mu_conv_nu ℓ
 
-/-! ## Numeric gates
+/-! ## Numeric gate
 
-`μ₁ = 25/3`, `μ₂ = 833/27` unconditionally (from the `native_decide` weights
-`V_1_1`, `V_1_2`, `V_2_2`); `μ₃ = 32708/243` conditional on the heavy leaf
-`V 3 3 = 4778`. All reuse existing weight theorems — no new `native_decide`. -/
+`μ₁ = 25/3` unconditionally, from the kernel-decided weight `V_1_1`. -/
 
 /-- Small convolution-power unfoldings. -/
 lemma convPow_nu_one : convPow nu 1 = nu := by simp only [convPow, conv_eps]
 
 lemma convPow_nu_two : convPow nu 2 = conv nu nu := by simp only [convPow, conv_eps]
 
-lemma convPow_nu_three : convPow nu 3 = conv nu (conv nu nu) := by
-  simp only [convPow, conv_eps]
-
 /-! Interior-weight values as `v`-coefficients. -/
 
 lemma v_10 : v 1 0 = 0 := by simp [v]
 lemma v_11 : v 1 1 = 25 := by rw [v_eq (by norm_num) (by norm_num), V_1_1]; norm_num
-lemma v_12 : v 1 2 = 49 := by rw [v_eq (by norm_num) (by norm_num), V_1_2]; norm_num
-lemma v_13 : v 1 3 = 81 := by rw [v_eq (by norm_num) (by norm_num), V_1_3]; norm_num
-lemma v_20 : v 2 0 = 0 := by simp [v]
-lemma v_21 : v 2 1 = 0 := by simp [v]
-lemma v_22 : v 2 2 = 339 := by rw [v_eq (by norm_num) (by norm_num), V_2_2]; norm_num
-lemma v_23 : v 2 3 = 1860 := by rw [v_eq (by norm_num) (by norm_num), V_2_3]; norm_num
-lemma v_30 : v 3 0 = 0 := by simp [v]
-lemma v_31 : v 3 1 = 0 := by simp [v]
-lemma v_32 : v 3 2 = 0 := by simp [v]
 
 /-- `ν₁ = −25/27`. -/
 lemma nu_one : nu 1 = -25/27 := by
@@ -241,37 +226,11 @@ lemma nu_one : nu 1 = -25/27 := by
   simp only [conv, Finset.sum_range_succ, Finset.sum_range_zero]
   norm_num [v_10, v_11, nu_zero]
 
-/-- `ν₂ = −208/243`. -/
-lemma nu_two : nu 2 = -208/243 := by
-  rw [nu_unfold 2 (by norm_num), show Finset.Icc 1 2 = ({1, 2} : Finset ℕ) by decide,
-    Finset.sum_insert (by decide), Finset.sum_singleton, convPow_nu_two, convPow_nu_three]
-  simp only [conv, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [v_10, v_11, v_12, v_20, v_21, v_22, nu_zero, nu_one]
-
-/-- **Gate μ₁.** `μ₁ = 25/3`, via `V_1_1` (no new `native_decide`). -/
+/-- **Gate μ₁.** `μ₁ = 25/3`, via `V_1_1`. -/
 theorem mu_one : mu 1 = 25 / 3 := by
   rw [mu_succ_eq (le_refl 1), Finset.Icc_self, Finset.sum_singleton, convPow_nu_one]
   simp only [conv, Finset.sum_range_succ, Finset.sum_range_zero]
   norm_num [v_10, v_11, nu_zero]
-
-/-- **Gate μ₂.** `μ₂ = 833/27`, via `V_1_1`, `V_1_2`, `V_2_2`. -/
-theorem mu_two : mu 2 = 833 / 27 := by
-  rw [mu_succ_eq (by norm_num), show Finset.Icc 1 2 = ({1, 2} : Finset ℕ) by decide,
-    Finset.sum_insert (by decide), Finset.sum_singleton, convPow_nu_one, convPow_nu_two]
-  simp only [conv, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [v_10, v_11, v_12, v_20, v_21, v_22, nu_zero, nu_one]
-
-/-- **Gate μ₃ (conditional).** `μ₃ = 32708/243`, given the heavy leaf
-`V 3 3 = 4778` (`Weights3Heavy.lean`, not imported here) plus `V_1_3`, `V_2_3`
-from `Weights3.lean`. -/
-theorem mu_three_of (hV33 : V 3 3 = 4778) : mu 3 = 32708 / 243 := by
-  have v_33 : v 3 3 = 4778 := by rw [v_eq (by norm_num) (by norm_num), hV33]; norm_num
-  rw [mu_succ_eq (by norm_num), show Finset.Icc 1 3 = ({1, 2, 3} : Finset ℕ) by decide,
-    Finset.sum_insert (by decide), Finset.sum_insert (by decide), Finset.sum_singleton,
-    convPow_nu_one, convPow_nu_two, convPow_nu_three]
-  simp only [conv, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [v_10, v_11, v_12, v_13, v_20, v_21, v_22, v_23, v_30, v_31, v_32, v_33,
-    nu_zero, nu_one, nu_two]
 
 /-! ## Axiom sanity check -/
 
@@ -279,8 +238,6 @@ section Sanity
 
 #print axioms mu_conv_nu
 #print axioms mu_one
-#print axioms mu_two
-#print axioms mu_three_of
 
 end Sanity
 

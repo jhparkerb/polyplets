@@ -57,7 +57,8 @@ king instance ($b=3$) is formalized in Lean~4 against mathlib
 (\repo{polyplets/Polyplets/Universal/}: \texttt{universal\_shape\_d},
 \texttt{universal\_shape}, \texttt{universal\_shape\_production},
 \texttt{universal\_production\_int\_all}) and depends on standard axioms only,
-with no \texttt{sorry} anywhere in the development. Machine checks of the
+with no \texttt{sorry} and no \texttt{native\_decide} anywhere in the
+development. Machine checks of the
 general statement: \repo{experiments/universal\_law\_check.py} (square),
 \repo{experiments/diagonal\_law\_proof\_check.py} (king),
 \repo{experiments/hex\_gas.py} (hex).
@@ -65,9 +66,10 @@ general statement: \repo{experiments/universal\_law\_check.py} (square),
 both sharpness witnesses are machine computations
 (\repo{experiments/universal\_pair\_weights.py}).
 \emph{Theorem~\ref{thm:C} (the product form)} --- paper proof below; the king
-instance is Lean, standard axioms only (\texttt{grand\_form},
-\texttt{grand\_form\_prod}), and the per-level production pinning for
-$k \le 18$ carries one named \texttt{native\_decide} leaf per weight card.
+instance is Lean, standard axioms only (\texttt{T\_staircase},
+\texttt{d\_mu\_rec}, \texttt{grand\_all}, \texttt{Pk\_prod}), and the
+per-level production pinning for $k \le 18$ is conditional on the enumerated
+onset cells, two per level, which enter as hypotheses.
 \emph{The closed forms of Table~\ref{tab:machine}} --- each is a consequence of
 Theorem~\ref{thm:A} applied to $k+1$ enumerated values, and each survives 5--11
 withheld values that were not used to fit it.
@@ -899,8 +901,10 @@ than a result.
 \label{sec:formal}
 
 The king instance is formalized in Lean~4 (toolchain v4.31.0) against
-mathlib~\cite{mathlib}, in a development of 65 modules and about 21{,}700 lines
-with \textbf{zero occurrences of \texttt{sorry}}. What is relevant here:
+mathlib~\cite{mathlib}, in a development with \textbf{no \texttt{sorry} and no
+\texttt{native\_decide}}: every theorem in it depends on the standard axioms
+(\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}) alone. What
+is relevant here:
 
 \begin{itemize}
 \item The engine (\texttt{Universal.universal\_shape\_d},
@@ -908,33 +912,32 @@ with \textbf{zero occurrences of \texttt{sorry}}. What is relevant here:
   \texttt{universal\_production\_int\_all}) and the \texttt{kingSystem} and
   \texttt{peelSystem} instances depend on \textbf{standard axioms only}
   (\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}).
-\item The product form (\texttt{grand\_form} and \texttt{grand\_form\_prod},
-  Theorem~\ref{thm:C}) likewise depends on standard axioms only. It was
+\item The product form (\texttt{T\_staircase}, \texttt{d\_mu\_rec},
+  \texttt{grand\_all}, \texttt{Pk\_prod}; Theorem~\ref{thm:C}) was
   restructured for Lean as a \emph{staircase} route: in sequence form, Steps 1--3
   collapse to a convolution fixed point plus one strong induction, and Step 4's
   Lagrange lemma becomes a fixed point, with no power-series ring involved. Same
   theorem, different scaffolding.
-\item \texttt{lead\_coeff\_25} (Corollary~\ref{cor:lead} for the king) adds a
-  single named \texttt{native\_decide} leaf, which is the evaluation of one
-  cluster weight.
+\item \texttt{production\_leadingCoeff} (Corollary~\ref{cor:lead} for the
+  king) is proved outright; the cluster weight $V(1,1) = 25$ it rests on is a
+  kernel-decided cell (\texttt{decide +kernel}), not a compiled evaluation.
 \item The per-lattice instance determinations (\texttt{king\_P1\_*},
   \texttt{square\_P1\_*}, \texttt{hex\_P1\_*}) and the cross-family row-sum
   gates carry named leaves that amount to two triangle cells per lattice.
-\item The $k \le 18$ production pinning
-  (\texttt{P\textit{k}\_grand\_of\_banked}) is \emph{conditional on enumerated
-  cells}: those cells are hypotheses of the Lean theorems, not proved in Lean.
+\item The $k \le 18$ production pinning (\texttt{grand\_all},
+  \texttt{Pk\_prod}) is \emph{conditional on enumerated cells}: the 36 onset
+  cells, two per level, are the hypothesis \texttt{BankedAnchors} of the Lean
+  theorems, not proved in Lean.
 \end{itemize}
 
 Of the axiom footprints, 88 are \emph{guarded}: those modules wrap
 \texttt{\#print axioms} in \texttt{\#guard\_msgs}, so a changed footprint is a
 build error and building the project checks them. The remaining 148 print their
-footprints but are informational. There is no \texttt{sorryAx} and no anonymous
-\texttt{Lean.ofReduceBool}; every compiled-evaluation leaf is named, so the
-trusted surface is enumerable rather than diffuse.
+footprints but are informational. There is no \texttt{sorryAx} and no
+\texttt{Lean.ofReduceBool}: the trusted surface is the kernel.
 
 The development does \emph{not} certify the enumeration engine, the stored
-triangle, or any anchor value. Those enter as explicit hypotheses or as named
-leaves.
+triangle, or any anchor value. Those enter as explicit hypotheses.
 
 % ===========================================================================
 \part*{Part II --- the mod-$3$ arithmetic of the king triangle}

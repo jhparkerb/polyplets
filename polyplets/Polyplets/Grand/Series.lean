@@ -10,7 +10,8 @@ import Mathlib.Tactic
 /-!
 # Series: a sequence-convolution toolkit over `ℕ → ℚ`
 
-The self-contained algebra layer under the grand-form staircase (GRANDFORM-PLAN.md).
+The self-contained algebra layer under the grand-form staircase
+(`docs/proofs/grand-form.md`).
 Everything works over plain functions `ℕ → ℚ` — no structure or type synonym, so
 later files can pattern-match on the underlying lambdas.
 

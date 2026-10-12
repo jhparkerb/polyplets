@@ -35,10 +35,9 @@ Faulhaber's formula (`sum_range_pow`) through the standalone lemma
 value is absorbed into the constant term of `δ_k`.
 
 Numeric guard: `shape_production` at `k = 0` plus the single onset value
-`T 1 1 = 1` pins `P_0 = 1`, giving `T(n,n) = 3^(n-1)` (`T_diag_pow`) — checked
-against the independently `native_decide`d `T 3 3 = 9` and `T 4 4 = 27`
-(`Compute.lean` proves the former directly). This is exactly the
-shape-plus-points pattern `Pin.lean` runs at every `k`.
+`T 1 1 = 1` pins `P_0 = 1`, giving `T(n,n) = 3^(n-1)` (`T_diag_pow`), and from
+it the banked `T 3 3 = 9` and `T 4 4 = 27`. This is exactly the
+shape-plus-points pattern `Pin.lean` runs at `k = 1`.
 -/
 
 namespace Polyplets
@@ -475,9 +474,9 @@ theorem production_int_all {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree �
 /-! ## Numeric guard: the `k = 0` pin
 
 The Pin pattern run at `k = 0`: `shape_production 0` gives a constant `P₀`,
-the single onset value `T 1 1 = 1` (a `native_decide` fact from
-`Compute.lean`) pins it, and the closed form `T(n,n) = 3^(n-1)` follows —
-cross-checked against the independently `native_decide`d `T 3 3 = 9`. -/
+the single onset value `T 1 1 = 1` (kernel-decided in `Compute.lean`) pins
+it, and the closed form `T(n,n) = 3^(n-1)` follows, with the banked
+`T 3 3 = 9` and `T 4 4 = 27` as instances. -/
 
 /-- The `k = 0` diagonal pinned: `T(n, n) = 3^(n-1)` for `n ≥ 1`. -/
 theorem T_diag_pow (n : ℕ) (hn : 1 ≤ n) : (T n n : ℚ) = (3 : ℚ) ^ ((n : ℤ) - 1) := by
@@ -493,8 +492,8 @@ theorem T_diag_pow (n : ℕ) (hn : 1 ≤ n) : (T n n : ℚ) = (3 : ℚ) ^ ((n : 
   simp only [Nat.sub_zero, eval_C, Nat.cast_zero, mul_zero, sub_zero] at h
   rw [h, ← h1, one_mul]
 
-/-- Guard: the shape-derived closed form reproduces the `native_decide`d
-`T 3 3 = 9` (`Compute.lean`'s `T_3_3`). -/
+/-- Guard: the shape-derived closed form gives `T 3 3 = 9` (banked; the
+kernel needs 6 GB to decide it directly). -/
 theorem shape_check_T_3_3 : T 3 3 = 9 := by
   have h := T_diag_pow 3 (by omega)
   have he : ((3 : ℕ) : ℤ) - 1 = 2 := by omega

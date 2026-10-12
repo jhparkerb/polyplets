@@ -2,8 +2,8 @@
 # run_strip_h14.sh — independent strip-TM full sweep, Hmax=14, vs banked triangle.
 #
 # Purpose: extend the second-source per-cell confirmation from H<=13 to H<=14
-#   (flips PinGrand anchors T(26,14)/T(27,14) to multi-source; fix 7 of
-#   docs/lean-record.md). The 2026-07-10 Hmax=14 run was stopped after
+#   (flips the Lean level-12 anchors T(26,14)/T(27,14) to multi-source; fix 7
+#   of the 2026-07-21 Lean audit). The 2026-07-10 Hmax=14 run was stopped after
 #   C_13, so its end-of-run banked compare never executed; this run re-prints
 #   the per-height match counts for ALL H<=14 in one log.
 # Machine: dalby (128 GB). Predicted cost: ~40 GB RAM peak, 1 core, ~60-90 min

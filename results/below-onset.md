@@ -678,9 +678,10 @@ onset using these `D_j`, which is what `a(41)` rests on.
 
 ## 11. Lean
 
-Gate `make gate-notary` (sorry/axiom grep plus `lake build`; axiom audits
-are `#guard_msgs` blocks in the modules). Status of record
-`polyplets/PROOF-STATUS.md`; modules under `polyplets/Polyplets/`. Axioms
+The modules below left the Lean build on 2026-10-12 (the Report overhaul
+kept only what `paper/technical-report.tex` claims); they are at commit
+697f376, with their `make gate-notary` target and `#guard_msgs` axiom
+audits. The current ledger is `polyplets/README.md`. Axioms
 `propext, Classical.choice, Quot.sound`, plus `Lean.ofReduceBool` where
 `native_decide` is used, audited per theorem.
 
@@ -724,7 +725,7 @@ D-finite relation at reachable complexity (`experiments/braw_from_data.py`;
 order: Lean at `k ≤ 8`, two programs at `k ≤ 19`, annihilation to order 60.
 (2) The analytic transfer from branch data to `k^(-1/2)` and `√π` is
 real-analytic, without Mathlib support, and out of scope. Separately,
-`docs/lean-record.md` records that using the below-onset
+the Lean ledger (`polyplets/README.md`) records that using the below-onset
 identity to determine a level (F1) and substituting a corrected entry for
 an onset entry (F2) are not stated in Lean.
 
@@ -743,8 +744,7 @@ an onset entry (F2) are not stated in Lean.
   weights and for `B(y)`; `P_k` from weights past `k = 9` (needs a
   state-space reduction in the stack DP).
 - In Lean: discharge `hbridge` to a chosen finite order; fixed-`k` cases
-  `k = 3, 4` in `Diagonal.lean`; F1 and F2 of
-  `docs/lean-record.md`.
+  `k = 3, 4`; F1 and F2 of the Lean ledger (`polyplets/README.md`).
 
 ## Reproduce
 
@@ -763,7 +763,7 @@ python3 experiments/depth1_gap_walk.py                # 42 s
 python3 experiments/depth1_minpoly.py; python3 experiments/depth1_asymptotics.py; python3 experiments/depth1_recurrence.py
 python3 experiments/depth1_sharpness.py               # 45 s
 python3 experiments/depth1_parametric.py
-make gate-severance-w1 gate-severance-w2 gate-severance-w3 gate-notary
+make gate-severance-w1 gate-severance-w2 gate-severance-w3
 build/severance_w3_families 19 3                      # 146 s, results/severance_w3_families_K19_e3.txt
 python3 experiments/severance_w3_modp.py; python3 experiments/severance_w4_field.py
 python3 experiments/ridgeline_master.py; python3 experiments/ridgeline_vertex.py

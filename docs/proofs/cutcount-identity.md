@@ -364,7 +364,7 @@ of §3. The argument has three parts, all mechanical.
   expired label is never consulted again — neither by the clash rule (Lemma 1)
   nor by the adopt/`b` rules, which range over the window.
 
-§7 prices this as routine for this development, and the GapWalk chain is the
+§7 prices this as routine for this development, and the GapWalk chain (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376) is the
 precedent. The bridge from a formal model to the compiled binary (§7's Tier 3)
 is not addressed at all.
 

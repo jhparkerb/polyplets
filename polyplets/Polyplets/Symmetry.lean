@@ -63,29 +63,23 @@ fixed by `σ²` is already fixed by `σ` (`2 p` is pinned by `t`, and so is
 `σ`-orbits all have exactly four elements: `card_div_four` peels them off one
 at a time, leaving `n % 4 ∈ {0, 1}`.
 
-## Anchors
+## Validation
 
 `fixCountC` is the computable twin (filter the `box n n` enumeration of
 `Compute.lean` by canonicality and `g`-fixedness), and `fixCountC_eq` transports
-it. The anchors run to `n = 5` and match `results/sym_counts.txt`:
-`r90 = 1, 0, 0, 2, 2`; `r180 = 1, 4, 4, 22, 22`;
-`hmirror = dmirror = 1, 2, 4, 10, 22`. The `n = 6` row — where `hmirror = 58`
-first parts company with `dmirror = 56`, so that it is the first row telling
-the two mirror conventions apart — needs the `C(36,6) ≈ 1.9M`-subset
-enumeration at roughly 490 s per group element (measured scaling from the
-`n = 5` anchors), so it is out of this module's budget. It is instead
+it. The kernel cannot decide even `fixCountC 1` within 6 GB (measured
+2026-10-12), so the in-file anchors `n ≤ 5` against `results/sym_counts.txt`
+(`native_decide` facts until then) are gone; the counts `n = 1 … 6` are
 verified by the committed independent brute force
-`experiments/sym_brute_check.py` (run 2026-07-31, log alongside): all four
-columns `n = 1 … 6` reproduce `results/sym_counts.txt` exactly, including
-the `58` / `56` split, and the derived free/one-sided/bilateral values match
-A030222/A030233/A030234 through `n = 6`. In-file, the conventions are pinned
-by proof rather than anchor — `toFun_mul` forces the multiplication table to
-be composition of the eight explicit linear maps, and `D4.h` (negate `y`)
-vs `D4.d` (swap) are distinct conjugacy classes by `decide` — and nothing
-published depends on which mirror is which: `free_eq` and `bilateral_eq` are
-symmetric in `Hm` and `Dm`. Derived spot checks `Free 4 = 22`,
-`OneSided 4 = 34`, `Bilateral 4 = 10` close the loop against
-A030222/A030233/A030234.
+`experiments/sym_brute_check.py` (run 2026-07-31, log alongside), including
+the `n = 6` row where `hmirror = 58` first parts company with `dmirror = 56`,
+and the derived free/one-sided/bilateral values match A030222/A030233/A030234
+through `n = 6`. In-file, the conventions are pinned by proof rather than
+anchor — `toFun_mul` forces the multiplication table to be composition of the
+eight explicit linear maps, and `D4.h` (negate `y`) vs `D4.d` (swap) are
+distinct conjugacy classes by `decide` — and nothing published depends on
+which mirror is which: `free_eq` and `bilateral_eq` are symmetric in `Hm` and
+`Dm`.
 -/
 
 namespace Polyplets
@@ -936,76 +930,15 @@ theorem fixCountC_eq (n : ℕ) (g : D4) : fixCountC n g = fixCount n g := by
   · intro S; rfl
   · intro x; rfl
 
-/-! The right-hand sides are the `r90`, `r180`, `hmirror` and `dmirror32`
-columns of `results/sym_counts.txt` (an absent `r90` row there means `0`).
-`native_decide` is the approved route for this validation section
-(PLAN.md, scope interview 2026-07-20). -/
-
-set_option linter.style.nativeDecide false
-
-theorem R90_1 : R90 1 = 1 := by change fixCount 1 D4.r1 = 1; rw [← fixCountC_eq]; native_decide
-theorem R90_2 : R90 2 = 0 := by change fixCount 2 D4.r1 = 0; rw [← fixCountC_eq]; native_decide
-theorem R90_3 : R90 3 = 0 := by change fixCount 3 D4.r1 = 0; rw [← fixCountC_eq]; native_decide
-theorem R90_4 : R90 4 = 2 := by change fixCount 4 D4.r1 = 2; rw [← fixCountC_eq]; native_decide
-theorem R90_5 : R90 5 = 2 := by change fixCount 5 D4.r1 = 2; rw [← fixCountC_eq]; native_decide
-
-theorem R180_1 : R180 1 = 1 := by change fixCount 1 D4.r2 = 1; rw [← fixCountC_eq]; native_decide
-theorem R180_2 : R180 2 = 4 := by change fixCount 2 D4.r2 = 4; rw [← fixCountC_eq]; native_decide
-theorem R180_3 : R180 3 = 4 := by change fixCount 3 D4.r2 = 4; rw [← fixCountC_eq]; native_decide
-theorem R180_4 : R180 4 = 22 := by change fixCount 4 D4.r2 = 22; rw [← fixCountC_eq]; native_decide
-theorem R180_5 : R180 5 = 22 := by change fixCount 5 D4.r2 = 22; rw [← fixCountC_eq]; native_decide
-
-theorem Hm_1 : Hm 1 = 1 := by change fixCount 1 D4.h = 1; rw [← fixCountC_eq]; native_decide
-theorem Hm_2 : Hm 2 = 2 := by change fixCount 2 D4.h = 2; rw [← fixCountC_eq]; native_decide
-theorem Hm_3 : Hm 3 = 4 := by change fixCount 3 D4.h = 4; rw [← fixCountC_eq]; native_decide
-theorem Hm_4 : Hm 4 = 10 := by change fixCount 4 D4.h = 10; rw [← fixCountC_eq]; native_decide
-theorem Hm_5 : Hm 5 = 22 := by change fixCount 5 D4.h = 22; rw [← fixCountC_eq]; native_decide
-
-theorem Dm_1 : Dm 1 = 1 := by change fixCount 1 D4.d = 1; rw [← fixCountC_eq]; native_decide
-theorem Dm_2 : Dm 2 = 2 := by change fixCount 2 D4.d = 2; rw [← fixCountC_eq]; native_decide
-theorem Dm_3 : Dm 3 = 4 := by change fixCount 3 D4.d = 4; rw [← fixCountC_eq]; native_decide
-theorem Dm_4 : Dm 4 = 10 := by change fixCount 4 D4.d = 10; rw [← fixCountC_eq]; native_decide
-theorem Dm_5 : Dm 5 = 22 := by change fixCount 5 D4.d = 22; rw [← fixCountC_eq]; native_decide
-
-/-! The banked `r90` column has no rows for `n = 2, 3`, which `r90_vanish`
-independently explains; `R90_2` and `R90_3` above confirm the two agree. -/
-
-example : R90 2 = 0 := r90_vanish 2 (by norm_num)
-example : R90 3 = 0 := r90_vanish 3 (by norm_num)
-
-/-! ## Derived spot checks against the companion sequences -/
-
-/-- `Free 4 = 22` (A030222), from `free_eq` and the anchors. -/
-theorem Free_4 : Free 4 = 22 := by
-  have h := free_eq 4
-  rw [a_4, R90_4, R180_4, Hm_4, Dm_4] at h
-  omega
-
-/-- `OneSided 4 = 34` (A030233), from `oneSided_eq` and the anchors. -/
-theorem OneSided_4 : OneSided 4 = 34 := by
-  have h := oneSided_eq 4
-  rw [a_4, R90_4, R180_4] at h
-  omega
-
-/-- `Bilateral 4 = 10` (A030234), from `bilateral_eq` and the anchors. -/
-theorem Bilateral_4 : Bilateral 4 = 10 := by
-  have h := bilateral_eq 4
-  rw [Hm_4, Dm_4] at h
-  omega
-
 /-! ## Axiom audit
 
 Plain `#print axioms` here; the `#guard_msgs`-wrapped versions are integrated
 into the campaign audit point by the orchestrator. The four headline theorems
-must carry the standard three; the anchors add exactly the `native_decide`
-constant. -/
+must carry the standard three. -/
 
 #print axioms free_eq
 #print axioms oneSided_eq
 #print axioms bilateral_eq
 #print axioms r90_vanish
-#print axioms Free_4
-#print axioms OneSided_4
-#print axioms Bilateral_4
 
 end Polyplets

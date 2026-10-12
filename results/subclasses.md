@@ -2415,7 +2415,7 @@ has `|Δu| + |Δv| ≤ 2`, `σ` spans `u` across `ha+1` and `v` across `hm+1`, s
 `|σ| ≥ ha+hm+2` and `n ≥ |σ|`. Maximizing `⌈ha·hm/2⌉` over integers with
 `ha+hm ≤ n−2` gives `M(n)` exactly for every residue. Rigor still owed on
 step 1's contour construction and step 3's winding bookkeeping.
-`polyplets/Polyplets/HolesUpper.lean` takes (II') as the named hypothesis
+`polyplets/Polyplets/HolesUpper.lean` (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376) takes (II') as the named hypothesis
 `MoatBound`, mathlib having no discrete-Jordan material, so the Lean bound is
 conditional; `polyplets/Polyplets/Holes.lean` uses the floor form
 `floor_maxhole_formula` (identical to the rounded form, checked to `n = 399`)
@@ -2570,7 +2570,8 @@ claimed, costs unestimated.
 - **A1. The universal diagonal law** (`docs/proofs/universal-diagonal-law.md`),
   stated for the row-local class and already run on square, hex and king
   (`experiments/universal_law_check.py`, `experiments/hex_gas.py`,
-  `experiments/diagonal_law_proof_check.py`; Lean `polyplets/Polyplets/Universal/`).
+  `experiments/diagonal_law_proof_check.py`; Lean `polyplets/Polyplets/Universal/`,
+  (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376)).
   Not instanced: triangular, the spread-8 neighborhood, `|dx| ≤ 2` lattices,
   directed and anisotropic variants; the obvious target is the A001168
   near-diagonal closed forms by the same peeling recursion and modular spine.
@@ -2589,7 +2590,7 @@ claimed, costs unestimated.
   the widest reach, for self-avoiding walks and polygons by width, directed
   and convex families, percolation and dimer strips, bounded-height heap
   models.
-- **B3. `polyplets/Polyplets/Northcott.lean`**, a standalone number-theory
+- **B3. `polyplets/Polyplets/Northcott.lean`** (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376), a standalone number-theory
   file: a house bound forces `M(minpoly) ≤ (max 1 B)^deg`, hence unbounded
   degree for pairwise distinct algebraic integers with a uniform house bound.
 - **C1. The column-step engine** behind the `libenum` seam

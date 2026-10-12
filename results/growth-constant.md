@@ -4,7 +4,7 @@ A polyplet (king animal) is a finite set of cells of the square lattice,
 connected through shared edges or corners, counted up to translation; a(n) is
 the number with n cells (OEIS A006770). The growth constant is
 λ = lim a(n)^(1/n). It exists by Fekete's lemma applied to
-a(m)a(n) ≤ a(m+n), which is proved in Lean 4 (`polyplets/PROOF-STATUS.md`).
+a(m)a(n) ≤ a(m+n), which is proved in Lean 4 (`polyplets/README.md`).
 This file holds everything the project established about λ and the
 asymptotic form of a(n): a proved two-sided bracket 6.543 ≤ λ ≤ 9.3154, both
 ends exact rational certificates; the strip growth constants μ_H for
@@ -49,8 +49,8 @@ exact rational super-solution of a 5930-component convolution system in the
 style of Bui, x = 2147/20000, every inequality checked in exact rational
 arithmetic; the derivation, the elementary bound λ ≤ 5⁵/4⁴, the false starts
 and the slack audit are in `docs/proofs/polyplet-upper-bound.md`, and the
-scheme is formalized in Lean with one named `native_decide` leaf
-(`polyplets/PROOF-STATUS.md`). The decimal 9.3154 rounds 9.31532… away from
+scheme was formalized in Lean with one named `native_decide` leaf
+(`polyplets/Polyplets/Upper/`, (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376)). The decimal 9.3154 rounds 9.31532… away from
 the truth; the form 9.3153 that stood until 2026-08-07 claimed 3.2e−5 more
 than the certificate gives and was corrected across the tree.
 

@@ -26,7 +26,7 @@ follow say what went into each and at which commit the sources are readable.
 | perimeter | `results/perimeter.md` |
 | non-D-finiteness | `results/anisotropic-not-dfinite.md` |
 | routes that did not work, and the open problems | `results/closed-doors.md` |
-| Lean | `polyplets/PROOF-STATUS.md`, `polyplets/DESIGN.md`, `docs/lean-environment.md`, `docs/lean-record.md`, `docs/lean-record.md` |
+| Lean | `polyplets/README.md`, `docs/lean-environment.md` |
 | the papers | `paper/README.md`, `docs/publication-split.md`, `docs/publication.md`, `docs/l-papers-record.md` |
 | how the work was run, and what to do differently | the project retrospective (removed from the repository) |
 | standards and process | `docs/engineering-standards.md`, `docs/job-checklist.md`, `docs/push-gate-tiers.md`, `docs/glossary.md`, `docs/external-anchors.md` |

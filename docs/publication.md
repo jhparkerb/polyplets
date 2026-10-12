@@ -117,7 +117,7 @@ and the Lean build receipt: one table, no hedging in the body.
 | tier | warrant | meaning |
 |---|---|---|
 | 1 | jasonp-vetted | he read the proof and believes it |
-| 2 | Lean-checked proof | sorry-free, axiom footprint printed and guarded (`polyplets/Polyplets/Grand/Audit.lean`, `polyplets/Polyplets/AuditOutworks.lean`) |
+| 2 | Lean-checked proof | sorry-free, axiom footprint printed and guarded (`polyplets/Polyplets/Audit.lean`) |
 | 3 | exact-arithmetic certificate | machine-checkable in integer or modular arithmetic by a short independent checker; the checker unverified, the arithmetic exact |
 | 4 | reproducible measurement | code, a control that must fail, a gate, an independent second computation; a measurement, never a theorem |
 
@@ -146,7 +146,7 @@ shows its control, gate and second computation.
 | 5 | T(n,n) = 3^(n−1) | 1 | hand derivation; Lean `T_king` | check B, 40 entries |
 | 6 | T(n,n−1) = 5(5n−9)3^(n−4) | 1 | `docs/proofs/T-n-nm1.md` | check B, 37 entries |
 | 7 | T(n,n−2) = ½(625n²−2459n+1134)3^(n−7) | 1 | `docs/proofs/T-n-nm2-and-general.md` | check B, 36 entries |
-| 8 | λ ≥ a(40)^(1/40) = 6.2208413587750324 | 2 | Lean `a_supermul`, `lambda_gt_of_banked`, standard axioms | `lake build`; guarded in `polyplets/Polyplets/AuditOutworks.lean` |
+| 8 | λ ≥ a(40)^(1/40) = 6.2208413587750324 | 2 | Lean `a_supermul`, `lambda_gt_of_banked`, standard axioms | `lake build`; guarded in `polyplets/Polyplets/Audit.lean` |
 | 9 | component stratification, C(n,1) = C(n,n) = A001168 | 1 | `results/subclasses.md`, the 45-degree sublattice bijection | brute force n ≤ 14 |
 | 10 | λ = 7.110(1), θ = −1.000(1) | 4 | `results/growth-constant.md` | differential approximants on 40 terms; an estimate |
 | 11a | M_single(n) = ⌊((n−2)²+4)/8⌋, one hole | 1, not ours | Sieben 2008 Theorem 4.1, σ(e) = ⌊e²/8 − e/2 + 1⌋, verbatim; the (I′)/(II′)/moat-cycle chain in `results/subclasses.md` is an independent reproof | `experiments/maxhole_sieben_check.py` (with a control that must fail); `experiments/maxhole_moat_check.py` (3,927 animals); `experiments/maxhole_box_construction.py` (n ≤ 60) |
@@ -182,7 +182,7 @@ Rechnitzer 2002 Lemma 9, cited as theirs.
 | 1 | λ ≤ 9.3154 | 2 | `docs/proofs/polyplet-upper-bound.md`; Lean `certSum_le`, `lambda_le_of_buiSystem`, `RatCert.lambda_le` (standard axioms), `lambda_le_of_bui_rd3` | `lake build`; the concrete certificate depends on the named leaf `buiRD3_valid` |
 | 2 | λ ≥ 6.543 | 3 | the certified strip ladder μ_17, exact rational Collatz–Wielandt with a per-H receipt, `results/growth-constant.md` | `make gate-strip-fast`: the exact routine must pass the certified numerator and fail numerator+1; `make gate-strip-cert`, the checker's must-fail-first self-test |
 | 3 | µ = 3.128943269730886… for every class between staircase and HV-convex (Proposition 6) | 1 | `results/subclasses.md`, Lemmas 1–3 and the squeeze | `make gate-middle-kingdom` |
-| 4 | M(i)M(j) ≤ M(i+j), and µ ≥ M(700)^(1/700) = 3.1234045… | 1, machine-checked | Lean `M_supermul`, `M_tendsto`, `M_le_mu_pow`, `mu_gt_of_banked` in `polyplets/Polyplets/StairGrowth.lean`, standard axioms, guarded | `lake build` proves the inequality for all i, j; `experiments/staircase_supermul.py` checks 700 terms with three must-fail controls; the floor is conditional on the recorded M(700) |
+| 4 | M(i)M(j) ≤ M(i+j), and µ ≥ M(700)^(1/700) = 3.1234045… | 1, machine-checked | Lean `M_supermul`, `M_tendsto`, `M_le_mu_pow`, `mu_gt_of_banked` in `polyplets/Polyplets/StairGrowth.lean` at commit 697f376, standard axioms, guarded there; the module left the Lean build 2026-10-12 in the Report overhaul | `lake build` proves the inequality for all i, j; `experiments/staircase_supermul.py` checks 700 terms with three must-fail controls; the floor is conditional on the recorded M(700) |
 | 5 | 3 + 2√2 for directed king animals | 1 | Bacher 2013, reproduced against A047781 | `make gate-king-grid` |
 | 6 | eight of twelve grid cells collapse onto the unfiltered row | 1 | `results/subclasses.md`, Propositions 1, 2, 3, 5 of the phase-3 note | brute-force grid n ≤ 14, `make gate-middle-kingdom` |
 | 7 | ν = 2.5145796438787291885… is the growth rate of an explicitly counted half of the 4-cone series | 1/4 | Lemma 4 and Proposition 7 (rates proved); the 153 and 242 trusted digits measured | `experiments/descent_block_oracle.py`, three must-fail controls |

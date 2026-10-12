@@ -23,9 +23,10 @@ argument — the expansion chain is monotone and confined to `S`, so it stalls
 within `S.card` rounds (`stepExpand_reachSet`), and a stalled set absorbs king
 steps, hence contains everything path-reachable.
 
-Validation: `native_decide` checks `Tc` (and, through `Tc_eq_T`, the
-noncomputable `T` itself) against banked two-algorithm-confirmed values from
-`results/triangle.txt`.
+Validation: kernel `decide` checks `Tc` (and, through `Tc_eq_T`, the
+noncomputable `T` itself) against the smallest banked values of
+`results/triangle.txt`. The kernel's memory grows fast with the cell (6 GB at
+`T 3 3`, past 8 GB at `T 5 4`), so the checks stop at `T 4 3`.
 -/
 
 namespace Polyplets
@@ -225,71 +226,44 @@ theorem Tc_eq_T (n H : ℕ) : Tc n H = T n H := by
 /-! ## Validation against banked values
 
 The right-hand sides are quoted from `results/triangle.txt` (provenance
-`results/ns_a36/PROVENANCE.md`; two-algorithm confirmed range). First the
-computable checks on `Tc`, then the same values transported to the
-noncomputable `T` via `Tc_eq_T`.
-
-`native_decide` is the approved route here (PLAN.md, scope interview
-2026-07-20); the style linter objecting to it in mathlib-bound code is
-silenced for this validation section only. -/
-
-set_option linter.style.nativeDecide false
-
-example : Tc 1 1 = 1 := by native_decide
-example : Tc 2 1 = 1 := by native_decide
-example : Tc 2 2 = 3 := by native_decide
-example : Tc 3 1 = 1 := by native_decide
-example : Tc 3 2 = 10 := by native_decide
-example : Tc 3 3 = 9 := by native_decide
-example : Tc 4 3 = 55 := by native_decide
-example : Tc 5 4 = 240 := by native_decide
+`results/ns_a36/PROVENANCE.md`; two-algorithm confirmed range), transported
+to the noncomputable `T` via `Tc_eq_T` and decided by the kernel. -/
 
 /-! Degenerate and impossible shapes count zero, as `T` does. -/
 
-example : Tc 0 0 = 0 := by native_decide
-example : Tc 0 3 = 0 := by native_decide
-example : Tc 3 0 = 0 := by native_decide
-example : Tc 2 3 = 0 := by native_decide
+example : Tc 0 0 = 0 := by decide +kernel
+example : Tc 0 3 = 0 := by decide +kernel
+example : Tc 3 0 = 0 := by decide +kernel
+example : Tc 2 3 = 0 := by decide +kernel
 
-/-- `T 1 1 = 1`, now by computation (independently re-proving
-`Sanity.lean`'s hand proof `T_one_one`). -/
+/-- `T 1 1 = 1`: the single cell. -/
 theorem T_1_1 : T 1 1 = 1 := by rw [← Tc_eq_T]; decide +kernel
 
 /-- `T 2 1 = 1`: the horizontal king domino. -/
-theorem T_2_1 : T 2 1 = 1 := by rw [← Tc_eq_T]; native_decide
+theorem T_2_1 : T 2 1 = 1 := by rw [← Tc_eq_T]; decide +kernel
 
 /-- `T 2 2 = 3`: vertical domino and the two diagonal king dominoes. -/
-theorem T_2_2 : T 2 2 = 3 := by rw [← Tc_eq_T]; native_decide
+theorem T_2_2 : T 2 2 = 3 := by rw [← Tc_eq_T]; decide +kernel
 
 /-- `T 3 1 = 1`: the horizontal tromino. -/
-theorem T_3_1 : T 3 1 = 1 := by rw [← Tc_eq_T]; native_decide
+theorem T_3_1 : T 3 1 = 1 := by rw [← Tc_eq_T]; decide +kernel
 
-/-- `T 3 2 = 10` (banked, `results/triangle.txt`). -/
+/-- `T 3 2 = 10` (banked, `results/triangle.txt`), the first `P_1` onset
+point. -/
 theorem T_3_2 : T 3 2 = 10 := by rw [← Tc_eq_T]; decide +kernel
 
-/-- `T 3 3 = 9 = 3^2`, the diagonal value `T(n,n) = 3^(n-1)` at `n = 3`. -/
-theorem T_3_3 : T 3 3 = 9 := by rw [← Tc_eq_T]; native_decide
-
-/-- `T 4 3 = 55` (banked, `results/triangle.txt`), a `P_1` onset point. -/
+/-- `T 4 3 = 55` (banked, `results/triangle.txt`), the second `P_1` onset
+point. -/
 theorem T_4_3 : T 4 3 = 55 := by rw [← Tc_eq_T]; decide +kernel
 
-/-- `T 5 4 = 240` (banked, `results/triangle.txt`), a `P_1` point. -/
-theorem T_5_4 : T 5 4 = 240 := by rw [← Tc_eq_T]; native_decide
-
 /-!
-Practical `native_decide` wall for this brute-force `Tc` (measured 2026-07-20):
-cost is dominated by the `C(n·H, n)` subset enumeration, at roughly 2–3k
-subsets/s.
-
-- `Tc 5 4 = 240` (`C(20,5) = 15504`): ~1 s.
-- `Tc 6 4 = 1480` (`C(24,6) = 134596`): ~66 s — verified out-of-file.
-- `Tc 6 5 = 945` (`C(30,6) = 593775`): ~190 s — verified out-of-file.
-- `Tc 6 6` (`C(36,6) ≈ 1.9M`) and `Tc 7 4` (`C(28,7) ≈ 1.2M`) extrapolate past
-  a 5-minute budget and were not attempted.
-
-The checks kept in this file all run in seconds, keeping the module build
-fast; onset points beyond `P_1` need the verified column DP planned in
-PLAN.md, not this enumerator.
+Memory of kernel `decide` on this brute-force `Tc`, measured 2026-10-12
+(`scripts/lean-decide-trials.sh`): the cells above peak at 2.7–3.3 GB;
+`T 3 3` needs 6 GB; `T 5 4` (`C(20,5) = 15504` subsets) passes 8 GB and was
+killed. `T 3 3 = 9` and `T 4 4 = 27` are instead derived from the shape
+theorem (`Shape.lean`, `shape_check_T_3_3`, `shape_check_T_4_4`). Cells
+beyond `P_1`'s onset points enter the development only as hypotheses
+(`Grand/PinAll.lean`, `BankedAnchors`).
 -/
 
 end Polyplets

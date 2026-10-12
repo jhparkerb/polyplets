@@ -390,12 +390,12 @@ real. For k ≥ 2, v₅(D_k) = H(k) at every measured level.
   start ≤ 9 and no quadratic algebraic relation with polynomial coefficients
   of degree ≤ 5 on the 20-term window. Not to be re-hunted on this window.
 
-**Lean** (`polyplets/Polyplets/V5Denominator.lean`, 2026-07-31): the law at
+**Lean** (`polyplets/Polyplets/V5Denominator.lean`, 2026-07-31, (removed from the Lean build 2026-10-12 in the Report overhaul; last at commit 697f376)): the law at
 k = 1..18 (`v5_law_all`), the refutation of the old fit at k = 11
 (`ceil_fit_refuted`), the k = 11 obstruction in general (`eleven_no_harvest`),
 the seeds tied to P₁ (`u1_seed`, `g1_seed`); `decide`, standard axioms, no
 native_decide, numerator lists tied to `Pin.lean` by rfl. The general-k
-lower bound is paper-level only (`polyplets/PROOF-STATUS.md`).
+lower bound is paper-level only.
 
 ## Characteristic 2, and the rank of the strip functional
 
@@ -635,7 +635,7 @@ engines.
     python3 experiments/spine_deeper.py             # the mod-27 lifts
     cd experiments/tristruct && python3 p2_measure.py && python3 p2_symtri_probe.py   # Theorem 9, the zero set
     python3 experiments/v5_denominator.py           # Theorem 10 and the profiles
-    cd polyplets && lake build                      # V5Denominator.lean
+    git show 697f376:polyplets/Polyplets/V5Denominator.lean   # the Lean, out of the build since 2026-10-12
     python3 experiments/tristruct/r3_char_landscape.py H [SHARD] [NSHARD]
     python3 experiments/tristruct/r3_char_landscape_certify.py <shard logs>
     python3 experiments/tristruct/exactchange_phi_probe.py

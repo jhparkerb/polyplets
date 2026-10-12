@@ -98,29 +98,30 @@ structure. The general T(n,n−k) is the open target this method is meant to rea
 
 ## Formalization and supersession (2026-07-21)
 
-This proof is fully formalized in Lean 4: `polyplets/Polyplets/Diagonal.lean`
-re-proves `T_n_nm1` from `Pin.lean`'s `P1_closed`, with the gadget
-multiplicities 16+9 / 4+1 of §4 as the `native_decide` weight leaves
+This proof is fully formalized in Lean 4: `Pin.lean`'s `P1_closed` (stated
+for the report as `report_T_n_nm1` in `Report.lean`), pinned from the
+kernel-decided cells T(3,2) = 10 and T(4,3) = 55, standard axioms only; the
+gadget multiplicities 16+9 / 4+1 of §4 are the kernel-decided weights
 V(1,1) = 25, Vᵗ(1,1) = 5 of `Weights.lean` (the same 25 = 16+9 split).
 
 §7's road map is CLOSED, beyond what this method was meant to reach:
 
-- T(n,n−2) is no longer "fitted" — the quadratic is proved
-  (`P2_closed`, and `T_n_nm2` in `Diagonal.lean`).
+- T(n,n−2) is no longer "fitted": the quadratic is `Pp2` of `Pin.lean`,
+  pinned by `Grand/PinAll.lean` from the two cells T(5,3), T(6,4) taken as
+  hypotheses. (An outright proof, `P2_closed`, rested on `native_decide`
+  leaves and left the build 2026-10-12; last at commit 697f376.)
 - The general shape T(n,n−k) = P_k(n)·3^(n−1−3k), deg P_k ≤ k, onset
   n ≥ 2k+1, is a theorem for ALL k (`Shape.lean`; paper proof
   `diagonal-law.md`), and the defect-gas structure is exact: the
-  diagonals are the exp of affine cumulants (`grand-form.md`,
-  Lean `Grand/ExpForm.lean`, standard axioms only).
-- The Poisson leading coefficient is proved: deg P_k = k exactly and
-  [n^k]P_k = 25^k/k! for all k (`Grand/Lead.lean`, standard axioms +
-  the single V(1,1) leaf — the 25 of this file's §5).
-- Production P_1..P_18 are pinned for all n ≥ 2k+1 (`Grand/PinGrand.lean`):
-  k ≤ 3 outright, k = 4..18 as conditional theorems whose explicit
-  hypotheses are the two real-swept onset cells per level — engine values
-  assumed, not proved in Lean (levels ≥ 12 single-algorithm; see
-  `docs/lean-record.md`). k = 19, the engine's last wired
-  diagonal, is deliberately excluded: fitted-no-holdout, load-bearing for
-  no banked term.
+  diagonals are the exp of affine cumulants (`grand-form.md`; the Lean
+  staircase route is `Grand/`).
+- The Poisson leading coefficient is proved: [n^k]P_k = 25^k/k! for all k
+  (`LeadingCoeff.lean`, standard axioms only — the 25 of this file's §5).
+- Production P_1..P_18 are pinned for all n ≥ 2k+1 (`Grand/PinAll.lean`)
+  as conditional theorems whose explicit hypotheses are two enumerated
+  onset cells per level — engine values assumed, not proved in Lean
+  (levels ≥ 13 single-algorithm; see `polyplets/README.md`). k = 19, the
+  engine's last wired diagonal, is deliberately excluded:
+  fitted-no-holdout, load-bearing for no banked term.
 
-Status ledger: `polyplets/PROOF-STATUS.md`.
+Status ledger: `polyplets/README.md`.

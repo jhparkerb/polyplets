@@ -408,7 +408,7 @@ work of the kind `polyplets/Polyplets/Defs.lean` and
 `polyplets/Polyplets/Graph.lean` already carry (`kingAdj`, `KingConnected`,
 `kingConnected_iff_reachable`). Tier 3, the bridge to the binary, is never
 provable; its gate is the Lean model evaluated on small boards against the C++
-at `H ≤ 6`, as `polyplets/Polyplets/ComputeBridge.lean` does for `T n H`.
+at `H ≤ 6`, as `polyplets/Polyplets/Compute.lean` does for `T n H`.
 
 ## Open problems
 

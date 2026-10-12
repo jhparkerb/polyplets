@@ -33,17 +33,11 @@ The upper height bound is the row analogue of `Finite.lean`'s `canonical_x_le`;
 both are instances of one anchored-projection lemma (`card_bound_of_anchored`).
 
 Finally a computable twin `ac n = ∑ H ∈ Finset.Icc 1 n, Tc n H` with
-`ac_eq_a`, giving `native_decide` anchors `a 1 … a 6` against the banked row
-sums of `results/triangle.txt`, and the paper's §9 strip-capture lower bound
-`strip_sum_le_a`.
-
-**Build cost.** Everything through `a 5` elaborates in ~21 s. The `a 6`
-anchor alone costs ~700 s (measured 2026-07-30: whole module 724 s, ~5.9 GB
-peak RSS) because `ac 6` forces `Tc 6 6`, a `C(36,6) ≈ 1.9M`-subset
-enumeration that `Compute.lean`'s cost note had ruled out of that module's
-budget. If that turns out to sit awkwardly on the rebuild path, `a_6` is the
-one declaration to relocate — the `ComputeBridge.lean` treatment of the slow
-`T 6 4` / `T 6 5` anchors.
+`ac_eq_a`, giving the kernel-decided anchors `a 1 = 1`, `a 2 = 4` against the
+banked row sums of `results/triangle.txt` (`a 3 = 20` needs 6 GB in the
+kernel and `a 4` more than 8 GB, measured 2026-10-12; `a 3 … a 6` were
+`native_decide` facts until then), and the paper's §9 strip-capture lower
+bound `strip_sum_le_a`.
 -/
 
 namespace Polyplets
@@ -236,46 +230,13 @@ theorem ac_eq_a (n : ℕ) : ac n = a n := by
   exact Finset.sum_congr rfl fun H _ => Tc_eq_T n H
 
 /-! The right-hand sides are the row sums of `results/triangle.txt`
-(provenance `results/ns_a40/PROVENANCE.md`): `a n = 1, 4, 20, 110, 638, 3832`
-for `n = 1 … 6`. `native_decide` is the approved route for this validation
-section (PLAN.md, scope interview 2026-07-20). -/
-
-set_option linter.style.nativeDecide false
+(provenance `results/ns_a40/PROVENANCE.md`): `a n = 1, 4` for `n = 1, 2`. -/
 
 /-- `a 1 = 1`: the single cell. -/
-theorem a_1 : a 1 = 1 := by rw [← ac_eq_a 1]; native_decide
+theorem a_1 : a 1 = 1 := by rw [← ac_eq_a 1]; decide +kernel
 
 /-- `a 2 = 4`: the horizontal, vertical and two diagonal king dominoes. -/
-theorem a_2 : a 2 = 4 := by rw [← ac_eq_a 2]; native_decide
-
-/-- `a 3 = 20` (banked row sum, `results/triangle.txt`). -/
-theorem a_3 : a 3 = 20 := by rw [← ac_eq_a 3]; native_decide
-
-/-- `a 4 = 110` (banked row sum, `results/triangle.txt`). -/
-theorem a_4 : a 4 = 110 := by rw [← ac_eq_a 4]; native_decide
-
-/-- `a 5 = 638` (banked row sum, `results/triangle.txt`). -/
-theorem a_5 : a 5 = 638 := by rw [← ac_eq_a 5]; native_decide
-
-/-- `a 6 = 3832` (banked row sum, `results/triangle.txt`). This anchor is the
-expensive one: it needs the whole `n = 6` row of `Tc`, including `Tc 6 6` — a
-`C(36,6) ≈ 1.9M`-subset enumeration that `Compute.lean`'s cost note explicitly
-ruled out of that module's budget. Measured ~700 s on its own (see the module
-header). `a 7` would need `Tc 7 7`, `C(49,7) ≈ 86M` subsets — roughly 44 times
-this one, so the anchors stop at `n = 6`. -/
-theorem a_6 : a 6 = 3832 := by rw [← ac_eq_a 6]; native_decide
-
-/-- **The ratio sequence `a n / a (n-1)` is not log-convex** (jasonp's question,
-2026-07-31). Log-convexity of the ratios at `n = 3` would need
-`r 3 ^ 2 ≤ r 2 * r 4`, i.e. (cross-multiplied over ℕ, no division)
-`a 3 ^ 3 * a 1 ≤ a 2 ^ 3 * a 4`; the banked values give `8000 > 7040`, refuting
-it. One exact triple settles the universal claim — and in the data the ratios
-are strictly log-concave at every `n = 3 .. 39`
-(`results/closed-doors.md`, C2 entry). Complements C2 (ratios increase,
-conjectural): increasing, at decreasing pace, as `θ = -1` predicts. Axioms:
-inherits the `a_1 .. a_4` native leaves only. -/
-theorem ratio_not_logConvex : a 2 ^ 3 * a 4 < a 3 ^ 3 * a 1 := by
-  rw [a_1, a_2, a_3, a_4]; decide
+theorem a_2 : a 2 = 4 := by rw [← ac_eq_a 2]; decide +kernel
 
 /-! ## The §9 strip-capture lower bound -/
 
@@ -292,9 +253,8 @@ theorem strip_sum_le_a (n : ℕ) (hn : 10 ≤ n) :
 
 Plain `#print axioms` here; the `#guard_msgs`-wrapped versions are integrated
 into the campaign audit point by the orchestrator. `a_eq_sum` must carry the
-standard three; the anchors add exactly `Lean.ofReduceBool`. -/
+standard three. -/
 
 #print axioms a_eq_sum
-#print axioms a_6
 
 end Polyplets

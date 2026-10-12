@@ -22,7 +22,7 @@ proved, and how the work was run.
 | `docs/push-gate-tiers.md` | what the push gates cost, and what `make gates-deep` restores |
 | `docs/job-checklist.md` | consult before launching any compute job |
 | `docs/lean-environment.md` | toolchain paths, vendored deps, lemma search |
-| `docs/lean-record.md` | the Lean development: what it proves, what it does not reach |
+| `polyplets/README.md` | the Lean development: what it proves, what it does not reach, how to check it |
 | `docs/reviews/outworks-adversarial.md` | the adversarial pass over the Lean material |
 
 ## 2. `docs/proofs/` — the mathematical record

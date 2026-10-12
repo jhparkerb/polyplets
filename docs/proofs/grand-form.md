@@ -176,26 +176,25 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
    banked 2-point solve inputs. The former free-standing assumption "the
    defect gas is exactly linear" is discharged. The former Lean PREDICTED
    tier for k = 12..16 is retired: this proof is formalized (§Formalization
-   below) and `P<k>_grand_of_banked` pins every level from two real-swept
-   cells with H ≤ 20 (`polyplets/PROOF-STATUS.md`).
+   below) and `Pk_prod` pins every level from two enumerated cells with
+   H ≤ 20 (`polyplets/README.md`).
 
-## Formalization (2026-07-21)
+## Formalization (2026-07-21; trimmed 2026-10-12)
 
-Formalized in Lean 4: `polyplets/Polyplets/Grand/` (plan
-`polyplets/GRANDFORM-PLAN.md`, briefs `polyplets/briefs/`). The proof was
+Formalized in Lean 4: `polyplets/Polyplets/Grand/`. The proof was
 restructured for Lean as the **staircase route**: in sequence form, Steps
 1–3 collapse to a convolution fixed point (ν = z*, μ = 1/z*) plus one
-strong induction (`d_mu_rec`), and Step 5's Lagrange lemma becomes the `W`
-fixed point of `ExpForm.lean` — same theorem, no power-series ring.
-Audits (`Polyplets/Grand/Audit.lean`): `grand_form` (the exp-form above)
-and `T_staircase` depend on **standard axioms only**; `lead_coeff_25`
-(Corollary 2) adds the single `V_1_1` native_decide leaf; the production
-polynomials are pinned for k ≤ 18 from two real-swept cells per level
-(`P<k>_grand_of_banked`) — *conditional on those cells*: they are
-hypotheses of the Lean theorems, engine values assumed, not proved in
-Lean (`docs/lean-record.md`). This retires the Lean PREDICTED
-tier. The item
-"Lean formalization" below is CLOSED.
+strong induction (`d_mu_rec`), and `T_staircase` carries it to the
+T-diagonals; both on **standard axioms only** (guarded in
+`Polyplets/Audit.lean`). Corollary 2, the leading coefficient 25^k/k!, is
+`LeadingCoeff.lean`'s `production_leadingCoeff`, standard axioms only. The
+production polynomials are pinned for k ≤ 18 from two enumerated cells per
+level (`Grand/PinAll.lean`, `Pk_prod`) — *conditional on those cells*: they
+are hypotheses of the Lean theorems, engine values assumed, not proved in
+Lean (`polyplets/README.md`). This retires the Lean PREDICTED tier. The
+exp-form statement itself (`grand_form`, `ExpForm.lean`/`Lead.lean`) left
+the build 2026-10-12 as a duplicate of the leading-coefficient route; last
+at commit 697f376. The item "Lean formalization" below is CLOSED.
 
 ## What remains open (unchanged from diagonal-law.md)
 
