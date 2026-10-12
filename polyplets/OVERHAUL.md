@@ -114,21 +114,21 @@ TODO.
       must then sit upstream of `LeadingCoeff` and `Grand/Mu`), and merge
       `Enum.V_eq_length`/`Vt_eq_length` into one cap-generic statement.
       About 500 lines.
-- [ ] C2. One "least coordinate" definition. `anchorVec`/`reanchor`
+- [ ] C2. One "least coordinate" definition. `corner`/`anchor`
       (`Symmetry`), `hmin` (`SymmetryRatio`), `minX` (`Universal/Peel`),
       `baseX`/`baseY` (`Growth`) each carry their own translation lemma, and
-      `reanchor` is not defined through `translate`. Put the min-of-`f`
+      `anchor` is not defined through `translate`. Put the min-of-`f`
       definition and its image lemma in `Universal/Defs` beside
-      `translate`, define `anchorVec` from it and
-      `reanchor S = translate (-anchorVec S) S`, and make the others its
+      `translate`, define `corner` from it and
+      `anchor S = translate (-corner S) S`, and make the others its
       components. About 150 lines.
 - [ ] C3. Kernel cost of `Enum.transform` and `Enum.children` (measured
       2026-10-12, one theorem per file): `Checks.symmetry_le_5` is 26.6 s
       and 8.1 GB, the build's heaviest kernel check, because `transform`
-      calls `reanchor`/`minX`/`minY` on a computed fold; taking the offset
+      calls `anchor`/`minX`/`minY` on a computed fold; taking the offset
       from the moved cells of the literal cuts R90 and Dm at n = 5 from
       6.0 s to 1.7 s each (`cells_transform` must be re-proved).
-      `children`'s `reanchor` of the shifted parent can be the shift
+      `children`'s `anchor` of the shifted parent can be the shift
       `min 1 (c/16) * 16 + min 1 (c%16)` (L6d slice 7.8 s → 6.3 s, 4.6 →
       4.1 GB), and `Nat.log2` costs 0.75 ms per board against 0.25 ms for
       a shift binary search (about 3 s of each `T_rows`/`d_rows`/`weights`
@@ -138,10 +138,10 @@ TODO.
       put `rowSize_shift` in `Universal/Defs`. (`Growth.shiftBy` done
       2026-10-12: `translate` with `mem_translate_mk`.)
 - [ ] C5. Small twins: `Enum.minX`/`minY` with `minX_le`, `exists_minX`
-      and the halves of `anchorVec_cells`, parametrized by the projection;
-      the canonical-animal box bound rederived in `Enum` (three sites),
-      `Sequence.canonicalAnimal_finite` and
-      `SymmetryRatio.mem_boxN_of_canonical` as one lemma in `Sequence`;
+      and the halves of `corner_cells`, parametrized by the projection;
+      the polyplet box bound rederived in `Enum` (three sites),
+      `Sequence.polyplets_finite` and
+      `SymmetryRatio.mem_boxN_of_isPolyplet` as one lemma in `Sequence`;
       `Enum.exists_isLeaf` against Mathlib's
       `SimpleGraph.Connected.exists_connected_induce_compl_singleton_of_finite_nontrivial`
       (the round trip through `Universal.graph` likely costs as much).

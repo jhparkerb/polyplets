@@ -15,7 +15,7 @@ import Polyplets.Sequence
 /-!
 # The eightfold count: Burnside identities for polyplets
 
-`Sequence.lean` counts *fixed* polyplets — `a n`, the canonical animals of
+`Sequence.lean` counts *fixed* polyplets — `a n`, the polyplets of
 `n` cells taken up to translation only. The paper's §7 companion sequences take
 the further quotient by the eight symmetries of the square, and every one of
 them is a Burnside average of fixed-point counts. This file builds that
@@ -24,19 +24,19 @@ apparatus.
 The group is Mathlib's `DihedralGroup 4` (`D4` below): `r i` is the rotation
 by `i` quarter turns and `sr i` the mirror in the `x`-axis followed by `r i`.
 It acts on `ℤ × ℤ` through `D4.toFun`, built from one quarter turn and one
-mirror (`rot i = quarter^[i.val]`). Acting on *canonical* animals needs a
-re-anchoring step, because a rotated canonical animal is generally no longer
+mirror (`rot i = quarter^[i.val]`). Acting on polyplets needs a
+anchoring step, because a rotated polyplet is generally no longer
 origin-anchored:
 
 * `Anchored S` : `min x = min y = 0` (the anchoring field of
-  `IsCanonicalAnimal`),
-* `anchorVec S` : the lower-left corner of `S`'s bounding box,
-* `reanchor S = S.image (· - anchorVec S)` : the canonical translate.
+  `IsPolyplet`),
+* `corner S` : the lower-left corner of `S`'s bounding box,
+* `anchor S = S.image (· - corner S)` : the anchored translate.
 
-`reanchor` kills translations (`reanchor_image_add`) and fixes anchored sets
-(`reanchor_eq_self`), which is exactly what the two `MulAction` laws need, so
-`g • S = reanchor (S.image g.toFun)` is an action of `D4` on
-`CA n = {S | IsCanonicalAnimal n S}`.
+`anchor` kills translations (`anchor_image_add`) and fixes anchored sets
+(`anchor_eq_self`), which is exactly what the two `MulAction` laws need, so
+`g • S = anchor (S.image g.toFun)` is an action of `D4` on
+`polyplets n = {S | IsPolyplet n S}`.
 
 ## Results
 
@@ -66,7 +66,7 @@ reflections (translate by a fixed reflection), so this is
 
 `r90_vanish` is elementary and center-free. A quarter-turn-fixed `S` satisfies
 `S.image σ = S` for the affine map `σ p = ρ p + t` (`ρ` the quarter turn, `t`
-the re-anchoring translation). Since `ρ² = -1`, one has `σ⁴ = id`, and a point
+the anchoring translation). Since `ρ² = -1`, one has `σ⁴ = id`, and a point
 fixed by `σ²` is already fixed by `σ` (`2 p` is pinned by `t`, and so is
 `2 σ p`). So off the at-most-one `σ`-fixed point (`(1 - ρ)` is injective) the
 `σ`-orbits all have exactly four elements: `card_div_four` peels them off one
@@ -217,7 +217,7 @@ lemma toFun_mul (g g' : D4) (p : ℤ × ℤ) : toFun (g * g') p = toFun g (toFun
       neg_add_eq_sub]
 
 /-- Every element of `D4` acts by an additive map, which is what makes
-re-anchoring commute with the action. -/
+anchoring commute with the action. -/
 lemma toFun_add (g : D4) (p q : ℤ × ℤ) : toFun g (p + q) = toFun g p + toFun g q := by
   rcases g with i | i
   · exact quarter_iterate_add _ p q
@@ -267,16 +267,13 @@ lemma ZMod.sum_univ_four {M : Type*} [AddCommMonoid M] (f : ZMod 4 → M) :
     ∑ i : ZMod 4, f i = f 0 + f 1 + f 2 + f 3 :=
   Fin.sum_univ_four f
 
-lemma IsCanonicalAnimal.nonempty {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
-    S.Nonempty := hS.anchored.nonempty
-
 /-- The lower-left corner of `S`'s bounding box (junk value `0` when `S` is
 empty). -/
-def anchorVec (S : Finset (ℤ × ℤ)) : ℤ × ℤ :=
+def corner (S : Finset (ℤ × ℤ)) : ℤ × ℤ :=
   if h : S.Nonempty then (S.inf' h Prod.fst, S.inf' h Prod.snd) else (0, 0)
 
-/-- The canonical translate of `S`: slide its bounding box to the origin. -/
-def reanchor (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) := S.image (fun p => p - anchorVec S)
+/-- The anchored translate of `S`: slide its bounding box to the origin. -/
+def anchor (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) := S.image (fun p => p - corner S)
 
 /-- A coordinate whose values shift by a constant under a translation has its
 minimum shifted by that same constant. -/
@@ -298,37 +295,37 @@ lemma inf'_image_add {S : Finset (ℤ × ℤ)} (h : S.Nonempty) (t : ℤ × ℤ)
     rw [hf c']
     omega
 
-lemma anchorVec_image_add {S : Finset (ℤ × ℤ)} (h : S.Nonempty) (t : ℤ × ℤ) :
-    anchorVec (S.image (fun p => p + t)) = anchorVec S + t := by
+lemma corner_image_add {S : Finset (ℤ × ℤ)} (h : S.Nonempty) (t : ℤ × ℤ) :
+    corner (S.image (fun p => p + t)) = corner S + t := by
   have hi : (S.image (fun p => p + t)).Nonempty := h.image _
-  rw [anchorVec, anchorVec, dif_pos h, dif_pos hi]
+  rw [corner, corner, dif_pos h, dif_pos hi]
   rw [inf'_image_add h t hi Prod.fst t.1 (fun p => rfl),
     inf'_image_add h t hi Prod.snd t.2 (fun p => rfl)]
   rfl
 
-/-- **Re-anchoring kills translations.** -/
-lemma reanchor_image_add (S : Finset (ℤ × ℤ)) (t : ℤ × ℤ) :
-    reanchor (S.image (fun p => p + t)) = reanchor S := by
+/-- **Anchoring kills translations.** -/
+lemma anchor_image_add (S : Finset (ℤ × ℤ)) (t : ℤ × ℤ) :
+    anchor (S.image (fun p => p + t)) = anchor S := by
   rcases S.eq_empty_or_nonempty with rfl | h
-  · simp [reanchor]
-  · rw [reanchor, reanchor, anchorVec_image_add h t, Finset.image_image]
+  · simp [anchor]
+  · rw [anchor, anchor, corner_image_add h t, Finset.image_image]
     exact Finset.image_congr fun p _ => by simp only [Function.comp_apply]; abel
 
 /-- A nonempty finite set is fixed only by the zero translation. -/
 lemma translate_eq_self {S : Finset (ℤ × ℤ)} {v : ℤ × ℤ} (h : S.Nonempty)
     (hS : translate v S = S) : v = 0 := by
-  have := anchorVec_image_add h v
+  have := corner_image_add h v
   rw [show S.image (fun p => p + v) = translate v S from rfl, hS] at this
   simpa using this
 
 /-- An anchored set has its bounding-box corner at the origin. -/
-lemma anchorVec_eq_zero {S : Finset (ℤ × ℤ)} (hS : Anchored S) : anchorVec S = 0 := by
+lemma corner_eq_zero {S : Finset (ℤ × ℤ)} (hS : Anchored S) : corner S = 0 := by
   obtain ⟨p, hpS, hp⟩ := hS.x_zero
   obtain ⟨q, hqS, hq⟩ := hS.y_zero
   have h : S.Nonempty := hS.nonempty
   have h1 : S.inf' h Prod.fst ≤ p.1 := Finset.inf'_le Prod.fst hpS
   have h2 : S.inf' h Prod.snd ≤ q.2 := Finset.inf'_le Prod.snd hqS
-  rw [anchorVec, dif_pos h]
+  rw [corner, dif_pos h]
   refine Prod.ext ?_ ?_
   · refine le_antisymm ?_ ?_
     · rw [hp] at h1; exact h1
@@ -337,62 +334,56 @@ lemma anchorVec_eq_zero {S : Finset (ℤ × ℤ)} (hS : Anchored S) : anchorVec 
     · rw [hq] at h2; exact h2
     · exact Finset.le_inf' h _ fun b hb => hS.y_nonneg b hb
 
-/-- **Re-anchoring fixes anchored sets.** -/
-lemma reanchor_eq_self {S : Finset (ℤ × ℤ)} (hS : Anchored S) : reanchor S = S := by
-  rw [reanchor, anchorVec_eq_zero hS]
+/-- **Anchoring fixes anchored sets.** -/
+lemma anchor_eq_self {S : Finset (ℤ × ℤ)} (hS : Anchored S) : anchor S = S := by
+  rw [anchor, corner_eq_zero hS]
   simp
 
-/-- The re-anchored set is anchored. -/
-lemma reanchor_anchored {S : Finset (ℤ × ℤ)} (h : S.Nonempty) : Anchored (reanchor S) := by
+/-- The anchored set is anchored. -/
+lemma anchor_anchored {S : Finset (ℤ × ℤ)} (h : S.Nonempty) : Anchored (anchor S) := by
   obtain ⟨a, ha, hae⟩ := Finset.exists_mem_eq_inf' h Prod.fst
   obtain ⟨b, hb, hbe⟩ := Finset.exists_mem_eq_inf' h Prod.snd
-  have hv : anchorVec S = (S.inf' h Prod.fst, S.inf' h Prod.snd) := dif_pos h
-  refine ⟨?_, ⟨a - anchorVec S, Finset.mem_image_of_mem _ ha, ?_⟩,
-    ?_, ⟨b - anchorVec S, Finset.mem_image_of_mem _ hb, ?_⟩⟩
+  have hv : corner S = (S.inf' h Prod.fst, S.inf' h Prod.snd) := dif_pos h
+  refine ⟨?_, ⟨a - corner S, Finset.mem_image_of_mem _ ha, ?_⟩,
+    ?_, ⟨b - corner S, Finset.mem_image_of_mem _ hb, ?_⟩⟩
   · rintro p hp
-    simp only [reanchor, Finset.mem_image] at hp
+    simp only [anchor, Finset.mem_image] at hp
     obtain ⟨q, hq, rfl⟩ := hp
     have hle : S.inf' h Prod.fst ≤ q.1 := Finset.inf'_le Prod.fst hq
     simp only [hv, Prod.fst_sub]
     omega
   · simp only [hv, Prod.fst_sub, hae]; omega
   · rintro p hp
-    simp only [reanchor, Finset.mem_image] at hp
+    simp only [anchor, Finset.mem_image] at hp
     obtain ⟨q, hq, rfl⟩ := hp
     have hle : S.inf' h Prod.snd ≤ q.2 := Finset.inf'_le Prod.snd hq
     simp only [hv, Prod.snd_sub]
     omega
   · simp only [hv, Prod.snd_sub, hbe]; omega
 
-lemma reanchor_card (S : Finset (ℤ × ℤ)) : (reanchor S).card = S.card :=
+lemma anchor_card (S : Finset (ℤ × ℤ)) : (anchor S).card = S.card :=
   Finset.card_image_of_injective _ (fun p q hpq => by
-    have : p - anchorVec S + anchorVec S = q - anchorVec S + anchorVec S := by rw [hpq]
+    have : p - corner S + corner S = q - corner S + corner S := by rw [hpq]
     simpa using this)
 
-lemma kingConnected_reanchor {S : Finset (ℤ × ℤ)} (hS : KingConnected S) :
-    KingConnected (reanchor S) :=
-  kingConnected_image (f := fun p => p - anchorVec S)
-    (fun p q hpq => by simpa [sub_eq_add_neg] using kingAdj_add (-anchorVec S) hpq) hS
+lemma kingConnected_anchor {S : Finset (ℤ × ℤ)} (hS : KingConnected S) :
+    KingConnected (anchor S) :=
+  kingConnected_image (f := fun p => p - corner S)
+    (fun p q hpq => by simpa [sub_eq_add_neg] using kingAdj_add (-corner S) hpq) hS
 
-/-! ## The action on canonical animals -/
+/-! ## The action on polyplets -/
 
-/-- Canonicality survives "apply a symmetry, then re-anchor". -/
-lemma isCanonicalAnimal_reanchor {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S)
-    (g : D4) : IsCanonicalAnimal n (reanchor (S.image (D4.toFun g))) := by
+/-- Being a polyplet survives "apply a symmetry, then anchor". -/
+lemma isPolyplet_anchor {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S)
+    (g : D4) : IsPolyplet n (anchor (S.image (D4.toFun g))) := by
   have hne : (S.image (D4.toFun g)).Nonempty := hS.nonempty.image _
-  refine ⟨?_, ?_, reanchor_anchored hne⟩
-  · rw [reanchor_card, Finset.card_image_of_injective _ (D4.toFun_injective g)]
+  refine ⟨?_, ?_, anchor_anchored hne⟩
+  · rw [anchor_card, Finset.card_image_of_injective _ (D4.toFun_injective g)]
     exact hS.card
-  · exact kingConnected_reanchor (kingConnected_image (fun _ _ => D4.toFun_kingAdj g) hS.conn)
+  · exact kingConnected_anchor (kingConnected_image (fun _ _ => D4.toFun_kingAdj g) hS.conn)
 
-/-- The canonical animals of `n` cells, as a set. -/
-def CA (n : ℕ) : Set (Finset (ℤ × ℤ)) := {S | IsCanonicalAnimal n S}
-
-lemma mem_CA {n : ℕ} {S : Finset (ℤ × ℤ)} : S ∈ CA n ↔ IsCanonicalAnimal n S := Iff.rfl
-
-lemma CA_finite (n : ℕ) : (CA n).Finite := canonicalAnimal_finite n
-
-lemma a_eq_natCard (n : ℕ) : a n = Nat.card (CA n) := (Nat.card_coe_set_eq (CA n)).symm
+lemma a_eq_natCard (n : ℕ) : a n = Nat.card (polyplets n) :=
+  (Nat.card_coe_set_eq (polyplets n)).symm
 
 /-- Images compose along the group law. -/
 lemma image_toFun_mul (g g' : D4) (T : Finset (ℤ × ℤ)) :
@@ -403,7 +394,7 @@ lemma image_toFun_mul (g g' : D4) (T : Finset (ℤ × ℤ)) :
   simpa using D4.toFun_mul g g' p
 
 /-- Images of translates are translates of images: the additivity of the action
-in the form re-anchoring needs. -/
+in the form anchoring needs. -/
 lemma image_toFun_add (g : D4) (T : Finset (ℤ × ℤ)) (u : ℤ × ℤ) :
     (T.image (fun p => p + u)).image (D4.toFun g)
       = (T.image (D4.toFun g)).image (fun p => p + D4.toFun g u) := by
@@ -412,52 +403,52 @@ lemma image_toFun_add (g : D4) (T : Finset (ℤ × ℤ)) (u : ℤ × ℤ) :
   intro p _
   simpa using D4.toFun_add g p u
 
-lemma reanchor_eq_image_add (T : Finset (ℤ × ℤ)) :
-    reanchor T = T.image (fun p => p + -anchorVec T) := by
-  simp only [reanchor, sub_eq_add_neg]
+lemma anchor_eq_image_add (T : Finset (ℤ × ℤ)) :
+    anchor T = T.image (fun p => p + -corner T) := by
+  simp only [anchor, sub_eq_add_neg]
 
-lemma reanchor_eq_translate (T : Finset (ℤ × ℤ)) :
-    reanchor T = translate (-anchorVec T) T :=
-  reanchor_eq_image_add T
+lemma anchor_eq_translate (T : Finset (ℤ × ℤ)) :
+    anchor T = translate (-corner T) T :=
+  anchor_eq_image_add T
 
-instance instSMulD4CA (n : ℕ) : SMul D4 (CA n) :=
-  ⟨fun g S => ⟨reanchor (S.1.image (D4.toFun g)), isCanonicalAnimal_reanchor S.2 g⟩⟩
+instance instSMulD4Polyplets (n : ℕ) : SMul D4 (polyplets n) :=
+  ⟨fun g S => ⟨anchor (S.1.image (D4.toFun g)), isPolyplet_anchor S.2 g⟩⟩
 
-lemma smul_CA_val {n : ℕ} (g : D4) (S : CA n) :
-    (g • S).1 = reanchor (S.1.image (D4.toFun g)) := rfl
+lemma smul_polyplets_val {n : ℕ} (g : D4) (S : polyplets n) :
+    (g • S).1 = anchor (S.1.image (D4.toFun g)) := rfl
 
-instance instMulActionD4CA (n : ℕ) : MulAction D4 (CA n) where
+instance instMulActionD4Polyplets (n : ℕ) : MulAction D4 (polyplets n) where
   one_smul S := by
     refine Subtype.ext ?_
-    rw [smul_CA_val]
+    rw [smul_polyplets_val]
     have hid : S.1.image (D4.toFun 1) = S.1 := by
       rw [show D4.toFun 1 = id from funext fun p => D4.toFun_one p]
       exact Finset.image_id
-    rw [hid, reanchor_eq_self S.2.anchored]
+    rw [hid, anchor_eq_self S.2.anchored]
   mul_smul g g' S := by
     refine Subtype.ext ?_
-    rw [smul_CA_val, smul_CA_val, smul_CA_val,
+    rw [smul_polyplets_val, smul_polyplets_val, smul_polyplets_val,
       image_toFun_mul g g' S.1,
-      reanchor_eq_image_add (S.1.image (D4.toFun g')),
-      image_toFun_add g (S.1.image (D4.toFun g')) (-anchorVec (S.1.image (D4.toFun g'))),
-      reanchor_image_add]
+      anchor_eq_image_add (S.1.image (D4.toFun g')),
+      image_toFun_add g (S.1.image (D4.toFun g')) (-corner (S.1.image (D4.toFun g'))),
+      anchor_image_add]
 
 /-! ## Finiteness bridges -/
 
-instance instFiniteCA (n : ℕ) : Finite (CA n) := (CA_finite n).to_subtype
+instance instFinitePolyplets (n : ℕ) : Finite (polyplets n) := (polyplets_finite n).to_subtype
 
-noncomputable instance instFintypeCA (n : ℕ) : Fintype (CA n) := Fintype.ofFinite _
+noncomputable instance instFintypeCA (n : ℕ) : Fintype (polyplets n) := Fintype.ofFinite _
 
 noncomputable instance instFintypeFixedByD4 (n : ℕ) (g : D4) :
-    Fintype (MulAction.fixedBy (CA n) g) := Fintype.ofFinite _
+    Fintype (MulAction.fixedBy (polyplets n) g) := Fintype.ofFinite _
 
 noncomputable instance instFintypeOrbitsD4 (n : ℕ) :
-    Fintype (MulAction.orbitRel.Quotient D4 (CA n)) := Fintype.ofFinite _
+    Fintype (MulAction.orbitRel.Quotient D4 (polyplets n)) := Fintype.ofFinite _
 
 /-! ## The fixed-point counts -/
 
-/-- The number of canonical animals of `n` cells fixed by `g`. -/
-noncomputable def fixCount (n : ℕ) (g : D4) : ℕ := Nat.card (MulAction.fixedBy (CA n) g)
+/-- The number of polyplets of `n` cells fixed by `g`. -/
+noncomputable def fixCount (n : ℕ) (g : D4) : ℕ := Nat.card (MulAction.fixedBy (polyplets n) g)
 
 /-- Quarter-turn-symmetric animals. -/
 noncomputable def R90 (n : ℕ) : ℕ := fixCount n (r 1)
@@ -473,17 +464,17 @@ noncomputable def Hm (n : ℕ) : ℕ := fixCount n (sr 0)
 column of `results/sym_counts.txt`. -/
 noncomputable def Dm (n : ℕ) : ℕ := fixCount n (sr 3)
 
-/-- Free polyplets: `D4`-orbits of canonical animals (A030222). -/
-noncomputable def Free (n : ℕ) : ℕ := Nat.card (MulAction.orbitRel.Quotient D4 (CA n))
+/-- Free polyplets: `D4`-orbits of polyplets (A030222). -/
+noncomputable def Free (n : ℕ) : ℕ := Nat.card (MulAction.orbitRel.Quotient D4 (polyplets n))
 
-/-- The fixed-point count is the number of canonical animals fixed by `g`, as
+/-- The fixed-point count is the number of polyplets fixed by `g`, as
 a set of finsets. -/
 lemma fixCount_eq_ncard (n : ℕ) (g : D4) :
-    fixCount n g = {S | IsCanonicalAnimal n S ∧ reanchor (S.image (D4.toFun g)) = S}.ncard := by
-  have hset : Subtype.val '' MulAction.fixedBy (CA n) g
-      = {S | IsCanonicalAnimal n S ∧ reanchor (S.image (D4.toFun g)) = S} := by
+    fixCount n g = {S | IsPolyplet n S ∧ anchor (S.image (D4.toFun g)) = S}.ncard := by
+  have hset : Subtype.val '' MulAction.fixedBy (polyplets n) g
+      = {S | IsPolyplet n S ∧ anchor (S.image (D4.toFun g)) = S} := by
     ext S
-    simp only [Set.mem_image, MulAction.fixedBy, Set.mem_setOf_eq, Subtype.exists, mem_CA,
+    simp only [Set.mem_image, MulAction.fixedBy, Set.mem_setOf_eq, Subtype.exists, mem_polyplets,
       exists_and_right, exists_eq_right]
     constructor
     · rintro ⟨hS, h⟩
@@ -547,19 +538,19 @@ lemma fixCount_sr1 (n : ℕ) : fixCount n (sr 1) = fixCount n (sr 3) := by
 /-! ## Burnside over the full symmetry group -/
 
 lemma card_fixedBy_eq_fixCount (n : ℕ) (g : D4) :
-    Fintype.card (MulAction.fixedBy (CA n) g) = fixCount n g :=
+    Fintype.card (MulAction.fixedBy (polyplets n) g) = fixCount n g :=
   (Nat.card_eq_fintype_card).symm
 
 /-- **Burnside's lemma for `D4`.** -/
 theorem free_eq (n : ℕ) :
     8 * Free n = a n + 2 * R90 n + R180 n + 2 * Hm n + 2 * Dm n := by
-  have hb := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group D4 (CA n)
-  rw [D4.sum_univ (fun g => Fintype.card (MulAction.fixedBy (CA n) g)), ZMod.sum_univ_four,
+  have hb := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group D4 (polyplets n)
+  rw [D4.sum_univ (fun g => Fintype.card (MulAction.fixedBy (polyplets n) g)), ZMod.sum_univ_four,
     ZMod.sum_univ_four] at hb
   simp only [card_fixedBy_eq_fixCount] at hb
   rw [DihedralGroup.r_zero, fixCount_one, fixCount_r3, fixCount_sr2, fixCount_sr1] at hb
   have hcard : Fintype.card D4 = 8 := DihedralGroup.card
-  have hfree : Fintype.card (MulAction.orbitRel.Quotient D4 (CA n)) = Free n :=
+  have hfree : Fintype.card (MulAction.orbitRel.Quotient D4 (polyplets n)) = Free n :=
     (Nat.card_eq_fintype_card).symm
   rw [hcard, hfree] at hb
   simp only [R90, R180, Hm, Dm]
@@ -568,7 +559,7 @@ theorem free_eq (n : ℕ) :
 /-! ## Burnside over the rotation subgroup -/
 
 /-- The cyclic group of order four, `Multiplicative (ZMod 4)`, which acts on
-canonical animals through the rotations of `D4`. -/
+polyplets through the rotations of `D4`. -/
 abbrev C4 := Multiplicative (ZMod 4)
 
 /-- The rotation subgroup, as a homomorphism `C4 →* D4`. -/
@@ -584,31 +575,31 @@ lemma C4.sum_univ {M : Type*} [AddCommMonoid M] (f : C4 → M) :
     ∑ c : C4, f c = f (.ofAdd 0) + f (.ofAdd 1) + f (.ofAdd 2) + f (.ofAdd 3) :=
   Fin.sum_univ_four f
 
-instance instMulActionC4CA (n : ℕ) : MulAction C4 (CA n) := MulAction.compHom _ rotHom
+instance instMulActionC4Polyplets (n : ℕ) : MulAction C4 (polyplets n) := MulAction.compHom _ rotHom
 
 noncomputable instance instFintypeFixedByC4 (n : ℕ) (c : C4) :
-    Fintype (MulAction.fixedBy (CA n) c) := Fintype.ofFinite _
+    Fintype (MulAction.fixedBy (polyplets n) c) := Fintype.ofFinite _
 
 noncomputable instance instFintypeOrbitsC4 (n : ℕ) :
-    Fintype (MulAction.orbitRel.Quotient C4 (CA n)) := Fintype.ofFinite _
+    Fintype (MulAction.orbitRel.Quotient C4 (polyplets n)) := Fintype.ofFinite _
 
-/-- One-sided polyplets: rotation-orbits of canonical animals (A030233). -/
-noncomputable def OneSided (n : ℕ) : ℕ := Nat.card (MulAction.orbitRel.Quotient C4 (CA n))
+/-- One-sided polyplets: rotation-orbits of polyplets (A030233). -/
+noncomputable def OneSided (n : ℕ) : ℕ := Nat.card (MulAction.orbitRel.Quotient C4 (polyplets n))
 
 lemma card_fixedByC4 (n : ℕ) (c : C4) :
-    Fintype.card (MulAction.fixedBy (CA n) c) = fixCount n (rotHom c) := by
+    Fintype.card (MulAction.fixedBy (polyplets n) c) = fixCount n (rotHom c) := by
   rw [fixCount, Nat.card_eq_fintype_card]
   exact Fintype.card_congr' rfl
 
 /-- **Burnside's lemma for the rotation subgroup.** -/
 theorem oneSided_eq (n : ℕ) :
     4 * OneSided n = a n + 2 * R90 n + R180 n := by
-  have hb := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group C4 (CA n)
-  rw [C4.sum_univ (fun c => Fintype.card (MulAction.fixedBy (CA n) c))] at hb
+  have hb := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group C4 (polyplets n)
+  rw [C4.sum_univ (fun c => Fintype.card (MulAction.fixedBy (polyplets n) c))] at hb
   simp only [card_fixedByC4, rotHom_apply, toAdd_ofAdd] at hb
   rw [DihedralGroup.r_zero, fixCount_one, fixCount_r3] at hb
   have hcard : Fintype.card C4 = 4 := ZMod.card 4
-  have hone : Fintype.card (MulAction.orbitRel.Quotient C4 (CA n)) = OneSided n :=
+  have hone : Fintype.card (MulAction.orbitRel.Quotient C4 (polyplets n)) = OneSided n :=
     (Nat.card_eq_fintype_card).symm
   rw [hcard, hone] at hb
   simp only [R90, R180]
@@ -750,14 +741,14 @@ lemma quarter_turn_card_mod (n : ℕ) (S : Finset (ℤ × ℤ)) (A B : ℤ)
 /-- **Quarter-turn symmetry is impossible unless `n ≡ 0, 1 (mod 4)`.** -/
 theorem r90_vanish (n : ℕ) (h : ¬ (n % 4 = 0 ∨ n % 4 = 1)) : R90 n = 0 := by
   rw [R90, fixCount]
-  have hempty : IsEmpty (MulAction.fixedBy (CA n) (r 1 : D4)) := by
+  have hempty : IsEmpty (MulAction.fixedBy (polyplets n) (r 1 : D4)) := by
     constructor
     rintro ⟨x, hx⟩
-    have h1 : reanchor (x.1.image (D4.toFun (r 1))) = x.1 := congrArg Subtype.val hx
-    obtain ⟨v, hveq⟩ : ∃ v : ℤ × ℤ, reanchor (x.1.image (D4.toFun (r 1)))
+    have h1 : anchor (x.1.image (D4.toFun (r 1))) = x.1 := congrArg Subtype.val hx
+    obtain ⟨v, hveq⟩ : ∃ v : ℤ × ℤ, anchor (x.1.image (D4.toFun (r 1)))
         = x.1.image (fun p : ℤ × ℤ => (-p.2 + -v.1, p.1 + -v.2)) := by
-      refine ⟨anchorVec (x.1.image (D4.toFun (r 1))), ?_⟩
-      rw [reanchor, Finset.image_image]
+      refine ⟨corner (x.1.image (D4.toFun (r 1))), ?_⟩
+      rw [anchor, Finset.image_image]
       refine Finset.image_congr ?_
       intro p _
       simp only [Function.comp_apply, D4.toFun, rot_one, quarter]
@@ -779,9 +770,9 @@ lemma D4.refl_mul_not_refl : ∀ a b : D4, a ∈ D4.refls → b ∉ D4.refls →
 lemma D4.inv_refl_mul_refl : ∀ a b : D4, a ∈ D4.refls → b ∈ D4.refls → a⁻¹ * b ∉ D4.refls := by
   decide
 
-/-- The `D4`-invariant set of canonical animals fixed by at least one
+/-- The `D4`-invariant set of polyplets fixed by at least one
 reflection: the *achiral* animals. -/
-def achiral (n : ℕ) : SubMulAction D4 (CA n) where
+def achiral (n : ℕ) : SubMulAction D4 (polyplets n) where
   carrier := {x | ∃ g ∈ D4.refls, g • x = x}
   smul_mem' := by
     rintro c x ⟨g, hg, hgx⟩
@@ -800,7 +791,7 @@ noncomputable instance instFintypeFixedByAchiral (n : ℕ) (g : D4) :
 noncomputable instance instFintypeOrbitsAchiral (n : ℕ) :
     Fintype (MulAction.orbitRel.Quotient D4 (achiral n)) := Fintype.ofFinite _
 
-/-- Bilateral polyplets: `D4`-orbits of achiral canonical animals (A030234). -/
+/-- Bilateral polyplets: `D4`-orbits of achiral polyplets (A030234). -/
 noncomputable def Bilateral (n : ℕ) : ℕ :=
   Nat.card (MulAction.orbitRel.Quotient D4 (achiral n))
 
@@ -818,7 +809,7 @@ lemma D4.sum_refls {M : Type*} [AddCommMonoid M] (f : D4 → M) :
   abel
 
 lemma smul_achiral_iff {n : ℕ} (g : D4) (y : achiral n) :
-    g • y = y ↔ g • (y : CA n) = (y : CA n) := by
+    g • y = y ↔ g • (y : polyplets n) = (y : polyplets n) := by
   constructor
   · intro hy; exact congrArg Subtype.val hy
   · intro hy; exact Subtype.ext hy
@@ -828,7 +819,7 @@ overall — anything a reflection fixes is achiral by definition. -/
 lemma card_fixedBy_achiral_refl (n : ℕ) {g : D4} (hg : g ∈ D4.refls) :
     Nat.card (MulAction.fixedBy (achiral n) g) = fixCount n g := by
   rw [fixCount]
-  refine Nat.card_congr ⟨fun y => ⟨(y.1 : CA n), ?_⟩,
+  refine Nat.card_congr ⟨fun y => ⟨(y.1 : polyplets n), ?_⟩,
     fun x => ⟨⟨x.1, ⟨g, hg, x.2⟩⟩, ?_⟩, ?_, ?_⟩
   · exact (smul_achiral_iff g y.1).mp y.2
   · exact Subtype.ext x.2

@@ -14,7 +14,7 @@ row-local lattice. The king lattice is `D = {-1, 0, 1}`, `b = 3`, and this
 file is the dictionary between the two vocabularies:
 
 * `kingLattice`, and the definitional bridges `adj_king` (`Adj kingLattice`
-  is `kingAdj`), `conn_king`, `isCanonical_king`, `T_king`, `Dc_king`,
+  is `kingAdj`), `conn_king`, `isAnimal_king`, `T_king`, `Dc_king`,
   `d_king`, `V_king`, `Vt_king`: the generic objects at the king lattice are
   the king objects of `Defs.lean` and `Weights.lean` on the nose;
 * the king-named theorems the rest of the development consumes — `d_rec`,
@@ -57,11 +57,13 @@ theorem conn_king {S : Finset (ℤ × ℤ)} : Conn kingLattice S ↔ Polyplets.K
   unfold Conn Polyplets.KingConnected
   simp only [adj_king]
 
-/-- Canonicality agrees. -/
-theorem isCanonical_king {n H : ℕ} {S : Finset (ℤ × ℤ)} :
-    IsCanonical kingLattice n H S ↔ Polyplets.IsCanonical n H S :=
-  ⟨fun h => ⟨h.card, conn_king.mp h.conn, h.anchored, h.y_le, h.y_top⟩,
-   fun h => ⟨h.card, conn_king.mpr h.conn, h.anchored, h.y_le, h.y_top⟩⟩
+/-- An animal on the king lattice is a polyplet: the `n`-cell, height-`H`
+`L`-animals at `kingLattice` are exactly `heightClass n H`. -/
+theorem isAnimal_king {n H : ℕ} {S : Finset (ℤ × ℤ)} :
+    IsAnimal kingLattice n H S ↔ S ∈ Polyplets.heightClass n H := by
+  rw [Polyplets.mem_heightClass_iff]
+  exact ⟨fun h => ⟨⟨h.card, conn_king.mp h.conn, h.anchored⟩, h.y_le, h.y_top⟩,
+    fun ⟨h, h1, h2⟩ => ⟨h.card, conn_king.mpr h.conn, h.anchored, h1, h2⟩⟩
 
 /-- Row sizes agree definitionally. -/
 theorem rowSize_king (S : Finset (ℤ × ℤ)) (y : ℤ) : rowSize S y = Polyplets.rowSize S y := rfl
@@ -71,12 +73,12 @@ theorem T_king (n H : ℕ) : T kingLattice n H = Polyplets.T n H := by
   unfold T Polyplets.T
   congr 1
   ext S
-  exact isCanonical_king
+  exact isAnimal_king
 
 /-- The walk-top families agree. -/
 theorem Dc_king (k H : ℕ) : Dc kingLattice k H = Polyplets.Dc k H := by
   ext S
-  rw [mem_Dc, Polyplets.mem_Dc, isCanonical_king, rowSize_king]
+  rw [mem_Dc, Polyplets.mem_Dc, isAnimal_king, rowSize_king]
 
 /-- **The walk-top counts agree**: `d kingLattice = Polyplets.d`. -/
 @[simp] theorem d_king (k H : ℕ) : d kingLattice k H = Polyplets.d k H := by
@@ -145,7 +147,7 @@ theorem d_rec (k H : ℕ) (hH : k + 2 ≤ H) :
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, V ℓ j * d (k - j) (H - 1 - ℓ) := by
   simpa using Universal.d_rec kingLattice k H hH
 
-/-- **The c-identity**: for `H ≥ k + 1`, a canonical animal has a walk top row
+/-- **The c-identity**: for `H ≥ k + 1`, a polyplet has a walk top row
 (counted by `d k H`) or a multi top row — a top-edge `Vᵗ`-configuration
 capping a shorter walk-top remainder. -/
 theorem c_ident (k H : ℕ) (hH : k + 1 ≤ H) :

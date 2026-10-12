@@ -13,7 +13,7 @@ import Polyplets.Universal.Graph
 /-!
 # Finiteness of the canonical set
 
-`{S | IsCanonical L n H S}` is a finite set of `Finset`s, so `T L n H` (defined
+`{S | IsAnimal L n H S}` is a finite set of `Finset`s, so `T L n H` (defined
 via `Set.ncard`) is a genuine cardinality.
 
 This is `Finite.lean` generically, with **one lemma that does not carry over
@@ -29,7 +29,7 @@ port.
   leaves column `1` empty, so a path can skip a column and the king width bound
   `p.1 ≤ n - 1` fails outright. It is replaced by the reach bound
   `|p.1 - q.1| ≤ M · (walk length)` plus "a path has at most `card - 1` steps",
-  giving `canonical_x_le : p.1 ≤ M · (n - 1)`. At `M = 1` this is the king
+  giving `animal_x_le : p.1 ≤ M · (n - 1)`. At `M = 1` this is the king
   statement. Nothing downstream reads the width bound quantitatively — it is
   consumed only as "some box contains every canonical set" — so the change is
   confined to this file.
@@ -137,18 +137,18 @@ lemma conn_abs_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : Conn L S)
 
 /-- **Uniform width bound.** In a canonical `L`-animal of `n` cells, every
 cell's x-coordinate is at most `M · (n − 1)`. -/
-lemma canonical_x_le {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)}
-    (hS : IsCanonical L n H S) {p : ℤ × ℤ} (hp : p ∈ S) : p.1 ≤ L.M * ((n : ℤ) - 1) := by
+lemma animal_x_le {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)}
+    (hS : IsAnimal L n H S) {p : ℤ × ℤ} (hp : p ∈ S) : p.1 ≤ L.M * ((n : ℤ) - 1) := by
   obtain ⟨p0, hp0S, hp0⟩ := hS.anchored.x_zero
   have h := conn_abs_sub_x_le hS.conn hp0S hp
   rw [hS.card, hp0, sub_zero] at h
   have := le_abs_self p.1
   omega
 
-/-- **Finiteness.** `{S | IsCanonical L n H S}` is contained in the powerset of
+/-- **Finiteness.** `{S | IsAnimal L n H S}` is contained in the powerset of
 the finite box `[0, M(n-1)] × [0, H-1]`, hence finite. -/
-lemma canonical_finite (L : RowLocal) (n H : ℕ) :
-    {S : Finset (ℤ × ℤ) | IsCanonical L n H S}.Finite := by
+lemma animals_finite (L : RowLocal) (n H : ℕ) :
+    {S : Finset (ℤ × ℤ) | IsAnimal L n H S}.Finite := by
   apply Set.Finite.subset
     (Finset.powerset
       (Finset.Icc ((0 : ℤ), (0 : ℤ)) (L.M * ((n : ℤ) - 1), (H : ℤ) - 1))).finite_toSet
@@ -159,12 +159,12 @@ lemma canonical_finite (L : RowLocal) (n H : ℕ) :
   refine ⟨⟨?_, ?_⟩, ?_, ?_⟩
   · exact hS.anchored.x_nonneg p hpS
   · exact hS.anchored.y_nonneg p hpS
-  · exact canonical_x_le hS hpS
+  · exact animal_x_le hS hpS
   · exact hS.y_le p hpS
 
 /-- **`T` is a genuine cardinality.** -/
 theorem T_eq_toFinset_card (L : RowLocal) (n H : ℕ) :
-    T L n H = (canonical_finite L n H).toFinset.card := by
-  rw [T, Set.ncard_eq_toFinset_card _ (canonical_finite L n H)]
+    T L n H = (animals_finite L n H).toFinset.card := by
+  rw [T, Set.ncard_eq_toFinset_card _ (animals_finite L n H)]
 
 end Polyplets.Universal

@@ -33,7 +33,7 @@ is available (the limit itself is not built here).
 
 ## The exploration
 
-Every canonical animal is first re-anchored: `expShape S` translates `S` so that
+Every polyplet is first anchored: `expShape S` translates `S` so that
 its scan-least cell (row-major, `y` before `x`) sits at the origin. Canonicity
 pins the translation back, so `expShape` is injective (`expShape_injOn`), and
 the shape is what the exploration reconstructs.
@@ -203,7 +203,7 @@ lemma nbrsOf_nodup (c : ℤ × ℤ) : (nbrsOf c).Nodup := by
 
 /-- Strictly scan-greater than the origin: `(0,0) < q` in the row-major scan
 order (`y` first, then `x`). Exactly the cells a shape may contain besides its
-own anchor. -/
+own scanAnchor. -/
 def scanPos (q : ℤ × ℤ) : Bool :=
   decide (0 < q.2) || (decide (q.2 = 0) && decide (0 < q.1))
 
@@ -226,7 +226,7 @@ most five of the eight king offsets are neither `e` itself nor king-adjacent to
 private lemma offsetFar_count_le : ∀ e ∈ nbrOffsets, nbrOffsets.countP (offsetFar e) ≤ 5 := by
   decide
 
-/-- **The proposal budget for a non-anchor cell.** If `c` has an already-decided
+/-- **The proposal budget for a non-scanAnchor cell.** If `c` has an already-decided
 king neighbor `p`, then any predicate that only holds on cells distinct from
 `p` and not adjacent to `p` selects at most five of `c`'s eight neighbors.
 Applied with `P` = "scan-positive and not yet considered", `p` = the proposer of
@@ -761,28 +761,28 @@ lemma accPos_subset (D : Finset (ℤ × ℤ)) (k : ℕ) : (runO D k).accPos ⊆ 
   have := (good_runO D k).posLt i hi
   rwa [runO_steps] at this
 
-/-! ## Re-anchoring a canonical animal
+/-! ## The scan anchor of a polyplet
 
-A canonical animal is anchored by its *bounding box*, which need not put any
+A polyplet is anchored by its *bounding box*, which need not put any
 cell at the origin. The exploration wants the *scan-least cell* there instead,
 so the animal is translated; canonicity pins the translation back, which is why
 nothing is lost (`expShape_injOn`). -/
 
 /-- The x-coordinate of the scan-least cell of `S`: the least `k` with
 `(k, 0) ∈ S`. Totalised by `Nat.sInf`, whose junk value `0` on the empty set
-never arises for a canonical animal (`anchorSet_nonempty`). -/
-noncomputable def anchorX (S : Finset (ℤ × ℤ)) : ℕ := sInf {k : ℕ | ((k : ℤ), (0 : ℤ)) ∈ S}
+never arises for a polyplet (`scanAnchorSet_nonempty`). -/
+noncomputable def scanAnchorX (S : Finset (ℤ × ℤ)) : ℕ := sInf {k : ℕ | ((k : ℤ), (0 : ℤ)) ∈ S}
 
-/-- The scan-least cell of a canonical animal: minimum `y` is `0`, so it lies in
-row `0`, and `anchorX` picks the leftmost cell of that row. -/
-noncomputable def anchor (S : Finset (ℤ × ℤ)) : ℤ × ℤ := ((anchorX S : ℤ), 0)
+/-- The scan-least cell of a polyplet: minimum `y` is `0`, so it lies in
+row `0`, and `scanAnchorX` picks the leftmost cell of that row. -/
+noncomputable def scanAnchor (S : Finset (ℤ × ℤ)) : ℤ × ℤ := ((scanAnchorX S : ℤ), 0)
 
 /-- `S` translated so that its scan-least cell sits at the origin. -/
-noncomputable def expShape (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) := translate (-anchor S) S
+noncomputable def expShape (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) := translate (-scanAnchor S) S
 
-/-- Row `0` of a canonical animal is inhabited, so `anchorX` is a genuine
+/-- Row `0` of a polyplet is inhabited, so `scanAnchorX` is a genuine
 minimum. -/
-private lemma anchorSet_nonempty {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
+private lemma scanAnchorSet_nonempty {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) :
     {k : ℕ | ((k : ℤ), (0 : ℤ)) ∈ S}.Nonempty := by
   obtain ⟨p, hp, hp2⟩ := hS.anchored.y_zero
   refine ⟨p.1.toNat, ?_⟩
@@ -792,98 +792,98 @@ private lemma anchorSet_nonempty {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCan
   rw [Set.mem_setOf_eq, hpe]
   exact hp
 
-/-- The anchor is a cell of the animal. -/
-lemma anchor_mem {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) : anchor S ∈ S :=
-  Nat.sInf_mem (anchorSet_nonempty hS)
+/-- The scanAnchor is a cell of the animal. -/
+lemma scanAnchor_mem {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) : scanAnchor S ∈ S :=
+  Nat.sInf_mem (scanAnchorSet_nonempty hS)
 
-/-- The anchor is leftmost in row `0`. -/
-lemma anchor_min {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) {q : ℤ × ℤ}
-    (hq : q ∈ S) (hq2 : q.2 = 0) : (anchor S).1 ≤ q.1 := by
+/-- The scanAnchor is leftmost in row `0`. -/
+lemma scanAnchor_min {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) {q : ℤ × ℤ}
+    (hq : q ∈ S) (hq2 : q.2 = 0) : (scanAnchor S).1 ≤ q.1 := by
   have hx := hS.anchored.x_nonneg q hq
   have hmem : q.1.toNat ∈ {k : ℕ | ((k : ℤ), (0 : ℤ)) ∈ S} := by
     have hqe : ((q.1.toNat : ℤ), (0 : ℤ)) = q := by
       rw [Int.toNat_of_nonneg hx, ← hq2]
     rw [Set.mem_setOf_eq, hqe]; exact hq
-  have hle : anchorX S ≤ q.1.toNat := Nat.sInf_le hmem
-  simp only [anchor]
+  have hle : scanAnchorX S ≤ q.1.toNat := Nat.sInf_le hmem
+  simp only [scanAnchor]
   omega
 
-/-- **A canonical animal re-anchors to a shape.** Size and connectivity survive
-the translation; the origin is the image of the anchor; and every other cell is
-scan-greater because the anchor is scan-least. -/
-lemma isShape_expShape {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
+/-- **A polyplet anchors to a shape.** Size and connectivity survive
+the translation; the origin is the image of the scanAnchor; and every other cell is
+scan-greater because the scanAnchor is scan-least. -/
+lemma isShape_expShape {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) :
     IsShape n (expShape S) where
   card := by rw [expShape, card_translate, hS.card]
   conn := kingConnected_translate _ hS.conn
   origin := by
-    have := translate_mem (v := -anchor S) (anchor_mem hS)
+    have := translate_mem (v := -scanAnchor S) (scanAnchor_mem hS)
     rwa [add_neg_cancel, show ((0 : ℤ × ℤ)) = ((0 : ℤ), (0 : ℤ)) from rfl] at this
   scan := by
     intro d hd hd0
     rw [expShape, translate, Finset.mem_image] at hd
     obtain ⟨q, hq, rfl⟩ := hd
     have hy := hS.anchored.y_nonneg q hq
-    have hane : (anchor S).2 = 0 := rfl
+    have hane : (scanAnchor S).2 = 0 := rfl
     simp only [ne_eq, Prod.ext_iff, Prod.fst_add, Prod.snd_add, Prod.fst_neg, Prod.snd_neg,
       not_and] at hd0
     simp only [scanPos, Bool.or_eq_true, Bool.and_eq_true, decide_eq_true_eq, Prod.fst_add,
       Prod.snd_add, Prod.fst_neg, Prod.snd_neg]
     rcases eq_or_lt_of_le hy with hy0 | hy0
-    · have hmin := anchor_min hS hq hy0.symm
-      have : ¬ (q.1 + -(anchor S).1 = 0) := fun h => hd0 h (by omega)
+    · have hmin := scanAnchor_min hS hq hy0.symm
+      have : ¬ (q.1 + -(scanAnchor S).1 = 0) := fun h => hd0 h (by omega)
       right; omega
     · left; omega
 
-/-- Re-anchoring is undone by translating back. -/
-lemma expShape_image (S : Finset (ℤ × ℤ)) : translate (anchor S) (expShape S) = S := by
+/-- Anchoring is undone by translating back. -/
+lemma expShape_image (S : Finset (ℤ × ℤ)) : translate (scanAnchor S) (expShape S) = S := by
   rw [expShape, translate_translate, neg_add_cancel, translate_zero]
 
-/-- **Re-anchoring loses nothing.** Two canonical animals with the same shape
-have the same anchor: the animal's own `min x = 0` clause forces the anchor's
+/-- **Anchoring loses nothing.** Two polyplets with the same shape
+have the same scanAnchor: the animal's own `min x = 0` clause forces the scanAnchor's
 x-coordinate to be the negative of the shape's minimum x-coordinate, so it is
 determined by the expShape. Translating back then identifies the animals. -/
 lemma expShape_injOn (n : ℕ) :
-    Set.InjOn expShape {S : Finset (ℤ × ℤ) | IsCanonicalAnimal n S} := by
-  have key : ∀ T₁ T₂ : Finset (ℤ × ℤ), IsCanonicalAnimal n T₁ → IsCanonicalAnimal n T₂ →
-      expShape T₁ = expShape T₂ → (anchor T₁).1 ≤ (anchor T₂).1 := by
+    Set.InjOn expShape {S : Finset (ℤ × ℤ) | IsPolyplet n S} := by
+  have key : ∀ T₁ T₂ : Finset (ℤ × ℤ), IsPolyplet n T₁ → IsPolyplet n T₂ →
+      expShape T₁ = expShape T₂ → (scanAnchor T₁).1 ≤ (scanAnchor T₂).1 := by
     intro T₁ T₂ hT₁ hT₂ h
     obtain ⟨q, hq, hq0⟩ := hT₁.anchored.x_zero
-    have hd : q + -anchor T₁ ∈ expShape T₂ := by
+    have hd : q + -scanAnchor T₁ ∈ expShape T₂ := by
       rw [← h, expShape]; exact translate_mem hq
     rw [expShape, mem_translate] at hd
     have hr0 := hT₂.anchored.x_nonneg _ hd
     simp only [Prod.fst_add, Prod.fst_sub, Prod.fst_neg] at hr0
     omega
   intro S₁ h₁ S₂ h₂ heq
-  have ha : anchor S₁ = anchor S₂ := by
+  have ha : scanAnchor S₁ = scanAnchor S₂ := by
     have e1 := key S₁ S₂ h₁ h₂ heq
     have e2 := key S₂ S₁ h₂ h₁ heq.symm
-    simp only [anchor] at e1 e2 ⊢
-    have : (anchorX S₁ : ℤ) = (anchorX S₂ : ℤ) := by omega
+    simp only [scanAnchor] at e1 e2 ⊢
+    have : (scanAnchorX S₁ : ℤ) = (scanAnchorX S₂ : ℤ) := by omega
     rw [this]
-  calc S₁ = translate (anchor S₁) (expShape S₁) := (expShape_image S₁).symm
-    _ = translate (anchor S₂) (expShape S₂) := by rw [heq, ha]
+  calc S₁ = translate (scanAnchor S₁) (expShape S₁) := (expShape_image S₁).symm
+    _ = translate (scanAnchor S₂) (expShape S₂) := by rw [heq, ha]
     _ = S₂ := expShape_image S₂
 
 /-! ## The bound -/
 
-/-- The exploration code of a canonical animal: the accept positions of the
+/-- The exploration code of a polyplet: the accept positions of the
 oracle-driven run on its expShape. -/
 noncomputable def expCode (n : ℕ) (S : Finset (ℤ × ℤ)) : Finset ℕ :=
   (runO (expShape S) (5 * n)).accPos
 
-/-- **`a n ≤ C(5n, n)`.** The exploration code embeds the canonical animals of
+/-- **`a n ≤ C(5n, n)`.** The exploration code embeds the polyplets of
 `n` cells into the `n`-element subsets of `Finset.range (5 * n)`: it lands there
 because the run halts within `5 * n` steps and accepts exactly `n` times, and it
 is injective because replaying the exploration from the code alone recovers the
 expShape (`runA_eq_runO`), which recovers the animal (`expShape_injOn`). -/
 theorem a_le_choose (n : ℕ) (hn : 1 ≤ n) : a n ≤ Nat.choose (5 * n) n := by
-  have hmap : ∀ S ∈ {S : Finset (ℤ × ℤ) | IsCanonicalAnimal n S},
+  have hmap : ∀ S ∈ {S : Finset (ℤ × ℤ) | IsPolyplet n S},
       expCode n S ∈ (↑(Finset.powersetCard n (Finset.range (5 * n))) : Set (Finset ℕ)) := by
     intro S hS
     rw [Finset.mem_coe, Finset.mem_powersetCard]
     exact ⟨accPos_subset _ _, accPos_card (isShape_expShape hS) hn⟩
-  have hinj : Set.InjOn (expCode n) {S : Finset (ℤ × ℤ) | IsCanonicalAnimal n S} := by
+  have hinj : Set.InjOn (expCode n) {S : Finset (ℤ × ℤ) | IsPolyplet n S} := by
     intro S₁ h₁ S₂ h₂ h
     refine expShape_injOn n h₁ h₂ ?_
     have k1 : runA (expCode n S₁) (5 * n) = runO (expShape S₁) (5 * n) :=

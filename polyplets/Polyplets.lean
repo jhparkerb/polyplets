@@ -5,7 +5,6 @@ import Polyplets.Defs
 import Polyplets.Enum
 import Polyplets.EnumData
 import Polyplets.Fekete
-import Polyplets.Finite
 import Polyplets.DiscreteCalculus
 import Polyplets.Growth
 import Polyplets.King

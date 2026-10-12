@@ -40,8 +40,8 @@ Two numbers control the geometry:
   the king case. `M` is what the width bound (`Universal/Finite.lean`) is
   stated in terms of; it never enters the counting identities.
 
-`IsCanonical L n H S` and `T L n H` are `Defs.lean`'s king definitions with
-`kingAdj` replaced by `Adj L`.
+`IsAnimal L n H S` and `T L n H` are `Defs.lean`'s `heightClass n H` and `T n H`
+with `kingAdj` replaced by `Adj L` (`King.lean`'s `isAnimal_king`).
 -/
 
 namespace Polyplets.Universal
@@ -156,7 +156,7 @@ def Conn (L : RowLocal) (S : Finset (ℤ × ℤ)) : Prop :=
 
 /-! ## Translation
 
-Every peeling bijection and both re-anchoring arguments move cell sets by a
+Every peeling bijection and both anchoring arguments move cell sets by a
 vector. Adjacency depends only on coordinate differences, so translation
 preserves it and hence connectivity; this is proved once here, for every
 lattice. -/
@@ -249,10 +249,11 @@ lemma Anchored.nonempty {S : Finset (ℤ × ℤ)} (hS : Anchored S) : S.Nonempty
   obtain ⟨p, hp, -⟩ := hS.x_zero
   exact ⟨p, hp⟩
 
-/-- `S` is the canonical (origin-anchored) representative of a fixed `L`-animal
-of `n` cells with bounding-box height exactly `H`: `n` cells, `L`-connected,
-anchored, maximum y-coordinate `H - 1`. The x-extent is unconstrained. -/
-structure IsCanonical (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+/-- `S` is an `L`-animal of `n` cells with bounding-box height exactly `H`, as
+the representative of its translation class with the bounding box at the
+origin: `n` cells, `L`-connected, anchored, maximum y-coordinate `H - 1`. The
+x-extent is unconstrained. -/
+structure IsAnimal (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
   /-- `n` cells. -/
   card : S.card = n
   /-- `L`-connected. -/
@@ -264,9 +265,9 @@ structure IsCanonical (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × ℤ)) : Pro
   /-- Row `H - 1` is occupied. -/
   y_top : ∃ p ∈ S, p.2 = (H : ℤ) - 1
 
-/-- `IsCanonical` as a conjunction (for decidability and for unfolding). -/
-lemma isCanonical_iff_and {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)} :
-    IsCanonical L n H S ↔ S.card = n ∧ Conn L S ∧
+/-- `IsAnimal` as a conjunction (for decidability and for unfolding). -/
+lemma isAnimal_iff_and {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)} :
+    IsAnimal L n H S ↔ S.card = n ∧ Conn L S ∧
       (∀ p ∈ S, 0 ≤ p.1) ∧ (∃ p ∈ S, p.1 = 0) ∧
       (∀ p ∈ S, 0 ≤ p.2) ∧ (∃ p ∈ S, p.2 = 0) ∧
       (∀ p ∈ S, p.2 ≤ (H : ℤ) - 1) ∧ (∃ p ∈ S, p.2 = (H : ℤ) - 1) :=
@@ -275,9 +276,9 @@ lemma isCanonical_iff_and {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)} :
    fun ⟨a, b, c, d, e, f, g, i⟩ => ⟨a, b, ⟨c, d, e, f⟩, g, i⟩⟩
 
 /-- `T L n H`: the number of fixed `L`-animals of `n` cells whose bounding box
-has height exactly `H`, i.e. the number of origin-anchored canonical
-representatives. Finiteness is `Universal/Finite.lean`. -/
+has height exactly `H`, i.e. the number of origin-anchored representatives.
+Finiteness is `Universal/Finite.lean`. -/
 noncomputable def T (L : RowLocal) (n H : ℕ) : ℕ :=
-  {S : Finset (ℤ × ℤ) | IsCanonical L n H S}.ncard
+  {S : Finset (ℤ × ℤ) | IsAnimal L n H S}.ncard
 
 end Polyplets.Universal

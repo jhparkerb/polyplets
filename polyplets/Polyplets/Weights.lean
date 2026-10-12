@@ -13,7 +13,7 @@ import Polyplets.Universal.Separation
 # Peeling weights: walk-top counts `d` and cluster configurations `V`, `Vᵗ`
 
 The counting objects of the peeling recursion (`README.md`). The primary
-object is `d k H`, the number of canonical height-`H`, surplus-`k` animals
+object is `d k H`, the number of polyplets of height `H` and surplus `k`
 whose **top row is a walk row** (holds exactly one cell); the recursion's
 weights aggregate cluster configurations by (rows `ℓ`, surplus `j`) only:
 
@@ -44,7 +44,7 @@ namespace Polyplets
 
 open Universal (IsWalkRow)
 
-/-! ## Row size and walk-top canonical sets -/
+/-! ## Row size and walk-top polyplets -/
 
 /-- The number of cells of `S` in row `y`. `rowSize S r = 1` is exactly
 `Universal.IsWalkRow S r` (`isWalkRow_iff_rowSize`). -/
@@ -55,29 +55,29 @@ def rowSize (S : Finset (ℤ × ℤ)) (y : ℤ) : ℕ :=
 lemma isWalkRow_iff_rowSize {S : Finset (ℤ × ℤ)} {r : ℤ} :
     IsWalkRow S r ↔ rowSize S r = 1 := Iff.rfl
 
-/-- **Walk-top canonical sets**: the canonical `(n = H + k, H)` animals whose
+/-- **Walk-top polyplets**: the polyplets of `H + k` cells and height `H` whose
 top row `H - 1` is a walk row. The enumeration domain is `Compute.lean`'s box;
 `mem_Dc` shows the encoding is invisible. -/
 def Dc (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
   ((box (H + k) H).powersetCard (H + k)).filter
-    fun S => IsCanonical (H + k) H S ∧ rowSize S ((H : ℤ) - 1) = 1
+    fun S => S ∈ heightClass (H + k) H ∧ rowSize S ((H : ℤ) - 1) = 1
 
-/-- `d k H`: the number of canonical height-`H` surplus-`k` animals whose top
+/-- `d k H`: the number of polyplets of height `H` and surplus `k` whose top
 row is a walk row — the primary object of the peeling recursion
 (`d_k(H) = 3·d_k(H−1) + Σ V(ℓ,j)·d_{k−j}(H−1−ℓ)` for `H ≥ k + 2`,
 proved in `Peel.lean`). -/
 def d (k H : ℕ) : ℕ := (Dc k H).card
 
 /-- **Propositional characterization of `Dc`** (window independence):
-membership is exactly canonicality plus walk top row — the box enumeration is
+membership is exactly height class plus walk top row — the box enumeration is
 an encoding artifact. -/
 theorem mem_Dc {k H : ℕ} {S : Finset (ℤ × ℤ)} :
-    S ∈ Dc k H ↔ IsCanonical (H + k) H S ∧ rowSize S ((H : ℤ) - 1) = 1 := by
+    S ∈ Dc k H ↔ S ∈ heightClass (H + k) H ∧ rowSize S ((H : ℤ) - 1) = 1 := by
   rw [Dc, Finset.mem_filter]
   constructor
   · exact fun h => h.2
   · intro h
-    exact ⟨canonical_mem_powersetCard_box h.1, h⟩
+    exact ⟨mem_powersetCard_box h.1, h⟩
 
 /-! ## The x-spread bound -/
 

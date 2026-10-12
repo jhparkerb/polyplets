@@ -56,20 +56,20 @@ lemma isWalkRow_iff_rowSize {S : Finset (ℤ × ℤ)} {r : ℤ} :
     IsWalkRow S r ↔ rowSize S r = 1 := Iff.rfl
 
 /-- The full canonical enumeration finset at `(H + k, H)`. -/
-noncomputable def allCanon (L : RowLocal) (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
-  (canonical_finite L (H + k) H).toFinset
+noncomputable def animals (L : RowLocal) (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
+  (animals_finite L (H + k) H).toFinset
 
-lemma mem_allCanon {L : RowLocal} {k H : ℕ} {S : Finset (ℤ × ℤ)} :
-    S ∈ allCanon L k H ↔ IsCanonical L (H + k) H S :=
+lemma mem_animals {L : RowLocal} {k H : ℕ} {S : Finset (ℤ × ℤ)} :
+    S ∈ animals L k H ↔ IsAnimal L (H + k) H S :=
   Set.Finite.mem_toFinset _
 
-lemma card_allCanon (L : RowLocal) (k H : ℕ) :
-    (allCanon L k H).card = T L (H + k) H := (T_eq_toFinset_card L (H + k) H).symm
+lemma card_animals (L : RowLocal) (k H : ℕ) :
+    (animals L k H).card = T L (H + k) H := (T_eq_toFinset_card L (H + k) H).symm
 
 /-- **Walk-top canonical sets**: the canonical `(n = H + k, H)` animals whose
 top row `H - 1` is a walk row. -/
 noncomputable def Dc (L : RowLocal) (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
-  (allCanon L k H).filter fun S => rowSize S ((H : ℤ) - 1) = 1
+  (animals L k H).filter fun S => rowSize S ((H : ℤ) - 1) = 1
 
 /-- `d L k H`: the number of canonical height-`H` surplus-`k` `L`-animals whose
 top row is a walk row — the primary object of the peeling recursion. -/
@@ -78,12 +78,12 @@ noncomputable def d (L : RowLocal) (k H : ℕ) : ℕ := (Dc L k H).card
 /-- **Propositional characterization of `Dc`**: membership is exactly
 canonicality plus walk top row. -/
 theorem mem_Dc {L : RowLocal} {k H : ℕ} {S : Finset (ℤ × ℤ)} :
-    S ∈ Dc L k H ↔ IsCanonical L (H + k) H S ∧ rowSize S ((H : ℤ) - 1) = 1 := by
-  rw [Dc, Finset.mem_filter, mem_allCanon]
+    S ∈ Dc L k H ↔ IsAnimal L (H + k) H S ∧ rowSize S ((H : ℤ) - 1) = 1 := by
+  rw [Dc, Finset.mem_filter, mem_animals]
 
 /-- The walk-top part of the full enumeration is exactly `Dc L k H`. -/
-lemma filter_allCanon_walkTop (L : RowLocal) (k H : ℕ) :
-    (allCanon L k H).filter (fun S => rowSize S ((H : ℤ) - 1) = 1) = Dc L k H := rfl
+lemma filter_animals_walkTop (L : RowLocal) (k H : ℕ) :
+    (animals L k H).filter (fun S => rowSize S ((H : ℤ) - 1) = 1) = Dc L k H := rfl
 
 /-! ## Cluster configurations, aggregated by (rows ℓ, surplus j) -/
 

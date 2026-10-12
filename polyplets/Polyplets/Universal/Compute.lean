@@ -163,9 +163,9 @@ instance instDecidableConn (L : RowLocal) : DecidablePred (Conn L) := fun S =>
   decidable_of_iff _ (conn_iff_reach L S).symm
 
 /-- Canonicality is decidable. -/
-instance instDecidableIsCanonical (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × ℤ)) :
-    Decidable (IsCanonical L n H S) :=
-  decidable_of_iff _ isCanonical_iff_and.symm
+instance instDecidableIsAnimal (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × ℤ)) :
+    Decidable (IsAnimal L n H S) :=
+  decidable_of_iff _ isAnimal_iff_and.symm
 
 /-! ## The computable counter -/
 
@@ -174,15 +174,15 @@ box `[0, W-1] × [0, H-1]` and count the canonical ones. Pure brute force —
 exponential in `W · H`, meant for anchor cells only. The box is
 `Compute.lean`'s (`Polyplets.box`), reused with an explicit width. -/
 def Tc (L : RowLocal) (W n H : ℕ) : ℕ :=
-  (((Polyplets.box W H).powersetCard n).filter fun S => IsCanonical L n H S).card
+  (((Polyplets.box W H).powersetCard n).filter fun S => IsAnimal L n H S).card
 
 /-- **The computable counter agrees with `T L`**, provided the box is wide
 enough to contain every canonical animal: `M · (n − 1) ≤ W − 1`
-(`Universal/Finite.lean`'s `canonical_x_le`). -/
+(`Universal/Finite.lean`'s `animal_x_le`). -/
 theorem Tc_eq_T (L : RowLocal) (W n H : ℕ) (hW : L.M * ((n : ℤ) - 1) ≤ (W : ℤ) - 1) :
     Tc L W n H = T L n H := by
-  have hset : ((Polyplets.box W H).powersetCard n).filter (fun S => IsCanonical L n H S)
-      = (canonical_finite L n H).toFinset := by
+  have hset : ((Polyplets.box W H).powersetCard n).filter (fun S => IsAnimal L n H S)
+      = (animals_finite L n H).toFinset := by
     ext S
     simp only [Finset.mem_filter, Finset.mem_powersetCard, Set.Finite.mem_toFinset,
       Set.mem_setOf_eq]
@@ -192,7 +192,7 @@ theorem Tc_eq_T (L : RowLocal) (W n H : ℕ) (hW : L.M * ((n : ℤ) - 1) ≤ (W 
       refine ⟨⟨fun p hp => ?_, h.card⟩, h⟩
       rw [Polyplets.mem_box]
       obtain ⟨B, hB1, hB2⟩ : ∃ B : ℤ, p.1 ≤ B ∧ B ≤ (W : ℤ) - 1 :=
-        ⟨_, canonical_x_le h hp, hW⟩
+        ⟨_, animal_x_le h hp, hW⟩
       have hx0 := h.anchored.x_nonneg p hp
       have hy0 := h.anchored.y_nonneg p hp
       have hy1 := h.y_le p hp

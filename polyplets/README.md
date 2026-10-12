@@ -1,6 +1,6 @@
 # polyplets — the Lean development
 
-Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 43 modules, about 15,200 lines,
+Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 42 modules, about 15,100 lines,
 no `sorry`, no `native_decide`; every theorem the report or an L-paper cites
 is on the standard three axioms, guarded in `Audit.lean`. The quality pass
 in progress is `OVERHAUL.md`. `Polyplets/Report.lean` states each claim of
@@ -68,11 +68,14 @@ the enumeration, no holdout exists, and no banked term uses it.
 
 ## How the proof goes
 
-Definitions (`Defs.lean`): a fixed polyplet is a finite set of cells of ℤ²,
-king-connected, anchored with min x = min y = 0; `T n H` is the number with
-n cells and max y = H − 1, `a n` the row sum (`Sequence.lean`). `Finite.lean` bounds the width so these are finite;
-`Compute.lean` decides king-connectivity, so `IsCanonical` is decidable; the
-small cells are decided by the kernel through the enumerator of `Enum.lean`.
+Definitions (`Defs.lean`): `IsPolyplet n S` says `S` is a finite set of `n`
+cells of ℤ², king-connected, anchored with min x = min y = 0 (one
+representative per translation class, so these are the fixed polyplets);
+`a n` is the number of them and `T n H` the number whose bounding-box
+`height` is `H`. `Sequence.lean` bounds the width and height so both sets
+are finite and proves `a n = Σ_H T n H`; `Compute.lean` decides
+king-connectivity, so `IsPolyplet` is decidable; the small cells are decided
+by the kernel through the enumerator of `Enum.lean`.
 
 The peeling recursion (`Universal/Separation`, `Universal/Weights`,
 `Universal/Peel`, proved for every row-local lattice; `King.lean` reads the
@@ -121,7 +124,7 @@ diagonal law with the concrete `Pp<k>` of `Pin.lean`. The 19 polynomials in
 `pin-data.md` by `scripts/extract_pin_data.py`); a wrong coefficient fails
 the anchor evaluations in `PinAll`.
 
-Symmetry (`Symmetry.lean`): the dihedral group acts by apply-then-reanchor;
+Symmetry (`Symmetry.lean`): the dihedral group acts by apply-then-anchor;
 `R90`, `R180`, `Hm`, `Dm` are the fixed-point counts, `Free`, `OneSided`,
 `Bilateral` the orbit counts, and the three identities are Burnside.
 
@@ -135,10 +138,9 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le : λ ≤ 3125/256` and
 
 | module | what |
 |---|---|
-| `Defs` | king adjacency, connectivity, canonical form, `T` |
-| `Finite` | width bound; `T` as a `Finset.card` |
-| `Compute` | decidable king-connectivity and `IsCanonical`; the enumeration box |
-| `Sequence` | `a n`, `a_eq_sum` |
+| `Defs` | king adjacency and connectivity, `IsPolyplet`, `a`, `height`, `T` |
+| `Sequence` | width and height bounds, finiteness, `a_eq_sum` |
+| `Compute` | decidable king-connectivity and `IsPolyplet`; the enumeration box |
 | `Weights` | the king `d`, `V`, `Vt` as computable enumerations, window independence, `V 1 1 = 25`, `d 0 1 = 1` |
 | `King` | `kingLattice`; the generic objects agree with the king ones; `d_rec`, `c_ident`, `shape_production`, `production_int_all`, `T_diag_pow` in king vocabulary |
 | `DiscreteCalculus` | the discrete antiderivative, integer values by finite differences |

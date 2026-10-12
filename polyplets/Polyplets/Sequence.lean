@@ -5,86 +5,57 @@ Authors: Jason H Parker
 -/
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Order.Lattice.Nat
-import Polyplets.Compute
+import Polyplets.Defs
 
 /-!
-# The sequence `a n`: fixed polyplets of `n` cells (A006770)
+# Bounds on polyplets: finiteness, the height range, `a` as a row sum
 
-`Defs.lean` counts polyplets *resolved by height* (`T n H`). The paper's
-headline object is the height-blind total `a n = Σ_H T n H`, the sequence
-A006770. This file introduces it.
+`Defs.lean` defines `IsPolyplet`, the two counts `a n = (polyplets n).ncard`
+and `T n H = (heightClass n H).ncard`, and the bounding-box `height`. This
+file proves what makes those counts genuine cardinalities and ties them
+together:
 
-`a n` is defined the same way `T n H` is — as the `Set.ncard` of the set of
-origin-anchored canonical representatives, here with the height clauses of
-`IsCanonical` dropped (`IsCanonicalAnimal`). Keeping the definition parallel
-to `T`'s means downstream work (symmetry counting, the Fekete ladder) can act
-on the *set* directly rather than on a sum of `T`s.
-
-The bridge between the two is the **height function**
-`heightOf S = (sup of the y-coordinates) + 1`, for which
-
-* `isCanonical_iff` : `IsCanonical n H S ↔ IsCanonicalAnimal n S ∧ heightOf S = H`
-* `heightOf_le` / `one_le_heightOf` : `1 ≤ heightOf S ≤ n` on canonical animals
-
-so that the canonical animals of size `n` partition, by height, into the `n`
-height classes counted by `T n 1, …, T n n`:
-
-* `a_eq_sum` : `a n = ∑ H ∈ Finset.Icc 1 n, T n H`.
-
-The upper height bound is the row analogue of `Finite.lean`'s `canonical_x_le`;
-both are instances of one anchored-projection lemma (`card_bound_of_anchored`).
-
-Finally the paper's §9 strip-capture lower bound `strip_sum_le_a`.
+* `IsPolyplet.x_le` / `IsPolyplet.y_le` : every cell of a polyplet of `n`
+  cells has coordinates `≤ n - 1`, both from one anchored-projection lemma
+  (`card_bound_of_anchored`: king paths skip no value, so `0, 1, …, proj p`
+  are all attained);
+* `polyplets_finite` / `heightClass_finite` : hence both sets are finite, and
+  `T_eq_toFinset_card` reads `T` as a `Finset.card`;
+* `IsPolyplet.height_le` and `height_eq_iff` : `1 ≤ height S ≤ n`, and
+  `height S = H` says exactly that every `y ≤ H - 1` with some `y = H - 1`
+  (`mem_heightClass_iff` is the five-clause form of membership in
+  `heightClass n H`);
+* `a_eq_sum` : `a n = ∑ H ∈ Finset.Icc 1 n, T n H`, the polyplets of `n`
+  cells partitioned by height;
+* `strip_sum_le_a` : the paper's §9 strip-capture lower bound.
 -/
 
 namespace Polyplets
 
 open scoped BigOperators
 
-/-! ## The height-blind canonical set -/
+/-! ## The height of a polyplet -/
 
-/-- `S` is the origin-anchored representative of a fixed polyplet of `n` cells,
-of any height: `n` cells, king-connected, with minimum x- and y-coordinate `0`.
-This is `IsCanonical` with the two height clauses dropped. -/
-structure IsCanonicalAnimal (n : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
-  /-- `n` cells. -/
-  card : S.card = n
-  /-- King-connected. -/
-  conn : KingConnected S
-  /-- Bounding box at the origin. -/
-  anchored : Anchored S
-
-/-- `a n`: the number of fixed polyplets of `n` cells (A006770), i.e. the number
-of origin-anchored canonical representatives of any height. As with `T`,
-`Set.ncard` returns the junk value `0` on infinite sets; `canonicalAnimal_finite`
-shows that never happens. Note `a 0 = 0`: the empty set fails the `∃ p ∈ S`
-anchoring clauses, so every statement below carries `1 ≤ n`. -/
-noncomputable def a (n : ℕ) : ℕ := {S : Finset (ℤ × ℤ) | IsCanonicalAnimal n S}.ncard
-
-/-! ## The height function -/
-
-/-- The bounding-box height of a cell set: one more than the largest
-y-coordinate. Taken through `Int.toNat` so that it is a total `ℕ`-valued
-function needing no nonemptiness hypothesis; on a canonical animal every
-y-coordinate is `≥ 0`, so no information is lost. -/
-def heightOf (S : Finset (ℤ × ℤ)) : ℕ := S.sup (fun p => p.2.toNat) + 1
-
-/-- Heights are positive, definitionally. -/
-lemma one_le_heightOf (S : Finset (ℤ × ℤ)) : 1 ≤ heightOf S := Nat.le_add_left 1 _
-
-/-- **`IsCanonical` is `IsCanonicalAnimal` at a pinned height.** The two extra
-clauses of `IsCanonical` — every `y ≤ H - 1`, some `y = H - 1` — say exactly
-that the y-coordinates attain their maximum at `H - 1`, which is
-`heightOf S = H`. Both sides force `S` to be nonempty (via the `x = 0` anchor),
-so no size hypothesis is needed; at `n = 0` both sides are simply false. -/
-lemma isCanonical_iff (n H : ℕ) (S : Finset (ℤ × ℤ)) :
-    IsCanonical n H S ↔ IsCanonicalAnimal n S ∧ heightOf S = H := by
+/-- **`height S = H` in two clauses.** On a polyplet, `height S = H` says
+exactly that every `y ≤ H - 1` and some `y = H - 1`: the y-coordinates attain
+their maximum at `H - 1`. -/
+lemma height_eq_iff {n H : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) :
+    height S = H ↔ (∀ p ∈ S, p.2 ≤ (H : ℤ) - 1) ∧ ∃ p ∈ S, p.2 = (H : ℤ) - 1 := by
+  have hnn : ∀ p ∈ S, 0 ≤ p.2 := hS.anchored.y_nonneg
+  obtain ⟨p0, hp0S, -⟩ := hS.anchored.x_zero
+  obtain ⟨pm, hpmS, hpm⟩ :=
+    Finset.exists_mem_eq_sup S ⟨p0, hp0S⟩ (fun p : ℤ × ℤ => p.2.toNat)
   constructor
-  · intro hS
-    obtain ⟨pmax, hmaxS, hmax⟩ := hS.y_top
-    have hnn : ∀ p ∈ S, 0 ≤ p.2 := hS.anchored.y_nonneg
-    have hub : ∀ p ∈ S, p.2 ≤ (H : ℤ) - 1 := hS.y_le
-    refine ⟨⟨hS.card, hS.conn, hS.anchored⟩, ?_⟩
+  · intro hh
+    simp only [height] at hh
+    refine ⟨fun p hp => ?_, pm, hpmS, ?_⟩
+    · have hle : p.2.toNat ≤ S.sup (fun p : ℤ × ℤ => p.2.toNat) :=
+        Finset.le_sup (f := fun p : ℤ × ℤ => p.2.toNat) hp
+      have := hnn p hp
+      omega
+    · have := hnn pm hpmS
+      omega
+  · rintro ⟨hub, pmax, hmaxS, hmax⟩
     have hsuple : S.sup (fun p : ℤ × ℤ => p.2.toNat) ≤ H - 1 :=
       Finset.sup_le fun p hp => by
         have h1 := hnn p hp
@@ -93,22 +64,17 @@ lemma isCanonical_iff (n H : ℕ) (S : Finset (ℤ × ℤ)) :
     have hlesup : pmax.2.toNat ≤ S.sup (fun p : ℤ × ℤ => p.2.toNat) :=
       Finset.le_sup (f := fun p : ℤ × ℤ => p.2.toNat) hmaxS
     have hnnmax := hnn pmax hmaxS
-    simp only [heightOf]
+    simp only [height]
     omega
-  · rintro ⟨hA, hh⟩
-    obtain ⟨p0, hp0S, -⟩ := hA.anchored.x_zero
-    obtain ⟨pm, hpmS, hpm⟩ :=
-      Finset.exists_mem_eq_sup S ⟨p0, hp0S⟩ (fun p : ℤ × ℤ => p.2.toNat)
-    have hnn : ∀ p ∈ S, 0 ≤ p.2 := hA.anchored.y_nonneg
-    simp only [heightOf] at hh
-    refine ⟨hA.card, hA.conn, hA.anchored, ?_, pm, hpmS, ?_⟩
-    · intro p hp
-      have hle : p.2.toNat ≤ S.sup (fun p : ℤ × ℤ => p.2.toNat) :=
-        Finset.le_sup (f := fun p : ℤ × ℤ => p.2.toNat) hp
-      have := hnn p hp
-      omega
-    · have := hnn pm hpmS
-      omega
+
+/-- Membership in `heightClass n H`, spelled out: a polyplet of `n` cells with
+no cell above row `H - 1` and a cell on it. -/
+lemma mem_heightClass_iff {n H : ℕ} {S : Finset (ℤ × ℤ)} :
+    S ∈ heightClass n H ↔
+      IsPolyplet n S ∧ (∀ p ∈ S, p.2 ≤ (H : ℤ) - 1) ∧ ∃ p ∈ S, p.2 = (H : ℤ) - 1 := by
+  rw [mem_heightClass]
+  exact ⟨fun ⟨h, hh⟩ => ⟨h, (height_eq_iff h).mp hh⟩,
+    fun ⟨h, hh⟩ => ⟨h, (height_eq_iff h).mpr hh⟩⟩
 
 /-! ## Uniform coordinate bounds -/
 
@@ -116,8 +82,8 @@ lemma isCanonical_iff (n H : ℕ) (S : Finset (ℤ × ℤ)) :
 coordinate `proj` vanishes somewhere on a king-connected `S`, then it is at most
 `n - 1` everywhere on `S`: the values `0, 1, …, proj p` are *all* attained (king
 paths skip no value, `exists_proj_eq_of_cross`), so `S` has at least
-`proj p + 1` distinct `proj`-fibers. This is `Finite.lean`'s `canonical_x_le`
-argument, stated once for both coordinates — and, as the proof shows, without
+`proj p + 1` distinct `proj`-fibers. Stated once for both coordinates — and, as
+the proof shows, without
 needing `proj` to be nonnegative on `S`. -/
 lemma card_bound_of_anchored {n : ℕ} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ}
     (proj : ℤ × ℤ → ℤ)
@@ -144,77 +110,81 @@ lemma card_bound_of_anchored {n : ℕ} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ
   rw [Int.toNat_le] at hbd
   omega
 
-/-- **Uniform width bound** for canonical animals (the `IsCanonical` version is
-`canonical_x_le`). -/
-lemma canonicalAnimal_x_le {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S)
+/-- **Uniform width bound**: every cell of a polyplet of `n` cells has
+`x ≤ n - 1`. -/
+lemma IsPolyplet.x_le {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S)
     {p : ℤ × ℤ} (hp : p ∈ S) : p.1 ≤ (n : ℤ) - 1 :=
   card_bound_of_anchored Prod.fst (fun _ _ h => h.2.1) hS.card hS.conn hS.anchored.x_zero hp
 
-/-- **Uniform height bound** for canonical animals: the row analogue of
-`canonicalAnimal_x_le`. Where `IsCanonical` *assumes* a height bound, a
-canonical animal earns one from connectivity. -/
-lemma canonicalAnimal_y_le {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S)
+/-- **Uniform height bound**: the row analogue of `IsPolyplet.x_le`. -/
+lemma IsPolyplet.y_le {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S)
     {p : ℤ × ℤ} (hp : p ∈ S) : p.2 ≤ (n : ℤ) - 1 :=
   card_bound_of_anchored Prod.snd (fun _ _ h => h.2.2) hS.card hS.conn hS.anchored.y_zero hp
 
-/-- **Height range.** A canonical animal of `n` cells has height between `1`
-and `n`: no row of its bounding box can be skipped, so its height is at most
-its cell count. -/
-lemma heightOf_le {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
-    heightOf S ≤ n := by
+/-- **Height range.** A polyplet of `n` cells has height between `1` and `n`:
+no row of its bounding box can be skipped, so its height is at most its cell
+count. -/
+lemma IsPolyplet.height_le {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) :
+    height S ≤ n := by
   obtain ⟨p0, hp0S, -⟩ := hS.anchored.x_zero
   obtain ⟨pm, hpmS, hpm⟩ :=
     Finset.exists_mem_eq_sup S ⟨p0, hp0S⟩ (fun p : ℤ × ℤ => p.2.toNat)
-  have hy := canonicalAnimal_y_le hS hpmS
+  have hy := hS.y_le hpmS
   have hnn := hS.anchored.y_nonneg pm hpmS
-  simp only [heightOf]
+  simp only [height]
   omega
 
-/-- **Finiteness.** Every canonical animal of `n` cells lives in the box
+/-- **Finiteness.** Every polyplet of `n` cells lives in the box
 `[0, n-1] × [0, n-1]`, so there are only finitely many — hence `a n` is a
 genuine cardinality, not `ncard`'s junk `0`. -/
-lemma canonicalAnimal_finite (n : ℕ) :
-    {S : Finset (ℤ × ℤ) | IsCanonicalAnimal n S}.Finite := by
+lemma polyplets_finite (n : ℕ) : (polyplets n).Finite := by
   apply Set.Finite.subset
     (Finset.powerset (Finset.Icc ((0 : ℤ), (0 : ℤ)) ((n : ℤ) - 1, (n : ℤ) - 1))).finite_toSet
   intro S hS
+  have hS : IsPolyplet n S := hS
   rw [Finset.mem_coe, Finset.mem_powerset]
   intro p hpS
   simp only [Finset.mem_Icc, Prod.le_def]
-  exact ⟨⟨hS.anchored.x_nonneg p hpS, hS.anchored.y_nonneg p hpS⟩,
-    canonicalAnimal_x_le hS hpS, canonicalAnimal_y_le hS hpS⟩
+  exact ⟨⟨hS.anchored.x_nonneg p hpS, hS.anchored.y_nonneg p hpS⟩, hS.x_le hpS, hS.y_le hpS⟩
+
+/-- The height classes are finite too: each is a subset of `polyplets n`. -/
+lemma heightClass_finite (n H : ℕ) : (heightClass n H).Finite :=
+  (polyplets_finite n).subset fun _ hS => hS.1
+
+/-- **`T` is a genuine cardinality.** With finiteness in hand, `T n H` is the
+`Finset.card` of the materialized height class — the concrete object any
+counting or bijection argument works against. -/
+theorem T_eq_toFinset_card (n H : ℕ) :
+    T n H = (heightClass_finite n H).toFinset.card := by
+  rw [T, Set.ncard_eq_toFinset_card _ (heightClass_finite n H)]
 
 /-! ## The sum identity -/
 
-/-- **`a` is the row sum of the height triangle.** `heightOf` sorts the
-canonical animals of `n` cells into height classes; each class is exactly the
-canonical set counted by `T n H` (`isCanonical_iff`), the classes are disjoint
-because `heightOf` is a function, and only heights `1 … n` occur
-(`one_le_heightOf`, `heightOf_le`). Unconditional: at `n = 0` both sides are
-`0` (no canonical animal has `0` cells, and `Finset.Icc 1 0` is empty). -/
+/-- **`a` is the row sum of the height triangle.** `height` sorts the
+polyplets of `n` cells into the height classes counted by `T n H`, the classes
+are disjoint because `height` is a function, and only heights `1 … n` occur
+(`one_le_height`, `IsPolyplet.height_le`). Unconditional: at `n = 0` both
+sides are `0` (no polyplet has `0` cells, and `Finset.Icc 1 0` is empty). -/
 theorem a_eq_sum (n : ℕ) :
     a n = ∑ H ∈ Finset.Icc 1 n, T n H := by
-  have hbi : (canonicalAnimal_finite n).toFinset
-      = (Finset.Icc 1 n).biUnion fun H => (canonical_finite n H).toFinset := by
+  have hbi : (polyplets_finite n).toFinset
+      = (Finset.Icc 1 n).biUnion fun H => (heightClass_finite n H).toFinset := by
     ext S
-    simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq, Finset.mem_biUnion,
-      Finset.mem_Icc]
+    simp only [Set.Finite.mem_toFinset, Finset.mem_biUnion, Finset.mem_Icc, mem_polyplets,
+      mem_heightClass]
     constructor
     · intro hS
-      exact ⟨heightOf S, ⟨one_le_heightOf S, heightOf_le hS⟩,
-        (isCanonical_iff n (heightOf S) S).mpr ⟨hS, rfl⟩⟩
-    · rintro ⟨H, -, hSH⟩
-      exact ((isCanonical_iff n H S).mp hSH).1
+      exact ⟨height S, ⟨one_le_height S, hS.height_le⟩, hS, rfl⟩
+    · rintro ⟨H, -, hS, -⟩
+      exact hS
   have hdisj : ∀ x ∈ Finset.Icc 1 n, ∀ y ∈ Finset.Icc 1 n, x ≠ y →
-      Disjoint ((canonical_finite n x).toFinset) ((canonical_finite n y).toFinset) := by
+      Disjoint ((heightClass_finite n x).toFinset) ((heightClass_finite n y).toFinset) := by
     intro x _ y _ hxy
     rw [Finset.disjoint_left]
     intro S hSx hSy
     rw [Set.Finite.mem_toFinset] at hSx hSy
-    exact hxy ((((isCanonical_iff n x S).mp hSx).2).symm.trans
-      (((isCanonical_iff n y S).mp hSy).2))
-  rw [a, Set.ncard_eq_toFinset_card _ (canonicalAnimal_finite n), hbi,
-    Finset.card_biUnion hdisj]
+    exact hxy (hSx.2.symm.trans hSy.2)
+  rw [a, Set.ncard_eq_toFinset_card _ (polyplets_finite n), hbi, Finset.card_biUnion hdisj]
   exact Finset.sum_congr rfl fun H _ => (T_eq_toFinset_card n H).symm
 
 /-! ## The §9 strip-capture lower bound -/

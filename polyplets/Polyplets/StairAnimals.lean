@@ -170,7 +170,7 @@ theorem cut_append : ∀ {x : List Col} {z : List Col} {p : ℕ},
       simp only [area_cons, Nat.add_sub_cancel_left] at hrec ⊢
       rw [hrec]
 
-/-- The join's second factor, re-anchored, is `y` again. -/
+/-- The join's second factor, anchored, is `y` again. -/
 theorem cut_join {x y : List Col} (hx : Valid x) (hy : Valid y) :
     (cut (area x) (join x y)).1 = x ∧ norm (cut (area x) (join x y)).2 = y := by
   obtain ⟨c, t, rfl⟩ := hy.exists_cons

@@ -20,7 +20,7 @@ paper quotes throughout — exists at all. This file builds it, from the two
 halves of Fekete's argument:
 
 * **Klarner supermultiplicativity** (`a_supermul`): `a m * a n ≤ a (m + n)`,
-  proved by an explicit injection `concat` that welds two canonical animals
+  proved by an explicit injection `concat` that welds two polyplets
   side by side across one king edge, together with the recovery maps
   (`recLeft`, `recRight`) that undo it;
 * **Fekete's lemma**, from Mathlib's `Subadditive.tendsto_lim`, applied to
@@ -39,7 +39,7 @@ The payoff:
 
 ## The concatenation injection
 
-Given canonical `A` (`m` cells) and `B` (`n` cells), let `w = maxX A` be `A`'s
+Given polyplets `A` (`m` cells) and `B` (`n` cells), let `w = maxX A` be `A`'s
 rightmost column, `aY = colTop A w` the top cell of that column, and
 `bY = colTop B 0` the top cell of `B`'s column `0` (nonempty because `B` is
 anchored at `x = 0`). Put `cTop A B = max aY bY` and lift each half so that its
@@ -57,7 +57,7 @@ are king-adjacent, which glues the two connected halves
 Injectivity is by explicit recovery. The **cut** `cutAt C m` is the least `k`
 with `|{p ∈ C : p.1 < k}| = m`; on `C = concat A B` it is `w + 1`, because the
 left count is `< m` for every `k ≤ w` (the bridge cell `(w, cTop)` is missed)
-and exactly `m` at `w + 1`. Splitting at the cut and re-anchoring — in `y` only
+and exactly `m` at `w + 1`. Splitting at the cut and anchoring — in `y` only
 for the left half, in both coordinates for the right — returns `A` and `B`
 (`recLeft_concat`, `recRight_concat`).
 -/
@@ -97,7 +97,7 @@ lemma translate_mk_cancel {e d e' d' : ℤ} (he : e + e' = 0) (hd : d + d' = 0)
 
 /-! ## `a n ≥ 1`: the bar witness
 
-The horizontal bar of `n` cells is canonical, so no `a n` with `n ≥ 1`
+The horizontal bar of `n` cells is a polyplet, so no `a n` with `n ≥ 1`
 vanishes — which is what makes `log (a n)` finite below. -/
 
 /-- The horizontal bar `{(0,0), (1,0), …, (n-1,0)}`. -/
@@ -139,8 +139,8 @@ lemma bar_connected (n : ℕ) : KingConnected (bar n) := by
   rw [Finset.mem_range] at hi hj
   exact (reflTransGen_symm (bar_path i hi)).trans (bar_path j hj)
 
-/-- The bar is a canonical animal. -/
-lemma bar_canonical {n : ℕ} (hn : 1 ≤ n) : IsCanonicalAnimal n (bar n) := by
+/-- The bar is a polyplet. -/
+lemma bar_isPolyplet {n : ℕ} (hn : 1 ≤ n) : IsPolyplet n (bar n) := by
   have h0 : ((0 : ℤ), (0 : ℤ)) ∈ bar n := by
     have := bar_mem (n := n) (i := 0) hn
     simpa using this
@@ -157,14 +157,14 @@ lemma bar_canonical {n : ℕ} (hn : 1 ≤ n) : IsCanonicalAnimal n (bar n) := by
 /-- **`a n ≥ 1` for `n ≥ 1`.** The bar witnesses it. -/
 theorem one_le_a {n : ℕ} (hn : 1 ≤ n) : 1 ≤ a n := by
   rw [a]
-  exact (Set.ncard_pos (canonicalAnimal_finite n)).mpr ⟨bar n, bar_canonical hn⟩
+  exact (Set.ncard_pos (polyplets_finite n)).mpr ⟨bar n, bar_isPolyplet hn⟩
 
 /-- **`a 0 = 0`.** The empty set is the only `0`-cell `Finset`, and it fails the
 anchoring clauses; so supermultiplicativity has to start at `1`. -/
 theorem a_zero : a 0 = 0 := by
-  have hempty : {S : Finset (ℤ × ℤ) | IsCanonicalAnimal 0 S} = ∅ := by
+  have hempty : polyplets 0 = ∅ := by
     ext S
-    simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+    simp only [mem_polyplets, Set.mem_empty_iff_false, iff_false]
     rintro ⟨hcard, -, -, ⟨p, hp, -⟩, -, -⟩
     rw [Finset.card_eq_zero] at hcard
     rw [hcard] at hp
@@ -195,8 +195,8 @@ lemma le_maxX {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ} (hp : p ∈ S) (hnn : 0
   have h' : p.1.toNat ≤ maxX S := h
   omega
 
-/-- `maxX` is attained on a canonical animal. -/
-lemma maxX_mem {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
+/-- `maxX` is attained on a polyplet. -/
+lemma maxX_mem {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) :
     ∃ p ∈ S, p.1 = (maxX S : ℤ) := by
   obtain ⟨p0, hp0, -⟩ := hS.anchored.x_zero
   obtain ⟨pm, hpm, hpme⟩ :=
@@ -242,7 +242,7 @@ def liftA (A B : Finset (ℤ × ℤ)) : ℤ := cTop A B - (colTop A (maxX A : �
 /-- The vertical lift applied to `B` inside `concat A B`. -/
 def liftB (A B : Finset (ℤ × ℤ)) : ℤ := cTop A B - (colTop B 0 : ℤ)
 
-/-- **The concatenation of two canonical animals**: `B` moved one column to the
+/-- **The concatenation of two polyplets**: `B` moved one column to the
 right of `A`, both lifted so their bridge cells share the height `cTop A B`. -/
 def concat (A B : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
   translate (0, liftA A B) A ∪ translate ((maxX A : ℤ) + 1, liftB A B) B
@@ -282,7 +282,7 @@ lemma concat_disjoint {A B : Finset (ℤ × ℤ)} (hA : ∀ p ∈ A, 0 ≤ p.1) 
   omega
 
 /-- The left bridge cell: the top of `A`'s rightmost column, lifted. -/
-lemma bridgeA_mem {m : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnimal m A) :
+lemma bridgeA_mem {m : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A) :
     ((maxX A : ℤ), cTop A B) ∈ translate (0, liftA A B) A := by
   have hmem : ((maxX A : ℤ), (colTop A (maxX A : ℤ) : ℤ)) ∈ A :=
     colTop_mem hA.anchored.y_nonneg (maxX_mem hA)
@@ -293,7 +293,7 @@ lemma bridgeA_mem {m : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnimal 
     rw [liftA]; ring
 
 /-- The right bridge cell: the top of `B`'s column `0`, shifted and lifted. -/
-lemma bridgeB_mem {n : ℕ} {A B : Finset (ℤ × ℤ)} (hB : IsCanonicalAnimal n B) :
+lemma bridgeB_mem {n : ℕ} {A B : Finset (ℤ × ℤ)} (hB : IsPolyplet n B) :
     ((maxX A : ℤ) + 1, cTop A B) ∈ translate ((maxX A : ℤ) + 1, liftB A B) B := by
   have hmem : ((0 : ℤ), (colTop B 0 : ℤ)) ∈ B :=
     colTop_mem hB.anchored.y_nonneg hB.anchored.x_zero
@@ -303,12 +303,12 @@ lemma bridgeB_mem {n : ℕ} {A B : Finset (ℤ × ℤ)} (hB : IsCanonicalAnimal 
   · change cTop A B = (colTop B 0 : ℤ) + liftB A B
     rw [liftB]; ring
 
-/-- **The concatenation is canonical of size `m + n`.** Disjointness gives the
+/-- **The concatenation is a polyplet of `m + n` cells.** Disjointness gives the
 count, the bridge edge gives connectivity, and the lifts were chosen exactly so
 that both anchoring clauses survive. -/
-theorem concat_canonical {m n : ℕ} {A B : Finset (ℤ × ℤ)}
-    (hA : IsCanonicalAnimal m A) (hB : IsCanonicalAnimal n B) :
-    IsCanonicalAnimal (m + n) (concat A B) := by
+theorem concat_isPolyplet {m n : ℕ} {A B : Finset (ℤ × ℤ)}
+    (hA : IsPolyplet m A) (hB : IsPolyplet n B) :
+    IsPolyplet (m + n) (concat A B) := by
   have hcard : (concat A B).card = m + n := by
     rw [concat,
       Finset.card_union_of_disjoint (concat_disjoint hA.anchored.x_nonneg hB.anchored.x_nonneg),
@@ -364,7 +364,7 @@ theorem concat_canonical {m n : ℕ} {A B : Finset (ℤ × ℤ)}
 
 /-! ## Recovery: the concatenation is injective
 
-The cut is located by counting, then each half is re-anchored — the left half in
+The cut is located by counting, then each half is anchored — the left half in
 `y` only (its x-anchor never moved), the right half in both coordinates. -/
 
 /-- The part of `C` strictly left of the vertical line `x = k`. -/
@@ -384,8 +384,8 @@ noncomputable def baseY (S : Finset (ℤ × ℤ)) : ℕ := sInf {k : ℕ | ∃ p
 /-- The least x-coordinate of `S`, as a natural number. -/
 noncomputable def baseX (S : Finset (ℤ × ℤ)) : ℕ := sInf {k : ℕ | ∃ p ∈ S, p.1 = (k : ℤ)}
 
-/-- **A translate of a canonical animal remembers its vertical offset.** -/
-lemma baseY_shift {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) {e d : ℤ}
+/-- **A translate of a polyplet remembers its vertical offset.** -/
+lemma baseY_shift {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) {e d : ℤ}
     (hd : 0 ≤ d) : (baseY (translate (e, d) S) : ℤ) = d := by
   rw [baseY]
   have hmem : d.toNat ∈ {k : ℕ | ∃ p ∈ translate (e, d) S, p.2 = (k : ℤ)} := by
@@ -400,8 +400,8 @@ lemma baseY_shift {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n 
   have hy := hS.anchored.y_nonneg q hq
   omega
 
-/-- **A translate of a canonical animal remembers its horizontal offset.** -/
-lemma baseX_shift {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) {e d : ℤ}
+/-- **A translate of a polyplet remembers its horizontal offset.** -/
+lemma baseX_shift {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) {e d : ℤ}
     (he : 0 ≤ e) : (baseX (translate (e, d) S) : ℤ) = e := by
   rw [baseX]
   have hmem : e.toNat ∈ {k : ℕ | ∃ p ∈ translate (e, d) S, p.1 = (k : ℤ)} := by
@@ -417,8 +417,8 @@ lemma baseX_shift {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n 
   omega
 
 /-- The left part of a concatenation, cut at the right place, is the lifted `A`. -/
-lemma leftOf_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnimal m A)
-    (hB : IsCanonicalAnimal n B) :
+lemma leftOf_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A)
+    (hB : IsPolyplet n B) :
     leftOf (concat A B) ((maxX A : ℤ) + 1) = translate (0, liftA A B) A := by
   ext q
   rw [leftOf, Finset.mem_filter, concat, Finset.mem_union]
@@ -431,8 +431,8 @@ lemma leftOf_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAni
     exact ⟨Or.inl hq, by have := concat_left_x_le hA.anchored.x_nonneg hq; omega⟩
 
 /-- The right part of a concatenation, cut at the right place, is the shifted `B`. -/
-lemma rightOf_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnimal m A)
-    (hB : IsCanonicalAnimal n B) :
+lemma rightOf_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A)
+    (hB : IsPolyplet n B) :
     rightOf (concat A B) ((maxX A : ℤ) + 1) = translate ((maxX A : ℤ) + 1, liftB A B) B := by
   ext q
   rw [rightOf, Finset.mem_filter, concat, Finset.mem_union]
@@ -448,8 +448,8 @@ lemma rightOf_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAn
 count is exactly `m`; at any `k ≤ maxX A` the left part misses `A`'s bridge cell
 `(maxX A, cTop A B)`, so it is a proper subset of the lifted `A` and its count is
 `< m`. Hence the least `k` with left count `m` is `maxX A + 1`. -/
-lemma cutAt_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnimal m A)
-    (hB : IsCanonicalAnimal n B) : cutAt (concat A B) m = maxX A + 1 := by
+lemma cutAt_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A)
+    (hB : IsPolyplet n B) : cutAt (concat A B) m = maxX A + 1 := by
   have hcast : ((maxX A + 1 : ℕ) : ℤ) = (maxX A : ℤ) + 1 := by push_cast; ring
   have hmem : (maxX A + 1) ∈ {k : ℕ | (leftOf (concat A B) (k : ℤ)).card = m} := by
     change (leftOf (concat A B) ((maxX A + 1 : ℕ) : ℤ)).card = m
@@ -485,26 +485,26 @@ lemma cutAt_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnim
   have := hlow (sInf {k : ℕ | (leftOf (concat A B) (k : ℤ)).card = m}) (by omega)
   omega
 
-/-- Recovering the left factor: cut, then re-anchor vertically. -/
+/-- Recovering the left factor: cut, then anchor vertically. -/
 noncomputable def recLeft (C : Finset (ℤ × ℤ)) (m : ℕ) : Finset (ℤ × ℤ) :=
   translate (0, -(baseY (leftOf C (cutAt C m : ℤ)) : ℤ)) (leftOf C (cutAt C m : ℤ))
 
-/-- Recovering the right factor: cut, then re-anchor in both coordinates. -/
+/-- Recovering the right factor: cut, then anchor in both coordinates. -/
 noncomputable def recRight (C : Finset (ℤ × ℤ)) (m : ℕ) : Finset (ℤ × ℤ) :=
   translate (-(baseX (rightOf C (cutAt C m : ℤ)) : ℤ), -(baseY (rightOf C (cutAt C m : ℤ)) : ℤ))
     (rightOf C (cutAt C m : ℤ))
 
 /-- `recLeft` inverts `concat` on the left. -/
-theorem recLeft_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnimal m A)
-    (hB : IsCanonicalAnimal n B) : recLeft (concat A B) m = A := by
+theorem recLeft_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A)
+    (hB : IsPolyplet n B) : recLeft (concat A B) m = A := by
   have hcast : ((maxX A + 1 : ℕ) : ℤ) = (maxX A : ℤ) + 1 := by push_cast; ring
   rw [recLeft, cutAt_concat hA hB, hcast, leftOf_concat hA hB,
     baseY_shift hA (liftA_nonneg A B)]
   exact translate_mk_cancel (by ring) (by ring) A
 
 /-- `recRight` inverts `concat` on the right. -/
-theorem recRight_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnimal m A)
-    (hB : IsCanonicalAnimal n B) : recRight (concat A B) m = B := by
+theorem recRight_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsPolyplet m A)
+    (hB : IsPolyplet n B) : recRight (concat A B) m = B := by
   have hcast : ((maxX A + 1 : ℕ) : ℤ) = (maxX A : ℤ) + 1 := by push_cast; ring
   have hw : (0 : ℤ) ≤ (maxX A : ℤ) + 1 := by
     have := Int.natCast_nonneg (maxX A); omega
@@ -512,8 +512,8 @@ theorem recRight_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonica
     baseX_shift hB hw, baseY_shift hB (liftB_nonneg A B)]
   exact translate_mk_cancel (by ring) (by ring) B
 
-/-- **Klarner supermultiplicativity.** `concat` injects pairs of canonical
-animals of sizes `m` and `n` into the canonical animals of size `m + n`;
+/-- **Klarner supermultiplicativity.** `concat` injects pairs of polyplets
+of sizes `m` and `n` into the polyplets of size `m + n`;
 `recLeft`/`recRight` are the left inverse that makes it an injection.
 
 Unconditional: at `m = 0` the left side is `a 0 * a n = 0` and the
@@ -521,18 +521,18 @@ inequality degenerates to `0 ≤ a n`. (The outworks brief pinned a `1 ≤ m`,
 `1 ≤ n` signature; the hypotheses were dead and dropped 2026-07-31.) -/
 theorem a_supermul {m n : ℕ} : a m * a n ≤ a (m + n) := by
   classical
-  have key : ∀ k : ℕ, a k = (canonicalAnimal_finite k).toFinset.card := fun k => by
-    rw [a, Set.ncard_eq_toFinset_card _ (canonicalAnimal_finite k)]
+  have key : ∀ k : ℕ, a k = (polyplets_finite k).toFinset.card := fun k => by
+    rw [a, Set.ncard_eq_toFinset_card _ (polyplets_finite k)]
   rw [key m, key n, key (m + n), ← Finset.card_product]
   refine Finset.card_le_card_of_injOn (fun z => concat z.1 z.2) ?_ ?_
   · intro z hz
     rw [Finset.mem_coe, Finset.mem_product] at hz
-    simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq] at hz
+    simp only [Set.Finite.mem_toFinset, mem_polyplets] at hz
     rw [Finset.mem_coe, Set.Finite.mem_toFinset]
-    exact concat_canonical hz.1 hz.2
+    exact concat_isPolyplet hz.1 hz.2
   · intro z hz w hw heq
     rw [Finset.mem_coe, Finset.mem_product] at hz hw
-    simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq] at hz hw
+    simp only [Set.Finite.mem_toFinset, mem_polyplets] at hz hw
     have hfun : concat z.1 z.2 = concat w.1 w.2 := heq
     have h1 : z.1 = w.1 := by
       rw [← recLeft_concat hz.1 hz.2, ← recLeft_concat hw.1 hw.2, hfun]

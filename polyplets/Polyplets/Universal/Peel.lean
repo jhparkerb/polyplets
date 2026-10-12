@@ -21,7 +21,7 @@ where `b = L.D.card` is the drift count. Both follow from a disjoint split on
 the row profile near the top and three peeling bijections:
 
 * **Class A** (walk top and walk second-top row): erasing the unique top cell
-  and re-anchoring is a bijection onto `L.D × Dc L k (H-1)`; the extra datum is
+  and anchoring is a bijection onto `L.D × Dc L k (H-1)`; the extra datum is
   the x-offset of the top cell over the second-top cell, which is an up-offset
   of `L` (`card_classA`).
 * **Classes B and C** are one bijection, `peel cap H` with `glueTop`, for a
@@ -36,7 +36,7 @@ the row profile near the top and three peeling bijections:
 
 Both share one x-renormalization pattern: the peeled configuration is
 based at its bottom walk cell (making it x-shift-invariant), the remainder is
-re-anchored by `xNorm`, and gluing shifts the configuration onto the
+anchored by `xNorm`, and gluing shifts the configuration onto the
 remainder's unique top cell. Membership is always matched against the
 propositional characterizations `mem_Dc` and `mem_CFG`.
 
@@ -182,7 +182,7 @@ lemma xNorm_eq_self {S : Finset (ℤ × ℤ)} (h0 : ∀ c ∈ S, 0 ≤ c.1)
     (he : ∃ c ∈ S, c.1 = 0) : xNorm S = S := by
   rw [xNorm, minX_eq_zero h0 he, neg_zero, shift_zero]
 
-/-- Shift invariance: re-anchoring forgets any prior x-translation. The
+/-- Shift invariance: anchoring forgets any prior x-translation. The
 workhorse of all three round trips. -/
 lemma xNorm_shift (a : ℤ) {S : Finset (ℤ × ℤ)} (h : S.Nonempty) :
     xNorm (shift a 0 S) = xNorm S := by
@@ -226,13 +226,13 @@ lemma exists_row_xNorm {S : Finset (ℤ × ℤ)} {y : ℤ} (h : ∃ c ∈ S, c.2
   change c.2 + 0 = y
   omega
 
-/-- Canonicality of a re-anchored piece: everything except the x-anchoring is
+/-- Canonicality of a anchored piece: everything except the x-anchoring is
 inherited, and `xNorm` provides the anchoring. -/
-lemma isCanonical_xNorm {n H : ℕ} {S : Finset (ℤ × ℤ)}
+lemma isAnimal_xNorm {n H : ℕ} {S : Finset (ℤ × ℤ)}
     (hcard : S.card = n) (hconn : Conn L S)
     (hy0 : ∀ c ∈ S, 0 ≤ c.2) (hy1 : ∀ c ∈ S, c.2 ≤ (H : ℤ) - 1)
     (he0 : ∃ c ∈ S, c.2 = 0) (he1 : ∃ c ∈ S, c.2 = (H : ℤ) - 1) :
-    IsCanonical L n H (xNorm S) := by
+    IsAnimal L n H (xNorm S) := by
   have hne : S.Nonempty := by
     obtain ⟨c, hc, -⟩ := he0
     exact ⟨c, hc⟩
@@ -357,21 +357,21 @@ lemma rowSize_insert_other {S : Finset (ℤ × ℤ)} {w : ℤ × ℤ} {y : ℤ}
 
 /-! ## Class A: walk top over walk second-top
 
-Peeling the top cell of a class-A animal and re-anchoring is a bijection onto
+Peeling the top cell of a class-A animal and anchoring is a bijection onto
 `L.D × Dc L k (H-1)`; the recorded offset `δ` (top cell x minus second-top cell
 x) is x-shift-invariant, which is what makes the round trips close after
 `xNorm`. This is the ONLY place in the geometric port where the lattice's
 up-offset set is visible, and it is visible only as the index set of the
 bijection — the king file's `{-1, 0, 1}` is `L.D`. -/
 
-/-- Class-A forward map: erase the unique top cell, re-anchor the remainder,
+/-- Class-A forward map: erase the unique top cell, anchor the remainder,
 and record the top cell's x-offset over the second-top cell. -/
 noncomputable def peelA (H : ℕ) (S : Finset (ℤ × ℤ)) : ℤ × Finset (ℤ × ℤ) :=
   ((rowCell S ((H : ℤ) - 1)).1 - (rowCell S ((H : ℤ) - 2)).1,
     xNorm (S.erase (rowCell S ((H : ℤ) - 1))))
 
 /-- Class-A backward map: re-attach a top cell at the recorded offset over the
-remainder's unique top cell, then re-anchor. -/
+remainder's unique top cell, then anchor. -/
 noncomputable def glueA (H : ℕ) (x : ℤ × Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
   xNorm (insert ((rowCell x.2 ((H : ℤ) - 2)).1 + x.1, (H : ℤ) - 1) x.2)
 
@@ -457,7 +457,7 @@ lemma peelA_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
   -- forward membership
   have hR : xNorm S' ∈ Dc L k (H - 1) := by
     rw [mem_Dc]
-    refine ⟨isCanonical_xNorm hS'card hS'conn hS'y0 (fun c hcm => ?_) hS'e0 ?_, ?_⟩
+    refine ⟨isAnimal_xNorm hS'card hS'conn hS'y0 (fun c hcm => ?_) hS'e0 ?_, ?_⟩
     · have := hS'rows c hcm
       omega
     · obtain ⟨c, hcm, hcy⟩ := hS'e1
@@ -585,7 +585,7 @@ lemma glueA_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : ℤ × Finset (ℤ 
     rw [← hu_def, ← hw₀_def, ← hG₀_def]
   have hGmem : glueA H (δ, R) ∈ Dc L k H := by
     rw [hgl, mem_Dc]
-    refine ⟨isCanonical_xNorm hG₀card hG₀conn hG₀y0 hG₀y1 hG₀e0 hG₀e1, ?_⟩
+    refine ⟨isAnimal_xNorm hG₀card hG₀conn hG₀y0 hG₀y1 hG₀e0 hG₀e1, ?_⟩
     rw [rowSize_xNorm]
     exact hG₀top
   have hG2' : rowSize (glueA H (δ, R)) ((H : ℤ) - 2) = 1 := by
@@ -632,7 +632,7 @@ lemma glueA_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : ℤ × Finset (ℤ 
     xNorm_eq_self hcR.anchored.x_nonneg hcR.anchored.x_zero]
 
 /-- **Class-A count**: walk-top animals whose second-top row is also a walk
-row are `b · d L k (H-1)` — the up-offset and the re-anchored remainder are a
+row are `b · d L k (H-1)` — the up-offset and the anchored remainder are a
 bijection. The king file's `3` is `L.D.card = L.b`. -/
 lemma card_classA (k H : ℕ) (hH : k + 2 ≤ H) :
     ((Dc L k H).filter fun S => rowSize S ((H : ℤ) - 2) = 1).card
@@ -718,12 +718,12 @@ lemma clusterBottom_spec {S : Finset (ℤ × ℤ)} {t : ℤ} (ht : 0 ≤ t)
     · exact hmulti y (by omega) hy2
 
 /-- The peeled-data type of classes B and C: surplus `j`, cluster rows `ℓ`,
-the based configuration, and the re-anchored walk-top remainder. -/
+the based configuration, and the anchored walk-top remainder. -/
 abbrev PeelData : Type :=
   Σ _ : ℕ, Σ _ : ℕ, Finset (ℤ × ℤ) × Finset (ℤ × ℤ)
 
 /-- Backward map of classes B and C: shift the configuration so its origin
-lands on the remainder's unique top cell (row `t - ℓ`), union, re-anchor.
+lands on the remainder's unique top cell (row `t - ℓ`), union, anchor.
 `t` is the cluster's top row: `H - 2` for class B, `H - 1` for class C. -/
 noncomputable def glueTop (t : ℤ) (x : PeelData) : Finset (ℤ × ℤ) :=
   xNorm (x.2.2.2 ∪
@@ -733,7 +733,7 @@ noncomputable def glueTop (t : ℤ) (x : PeelData) : Finset (ℤ × ℤ) :=
 `t = H - 1 - cap` has `cap` walk rows above it: peel the maximal cluster over
 rows `[b, t]` (`b = clusterBottom`) together with the walk cell on row `b - 1`
 and the `cap` walk cells above; the configuration is based at the row-`(b-1)`
-walk cell, the remainder `[0, b-1]` is re-anchored. Class B is `cap = 1`,
+walk cell, the remainder `[0, b-1]` is anchored. Class B is `cap = 1`,
 class C is `cap = 0`. -/
 noncomputable def peel (cap H : ℕ) (S : Finset (ℤ × ℤ)) : PeelData :=
   ⟨(seg S (clusterBottom S ((H : ℤ) - 1 - cap)) ((H : ℤ) - 1 - cap)).card
@@ -802,7 +802,7 @@ lemma seg_xShift (a r r' : ℤ) (S : Finset (ℤ × ℤ)) :
     seg (shift a 0 S) r r' = shift a 0 (seg S r r') := by
   rw [seg_shift, sub_zero, sub_zero]
 
-/-- The re-anchored bottom band `[0, b-1]` of a connected animal with a walk
+/-- The anchored bottom band `[0, b-1]` of a connected animal with a walk
 row at `b - 1` is a walk-top canonical animal of height `b`. Shared by all
 three peeling classes. -/
 lemma xNorm_seg_mem_Dc {k' H' : ℕ} {S : Finset (ℤ × ℤ)} {b : ℤ}
@@ -827,7 +827,7 @@ lemma xNorm_seg_mem_Dc {k' H' : ℕ} {S : Finset (ℤ × ℤ)} {b : ℤ}
   have he1 : ∃ c ∈ seg S 0 (b - 1), c.2 = (H' : ℤ) - 1 := by
     obtain ⟨c, hcS, hc2⟩ := hwr.exists_mem
     exact ⟨c, mem_seg.mpr ⟨hcS, by omega, by omega⟩, by omega⟩
-  refine ⟨isCanonical_xNorm hcard hconnQ hyQ0 hyQ1 he0 he1, ?_⟩
+  refine ⟨isAnimal_xNorm hcard hconnQ hyQ0 hyQ1 he0 he1, ?_⟩
   rw [rowSize_xNorm, show (H' : ℤ) - 1 = b - 1 by omega, rowSize_seg (by omega) le_rfl]
   exact hwb
 
@@ -843,7 +843,7 @@ lemma sum_rowSize_walk {S : Finset (ℤ × ℤ)} {a b : ℤ}
 the walk row below the cluster, and the cell-count identities the bijection
 needs. -/
 lemma cluster_facts {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {S : Finset (ℤ × ℤ)}
-    (hSc : IsCanonical L (H + k) H S)
+    (hSc : IsAnimal L (H + k) H S)
     (hw : ∀ y : ℤ, (H : ℤ) - 1 - cap < y → y ≤ (H : ℤ) - 1 → rowSize S y = 1)
     (hm : ¬ rowSize S ((H : ℤ) - 1 - cap) = 1) :
     1 ≤ clusterBottom S ((H : ℤ) - 1 - cap) ∧
@@ -862,7 +862,7 @@ lemma cluster_facts {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {S : Finset (ℤ ×
       = (seg S (clusterBottom S ((H : ℤ) - 1 - cap)) ((H : ℤ) - 1 - cap)).card + 1 + cap := by
   set t : ℤ := (H : ℤ) - 1 - cap with ht_def
   have hocc : ∀ y, 0 ≤ y → y ≤ (H : ℤ) - 1 → 1 ≤ rowSize S y := fun y h0 h1 =>
-    Finset.card_pos.mpr (canonical_fiber_nonempty hSc h0 h1)
+    Finset.card_pos.mpr (animal_fiber_nonempty hSc h0 h1)
   have hm2 : 2 ≤ rowSize S t := by
     have := hocc t (by omega) (by omega)
     omega
@@ -931,7 +931,7 @@ lemma cluster_facts {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {S : Finset (ℤ ×
 /-- Forward well-definedness and the peel-then-glue round trip for classes B
 and C. -/
 lemma peel_mem_and_glue {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {S : Finset (ℤ × ℤ)}
-    (hSc : IsCanonical L (H + k) H S)
+    (hSc : IsAnimal L (H + k) H S)
     (hw : ∀ y : ℤ, (H : ℤ) - 1 - cap < y → y ≤ (H : ℤ) - 1 → rowSize S y = 1)
     (hm : ¬ rowSize S ((H : ℤ) - 1 - cap) = 1) :
     peel cap H S ∈ target L cap k H ∧ glueTop ((H : ℤ) - 1 - cap) (peel cap H S) = S := by
@@ -987,7 +987,7 @@ lemma peel_mem_and_glue {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {S : Finset (�
   have hC0V : C0 ∈ CFG L cap ln jn := by
     rw [mem_CFG]
     exact ⟨hC0card, h00, hC0rows, hC0r0, hC0cap, hC0multi, conn_shift _ _ hPconn⟩
-  -- the re-anchored remainder is a shorter walk-top animal
+  -- the anchored remainder is a shorter walk-top animal
   have hR0 : xNorm (seg S 0 (b - 1)) ∈ Dc L (k - jn) (H - cap - ln) :=
     xNorm_seg_mem_Dc hSc.conn hSc.anchored.y_nonneg hb1 (by omega) hwalkb
       hSc.anchored.y_zero (by omega)
@@ -1039,7 +1039,7 @@ and C: the glued animal is canonical, its `cap` top rows are walk rows, its row
 `t = H - 1 - cap` is not, and peeling recovers the data. -/
 lemma glue_mem_and_peel {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {x : PeelData}
     (hx : x ∈ target L cap k H) :
-    (IsCanonical L (H + k) H (glueTop ((H : ℤ) - 1 - cap) x) ∧
+    (IsAnimal L (H + k) H (glueTop ((H : ℤ) - 1 - cap) x) ∧
       (∀ y : ℤ, (H : ℤ) - 1 - cap < y → y ≤ (H : ℤ) - 1 →
         rowSize (glueTop ((H : ℤ) - 1 - cap) x) y = 1) ∧
       ¬ rowSize (glueTop ((H : ℤ) - 1 - cap) x) ((H : ℤ) - 1 - cap) = 1) ∧
@@ -1153,7 +1153,7 @@ lemma glue_mem_and_peel {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {x : PeelData}
     rw [rowSize, Finset.filter_union, filter_row_eq_singleton hwRr huR huy,
       filter_row_eq_singleton hwC'r huC' huy, Finset.union_self]
     exact Finset.card_singleton u
-  refine ⟨⟨isCanonical_xNorm hcardU hconnU hUy0 hUy1 hUe0 hUe1,
+  refine ⟨⟨isAnimal_xNorm hcardU hconnU hUy0 hUy1 hUe0 hUe1,
     fun y h1 h2 => by rw [rowSize_xNorm]; exact hGcap y h1 h2,
     by rw [rowSize_xNorm]; omega⟩, ?_⟩
   -- the round trip: peel the glued animal back apart
@@ -1272,7 +1272,7 @@ rows and whose row `H - 1 - cap` is not are counted by configurations with
 `cap` walk rows on top times shorter walk-top remainders, aggregated over
 `(j, ℓ)`. Class B is `cap = 1`, class C is `cap = 0`. -/
 lemma card_class (cap k H : ℕ) (hH : k + 1 + cap ≤ H) :
-    ((allCanon L k H).filter fun S =>
+    ((animals L k H).filter fun S =>
       CapWalk cap H S ∧ ¬ rowSize S ((H : ℤ) - 1 - cap) = 1).card =
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
         (CFG L cap ℓ j).card * d L (k - j) (H - cap - ℓ) := by
@@ -1285,16 +1285,16 @@ lemma card_class (cap k H : ℕ) (hH : k + 1 + cap ≤ H) :
   rw [← htarget]
   refine Finset.card_nbij' (peel cap H) (glueTop ((H : ℤ) - 1 - cap)) ?_ ?_ ?_ ?_
   · intro S hS
-    rw [Finset.mem_coe, Finset.mem_filter, mem_allCanon] at hS
+    rw [Finset.mem_coe, Finset.mem_filter, mem_animals] at hS
     rw [Finset.mem_coe]
     exact (peel_mem_and_glue hH hS.1 (capWalk_iff.mp hS.2.1) hS.2.2).1
   · intro x hx
     rw [Finset.mem_coe] at hx
-    rw [Finset.mem_coe, Finset.mem_filter, mem_allCanon]
+    rw [Finset.mem_coe, Finset.mem_filter, mem_animals]
     obtain ⟨⟨h1, h2, h3⟩, -⟩ := glue_mem_and_peel hH hx
     exact ⟨h1, capWalk_iff.mpr h2, h3⟩
   · intro S hS
-    rw [Finset.mem_coe, Finset.mem_filter, mem_allCanon] at hS
+    rw [Finset.mem_coe, Finset.mem_filter, mem_animals] at hS
     exact (peel_mem_and_glue hH hS.1 (capWalk_iff.mp hS.2.1) hS.2.2).2
   · intro x hx
     rw [Finset.mem_coe] at hx
@@ -1307,7 +1307,7 @@ lemma card_classB (k H : ℕ) (hH : k + 2 ≤ H) :
     ((Dc L k H).filter fun S => ¬ rowSize S ((H : ℤ) - 2) = 1).card =
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, V L ℓ j * d L (k - j) (H - 1 - ℓ) := by
   have key : ((Dc L k H).filter fun S => ¬ rowSize S ((H : ℤ) - 2) = 1)
-      = (allCanon L k H).filter fun S =>
+      = (animals L k H).filter fun S =>
         CapWalk 1 H S ∧ ¬ rowSize S ((H : ℤ) - 1 - ((1 : ℕ) : ℤ)) = 1 := by
     rw [Dc, Finset.filter_filter]
     refine Finset.filter_congr fun S _ => ?_
@@ -1319,10 +1319,10 @@ lemma card_classB (k H : ℕ) (hH : k + 2 ≤ H) :
 top-edge cluster configurations times shorter walk-top remainders, aggregated
 over `(j, ℓ)`. The `cap = 0` case of `card_class`. -/
 lemma card_classC (k H : ℕ) (hH : k + 1 ≤ H) :
-    ((allCanon L k H).filter fun S => ¬ rowSize S ((H : ℤ) - 1) = 1).card =
+    ((animals L k H).filter fun S => ¬ rowSize S ((H : ℤ) - 1) = 1).card =
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, Vt L ℓ j * d L (k - j) (H - ℓ) := by
-  have key : ((allCanon L k H).filter fun S => ¬ rowSize S ((H : ℤ) - 1) = 1)
-      = (allCanon L k H).filter fun S =>
+  have key : ((animals L k H).filter fun S => ¬ rowSize S ((H : ℤ) - 1) = 1)
+      = (animals L k H).filter fun S =>
         CapWalk 0 H S ∧ ¬ rowSize S ((H : ℤ) - 1 - ((0 : ℕ) : ℤ)) = 1 := by
     refine Finset.filter_congr fun S _ => ?_
     rw [Nat.cast_zero, sub_zero]
@@ -1353,9 +1353,9 @@ theorem c_ident (L : RowLocal) (k H : ℕ) (hH : k + 1 ≤ H) :
     T L (H + k) H = d L k H +
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, Vt L ℓ j * d L (k - j) (H - ℓ) := by
   classical
-  have hsplit := Finset.card_filter_add_card_filter_not (s := allCanon L k H)
+  have hsplit := Finset.card_filter_add_card_filter_not (s := animals L k H)
     (fun S => rowSize S ((H : ℤ) - 1) = 1)
-  rw [← card_allCanon, ← hsplit, filter_allCanon_walkTop, card_classC k H hH]
+  rw [← card_animals, ← hsplit, filter_animals_walkTop, card_classC k H hH]
   rfl
 
 end Polyplets.Universal

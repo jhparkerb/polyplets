@@ -3,6 +3,9 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
+import Mathlib.Algebra.Order.Group.Abs
+import Mathlib.Data.Int.ConditionallyCompleteOrder
+import Mathlib.Data.Int.Interval
 import Mathlib.Data.Set.Card
 import Polyplets.Universal.Defs
 
@@ -134,49 +137,103 @@ lemma exists_edge_of_connected {S : Finset (ℤ × ℤ)} (hS : KingConnected S)
         · exact ih hb
   exact key q (hS p hp q hq) hPq
 
-/-- `S` is the canonical (origin-anchored) representative of a fixed polyplet of
-`n` cells with bounding-box height exactly `H`: it has `n` cells, is
-king-connected, its bounding box sits at the origin (`Anchored`), and its
-maximum y-coordinate is `H - 1` (so the y-extent is exactly `H`). The x-extent
-(width) is unconstrained. -/
-structure IsCanonical (n H : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+/-! ## King paths skip no coordinate value -/
+
+/-- **King paths don't skip a coordinate value.** For any `1`-Lipschitz
+coordinate `proj` (king steps move it by at most one), if a king path inside `S`
+runs from a cell with `proj ≤ k` to a cell with `proj ≥ k+1`, then some cell of
+`S` sits exactly at `proj = k`: the step crossing the `k`/`k+1` boundary lands
+on it. Instantiated at `Prod.fst`/`Prod.snd` for columns and rows below. -/
+lemma exists_proj_eq_of_cross {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
+    (proj : ℤ × ℤ → ℤ)
+    (hlip : ∀ a b : ℤ × ℤ, kingAdj a b → |proj a - proj b| ≤ 1)
+    (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q)
+    (hp : proj p ≤ k) (hq : k + 1 ≤ proj q) : ∃ c ∈ S, proj c = k := by
+  revert hq
+  induction h with
+  | refl => intro hq; exact absurd hq (by omega)
+  | @tail b c _ hbc ih =>
+      intro hq
+      by_cases hb : k + 1 ≤ proj b
+      · exact ih hb
+      · exact ⟨b, hbc.1, by have h2 := hlip b c hbc.2.2; rw [abs_le] at h2; omega⟩
+
+/-- Column specialization of `exists_proj_eq_of_cross` (`proj = Prod.fst`). -/
+lemma exists_x_eq_of_cross {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
+    (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q)
+    (hp : p.1 ≤ k) (hq : k + 1 ≤ q.1) : ∃ c ∈ S, c.1 = k :=
+  exists_proj_eq_of_cross Prod.fst (fun _ _ hab => hab.2.1) h hp hq
+
+/-- Row specialization of `exists_proj_eq_of_cross` (`proj = Prod.snd`). -/
+lemma exists_y_eq_of_cross {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
+    (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q)
+    (hp : p.2 ≤ k) (hq : k + 1 ≤ q.2) : ∃ c ∈ S, c.2 = k :=
+  exists_proj_eq_of_cross Prod.snd (fun _ _ hab => hab.2.2) h hp hq
+
+/-! ## Polyplets, and the two counts `a` and `T` -/
+
+/-- `S` is a polyplet of `n` cells, as the representative of its translation
+class whose bounding box has its corner at the origin: `n` cells, king-connected,
+`Anchored` (min x = min y = 0). This is the report's fixed polyplet of size `n`;
+`a n` counts these. -/
+structure IsPolyplet (n : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
   /-- `n` cells. -/
   card : S.card = n
   /-- King-connected. -/
   conn : KingConnected S
   /-- Bounding box at the origin. -/
   anchored : Anchored S
-  /-- No cell above row `H - 1`. -/
-  y_le : ∀ p ∈ S, p.2 ≤ (H : ℤ) - 1
-  /-- Row `H - 1` is occupied. -/
-  y_top : ∃ p ∈ S, p.2 = (H : ℤ) - 1
 
-/-- `IsCanonical` as a conjunction (for decidability and for unfolding). -/
-lemma isCanonical_iff_and {n H : ℕ} {S : Finset (ℤ × ℤ)} :
-    IsCanonical n H S ↔ S.card = n ∧ KingConnected S ∧
-      (∀ p ∈ S, 0 ≤ p.1) ∧ (∃ p ∈ S, p.1 = 0) ∧
-      (∀ p ∈ S, 0 ≤ p.2) ∧ (∃ p ∈ S, p.2 = 0) ∧
-      (∀ p ∈ S, p.2 ≤ (H : ℤ) - 1) ∧ (∃ p ∈ S, p.2 = (H : ℤ) - 1) :=
+/-- `IsPolyplet` as a conjunction (for decidability and for unfolding). -/
+lemma isPolyplet_iff_and {n : ℕ} {S : Finset (ℤ × ℤ)} :
+    IsPolyplet n S ↔ S.card = n ∧ KingConnected S ∧
+      (∀ p ∈ S, 0 ≤ p.1) ∧ (∃ p ∈ S, p.1 = 0) ∧ (∀ p ∈ S, 0 ≤ p.2) ∧ (∃ p ∈ S, p.2 = 0) :=
   ⟨fun h => ⟨h.card, h.conn, h.anchored.x_nonneg, h.anchored.x_zero, h.anchored.y_nonneg,
-    h.anchored.y_zero, h.y_le, h.y_top⟩,
-   fun ⟨a, b, c, d, e, f, g, i⟩ => ⟨a, b, ⟨c, d, e, f⟩, g, i⟩⟩
+    h.anchored.y_zero⟩,
+   fun ⟨a, b, c, d, e, f⟩ => ⟨a, b, ⟨c, d, e, f⟩⟩⟩
+
+/-- A polyplet is nonempty (column `0` is occupied). -/
+lemma IsPolyplet.nonempty {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) : S.Nonempty :=
+  hS.anchored.nonempty
+
+/-- The polyplets of `n` cells, as a set of cell sets. -/
+def polyplets (n : ℕ) : Set (Finset (ℤ × ℤ)) := {S | IsPolyplet n S}
+
+lemma mem_polyplets {n : ℕ} {S : Finset (ℤ × ℤ)} : S ∈ polyplets n ↔ IsPolyplet n S := Iff.rfl
+
+/-- `a n`: the number of fixed polyplets of `n` cells (A006770). `Set.ncard`
+returns the junk value `0` on infinite sets; `polyplets_finite`
+(`Sequence.lean`) shows that never happens. `a 0 = 0`: the empty set is not
+anchored, so every statement about `a` carries `1 ≤ n`. -/
+noncomputable def a (n : ℕ) : ℕ := (polyplets n).ncard
+
+/-- The bounding-box height of a cell set: one more than the largest
+y-coordinate. Through `Int.toNat`, so that it is a total `ℕ`-valued function;
+on a polyplet every y-coordinate is `≥ 0`, so nothing is lost. -/
+def height (S : Finset (ℤ × ℤ)) : ℕ := S.sup (fun p => p.2.toNat) + 1
+
+/-- Heights are positive, definitionally. -/
+lemma one_le_height (S : Finset (ℤ × ℤ)) : 1 ≤ height S := Nat.le_add_left 1 _
+
+/-- The polyplets of `n` cells whose bounding box has height `H`. -/
+def heightClass (n H : ℕ) : Set (Finset (ℤ × ℤ)) := {S | IsPolyplet n S ∧ height S = H}
+
+lemma mem_heightClass {n H : ℕ} {S : Finset (ℤ × ℤ)} :
+    S ∈ heightClass n H ↔ IsPolyplet n S ∧ height S = H := Iff.rfl
 
 /-- `T n H`: the number of fixed polyplets of `n` cells whose bounding box has
-height exactly `H`, i.e. the number of origin-anchored canonical
-representatives. `Set.ncard` returns `0` on the infinite case, which never
-arises for the intended `n, H` (finiteness is proved where a theorem needs it).
--/
-noncomputable def T (n H : ℕ) : ℕ :=
-  {S : Finset (ℤ × ℤ) | IsCanonical n H S}.ncard
+height exactly `H`. Finiteness is `heightClass_finite` (`Sequence.lean`), so
+`Set.ncard`'s junk value never arises for the intended `n, H`. -/
+noncomputable def T (n H : ℕ) : ℕ := (heightClass n H).ncard
 
-/-- `T 1 1 = 1`: the single cell `{(0, 0)}` is the only one-cell canonical set.
+/-- `T 1 1 = 1`: the single cell `{(0, 0)}` is the only one-cell polyplet.
 The seed of the `k = 0` diagonal (`King.lean`). -/
 theorem T_1_1 : T 1 1 = 1 := by
   rw [T, Set.ncard_eq_one]
   refine ⟨{(0, 0)}, Set.ext fun S => ?_⟩
-  simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+  simp only [heightClass, Set.mem_setOf_eq, Set.mem_singleton_iff]
   constructor
-  · intro h
+  · rintro ⟨h, -⟩
     obtain ⟨p, hp⟩ := Finset.card_eq_one.mp h.card
     obtain ⟨q, hq, hq1⟩ := h.anchored.x_zero
     obtain ⟨r, hr, hr2⟩ := h.anchored.y_zero
@@ -185,7 +242,8 @@ theorem T_1_1 : T 1 1 = 1 := by
     rw [hr] at hr2
     rw [hp, show p = (0, 0) from Prod.ext hq1 hr2]
   · rintro rfl
-    exact ⟨rfl, kingConnected_singleton _,
-      ⟨by simp, ⟨(0, 0), by simp⟩, by simp, ⟨(0, 0), by simp⟩⟩, by simp, ⟨(0, 0), by simp⟩⟩
+    refine ⟨⟨rfl, kingConnected_singleton _, ⟨by simp, ⟨(0, 0), by simp⟩, by simp, ?_⟩⟩, ?_⟩
+    · exact ⟨(0, 0), by simp⟩
+    · simp [height]
 
 end Polyplets

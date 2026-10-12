@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.Tactic.Push
-import Polyplets.Finite
+import Polyplets.Sequence
 
 /-!
 # Deciding king connectivity, and the enumeration box
@@ -16,10 +16,11 @@ expansion inside `S` from a seed cell (`reachSet`). Soundness
 (`reachSet_complete`) is the finite fixpoint argument — the expansion chain is
 monotone and confined to `S`, so it stalls within `S.card` rounds
 (`stepExpand_reachSet`), and a stalled set absorbs king steps, hence contains
-everything path-reachable. With it `IsCanonical n H S` is decidable.
+everything path-reachable. With it `IsPolyplet n S` and `S ∈ heightClass n H` are
+decidable.
 
-`box n H` is the finite box `[0, n-1] × [0, H-1]` that `canonical_finite`
-proves contains every canonical set; `Weights.lean` enumerates its subsets
+`box n H` is the finite box `[0, n-1] × [0, H-1]` that contains every polyplet
+of height `H` (`mem_powersetCard_box`); `Weights.lean` enumerates its subsets
 and `Enum.lean`'s bit-board flood is this closure on boards. The powerset
 counter `Tc` that once lived here was removed 2026-10-12: every cell it could
 decide (up to `T 4 3`, at 5.5 GB) the enumerator decides in under a second.
@@ -160,17 +161,20 @@ lemma kingConnected_iff_reach (S : Finset (ℤ × ℤ)) :
 instance : DecidablePred KingConnected := fun S =>
   decidable_of_iff _ (kingConnected_iff_reach S).symm
 
-/-- Canonicality is decidable: a conjunction of decidable cardinality,
+/-- `IsPolyplet` is decidable: a conjunction of decidable cardinality,
 connectivity (`DecidablePred KingConnected`), and bounded quantifiers over a
 `Finset`. -/
-instance decidableIsCanonical (n H : ℕ) (S : Finset (ℤ × ℤ)) :
-    Decidable (IsCanonical n H S) :=
-  decidable_of_iff _ isCanonical_iff_and.symm
+instance decidableIsPolyplet (n : ℕ) (S : Finset (ℤ × ℤ)) : Decidable (IsPolyplet n S) :=
+  decidable_of_iff _ isPolyplet_iff_and.symm
 
-/-! ## The computable counter -/
+instance decidableMemHeightClass (n H : ℕ) (S : Finset (ℤ × ℤ)) :
+    Decidable (S ∈ heightClass n H) :=
+  inferInstanceAs (Decidable (IsPolyplet n S ∧ height S = H))
 
-/-- The finite box `[0, n-1] × [0, H-1]` containing every canonical `n`-cell,
-height-`H` set (`canonical_finite`). Built by casting `Finset.range` products
+/-! ## The enumeration box -/
+
+/-- The finite box `[0, n-1] × [0, H-1]` containing every polyplet of `n` cells
+and height `H`. Built by casting `Finset.range` products
 into `ℤ × ℤ`: `Finset.Icc` on `ℤ` compiles against the noncomputable
 `Int.instConditionallyCompleteLinearOrder` in current mathlib, so it cannot be
 used in a computable definition. -/
@@ -189,17 +193,18 @@ lemma mem_box {n H : ℕ} {p : ℤ × ℤ} :
     rw [Prod.ext_iff]
     constructor <;> simp <;> omega
 
-/-- Every canonical set is an `n`-element subset of the box — the height
-bounds are part of `IsCanonical`, the width bound is `canonical_x_le`. -/
-lemma canonical_mem_powersetCard_box {n H : ℕ} {S : Finset (ℤ × ℤ)}
-    (h : IsCanonical n H S) : S ∈ (box n H).powersetCard n := by
+/-- Every polyplet of height `H` is an `n`-element subset of the box — the
+height bound is `mem_heightClass_iff`, the width bound `IsPolyplet.x_le`. -/
+lemma mem_powersetCard_box {n H : ℕ} {S : Finset (ℤ × ℤ)}
+    (h : S ∈ heightClass n H) : S ∈ (box n H).powersetCard n := by
+  obtain ⟨hP, hy, -⟩ := mem_heightClass_iff.mp h
   rw [Finset.mem_powersetCard]
-  refine ⟨fun p hp => ?_, h.card⟩
+  refine ⟨fun p hp => ?_, hP.card⟩
   rw [mem_box]
-  have hx1 := canonical_x_le h hp
-  have hx0 := h.anchored.x_nonneg p hp
-  have hy0 := h.anchored.y_nonneg p hp
-  have hy1 := h.y_le p hp
+  have hx1 := hP.x_le hp
+  have hx0 := hP.anchored.x_nonneg p hp
+  have hy0 := hP.anchored.y_nonneg p hp
+  have hy1 := hy p hp
   omega
 
 end Polyplets
