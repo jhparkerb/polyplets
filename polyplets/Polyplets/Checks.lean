@@ -21,11 +21,9 @@ a mismatch fails the build. The facts a proof actually needs (`T_1_1`,
 `T_3_2`, `T_4_3`, `V_1_1`, `Vt_1_1`, `d_0_1`, the first anchor cell of each lattice)
 live beside their consumers.
 
-The powerset counters (`Tc`, `ac`, the window enumerations of `Weights.lean`)
-cost the kernel 2.7–3.5 GB per cell and stop there. Everything up to six cells
-comes instead from the bit-board enumerator of `Enum.lean`: a count is a
-filter over the stored boards of `EnumData.lean`, and the kernel evaluates it
-in seconds.
+Everything up to six cells comes from the bit-board enumerator of `Enum.lean`
+through the stored boards of `EnumData.lean` (`README.md`, "No
+`native_decide`").
 -/
 
 namespace Polyplets

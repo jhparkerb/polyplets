@@ -1,6 +1,6 @@
 # polyplets — the Lean development
 
-Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 43 modules, about 15,400 lines,
+Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 43 modules, about 15,300 lines,
 no `sorry`, no `native_decide`; every theorem the report or an L-paper cites
 is on the standard three axioms, guarded in `Audit.lean`. The quality pass
 in progress is `OVERHAUL.md`. `Polyplets/Report.lean` states each claim of
@@ -29,8 +29,8 @@ the theorem takes as input rather than proves.
 | report claim | `Report.lean` | proved by | hypothesis |
 |---|---|---|---|
 | a(n) = Σ_H T(n,H) | `report_a_eq_sum` | `a_eq_sum` (`Sequence`) | — |
-| T(n,n) = 3^(n−1) | `report_T_diag` | `T_diag_pow` (`Shape`) | — |
-| diagonal law: for H > n/2, T(n,H) = P_{n−H}(n)·3^(3H−2n−1), P_k integer-valued, deg ≤ k | `report_diagonal_law` | `shape_production`, `production_int_all` (`Shape`) | — |
+| T(n,n) = 3^(n−1) | `report_T_diag` | `T_diag_pow` (`King`) | — |
+| diagonal law: for H > n/2, T(n,H) = P_{n−H}(n)·3^(3H−2n−1), P_k integer-valued, deg ≤ k | `report_diagonal_law` | `shape_production`, `production_int_all` (`King`) | — |
 | leading coefficient of P_k is 25^k/k! | `report_leading_coeff` | `production_leadingCoeff` (`LeadingCoeff`) | — |
 | P_k is fixed once row 3k is computed | `report_pin_row_3k` | `pin_of_leadingCoeff` (`LeadingCoeff`) | — |
 | T(n,n−1) = (25n−45)·3^(n−4) | `report_T_n_nm1` | `P1_closed` (`Pin`), from the kernel-decided cells T(3,2) = 10, T(4,3) = 55 | — |
@@ -84,7 +84,7 @@ rows is a *cluster*; `V ℓ j` counts the cluster shapes spanning ℓ rows with
 surplus j between a walk cell below and a walk cell above, `Vt ℓ j` the same
 with nothing above. A walk row separates the animal
 (`Universal/Separation.lean`), and peeling the top row gives two bijections
-(`Universal/Peel.lean`, 1,760 lines, the long pole), with the drift count `b`
+(`Universal/Peel.lean`, the long pole), with the drift count `b`
 (3 for the king lattice) in place of the 3:
 
     d k H     = 3·d k (H−1) + Σ_{j≤k} Σ_{ℓ≤j} V ℓ j · d (k−j) (H−1−ℓ)      (H ≥ k+2)
@@ -232,8 +232,7 @@ Lines are at that commit.
 Also gone, same reasons: `Grand/PinGrand.lean` and `scripts/gen_grand_pin.py`
 (2,608 generated lines, replaced by `Grand/PinAll.lean` at `7641b74`), the
 old Lagrange tiers of `Pin.lean` (`P<k>_pinned_of_banked`, k = 4 … 11, with
-`scripts/gen_pin.py`), `P2_closed` and `P3_pinned_of_heavy`, the `make
-gate-notary` target, and the planning files `PROOF-STATUS.md`, `DESIGN.md`,
+`scripts/gen_pin.py`), `P3_pinned_of_heavy`, the `make gate-notary` target, and the planning files `PROOF-STATUS.md`, `DESIGN.md`,
 `docs/lean-record.md`, whose surviving content is this file.
 
 ## History

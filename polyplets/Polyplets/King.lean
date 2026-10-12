@@ -128,25 +128,6 @@ theorem CFGVt_king (ℓ j : ℕ) : CFGVt kingLattice ℓ j = Polyplets.CFGVt ℓ
   change (CFGVt kingLattice ℓ j).card = (Polyplets.CFGVt ℓ j).card
   rw [CFGVt_king]
 
-/-! ## The two recursions at the king lattice, `L.b` landing on the literal `3` -/
-
-/-- The d-recursion at the king lattice, in king vocabulary. -/
-theorem d_rec_king (k H : ℕ) (hH : k + 2 ≤ H) :
-    Polyplets.d k H = 3 * Polyplets.d k (H - 1) +
-      ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
-        Polyplets.V ℓ j * Polyplets.d (k - j) (H - 1 - ℓ) := by
-  have h := d_rec kingLattice k H hH
-  simpa using h
-
-/-- The c-identity at the king lattice, in king vocabulary. -/
-theorem c_ident_king (k H : ℕ) (hH : k + 1 ≤ H) :
-    Polyplets.T (H + k) H = Polyplets.d k H +
-      ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
-        Polyplets.Vt ℓ j * Polyplets.d (k - j) (H - ℓ) := by
-  have h := c_ident kingLattice k H hH
-  rw [T_king] at h
-  simpa using h
-
 end Polyplets.Universal
 
 namespace Polyplets
@@ -161,16 +142,18 @@ the base of a cluster (an interior `V`-configuration capping a shorter walk-top
 remainder). -/
 theorem d_rec (k H : ℕ) (hH : k + 2 ≤ H) :
     d k H = 3 * d k (H - 1) +
-      ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, V ℓ j * d (k - j) (H - 1 - ℓ) :=
-  d_rec_king k H hH
+      ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, V ℓ j * d (k - j) (H - 1 - ℓ) := by
+  simpa using Universal.d_rec kingLattice k H hH
 
 /-- **The c-identity**: for `H ≥ k + 1`, a canonical animal has a walk top row
 (counted by `d k H`) or a multi top row — a top-edge `Vᵗ`-configuration
 capping a shorter walk-top remainder. -/
 theorem c_ident (k H : ℕ) (hH : k + 1 ≤ H) :
     T (H + k) H = d k H +
-      ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, Vt ℓ j * d (k - j) (H - ℓ) :=
-  c_ident_king k H hH
+      ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, Vt ℓ j * d (k - j) (H - ℓ) := by
+  have h := Universal.c_ident kingLattice k H hH
+  rw [T_king] at h
+  simpa using h
 
 /-! ## The shape theorem -/
 
@@ -221,17 +204,6 @@ theorem production_int_onset {k : ℕ} {P : Polynomial ℚ}
   have h := (peelSystem kingLattice).production_int_onset (P := P)
     (fun n hn => by simpa [T_king] using hP n hn) hn1 hn2
   simpa [T_king] using h
-
-/-- Integrality at the pinning window, in `∃ z : ℤ` form. -/
-theorem production_int_onset' {k : ℕ} {P : Polynomial ℚ}
-    (hP : ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (3 : ℚ) ^ (3 * k + 1) * (T n (n - k) : ℚ) = P.eval (n : ℚ) * 3 ^ n)
-    {n : ℕ} (hn1 : 2 * k + 1 ≤ n) (hn2 : n ≤ 3 * k + 1) :
-    ∃ z : ℤ, P.eval (n : ℚ) = (z : ℚ) :=
-  ⟨(T n (n - k) * 3 ^ (3 * k + 1 - n) : ℕ), by
-    rw [production_int_onset hP hn1 hn2]
-    push_cast
-    ring⟩
 
 /-- **Integrality everywhere**: any `P` of degree `≤ k` satisfying the
 production identity is integer-valued on all of `ℤ`. -/

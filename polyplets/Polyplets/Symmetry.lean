@@ -4,8 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.Algebra.BigOperators.Fin
-import Mathlib.Analysis.Normed.Ring.Lemmas
-import Mathlib.CategoryTheory.Action.Concrete
 import Mathlib.GroupTheory.SpecificGroups.Dihedral
 import Mathlib.Tactic.Abel
 import Mathlib.Tactic.Group
@@ -76,17 +74,17 @@ at a time, leaving `n % 4 ∈ {0, 1}`.
 
 ## Conventions
 
-The counts `n = 1 … 6` are verified outside Lean by the committed brute force
+The counts `n ≤ 5` (R90, R180, Hm, Dm) are kernel-decided in `Checks.lean`
+through the enumerator of `Enum.lean` (`fixCount_eq_length`), and `n = 1 … 6`
+are also verified outside Lean by the committed brute force
 `experiments/sym_brute_check.py` (run 2026-07-31, log alongside), including
-the `n = 6` row where `hmirror = 58` first parts company with `dmirror = 56`,
-and the derived free/one-sided/bilateral values match A030222/A030233/A030234
-through `n = 6`. (Kernel `decide` on the brute-force enumeration needs more
-than 6 GB even at `n = 1`, measured 2026-10-12, so no in-file anchors.)
-In-file, the conventions are pinned by proof rather than anchor —
-`toFun_mul` says the eight maps compose as the group multiplies, and the axis
-mirror `sr 0` (negate `y`) and the diagonal mirror `sr 3` (swap) are distinct
-conjugacy classes by `decide` — and nothing published depends on which mirror
-is which: `free_eq` and `bilateral_eq` are symmetric in `Hm` and `Dm`.
+the `n = 6` row where `hmirror = 58` first parts company with `dmirror = 56`;
+the derived free/one-sided/bilateral values match A030222/A030233/A030234
+through `n = 6`. The conventions are pinned by proof: `toFun_mul` says the
+eight maps compose as the group multiplies, `toFun_sr0`, `toFun_sr3` and
+`toFun_r2` say which map each generator is, and nothing published depends on
+which mirror is which: `free_eq` and `bilateral_eq` are symmetric in `Hm`
+and `Dm`.
 -/
 
 namespace Polyplets
@@ -181,8 +179,6 @@ lemma mirror_quarter_iterate (k : ℕ) (p : ℤ × ℤ) :
 /-- Rotation by `i` quarter turns. -/
 def rot (i : ZMod 4) : ℤ × ℤ → ℤ × ℤ := quarter^[i.val]
 
-lemma rot_zero : rot 0 = id := rfl
-
 lemma rot_one (p : ℤ × ℤ) : rot 1 p = quarter p := rfl
 
 lemma rot_add (i j : ZMod 4) : rot (i + j) = rot i ∘ rot j := by
@@ -240,6 +236,20 @@ lemma toFun_kingAdj (g : D4) {p q : ℤ × ℤ} (hpq : kingAdj p q) :
   · exact quarter_iterate_kingAdj _ hpq
   · exact mirror_kingAdj (quarter_iterate_kingAdj _ hpq)
 
+/-- The generators as maps: `sr 0` is the `x`-axis mirror, `sr 3` the
+coordinate swap, `r 2` the half turn. -/
+lemma toFun_sr0 : toFun (sr 0) = mirror := rfl
+
+lemma toFun_sr3 : toFun (sr 3) = fun p => (p.2, p.1) := by
+  funext p
+  have h3 : (3 : ZMod 4).val = 3 := rfl
+  simp [toFun, rot, h3, quarter, mirror, Function.iterate_succ, Function.comp]
+
+lemma toFun_r2 : toFun (r 2) = fun p => -p := by
+  funext p
+  have h2 : (2 : ZMod 4).val = 2 := rfl
+  simp [toFun, rot, h2, quarter, Function.iterate_succ, Function.comp, Prod.ext_iff]
+
 /-- The four reflections. -/
 def refls : Finset D4 := {sr 0, sr 1, sr 2, sr 3}
 
@@ -256,11 +266,6 @@ end D4
 lemma ZMod.sum_univ_four {M : Type*} [AddCommMonoid M] (f : ZMod 4 → M) :
     ∑ i : ZMod 4, f i = f 0 + f 1 + f 2 + f 3 :=
   Fin.sum_univ_four f
-
-/-- `IsCanonicalAnimal` is "`n` cells, king-connected, anchored". -/
-lemma isCanonicalAnimal_iff (n : ℕ) (S : Finset (ℤ × ℤ)) :
-    IsCanonicalAnimal n S ↔ S.card = n ∧ KingConnected S ∧ Anchored S :=
-  ⟨fun h => ⟨h.card, h.conn, h.anchored⟩, fun ⟨a, b, c⟩ => ⟨a, b, c⟩⟩
 
 lemma IsCanonicalAnimal.nonempty {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
     S.Nonempty := hS.anchored.nonempty
@@ -308,6 +313,13 @@ lemma reanchor_image_add (S : Finset (ℤ × ℤ)) (t : ℤ × ℤ) :
   · simp [reanchor]
   · rw [reanchor, reanchor, anchorVec_image_add h t, Finset.image_image]
     exact Finset.image_congr fun p _ => by simp only [Function.comp_apply]; abel
+
+/-- A nonempty finite set is fixed only by the zero translation. -/
+lemma translate_eq_self {S : Finset (ℤ × ℤ)} {v : ℤ × ℤ} (h : S.Nonempty)
+    (hS : translate v S = S) : v = 0 := by
+  have := anchorVec_image_add h v
+  rw [show S.image (fun p => p + v) = translate v S from rfl, hS] at this
+  simpa using this
 
 /-- An anchored set has its bounding-box corner at the origin. -/
 lemma anchorVec_eq_zero {S : Finset (ℤ × ℤ)} (hS : Anchored S) : anchorVec S = 0 := by
@@ -404,6 +416,10 @@ lemma reanchor_eq_image_add (T : Finset (ℤ × ℤ)) :
     reanchor T = T.image (fun p => p + -anchorVec T) := by
   simp only [reanchor, sub_eq_add_neg]
 
+lemma reanchor_eq_translate (T : Finset (ℤ × ℤ)) :
+    reanchor T = translate (-anchorVec T) T :=
+  reanchor_eq_image_add T
+
 instance instSMulD4CA (n : ℕ) : SMul D4 (CA n) :=
   ⟨fun g S => ⟨reanchor (S.1.image (D4.toFun g)), isCanonicalAnimal_reanchor S.2 g⟩⟩
 
@@ -459,6 +475,22 @@ noncomputable def Dm (n : ℕ) : ℕ := fixCount n (sr 3)
 
 /-- Free polyplets: `D4`-orbits of canonical animals (A030222). -/
 noncomputable def Free (n : ℕ) : ℕ := Nat.card (MulAction.orbitRel.Quotient D4 (CA n))
+
+/-- The fixed-point count is the number of canonical animals fixed by `g`, as
+a set of finsets. -/
+lemma fixCount_eq_ncard (n : ℕ) (g : D4) :
+    fixCount n g = {S | IsCanonicalAnimal n S ∧ reanchor (S.image (D4.toFun g)) = S}.ncard := by
+  have hset : Subtype.val '' MulAction.fixedBy (CA n) g
+      = {S | IsCanonicalAnimal n S ∧ reanchor (S.image (D4.toFun g)) = S} := by
+    ext S
+    simp only [Set.mem_image, MulAction.fixedBy, Set.mem_setOf_eq, Subtype.exists, mem_CA,
+      exists_and_right, exists_eq_right]
+    constructor
+    · rintro ⟨hS, h⟩
+      exact ⟨hS, congrArg Subtype.val h⟩
+    · rintro ⟨hS, h⟩
+      exact ⟨hS, Subtype.ext h⟩
+  rw [fixCount, Nat.card_coe_set_eq, ← Set.ncard_image_of_injective _ Subtype.val_injective, hset]
 
 lemma fixCount_one (n : ℕ) : fixCount n 1 = a n := by
   rw [fixCount, a_eq_natCard]

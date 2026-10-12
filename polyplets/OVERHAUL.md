@@ -43,8 +43,9 @@ Easiest and most depended-on first. One commit per item.
 - [x] A6. Dead code (2026-10-12: 21 declarations; `#lint` has no unused-
       declaration check, a usage scan found them) and restatements: `fixCountC`/`fixPred`/
       `decidableIsCanonicalAnimal` (no consumer since the anchors went),
-      `nu_zero'`, `xNorm_def'`, `rowSize_union_left`, whatever `#lint` and
-      a usage grep show unused.
+      `nu_zero'`, `rowSize_union_left` (gone in the 2026-10-12 simplify
+      pass), whatever `#lint` and a usage grep show unused; `xNorm_def'`
+      stays, it has six uses.
 - [x] A7 (2026-10-12; `King.lean` is the instance, `DiscreteCalculus.lean` the
       polynomial lemmas, 2,700 lines gone). One development, not two: the king tree (`Graph`, `Finite`,
       `RowProfile`, `Separation`, `Weights`, `Peel`, `Shape`) becomes the
@@ -76,13 +77,8 @@ Easiest and most depended-on first. One commit per item.
       `L_spec` for n ≤ 14; `EnumData.lean` stores `L 5`, `L 6`; rows ≤ 6,
       a(3) … a(6), d with H + k ≤ 6, the six-cell weights, the symmetry
       anchors n ≤ 5 and `P2_closed` are back; `L 7` is beyond 12 GB, so the
-      j = 3 weights are not). A counter that reduces in the kernel: `Tc`, `d`, `V`, `Vt`,
-      `fixCount` over `Fin`-indexed cells and `Bool` predicates (no
-      `Finset (ℤ × ℤ)` powersets in the evaluation path), proved equal to
-      the definitions; then the validation cells that `native_decide` used to
-      carry (rows ≤ 6 of `T`, `a 3 … a 6`, the j ≤ 3 weights, the symmetry
-      anchors n ≤ 5) return to `Checks.lean` as kernel facts, and
-      `P2_closed` returns unconditional.
+      j = 3 weights are not). The plan was a counter over `Fin`-indexed
+      cells reaching the j ≤ 3 weights; bit boards reach six cells.
 - [x] A13 (2026-10-12). `Separation.reachable_seg_aux`: one proof for both cut lines
       instead of two 30-line mirror-image branches.
 - [x] A14 (2026-10-12: `IsConfig L cap ℓ j` in `Universal/Weights` with
@@ -99,12 +95,60 @@ Easiest and most depended-on first. One commit per item.
 - [x] A16 (2026-10-12: `SymmetryRatio.lean`, unconditional; mirrors by the
       closed half-plane, the half turn by a maximal connected half, `R90 ≤
       R180`; the comparison is `a_supermul` against `a 3 = 20`, no upper
-      bound on λ needed). `SymmetryRatioClaim` as a theorem, conditional on
-      the banked a(40): encode a symmetric animal by its axis cells and the components
-      of one half, bound the count by `a_le_lambda_pow` and the components,
-      and beat it with `lambda_gt_of_banked`; needs the encoding tight enough
-      that `λ ≤ 12.2` suffices, or `lambda_le_of_bui_rd3` (9.3154) from
-      Queue B. Last: it is the only item that is new mathematics.
+      bound on λ needed). The plan was a theorem conditional on the banked
+      a(40) and a λ bound; the half-animal encoding needs neither.
+
+## Queue C — deferred by the 2026-10-12 simplify pass
+
+Found by the four-angle review of dcd1a05..7e5983f; each is larger than a
+cleanup pass should take on, and is recorded here rather than as a code
+TODO.
+
+- [ ] C1. The king vocabulary is a bridged copy, not an instance:
+      `Weights.lean` (rowSize, Dc, d, IsVConfig/IsVtConfig, CFGV/CFGVt, V,
+      Vt, window independence) and `Compute.lean`'s closure/`Tc` repeat
+      `Universal/{Weights,Compute}` at `kingLattice`, and `King.lean`
+      bridges them field by field. Make the king objects abbreviations of
+      the universal ones, take `V 1 1`, `Vt 1 1`, `d 0 1` from `Enum` (which
+      must then sit upstream of `LeadingCoeff` and `Grand/Mu`), and merge
+      `Enum.V_eq_length`/`Vt_eq_length` into one cap-generic statement.
+      About 500 lines.
+- [ ] C2. One "least coordinate" definition. `anchorVec`/`reanchor`
+      (`Symmetry`), `hmin` (`SymmetryRatio`), `minX` (`Universal/Peel`),
+      `baseX`/`baseY` (`Growth`) each carry their own translation lemma, and
+      `reanchor` is not defined through `translate`. Put the min-of-`f`
+      definition and its image lemma in `Universal/Defs` beside
+      `translate`, define `anchorVec` from it and
+      `reanchor S = translate (-anchorVec S) S`, and make the others its
+      components. About 150 lines.
+- [ ] C3. Kernel cost of `Enum.transform` and `Enum.children` (measured
+      2026-10-12, one theorem per file): `Checks.symmetry_le_5` is 26.6 s
+      and 8.1 GB, the build's heaviest kernel check, because `transform`
+      calls `reanchor`/`minX`/`minY` on a computed fold; taking the offset
+      from the moved cells of the literal cuts R90 and Dm at n = 5 from
+      6.0 s to 1.7 s each (`cells_transform` must be re-proved).
+      `children`'s `reanchor` of the shifted parent can be the shift
+      `min 1 (c/16) * 16 + min 1 (c%16)` (L6d slice 7.8 s → 6.3 s, 4.6 →
+      4.1 GB), and `Nat.log2` costs 0.75 ms per board against 0.25 ms for
+      a shift binary search (about 3 s of each `T_rows`/`d_rows`/`weights`
+      check and of `T_6_4`). Together about a third off every EnumData run.
+- [ ] C4. Aliases of `translate`: `Growth.shiftBy` (48 uses, with
+      `shiftBy_shiftBy`/`shiftBy_cancel` restating `translate_translate`/
+      `translate_zero`) and `Universal/Peel.shift`; `Peel.rowSize_shift` at
+      `b = 0` is `Enum.rowSize_translate_x`. Use `translate` directly and
+      put `rowSize_shift` in `Universal/Defs`.
+- [ ] C5. Small twins: `Enum.minX`/`minY` with `minX_le`, `exists_minX`
+      and the halves of `anchorVec_cells`, parametrized by the projection;
+      the canonical-animal box bound rederived in `Enum` (three sites),
+      `Sequence.canonicalAnimal_finite` and
+      `SymmetryRatio.mem_boxN_of_canonical` as one lemma in `Sequence`;
+      `Enum.exists_isLeaf` against Mathlib's
+      `SimpleGraph.Connected.exists_connected_induce_compl_singleton_of_finite_nontrivial`
+      (the round trip through `Universal.graph` likely costs as much).
+- [ ] C6. Imports: `Symmetry.lean`'s `Analysis.Normed.Ring.Lemmas` and
+      `CategoryTheory.Action.Concrete` were dropped 2026-10-12 (peak 2.12 →
+      1.80 GB) and `Enum` no longer imports `Growth`; a pass of
+      `scripts/lean-min-imports.sh` over the tree would find the rest.
 
 ## Queue B — the Lean behind the L-papers
 
@@ -141,7 +185,7 @@ Easiest and most depended-on first. One commit per item.
 - `LeadingCoeff.lean`: leading coefficient 25^k/k!, and P_k fixed from rows
   2k+1 … 3k (2026-10-11).
 - `Grand/PinAll.lean` replaces `Grand/PinGrand.lean` (2608 generated lines →
-  ~330): one `mu_step`, one `grand_step`, a 15-level climb from
+  ~330): one `mu_step`, one `grand_step`, an 18-level climb from
   `BankedAnchors` (2026-10-11).
 - Option A (2026-10-12): levels 1–3 take their two onset cells as hypotheses
   like levels 4–18, so `BankedAnchors` is 36 cells and `Weights3Heavy` leaves

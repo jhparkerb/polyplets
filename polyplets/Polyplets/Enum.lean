@@ -7,7 +7,6 @@ import Mathlib.Data.Nat.Bitwise
 import Mathlib.Data.Nat.Find
 import Mathlib.Data.Prod.Lex
 import Polyplets.Compute
-import Polyplets.Growth
 import Polyplets.Symmetry
 import Polyplets.Weights
 
@@ -241,23 +240,18 @@ lemma cells_zero : cells 0 = ∅ := by
   ext p
   simp [mem_cells]
 
-lemma cells_eq_empty_iff {m : ℕ} (hm : InBox m) : cells m = ∅ ↔ m = 0 := by
-  constructor
-  · intro h
-    exact eq_of_cells_eq hm (by norm_num [InBox]) (h.trans cells_zero.symm)
-  · rintro rfl
-    exact cells_zero
+lemma ne_zero_of_cells_nonempty {m : ℕ} (h : (cells m).Nonempty) : m ≠ 0 := by
+  rintro rfl
+  rw [cells_zero] at h
+  exact Finset.not_nonempty_empty h
 
-lemma card_cells_pos {m : ℕ} (hm : InBox m) (h0 : m ≠ 0) : 0 < (cells m).card :=
-  Finset.card_pos.mpr (Finset.nonempty_iff_ne_empty.mpr fun h => h0 ((cells_eq_empty_iff hm).mp h))
+/-- A bit set inside the box lies below `256`. -/
+lemma lt_256_of_testBit {m i : ℕ} (hm : InBox m) (h : m.testBit i = true) : i < 256 := by
+  by_contra hc
+  rw [testBit_eq_false_of_inBox hm (by omega)] at h
+  exact Bool.false_ne_true h
 
 /-! ## The highest bit -/
-
-lemma testBit_log2 {m : ℕ} (h : m ≠ 0) : m.testBit (Nat.log2 m) = true := by
-  rw [Nat.testBit_eq_decide_div_mod_eq, decide_eq_true_eq]
-  have h1 : 2 ^ Nat.log2 m ≤ m := (Nat.le_log2 h).mp le_rfl
-  have h2 : m < 2 ^ (Nat.log2 m + 1) := (Nat.log2_lt h).mp (Nat.lt_succ_self _)
-  rw [Nat.div_eq_of_lt_le (k := 1) (by simpa using h1) (by rw [pow_succ] at h2; omega)]
 
 lemma le_log2_of_testBit {m i : ℕ} (h : m.testBit i = true) : i ≤ Nat.log2 m := by
   have h0 : m ≠ 0 := by
@@ -331,16 +325,7 @@ lemma mem_cells_nbrs_land {R B : ℕ} (hR : NoWrap R) (hB : NoWrap B) {q : ℤ �
 /-! ## The flood and connectivity -/
 
 lemma cells_lor_land (A B C : ℕ) : cells ((A ||| B) &&& C) = cells (A &&& C) ∪ cells (B &&& C) := by
-  ext p
-  simp only [mem_cells, Finset.mem_union, Nat.testBit_land, Nat.testBit_lor, Bool.and_eq_true,
-    Bool.or_eq_true]
-  constructor
-  · rintro ⟨i, hi, ⟨h | h, hc⟩, rfl⟩
-    · exact Or.inl ⟨i, hi, ⟨h, hc⟩, rfl⟩
-    · exact Or.inr ⟨i, hi, ⟨h, hc⟩, rfl⟩
-  · rintro (⟨i, hi, ⟨h, hc⟩, rfl⟩ | ⟨i, hi, ⟨h, hc⟩, rfl⟩)
-    · exact ⟨i, hi, ⟨Or.inl h, hc⟩, rfl⟩
-    · exact ⟨i, hi, ⟨Or.inr h, hc⟩, rfl⟩
+  rw [cells_land, cells_lor, cells_land, cells_land, Finset.union_inter_distrib_right]
 
 lemma sub_grow (S R : ℕ) : Sub (grow S R) S := fun i hi => by
   simp only [grow, Nat.testBit_land, Bool.and_eq_true] at hi
@@ -384,7 +369,7 @@ lemma iterate_stepExpand_mono (S : Finset (ℤ × ℤ)) (p : ℤ × ℤ) {k k' :
 lemma sub_pow_log2 {S : ℕ} (h0 : S ≠ 0) : Sub (2 ^ Nat.log2 S) S := fun i hi => by
   rw [Nat.testBit_two_pow, decide_eq_true_eq] at hi
   rw [← hi]
-  exact testBit_log2 h0
+  exact Nat.testBit_log2 h0
 
 /-- **The connectivity test is `KingConnected`**, for a `NoWrap` board with at
 most `n` cells. -/
@@ -392,7 +377,7 @@ lemma connected_iff {n S : ℕ} (hS : NoWrap S) (h0 : S ≠ 0) (hn : (cells S).c
     connected n S = true ↔ KingConnected (cells S) := by
   have hbox := inBox_of_noWrap hS
   have hL := log2_lt_of_inBox hbox h0
-  have hp : decode (Nat.log2 S) ∈ cells S := (decode_mem_cells hL).mpr (testBit_log2 h0)
+  have hp : decode (Nat.log2 S) ∈ cells S := (decode_mem_cells hL).mpr (Nat.testBit_log2 h0)
   have hcells : cells (flood S n (2 ^ Nat.log2 S))
       = (stepExpand (cells S))^[n] {decode (Nat.log2 S)} := by
     rw [cells_flood hS n _ (sub_pow_log2 h0), cells_pow hL]
@@ -427,23 +412,10 @@ lemma inBox_xor_pow {m i : ℕ} (hm : InBox m) (hi : i < 256) : InBox (m ^^^ 2 ^
 
 lemma nbits_xor_log2 {m : ℕ} (hm : InBox m) (h0 : m ≠ 0) :
     nbits (m ^^^ 2 ^ Nat.log2 m) + 1 = nbits m := by
-  have hL := log2_lt_of_inBox hm h0
-  have hmem : Nat.log2 m ∈ (Finset.range 256).filter fun i => m.testBit i = true :=
-    Finset.mem_filter.mpr ⟨Finset.mem_range.mpr hL, testBit_log2 h0⟩
-  have hfilter : ((Finset.range 256).filter fun i => (m ^^^ 2 ^ Nat.log2 m).testBit i = true)
-      = ((Finset.range 256).filter fun i => m.testBit i = true).erase (Nat.log2 m) := by
-    ext i
-    simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_erase, Nat.testBit_xor,
-      Nat.testBit_two_pow]
-    constructor
-    · rintro ⟨hi, hb⟩
-      have hne : Nat.log2 m ≠ i := by
-        rintro rfl
-        simp [testBit_log2 h0] at hb
-      exact ⟨Ne.symm hne, hi, by simpa [hne] using hb⟩
-    · rintro ⟨hne, hi, hb⟩
-      exact ⟨hi, by simpa [Ne.symm hne] using hb⟩
-  rw [nbits, nbits, hfilter, Finset.card_erase_of_mem hmem]
+  have hmem : decode (Nat.log2 m) ∈ cells m :=
+    (decode_mem_cells (log2_lt_of_inBox hm h0)).mpr (Nat.testBit_log2 h0)
+  rw [← card_cells, ← card_cells, cells_xor_pow (Nat.testBit_log2 h0),
+    Finset.card_erase_of_mem hmem]
   have := Finset.card_pos.mpr ⟨_, hmem⟩
   omega
 
@@ -459,10 +431,7 @@ lemma mem_bitsOf {m : ℕ} (hm : InBox m) :
     intro hf j
     simp only [bitsOf, List.not_mem_nil, false_iff]
     intro hb
-    have hj : j < 256 := by
-      by_contra hc
-      rw [testBit_eq_false_of_inBox hm (by omega)] at hb
-      exact Bool.false_ne_true hb
+    have hj : j < 256 := lt_256_of_testBit hm hb
     have : 0 < nbits m := Finset.card_pos.mpr
       ⟨j, Finset.mem_filter.mpr ⟨Finset.mem_range.mpr hj, hb⟩⟩
     omega
@@ -476,9 +445,9 @@ lemma mem_bitsOf {m : ℕ} (hm : InBox m) :
       simp only [bitsOf, h0, if_false, List.mem_cons, hrec, Nat.testBit_xor, Nat.testBit_two_pow]
       constructor
       · rintro (rfl | h)
-        · exact testBit_log2 h0
+        · exact Nat.testBit_log2 h0
         · by_cases hj : Nat.log2 m = j
-          · subst hj; exact testBit_log2 h0
+          · subst hj; exact Nat.testBit_log2 h0
           · simpa [hj] using h
       · intro h
         by_cases hj : Nat.log2 m = j
@@ -499,25 +468,12 @@ lemma bitsOf_nodup {m : ℕ} (hm : InBox m) :
         have := nbits_xor_log2 hm h0; omega
       simp only [bitsOf, h0, if_false, List.nodup_cons]
       refine ⟨fun h => ?_, ih (inBox_xor_pow hm hL) hf'⟩
-      rw [mem_bitsOf (inBox_xor_pow hm hL) fuel hf', Nat.testBit_xor, testBit_log2 h0,
+      rw [mem_bitsOf (inBox_xor_pow hm hL) fuel hf', Nat.testBit_xor, Nat.testBit_log2 h0,
         Nat.testBit_two_pow_self] at h
       simp at h
 
 lemma mem_bitsOf' {m j : ℕ} (hm : InBox m) : j ∈ bitsOf 256 m ↔ m.testBit j = true :=
   mem_bitsOf hm 256 (nbits_le m) j
-
-lemma length_bitsOf {m : ℕ} (hm : InBox m) : (bitsOf 256 m).length = nbits m := by
-  rw [← List.toFinset_card_of_nodup (bitsOf_nodup hm 256 (nbits_le m)), nbits]
-  congr 1
-  ext i
-  simp only [List.mem_toFinset, mem_bitsOf' hm, Finset.mem_filter, Finset.mem_range]
-  constructor
-  · intro h
-    refine ⟨?_, h⟩
-    by_contra hc
-    rw [testBit_eq_false_of_inBox hm (by omega)] at h
-    exact Bool.false_ne_true h
-  · exact fun h => h.2
 
 /-! ## Minima and re-anchoring -/
 
@@ -551,7 +507,7 @@ lemma exists_minX {m : ℕ} (hm : InBox m) (h0 : m ≠ 0) :
     ∃ i, m.testBit i = true ∧ i % 16 = minX m := by
   rcases foldl_min_mem ((bitsOf 256 m).map (· % 16)) 16 with h | h
   · exfalso
-    have := minX_le hm (testBit_log2 h0)
+    have := minX_le hm (Nat.testBit_log2 h0)
     rw [minX] at this
     omega
   · obtain ⟨i, hi, he⟩ := List.mem_map.mp h
@@ -561,7 +517,7 @@ lemma exists_minY {m : ℕ} (hm : InBox m) (h0 : m ≠ 0) :
     ∃ i, m.testBit i = true ∧ i / 16 = minY m := by
   rcases foldl_min_mem ((bitsOf 256 m).map (· / 16)) 16 with h | h
   · exfalso
-    have := minY_le hm (testBit_log2 h0)
+    have := minY_le hm (Nat.testBit_log2 h0)
     have hL := log2_lt_of_inBox hm h0
     rw [minY] at this
     omega
@@ -571,18 +527,13 @@ lemma exists_minY {m : ℕ} (hm : InBox m) (h0 : m ≠ 0) :
 /-- The anchor vector of a board's cells is its pair of minima. -/
 lemma anchorVec_cells {m : ℕ} (hm : InBox m) (h0 : m ≠ 0) :
     anchorVec (cells m) = ((minX m : ℤ), (minY m : ℤ)) := by
-  have hne : (cells m).Nonempty := Finset.card_pos.mp (card_cells_pos hm h0)
+  have hne : (cells m).Nonempty :=
+    ⟨decode (Nat.log2 m), (decode_mem_cells (log2_lt_of_inBox hm h0)).mpr (Nat.testBit_log2 h0)⟩
   rw [anchorVec, dif_pos hne]
   obtain ⟨ix, hbx, hex⟩ := exists_minX hm h0
   obtain ⟨iy, hby, hey⟩ := exists_minY hm h0
-  have hx : ix < 256 := by
-    by_contra hc
-    rw [testBit_eq_false_of_inBox hm (by omega)] at hbx
-    exact Bool.false_ne_true hbx
-  have hy : iy < 256 := by
-    by_contra hc
-    rw [testBit_eq_false_of_inBox hm (by omega)] at hby
-    exact Bool.false_ne_true hby
+  have hx : ix < 256 := lt_256_of_testBit hm hbx
+  have hy : iy < 256 := lt_256_of_testBit hm hby
   refine Prod.ext ?_ ?_
   · refine le_antisymm ?_ ?_
     · have := Finset.inf'_le Prod.fst ((decode_mem_cells hx).mpr hbx)
@@ -615,9 +566,7 @@ lemma cells_reanchor {m : ℕ} (hm : InBox m) (h0 : m ≠ 0) :
     have hmx := minX_le hm hb
     have hmy := minY_le hm hb
     refine ⟨decode (minY m * 16 + minX m + j), ⟨_, ?_, hb, rfl⟩, ?_⟩
-    · by_contra hc
-      rw [testBit_eq_false_of_inBox hm (by omega)] at hb
-      exact Bool.false_ne_true hb
+    · exact lt_256_of_testBit hm hb
     · have hx : j % 16 + minX m < 16 := by
         by_contra hc
         have h1 : (minY m * 16 + minX m + j) % 16 = j % 16 + minX m - 16 := by omega
@@ -681,7 +630,7 @@ lemma height_eq {m : ℕ} (hm : InBox m) (h0 : m ≠ 0) : height m = heightOf (c
   refine le_antisymm ?_ ?_
   · have hL := log2_lt_of_inBox hm h0
     have := Finset.le_sup (f := fun p : ℤ × ℤ => p.2.toNat)
-      ((decode_mem_cells hL).mpr (testBit_log2 h0))
+      ((decode_mem_cells hL).mpr (Nat.testBit_log2 h0))
     simp only [decode, Int.toNat_natCast] at this
     exact this
   · refine Finset.sup_le fun p hp => ?_
@@ -705,9 +654,7 @@ lemma rowCount_eq {m : ℕ} (hm : InBox m) (y : ℕ) : rowCount m y = rowSize (c
       exact_mod_cast hy
     · rintro ⟨i, ⟨hb, hy⟩, rfl⟩
       refine ⟨⟨i, ?_, hb, rfl⟩, ?_⟩
-      · by_contra hc
-        rw [testBit_eq_false_of_inBox hm (by omega)] at hb
-        exact Bool.false_ne_true hb
+      · exact lt_256_of_testBit hm hb
       · simp only [decode]
         exact_mod_cast hy
   rw [rowCount, rowSize, himg, Finset.card_image_of_injOn fun _ _ _ _ h => decode_inj h,
@@ -833,16 +780,6 @@ lemma isDel_translate (v : ℤ × ℤ) {S : Finset (ℤ × ℤ)} {c : ℤ × ℤ
       exact ⟨x - v, hx, sub_add_cancel x v⟩
     exact key_le_add.mpr (h y hy ((isLeaf_translate v).mp hl))
 
-lemma reanchor_eq_translate (S : Finset (ℤ × ℤ)) :
-    Polyplets.reanchor S = translate (-anchorVec S) S := by
-  simp only [Polyplets.reanchor, translate, sub_eq_add_neg]
-
-lemma translate_eq_self {S : Finset (ℤ × ℤ)} {v : ℤ × ℤ} (h : S.Nonempty)
-    (hS : translate v S = S) : v = 0 := by
-  have := anchorVec_image_add h v
-  rw [show S.image (fun p => p + v) = translate v S from rfl, hS] at this
-  simpa using this
-
 /-- **The parent of a child.** The re-anchored `insert c P`, when `c` is its
 deletable cell, has deletable cell `c - anchorVec (insert c P)`; removing it
 and re-anchoring recovers `reanchor P`. -/
@@ -894,15 +831,9 @@ lemma isCanonicalAnimal_insert_reanchor {n : ℕ} {P : Finset (ℤ × ℤ)} (hP 
     {c : ℤ × ℤ} (hc : c ∉ P) (hadj : ∃ p ∈ P, kingAdj p c) :
     IsCanonicalAnimal (n + 1) (Polyplets.reanchor (insert c P)) := by
   obtain ⟨p, hp, hpc⟩ := hadj
-  have hconn : KingConnected (insert c P) := by
-    rw [Finset.insert_eq, Finset.union_comm]
-    refine kingConnected_union_of_adj hP.conn ?_ hp (Finset.mem_singleton_self c) hpc
-    intro x hx y hy
-    rw [Finset.mem_singleton] at hx hy
-    subst hx hy
-    exact Relation.ReflTransGen.refl
   exact ⟨by rw [reanchor_card, Finset.card_insert_of_notMem hc, hP.card],
-    kingConnected_reanchor hconn, reanchor_anchored ⟨c, Finset.mem_insert_self c P⟩⟩
+    kingConnected_reanchor (kingConnected_insert hP.conn hp hpc),
+    reanchor_anchored ⟨c, Finset.mem_insert_self c P⟩⟩
 
 /-! ## The boards of a child -/
 
@@ -944,9 +875,7 @@ lemma margin_of_canonical {n : ℕ} {P : ℕ} (hbox : InBox P) (hP : IsCanonical
     (hn : n ≤ 14) : Margin P := by
   intro i hi
   have hi' : i < 256 := by
-    by_contra hc
-    rw [testBit_eq_false_of_inBox hbox (by omega)] at hi
-    exact Bool.false_ne_true hi
+    exact lt_256_of_testBit hbox hi
   have hx := canonicalAnimal_x_le hP ((decode_mem_cells hi').mpr hi)
   have hy := canonicalAnimal_y_le hP ((decode_mem_cells hi').mpr hi)
   simp only [decode] at hx hy
@@ -1037,7 +966,7 @@ lemma firstLeaf_spec {n S : ℕ} (hS : NoWrap S) (hn : (cells S).card ≤ n)
     · subst h0
       simp [firstLeaf, show (256 : ℕ) ≠ c by omega]
     · have hL := log2_lt_of_inBox hbs h0
-      have hbL : scan.testBit (Nat.log2 scan) = true := testBit_log2 h0
+      have hbL : scan.testBit (Nat.log2 scan) = true := Nat.testBit_log2 h0
       have hSL : S.testBit (Nat.log2 scan) = true := hsub _ hbL
       have hleafL := connected_erase_iff hS hn h2 hSL
       simp only [firstLeaf, h0, if_false]
@@ -1293,10 +1222,7 @@ lemma isCanonicalAnimal_one_iff {S : Finset (ℤ × ℤ)} :
     congr 1
     exact Prod.ext (hq ▸ hq1) (hr ▸ hr2)
   · rintro rfl
-    refine ⟨Finset.card_singleton _, fun p hp q hq => ?_, ?_⟩
-    · rw [Finset.mem_singleton] at hp hq
-      subst hp hq
-      exact Relation.ReflTransGen.refl
+    refine ⟨Finset.card_singleton _, kingConnected_singleton _, ?_⟩
     · refine ⟨fun p hp => ?_, ⟨_, Finset.mem_singleton_self _, rfl⟩, fun p hp => ?_,
         ⟨_, Finset.mem_singleton_self _, rfl⟩⟩ <;>
       · rw [Finset.mem_singleton] at hp
@@ -1400,15 +1326,6 @@ lemma ne_zero_of_mem_L {n m : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) (hm : m ∈ L 
 
 /-! ## The counts -/
 
-/-- **`a n` is a list length.** -/
-theorem a_eq_length {n : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) : a n = (L n).length := by
-  obtain ⟨-, hnd, hmem⟩ := L_spec n h1 hn
-  have hset : {S : Finset (ℤ × ℤ) | IsCanonicalAnimal n S} = ↑(((L n).map cells).toFinset) := by
-    ext S
-    simp only [Set.mem_setOf_eq, Finset.mem_coe, List.mem_toFinset, List.mem_map]
-    exact hmem S
-  rw [a, hset, Set.ncard_coe_finset, List.toFinset_card_of_nodup hnd, List.length_map]
-
 /-- **A count over the animals of `n` cells is the length of a filter of
 `L n`**, for a board test `q` that decides the predicate `Q` on the cells. -/
 lemma ncard_eq_length {n : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) {Q : Finset (ℤ × ℤ) → Prop}
@@ -1428,6 +1345,11 @@ lemma ncard_eq_length {n : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) {Q : Finset (ℤ 
   rw [hset, Set.ncard_coe_finset,
     List.toFinset_card_of_nodup (hnd.sublist (List.Sublist.map _ List.filter_sublist)),
     List.length_map]
+
+/-- **`a n` is a list length.** -/
+theorem a_eq_length {n : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) : a n = (L n).length := by
+  have h := ncard_eq_length h1 hn (Q := fun _ => True) (q := fun _ => true) (fun _ _ => by simp)
+  simpa [a, List.filter_true] using h
 
 /-- **`T n H` is a filtered list length.** -/
 theorem T_eq_length {n H : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) :
@@ -1465,7 +1387,7 @@ lemma rowSize_translate_x (t : ℤ) (S : Finset (ℤ × ℤ)) (y : ℤ) :
     simp only [Finset.mem_filter, mem_translate, Prod.snd_sub, sub_zero]
   rw [this, card_translate]
 
-lemma anchorVec_snd {S : Finset (ℤ × ℤ)} (h0 : ∀ p ∈ S, 0 ≤ p.2) (hz : ∃ p ∈ S, p.2 = 0) :
+lemma anchorVec_snd_eq_zero {S : Finset (ℤ × ℤ)} (h0 : ∀ p ∈ S, 0 ≤ p.2) (hz : ∃ p ∈ S, p.2 = 0) :
     (anchorVec S).2 = 0 := by
   obtain ⟨p, hp, hp2⟩ := hz
   have hne : S.Nonempty := ⟨p, hp⟩
@@ -1500,7 +1422,7 @@ lemma ncard_config {N h : ℕ} {R : Finset (ℤ × ℤ) → Prop}
     intro S h0 hrows
     rw [reanchor_eq_translate]
     congr 1
-    exact Prod.ext rfl (by simp [anchorVec_snd hrows ⟨_, h0, rfl⟩])
+    exact Prod.ext rfl (by simp [anchorVec_snd_eq_zero hrows ⟨_, h0, rfl⟩])
   refine Set.ncard_congr (fun S _ => Polyplets.reanchor S) ?_ ?_ ?_
   · rintro S ⟨hcard, h0, hrows, hr0, hRS, hconn⟩
     have hne : S.Nonempty := ⟨_, h0⟩
@@ -1668,9 +1590,7 @@ lemma inBox_foldl_lor (f : ℕ → ℕ) : ∀ (l : List ℕ) (a : ℕ), InBox a 
     refine inBox_of_testBit fun k hk => ?_
     rw [Nat.testBit_lor, Bool.or_eq_true, Nat.testBit_two_pow, decide_eq_true_eq] at hk
     rcases hk with hk | rfl
-    · by_contra hc
-      rw [testBit_eq_false_of_inBox ha (by omega)] at hk
-      exact Bool.false_ne_true hk
+    · exact lt_256_of_testBit ha hk
     · exact h i (List.mem_cons_self ..)
 
 /-- The eight symmetries permute and negate coordinates, so they preserve the
@@ -1705,10 +1625,7 @@ lemma cells_transform {n : ℕ} (g : D4) {m : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 7)
   have hin : ∀ i ∈ bitsOf 256 m, f i < 256 ∧ decode (f i) = D4.toFun g (decode i) + (8, 8) := by
     intro i hi
     rw [mem_bitsOf' hb] at hi
-    have hi256 : i < 256 := by
-      by_contra hc
-      rw [testBit_eq_false_of_inBox hb (by omega)] at hi
-      exact Bool.false_ne_true hi
+    have hi256 : i < 256 := lt_256_of_testBit hb hi
     have hc := (decode_mem_cells hi256).mpr hi
     have hx := canonicalAnimal_x_le hcan hc
     have hy := canonicalAnimal_y_le hcan hc
@@ -1766,18 +1683,7 @@ lemma cells_transform {n : ℕ} (g : D4) {m : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 7)
 /-- **A fixed-point count of a symmetry is a filtered list length.** -/
 theorem fixCount_eq_length {n : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 7) (g : D4) :
     fixCount n g = ((L n).filter fun m => transform g m = m).length := by
-  have hset : Subtype.val '' MulAction.fixedBy (CA n) g
-      = {S | IsCanonicalAnimal n S ∧ Polyplets.reanchor (S.image (D4.toFun g)) = S} := by
-    ext S
-    simp only [Set.mem_image, MulAction.fixedBy, Set.mem_setOf_eq, Subtype.exists, mem_CA,
-      exists_and_right, exists_eq_right]
-    constructor
-    · rintro ⟨hS, h⟩
-      exact ⟨hS, congrArg Subtype.val h⟩
-    · rintro ⟨hS, h⟩
-      exact ⟨hS, Subtype.ext h⟩
-  rw [fixCount, Nat.card_coe_set_eq, ← Set.ncard_image_of_injective _ Subtype.val_injective, hset,
-    ncard_eq_length h1 (by omega)]
+  rw [fixCount_eq_ncard, ncard_eq_length h1 (by omega)]
   intro m hm
   obtain ⟨hbox', hcells⟩ := cells_transform g h1 hn hm
   have hbox := (L_spec n h1 (by omega)).1 m hm
@@ -1785,3 +1691,31 @@ theorem fixCount_eq_length {n : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 7) (g : D4) :
   exact ⟨fun h => by rw [h], fun h => eq_of_cells_eq hbox' hbox h⟩
 
 end Polyplets.Enum
+
+namespace Polyplets
+
+open Enum
+
+/-! ## The onset cells the development consumes
+
+Kernel-decided through the enumerator: `T 3 2` and `T 4 3` pin `P_1`
+(`Pin.lean`, `Grand/PinAll.lean`), `a 3` is the base of the growth lower
+bound `20 ^ (n / 3) ≤ a n` (`SymmetryRatio.lean`). Further cells are checked
+in `Checks.lean`. -/
+
+/-- `T 3 2 = 10` (`results/triangle.txt`), the first `P_1` onset point. -/
+theorem T_3_2 : T 3 2 = 10 := by
+  rw [T_eq_length (by norm_num) (by norm_num)]
+  decide +kernel
+
+/-- `T 4 3 = 55` (`results/triangle.txt`), the second `P_1` onset point. -/
+theorem T_4_3 : T 4 3 = 55 := by
+  rw [T_eq_length (by norm_num) (by norm_num)]
+  decide +kernel
+
+/-- `a 3 = 20` (`results/triangle.txt`, row sum). -/
+theorem a_3 : a 3 = 20 := by
+  rw [a_eq_length (by norm_num) (by norm_num)]
+  decide +kernel
+
+end Polyplets

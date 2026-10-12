@@ -35,18 +35,7 @@ open Polynomial
 lemma sum_Icc_eq_sum_range_sub (f : ℕ → ℚ) {a b : ℕ} (h : a ≤ b + 1) :
     ∑ i ∈ Finset.Icc a b, f i
       = (∑ i ∈ Finset.range (b + 1), f i) - ∑ i ∈ Finset.range a, f i := by
-  have hdisj : Disjoint (Finset.range a) (Finset.Icc a b) := by
-    rw [Finset.disjoint_left]
-    intro i hi hi'
-    rw [Finset.mem_range] at hi
-    rw [Finset.mem_Icc] at hi'
-    omega
-  have hun : Finset.range (b + 1) = Finset.range a ∪ Finset.Icc a b := by
-    ext i
-    simp only [Finset.mem_union, Finset.mem_range, Finset.mem_Icc]
-    omega
-  rw [hun, Finset.sum_union hdisj]
-  ring
+  rw [← Finset.Ico_add_one_right_eq_Icc, Finset.sum_Ico_eq_sub _ h]
 
 /-! ## The discrete antiderivative, via Faulhaber -/
 

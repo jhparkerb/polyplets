@@ -23,23 +23,23 @@ surplus `j`) only:
 Both are instances of one structure, `IsConfig L cap ℓ j`, a cluster with
 `cap` walk rows on top (`cap = 1` for `V`, `cap = 0` for `Vᵗ`), so the peeling
 bijections of `Peel.lean` are written once. The king file's `IsVConfig` and
-`IsVtConfig` are the two instances with `KingConnected` for `Conn L`.
+`IsVtConfig` are the same two descriptions with `KingConnected` for `Conn L`,
+identified with these at `kingLattice` by `King.lean`'s bridges.
 
 ## Deviation from the king file: no window enumeration
 
 `Weights.lean` materializes each family as an explicit `Finset` built from a
 computable window (`box`, `window`, `powersetCard`, decidable filter) so that
-`native_decide` can evaluate it, and then proves *window-independence* lemmas
-(`mem_Dc`, `mem_CFGV`, `mem_CFGVt`) recovering the propositional description.
-The bijections need only the propositional descriptions — no value is ever evaluated
-here — so the generic families are built directly as `Set.Finite.toFinset` of
-the propositionally-described sets. The `mem_*` lemmas are then
-`Set.Finite.mem_toFinset`, and the downstream bijections match against exactly
-the same propositions as in the king proof.
+the kernel can decide the three small values it consumes, and then proves
+*window-independence* lemmas (`mem_Dc`, `mem_CFGV`, `mem_CFGVt`) recovering
+the propositional description. The bijections need only the propositional
+descriptions — no value is ever evaluated here — so the generic families are
+built directly as `Set.Finite.toFinset` of the propositionally-described
+sets, and the `mem_*` lemmas are `Set.Finite.mem_toFinset`.
 
 Finiteness replaces window-independence: it is the same x-spread bound
 (`conn_abs_x_le`, now with reach `M`) applied to the whole family at once.
-A computable twin for the instance anchors is phase C's business.
+The instance anchors come from `Universal/Compute.lean`'s counter.
 -/
 
 namespace Polyplets.Universal

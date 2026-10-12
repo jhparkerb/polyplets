@@ -61,6 +61,79 @@ lemma kingConnected_translate (v : ℤ × ℤ) {S : Finset (ℤ × ℤ)} (h : Ki
     KingConnected (translate v S) :=
   kingConnected_image (fun _ _ => kingAdj_add v) h
 
+/-- King adjacency, with the absolute values opened for `omega`. -/
+lemma kingAdj_iff' {p q : ℤ × ℤ} :
+    kingAdj p q ↔ (p.1 ≠ q.1 ∨ p.2 ≠ q.2) ∧
+      -1 ≤ p.1 - q.1 ∧ p.1 - q.1 ≤ 1 ∧ -1 ≤ p.2 - q.2 ∧ p.2 - q.2 ≤ 1 := by
+  simp only [kingAdj, abs_le, ne_eq, Prod.ext_iff, not_and_or, and_assoc]
+
+/-- King paths reverse: the step relation is symmetric, so its reflexive
+transitive closure is. -/
+lemma reflTransGen_symm {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ}
+    (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q) :
+    Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) q p := by
+  induction h with
+  | refl => exact Relation.ReflTransGen.refl
+  | @tail b c _ hbc ih =>
+      exact Relation.ReflTransGen.head ⟨hbc.2.1, hbc.1, kingAdj_symm hbc.2.2⟩ ih
+
+lemma kingConnected_singleton (p : ℤ × ℤ) : KingConnected {p} := by
+  intro x hx y hy
+  rw [Finset.mem_singleton] at hx hy
+  subst hx hy
+  exact Relation.ReflTransGen.refl
+
+/-- **Gluing two connected sets across one king edge.** Paths inside either half
+lift into the union (the step predicate only weakens), and the bridge edge
+`x₀ → y₀` — traversable in both directions, king adjacency being symmetric —
+routes between the halves. -/
+lemma kingConnected_union_of_adj {X Y : Finset (ℤ × ℤ)} {x₀ y₀ : ℤ × ℤ}
+    (hX : KingConnected X) (hY : KingConnected Y) (hx₀ : x₀ ∈ X) (hy₀ : y₀ ∈ Y)
+    (hadj : kingAdj x₀ y₀) : KingConnected (X ∪ Y) := by
+  have liftX : ∀ p ∈ X, ∀ q ∈ X,
+      Relation.ReflTransGen (fun a b => a ∈ X ∪ Y ∧ b ∈ X ∪ Y ∧ kingAdj a b) p q :=
+    fun p hp q hq => (hX p hp q hq).mono fun a b hab =>
+      ⟨Finset.mem_union_left _ hab.1, Finset.mem_union_left _ hab.2.1, hab.2.2⟩
+  have liftY : ∀ p ∈ Y, ∀ q ∈ Y,
+      Relation.ReflTransGen (fun a b => a ∈ X ∪ Y ∧ b ∈ X ∪ Y ∧ kingAdj a b) p q :=
+    fun p hp q hq => (hY p hp q hq).mono fun a b hab =>
+      ⟨Finset.mem_union_right _ hab.1, Finset.mem_union_right _ hab.2.1, hab.2.2⟩
+  have bridge : (fun a b => a ∈ X ∪ Y ∧ b ∈ X ∪ Y ∧ kingAdj a b) x₀ y₀ :=
+    ⟨Finset.mem_union_left _ hx₀, Finset.mem_union_right _ hy₀, hadj⟩
+  have bridge' : (fun a b => a ∈ X ∪ Y ∧ b ∈ X ∪ Y ∧ kingAdj a b) y₀ x₀ :=
+    ⟨Finset.mem_union_right _ hy₀, Finset.mem_union_left _ hx₀, kingAdj_symm hadj⟩
+  intro p hp q hq
+  rcases Finset.mem_union.mp hp with hp | hp <;> rcases Finset.mem_union.mp hq with hq | hq
+  · exact liftX p hp q hq
+  · exact ((liftX p hp x₀ hx₀).tail bridge).trans (liftY y₀ hy₀ q hq)
+  · exact ((liftY p hp y₀ hy₀).tail bridge').trans (liftX x₀ hx₀ q hq)
+  · exact liftY p hp q hq
+
+/-- Inserting a cell adjacent to a connected set keeps it connected. -/
+lemma kingConnected_insert {W : Finset (ℤ × ℤ)} {w q : ℤ × ℤ} (hW : KingConnected W)
+    (hw : w ∈ W) (hadj : kingAdj w q) : KingConnected (insert q W) := by
+  rw [Finset.insert_eq]
+  exact kingConnected_union_of_adj (kingConnected_singleton q) hW (Finset.mem_singleton_self q)
+    hw (kingAdj_symm hadj)
+
+/-- Along a path in `S` from a cell satisfying `P` to one that does not, some
+king step leaves `P`. -/
+lemma exists_edge_of_connected {S : Finset (ℤ × ℤ)} (hS : KingConnected S)
+    (P : ℤ × ℤ → Prop) {p q : ℤ × ℤ} (hp : p ∈ S) (hq : q ∈ S) (hPp : P p)
+    (hPq : ¬ P q) :
+    ∃ a ∈ S, ∃ b ∈ S, P a ∧ ¬ P b ∧ kingAdj a b := by
+  have key : ∀ r, Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p r →
+      ¬ P r → ∃ a ∈ S, ∃ b ∈ S, P a ∧ ¬ P b ∧ kingAdj a b := by
+    intro r hr
+    induction hr with
+    | refl => exact fun h => absurd hPp h
+    | @tail b c _ hbc ih =>
+        intro hc
+        by_cases hb : P b
+        · exact ⟨b, hbc.1, c, hbc.2.1, hb, hc, hbc.2.2⟩
+        · exact ih hb
+  exact key q (hS p hp q hq) hPq
+
 /-- `S` is the canonical (origin-anchored) representative of a fixed polyplet of
 `n` cells with bounding-box height exactly `H`: it has `n` cells, is
 king-connected, its bounding box sits at the origin (`Anchored`), and its

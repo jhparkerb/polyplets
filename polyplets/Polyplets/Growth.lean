@@ -99,42 +99,6 @@ lemma shiftBy_cancel {e d e' d' : ℤ} (he : e + e' = 0) (hd : d + d' = 0)
   rw [shiftBy_shiftBy, he, hd]
   exact translate_zero S
 
-/-- King paths reverse: the step relation is symmetric, so its reflexive
-transitive closure is. -/
-lemma reflTransGen_symm {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ}
-    (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q) :
-    Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) q p := by
-  induction h with
-  | refl => exact Relation.ReflTransGen.refl
-  | @tail b c _ hbc ih =>
-      exact Relation.ReflTransGen.head ⟨hbc.2.1, hbc.1, kingAdj_symm hbc.2.2⟩ ih
-
-/-- **Gluing two connected sets across one king edge.** Paths inside either half
-lift into the union (the step predicate only weakens), and the bridge edge
-`x₀ → y₀` — traversable in both directions, king adjacency being symmetric —
-routes between the halves. -/
-lemma kingConnected_union_of_adj {X Y : Finset (ℤ × ℤ)} {x₀ y₀ : ℤ × ℤ}
-    (hX : KingConnected X) (hY : KingConnected Y) (hx₀ : x₀ ∈ X) (hy₀ : y₀ ∈ Y)
-    (hadj : kingAdj x₀ y₀) : KingConnected (X ∪ Y) := by
-  have liftX : ∀ p ∈ X, ∀ q ∈ X,
-      Relation.ReflTransGen (fun a b => a ∈ X ∪ Y ∧ b ∈ X ∪ Y ∧ kingAdj a b) p q :=
-    fun p hp q hq => (hX p hp q hq).mono fun a b hab =>
-      ⟨Finset.mem_union_left _ hab.1, Finset.mem_union_left _ hab.2.1, hab.2.2⟩
-  have liftY : ∀ p ∈ Y, ∀ q ∈ Y,
-      Relation.ReflTransGen (fun a b => a ∈ X ∪ Y ∧ b ∈ X ∪ Y ∧ kingAdj a b) p q :=
-    fun p hp q hq => (hY p hp q hq).mono fun a b hab =>
-      ⟨Finset.mem_union_right _ hab.1, Finset.mem_union_right _ hab.2.1, hab.2.2⟩
-  have bridge : (fun a b => a ∈ X ∪ Y ∧ b ∈ X ∪ Y ∧ kingAdj a b) x₀ y₀ :=
-    ⟨Finset.mem_union_left _ hx₀, Finset.mem_union_right _ hy₀, hadj⟩
-  have bridge' : (fun a b => a ∈ X ∪ Y ∧ b ∈ X ∪ Y ∧ kingAdj a b) y₀ x₀ :=
-    ⟨Finset.mem_union_right _ hy₀, Finset.mem_union_left _ hx₀, kingAdj_symm hadj⟩
-  intro p hp q hq
-  rcases Finset.mem_union.mp hp with hp | hp <;> rcases Finset.mem_union.mp hq with hq | hq
-  · exact liftX p hp q hq
-  · exact ((liftX p hp x₀ hx₀).tail bridge).trans (liftY y₀ hy₀ q hq)
-  · exact ((liftY p hp y₀ hy₀).tail bridge').trans (liftX x₀ hx₀ q hq)
-  · exact liftY p hp q hq
-
 /-! ## `a n ≥ 1`: the bar witness
 
 The horizontal bar of `n` cells is canonical, so no `a n` with `n ≥ 1`

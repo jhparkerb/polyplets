@@ -71,9 +71,6 @@ into its two coordinates, which is how the peel and glue maps are written. -/
 /-- Translate a cell by `(a, b)`. -/
 abbrev shiftCell (a b : ℤ) (c : ℤ × ℤ) : ℤ × ℤ := c + (a, b)
 
-lemma shiftCell_injective (a b : ℤ) : Function.Injective (shiftCell a b) :=
-  add_left_injective _
-
 /-- Translate every cell of `S` by `(a, b)`. -/
 abbrev shift (a b : ℤ) (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) := translate (a, b) S
 
@@ -119,10 +116,6 @@ lemma rowSize_shift (a b : ℤ) (S : Finset (ℤ × ℤ)) (y : ℤ) :
     · rintro ⟨h1, h2⟩
       exact ⟨h1, by omega⟩
   rw [h, card_shift]
-
-lemma adj_shiftCell {a b : ℤ} {c d : ℤ × ℤ} (h : Adj L c d) :
-    Adj L (shiftCell a b c) (shiftCell a b d) :=
-  adj_add (a, b) h
 
 lemma conn_shift (a b : ℤ) {S : Finset (ℤ × ℤ)} (h : Conn L S) :
     Conn L (shift a b S) :=
@@ -326,11 +319,6 @@ lemma sum_Icc_split (f : ℤ → ℕ) {a b c : ℤ} (h1 : a ≤ b + 1) (h2 : b �
     intro y hy hy'
     rw [Finset.mem_Icc] at hy hy'
     omega
-
-lemma rowSize_union_left {A B : Finset (ℤ × ℤ)} {y : ℤ} (h : ∀ c ∈ B, c.2 ≠ y) :
-    rowSize (A ∪ B) y = rowSize A y := by
-  rw [rowSize, rowSize, Finset.filter_union,
-    Finset.filter_eq_empty_iff.mpr fun c hc => h c hc, Finset.union_empty]
 
 lemma rowSize_union_right {A B : Finset (ℤ × ℤ)} {y : ℤ} (h : ∀ c ∈ A, c.2 ≠ y) :
     rowSize (A ∪ B) y = rowSize B y := by

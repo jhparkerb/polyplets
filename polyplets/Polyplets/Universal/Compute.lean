@@ -10,7 +10,7 @@ import Polyplets.Universal.System
 /-!
 # Instance toolkit: a computable counter for `T L`, and the generic pin lemma
 
-Phase C of the universal diagonal law needs two pieces of machinery that are
+The universal diagonal law needs two pieces of machinery that are
 lattice-generic but live outside the shape engine:
 
 * **the computable twin** `Tc L W n H` — `Compute.lean`'s bounded-closure
@@ -28,8 +28,8 @@ lattice-generic but live outside the shape engine:
   witness at `k + 1` of the `k + 1` onset points *is* the witness, so it carries
   the whole diagonal law for `L`.
 
-Nothing here is instance-specific; `Universal/{King,Square,Hex}.lean` supply the
-lattices and the anchor cells.
+Nothing here is instance-specific; `King.lean` and `Universal/{Square,Hex}.lean`
+supply the lattices and the anchor cells.
 -/
 
 namespace Polyplets.Universal

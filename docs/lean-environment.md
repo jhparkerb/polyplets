@@ -159,8 +159,7 @@ theorem and the internal results they rest on. Example:
 immediately above; if the real footprint drifts (a new axiom, a dropped
 `native_decide` leaf, etc.), the string comparison fails and `lake build`
 errors — so axiom-footprint drift is a build failure, not something a
-reviewer has to remember to check. A few modules also print footprints
-unguarded (informational only).
+reviewer has to remember to check.
 
 ## 6. Editor/config, linter conventions
 

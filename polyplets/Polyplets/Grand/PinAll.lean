@@ -336,16 +336,18 @@ lemma grand_zero : GrandForm 0 Pp0 := by
     prodPoly_eval, show (3 : ℚ) ^ H = 3 * 3 ^ (H - 1) from by rw [← pow_succ']; congr 1; omega]
   norm_num
 
+/-- Level `0`: `P_0 = 1` and `μ_0`. -/
+theorem grand_base : grandOK Pk 0 ∧ muOK cTab 0 := by
+  refine ⟨fun i hi => ?_, fun i hi => ?_⟩
+  · interval_cases i; exact grand_zero
+  · interval_cases i; rw [mu_zero]; norm_num [cTab]
+
 /-- **`P_0 … P_18` and `μ_0 … μ_18`**, from the anchors: level `0` is
-`grand_zero`, each later level one `level_step`. -/
+`grand_base`, each later level one `level_step`. -/
 theorem grand_all (hA : BankedAnchors) : ∀ k, k ≤ 18 → grandOK Pk k ∧ muOK cTab k := by
   intro k
   induction k with
-  | zero =>
-    intro _
-    refine ⟨fun i hi => ?_, fun i hi => ?_⟩
-    · interval_cases i; exact grand_zero
-    · interval_cases i; rw [mu_zero]; norm_num [cTab]
+  | zero => exact fun _ => grand_base
   | succ k ih =>
     intro hk
     obtain ⟨hg, hm⟩ := ih (by omega)
@@ -362,19 +364,16 @@ theorem Pk_prod (hA : BankedAnchors) (k : ℕ) (hk : k ≤ 18) :
 /-! ## Levels `1` and `2` unconditionally
 
 The climb's first two levels need four onset cells, `T(3,2)`, `T(4,3)`,
-`T(5,3)` and `T(6,4)`, all of which the kernel decides (`Compute.lean`,
+`T(5,3)` and `T(6,4)`, all of which the kernel decides (`Enum.lean`,
 `EnumData.lean`), so `P_1` and `P_2` hold outright. `P1_closed` of
 `Pin.lean` is the Lagrange route to the first; this is the staircase route to
 both, and `P2_closed` is the `k = 2` law in its human form. -/
 
 /-- The climb to level `2`, from the kernel-decided cells. -/
 theorem grand_two : grandOK Pk 2 ∧ muOK cTab 2 := by
-  have h0 : grandOK Pk 0 ∧ muOK cTab 0 := by
-    refine ⟨fun i hi => ?_, fun i hi => ?_⟩
-    · interval_cases i; exact grand_zero
-    · interval_cases i; rw [mu_zero]; norm_num [cTab]
   have h1 : grandOK Pk 1 ∧ muOK cTab 1 :=
-    level_step 1 (by norm_num) Pk cTab h0.1 h0.2 (stair_check 1 (by norm_num) (by norm_num))
+    level_step 1 (by norm_num) Pk cTab grand_base.1 grand_base.2
+      (stair_check 1 (by norm_num) (by norm_num))
       (by norm_num [T_3_2, Pk, Pp1, prodPoly_eval])
       (by norm_num [Finset.sum_range_succ, T_4_3, Pk, cTab, Pp0, Pp1, prodPoly_eval])
   exact level_step 2 (by norm_num) Pk cTab h1.1 h1.2 (stair_check 2 (by norm_num) (by norm_num))

@@ -55,21 +55,6 @@ def rowSize (S : Finset (ℤ × ℤ)) (y : ℤ) : ℕ :=
 lemma isWalkRow_iff_rowSize {S : Finset (ℤ × ℤ)} {r : ℤ} :
     IsWalkRow S r ↔ rowSize S r = 1 := Iff.rfl
 
-/-- Every canonical set is an `n`-element subset of `Compute.lean`'s box —
-the height bounds are part of `IsCanonical`, the width bound is
-`canonical_x_le`. (Extracted from the proof of `Tc_eq_T` for reuse in the
-filtered enumerations below.) -/
-lemma canonical_mem_powersetCard_box {n H : ℕ} {S : Finset (ℤ × ℤ)}
-    (h : IsCanonical n H S) : S ∈ (box n H).powersetCard n := by
-  rw [Finset.mem_powersetCard]
-  refine ⟨fun p hp => ?_, h.card⟩
-  rw [mem_box]
-  have hx1 := canonical_x_le h hp
-  have hx0 := h.anchored.x_nonneg p hp
-  have hy0 := h.anchored.y_nonneg p hp
-  have hy1 := h.y_le p hp
-  omega
-
 /-- **Walk-top canonical sets**: the canonical `(n = H + k, H)` animals whose
 top row `H - 1` is a walk row. The enumeration domain is `Compute.lean`'s box;
 `mem_Dc` shows the encoding is invisible. -/
@@ -407,11 +392,12 @@ theorem mem_CFGVt {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
 
 /-! ## The values the proofs consume
 
-Kernel-decided, and independently cross-checked by a direct enumeration
-outside Lean (2026-07-20). Larger values (`V 1 2 = 49`, `V 2 2 = 339`,
-`Vt 2 2 = 66`, `d 0 3 = 9`, `d 1 3 = 40`, `d 2 3 = 136`, `d 2 4 = 1019`,
-`T 5 3 = 248`) were `native_decide` facts until 2026-10-12; the kernel needs
-6–9 GB for them, and nothing in the development consumes them. -/
+Kernel-decided through the window enumerations (0.4–2.6 s, under 1 GB), and
+independently cross-checked by a direct enumeration outside Lean
+(2026-07-20). The larger values (`V 1 2 = 49`, `V 2 2 = 339`, `Vt 2 2 = 66`,
+`d 0 3 = 9`, `d 1 3 = 40`, `d 2 3 = 136`, `d 2 4 = 1019`, `T 5 3 = 248`) need
+6–9 GB through these windows; `Checks.lean` and `Grand/PinAll.lean` take
+them from the enumerator of `Enum.lean` instead. -/
 
 /-- `V 1 1 = 25`: the paper-enumerated `16 + 9` gadget count. -/
 theorem V_1_1 : V 1 1 = 25 := by decide +kernel

@@ -8,6 +8,7 @@ import Mathlib.Tactic.FinCases
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Set
+import Polyplets.Enum
 import Polyplets.King
 import Polyplets.Universal.Compute
 

@@ -200,52 +200,45 @@ size, meant for validation at small `n, H` only. -/
 def Tc (n H : ℕ) : ℕ :=
   (((box n H).powersetCard n).filter fun S => IsCanonical n H S).card
 
+/-- Every canonical set is an `n`-element subset of the box — the height
+bounds are part of `IsCanonical`, the width bound is `canonical_x_le`. -/
+lemma canonical_mem_powersetCard_box {n H : ℕ} {S : Finset (ℤ × ℤ)}
+    (h : IsCanonical n H S) : S ∈ (box n H).powersetCard n := by
+  rw [Finset.mem_powersetCard]
+  refine ⟨fun p hp => ?_, h.card⟩
+  rw [mem_box]
+  have hx1 := canonical_x_le h hp
+  have hx0 := h.anchored.x_nonneg p hp
+  have hy0 := h.anchored.y_nonneg p hp
+  have hy1 := h.y_le p hp
+  omega
+
 /-- **The computable counter agrees with `T`.** The filtered enumeration is
-exactly the materialized canonical set of `Finite.lean`: membership in the
-box's `powersetCard` is implied by canonicality (height bounds from
-`IsCanonical`, width bound from `canonical_x_le`). Degenerate cases need no
-special handling: for `n = 0` or `H = 0` the `∃`-clauses of `IsCanonical` are
-unsatisfiable, so both sides are `0`. -/
+exactly the materialized canonical set of `Finite.lean`. Degenerate cases need
+no special handling: for `n = 0` or `H = 0` the `∃`-clauses of `IsCanonical`
+are unsatisfiable, so both sides are `0`. -/
 theorem Tc_eq_T (n H : ℕ) : Tc n H = T n H := by
   have hset : ((box n H).powersetCard n).filter (fun S => IsCanonical n H S)
       = (canonical_finite n H).toFinset := by
     ext S
-    simp only [Finset.mem_filter, Finset.mem_powersetCard, Set.Finite.mem_toFinset,
-      Set.mem_setOf_eq]
-    constructor
-    · exact fun h => h.2
-    · intro h
-      refine ⟨⟨fun p hp => ?_, h.card⟩, h⟩
-      rw [mem_box]
-      have hx1 := canonical_x_le h hp
-      have hx0 := h.anchored.x_nonneg p hp
-      have hy0 := h.anchored.y_nonneg p hp
-      have hy1 := h.y_le p hp
-      omega
+    simp only [Finset.mem_filter, Set.Finite.mem_toFinset, Set.mem_setOf_eq]
+    exact ⟨fun h => h.2, fun h => ⟨canonical_mem_powersetCard_box h, h⟩⟩
   rw [Tc, hset, T_eq_toFinset_card]
 
-/-! ## The cells the development consumes
+/-! ## The cell the shape theorem seeds from
 
-Three banked values (`results/triangle.txt`, provenance
-`results/ns_a36/PROVENANCE.md`, two-algorithm confirmed range), transported to
-the noncomputable `T` via `Tc_eq_T` and decided by the kernel: `T 1 1` seeds
-the shape theorem's `k = 0` pin, `T 3 2` and `T 4 3` pin `P_1`. Further cells
-are checked in `Checks.lean`. -/
+`T 1 1 = 1` seeds the `k = 0` pin (`King.lean`). The two `P_1` onset cells,
+`T 3 2` and `T 4 3`, are decided through the bit-board enumerator at the end
+of `Enum.lean`, not through `Tc`: `T 4 3` costs 14.8 s and 5.5 GB here
+against 0.4 s there (measured 2026-10-12). -/
 
 /-- `T 1 1 = 1`: the single cell. -/
 theorem T_1_1 : T 1 1 = 1 := by rw [← Tc_eq_T]; decide +kernel
 
-/-- `T 3 2 = 10` (banked, `results/triangle.txt`), the first `P_1` onset
-point. -/
-theorem T_3_2 : T 3 2 = 10 := by rw [← Tc_eq_T]; decide +kernel
-
-/-- `T 4 3 = 55` (banked, `results/triangle.txt`), the second `P_1` onset
-point. -/
-theorem T_4_3 : T 4 3 = 55 := by rw [← Tc_eq_T]; decide +kernel
-
 /-!
-Memory of kernel `decide` on this brute-force `Tc`, measured 2026-10-12
-(`scripts/lean-decide-trials.sh`): the cells above peak at 2.7–3.3 GB;
+Memory of kernel `decide` on this brute-force `Tc`
+(`scripts/lean-decide-trials.sh`, 2026-10-12): `T 1 1` … `T 3 2` peak at
+2.7–3.3 GB, `T 4 3` at 5.5 GB;
 `T 3 3` needs 6 GB; `T 5 4` (`C(20,5) = 15504` subsets) passes 8 GB and was
 killed. Cells beyond `P_1`'s onset points enter the development only as
 hypotheses (`Grand/PinAll.lean`, `BankedAnchors`).
