@@ -3,11 +3,11 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Mathlib.Algebra.Group.MinimalAxioms
+import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Analysis.Normed.Ring.Lemmas
 import Mathlib.CategoryTheory.Action.Concrete
+import Mathlib.GroupTheory.SpecificGroups.Dihedral
 import Mathlib.Tactic.Abel
-import Mathlib.Tactic.DeriveFintype
 import Mathlib.Tactic.Group
 import Mathlib.Tactic.Push
 import Mathlib.Tactic.Ring
@@ -23,9 +23,10 @@ the further quotient by the eight symmetries of the square, and every one of
 them is a Burnside average of fixed-point counts. This file builds that
 apparatus.
 
-The group is `D4`, a hand-rolled eight-element inductive with an explicit
-multiplication table (all group laws by `decide`), together with its linear
-action `D4.toFun` on `ℤ × ℤ`. Acting on *canonical* animals needs a
+The group is Mathlib's `DihedralGroup 4` (`D4` below): `r i` is the rotation
+by `i` quarter turns and `sr i` the mirror in the `x`-axis followed by `r i`.
+It acts on `ℤ × ℤ` through `D4.toFun`, built from one quarter turn and one
+mirror (`rot i = quarter^[i.val]`). Acting on *canonical* animals needs a
 re-anchoring step, because a rotated canonical animal is generally no longer
 origin-anchored:
 
@@ -42,7 +43,8 @@ origin-anchored:
 ## Results
 
 With `fixCount n g = #(fixed points of g)` and the rotation subgroup realized
-as a second small group `C4` acting through `C4.hom : C4 →* D4`:
+as the cyclic group `C4 = Multiplicative (ZMod 4)` acting through
+`rotHom : C4 →* D4`:
 
 * `free_eq` : `8 * Free n = a n + 2 * R90 n + R180 n + 2 * Hm n + 2 * Dm n`
 * `oneSided_eq` : `4 * OneSided n = a n + 2 * R90 n + R180 n`
@@ -52,9 +54,9 @@ as a second small group `C4` acting through `C4.hom : C4 →* D4`:
 The first two are Mathlib's Burnside lemma
 (`MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group`) over `D4` resp.
 `C4`, after collapsing the eight fixed-point counts by
-`fixCount_inv` (`fixedBy g = fixedBy g⁻¹`, which pairs `r1` with `r3`) and
-`fixCount_conj` (conjugation, which pairs the mirror `v` with `h` and `ad`
-with `d`).
+`fixCount_inv` (`fixedBy g = fixedBy g⁻¹`, which pairs `r 1` with `r 3`) and
+`fixCount_conj` (conjugation, which pairs the mirror `sr 2` with `sr 0` and
+`sr 1` with `sr 3`).
 
 `bilateral_eq` counts the pairs `(g, x)` with `g` a reflection fixing `x` in
 two ways. Summed over reflections it is `2 * Hm n + 2 * Dm n`; summed over
@@ -81,8 +83,8 @@ and the derived free/one-sided/bilateral values match A030222/A030233/A030234
 through `n = 6`. (Kernel `decide` on the brute-force enumeration needs more
 than 6 GB even at `n = 1`, measured 2026-10-12, so no in-file anchors.)
 In-file, the conventions are pinned by proof rather than anchor —
-`toFun_mul` forces the multiplication table to be composition of the eight
-explicit linear maps, and `D4.h` (negate `y`) vs `D4.d` (swap) are distinct
+`toFun_mul` says the eight maps compose as the group multiplies, and the axis
+mirror `sr 0` (negate `y`) and the diagonal mirror `sr 3` (swap) are distinct
 conjugacy classes by `decide` — and nothing published depends on which mirror
 is which: `free_eq` and `bilateral_eq` are symmetric in `Hm` and `Dm`.
 -/
@@ -91,94 +93,169 @@ namespace Polyplets
 
 open scoped BigOperators
 
-/-! ## The dihedral group of the square -/
+/-! ## The dihedral group of the square and its action on the plane -/
 
-/-- The eight symmetries of the square: the identity, the three rotations
-`r1, r2, r3` (quarter turns counterclockwise), the two axis-parallel mirrors
-`h` (negate `y`) and `v` (negate `x`), and the two diagonal mirrors `d` (swap)
-and `ad` (swap and negate). -/
-inductive D4 : Type
-  | e | r1 | r2 | r3 | h | v | d | ad
-  deriving DecidableEq, Fintype
+/-- The eight symmetries of the square: Mathlib's `DihedralGroup 4`, with `r i`
+the rotation by `i` quarter turns and `sr i` the mirror in the `x`-axis followed
+by `r i`. -/
+abbrev D4 := DihedralGroup 4
+
+open DihedralGroup (r sr)
+
+/-- A quarter turn counterclockwise about the origin. -/
+def quarter (p : ℤ × ℤ) : ℤ × ℤ := (-p.2, p.1)
+
+/-- The mirror in the `x`-axis. -/
+def mirror (p : ℤ × ℤ) : ℤ × ℤ := (p.1, -p.2)
+
+lemma quarter_add (p q : ℤ × ℤ) : quarter (p + q) = quarter p + quarter q := by
+  simp [quarter, add_comm]
+
+lemma quarter_injective : Function.Injective quarter := by
+  intro p q h
+  simp only [quarter, Prod.mk.injEq, neg_inj] at h
+  exact Prod.ext h.2 h.1
+
+/-- The king relation survives a quarter turn: `|Δx|, |Δy| ≤ 1` is symmetric
+under swapping and negating coordinates. -/
+lemma quarter_kingAdj {p q : ℤ × ℤ} (h : kingAdj p q) : kingAdj (quarter p) (quarter q) := by
+  obtain ⟨hne, h1, h2⟩ := h
+  refine ⟨fun hc => hne (quarter_injective hc), ?_, h1⟩
+  simp only [quarter]
+  rw [abs_le] at h2 ⊢
+  constructor <;> omega
+
+lemma mirror_add (p q : ℤ × ℤ) : mirror (p + q) = mirror p + mirror q := by
+  simp [mirror, add_comm]
+
+lemma mirror_injective : Function.Injective mirror := by
+  intro p q h
+  simp only [mirror, Prod.mk.injEq, neg_inj] at h
+  exact Prod.ext h.1 h.2
+
+lemma mirror_kingAdj {p q : ℤ × ℤ} (h : kingAdj p q) : kingAdj (mirror p) (mirror q) := by
+  obtain ⟨hne, h1, h2⟩ := h
+  refine ⟨fun hc => hne (mirror_injective hc), h1, ?_⟩
+  simp only [mirror]
+  rw [abs_le] at h2 ⊢
+  constructor <;> omega
+
+@[simp] lemma mirror_mirror (p : ℤ × ℤ) : mirror (mirror p) = p := by simp [mirror]
+
+lemma quarter_iterate_four : quarter^[4] = id := by
+  funext p
+  change quarter (quarter (quarter (quarter p))) = p
+  simp [quarter]
+
+/-- Iterating the quarter turn only matters modulo four. -/
+lemma quarter_iterate_mod (k : ℕ) : quarter^[k] = quarter^[k % 4] := by
+  conv_lhs => rw [← Nat.mod_add_div k 4, Function.iterate_add, Function.iterate_mul,
+    quarter_iterate_four, Function.iterate_id, Function.comp_id]
+
+lemma quarter_iterate_add (k : ℕ) (p q : ℤ × ℤ) :
+    quarter^[k] (p + q) = quarter^[k] p + quarter^[k] q := by
+  induction k with
+  | zero => rfl
+  | succ k ih => simp only [Function.iterate_succ_apply', ih, quarter_add]
+
+lemma quarter_iterate_kingAdj (k : ℕ) {p q : ℤ × ℤ} (h : kingAdj p q) :
+    kingAdj (quarter^[k] p) (quarter^[k] q) := by
+  induction k with
+  | zero => exact h
+  | succ k ih => simp only [Function.iterate_succ_apply']; exact quarter_kingAdj ih
+
+/-- A mirror image of a quarter turn is three quarter turns of the mirror image. -/
+lemma mirror_quarter (p : ℤ × ℤ) : mirror (quarter p) = quarter^[3] (mirror p) := by
+  change mirror (quarter p) = quarter (quarter (quarter (mirror p)))
+  simp [mirror, quarter]
+
+lemma mirror_quarter_iterate (k : ℕ) (p : ℤ × ℤ) :
+    mirror (quarter^[k] p) = quarter^[3 * k] (mirror p) := by
+  induction k with
+  | zero => rfl
+  | succ k ih =>
+    rw [Function.iterate_succ_apply', mirror_quarter, ih, ← Function.iterate_add_apply]
+    congr 1
+    ring
+
+/-- Rotation by `i` quarter turns. -/
+def rot (i : ZMod 4) : ℤ × ℤ → ℤ × ℤ := quarter^[i.val]
+
+lemma rot_zero : rot 0 = id := rfl
+
+lemma rot_one (p : ℤ × ℤ) : rot 1 p = quarter p := rfl
+
+lemma rot_add (i j : ZMod 4) : rot (i + j) = rot i ∘ rot j := by
+  rw [rot, rot, rot, ZMod.val_add, ← quarter_iterate_mod, Function.iterate_add]
+
+lemma mirror_rot (i : ZMod 4) (p : ℤ × ℤ) : mirror (rot i p) = rot (-i) (mirror p) := by
+  rw [rot, rot, mirror_quarter_iterate, show (-i : ZMod 4) = 3 * i by
+    rw [show (3 : ZMod 4) = -1 by decide, neg_one_mul], ZMod.val_mul, ← quarter_iterate_mod]
+  rfl
 
 namespace D4
 
-/-- Composition table of `D4`, written so that `mul g g'` is "`g` after `g'`"
-(matching `toFun_mul`). -/
-def mul : D4 → D4 → D4
-  | e, e => e   | e, r1 => r1 | e, r2 => r2 | e, r3 => r3
-  | e, h => h   | e, v => v   | e, d => d   | e, ad => ad
-  | r1, e => r1 | r1, r1 => r2 | r1, r2 => r3 | r1, r3 => e
-  | r1, h => d  | r1, v => ad | r1, d => v  | r1, ad => h
-  | r2, e => r2 | r2, r1 => r3 | r2, r2 => e  | r2, r3 => r1
-  | r2, h => v  | r2, v => h  | r2, d => ad | r2, ad => d
-  | r3, e => r3 | r3, r1 => e  | r3, r2 => r1 | r3, r3 => r2
-  | r3, h => ad | r3, v => d  | r3, d => h  | r3, ad => v
-  | h, e => h   | h, r1 => ad | h, r2 => v  | h, r3 => d
-  | h, h => e   | h, v => r2  | h, d => r3  | h, ad => r1
-  | v, e => v   | v, r1 => d  | v, r2 => h  | v, r3 => ad
-  | v, h => r2  | v, v => e   | v, d => r1  | v, ad => r3
-  | d, e => d   | d, r1 => h  | d, r2 => ad | d, r3 => v
-  | d, h => r1  | d, v => r3  | d, d => e   | d, ad => r2
-  | ad, e => ad | ad, r1 => v | ad, r2 => d | ad, r3 => h
-  | ad, h => r3 | ad, v => r1 | ad, d => r2 | ad, ad => e
-
-/-- Inversion in `D4`: everything but the two quarter turns is an involution. -/
-def inv : D4 → D4
-  | e => e | r1 => r3 | r2 => r2 | r3 => r1
-  | h => h | v => v | d => d | ad => ad
-
-instance instMul : Mul D4 := ⟨mul⟩
-instance instOne : One D4 := ⟨e⟩
-instance instInv : Inv D4 := ⟨inv⟩
-
-instance instGroup : Group D4 :=
-  Group.ofLeftAxioms (by decide) (by decide) (by decide)
-
-lemma mul_def (g g' : D4) : g * g' = mul g g' := rfl
-
-/-- The action of `D4` on the integer plane, by the eight linear maps of the
-square lattice. -/
+/-- The action of `D4` on the integer plane: `r i` rotates by `i` quarter turns,
+`sr i` mirrors in the `x`-axis and then rotates. -/
 def toFun : D4 → ℤ × ℤ → ℤ × ℤ
-  | e,  p => (p.1, p.2)
-  | r1, p => (-p.2, p.1)
-  | r2, p => (-p.1, -p.2)
-  | r3, p => (p.2, -p.1)
-  | h,  p => (p.1, -p.2)
-  | v,  p => (-p.1, p.2)
-  | d,  p => (p.2, p.1)
-  | ad, p => (-p.2, -p.1)
+  | .r i => rot i
+  | .sr i => mirror ∘ rot i
 
 @[simp] lemma toFun_one (p : ℤ × ℤ) : toFun 1 p = p := rfl
 
 lemma toFun_mul (g g' : D4) (p : ℤ × ℤ) : toFun (g * g') p = toFun g (toFun g' p) := by
-  rw [mul_def]
-  cases g <;> cases g' <;> simp [toFun, mul]
+  rcases g with i | i <;> rcases g' with j | j
+  · rw [DihedralGroup.r_mul_r]
+    exact congrFun (rot_add i j) p
+  · rw [DihedralGroup.r_mul_sr]
+    change mirror (rot (j - i) p) = rot i (mirror (rot j p))
+    rw [mirror_rot, mirror_rot, ← Function.comp_apply (f := rot i), ← rot_add, neg_sub,
+      sub_eq_add_neg]
+  · rw [DihedralGroup.sr_mul_r]
+    change mirror (rot (i + j) p) = mirror (rot i (rot j p))
+    rw [rot_add]
+    rfl
+  · rw [DihedralGroup.sr_mul_sr]
+    change rot (j - i) p = mirror (rot i (mirror (rot j p)))
+    rw [mirror_rot, mirror_mirror, ← Function.comp_apply (f := rot (-i)), ← rot_add,
+      neg_add_eq_sub]
 
 /-- Every element of `D4` acts by an additive map, which is what makes
 re-anchoring commute with the action. -/
 lemma toFun_add (g : D4) (p q : ℤ × ℤ) : toFun g (p + q) = toFun g p + toFun g q := by
-  cases g <;> refine Prod.ext ?_ ?_ <;> simp [toFun] <;> ring
+  rcases g with i | i
+  · exact quarter_iterate_add _ p q
+  · change mirror (rot i (p + q)) = mirror (rot i p) + mirror (rot i q)
+    rw [rot, quarter_iterate_add, mirror_add]
 
 lemma toFun_injective (g : D4) : Function.Injective (toFun g) := by
-  intro p q hpq
-  cases g <;> · simp only [toFun, Prod.mk.injEq] at hpq; exact Prod.ext (by omega) (by omega)
+  rcases g with i | i
+  · exact quarter_injective.iterate _
+  · exact mirror_injective.comp (quarter_injective.iterate _)
 
-/-- The king relation is `D4`-invariant: `|Δx|, |Δy| ≤ 1` is symmetric under
-swapping and negating coordinates. -/
+/-- The king relation is `D4`-invariant. -/
 lemma toFun_kingAdj (g : D4) {p q : ℤ × ℤ} (hpq : kingAdj p q) :
     kingAdj (toFun g p) (toFun g q) := by
-  obtain ⟨hne, h1, h2⟩ := hpq
-  rw [abs_le] at h1 h2
-  refine ⟨fun hc => hne (toFun_injective g hc), ?_, ?_⟩ <;>
-    cases g <;> simp only [toFun, abs_le] <;> omega
+  rcases g with i | i
+  · exact quarter_iterate_kingAdj _ hpq
+  · exact mirror_kingAdj (quarter_iterate_kingAdj _ hpq)
 
 /-- The four reflections. -/
-def refls : Finset D4 := {h, v, d, ad}
+def refls : Finset D4 := {sr 0, sr 1, sr 2, sr 3}
+
+/-- A sum over `D4` is a sum over the rotations plus a sum over the mirrors. -/
+lemma sum_univ {M : Type*} [AddCommMonoid M] (f : D4 → M) :
+    ∑ g : D4, f g = ∑ i : ZMod 4, f (r i) + ∑ i : ZMod 4, f (sr i) := by
+  rw [← Fintype.sum_equiv DihedralGroup.equivSum.symm (fun x => f (DihedralGroup.equivSum.symm x))
+    f (fun _ => rfl), Fintype.sum_sum_type]
+  rfl
 
 end D4
 
-/-! ## Translations and re-anchoring -/
+/-- A sum over `ZMod 4`, unfolded. -/
+lemma ZMod.sum_univ_four {M : Type*} [AddCommMonoid M] (f : ZMod 4 → M) :
+    ∑ i : ZMod 4, f i = f 0 + f 1 + f 2 + f 3 :=
+  Fin.sum_univ_four f
 
 /-- `IsCanonicalAnimal` is "`n` cells, king-connected, anchored". -/
 lemma isCanonicalAnimal_iff (n : ℕ) (S : Finset (ℤ × ℤ)) :
@@ -367,18 +444,18 @@ noncomputable instance instFintypeOrbitsD4 (n : ℕ) :
 noncomputable def fixCount (n : ℕ) (g : D4) : ℕ := Nat.card (MulAction.fixedBy (CA n) g)
 
 /-- Quarter-turn-symmetric animals. -/
-noncomputable def R90 (n : ℕ) : ℕ := fixCount n D4.r1
+noncomputable def R90 (n : ℕ) : ℕ := fixCount n (r 1)
 
 /-- Half-turn-symmetric animals. -/
-noncomputable def R180 (n : ℕ) : ℕ := fixCount n D4.r2
+noncomputable def R180 (n : ℕ) : ℕ := fixCount n (r 2)
 
 /-- Animals symmetric in an axis-parallel mirror (`y ↦ -y`); the `hmirror`
 column of `results/sym_counts.txt`. -/
-noncomputable def Hm (n : ℕ) : ℕ := fixCount n D4.h
+noncomputable def Hm (n : ℕ) : ℕ := fixCount n (sr 0)
 
 /-- Animals symmetric in a diagonal mirror (swap coordinates); the `dmirror`
 column of `results/sym_counts.txt`. -/
-noncomputable def Dm (n : ℕ) : ℕ := fixCount n D4.d
+noncomputable def Dm (n : ℕ) : ℕ := fixCount n (sr 3)
 
 /-- Free polyplets: `D4`-orbits of canonical animals (A030222). -/
 noncomputable def Free (n : ℕ) : ℕ := Nat.card (MulAction.orbitRel.Quotient D4 (CA n))
@@ -402,7 +479,7 @@ lemma fixCount_inv (n : ℕ) (g : D4) : fixCount n g⁻¹ = fixCount n g := by
     rw [smul_smul, inv_mul_cancel, one_smul]
 
 /-- Conjugate elements have equinumerous fixed-point sets; this pairs the
-mirror `v` with `h` and `ad` with `d`. -/
+mirror `sr 2` with `sr 0` and `sr 1` with `sr 3`. -/
 lemma fixCount_conj (n : ℕ) (g c : D4) : fixCount n (c * g * c⁻¹) = fixCount n g := by
   rw [fixCount, fixCount]
   refine Nat.card_congr ⟨fun x => ⟨c⁻¹ • x.1, ?_⟩, fun y => ⟨c • y.1, ?_⟩, ?_, ?_⟩
@@ -424,19 +501,16 @@ lemma fixCount_conj (n : ℕ) (g c : D4) : fixCount n (c * g * c⁻¹) = fixCoun
   · intro y; ext; simp
 
 /-- The two quarter turns are inverse, hence equinumerously fixed. -/
-lemma fixCount_r3 (n : ℕ) : fixCount n D4.r3 = fixCount n D4.r1 := by
-  have h : (D4.r3 : D4) = D4.r1⁻¹ := by decide
-  rw [h, fixCount_inv]
+lemma fixCount_r3 (n : ℕ) : fixCount n (r 3) = fixCount n (r 1) := by
+  rw [show (r 3 : D4) = (r 1)⁻¹ by decide, fixCount_inv]
 
 /-- The two axis-parallel mirrors are conjugate by a quarter turn. -/
-lemma fixCount_v (n : ℕ) : fixCount n D4.v = fixCount n D4.h := by
-  have h : (D4.v : D4) = D4.r1 * D4.h * D4.r1⁻¹ := by decide
-  rw [h, fixCount_conj]
+lemma fixCount_sr2 (n : ℕ) : fixCount n (sr 2) = fixCount n (sr 0) := by
+  rw [show (sr 2 : D4) = r 1 * sr 0 * (r 1)⁻¹ by decide, fixCount_conj]
 
 /-- The two diagonal mirrors are conjugate by a quarter turn. -/
-lemma fixCount_ad (n : ℕ) : fixCount n D4.ad = fixCount n D4.d := by
-  have h : (D4.ad : D4) = D4.r1 * D4.d * D4.r1⁻¹ := by decide
-  rw [h, fixCount_conj]
+lemma fixCount_sr1 (n : ℕ) : fixCount n (sr 1) = fixCount n (sr 3) := by
+  rw [show (sr 1 : D4) = r 1 * sr 3 * (r 1)⁻¹ by decide, fixCount_conj]
 
 /-! ## Burnside over the full symmetry group -/
 
@@ -444,23 +518,15 @@ lemma card_fixedBy_eq_fixCount (n : ℕ) (g : D4) :
     Fintype.card (MulAction.fixedBy (CA n) g) = fixCount n g :=
   (Nat.card_eq_fintype_card).symm
 
-/-- Sum over `D4` of a function, unfolded into its eight terms. -/
-lemma D4.sum_univ {M : Type*} [AddCommMonoid M] (f : D4 → M) :
-    ∑ g : D4, f g = f e + f r1 + f r2 + f r3 + f h + f v + f d + f ad := by
-  have : (Finset.univ : Finset D4) = {e, r1, r2, r3, h, v, d, ad} := by decide
-  rw [this]
-  simp only [Finset.sum_insert, Finset.mem_insert, Finset.mem_singleton, Finset.sum_singleton,
-    reduceCtorEq, or_self, not_false_eq_true]
-  abel
-
 /-- **Burnside's lemma for `D4`.** -/
 theorem free_eq (n : ℕ) :
     8 * Free n = a n + 2 * R90 n + R180 n + 2 * Hm n + 2 * Dm n := by
   have hb := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group D4 (CA n)
-  rw [D4.sum_univ (fun g => Fintype.card (MulAction.fixedBy (CA n) g))] at hb
+  rw [D4.sum_univ (fun g => Fintype.card (MulAction.fixedBy (CA n) g)), ZMod.sum_univ_four,
+    ZMod.sum_univ_four] at hb
   simp only [card_fixedBy_eq_fixCount] at hb
-  rw [show (D4.e : D4) = 1 from rfl, fixCount_one, fixCount_r3, fixCount_v, fixCount_ad] at hb
-  have hcard : Fintype.card D4 = 8 := by decide
+  rw [DihedralGroup.r_zero, fixCount_one, fixCount_r3, fixCount_sr2, fixCount_sr1] at hb
+  have hcard : Fintype.card D4 = 8 := DihedralGroup.card
   have hfree : Fintype.card (MulAction.orbitRel.Quotient D4 (CA n)) = Free n :=
     (Nat.card_eq_fintype_card).symm
   rw [hcard, hfree] at hb
@@ -469,54 +535,24 @@ theorem free_eq (n : ℕ) :
 
 /-! ## Burnside over the rotation subgroup -/
 
-/-- The cyclic group of order four, acting on canonical animals through the
-rotations of `D4`. Realizing the rotation subgroup as a group in its own right
-(rather than as a `Subgroup D4`) keeps the four-term Burnside sum concrete. -/
-inductive C4 : Type
-  | c0 | c1 | c2 | c3
-  deriving DecidableEq, Fintype
+/-- The cyclic group of order four, `Multiplicative (ZMod 4)`, which acts on
+canonical animals through the rotations of `D4`. -/
+abbrev C4 := Multiplicative (ZMod 4)
 
-namespace C4
-
-/-- Addition table of `ℤ/4`, written multiplicatively. -/
-def mul : C4 → C4 → C4
-  | c0, c0 => c0 | c0, c1 => c1 | c0, c2 => c2 | c0, c3 => c3
-  | c1, c0 => c1 | c1, c1 => c2 | c1, c2 => c3 | c1, c3 => c0
-  | c2, c0 => c2 | c2, c1 => c3 | c2, c2 => c0 | c2, c3 => c1
-  | c3, c0 => c3 | c3, c1 => c0 | c3, c2 => c1 | c3, c3 => c2
-
-/-- Negation in `ℤ/4`, written multiplicatively. -/
-def inv : C4 → C4
-  | c0 => c0 | c1 => c3 | c2 => c2 | c3 => c1
-
-instance instMul : Mul C4 := ⟨mul⟩
-instance instOne : One C4 := ⟨c0⟩
-instance instInv : Inv C4 := ⟨inv⟩
-
-instance instGroup : Group C4 :=
-  Group.ofLeftAxioms (by decide) (by decide) (by decide)
-
-/-- The rotation embedding. -/
-def toD4 : C4 → D4
-  | c0 => D4.e | c1 => D4.r1 | c2 => D4.r2 | c3 => D4.r3
-
-/-- `C4` as a subgroup of `D4`, bundled. -/
-def hom : C4 →* D4 where
-  toFun := toD4
+/-- The rotation subgroup, as a homomorphism `C4 →* D4`. -/
+def rotHom : C4 →* D4 where
+  toFun c := r c.toAdd
   map_one' := rfl
-  map_mul' := by decide
+  map_mul' _ _ := (DihedralGroup.r_mul_r _ _).symm
 
-lemma sum_univ {M : Type*} [AddCommMonoid M] (f : C4 → M) :
-    ∑ c : C4, f c = f c0 + f c1 + f c2 + f c3 := by
-  have h : (Finset.univ : Finset C4) = {c0, c1, c2, c3} := by decide
-  rw [h]
-  simp only [Finset.sum_insert, Finset.mem_insert, Finset.mem_singleton, Finset.sum_singleton,
-    reduceCtorEq, or_self, not_false_eq_true]
-  abel
+lemma rotHom_apply (c : C4) : rotHom c = r c.toAdd := rfl
 
-end C4
+/-- A sum over `C4`, unfolded. -/
+lemma C4.sum_univ {M : Type*} [AddCommMonoid M] (f : C4 → M) :
+    ∑ c : C4, f c = f (.ofAdd 0) + f (.ofAdd 1) + f (.ofAdd 2) + f (.ofAdd 3) :=
+  Fin.sum_univ_four f
 
-instance instMulActionC4CA (n : ℕ) : MulAction C4 (CA n) := MulAction.compHom _ C4.hom
+instance instMulActionC4CA (n : ℕ) : MulAction C4 (CA n) := MulAction.compHom _ rotHom
 
 noncomputable instance instFintypeFixedByC4 (n : ℕ) (c : C4) :
     Fintype (MulAction.fixedBy (CA n) c) := Fintype.ofFinite _
@@ -528,7 +564,7 @@ noncomputable instance instFintypeOrbitsC4 (n : ℕ) :
 noncomputable def OneSided (n : ℕ) : ℕ := Nat.card (MulAction.orbitRel.Quotient C4 (CA n))
 
 lemma card_fixedByC4 (n : ℕ) (c : C4) :
-    Fintype.card (MulAction.fixedBy (CA n) c) = fixCount n (C4.toD4 c) := by
+    Fintype.card (MulAction.fixedBy (CA n) c) = fixCount n (rotHom c) := by
   rw [fixCount, Nat.card_eq_fintype_card]
   exact Fintype.card_congr' rfl
 
@@ -537,9 +573,9 @@ theorem oneSided_eq (n : ℕ) :
     4 * OneSided n = a n + 2 * R90 n + R180 n := by
   have hb := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group C4 (CA n)
   rw [C4.sum_univ (fun c => Fintype.card (MulAction.fixedBy (CA n) c))] at hb
-  simp only [card_fixedByC4, C4.toD4] at hb
-  rw [show (D4.e : D4) = 1 from rfl, fixCount_one, fixCount_r3] at hb
-  have hcard : Fintype.card C4 = 4 := by decide
+  simp only [card_fixedByC4, rotHom_apply, toAdd_ofAdd] at hb
+  rw [DihedralGroup.r_zero, fixCount_one, fixCount_r3] at hb
+  have hcard : Fintype.card C4 = 4 := ZMod.card 4
   have hone : Fintype.card (MulAction.orbitRel.Quotient C4 (CA n)) = OneSided n :=
     (Nat.card_eq_fintype_card).symm
   rw [hcard, hone] at hb
@@ -682,17 +718,17 @@ lemma quarter_turn_card_mod (n : ℕ) (S : Finset (ℤ × ℤ)) (A B : ℤ)
 /-- **Quarter-turn symmetry is impossible unless `n ≡ 0, 1 (mod 4)`.** -/
 theorem r90_vanish (n : ℕ) (h : ¬ (n % 4 = 0 ∨ n % 4 = 1)) : R90 n = 0 := by
   rw [R90, fixCount]
-  have hempty : IsEmpty (MulAction.fixedBy (CA n) D4.r1) := by
+  have hempty : IsEmpty (MulAction.fixedBy (CA n) (r 1 : D4)) := by
     constructor
     rintro ⟨x, hx⟩
-    have h1 : reanchor (x.1.image (D4.toFun D4.r1)) = x.1 := congrArg Subtype.val hx
-    obtain ⟨v, hveq⟩ : ∃ v : ℤ × ℤ, reanchor (x.1.image (D4.toFun D4.r1))
+    have h1 : reanchor (x.1.image (D4.toFun (r 1))) = x.1 := congrArg Subtype.val hx
+    obtain ⟨v, hveq⟩ : ∃ v : ℤ × ℤ, reanchor (x.1.image (D4.toFun (r 1)))
         = x.1.image (fun p : ℤ × ℤ => (-p.2 + -v.1, p.1 + -v.2)) := by
-      refine ⟨anchorVec (x.1.image (D4.toFun D4.r1)), ?_⟩
+      refine ⟨anchorVec (x.1.image (D4.toFun (r 1))), ?_⟩
       rw [reanchor, Finset.image_image]
       refine Finset.image_congr ?_
       intro p _
-      simp only [Function.comp_apply, D4.toFun]
+      simp only [Function.comp_apply, D4.toFun, rot_one, quarter]
       refine Prod.ext ?_ ?_ <;> simp [sub_eq_add_neg]
     rw [hveq] at h1
     exact h (quarter_turn_card_mod n x.1 (-v.1) (-v.2) x.2.1 h1)
@@ -744,10 +780,9 @@ lemma sum_card_filter_comm {α β : Type*}
   exact Finset.sum_comm
 
 lemma D4.sum_refls {M : Type*} [AddCommMonoid M] (f : D4 → M) :
-    ∑ g ∈ D4.refls, f g = f h + f v + f d + f ad := by
-  rw [D4.refls]
-  simp only [Finset.sum_insert, Finset.mem_insert, Finset.mem_singleton, Finset.sum_singleton,
-    reduceCtorEq, or_self, not_false_eq_true]
+    ∑ g ∈ D4.refls, f g = f (sr 0) + f (sr 1) + f (sr 2) + f (sr 3) := by
+  rw [D4.refls, Finset.sum_insert (by decide), Finset.sum_insert (by decide),
+    Finset.sum_insert (by decide), Finset.sum_singleton]
   abel
 
 lemma smul_achiral_iff {n : ℕ} (g : D4) (y : achiral n) :
@@ -778,7 +813,7 @@ lemma sum_stab_achiral (n : ℕ) :
     rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_finsetCard]
     exact Nat.card_congr (Equiv.subtypeEquivRight fun y => by simp)
   simp only [hterm] at hb
-  rw [show Fintype.card D4 = 8 from by decide,
+  rw [show Fintype.card D4 = 8 from DihedralGroup.card,
     show Fintype.card (MulAction.orbitRel.Quotient D4 (achiral n)) = Bilateral n from
       (Nat.card_eq_fintype_card).symm] at hb
   rw [← hb]
@@ -796,11 +831,11 @@ lemma sum_stab_refl_achiral (n : ℕ) :
     exact (Nat.card_congr (Equiv.subtypeEquivRight fun y => by simp)).symm
   simp only [hterm]
   rw [D4.sum_refls (fun g => Nat.card (MulAction.fixedBy (achiral n) g))]
-  rw [card_fixedBy_achiral_refl n (by decide : D4.h ∈ D4.refls),
-    card_fixedBy_achiral_refl n (by decide : D4.v ∈ D4.refls),
-    card_fixedBy_achiral_refl n (by decide : D4.d ∈ D4.refls),
-    card_fixedBy_achiral_refl n (by decide : D4.ad ∈ D4.refls),
-    fixCount_v, fixCount_ad]
+  rw [card_fixedBy_achiral_refl n (by decide : sr 0 ∈ D4.refls),
+    card_fixedBy_achiral_refl n (by decide : sr 1 ∈ D4.refls),
+    card_fixedBy_achiral_refl n (by decide : sr 2 ∈ D4.refls),
+    card_fixedBy_achiral_refl n (by decide : sr 3 ∈ D4.refls),
+    fixCount_sr2, fixCount_sr1]
   simp only [Hm, Dm]
   omega
 

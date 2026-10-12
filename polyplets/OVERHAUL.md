@@ -83,7 +83,9 @@ Easiest and most depended-on first. One commit per item.
       instead of two 30-line mirror-image branches.
 - [ ] A14. `Peel`: classes B and C share one peel/glue pair parametrized by
       whether a walk cell caps the cluster, instead of two ~350-line copies.
-- [ ] A15. `Symmetry`: `DihedralGroup 4` from Mathlib in place of the
+- [x] A15 (2026-10-12: `D4 = DihedralGroup 4`, `C4 = Multiplicative (ZMod 4)`
+      through `rotHom`; the action is built from one quarter turn and one
+      mirror). `Symmetry`: `DihedralGroup 4` from Mathlib in place of the
       hand-rolled `D4` and `C4` tables.
 - [ ] A16. `SymmetryRatioClaim` as a theorem, conditional on the banked
       a(40): encode a symmetric animal by its axis cells and the components
