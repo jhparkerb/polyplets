@@ -25,11 +25,11 @@ up-offset there is exactly one way to continue a walk row upward.
 `|Δx| + |Δy| = 1` of the ordinary square lattice, so `T squareLattice n H`
 counts fixed polyominoes of `n` cells and bounding-box height exactly `H`.
 
-## What is pinned here
+## What is determined here
 
 * `isDiagonalPoly_sqP1` / `square_T_sub_one` : `P₁(n) = 4n − 8`, i.e.
   `T(n, n−1) = 4n − 8` for `n ≥ 3` (paper instance table, density `4 = 2²`),
-  given the second anchor cell `T(4,3) = 8` as a hypothesis. The first anchor
+  given the second cell `T(4,3) = 8` as a hypothesis. The first
   `T(3,2) = 4` the kernel decides from the generic enumerator `Tc`, and
   `Universal/Compute.lean`'s `isDiagonalPoly_of_eval` does the Lagrange step; `T(4,3)` needs more
   than 8 GB in the kernel (measured 2026-10-12).
@@ -62,7 +62,7 @@ lemma mem_squareLattice_D {t : ℤ} : t ∈ squareLattice.D ↔ t = 0 := by
 lemma square_reach_le : squareLattice.reach ≤ 1 :=
   reach_le_one _ (by decide)
 
-/-- **The instance anchor**: row-local adjacency at the square lattice IS
+/-- **The instance bridge**: row-local adjacency at the square lattice IS
 ordinary ℓ¹ (edge) adjacency of the square lattice. -/
 theorem adj_square {p q : ℤ × ℤ} :
     Adj squareLattice p q ↔ |p.1 - q.1| + |p.2 - q.2| = 1 := by
@@ -73,7 +73,7 @@ theorem adj_square {p q : ℤ × ℤ} :
     rcases abs_cases (p.2 - q.2) with ⟨h2, h2'⟩ | ⟨h2, h2'⟩ <;>
       rw [h1, h2] <;> omega
 
-/-! ## The first anchor cell
+/-! ## The first cell
 
 The generic enumerator at `W = n` (legitimate because `M ≤ 1`), decided by the
 kernel; `Tc_eq_T_of_reach_le_one` transports the value to the noncomputable `T`.
@@ -86,7 +86,7 @@ theorem T_square_3_2 : T squareLattice 3 2 = 4 := by
 
 /-! ## Pinning `P₁` -/
 
-/-- The square lattice's level-1 production polynomial `P₁ = 4X − 8`. -/
+/-- The square lattice's level-1 diagonal polynomial `P₁ = 4X − 8`. -/
 noncomputable def sqP1 : Polynomial ℚ := C 4 * X - C 8
 
 /-- `P₁` has degree `≤ 1`. -/
@@ -108,7 +108,7 @@ lemma sqP1_eval_four (h43 : T squareLattice 4 3 = 8) :
     sqP1.eval (4 : ℚ) = ((T squareLattice 4 3 * squareLattice.b ^ 0 : ℕ) : ℚ) := by
   rw [sqP1_eval, h43, b_square]; norm_num
 
-/-- **The square `P₁`, pinned** , given the second anchor cell
+/-- **The square `P₁`**, given the second cell
 `T(4,3) = 8`: Lagrange uniqueness identifies `4X − 8` with the witness of
 `Universal.exists_isDiagonalPoly`. -/
 theorem isDiagonalPoly_sqP1 (h43 : T squareLattice 4 3 = 8) :
@@ -124,7 +124,7 @@ theorem isDiagonalPoly_sqP1 (h43 : T squareLattice 4 3 = 8) :
 
 /-- **The square `P₁`, human form**: the number of fixed polyominoes with `n`
 cells and bounding-box height exactly `n − 1` is `4n − 8`, for every `n ≥ 3`,
-given `T(4,3) = 8`. (The drift factor is `1^(n-4) = 1`, so the production form
+given `T(4,3) = 8`. (The drift factor is `1^(n-4) = 1`, so the law
 *is* the closed form.) -/
 theorem square_T_sub_one (h43 : T squareLattice 4 3 = 8) (n : ℕ) (hn : 3 ≤ n) :
     (T squareLattice n (n - 1) : ℚ) = 4 * (n : ℚ) - 8 := by

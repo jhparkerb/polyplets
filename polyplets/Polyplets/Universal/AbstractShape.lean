@@ -326,7 +326,7 @@ theorem IsDiagonalPoly.cleared {k : ℕ} {P : Polynomial ℚ} (hP : S.IsDiagonal
 
 /-! ## Integrality -/
 
-/-- **Integrality at the pinning window**: for `2k+1 ≤ n ≤ 3k+1` the
+/-- **Integrality at the onset window**: for `2k+1 ≤ n ≤ 3k+1` the
 value `P_k(n)` is the natural number `T(n, n-k) · b^(3k+1-n)`. These are
 exactly the `k+1` onset points `H = k+1 .. 2k+1` (`n = H+k`). Stated for any
 `P` satisfying the law.
@@ -347,7 +347,7 @@ theorem IsDiagonalPoly.eval_onset {k : ℕ} {P : Polynomial ℚ} (hP : S.IsDiago
   push_cast
   ring
 
-/-- Integrality at the pinning window, in `∃ z : ℤ` form. -/
+/-- Integrality at the onset window, in `∃ z : ℤ` form. -/
 theorem IsDiagonalPoly.eval_onset_int {k : ℕ} {P : Polynomial ℚ} (hP : S.IsDiagonalPoly k P)
     {n : ℕ} (hn1 : 2 * k + 1 ≤ n) (hn2 : n ≤ 3 * k + 1) :
     ∃ z : ℤ, P.eval (n : ℚ) = (z : ℚ) :=
@@ -356,9 +356,9 @@ theorem IsDiagonalPoly.eval_onset_int {k : ℕ} {P : Polynomial ℚ} (hP : S.IsD
     push_cast
     ring⟩
 
-/-- **Integrality everywhere**: any `P` of degree `≤ k` satisfying the production
-identity is integer-valued on all of `ℤ` — the `k+1` onset points
-`n = 2k+1 .. 3k+1` are integer (`IsDiagonalPoly.eval_onset`) and consecutive, so finite differences
+/-- **Integrality everywhere**: any `P` of degree `≤ k` satisfying the law is
+integer-valued on all of `ℤ` — the `k+1` onset points `n = 2k+1 .. 3k+1` are
+integer (`IsDiagonalPoly.eval_onset`) and consecutive, so finite differences
 (`int_valued_of_consecutive`, `DiscreteCalculus.lean`)
 extend integrality everywhere. -/
 theorem IsDiagonalPoly.intValued {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree ≤ k)

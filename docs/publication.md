@@ -165,8 +165,8 @@ conditionality (`MoatBound`) is a formalization gap, not a mathematical one.
 | 2 | the defect gas: 25 = 16 + 9, and the same bookkeeping generates every P_k | 1 | `results/diagonal-formula.md` | the note's derivation |
 | 3 | the universal diagonal formula: T(H+k,H) = q_k(H)·b^H for every row-local lattice, deg q_k ≤ k, H ≥ k+1 | 2 | `docs/proofs/universal-diagonal-law.md`; Lean `Universal.exists_delta`, `exists_q`, `exists_isDiagonalPoly`, `IsDiagonalPoly.intValued`, standard axioms | `lake build --no-build`; the four names guarded |
 | 4 | the lattice instances (king b = 3, hex b = 2, square b = 1) | 2 | Lean `T_sub_one`, `hex_T_sub_one`, `square_T_sub_one` (renamed 2026-10-12) | named native leaves, two triangle entries per lattice; the table must say so |
-| 5 | the grand form | 2 | `docs/proofs/grand-form.md`; Lean `grand_form`, `grand_form_prod`, standard axioms | guarded |
-| 6 | P_k determined to k ≤ 18 from production data | 2 | Lean `P18_grand_of_banked`, `P18_grand_prod` | named leaves: the chunked weight cards |
+| 5 | the grand form | 2 | `docs/proofs/grand-form.md`; Lean `T_staircase`, `climb` (renamed 2026-10-12), standard axioms | guarded |
+| 6 | P_k determined to k ≤ 18 from production data | 2 | Lean `isDiagonalPoly_Pk` under `EnumeratedCells` (renamed 2026-10-12) | named leaves: the chunked weight cards |
 | 7 | the ternary spine: the triangle mod 3 is governed by W³ = W² + t | 1/4 | `results/arithmetic-structure.md`; the formula and its consequences down the levels proved, the "bonus depth" section measured | `experiments/ternary_spine.py`, 15 of 15, with a 342-entry check |
 | 8 | Smith normal form: all invariant factors powers of 3, ⌈(N−1)/3⌉ nontrivial | 1/4 | `results/arithmetic-structure.md`; the 3-power containment and (A1b), (A2), (B) proved, the rest conjectural | sympy SNF on the recorded triangle, N = 4..14 |
 | 9 | the anisotropic generating function is not D-finite, certified degrees deg ψ_H = 1, 2, 4, 9, 29, 68, 181, 462, 1254, 3289 | 3 | `results/anisotropic-not-dfinite.md`, mod p = 2⁶¹−1 with preserved degrees | the note's exact-arithmetic checker |

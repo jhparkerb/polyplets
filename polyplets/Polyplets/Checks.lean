@@ -18,7 +18,7 @@ out of the library modules the way a test file is: the root target builds
 this module, nothing imports it. Each value is a banked engine number
 (`results/triangle.txt`, `results/sym_counts.txt`, OEIS) or a paper count;
 a mismatch fails the build. The facts a proof actually needs (`T_1_1`,
-`T_3_2`, `T_4_3`, `V_1_1`, `Vt_1_1`, `d_0_1`, the first anchor cell of each lattice)
+`T_3_2`, `T_4_3`, `V_1_1`, `Vt_1_1`, `d_0_1`, the first enumerated cell of each lattice)
 live beside their consumers.
 
 Everything up to six cells comes from the bit-board enumerator of `Enum.lean`
@@ -71,28 +71,28 @@ theorem T_of_d_1_2 : T 3 2 = d 1 2 + Vt 1 1 * d 0 1 := by
   norm_num [T_3_2, d_1_2, Vt_1_1, d_0_1]
 
 /-- The μ-recursion at `(k, H) = (1, 2)`: `d 1 3 = μ₀·d 1 2 + μ₁·d 0 2`. -/
-theorem d_mu_rec_check_k1_H2 : (d 1 3 : ℚ) = mu 0 * d 1 2 + mu 1 * d 0 2 := by
-  have h := d_mu_rec 2 1 (by norm_num)
+theorem d_staircase_1_2 : (d 1 3 : ℚ) = mu 0 * d 1 2 + mu 1 * d 0 2 := by
+  have h := d_staircase 2 1 (by norm_num)
   simpa only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Nat.sub_zero] using h
 
 /-- …and its right-hand side evaluates to the banked `d 1 3 = 40`:
 `3·5 + (25/3)·3`. -/
-theorem d_mu_rec_value_check : mu 0 * (d 1 2 : ℚ) + mu 1 * (d 0 2 : ℚ) = 40 := by
+theorem d_staircase_value_1_2 : mu 0 * (d 1 2 : ℚ) + mu 1 * (d 0 2 : ℚ) = 40 := by
   rw [mu_zero, mu_one, d_1_2, d_0_2]; norm_num
 
 /-- The μ-recursion at `(k, H) = (2, 3)`. -/
-theorem d_mu_rec_check_k2_H3 : (d 2 4 : ℚ) = mu 0 * d 2 3 + mu 1 * d 1 3 + mu 2 * d 0 3 := by
-  have h := d_mu_rec 3 2 (by norm_num)
+theorem d_staircase_2_3 : (d 2 4 : ℚ) = mu 0 * d 2 3 + mu 1 * d 1 3 + mu 2 * d 0 3 := by
+  have h := d_staircase 3 2 (by norm_num)
   simpa only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Nat.sub_zero] using h
 
 /-- The staircase at `(k, H) = (1, 2)`: `T 4 3 = μ₀·T 3 2 + μ₁·T 2 2`. -/
-theorem T_staircase_check_k1_H2 : (T 4 3 : ℚ) = mu 0 * T 3 2 + mu 1 * T 2 2 := by
+theorem T_staircase_1_2 : (T 4 3 : ℚ) = mu 0 * T 3 2 + mu 1 * T 2 2 := by
   have h := T_staircase 1 2 (by norm_num)
   simpa only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
     Nat.sub_zero, Nat.sub_self] using h
 
 /-- …and it evaluates: `55 = 3·10 + (25/3)·3`. -/
-theorem T_staircase_value_check : mu 0 * (T 3 2 : ℚ) + mu 1 * (T 2 2 : ℚ) = 55 := by
+theorem T_staircase_value_1_2 : mu 0 * (T 3 2 : ℚ) + mu 1 * (T 2 2 : ℚ) = 55 := by
   rw [mu_zero, mu_one, T_3_2, T_2_2]; norm_num
 
 /-! ## `T_self` against the triangle -/

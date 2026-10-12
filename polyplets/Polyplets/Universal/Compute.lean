@@ -28,7 +28,7 @@ lattice-generic but live outside the shape engine:
   points *is* the witness, so it satisfies the diagonal law for `L`.
 
 Nothing here is instance-specific; `King.lean` and `Universal/{Square,Hex}.lean`
-supply the lattices and the anchor cells.
+supply the lattices and the enumerated cells.
 -/
 
 namespace Polyplets.Universal
@@ -170,7 +170,7 @@ instance instDecidableIsAnimal (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × �
 
 /-- **Computable counter for `T L`**: enumerate the `n`-element subsets of the
 box `[0, W-1] × [0, H-1]` and count the animals. Pure brute force —
-exponential in `W · H`, meant for anchor cells only. The box is
+exponential in `W · H`, meant for the smallest cells only. The box is
 `Compute.lean`'s (`Polyplets.box`), reused with an explicit width. -/
 def Tc (L : RowLocal) (W n H : ℕ) : ℕ :=
   (((Polyplets.box W H).powersetCard n).filter fun S => IsAnimal L n H S).card

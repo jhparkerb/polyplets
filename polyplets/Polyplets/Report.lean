@@ -86,12 +86,11 @@ theorem report_T_n_nm1 (n : ℕ) (hn : 3 ≤ n) :
   T_sub_one n hn
 
 /-- **`P_k` is explicitly known for `k ≤ 18`**, given the 36 enumerated
-anchor cells, two per level (`BankedAnchors`: `anchorA`, `anchorB` in
-`Grand/PinAll.lean`).
-`Pk k` is the polynomial of `Pin.lean`. -/
-theorem report_Pk_known (hA : BankedAnchors) (k : ℕ) (hk : k ≤ 18) :
+cells, two per level (`EnumeratedCells`: the table `enumerated` of
+`Grand/PinAll.lean`). `Pk k` is the polynomial of `Pin.lean`. -/
+theorem report_Pk_known (hA : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) :
     IsDiagonalPoly k (Pk k) :=
-  Pk_prod hA k hk
+  isDiagonalPoly_Pk hA k hk
 
 /-! ## Results: non-fixed polyplets
 

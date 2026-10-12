@@ -13,20 +13,20 @@ import Polyplets.King
 import Polyplets.Universal.Compute
 
 /-!
-# Pin: the explicit production polynomials `P_k`
+# Pin: the explicit diagonal polynomials `P_k`
 
 `King.lean` proves that for every surplus `k` there is *some* `P_k ∈ ℚ[X]` of
 degree `≤ k` with `T(n, n-k) = P_k(n)·3^(n-1-3k)` for `n ≥ 2k+1`
 (`exists_isDiagonalPoly`), but does not identify it. This file holds the concrete
-production polynomials `Pk 0 … Pk 18` of `orchestrator/sweep.go` (numerator
+diagonal polynomials `Pk 0 … Pk 18` of `orchestrator/sweep.go` (numerator
 coefficients descending in `n`, over `k!`), the values lemma
 `isDiagonalPoly_of_eval_Icc` (a degree-`≤ k` polynomial matching the witness at
 the `k+1` onset points `2k+1 … 3k+1` *is* the witness), and the `k = 1`
 diagonal `T_sub_one`, from the kernel-decided cells `T 3 2` and `T 4 3`.
 
-`Grand/PinAll.lean` pins every `Pk k`, `k ≤ 18`, from two enumerated anchor
-cells per level; `LeadingCoeff.lean` pins from `k` rows given the leading
-coefficient. A mistyped coefficient fails there, at the anchor evaluations.
+`Grand/PinAll.lean` determines every `Pk k`, `k ≤ 18`, from two enumerated
+cells per level; `LeadingCoeff.lean` from `k` rows given the leading
+coefficient. A mistyped coefficient fails there, at the cell evaluations.
 -/
 
 namespace Polyplets
@@ -63,7 +63,7 @@ lemma horner_eval (l : List ℚ) (x : ℚ) :
   | nil => simp [horner]
   | cons c cs ih => simp only [horner, eval_add, eval_mul, eval_C, eval_X, ih, List.foldr_cons]
 
-/-- The production polynomial: a descending numerator coefficient list over the
+/-- A polynomial from its descending numerator coefficient list over the
 scalar `kf` (the `k!` of `pin-data.md`). -/
 noncomputable def prodPoly (num : List ℚ) (kf : ℚ) : Polynomial ℚ :=
   C (1 / kf) * horner num.reverse
@@ -80,9 +80,9 @@ lemma prodPoly_eval (num : List ℚ) (kf x : ℚ) :
   rw [prodPoly, eval_mul, eval_C, horner_eval]
 
 set_option linter.style.longLine false in
-/-- The production polynomials `P_0 … P_18` of `orchestrator/sweep.go`: for each
+/-- The diagonal polynomials `P_0 … P_18` of `orchestrator/sweep.go`: for each
 `k` the numerator coefficients, descending in `n`, over `k!`; `Pk k = 0` for
-`k > 18`. A mistyped coefficient fails in `Grand/PinAll.lean`, at the anchor
+`k > 18`. A mistyped coefficient fails in `Grand/PinAll.lean`, at the cell
 evaluations. -/
 noncomputable def Pk : ℕ → Polynomial ℚ
   | 0 => prodPoly [1] 1

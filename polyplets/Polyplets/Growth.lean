@@ -601,7 +601,7 @@ theorem lambda_le : lambda ≤ 3125 / 256 := polypletFekete.growth_le
 
 The project's banked table reaches `a 40`, and Fekete's `a n ≤ λⁿ` turns
 *any* banked term into a lower bound for `λ`. Taking the banked value as an
-explicit hypothesis, as `Grand/PinAll.lean` takes its anchor cells, keeps the
+explicit hypothesis, as `Grand/PinAll.lean` takes its enumerated cells, keeps the
 computation outside the kernel and visible in the statement. (An
 unconditional `3.95 < λ` from the `native_decide` fact `a 6 = 3832` was
 removed 2026-10-12 with that fact.) -/

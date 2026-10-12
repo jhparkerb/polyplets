@@ -67,7 +67,7 @@ both sharpness witnesses are machine computations
 (\repo{experiments/universal\_pair\_weights.py}).
 \emph{Theorem~\ref{thm:C} (the product form)} --- paper proof below; the king
 instance is Lean, standard axioms only (\texttt{T\_staircase},
-\texttt{d\_mu\_rec}, \texttt{grand\_all}, \texttt{Pk\_prod}), and the
+\texttt{d\_staircase}, \texttt{climb}, \texttt{isDiagonalPoly\_Pk}), and the
 per-level production pinning for $k \le 18$ is conditional on the enumerated
 onset cells, two per level, which enter as hypotheses.
 \emph{The closed forms of Table~\ref{tab:machine}} --- each is a consequence of
@@ -916,8 +916,8 @@ is relevant here:
   (\repo{polyplets/Polyplets/Universal/}); the king lattice is the instance
   \texttt{kingLattice} of \repo{polyplets/Polyplets/King.lean}, and the
   report's king-named theorems are the universal ones read at it.
-\item The product form (\texttt{T\_staircase}, \texttt{d\_mu\_rec},
-  \texttt{grand\_all}, \texttt{Pk\_prod}; Theorem~\ref{thm:C}) was
+\item The product form (\texttt{T\_staircase}, \texttt{d\_staircase},
+  \texttt{climb}, \texttt{isDiagonalPoly\_Pk}; Theorem~\ref{thm:C}) was
   restructured for Lean as a \emph{staircase} route: in sequence form, Steps 1--3
   collapse to a convolution fixed point plus one strong induction, and Step 4's
   Lagrange lemma becomes a fixed point, with no power-series ring involved. Same
@@ -931,9 +931,9 @@ is relevant here:
   hex $T(4,3)$ is a hypothesis of the theorem. The $n = 3$ row sums of the
   three lattices are kernel-decided validation facts in \texttt{Checks.lean},
   outside the library.
-\item The $k \le 18$ production pinning (\texttt{grand\_all},
-  \texttt{Pk\_prod}) is \emph{conditional on enumerated cells}: the 36 onset
-  cells, two per level, are the hypothesis \texttt{BankedAnchors} of the Lean
+\item The $k \le 18$ production pinning (\texttt{climb},
+  \texttt{isDiagonalPoly\_Pk}) is \emph{conditional on enumerated cells}: the 36 onset
+  cells, two per level, are the hypothesis \texttt{EnumeratedCells} of the Lean
   theorems, not proved in Lean.
 \end{itemize}
 

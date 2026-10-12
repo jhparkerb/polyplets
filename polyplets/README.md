@@ -35,7 +35,7 @@ the theorem takes as input rather than proves.
 | P_k is fixed once row 3k is computed | `report_pin_row_3k` | `isDiagonalPoly_of_coeff_of_eval_Icc` (`LeadingCoeff`) | — |
 | T(n,n−1) = (25n−45)·3^(n−4) | `report_T_n_nm1` | `T_sub_one` (`Pin`), from the kernel-decided cells T(3,2) = 10, T(4,3) = 55 | — |
 | T(n,n−2) = ½(625n²−2459n+1134)·3^(n−7) | — (not a report claim; `docs/proofs/T-n-nm2-and-general.md`) | `T_sub_two` (`Grand/PinAll`), the climb to level 2 from the kernel-decided cells T(3,2), T(4,3), T(5,3) = 248, T(6,4) = 1480 | — |
-| P_k explicitly known for k ≤ 18 | `report_Pk_known` | `Pk_prod`, `grand_all` (`Grand/PinAll`), climbing level by level from `d_mu_rec` and `T_staircase` | `BankedAnchors`: 36 cells, below |
+| P_k explicitly known for k ≤ 18 | `report_Pk_known` | `isDiagonalPoly_Pk`, `climb` (`Grand/PinAll`), climbing level by level from `d_staircase` and `T_staircase` | `EnumeratedCells`: 36 cells, below |
 | 8·free = a + 2R90 + R180 + 2Hm + 2Dm (Burnside) | `report_free` | `free_eq` (`Symmetry`) | — |
 | 4·one-sided = a + 2R90 + R180 | `report_oneSided` | `oneSided_eq` (`Symmetry`) | — |
 | 2·bilateral = Hm + Dm | `report_bilateral` | `bilateral_eq` (`Symmetry`) | — |
@@ -47,15 +47,16 @@ cells, the symmetry-class and hole counts) and the value λ ≈ 7.11. Those are
 enumeration output. Lean certifies nothing about the engine; the engine's
 numbers enter only as the hypothesis below.
 
-### The 36 hypothesis cells
+### The 36 enumerated cells
 
-`BankedAnchors` (`Grand/PinAll.lean`) is, for each level k = 1 … 18, the two
-cells A_k = T(2k+1, k+1) and B_k = T(2k+2, k+2), at and one above the onset
-of level k, with the values the engine enumerated (`results/triangle.txt`).
+`EnumeratedCells` (`Grand/PinAll.lean`) says `T` agrees with the table
+`enumerated` at, for each level k = 1 … 18, the two cells T(2k+1, k+1) and
+T(2k+2, k+2), at and one above the onset of level k, with the values the
+engine enumerated (`results/triangle.txt`).
 Every one has H ≤ 20, so every one was really swept, none was generated from
 a P_k. Provenance by second source:
 
-- levels 1 … 12 and A_13, 25 cells: confirmed by the independent strip
+- levels 1 … 12 and T(27,14), 25 cells: confirmed by the independent strip
   transfer matrix (H ≤ 14, n ≤ 36; `results/second-sources.md`), and the row
   totals through n = 22 by a second enumeration (Redelmeier);
 - the 11 cells beyond strip reach, kink engine only, re-run across machines
@@ -63,7 +64,7 @@ a P_k. Provenance by second source:
   T(28,15) T(29,15) T(30,16) T(31,16) T(32,17) T(33,17) T(34,18) T(35,18)
   T(36,19) T(37,19) T(38,20).
 
-Level 19 is deliberately not pinned: its two anchors are the top cells of
+Level 19 is deliberately not determined: its two cells would be the top cells of
 the enumeration, no holdout exists, and no banked term uses it.
 
 ## How the proof goes
@@ -115,17 +116,17 @@ coefficient known, k rows (2k+1 … 3k) determine P_k by Lagrange
 
 The staircase (`Grand/`). `Series.lean` is a convolution toolkit; `Mu.lean`
 defines the multiplier sequence μ from the weights and its inverse ν;
-`MuRec.lean` proves `d_mu_rec`: `d k (H+1) = Σ_i μ_i·d (k−i) H` for
+`MuRec.lean` proves `d_staircase`: `d k (H+1) = Σ_i μ_i·d (k−i) H` for
 H ≥ k+1, one strong induction from the first peeling identity;
 `Staircase.lean` transports it to the diagonals (`T_staircase`). On this,
-`Grand/PinAll.lean` climbs: `GrandForm k P` says P is the production
-polynomial of level k; `level_step` passes from levels < k to level k given
-the two cells A_k, B_k; `grand_all` runs it from `grand_zero` (P_0 = 1,
+`Grand/PinAll.lean` climbs: `IsDiagonalPolyH k P` is the law of level k in
+the climb's coordinates; `climb_step` passes from levels < k to level k given
+the two cells; `climb` runs it from `climb_zero` (P_0 = 1,
 unconditional) to k = 18 under `BankedAnchors`, and `Pk_prod` reads off the
 diagonal law with the concrete `Pp<k>` of `Pin.lean`. The 19 polynomials in
 `Pin.lean` are the engine's (`orchestrator/sweep.go`, extracted to
 `pin-data.md` by `scripts/extract_pin_data.py`); a wrong coefficient fails
-the anchor evaluations in `PinAll`.
+the cell evaluations in `PinAll`.
 
 Symmetry (`Symmetry.lean`): the dihedral group acts by apply-then-anchor;
 `R90`, `R180`, `Hm`, `Dm` are the fixed-point counts, `Free`, `OneSided`,
@@ -151,9 +152,9 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le : λ ≤ 3125/256` and
 | `Pin` | the 19 production polynomials `Pk`, `P_k` from k+1 values, `T_sub_one` |
 | `Grand/Series` | convolution toolkit |
 | `Grand/Mu` | μ, ν, `mu_conv_nu`, the gates μ₁, μ₂ |
-| `Grand/MuRec` | `d_mu_rec` |
+| `Grand/MuRec` | `d_staircase` |
 | `Grand/Staircase` | `T_staircase` |
-| `Grand/PinAll` | `GrandForm`, `level_step`, `grand_all`, `Pk_prod`, `BankedAnchors` |
+| `Grand/PinAll` | `IsDiagonalPolyH`, `climb_step`, `climb`, `isDiagonalPoly_Pk`, `enumerated`, `EnumeratedCells` |
 | `Symmetry` | dihedral action, Burnside identities, `r90_vanish` |
 | `SymmetryRatio` | `symmetryRatio`: the symmetric counts are o(a(n)), so one-sided → a(n)/4 and free → a(n)/8 |
 | `UpperBound` | `a n ≤ C(5n,n)` |
@@ -212,7 +213,7 @@ unconditional 3.95 < λ and μ₂ that rested on them.
   defect D_j(k) (`results/below-onset.md`), and neither that identity nor
   the substitution is stated in Lean.
 - The engine. Nothing here certifies the enumeration, the banked triangle, or
-  the 36 anchor values; a(40)'s warrant is `docs/publication.md`.
+  the 36 enumerated values; a(40)'s warrant is `docs/publication.md`.
 
 ## Removed from the build, 2026-10-12
 
@@ -253,6 +254,6 @@ old Lagrange tiers of `Pin.lean` (`P<k>_pinned_of_banked`, k = 4 … 11, with
   the Bui certificate, the 5-adic law, the staircase constant).
 - 2026-10-11 … 12: the overhaul. `Report.lean` written; `LeadingCoeff.lean`
   replaces the exp-form route; `PinAll.lean` replaces the generated pinning;
-  levels 1 … 3 take their anchors as hypotheses like the rest, so every Report
+  levels 1 … 3 take their cells as hypotheses like the rest, so every Report
   theorem is on standard axioms; everything outside the Report cone deleted.
   Working list: `OVERHAUL.md`.

@@ -150,9 +150,9 @@ Pattern lives in `polyplets/Polyplets/Audit.lean`: every `Report.lean`
 theorem and the internal results they rest on. Example:
 
 ```
-/-- info: 'Polyplets.d_mu_rec' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.d_staircase' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms d_mu_rec
+#print axioms d_staircase
 ```
 
 `#guard_msgs` pins the expected `#print axioms` output as a doc comment

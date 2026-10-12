@@ -16,15 +16,15 @@ multiplier series `μ`, exactly, for `H ≥ k + 1` (sharp onset):
 
 `T (H + 1 + k) (H + 1) = ∑_{i ≤ k} μ i · T (H + (k − i)) H`.
 
-The proof rides the top-row peel `Peel.T_of_d` through `MuRec.d_mu_rec`. Both
+The proof rides the top-row peel `Peel.T_of_d` through `MuRec.d_staircase`. Both
 sides expand by `T_of_d` into a `d`-head plus a `Vt`-weighted interior double
-sum. Applying `d_mu_rec` to the head (at height `H + 1`) and to each interior
+sum. Applying `d_staircase` to the head (at height `H + 1`) and to each interior
 `d (k − j) ((H + 1) − ℓ)` (at height `(H − ℓ) + 1`) reveals, after transposing
 the fresh μ-index `i` outward across the `(j, ℓ)`-sums, exactly the `T_of_d`
 expansion of the right-hand side — one `T_of_d (k − i) H` per `i`. The index
 swap is a plain `Finset.sum_comm`/`Finset.sum_comm'` transposition (`μ`'s index
 passes through unchanged; the `ℓ`-sum rides along inside `j`) — no convolution
-collapse is needed here, unlike `d_mu_rec`.
+collapse is needed here, unlike `d_staircase`.
 
 The statement was verified on banked data at all 170 in-range instances
 (`experiments/staircase_check.py`); `Checks.lean` instantiates it at
@@ -36,9 +36,9 @@ namespace Polyplets
 /-! ## The staircase -/
 
 /-- **The staircase**: one transfer step multiplies the T-diagonal family by
-`μ`, exactly, for `H ≥ k + 1` (sharp onset). In production coordinates
+`μ`, exactly, for `H ≥ k + 1` (sharp onset). In the report's coordinates
 (`n = H + k`) this relates diagonal `k` at `n + 1` to diagonals `k − i` at
-`n − i`. Proved from `Peel.T_of_d` through `MuRec.d_mu_rec`. -/
+`n − i`. Proved from `Peel.T_of_d` through `MuRec.d_staircase`. -/
 theorem T_staircase : ∀ k H : ℕ, k + 1 ≤ H →
     (T (H + 1 + k) (H + 1) : ℚ) =
       ∑ i ∈ Finset.range (k + 1), mu i * (T (H + (k - i)) H : ℚ) := by
@@ -49,10 +49,10 @@ theorem T_staircase : ∀ k H : ℕ, k + 1 ≤ H →
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
         (Vt ℓ j : ℚ) * (d (k - j) ((H + 1) - ℓ) : ℚ) := by
     exact_mod_cast T_of_d k (H + 1) (by omega)
-  -- Step 2: `d_mu_rec` on the head.
+  -- Step 2: `d_staircase` on the head.
   have hhead : (d k (H + 1) : ℚ) =
-      ∑ i ∈ Finset.range (k + 1), mu i * (d (k - i) H : ℚ) := d_mu_rec H k hk
-  -- Step 3: `d_mu_rec` on each interior `d`, at height `(H−ℓ)+1`.
+      ∑ i ∈ Finset.range (k + 1), mu i * (d (k - i) H : ℚ) := d_staircase H k hk
+  -- Step 3: `d_staircase` on each interior `d`, at height `(H−ℓ)+1`.
   have hint : (∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
         (Vt ℓ j : ℚ) * (d (k - j) ((H + 1) - ℓ) : ℚ)) =
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, (Vt ℓ j : ℚ) *
@@ -61,7 +61,7 @@ theorem T_staircase : ∀ k H : ℕ, k + 1 ≤ H →
     rw [Finset.mem_Icc] at hj
     refine Finset.sum_congr rfl fun ℓ hℓ => ?_
     rw [Finset.mem_Icc] at hℓ
-    rw [show (H + 1) - ℓ = (H - ℓ) + 1 from by omega, d_mu_rec (H - ℓ) (k - j) (by omega)]
+    rw [show (H + 1) - ℓ = (H - ℓ) + 1 from by omega, d_staircase (H - ℓ) (k - j) (by omega)]
   -- Step 4: expand the RHS's each `T (H+(k−i)) H` by `T_of_d (k−i) H`.
   have hRHStot : (∑ i ∈ Finset.range (k + 1), mu i * (T (H + (k - i)) H : ℚ)) =
       (∑ i ∈ Finset.range (k + 1), mu i * (d (k - i) H : ℚ)) +

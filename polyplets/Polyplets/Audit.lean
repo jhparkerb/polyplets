@@ -88,21 +88,21 @@ namespace Polyplets
 #guard_msgs in
 #print axioms IsDiagonalPoly.intValued
 
-/-- info: 'Polyplets.d_mu_rec' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.d_staircase' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms d_mu_rec
+#print axioms d_staircase
 
 /-- info: 'Polyplets.T_staircase' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms T_staircase
 
-/-- info: 'Polyplets.grand_all' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.climb' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms grand_all
+#print axioms climb
 
-/-- info: 'Polyplets.Pk_prod' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.isDiagonalPoly_Pk' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Pk_prod
+#print axioms isDiagonalPoly_Pk
 
 /-- info: 'Polyplets.lambda_gt_of_banked' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in

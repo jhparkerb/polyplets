@@ -39,7 +39,7 @@ sets, and the `mem_*` lemmas are `Set.Finite.mem_toFinset`.
 
 Finiteness replaces window-independence: it is the same x-spread bound
 (`connected_abs_x_le`, now with reach `M`) applied to the whole family at once.
-The instance anchors come from `Universal/Compute.lean`'s counter.
+The instance cells come from `Universal/Compute.lean`'s counter.
 -/
 
 namespace Polyplets.Universal

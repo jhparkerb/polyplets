@@ -183,7 +183,7 @@ theorem delta_coeff : ∀ (k : ℕ) (δ : Polynomial ℚ), δ.natDegree ≤ k �
   rw [hfac, pow_succ, eq_div_iff (by positivity)]
   linear_combination hkey'
 
-/-! ## Transfer to the production form -/
+/-! ## Transfer to the diagonal polynomial -/
 
 /-- **The leading coefficient of `P_k` is `25^k/k!`.** For any `P` of degree
 `≤ k` satisfying the diagonal law at level `k`. -/
@@ -205,7 +205,7 @@ theorem IsDiagonalPoly.coeff_eq {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegr
           (Vt ℓ j : ℚ) / 3 ^ ℓ * (δ' (k - j)).eval ((H : ℚ) - ℓ)) := by
       simp only [hRt, eval_mul, eval_C, eval_add, eval_finsetSum, eval_comp, eval_sub, eval_X]
     rw [hLe, hRe]
-    -- the production identity at `n = H + k`, cleared of `zpow`
+    -- the law at `n = H + k`, cleared of `zpow`
     have hprod : P.eval ((H : ℚ) + k) * 3 ^ H = 3 ^ (2 * k + 1) * (T (H + k) H : ℚ) := by
       have h := hP (H + k) (by omega)
       rw [Nat.add_sub_cancel] at h

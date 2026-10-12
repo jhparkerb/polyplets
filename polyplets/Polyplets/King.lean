@@ -43,7 +43,7 @@ lemma mem_kingLattice_D {t : ℤ} : t ∈ kingLattice.D ↔ (-1 ≤ t ∧ t ≤ 
 /-- **The king drift count is 3.** -/
 @[simp] lemma b_king : kingLattice.b = 3 := by decide
 
-/-- **The definitional anchor**: row-local adjacency at the king lattice IS king
+/-- **The definitional bridge**: row-local adjacency at the king lattice IS king
 adjacency. Given `p ≠ q`, "`|Δx| ≤ 1` and `|Δy| ≤ 1`" and "same row with
 `|Δx| = 1`, or consecutive rows with `Δx ∈ {-1,0,1}`" are the same condition. -/
 theorem adj_king {p q : ℤ × ℤ} : Adj kingLattice p q ↔ Polyplets.kingAdj p q := by

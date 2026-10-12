@@ -9,9 +9,9 @@ import Polyplets.Grand.Mu
 import Polyplets.King
 
 /-!
-# MuRec: the μ-recursion (the core theorem)
+# MuRec: the staircase for `d` (the core theorem)
 
-The mathematical heart of the grand-form staircase (`docs/proofs/grand-form.md`): one
+The mathematical heart of the staircase (`docs/proofs/grand-form.md`): one
 transfer step multiplies the walk-top diagonal family `d k H` by the fixed
 multiplier series `μ`, exactly, for `H ≥ k + 1` (sharp onset):
 
@@ -115,8 +115,8 @@ lemma d_iter_down (H₀ ℓ : ℕ)
 
 /-! ## The μ-recursion -/
 
-/-- The inductive step of `d_mu_rec`, packaged for `Nat.strong_induction_on`. -/
-lemma d_mu_rec_step (H : ℕ)
+/-- The inductive step of `d_staircase`, packaged for `Nat.strong_induction_on`. -/
+lemma d_staircase_step (H : ℕ)
     (M_ih : ∀ m, m < H → ∀ k, k + 1 ≤ m →
       (d k (m + 1) : ℚ) = ∑ i ∈ Finset.range (k + 1), mu i * (d (k - i) m : ℚ)) :
     ∀ k, k + 1 ≤ H →
@@ -129,10 +129,10 @@ lemma d_mu_rec_step (H : ℕ)
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
         (V ℓ j : ℚ) * (d (k - j) (H - ℓ) : ℚ) := by exact_mod_cast hrec
   -- Step 2: expand each `d (k−j) (H−ℓ)` downward with `d_iter_down` and switch
-  -- `V ℓ j` to its guarded form `v ℓ j`.
+  -- `V ℓ j` to its guarded form `vGuard ℓ j`.
   have hB : (∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
         (V ℓ j : ℚ) * (d (k - j) (H - ℓ) : ℚ)) =
-      ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, v ℓ j *
+      ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, vGuard ℓ j *
         ∑ t ∈ Finset.range (k - j + 1), convPow nu ℓ t * (d (k - j - t) H : ℚ) := by
     refine Finset.sum_congr rfl fun j hj => ?_
     rw [Finset.mem_Icc] at hj
@@ -141,26 +141,26 @@ lemma d_mu_rec_step (H : ℕ)
     have hdd := d_iter_down (H - ℓ) ℓ
       (fun r hr k'' hk'' => M_ih (H - ℓ + r) (by omega) k'' hk'') (k - j) (by omega)
     rw [show H - ℓ + ℓ = H from by omega] at hdd
-    rw [← v_eq (by omega) (by omega), hdd]
+    rw [← vGuard_eq (by omega) (by omega), hdd]
   -- Step 3a: transpose the `j`/`ℓ` order to `∑_ℓ ∑_{j ≥ ℓ}`.
-  have hswap : (∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, v ℓ j *
+  have hswap : (∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, vGuard ℓ j *
         ∑ t ∈ Finset.range (k - j + 1), convPow nu ℓ t * (d (k - j - t) H : ℚ)) =
-      ∑ ℓ ∈ Finset.Icc 1 k, ∑ j ∈ Finset.Icc ℓ k, v ℓ j *
+      ∑ ℓ ∈ Finset.Icc 1 k, ∑ j ∈ Finset.Icc ℓ k, vGuard ℓ j *
         ∑ t ∈ Finset.range (k - j + 1), convPow nu ℓ t * (d (k - j - t) H : ℚ) := by
     apply Finset.sum_comm'
     intro j ℓ
     simp only [Finset.mem_Icc]
     omega
   -- Step 3b: for each `ℓ`, extend the inner range and collapse `(j, t)` by
-  -- `sum_conv_collapse`; the `v ℓ`-vanishing absorbs the range mismatch.
-  have hcollapse : (∑ ℓ ∈ Finset.Icc 1 k, ∑ j ∈ Finset.Icc ℓ k, v ℓ j *
+  -- `sum_conv_collapse`; the `vGuard ℓ`-vanishing absorbs the range mismatch.
+  have hcollapse : (∑ ℓ ∈ Finset.Icc 1 k, ∑ j ∈ Finset.Icc ℓ k, vGuard ℓ j *
         ∑ t ∈ Finset.range (k - j + 1), convPow nu ℓ t * (d (k - j - t) H : ℚ)) =
       ∑ ℓ ∈ Finset.Icc 1 k, ∑ s ∈ Finset.range (k + 1),
-        conv (v ℓ) (convPow nu ℓ) s * (d (k - s) H : ℚ) := by
+        conv (vGuard ℓ) (convPow nu ℓ) s * (d (k - s) H : ℚ) := by
     refine Finset.sum_congr rfl fun ℓ _ => ?_
-    have hext : (∑ j ∈ Finset.Icc ℓ k, v ℓ j *
+    have hext : (∑ j ∈ Finset.Icc ℓ k, vGuard ℓ j *
           ∑ t ∈ Finset.range (k - j + 1), convPow nu ℓ t * (d (k - j - t) H : ℚ)) =
-        ∑ i ∈ Finset.range (k + 1), v ℓ i *
+        ∑ i ∈ Finset.range (k + 1), vGuard ℓ i *
           ∑ t ∈ Finset.range (k - i + 1), convPow nu ℓ t * (d (k - i - t) H : ℚ) := by
       refine Finset.sum_subset ?_ ?_
       · intro x hx
@@ -170,18 +170,18 @@ lemma d_mu_rec_step (H : ℕ)
       · intro i hi hni
         rw [Finset.mem_range] at hi
         rw [Finset.mem_Icc] at hni
-        rw [v_vanish_lt i (by omega), zero_mul]
+        rw [vGuard_vanish_lt i (by omega), zero_mul]
     rw [hext]
-    exact sum_conv_collapse (v ℓ) (convPow nu ℓ) (fun s => (d s H : ℚ)) k
+    exact sum_conv_collapse (vGuard ℓ) (convPow nu ℓ) (fun s => (d s H : ℚ)) k
   -- Step 3c: transpose back and factor out `d (k−s) H`.
   have hfactor : (∑ ℓ ∈ Finset.Icc 1 k, ∑ s ∈ Finset.range (k + 1),
-        conv (v ℓ) (convPow nu ℓ) s * (d (k - s) H : ℚ)) =
+        conv (vGuard ℓ) (convPow nu ℓ) s * (d (k - s) H : ℚ)) =
       ∑ s ∈ Finset.range (k + 1), (mu s - 3 * eps s) * (d (k - s) H : ℚ) := by
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun s hs => ?_
     rw [Finset.mem_range] at hs
     rw [← Finset.sum_mul]
-    have hcoeff : (∑ ℓ ∈ Finset.Icc 1 k, conv (v ℓ) (convPow nu ℓ) s) = mu s - 3 * eps s := by
+    have hcoeff : (∑ ℓ ∈ Finset.Icc 1 k, conv (vGuard ℓ) (convPow nu ℓ) s) = mu s - 3 * eps s := by
       rw [mu_bigRange (m := k) s (by omega)]; ring
     rw [hcoeff]
   -- Step 4: assemble.  `∑ eps s · d (k−s) H = d k H` cancels the `3·d k H` head.
@@ -200,8 +200,8 @@ lemma d_mu_rec_step (H : ℕ)
 /-- **The μ-recursion**: one transfer step multiplies the walk-top diagonal
 family by the fixed series `μ`, exactly, for `H ≥ k + 1` (sharp onset). Proved by
 strong induction on `H` from `Peel.d_rec` through the `μ`/`ν` inverse pair. -/
-theorem d_mu_rec : ∀ H k : ℕ, k + 1 ≤ H →
+theorem d_staircase : ∀ H k : ℕ, k + 1 ≤ H →
     (d k (H + 1) : ℚ) = ∑ i ∈ Finset.range (k + 1), mu i * (d (k - i) H : ℚ) :=
-  fun H => Nat.strong_induction_on H d_mu_rec_step
+  fun H => Nat.strong_induction_on H d_staircase_step
 
 end Polyplets

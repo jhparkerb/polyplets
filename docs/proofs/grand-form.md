@@ -176,7 +176,7 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
    banked 2-point solve inputs. The former free-standing assumption "the
    defect gas is exactly linear" is discharged. The former Lean PREDICTED
    tier for k = 12..16 is retired: this proof is formalized (§Formalization
-   below) and `Pk_prod` pins every level from two enumerated cells with
+   below) and `isDiagonalPoly_Pk` determines every level from two enumerated cells with
    H ≤ 20 (`polyplets/README.md`).
 
 ## Formalization (2026-07-21; trimmed 2026-10-12)
@@ -184,12 +184,12 @@ object at order j is built from σ_{≤j}, E-terms ≤ j — weights of surplus
 Formalized in Lean 4: `polyplets/Polyplets/Grand/`. The proof was
 restructured for Lean as the **staircase route**: in sequence form, Steps
 1–3 collapse to a convolution fixed point (ν = z*, μ = 1/z*) plus one
-strong induction (`d_mu_rec`), and `T_staircase` carries it to the
+strong induction (`d_staircase`), and `T_staircase` carries it to the
 T-diagonals; both on **standard axioms only** (guarded in
 `Polyplets/Audit.lean`). Corollary 2, the leading coefficient 25^k/k!, is
 `LeadingCoeff.lean`'s `IsDiagonalPoly.coeff_eq`, standard axioms only. The
 production polynomials are pinned for k ≤ 18 from two enumerated cells per
-level (`Grand/PinAll.lean`, `Pk_prod`) — *conditional on those cells*: they
+level (`Grand/PinAll.lean`, `isDiagonalPoly_Pk`) — *conditional on those cells*: they
 are hypotheses of the Lean theorems, engine values assumed, not proved in
 Lean (`polyplets/README.md`). This retires the Lean PREDICTED tier. The
 exp-form statement itself (`grand_form`, `ExpForm.lean`/`Lead.lean`) left

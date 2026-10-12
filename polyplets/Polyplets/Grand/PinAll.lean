@@ -13,7 +13,7 @@ import Polyplets.EnumData
 import Polyplets.Pin
 
 /-!
-# The production polynomials `P_0 … P_18`, pinned level by level
+# The diagonal polynomials `P_0 … P_18`, determined level by level
 
 `T_staircase` says one transfer step multiplies the diagonal family by the
 fixed series `μ`:
@@ -22,20 +22,22 @@ fixed series `μ`:
 
 Two consequences, each a single theorem here rather than one copy per level:
 
-* `grand_step`: if `P_{k-i}` is known for `1 ≤ i ≤ k`, and `μ_0 … μ_k` are
-  known, then `P_k` is pinned by its value at one cell `A_k = T(2k+1, k+1)`,
-  by induction on `H` through the staircase (`hstair` is the staircase as a
-  polynomial identity).
-* `mu_step`: `μ_k` itself is solved from the staircase at `H = k+1`, where the
-  only unknown is `μ_k · T(k+1, k+1) = μ_k · 3^k`; the one new cell is
-  `B_k = T(2k+2, k+2)`.
+* `isDiagonalPolyH_of_below`: if `P_{k-i}` is known for `1 ≤ i ≤ k`, and
+  `μ_0 … μ_k` are known, then `P_k` is determined by its value at one cell
+  `T(2k+1, k+1)`, by induction on `H` through the staircase (`hstair` is the
+  staircase as a polynomial identity).
+* `mu_eq_of_below`: `μ_k` itself is solved from the staircase at `H = k+1`,
+  where the only unknown is `μ_k · T(k+1, k+1) = μ_k · 3^k`; the one new cell
+  is `T(2k+2, k+2)`.
 
-Level `0` is `T(n,n) = 3^(n-1)`; levels `1 … 18` climb through `level_step`
-with `anchorA`/`anchorB` as the only inputs (`BankedAnchors`, 36 cells). The
+Level `0` is `T(n,n) = 3^(n-1)`; levels `1 … 18` climb through `climb_step`
+with the 36 cells of `enumerated` as the only inputs (`EnumeratedCells`). The
 per-level arithmetic is three lemmas proved by `interval_cases`
-(`stair_check`, `anchor_check`, `num_check`).
+(`Pk_staircase`, `Pk_eval_cell`, `mu_eval_cell`).
 
-`μ_i·3^(2i-1)` is an integer (`cTab`); `μ` is carried as `μ_i·3^(2i) = 3·c_i`
+The climb works in `H`-coordinates with denominators cleared
+(`IsDiagonalPolyH`; `isDiagonalPoly_of_H` returns to `IsDiagonalPoly`), and
+`μ_i·3^(2i-1)` is an integer (`cInt`): `μ` is carried as `μ_i·3^(2i) = 3·c_i`
 so no negative exponent appears.
 -/
 
@@ -43,16 +45,18 @@ namespace Polyplets
 
 open Polynomial
 
-/-! ## Grand form and its coordinate changes -/
+/-! ## The law in the climb's coordinates -/
 
-/-- Grand form at level `i`: `3^(3i+1)·T(H+i, H) = Q(H+i)·3^(H+i)` for all
-`H ≥ i+1`. -/
-def GrandForm (i : ℕ) (Q : Polynomial ℚ) : Prop :=
+/-- The diagonal law at level `i` in the `H`-coordinates the climb uses,
+denominators cleared: `3^(3i+1)·T(H+i, H) = Q(H+i)·3^(H+i)` for all `H ≥ i+1`.
+The same statement as `IsDiagonalPoly i Q` (`isDiagonalPoly_of_H`). -/
+def IsDiagonalPolyH (i : ℕ) (Q : Polynomial ℚ) : Prop :=
   ∀ H : ℕ, i + 1 ≤ H →
     (3 : ℚ) ^ (3 * i + 1) * (T (H + i) H : ℚ) = Q.eval ((H : ℚ) + i) * 3 ^ (H + i)
 
-/-- Grand form to the production `n`-form `T(n, n-k) = P(n)·3^(n-1-3k)`. -/
-lemma grand_to_prod {k : ℕ} {P : Polynomial ℚ} (h : GrandForm k P) : IsDiagonalPoly k P := by
+/-- Back to the report's coordinates, `T(n, n-k) = P(n)·3^(n-1-3k)`. -/
+lemma isDiagonalPoly_of_H {k : ℕ} {P : Polynomial ℚ} (h : IsDiagonalPolyH k P) :
+    IsDiagonalPoly k P := by
   intro n hn
   have hg := h (n - k) (by omega)
   rw [show n - k + k = n from by omega,
@@ -69,8 +73,8 @@ lemma grand_to_prod {k : ℕ} {P : Polynomial ℚ} (h : GrandForm k P) : IsDiago
 `B_k = Σ_{i<k} μ_i·T(2k+1-i, k+1) + μ_k·3^k`, and `hnum` is that equation
 with the proposed `μ_k = 3·c_k/3^(2k)` substituted. The `i = 0` term is level
 `k` at its onset, `A_k`, hence `hanchor`. -/
-theorem mu_step (k : ℕ) (Q : ℕ → Polynomial ℚ) (c : ℕ → ℚ)
-    (hlow : ∀ i, 1 ≤ i → i ≤ k → GrandForm (k - i) (Q (k - i)))
+theorem mu_eq_of_below (k : ℕ) (Q : ℕ → Polynomial ℚ) (c : ℕ → ℚ)
+    (hlow : ∀ i, 1 ≤ i → i ≤ k → IsDiagonalPolyH (k - i) (Q (k - i)))
     (hmu : ∀ i, i < k → mu i * 3 ^ (2 * i) = 3 * c i)
     (hanchor : (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
       (Q k).eval ((2 * k + 1 : ℕ) : ℚ) * 3 ^ (2 * k + 1))
@@ -125,16 +129,16 @@ theorem mu_step (k : ℕ) (Q : ℕ → Polynomial ℚ) (c : ℕ → ℚ)
   linear_combination (-1 : ℚ) * key
 
 /-- **`P_k` from one cell.** With the lower levels and `μ_0 … μ_k` known, and
-the staircase as a polynomial identity (`hstair`), the grand form at level
+the staircase as a polynomial identity (`hstair`), the law at level
 `k` follows from its value at `A_k = T(2k+1, k+1)` by induction on `H`. -/
-theorem grand_step (k : ℕ) (Q : ℕ → Polynomial ℚ) (c : ℕ → ℚ)
-    (hlow : ∀ i, 1 ≤ i → i ≤ k → GrandForm (k - i) (Q (k - i)))
+theorem isDiagonalPolyH_of_below (k : ℕ) (Q : ℕ → Polynomial ℚ) (c : ℕ → ℚ)
+    (hlow : ∀ i, 1 ≤ i → i ≤ k → IsDiagonalPolyH (k - i) (Q (k - i)))
     (hmu : ∀ i, i ≤ k → mu i * 3 ^ (2 * i) = 3 * c i)
     (hstair : ∀ x : ℚ, (Q k).eval (x + 1) =
       ∑ i ∈ Finset.range (k + 1), c i * (Q (k - i)).eval (x - i))
     (hanchor : (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
       (Q k).eval ((2 * k + 1 : ℕ) : ℚ) * 3 ^ (2 * k + 1)) :
-    GrandForm k (Q k) := by
+    IsDiagonalPolyH k (Q k) := by
   intro H hH
   induction H, hH using Nat.le_induction with
   | base =>
@@ -172,15 +176,16 @@ theorem grand_step (k : ℕ) (Q : ℕ → Polynomial ℚ) (c : ℕ → ℚ)
         + (3 * c i * 3 ^ (3 * i)) * e
         - (c i * (Q (k - i)).eval ((H : ℚ) + k - i)) * p3
 
-/-- Levels `0 … K` all in grand form. -/
-def grandOK (Q : ℕ → Polynomial ℚ) (K : ℕ) : Prop := ∀ i, i ≤ K → GrandForm i (Q i)
+/-- Levels `0 … K` all determined (in the climb's coordinates). -/
+def IsDiagonalPolyHUpTo (Q : ℕ → Polynomial ℚ) (K : ℕ) : Prop :=
+  ∀ i, i ≤ K → IsDiagonalPolyH i (Q i)
 
 /-- `μ_0 … μ_K` all known: `μ_i·3^(2i) = 3·c_i`. -/
-def muOK (c : ℕ → ℚ) (K : ℕ) : Prop := ∀ i, i ≤ K → mu i * 3 ^ (2 * i) = 3 * c i
+def MuEqUpTo (c : ℕ → ℚ) (K : ℕ) : Prop := ∀ i, i ≤ K → mu i * 3 ^ (2 * i) = 3 * c i
 
-/-- One level up: `mu_step` then `grand_step`. -/
-theorem level_step (k : ℕ) (hk : 1 ≤ k) (Q : ℕ → Polynomial ℚ) (c : ℕ → ℚ)
-    (hg : grandOK Q (k - 1)) (hm : muOK c (k - 1))
+/-- One level up: `mu_eq_of_below` then `isDiagonalPolyH_of_below`. -/
+theorem climb_step (k : ℕ) (hk : 1 ≤ k) (Q : ℕ → Polynomial ℚ) (c : ℕ → ℚ)
+    (hg : IsDiagonalPolyHUpTo Q (k - 1)) (hm : MuEqUpTo c (k - 1))
     (hstair : ∀ x : ℚ, (Q k).eval (x + 1) =
       ∑ i ∈ Finset.range (k + 1), c i * (Q (k - i)).eval (x - i))
     (hanchor : (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
@@ -189,25 +194,25 @@ theorem level_step (k : ℕ) (hk : 1 ≤ k) (Q : ℕ → Polynomial ℚ) (c : �
       ∑ i ∈ Finset.range k, 3 * c i * 3 ^ (2 * k - 2 * i) *
         ((Q (k - i)).eval ((k + 1 + (k - i) : ℕ) : ℚ) * 3 ^ (k + 1 + (k - i))
           / 3 ^ (3 * (k - i) + 1))) :
-    grandOK Q k ∧ muOK c k := by
-  have hlow : ∀ i, 1 ≤ i → i ≤ k → GrandForm (k - i) (Q (k - i)) :=
+    IsDiagonalPolyHUpTo Q k ∧ MuEqUpTo c k := by
+  have hlow : ∀ i, 1 ≤ i → i ≤ k → IsDiagonalPolyH (k - i) (Q (k - i)) :=
     fun i h1 _ => hg (k - i) (by omega)
   have hmu' : ∀ i, i < k → mu i * 3 ^ (2 * i) = 3 * c i := fun i hi => hm i (by omega)
-  have hk' := mu_step k Q c hlow hmu' hanchor hnum
+  have hk' := mu_eq_of_below k Q c hlow hmu' hanchor hnum
   have hmu : ∀ i, i ≤ k → mu i * 3 ^ (2 * i) = 3 * c i := fun i hi => by
     rcases Nat.lt_or_eq_of_le hi with h | rfl
     · exact hmu' i h
     · exact hk'
-  have hG := grand_step k Q c hlow hmu hstair hanchor
+  have hG := isDiagonalPolyH_of_below k Q c hlow hmu hstair hanchor
   refine ⟨fun i hi => ?_, hmu⟩
   rcases Nat.lt_or_eq_of_le hi with h | rfl
   · exact hg i (by omega)
   · exact hG
 
-/-! ## The data: `c_k` and the anchor cells (`Pk` is `Pin.lean`'s) -/
+/-! ## The data: `c_k` and the enumerated cells (`Pk` is `Pin.lean`'s) -/
 
 /-- `c_i = μ_i·3^(2i-1)`, the integer staircase coefficients, `i ≤ 18`. -/
-def cTab : ℕ → ℚ
+def cInt : ℕ → ℚ
   | 0 => 1
   | 1 => 25
   | 2 => 833
@@ -229,95 +234,98 @@ def cTab : ℕ → ℚ
   | 18 => 2780470639303344734283777988650
   | _ => 0
 
-/-- The first anchor cell of level `k`: `A_k = T(2k+1, k+1)`, enumerated. -/
-def anchorA : ℕ → ℕ
-  | 1 => 10
-  | 2 => 248
-  | 3 => 7898
-  | 4 => 278240
-  | 5 => 10311170
-  | 6 => 393543824
-  | 7 => 15308484950
-  | 8 => 603392972436
-  | 9 => 24014057424024
-  | 10 => 962797249464752
-  | 11 => 38826609174639928
-  | 12 => 1573134737210737385
-  | 13 => 63986427407097237332
-  | 14 => 2611110015255604740530
-  | 15 => 106848447386284024770292
-  | 16 => 4382793740312244017806517
-  | 17 => 180152359823857046862682314
-  | 18 => 7418664369542642927200487045
-  | _ => 0
+/-- **The 36 enumerated cells** the climb takes as input: for each level
+`k = 1 … 18` the first two cells of diagonal `k`, `T(2k+1, k+1)` and
+`T(2k+2, k+2)`, with the values the engine enumerated (`results/triangle.txt`;
+every one has `H ≤ 20`). `0` elsewhere. -/
+def enumerated : ℕ → ℕ → ℕ
+  | 3, 2 => 10
+  | 4, 3 => 55
+  | 5, 3 => 248
+  | 6, 4 => 1480
+  | 7, 4 => 7898
+  | 8, 5 => 47066
+  | 9, 5 => 278240
+  | 10, 6 => 1631340
+  | 11, 6 => 10311170
+  | 12, 7 => 59434367
+  | 13, 7 => 393543824
+  | 14, 8 => 2234817674
+  | 15, 8 => 15308484950
+  | 16, 9 => 85849256593
+  | 17, 9 => 603392972436
+  | 18, 10 => 3348606811298
+  | 19, 10 => 24014057424024
+  | 20, 11 => 132107598093637
+  | 21, 11 => 962797249464752
+  | 22, 12 => 5257610926802452
+  | 23, 12 => 38826609174639928
+  | 24, 13 => 210692983396251014
+  | 25, 13 => 1573134737210737385
+  | 26, 14 => 8490578913536448064
+  | 27, 14 => 63986427407097237332
+  | 28, 15 => 343733831675681363476
+  | 29, 15 => 2611110015255604740530
+  | 30, 16 => 13969442417594351366268
+  | 31, 16 => 106848447386284024770292
+  | 32, 17 => 569579285523233406028051
+  | 33, 17 => 4382793740312244017806517
+  | 34, 18 => 23288787870043631158670332
+  | 35, 18 => 180152359823857046862682314
+  | 36, 19 => 954543410624801880699125196
+  | 37, 19 => 7418664369542642927200487045
+  | 38, 20 => 39207474138446972682720171554
+  | _, _ => 0
 
-/-- The second anchor cell of level `k`: `B_k = T(2k+2, k+2)`, enumerated. -/
-def anchorB : ℕ → ℕ
-  | 1 => 55
-  | 2 => 1480
-  | 3 => 47066
-  | 4 => 1631340
-  | 5 => 59434367
-  | 6 => 2234817674
-  | 7 => 85849256593
-  | 8 => 3348606811298
-  | 9 => 132107598093637
-  | 10 => 5257610926802452
-  | 11 => 210692983396251014
-  | 12 => 8490578913536448064
-  | 13 => 343733831675681363476
-  | 14 => 13969442417594351366268
-  | 15 => 569579285523233406028051
-  | 16 => 23288787870043631158670332
-  | 17 => 954543410624801880699125196
-  | 18 => 39207474138446972682720171554
-  | _ => 0
-
-/-- The enumerated cells the pinning of `P_1 … P_18` takes as input: two per
-level, `A_k = T(2k+1, k+1)` and `B_k = T(2k+2, k+2)`, all with `H ≤ 20`. -/
-def BankedAnchors : Prop :=
-  ∀ k, 1 ≤ k → k ≤ 18 → T (2 * k + 1) (k + 1) = anchorA k ∧ T (2 * k + 2) (k + 2) = anchorB k
+/-- **The hypothesis of the climb**: `T` agrees with the enumerated table at the
+36 cells, two per level. Nothing in Lean certifies these values; they are the
+engine's. -/
+def EnumeratedCells : Prop :=
+  ∀ k, 1 ≤ k → k ≤ 18 →
+    T (2 * k + 1) (k + 1) = enumerated (2 * k + 1) (k + 1) ∧
+      T (2 * k + 2) (k + 2) = enumerated (2 * k + 2) (k + 2)
 
 /-! ## The per-level arithmetic -/
 
 set_option maxHeartbeats 1600000 in
 -- 18 levels of `norm_num` on degree-18 polynomials with 30-digit coefficients
 /-- The staircase as a polynomial identity, `P_k(x+1) = Σ c_i·P_{k-i}(x-i)`. -/
-lemma stair_check : ∀ k, 1 ≤ k → k ≤ 18 → ∀ x : ℚ,
-    (Pk k).eval (x + 1) = ∑ i ∈ Finset.range (k + 1), cTab i * (Pk (k - i)).eval (x - i) := by
+lemma Pk_staircase : ∀ k, 1 ≤ k → k ≤ 18 → ∀ x : ℚ,
+    (Pk k).eval (x + 1) = ∑ i ∈ Finset.range (k + 1), cInt i * (Pk (k - i)).eval (x - i) := by
   intro k h1 h2 x
   interval_cases k <;>
-    norm_num [Finset.sum_range_succ, Pk, cTab, prodPoly_eval] <;>
+    norm_num [Finset.sum_range_succ, Pk, cInt, prodPoly_eval] <;>
     ring
 
 set_option maxHeartbeats 1600000 in
--- 18 levels of `norm_num` on up-to-30-digit anchor values
-/-- `P_k` agrees with the anchor `A_k`. -/
-lemma anchor_check (hA : BankedAnchors) : ∀ k, 1 ≤ k → k ≤ 18 →
+-- 18 levels of `norm_num` on up-to-30-digit cell values
+/-- `P_k` agrees with the cell `T(2k+1, k+1)`. -/
+lemma Pk_eval_cell (hA : EnumeratedCells) : ∀ k, 1 ≤ k → k ≤ 18 →
     (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
       (Pk k).eval ((2 * k + 1 : ℕ) : ℚ) * 3 ^ (2 * k + 1) := by
   intro k h1 h2
   rw [(hA k h1 h2).1]
   interval_cases k <;>
-    norm_num [Pk, anchorA, prodPoly_eval]
+    norm_num [Pk, enumerated, prodPoly_eval]
 
 set_option maxHeartbeats 1600000 in
 -- 18 levels of `norm_num` on sums of up to 18 big rationals
-/-- The anchor `B_k` solves the staircase at `H = k+1` with `μ_k = 3·c_k/3^(2k)`. -/
-lemma num_check (hA : BankedAnchors) : ∀ k, 1 ≤ k → k ≤ 18 →
-    (T (2 * k + 2) (k + 2) : ℚ) * 3 ^ (2 * k) = 3 * cTab k * 3 ^ k +
-      ∑ i ∈ Finset.range k, 3 * cTab i * 3 ^ (2 * k - 2 * i) *
+/-- The cell `T(2k+2, k+2)` solves the staircase at `H = k+1` with
+`μ_k = 3·c_k/3^(2k)`. -/
+lemma mu_eval_cell (hA : EnumeratedCells) : ∀ k, 1 ≤ k → k ≤ 18 →
+    (T (2 * k + 2) (k + 2) : ℚ) * 3 ^ (2 * k) = 3 * cInt k * 3 ^ k +
+      ∑ i ∈ Finset.range k, 3 * cInt i * 3 ^ (2 * k - 2 * i) *
         ((Pk (k - i)).eval ((k + 1 + (k - i) : ℕ) : ℚ) * 3 ^ (k + 1 + (k - i))
           / 3 ^ (3 * (k - i) + 1)) := by
   intro k h1 h2
   rw [(hA k h1 h2).2]
   interval_cases k <;>
-    norm_num [Finset.sum_range_succ, Pk, cTab, anchorB, prodPoly_eval]
+    norm_num [Finset.sum_range_succ, Pk, cInt, enumerated, prodPoly_eval]
 
 /-! ## The climb -/
 
 /-- Level `0`: `3·T(H, H) = 1·3^H`, from `T(n,n) = 3^(n-1)`. -/
-lemma grand_zero : GrandForm 0 (Pk 0) := by
+lemma isDiagonalPolyH_zero : IsDiagonalPolyH 0 (Pk 0) := by
   intro H hH
   simp only [Nat.cast_zero, add_zero, Nat.mul_zero, Nat.zero_add, pow_one, Pk, prodPoly_eval]
   rw [T_self H hH, show (H : ℤ) - 1 = ((H - 1 : ℕ) : ℤ) from by omega, zpow_natCast,
@@ -325,27 +333,29 @@ lemma grand_zero : GrandForm 0 (Pk 0) := by
   norm_num
 
 /-- Level `0`: `P_0 = 1` and `μ_0`. -/
-theorem grand_base : grandOK Pk 0 ∧ muOK cTab 0 := by
+theorem climb_zero : IsDiagonalPolyHUpTo Pk 0 ∧ MuEqUpTo cInt 0 := by
   refine ⟨fun i hi => ?_, fun i hi => ?_⟩
-  · interval_cases i; exact grand_zero
-  · interval_cases i; rw [mu_zero]; norm_num [cTab]
+  · interval_cases i; exact isDiagonalPolyH_zero
+  · interval_cases i; rw [mu_zero]; norm_num [cInt]
 
-/-- **`P_0 … P_18` and `μ_0 … μ_18`**, from the anchors: level `0` is
-`grand_base`, each later level one `level_step`. -/
-theorem grand_all (hA : BankedAnchors) : ∀ k, k ≤ 18 → grandOK Pk k ∧ muOK cTab k := by
+/-- **The climb: `P_0 … P_18` and `μ_0 … μ_18`**, from the enumerated cells:
+level `0` is `climb_zero`, each later level one `climb_step`. -/
+theorem climb (hA : EnumeratedCells) :
+    ∀ k, k ≤ 18 → IsDiagonalPolyHUpTo Pk k ∧ MuEqUpTo cInt k := by
   intro k
   induction k with
-  | zero => exact fun _ => grand_base
+  | zero => exact fun _ => climb_zero
   | succ k ih =>
     intro hk
     obtain ⟨hg, hm⟩ := ih (by omega)
-    exact level_step (k + 1) (by omega) Pk cTab (by rwa [Nat.add_sub_cancel])
-      (by rwa [Nat.add_sub_cancel]) (stair_check (k + 1) (by omega) hk)
-      (anchor_check hA (k + 1) (by omega) hk) (num_check hA (k + 1) (by omega) hk)
+    exact climb_step (k + 1) (by omega) Pk cInt (by rwa [Nat.add_sub_cancel])
+      (by rwa [Nat.add_sub_cancel]) (Pk_staircase (k + 1) (by omega) hk)
+      (Pk_eval_cell hA (k + 1) (by omega) hk) (mu_eval_cell hA (k + 1) (by omega) hk)
 
-/-- **`P_k` is explicitly known for `k ≤ 18`**, production form. -/
-theorem Pk_prod (hA : BankedAnchors) (k : ℕ) (hk : k ≤ 18) : IsDiagonalPoly k (Pk k) :=
-  grand_to_prod ((grand_all hA k hk).1 k le_rfl)
+/-- **`P_k` is explicitly known for `k ≤ 18`**: `Pk k` satisfies the law, given
+the 36 enumerated cells. -/
+theorem isDiagonalPoly_Pk (hA : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) : IsDiagonalPoly k (Pk k) :=
+  isDiagonalPoly_of_H ((climb hA k hk).1 k le_rfl)
 
 /-! ## Levels `1` and `2` unconditionally
 
@@ -356,19 +366,19 @@ The climb's first two levels need four onset cells, `T(3,2)`, `T(4,3)`,
 both, and `T_sub_two` is the `k = 2` diagonal in closed form. -/
 
 /-- The climb to level `2`, from the kernel-decided cells. -/
-theorem grand_two : grandOK Pk 2 ∧ muOK cTab 2 := by
-  have h1 : grandOK Pk 1 ∧ muOK cTab 1 :=
-    level_step 1 (by norm_num) Pk cTab grand_base.1 grand_base.2
-      (stair_check 1 (by norm_num) (by norm_num))
+theorem climb_two : IsDiagonalPolyHUpTo Pk 2 ∧ MuEqUpTo cInt 2 := by
+  have h1 : IsDiagonalPolyHUpTo Pk 1 ∧ MuEqUpTo cInt 1 :=
+    climb_step 1 (by norm_num) Pk cInt climb_zero.1 climb_zero.2
+      (Pk_staircase 1 (by norm_num) (by norm_num))
       (by norm_num [T_3_2, Pk, prodPoly_eval])
-      (by norm_num [Finset.sum_range_succ, T_4_3, Pk, cTab, prodPoly_eval])
-  exact level_step 2 (by norm_num) Pk cTab h1.1 h1.2 (stair_check 2 (by norm_num) (by norm_num))
+      (by norm_num [Finset.sum_range_succ, T_4_3, Pk, cInt, prodPoly_eval])
+  exact climb_step 2 (by norm_num) Pk cInt h1.1 h1.2 (Pk_staircase 2 (by norm_num) (by norm_num))
     (by norm_num [Enum.T_5_3, Pk, prodPoly_eval])
-    (by norm_num [Finset.sum_range_succ, Enum.T_6_4, Pk, cTab, prodPoly_eval])
+    (by norm_num [Finset.sum_range_succ, Enum.T_6_4, Pk, cInt, prodPoly_eval])
 
 /-- **`P₂ = Pk 2`, unconditionally.** -/
 theorem isDiagonalPoly_P2 : IsDiagonalPoly 2 (Pk 2) :=
-  grand_to_prod (grand_two.1 2 le_rfl)
+  isDiagonalPoly_of_H (climb_two.1 2 le_rfl)
 
 /-- **`T(n, n-2) = ½(625n² - 2459n + 1134)·3^(n-7)`** for `n ≥ 5`: the `k = 2`
 diagonal. -/

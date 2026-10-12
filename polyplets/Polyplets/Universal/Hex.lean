@@ -22,11 +22,11 @@ throughout, the six neighbors of a cell are
 therefore gives `T(n, n-k) = P_k(n) · 2^(n-1-3k)` for `n ≥ 2k+1`: **the
 by-height diagonals of fixed polyhexes are a polynomial times `2^n`.**
 
-## What is pinned here
+## What is determined here
 
 * `isDiagonalPoly_hexP1` / `hex_T_sub_one` : `P₁(n) = 9n − 15`, i.e.
   `T(n, n−1) = (9n − 15)·2^(n−4)` for `n ≥ 3` (paper instance table, density
-  `9 = 3²`), given the second anchor cell `T(4,3) = 21` as a hypothesis. The
+  `9 = 3²`), given the second cell `T(4,3) = 21` as a hypothesis. The
   first anchor `T(3,2) = 6` the kernel decides from the generic enumerator;
   `T(4,3)` needs more than 8 GB in the kernel (measured 2026-10-12), so it
   enters as the hypothesis `isDiagonalPoly_hexP1` and `hex_T_sub_one` carry.
@@ -58,7 +58,7 @@ lemma mem_hexLattice_D {t : ℤ} : t ∈ hexLattice.D ↔ (t = -1 ∨ t = 0) := 
 lemma hex_reach_le : hexLattice.reach ≤ 1 :=
   reach_le_one _ (by decide)
 
-/-- **The instance anchor**: row-local adjacency at the hexagonal lattice is
+/-- **The instance bridge**: row-local adjacency at the hexagonal lattice is
 adjacency to one of the six hexagonal neighbors. -/
 theorem adj_hex {p q : ℤ × ℤ} :
     Adj hexLattice p q ↔ (q.1 - p.1, q.2 - p.2) ∈
@@ -69,7 +69,7 @@ theorem adj_hex {p q : ℤ × ℤ} :
     abs_eq (by norm_num : (0 : ℤ) ≤ 1)]
   omega
 
-/-! ## The first anchor cell -/
+/-! ## The first cell -/
 
 /-- `T(3,2) = 6`: of the 11 fixed 3-cell polyhexes, one is flat and four are
 strict staircases, leaving six of height exactly 2. -/
@@ -78,7 +78,7 @@ theorem T_hex_3_2 : T hexLattice 3 2 = 6 := by
 
 /-! ## Pinning `P₁` -/
 
-/-- The hexagonal lattice's level-1 production polynomial `P₁ = 9X − 15`. -/
+/-- The hexagonal lattice's level-1 diagonal polynomial `P₁ = 9X − 15`. -/
 noncomputable def hexP1 : Polynomial ℚ := C 9 * X - C 15
 
 /-- `P₁` has degree `≤ 1`. -/
@@ -99,8 +99,7 @@ lemma hexP1_eval_four (h43 : T hexLattice 4 3 = 21) :
     hexP1.eval (4 : ℚ) = ((T hexLattice 4 3 * hexLattice.b ^ 0 : ℕ) : ℚ) := by
   rw [hexP1_eval, h43, b_hex]; norm_num
 
-/-- **The hexagonal `P₁`, pinned** , given the second anchor
-cell `T(4,3) = 21`. -/
+/-- **The hexagonal `P₁`**, given the second cell `T(4,3) = 21`. -/
 theorem isDiagonalPoly_hexP1 (h43 : T hexLattice 4 3 = 21) :
     IsDiagonalPoly hexLattice 1 hexP1 := by
   refine isDiagonalPoly_of_eval hexLattice 1 hexP1 hexP1_deg ({3, 4} : Finset ℕ) (by decide) ?_ ?_
