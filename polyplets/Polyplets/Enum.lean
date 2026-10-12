@@ -23,12 +23,12 @@ kernel evaluates with bignum arithmetic. The list is built by growth:
 * every polyplet of `n + 1 ≥ 2` cells has a **leaf**, a cell whose
   removal leaves it connected (`exists_isLeaf`: a cell farthest from a seed);
 * its **deletable cell** `del` is the leaf that is largest in row-major order
-  (`IsDel`, unique by `isDel_unique`);
+  (`IsLastLeaf`, unique by `isLastLeaf_unique`);
 * so the animals of `n + 1` cells are, exactly once each, the anchored
   `P ∪ {c}` over the animals `P` of `n` cells and the frontier cells `c` for
   which `c` is the deletable cell of `P ∪ {c}` (`children`).
 
-`L n` is that list and `L_spec` says its boards are the polyplets of
+`boards n` is that list and `boards_spec` says its boards are the polyplets of
 `n` cells, each once, for `n ≤ 14`. Counts are then lengths of filtered
 lists: `a n`, `T n H`, the walk-top counts, the cluster weights and the
 fixed-point counts of the symmetries all have a kernel-checkable form
@@ -54,7 +54,7 @@ def cells (m : ℕ) : Finset (ℤ × ℤ) :=
 def InBox (m : ℕ) : Prop := m < 2 ^ 256
 
 /-- Every set bit lies below `256` and not in the last column, so that the
-column shifts of `nbrs` do not wrap. -/
+column shifts of `neighbors` do not wrap. -/
 def NoWrap (m : ℕ) : Prop := ∀ i, m.testBit i = true → i < 256 ∧ i % 16 + 1 < 16
 
 /-- `R` is a sub-board of `S`. -/
@@ -63,12 +63,12 @@ def Sub (R S : ℕ) : Prop := ∀ i, R.testBit i = true → S.testBit i = true
 /-- The eight king neighbours of every set cell, as one board. Row-wrapped
 bits (from a cell in the first or last column) are garbage; every consumer
 masks with a `NoWrap` board. -/
-def nbrs (m : ℕ) : ℕ :=
+def neighbors (m : ℕ) : ℕ :=
   (m <<< 1) ||| (m >>> 1) ||| (m <<< 16) ||| (m >>> 16) |||
   (m <<< 17) ||| (m >>> 17) ||| (m <<< 15) ||| (m >>> 15)
 
 /-- One flood step inside `S` from the reached board `R`. -/
-def grow (S R : ℕ) : ℕ := (R ||| nbrs R) &&& S
+def grow (S R : ℕ) : ℕ := (R ||| neighbors R) &&& S
 
 /-- `k` flood steps inside `S` from `R`. -/
 def flood (S : ℕ) : ℕ → ℕ → ℕ
@@ -111,16 +111,16 @@ that its frontier fits, and for each frontier cell `c` keep the anchored
 `P ∪ {c}` exactly when `c` is its first leaf. -/
 def children (n P : ℕ) : List ℕ :=
   let P' := P <<< 17
-  let F := (nbrs P' ^^^ (nbrs P' &&& P')) &&& boxMask
+  let F := (neighbors P' ^^^ (neighbors P' &&& P')) &&& boxMask
   (bitsOf 256 F).filterMap fun c =>
     let S := P' ||| 2 ^ c
     if firstLeaf n S 256 S = c then some (anchor S) else none
 
 /-- The polyplets of `n` cells, as boards, each once. -/
-def L : ℕ → List ℕ
+def boards : ℕ → List ℕ
   | 0 => []
   | 1 => [1]
-  | n + 2 => (L (n + 1)).flatMap (children (n + 2))
+  | n + 2 => (boards (n + 1)).flatMap (children (n + 2))
 
 /-- The bounding-box height of an anchored board. -/
 def height (m : ℕ) : ℕ := Nat.log2 m / 16 + 1
@@ -264,12 +264,12 @@ lemma log2_lt_of_inBox {m : ℕ} (hm : InBox m) (h0 : m ≠ 0) : Nat.log2 m < 25
 
 /-! ## Neighbours -/
 
-/-- A bit of `nbrs m` is a bit of `m` moved by one of the eight index offsets. -/
-lemma testBit_nbrs {m j : ℕ} :
-    (nbrs m).testBit j = true ↔ ∃ i, m.testBit i = true ∧
+/-- A bit of `neighbors m` is a bit of `m` moved by one of the eight index offsets. -/
+lemma testBit_neighbors {m j : ℕ} :
+    (neighbors m).testBit j = true ↔ ∃ i, m.testBit i = true ∧
       (i + 1 = j ∨ j + 1 = i ∨ i + 16 = j ∨ j + 16 = i ∨
         i + 17 = j ∨ j + 17 = i ∨ i + 15 = j ∨ j + 15 = i) := by
-  simp only [nbrs, Nat.testBit_lor, Nat.testBit_shiftLeft, Nat.testBit_shiftRight,
+  simp only [neighbors, Nat.testBit_lor, Nat.testBit_shiftLeft, Nat.testBit_shiftRight,
     Bool.or_eq_true, Bool.and_eq_true, decide_eq_true_eq]
   constructor
   · rintro (((((((⟨h1, h2⟩ | h) | ⟨h1, h2⟩) | h) | ⟨h1, h2⟩) | h) | ⟨h1, h2⟩) | h)
@@ -303,23 +303,23 @@ lemma kingAdj_decode_iff {i j : ℕ} (_hi : i < 256) (hi' : i % 16 + 1 < 16) (_h
   simp only [kingAdj, decode, ne_eq, Prod.mk.injEq, Nat.cast_inj, abs_le]
   omega
 
-/-- The cells of `nbrs R &&& B`, for `NoWrap` boards: the cells of `B` king-adjacent
+/-- The cells of `neighbors R &&& B`, for `NoWrap` boards: the cells of `B` king-adjacent
 to a cell of `R`. -/
-lemma mem_cells_nbrs_land {R B : ℕ} (hR : NoWrap R) (hB : NoWrap B) {q : ℤ × ℤ} :
-    q ∈ cells (nbrs R &&& B) ↔ q ∈ cells B ∧ ∃ p ∈ cells R, kingAdj p q := by
+lemma mem_cells_neighbors_land {R B : ℕ} (hR : NoWrap R) (hB : NoWrap B) {q : ℤ × ℤ} :
+    q ∈ cells (neighbors R &&& B) ↔ q ∈ cells B ∧ ∃ p ∈ cells R, kingAdj p q := by
   rw [cells_land, Finset.mem_inter]
   constructor
   · rintro ⟨hq1, hq2⟩
     refine ⟨hq2, ?_⟩
     obtain ⟨j, hj, hbj, rfl⟩ := mem_cells.mp hq2
-    obtain ⟨i, hbi, hrel⟩ := testBit_nbrs.mp ((decode_mem_cells hj).mp hq1)
+    obtain ⟨i, hbi, hrel⟩ := testBit_neighbors.mp ((decode_mem_cells hj).mp hq1)
     obtain ⟨hi, hi'⟩ := hR i hbi
     exact ⟨decode i, (decode_mem_cells hi).mpr hbi,
       (kingAdj_decode_iff hi hi' hj (hB j hbj).2).mpr hrel⟩
   · rintro ⟨hqB, p, hpR, hadj⟩
     obtain ⟨i, hi, hbi, rfl⟩ := mem_cells.mp hpR
     obtain ⟨j, hj, hbj, rfl⟩ := mem_cells.mp hqB
-    refine ⟨(decode_mem_cells hj).mpr (testBit_nbrs.mpr ⟨i, hbi, ?_⟩), hqB⟩
+    refine ⟨(decode_mem_cells hj).mpr (testBit_neighbors.mpr ⟨i, hbi, ?_⟩), hqB⟩
     exact (kingAdj_decode_iff hi (hR i hbi).2 hj (hB j hbj).2).mp hadj
 
 /-! ## The flood and connectivity -/
@@ -340,7 +340,7 @@ lemma cells_grow {S R : ℕ} (hS : NoWrap S) (hR : Sub R S) :
   rw [h1]
   congr 1
   ext q
-  rw [mem_cells_nbrs_land (noWrap_of_sub hR hS) hS, Finset.mem_filter]
+  rw [mem_cells_neighbors_land (noWrap_of_sub hR hS) hS, Finset.mem_filter]
 
 lemma sub_flood {S : ℕ} : ∀ k R, Sub R S → Sub (flood S k R) S := by
   intro k
@@ -730,31 +730,33 @@ lemma exists_adj_of_connected {S : Finset (ℤ × ℤ)} (hS : KingConnected S) (
   · exact ⟨q, hqS, fun h => hadj.1 h.symm, hadj⟩
 
 /-- Row-major order on cells: the order of bit indices. -/
-def key (c : ℤ × ℤ) : Lex (ℤ × ℤ) := toLex (c.2, c.1)
+def rowMajor (c : ℤ × ℤ) : Lex (ℤ × ℤ) := toLex (c.2, c.1)
 
-lemma key_injective : Function.Injective key := fun a b h => by
+lemma rowMajor_injective : Function.Injective rowMajor := fun a b h => by
   have h' := toLex.injective h
   simp only [Prod.mk.injEq] at h'
   exact Prod.ext h'.2 h'.1
 
-lemma key_le_add {c d v : ℤ × ℤ} : key (c + v) ≤ key (d + v) ↔ key c ≤ key d := by
-  simp only [key, Prod.Lex.toLex_le_toLex, Prod.fst_add, Prod.snd_add]
+lemma rowMajor_le_add {c d v : ℤ × ℤ} :
+    rowMajor (c + v) ≤ rowMajor (d + v) ↔ rowMajor c ≤ rowMajor d := by
+  simp only [rowMajor, Prod.Lex.toLex_le_toLex, Prod.fst_add, Prod.snd_add]
   omega
 
 /-- `c` is the deletable cell of `S`: its leaf that is largest in row-major
 order. -/
-def IsDel (S : Finset (ℤ × ℤ)) (c : ℤ × ℤ) : Prop :=
-  IsLeaf S c ∧ ∀ x ∈ S, IsLeaf S x → key x ≤ key c
+def IsLastLeaf (S : Finset (ℤ × ℤ)) (c : ℤ × ℤ) : Prop :=
+  IsLeaf S c ∧ ∀ x ∈ S, IsLeaf S x → rowMajor x ≤ rowMajor c
 
-theorem isDel_unique {S : Finset (ℤ × ℤ)} {c d : ℤ × ℤ} (hc : IsDel S c) (hd : IsDel S d) :
+theorem isLastLeaf_unique {S : Finset (ℤ × ℤ)} {c d : ℤ × ℤ} (hc : IsLastLeaf S c)
+    (hd : IsLastLeaf S d) :
     c = d :=
-  key_injective (le_antisymm (hd.2 c hc.1.1 hc.1) (hc.2 d hd.1.1 hd.1))
+  rowMajor_injective (le_antisymm (hd.2 c hc.1.1 hc.1) (hc.2 d hd.1.1 hd.1))
 
-theorem exists_isDel {S : Finset (ℤ × ℤ)} (hS : KingConnected S) (h2 : 2 ≤ S.card) :
-    ∃ c, IsDel S c := by
+theorem exists_isLastLeaf {S : Finset (ℤ × ℤ)} (hS : KingConnected S) (h2 : 2 ≤ S.card) :
+    ∃ c, IsLastLeaf S c := by
   classical
   obtain ⟨c0, hc0⟩ := exists_isLeaf hS h2
-  obtain ⟨c, hc, hmax⟩ := Finset.exists_max_image (S.filter fun x => IsLeaf S x) key
+  obtain ⟨c, hc, hmax⟩ := Finset.exists_max_image (S.filter fun x => IsLeaf S x) rowMajor
     ⟨c0, Finset.mem_filter.mpr ⟨hc0.1, hc0⟩⟩
   exact ⟨c, (Finset.mem_filter.mp hc).2,
     fun x hx hlx => hmax x (Finset.mem_filter.mpr ⟨hx, hlx⟩)⟩
@@ -770,36 +772,36 @@ lemma isLeaf_translate (v : ℤ × ℤ) {S : Finset (ℤ × ℤ)} {c : ℤ × �
   rw [IsLeaf, IsLeaf, mem_translate, add_sub_cancel_right, ← translate_erase,
     kingConnected_translate_iff]
 
-lemma isDel_translate (v : ℤ × ℤ) {S : Finset (ℤ × ℤ)} {c : ℤ × ℤ} :
-    IsDel (translate v S) (c + v) ↔ IsDel S c := by
-  rw [IsDel, IsDel, isLeaf_translate]
+lemma isLastLeaf_translate (v : ℤ × ℤ) {S : Finset (ℤ × ℤ)} {c : ℤ × ℤ} :
+    IsLastLeaf (translate v S) (c + v) ↔ IsLastLeaf S c := by
+  rw [IsLastLeaf, IsLastLeaf, isLeaf_translate]
   refine and_congr_right fun _ => ⟨fun h x hx hl => ?_, fun h x hx hl => ?_⟩
-  · exact key_le_add.mp (h (x + v) (translate_mem hx) ((isLeaf_translate v).mpr hl))
+  · exact rowMajor_le_add.mp (h (x + v) (translate_mem hx) ((isLeaf_translate v).mpr hl))
   · obtain ⟨y, hy, rfl⟩ : ∃ y ∈ S, y + v = x := by
       rw [mem_translate] at hx
       exact ⟨x - v, hx, sub_add_cancel x v⟩
-    exact key_le_add.mpr (h y hy ((isLeaf_translate v).mp hl))
+    exact rowMajor_le_add.mpr (h y hy ((isLeaf_translate v).mp hl))
 
 /-- **The parent of a child.** The anchored `insert c P`, when `c` is its
 deletable cell, has deletable cell `c - corner (insert c P)`; removing it
 and anchoring recovers `anchor P`. -/
 lemma child_parent {P : Finset (ℤ × ℤ)} {c : ℤ × ℤ} (hc : c ∉ P)
-    (hdel : IsDel (insert c P) c) :
-    IsDel (Polyplets.anchor (insert c P)) (c - corner (insert c P)) ∧
+    (hdel : IsLastLeaf (insert c P) c) :
+    IsLastLeaf (Polyplets.anchor (insert c P)) (c - corner (insert c P)) ∧
     (Polyplets.anchor (insert c P)).erase (c - corner (insert c P))
       = translate (-corner (insert c P)) P := by
   rw [anchor_eq_translate, sub_eq_add_neg]
-  exact ⟨(isDel_translate _).mpr hdel, by rw [← translate_erase, Finset.erase_insert hc]⟩
+  exact ⟨(isLastLeaf_translate _).mpr hdel, by rw [← translate_erase, Finset.erase_insert hc]⟩
 
 /-- Two children of one parent with the same anchored form are the same
 child. -/
 lemma child_inj {P : Finset (ℤ × ℤ)} (hP : P.Nonempty) {c c' : ℤ × ℤ} (hc : c ∉ P)
-    (hc' : c' ∉ P) (hdel : IsDel (insert c P) c) (hdel' : IsDel (insert c' P) c')
+    (hc' : c' ∉ P) (hdel : IsLastLeaf (insert c P) c) (hdel' : IsLastLeaf (insert c' P) c')
     (h : Polyplets.anchor (insert c P) = Polyplets.anchor (insert c' P)) : c = c' := by
   obtain ⟨d1, e1⟩ := child_parent hc hdel
   obtain ⟨d2, e2⟩ := child_parent hc' hdel'
   rw [← h] at d2 e2
-  have he := isDel_unique d1 d2
+  have he := isLastLeaf_unique d1 d2
   rw [← he, e1] at e2
   have h3 : translate (-corner (insert c P) + corner (insert c' P)) P = P := by
     have := congrArg (translate (corner (insert c' P))) e2
@@ -813,13 +815,13 @@ lemma child_inj {P : Finset (ℤ × ℤ)} (hP : P.Nonempty) {c c' : ℤ × ℤ} 
 
 /-- Children with the same anchored form have the same anchored parent. -/
 lemma parent_eq_of_child_eq {P P' : Finset (ℤ × ℤ)} {c c' : ℤ × ℤ} (hc : c ∉ P) (hc' : c' ∉ P')
-    (hdel : IsDel (insert c P) c) (hdel' : IsDel (insert c' P') c')
+    (hdel : IsLastLeaf (insert c P) c) (hdel' : IsLastLeaf (insert c' P') c')
     (h : Polyplets.anchor (insert c P) = Polyplets.anchor (insert c' P')) :
     Polyplets.anchor P = Polyplets.anchor P' := by
   obtain ⟨d1, e1⟩ := child_parent hc hdel
   obtain ⟨d2, e2⟩ := child_parent hc' hdel'
   rw [← h] at d2 e2
-  rw [← isDel_unique d1 d2, e1] at e2
+  rw [← isLastLeaf_unique d1 d2, e1] at e2
   have h1 := congrArg Polyplets.anchor e2
   rwa [show translate (-corner (insert c P)) P = P.image (· + -corner (insert c P))
     from rfl, show translate (-corner (insert c' P')) P'
@@ -884,12 +886,12 @@ lemma margin_of_isPolyplet {n : ℕ} {P : ℕ} (hbox : InBox P) (hP : IsPolyplet
 /-! ## The children of a board -/
 
 lemma testBit_frontier (P' j : ℕ) :
-    ((nbrs P' ^^^ (nbrs P' &&& P')) &&& boxMask).testBit j = true ↔
-      (nbrs P').testBit j = true ∧ P'.testBit j = false ∧ j < 256 ∧ j % 16 + 1 < 16 := by
+    ((neighbors P' ^^^ (neighbors P' &&& P')) &&& boxMask).testBit j = true ↔
+      (neighbors P').testBit j = true ∧ P'.testBit j = false ∧ j < 256 ∧ j % 16 + 1 < 16 := by
   rw [Nat.testBit_land, Nat.testBit_xor, Nat.testBit_land, boxMask_testBit]
-  cases (nbrs P').testBit j <;> cases P'.testBit j <;> simp
+  cases (neighbors P').testBit j <;> cases P'.testBit j <;> simp
 
-lemma inBox_frontier (P' : ℕ) : InBox ((nbrs P' ^^^ (nbrs P' &&& P')) &&& boxMask) :=
+lemma inBox_frontier (P' : ℕ) : InBox ((neighbors P' ^^^ (neighbors P' &&& P')) &&& boxMask) :=
   inBox_of_testBit fun j hj => ((testBit_frontier P' j).mp hj).2.2.1
 
 lemma noWrap_shift17 {P : ℕ} (hM : Margin P) : NoWrap (P <<< 17) := by
@@ -934,8 +936,8 @@ lemma connected_erase_iff {n S i : ℕ} (hS : NoWrap S) (hn : (cells S).card ≤
     decode_mem_cells hi', hi]
   simp
 
-lemma key_decode_le {i j : ℕ} : key (decode i) ≤ key (decode j) ↔ i ≤ j := by
-  simp only [key, decode, Prod.Lex.toLex_le_toLex, Nat.cast_lt, Nat.cast_inj, Nat.cast_le]
+lemma rowMajor_decode_le {i j : ℕ} : rowMajor (decode i) ≤ rowMajor (decode j) ↔ i ≤ j := by
+  simp only [rowMajor, decode, Prod.Lex.toLex_le_toLex, Nat.cast_lt, Nat.cast_inj, Nat.cast_le]
   omega
 
 /-- **The first-leaf scan.** With fuel for every bit of `scan`, it returns `c`
@@ -1007,10 +1009,11 @@ frontier index `j` that passes the first-leaf test gives the adjoined cell
 `c = decode j - (1, 1)`. -/
 lemma child_of_index {n P j : ℕ} (hbox : InBox P) (hP : IsPolyplet n (cells P))
     (hn : n ≤ 13)
-    (hj : ((nbrs (P <<< 17) ^^^ (nbrs (P <<< 17) &&& (P <<< 17))) &&& boxMask).testBit j = true)
+    (hj : ((neighbors (P <<< 17) ^^^ (neighbors (P <<< 17) &&& (P <<< 17))) &&& boxMask).testBit j
+      = true)
     (hfl : firstLeaf (n + 1) ((P <<< 17) ||| 2 ^ j) 256 ((P <<< 17) ||| 2 ^ j) = j) :
     InBox (anchor ((P <<< 17) ||| 2 ^ j)) ∧
-    ∃ c, c ∉ cells P ∧ (∃ p ∈ cells P, kingAdj p c) ∧ IsDel (insert c (cells P)) c ∧
+    ∃ c, c ∉ cells P ∧ (∃ p ∈ cells P, kingAdj p c) ∧ IsLastLeaf (insert c (cells P)) c ∧
       decode j = c + (1, 1) ∧
       cells (anchor ((P <<< 17) ||| 2 ^ j)) = Polyplets.anchor (insert c (cells P)) := by
   have hM := margin_of_isPolyplet hbox hP (by omega)
@@ -1044,7 +1047,7 @@ lemma child_of_index {n P j : ℕ} (hbox : InBox P) (hP : IsPolyplet n (cells P)
     apply hc'P'
     rw [hP'cells, mem_translate]
     exact h
-  · obtain ⟨i, hi, hrel⟩ := testBit_nbrs.mp hnb
+  · obtain ⟨i, hi, hrel⟩ := testBit_neighbors.mp hnb
     obtain ⟨hi256, hicol⟩ := hP'nw i hi
     have hadj : kingAdj (decode i) c' := (kingAdj_decode_iff hi256 hicol hj256 hjcol).mpr hrel
     refine ⟨decode i - (1, 1), ?_, ?_⟩
@@ -1055,17 +1058,17 @@ lemma child_of_index {n P j : ℕ} (hbox : InBox P) (hP : IsPolyplet n (cells P)
   · have hspec := (firstLeaf_spec hS1nw (le_of_eq hS1card) (by omega) 256 _ (fun _ h => h)
       (nbits_le _) j hj256).mp hfl
     obtain ⟨-, hleaf, hmax⟩ := hspec
-    have hdel' : IsDel (cells ((P <<< 17) ||| 2 ^ j)) c' := by
+    have hdel' : IsLastLeaf (cells ((P <<< 17) ||| 2 ^ j)) c' := by
       refine ⟨hleaf, fun x hx hlx => ?_⟩
       obtain ⟨i, hi256, hbi, rfl⟩ := mem_cells.mp hx
       by_contra hlt
       rw [not_le] at hlt
       have hji : j < i := by
         by_contra h
-        exact absurd (key_decode_le.mpr (not_lt.mp h)) (not_le.mpr hlt)
+        exact absurd (rowMajor_decode_le.mpr (not_lt.mp h)) (not_le.mpr hlt)
       exact hmax i hbi hji hlx
     rw [hS1cells, hP'cells, hins] at hdel'
-    exact (isDel_translate _).mp (by rwa [sub_add_cancel])
+    exact (isLastLeaf_translate _).mp (by rwa [sub_add_cancel])
   · rw [cells_anchor (inBox_of_noWrap hS1nw) hS1ne, hS1cells, hP'cells, hins, translate,
       anchor_image_add]
 
@@ -1073,7 +1076,7 @@ lemma child_of_index {n P j : ℕ} (hbox : InBox P) (hP : IsPolyplet n (cells P)
 its deletable cell adjoined. -/
 lemma children_sound {n P m : ℕ} (hbox : InBox P) (hP : IsPolyplet n (cells P))
     (hn : n ≤ 13) (hm : m ∈ children (n + 1) P) :
-    InBox m ∧ ∃ c, c ∉ cells P ∧ (∃ p ∈ cells P, kingAdj p c) ∧ IsDel (insert c (cells P)) c ∧
+    InBox m ∧ ∃ c, c ∉ cells P ∧ (∃ p ∈ cells P, kingAdj p c) ∧ IsLastLeaf (insert c (cells P)) c ∧
       cells m = Polyplets.anchor (insert c (cells P)) := by
   simp only [children, List.mem_filterMap] at hm
   obtain ⟨j, hjmem, hj⟩ := hm
@@ -1089,7 +1092,7 @@ lemma children_sound {n P m : ℕ} (hbox : InBox P) (hP : IsPolyplet n (cells P)
 /-- **Completeness of `children`**: every adjoinable deletable cell occurs. -/
 lemma children_complete {n P : ℕ} (hbox : InBox P) (hP : IsPolyplet n (cells P))
     (hn : n ≤ 13) {c : ℤ × ℤ} (hc : c ∉ cells P) (hadj : ∃ p ∈ cells P, kingAdj p c)
-    (hdel : IsDel (insert c (cells P)) c) :
+    (hdel : IsLastLeaf (insert c (cells P)) c) :
     ∃ m ∈ children (n + 1) P, cells m = Polyplets.anchor (insert c (cells P)) := by
   have hM := margin_of_isPolyplet hbox hP (by omega)
   have hP'nw := noWrap_shift17 hM
@@ -1140,10 +1143,10 @@ lemma children_complete {n P : ℕ} (hbox : InBox P) (hP : IsPolyplet n (cells P
     · rfl
     · exact absurd (this.mpr h) hc'mem
   have hadj' : kingAdj p' c' := kingAdj_add (1, 1) hpc
-  have hF : ((nbrs (P <<< 17) ^^^ (nbrs (P <<< 17) &&& (P <<< 17))) &&& boxMask).testBit j
+  have hF : ((neighbors (P <<< 17) ^^^ (neighbors (P <<< 17) &&& (P <<< 17))) &&& boxMask).testBit j
       = true := by
     rw [testBit_frontier]
-    refine ⟨testBit_nbrs.mpr ⟨i, hbi, ?_⟩, hbj, hj256.1, hj256.2⟩
+    refine ⟨testBit_neighbors.mpr ⟨i, hbi, ?_⟩, hbj, hj256.1, hj256.2⟩
     rw [← kingAdj_decode_iff hi256.1 hi256.2 hj256.1 hj256.2, hdi, hdj]
     exact hadj'
   -- the first-leaf test passes at `j`
@@ -1153,9 +1156,9 @@ lemma children_complete {n P : ℕ} (hbox : InBox P) (hP : IsPolyplet n (cells P
       ← translate_insert]
   have hS1card : (cells ((P <<< 17) ||| 2 ^ j)).card = n + 1 := by
     rw [hS1cells, card_translate, Finset.card_insert_of_notMem hc, hP.card]
-  have hdel' : IsDel (cells ((P <<< 17) ||| 2 ^ j)) c' := by
+  have hdel' : IsLastLeaf (cells ((P <<< 17) ||| 2 ^ j)) c' := by
     rw [hS1cells, hc']
-    exact (isDel_translate _).mpr hdel
+    exact (isLastLeaf_translate _).mpr hdel
   have hfl : firstLeaf (n + 1) ((P <<< 17) ||| 2 ^ j) 256 ((P <<< 17) ||| 2 ^ j) = j := by
     rw [firstLeaf_spec hS1nw (le_of_eq hS1card) (by omega) 256 _ (fun _ h => h) (nbits_le _)
       j hj256.1]
@@ -1163,7 +1166,7 @@ lemma children_complete {n P : ℕ} (hbox : InBox P) (hP : IsPolyplet n (cells P
     · rw [Nat.testBit_lor, Nat.testBit_two_pow_self, Bool.or_true]
     · have hk256 := (hS1nw k hk).1
       have := hdel'.2 (decode k) ((decode_mem_cells hk256).mpr hk) hleaf
-      rw [← hdj, key_decode_le] at this
+      rw [← hdj, rowMajor_decode_le] at this
       omega
   refine ⟨anchor ((P <<< 17) ||| 2 ^ j), ?_, ?_⟩
   · simp only [children, List.mem_filterMap]
@@ -1205,7 +1208,8 @@ lemma children_nodup {n P : ℕ} (hbox : InBox P) (hP : IsPolyplet n (cells P))
 
 /-! ## The list of all animals -/
 
-lemma L_succ (n : ℕ) (hn : 1 ≤ n) : L (n + 1) = (L n).flatMap (children (n + 1)) := by
+lemma boards_succ (n : ℕ) (hn : 1 ≤ n) :
+    boards (n + 1) = (boards n).flatMap (children (n + 1)) := by
   obtain ⟨k, rfl⟩ : ∃ k, n = k + 1 := ⟨n - 1, by omega⟩
   rfl
 
@@ -1229,12 +1233,12 @@ lemma isPolyplet_one_iff {S : Finset (ℤ × ℤ)} :
         subst hp
         exact le_rfl
 
-/-- **The enumeration is exact**: for `1 ≤ n ≤ 14`, the boards of `L n` are
+/-- **The enumeration is exact**: for `1 ≤ n ≤ 14`, the boards of `boards n` are
 in the box, pairwise distinct, and their cells are exactly the polyplets
 animals of `n` cells. -/
-theorem L_spec : ∀ n, 1 ≤ n → n ≤ 14 →
-    (∀ m ∈ L n, InBox m) ∧ ((L n).map cells).Nodup ∧
-      ∀ S, IsPolyplet n S ↔ ∃ m ∈ L n, cells m = S := by
+theorem boards_spec : ∀ n, 1 ≤ n → n ≤ 14 →
+    (∀ m ∈ boards n, InBox m) ∧ ((boards n).map cells).Nodup ∧
+      ∀ S, IsPolyplet n S ↔ ∃ m ∈ boards n, cells m = S := by
   intro n
   induction n with
   | zero => intro h; omega
@@ -1243,18 +1247,18 @@ theorem L_spec : ∀ n, 1 ≤ n → n ≤ 14 →
     rcases Nat.eq_zero_or_pos n with rfl | hn1
     · refine ⟨?_, ?_, ?_⟩
       · intro m hm
-        simp only [L, List.mem_singleton] at hm
+        simp only [boards, List.mem_singleton] at hm
         subst hm
         norm_num [InBox]
-      · simp [L]
+      · simp [boards]
       · intro S
         rw [isPolyplet_one_iff]
-        simp only [L, List.mem_singleton, exists_eq_left]
+        simp only [boards, List.mem_singleton, exists_eq_left]
         rw [show (1 : ℕ) = 2 ^ 0 from rfl, cells_pow (by norm_num)]
         constructor <;> rintro rfl <;> rfl
     · obtain ⟨hbox, hnd, hmem⟩ := ih hn1 (by omega)
-      rw [L_succ n hn1]
-      have hcan : ∀ P ∈ L n, IsPolyplet n (cells P) := fun P hP =>
+      rw [boards_succ n hn1]
+      have hcan : ∀ P ∈ boards n, IsPolyplet n (cells P) := fun P hP =>
         (hmem _).mpr ⟨P, hP, rfl⟩
       refine ⟨?_, ?_, ?_⟩
       · intro m hm
@@ -1279,7 +1283,7 @@ theorem L_spec : ∀ n, 1 ≤ n → n ≤ 14 →
         constructor
         · intro hS
           have h2 : 2 ≤ S.card := by rw [hS.card]; omega
-          obtain ⟨c₀, hdel⟩ := exists_isDel hS.conn h2
+          obtain ⟨c₀, hdel⟩ := exists_isLastLeaf hS.conn h2
           have hc₀S := hdel.1.1
           have hQconn : KingConnected (S.erase c₀) := hdel.1.2
           have hQcard : (S.erase c₀).card = n := by
@@ -1303,10 +1307,10 @@ theorem L_spec : ∀ n, 1 ≤ n → n ≤ 14 →
           have hins : insert (c₀ - corner (S.erase c₀)) (cells P)
               = translate (-corner (S.erase c₀)) S := by
             rw [hP₀eq, sub_eq_add_neg, ← translate_insert, Finset.insert_erase hc₀S]
-          have hdel' : IsDel (insert (c₀ - corner (S.erase c₀)) (cells P))
+          have hdel' : IsLastLeaf (insert (c₀ - corner (S.erase c₀)) (cells P))
               (c₀ - corner (S.erase c₀)) := by
             rw [hins, sub_eq_add_neg]
-            exact (isDel_translate _).mpr hdel
+            exact (isLastLeaf_translate _).mpr hdel
           obtain ⟨m, hm, hmc⟩ :=
             children_complete (hbox P hP) (hcan P hP) (by omega) hcnot hadj hdel'
           refine ⟨m, List.mem_flatMap.mpr ⟨P, hP, hm⟩, ?_⟩
@@ -1318,22 +1322,22 @@ theorem L_spec : ∀ n, 1 ≤ n → n ≤ 14 →
           rw [hcells]
           exact isPolyplet_insert_anchor (hcan P hP) hc hadj
 
-lemma ne_zero_of_mem_L {n m : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) (hm : m ∈ L n) : m ≠ 0 := by
+lemma ne_zero_of_mem_boards {n m : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) (hm : m ∈ boards n) : m ≠ 0 := by
   intro h
-  have := ((L_spec n h1 hn).2.2 _).mpr ⟨m, hm, rfl⟩
+  have := ((boards_spec n h1 hn).2.2 _).mpr ⟨m, hm, rfl⟩
   rw [h, cells_zero] at this
   exact Finset.not_nonempty_empty this.anchored.nonempty
 
 /-! ## The counts -/
 
 /-- **A count over the animals of `n` cells is the length of a filter of
-`L n`**, for a board test `q` that decides the predicate `Q` on the cells. -/
+`boards n`**, for a board test `q` that decides the predicate `Q` on the cells. -/
 lemma ncard_eq_length {n : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) {Q : Finset (ℤ × ℤ) → Prop}
-    {q : ℕ → Bool} (hq : ∀ m ∈ L n, q m = true ↔ Q (cells m)) :
-    {S : Finset (ℤ × ℤ) | IsPolyplet n S ∧ Q S}.ncard = ((L n).filter q).length := by
-  obtain ⟨-, hnd, hmem⟩ := L_spec n h1 hn
+    {q : ℕ → Bool} (hq : ∀ m ∈ boards n, q m = true ↔ Q (cells m)) :
+    {S : Finset (ℤ × ℤ) | IsPolyplet n S ∧ Q S}.ncard = ((boards n).filter q).length := by
+  obtain ⟨-, hnd, hmem⟩ := boards_spec n h1 hn
   have hset : {S : Finset (ℤ × ℤ) | IsPolyplet n S ∧ Q S}
-      = ↑((((L n).filter q).map cells).toFinset) := by
+      = ↑((((boards n).filter q).map cells).toFinset) := by
     ext S
     simp only [Set.mem_setOf_eq, Finset.mem_coe, List.mem_toFinset, List.mem_map, List.mem_filter]
     constructor
@@ -1347,28 +1351,28 @@ lemma ncard_eq_length {n : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) {Q : Finset (ℤ 
     List.length_map]
 
 /-- **`a n` is a list length.** -/
-theorem a_eq_length {n : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) : a n = (L n).length := by
+theorem a_eq_length {n : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) : a n = (boards n).length := by
   have h := ncard_eq_length h1 hn (Q := fun _ => True) (q := fun _ => true) (fun _ _ => by simp)
   simpa [a, polyplets, List.filter_true] using h
 
 /-- **`T n H` is a filtered list length.** -/
 theorem T_eq_length {n H : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) :
-    T n H = ((L n).filter fun m => height m = H).length := by
+    T n H = ((boards n).filter fun m => height m = H).length := by
   rw [T, heightClass, ncard_eq_length h1 hn]
   intro m hm
-  rw [decide_eq_true_eq, height_eq ((L_spec n h1 hn).1 m hm) (ne_zero_of_mem_L h1 hn hm)]
+  rw [decide_eq_true_eq, height_eq ((boards_spec n h1 hn).1 m hm) (ne_zero_of_mem_boards h1 hn hm)]
 
 /-- **The walk-top count `d k H` is a filtered list length.** -/
 theorem d_eq_length {k H : ℕ} (hH : 1 ≤ H) (hn : H + k ≤ 14) :
-    d k H = ((L (H + k)).filter fun m => height m = H ∧ rowCount m (H - 1) = 1).length := by
+    d k H = ((boards (H + k)).filter fun m => height m = H ∧ rowCount m (H - 1) = 1).length := by
   have hset : (walkTop k H : Set (Finset (ℤ × ℤ)))
       = {S | IsPolyplet (H + k) S ∧ (Polyplets.height S = H ∧ rowSize S ((H : ℤ) - 1) = 1)} := by
     ext S
     simp only [Finset.mem_coe, mem_walkTop, mem_heightClass, Set.mem_setOf_eq, and_assoc]
   rw [d, ← Set.ncard_coe_finset, hset, ncard_eq_length (by omega) hn]
   intro m hm
-  have hbox := (L_spec _ (by omega) hn).1 m hm
-  rw [decide_eq_true_eq, height_eq hbox (ne_zero_of_mem_L (by omega) hn hm), rowCount_eq hbox,
+  have hbox := (boards_spec _ (by omega) hn).1 m hm
+  rw [decide_eq_true_eq, height_eq hbox (ne_zero_of_mem_boards (by omega) hn hm), rowCount_eq hbox,
     Nat.cast_pred hH]
 
 /-! ## Cluster configurations -/
@@ -1480,20 +1484,20 @@ lemma ncard_config {N h : ℕ} {R : Finset (ℤ × ℤ) → Prop}
       rw [anchor_eq_translate, ha, translate_translate, add_neg_cancel, translate_zero]
 
 /-- The cluster rows `1 … ℓ` of a board each hold at least two cells. -/
-def Multi (m ℓ : ℕ) : Prop := ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowCount m i
+def ClusterRows (m ℓ : ℕ) : Prop := ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowCount m i
 
-instance (m ℓ : ℕ) : Decidable (Multi m ℓ) := by
-  unfold Multi
+instance (m ℓ : ℕ) : Decidable (ClusterRows m ℓ) := by
+  unfold ClusterRows
   infer_instance
 
-lemma multi_iff {m ℓ : ℕ} (hm : InBox m) :
-    Multi m ℓ ↔ ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize (cells m) (i : ℤ) := by
-  simp only [Multi, rowCount_eq hm]
+lemma clusterRows_iff {m ℓ : ℕ} (hm : InBox m) :
+    ClusterRows m ℓ ↔ ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize (cells m) (i : ℤ) := by
+  simp only [ClusterRows, rowCount_eq hm]
 
 /-- **The interior weight `V ℓ j` is a filtered list length.** -/
 theorem V_eq_length {ℓ j : ℕ} (hn : ℓ + j + 2 ≤ 14) :
-    V ℓ j = ((L (ℓ + j + 2)).filter fun m => height m = ℓ + 2 ∧ rowCount m 0 = 1 ∧
-      rowCount m (ℓ + 1) = 1 ∧ Multi m ℓ).length := by
+    V ℓ j = ((boards (ℓ + j + 2)).filter fun m => height m = ℓ + 2 ∧ rowCount m 0 = 1 ∧
+      rowCount m (ℓ + 1) = 1 ∧ ClusterRows m ℓ).length := by
   have hset : (interiorConfigs ℓ j : Set (Finset (ℤ × ℤ)))
       = {S | S.card = ℓ + j + 2 ∧ ((0 : ℤ), (0 : ℤ)) ∈ S ∧
           (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ ((ℓ + 2 : ℕ) : ℤ) - 1) ∧ rowSize S 0 = 1 ∧
@@ -1511,9 +1515,9 @@ theorem V_eq_length {ℓ j : ℕ} (hn : ℓ + j + 2 ≤ 14) :
     (R := fun S => rowSize S ((ℓ : ℤ) + 1) = 1 ∧ ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ))
     (fun t S => by simp only [rowSize_translate_x]) ?_, ncard_eq_length (by omega) hn]
   · intro m hm
-    have hbox := (L_spec _ (by omega) hn).1 m hm
-    simp only [decide_eq_true_eq, height_eq hbox (ne_zero_of_mem_L (by omega) hn hm),
-      rowCount_eq hbox, multi_iff hbox, Nat.cast_zero, Nat.cast_add, Nat.cast_one]
+    have hbox := (boards_spec _ (by omega) hn).1 m hm
+    simp only [decide_eq_true_eq, height_eq hbox (ne_zero_of_mem_boards (by omega) hn hm),
+      rowCount_eq hbox, clusterRows_iff hbox, Nat.cast_zero, Nat.cast_add, Nat.cast_one]
   · rintro S ⟨htop, -⟩
     obtain ⟨r, hr⟩ := Finset.card_eq_one.mp htop
     have : r ∈ S.filter (fun c => c.2 = (ℓ : ℤ) + 1) := by
@@ -1523,8 +1527,8 @@ theorem V_eq_length {ℓ j : ℕ} (hn : ℓ + j + 2 ≤ 14) :
 
 /-- **The top-edge weight `Vt ℓ j` is a filtered list length.** -/
 theorem Vt_eq_length {ℓ j : ℕ} (hℓ : 1 ≤ ℓ) (hn : ℓ + j + 1 ≤ 14) :
-    Vt ℓ j = ((L (ℓ + j + 1)).filter fun m => height m = ℓ + 1 ∧ rowCount m 0 = 1 ∧
-      Multi m ℓ).length := by
+    Vt ℓ j = ((boards (ℓ + j + 1)).filter fun m => height m = ℓ + 1 ∧ rowCount m 0 = 1 ∧
+      ClusterRows m ℓ).length := by
   have hset : (topConfigs ℓ j : Set (Finset (ℤ × ℤ)))
       = {S | S.card = ℓ + j + 1 ∧ ((0 : ℤ), (0 : ℤ)) ∈ S ∧
           (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ ((ℓ + 1 : ℕ) : ℤ) - 1) ∧ rowSize S 0 = 1 ∧
@@ -1541,9 +1545,9 @@ theorem Vt_eq_length {ℓ j : ℕ} (hℓ : 1 ≤ ℓ) (hn : ℓ + j + 1 ≤ 14) 
     (R := fun S => ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ))
     (fun t S => by simp only [rowSize_translate_x]) ?_, ncard_eq_length (by omega) hn]
   · intro m hm
-    have hbox := (L_spec _ (by omega) hn).1 m hm
-    simp only [decide_eq_true_eq, height_eq hbox (ne_zero_of_mem_L (by omega) hn hm),
-      rowCount_eq hbox, multi_iff hbox, Nat.cast_zero]
+    have hbox := (boards_spec _ (by omega) hn).1 m hm
+    simp only [decide_eq_true_eq, height_eq hbox (ne_zero_of_mem_boards (by omega) hn hm),
+      rowCount_eq hbox, clusterRows_iff hbox, Nat.cast_zero]
   · intro S hmulti
     have h2 : 2 ≤ (S.filter fun c => c.2 = (ℓ : ℤ)).card :=
       hmulti ℓ (Finset.mem_Icc.mpr ⟨hℓ, le_rfl⟩)
@@ -1556,7 +1560,7 @@ theorem Vt_eq_length {ℓ j : ℕ} (hℓ : 1 ≤ ℓ) (hn : ℓ + j + 1 ≤ 14) 
 
 /-- The board of `g` applied to the cells of `m`: each cell is moved, shifted
 by `(8, 8)` to stay in the box, and the result is anchored. -/
-def transform (g : D4) (m : ℕ) : ℕ :=
+def applySym (g : D4) (m : ℕ) : ℕ :=
   anchor ((bitsOf 256 m).foldl
     (fun acc i => acc ||| 2 ^ encode (D4.toFun g (decode i) + (8, 8))) 0)
 
@@ -1612,10 +1616,10 @@ lemma max_abs_toFun (g : D4) (p : ℤ × ℤ) :
   · exact (hm _).trans (hq _ p)
 
 /-- The transformed board carries the transformed cells, anchored. -/
-lemma cells_transform {n : ℕ} (g : D4) {m : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 7) (hm : m ∈ L n) :
-    InBox (transform g m) ∧
-      cells (transform g m) = Polyplets.anchor ((cells m).image (D4.toFun g)) := by
-  obtain ⟨hbox, -, hmem⟩ := L_spec n h1 (by omega)
+lemma cells_applySym {n : ℕ} (g : D4) {m : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 7) (hm : m ∈ boards n) :
+    InBox (applySym g m) ∧
+      cells (applySym g m) = Polyplets.anchor ((cells m).image (D4.toFun g)) := by
+  obtain ⟨hbox, -, hmem⟩ := boards_spec n h1 (by omega)
   have hcan := (hmem _).mpr ⟨m, hm, rfl⟩
   have hb := hbox m hm
   set f : ℕ → ℕ := fun i => encode (D4.toFun g (decode i) + (8, 8)) with hf
@@ -1679,11 +1683,11 @@ lemma cells_transform {n : ℕ} (g : D4) {m : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 7)
 
 /-- **A fixed-point count of a symmetry is a filtered list length.** -/
 theorem fixCount_eq_length {n : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 7) (g : D4) :
-    fixCount n g = ((L n).filter fun m => transform g m = m).length := by
+    fixCount n g = ((boards n).filter fun m => applySym g m = m).length := by
   rw [fixCount_eq_ncard, ncard_eq_length h1 (by omega)]
   intro m hm
-  obtain ⟨hbox', hcells⟩ := cells_transform g h1 hn hm
-  have hbox := (L_spec n h1 (by omega)).1 m hm
+  obtain ⟨hbox', hcells⟩ := cells_applySym g h1 hn hm
+  have hbox := (boards_spec n h1 (by omega)).1 m hm
   rw [decide_eq_true_eq, ← hcells]
   exact ⟨fun h => by rw [h], fun h => eq_of_cells_eq hbox' hbox h⟩
 

@@ -123,14 +123,14 @@ TODO.
       `translate`, define `corner` from it and
       `anchor S = translate (-corner S) S`, and make the others its
       components. About 150 lines.
-- [ ] C3. Kernel cost of `Enum.transform` and `Enum.children` (measured
+- [ ] C3. Kernel cost of `Enum.applySym` and `Enum.children` (measured
       2026-10-12, one theorem per file): `Checks.symmetry_le_5` is 26.6 s
-      and 8.1 GB, the build's heaviest kernel check, because `transform`
+      and 8.1 GB, the build's heaviest kernel check, because `applySym`
       calls `anchor`/`minX`/`minY` on a computed fold; taking the offset
       from the moved cells of the literal cuts R90 and Dm at n = 5 from
-      6.0 s to 1.7 s each (`cells_transform` must be re-proved).
+      6.0 s to 1.7 s each (`cells_applySym` must be re-proved).
       `children`'s `anchor` of the shifted parent can be the shift
-      `min 1 (c/16) * 16 + min 1 (c%16)` (L6d slice 7.8 s → 6.3 s, 4.6 →
+      `min 1 (c/16) * 16 + min 1 (c%16)` (boards6d slice 7.8 s → 6.3 s, 4.6 →
       4.1 GB), and `Nat.log2` costs 0.75 ms per board against 0.25 ms for
       a shift binary search (about 3 s of each `T_rows`/`d_rows`/`weights`
       check and of `T_6_4`). Together about a third off every EnumData run.

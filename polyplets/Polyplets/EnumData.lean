@@ -8,12 +8,12 @@ import Polyplets.Enum
 /-!
 # The boards of the animals with at most six cells
 
-`Enum.lean`'s `L n` is kernel-evaluable but the kernel pays for the whole
-growth from `L 1` on every evaluation (`L 6` from scratch is 28 s and 7 GB).
-This file stores `L 5` and `L 6` as literals and proves them equal to the
-enumeration once, in five pieces of 4–5 GB and 8–14 s each (measured 2026-10-12): `L5_eq` grows
-`L 5`, and `L 6 = L5.flatMap (children 6)` is checked over four slices of
-`L5`. Every count of `Checks.lean` is then a filter over a literal list.
+`Enum.lean`'s `boards n` is kernel-evaluable but the kernel pays for the whole
+growth from `boards 1` on every evaluation (`boards 6` from scratch is 28 s and 7 GB).
+This file stores `boards 5` and `boards 6` as literals and proves them equal to the
+enumeration once, in five pieces of 4–5 GB and 8–14 s each (measured 2026-10-12): `boards5_eq` grows
+`boards 5`, and `boards 6 = boards5.flatMap (children 6)` is checked over four slices of
+`boards5`. Every count of `Checks.lean` is then a filter over a literal list.
 
 The literals were printed by `#eval` of the same definitions; their
 provenance does not matter, the kernel checks them.
@@ -21,8 +21,8 @@ provenance does not matter, the kernel checks them.
 
 namespace Polyplets.Enum
 
-/-- `L 5`: the 638 boards of the five-cell animals. -/
-def L5 : List ℕ := [
+/-- `boards 5`: the 638 boards of the five-cell animals. -/
+def boards5 : List ℕ := [
   295150156996346511361, 147576204406670098433, 73789228111831891969, 6755416621056001,
   2251885713162241, 147575078506763255809, 73788102211925049345, 36894614064505946113,
   3377716900528129, 73787539261971628033, 36894051114552524801, 18447307040842973185,
@@ -134,8 +134,8 @@ def L5 : List ℕ := [
   4295098382, 589831, 327687, 196615, 8590000142, 4295032846, 4295098396, 1114126, 589838,
   327694, 196622, 196636, 1048591, 524303, 262159, 131087, 65551, 65566, 31]
 
-/-- The children of the first 160 boards of `L5`. -/
-def L6a : List ℕ := [
+/-- The children of the first 160 boards of `boards5`. -/
+def boards6a : List ℕ := [
   38685921377825129937108993, 19343108263991063141810177, 9671701707074029744160769,
   885445967355052163073, 295159164195601252353, 19342960690038473465397249,
   9671554133121440067747841, 4835850854662923368923137, 442724109586022924289,
@@ -345,8 +345,8 @@ def L6a : List ℕ := [
   12885229578, 562954249043988, 281479272333332, 281483567956008, 73015099412, 38655361044,
   21475491860, 12885557268, 12886212648, 8591310888]
 
-/-- The children of boards 160–319 of `L5`. -/
-def L6b : List ℕ := [
+/-- The children of boards 160–319 of `boards5`. -/
+def boards6b : List ℕ := [
   137440329738, 68720853002, 34361114634, 17181245450, 8591310858, 4296343562, 4297719828,
   3473418, 68720328714, 34360590346, 17180721162, 8590786570, 4295819274, 4296671252, 1900554,
   34360197130, 17180327946, 8590393354, 4295426058, 4295884820, 1507338, 983050, 68720197652,
@@ -569,8 +569,8 @@ def L6b : List ℕ := [
   73788665148993503234, 36895177001574400002, 18448432927864848386, 3940653968982018,
   1688888515035138]
 
-/-- The children of boards 320–479 of `L5`. -/
-def L6c : List ℕ := [
+/-- The children of boards 320–479 of `boards5`. -/
+def boards6c : List ℕ := [
   73787539266266529794, 36894051118847426562, 18447307045137874946, 2814771242008578,
   1688871335165954, 844446405033986, 1407417833357316, 563005788061698, 562971428847618,
   4835740172228143389671426, 2417888532998885040259074, 1208962713384255865552898,
@@ -775,8 +775,8 @@ def L6c : List ℕ := [
   1125917087170568, 562967133749256, 51540066312, 1125908497235976, 562958543814664,
   281483567104008, 42950131720, 25770262536]
 
-/-- The children of boards 480–637 of `L5`. -/
-def L6d : List ℕ := [
+/-- The children of boards 480–637 of `boards5`. -/
+def boards6d : List ℕ := [
   562954248847368, 281479272136712, 281483567562768, 38655164424, 21475295240, 12885360648,
   562954249306128, 281479272595472, 281483568480288, 73015361552, 38655623184, 21475754000,
   12885819408, 12886736928, 8591835168, 137440460808, 68720984072, 34361245704, 17181376520,
@@ -940,36 +940,39 @@ def L6d : List ℕ := [
   4295032862, 4295098428, 2162718, 1114142, 589854, 327710, 196638, 196668, 2097183, 1048607,
   524319, 262175, 131103, 65567, 65598, 63]
 
-/-- `L 6`: the 3832 boards of the six-cell animals. -/
-def L6 : List ℕ := L6a ++ L6b ++ L6c ++ L6d
+/-- `boards 6`: the 3832 boards of the six-cell animals. -/
+def boards6 : List ℕ := boards6a ++ boards6b ++ boards6c ++ boards6d
 
-theorem L5_eq : L 5 = L5 := by decide +kernel
+theorem boards5_eq : boards 5 = boards5 := by decide +kernel
 
-theorem L6a_eq : (L5.take 160).flatMap (children 6) = L6a := by decide +kernel
+theorem boards6a_eq : (boards5.take 160).flatMap (children 6) = boards6a := by decide +kernel
 
-theorem L6b_eq : ((L5.drop 160).take 160).flatMap (children 6) = L6b := by decide +kernel
+theorem boards6b_eq : ((boards5.drop 160).take 160).flatMap (children 6) = boards6b := by
+  decide +kernel
 
-theorem L6c_eq : ((L5.drop 320).take 160).flatMap (children 6) = L6c := by decide +kernel
+theorem boards6c_eq : ((boards5.drop 320).take 160).flatMap (children 6) = boards6c := by
+  decide +kernel
 
-theorem L6d_eq : (L5.drop 480).flatMap (children 6) = L6d := by decide +kernel
+theorem boards6d_eq : (boards5.drop 480).flatMap (children 6) = boards6d := by decide +kernel
 
-theorem L6_eq : L 6 = L6 := by
-  have h : L5 = L5.take 160 ++
-      ((L5.drop 160).take 160 ++ ((L5.drop 320).take 160 ++ L5.drop 480)) := by
+theorem boards6_eq : boards 6 = boards6 := by
+  have h : boards5 = boards5.take 160 ++
+      ((boards5.drop 160).take 160 ++ ((boards5.drop 320).take 160 ++ boards5.drop 480)) := by
     decide +kernel
-  rw [L_succ 5 (by norm_num), L5_eq, h, List.flatMap_append, List.flatMap_append,
-    List.flatMap_append, L6a_eq, L6b_eq, L6c_eq, L6d_eq, L6, List.append_assoc, List.append_assoc]
+  rw [boards_succ 5 (by norm_num), boards5_eq, h, List.flatMap_append, List.flatMap_append,
+    List.flatMap_append, boards6a_eq, boards6b_eq, boards6c_eq, boards6d_eq, boards6,
+    List.append_assoc, List.append_assoc]
 
 /-! ## The two onset cells the `k = 2` law consumes -/
 
 /-- `T 5 3 = 248` (`results/triangle.txt`). -/
 theorem T_5_3 : T 5 3 = 248 := by
-  rw [T_eq_length (by norm_num) (by norm_num), L5_eq]
+  rw [T_eq_length (by norm_num) (by norm_num), boards5_eq]
   decide +kernel
 
 /-- `T 6 4 = 1480` (`results/triangle.txt`). -/
 theorem T_6_4 : T 6 4 = 1480 := by
-  rw [T_eq_length (by norm_num) (by norm_num), L6_eq]
+  rw [T_eq_length (by norm_num) (by norm_num), boards6_eq]
   decide +kernel
 
 end Polyplets.Enum

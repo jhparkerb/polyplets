@@ -162,8 +162,8 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le_3125_div_256 : λ ≤ 3125
 | `Growth` | λ, `lambda_tendsto`, the brackets |
 | `Report` | the report's claims |
 | `Audit` | the `#guard_msgs` axiom guards |
-| `Enum` | the bit-board enumerator: `L n` lists the canonical animals of `n` cells (`L_spec`, `n ≤ 14`); `a`, `T`, `d`, `V`, `Vt` and the symmetry fixed-point counts as filtered list lengths |
-| `EnumData` | the 638 and 3,832 boards of `L 5` and `L 6` as literals, checked against the enumeration in five kernel runs; `T 5 3`, `T 6 4` |
+| `Enum` | the bit-board enumerator: `boards n` lists the polyplets of `n` cells (`boards_spec`, `n ≤ 14`); `a`, `T`, `d`, `V`, `Vt` and the symmetry fixed-point counts as filtered list lengths |
+| `EnumData` | the 638 and 3,832 boards of `boards 5` and `boards 6` as literals, checked against the enumeration in five kernel runs; `T 5 3`, `T 6 4` |
 | `Checks` | validation facts nothing consumes (built, never imported) |
 
 The generic development the report's proofs run through, and the other
@@ -194,15 +194,15 @@ them). Everything up to six
 cells comes instead from `Enum.lean`: a cell set is one natural number (bit
 `16y + x`), the animals of `n + 1` cells are grown from those of `n` cells by
 adjoining a frontier cell and keeping the child exactly when that cell is
-its row-major-largest leaf, and `L_spec` proves the list is the canonical
-animals of `n` cells, each once, for `n ≤ 14`. `EnumData.lean` stores `L 5`
-and `L 6` as literals and checks them against the enumeration in five
+its row-major-largest leaf, and `boards_spec` proves the list is the polyplets
+of `n` cells, each once, for `n ≤ 14`. `EnumData.lean` stores `boards 5`
+and `boards 6` as literals and checks them against the enumeration in five
 kernel runs of 4–5 GB and 8–14 s each (`scripts/lean-enumdata-measure.sh`); a count is then a filter over the
 literal. That is how `Checks.lean` has rows 4–6 of the triangle,
 a(3) … a(6), the walk-top counts d(k,H) for H + k ≤ 6, the weights with at
 most six cells (V(1,2), V(2,2), V(1,3), Vt(2,2), Vt(1,3), Vt(2,3)) and the
 symmetry counts R90, R180, Hm, Dm for n ≤ 5, and how `T_sub_two` holds
-outright. Seven cells are the limit: `L 7` (23,592 boards) passes 12 GB in
+outright. Seven cells are the limit: `boards 7` (23,592 boards) passes 12 GB in
 one kernel run, so V(2,3), Vt(3,3), V(3,3) and d(3,4) stay out, as do the
 unconditional 3.95 < λ and μ₂ that rested on them.
 

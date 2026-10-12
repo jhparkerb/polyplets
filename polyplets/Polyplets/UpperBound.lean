@@ -45,10 +45,10 @@ answer to "is this cell in the animal?". Accepted cells push their king
 neighbors (those scan-greater than the origin, and not yet seen) onto the
 queue. Two runs of that transition are compared:
 
-* `runO D k` drives it with the membership oracle of a fixed shape `D`;
-* `runA A k` drives it with a set `A ⊆ ℕ` of *accepting step indices*.
+* `runOracle D k` drives it with the membership oracle of a fixed shape `D`;
+* `runAccept A k` drives it with a set `A ⊆ ℕ` of *accepting step indices*.
 
-`runA_eq_runO` shows the second reproduces the first when `A` is the first's own
+`runAccept_eq_runOracle` shows the second reproduces the first when `A` is the first's own
 accept-position set, which is what makes `S ↦ accept positions` injective.
 
 Two facts bound the number of steps:
@@ -60,7 +60,7 @@ Two facts bound the number of steps:
   at least two neighbors with `c` (`countP_new_le`).
 
 So at most `5n` cells are ever considered, the run halts inside `5 * n` steps
-(`runO_queue_nil`), and the accept positions form an `n`-subset of
+(`runOracle_queue_nil`), and the accept positions form an `n`-subset of
 `Finset.range (5 * n)`.
 -/
 
@@ -171,32 +171,32 @@ point), so they are produced as a `List`, not a `Finset`. Everything about the
 proposal budget is a statement about `List.countP` over these eight cells. -/
 
 /-- The eight king offsets, in a fixed order. -/
-def nbrOffsets : List (ℤ × ℤ) :=
+def neighborOffsets : List (ℤ × ℤ) :=
   [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
 
-/-- The eight king neighbors of `c`, in the fixed order of `nbrOffsets`. -/
-def nbrsOf (c : ℤ × ℤ) : List (ℤ × ℤ) :=
-  nbrOffsets.map fun o => (c.1 + o.1, c.2 + o.2)
+/-- The eight king neighbors of `c`, in the fixed order of `neighborOffsets`. -/
+def neighborsOf (c : ℤ × ℤ) : List (ℤ × ℤ) :=
+  neighborOffsets.map fun o => (c.1 + o.1, c.2 + o.2)
 
-/-- `nbrsOf`, written out. -/
-lemma nbrsOf_eq (c : ℤ × ℤ) :
-    nbrsOf c = [(c.1 - 1, c.2 - 1), (c.1, c.2 - 1), (c.1 + 1, c.2 - 1),
+/-- `neighborsOf`, written out. -/
+lemma neighborsOf_eq (c : ℤ × ℤ) :
+    neighborsOf c = [(c.1 - 1, c.2 - 1), (c.1, c.2 - 1), (c.1 + 1, c.2 - 1),
                 (c.1 - 1, c.2), (c.1 + 1, c.2),
                 (c.1 - 1, c.2 + 1), (c.1, c.2 + 1), (c.1 + 1, c.2 + 1)] := by
-  simp [nbrsOf, nbrOffsets, sub_eq_add_neg]
+  simp [neighborsOf, neighborOffsets, sub_eq_add_neg]
 
-/-- `nbrsOf c` lists exactly the cells king-adjacent to `c`. -/
-lemma mem_nbrsOf {c q : ℤ × ℤ} : q ∈ nbrsOf c ↔ kingAdj c q := by
+/-- `neighborsOf c` lists exactly the cells king-adjacent to `c`. -/
+lemma mem_neighborsOf {c q : ℤ × ℤ} : q ∈ neighborsOf c ↔ kingAdj c q := by
   obtain ⟨cx, cy⟩ := c
   obtain ⟨qx, qy⟩ := q
-  rw [nbrsOf_eq]
+  rw [neighborsOf_eq]
   simp only [List.mem_cons, List.not_mem_nil, or_false, kingAdj, ne_eq, Prod.mk.injEq, abs_le]
   omega
 
 /-- The eight neighbors are distinct. -/
-lemma nbrsOf_nodup (c : ℤ × ℤ) : (nbrsOf c).Nodup := by
+lemma neighborsOf_nodup (c : ℤ × ℤ) : (neighborsOf c).Nodup := by
   obtain ⟨cx, cy⟩ := c
-  rw [nbrsOf_eq]
+  rw [neighborsOf_eq]
   simp only [List.nodup_cons, List.mem_cons, List.not_mem_nil, or_false, List.nodup_nil,
     and_true, true_and, not_or, not_false_eq_true, Prod.mk.injEq]
   omega
@@ -210,7 +210,7 @@ def scanPos (q : ℤ × ℤ) : Bool :=
 /-- **The origin proposes only four candidates.** Of its eight king neighbors,
 the four scan-predecessors `(x-1..x+1, y-1)` and `(x-1, y)` are scan-smaller
 than the origin, hence never proposed. -/
-lemma countP_scanPos_origin : (nbrsOf (0, 0)).countP scanPos = 4 := by decide
+lemma countP_scanPos_origin : (neighborsOf (0, 0)).countP scanPos = 4 := by decide
 
 /-- The offset form of "far from the proposer": `o` differs from `e` and is not
 king-adjacent to it, written with plain integer comparisons so that the
@@ -223,7 +223,8 @@ private def offsetFar (e o : ℤ × ℤ) : Bool :=
 most five of the eight king offsets are neither `e` itself nor king-adjacent to
 `e`: an orthogonal `e` leaves three, a diagonal `e` leaves five. This is the
 `|N(p) ∩ N(c)| ∈ {2, 4}` fact of the paper's decision-tree count. -/
-private lemma offsetFar_count_le : ∀ e ∈ nbrOffsets, nbrOffsets.countP (offsetFar e) ≤ 5 := by
+private lemma offsetFar_count_le :
+    ∀ e ∈ neighborOffsets, neighborOffsets.countP (offsetFar e) ≤ 5 := by
   decide
 
 /-- **The proposal budget for a non-scanAnchor cell.** If `c` has an already-decided
@@ -234,18 +235,18 @@ Applied with `P` = "scan-positive and not yet considered", `p` = the proposer of
 when `p` was accepted. -/
 lemma countP_new_le {p c : ℤ × ℤ} (h : kingAdj p c) {P : ℤ × ℤ → Bool}
     (hP : ∀ q, P q = true → q ≠ p ∧ ¬ kingAdj p q) :
-    (nbrsOf c).countP P ≤ 5 := by
+    (neighborsOf c).countP P ≤ 5 := by
   obtain ⟨px, py⟩ := p
   obtain ⟨cx, cy⟩ := c
-  have hmem : ((px - cx : ℤ), (py - cy : ℤ)) ∈ nbrOffsets := by
+  have hmem : ((px - cx : ℤ), (py - cy : ℤ)) ∈ neighborOffsets := by
     obtain ⟨hne, h1, h2⟩ := h
     simp only [ne_eq, Prod.mk.injEq, abs_le] at hne h1 h2
-    simp only [nbrOffsets, List.mem_cons, List.not_mem_nil, or_false, Prod.mk.injEq]
+    simp only [neighborOffsets, List.mem_cons, List.not_mem_nil, or_false, Prod.mk.injEq]
     omega
-  calc (nbrsOf (cx, cy)).countP P
-      = nbrOffsets.countP fun o => P (cx + o.1, cy + o.2) := by
-        simp [nbrsOf, List.countP_map, Function.comp_def]
-    _ ≤ nbrOffsets.countP (offsetFar ((px - cx : ℤ), (py - cy : ℤ))) := by
+  calc (neighborsOf (cx, cy)).countP P
+      = neighborOffsets.countP fun o => P (cx + o.1, cy + o.2) := by
+        simp [neighborsOf, List.countP_map, Function.comp_def]
+    _ ≤ neighborOffsets.countP (offsetFar ((px - cx : ℤ), (py - cy : ℤ))) := by
         refine List.countP_mono_left fun o _ ho => ?_
         obtain ⟨ox, oy⟩ := o
         obtain ⟨hne, hadj⟩ := hP _ ho
@@ -277,21 +278,21 @@ structure ExpState where
 are scan-greater than the origin (a shape has no others) and have not been
 considered yet. -/
 def newCells (con : Finset (ℤ × ℤ)) (c : ℤ × ℤ) : List (ℤ × ℤ) :=
-  (nbrsOf c).filter fun q => scanPos q && !decide (q ∈ con)
+  (neighborsOf c).filter fun q => scanPos q && !decide (q ∈ con)
 
 /-- Membership in `newCells`, unfolded. -/
 lemma mem_newCells {con : Finset (ℤ × ℤ)} {c q : ℤ × ℤ} :
-    q ∈ newCells con c ↔ q ∈ nbrsOf c ∧ scanPos q = true ∧ q ∉ con := by
+    q ∈ newCells con c ↔ q ∈ neighborsOf c ∧ scanPos q = true ∧ q ∉ con := by
   simp [newCells, List.mem_filter]
 
 /-- Proposals are distinct: the eight king neighbors are. -/
 lemma newCells_nodup (con : Finset (ℤ × ℤ)) (c : ℤ × ℤ) : (newCells con c).Nodup :=
-  (nbrsOf_nodup c).filter _
+  (neighborsOf_nodup c).filter _
 
 /-- The proposal count as a `countP` over the neighbor list. -/
 lemma newCells_length (con : Finset (ℤ × ℤ)) (c : ℤ × ℤ) :
     (newCells con c).length
-      = (nbrsOf c).countP fun q => scanPos q && !decide (q ∈ con) :=
+      = (neighborsOf c).countP fun q => scanPos q && !decide (q ∈ con) :=
   List.countP_eq_length_filter.symm
 
 /-- The transition, taken apart by the queue so that its equations are clean. -/
@@ -358,21 +359,21 @@ def oracleBit (D : Finset (ℤ × ℤ)) (st : ExpState) : Bool :=
   | (c, _) :: _ => decide (c ∈ D)
 
 /-- The oracle-driven run: `k` steps of `expStep`, answered by membership in `D`. -/
-def runO (D : Finset (ℤ × ℤ)) : ℕ → ExpState
+def runOracle (D : Finset (ℤ × ℤ)) : ℕ → ExpState
   | 0 => expInit
-  | k + 1 => expStep (runO D k) (oracleBit D (runO D k))
+  | k + 1 => expStep (runOracle D k) (oracleBit D (runOracle D k))
 
 /-- The position-driven run: `k` steps of `expStep`, accepting exactly at the
 step indices listed in `A`. -/
-def runA (A : Finset ℕ) : ℕ → ExpState
+def runAccept (A : Finset ℕ) : ℕ → ExpState
   | 0 => expInit
-  | k + 1 => expStep (runA A k) (decide ((runA A k).steps ∈ A))
+  | k + 1 => expStep (runAccept A k) (decide ((runAccept A k).steps ∈ A))
 
 /-- The oracle run's counter is the iteration index. -/
-lemma runO_steps (D : Finset (ℤ × ℤ)) (k : ℕ) : (runO D k).steps = k := by
+lemma runOracle_steps (D : Finset (ℤ × ℤ)) (k : ℕ) : (runOracle D k).steps = k := by
   induction k with
   | zero => rfl
-  | succ k ih => rw [runO, expStep_steps, ih]
+  | succ k ih => rw [runOracle, expStep_steps, ih]
 
 /-- A "yes" answer names a head candidate. -/
 lemma oracleBit_true {D : Finset (ℤ × ℤ)} {st : ExpState} (h : oracleBit D st = true) :
@@ -385,14 +386,14 @@ lemma oracleBit_true {D : Finset (ℤ × ℤ)} {st : ExpState} (h : oracleBit D 
 banked by the run of length `m` iff step `k` happened and answered "yes"; in
 particular the record never changes retroactively. -/
 lemma mem_accPos (D : Finset (ℤ × ℤ)) (m k : ℕ) :
-    k ∈ (runO D m).accPos ↔ k < m ∧ oracleBit D (runO D k) = true := by
+    k ∈ (runOracle D m).accPos ↔ k < m ∧ oracleBit D (runOracle D k) = true := by
   induction m with
-  | zero => simp [runO, expInit]
+  | zero => simp [runOracle, expInit]
   | succ m ih =>
-      have hst : (runO D m).steps = m := runO_steps D m
-      by_cases hb : oracleBit D (runO D m) = true
+      have hst : (runOracle D m).steps = m := runOracle_steps D m
+      by_cases hb : oracleBit D (runOracle D m) = true
       · obtain ⟨c, p, rest, hq, -⟩ := oracleBit_true hb
-        rw [runO, hb, expStep_true hq, hst]
+        rw [runOracle, hb, expStep_true hq, hst]
         simp only [Finset.mem_insert, ih]
         constructor
         · rintro (rfl | ⟨h1, h2⟩)
@@ -403,10 +404,10 @@ lemma mem_accPos (D : Finset (ℤ × ℤ)) (m k : ℕ) :
           · exact Or.inr ⟨h, h2⟩
           · exact Or.inl rfl
       · rw [Bool.not_eq_true] at hb
-        have hacc : (runO D (m + 1)).accPos = (runO D m).accPos := by
-          rcases hq : (runO D m).queue with _ | ⟨⟨c, p⟩, rest⟩
-          · rw [runO, expStep_nil _ hq]
-          · rw [runO, hb, expStep_false hq]
+        have hacc : (runOracle D (m + 1)).accPos = (runOracle D m).accPos := by
+          rcases hq : (runOracle D m).queue with _ | ⟨⟨c, p⟩, rest⟩
+          · rw [runOracle, expStep_nil _ hq]
+          · rw [runOracle, hb, expStep_false hq]
         rw [hacc, ih]
         constructor
         · rintro ⟨h1, h2⟩; exact ⟨Nat.lt_succ_of_lt h1, h2⟩
@@ -419,17 +420,17 @@ lemma mem_accPos (D : Finset (ℤ × ℤ)) (m k : ℕ) :
 /-- **The decision word determines the run.** Replaying the exploration with the
 accept positions of an oracle run — a `Finset ℕ`, carrying no information about
 `D` beyond those positions — reproduces that run step for step. -/
-lemma runA_eq_runO (D : Finset (ℤ × ℤ)) (K : ℕ) :
-    ∀ k, k ≤ K → runA (runO D K).accPos k = runO D k := by
+lemma runAccept_eq_runOracle (D : Finset (ℤ × ℤ)) (K : ℕ) :
+    ∀ k, k ≤ K → runAccept (runOracle D K).accPos k = runOracle D k := by
   intro k
   induction k with
   | zero => intro _; rfl
   | succ k ih =>
       intro hk
       have hlt : k < K := by omega
-      have h1 : (k ∈ (runO D K).accPos) ↔ (oracleBit D (runO D k) = true) := by
+      have h1 : (k ∈ (runOracle D K).accPos) ↔ (oracleBit D (runOracle D k) = true) := by
         rw [mem_accPos]; exact ⟨fun h => h.2, fun h => ⟨hlt, h⟩⟩
-      rw [runA, ih (by omega), runO, runO_steps]
+      rw [runAccept, ih (by omega), runOracle, runOracle_steps]
       congr 1
       simp [h1]
 
@@ -441,7 +442,7 @@ once. `D` is an arbitrary cell set here — nothing in this section needs it to
 be a shape. -/
 
 /-- The exploration invariant relative to a cell set `D`. -/
-structure Good (D : Finset (ℤ × ℤ)) (st : ExpState) : Prop where
+structure Invariant (D : Finset (ℤ × ℤ)) (st : ExpState) : Prop where
   /-- Only cells of `D` are ever accepted. -/
   accSub : st.accepted ⊆ D
   /-- Accepted cells have been considered. -/
@@ -457,7 +458,7 @@ structure Good (D : Finset (ℤ × ℤ)) (st : ExpState) : Prop where
   /-- Every candidate but the origin carries an accepted, adjacent proposer. -/
   qParent : ∀ e ∈ st.queue, (e.2 ∈ st.accepted ∧ kingAdj e.2 e.1) ∨ e.1 = (0, 0)
   /-- An accepted cell has proposed all of its scan-positive neighbors. -/
-  closure : ∀ q ∈ st.accepted, ∀ r ∈ nbrsOf q, scanPos r = true → r ∈ st.considered
+  closure : ∀ q ∈ st.accepted, ∀ r ∈ neighborsOf q, scanPos r = true → r ∈ st.considered
   /-- Before the origin is accepted, nothing has happened at all. -/
   base : (0, 0) ∈ st.accepted ∨ (st.accepted = ∅ ∧ st.considered = {(0, 0)})
   /-- The five-per-cell budget, once the origin has been accepted. -/
@@ -472,7 +473,7 @@ structure Good (D : Finset (ℤ × ℤ)) (st : ExpState) : Prop where
   reach : ∀ q ∈ st.considered, q ∈ D → q ∈ st.accepted ∨ ∃ e ∈ st.queue, e.1 = q
 
 /-- The invariant holds at the start: the origin is the sole candidate. -/
-lemma good_init (D : Finset (ℤ × ℤ)) : Good D expInit where
+lemma invariant_init (D : Finset (ℤ × ℤ)) : Invariant D expInit where
   accSub := by simp [expInit]
   accCon := by simp [expInit]
   origCon := by simp [expInit]
@@ -497,8 +498,8 @@ inert steps only shrink the queue; the accepting step is where the budget
 argument lives — the origin proposes four candidates, and any later cell
 proposes at most five because its proposer and their shared neighbors are
 already recorded (`countP_new_le`). -/
-lemma good_step {D : Finset (ℤ × ℤ)} {st : ExpState} (hg : Good D st) :
-    Good D (expStep st (oracleBit D st)) := by
+lemma invariant_step {D : Finset (ℤ × ℤ)} {st : ExpState} (hg : Invariant D st) :
+    Invariant D (expStep st (oracleBit D st)) := by
   rcases hq : st.queue with _ | ⟨⟨c, p⟩, rest⟩
   · rw [expStep_nil _ hq]
     exact { hg with
@@ -522,7 +523,7 @@ lemma good_step {D : Finset (ℤ × ℤ)} {st : ExpState} (hg : Good D st) :
     · -- the accepting step
       rw [hbit, decide_eq_true hcD, expStep_true hq]
       set N := newCells st.considered c with hN
-      have hNmem : ∀ q ∈ N, q ∈ nbrsOf c ∧ scanPos q = true ∧ q ∉ st.considered :=
+      have hNmem : ∀ q ∈ N, q ∈ neighborsOf c ∧ scanPos q = true ∧ q ∉ st.considered :=
         fun q hqN => mem_newCells.mp hqN
       have hNnodup : N.Nodup := newCells_nodup _ _
       have hdisj : Disjoint st.considered N.toFinset := by
@@ -572,7 +573,7 @@ lemma good_step {D : Finset (ℤ × ℤ)} {st : ExpState} (hg : Good D st) :
           · exact Or.inr h
         · refine Or.inl ⟨he2 ▸ Finset.mem_insert_self _ _, ?_⟩
           rw [he2]
-          exact mem_nbrsOf.mp (hNmem e.1 he).1
+          exact mem_neighborsOf.mp (hNmem e.1 he).1
       · intro q hqacc r hr hscan
         rcases Finset.mem_insert.mp hqacc with rfl | h
         · by_cases hrc : r ∈ st.considered
@@ -595,9 +596,9 @@ lemma good_step {D : Finset (ℤ × ℤ)} {st : ExpState} (hg : Good D st) :
             · exact h
           have hlen : N.length ≤ 4 := by
             rw [hN, newCells_length]
-            calc (nbrsOf ((0 : ℤ), (0 : ℤ))).countP
+            calc (neighborsOf ((0 : ℤ), (0 : ℤ))).countP
                     (fun q => scanPos q && !decide (q ∈ st.considered))
-                ≤ (nbrsOf ((0 : ℤ), (0 : ℤ))).countP scanPos :=
+                ≤ (neighborsOf ((0 : ℤ), (0 : ℤ))).countP scanPos :=
                   List.countP_mono_left fun x _ hx => by
                     have hx' : scanPos x = true ∧ x ∉ st.considered := by simpa using hx
                     exact hx'.1
@@ -621,7 +622,7 @@ lemma good_step {D : Finset (ℤ × ℤ)} {st : ExpState} (hg : Good D st) :
             have hq' : scanPos q = true ∧ q ∉ st.considered := by simpa using hqt
             obtain ⟨hs, hnc⟩ := hq'
             exact ⟨fun hqp => hnc (hqp ▸ hg.accCon hpacc),
-              fun hk => hnc (hg.closure p hpacc q (mem_nbrsOf.mpr hk) hs)⟩
+              fun hk => hnc (hg.closure p hpacc q (mem_neighborsOf.mpr hk) hs)⟩
           have hb := hg.budget h0acc
           rw [hcardU, Finset.card_insert_of_notMem hcNotAcc]
           omega
@@ -669,10 +670,10 @@ lemma good_step {D : Finset (ℤ × ℤ)} {st : ExpState} (hg : Good D st) :
           · exact Or.inr ⟨e, he, rfl⟩
 
 /-- The invariant holds all along the oracle-driven run. -/
-lemma good_runO (D : Finset (ℤ × ℤ)) (k : ℕ) : Good D (runO D k) := by
+lemma invariant_runOracle (D : Finset (ℤ × ℤ)) (k : ℕ) : Invariant D (runOracle D k) := by
   induction k with
-  | zero => exact good_init D
-  | succ k ih => exact good_step ih
+  | zero => exact invariant_init D
+  | succ k ih => exact invariant_step ih
 
 /-! ## Termination and completeness
 
@@ -694,10 +695,10 @@ structure IsShape (n : ℕ) (D : Finset (ℤ × ℤ)) : Prop where
 charges five considered cells to each accepted one, or nothing has happened yet
 and only the origin is considered. -/
 lemma considered_card_le {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) (hn : 1 ≤ n) (k : ℕ) :
-    (runO D k).considered.card ≤ 5 * n := by
-  have hg := good_runO D k
+    (runOracle D k).considered.card ≤ 5 * n := by
+  have hg := invariant_runOracle D k
   rcases hg.base with h0 | ⟨-, hcon⟩
-  · have hle : (runO D k).accepted.card ≤ n := by
+  · have hle : (runOracle D k).accepted.card ≤ n := by
       have := Finset.card_le_card hg.accSub
       rwa [hD.card] at this
     have := hg.budget h0
@@ -708,15 +709,15 @@ lemma considered_card_le {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) 
 /-- **The run halts inside `5 * n` steps.** Each step either finds the queue
 empty or consumes a distinct considered cell, and there are at most `5n` of
 those. -/
-lemma runO_queue_nil {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) (hn : 1 ≤ n) :
-    (runO D (5 * n)).queue = [] := by
+lemma runOracle_queue_nil {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) (hn : 1 ≤ n) :
+    (runOracle D (5 * n)).queue = [] := by
   by_contra hne
-  have hg := good_runO D (5 * n)
+  have hg := invariant_runOracle D (5 * n)
   rcases hg.count with h | h
   · exact hne h
-  · rw [runO_steps] at h
+  · rw [runOracle_steps] at h
     have hb := considered_card_le hD hn (5 * n)
-    rcases hq : (runO D (5 * n)).queue with _ | ⟨e, r⟩
+    rcases hq : (runOracle D (5 * n)).queue with _ | ⟨e, r⟩
     · exact hne hq
     · rw [hq] at h
       simp only [List.length_cons] at h
@@ -727,16 +728,17 @@ and every cell of `D` is: the origin is decided first, and each further cell is
 reached along a king path from it — when its predecessor was accepted the cell
 was proposed (it is scan-positive, being a non-origin cell of a shape), and a
 halted run has decided everything it proposed. -/
-lemma runO_accepted {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) (hn : 1 ≤ n) :
-    (runO D (5 * n)).accepted = D := by
-  have hg := good_runO D (5 * n)
-  have hnil := runO_queue_nil hD hn
-  have hdec : ∀ q ∈ (runO D (5 * n)).considered, q ∈ D → q ∈ (runO D (5 * n)).accepted := by
+lemma runOracle_accepted {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) (hn : 1 ≤ n) :
+    (runOracle D (5 * n)).accepted = D := by
+  have hg := invariant_runOracle D (5 * n)
+  have hnil := runOracle_queue_nil hD hn
+  have hdec : ∀ q ∈ (runOracle D (5 * n)).considered,
+      q ∈ D → q ∈ (runOracle D (5 * n)).accepted := by
     intro q hq hqD
     rcases hg.reach q hq hqD with h | ⟨e, he, -⟩
     · exact h
     · rw [hnil] at he; exact absurd he (by simp)
-  have h0 : ((0 : ℤ), (0 : ℤ)) ∈ (runO D (5 * n)).accepted := hdec _ hg.origCon hD.origin
+  have h0 : ((0 : ℤ), (0 : ℤ)) ∈ (runOracle D (5 * n)).accepted := hdec _ hg.origCon hD.origin
   refine Finset.Subset.antisymm hg.accSub fun q hqD => ?_
   have hpath : Relation.ReflTransGen (fun x y => x ∈ D ∧ y ∈ D ∧ kingAdj x y)
       ((0 : ℤ), (0 : ℤ)) q := hD.conn _ hD.origin q hqD
@@ -746,20 +748,20 @@ lemma runO_accepted {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) (hn :
   | @tail b c _ hstep ih =>
       by_cases hc0 : c = (0, 0)
       · exact hc0 ▸ h0
-      · exact hdec c (hg.closure b ih c (mem_nbrsOf.mpr hstep.2.2)
+      · exact hdec c (hg.closure b ih c (mem_neighborsOf.mpr hstep.2.2)
           (hD.scan c hstep.2.1 hc0)) hstep.2.1
 
 /-- The code of a halted run has one position per cell. -/
 lemma accPos_card {n : ℕ} {D : Finset (ℤ × ℤ)} (hD : IsShape n D) (hn : 1 ≤ n) :
-    (runO D (5 * n)).accPos.card = n := by
-  rw [(good_runO D (5 * n)).posCard, runO_accepted hD hn, hD.card]
+    (runOracle D (5 * n)).accPos.card = n := by
+  rw [(invariant_runOracle D (5 * n)).posCard, runOracle_accepted hD hn, hD.card]
 
 /-- Positions are banked before the run ends. -/
-lemma accPos_subset (D : Finset (ℤ × ℤ)) (k : ℕ) : (runO D k).accPos ⊆ Finset.range k := by
+lemma accPos_subset (D : Finset (ℤ × ℤ)) (k : ℕ) : (runOracle D k).accPos ⊆ Finset.range k := by
   intro i hi
   rw [Finset.mem_range]
-  have := (good_runO D k).posLt i hi
-  rwa [runO_steps] at this
+  have := (invariant_runOracle D k).posLt i hi
+  rwa [runOracle_steps] at this
 
 /-! ## The scan anchor of a polyplet
 
@@ -870,13 +872,13 @@ lemma expShape_injOn (n : ℕ) :
 /-- The exploration code of a polyplet: the accept positions of the
 oracle-driven run on its expShape. -/
 noncomputable def expCode (n : ℕ) (S : Finset (ℤ × ℤ)) : Finset ℕ :=
-  (runO (expShape S) (5 * n)).accPos
+  (runOracle (expShape S) (5 * n)).accPos
 
 /-- **`a n ≤ C(5n, n)`.** The exploration code embeds the polyplets of
 `n` cells into the `n`-element subsets of `Finset.range (5 * n)`: it lands there
 because the run halts within `5 * n` steps and accepts exactly `n` times, and it
 is injective because replaying the exploration from the code alone recovers the
-expShape (`runA_eq_runO`), which recovers the animal (`expShape_injOn`). -/
+expShape (`runAccept_eq_runOracle`), which recovers the animal (`expShape_injOn`). -/
 theorem a_le_choose (n : ℕ) (hn : 1 ≤ n) : a n ≤ Nat.choose (5 * n) n := by
   have hmap : ∀ S ∈ {S : Finset (ℤ × ℤ) | IsPolyplet n S},
       expCode n S ∈ (↑(Finset.powersetCard n (Finset.range (5 * n))) : Set (Finset ℕ)) := by
@@ -886,11 +888,12 @@ theorem a_le_choose (n : ℕ) (hn : 1 ≤ n) : a n ≤ Nat.choose (5 * n) n := b
   have hinj : Set.InjOn (expCode n) {S : Finset (ℤ × ℤ) | IsPolyplet n S} := by
     intro S₁ h₁ S₂ h₂ h
     refine expShape_injOn n h₁ h₂ ?_
-    have k1 : runA (expCode n S₁) (5 * n) = runO (expShape S₁) (5 * n) :=
-      runA_eq_runO _ _ _ le_rfl
-    have k2 : runA (expCode n S₂) (5 * n) = runO (expShape S₂) (5 * n) :=
-      runA_eq_runO _ _ _ le_rfl
-    rw [← runO_accepted (isShape_expShape h₁) hn, ← runO_accepted (isShape_expShape h₂) hn,
+    have k1 : runAccept (expCode n S₁) (5 * n) = runOracle (expShape S₁) (5 * n) :=
+      runAccept_eq_runOracle _ _ _ le_rfl
+    have k2 : runAccept (expCode n S₂) (5 * n) = runOracle (expShape S₂) (5 * n) :=
+      runAccept_eq_runOracle _ _ _ le_rfl
+    rw [← runOracle_accepted (isShape_expShape h₁) hn,
+      ← runOracle_accepted (isShape_expShape h₂) hn,
       ← k1, ← k2, h]
   have hfin := (Finset.powersetCard n (Finset.range (5 * n))).finite_toSet
   have hle := Set.ncard_le_ncard_of_injOn (expCode n) hmap hinj hfin

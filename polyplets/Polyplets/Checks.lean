@@ -130,7 +130,8 @@ open Enum in
 /-- The first six values of A006770 (`results/triangle.txt` row sums). -/
 theorem a_3_to_6 : a 3 = 20 ∧ a 4 = 110 ∧ a 5 = 638 ∧ a 6 = 3832 := by
   rw [a_eq_length (by norm_num) (by norm_num), a_eq_length (by norm_num) (by norm_num),
-    a_eq_length (by norm_num) (by norm_num), a_eq_length (by norm_num) (by norm_num), L5_eq, L6_eq]
+    a_eq_length (by norm_num) (by norm_num), a_eq_length (by norm_num) (by norm_num), boards5_eq,
+    boards6_eq]
   decide +kernel
 
 open Enum in
@@ -142,7 +143,7 @@ theorem T_rows_4_to_6 :
     T 6 1 = 1 ∧ T 6 2 = 167 ∧ T 6 3 = 996 ∧ T 6 5 = 945 ∧ T 6 6 = 243 := by
   simp only [T_eq_length (by norm_num : 1 ≤ 4) (by norm_num : 4 ≤ 14),
     T_eq_length (by norm_num : 1 ≤ 5) (by norm_num : 5 ≤ 14),
-    T_eq_length (by norm_num : 1 ≤ 6) (by norm_num : 6 ≤ 14), L5_eq, L6_eq]
+    T_eq_length (by norm_num : 1 ≤ 6) (by norm_num : 6 ≤ 14), boards5_eq, boards6_eq]
   decide +kernel
 
 open Enum in
@@ -153,7 +154,8 @@ theorem d_rows_le_6 : d 0 3 = 9 ∧ d 0 4 = 27 ∧ d 1 3 = 40 ∧ d 2 3 = 136 �
     d_eq_length (by norm_num : 1 ≤ 4) (by norm_num : 4 + 0 ≤ 14),
     d_eq_length (by norm_num : 1 ≤ 3) (by norm_num : 3 + 1 ≤ 14),
     d_eq_length (by norm_num : 1 ≤ 3) (by norm_num : 3 + 2 ≤ 14),
-    d_eq_length (by norm_num : 1 ≤ 4) (by norm_num : 4 + 2 ≤ 14), Nat.reduceAdd, L5_eq, L6_eq]
+    d_eq_length (by norm_num : 1 ≤ 4) (by norm_num : 4 + 2 ≤ 14), Nat.reduceAdd, boards5_eq,
+    boards6_eq]
   decide +kernel
 
 open Enum in
@@ -165,8 +167,8 @@ theorem weights_le_6 :
     V_eq_length (by norm_num : 1 + 3 + 2 ≤ 14),
     Vt_eq_length (by norm_num : 1 ≤ 2) (by norm_num : 2 + 2 + 1 ≤ 14),
     Vt_eq_length (by norm_num : 1 ≤ 1) (by norm_num : 1 + 3 + 1 ≤ 14),
-    Vt_eq_length (by norm_num : 1 ≤ 2) (by norm_num : 2 + 3 + 1 ≤ 14), Nat.reduceAdd, L5_eq,
-    L6_eq]
+    Vt_eq_length (by norm_num : 1 ≤ 2) (by norm_num : 2 + 3 + 1 ≤ 14), Nat.reduceAdd, boards5_eq,
+    boards6_eq]
   decide +kernel
 
 open Enum in
@@ -181,7 +183,7 @@ theorem symmetry_le_5 :
     fixCount_eq_length (by norm_num : 1 ≤ 2) (by norm_num : 2 ≤ 7),
     fixCount_eq_length (by norm_num : 1 ≤ 3) (by norm_num : 3 ≤ 7),
     fixCount_eq_length (by norm_num : 1 ≤ 4) (by norm_num : 4 ≤ 7),
-    fixCount_eq_length (by norm_num : 1 ≤ 5) (by norm_num : 5 ≤ 7), L5_eq]
+    fixCount_eq_length (by norm_num : 1 ≤ 5) (by norm_num : 5 ≤ 7), boards5_eq]
   decide +kernel
 
 end Polyplets
