@@ -1,6 +1,6 @@
 # polyplets — the Lean development
 
-Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 44 modules, about 14,200 lines,
+Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 39 modules, about 11,500 lines,
 no `sorry`, no `native_decide`; every theorem the report or an L-paper cites
 is on the standard three axioms, guarded in `Audit.lean`. The quality pass
 in progress is `OVERHAUL.md`. `Polyplets/Report.lean` states each claim of
@@ -73,19 +73,26 @@ n cells and max y = H − 1, `a n` the row sum (`Sequence.lean`). `Finite.lean` 
 `Compute.lean` gives the computable twin `Tc` and `Tc_eq_T`, which is how the
 small cells are decided by the kernel.
 
-The peeling recursion (`Separation`, `Weights`, `Peel`). Write surplus
+The peeling recursion (`Universal/Separation`, `Universal/Weights`,
+`Universal/Peel`, proved for every row-local lattice; `King.lean` reads the
+king instance off it, `Weights.lean` keeps the king weights as computable
+enumerations for the kernel). Write surplus
 k = n − H. A row with one cell is a *walk row*; `d k H` counts the height-H
 surplus-k animals whose top row is a walk row. A maximal run of multi-cell
 rows is a *cluster*; `V ℓ j` counts the cluster shapes spanning ℓ rows with
 surplus j between a walk cell below and a walk cell above, `Vt ℓ j` the same
-with nothing above. A walk row separates the animal (`Separation.lean`), and
-peeling the top row gives two bijections (`Peel.lean`, 1,748 lines, the long
-pole):
+with nothing above. A walk row separates the animal
+(`Universal/Separation.lean`), and peeling the top row gives two bijections
+(`Universal/Peel.lean`, 1,760 lines, the long pole), with the drift count `b`
+(3 for the king lattice) in place of the 3:
 
     d k H     = 3·d k (H−1) + Σ_{j≤k} Σ_{ℓ≤j} V ℓ j · d (k−j) (H−1−ℓ)      (H ≥ k+2)
     T (H+k) H = d k H + Σ_{j≤k} Σ_{ℓ≤j} Vt ℓ j · d (k−j) (H−ℓ)              (H ≥ k+1)
 
-Shape (`Shape.lean`). Strong induction on k through the first identity:
+Shape (`Universal/AbstractShape.lean`, from the two identities alone through
+the `PeelSystem` interface; `DiscreteCalculus.lean` supplies the discrete
+antiderivative and integer values by finite differences). Strong induction on
+k through the first identity:
 `d k H = δ_k(H)·3^H` with deg δ_k ≤ k for all H ≥ k+1, the base value
 absorbed into the constant term, which is why the onset is k+1 and not k+2;
 the second identity carries it to the diagonal and gives `shape_production`.
@@ -127,16 +134,13 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le : λ ≤ 3125/256` and
 
 | module | lines | what |
 |---|---|---|
-| `Defs` | 52 | king adjacency, connectivity, canonical form, `T` |
-| `Finite` | 129 | width bound; `T` as a `Finset.card` |
-| `Graph` | 71 | bridge to `SimpleGraph.Reachable` |
-| `Compute` | 295 | computable `Tc`, `Tc_eq_T`, the kernel-decided small cells |
-| `Sequence` | 300 | `a n`, `a_eq_sum`, computable twin `ac` |
-| `RowProfile` | 200 | row fibers, occupied-row interval |
-| `Separation` | 238 | a walk row is a cut |
-| `Weights` | 420 | `d`, `V`, `Vt`, spread bounds, the small weight values |
-| `Peel` | 1748 | the two peeling bijections |
-| `Shape` | 513 | the diagonal-law shape theorem, integer values |
+| `Defs` | 56 | king adjacency, connectivity, canonical form, `T` |
+| `Finite` | 107 | width bound; `T` as a `Finset.card` |
+| `Compute` | 270 | computable `Tc`, `Tc_eq_T`, the three kernel-decided cells the proofs use |
+| `Sequence` | 280 | `a n`, `a_eq_sum`, computable twin `ac` |
+| `Weights` | 390 | the king `d`, `V`, `Vt` as computable enumerations, window independence, `V 1 1 = 25`, `d 0 1 = 1` |
+| `King` | 240 | `kingLattice`; the generic objects agree with the king ones; `d_rec`, `c_ident`, `shape_production`, `production_int_all`, `T_diag_pow` in king vocabulary |
+| `DiscreteCalculus` | 190 | the discrete antiderivative, integer values by finite differences |
 | `LeadingCoeff` | 285 | 25^k/k!, pinning from k rows |
 | `Pin` | 224 | the 19 production polynomials, Lagrange pin, `P1_closed` |
 | `Grand/Series` | 259 | convolution toolkit |
@@ -149,15 +153,17 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le : λ ≤ 3125/256` and
 | `Fekete` | 164 | Fekete's lemma as a structure |
 | `Growth` | 755 | λ, `lambda_tendsto`, the brackets |
 | `Report` | 124 | the report's claims |
-| `Audit` | 150 | the `#guard_msgs` axiom guards |
+| `Audit` | 160 | the `#guard_msgs` axiom guards |
+| `Checks` | 110 | validation facts nothing consumes (built, never imported) |
 
-The L-paper modules, restored 2026-10-12 after the morning's deletion:
+The generic development the report's proofs run through, and the other
+L-paper modules:
 
 | module | lines | paper | what |
 |---|---|---|---|
-| `Universal/Defs`, `Graph`, `Finite`, `Separation`, `RowProfile`, `Weights`, `Peel` | 2,600 | L1 | the peeling recursion for every row-local lattice (a finite set `D` of up-offsets, `b = |D|`) |
-| `Universal/AbstractShape`, `System` | 540 | L1 | the diagonal law as a theorem about any `PeelSystem`, hence for every row-local lattice |
-| `Universal/Compute`, `King`, `KingAgree`, `Hex`, `Square` | 1,030 | L1 | the generic enumerator; the king, hex and square instances and their `P_1` |
+| `Universal/Defs`, `Graph`, `Finite`, `Separation`, `RowProfile`, `Weights`, `Peel` | 2,600 | report, L1 | the peeling recursion for every row-local lattice (a finite set `D` of up-offsets, `b = |D|`) |
+| `Universal/AbstractShape`, `System` | 470 | report, L1 | the diagonal law as a theorem about any `PeelSystem`, hence for every row-local lattice |
+| `Universal/Compute`, `Hex`, `Square` | 600 | L1 | the generic enumerator and pin lemma; the hex and square instances and their `P_1` |
 | `Upper/Certificate` | 518 | L3 | the convolution-certificate bound `λ ≤ 1/x` from a rational super-solution, and `RatCert`, the exported-data check |
 | `Upper/BuiData2`, `BuiRD2`, `BuiData3`, `BuiRD3` | 700 | L3 | the 185-type (λ ≤ 9.4117) and 5930-type (λ ≤ 9.3154) certificates as balanced lookup trees the kernel checks (`decide +kernel`, 11 s for RD = 3), conditional on the named system hypotheses |
 | `StairAnimals`, `StairGrowth` | 500 | L5 | staircase king animals: the column join is injective at fixed area (Lemma 3), µ exists, 3.1234 < µ ≤ 4 given M(700) |

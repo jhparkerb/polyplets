@@ -17,7 +17,7 @@ EOF
 }
 for L in king hex square; do
   case $L in
-    king)   M=Universal.King;   LAT=kingLattice;   MLE=M_king_le;   A="3 2 = 10"; B="4 3 = 55"; C="5 4 = 240"; R3=20; R4=110; R5=638;;
+    king)   M=King;   LAT=kingLattice;   MLE=M_king_le;   A="3 2 = 10"; B="4 3 = 55"; C="5 4 = 240"; R3=20; R4=110; R5=638;;
     hex)    M=Universal.Hex;    LAT=hexLattice;    MLE=M_hex_le;    A="3 2 = 6";  B="4 3 = 21"; C="5 4 = 60";  R3=11; R4=44;  R5=186;;
     square) M=Universal.Square; LAT=squareLattice; MLE=M_square_le; A="3 2 = $(grep -o 'T squareLattice 3 2 = [0-9]*' polyplets/Polyplets/Universal/Square.lean | head -1 | awk '{print $NF}')"; B="4 3 = $(grep -o 'T squareLattice 4 3 = [0-9]*' polyplets/Polyplets/Universal/Square.lean | head -1 | awk '{print $NF}')"; C="5 4 = $(grep -o 'T squareLattice 5 4 = [0-9]*' polyplets/Polyplets/Universal/Square.lean | head -1 | awk '{print $NF}')"; R3=6; R4=19; R5=63;;
   esac

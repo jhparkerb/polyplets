@@ -18,7 +18,7 @@ Checks (all fail-closed):
      H = n-k <= REAL_HMAX).  Reports how many of those points exist vs the
      k+1 needed to pin a degree-k polynomial.
   B. For k <= KPIN there are >= k+1 real points, so by the Lean shape theorem
-     (polyplets/Polyplets/Shape.lean: T(n,n-k) = P(n)*3^(n-1-3k), deg <= k,
+     (polyplets/Polyplets/King.lean: T(n,n-k) = P(n)*3^(n-1-3k), deg <= k,
      n >= 2k+1) interpolation through real data determines P_k uniquely.
      Verifies the interpolant equals the production polynomial identically.
      KPIN is derived from the real point counts, not hardcoded.

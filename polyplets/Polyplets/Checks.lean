@@ -6,7 +6,7 @@ Authors: Jason H Parker
 import Polyplets.Grand.Staircase
 import Polyplets.Sequence
 import Polyplets.Universal.Hex
-import Polyplets.Universal.King
+import Polyplets.King
 import Polyplets.Universal.Square
 
 /-!

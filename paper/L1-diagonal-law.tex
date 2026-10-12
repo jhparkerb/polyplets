@@ -52,14 +52,14 @@ height defect, and the mod-$3$ arithmetic of the king instance}
 
 \Ldisclosure{%
 \textbf{Part I --- the law.}
-\emph{Theorem~\ref{thm:A} (shape, onset, integrality)} --- proved below. The
-king instance ($b=3$) is formalized in Lean~4 against mathlib
+\emph{Theorem~\ref{thm:A} (shape, onset, integrality)} --- proved below, and
+formalized for every row-local lattice in Lean~4 against mathlib
 (\repo{polyplets/Polyplets/Universal/}: \texttt{universal\_shape\_d},
 \texttt{universal\_shape}, \texttt{universal\_shape\_production},
 \texttt{universal\_production\_int\_all}) and depends on standard axioms only,
 with no \texttt{sorry} and no \texttt{native\_decide} anywhere in the
-development. Machine checks of the
-general statement: \repo{experiments/universal\_law\_check.py} (square),
+development; the king, square and hex cases are instances. Machine checks of
+the general statement: \repo{experiments/universal\_law\_check.py} (square),
 \repo{experiments/diagonal\_law\_proof\_check.py} (king),
 \repo{experiments/hex\_gas.py} (hex).
 \emph{Theorem~\ref{thm:B} (the spine)} --- paper proof only, not formalized;
@@ -633,8 +633,9 @@ weights of surplus at most $j$, which is the locality claim. \qed
 \begin{remark}[scope]
 The proof above is written for a general row-local lattice, replacing the
 constant $3$ of the king case by $b$ throughout. The king case is the one that
-was written out first in full detail and the one formalized in Lean; the
-generalization is the same induction with $b$ symbolic. Its two delicate steps,
+was written out first in full detail; the general statement is the one
+formalized in Lean, with the king case as its \texttt{kingLattice} instance,
+and the generalization is the same induction with $b$ symbolic. Its two delicate steps,
 the choice of $\zeta_j$ and the $y$-adic convergence of $\hat C$, use only
 $b \ne 0$ and $\mathrm{ord}_y(g_i) \ge i-1$ respectively.
 \end{remark}
@@ -900,8 +901,9 @@ than a result.
 \section{Formalization}
 \label{sec:formal}
 
-The king instance is formalized in Lean~4 (toolchain v4.31.0) against
-mathlib~\cite{mathlib}, in a development with \textbf{no \texttt{sorry} and no
+The theorems of Part~I are formalized in Lean~4 (toolchain v4.31.0) against
+mathlib~\cite{mathlib}, in a development of 40 modules and about 11{,}100
+lines with \textbf{no \texttt{sorry} and no
 \texttt{native\_decide}}: every theorem in it depends on the standard axioms
 (\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}) alone. What
 is relevant here:
@@ -909,9 +911,11 @@ is relevant here:
 \begin{itemize}
 \item The engine (\texttt{Universal.universal\_shape\_d},
   \texttt{universal\_shape}, \texttt{universal\_shape\_production},
-  \texttt{universal\_production\_int\_all}) and the \texttt{kingSystem} and
-  \texttt{peelSystem} instances depend on \textbf{standard axioms only}
-  (\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}).
+  \texttt{universal\_production\_int\_all}) is proved for every row-local
+  lattice, as a theorem about any \texttt{PeelSystem}
+  (\repo{polyplets/Polyplets/Universal/}); the king lattice is the instance
+  \texttt{kingLattice} of \repo{polyplets/Polyplets/King.lean}, and the
+  report's king-named theorems are the universal ones read at it.
 \item The product form (\texttt{T\_staircase}, \texttt{d\_mu\_rec},
   \texttt{grand\_all}, \texttt{Pk\_prod}; Theorem~\ref{thm:C}) was
   restructured for Lean as a \emph{staircase} route: in sequence form, Steps 1--3
@@ -921,7 +925,7 @@ is relevant here:
 \item \texttt{production\_leadingCoeff} (Corollary~\ref{cor:lead} for the
   king) is proved outright; the cluster weight $V(1,1) = 25$ it rests on is a
   kernel-decided cell (\texttt{decide +kernel}), not a compiled evaluation.
-\item The per-lattice $P_1$ determinations (\texttt{king\_P1\_*},
+\item The per-lattice $P_1$ determinations (\texttt{P1\_closed} for the king,
   \texttt{square\_P1\_closed}, \texttt{hex\_P1\_closed}) rest on two
   triangle cells per lattice: the king cells are kernel-decided, the square and
   hex $T(4,3)$ is a hypothesis of the theorem. The $n = 3$ row sums of the

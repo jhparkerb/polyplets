@@ -11,7 +11,7 @@ import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Positivity
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Set
-import Polyplets.Shape
+import Polyplets.King
 
 /-!
 # The leading coefficient of `P_k` is `25^k / k!`

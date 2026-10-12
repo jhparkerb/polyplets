@@ -33,7 +33,7 @@ The objects are those of `polyplets/Polyplets/Defs.lean`: `kingAdj p q` is
 Chebyshev-distance-one adjacency (`p ≠ q ∧ |p.1 − q.1| ≤ 1 ∧ |p.2 − q.2| ≤ 1`)
 and `KingConnected S` is pairwise reachability inside `S` under that relation,
 shown equivalent to `SimpleGraph.Reachable` in `kingGraph S` by
-`kingConnected_iff_reachable` in `Polyplets/Graph.lean`, cited for agreement on
+`conn_iff_reachable` in `Polyplets/Universal/Graph.lean`, cited for agreement on
 definitions only: this is a paper proof, not a Lean task.
 
 Write `c(S)` for the number of king-connected components of a finite cell set

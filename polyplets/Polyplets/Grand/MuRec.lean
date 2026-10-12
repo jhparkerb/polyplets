@@ -6,7 +6,7 @@ Authors: Jason H Parker
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 import Polyplets.Grand.Mu
-import Polyplets.Peel
+import Polyplets.King
 
 /-!
 # MuRec: the μ-recursion (the core theorem)

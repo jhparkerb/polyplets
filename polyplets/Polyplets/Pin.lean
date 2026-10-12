@@ -8,7 +8,8 @@ import Mathlib.Tactic.FinCases
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Set
-import Polyplets.Shape
+import Polyplets.King
+import Polyplets.Universal.Compute
 
 /-!
 # Pin: the explicit production polynomials `P_k`
@@ -82,45 +83,20 @@ lemma prodPoly_eval (num : List ℚ) (kf x : ℚ) :
 /-- **Pin lemma.** A polynomial `p` of degree `≤ k` that matches the shape
 witness (`shape_production`) at the `k+1` onset points `[2k+1, 3k+1]`
 *is* the shape witness, hence carries the full diagonal-law production form.
-
-The hypothesis `hpts` states, at each of the `k+1` onset points
-`n ∈ [2k+1, 3k+1]`, that `p(n)` equals the integer `T(n,n-k)·3^(3k+1-n)`
-that `production_int_onset` also forces on the witness; Lagrange
-(`eq_of_degrees_lt_of_eval_finset_eq`) over `ℚ`, on the interval cast into
-`ℚ`, then identifies the two polynomials. (2026-07-31: specialized to
-`s = Finset.Icc (2k+1) (3k+1)` — every caller passed exactly that set, so
-the former `s`/`hcard`/`hin` parameters were noise.) -/
+The hypothesis `hpts` states, at each onset point, that `p(n)` equals the
+integer `T(n,n-k)·3^(3k+1-n)` that `production_int_onset` also forces on the
+witness. This is `Universal.pin` at the king lattice. -/
 theorem pin (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k)
     (hpts : ∀ n ∈ Finset.Icc (2 * k + 1) (3 * k + 1),
       p.eval (n : ℚ) = ((T n (n - k) * 3 ^ (3 * k + 1 - n) : ℕ) : ℚ)) :
     ∀ n : ℕ, 2 * k + 1 ≤ n →
       (T n (n - k) : ℚ) = p.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) := by
-  set s : Finset ℕ := Finset.Icc (2 * k + 1) (3 * k + 1) with hs
-  have hcard : k + 1 ≤ s.card := by rw [hs, Nat.card_Icc]; omega
-  have hin : ∀ n ∈ s, 2 * k + 1 ≤ n ∧ n ≤ 3 * k + 1 := fun n hn =>
-    Finset.mem_Icc.mp (hs ▸ hn)
-  obtain ⟨P, hPdeg, hPzpow, hPcomp⟩ := shape_production k
-  have hpP : p = P := by
-    have hinj : Set.InjOn (Nat.cast : ℕ → ℚ) s := fun a _ b _ h => by exact_mod_cast h
-    have hcard' : (s.image (Nat.cast : ℕ → ℚ)).card = s.card :=
-      Finset.card_image_of_injOn hinj
-    apply Polynomial.eq_of_degrees_lt_of_eval_finset_eq (s.image (Nat.cast : ℕ → ℚ))
-    · calc p.degree ≤ (p.natDegree : WithBot ℕ) := Polynomial.degree_le_natDegree
-        _ ≤ (k : WithBot ℕ) := by exact_mod_cast hp
-        _ < ((s.image (Nat.cast : ℕ → ℚ)).card : WithBot ℕ) := by
-            rw [hcard']; exact_mod_cast (by omega : k < s.card)
-    · calc P.degree ≤ (P.natDegree : WithBot ℕ) := Polynomial.degree_le_natDegree
-        _ ≤ (k : WithBot ℕ) := by exact_mod_cast hPdeg
-        _ < ((s.image (Nat.cast : ℕ → ℚ)).card : WithBot ℕ) := by
-            rw [hcard']; exact_mod_cast (by omega : k < s.card)
-    · intro x hx
-      rw [Finset.mem_image] at hx
-      obtain ⟨n, hn, rfl⟩ := hx
-      rw [hpts n hn]
-      obtain ⟨hn1, hn2⟩ := hin n hn
-      rw [production_int_onset hPcomp hn1 hn2]
-  rw [hpP]
-  exact hPzpow
+  intro n hn
+  have h := Universal.pin Universal.kingLattice k p hp (Finset.Icc (2 * k + 1) (3 * k + 1))
+    (by rw [Nat.card_Icc]; omega) (fun n hn => Finset.mem_Icc.mp hn)
+    (fun n hn => by rw [hpts n hn, Universal.T_king, Universal.b_king]) n hn
+  rw [Universal.T_king, Universal.b_king] at h
+  exact_mod_cast h
 
 /-! ## The production polynomials, and the unconditional `k = 1` law -/
 

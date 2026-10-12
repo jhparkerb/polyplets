@@ -10,16 +10,15 @@ import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Positivity
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Set
-import Polyplets.Shape
+import Polyplets.DiscreteCalculus
 
 /-!
 # AbstractShape: the diagonal law over an abstract peeling system
 
-`Shape.lean` proves the king diagonal law from `Peel.lean` through a very thin
-interface: the two recursions (`d_rec`, `c_ident`) and nothing else. This file
-extracts that interface as a structure `PeelSystem` carrying a drift count
-`b : ℕ` in place of the king's `3`, and re-proves the four shape theorems
-generically:
+The diagonal law needs only a thin interface to the geometry: the two
+recursions (`d_rec`, `c_ident`) and nothing else. This file states that
+interface as a structure `PeelSystem` carrying a drift count `b : ℕ` (the
+king lattice's `3`) and proves the four shape theorems from it:
 
 * `PeelSystem.shape_d` : `d k H = δ_k(H) · b^H` for `H ≥ k + 1`, `deg δ_k ≤ k`;
 * `PeelSystem.shape` : `T(H+k, H) = q_k(H) · b^H` for `H ≥ k + 1`;
@@ -28,13 +27,12 @@ generically:
   the zpow-free companion `b^(3k+1) · T(n, n-k) = P_k(n) · b^n`;
 * `PeelSystem.production_int_all` : any such `P_k` is integer-valued on `ℤ`.
 
-The proof scripts are `Shape.lean`'s, with `3 ↦ S.b` and the literal
-`(3 : ℚ) ≠ 0` side conditions replaced by `PeelSystem.b_ne_zero` (whence the
-field `hb : 1 ≤ b`). This is the formalized half of the "verbatim wager" of
-`docs/proofs/universal-diagonal-law.md`: steps 3–5 of that proof carry over
-with `b` in place of `3`. The geometric half (steps 1–2: producing a
-`PeelSystem` from a row-local lattice) is the next phase; this file is
-lattice-agnostic and settles the algebra.
+The only arithmetic fact about `b` the proofs use is `(b : ℚ) ≠ 0`
+(`PeelSystem.b_ne_zero`, from the field `hb : 1 ≤ b`), which is why the
+"verbatim wager" of `docs/proofs/universal-diagonal-law.md` holds: steps 3–5
+of that proof carry over with `b` in place of `3`. The geometric half (steps
+1–2, a `PeelSystem` from any row-local lattice) is `Universal/System.lean`;
+the king instance with its original names is `King.lean`.
 
 ## What the shape law needs from a lattice
 
@@ -115,8 +113,8 @@ lemma b_pow_ne_zero (m : ℕ) : (S.b : ℚ) ^ m ≠ 0 := pow_ne_zero _ S.b_ne_ze
 
 /-! ## Shape of the walk-top counts -/
 
-/-- The strong-induction step for `shape_d` (`Shape.lean`'s `shape_d_step`
-with `3 ↦ S.b`): lower-surplus polynomials give the surplus-`k` one. The
+/-- The strong-induction step for `shape_d`: lower-surplus polynomials give the
+surplus-`k` one. The
 d-recursion divided by `b^H` is the difference equation `e(H) = e(H-1) + g(H)`;
 telescoping from `H₀ = k+1` and summing `g` by `exists_poly_sum_Icc` gives
 `δ_k`, with the base value absorbed into the constant term. -/
@@ -359,7 +357,7 @@ theorem production_int_onset' {k : ℕ} {P : Polynomial ℚ}
 /-- **Integrality everywhere**: any `P` of degree `≤ k` satisfying the production
 identity is integer-valued on all of `ℤ` — the `k+1` onset points
 `n = 2k+1 .. 3k+1` are integer (`production_int_onset`) and consecutive, so finite differences
-(`int_valued_of_consecutive`, a lattice-independent lemma of `Shape.lean`)
+(`int_valued_of_consecutive`, `DiscreteCalculus.lean`)
 extend integrality everywhere. -/
 theorem production_int_all {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree ≤ k)
     (hP : ∀ n : ℕ, 2 * k + 1 ≤ n →
@@ -376,66 +374,5 @@ theorem production_int_all {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree �
   exact hz
 
 end PeelSystem
-
-/-! ## Gate GD-1: the king lattice as a peeling system
-
-The king case is a `PeelSystem` with `b = 3`, its two recursion fields
-discharged by `Peel.lean`'s theorems verbatim. The `example`s below check that
-the generic theorems instantiated at `kingSystem` are the *same statements*
-`Shape.lean` proves directly (term-mode, no bridging tactic), which is the
-GD-1 gate. The king tree itself is untouched. -/
-
-/-- The king lattice (up-offsets `{-1, 0, 1}`, so `b = 3`) as a peeling
-system: every field is a `Peel.lean`/`Weights.lean` object, and the two
-recursion fields ARE `d_rec` and `c_ident`. -/
-noncomputable def kingSystem : PeelSystem where
-  b := 3
-  hb := by norm_num
-  d := Polyplets.d
-  T := Polyplets.T
-  V := Polyplets.V
-  Vt := Polyplets.Vt
-  d_rec := Polyplets.d_rec
-  c_ident := Polyplets.c_ident
-
-@[simp] lemma kingSystem_b : kingSystem.b = 3 := rfl
-
-@[simp] lemma kingSystem_d : kingSystem.d = Polyplets.d := rfl
-
-@[simp] lemma kingSystem_T : kingSystem.T = Polyplets.T := rfl
-
-/-- `Shape.lean`'s `shape_d` statement, transcribed. Inhabited twice below. -/
-def KingShapeD : Prop := ∀ k : ℕ, ∃ δ : Polynomial ℚ, δ.natDegree ≤ k ∧
-  ∀ H : ℕ, k + 1 ≤ H → (Polyplets.d k H : ℚ) = δ.eval (H : ℚ) * 3 ^ H
-
-/-- `Shape.lean`'s `shape` statement, transcribed. -/
-def KingShape : Prop := ∀ k : ℕ, ∃ q : Polynomial ℚ, q.natDegree ≤ k ∧
-  ∀ H : ℕ, k + 1 ≤ H → (Polyplets.T (H + k) H : ℚ) = q.eval (H : ℚ) * 3 ^ H
-
-/-- `Shape.lean`'s `shape_production` statement, transcribed. -/
-def KingShapeProduction : Prop := ∀ k : ℕ, ∃ P : Polynomial ℚ, P.natDegree ≤ k ∧
-  (∀ n : ℕ, 2 * k + 1 ≤ n →
-    (Polyplets.T n (n - k) : ℚ) = P.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k)) ∧
-  (∀ n : ℕ, 2 * k + 1 ≤ n →
-    (3 : ℚ) ^ (3 * k + 1) * (Polyplets.T n (n - k) : ℚ) = P.eval (n : ℚ) * 3 ^ n)
-
-/-- `Shape.lean`'s `production_int_all` statement, transcribed. -/
-def KingProductionIntAll : Prop := ∀ (k : ℕ) (P : Polynomial ℚ), P.natDegree ≤ k →
-  (∀ n : ℕ, 2 * k + 1 ≤ n →
-    (3 : ℚ) ^ (3 * k + 1) * (Polyplets.T n (n - k) : ℚ) = P.eval (n : ℚ) * 3 ^ n) →
-  ∀ m : ℤ, ∃ z : ℤ, P.eval (m : ℚ) = (z : ℚ)
-
--- Each transcription is the ORIGINAL theorem's type: `Shape.lean`'s proofs
--- inhabit it term-mode, with no bridging tactic.
-example : KingShapeD := Polyplets.shape_d
-example : KingShape := Polyplets.shape
-example : KingShapeProduction := Polyplets.shape_production
-example : KingProductionIntAll := fun _ _ hdeg hP => Polyplets.production_int_all hdeg hP
-
--- **GD-1**: the generic theorems at `kingSystem` inhabit the very same types.
-example : KingShapeD := kingSystem.shape_d
-example : KingShape := kingSystem.shape
-example : KingShapeProduction := kingSystem.shape_production
-example : KingProductionIntAll := fun _ _ hdeg hP => kingSystem.production_int_all hdeg hP
 
 end Polyplets.Universal

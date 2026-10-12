@@ -7,7 +7,7 @@ import Mathlib.Order.Interval.Finset.Nat
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.NormNum.Basic
 import Polyplets.Compute
-import Polyplets.Separation
+import Polyplets.Universal.Separation
 
 /-!
 # Peeling weights: walk-top counts `d` and cluster configurations `V`, `Vᵗ`
@@ -42,10 +42,12 @@ and the identities at their onset are in `Checks.lean`.
 
 namespace Polyplets
 
+open Universal (IsWalkRow)
+
 /-! ## Row size and walk-top canonical sets -/
 
 /-- The number of cells of `S` in row `y`. `rowSize S r = 1` is exactly
-`IsWalkRow S r` of `Separation.lean` (`isWalkRow_iff_rowSize`). -/
+`Universal.IsWalkRow S r` (`isWalkRow_iff_rowSize`). -/
 def rowSize (S : Finset (ℤ × ℤ)) (y : ℤ) : ℕ :=
   (S.filter fun c => c.2 = y).card
 

@@ -111,7 +111,7 @@ V(1,1) = 25, Vᵗ(1,1) = 5 of `Weights.lean` (the same 25 = 16+9 split).
   hypotheses. (An outright proof, `P2_closed`, rested on `native_decide`
   leaves and left the build 2026-10-12; last at commit 697f376.)
 - The general shape T(n,n−k) = P_k(n)·3^(n−1−3k), deg P_k ≤ k, onset
-  n ≥ 2k+1, is a theorem for ALL k (`Shape.lean`; paper proof
+  n ≥ 2k+1, is a theorem for ALL k (`Universal/AbstractShape.lean`, `King.lean`; paper proof
   `diagonal-law.md`), and the defect-gas structure is exact: the
   diagonals are the exp of affine cumulants (`grand-form.md`; the Lean
   staircase route is `Grand/`).

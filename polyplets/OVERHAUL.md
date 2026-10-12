@@ -45,7 +45,8 @@ Easiest and most depended-on first. One commit per item.
       `decidableIsCanonicalAnimal` (no consumer since the anchors went),
       `nu_zero'`, `xNorm_def'`, `rowSize_union_left`, whatever `#lint` and
       a usage grep show unused.
-- [ ] A7. One development, not two: the king tree (`Graph`, `Finite`,
+- [x] A7 (2026-10-12; `King.lean` is the instance, `DiscreteCalculus.lean` the
+      polynomial lemmas, 2,700 lines gone). One development, not two: the king tree (`Graph`, `Finite`,
       `RowProfile`, `Separation`, `Weights`, `Peel`, `Shape`) becomes the
       `kingLattice` instance of `Universal/` (`KingAgree` already proves the
       objects agree definitionally), and `AbstractShape`'s copy of `Shape`
@@ -75,7 +76,7 @@ Easiest and most depended-on first. One commit per item.
       carry (rows ≤ 6 of `T`, `a 3 … a 6`, the j ≤ 3 weights, the symmetry
       anchors n ≤ 5) return to `Checks.lean` as kernel facts, and
       `P2_closed` returns unconditional.
-- [ ] A13. `Separation.reachable_seg_aux`: one proof for both cut lines
+- [x] A13 (2026-10-12). `Separation.reachable_seg_aux`: one proof for both cut lines
       instead of two 30-line mirror-image branches.
 - [ ] A14. `Peel`: classes B and C share one peel/glue pair parametrized by
       whether a walk cell caps the cluster, instead of two ~350-line copies.
@@ -104,8 +105,8 @@ Easiest and most depended-on first. One commit per item.
       counts; `StairGrowth`'s `docs/lean-record.md` reference.
 - [x] B3. Imports, lints, docstrings, loose `#print axioms`, guards for
       these modules (A1–A4 applied to `Universal/`, `Upper/`, `Stair*`).
-- [ ] B4. `Universal/Compute.pin` duplicates `Pin.pin`; `Universal/Peel`
-      duplicates `Peel` (resolved by A7).
+- [x] B4 (2026-10-12, with A7). `Universal/Compute.pin` duplicates `Pin.pin`;
+      `Universal/Peel` duplicates `Peel`.
 - [ ] B5. `Upper`: the `RatCert` data files were converted in place
       (`scripts/bui_lists_to_trees.py`); `scripts/gen_bui_cert.lean.py` emits
       the same format but has not been rerun against the oracle; regenerate

@@ -405,7 +405,7 @@ live components; and the window-reach lemma (king adjacency reaches at most
 `H + 1` cells back in scan order) belongs to this tier. Tier 2, that the
 dynamic program realizes the sum, is delimited in the proof's §7, invariant
 work of the kind `polyplets/Polyplets/Defs.lean` and
-`polyplets/Polyplets/Graph.lean` already carry (`kingAdj`, `KingConnected`,
+`polyplets/Polyplets/Universal/Graph.lean` already carry (`kingAdj`, `KingConnected`,
 `kingConnected_iff_reachable`). Tier 3, the bridge to the binary, is never
 provable; its gate is the Lean model evaluated on small boards against the C++
 at `H ≤ 6`, as `polyplets/Polyplets/Compute.lean` does for `T n H`.

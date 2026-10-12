@@ -9,7 +9,6 @@ import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Positivity
 import Mathlib.Tactic.Ring
 import Polyplets.Fekete
-import Polyplets.Graph
 import Polyplets.UpperBound
 
 /-!

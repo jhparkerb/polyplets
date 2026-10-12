@@ -24,6 +24,10 @@ differing by at most one in each coordinate. -/
 def kingAdj (p q : ℤ × ℤ) : Prop :=
   p ≠ q ∧ |p.1 - q.1| ≤ 1 ∧ |p.2 - q.2| ≤ 1
 
+/-- King adjacency is symmetric. -/
+lemma kingAdj_symm {p q : ℤ × ℤ} (h : kingAdj p q) : kingAdj q p :=
+  ⟨h.1.symm, by rw [abs_sub_comm]; exact h.2.1, by rw [abs_sub_comm]; exact h.2.2⟩
+
 /-- A finite cell set is king-connected: every pair of its cells is joined by a
 path of king-adjacent steps that stays inside the set. -/
 def KingConnected (S : Finset (ℤ × ℤ)) : Prop :=
