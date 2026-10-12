@@ -99,7 +99,7 @@ structure. The general T(n,n−k) is the open target this method is meant to rea
 ## Formalization and supersession (2026-07-21)
 
 This proof is fully formalized in Lean 4: `DiagonalPolys.lean`'s `T_sub_one` (stated
-for the report as `report_T_n_nm1` in `Report.lean`), pinned from the
+for the report as `report_T_sub_one` in `Report.lean`), pinned from the
 kernel-decided cells T(3,2) = 10 and T(4,3) = 55, standard axioms only; the
 gadget multiplicities 16+9 / 4+1 of §4 are the kernel-decided weights
 V(1,1) = 25, Vᵗ(1,1) = 5 of `Weights.lean` (the same 25 = 16+9 split).

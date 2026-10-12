@@ -38,13 +38,17 @@ namespace Polyplets
 #guard_msgs in
 #print axioms report_leading_coeff
 
+/-- info: 'Polyplets.report_Pk_degree' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms report_Pk_degree
+
 /-- info: 'Polyplets.report_pin_row_3k' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms report_pin_row_3k
 
-/-- info: 'Polyplets.report_T_n_nm1' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.report_T_sub_one' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms report_T_n_nm1
+#print axioms report_T_sub_one
 
 /-- info: 'Polyplets.T_sub_two' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
@@ -69,6 +73,10 @@ namespace Polyplets
 /-- info: 'Polyplets.report_bilateral' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms report_bilateral
+
+/-- info: 'Polyplets.report_asymmetric' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms report_asymmetric
 
 /-- info: 'Polyplets.report_growth' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in

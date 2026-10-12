@@ -17,10 +17,9 @@ import Polyplets.Growth
 One entry per claim in `paper/technical-report.tex`, in the report's order,
 each stated as close to the report's sentence as Lean allows and proved by a
 short reference into the rest of the tree. The definitions it rests on are
-`T` (`Defs.lean`) and `a` (`Sequence.lean`).
-
-A claim Lean does not yet prove is stated as a `Prop` definition, not a
-theorem: it type-checks, so the statement is fixed, but nothing asserts it.
+`IsPolyplet`, `a` and `T` (`Defs.lean`); `IsDiagonalPoly k P` (`King.lean`)
+is the diagonal law for a given polynomial, `T(n, n-k) = P(n)·3^(n-1-3k)` for
+`n ≥ 2k+1`.
 
 Out of scope: the computed tables (a(n), T(n,H) beyond small rows, the
 symmetry-class and hole counts). Those are enumeration output, not theorems.
@@ -45,7 +44,8 @@ theorem report_T_diag (n : ℕ) (hn : 1 ≤ n) : T n n = 3 ^ (n - 1) := by
   exact_mod_cast h
 
 /-- **The diagonal law.** When `H > n/2`, `T(n,H) = P_{n-H}(n)·3^(3H-2n-1)`,
-where `P_k` has degree at most `k` and is integer-valued. -/
+where `P_k` has degree at most `k` and is integer-valued. (Degree exactly `k`
+is `report_Pk_degree` below.) -/
 theorem report_diagonal_law : ∃ P : ℕ → Polynomial ℚ, ∀ k : ℕ,
     (P k).natDegree ≤ k ∧
     (∀ m : ℤ, ∃ z : ℤ, (P k).eval (m : ℚ) = z) ∧
@@ -70,6 +70,12 @@ theorem report_leading_coeff (k : ℕ) (P : Polynomial ℚ) (hdeg : P.natDegree 
     (hP : IsDiagonalPoly k P) : P.coeff k = 25 ^ k / k.factorial :=
   hP.coeff_eq hdeg
 
+/-- **`P_k` has degree exactly `k`.** For any polynomial satisfying the diagonal
+law at level `k`: its coefficient of `X^k` is `25^k/k!`, not zero. -/
+theorem report_Pk_degree (k : ℕ) (P : Polynomial ℚ) (hdeg : P.natDegree ≤ k)
+    (hP : IsDiagonalPoly k P) : P.natDegree = k :=
+  hP.natDegree_eq hdeg
+
 /-- **`P_k` can be fixed after computing the `3k`-th row.** A polynomial of
 degree `≤ k` with the known leading coefficient that matches `T` on rows
 `2k+1 … 3k` satisfies the diagonal law at level `k`. -/
@@ -81,7 +87,7 @@ theorem report_pin_row_3k (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k
   isDiagonalPoly_of_coeff_of_eval_Icc k p hp hlc hpts
 
 /-- **The worked example in Methods**: `T(n, n-1) = (25n - 45)·3^(n-4)`. -/
-theorem report_T_n_nm1 (n : ℕ) (hn : 3 ≤ n) :
+theorem report_T_sub_one (n : ℕ) (hn : 3 ≤ n) :
     (T n (n - 1) : ℚ) = (25 * (n : ℚ) - 45) * (3 : ℚ) ^ ((n : ℤ) - 4) :=
   T_sub_one n hn
 
@@ -95,9 +101,8 @@ theorem report_Pk_known (hA : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) :
 /-! ## Results: non-fixed polyplets
 
 The report gives counts only. Lean has the Burnside identities the counts are
-computed through; `Free`, `OneSided`, `Bilateral` are `Symmetry.lean`'s orbit
-counts. The report defines asymmetric as free minus bilateral, so
-`#bilateral + #asymmetric = #free` is definitional and gets no entry. -/
+computed through; `Free`, `OneSided`, `Bilateral`, `Asym` are `Symmetry.lean`'s
+orbit counts. -/
 
 theorem report_free (n : ℕ) :
     8 * Free n = a n + 2 * R90 n + R180 n + 2 * Hm n + 2 * Dm n := eight_mul_Free n
@@ -107,15 +112,17 @@ theorem report_oneSided (n : ℕ) : 4 * OneSided n = a n + 2 * R90 n + R180 n :=
 
 theorem report_bilateral (n : ℕ) : 2 * Bilateral n = Hm n + Dm n := two_mul_Bilateral n
 
-/-- **One-sided approaches `a(n)/4` and free approaches `a(n)/8`.** -/
-def SymmetryRatioClaim : Prop :=
-  Filter.Tendsto (fun n => 4 * (OneSided n : ℝ) / a n) Filter.atTop (nhds 1) ∧
-  Filter.Tendsto (fun n => 8 * (Free n : ℝ) / a n) Filter.atTop (nhds 1)
+/-- **The asymmetric polyplets are the free ones minus the bilateral ones.** -/
+theorem report_asymmetric (n : ℕ) : Asym n = Free n - Bilateral n := rfl
 
-/-- The symmetric counts are `o(a n)` (`SymmetryRatio.lean`: every symmetric
-animal is recovered from a connected half of about `n / 2` cells), so the
-Burnside identities give the limits. -/
-theorem report_symmetryRatio : SymmetryRatioClaim := symmetryRatio
+/-- **One-sided approaches `a(n)/4` and free approaches `a(n)/8`.** The
+symmetric counts are `o(a n)` (`SymmetryRatio.lean`: every symmetric polyplet
+is recovered from a connected half of about `n / 2` cells), so the Burnside
+identities give the limits. -/
+theorem report_symmetryRatio :
+    Filter.Tendsto (fun n => 4 * (OneSided n : ℝ) / a n) Filter.atTop (nhds 1) ∧
+    Filter.Tendsto (fun n => 8 * (Free n : ℝ) / a n) Filter.atTop (nhds 1) :=
+  symmetryRatio
 
 /-! ## Results: growth rate -/
 

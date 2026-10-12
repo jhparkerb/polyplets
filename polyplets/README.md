@@ -32,13 +32,15 @@ the theorem takes as input rather than proves.
 | T(n,n) = 3^(n−1) | `report_T_diag` | `T_self` (`King`) | — |
 | diagonal law: for H > n/2, T(n,H) = P_{n−H}(n)·3^(3H−2n−1), P_k integer-valued, deg ≤ k | `report_diagonal_law` | `exists_isDiagonalPoly`, `IsDiagonalPoly.intValued` (`King`) | — |
 | leading coefficient of P_k is 25^k/k! | `report_leading_coeff` | `IsDiagonalPoly.coeff_eq` (`LeadingCoeff`) | — |
+| P_k has degree exactly k | `report_Pk_degree` | `IsDiagonalPoly.natDegree_eq` (`LeadingCoeff`) | — |
 | P_k is fixed once row 3k is computed | `report_pin_row_3k` | `isDiagonalPoly_of_coeff_of_eval_Icc` (`LeadingCoeff`) | — |
-| T(n,n−1) = (25n−45)·3^(n−4) | `report_T_n_nm1` | `T_sub_one` (`DiagonalPolys`), from the kernel-decided cells T(3,2) = 10, T(4,3) = 55 | — |
+| T(n,n−1) = (25n−45)·3^(n−4) | `report_T_sub_one` | `T_sub_one` (`DiagonalPolys`), from the kernel-decided cells T(3,2) = 10, T(4,3) = 55 | — |
 | T(n,n−2) = ½(625n²−2459n+1134)·3^(n−7) | — (not a report claim; `docs/proofs/T-n-nm2-and-general.md`) | `T_sub_two` (`Staircase/Climb`), the climb to level 2 from the kernel-decided cells T(3,2), T(4,3), T(5,3) = 248, T(6,4) = 1480 | — |
 | P_k explicitly known for k ≤ 18 | `report_Pk_known` | `isDiagonalPoly_Pk`, `climb` (`Staircase/Climb`), climbing level by level from `d_staircase` and `T_staircase` | `EnumeratedCells`: 36 cells, below |
 | 8·free = a + 2R90 + R180 + 2Hm + 2Dm (Burnside) | `report_free` | `eight_mul_Free` (`Symmetry`) | — |
 | 4·one-sided = a + 2R90 + R180 | `report_oneSided` | `four_mul_OneSided` (`Symmetry`) | — |
 | 2·bilateral = Hm + Dm | `report_bilateral` | `two_mul_Bilateral` (`Symmetry`) | — |
+| asymmetric = free − bilateral | `report_asymmetric` | `Asym` (`Symmetry`), by definition | — |
 | a(n)^(1/n) → λ | `report_growth` | `lambda_tendsto` (`Growth`, `Fekete`, `UpperBound`) | — |
 | one-sided → a(n)/4, free → a(n)/8 | `report_symmetryRatio` | `symmetryRatio` (`SymmetryRatio`): each symmetric count is o(a(n)), by encoding a symmetric animal as a connected half of about n/2 cells and comparing with `a_supermul` against the kernel-decided a(3) = 20 | — |
 
