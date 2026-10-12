@@ -119,19 +119,31 @@ theorem validFrom_append {p : ℕ} : ∀ {x : List Col} {y : List Col},
       have : ValidFrom (lastH (c' :: t)) y := by simpa [lastH] using hy
       exact validFrom_append hx.2.2.2 (by simp) this
 
-/-- **The join lands in the class.** `d = lastH x - h'` is `max(0, lastH x − h')`
+/-- A valid animal is nonempty. -/
+theorem Valid.exists_cons {x : List Col} (hx : Valid x) : ∃ e s, x = e :: s := by
+  cases x with
+  | nil => exact hx.elim
+  | cons e s => exact ⟨e, s, rfl⟩
+
+/-- A valid animal is a legal continuation of its own first column's height
+(its first offset is `0`). -/
+theorem validFrom_of_valid {e : Col} {s : List Col} (hx : Valid (e :: s)) :
+    ValidFrom e.1 (e :: s) :=
+  ⟨hx.1, by have := hx.2.1; omega, by omega, hx.2.2⟩
+
+/-- **The join's step is legal.** `d = lastH x - h'` is `max(0, lastH x − h')`
 in `ℕ`, and both constraints it has to meet — `d ≤ lastH x` and
 `lastH x ≤ h' + d` — hold in each of the two cases. -/
+theorem validFrom_join_step (x : List Col) {c : Col} {t : List Col} (hy : Valid (c :: t)) :
+    ValidFrom (lastH x) ((c.1, lastH x - c.1) :: t) :=
+  ⟨hy.1, Nat.sub_le _ _, by omega, hy.2.2⟩
+
+/-- **The join lands in the class.** -/
 theorem join_valid {x y : List Col} (hx : Valid x) (hy : Valid y) : Valid (join x y) := by
-  match y, hy with
-  | c :: t, hy =>
-    match x, hx with
-    | e :: s, hx =>
-      have he2 : e.2 = 0 := hx.2.1
-      have hvx : ValidFrom e.1 (e :: s) := ⟨hx.1, by omega, by omega, hx.2.2⟩
-      have hstep : ValidFrom (lastH (e :: s)) ((c.1, lastH (e :: s) - c.1) :: t) :=
-        ⟨hy.1, Nat.sub_le _ _, by omega, hy.2.2⟩
-      exact ⟨hx.1, hx.2.1, (validFrom_append hvx (by simp) hstep).2.2.2⟩
+  obtain ⟨c, t, rfl⟩ := hy.exists_cons
+  obtain ⟨e, s, rfl⟩ := hx.exists_cons
+  exact ⟨hx.1, hx.2.1,
+    (validFrom_append (validFrom_of_valid hx) (by simp) (validFrom_join_step _ hy)).2.2.2⟩
 
 @[simp] theorem area_join (x y : List Col) : area (join x y) = area x + area y := by
   cases y with
@@ -161,22 +173,13 @@ theorem cut_append : ∀ {x : List Col} {z : List Col} {p : ℕ},
 /-- The join's second factor, re-anchored, is `y` again. -/
 theorem cut_join {x y : List Col} (hx : Valid x) (hy : Valid y) :
     (cut (area x) (join x y)).1 = x ∧ norm (cut (area x) (join x y)).2 = y := by
-  match y, hy with
-  | c :: t, hy =>
-    match x, hx with
-    | e :: s, hx =>
-      have he2 : e.2 = 0 := hx.2.1
-      have hvx : ValidFrom e.1 (e :: s) := ⟨hx.1, by omega, by omega, hx.2.2⟩
-      have hstep : ValidFrom (lastH (e :: s)) ((c.1, lastH (e :: s) - c.1) :: t) :=
-        ⟨hy.1, Nat.sub_le _ _, by omega, hy.2.2⟩
-      have hcut := cut_append hvx (by simp) hstep (by simp)
-      have hjoin : join (e :: s) (c :: t)
-          = (e :: s) ++ (c.1, lastH (e :: s) - c.1) :: t := rfl
-      rw [hjoin, hcut]
-      refine ⟨rfl, ?_⟩
-      have hcd : c.2 = 0 := hy.2.1
-      simp only [norm, List.cons.injEq, and_true]
-      exact Prod.ext rfl hcd.symm
+  obtain ⟨c, t, rfl⟩ := hy.exists_cons
+  obtain ⟨e, s, rfl⟩ := hx.exists_cons
+  rw [show join (e :: s) (c :: t) = (e :: s) ++ (c.1, lastH (e :: s) - c.1) :: t from rfl,
+    cut_append (validFrom_of_valid hx) (by simp) (validFrom_join_step _ hy) (by simp)]
+  refine ⟨rfl, ?_⟩
+  simp only [norm, List.cons.injEq, and_true]
+  exact Prod.ext rfl hy.2.1.symm
 
 /-- **Injectivity at fixed areas**: the pair is recovered from the join alone,
 so distinct pairs of equal areas have distinct joins. This is the step

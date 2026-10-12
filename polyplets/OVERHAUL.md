@@ -122,9 +122,11 @@ Easiest and most depended-on first. One commit per item.
       (`scripts/bui_lists_to_trees.py`); `scripts/gen_bui_cert.lean.py` emits
       the same format but has not been rerun against the oracle; regenerate
       and diff.
-- [ ] B6. `StairAnimals`: `cut`/`join` on `List (ℕ × ℕ)` is fine; replace the
-      `match … with` proofs by structural induction where `#lint` or
-      readability asks.
+- [x] B6 (2026-10-12: `join_valid` and `cut_join` share `Valid.exists_cons`,
+      `validFrom_of_valid` and `validFrom_join_step` instead of two copies of
+      a `match` on `Valid`; the structural recursions stay). `StairAnimals`:
+      `cut`/`join` on `List (ℕ × ℕ)` is fine; replace the `match … with`
+      proofs by structural induction where `#lint` or readability asks.
 
 ## Done
 
