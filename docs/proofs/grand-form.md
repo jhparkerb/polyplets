@@ -188,7 +188,7 @@ strong induction (`d_staircase`), and `T_staircase` carries it to the
 T-diagonals; both on **standard axioms only** (guarded in
 `Polyplets/Audit.lean`). Corollary 2, the leading coefficient 25^k/k!, is
 `LeadingCoeff.lean`'s `IsDiagonalPoly.coeff_eq`, standard axioms only. The
-production polynomials are pinned for k ≤ 18 from two enumerated cells per
+diagonal polynomials are determined for k ≤ 18 from two enumerated cells per
 level (`Staircase/Climb.lean`, `isDiagonalPoly_Pk`) — *conditional on those cells*: they
 are hypotheses of the Lean theorems, engine values assumed, not proved in
 Lean (`polyplets/README.md`). This retires the Lean PREDICTED tier. The

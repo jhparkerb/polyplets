@@ -62,7 +62,7 @@ theorem connected_king {S : Finset (ℤ × ℤ)} :
 `L`-animals at `kingLattice` are exactly `heightClass n H`. -/
 theorem isAnimal_king {n H : ℕ} {S : Finset (ℤ × ℤ)} :
     IsAnimal kingLattice n H S ↔ S ∈ Polyplets.heightClass n H := by
-  rw [Polyplets.mem_heightClass_iff]
+  rw [Polyplets.mem_heightClass_iff_rows]
   exact ⟨fun h => ⟨⟨h.card, connected_king.mp h.conn, h.anchored⟩, h.y_le, h.y_top⟩,
     fun ⟨h, h1, h2⟩ => ⟨h.card, connected_king.mpr h.conn, h.anchored, h1, h2⟩⟩
 
@@ -161,14 +161,14 @@ theorem T_of_d (k H : ℕ) (hH : k + 1 ≤ H) :
 
 /-! ## The diagonal law -/
 
-/-- **Shape of the walk-top diagonal**: `d k H = δ_k(H) · 3^H` for all
+/-- **The walk-top diagonal**: `d k H = δ_k(H) · 3^H` for all
 `H ≥ k + 1`, with `δ_k ∈ ℚ[X]` of degree `≤ k`. -/
 theorem exists_delta (k : ℕ) : ∃ δ : Polynomial ℚ, δ.natDegree ≤ k ∧
     ∀ H : ℕ, k + 1 ≤ H → (d k H : ℚ) = δ.eval (H : ℚ) * 3 ^ H := by
   obtain ⟨δ, hdeg, h⟩ := RowLocal.exists_delta kingLattice k
   exact ⟨δ, hdeg, fun H hH => by simpa using h H hH⟩
 
-/-- **Shape of the k-th diagonal**: `T(H+k, H) = q_k(H) · 3^H` for all
+/-- **The k-th diagonal**: `T(H+k, H) = q_k(H) · 3^H` for all
 `H ≥ k + 1`, with `q_k ∈ ℚ[X]` of degree `≤ k`. -/
 theorem exists_q (k : ℕ) : ∃ q : Polynomial ℚ, q.natDegree ≤ k ∧
     ∀ H : ℕ, k + 1 ≤ H → (T (H + k) H : ℚ) = q.eval (H : ℚ) * 3 ^ H := by
@@ -188,7 +188,8 @@ def IsDiagonalPoly (k : ℕ) (P : Polynomial ℚ) : Prop :=
 /-- The king instance of the row-local predicate. -/
 lemma isDiagonalPoly_king {k : ℕ} {P : Polynomial ℚ} :
     RowLocal.IsDiagonalPoly kingLattice k P ↔ IsDiagonalPoly k P := by
-  simp only [RowLocal.IsDiagonalPoly, IsDiagonalPoly, T_king, b_king, Nat.cast_ofNat]
+  simp only [RowLocal.IsDiagonalPoly, TopRowRecursion.IsDiagonalPoly, topRowRecursion,
+    IsDiagonalPoly, T_king, b_king, Nat.cast_ofNat]
 
 /-- **The diagonal law**: for every `k` there is `P_k ∈ ℚ[X]` of degree `≤ k`
 with `T(n, n-k) = P_k(n) · 3^(n-1-3k)` for all `n ≥ 2k + 1`. -/
@@ -212,16 +213,22 @@ theorem IsDiagonalPoly.eval_onset {k : ℕ} {P : Polynomial ℚ} (hP : IsDiagona
   have h := (isDiagonalPoly_king.mpr hP).eval_onset hn1 hn2
   simpa [T_king] using h
 
-/-- **Integrality everywhere**: any `P` of degree `≤ k` satisfying the law is
-integer-valued on all of `ℤ`. -/
-theorem IsDiagonalPoly.intValued {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree ≤ k)
-    (hP : IsDiagonalPoly k P) : ∀ m : ℤ, ∃ z : ℤ, P.eval (m : ℚ) = (z : ℚ) :=
-  (isDiagonalPoly_king.mpr hP).intValued hdeg
+/-- **The law determines `P`**: any `P` satisfying it at level `k` has degree
+`≤ k`, being the witness of `exists_isDiagonalPoly`. -/
+theorem IsDiagonalPoly.natDegree_le {k : ℕ} {P : Polynomial ℚ} (hP : IsDiagonalPoly k P) :
+    P.natDegree ≤ k :=
+  (isDiagonalPoly_king.mpr hP).natDegree_le
+
+/-- **Integrality everywhere**: any `P` satisfying the law is integer-valued on
+all of `ℤ`. -/
+theorem IsDiagonalPoly.intValued {k : ℕ} {P : Polynomial ℚ} (hP : IsDiagonalPoly k P) :
+    ∀ m : ℤ, ∃ z : ℤ, P.eval (m : ℚ) = (z : ℚ) :=
+  (isDiagonalPoly_king.mpr hP).intValued
 
 /-! ## The `k = 0` diagonal
 
 `exists_isDiagonalPoly 0` gives a constant `P₀`, the single onset value
-`T 1 1 = 1` (`Defs.lean`) pins it, and the closed form `T(n,n) = 3^(n-1)`
+`T 1 1 = 1` (`Defs.lean`) determines it, and the closed form `T(n,n) = 3^(n-1)`
 follows. -/
 
 /-- **`T(n, n) = 3^(n-1)`** for `n ≥ 1`: the `k = 0` diagonal. -/

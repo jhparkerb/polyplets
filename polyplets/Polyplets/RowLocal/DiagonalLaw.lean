@@ -18,7 +18,7 @@ import Polyplets.DiscreteCalculus
 The diagonal law needs only a thin interface to the geometry: the two
 identities about the top row (`d_rec`, `T_of_d`) and nothing else. This file
 states that interface as a structure `TopRowRecursion` carrying a drift count `b : ℕ` (the
-king lattice's `3`) and proves the four shape theorems from it:
+king lattice's `3`) and proves the four diagonal-law theorems from it:
 
 * `TopRowRecursion.exists_delta` : `d k H = δ_k(H) · b^H` for `H ≥ k + 1`, `deg δ_k ≤ k`;
 * `TopRowRecursion.exists_q` : `T(H+k, H) = q_k(H) · b^H` for `H ≥ k + 1`;
@@ -26,7 +26,8 @@ king lattice's `3`) and proves the four shape theorems from it:
   `n ≥ 2k+1` (`IsDiagonalPoly`; `zpow`, so the onset window `2k+1 ≤ n < 3k+1`
   is covered), with the zpow-free form `b^(3k+1) · T(n, n-k) = P_k(n) · b^n`
   as `IsDiagonalPoly.cleared`;
-* `TopRowRecursion.IsDiagonalPoly.intValued` : any such `P_k` is integer-valued on `ℤ`.
+* `TopRowRecursion.IsDiagonalPoly.intValued` : any such `P_k` is integer-valued on `ℤ`
+  (and, `IsDiagonalPoly.natDegree_le`, of degree `≤ k`: the law determines `P_k`).
 
 The only arithmetic fact about `b` the proofs use is `(b : ℚ) ≠ 0`
 (`TopRowRecursion.b_ne_zero`, from the field `hb : 1 ≤ b`), which is why the
@@ -35,7 +36,7 @@ of that proof carry over with `b` in place of `3`. The geometric half (steps
 1–2, a `TopRowRecursion` from any row-local lattice) is `RowLocal/Instance.lean`;
 the king instance with its original names is `King.lean`.
 
-## What the shape law needs from a lattice
+## What the diagonal law needs from a lattice
 
 Exactly the eight fields of `TopRowRecursion` — most of them data. The proofs use
 NO base values, NO support or vanishing ranges for `V`/`Vt`, and NO
@@ -71,7 +72,7 @@ open Polynomial
 /-- **The two top-row identities**: the finite numeric interface that the
 diagonal-law algebra consumes. `b` is the drift count (`3` for the king lattice, `|D|` in
 general); `d k H` counts walk-top animals of surplus `k` and height `H`;
-`T n H` counts all canonical animals; `V`/`Vt` are the interior and top-edge
+`T n H` counts all animals; `V`/`Vt` are the interior and top-edge
 cluster weights. The two recursions are `RowLocal/TopRow.lean`'s `d_rec` and `T_of_d`
 verbatim with `3 ↦ b`. -/
 structure TopRowRecursion where
@@ -82,7 +83,7 @@ structure TopRowRecursion where
   hb : 1 ≤ b
   /-- `d k H`: walk-top animals of surplus `k` and height `H`. -/
   d : ℕ → ℕ → ℕ
-  /-- `T n H`: all canonical animals with `n` cells and height `H`. -/
+  /-- `T n H`: all animals with `n` cells and height `H`. -/
   T : ℕ → ℕ → ℕ
   /-- `V ℓ j`: the interior cluster weight at span `ℓ`, surplus `j`. -/
   V : ℕ → ℕ → ℕ
@@ -93,7 +94,7 @@ structure TopRowRecursion where
   d_rec : ∀ k H : ℕ, k + 2 ≤ H →
     d k H = b * d k (H - 1) +
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, V ℓ j * d (k - j) (H - 1 - ℓ)
-  /-- **The top-row identity**: a canonical animal has a walk top row or a top-edge
+  /-- **The top-row identity**: an animal has a walk top row or a top-edge
   cluster capping a shorter walk-top remainder. -/
   T_of_d : ∀ k H : ℕ, k + 1 ≤ H →
     T (H + k) H = d k H +
@@ -104,7 +105,7 @@ namespace TopRowRecursion
 variable (S : TopRowRecursion)
 
 /-- The drift count is invertible in `ℚ` — the only arithmetic fact about `b`
-the shape law uses. -/
+the diagonal law uses. -/
 lemma b_ne_zero : (S.b : ℚ) ≠ 0 := by
   have := S.hb
   positivity
@@ -112,7 +113,7 @@ lemma b_ne_zero : (S.b : ℚ) ≠ 0 := by
 /-- Powers of the drift count are invertible in `ℚ`. -/
 lemma b_pow_ne_zero (m : ℕ) : (S.b : ℚ) ^ m ≠ 0 := pow_ne_zero _ S.b_ne_zero
 
-/-! ## Shape of the walk-top counts -/
+/-! ## The walk-top counts are polynomial times `b^H` -/
 
 /-- The strong-induction step for `shape_d`: lower-surplus polynomials give the
 surplus-`k` one. The
@@ -212,13 +213,13 @@ lemma exists_delta_step (k : ℕ)
       rw [hrecQ, hsum, ihm, hδstep]
       ring
 
-/-- **Shape of the walk-top diagonal**: `d k H = δ_k(H) · b^H` for all
+/-- **The walk-top diagonal**: `d k H = δ_k(H) · b^H` for all
 `H ≥ k + 1`, with `δ_k ∈ ℚ[X]` of degree `≤ k`. -/
 theorem exists_delta : ∀ k : ℕ, ∃ δ : Polynomial ℚ, δ.natDegree ≤ k ∧
     ∀ H : ℕ, k + 1 ≤ H → (S.d k H : ℚ) = δ.eval (H : ℚ) * (S.b : ℚ) ^ H := fun k =>
   Nat.strong_induction_on k S.exists_delta_step
 
-/-- **Shape of the k-th diagonal**: `T(H+k, H) = q_k(H) · b^H` for all
+/-- **The k-th diagonal**: `T(H+k, H) = q_k(H) · b^H` for all
 `H ≥ k + 1`, with `q_k ∈ ℚ[X]` of degree `≤ k`. From `shape_d` through the
 top-row identity: at `H ≥ k + 1` every `d`-term of `T_of_d` is exactly in range. -/
 theorem exists_q (k : ℕ) : ∃ q : Polynomial ℚ, q.natDegree ≤ k ∧
@@ -324,6 +325,30 @@ theorem IsDiagonalPoly.cleared {k : ℕ} {P : Polynomial ℚ} (hP : S.IsDiagonal
   rw [hP n hn]
   linear_combination P.eval (n : ℚ) * hpow
 
+/-! ## Uniqueness, and the degree bound for free -/
+
+/-- **Uniqueness**: two polynomials satisfying the law at level `k` agree at
+every `n ≥ 2k+1`, hence everywhere. -/
+theorem IsDiagonalPoly.eq {k : ℕ} {P Q : Polynomial ℚ} (hP : S.IsDiagonalPoly k P)
+    (hQ : S.IsDiagonalPoly k Q) : P = Q := by
+  refine eq_of_infinite_eval_eq P Q ?_
+  refine Set.infinite_of_injective_forall_mem
+    (f := fun i : ℕ => ((2 * k + 1 + i : ℕ) : ℚ)) ?_ fun i => ?_
+  · intro i j hij
+    dsimp only at hij
+    have : 2 * k + 1 + i = 2 * k + 1 + j := by exact_mod_cast hij
+    omega
+  · exact mul_right_cancel₀ (zpow_ne_zero _ S.b_ne_zero)
+      ((hP _ (by omega)).symm.trans (hQ _ (by omega)))
+
+/-- **The degree bound is automatic**: any polynomial satisfying the law at
+level `k` is the witness of `exists_isDiagonalPoly`, so its degree is `≤ k`. -/
+theorem IsDiagonalPoly.natDegree_le {k : ℕ} {P : Polynomial ℚ} (hP : S.IsDiagonalPoly k P) :
+    P.natDegree ≤ k := by
+  obtain ⟨Q, hQdeg, hQ⟩ := S.exists_isDiagonalPoly k
+  rw [hP.eq hQ]
+  exact hQdeg
+
 /-! ## Integrality -/
 
 /-- **Integrality at the onset window**: for `2k+1 ≤ n ≤ 3k+1` the
@@ -356,15 +381,14 @@ theorem IsDiagonalPoly.eval_onset_int {k : ℕ} {P : Polynomial ℚ} (hP : S.IsD
     push_cast
     ring⟩
 
-/-- **Integrality everywhere**: any `P` of degree `≤ k` satisfying the law is
-integer-valued on all of `ℤ` — the `k+1` onset points `n = 2k+1 .. 3k+1` are
-integer (`IsDiagonalPoly.eval_onset`) and consecutive, so finite differences
-(`int_valued_of_consecutive`, `DiscreteCalculus.lean`)
-extend integrality everywhere. -/
-theorem IsDiagonalPoly.intValued {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree ≤ k)
-    (hP : S.IsDiagonalPoly k P) :
+/-- **Integrality everywhere**: any `P` satisfying the law is integer-valued on
+all of `ℤ` — the `k+1` onset points `n = 2k+1 .. 3k+1` are integer
+(`IsDiagonalPoly.eval_onset`) and consecutive, so finite differences
+(`int_valued_of_consecutive`, `DiscreteCalculus.lean`) extend integrality
+everywhere, the degree being `≤ k` (`IsDiagonalPoly.natDegree_le`). -/
+theorem IsDiagonalPoly.intValued {k : ℕ} {P : Polynomial ℚ} (hP : S.IsDiagonalPoly k P) :
     ∀ m : ℤ, ∃ z : ℤ, P.eval (m : ℚ) = (z : ℚ) := by
-  refine int_valued_of_consecutive k P ((2 * k + 1 : ℕ) : ℤ) hdeg fun i hi => ?_
+  refine int_valued_of_consecutive k P ((2 * k + 1 : ℕ) : ℤ) hP.natDegree_le fun i hi => ?_
   obtain ⟨z, hz⟩ := hP.eval_onset_int
     (show 2 * k + 1 ≤ 2 * k + 1 + i by omega) (show 2 * k + 1 + i ≤ 3 * k + 1 by omega)
   refine ⟨z, ?_⟩

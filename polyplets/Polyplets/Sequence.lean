@@ -23,7 +23,7 @@ together:
   `T_eq_toFinset_card` reads `T` as a `Finset.card`;
 * `IsPolyplet.height_le` and `height_eq_iff` : `1 ≤ height S ≤ n`, and
   `height S = H` says exactly that every `y ≤ H - 1` with some `y = H - 1`
-  (`mem_heightClass_iff` is the five-clause form of membership in
+  (`mem_heightClass_iff_rows` is the five-clause form of membership in
   `heightClass n H`);
 * `a_eq_sum` : `a n = ∑ H ∈ Finset.Icc 1 n, T n H`, the polyplets of `n`
   cells partitioned by height;
@@ -69,7 +69,7 @@ lemma height_eq_iff {n H : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) 
 
 /-- Membership in `heightClass n H`, spelled out: a polyplet of `n` cells with
 no cell above row `H - 1` and a cell on it. -/
-lemma mem_heightClass_iff {n H : ℕ} {S : Finset (ℤ × ℤ)} :
+lemma mem_heightClass_iff_rows {n H : ℕ} {S : Finset (ℤ × ℤ)} :
     S ∈ heightClass n H ↔
       IsPolyplet n S ∧ (∀ p ∈ S, p.2 ≤ (H : ℤ) - 1) ∧ ∃ p ∈ S, p.2 = (H : ℤ) - 1 := by
   rw [mem_heightClass]
@@ -81,7 +81,7 @@ lemma mem_heightClass_iff {n H : ℕ} {S : Finset (ℤ × ℤ)} :
 /-- **Anchored projections are bounded by the cell count.** If a `1`-Lipschitz
 coordinate `proj` vanishes somewhere on a king-connected `S`, then it is at most
 `n - 1` everywhere on `S`: the values `0, 1, …, proj p` are *all* attained (king
-paths skip no value, `exists_proj_eq_of_cross`), so `S` has at least
+paths skip no value, `RowLocal.exists_proj_eq_of_cross`), so `S` has at least
 `proj p + 1` distinct `proj`-fibers. Stated once for both coordinates — and, as
 the proof shows, without
 needing `proj` to be nonnegative on `S`. -/
@@ -98,7 +98,8 @@ lemma card_bound_of_anchored {n : ℕ} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ
     rcases eq_or_lt_of_le hj.2 with hjm | hjm
     · exact ⟨p, hp, hjm.symm⟩
     · obtain ⟨c, hcS, hcj⟩ :=
-        exists_proj_eq_of_cross (k := j) proj hlip (hconn p0 hp0S p hp) (by omega) (by omega)
+        RowLocal.exists_proj_eq_of_cross (k := j) proj hlip (hconn p0 hp0S p hp) (by omega)
+          (by omega)
       exact ⟨c, hcS, hcj⟩
   have hbd : (Finset.Icc (0 : ℤ) (proj p)).card ≤ n := by
     calc (Finset.Icc (0 : ℤ) (proj p)).card
@@ -161,31 +162,23 @@ theorem T_eq_toFinset_card (n H : ℕ) :
 /-! ## The sum identity -/
 
 /-- **`a` is the row sum of the height triangle.** `height` sorts the
-polyplets of `n` cells into the height classes counted by `T n H`, the classes
-are disjoint because `height` is a function, and only heights `1 … n` occur
+polyplets of `n` cells into the height classes counted by `T n H`
+(`Finset.card_eq_sum_card_fiberwise`), and only heights `1 … n` occur
 (`one_le_height`, `IsPolyplet.height_le`). Unconditional: at `n = 0` both
 sides are `0` (no polyplet has `0` cells, and `Finset.Icc 1 0` is empty). -/
 theorem a_eq_sum (n : ℕ) :
     a n = ∑ H ∈ Finset.Icc 1 n, T n H := by
-  have hbi : (polyplets_finite n).toFinset
-      = (Finset.Icc 1 n).biUnion fun H => (heightClass_finite n H).toFinset := by
-    ext S
-    simp only [Set.Finite.mem_toFinset, Finset.mem_biUnion, Finset.mem_Icc, mem_polyplets,
-      mem_heightClass]
-    constructor
-    · intro hS
-      exact ⟨height S, ⟨one_le_height S, hS.height_le⟩, hS, rfl⟩
-    · rintro ⟨H, -, hS, -⟩
-      exact hS
-  have hdisj : ∀ x ∈ Finset.Icc 1 n, ∀ y ∈ Finset.Icc 1 n, x ≠ y →
-      Disjoint ((heightClass_finite n x).toFinset) ((heightClass_finite n y).toFinset) := by
-    intro x _ y _ hxy
-    rw [Finset.disjoint_left]
-    intro S hSx hSy
-    rw [Set.Finite.mem_toFinset] at hSx hSy
-    exact hxy (hSx.2.symm.trans hSy.2)
-  rw [a, Set.ncard_eq_toFinset_card _ (polyplets_finite n), hbi, Finset.card_biUnion hdisj]
-  exact Finset.sum_congr rfl fun H _ => (T_eq_toFinset_card n H).symm
+  classical
+  rw [a, Set.ncard_eq_toFinset_card _ (polyplets_finite n),
+    Finset.card_eq_sum_card_fiberwise (f := height) (t := Finset.Icc 1 n)
+      fun S hS => by
+        rw [Finset.mem_coe, Set.Finite.mem_toFinset] at hS
+        exact Finset.mem_coe.mpr <| Finset.mem_Icc.mpr ⟨one_le_height S, hS.height_le⟩]
+  refine Finset.sum_congr rfl fun H _ => ?_
+  rw [T_eq_toFinset_card]
+  congr 1
+  ext S
+  simp [mem_heightClass, mem_polyplets]
 
 /-! ## The §9 strip-capture lower bound -/
 

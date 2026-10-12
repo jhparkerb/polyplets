@@ -31,7 +31,7 @@ live outside the induction. The main step feeds `d_rec` through `d_iter_down`
 the diagonal `s = j + t`, at which point `Mu.mu_bigRange` recognizes the
 coefficient as `μ s − 3·eps s` and the algebra closes.
 
-The statement was verified on banked data at all 170 in-range instances
+The statement was verified on the enumerated table at all 170 in-range instances
 (`experiments/staircase_check.py`); `Checks.lean` instantiates it at
 `(k, H) = (1, 2)` and `(2, 3)`.
 -/

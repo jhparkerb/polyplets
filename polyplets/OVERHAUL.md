@@ -117,8 +117,15 @@ TODO.
       About 500 lines.
 - [ ] C2. One "least coordinate" definition. `corner`/`anchor`
       (`Symmetry`), `hmin` (`SymmetryRatio`), `minX` (`RowLocal/TopRow`),
-      `baseX`/`baseY` (`Growth`) each carry their own translation lemma, and
-      `anchor` is not defined through `translate`. Put the min-of-`f`
+      `baseX`/`baseY` (`Growth`), `scanAnchorX` (`UpperBound`, the least
+      `Prod.fst` over row 0) each carry their own translation lemma, and
+      `anchor` is not defined through `translate`; the maximum side is the
+      same twin: `height` (`Defs`) and `maxX` (`Growth`) are one sup of a
+      coordinate, each with its own bound-and-attained lemmas. With it:
+      the `Anchored` docstring's "every fixed animal has exactly one
+      anchored translate" is asserted, not proved; `anchor_anchored`,
+      `anchor_eq_self` and `anchor_image_add` (`Symmetry`) are its pieces,
+      about 15 lines once `corner`/`anchor` live in `RowLocal/Defs`. Put the min-of-`f`
       definition and its image lemma in `RowLocal/Defs` beside
       `translate`, define `corner` from it and
       `anchor S = translate (-corner S) S`, and make the others its
@@ -137,7 +144,10 @@ TODO.
 - [ ] C4. Aliases of `translate`: `RowLocal/TopRow.shift`; `Peel.rowSize_shift`
       at `b = 0` is `Enum.rowSize_translate_x`. Use `translate` directly and
       put `rowSize_shift` in `RowLocal/Defs`. (`Growth.shiftBy` done
-      2026-10-12: `translate` with `mem_translate_mk`.)
+      2026-10-12: `translate` with `mem_translate_mk`.) `translate` itself is
+      Mathlib's pointwise `v +ᵥ S` up to `add_comm` (`translate_translate` is
+      `vadd_vadd`, `card_translate` is `Finset.card_vadd_finset`, and so on);
+      switching touches every user, so only with the rest of this item.
 - [ ] C5. Small twins: `Enum.minX`/`minY` with `minX_le`, `exists_minX`
       and the halves of `corner_cells`, parametrized by the projection;
       the polyplet box bound rederived in `Enum` (three sites),
@@ -150,6 +160,20 @@ TODO.
       `CategoryTheory.Action.Concrete` were dropped 2026-10-12 (peak 2.12 →
       1.80 GB) and `Enum` no longer imports `Growth`; a pass of
       `scripts/lean-min-imports.sh` over the tree would find the rest.
+- [ ] C7. `Asym n` is `Free n − Bilateral n` by definition (truncated ℕ
+      subtraction), so `report_asymmetric` is `rfl` and Lean cannot state
+      the report's "bilateral + asymmetric = free" (no `Bilateral ≤ Free`).
+      Define the chiral polyplets as the complement of `achiral n` (a
+      `SubMulAction`, invariant since D4 is a group), `Asym` as the number
+      of their D4-orbits, and prove `Bilateral n + Asym n = Free n` by
+      splitting the orbit quotient along the invariant predicate; then
+      `report_asymmetric` states that sum. About 40–60 lines in `Symmetry`,
+      plus `Report`, `Audit` and the README row.
+- [ ] C8. `Staircase/Climb.enumerated` is keyed by `(n, H)` so that a reviewer
+      compares it against `results/triangle.txt` by cell; the two-argument
+      literal match costs about 1 s of equation-lemma generation per build
+      of `Climb.lean` (measured 2026-10-12; a one-argument table keyed by
+      level costs 0.08 s). Leave unless the table is touched anyway.
 
 ## Queue B — the Lean behind the L-papers
 
@@ -167,7 +191,8 @@ TODO.
       counts; `StairGrowth`'s `docs/lean-record.md` reference.
 - [x] B3. Imports, lints, docstrings, loose `#print axioms`, guards for
       these modules (A1–A4 applied to `RowLocal/`, `Upper/`, `Stair*`).
-- [x] B4 (2026-10-12, with A7). `RowLocal/Compute.pin` duplicates `Pin.pin`;
+- [x] B4 (2026-10-12, with A7). `Universal/Compute.pin` duplicated `Pin.pin`
+      (now `RowLocal/Compute.isDiagonalPoly_of_eval`, the only copy);
       `RowLocal/TopRow` duplicates `RowLocal/TopRow`.
 - [x] B5 (2026-10-12: regenerated RD=3 against the oracle, 0 diff lines; RD=2
       likewise). `Upper`: the `RatCert` data files were converted in place
@@ -193,7 +218,7 @@ TODO.
   the Report cone. Every `Report.lean` theorem is on
   `[propext, Classical.choice, Quot.sound]` alone.
 - Delete outside the Report cone (2026-10-12, third checkpoint): 60 modules,
-  24k lines; `DiagonalPolys.lean` cut to the polynomials, the pin lemma and
+  24k lines; `Pin.lean` (now `DiagonalPolys.lean`) cut to the polynomials, the pin lemma and
   `P1_closed`. Reversed the same day for the L-paper modules `RowLocal/`,
   `Upper/`, `StairAnimals`, `StairGrowth` (restored from 697f376); the rest
   (GapWalk/DepthOne/Kernel, Holes, V5Denominator, Northcott, IntCoeff,

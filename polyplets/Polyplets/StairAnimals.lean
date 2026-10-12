@@ -93,20 +93,6 @@ def cut : ℕ → List Column → List Column × List Column
   | nil => simp
   | cons c t ih => simp [area_cons, ih, Nat.add_assoc]
 
-/-- Every column of a valid continuation has positive height, so a nonempty
-continuation has positive area. -/
-theorem area_pos_of_validFrom {p : ℕ} : ∀ {l : List Column}, ValidFrom p l → l ≠ [] → 0 < area l
-  | [], _, h => absurd rfl h
-  | c :: t, hv, _ => by
-      have : 1 ≤ c.1 := hv.1
-      simp only [area_cons]
-      omega
-
-/-- The unfolding lemma for `ValidFrom` at a cons, stated so proofs can name the
-three constraints rather than re-deriving them from the definition. -/
-theorem validFrom_cons {p : ℕ} {c : Column} {t : List Column} :
-    ValidFrom p (c :: t) ↔ 1 ≤ c.1 ∧ c.2 ≤ p ∧ p ≤ c.1 + c.2 ∧ ValidFrom c.1 t := Iff.rfl
-
 /-- Appending a legal continuation to a valid animal keeps `ValidFrom`. -/
 theorem validFrom_append {p : ℕ} : ∀ {x : List Column} {y : List Column},
     ValidFrom p x → x ≠ [] → ValidFrom (lastHeight x) y → ValidFrom p (x ++ y)

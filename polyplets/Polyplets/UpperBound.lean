@@ -203,7 +203,7 @@ lemma neighborsOf_nodup (c : ℤ × ℤ) : (neighborsOf c).Nodup := by
 
 /-- Strictly scan-greater than the origin: `(0,0) < q` in the row-major scan
 order (`y` first, then `x`). Exactly the cells a shape may contain besides its
-own scanAnchor. -/
+own scan-least cell. -/
 def scanPos (q : ℤ × ℤ) : Bool :=
   decide (0 < q.2) || (decide (q.2 = 0) && decide (0 < q.1))
 
@@ -227,7 +227,7 @@ private lemma offsetFar_count_le :
     ∀ e ∈ neighborOffsets, neighborOffsets.countP (offsetFar e) ≤ 5 := by
   decide
 
-/-- **The proposal budget for a non-scanAnchor cell.** If `c` has an already-decided
+/-- **The proposal budget for a cell other than the scan-least one.** If `c` has an already-decided
 king neighbor `p`, then any predicate that only holds on cells distinct from
 `p` and not adjacent to `p` selects at most five of `c`'s eight neighbors.
 Applied with `P` = "scan-positive and not yet considered", `p` = the proposer of
@@ -794,11 +794,11 @@ private lemma scanAnchorSet_nonempty {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : I
   rw [Set.mem_setOf_eq, hpe]
   exact hp
 
-/-- The scanAnchor is a cell of the animal. -/
+/-- The scan-least cell is a cell of the animal. -/
 lemma scanAnchor_mem {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) : scanAnchor S ∈ S :=
   Nat.sInf_mem (scanAnchorSet_nonempty hS)
 
-/-- The scanAnchor is leftmost in row `0`. -/
+/-- The scan-least cell is leftmost in row `0`. -/
 lemma scanAnchor_min {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) {q : ℤ × ℤ}
     (hq : q ∈ S) (hq2 : q.2 = 0) : (scanAnchor S).1 ≤ q.1 := by
   have hx := hS.anchored.x_nonneg q hq
@@ -811,8 +811,8 @@ lemma scanAnchor_min {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) {
   omega
 
 /-- **A polyplet anchors to a shape.** Size and connectivity survive
-the translation; the origin is the image of the scanAnchor; and every other cell is
-scan-greater because the scanAnchor is scan-least. -/
+the translation; the origin is the image of the scan-least cell; and every other
+cell is scan-greater. -/
 lemma isShape_expShape {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsPolyplet n S) :
     IsShape n (expShape S) where
   card := by rw [expShape, card_translate, hS.card]

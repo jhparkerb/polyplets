@@ -26,7 +26,7 @@ swap is a plain `Finset.sum_comm`/`Finset.sum_comm'` transposition (`μ`'s index
 passes through unchanged; the `ℓ`-sum rides along inside `j`) — no convolution
 collapse is needed here, unlike `d_staircase`.
 
-The statement was verified on banked data at all 170 in-range instances
+The statement was verified on the enumerated table at all 170 in-range instances
 (`experiments/staircase_check.py`); `Checks.lean` instantiates it at
 `(k, H) = (1, 2)`: `T 4 3 = 3·T 3 2 + (25/3)·T 2 2 = 55`.
 -/

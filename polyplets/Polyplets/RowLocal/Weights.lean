@@ -10,7 +10,7 @@ import Polyplets.RowLocal.RowProfile
 # Peeling weights: walk-top counts `d L` and cluster configurations `V L`, `Vᵗ L`
 
 `Weights.lean` generically. The primary object is `d L k H`, the number of
-canonical height-`H`, surplus-`k` `L`-animals whose **top row is a walk row**;
+height-`H`, surplus-`k` `L`-animals whose **top row is a walk row**;
 the recursion's weights aggregate cluster configurations by (rows `ℓ`,
 surplus `j`) only:
 
@@ -38,13 +38,13 @@ built directly as `Set.Finite.toFinset` of the propositionally-described
 sets, and the `mem_*` lemmas are `Set.Finite.mem_toFinset`.
 
 Finiteness replaces window-independence: it is the same x-spread bound
-(`connected_abs_x_le`, now with reach `M`) applied to the whole family at once.
+(`connected_abs_x_le`, now with the reach) applied to the whole family at once.
 The instance cells come from `RowLocal/Compute.lean`'s counter.
 -/
 
 namespace Polyplets.RowLocal
 
-/-! ## Row size and walk-top canonical sets -/
+/-! ## Row size and walk-top animals -/
 
 /-- The number of cells of `S` in row `y`. `rowSize S r = 1` is exactly
 `IsWalkRow S r`. -/
@@ -55,7 +55,7 @@ def rowSize (S : Finset (ℤ × ℤ)) (y : ℤ) : ℕ :=
 lemma isWalkRow_iff_rowSize {S : Finset (ℤ × ℤ)} {r : ℤ} :
     IsWalkRow S r ↔ rowSize S r = 1 := Iff.rfl
 
-/-- The full canonical enumeration finset at `(H + k, H)`. -/
+/-- The full enumeration finset of animals at `(H + k, H)`. -/
 noncomputable def animals (L : Lattice) (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
   (animals_finite L (H + k) H).toFinset
 
@@ -66,17 +66,17 @@ lemma mem_animals {L : Lattice} {k H : ℕ} {S : Finset (ℤ × ℤ)} :
 lemma card_animals (L : Lattice) (k H : ℕ) :
     (animals L k H).card = T L (H + k) H := (T_eq_toFinset_card L (H + k) H).symm
 
-/-- **Walk-top canonical sets**: the canonical `(n = H + k, H)` animals whose
+/-- **Walk-top animals**: the `(n = H + k, H)` animals whose
 top row `H - 1` is a walk row. -/
 noncomputable def walkTop (L : Lattice) (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
   (animals L k H).filter fun S => rowSize S ((H : ℤ) - 1) = 1
 
-/-- `d L k H`: the number of canonical height-`H` surplus-`k` `L`-animals whose
+/-- `d L k H`: the number of height-`H` surplus-`k` `L`-animals whose
 top row is a walk row — the primary object of the peeling recursion. -/
 noncomputable def d (L : Lattice) (k H : ℕ) : ℕ := (walkTop L k H).card
 
 /-- **Propositional characterization of `walkTop`**: membership is exactly
-canonicality plus walk top row. -/
+`IsAnimal` plus walk top row. -/
 theorem mem_walkTop {L : Lattice} {k H : ℕ} {S : Finset (ℤ × ℤ)} :
     S ∈ walkTop L k H ↔ IsAnimal L (H + k) H S ∧ rowSize S ((H : ℤ) - 1) = 1 := by
   rw [walkTop, Finset.mem_filter, mem_animals]
@@ -124,7 +124,7 @@ abbrev IsTopConfig (L : Lattice) (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop 
 
 /-- **Finiteness of a configuration family**: a configuration has
 `ℓ + j + 1 + cap` cells, is connected and contains the origin, so it lies in
-the box `[-M(ℓ+j+cap), M(ℓ+j+cap)] × [0, ℓ+cap]`. -/
+the box `[-reach·(ℓ+j+cap), reach·(ℓ+j+cap)] × [0, ℓ+cap]`. -/
 lemma config_finite (L : Lattice) (cap ℓ j : ℕ) :
     {S : Finset (ℤ × ℤ) | IsConfig L cap ℓ j S}.Finite := by
   apply Set.Finite.subset

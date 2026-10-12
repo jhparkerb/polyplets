@@ -154,6 +154,12 @@ theorem le_growth_pow {n : ℕ} (hn : 1 ≤ n) : (F.f n : ℝ) ≤ F.growth ^ n 
     _ ≤ Real.exp ((n : ℝ) * (-F.subadditive.lim)) := Real.exp_le_exp.mpr (by linarith)
     _ = F.growth ^ n := by rw [growth]; exact Real.exp_nat_mul _ n
 
+/-- **A term above `q ^ n` puts `q` below the growth constant**: from
+`le_growth_pow`, as `x ↦ x ^ n` is strictly monotone on `[0, ∞)`. -/
+theorem lt_growth_of_pow_lt {n : ℕ} (hn : 1 ≤ n) {q : ℝ} (h : q ^ n < F.f n) :
+    q < F.growth :=
+  lt_of_pow_lt_pow_left₀ n F.growth_pos.le (lt_of_lt_of_le h (F.le_growth_pow hn))
+
 /-- The ceiling passes to the limit: `growth ≤ c`. -/
 theorem growth_le : F.growth ≤ F.c := by
   have hbd : -Real.log F.c ≤ F.subadditive.lim := by

@@ -35,7 +35,7 @@ The payoff:
 * `a_le_lambda_pow` : `a n ≤ lambda ^ n` (Fekete's limit-is-supremum half);
 * `lambda_le_3125_div_256` : `lambda ≤ 3125 / 256 = 5⁵/4⁴`;
 * `lambda_gt_of_a_40` : `311/50 = 6.22 < lambda`, **conditional** on the
-  banked hypothesis `a 40 = 56749893611764175164545926946127`.
+  hypothesis `a 40 = 56749893611764175164545926946127`.
 
 ## The concatenation injection
 
@@ -83,16 +83,11 @@ lemma mem_translate_mk {e d : ℤ} {q : ℤ × ℤ} {S : Finset (ℤ × ℤ)} :
   · rintro ⟨p, hp, h1, h2⟩
     exact ⟨p, hp, Prod.ext h1.symm h2.symm⟩
 
-/-- Two translations compose. -/
-lemma translate_mk_translate_mk (e d e' d' : ℤ) (S : Finset (ℤ × ℤ)) :
-    translate (e', d') (translate (e, d) S) = translate (e + e', d + d') S := by
-  rw [translate_translate, Prod.mk_add_mk]
-
 /-- **Translation is undone by the opposite translation.** Stated with the
 cancellation as hypotheses so that it applies without any `-0`/`0` mismatch. -/
 lemma translate_mk_cancel {e d e' d' : ℤ} (he : e + e' = 0) (hd : d + d' = 0)
     (S : Finset (ℤ × ℤ)) : translate (e', d') (translate (e, d) S) = S := by
-  rw [translate_mk_translate_mk, he, hd]
+  rw [translate_translate, Prod.mk_add_mk, he, hd]
   exact translate_zero S
 
 /-! ## `a n ≥ 1`: the bar witness
@@ -517,8 +512,7 @@ of sizes `m` and `n` into the polyplets of size `m + n`;
 `leftPart`/`rightPart` are the left inverse that makes it an injection.
 
 Unconditional: at `m = 0` the left side is `a 0 * a n = 0` and the
-inequality degenerates to `0 ≤ a n`. (The outworks brief pinned a `1 ≤ m`,
-`1 ≤ n` signature; the hypotheses were dead and dropped 2026-07-31.) -/
+inequality degenerates to `0 ≤ a n`. -/
 theorem a_supermul {m n : ℕ} : a m * a n ≤ a (m + n) := by
   classical
   have key : ∀ k : ℕ, a k = (polyplets_finite k).toFinset.card := fun k => by
@@ -597,17 +591,17 @@ theorem a_le_lambda_pow {n : ℕ} (hn : 1 ≤ n) : (a n : ℝ) ≤ lambda ^ n :=
 of `UpperBound.lean`. -/
 theorem lambda_le_3125_div_256 : lambda ≤ 3125 / 256 := polypletFekete.growth_le
 
-/-! ## The conditional lower bound from the banked final term
+/-! ## The conditional lower bound from the enumerated final term
 
-The project's banked table reaches `a 40`, and Fekete's `a n ≤ λⁿ` turns
-*any* banked term into a lower bound for `λ`. Taking the banked value as an
+The enumerated table reaches `a 40`, and Fekete's `a n ≤ λⁿ` turns *any*
+term into a lower bound for `λ`. Taking the enumerated value as an
 explicit hypothesis, as `Staircase/Climb.lean` takes its enumerated cells, keeps the
 computation outside the kernel and visible in the statement. (An
 unconditional `3.95 < λ` from the `native_decide` fact `a 6 = 3832` was
 removed 2026-10-12 with that fact.) -/
 
-/-- **The conditional lower bound `6.22 < λ`, given the banked final term.**
-`a 40 = 56749893611764175164545926946127` is the last term of the banked
+/-- **The conditional lower bound `6.22 < λ`, given the enumerated final term.**
+`a 40 = 56749893611764175164545926946127` is the last term of the enumerated
 triangle (`results/triangle.txt`, provenance `results/ns_a40/PROVENANCE.md`);
 it enters here as a hypothesis, not as a computation. From it,
 `(311/50)⁴⁰ = 6.22⁴⁰ < a 40 ≤ λ⁴⁰` — an exact integer comparison,
@@ -621,12 +615,9 @@ single-source value (the top of the table is kink-engine-only; see
 weaker than the unformalized strip ladder. -/
 theorem lambda_gt_of_a_40 (h : a 40 = 56749893611764175164545926946127) :
     (311 / 50 : ℝ) < lambda := by
-  have hle : ((56749893611764175164545926946127 : ℕ) : ℝ) ≤ lambda ^ 40 := by
-    have := a_le_lambda_pow (n := 40) (by norm_num)
-    rwa [h] at this
-  have hpow : ((311 / 50 : ℝ)) ^ 40 < lambda ^ 40 := by
-    refine lt_of_lt_of_le ?_ hle
-    norm_num
-  exact lt_of_pow_lt_pow_left₀ 40 (le_of_lt lambda_pos) hpow
+  refine polypletFekete.lt_growth_of_pow_lt (n := 40) (by norm_num) ?_
+  change (311 / 50 : ℝ) ^ 40 < (a 40 : ℝ)
+  rw [h]
+  norm_num
 
 end Polyplets

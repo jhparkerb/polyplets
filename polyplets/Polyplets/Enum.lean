@@ -718,16 +718,9 @@ theorem exists_isLeaf {S : Finset (ℤ × ℤ)} (hS : KingConnected S) (h2 : 2 �
 /-- A cell of a connected set of two or more cells has a neighbour in it. -/
 lemma exists_adj_of_connected {S : Finset (ℤ × ℤ)} (hS : KingConnected S) (h2 : 2 ≤ S.card)
     {c : ℤ × ℤ} (hc : c ∈ S) : ∃ q ∈ S, q ≠ c ∧ kingAdj c q := by
-  obtain ⟨r, hr, hrc⟩ : ∃ r ∈ S, r ≠ c := by
-    by_contra h
-    push Not at h
-    have : S ⊆ {c} := fun x hx => Finset.mem_singleton.mpr (h x hx)
-    have := Finset.card_le_card this
-    rw [Finset.card_singleton] at this
-    omega
-  rcases Relation.ReflTransGen.cases_head (hS c hc r hr) with h | ⟨q, ⟨-, hqS, hadj⟩, -⟩
-  · exact absurd h.symm hrc
-  · exact ⟨q, hqS, fun h => hadj.1 h.symm, hadj⟩
+  obtain ⟨r, hr, hrc⟩ := Finset.exists_mem_ne (s := S) (by omega) c
+  obtain ⟨a, -, b, hb, rfl, hbc, hab⟩ := exists_edge_of_connected hS (· = c) hc hr rfl hrc
+  exact ⟨b, hb, hbc, hab⟩
 
 /-- Row-major order on cells: the order of bit indices. -/
 def rowMajor (c : ℤ × ℤ) : Lex (ℤ × ℤ) := toLex (c.2, c.1)
@@ -1213,26 +1206,6 @@ lemma boards_succ (n : ℕ) (hn : 1 ≤ n) :
   obtain ⟨k, rfl⟩ : ∃ k, n = k + 1 := ⟨n - 1, by omega⟩
   rfl
 
-/-- `{(0, 0)}` is the only polyplet of one cell. -/
-lemma isPolyplet_one_iff {S : Finset (ℤ × ℤ)} :
-    IsPolyplet 1 S ↔ S = {((0 : ℤ), (0 : ℤ))} := by
-  constructor
-  · intro h
-    obtain ⟨p, hp⟩ := Finset.card_eq_one.mp h.card
-    obtain ⟨q, hq, hq1⟩ := h.anchored.x_zero
-    obtain ⟨r, hr, hr2⟩ := h.anchored.y_zero
-    rw [hp, Finset.mem_singleton] at hq hr
-    rw [hp]
-    congr 1
-    exact Prod.ext (hq ▸ hq1) (hr ▸ hr2)
-  · rintro rfl
-    refine ⟨Finset.card_singleton _, kingConnected_singleton _, ?_⟩
-    · refine ⟨fun p hp => ?_, ⟨_, Finset.mem_singleton_self _, rfl⟩, fun p hp => ?_,
-        ⟨_, Finset.mem_singleton_self _, rfl⟩⟩ <;>
-      · rw [Finset.mem_singleton] at hp
-        subst hp
-        exact le_rfl
-
 /-- **The enumeration is exact**: for `1 ≤ n ≤ 14`, the boards of `boards n` are
 in the box, pairwise distinct, and their cells are exactly the polyplets
 animals of `n` cells. -/
@@ -1428,7 +1401,7 @@ lemma ncard_config {N h : ℕ} {R : Finset (ℤ × ℤ) → Prop}
     have hne : S.Nonempty := ⟨_, h0⟩
     have hre' := hre S h0 fun p hp => (hrows p hp).1
     have hcan : Polyplets.anchor S ∈ heightClass N h := by
-      refine mem_heightClass_iff.mpr
+      refine mem_heightClass_iff_rows.mpr
         ⟨⟨by rw [anchor_card, hcard], kingConnected_anchor hconn, anchor_anchored hne⟩, ?_, ?_⟩
       · intro p hp
         rw [hre', mem_translate] at hp
@@ -1460,7 +1433,7 @@ lemma ncard_config {N h : ℕ} {R : Finset (ℤ × ℤ) → Prop}
     rwa [hax, translate_translate, translate_translate, Prod.mk_add_mk, neg_add_cancel, add_zero,
       Prod.mk_zero_zero, translate_zero, translate_zero] at h1
   · rintro S' ⟨hS', hh, hr0, hRS'⟩
-    have hcan := mem_heightClass_iff.mp (mem_heightClass.mpr ⟨hS', hh⟩)
+    have hcan := (height_eq_iff hS').mp hh
     obtain ⟨q, hq, hqy⟩ : ∃ q ∈ S', q.2 = 0 := by
       obtain ⟨r, hr⟩ := Finset.card_eq_one.mp hr0
       have : r ∈ S'.filter (fun c => c.2 = 0) := by rw [hr]; exact Finset.mem_singleton_self r
@@ -1472,7 +1445,7 @@ lemma ncard_config {N h : ℕ} {R : Finset (ℤ × ℤ) → Prop}
     · intro p hp
       rw [mem_translate] at hp
       have h1 := hS'.anchored.y_nonneg _ hp
-      have h2 := hcan.2.1 _ hp
+      have h2 := hcan.1 _ hp
       simp only [Prod.snd_sub, sub_zero] at h1 h2
       exact ⟨h1, h2⟩
     · rw [rowSize_translate_x]; exact hr0
@@ -1699,7 +1672,7 @@ open Enum
 
 /-! ## The onset cells the development consumes
 
-Kernel-decided through the enumerator: `T 3 2` and `T 4 3` pin `P_1`
+Kernel-decided through the enumerator: `T 3 2` and `T 4 3` determine `P_1`
 (`DiagonalPolys.lean`, `Staircase/Climb.lean`), `a 3` is the base of the growth lower
 bound `20 ^ (n / 3) ≤ a n` (`SymmetryRatio.lean`). Further cells are checked
 in `Checks.lean`. -/

@@ -146,9 +146,9 @@ namespace Polyplets
 #guard_msgs in
 #print axioms RowLocal.exists_isDiagonalPoly
 
-/-- info: 'Polyplets.RowLocal.IsDiagonalPoly.intValued' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.RowLocal.TopRowRecursion.IsDiagonalPoly.intValued' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms RowLocal.IsDiagonalPoly.intValued
+#print axioms RowLocal.TopRowRecursion.IsDiagonalPoly.intValued
 
 /-- info: 'Polyplets.Staircase.M_supermul' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in

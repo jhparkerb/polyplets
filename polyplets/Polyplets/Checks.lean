@@ -15,7 +15,7 @@ import Polyplets.RowLocal.Square
 
 Small kernel-decided values and numeric instances of the recursions, kept
 out of the library modules the way a test file is: the root target builds
-this module, nothing imports it. Each value is a banked engine number
+this module, nothing imports it. Each value is an engine number
 (`results/triangle.txt`, `results/sym_counts.txt`, OEIS) or a paper count;
 a mismatch fails the build. The facts a proof actually needs (`T_1_1`,
 `T_3_2`, `T_4_3`, `V_1_1`, `Vt_1_1`, `d_0_1`, the first enumerated cell of each lattice)
@@ -75,7 +75,7 @@ theorem d_staircase_1_2 : (d 1 3 : ℚ) = mu 0 * d 1 2 + mu 1 * d 0 2 := by
   have h := d_staircase 2 1 (by norm_num)
   simpa only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Nat.sub_zero] using h
 
-/-- …and its right-hand side evaluates to the banked `d 1 3 = 40`:
+/-- …and its right-hand side evaluates to the enumerated `d 1 3 = 40`:
 `3·5 + (25/3)·3`. -/
 theorem d_staircase_value_1_2 : mu 0 * (d 1 2 : ℚ) + mu 1 * (d 0 2 : ℚ) = 40 := by
   rw [mu_zero, mu_one, d_1_2, d_0_2]; norm_num
@@ -97,7 +97,7 @@ theorem T_staircase_value_1_2 : mu 0 * (T 3 2 : ℚ) + mu 1 * (T 2 2 : ℚ) = 55
 
 /-! ## `T_self` against the triangle -/
 
-/-- `T(n, n) = 3^(n-1)` gives the banked `T 3 3 = 9`. -/
+/-- `T(n, n) = 3^(n-1)` gives the enumerated `T 3 3 = 9`. -/
 theorem T_self_3_3 : T 3 3 = 9 := by
   have h := T_self 3 (by omega)
   have he : ((3 : ℕ) : ℤ) - 1 = 2 := by omega

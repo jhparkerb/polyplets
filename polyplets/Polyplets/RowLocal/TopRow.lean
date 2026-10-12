@@ -20,18 +20,19 @@ row-local lattice `L`:
 where `b = L.D.card` is the drift count. Both follow from a disjoint split on
 the row profile near the top and three peeling bijections:
 
-* **Class A** (walk top and walk second-top row): erasing the unique top cell
-  and anchoring is a bijection onto `L.D × walkTop L k (H-1)`; the extra datum is
-  the x-offset of the top cell over the second-top cell, which is an up-offset
-  of `L` (`card_walkWalk`).
-* **Classes B and C** are one bijection, `peelCluster cap H` with `glueCluster`, for a
-  cluster whose top row `H - 1 - cap` has `cap` walk rows above it
-  (`card_cluster`): peeling the maximal cluster `[b, H-1-cap]` together with the
-  walk cell directly below (row `b-1`) and the `cap` walk cells above is a
-  bijection onto `Σ (j,ℓ), configs L cap ℓ j × walkTop L (k-j) (H-cap-ℓ)`. Class B
+* **Walk on walk** (walk top and walk second-top row): erasing the unique top
+  cell and anchoring is a bijection onto `L.D × walkTop L k (H-1)`; the extra
+  datum is the x-offset of the top cell over the second-top cell, which is an
+  up-offset of `L` (`card_walkWalk`).
+* **Walk on cluster** and **cluster at top** are one bijection,
+  `peelCluster cap H` with `glueCluster`, for a cluster whose top row
+  `H - 1 - cap` has `cap` walk rows above it (`card_cluster`): peeling the
+  maximal cluster `[b, H-1-cap]` together with the walk cell directly below
+  (row `b-1`) and the `cap` walk cells above is a bijection onto
+  `Σ (j,ℓ), configs L cap ℓ j × walkTop L (k-j) (H-cap-ℓ)`. Walk on cluster
   (walk top, multi second-top row) is `cap = 1`, onto the `V`-configurations
-  (`card_walkCluster`); class C (multi top row, for `T_of_d`) is `cap = 0`,
-  the cluster reaching the top edge, onto the `Vᵗ`-configurations
+  (`card_walkCluster`); cluster at top (multi top row, for `T_of_d`) is
+  `cap = 0`, the cluster reaching the top edge, onto the `Vᵗ`-configurations
   (`card_clusterTop`).
 
 Both share one x-renormalization pattern: the peeled configuration is
@@ -40,23 +41,14 @@ anchored by `anchorX`, and gluing shifts the configuration onto the
 remainder's unique top cell. Membership is always matched against the
 propositional characterizations `mem_walkTop` and `mem_configs`.
 
-## The verbatim wager, settled
-
-This file is `RowLocal/TopRow.lean` transcribed with `kingAdj ↦ Adj L` and
-`KingConnected ↦ Connected L`. Every proof carries over unchanged. The drift count
-enters at exactly **three** places, all inside class A:
-
-* `peelWalk_mem_and_glue`: the recorded offset lies in `L.D` — king
-  `|Δx| ≤ 1` becomes `adj_up_mem` (the top cell is one row above the second-top
-  cell, so their x-displacement IS an up-offset, by definition of `Adj`);
-* `glueWalk_mem_and_peel`: conversely every `δ ∈ L.D` re-attaches legally
-  (`adj_of_up`);
-* `card_walkWalk`: the target is `L.D ×ˢ walkTop L k (H-1)`, of cardinality
-  `L.b * d L k (H-1)` — the king `3` is `L.D.card`, nothing else.
-
-Classes B and C mention adjacency only through connectivity lemmas
-(`connected_band`, `connected_union`, `connected_translate`), which are lattice-agnostic. No
-proof needed the reach `L.reach`, the shape of `D`, or any arithmetic of `b`.
+The drift count enters at exactly three places, all in the walk-on-walk
+case: `peelWalk_mem_and_glue` (the recorded offset lies in `L.D`, by
+`adj_up_mem`), `glueWalk_mem_and_peel` (every `δ ∈ L.D` re-attaches, by
+`adj_of_up`) and `card_walkWalk` (the target `L.D ×ˢ walkTop L k (H-1)` has
+cardinality `L.b * d L k (H-1)`). The cluster cases mention adjacency only
+through the connectivity lemmas `connected_band`, `connected_union` and
+`connected_translate`. No proof needs the reach `L.reach`, the shape of `D`,
+or any arithmetic of `b`.
 -/
 
 namespace Polyplets.RowLocal
@@ -226,7 +218,7 @@ lemma exists_row_anchorX {S : Finset (ℤ × ℤ)} {y : ℤ} (h : ∃ c ∈ S, c
   change c.2 + 0 = y
   omega
 
-/-- Canonicality of a anchored piece: everything except the x-anchoring is
+/-- `IsAnimal` for an anchored piece: everything except the x-anchoring is
 inherited, and `anchorX` provides the anchoring. -/
 lemma isAnimal_anchorX {n H : ℕ} {S : Finset (ℤ × ℤ)}
     (hcard : S.card = n) (hconn : Connected L S)
@@ -355,7 +347,7 @@ lemma rowSize_insert_other {S : Finset (ℤ × ℤ)} {w : ℤ × ℤ} {y : ℤ}
     (hw : w.2 ≠ y) : rowSize (insert w S) y = rowSize S y := by
   rw [rowSize, Finset.filter_insert, if_neg hw, rowSize]
 
-/-! ## Class A: walk top over walk second-top
+/-! ## Walk on walk: walk top over walk second-top
 
 Peeling the top cell of a class-A animal and anchoring is a bijection onto
 `L.D × walkTop L k (H-1)`; the recorded offset `δ` (top cell x minus second-top cell
@@ -375,7 +367,7 @@ remainder's unique top cell, then anchor. -/
 noncomputable def glueWalk (H : ℕ) (x : ℤ × Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
   anchorX (insert ((rowCell x.2 ((H : ℤ) - 2)).1 + x.1, (H : ℤ) - 1) x.2)
 
-/-- Forward well-definedness and the peel-then-glue round trip for class A. -/
+/-- Forward well-definedness and the peel-then-glue round trip, walk on walk. -/
 lemma peelWalk_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)}
     (hS : S ∈ walkTop L k H) (hw2 : rowSize S ((H : ℤ) - 2) = 1) :
     peelWalk H S ∈ L.D ×ˢ walkTop L k (H - 1) ∧ glueWalk H (peelWalk H S) = S := by
@@ -498,7 +490,7 @@ lemma peelWalk_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × �
       _ = anchorX S := by rw [hS'_def, Finset.insert_erase hwS]
       _ = S := anchorX_eq_self hc.anchored.x_nonneg hc.anchored.x_zero
 
-/-- Backward well-definedness and the glue-then-peel round trip for class A. -/
+/-- Backward well-definedness and the glue-then-peel round trip, walk on walk. -/
 lemma glueWalk_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : ℤ × Finset (ℤ × ℤ)}
     (hx : x ∈ L.D ×ˢ walkTop L k (H - 1)) :
     (glueWalk H x ∈ walkTop L k H ∧ rowSize (glueWalk H x) ((H : ℤ) - 2) = 1) ∧
@@ -657,7 +649,7 @@ lemma card_walkWalk (k H : ℕ) (hH : k + 2 ≤ H) :
     rw [Finset.mem_coe] at hx
     exact (glueWalk_mem_and_peel hH hx).2
 
-/-! ## Cluster peeling: shared machinery for classes B and C -/
+/-! ## Cluster peeling: shared machinery for the two cluster cases -/
 
 /-- The bottom row of the maximal all-multi run of rows ending at `t`: the
 least `r ∈ [0, t]` such that every row of `[r, t]` holds at least two cells
@@ -717,24 +709,25 @@ lemma clusterBottom_spec {S : Finset (ℤ × ℤ)} {t : ℤ} (ht : 0 ≤ t)
       exact hcon
     · exact hmulti y (by omega) hy2
 
-/-- The peeled-data type of classes B and C: surplus `j`, cluster rows `ℓ`,
+/-- The peeled-data type of the cluster cases: surplus `j`, cluster rows `ℓ`,
 the based configuration, and the anchored walk-top remainder. -/
 abbrev PeelData : Type :=
   Σ _ : ℕ, Σ _ : ℕ, Finset (ℤ × ℤ) × Finset (ℤ × ℤ)
 
-/-- Backward map of classes B and C: shift the configuration so its origin
+/-- Backward map of the cluster cases: shift the configuration so its origin
 lands on the remainder's unique top cell (row `t - ℓ`), union, anchor.
-`t` is the cluster's top row: `H - 2` for class B, `H - 1` for class C. -/
+`t` is the cluster's top row: `H - 2` for walk on cluster, `H - 1` for cluster
+at top. -/
 noncomputable def glueCluster (t : ℤ) (x : PeelData) : Finset (ℤ × ℤ) :=
   anchorX (x.2.2.2 ∪
     shift (rowCell x.2.2.2 (t - (x.2.1 : ℤ))).1 (t - (x.2.1 : ℤ)) x.2.2.1)
 
-/-- Forward map of classes B and C, for the cluster whose top row
+/-- Forward map of the cluster cases, for the cluster whose top row
 `t = H - 1 - cap` has `cap` walk rows above it: peel the maximal cluster over
 rows `[b, t]` (`b = clusterBottom`) together with the walk cell on row `b - 1`
 and the `cap` walk cells above; the configuration is based at the row-`(b-1)`
-walk cell, the remainder `[0, b-1]` is anchored. Class B is `cap = 1`,
-class C is `cap = 0`. -/
+walk cell, the remainder `[0, b-1]` is anchored. Walk on cluster is `cap = 1`,
+cluster at top is `cap = 0`. -/
 noncomputable def peelCluster (cap H : ℕ) (S : Finset (ℤ × ℤ)) : PeelData :=
   ⟨(band S (clusterBottom S ((H : ℤ) - 1 - cap)) ((H : ℤ) - 1 - cap)).card
       - ((H : ℤ) - cap - clusterBottom S ((H : ℤ) - 1 - cap)).toNat,
@@ -745,7 +738,7 @@ noncomputable def peelCluster (cap H : ℕ) (S : Finset (ℤ × ℤ)) : PeelData
    anchorX (band S 0 (clusterBottom S ((H : ℤ) - 1 - cap) - 1))⟩
 
 /-- The `cap` rows above row `H - 1 - cap` are walk rows: the source
-condition of classes B and C besides the multi row `H - 1 - cap` itself. -/
+condition of the cluster cases besides the multi row `H - 1 - cap` itself. -/
 def CapWalk (cap H : ℕ) (S : Finset (ℤ × ℤ)) : Prop :=
   ∀ y ∈ Finset.Ioc ((H : ℤ) - 1 - cap) ((H : ℤ) - 1), rowSize S y = 1
 
@@ -775,7 +768,7 @@ lemma capWalk_zero {H : ℕ} {S : Finset (ℤ × ℤ)} : CapWalk 0 H S := by
   push_cast at h1
   omega
 
-/-- The target of classes B and C: configurations with `cap` walk rows on top,
+/-- The target of the cluster cases: configurations with `cap` walk rows on top,
 paired with walk-top remainders, indexed by `(j, ℓ)`. -/
 noncomputable def target (L : Lattice) (cap k H : ℕ) : Finset PeelData :=
   (Finset.Icc 1 k).sigma fun j => (Finset.Icc 1 j).sigma fun ℓ =>
@@ -803,7 +796,7 @@ lemma band_xShift (a r r' : ℤ) (S : Finset (ℤ × ℤ)) :
   rw [band_shift, sub_zero, sub_zero]
 
 /-- The anchored bottom band `[0, b-1]` of a connected animal with a walk
-row at `b - 1` is a walk-top canonical animal of height `b`. Shared by all
+row at `b - 1` is a walk-top animal of height `b`. Shared by all
 three peeling classes. -/
 lemma anchorX_seg_mem_walkTop {k' H' : ℕ} {S : Finset (ℤ × ℤ)} {b : ℤ}
     (hconn : Connected L S) (hy0 : ∀ c ∈ S, 0 ≤ c.2)
@@ -838,7 +831,7 @@ lemma sum_rowSize_walk {S : Finset (ℤ × ℤ)} {a b : ℤ}
   rw [Finset.sum_congr rfl fun y hy => h y (Finset.mem_Icc.mp hy).1 (Finset.mem_Icc.mp hy).2,
     Finset.sum_const, smul_eq_mul, mul_one, Int.card_Icc]
 
-/-- Cluster bookkeeping for classes B and C, for the cluster whose top row is
+/-- Cluster bookkeeping for the cluster cases, for the cluster whose top row is
 `t = H - 1 - cap` with `cap` walk rows above it: bounds of `b = clusterBottom`,
 the walk row below the cluster, and the cell-count identities the bijection
 needs. -/
@@ -1035,8 +1028,8 @@ lemma peelCluster_mem_and_glue {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {S : Fin
       anchorX_def' (band S 0 (b - 1)), ← shift_union, hQP, anchorX_shift _ hSne,
       anchorX_eq_self hSc.anchored.x_nonneg hSc.anchored.x_zero]
 
-/-- Backward well-definedness and the glue-then-peel round trip for classes B
-and C: the glued animal is canonical, its `cap` top rows are walk rows, its row
+/-- Backward well-definedness and the glue-then-peel round trip for the cluster
+cases: the glued animal is an animal, its `cap` top rows are walk rows, its row
 `t = H - 1 - cap` is not, and peeling recovers the data. -/
 lemma glueCluster_mem_and_peel {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {x : PeelData}
     (hx : x ∈ target L cap k H) :
@@ -1268,10 +1261,10 @@ lemma glueCluster_mem_and_peel {cap k H : ℕ} (hH : k + 1 + cap ≤ H) {x : Pee
   · -- the remainder component
     rw [hsegbotX, anchorX_shift _ hRne, anchorX_eq_self hcR.anchored.x_nonneg hcR.anchored.x_zero]
 
-/-- **The cluster count**: canonical animals whose `cap` top rows are walk
+/-- **The cluster count**: animals whose `cap` top rows are walk
 rows and whose row `H - 1 - cap` is not are counted by configurations with
 `cap` walk rows on top times shorter walk-top remainders, aggregated over
-`(j, ℓ)`. Class B is `cap = 1`, class C is `cap = 0`. -/
+`(j, ℓ)`. Walk on cluster is `cap = 1`, cluster at top is `cap = 0`. -/
 lemma card_cluster (cap k H : ℕ) (hH : k + 1 + cap ≤ H) :
     ((animals L k H).filter fun S =>
       CapWalk cap H S ∧ ¬ rowSize S ((H : ℤ) - 1 - cap) = 1).card =
@@ -1301,7 +1294,7 @@ lemma card_cluster (cap k H : ℕ) (hH : k + 1 + cap ≤ H) :
     rw [Finset.mem_coe] at hx
     exact (glueCluster_mem_and_peel hH hx).2
 
-/-- **Class-B count**: walk-top animals with a multi second-top row are
+/-- **Walk on cluster**: walk-top animals with a multi second-top row are
 counted by interior cluster configurations times shorter walk-top remainders,
 aggregated over `(j, ℓ)`. The `cap = 1` case of `card_cluster`. -/
 lemma card_walkCluster (k H : ℕ) (hH : k + 2 ≤ H) :
@@ -1316,7 +1309,7 @@ lemma card_walkCluster (k H : ℕ) (hH : k + 2 ≤ H) :
   rw [key]
   exact card_cluster 1 k H (by omega)
 
-/-- **Class-C count**: canonical animals with a multi top row are counted by
+/-- **Cluster at top**: animals with a multi top row are counted by
 top-edge cluster configurations times shorter walk-top remainders, aggregated
 over `(j, ℓ)`. The `cap = 0` case of `card_cluster`. -/
 lemma card_clusterTop (k H : ℕ) (hH : k + 1 ≤ H) :
@@ -1336,8 +1329,8 @@ lemma card_clusterTop (k H : ℕ) (hH : k + 1 ≤ H) :
 /-! ## The main theorems -/
 
 /-- **The d-recursion**: for `H ≥ k + 2`, a walk-top animal
-splits by its second-top row — walk (class A: `b` up-offsets on a height-`H-1`
-walk-top remainder) or the base of a cluster (class B: an interior
+splits by its second-top row — walk (`b` up-offsets on a height-`H-1`
+walk-top remainder) or the base of a cluster (an interior
 `V`-configuration capping a shorter walk-top remainder). -/
 theorem d_rec (L : Lattice) (k H : ℕ) (hH : k + 2 ≤ H) :
     d L k H = L.b * d L k (H - 1) +
@@ -1349,7 +1342,7 @@ theorem d_rec (L : Lattice) (k H : ℕ) (hH : k + 2 ≤ H) :
 
 /-- **The top-row identity**: for `H ≥ k + 1`, an animal has a walk top
 row (counted by `d L k H`) or a multi top row — a top-edge `Vᵗ`-configuration
-capping a shorter walk-top remainder (class C). -/
+capping a shorter walk-top remainder. -/
 theorem T_of_d (L : Lattice) (k H : ℕ) (hH : k + 1 ≤ H) :
     T L (H + k) H = d L k H +
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, Vt L ℓ j * d L (k - j) (H - ℓ) := by

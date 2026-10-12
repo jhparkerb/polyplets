@@ -281,4 +281,27 @@ Finiteness is `RowLocal/Finite.lean`. -/
 noncomputable def T (L : Lattice) (n H : ℕ) : ℕ :=
   {S : Finset (ℤ × ℤ) | IsAnimal L n H S}.ncard
 
+/-! ## Paths skip no coordinate value -/
+
+/-- **Paths don't skip a coordinate value.** For any adjacency `adj` and any
+coordinate `proj` that `adj`-steps move by at most one, if an `adj`-path inside
+`S` runs from a cell with `proj ≤ k` to a cell with `proj ≥ k+1`, then some cell
+of `S` sits exactly at `proj = k`: the step crossing the `k`/`k+1` boundary
+lands on it. Instantiated at `Prod.snd` for rows (`exists_y_eq_of_cross`,
+`RowLocal/Finite.lean`) and, on the king lattice, at `Prod.fst` for columns
+(`exists_x_eq_of_cross`, `Defs.lean`). -/
+lemma exists_proj_eq_of_cross {adj : ℤ × ℤ → ℤ × ℤ → Prop} {S : Finset (ℤ × ℤ)}
+    {p q : ℤ × ℤ} {k : ℤ} (proj : ℤ × ℤ → ℤ)
+    (hlip : ∀ a b : ℤ × ℤ, adj a b → |proj a - proj b| ≤ 1)
+    (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ adj a b) p q)
+    (hp : proj p ≤ k) (hq : k + 1 ≤ proj q) : ∃ c ∈ S, proj c = k := by
+  revert hq
+  induction h with
+  | refl => intro hq; exact absurd hq (by omega)
+  | @tail b c _ hbc ih =>
+      intro hq
+      by_cases hb : k + 1 ≤ proj b
+      · exact ih hb
+      · exact ⟨b, hbc.1, by have h2 := hlip b c hbc.2.2; rw [abs_le] at h2; omega⟩
+
 end Polyplets.RowLocal

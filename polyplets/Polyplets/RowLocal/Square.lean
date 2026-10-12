@@ -75,22 +75,22 @@ theorem adj_square {p q : ℤ × ℤ} :
 
 /-! ## The first cell
 
-The generic enumerator at `W = n` (legitimate because `M ≤ 1`), decided by the
-kernel; `Tc_eq_T_of_reach_le_one` transports the value to the noncomputable `T`.
-The second anchor `T(4,3) = 8` needs more than 8 GB in the kernel (measured
-2026-10-12) and enters the pin below as a hypothesis. -/
+The generic enumerator at `W = n` (legitimate because the reach is `≤ 1`),
+decided by the kernel; `Tc_eq_T_of_reach_le_one` transports the value to the
+noncomputable `T`. The second cell `T(4,3) = 8` needs more than 8 GB in the
+kernel (measured 2026-10-12) and enters below as a hypothesis. -/
 
 /-- `T(3,2) = 4`: the four L-trominoes. -/
 theorem T_square_3_2 : T squareLattice 3 2 = 4 := by
   rw [← Tc_eq_T_of_reach_le_one square_reach_le]; decide +kernel
 
-/-! ## Pinning `P₁` -/
+/-! ## `P₁` -/
 
 /-- The square lattice's level-1 diagonal polynomial `P₁ = 4X − 8`. -/
 noncomputable def squareP1 : Polynomial ℚ := C 4 * X - C 8
 
 /-- `P₁` has degree `≤ 1`. -/
-lemma squareP1_deg : squareP1.natDegree ≤ 1 := by
+lemma squareP1_natDegree_le : squareP1.natDegree ≤ 1 := by
   refine le_trans (natDegree_sub_le _ _) (max_le ?_ ?_)
   · exact le_trans (natDegree_C_mul_le _ _) (by simp)
   · simp
@@ -98,12 +98,12 @@ lemma squareP1_deg : squareP1.natDegree ≤ 1 := by
 /-- `P₁` evaluated. -/
 lemma squareP1_eval (x : ℚ) : squareP1.eval x = 4 * x - 8 := by simp [squareP1]
 
-/-- Guard at the first pin point: `P₁(3) = T(3,2) · b^1 = 4`. -/
+/-- `P₁` at the first onset point: `P₁(3) = T(3,2) · b^1 = 4`. -/
 lemma squareP1_eval_three :
     squareP1.eval (3 : ℚ) = ((T squareLattice 3 2 * squareLattice.b ^ 1 : ℕ) : ℚ) := by
   rw [squareP1_eval, T_square_3_2, b_square]; norm_num
 
-/-- Guard at the second pin point: `P₁(4) = T(4,3) · b^0 = 8`, given the cell. -/
+/-- `P₁` at the second onset point: `P₁(4) = T(4,3) · b^0 = 8`, given the cell. -/
 lemma squareP1_eval_four (h43 : T squareLattice 4 3 = 8) :
     squareP1.eval (4 : ℚ) = ((T squareLattice 4 3 * squareLattice.b ^ 0 : ℕ) : ℚ) := by
   rw [squareP1_eval, h43, b_square]; norm_num
@@ -112,16 +112,9 @@ lemma squareP1_eval_four (h43 : T squareLattice 4 3 = 8) :
 `T(4,3) = 8`: Lagrange uniqueness identifies `4X − 8` with the witness of
 `RowLocal.exists_isDiagonalPoly`. -/
 theorem isDiagonalPoly_squareP1 (h43 : T squareLattice 4 3 = 8) :
-    IsDiagonalPoly squareLattice 1 squareP1 := by
-  refine isDiagonalPoly_of_eval squareLattice 1 squareP1 squareP1_deg ({3, 4} : Finset ℕ)
-    (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (3 - 1 : ℕ) = 2 from rfl, show (3 * 1 + 1 - 3 : ℕ) = 1 from rfl]
-      exact squareP1_eval_three
-    · simp only [show (4 - 1 : ℕ) = 3 from rfl, show (3 * 1 + 1 - 4 : ℕ) = 0 from rfl]
-      exact squareP1_eval_four h43
+    IsDiagonalPoly squareLattice 1 squareP1 :=
+  isDiagonalPoly_one_of_eval squareLattice squareP1 squareP1_natDegree_le squareP1_eval_three
+    (squareP1_eval_four h43)
 
 /-- **The square `P₁`, human form**: the number of fixed polyominoes with `n`
 cells and bounding-box height exactly `n − 1` is `4n − 8`, for every `n ≥ 3`,
@@ -130,7 +123,7 @@ given `T(4,3) = 8`. (The drift factor is `1^(n-4) = 1`, so the law
 theorem square_T_sub_one (h43 : T squareLattice 4 3 = 8) (n : ℕ) (hn : 3 ≤ n) :
     (T squareLattice n (n - 1) : ℚ) = 4 * (n : ℚ) - 8 := by
   have h := isDiagonalPoly_squareP1 h43 n (by omega)
-  rw [b_square] at h
+  simp only [topRowRecursion_T, topRowRecursion_b, b_square] at h
   simpa [squareP1_eval] using h
 
 end Polyplets.RowLocal

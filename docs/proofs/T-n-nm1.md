@@ -110,14 +110,14 @@ V(1,1) = 25, Vᵗ(1,1) = 5 of `Weights.lean` (the same 25 = 16+9 split).
   `T_sub_two` (`Staircase/Climb.lean`) proves it outright, standard axioms only:
   the climb to level 2 from the four kernel-decided cells T(3,2), T(4,3),
   T(5,3), T(6,4), the last two by the bit-board enumerator of `Enum.lean`.
-- The general shape T(n,n−k) = P_k(n)·3^(n−1−3k), deg P_k ≤ k, onset
+- The general law T(n,n−k) = P_k(n)·3^(n−1−3k), deg P_k = k, onset
   n ≥ 2k+1, is a theorem for ALL k (`RowLocal/DiagonalLaw.lean`, `King.lean`; paper proof
   `diagonal-law.md`), and the defect-gas structure is exact: the
   diagonals are the exp of affine cumulants (`grand-form.md`; the Lean
   staircase route is `Staircase/`).
 - The Poisson leading coefficient is proved: [n^k]P_k = 25^k/k! for all k
   (`LeadingCoeff.lean`, standard axioms only — the 25 of this file's §5).
-- Production P_1..P_18 are pinned for all n ≥ 2k+1 (`Staircase/Climb.lean`)
+- P_1..P_18 are determined for all n ≥ 2k+1 (`Staircase/Climb.lean`)
   as conditional theorems whose explicit hypotheses are two enumerated
   onset cells per level — engine values assumed, not proved in Lean
   (levels ≥ 13 single-algorithm; see `polyplets/README.md`). k = 19, the

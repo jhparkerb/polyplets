@@ -11,15 +11,15 @@ import Polyplets.RowLocal.Instance
 # Instance toolkit: a computable counter for `T L`, and the values lemma
 
 The universal diagonal law needs two pieces of machinery that are
-lattice-generic but live outside the shape engine:
+lattice-generic but live outside the diagonal law:
 
 * **the computable twin** `Tc L W n H` — `Compute.lean`'s bounded-closure
   enumerator with `kingAdj ↦ Adj L`, plus `Tc_eq_T`. The one genuine change is
   the enumeration box: the king file's box is `[0, n-1] × [0, H-1]`, but a
   general row-local lattice can skip columns, so the width bound of
-  `RowLocal/Finite.lean` is `p.1 ≤ M · (n − 1)`. Rather than compute `M`, `Tc`
+  `RowLocal/Finite.lean` is `p.1 ≤ reach · (n − 1)`. Rather than compute the reach, `Tc`
   takes the box width `W` as a parameter and `Tc_eq_T` asks for
-  `M · (n − 1) ≤ W − 1`; `Tc_eq_T_of_reach_le_one` is the convenient corollary
+  `reach · (n − 1) ≤ W − 1`; `Tc_eq_T_of_reach_le_one` is the convenient corollary
   `W = n` for every lattice of reach `1` (square, hex, king — the named
   instances except the five-neighbor `D = Icc (-2) 2` and the degenerate
   `D = {-2, 0, 2}`, both of reach `2`).
@@ -161,7 +161,7 @@ lemma connected_iff_reach (L : Lattice) (S : Finset (ℤ × ℤ)) :
 instance instDecidableConnected (L : Lattice) : DecidablePred (Connected L) := fun S =>
   decidable_of_iff _ (connected_iff_reach L S).symm
 
-/-- Canonicality is decidable. -/
+/-- `IsAnimal` is decidable. -/
 instance instDecidableIsAnimal (L : Lattice) (n H : ℕ) (S : Finset (ℤ × ℤ)) :
     Decidable (IsAnimal L n H S) :=
   decidable_of_iff _ isAnimal_iff_and.symm
@@ -176,7 +176,7 @@ def Tc (L : Lattice) (W n H : ℕ) : ℕ :=
   (((Polyplets.box W H).powersetCard n).filter fun S => IsAnimal L n H S).card
 
 /-- **The computable counter agrees with `T L`**, provided the box is wide
-enough to contain every canonical animal: `M · (n − 1) ≤ W − 1`
+enough to contain every animal: `reach · (n − 1) ≤ W − 1`
 (`RowLocal/Finite.lean`'s `animal_x_le`). -/
 theorem Tc_eq_T (L : Lattice) (W n H : ℕ) (hW : L.reach * ((n : ℤ) - 1) ≤ (W : ℤ) - 1) :
     Tc L W n H = T L n H := by
@@ -199,7 +199,7 @@ theorem Tc_eq_T (L : Lattice) (W n H : ℕ) (hW : L.reach * ((n : ℤ) - 1) ≤ 
   rw [Tc, hset, T_eq_toFinset_card]
 
 /-- **Reach one**: a lattice all of whose up-offsets are `0` or `±1` has
-`M = 1`. -/
+reach `1`. -/
 lemma reach_le_one (L : Lattice) (h : ∀ d ∈ L.D, |d| ≤ 1) : L.reach ≤ 1 := by
   refine Finset.max'_le _ _ _ fun y hy => ?_
   rcases Finset.mem_insert.mp hy with rfl | hy
@@ -209,7 +209,7 @@ lemma reach_le_one (L : Lattice) (h : ∀ d ∈ L.D, |d| ≤ 1) : L.reach ≤ 1 
 
 /-- The convenient specialization of `Tc_eq_T` for a reach-`1` lattice: the box
 `[0, n-1] × [0, H-1]` suffices, exactly as in the king case. -/
-theorem Tc_eq_T_of_reach_le_one {L : Lattice} (hM : L.reach ≤ 1) (n H : ℕ) :
+theorem Tc_eq_T_of_reach_le_one {L : Lattice} (hreach : L.reach ≤ 1) (n H : ℕ) :
     Tc L n n H = T L n H := by
   refine Tc_eq_T L n n H ?_
   have h1 := L.one_le_reach
@@ -220,7 +220,7 @@ theorem Tc_eq_T_of_reach_le_one {L : Lattice} (hM : L.reach ≤ 1) (n H : ℕ) :
       have : (1 : ℤ) ≤ (n : ℤ) := by exact_mod_cast hn
       linarith
     calc L.reach * ((n : ℤ) - 1) ≤ 1 * ((n : ℤ) - 1) := by
-          exact mul_le_mul_of_nonneg_right hM hx
+          exact mul_le_mul_of_nonneg_right hreach hx
       _ = (n : ℤ) - 1 := one_mul _
 
 /-- The `n`-th row sum of the height triangle, computably: the number of fixed
@@ -260,7 +260,22 @@ theorem isDiagonalPoly_of_eval (L : Lattice) (k : ℕ) (p : Polynomial ℚ) (hp 
       obtain ⟨n, hn, rfl⟩ := hx
       obtain ⟨hn1, hn2⟩ := hin n hn
       rw [hpts n hn, hP.eval_onset hn1 hn2]
+      rfl
   rw [hpP]
   exact hP
+
+/-- **`P₁` from its two onset values.** A polynomial of degree `≤ 1` through
+`(3, T(3,2)·b)` and `(4, T(4,3))` is the level-`1` diagonal polynomial of `L`:
+`isDiagonalPoly_of_eval` at the two onset points `n = 3, 4`. The king, hexagonal
+and square instances each supply their two cells. -/
+theorem isDiagonalPoly_one_of_eval (L : Lattice) (p : Polynomial ℚ) (hp : p.natDegree ≤ 1)
+    (h3 : p.eval (3 : ℚ) = ((T L 3 2 * L.b ^ 1 : ℕ) : ℚ))
+    (h4 : p.eval (4 : ℚ) = ((T L 4 3 * L.b ^ 0 : ℕ) : ℚ)) : IsDiagonalPoly L 1 p := by
+  refine isDiagonalPoly_of_eval L 1 p hp {3, 4} (by decide) ?_ ?_
+  · intro n hn; fin_cases hn <;> norm_num
+  · intro n hn
+    fin_cases hn
+    · exact h3
+    · exact h4
 
 end Polyplets.RowLocal

@@ -10,16 +10,16 @@ import Polyplets.RowLocal.TopRow
 # The diagonal law for every row-local lattice
 
 The geometric front (`RowLocal/{Defs, Graph, Finite,
-Separation, RowProfile, Weights, Peel}.lean`) discharges every field of
-`TopRowRecursion`, so the abstract shape engine of `RowLocal/DiagonalLaw.lean`
+Separation, RowProfile, Weights, TopRow}.lean`) discharges every field of
+`TopRowRecursion`, so the abstract diagonal law of `RowLocal/DiagonalLaw.lean`
 applies to **every** row-local lattice `L`. Composing the two halves gives
 Theorem A of `docs/proofs/universal-diagonal-law.md` in Lean:
 
 * `exists_delta` : `d L k H = δ_k(H) · b^H` for `H ≥ k + 1`;
 * `exists_q` : `T L (H+k) H = q_k(H) · b^H` for `H ≥ k + 1`;
 * `exists_isDiagonalPoly` : `T L (n, n-k) = P_k(n) · b^(n-1-3k)` for
-  `n ≥ 2k+1` (`IsDiagonalPoly L k P_k`), with the zpow-free form
-  `IsDiagonalPoly.cleared`;
+  `n ≥ 2k+1` (`IsDiagonalPoly L k P_k`, the abstract predicate at
+  `topRowRecursion L`), with the zpow-free form `IsDiagonalPoly.cleared`;
 * `IsDiagonalPoly.intValued` : the `P_k` are integer-valued on `ℤ`,
 
 with `b = L.D.card` throughout. No hypothesis on `L` beyond `D` finite and
@@ -43,6 +43,7 @@ noncomputable def topRowRecursion (L : Lattice) : TopRowRecursion where
   d_rec := d_rec L
   T_of_d := T_of_d L
 
+/-- The fields of `topRowRecursion L` are the geometric objects, for `simp`. -/
 @[simp] lemma topRowRecursion_b (L : Lattice) : (topRowRecursion L).b = L.b := rfl
 
 @[simp] lemma topRowRecursion_d (L : Lattice) : (topRowRecursion L).d = d L := rfl
@@ -55,7 +56,7 @@ noncomputable def topRowRecursion (L : Lattice) : TopRowRecursion where
 
 /-! ## Theorem A -/
 
-/-- **Shape of the walk-top diagonal, universally**: for every row-local lattice
+/-- **The walk-top diagonal, universally**: for every row-local lattice
 and every surplus `k`, `d L k H = δ_k(H) · b^H` for all `H ≥ k + 1`, with
 `δ_k ∈ ℚ[X]` of degree `≤ k`. -/
 theorem exists_delta (L : Lattice) (k : ℕ) :
@@ -72,15 +73,13 @@ theorem exists_q (L : Lattice) (k : ℕ) :
   (topRowRecursion L).exists_q k
 
 /-- **`P` is the polynomial of the `k`-th diagonal of `L`**:
-`T(n, n-k) = P(n) · b^(n-1-3k)` for all `n ≥ 2k+1`. The `3` in the exponent is
-structural bookkeeping, not the king drift count. -/
-def IsDiagonalPoly (L : Lattice) (k : ℕ) (P : Polynomial ℚ) : Prop :=
-  ∀ n : ℕ, 2 * k + 1 ≤ n →
-    (T L n (n - k) : ℚ) = P.eval (n : ℚ) * (L.b : ℚ) ^ ((n : ℤ) - 1 - 3 * k)
-
-/-- The predicate is the abstract one at `topRowRecursion L`, definitionally. -/
-lemma isDiagonalPoly_topRowRecursion {L : Lattice} {k : ℕ} {P : Polynomial ℚ} :
-    (topRowRecursion L).IsDiagonalPoly k P ↔ IsDiagonalPoly L k P := Iff.rfl
+`T(n, n-k) = P(n) · b^(n-1-3k)` for all `n ≥ 2k+1`, the predicate
+`TopRowRecursion.IsDiagonalPoly` at `topRowRecursion L`, so its lemmas apply by
+dot notation: `.cleared` (the zpow-free form), `.eval_onset` (the values on the
+onset window are counts), `.intValued` (integer-valued on `ℤ`),
+`.natDegree_le` (degree `≤ k`), `.eq` (unique). -/
+abbrev IsDiagonalPoly (L : Lattice) (k : ℕ) (P : Polynomial ℚ) : Prop :=
+  (topRowRecursion L).IsDiagonalPoly k P
 
 /-- **The diagonal law in the report's coordinates, universally**: for every
 row-local lattice and every `k` there is a `P_k` of degree `≤ k` with
@@ -88,26 +87,5 @@ row-local lattice and every `k` there is a `P_k` of degree `≤ k` with
 theorem exists_isDiagonalPoly (L : Lattice) (k : ℕ) :
     ∃ P : Polynomial ℚ, P.natDegree ≤ k ∧ IsDiagonalPoly L k P :=
   (topRowRecursion L).exists_isDiagonalPoly k
-
-/-- The zpow-free form: `b^(3k+1) · T(n, n-k) = P(n) · b^n`. -/
-theorem IsDiagonalPoly.cleared {L : Lattice} {k : ℕ} {P : Polynomial ℚ}
-    (hP : IsDiagonalPoly L k P) :
-    ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (L.b : ℚ) ^ (3 * k + 1) * (T L n (n - k) : ℚ) = P.eval (n : ℚ) * (L.b : ℚ) ^ n :=
-  TopRowRecursion.IsDiagonalPoly.cleared (isDiagonalPoly_topRowRecursion.mpr hP)
-
-/-- **The values on the onset window are counts**: for `2k+1 ≤ n ≤ 3k+1`,
-`P(n) = T(n, n-k) · b^(3k+1-n)`. -/
-theorem IsDiagonalPoly.eval_onset {L : Lattice} {k : ℕ} {P : Polynomial ℚ}
-    (hP : IsDiagonalPoly L k P) {n : ℕ} (hn1 : 2 * k + 1 ≤ n) (hn2 : n ≤ 3 * k + 1) :
-    P.eval (n : ℚ) = ((T L n (n - k) * L.b ^ (3 * k + 1 - n) : ℕ) : ℚ) :=
-  TopRowRecursion.IsDiagonalPoly.eval_onset (isDiagonalPoly_topRowRecursion.mpr hP) hn1 hn2
-
-/-- **Integrality, universally**: any `P` of degree `≤ k` satisfying the law
-for `L` is integer-valued on all of `ℤ`. -/
-theorem IsDiagonalPoly.intValued {L : Lattice} {k : ℕ} {P : Polynomial ℚ}
-    (hdeg : P.natDegree ≤ k) (hP : IsDiagonalPoly L k P) :
-    ∀ m : ℤ, ∃ z : ℤ, P.eval (m : ℚ) = (z : ℚ) :=
-  TopRowRecursion.IsDiagonalPoly.intValued hdeg (isDiagonalPoly_topRowRecursion.mpr hP)
 
 end Polyplets.RowLocal

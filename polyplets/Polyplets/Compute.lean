@@ -21,9 +21,7 @@ decidable.
 
 `box n H` is the finite box `[0, n-1] × [0, H-1]` that contains every polyplet
 of height `H` (`mem_powersetCard_box`); `Weights.lean` enumerates its subsets
-and `Enum.lean`'s bit-board flood is this closure on boards. The powerset
-counter `Tc` that once lived here was removed 2026-10-12: every cell it could
-decide (up to `T 4 3`, at 5.5 GB) the enumerator decides in under a second.
+and `Enum.lean`'s bit-board flood is this closure on boards.
 -/
 
 namespace Polyplets
@@ -194,10 +192,10 @@ lemma mem_box {n H : ℕ} {p : ℤ × ℤ} :
     constructor <;> simp <;> omega
 
 /-- Every polyplet of height `H` is an `n`-element subset of the box — the
-height bound is `mem_heightClass_iff`, the width bound `IsPolyplet.x_le`. -/
+height bound is `mem_heightClass_iff_rows`, the width bound `IsPolyplet.x_le`. -/
 lemma mem_powersetCard_box {n H : ℕ} {S : Finset (ℤ × ℤ)}
     (h : S ∈ heightClass n H) : S ∈ (box n H).powersetCard n := by
-  obtain ⟨hP, hy, -⟩ := mem_heightClass_iff.mp h
+  obtain ⟨hP, hy, -⟩ := mem_heightClass_iff_rows.mp h
   rw [Finset.mem_powersetCard]
   refine ⟨fun p hp => ?_, hP.card⟩
   rw [mem_box]

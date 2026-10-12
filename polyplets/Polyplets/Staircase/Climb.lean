@@ -49,7 +49,7 @@ open Polynomial
 
 /-- The diagonal law at level `i` in the `H`-coordinates the climb uses,
 denominators cleared: `3^(3i+1)·T(H+i, H) = Q(H+i)·3^(H+i)` for all `H ≥ i+1`.
-The same statement as `IsDiagonalPoly i Q` (`isDiagonalPoly_of_H`). -/
+It implies `IsDiagonalPoly i Q` (`isDiagonalPoly_of_H`). -/
 def IsDiagonalPolyH (i : ℕ) (Q : Polynomial ℚ) : Prop :=
   ∀ H : ℕ, i + 1 ≤ H →
     (3 : ℚ) ^ (3 * i + 1) * (T (H + i) H : ℚ) = Q.eval ((H : ℚ) + i) * 3 ^ (H + i)
@@ -72,11 +72,11 @@ lemma isDiagonalPoly_of_H {k : ℕ} {P : Polynomial ℚ} (h : IsDiagonalPolyH k 
 `μ_0 … μ_{k-1}` known, the staircase reads
 `B_k = Σ_{i<k} μ_i·T(2k+1-i, k+1) + μ_k·3^k`, and `hnum` is that equation
 with the proposed `μ_k = 3·c_k/3^(2k)` substituted. The `i = 0` term is level
-`k` at its onset, `A_k`, hence `hanchor`. -/
+`k` at its onset, `A_k`, hence `hcell`, the first enumerated cell. -/
 theorem mu_eq_of_below (k : ℕ) (Q : ℕ → Polynomial ℚ) (c : ℕ → ℚ)
     (hlow : ∀ i, 1 ≤ i → i ≤ k → IsDiagonalPolyH (k - i) (Q (k - i)))
     (hmu : ∀ i, i < k → mu i * 3 ^ (2 * i) = 3 * c i)
-    (hanchor : (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
+    (hcell : (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
       (Q k).eval ((2 * k + 1 : ℕ) : ℚ) * 3 ^ (2 * k + 1))
     (hnum : (T (2 * k + 2) (k + 2) : ℚ) * 3 ^ (2 * k) = 3 * c k * 3 ^ k +
       ∑ i ∈ Finset.range k, 3 * c i * 3 ^ (2 * k - 2 * i) *
@@ -103,7 +103,7 @@ theorem mu_eq_of_below (k : ℕ) (Q : ℕ → Polynomial ℚ) (c : ℕ → ℚ)
       · simp only [Nat.sub_zero]
         rw [show k + 1 + k = 2 * k + 1 from by omega,
           show ((k + 1 : ℕ) : ℚ) + (k : ℚ) = ((2 * k + 1 : ℕ) : ℚ) from by push_cast; ring]
-        exact hanchor
+        exact hcell
       · exact hlow i hpos (by omega) (k + 1) (by omega)
     have h3 : (3 : ℚ) ^ (3 * (k - i) + 1) ≠ 0 := pow_ne_zero _ (by norm_num)
     have h3' : (3 : ℚ) ^ (2 * i) ≠ 0 := pow_ne_zero _ (by norm_num)
@@ -136,7 +136,7 @@ theorem isDiagonalPolyH_of_below (k : ℕ) (Q : ℕ → Polynomial ℚ) (c : ℕ
     (hmu : ∀ i, i ≤ k → mu i * 3 ^ (2 * i) = 3 * c i)
     (hstair : ∀ x : ℚ, (Q k).eval (x + 1) =
       ∑ i ∈ Finset.range (k + 1), c i * (Q (k - i)).eval (x - i))
-    (hanchor : (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
+    (hcell : (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
       (Q k).eval ((2 * k + 1 : ℕ) : ℚ) * 3 ^ (2 * k + 1)) :
     IsDiagonalPolyH k (Q k) := by
   intro H hH
@@ -144,7 +144,7 @@ theorem isDiagonalPolyH_of_below (k : ℕ) (Q : ℕ → Polynomial ℚ) (c : ℕ
   | base =>
     rw [show k + 1 + k = 2 * k + 1 from by omega,
       show ((k + 1 : ℕ) : ℚ) + k = ((2 * k + 1 : ℕ) : ℚ) from by push_cast; ring]
-    exact hanchor
+    exact hcell
   | succ H hH ih =>
     have hall : ∀ i, i ≤ k →
         (3 : ℚ) ^ (3 * (k - i) + 1) * (T (H + (k - i)) H : ℚ) =
@@ -188,7 +188,7 @@ theorem climb_step (k : ℕ) (hk : 1 ≤ k) (Q : ℕ → Polynomial ℚ) (c : �
     (hg : IsDiagonalPolyHUpTo Q (k - 1)) (hm : MuEqUpTo c (k - 1))
     (hstair : ∀ x : ℚ, (Q k).eval (x + 1) =
       ∑ i ∈ Finset.range (k + 1), c i * (Q (k - i)).eval (x - i))
-    (hanchor : (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
+    (hcell : (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
       (Q k).eval ((2 * k + 1 : ℕ) : ℚ) * 3 ^ (2 * k + 1))
     (hnum : (T (2 * k + 2) (k + 2) : ℚ) * 3 ^ (2 * k) = 3 * c k * 3 ^ k +
       ∑ i ∈ Finset.range k, 3 * c i * 3 ^ (2 * k - 2 * i) *
@@ -198,12 +198,12 @@ theorem climb_step (k : ℕ) (hk : 1 ≤ k) (Q : ℕ → Polynomial ℚ) (c : �
   have hlow : ∀ i, 1 ≤ i → i ≤ k → IsDiagonalPolyH (k - i) (Q (k - i)) :=
     fun i h1 _ => hg (k - i) (by omega)
   have hmu' : ∀ i, i < k → mu i * 3 ^ (2 * i) = 3 * c i := fun i hi => hm i (by omega)
-  have hk' := mu_eq_of_below k Q c hlow hmu' hanchor hnum
+  have hk' := mu_eq_of_below k Q c hlow hmu' hcell hnum
   have hmu : ∀ i, i ≤ k → mu i * 3 ^ (2 * i) = 3 * c i := fun i hi => by
     rcases Nat.lt_or_eq_of_le hi with h | rfl
     · exact hmu' i h
     · exact hk'
-  have hG := isDiagonalPolyH_of_below k Q c hlow hmu hstair hanchor
+  have hG := isDiagonalPolyH_of_below k Q c hlow hmu hstair hcell
   refine ⟨fun i hi => ?_, hmu⟩
   rcases Nat.lt_or_eq_of_le hi with h | rfl
   · exact hg i (by omega)
@@ -294,40 +294,40 @@ lemma Pk_staircase : ∀ k, 1 ≤ k → k ≤ 18 → ∀ x : ℚ,
     (Pk k).eval (x + 1) = ∑ i ∈ Finset.range (k + 1), cInt i * (Pk (k - i)).eval (x - i) := by
   intro k h1 h2 x
   interval_cases k <;>
-    norm_num [Finset.sum_range_succ, Pk, cInt, prodPoly_eval] <;>
+    norm_num [Finset.sum_range_succ, Pk, cInt, ofNumerators_eval] <;>
     ring
 
 set_option maxHeartbeats 1600000 in
 -- 18 levels of `norm_num` on up-to-30-digit cell values
 /-- `P_k` agrees with the cell `T(2k+1, k+1)`. -/
-lemma Pk_eval_cell (hA : EnumeratedCells) : ∀ k, 1 ≤ k → k ≤ 18 →
+lemma Pk_eval_cell (hcells : EnumeratedCells) : ∀ k, 1 ≤ k → k ≤ 18 →
     (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
       (Pk k).eval ((2 * k + 1 : ℕ) : ℚ) * 3 ^ (2 * k + 1) := by
   intro k h1 h2
-  rw [(hA k h1 h2).1]
+  rw [(hcells k h1 h2).1]
   interval_cases k <;>
-    norm_num [Pk, enumerated, prodPoly_eval]
+    norm_num [Pk, enumerated, ofNumerators_eval]
 
 set_option maxHeartbeats 1600000 in
 -- 18 levels of `norm_num` on sums of up to 18 big rationals
 /-- The cell `T(2k+2, k+2)` solves the staircase at `H = k+1` with
 `μ_k = 3·c_k/3^(2k)`. -/
-lemma mu_eval_cell (hA : EnumeratedCells) : ∀ k, 1 ≤ k → k ≤ 18 →
+lemma mu_eval_cell (hcells : EnumeratedCells) : ∀ k, 1 ≤ k → k ≤ 18 →
     (T (2 * k + 2) (k + 2) : ℚ) * 3 ^ (2 * k) = 3 * cInt k * 3 ^ k +
       ∑ i ∈ Finset.range k, 3 * cInt i * 3 ^ (2 * k - 2 * i) *
         ((Pk (k - i)).eval ((k + 1 + (k - i) : ℕ) : ℚ) * 3 ^ (k + 1 + (k - i))
           / 3 ^ (3 * (k - i) + 1)) := by
   intro k h1 h2
-  rw [(hA k h1 h2).2]
+  rw [(hcells k h1 h2).2]
   interval_cases k <;>
-    norm_num [Finset.sum_range_succ, Pk, cInt, enumerated, prodPoly_eval]
+    norm_num [Finset.sum_range_succ, Pk, cInt, enumerated, ofNumerators_eval]
 
 /-! ## The climb -/
 
 /-- Level `0`: `3·T(H, H) = 1·3^H`, from `T(n,n) = 3^(n-1)`. -/
 lemma isDiagonalPolyH_zero : IsDiagonalPolyH 0 (Pk 0) := by
   intro H hH
-  simp only [Nat.cast_zero, add_zero, Nat.mul_zero, Nat.zero_add, pow_one, Pk, prodPoly_eval]
+  simp only [Nat.cast_zero, add_zero, Nat.mul_zero, Nat.zero_add, pow_one, Pk, ofNumerators_eval]
   rw [T_self H hH, show (H : ℤ) - 1 = ((H - 1 : ℕ) : ℤ) from by omega, zpow_natCast,
     show (3 : ℚ) ^ H = 3 * 3 ^ (H - 1) from by rw [← pow_succ']; congr 1; omega]
   norm_num
@@ -340,7 +340,7 @@ theorem climb_zero : IsDiagonalPolyHUpTo Pk 0 ∧ MuEqUpTo cInt 0 := by
 
 /-- **The climb: `P_0 … P_18` and `μ_0 … μ_18`**, from the enumerated cells:
 level `0` is `climb_zero`, each later level one `climb_step`. -/
-theorem climb (hA : EnumeratedCells) :
+theorem climb (hcells : EnumeratedCells) :
     ∀ k, k ≤ 18 → IsDiagonalPolyHUpTo Pk k ∧ MuEqUpTo cInt k := by
   intro k
   induction k with
@@ -350,12 +350,13 @@ theorem climb (hA : EnumeratedCells) :
     obtain ⟨hg, hm⟩ := ih (by omega)
     exact climb_step (k + 1) (by omega) Pk cInt (by rwa [Nat.add_sub_cancel])
       (by rwa [Nat.add_sub_cancel]) (Pk_staircase (k + 1) (by omega) hk)
-      (Pk_eval_cell hA (k + 1) (by omega) hk) (mu_eval_cell hA (k + 1) (by omega) hk)
+      (Pk_eval_cell hcells (k + 1) (by omega) hk) (mu_eval_cell hcells (k + 1) (by omega) hk)
 
 /-- **`P_k` is explicitly known for `k ≤ 18`**: `Pk k` satisfies the law, given
 the 36 enumerated cells. -/
-theorem isDiagonalPoly_Pk (hA : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) : IsDiagonalPoly k (Pk k) :=
-  isDiagonalPoly_of_H ((climb hA k hk).1 k le_rfl)
+theorem isDiagonalPoly_Pk (hcells : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) :
+    IsDiagonalPoly k (Pk k) :=
+  isDiagonalPoly_of_H ((climb hcells k hk).1 k le_rfl)
 
 /-! ## Levels `1` and `2` unconditionally
 
@@ -370,11 +371,11 @@ theorem climb_two : IsDiagonalPolyHUpTo Pk 2 ∧ MuEqUpTo cInt 2 := by
   have h1 : IsDiagonalPolyHUpTo Pk 1 ∧ MuEqUpTo cInt 1 :=
     climb_step 1 (by norm_num) Pk cInt climb_zero.1 climb_zero.2
       (Pk_staircase 1 (by norm_num) (by norm_num))
-      (by norm_num [T_3_2, Pk, prodPoly_eval])
-      (by norm_num [Finset.sum_range_succ, T_4_3, Pk, cInt, prodPoly_eval])
+      (by norm_num [T_3_2, Pk, ofNumerators_eval])
+      (by norm_num [Finset.sum_range_succ, T_4_3, Pk, cInt, ofNumerators_eval])
   exact climb_step 2 (by norm_num) Pk cInt h1.1 h1.2 (Pk_staircase 2 (by norm_num) (by norm_num))
-    (by norm_num [Enum.T_5_3, Pk, prodPoly_eval])
-    (by norm_num [Finset.sum_range_succ, Enum.T_6_4, Pk, cInt, prodPoly_eval])
+    (by norm_num [Enum.T_5_3, Pk, ofNumerators_eval])
+    (by norm_num [Finset.sum_range_succ, Enum.T_6_4, Pk, cInt, ofNumerators_eval])
 
 /-- **`P₂ = Pk 2`, unconditionally.** -/
 theorem isDiagonalPoly_P2 : IsDiagonalPoly 2 (Pk 2) :=
@@ -386,7 +387,7 @@ theorem T_sub_two (n : ℕ) (hn : 5 ≤ n) :
     (T n (n - 2) : ℚ)
       = (1 / 2) * (625 * (n : ℚ) ^ 2 - 2459 * (n : ℚ) + 1134) * (3 : ℚ) ^ ((n : ℤ) - 7) := by
   have h := isDiagonalPoly_P2 n hn
-  simp only [Pk, prodPoly_eval] at h
+  simp only [Pk, ofNumerators_eval] at h
   norm_num at h ⊢
   rw [h]; ring_nf
 

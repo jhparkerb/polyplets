@@ -27,7 +27,7 @@ by-height diagonals of fixed polyhexes are a polynomial times `2^n`.**
 * `isDiagonalPoly_hexP1` / `hex_T_sub_one` : `P₁(n) = 9n − 15`, i.e.
   `T(n, n−1) = (9n − 15)·2^(n−4)` for `n ≥ 3` (paper instance table, density
   `9 = 3²`), given the second cell `T(4,3) = 21` as a hypothesis. The
-  first anchor `T(3,2) = 6` the kernel decides from the generic enumerator;
+  first cell `T(3,2) = 6` the kernel decides from the generic enumerator;
   `T(4,3)` needs more than 8 GB in the kernel (measured 2026-10-12), so it
   enters as the hypothesis `isDiagonalPoly_hexP1` and `hex_T_sub_one` carry.
 * `Checks.lean`: the row sum of the computed height triangle at `n = 3`
@@ -76,13 +76,13 @@ strict staircases, leaving six of height exactly 2. -/
 theorem T_hex_3_2 : T hexLattice 3 2 = 6 := by
   rw [← Tc_eq_T_of_reach_le_one hex_reach_le]; decide +kernel
 
-/-! ## Pinning `P₁` -/
+/-! ## `P₁` -/
 
 /-- The hexagonal lattice's level-1 diagonal polynomial `P₁ = 9X − 15`. -/
 noncomputable def hexP1 : Polynomial ℚ := C 9 * X - C 15
 
 /-- `P₁` has degree `≤ 1`. -/
-lemma hexP1_deg : hexP1.natDegree ≤ 1 := by
+lemma hexP1_natDegree_le : hexP1.natDegree ≤ 1 := by
   refine le_trans (natDegree_sub_le _ _) (max_le ?_ ?_)
   · exact le_trans (natDegree_C_mul_le _ _) (by simp)
   · simp
@@ -90,26 +90,20 @@ lemma hexP1_deg : hexP1.natDegree ≤ 1 := by
 /-- `P₁` evaluated. -/
 lemma hexP1_eval (x : ℚ) : hexP1.eval x = 9 * x - 15 := by simp [hexP1]
 
-/-- Guard at the first pin point: `P₁(3) = T(3,2) · b^1 = 12`. -/
+/-- `P₁` at the first onset point: `P₁(3) = T(3,2) · b^1 = 12`. -/
 lemma hexP1_eval_three : hexP1.eval (3 : ℚ) = ((T hexLattice 3 2 * hexLattice.b ^ 1 : ℕ) : ℚ) := by
   rw [hexP1_eval, T_hex_3_2, b_hex]; norm_num
 
-/-- Guard at the second pin point: `P₁(4) = T(4,3) · b^0 = 21`, given the cell. -/
+/-- `P₁` at the second onset point: `P₁(4) = T(4,3) · b^0 = 21`, given the cell. -/
 lemma hexP1_eval_four (h43 : T hexLattice 4 3 = 21) :
     hexP1.eval (4 : ℚ) = ((T hexLattice 4 3 * hexLattice.b ^ 0 : ℕ) : ℚ) := by
   rw [hexP1_eval, h43, b_hex]; norm_num
 
 /-- **The hexagonal `P₁`**, given the second cell `T(4,3) = 21`. -/
 theorem isDiagonalPoly_hexP1 (h43 : T hexLattice 4 3 = 21) :
-    IsDiagonalPoly hexLattice 1 hexP1 := by
-  refine isDiagonalPoly_of_eval hexLattice 1 hexP1 hexP1_deg ({3, 4} : Finset ℕ) (by decide) ?_ ?_
-  · intro n hn; fin_cases hn <;> norm_num
-  · intro n hn
-    fin_cases hn
-    · simp only [show (3 - 1 : ℕ) = 2 from rfl, show (3 * 1 + 1 - 3 : ℕ) = 1 from rfl]
-      exact hexP1_eval_three
-    · simp only [show (4 - 1 : ℕ) = 3 from rfl, show (3 * 1 + 1 - 4 : ℕ) = 0 from rfl]
-      exact hexP1_eval_four h43
+    IsDiagonalPoly hexLattice 1 hexP1 :=
+  isDiagonalPoly_one_of_eval hexLattice hexP1 hexP1_natDegree_le hexP1_eval_three
+    (hexP1_eval_four h43)
 
 /-- **The hexagonal `P₁`, human form**: the number of fixed polyhexes with `n`
 cells and bounding-box height exactly `n − 1` is `(9n − 15)·2^(n−4)`, for every
@@ -117,7 +111,7 @@ cells and bounding-box height exactly `n − 1` is `(9n − 15)·2^(n−4)`, for
 theorem hex_T_sub_one (h43 : T hexLattice 4 3 = 21) (n : ℕ) (hn : 3 ≤ n) :
     (T hexLattice n (n - 1) : ℚ) = (9 * (n : ℚ) - 15) * (2 : ℚ) ^ ((n : ℤ) - 4) := by
   have h := isDiagonalPoly_hexP1 h43 n (by omega)
-  rw [b_hex] at h
+  simp only [topRowRecursion_T, topRowRecursion_b, b_hex] at h
   norm_num [hexP1_eval] at h ⊢
   rw [h]
   ring_nf

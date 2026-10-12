@@ -6,7 +6,7 @@ Authors: Jason H Parker
 import Polyplets.RowLocal.Separation
 
 /-!
-# Row profile of a canonical `L`-animal
+# Row profile of an `L`-animal
 
 The two row-profile facts the peeling bijections consume, ported verbatim from
 `RowProfile.lean`: every row of the bounding box is occupied, because the
@@ -20,7 +20,7 @@ not needed by the peeling recursion and is not ported.
 namespace Polyplets.RowLocal
 
 /-- **Every row in range is occupied.** For `0 ≤ y ≤ H-1`, some cell of a
-canonical `S` has that row: the anchored `y = 0` and `y = H-1` cells bracket
+an animal `S` has that row: the anchored `y = 0` and `y = H-1` cells bracket
 `y`, and a path between them cannot skip it. -/
 lemma animal_row_occupied {L : Lattice} {n H : ℕ} {S : Finset (ℤ × ℤ)}
     (hS : IsAnimal L n H S) {y0 : ℤ} (h0 : 0 ≤ y0) (hH : y0 ≤ (H : ℤ) - 1) :

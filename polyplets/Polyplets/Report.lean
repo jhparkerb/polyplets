@@ -44,15 +44,14 @@ theorem report_T_diag (n : ℕ) (hn : 1 ≤ n) : T n n = 3 ^ (n - 1) := by
   exact_mod_cast h
 
 /-- **The diagonal law.** When `H > n/2`, `T(n,H) = P_{n-H}(n)·3^(3H-2n-1)`,
-where `P_k` has degree at most `k` and is integer-valued. (Degree exactly `k`
-is `report_Pk_degree` below.) -/
+where `P_k` has degree `k` and is integer-valued. -/
 theorem report_diagonal_law : ∃ P : ℕ → Polynomial ℚ, ∀ k : ℕ,
-    (P k).natDegree ≤ k ∧
+    (P k).natDegree = k ∧
     (∀ m : ℤ, ∃ z : ℤ, (P k).eval (m : ℚ) = z) ∧
     ∀ n H : ℕ, H ≤ n → n < 2 * H →
       n - H = k → (T n H : ℚ) = (P k).eval (n : ℚ) * 3 ^ (3 * (H : ℤ) - 2 * n - 1) := by
-  choose P hdeg hz using exists_isDiagonalPoly
-  refine ⟨P, fun k => ⟨hdeg k, (hz k).intValued (hdeg k), ?_⟩⟩
+  choose P _ hz using exists_isDiagonalPoly
+  refine ⟨P, fun k => ⟨(hz k).natDegree_eq, (hz k).intValued, ?_⟩⟩
   intro n H hHn hlt hk
   subst hk
   have h := hz (n - H) n (by omega)
@@ -66,15 +65,15 @@ theorem report_diagonal_law : ∃ P : ℕ → Polynomial ℚ, ∀ k : ℕ,
 polynomial satisfying the diagonal law at level `k` (`IsDiagonalPoly k P`:
 `T(n, n-k) = P(n)·3^(n-1-3k)` for `n ≥ 2k+1`), not only the witness
 `report_diagonal_law` picks. -/
-theorem report_leading_coeff (k : ℕ) (P : Polynomial ℚ) (hdeg : P.natDegree ≤ k)
-    (hP : IsDiagonalPoly k P) : P.coeff k = 25 ^ k / k.factorial :=
-  hP.coeff_eq hdeg
+theorem report_leading_coeff (k : ℕ) (P : Polynomial ℚ) (hP : IsDiagonalPoly k P) :
+    P.coeff k = 25 ^ k / k.factorial :=
+  hP.coeff_eq
 
 /-- **`P_k` has degree exactly `k`.** For any polynomial satisfying the diagonal
 law at level `k`: its coefficient of `X^k` is `25^k/k!`, not zero. -/
-theorem report_Pk_degree (k : ℕ) (P : Polynomial ℚ) (hdeg : P.natDegree ≤ k)
-    (hP : IsDiagonalPoly k P) : P.natDegree = k :=
-  hP.natDegree_eq hdeg
+theorem report_Pk_degree (k : ℕ) (P : Polynomial ℚ) (hP : IsDiagonalPoly k P) :
+    P.natDegree = k :=
+  hP.natDegree_eq
 
 /-- **`P_k` can be fixed after computing the `3k`-th row.** A polynomial of
 degree `≤ k` with the known leading coefficient that matches `T` on rows
@@ -94,9 +93,9 @@ theorem report_T_sub_one (n : ℕ) (hn : 3 ≤ n) :
 /-- **`P_k` is explicitly known for `k ≤ 18`**, given the 36 enumerated
 cells, two per level (`EnumeratedCells`: the table `enumerated` of
 `Staircase/Climb.lean`). `Pk k` is the polynomial of `DiagonalPolys.lean`. -/
-theorem report_Pk_known (hA : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) :
+theorem report_Pk_known (hcells : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) :
     IsDiagonalPoly k (Pk k) :=
-  isDiagonalPoly_Pk hA k hk
+  isDiagonalPoly_Pk hcells k hk
 
 /-! ## Results: non-fixed polyplets
 

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Combinatorics.Enumerative.DoubleCounting
 import Mathlib.GroupTheory.SpecificGroups.Dihedral
 import Mathlib.Tactic.Abel
 import Mathlib.Tactic.Group
@@ -438,7 +439,7 @@ instance instMulActionD4Polyplets (n : ℕ) : MulAction D4 (polyplets n) where
 
 instance instFinitePolyplets (n : ℕ) : Finite (polyplets n) := (polyplets_finite n).to_subtype
 
-noncomputable instance instFintypeCA (n : ℕ) : Fintype (polyplets n) := Fintype.ofFinite _
+noncomputable instance instFintypePolyplets (n : ℕ) : Fintype (polyplets n) := Fintype.ofFinite _
 
 noncomputable instance instFintypeFixedByD4 (n : ℕ) (g : D4) :
     Fintype (MulAction.fixedBy (polyplets n) g) := Fintype.ofFinite _
@@ -800,13 +801,6 @@ noncomputable def Bilateral (n : ℕ) : ℕ :=
 minus bilateral (A030235). -/
 noncomputable def Asym (n : ℕ) : ℕ := Free n - Bilateral n
 
-/-- Double counting a relation over two finite index sets. -/
-lemma sum_card_filter_comm {α β : Type*}
-    (s : Finset α) (t : Finset β) (R : α → β → Prop) [∀ a b, Decidable (R a b)] :
-    ∑ a ∈ s, (t.filter (R a)).card = ∑ b ∈ t, (s.filter (fun a => R a b)).card := by
-  simp only [Finset.card_filter]
-  exact Finset.sum_comm
-
 lemma D4.sum_refls {M : Type*} [AddCommMonoid M] (f : D4 → M) :
     ∑ g ∈ D4.refls, f g = f (sr 0) + f (sr 1) + f (sr 2) + f (sr 3) := by
   rw [D4.refls, Finset.sum_insert (by decide), Finset.sum_insert (by decide),
@@ -845,19 +839,20 @@ lemma sum_stab_achiral (n : ℕ) :
     show Fintype.card (MulAction.orbitRel.Quotient D4 (achiral n)) = Bilateral n from
       (Nat.card_eq_fintype_card).symm] at hb
   rw [← hb]
-  exact (sum_card_filter_comm Finset.univ Finset.univ
+  exact (Finset.sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow
     (fun (g : D4) (y : achiral n) => g • y = y)).symm
 
 /-- The reflection half of the same double count. -/
 lemma sum_stab_refl_achiral (n : ℕ) :
     ∑ y : achiral n, (D4.refls.filter (fun g => g • y = y)).card
       = 2 * Hm n + 2 * Dm n := by
-  rw [sum_card_filter_comm Finset.univ D4.refls (fun (y : achiral n) (g : D4) => g • y = y)]
+  refine (Finset.sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow
+    (fun (y : achiral n) (g : D4) => g • y = y)).trans ?_
   have hterm : ∀ g : D4, (Finset.univ.filter (fun y : achiral n => g • y = y)).card
       = Nat.card (MulAction.fixedBy (achiral n) g) := fun g => by
     rw [← Nat.card_eq_finsetCard]
     exact (Nat.card_congr (Equiv.subtypeEquivRight fun y => by simp)).symm
-  simp only [hterm]
+  simp only [Finset.bipartiteBelow, hterm]
   rw [D4.sum_refls (fun g => Nat.card (MulAction.fixedBy (achiral n) g))]
   rw [card_fixedBy_achiral_refl n (by decide : sr 0 ∈ D4.refls),
     card_fixedBy_achiral_refl n (by decide : sr 1 ∈ D4.refls),

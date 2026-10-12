@@ -30,7 +30,7 @@ the theorem takes as input rather than proves.
 |---|---|---|---|
 | a(n) = Σ_H T(n,H) | `report_a_eq_sum` | `a_eq_sum` (`Sequence`) | — |
 | T(n,n) = 3^(n−1) | `report_T_diag` | `T_self` (`King`) | — |
-| diagonal law: for H > n/2, T(n,H) = P_{n−H}(n)·3^(3H−2n−1), P_k integer-valued, deg ≤ k | `report_diagonal_law` | `exists_isDiagonalPoly`, `IsDiagonalPoly.intValued` (`King`) | — |
+| diagonal law: for H > n/2, T(n,H) = P_{n−H}(n)·3^(3H−2n−1), P_k integer-valued of degree k | `report_diagonal_law` | `exists_isDiagonalPoly`, `IsDiagonalPoly.intValued` (`King`), `IsDiagonalPoly.natDegree_eq` (`LeadingCoeff`) | — |
 | leading coefficient of P_k is 25^k/k! | `report_leading_coeff` | `IsDiagonalPoly.coeff_eq` (`LeadingCoeff`) | — |
 | P_k has degree exactly k | `report_Pk_degree` | `IsDiagonalPoly.natDegree_eq` (`LeadingCoeff`) | — |
 | P_k is fixed once row 3k is computed | `report_pin_row_3k` | `isDiagonalPoly_of_coeff_of_eval_Icc` (`LeadingCoeff`) | — |
@@ -104,7 +104,10 @@ k through the first identity:
 absorbed into the constant term, which is why the onset is k+1 and not k+2;
 the second identity carries it to the diagonal and gives
 `exists_isDiagonalPoly`: a `P_k` with `IsDiagonalPoly k P_k`, which says
-`T(n, n−k) = P_k(n)·3^(n−1−3k)` for `n ≥ 2k+1`. Integer values on all of ℤ
+`T(n, n−k) = P_k(n)·3^(n−1−3k)` for `n ≥ 2k+1`. The law determines `P_k`
+(`IsDiagonalPoly.eq`: two polynomials satisfying it agree at every n ≥ 2k+1),
+so any polynomial satisfying it has degree ≤ k (`IsDiagonalPoly.natDegree_le`)
+and no theorem below needs a degree hypothesis. Integer values on all of ℤ
 come from finite differences (`IsDiagonalPoly.intValued`).
 
 Leading coefficient (`LeadingCoeff.lean`). Divide the first identity by
@@ -124,8 +127,8 @@ H ≥ k+1, one strong induction from the first peeling identity;
 `Staircase/Climb.lean` climbs: `IsDiagonalPolyH k P` is the law of level k in
 the climb's coordinates; `climb_step` passes from levels < k to level k given
 the two cells; `climb` runs it from `climb_zero` (P_0 = 1,
-unconditional) to k = 18 under `BankedAnchors`, and `Pk_prod` reads off the
-diagonal law with the concrete `Pp<k>` of `DiagonalPolys.lean`. The 19 polynomials in
+unconditional) to k = 18 under `EnumeratedCells`, and `isDiagonalPoly_Pk` reads off
+the diagonal law with the concrete `Pk k` of `DiagonalPolys.lean`. The 19 polynomials in
 `DiagonalPolys.lean` are the engine's (`orchestrator/sweep.go`, extracted to
 `pin-data.md` by `scripts/extract_pin_data.py`); a wrong coefficient fails
 the cell evaluations in `Staircase/Climb`.
@@ -151,7 +154,7 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le_3125_div_256 : λ ≤ 3125
 | `King` | `kingLattice`; the generic objects agree with the king ones; `d_rec`, `T_of_d`, `IsDiagonalPoly`, `exists_isDiagonalPoly`, `IsDiagonalPoly.intValued`, `T_self` in king vocabulary |
 | `DiscreteCalculus` | the discrete antiderivative, integer values by finite differences |
 | `LeadingCoeff` | 25^k/k!, the degree is exactly k, `P_k` from k rows |
-| `DiagonalPolys` | the 19 production polynomials `Pk`, `P_k` from k+1 values, `T_sub_one` |
+| `DiagonalPolys` | the 19 diagonal polynomials `Pk`; `P_1 = Pk 1` from its two onset cells, `T_sub_one` |
 | `Staircase/Series` | convolution toolkit |
 | `Staircase/Mu` | μ, ν, `mu_conv_nu`, the gates μ₁, μ₂ |
 | `Staircase/WalkTop` | `d_staircase` |
@@ -175,7 +178,7 @@ L-paper modules:
 |---|---|---|
 | `RowLocal/Defs`, `Graph`, `Finite`, `Separation`, `RowProfile`, `Weights`, `RowLocal/TopRow` | report, L1 | the peeling recursion for every row-local lattice (a finite set `D` of up-offsets, `b = |D|`) |
 | `RowLocal/DiagonalLaw`, `Instance` | report, L1 | the diagonal law as a theorem about any `TopRowRecursion`, hence for every row-local lattice |
-| `RowLocal/Compute`, `Hex`, `Square` | L1 | the generic enumerator and the values lemma; the hex and square instances and their `P_1` |
+| `RowLocal/Compute`, `Hex`, `Square` | L1 | the generic enumerator, the values lemma `isDiagonalPoly_of_eval` and its k = 1 case `isDiagonalPoly_one_of_eval`; the hex and square instances and their `P_1` |
 | `Upper/Certificate` | L3 | the convolution-certificate bound `λ ≤ 1/x` from a rational super-solution, and `RatCert`, the exported-data check |
 | `Upper/BuiData2`, `BuiRD2`, `BuiData3`, `BuiRD3` | L3 | the 185-type (λ ≤ 9.4117) and 5930-type (λ ≤ 9.3154) certificates as balanced lookup trees the kernel checks (`decide +kernel`, 11 s for RD = 3), conditional on the named system hypotheses |
 | `StairAnimals`, `StairGrowth` | L5 | staircase polyplets: the column join is injective at fixed area (Lemma 3), µ exists, 3.1234 < µ ≤ 4 given M(700) |
@@ -240,7 +243,7 @@ Lines are at that commit.
 
 Also gone, same reasons: `Grand/PinGrand.lean` and `scripts/gen_grand_pin.py`
 (2,608 generated lines, replaced by `Staircase/Climb.lean` at `7641b74`), the
-old Lagrange tiers of `DiagonalPolys.lean` (`P<k>_pinned_of_banked`, k = 4 … 11, with
+old Lagrange tiers of `Pin.lean` (now `DiagonalPolys.lean`; `P<k>_pinned_of_banked`, k = 4 … 11, with
 `scripts/gen_pin.py`), `P3_pinned_of_heavy`, the `make gate-notary` target, and the planning files `PROOF-STATUS.md`, `DESIGN.md`,
 `docs/lean-record.md`, whose surviving content is this file.
 

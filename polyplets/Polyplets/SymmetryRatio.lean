@@ -386,7 +386,7 @@ lemma card_le_split {α : Type*} (s : Finset α) (f : α → ℕ) {n K : ℕ} (h
   · exact h₂ k
 
 /-- The pairs `(animal of `m` cells, offset in {0, 1})` satisfying anything. -/
-lemma card_filter_CAfin_le (m : ℕ) (P : Finset (ℤ × ℤ) × ℤ → Prop) [DecidablePred P] :
+lemma card_filter_polypletsFinset_le (m : ℕ) (P : Finset (ℤ × ℤ) × ℤ → Prop) [DecidablePred P] :
     ((polypletsFinset m ×ˢ ({0, 1} : Finset ℤ)).filter P).card ≤ 2 * a m := by
   calc ((polypletsFinset m ×ˢ ({0, 1} : Finset ℤ)).filter P).card
       ≤ (polypletsFinset m ×ˢ ({0, 1} : Finset ℤ)).card := Finset.card_filter_le _ _
@@ -732,7 +732,7 @@ lemma fiber_le (n u : ℕ) :
     (fun S hS => recon_Φ (Finset.mem_filter.1 hS).1)
 
 lemma A_le_a (n u : ℕ) : (A n u).card ≤ 2 * a (n - u) :=
-  card_filter_CAfin_le (n - u) _
+  card_filter_polypletsFinset_le (n - u) _
 
 lemma A_le_crude (n u : ℕ) : (A n u).card ≤ 2 * 2 ^ n * (n * n) ^ u := by
   have := card_le_crude (A n u) (fun z => z.2) ({0, 1} : Finset ℤ)
@@ -910,7 +910,7 @@ lemma fiber_le (n u : ℕ) :
     (fun S hS => recon_Φ (Finset.mem_filter.1 hS).1)
 
 lemma A_le_a (n u : ℕ) : (A n u).card ≤ 2 * a (n - u) :=
-  card_filter_CAfin_le (n - u) _
+  card_filter_polypletsFinset_le (n - u) _
 
 lemma A_le_crude (n u : ℕ) : (A n u).card ≤ 2 * (2 * n + 1) * 2 ^ n * (n * n) ^ u := by
   have hmem : ∀ z ∈ A n u, IsPolyplet (n - u) z.1 ∧ z.2 ∈ ({0, 1} : Finset ℤ) := by

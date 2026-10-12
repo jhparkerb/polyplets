@@ -137,38 +137,14 @@ lemma exists_edge_of_connected {S : Finset (ℤ × ℤ)} (hS : KingConnected S)
         · exact ih hb
   exact key q (hS p hp q hq) hPq
 
-/-! ## King paths skip no coordinate value -/
+/-! ## King paths skip no column -/
 
-/-- **King paths don't skip a coordinate value.** For any `1`-Lipschitz
-coordinate `proj` (king steps move it by at most one), if a king path inside `S`
-runs from a cell with `proj ≤ k` to a cell with `proj ≥ k+1`, then some cell of
-`S` sits exactly at `proj = k`: the step crossing the `k`/`k+1` boundary lands
-on it. Instantiated at `Prod.fst`/`Prod.snd` for columns and rows below. -/
-lemma exists_proj_eq_of_cross {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
-    (proj : ℤ × ℤ → ℤ)
-    (hlip : ∀ a b : ℤ × ℤ, kingAdj a b → |proj a - proj b| ≤ 1)
-    (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q)
-    (hp : proj p ≤ k) (hq : k + 1 ≤ proj q) : ∃ c ∈ S, proj c = k := by
-  revert hq
-  induction h with
-  | refl => intro hq; exact absurd hq (by omega)
-  | @tail b c _ hbc ih =>
-      intro hq
-      by_cases hb : k + 1 ≤ proj b
-      · exact ih hb
-      · exact ⟨b, hbc.1, by have h2 := hlip b c hbc.2.2; rw [abs_le] at h2; omega⟩
-
-/-- Column specialization of `exists_proj_eq_of_cross` (`proj = Prod.fst`). -/
+/-- **King paths don't skip a column**: `RowLocal.exists_proj_eq_of_cross` at
+`Prod.fst`, which a king step moves by at most one. -/
 lemma exists_x_eq_of_cross {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
     (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q)
     (hp : p.1 ≤ k) (hq : k + 1 ≤ q.1) : ∃ c ∈ S, c.1 = k :=
-  exists_proj_eq_of_cross Prod.fst (fun _ _ hab => hab.2.1) h hp hq
-
-/-- Row specialization of `exists_proj_eq_of_cross` (`proj = Prod.snd`). -/
-lemma exists_y_eq_of_cross {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ} {k : ℤ}
-    (h : Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q)
-    (hp : p.2 ≤ k) (hq : k + 1 ≤ q.2) : ∃ c ∈ S, c.2 = k :=
-  exists_proj_eq_of_cross Prod.snd (fun _ _ hab => hab.2.2) h hp hq
+  RowLocal.exists_proj_eq_of_cross Prod.fst (fun _ _ hab => hab.2.1) h hp hq
 
 /-! ## Polyplets, and the two counts `a` and `T` -/
 
@@ -226,24 +202,32 @@ height exactly `H`. Finiteness is `heightClass_finite` (`Sequence.lean`), so
 `Set.ncard`'s junk value never arises for the intended `n, H`. -/
 noncomputable def T (n H : ℕ) : ℕ := (heightClass n H).ncard
 
+/-- `{(0, 0)}` is the only polyplet of one cell. -/
+lemma isPolyplet_one_iff {S : Finset (ℤ × ℤ)} :
+    IsPolyplet 1 S ↔ S = {((0 : ℤ), (0 : ℤ))} := by
+  constructor
+  · intro h
+    obtain ⟨p, hp⟩ := Finset.card_eq_one.mp h.card
+    obtain ⟨q, hq, hq1⟩ := h.anchored.x_zero
+    obtain ⟨r, hr, hr2⟩ := h.anchored.y_zero
+    rw [hp, Finset.mem_singleton] at hq hr
+    rw [hp]
+    congr 1
+    exact Prod.ext (hq ▸ hq1) (hr ▸ hr2)
+  · rintro rfl
+    refine ⟨Finset.card_singleton _, kingConnected_singleton _, ?_⟩
+    · refine ⟨fun p hp => ?_, ⟨_, Finset.mem_singleton_self _, rfl⟩, fun p hp => ?_,
+        ⟨_, Finset.mem_singleton_self _, rfl⟩⟩ <;>
+      · rw [Finset.mem_singleton] at hp
+        subst hp
+        exact le_rfl
+
 /-- `T 1 1 = 1`: the single cell `{(0, 0)}` is the only one-cell polyplet.
 The seed of the `k = 0` diagonal (`King.lean`). -/
 theorem T_1_1 : T 1 1 = 1 := by
   rw [T, Set.ncard_eq_one]
   refine ⟨{(0, 0)}, Set.ext fun S => ?_⟩
-  simp only [heightClass, Set.mem_setOf_eq, Set.mem_singleton_iff]
-  constructor
-  · rintro ⟨h, -⟩
-    obtain ⟨p, hp⟩ := Finset.card_eq_one.mp h.card
-    obtain ⟨q, hq, hq1⟩ := h.anchored.x_zero
-    obtain ⟨r, hr, hr2⟩ := h.anchored.y_zero
-    rw [hp, Finset.mem_singleton] at hq hr
-    rw [hq] at hq1
-    rw [hr] at hr2
-    rw [hp, show p = (0, 0) from Prod.ext hq1 hr2]
-  · rintro rfl
-    refine ⟨⟨rfl, kingConnected_singleton _, ⟨by simp, ⟨(0, 0), by simp⟩, by simp, ?_⟩⟩, ?_⟩
-    · exact ⟨(0, 0), by simp⟩
-    · simp [height]
+  simp only [mem_heightClass, isPolyplet_one_iff, Set.mem_singleton_iff]
+  exact ⟨And.left, fun h => ⟨h, by subst h; simp [height]⟩⟩
 
 end Polyplets

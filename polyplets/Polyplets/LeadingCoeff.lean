@@ -17,7 +17,7 @@ import Polyplets.King
 # The leading coefficient of `P_k` is `25^k / k!`
 
 `King.lean` proves `T(n, n-k) = P_k(n)·3^(n-1-3k)` with `P_k` of degree at
-most `k` (`exists_isDiagonalPoly`). This file pins the top coefficient, so the
+most `k` (`exists_isDiagonalPoly`). This file fixes the top coefficient, so the
 degree is exactly `k`.
 
 The route is the one the recursions themselves suggest. Divide `d_rec` by
@@ -185,10 +185,11 @@ theorem delta_coeff : ∀ (k : ℕ) (δ : Polynomial ℚ), δ.natDegree ≤ k �
 
 /-! ## Transfer to the diagonal polynomial -/
 
-/-- **The leading coefficient of `P_k` is `25^k/k!`.** For any `P` of degree
-`≤ k` satisfying the diagonal law at level `k`. -/
-theorem IsDiagonalPoly.coeff_eq {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree ≤ k)
-    (hP : IsDiagonalPoly k P) : P.coeff k = 25 ^ k / k.factorial := by
+/-- **The leading coefficient of `P_k` is `25^k/k!`.** For any `P` satisfying
+the diagonal law at level `k`. -/
+theorem IsDiagonalPoly.coeff_eq {k : ℕ} {P : Polynomial ℚ} (hP : IsDiagonalPoly k P) :
+    P.coeff k = 25 ^ k / k.factorial := by
+  have hdeg := hP.natDegree_le
   choose δ' hdeg' hval' using exists_delta
   set L : Polynomial ℚ := P.comp (X + C (k : ℚ)) with hL
   set Rt : Polynomial ℚ := C ((3 : ℚ) ^ (2 * k + 1)) * (δ' k +
@@ -254,15 +255,15 @@ theorem IsDiagonalPoly.coeff_eq {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegr
   ring
 
 /-- **`P_k` has degree exactly `k`**: its top coefficient `25^k/k!` is not zero. -/
-theorem IsDiagonalPoly.natDegree_eq {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree ≤ k)
-    (hP : IsDiagonalPoly k P) : P.natDegree = k :=
-  natDegree_eq_of_le_of_coeff_ne_zero hdeg (by rw [hP.coeff_eq hdeg]; positivity)
+theorem IsDiagonalPoly.natDegree_eq {k : ℕ} {P : Polynomial ℚ} (hP : IsDiagonalPoly k P) :
+    P.natDegree = k :=
+  natDegree_eq_of_le_of_coeff_ne_zero hP.natDegree_le (by rw [hP.coeff_eq]; positivity)
 
 /-! ## The diagonal polynomial from `k` values and the leading coefficient -/
 
 /-- **`P_k` is fixed by rows `2k+1 … 3k`.** A polynomial of degree `≤ k` with
 leading coefficient `25^k/k!` that matches `T` on those `k` rows satisfies
-the diagonal law at level `k`. One row fewer than `isDiagonalPoly_of_eval_Icc`,
+the diagonal law at level `k`. One row fewer than `RowLocal.isDiagonalPoly_of_eval`,
 which needs `k + 1` points because it does not know the leading coefficient. -/
 theorem isDiagonalPoly_of_coeff_of_eval_Icc (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k)
     (hlc : p.coeff k = 25 ^ k / k.factorial)
@@ -270,7 +271,7 @@ theorem isDiagonalPoly_of_coeff_of_eval_Icc (k : ℕ) (p : Polynomial ℚ) (hp :
       p.eval (n : ℚ) = ((T n (n - k) * 3 ^ (3 * k + 1 - n) : ℕ) : ℚ)) :
     IsDiagonalPoly k p := by
   obtain ⟨P, hPdeg, hP⟩ := exists_isDiagonalPoly k
-  have hPlc : P.coeff k = 25 ^ k / k.factorial := hP.coeff_eq hPdeg
+  have hPlc : P.coeff k = 25 ^ k / k.factorial := hP.coeff_eq
   suffices hpP : p = P by rw [hpP]; exact hP
   rcases k with _ | m
   · rw [eq_C_of_natDegree_le_zero hp, eq_C_of_natDegree_le_zero hPdeg, hlc, hPlc]

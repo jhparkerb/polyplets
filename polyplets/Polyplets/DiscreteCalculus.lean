@@ -11,7 +11,7 @@ import Mathlib.Tactic.Ring
 /-!
 # Two facts about polynomials over `ℚ` on the integers
 
-The algebra the diagonal-law shape theorem (`RowLocal/DiagonalLaw.lean`)
+The algebra the diagonal law (`RowLocal/DiagonalLaw.lean`)
 needs and nothing else:
 
 * `exists_poly_sum_Icc` — the discrete antiderivative: every `g ∈ ℚ[X]` has a
@@ -63,7 +63,7 @@ lemma faulhaberPoly_eval (p n : ℕ) :
 /-- **Discrete antiderivative.** Every `g : ℚ[X]` has a `G : ℚ[X]` with
 `deg G ≤ deg g + 1` (and `G = 0` for `g = 0`) summing it over any integer
 interval: `∑_{i ∈ Icc a b} g(i) = G(b) - G(a-1)`. The one real algebra input
-of the shape theorem. -/
+of the diagonal law. -/
 lemma exists_poly_sum_Icc (g : Polynomial ℚ) :
     ∃ G : Polynomial ℚ, G.natDegree ≤ g.natDegree + 1 ∧ (g = 0 → G = 0) ∧
       ∀ a b : ℕ, a ≤ b + 1 →

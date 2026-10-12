@@ -22,12 +22,12 @@ of it, and the Fekete step:
 * `M_supermul` — **Lemma 3**, `M i * M j ≤ M (i + j)`, for all `i` and `j`;
 * `M_tendsto` — `µ = lim M(n)^{1/n}` exists;
 * `M_le_mu_pow` — `M n ≤ µⁿ` for every `n`, the limit-is-supremum half;
-* `mu_gt_of_M_700` — `3.1234 < µ`, **conditional** on the banked
+* `mu_gt_of_M_700` — `3.1234 < µ`, **conditional** on the computed
   `M 700` of `results/mk_stair_terms_n700.txt`.
 
 The last two are the point. `make gate-middle-kingdom` checks
 supermultiplicativity on 700 computed terms; `M_supermul` makes it a theorem for
-all `i` and `j`, and Fekete then converts *any* banked term into a rigorous
+all `i` and `j`, and Fekete then converts *any* computed term into a rigorous
 floor under `µ` rather than an extrapolation toward it.
 
 What is deliberately not here: Lemma 1 (the phase split), Lemma 2 (the stack
@@ -264,16 +264,16 @@ theorem M_le_mu_pow (n : ℕ) : (M n : ℝ) ≤ mu ^ n := by
 measured `3.1289…`, and free: it is the ceiling Fekete needed anyway. -/
 theorem mu_le : mu ≤ 4 := stairFekete.growth_le
 
-/-! ## The conditional lower bound from the banked term
+/-! ## The conditional lower bound from the computed term
 
-`M_le_mu_pow` turns any banked term into a floor. The largest one this project
+`M_le_mu_pow` turns any computed term into a floor. The largest one this project
 has computed is `M 700`, from `cpp/middle_kingdom_tm.cpp` in `stair` mode
 (`results/mk_stair_terms_n700.txt`, log `results/mk_stair_n700.log`). It enters
 as an explicit hypothesis, in the `lambda_gt_of_a_40` style, so the
 computation stays outside the kernel and visible in the statement. -/
 
 set_option linter.style.longLine false in
-/-- **The conditional lower bound `3.1234 < µ`, given the banked `M 700`.**
+/-- **The conditional lower bound `3.1234 < µ`, given the computed `M 700`.**
 `M 700 ^ (1/700) = 3.1234045…`, so `15617/5000 = 3.1234` is a floor with room to
 spare, and `x ↦ x⁷⁰⁰` is strictly monotone on `[0, ∞)`. With `mu_le` this is the
 machine-checked bracket `3.1234 < µ ≤ 4`.
@@ -285,7 +285,6 @@ the inequality direction is `M_le_mu_pow`, a theorem, which is what Lemma 3
 buys. The digits appear once, in the statement; the proof carries `M 700` and
 rewrites by the hypothesis at the last moment. -/
 theorem mu_gt_of_M_700 (h : M 700 = 17368528651849586692964028326758271833612371383870423413808116889318363599460025100827498779086610136761902989817504169488748816867918876735230734086164154151538989546114696139586414190817304691612024386097843528450235138333808483697230123839488604376917096321409200698726184492443222298900447735379737893097804045322780266978742339265500438636729) : (15617 / 5000 : ℝ) < mu := by
-  have hle : (M 700 : ℝ) ≤ mu ^ 700 := M_le_mu_pow 700
   have hnum : (15617 : ℕ) ^ 700 < M 700 * 5000 ^ 700 := by
     rw [h]
     have e1 : (15617 : ℕ) ^ 700 = ((15617 : ℕ) ^ 100) ^ 7 := by rw [← pow_mul]
@@ -294,10 +293,9 @@ theorem mu_gt_of_M_700 (h : M 700 = 17368528651849586692964028326758271833612371
     norm_num
   have hnumR : (15617 : ℝ) ^ 700 < (M 700 : ℝ) * (5000 : ℝ) ^ 700 := by
     exact_mod_cast hnum
-  have hpow : ((15617 / 5000 : ℝ)) ^ 700 < mu ^ 700 := by
-    refine lt_of_lt_of_le ?_ hle
-    rw [div_pow, div_lt_iff₀ (by positivity)]
-    exact hnumR
-  exact lt_of_pow_lt_pow_left₀ 700 (le_of_lt mu_pos) hpow
+  refine stairFekete.lt_growth_of_pow_lt (n := 700) (by norm_num) ?_
+  change (15617 / 5000 : ℝ) ^ 700 < (M 700 : ℝ)
+  rw [div_pow, div_lt_iff₀ (by positivity)]
+  exact hnumR
 
 end Polyplets.Staircase
