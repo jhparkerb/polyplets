@@ -10,18 +10,18 @@ import Polyplets.Grand.MuRec
 /-!
 # Staircase: the T-diagonal transfer step
 
-The `c_ident`-transported form of the μ-recursion (`docs/proofs/grand-form.md`): one
+The `T_of_d`-transported form of the μ-recursion (`docs/proofs/grand-form.md`): one
 transfer step multiplies the *full* diagonal family `T (H + k) H` by the fixed
 multiplier series `μ`, exactly, for `H ≥ k + 1` (sharp onset):
 
 `T (H + 1 + k) (H + 1) = ∑_{i ≤ k} μ i · T (H + (k − i)) H`.
 
-The proof rides the top-row peel `Peel.c_ident` through `MuRec.d_mu_rec`. Both
-sides expand by `c_ident` into a `d`-head plus a `Vt`-weighted interior double
+The proof rides the top-row peel `Peel.T_of_d` through `MuRec.d_mu_rec`. Both
+sides expand by `T_of_d` into a `d`-head plus a `Vt`-weighted interior double
 sum. Applying `d_mu_rec` to the head (at height `H + 1`) and to each interior
 `d (k − j) ((H + 1) − ℓ)` (at height `(H − ℓ) + 1`) reveals, after transposing
-the fresh μ-index `i` outward across the `(j, ℓ)`-sums, exactly the `c_ident`
-expansion of the right-hand side — one `c_ident (k − i) H` per `i`. The index
+the fresh μ-index `i` outward across the `(j, ℓ)`-sums, exactly the `T_of_d`
+expansion of the right-hand side — one `T_of_d (k − i) H` per `i`. The index
 swap is a plain `Finset.sum_comm`/`Finset.sum_comm'` transposition (`μ`'s index
 passes through unchanged; the `ℓ`-sum rides along inside `j`) — no convolution
 collapse is needed here, unlike `d_mu_rec`.
@@ -38,17 +38,17 @@ namespace Polyplets
 /-- **The staircase**: one transfer step multiplies the T-diagonal family by
 `μ`, exactly, for `H ≥ k + 1` (sharp onset). In production coordinates
 (`n = H + k`) this relates diagonal `k` at `n + 1` to diagonals `k − i` at
-`n − i`. Proved from `Peel.c_ident` through `MuRec.d_mu_rec`. -/
+`n − i`. Proved from `Peel.T_of_d` through `MuRec.d_mu_rec`. -/
 theorem T_staircase : ∀ k H : ℕ, k + 1 ≤ H →
     (T (H + 1 + k) (H + 1) : ℚ) =
       ∑ i ∈ Finset.range (k + 1), mu i * (T (H + (k - i)) H : ℚ) := by
   intro k H hk
-  -- Step 1: `c_ident k (H+1)`, cast to ℚ.  The head is `d k (H+1)`; the interior
+  -- Step 1: `T_of_d k (H+1)`, cast to ℚ.  The head is `d k (H+1)`; the interior
   -- is a `Vt`-weighted double sum over `d (k−j) ((H+1)−ℓ)`.
   have hLHS : (T (H + 1 + k) (H + 1) : ℚ) = (d k (H + 1) : ℚ) +
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
         (Vt ℓ j : ℚ) * (d (k - j) ((H + 1) - ℓ) : ℚ) := by
-    exact_mod_cast c_ident k (H + 1) (by omega)
+    exact_mod_cast T_of_d k (H + 1) (by omega)
   -- Step 2: `d_mu_rec` on the head.
   have hhead : (d k (H + 1) : ℚ) =
       ∑ i ∈ Finset.range (k + 1), mu i * (d (k - i) H : ℚ) := d_mu_rec H k hk
@@ -62,7 +62,7 @@ theorem T_staircase : ∀ k H : ℕ, k + 1 ≤ H →
     refine Finset.sum_congr rfl fun ℓ hℓ => ?_
     rw [Finset.mem_Icc] at hℓ
     rw [show (H + 1) - ℓ = (H - ℓ) + 1 from by omega, d_mu_rec (H - ℓ) (k - j) (by omega)]
-  -- Step 4: expand the RHS's each `T (H+(k−i)) H` by `c_ident (k−i) H`.
+  -- Step 4: expand the RHS's each `T (H+(k−i)) H` by `T_of_d (k−i) H`.
   have hRHStot : (∑ i ∈ Finset.range (k + 1), mu i * (T (H + (k - i)) H : ℚ)) =
       (∑ i ∈ Finset.range (k + 1), mu i * (d (k - i) H : ℚ)) +
         ∑ i ∈ Finset.range (k + 1), mu i *
@@ -74,7 +74,7 @@ theorem T_staircase : ∀ k H : ℕ, k + 1 ≤ H →
     have hc : (T (H + (k - i)) H : ℚ) = (d (k - i) H : ℚ) +
         ∑ j ∈ Finset.Icc 1 (k - i), ∑ ℓ ∈ Finset.Icc 1 j,
           (Vt ℓ j : ℚ) * (d ((k - i) - j) (H - ℓ) : ℚ) := by
-      exact_mod_cast c_ident (k - i) H (by omega)
+      exact_mod_cast T_of_d (k - i) H (by omega)
     rw [hc, mul_add]
   -- Step 5: the two interiors agree by transposing the μ-index `i` outward.
   have hinterior : (∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, (Vt ℓ j : ℚ) *

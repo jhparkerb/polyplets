@@ -187,7 +187,7 @@ restructured for Lean as the **staircase route**: in sequence form, Steps
 strong induction (`d_mu_rec`), and `T_staircase` carries it to the
 T-diagonals; both on **standard axioms only** (guarded in
 `Polyplets/Audit.lean`). Corollary 2, the leading coefficient 25^k/k!, is
-`LeadingCoeff.lean`'s `production_leadingCoeff`, standard axioms only. The
+`LeadingCoeff.lean`'s `IsDiagonalPoly.coeff_eq`, standard axioms only. The
 production polynomials are pinned for k ≤ 18 from two enumerated cells per
 level (`Grand/PinAll.lean`, `Pk_prod`) — *conditional on those cells*: they
 are hypotheses of the Lean theorems, engine values assumed, not proved in
@@ -210,8 +210,8 @@ at commit 697f376. The item "Lean formalization" below is CLOSED.
   "monomial integer coefficients of P_k, coefficient integrality observed
   k ≤ 17". Monomial integrality is FALSE at every k ≥ 2 — P_2's leading
   coefficient is 625/2 — measured across all 19 wired levels. Integer
-  *values* are proved: Step 6 of `diagonal-law.md`, `production_int_all` in
-  Lean; the equivalent Newton-basis integrality checks out k = 1..19.)
+  *values* are proved: Step 6 of `diagonal-law.md`, `IsDiagonalPoly.intValued`
+  in Lean; the equivalent Newton-basis integrality checks out k = 1..19.)
 
 (The Lean formalization of this theorem, formerly listed here, is CLOSED —
 see §Formalization above.)

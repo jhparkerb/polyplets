@@ -52,9 +52,7 @@ def GrandForm (i : ℕ) (Q : Polynomial ℚ) : Prop :=
     (3 : ℚ) ^ (3 * i + 1) * (T (H + i) H : ℚ) = Q.eval ((H : ℚ) + i) * 3 ^ (H + i)
 
 /-- Grand form to the production `n`-form `T(n, n-k) = P(n)·3^(n-1-3k)`. -/
-lemma grand_to_prod {k : ℕ} {P : Polynomial ℚ} (h : GrandForm k P) :
-    ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (T n (n - k) : ℚ) = P.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) := by
+lemma grand_to_prod {k : ℕ} {P : Polynomial ℚ} (h : GrandForm k P) : IsDiagonalPoly k P := by
   intro n hn
   have hg := h (n - k) (by omega)
   rw [show n - k + k = n from by omega,
@@ -85,7 +83,7 @@ theorem mu_step (k : ℕ) (Q : ℕ → Polynomial ℚ) (c : ℕ → ℚ)
   rw [Finset.sum_range_succ, Nat.sub_self, Nat.add_zero,
     show k + 1 + 1 + k = 2 * k + 2 from by omega, show k + 1 + 1 = k + 2 from by omega] at hst
   have hdiag : (T (k + 1) (k + 1) : ℚ) = 3 ^ k := by
-    rw [T_diag_pow (k + 1) (by omega),
+    rw [T_self (k + 1) (by omega),
       show ((k + 1 : ℕ) : ℤ) - 1 = (k : ℤ) from by push_cast; ring, zpow_natCast]
   rw [hdiag] at hst
   have hterm : ∀ i ∈ Finset.range k,
@@ -322,7 +320,7 @@ lemma num_check (hA : BankedAnchors) : ∀ k, 1 ≤ k → k ≤ 18 →
 lemma grand_zero : GrandForm 0 (Pk 0) := by
   intro H hH
   simp only [Nat.cast_zero, add_zero, Nat.mul_zero, Nat.zero_add, pow_one, Pk, prodPoly_eval]
-  rw [T_diag_pow H hH, show (H : ℤ) - 1 = ((H - 1 : ℕ) : ℤ) from by omega, zpow_natCast,
+  rw [T_self H hH, show (H : ℤ) - 1 = ((H - 1 : ℕ) : ℤ) from by omega, zpow_natCast,
     show (3 : ℚ) ^ H = 3 * 3 ^ (H - 1) from by rw [← pow_succ']; congr 1; omega]
   norm_num
 
@@ -346,18 +344,16 @@ theorem grand_all (hA : BankedAnchors) : ∀ k, k ≤ 18 → grandOK Pk k ∧ mu
       (anchor_check hA (k + 1) (by omega) hk) (num_check hA (k + 1) (by omega) hk)
 
 /-- **`P_k` is explicitly known for `k ≤ 18`**, production form. -/
-theorem Pk_prod (hA : BankedAnchors) (k : ℕ) (hk : k ≤ 18) :
-    ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (T n (n - k) : ℚ) = (Pk k).eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) :=
+theorem Pk_prod (hA : BankedAnchors) (k : ℕ) (hk : k ≤ 18) : IsDiagonalPoly k (Pk k) :=
   grand_to_prod ((grand_all hA k hk).1 k le_rfl)
 
 /-! ## Levels `1` and `2` unconditionally
 
 The climb's first two levels need four onset cells, `T(3,2)`, `T(4,3)`,
 `T(5,3)` and `T(6,4)`, all of which the kernel decides (`Enum.lean`,
-`EnumData.lean`), so `P_1` and `P_2` hold outright. `P1_closed` of
+`EnumData.lean`), so `P_1` and `P_2` hold outright. `T_sub_one` of
 `Pin.lean` is the Lagrange route to the first; this is the staircase route to
-both, and `P2_closed` is the `k = 2` law in its human form. -/
+both, and `T_sub_two` is the `k = 2` diagonal in closed form. -/
 
 /-- The climb to level `2`, from the kernel-decided cells. -/
 theorem grand_two : grandOK Pk 2 ∧ muOK cTab 2 := by
@@ -370,17 +366,16 @@ theorem grand_two : grandOK Pk 2 ∧ muOK cTab 2 := by
     (by norm_num [Enum.T_5_3, Pk, prodPoly_eval])
     (by norm_num [Finset.sum_range_succ, Enum.T_6_4, Pk, cTab, prodPoly_eval])
 
-/-- **`k = 2` diagonal, unconditional** (production form). -/
-theorem P2_pinned : ∀ n : ℕ, 2 * 2 + 1 ≤ n →
-    (T n (n - 2) : ℚ) = (Pk 2).eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 2) :=
+/-- **`P₂ = Pk 2`, unconditionally.** -/
+theorem isDiagonalPoly_P2 : IsDiagonalPoly 2 (Pk 2) :=
   grand_to_prod (grand_two.1 2 le_rfl)
 
-/-- **`k = 2` diagonal, human form**:
-`T(n, n-2) = ½(625n² - 2459n + 1134)·3^(n-7)` for `n ≥ 5`. -/
-theorem P2_closed (n : ℕ) (hn : 5 ≤ n) :
+/-- **`T(n, n-2) = ½(625n² - 2459n + 1134)·3^(n-7)`** for `n ≥ 5`: the `k = 2`
+diagonal. -/
+theorem T_sub_two (n : ℕ) (hn : 5 ≤ n) :
     (T n (n - 2) : ℚ)
       = (1 / 2) * (625 * (n : ℚ) ^ 2 - 2459 * (n : ℚ) + 1134) * (3 : ℚ) ^ ((n : ℤ) - 7) := by
-  have h := P2_pinned n hn
+  have h := isDiagonalPoly_P2 n hn
   simp only [Pk, prodPoly_eval] at h
   norm_num at h ⊢
   rw [h]; ring_nf

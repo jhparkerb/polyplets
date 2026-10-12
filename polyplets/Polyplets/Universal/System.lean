@@ -7,19 +7,20 @@ import Polyplets.Universal.AbstractShape
 import Polyplets.Universal.Peel
 
 /-!
-# A peeling system for every row-local lattice
+# The diagonal law for every row-local lattice
 
 The geometric front (`Universal/{Defs, Graph, Finite,
 Separation, RowProfile, Weights, Peel}.lean`) discharges every field of
-`PeelSystem`, so the abstract shape engine of `Universal/AbstractShape.lean`
+`TopRowRecursion`, so the abstract shape engine of `Universal/AbstractShape.lean`
 applies to **every** row-local lattice `L`. Composing the two halves gives
 Theorem A of `docs/proofs/universal-diagonal-law.md` in Lean:
 
-* `universal_shape_d` : `d L k H = δ_k(H) · b^H` for `H ≥ k + 1`;
-* `universal_shape` : `T L (H+k) H = q_k(H) · b^H` for `H ≥ k + 1`;
-* `universal_shape_production` : `T L (n, n-k) = P_k(n) · b^(n-1-3k)` for
-  `n ≥ 2k+1`, plus the zpow-free companion;
-* `universal_production_int_all` : the `P_k` are integer-valued on `ℤ`,
+* `exists_delta` : `d L k H = δ_k(H) · b^H` for `H ≥ k + 1`;
+* `exists_q` : `T L (H+k) H = q_k(H) · b^H` for `H ≥ k + 1`;
+* `exists_isDiagonalPoly` : `T L (n, n-k) = P_k(n) · b^(n-1-3k)` for
+  `n ≥ 2k+1` (`IsDiagonalPoly L k P_k`), with the zpow-free form
+  `IsDiagonalPoly.cleared`;
+* `IsDiagonalPoly.intValued` : the `P_k` are integer-valued on `ℤ`,
 
 with `b = L.D.card` throughout. No hypothesis on `L` beyond `D` finite and
 nonempty; in particular no primality, no symmetry of `D`, no bound on `|D|`.
@@ -29,10 +30,10 @@ namespace Polyplets.Universal
 
 open Polynomial
 
-/-- **The peeling system of a row-local lattice.** Every field is an object of
-the generic geometric tree, and the two recursion fields ARE `Universal/Peel`'s
-`d_rec` and `c_ident`. -/
-noncomputable def peelSystem (L : RowLocal) : PeelSystem where
+/-- **The top-row identities of a row-local lattice.** Every field is an object
+of the generic geometric tree, and the two identity fields ARE `Universal/Peel`'s
+`d_rec` and `T_of_d`. -/
+noncomputable def topRowRecursion (L : RowLocal) : TopRowRecursion where
   b := L.b
   hb := L.one_le_b
   d := d L
@@ -40,55 +41,73 @@ noncomputable def peelSystem (L : RowLocal) : PeelSystem where
   V := V L
   Vt := Vt L
   d_rec := d_rec L
-  c_ident := c_ident L
+  T_of_d := T_of_d L
 
-@[simp] lemma peelSystem_b (L : RowLocal) : (peelSystem L).b = L.b := rfl
+@[simp] lemma topRowRecursion_b (L : RowLocal) : (topRowRecursion L).b = L.b := rfl
 
-@[simp] lemma peelSystem_d (L : RowLocal) : (peelSystem L).d = d L := rfl
+@[simp] lemma topRowRecursion_d (L : RowLocal) : (topRowRecursion L).d = d L := rfl
 
-@[simp] lemma peelSystem_T (L : RowLocal) : (peelSystem L).T = T L := rfl
+@[simp] lemma topRowRecursion_T (L : RowLocal) : (topRowRecursion L).T = T L := rfl
 
-@[simp] lemma peelSystem_V (L : RowLocal) : (peelSystem L).V = V L := rfl
+@[simp] lemma topRowRecursion_V (L : RowLocal) : (topRowRecursion L).V = V L := rfl
 
-@[simp] lemma peelSystem_Vt (L : RowLocal) : (peelSystem L).Vt = Vt L := rfl
+@[simp] lemma topRowRecursion_Vt (L : RowLocal) : (topRowRecursion L).Vt = Vt L := rfl
 
 /-! ## Theorem A -/
 
 /-- **Shape of the walk-top diagonal, universally**: for every row-local lattice
 and every surplus `k`, `d L k H = δ_k(H) · b^H` for all `H ≥ k + 1`, with
 `δ_k ∈ ℚ[X]` of degree `≤ k`. -/
-theorem universal_shape_d (L : RowLocal) (k : ℕ) :
+theorem exists_delta (L : RowLocal) (k : ℕ) :
     ∃ δ : Polynomial ℚ, δ.natDegree ≤ k ∧
       ∀ H : ℕ, k + 1 ≤ H → (d L k H : ℚ) = δ.eval (H : ℚ) * (L.b : ℚ) ^ H :=
-  (peelSystem L).shape_d k
+  (topRowRecursion L).exists_delta k
 
 /-- **The universal diagonal law (Theorem A)**: for every row-local lattice and
 every `k` there is `q_k ∈ ℚ[X]` of degree `≤ k` with
 `T(H+k, H) = q_k(H) · b^H` for all `H ≥ k + 1`, where `b = |D|`. -/
-theorem universal_shape (L : RowLocal) (k : ℕ) :
+theorem exists_q (L : RowLocal) (k : ℕ) :
     ∃ q : Polynomial ℚ, q.natDegree ≤ k ∧
       ∀ H : ℕ, k + 1 ≤ H → (T L (H + k) H : ℚ) = q.eval (H : ℚ) * (L.b : ℚ) ^ H :=
-  (peelSystem L).shape k
+  (topRowRecursion L).exists_q k
 
-/-- **Production form, universally**: `T(n, n-k) = P_k(n) · b^(n-1-3k)` for
-`n ≥ 2k+1`, plus the zpow-free companion. The `3` in the exponent is structural
-bookkeeping, not the king drift count. -/
-theorem universal_shape_production (L : RowLocal) (k : ℕ) :
-    ∃ P : Polynomial ℚ, P.natDegree ≤ k ∧
-      (∀ n : ℕ, 2 * k + 1 ≤ n →
-        (T L n (n - k) : ℚ) = P.eval (n : ℚ) * (L.b : ℚ) ^ ((n : ℤ) - 1 - 3 * k)) ∧
-      (∀ n : ℕ, 2 * k + 1 ≤ n →
-        (L.b : ℚ) ^ (3 * k + 1) * (T L n (n - k) : ℚ)
-          = P.eval (n : ℚ) * (L.b : ℚ) ^ n) :=
-  (peelSystem L).shape_production k
+/-- **`P` is the polynomial of the `k`-th diagonal of `L`**:
+`T(n, n-k) = P(n) · b^(n-1-3k)` for all `n ≥ 2k+1`. The `3` in the exponent is
+structural bookkeeping, not the king drift count. -/
+def IsDiagonalPoly (L : RowLocal) (k : ℕ) (P : Polynomial ℚ) : Prop :=
+  ∀ n : ℕ, 2 * k + 1 ≤ n →
+    (T L n (n - k) : ℚ) = P.eval (n : ℚ) * (L.b : ℚ) ^ ((n : ℤ) - 1 - 3 * k)
 
-/-- **Integrality, universally**: any `P` of degree `≤ k` satisfying the
-production identity for `L` is integer-valued on all of `ℤ`. -/
-theorem universal_production_int_all (L : RowLocal) {k : ℕ} {P : Polynomial ℚ}
-    (hdeg : P.natDegree ≤ k)
-    (hP : ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (L.b : ℚ) ^ (3 * k + 1) * (T L n (n - k) : ℚ) = P.eval (n : ℚ) * (L.b : ℚ) ^ n) :
+/-- The predicate is the abstract one at `topRowRecursion L`, definitionally. -/
+lemma isDiagonalPoly_topRowRecursion {L : RowLocal} {k : ℕ} {P : Polynomial ℚ} :
+    (topRowRecursion L).IsDiagonalPoly k P ↔ IsDiagonalPoly L k P := Iff.rfl
+
+/-- **The diagonal law in the report's coordinates, universally**: for every
+row-local lattice and every `k` there is a `P_k` of degree `≤ k` with
+`T(n, n-k) = P_k(n) · b^(n-1-3k)` for `n ≥ 2k+1`. -/
+theorem exists_isDiagonalPoly (L : RowLocal) (k : ℕ) :
+    ∃ P : Polynomial ℚ, P.natDegree ≤ k ∧ IsDiagonalPoly L k P :=
+  (topRowRecursion L).exists_isDiagonalPoly k
+
+/-- The zpow-free form: `b^(3k+1) · T(n, n-k) = P(n) · b^n`. -/
+theorem IsDiagonalPoly.cleared {L : RowLocal} {k : ℕ} {P : Polynomial ℚ}
+    (hP : IsDiagonalPoly L k P) :
+    ∀ n : ℕ, 2 * k + 1 ≤ n →
+      (L.b : ℚ) ^ (3 * k + 1) * (T L n (n - k) : ℚ) = P.eval (n : ℚ) * (L.b : ℚ) ^ n :=
+  TopRowRecursion.IsDiagonalPoly.cleared (isDiagonalPoly_topRowRecursion.mpr hP)
+
+/-- **The values on the onset window are counts**: for `2k+1 ≤ n ≤ 3k+1`,
+`P(n) = T(n, n-k) · b^(3k+1-n)`. -/
+theorem IsDiagonalPoly.eval_onset {L : RowLocal} {k : ℕ} {P : Polynomial ℚ}
+    (hP : IsDiagonalPoly L k P) {n : ℕ} (hn1 : 2 * k + 1 ≤ n) (hn2 : n ≤ 3 * k + 1) :
+    P.eval (n : ℚ) = ((T L n (n - k) * L.b ^ (3 * k + 1 - n) : ℕ) : ℚ) :=
+  TopRowRecursion.IsDiagonalPoly.eval_onset (isDiagonalPoly_topRowRecursion.mpr hP) hn1 hn2
+
+/-- **Integrality, universally**: any `P` of degree `≤ k` satisfying the law
+for `L` is integer-valued on all of `ℤ`. -/
+theorem IsDiagonalPoly.intValued {L : RowLocal} {k : ℕ} {P : Polynomial ℚ}
+    (hdeg : P.natDegree ≤ k) (hP : IsDiagonalPoly L k P) :
     ∀ m : ℤ, ∃ z : ℤ, P.eval (m : ℚ) = (z : ℚ) :=
-  (peelSystem L).production_int_all hdeg hP
+  TopRowRecursion.IsDiagonalPoly.intValued hdeg (isDiagonalPoly_topRowRecursion.mpr hP)
 
 end Polyplets.Universal

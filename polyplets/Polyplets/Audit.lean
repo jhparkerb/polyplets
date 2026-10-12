@@ -46,9 +46,9 @@ namespace Polyplets
 #guard_msgs in
 #print axioms report_T_n_nm1
 
-/-- info: 'Polyplets.P2_closed' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.T_sub_two' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms P2_closed
+#print axioms T_sub_two
 
 /-- info: 'Polyplets.Enum.L_spec' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
@@ -80,13 +80,13 @@ namespace Polyplets
 
 /-! ## The results they rest on -/
 
-/-- info: 'Polyplets.shape_production' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.exists_isDiagonalPoly' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms shape_production
+#print axioms exists_isDiagonalPoly
 
-/-- info: 'Polyplets.production_int_all' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.IsDiagonalPoly.intValued' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms production_int_all
+#print axioms IsDiagonalPoly.intValued
 
 /-- info: 'Polyplets.d_mu_rec' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
@@ -126,21 +126,21 @@ namespace Polyplets
 #guard_msgs in
 #print axioms r90_vanish
 
-/-- info: 'Polyplets.Universal.universal_shape_d' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.Universal.exists_delta' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Universal.universal_shape_d
+#print axioms Universal.exists_delta
 
-/-- info: 'Polyplets.Universal.universal_shape' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.Universal.exists_q' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Universal.universal_shape
+#print axioms Universal.exists_q
 
-/-- info: 'Polyplets.Universal.universal_shape_production' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.Universal.exists_isDiagonalPoly' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Universal.universal_shape_production
+#print axioms Universal.exists_isDiagonalPoly
 
-/-- info: 'Polyplets.Universal.universal_production_int_all' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'Polyplets.Universal.IsDiagonalPoly.intValued' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
-#print axioms Universal.universal_production_int_all
+#print axioms Universal.IsDiagonalPoly.intValued
 
 /-- info: 'Polyplets.Stair.M_supermul' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in

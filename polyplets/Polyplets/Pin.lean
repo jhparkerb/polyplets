@@ -15,14 +15,14 @@ import Polyplets.Universal.Compute
 /-!
 # Pin: the explicit production polynomials `P_k`
 
-`Shape.lean` proves that for every surplus `k` there is *some* `P_k ∈ ℚ[X]` of
+`King.lean` proves that for every surplus `k` there is *some* `P_k ∈ ℚ[X]` of
 degree `≤ k` with `T(n, n-k) = P_k(n)·3^(n-1-3k)` for `n ≥ 2k+1`
-(`shape_production`), but does not identify it. This file holds the concrete
+(`exists_isDiagonalPoly`), but does not identify it. This file holds the concrete
 production polynomials `Pk 0 … Pk 18` of `orchestrator/sweep.go` (numerator
-coefficients descending in `n`, over `k!`), the Lagrange pin lemma `pin`
-(a degree-`≤ k` polynomial matching the shape witness at the `k+1` onset
-points `2k+1 … 3k+1` *is* the witness), and the unconditional `k = 1` law
-`P1_closed`, pinned from the kernel-decided cells `T 3 2` and `T 4 3`.
+coefficients descending in `n`, over `k!`), the values lemma
+`isDiagonalPoly_of_eval_Icc` (a degree-`≤ k` polynomial matching the witness at
+the `k+1` onset points `2k+1 … 3k+1` *is* the witness), and the `k = 1`
+diagonal `T_sub_one`, from the kernel-decided cells `T 3 2` and `T 4 3`.
 
 `Grand/PinAll.lean` pins every `Pk k`, `k ≤ 18`, from two enumerated anchor
 cells per level; `LeadingCoeff.lean` pins from `k` rows given the leading
@@ -106,51 +106,53 @@ noncomputable def Pk : ℕ → Polynomial ℚ
   | 18 => prodPoly [14551915228366851806640625, -1216004602611064910888671875, 47220123186707496643066406250, -1152996117314100265502929687500, 19425111820647906303405761718750, -230445407070280340071105957031250, 1818181407908782536004023437500000, -6826614118228039757132018320312500, -34818861040188463329071106306984375, 701508624630574629016108663795874925, -4974015500069905129885380187424318850, 24632585272713265594357624257091138200, -181772288700805914476560807450032440000, 1799250000012213308990934660048459646800, -11981768558659998471685945614032297834400, 43413108716808863459147673721575806860800, -62928082571267723622620177718733540032000, -37079629775551619904419498589278737305600, 127787800900726736892183047952793411584000] 6402373705728000
   | _ => 0
 
-/-! ## The generic pin lemma (Lagrange uniqueness) -/
+/-! ## The diagonal polynomial from its `k + 1` onset values -/
 
-/-- **Pin lemma.** A polynomial `p` of degree `≤ k` that matches the shape
-witness (`shape_production`) at the `k+1` onset points `[2k+1, 3k+1]`
-*is* the shape witness, hence carries the full diagonal-law production form.
-The hypothesis `hpts` states, at each onset point, that `p(n)` equals the
-integer `T(n,n-k)·3^(3k+1-n)` that `production_int_onset` also forces on the
-witness. This is `Universal.pin` at the king lattice. -/
-theorem pin (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k)
+/-- **The diagonal polynomial from `k + 1` values.** A polynomial `p` of
+degree `≤ k` that matches the witness of `exists_isDiagonalPoly` at the `k+1`
+onset points `[2k+1, 3k+1]` *is* that witness, hence satisfies the diagonal
+law. The hypothesis `hpts` states, at each onset point, that `p(n)` equals the
+count `T(n,n-k)·3^(3k+1-n)` that `IsDiagonalPoly.eval_onset` forces on the
+witness. This is `Universal.isDiagonalPoly_of_eval` at the king lattice. -/
+theorem isDiagonalPoly_of_eval_Icc (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k)
     (hpts : ∀ n ∈ Finset.Icc (2 * k + 1) (3 * k + 1),
       p.eval (n : ℚ) = ((T n (n - k) * 3 ^ (3 * k + 1 - n) : ℕ) : ℚ)) :
-    ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (T n (n - k) : ℚ) = p.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) := by
+    IsDiagonalPoly k p := by
   intro n hn
-  have h := Universal.pin Universal.kingLattice k p hp (Finset.Icc (2 * k + 1) (3 * k + 1))
+  have h := Universal.isDiagonalPoly_of_eval Universal.kingLattice k p hp
+    (Finset.Icc (2 * k + 1) (3 * k + 1))
     (by rw [Nat.card_Icc]; omega) (fun n hn => Finset.mem_Icc.mp hn)
     (fun n hn => by rw [hpts n hn, Universal.T_king, Universal.b_king]) n hn
   rw [Universal.T_king, Universal.b_king] at h
   exact_mod_cast h
 
-/-! ## The unconditional `k = 1` law -/
+/-! ## The `k = 1` diagonal, unconditionally -/
 
 
 lemma Pk_one_natDegree_le : (Pk 1).natDegree ≤ 1 := by
   simp only [Pk]; exact le_trans (prodPoly_natDegree_le _ _) (by norm_num)
-lemma guard_1_3 : (Pk 1).eval (3 : ℚ) = ((T 3 2 * 3 ^ 1 : ℕ) : ℚ) := by
+/-- `P₁(3) = T(3,2)·3`. -/
+lemma Pk_one_eval_three : (Pk 1).eval (3 : ℚ) = ((T 3 2 * 3 ^ 1 : ℕ) : ℚ) := by
   simp only [Pk, prodPoly_eval]; norm_num [T_3_2]
-lemma guard_1_4 : (Pk 1).eval (4 : ℚ) = ((T 4 3 * 3 ^ 0 : ℕ) : ℚ) := by
+/-- `P₁(4) = T(4,3)`. -/
+lemma Pk_one_eval_four : (Pk 1).eval (4 : ℚ) = ((T 4 3 * 3 ^ 0 : ℕ) : ℚ) := by
   simp only [Pk, prodPoly_eval]; norm_num [T_4_3]
 
-/-- **k=1 diagonal, unconditional** (production form). -/
-theorem P1_pinned : ∀ n : ℕ, 2 * 1 + 1 ≤ n →
-    (T n (n - 1) : ℚ) = (Pk 1).eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 1) := by
-  refine pin 1 (Pk 1) Pk_one_natDegree_le ?_
+/-- **`P₁ = Pk 1`, unconditionally**: from the two kernel-decided cells. -/
+theorem isDiagonalPoly_P1 : IsDiagonalPoly 1 (Pk 1) := by
+  refine isDiagonalPoly_of_eval_Icc 1 (Pk 1) Pk_one_natDegree_le ?_
   intro n hn
   fin_cases hn
   · simp only [show (3 - 1 : ℕ) = 2 from rfl, show (3 * 1 + 1 - 3 : ℕ) = 1 from rfl]
-    exact guard_1_3
+    exact Pk_one_eval_three
   · simp only [show (4 - 1 : ℕ) = 3 from rfl, show (3 * 1 + 1 - 4 : ℕ) = 0 from rfl]
-    exact guard_1_4
+    exact Pk_one_eval_four
 
-/-- **k=1 diagonal, human form**: `T(n, n-1) = (25n - 45)·3^(n-4)` for `n ≥ 3`. -/
-theorem P1_closed (n : ℕ) (hn : 3 ≤ n) :
+/-- **`T(n, n-1) = (25n - 45)·3^(n-4)`** for `n ≥ 3`: the `k = 1` diagonal, the
+report's worked example. -/
+theorem T_sub_one (n : ℕ) (hn : 3 ≤ n) :
     (T n (n - 1) : ℚ) = (25 * (n : ℚ) - 45) * (3 : ℚ) ^ ((n : ℤ) - 4) := by
-  have h := P1_pinned n hn
+  have h := isDiagonalPoly_P1 n hn
   simp only [Pk, prodPoly_eval] at h
   norm_num at h ⊢
   rw [h]; ring_nf

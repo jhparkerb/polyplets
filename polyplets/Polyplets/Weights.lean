@@ -26,7 +26,7 @@ weights aggregate cluster configurations by (rows `ℓ`, surplus `j`) only:
 Everything is a `Finset.card` of a computable enumeration in the style of
 `Compute.lean` (window + `powersetCard` + decidable filter), so the kernel can
 decide the smallest values. The enumeration windows are an encoding artifact: the
-**window-independence lemmas** `mem_Dc`, `mem_CFGV`, `mem_CFGVt` characterize
+**window-independence lemmas** `mem_walkTop`, `mem_interiorConfigs`, `mem_topConfigs` characterize
 membership by the propositional descriptions alone (the x-spread of a connected
 set containing the origin is bounded by its cell count, `connected_abs_x_le`).
 Downstream bijections (`Peel.lean`) must match against those propositional
@@ -57,8 +57,8 @@ lemma isWalkRow_iff_rowSize {S : Finset (ℤ × ℤ)} {r : ℤ} :
 
 /-- **Walk-top polyplets**: the polyplets of `H + k` cells and height `H` whose
 top row `H - 1` is a walk row. The enumeration domain is `Compute.lean`'s box;
-`mem_Dc` shows the encoding is invisible. -/
-def Dc (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
+`mem_walkTop` shows the encoding is invisible. -/
+def walkTop (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
   ((box (H + k) H).powersetCard (H + k)).filter
     fun S => S ∈ heightClass (H + k) H ∧ rowSize S ((H : ℤ) - 1) = 1
 
@@ -66,14 +66,14 @@ def Dc (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
 row is a walk row — the primary object of the peeling recursion
 (`d_k(H) = 3·d_k(H−1) + Σ V(ℓ,j)·d_{k−j}(H−1−ℓ)` for `H ≥ k + 2`,
 proved in `Peel.lean`). -/
-def d (k H : ℕ) : ℕ := (Dc k H).card
+def d (k H : ℕ) : ℕ := (walkTop k H).card
 
-/-- **Propositional characterization of `Dc`** (window independence):
+/-- **Propositional characterization of `walkTop`** (window independence):
 membership is exactly height class plus walk top row — the box enumeration is
 an encoding artifact. -/
-theorem mem_Dc {k H : ℕ} {S : Finset (ℤ × ℤ)} :
-    S ∈ Dc k H ↔ S ∈ heightClass (H + k) H ∧ rowSize S ((H : ℤ) - 1) = 1 := by
-  rw [Dc, Finset.mem_filter]
+theorem mem_walkTop {k H : ℕ} {S : Finset (ℤ × ℤ)} :
+    S ∈ walkTop k H ↔ S ∈ heightClass (H + k) H ∧ rowSize S ((H : ℤ) - 1) = 1 := by
+  rw [walkTop, Finset.mem_filter]
   constructor
   · exact fun h => h.2
   · intro h
@@ -159,7 +159,7 @@ in total (so the cluster has `ℓ + j` cells — surplus `j`); and the whole
 king-connected. Everything is encoded as the single finset
 `S = {p} ∪ C ∪ {q}` and read off its row profile. Positions are relative to
 `p`, pinned at the origin — there is deliberately **no x-anchoring clause**. -/
-structure IsVConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+structure IsInteriorConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
   /-- `ℓ + j + 2` cells: the cluster's `ℓ + j`, plus `p` and `q`. -/
   card : S.card = ℓ + j + 2
   /-- The fixed walk cell `p = (0, 0)`. -/
@@ -175,9 +175,9 @@ structure IsVConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
   /-- King-connected. -/
   conn : KingConnected S
 
-/-- `IsVConfig` as a conjunction (for decidability). -/
-lemma isVConfig_iff_and {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
-    IsVConfig ℓ j S ↔ S.card = ℓ + j + 2 ∧ ((0 : ℤ), (0 : ℤ)) ∈ S ∧
+/-- `IsInteriorConfig` as a conjunction (for decidability). -/
+lemma isInteriorConfig_iff_and {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
+    IsInteriorConfig ℓ j S ↔ S.card = ℓ + j + 2 ∧ ((0 : ℤ), (0 : ℤ)) ∈ S ∧
       (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ) + 1) ∧ rowSize S 0 = 1 ∧
       rowSize S ((ℓ : ℤ) + 1) = 1 ∧ (∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)) ∧
       KingConnected S :=
@@ -185,9 +185,9 @@ lemma isVConfig_iff_and {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
    fun ⟨a, b, c, d, e, f, g⟩ => ⟨a, b, c, d, e, f, g⟩⟩
 
 /-- `S` is a **Vᵗ-configuration** for `(ℓ, j)` — the peeled data of the
-multi-top case of the c-identity: a V-configuration without the free walk cell
+multi-top case of `T_of_d`: a V-configuration without the free walk cell
 `q` (the cluster caps the animal), hence `ℓ + j + 1` cells on rows `0..ℓ`. -/
-structure IsVtConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+structure IsTopConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
   /-- `ℓ + j + 1` cells: the cluster's `ℓ + j`, plus `p`. -/
   card : S.card = ℓ + j + 1
   /-- The fixed walk cell `p = (0, 0)`. -/
@@ -201,9 +201,9 @@ structure IsVtConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
   /-- King-connected. -/
   conn : KingConnected S
 
-/-- `IsVtConfig` as a conjunction (for decidability). -/
-lemma isVtConfig_iff_and {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
-    IsVtConfig ℓ j S ↔ S.card = ℓ + j + 1 ∧ ((0 : ℤ), (0 : ℤ)) ∈ S ∧
+/-- `IsTopConfig` as a conjunction (for decidability). -/
+lemma isTopConfig_iff_and {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
+    IsTopConfig ℓ j S ↔ S.card = ℓ + j + 1 ∧ ((0 : ℤ), (0 : ℤ)) ∈ S ∧
       (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ)) ∧ rowSize S 0 = 1 ∧
       (∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)) ∧ KingConnected S :=
   ⟨fun h => ⟨h.card, h.origin, h.rows, h.row_zero, h.multi, h.conn⟩,
@@ -211,14 +211,14 @@ lemma isVtConfig_iff_and {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
 
 /-- V-configurations are decidable: decidable cardinality, membership, bounded
 quantifiers, row sizes, and connectivity (`Compute.lean`). -/
-instance decidableIsVConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) :
-    Decidable (IsVConfig ℓ j S) :=
-  decidable_of_iff _ isVConfig_iff_and.symm
+instance decidableIsInteriorConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) :
+    Decidable (IsInteriorConfig ℓ j S) :=
+  decidable_of_iff _ isInteriorConfig_iff_and.symm
 
 /-- Vᵗ-configurations are decidable. -/
-instance decidableIsVtConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) :
-    Decidable (IsVtConfig ℓ j S) :=
-  decidable_of_iff _ isVtConfig_iff_and.symm
+instance decidableIsTopConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) :
+    Decidable (IsTopConfig ℓ j S) :=
+  decidable_of_iff _ isTopConfig_iff_and.symm
 
 /-- **The V-configurations for `(ℓ, j)`**, enumerated computably: choose the
 cluster `C` as an `(ℓ+j)`-subset of the interior window (rows `1..ℓ`,
@@ -226,39 +226,39 @@ cluster `C` as an `(ℓ+j)`-subset of the interior window (rows `1..ℓ`,
 keep the pairs whose assembled set `{(0,0)} ∪ C ∪ {q}` is a V-configuration,
 and take the assembled sets. (Filtering *before* the image keeps the image —
 whose deduplication is quadratic — on the few survivors; the pre-image pairs
-are ~10⁵ at the sizes validated below.) `mem_CFGV` shows the encoding is
+are ~10⁵ at the sizes validated below.) `mem_interiorConfigs` shows the encoding is
 invisible. -/
-def CFGV (ℓ j : ℕ) : Finset (Finset (ℤ × ℤ)) :=
+def interiorConfigs (ℓ j : ℕ) : Finset (Finset (ℤ × ℤ)) :=
   ((((window (ℓ + j + 1) 1 ℓ).powersetCard (ℓ + j)) ×ˢ window (ℓ + j + 1) (ℓ + 1) 1).filter
-    fun Cq => IsVConfig ℓ j (insert ((0 : ℤ), (0 : ℤ)) (insert Cq.2 Cq.1))).image
+    fun Cq => IsInteriorConfig ℓ j (insert ((0 : ℤ), (0 : ℤ)) (insert Cq.2 Cq.1))).image
     fun Cq => insert ((0 : ℤ), (0 : ℤ)) (insert Cq.2 Cq.1)
 
 /-- `V ℓ j`: the interior cluster weight — the number of V-configurations. -/
-def V (ℓ j : ℕ) : ℕ := (CFGV ℓ j).card
+def V (ℓ j : ℕ) : ℕ := (interiorConfigs ℓ j).card
 
-/-- **The Vᵗ-configurations for `(ℓ, j)`**, enumerated computably: as `CFGV`
+/-- **The Vᵗ-configurations for `(ℓ, j)`**, enumerated computably: as `interiorConfigs`
 but with no `q` (window `|x| ≤ ℓ+j`, matching the smaller cell count). -/
-def CFGVt (ℓ j : ℕ) : Finset (Finset (ℤ × ℤ)) :=
+def topConfigs (ℓ j : ℕ) : Finset (Finset (ℤ × ℤ)) :=
   (((window (ℓ + j) 1 ℓ).powersetCard (ℓ + j)).filter
-    fun C => IsVtConfig ℓ j (insert ((0 : ℤ), (0 : ℤ)) C)).image
+    fun C => IsTopConfig ℓ j (insert ((0 : ℤ), (0 : ℤ)) C)).image
     fun C => insert ((0 : ℤ), (0 : ℤ)) C
 
 /-- `Vt ℓ j`: the top-edge cluster weight — the number of Vᵗ-configurations. -/
-def Vt (ℓ j : ℕ) : ℕ := (CFGVt ℓ j).card
+def Vt (ℓ j : ℕ) : ℕ := (topConfigs ℓ j).card
 
 /-! ## Window independence for the configuration sets -/
 
-/-- **Propositional characterization of `CFGV`** (window independence):
-membership is exactly `IsVConfig`. The encoding direction decomposes `S` by its
+/-- **Propositional characterization of `interiorConfigs`** (window independence):
+membership is exactly `IsInteriorConfig`. The encoding direction decomposes `S` by its
 row profile — the unique row-`0` cell is the origin, the unique row-`(ℓ+1)`
 cell is `q`, the rest is the cluster; the x-window is wide enough by
-`connected_abs_x_le`. Downstream bijections must match against `IsVConfig`,
+`connected_abs_x_le`. Downstream bijections must match against `IsInteriorConfig`,
 never this enumeration. -/
-theorem mem_CFGV {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
-    S ∈ CFGV ℓ j ↔ IsVConfig ℓ j S := by
+theorem mem_interiorConfigs {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
+    S ∈ interiorConfigs ℓ j ↔ IsInteriorConfig ℓ j S := by
   constructor
   · intro h
-    rw [CFGV, Finset.mem_image] at h
+    rw [interiorConfigs, Finset.mem_image] at h
     obtain ⟨Cq, hCq, heq⟩ := h
     rw [Finset.mem_filter] at hCq
     rw [← heq]
@@ -309,7 +309,7 @@ theorem mem_CFGV {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
       have hc2 := Finset.card_insert_of_notMem hqC
       rw [hins, hc2] at hc1
       omega
-    rw [CFGV, Finset.mem_image]
+    rw [interiorConfigs, Finset.mem_image]
     refine ⟨(S.filter (fun c => 1 ≤ c.2 ∧ c.2 ≤ (ℓ : ℤ)), q), ?_, hins⟩
     rw [Finset.mem_filter]
     refine ⟨?_, ?_⟩
@@ -331,20 +331,20 @@ theorem mem_CFGV {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
         rw [hcard, abs_le] at hx
         rw [mem_window]
         omega
-    · change IsVConfig ℓ j
+    · change IsInteriorConfig ℓ j
         (insert ((0 : ℤ), (0 : ℤ))
           (insert q (S.filter fun c => 1 ≤ c.2 ∧ c.2 ≤ (ℓ : ℤ))))
       rw [hins]
       exact hS
 
-/-- **Propositional characterization of `CFGVt`** (window independence):
-membership is exactly `IsVtConfig`. Same decomposition as `mem_CFGV`, without
+/-- **Propositional characterization of `topConfigs`** (window independence):
+membership is exactly `IsTopConfig`. Same decomposition as `mem_interiorConfigs`, without
 the top cell. -/
-theorem mem_CFGVt {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
-    S ∈ CFGVt ℓ j ↔ IsVtConfig ℓ j S := by
+theorem mem_topConfigs {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
+    S ∈ topConfigs ℓ j ↔ IsTopConfig ℓ j S := by
   constructor
   · intro h
-    rw [CFGVt, Finset.mem_image] at h
+    rw [topConfigs, Finset.mem_image] at h
     obtain ⟨C, hC, heq⟩ := h
     rw [Finset.mem_filter] at hC
     rw [← heq]
@@ -373,7 +373,7 @@ theorem mem_CFGVt {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
       have hc1 := Finset.card_insert_of_notMem h0notin
       rw [hins] at hc1
       omega
-    rw [CFGVt, Finset.mem_image]
+    rw [topConfigs, Finset.mem_image]
     refine ⟨S.filter (fun c => 1 ≤ c.2), ?_, hins⟩
     rw [Finset.mem_filter]
     refine ⟨?_, ?_⟩

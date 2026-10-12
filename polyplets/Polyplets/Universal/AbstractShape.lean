@@ -13,37 +13,38 @@ import Mathlib.Tactic.Set
 import Polyplets.DiscreteCalculus
 
 /-!
-# AbstractShape: the diagonal law over an abstract peeling system
+# AbstractShape: the diagonal law from the two top-row identities
 
 The diagonal law needs only a thin interface to the geometry: the two
-recursions (`d_rec`, `c_ident`) and nothing else. This file states that
-interface as a structure `PeelSystem` carrying a drift count `b : ℕ` (the
+identities about the top row (`d_rec`, `T_of_d`) and nothing else. This file
+states that interface as a structure `TopRowRecursion` carrying a drift count `b : ℕ` (the
 king lattice's `3`) and proves the four shape theorems from it:
 
-* `PeelSystem.shape_d` : `d k H = δ_k(H) · b^H` for `H ≥ k + 1`, `deg δ_k ≤ k`;
-* `PeelSystem.shape` : `T(H+k, H) = q_k(H) · b^H` for `H ≥ k + 1`;
-* `PeelSystem.shape_production` : `T(n, n-k) = P_k(n) · b^(n-1-3k)` for
-  `n ≥ 2k+1` (`zpow`, so the onset window `2k+1 ≤ n < 3k+1` is covered), plus
-  the zpow-free companion `b^(3k+1) · T(n, n-k) = P_k(n) · b^n`;
-* `PeelSystem.production_int_all` : any such `P_k` is integer-valued on `ℤ`.
+* `TopRowRecursion.exists_delta` : `d k H = δ_k(H) · b^H` for `H ≥ k + 1`, `deg δ_k ≤ k`;
+* `TopRowRecursion.exists_q` : `T(H+k, H) = q_k(H) · b^H` for `H ≥ k + 1`;
+* `TopRowRecursion.exists_isDiagonalPoly` : `T(n, n-k) = P_k(n) · b^(n-1-3k)` for
+  `n ≥ 2k+1` (`IsDiagonalPoly`; `zpow`, so the onset window `2k+1 ≤ n < 3k+1`
+  is covered), with the zpow-free form `b^(3k+1) · T(n, n-k) = P_k(n) · b^n`
+  as `IsDiagonalPoly.cleared`;
+* `TopRowRecursion.IsDiagonalPoly.intValued` : any such `P_k` is integer-valued on `ℤ`.
 
 The only arithmetic fact about `b` the proofs use is `(b : ℚ) ≠ 0`
-(`PeelSystem.b_ne_zero`, from the field `hb : 1 ≤ b`), which is why the
+(`TopRowRecursion.b_ne_zero`, from the field `hb : 1 ≤ b`), which is why the
 "verbatim wager" of `docs/proofs/universal-diagonal-law.md` holds: steps 3–5
 of that proof carry over with `b` in place of `3`. The geometric half (steps
-1–2, a `PeelSystem` from any row-local lattice) is `Universal/System.lean`;
+1–2, a `TopRowRecursion` from any row-local lattice) is `Universal/System.lean`;
 the king instance with its original names is `King.lean`.
 
 ## What the shape law needs from a lattice
 
-Exactly the eight fields of `PeelSystem` — most of them data. The proofs use
+Exactly the eight fields of `TopRowRecursion` — most of them data. The proofs use
 NO base values, NO support or vanishing ranges for `V`/`Vt`, and NO
 arithmetic property of `b` beyond `b ≠ 0`:
 
 * the drift count `b` with `1 ≤ b` (the recursion's homogeneous coefficient;
   `1 ≤ b` is used only as `(b : ℚ) ≠ 0`, to divide by powers of `b`);
 * the four numeric families `d`, `T`, `V`, `Vt` (opaque);
-* the recursion `d_rec` and the top-row identity `c_ident`.
+* the recursion `d_rec` and the top-row identity `T_of_d`.
 
 Notably the ranges `Finset.Icc 1 k` / `Finset.Icc 1 j` in the two recursions
 carry all the support information the induction needs: `ℓ ≤ j ≤ k` is what puts
@@ -54,10 +55,10 @@ every recursive `d (k-j) (H-1-ℓ)` above its own onset, by `omega`.
 Step 5 of the paper proof argues integrality of `P_k` p-adically, prime by
 prime over `p ∣ b`, which for the king case is `p = 3` — the one place where
 primality of `3` could plausibly have been used. The Lean route never needs it:
-`production_int_onset` reads `P_k(n)` off the zpow-free identity as
+`IsDiagonalPoly.eval_onset` reads `P_k(n)` off the zpow-free identity as
 the *natural number* `T(n,n-k) · b^(3k+1-n)` on the onset window
 `2k+1 ≤ n ≤ 3k+1` (exact division by `b^n`, valid for any `b ≠ 0`), and
-`production_int_all` extends by finite differences over the `k+1` consecutive
+`IsDiagonalPoly.intValued` extends by finite differences over the `k+1` consecutive
 onset points. Both are prime-agnostic; `b` is never factored.
 -/
 
@@ -67,13 +68,13 @@ open Polynomial
 
 /-! ## The interface -/
 
-/-- **A peeling system**: the finite numeric interface that the diagonal-law
-algebra consumes. `b` is the drift count (`3` for the king lattice, `|D|` in
+/-- **The two top-row identities**: the finite numeric interface that the
+diagonal-law algebra consumes. `b` is the drift count (`3` for the king lattice, `|D|` in
 general); `d k H` counts walk-top animals of surplus `k` and height `H`;
 `T n H` counts all canonical animals; `V`/`Vt` are the interior and top-edge
-cluster weights. The two recursions are `Peel.lean`'s `d_rec` and `c_ident`
+cluster weights. The two recursions are `Peel.lean`'s `d_rec` and `T_of_d`
 verbatim with `3 ↦ b`. -/
-structure PeelSystem where
+structure TopRowRecursion where
   /-- The drift count: the number of up-offsets of the lattice. -/
   b : ℕ
   /-- The drift count is positive (the up-offset set is nonempty). Used only
@@ -92,15 +93,15 @@ structure PeelSystem where
   d_rec : ∀ k H : ℕ, k + 2 ≤ H →
     d k H = b * d k (H - 1) +
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, V ℓ j * d (k - j) (H - 1 - ℓ)
-  /-- **The c-identity**: a canonical animal has a walk top row or a top-edge
+  /-- **The top-row identity**: a canonical animal has a walk top row or a top-edge
   cluster capping a shorter walk-top remainder. -/
-  c_ident : ∀ k H : ℕ, k + 1 ≤ H →
+  T_of_d : ∀ k H : ℕ, k + 1 ≤ H →
     T (H + k) H = d k H +
       ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, Vt ℓ j * d (k - j) (H - ℓ)
 
-namespace PeelSystem
+namespace TopRowRecursion
 
-variable (S : PeelSystem)
+variable (S : TopRowRecursion)
 
 /-- The drift count is invertible in `ℚ` — the only arithmetic fact about `b`
 the shape law uses. -/
@@ -118,7 +119,7 @@ surplus-`k` one. The
 d-recursion divided by `b^H` is the difference equation `e(H) = e(H-1) + g(H)`;
 telescoping from `H₀ = k+1` and summing `g` by `exists_poly_sum_Icc` gives
 `δ_k`, with the base value absorbed into the constant term. -/
-lemma shape_d_step (k : ℕ)
+lemma exists_delta_step (k : ℕ)
     (IH : ∀ j, j < k → ∃ δ : Polynomial ℚ, δ.natDegree ≤ j ∧
       ∀ H : ℕ, j + 1 ≤ H → (S.d j H : ℚ) = δ.eval (H : ℚ) * (S.b : ℚ) ^ H) :
     ∃ δ : Polynomial ℚ, δ.natDegree ≤ k ∧
@@ -213,18 +214,18 @@ lemma shape_d_step (k : ℕ)
 
 /-- **Shape of the walk-top diagonal**: `d k H = δ_k(H) · b^H` for all
 `H ≥ k + 1`, with `δ_k ∈ ℚ[X]` of degree `≤ k`. -/
-theorem shape_d : ∀ k : ℕ, ∃ δ : Polynomial ℚ, δ.natDegree ≤ k ∧
+theorem exists_delta : ∀ k : ℕ, ∃ δ : Polynomial ℚ, δ.natDegree ≤ k ∧
     ∀ H : ℕ, k + 1 ≤ H → (S.d k H : ℚ) = δ.eval (H : ℚ) * (S.b : ℚ) ^ H := fun k =>
-  Nat.strong_induction_on k S.shape_d_step
+  Nat.strong_induction_on k S.exists_delta_step
 
 /-- **Shape of the k-th diagonal**: `T(H+k, H) = q_k(H) · b^H` for all
 `H ≥ k + 1`, with `q_k ∈ ℚ[X]` of degree `≤ k`. From `shape_d` through the
-c-identity: at `H ≥ k + 1` every `d`-term of `c_ident` is exactly in range. -/
-theorem shape (k : ℕ) : ∃ q : Polynomial ℚ, q.natDegree ≤ k ∧
+top-row identity: at `H ≥ k + 1` every `d`-term of `T_of_d` is exactly in range. -/
+theorem exists_q (k : ℕ) : ∃ q : Polynomial ℚ, q.natDegree ≤ k ∧
     ∀ H : ℕ, k + 1 ≤ H → (S.T (H + k) H : ℚ) = q.eval (H : ℚ) * (S.b : ℚ) ^ H := by
   classical
   have hbne : (S.b : ℚ) ≠ 0 := S.b_ne_zero
-  choose δ hδdeg hδval using S.shape_d
+  choose δ hδdeg hδval using S.exists_delta
   refine ⟨δ k + ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
     C ((S.Vt ℓ j : ℚ) / (S.b : ℚ) ^ ℓ) * (δ (k - j)).comp (X - C (ℓ : ℚ)), ?_, ?_⟩
   · refine le_trans (natDegree_add_le _ _) (max_le (hδdeg k) ?_)
@@ -239,7 +240,7 @@ theorem shape (k : ℕ) : ∃ q : Polynomial ℚ, q.natDegree ≤ k ∧
     have hcQ : (S.T (H + k) H : ℚ) = (S.d k H : ℚ)
         + ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
             (S.Vt ℓ j : ℚ) * (S.d (k - j) (H - ℓ) : ℚ) := by
-      exact_mod_cast S.c_ident k H (by omega)
+      exact_mod_cast S.T_of_d k H (by omega)
     rw [hcQ, eval_add, add_mul, hδval k H hH]
     congr 1
     rw [eval_finsetSum, Finset.sum_mul]
@@ -261,27 +262,25 @@ theorem shape (k : ℕ) : ∃ q : Polynomial ℚ, q.natDegree ≤ k ∧
     have hb1 : ((S.b : ℚ)) ^ ℓ ≠ 0 := S.b_pow_ne_zero _
     field_simp
 
-/-! ## The production form -/
+/-! ## The diagonal law in the report's coordinates -/
 
-/-- **Production form of the diagonal law**: for every `k` there is
-`P_k ∈ ℚ[X]` of degree `≤ k` with
+/-- **`P` is the polynomial of the `k`-th diagonal**: `T(n, n-k) = P(n) · b^(n-1-3k)`
+for all `n ≥ 2k + 1`. The exponent is an integer (`zpow`), negative on the
+onset window `2k+1 ≤ n < 3k+1`, where `P(n)` carries the compensating powers
+of `b`. The `3` in `n - 1 - 3k` is structural bookkeeping (`k` from
+`H = n - k` plus `2k + 1` from the normalization), NOT the king drift count:
+it survives the generalization unchanged. -/
+def IsDiagonalPoly (k : ℕ) (P : Polynomial ℚ) : Prop :=
+  ∀ n : ℕ, 2 * k + 1 ≤ n →
+    (S.T n (n - k) : ℚ) = P.eval (n : ℚ) * (S.b : ℚ) ^ ((n : ℤ) - 1 - 3 * k)
 
-* `T(n, n-k) = P_k(n) · b^(n-1-3k)` for all `n ≥ 2k + 1`, the exponent an
-  integer (`zpow`) — negative on the onset window `2k+1 ≤ n < 3k+1`, where
-  `P_k(n)` carries the compensating powers of `b`; and
-* the zpow-free companion `b^(3k+1) · T(n, n-k) = P_k(n) · b^n`.
-
-`P_k(n) = b^(2k+1) · q_k(n - k)` for the `q_k` of `shape`. The `3` in the
-exponent `n - 1 - 3k` is structural bookkeeping (`k` from `H = n - k` plus
-`2k + 1` from the normalization), NOT the king drift count: it survives the
-generalization unchanged. -/
-theorem shape_production (k : ℕ) : ∃ P : Polynomial ℚ, P.natDegree ≤ k ∧
-    (∀ n : ℕ, 2 * k + 1 ≤ n →
-      (S.T n (n - k) : ℚ) = P.eval (n : ℚ) * (S.b : ℚ) ^ ((n : ℤ) - 1 - 3 * k)) ∧
-    (∀ n : ℕ, 2 * k + 1 ≤ n →
-      (S.b : ℚ) ^ (3 * k + 1) * (S.T n (n - k) : ℚ) = P.eval (n : ℚ) * (S.b : ℚ) ^ n) := by
+/-- **The diagonal law**: for every `k` there is a `P_k ∈ ℚ[X]` of degree `≤ k`
+with `T(n, n-k) = P_k(n) · b^(n-1-3k)` for all `n ≥ 2k + 1`; it is
+`P_k(n) = b^(2k+1) · q_k(n - k)` for the `q_k` of `exists_q`. -/
+theorem exists_isDiagonalPoly (k : ℕ) : ∃ P : Polynomial ℚ, P.natDegree ≤ k ∧
+    S.IsDiagonalPoly k P := by
   have hbne : (S.b : ℚ) ≠ 0 := S.b_ne_zero
-  obtain ⟨q, hqdeg, hq⟩ := S.shape k
+  obtain ⟨q, hqdeg, hq⟩ := S.exists_q k
   have hbase : ∀ n : ℕ, 2 * k + 1 ≤ n →
       (S.T n (n - k) : ℚ) = q.eval ((n : ℚ) - (k : ℚ)) * (S.b : ℚ) ^ (n - k) := by
     intro n hn
@@ -293,7 +292,7 @@ theorem shape_production (k : ℕ) : ∃ P : Polynomial ℚ, P.natDegree ≤ k �
   have hPeval : ∀ x : ℚ, P.eval x = (S.b : ℚ) ^ (2 * k + 1) * q.eval (x - (k : ℚ)) := by
     intro x
     rw [hP, eval_mul, eval_C, eval_comp, eval_sub, eval_X, eval_C]
-  refine ⟨P, ?_, ?_, ?_⟩
+  refine ⟨P, ?_, ?_⟩
   · rw [hP]
     refine le_trans (natDegree_C_mul_le _ _) (le_trans natDegree_comp_le ?_)
     rw [natDegree_X_sub_C, mul_one]
@@ -308,31 +307,36 @@ theorem shape_production (k : ℕ) : ∃ P : Polynomial ℚ, P.natDegree ≤ k �
     rw [hz]
     have hb1 : ((S.b : ℚ)) ^ (2 * k + 1) ≠ 0 := S.b_pow_ne_zero _
     field_simp
-  · intro n hn
-    have hkn : k ≤ n := by omega
-    rw [hbase n hn, hPeval]
-    have hpow : (S.b : ℚ) ^ (3 * k + 1) * (S.b : ℚ) ^ (n - k)
-        = (S.b : ℚ) ^ (2 * k + 1) * (S.b : ℚ) ^ n := by
-      rw [← pow_add, ← pow_add]
-      congr 1
-      omega
-    linear_combination q.eval ((n : ℚ) - (k : ℚ)) * hpow
+
+variable {S}
+
+/-- The zpow-free form of the law: `b^(3k+1) · T(n, n-k) = P(n) · b^n`. -/
+theorem IsDiagonalPoly.cleared {k : ℕ} {P : Polynomial ℚ} (hP : S.IsDiagonalPoly k P) :
+    ∀ n : ℕ, 2 * k + 1 ≤ n →
+      (S.b : ℚ) ^ (3 * k + 1) * (S.T n (n - k) : ℚ) = P.eval (n : ℚ) * (S.b : ℚ) ^ n := by
+  intro n hn
+  have hbne : (S.b : ℚ) ≠ 0 := S.b_ne_zero
+  have hpow : (S.b : ℚ) ^ (3 * k + 1) * (S.b : ℚ) ^ ((n : ℤ) - 1 - 3 * k) = (S.b : ℚ) ^ n := by
+    rw [← zpow_natCast (S.b : ℚ) (3 * k + 1), ← zpow_add₀ hbne, ← zpow_natCast (S.b : ℚ) n]
+    congr 1
+    push_cast
+    ring
+  rw [hP n hn]
+  linear_combination P.eval (n : ℚ) * hpow
 
 /-! ## Integrality -/
 
 /-- **Integrality at the pinning window**: for `2k+1 ≤ n ≤ 3k+1` the
 value `P_k(n)` is the natural number `T(n, n-k) · b^(3k+1-n)`. These are
 exactly the `k+1` onset points `H = k+1 .. 2k+1` (`n = H+k`). Stated for any
-`P` satisfying the production identity.
+`P` satisfying the law.
 
 This is the step the paper proof runs p-adically over the primes dividing `b`;
 here it is exact division by `b^n` and uses no factorization of `b`. -/
-theorem production_int_onset {k : ℕ} {P : Polynomial ℚ}
-    (hP : ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (S.b : ℚ) ^ (3 * k + 1) * (S.T n (n - k) : ℚ) = P.eval (n : ℚ) * (S.b : ℚ) ^ n)
+theorem IsDiagonalPoly.eval_onset {k : ℕ} {P : Polynomial ℚ} (hP : S.IsDiagonalPoly k P)
     {n : ℕ} (hn1 : 2 * k + 1 ≤ n) (hn2 : n ≤ 3 * k + 1) :
     P.eval (n : ℚ) = ((S.T n (n - k) * S.b ^ (3 * k + 1 - n) : ℕ) : ℚ) := by
-  have h := hP n hn1
+  have h := hP.cleared n hn1
   have hpow : (S.b : ℚ) ^ (3 * k + 1) = (S.b : ℚ) ^ (3 * k + 1 - n) * (S.b : ℚ) ^ n := by
     rw [← pow_add]
     congr 1
@@ -344,27 +348,24 @@ theorem production_int_onset {k : ℕ} {P : Polynomial ℚ}
   ring
 
 /-- Integrality at the pinning window, in `∃ z : ℤ` form. -/
-theorem production_int_onset' {k : ℕ} {P : Polynomial ℚ}
-    (hP : ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (S.b : ℚ) ^ (3 * k + 1) * (S.T n (n - k) : ℚ) = P.eval (n : ℚ) * (S.b : ℚ) ^ n)
+theorem IsDiagonalPoly.eval_onset_int {k : ℕ} {P : Polynomial ℚ} (hP : S.IsDiagonalPoly k P)
     {n : ℕ} (hn1 : 2 * k + 1 ≤ n) (hn2 : n ≤ 3 * k + 1) :
     ∃ z : ℤ, P.eval (n : ℚ) = (z : ℚ) :=
   ⟨(S.T n (n - k) * S.b ^ (3 * k + 1 - n) : ℕ), by
-    rw [S.production_int_onset hP hn1 hn2]
+    rw [hP.eval_onset hn1 hn2]
     push_cast
     ring⟩
 
 /-- **Integrality everywhere**: any `P` of degree `≤ k` satisfying the production
 identity is integer-valued on all of `ℤ` — the `k+1` onset points
-`n = 2k+1 .. 3k+1` are integer (`production_int_onset`) and consecutive, so finite differences
+`n = 2k+1 .. 3k+1` are integer (`IsDiagonalPoly.eval_onset`) and consecutive, so finite differences
 (`int_valued_of_consecutive`, `DiscreteCalculus.lean`)
 extend integrality everywhere. -/
-theorem production_int_all {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree ≤ k)
-    (hP : ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (S.b : ℚ) ^ (3 * k + 1) * (S.T n (n - k) : ℚ) = P.eval (n : ℚ) * (S.b : ℚ) ^ n) :
+theorem IsDiagonalPoly.intValued {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree ≤ k)
+    (hP : S.IsDiagonalPoly k P) :
     ∀ m : ℤ, ∃ z : ℤ, P.eval (m : ℚ) = (z : ℚ) := by
   refine int_valued_of_consecutive k P ((2 * k + 1 : ℕ) : ℤ) hdeg fun i hi => ?_
-  obtain ⟨z, hz⟩ := S.production_int_onset' hP
+  obtain ⟨z, hz⟩ := hP.eval_onset_int
     (show 2 * k + 1 ≤ 2 * k + 1 + i by omega) (show 2 * k + 1 + i ≤ 3 * k + 1 by omega)
   refine ⟨z, ?_⟩
   have hcast : ((((2 * k + 1 : ℕ) : ℤ) + (i : ℕ) : ℤ) : ℚ) = ((2 * k + 1 + i : ℕ) : ℚ) := by
@@ -373,6 +374,6 @@ theorem production_int_all {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree �
   rw [hcast]
   exact hz
 
-end PeelSystem
+end TopRowRecursion
 
 end Polyplets.Universal

@@ -24,12 +24,12 @@ by-height diagonals of fixed polyhexes are a polynomial times `2^n`.**
 
 ## What is pinned here
 
-* `hex_P1_pinned` / `hex_P1_closed` : `P₁(n) = 9n − 15`, i.e.
+* `isDiagonalPoly_hexP1` / `hex_T_sub_one` : `P₁(n) = 9n − 15`, i.e.
   `T(n, n−1) = (9n − 15)·2^(n−4)` for `n ≥ 3` (paper instance table, density
   `9 = 3²`), given the second anchor cell `T(4,3) = 21` as a hypothesis. The
   first anchor `T(3,2) = 6` the kernel decides from the generic enumerator;
   `T(4,3)` needs more than 8 GB in the kernel (measured 2026-10-12), so it
-  enters as the hypothesis `hex_P1_pinned` and `hex_P1_closed` carry.
+  enters as the hypothesis `isDiagonalPoly_hexP1` and `hex_T_sub_one` carry.
 * `Checks.lean`: the row sum of the computed height triangle at `n = 3`
   reproduces A001207 (fixed polyhexes) `11` — the same cross-family check as
   for the square lattice against A001168.
@@ -55,8 +55,8 @@ lemma mem_hexLattice_D {t : ℤ} : t ∈ hexLattice.D ↔ (t = -1 ∨ t = 0) := 
 @[simp] lemma b_hex : hexLattice.b = 2 := by decide
 
 /-- The hexagonal lattice has reach `1`: no step skips a column. -/
-lemma M_hex_le : hexLattice.M ≤ 1 :=
-  M_le_one _ (by decide)
+lemma hex_reach_le : hexLattice.reach ≤ 1 :=
+  reach_le_one _ (by decide)
 
 /-- **The instance anchor**: row-local adjacency at the hexagonal lattice is
 adjacency to one of the six hexagonal neighbors. -/
@@ -74,7 +74,7 @@ theorem adj_hex {p q : ℤ × ℤ} :
 /-- `T(3,2) = 6`: of the 11 fixed 3-cell polyhexes, one is flat and four are
 strict staircases, leaving six of height exactly 2. -/
 theorem T_hex_3_2 : T hexLattice 3 2 = 6 := by
-  rw [← Tc_eq_T_of_M_le_one M_hex_le]; decide +kernel
+  rw [← Tc_eq_T_of_reach_le_one hex_reach_le]; decide +kernel
 
 /-! ## Pinning `P₁` -/
 
@@ -91,34 +91,33 @@ lemma hexP1_deg : hexP1.natDegree ≤ 1 := by
 lemma hexP1_eval (x : ℚ) : hexP1.eval x = 9 * x - 15 := by simp [hexP1]
 
 /-- Guard at the first pin point: `P₁(3) = T(3,2) · b^1 = 12`. -/
-lemma hex_guard_3 : hexP1.eval (3 : ℚ) = ((T hexLattice 3 2 * hexLattice.b ^ 1 : ℕ) : ℚ) := by
+lemma hexP1_eval_three : hexP1.eval (3 : ℚ) = ((T hexLattice 3 2 * hexLattice.b ^ 1 : ℕ) : ℚ) := by
   rw [hexP1_eval, T_hex_3_2, b_hex]; norm_num
 
 /-- Guard at the second pin point: `P₁(4) = T(4,3) · b^0 = 21`, given the cell. -/
-lemma hex_guard_4 (h43 : T hexLattice 4 3 = 21) :
+lemma hexP1_eval_four (h43 : T hexLattice 4 3 = 21) :
     hexP1.eval (4 : ℚ) = ((T hexLattice 4 3 * hexLattice.b ^ 0 : ℕ) : ℚ) := by
   rw [hexP1_eval, h43, b_hex]; norm_num
 
-/-- **The hexagonal `P₁`, pinned** (production form), given the second anchor
+/-- **The hexagonal `P₁`, pinned** , given the second anchor
 cell `T(4,3) = 21`. -/
-theorem hex_P1_pinned (h43 : T hexLattice 4 3 = 21) : ∀ n : ℕ, 2 * 1 + 1 ≤ n →
-    (T hexLattice n (n - 1) : ℚ)
-      = hexP1.eval (n : ℚ) * (hexLattice.b : ℚ) ^ ((n : ℤ) - 1 - 3 * 1) := by
-  refine pin hexLattice 1 hexP1 hexP1_deg ({3, 4} : Finset ℕ) (by decide) ?_ ?_
+theorem isDiagonalPoly_hexP1 (h43 : T hexLattice 4 3 = 21) :
+    IsDiagonalPoly hexLattice 1 hexP1 := by
+  refine isDiagonalPoly_of_eval hexLattice 1 hexP1 hexP1_deg ({3, 4} : Finset ℕ) (by decide) ?_ ?_
   · intro n hn; fin_cases hn <;> norm_num
   · intro n hn
     fin_cases hn
     · simp only [show (3 - 1 : ℕ) = 2 from rfl, show (3 * 1 + 1 - 3 : ℕ) = 1 from rfl]
-      exact hex_guard_3
+      exact hexP1_eval_three
     · simp only [show (4 - 1 : ℕ) = 3 from rfl, show (3 * 1 + 1 - 4 : ℕ) = 0 from rfl]
-      exact hex_guard_4 h43
+      exact hexP1_eval_four h43
 
 /-- **The hexagonal `P₁`, human form**: the number of fixed polyhexes with `n`
 cells and bounding-box height exactly `n − 1` is `(9n − 15)·2^(n−4)`, for every
 `n ≥ 3`, given `T(4,3) = 21`. -/
-theorem hex_P1_closed (h43 : T hexLattice 4 3 = 21) (n : ℕ) (hn : 3 ≤ n) :
+theorem hex_T_sub_one (h43 : T hexLattice 4 3 = 21) (n : ℕ) (hn : 3 ≤ n) :
     (T hexLattice n (n - 1) : ℚ) = (9 * (n : ℚ) - 15) * (2 : ℚ) ^ ((n : ℤ) - 4) := by
-  have h := hex_P1_pinned h43 n (by omega)
+  have h := isDiagonalPoly_hexP1 h43 n (by omega)
   rw [b_hex] at h
   norm_num [hexP1_eval] at h ⊢
   rw [h]

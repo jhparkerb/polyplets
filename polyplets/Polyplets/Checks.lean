@@ -66,8 +66,8 @@ theorem d_0_2 : d 0 2 = 3 := by decide +kernel
 /-- `d 1 2 = 5`: of the `T(3,2) = 10` animals, five have a walk top row. -/
 theorem d_1_2 : d 1 2 = 5 := by decide +kernel
 
-/-- The c-identity at its onset `k = 1, H = 2`: `T(3,2) = 10 = 5 + 5·1`. -/
-theorem c_ident_check_k1_H2 : T 3 2 = d 1 2 + Vt 1 1 * d 0 1 := by
+/-- `T_of_d` at its onset `k = 1, H = 2`: `T(3,2) = 10 = 5 + 5·1`. -/
+theorem T_of_d_1_2 : T 3 2 = d 1 2 + Vt 1 1 * d 0 1 := by
   norm_num [T_3_2, d_1_2, Vt_1_1, d_0_1]
 
 /-- The μ-recursion at `(k, H) = (1, 2)`: `d 1 3 = μ₀·d 1 2 + μ₁·d 0 2`. -/
@@ -95,19 +95,19 @@ theorem T_staircase_check_k1_H2 : (T 4 3 : ℚ) = mu 0 * T 3 2 + mu 1 * T 2 2 :=
 theorem T_staircase_value_check : mu 0 * (T 3 2 : ℚ) + mu 1 * (T 2 2 : ℚ) = 55 := by
   rw [mu_zero, mu_one, T_3_2, T_2_2]; norm_num
 
-/-! ## The shape theorem at `k = 0` -/
+/-! ## `T_self` against the triangle -/
 
-/-- The shape-derived closed form gives the banked `T 3 3 = 9`. -/
-theorem shape_check_T_3_3 : T 3 3 = 9 := by
-  have h := T_diag_pow 3 (by omega)
+/-- `T(n, n) = 3^(n-1)` gives the banked `T 3 3 = 9`. -/
+theorem T_self_3_3 : T 3 3 = 9 := by
+  have h := T_self 3 (by omega)
   have he : ((3 : ℕ) : ℤ) - 1 = 2 := by omega
   rw [he] at h
   norm_num at h
   exact_mod_cast h
 
-/-- The shape-derived `T 4 4 = 27`. -/
-theorem shape_check_T_4_4 : T 4 4 = 27 := by
-  have h := T_diag_pow 4 (by omega)
+/-- `T(n, n) = 3^(n-1)` gives `T 4 4 = 27`. -/
+theorem T_self_4_4 : T 4 4 = 27 := by
+  have h := T_self 4 (by omega)
   have he : ((4 : ℕ) : ℤ) - 1 = 3 := by omega
   rw [he] at h
   norm_num at h

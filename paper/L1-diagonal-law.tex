@@ -54,9 +54,9 @@ height defect, and the mod-$3$ arithmetic of the king instance}
 \textbf{Part I --- the law.}
 \emph{Theorem~\ref{thm:A} (shape, onset, integrality)} --- proved below, and
 formalized for every row-local lattice in Lean~4 against mathlib
-(\repo{polyplets/Polyplets/Universal/}: \texttt{universal\_shape\_d},
-\texttt{universal\_shape}, \texttt{universal\_shape\_production},
-\texttt{universal\_production\_int\_all}) and depends on standard axioms only,
+(\repo{polyplets/Polyplets/Universal/}: \texttt{exists\_delta},
+\texttt{exists\_q}, \texttt{exists\_isDiagonalPoly},
+\texttt{IsDiagonalPoly.intValued}) and depends on standard axioms only,
 with no \texttt{sorry} and no \texttt{native\_decide} anywhere in the
 development; the king, square and hex cases are instances. Machine checks of
 the general statement: \repo{experiments/universal\_law\_check.py} (square),
@@ -909,10 +909,10 @@ lines with \textbf{no \texttt{sorry} and no
 is relevant here:
 
 \begin{itemize}
-\item The engine (\texttt{Universal.universal\_shape\_d},
-  \texttt{universal\_shape}, \texttt{universal\_shape\_production},
-  \texttt{universal\_production\_int\_all}) is proved for every row-local
-  lattice, as a theorem about any \texttt{PeelSystem}
+\item The engine (\texttt{Universal.exists\_delta},
+  \texttt{exists\_q}, \texttt{exists\_isDiagonalPoly},
+  \texttt{IsDiagonalPoly.intValued}) is proved for every row-local
+  lattice, as a theorem about any \texttt{TopRowRecursion}
   (\repo{polyplets/Polyplets/Universal/}); the king lattice is the instance
   \texttt{kingLattice} of \repo{polyplets/Polyplets/King.lean}, and the
   report's king-named theorems are the universal ones read at it.
@@ -922,11 +922,11 @@ is relevant here:
   collapse to a convolution fixed point plus one strong induction, and Step 4's
   Lagrange lemma becomes a fixed point, with no power-series ring involved. Same
   theorem, different scaffolding.
-\item \texttt{production\_leadingCoeff} (Corollary~\ref{cor:lead} for the
+\item \texttt{IsDiagonalPoly.coeff\_eq} (Corollary~\ref{cor:lead} for the
   king) is proved outright; the cluster weight $V(1,1) = 25$ it rests on is a
   kernel-decided cell (\texttt{decide +kernel}), not a compiled evaluation.
-\item The per-lattice $P_1$ determinations (\texttt{P1\_closed} for the king,
-  \texttt{square\_P1\_closed}, \texttt{hex\_P1\_closed}) rest on two
+\item The per-lattice $P_1$ determinations (\texttt{T\_sub\_one} for the king,
+  \texttt{square\_T\_sub\_one}, \texttt{hex\_T\_sub\_one}) rest on two
   triangle cells per lattice: the king cells are kernel-decided, the square and
   hex $T(4,3)$ is a hypothesis of the theorem. The $n = 3$ row sums of the
   three lattices are kernel-decided validation facts in \texttt{Checks.lean},

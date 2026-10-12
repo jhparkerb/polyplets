@@ -86,15 +86,15 @@ lemma exists_adj_cross_of_reflTransGen {L : RowLocal} {S : Finset (ℤ × ℤ)}
 /-- **Reach along a walk**: each step moves x by at most `M`, so a walk of
 length `n` moves x by at most `M · n`. -/
 lemma abs_dx_le_of_walk {L : RowLocal} {S : Finset (ℤ × ℤ)} {p q : ℤ × ℤ}
-    (w : (graph L S).Walk p q) : |p.1 - q.1| ≤ L.M * (w.length : ℤ) := by
+    (w : (graph L S).Walk p q) : |p.1 - q.1| ≤ L.reach * (w.length : ℤ) := by
   induction w with
   | nil => simp
   | @cons a x c hadj w' ih =>
-      have h1 : |a.1 - x.1| ≤ L.M := adj_abs_dx_le hadj.2.2
+      have h1 : |a.1 - x.1| ≤ L.reach := adj_abs_dx_le hadj.2.2
       have h2 : |a.1 - c.1| ≤ |a.1 - x.1| + |x.1 - c.1| := abs_sub_le _ _ _
       rw [SimpleGraph.Walk.length_cons]
       push_cast
-      have : L.M * ((w'.length : ℤ) + 1) = L.M + L.M * (w'.length : ℤ) := by ring
+      have : L.reach * ((w'.length : ℤ) + 1) = L.reach + L.reach * (w'.length : ℤ) := by ring
       omega
 
 /-- **x-spread of a connected set**: any two cells of an `L`-connected `S` differ
@@ -103,11 +103,11 @@ so at most `card − 1` steps, each of reach `M`.
 
 At `M = 1` this is the king file's `connected_sub_x_le`; the king proof (every
 intermediate column is occupied) is unavailable in general. -/
-lemma conn_abs_sub_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : Conn L S)
+lemma connected_abs_sub_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : Connected L S)
     {a p : ℤ × ℤ} (ha : a ∈ S) (hp : p ∈ S) :
-    |p.1 - a.1| ≤ L.M * ((S.card : ℤ) - 1) := by
+    |p.1 - a.1| ≤ L.reach * ((S.card : ℤ) - 1) := by
   classical
-  rw [conn_iff_reachable] at hconn
+  rw [connected_iff_reachable] at hconn
   obtain ⟨w⟩ := hconn a ha p hp
   set v := w.toPath with hv
   have hpath : v.val.IsPath := v.2
@@ -119,8 +119,8 @@ lemma conn_abs_sub_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : Conn L
   rw [List.toFinset_card_of_nodup hpath.support_nodup,
     SimpleGraph.Walk.length_support] at hcard
   have hb := abs_dx_le_of_walk v.val
-  have hmul : L.M * (v.val.length : ℤ) ≤ L.M * ((S.card : ℤ) - 1) := by
-    refine mul_le_mul_of_nonneg_left ?_ L.M_nonneg
+  have hmul : L.reach * (v.val.length : ℤ) ≤ L.reach * ((S.card : ℤ) - 1) := by
+    refine mul_le_mul_of_nonneg_left ?_ L.reach_nonneg
     have : (v.val.length : ℤ) + 1 ≤ (S.card : ℤ) := by exact_mod_cast hcard
     omega
   rw [abs_sub_comm] at hb
@@ -129,18 +129,18 @@ lemma conn_abs_sub_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : Conn L
 /-- **x-spread bound at the origin.** In an `L`-connected set containing the
 origin, every cell's `|x|` is at most `M · (card − 1)`. This is what makes the
 enumeration windows of `Universal/Weights.lean` finite. -/
-lemma conn_abs_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : Conn L S)
+lemma connected_abs_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : Connected L S)
     (h0 : ((0 : ℤ), (0 : ℤ)) ∈ S) {p : ℤ × ℤ} (hp : p ∈ S) :
-    |p.1| ≤ L.M * ((S.card : ℤ) - 1) := by
-  have h := conn_abs_sub_x_le hconn h0 hp
+    |p.1| ≤ L.reach * ((S.card : ℤ) - 1) := by
+  have h := connected_abs_sub_x_le hconn h0 hp
   simpa using h
 
 /-- **Uniform width bound.** In a canonical `L`-animal of `n` cells, every
 cell's x-coordinate is at most `M · (n − 1)`. -/
 lemma animal_x_le {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)}
-    (hS : IsAnimal L n H S) {p : ℤ × ℤ} (hp : p ∈ S) : p.1 ≤ L.M * ((n : ℤ) - 1) := by
+    (hS : IsAnimal L n H S) {p : ℤ × ℤ} (hp : p ∈ S) : p.1 ≤ L.reach * ((n : ℤ) - 1) := by
   obtain ⟨p0, hp0S, hp0⟩ := hS.anchored.x_zero
-  have h := conn_abs_sub_x_le hS.conn hp0S hp
+  have h := connected_abs_sub_x_le hS.conn hp0S hp
   rw [hS.card, hp0, sub_zero] at h
   have := le_abs_self p.1
   omega
@@ -151,7 +151,7 @@ lemma animals_finite (L : RowLocal) (n H : ℕ) :
     {S : Finset (ℤ × ℤ) | IsAnimal L n H S}.Finite := by
   apply Set.Finite.subset
     (Finset.powerset
-      (Finset.Icc ((0 : ℤ), (0 : ℤ)) (L.M * ((n : ℤ) - 1), (H : ℤ) - 1))).finite_toSet
+      (Finset.Icc ((0 : ℤ), (0 : ℤ)) (L.reach * ((n : ℤ) - 1), (H : ℤ) - 1))).finite_toSet
   intro S hS
   rw [Finset.mem_coe, Finset.mem_powerset]
   intro p hpS

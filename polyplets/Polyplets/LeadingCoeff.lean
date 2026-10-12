@@ -16,19 +16,20 @@ import Polyplets.King
 /-!
 # The leading coefficient of `P_k` is `25^k / k!`
 
-`Shape.lean` proves `T(n, n-k) = P_k(n)·3^(n-1-3k)` with `P_k` of degree at
-most `k`. This file pins the top coefficient.
+`King.lean` proves `T(n, n-k) = P_k(n)·3^(n-1-3k)` with `P_k` of degree at
+most `k` (`exists_isDiagonalPoly`). This file pins the top coefficient, so the
+degree is exactly `k`.
 
 The route is the one the recursions themselves suggest. Divide `d_rec` by
 `3^H`: the walk-top polynomial `δ_k` satisfies the difference equation
 `δ_k(H) - δ_k(H-1) = Σ V(ℓ,j)·3^{-(1+ℓ)}·δ_{k-j}(H-1-ℓ)`. Only the `j = ℓ = 1`
 term reaches degree `k-1`, so `k·[X^k]δ_k = (V(1,1)/9)·[X^{k-1}]δ_{k-1}` with
 `V(1,1) = 25`, and `[X^0]δ_0 = 1/3` from `d(0,1) = 1`. Hence
-`[X^k]δ_k = (25/9)^k/(3·k!)`. The `c`-identity adds only lower-degree terms, and
+`[X^k]δ_k = (25/9)^k/(3·k!)`. The top-row identity `T_of_d` adds only lower-degree terms, and
 `P_k(n) = 3^(2k+1)·q_k(n-k)` scales this to `25^k/k!`.
 
 Everything is stated for an arbitrary witness polynomial, not the one
-`shape_d` happens to construct: two polynomials over `ℚ` that agree at every
+`exists_delta` happens to construct: two polynomials over `ℚ` that agree at every
 large natural number are equal (`eq_of_eval_nat_eventually`).
 -/
 
@@ -108,7 +109,7 @@ theorem delta_coeff : ∀ (k : ℕ) (δ : Polynomial ℚ), δ.natDegree ≤ k �
     norm_num at h1 ⊢
     linarith
   -- `k = m + 1`: the difference equation.
-  choose δ' hdeg' hval' using shape_d
+  choose δ' hdeg' hval' using exists_delta
   set R : Polynomial ℚ := δ - δ.comp (X - C 1) with hR
   set S : Polynomial ℚ := ∑ j ∈ Finset.Icc 1 (m + 1), ∑ ℓ ∈ Finset.Icc 1 j,
     C ((V ℓ j : ℚ) / 3 ^ (1 + ℓ)) * (δ' (m + 1 - j)).comp (X - C ((1 : ℚ) + ℓ)) with hS
@@ -186,11 +187,9 @@ theorem delta_coeff : ∀ (k : ℕ) (δ : Polynomial ℚ), δ.natDegree ≤ k �
 
 /-- **The leading coefficient of `P_k` is `25^k/k!`.** For any `P` of degree
 `≤ k` satisfying the diagonal law at level `k`. -/
-theorem production_leadingCoeff (k : ℕ) (P : Polynomial ℚ) (hdeg : P.natDegree ≤ k)
-    (hP : ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (T n (n - k) : ℚ) = P.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k)) :
-    P.coeff k = 25 ^ k / k.factorial := by
-  choose δ' hdeg' hval' using shape_d
+theorem IsDiagonalPoly.coeff_eq {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree ≤ k)
+    (hP : IsDiagonalPoly k P) : P.coeff k = 25 ^ k / k.factorial := by
+  choose δ' hdeg' hval' using exists_delta
   set L : Polynomial ℚ := P.comp (X + C (k : ℚ)) with hL
   set Rt : Polynomial ℚ := C ((3 : ℚ) ^ (2 * k + 1)) * (δ' k +
     ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
@@ -218,7 +217,7 @@ theorem production_leadingCoeff (k : ℕ) (P : Polynomial ℚ) (hdeg : P.natDegr
       field_simp
     have hc : (T (H + k) H : ℚ) = d k H +
         ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, (Vt ℓ j : ℚ) * d (k - j) (H - ℓ) := by
-      exact_mod_cast c_ident k H hH
+      exact_mod_cast T_of_d k H hH
     have hsum : ∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j, (Vt ℓ j : ℚ) * d (k - j) (H - ℓ)
         = (∑ j ∈ Finset.Icc 1 k, ∑ ℓ ∈ Finset.Icc 1 j,
             (Vt ℓ j : ℚ) / 3 ^ ℓ * (δ' (k - j)).eval ((H : ℚ) - ℓ)) * 3 ^ H := by
@@ -254,21 +253,25 @@ theorem production_leadingCoeff (k : ℕ) (P : Polynomial ℚ) (hdeg : P.natDegr
   field_simp
   ring
 
-/-! ## Pinning from `k` rows -/
+/-- **`P_k` has degree exactly `k`**: its top coefficient `25^k/k!` is not zero. -/
+theorem IsDiagonalPoly.natDegree_eq {k : ℕ} {P : Polynomial ℚ} (hdeg : P.natDegree ≤ k)
+    (hP : IsDiagonalPoly k P) : P.natDegree = k :=
+  natDegree_eq_of_le_of_coeff_ne_zero hdeg (by rw [hP.coeff_eq hdeg]; positivity)
+
+/-! ## The diagonal polynomial from `k` values and the leading coefficient -/
 
 /-- **`P_k` is fixed by rows `2k+1 … 3k`.** A polynomial of degree `≤ k` with
 leading coefficient `25^k/k!` that matches `T` on those `k` rows satisfies
-the diagonal law at level `k`. One row fewer than `pin`, which needs
-`k + 1` points because it does not know the leading coefficient. -/
-theorem pin_of_leadingCoeff (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k)
+the diagonal law at level `k`. One row fewer than `isDiagonalPoly_of_eval_Icc`,
+which needs `k + 1` points because it does not know the leading coefficient. -/
+theorem isDiagonalPoly_of_coeff_of_eval_Icc (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k)
     (hlc : p.coeff k = 25 ^ k / k.factorial)
     (hpts : ∀ n ∈ Finset.Icc (2 * k + 1) (3 * k),
       p.eval (n : ℚ) = ((T n (n - k) * 3 ^ (3 * k + 1 - n) : ℕ) : ℚ)) :
-    ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (T n (n - k) : ℚ) = p.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) := by
-  obtain ⟨P, hPdeg, hPzpow, hPcomp⟩ := shape_production k
-  have hPlc : P.coeff k = 25 ^ k / k.factorial := production_leadingCoeff k P hPdeg hPzpow
-  suffices hpP : p = P by rw [hpP]; exact hPzpow
+    IsDiagonalPoly k p := by
+  obtain ⟨P, hPdeg, hP⟩ := exists_isDiagonalPoly k
+  have hPlc : P.coeff k = 25 ^ k / k.factorial := hP.coeff_eq hPdeg
+  suffices hpP : p = P by rw [hpP]; exact hP
   rcases k with _ | m
   · rw [eq_C_of_natDegree_le_zero hp, eq_C_of_natDegree_le_zero hPdeg, hlc, hPlc]
   rw [← sub_eq_zero]
@@ -286,7 +289,7 @@ theorem pin_of_leadingCoeff (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤
   · intro x hx
     obtain ⟨n, hn, rfl⟩ := Finset.mem_image.mp hx
     have hn' := Finset.mem_Icc.mp hn
-    rw [eval_sub, hpts n hn, production_int_onset hPcomp hn'.1 (by omega), sub_self]
+    rw [eval_sub, hpts n hn, hP.eval_onset hn'.1 (by omega), sub_self]
   · rw [Finset.card_image_of_injective _ Nat.cast_injective, Nat.card_Icc]
     omega
 

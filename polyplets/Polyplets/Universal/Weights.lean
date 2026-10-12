@@ -22,8 +22,8 @@ surplus `j`) only:
 
 Both are instances of one structure, `IsConfig L cap ℓ j`, a cluster with
 `cap` walk rows on top (`cap = 1` for `V`, `cap = 0` for `Vᵗ`), so the peeling
-bijections of `Peel.lean` are written once. The king file's `IsVConfig` and
-`IsVtConfig` are the same two descriptions with `KingConnected` for `Conn L`,
+bijections of `Peel.lean` are written once. The king file's `IsInteriorConfig` and
+`IsTopConfig` are the same two descriptions with `KingConnected` for `Connected L`,
 identified with these at `kingLattice` by `King.lean`'s bridges.
 
 ## Deviation from the king file: no window enumeration
@@ -31,14 +31,14 @@ identified with these at `kingLattice` by `King.lean`'s bridges.
 `Weights.lean` materializes each family as an explicit `Finset` built from a
 computable window (`box`, `window`, `powersetCard`, decidable filter) so that
 the kernel can decide the three small values it consumes, and then proves
-*window-independence* lemmas (`mem_Dc`, `mem_CFGV`, `mem_CFGVt`) recovering
+*window-independence* lemmas (`mem_walkTop`, `mem_interiorConfigs`, `mem_topConfigs`) recovering
 the propositional description. The bijections need only the propositional
 descriptions — no value is ever evaluated here — so the generic families are
 built directly as `Set.Finite.toFinset` of the propositionally-described
 sets, and the `mem_*` lemmas are `Set.Finite.mem_toFinset`.
 
 Finiteness replaces window-independence: it is the same x-spread bound
-(`conn_abs_x_le`, now with reach `M`) applied to the whole family at once.
+(`connected_abs_x_le`, now with reach `M`) applied to the whole family at once.
 The instance anchors come from `Universal/Compute.lean`'s counter.
 -/
 
@@ -68,22 +68,22 @@ lemma card_animals (L : RowLocal) (k H : ℕ) :
 
 /-- **Walk-top canonical sets**: the canonical `(n = H + k, H)` animals whose
 top row `H - 1` is a walk row. -/
-noncomputable def Dc (L : RowLocal) (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
+noncomputable def walkTop (L : RowLocal) (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
   (animals L k H).filter fun S => rowSize S ((H : ℤ) - 1) = 1
 
 /-- `d L k H`: the number of canonical height-`H` surplus-`k` `L`-animals whose
 top row is a walk row — the primary object of the peeling recursion. -/
-noncomputable def d (L : RowLocal) (k H : ℕ) : ℕ := (Dc L k H).card
+noncomputable def d (L : RowLocal) (k H : ℕ) : ℕ := (walkTop L k H).card
 
-/-- **Propositional characterization of `Dc`**: membership is exactly
+/-- **Propositional characterization of `walkTop`**: membership is exactly
 canonicality plus walk top row. -/
-theorem mem_Dc {L : RowLocal} {k H : ℕ} {S : Finset (ℤ × ℤ)} :
-    S ∈ Dc L k H ↔ IsAnimal L (H + k) H S ∧ rowSize S ((H : ℤ) - 1) = 1 := by
-  rw [Dc, Finset.mem_filter, mem_animals]
+theorem mem_walkTop {L : RowLocal} {k H : ℕ} {S : Finset (ℤ × ℤ)} :
+    S ∈ walkTop L k H ↔ IsAnimal L (H + k) H S ∧ rowSize S ((H : ℤ) - 1) = 1 := by
+  rw [walkTop, Finset.mem_filter, mem_animals]
 
-/-- The walk-top part of the full enumeration is exactly `Dc L k H`. -/
+/-- The walk-top part of the full enumeration is exactly `walkTop L k H`. -/
 lemma filter_animals_walkTop (L : RowLocal) (k H : ℕ) :
-    (animals L k H).filter (fun S => rowSize S ((H : ℤ) - 1) = 1) = Dc L k H := rfl
+    (animals L k H).filter (fun S => rowSize S ((H : ℤ) - 1) = 1) = walkTop L k H := rfl
 
 /-! ## Cluster configurations, aggregated by (rows ℓ, surplus j) -/
 
@@ -110,17 +110,17 @@ structure IsConfig (L : RowLocal) (cap ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : 
   /-- The cluster rows `1 … ℓ` each hold at least two cells. -/
   multi : ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)
   /-- `L`-connected. -/
-  conn : Conn L S
+  conn : Connected L S
 
 /-- `S` is a **V-configuration** for `(ℓ, j)` — the peeled data of case 2 of
 the d-recursion: an interior cluster, with a free walk cell `q` alone on row
 `ℓ + 1` above it; `ℓ + j + 2` cells in total. -/
-abbrev IsVConfig (L : RowLocal) (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop := IsConfig L 1 ℓ j S
+abbrev IsInteriorConfig (L : RowLocal) (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop := IsConfig L 1 ℓ j S
 
 /-- `S` is a **Vᵗ-configuration** for `(ℓ, j)` — a V-configuration without the
 free walk cell `q` (the cluster caps the animal), hence `ℓ + j + 1` cells on
 rows `0..ℓ`. -/
-abbrev IsVtConfig (L : RowLocal) (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop := IsConfig L 0 ℓ j S
+abbrev IsTopConfig (L : RowLocal) (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop := IsConfig L 0 ℓ j S
 
 /-- **Finiteness of a configuration family**: a configuration has
 `ℓ + j + 1 + cap` cells, is connected and contains the origin, so it lies in
@@ -128,14 +128,14 @@ the box `[-M(ℓ+j+cap), M(ℓ+j+cap)] × [0, ℓ+cap]`. -/
 lemma config_finite (L : RowLocal) (cap ℓ j : ℕ) :
     {S : Finset (ℤ × ℤ) | IsConfig L cap ℓ j S}.Finite := by
   apply Set.Finite.subset
-    (Finset.powerset (Finset.Icc (-(L.M * ((ℓ : ℤ) + (j : ℤ) + cap)), (0 : ℤ))
-      (L.M * ((ℓ : ℤ) + (j : ℤ) + cap), (ℓ : ℤ) + cap))).finite_toSet
+    (Finset.powerset (Finset.Icc (-(L.reach * ((ℓ : ℤ) + (j : ℤ) + cap)), (0 : ℤ))
+      (L.reach * ((ℓ : ℤ) + (j : ℤ) + cap), (ℓ : ℤ) + cap))).finite_toSet
   intro S hS
   obtain ⟨hcard, h0, hrows, -, -, -, hconn⟩ := hS
   rw [Finset.mem_coe, Finset.mem_powerset]
   intro p hpS
-  have hx : |p.1| ≤ L.M * ((ℓ : ℤ) + (j : ℤ) + cap) := by
-    refine le_trans (conn_abs_x_le hconn h0 hpS) (le_of_eq ?_)
+  have hx : |p.1| ≤ L.reach * ((ℓ : ℤ) + (j : ℤ) + cap) := by
+    refine le_trans (connected_abs_x_le hconn h0 hpS) (le_of_eq ?_)
     rw [hcard]
     push_cast
     ring
@@ -146,34 +146,36 @@ lemma config_finite (L : RowLocal) (cap ℓ j : ℕ) :
 
 /-- **The configurations with `cap` walk rows on top, for `(ℓ, j)`** as a
 finset. -/
-noncomputable def CFG (L : RowLocal) (cap ℓ j : ℕ) : Finset (Finset (ℤ × ℤ)) :=
+noncomputable def configs (L : RowLocal) (cap ℓ j : ℕ) : Finset (Finset (ℤ × ℤ)) :=
   (config_finite L cap ℓ j).toFinset
 
-/-- **Propositional characterization of `CFG`**: membership is exactly
+/-- **Propositional characterization of `configs`**: membership is exactly
 `IsConfig`. Downstream bijections match against this, never the
 construction. -/
-theorem mem_CFG {L : RowLocal} {cap ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
-    S ∈ CFG L cap ℓ j ↔ IsConfig L cap ℓ j S := Set.Finite.mem_toFinset _
+theorem mem_configs {L : RowLocal} {cap ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
+    S ∈ configs L cap ℓ j ↔ IsConfig L cap ℓ j S := Set.Finite.mem_toFinset _
 
 /-- **The V-configurations for `(ℓ, j)`** as a finset. -/
-noncomputable abbrev CFGV (L : RowLocal) (ℓ j : ℕ) : Finset (Finset (ℤ × ℤ)) := CFG L 1 ℓ j
+noncomputable abbrev interiorConfigs (L : RowLocal) (ℓ j : ℕ) : Finset (Finset (ℤ × ℤ)) :=
+  configs L 1 ℓ j
 
 /-- **The Vᵗ-configurations for `(ℓ, j)`** as a finset. -/
-noncomputable abbrev CFGVt (L : RowLocal) (ℓ j : ℕ) : Finset (Finset (ℤ × ℤ)) := CFG L 0 ℓ j
+noncomputable abbrev topConfigs (L : RowLocal) (ℓ j : ℕ) : Finset (Finset (ℤ × ℤ)) :=
+  configs L 0 ℓ j
 
 /-- `V L ℓ j`: the interior cluster weight — the number of V-configurations. -/
-noncomputable def V (L : RowLocal) (ℓ j : ℕ) : ℕ := (CFGV L ℓ j).card
+noncomputable def V (L : RowLocal) (ℓ j : ℕ) : ℕ := (interiorConfigs L ℓ j).card
 
 /-- `Vt L ℓ j`: the top-edge cluster weight — the number of
 Vᵗ-configurations. -/
-noncomputable def Vt (L : RowLocal) (ℓ j : ℕ) : ℕ := (CFGVt L ℓ j).card
+noncomputable def Vt (L : RowLocal) (ℓ j : ℕ) : ℕ := (topConfigs L ℓ j).card
 
-/-- Membership in `CFGV` is exactly `IsVConfig`. -/
-theorem mem_CFGV {L : RowLocal} {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
-    S ∈ CFGV L ℓ j ↔ IsVConfig L ℓ j S := mem_CFG
+/-- Membership in `interiorConfigs` is exactly `IsInteriorConfig`. -/
+theorem mem_interiorConfigs {L : RowLocal} {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
+    S ∈ interiorConfigs L ℓ j ↔ IsInteriorConfig L ℓ j S := mem_configs
 
-/-- Membership in `CFGVt` is exactly `IsVtConfig`. -/
-theorem mem_CFGVt {L : RowLocal} {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
-    S ∈ CFGVt L ℓ j ↔ IsVtConfig L ℓ j S := mem_CFG
+/-- Membership in `topConfigs` is exactly `IsTopConfig`. -/
+theorem mem_topConfigs {L : RowLocal} {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
+    S ∈ topConfigs L ℓ j ↔ IsTopConfig L ℓ j S := mem_configs
 
 end Polyplets.Universal

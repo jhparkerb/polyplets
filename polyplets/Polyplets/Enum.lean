@@ -1361,10 +1361,10 @@ theorem T_eq_length {n H : ℕ} (h1 : 1 ≤ n) (hn : n ≤ 14) :
 /-- **The walk-top count `d k H` is a filtered list length.** -/
 theorem d_eq_length {k H : ℕ} (hH : 1 ≤ H) (hn : H + k ≤ 14) :
     d k H = ((L (H + k)).filter fun m => height m = H ∧ rowCount m (H - 1) = 1).length := by
-  have hset : (Dc k H : Set (Finset (ℤ × ℤ)))
+  have hset : (walkTop k H : Set (Finset (ℤ × ℤ)))
       = {S | IsPolyplet (H + k) S ∧ (Polyplets.height S = H ∧ rowSize S ((H : ℤ) - 1) = 1)} := by
     ext S
-    simp only [Finset.mem_coe, mem_Dc, mem_heightClass, Set.mem_setOf_eq, and_assoc]
+    simp only [Finset.mem_coe, mem_walkTop, mem_heightClass, Set.mem_setOf_eq, and_assoc]
   rw [d, ← Set.ncard_coe_finset, hset, ncard_eq_length (by omega) hn]
   intro m hm
   have hbox := (L_spec _ (by omega) hn).1 m hm
@@ -1494,13 +1494,13 @@ lemma multi_iff {m ℓ : ℕ} (hm : InBox m) :
 theorem V_eq_length {ℓ j : ℕ} (hn : ℓ + j + 2 ≤ 14) :
     V ℓ j = ((L (ℓ + j + 2)).filter fun m => height m = ℓ + 2 ∧ rowCount m 0 = 1 ∧
       rowCount m (ℓ + 1) = 1 ∧ Multi m ℓ).length := by
-  have hset : (CFGV ℓ j : Set (Finset (ℤ × ℤ)))
+  have hset : (interiorConfigs ℓ j : Set (Finset (ℤ × ℤ)))
       = {S | S.card = ℓ + j + 2 ∧ ((0 : ℤ), (0 : ℤ)) ∈ S ∧
           (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ ((ℓ + 2 : ℕ) : ℤ) - 1) ∧ rowSize S 0 = 1 ∧
           (rowSize S ((ℓ : ℤ) + 1) = 1 ∧ ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)) ∧
           KingConnected S} := by
     ext S
-    simp only [Finset.mem_coe, mem_CFGV, Set.mem_setOf_eq]
+    simp only [Finset.mem_coe, mem_interiorConfigs, Set.mem_setOf_eq]
     push_cast
     constructor
     · rintro ⟨a, b, c, d, e, f, g⟩
@@ -1525,12 +1525,12 @@ theorem V_eq_length {ℓ j : ℕ} (hn : ℓ + j + 2 ≤ 14) :
 theorem Vt_eq_length {ℓ j : ℕ} (hℓ : 1 ≤ ℓ) (hn : ℓ + j + 1 ≤ 14) :
     Vt ℓ j = ((L (ℓ + j + 1)).filter fun m => height m = ℓ + 1 ∧ rowCount m 0 = 1 ∧
       Multi m ℓ).length := by
-  have hset : (CFGVt ℓ j : Set (Finset (ℤ × ℤ)))
+  have hset : (topConfigs ℓ j : Set (Finset (ℤ × ℤ)))
       = {S | S.card = ℓ + j + 1 ∧ ((0 : ℤ), (0 : ℤ)) ∈ S ∧
           (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ ((ℓ + 1 : ℕ) : ℤ) - 1) ∧ rowSize S 0 = 1 ∧
           (∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)) ∧ KingConnected S} := by
     ext S
-    simp only [Finset.mem_coe, mem_CFGVt, Set.mem_setOf_eq]
+    simp only [Finset.mem_coe, mem_topConfigs, Set.mem_setOf_eq]
     push_cast
     constructor
     · rintro ⟨a, b, c, d, e, f⟩

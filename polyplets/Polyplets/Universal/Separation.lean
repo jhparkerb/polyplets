@@ -11,18 +11,18 @@ import Polyplets.Universal.Finite
 
 Step 1 of the universal diagonal law: *adjacency changes the row index by at
 most 1, so a single-cell row is a cut*. A *walk row* is a row holding exactly
-one cell of `S`; `seg S a b` is the band of cells with rows in `[a, b]`.
+one cell of `S`; `band S a b` is the band of cells with rows in `[a, b]`.
 
-* **Glue** (`conn_union`): a union of two `L`-connected pieces sharing a cell
+* **Glue** (`connected_union`): a union of two `L`-connected pieces sharing a cell
   is `L`-connected.
-* **Cut** (`conn_seg`): restricting an `L`-connected `S` to `seg S r r'`
+* **Cut** (`connected_band`): restricting an `L`-connected `S` to `band S r r'`
   preserves `L`-connectivity, provided each cut line is either a walk row of
   `S` or a boundary. Walk surgery in `graph L S` by strong induction on walk
   length: a step escaping the band leaves from THE unique walk-row cell on the
   cut line, and the rest of the walk re-enters through a boundary dart
   (`Walk.exists_boundary_dart`) landing on that same cell, so the excursion is
   excised with `Walk.dropUntil`.
-* **Erase-top** (`conn_erase_top`): the corollary peeling case 1 consumes.
+* **Erase-top** (`connected_erase_top`): the corollary peeling case 1 consumes.
 
 **Wager status: verbatim.** Every proof in this file is `Separation.lean`'s with
 `kingAdj ↦ Adj L`. The only property of adjacency used anywhere — including in
@@ -34,15 +34,15 @@ x-offset, no `|Δx| ≤ 1`, no cardinality of `D` appears.
 namespace Polyplets.Universal
 
 /-- The row band `[a, b]` of `S`: the cells whose row lies in `[a, b]`. -/
-def seg (S : Finset (ℤ × ℤ)) (a b : ℤ) : Finset (ℤ × ℤ) :=
+def band (S : Finset (ℤ × ℤ)) (a b : ℤ) : Finset (ℤ × ℤ) :=
   S.filter fun c => a ≤ c.2 ∧ c.2 ≤ b
 
 /-- Row `r` is a *walk row* of `S`: it holds exactly one cell. -/
 def IsWalkRow (S : Finset (ℤ × ℤ)) (r : ℤ) : Prop :=
   (S.filter fun c => c.2 = r).card = 1
 
-lemma mem_seg {S : Finset (ℤ × ℤ)} {a b : ℤ} {c : ℤ × ℤ} :
-    c ∈ seg S a b ↔ c ∈ S ∧ a ≤ c.2 ∧ c.2 ≤ b := Finset.mem_filter
+lemma mem_band {S : Finset (ℤ × ℤ)} {a b : ℤ} {c : ℤ × ℤ} :
+    c ∈ band S a b ↔ c ∈ S ∧ a ≤ c.2 ∧ c.2 ≤ b := Finset.mem_filter
 
 /-- Two cells of `S` on a walk row coincide. -/
 lemma IsWalkRow.eq_of_mem {S : Finset (ℤ × ℤ)} {r : ℤ} (h : IsWalkRow S r)
@@ -59,9 +59,9 @@ lemma path_mono {L : RowLocal} {A S : Finset (ℤ × ℤ)} (hAS : A ⊆ S) {p q 
 
 /-- **Glue.** A union of two `L`-connected sets sharing a cell is `L`-connected:
 route any pair through the shared cell. No walk-row hypothesis needed. -/
-theorem conn_union {L : RowLocal} {S A B : Finset (ℤ × ℤ)} (hS : S = A ∪ B)
-    (hA : Conn L A) (hB : Conn L B) (hAB : (A ∩ B).Nonempty) :
-    Conn L S := by
+theorem connected_union {L : RowLocal} {S A B : Finset (ℤ × ℤ)} (hS : S = A ∪ B)
+    (hA : Connected L A) (hB : Connected L B) (hAB : (A ∩ B).Nonempty) :
+    Connected L S := by
   subst hS
   obtain ⟨x, hx⟩ := hAB
   rw [Finset.mem_inter] at hx
@@ -102,16 +102,16 @@ private lemma exists_walk_from_cut {S : Finset (ℤ × ℤ)} {x q p : ℤ × ℤ
 /-- Walk-surgery core of the cut theorem, by strong induction on walk length
 (phrased as induction on an upper bound `N`). Given a `graph L S`-walk between
 two cells of the band, the band endpoints are reachable inside
-`graph L (seg S r r')`: a step escaping the band leaves from THE unique
+`graph L (band S r r')`: a step escaping the band leaves from THE unique
 walk-row cell on the crossed cut line, and the rest of the walk must re-enter
 through that same cell (`exists_walk_from_cut`), so the excursion is excised
 and the walk shortened. -/
 private lemma reachable_seg_aux {L : RowLocal} {S : Finset (ℤ × ℤ)} {r r' : ℤ}
     (hr : IsWalkRow S r ∨ ∀ p ∈ S, r ≤ p.2)
     (hr' : IsWalkRow S r' ∨ ∀ p ∈ S, p.2 ≤ r') :
-    ∀ N (p q : ℤ × ℤ), p ∈ seg S r r' → q ∈ seg S r r' →
+    ∀ N (p q : ℤ × ℤ), p ∈ band S r r' → q ∈ band S r r' →
       ∀ w : (graph L S).Walk p q, w.length ≤ N →
-      (graph L (seg S r r')).Reachable p q := by
+      (graph L (band S r r')).Reachable p q := by
   intro N
   induction N with
   | zero =>
@@ -130,16 +130,16 @@ private lemma reachable_seg_aux {L : RowLocal} {S : Finset (ℤ × ℤ)} {r r' :
         rw [SimpleGraph.Walk.length_cons] at hw
         omega
       have hxS : x ∈ S := hadj.2.1
-      by_cases hx : x ∈ seg S r r'
+      by_cases hx : x ∈ band S r r'
       · -- step stays in the band: prepend it to the IH's reachability
-        have hstep : (graph L (seg S r r')).Adj p x :=
+        have hstep : (graph L (band S r r')).Adj p x :=
           graph_adj.mpr ⟨hp, hx, hadj.2.2⟩
         exact hstep.reachable.trans (ih x q hx hq w' hlen)
       · -- step escapes the band, above or below
         have hx2 : x.2 < r ∨ r' < x.2 := by
           by_contra hcon
           push Not at hcon
-          exact hx (mem_seg.mpr ⟨hxS, hcon.1, hcon.2⟩)
+          exact hx (mem_band.mpr ⟨hxS, hcon.1, hcon.2⟩)
         rcases hx2 with hbelow | habove
         · -- escape below: `p` is THE row-`r` cell; excise down to the re-entry
           have hwr : IsWalkRow S r := by
@@ -149,16 +149,16 @@ private lemma reachable_seg_aux {L : RowLocal} {S : Finset (ℤ × ℤ)} {r r' :
           have hp2 : p.2 = r := by
             have hk := adj_abs_dy_le hadj.2.2
             rw [abs_le] at hk
-            have := (mem_seg.mp hp).2.1
+            have := (mem_band.mp hp).2.1
             omega
           obtain ⟨w'', hw''⟩ := exists_walk_from_cut w' {v : ℤ × ℤ | v.2 < r} hbelow
-            (by simp only [Set.mem_setOf_eq, not_lt]; exact (mem_seg.mp hq).2.1)
+            (by simp only [Set.mem_setOf_eq, not_lt]; exact (mem_band.mp hq).2.1)
             (fun a b hab ha hb => by
               have hk := adj_abs_dy_le hab
               rw [abs_le] at hk
               simp only [Set.mem_setOf_eq, not_lt] at ha hb
               omega)
-            hwr (mem_seg.mp hp).1 hp2
+            hwr (mem_band.mp hp).1 hp2
           exact ih p q hp hq w'' (by omega)
         · -- escape above: `p` is THE row-`r'` cell; excise down to the re-entry
           have hwr' : IsWalkRow S r' := by
@@ -168,48 +168,48 @@ private lemma reachable_seg_aux {L : RowLocal} {S : Finset (ℤ × ℤ)} {r r' :
           have hp2 : p.2 = r' := by
             have hk := adj_abs_dy_le hadj.2.2
             rw [abs_le] at hk
-            have := (mem_seg.mp hp).2.2
+            have := (mem_band.mp hp).2.2
             omega
           obtain ⟨w'', hw''⟩ := exists_walk_from_cut w' {v : ℤ × ℤ | r' < v.2} habove
-            (by simp only [Set.mem_setOf_eq, not_lt]; exact (mem_seg.mp hq).2.2)
+            (by simp only [Set.mem_setOf_eq, not_lt]; exact (mem_band.mp hq).2.2)
             (fun a b hab ha hb => by
               have hk := adj_abs_dy_le hab
               rw [abs_le] at hk
               simp only [Set.mem_setOf_eq, not_lt] at ha hb
               omega)
-            hwr' (mem_seg.mp hp).1 hp2
+            hwr' (mem_band.mp hp).1 hp2
           exact ih p q hp hq w'' (by omega)
 
 /-- **Cut.** Restricting an `L`-connected `S` to the row band `[r, r']`
 preserves `L`-connectivity, provided each cut line is either a walk row of `S`
 or a boundary. -/
-theorem conn_seg {L : RowLocal} {S : Finset (ℤ × ℤ)} (hS : Conn L S)
+theorem connected_band {L : RowLocal} {S : Finset (ℤ × ℤ)} (hS : Connected L S)
     {r r' : ℤ}
     (hr : IsWalkRow S r ∨ ∀ p ∈ S, r ≤ p.2)
     (hr' : IsWalkRow S r' ∨ ∀ p ∈ S, p.2 ≤ r') :
-    Conn L (seg S r r') := by
-  rw [conn_iff_reachable] at hS ⊢
+    Connected L (band S r r') := by
+  rw [connected_iff_reachable] at hS ⊢
   intro p hp q hq
-  obtain ⟨w⟩ := hS p (mem_seg.mp hp).1 q (mem_seg.mp hq).1
+  obtain ⟨w⟩ := hS p (mem_band.mp hp).1 q (mem_band.mp hq).1
   exact reachable_seg_aux hr hr' w.length p q hp hq w le_rfl
 
 /-- The band is all of `S` when it brackets every row. -/
-lemma seg_eq_self {S : Finset (ℤ × ℤ)} {a b : ℤ}
-    (h : ∀ p ∈ S, a ≤ p.2 ∧ p.2 ≤ b) : seg S a b = S :=
+lemma band_eq_self {S : Finset (ℤ × ℤ)} {a b : ℤ}
+    (h : ∀ p ∈ S, a ≤ p.2 ∧ p.2 ≤ b) : band S a b = S :=
   Finset.filter_true_of_mem h
 
 /-- **Erase-top** (consumed by peeling case 1). If every cell of `S` sits in row
 `≤ t`, rows `t` and `t - 1` are both walk rows, and `w` is the unique row-`t`
 cell, then removing `w` keeps `S` `L`-connected. -/
-theorem conn_erase_top {L : RowLocal} {S : Finset (ℤ × ℤ)} {t : ℤ} {w : ℤ × ℤ}
-    (hS : Conn L S) (htop : ∀ p ∈ S, p.2 ≤ t)
+theorem connected_erase_top {L : RowLocal} {S : Finset (ℤ × ℤ)} {t : ℤ} {w : ℤ × ℤ}
+    (hS : Connected L S) (htop : ∀ p ∈ S, p.2 ≤ t)
     (hwt : IsWalkRow S t) (hwt' : IsWalkRow S (t - 1))
     (hwS : w ∈ S) (hw2 : w.2 = t) :
-    Conn L (S.erase w) := by
+    Connected L (S.erase w) := by
   obtain ⟨m, hmS, hm⟩ := S.exists_min_image Prod.snd ⟨w, hwS⟩
-  have hseg : seg S m.2 (t - 1) = S.erase w := by
+  have hseg : band S m.2 (t - 1) = S.erase w := by
     ext c
-    rw [mem_seg, Finset.mem_erase]
+    rw [mem_band, Finset.mem_erase]
     constructor
     · rintro ⟨hcS, -, hct⟩
       refine ⟨fun hcw => ?_, hcS⟩
@@ -224,6 +224,6 @@ theorem conn_erase_top {L : RowLocal} {S : Finset (ℤ × ℤ)} {t : ℤ} {w : �
         omega
       exact hcw (hwt.eq_of_mem hcS hc2 hwS hw2)
   rw [← hseg]
-  exact conn_seg hS (Or.inr hm) (Or.inl hwt')
+  exact connected_band hS (Or.inr hm) (Or.inl hwt')
 
 end Polyplets.Universal

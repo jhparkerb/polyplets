@@ -40,7 +40,7 @@ theorem report_a_eq_sum (n : ℕ) : a n = ∑ H ∈ Finset.Icc 1 n, T n H :=
 
 /-- **`T(n,n) = 3^(n-1)`.** -/
 theorem report_T_diag (n : ℕ) (hn : 1 ≤ n) : T n n = 3 ^ (n - 1) := by
-  have h := T_diag_pow n hn
+  have h := T_self n hn
   rw [show (n : ℤ) - 1 = ((n - 1 : ℕ) : ℤ) by omega, zpow_natCast] at h
   exact_mod_cast h
 
@@ -51,8 +51,8 @@ theorem report_diagonal_law : ∃ P : ℕ → Polynomial ℚ, ∀ k : ℕ,
     (∀ m : ℤ, ∃ z : ℤ, (P k).eval (m : ℚ) = z) ∧
     ∀ n H : ℕ, H ≤ n → n < 2 * H →
       n - H = k → (T n H : ℚ) = (P k).eval (n : ℚ) * 3 ^ (3 * (H : ℤ) - 2 * n - 1) := by
-  choose P hdeg hz hcomp using shape_production
-  refine ⟨P, fun k => ⟨hdeg k, production_int_all (hdeg k) (hcomp k), ?_⟩⟩
+  choose P hdeg hz using exists_isDiagonalPoly
+  refine ⟨P, fun k => ⟨hdeg k, (hz k).intValued (hdeg k), ?_⟩⟩
   intro n H hHn hlt hk
   subst hk
   have h := hz (n - H) n (by omega)
@@ -63,13 +63,12 @@ theorem report_diagonal_law : ∃ P : ℕ → Polynomial ℚ, ∀ k : ℕ,
   ring
 
 /-- **The leading coefficient of `P_k` is exactly `25^k/k!`.** For any
-polynomial satisfying the diagonal law at level `k`, not only the witness
+polynomial satisfying the diagonal law at level `k` (`IsDiagonalPoly k P`:
+`T(n, n-k) = P(n)·3^(n-1-3k)` for `n ≥ 2k+1`), not only the witness
 `report_diagonal_law` picks. -/
 theorem report_leading_coeff (k : ℕ) (P : Polynomial ℚ) (hdeg : P.natDegree ≤ k)
-    (hP : ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (T n (n - k) : ℚ) = P.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k)) :
-    P.coeff k = 25 ^ k / k.factorial :=
-  production_leadingCoeff k P hdeg hP
+    (hP : IsDiagonalPoly k P) : P.coeff k = 25 ^ k / k.factorial :=
+  hP.coeff_eq hdeg
 
 /-- **`P_k` can be fixed after computing the `3k`-th row.** A polynomial of
 degree `≤ k` with the known leading coefficient that matches `T` on rows
@@ -78,23 +77,21 @@ theorem report_pin_row_3k (k : ℕ) (p : Polynomial ℚ) (hp : p.natDegree ≤ k
     (hlc : p.coeff k = 25 ^ k / k.factorial)
     (hpts : ∀ n ∈ Finset.Icc (2 * k + 1) (3 * k),
       p.eval (n : ℚ) = ((T n (n - k) * 3 ^ (3 * k + 1 - n) : ℕ) : ℚ)) :
-    ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (T n (n - k) : ℚ) = p.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) :=
-  pin_of_leadingCoeff k p hp hlc hpts
+    IsDiagonalPoly k p :=
+  isDiagonalPoly_of_coeff_of_eval_Icc k p hp hlc hpts
 
 /-- **The worked example in Methods**: `T(n, n-1) = (25n - 45)·3^(n-4)`. -/
 theorem report_T_n_nm1 (n : ℕ) (hn : 3 ≤ n) :
     (T n (n - 1) : ℚ) = (25 * (n : ℚ) - 45) * (3 : ℚ) ^ ((n : ℤ) - 4) :=
-  P1_closed n hn
+  T_sub_one n hn
 
 /-- **`P_k` is explicitly known for `k ≤ 18`**, given the 36 enumerated
 anchor cells, two per level (`BankedAnchors`: `anchorA`, `anchorB` in
 `Grand/PinAll.lean`).
 `Pk k` is the polynomial of `Pin.lean`. -/
-theorem report_Pk_known (hA : BankedAnchors) (k : ℕ) (hk : k ≤ 18) (n : ℕ)
-    (hn : 2 * k + 1 ≤ n) :
-    (T n (n - k) : ℚ) = (Pk k).eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) :=
-  Pk_prod hA k hk n hn
+theorem report_Pk_known (hA : BankedAnchors) (k : ℕ) (hk : k ≤ 18) :
+    IsDiagonalPoly k (Pk k) :=
+  Pk_prod hA k hk
 
 /-! ## Results: non-fixed polyplets
 

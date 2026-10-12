@@ -105,7 +105,8 @@ cleanup pass should take on, and is recorded here rather than as a code
 TODO.
 
 - [ ] C1. The king vocabulary is a bridged copy, not an instance:
-      `Weights.lean` (rowSize, Dc, d, IsVConfig/IsVtConfig, CFGV/CFGVt, V,
+      `Weights.lean` (rowSize, walkTop, d, IsInteriorConfig/IsTopConfig,
+      interiorConfigs/topConfigs, V,
       Vt, window independence) and `Compute.lean`'s closure repeat
       `Universal/{Weights,Compute}` at `kingLattice` (the king `Tc`/`ac`
       were removed 2026-10-12), and `King.lean`

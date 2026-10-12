@@ -15,7 +15,7 @@ bound, the peeling bijections) wants mathlib's `SimpleGraph.Walk` API —
 `dropUntil`, boundary darts, `toPath` — so this file packages the step relation
 as a `SimpleGraph` on `ℤ × ℤ` (`graph L S`, adjacency definitionally the step
 relation) and proves the two connectivity notions coincide
-(`conn_iff_reachable`).
+(`connected_iff_reachable`).
 
 This is `Graph.lean` with `kingAdj ↦ Adj L`.
 -/
@@ -24,7 +24,7 @@ namespace Polyplets.Universal
 
 /-- The `L`-graph induced by `S`: vertices are all of `ℤ × ℤ`, and two cells are
 adjacent iff both lie in `S` and are `L`-adjacent. `Adj` is definitionally the
-step relation of `Conn`. -/
+step relation of `Connected`. -/
 def graph (L : RowLocal) (S : Finset (ℤ × ℤ)) : SimpleGraph (ℤ × ℤ) where
   Adj a b := a ∈ S ∧ b ∈ S ∧ Adj L a b
   symm := ⟨fun _ _ h => ⟨h.2.1, h.1, adj_symm h.2.2⟩⟩
@@ -34,12 +34,12 @@ def graph (L : RowLocal) (S : Finset (ℤ × ℤ)) : SimpleGraph (ℤ × ℤ) wh
 lemma graph_adj {L : RowLocal} {S : Finset (ℤ × ℤ)} {a b : ℤ × ℤ} :
     (graph L S).Adj a b ↔ a ∈ S ∧ b ∈ S ∧ Adj L a b := Iff.rfl
 
-/-- **The bridge.** `Conn L S` is pairwise `Reachable` in `graph L S`: the
+/-- **The bridge.** `Connected L S` is pairwise `Reachable` in `graph L S`: the
 `ReflTransGen` of `Universal/Defs.lean` is literally
 `ReflTransGen (graph L S).Adj`. -/
-theorem conn_iff_reachable (L : RowLocal) (S : Finset (ℤ × ℤ)) :
-    Conn L S ↔ ∀ p ∈ S, ∀ q ∈ S, (graph L S).Reachable p q := by
-  unfold Conn
+theorem connected_iff_reachable (L : RowLocal) (S : Finset (ℤ × ℤ)) :
+    Connected L S ↔ ∀ p ∈ S, ∀ q ∈ S, (graph L S).Reachable p q := by
+  unfold Connected
   constructor
   · intro h p hp q hq
     rw [SimpleGraph.reachable_iff_reflTransGen]
