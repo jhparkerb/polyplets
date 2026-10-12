@@ -395,10 +395,10 @@ two-algorithm-confirmed `results/triangle.txt` entries. -/
 set_option linter.style.nativeDecide false
 
 /-- `V 1 1 = 25`: the paper-enumerated `16 + 9` gadget count. -/
-theorem V_1_1 : V 1 1 = 25 := by native_decide
+theorem V_1_1 : V 1 1 = 25 := by decide +kernel
 
 /-- `Vt 1 1 = 5`: the paper-enumerated `4 + 1` gadget count. -/
-theorem Vt_1_1 : Vt 1 1 = 5 := by native_decide
+theorem Vt_1_1 : Vt 1 1 = 5 := by decide +kernel
 
 /-- `V 1 2 = 49` (cross-checked enumeration). -/
 theorem V_1_2 : V 1 2 = 49 := by native_decide
@@ -415,7 +415,7 @@ theorem Vt_2_2 : Vt 2 2 = 66 := by native_decide
 /-! `d 0 H = 3^(H-1)` — surplus 0 forces every row to a single cell, a free
 walk chain of offsets. -/
 
-theorem d_0_1 : d 0 1 = 1 := by native_decide
+theorem d_0_1 : d 0 1 = 1 := by decide +kernel
 theorem d_0_2 : d 0 2 = 3 := by native_decide
 theorem d_0_3 : d 0 3 = 9 := by native_decide
 theorem d_0_4 : d 0 4 = 27 := by native_decide

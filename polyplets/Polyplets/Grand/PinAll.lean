@@ -5,7 +5,6 @@ Authors: Jason H Parker
 -/
 import Polyplets.Grand.Staircase
 import Polyplets.Pin
-import Polyplets.Weights3Heavy
 
 /-!
 # The production polynomials `P_0 … P_18`, pinned level by level
@@ -25,10 +24,10 @@ Two consequences, each a single theorem here rather than one copy per level:
   only unknown is `μ_k · T(k+1, k+1) = μ_k · 3^k`; the one new cell is
   `B_k = T(2k+2, k+2)`.
 
-Levels `0 … 3` come from the closed forms in `Pin.lean`; levels `4 … 18`
-climb through `level_step` with `anchorA`/`anchorB` as the only inputs
-(`BankedAnchors`). The per-level arithmetic is three lemmas proved by
-`interval_cases` (`stair_check`, `anchor_check`, `num_check`).
+Level `0` is `T(n,n) = 3^(n-1)`; levels `1 … 18` climb through `level_step`
+with `anchorA`/`anchorB` as the only inputs (`BankedAnchors`, 36 cells). The
+per-level arithmetic is three lemmas proved by `interval_cases`
+(`stair_check`, `anchor_check`, `num_check`).
 
 `μ_i·3^(2i-1)` is an integer (`cTab`); `μ` is carried as `μ_i·3^(2i) = 3·c_i`
 so no negative exponent appears.
@@ -249,6 +248,9 @@ def cTab : ℕ → ℚ
 
 /-- The first anchor cell of level `k`: `A_k = T(2k+1, k+1)`, enumerated. -/
 def anchorA : ℕ → ℕ
+  | 1 => 10
+  | 2 => 248
+  | 3 => 7898
   | 4 => 278240
   | 5 => 10311170
   | 6 => 393543824
@@ -268,6 +270,9 @@ def anchorA : ℕ → ℕ
 
 /-- The second anchor cell of level `k`: `B_k = T(2k+2, k+2)`, enumerated. -/
 def anchorB : ℕ → ℕ
+  | 1 => 55
+  | 2 => 1480
+  | 3 => 47066
   | 4 => 1631340
   | 5 => 59434367
   | 6 => 2234817674
@@ -285,10 +290,10 @@ def anchorB : ℕ → ℕ
   | 18 => 39207474138446972682720171554
   | _ => 0
 
-/-- The enumerated cells the pinning of `P_4 … P_18` takes as input: two per
+/-- The enumerated cells the pinning of `P_1 … P_18` takes as input: two per
 level, `A_k = T(2k+1, k+1)` and `B_k = T(2k+2, k+2)`, all with `H ≤ 20`. -/
 def BankedAnchors : Prop :=
-  ∀ k, 4 ≤ k → k ≤ 18 → T (2 * k + 1) (k + 1) = anchorA k ∧ T (2 * k + 2) (k + 2) = anchorB k
+  ∀ k, 1 ≤ k → k ≤ 18 → T (2 * k + 1) (k + 1) = anchorA k ∧ T (2 * k + 2) (k + 2) = anchorB k
 
 /-! ## The per-level arithmetic -/
 
@@ -304,21 +309,21 @@ lemma stair_check : ∀ k, 1 ≤ k → k ≤ 18 → ∀ x : ℚ,
     ring
 
 set_option maxHeartbeats 1600000 in
--- 15 levels of `norm_num` on 30-digit anchor values
+-- 18 levels of `norm_num` on up-to-30-digit anchor values
 /-- `P_k` agrees with the anchor `A_k`. -/
-lemma anchor_check (hA : BankedAnchors) : ∀ k, 4 ≤ k → k ≤ 18 →
+lemma anchor_check (hA : BankedAnchors) : ∀ k, 1 ≤ k → k ≤ 18 →
     (3 : ℚ) ^ (3 * k + 1) * (T (2 * k + 1) (k + 1) : ℚ) =
       (Pk k).eval ((2 * k + 1 : ℕ) : ℚ) * 3 ^ (2 * k + 1) := by
   intro k h1 h2
   rw [(hA k h1 h2).1]
   interval_cases k <;>
-    norm_num [Pk, anchorA, Pp4, Pp5, Pp6, Pp7, Pp8, Pp9, Pp10, Pp11, Pp12, Pp13, Pp14, Pp15,
-      Pp16, Pp17, Pp18, prodPoly_eval]
+    norm_num [Pk, anchorA, Pp1, Pp2, Pp3, Pp4, Pp5, Pp6, Pp7, Pp8, Pp9, Pp10, Pp11, Pp12, Pp13,
+      Pp14, Pp15, Pp16, Pp17, Pp18, prodPoly_eval]
 
 set_option maxHeartbeats 1600000 in
--- 15 levels of `norm_num` on sums of up to 18 big rationals
+-- 18 levels of `norm_num` on sums of up to 18 big rationals
 /-- The anchor `B_k` solves the staircase at `H = k+1` with `μ_k = 3·c_k/3^(2k)`. -/
-lemma num_check (hA : BankedAnchors) : ∀ k, 4 ≤ k → k ≤ 18 →
+lemma num_check (hA : BankedAnchors) : ∀ k, 1 ≤ k → k ≤ 18 →
     (T (2 * k + 2) (k + 2) : ℚ) * 3 ^ (2 * k) = 3 * cTab k * 3 ^ k +
       ∑ i ∈ Finset.range k, 3 * cTab i * 3 ^ (2 * k - 2 * i) *
         ((Pk (k - i)).eval ((k + 1 + (k - i) : ℕ) : ℚ) * 3 ^ (k + 1 + (k - i))
@@ -331,36 +336,30 @@ lemma num_check (hA : BankedAnchors) : ∀ k, 4 ≤ k → k ≤ 18 →
 
 /-! ## The climb -/
 
-/-- **`P_0 … P_18` and `μ_0 … μ_18`**, from the anchors. Levels `0 … 3` are
-the closed forms of `Pin.lean`; each later level is one `level_step`. -/
+/-- Level `0`: `3·T(H, H) = 1·3^H`, from `T(n,n) = 3^(n-1)`. -/
+lemma grand_zero : GrandForm 0 Pp0 := by
+  intro H hH
+  simp only [Nat.cast_zero, add_zero, Nat.mul_zero, Nat.zero_add, pow_one]
+  rw [T_diag_pow H hH, show (H : ℤ) - 1 = ((H - 1 : ℕ) : ℤ) from by omega, zpow_natCast, Pp0,
+    prodPoly_eval, show (3 : ℚ) ^ H = 3 * 3 ^ (H - 1) from by rw [← pow_succ']; congr 1; omega]
+  norm_num
+
+/-- **`P_0 … P_18` and `μ_0 … μ_18`**, from the anchors: level `0` is
+`grand_zero`, each later level one `level_step`. -/
 theorem grand_all (hA : BankedAnchors) : ∀ k, k ≤ 18 → grandOK Pk k ∧ muOK cTab k := by
   intro k
   induction k with
   | zero =>
     intro _
     refine ⟨fun i hi => ?_, fun i hi => ?_⟩
-    · interval_cases i; exact prod_to_grand P0_pinned
+    · interval_cases i; exact grand_zero
     · interval_cases i; rw [mu_zero]; norm_num [cTab]
   | succ k ih =>
     intro hk
     obtain ⟨hg, hm⟩ := ih (by omega)
-    rcases Nat.lt_or_ge 3 (k + 1) with h3 | h3
-    · exact level_step (k + 1) (by omega) Pk cTab (by rwa [Nat.add_sub_cancel])
-        (by rwa [Nat.add_sub_cancel]) (stair_check (k + 1) (by omega) hk)
-        (anchor_check hA (k + 1) (by omega) hk) (num_check hA (k + 1) (by omega) hk)
-    · refine ⟨fun i hi => ?_, fun i hi => ?_⟩
-      · have : i ≤ 3 := by omega
-        interval_cases i
-        · exact prod_to_grand P0_pinned
-        · exact prod_to_grand P1_pinned
-        · exact prod_to_grand P2_pinned
-        · exact prod_to_grand P3_pinned
-      · have : i ≤ 3 := by omega
-        interval_cases i
-        · rw [mu_zero]; norm_num [cTab]
-        · rw [mu_one]; norm_num [cTab]
-        · rw [mu_two]; norm_num [cTab]
-        · rw [mu_three_of V_3_3]; norm_num [cTab]
+    exact level_step (k + 1) (by omega) Pk cTab (by rwa [Nat.add_sub_cancel])
+      (by rwa [Nat.add_sub_cancel]) (stair_check (k + 1) (by omega) hk)
+      (anchor_check hA (k + 1) (by omega) hk) (num_check hA (k + 1) (by omega) hk)
 
 /-- **`P_k` is explicitly known for `k ≤ 18`**, production form. -/
 theorem Pk_prod (hA : BankedAnchors) (k : ℕ) (hk : k ≤ 18) :

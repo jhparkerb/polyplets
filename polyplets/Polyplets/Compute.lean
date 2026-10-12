@@ -253,7 +253,7 @@ example : Tc 2 3 = 0 := by native_decide
 
 /-- `T 1 1 = 1`, now by computation (independently re-proving
 `Sanity.lean`'s hand proof `T_one_one`). -/
-theorem T_1_1 : T 1 1 = 1 := by rw [← Tc_eq_T]; native_decide
+theorem T_1_1 : T 1 1 = 1 := by rw [← Tc_eq_T]; decide +kernel
 
 /-- `T 2 1 = 1`: the horizontal king domino. -/
 theorem T_2_1 : T 2 1 = 1 := by rw [← Tc_eq_T]; native_decide
@@ -265,13 +265,13 @@ theorem T_2_2 : T 2 2 = 3 := by rw [← Tc_eq_T]; native_decide
 theorem T_3_1 : T 3 1 = 1 := by rw [← Tc_eq_T]; native_decide
 
 /-- `T 3 2 = 10` (banked, `results/triangle.txt`). -/
-theorem T_3_2 : T 3 2 = 10 := by rw [← Tc_eq_T]; native_decide
+theorem T_3_2 : T 3 2 = 10 := by rw [← Tc_eq_T]; decide +kernel
 
 /-- `T 3 3 = 9 = 3^2`, the diagonal value `T(n,n) = 3^(n-1)` at `n = 3`. -/
 theorem T_3_3 : T 3 3 = 9 := by rw [← Tc_eq_T]; native_decide
 
 /-- `T 4 3 = 55` (banked, `results/triangle.txt`), a `P_1` onset point. -/
-theorem T_4_3 : T 4 3 = 55 := by rw [← Tc_eq_T]; native_decide
+theorem T_4_3 : T 4 3 = 55 := by rw [← Tc_eq_T]; decide +kernel
 
 /-- `T 5 4 = 240` (banked, `results/triangle.txt`), a `P_1` point. -/
 theorem T_5_4 : T 5 4 = 240 := by rw [← Tc_eq_T]; native_decide

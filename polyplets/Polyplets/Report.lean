@@ -84,8 +84,9 @@ theorem report_T_n_nm1 (n : ℕ) (hn : 3 ≤ n) :
     (T n (n - 1) : ℚ) = (25 * (n : ℚ) - 45) * (3 : ℚ) ^ ((n : ℤ) - 4) :=
   P1_closed n hn
 
-/-- **`P_k` is explicitly known for `k ≤ 18`**, given the 30 enumerated
-anchor cells (`BankedAnchors`: `anchorA`, `anchorB` in `Grand/PinAll.lean`).
+/-- **`P_k` is explicitly known for `k ≤ 18`**, given the 36 enumerated
+anchor cells, two per level (`BankedAnchors`: `anchorA`, `anchorB` in
+`Grand/PinAll.lean`).
 `Pk k` is the polynomial `Pp<k>` of `Pin.lean`. -/
 theorem report_Pk_known (hA : BankedAnchors) (k : ℕ) (hk : k ≤ 18) (n : ℕ)
     (hn : 2 * k + 1 ≤ n) :
