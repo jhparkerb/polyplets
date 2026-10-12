@@ -217,10 +217,12 @@ TODO.
   like levels 4–18, so `BankedAnchors` is 36 cells and `Weights3Heavy` leaves
   the Report cone. Every `Report.lean` theorem is on
   `[propext, Classical.choice, Quot.sound]` alone.
-- Climb from `climb_two` (2026-10-12): levels 1 and 2 use the four cells the
-  kernel already decides (T(3,2), T(4,3), T(5,3), T(6,4)), so `EnumeratedCells`
-  is the 32 cells of levels 3 … 18; `Weights3Heavy` stays out. King `P₁` is
-  proved once, by the climb (`isDiagonalPoly_P1`, `T_sub_one` in
+- One climb (2026-10-12): `climb k` takes the enumerated cells of levels
+  3 … k only, the kernel deciding levels 1 and 2 (T(3,2), T(4,3), T(5,3),
+  T(6,4)), so `EnumeratedCells` is the 32 cells of levels 3 … 18 and P₁, P₂
+  are `climb` at k = 1, 2 with no hypothesis; the separate unconditional
+  two-level run (`climb_two`) is gone; `Weights3Heavy` stays out. King `P₁`
+  is proved once, by the climb (`isDiagonalPoly_P1`, `T_sub_one` in
   `Staircase/Climb`); the Lagrange copy in `DiagonalPolys` is gone, and that
   file is the 19 polynomials as data.
 - Delete outside the Report cone (2026-10-12, third checkpoint): 60 modules,

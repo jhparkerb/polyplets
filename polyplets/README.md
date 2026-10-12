@@ -56,7 +56,8 @@ numbers enter only as the hypothesis below.
 T(2k+2, k+2), at and one above the onset of level k, with the values the
 engine enumerated (`results/triangle.txt`). Levels 1 and 2 need no
 hypothesis: their four cells T(3,2), T(4,3), T(5,3), T(6,4) are kernel-decided
-(`climb_two`).
+(`enumeratedCellsAt_of_le_two`), and the table `enumerated` carries all 36
+so that the kernel checks four of its rows.
 Every one has H ≤ 20, so every one was really swept, none was generated from
 a P_k. Provenance by second source:
 
@@ -128,9 +129,10 @@ H ≥ k+1, one strong induction from the first peeling identity;
 `Staircase/Diagonal.lean` transports it to the diagonals (`T_staircase`). On this,
 `Staircase/Climb.lean` climbs: `IsDiagonalPolyH k P` is the law of level k in
 the climb's coordinates; `climb_step` passes from levels < k to level k given
-the two cells; `climb_two` runs it to level 2 on the kernel-decided cells
-(so P_1 and P_2 hold outright: `T_sub_one`, `T_sub_two`), and `climb` goes on
-to k = 18 under `EnumeratedCells`; `isDiagonalPoly_Pk` reads off
+the two cells; `climb k` runs it from `climb_zero` (P_0 = 1) to level k ≤ 18
+given the enumerated cells of levels 3 … k, the kernel supplying levels 1
+and 2 (so P_1 and P_2 hold outright: `T_sub_one`, `T_sub_two`), and
+`isDiagonalPoly_Pk` reads off
 the diagonal law with the concrete `Pk k` of `DiagonalPolys.lean`. The 19 polynomials in
 `DiagonalPolys.lean` are the engine's (`orchestrator/sweep.go`, extracted to
 `pin-data.md` by `scripts/extract_pin_data.py`); a wrong coefficient fails
@@ -162,7 +164,7 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le_3125_div_256 : λ ≤ 3125
 | `Staircase/Mu` | μ, ν, `mu_conv_nu`, the gates μ₁, μ₂ |
 | `Staircase/WalkTop` | `d_staircase` |
 | `Staircase/Diagonal` | `T_staircase` |
-| `Staircase/Climb` | `IsDiagonalPolyH`, `climb_step`, `climb_two` (`T_sub_one`, `T_sub_two`), `climb`, `isDiagonalPoly_Pk`, `enumerated`, `EnumeratedCells` |
+| `Staircase/Climb` | `IsDiagonalPolyH`, `climb_step`, `climb`, `isDiagonalPoly_Pk`, `T_sub_one`, `T_sub_two`, `enumerated`, `EnumeratedCells` |
 | `Symmetry` | dihedral action, Burnside identities, `R90_eq_zero`, `Asym` |
 | `SymmetryRatio` | `symmetryRatio`: the symmetric counts are o(a(n)), so one-sided → a(n)/4 and free → a(n)/8 |
 | `UpperBound` | `a n ≤ C(5n,n)` |
