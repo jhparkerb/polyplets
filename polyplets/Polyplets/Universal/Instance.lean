@@ -3,15 +3,15 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Polyplets.Universal.AbstractShape
-import Polyplets.Universal.Peel
+import Polyplets.Universal.DiagonalLaw
+import Polyplets.Universal.TopRow
 
 /-!
 # The diagonal law for every row-local lattice
 
 The geometric front (`Universal/{Defs, Graph, Finite,
 Separation, RowProfile, Weights, Peel}.lean`) discharges every field of
-`TopRowRecursion`, so the abstract shape engine of `Universal/AbstractShape.lean`
+`TopRowRecursion`, so the abstract shape engine of `Universal/DiagonalLaw.lean`
 applies to **every** row-local lattice `L`. Composing the two halves gives
 Theorem A of `docs/proofs/universal-diagonal-law.md` in Lean:
 
@@ -31,7 +31,7 @@ namespace Polyplets.Universal
 open Polynomial
 
 /-- **The top-row identities of a row-local lattice.** Every field is an object
-of the generic geometric tree, and the two identity fields ARE `Universal/Peel`'s
+of the generic geometric tree, and the two identity fields ARE `Universal/TopRow`'s
 `d_rec` and `T_of_d`. -/
 noncomputable def topRowRecursion (L : RowLocal) : TopRowRecursion where
   b := L.b

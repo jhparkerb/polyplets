@@ -19,7 +19,7 @@ Easiest and most depended-on first. One commit per item.
 
 - [x] A1. Imports (2026-10-12; `lake exe shake` still lists prunable
       imports and some dependency re-routings, left for a later pass). Replace `import Mathlib` (`Defs`, `StairAnimals`,
-      `Universal/Defs`) and `import Mathlib.Tactic` (`Grand/Series`) by the
+      `Universal/Defs`) and `import Mathlib.Tactic` (`Staircase/Series`) by the
       `#min_imports` set; run `lake exe shake` and drop unused imports.
 - [x] A2. Lints (2026-10-12: `#lint in Polyplets`, 934 declarations, 0
       findings after the six docstrings it asked for). Run Batteries' `#lint` over the whole tree (unused
@@ -30,7 +30,7 @@ Easiest and most depended-on first. One commit per item.
       Phase B, OW-n, "anti-confabulation") and stale pointers
       (`docs/lean-record.md`, `AuditOutworks.lean`, `GRANDFORM-PLAN.md`,
       `PLAN.md`, `DESIGN.md`); delete `example : True := trivial` in
-      `Grand/Series`.
+      `Staircase/Series`.
 - [x] A4. Loose `#print axioms` out of library modules; every headline
       theorem of the report and the L-papers gets a `#guard_msgs` guard in
       `Audit.lean` instead.
@@ -48,9 +48,9 @@ Easiest and most depended-on first. One commit per item.
       stays, it has six uses.
 - [x] A7 (2026-10-12; `King.lean` is the instance, `DiscreteCalculus.lean` the
       polynomial lemmas, 2,700 lines gone). One development, not two: the king tree (`Graph`, `Finite`,
-      `RowProfile`, `Separation`, `Weights`, `Peel`, `Shape`) becomes the
+      `RowProfile`, `Separation`, `Weights`, `Universal/TopRow`, `Shape`) becomes the
       `kingLattice` instance of `Universal/` (`KingAgree` already proves the
-      objects agree definitionally), and `AbstractShape`'s copy of `Shape`
+      objects agree definitionally), and `DiagonalLaw`'s copy of `Shape`
       is the only shape proof. Deletes ~2,400 duplicated lines and the GD-1/
       GD-2/GD-3 scaffolding (`KingShapeD` transcriptions, `kingSystemGeneric`,
       the `king_*_via_universal` re-derivations). The report cone then runs
@@ -62,11 +62,11 @@ Easiest and most depended-on first. One commit per item.
 - [x] A9 (2026-10-12: `Universal.translate` with `adj_add`, `conn_image`,
       `conn_translate` in `Universal/Defs`; the king forms in `Defs`; `shift`
       and `shiftBy` are abbreviations of it, `expShape` is `translate
-      (-anchor S)`). One translation toolkit: `shift`/`shiftCell` (`Peel`), `shiftBy`
+      (-anchor S)`). One translation toolkit: `shift`/`shiftCell` (`Universal/TopRow`), `shiftBy`
       (`Growth`), the `p + t` images of `Symmetry`, the `sub` maps of
       `UpperBound`, with cardinality, membership, adjacency and connectivity
       invariance proved once.
-- [x] A10 (2026-10-12). `Grand/Series` on `PowerSeries ℚ`: `conv a b = coeff (mk a * mk b)`,
+- [x] A10 (2026-10-12). `Staircase/Series` on `PowerSeries ℚ`: `conv a b = coeff (mk a * mk b)`,
       `eps = 1`, `convPow = (·)^ℓ`; associativity, commutativity and the
       collapse lemma come from Mathlib instead of a 40-line sigma bijection.
 - [x] A11 (checked 2026-10-12: Mathlib has the forward-difference calculus but no integer-valued-polynomial theorem; the local lemma stays). `int_valued_of_consecutive` from Mathlib's forward differences
@@ -84,8 +84,8 @@ Easiest and most depended-on first. One commit per item.
 - [x] A14 (2026-10-12: `IsConfig L cap ℓ j` in `Universal/Weights` with
       `IsVConfig = IsConfig 1`, `IsVtConfig = IsConfig 0`; `peel cap H`,
       `cluster_facts`, `peel_mem_and_glue`, `glue_mem_and_peel`, `card_class`
-      in `Peel`, with `card_classB`/`card_classC` as the two instances; 405
-      lines gone). `Peel`: classes B and C share one peel/glue pair
+      in `Universal/TopRow`, with `card_classB`/`card_classC` as the two instances; 405
+      lines gone). `Universal/TopRow`: classes B and C share one peel/glue pair
       parametrized by whether a walk cell caps the cluster, instead of two
       ~350-line copies.
 - [x] A15 (2026-10-12: `D4 = DihedralGroup 4`, `C4 = Multiplicative (ZMod 4)`
@@ -112,11 +112,11 @@ TODO.
       were removed 2026-10-12), and `King.lean`
       bridges them field by field. Make the king objects abbreviations of
       the universal ones, take `V 1 1`, `Vt 1 1`, `d 0 1` from `Enum` (which
-      must then sit upstream of `LeadingCoeff` and `Grand/Mu`), and merge
+      must then sit upstream of `LeadingCoeff` and `Staircase/Mu`), and merge
       `Enum.V_eq_length`/`Vt_eq_length` into one cap-generic statement.
       About 500 lines.
 - [ ] C2. One "least coordinate" definition. `corner`/`anchor`
-      (`Symmetry`), `hmin` (`SymmetryRatio`), `minX` (`Universal/Peel`),
+      (`Symmetry`), `hmin` (`SymmetryRatio`), `minX` (`Universal/TopRow`),
       `baseX`/`baseY` (`Growth`) each carry their own translation lemma, and
       `anchor` is not defined through `translate`. Put the min-of-`f`
       definition and its image lemma in `Universal/Defs` beside
@@ -134,7 +134,7 @@ TODO.
       4.1 GB), and `Nat.log2` costs 0.75 ms per board against 0.25 ms for
       a shift binary search (about 3 s of each `T_rows`/`d_rows`/`weights`
       check and of `T_6_4`). Together about a third off every EnumData run.
-- [ ] C4. Aliases of `translate`: `Universal/Peel.shift`; `Peel.rowSize_shift`
+- [ ] C4. Aliases of `translate`: `Universal/TopRow.shift`; `Peel.rowSize_shift`
       at `b = 0` is `Enum.rowSize_translate_x`. Use `translate` directly and
       put `rowSize_shift` in `Universal/Defs`. (`Growth.shiftBy` done
       2026-10-12: `translate` with `mem_translate_mk`.)
@@ -168,7 +168,7 @@ TODO.
 - [x] B3. Imports, lints, docstrings, loose `#print axioms`, guards for
       these modules (A1–A4 applied to `Universal/`, `Upper/`, `Stair*`).
 - [x] B4 (2026-10-12, with A7). `Universal/Compute.pin` duplicates `Pin.pin`;
-      `Universal/Peel` duplicates `Peel`.
+      `Universal/TopRow` duplicates `Universal/TopRow`.
 - [x] B5 (2026-10-12: regenerated RD=3 against the oracle, 0 diff lines; RD=2
       likewise). `Upper`: the `RatCert` data files were converted in place
       (`scripts/bui_lists_to_trees.py`); `scripts/gen_bui_cert.lean.py` emits
@@ -185,7 +185,7 @@ TODO.
 - `Report.lean` drafted and in the root build (2026-10-11).
 - `LeadingCoeff.lean`: leading coefficient 25^k/k!, and P_k fixed from rows
   2k+1 … 3k (2026-10-11).
-- `Grand/PinAll.lean` replaces `Grand/PinGrand.lean` (2608 generated lines →
+- `Staircase/Climb.lean` replaces `Grand/PinGrand.lean` (2608 generated lines →
   ~330): one `mu_step`, one `grand_step`, an 18-level climb from
   `BankedAnchors` (2026-10-11).
 - Option A (2026-10-12): levels 1–3 take their two onset cells as hypotheses
@@ -193,7 +193,7 @@ TODO.
   the Report cone. Every `Report.lean` theorem is on
   `[propext, Classical.choice, Quot.sound]` alone.
 - Delete outside the Report cone (2026-10-12, third checkpoint): 60 modules,
-  24k lines; `Pin.lean` cut to the polynomials, the pin lemma and
+  24k lines; `DiagonalPolys.lean` cut to the polynomials, the pin lemma and
   `P1_closed`. Reversed the same day for the L-paper modules `Universal/`,
   `Upper/`, `StairAnimals`, `StairGrowth` (restored from 697f376); the rest
   (GapWalk/DepthOne/Kernel, Holes, V5Denominator, Northcott, IntCoeff,

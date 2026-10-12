@@ -42,7 +42,7 @@ propositional characterizations `mem_walkTop` and `mem_configs`.
 
 ## The verbatim wager, settled
 
-This file is `Peel.lean` transcribed with `kingAdj ↦ Adj L` and
+This file is `Universal/TopRow.lean` transcribed with `kingAdj ↦ Adj L` and
 `KingConnected ↦ Connected L`. Every proof carries over unchanged. The drift count
 enters at exactly **three** places, all inside class A:
 

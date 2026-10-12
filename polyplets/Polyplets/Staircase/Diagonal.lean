@@ -5,7 +5,7 @@ Authors: Jason H Parker
 -/
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
-import Polyplets.Grand.MuRec
+import Polyplets.Staircase.WalkTop
 
 /-!
 # Staircase: the T-diagonal transfer step
@@ -16,7 +16,7 @@ multiplier series `μ`, exactly, for `H ≥ k + 1` (sharp onset):
 
 `T (H + 1 + k) (H + 1) = ∑_{i ≤ k} μ i · T (H + (k − i)) H`.
 
-The proof rides the top-row peel `Peel.T_of_d` through `MuRec.d_staircase`. Both
+The proof rides the top-row peel `TopRow.T_of_d` through `WalkTop.d_staircase`. Both
 sides expand by `T_of_d` into a `d`-head plus a `Vt`-weighted interior double
 sum. Applying `d_staircase` to the head (at height `H + 1`) and to each interior
 `d (k − j) ((H + 1) − ℓ)` (at height `(H − ℓ) + 1`) reveals, after transposing
@@ -38,7 +38,7 @@ namespace Polyplets
 /-- **The staircase**: one transfer step multiplies the T-diagonal family by
 `μ`, exactly, for `H ≥ k + 1` (sharp onset). In the report's coordinates
 (`n = H + k`) this relates diagonal `k` at `n + 1` to diagonals `k − i` at
-`n − i`. Proved from `Peel.T_of_d` through `MuRec.d_staircase`. -/
+`n − i`. Proved from `TopRow.T_of_d` through `WalkTop.d_staircase`. -/
 theorem T_staircase : ∀ k H : ℕ, k + 1 ≤ H →
     (T (H + 1 + k) (H + 1) : ℚ) =
       ∑ i ∈ Finset.range (k + 1), mu i * (T (H + (k - i)) H : ℚ) := by

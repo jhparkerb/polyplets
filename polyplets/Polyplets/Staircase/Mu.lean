@@ -6,7 +6,7 @@ Authors: Jason H Parker
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.SimpRw
-import Polyplets.Grand.Series
+import Polyplets.Staircase.Series
 import Polyplets.Weights
 
 /-!

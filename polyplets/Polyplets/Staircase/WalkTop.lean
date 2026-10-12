@@ -5,11 +5,11 @@ Authors: Jason H Parker
 -/
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
-import Polyplets.Grand.Mu
+import Polyplets.Staircase.Mu
 import Polyplets.King
 
 /-!
-# MuRec: the staircase for `d` (the core theorem)
+# WalkTop: the staircase for `d` (the core theorem)
 
 The mathematical heart of the staircase (`docs/proofs/grand-form.md`): one
 transfer step multiplies the walk-top diagonal family `d k H` by the fixed
@@ -18,7 +18,7 @@ multiplier series `μ`, exactly, for `H ≥ k + 1` (sharp onset):
 `d k (H + 1) = ∑_{i ≤ k} μ i · d (k − i) H`.
 
 The proof is a single strong induction on `H`, from the peeling recursion
-`Peel.d_rec` alone — no power series, no polynomials, no analysis. Two helper
+`TopRow.d_rec` alone — no power series, no polynomials, no analysis. Two helper
 lemmas do the heavy lifting:
 
 * `d_iter_up` — iterating the recursion upward `ℓ` steps multiplies by `μ^{∗ℓ}`.
@@ -199,7 +199,7 @@ lemma d_staircase_step (H : ℕ)
 
 /-- **The μ-recursion**: one transfer step multiplies the walk-top diagonal
 family by the fixed series `μ`, exactly, for `H ≥ k + 1` (sharp onset). Proved by
-strong induction on `H` from `Peel.d_rec` through the `μ`/`ν` inverse pair. -/
+strong induction on `H` from `TopRow.d_rec` through the `μ`/`ν` inverse pair. -/
 theorem d_staircase : ∀ H k : ℕ, k + 1 ≤ H →
     (d k (H + 1) : ℚ) = ∑ i ∈ Finset.range (k + 1), mu i * (d (k - i) H : ℚ) :=
   fun H => Nat.strong_induction_on H d_staircase_step

@@ -1700,7 +1700,7 @@ open Enum
 /-! ## The onset cells the development consumes
 
 Kernel-decided through the enumerator: `T 3 2` and `T 4 3` pin `P_1`
-(`Pin.lean`, `Grand/PinAll.lean`), `a 3` is the base of the growth lower
+(`DiagonalPolys.lean`, `Staircase/Climb.lean`), `a 3` is the base of the growth lower
 bound `20 ^ (n / 3) ≤ a n` (`SymmetryRatio.lean`). Further cells are checked
 in `Checks.lean`. -/
 

@@ -98,7 +98,7 @@ structure. The general T(n,n−k) is the open target this method is meant to rea
 
 ## Formalization and supersession (2026-07-21)
 
-This proof is fully formalized in Lean 4: `Pin.lean`'s `T_sub_one` (stated
+This proof is fully formalized in Lean 4: `DiagonalPolys.lean`'s `T_sub_one` (stated
 for the report as `report_T_n_nm1` in `Report.lean`), pinned from the
 kernel-decided cells T(3,2) = 10 and T(4,3) = 55, standard axioms only; the
 gadget multiplicities 16+9 / 4+1 of §4 are the kernel-decided weights
@@ -106,18 +106,18 @@ V(1,1) = 25, Vᵗ(1,1) = 5 of `Weights.lean` (the same 25 = 16+9 split).
 
 §7's road map is CLOSED, beyond what this method was meant to reach:
 
-- T(n,n−2) is no longer "fitted": the quadratic is `Pk 2` of `Pin.lean`, and
-  `T_sub_two` (`Grand/PinAll.lean`) proves it outright, standard axioms only:
+- T(n,n−2) is no longer "fitted": the quadratic is `Pk 2` of `DiagonalPolys.lean`, and
+  `T_sub_two` (`Staircase/Climb.lean`) proves it outright, standard axioms only:
   the climb to level 2 from the four kernel-decided cells T(3,2), T(4,3),
   T(5,3), T(6,4), the last two by the bit-board enumerator of `Enum.lean`.
 - The general shape T(n,n−k) = P_k(n)·3^(n−1−3k), deg P_k ≤ k, onset
-  n ≥ 2k+1, is a theorem for ALL k (`Universal/AbstractShape.lean`, `King.lean`; paper proof
+  n ≥ 2k+1, is a theorem for ALL k (`Universal/DiagonalLaw.lean`, `King.lean`; paper proof
   `diagonal-law.md`), and the defect-gas structure is exact: the
   diagonals are the exp of affine cumulants (`grand-form.md`; the Lean
-  staircase route is `Grand/`).
+  staircase route is `Staircase/`).
 - The Poisson leading coefficient is proved: [n^k]P_k = 25^k/k! for all k
   (`LeadingCoeff.lean`, standard axioms only — the 25 of this file's §5).
-- Production P_1..P_18 are pinned for all n ≥ 2k+1 (`Grand/PinAll.lean`)
+- Production P_1..P_18 are pinned for all n ≥ 2k+1 (`Staircase/Climb.lean`)
   as conditional theorems whose explicit hypotheses are two enumerated
   onset cells per level — engine values assumed, not proved in Lean
   (levels ≥ 13 single-algorithm; see `polyplets/README.md`). k = 19, the

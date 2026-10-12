@@ -5,7 +5,7 @@ Authors: Jason H Parker
 -/
 import Mathlib.Tactic.Choose
 import Mathlib.Tactic.Ring
-import Polyplets.Grand.PinAll
+import Polyplets.Staircase.Climb
 import Polyplets.LeadingCoeff
 import Polyplets.Symmetry
 import Polyplets.SymmetryRatio
@@ -87,7 +87,7 @@ theorem report_T_n_nm1 (n : ℕ) (hn : 3 ≤ n) :
 
 /-- **`P_k` is explicitly known for `k ≤ 18`**, given the 36 enumerated
 cells, two per level (`EnumeratedCells`: the table `enumerated` of
-`Grand/PinAll.lean`). `Pk k` is the polynomial of `Pin.lean`. -/
+`Staircase/Climb.lean`). `Pk k` is the polynomial of `DiagonalPolys.lean`. -/
 theorem report_Pk_known (hA : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) :
     IsDiagonalPoly k (Pk k) :=
   isDiagonalPoly_Pk hA k hk

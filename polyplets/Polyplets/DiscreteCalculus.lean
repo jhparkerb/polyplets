@@ -11,7 +11,7 @@ import Mathlib.Tactic.Ring
 /-!
 # Two facts about polynomials over `ℚ` on the integers
 
-The algebra the diagonal-law shape theorem (`Universal/AbstractShape.lean`)
+The algebra the diagonal-law shape theorem (`Universal/DiagonalLaw.lean`)
 needs and nothing else:
 
 * `exists_poly_sum_Icc` — the discrete antiderivative: every `g ∈ ℚ[X]` has a

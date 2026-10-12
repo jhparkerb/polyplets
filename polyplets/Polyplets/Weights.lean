@@ -29,7 +29,7 @@ decide the smallest values. The enumeration windows are an encoding artifact: th
 **window-independence lemmas** `mem_walkTop`, `mem_interiorConfigs`, `mem_topConfigs` characterize
 membership by the propositional descriptions alone (the x-spread of a connected
 set containing the origin is bounded by its cell count, `connected_abs_x_le`).
-Downstream bijections (`Peel.lean`) must match against those propositional
+Downstream bijections (`Universal/TopRow.lean`) must match against those propositional
 descriptions, never the window encoding.
 
 ## The values the proofs consume
@@ -65,7 +65,7 @@ def walkTop (k H : ℕ) : Finset (Finset (ℤ × ℤ)) :=
 /-- `d k H`: the number of polyplets of height `H` and surplus `k` whose top
 row is a walk row — the primary object of the peeling recursion
 (`d_k(H) = 3·d_k(H−1) + Σ V(ℓ,j)·d_{k−j}(H−1−ℓ)` for `H ≥ k + 2`,
-proved in `Peel.lean`). -/
+proved in `Universal/TopRow.lean`). -/
 def d (k H : ℕ) : ℕ := (walkTop k H).card
 
 /-- **Propositional characterization of `walkTop`** (window independence):
@@ -396,7 +396,7 @@ Kernel-decided through the window enumerations (0.4–2.6 s, under 1 GB), and
 independently cross-checked by a direct enumeration outside Lean
 (2026-07-20). The larger values (`V 1 2 = 49`, `V 2 2 = 339`, `Vt 2 2 = 66`,
 `d 0 3 = 9`, `d 1 3 = 40`, `d 2 3 = 136`, `d 2 4 = 1019`, `T 5 3 = 248`) need
-6–9 GB through these windows; `Checks.lean` and `Grand/PinAll.lean` take
+6–9 GB through these windows; `Checks.lean` and `Staircase/Climb.lean` take
 them from the enumerator of `Enum.lean` instead. -/
 
 /-- `V 1 1 = 25`: the paper-enumerated `16 + 9` gadget count. -/

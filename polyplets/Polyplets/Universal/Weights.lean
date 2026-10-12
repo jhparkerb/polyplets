@@ -22,7 +22,7 @@ surplus `j`) only:
 
 Both are instances of one structure, `IsConfig L cap ℓ j`, a cluster with
 `cap` walk rows on top (`cap = 1` for `V`, `cap = 0` for `Vᵗ`), so the peeling
-bijections of `Peel.lean` are written once. The king file's `IsInteriorConfig` and
+bijections of `Universal/TopRow.lean` are written once. The king file's `IsInteriorConfig` and
 `IsTopConfig` are the same two descriptions with `KingConnected` for `Connected L`,
 identified with these at `kingLattice` by `King.lean`'s bridges.
 

@@ -11,7 +11,7 @@ import Polyplets.Universal.Compute
 # The square lattice: ordinary polyominoes
 
 `D = {0}`, so `b = |D| = 1` and the universal diagonal law
-(`Universal/System.lean`) reads
+(`Universal/Instance.lean`) reads
 
 ```
 T(n, n-k) = P_k(n) · 1^(n-1-3k) = P_k(n)     for n ≥ 2k+1,

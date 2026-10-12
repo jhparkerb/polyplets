@@ -13,7 +13,7 @@ import Polyplets.King
 import Polyplets.Universal.Compute
 
 /-!
-# Pin: the explicit diagonal polynomials `P_k`
+# DiagonalPolys: the explicit diagonal polynomials `P_k`
 
 `King.lean` proves that for every surplus `k` there is *some* `P_k ∈ ℚ[X]` of
 degree `≤ k` with `T(n, n-k) = P_k(n)·3^(n-1-3k)` for `n ≥ 2k+1`
@@ -24,7 +24,7 @@ coefficients descending in `n`, over `k!`), the values lemma
 the `k+1` onset points `2k+1 … 3k+1` *is* the witness), and the `k = 1`
 diagonal `T_sub_one`, from the kernel-decided cells `T 3 2` and `T 4 3`.
 
-`Grand/PinAll.lean` determines every `Pk k`, `k ≤ 18`, from two enumerated
+`Staircase/Climb.lean` determines every `Pk k`, `k ≤ 18`, from two enumerated
 cells per level; `LeadingCoeff.lean` from `k` rows given the leading
 coefficient. A mistyped coefficient fails there, at the cell evaluations.
 -/
@@ -82,7 +82,7 @@ lemma prodPoly_eval (num : List ℚ) (kf x : ℚ) :
 set_option linter.style.longLine false in
 /-- The diagonal polynomials `P_0 … P_18` of `orchestrator/sweep.go`: for each
 `k` the numerator coefficients, descending in `n`, over `k!`; `Pk k = 0` for
-`k > 18`. A mistyped coefficient fails in `Grand/PinAll.lean`, at the cell
+`k > 18`. A mistyped coefficient fails in `Staircase/Climb.lean`, at the cell
 evaluations. -/
 noncomputable def Pk : ℕ → Polynomial ℚ
   | 0 => prodPoly [1] 1

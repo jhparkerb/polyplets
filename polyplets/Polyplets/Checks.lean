@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Polyplets.EnumData
-import Polyplets.Grand.Staircase
+import Polyplets.Staircase.Diagonal
 import Polyplets.Sequence
 import Polyplets.Universal.Hex
 import Polyplets.King

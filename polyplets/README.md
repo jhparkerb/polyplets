@@ -33,9 +33,9 @@ the theorem takes as input rather than proves.
 | diagonal law: for H > n/2, T(n,H) = P_{n−H}(n)·3^(3H−2n−1), P_k integer-valued, deg ≤ k | `report_diagonal_law` | `exists_isDiagonalPoly`, `IsDiagonalPoly.intValued` (`King`) | — |
 | leading coefficient of P_k is 25^k/k! | `report_leading_coeff` | `IsDiagonalPoly.coeff_eq` (`LeadingCoeff`) | — |
 | P_k is fixed once row 3k is computed | `report_pin_row_3k` | `isDiagonalPoly_of_coeff_of_eval_Icc` (`LeadingCoeff`) | — |
-| T(n,n−1) = (25n−45)·3^(n−4) | `report_T_n_nm1` | `T_sub_one` (`Pin`), from the kernel-decided cells T(3,2) = 10, T(4,3) = 55 | — |
-| T(n,n−2) = ½(625n²−2459n+1134)·3^(n−7) | — (not a report claim; `docs/proofs/T-n-nm2-and-general.md`) | `T_sub_two` (`Grand/PinAll`), the climb to level 2 from the kernel-decided cells T(3,2), T(4,3), T(5,3) = 248, T(6,4) = 1480 | — |
-| P_k explicitly known for k ≤ 18 | `report_Pk_known` | `isDiagonalPoly_Pk`, `climb` (`Grand/PinAll`), climbing level by level from `d_staircase` and `T_staircase` | `EnumeratedCells`: 36 cells, below |
+| T(n,n−1) = (25n−45)·3^(n−4) | `report_T_n_nm1` | `T_sub_one` (`DiagonalPolys`), from the kernel-decided cells T(3,2) = 10, T(4,3) = 55 | — |
+| T(n,n−2) = ½(625n²−2459n+1134)·3^(n−7) | — (not a report claim; `docs/proofs/T-n-nm2-and-general.md`) | `T_sub_two` (`Staircase/Climb`), the climb to level 2 from the kernel-decided cells T(3,2), T(4,3), T(5,3) = 248, T(6,4) = 1480 | — |
+| P_k explicitly known for k ≤ 18 | `report_Pk_known` | `isDiagonalPoly_Pk`, `climb` (`Staircase/Climb`), climbing level by level from `d_staircase` and `T_staircase` | `EnumeratedCells`: 36 cells, below |
 | 8·free = a + 2R90 + R180 + 2Hm + 2Dm (Burnside) | `report_free` | `eight_mul_Free` (`Symmetry`) | — |
 | 4·one-sided = a + 2R90 + R180 | `report_oneSided` | `four_mul_OneSided` (`Symmetry`) | — |
 | 2·bilateral = Hm + Dm | `report_bilateral` | `two_mul_Bilateral` (`Symmetry`) | — |
@@ -49,7 +49,7 @@ numbers enter only as the hypothesis below.
 
 ### The 36 enumerated cells
 
-`EnumeratedCells` (`Grand/PinAll.lean`) says `T` agrees with the table
+`EnumeratedCells` (`Staircase/Climb.lean`) says `T` agrees with the table
 `enumerated` at, for each level k = 1 … 18, the two cells T(2k+1, k+1) and
 T(2k+2, k+2), at and one above the onset of level k, with the values the
 engine enumerated (`results/triangle.txt`).
@@ -79,7 +79,7 @@ king-connectivity, so `IsPolyplet` is decidable; the small cells are decided
 by the kernel through the enumerator of `Enum.lean`.
 
 The peeling recursion (`Universal/Separation`, `Universal/Weights`,
-`Universal/Peel`, proved for every row-local lattice; `King.lean` reads the
+`Universal/TopRow`, proved for every row-local lattice; `King.lean` reads the
 king instance off it, `Weights.lean` keeps the king weights as computable
 enumerations for the kernel). Write surplus
 k = n − H. A row with one cell is a *walk row*; `d k H` counts the height-H
@@ -88,13 +88,13 @@ rows is a *cluster*; `V ℓ j` counts the cluster shapes spanning ℓ rows with
 surplus j between a walk cell below and a walk cell above, `Vt ℓ j` the same
 with nothing above. A walk row separates the animal
 (`Universal/Separation.lean`), and peeling the top row gives two bijections
-(`Universal/Peel.lean`, the long pole), with the drift count `b`
+(`Universal/TopRow.lean`, the long pole), with the drift count `b`
 (3 for the king lattice) in place of the 3:
 
     d k H     = 3·d k (H−1) + Σ_{j≤k} Σ_{ℓ≤j} V ℓ j · d (k−j) (H−1−ℓ)      (H ≥ k+2)
     T (H+k) H = d k H + Σ_{j≤k} Σ_{ℓ≤j} Vt ℓ j · d (k−j) (H−ℓ)              (H ≥ k+1)
 
-Shape (`Universal/AbstractShape.lean`, from the two identities alone through
+Shape (`Universal/DiagonalLaw.lean`, from the two identities alone through
 the `TopRowRecursion` interface; `DiscreteCalculus.lean` supplies the discrete
 antiderivative and integer values by finite differences). Strong induction on
 k through the first identity:
@@ -114,19 +114,19 @@ so `IsDiagonalPoly.natDegree_eq`: the degree is exactly k). With the leading
 coefficient known, k rows (2k+1 … 3k) determine P_k by Lagrange
 (`isDiagonalPoly_of_coeff_of_eval_Icc`).
 
-The staircase (`Grand/`). `Series.lean` is a convolution toolkit; `Mu.lean`
+The staircase (`Staircase/`). `Staircase/Series.lean` is a convolution toolkit; `Staircase/Mu.lean`
 defines the multiplier sequence μ from the weights and its inverse ν;
-`MuRec.lean` proves `d_staircase`: `d k (H+1) = Σ_i μ_i·d (k−i) H` for
+`WalkTop.lean` proves `d_staircase`: `d k (H+1) = Σ_i μ_i·d (k−i) H` for
 H ≥ k+1, one strong induction from the first peeling identity;
-`Staircase.lean` transports it to the diagonals (`T_staircase`). On this,
-`Grand/PinAll.lean` climbs: `IsDiagonalPolyH k P` is the law of level k in
+`Staircase/Diagonal.lean` transports it to the diagonals (`T_staircase`). On this,
+`Staircase/Climb.lean` climbs: `IsDiagonalPolyH k P` is the law of level k in
 the climb's coordinates; `climb_step` passes from levels < k to level k given
 the two cells; `climb` runs it from `climb_zero` (P_0 = 1,
 unconditional) to k = 18 under `BankedAnchors`, and `Pk_prod` reads off the
-diagonal law with the concrete `Pp<k>` of `Pin.lean`. The 19 polynomials in
-`Pin.lean` are the engine's (`orchestrator/sweep.go`, extracted to
+diagonal law with the concrete `Pp<k>` of `DiagonalPolys.lean`. The 19 polynomials in
+`DiagonalPolys.lean` are the engine's (`orchestrator/sweep.go`, extracted to
 `pin-data.md` by `scripts/extract_pin_data.py`); a wrong coefficient fails
-the cell evaluations in `PinAll`.
+the cell evaluations in `Staircase/Climb`.
 
 Symmetry (`Symmetry.lean`): the dihedral group acts by apply-then-anchor;
 `R90`, `R180`, `Hm`, `Dm` are the fixed-point counts, `Free`, `OneSided`,
@@ -149,12 +149,12 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le_3125_div_256 : λ ≤ 3125
 | `King` | `kingLattice`; the generic objects agree with the king ones; `d_rec`, `T_of_d`, `IsDiagonalPoly`, `exists_isDiagonalPoly`, `IsDiagonalPoly.intValued`, `T_self` in king vocabulary |
 | `DiscreteCalculus` | the discrete antiderivative, integer values by finite differences |
 | `LeadingCoeff` | 25^k/k!, the degree is exactly k, `P_k` from k rows |
-| `Pin` | the 19 production polynomials `Pk`, `P_k` from k+1 values, `T_sub_one` |
-| `Grand/Series` | convolution toolkit |
-| `Grand/Mu` | μ, ν, `mu_conv_nu`, the gates μ₁, μ₂ |
-| `Grand/MuRec` | `d_staircase` |
-| `Grand/Staircase` | `T_staircase` |
-| `Grand/PinAll` | `IsDiagonalPolyH`, `climb_step`, `climb`, `isDiagonalPoly_Pk`, `enumerated`, `EnumeratedCells` |
+| `DiagonalPolys` | the 19 production polynomials `Pk`, `P_k` from k+1 values, `T_sub_one` |
+| `Staircase/Series` | convolution toolkit |
+| `Staircase/Mu` | μ, ν, `mu_conv_nu`, the gates μ₁, μ₂ |
+| `Staircase/WalkTop` | `d_staircase` |
+| `Staircase/Diagonal` | `T_staircase` |
+| `Staircase/Climb` | `IsDiagonalPolyH`, `climb_step`, `climb`, `isDiagonalPoly_Pk`, `enumerated`, `EnumeratedCells` |
 | `Symmetry` | dihedral action, Burnside identities, `R90_eq_zero`, `Asym` |
 | `SymmetryRatio` | `symmetryRatio`: the symmetric counts are o(a(n)), so one-sided → a(n)/4 and free → a(n)/8 |
 | `UpperBound` | `a n ≤ C(5n,n)` |
@@ -171,8 +171,8 @@ L-paper modules:
 
 | module | paper | what |
 |---|---|---|
-| `Universal/Defs`, `Graph`, `Finite`, `Separation`, `RowProfile`, `Weights`, `Peel` | report, L1 | the peeling recursion for every row-local lattice (a finite set `D` of up-offsets, `b = |D|`) |
-| `Universal/AbstractShape`, `System` | report, L1 | the diagonal law as a theorem about any `TopRowRecursion`, hence for every row-local lattice |
+| `Universal/Defs`, `Graph`, `Finite`, `Separation`, `RowProfile`, `Weights`, `Universal/TopRow` | report, L1 | the peeling recursion for every row-local lattice (a finite set `D` of up-offsets, `b = |D|`) |
+| `Universal/DiagonalLaw`, `Instance` | report, L1 | the diagonal law as a theorem about any `TopRowRecursion`, hence for every row-local lattice |
 | `Universal/Compute`, `Hex`, `Square` | L1 | the generic enumerator and the values lemma; the hex and square instances and their `P_1` |
 | `Upper/Certificate` | L3 | the convolution-certificate bound `λ ≤ 1/x` from a rational super-solution, and `RatCert`, the exported-data check |
 | `Upper/BuiData2`, `BuiRD2`, `BuiData3`, `BuiRD3` | L3 | the 185-type (λ ≤ 9.4117) and 5930-type (λ ≤ 9.3154) certificates as balanced lookup trees the kernel checks (`decide +kernel`, 11 s for RD = 3), conditional on the named system hypotheses |
@@ -237,8 +237,8 @@ Lines are at that commit.
 | `Draft/Prop6Skeleton` | — | the never-built `sorry` skeleton of Proposition 6 |
 
 Also gone, same reasons: `Grand/PinGrand.lean` and `scripts/gen_grand_pin.py`
-(2,608 generated lines, replaced by `Grand/PinAll.lean` at `7641b74`), the
-old Lagrange tiers of `Pin.lean` (`P<k>_pinned_of_banked`, k = 4 … 11, with
+(2,608 generated lines, replaced by `Staircase/Climb.lean` at `7641b74`), the
+old Lagrange tiers of `DiagonalPolys.lean` (`P<k>_pinned_of_banked`, k = 4 … 11, with
 `scripts/gen_pin.py`), `P3_pinned_of_heavy`, the `make gate-notary` target, and the planning files `PROOF-STATUS.md`, `DESIGN.md`,
 `docs/lean-record.md`, whose surviving content is this file.
 
@@ -253,7 +253,7 @@ old Lagrange tiers of `Pin.lean` (`P<k>_pinned_of_banked`, k = 4 … 11, with
 - 2026-07-30 … 08-06: the outworks (a(n), λ, symmetry, holes, universal law,
   the Bui certificate, the 5-adic law, the staircase constant).
 - 2026-10-11 … 12: the overhaul. `Report.lean` written; `LeadingCoeff.lean`
-  replaces the exp-form route; `PinAll.lean` replaces the generated pinning;
+  replaces the exp-form route; `Climb.lean` replaces the generated pinning;
   levels 1 … 3 take their cells as hypotheses like the rest, so every Report
   theorem is on standard axioms; everything outside the Report cone deleted.
   Working list: `OVERHAUL.md`.

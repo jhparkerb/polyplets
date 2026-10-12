@@ -5,7 +5,7 @@ Authors: Jason H Parker
 -/
 import Mathlib.LinearAlgebra.Lagrange
 import Polyplets.Compute
-import Polyplets.Universal.System
+import Polyplets.Universal.Instance
 
 /-!
 # Instance toolkit: a computable counter for `T L`, and the values lemma

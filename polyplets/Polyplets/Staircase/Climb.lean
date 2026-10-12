@@ -8,9 +8,9 @@ import Mathlib.Tactic.IntervalCases
 import Mathlib.Tactic.LinearCombination
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
-import Polyplets.Grand.Staircase
+import Polyplets.Staircase.Diagonal
 import Polyplets.EnumData
-import Polyplets.Pin
+import Polyplets.DiagonalPolys
 
 /-!
 # The diagonal polynomials `P_0 … P_18`, determined level by level
@@ -209,7 +209,7 @@ theorem climb_step (k : ℕ) (hk : 1 ≤ k) (Q : ℕ → Polynomial ℚ) (c : �
   · exact hg i (by omega)
   · exact hG
 
-/-! ## The data: `c_k` and the enumerated cells (`Pk` is `Pin.lean`'s) -/
+/-! ## The data: `c_k` and the enumerated cells (`Pk` is `DiagonalPolys.lean`'s) -/
 
 /-- `c_i = μ_i·3^(2i-1)`, the integer staircase coefficients, `i ≤ 18`. -/
 def cInt : ℕ → ℚ
@@ -362,7 +362,7 @@ theorem isDiagonalPoly_Pk (hA : EnumeratedCells) (k : ℕ) (hk : k ≤ 18) : IsD
 The climb's first two levels need four onset cells, `T(3,2)`, `T(4,3)`,
 `T(5,3)` and `T(6,4)`, all of which the kernel decides (`Enum.lean`,
 `EnumData.lean`), so `P_1` and `P_2` hold outright. `T_sub_one` of
-`Pin.lean` is the Lagrange route to the first; this is the staircase route to
+`DiagonalPolys.lean` is the Lagrange route to the first; this is the staircase route to
 both, and `T_sub_two` is the `k = 2` diagonal in closed form. -/
 
 /-- The climb to level `2`, from the kernel-decided cells. -/
