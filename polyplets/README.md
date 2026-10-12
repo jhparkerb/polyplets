@@ -132,41 +132,41 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le : λ ≤ 3125/256` and
 
 ## Modules
 
-| module | lines | what |
-|---|---|---|
-| `Defs` | 56 | king adjacency, connectivity, canonical form, `T` |
-| `Finite` | 107 | width bound; `T` as a `Finset.card` |
-| `Compute` | 270 | computable `Tc`, `Tc_eq_T`, the three kernel-decided cells the proofs use |
-| `Sequence` | 280 | `a n`, `a_eq_sum`, computable twin `ac` |
-| `Weights` | 390 | the king `d`, `V`, `Vt` as computable enumerations, window independence, `V 1 1 = 25`, `d 0 1 = 1` |
-| `King` | 240 | `kingLattice`; the generic objects agree with the king ones; `d_rec`, `c_ident`, `shape_production`, `production_int_all`, `T_diag_pow` in king vocabulary |
-| `DiscreteCalculus` | 190 | the discrete antiderivative, integer values by finite differences |
-| `LeadingCoeff` | 285 | 25^k/k!, pinning from k rows |
-| `Pin` | 224 | the 19 production polynomials, Lagrange pin, `P1_closed` |
-| `Grand/Series` | 259 | convolution toolkit |
-| `Grand/Mu` | 287 | μ, ν, `mu_conv_nu`, the gates μ₁, μ₂ |
-| `Grand/MuRec` | 238 | `d_mu_rec` |
-| `Grand/Staircase` | 153 | `T_staircase` |
-| `Grand/PinAll` | 370 | `GrandForm`, `level_step`, `grand_all`, `Pk_prod`, `BankedAnchors` |
-| `Symmetry` | 1011 | dihedral action, Burnside identities, `r90_vanish` |
-| `UpperBound` | 941 | `a n ≤ C(5n,n)` |
-| `Fekete` | 164 | Fekete's lemma as a structure |
-| `Growth` | 755 | λ, `lambda_tendsto`, the brackets |
-| `Report` | 124 | the report's claims |
-| `Audit` | 160 | the `#guard_msgs` axiom guards |
-| `Checks` | 110 | validation facts nothing consumes (built, never imported) |
+| module | what |
+|---|---|
+| `Defs` | king adjacency, connectivity, canonical form, `T` |
+| `Finite` | width bound; `T` as a `Finset.card` |
+| `Compute` | computable `Tc`, `Tc_eq_T`, the three kernel-decided cells the proofs use |
+| `Sequence` | `a n`, `a_eq_sum`, computable twin `ac` |
+| `Weights` | the king `d`, `V`, `Vt` as computable enumerations, window independence, `V 1 1 = 25`, `d 0 1 = 1` |
+| `King` | `kingLattice`; the generic objects agree with the king ones; `d_rec`, `c_ident`, `shape_production`, `production_int_all`, `T_diag_pow` in king vocabulary |
+| `DiscreteCalculus` | the discrete antiderivative, integer values by finite differences |
+| `LeadingCoeff` | 25^k/k!, pinning from k rows |
+| `Pin` | the 19 production polynomials, Lagrange pin, `P1_closed` |
+| `Grand/Series` | convolution toolkit |
+| `Grand/Mu` | μ, ν, `mu_conv_nu`, the gates μ₁, μ₂ |
+| `Grand/MuRec` | `d_mu_rec` |
+| `Grand/Staircase` | `T_staircase` |
+| `Grand/PinAll` | `GrandForm`, `level_step`, `grand_all`, `Pk_prod`, `BankedAnchors` |
+| `Symmetry` | dihedral action, Burnside identities, `r90_vanish` |
+| `UpperBound` | `a n ≤ C(5n,n)` |
+| `Fekete` | Fekete's lemma as a structure |
+| `Growth` | λ, `lambda_tendsto`, the brackets |
+| `Report` | the report's claims |
+| `Audit` | the `#guard_msgs` axiom guards |
+| `Checks` | validation facts nothing consumes (built, never imported) |
 
 The generic development the report's proofs run through, and the other
 L-paper modules:
 
-| module | lines | paper | what |
-|---|---|---|---|
-| `Universal/Defs`, `Graph`, `Finite`, `Separation`, `RowProfile`, `Weights`, `Peel` | 2,600 | report, L1 | the peeling recursion for every row-local lattice (a finite set `D` of up-offsets, `b = |D|`) |
-| `Universal/AbstractShape`, `System` | 470 | report, L1 | the diagonal law as a theorem about any `PeelSystem`, hence for every row-local lattice |
-| `Universal/Compute`, `Hex`, `Square` | 600 | L1 | the generic enumerator and pin lemma; the hex and square instances and their `P_1` |
-| `Upper/Certificate` | 518 | L3 | the convolution-certificate bound `λ ≤ 1/x` from a rational super-solution, and `RatCert`, the exported-data check |
-| `Upper/BuiData2`, `BuiRD2`, `BuiData3`, `BuiRD3` | 700 | L3 | the 185-type (λ ≤ 9.4117) and 5930-type (λ ≤ 9.3154) certificates as balanced lookup trees the kernel checks (`decide +kernel`, 11 s for RD = 3), conditional on the named system hypotheses |
-| `StairAnimals`, `StairGrowth` | 500 | L5 | staircase king animals: the column join is injective at fixed area (Lemma 3), µ exists, 3.1234 < µ ≤ 4 given M(700) |
+| module | paper | what |
+|---|---|---|
+| `Universal/Defs`, `Graph`, `Finite`, `Separation`, `RowProfile`, `Weights`, `Peel` | report, L1 | the peeling recursion for every row-local lattice (a finite set `D` of up-offsets, `b = |D|`) |
+| `Universal/AbstractShape`, `System` | report, L1 | the diagonal law as a theorem about any `PeelSystem`, hence for every row-local lattice |
+| `Universal/Compute`, `Hex`, `Square` | L1 | the generic enumerator and pin lemma; the hex and square instances and their `P_1` |
+| `Upper/Certificate` | L3 | the convolution-certificate bound `λ ≤ 1/x` from a rational super-solution, and `RatCert`, the exported-data check |
+| `Upper/BuiData2`, `BuiRD2`, `BuiData3`, `BuiRD3` | L3 | the 185-type (λ ≤ 9.4117) and 5930-type (λ ≤ 9.3154) certificates as balanced lookup trees the kernel checks (`decide +kernel`, 11 s for RD = 3), conditional on the named system hypotheses |
+| `StairAnimals`, `StairGrowth` | L5 | staircase king animals: the column join is injective at fixed area (Lemma 3), µ exists, 3.1234 < µ ≤ 4 given M(700) |
 
 ## No `native_decide`
 
@@ -208,13 +208,13 @@ Lines are at that commit.
 | group | lines | what it proved |
 |---|---|---|
 | `GapWalk*`, `DepthOne*`, `KernelRoots`, `KernelSeries`, `DepthAssembly` (20 modules) | 14,000 | the Severance and Notary campaigns: the depth-1 defect's gap walk, `Φ(x, N(x)) = 0` at every order, the depth identities for D_j(k) with the weight tables as hypotheses (`results/below-onset.md` §11) |
-| `Holes`, `HolesUpper` | 1,100 | the maximum-hole bound, lower side unconditional, upper side under the hypothesis `MoatBound` |
-| `V5Denominator` | 300 | the 5-adic denominator law of P_k for k ≤ 18, kernel `decide` |
-| `Northcott` | 180 | bounded degree + bounded house ⇒ finitely many algebraic integers |
-| `IntCoeff` | 255 | k!·P_k ∈ ℤ[X] |
-| `Grand/ExpForm`, `Grand/Lead` | 790 | the exp-form `grand_form` and `lead_coeff_25`; superseded by `LeadingCoeff.lean` |
+| `Holes`, `HolesUpper` | the maximum-hole bound, lower side unconditional, upper side under the hypothesis `MoatBound` |
+| `V5Denominator` | the 5-adic denominator law of P_k for k ≤ 18, kernel `decide` |
+| `Northcott` | bounded degree + bounded house ⇒ finitely many algebraic integers |
+| `IntCoeff` | k!·P_k ∈ ℤ[X] |
+| `Grand/ExpForm`, `Grand/Lead` | the exp-form `grand_form` and `lead_coeff_25`; superseded by `LeadingCoeff.lean` |
 | `Weights3Heavy`, `WeightsChunk*` (11) | 800 | V(3,3) = 4778, Vt(3,3) = 919, d(3,4) = 4687 by chunked `native_decide`, an hour of every cold build |
-| `ComputeBridge`, `Diagonal`, `Sanity`, `AuditOutworks` | 750 | more `native_decide` cells of rows ≤ 6, restatements of P1/P2, a hand proof of T(1,1) = 1, 70 axiom guards |
+| `ComputeBridge`, `Diagonal`, `Sanity`, `AuditOutworks` | more `native_decide` cells of rows ≤ 6, restatements of P1/P2, a hand proof of T(1,1) = 1, 70 axiom guards |
 | `Draft/Prop6Skeleton` | — | the never-built `sorry` skeleton of Proposition 6 |
 
 Also gone, same reasons: `Grand/PinGrand.lean` and `scripts/gen_grand_pin.py`
