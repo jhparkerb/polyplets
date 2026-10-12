@@ -34,7 +34,7 @@ Easiest and most depended-on first. One commit per item.
 - [x] A4. Loose `#print axioms` out of library modules; every headline
       theorem of the report and the L-papers gets a `#guard_msgs` guard in
       `Audit.lean` instead.
-- [ ] A5. Validation out of the library: the kernel-decided cells, the
+- [x] A5. Validation out of the library (2026-10-12): the kernel-decided cells, the
       numeric gates (`c_ident_check_*`, `d_mu_rec_check_*`,
       `T_staircase_check_*`, `shape_check_T_*`, the `Tc` examples) move to
       one `Polyplets/Checks.lean` that the root builds and nothing imports;

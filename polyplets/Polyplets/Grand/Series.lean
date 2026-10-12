@@ -4,34 +4,33 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.Algebra.BigOperators.NatAntidiagonal
-import Mathlib.Analysis.Normed.Field.Lemmas
-import Mathlib.Tactic.Ring
+import Mathlib.RingTheory.PowerSeries.Basic
 
 /-!
-# Series: a sequence-convolution toolkit over `ℕ → ℚ`
+# Series: sequence convolution, as power-series coefficients
 
-The self-contained algebra layer under the grand-form staircase
-(`docs/proofs/grand-form.md`).
-Everything works over plain functions `ℕ → ℚ` — no structure or type synonym, so
-later files can pattern-match on the underlying lambdas.
+The algebra layer under the grand-form staircase (`docs/proofs/grand-form.md`)
+works with plain sequences `ℕ → ℚ`, so that `Mu.lean` can define the root
+series `ν` by a well-founded recursion on the index and pattern-match on the
+underlying functions.
 
-* `conv a b` — the Cauchy convolution `m ↦ ∑_{i ≤ m} a i · b (m − i)`.
-* `eps` — the convolution unit (`1` at `0`, else `0`).
+* `conv a b` — the Cauchy convolution `m ↦ ∑_{i ≤ m} a i · b (m − i)`;
+* `eps` — the convolution unit (`1` at `0`, else `0`);
 * `convPow a ℓ` — the `ℓ`-fold convolution power of `a` (`convPow a 0 = eps`).
 
-The core reusable lemma is **`sum_conv_collapse`**: the reindexing
-`∑_i a i · (∑_t b t · f (k−i−t)) = ∑_s (conv a b) s · f (k−s)`, proved by a
-bijection of sigma index sets. It is `conv_assoc` in disguise (the inner sum is
-`conv b f (k − i)`); `Mu`, `MuRec` and `Staircase` consume it.
-
-`conv` is a commutative, associative product with unit `eps`, and a convolution
-inverse lifts to powers (`conv_convPow_inv`). Truncation lemmas (`conv_congr_le`,
-`convPow_congr_le`, `conv_left_vanish_lt`) express that coefficient `m` of a
-convolution reads its arguments only at indices `≤ m` — the workhorses the
-well-founded `ν`/`μ` recursions of `Mu.lean` lean on.
+Every algebraic fact about them is read off Mathlib's `PowerSeries ℚ` through
+the bridge `mk_conv : mk (conv a b) = mk a * mk b` (and `mk_eps`, `mk_convPow`):
+commutativity, associativity (`sum_conv_collapse`, the reindexing the staircase
+uses), the unit laws, and that an inverse lifts to powers (`conv_convPow_inv`).
+Only the truncation lemmas (`conv_congr_le`, `convPow_congr_le`,
+`conv_left_vanish_lt`), which say that coefficient `m` of a convolution reads
+its arguments at indices `≤ m` only, are proved on the sum directly; the
+well-founded `ν` recursion of `Mu.lean` leans on them.
 -/
 
 namespace Polyplets
+
+open PowerSeries
 
 /-! ## Definitions -/
 
@@ -48,96 +47,67 @@ def convPow (a : ℕ → ℚ) : ℕ → ℕ → ℚ
   | 0     => eps
   | ℓ + 1 => conv a (convPow a ℓ)
 
-/-! ## Antidiagonal form and commutativity -/
+/-! ## The bridge to `PowerSeries ℚ` -/
 
-/-- `conv` written as a sum over the antidiagonal of `m`. -/
-lemma conv_eq_antidiagonal (a b : ℕ → ℚ) (m : ℕ) :
-    conv a b m = ∑ p ∈ Finset.antidiagonal m, a p.1 * b p.2 := by
-  rw [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk (fun p => a p.1 * b p.2) m]
-  rfl
+/-- `conv` is the coefficient of a product of power series. -/
+lemma conv_eq_coeff (a b : ℕ → ℚ) (m : ℕ) : conv a b m = coeff m (mk a * mk b) := by
+  rw [coeff_mul, Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk
+    (fun p => coeff p.1 (mk a) * coeff p.2 (mk b)) m]
+  simp only [conv, coeff_mk]
+
+/-- `mk` turns convolution into multiplication. -/
+lemma mk_conv (a b : ℕ → ℚ) : mk (conv a b) = mk a * mk b :=
+  PowerSeries.ext fun m => by rw [coeff_mk, conv_eq_coeff]
+
+/-- `mk` turns the unit into `1`. -/
+lemma mk_eps : mk eps = (1 : ℚ⟦X⟧) :=
+  PowerSeries.ext fun m => by rw [coeff_mk, coeff_one, eps]
+
+/-- `mk` turns convolution powers into powers. -/
+lemma mk_convPow (a : ℕ → ℚ) (ℓ : ℕ) : mk (convPow a ℓ) = mk a ^ ℓ := by
+  induction ℓ with
+  | zero => simp only [convPow, mk_eps, pow_zero]
+  | succ ℓ ih => simp only [convPow, mk_conv, ih, pow_succ']
+
+/-- Two sequences with the same power series are equal. -/
+lemma eq_of_mk_eq {a b : ℕ → ℚ} (h : mk a = mk b) : a = b :=
+  funext fun m => by rw [← coeff_mk m a, h, coeff_mk]
+
+/-! ## The ring laws, read off the power series -/
 
 /-- Convolution is commutative. -/
-lemma conv_comm (a b : ℕ → ℚ) : conv a b = conv b a := by
-  funext m
-  rw [conv_eq_antidiagonal, conv_eq_antidiagonal,
-      ← Finset.Nat.sum_antidiagonal_swap (f := fun p => b p.1 * a p.2)]
-  refine Finset.sum_congr rfl fun p _ => ?_
-  simp only [Prod.fst_swap, Prod.snd_swap]
-  ring
+lemma conv_comm (a b : ℕ → ℚ) : conv a b = conv b a :=
+  eq_of_mk_eq (by rw [mk_conv, mk_conv, mul_comm])
 
-/-! ## The collapse lemma and associativity -/
+/-- Convolution is associative. -/
+lemma conv_assoc (a b c : ℕ → ℚ) : conv (conv a b) c = conv a (conv b c) :=
+  eq_of_mk_eq (by rw [mk_conv, mk_conv, mk_conv, mk_conv, mul_assoc])
 
-/-- **`sum_conv_collapse`** — the key reindexing of the staircase: folding a
-nested convolution sum along the diagonal `s = i + t` turns the inner
-`∑_t b t · f (k − i − t)` into a genuine `conv a b` coefficient. Proved by a
-bijection of the two sigma index sets `{(i,t) : i + t ≤ k}` and
-`{(s,i) : i ≤ s ≤ k}`. -/
+/-- **`sum_conv_collapse`** — the reindexing of the staircase: folding a nested
+convolution sum along the diagonal `s = i + t` turns the inner
+`∑_t b t · f (k − i − t)` into a genuine `conv a b` coefficient. It is
+associativity, coefficient by coefficient: the left side is
+`conv a (conv b f) k`, the right side `conv (conv a b) f k`. -/
 lemma sum_conv_collapse (a b f : ℕ → ℚ) (k : ℕ) :
     ∑ i ∈ Finset.range (k + 1), a i *
         ∑ t ∈ Finset.range (k - i + 1), b t * f (k - i - t)
-      = ∑ s ∈ Finset.range (k + 1), conv a b s * f (k - s) := by
-  have hL : ∑ i ∈ Finset.range (k + 1), a i *
-        ∑ t ∈ Finset.range (k - i + 1), b t * f (k - i - t)
-      = ∑ i ∈ Finset.range (k + 1), ∑ t ∈ Finset.range (k - i + 1),
-          a i * (b t * f (k - i - t)) := by
-    refine Finset.sum_congr rfl fun i _ => ?_
-    rw [Finset.mul_sum]
-  have hR : ∑ s ∈ Finset.range (k + 1), conv a b s * f (k - s)
-      = ∑ s ∈ Finset.range (k + 1), ∑ i ∈ Finset.range (s + 1),
-          a i * b (s - i) * f (k - s) := by
-    refine Finset.sum_congr rfl fun s _ => ?_
-    simp only [conv]
-    rw [Finset.sum_mul]
-  rw [hL, hR, Finset.sum_sigma', Finset.sum_sigma']
-  refine Finset.sum_bij'
-    (fun x _ => (⟨x.1 + x.2, x.1⟩ : (_ : ℕ) × ℕ))
-    (fun x _ => (⟨x.2, x.1 - x.2⟩ : (_ : ℕ) × ℕ)) ?_ ?_ ?_ ?_ ?_
-  · rintro ⟨i, t⟩ hx
-    simp only [Finset.mem_sigma, Finset.mem_range] at hx ⊢
-    omega
-  · rintro ⟨s, i⟩ hy
-    simp only [Finset.mem_sigma, Finset.mem_range] at hy ⊢
-    omega
-  · rintro ⟨i, t⟩ _
-    have h1 : i + t - i = t := by omega
-    simp only [h1]
-  · rintro ⟨s, i⟩ hy
-    simp only [Finset.mem_sigma, Finset.mem_range] at hy
-    have h1 : i + (s - i) = s := by omega
-    simp only [h1]
-  · rintro ⟨i, t⟩ _
-    dsimp only
-    have h1 : i + t - i = t := by omega
-    have h2 : k - (i + t) = k - i - t := by omega
-    rw [h1, h2]
-    ring
-
-/-- Convolution is associative — a definitional restatement of
-`sum_conv_collapse` (the inner sum on its left is `conv b c (m − i)`). -/
-lemma conv_assoc (a b c : ℕ → ℚ) : conv (conv a b) c = conv a (conv b c) := by
-  funext m
-  change (∑ s ∈ Finset.range (m + 1), conv a b s * c (m - s))
-     = ∑ i ∈ Finset.range (m + 1), a i * conv b c (m - i)
-  exact (sum_conv_collapse a b c m).symm
-
-/-! ## The unit -/
+      = ∑ s ∈ Finset.range (k + 1), conv a b s * f (k - s) :=
+  (congrFun (conv_assoc a b f) k).symm
 
 /-- `eps` is a right unit for `conv`. -/
-lemma conv_eps (a : ℕ → ℚ) : conv a eps = a := by
-  funext m
-  simp only [conv, eps]
-  rw [Finset.sum_eq_single m]
-  · simp
-  · intro i hi hne
-    rw [Finset.mem_range] at hi
-    have : m - i ≠ 0 := by omega
-    simp [this]
-  · intro h
-    exact absurd (Finset.self_mem_range_succ m) h
+lemma conv_eps (a : ℕ → ℚ) : conv a eps = a :=
+  eq_of_mk_eq (by rw [mk_conv, mk_eps, mul_one])
 
 /-- `eps` is a left unit for `conv`. -/
 lemma eps_conv (a : ℕ → ℚ) : conv eps a = a := by
   rw [conv_comm, conv_eps]
+
+/-- A convolution inverse lifts to powers: if `conv a b = eps` then
+`conv (convPow a ℓ) (convPow b ℓ) = eps`. -/
+lemma conv_convPow_inv {a b : ℕ → ℚ} (h : conv a b = eps) (ℓ : ℕ) :
+    conv (convPow a ℓ) (convPow b ℓ) = eps := by
+  have hab : mk a * mk b = 1 := by rw [← mk_conv, h, mk_eps]
+  exact eq_of_mk_eq (by rw [mk_conv, mk_convPow, mk_convPow, ← mul_pow, hab, one_pow, mk_eps])
 
 /-! ## Truncation: a convolution coefficient reads only low indices -/
 
@@ -194,19 +164,5 @@ lemma conv_left_vanish_lt {a b : ℕ → ℚ} {ℓ : ℕ} (h : ∀ j, j < ℓ �
 lemma conv_eq_zero_of_lt {a b : ℕ → ℚ} {ℓ : ℕ} (h : ∀ j, j < ℓ → a j = 0)
     {m : ℕ} (hm : m < ℓ) : conv a b m = 0 := by
   rw [conv_left_vanish_lt h m, Finset.Icc_eq_empty (by omega), Finset.sum_empty]
-
-/-! ## Convolution powers -/
-
-/-- A convolution inverse lifts to powers: if `conv a b = eps` then
-`conv (convPow a ℓ) (convPow b ℓ) = eps`. -/
-lemma conv_convPow_inv {a b : ℕ → ℚ} (h : conv a b = eps) :
-    ∀ ℓ : ℕ, conv (convPow a ℓ) (convPow b ℓ) = eps := by
-  intro ℓ
-  induction ℓ with
-  | zero => simp only [convPow]; exact conv_eps eps
-  | succ ℓ ih =>
-    simp only [convPow]
-    rw [conv_assoc, ← conv_assoc (convPow a ℓ) b, conv_comm (convPow a ℓ) b,
-        conv_assoc b, ih, conv_eps, h]
 
 end Polyplets
