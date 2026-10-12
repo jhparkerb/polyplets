@@ -96,8 +96,11 @@ Easiest and most depended-on first. One commit per item.
       through `rotHom`; the action is built from one quarter turn and one
       mirror). `Symmetry`: `DihedralGroup 4` from Mathlib in place of the
       hand-rolled `D4` and `C4` tables.
-- [ ] A16. `SymmetryRatioClaim` as a theorem, conditional on the banked
-      a(40): encode a symmetric animal by its axis cells and the components
+- [x] A16 (2026-10-12: `SymmetryRatio.lean`, unconditional; mirrors by the
+      closed half-plane, the half turn by a maximal connected half, `R90 ≤
+      R180`; the comparison is `a_supermul` against `a 3 = 20`, no upper
+      bound on λ needed). `SymmetryRatioClaim` as a theorem, conditional on
+      the banked a(40): encode a symmetric animal by its axis cells and the components
       of one half, bound the count by `a_le_lambda_pow` and the components,
       and beat it with `lambda_gt_of_banked`; needs the encoding tight enough
       that `λ ≤ 12.2` suffices, or `lambda_le_of_bui_rd3` (9.3154) from

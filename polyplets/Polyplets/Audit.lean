@@ -74,6 +74,10 @@ namespace Polyplets
 #guard_msgs in
 #print axioms report_growth
 
+/-- info: 'Polyplets.report_symmetryRatio' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms report_symmetryRatio
+
 /-! ## The results they rest on -/
 
 /-- info: 'Polyplets.shape_production' depends on axioms: [propext, Classical.choice, Quot.sound] -/

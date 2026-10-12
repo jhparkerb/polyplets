@@ -1,6 +1,6 @@
 # polyplets — the Lean development
 
-Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 42 modules, about 14,000 lines,
+Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 43 modules, about 15,400 lines,
 no `sorry`, no `native_decide`; every theorem the report or an L-paper cites
 is on the standard three axioms, guarded in `Audit.lean`. The quality pass
 in progress is `OVERHAUL.md`. `Polyplets/Report.lean` states each claim of
@@ -40,7 +40,7 @@ the theorem takes as input rather than proves.
 | 4·one-sided = a + 2R90 + R180 | `report_oneSided` | `oneSided_eq` (`Symmetry`) | — |
 | 2·bilateral = Hm + Dm | `report_bilateral` | `bilateral_eq` (`Symmetry`) | — |
 | a(n)^(1/n) → λ | `report_growth` | `lambda_tendsto` (`Growth`, `Fekete`, `UpperBound`) | — |
-| one-sided → a(n)/4, free → a(n)/8 | `SymmetryRatioClaim` | **not proved**: stated as a `Prop`, needs the symmetric counts o(a(n)) | — |
+| one-sided → a(n)/4, free → a(n)/8 | `report_symmetryRatio` | `symmetryRatio` (`SymmetryRatio`): each symmetric count is o(a(n)), by encoding a symmetric animal as a connected half of about n/2 cells and comparing with `a_supermul` against the kernel-decided a(3) = 20 | — |
 
 Out of scope by design: the computed tables (a(n), T(n,H) beyond the small
 cells, the symmetry-class and hole counts) and the value λ ≈ 7.11. Those are
@@ -150,6 +150,7 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le : λ ≤ 3125/256` and
 | `Grand/Staircase` | `T_staircase` |
 | `Grand/PinAll` | `GrandForm`, `level_step`, `grand_all`, `Pk_prod`, `BankedAnchors` |
 | `Symmetry` | dihedral action, Burnside identities, `r90_vanish` |
+| `SymmetryRatio` | `symmetryRatio`: the symmetric counts are o(a(n)), so one-sided → a(n)/4 and free → a(n)/8 |
 | `UpperBound` | `a n ≤ C(5n,n)` |
 | `Fekete` | Fekete's lemma as a structure |
 | `Growth` | λ, `lambda_tendsto`, the brackets |
@@ -200,7 +201,6 @@ unconditional 3.95 < λ and μ₂ that rested on them.
 
 ## What is not reached
 
-- The symmetry-ratio claim, above.
 - a(41). The pinning takes two cells at or above the onset per level; the
   a(41) route replaced one anchor by a below-onset cell corrected by the
   defect D_j(k) (`results/below-onset.md`), and neither that identity nor

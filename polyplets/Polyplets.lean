@@ -19,6 +19,7 @@ import Polyplets.Pin
 import Polyplets.Report
 import Polyplets.Sequence
 import Polyplets.Symmetry
+import Polyplets.SymmetryRatio
 import Polyplets.StairAnimals
 import Polyplets.StairGrowth
 import Polyplets.Universal.AbstractShape

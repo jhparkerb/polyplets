@@ -8,6 +8,7 @@ import Mathlib.Tactic.Ring
 import Polyplets.Grand.PinAll
 import Polyplets.LeadingCoeff
 import Polyplets.Symmetry
+import Polyplets.SymmetryRatio
 import Polyplets.Growth
 
 /-!
@@ -110,11 +111,15 @@ theorem report_oneSided (n : ℕ) : 4 * OneSided n = a n + 2 * R90 n + R180 n :=
 
 theorem report_bilateral (n : ℕ) : 2 * Bilateral n = Hm n + Dm n := bilateral_eq n
 
-/-- Claim, not yet proved: **one-sided approaches `a(n)/4` and free approaches
-`a(n)/8`.** Needs the symmetric counts to be `o(a(n))`. -/
+/-- **One-sided approaches `a(n)/4` and free approaches `a(n)/8`.** -/
 def SymmetryRatioClaim : Prop :=
   Filter.Tendsto (fun n => 4 * (OneSided n : ℝ) / a n) Filter.atTop (nhds 1) ∧
   Filter.Tendsto (fun n => 8 * (Free n : ℝ) / a n) Filter.atTop (nhds 1)
+
+/-- The symmetric counts are `o(a n)` (`SymmetryRatio.lean`: every symmetric
+animal is recovered from a connected half of about `n / 2` cells), so the
+Burnside identities give the limits. -/
+theorem report_symmetryRatio : SymmetryRatioClaim := symmetryRatio
 
 /-! ## Results: growth rate -/
 
