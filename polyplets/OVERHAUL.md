@@ -61,10 +61,10 @@ Easiest and most depended-on first. One commit per item.
       (`Growth`), the `p + t` images of `Symmetry`, the `sub` maps of
       `UpperBound`, with cardinality, membership, adjacency and connectivity
       invariance proved once.
-- [ ] A10. `Grand/Series` on `PowerSeries ℚ`: `conv a b = coeff (mk a * mk b)`,
+- [x] A10 (2026-10-12). `Grand/Series` on `PowerSeries ℚ`: `conv a b = coeff (mk a * mk b)`,
       `eps = 1`, `convPow = (·)^ℓ`; associativity, commutativity and the
       collapse lemma come from Mathlib instead of a 40-line sigma bijection.
-- [ ] A11. `int_valued_of_consecutive` from Mathlib's forward differences
+- [x] A11 (checked 2026-10-12: Mathlib has the forward-difference calculus but no integer-valued-polynomial theorem; the local lemma stays). `int_valued_of_consecutive` from Mathlib's forward differences
       (`fwdDiff`, `shift_eq_sum_fwdDiff_iter`) instead of the 80-line
       home-grown induction; likewise `exists_poly_sum_Icc` if Mathlib's
       Faulhaber/`fwdDiff` material covers it.

@@ -82,13 +82,30 @@ theorem conn_union {L : RowLocal} {S A B : Finset (ℤ × ℤ)} (hS : S = A ∪ 
   intro p hp q hq
   exact (to_x p hp).trans (from_x q hq)
 
+/-- The excision step shared by both escape directions. A walk `w` runs from a
+cell of `B` (the far side of a cut line) to a cell outside it, and every dart
+leaving `B` lands on the cut row `c`, which is a walk row of `S` whose cell is
+`p`: then `w` passes through `p`, and `w.dropUntil p` is a walk from `p` no
+longer than `w`. -/
+private lemma exists_walk_from_cut {S : Finset (ℤ × ℤ)} {x q p : ℤ × ℤ} {c : ℤ}
+    (w : (graph L S).Walk x q) (B : Set (ℤ × ℤ)) (hx : x ∈ B) (hq : q ∉ B)
+    (hcross : ∀ a b : ℤ × ℤ, Adj L a b → a ∈ B → b ∉ B → b.2 = c)
+    (hwc : IsWalkRow S c) (hpS : p ∈ S) (hpc : p.2 = c) :
+    ∃ w' : (graph L S).Walk p q, w'.length ≤ w.length := by
+  obtain ⟨d, hd, hdf, hds⟩ := w.exists_boundary_dart B hx hq
+  have hdadj : (graph L S).Adj d.fst d.snd := d.adj
+  have hdp : d.snd = p :=
+    hwc.eq_of_mem hdadj.2.1 (hcross _ _ hdadj.2.2 hdf hds) hpS hpc
+  have hpsup : p ∈ w.support := hdp ▸ w.dart_snd_mem_support_of_mem_darts hd
+  exact ⟨w.dropUntil p hpsup, by rw [SimpleGraph.Walk.length_dropUntil]; omega⟩
+
 /-- Walk-surgery core of the cut theorem, by strong induction on walk length
 (phrased as induction on an upper bound `N`). Given a `graph L S`-walk between
 two cells of the band, the band endpoints are reachable inside
 `graph L (seg S r r')`: a step escaping the band leaves from THE unique
-walk-row cell on the crossed cut line, and `Walk.exists_boundary_dart` finds the
-re-entry dart of the remaining walk, whose head is on the cut row, hence IS that
-same unique cell — so `Walk.dropUntil` excises the whole excursion. -/
+walk-row cell on the crossed cut line, and the rest of the walk must re-enter
+through that same cell (`exists_walk_from_cut`), so the excursion is excised
+and the walk shortened. -/
 private lemma reachable_seg_aux {L : RowLocal} {S : Finset (ℤ × ℤ)} {r r' : ℤ}
     (hr : IsWalkRow S r ∨ ∀ p ∈ S, r ≤ p.2)
     (hr' : IsWalkRow S r' ∨ ∀ p ∈ S, p.2 ≤ r') :
@@ -124,7 +141,7 @@ private lemma reachable_seg_aux {L : RowLocal} {S : Finset (ℤ × ℤ)} {r r' :
           push Not at hcon
           exact hx (mem_seg.mpr ⟨hxS, hcon.1, hcon.2⟩)
         rcases hx2 with hbelow | habove
-        · -- escape below: p is THE row-r cell; excise down to the re-entry
+        · -- escape below: `p` is THE row-`r` cell; excise down to the re-entry
           have hwr : IsWalkRow S r := by
             rcases hr with h | h
             · exact h
@@ -134,27 +151,16 @@ private lemma reachable_seg_aux {L : RowLocal} {S : Finset (ℤ × ℤ)} {r r' :
             rw [abs_le] at hk
             have := (mem_seg.mp hp).2.1
             omega
-          obtain ⟨d, hd, hdf, hds⟩ :=
-            w'.exists_boundary_dart {v : ℤ × ℤ | v.2 < r} hbelow
-              (by
-                simp only [Set.mem_setOf_eq, not_lt]
-                exact (mem_seg.mp hq).2.1)
-          have hdadj : (graph L S).Adj d.fst d.snd := d.adj
-          have hds2 : d.snd.2 = r := by
-            have hk := adj_abs_dy_le hdadj.2.2
-            rw [abs_le] at hk
-            simp only [Set.mem_setOf_eq] at hdf
-            simp only [Set.mem_setOf_eq, not_lt] at hds
-            omega
-          have hdp : d.snd = p :=
-            hwr.eq_of_mem hdadj.2.1 hds2 (mem_seg.mp hp).1 hp2
-          have hpsup : p ∈ w'.support :=
-            hdp ▸ w'.dart_snd_mem_support_of_mem_darts hd
-          refine ih p q hp hq (w'.dropUntil p hpsup) ?_
-          calc (w'.dropUntil p hpsup).length
-              ≤ w'.length := by rw [SimpleGraph.Walk.length_dropUntil]; omega
-            _ ≤ N := hlen
-        · -- escape above: p is THE row-r' cell; excise down to the re-entry
+          obtain ⟨w'', hw''⟩ := exists_walk_from_cut w' {v : ℤ × ℤ | v.2 < r} hbelow
+            (by simp only [Set.mem_setOf_eq, not_lt]; exact (mem_seg.mp hq).2.1)
+            (fun a b hab ha hb => by
+              have hk := adj_abs_dy_le hab
+              rw [abs_le] at hk
+              simp only [Set.mem_setOf_eq, not_lt] at ha hb
+              omega)
+            hwr (mem_seg.mp hp).1 hp2
+          exact ih p q hp hq w'' (by omega)
+        · -- escape above: `p` is THE row-`r'` cell; excise down to the re-entry
           have hwr' : IsWalkRow S r' := by
             rcases hr' with h | h
             · exact h
@@ -164,26 +170,15 @@ private lemma reachable_seg_aux {L : RowLocal} {S : Finset (ℤ × ℤ)} {r r' :
             rw [abs_le] at hk
             have := (mem_seg.mp hp).2.2
             omega
-          obtain ⟨d, hd, hdf, hds⟩ :=
-            w'.exists_boundary_dart {v : ℤ × ℤ | r' < v.2} habove
-              (by
-                simp only [Set.mem_setOf_eq, not_lt]
-                exact (mem_seg.mp hq).2.2)
-          have hdadj : (graph L S).Adj d.fst d.snd := d.adj
-          have hds2 : d.snd.2 = r' := by
-            have hk := adj_abs_dy_le hdadj.2.2
-            rw [abs_le] at hk
-            simp only [Set.mem_setOf_eq] at hdf
-            simp only [Set.mem_setOf_eq, not_lt] at hds
-            omega
-          have hdp : d.snd = p :=
-            hwr'.eq_of_mem hdadj.2.1 hds2 (mem_seg.mp hp).1 hp2
-          have hpsup : p ∈ w'.support :=
-            hdp ▸ w'.dart_snd_mem_support_of_mem_darts hd
-          refine ih p q hp hq (w'.dropUntil p hpsup) ?_
-          calc (w'.dropUntil p hpsup).length
-              ≤ w'.length := by rw [SimpleGraph.Walk.length_dropUntil]; omega
-            _ ≤ N := hlen
+          obtain ⟨w'', hw''⟩ := exists_walk_from_cut w' {v : ℤ × ℤ | r' < v.2} habove
+            (by simp only [Set.mem_setOf_eq, not_lt]; exact (mem_seg.mp hq).2.2)
+            (fun a b hab ha hb => by
+              have hk := adj_abs_dy_le hab
+              rw [abs_le] at hk
+              simp only [Set.mem_setOf_eq, not_lt] at ha hb
+              omega)
+            hwr' (mem_seg.mp hp).1 hp2
+          exact ih p q hp hq w'' (by omega)
 
 /-- **Cut.** Restricting an `L`-connected `S` to the row band `[r, r']`
 preserves `L`-connectivity, provided each cut line is either a walk row of `S`
