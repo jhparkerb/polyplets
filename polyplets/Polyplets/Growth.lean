@@ -350,7 +350,8 @@ theorem concat_canonical {m n : ℕ} {A B : Finset (ℤ × ℤ)}
     (hA : IsCanonicalAnimal m A) (hB : IsCanonicalAnimal n B) :
     IsCanonicalAnimal (m + n) (concat A B) := by
   have hcard : (concat A B).card = m + n := by
-    rw [concat, Finset.card_union_of_disjoint (concat_disjoint hA.anchored.x_nonneg hB.anchored.x_nonneg),
+    rw [concat,
+      Finset.card_union_of_disjoint (concat_disjoint hA.anchored.x_nonneg hB.anchored.x_nonneg),
       card_translate, card_translate, hA.card, hB.card]
   have hconn : KingConnected (concat A B) := by
     rw [concat]

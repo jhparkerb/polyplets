@@ -2,6 +2,8 @@ import Polyplets.Audit
 import Polyplets.Checks
 import Polyplets.Compute
 import Polyplets.Defs
+import Polyplets.Enum
+import Polyplets.EnumData
 import Polyplets.Fekete
 import Polyplets.Finite
 import Polyplets.DiscreteCalculus

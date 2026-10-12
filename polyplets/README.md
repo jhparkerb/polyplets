@@ -1,6 +1,6 @@
 # polyplets — the Lean development
 
-Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 39 modules, about 11,500 lines,
+Lean 4 `v4.31.0` against Mathlib `v4.31.0`, 42 modules, about 14,000 lines,
 no `sorry`, no `native_decide`; every theorem the report or an L-paper cites
 is on the standard three axioms, guarded in `Audit.lean`. The quality pass
 in progress is `OVERHAUL.md`. `Polyplets/Report.lean` states each claim of
@@ -34,6 +34,7 @@ the theorem takes as input rather than proves.
 | leading coefficient of P_k is 25^k/k! | `report_leading_coeff` | `production_leadingCoeff` (`LeadingCoeff`) | — |
 | P_k is fixed once row 3k is computed | `report_pin_row_3k` | `pin_of_leadingCoeff` (`LeadingCoeff`) | — |
 | T(n,n−1) = (25n−45)·3^(n−4) | `report_T_n_nm1` | `P1_closed` (`Pin`), from the kernel-decided cells T(3,2) = 10, T(4,3) = 55 | — |
+| T(n,n−2) = ½(625n²−2459n+1134)·3^(n−7) | — (not a report claim; `docs/proofs/T-n-nm2-and-general.md`) | `P2_closed` (`Grand/PinAll`), the climb to level 2 from the kernel-decided cells T(3,2), T(4,3), T(5,3) = 248, T(6,4) = 1480 | — |
 | P_k explicitly known for k ≤ 18 | `report_Pk_known` | `Pk_prod`, `grand_all` (`Grand/PinAll`), climbing level by level from `d_mu_rec` and `T_staircase` | `BankedAnchors`: 36 cells, below |
 | 8·free = a + 2R90 + R180 + 2Hm + 2Dm (Burnside) | `report_free` | `free_eq` (`Symmetry`) | — |
 | 4·one-sided = a + 2R90 + R180 | `report_oneSided` | `oneSided_eq` (`Symmetry`) | — |
@@ -154,6 +155,8 @@ limit λ, `a n ≤ λ^n`, and the brackets `lambda_le : λ ≤ 3125/256` and
 | `Growth` | λ, `lambda_tendsto`, the brackets |
 | `Report` | the report's claims |
 | `Audit` | the `#guard_msgs` axiom guards |
+| `Enum` | the bit-board enumerator: `L n` lists the canonical animals of `n` cells (`L_spec`, `n ≤ 14`); `a`, `T`, `d`, `V`, `Vt` and the symmetry fixed-point counts as filtered list lengths |
+| `EnumData` | the 638 and 3,832 boards of `L 5` and `L 6` as literals, checked against the enumeration in five kernel runs; `T 5 3`, `T 6 4` |
 | `Checks` | validation facts nothing consumes (built, never imported) |
 
 The generic development the report's proofs run through, and the other
@@ -173,18 +176,27 @@ L-paper modules:
 Since 2026-10-12 the tree has no `native_decide` at all, so every theorem in
 it is on the standard three axioms. (The RD = 3 certificate check was the last
 holdout: 5930 rows with `List.getD` lookups were beyond the kernel, balanced
-trees made it an 11-second `decide +kernel`.) The validation cells that remain are
-kernel-decided (`decide +kernel`): T(1,1), T(2,1), T(2,2), T(3,1), T(3,2),
-T(4,3), a(1), a(2), V(1,1), Vt(1,1), Vt(1,2), d(0,1), d(0,2), d(1,2), each
-under 3.5 GB. The brute-force definitions blow up fast in the kernel
-(`scripts/lean-decide-trials.sh`, 2026-10-12): T(3,3), a(3), d(0,3) need
-6 GB; T(5,4), a(4), V(1,2), d(1,3) and the symmetry counts at every n pass
-8 GB and were killed. The larger validation facts those modules used to
-carry by `native_decide` (rows ≤ 6 of T, a(3) … a(6), the j ≤ 3 weights, the
-symmetry anchors n ≤ 5, the k = 2 closed form, μ₂, the unconditional
-3.95 < λ) are gone with it; the kernel-decided cells above already separate
-the definition of `T` from every near-miss the 2026-07-21 audit tried, and
-nothing on the report's path consumed the rest.
+trees made it an 11-second `decide +kernel`.)
+
+The powerset counters (`Tc`, `ac`, the window enumerations of `Weights.lean`)
+reach the kernel only for the smallest cells: T(1,1), T(2,1), T(2,2), T(3,1),
+T(3,2), T(4,3), a(1), a(2), V(1,1), Vt(1,1), Vt(1,2), d(0,1), d(0,2), d(1,2)
+at 2.7–3.5 GB each; T(3,3), a(3), d(0,3) need 6 GB and anything larger passes
+8 GB (`scripts/lean-decide-trials.sh`, 2026-10-12). Everything up to six
+cells comes instead from `Enum.lean`: a cell set is one natural number (bit
+`16y + x`), the animals of `n + 1` cells are grown from those of `n` cells by
+adjoining a frontier cell and keeping the child exactly when that cell is
+its row-major-largest leaf, and `L_spec` proves the list is the canonical
+animals of `n` cells, each once, for `n ≤ 14`. `EnumData.lean` stores `L 5`
+and `L 6` as literals and checks them against the enumeration in five
+kernel runs of 4–5 GB and 8–14 s each (`scripts/lean-enumdata-measure.sh`); a count is then a filter over the
+literal. That is how `Checks.lean` has rows 4–6 of the triangle,
+a(3) … a(6), the walk-top counts d(k,H) for H + k ≤ 6, the weights with at
+most six cells (V(1,2), V(2,2), V(1,3), Vt(2,2), Vt(1,3), Vt(2,3)) and the
+symmetry counts R90, R180, Hm, Dm for n ≤ 5, and how `P2_closed` holds
+outright. Seven cells are the limit: `L 7` (23,592 boards) passes 12 GB in
+one kernel run, so V(2,3), Vt(3,3), V(3,3) and d(3,4) stay out, as do the
+unconditional 3.95 < λ and μ₂ that rested on them.
 
 ## What is not reached
 

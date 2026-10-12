@@ -72,7 +72,11 @@ Easiest and most depended-on first. One commit per item.
       (`fwdDiff`, `shift_eq_sum_fwdDiff_iter`) instead of the 80-line
       home-grown induction; likewise `exists_poly_sum_Icc` if Mathlib's
       Faulhaber/`fwdDiff` material covers it.
-- [ ] A12. A counter that reduces in the kernel: `Tc`, `d`, `V`, `Vt`,
+- [x] A12 (2026-10-12: `Enum.lean`, bit boards grown by leaf deletion,
+      `L_spec` for n ≤ 14; `EnumData.lean` stores `L 5`, `L 6`; rows ≤ 6,
+      a(3) … a(6), d with H + k ≤ 6, the six-cell weights, the symmetry
+      anchors n ≤ 5 and `P2_closed` are back; `L 7` is beyond 12 GB, so the
+      j = 3 weights are not). A counter that reduces in the kernel: `Tc`, `d`, `V`, `Vt`,
       `fixCount` over `Fin`-indexed cells and `Bool` predicates (no
       `Finset (ℤ × ℤ)` powersets in the evaluation path), proved equal to
       the definitions; then the validation cells that `native_decide` used to

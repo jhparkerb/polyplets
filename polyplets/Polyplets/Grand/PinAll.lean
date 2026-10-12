@@ -9,6 +9,7 @@ import Mathlib.Tactic.LinearCombination
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 import Polyplets.Grand.Staircase
+import Polyplets.EnumData
 import Polyplets.Pin
 
 /-!
@@ -357,5 +358,42 @@ theorem Pk_prod (hA : BankedAnchors) (k : ℕ) (hk : k ≤ 18) :
     ∀ n : ℕ, 2 * k + 1 ≤ n →
       (T n (n - k) : ℚ) = (Pk k).eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * k) :=
   grand_to_prod ((grand_all hA k hk).1 k le_rfl)
+
+/-! ## Levels `1` and `2` unconditionally
+
+The climb's first two levels need four onset cells, `T(3,2)`, `T(4,3)`,
+`T(5,3)` and `T(6,4)`, all of which the kernel decides (`Compute.lean`,
+`EnumData.lean`), so `P_1` and `P_2` hold outright. `P1_closed` of
+`Pin.lean` is the Lagrange route to the first; this is the staircase route to
+both, and `P2_closed` is the `k = 2` law in its human form. -/
+
+/-- The climb to level `2`, from the kernel-decided cells. -/
+theorem grand_two : grandOK Pk 2 ∧ muOK cTab 2 := by
+  have h0 : grandOK Pk 0 ∧ muOK cTab 0 := by
+    refine ⟨fun i hi => ?_, fun i hi => ?_⟩
+    · interval_cases i; exact grand_zero
+    · interval_cases i; rw [mu_zero]; norm_num [cTab]
+  have h1 : grandOK Pk 1 ∧ muOK cTab 1 :=
+    level_step 1 (by norm_num) Pk cTab h0.1 h0.2 (stair_check 1 (by norm_num) (by norm_num))
+      (by norm_num [T_3_2, Pk, Pp1, prodPoly_eval])
+      (by norm_num [Finset.sum_range_succ, T_4_3, Pk, cTab, Pp0, Pp1, prodPoly_eval])
+  exact level_step 2 (by norm_num) Pk cTab h1.1 h1.2 (stair_check 2 (by norm_num) (by norm_num))
+    (by norm_num [Enum.T_5_3, Pk, Pp2, prodPoly_eval])
+    (by norm_num [Finset.sum_range_succ, Enum.T_6_4, Pk, cTab, Pp0, Pp1, Pp2, prodPoly_eval])
+
+/-- **`k = 2` diagonal, unconditional** (production form). -/
+theorem P2_pinned : ∀ n : ℕ, 2 * 2 + 1 ≤ n →
+    (T n (n - 2) : ℚ) = Pp2.eval (n : ℚ) * (3 : ℚ) ^ ((n : ℤ) - 1 - 3 * 2) :=
+  grand_to_prod (grand_two.1 2 le_rfl)
+
+/-- **`k = 2` diagonal, human form**:
+`T(n, n-2) = ½(625n² - 2459n + 1134)·3^(n-7)` for `n ≥ 5`. -/
+theorem P2_closed (n : ℕ) (hn : 5 ≤ n) :
+    (T n (n - 2) : ℚ)
+      = (1 / 2) * (625 * (n : ℚ) ^ 2 - 2459 * (n : ℚ) + 1134) * (3 : ℚ) ^ ((n : ℤ) - 7) := by
+  have h := P2_pinned n hn
+  rw [Pp2, prodPoly_eval] at h
+  norm_num at h ⊢
+  rw [h]; ring_nf
 
 end Polyplets

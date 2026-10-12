@@ -106,10 +106,10 @@ V(1,1) = 25, Vᵗ(1,1) = 5 of `Weights.lean` (the same 25 = 16+9 split).
 
 §7's road map is CLOSED, beyond what this method was meant to reach:
 
-- T(n,n−2) is no longer "fitted": the quadratic is `Pp2` of `Pin.lean`,
-  pinned by `Grand/PinAll.lean` from the two cells T(5,3), T(6,4) taken as
-  hypotheses. (An outright proof, `P2_closed`, rested on `native_decide`
-  leaves and left the build 2026-10-12; last at commit 697f376.)
+- T(n,n−2) is no longer "fitted": the quadratic is `Pp2` of `Pin.lean`, and
+  `P2_closed` (`Grand/PinAll.lean`) proves it outright, standard axioms only:
+  the climb to level 2 from the four kernel-decided cells T(3,2), T(4,3),
+  T(5,3), T(6,4), the last two by the bit-board enumerator of `Enum.lean`.
 - The general shape T(n,n−k) = P_k(n)·3^(n−1−3k), deg P_k ≤ k, onset
   n ≥ 2k+1, is a theorem for ALL k (`Universal/AbstractShape.lean`, `King.lean`; paper proof
   `diagonal-law.md`), and the defect-gas structure is exact: the
