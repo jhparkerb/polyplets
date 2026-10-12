@@ -198,13 +198,6 @@ theorem exists_isDiagonalPoly (k : ℕ) : ∃ P : Polynomial ℚ, P.natDegree �
   obtain ⟨P, hdeg, h⟩ := RowLocal.exists_isDiagonalPoly kingLattice k
   exact ⟨P, hdeg, isDiagonalPoly_king.mp h⟩
 
-/-- The zpow-free form of the law: `3^(3k+1) · T(n, n-k) = P(n) · 3^n`. -/
-theorem IsDiagonalPoly.cleared {k : ℕ} {P : Polynomial ℚ} (hP : IsDiagonalPoly k P) :
-    ∀ n : ℕ, 2 * k + 1 ≤ n →
-      (3 : ℚ) ^ (3 * k + 1) * (T n (n - k) : ℚ) = P.eval (n : ℚ) * 3 ^ n := by
-  have h := (isDiagonalPoly_king.mpr hP).cleared
-  simpa [T_king] using h
-
 /-- **The values on the onset window are counts**: for `2k+1 ≤ n ≤ 3k+1`,
 `P(n)` is the natural number `T(n, n-k) · 3^(3k+1-n)`. -/
 theorem IsDiagonalPoly.eval_onset {k : ℕ} {P : Polynomial ℚ} (hP : IsDiagonalPoly k P)

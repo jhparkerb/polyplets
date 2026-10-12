@@ -241,8 +241,6 @@ definition. -/
 noncomputable def rowCell (S : Finset (ℤ × ℤ)) (y : ℤ) : ℤ × ℤ :=
   (WithTop.untopD 0 ((S.filter fun c => c.2 = y).image Prod.fst).min, y)
 
-@[simp] lemma rowCell_snd (S : Finset (ℤ × ℤ)) (y : ℤ) : (rowCell S y).2 = y := rfl
-
 lemma filter_row_eq_singleton {S : Finset (ℤ × ℤ)} {y : ℤ} {u : ℤ × ℤ}
     (hw : IsWalkRow S y) (hu : u ∈ S) (hu2 : u.2 = y) :
     S.filter (fun c => c.2 = y) = {u} := by

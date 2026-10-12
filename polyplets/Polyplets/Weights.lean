@@ -3,9 +3,6 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Mathlib.Order.Interval.Finset.Nat
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.NormNum.Basic
 import Polyplets.Compute
 import Polyplets.RowLocal.Separation
 

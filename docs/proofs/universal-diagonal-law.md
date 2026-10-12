@@ -315,7 +315,8 @@ degenerate iff p = 2 and 4 | b (for interval D).
 
 **Degree sharpening (2026-07-31).** deg q_k = k exactly, with leading
 coefficient [n^k]P_k = W_pair^k / k!: proved for king (grand-form
-Corollary 2, Lean `lead_coeff_25`; the argument is uniform in the weights
+Corollary 2, Lean `IsDiagonalPoly.coeff_eq` in `LeadingCoeff.lean`, which
+replaced `lead_coeff_25` on 2026-10-12; the argument is uniform in the weights
 with 25 -> W_pair, not written out for general b), and measured: k = 1 at
 all six test lattices above (slope = W_pair), hex k <= 2 (banked lead
 81/2 = 9^2/2!, `results/diagonal-formula.md`), square deg-k diagonals

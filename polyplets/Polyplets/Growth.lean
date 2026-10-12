@@ -3,11 +3,6 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.Analysis.Subadditive
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
 import Polyplets.Fekete
 import Polyplets.UpperBound
 
@@ -572,9 +567,6 @@ noncomputable def polypletFekete : Fekete where
 
 /-- **The growth constant of the polyplet sequence**, `λ = lim a(n)^{1/n}`. -/
 noncomputable def lambda : ℝ := polypletFekete.growth
-
-/-- `λ` is positive. -/
-lemma lambda_pos : 0 < lambda := polypletFekete.growth_pos
 
 /-- **`λ` is the limit of `a(n)^{1/n}`.** -/
 theorem lambda_tendsto :

@@ -4,9 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.NumberTheory.Bernoulli
-import Mathlib.Algebra.Polynomial.Taylor
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Ring
 
 /-!
 # Two facts about polynomials over `ℚ` on the integers

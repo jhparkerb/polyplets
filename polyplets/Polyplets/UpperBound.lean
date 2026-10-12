@@ -3,15 +3,8 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Mathlib.Algebra.Order.Ring.Star
-import Mathlib.Tactic.Choose
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.NormNum.Ineq
 import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Positivity.Core
 import Mathlib.Tactic.Ring
-import Mathlib.Tactic.Ring.Basic
-import Mathlib.Tactic.Set
 import Polyplets.Sequence
 
 /-!

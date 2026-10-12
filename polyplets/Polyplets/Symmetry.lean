@@ -7,10 +7,6 @@ import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Combinatorics.Enumerative.DoubleCounting
 import Mathlib.GroupTheory.SpecificGroups.Dihedral
 import Mathlib.Tactic.Abel
-import Mathlib.Tactic.Group
-import Mathlib.Tactic.Push
-import Mathlib.Tactic.Ring
-import Mathlib.Tactic.Set
 import Polyplets.Sequence
 
 /-!
@@ -438,8 +434,6 @@ instance instMulActionD4Polyplets (n : ℕ) : MulAction D4 (polyplets n) where
 /-! ## Finiteness bridges -/
 
 instance instFinitePolyplets (n : ℕ) : Finite (polyplets n) := (polyplets_finite n).to_subtype
-
-noncomputable instance instFintypePolyplets (n : ℕ) : Fintype (polyplets n) := Fintype.ofFinite _
 
 noncomputable instance instFintypeFixedByD4 (n : ℕ) (g : D4) :
     Fintype (MulAction.fixedBy (polyplets n) g) := Fintype.ofFinite _

@@ -4,9 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.Data.Nat.Bitwise
-import Mathlib.Data.Nat.Find
-import Mathlib.Data.Prod.Lex
-import Polyplets.Compute
 import Polyplets.Symmetry
 import Polyplets.Weights
 
@@ -239,11 +236,6 @@ lemma cells_xor_pow {m i : ℕ} (h : m.testBit i = true) :
 lemma cells_zero : cells 0 = ∅ := by
   ext p
   simp [mem_cells]
-
-lemma ne_zero_of_cells_nonempty {m : ℕ} (h : (cells m).Nonempty) : m ≠ 0 := by
-  rintro rfl
-  rw [cells_zero] at h
-  exact Finset.not_nonempty_empty h
 
 /-- A bit set inside the box lies below `256`. -/
 lemma lt_256_of_testBit {m i : ℕ} (hm : InBox m) (h : m.testBit i = true) : i < 256 := by

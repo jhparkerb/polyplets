@@ -43,16 +43,11 @@ noncomputable def topRowRecursion (L : Lattice) : TopRowRecursion where
   d_rec := d_rec L
   T_of_d := T_of_d L
 
-/-- The fields of `topRowRecursion L` are the geometric objects, for `simp`. -/
+/-- The `b` and `T` fields of `topRowRecursion L` are the geometric objects, for
+`simp` (the instances' closed forms rewrite through them). -/
 @[simp] lemma topRowRecursion_b (L : Lattice) : (topRowRecursion L).b = L.b := rfl
 
-@[simp] lemma topRowRecursion_d (L : Lattice) : (topRowRecursion L).d = d L := rfl
-
 @[simp] lemma topRowRecursion_T (L : Lattice) : (topRowRecursion L).T = T L := rfl
-
-@[simp] lemma topRowRecursion_V (L : Lattice) : (topRowRecursion L).V = V L := rfl
-
-@[simp] lemma topRowRecursion_Vt (L : Lattice) : (topRowRecursion L).Vt = Vt L := rfl
 
 /-! ## Theorem A -/
 

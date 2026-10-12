@@ -3,7 +3,7 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Mathlib.Algebra.Polynomial.Degree.Lemmas
+import Mathlib.Algebra.Polynomial.Eval.Defs
 
 /-!
 # DiagonalPolys: the explicit diagonal polynomials `P_k`
@@ -34,21 +34,6 @@ noncomputable def horner : List ℚ → Polynomial ℚ
   | [] => 0
   | c :: cs => C c + X * horner cs
 
-/-- The Horner polynomial of an `(d+1)`-coefficient list has degree `≤ d`. -/
-lemma horner_natDegree_le : ∀ l : List ℚ, (horner l).natDegree ≤ l.length - 1
-  | [] => by simp [horner]
-  | [c] => by simp [horner]
-  | c :: d :: cs => by
-      have ih := horner_natDegree_le (d :: cs)
-      change (C c + X * horner (d :: cs)).natDegree ≤ _
-      refine le_trans (natDegree_add_le _ _) ?_
-      rw [natDegree_C]
-      refine max_le (Nat.zero_le _) ?_
-      refine le_trans natDegree_mul_le ?_
-      rw [natDegree_X]
-      simp only [List.length_cons] at ih ⊢
-      omega
-
 /-- Evaluation of a Horner polynomial is the Horner fold of its coefficients. -/
 lemma horner_eval (l : List ℚ) (x : ℚ) :
     (horner l).eval x = l.foldr (fun c acc => c + x * acc) 0 := by
@@ -60,12 +45,6 @@ lemma horner_eval (l : List ℚ) (x : ℚ) :
 scalar `kf` (the `k!` of `pin-data.md`). -/
 noncomputable def ofNumerators (num : List ℚ) (kf : ℚ) : Polynomial ℚ :=
   C (1 / kf) * horner num.reverse
-
-/-- `ofNumerators` of a `(k+1)`-coefficient numerator has degree `≤ k`. -/
-lemma ofNumerators_natDegree_le (num : List ℚ) (kf : ℚ) :
-    (ofNumerators num kf).natDegree ≤ num.length - 1 := by
-  refine le_trans (natDegree_C_mul_le _ _) (le_trans (horner_natDegree_le num.reverse) ?_)
-  simp [List.length_reverse]
 
 /-- Evaluation of `ofNumerators`, ready for `norm_num` at an onset point. -/
 lemma ofNumerators_eval (num : List ℚ) (kf x : ℚ) :

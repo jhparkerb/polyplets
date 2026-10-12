@@ -3,9 +3,6 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.Ring
-import Mathlib.Tactic.SimpRw
 import Polyplets.Staircase.Series
 import Polyplets.Weights
 
@@ -199,10 +196,8 @@ theorem mu_conv_nu_pow (ℓ : ℕ) : conv (convPow mu ℓ) (convPow nu ℓ) = ep
 
 `μ₁ = 25/3` unconditionally, from the kernel-decided weight `V_1_1`. -/
 
-/-- Small convolution-power unfoldings. -/
+/-- The first convolution power unfolded. -/
 lemma convPow_nu_one : convPow nu 1 = nu := by simp only [convPow, conv_eps]
-
-lemma convPow_nu_two : convPow nu 2 = conv nu nu := by simp only [convPow, conv_eps]
 
 /-! Interior-weight values as `vGuard`-coefficients. -/
 

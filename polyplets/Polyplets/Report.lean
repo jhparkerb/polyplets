@@ -3,13 +3,9 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Mathlib.Tactic.Choose
-import Mathlib.Tactic.Ring
 import Polyplets.Staircase.Climb
 import Polyplets.LeadingCoeff
-import Polyplets.Symmetry
 import Polyplets.SymmetryRatio
-import Polyplets.Growth
 
 /-!
 # The technical report's claims, as Lean statements

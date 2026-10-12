@@ -155,7 +155,8 @@ shows its control, gate and second computation.
 
 Rows 11a and 11b are theorems of the isoperimetry literature and ship with
 citations; the project's part is the question and the enumeration. The Lean
-conditionality (`MoatBound`) is a formalization gap, not a mathematical one.
+hole modules (`Holes`, `HolesUpper`, conditional on `MoatBound`) left the build
+on 2026-10-12; that was a formalization gap, not a mathematical one.
 
 ### Paper 2, the structure of the height triangle
 

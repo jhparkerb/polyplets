@@ -201,7 +201,9 @@ at commit 697f376. The item "Lean formalization" below is CLOSED.
 - Onset sharpness at n = 2k (failure below onset) — verified on banked data,
   proved ab initio only k ≤ 5.
 - **Denominator k! — CLOSED both ways (2026-07-31)**: `k!·P_k ∈ ℤ[n]` is
-  proved for all k (Lean `production_factorial_int`); minimality is FALSE —
+  proved for all k (Lean `production_factorial_int`, out of the build since
+  2026-10-12, last at 697f376; integrality of the values survives as
+  `IsDiagonalPoly.intValued`); minimality is FALSE —
   the minimal denominator is k!/5^{ĉ_k}, ĉ_k = v₅(k!) − v₅(⌊k/2⌋!) +
   [k ≡ 1 (mod 10)] (`results/arithmetic-structure.md`; lower bound proved,
   exact k ≤ 19). The old "25^k/k! shows k! is necessary" pointed the wrong

@@ -3,10 +3,6 @@ Copyright (c) 2026 Jason H Parker. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
-import Mathlib.Algebra.Order.Ring.Star
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
 import Polyplets.Fekete
 import Polyplets.StairAnimals
 
@@ -243,9 +239,6 @@ noncomputable def stairFekete : Fekete where
 `3.128943269730886…` (`results/subclasses.md`); what is proved here is
 that the limit exists, plus the two-sided bracket below. -/
 noncomputable def mu : ℝ := stairFekete.growth
-
-/-- `µ` is positive. -/
-lemma mu_pos : 0 < mu := stairFekete.growth_pos
 
 /-- **`µ` is the limit of `M(n)^{1/n}`.** -/
 theorem M_tendsto :

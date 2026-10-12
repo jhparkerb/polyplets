@@ -5,9 +5,7 @@ Authors: Jason H Parker
 -/
 import Polyplets.EnumData
 import Polyplets.Staircase.Diagonal
-import Polyplets.Sequence
 import Polyplets.RowLocal.Hex
-import Polyplets.King
 import Polyplets.RowLocal.Square
 
 /-!
