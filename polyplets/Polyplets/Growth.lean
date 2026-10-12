@@ -285,11 +285,11 @@ lemma le_maxX {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ} (hp : p ∈ S) (hnn : 0
 /-- `maxX` is attained on a canonical animal. -/
 lemma maxX_mem {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
     ∃ p ∈ S, p.1 = (maxX S : ℤ) := by
-  obtain ⟨p0, hp0, -⟩ := hS.2.2.2.1
+  obtain ⟨p0, hp0, -⟩ := hS.anchored.x_zero
   obtain ⟨pm, hpm, hpme⟩ :=
     Finset.exists_mem_eq_sup S ⟨p0, hp0⟩ (fun p : ℤ × ℤ => p.1.toNat)
   refine ⟨pm, hpm, ?_⟩
-  have hnn := hS.2.2.1 pm hpm
+  have hnn := hS.anchored.x_nonneg pm hpm
   have hval : maxX S = pm.1.toNat := hpme
   omega
 
@@ -372,7 +372,7 @@ lemma concat_disjoint {A B : Finset (ℤ × ℤ)} (hA : ∀ p ∈ A, 0 ≤ p.1) 
 lemma bridgeA_mem {m : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnimal m A) :
     ((maxX A : ℤ), cTop A B) ∈ shiftBy (0, liftA A B) A := by
   have hmem : ((maxX A : ℤ), (colTop A (maxX A : ℤ) : ℤ)) ∈ A :=
-    colTop_mem hA.2.2.2.2.1 (maxX_mem hA)
+    colTop_mem hA.anchored.y_nonneg (maxX_mem hA)
   refine mem_shiftBy_iff.mpr ⟨_, hmem, ?_, ?_⟩
   · change (maxX A : ℤ) = (maxX A : ℤ) + 0
     ring
@@ -383,7 +383,7 @@ lemma bridgeA_mem {m : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnimal 
 lemma bridgeB_mem {n : ℕ} {A B : Finset (ℤ × ℤ)} (hB : IsCanonicalAnimal n B) :
     ((maxX A : ℤ) + 1, cTop A B) ∈ shiftBy ((maxX A : ℤ) + 1, liftB A B) B := by
   have hmem : ((0 : ℤ), (colTop B 0 : ℤ)) ∈ B :=
-    colTop_mem hB.2.2.2.2.1 hB.2.2.2.1
+    colTop_mem hB.anchored.y_nonneg hB.anchored.x_zero
   refine mem_shiftBy_iff.mpr ⟨_, hmem, ?_, ?_⟩
   · change (maxX A : ℤ) + 1 = (0 : ℤ) + ((maxX A : ℤ) + 1)
     ring
@@ -397,12 +397,12 @@ theorem concat_canonical {m n : ℕ} {A B : Finset (ℤ × ℤ)}
     (hA : IsCanonicalAnimal m A) (hB : IsCanonicalAnimal n B) :
     IsCanonicalAnimal (m + n) (concat A B) := by
   have hcard : (concat A B).card = m + n := by
-    rw [concat, Finset.card_union_of_disjoint (concat_disjoint hA.2.2.1 hB.2.2.1),
-      card_shiftBy, card_shiftBy, hA.1, hB.1]
+    rw [concat, Finset.card_union_of_disjoint (concat_disjoint hA.anchored.x_nonneg hB.anchored.x_nonneg),
+      card_shiftBy, card_shiftBy, hA.card, hB.card]
   have hconn : KingConnected (concat A B) := by
     rw [concat]
-    refine kingConnected_union_of_adj (kingConnected_shiftBy _ hA.2.1)
-      (kingConnected_shiftBy _ hB.2.1) (bridgeA_mem hA) (bridgeB_mem hB) ?_
+    refine kingConnected_union_of_adj (kingConnected_shiftBy _ hA.conn)
+      (kingConnected_shiftBy _ hB.conn) (bridgeA_mem hA) (bridgeB_mem hB) ?_
     refine ⟨by simp only [ne_eq, Prod.mk.injEq]; omega, ?_, ?_⟩
     · change |(maxX A : ℤ) - ((maxX A : ℤ) + 1)| ≤ 1
       rw [abs_le]; omega
@@ -413,12 +413,12 @@ theorem concat_canonical {m n : ℕ} {A B : Finset (ℤ × ℤ)}
     rw [concat, Finset.mem_union] at hq
     rcases hq with hq | hq
     · obtain ⟨p, hp, h1, -⟩ := mem_shiftBy_iff.mp hq
-      have hx := hA.2.2.1 p hp
+      have hx := hA.anchored.x_nonneg p hp
       omega
-    · have hx := concat_right_x_ge (A := A) hB.2.2.1 hq
+    · have hx := concat_right_x_ge (A := A) hB.anchored.x_nonneg hq
       have hw : (0 : ℤ) ≤ (maxX A : ℤ) := Int.natCast_nonneg _
       omega
-  · obtain ⟨p, hp, hp1⟩ := hA.2.2.2.1
+  · obtain ⟨p, hp, hp1⟩ := hA.anchored.x_zero
     refine ⟨(p.1, p.2 + liftA A B), ?_, hp1⟩
     rw [concat]
     exact Finset.mem_union_left _ (mem_shiftBy_iff.mpr ⟨p, hp, by change p.1 = p.1 + 0; ring, rfl⟩)
@@ -426,22 +426,22 @@ theorem concat_canonical {m n : ℕ} {A B : Finset (ℤ × ℤ)}
     rw [concat, Finset.mem_union] at hq
     rcases hq with hq | hq
     · obtain ⟨p, hp, -, h2⟩ := mem_shiftBy_iff.mp hq
-      have hy := hA.2.2.2.2.1 p hp
+      have hy := hA.anchored.y_nonneg p hp
       have hl := liftA_nonneg A B
       omega
     · obtain ⟨p, hp, -, h2⟩ := mem_shiftBy_iff.mp hq
-      have hy := hB.2.2.2.2.1 p hp
+      have hy := hB.anchored.y_nonneg p hp
       have hl := liftB_nonneg A B
       omega
   · rcases lift_eq_zero A B with h | h
-    · obtain ⟨p, hp, hp2⟩ := hA.2.2.2.2.2
+    · obtain ⟨p, hp, hp2⟩ := hA.anchored.y_zero
       refine ⟨(p.1, p.2 + liftA A B), ?_, ?_⟩
       · rw [concat]
         exact Finset.mem_union_left _
           (mem_shiftBy_iff.mpr ⟨p, hp, by change p.1 = p.1 + 0; ring, rfl⟩)
       · change p.2 + liftA A B = 0
         omega
-    · obtain ⟨p, hp, hp2⟩ := hB.2.2.2.2.2
+    · obtain ⟨p, hp, hp2⟩ := hB.anchored.y_zero
       refine ⟨(p.1 + ((maxX A : ℤ) + 1), p.2 + liftB A B), ?_, ?_⟩
       · rw [concat]
         exact Finset.mem_union_right _ (mem_shiftBy_iff.mpr ⟨p, hp, rfl, rfl⟩)
@@ -475,7 +475,7 @@ lemma baseY_shift {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n 
     (hd : 0 ≤ d) : (baseY (shiftBy (e, d) S) : ℤ) = d := by
   rw [baseY]
   have hmem : d.toNat ∈ {k : ℕ | ∃ p ∈ shiftBy (e, d) S, p.2 = (k : ℤ)} := by
-    obtain ⟨p₀, hp₀, hp₀2⟩ := hS.2.2.2.2.2
+    obtain ⟨p₀, hp₀, hp₀2⟩ := hS.anchored.y_zero
     exact ⟨(p₀.1 + e, p₀.2 + d), mem_shiftBy_iff.mpr ⟨p₀, hp₀, rfl, rfl⟩,
       by change p₀.2 + d = (d.toNat : ℤ); omega⟩
   have hle : sInf {k : ℕ | ∃ p ∈ shiftBy (e, d) S, p.2 = (k : ℤ)} ≤ d.toNat :=
@@ -483,7 +483,7 @@ lemma baseY_shift {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n 
   obtain ⟨p, hp, hp2⟩ := Nat.sInf_mem (⟨_, hmem⟩ :
     {k : ℕ | ∃ p ∈ shiftBy (e, d) S, p.2 = (k : ℤ)}.Nonempty)
   obtain ⟨q, hq, -, hq2⟩ := mem_shiftBy_iff.mp hp
-  have hy := hS.2.2.2.2.1 q hq
+  have hy := hS.anchored.y_nonneg q hq
   omega
 
 /-- **A translate of a canonical animal remembers its horizontal offset.** -/
@@ -491,7 +491,7 @@ lemma baseX_shift {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n 
     (he : 0 ≤ e) : (baseX (shiftBy (e, d) S) : ℤ) = e := by
   rw [baseX]
   have hmem : e.toNat ∈ {k : ℕ | ∃ p ∈ shiftBy (e, d) S, p.1 = (k : ℤ)} := by
-    obtain ⟨p₀, hp₀, hp₀1⟩ := hS.2.2.2.1
+    obtain ⟨p₀, hp₀, hp₀1⟩ := hS.anchored.x_zero
     exact ⟨(p₀.1 + e, p₀.2 + d), mem_shiftBy_iff.mpr ⟨p₀, hp₀, rfl, rfl⟩,
       by change p₀.1 + e = (e.toNat : ℤ); omega⟩
   have hle : sInf {k : ℕ | ∃ p ∈ shiftBy (e, d) S, p.1 = (k : ℤ)} ≤ e.toNat :=
@@ -499,7 +499,7 @@ lemma baseX_shift {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n 
   obtain ⟨p, hp, hp1⟩ := Nat.sInf_mem (⟨_, hmem⟩ :
     {k : ℕ | ∃ p ∈ shiftBy (e, d) S, p.1 = (k : ℤ)}.Nonempty)
   obtain ⟨q, hq, hq1, -⟩ := mem_shiftBy_iff.mp hp
-  have hx := hS.2.2.1 q hq
+  have hx := hS.anchored.x_nonneg q hq
   omega
 
 /-- The left part of a concatenation, cut at the right place, is the lifted `A`. -/
@@ -511,10 +511,10 @@ lemma leftOf_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAni
   constructor
   · rintro ⟨hq | hq, hlt⟩
     · exact hq
-    · have := concat_right_x_ge (A := A) hB.2.2.1 hq
+    · have := concat_right_x_ge (A := A) hB.anchored.x_nonneg hq
       omega
   · intro hq
-    exact ⟨Or.inl hq, by have := concat_left_x_le hA.2.2.1 hq; omega⟩
+    exact ⟨Or.inl hq, by have := concat_left_x_le hA.anchored.x_nonneg hq; omega⟩
 
 /-- The right part of a concatenation, cut at the right place, is the shifted `B`. -/
 lemma rightOf_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnimal m A)
@@ -524,11 +524,11 @@ lemma rightOf_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAn
   rw [rightOf, Finset.mem_filter, concat, Finset.mem_union]
   constructor
   · rintro ⟨hq | hq, hge⟩
-    · have := concat_left_x_le hA.2.2.1 hq
+    · have := concat_left_x_le hA.anchored.x_nonneg hq
       omega
     · exact hq
   · intro hq
-    exact ⟨Or.inr hq, concat_right_x_ge (A := A) hB.2.2.1 hq⟩
+    exact ⟨Or.inr hq, concat_right_x_ge (A := A) hB.anchored.x_nonneg hq⟩
 
 /-- **The cut is where the construction put it.** At `k = maxX A + 1` the left
 count is exactly `m`; at any `k ≤ maxX A` the left part misses `A`'s bridge cell
@@ -539,7 +539,7 @@ lemma cutAt_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnim
   have hcast : ((maxX A + 1 : ℕ) : ℤ) = (maxX A : ℤ) + 1 := by push_cast; ring
   have hmem : (maxX A + 1) ∈ {k : ℕ | (leftOf (concat A B) (k : ℤ)).card = m} := by
     change (leftOf (concat A B) ((maxX A + 1 : ℕ) : ℤ)).card = m
-    rw [hcast, leftOf_concat hA hB, card_shiftBy, hA.1]
+    rw [hcast, leftOf_concat hA hB, card_shiftBy, hA.card]
   have hlow : ∀ k : ℕ, (k : ℤ) ≤ (maxX A : ℤ) → (leftOf (concat A B) (k : ℤ)).card < m := by
     intro k hk
     have hsub : leftOf (concat A B) (k : ℤ) ⊆ shiftBy (0, liftA A B) A := by
@@ -547,7 +547,7 @@ lemma cutAt_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnim
       rw [leftOf, Finset.mem_filter, concat, Finset.mem_union] at hq
       rcases hq.1 with h | h
       · exact h
-      · have h1 := concat_right_x_ge (A := A) hB.2.2.1 h
+      · have h1 := concat_right_x_ge (A := A) hB.anchored.x_nonneg h
         have h2 : q.1 < (k : ℤ) := hq.2
         omega
     have hbr : ((maxX A : ℤ), cTop A B) ∈ shiftBy (0, liftA A B) A := bridgeA_mem hA
@@ -559,7 +559,7 @@ lemma cutAt_concat {m n : ℕ} {A B : Finset (ℤ × ℤ)} (hA : IsCanonicalAnim
     calc (leftOf (concat A B) (k : ℤ)).card
         < (shiftBy (0, liftA A B) A).card :=
           Finset.card_lt_card ((Finset.ssubset_iff_of_subset hsub).mpr ⟨_, hbr, hbrn⟩)
-      _ = m := by rw [card_shiftBy, hA.1]
+      _ = m := by rw [card_shiftBy, hA.card]
   rw [cutAt]
   refine le_antisymm (Nat.sInf_le hmem) ?_
   by_contra hcon

@@ -139,9 +139,9 @@ lemma conn_abs_x_le {L : RowLocal} {S : Finset (ℤ × ℤ)} (hconn : Conn L S)
 cell's x-coordinate is at most `M · (n − 1)`. -/
 lemma canonical_x_le {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)}
     (hS : IsCanonical L n H S) {p : ℤ × ℤ} (hp : p ∈ S) : p.1 ≤ L.M * ((n : ℤ) - 1) := by
-  obtain ⟨p0, hp0S, hp0⟩ := hS.2.2.2.1
-  have h := conn_abs_sub_x_le hS.2.1 hp0S hp
-  rw [hS.1, hp0, sub_zero] at h
+  obtain ⟨p0, hp0S, hp0⟩ := hS.anchored.x_zero
+  have h := conn_abs_sub_x_le hS.conn hp0S hp
+  rw [hS.card, hp0, sub_zero] at h
   have := le_abs_self p.1
   omega
 
@@ -157,10 +157,10 @@ lemma canonical_finite (L : RowLocal) (n H : ℕ) :
   intro p hpS
   simp only [Finset.mem_Icc, Prod.le_def]
   refine ⟨⟨?_, ?_⟩, ?_, ?_⟩
-  · exact hS.2.2.1 p hpS
-  · exact hS.2.2.2.2.1 p hpS
+  · exact hS.anchored.x_nonneg p hpS
+  · exact hS.anchored.y_nonneg p hpS
   · exact canonical_x_le hS hpS
-  · exact hS.2.2.2.2.2.2.1 p hpS
+  · exact hS.y_le p hpS
 
 /-- **`T` is a genuine cardinality.** -/
 theorem T_eq_toFinset_card (L : RowLocal) (n H : ℕ) :

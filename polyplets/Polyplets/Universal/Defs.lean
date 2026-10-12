@@ -154,15 +154,48 @@ def Conn (L : RowLocal) (S : Finset (ℤ × ℤ)) : Prop :=
   ∀ p ∈ S, ∀ q ∈ S,
     Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ Adj L a b) p q
 
+/-- `S` is origin-anchored: its bounding box has lower-left corner at the
+origin. This is the translation quotient: every fixed animal has exactly one
+anchored translate. -/
+structure Anchored (S : Finset (ℤ × ℤ)) : Prop where
+  /-- No cell left of column `0`. -/
+  x_nonneg : ∀ p ∈ S, 0 ≤ p.1
+  /-- Column `0` is occupied. -/
+  x_zero : ∃ p ∈ S, p.1 = 0
+  /-- No cell below row `0`. -/
+  y_nonneg : ∀ p ∈ S, 0 ≤ p.2
+  /-- Row `0` is occupied. -/
+  y_zero : ∃ p ∈ S, p.2 = 0
+
+/-- An anchored set is nonempty. -/
+lemma Anchored.nonempty {S : Finset (ℤ × ℤ)} (hS : Anchored S) : S.Nonempty := by
+  obtain ⟨p, hp, -⟩ := hS.x_zero
+  exact ⟨p, hp⟩
+
 /-- `S` is the canonical (origin-anchored) representative of a fixed `L`-animal
 of `n` cells with bounding-box height exactly `H`: `n` cells, `L`-connected,
-minimum x- and y-coordinates `0`, maximum y-coordinate `H - 1`. The x-extent is
-unconstrained. -/
-def IsCanonical (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × ℤ)) : Prop :=
-  S.card = n ∧ Conn L S ∧
-  (∀ p ∈ S, 0 ≤ p.1) ∧ (∃ p ∈ S, p.1 = 0) ∧
-  (∀ p ∈ S, 0 ≤ p.2) ∧ (∃ p ∈ S, p.2 = 0) ∧
-  (∀ p ∈ S, p.2 ≤ (H : ℤ) - 1) ∧ (∃ p ∈ S, p.2 = (H : ℤ) - 1)
+anchored, maximum y-coordinate `H - 1`. The x-extent is unconstrained. -/
+structure IsCanonical (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+  /-- `n` cells. -/
+  card : S.card = n
+  /-- `L`-connected. -/
+  conn : Conn L S
+  /-- Bounding box at the origin. -/
+  anchored : Anchored S
+  /-- No cell above row `H - 1`. -/
+  y_le : ∀ p ∈ S, p.2 ≤ (H : ℤ) - 1
+  /-- Row `H - 1` is occupied. -/
+  y_top : ∃ p ∈ S, p.2 = (H : ℤ) - 1
+
+/-- `IsCanonical` as a conjunction (for decidability and for unfolding). -/
+lemma isCanonical_iff_and {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)} :
+    IsCanonical L n H S ↔ S.card = n ∧ Conn L S ∧
+      (∀ p ∈ S, 0 ≤ p.1) ∧ (∃ p ∈ S, p.1 = 0) ∧
+      (∀ p ∈ S, 0 ≤ p.2) ∧ (∃ p ∈ S, p.2 = 0) ∧
+      (∀ p ∈ S, p.2 ≤ (H : ℤ) - 1) ∧ (∃ p ∈ S, p.2 = (H : ℤ) - 1) :=
+  ⟨fun h => ⟨h.card, h.conn, h.anchored.x_nonneg, h.anchored.x_zero, h.anchored.y_nonneg,
+    h.anchored.y_zero, h.y_le, h.y_top⟩,
+   fun ⟨a, b, c, d, e, f, g, i⟩ => ⟨a, b, ⟨c, d, e, f⟩, g, i⟩⟩
 
 /-- `T L n H`: the number of fixed `L`-animals of `n` cells whose bounding box
 has height exactly `H`, i.e. the number of origin-anchored canonical

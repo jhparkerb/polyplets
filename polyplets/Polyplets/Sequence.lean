@@ -49,10 +49,13 @@ open scoped BigOperators
 /-- `S` is the origin-anchored representative of a fixed polyplet of `n` cells,
 of any height: `n` cells, king-connected, with minimum x- and y-coordinate `0`.
 This is `IsCanonical` with the two height clauses dropped. -/
-def IsCanonicalAnimal (n : ℕ) (S : Finset (ℤ × ℤ)) : Prop :=
-  S.card = n ∧ KingConnected S ∧
-  (∀ p ∈ S, 0 ≤ p.1) ∧ (∃ p ∈ S, p.1 = 0) ∧
-  (∀ p ∈ S, 0 ≤ p.2) ∧ (∃ p ∈ S, p.2 = 0)
+structure IsCanonicalAnimal (n : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+  /-- `n` cells. -/
+  card : S.card = n
+  /-- King-connected. -/
+  conn : KingConnected S
+  /-- Bounding box at the origin. -/
+  anchored : Anchored S
 
 /-- `a n`: the number of fixed polyplets of `n` cells (A006770), i.e. the number
 of origin-anchored canonical representatives of any height. As with `T`,
@@ -81,10 +84,10 @@ lemma isCanonical_iff (n H : ℕ) (S : Finset (ℤ × ℤ)) :
     IsCanonical n H S ↔ IsCanonicalAnimal n S ∧ heightOf S = H := by
   constructor
   · intro hS
-    obtain ⟨pmax, hmaxS, hmax⟩ := hS.2.2.2.2.2.2.2
-    have hnn : ∀ p ∈ S, 0 ≤ p.2 := hS.2.2.2.2.1
-    have hub : ∀ p ∈ S, p.2 ≤ (H : ℤ) - 1 := hS.2.2.2.2.2.2.1
-    refine ⟨⟨hS.1, hS.2.1, hS.2.2.1, hS.2.2.2.1, hnn, hS.2.2.2.2.2.1⟩, ?_⟩
+    obtain ⟨pmax, hmaxS, hmax⟩ := hS.y_top
+    have hnn : ∀ p ∈ S, 0 ≤ p.2 := hS.anchored.y_nonneg
+    have hub : ∀ p ∈ S, p.2 ≤ (H : ℤ) - 1 := hS.y_le
+    refine ⟨⟨hS.card, hS.conn, hS.anchored⟩, ?_⟩
     have hsuple : S.sup (fun p : ℤ × ℤ => p.2.toNat) ≤ H - 1 :=
       Finset.sup_le fun p hp => by
         have h1 := hnn p hp
@@ -96,12 +99,12 @@ lemma isCanonical_iff (n H : ℕ) (S : Finset (ℤ × ℤ)) :
     simp only [heightOf]
     omega
   · rintro ⟨hA, hh⟩
-    obtain ⟨p0, hp0S, -⟩ := hA.2.2.2.1
+    obtain ⟨p0, hp0S, -⟩ := hA.anchored.x_zero
     obtain ⟨pm, hpmS, hpm⟩ :=
       Finset.exists_mem_eq_sup S ⟨p0, hp0S⟩ (fun p : ℤ × ℤ => p.2.toNat)
-    have hnn : ∀ p ∈ S, 0 ≤ p.2 := hA.2.2.2.2.1
+    have hnn : ∀ p ∈ S, 0 ≤ p.2 := hA.anchored.y_nonneg
     simp only [heightOf] at hh
-    refine ⟨hA.1, hA.2.1, hA.2.2.1, hA.2.2.2.1, hnn, hA.2.2.2.2.2, ?_, pm, hpmS, ?_⟩
+    refine ⟨hA.card, hA.conn, hA.anchored, ?_, pm, hpmS, ?_⟩
     · intro p hp
       have hle : p.2.toNat ≤ S.sup (fun p : ℤ × ℤ => p.2.toNat) :=
         Finset.le_sup (f := fun p : ℤ × ℤ => p.2.toNat) hp
@@ -148,25 +151,25 @@ lemma card_bound_of_anchored {n : ℕ} {S : Finset (ℤ × ℤ)} {p : ℤ × ℤ
 `canonical_x_le`). -/
 lemma canonicalAnimal_x_le {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S)
     {p : ℤ × ℤ} (hp : p ∈ S) : p.1 ≤ (n : ℤ) - 1 :=
-  card_bound_of_anchored Prod.fst (fun _ _ h => h.2.1) hS.1 hS.2.1 hS.2.2.2.1 hp
+  card_bound_of_anchored Prod.fst (fun _ _ h => h.2.1) hS.card hS.conn hS.anchored.x_zero hp
 
 /-- **Uniform height bound** for canonical animals: the row analogue of
 `canonicalAnimal_x_le`. Where `IsCanonical` *assumes* a height bound, a
 canonical animal earns one from connectivity. -/
 lemma canonicalAnimal_y_le {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S)
     {p : ℤ × ℤ} (hp : p ∈ S) : p.2 ≤ (n : ℤ) - 1 :=
-  card_bound_of_anchored Prod.snd (fun _ _ h => h.2.2) hS.1 hS.2.1 hS.2.2.2.2.2 hp
+  card_bound_of_anchored Prod.snd (fun _ _ h => h.2.2) hS.card hS.conn hS.anchored.y_zero hp
 
 /-- **Height range.** A canonical animal of `n` cells has height between `1`
 and `n`: no row of its bounding box can be skipped, so its height is at most
 its cell count. -/
 lemma heightOf_le {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
     heightOf S ≤ n := by
-  obtain ⟨p0, hp0S, -⟩ := hS.2.2.2.1
+  obtain ⟨p0, hp0S, -⟩ := hS.anchored.x_zero
   obtain ⟨pm, hpmS, hpm⟩ :=
     Finset.exists_mem_eq_sup S ⟨p0, hp0S⟩ (fun p : ℤ × ℤ => p.2.toNat)
   have hy := canonicalAnimal_y_le hS hpmS
-  have hnn := hS.2.2.2.2.1 pm hpmS
+  have hnn := hS.anchored.y_nonneg pm hpmS
   simp only [heightOf]
   omega
 
@@ -181,7 +184,7 @@ lemma canonicalAnimal_finite (n : ℕ) :
   rw [Finset.mem_coe, Finset.mem_powerset]
   intro p hpS
   simp only [Finset.mem_Icc, Prod.le_def]
-  exact ⟨⟨hS.2.2.1 p hpS, hS.2.2.2.2.1 p hpS⟩,
+  exact ⟨⟨hS.anchored.x_nonneg p hpS, hS.anchored.y_nonneg p hpS⟩,
     canonicalAnimal_x_le hS hpS, canonicalAnimal_y_le hS hpS⟩
 
 /-! ## The sum identity -/

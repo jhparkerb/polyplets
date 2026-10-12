@@ -785,9 +785,9 @@ noncomputable def expShape (S : Finset (ℤ × ℤ)) : Finset (ℤ × ℤ) :=
 minimum. -/
 private lemma anchorSet_nonempty {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
     {k : ℕ | ((k : ℤ), (0 : ℤ)) ∈ S}.Nonempty := by
-  obtain ⟨p, hp, hp2⟩ := hS.2.2.2.2.2
+  obtain ⟨p, hp, hp2⟩ := hS.anchored.y_zero
   refine ⟨p.1.toNat, ?_⟩
-  have hx := hS.2.2.1 p hp
+  have hx := hS.anchored.x_nonneg p hp
   have hpe : ((p.1.toNat : ℤ), (0 : ℤ)) = p := by
     rw [Int.toNat_of_nonneg hx, ← hp2]
   rw [Set.mem_setOf_eq, hpe]
@@ -800,7 +800,7 @@ lemma anchor_mem {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S
 /-- The anchor is leftmost in row `0`. -/
 lemma anchor_min {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) {q : ℤ × ℤ}
     (hq : q ∈ S) (hq2 : q.2 = 0) : (anchor S).1 ≤ q.1 := by
-  have hx := hS.2.2.1 q hq
+  have hx := hS.anchored.x_nonneg q hq
   have hmem : q.1.toNat ∈ {k : ℕ | ((k : ℤ), (0 : ℤ)) ∈ S} := by
     have hqe : ((q.1.toNat : ℤ), (0 : ℤ)) = q := by
       rw [Int.toNat_of_nonneg hx, ← hq2]
@@ -832,7 +832,7 @@ the translation; the origin is the image of the anchor; and every other cell is
 scan-greater because the anchor is scan-least. -/
 lemma isShape_expShape {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
     IsShape n (expShape S) where
-  card := by rw [expShape, Finset.card_image_of_injective _ (sub_injective _), hS.1]
+  card := by rw [expShape, Finset.card_image_of_injective _ (sub_injective _), hS.card]
   conn := by
     intro d hd e he
     rw [expShape, Finset.mem_image] at hd he
@@ -840,7 +840,7 @@ lemma isShape_expShape {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnim
     obtain ⟨y, hy, rfl⟩ := he
     refine Relation.ReflTransGen.lift
       (fun q : ℤ × ℤ => (q.1 - (anchor S).1, q.2 - (anchor S).2)) (fun u v huv => ?_)
-      (hS.2.1 x hx y hy)
+      (hS.conn x hx y hy)
     exact ⟨by rw [expShape]; exact Finset.mem_image_of_mem _ huv.1,
       by rw [expShape]; exact Finset.mem_image_of_mem _ huv.2.1, kingAdj_sub _ huv.2.2⟩
   origin := by
@@ -851,7 +851,7 @@ lemma isShape_expShape {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnim
     intro d hd hd0
     rw [expShape, Finset.mem_image] at hd
     obtain ⟨q, hq, rfl⟩ := hd
-    have hy := hS.2.2.2.2.1 q hq
+    have hy := hS.anchored.y_nonneg q hq
     have hane : (anchor S).2 = 0 := rfl
     simp only [ne_eq, Prod.mk.injEq, not_and] at hd0
     simp only [scanPos, Bool.or_eq_true, Bool.and_eq_true, decide_eq_true_eq]
@@ -877,12 +877,12 @@ lemma expShape_injOn (n : ℕ) :
   have key : ∀ T₁ T₂ : Finset (ℤ × ℤ), IsCanonicalAnimal n T₁ → IsCanonicalAnimal n T₂ →
       expShape T₁ = expShape T₂ → (anchor T₁).1 ≤ (anchor T₂).1 := by
     intro T₁ T₂ hT₁ hT₂ h
-    obtain ⟨q, hq, hq0⟩ := hT₁.2.2.2.1
+    obtain ⟨q, hq, hq0⟩ := hT₁.anchored.x_zero
     have hd : (q.1 - (anchor T₁).1, q.2 - (anchor T₁).2) ∈ expShape T₂ := by
       rw [← h, expShape]; exact Finset.mem_image_of_mem _ hq
     rw [expShape, Finset.mem_image] at hd
     obtain ⟨r, hr, hre⟩ := hd
-    have hr0 : 0 ≤ r.1 := hT₂.2.2.1 r hr
+    have hr0 : 0 ≤ r.1 := hT₂.anchored.x_nonneg r hr
     simp only [Prod.mk.injEq] at hre
     omega
   intro S₁ h₁ S₂ h₂ heq

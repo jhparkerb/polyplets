@@ -59,9 +59,9 @@ theorem conn_king {S : Finset (ℤ × ℤ)} : Conn kingLattice S ↔ Polyplets.K
 
 /-- Canonicality agrees. -/
 theorem isCanonical_king {n H : ℕ} {S : Finset (ℤ × ℤ)} :
-    IsCanonical kingLattice n H S ↔ Polyplets.IsCanonical n H S := by
-  unfold IsCanonical Polyplets.IsCanonical
-  rw [conn_king]
+    IsCanonical kingLattice n H S ↔ Polyplets.IsCanonical n H S :=
+  ⟨fun h => ⟨h.card, conn_king.mp h.conn, h.anchored, h.y_le, h.y_top⟩,
+   fun h => ⟨h.card, conn_king.mpr h.conn, h.anchored, h.y_le, h.y_top⟩⟩
 
 /-- Row sizes agree definitionally. -/
 theorem rowSize_king (S : Finset (ℤ × ℤ)) (y : ℤ) : rowSize S y = Polyplets.rowSize S y := rfl
@@ -85,15 +85,15 @@ theorem Dc_king (k H : ℕ) : Dc kingLattice k H = Polyplets.Dc k H := by
 
 /-- V-configurations agree. -/
 theorem isVConfig_king {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
-    IsVConfig kingLattice ℓ j S ↔ Polyplets.IsVConfig ℓ j S := by
-  unfold IsVConfig Polyplets.IsVConfig
-  simp only [rowSize_king, conn_king]
+    IsVConfig kingLattice ℓ j S ↔ Polyplets.IsVConfig ℓ j S :=
+  ⟨fun h => ⟨h.card, h.origin, h.rows, h.row_zero, h.row_top, h.multi, conn_king.mp h.conn⟩,
+   fun h => ⟨h.card, h.origin, h.rows, h.row_zero, h.row_top, h.multi, conn_king.mpr h.conn⟩⟩
 
 /-- Vᵗ-configurations agree. -/
 theorem isVtConfig_king {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
-    IsVtConfig kingLattice ℓ j S ↔ Polyplets.IsVtConfig ℓ j S := by
-  unfold IsVtConfig Polyplets.IsVtConfig
-  simp only [rowSize_king, conn_king]
+    IsVtConfig kingLattice ℓ j S ↔ Polyplets.IsVtConfig ℓ j S :=
+  ⟨fun h => ⟨h.card, h.origin, h.rows, h.row_zero, h.multi, conn_king.mp h.conn⟩,
+   fun h => ⟨h.card, h.origin, h.rows, h.row_zero, h.multi, conn_king.mpr h.conn⟩⟩
 
 /-- The V-families agree. -/
 theorem CFGV_king (ℓ j : ℕ) : CFGV kingLattice ℓ j = Polyplets.CFGV ℓ j := by

@@ -280,8 +280,8 @@ lemma isCanonical_xNorm {n H : ℕ} {S : Finset (ℤ × ℤ)}
     obtain ⟨c, hc, -⟩ := he0
     exact ⟨c, hc⟩
   exact ⟨by rw [card_xNorm, hcard], conn_xNorm hconn,
-    xNorm_x_nonneg, xNorm_exists_x_zero hne,
-    forall_row_xNorm (P := fun t => 0 ≤ t) hy0, exists_row_xNorm he0,
+    ⟨xNorm_x_nonneg, xNorm_exists_x_zero hne,
+      forall_row_xNorm (P := fun t => 0 ≤ t) hy0, exists_row_xNorm he0⟩,
     forall_row_xNorm (P := fun t => t ≤ (H : ℤ) - 1) hy1, exists_row_xNorm he1⟩
 
 /-! ## The unique cell of a walk row -/
@@ -438,19 +438,19 @@ lemma peelA_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
   have hw'y : w'.2 = (H : ℤ) - 2 := rfl
   -- the top cell is king-adjacent to the second-top cell
   have hadj : Adj L w w' := by
-    obtain ⟨z, hzS, hzy⟩ := hc.2.2.2.2.2.1
+    obtain ⟨z, hzS, hzy⟩ := hc.anchored.y_zero
     have hwz : w ≠ z := by
       intro heq
       rw [← heq] at hzy
       rw [hwy] at hzy
       omega
-    rcases Relation.ReflTransGen.cases_head (hc.2.1 w hwS z hzS) with heq | ⟨x, hstep, -⟩
+    rcases Relation.ReflTransGen.cases_head (hc.conn w hwS z hzS) with heq | ⟨x, hstep, -⟩
     · exact absurd heq hwz
     · obtain ⟨-, hxS, hadjwx⟩ := hstep
       have hxy : x.2 = (H : ℤ) - 2 := by
         have h1 := adj_abs_dy_le hadjwx
         rw [abs_le] at h1
-        have h2 := hc.2.2.2.2.2.2.1 x hxS
+        have h2 := hc.y_le x hxS
         rcases eq_or_lt_of_le h2 with heq2 | hlt
         · have hxw : x = w := hwr1.eq_of_mem hxS heq2 hwS hwy
           exact absurd hxw.symm hadjwx.1
@@ -465,23 +465,23 @@ lemma peelA_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
   -- the erased remainder
   set S' := S.erase w with hS'_def
   have hS'card : S'.card = (H - 1) + k := by
-    rw [hS'_def, Finset.card_erase_of_mem hwS, hc.1]
+    rw [hS'_def, Finset.card_erase_of_mem hwS, hc.card]
     omega
   have hS'conn : Conn L S' := by
     rw [hS'_def]
-    refine conn_erase_top hc.2.1 hc.2.2.2.2.2.2.1 hwr1 ?_ hwS hwy
+    refine conn_erase_top hc.conn hc.y_le hwr1 ?_ hwS hwy
     have he : (H : ℤ) - 1 - 1 = (H : ℤ) - 2 := by ring
     rw [he]
     exact hwr2
   have hS'rows : ∀ c ∈ S', c.2 ≤ (H : ℤ) - 2 := by
     intro c hcm
     obtain ⟨hcw, hcS⟩ := Finset.mem_erase.mp hcm
-    have h1 := hc.2.2.2.2.2.2.1 c hcS
+    have h1 := hc.y_le c hcS
     rcases eq_or_lt_of_le h1 with heq | hlt
     · exact absurd (hwr1.eq_of_mem hcS heq hwS hwy) hcw
     · omega
   have hS'y0 : ∀ c ∈ S', 0 ≤ c.2 := fun c hcm =>
-    hc.2.2.2.2.1 c (Finset.mem_erase.mp hcm).2
+    hc.anchored.y_nonneg c (Finset.mem_erase.mp hcm).2
   have hw'S' : w' ∈ S' := by
     rw [hS'_def]
     refine Finset.mem_erase.mpr ⟨?_, hw'S⟩
@@ -490,7 +490,7 @@ lemma peelA_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
     rw [heq, hwy] at h
     omega
   have hS'e0 : ∃ c ∈ S', c.2 = 0 := by
-    obtain ⟨z, hzS, hzy⟩ := hc.2.2.2.2.2.1
+    obtain ⟨z, hzS, hzy⟩ := hc.anchored.y_zero
     refine ⟨z, ?_, hzy⟩
     rw [hS'_def]
     refine Finset.mem_erase.mpr ⟨?_, hzS⟩
@@ -544,7 +544,7 @@ lemma peelA_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
           rw [hu, hcell, show xNorm S' = shift (-minX S') 0 S' from rfl, ← shift_insert]
       _ = xNorm (insert w S') := xNorm_shift _ ⟨w, Finset.mem_insert_self w S'⟩
       _ = xNorm S := by rw [hS'_def, Finset.insert_erase hwS]
-      _ = S := xNorm_eq_self hc.2.2.1 hc.2.2.2.1
+      _ = S := xNorm_eq_self hc.anchored.x_nonneg hc.anchored.x_zero
 
 /-- Backward well-definedness and the glue-then-peel round trip for class A. -/
 lemma glueA_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : ℤ × Finset (ℤ × ℤ)}
@@ -567,8 +567,8 @@ lemma glueA_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : ℤ × Finset (ℤ 
   have hw₀y : w₀.2 = (H : ℤ) - 1 := rfl
   have hRrows : ∀ c ∈ R, 0 ≤ c.2 ∧ c.2 ≤ (H : ℤ) - 2 := by
     intro c hcm
-    have h1 := hcR.2.2.2.2.1 c hcm
-    have h2 := hcR.2.2.2.2.2.2.1 c hcm
+    have h1 := hcR.anchored.y_nonneg c hcm
+    have h2 := hcR.y_le c hcm
     omega
   have hw₀R : w₀ ∉ R := by
     intro hmem
@@ -577,7 +577,7 @@ lemma glueA_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : ℤ × Finset (ℤ 
     omega
   set G₀ := insert w₀ R with hG₀_def
   have hG₀card : G₀.card = H + k := by
-    rw [hG₀_def, Finset.card_insert_of_notMem hw₀R, hcR.1]
+    rw [hG₀_def, Finset.card_insert_of_notMem hw₀R, hcR.card]
     omega
   -- any up-offset re-attaches legally: `w₀` sits one row above `u` at
   -- displacement `δ ∈ L.D`
@@ -601,7 +601,7 @@ lemma glueA_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : ℤ × Finset (ℤ 
       · exact Or.inr huR
       · exact Or.inl rfl
   have hG₀conn : Conn L G₀ :=
-    conn_union hG₀eq hcR.2.1 (conn_pair hadj)
+    conn_union hG₀eq hcR.conn (conn_pair hadj)
       ⟨u, Finset.mem_inter.mpr ⟨huR, by simp⟩⟩
   have hG₀y0 : ∀ c ∈ G₀, 0 ≤ c.2 := by
     intro c hcm
@@ -616,7 +616,7 @@ lemma glueA_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : ℤ × Finset (ℤ 
     · have := (hRrows c hcm').2
       omega
   have hG₀e0 : ∃ c ∈ G₀, c.2 = 0 := by
-    obtain ⟨z, hzR, hzy⟩ := hcR.2.2.2.2.2.1
+    obtain ⟨z, hzR, hzy⟩ := hcR.anchored.y_zero
     exact ⟨z, by rw [hG₀_def]; exact Finset.mem_insert_of_mem hzR, hzy⟩
   have hG₀e1 : ∃ c ∈ G₀, c.2 = (H : ℤ) - 1 :=
     ⟨w₀, by rw [hG₀_def]; exact Finset.mem_insert_self _ _, hw₀y⟩
@@ -672,12 +672,12 @@ lemma glueA_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : ℤ × Finset (ℤ 
     rw [hwG, show xNorm G₀ = shift (-minX G₀) 0 G₀ from rfl, ← shift_erase, hG₀_def,
       Finset.erase_insert hw₀R]
   have hRne : R.Nonempty := by
-    obtain ⟨z, hzR, -⟩ := hcR.2.2.2.2.2.1
+    obtain ⟨z, hzR, -⟩ := hcR.anchored.y_zero
     exact ⟨z, hzR⟩
   rw [hgl]
   simp only [peelA]
   rw [hδrec, herase, xNorm_shift (-minX G₀) hRne,
-    xNorm_eq_self hcR.2.2.1 hcR.2.2.2.1]
+    xNorm_eq_self hcR.anchored.x_nonneg hcR.anchored.x_zero]
 
 /-- **Class-A count**: walk-top animals whose second-top row is also a walk
 row are `b · d L k (H-1)` — the up-offset and the re-anchored remainder are a
@@ -891,9 +891,9 @@ lemma clusterB_facts {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)}
   set b := clusterBottom S ((H : ℤ) - 2) with hb_def
   -- total cell count as a row sum
   have hself : seg S 0 ((H : ℤ) - 1) = S :=
-    seg_eq_self fun p hp => ⟨hSc.2.2.2.2.1 p hp, hSc.2.2.2.2.2.2.1 p hp⟩
+    seg_eq_self fun p hp => ⟨hSc.anchored.y_nonneg p hp, hSc.y_le p hp⟩
   have htotal : (H : ℕ) + k = ∑ y ∈ Finset.Icc 0 ((H : ℤ) - 1), rowSize S y := by
-    rw [← card_seg_sum, hself, hSc.1]
+    rw [← card_seg_sum, hself, hSc.card]
   have hsplit1 : ∑ y ∈ Finset.Icc 0 ((H : ℤ) - 1), rowSize S y
       = (∑ y ∈ Finset.Icc 0 (b - 1), rowSize S y)
         + ∑ y ∈ Finset.Icc b ((H : ℤ) - 1), rowSize S y := by
@@ -978,9 +978,9 @@ lemma clusterC_facts {k H : ℕ} (hH : k + 1 ≤ H) {S : Finset (ℤ × ℤ)}
     clusterBottom_spec (show (0 : ℤ) ≤ (H : ℤ) - 1 by omega) hm2
   set b := clusterBottom S ((H : ℤ) - 1) with hb_def
   have hself : seg S 0 ((H : ℤ) - 1) = S :=
-    seg_eq_self fun p hp => ⟨hSc.2.2.2.2.1 p hp, hSc.2.2.2.2.2.2.1 p hp⟩
+    seg_eq_self fun p hp => ⟨hSc.anchored.y_nonneg p hp, hSc.y_le p hp⟩
   have htotal : (H : ℕ) + k = ∑ y ∈ Finset.Icc 0 ((H : ℤ) - 1), rowSize S y := by
-    rw [← card_seg_sum, hself, hSc.1]
+    rw [← card_seg_sum, hself, hSc.card]
   have hsplit1 : ∑ y ∈ Finset.Icc 0 ((H : ℤ) - 1), rowSize S y
       = (∑ y ∈ Finset.Icc 0 (b - 1), rowSize S y)
         + ∑ y ∈ Finset.Icc b ((H : ℤ) - 1), rowSize S y := by
@@ -1051,7 +1051,7 @@ lemma peelB_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
     mem_seg.mpr ⟨hpS, by omega, by omega⟩
   -- the peeled configuration is a V-configuration
   have hPconn : Conn L (seg S (b - 1) ((H : ℤ) - 1)) :=
-    conn_seg hc.2.1 (Or.inl hwrb) (Or.inr hc.2.2.2.2.2.2.1)
+    conn_seg hc.conn (Or.inl hwrb) (Or.inr hc.y_le)
   have hC0card :
       (shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1))).card = ln + jn + 2 := by
     rw [card_shift, hPcard]
@@ -1092,8 +1092,8 @@ lemma peelB_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
       conn_shift _ _ hPconn⟩
   -- the re-anchored remainder is a shorter walk-top animal
   have hR0 : xNorm (seg S 0 (b - 1)) ∈ Dc L (k - jn) (H - 1 - ln) := by
-    refine xNorm_seg_mem_Dc hc.2.1 hc.2.2.2.2.1 hb1 (by omega) hwalkb
-      hc.2.2.2.2.2.1 (by omega)
+    refine xNorm_seg_mem_Dc hc.conn hc.anchored.y_nonneg hb1 (by omega) hwalkb
+      hc.anchored.y_zero (by omega)
   clear_value jn ln
   have hjmem : jn ∈ Finset.Icc 1 k := Finset.mem_Icc.mpr ⟨by omega, by omega⟩
   have hlmem : ln ∈ Finset.Icc 1 jn := Finset.mem_Icc.mpr ⟨hln1, by omega⟩
@@ -1102,7 +1102,7 @@ lemma peelB_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
       Finset.mem_product.mpr ⟨hC0V, hR0⟩⟩⟩
   -- the round trip: glue the peeled pieces back
   · have hSne : S.Nonempty := by
-      obtain ⟨z, hzS, -⟩ := hc.2.2.2.2.2.1
+      obtain ⟨z, hzS, -⟩ := hc.anchored.y_zero
       exact ⟨z, hzS⟩
     have hr : (H : ℤ) - 2 - (ln : ℤ) = b - 1 := by omega
     have hwQ : IsWalkRow (xNorm (seg S 0 (b - 1))) (b - 1) := by
@@ -1123,8 +1123,8 @@ lemma peelB_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
       constructor
       · rintro (⟨h, -, -⟩ | ⟨h, -, -⟩) <;> exact h
       · intro hcS
-        have h0 := hc.2.2.2.2.1 c hcS
-        have h1 := hc.2.2.2.2.2.2.1 c hcS
+        have h0 := hc.anchored.y_nonneg c hcS
+        have h1 := hc.y_le c hcS
         by_cases hcb : c.2 ≤ b - 1
         · exact Or.inl ⟨hcS, h0, hcb⟩
         · exact Or.inr ⟨hcS, by omega, h1⟩
@@ -1135,7 +1135,7 @@ lemma peelB_mem_and_glue {k H : ℕ} (hH : k + 2 ≤ H) {S : Finset (ℤ × ℤ)
       show p.1 + -minX (seg S 0 (b - 1)) + -p.1 = -minX (seg S 0 (b - 1)) from by ring,
       show b - 1 + -(b - 1) = (0 : ℤ) from by ring,
       xNorm_def' (seg S 0 (b - 1)), ← shift_union, hQP, xNorm_shift _ hSne,
-      xNorm_eq_self hc.2.2.1 hc.2.2.2.1]
+      xNorm_eq_self hc.anchored.x_nonneg hc.anchored.x_zero]
 
 /-- Backward well-definedness and the glue-then-peel round trip for class B. -/
 lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
@@ -1165,10 +1165,10 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
   set C' := shift u.1 r C with hC'_def
   have hRrows : ∀ c ∈ R, 0 ≤ c.2 ∧ c.2 ≤ r := by
     intro c hcm
-    have h1 := hcR.2.2.2.2.1 c hcm
-    have h2 := hcR.2.2.2.2.2.2.1 c hcm
+    have h1 := hcR.anchored.y_nonneg c hcm
+    have h2 := hcR.y_le c hcm
     omega
-  have hCrows := hCv.2.2.1
+  have hCrows := hCv.rows
   have hC'rows : ∀ c ∈ C', r ≤ c.2 ∧ c.2 ≤ (H : ℤ) - 1 := by
     intro c hcm
     rw [hC'_def, mem_shift] at hcm
@@ -1176,7 +1176,7 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
     have h2 : c.2 - r ≤ (ℓ : ℤ) + 1 := (hCrows _ hcm).2
     omega
   have huC' : u ∈ C' := by
-    have h0 := shift_mem (a := u.1) (b := r) hCv.2.1
+    have h0 := shift_mem (a := u.1) (b := r) hCv.origin
     rw [shiftCell_origin, show ((u.1, r) : ℤ × ℤ) = u from by rw [← huy]] at h0
     exact h0
   have hinter : R ∩ C' = {u} := by
@@ -1193,14 +1193,14 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
     rw [hinter, Finset.card_singleton] at h
     have hC'c : C'.card = ℓ + j + 2 := by
       rw [hC'_def, card_shift]
-      exact hCv.1
-    have hRc : R.card = (H - 1 - ℓ) + (k - j) := hcR.1
+      exact hCv.card
+    have hRc : R.card = (H - 1 - ℓ) + (k - j) := hcR.card
     omega
   have hC'conn : Conn L C' := by
     rw [hC'_def]
-    exact conn_shift _ _ hCv.2.2.2.2.2.2
+    exact conn_shift _ _ hCv.conn
   have hconnU : Conn L (R ∪ C') :=
-    conn_union rfl hcR.2.1 hC'conn ⟨u, Finset.mem_inter.mpr ⟨huR, huC'⟩⟩
+    conn_union rfl hcR.conn hC'conn ⟨u, Finset.mem_inter.mpr ⟨huR, huC'⟩⟩
   have hUy0 : ∀ c ∈ R ∪ C', 0 ≤ c.2 := by
     intro c hcm
     rcases Finset.mem_union.mp hcm with h | h
@@ -1214,10 +1214,10 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
       omega
     · exact (hC'rows c h).2
   have hUe0 : ∃ c ∈ R ∪ C', c.2 = 0 := by
-    obtain ⟨z, hzR, hzy⟩ := hcR.2.2.2.2.2.1
+    obtain ⟨z, hzR, hzy⟩ := hcR.anchored.y_zero
     exact ⟨z, Finset.mem_union_left _ hzR, hzy⟩
   have hUe1 : ∃ c ∈ R ∪ C', c.2 = (H : ℤ) - 1 := by
-    have hwtop : IsWalkRow C ((ℓ : ℤ) + 1) := hCv.2.2.2.2.1
+    have hwtop : IsWalkRow C ((ℓ : ℤ) + 1) := hCv.row_top
     obtain ⟨c0, hc0C, hc0y⟩ := hwtop.exists_mem
     refine ⟨shiftCell u.1 r c0, Finset.mem_union_right _ ?_, ?_⟩
     · rw [hC'_def]
@@ -1230,13 +1230,13 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
       hC'_def, rowSize_shift]
   have hG₀top : rowSize (R ∪ C') ((H : ℤ) - 1) = 1 := by
     rw [hrsAbove _ (by omega), show (H : ℤ) - 1 - r = (ℓ : ℤ) + 1 from by omega]
-    exact hCv.2.2.2.2.1
+    exact hCv.row_top
   have hG₀m : 2 ≤ rowSize (R ∪ C') ((H : ℤ) - 2) := by
     rw [hrsAbove _ (by omega), show (H : ℤ) - 2 - r = (ℓ : ℤ) from by omega]
-    exact hCv.2.2.2.2.2.1 ℓ (Finset.mem_Icc.mpr ⟨hl1, le_rfl⟩)
+    exact hCv.multi ℓ (Finset.mem_Icc.mpr ⟨hl1, le_rfl⟩)
   have hwC'r : IsWalkRow C' r := by
     rw [isWalkRow_iff_rowSize, hC'_def, rowSize_shift, sub_self]
-    exact hCv.2.2.2.1
+    exact hCv.row_zero
   have hG₀r : rowSize (R ∪ C') r = 1 := by
     rw [rowSize, Finset.filter_union, filter_row_eq_singleton hwRr huR huy,
       filter_row_eq_singleton hwC'r huC' huy, Finset.union_self]
@@ -1252,7 +1252,7 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
   refine ⟨⟨hDc, hnot⟩, ?_⟩
   -- the round trip: peel the glued animal back apart
   have hRne : R.Nonempty := by
-    obtain ⟨z, hzR, -⟩ := hcR.2.2.2.2.2.1
+    obtain ⟨z, hzR, -⟩ := hcR.anchored.y_zero
     exact ⟨z, hzR⟩
   -- the recomputed cluster bottom is `r + 1`
   have hm2X : 2 ≤ rowSize (xNorm (R ∪ C')) ((H : ℤ) - 2) := by
@@ -1265,7 +1265,7 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
     intro y hy1 hy2
     rw [rowSize_xNorm, hrsAbove y (by omega),
       show y - r = (((y - r).toNat : ℕ) : ℤ) from by omega]
-    exact hCv.2.2.2.2.2.1 _ (Finset.mem_Icc.mpr ⟨by omega, by omega⟩)
+    exact hCv.multi _ (Finset.mem_Icc.mpr ⟨by omega, by omega⟩)
   have hbgt : r < clusterBottom (xNorm (R ∪ C')) ((H : ℤ) - 2) := by
     by_contra hcon
     push Not at hcon
@@ -1301,9 +1301,9 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
       Finset.sum_singleton] at hs1
     rw [show Finset.Icc ((ℓ : ℤ) + 1) ((ℓ : ℤ) + 1) = {((ℓ : ℤ) + 1)} from
       Finset.Icc_self _, Finset.sum_singleton] at hs2
-    have hr0' : rowSize C 0 = 1 := hCv.2.2.2.1
-    have hrt' : rowSize C ((ℓ : ℤ) + 1) = 1 := hCv.2.2.2.2.1
-    have hCcardv : C.card = ℓ + j + 2 := hCv.1
+    have hr0' : rowSize C 0 = 1 := hCv.row_zero
+    have hrt' : rowSize C ((ℓ : ℤ) + 1) = 1 := hCv.row_top
+    have hCcardv : C.card = ℓ + j + 2 := hCv.card
     omega
   -- the walk cell of the recomputed base row
   have hcellX : rowCell (xNorm (R ∪ C')) r = shiftCell (-minX (R ∪ C')) 0 u := by
@@ -1359,7 +1359,7 @@ lemma glueB_mem_and_peel {k H : ℕ} (hH : k + 2 ≤ H) {x : PeelData}
       show -(u.1 + -minX (R ∪ C')) + -minX (R ∪ C') + u.1 = (0 : ℤ) from by ring,
       show -r + 0 + r = (0 : ℤ) from by ring, shift_zero]
   · -- the remainder component
-    rw [hsegbotX, xNorm_shift _ hRne, xNorm_eq_self hcR.2.2.1 hcR.2.2.2.1]
+    rw [hsegbotX, xNorm_shift _ hRne, xNorm_eq_self hcR.anchored.x_nonneg hcR.anchored.x_zero]
 
 /-- **Class-B count**: walk-top animals with a multi second-top row are
 counted by interior cluster configurations times shorter walk-top remainders,
@@ -1413,7 +1413,7 @@ lemma peelC_mem_and_glue {k H : ℕ} (hH : k + 1 ≤ H) {S : Finset (ℤ × ℤ)
   have hpP : p ∈ seg S (b - 1) ((H : ℤ) - 1) :=
     mem_seg.mpr ⟨hpS, by omega, by omega⟩
   have hPconn : Conn L (seg S (b - 1) ((H : ℤ) - 1)) :=
-    conn_seg hc.2.1 (Or.inl hwrb) (Or.inr hc.2.2.2.2.2.2.1)
+    conn_seg hc.conn (Or.inl hwrb) (Or.inr hc.y_le)
   have hC0card :
       (shift (-p.1) (-(b - 1)) (seg S (b - 1) ((H : ℤ) - 1))).card = ln + jn + 1 := by
     rw [card_shift, hPcard]
@@ -1448,8 +1448,8 @@ lemma peelC_mem_and_glue {k H : ℕ} (hH : k + 1 ≤ H) {S : Finset (ℤ × ℤ)
     rw [mem_CFGVt]
     exact ⟨hC0card, h00, hC0rows, hC0r0, hC0multi, conn_shift _ _ hPconn⟩
   have hR0 : xNorm (seg S 0 (b - 1)) ∈ Dc L (k - jn) (H - ln) := by
-    refine xNorm_seg_mem_Dc hc.2.1 hc.2.2.2.2.1 hb1 (by omega) hwalkb
-      hc.2.2.2.2.2.1 (by omega)
+    refine xNorm_seg_mem_Dc hc.conn hc.anchored.y_nonneg hb1 (by omega) hwalkb
+      hc.anchored.y_zero (by omega)
   clear_value jn ln
   have hjmem : jn ∈ Finset.Icc 1 k := Finset.mem_Icc.mpr ⟨by omega, by omega⟩
   have hlmem : ln ∈ Finset.Icc 1 jn := Finset.mem_Icc.mpr ⟨hln1, by omega⟩
@@ -1457,7 +1457,7 @@ lemma peelC_mem_and_glue {k H : ℕ} (hH : k + 1 ≤ H) {S : Finset (ℤ × ℤ)
   · exact Finset.mem_sigma.mpr ⟨hjmem, Finset.mem_sigma.mpr ⟨hlmem,
       Finset.mem_product.mpr ⟨hC0V, hR0⟩⟩⟩
   · have hSne : S.Nonempty := by
-      obtain ⟨z, hzS, -⟩ := hc.2.2.2.2.2.1
+      obtain ⟨z, hzS, -⟩ := hc.anchored.y_zero
       exact ⟨z, hzS⟩
     have hr : (H : ℤ) - 1 - (ln : ℤ) = b - 1 := by omega
     have hwQ : IsWalkRow (xNorm (seg S 0 (b - 1))) (b - 1) := by
@@ -1478,8 +1478,8 @@ lemma peelC_mem_and_glue {k H : ℕ} (hH : k + 1 ≤ H) {S : Finset (ℤ × ℤ)
       constructor
       · rintro (⟨h, -, -⟩ | ⟨h, -, -⟩) <;> exact h
       · intro hcS
-        have h0 := hc.2.2.2.2.1 c hcS
-        have h1 := hc.2.2.2.2.2.2.1 c hcS
+        have h0 := hc.anchored.y_nonneg c hcS
+        have h1 := hc.y_le c hcS
         by_cases hcb : c.2 ≤ b - 1
         · exact Or.inl ⟨hcS, h0, hcb⟩
         · exact Or.inr ⟨hcS, by omega, h1⟩
@@ -1490,7 +1490,7 @@ lemma peelC_mem_and_glue {k H : ℕ} (hH : k + 1 ≤ H) {S : Finset (ℤ × ℤ)
       show p.1 + -minX (seg S 0 (b - 1)) + -p.1 = -minX (seg S 0 (b - 1)) from by ring,
       show b - 1 + -(b - 1) = (0 : ℤ) from by ring,
       xNorm_def' (seg S 0 (b - 1)), ← shift_union, hQP, xNorm_shift _ hSne,
-      xNorm_eq_self hc.2.2.1 hc.2.2.2.1]
+      xNorm_eq_self hc.anchored.x_nonneg hc.anchored.x_zero]
 
 /-- Backward well-definedness and the glue-then-peel round trip for class C. -/
 lemma glueC_mem_and_peel {k H : ℕ} (hH : k + 1 ≤ H) {x : PeelData}
@@ -1520,10 +1520,10 @@ lemma glueC_mem_and_peel {k H : ℕ} (hH : k + 1 ≤ H) {x : PeelData}
   set C' := shift u.1 r C with hC'_def
   have hRrows : ∀ c ∈ R, 0 ≤ c.2 ∧ c.2 ≤ r := by
     intro c hcm
-    have h1 := hcR.2.2.2.2.1 c hcm
-    have h2 := hcR.2.2.2.2.2.2.1 c hcm
+    have h1 := hcR.anchored.y_nonneg c hcm
+    have h2 := hcR.y_le c hcm
     omega
-  have hCrows := hCv.2.2.1
+  have hCrows := hCv.rows
   have hC'rows : ∀ c ∈ C', r ≤ c.2 ∧ c.2 ≤ (H : ℤ) - 1 := by
     intro c hcm
     rw [hC'_def, mem_shift] at hcm
@@ -1531,7 +1531,7 @@ lemma glueC_mem_and_peel {k H : ℕ} (hH : k + 1 ≤ H) {x : PeelData}
     have h2 : c.2 - r ≤ (ℓ : ℤ) := (hCrows _ hcm).2
     omega
   have huC' : u ∈ C' := by
-    have h0 := shift_mem (a := u.1) (b := r) hCv.2.1
+    have h0 := shift_mem (a := u.1) (b := r) hCv.origin
     rw [shiftCell_origin, show ((u.1, r) : ℤ × ℤ) = u from by rw [← huy]] at h0
     exact h0
   have hinter : R ∩ C' = {u} := by
@@ -1548,14 +1548,14 @@ lemma glueC_mem_and_peel {k H : ℕ} (hH : k + 1 ≤ H) {x : PeelData}
     rw [hinter, Finset.card_singleton] at h
     have hC'c : C'.card = ℓ + j + 1 := by
       rw [hC'_def, card_shift]
-      exact hCv.1
-    have hRc : R.card = (H - ℓ) + (k - j) := hcR.1
+      exact hCv.card
+    have hRc : R.card = (H - ℓ) + (k - j) := hcR.card
     omega
   have hC'conn : Conn L C' := by
     rw [hC'_def]
-    exact conn_shift _ _ hCv.2.2.2.2.2
+    exact conn_shift _ _ hCv.conn
   have hconnU : Conn L (R ∪ C') :=
-    conn_union rfl hcR.2.1 hC'conn ⟨u, Finset.mem_inter.mpr ⟨huR, huC'⟩⟩
+    conn_union rfl hcR.conn hC'conn ⟨u, Finset.mem_inter.mpr ⟨huR, huC'⟩⟩
   have hUy0 : ∀ c ∈ R ∪ C', 0 ≤ c.2 := by
     intro c hcm
     rcases Finset.mem_union.mp hcm with h | h
@@ -1569,10 +1569,10 @@ lemma glueC_mem_and_peel {k H : ℕ} (hH : k + 1 ≤ H) {x : PeelData}
       omega
     · exact (hC'rows c h).2
   have hUe0 : ∃ c ∈ R ∪ C', c.2 = 0 := by
-    obtain ⟨z, hzR, hzy⟩ := hcR.2.2.2.2.2.1
+    obtain ⟨z, hzR, hzy⟩ := hcR.anchored.y_zero
     exact ⟨z, Finset.mem_union_left _ hzR, hzy⟩
   have hCtop : 2 ≤ rowSize C (ℓ : ℤ) :=
-    hCv.2.2.2.2.1 ℓ (Finset.mem_Icc.mpr ⟨hl1, le_rfl⟩)
+    hCv.multi ℓ (Finset.mem_Icc.mpr ⟨hl1, le_rfl⟩)
   have hUe1 : ∃ c ∈ R ∪ C', c.2 = (H : ℤ) - 1 := by
     have hpos : 0 < (C.filter fun c => c.2 = (ℓ : ℤ)).card := by
       have h2 : 2 ≤ (C.filter fun c => c.2 = (ℓ : ℤ)).card := hCtop
@@ -1594,7 +1594,7 @@ lemma glueC_mem_and_peel {k H : ℕ} (hH : k + 1 ≤ H) {x : PeelData}
     exact hCtop
   have hwC'r : IsWalkRow C' r := by
     rw [isWalkRow_iff_rowSize, hC'_def, rowSize_shift, sub_self]
-    exact hCv.2.2.2.1
+    exact hCv.row_zero
   have hG₀r : rowSize (R ∪ C') r = 1 := by
     rw [rowSize, Finset.filter_union, filter_row_eq_singleton hwRr huR huy,
       filter_row_eq_singleton hwC'r huC' huy, Finset.union_self]
@@ -1606,7 +1606,7 @@ lemma glueC_mem_and_peel {k H : ℕ} (hH : k + 1 ≤ H) {x : PeelData}
     omega
   refine ⟨⟨hAll, hnot⟩, ?_⟩
   have hRne : R.Nonempty := by
-    obtain ⟨z, hzR, -⟩ := hcR.2.2.2.2.2.1
+    obtain ⟨z, hzR, -⟩ := hcR.anchored.y_zero
     exact ⟨z, hzR⟩
   have hm2X : 2 ≤ rowSize (xNorm (R ∪ C')) ((H : ℤ) - 1) := by
     rw [rowSize_xNorm]
@@ -1618,7 +1618,7 @@ lemma glueC_mem_and_peel {k H : ℕ} (hH : k + 1 ≤ H) {x : PeelData}
     intro y hy1 hy2
     rw [rowSize_xNorm, hrsAbove y (by omega),
       show y - r = (((y - r).toNat : ℕ) : ℤ) from by omega]
-    exact hCv.2.2.2.2.1 _ (Finset.mem_Icc.mpr ⟨by omega, by omega⟩)
+    exact hCv.multi _ (Finset.mem_Icc.mpr ⟨by omega, by omega⟩)
   have hbgt : r < clusterBottom (xNorm (R ∪ C')) ((H : ℤ) - 1) := by
     by_contra hcon
     push Not at hcon
@@ -1647,8 +1647,8 @@ lemma glueC_mem_and_peel {k H : ℕ} (hH : k + 1 ≤ H) {x : PeelData}
     rw [hCself] at h1
     rw [show Finset.Icc (0 : ℤ) 0 = {(0 : ℤ)} from Finset.Icc_self 0,
       Finset.sum_singleton] at hs1
-    have hr0' : rowSize C 0 = 1 := hCv.2.2.2.1
-    have hCcardv : C.card = ℓ + j + 1 := hCv.1
+    have hr0' : rowSize C 0 = 1 := hCv.row_zero
+    have hCcardv : C.card = ℓ + j + 1 := hCv.card
     omega
   have hcellX : rowCell (xNorm (R ∪ C')) r = shiftCell (-minX (R ∪ C')) 0 u := by
     refine rowCell_eq ?_ ?_ ?_
@@ -1700,7 +1700,7 @@ lemma glueC_mem_and_peel {k H : ℕ} (hH : k + 1 ≤ H) {x : PeelData}
       shift_shift, hC'_def, shift_shift,
       show -(u.1 + -minX (R ∪ C')) + -minX (R ∪ C') + u.1 = (0 : ℤ) from by ring,
       show -r + 0 + r = (0 : ℤ) from by ring, shift_zero]
-  · rw [hsegbotX, xNorm_shift _ hRne, xNorm_eq_self hcR.2.2.1 hcR.2.2.2.1]
+  · rw [hsegbotX, xNorm_shift _ hRne, xNorm_eq_self hcR.anchored.x_nonneg hcR.anchored.x_zero]
 
 /-- **Class-C count**: canonical animals with a multi top row are counted by
 top-edge cluster configurations times shorter walk-top remainders, aggregated

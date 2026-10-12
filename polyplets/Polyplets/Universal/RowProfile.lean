@@ -25,11 +25,11 @@ canonical `S` has that row: the anchored `y = 0` and `y = H-1` cells bracket
 lemma canonical_row_occupied {L : RowLocal} {n H : ℕ} {S : Finset (ℤ × ℤ)}
     (hS : IsCanonical L n H S) {y0 : ℤ} (h0 : 0 ≤ y0) (hH : y0 ≤ (H : ℤ) - 1) :
     ∃ c ∈ S, c.2 = y0 := by
-  obtain ⟨pmin, hminS, hmin⟩ := hS.2.2.2.2.2.1
-  obtain ⟨pmax, hmaxS, hmax⟩ := hS.2.2.2.2.2.2.2
+  obtain ⟨pmin, hminS, hmin⟩ := hS.anchored.y_zero
+  obtain ⟨pmax, hmaxS, hmax⟩ := hS.y_top
   rcases eq_or_lt_of_le hH with hy | hy
   · exact ⟨pmax, hmaxS, by omega⟩
-  · have hconn := hS.2.1 pmin hminS pmax hmaxS
+  · have hconn := hS.conn pmin hminS pmax hmaxS
     exact exists_y_eq_of_cross hconn (by omega) (by omega)
 
 /-- **Each row's fiber is nonempty.** -/

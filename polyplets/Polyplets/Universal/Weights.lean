@@ -91,25 +91,38 @@ occupying exactly rows `1..ℓ`, every one of those rows with at least two cells
 a free walk cell `q` alone on row `ℓ + 1`; `ℓ + j + 2` cells in total; and the
 whole `L`-connected. Positions are relative to `p`, pinned at the origin —
 there is deliberately **no x-anchoring clause**. -/
-def IsVConfig (L : RowLocal) (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop :=
-  S.card = ℓ + j + 2 ∧
-  ((0 : ℤ), (0 : ℤ)) ∈ S ∧
-  (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ) + 1) ∧
-  rowSize S 0 = 1 ∧
-  rowSize S ((ℓ : ℤ) + 1) = 1 ∧
-  (∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)) ∧
-  Conn L S
+structure IsVConfig (L : RowLocal) (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+  /-- `ℓ + j + 2` cells: the cluster's `ℓ + j`, plus `p` and `q`. -/
+  card : S.card = ℓ + j + 2
+  /-- The fixed walk cell `p = (0, 0)`. -/
+  origin : ((0 : ℤ), (0 : ℤ)) ∈ S
+  /-- Everything on rows `0 … ℓ + 1`. -/
+  rows : ∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ) + 1
+  /-- Row `0` is the walk cell alone. -/
+  row_zero : rowSize S 0 = 1
+  /-- Row `ℓ + 1` is the free walk cell `q` alone. -/
+  row_top : rowSize S ((ℓ : ℤ) + 1) = 1
+  /-- The cluster rows `1 … ℓ` each hold at least two cells. -/
+  multi : ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)
+  /-- `L`-connected. -/
+  conn : Conn L S
 
 /-- `S` is a **Vᵗ-configuration** for `(ℓ, j)` — a V-configuration without the
 free walk cell `q` (the cluster caps the animal), hence `ℓ + j + 1` cells on
 rows `0..ℓ`. -/
-def IsVtConfig (L : RowLocal) (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop :=
-  S.card = ℓ + j + 1 ∧
-  ((0 : ℤ), (0 : ℤ)) ∈ S ∧
-  (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ)) ∧
-  rowSize S 0 = 1 ∧
-  (∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)) ∧
-  Conn L S
+structure IsVtConfig (L : RowLocal) (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+  /-- `ℓ + j + 1` cells: the cluster's `ℓ + j`, plus `p`. -/
+  card : S.card = ℓ + j + 1
+  /-- The fixed walk cell `p = (0, 0)`. -/
+  origin : ((0 : ℤ), (0 : ℤ)) ∈ S
+  /-- Everything on rows `0 … ℓ`. -/
+  rows : ∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ)
+  /-- Row `0` is the walk cell alone. -/
+  row_zero : rowSize S 0 = 1
+  /-- The cluster rows `1 … ℓ` each hold at least two cells. -/
+  multi : ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)
+  /-- `L`-connected. -/
+  conn : Conn L S
 
 /-- **Finiteness of the V-family**: a V-configuration has `ℓ + j + 2` cells, is
 connected and contains the origin, so it lies in the box

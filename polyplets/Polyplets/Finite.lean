@@ -62,14 +62,14 @@ x-coordinate is at most `n - 1`: the columns `0, 1, …, p.1` are all occupied
 so there are at least `p.1 + 1` distinct columns, hence `p.1 + 1 ≤ n`. -/
 lemma canonical_x_le {n H : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonical n H S)
     {p : ℤ × ℤ} (hp : p ∈ S) : p.1 ≤ (n : ℤ) - 1 := by
-  obtain ⟨p0, hp0S, hp0⟩ := hS.2.2.2.1
+  obtain ⟨p0, hp0S, hp0⟩ := hS.anchored.x_zero
   have hsub : Finset.Icc (0 : ℤ) p.1 ⊆ S.image Prod.fst := by
     intro j hj
     rw [Finset.mem_Icc] at hj
     rw [Finset.mem_image]
     rcases eq_or_lt_of_le hj.2 with hjm | hjm
     · exact ⟨p, hp, hjm.symm⟩
-    · have hconn := hS.2.1 p0 hp0S p hp
+    · have hconn := hS.conn p0 hp0S p hp
       have hcross : ∃ c ∈ S, c.1 = j :=
         exists_x_eq_of_cross hconn (by omega) (by omega)
       obtain ⟨c, hcS, hcj⟩ := hcross
@@ -78,7 +78,7 @@ lemma canonical_x_le {n H : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonical n H
     calc (Finset.Icc (0 : ℤ) p.1).card
         ≤ (S.image Prod.fst).card := Finset.card_le_card hsub
       _ ≤ S.card := Finset.card_image_le
-      _ = n := hS.1
+      _ = n := hS.card
   rw [Int.card_Icc] at hcard
   simp only [sub_zero] at hcard
   rw [Int.toNat_le] at hcard
@@ -95,10 +95,10 @@ lemma canonical_finite (n H : ℕ) :
   intro p hpS
   simp only [Finset.mem_Icc, Prod.le_def]
   refine ⟨⟨?_, ?_⟩, ?_, ?_⟩
-  · exact hS.2.2.1 p hpS
-  · exact hS.2.2.2.2.1 p hpS
+  · exact hS.anchored.x_nonneg p hpS
+  · exact hS.anchored.y_nonneg p hpS
   · exact canonical_x_le hS hpS
-  · exact hS.2.2.2.2.2.2.1 p hpS
+  · exact hS.y_le p hpS
 
 /-- **`T` is a genuine cardinality.** With finiteness in hand, `T n H` is the
 `Finset.card` of the materialized canonical set — the concrete object any

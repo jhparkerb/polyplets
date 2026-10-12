@@ -164,8 +164,8 @@ instance instDecidableConn (L : RowLocal) : DecidablePred (Conn L) := fun S =>
 
 /-- Canonicality is decidable. -/
 instance instDecidableIsCanonical (L : RowLocal) (n H : ℕ) (S : Finset (ℤ × ℤ)) :
-    Decidable (IsCanonical L n H S) := by
-  unfold IsCanonical; infer_instance
+    Decidable (IsCanonical L n H S) :=
+  decidable_of_iff _ isCanonical_iff_and.symm
 
 /-! ## The computable counter -/
 
@@ -189,13 +189,13 @@ theorem Tc_eq_T (L : RowLocal) (W n H : ℕ) (hW : L.M * ((n : ℤ) - 1) ≤ (W 
     constructor
     · exact fun h => h.2
     · intro h
-      refine ⟨⟨fun p hp => ?_, h.1⟩, h⟩
+      refine ⟨⟨fun p hp => ?_, h.card⟩, h⟩
       rw [Polyplets.mem_box]
       obtain ⟨B, hB1, hB2⟩ : ∃ B : ℤ, p.1 ≤ B ∧ B ≤ (W : ℤ) - 1 :=
         ⟨_, canonical_x_le h hp, hW⟩
-      have hx0 := h.2.2.1 p hp
-      have hy0 := h.2.2.2.2.1 p hp
-      have hy1 := h.2.2.2.2.2.2.1 p hp
+      have hx0 := h.anchored.x_nonneg p hp
+      have hy0 := h.anchored.y_nonneg p hp
+      have hy1 := h.y_le p hp
       omega
   rw [Tc, hset, T_eq_toFinset_card]
 

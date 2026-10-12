@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jason H Parker
 -/
 import Mathlib.Data.Set.Card
+import Polyplets.Universal.Defs
 
 /-!
 # Fixed polyplets: basic definitions
@@ -34,16 +35,34 @@ def KingConnected (S : Finset (ℤ × ℤ)) : Prop :=
   ∀ p ∈ S, ∀ q ∈ S,
     Relation.ReflTransGen (fun a b => a ∈ S ∧ b ∈ S ∧ kingAdj a b) p q
 
+export Universal (Anchored)
+
 /-- `S` is the canonical (origin-anchored) representative of a fixed polyplet of
 `n` cells with bounding-box height exactly `H`: it has `n` cells, is
-king-connected, its minimum x- and y-coordinates are `0`, and its maximum
-y-coordinate is `H - 1` (so the y-extent is exactly `H`). The x-extent (width)
-is unconstrained. -/
-def IsCanonical (n H : ℕ) (S : Finset (ℤ × ℤ)) : Prop :=
-  S.card = n ∧ KingConnected S ∧
-  (∀ p ∈ S, 0 ≤ p.1) ∧ (∃ p ∈ S, p.1 = 0) ∧
-  (∀ p ∈ S, 0 ≤ p.2) ∧ (∃ p ∈ S, p.2 = 0) ∧
-  (∀ p ∈ S, p.2 ≤ (H : ℤ) - 1) ∧ (∃ p ∈ S, p.2 = (H : ℤ) - 1)
+king-connected, its bounding box sits at the origin (`Anchored`), and its
+maximum y-coordinate is `H - 1` (so the y-extent is exactly `H`). The x-extent
+(width) is unconstrained. -/
+structure IsCanonical (n H : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+  /-- `n` cells. -/
+  card : S.card = n
+  /-- King-connected. -/
+  conn : KingConnected S
+  /-- Bounding box at the origin. -/
+  anchored : Anchored S
+  /-- No cell above row `H - 1`. -/
+  y_le : ∀ p ∈ S, p.2 ≤ (H : ℤ) - 1
+  /-- Row `H - 1` is occupied. -/
+  y_top : ∃ p ∈ S, p.2 = (H : ℤ) - 1
+
+/-- `IsCanonical` as a conjunction (for decidability and for unfolding). -/
+lemma isCanonical_iff_and {n H : ℕ} {S : Finset (ℤ × ℤ)} :
+    IsCanonical n H S ↔ S.card = n ∧ KingConnected S ∧
+      (∀ p ∈ S, 0 ≤ p.1) ∧ (∃ p ∈ S, p.1 = 0) ∧
+      (∀ p ∈ S, 0 ≤ p.2) ∧ (∃ p ∈ S, p.2 = 0) ∧
+      (∀ p ∈ S, p.2 ≤ (H : ℤ) - 1) ∧ (∃ p ∈ S, p.2 = (H : ℤ) - 1) :=
+  ⟨fun h => ⟨h.card, h.conn, h.anchored.x_nonneg, h.anchored.x_zero, h.anchored.y_nonneg,
+    h.anchored.y_zero, h.y_le, h.y_top⟩,
+   fun ⟨a, b, c, d, e, f, g, i⟩ => ⟨a, b, ⟨c, d, e, f⟩, g, i⟩⟩
 
 /-- `T n H`: the number of fixed polyplets of `n` cells whose bounding box has
 height exactly `H`, i.e. the number of origin-anchored canonical

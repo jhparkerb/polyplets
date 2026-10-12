@@ -29,8 +29,8 @@ action `D4.toFun` on `ℤ × ℤ`. Acting on *canonical* animals needs a
 re-anchoring step, because a rotated canonical animal is generally no longer
 origin-anchored:
 
-* `Anchored S` : `min x = min y = 0` (the four anchoring clauses of
-  `IsCanonicalAnimal`, isolated),
+* `Anchored S` : `min x = min y = 0` (the anchoring field of
+  `IsCanonicalAnimal`),
 * `anchorVec S` : the lower-left corner of `S`'s bounding box,
 * `reanchor S = S.image (· - anchorVec S)` : the canonical translate.
 
@@ -208,21 +208,13 @@ lemma kingConnected_image {f : ℤ × ℤ → ℤ × ℤ}
   obtain ⟨b, hbS, rfl⟩ := hq
   exact reflTransGen_image hadj (hS a haS b hbS)
 
-/-- `S` is origin-anchored: its bounding box has lower-left corner at the
-origin. These are exactly the four anchoring clauses of `IsCanonicalAnimal`. -/
-def Anchored (S : Finset (ℤ × ℤ)) : Prop :=
-  (∀ p ∈ S, 0 ≤ p.1) ∧ (∃ p ∈ S, p.1 = 0) ∧ (∀ p ∈ S, 0 ≤ p.2) ∧ (∃ p ∈ S, p.2 = 0)
-
 /-- `IsCanonicalAnimal` is "`n` cells, king-connected, anchored". -/
 lemma isCanonicalAnimal_iff (n : ℕ) (S : Finset (ℤ × ℤ)) :
-    IsCanonicalAnimal n S ↔ S.card = n ∧ KingConnected S ∧ Anchored S := Iff.rfl
-
-lemma Anchored.nonempty {S : Finset (ℤ × ℤ)} (hS : Anchored S) : S.Nonempty := by
-  obtain ⟨p, hp, -⟩ := hS.2.1
-  exact ⟨p, hp⟩
+    IsCanonicalAnimal n S ↔ S.card = n ∧ KingConnected S ∧ Anchored S :=
+  ⟨fun h => ⟨h.card, h.conn, h.anchored⟩, fun ⟨a, b, c⟩ => ⟨a, b, c⟩⟩
 
 lemma IsCanonicalAnimal.nonempty {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCanonicalAnimal n S) :
-    S.Nonempty := Anchored.nonempty hS.2.2
+    S.Nonempty := hS.anchored.nonempty
 
 /-- The lower-left corner of `S`'s bounding box (junk value `0` when `S` is
 empty). -/
@@ -270,8 +262,8 @@ lemma reanchor_image_add (S : Finset (ℤ × ℤ)) (t : ℤ × ℤ) :
 
 /-- An anchored set has its bounding-box corner at the origin. -/
 lemma anchorVec_eq_zero {S : Finset (ℤ × ℤ)} (hS : Anchored S) : anchorVec S = 0 := by
-  obtain ⟨p, hpS, hp⟩ := hS.2.1
-  obtain ⟨q, hqS, hq⟩ := hS.2.2.2
+  obtain ⟨p, hpS, hp⟩ := hS.x_zero
+  obtain ⟨q, hqS, hq⟩ := hS.y_zero
   have h : S.Nonempty := hS.nonempty
   have h1 : S.inf' h Prod.fst ≤ p.1 := Finset.inf'_le Prod.fst hpS
   have h2 : S.inf' h Prod.snd ≤ q.2 := Finset.inf'_le Prod.snd hqS
@@ -279,10 +271,10 @@ lemma anchorVec_eq_zero {S : Finset (ℤ × ℤ)} (hS : Anchored S) : anchorVec 
   refine Prod.ext ?_ ?_
   · refine le_antisymm ?_ ?_
     · rw [hp] at h1; exact h1
-    · exact Finset.le_inf' h _ fun b hb => hS.1 b hb
+    · exact Finset.le_inf' h _ fun b hb => hS.x_nonneg b hb
   · refine le_antisymm ?_ ?_
     · rw [hq] at h2; exact h2
-    · exact Finset.le_inf' h _ fun b hb => hS.2.2.1 b hb
+    · exact Finset.le_inf' h _ fun b hb => hS.y_nonneg b hb
 
 /-- **Re-anchoring fixes anchored sets.** -/
 lemma reanchor_eq_self {S : Finset (ℤ × ℤ)} (hS : Anchored S) : reanchor S = S := by
@@ -329,8 +321,8 @@ lemma isCanonicalAnimal_reanchor {n : ℕ} {S : Finset (ℤ × ℤ)} (hS : IsCan
   have hne : (S.image (D4.toFun g)).Nonempty := hS.nonempty.image _
   refine ⟨?_, ?_, reanchor_anchored hne⟩
   · rw [reanchor_card, Finset.card_image_of_injective _ (D4.toFun_injective g)]
-    exact hS.1
-  · exact kingConnected_reanchor (kingConnected_image (fun _ _ => D4.toFun_kingAdj g) hS.2.1)
+    exact hS.card
+  · exact kingConnected_reanchor (kingConnected_image (fun _ _ => D4.toFun_kingAdj g) hS.conn)
 
 /-- The canonical animals of `n` cells, as a set. -/
 def CA (n : ℕ) : Set (Finset (ℤ × ℤ)) := {S | IsCanonicalAnimal n S}
@@ -376,7 +368,7 @@ instance instMulActionD4CA (n : ℕ) : MulAction D4 (CA n) where
     have hid : S.1.image (D4.toFun 1) = S.1 := by
       rw [show D4.toFun 1 = id from funext fun p => D4.toFun_one p]
       exact Finset.image_id
-    rw [hid, reanchor_eq_self S.2.2.2]
+    rw [hid, reanchor_eq_self S.2.anchored]
   mul_smul g g' S := by
     refine Subtype.ext ?_
     rw [smul_CA_val, smul_CA_val, smul_CA_val,

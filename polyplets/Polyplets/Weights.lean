@@ -62,12 +62,12 @@ filtered enumerations below.) -/
 lemma canonical_mem_powersetCard_box {n H : ℕ} {S : Finset (ℤ × ℤ)}
     (h : IsCanonical n H S) : S ∈ (box n H).powersetCard n := by
   rw [Finset.mem_powersetCard]
-  refine ⟨fun p hp => ?_, h.1⟩
+  refine ⟨fun p hp => ?_, h.card⟩
   rw [mem_box]
   have hx1 := canonical_x_le h hp
-  have hx0 := h.2.2.1 p hp
-  have hy0 := h.2.2.2.2.1 p hp
-  have hy1 := h.2.2.2.2.2.2.1 p hp
+  have hx0 := h.anchored.x_nonneg p hp
+  have hy0 := h.anchored.y_nonneg p hp
+  have hy1 := h.y_le p hp
   omega
 
 /-- **Walk-top canonical sets**: the canonical `(n = H + k, H)` animals whose
@@ -174,36 +174,66 @@ in total (so the cluster has `ℓ + j` cells — surplus `j`); and the whole
 king-connected. Everything is encoded as the single finset
 `S = {p} ∪ C ∪ {q}` and read off its row profile. Positions are relative to
 `p`, pinned at the origin — there is deliberately **no x-anchoring clause**. -/
-def IsVConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop :=
-  S.card = ℓ + j + 2 ∧
-  ((0 : ℤ), (0 : ℤ)) ∈ S ∧
-  (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ) + 1) ∧
-  rowSize S 0 = 1 ∧
-  rowSize S ((ℓ : ℤ) + 1) = 1 ∧
-  (∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)) ∧
-  KingConnected S
+structure IsVConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+  /-- `ℓ + j + 2` cells: the cluster's `ℓ + j`, plus `p` and `q`. -/
+  card : S.card = ℓ + j + 2
+  /-- The fixed walk cell `p = (0, 0)`. -/
+  origin : ((0 : ℤ), (0 : ℤ)) ∈ S
+  /-- Everything on rows `0 … ℓ + 1`. -/
+  rows : ∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ) + 1
+  /-- Row `0` is the walk cell alone. -/
+  row_zero : rowSize S 0 = 1
+  /-- Row `ℓ + 1` is the free walk cell `q` alone. -/
+  row_top : rowSize S ((ℓ : ℤ) + 1) = 1
+  /-- The cluster rows `1 … ℓ` each hold at least two cells. -/
+  multi : ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)
+  /-- King-connected. -/
+  conn : KingConnected S
+
+/-- `IsVConfig` as a conjunction (for decidability). -/
+lemma isVConfig_iff_and {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
+    IsVConfig ℓ j S ↔ S.card = ℓ + j + 2 ∧ ((0 : ℤ), (0 : ℤ)) ∈ S ∧
+      (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ) + 1) ∧ rowSize S 0 = 1 ∧
+      rowSize S ((ℓ : ℤ) + 1) = 1 ∧ (∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)) ∧
+      KingConnected S :=
+  ⟨fun h => ⟨h.card, h.origin, h.rows, h.row_zero, h.row_top, h.multi, h.conn⟩,
+   fun ⟨a, b, c, d, e, f, g⟩ => ⟨a, b, c, d, e, f, g⟩⟩
 
 /-- `S` is a **Vᵗ-configuration** for `(ℓ, j)` — the peeled data of the
 multi-top case of the c-identity: a V-configuration without the free walk cell
 `q` (the cluster caps the animal), hence `ℓ + j + 1` cells on rows `0..ℓ`. -/
-def IsVtConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop :=
-  S.card = ℓ + j + 1 ∧
-  ((0 : ℤ), (0 : ℤ)) ∈ S ∧
-  (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ)) ∧
-  rowSize S 0 = 1 ∧
-  (∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)) ∧
-  KingConnected S
+structure IsVtConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) : Prop where
+  /-- `ℓ + j + 1` cells: the cluster's `ℓ + j`, plus `p`. -/
+  card : S.card = ℓ + j + 1
+  /-- The fixed walk cell `p = (0, 0)`. -/
+  origin : ((0 : ℤ), (0 : ℤ)) ∈ S
+  /-- Everything on rows `0 … ℓ`. -/
+  rows : ∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ)
+  /-- Row `0` is the walk cell alone. -/
+  row_zero : rowSize S 0 = 1
+  /-- The cluster rows `1 … ℓ` each hold at least two cells. -/
+  multi : ∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)
+  /-- King-connected. -/
+  conn : KingConnected S
+
+/-- `IsVtConfig` as a conjunction (for decidability). -/
+lemma isVtConfig_iff_and {ℓ j : ℕ} {S : Finset (ℤ × ℤ)} :
+    IsVtConfig ℓ j S ↔ S.card = ℓ + j + 1 ∧ ((0 : ℤ), (0 : ℤ)) ∈ S ∧
+      (∀ p ∈ S, 0 ≤ p.2 ∧ p.2 ≤ (ℓ : ℤ)) ∧ rowSize S 0 = 1 ∧
+      (∀ i ∈ Finset.Icc 1 ℓ, 2 ≤ rowSize S (i : ℤ)) ∧ KingConnected S :=
+  ⟨fun h => ⟨h.card, h.origin, h.rows, h.row_zero, h.multi, h.conn⟩,
+   fun ⟨a, b, c, d, e, f⟩ => ⟨a, b, c, d, e, f⟩⟩
 
 /-- V-configurations are decidable: decidable cardinality, membership, bounded
 quantifiers, row sizes, and connectivity (`Compute.lean`). -/
 instance decidableIsVConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) :
-    Decidable (IsVConfig ℓ j S) := by
-  unfold IsVConfig; infer_instance
+    Decidable (IsVConfig ℓ j S) :=
+  decidable_of_iff _ isVConfig_iff_and.symm
 
 /-- Vᵗ-configurations are decidable. -/
 instance decidableIsVtConfig (ℓ j : ℕ) (S : Finset (ℤ × ℤ)) :
-    Decidable (IsVtConfig ℓ j S) := by
-  unfold IsVtConfig; infer_instance
+    Decidable (IsVtConfig ℓ j S) :=
+  decidable_of_iff _ isVtConfig_iff_and.symm
 
 /-- **The V-configurations for `(ℓ, j)`**, enumerated computably: choose the
 cluster `C` as an `(ℓ+j)`-subset of the interior window (rows `1..ℓ`,
